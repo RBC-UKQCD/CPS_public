@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Implementation of AlgWline class methods.
 
-  $Id: alg_wline.C,v 1.8 2004-09-02 16:53:12 zs Exp $
+  $Id: alg_wline.C,v 1.9 2004-10-15 05:09:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:53:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v 1.8 2004-09-02 16:53:12 zs Exp $
-//  $Id: alg_wline.C,v 1.8 2004-09-02 16:53:12 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-10-15 05:09:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v 1.9 2004-10-15 05:09:36 chulwoo Exp $
+//  $Id: alg_wline.C,v 1.9 2004-10-15 05:09:36 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_wline.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v $
 //  $State: Exp $
 //
@@ -181,14 +181,14 @@ void AlgWline::run()
  
     if(common_arg->filename != 0){
       FILE *fp;
-//       if( (fp = Fopen(common_arg->filename, "a")) == NULL ) {
-//         ERR.FileA(cname,fname, (char *)common_arg->filename);
-//       }
-//       Fprintf(fp, "%e %e %e %e %e %e %e %e\n",
-//         wline[0].real(), wline[0].imag(),
-//         wline[1].real(), wline[1].imag(),
-//         wline[2].real(), wline[2].imag(),
-//         wline[3].real(), wline[3].imag() );
+       if( (fp = Fopen(common_arg->filename, "a")) == NULL ) {
+         ERR.FileA(cname,fname, (char *)common_arg->filename);
+       }
+       Fprintf(fp, "%e %e %e %e %e %e %e %e\n",
+         wline[0].real(), wline[0].imag(),
+         wline[1].real(), wline[1].imag(),
+         wline[2].real(), wline[2].imag(),
+         wline[3].real(), wline[3].imag() );
       Fclose(fp);
     }
 
