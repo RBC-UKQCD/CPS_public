@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.5 2003-10-23 13:38:59 zs Exp $
+  $Id: gjp.h,v 1.6 2003-10-31 14:15:33 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-10-23 13:38:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.5 2003-10-23 13:38:59 zs Exp $
-//  $Id: gjp.h,v 1.5 2003-10-23 13:38:59 zs Exp $
+//  $Date: 2003-10-31 14:15:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.6 2003-10-31 14:15:33 zs Exp $
+//  $Id: gjp.h,v 1.6 2003-10-31 14:15:33 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //
@@ -50,7 +50,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #ifdef PARALLEL
 CPS_END_NAMESPACE
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 #endif
 

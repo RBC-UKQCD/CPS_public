@@ -1,5 +1,5 @@
-# tests/regression.pl.  Generated from regression.pl.in by configure.
-# $Id: regression.pl,v 1.7 2003-10-23 13:38:59 zs Exp $ 
+# Generated automatically from regression.pl.in by configure.
+# $Id: regression.pl,v 1.8 2003-10-31 14:15:33 zs Exp $ 
 # Note that this shebang line may not work everywhere, as some 
 # Unixies put perl elsewhere, e.g. /usr/bin/perl.
 #
@@ -30,8 +30,8 @@ $error_tol = 0.001;
 if( 'yes' eq 'yes' ) {
 # This makes it run autoconf version:
   $machine = 'i686-pc-linux-gnu';
-  $parallel = 'no';
-  $compiler = 'gcc';
+  $parallel = 'yes';
+  $compiler = '@CC@';
   $executable = "regression_cps.x";
 } else {
 # This is right for the parallel QCDSP version:

@@ -11,7 +11,7 @@
 # cps code.
 TOP=../../..
 
-COMPILER = g++
+COMPILER = mpic++
 LDFLAGS = -lm
 
 
@@ -39,7 +39,7 @@ CFLAGS= -DTARGET_QCDSP=$(TARGET_QCDSP)  -O2
 # Libraries for the Columbia code
 #
 
-LINLIB = $(TOP)/cps++
+LINLIB = "$(TOP)/cps++"
 LIBLIST =\
   $(LINLIB)/cps.a \
 
@@ -65,4 +65,3 @@ clean:
 	rm -f *.dat *.o  regression_cps.x 
 	rm -f ../regressions/*$(me).dat
 	rm -f ../regressions/*$(me).checklog
-

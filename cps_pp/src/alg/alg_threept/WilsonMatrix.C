@@ -4,40 +4,12 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/WilsonMatrix.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: WilsonMatrix.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2003-10-31 14:15:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/WilsonMatrix.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+//  $Id: WilsonMatrix.C,v 1.3 2003-10-31 14:15:33 zs Exp $
 //  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.4  2001/07/03 17:00:46  anj
-//
-//  Multiple minor alterations to change some #include's from referring to
-//  files relative to the top-level source directory to referring to files
-//  relative to the source-file positions.  This alteration makes the code
-//  backwards compatable with the make structure of QCDSP, although this
-//  may have to be changed to a more usual form in the future. Anj.
-//
-//  Revision 1.3  2001/06/21 15:40:10  anj
-//  Updated the _TARTAN ifdefs, using PARALLEL instead (where appropriate).Anj
-//
-//  Revision 1.2  2001/06/19 18:11:32  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:00  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: WilsonMatrix.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/WilsonMatrix.C,v $
 //  $State: Exp $
 //
@@ -58,7 +30,7 @@ CPS_START_NAMESPACE
 #ifdef PARALLEL
 CPS_END_NAMESPACE
 #include <comms/glb.h>
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 #endif
 

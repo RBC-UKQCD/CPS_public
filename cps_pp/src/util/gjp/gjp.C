@@ -3,68 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.4 2003-10-23 13:38:59 zs Exp $
+  $Id: gjp.C,v 1.5 2003-10-31 14:15:33 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-10-23 13:38:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.4 2003-10-23 13:38:59 zs Exp $
-//  $Id: gjp.C,v 1.4 2003-10-23 13:38:59 zs Exp $
+//  $Date: 2003-10-31 14:15:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.5 2003-10-31 14:15:33 zs Exp $
+//  $Id: gjp.C,v 1.5 2003-10-31 14:15:33 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.3.6.1  2003/08/29 15:56:31  zs
-//  First draft of the asqtad fermion force stuff - it compiles at least!
-//
-//  Revision 1.3  2003/08/12 16:22:51  zs
-//  Added Asqtad action parameters.
-//
-//  Revision 1.7  2001/08/01 12:11:29  anj
-//  Minor alteration to allow the serial RNG seed to be set from config.h,
-//  via a #define. Anj.
-//
-//  Revision 1.6  2001/07/03 17:01:02  anj
-//
-//  Multiple minor alterations to change some #include's from referring to
-//  files relative to the top-level source directory to referring to files
-//  relative to the source-file positions.  This alteration makes the code
-//  backwards compatable with the make structure of QCDSP, although this
-//  may have to be changed to a more usual form in the future. Anj.
-//
-//  Revision 1.5  2001/06/25 16:44:38  anj
-//  Fixed the problems due to sizes of the local data.  The MPI layer was
-//  set up for 4-byte data, but I was trying to use 8-byte data locally.
-//  Globals have been set to 8, and locals to 4, which should work just
-//  fine now. Anj.
-//
-//  CVS:----------------------------------------------------------------------
-//  CVS:----------------------------------------------------------------------
-//
-//  Revision 1.4  2001/06/22 12:31:49  anj
-//  Variations for debugging purposes. Anj.
-//
-//  Revision 1.3  2001/06/21 09:20:35  anj
-//  *** empty log message ***
-//
-//  Revision 1.2  2001/06/19 18:13:16  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:08  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -105,7 +56,7 @@ CPS_START_NAMESPACE
 
 #ifdef PARALLEL
 CPS_END_NAMESPACE
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 #else
 CPS_END_NAMESPACE

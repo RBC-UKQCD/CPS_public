@@ -3,53 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: dirac.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-10-31 14:15:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac.C,v 1.2 2003-10-31 14:15:33 zs Exp $
+//  $Id: dirac.C,v 1.2 2003-10-31 14:15:33 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.5  2001/08/16 10:50:21  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.3  2001/06/28 14:34:22  anj
-//
-//  The core ANSIfication should now be complete.  There are a few
-//  remaining issues, but this version should compile anywhere and be
-//  backward compatable with QCDSP (although this requires the top source
-//  directory (.../phys/ to be added to the include path).
-//
-//  The serial GCC version has also been tested, and all test programs
-//  appear to behave as they should (not to imply that they all work, but
-//  I believe those that should work are ok).  There are minor differences
-//  in the results due to rounding, (see example pbp_gccsun.dat files),
-//  but that is all.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/06/19 18:12:46  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:06  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: dirac.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac.C,v $
 //  $State: Exp $
 //
@@ -71,7 +32,7 @@ CPS_END_NAMESPACE
 #include<util/lattice.h>
 #include<util/dirac_op.h>
 #include<util/vector.h>
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

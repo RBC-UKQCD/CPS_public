@@ -3,30 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp_hdw/global_sum_init.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: global_sum_init.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-10-31 14:15:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp_hdw/global_sum_init.C,v 1.2 2003-10-31 14:15:33 zs Exp $
+//  $Id: global_sum_init.C,v 1.2 2003-10-31 14:15:33 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.2  2001/06/19 18:12:03  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:02  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: global_sum_init.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp_hdw/global_sum_init.C,v $
 //  $State: Exp $
 //
@@ -89,7 +73,7 @@ inline unsigned int bitCode(unsigned int wire)
 // void global_sum_init(int, int) 
 //--------------------------------------------------------------------------
 CPS_END_NAMESPACE
-#include <sysfunc.h>                   // SizeT() and etc.
+#include <comms/sysfunc.h>                   // SizeT() and etc.
 CPS_START_NAMESPACE
 void global_sum_init(int fast_mode, int max_num_try)
 {

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the DoArg structure.
   
-  $Id: do_arg.h,v 1.5 2003-10-23 13:38:58 zs Exp $
+  $Id: do_arg.h,v 1.6 2003-10-31 14:15:33 zs Exp $
 */
 //--------------------------------------------------------------------
 /* CIM Sun Jul  6 23:30:27 GMT 1997 */
@@ -34,7 +34,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #ifdef PARALLEL
 CPS_END_NAMESPACE
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 #endif
 

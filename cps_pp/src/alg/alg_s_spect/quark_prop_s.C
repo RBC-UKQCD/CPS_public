@@ -4,48 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.2 2003-07-24 16:53:53 zs Exp $
-//  $Id: quark_prop_s.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Date: 2003-10-31 14:15:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+//  $Id: quark_prop_s.C,v 1.3 2003-10-31 14:15:33 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.6  2001/08/16 10:49:41  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.4  2001/07/03 17:00:45  anj
-//
-//  Multiple minor alterations to change some #include's from referring to
-//  files relative to the top-level source directory to referring to files
-//  relative to the source-file positions.  This alteration makes the code
-//  backwards compatable with the make structure of QCDSP, although this
-//  may have to be changed to a more usual form in the future. Anj.
-//
-//  Revision 1.3  2001/06/21 15:40:10  anj
-//  Updated the _TARTAN ifdefs, using PARALLEL instead (where appropriate).Anj
-//
-//  Revision 1.2  2001/06/19 18:11:31  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:00  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: quark_prop_s.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v $
 //  $State: Exp $
 //
@@ -64,7 +29,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #ifdef PARALLEL
 CPS_END_NAMESPACE
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 #endif
 CPS_END_NAMESPACE

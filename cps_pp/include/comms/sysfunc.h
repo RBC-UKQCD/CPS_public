@@ -1,10 +1,15 @@
 #include<config.h>
+
+#if defined TARGET_QCDSP
+#include <sysfunc.h>
+#else
+
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 /*!\file
   \brief  Declarations for the MPI implementation of the QCDSP/QCDOC communications  layer.
   
-  $Id: sysfunc.h,v 1.3 2003-10-27 16:45:38 zs Exp $
+  $Id: sysfunc.h,v 1.4 2003-10-31 14:15:33 zs Exp $
 */
 /*----------------------------------------------------------------------
   The Sysfunc Comms Interface: sysfunc.h
@@ -17,13 +22,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2003-10-27 16:45:38 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v 1.3 2003-10-27 16:45:38 zs Exp $
-  $Id: sysfunc.h,v 1.3 2003-10-27 16:45:38 zs Exp $
+  $Date: 2003-10-31 14:15:33 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v 1.4 2003-10-31 14:15:33 zs Exp $
+  $Id: sysfunc.h,v 1.4 2003-10-31 14:15:33 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.h,v $
-  $Revision: 1.3 $
+  $Revision: 1.4 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -187,3 +192,4 @@ unsigned int SCUReadSeedFile( void );
 
 
 CPS_END_NAMESPACE
+#endif
