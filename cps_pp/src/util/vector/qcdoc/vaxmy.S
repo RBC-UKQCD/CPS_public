@@ -11,15 +11,14 @@
 .globl vaxmy
 vaxmy:
 
-	or    %r12 , %r3 , %r3
-	la   %r1,	-864(%r1)
-	or    %r10 , %r5 , %r5
-	or    %r11 , %r6 , %r6
-	or    %r13 , %r7 , %r7
-	stw   %r14,	368(%r1)
+	or    %r10 , %r4 , %r4
+	la   %r1,	-736(%r1)
+	or    %r11 , %r5 , %r5
+	or    %r13 , %r6 , %r6
 	or.  %r13 , %r13 , %r13
+	stw   %r14,	368(%r1)
 	stw   %r15,	376(%r1)
-	or    %r14 , %r4 , %r4
+	or    %r14 , %r3 , %r3
 	stw   %r16,	384(%r1)
 	stw   %r17,	392(%r1)
 	stw   %r18,	400(%r1)
@@ -55,50 +54,53 @@ vaxmy:
 	stfd  30,	240(%r1)
 	stfd  31,	248(%r1)
 	lfd   0,	0(%r14)
-	li   %r16,128
-	li   %r17,160
+	li   %r16,32
+	li   %r17,64
 	bf gt,  vaxmy_lab0
 	lfd   1,	0(%r10)
 	lfd   7,	0(%r11)
 	lfd   2,	8(%r10)
 	lfd   8,	8(%r11)
+	lfd   3,	16(%r10)
+	lfd   9,	16(%r11)
+	lfd   4,	24(%r10)
+	lfd   10,	24(%r11)
 	mtctr 	%r13
 	b       vaxmy_lab1
 .align 4
 vaxmy_lab1:
-	addi  %r15 , %r12 , 0
-	lfd   3,	16(%r10)
-	fmsub  13 , 0 , 1 , 7
-	lfd   9,	16(%r11)
-	fmsub  14 , 0 , 2 , 8
-	dcbt 	%r16,%r10
-	lfd   4,	24(%r10)
-	lfd   10,	24(%r11)
+	addi  %r15 , %r11 , 0
 	lfd   5,	32(%r10)
+	fmsub  13 , 0 , 1 , 7
+	lfd   11,	32(%r11)
+	fmsub  14 , 0 , 2 , 8
+	lfd   6,	40(%r10)
+	fmsub  15 , 0 , 3 , 9
+	lfd   12,	40(%r11)
+	fmsub  16 , 0 , 4 , 10
+	la   %r10,	48(%r10)
+	la   %r11,	48(%r11)
 	stfd  13,	0(%r15)
 	stfd  14,	8(%r15)
-	fmsub  15 , 0 , 3 , 9
-	dcbt 	%r17,%r10
-	lfd   11,	32(%r11)
-	lfd   6,	40(%r10)
-	fmsub  16 , 0 , 4 , 10
-	lfd   12,	40(%r11)
-	la   %r10,	48(%r10)
-	stfd  15,	16(%r15)
-	dcbt 	%r16,%r11
-	la   %r12,	48(%r12)
 	fmsub  17 , 0 , 5 , 11
+	stfd  15,	16(%r15)
 	stfd  16,	24(%r15)
-	lfd   1,	0(%r10)
 	fmsub  18 , 0 , 6 , 12
+	dcbt 	%r16,%r10
+	lfd   1,	0(%r10)
+	lfd   7,	0(%r11)
+	stfd  17,	32(%r15)
 	lfd   2,	8(%r10)
+	stfd  18,	40(%r15)
+	dcbt 	%r17,%r10
+	lfd   8,	8(%r11)
+	lfd   3,	16(%r10)
+	lfd   9,	16(%r11)
+	lfd   4,	24(%r10)
+	lfd   10,	24(%r11)
+	dcbt 	%r16,%r11
 	la   %r13,	-1(%r13)
 	dcbt 	%r17,%r11
-	stfd  17,	32(%r15)
-	la   %r11,	48(%r11)
-	stfd  18,	40(%r15)
-	lfd   7,	0(%r11)
-	lfd   8,	8(%r11)
 	bdnz    vaxmy_lab1
 vaxmy_lab0:
 	lwz   %r14,	368(%r1)
@@ -137,5 +139,5 @@ vaxmy_lab0:
 	lfd   29,	232(%r1)
 	lfd   30,	240(%r1)
 	lfd   31,	248(%r1)
-	la   %r1,	864(%r1)
+	la   %r1,	736(%r1)
 	blr

@@ -5,19 +5,10 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.3 2004-06-04 21:14:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.3 2004-06-04 21:14:05 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.3 2004-06-04 21:14:05 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -181,53 +172,21 @@ int DiracOp::InvCg(Vector *out,
 // Calculate stopping condition
 //------------------------------------------------------------------
   stp_cnd = src_norm_sq * dirac_arg->stop_rsd * dirac_arg->stop_rsd;
-  VRB.Flow(cname,fname, 
-	   "stp_cnd =%e\n", IFloat(stp_cnd));
-
-// Make IFloat pointers out of Vector pointers
-//------------------------------------------------------------------
-  IFloat *f_sol = (IFloat *) sol; 
-  IFloat *f_dir = (IFloat *) dir; 
-  IFloat *f_res = (IFloat *) res; 
-  IFloat *f_mmp = (IFloat *) mmp; 
-
-// Calculate the cram buffers size (must divide f_size_cb exactly)
-//------------------------------------------------------------------
-  int cram_buf_size = CRAM_SCRATCH_SIZE / 2;
-  for(i=0; i< CRAM_SCRATCH_SIZE / 2; i++){
-    cram_buf_size = cram_buf_size - i;
-    if(f_size_cb % cram_buf_size == 0) break;
-  }
-  int cram_buf_size_sof = cram_buf_size * sizeof(Float);
-  int cram_blocks = f_size_cb / cram_buf_size;
-
-// Set pointers to two cram buffers
-//------------------------------------------------------------------
-#ifdef _TARTAN
-  IFloat *cram_a = (IFloat *) CRAM_SCRATCH_ADDR;
-  IFloat *cram_b = (IFloat *) (CRAM_SCRATCH_ADDR + cram_buf_size);
-#else
-  IFloat cram_a[CRAM_SCRATCH_SIZE/2];
-  IFloat cram_b[CRAM_SCRATCH_SIZE/2];
-#endif
-
-
+  VRB.Flow(cname,fname, "stp_cnd =%e\n", IFloat(stp_cnd));
 
 #ifdef REPRODUCE_TEST 
   
 // Allocate space for storing solution
 //------------------------------------------------------------------
   Vector *sol_store = (Vector *) smalloc(f_size_cb * sizeof(Float));
-  if(sol_store == 0)
-    ERR.Pointer(cname,fname, "sol_store");
+  if(sol_store == 0) ERR.Pointer(cname,fname, "sol_store");
   VRB.Smalloc(cname,fname, "sol_store", sol_store, f_size_cb * sizeof(Float));
 
 // Allocate space for storing d
 //------------------------------------------------------------------
   Float *d_store = (Float *) smalloc( dirac_arg->max_num_iter-1 * sizeof(Float));
 
-  if(d_store == 0)
-    ERR.Pointer(cname,fname, "d_store");
+  if(d_store == 0) ERR.Pointer(cname,fname, "d_store");
   VRB.Smalloc(cname,fname, "d_store", d_store, dirac_arg->max_num_iter-1 * sizeof(Float));
 
   for ( int n = 0; n < dirac_arg->max_num_iter-1; n++ )  d_store[n] = 0;
@@ -263,6 +222,7 @@ int DiracOp::InvCg(Vector *out,
 
   // res_norm_sq_cur = res * res
   res_norm_sq_cur = res->NormSqNode(f_size_cb);
+
   DiracOpGlbSum(&res_norm_sq_cur);
 
   // if( |res|^2 <= stp_cnd ) we are done
@@ -279,7 +239,7 @@ int DiracOp::InvCg(Vector *out,
 //------------------------------------------------------------------
   for(i=0; i < max_itr; i++){
     timeval start,end;
-    itr = itr + 1;
+    itr++;
     res_norm_sq_prv = res_norm_sq_cur;
 
     // mmp = MatPcDagMatPc * dir
@@ -309,34 +269,24 @@ int DiracOp::InvCg(Vector *out,
 
     a = res_norm_sq_prv / d;
 
-    // PAB. 
-    // Finally get rid of the annoying Cbuf crap 
-    // that should have been hidden deep inside
-    // FTimesV1PlusV2.
     // sol = a * dir + sol;
     //sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
     vaxpy3(sol,&a,dir,sol,f_size_cb/6);
 
-    //PAB. Should be able to use "vaxpy_norm here"
     // res = - a * (MatPcDagMatPc * dir) + res;
     // res_norm_sq_cur = res * res
 
-    //res->FTimesV1PlusV2(-a, mmp, res, f_size_cb);
-    //res_norm_sq_cur = res->NormSqNode(f_size_cb);
-
-    double ma = -a;
-    vaxpy3_norm(res,&ma,mmp,res,f_size_cb/6,&res_norm_sq_cur);
+    a *= -1.0;
+    vaxpy3_norm(res,&a,mmp,res,f_size_cb/6,&res_norm_sq_cur);
     DiracOpGlbSum(&res_norm_sq_cur);
 
     // if( |res|^2 <= stp_cnd ) we are done
-    VRB.Flow(cname,fname,
-	     "|res[%d]|^2 = %e\n", itr, IFloat(res_norm_sq_cur));
+    VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", itr, IFloat(res_norm_sq_cur));
     if(res_norm_sq_cur <= stp_cnd) break;
 
     b = res_norm_sq_cur / res_norm_sq_prv;
 
     // dir = b * dir + res;
-    //dir->FTimesV1PlusV2(b, dir, res, f_size_cb);
     vaxpy3(dir,&b,dir,res,f_size_cb/6);
 #ifdef PROFILE
     gettimeofday(&end,NULL);
@@ -347,8 +297,7 @@ int DiracOp::InvCg(Vector *out,
 
   // It has not reached stp_cnd: Issue a warning
   if(itr == dirac_arg->max_num_iter - 1){
-    VRB.Warn(cname,fname,
-	      "CG reached max iterations = %d. |res|^2 = %e\n",
+    VRB.Warn(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
 	     itr+1, IFloat(res_norm_sq_cur) );
   }
 

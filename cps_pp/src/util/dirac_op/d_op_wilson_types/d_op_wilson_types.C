@@ -3,19 +3,15 @@ CPS_START_NAMESPACE
 /*! \file
   \brief Definition of DiracOpWilsonTypes class constructor and destructor.
   
-  $Id: d_op_wilson_types.C,v 1.4 2004-06-04 21:14:12 chulwoo Exp $
+<<<<<<< d_op_wilson_types.C
+  $Id: d_op_wilson_types.C,v 1.5 2004-06-07 20:27:11 mclark Exp $
+=======
+  $Id: d_op_wilson_types.C,v 1.5 2004-06-07 20:27:11 mclark Exp $
+>>>>>>> 1.3.6.1
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.C,v 1.4 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: d_op_wilson_types.C,v 1.4 2004-06-04 21:14:12 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: d_op_wilson_types.C,v $
-//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.C,v $
 //  $State: Exp $
 //
@@ -138,6 +134,7 @@ int DiracOpWilsonTypes::RitzLatSize() {
 
   case MATPC_HERM:
   case MATPCDAG_MATPC:
+  case NEG_MATPCDAG_MATPC:
     f_size >>= 1;
     break;
 
@@ -160,26 +157,30 @@ void DiracOpWilsonTypes::RitzMat(Vector *out, Vector *in) {
   VRB.Func(cname,fname);
 
   switch(dirac_arg->RitzMatOper)
-  {
-  case MAT_HERM:
-  case MATDAG_MAT:
-    MatDagMat(out, in);
-    break;
+    {
+    case MAT_HERM:
+    case MATDAG_MAT:
+      MatDagMat(out, in);
+      break;
+      
+    case MATPCDAG_MATPC:
+      MatPcDagMatPc(out, in);
+      break;
 
-//  case MATPC_HERM:
-//  case MATPCDAG_MATPC:
-//    MatDagPcMatPc(out, in);
-//    break;
-
-  case NEG_MATDAG_MAT:
-    MatDagMat(out, in);
-    out->VecNegative(out, RitzLatSize());
-    break;
-
-  default:
-    ERR.General(cname,fname,"RitzMatOper %d not implemented",
-		dirac_arg->RitzMatOper);
-  }
+    case NEG_MATPCDAG_MATPC:
+      MatPcDagMatPc(out, in);
+      out -> VecNegative(out, RitzLatSize());
+      break;    
+      
+    case NEG_MATDAG_MAT:
+      MatDagMat(out, in);
+      out->VecNegative(out, RitzLatSize());
+      break;
+      
+    default:
+      ERR.General(cname,fname,"RitzMatOper %d not implemented",
+		  dirac_arg->RitzMatOper);
+    }
 }
 
 //------------------------------------------------------------------
@@ -202,18 +203,19 @@ void DiracOpWilsonTypes::RitzEigMat(Vector *out, Vector *in) {
     MatDagMat(out, in);
     break;
 
-//  case MATPCDAG_MATPC:
-//    MatDagPcMatPc(out, in);
-    //   break;
+  case MATPCDAG_MATPC:
+    MatPcDagMatPc(out, in);
+    break;
+
+  case NEG_MATPCDAG_MATPC:
+    MatPcDagMatPc(out, in);
+    out->VecNegative(out, RitzLatSize());
+    break;
 
   case NEG_MATDAG_MAT:
     MatDagMat(out, in);
     out->VecNegative(out, RitzLatSize());
     break;
-
-//  case MATPC_HERM:
-    // This is not implemented (or defined)
-    // MatPcHerm(out, in);
 
   default:
     ERR.General(cname,fname,"RitzMatOper %d not implemented",

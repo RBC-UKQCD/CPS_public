@@ -3,13 +3,6 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdoc/d_op_stag.C,v 1.4 2004-06-04 21:14:06 chulwoo Exp $
-//  $Id: d_op_stag.C,v 1.4 2004-06-04 21:14:06 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdoc/d_op_stag.C,v $
 //  $State: Exp $
 //
@@ -39,12 +32,10 @@ CPS_END_NAMESPACE
 #include<mem/p2v.h>
 CPS_START_NAMESPACE
 
-/*
-const unsigned CBUF_MODE1 = 0xcb911548;
-const unsigned CBUF_MODE2 = 0xcca52112;
-const unsigned CBUF_MODE3 = 0xc98c6106;
-const unsigned CBUF_MODE4 = 0xcca52112;
-*/
+extern "C"{
+  void vaxmy(Float *scale,Vector *mult,Vector *sub,int ncvec);
+  void vaxmy_vxdot(Float *scale, Vector *mult, Vector *sub, int ncvec, Float *norm);
+}
 
 //------------------------------------------------------------------
 // Constructor
@@ -140,16 +131,15 @@ DiracOpStag::~DiracOpStag() {
 // It sets the dirac_arg pointer to arg and initializes
 // mass_sq = 4 * mass^2.
 //------------------------------------------------------------------
-  void DiracOpStag::DiracArg(CgArg *arg){
-    dirac_arg = arg;
-
-    // Added for anisotropic lattices
-    //------------------------------------------------------------------
-    mass_rs = dirac_arg->mass * GJP.XiBare()/GJP.XiV();
-    mass_sq = 4 * mass_rs * mass_rs;
-    // End modification
-
-  }
+void DiracOpStag::DiracArg(CgArg *arg){
+  dirac_arg = arg;
+  
+  // Added for anisotropic lattices
+  //------------------------------------------------------------------
+  mass_rs = dirac_arg->mass * GJP.XiBare()/GJP.XiV();
+  mass_sq = 4 * mass_rs * mass_rs;
+  // End modification
+}
 
 
 //------------------------------------------------------------------
@@ -165,19 +155,12 @@ DiracOpStag::~DiracOpStag() {
 void DiracOpStag::MatPcDagMatPc(Vector *out, 
 			       Vector *in, 
 			       Float *dot_prd){
-/* SUI
-  setCbufCntrlReg(1, CBUF_MODE1);
-  setCbufCntrlReg(2, CBUF_MODE2);
-  setCbufCntrlReg(3, CBUF_MODE3);
-  setCbufCntrlReg(4, CBUF_MODE4);
-   SUI */ 
   stag_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
   stag_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
-  out->FTimesV1MinusV2(mass_sq, in, out, f_size_cb);
 
-  if( dot_prd !=0 ){
-    *dot_prd = dotProduct((IFloat *) in, (IFloat *) out, f_size_cb);
-  }
+  if( dot_prd !=0 ) vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);
+  else vaxmy(&mass_sq,in,out,f_size_cb/6);
+
 }
 
 
@@ -192,16 +175,7 @@ void DiracOpStag::Dslash(Vector *out,
 				  Vector *in, 
 				  ChkbType cb, 
 				  DagType dag) {
-/* SUI
-  setCbufCntrlReg(1, CBUF_MODE1);
-  setCbufCntrlReg(2, CBUF_MODE2);
-  setCbufCntrlReg(3, CBUF_MODE3);
-  setCbufCntrlReg(4, CBUF_MODE4);
-   SUI */
-  stag_dirac((IFloat *)out, 
-	(IFloat *)in, 
-	int(cb),
-	int(dag));
+  stag_dirac((IFloat *)out, (IFloat *)in, int(cb), int(dag));
 }
 
 
@@ -372,12 +346,6 @@ int DiracOpStag::MatInv(Vector *out,
   char *fname = "MatInv(V*,V*,F*)";
   VRB.Func(cname,fname);
 
-/* SUI
-  setCbufCntrlReg(1, CBUF_MODE1);
-  setCbufCntrlReg(2, CBUF_MODE2);
-  setCbufCntrlReg(3, CBUF_MODE3);
-  setCbufCntrlReg(4, CBUF_MODE4);
-   SUI */
   IFloat *k_e = (IFloat *)in;
   IFloat *k_o = k_e+f_size_cb;
 

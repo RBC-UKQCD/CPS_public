@@ -3,19 +3,10 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.3 2004-06-04 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_dwf_base/f_dwf_base.C,v 1.3 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: f_dwf_base.C,v 1.3 2004-06-04 21:14:12 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: f_dwf_base.C,v $
-//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_dwf_base/f_dwf_base.C,v $
 //  $State: Exp $
 //
@@ -194,6 +185,41 @@ int FdwfBase::FmatEvlInv(Vector *f_out, Vector *f_in,
 		     CgArg *cg_arg, 
 		     CnvFrmType cnv_frm)
 { return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
+
+
+//------------------------------------------------------------------
+// int FmatEvlMInv(Vector **f_out, Vector *f_in, 
+//                Float shift[], int Nshift, 
+//                CgArg *cg_arg, Float *true_res,
+//		  CnvFrmType cnv_frm = CNV_FRM_YES):
+// It calculates f_out where (A + shift)* f_out = f_in and
+// A is the fermion matrix that appears in the HMC 
+// evolution ([Dirac^dag Dirac]) and shift is a real shift of the 
+// fermion matrix, with Nshift such shifts. The inversion is done 
+// with the multishift conjugate gradient. cg_arg is the structure
+// that contains all the control parameters, f_in is the
+// fermion field source vector, f_out is the array of solution 
+// vectors, f_in and f_out are defined on a checkerboard.
+// The function returns the total number of CG iterations.
+//------------------------------------------------------------------
+int FdwfBase::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+			  int Nshift, int isz, CgArg *cg_arg, 
+			  CnvFrmType cnv_frm, MultiShiftSolveType type, 
+			  Float *alpha, Vector **f_out_d)
+{
+  int iter;
+  char *fname = "FmatMInv(V**, V*, .....)";
+  VRB.Func(cname,fname);
+
+  int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
+  Float dot = f_in -> NormSqGlbSum(f_size);
+  Float RsdCG[Nshift];
+  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
+
+  //Fake the constructor
+  DiracOpDwf dwf(*this, f_out[0], f_in, cg_arg, cnv_frm);
+  return dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+}
 
 
 //------------------------------------------------------------------
@@ -468,7 +494,7 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float lambda[],
   DiracOpDwf dwf(*this, v1, v2, &cg_arg, CNV_FRM_NO);
   
   iter = dwf.RitzEig(f_eigenv, lambda, valid_eig, eig_arg);
-  
+ 
   if(cnv_frm == CNV_FRM_YES)
     for(int i=0; i < N_eig; ++i)
       Fconvert(f_eigenv[i], CANONICAL, StrOrd());
@@ -476,19 +502,19 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float lambda[],
   // rescale eigenvalues to normal convention
   Float factor = 5. - GJP.DwfHeight();
   int i;
-  for(i=0; i<N_eig; ++i)
-    lambda[i] *= factor;
+  //for(i=0; i<N_eig; ++i)
+  //lambda[i] *= factor;
 
   // calculate chirality
-  int f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents()*sizeof(Float);
-  Vector *four = (Vector *) smalloc (f_size);
+  int f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents();
+  Vector *four = (Vector *) smalloc (f_size * sizeof(Float));
   if (four == 0)
     ERR.Pointer (cname, fname, "four");
-  VRB.Smalloc (cname,fname, "four", four, f_size);
-  Vector *fourg5 = (Vector *) smalloc (f_size);
+  VRB.Smalloc (cname,fname, "four", four, f_size * sizeof(Float));
+  Vector *fourg5 = (Vector *) smalloc (f_size * sizeof(Float));
   if (fourg5 == 0)
     ERR.Pointer (cname, fname, "fourg5");
-  VRB.Smalloc (cname,fname, "fourg5", fourg5, f_size);
+  VRB.Smalloc (cname,fname, "fourg5", fourg5, f_size * sizeof(Float));
   Float help;
 
   for (i=0; i<N_eig; i++) {
@@ -499,7 +525,6 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float lambda[],
     glb_sum(&factor);
     factor=1./sqrt(factor);
     four->VecTimesEquFloat(factor,f_size);
-
     Gamma5(fourg5,four,GJP.VolNodeSites());
     chirality[i]= four->ReDotProductNode(fourg5, f_size);
     glb_sum(&chirality[i]);
@@ -812,6 +837,15 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   return ;
 }
 
+void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+				    Float *alpha, Float mass, Float dt,
+				    Vector **sol_d) {
+  char *fname = "RHMC_EvolveMomFforce";
+
+  for (int i=0; i<degree; i++)
+    EvolveMomFforce(mom,sol[i],mass,dt*alpha[i]);
+
+}
 
 //------------------------------------------------------------------
 // Float FhamiltonNode(Vector *phi, Vector *chi):

@@ -1,18 +1,3 @@
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/noarch/d_op_asqtad.C,v 1.6 2004-06-04 21:14:05 chulwoo Exp $
-//  $Id: d_op_asqtad.C,v 1.6 2004-06-04 21:14:05 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: d_op_asqtad.C,v $
-//  $Revision: 1.6 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/noarch/d_op_asqtad.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // d_op_asqtad.C
@@ -33,6 +18,7 @@
 #include <util/verbose.h>
 #include <util/error.h>
 #include <util/asqtad.h>
+#include <util/time.h>
 #include <comms/cbuf.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
@@ -150,6 +136,12 @@ DiracOpAsqtad::~DiracOpAsqtad() {
 void DiracOpAsqtad::MatPcDagMatPc(Vector *out, 
 			       Vector *in, 
 			       Float *dot_prd){
+  static long nflops = (1158)*GJP.VolNodeSites();
+  struct timeval start,end;
+#undef PROFILE
+#ifdef PROFILE
+  gettimeofday(&start,NULL);
+#endif
 
   asqtad_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
   asqtad_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
@@ -158,6 +150,13 @@ void DiracOpAsqtad::MatPcDagMatPc(Vector *out,
   if( dot_prd !=0 ){
     *dot_prd = dotProduct((IFloat *) in, (IFloat *) out, f_size_cb);
   }
+
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  printf("DiracOpAsqtad::MatPcDagMatPc::\n");
+  print_flops(nflops,&start,&end);
+#endif
+
 }
 
 

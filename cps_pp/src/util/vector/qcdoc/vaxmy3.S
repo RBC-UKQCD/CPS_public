@@ -8,8 +8,8 @@
  */  
 .text
 .align 2
-.globl vaxpy3
-vaxpy3:
+.globl vaxmy3
+vaxmy3:
 
 	or    %r12 , %r3 , %r3
 	la   %r1,	-736(%r1)
@@ -57,7 +57,7 @@ vaxpy3:
 	lfd   0,	0(%r14)
 	li   %r16,32
 	li   %r17,64
-	bf gt,  vaxpy3_lab0
+	bf gt,  vaxmy3_lab0
 	lfd   1,	0(%r10)
 	lfd   7,	0(%r11)
 	lfd   2,	8(%r10)
@@ -67,26 +67,26 @@ vaxpy3:
 	lfd   4,	24(%r10)
 	lfd   10,	24(%r11)
 	mtctr 	%r13
-	b       vaxpy3_lab1
+	b       vaxmy3_lab1
 .align 4
-vaxpy3_lab1:
+vaxmy3_lab1:
 	addi  %r15 , %r12 , 0
 	lfd   5,	32(%r10)
-	fmadd  13 , 0 , 1 , 7
+	fmsub  13 , 0 , 1 , 7
 	lfd   11,	32(%r11)
-	fmadd  14 , 0 , 2 , 8
+	fmsub  14 , 0 , 2 , 8
 	lfd   6,	40(%r10)
-	fmadd  15 , 0 , 3 , 9
+	fmsub  15 , 0 , 3 , 9
 	lfd   12,	40(%r11)
-	fmadd  16 , 0 , 4 , 10
+	fmsub  16 , 0 , 4 , 10
 	la   %r10,	48(%r10)
 	la   %r11,	48(%r11)
 	stfd  13,	0(%r15)
 	stfd  14,	8(%r15)
-	fmadd  17 , 0 , 5 , 11
+	fmsub  17 , 0 , 5 , 11
 	stfd  15,	16(%r15)
 	stfd  16,	24(%r15)
-	fmadd  18 , 0 , 6 , 12
+	fmsub  18 , 0 , 6 , 12
 	la   %r12,	48(%r12)
 	dcbt 	%r16,%r10
 	lfd   1,	0(%r10)
@@ -103,8 +103,8 @@ vaxpy3_lab1:
 	dcbt 	%r16,%r11
 	la   %r13,	-1(%r13)
 	dcbt 	%r17,%r11
-	bdnz    vaxpy3_lab1
-vaxpy3_lab0:
+	bdnz    vaxmy3_lab1
+vaxmy3_lab0:
 	lwz   %r14,	368(%r1)
 	lwz   %r15,	376(%r1)
 	lwz   %r16,	384(%r1)

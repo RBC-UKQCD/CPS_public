@@ -3,19 +3,15 @@ CPS_START_NAMESPACE
  /*! \file
   \brief  Definition of DiracOpWilsonTypes class eigensolver methods.
 
-  $Id: eigen_wilson.C,v 1.4 2004-06-04 21:14:12 chulwoo Exp $
+<<<<<<< eigen_wilson.C
+  $Id: eigen_wilson.C,v 1.5 2004-06-07 20:27:11 mclark Exp $
+=======
+  $Id: eigen_wilson.C,v 1.5 2004-06-07 20:27:11 mclark Exp $
+>>>>>>> 1.3.6.1
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson_types/eigen_wilson.C,v 1.4 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: eigen_wilson.C,v 1.4 2004-06-04 21:14:12 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: eigen_wilson.C,v $
-//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson_types/eigen_wilson.C,v $
 //  $State: Exp $
 //
@@ -364,7 +360,7 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
       n_valid = 0;
     }
 
-    VRB.Result(cname,fname,"Final Result: n_valid=%d  NCG=%g\n",n_valid,NCG_tot); 
+    VRB.Result(cname,fname,"Final Result: n_valid=%d  NCG=%d\n",n_valid,NCG_tot); 
     for(n = 0; n < N_eig; n++)
       VRB.Result(cname,fname,"lambda[%d] = %g\n",n,(IFloat)lambda[n]);
     for(n = 0; n < N_eig; n++)

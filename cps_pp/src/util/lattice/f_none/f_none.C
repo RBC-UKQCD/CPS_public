@@ -3,19 +3,10 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fnone class.
 
-  $Id: f_none.C,v 1.5 2004-06-04 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v 1.5 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: f_none.C,v 1.5 2004-06-04 21:14:12 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: f_none.C,v $
-//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v $
 //  $State: Exp $
 //
@@ -135,26 +126,18 @@ int Fnone::FmatEvlInv(Vector *f_out, Vector *f_in,
   return 0;
 }
 
-
-//------------------------------------------------------------------
-// Overloaded function is same as original but with true_res=0;
-//------------------------------------------------------------------
-// int Fnone::FmatEvlInv(Vector *f_out, Vector *f_in, 
-// 		      CgArg *cg_arg, 
-// 		      CnvFrmType cnv_frm)
-// { return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
-
-
 //------------------------------------------------------------------
 // int FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
 //                 int Nshift, int isz, CgArg *cg_arg, 
-//                 CnvFrmType cnv_frm);
+//                 CnvFrmType cnv_frm, MultiShiftSolveType type,
+//                 Float *alpha);
 // It does nothing and returns 0.
 //------------------------------------------------------------------
 int Fnone::FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
-		       int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
+		       int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm,
+		       MultiShiftSolveType type, Float *alpha, Vector **out_d)
 {
-  char *fname = "FmatEvlMInv(V**,V*,F*,int,int,CgArg*,CnvFrmType)";
+  char *fname = "FmatEvlMInv(V**,V*, .....)";
   VRB.Func(cname,fname);
 
   // Return the number of iterations
@@ -244,6 +227,13 @@ void Fnone::FforceSite(Matrix& force, Vector *frm, int *x, int mu)
 //------------------------------------------------------------------
 void Fnone::EvolveMomFforce(Matrix *mom, Vector *frm, 
 			    Float mass, Float step_size){
+  char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
+  VRB.Func(cname,fname);
+}
+
+void Fnone::RHMC_EvolveMomFforce(Matrix *mom, Vector **frm, int degree, 
+				 Float *alpha, Float mass,  Float step_size,
+				 Vector **frm_d){
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
 }

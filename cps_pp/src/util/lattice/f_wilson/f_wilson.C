@@ -3,19 +3,10 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.6 2004-06-04 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v 1.6 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: f_wilson.C,v 1.6 2004-06-04 21:14:12 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: f_wilson.C,v $
-//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v $
 //  $State: Exp $
 //
@@ -185,6 +176,40 @@ int Fwilson::FmatEvlInv(Vector *f_out, Vector *f_in,
   return iter;
 }
 
+//------------------------------------------------------------------
+// int FmatEvlMInv(Vector **f_out, Vector *f_in, 
+//                Float shift[], int Nshift, 
+//                CgArg *cg_arg, Float *true_res,
+//		  CnvFrmType cnv_frm = CNV_FRM_YES):
+// It calculates f_out where (A + shift)* f_out = f_in and
+// A is the fermion matrix that appears in the HMC 
+// evolution ([Dirac^dag Dirac]) and shift is a real shift of the 
+// fermion matrix, with Nshift such shifts. The inversion is done 
+// with the multishift conjugate gradient. cg_arg is the structure
+// that contains all the control parameters, f_in is the
+// fermion field source vector, f_out is the array of solution 
+// vectors, f_in and f_out are defined on a checkerboard.
+// The function returns the total number of CG iterations.
+//------------------------------------------------------------------
+int Fwilson::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+			 int Nshift, int isz, CgArg *cg_arg,
+			 CnvFrmType cnv_frm, MultiShiftSolveType type, 
+			 Float *alpha, Vector **f_out_d)
+{
+  char *fname = "FmatMInv(V**, V*, .....)";
+  VRB.Func(cname,fname);
+
+  int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
+  Float dot = f_in -> NormSqGlbSum(f_size);
+
+  Float RsdCG[Nshift];
+  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
+
+  //Fake the constructor
+  DiracOpWilson wilson(*this, f_out[0], f_in, cg_arg, cnv_frm);
+
+  return wilson.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+}
 
 
 //------------------------------------------------------------------
@@ -278,7 +303,7 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float lambda[],
   // Compute chirality
   // Also, rescale wilson eigenvalues to the convention  m + Dslash(U)
   int f_size = (GJP.VolNodeSites() * FsiteSize());
-  Float factor = 4.0 + eig_arg->mass;
+  //Float factor = 4.0 + eig_arg->mass;
   v1 = (Vector *)smalloc(f_size*sizeof(Float));
   if (v1 == 0)
     ERR.Pointer(cname, fname, "v1");
@@ -289,7 +314,7 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float lambda[],
   {
     Gamma5(v1, f_eigenv[i], GJP.VolNodeSites());
     chirality[i] = f_eigenv[i]->ReDotProductGlbSum(v1, f_size);
-    lambda[i] *= factor;
+    //lambda[i] *= factor;
   }
 
   VRB.Sfree(cname, fname, "v1", v1);
@@ -537,7 +562,15 @@ void Fwilson::EvolveMomFforce(Matrix *mom, Vector *chi,
   return ;
 }
 
+void Fwilson::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+				   Float *alpha, Float mass, Float dt,
+				   Vector **sol_d) {
+  char *fname = "RHMC_EvolveMomFforce";
 
+  for (int i=0; i<degree; i++)
+    EvolveMomFforce(mom,sol[i],mass,dt*alpha[i]);
+
+}
 
 //------------------------------------------------------------------
 // Float BhamiltonNode(Vector *boson, Float mass):

@@ -3,19 +3,10 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definition of FstagTypes methods.
 
-  $Id: f_stag_t.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag_types/f_stag_t.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: f_stag_t.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: f_stag_t.C,v $
-//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag_types/f_stag_t.C,v $
 //  $State: Exp $
 //
@@ -52,6 +43,7 @@ FstagTypes::FstagTypes()
     for(int i = 0; i < 4; ++i) e_vsize *= node_sites[i];
 
     f_tmp = (Vector *)smalloc(e_vsize*sizeof(Float));
+    VRB.Smalloc(cname,fname, "f_tmp", f_tmp, e_vsize * sizeof(Float));
 
     xv[0] = node_sites[3]/2;
     xv[1] = (node_sites[3]*node_sites[0])/2;
@@ -180,6 +172,7 @@ FstagTypes::~FstagTypes()
 {
   char *fname = "~FstagTypes()";
   VRB.Func(cname,fname);
+  VRB.Sfree(cname,fname,"f_tmp",f_tmp);
   sfree(f_tmp);
 }
 

@@ -5,19 +5,10 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.8 2004-06-04 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v 1.8 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: f_stag.C,v 1.8 2004-06-04 21:14:12 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: f_stag.C,v $
-//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v $
 //  $State: Exp $
 //
@@ -212,15 +203,10 @@ int Fstag::FmatEvlInv(Vector *f_out, Vector *f_in,
   iter = stag.InvCg(true_res);
 
   stag.Dslash(f_tmp, f_out, CHKB_EVEN, DAG_NO);
-  printf("        InvCG out = %e f_tmp = %e\n", FhamiltonNode(f_out,f_out),
-	 FhamiltonNode(f_tmp,f_tmp));
 
   // Return the number of iterations
   return iter;
 }
-
-
-
 
 //------------------------------------------------------------------
 // int FmatEvlMInv(Vector **f_out, Vector *f_in, 
@@ -238,24 +224,28 @@ int Fstag::FmatEvlInv(Vector *f_out, Vector *f_in,
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
 int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
-		    int Nshift, int isz, CgArg *cg_arg,
-		    CnvFrmType cnv_frm)
+		       int Nshift, int isz, CgArg *cg_arg,
+		       CnvFrmType cnv_frm, MultiShiftSolveType type, 
+		       Float *alpha, Vector **f_out_d)
 {
-  int iter;
   char *fname = "FmatMInv(V**, V*, .....)";
   VRB.Func(cname,fname);
 
-  Vector **EigVec=0;
-  int Neig = 0;
   Float dot = f_in -> NormSqGlbSum(e_vsize);
   Float RsdCG[Nshift];
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
   DiracOpStag stag(*this, f_out[0], f_in, cg_arg, cnv_frm);
-  return stag.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,EigVec,Neig);  
-}
+  int iter = stag.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
 
+  if (type == MULTI && f_out_d != 0)
+    for (int s=0; s<Nshift; s++)
+      stag.Dslash(f_out_d[s],f_out[s],CHKB_EVEN,DAG_NO);
+
+  return iter;
+
+}
 
 //------------------------------------------------------------------
 // int FmatInv(Vector *f_out, Vector *f_in, 
@@ -448,16 +438,7 @@ void Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
 			    Float mass, Float dt){
   char *fname = "EvolveMomFforce(M*,V*,F,F)";
   VRB.Func(cname,fname);
-
-  { 
-    // Added this dslash to give compatibility with RHMC
-    CgArg cg_arg;
-    cg_arg.mass = 0.0;
-    Vector *v1=(Vector*)0, *v2=(Vector*)0;
-    DiracOpStag stag(*this, v2, v1, &cg_arg, CNV_FRM_NO);
-    stag.Dslash(f_tmp, frm, CHKB_EVEN, DAG_NO);
-  }
-
+ 
   setCbufCntrlReg(4, CBUF_MODE4);
   int x[4];
   
@@ -481,8 +462,17 @@ void Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
 
 }
 
+void Fstag::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+				 Float *alpha, Float mass, Float dt,
+				 Vector **sol_d) {
+  char *fname = "RHMC_EvolveMomFforce";
 
+  for (int i=0; i<degree; i++) {
+    f_tmp -> CopyVec(sol_d[i], e_vsize);
+    EvolveMomFforce(mom,sol[i],mass,dt*alpha[i]);
+  }
 
+}
 
 //------------------------------------------------------------------
 // Float BhamiltonNode(Vector *boson, Float mass):

@@ -1,14 +1,6 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v 1.6 2004-06-04 21:14:05 chulwoo Exp $
-//  $Id: d_op_asqtad.C,v 1.6 2004-06-04 21:14:05 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: d_op_asqtad.C,v $
-//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v $
 //  $State: Exp $
 //
@@ -43,8 +35,8 @@
 CPS_START_NAMESPACE
 
 extern "C"{
-void vaxmy(Vector *res, Float *scale,Vector *mult,Vector *sub,int ncvec);
-void vaxmy_norm(Vector *res, Float *scale,Vector *mult,Vector *sub, int ncvec, Float *norm);
+  void vaxmy(Float *scale,Vector *mult,Vector *sub,int ncvec);
+  void vaxmy_vxdot(Float *scale, Vector *mult, Vector *sub, int ncvec, Float *norm);
 }
 
 extern "C" void dirac_comm_assert(void);
@@ -172,31 +164,21 @@ void DiracOpAsqtad::MatPcDagMatPc(Vector *out,
 			       Float *dot_prd){
   static long nflops = (1158)*GJP.VolNodeSites();
   struct timeval start,end;
-//  printf("mass_sq=%e\n",mass_sq);
 #undef PROFILE
 #ifdef PROFILE
   gettimeofday(&start,NULL);
 #endif
   asqtad_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
   asqtad_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
+
+  if( dot_prd !=0 ) vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);
+  else vaxmy(&mass_sq,in,out,f_size_cb/6);
+
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  printf("DiracOpAsqtad::MatPcDagMatPc:: ");
+  printf("DiracOpAsqtad::MatPcDagMatPc::");
   print_flops(nflops,&start,&end);
 #endif
-
-//  out->FTimesV1MinusV2(mass_sq, in, out, f_size_cb);
-//  if( dot_prd !=0 ){
-//    *dot_prd = dotProduct((IFloat *) in, (IFloat *) out, f_size_cb);
-//  }
-   vaxmy(out,&mass_sq,in,out,f_size_cb/6);
-  if( dot_prd !=0 ){
-//	printf("dot_prd=%e\n",*dot_prd);
-    *dot_prd = dotProduct((IFloat *) in, (IFloat *) out, f_size_cb);
-//	printf("dot_prd=%e\n",*dot_prd);
-  }
-
-
 }
 
 

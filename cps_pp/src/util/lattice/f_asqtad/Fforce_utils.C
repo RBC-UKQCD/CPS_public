@@ -3,7 +3,7 @@
 /*!\file
   \brief  Routines used in the Asqtad RHMC fermion force calculation
 
-  $Id: Fforce_utils.C,v 1.2 2004-05-10 15:26:55 zs Exp $
+  $Id: Fforce_utils.C,v 1.3 2004-06-07 20:27:11 mclark Exp $
 */
 //----------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <comms/scu.h>
-
+#include<comms/glb.h>
 
 USING_NAMESPACE_CPS
 
@@ -23,54 +23,51 @@ USING_NAMESPACE_CPS
 
 void Fasqtad::vvpd(Vector **vect, int n_vect,
 		   const int *dir, int n_dir, int hop, Matrix **sum){
-   
-    Vector vp;
-    int s[4];
-    Matrix m;
-    
-    for(s[3] = 0; s[3]<node_sites[3]; s[3]++)
-	for(s[2] = 0; s[2]<node_sites[2]; s[2]++)
-	    for(s[1] = 0; s[1]<node_sites[1]; s[1]++)
-		for(s[0] = 0; s[0]<node_sites[0]; s[0]++) {
-		    int  n = FsiteOffset(s);
+  
+  Vector vp;
+  int s[4];
+  Matrix m;
 
-		    for(int d=0; d<n_dir; d++){ 
-			sum[d][n].ZeroMatrix();  
-		
-			if(s[dir[d]]+hop>node_sites[dir[d]]-1){
+  for(s[3] = 0; s[3]<node_sites[3]; s[3]++)
+    for(s[2] = 0; s[2]<node_sites[2]; s[2]++)
+      for(s[1] = 0; s[1]<node_sites[1]; s[1]++)
+	for(s[0] = 0; s[0]<node_sites[0]; s[0]++) {
+	  int  n = FsiteOffset(s);
+	  
+	  for(int d=0; d<n_dir; d++){ 
+	    sum[d][n].ZeroMatrix();  
 
-			    int save_coord = s[dir[d]];
-			    s[dir[d]] = (s[dir[d]]+hop)%node_sites[dir[d]];
-			    int np = FsiteOffset(s);
-			    s[dir[d]] = save_coord;
-
-			    for(int v=0; v<n_vect; v++){
-				getPlusData((IFloat*)&vp,
-					    (IFloat*)&vect[v][np],
-					    FsiteSize(), dir[d]);
-				m.Cross2(vect[v][n], vp);
-// Note the factor of 2 from Matrix::Cross2; this is corrected by the factor
-// of 1/2 in Matrix::TrLessAntiHermMatrix used in Fasqtad::update_momenta.
-				sum[d][n] += m;
-			    }
-
-			}else{
-
-			    s[dir[d]] += hop;
-			    int np = FsiteOffset(s);
-			    s[dir[d]] -= hop;
-
-			    for(int v=0; v<n_vect; v++){
-				m.Cross2(vect[v][n], vect[v][np]);
-				// see comment above.
-				sum[d][n] += m;
-			    }
-
-			}
-		
-		    }
-		}
-
+	    if(s[dir[d]]+hop>node_sites[dir[d]]-1){
+	      
+	      int save_coord = s[dir[d]];
+	      s[dir[d]] = (s[dir[d]]+hop)%node_sites[dir[d]];
+	      int np = FsiteOffset(s);
+	      s[dir[d]] = save_coord;
+	      
+	      for(int v=0; v<n_vect; v++){
+		getPlusData((IFloat*)&vp, (IFloat*)&vect[v][np],
+			    FsiteSize(), dir[d]);
+		m.Cross2(vect[v][n], vp);
+		// Note the factor of 2 from Matrix::Cross2; this is corrected by the factor
+		// of 1/2 in Matrix::TrLessAntiHermMatrix used in Fasqtad::update_momenta.
+		sum[d][n] += m;
+	      }
+	      
+	    }else{
+	      
+	      s[dir[d]] += hop;
+	      int np = FsiteOffset(s);
+	      s[dir[d]] -= hop;
+	      
+	      for(int v=0; v<n_vect; v++){
+		m.Cross2(vect[v][n], vect[v][np]);
+		// see comment above.
+		sum[d][n] += m;
+	      }
+	    }
+	  }
+	}
+  
 }
 
 

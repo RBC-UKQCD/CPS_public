@@ -1,22 +1,14 @@
+#include<stdio.h>
 #include<config.h>
 #include<math.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.3 2004-06-04 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/f_asqtad.C,v 1.3 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: f_asqtad.C,v 1.3 2004-06-04 21:14:12 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: f_asqtad.C,v $
-//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/f_asqtad.C,v $
 //  $State: Exp $
 //
@@ -45,9 +37,6 @@ void  set_pt (Fasqtad *lat);
 #endif
 
 
-
-
-
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
@@ -57,8 +46,6 @@ Fasqtad::Fasqtad()
   char *fname = "Fasqtad()";
   VRB.Func(cname,fname);
 
-
-//  IFloat *tmp_p = (IFloat *)GaugeField();
   asqtad_dirac_init(GaugeField());
 #if TARGET == QCDOC
   set_pt (this);
@@ -114,12 +101,10 @@ int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in,
   char *fname = "FmatEvlInv(CgArg*,V*,V*,F*,CnvFrmType)";
   VRB.Func(cname,fname);
 
-  DiracOpAsqtad stag(*this, f_out, f_in, cg_arg, cnv_frm);
-  iter = stag.InvCg(true_res);
+  DiracOpAsqtad asqtad(*this, f_out, f_in, cg_arg, cnv_frm);
+  iter = asqtad.InvCg(true_res);
 
-  stag.Dslash(f_tmp, f_out, CHKB_EVEN, DAG_NO);
-  VRB.Flow(cname,fname,"        InvCG out = %e f_tmp = %e\n", FhamiltonNode(f_out,f_out),
-	 FhamiltonNode(f_tmp,f_tmp));
+  asqtad.Dslash(f_tmp, f_out, CHKB_EVEN, DAG_NO);
 
   // Return the number of iterations
   return iter;
@@ -144,25 +129,30 @@ int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in,
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
 int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
-		    int Nshift, int isz, CgArg *cg_arg,
-		    CnvFrmType cnv_frm)
+			 int Nshift, int isz, CgArg *cg_arg,
+			 CnvFrmType cnv_frm, MultiShiftSolveType type, 
+			 Float *alpha, Vector** f_out_d)
 {
-  int iter;
   char *fname = "FmatMInv(V**, V*, .....)";
   VRB.Func(cname,fname);
 
-  Vector **EigVec=0;
-  int Neig = 0;
   Float dot = f_in -> NormSqGlbSum(e_vsize);
+
   Float RsdCG[Nshift];
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
-  DiracOpAsqtad stag(*this, f_out[0], f_in, cg_arg, cnv_frm);
+  DiracOpAsqtad asqtad(*this, f_out[0], f_in, cg_arg, cnv_frm);
 
-  return stag.MInvCG(f_out,f_in,sqrt(dot),shift,Nshift,isz,RsdCG,EigVec,Neig);  
+  int iter = asqtad.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);
+
+  if (type == MULTI && f_out_d != 0)
+    for (int s=0; s<Nshift; s++)
+      asqtad.Dslash(f_out_d[s],f_out[s],CHKB_EVEN,DAG_NO);
+
+  return iter;
+
 }
-
 
 //------------------------------------------------------------------
 // int FmatInv(Vector *f_out, Vector *f_in, 
@@ -226,12 +216,6 @@ int Fasqtad::FeigSolv(Vector **f_eigenv, Float lambda[],
   cg_arg.mass = eig_arg -> mass;
   cg_arg.RitzMatOper = eig_arg->RitzMatOper;
   int N_eig = eig_arg->N_eig;
-#if 0
-  // IS THIS NECESSARY ???
-  if(cnv_frm == CNV_FRM_YES)
-    for(int i=0; i < N_eig; ++i)
-      Fconvert(f_eigenv[i], WILSON, StrOrd());
-#endif
 
   // Call constructor and solve for eigenvectors.
   // Use null pointers to fake out constructor.
@@ -242,13 +226,6 @@ int Fasqtad::FeigSolv(Vector **f_eigenv, Float lambda[],
   
   iter = stag.RitzEig(f_eigenv, lambda, valid_eig, eig_arg);
   
-#if 0
-  // IS THIS NECESSARY ???
-  if(cnv_frm == CNV_FRM_YES)
-    for(int i=0; i < N_eig; ++i)
-      Fconvert(f_eigenv[i], CANONICAL, StrOrd());
-#endif
-
   // Modified for anisotropic lattices
   Float factor = GJP.XiV()/GJP.XiBare();
   // Chirality is trivial
@@ -284,42 +261,11 @@ void Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o,
 
   DiracOpAsqtad stag(*this, phi, frm_o, &cg_arg, CNV_FRM_NO);
   stag.Dslash(phi, frm_o, CHKB_ODD, DAG_NO);
-#if 0
-  Float * tmp_p = (Float *)frm_o;
-  printf("frm_o = \n");
-  for(int i = 0;i<GJP.VolNodeSites()*3;i++){
-	printf("%e ",*tmp_p);
-	if(i%6==5) printf("\n");
-	tmp_p++;
-  }
-  tmp_p = (Float *)phi;
-  printf("phi = \n");
-  for(int i = 0;i<GJP.VolNodeSites()*3;i++){
-	printf("%e ",*tmp_p);
-	if(i%6==5) printf("\n");
-	tmp_p++;
-  }
-#endif
 
   // Modified for anisotropic lattices
   //------------------------------------------------------------------
   fTimesV1MinusV2((IFloat *)phi, 2.*mass*GJP.XiBare()/GJP.XiV(), 
 	(IFloat *)frm_e, (IFloat *)phi, e_vsize);
-
-}
-
-
-
-void Fasqtad::prepForce(Vector *frm) {
-  char *fname = "prepForce(V*)";
-  VRB.Func(cname,fname);
-
-  // Fake out the constructor
-  CgArg cg_arg;
-  cg_arg.mass = 0.0;
-  Vector *v1=(Vector*)0, *v2=(Vector*)0;
-  DiracOpAsqtad stag(*this, v2, v1, &cg_arg, CNV_FRM_NO);
-  stag.Dslash(f_tmp, frm, CHKB_EVEN, DAG_NO);
 
 }
 

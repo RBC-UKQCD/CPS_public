@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <config.h>
 CPS_START_NAMESPACE
  /*! \file
@@ -19,7 +20,7 @@ CPS_START_NAMESPACE
 
 //! Multishift CG invertor used in RHMC.
 int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, int Nmass, 
-		    int isz, Float *RsdCG, Vector **EigVec, int NEig)
+		    int isz, Float *RsdCG, MultiShiftSolveType type, Float *alpha)
 {
   char *fname = "MInvCG(V*,V**,...)";
   VRB.Func(cname,fname);
@@ -49,9 +50,6 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, int 
 //------------------------------------------------------------------
 
   int iz, k, s;
-  int convP;
-  int *convsP = (int*)smalloc(Nmass*sizeof(int));
-  
   int f_size;
   if(lat.Fclass() == F_CLASS_CLOVER) {
     f_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
@@ -59,59 +57,66 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, int 
     f_size = GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
   }
   
+  Vector *r = (Vector *)smalloc(f_size * sizeof(Float));
+  if(r == 0) ERR.Pointer(cname,fname, "r");
+  VRB.Smalloc(cname,fname,"r", r, sizeof(Float));
+  
+  Vector *Ap = (Vector *)smalloc(f_size * sizeof(Float));
+  if(Ap == 0) ERR.Pointer(cname,fname, "Ap");
+  VRB.Smalloc(cname,fname,"Ap", Ap, sizeof(Float));
+  
   Vector **p = (Vector **)smalloc(Nmass * sizeof(Vector*));
   if(p == 0) ERR.Pointer(cname,fname, "p");
-  VRB.Smalloc(cname,fname, "psi", psi, f_size * sizeof(Vector*));
+  VRB.Smalloc(cname,fname, "p", p, f_size * sizeof(Vector*));
   for (s=0; s<Nmass; s++) {
-    *(p+s) = (Vector*)smalloc(f_size * sizeof(Vector));
+    *(p+s) = (Vector*)smalloc(f_size * sizeof(Float));
     if(*(p+s) == 0) ERR.Pointer(cname,fname, "p[i]");
-    VRB.Smalloc(cname,fname,"p[s]", p[s], sizeof(Vector));
+    VRB.Smalloc(cname,fname,"p[s]", p[s], sizeof(Float));
   }
   
-  Vector *r = (Vector *)smalloc(f_size * sizeof(Vector));
-  if(r == 0) ERR.Pointer(cname,fname, "r");
-  VRB.Smalloc(cname,fname,"r", r, sizeof(Vector));
+  int convP;
+  int *convsP = (int*)smalloc(Nmass*sizeof(int));
   
-  Vector *Ap = (Vector *)smalloc(f_size * sizeof(Vector));
-  if(Ap == 0) ERR.Pointer(cname,fname, "Ap");
-  VRB.Smalloc(cname,fname,"Ap", Ap, sizeof(Vector));
-  
-  Float a, as, b, bp;
+  Float a=0, as, b, bp, b_tmp;
   Float *bs = (Float*)smalloc(Nmass * sizeof(Float));
-  Float **z = (Float**)smalloc(2 * sizeof(float*));
+  Float **z = (Float**)smalloc(2 * sizeof(Float*));
   for (s=0; s<2; s++) *(z+s) = (Float*)smalloc(Nmass * sizeof(Float));
   Float css, ztmp;
   
   Float c, cs, d, cp;
-  
+  Float *dot=0;
+
   Float *rsd_sq = (Float*)smalloc(Nmass*sizeof(Float)); 
   Float *rsdcg_sq = (Float*)smalloc(Nmass*sizeof(Float)); 
-  
-  Float *dot=0;
-  
+
   // If source norm = 0, solution must be 0
   if (chi_norm == 0.0) {
-    for (k=0; k<Nmass; k++) psi[k]->VecTimesEquFloat(0.0,f_size);
+    if (type == SINGLE) psi[0]->VecTimesEquFloat(0.0,f_size);
+    else for (k=0; k<Nmass; k++) psi[k]->VecTimesEquFloat(0.0,f_size);
     return 0;
   }
   
   r-> CopyVec(chi,f_size);
   for (s=0; s<Nmass; s++) p[s] -> CopyVec(chi,f_size);
   cp = chi_norm;
-  
+
   for (s=0; s<Nmass; s++) {
     rsdcg_sq[s] = RsdCG[s]*RsdCG[s];
     rsd_sq[s] = cp*rsdcg_sq[s];
   }
 
-  MatPcDagMatPc(Ap,p[isz],dot);
-  
   /*  d = <p, A.p>  */
-  Ap -> FTimesV1PlusV2(mass[isz],p[isz],Ap,f_size);
-  d = p[isz] -> ReDotProductGlbSum(Ap, f_size);
+  if (mass[isz] > 0) {
+    MatPcDagMatPc(Ap,p[isz],dot);
+    Ap -> FTimesV1PlusV2(mass[isz],p[isz],Ap, f_size);
+    d = p[isz] -> ReDotProductGlbSum(Ap, f_size);
+  } else {
+    MatPcDagMatPc(Ap,p[isz],&d);
+    DiracOpGlbSum(&d);
+  }
 
   b = -cp/d;
-  
+
   z[0][isz] = 1.0;
   z[1][isz] = 1.0;
   bs[isz] = b;
@@ -123,35 +128,41 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, int 
     z[iz][s] = 1.0 / ( 1.0 - b*(mass[s] - mass[isz]) );
     bs[s] = b*z[iz][s];
   }
-  
+
   // r[1] += b[0] A.p[0]
   r -> FTimesV1PlusV2(b,Ap,r,f_size);
-  
-  // Psi[1] -= b[0] p[0] =- b[0] chi;
-  for (s=0; s<Nmass; s++) psi[s]-> FTimesV1PlusV2(-bs[s],chi,psi[s],f_size);
-  
   // c = |r[1]|^2
-  
   c = r -> NormSqGlbSum(f_size);
   
+  // Psi[1] -= b[0] p[0] =- b[0] chi;
+  if (type == SINGLE) {
+    for (s=0; s<Nmass; s++) {
+      b_tmp = bs[s] * alpha[s];
+      psi[0]-> FTimesV1PlusV2(-b_tmp,chi,psi[0],f_size);
+    }
+  } else {
+    for (s=0; s<Nmass; s++) psi[s]-> FTimesV1PlusV2(-bs[s],chi,psi[s],f_size);  
+  }
+
   // Check the convergance of the first solution
   for (s=0; s<Nmass; s++) convsP[s] = 0;
   
   convP = (c < rsd_sq[isz]) ? 1 : 0;
   
+  // a[k+1] = |r[k]**2/ |r[k-1]|**2
+  a = c/cp;
+  
   // for k=1 until MaxCG do
   // if |psi[k+1] - psi[k]| <= RsdCG |psi[k+1]| then return
   for (k=1; k<=dirac_arg->max_num_iter && !convP; k++) {
-    
     // a[k+1] = |r[k]**2/ |r[k-1]|**2
     a = c/cp;
-    
+
     // p[k+1] = r[k+1] + a[k+1] p[k]
     //   Compute the shifted as
     //   ps[k+1] = zs[k+1] r[k+1] + a[k+1] ps[k]
     for (s=0; s<Nmass; s++) {
       if (convsP[s]) continue;
-      
       if (s==isz) {
 	p[s] -> FTimesV1PlusV2(a,p[s],r,f_size);
       } else {
@@ -165,13 +176,15 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, int 
     cp = c;
     
     // b[k] = |r[k]**2 / <p[k], Ap[k]>
-    //   First compute d = <p,Ap>
-    //   Ap = A. p
-    
-    MatPcDagMatPc(Ap,p[isz],dot);
-    Ap -> FTimesV1PlusV2(mass[isz],p[isz],Ap,f_size);
-    d = p[isz] -> ReDotProductGlbSum(Ap, f_size);
-    
+    if (mass[isz] > 0) {
+      MatPcDagMatPc(Ap,p[isz],dot);
+      Ap -> FTimesV1PlusV2(mass[isz],p[isz],Ap, f_size);
+      d = p[isz] -> ReDotProductGlbSum(Ap, f_size);
+    } else {
+      MatPcDagMatPc(Ap,p[isz],&d);
+      DiracOpGlbSum(&d);
+    }
+
     bp = b;
     b = -cp/d;
     
@@ -188,15 +201,24 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, int 
     
     // r[k+1] += b[k] A.p[k]
     r -> FTimesV1PlusV2(b,Ap,r,f_size);
-    
-    // Psi[k+1] -= b[k] p[k]
-    for (s=0; s<Nmass; s++) {
-      if (convsP[s]) continue;
-      psi[s]->FTimesV1PlusV2(-bs[s],p[s],psi[s],f_size);
-    }
-    
     // c = |r[k]|**2
     c = r-> NormSqGlbSum(f_size);
+    
+    // p[k+1] = r[k+1] + a[k+1] p[k]
+    //   Compute the shifted as
+    //   ps[k+1] = zs[k+1] r[k+1] + a[k+1] ps[k]
+    // Psi[k+1] -= b[k] p[k]
+
+    if (type == SINGLE)
+      for (s=0; s<Nmass; s++) {
+	if (convsP[s]) continue;
+	psi[0]->FTimesV1PlusV2(-bs[s]*alpha[s],p[s],psi[0],f_size);
+      }
+    else
+      for (s=0; s<Nmass; s++) {
+	if (convsP[s]) continue;
+	psi[s]->FTimesV1PlusV2(-bs[s],p[s],psi[s],f_size);
+      }
     
     // if |psi[k+1] -psi[k]| <= rsdCG |psi[k+1]| then return
     // or if |r[k+1]| <= RsdCG |chi| then return
@@ -204,25 +226,13 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, int 
       if (convsP[s]) continue;
       // convergance methods
       
-#ifndef RELATIVE_ERROR
       //check norm of shifted residuals
       css = c * z[iz][s] * z[iz][s];
       convsP[s] = (css < rsd_sq[s]) ? 1 : 0;
-      
-#else
-      //check relative error of solution
-      css = 0;
-      d = 0;
-      css = p[s]-> NormSqGlbSum(p[s], f_size);
-      d = psi[s]-> NormSqGlbSum(psi[s], f_size);
-      css*= bs[s]*bs[s];
-      d *= rsdcg_sq[s];
-      convsP[s] = (css < d) ? 1 : 0;
-#endif
-      if (convsP[s]) 
-	VRB.Result(cname,fname,"%d, mass = %e, iter = %d, res = %e, norm = %e\n",
-		   s,mass[s],k,css,psi[s] -> NormSqGlbSum(f_size));
-      //VRB.Result(cname,fname,"%d shift converged at %d, iter = %d, res = %e\n",s,k,css);
+
+      if (convsP[s]){
+	VRB.Result(cname,fname,"%d shift converged, iter = %d, res = %e\n",s,k,css);
+      }
     }    
     
     convP = convsP[isz];
@@ -236,7 +246,6 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, int 
     sfree(*(p+s));
   }
   
-
   VRB.Sfree(cname,fname,"p",p);
   sfree(p);
   VRB.Sfree(cname,fname,"Ap",Ap);

@@ -1,20 +1,18 @@
+#include<stdio.h>
 #include <config.h>
 CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStag class methods.
 
-  $Id: d_op_stag.C,v 1.6 2004-06-04 21:14:06 chulwoo Exp $
+<<<<<<< d_op_stag.C
+  $Id: d_op_stag.C,v 1.7 2004-06-07 20:27:09 mclark Exp $
+=======
+  $Id: d_op_stag.C,v 1.7 2004-06-07 20:27:09 mclark Exp $
+>>>>>>> 1.5.6.1
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.6 2004-06-04 21:14:06 chulwoo Exp $
-//  $Id: d_op_stag.C,v 1.6 2004-06-04 21:14:06 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v $
 //  $State: Exp $
 //
@@ -95,7 +93,6 @@ DiracOpStag::DiracOpStag(Lattice & latt,
   //----------------------------------------------------------------
   f_size_cb = GJP.VolNodeSites() * lat.FsiteSize() / 2;
 
-
   //----------------------------------------------------------------
   // Allocate memory for the temporary fermion vector frm_tmp.
   //----------------------------------------------------------------
@@ -105,16 +102,10 @@ DiracOpStag::DiracOpStag(Lattice & latt,
   VRB.Smalloc(cname,fname, "frm_tmp", 
 	      frm_tmp, f_size_cb * sizeof(Float));
 
-
   //----------------------------------------------------------------
   // Initialize parameters
   //----------------------------------------------------------------
   DiracArg(dirac_arg);
-
-  //----------------------------------------------------------------
-  // Copy optimized code into its execution place (CRAM)
-  //----------------------------------------------------------------
-  //p2vStagDs();
 
 }
 

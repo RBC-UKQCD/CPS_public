@@ -11,18 +11,17 @@
 .globl vaxmy_norm
 vaxmy_norm:
 
-	or    %r13 , %r3 , %r3
-	la   %r1,	-864(%r1)
-	or    %r11 , %r5 , %r5
-	or    %r12 , %r6 , %r6
+	or    %r11 , %r4 , %r4
+	la   %r1,	-736(%r1)
+	or    %r12 , %r5 , %r5
 	stw   %r14,	368(%r1)
 	stw   %r15,	376(%r1)
-	or    %r14 , %r7 , %r7
+	or    %r14 , %r6 , %r6
 	stw   %r16,	384(%r1)
-	or    %r15 , %r4 , %r4
+	or    %r15 , %r3 , %r3
 	stw   %r17,	392(%r1)
 	stw   %r18,	400(%r1)
-	or    %r17 , %r8 , %r8
+	or    %r17 , %r7 , %r7
 	stw   %r19,	408(%r1)
 	stw   %r20,	416(%r1)
 	stw   %r21,	424(%r1)
@@ -66,56 +65,59 @@ vaxmy_norm_lab0:
 	lfd   22,	0(%r17)
 	lfd   23,	0(%r17)
 	lfd   24,	0(%r17)
-	li   %r19,128
-	li   %r20,160
+	li   %r19,32
+	li   %r20,64
 	bf gt,  vaxmy_norm_lab1
 	lfd   1,	0(%r11)
 	lfd   7,	0(%r12)
 	lfd   2,	8(%r11)
 	lfd   8,	8(%r12)
+	lfd   3,	16(%r11)
+	lfd   9,	16(%r12)
+	lfd   4,	24(%r11)
+	lfd   10,	24(%r12)
 	mtctr 	%r14
 	b       vaxmy_norm_lab2
 .align 4
 vaxmy_norm_lab2:
-	addi  %r16 , %r13 , 0
-	lfd   3,	16(%r11)
-	fmsub  13 , 0 , 1 , 7
-	lfd   9,	16(%r12)
-	fmsub  14 , 0 , 2 , 8
-	dcbt 	%r19,%r11
-	lfd   4,	24(%r11)
-	lfd   10,	24(%r12)
+	addi  %r16 , %r12 , 0
 	lfd   5,	32(%r11)
+	fmsub  13 , 0 , 1 , 7
+	lfd   11,	32(%r12)
+	fmsub  14 , 0 , 2 , 8
+	lfd   6,	40(%r11)
+	fmsub  15 , 0 , 3 , 9
+	lfd   12,	40(%r12)
+	fmsub  16 , 0 , 4 , 10
+	la   %r11,	48(%r11)
+	la   %r12,	48(%r12)
 	fmadd  19 , 13 , 13 , 19
 	stfd  13,	0(%r16)
 	fmadd  20 , 14 , 14 , 20
 	stfd  14,	8(%r16)
-	fmsub  15 , 0 , 3 , 9
-	dcbt 	%r20,%r11
-	lfd   11,	32(%r12)
-	lfd   6,	40(%r11)
-	fmsub  16 , 0 , 4 , 10
-	lfd   12,	40(%r12)
-	la   %r11,	48(%r11)
 	fmadd  21 , 15 , 15 , 21
 	stfd  15,	16(%r16)
-	dcbt 	%r19,%r12
-	la   %r13,	48(%r13)
 	fmadd  22 , 16 , 16 , 22
 	stfd  16,	24(%r16)
 	fmsub  17 , 0 , 5 , 11
-	lfd   1,	0(%r11)
+	dcbt 	%r19,%r11
 	fmsub  18 , 0 , 6 , 12
+	lfd   1,	0(%r11)
+	lfd   7,	0(%r12)
 	lfd   2,	8(%r11)
-	la   %r14,	-1(%r14)
-	dcbt 	%r20,%r12
+	lfd   8,	8(%r12)
 	fmadd  23 , 17 , 17 , 23
 	stfd  17,	32(%r16)
 	fmadd  24 , 18 , 18 , 24
 	stfd  18,	40(%r16)
-	la   %r12,	48(%r12)
-	lfd   7,	0(%r12)
-	lfd   8,	8(%r12)
+	dcbt 	%r20,%r11
+	lfd   3,	16(%r11)
+	lfd   9,	16(%r12)
+	lfd   4,	24(%r11)
+	lfd   10,	24(%r12)
+	la   %r14,	-1(%r14)
+	dcbt 	%r19,%r12
+	dcbt 	%r20,%r12
 	bdnz    vaxmy_norm_lab2
 	fadd   19 , 19 , 20
 	fadd   21 , 21 , 22
@@ -160,5 +162,5 @@ vaxmy_norm_lab1:
 	lfd   29,	232(%r1)
 	lfd   30,	240(%r1)
 	lfd   31,	248(%r1)
-	la   %r1,	864(%r1)
+	la   %r1,	736(%r1)
 	blr

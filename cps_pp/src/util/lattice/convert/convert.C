@@ -3,19 +3,10 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of methods converting between different data layouts.
 
-  $Id: convert.C,v 1.8 2004-06-04 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v 1.8 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: convert.C,v 1.8 2004-06-04 21:14:12 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: convert.C,v $
-//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v $
 //  $State: Exp $
 //
@@ -441,47 +432,46 @@ void FwilsonTypes::Fconvert(Vector *f_field,StrOrdType to,StrOrdType from)
 void FstagTypes::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
 {
   VRB.Func(cname,fname_fconvert);
-
-        CAS     cas ;
-
-	
-        cas.lx          = GJP.XnodeSites() ;
-        cas.ly          = GJP.YnodeSites() ;
-        cas.lz          = GJP.ZnodeSites() ;
-        cas.lt          = GJP.TnodeSites() ;
-        cas.nc          = Colors() ;
-        cas.ns          = SpinComponents() ;
-        cas.site_size   = FsiteSize() ;
-        cas.start_ptr   = (Float *) f_field ;
-        cas.vol         = GJP.VolNodeSites() ;
-
-        if (from == to) {
-                VRB.Flow(cname,fname_fconvert,
-                        "No conversion necessary from %d to %d\n",
-                        int(from), int(to));
-                return ;
-        }
-
-        if ((from == CANONICAL) && (to == STAG)) {
-
-          VRB.Flow(cname,fname_fconvert, converting_str,
-                   int(from), int(to));
-          FcanonToStag(&cas) ;
-
-        } else if ((from == STAG) && (to == CANONICAL)) {
-
-          VRB.Flow(cname,fname_fconvert, converting_str,
-                   int(from), int(to));
-
-          FstagToCanon(&cas) ;
-
-        } else {
-                ERR.General(cname,fname_fconvert,
-                        "Unsupported fermion conversion from %d to %d\n",
-                        int(from), int(to)) ;
-        }
-
-        return ;
+  
+  CAS     cas ;
+  
+  
+  cas.lx          = GJP.XnodeSites() ;
+  cas.ly          = GJP.YnodeSites() ;
+  cas.lz          = GJP.ZnodeSites() ;
+  cas.lt          = GJP.TnodeSites() ;
+  cas.nc          = Colors() ;
+  cas.ns          = SpinComponents() ;
+  cas.site_size   = FsiteSize() ;
+  cas.start_ptr   = (Float *) f_field ;
+  cas.vol         = GJP.VolNodeSites() ;
+  
+  if (from == to) {
+    VRB.Flow(cname,fname_fconvert,
+	     "No conversion necessary from %d to %d\n",
+	     int(from), int(to));
+    return ;
+  }
+  
+  if ((from == CANONICAL) && (to == STAG)) {
+    
+    VRB.Flow(cname,fname_fconvert, converting_str,
+	     int(from), int(to));
+    FcanonToStag(&cas) ;
+    
+  } else if ((from == STAG) && (to == CANONICAL)) {
+    
+    VRB.Flow(cname,fname_fconvert, converting_str,
+	     int(from), int(to));    
+    FstagToCanon(&cas) ;
+    
+  } else {
+    ERR.General(cname,fname_fconvert,
+		"Unsupported fermion conversion from %d to %d\n",
+		int(from), int(to)) ;
+  }
+  
+  return ;
 }
 
 
