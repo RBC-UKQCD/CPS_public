@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.14 2004-09-21 20:16:51 chulwoo Exp $
+  $Id: main.C,v 1.15 2004-12-06 21:18:04 chulwoo Exp $
 */
 
 #include<config.h>
@@ -50,20 +50,32 @@ int main(int argc,char *argv[]){
 
     if (argc < 5){
         ERR.General("f_asqtad_test","main()","usage: %s nx ny nz nt\n",argv[0]);
+	exit(4);
     }
     sscanf(argv[1],"%d",&nx);
     sscanf(argv[2],"%d",&ny);
     sscanf(argv[3],"%d",&nz);
     sscanf(argv[4],"%d",&nt);
 
-    do_arg.x_node_sites = nx/SizeX();
-    do_arg.y_node_sites = ny/SizeY();
-    do_arg.z_node_sites = nz/SizeZ();
-    do_arg.t_node_sites = nt/SizeT();
-    do_arg.x_nodes = SizeX();
-    do_arg.y_nodes = SizeY();
-    do_arg.z_nodes = SizeZ();
-    do_arg.t_nodes = SizeT();
+    int size[4];
+    int sites[4];
+    size[0] = SizeX(); sites[0] =nx;
+    size[1] = SizeY(); sites[1] =ny;
+    size[2] = SizeZ(); sites[2] =nz;
+    size[3] = SizeT(); sites[3] =nt;
+    for (int i = 0;i<4;i++)
+      if( (size[i]*2) > sites[i] ) size[i] = sites[i]/2;
+    for (int i = 0;i<4;i++)
+      if( sites[i] % size[i] !=0) size[i] = 1;
+    do_arg.x_node_sites = nx/size[0];
+    do_arg.y_node_sites = ny/size[1];
+    do_arg.z_node_sites = nz/size[2];
+    do_arg.t_node_sites = nt/size[3];
+    do_arg.x_nodes = size[0];
+    do_arg.y_nodes = size[1];
+    do_arg.z_nodes = size[2];
+    do_arg.t_nodes = size[3];
+
     do_arg.x_bc = BND_CND_PRD;
     do_arg.y_bc = BND_CND_PRD;
     do_arg.z_bc = BND_CND_PRD;
@@ -201,13 +213,19 @@ int main(int argc,char *argv[]){
 		    Fprintf(fp,"\n");
 #else
 		    Fprintf(fp," (%0.2e %0.2e)\n",
-		    *(X_out2->Field(n,i*2)-*(X_in->Field(n,i*2)), 
-		    *(X_out2->Field(n,i*2+1))-*(X_in->Field(n,i* 2+1));
+		    (*(X_out2->Field(n,0,i*2))),
+		    (*(X_out2->Field(n,0,i*2+1))) );
+//		    (*(X_out2->Field(n,0,i*2)))-(*(X_in->Field(n,0,i*2))), 
+//		    (*(X_out2->Field(n,0,i*2+1)))-*(X_in->Field(n,0,i* 2+1)) );
 #endif
-		    double diff = *(X_out2->Field(n,i*2))-*(X_in->Field(n,i*2));
-		    if (fabs(diff)>maxdiff) maxdiff = fabs(diff);
-		    diff = *(X_out2->Field(n,i*2+1))-*(X_in->Field(n,i*2+1));
-		    if (fabs(diff)>maxdiff) maxdiff = fabs(diff);
+		    double diff = (*(X_out2->Field(n,0,i*2)))-*(X_in->Field(n,0,i*2));
+		    if (fabs(diff)>maxdiff){
+				 maxdiff = fabs(diff);
+			}
+		    diff = (*(X_out2->Field(n,0,i*2+1)))-*(X_in->Field(n,0,i*2+1));
+		    if (fabs(diff)>maxdiff){
+				maxdiff = fabs(diff);
+			}
 		}
 	    }
 	}
