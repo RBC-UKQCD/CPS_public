@@ -100,7 +100,7 @@ for( $tsi = 0; $tsi < scalar(@test_dirs); $tsi++ ) {
 # Remove any files associated with previous runs (i.e. *.dat)
 	print SHOUT 'rm -f '.$exec_cmd.' *.dat'."\n";
 #       compile the code
-	print SHOUT 'make -f Makefile_regression'."\n";
+	print SHOUT 'make -s -f Makefile_regression'."\n";
 # Run the program:
 	$exec_cmd = $exec_prefix.$executable;
 ##	print SHOUT "echo Running $exec_cmd...\n";
