@@ -1,11 +1,13 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.8 2004-02-09 14:49:10 zs Exp $
+# $Id: Makefile.in,v 1.9 2004-02-10 14:29:53 zs Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_builddir@
 TESTDIR = $(SRCDIR)/tests
 QOS = @QOS@
+
+
 
 all: recurse
 
@@ -19,7 +21,8 @@ recurse:
 	mkdir -p $(BUILDDIR)/objs
 	touch -a $(BUILDDIR)/objs/Makefile_depend
 	cp -p $(SRCDIR)/src/Makefile $(BUILDDIR)/objs
-	$(MAKE) -C $(BUILDDIR)/objs $(MAKECMDGOALS)
+	$(MAKE) -C $(BUILDDIR)/objs $(filter-out test, $(MAKECMDGOALS))
+
 
 cleanlib: clean
 	rm -f *.a
@@ -28,8 +31,8 @@ install:
 	cp Makefile Makefile.rules Makefile.vars Makefile.compile ${SRCDIR}
 	cp tests/Makefile_common* ${SRCDIR}/tests
 
-#  Create the documentation
 
+#  Create the documentation
 
 have_doxygen = @have_doxygen@
 
@@ -60,6 +63,13 @@ endif
 
 #  Run the regression test suite
 
-test: 
+test: cps
+	-cp tests/Makefile_common tests/regressoin.pl ${TESTDIR}
 	cd $(TESTDIR) ; perl regression.pl
 	cd $(TESTDIR) ; sh regression.sh
+
+
+# Remove everything made by this makefile
+
+realclean: 
+	rm -rf $(BUILDDIR)/objs $(BUILDDIR)/*.a

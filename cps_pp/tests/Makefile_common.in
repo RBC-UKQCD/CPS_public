@@ -1,4 +1,4 @@
-# $Id: Makefile_common.in,v 1.8 2004-02-09 14:30:07 zs Exp $
+# $Id: Makefile_common.in,v 1.9 2004-02-10 14:29:53 zs Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -18,7 +18,7 @@ BIN = regression_cps.x
 #
 # include list for the Columbia code
 #
-INCLIST = @INCLUDE_FLAGS@
+INCLIST = -I${BUILDDIR} -I${SRCDIR}/include @INCLUDE_FLAGS@
 
 CXXFLAGS= @CXXFLAGS@
 DFLAGS= @DFLAGS@

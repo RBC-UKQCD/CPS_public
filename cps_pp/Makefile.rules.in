@@ -3,12 +3,9 @@ BUILDDIR = @abs_builddir@
 QOS = @QOS@
 
 PWD := $(shell pwd)
-DIR := $(subst $(BUILDDIR),,$(PWD))
-DIR := $(subst $(SRCDIR),,$(DIR))/
-DIRB:= $(subst /src,/objs/,$(DIR))
-DIR:= $(subst /objs/,/src/,$(DIRB))
-#DIRB:= $(DIR)
-VPATH:=${SRCDIR}/$(DIR) ${BUILDDIR}/$(DIRB)
+DIR := $(subst $(BUILDDIR)/objs,src,$(PWD))
+
+VPATH := ${SRCDIR}/$(DIR) 
 
 CC = @CC@
 CXX = @CXX@
@@ -19,7 +16,7 @@ CFLAGS = @CFLAGS@
 CXXFLAGS = @CXXFLAGS@
 ASFLAGS = @ASFLAGS@
 
-INCLUDE_FLAGS = @INCLUDE_FLAGS@
+INCLUDE_FLAGS = -I${BUILDDIR} -I${SRCDIR}/include @INCLUDE_FLAGS@
 
 ifeq	($(LIB_NAME_SET),yes)
 SEPARATE_LIB = yes
@@ -62,20 +59,17 @@ ifeq "$(ARCH)" "cpsMPI"
 endif 
 
 libcps_CXXFLAGS = $(INCLUDE_FLAGS) $(CXXFLAGS) $(DFLAGS)
-.PHONY: $(RECURSEDIRS) cps all recurse
+.PHONY: $(RECURSEDIRS) cps all recurse clean
 
 all: cps 
 
 recurse: $(RECURSEDIRS)
 
 $(RECURSEDIRS):
-#	@echo PWD = $(PWD)
-	@echo PWD = $(BUILDDIR)/$(DIRB)
-	@echo DIR = $(DIR)
-	@echo DIRB = $(DIRB)
-	mkdir -p $(BUILDDIR)/$(DIRB)/$@
-	touch -a $(BUILDDIR)/$(DIRB)/$@/Makefile_depend
-	cp -p $(SRCDIR)/$(DIR)/$@/Makefile $(BUILDDIR)/$(DIRB)/$@
+	@echo PWD = $(PWD)
+	mkdir -p $@
+	touch -a $@/Makefile_depend
+	cp -p $(SRCDIR)/$(DIR)/$@/Makefile $@
 ifeq	($(LIB_NAME_SET),yes)
 	$(MAKE) -C $@ LIBNAME=$(LIBNAME) $(MAKECMDGOALS)
 else
@@ -88,7 +82,6 @@ endif
 
 
 .SUFFIXES:
-
 .SUFFIXES:  .o .C .S
 
 CSRC :=$(wildcard $(SRCDIR)/$(DIR)/*.c)
@@ -103,44 +96,45 @@ OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
 OBJS := $(notdir $(OBJS_SRC))
 
 %.o:%.c
-	mkdir -p $(BUILDDIR)/$(DIRB)
-	${CC} -c $< -o $(BUILDDIR)/$(DIRB)/$@ ${libcps_CXXFLAGS}
-	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+	${CC} -c $< -o $@ ${libcps_CXXFLAGS}
+	${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.C
-	${CXX} -c $< -o $(BUILDDIR)/$(DIRB)/$@ ${libcps_CXXFLAGS}
-	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+	${CXX} -c $< -o $@ ${libcps_CXXFLAGS}
+	${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.S
-	$(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR)/$(DIRB)/$*.i
-	$(AS) $(ASFLAGS) -o $(BUILDDIR)/$(DIRB)/$@ $(BUILDDIR)/$(DIRB)/$*.i
-	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+	$(CC) -E $(libcps_CXXFLAGS) $< > $*.i
+	$(AS) $(ASFLAGS) -o $@ $$*.i
+	${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 ifeq "${ARCH}" "cpsMPI"
 
 depend: recurse
 	cd $(SRCDIR)/$(DIR) ; \
 	$(CXX) -M $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
-	| sed -e 's/:.*\.[cC]/\:/g' > $(BUILDDIR)/$(DIRB)/Makefile_depend
+	| sed -e 's/:.*\.[cC]/\:/g' > $(PWD)/Makefile_depend
 
 else
 
 
 depend: recurse
-	echo > $(BUILDDIR)/$(DIRB)/Makefile_depend
-	cd $(SRCDIR)/$(DIR) ;makedepend -f$(BUILDDIR)/$(DIRB)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
+	echo > Makefile_depend
+	cd $(SRCDIR)/$(DIR) ;makedepend -f$(PWD)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
 
 endif
 
 clean: recurse
-	cd $(BUILDDIR)/$(DIRB) ; rm -f *.o *.i *.bak
+	rm -f *.o *.i *.bak
 
 cleanlib:
-	cd $(BUILDDIR) ; rm -f *.a
+	rm -f $(BUILDDIR)/*.a
 
 cps: recurse $(OBJS) 
-#	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $(OBJS)
 
-$(BUILDDIR)/$(DIRB)/Makefile_depend: depend
 
-include $(BUILDDIR)/$(DIRB)/Makefile_depend
+Makefile_depend: depend
+
+ifneq ($(MAKECMDGOALS), clean)
+include Makefile_depend
+endif
