@@ -65,7 +65,7 @@ DiracOp::InvCg(V*,V*,F,F*) :
 	|res[26]|^2 = 7.647149e-21
 DiracOp::InvCg(V*,V*,F,F*) :
 	|res[27]|^2 = 9.505082e-22
-8.214528e+06 flops /4.735809e-02 seconds = 1.734556e+02 MFlops
+8.214528e+06 flops /4.483799e-02 seconds = 1.832046e+02 MFlops
 iter=28
 FwilsonTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
 	Converting frm field str ord from 2 to 0
@@ -73,6 +73,6 @@ FwilsonTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
 	Converting frm field str ord from 2 to 0
 FwilsonTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
 	Converting frm field str ord from 2 to 0
-Max diff between X_in and M*X_out = 1.85e+01
+Max diff between X_in and M*X_out = 2.13e-12
 Lattice::Convert(StrOrdType) :
 	Converting gauge field order: WILSON -> CANONICAL

@@ -213,8 +213,7 @@ int main(int argc,char *argv[]){
 		}
 		lat.Fconvert(out,CANONICAL,WILSON);
 		lat.Fconvert(X_in,CANONICAL,WILSON);
-		X_out2->FTimesV1PlusV2(2*cg_arg.mass,out,X_out2,GJP.VolNodeSites
-()*lat.FsiteSize());
+		X_out2->FTimesV1PlusV2(-0.5/(cg_arg.mass+4.0),X_out2,out,GJP.VolNodeSites()*lat.FsiteSize());
     
     Float dummy;
     Float dt = 2;
@@ -239,7 +238,13 @@ int main(int argc,char *argv[]){
 				*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1));
 #if 0
 				fprintf(fp," (%0.2e %0.2e)\n",
-				*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1));
+#if 0
+		*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), 
+	*((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1));
+#else
+		*((IFloat*)&X_out2[n]+i*2),
+	*((IFloat*)&X_out2[n]+i*2+1));
+#endif
 #else
 				fprintf(fp,"\n");
 #endif
