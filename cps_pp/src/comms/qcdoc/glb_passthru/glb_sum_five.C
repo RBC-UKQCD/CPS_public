@@ -46,7 +46,12 @@ static int initted=0;
 //---------------------------------------------------------------------- 
 void glb_sum_five(Float * float_p)
 {
+//  static int called=0;
+//  printf("glb_sum_five: before =%e\n",*float_p);
   if (!initted){ gsum.Init(gsum_axis,5); initted=1;}
   *float_p = (Float) gsum.Sum((double)*float_p);
+//  printf("glb_sum_five: after =%e\n",*float_p);
+//  called++;
+//  if(called>=10) exit(-43);
 }
 CPS_END_NAMESPACE

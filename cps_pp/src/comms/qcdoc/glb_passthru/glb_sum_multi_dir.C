@@ -9,6 +9,12 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Log: not supported by cvs2svn $
+//  Revision 1.4.4.1  2004/07/15 22:00:40  chulwoo
+//  *** empty log message ***
+//
+//  Revision 1.4  2004/06/07 19:56:25  mclark
+//  Merging rhmc_update to trunk.
+//
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_passthru/glb_sum_multi_dir.C,v $
 //  $State: Exp $
 //
@@ -30,11 +36,12 @@ CPS_START_NAMESPACE
 
 #define MAX_NUM_WORDS 40 //set to larger than size of double precision 3x3 matrix
 
-static Double64 transmit_buf;
-static Double64 receive_buf;
-static Double64 gsum_buf;
-static Gsum64 gsum;
+//static Double64 transmit_buf;
+//static Double64 receive_buf;
+//static Double64 gsum_buf;
 static SCUAxis gsum_axis[]={SCU_X,SCU_Y,SCU_Z,SCU_T,SCU_S,SCU_W};
+Gsum64 gsum[6];
+static int initted[] = {0,0,0,0,0,0};
 
 //----------------------------------------------------------------------
 /*!
@@ -53,9 +60,13 @@ static SCUAxis gsum_axis[]={SCU_X,SCU_Y,SCU_Z,SCU_T,SCU_S,SCU_W};
 
 void glb_sum_multi_dir(Float * float_p, int dir, int len)
 {
-	gsum.Init(&gsum_axis[dir],1);
+//	Gsum64 *gsum = new Gsum64;
+//	gsum->Init(&gsum_axis[dir],1);
+//	if (!initted) {gsum.Init(&gsum_axis[dir],1);initted=1;}
+	if (!initted[dir]) {gsum[dir].Init(&gsum_axis[dir],1);initted[dir]=1;}
 	for(int j = 0; j <len; j++)
-	*(float_p+j) = (Float) gsum.Sum( (double) *(float_p+j));
+	*(float_p+j) = (Float) gsum[dir].Sum( (double) *(float_p+j));
+//	delete gsum;
 }
 
 
