@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.14 2004-09-02 16:57:02 zs Exp $
+  $Id: random.C,v 1.15 2004-09-03 13:45:00 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-09-02 16:57:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.14 2004-09-02 16:57:02 zs Exp $
-//  $Id: random.C,v 1.14 2004-09-02 16:57:02 zs Exp $
+//  $Date: 2004-09-03 13:45:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.15 2004-09-03 13:45:00 zs Exp $
+//  $Id: random.C,v 1.15 2004-09-03 13:45:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -219,26 +219,19 @@ void LatRanGen::Initialize()
   int start_seed, base_seed;
   int start_seed_4d, base_seed_4d;
 
-  if(GJP.StartSeedKind()==START_SEED_INPUT_UNIFORM||
-     GJP.StartSeedKind()==START_SEED_INPUT_NODE||
-     GJP.StartSeedKind()==START_SEED_INPUT)
+  switch(GJP.StartSeedKind()){
+  case START_SEED_INPUT_UNIFORM:
+  case START_SEED_INPUT_NODE:
+  case START_SEED_INPUT:
       base_seed = GJP.StartSeedValue();
-
-  else if(GJP.StartSeedKind()==START_SEED_UNIFORM||
-	  GJP.StartSeedKind()==START_SEED)
-#ifdef PARALLEL
+      break;
+  case START_SEED_UNIFORM:
+  case START_SEED:
       base_seed = SeedS();
-#else
-      base_seed = int (time(NULL));
-#endif
-
-  else if(GJP.StartSeedKind()==START_SEED_FIXED_UNIFORM||
-	  GJP.StartSeedKind()==START_SEED_FIXED)
+      break;
+  default:
       base_seed = default_seed;
-
-  else
-      ERR.General(cname, fname,"Unknown StartSeedType %d\n",
-		  int(GJP.StartSeedKind()));
+  }
     
 #ifdef PARALLEL
   if(GJP.StartSeedKind()==START_SEED_INPUT_NODE){
