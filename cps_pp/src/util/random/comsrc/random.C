@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.15 2004-09-03 13:45:00 zs Exp $
+  $Id: random.C,v 1.16 2004-09-03 14:59:11 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-09-03 13:45:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.15 2004-09-03 13:45:00 zs Exp $
-//  $Id: random.C,v 1.15 2004-09-03 13:45:00 zs Exp $
+//  $Date: 2004-09-03 14:59:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.16 2004-09-03 14:59:11 zs Exp $
+//  $Id: random.C,v 1.16 2004-09-03 14:59:11 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -32,11 +32,7 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <util/latrngio.h>
 #include <comms/glb.h>
-#ifdef PARALLEL
 #include <comms/sysfunc.h>
-#else
-#include <time.h>
-#endif
 CPS_START_NAMESPACE
 
 int  RandomGenerator::MBIG  = 1000000000;
