@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the HmdArg structure.
 
-  $Id: hmd_arg.h,v 1.5 2004-04-27 03:51:16 cwj Exp $
+  $Id: hmd_arg.h,v 1.6 2004-06-07 19:41:08 mclark Exp $
 */
 //------------------------------------------------------------------
 
@@ -40,22 +40,22 @@ enum MetropolisType { METROPOLIS_NO    = 0,
 struct HmdArg {
 
 
-    int n_frm_masses;                /*!< The number of dynamical fermion
+  int n_frm_masses;                /*!< The number of dynamical fermion
 				      masses. This is not necessarily the
 				      number of flavours: At each mass the
 				      number of flavours is given by
 				      Lattice::ExactFlavors. */
 				
-    Float frm_mass[MAX_HMD_MASSES];   /*!< The array of dynamical fermions
+  Float frm_mass[MAX_HMD_MASSES];   /*!< The array of dynamical fermions
 					masses . */
 
-    int frm_flavors[MAX_HMD_MASSES];  /*!<
-					The flavour number of each dynamical
-					mass:
-					This is relevant to the R
-					algorithm only. Bosonic fields
-                                    are simulated by setting 
-                                    a negative flavor number. */
+  int frm_flavors[MAX_HMD_MASSES];  /*!<
+				      The flavour number of each dynamical
+				      mass:
+				      This is relevant to the R
+				      algorithm only. Bosonic fields
+				      are simulated by setting 
+				      a negative flavor number. */
 
   int n_bsn_masses;                 /*!< The number of dynamical boson 
 				    masses. This is not necessarily the
@@ -112,6 +112,25 @@ struct HmdArg {
   Float SIRatNorm[MAX_HMD_MASSES];
   Float SIRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
   Float SIRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+
+  /*!< What approximation do the rational functions represent (RHMC only)*/
+  int frm_power_num[MAX_HMD_MASSES];
+  int frm_power_den[MAX_HMD_MASSES];
+
+  /*!< Is the approximation static or dynamic (RHMC only)*/
+  int approx_type;
+
+  /*!< The new degrees to use (DYNAMIC RHMC only) */
+  int FRatDegNew[MAX_HMD_MASSES], SRatDegNew[MAX_HMD_MASSES];
+
+  Float lambda_low[MAX_HMD_MASSES];
+  Float lambda_high[MAX_HMD_MASSES];
+  Float lambda_min[MAX_HMD_MASSES];
+  Float lambda_max[MAX_HMD_MASSES];
+  Float spread; // the allowed sprectral spread in the rational approximation
+
+  /*!< The precision used in the Remez algorithm of the approximation (RHMC only)*/
+  long precision;
 
   /*!< The location of the smallest polar shift in the rational approximations*/
   int isz;

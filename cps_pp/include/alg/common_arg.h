@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the CommonArg structure.
 
-  $Id: common_arg.h,v 1.3 2004-04-30 12:17:59 zs Exp $
+  $Id: common_arg.h,v 1.4 2004-06-07 19:41:08 mclark Exp $
 */
 //--------------------------------------------------------------------------
 #ifndef INCLUDED_COMMON_ARG_H
@@ -32,6 +32,7 @@ struct CommonArg {
     */
     CommonArg(const char *l=0, const char *f=0){
 	filename = label = 0;
+	results = 0;
 	if(l) set_label(l);
 	if(f) set_filename(f);
     }

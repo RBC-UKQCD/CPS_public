@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.5 2004-04-30 12:17:59 zs Exp $
+  $Id: random.h,v 1.6 2004-06-07 19:41:08 mclark Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-04-30 12:17:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.5 2004-04-30 12:17:59 zs Exp $
-//  $Id: random.h,v 1.5 2004-04-30 12:17:59 zs Exp $
+//  $Author: mclark $
+//  $Date: 2004-06-07 19:41:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.6 2004-06-07 19:41:08 mclark Exp $
+//  $Id: random.h,v 1.6 2004-06-07 19:41:08 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -46,7 +46,7 @@ class RandomGenerator {
     int inext;
     int inextp;
     static const int MBIG  = 1000000000;
-    static const IFloat FAC   = 1.0e-9;			// 1.0/MBIG
+    static const IFloat FAC = 1.0e-9;			// 1.0/MBIG
     
   public:
 

@@ -3,24 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.8 2004-06-02 11:03:19 zs Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: zs $
-//  $Date: 2004-06-02 11:03:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.8 2004-06-02 11:03:19 zs Exp $
-//  $Id: dirac_op.h,v 1.8 2004-06-02 11:03:19 zs Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: dirac_op.h,v $
-//  $Revision: 1.8 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
-
 
 #ifndef INCLUDED_DIRAC_OP_H
 #define INCLUDED_DIRAC_OP_H
@@ -147,7 +130,8 @@ class DiracOp
 
   //! Multishift CG invertor used in RHMC.
   int MInvCG(Vector **out, Vector *in, Float in_norm, Float *shift, 
-	     int Nshift, int isz, Float *RsdCG, Vector **EigVec, int NEig);
+	     int Nshift, int isz, Float *RsdCG, 
+	     MultiShiftSolveType type, Float *alpha);
 
 // Pure virtual functions
 //------------------------------------------------------------------

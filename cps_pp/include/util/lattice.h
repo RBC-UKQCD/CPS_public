@@ -3,23 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.16 2004-06-04 21:13:58 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.16 2004-06-04 21:13:58 chulwoo Exp $
-//  $Id: lattice.h,v 1.16 2004-06-04 21:13:58 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: lattice.h,v $
-//  $Revision: 1.16 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // lattice.h
@@ -709,7 +693,54 @@ class Lattice
     */
 
     virtual int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
-			 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm) = 0;
+			    int Nshift, int isz, CgArg *cg_arg, 
+			    CnvFrmType cnv_frm, MultiShiftSolveType type, 
+			    Float *alpha, Vector**f_out_d) = 0;
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The solution vectors.
+      \param f_in The source vector
+      \param shift The shifts of the fermion matrix.
+      \param Nshift The number of shifts
+      \param isz The smallest shift (required by MInvCG)
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+      to a new storage order appropriate for the type of fermion action.
+      If this is ::CNV_FRM_NO, then just the gauge field is converted.
+      If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+      are also converted: This assumes they are initially in the same order as
+      the gauge field. Fields that are converted are restored to their original
+      order upon exit of this method. \e N.B. If the fields are already in the
+      suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \param type The type of multimass inverter.
+      If type == MULTI, then regular multishift inversion is performed, each solution
+      stored separately.  If type == SINGLE, the there is a single solution vector, and
+      each solution is summed to this vector with proportional amount alpha.
+      \param The contribution of each shifted solution to the total solution vector
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
+
+
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm,
+		    MultiShiftSolveType type, Float *alpha)
+      {	Vector **f_out_d = 0; return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
+						 type,alpha, f_out_d);}
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm,
+		    Vector **f_out_d)
+      {	Float *alpha; return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
+					 MULTI,alpha, f_out_d);}
+
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
+      {	Float *alpha=0; Vector **f_out_d=0; 
+      return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,MULTI,alpha,f_out_d);}
+
     //!< The matrix inversion used in the molecular dynamics algorithms.
     /*!<
       Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
@@ -854,6 +885,10 @@ class Lattice
       \post \a mom is assigned the value of the momentum after the molecular
       dynamics evolution.
     */
+
+    virtual void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+				      Float *alpha, Float mass, Float dt,
+				      Vector **sol_d) = 0;
 
     virtual Float FhamiltonNode(Vector *phi, Vector *chi) = 0;
     //!< Computes the pseudofermionic action on the local sublattice.
@@ -1316,6 +1351,11 @@ class Fnone : public virtual Lattice
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
         // It does nothing and returns 0.
 
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, MultiShiftSolveType type, 
+		    Float *alpha, Vector**f_out_d);
+        // It does nothing and returns 0.    
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
@@ -1348,6 +1388,10 @@ class Fnone : public virtual Lattice
         // It evolves the canonical momentum mom by step_size
         // using the fermion force. 
 
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+			      Float *alpha, Float mass, Float dt,
+			      Vector **sol_d);
+
     Float FhamiltonNode(Vector *phi, Vector *chi);
         // The fermion Hamiltonian of the node sublattice.
         // chi must be the solution of Cg with source phi.	       
@@ -1359,8 +1403,6 @@ class Fnone : public virtual Lattice
 
     Float BhamiltonNode(Vector *boson, Float mass);
         // The boson Hamiltonian of the node sublattice.
-    int FmatEvlMInv(Vector **out, Vector *in, Float *shift,
-        int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm);
 
 };
 
@@ -1376,11 +1418,12 @@ class FstagTypes : public virtual Lattice
     
   protected:
 
-    enum{
+    enum
+      {
 	VECT_LEN=6,          //!< Number of floats in  a Vector
-	    MATRIX_SIZE=18,  //!< Number of floats in  a Matrix
-	    SITE_LEN=72      //!< Number of floats in four Matrix's
-	    };
+	MATRIX_SIZE=18,  //!< Number of floats in  a Matrix
+	SITE_LEN=72      //!< Number of floats in four Matrix's
+      };
     
     int bc[4];	        //!< Boundary conditions
     int e_vsize;	//!< Size of a single parity vector field
@@ -1390,7 +1433,7 @@ class FstagTypes : public virtual Lattice
     static const unsigned CBUF_MODE3 = 0xc98c6106;
     static const unsigned CBUF_MODE4 = 0xcca52112;
 
-    Vector *f_tmp;
+    Vector *f_tmp; 
     
  public:
 
@@ -1446,9 +1489,10 @@ class Fstag : public virtual FstagTypes
 		   Float *true_res,
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
-		 int Nshift, int isz, CgArg *cg_arg, 
-		 CnvFrmType cnv_frm);
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
+		    Vector **f_out_d);
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
@@ -1472,7 +1516,9 @@ class Fstag : public virtual FstagTypes
     void EvolveMomFforce(Matrix *mom, Vector *frm, 
 			 Float mass, Float step_size);
 
-    void prepForce(Vector* out);
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+			      Float *alpha, Float mass, Float dt,
+			      Vector **sol_d);
 
     Float BhamiltonNode(Vector *boson, Float mass);
 
@@ -1508,9 +1554,10 @@ class Fasqtad : public virtual FstagTypes
 		   Float *true_res,
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
-		 int Nshift, int isz, CgArg *cg_arg, 
-		 CnvFrmType cnv_frm);
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
+		    Vector **f_out_d);
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
@@ -1530,8 +1577,6 @@ class Fasqtad : public virtual FstagTypes
     void EvolveMomFforce(Matrix *mom, Vector *frm, 
 			 Float mass, Float step_size);
 
-    void prepForce(Vector* out);
-
     Float BhamiltonNode(Vector *boson, Float mass);
 
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
@@ -1540,7 +1585,8 @@ class Fasqtad : public virtual FstagTypes
 
     //! Momentum update in the RHMC algorithm.
     void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-			      Float dummy, Float dt);
+			      Float *alpha, Float mass, Float dt,
+			      Vector **sol_d);
 
     // Various utility routines for the momentum force computation.
     
@@ -1645,6 +1691,7 @@ class FwilsonTypes : public virtual Lattice
     //! Multiplication of a lattice spin-colour vector by gamma_5.
     void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
 
+<<<<<<< lattice.h
     int FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
 		 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
       {
@@ -1662,6 +1709,8 @@ class FwilsonTypes : public virtual Lattice
 	ERR.NotImplemented(cname,fname);
       }
 
+=======
+>>>>>>> 1.15.2.2
     void Fconvert(Vector*, StrOrdType, StrOrdType);
 
     Float FhamiltonNode( Vector*,  Vector*) ;
@@ -1724,6 +1773,38 @@ class Fwilson : public virtual FwilsonTypes
         // *true_res = |src - MatPcDagMatPc * sol| / |src|
 	// The function returns the total number of CG iterations.
 
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, MultiShiftSolveType type, 
+		    Float *alpha, Vector **f_out_d);
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The solution vectors.
+      \param f_in The source vector
+      \param shift The shifts of the fermion matrix.
+      \param Nshift The number of shifts
+      \param isz The smallest shift (required by MInvCG)
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+      to a new storage order appropriate for the type of fermion action.
+      If this is ::CNV_FRM_NO, then just the gauge field is converted.
+      If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+      are also converted: This assumes they are initially in the same order as
+      the gauge field. Fields that are converted are restored to their original
+      order upon exit of this method. \e N.B. If the fields are already in the
+      suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \param type The type of multimass inverter.
+      If type == MULTI, then regular multishift inversion is performed, each solution
+      stored separately.  If type == SINGLE, the there is a single solution vector, and
+      each solution is summed to this vector with amount alpha.
+      \param The contribution of each shifted solution to the total solution vector
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
+
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
@@ -1769,6 +1850,10 @@ class Fwilson : public virtual FwilsonTypes
 				 Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force. 
+
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+			      Float *alpha, Float mass, Float dt,
+			      Vector **sol_d);
 
     Float BhamiltonNode(Vector *boson, Float mass);
         // The boson Hamiltonian of the node sublattice.
@@ -1832,6 +1917,38 @@ class Fclover : public virtual FwilsonTypes
         // *true_res = |src - MatPcDagMatPc * sol| / |src|
         // The function returns the total number of CG iterations.
 
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
+		    Vector **f_out_d);
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The solution vectors.
+      \param f_in The source vector
+      \param shift The shifts of the fermion matrix.
+      \param Nshift The number of shifts
+      \param isz The smallest shift (required by MInvCG)
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+      to a new storage order appropriate for the type of fermion action.
+      If this is ::CNV_FRM_NO, then just the gauge field is converted.
+      If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+      are also converted: This assumes they are initially in the same order as
+      the gauge field. Fields that are converted are restored to their original
+      order upon exit of this method. \e N.B. If the fields are already in the
+      suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \param type The type of multimass inverter.
+      If type == MULTI, then regular multishift inversion is performed, each solution
+      stored separately.  If type == SINGLE, the there is a single solution vector, and
+      each solution is summed to this vector with amount alpha.
+      \param The contribution of each shifted solution to the total solution vector
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
+
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
@@ -1885,6 +2002,9 @@ class Fclover : public virtual FwilsonTypes
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
 
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+			      Float *alpha, Float mass, Float dt,
+			      Vector **sol_d);
 
     Float BhamiltonNode(Vector *boson, Float mass);
     // The boson Hamiltonian of the node sublattice
@@ -1954,6 +2074,38 @@ class FdwfBase : public virtual FwilsonTypes
     int FmatEvlInv(Vector *f_out, Vector *f_in, 
 		   CgArg *cg_arg, 
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
+
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
+		    Vector **f_out_d);
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The solution vectors.
+      \param f_in The source vector
+      \param shift The shifts of the fermion matrix.
+      \param Nshift The number of shifts
+      \param isz The smallest shift (required by MInvCG)
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+      to a new storage order appropriate for the type of fermion action.
+      If this is ::CNV_FRM_NO, then just the gauge field is converted.
+      If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+      are also converted: This assumes they are initially in the same order as
+      the gauge field. Fields that are converted are restored to their original
+      order upon exit of this method. \e N.B. If the fields are already in the
+      suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \param type The type of multimass inverter.
+      If type == MULTI, then regular multishift inversion is performed, each solution
+      stored separately.  If type == SINGLE, the there is a single solution vector, and
+      each solution is summed to this vector with amount alpha.
+      \param The contribution of each shifted solution to the total solution vector
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
@@ -2029,6 +2181,10 @@ class FdwfBase : public virtual FwilsonTypes
 				 Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
+
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+			      Float *alpha, Float mass, Float dt,
+			      Vector **sol_d);
 
     Float FhamiltonNode( Vector *phi,  Vector *chi) ;
         // The fermion Hamiltonian of the node sublattice.

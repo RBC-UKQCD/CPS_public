@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.7 2004-05-10 15:15:11 zs Exp $
+  $Id: alg_hmd.h,v 1.8 2004-06-07 19:41:08 mclark Exp $
 */
 //------------------------------------------------------------------
 
@@ -227,8 +227,11 @@ class AlgHmcRHMC : public AlgHmd
     Matrix* gauge_field_init;
         // Initial gauge field needed if the evolved one is rejected
 
-    Vector*** frmn;
+    Vector** frmn;
         // Solution vectors
+
+    Vector** frmn_d;
+        // Dslash * Solution vectors 
 
     Float *h_f_init;    
         // Initial fermion Hamiltonian (one for each mass)
@@ -248,32 +251,24 @@ class AlgHmcRHMC : public AlgHmd
     Float *delta_h_b;   
         // Final-Init boson Hamiltonian (one for each mass)
 
-    // The force approximations
-    int *FRatDeg;
-    Float *FRatNorm;
-    Float **FRatRes;
-    Float **FRatPole;
+    int total_size;
+        // The sum of the rational approximation degrees used for the force
+    Float *all_res;
 
-    // The action approximations
-    int *SRatDeg;
-    Float *SRatNorm;
-    Float **SRatRes;
-    Float **SRatPole;
-    Float *SIRatNorm;
-    Float **SIRatRes;
-    Float **SIRatPole;
+    EigArg *eig_arg;
 
-    int isz; // smallest polar shift of rational approximation
-
-    int sw; // sexton-weingarten factor
 
  public:
 
   AlgHmcRHMC(Lattice& latt, CommonArg *c_arg, HmdArg *arg);
+  AlgHmcRHMC(Lattice& latt, CommonArg *c_arg, HmdArg *arg, EigArg *e_arg);
+  void init();
 
   virtual ~AlgHmcRHMC();
 
   Float run(void);
+
+  void dynamicalApprox();
 };
 
 //------------------------------------------------------------------
@@ -334,12 +329,9 @@ class AlgHmdR : public AlgHmd
     /*!< One for each mass */
 
     Vector* frm1;
-    //!< Array of general purpose fields
-
     Vector* frm2;
-    //!< Another array of general purpose fields
+    //!< Fermion work vectors
     
-
  public:
 
   AlgHmdR(Lattice& latt, CommonArg *c_arg, HmdArg *arg);
