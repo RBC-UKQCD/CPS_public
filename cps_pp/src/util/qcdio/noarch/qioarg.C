@@ -1,56 +1,91 @@
-#include <sysfunc.h>
 #include <iostream>
+#include <util/gjp.h>
 using namespace std;
 
-#include <util/parctrl.h>
+#include <util/qioarg.h>
 
 CPS_START_NAMESPACE
 
-ParallelControl::ParallelControl() 
+
+/////////////////////////////////////////////////////////////////
+// QioArg members////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+void QioArg::init(const char * file, const int concur_io_number, const Float chk_prec,
+		  const FP_FORMAT file_format, const int recon_row_3) {
+  Xnodes = GJP.Xnodes();  Ynodes = GJP.Ynodes();  Znodes = GJP.Znodes();  Tnodes = GJP.Tnodes(); 
+  Snodes = 1;
+
+  XnodeSites = GJP.XnodeSites();  YnodeSites = GJP.YnodeSites(); 
+  ZnodeSites = GJP.ZnodeSites();  TnodeSites = GJP.TnodeSites(); 
+  SnodeSites = 1;
+
+  Xcoor = GJP.XnodeCoor(); Ycoor = GJP.YnodeCoor(); Zcoor = GJP.ZnodeCoor(); Tcoor = GJP.TnodeCoor();
+  Scoor = 0;
+
+//  Xbc = GJP.Xbc(); Ybc = GJP.Ybc(); Zbc = GJP.Zbc(); Tbc = GJP.Tbc();
+  Xbc =  Ybc = Zbc = Tbc = BND_CND_PRD;
+
+  StartConfLoadAddr = GJP.StartConfLoadAddr();
+
+  // user set params
+  ConcurIONumber = concur_io_number;
+  strcpy(FileName, file);
+  CheckPrecision = chk_prec;
+  FileFpFormat = file_format;
+  ReconRow3 = recon_row_3;
+}
+
+
+/////////////////////////////////////////////////////////////////////
+// QioControl members////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+QioControl::QioControl() 
   : num_concur_io(8)
 {
   // TODO: set nodes[4], set coor[4], set unique_id
   // waiting for Bob's reply...
 
-  cout << "I am on a " << SizeX() << "x"<< SizeY() << "x"<< SizeZ() << "x"<< SizeT() <<"x"
-       <<SizeS()<<"x"<<SizeW()<< " lattice" << endl;
-  cout << "My pos is (" << CoorX() << ","<< CoorY() << ","<< CoorZ() << ","<< CoorT() << ","
-       << CoorS() << "," << CoorW() << ")" << endl;
-  cout << "My UniqueID() = " << UniqueID() << endl;
+  cout << "I am on a " << GJP.Xnodes() << "x"<< GJP.Ynodes() << "x"<< GJP.Znodes() 
+       << "x"<< GJP.Tnodes() <<"x"<<GJP.Snodes() << " lattice" << endl;
+  cout << "My pos is (" << GJP.XnodeCoor() << ","<< GJP.YnodeCoor() << ","<< GJP.ZnodeCoor() << ","
+       << GJP.TnodeCoor() << "," << GJP.SnodeCoor() << ")" << endl;
 
   // naive version, just check dim_s = 1, dim_w = 1, and other 4 directions are used
-  if(SizeS()!= 1 || SizeW()!=1) {
+  if(GJP.Snodes()!= 1) {
     cout << "Dimension > 4 not implemented!" << endl;
     exit(13);
   }
-  nodes[0] = SizeX();
-  nodes[1] = SizeY();
-  nodes[2] = SizeZ();
-  nodes[3] = SizeT();
+  nodes[0] = GJP.Xnodes();
+  nodes[1] = GJP.Ynodes();
+  nodes[2] = GJP.Znodes();
+  nodes[3] = GJP.Tnodes();
 
-  coor[0] = CoorX();
-  coor[1] = CoorY();
-  coor[2] = CoorZ();
-  coor[3] = CoorT();
+  coor[0] = GJP.XnodeCoor();
+  coor[1] = GJP.YnodeCoor();
+  coor[2] = GJP.ZnodeCoor();
+  coor[3] = GJP.TnodeCoor();
 
-  unique_id = CoorX() + SizeX() * (CoorY() + SizeY() * (CoorZ() + SizeZ() * CoorT()));
-
-}
-
-ParallelControl::~ParallelControl() {
+  unique_id = GJP.XnodeCoor() + GJP.Xnodes() * (GJP.YnodeCoor() + GJP.Ynodes() * 
+						(GJP.ZnodeCoor() + GJP.Znodes() * GJP.TnodeCoor()));
+  cout << "My UniqueID() = " << unique_id << endl;
 
 }
 
+QioControl::~QioControl() {
 
-// The following are NEW functions added to ParallelControl class 
+}
+
+
+// The following are NEW functions added to QioControl class 
 // to enable message passing between parallel processors, based on QMP calls
 // (some are pretty useful...)
 
-int ParallelControl::synchronize(const int errorStatus)  const {
+int QioControl::synchronize(const int errorStatus)  const {
   int error = errorStatus;
  
   if(NumNodes()>1) {
-    QMP_sum_int(&error);
+    //    QMP_sum_int(&error);
+    error = globalSumInt(error);
     if(error > 0) {
       cout << "Totally " << error << " nodes reported error!" << endl;
     }
@@ -58,27 +93,40 @@ int ParallelControl::synchronize(const int errorStatus)  const {
   return error;
 }
 
-void ParallelControl::broadcastInt(int * data, int fromID)  const {
+void QioControl::broadcastInt(int * data, int fromID)  const {
   if(NumNodes() > 1) {
     if(unique_id != fromID) {
       *data = 0;
     }
-    QMP_sum_int(data);
+    //    QMP_sum_int(data);
+    *data = globalSumInt(*data);
   }
 }
 
-void ParallelControl::broadcastFloat(Float * data, int fromID) const {
+void QioControl::broadcastFloat(Float * data, int fromID) const {
   if(NumNodes() > 1) {
     if(unique_id != fromID) {
       * data = 0;
     }
-    QMP_float_t  buf = *data;
-    QMP_sum_float(&buf);
-    *data = buf;
+    //    QMP_float_t  buf = *data;
+    //    QMP_sum_float(&buf);
+    *data = globalSumFloat(*data);
+    //    *data = buf;
   }
 }
 
-unsigned int ParallelControl::globalSumUint(const unsigned int data) const{
+int QioControl::globalSumInt(const int data) const{
+//  Gsum64Ext  gsum;
+//  return gsum.Sum(data);
+    return data;
+}
+
+unsigned int QioControl::globalSumUint(const unsigned int data) const{
+//  Gsum64Ext  gsum;
+//  return gsum.Sum(data);
+   return data;
+
+  /*
   if(NumNodes() > 1) {
     // i cannot find global sum on uint, so sum on 2 halves respectively
     // on 32-bit int machine, this proc may break down when more then 32768 nodes
@@ -99,9 +147,15 @@ unsigned int ParallelControl::globalSumUint(const unsigned int data) const{
   }
   else
     return data;
+  */
 }
 
-Float ParallelControl::globalSumFloat(const Float data) const {
+Float QioControl::globalSumFloat(const Float data) const {
+//  Gsum64Ext  gsum;
+//  return gsum.Sum(data);
+  return data;
+
+  /*
   QMP_float_t buf = data;
   
   if(NumNodes() > 1) {
@@ -109,12 +163,13 @@ Float ParallelControl::globalSumFloat(const Float data) const {
   }
 
   return buf;
+  */
 }
 
 // IO control pattern:  two broadcast to set id range who got control
 //                      read/write
 //                      one sync to indicate finish, ret<0 means all finished
-int ParallelControl::getIOTimeSlot(int block) const {
+int QioControl::getIOTimeSlot(int block) const {
   if(!block) {
     cout << "non-blocking mode not implemented! sorry!" << endl;
     cout << "using blocking mode..." << endl;
@@ -140,7 +195,7 @@ int ParallelControl::getIOTimeSlot(int block) const {
   return 1;
 }
 
-int ParallelControl::finishIOTimeSlot(int block) const {
+int QioControl::finishIOTimeSlot(int block) const {
   if(!block) {
     cout << "non-blocking mode not implemented! sorry!" << endl;
     cout << "using blocking mode..." << endl;
@@ -164,13 +219,13 @@ int ParallelControl::finishIOTimeSlot(int block) const {
 }
 
 
-int ParallelControl::IOCommander(int caller, int block) const {
+int QioControl::IOCommander(int caller, int block) const {
   if(!block) {
     cout << "non-blocking mode not implemented! sorry!" << endl;
     cout << "using blocking mode..." << endl;
   }
 
-  int totalnodes = Xnodes() * Ynodes() * Znodes() * Tnodes();
+  int totalnodes = NumNodes();
   int batches = totalnodes / num_concur_io;
   if(num_concur_io * batches < totalnodes)  batches ++;
 
@@ -207,5 +262,10 @@ int ParallelControl::IOCommander(int caller, int block) const {
     return 0;
   }
 }
+
+
+
+
+
 
 CPS_END_NAMESPACE
