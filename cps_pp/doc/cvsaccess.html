@@ -40,10 +40,12 @@
      for this). &nbsp; (Your account needs to be in the qcdoc group.)To check out the current version of the Columbia code,
   you need to (in bash):<br>
        
-<pre wrap="">export CVS_RSH=ssh<br><span class="moz-txt-citetags"></span>export CVSROOT=:ext:<font color="#ff0000"><b>YOURUSERNAME</b></font>@pughpugh.ph.ed.ac.uk:/Disk/ukqcd/QCDOC/CVS <br><span class="moz-txt-citetags"></span>cvs co cps++</pre>
+<pre wrap="">export CVS_RSH=ssh<br><span class="moz-txt-citetags"></span>export CVSROOT=:ext:<font color="#ff0000"><b>YOURUSERNAME</b></font>@pughpugh.ph.ed.ac.uk:/Disk/ukqcd/QCDOC/CVS <br><span class="moz-txt-citetags"></span>cvs co -P cps++</pre>
     This will then prompt you for your pughpugh password, and then check the 
 entire  codebase out into a directory called `cps++'.<br>
-       
+The -P flag is required so that empty directories are not
+checked out. This will cause the build system to fail.
+
 <h2><a name="Submission_of_Changes"></a>
  Submission of Changes</h2>
    Anyone who has checked out the code in the manner described above has
