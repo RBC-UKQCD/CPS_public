@@ -3,10 +3,10 @@
 /*!\file
   \brief Declarations for the communications layer.
   
-  $Id: sysfunc.h,v 1.11 2004-09-03 12:34:14 zs Exp $
+  $Id: sysfunc.h,v 1.12 2004-09-03 15:49:26 zs Exp $
 */
 
-#if TARGET == QCDOC || TARGET == QDCSP
+#if TARGET == QCDOC || TARGET == QCDSP
 #include <sysfunc.h>
 #elif TARGET == cpsMPI
 #include <comms/sysfunc_mpi.h>
