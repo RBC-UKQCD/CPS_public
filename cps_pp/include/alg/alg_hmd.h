@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.4 2003-08-29 20:15:44 mike Exp $
+  $Id: alg_hmd.h,v 1.5 2003-10-30 18:04:00 zs Exp $
 */
 //------------------------------------------------------------------
 
@@ -309,7 +309,7 @@ class AlgHmdR : public AlgHmd
     //!< A tricky thing to describe succinctly.
     /*!<
       This is an array of the time steps used for the intermediate gauge
-      field updates for each dynamical mass.
+      field updates in the R algorithm for each dynamical mass.
       Actually it is the differences between them. At least most of it is.
     */
 
