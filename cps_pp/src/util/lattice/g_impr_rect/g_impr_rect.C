@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprRect class.
 
-  $Id: g_impr_rect.C,v 1.5 2004-08-18 11:58:04 zs Exp $
+  $Id: g_impr_rect.C,v 1.6 2004-08-30 04:50:28 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.5 2004-08-18 11:58:04 zs Exp $
-//  $Id: g_impr_rect.C,v 1.5 2004-08-18 11:58:04 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-30 04:50:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.6 2004-08-30 04:50:28 chulwoo Exp $
+//  $Id: g_impr_rect.C,v 1.6 2004-08-30 04:50:28 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v $
 //  $State: Exp $
 //
@@ -173,6 +173,8 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
   ForceFlops +=198+24;
 }
 
+#ifdef PARALLEL
+#else
 #define PROFILE
 //------------------------------------------------------------------------------
 // EvolveMomGforce(Matrix *mom, Float step_size):
@@ -212,7 +214,7 @@ void GimprRect::EvolveMomGforce(Matrix *mom, Float step_size){
   print_flops(cname,fname,ForceFlops,time);
 #endif
 }
-
+#endif
 
 //------------------------------------------------------------------------------
 // Float GhamiltonNode(void):
