@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.17 2004-09-02 16:56:58 zs Exp $
+  $Id: random.h,v 1.18 2004-09-17 18:08:13 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:56:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.17 2004-09-02 16:56:58 zs Exp $
-//  $Id: random.h,v 1.17 2004-09-02 16:56:58 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-17 18:08:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.18 2004-09-17 18:08:13 chulwoo Exp $
+//  $Id: random.h,v 1.18 2004-09-17 18:08:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -29,6 +29,7 @@ CPS_END_NAMESPACE
 #include <string.h>
 #include <util/data_types.h>
 #include <util/enum.h>
+#include <util/error.h>
 #include <util/smalloc.h>
 CPS_START_NAMESPACE
 //---------------------------------------------------------------
@@ -69,8 +70,9 @@ class RandomGenerator {
     //! Size of the RNG state.
     int StateSize() const;
 
+#if 1
     //! Number of Integers in RNG, that should be stored to record status
-    int RNGints() const { return state_size + 2; } // ma & inext & inextp
+    virtual int RNGints() const { return state_size + 2; } // ma & inext & inextp
 
     //! to store this object
     void store(int *buf) {
@@ -85,6 +87,7 @@ class RandomGenerator {
       inext = buf[state_size];
       inextp = buf[state_size+1];
     }
+#endif
     
 };
 
@@ -180,6 +183,25 @@ class GaussianRandomGenerator : public virtual RandomGenerator
     }
 
     IFloat Rand();
+#if 1
+    //! Number of Integers in RNG, that should be stored to record status
+    int RNGints() const { return RandomGenerator::RNGints()+1; } // iset
+    int RNGIFloats() const { return 1; } // gset
+
+    //! to store this object
+    void store(int *buf) {
+      if (iset)
+        ERR.General("GaussianRandomGenerator","store()","iset !=0, RNG state cannot be saved correctly");
+      RandomGenerator::store(buf);
+      buf[RandomGenerator::RNGints()] = iset;
+    }
+
+    //! to load from file
+    void load(int *buf) {
+      RandomGenerator::load(buf);
+      iset = buf[RandomGenerator::RNGints()];
+    }
+#endif
 };
  
 
@@ -224,6 +246,9 @@ public UniformRandomGenerator, public GaussianRandomGenerator
   \param s2 the variance of the gaussian distribution.
 */
     void SetSigma(IFloat s2) { GaussianRandomGenerator::SetSigma(s2);  }
+
+    //! Number of Integers in RNG, that should be stored to record status
+    int RNGints() const { return GaussianRandomGenerator::RNGints(); } // iset
 };
 
   
