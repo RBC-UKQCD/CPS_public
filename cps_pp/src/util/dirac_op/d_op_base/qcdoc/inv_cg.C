@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-09 07:47:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.9 2004-08-09 07:47:23 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.9 2004-08-09 07:47:23 chulwoo Exp $
+//  $Date: 2004-08-11 05:33:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.10 2004-08-11 05:33:33 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.10 2004-08-11 05:33:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -183,6 +183,7 @@ int DiracOp::InvCg(Vector *out,
   if(mmp == 0){
     mmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
   }
+  printf("dir=%p mmp=%p\n",dir,mmp);
   if(mmp == 0)
     ERR.Pointer(cname,fname, "mmp");
   VRB.Smalloc(cname,fname, "mmp", mmp, f_size_cb * sizeof(Float));

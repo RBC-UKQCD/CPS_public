@@ -97,6 +97,8 @@ class Lattice
       // The kind of gauge fixing. It is set to FIX_GAUGE_NONE
       // if the gauge is not fixed.
 
+    static int scope_lock;
+
  protected:
 
     static int node_sites[5];

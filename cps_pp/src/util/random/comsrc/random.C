@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.9 2004-08-09 07:47:26 chulwoo Exp $
+  $Id: random.C,v 1.10 2004-08-11 05:33:35 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-09 07:47:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.9 2004-08-09 07:47:26 chulwoo Exp $
-//  $Id: random.C,v 1.9 2004-08-09 07:47:26 chulwoo Exp $
+//  $Date: 2004-08-11 05:33:35 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.10 2004-08-11 05:33:35 chulwoo Exp $
+//  $Id: random.C,v 1.10 2004-08-11 05:33:35 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -39,17 +39,20 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 
+IFloat UniformRandomGenerator::A = -0.5;
+IFloat UniformRandomGenerator::B = 0.5;
+IFloat GaussianRandomGenerator::sigma2 = 1.0;
 
 /*!
   This method must be called before the RNG is used
   \param idum The seed.	
  */
-void RandomGenerator::Reset(long long idum)
+void RandomGenerator::Reset(int idum)
 {
     int i, k, ii;
-    long long mk, mj;
+    int mk, mj;
 
-    const long long MSEED = 161803398;
+    const int MSEED = 161803398;
     
     //-----------------------------------------------------
     //  Initialize ma[state_size] using the seed idum and the large
@@ -98,21 +101,21 @@ void RandomGenerator::Reset(long long idum)
 //---------------------------------------------------------------
 
 /*!
-  \param to Pointer to a buffer of size at least 57*sizeof(long long).
+  \param to Pointer to a buffer of size at least 57*sizeof(int).
 */
 
-void RandomGenerator::StoreSeeds(unsigned long long *to) const
+void RandomGenerator::StoreSeeds(unsigned int *to) const
 {
-    *to++ = (unsigned long long)inext;
-    *to++ = (unsigned long long)inextp;
+    *to++ = (unsigned int)inext;
+    *to++ = (unsigned int)inextp;
     for(int i = 0; i < 55; ++i) *to++ = ma[i];
 }
 
 /*!
-  \param from Pointer to a buffer of size at least 57*sizeof(long long).
+  \param from Pointer to a buffer of size at least 57*sizeof(int).
 */
 
-void RandomGenerator::RestoreSeeds(const unsigned long long *from)
+void RandomGenerator::RestoreSeeds(const unsigned int *from)
 {
     inext = *from++;
     inextp = *from++;
@@ -299,13 +302,9 @@ IFloat LatRanGen::Urand(FermionFieldDimension frm_dim)
 {
   char *fname = "Urand(FermionFieldDimension)";
   if (frm_dim == FIVE_D)
-  return ugran[rgen_pos].Urand();
-  else{
-    if(rgen_pos >GJP.VolNodeSites()/16)
-      ERR.General(cname,fname,"rgen_pos(%d)>GJP.VolNodeSites()/16",rgen_pos);
-    return ugran_4d[rgen_pos].Urand();
-  }
-//  return ugran[rgen_pos].Urand();
+    return ugran[rgen_pos].Urand();
+  else
+    return ugran_4d[rgen_pos_4d].Urand();
 }
 
 //---------------------------------------------------------
@@ -319,12 +318,9 @@ IFloat LatRanGen::Grand(FermionFieldDimension frm_dim)
   char *fname = "Grand(FermionFieldDimension)";
 //  printf("LatRanGen::Grand():%d\n",rgen_pos);
   if (frm_dim == FIVE_D)
-  return ugran[rgen_pos].Grand();
-  else{
-    if(rgen_pos >GJP.VolNodeSites()/16)
-      ERR.General(cname,fname,"rgen_pos(%d)>GJP.VolNodeSites()/16",rgen_pos);
-    return ugran_4d[rgen_pos].Grand();
-  }
+    return ugran[rgen_pos].Grand();
+  else
+    return ugran_4d[rgen_pos_4d].Grand();
 }
 
 
@@ -337,9 +333,11 @@ IFloat LatRanGen::Grand(FermionFieldDimension frm_dim)
 //----------------------------------------------------------------------
 void LatRanGen::SetInterval(IFloat high, IFloat low)
 {
+#if 0
   for(int i=0; i<n_rgen; i++) ugran[i].SetInterval(high, low);
   for(int i=0; i<n_rgen_4d; i++) ugran_4d[i].SetInterval(high, low);
-  
+#endif
+  ugran[0].SetInterval(high,low);
 }
 
 //---------------------------------------------------------
@@ -350,8 +348,11 @@ void LatRanGen::SetInterval(IFloat high, IFloat low)
 //----------------------------------------------------------------------
 void LatRanGen::SetSigma(IFloat sigma)
 {
+#if 0
   for(int i=0; i<n_rgen; i++) ugran[i].SetSigma(sigma);
   for(int i=0; i<n_rgen_4d; i++) ugran_4d[i].SetSigma(sigma);
+#endif
+  ugran[0].SetSigma(sigma);
 }
 
 //---------------------------------------------------------
@@ -383,6 +384,7 @@ void LatRanGen::AssignGenerator(int x, int y, int z, int t,int s)
   s/=2;
 
   rgen_pos = x + hx[0] * (y + hx[1] * (z + hx[2] * (t +hx[3] * s)));
+  rgen_pos_4d = x + hx[0] * (y + hx[1] * (z + hx[2] * t ));
 }
 
 //----------------------------------------------------------------------
@@ -418,7 +420,8 @@ void LatRanGen ::AssignGenerator(int i)
   if (GJP.SnodeSites()<2) s = 0;
   else  s = (i/can[4]) % hx[4];
   rgen_pos = x + hx[0] * (y + hx[1] * (z + hx[2] * (t + hx[3] * s)));
-//  fprintf(stders,"i=%d x = %d %d %d %d %d rgen_pos=%d ",i,x,y,z,t,s,rgen_pos);
+  rgen_pos_4d = x + hx[0] * (y + hx[1] * (z + hx[2] * t ));
+//  fprintf(stdout,"i=%d x = %d %d %d %d %d rgen_pos=%d ",i,x,y,z,t,s,rgen_pos);
 }
 
 
@@ -437,8 +440,9 @@ IFloat LatRanGen::Lrand()
   
   Float divisor = (Float) (n_rgen*GJP.Xnodes()*GJP.Ynodes()*GJP.Znodes()
 			   *GJP.Tnodes());
+  if(GJP.Snodes()>1) divisor *= (Float) GJP.Snodes();
   cntr/=divisor;
-  glb_sum(&cntr);
+  glb_sum_five(&cntr);
   return  (IFloat) cntr;
 
 }
@@ -460,10 +464,12 @@ int LatRanGen::StateSize() const{
 
   \param state The state to be copied from the RNG.
 */
-void LatRanGen::GetState(unsigned long long *state) const{
-
+void LatRanGen::GetState(unsigned int *state,
+FermionFieldDimension frm_dim) const{
+    if (frm_dim == FIVE_D)
     ugran[rgen_pos].StoreSeeds(state);        
-    
+    else
+    ugran_4d[rgen_pos_4d].StoreSeeds(state);        
 }
 
 /*!
@@ -471,9 +477,14 @@ void LatRanGen::GetState(unsigned long long *state) const{
   \pre \a s must be an array with length given by ::StateSize.
   \param s The state to assigned to the RNG on an assigned site.
 */
-void LatRanGen::SetState(const unsigned long long * s){
+void LatRanGen::SetState(const unsigned int * s,
+FermionFieldDimension frm_dim) {
 
-    ugran[rgen_pos].RestoreSeeds(s);
+   // ugran[rgen_pos].RestoreSeeds(s);
+    if (frm_dim == FIVE_D)
+    ugran[rgen_pos].RestoreSeeds(s);        
+    else
+    ugran_4d[rgen_pos_4d].RestoreSeeds(s);        
 
 }
 
@@ -491,9 +502,12 @@ int LatRanGen::NStates() const{
   ::StateSize.
   \param s The state to assigned to the RNGs on the entire local lattice.
 */
-void LatRanGen::SetStates(unsigned long long **s){
-
+void LatRanGen::SetStates(unsigned int **s,
+FermionFieldDimension frm_dim) {
+    if (frm_dim == FIVE_D)
     for(int h=0; h<n_rgen; h++) ugran[h].RestoreSeeds(s[h]);
+    else
+    for(int h=0; h<n_rgen_4d; h++) ugran_4d[h].RestoreSeeds(s[h]);
 
 }
 	
@@ -503,9 +517,13 @@ void LatRanGen::SetStates(unsigned long long **s){
   ::StateSize.
   \param s The state to be copied from the RNGs on the entire local lattice. 
 */
-void LatRanGen::GetStates(unsigned long long **s) const{
+void LatRanGen::GetStates(unsigned int **s,
+FermionFieldDimension frm_dim) const {
 
+    if (frm_dim == FIVE_D)
     for(int h=0; h<n_rgen; h++) ugran[h].StoreSeeds(s[h]);
+    else
+    for(int h=0; h<n_rgen; h++) ugran_4d[h].StoreSeeds(s[h]);
 
 }
 

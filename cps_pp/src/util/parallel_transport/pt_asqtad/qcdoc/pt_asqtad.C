@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief    Definition of ParTransAsqtad class methods for QCDOC.
 
-  $Id: pt_asqtad.C,v 1.7 2004-08-09 07:47:25 chulwoo Exp $
+  $Id: pt_asqtad.C,v 1.8 2004-08-11 05:33:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-09 07:47:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v 1.7 2004-08-09 07:47:25 chulwoo Exp $
-//  $Id: pt_asqtad.C,v 1.7 2004-08-09 07:47:25 chulwoo Exp $
+//  $Date: 2004-08-11 05:33:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v 1.8 2004-08-11 05:33:34 chulwoo Exp $
+//  $Id: pt_asqtad.C,v 1.8 2004-08-11 05:33:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_asqtad.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v $
 //  $State: Exp $
 //
@@ -79,7 +79,7 @@ ParTransAsqtad::ParTransAsqtad(Lattice & latt) :
   VRB.Smalloc(cname,fname, "frm_tmp", 
 	      frm_tmp, f_size_cb * sizeof(Float));
 #endif
-
+  printf("%s:%s end\n",cname,fname);
 }
 
 

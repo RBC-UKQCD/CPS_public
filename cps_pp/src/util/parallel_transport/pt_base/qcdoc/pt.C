@@ -1,19 +1,19 @@
 /*! \file
-  \brief  Definition of ParTransAsqtad class methods for QCDOC.
+  \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.2 2004-08-09 07:47:26 chulwoo Exp $
+  $Id: pt.C,v 1.3 2004-08-11 05:33:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-09 07:47:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.2 2004-08-09 07:47:26 chulwoo Exp $
-//  $Id: pt.C,v 1.2 2004-08-09 07:47:26 chulwoo Exp $
+//  $Date: 2004-08-11 05:33:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.3 2004-08-11 05:33:34 chulwoo Exp $
+//  $Id: pt.C,v 1.3 2004-08-11 05:33:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -82,9 +82,6 @@ static int lex_xyzt(int *x){
 	static char *fname = "lex_xyzt()";
 //	printf("%s: %d %d %d %d\n",fname,x[0],x[1],x[2],x[3]);
 	int result = x[0] + size[0]*(x[1]+size[1]*(x[2]+size[2]*x[3]));
-	if (result<0 or result>=vol)
-	ERR.General("","lex_xyzt","index out of bounds %d %d %d %d\n",
-		x[0],x[1],x[2],x[3]);
 	return result;
 }
 
@@ -394,8 +391,6 @@ void pt_init_g(void){
 
 	char *fname = "pt_init_g()";
 	VRB.Func("",fname);
-	IFloat *rcv_mat = (IFloat *)qalloc(QFAST|QNONCACHE,18*sizeof(IFloat));
-//	for(i=0;i<18;i++) rcv_mat[i]=0.;
 	for(i=0; i<2*NDIM;i++){
 		local_count[i]=non_local_count[i]=0;
 	}
@@ -403,6 +398,8 @@ void pt_init_g(void){
 
 	SCUDir rcv_dir[]={SCU_XP, SCU_XM, SCU_YP, SCU_YM, SCU_ZP, SCU_ZM,SCU_TP,SCU_TM};
 	SCUDir snd_dir[]={SCU_XM, SCU_XP, SCU_YM, SCU_YP, SCU_ZM, SCU_ZP,SCU_TM,SCU_TP};
+
+	IFloat *rcv_mat = (IFloat *)qalloc(QFAST|QNONCACHE,18*sizeof(IFloat));
     sys_cacheflush(0);
 	for(i=0;i<NDIM;i++){
 		SCUDirArgIR snd(u,snd_dir[i*2+1],SCU_SEND,sizeof(Matrix));
@@ -576,6 +573,8 @@ void pt_1vec(int n, IFloat **vout, IFloat **vin, const int *dir){
 */
 void pt_vvpd(Vector **vect, int n_vect, const int *dir, 
 			  int n_dir, int hop, Matrix **sum){
+char *fname = "pt_vvpd()";
+VRB.Func("",fname);
   int i, s, v;
   int wire[n_dir];
   for(i=0;i<n_dir;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
@@ -676,6 +675,8 @@ void pt_shift_field(Matrix **v, const int *dir, int n_dir,
 //! u[-/+nu](x) = U_[-/+nu](x) 
 void pt_shift_link(Matrix **u, const int *dir, int n_dir){
 
+char *fname = "pt_shift_link()";
+VRB.Func("",fname);
   for (int i=0; i<n_dir; i++) {
     for (int s=0; s<local_chi[dir[i]]; s++) {
       Copy((IFloat*)((int)u[i] + 3*hp_l[0][dir[i]][s].dest),

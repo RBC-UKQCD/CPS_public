@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
+  $Id: random.h,v 1.12 2004-08-11 05:33:47 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-08 05:05:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
-//  $Id: random.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
+//  $Date: 2004-08-11 05:33:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.12 2004-08-11 05:33:47 chulwoo Exp $
+//  $Id: random.h,v 1.12 2004-08-11 05:33:47 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -36,13 +36,13 @@ CPS_START_NAMESPACE
   This uses the Fibonacci RNG routine (ran3) from Numerical Recipes in C
 */
 //---------------------------------------------------------------
-const long long MBIG  = 1000000000;
+const int MBIG  = 1000000000;
 const IFloat FAC = 1.0E-09;			// 1.0/MBIG
 class RandomGenerator {
   private:
 
     static const int state_size = 55;
-    long long ma[state_size];	// The value 55(range ma[0...54])
+    int ma[state_size];	// The value 55(range ma[0...54])
     				// is special and should not be
 				// modified.
     int inext;
@@ -58,13 +58,13 @@ class RandomGenerator {
     virtual IFloat Rand();
 
     //! Seeds the RNG.
-    void Reset(long long seed);
+    void Reset(int seed);
 
     //! Stores the RNG state.
-    void StoreSeeds(unsigned long long *to) const;
+    void StoreSeeds(unsigned int *to) const;
 
     //! Loads the RNG state.
-    void RestoreSeeds(const unsigned long long *from);
+    void RestoreSeeds(const unsigned int *from);
 
     //! Size of the RNG state.
     int StateSize() const;
@@ -88,8 +88,8 @@ class RandomGenerator {
 class UniformRandomGenerator: public virtual RandomGenerator
 {
   private:
-    IFloat A;
-    IFloat B;
+    static IFloat A;
+    static IFloat B;
 
   public:
 
@@ -99,7 +99,8 @@ class UniformRandomGenerator: public virtual RandomGenerator
   \param lower_limit the lower bound of the distribution range
 */
     UniformRandomGenerator(IFloat high_limit = 0.5, IFloat low_limit = -0.5):
-	RandomGenerator(), A(low_limit), B(high_limit) {}
+//	RandomGenerator(), A(low_limit), B(high_limit) {}
+	RandomGenerator() {}
 
 //! Sets the interval over which the uniform distribution is defined.
 /*!
@@ -135,7 +136,7 @@ class UniformRandomGenerator: public virtual RandomGenerator
 class GaussianRandomGenerator : public virtual RandomGenerator
 {
   private:
-    IFloat sigma2;
+    static IFloat sigma2;
     int iset;			 // flag
     IFloat gset;			 // saved random number
 
@@ -145,7 +146,7 @@ class GaussianRandomGenerator : public virtual RandomGenerator
   \param s2 the variance of the gaussian distribution.
 */
     GaussianRandomGenerator(IFloat s2 = 1.0):
-	RandomGenerator(), sigma2(s2), iset(0) {}    
+	RandomGenerator(), iset(0) {SetSigma(s2);}    
 
 //! Sets the variance of the distribution.
 /*!
@@ -228,6 +229,7 @@ class LatRanGen
                                 // = 1 when LatRanGen is initialized
     UGrandomGenerator *ugran;
     int n_rgen_4d ;  // CJ: Gives the number of 4d generators (and hypercubes)
+    int rgen_pos_4d;// CJ: ID of the 4D generator being used
     UGrandomGenerator *ugran_4d; // CJ: 4D RNG for gauge field
 
     char *cname;
@@ -264,19 +266,23 @@ class LatRanGen
 
 
     //! Assign the  state to a selected RNG.
-    void SetState(const unsigned long long *);
+    void SetState(const unsigned int *,
+        FermionFieldDimension frm_dim =FIVE_D );
 
     //! Assign the  state of all RNGs.      
-    void SetStates(unsigned long long **);
+    void SetStates(unsigned int **, 
+        FermionFieldDimension frm_dim =FIVE_D );
 
     //! Get the total number of states
     int NStates() const;
     
     //! Retrieve the state of a single RNG
-    void GetState(unsigned long long *) const;
+    void GetState(unsigned int *, 
+        FermionFieldDimension frm_dim = FIVE_D ) const;
 
     //! Retrieve the state of all RNGs
-    void GetStates(unsigned long long **) const;
+    void GetStates(unsigned int **,
+        FermionFieldDimension frm_dim = FIVE_D ) const;
     
 	
 };

@@ -154,7 +154,7 @@ int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
       asqtad.Dslash(f_out_d[s],f_out[s],CHKB_EVEN,DAG_NO);
-  cg_arg->true_rsd - RsdCG[isz];
+  cg_arg->true_rsd = RsdCG[isz];
 
   return iter;
 
@@ -362,7 +362,7 @@ enum {NUM_DIR=8,POS_DIR=4};
 void Fasqtad::Smear(){
   char *fname = "Smear()";
   VRB.Func(cname,fname);
-  if (smeared) return;
+//  if (smeared) return;
 
 //--------------------------------------------------------------------
 // c1 -> one link; c2 -> 3-link; c3 -> 3-link staple; c5 -> 5-link staple;

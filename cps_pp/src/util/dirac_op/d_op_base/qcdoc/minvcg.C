@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpBase class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.5 2004-08-05 19:00:56 mclark Exp $
+   $Id: minvcg.C,v 1.6 2004-08-11 05:33:33 chulwoo Exp $
  */
 
 CPS_END_NAMESPACE
@@ -198,6 +198,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     MatPcDagMatPc(Ap,p[isz],&d);
   }
   DiracOpGlbSum(&d);
+  IFloat *Ap_tmp = (IFloat *)Ap;
+  VRB.Flow(cname,fname,"Ap= %e pAp =%e\n",*Ap_tmp,d);
  
   b = -cp/d;
   
@@ -217,6 +219,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   // c = |r[1]|^2
   vaxpy_norm(&b,Ap,r,f_size/6,&c);
   DiracOpGlbSum(&c);
+  VRB.Flow(cname,fname,"|r[1]^2 =%e\n",c);
 
   // Psi[1] -= b[0] p[0] =- b[0] chi;
   if (type == SINGLE) {
@@ -250,6 +253,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     timeval start,end;
     // a[k+1] = |r[k]**2/ |r[k-1]|**2
     a = c/cp;
+  VRB.Flow(cname,fname,"a =%e\n",a);
 
     // p[k+1] = r[k+1] + a[k+1] p[k]
     //   Compute the shifted as
@@ -260,6 +264,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
       as = z[iz][s]/at[s];
       vaxpy(&as,r,p[s],f_size/6);
       CGflops += f_size*2;
+    IFloat *Ap_tmp = (IFloat *)p[s];
+  VRB.Flow(cname,fname,"as = %e p[%d] =%e\n",as, s,*Ap_tmp);
     }
 
     // cp = |r[k]**2
@@ -274,6 +280,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
       MatPcDagMatPc(Ap,p[isz],&d);
     }
     DiracOpGlbSum(&d);
+    IFloat *Ap_tmp = (IFloat *)Ap;
+  VRB.Flow(cname,fname,"Ap =%e  |b[%d]^2 =%e\n",*Ap_tmp,k,d);
     
     bp = b;
     b = -cp/(d*at[isz]*at[isz]);

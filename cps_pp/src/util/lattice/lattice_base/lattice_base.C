@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.15 2004-08-09 07:47:24 chulwoo Exp $
+  $Id: lattice_base.C,v 1.16 2004-08-11 05:33:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-09 07:47:24 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.15 2004-08-09 07:47:24 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.15 2004-08-09 07:47:24 chulwoo Exp $
+//  $Date: 2004-08-11 05:33:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.16 2004-08-11 05:33:34 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.16 2004-08-11 05:33:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -125,6 +125,7 @@ static Matrix *mp4 = &mt4;
 
 
 int Lattice::ForceFlops=0;
+int Lattice::scope_lock=0;
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
@@ -142,6 +143,15 @@ Lattice::Lattice()
 
   StartConfType start_conf_kind = GJP.StartConfKind();
   link_buffer = 0;
+
+  //----------------------------------------------------------------
+  // Check and set the scope_lock
+  //----------------------------------------------------------------
+  if(scope_lock != 0){
+    ERR.General(cname,fname,
+		"Only one lattice object is allowed to be on scope\n");
+  }
+  scope_lock = 1;
 
 
   if(!(is_allocated)){
@@ -279,6 +289,8 @@ Lattice::Lattice()
   //----------------------------------------------------------------
   if (GJP.XiBare() != 1.0)
     Reunitarize();  
+
+  smeared = 0;
 }
 
 
@@ -301,6 +313,12 @@ Lattice::~Lattice()
     VRB.Flow(cname,fname, "Checking gauge field across s-slices\n");
     GsoCheck();
   }
+
+  //----------------------------------------------------------------
+  // Release the scope_lock
+  //----------------------------------------------------------------
+  scope_lock = 0;
+  
 
   // Undo the scaling of links on anisotropic lattices  -- Ping
   //----------------------------------------------------------------
@@ -342,6 +360,7 @@ void Lattice::GaugeField(Matrix *u)
   // Copy from u to gauge_field
   //----------------------------
   moveMem((IFloat *) gauge_field, (IFloat *) u, size);
+  smeared = 0;
 }
 
 
@@ -1809,6 +1828,7 @@ void Lattice::Reunitarize(void)
   // Modified here by Ping for anisotropic lattices
   //----------------------------------------------------------------
   MltFloat(GJP.XiBare(), GJP.XiDir());  
+  smeared = 0;
 }
 
 
@@ -1876,6 +1896,7 @@ void Lattice::Reunitarize(Float &dev, Float &max_diff)
   // Modified here by Ping for anisotropic lattices
   //----------------------------------------------------------------
   MltFloat(GJP.XiBare(), GJP.XiDir());    
+  smeared = 0;
 }
 
 
@@ -2184,6 +2205,7 @@ void Lattice::SetGfieldDisOrd(void){
     }
   }
   Reunitarize();
+  smeared=0;
 
 }
 

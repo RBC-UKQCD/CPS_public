@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.12 2004-08-09 07:47:22 chulwoo Exp $
+  $Id: pt.h,v 1.13 2004-08-11 05:33:47 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-09 07:47:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.12 2004-08-09 07:47:22 chulwoo Exp $
-//  $Id: pt.h,v 1.12 2004-08-09 07:47:22 chulwoo Exp $
+//  $Date: 2004-08-11 05:33:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.13 2004-08-11 05:33:47 chulwoo Exp $
+//  $Id: pt.h,v 1.13 2004-08-11 05:33:47 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -196,7 +196,7 @@ class ParTransAsqtad : public ParTransStagTypes
 
     //! u[-/+nu](x) = U_[-/+nu](x)
     void shift_link(Matrix **u, const int *dir, int n_dir){
-        shift_link(u,dir,n_dir);
+        pt_shift_link(u,dir,n_dir);
     }
 
     ~ParTransAsqtad();

@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.8 2004-08-08 05:05:29 chulwoo Exp $
+  $Id: vector.h,v 1.9 2004-08-11 05:33:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-08 05:05:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.8 2004-08-08 05:05:29 chulwoo Exp $
-//  $Id: vector.h,v 1.8 2004-08-08 05:05:29 chulwoo Exp $
+//  $Date: 2004-08-11 05:33:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.9 2004-08-11 05:33:48 chulwoo Exp $
+//  $Id: vector.h,v 1.9 2004-08-11 05:33:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -251,6 +251,9 @@ class Matrix
 
     //! Not what you might think.
     void TrLessAntiHermMatrix(const Matrix& this_dag);
+#if TARGET ==QCDOC
+    void TrLessAntiHermMatrix();
+#endif
 
     //! Assignment to tensor product of vectors.
     void Cross2(const Vector& v1, const Vector& v2);

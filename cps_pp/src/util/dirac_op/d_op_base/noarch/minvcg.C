@@ -115,6 +115,8 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
     MatPcDagMatPc(Ap,p[isz],&d);
     DiracOpGlbSum(&d);
   }
+  IFloat *Ap_tmp = (IFloat *)Ap;
+  VRB.Flow(cname,fname,"Ap=%e pAp =%e\n",*Ap_tmp,d);
 
   b = -cp/d;
 
@@ -134,6 +136,7 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
   r -> FTimesV1PlusV2(b,Ap,r,f_size);
   // c = |r[1]|^2
   c = r -> NormSqGlbSum(f_size);
+  VRB.Flow(cname,fname,"|r[1]|^2 =%e\n",c);
   
   // Psi[1] -= b[0] p[0] =- b[0] chi;
   if (type == SINGLE) {
@@ -158,6 +161,7 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
   for (k=1; k<=dirac_arg->max_num_iter && !convP; k++) {
     // a[k+1] = |r[k]**2/ |r[k-1]|**2
     a = c/cp;
+  VRB.Flow(cname,fname,"a =%e\n",a);
 
     // p[k+1] = r[k+1] + a[k+1] p[k]
     //   Compute the shifted as
@@ -171,6 +175,8 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
 	p[s] -> VecTimesEquFloat(as,f_size);	
 	p[s] -> FTimesV1PlusV2(z[iz][s],r,p[s],f_size);	
       }
+    IFloat *Ap_tmp = (IFloat *)p[s];
+  VRB.Flow(cname,fname,"as = %e p[%d] =%e\n",as, s,*Ap_tmp);
     }
     
     // cp = |r[k]**2
@@ -185,6 +191,8 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
       MatPcDagMatPc(Ap,p[isz],&d);
       DiracOpGlbSum(&d);
     }
+    IFloat *Ap_tmp = (IFloat *)Ap;
+  VRB.Flow(cname,fname,"Ap =%e  |b[%d]^2 =%e\n",*Ap_tmp,k,d);
 
     bp = b;
     b = -cp/d;

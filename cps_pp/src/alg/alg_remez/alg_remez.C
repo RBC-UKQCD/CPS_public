@@ -146,7 +146,7 @@ Float AlgRemez::generateApprox(int degree, unsigned long pnum, unsigned long pde
 Float AlgRemez::generateApprox(int num_degree, int den_degree, unsigned long pnum, unsigned long pden)
 {
   char *fname = "generateApprox(int, unsigned long, unsigned long)";
-  VRB.Func(cname,fname);
+//  VRB.Func(cname,fname);
 
   // Reallocate arrays, since degree has changed
   if (num_degree != n || den_degree != d) allocate(num_degree,den_degree);
@@ -196,7 +196,7 @@ Float AlgRemez::generateApprox(int num_degree, int den_degree, unsigned long pnu
 // Return the partial fraction expansion of the approximation x^(pnum/pden)
 int AlgRemez::getPFE(Float *Res, Float *Pole, Float *Norm) {
   char *fname = "getPFE(Float*, Float*, Float*)";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
 
   if (n!=d) ERR.General(cname,fname,"Cannot handle case: Numerator degree neq Denominator degree\n");
 
@@ -232,7 +232,7 @@ int AlgRemez::getPFE(Float *Res, Float *Pole, Float *Norm) {
 // Return the partial fraction expansion of the approximation x^(-pnum/pden)
 int AlgRemez::getIPFE(Float *Res, Float *Pole, Float *Norm) {
   char *fname = "getIPFE(Float*, Float*, Float*)";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
 
   if (!alloc) ERR.General(cname,fname,"Approximation not yet generated\n");
 
@@ -271,7 +271,7 @@ int AlgRemez::getIPFE(Float *Res, Float *Pole, Float *Norm) {
 // Initial values of maximal and minimal errors
 void AlgRemez::initialGuess() {
   char *fname = "initialGuess()";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
   // Supply initial guesses for solution points
   long ncheb = neq;			// Degree of Chebyshev error estimate
   bigfloat a, r;
@@ -300,7 +300,7 @@ void AlgRemez::initialGuess() {
 // Initialise step sizes
 void AlgRemez::stpini(bigfloat *step) {
   char *fname = "stpini()";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
 
   xx[neq+1] = apend;
   delta = 0.25;
@@ -312,7 +312,7 @@ void AlgRemez::stpini(bigfloat *step) {
 // Search for error maxima and minima
 void AlgRemez::search(bigfloat *step) {
   char *fname = "search()";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
   bigfloat a, q, xm, ym, xn, yn, xx0, xx1;
   int i, j, meq, emsign, ensign, steps;
 
@@ -401,7 +401,7 @@ void AlgRemez::search(bigfloat *step) {
 // Solve the equations
 void AlgRemez::equations(void) {
   char *fname = "equations()";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
   bigfloat x, y, z;
   int i, j, ip;
   bigfloat *aa;
@@ -447,7 +447,7 @@ void AlgRemez::equations(void) {
 // from the solution vector param
 bigfloat AlgRemez::approx(const bigfloat x) {
   char *fname = "approx(bigfloat)";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
   bigfloat yn, yd;
   int i;
 
@@ -463,7 +463,7 @@ bigfloat AlgRemez::approx(const bigfloat x) {
 // Compute size and sign of the approximation error at x
 bigfloat AlgRemez::getErr(bigfloat x, int *sign) {
   char *fname = "getErr(bigfloat)";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
   bigfloat e, f;
 
   f = func(x);
@@ -481,7 +481,7 @@ bigfloat AlgRemez::getErr(bigfloat x, int *sign) {
 // Calculate function required for the approximation
 bigfloat AlgRemez::func(const bigfloat x) {
   char *fname = "func(bigfloat)";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
 
   bigfloat y,dy,f=1l,df;
 
@@ -500,7 +500,7 @@ bigfloat AlgRemez::func(const bigfloat x) {
 int AlgRemez::simq(bigfloat A[], bigfloat B[], bigfloat X[], int n) {
 
   char *fname = "simq(bigfloat*, bigfloat*, bigfloat*, int, int)";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
 
   int i, j, ij, ip, ipj, ipk, ipn;
   int idxpiv, iback;
@@ -622,7 +622,7 @@ int AlgRemez::simq(bigfloat A[], bigfloat B[], bigfloat X[], int n) {
 // Calculate the roots of the approximation
 int AlgRemez::root() {
   char *fname = "root()";
-  VRB.Func(cname,fname);
+ //  VRB.Func(cname,fname);
   long i,j;
   bigfloat x,dx=0.05;
   bigfloat upper=1, lower=-100000;
@@ -672,7 +672,7 @@ int AlgRemez::root() {
 // Evaluate the polynomial
 bigfloat AlgRemez::polyEval(bigfloat x, bigfloat *poly, long size) {
   char *fname = "polyEval(bigfloat, bigfloat *, long)";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
   bigfloat f = poly[size];
   for (int i=size-1; i>=0; i--) f = f*x + poly[i];
   return f;
@@ -681,7 +681,7 @@ bigfloat AlgRemez::polyEval(bigfloat x, bigfloat *poly, long size) {
 // Evaluate the differential of the polynomial
 bigfloat AlgRemez::polyDiff(bigfloat x, bigfloat *poly, long size) {
   char *fname = "polyDiff(bigfloat, bigfloat *, long)";
-  VRB.Func(cname,fname);
+//   VRB.Func(cname,fname);
   bigfloat df = (bigfloat)size*poly[size];
   for (int i=size-1; i>0; i--) df = df*x + (bigfloat)i*poly[i];
   return df;

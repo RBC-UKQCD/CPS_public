@@ -45,6 +45,15 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
   //----------------------------------------------------------------
   hmd_arg->approx_type = CONSTANT;
 
+  // Currently RHMC force term is not implemented for Asqtad with any
+  // dimension less than 4
+  //----------------------------------------------------------------
+  if( latt.Fclass() == F_CLASS_ASQTAD && 
+	(GJP.XnodeSites()==2 ||
+	GJP.YnodeSites()==2 ||
+	GJP.ZnodeSites()==2 ||
+	GJP.TnodeSites()==2 ) )
+  ERR.General(cname,fname," RHMC force term is not implemented for Fasqtad with any dimension less than 4\n");
   init();
 }
 

@@ -71,17 +71,16 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
     for(mu = 0;mu<4;mu++){
       Matrix *mtmp = result[mu];
       for(int i = 0;i<vol;i++) {
+#if 0
         mp1.Dagger((IFloat *)mtmp);
         mtmp->TrLessAntiHermMatrix(mp1);
+#else
+        mtmp->TrLessAntiHermMatrix();
+#endif
         mtmp++;
       }
     }
-  ffree(Unit);
-  for(int i = 0;i<N;i++){
-  ffree(tmp1[i]);
-  ffree(tmp2[i]);
-  }
-  ForceFlops += vol*96;
+  ForceFlops += vol*60;
   
   int x[4];
   
@@ -109,6 +108,11 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
   time += dclock();
   print_flops(cname,fname,ForceFlops+ParTrans::PTflops,time);
 #endif
+  ffree(Unit);
+  for(int i = 0;i<N;i++){
+  ffree(tmp1[i]);
+  ffree(tmp2[i]);
+  }
   for(int i = 0;i<4;i++) 
   ffree(result[i]);
 }
