@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.8 2004-09-28 16:10:28 chulwoo Exp $
+  $Id: pt.C,v 1.9 2004-10-20 19:10:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-28 16:10:28 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.8 2004-09-28 16:10:28 chulwoo Exp $
-//  $Id: pt.C,v 1.8 2004-09-28 16:10:28 chulwoo Exp $
+//  $Date: 2004-10-20 19:10:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.9 2004-10-20 19:10:48 chulwoo Exp $
+//  $Id: pt.C,v 1.9 2004-10-20 19:10:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -415,11 +415,15 @@ void pt_delete(){
   }
   for (int hop=0; hop<MAX_HOP; hop++) {
     for(int i = 0; i < 2*NDIM; i++){
-      sfree(hp_l[hop][i]);
+      int nl_size = (hop+1)*non_local_chi[i];
+      int l_size = vol - nl_size;
+      if (l_size>0){
+        sfree(hp_l[hop][i]);
+        qfree(src_l[hop][i]);
+        qfree(dest_l[hop][i]);
+      }
       sfree(hp_nl[hop][i]);
-      qfree(src_l[hop][i]);
       qfree(src_nl[hop][i]);
-      qfree(dest_l[hop][i]);
       qfree(dest_nl[hop][i]);
     }
   }
