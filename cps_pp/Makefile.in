@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.7 2004-02-09 14:30:07 zs Exp $
+# $Id: Makefile.in,v 1.8 2004-02-09 14:49:10 zs Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -60,6 +60,6 @@ endif
 
 #  Run the regression test suite
 
-test: cps
+test: 
 	cd $(TESTDIR) ; perl regression.pl
 	cd $(TESTDIR) ; sh regression.sh
