@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: config.h.in,v 1.3 2003-08-14 13:15:08 mcneile Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -13,14 +13,14 @@
  *--------------------------------------------------------------------
  *  CVS keywords
  *
- *  $Author: zs $
- *  $Date: 2003-07-24 16:53:53 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.2 2003-07-24 16:53:53 zs Exp $
- *  $Id: config.h.in,v 1.2 2003-07-24 16:53:53 zs Exp $
+ *  $Author: mcneile $
+ *  $Date: 2003-08-14 13:15:08 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.3 2003-08-14 13:15:08 mcneile Exp $
+ *  $Id: config.h.in,v 1.3 2003-08-14 13:15:08 mcneile Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.2 $
+ *  $Revision: 1.3 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -71,7 +71,7 @@
 
 #define CPS_END_NAMESPACE } 
 #define CPS_START_NAMESPACE  namespace cps {
-
+#define USING_NAMESPACE_CPS using namespace cps 
 
 /* Override printf to only print on one proc (Not nec. on QCDSP, only
  *    expected to work via the MPI layer. */
@@ -82,7 +82,7 @@
 
 #define CPS_END_NAMESPACE 
 #define CPS_START_NAMESPACE  
-
+#define USING_NAMESPACE_CPS using namespace cps 
 
 #ifndef _TARTAN  /* Not using TARTAN, so under the Sun CC compiler: */
 
