@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.3 2004-10-29 13:31:34 zs Exp $
+  $Id: Fforce.C,v 1.4 2004-11-08 00:00:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -105,14 +105,10 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
 
     // input/output arrays for the parallel transport routines
-    Vector **vin = (Vector**)smalloc(cname, fname, "vin",
-				     n_sign*N*sizeof(Vector*));
-    Vector **vout = (Vector**)smalloc(cname, fname, "vout",
-				      n_sign*N*sizeof(Vector*));
-
-    int dir[n_sign*N];
+    Vector *vin[n_sign*4], *vout[n_sign*4];
+    int dir[n_sign*4];
 	
-    int mu[N], nu[N], rho[N], sigma[N];   // Sets of directions
+    int mu[4], nu[4], rho[4], sigma[4];   // Sets of directions
     int w;                                // The direction index 0...N-1
     int ms, ns, rs, ss;                   // Sign of direction
     bool done[4] = {false,false,false,false};  // Flags to tell us which 
