@@ -38,7 +38,7 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
   for(int i = 0;i<N;i++){
   	tmp1[i] = (Matrix *) fmalloc(vol*sizeof(Matrix));
   	tmp2[i] = (Matrix *) fmalloc(vol*sizeof(Matrix));
-        bzero(tmp2[i],vol*sizeof(Matrix));
+        bzero((char *)tmp2[i],vol*sizeof(Matrix));
   }
   for(int i = 0;i<vol;i++) 
 	Unit[i]=1.;
