@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v 1.6 2004-08-18 11:57:36 zs Exp $
-//  $Id: hadron_prop_s.h,v 1.6 2004-08-18 11:57:36 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-09 20:35:45 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v 1.7 2005-03-09 20:35:45 chulwoo Exp $
+//  $Id: hadron_prop_s.h,v 1.7 2005-03-09 20:35:45 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.h,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v $
 //  $State: Exp $
 //
@@ -84,12 +84,6 @@ class HadronPropS {
 
   void collect_prop(HadronType type, Float *sum_buf, 
 		    const Float *float_p, int unit, int dir, int t);
-
-  // added by manke:
-  // a safer version of the above for cases where "unit" is  large
-
-  void collect_large_prop(HadronType type, Float *sum_buf,
-                    const Float *float_p, int unit, int dir, int t);
 
 protected:
 

@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.8 2004-08-18 11:57:39 zs Exp $
-//  $Id: alg_s_spect.C,v 1.8 2004-08-18 11:57:39 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-09 20:36:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.9 2005-03-09 20:36:21 chulwoo Exp $
+//  $Id: alg_s_spect.C,v 1.9 2005-03-09 20:36:21 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_s_spect.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v $
 //  $State: Exp $
 //
@@ -86,16 +86,6 @@ static void write_to_file(const Float *data_p, FILE *fp,
 	unit = 0; break;
   }
 
-  /*
-  printf("write_to_file: mom=%d unit =%d num_IFloats=%d num_slices=%d \n",mom,uni
-t,num_IFloats,num_slices);
-
-  printf("data_p[0] = %e %e %e \n",data_p[0],data_p[1],data_p[2]);
-
-  FILE *fp1=Fopen("total_correlator.dat", "a");
-  for (int ii=0; ii < num_IFloats; ii++) Fprintf(fp1,"%e\n",(IFloat)data_p[ii]);
-  Fclose(fp1);
-  */
   
   int i, k;
 

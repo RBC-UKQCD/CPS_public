@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.9 2004-08-18 11:57:40 zs Exp $
-//  $Id: quark_prop_s.C,v 1.9 2004-08-18 11:57:40 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-09 20:36:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.10 2005-03-09 20:36:22 chulwoo Exp $
+//  $Id: quark_prop_s.C,v 1.10 2005-03-09 20:36:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: quark_prop_s.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v $
 //  $State: Exp $
 //
@@ -307,7 +307,7 @@ void QuarkPropS::setWallSrc(Matrix **gm, StagQuarkSrc& qs, int color )
 	    // or WALL2Z source with all 3d coordinates even
 	    // need to set the source on this site
 	    //--------------------------------------------------
-	    if ( qs.type == WALLZ || 
+	    if ( qs.type == WALLZ || ( qs.type == WALL2Z)&&
 	       ( (s[i]%2 == 0) && (s[j]%2 == 0) && (s[k]%2 == 0))) {
 
               int s3d[4] = { s[0], s[1], s[2], s[3] };
