@@ -122,8 +122,8 @@ int main(int argc,char *argv[])
           VRB.Flow(cname,fname,"warmup iteration # = %d/%d\n",n,no_warmup_sweep);
 	  Float sum_plaq0 = lat.SumReTrPlaq();
 	  Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
-	  VRB.Flow(cname,fname,"%d plaquette = %0.16e\n",n,(float)aver_plaq0); 
-	  Fprintf(plaq,"%d %0.16e\n",n,(float)aver_plaq0);fflush(plaq);
+	  VRB.Flow(cname,fname,"%d plaquette = %0.16e\n",n,(Float)aver_plaq0); 
+	  Fprintf(plaq,"%d %0.16e\n",n,(Float)aver_plaq0);fflush(plaq);
 
        	  hmc_r.run();
 	  sweep_counter++; 
@@ -140,8 +140,8 @@ int main(int argc,char *argv[])
 
 	Float sum_plaq0 = lat.SumReTrPlaq();
 	Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
-	VRB.Flow(cname,fname,"%d plaquette = %e\n",i,(float)aver_plaq0); 
-	Fprintf(plaq,"%d %0.16e\n",i,(float)aver_plaq0);
+	VRB.Flow(cname,fname,"%d plaquette = %e\n",i,(Float)aver_plaq0); 
+	Fprintf(plaq,"%d %0.16e\n",i,(Float)aver_plaq0);
 	fflush(plaq);
 
 

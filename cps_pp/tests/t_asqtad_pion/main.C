@@ -3,7 +3,7 @@
 ///
 
 /*!----------------------------------------------------------------------
-  $Id: main.C,v 1.7 2004-08-18 11:58:11 zs Exp $
+  $Id: main.C,v 1.8 2004-09-17 17:56:21 chulwoo Exp $
   Test Asqtad dirac operator code.	
 
    This is a simple regression test of the Asqtad inverter.
@@ -138,7 +138,7 @@ int main(int argc,char *argv[])
 
     GwilsonFasqtad lat;
     // char gauge_name[50] = "../gauge/hot";
-    // qload_gauge(gauge_name, lat,sizeof(float),1,1);
+    // qload_gauge(gauge_name, lat,sizeof(Float),1,1);
 
     //    char gauge_name[50] = "../gauge/Q5600U003500";
     //qload_gauge(gauge_name, lat,sizeof(double),1,1);

@@ -164,8 +164,8 @@ int main(int argc,char *argv[])
 
 	Float sum_plaq0 = lat.SumReTrPlaq();
 	Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
-	VRB.Flow(cname,fname,"%d plaquette = %e\n",i,(float)aver_plaq0); 
-	Fprintf(plaq,"%d %0.16e\n",i,(float)aver_plaq0);
+	VRB.Flow(cname,fname,"%d plaquette = %e\n",i,(Float)aver_plaq0); 
+	Fprintf(plaq,"%d %0.16e\n",i,(Float)aver_plaq0);
 	plaquette += aver_plaq0;
 
 	// Dynamic setting of u0

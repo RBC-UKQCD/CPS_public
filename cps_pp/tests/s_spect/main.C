@@ -2,14 +2,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.8 2004-08-18 11:58:11 zs Exp $
-//  $Id: main.C,v 1.8 2004-08-18 11:58:11 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-17 17:56:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.9 2004-09-17 17:56:21 chulwoo Exp $
+//  $Id: main.C,v 1.9 2004-09-17 17:56:21 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v $
 //  $State: Exp $
 //
@@ -274,7 +274,7 @@ int main(int argc,char *argv[])
         if( 0 == (action = Fopen("action.dat", "a")) ) 
 	    ERR.FileA("", "main", "action.dat");
 		
-	Fprintf(action, "%e\n", (float)aver_plaq0);
+	Fprintf(action, "%e\n", (Float)aver_plaq0);
         Fclose(action);
 
         //------------------------------------------------------------

@@ -147,7 +147,7 @@ The approximations used in the action (and heatbath) should be
 "exact", and so the maximum error of the approximation should not be
 the greatest error in the simulation.  This means the approximation
 should be at least as good as the residuals of the inverter or
-floating point precision.  For the force approximations, any errors
+Floating point precision.  For the force approximations, any errors
 introduced by an inaccurate approximations are corrected by the
 Metropolis acceptance test, and so the deciding factor here should be
 what the lowest degree approximation is possible that has a minimal

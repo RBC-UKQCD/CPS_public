@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:10 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v 1.6 2004-08-18 11:58:10 zs Exp $
-//  $Id: main.C,v 1.6 2004-08-18 11:58:10 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-17 17:56:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v 1.7 2004-09-17 17:56:21 chulwoo Exp $
+//  $Id: main.C,v 1.7 2004-09-17 17:56:21 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v $
 //  $State: Exp $
 //
@@ -62,7 +62,7 @@ public:
   static const int CheckFreq;
   static const int Dimension;
   static const int SiteSize;
-  static const float SmallFloat;
+  static const Float SmallFloat;
 
 public:
 
