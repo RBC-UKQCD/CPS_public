@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.18 2004-09-02 16:52:50 zs Exp $
+# $Id: Makefile.in,v 1.19 2004-09-21 18:05:24 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -35,8 +35,9 @@ cleanlib:
 	rm -f *.a
 
 copy_makefile:
-	-cp $(BUILDDIR)Makefile $(BUILDDIR)Makefile.rules ${SRCDIR}
-	-cp $(BUILDDIR)/$(TESTDIR))/Makefile_common* ${SRCDIR}/$(TESTDIR)
+	-cp $(BUILDDIR)/Makefile $(BUILDDIR)/Makefile.rules ${SRCDIR}
+	-cp $(BUILDDIR)/$(TESTDIR)/Makefile_common* ${SRCDIR}/$(TESTDIR)
+	-cp $(BUILDDIR)/$(TESTDIR)/regression.pl ${SRCDIR}/$(TESTDIR)
 
 copy_include:
 	$(if $(builddir_isnt_srcdir), 
@@ -50,7 +51,8 @@ copy_testdir: $(TESTSUBDIRS)
 	$(if $(findstring s, $(MAKEFLAGS)),,@echo TESTSUBDIRS = $(TESTSUBDIRS))
 
 $(TESTSUBDIRS):
-	$(if $(builddir_isnt_srcdir), mkdir -p $(TESTDIR)/$@; cp -p $(SRCDIR)/$(TESTDIR)/$@/Makefile_regression  $(TESTDIR)/$@)
+	$(if $(builddir_isnt_srcdir), mkdir -p $(TESTDIR)/$@)
+	-cp -p $(SRCDIR)/$(TESTDIR)/$@/Makefile_regression  $(TESTDIR)/$@
 #  Create the documentation
 
 have_doxygen = @have_doxygen@
@@ -87,7 +89,7 @@ endif
 test: cps
 	-cp $(TESTDIR)/Makefile_common tests/regression.pl $(SRCDIR)/${TESTDIR}
 	cd $(SRCDIR)/$(TESTDIR); perl regression.pl
-	cd $(SRCDIR)/$(TESTDIR); sh regression.sh
+#	cd $(SRCDIR)/$(TESTDIR); sh regression.sh
 
 
 # Remove everything made by this makefile
