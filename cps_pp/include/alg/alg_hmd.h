@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: alg_hmd.h,v 1.3 2003-08-11 22:15:45 mike Exp $
 */
 //------------------------------------------------------------------
 
@@ -176,6 +176,16 @@ class AlgHmcPhi : public AlgHmd
     //!< The change in the value of the boson action.
     /*!< The final value - the initial value. One for each mass */
 
+    int *FRatDeg;
+    Float *FRatNorm;
+    Float **FRatConst;
+    Float **FRatPole;
+
+    int *HBRatDeg;
+    Float *HBRatNorm;
+    Float **HBRatConst;
+    Float **HBRatPole;
+
  public:
 
   AlgHmcPhi(Lattice& latt, CommonArg *c_arg, HmdArg *arg);
@@ -185,6 +195,90 @@ class AlgHmcPhi : public AlgHmd
   void run(void);
 };
 
+//------------------------------------------------------------------
+//
+// AlgHmcRHMC is derived from AlgHmd and is relevant to the Rational Hybrid  
+// Monte Carlo algorithm.
+//
+//------------------------------------------------------------------
+class AlgHmcRHMC : public AlgHmd
+{
+ private:
+    char *cname;
+
+
+ protected:
+
+    int n_frm_masses;     
+        // The number of dynamical fermion masses.
+
+    int n_bsn_masses;     
+        // The number of dynamical boson masses.
+
+    int f_size;       
+        // Node checkerboard size of the fermion field
+
+    CgArg **frm_cg_arg;
+        // pointer to an array of CG argument structures
+	// relevant to fermions.
+
+    CgArg **bsn_cg_arg;
+        // pointer to an array of CG argument structures
+	// relevant to bosons.
+
+    Vector** phi;
+        // Pseudo fermion field phi (checkerboarded).
+
+    Vector** bsn;
+        // Boson field bsn (checkerboarded).
+
+    Matrix* gauge_field_init;
+        // Initial gauge field needed if the evolved one is rejected
+
+    Vector** frm1;
+    Vector** frm2;
+        // 2 general purpose fermion/boson field arrays (checkerboarded).
+
+    Vector** cg_sol_cur; 
+    Vector** cg_sol_prev;
+        // Temporary pointers to the current and previous CG solution.
+
+    Float *h_f_init;    
+        // Initial fermion Hamiltonian (one for each mass)
+
+    Float *h_f_final;   
+        // Final fermion Hamiltonian (one for each mass)
+
+    Float *delta_h_f;   
+        // Final-Init fermion Hamiltonian (one for each mass)
+
+    Float *h_b_init;    
+        // Initial boson Hamiltonian (one for each mass)
+
+    Float *h_b_final;   
+        // Final boson Hamiltonian (one for each mass)
+
+    Float *delta_h_b;   
+        // Final-Init boson Hamiltonian (one for each mass)
+
+    int *FRatDeg;
+    Float *FRatNorm;
+    Float **FRatConst;
+    Float **FRatPole;
+
+    int *HBRatDeg;
+    Float *HBRatNorm;
+    Float **HBRatConst;
+    Float **HBRatPole;
+
+ public:
+
+  AlgHmcRHMC(Lattice& latt, CommonArg *c_arg, HmdArg *arg);
+
+  virtual ~AlgHmcRHMC();
+
+  void run(void);
+};
 
 //------------------------------------------------------------------
 //! A class implementing the Hybrid Molecular Dynamics (R) algorithm.
