@@ -1,20 +1,27 @@
 #include<config.h>
+#include<math.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: f_stag.C,v 1.3 2003-08-29 20:58:09 mike Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: f_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Author: mike $
+//  $Date: 2003-08-29 20:58:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v 1.3 2003-08-29 20:58:09 mike Exp $
+//  $Id: f_stag.C,v 1.3 2003-08-29 20:58:09 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.4  2001/08/16 10:50:35  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -39,7 +46,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: f_stag.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v $
 //  $State: Exp $
 //
@@ -353,10 +360,11 @@ int Fstag::FmatEvlInv(Vector *f_out, Vector *f_in,
   VRB.Func(cname,fname);
 
   DiracOpStag stag(*this, f_out, f_in, cg_arg, cnv_frm);
-  
   iter = stag.InvCg(true_res);
 
   stag.Dslash(f_tmp, f_out, CHKB_EVEN, DAG_NO);
+  printf("        InvCG out = %e f_tmp = %e\n", FhamiltonNode(f_out,f_out),
+	 FhamiltonNode(f_tmp,f_tmp));
 
   // Return the number of iterations
   return iter;
@@ -370,6 +378,43 @@ int Fstag::FmatEvlInv(Vector *f_out, Vector *f_in,
 		      CgArg *cg_arg, 
 		      CnvFrmType cnv_frm)
 { return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
+
+
+
+//------------------------------------------------------------------
+// int FmatEvlMInv(Vector **f_out, Vector *f_in, 
+//                Float shift[], int Nshift, 
+//                CgArg *cg_arg, Float *true_res,
+//		  CnvFrmType cnv_frm = CNV_FRM_YES):
+// It calculates f_out where (A + shift)* f_out = f_in and
+// A is the fermion matrix that appears in the HMC 
+// evolution ([Dirac^dag Dirac]) and shift is a real shift of the 
+// fermion matrix, with Nshift such shifts. The inversion is done 
+// with the multishift conjugate gradient. cg_arg is the structure
+// that contains all the control parameters, f_in is the
+// fermion field source vector, f_out is the array of solution 
+// vectors, f_in and f_out are defined on a checkerboard.
+// The function returns the total number of CG iterations.
+//------------------------------------------------------------------
+int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg,
+		    CnvFrmType cnv_frm)
+{
+  int iter;
+  char *fname = "FmatMInv(V**, V*, .....)";
+  VRB.Func(cname,fname);
+
+  Vector **EigVec=0;
+  int Neig = 0;
+  Float dot = f_in -> NormSqGlbSum(e_vsize);
+  Float RsdCG[Nshift];
+  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
+
+  //Fake the constructor
+  DiracOpStag stag(*this, f_out[0], f_in, cg_arg, cnv_frm);
+
+  return stag.MInvCG(f_out,f_in,sqrt(dot),shift,Nshift,isz,RsdCG,EigVec,Neig);  
+}
 
 
 //------------------------------------------------------------------
@@ -414,14 +459,11 @@ int Fstag::FmatInv(Vector *f_out, Vector *f_in,
   return iter;
 }
 
-
 //------------------------------------------------------------------
 // Overloaded function is same as original but with true_res=0;
 //------------------------------------------------------------------
-int Fstag::FmatInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   CnvFrmType cnv_frm,
-		   PreserveType prs_f_in)
+int Fstag::FmatInv(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		   CnvFrmType cnv_frm, PreserveType prs_f_in)
 { return FmatInv(f_out, f_in, cg_arg, 0, cnv_frm, prs_f_in); }
 
 
@@ -440,7 +482,7 @@ int Fstag::FeigSolv(Vector **f_eigenv, Float lambda[],
   char *fname = "FeigSolv(EigArg*,V*,F*,CnvFrmType)";
   VRB.Func(cname,fname);
   CgArg cg_arg;
-  cg_arg.mass = 0.0;
+  cg_arg.mass = eig_arg -> mass;
   cg_arg.RitzMatOper = eig_arg->RitzMatOper;
   int N_eig = eig_arg->N_eig;
 #if 0
@@ -455,9 +497,9 @@ int Fstag::FeigSolv(Vector **f_eigenv, Float lambda[],
   Vector *v1 = (Vector *)0;
   Vector *v2 = (Vector *)0;
 
-  DiracOpStag wilson(*this, v1, v2, &cg_arg, CNV_FRM_NO);
+  DiracOpStag stag(*this, v1, v2, &cg_arg, CNV_FRM_NO);
   
-  iter = wilson.RitzEig(f_eigenv, lambda, valid_eig, eig_arg);
+  iter = stag.RitzEig(f_eigenv, lambda, valid_eig, eig_arg);
   
 #if 0
   // IS THIS NECESSARY ???
@@ -571,29 +613,41 @@ void Fstag::FforceSite(Matrix& force, Vector *frm, int *x, int mu)
 //------------------------------------------------------------------
 void Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
 			    Float mass, Float dt){
-  char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
+  char *fname = "EvolveMomFforce(M*,V*,F,F)";
   VRB.Func(cname,fname);
 
-    setCbufCntrlReg(4, CBUF_MODE4);
-    int x[4];
-
-    for(x[0] = 0; x[0] < node_sites[0]; ++x[0]) {
-        for(x[1] = 0; x[1] < node_sites[1]; ++x[1]) {
-	    for(x[2] = 0; x[2] < node_sites[2]; ++x[2]) {
-	        for(x[3] = 0; x[3] < node_sites[3]; ++x[3]) {
-
-		    Matrix *ihp = mom+GsiteOffset(x);
-
-		    for (int mu = 0; mu < 4; ++mu) {
-		        FforceSite(*mp0, frm, x, mu);
-			fTimesV1PlusV2((IFloat *)(ihp+mu), dt,
-			    (IFloat *)mp0,
-			    (IFloat *)(ihp+mu)+BANK4_BASE, 18);
-		    }
-		}
-	    }
+  setCbufCntrlReg(4, CBUF_MODE4);
+  int x[4];
+  
+  for(x[0] = 0; x[0] < node_sites[0]; ++x[0]) {
+    for(x[1] = 0; x[1] < node_sites[1]; ++x[1]) {
+      for(x[2] = 0; x[2] < node_sites[2]; ++x[2]) {
+	for(x[3] = 0; x[3] < node_sites[3]; ++x[3]) {
+	  
+	  Matrix *ihp = mom+GsiteOffset(x);
+	  
+	  for (int mu = 0; mu < 4; ++mu) {
+	    FforceSite(*mp0, frm, x, mu);
+	    fTimesV1PlusV2((IFloat *)(ihp+mu), dt,
+			   (IFloat *)mp0,
+			   (IFloat *)(ihp+mu)+BANK4_BASE, 18);
+	  }
 	}
+      }
     }
+  }
+}
+
+void Fstag::prepForce(Vector *frm) {
+  char *fname = "prepForce(V*)";
+  VRB.Func(cname,fname);
+
+  // Fake out the constructor
+  CgArg cg_arg;
+  cg_arg.mass = 0.0;
+  Vector *v1=(Vector*)0, *v2=(Vector*)0;
+  DiracOpStag stag(*this, v2, v1, &cg_arg, CNV_FRM_NO);
+  stag.Dslash(f_tmp, frm, CHKB_EVEN, DAG_NO);
 }
 
 
