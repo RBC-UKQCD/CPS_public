@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-07 06:08:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.14 2004-09-07 06:08:12 chulwoo Exp $
-//  $Id: main.C,v 1.14 2004-09-07 06:08:12 chulwoo Exp $
+//  $Date: 2004-09-17 16:00:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.15 2004-09-17 16:00:46 chulwoo Exp $
+//  $Id: main.C,v 1.15 2004-09-17 16:00:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -33,6 +33,9 @@ CPS_END_NAMESPACE
 USING_NAMESPACE_CPS 
 
 static int nx,ny,nz,nt,ns;
+const int SAVE_RNG = 0;
+const int LOAD_RNG = 1;
+
 int main(int argc,char *argv[])
 {
   FILE *fp;
@@ -88,15 +91,14 @@ int main(int argc,char *argv[])
   
   GJP.Initialize(do_arg);
 
-
   //----------------------------------------------------------------
   // Set verbose level
   //----------------------------------------------------------------
 
   VRB.Level(0);
 //  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
-  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
-  VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
 //  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_CLOCK_LEVEL);
   VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
@@ -146,7 +148,7 @@ int main(int argc,char *argv[])
       if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	ERR.FileA(" ","main", "plaq.dat");
       }
-      Fprintf(fp, "%e\n", float(aver_plaq0));
+      Fprintf(fp, "%0.14e\n", Float(aver_plaq0));
       Fclose(fp);
 
       for (int i = 0; i < 1; ++i) {
@@ -156,9 +158,25 @@ int main(int argc,char *argv[])
 	if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	  ERR.FileA(" ","main", "plaq.dat");
 	}
-	Fprintf(fp,"%e\n", float(aver_plaq0));
+	Fprintf(fp,"%0.14e\n", Float(aver_plaq0));
 	Fclose(fp);
       }
+    }
+  }
+#endif
+
+#if 1
+  {
+    char rng_file[200];
+    sprintf(rng_file,"%dx%dx%dx%dx%d.rng",nx,ny,nz,nt,ns);
+    printf("rng_file = %s\n",rng_file);
+    if (SAVE_RNG){
+      if(LRG.Write(rng_file)) printf("saving RNG success\n");
+      else printf("saving RNG fail\n");
+    }
+    if (LOAD_RNG){
+      if(LRG.Read(rng_file)) printf("loading RNG success\n");
+      else printf("loading RNG fail\n");
     }
   }
 #endif
@@ -185,7 +203,7 @@ int main(int argc,char *argv[])
       if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	ERR.FileA(" ","main", "plaq.dat");
       }
-      Fprintf(fp, "%e\n", float(aver_plaq0));
+      Fprintf(fp, "%0.14e\n", Float(aver_plaq0));
       Fclose(fp);
 
       for (int i = 0; i < 1; ++i) {
@@ -195,7 +213,7 @@ int main(int argc,char *argv[])
 	if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	  ERR.FileA(" ","main", "plaq.dat");
 	}
-	Fprintf(fp,"%e\n", float(aver_plaq0));
+	Fprintf(fp,"%0.14e\n", Float(aver_plaq0));
 	Fclose(fp);
       }
     }
@@ -227,7 +245,7 @@ int main(int argc,char *argv[])
       if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	ERR.FileA(" ","main", "plaq.dat");
       }
-      Fprintf(fp, "%e\n", float(aver_plaq0));
+      Fprintf(fp, "%0.14e\n", Float(aver_plaq0));
       Fclose(fp);
 
       for (int i = 0; i < 1; ++i) {
@@ -237,7 +255,7 @@ int main(int argc,char *argv[])
 	if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	  ERR.FileA(" ","main", "plaq.dat");
 	}
-	Fprintf(fp,"%e\n", float(aver_plaq0));
+	Fprintf(fp,"%0.14e\n", Float(aver_plaq0));
 	Fclose(fp);
       }
     }
@@ -271,7 +289,7 @@ int main(int argc,char *argv[])
       if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	ERR.FileA(" ","main", "plaq.dat");
       }
-      Fprintf(fp, "%e\n", float(aver_plaq0));
+      Fprintf(fp, "%0.14e\n", Float(aver_plaq0));
       Fclose(fp);
 
       for (int i = 0; i < 1; ++i) {
@@ -281,7 +299,7 @@ int main(int argc,char *argv[])
 	if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	  ERR.FileA(" ","main", "plaq.dat");
 	}
-	Fprintf(fp,"%e\n", float(aver_plaq0));
+	Fprintf(fp,"%0.14e\n", Float(aver_plaq0));
 	Fclose(fp);
       }
     }
