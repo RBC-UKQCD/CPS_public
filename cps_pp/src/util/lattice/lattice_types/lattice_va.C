@@ -2,9 +2,9 @@
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 /*!\file
-  \brief  Implementation of the GpowerRectFstagAsqtad class.
+  \brief  Implementation of the GpowerRectFasqtad class.
 
-  $Id: lattice_va.C,v 1.2 2003-10-23 13:38:59 zs Exp $
+  $Id: lattice_va.C,v 1.3 2003-10-30 05:39:12 cwj Exp $
 */
 //--------------------------------------------------------------------
 
@@ -17,16 +17,16 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 // PowerRect gauge action + asqtad staggered fermion action
 //------------------------------------------------------------------
-GpowerRectFstagAsqtad::GpowerRectFstagAsqtad()
+GpowerRectFasqtad::GpowerRectFasqtad()
 {
-  cname = "GpowerRectFstagAsqtad";
-  char *fname = "GpowerRectFstagAsqtad()";
+  cname = "GpowerRectFasqtad";
+  char *fname = "GpowerRectFasqtad()";
   VRB.Func(cname,fname);
 }
 
-GpowerRectFstagAsqtad::~GpowerRectFstagAsqtad()
+GpowerRectFasqtad::~GpowerRectFasqtad()
 {
-  char *fname = "~GpowerRectFstagAsqtad()";
+  char *fname = "~GpowerRectFasqtad()";
   VRB.Func(cname,fname);
 }
 

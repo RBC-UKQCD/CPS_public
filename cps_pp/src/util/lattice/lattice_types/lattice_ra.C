@@ -2,9 +2,9 @@
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 /*!\file
-  \brief  Implementation of GimprRectFstagAsqtad class.
+  \brief  Implementation of GimprRectFasqtad class.
 
-  $Id: lattice_ra.C,v 1.2 2003-10-23 13:38:59 zs Exp $
+  $Id: lattice_ra.C,v 1.3 2003-10-30 05:39:12 cwj Exp $
 */
 //--------------------------------------------------------------------
 
@@ -17,16 +17,16 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 // Wilson gauge action + asqtadstaggered fermion action
 //------------------------------------------------------------------
-GimprRectFstagAsqtad::GimprRectFstagAsqtad()
+GimprRectFasqtad::GimprRectFasqtad()
 {
-  cname = "GimprRectFstagAsqtad";
-  char *fname = "GimprRectFstagAsqtad()";
+  cname = "GimprRectFasqtad";
+  char *fname = "GimprRectFasqtad()";
   VRB.Func(cname,fname);
 }
 
-GimprRectFstagAsqtad::~GimprRectFstagAsqtad()
+GimprRectFasqtad::~GimprRectFasqtad()
 {
-  char *fname = "~GimprRectFstagAsqtad()";
+  char *fname = "~GimprRectFasqtad()";
   VRB.Func(cname,fname);
 }
 

@@ -2,9 +2,9 @@
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 /*!\file
-  \brief  Implementation of GnoneFstagAsqtad class.
+  \brief  Implementation of GnoneFasqtad class.
 
-  $Id: lattice_na.C,v 1.2 2003-10-23 13:38:59 zs Exp $
+  $Id: lattice_na.C,v 1.3 2003-10-30 05:39:12 cwj Exp $
 */
 //--------------------------------------------------------------------
 
@@ -17,16 +17,16 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 // No gauge action + asqtad staggered fermion action
 //------------------------------------------------------------------
-GnoneFstagAsqtad::GnoneFstagAsqtad()
+GnoneFasqtad::GnoneFasqtad()
 {
-  cname = "GnoneFstagAsqtad";
-  char *fname = "GnoneFstagAsqtad()";
+  cname = "GnoneFasqtad";
+  char *fname = "GnoneFasqtad()";
   VRB.Func(cname,fname);
 }
 
-GnoneFstagAsqtad::~GnoneFstagAsqtad()
+GnoneFasqtad::~GnoneFasqtad()
 {
-  char *fname = "~GnoneFstagAsqtad()";
+  char *fname = "~GnoneFasqtad()";
   VRB.Func(cname,fname);
 }
 
