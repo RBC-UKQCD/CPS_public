@@ -1,21 +1,26 @@
 /*!\file
   \brief   Global options for compiling the Colombia code:
 
-  @configure_input@
-  $Id: config.h.in,v 1.9 2004-04-30 12:17:59 zs Exp $
+  Generated automatically from config.h.in by configure procedure.
+
+  $Id: config.h.in,v 1.10 2004-06-02 09:33:08 zs Exp $
 */
-/* 
+/* Global options for compiling the Colombia code:  
+ * @configure_input@
+ * 
+ *    Currently, this fine copes with two different build environments,
+ *       on QCDSP or not on QCDSP, as determined by a flag.
  *--------------------------------------------------------------------
  *  CVS keywords
  *
  *  $Author: zs $
- *  $Date: 2004-04-30 12:17:59 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.9 2004-04-30 12:17:59 zs Exp $
- *  $Id: config.h.in,v 1.9 2004-04-30 12:17:59 zs Exp $
+ *  $Date: 2004-06-02 09:33:08 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.10 2004-06-02 09:33:08 zs Exp $
+ *  $Id: config.h.in,v 1.10 2004-06-02 09:33:08 zs Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.9 $
+ *  $Revision: 1.10 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -32,7 +37,7 @@
 #define TARGET @ARCH@
 #@ENABLE_PARALLEL@
 
-/* Define this flag if you are using QCDSP (default): */
+// The configure procedure should make this unnecessary, but just in case...
 #ifndef TARGET
 #define TARGET NOARCH
 #endif
@@ -63,18 +68,10 @@
 /*! Precision of internal calculations: float, double. */
 #define INTERNAL_LOCALCALC_TYPE @LOCALPRECISION@
 
-/*! \def INCLUDE_MPI_SCU
-  If parallel (and not QCDSP), include the MPI layer in the make.
-*/
-#ifdef PARALLEL
-#define INCLUDE_MPI_SCU 1
-#endif
-
-/*! Data size for the MPI comms layer: */
-#define COMMS_DATASIZE (sizeof(@LOCALPRECISION@))
 
 
-#if (TARGET == QCDOC) || (TARGET == QCDSP)
+
+#if TARGET == QCDOC
 #define CPS_END_NAMESPACE
 #define CPS_START_NAMESPACE
 #define USING_NAMESPACE_CPS 
@@ -84,10 +81,13 @@
 #define USING_NAMESPACE_CPS using namespace cps;
 #endif
 
-/* Override printf to only print on one proc (Not nec. on QCDSP, only
- *    expected to work via the MPI layer. */
 #if TARGET == cpsMPI
+/*! Data size for the MPI comms layer: */
+#define COMMS_DATASIZE (sizeof(float))
+/* Override printf to only print from only one processor */
 #include<util/qcdio_qprintf.h>
+#undef CPS_START_NAMESPACE
+#define CPS_START_NAMESPACE  namespace cps{ using MPISCU::printf; 
 #endif
 
 /* ------------------------------------------------------------------*/
@@ -97,25 +97,31 @@
 #define CPS_END_NAMESPACE 
 #define CPS_START_NAMESPACE  
 #define USING_NAMESPACE_CPS using namespace cps 
-
-#ifndef _TARTAN  /* Not using TARTAN, so under the Sun CC compiler: */
-
 #define CAST_AWAY_CONST(x) ( x )
 #define LOCALCALC_TYPE rfloat
 #define INTERNAL_LOCALCALC_TYPE float
 #define COMMS_DATASIZE 4
 #include<util/qcdio_qprintf.h>
 
-#else  /* ELSE using TARTAN */
-
-#define CAST_AWAY_CONST(x) ( x )
+#ifdef _TARTAN  
 #define PARALLEL 1
-#define LOCALCALC_TYPE rfloat
-#define INTERNAL_LOCALCALC_TYPE float
-#define COMMS_DATASIZE 4
-
 #endif /* END of TARTAN */
+
 
 #endif /* END of TARGET_ */
 
+/* ------------------------------------------------------------------*/
+/* Other overall definitions:   */
+/* ------------------------------------------------------------------*/
+
+#define SERIAL_SEED 112319
+
+/*! Default value for the verbosity level (see the Verbose class for details).*/
+#define DEFAULT_VERBOSE_LEVEL -12100502
+
 #endif /* INCLUDED_CONFIG_H_ */
+
+
+
+
+
