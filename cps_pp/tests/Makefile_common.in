@@ -1,4 +1,4 @@
-# $Id: Makefile_common.in,v 1.18 2004-09-21 20:16:49 chulwoo Exp $
+# $Id: Makefile_common.in,v 1.19 2004-10-27 16:19:50 zs Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -65,7 +65,6 @@ OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
 OBJS := $(notdir $(OBJS_SRC))
 
 $(BIN):  $(OBJS) $(LIBLIST)
-	@echo OBJS = $(OBJS)
 	$(CXX) $(OBJS) $(LIBLIST) $(LDFLAGS) -o $(BIN)
 
 .c.o:
