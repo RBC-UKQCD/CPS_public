@@ -63,13 +63,22 @@ docs:
 webdocs:
 	@echo Creating documentation for the web page
 	@echo This will delete all the source code
+        make -f $(MAKEFILE) docs
         @rm -i -r src
         @rm -r src tests include
-        make -f $(MAKEFILE) docs
 endif
 
 clean:
 	rm $(cps_obj) cps.a
+
+##
+##  run the test suite
+##
+TEST_DIR = tests
+
+test:
+	cd $(TEST_DIR) ; perl regression.pl
+	cd $(TEST_DIR) ; source regression.sh
 
 ##
 ## create dependencies
