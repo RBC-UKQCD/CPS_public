@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2004-12-16 18:37:15 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.29 2004-12-16 18:37:15 chulwoo Exp $
-dnl  $Id: configure.in,v 1.29 2004-12-16 18:37:15 chulwoo Exp $
+dnl  $Date: 2004-12-20 22:09:25 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.30 2004-12-20 22:09:25 chulwoo Exp $
+dnl  $Id: configure.in,v 1.30 2004-12-20 22:09:25 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.29 $
+dnl  $Revision: 1.30 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -251,6 +251,20 @@ AC_SUBST(VERSION_STR)
 AC_PROG_INSTALL
 
 AC_CHECK_PROG(have_doxygen, doxygen, "yes")
+AC_CHECK_TYPES(bool_t)
+AC_CHECK_TYPES(enum_t)
+AC_CHECK_TYPES(int8_t)
+AC_CHECK_TYPES(int16_t)
+AC_CHECK_TYPES(int32_t)
+AC_CHECK_TYPES(int64_t)
+AC_CHECK_TYPES(quad_t)
+AC_CHECK_TYPES(uint_t)
+AC_CHECK_TYPES(uint8_t)
+AC_CHECK_TYPES(uint16_t)
+AC_CHECK_TYPES(uint32_t)
+AC_CHECK_TYPES(uint64_t)
+AC_CHECK_TYPES(u_quad_t)
+AC_CHECK_TYPES(netobj)
 AC_CONFIG_HEADERS([conf.h])
 dnl AC_CHECK_HEADERS([string.h])
 dnl AC_CHECK_HEADERS([strings.h])

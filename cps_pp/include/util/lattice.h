@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.33 2004-12-16 00:10:55 chulwoo Exp $
+  $Id: lattice.h,v 1.34 2004-12-20 22:09:25 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2004-12-16 00:10:55 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.33 2004-12-16 00:10:55 chulwoo Exp $
-  $Id: lattice.h,v 1.33 2004-12-16 00:10:55 chulwoo Exp $
+  $Date: 2004-12-20 22:09:25 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.34 2004-12-20 22:09:25 chulwoo Exp $
+  $Id: lattice.h,v 1.34 2004-12-20 22:09:25 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.33 $
+  $Revision: 1.34 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -36,7 +36,6 @@
 #include <util/data_types.h>
 
 #include <alg/cg_arg.h>
-#include <alg/ghb_arg.h>
 #include <alg/eig_arg.h>
 #ifdef PARALLEL
 #include <comms/sysfunc.h>

@@ -7,14 +7,12 @@
 #include <limits.h>
 #include <string.h>
 
-#if 0
-#include <rpc/types.h>
-#include <rpc/rpc.h>
-#endif
 #include <util/qcdio.h>
 #include <util/vml/types.h>
 #include <util/vml/vml.h>
 #include <util/vml/vml_encoder.h>
+
+USING_NAMESPACE_CPS
 
 static GenericEncoder *VmlEncode = new TextEncoder;
 
@@ -55,7 +53,7 @@ vml_free (vmlproc_t proc, char *name, char *objp)
 bool_t
 vml_void (void)
 {
-  return TRUE;
+  return VML_TRUE;
 }
 
 /*
@@ -215,7 +213,7 @@ vml_enum (VML *vmls, char *name, enum_t *ep)
 	    }
 	  *ep = l;
 	case VML_FREE:
-	  return TRUE;
+	  return VML_TRUE;
 
 	}
       return FALSE;
@@ -229,7 +227,7 @@ vml_enum (VML *vmls, char *name, enum_t *ep)
     }
   else
     {
-      return FALSE;
+      return VML_FALSE;
     }
 }
 
@@ -246,7 +244,7 @@ vml_opaque (VML *vmls, char *name, caddr_t cp, u_int cnt)
   int icnt = cnt;
   VmlEncode->Bytes(vmls,name,tmp,icnt);
   cnt = icnt;
-  return TRUE;
+  return VML_TRUE;
 }
 
 /*
@@ -265,7 +263,7 @@ vml_bytes (
   int icnt = *sizep;
   VmlEncode->Bytes(vmls,name,*cpp,icnt);
   *sizep = icnt;
-  return TRUE;
+  return VML_TRUE;
 }
 
 /*
@@ -308,7 +306,7 @@ vml_union (
    */
   if (!vml_enum (vmls, name, dscmp))
     {
-      return FALSE;
+      return VML_FALSE;
     }
   dscm = *dscmp;
 
@@ -325,7 +323,7 @@ vml_union (
   /*
    * no match - execute the default vml routine if there is one
    */
-  return ((dfault == NULL_vmlproc_t) ? FALSE :
+  return ((dfault == NULL_vmlproc_t) ? VML_FALSE :
 	  (*dfault) (vmls, name, unp, LASTUNSIGNED));
 }
 
@@ -366,9 +364,9 @@ vml_wrapstring (
 {
   if (vml_string (vmls, name, cpp, LASTUNSIGNED))
     {
-      return TRUE;
+      return VML_TRUE;
     }
-  return FALSE;
+  return VML_FALSE;
 }
 
 bool_t
@@ -515,12 +513,12 @@ vml_pointer (
   more_data = (*objpp != NULL);
   if (!vml_bool (vmls, name, &more_data))
     {
-      return FALSE;
+      return VML_FALSE;
     }
   if (!more_data)
     {
       *objpp = NULL;
-      return TRUE;
+      return VML_TRUE;
     }
   return vml_reference (vmls, name, objpp, obj_size, vml_obj);
 }
@@ -545,7 +543,6 @@ void vml_class_end   (VML *vmls, char *type, char *instance)
 
 }
 
-USING_NAMESPACE_CPS
 
 bool_t VML::Puts(char *string)
 {

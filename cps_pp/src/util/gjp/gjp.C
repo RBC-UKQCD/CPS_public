@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.22 2004-12-16 00:10:57 chulwoo Exp $
+  $Id: gjp.C,v 1.23 2004-12-20 22:09:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-16 00:10:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.22 2004-12-16 00:10:57 chulwoo Exp $
-//  $Id: gjp.C,v 1.22 2004-12-16 00:10:57 chulwoo Exp $
+//  $Date: 2004-12-20 22:09:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.23 2004-12-20 22:09:26 chulwoo Exp $
+//  $Id: gjp.C,v 1.23 2004-12-20 22:09:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -124,79 +124,58 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
 
   doarg_int = rda;
 
-#if 1
+  // Set the number of sites of a single node
+  //----------------------------------------------------------------
   node_sites[0] = doarg_int.x_node_sites;
   node_sites[1] = doarg_int.y_node_sites;
   node_sites[2] = doarg_int.z_node_sites;
   node_sites[3] = doarg_int.t_node_sites;
   node_sites[4] = doarg_int.s_node_sites;
+
+  // Set the number of nodes
+  //----------------------------------------------------------------
   nodes[0] = doarg_int.x_nodes;
   nodes[1] = doarg_int.y_nodes;
   nodes[2] = doarg_int.z_nodes;
   nodes[3] = doarg_int.t_nodes;
   nodes[4] = doarg_int.s_nodes;
-  bc[0] = doarg_int.x_bc;
-  bc[1] = doarg_int.y_bc;
-  bc[2] = doarg_int.z_bc;
-  bc[3] = doarg_int.t_bc;
-#else
-  // Set the number of sites of a single node
-  //----------------------------------------------------------------
-  x_node_sites = rda.x_node_sites;
-  y_node_sites = rda.y_node_sites;
-  z_node_sites = rda.z_node_sites;
-  t_node_sites = rda.t_node_sites;
-  s_node_sites = rda.s_node_sites;   
-  // if(s_node_sites == 0) s_node_sites=1;
-#endif
-  
+  if (nodes[4] == 0) nodes[4] = 1;
+
   for(i = 0; i<4 ; i++)
-  if (node_sites[i]<0 ||node_sites[i]%2!=0)
+  if (node_sites[i]<=0 ||node_sites[i]%2!=0)
       ERR.General(cname,fname,
 	"Bad value %d for %s_node_sites; must be divisible by 2\n", node_sites[i], dim_name[i]);
-
-#if 0
-  // Set the number of nodes
-  //----------------------------------------------------------------
-  x_nodes = rda.x_nodes;
-  y_nodes = rda.y_nodes;
-  z_nodes = rda.z_nodes;
-  t_nodes = rda.t_nodes;
-  s_nodes = rda.s_nodes;
-#endif
 
   // Check that the number of nodes divides the machine into
   // same size partitions.
   //----------------------------------------------------------------
   int size[5];
+#if 0
   for(i = 0; i<5 ; i++)
   size[i] = 1;
-#ifdef PARALLEL
-  if( nodes[0]*nodes[1]*nodes[2]*nodes[3]*nodes[4] != 1)
-    { 
-      size[0] = SizeX(); 
-      size[1] = SizeY(); 
-      size[2] = SizeZ(); 
-      size[3] = SizeT(); 
-      size[4] = SizeS(); 
-    }
-  if( node_sites[0]* node_sites[1]* node_sites[2]* node_sites[3]* node_sites[4] == 0 )
-    {
-      node_sites[0] = rda.x_sites/SizeX();
-      node_sites[1] = rda.y_sites/SizeY();
-      node_sites[2] = rda.z_sites/SizeZ();
-      node_sites[3] = rda.t_sites/SizeT();
-      node_sites[4] = rda.s_sites/SizeS();   
-    }
 #endif
-  
-
+  size[0] = SizeX(); 
+  size[1] = SizeY(); 
+  size[2] = SizeZ(); 
+  size[3] = SizeT(); 
+  size[4] = SizeS(); 
   for(i = 0; i<5 ; i++)
   if( nodes[i] == 0 || size[i]%nodes[i] != 0) 
       ERR.General(cname,fname,	
 		  "Illegal machine partition in %s direction; physical grid size = %d must be a multiple of DoArg::x_nodes = %d\n",
 		  dim_name[i], size[i], nodes[i] );
   
+
+  if( node_sites[0]==0 && node_sites[1]==0 && node_sites[2]==0 && node_sites[3]==0 && node_sites[4] == 0 )
+    {
+      node_sites[0] = rda.x_sites/nodes[0];
+      node_sites[1] = rda.y_sites/nodes[1];
+      node_sites[2] = rda.z_sites/nodes[2];
+      node_sites[3] = rda.t_sites/nodes[3];
+      node_sites[4] = rda.s_sites/nodes[4];
+    }
+#ifdef PARALLEL
+#endif
 
   // Set the volume values
   //----------------------------------------------------------------
@@ -206,20 +185,12 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   vol_sites = vol_node_sites;
   for(i = 0; i<4 ; i++) vol_sites *= nodes[i];
 
-  for(i = 0; i<5 ; i++) node_coor[i] = 0;
 
-#if 0
   // Set the coordinates of the node
   //----------------------------------------------------------------
-  x_node_coor = 0;
-  y_node_coor = 0;
-  z_node_coor = 0;
-  t_node_coor = 0;
-  s_node_coor = 0;
-#endif
 
+  for(i = 0; i<5 ; i++) node_coor[i] = 0;
 #ifdef PARALLEL
-
   int coor[5];
   coor[0] = CoorX();
   coor[1] = CoorY();
@@ -234,17 +205,6 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
 node_sites[0], node_sites[1], node_sites[2], node_sites[3], node_sites[4]);
   VRB.Result(cname,fname, "nodes= %d %d %d %d %d\n",
 nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
-#if 0
-  if(x_nodes != 1) x_node_coor = CoorX() % x_nodes;
-  if(y_nodes != 1) y_node_coor = CoorY() % y_nodes;
-  if(z_nodes != 1) z_node_coor = CoorZ() % z_nodes;
-  if(t_nodes != 1) t_node_coor = CoorT() % t_nodes;
-  if(s_nodes != 1) s_node_coor = CoorS() % s_nodes;
-  VRB.Result(cname,fname, "node_sites= %d %d %d %d %d\n",
-x_node_sites,y_node_sites,z_node_sites,t_node_sites,s_node_sites);
-  VRB.Result(cname,fname, "nodes= %d %d %d %d %d\n",
-x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
-#endif
 
   // Set the static arrays gjp_local_axis[5], gjp_scu_dir[10],
   // and gjp_scu_wire_map[10].
@@ -267,34 +227,22 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   gjp_scu_dir[8] = SCU_SP;
   gjp_scu_dir[9] = SCU_SM;
 
-  gjp_scu_wire_map[0] = SCURemap( SCU_XP );
-  gjp_scu_wire_map[1] = SCURemap( SCU_XM );
-  gjp_scu_wire_map[2] = SCURemap( SCU_YP );
-  gjp_scu_wire_map[3] = SCURemap( SCU_YM );
-  gjp_scu_wire_map[4] = SCURemap( SCU_ZP );
-  gjp_scu_wire_map[5] = SCURemap( SCU_ZM );
-  if(nodes[3] > 1){
-  gjp_scu_wire_map[6] = SCURemap( SCU_TP );
-  gjp_scu_wire_map[7] = SCURemap( SCU_TM );
+  for(int i = 0;i<5;i++)
+  if(nodes[i] > 1){
+  gjp_scu_wire_map[2*i]   = SCURemap(gjp_scu_dir[2*i]);
+  gjp_scu_wire_map[2*i+1] = SCURemap(gjp_scu_dir[2*i+1]);
   }
-  if(nodes[4] > 1){
-  gjp_scu_wire_map[8] = SCURemap( SCU_SP );
-  gjp_scu_wire_map[9] = SCURemap( SCU_SM );
-  }
-//  for(int i = 0;i<10;i++) fprintf(stderr,"SCURemap(%d)= %d\n",gjp_scu_dir[i],gjp_scu_wire_map[i]);
-
+  
 #endif //PARALLEL
 
 
   
-#if 0
   // Set the boundary conditions for the whole lattice
   //----------------------------------------------------------------
-  x_bc = rda.x_bc;
-  y_bc = rda.y_bc;
-  z_bc = rda.z_bc;
-  t_bc = rda.t_bc;
-#endif
+  bc[0] = doarg_int.x_bc;
+  bc[1] = doarg_int.y_bc;
+  bc[2] = doarg_int.z_bc;
+  bc[3] = doarg_int.t_bc;
 
   // Set the boundary conditions for the sub-lattice on this node
   //----------------------------------------------------------------
@@ -303,24 +251,6 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   if(bc[i] == BND_CND_APRD) 
     node_bc[i] = ( node_coor[i] == (nodes[i]-1) ) ? BND_CND_APRD : BND_CND_PRD;
   }
-#if 0
-  x_node_bc = BND_CND_PRD;
-  if(x_bc == BND_CND_APRD) 
-    x_node_bc = ( x_node_coor == (x_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
-  y_node_bc = BND_CND_PRD;
-  if(y_bc == BND_CND_APRD) 
-    y_node_bc = ( y_node_coor == (y_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
-  z_node_bc = BND_CND_PRD;
-  if(z_bc == BND_CND_APRD) 
-    z_node_bc = ( z_node_coor == (z_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
-  t_node_bc = BND_CND_PRD;
-  if(t_bc == BND_CND_APRD) 
-    t_node_bc = ( t_node_coor == (t_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
-
-  // Set the initial configuration kind.
-  //----------------------------------------------------------------
-  start_conf_kind = rda.start_conf_kind;
-#endif
 
   // Set the initial configuration load address
   //----------------------------------------------------------------
@@ -341,51 +271,10 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   }
 #endif
 
-//    start_conf_alloc_flag = rda.start_conf_alloc_flag;
     VRB.Flow(cname,fname,"start_conf_alloc_flag=%d\n",doarg_int.start_conf_alloc_flag);
     
 
-  // Set the initial seed type.
-  //----------------------------------------------------------------
-//  start_seed_kind = rda.start_seed_kind;
-
-  // Set the initial seed value
-  //----------------------------------------------------------------
-
 #if 0
-  if(start_seed_kind == START_SEED_INPUT ||
-     start_seed_kind == START_SEED_INPUT_UNIFORM ||
-     start_seed_kind == START_SEED_INPUT_NODE) 
-      start_seed_value = rda.start_seed_value;
-#endif
-  
-
-#if 0
-  // Set beta.
-  //----------------------------------------------------------------
-  beta = rda.beta;
-
-  // Set c_1
-  //----------------------------------------------------------------
-  c_1 = rda.c_1;
-
-  //Set u_0
-  //----------------------------------------------------------------
-  u_0 = rda.u0;
-
-  // Set dwf_height.
-  //----------------------------------------------------------------
-  dwf_height = rda.dwf_height;
-
-  // Set the inverse of the dwf 5th dir. lattice spacing 
-  //----------------------------------------------------------------
-  dwf_a5_inv = rda.dwf_a5_inv;
-
-
-  // Set parameters for anisotropic lattices and clover improvement.
-  // MUST BE AFTER THE SETTING OF BETA [which is re-adjusted for
-  // anisotropic implementations]. 
-  //----------------------------------------------------------------
   xi_bare = rda.xi_bare;
   xi_dir  = rda.xi_dir;
   xi_v    = rda.xi_v;
@@ -394,7 +283,10 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   clover_coeff_xi = clover_coeff = rda.clover_coeff;
 #endif
 
-//  if (doarg_int.xi_bare != 1.0) {
+  // Set parameters for anisotropic lattices and clover improvement.
+  // MUST BE AFTER THE SETTING OF BETA [which is re-adjusted for
+  // anisotropic implementations]. 
+  //----------------------------------------------------------------
   if (fabs(doarg_int.xi_bare - 1.0)> SMALL ) {
     doarg_int.clover_coeff_xi = rda.clover_coeff_xi;
     doarg_int.beta /= doarg_int.xi_bare;    
@@ -402,43 +294,6 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   } else {
     doarg_int.clover_coeff_xi = doarg_int.clover_coeff;
   }
-  printf("clover_coeff_xi - clover_coeff= %e\n",
-  doarg_int.clover_coeff_xi - doarg_int.clover_coeff);
-
-#if 0
-  // Set the power plaquette cutoff.
-  //----------------------------------------------------------------
-  power_plaq_cutoff = rda.power_plaq_cutoff;
-
-  // Set the power plaquette exponent.
-  //----------------------------------------------------------------
-  power_plaq_exponent = rda.power_plaq_exponent;
-
-  // Set the power rectangle cutoff.
-  //----------------------------------------------------------------
-  power_rect_cutoff = rda.power_rect_cutoff;
-
-  // Set the power rectangle exponent.
-  //----------------------------------------------------------------
-  power_rect_exponent = rda.power_rect_exponent;
-
-
-  // Set the asqtad improved  staggered fermion action parameters.
-
-  asqtad_KS = rda.asqtad_KS;	  
-  asqtad_naik = rda.asqtad_naik;	  
-  asqtad_3staple = rda.asqtad_3staple; 
-  asqtad_5staple = rda.asqtad_5staple; 
-  asqtad_7staple = rda.asqtad_7staple; 
-  asqtad_lepage = rda.asqtad_lepage;  
- 
-  p4_KS = rda.p4_KS;	  
-  p4_knight = rda.p4_knight;	  
-  p4_3staple = rda.p4_3staple; 
-  p4_5staple = rda.p4_5staple; 
-  p4_7staple = rda.p4_7staple; 
-  p4_lepage = rda.p4_lepage; 
-#endif 
 
   //================================================================
   // Other initializations

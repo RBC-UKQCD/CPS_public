@@ -1,5 +1,5 @@
 SRCDIR = /home/chulwoo/CPS/qcdserver0/v4_8_11/cps++
-BUILDDIR = /home/chulwoo/CPS/qcdserver0/v4_8_11/v2.5.0/aix5.2_2
+BUILDDIR = /home/chulwoo/CPS/qcdserver0/v4_8_11/linux
 
 RPCGEN=${SRCDIR}/misc/vml_encode/rpcgenvml/rpcgenvml
 

@@ -2,28 +2,15 @@
  * vml.h, Serialisation routines to connect Sunrpc/XDR to VML
  */
 
-#ifndef _RPC_VML_H
-#define _RPC_VML_H 1
+#ifndef _VML_H
+#define _VML_H 1
 
 #include <config.h>
-#include <sys/types.h>
-#if TARGET == QCDOC
-#include <util/vml/types.h>
-#else
-#include <rpc/types.h>
-#endif
-
-#include <config.h>
-
-struct VML;
-#define AIX
-#ifdef AIX
-typedef unsigned long long u_quad_t;
-typedef long long quad_t;
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <util/vml/types.h>
+
+struct VML;
 
 #ifdef __cplusplus 
 extern "C" { 
