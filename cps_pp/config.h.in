@@ -3,24 +3,22 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.15 2004-09-03 13:49:37 zs Exp $
+  $Id: config.h.in,v 1.16 2004-09-03 15:33:15 zs Exp $
 */
-/* Global options for compiling the Colombia code:  
+/* Global options for compiling the Columbia code:  
  * @configure_input@
  * 
- *    Currently, this fine copes with two different build environments,
- *       on QCDSP or not on QCDSP, as determined by a flag.
  *--------------------------------------------------------------------
  *  CVS keywords
  *
  *  $Author: zs $
- *  $Date: 2004-09-03 13:49:37 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.15 2004-09-03 13:49:37 zs Exp $
- *  $Id: config.h.in,v 1.15 2004-09-03 13:49:37 zs Exp $
+ *  $Date: 2004-09-03 15:33:15 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.16 2004-09-03 15:33:15 zs Exp $
+ *  $Id: config.h.in,v 1.16 2004-09-03 15:33:15 zs Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.15 $
+ *  $Revision: 1.16 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
