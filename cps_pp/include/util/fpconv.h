@@ -1,3 +1,10 @@
+/*!
+  \file
+  \brief
+  
+  $Id: fpconv.h,v 1.6 2004-10-27 16:01:13 zs Exp $
+ */
+
 #ifndef __FP_CONV__
 #define __FP_CONV__
 
