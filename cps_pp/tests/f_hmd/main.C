@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-29 17:18:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.18 2004-09-29 17:18:56 chulwoo Exp $
-//  $Id: main.C,v 1.18 2004-09-29 17:18:56 chulwoo Exp $
+//  $Date: 2004-11-08 06:39:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.19 2004-11-08 06:39:52 chulwoo Exp $
+//  $Id: main.C,v 1.19 2004-11-08 06:39:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -120,7 +120,7 @@ int main(int argc,char *argv[])
   hmd_arg.reunitarize = REUNITARIZE_YES;
 
 
-#if 1
+#if 0
   //----------------------------------------------------------------
   // Run HMC Phi Wilson
   //----------------------------------------------------------------
@@ -159,7 +159,7 @@ int main(int argc,char *argv[])
   }
 #endif
 
-#if 1
+#if 0
   {
     char rng_file[200];
     sprintf(rng_file,"%dx%dx%dx%dx%d.rng",nx,ny,nz,nt,ns);
@@ -176,7 +176,7 @@ int main(int argc,char *argv[])
 #endif
 
 
-#if 1
+#if 0
   //----------------------------------------------------------------
   // Run HMD R Staggered
   //----------------------------------------------------------------
@@ -256,7 +256,7 @@ int main(int argc,char *argv[])
   }
 #endif
 
-#if 1
+#if 0
   //----------------------------------------------------------------
   // Run HMC Phi Clover
   //----------------------------------------------------------------
