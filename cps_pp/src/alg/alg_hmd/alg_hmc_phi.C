@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
 
-  $Id: alg_hmc_phi.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
+  $Id: alg_hmc_phi.C,v 1.20 2005-02-18 19:55:59 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-12-07 06:11:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 19:55:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.20 2005-02-18 19:55:59 mclark Exp $
+//  $Id: alg_hmc_phi.C,v 1.20 2005-02-18 19:55:59 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -449,7 +449,6 @@ Float AlgHmcPhi::run(void)
   //----------------------------------------------------------------
   lat.EvolveMomGforce(mom, 0.5*dt);
 
-
   // Evolve momenta by half a step using the fermion force
   //----------------------------------------------------------------
   for(i=0; i<n_frm_masses; i++){
@@ -677,7 +676,7 @@ Float AlgHmcPhi::run(void)
     if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
-    Fprintf(fp,"%d %e %d %e %e %e %d %d %e %e %e\n",
+    Fprintf(fp,"%d %.16e %d %.16e %.16e %.16e %d %d %.16e %.16e %.16e\n",
 	    hmd_arg->steps_per_traj+2,
 	    IFloat(delta_h), 
 	    accept, 

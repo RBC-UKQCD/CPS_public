@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.13 2004-09-02 17:00:15 zs Exp $
+  $Id: alg_hmd_r.C,v 1.14 2005-02-18 19:56:00 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 17:00:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.13 2004-09-02 17:00:15 zs Exp $
-//  $Id: alg_hmd_r.C,v 1.13 2004-09-02 17:00:15 zs Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 19:56:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.14 2005-02-18 19:56:00 mclark Exp $
+//  $Id: alg_hmd_r.C,v 1.14 2005-02-18 19:56:00 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //
@@ -324,54 +324,23 @@ Float AlgHmdR::run(void)
     // and gaussian random vector.
     //--------------------------------------------------------------
     for(i=0; i<n_frm_masses; i++){
-      lat.EvolveGfield(mom, flavor_time_step[i]);
+      if (flavor_time_step[i] > 0.0) 
+	lat.EvolveGfield(mom, flavor_time_step[i]);
       lat.MdTimeInc(flavor_time_step[i] / dt);
       VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
       lat.RandGaussVector(frm1, 0.5, Ncb);
       Float phi_sum = (frm1)->NormSqGlbSum(GJP.VolNodeSites()*6/2);
       VRB.Flow(cname,fname,"frm1_sum = %0.14e\n",phi_sum);
       phi_p = (Float *)frm1;
-#if 0
-      for(int ii = 0; ii<GJP.VolNodeSites()/2;ii++){
-	printf("%0.4d ",ii);
-      for(int j = 0; j<6;j++){
-	printf("%0.8e ",*phi_p);
-	phi_p++;
-      }
-	printf("\n");
-      }
-#endif
 
       lat.RandGaussVector(frm2, 0.5, Ncb);
       phi_sum = (frm2)->NormSqGlbSum(GJP.VolNodeSites()/2*6);
       VRB.Flow(cname,fname,"frm2_sum = %0.14e\n",phi_sum);
-#if 0
-      phi_p = (Float *)frm2;
-      for(int ii = 0; ii<GJP.VolNodeSites()/2;ii++){
-	printf("%0.4d ",ii);
-      for(int j = 0; j<6;j++){
-	printf("%0.8e ",*phi_p);
-	phi_p++;
-      }
-	printf("\n");
-      }
-#endif
-//      lat.Fconvert(frm1,STAG,CANONICAL);
 	
       lat.SetPhi(phi[i], frm1, frm2, hmd_arg->frm_mass[i]);
       phi_sum = (phi[i])->NormSqGlbSum(GJP.VolNodeSites()/2*6);
       phi_p = (Float *)phi[i];
       VRB.Flow(cname,fname,"phi_sum = %0.14e\n",phi_sum);
-#if 0
-      for(int ii = 0; ii<GJP.VolNodeSites()/2;ii++){
-	printf("%0.4d ",i);
-      for(int j = 0; j<6;j++){
-	printf("%0.8e ",*phi_p);
-	phi_p++;
-      }
-	printf("\n");
-      }
-#endif
     }
 
     // Evolve gauge field to the mid-point N*dt + dt/2

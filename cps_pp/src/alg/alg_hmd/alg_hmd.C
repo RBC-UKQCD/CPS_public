@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmd constructor and destructor.
 
-  $Id: alg_hmd.C,v 1.9 2004-09-02 17:00:13 zs Exp $
+  $Id: alg_hmd.C,v 1.10 2005-02-18 19:56:00 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 17:00:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v 1.9 2004-09-02 17:00:13 zs Exp $
-//  $Id: alg_hmd.C,v 1.9 2004-09-02 17:00:13 zs Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 19:56:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v 1.10 2005-02-18 19:56:00 mclark Exp $
+//  $Id: alg_hmd.C,v 1.10 2005-02-18 19:56:00 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -85,7 +85,7 @@ AlgHmd::AlgHmd(Lattice& latt, CommonArg *c_arg, HmdArg *arg) :
   if(latt.FchkbEvl() == 1)
     Ncb = 1;                    // Half Checkerboard
   else if(latt.FchkbEvl() == 0)
-      Ncb = 2;                    // Full Checkerboard
+    Ncb = 2;                    // Full Checkerboard
 
 }
 
