@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v 1.8 2004-08-18 11:57:40 zs Exp $
-//  $Id: w_mesons.C,v 1.8 2004-08-18 11:57:40 zs Exp $
+//  $Date: 2004-09-02 17:18:29 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v 1.9 2004-09-02 17:18:29 zs Exp $
+//  $Id: w_mesons.C,v 1.9 2004-09-02 17:18:29 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_mesons.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v $
 //  $State: Exp $
 //
@@ -195,7 +195,7 @@ WspectMesons::~WspectMesons()
 //---------------------------------------------------------------------------
 void
 WspectMesons::ColorAlgebra(int D1x, int D2x, int D1y, int D2y,
-			   const int lcl[], Complex &result) const
+			   const int lcl[LORENTZs], Complex &result) const
 {
   int local_site_offset = siteOffset(lcl) * SPINORs;  
 
@@ -738,7 +738,7 @@ WspectMesons::DiracAlgebra(int lclW)
 // void WspectMesons::print(const CommonArg *common_arg) const
 //--------------------------------------------------------------------------- 
 void
-WspectMesons::print(char **filename) const
+WspectMesons::print(char *filename[MESONs]) const
 {
 
 #if TARGET==cpsMPI

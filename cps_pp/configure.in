@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: zs $
-dnl  $Date: 2004-09-02 16:52:58 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.19 2004-09-02 16:52:58 zs Exp $
-dnl  $Id: configure.in,v 1.19 2004-09-02 16:52:58 zs Exp $
+dnl  $Date: 2004-09-02 17:16:40 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.20 2004-09-02 17:16:40 zs Exp $
+dnl  $Id: configure.in,v 1.20 2004-09-02 17:16:40 zs Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.19 $
+dnl  $Revision: 1.20 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -234,10 +234,10 @@ AC_SUBST(LOCALPRECISION)
 
 dnl configuring version number
 .  $srcdir/VERSION
-echo $srcdir
-echo MAJOR ${VERSION_MAJOR}
-echo MINOR ${VERSION_MINOR}
-echo SUB   ${VERSION_SUB}
+echo CPS source: $srcdir
+echo "CPS Version MAJOR: ${VERSION_MAJOR}"
+echo "CPS Version MINOR: ${VERSION_MINOR}"
+echo "CPS Version SUB:   ${VERSION_SUB}"
 echo Version ${VERSION_STR}
 AC_SUBST(VERSION_MAJOR)
 AC_SUBST(VERSION_MINOR)

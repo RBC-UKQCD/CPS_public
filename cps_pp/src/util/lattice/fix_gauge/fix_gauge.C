@@ -1,18 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  $Id: fix_gauge.C,v 1.5 2004-08-18 11:58:04 zs Exp $
+  $Id: fix_gauge.C,v 1.6 2004-09-02 17:16:50 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.5 2004-08-18 11:58:04 zs Exp $
-//  $Id: fix_gauge.C,v 1.5 2004-08-18 11:58:04 zs Exp $
+//  $Date: 2004-09-02 17:16:50 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.6 2004-09-02 17:16:50 zs Exp $
+//  $Id: fix_gauge.C,v 1.6 2004-09-02 17:16:50 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -894,9 +894,10 @@ void FixHPlane::unitarize(int recurse)
   gauge fixing.
   \param MaxIterNum The maximum number of iterations the gauge fixing
   algorithm is allowed before it gives up.
-  \return The total number of iterations used. The algorithm failed to converge
-  within the allowed number of iterations, then the -1 times the number of
-  iterations reached is returned (this might not be MaxIterNum, oddly enough).
+  \return The total number of iterations used. If the algorithm fails to
+  converge within the allowed number of iterations, then the -1 times the
+  number of iterations reached is returned (this might not be MaxIterNum,
+  oddly enough).
 
   \post The required parts of the gauge field are fixed to the desired gauge.
  */
@@ -1243,7 +1244,10 @@ void Lattice::FixGaugeAllocate(FixGaugeType GaugeKind,
 // Deallocates memory                                                      //
 //                                                                         //
 //-------------------------------------------------------------------------//
-
+/*!
+  \post Lattice::Lattice::FixGaugeKind will now return FIX_GAUGE_NONE.
+*/
+  
 void Lattice::FixGaugeFree()
 {
   char *fname = "FixGaugeFree()";
