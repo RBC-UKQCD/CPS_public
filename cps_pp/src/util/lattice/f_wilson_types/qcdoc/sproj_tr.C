@@ -5,18 +5,18 @@ CPS_START_NAMESPACE
 
   Used by derivatives of the FwilsonTypes class.
   
-  $Id: sproj_tr.C,v 1.2 2004-11-17 23:23:09 chulwoo Exp $
+  $Id: sproj_tr.C,v 1.3 2004-11-19 20:25:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-11-17 23:23:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/qcdoc/sproj_tr.C,v 1.2 2004-11-17 23:23:09 chulwoo Exp $
-//  $Id: sproj_tr.C,v 1.2 2004-11-17 23:23:09 chulwoo Exp $
+//  $Date: 2004-11-19 20:25:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/qcdoc/sproj_tr.C,v 1.3 2004-11-19 20:25:08 chulwoo Exp $
+//  $Id: sproj_tr.C,v 1.3 2004-11-19 20:25:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/qcdoc/sproj_tr.C,v $
 //  $State: Exp $
 //
@@ -68,13 +68,14 @@ void sprojTrXp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
 //  tf = f ;
 //  IFloat temp_mat[18];
 //  IFloat v1[6],w1[6];
-  register IFloat f00r ,f00i ,f01r ,f01i ,f02r ,f02i;
-  register IFloat f10r,f10i,f11r,f11i,f12r,f12i;
-  register IFloat f20r,f20i,f21r,f21i,f22r,f22i;
+  register IFloat f00r=0.,f00i=0.,f01r=0.,f01i=0.,f02r=0.,f02i=0.;
+  register IFloat f10r=0.,f10i=0.,f11r=0.,f11i=0.,f12r=0.,f12i=0.;
+  register IFloat f20r=0.,f20i=0.,f21r=0.,f21i=0.,f22r=0.,f22i=0.;
   IFloat v1_0,v1_1,v1_2,v1_3,v1_4,v1_5;
   IFloat w1_0,w1_1,w1_2,w1_3,w1_4,w1_5;
 
   tf = f;
+#if 0
   f00r = *tf++;f00i = *tf++;
   f01r = *tf++;f01i = *tf++;
   f02r = *tf++;f02i = *tf++;
@@ -84,6 +85,7 @@ void sprojTrXp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
   f20r = *tf++;f20i = *tf++;
   f21r = *tf++;f21i = *tf++;
   f22r = *tf++;f22i = *tf++;
+#endif
 
 //  tf = f;
 //  for (row=0; row<MATRIX_SIZE; row++) 
@@ -95,66 +97,59 @@ void sprojTrXp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
 //    tf = f ;
     tv = v ;
     tw = w ;
-	  __builtin_prefetch(vnext); vnext +=4;
 	v1_0 = (*(tv   ) - *(tv+19));
 	v1_1 = (*(tv+ 1) + *(tv+18));
 	v1_2 = (*(tv+ 2) - *(tv+21));
-	  __builtin_prefetch(wnext); wnext +=4;
 	v1_3 = (*(tv+ 3) + *(tv+20));
 	v1_4 = (*(tv+ 4) - *(tv+23));
 	v1_5 = (*(tv+ 5) + *(tv+22));
-	  __builtin_prefetch(vnext); vnext +=4;
 	w1_0 = (*(tw   ) - *(tw+19));
 	w1_1 = (*(tw+ 1) + *(tw+18));
 	w1_2 = (*(tw+ 2) - *(tw+21));
-	  __builtin_prefetch(wnext);wnext +=4;
 	w1_3 = (*(tw+ 3) + *(tw+20));
 	w1_4 = (*(tw+ 4) - *(tw+23));
 	w1_5 = (*(tw+ 5) + *(tw+22));
-	  __builtin_prefetch(vnext); vnext +=4;
 
 	f00r += v1_0*w1_0+v1_1*w1_1;
 	f00i += v1_1*w1_0-v1_0*w1_1;
 	f01r += v1_0*w1_2+v1_1*w1_3;
-	  __builtin_prefetch(wnext); wnext +=4;
 	f01i += v1_1*w1_2-v1_0*w1_3;
 	f02r += v1_0*w1_4+v1_1*w1_5;
 	f02i += v1_1*w1_4-v1_0*w1_5;
 	  __builtin_prefetch(vnext); vnext +=4;
+	  __builtin_prefetch(wnext); wnext +=4;
 
 	f10r += v1_2*w1_0+v1_3*w1_1;
 	f10i += v1_3*w1_0-v1_2*w1_1;
 	f11r += v1_2*w1_2+v1_3*w1_3;
-	  __builtin_prefetch(wnext); wnext +=4;
 	f11i += v1_3*w1_2-v1_2*w1_3;
 	f12r += v1_2*w1_4+v1_3*w1_5;
 	f12i += v1_3*w1_4-v1_2*w1_5;
+	  __builtin_prefetch(vnext); vnext +=4;
+	  __builtin_prefetch(wnext); wnext +=4;
 
 	f20r += v1_4*w1_0+v1_5*w1_1;
 	f20i += v1_5*w1_0-v1_4*w1_1;
 	f21r += v1_4*w1_2+v1_5*w1_3;
-	__builtin_prefetch(vnext); vnext +=4;
 	f21i += v1_5*w1_2-v1_4*w1_3;
 	f22r += v1_4*w1_4+v1_5*w1_5;
 	f22i += v1_5*w1_4-v1_4*w1_5;
+	  __builtin_prefetch(vnext); vnext +=4;
+	  __builtin_prefetch(wnext); wnext +=4;
 
     tf = f ;
-	__builtin_prefetch(wnext); wnext +=4;
-
 	v1_0 = (*(tv+ 6) - *(tv+13));
 	v1_1 = (*(tv+ 7) + *(tv+12));
 	v1_2 = (*(tv+ 8) - *(tv+15));
 	v1_3 = (*(tv+ 9) + *(tv+14));
 	v1_4 = (*(tv+10) - *(tv+17));
 	v1_5 = (*(tv+11) + *(tv+16));
-	  __builtin_prefetch(vnext); vnext +=4;
-	w1_0 = (*(tw   ) - *(tw+13));
-	w1_1 = (*(tw+ 1) + *(tw+12));
-	w1_2 = (*(tw+ 2) - *(tw+15));
-	w1_3 = (*(tw+ 3) + *(tw+14));
-	w1_4 = (*(tw+ 4) - *(tw+17));
-	w1_5 = (*(tw+ 5) + *(tw+16));
-	  __builtin_prefetch(wnext); wnext +=4;
+	w1_0 = (*(tw+ 6) - *(tw+13));
+	w1_1 = (*(tw+ 7) + *(tw+12));
+	w1_2 = (*(tw+ 8) - *(tw+15));
+	w1_3 = (*(tw+ 9) + *(tw+14));
+	w1_4 = (*(tw+10) - *(tw+17));
+	w1_5 = (*(tw+11) + *(tw+16));
 
 	f00r += v1_0*w1_0+v1_1*w1_1;
 	f00i += v1_1*w1_0-v1_0*w1_1;
@@ -162,6 +157,8 @@ void sprojTrXp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
 	f01i += v1_1*w1_2-v1_0*w1_3;
 	f02r += v1_0*w1_4+v1_1*w1_5;
 	f02i += v1_1*w1_4-v1_0*w1_5;
+	  __builtin_prefetch(vnext); vnext +=4;
+	  __builtin_prefetch(wnext); wnext +=4;
 
 	f10r += v1_2*w1_0+v1_3*w1_1;
 	f10i += v1_3*w1_0-v1_2*w1_1;
@@ -169,6 +166,8 @@ void sprojTrXp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
 	f11i += v1_3*w1_2-v1_2*w1_3;
 	f12r += v1_2*w1_4+v1_3*w1_5;
 	f12i += v1_3*w1_4-v1_2*w1_5;
+	  __builtin_prefetch(wnext); wnext +=4;
+	__builtin_prefetch(vnext); vnext +=4;
 
 	f20r += v1_4*w1_0+v1_5*w1_1;
 	f20i += v1_5*w1_0-v1_4*w1_1;
@@ -176,14 +175,16 @@ void sprojTrXp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
 	f21i += v1_5*w1_2-v1_4*w1_3;
 	f22r += v1_4*w1_4+v1_5*w1_5;
 	f22i += v1_5*w1_4-v1_4*w1_5;
+	  __builtin_prefetch(vnext); vnext +=4;
+	__builtin_prefetch(wnext); wnext +=4;
 
     v += 24 + v_stride ;
     w += 24 + w_stride ;
     vnext +=  v_stride ;
     wnext +=  w_stride ;
   }
-#if 1
   tf = f;
+#if 1
   *tf = f00r;tf++; *tf = f00i;tf++;
   *tf = f01r;tf++; *tf = f01i;tf++;
   *tf = f02r;tf++; *tf = f02i;tf++;
