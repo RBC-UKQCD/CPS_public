@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.2 2004-12-08 20:49:51 chulwoo Exp $
+  $Id: f_p4.C,v 1.3 2004-12-11 20:58:03 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -33,6 +33,7 @@ CPS_END_NAMESPACE
 #include <util/pt.h>
 #include <util/time.h>
 #include <util/gjp.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 
@@ -134,10 +135,10 @@ int Fp4::FmatEvlInv(Vector *f_out, Vector *f_in,
 // vectors, f_in and f_out are defined on a checkerboard.
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
-int Fp4::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+int Fp4::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 			 int Nshift, int isz, CgArg *cg_arg,
 			 CnvFrmType cnv_frm, MultiShiftSolveType type, 
-			 Float *alpha, Vector** f_out_d)
+			 Float *alpha, Vector* f_out_d)
 {
   char *fname = "FmatMInv(V**, V*, .....)";
   VRB.Func(cname,fname);
@@ -149,13 +150,13 @@ int Fp4::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
-  DiracOpP4 p4(*this, f_out[0], f_in, cg_arg, cnv_frm);
+  DiracOpP4 p4(*this, f_out, f_in, cg_arg, cnv_frm);
 
   int iter = p4.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);
 
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
-      p4.Dslash(f_out_d[s],f_out[s],CHKB_EVEN,DAG_NO);
+      p4.Dslash(f_out_d + e_vsize*s,f_out + e_vsize*s,CHKB_EVEN,DAG_NO);
   cg_arg->true_rsd = RsdCG[isz];
 
   sfree(RsdCG);
@@ -338,6 +339,11 @@ void Fp4::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
 
 }
 
+void Fp4::RHMC_EvolveMomFforce(Matrix * mom, Vector * vect, int abc,
+Float * def, Float ghi, Float jkl, Vector * vect2)
+{
+  ERR.NotImplemented(cname,"RHMC_EvolveMomFforce()");
+}
 
 static int Rotate (int mu, int i){
 	int mu_p = (mu+i)%4;

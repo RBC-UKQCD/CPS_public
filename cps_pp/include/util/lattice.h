@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.31 2004-12-07 05:23:18 chulwoo Exp $
+  $Id: lattice.h,v 1.32 2004-12-11 20:57:40 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2004-12-07 05:23:18 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.31 2004-12-07 05:23:18 chulwoo Exp $
-  $Id: lattice.h,v 1.31 2004-12-07 05:23:18 chulwoo Exp $
+  $Date: 2004-12-11 20:57:40 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.32 2004-12-11 20:57:40 chulwoo Exp $
+  $Id: lattice.h,v 1.32 2004-12-11 20:57:40 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.31 $
+  $Revision: 1.32 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -1809,10 +1809,10 @@ class Fp4 : public virtual FstagTypes, public virtual Fsmear
 		   Float *true_res,
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, 
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
-		    Vector **f_out_d);
+		    Vector *f_out_d);
 
     Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
@@ -1842,9 +1842,9 @@ class Fp4 : public virtual FstagTypes, public virtual Fsmear
 
 
     //! Momentum update in the RHMC algorithm.
-    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 			      Float *alpha, Float mass, Float dt,
-			      Vector **sol_d);
+			      Vector *sol_d);
 
     // Various utility routines for the momentum force computation.
 

@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.21 2004-10-27 14:36:24 zs Exp $
+# $Id: Makefile.in,v 1.22 2004-12-11 20:57:27 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -31,6 +31,9 @@ recurse:
 	cp -p $(SRCDIR)/src/Makefile $(BUILDDIR)/objs
 	$(MAKE) -C $(BUILDDIR)/objs $(filter-out test, $(MAKECMDGOALS))
 
+headers:
+	-cp $(BUILDDIR)/include/input/Makefile ${SRCDIR}/include/input
+	$(MAKE) -C $(SRCDIR)/include/input
 
 cleanlib: 
 	rm -f *.a

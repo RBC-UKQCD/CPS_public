@@ -2,19 +2,19 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2004-11-21 21:40:00 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.26 2004-11-21 21:40:00 chulwoo Exp $
-dnl  $Id: configure.in,v 1.26 2004-11-21 21:40:00 chulwoo Exp $
+dnl  $Date: 2004-12-11 20:57:29 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.27 2004-12-11 20:57:29 chulwoo Exp $
+dnl  $Id: configure.in,v 1.27 2004-12-11 20:57:29 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.26 $
+dnl  $Revision: 1.27 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
 dnl--------------------------------------------------------------------
 AC_INIT(./src/)
-AC_CONFIG_HEADERS([conf.h])
+dnl AC_CONFIG_HEADERS([conf.h])
 AC_CHECK_HEADERS([malloc.h])
 
 dnl Get host and target information:
@@ -64,7 +64,7 @@ AC_CHECK_LIB(m, sin, ,echo "CPS needs the math library - bailing out"; exit 1)
 dnl Set the relevant include files
 topwd_srcdir=`pwd`
 AC_SUBST(topwd_srcdir)
-dnl INCLUDE_FLAGS="-I\${BUILDDIR} -I\${SRCDIR}/include"
+dnl INCLUDE_FLAGS="-I\${BUILDDIR} -I\${BUILDDIR}/include -I\${SRCDIR}/include"
 
 dnl This is the _default_ default
 namespace_default="yes" 
@@ -252,17 +252,19 @@ AC_SUBST(VERSION_STR)
 AC_PROG_INSTALL
 
 AC_CHECK_PROG(have_doxygen, doxygen, "yes")
-dnl AC_CONFIG_HEADERS([conf.h])
+AC_CONFIG_HEADERS([conf.h])
 dnl AC_CHECK_HEADERS([string.h])
 dnl AC_CHECK_HEADERS([strings.h])
 
 
 AC_OUTPUT(config.h \
+	  precision.h \
 	  XLC.cfg \
 	  Makefile \
 	  Makefile.rules \
 	  Makefile.users \
           tests/Makefile_common \
           hdw_tests/Makefile_common \
-          tests/regression.pl )
-
+          tests/regression.pl \
+	  include/input/Makefile\
+	  )	  

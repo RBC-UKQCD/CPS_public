@@ -1,0 +1,21 @@
+SRCDIR = /home/chulwoo/CPS/qcdserver0/v4_8_11/cps++
+BUILDDIR = /home/chulwoo/CPS/qcdserver0/v4_8_11/v2.5.0/aix5.2
+
+RPCGEN=${SRCDIR}/misc/vml_encode/rpcgenvml/rpcgenvml
+
+all:
+	$(MAKE) -C ${SRCDIR}/misc/vml_encode/ clean all
+	cp ${BUILDDIR}/config.h .
+	cp ${BUILDDIR}/precision.h .
+	${RPCGEN} -h -C -x enum.x >${SRCDIR}/include/util/enum.h
+	${RPCGEN} -h -C -x enum.x >${SRCDIR}/include/alg/enum.h
+	${RPCGEN}  -C -x -c enum.x >${SRCDIR}/src/alg/alg_arg/enum.C
+	${RPCGEN} -h -C -x cg_arg.x >${SRCDIR}/include/alg/cg_arg.h
+	${RPCGEN} -c -C -x cg_arg.x >${SRCDIR}/src/alg/alg_arg/cg_arg.C
+	${RPCGEN} -h -C -x do_arg.x >${SRCDIR}/include/alg/do_arg.h
+	${RPCGEN}  -C -x -c  do_arg.x >${SRCDIR}/src/alg/alg_arg/do_arg.C
+	${RPCGEN} -h -C -x w_spect_arg.x >${SRCDIR}/include/alg/w_spect_arg.h
+	${RPCGEN}  -C -x -c  w_spect_arg.x >${SRCDIR}/src/alg/alg_arg/w_spect_arg.C
+
+clean: 
+

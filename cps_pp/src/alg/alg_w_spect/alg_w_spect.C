@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.6 2004-08-18 11:57:40 zs Exp $
-//  $Id: alg_w_spect.C,v 1.6 2004-08-18 11:57:40 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-12-11 20:58:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.7 2004-12-11 20:58:01 chulwoo Exp $
+//  $Id: alg_w_spect.C,v 1.7 2004-12-11 20:58:01 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_w_spect.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v $
 //  $State: Exp $
 //
@@ -28,22 +28,11 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <alg/alg_w_spect.h>         // class AlgWspect
-CPS_START_NAMESPACE
-
-
-CPS_END_NAMESPACE
 #include <alg/common_arg.h>          // class CommonArg
 #include <alg/w_spect_arg.h>         // class WspectArg
 #include <util/lattice.h>            // class Lattice
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <util/verbose.h>            // VRB
 #include <util/error.h>              // ERR
-CPS_START_NAMESPACE
-
-
-CPS_END_NAMESPACE
 #include <alg/w_all.h>                                 // class Wspect*
 CPS_START_NAMESPACE
 
@@ -53,9 +42,7 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------------------
 // For the purpose of debugging or timing during code upgrade
 //---------------------------------------------------------------------------
-CPS_END_NAMESPACE
-//#include <stdlib.h>      // exit
-CPS_START_NAMESPACE
+
 //#define TIMING_ALG_W_SPECT
 
 #ifdef  TIMING_ALG_W_SPECT
@@ -89,6 +76,7 @@ AlgWspect::SetCounter(int counter, int step)
 AlgWspect::AlgWspect(Lattice& latt, 
 		     CommonArg *c_arg,
 		     WspectArg *w_arg,
+		     CgArg *cg,
 		     int n_quark_masses) 
   : Alg(latt, c_arg),
     d_arg_p(w_arg),
@@ -167,7 +155,7 @@ void AlgWspect::run()
   int total_b = clock();
   int total_e;  
 #endif
-
+  CgArg cg;
   char *fname = "run()";
   VRB.Func(d_class_name,fname);
 
@@ -219,7 +207,7 @@ void AlgWspect::run()
     // create local quark propagator
     // printf("create quark q1 \n");
      WspectQuark q1(lat, output->cg, output->pbp,
-                  output->mid_point, output->a0_p, d_arg_p[0], hyperRect);
+                  output->mid_point, output->a0_p, d_arg_p[0], cg,hyperRect);
 		  
      // printf("finished quark q1 \n");
 #ifdef  TIMING_ALG_W_SPECT

@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fp4::EvolveMomFforce.
 
-  $Id: p4_Fforce.C,v 1.2 2004-12-08 20:49:53 chulwoo Exp $
+  $Id: p4_Fforce.C,v 1.3 2004-12-11 20:58:04 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -57,13 +57,16 @@ const int VAXPY_UNROLL =6;
 // are zero.
 
 #define PROFILE
+#if 0
 void Fp4::RHMC_EvolveMomFforce(Matrix * mom, Vector ** vect, int abc, double * def, double ghi, double jkl, Vector ** vect2)
 {
 }
+#endif
 
 void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
-#if 0
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
+  ERR.NotImplemented(cname,fname);
+#if 0
   VRB.Func(cname,fname);
 
 #ifdef PROFILE

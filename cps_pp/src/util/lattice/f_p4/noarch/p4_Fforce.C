@@ -1,9 +1,9 @@
 #include<config.h>
 
 /*!\file
-  \brief  Implementation of Fasqtad::EvolveMomFforce.
+  \brief  Implementation of Fp4::EvolveMomFforce.
 
-  $Id: p4_Fforce.C,v 1.2 2004-12-08 20:49:52 chulwoo Exp $
+  $Id: p4_Fforce.C,v 1.3 2004-12-11 20:58:04 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -50,9 +50,11 @@ static void v_free(void *ptr){
 // are zero.
 
 #undef PROFILE
-void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
+void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
     char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
+    ERR.NotImplemented(cname,fname);
+#if 0
     VRB.Func(cname,fname);
 
     ParTrans::PTflops=0;
@@ -671,7 +673,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     sfree(X);
 
     Convert(CANONICAL);
-   
+#endif
 }
 
 

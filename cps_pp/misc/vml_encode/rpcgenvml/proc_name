@@ -1,0 +1,137 @@
+rpc_clntout.c:      for (proc = vp->procs; proc != NULL; proc = proc->next)
+rpc_clntout.c:	      ptype (proc->res_prefix, proc->res_type, 1);
+rpc_clntout.c:	      pvname (proc->proc_name, vp->vers_num);
+rpc_clntout.c:	      pvname (proc->proc_name, vp->vers_num);
+rpc_clntout.c:	  ptype (proc->args.decls->decl.prefix,
+rpc_clntout.c:		 proc->args.decls->decl.type, 1);
+rpc_clntout.c:	      ptype(proc->res_prefix, proc->res_type, 1);
+rpc_clntout.c:	  ptype (proc->args.decls->decl.prefix,
+rpc_clntout.c:		 proc->args.decls->decl.type, 1);
+rpc_clntout.c:	      ptype (proc->res_prefix, proc->res_type, 1);
+rpc_clntout.c:  else if (streq (proc->args.decls->decl.type, "void"))
+rpc_clntout.c:	      ptype(proc->res_prefix, proc->res_type, 1);
+rpc_clntout.c:	  for (l = proc->args.decls; l != NULL; l = l->next)
+rpc_clntout.c:	  for (l = proc->args.decls; l != NULL; l = l->next)
+rpc_clntout.c:	      pdeclaration (proc->args.argname, &l->decl, 1, ";\n");
+rpc_clntout.c:	      ptype (proc->res_prefix, proc->res_type, 1);
+rpc_clntout.c:	  for (l = proc->args.decls; l != NULL; l = l->next)
+rpc_clntout.c:	      pdeclaration (proc->args.argname, &l->decl, 0, ", ");
+rpc_clntout.c:	      ptype (proc->res_prefix, proc->res_type, 1);
+rpc_clntout.c:  bool_t args2 = (proc->arg_num > 1);
+rpc_clntout.c:      fprintf (fout, "\t%s", proc->args.argname);
+rpc_clntout.c:      if (streq (proc->res_type, "void"))
+rpc_clntout.c:	  ptype (proc->res_prefix, proc->res_type, 0);
+rpc_clntout.c:	       ampr (proc->res_type), RESULT, RESULT);
+rpc_clntout.c:  if (newstyle && !args2 && (streq (proc->args.decls->decl.type, "void")))
+rpc_clntout.c:	       "(clnt_call (clnt, %s, (xdrproc_t) xdr_void, ", proc->proc_name);
+rpc_clntout.c:	       stringfix(proc->res_type), (mtflag)?"":ampr(proc->res_type),
+rpc_clntout.c:      for (l = proc->args.decls; l != NULL; l = l->next)
+rpc_clntout.c:	       "(clnt_call (clnt, %s, (xdrproc_t) xdr_%s", proc->proc_name,
+rpc_clntout.c:	       proc->args.argname);
+rpc_clntout.c:	       stringfix(proc->res_type), (mtflag)?"":ampr(proc->res_type),
+rpc_clntout.c:		 proc->proc_name,
+rpc_clntout.c:		 stringfix (proc->args.decls->decl.type),
+rpc_clntout.c:		 (newstyle ? proc->args.decls->decl.name : "argp"),
+rpc_clntout.c:		 stringfix (proc->res_type), ampr (proc->res_type),
+rpc_clntout.c:		proc->proc_name,
+rpc_clntout.c:		stringfix (proc->args.decls->decl.type),
+rpc_clntout.c:		(newstyle ? proc->args.decls->decl.name : "argp"),
+rpc_clntout.c:		stringfix (proc->res_type), "",
+rpc_clntout.c:      if (streq (proc->res_type, "void"))
+rpc_clntout.c:		   ampr (proc->res_type), RESULT);
+rpc_clntout.c:	  fprintf (fout, "\treturn (%s%s);\n", ampr (proc->res_type), RESULT);
+rpc_hout.c:      for (proc = vers->procs; proc != NULL; proc = proc->next)
+rpc_hout.c:	  else if (streq (proc->proc_name, stop->proc_name))
+rpc_hout.c:	       proc = proc->next)
+rpc_hout.c:		  pdefine (proc->proc_name, proc->proc_num);
+rpc_hout.c:	      for (proc = vers->procs; proc != NULL; proc = proc->next)
+rpc_hout.c:		      pdefine(proc->proc_name, proc->proc_num);
+rpc_hout.c:      ptype (proc->res_prefix, proc->res_type, 1);
+rpc_hout.c:    pvname_svc (proc->proc_name, vp->vers_num);
+rpc_hout.c:    pvname (proc->proc_name, vp->vers_num);
+rpc_hout.c:  if (proc->arg_num < 2 && newstyle &&
+rpc_hout.c:      streq (proc->args.decls->decl.type, "void"))
+rpc_hout.c:      for (dl = proc->args.decls; dl != NULL; dl = dl->next)
+rpc_hout.c:      ptype(proc->res_prefix, proc->res_type, 1);
+rpc_pktout.c:      for (proc = vers->procs; proc != NULL;proc = proc->next){
+rpc_pktout.c:      dl = proc->args.decls;
+rpc_pktout.c:                                   proc->proc_name,
+rpc_pktout.c:      fprintf(stderr,"RPCpkt_%s\n",proc->res_type);
+rpc_pktout.c:      ptype(proc->res_prefix,proc->res_type, 1);
+rpc_pktout.c:      ptype(proc->res_prefix,proc->res_type, 1);
+rpc_pktout.c:      ptype(proc->res_prefix,proc->res_type, 1);
+rpc_pktout.c:                                   proc->proc_name,
+rpc_pktout.c:      ptype(proc->res_prefix,proc->res_type, 1);
+rpc_sample.c:  for (proc = vp->procs; proc != NULL; proc = proc->next)
+rpc_sample.c:	  ptype (proc->res_prefix, proc->res_type, 1);
+rpc_sample.c:	  if (!streq (proc->res_type, "void"))
+rpc_sample.c:	  ptype (proc->res_prefix, proc->res_type, 1);
+rpc_sample.c:      if (proc->arg_num < 2 && !newstyle)
+rpc_sample.c:	  if (!streq (proc->args.decls->decl.type, "void"))
+rpc_sample.c:	      ptype (proc->args.decls->decl.prefix,
+rpc_sample.c:		     proc->args.decls->decl.type, 1);
+rpc_sample.c:	  pvname (proc->proc_name, vp->vers_num);
+rpc_sample.c:      else if (!streq (proc->args.decls->decl.type, "void"))
+rpc_sample.c:	  for (l = proc->args.decls; l != NULL; l = l->next)
+rpc_sample.c:	      pvname (proc->proc_name, vp->vers_num);
+rpc_sample.c:  for (proc = vp->procs; proc != NULL; proc = proc->next)
+rpc_sample.c:      pvname (proc->proc_name, vp->vers_num);
+rpc_sample.c:      if (proc->arg_num < 2 && !newstyle)
+rpc_sample.c:	  if (streq (proc->args.decls->decl.type, "void"))/* cast to void* */
+rpc_sample.c:	  pvname (proc->proc_name, vp->vers_num);
+rpc_sample.c:      else if (streq (proc->args.decls->decl.type, "void"))
+rpc_sample.c:	  for (l = proc->args.decls; l != NULL; l = l->next)
+rpc_sample.c:	      pvname (proc->proc_name, vp->vers_num);
+rpc_sample.c:	  ptype(proc->res_prefix, proc->res_type, 1);
+rpc_sample.c:      for (proc = vp->procs; proc != NULL; proc = proc->next)
+rpc_sample.c:	    pvname_svc (proc->proc_name, vp->vers_num);
+rpc_sample.c:	    pvname(proc->proc_name, vp->vers_num);
+rpc_sample.c:	      if(!streq(proc->res_type, "void"))
+rpc_sample.c:	      /* f_print(fout, " result;\n", proc->res_type); */
+rpc_sample.c:	      if (!streq(proc->res_type, "void"))
+rpc_svcout.c:      for (proc = vp->procs; proc != NULL; proc = proc->next)
+rpc_svcout.c:	  pvname (proc->proc_name, vp->vers_num);
+rpc_svcout.c:	      if (proc->arg_num > 1)
+rpc_svcout.c:		f_print (fout, proc->args.argname);
+rpc_svcout.c:		ptype (proc->args.decls->decl.prefix,
+rpc_svcout.c:		       proc->args.decls->decl.type, 0);
+rpc_svcout.c:	      if (proc->arg_num > 1)
+rpc_svcout.c:		f_print (fout, "\t%s *argp;\n", proc->args.argname);
+rpc_svcout.c:		  ptype (proc->args.decls->decl.prefix,
+rpc_svcout.c:			 proc->args.decls->decl.type, 0);
+rpc_svcout.c:	    pvname_svc (proc->proc_name, vp->vers_num);
+rpc_svcout.c:	    pvname (proc->proc_name, vp->vers_num);
+rpc_svcout.c:	  if (proc->arg_num < 2)
+rpc_svcout.c:	      if (!streq (proc->args.decls->decl.type, "void"))
+rpc_svcout.c:	      for (l = proc->args.decls; l != NULL; l = l->next)
+rpc_svcout.c:      for (proc = vp->procs; proc != NULL; proc = proc->next)
+rpc_svcout.c:	  if (proc->arg_num < 2)
+rpc_svcout.c:	      if (streq (proc->args.decls->decl.type,
+rpc_svcout.c:	      ptype (proc->args.decls->decl.prefix,
+rpc_svcout.c:		     proc->args.decls->decl.type, 0);
+rpc_svcout.c:	      pvname (proc->proc_name, vp->vers_num);
+rpc_svcout.c:	      f_print (fout, "\t\t%s", proc->args.argname);
+rpc_svcout.c:	      pvname (proc->proc_name, vp->vers_num);
+rpc_svcout.c:	  for (proc = vp->procs; proc != NULL; proc = proc->next)
+rpc_svcout.c:	    if (!streq (proc->res_type, "void"))
+rpc_svcout.c:		ptype(proc->res_prefix, proc->res_type, 0);
+rpc_svcout.c:		pvname(proc->proc_name, vp->vers_num);
+rpc_svcout.c:      for (proc = vp->procs; proc != NULL; proc = proc->next)
+rpc_svcout.c:	  f_print (fout, "\tcase %s:\n", proc->proc_name);
+rpc_svcout.c:	  if (proc->arg_num < 2)
+rpc_svcout.c:	      p_xdrfunc (ARG, proc->args.decls->decl.type);
+rpc_svcout.c:	      p_xdrfunc (ARG, proc->args.argname);
+rpc_svcout.c:	  p_xdrfunc (RESULT, proc->res_type);
+rpc_svcout.c:	    pvname_svc (proc->proc_name, vp->vers_num);
+rpc_svcout.c:	    pvname (proc->proc_name, vp->vers_num);
+rpc_svcout.c:  for (; proc != NULL; proc = proc->next)
+rpc_svcout.c:      if (streq (proc->proc_num, "0"))
+rpc_tblout.c:      for (proc = vp->procs; proc != NULL; proc = proc->next)
+rpc_tblout.c:	  current = atoi (proc->proc_num);
+rpc_tblout.c:	    pvname_svc (proc->proc_name, vp->vers_num);
+rpc_tblout.c:	      pvname (proc->proc_name, vp->vers_num);
+rpc_tblout.c:	  if (proc->arg_num > 1)
+rpc_tblout.c:	    printit ((char *) NULL, proc->args.argname);
+rpc_tblout.c:	    printit (proc->args.decls->decl.prefix,
+rpc_tblout.c:		     proc->args.decls->decl.type);
+rpc_tblout.c:	  printit (proc->res_prefix, proc->res_type);

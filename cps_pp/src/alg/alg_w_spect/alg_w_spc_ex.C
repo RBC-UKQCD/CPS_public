@@ -12,23 +12,14 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <alg/alg_w_spect.h>         // class AlgWspect
-CPS_START_NAMESPACE
-
-
-CPS_END_NAMESPACE
 #include <alg/common_arg.h>          // class CommonArg
 #include <alg/w_spect_arg.h>         // class WspectArg
 #include <util/lattice.h>            // class Lattice
-CPS_START_NAMESPACE
 
-CPS_END_NAMESPACE
 #include <util/verbose.h>            // VRB
 #include <util/error.h>              // ERR
-CPS_START_NAMESPACE
-
-
-CPS_END_NAMESPACE
 #include <alg/w_all.h>                                 // class Wspect*
+#include <stdlib.h>      // exit
 CPS_START_NAMESPACE
 
 #define DEBUG_ALG_W_SPECT_EXT_MESONS
@@ -36,9 +27,7 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------------------
 // For the purpose of debugging or timing during code upgrade
 //---------------------------------------------------------------------------
-CPS_END_NAMESPACE
-#include <stdlib.h>      // exit
-CPS_START_NAMESPACE
+
 //#define TIMING_ALG_W_SPECT
 
 #ifdef  TIMING_ALG_W_SPECT
@@ -59,7 +48,8 @@ char * AlgWspectExtMeson::d_class_name = "AlgWspectExtMeson";
 AlgWspectExtMeson::AlgWspectExtMeson(Lattice & latt, 
 		  CommonArg *c_arg, 
 		  WspectArg *arg,
-		  int n_quark_masses) : AlgWspect(latt,c_arg,arg,n_quark_masses){
+				     CgArg *cg,
+		  int n_quark_masses) : AlgWspect(latt,c_arg,arg,cg,n_quark_masses){
 
 }
 
@@ -94,7 +84,7 @@ void AlgWspectExtMeson::run()
   int src_slice = d_arg_p->aots_start;
   int src_slice_step = d_arg_p->aots_step;
   int src_slice_end  = src_slice_step * d_arg_p->aots_num;
-  
+  CgArg cg;
   for ( ; src_slice < src_slice_end; src_slice += src_slice_step) {
 
 
@@ -124,7 +114,7 @@ void AlgWspectExtMeson::run()
     // WspectQuark q1(lat, output->cg, d_arg_p[0], hyperRect);
     // as from phys_v4.0.0
     WspectQuark q1(lat, output->cg, output->pbp, 
-		   output->mid_point, output->a0_p, d_arg_p[0], hyperRect);
+		   output->mid_point, output->a0_p, d_arg_p[0], cg,hyperRect);
     
     
     //Note: for ExtendedMesons, do only zero momentum projection
@@ -249,7 +239,7 @@ void AlgWspectExtMeson::run()
 		       // if(!q2) q2=new WspectQuark(lat, output->cg2, d_arg_p[0], hyperRect, (DEVOperatorKind)src_op,src_fuzz_p);//run once is enough!
 		       
 		       if(!q2) q2=new WspectQuark(lat, output->cg2, output->pbp, 
-                  output->mid_point, output->a0_p, d_arg_p[0], hyperRect, (DEVOperatorKind)src_op,src_fuzz_p );
+                  output->mid_point, output->a0_p, d_arg_p[0], cg,hyperRect, (DEVOperatorKind)src_op,src_fuzz_p );
 
 		       ext_meson_p[sink_fuzz_count]->collect(q1,*q2,sink_fuzz_p);
 		     }else{
@@ -267,7 +257,7 @@ void AlgWspectExtMeson::run()
 		    // as in phys_v3.11.4.xiaodong
 		    // if(!q2) q2=new WspectQuark(lat, output->cg2, d_arg_p[0], hyperRect, (DEVOperatorKind)src_op,src_fuzz_p);
 		    if(!q2) q2=new WspectQuark(lat, output->cg2, output->pbp, 
-                  output->mid_point, output->a0_p, d_arg_p[0], hyperRect, (DEVOperatorKind)src_op, src_fuzz_p );
+                  output->mid_point, output->a0_p, d_arg_p[0], cg,hyperRect, (DEVOperatorKind)src_op, src_fuzz_p );
 		    //then call collect
 		    ext_meson_p[0]->collect(q1,*q2,sink_fuzz_p);
 		  }else{
@@ -390,7 +380,7 @@ void AlgWspectExtMeson::run()
 		  // as in phys_v3.11.4.xiaodong
 		  // q2=new WspectQuark(lat, output->cg2, d_arg_p[0], hyperRect, (DEVOperatorKind)src_op,0,field_p);
 		  q2=new WspectQuark(lat, output->cg2, output->pbp, 
-                  output->mid_point, output->a0_p, d_arg_p[0], hyperRect, (DEVOperatorKind)src_op, 0, field_p );
+                  output->mid_point, output->a0_p, d_arg_p[0], cg, hyperRect, (DEVOperatorKind)src_op, 0, field_p );
 		       
 		  ext_mesonBE_p->collect(q1,*q2);
 		}else{

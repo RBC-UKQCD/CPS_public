@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.8 2004-12-07 06:11:58 chulwoo Exp $
+  $Id: w_quark.C,v 1.9 2004-12-11 20:58:02 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP
@@ -46,6 +46,7 @@ WspectQuark::WspectQuark(Lattice &lat,
                          char *        mid_point_outfile,
                          char *        a0_p_outfile,
 			 WspectArg &warg,
+			 CgArg &cg,
 			 const WspectHyperRectangle & whr,
 			 DEVOperatorKind source_operator_kind,
 			 WspectFuzzing *src_fuzz_ptr,
@@ -288,7 +289,7 @@ WspectQuark::WspectQuark(Lattice &lat,
 
   if ((lat.Fclass() == F_CLASS_WILSON) ||
       (lat.Fclass() == F_CLASS_CLOVER)) {
-    pbp_norm = (4.0 + warg.cg.mass) * COLORs * DIRACs;
+    pbp_norm = (4.0 + cg.mass) * COLORs * DIRACs;
   }
   else if (lat.Fclass() == F_CLASS_DWF) {
     pbp_norm = (4.0 + GJP.DwfA5Inv() - GJP.DwfHeight()) * COLORs * DIRACs;
@@ -487,7 +488,7 @@ WspectQuark::WspectQuark(Lattice &lat,
         lat.Ffour2five(src_5d, src_4d, 0, ls_glb-1);
         lat.Ffour2five(sol_5d, sol_4d, ls_glb-1, 0);
 	
-        cg_iter = lat.FmatInv(sol_5d, src_5d, &(warg.cg), &true_res);
+        cg_iter = lat.FmatInv(sol_5d, src_5d, &(cg), &true_res);
 	
 	// ================= added from phys_v4.0.0 =================
         // Calculate <A_0 P> correlators for DWF lattice
@@ -513,12 +514,12 @@ WspectQuark::WspectQuark(Lattice &lat,
 	//	printf("w_quark: enter FmatInv Cy=%4i, Dy=%4i \n",Cy,Dy);
 #endif 
 	
-        // warg.cg.max_num_iter = 500;
+        // cg.max_num_iter = 500;
 	cg_iter=0;
 	cg_iter += lat.FmatInv((Vector *)(d_data_p+
 					 f_size*(Cy+COLORs*Dy)), 
 		      (Vector *)source.data(), 
-			      &(warg.cg), &true_res);
+			      &(cg), &true_res);
 
 #ifdef DEBUG_W_QUARK
 	//printf("w_quark: exit FmatInv %i %22.12e \n",cg_iter,true_res);
@@ -572,7 +573,7 @@ WspectQuark::WspectQuark(Lattice &lat,
       ERR.FileA(d_class_name, ctor_str, pbp_outfile);
     }
     Fprintf(fp, "%e %e %e\n",
-            IFloat(warg.cg.mass),
+            IFloat(cg.mass),
             IFloat(pbp/pbp_norm),
             IFloat(pbg5p/pbp_norm));
     Fclose(fp);
@@ -582,7 +583,7 @@ WspectQuark::WspectQuark(Lattice &lat,
     axialCurrent.doSum();
     axialCurrent.print();
   }
-  // ==== end added from phys_v4.0.0 =================================
+
 
   // DEBUG -- PING
 #ifdef DEBUG_W_QUARK

@@ -1277,8 +1277,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-          ac_config_headers="$ac_config_headers conf.h"
-
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4193,9 +4191,11 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
+          ac_config_headers="$ac_config_headers conf.h"
 
 
-                                                                                ac_config_files="$ac_config_files config.h XLC.cfg Makefile Makefile.rules Makefile.users tests/Makefile_common hdw_tests/Makefile_common tests/regression.pl"
+
+                                                                                                    ac_config_files="$ac_config_files config.h precision.h XLC.cfg Makefile Makefile.rules Makefile.users tests/Makefile_common hdw_tests/Makefile_common tests/regression.pl include/input/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -4721,6 +4721,7 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "config.h" ) CONFIG_FILES="$CONFIG_FILES config.h" ;;
+  "precision.h" ) CONFIG_FILES="$CONFIG_FILES precision.h" ;;
   "XLC.cfg" ) CONFIG_FILES="$CONFIG_FILES XLC.cfg" ;;
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "Makefile.rules" ) CONFIG_FILES="$CONFIG_FILES Makefile.rules" ;;
@@ -4728,6 +4729,7 @@ do
   "tests/Makefile_common" ) CONFIG_FILES="$CONFIG_FILES tests/Makefile_common" ;;
   "hdw_tests/Makefile_common" ) CONFIG_FILES="$CONFIG_FILES hdw_tests/Makefile_common" ;;
   "tests/regression.pl" ) CONFIG_FILES="$CONFIG_FILES tests/regression.pl" ;;
+  "include/input/Makefile" ) CONFIG_FILES="$CONFIG_FILES include/input/Makefile" ;;
   "conf.h" ) CONFIG_HEADERS="$CONFIG_HEADERS conf.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -5323,5 +5325,4 @@ if test "$no_create" != yes; then
   # would make configure fail if this is the last instruction.
   $ac_cs_success || { (exit 1); exit 1; }
 fi
-
 

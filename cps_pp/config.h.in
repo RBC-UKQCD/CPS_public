@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.17 2004-09-17 18:06:07 chulwoo Exp $
+  $Id: config.h.in,v 1.18 2004-12-11 20:57:28 chulwoo Exp $
 */
 /* Global options for compiling the Columbia code:  
  * @configure_input@
@@ -12,13 +12,13 @@
  *  CVS keywords
  *
  *  $Author: chulwoo $
- *  $Date: 2004-09-17 18:06:07 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.17 2004-09-17 18:06:07 chulwoo Exp $
- *  $Id: config.h.in,v 1.17 2004-09-17 18:06:07 chulwoo Exp $
+ *  $Date: 2004-12-11 20:57:28 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.18 2004-12-11 20:57:28 chulwoo Exp $
+ *  $Id: config.h.in,v 1.18 2004-12-11 20:57:28 chulwoo Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.17 $
+ *  $Revision: 1.18 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -28,6 +28,7 @@
 #define INCLUDED_CONFIG_H_                  //!< Prevent multiple inclusion 
 
 #include <conf.h>
+#include <precision.h>
 
 #define NOARCH 0
 #define QCDOC  1
@@ -68,10 +69,12 @@
 #define GLOBALSUM_TYPE @GSUMPRECISION@
 
 /*! Precision of the local calculations: rfloat, float, double. */
-#define LOCALCALC_TYPE @LOCALPRECISION@
+//#define LOCALCALC_TYPE @LOCALPRECISION@
+//typedef @LOCALPRECISION@ Float;
 
 /*! Precision of internal calculations: float, double. */
-#define INTERNAL_LOCALCALC_TYPE @LOCALPRECISION@
+//#define INTERNAL_LOCALCALC_TYPE @LOCALPRECISION@
+//typedef @LOCALPRECISION@ IFloat;
 
 
 #define CPS_END_NAMESPACE    @CPS_END_NAMESPACE@  

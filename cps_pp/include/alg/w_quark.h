@@ -24,7 +24,8 @@ public:
 	      char *pbp_outfile,
 	      char *mid_point_outfile,
 	      char *ap_corr_outfile,       // output file for <A_0 P> correlators   
-	      WspectArg & warg,            // const WspectArg actually
+	      WspectArg & warg,      
+	      CgArg &cg,// const WspectArg actually
 	      const WspectHyperRectangle & whr,
 	      DEVOperatorKind src_op_kind=UNIT,
 	      WspectFuzzing *srcfuzz_p=0,

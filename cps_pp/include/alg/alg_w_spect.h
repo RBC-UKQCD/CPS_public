@@ -61,6 +61,7 @@ class AlgWspect : public Alg
   AlgWspect(Lattice & latt, 
 	    CommonArg *c_arg, 
 	    WspectArg *arg,
+	    CgArg *cg,
 	    int n_quark_masses = 1);   // Ping -- needed for heavy-light
 
   static void SetCounter(int counter, int step);
@@ -82,6 +83,7 @@ class AlgWspectExtMeson : public AlgWspect
   AlgWspectExtMeson(Lattice & latt, 
             CommonArg *c_arg, 
             WspectArg *arg,
+		    CgArg *cg,
             int n_quark_masses = 1);
   virtual ~AlgWspectExtMeson();
   

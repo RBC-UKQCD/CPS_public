@@ -1,21 +1,22 @@
 #include<config.h>
+#include<math.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
+  $Id: gjp.C,v 1.20 2004-12-11 20:58:03 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-07 06:11:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
-//  $Id: gjp.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
+//  $Date: 2004-12-11 20:58:03 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.20 2004-12-11 20:58:03 chulwoo Exp $
+//  $Id: gjp.C,v 1.20 2004-12-11 20:58:03 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -53,13 +54,7 @@ CPS_END_NAMESPACE
 #include <mem/p2v.h>
 CPS_START_NAMESPACE
 
-// CPS_END_NAMESPACE
-// #ifdef PARALLEL
-// #include <comms/sysfunc.h>
-// #else
-// #include <time.h>
-// #endif
-// CPS_START_NAMESPACE
+static const double SMALL = 1e-10;
 
 #ifdef PARALLEL
 int gjp_local_axis[6] = {0, 0, 0, 0, 1, 1}; 
@@ -121,11 +116,30 @@ GlobalJobParameter::~GlobalJobParameter() {
   checks to make sure the values are suitable.
   \param rda Structure containing the initial values of the global variables
 */
-
 void GlobalJobParameter::Initialize(const DoArg& rda) {
   char *fname = "Initialize()";
   VRB.Func(cname,fname);
+  int i, j;
+  char *dim_name[5] = {"X","Y","Z","T","S"};
 
+  doarg_int = rda;
+
+#if 1
+  node_sites[0] = doarg_int.x_node_sites;
+  node_sites[1] = doarg_int.y_node_sites;
+  node_sites[2] = doarg_int.z_node_sites;
+  node_sites[3] = doarg_int.t_node_sites;
+  node_sites[4] = doarg_int.s_node_sites;
+  nodes[0] = doarg_int.x_nodes;
+  nodes[1] = doarg_int.y_nodes;
+  nodes[2] = doarg_int.z_nodes;
+  nodes[3] = doarg_int.t_nodes;
+  nodes[4] = doarg_int.s_nodes;
+  bc[0] = doarg_int.x_bc;
+  bc[1] = doarg_int.y_bc;
+  bc[2] = doarg_int.z_bc;
+  bc[3] = doarg_int.t_bc;
+#else
   // Set the number of sites of a single node
   //----------------------------------------------------------------
   x_node_sites = rda.x_node_sites;
@@ -133,24 +147,15 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   z_node_sites = rda.z_node_sites;
   t_node_sites = rda.t_node_sites;
   s_node_sites = rda.s_node_sites;   
-  if(s_node_sites == 0) s_node_sites=1;
+  // if(s_node_sites == 0) s_node_sites=1;
+#endif
   
-  if (x_node_sites<=0 ||x_node_sites%2!=0)
+  for(i = 0; i<5 ; i++)
+  if (node_sites[i]<0 ||node_sites[i]%2!=0)
       ERR.General(cname,fname,
-	"Bad value %d for x_node_sites; must be divisible by 2\n", x_node_sites);
-  if (y_node_sites<=0 ||y_node_sites%2!=0)
-      ERR.General(cname,fname,
-	"Bad value %d for y_node_sites; must be divisible by 2\n", y_node_sites);
-  if (z_node_sites<=0 ||z_node_sites%2!=0)
-      ERR.General(cname,fname,
-	"Bad value %d for z_node_sites; must be divisible by 2\n", z_node_sites);
-  if (t_node_sites<=0 ||t_node_sites%2!=0)
-      ERR.General(cname,fname,
-	"Bad value %d for t_node_sites; must be divisible by 2\n", t_node_sites);
-  if (s_node_sites<=0 || (s_node_sites>1 && s_node_sites%2!=0))
-      ERR.General(cname,fname,
-	"Bad value %d for s_node_sites; must be 1 or divisible by 2\n", t_node_sites);
+	"Bad value %d for %s_node_sites; must be divisible by 2\n", node_sites[i], dim_name[i]);
 
+#if 0
   // Set the number of nodes
   //----------------------------------------------------------------
   x_nodes = rda.x_nodes;
@@ -158,113 +163,52 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   z_nodes = rda.z_nodes;
   t_nodes = rda.t_nodes;
   s_nodes = rda.s_nodes;
-
-  // On the QCDSP, check that at least one number_of_nodes is equal to 1
-  //----------------------------------------------------------------
-#if TARGET == QCDSP
-  if( x_nodes != 1 &&
-      y_nodes != 1 &&
-      z_nodes != 1 &&
-      t_nodes != 1 &&
-      s_nodes != 1 ) {
-      ERR.General(cname,fname,
-		  "The processor grid must be of dimension 1 in at least one direction, but your grid is (X, Y, Z, T, S) = (%d, %d, %d, %d, %d).\n",
-		  x_nodes, y_nodes, z_nodes, t_nodes, s_nodes);
-  }
-#endif
-  
-
-  // Check and set s_axis
-  //-----------------------------------------------------------------
-#if TARGET == QCDSP
-  if(s_nodes != 1) {
-      s_axis = rda.s_axis;
-      if(s_axis != SCU_X &&
-	 s_axis != SCU_Y &&
-	 s_axis != SCU_Z &&
-	 s_axis != SCU_T )
-	  ERR.General(cname, fname,
-		      "Illegal direction %d for the parallel S axis. Set DoArg::s_axis to one of 0, 1, 2 or 3.\n",
-		      s_axis);
-
-      if(s_axis == SCU_X && x_nodes != 1)
-	  ERR. General(cname, fname, "You cannot choose %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the X axis too (DoArg::x_nodes = %d).\n", s_axis, s_axis, x_nodes);
-      
-      if(s_axis == SCU_Y && y_nodes != 1) 
-	  ERR. General(cname, fname, "You cannot choose %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the Y axis too (DoArg::y_nodes = %d).\n", s_axis,s_axis,  y_nodes);
-      
-      if(s_axis == SCU_Z && z_nodes != 1) 
-	  ERR. General(cname, fname, "You cannot choose %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the Z axis too (DoArg::z_nodes = %d).\n", s_axis, s_axis, t_nodes);
-      
-      if(s_axis == SCU_T && t_nodes != 1) 
-	  ERR. General(cname, fname, "You cannot chosen %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the T axis too (DoArg::t_nodes = %d).\n", s_axis, s_axis, t_nodes);
-
-      
-  }
 #endif
 
   // Check that the number of nodes divides the machine into
   // same size partitions.
   //----------------------------------------------------------------
-  int size_x = 1;
-  int size_y = 1;
-  int size_z = 1;
-  int size_t = 1;
-  int size_s = 1;
+  int size[5];
+  for(i = 0; i<5 ; i++)
+  size[i] = 1;
 #ifdef PARALLEL
-  if( x_nodes != 1) size_x = SizeX(); 
-  if( y_nodes != 1) size_y = SizeY(); 
-  if( z_nodes != 1) size_z = SizeZ(); 
-  if( t_nodes != 1) size_t = SizeT(); 
-  if( s_nodes != 1) size_s = SizeS(); 
+  if( nodes[0]*nodes[1]*nodes[2]*nodes[3]*nodes[4] != 1)
+    { 
+      size[0] = SizeX(); 
+      size[1] = SizeY(); 
+      size[2] = SizeZ(); 
+      size[3] = SizeT(); 
+      size[4] = SizeS(); 
+    }
+  if(x_node_sites*y_node_sites*t_node_sites*s_node_sites==0)
+    {
+      x_node_sites = rda.x_sites/SizeX();
+      y_node_sites = rda.y_sites/SizeY();
+      z_node_sites = rda.z_sites/SizeZ();
+      t_node_sites = rda.t_sites/SizeT();
+      s_node_sites = rda.s_sites/SizeS();   
+    }
 #endif
-#if TARGET==QCDSP
-  if( s_nodes != 1) {
-    if (s_axis == SCU_X) size_s = SizeX();
-    if (s_axis == SCU_Y) size_s = SizeY();
-    if (s_axis == SCU_Z) size_s = SizeZ();
-    if (s_axis == SCU_T) size_s = SizeT();
-  } 
-#endif
+  
 
-  if( x_nodes == 0 || size_x%x_nodes != 0) 
+  for(i = 0; i<5 ; i++)
+  if( nodes[i] == 0 || size[i]%nodes[i] != 0) 
       ERR.General(cname,fname,	
-		  "Illegal machine partition in X direction; physical grid size = %d must be a multiple of DoArg::x_nodes = %d\n",
-		  size_x, x_nodes );
-  
-  if( y_nodes == 0 || size_y%y_nodes != 0) 
-      ERR.General(cname,fname,
-		  "Illegal machine partition in Y direction; physical grid size = %d must be a multiple of DoArg::y_nodes = %d\n",
-		  size_y, y_nodes);	
-  
-  if( z_nodes == 0 || size_z%z_nodes != 0) 
-       ERR.General(cname,fname,
-		  "Illegal machine partition in Z direction; physical grid size = %d must be a multiple of DoArg::z_nodes = %d\n",
-		   size_z, z_nodes);
-
-  if( t_nodes == 0 || size_t%t_nodes != 0) 
-      ERR.General(cname,fname,
-		  "Illegal machine partition in T direction; physical grid size = %d must be a multiple of DoArg::t_nodes = %d\n",
-		  size_t, t_nodes);
-  
-  if( s_nodes == 0 || size_s%s_nodes != 0) 
-      ERR.General(cname,fname,
-		  "Illegal machine partition in S direction; physical grid size = %d must be a multiple of DoArg::s_nodes = %d\n",
-		  size_s, s_nodes);
+		  "Illegal machine partition in %s direction; physical grid size = %d must be a multiple of DoArg::x_nodes = %d\n",
+		  dim_name[i], size[i], nodes[i] );
   
 
   // Set the volume values
   //----------------------------------------------------------------
-  vol_node_sites = x_node_sites * 
-                   y_node_sites * 
-                   z_node_sites * 
-                   t_node_sites; 
-  vol_sites = x_nodes * 
-              y_nodes * 
-              z_nodes * 
-              t_nodes *
-              vol_node_sites;
+ 
+  vol_node_sites = 1;
+  for(i = 0; i<4 ; i++) vol_node_sites *= node_sites[i];
+  vol_sites = vol_node_sites;
+  for(i = 0; i<4 ; i++) vol_sites *= nodes[i];
 
+  for(i = 0; i<5 ; i++) node_coor[i] = 0;
+
+#if 0
   // Set the coordinates of the node
   //----------------------------------------------------------------
   x_node_coor = 0;
@@ -272,31 +216,39 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   z_node_coor = 0;
   t_node_coor = 0;
   s_node_coor = 0;
+#endif
+
 #ifdef PARALLEL
+
+  int coor[5];
+  coor[0] = CoorX();
+  coor[1] = CoorY();
+  coor[2] = CoorZ();
+  coor[3] = CoorT();
+  coor[4] = CoorS();
+	
+  for(i = 0; i<5 ; i++){
+    if(nodes[i] != 1) node_coor[i] = coor[i] % nodes[i];
+  }
+  VRB.Result(cname,fname, "node_sites= %d %d %d %d %d\n",
+node_sites,[0], node_sites,[1], node_sites,[2], node_sites,[3], node_sites,[4]);
+  VRB.Result(cname,fname, "nodes= %d %d %d %d %d\n",
+nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
+#if 0
   if(x_nodes != 1) x_node_coor = CoorX() % x_nodes;
   if(y_nodes != 1) y_node_coor = CoorY() % y_nodes;
   if(z_nodes != 1) z_node_coor = CoorZ() % z_nodes;
   if(t_nodes != 1) t_node_coor = CoorT() % t_nodes;
-#if TARGET == QCDSP
-  if(s_nodes != 1) {
-    if (s_axis == SCU_X) s_node_coor = CoorX() % s_nodes;
-    if (s_axis == SCU_Y) s_node_coor = CoorY() % s_nodes;
-    if (s_axis == SCU_Z) s_node_coor = CoorZ() % s_nodes;
-    if (s_axis == SCU_T) s_node_coor = CoorT() % s_nodes;
-  }
-#else
   if(s_nodes != 1) s_node_coor = CoorS() % s_nodes;
-#endif
-#endif
   VRB.Result(cname,fname, "node_sites= %d %d %d %d %d\n",
 x_node_sites,y_node_sites,z_node_sites,t_node_sites,s_node_sites);
   VRB.Result(cname,fname, "nodes= %d %d %d %d %d\n",
 x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
+#endif
 
   // Set the static arrays gjp_local_axis[5], gjp_scu_dir[10],
   // and gjp_scu_wire_map[10].
   //----------------------------------------------------------------
-#ifdef PARALLEL
 
   for(int la=0; la<6; la++) gjp_local_axis[la] = 0;
   if(x_nodes == 1) gjp_local_axis[0] = gjp_local_axis[5] = 1;
@@ -330,49 +282,29 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   gjp_scu_wire_map[8] = SCURemap( SCU_SP );
   gjp_scu_wire_map[9] = SCURemap( SCU_SM );
   }
-#if TARGET == QCDSP
-  if(s_nodes != 1) {
-    if (s_axis == SCU_X) {
-      gjp_scu_dir[8] = SCU_XP;
-      gjp_scu_dir[9] = SCU_XM;
-      gjp_scu_wire_map[8] = SCURemap( SCU_XP );
-      gjp_scu_wire_map[9] = SCURemap( SCU_XM );
-    }
-    if (s_axis == SCU_Y) {
-      gjp_scu_dir[8] = SCU_YP;
-      gjp_scu_dir[9] = SCU_YM;
-      gjp_scu_wire_map[8] = SCURemap( SCU_YP );
-      gjp_scu_wire_map[9] = SCURemap( SCU_YM );
-    }
-    if (s_axis == SCU_Z) {
-      gjp_scu_dir[8] = SCU_ZP;
-      gjp_scu_dir[9] = SCU_ZM;
-      gjp_scu_wire_map[8] = SCURemap( SCU_ZP );
-      gjp_scu_wire_map[9] = SCURemap( SCU_ZM );
-    }
-    if (s_axis == SCU_T) {
-      gjp_scu_dir[8] = SCU_TP;
-      gjp_scu_dir[9] = SCU_TM;
-      gjp_scu_wire_map[8] = SCURemap( SCU_TP );
-      gjp_scu_wire_map[9] = SCURemap( SCU_TM );
-    }
-  }
-#endif
 //  for(int i = 0;i<10;i++) fprintf(stderr,"SCURemap(%d)= %d\n",gjp_scu_dir[i],gjp_scu_wire_map[i]);
 
-
-
 #endif //PARALLEL
+
+
   
+#if 0
   // Set the boundary conditions for the whole lattice
   //----------------------------------------------------------------
   x_bc = rda.x_bc;
   y_bc = rda.y_bc;
   z_bc = rda.z_bc;
   t_bc = rda.t_bc;
+#endif
 
   // Set the boundary conditions for the sub-lattice on this node
   //----------------------------------------------------------------
+  for(i = 0; i<4 ; i++){
+  node_bc[i] = BND_CND_PRD;
+  if(bc[i] == BND_CND_APRD) 
+    node_bc[i] = ( node_coor[i] == (nodes[i]-1) ) ? BND_CND_APRD : BND_CND_PRD;
+  }
+#if 0
   x_node_bc = BND_CND_PRD;
   if(x_bc == BND_CND_APRD) 
     x_node_bc = ( x_node_coor == (x_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
@@ -389,16 +321,18 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   // Set the initial configuration kind.
   //----------------------------------------------------------------
   start_conf_kind = rda.start_conf_kind;
+#endif
 
   // Set the initial configuration load address
   //----------------------------------------------------------------
-  if(start_conf_kind == START_CONF_MEM || 
-     start_conf_kind == START_CONF_LOAD ||
-     start_conf_kind == START_CONF_FILE)
-    start_conf_load_addr = rda.start_conf_load_addr;
-  else
-    start_conf_load_addr = 0;
+  StartConfType conf_kind = doarg_int.start_conf_kind;
+   if(conf_kind != START_CONF_MEM && 
+      conf_kind != START_CONF_LOAD &&
+      conf_kind != START_CONF_FILE)
+   doarg_int.start_conf_load_addr = 0;
 
+
+#if 0
   if(start_conf_kind == START_CONF_FILE){
     if(strlen(rda.start_conf_filename)<1){
       ERR.General(cname,fname,
@@ -406,24 +340,28 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
     } else
     strcpy(start_conf_filename,rda.start_conf_filename);
   }
+#endif
 
-    start_conf_alloc_flag = rda.start_conf_alloc_flag;
-    VRB.Flow(cname,fname,"start_conf_alloc_flag=%d\n",start_conf_alloc_flag);
+//    start_conf_alloc_flag = rda.start_conf_alloc_flag;
+    VRB.Flow(cname,fname,"start_conf_alloc_flag=%d\n",doarg_int.start_conf_alloc_flag);
     
 
   // Set the initial seed type.
   //----------------------------------------------------------------
-  start_seed_kind = rda.start_seed_kind;
+//  start_seed_kind = rda.start_seed_kind;
 
   // Set the initial seed value
   //----------------------------------------------------------------
 
+#if 0
   if(start_seed_kind == START_SEED_INPUT ||
      start_seed_kind == START_SEED_INPUT_UNIFORM ||
      start_seed_kind == START_SEED_INPUT_NODE) 
       start_seed_value = rda.start_seed_value;
+#endif
   
 
+#if 0
   // Set beta.
   //----------------------------------------------------------------
   beta = rda.beta;
@@ -445,10 +383,6 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   dwf_a5_inv = rda.dwf_a5_inv;
 
 
-  //------------------------------------------------------------------
-  // Added in by Ping for anisotropic lattices and clover improvement.
-  //------------------------------------------------------------------
-
   // Set parameters for anisotropic lattices and clover improvement.
   // MUST BE AFTER THE SETTING OF BETA [which is re-adjusted for
   // anisotropic implementations]. 
@@ -459,22 +393,18 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   xi_v_xi = rda.xi_v_xi;
   xi_gfix = rda.xi_gfix;  // for Landau gauge
   clover_coeff_xi = clover_coeff = rda.clover_coeff;
-  if (xi_bare != 1.0) {
-    clover_coeff_xi = rda.clover_coeff_xi;
-    beta /= xi_bare;    
-    xi_gfix *= xi_bare;
+#endif
+
+//  if (doarg_int.xi_bare != 1.0) {
+  if (fabs(doarg_int.xi_bare - 1.0)< SMALL ) {
+    doarg_int.clover_coeff_xi = rda.clover_coeff_xi;
+    doarg_int.beta /= doarg_int.xi_bare;    
+    doarg_int.xi_gfix *= doarg_int.xi_bare;
+  } else {
+    doarg_int.clover_coeff_xi = doarg_int.clover_coeff;
   }
 
-  //------------------------------------------------------------------
-  // Added in by Ping for global sum
-  //------------------------------------------------------------------
-  // The following two parameters are relevant to scu transfer frequency
-  // and hardware global sum.
-
-  gsum_fast_mode = rda.gsum_fast_mode;
-  gsum_max_try = rda.gsum_max_try;
-
-
+#if 0
   // Set the power plaquette cutoff.
   //----------------------------------------------------------------
   power_plaq_cutoff = rda.power_plaq_cutoff;
@@ -507,14 +437,12 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   p4_5staple = rda.p4_5staple; 
   p4_7staple = rda.p4_7staple; 
   p4_lepage = rda.p4_lepage; 
+#endif 
+
   //================================================================
   // Other initializations
   //================================================================
     
-  //----------------------------------------------------------------
-  // Copy into cram the relevant vector library segment 
-  //----------------------------------------------------------------
-  p2vVector();
 
 }
 
@@ -525,6 +453,26 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   and also adjusts the local X direction boundary conditions to match.
   \param bc The type of boundary condition.
 */
+
+
+void GlobalJobParameter::Bc(int dir, BndCndType cond){
+
+  // Set the x boundary condition for the whole lattice
+  //----------------------------------------------------------------
+  bc[dir] = cond;
+
+  // Set the x boundary condition for the sub-lattice on this node
+  //----------------------------------------------------------------
+  node_bc[dir] = BND_CND_PRD;
+  if(bc[dir] == BND_CND_APRD) 
+    node_bc[dir] = ( node_coor[dir] == (nodes[dir]-1) ) ? BND_CND_APRD : BND_CND_PRD;
+}
+
+#if 0
+void GlobalJobParameter::Xbc(BndCndType bc){ Bc(0,bc);}
+void GlobalJobParameter::Ybc(BndCndType bc){ Bc(1,bc);}
+void GlobalJobParameter::Zbc(BndCndType bc){ Bc(2,bc);}
+void GlobalJobParameter::Tbc(BndCndType bc){ Bc(3,bc);}
 
 void GlobalJobParameter::Xbc(BndCndType bc){
 
@@ -601,13 +549,7 @@ void GlobalJobParameter::Tbc(BndCndType bc){
   if(t_bc == BND_CND_APRD) 
     t_node_bc = ( t_node_coor == (t_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
 }
-
-
-
-
-
-
-
+#endif
 
 
 CPS_END_NAMESPACE

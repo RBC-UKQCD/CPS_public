@@ -1,7 +1,7 @@
 /*!\file
   \brief Pion correlation function for the testing framework.
 
-  $Id: staggered_local_pion.C,v 1.5 2004-09-02 16:58:01 zs Exp $
+  $Id: staggered_local_pion.C,v 1.6 2004-12-11 20:58:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 // Compute the local pion correlator for staggered fermions.
@@ -12,8 +12,8 @@
 //
 //
 //  Starting point
-//  $Date: 2004-09-02 16:58:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/testing_framework/staggered_local_pion.C,v 1.5 2004-09-02 16:58:01 zs Exp $
+//  $Date: 2004-12-11 20:58:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/testing_framework/staggered_local_pion.C,v 1.6 2004-12-11 20:58:06 chulwoo Exp $
 //
 //-------------------------------------------------------------------
 
@@ -55,9 +55,10 @@ void staggered_local_pion(Lattice &lat, Float mass,
   // the cg data structure is the only one needed
 
   WspectArg w_spect_arg;
-  w_spect_arg.cg.mass = mass ;
-  w_spect_arg.cg.stop_rsd = 1.0E-12;
-  w_spect_arg.cg.max_num_iter = 5000;
+  CgArg cg;
+  cg.mass = mass ;
+  cg.stop_rsd = 1.0E-12;
+  cg.max_num_iter = 5000;
 
   WspectGinfo *con_ ; 
   // constructor is protected, so need hack
@@ -110,7 +111,7 @@ void staggered_local_pion(Lattice &lat, Float mass,
       *(src + 0 + 2*(color)) = 1.0 ; 
 
       cg_iter = lat.FmatInv((Vector *)sln, (Vector *)src, 
-			    &(w_spect_arg.cg), &true_res, CNV_FRM_YES);
+			    &cg, &true_res, CNV_FRM_YES);
 
       printf("CG iters %d\n",cg_iter); 
       printf("True residual = %e\n",true_res); 

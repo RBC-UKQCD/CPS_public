@@ -1,0 +1,27 @@
+  {   
+	s_node_sites=1;
+	s_nodes=1;
+	xi_bare=1.0;           
+    xi_dir=3;              
+    xi_v=1.0;              
+    xi_v_xi=1.0;           
+    clover_coeff=0.0;      
+    clover_coeff_xi=0.0;   
+    c_1=0.0;               
+    u0=1.0;                
+    xi_gfix=1.0;           
+    gsum_fast_mode=0;      
+    gsum_max_try=2;        
+	dwf_a5_inv=1.0;
+	asqtad_naik=0.0; 
+	asqtad_3staple=0.0;
+	asqtad_5staple=0.0;
+	asqtad_7staple=0.0;
+	asqtad_lepage=0.0;
+	p4_knight=0.0; 
+	p4_3staple=0.0;
+	p4_5staple=0.0;
+	p4_7staple=0.0;
+	p4_lepage=0.0;
+	}
+    

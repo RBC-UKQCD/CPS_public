@@ -2,7 +2,7 @@
 CPS_START_NAMESPACE
 /*! \file
 
-  $Id: w_ext_mesonBE.C,v 1.9 2004-08-18 11:57:40 zs Exp $
+  $Id: w_ext_mesonBE.C,v 1.10 2004-12-11 20:58:01 chulwoo Exp $
 */  
 
 /*w_ext_mesonBE.C
@@ -253,10 +253,12 @@ void WspectExtendedMesonsBE::print()const{
 	if(WMesonStateTable[state].measure) {
 	  measure_flag=1;
 	  if(!arg_p->fuzzing_on){
-	    sprintf(outputfilename,"%s.%s",WMesonStateTable[state].stateName,arg_p->filetail);
+	    //	    sprintf(outputfilename,"%s.%s",WMesonStateTable[state].stateName,arg_p->filetail);
+      	    sprintf(outputfilename,"%s",WMesonStateTable[state].stateName);
 	  }else{
 	    //fuzzing is on
-	    sprintf(outputfilename,"%s.%sF%.1f",WMesonStateTable[state].stateName,arg_p->filetail,arg_p->fuzzing_c[fuzzing_c_index]);
+	    // sprintf(outputfilename,"%s.%sF%.1f",WMesonStateTable[state].stateName,arg_p->filetail,arg_p->fuzzing_c[fuzzing_c_index]);
+	    sprintf(outputfilename,"%sF%.1f",WMesonStateTable[state].stateName,arg_p->fuzzing_c[fuzzing_c_index]);
 	  }
 	  break;
 	}
