@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FstagAsqtad class.
 
-  $Id: f_stagAsqtad.C,v 1.2 2003-10-23 13:38:59 zs Exp $
+  $Id: f_stagAsqtad.C,v 1.3 2003-10-29 17:22:50 zs Exp $
 */
 //--------------------------------------------------------------------
 
@@ -254,5 +254,21 @@ void FstagAsqtad::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
 
 }
 
+
+void FstagAsqtad::prepForce(Vector *frm){
+
+    char *fname = "preopForce";
+    ERR.NotImplemented(cname,fname);
+	
+}
+
+int FstagAsqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		       int Nshift, int isz, CgArg *cg_arg,
+		       CnvFrmType cnv_frm) {
+
+    char *fname = "FmatMInv";
+    ERR.NotImplemented(cname,fname);    
+    
+}
 
 CPS_END_NAMESPACE
