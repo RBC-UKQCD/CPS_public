@@ -1,6 +1,6 @@
-# $Id: regression.pl.in,v 1.15 2004-05-11 15:06:01 mcneile Exp $
+# $Id: regression.pl.in,v 1.16 2004-05-11 15:48:21 mcneile Exp $
 # @configure_input@
-# $Id: regression.pl.in,v 1.15 2004-05-11 15:06:01 mcneile Exp $ 
+# $Id: regression.pl.in,v 1.16 2004-05-11 15:48:21 mcneile Exp $ 
 #--------------------------------------------------------------------
 # 
 # This perl script writes a shell script "regression.sh"
@@ -43,7 +43,7 @@ if( '@NOT_TESTING_QCDSP@' eq 'yes' ) {
 # This makes it run autoconf version:
   $machine = '@target@';
   $parallel = '@TESTING_PARALLEL@';
-  $executable = "regression_cps.x";
+  $executable = "@ARCH@.x";
 } else {
 # This is right for the parallel QCDSP version:
   $machine = "qcdsp";
