@@ -25,6 +25,10 @@ void compare_array_relative(Float* pion_corr_A,
 			    Float tol, 
 			    int time_size) ;
 
+void compare_float_relative(Float pion_corr_A,
+                            Float pion_corr_B,
+                            Float tol) ;
+
 
 
 CPS_END_NAMESPACE
