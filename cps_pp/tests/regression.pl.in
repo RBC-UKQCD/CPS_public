@@ -99,8 +99,11 @@ for( $tsi = 0; $tsi < scalar(@test_dirs); $tsi++ ) {
 # State which test is about to run, run it, and store the results:
 	print SHOUT "echo Starting test ".$test_names[$tni]."\n";
 	print SHOUT "cd ".$test_names[$tni]."\n";
+#       compile the code
+	print SHOUT 'make -f Makefile_regression'."\n";
+
 # Remove any files associated with previous runs (i.e. *.dat)
-	print SHOUT 'rm *.dat'."\n";
+	print SHOUT 'rm -f *.dat'."\n";
 # Run the program:
 	$exec_cmd = $exec_prefix.$executable;
 ##	print SHOUT "echo Running $exec_cmd...\n";
