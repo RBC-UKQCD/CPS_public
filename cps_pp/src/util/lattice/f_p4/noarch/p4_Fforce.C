@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fp4::EvolveMomFforce.
 
-  $Id: p4_Fforce.C,v 1.3 2004-12-11 20:58:04 chulwoo Exp $
+  $Id: p4_Fforce.C,v 1.4 2005-03-09 18:12:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -218,7 +218,7 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 		    for(w=0; w<N; w++)
 			for(ns=0; ns<n_sign; ns++){
 			    force_product_sum(P3[plus][ns][w], Pnu[ns][w],
-				       -GJP.staple3_coeff(),
+				       GJP.staple3_coeff(),
 				       force[mu[w]]);
 			}
 
@@ -314,7 +314,7 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 		    for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(ss=0; ss<n_sign; ss++)
 			force_product_sum(P7[plus][ns][rs][ss][w],
 					   Psigmarhonu[ns][rs][ss][w],
-					   -GJP.staple7_coeff(),
+					   GJP.staple7_coeff(),
 					   force[mu[w]]);
 
 		// F_sigma += P7 Psigmarhonu^\dagger
@@ -324,7 +324,7 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 		    for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) 
 			force_product_sum(P7[plus][ns][rs][minus][w],
 					  Psigmarhonu[ns][rs][minus][w],
-					  GJP.staple7_coeff(),
+					  -GJP.staple7_coeff(),
 					  force[sigma[w]]);
 
 		// F_sigma += Psigmarhonu P7^\dagger
@@ -333,7 +333,7 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 		    for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) 
 			force_product_sum(Psigmarhonu[ns][rs][minus][w],
 					  P7[minus][ns][rs][minus][w],
-					  GJP.staple7_coeff(),
+					  -GJP.staple7_coeff(),
 					  force[sigma[w]]);
 
 		// Psigma7 = U_sigma P7 
@@ -357,7 +357,7 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 		    for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) 
 			force_product_sum(Psigma7[plus][ns][rs][plus][w],
 					  Prhonu[ns][rs][w],
-					  GJP.staple7_coeff(),
+					  -GJP.staple7_coeff(),
 					  force[sigma[w]]);
 
 		// F_sigma += Frhonu Fsigma7^\dagger
@@ -366,14 +366,14 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 		    for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) 
 			force_product_sum(Prhonu[ns][rs][w],
 					  Psigma7[minus][ns][rs][plus][w],
-					  GJP.staple7_coeff(),
+					  -GJP.staple7_coeff(),
 					  force[sigma[w]]);
 
 		// P5 += c_7/c_5 Psigma7
 
 		if(GJP.staple5_coeff()!=0.0)
 		    for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(ss=0; ss<n_sign; ss++) for(w=0; w<N; w++)
-			P5[ms][ns][rs][w]->FTimesV1PlusV2(GJP.staple7_coeff()/GJP.staple5_coeff(), Psigma7[ms][ns][rs][ss][w], P5[ms][ns][rs][w], GJP.VolNodeSites()*VECT_LEN);
+			P5[ms][ns][rs][w]->FTimesV1PlusV2(-GJP.staple7_coeff()/GJP.staple5_coeff(), Psigma7[ms][ns][rs][ss][w], P5[ms][ns][rs][w], GJP.VolNodeSites()*VECT_LEN);
 		nflops += 2*GJP.VolNodeSites()*VECT_LEN*N*n_sign*n_sign*n_sign*n_sign;
 
 		// F_rho -= P5 Prhonu^\dagger
@@ -431,7 +431,7 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
 		if(GJP.staple3_coeff()!=0.0)		
 		    for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(w=0; w<N; w++)
-			P3[ms][ns][w]->FTimesV1PlusV2(GJP.staple5_coeff()/GJP.staple3_coeff(), Prho5[ms][ns][rs][w], P3[ms][ns][w], GJP.VolNodeSites()*VECT_LEN);
+			P3[ms][ns][w]->FTimesV1PlusV2(-GJP.staple5_coeff()/GJP.staple3_coeff(), Prho5[ms][ns][rs][w], P3[ms][ns][w], GJP.VolNodeSites()*VECT_LEN);
 		nflops += 2*GJP.VolNodeSites()*VECT_LEN*N*n_sign*n_sign*n_sign;
 
 	    } // rho+sigma loop
@@ -528,7 +528,7 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
 	    if(GJP.staple3_coeff()!=0.0)
 		for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(w=0; w<N; w++)
-		    P3[ms][ns][w]->FTimesV1PlusV2(GJP.Lepage_coeff()/GJP.staple3_coeff(), Pnu5[ms][ns][w], P3[ms][ns][w], GJP.VolNodeSites()*VECT_LEN);
+		    P3[ms][ns][w]->FTimesV1PlusV2(-GJP.Lepage_coeff()/GJP.staple3_coeff(), Pnu5[ms][ns][w], P3[ms][ns][w], GJP.VolNodeSites()*VECT_LEN);
 		nflops += 2*GJP.VolNodeSites()*VECT_LEN*N*n_sign*n_sign;
 
 	    // F_nu += P3 Pnu^\dagger
@@ -536,7 +536,7 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 	    for(w=0; w<N; w++)
 		force_product_sum(P3[plus][minus][w],
 				  Pnu[minus][w],
-				  GJP.staple3_coeff(),
+				  -GJP.staple3_coeff(),
 				  force[nu[w]]);
 
 	    // F_nu +=  Pnu P3^\dagger
@@ -544,7 +544,7 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 	    for(w=0; w<N; w++)
 		force_product_sum(Pnu[minus][w],
 				  P3[minus][minus][w],
-				  GJP.staple3_coeff(),
+				  -GJP.staple3_coeff(),
 				  force[nu[w]]);
 	    
 	    // Pnu3 = U_nu P3
@@ -563,14 +563,14 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
 	    for(w=0; w<N; w++)
 		force_product_sum(Pnu3[plus][plus][w], X,
-				  GJP.staple3_coeff(),
+				  -GJP.staple3_coeff(),
 				  force[nu[w]]);
 
 	    // F_nu += X Pnu3^\dagger
 
 	    for(w=0; w<N; w++)
 		force_product_sum(X, Pnu3[minus][plus][w], 
-				  GJP.staple3_coeff(),
+				  -GJP.staple3_coeff(),
 				  force[nu[w]]);
 
 	    // This stuff is to be done once only for each value of nu[w].

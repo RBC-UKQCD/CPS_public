@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.5 2005-02-18 20:18:14 mclark Exp $
+  $Id: f_p4.C,v 1.6 2005-03-09 18:12:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -37,9 +37,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 
-#if TARGET == QCDOC
 void  set_pt (Fp4 *lat);
-#endif
 
 
 //int Fp4::ForceFlops=0;
@@ -54,10 +52,7 @@ Fp4::Fp4()
   VRB.Func(cname,fname);
 
   p4_dirac_init(GaugeField());
-#if TARGET == QCDOC
   set_pt (this);
-#endif
-
 }
 
 
@@ -117,8 +112,17 @@ int Fp4::FmatEvlInv(Vector *f_out, Vector *f_in,
   return iter;
 }
 
-
-
+#if 0
+//-----------------------------------------------------------------
+//Added by Michael C
+int Fp4::FmatEvlMInv(Vector * a, Vector * b, Float * c, int d, int e,
+		    CgArg * f, CnvFrmType g, MultiShiftSolveType h,
+		    Float * i, Vector * j)
+{
+  return 0;
+}
+//----------------------------------------------------------------
+#endif
 
 //------------------------------------------------------------------
 // int FmatEvlMInv(Vector **f_out, Vector *f_in, 
@@ -143,7 +147,7 @@ int Fp4::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   char *fname = "FmatMInv(V**, V*, .....)";
   VRB.Func(cname,fname);
 
-  Float dot = f_in -> NormSqGlbSum(e_vsize);
+  double dot = f_in -> NormSqGlbSum(e_vsize);
 
 //  Float RsdCG[Nshift];
   Float *RsdCG = (Float *)smalloc(sizeof(Float)*Nshift);
@@ -375,9 +379,9 @@ void Fp4::Smear(){
 
   IFloat c1 = GJP.p4_KS_coeff();
   IFloat c2 = GJP.p4_knight_coeff();
-  IFloat c3 = GJP.p4_staple3_coeff();
+  IFloat c3 = -GJP.p4_staple3_coeff();
   IFloat c5 = GJP.p4_staple5_coeff();
-  IFloat c7 = GJP.p4_staple7_coeff();
+  IFloat c7 = -GJP.p4_staple7_coeff();
   IFloat c6 = GJP.p4_Lepage_coeff();
 
   int i, j, N = 4;

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.8 2005-03-07 00:33:40 chulwoo Exp $
+  $Id: convert_func.C,v 1.9 2005-03-09 18:13:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:33:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.8 2005-03-07 00:33:40 chulwoo Exp $
-//  $Id: convert_func.C,v 1.8 2005-03-07 00:33:40 chulwoo Exp $
+//  $Date: 2005-03-09 18:13:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.9 2005-03-09 18:13:49 chulwoo Exp $
+//  $Id: convert_func.C,v 1.9 2005-03-09 18:13:49 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -219,6 +219,56 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 				    18*sizeof(IFloat));
 			  }
 			}
+
+			break ;
+		case STAG_BLOCK :
+		  {
+
+			VRB.Flow(cname_none,fname,
+			"Converting gauge field order: CANONICAL -> STAG_BLOCK\n");
+
+			MultStagPhases(cap) ; // CANONICAL -> STAG
+
+			//---------------------------------------------------
+			//  Dagger all links
+			//---------------------------------------------------
+			{
+			  Matrix *p = (Matrix *) cap->start_ptr;
+			  int n_links = 4 * cap->vol;
+			  
+			  setCbufCntrlReg(4, CBUF_MODE4);
+			  
+			  for(int i = 0; i < n_links; ++i) {
+			    mp2->Dagger((IFloat *)p+BANK4_BASE+BANK_SIZE);
+			    moveMem((IFloat *)(p++), (IFloat *)mp2,
+				    18*sizeof(IFloat));
+			  }
+			}
+			
+			//Copy the links into tmp_gauge into STAG_BLOCK ordering
+			//Then, copy tmp_gauge back to GaugeField()
+
+			Matrix * tmp_gauge = (Matrix *)smalloc(cap->vol*4*sizeof(Matrix));
+			if(tmp_gauge == 0)
+			  ERR.Pointer(cname_none,fname,"tmp_gauge");
+			VRB.Smalloc(cname_none,fname,"tmp_gauge",tmp_gauge,cap->vol*4*sizeof(Matrix));
+
+			int x[4];
+			int mu,current,new_index;
+			for(mu = 0; mu < 4; mu++)
+			  for(x[2]=0;x[2]<cap->lz;x[2]++)
+			    for(x[1]=0;x[1]<cap->ly;x[1]++)
+			      for(x[0]=0;x[0]<cap->lx;x[0]++)
+				for(x[3]=0;x[3]<cap->lt;x[3]++)
+				  {
+				    new_index = cap->vol*mu+x[3]+cap->lt*(x[0]+cap->lx*(x[1]+cap->ly*x[2]));
+				    current = 4*(x[0]+cap->lx*(x[1]+cap->ly*(x[2]+cap->lz*x[3])))+mu;
+				    moveMem(tmp_gauge+new_index,cap->start_ptr+18*current,sizeof(Matrix));
+				  }
+			moveMem(cap->start_ptr,tmp_gauge,cap->vol*4*sizeof(Matrix));
+			VRB.Sfree(cname_none,fname, "tmp_gauge", tmp_gauge);
+			sfree(tmp_gauge);
+		  }
 
 			break ;
 

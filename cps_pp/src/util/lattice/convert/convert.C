@@ -177,6 +177,52 @@ void Lattice::Convert(StrOrdType new_str_ord)
 			}
 
 			break ;
+		case STAG_BLOCK :
+		  {
+	                VRB.Flow(cname,fname,
+			"Converting gauge field order: STAG_BLOCK -> CANONICAL\n");
+			//Copy the links into tmp_gauge into STAG ordering
+			//Then, copy tmp_gauge back to GaugeField()
+			Matrix * tmp_gauge = (Matrix *)smalloc(cas.vol*4*sizeof(Matrix));
+			if(tmp_gauge == 0)
+			  ERR.Pointer(cname,fname,"tmp_gauge");
+			VRB.Smalloc(cname,fname,"tmp_gauge",tmp_gauge,cas.vol*4*sizeof(Matrix));
+			int x[4];
+			int mu,current,new_index;
+			for(mu = 0; mu < 4; mu++)
+			  for(x[2]=0;x[2]<cas.lz;x[2]++)
+			    for(x[1]=0;x[1]<cas.ly;x[1]++)
+			      for(x[0]=0;x[0]<cas.lx;x[0]++)
+				for(x[3]=0;x[3]<cas.lt;x[3]++)
+				  {
+				    current = cas.vol*mu+x[3]+cas.lt*(x[0]+cas.lx*(x[1]+cas.ly*x[2]));
+				    new_index = 4*(x[0]+cas.lx*(x[1]+cas.ly*(x[2]+cas.lz*x[3])))+mu;
+				    moveMem(tmp_gauge+new_index,cas.start_ptr+18*current,sizeof(Matrix));
+				  }
+			moveMem(cas.start_ptr,tmp_gauge,cas.vol*4*sizeof(Matrix));
+			VRB.Sfree(cname,fname, "tmp_gauge", tmp_gauge);
+			sfree(tmp_gauge);
+
+			MultStagPhases(&cas) ; // STAG -> CANONICAL
+
+			//---------------------------------------------------
+			//  de-Dagger all links
+			//---------------------------------------------------
+			{
+			  Matrix *p = GaugeField();
+			  int n_links = 4 * GJP.VolNodeSites();
+			  
+			  setCbufCntrlReg(4, CBUF_MODE4);
+			  
+			  for(int i = 0; i < n_links; ++i) {
+			    mp2->Dagger((IFloat *)p+BANK4_BASE);
+			    moveMem((IFloat *)(p++), (IFloat *)mp2,
+				    18*sizeof(IFloat));
+			  }
+			}
+		  }
+
+			break ;
 		case WILSON :
 			VRB.Flow(cname,fname,
 			"Converting gauge field order: WILSON -> CANONICAL\n");
