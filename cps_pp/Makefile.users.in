@@ -1,0 +1,85 @@
+# $Id: Makefile.users.in,v 1.1 2004-08-17 03:35:34 chulwoo Exp $
+# @configure_input@
+#   This is the makefile for all the commands
+#   that are common for all testing applications.
+#----------------------------------------------------------------------
+
+
+SRCDIR = @abs_top_srcdir@
+BUILDDIR = @abs_builddir@
+QOS = @QOS@
+CC = @CC@
+CXX = @CXX@
+AS  = @AS@
+LDFLAGS = @LDFLAGS@
+
+me = $(notdir $(PWD))
+BIN = @ARCH@.x
+
+#VPATH :=$(SRCDIR)/tests/$(me)
+
+
+
+#
+# include list for the Columbia code
+#
+INCLIST = -I${BUILDDIR} -I${SRCDIR}/include @INCLUDE_FLAGS@
+
+CFLAGS= @CFLAGS@
+CXXFLAGS= @CXXFLAGS@
+ASFLAGS= @ASFLAGS@
+DFLAGS += @DFLAGS@
+
+#
+# Libraries for the Columbia code
+#
+# (These are for the scalar version of the code)
+#
+#
+
+.PHONY: cps clean
+
+
+LIBLIST =\
+  $(BUILDDIR)/cps.a \
+
+#
+#  targets
+#
+
+
+all:$(BIN)
+
+.SUFFIXES:
+.SUFFIXES:  .o .C .S .c
+
+CSRC :=$(wildcard *.c)
+CCSRC :=$(wildcard *.C)
+SSRC :=$(wildcard *.S)
+
+COBJ=$(CSRC:.c=.o)
+CCOBJ=$(CCSRC:.C=.o)
+SOBJ=$(SSRC:.S=.o)
+
+OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
+OBJS := $(notdir $(OBJS_SRC))
+
+$(BIN):  $(OBJS) $(LIBLIST)
+	@echo OBJS = $(OBJS)
+	$(CXX) $(OBJS) $(LIBLIST) $(LDFLAGS) -o $(BIN)
+
+.c.o:
+	$(CC) -o $@ $(CFLAGS) $(DFLAGS) -c $(INCLIST) $<
+.C.o:
+	$(CXX) -o $@ $(CXXFLAGS) $(DFLAGS) -c $(INCLIST) $<
+.S.o:
+	$(AS) -o $@ $(ASFLAGS) -c $(INCLIST) $<
+
+cps:
+	$(MAKE) -C $(BUILDDIR)
+
+clean:
+	rm -f *.dat *.o  $(BIN)
+	rm -f ../regressions/*$(me).dat
+	rm -f ../regressions/*$(me).checklog
+
