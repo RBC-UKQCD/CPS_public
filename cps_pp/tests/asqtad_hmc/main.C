@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.11 2004-09-21 20:16:50 chulwoo Exp $
+  $Id: main.C,v 1.12 2004-12-07 06:18:19 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -16,10 +16,10 @@
 #include <util/random.h>
 #include <comms/sysfunc.h>
 
-const int nx = 4;
-const int ny = 4;
-const int nz = 4;
-const int nt = 4;
+const int nx = 8;
+const int ny = 8;
+const int nz = 8;
+const int nt = 8;
 
 
 USING_NAMESPACE_CPS
@@ -159,15 +159,24 @@ int main(int argc,char *argv[])
 void setup_do_arg(DoArg& do_arg)
 {
 
-
-  do_arg.x_node_sites = nx/SizeX();
-  do_arg.y_node_sites = ny/SizeY();
-  do_arg.z_node_sites = nz/SizeZ();
-  do_arg.t_node_sites = nt/SizeT();
-  do_arg.x_nodes = SizeX();
-  do_arg.y_nodes = SizeY();
-  do_arg.z_nodes = SizeZ();
-  do_arg.t_nodes = SizeT();
+  int size[4]; 
+  int sites[4];
+  size[0] = SizeX(); sites[0] =nx;
+  size[1] = SizeY(); sites[1] =ny;
+  size[2] = SizeZ(); sites[2] =nz;
+  size[3] = SizeT(); sites[3] =nt;
+  for (int i = 0;i<4;i++) 
+    if( (size[i]*2) > sites[i] ) size[i] = sites[i]/2;
+  for (int i = 0;i<4;i++) 
+    if( sites[i] % size[i] !=0) size[i] = 1;
+  do_arg.x_node_sites = nx/size[0];
+  do_arg.y_node_sites = ny/size[1];
+  do_arg.z_node_sites = nz/size[2];
+  do_arg.t_node_sites = nt/size[3];
+  do_arg.x_nodes = size[0];
+  do_arg.y_nodes = size[1];
+  do_arg.z_nodes = size[2];
+  do_arg.t_nodes = size[3];
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
   do_arg.z_bc = BND_CND_PRD;
