@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the DoArg structure.
   
-  $Id: do_arg.h,v 1.10 2004-07-28 06:13:52 chulwoo Exp $
+  $Id: do_arg.h,v 1.11 2004-08-18 11:47:03 zs Exp $
 */
 //--------------------------------------------------------------------
 /* CIM Sun Jul  6 23:30:27 GMT 1997 */
@@ -152,7 +152,7 @@ struct DoArg {
   DoArg()     :  
     s_node_sites(1),
     s_nodes(1),
-    start_conf_filename(NULL),
+    start_conf_filename(0),
     c_1(0.0),               
     u0(1.0),                
     dwf_a5_inv(1.0),
