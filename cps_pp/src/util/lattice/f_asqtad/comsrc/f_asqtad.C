@@ -362,7 +362,7 @@ enum {NUM_DIR=8,POS_DIR=4};
 void Fasqtad::Smear(){
   char *fname = "Smear()";
   VRB.Func(cname,fname);
-//  if (smeared) return;
+  if (smeared) return;
 
 //--------------------------------------------------------------------
 // c1 -> one link; c2 -> 3-link; c3 -> 3-link staple; c5 -> 5-link staple;
