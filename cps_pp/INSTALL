@@ -1,15 +1,37 @@
 ----------------------------------------------------------------------
 INSTALL: The Columbia Code
 ----------------------------------------------------------------------
+$Id: INSTALL,v 1.4 2004-01-25 18:39:49 mcneile Exp $
 
 The new system only creates one library: cps.a
 The system probably requires gnu make, so 
 you may need to use gmake.
 
-ln -s Makefile_cps  makefile
-make depend
-make cps
+These are the instruction to compile the cps++
+code using the build system developed by the 
+Columbia group.
 
+It is advised not to build this code inside the 
+source code directory.
+
+From this directory the steps you need to take to 
+compile the code are:
+
+mkdir ../cps++_build
+cd ../cps++_build
+../cps++/configure
+make
+
+
+NOTES
+----
+This build system may have problems in read only
+check outs, as it involves copying of files around
+the build tree.
+
+Also remember to check the code out with "cvs co -P cps++",
+because the empty directories cause problems with 
+the build system.
 
 To run the test suite:
 make test
@@ -19,6 +41,9 @@ Full instructions for comfiguration and compilation can be found in
 ./doc/porting/porting.html
 
 
-Andy Jackson  - EPCC      - A.N.Jackson@ed.ac.uk.
+If you have problems you can send email to
+qcd-measure-cps++@forge.nesc.ac.uk
+
 Craig McNeile - Liverpool -  mcneile@amtp.liv.ac.uk
+Andy Jackson  - EPCC      
 ----------------------------------------------------------------------
