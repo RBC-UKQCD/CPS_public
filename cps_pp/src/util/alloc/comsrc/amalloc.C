@@ -3,7 +3,7 @@
   \file
   \brief Functions for dynamical array allocation.
 
-  $Id: amalloc.C,v 1.4 2004-09-02 16:59:38 zs Exp $
+  $Id: amalloc.C,v 1.5 2004-09-17 18:10:53 chulwoo Exp $
 */
 #include <util/smalloc.h>
 #include <stdarg.h>
@@ -41,7 +41,8 @@ void subarray(size_t size, int n_dim, int n_ptr,
 
     }else{		// Last recursion; set up pointers to data   
 
-	for(i=0; i<n_ptr; i++) (char*)prev[i] = (char*)start+i*dim*size;
+//	for(i=0; i<n_ptr; i++) (char*)prev[i] = (char*)start+i*dim*size;
+	for(i=0; i<n_ptr; i++) prev[i] = start+i*dim*size;
 	
     }
 
