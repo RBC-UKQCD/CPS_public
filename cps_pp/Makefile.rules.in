@@ -1,0 +1,101 @@
+SRCDIR = @abs_top_srcdir@
+BUILDDIR = @abs_builddir@
+
+PWD := $(shell pwd)
+DIR := $(subst $(SRCDIR),,$(PWD))
+DIR := $(subst $(BUILDDIR),,$(DIR))
+VPATH:=${SRCDIR}/$(DIR) ${BUILDDIR}/$(DIR)
+
+CC = @CC@
+CXX = @CXX@
+AR = @AR@
+AS = @AS@
+
+CFLAGS = @CFLAGS@
+CXXFLAGS = @CXXFLAGS@
+ASFLAGS = @ASFLAGS@
+
+INCLUDE_FLAGS = @INCLUDE_FLAGS@
+
+DFLAGS = @DFLAGS@
+
+
+DIRLIST := $(shell ls -p $(SRCDIR)/$(DIR) )
+DIRLIST := $(filter %/ ,$(DIRLIST))
+DIRLIST := $(DIRLIST:/=)
+
+ARCHDIR := $(@ARCHDIR@)
+
+FILTERDIR := $(filter-out $(ARCHDIR) , $(NORECURSE_DIR))
+RECURSEDIRS := $(filter-out $(FILTERDIR) , $(DIRLIST))
+
+
+libcps_CXXFLAGS = $(INCLUDE_FLAGS) $(CXXFLAGS) $(DFLAGS)
+.PHONY: $(RECURSEDIRS) cps all recurse
+
+all: cps 
+
+recurse: $(RECURSEDIRS)
+#	@echo RECURSEDIRS = $(RECURSEDIRS)
+
+$(RECURSEDIRS):
+#	@echo PWD = $(PWD)
+	mkdir -p $(BUILDDIR)/$(DIR)/$@
+	touch -a $(BUILDDIR)/$(DIR)/$@/Makefile_depend
+	cp -p $(SRCDIR)/$(DIR)/$@/Makefile $(BUILDDIR)/$(DIR)/$@/
+	$(MAKE) -C $@ $(MAKECMDGOALS)
+
+
+.SUFFIXES:
+
+.SUFFIXES:  .o .C .S
+
+CSRC :=$(wildcard $(SRCDIR)/$(DIR)/*.c)
+CCSRC:=$(wildcard $(SRCDIR)/$(DIR)/*.C)
+SSRC := $(wildcard $(SRCDIR)/$(DIR)/*.S)
+
+COBJ=$(CSRC:.c=.o)
+CCOBJ=$(CCSRC:.C=.o)
+SOBJ=$(SSRC:.S=.o)
+
+OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
+OBJS := $(notdir $(OBJS_SRC))
+
+%.o:%.c
+#	@echo CSRC = $(CSRC)
+#	@echo TARGET = $@
+	mkdir -p $(BUILDDIR)/$(DIR)
+	${CC} -c $< -o $(BUILDDIR)/$(DIR)/$@ ${libcps_CXXFLAGS}
+	cd $(BUILDDIR)/$(DIR) ; ${AR} rcs ${BUILDDIR}/cps.a $@
+
+%.o:%.C
+#	@echo CCSRC = $(CCSRC)
+#	@echo TARGET = $@
+#	mkdir -p $(BUILDDIR)/$(DIR)
+	${CXX} -c $< -o $(BUILDDIR)/$(DIR)/$@ ${libcps_CXXFLAGS}
+#	${CXX} -c $< -o $@ ${libcps_CXXFLAGS}
+	cd $(BUILDDIR)/$(DIR) ; ${AR} rcs ${BUILDDIR}/cps.a $@
+
+%.o:%.S
+#	@echo SSRC = $(SSRC)
+#	@echo TARGET = $@
+	$(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR)/$(DIR)/$*.i
+	$(AS) $(ASFLAGS) -o $(BUILDDIR)/$(DIR)/$@ $(BUILDDIR)/$(DIR)/$*.i
+	cd $(BUILDDIR)/$(DIR) ; ${AR} rcs ${BUILDDIR}/cps.a $@
+#	rm $*.i
+
+
+depend: recurse
+	echo > $(BUILDDIR)/$(DIR)/Makefile_depend
+	cd $(SRCDIR)/$(DIR) ;makedepend -f$(BUILDDIR)/$(DIR)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
+
+clean: recurse
+	cd $(BUILDDIR)/$(DIR) ; rm -f *.o *.i *.bak
+
+cps: recurse $(OBJS) 
+#	@echo OBJS = $(OBJS)
+#	@echo DIR = $(DIR)
+#	@echo CCOBJ = $(CCOBJ)
+#	cd $(BUILDDIR)/$(DIR) ; ${AR} rcs ${BUILDDIR}/cps.a $(OBJS)
+
+include $(BUILDDIR)/$(DIR)/Makefile_depend

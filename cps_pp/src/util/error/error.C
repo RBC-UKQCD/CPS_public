@@ -3,18 +3,24 @@ CPS_START_NAMESPACE
 /*!\file 
   \brief   Definition of Error class methods.
 
-  $Id: error.C,v 1.3 2003-09-11 15:07:34 zs Exp $
+  $Id: error.C,v 1.4 2004-01-13 20:39:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-09-11 15:07:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.3 2003-09-11 15:07:34 zs Exp $
-//  $Id: error.C,v 1.3 2003-09-11 15:07:34 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.4 2004-01-13 20:39:49 chulwoo Exp $
+//  $Id: error.C,v 1.4 2004-01-13 20:39:49 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3.2.1  2003/11/05 16:32:16  mike
+//  Attempting to create new working branch!
+//
+//  Revision 1.3  2003/09/11 15:07:34  zs
+//  Corrected documentation.
+//
 //  Revision 1.2  2003/07/24 16:53:54  zs
 //  Addition of documentation via doxygen:
 //  doxygen-parsable comment blocks added to many source files;
@@ -37,7 +43,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: error.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v $
 //  $State: Exp $
 //
@@ -65,7 +71,7 @@ char *general_str = "Error in %s::%s :\n\t";
 //------------------------------------------------------------------
 // Error names
 //------------------------------------------------------------------
-char *error_file_name = "phys.error";
+char *error_file_name = CWDPREFIX("phys.error");
 char *error_class_name = "Error";
 
 //------------------------------------------------------------------

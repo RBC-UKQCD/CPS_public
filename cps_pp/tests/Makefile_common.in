@@ -10,35 +10,35 @@
 # cps code.
 TOP=../../..
 
+SRCDIR = @abs_top_srcdir@
+BUILDDIR = @abs_top_builddir@
 COMPILER = @CXX@
-LDFLAGS = -lm
+LDFLAGS = @LDFLAGS@
 
-
-# TARGET_QCDSP = 1 for QCDSP build, 0 otherwise
-TARGET_QCDSP = @TARGET_QCDSP@
-
-# PARALLEL = 1 for parallel compilation, 0 for serial compilation 
-PARALLEL = @PARALLEL@
 
 
 #
 # include list for the Columbia code
 #
-TOPINC=$(TOP)/cps++
-INCLIST := -I$(TOPINC) -I$(TOPINC)/include 
-ifeq "$(PARALLEL)" "1" 
-ifeq "$(TARGET_QCDSP)" "0"
-INCLIST := $(INCLIST) -I$(TOPINC)/include/comms
-endif
-endif
+#TOPINC=@enable_installdir@
+INCLIST = @INCLUDE_FLAGS@
 
-CFLAGS= @CXXFLAGS@ 
+CXXFLAGS= @CXXFLAGS@
+DFLAGS= @DFLAGS@
+
+CFLAGS = ${CXXFLAGS} ${DFLAGS}
 
 #
 # Libraries for the Columbia code
 #
+# (These are for the scalar version of the code)
+#
+#
 
-LINLIB = "$(TOP)/cps++"
+.PHONY: cps clean
+
+
+LINLIB = @enable_installdir@
 LIBLIST =\
   $(LINLIB)/cps.a \
 
@@ -48,19 +48,20 @@ LIBLIST =\
 
 me = $(notdir $(PWD))
 
-all:regression_cps.x 
+all:regression_cps.x
 
-regression_cps.x:  cps main.o
+regression_cps.x:  main.o
 	$(COMPILER) -o regression_cps.x main.o $(LIBLIST) $(LDFLAGS)
 
 main.o: main.C
-	$(COMPILER) -o main.o $(CFLAGS) -c $(INCLIST) main.C 
+	$(COMPILER) -o main.o $(CFLAGS) -c $(INCLIST) main.C
 
-cps: 
-	cd $(TOPINC); $(MAKE)
-#	$(MAKE) -C $(TOPINC)
+cps:
+#       cd $(TOPINC); $(MAKE)
+	$(MAKE) -C $(SRCDIR)
 
 clean:
-	rm -f *.dat *.o  regression_cps.x 
+	rm -f *.dat *.o  regression_cps.x
 	rm -f ../regressions/*$(me).dat
 	rm -f ../regressions/*$(me).checklog
+

@@ -1,9 +1,9 @@
 /*!\file
   \brief   Global options for compiling the Colombia code:
 
-  @configure_input@
+  Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.6 2003-10-31 16:26:42 zs Exp $
+  $Id: config.h.in,v 1.7 2004-01-13 20:38:56 chulwoo Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -13,14 +13,14 @@
  *--------------------------------------------------------------------
  *  CVS keywords
  *
- *  $Author: zs $
- *  $Date: 2003-10-31 16:26:42 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.6 2003-10-31 16:26:42 zs Exp $
- *  $Id: config.h.in,v 1.6 2003-10-31 16:26:42 zs Exp $
+ *  $Author: chulwoo $
+ *  $Date: 2004-01-13 20:38:56 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.7 2004-01-13 20:38:56 chulwoo Exp $
+ *  $Id: config.h.in,v 1.7 2004-01-13 20:38:56 chulwoo Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.6 $
+ *  $Revision: 1.7 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -29,14 +29,32 @@
 #ifndef INCLUDED_CONFIG_H_
 #define INCLUDED_CONFIG_H_                  //!< Prevent multiple inclusion 
 
-#ifndef TARGET_QCDSP
+#define NOARCH 0
+#define QCDOC  1
+#define QCDSP  2
+#define MPI    3
 
-/* PARALLEL = 1 for parallel compilation, 0 for serial compilation */
-#define PARALLEL @PARALLEL@
-#if PARALLEL == 0 
-#undef PARALLEL
-#endif 
+#define TARGET @ARCH@
+#@ENABLE_PARALLEL@
 
+/* Define this flag if you are using QCDSP (default): */
+#ifndef TARGET
+#define TARGET NOARCH
+#endif
+
+#if TARGET == QCDOC
+#include<qcdocos.h>
+#endif
+
+#if TARGET == QCDOC
+// temporary hack until qos is more mature
+#define CWDPREFIX(A) "@CWD@/"A
+#else
+#define CWDPREFIX(A) A
+#endif
+
+
+#if TARGET != QCDSP        /* General non-QCDSP version: */
 
 /*! Explicit casting away of the const-ness  */
 #define CAST_AWAY_CONST(x) ( const_cast<char*>(x) )
@@ -50,46 +68,64 @@
 /*! Precision of internal calculations: float, double. */
 #define INTERNAL_LOCALCALC_TYPE @LOCALPRECISION@
 
+/*! \def INCLUDE_MPI_SCU
+  If parallel (and not QCDSP), include the MPI layer in the make.
+*/
+#ifdef PARALLEL
+#define INCLUDE_MPI_SCU 1
+#endif
+
 /*! Data size for the MPI comms layer: */
 #define COMMS_DATASIZE (sizeof(@LOCALPRECISION@))
 
 /*! Debugging flag: */
 #ifndef VERBOSE
-#define VERBOSE 
+#define VERBOSE 1
 #endif
 
+#if (TARGET == QCDOC) || (TARGET == QCDSP)
+#define CPS_END_NAMESPACE
+#define CPS_START_NAMESPACE
+#define USING_NAMESPACE_CPS 
+#else
 #define CPS_END_NAMESPACE } 
 #define CPS_START_NAMESPACE  namespace cps {
-#define USING_CPS_NAMESPACE  using namespace cps;
+#define USING_NAMESPACE_CPS using namespace cps;
+#endif
 
 /* Override printf to only print on one proc (Not nec. on QCDSP, only
  *    expected to work via the MPI layer. */
+#if TARGET == MPI
 #include<util/qcdio_qprintf.h>
+#endif
 
 /* ------------------------------------------------------------------*/
+
 #else /* For compiling on QCDSP: */
 
-#define TARGET_QCDSP 1
 #define CPS_END_NAMESPACE 
 #define CPS_START_NAMESPACE  
-#define USING_NAMESPACE_CPS 
+#define USING_NAMESPACE_CPS using namespace cps 
+
+#ifndef _TARTAN  /* Not using TARTAN, so under the Sun CC compiler: */
 
 #define CAST_AWAY_CONST(x) ( x )
 #define LOCALCALC_TYPE rfloat
 #define INTERNAL_LOCALCALC_TYPE float
 #define COMMS_DATASIZE 4
-
-#ifndef _TARTAN  /* Not using TARTAN, so under the Sun CC compiler: */
-
 #include<util/qcdio_qprintf.h>
 
 #else  /* ELSE using TARTAN */
 
+#define CAST_AWAY_CONST(x) ( x )
 #define PARALLEL 1
+#define LOCALCALC_TYPE rfloat
+#define INTERNAL_LOCALCALC_TYPE float
+#define COMMS_DATASIZE 4
 
 #endif /* END of TARTAN */
 
-#endif /* END of TARGET_QCDSP */
+#endif /* END of TARGET_ */
 
 /* ------------------------------------------------------------------*/
 /* Other overall definitions:   */
@@ -97,9 +133,7 @@
 
 #define SERIAL_SEED 112319
 
-//! Default value for the verbosity level
-/*! see the Verbose class for details. */
-
+/*! Default value for the verbosity level (see the Verbose class for details).*/
 #define DEFAULT_VERBOSE_LEVEL -12100502
 
 #endif /* INCLUDED_CONFIG_H_ */

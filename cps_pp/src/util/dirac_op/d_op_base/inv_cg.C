@@ -1,21 +1,23 @@
 #include <config.h>
+#include <stdio.h>
+#include <stdlib.h>
 CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+  $Id: inv_cg.C,v 1.4 2004-01-13 20:39:35 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-10-31 14:15:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/inv_cg.C,v 1.3 2003-10-31 14:15:33 zs Exp $
-//  $Id: inv_cg.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:35 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/inv_cg.C,v 1.4 2004-01-13 20:39:35 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.4 2004-01-13 20:39:35 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -42,6 +44,7 @@ CPS_START_NAMESPACE
 //Uncomment the following line to activate reproducibility test
 //#define REPRODUCE_TEST
 #endif
+#undef REPRODUCE_TEST
 
 #ifdef  REPRODUCE_TEST
 CPS_END_NAMESPACE
@@ -229,6 +232,7 @@ int DiracOp::InvCg(Vector *out,
 //   return
 // }
 //------------------------------------------------------------------
+  Float *in_f =  (Float *) sol;
   // Mmp = MatPcDagMatPc * sol
   MatPcDagMatPc(mmp, sol);
 
@@ -243,6 +247,7 @@ int DiracOp::InvCg(Vector *out,
 
   // res_norm_sq_cur = res * res
   res_norm_sq_cur = res->NormSqNode(f_size_cb);
+  //printf("res_norm_sq_cur=%e\n",res_norm_sq_cur);
   DiracOpGlbSum(&res_norm_sq_cur);
 
   // if( |res|^2 <= stp_cnd ) we are done
@@ -251,19 +256,23 @@ int DiracOp::InvCg(Vector *out,
   itr = 0;
   max_itr = dirac_arg->max_num_iter-1;
   if(res_norm_sq_cur <= stp_cnd) max_itr = 0;
+  //printf("max_itr=%d\n",max_itr);
 
 
 //------------------------------------------------------------------
 // Loop over CG iterations
 //------------------------------------------------------------------
   for(i=0; i < max_itr; i++){
+  //printf("i=%d\n",i);
 
     itr = itr + 1;
     res_norm_sq_prv = res_norm_sq_cur;
 
     // mmp = MatPcDagMatPc * dir
     // d = <dir, MatPcDagMatPc*dir>
+
     MatPcDagMatPc(mmp, dir, &d);
+    //printf("d=%e\n",d);
 
 #ifdef REPRODUCE_TEST 
 
@@ -279,6 +288,8 @@ int DiracOp::InvCg(Vector *out,
 
     // If d = 0 we are done
     if(d == 0.0) {
+      ERR.General(cname,fname,"d(%e) = 0.0!!\n",d);
+	exit(5);
       break;
       //??? or should we give a warning or error? Yes we should, really.
     }

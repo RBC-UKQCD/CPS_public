@@ -3,19 +3,102 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.8 2003-10-30 06:19:44 cwj Exp $
+  $Id: lattice.h,v 1.9 2004-01-13 20:38:57 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2003-10-30 06:19:44 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.8 2003-10-30 06:19:44 cwj Exp $
-//  $Id: lattice.h,v 1.8 2003-10-30 06:19:44 cwj Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:38:57 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.9 2004-01-13 20:38:57 chulwoo Exp $
+//  $Id: lattice.h,v 1.9 2004-01-13 20:38:57 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.8.2.1.2.3  2003/11/07 22:24:56  cwj
+//  *** empty log message ***
+//
+//  Revision 1.8.2.1.2.2  2003/11/07 19:17:06  cwj
+//  *** empty log message ***
+//
+//  Revision 1.8.2.1  2003/11/05 16:13:21  mike
+//  Initial attempt at producing working branch
+//
+//  Revision 1.2  2003/10/21 17:53:08  chulwoo
+//  added asqtad_KS
+//  changes for stagerred and asqtad action
+//
+//  Revision 1.1.1.1  2003/09/18 22:30:57  chulwoo
+//  Mike's files for single node QCDOC + Parallel transport
+//  I added some hacks for PARALLEL without MPI_SCU
+//  PARALLEL=2 set PARALLEL without MPI_SCU
+//
+//
+//  Revision 1.5  2003/09/03 21:41:22  mike
+//  Implemented dummy functions for Fnone and FWilsonTypes for prepForce and
+//  FMatEvlInv() to avoid abstract instances.
+//
+//  Revision 1.4  2003/08/29 20:43:59  mike
+//  Small bug fixes to RHMC related material.
+//
+//  Revision 1.3  2003/08/29 20:27:38  mike
+//  Added new function prepForce for use by RHMC to avoid storing Dslash psi for all
+//  evaluated poles simultaneusly.
+//
+//  Revision 1.2  2003/07/24 16:53:53  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
+//  Revision 1.9  2002/12/04 17:16:27  zs
+//  Merged the new 2^4 RNG into the code.
+//  This new RNG is implemented in the LatRanGen class.
+//  The following algorithm and utility classes are affected:
+//
+//  AlgEig                  Fdwf
+//  AlgGheatBath            Fstag
+//  AlgHmd                  GlobalJobParameter
+//  AlgNoise                Lattice
+//  AlgPbp                  Matrix
+//  AlgThreept              RandomGenerator
+//                          Vector
+//
+//  Revision 1.8  2002/03/11 22:27:10  anj
+//  This should now be the correct, fully merged code from our two versions. Anj
+//
+//  Revision 1.5.2.1  2002/03/08 16:36:49  anj
+//  Checking in the Columbia code branch on tag Columbia4_1_1_test-branch, to be
+//  merged with the UKQCD head branch shortly.  Anj
+//
+//  Revision 1.5  2001/11/08 14:39:38  anj
+//  A couple of monir portability tweaks.  Anj
+//
+//  Revision 1.4  2001/08/16 10:50:30  anj
+//  The float->Float changes in the previous version were unworkable on QCDSP.
+//  To allow type-flexibility, all references to "float" have been
+//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
+//  (where Float=rfloat), and on all other machines allows the use of
+//  double or float in all cases (i.e. for both Float and IFloat).  The I
+//  stands for Internal, as in "for internal use only". Anj
+//
+//  Revision 1.2  2001/06/19 18:13:17  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:16:09  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -47,9 +130,10 @@ CPS_END_NAMESPACE
 #include <alg/cg_arg.h>
 #include <alg/ghb_arg.h>
 #include <alg/eig_arg.h>
-#include <comms/scu_enum.h> 
+#ifdef PARALLEL
+#include <sysfunc.h>
+#endif
 CPS_START_NAMESPACE
-
 
 class LinkBuffer;
 
@@ -605,14 +689,22 @@ class Lattice
     virtual int FsiteOffsetChkb(const int *x) const = 0;
     //!< Gets the lattice site index for the odd-even (checkerboard) order.
     /*!<
-      This method converts a sites
-      cartesian coordinates into its lattice site index according to the
-      odd-even (checkerboard) order, as defined by the ::WILSON  ::StrOrdType.
+      When the fermion field is stored in the odd-even (checkerboard) order,
+      defined by ::StrOrdType = WILSON, this method converts a sites
+      cartesian coordinates into its lattice site index.
       \param x The cartesian lattice site coordinates.
       \return The lattice site index.
-      \warning  This method is not implemented in the Fdwf class.
     */
 
+    virtual int FsiteOffset(const int *x) const = 0;
+    //!< Gets the lattice site index for the canonical order.
+    /*!<
+      When the fermion field is stored in canonical order,
+      defined by StrOrdType = CANONICAL, this method converts a sites
+      cartesian coordinates into its lattice site index.
+      \param x The cartesian lattice site coordinates.
+      \return The lattice site index.
+    */
 
     virtual int ExactFlavors(void) = 0;
     //!<  The number of dynamical flavors.
@@ -692,7 +784,7 @@ class Lattice
 
     virtual int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 			 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm) = 0;
-    //!< The multiple-mass matrix inversion used in the molecular dynamics algorithms.
+    //!< The matrix inversion used in the molecular dynamics algorithms.
     /*!<
       Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
       where \a M is the (possibly odd-even preconditioned) fermionic matrix.
@@ -826,9 +918,6 @@ class Lattice
       The momentum is evolved for a single molecular dynamics timestep
       using the force from the fermion action.
       \param mom The momentum matrices on all links of the local lattice.
-      \param frm The \a X vector which appears in the equations of motion;
-      the solution of \f$M^\dagger MX=\phi \f$
-      \param mass A mass parameter
       \param step_size The molecular dynamics timestep used in the numerical
       integration.
       \post \a mom is assigned the value of the momentum after the molecular
@@ -862,16 +951,6 @@ class Lattice
       \param to The new order.
       \param from The current order.
     */
-
-    //! Gets the lattice site index for the canonical order.
-    /*!
-     This method converts a sites
-     cartesian coordinates into its lattice site index
-     according to the ::CANONICAL storage order.
-      \param x The cartesian lattice site coordinates.
-      \return The lattice site index.
-    */
-    virtual int FsiteOffset(const int *x) const = 0;
 
 
 // Bosonic action related pure virtual functions.
@@ -1382,56 +1461,210 @@ class Fnone : public virtual Lattice
 };
 
 
-
 //------------------------------------------------------------------
 //! A class containing methods relevant to all staggered fermion actions.
 //------------------------------------------------------------------
-class FstagTypes : public virtual Lattice{
-
-  private:
+class FstagTypes : public virtual Lattice
+{
+ private:
     char *cname;    // Class name.
-    int xv[3];
     
-  protected:
-
-    enum{
+ protected:
+	enum{
 	VECT_LEN=6,          //!< Number of floats in  a Vector
 	    MATRIX_SIZE=18,  //!< Number of floats in  a Matrix
 	    SITE_LEN=72      //!< Number of floats in four Matrix's
 	    };
     
-    int bc[4];	        //!< Boundary conditions
-    int e_vsize;	//!< Size of a single parity vector field
-    unsigned CBUF_MODE1;
-    unsigned CBUF_MODE2;
-    unsigned CBUF_MODE3;
-    unsigned CBUF_MODE4;
+
+ public:
+
+    FstagTypes(void);
+
+    virtual ~FstagTypes(void);
+};
+
+//------------------------------------------------------------------
+//! A class implementing staggered fermions.
+/*!
+  \ingroup factions
+*/
+//------------------------------------------------------------------
+class Fstag : public virtual FstagTypes
+{
+ private:
+    char *cname;    // Class name.
+
+    int e_vsize;	// even(odd) vector size
+    int xv[3];
 
     Vector *f_tmp;
 
-  public:
-
-    FstagTypes();
-
-    virtual ~FstagTypes();
-
-    virtual FclassType Fclass() = 0;
-
-    int FsiteOffsetChkb(const int*) const;
-	
-    int FsiteOffset(const int*) const;
-
-    int ExactFlavors();
-
-    int SpinComponents();
-
-    int FsiteSize();
-
-    int FchkbEvl();
-
-    void Fconvert(Vector*, StrOrdType, StrOrdType);
+    void getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const;
     
-    Float FhamiltonNode(Vector*, Vector*);
+ public:
+
+    Fstag(void);
+
+    virtual ~Fstag(void);
+
+    FclassType Fclass(void);
+        // It returns the type of fermion class
+
+    int FsiteOffsetChkb(const int *x) const
+        { return (x[3]>>1)+xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2] ; }
+        // Sets the offsets for the fermion fields on a 
+        // checkerboard. The fermion field storage order
+        // is not the canonical one but it is particular
+        // to the Staggered fermion type. x[i] is the 
+        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+
+    int FsiteOffset(const int *x) const;
+        // Sets the offsets for the fermion fields on a 
+        // checkerboard. The fermion field storage order
+        // is the canonical one. X[I] is the
+        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+
+    int ExactFlavors(void);
+        // Returns the number of exact flavors of the matrix that
+        // is inverted during a molecular dynamics evolution.
+
+    int SpinComponents(void);
+        // Returns the number of spin components.
+
+    int FsiteSize(void);
+        // Returns the number of fermion field 
+        // components (including real/imaginary) on a
+        // site of the 4-D lattice.
+
+    int FchkbEvl(void);
+	// returns 1 => The fermion fields in the evolution
+        //      or the CG that inverts the evolution matrix
+	//      are defined on a single checkerboard (half the 
+	//      lattice).
+
+    int FmatEvlInv(Vector *f_out, Vector *f_in, 
+		   CgArg *cg_arg, 
+		   Float *true_res,
+		   CnvFrmType cnv_frm = CNV_FRM_YES);
+        // It calculates f_out where A * f_out = f_in and
+        // A is the fermion matrix that appears in the HMC 
+        // evolution ([Dirac^dag Dirac]). The inversion is done
+	// with the conjugate gradient. cg_arg is the structure
+        // that contains all the control parameters, f_in is the
+        // fermion field source vector, f_out should be set to be
+        // the initial guess and on return is the solution.
+	// f_in and f_out are defined on a checkerboard.
+        // If true_res !=0 the value of the true residual is returned
+        // in true_res.
+        // *true_res = |src - MatPcDagMatPc * sol| / |src|
+	// The function returns the total number of CG iterations.
+
+    int FmatEvlInv(Vector *f_out, Vector *f_in, 
+		   CgArg *cg_arg, 
+		   CnvFrmType cnv_frm = CNV_FRM_YES);
+        // Same as original but with true_res=0;
+
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
+		 int Nshift, int isz, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm);
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The solution vectors.
+      \param f_in The source vector
+      \param shift The shifts of the fermion matrix.
+      \param Nshift The number of shifts
+      \param isz The smallest shift (required by MInvCG)
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field. Fields that are converted are restored to their original
+  order upon exit of this method. \e N.B. If the fields are already in the
+  suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
+
+    int FmatInv(Vector *f_out, Vector *f_in, 
+		CgArg *cg_arg, 
+		Float *true_res,
+		CnvFrmType cnv_frm = CNV_FRM_YES,
+		PreserveType prs_f_in = PRESERVE_YES);
+        // It calculates f_out where A * f_out = f_in and
+        // A is the fermion matrix (Dirac operator). The inversion
+	// is done with the conjugate gradient. cg_arg is the 
+        // structure that contains all the control parameters, f_in 
+        // is the fermion field source vector, f_out should be set 
+        // to be the initial guess and on return is the solution.
+	// f_in and f_out are defined on the whole lattice.
+        // If true_res !=0 the value of the true residual is returned
+        // in true_res.
+        // *true_res = |src - MatPcDagMatPc * sol| / |src|.
+        // cnv_frm is used to specify if f_in should be converted 
+        // from canonical to fermion order and f_out from fermion 
+        // to canonical. 
+        // prs_f_in is not used. The source f_in is always preserved.
+	// The function returns the total number of CG iterations.
+
+    int FmatInv(Vector *f_out, Vector *f_in, 
+		CgArg *cg_arg, 
+		CnvFrmType cnv_frm = CNV_FRM_YES,
+		PreserveType prs_f_in = PRESERVE_YES);
+        // Same as original but with true_res=0;
+
+    int FeigSolv(Vector **f_eigenv, Float lambda[], 
+		 Float chirality[], int valid_eig[],
+		 Float **hsum,
+		 EigArg *eig_arg,
+		 CnvFrmType cnv_frm = CNV_FRM_YES);
+        // It finds the eigenvectors and eigenvalues of A where
+        // A is the fermion matrix (Dirac operator). The solution
+	// uses Ritz minimization. eig_arg is the 
+        // structure that contains all the control parameters, f_eigenv
+        // are the fermion field source vectors which should be
+        // defined initially, lambda are the eigenvalues returned 
+        // on solution. f_eigenv is defined on the whole lattice.
+	// The function returns the total number of Ritz iterations.
+
+    void SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+			Float mass);
+	// It sets the pseudofermion field phi from frm1, frm2.
+
+    void FforceSite(Matrix& force, Vector *frm, 
+                            int *x, int mu);
+    //!< Calculates the pseudofermion force at site x and direction mu.
+        // It calculates the fermion force per site x
+        // and direction mu. frm is the fermion field that 
+        // resulted from the application of the inverter on 
+        // the pseudofermion field.
+
+    void EvolveMomFforce(Matrix *mom, Vector *frm, 
+			 Float mass, Float step_size);
+        // It evolves the canonical momentum mom by step_size
+        // using the fermion force.
+
+    void prepForce(Vector* out);
+
+    Float FhamiltonNode(Vector *phi, Vector *chi);
+        // The fermion Hamiltonian of the node sublattice.
+        // chi must be the solution of Cg with source phi.	       
+
+    void Fconvert(Vector *f_field,
+			  StrOrdType to,
+			  StrOrdType from);
+        // Convert fermion field f_field from -> to
+
+    Float BhamiltonNode(Vector *boson, Float mass);
+        // The boson Hamiltonian of the node sublattice.
+
+    void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm, int dir_flag);
 
 };
 
@@ -1441,53 +1674,163 @@ class FstagTypes : public virtual Lattice{
   \ingroup factions
 */
 //------------------------------------------------------------------
-class Fstag : public FstagTypes{
-    
-  private:
+class Fasqtad : public virtual FstagTypes
+{
+ private:
     char *cname;    // Class name.
+
+    int e_vsize;	// even(odd) vector size
+    int xv[3];
+    ChkbType parity(const int*);
+    void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
+//    void parallel_transport(Vector**, const SCUDir*, int, Vector**);
+    void parallel_transport(Vector**, const int*, int, Vector**);
+
+    Vector *f_tmp;
+
     void getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const;
     
-  public:
+ public:
 
-    Fstag();
-    virtual ~Fstag();
+    Fasqtad(void);
 
-    FclassType Fclass();
+    virtual ~Fasqtad(void);
+
+    FclassType Fclass(void);
+        // It returns the type of fermion class
+
+    int FsiteOffsetChkb(const int *x) const
+        { return (x[3]>>1)+xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2] ; }
+        // Sets the offsets for the fermion fields on a 
+        // checkerboard. The fermion field storage order
+        // is not the canonical one but it is particular
+        // to the Staggered fermion type. x[i] is the 
+        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+
+    int FsiteOffset(const int *x) const;
+        // Sets the offsets for the fermion fields on a 
+        // checkerboard. The fermion field storage order
+        // is the canonical one. X[I] is the
+        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+
+    int ExactFlavors(void);
+        // Returns the number of exact flavors of the matrix that
+        // is inverted during a molecular dynamics evolution.
+
+    int SpinComponents(void);
+        // Returns the number of spin components.
+
+    int FsiteSize(void);
+        // Returns the number of fermion field 
+        // components (including real/imaginary) on a
+        // site of the 4-D lattice.
+
+    int FchkbEvl(void);
+	// returns 1 => The fermion fields in the evolution
+        //      or the CG that inverts the evolution matrix
+	//      are defined on a single checkerboard (half the 
+	//      lattice).
+
     int FmatEvlInv(Vector *f_out, Vector *f_in, 
 		   CgArg *cg_arg, 
 		   Float *true_res,
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
+        // It calculates f_out where A * f_out = f_in and
+        // A is the fermion matrix that appears in the HMC 
+        // evolution ([Dirac^dag Dirac]). The inversion is done
+	// with the conjugate gradient. cg_arg is the structure
+        // that contains all the control parameters, f_in is the
+        // fermion field source vector, f_out should be set to be
+        // the initial guess and on return is the solution.
+	// f_in and f_out are defined on a checkerboard.
+        // If true_res !=0 the value of the true residual is returned
+        // in true_res.
+        // *true_res = |src - MatPcDagMatPc * sol| / |src|
+	// The function returns the total number of CG iterations.
 
     int FmatEvlInv(Vector *f_out, Vector *f_in, 
 		   CgArg *cg_arg, 
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
+        // Same as original but with true_res=0;
 
     int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 		 int Nshift, int isz, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm);
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The solution vectors.
+      \param f_in The source vector
+      \param shift The shifts of the fermion matrix.
+      \param Nshift The number of shifts
+      \param isz The smallest shift (required by MInvCG)
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field. Fields that are converted are restored to their original
+  order upon exit of this method. \e N.B. If the fields are already in the
+  suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
+        // It calculates f_out where A * f_out = f_in and
+        // A is the fermion matrix (Dirac operator). The inversion
+	// is done with the conjugate gradient. cg_arg is the 
+        // structure that contains all the control parameters, f_in 
+        // is the fermion field source vector, f_out should be set 
+        // to be the initial guess and on return is the solution.
+	// f_in and f_out are defined on the whole lattice.
+        // If true_res !=0 the value of the true residual is returned
+        // in true_res.
+        // *true_res = |src - MatPcDagMatPc * sol| / |src|.
+        // cnv_frm is used to specify if f_in should be converted 
+        // from canonical to fermion order and f_out from fermion 
+        // to canonical. 
+        // prs_f_in is not used. The source f_in is always preserved.
+	// The function returns the total number of CG iterations.
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
+        // Same as original but with true_res=0;
 
     int FeigSolv(Vector **f_eigenv, Float lambda[], 
 		 Float chirality[], int valid_eig[],
 		 Float **hsum,
 		 EigArg *eig_arg,
 		 CnvFrmType cnv_frm = CNV_FRM_YES);
+        // It finds the eigenvectors and eigenvalues of A where
+        // A is the fermion matrix (Dirac operator). The solution
+	// uses Ritz minimization. eig_arg is the 
+        // structure that contains all the control parameters, f_eigenv
+        // are the fermion field source vectors which should be
+        // defined initially, lambda are the eigenvalues returned 
+        // on solution. f_eigenv is defined on the whole lattice.
+	// The function returns the total number of Ritz iterations.
 
     void SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
-		Float mass);
+			Float mass);
+	// It sets the pseudofermion field phi from frm1, frm2.
 
     void FforceSite(Matrix& force, Vector *frm, 
-		    int *x, int mu);
+                            int *x, int mu);
+    //!< Calculates the pseudofermion force at site x and direction mu.
+        // It calculates the fermion force per site x
+        // and direction mu. frm is the fermion field that 
+        // resulted from the application of the inverter on 
+        // the pseudofermion field.
 
     void EvolveMomFforce(Matrix *mom, Vector *frm, 
 			 Float mass, Float step_size);
@@ -1496,85 +1839,24 @@ class Fstag : public FstagTypes{
 
     void prepForce(Vector* out);
 
+    Float FhamiltonNode(Vector *phi, Vector *chi);
+        // The fermion Hamiltonian of the node sublattice.
+        // chi must be the solution of Cg with source phi.	       
+
+    void Fconvert(Vector *f_field,
+			  StrOrdType to,
+			  StrOrdType from);
+        // Convert fermion field f_field from -> to
+
     Float BhamiltonNode(Vector *boson, Float mass);
+        // The boson Hamiltonian of the node sublattice.
 
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int dir_flag);
-    
 
-    
 };
 
 
-
-//------------------------------------------------------------------
-//! A class implementing improved staggered fermions (the asqtad action).
-/*!
-  \ingroup factions
-*/
-//------------------------------------------------------------------
-class Fasqtad : public FstagTypes{
-    
-  private:
-
-    char *cname;    // Class name.
-    ChkbType parity(const int*);
-    void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
-    void parallel_transport(Vector**, const SCUDir*, int, Vector**);
-    
-  public:
-
-    Fasqtad();
-    virtual ~Fasqtad();
-
-    FclassType Fclass();
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   Float *true_res,
-		   CnvFrmType cnv_frm = CNV_FRM_YES);
-
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   CnvFrmType cnv_frm = CNV_FRM_YES);
-
-    int FmatInv(Vector *f_out, Vector *f_in, 
-		CgArg *cg_arg, 
-		Float *true_res,
-		CnvFrmType cnv_frm = CNV_FRM_YES,
-		PreserveType prs_f_in = PRESERVE_YES);
-
-    int FmatInv(Vector *f_out, Vector *f_in, 
-		CgArg *cg_arg, 
-		CnvFrmType cnv_frm = CNV_FRM_YES,
-		PreserveType prs_f_in = PRESERVE_YES);
-
-    int FeigSolv(Vector **f_eigenv, Float lambda[], 
-		 Float chirality[], int valid_eig[],
-		 Float **hsum,
-		 EigArg *eig_arg,
-		 CnvFrmType cnv_frm = CNV_FRM_YES);
-
-    void SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
-		Float mass);
-
-    void FforceSite(Matrix& force, Vector *frm, 
-		    int *x, int mu);
-
-    void EvolveMomFforce(Matrix *mom, Vector *frm, 
-			 Float mass, Float step_size);
-
-    Float BhamiltonNode(Vector *boson, Float mass);
-
-    void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
-		 CnvFrmType cnv_frm, int dir_flag);
-    
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
-		    int Nshift, int isz, CgArg *cg_arg,
-		    CnvFrmType cnv_frm);
-
-    void prepForce(Vector* out);
-    
-};
 
 //------------------------------------------------------------------
 //! A class containing methods relevant to all Wilson type fermion actions.
@@ -2152,13 +2434,17 @@ class Fdwf : public virtual FwilsonTypes
 //! Trivial gauge action with no fermions
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GnoneFnone : public Gnone, public Fnone {
-  private:
+class GnoneFnone  
+    : public virtual Lattice, 
+    public Gnone, 
+    public Fnone
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GnoneFnone();
-    ~GnoneFnone();
+ public:
+    GnoneFnone(void);
+    virtual ~GnoneFnone(void);
 };
 
 
@@ -2166,13 +2452,36 @@ class GnoneFnone : public Gnone, public Fnone {
 //! Trivial gauge action with staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GnoneFstag : public Gnone, public Fstag {
-  private:
+class GnoneFasqtad 
+    : public virtual Lattice, 
+    public virtual FstagTypes, 
+    public Gnone, 
+    public Fasqtad
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GnoneFstag();
-    ~GnoneFstag();
+ public:
+    GnoneFasqtad(void);
+    virtual ~GnoneFasqtad(void);
+};
+
+//------------------------------------------------------------------
+//! Trivial gauge action with staggered fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GnoneFstag 
+    : public virtual Lattice, 
+    public virtual FstagTypes, 
+    public Gnone, 
+    public Fstag
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GnoneFstag(void);
+    virtual ~GnoneFstag(void);
 };
 
 
@@ -2180,13 +2489,18 @@ class GnoneFstag : public Gnone, public Fstag {
 //! Trivial gauge action with wilson fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GnoneFwilson : public Gnone, public Fwilson {
-  private:
+class GnoneFwilson 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gnone, 
+    public Fwilson
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GnoneFwilson();
-    ~GnoneFwilson();
+ public:
+    GnoneFwilson(void);
+    virtual ~GnoneFwilson(void);
 };
 
 
@@ -2194,13 +2508,18 @@ class GnoneFwilson : public Gnone, public Fwilson {
 //! Trivial gauge action with clover Wilson fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GnoneFclover : public Gnone, public Fclover {
-  private:
+class GnoneFclover 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gnone, 
+    public Fclover
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GnoneFclover();
-    ~GnoneFclover();
+ public:
+    GnoneFclover(void);
+    virtual ~GnoneFclover(void);
 };
 
 
@@ -2208,13 +2527,18 @@ class GnoneFclover : public Gnone, public Fclover {
 //! Trivial gauge action with domain wall fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GnoneFdwf : public Gnone, public Fdwf {
-  private:
+class GnoneFdwf 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gnone, 
+    public Fdwf
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GnoneFdwf();
-    ~GnoneFdwf();
+ public:
+    GnoneFdwf(void);
+    virtual ~GnoneFdwf(void);
 };
 
 
@@ -2222,13 +2546,17 @@ class GnoneFdwf : public Gnone, public Fdwf {
 //! Wilson gauge action with no fermions
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GwilsonFnone : public Gwilson, public Fnone {
-  private:
+class GwilsonFnone 
+    : public virtual Lattice, 
+    public Gwilson, 
+    public Fnone
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GwilsonFnone();
-    ~GwilsonFnone();
+ public:
+    GwilsonFnone(void);
+    virtual ~GwilsonFnone(void);
 };
 
 
@@ -2236,13 +2564,36 @@ class GwilsonFnone : public Gwilson, public Fnone {
 //! Wilson gauge action with staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GwilsonFstag : public Gwilson, public Fstag {
-  private:
+class GwilsonFstag 
+    : public virtual Lattice, 
+    public virtual FstagTypes, 
+    public Gwilson, 
+    public Fstag
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GwilsonFstag();
-    ~GwilsonFstag();
+ public:
+    GwilsonFstag(void);
+    virtual ~GwilsonFstag(void);
+};
+
+//------------------------------------------------------------------
+//! Wilson gauge action with staggered fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GwilsonFasqtad 
+    : public virtual Lattice, 
+    public virtual FstagTypes, 
+    public Gwilson, 
+    public Fasqtad
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GwilsonFasqtad(void);
+    virtual ~GwilsonFasqtad(void);
 };
 
 
@@ -2250,13 +2601,18 @@ class GwilsonFstag : public Gwilson, public Fstag {
 //! Wilson gauge action with wilson fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GwilsonFwilson : public Gwilson, public Fwilson {
-  private:
+class GwilsonFwilson 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gwilson, 
+    public Fwilson
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GwilsonFwilson();
-    ~GwilsonFwilson();
+ public:
+    GwilsonFwilson(void);
+    virtual ~GwilsonFwilson(void);
 };
 
 
@@ -2264,13 +2620,18 @@ class GwilsonFwilson : public Gwilson, public Fwilson {
 //! Wilson gauge action with clover Wilson fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GwilsonFclover : public Gwilson, public Fclover {
-  private:
+class GwilsonFclover 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gwilson, 
+    public Fclover
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GwilsonFclover();
-    ~GwilsonFclover();
+ public:
+    GwilsonFclover(void);
+    virtual ~GwilsonFclover(void);
 };
 
 
@@ -2278,13 +2639,18 @@ class GwilsonFclover : public Gwilson, public Fclover {
 //! Wilson gauge action with domain wall fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GwilsonFdwf : public Gwilson, public Fdwf {
-  private:
+class GwilsonFdwf 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gwilson, 
+    public Fdwf
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GwilsonFdwf();
-    ~GwilsonFdwf();
+ public:
+    GwilsonFdwf(void);
+    virtual ~GwilsonFdwf(void);
 };
 
 
@@ -2292,13 +2658,17 @@ class GwilsonFdwf : public Gwilson, public Fdwf {
 //! Power plaquette gauge action with no fermions
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerPlaqFnone : public GpowerPlaq, public Fnone {
-  private:
+class GpowerPlaqFnone 
+    : public virtual Lattice, 
+    public GpowerPlaq, 
+    public Fnone
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GpowerPlaqFnone();
-    ~GpowerPlaqFnone();
+ public:
+    GpowerPlaqFnone(void);
+    virtual ~GpowerPlaqFnone(void);
 };
 
 
@@ -2306,13 +2676,18 @@ class GpowerPlaqFnone : public GpowerPlaq, public Fnone {
 //! Power plaquette gauge action with staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerPlaqFstag : public GpowerPlaq, public Fstag {
-  private:
+class GpowerPlaqFstag 
+    : public virtual Lattice, 
+    public virtual FstagTypes, 
+    public GpowerPlaq, 
+    public Fstag
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GpowerPlaqFstag();
-    ~GpowerPlaqFstag();
+ public:
+    GpowerPlaqFstag(void);
+    virtual ~GpowerPlaqFstag(void);
 };
 
 
@@ -2320,13 +2695,17 @@ class GpowerPlaqFstag : public GpowerPlaq, public Fstag {
 //! Power plaquette gauge action with Wilson fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerPlaqFwilson : public GpowerPlaq, public Fwilson {
-  private:
+class GpowerPlaqFwilson 
+    : public virtual Lattice, 
+    public GpowerPlaq, 
+    public Fwilson
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GpowerPlaqFwilson();
-    ~GpowerPlaqFwilson();
+ public:
+    GpowerPlaqFwilson(void);
+    virtual ~GpowerPlaqFwilson(void);
 };
 
 
@@ -2334,13 +2713,17 @@ class GpowerPlaqFwilson : public GpowerPlaq, public Fwilson {
 //! Power plaquette gauge action with clover PowerPlaq fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerPlaqFclover : public GpowerPlaq, public Fclover{
-  private:
+class GpowerPlaqFclover 
+    : public virtual Lattice, 
+    public GpowerPlaq, 
+    public Fclover
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GpowerPlaqFclover();
-    ~GpowerPlaqFclover();
+ public:
+    GpowerPlaqFclover(void);
+    virtual ~GpowerPlaqFclover(void);
 };
 
 
@@ -2348,13 +2731,17 @@ class GpowerPlaqFclover : public GpowerPlaq, public Fclover{
 //! Power plaquette gauge action with domain wall fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerPlaqFdwf : public GpowerPlaq, public Fdwf {
-  private:
+class GpowerPlaqFdwf 
+    : public virtual Lattice, 
+    public GpowerPlaq, 
+    public Fdwf
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GpowerPlaqFdwf();
-    ~GpowerPlaqFdwf();
+ public:
+    GpowerPlaqFdwf(void);
+    virtual ~GpowerPlaqFdwf(void);
 };
 
 
@@ -2362,13 +2749,17 @@ class GpowerPlaqFdwf : public GpowerPlaq, public Fdwf {
 //! Improved rectangle gauge action with no fermions
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprRectFnone : public GimprRect, public Fnone {
-  private:
+class GimprRectFnone
+    : public virtual Lattice,
+    public GimprRect,
+    public Fnone
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GimprRectFnone();
-    ~GimprRectFnone();
+ public:
+    GimprRectFnone(void);
+    virtual ~GimprRectFnone(void);
 };
 
 
@@ -2376,13 +2767,18 @@ class GimprRectFnone : public GimprRect, public Fnone {
 //! Improved rectangle gauge action with staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprRectFstag : public GimprRect, public Fstag {
-  private:
+class GimprRectFstag
+    : public virtual Lattice,
+    public virtual FstagTypes,
+    public GimprRect,
+    public Fstag
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GimprRectFstag();
-    ~GimprRectFstag();
+ public:
+    GimprRectFstag(void);
+    virtual ~GimprRectFstag(void);
 };
 
 
@@ -2390,13 +2786,18 @@ class GimprRectFstag : public GimprRect, public Fstag {
 //! Improved rectangle gauge action with wilson fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprRectFwilson : public GimprRect, public Fwilson {
-  private:
+class GimprRectFwilson
+    : public virtual Lattice,
+    public virtual FwilsonTypes,
+    public GimprRect,
+    public Fwilson
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GimprRectFwilson();
-    ~GimprRectFwilson();
+ public:
+    GimprRectFwilson(void);
+    virtual ~GimprRectFwilson(void);
 };
 
 
@@ -2404,13 +2805,18 @@ class GimprRectFwilson : public GimprRect, public Fwilson {
 //! Improved rectangle gauge action with clover Wilson fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprRectFclover : public GimprRect, public Fclover {
-  private:
+class GimprRectFclover
+    : public virtual Lattice,
+    public virtual FwilsonTypes,
+    public GimprRect,
+    public Fclover
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GimprRectFclover();
-    ~GimprRectFclover();
+ public:
+    GimprRectFclover(void);
+    virtual ~GimprRectFclover(void);
 };
 
 
@@ -2418,13 +2824,18 @@ class GimprRectFclover : public GimprRect, public Fclover {
 //! Improved rectangle gauge action with domain wall fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprRectFdwf : public GimprRect, public Fdwf {
-  private:
+class GimprRectFdwf
+    : public virtual Lattice,
+    public virtual FwilsonTypes,
+    public GimprRect,
+    public Fdwf
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GimprRectFdwf();
-    ~GimprRectFdwf();
+ public:
+    GimprRectFdwf(void);
+    virtual ~GimprRectFdwf(void);
 };
 
 
@@ -2432,13 +2843,17 @@ class GimprRectFdwf : public GimprRect, public Fdwf {
 //! Power rectangle gauge action with no fermions
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerRectFnone : public GpowerRect, public Fnone {
-  private:
+class GpowerRectFnone 
+    : public virtual Lattice, 
+    public GpowerRect, 
+    public Fnone
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GpowerRectFnone();
-    ~GpowerRectFnone();
+ public:
+    GpowerRectFnone(void);
+    virtual ~GpowerRectFnone(void);
 };
 
 
@@ -2446,13 +2861,18 @@ class GpowerRectFnone : public GpowerRect, public Fnone {
 //! Power rectangle gauge action with staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerRectFstag : public GpowerRect, public Fstag {
-  private:
+class GpowerRectFstag 
+    : public virtual Lattice, 
+    public virtual FstagTypes, 
+    public GpowerRect, 
+    public Fstag
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GpowerRectFstag();
-    ~GpowerRectFstag();
+ public:
+    GpowerRectFstag(void);
+    virtual ~GpowerRectFstag(void);
 };
 
 
@@ -2460,13 +2880,17 @@ class GpowerRectFstag : public GpowerRect, public Fstag {
 //! Power rectangle gauge action with powerRect fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerRectFwilson : public GpowerRect, public Fwilson {
-  private:
+class GpowerRectFwilson 
+    : public virtual Lattice, 
+    public GpowerRect, 
+    public Fwilson
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GpowerRectFwilson();
-    ~GpowerRectFwilson();
+ public:
+    GpowerRectFwilson(void);
+    virtual ~GpowerRectFwilson(void);
 };
 
 
@@ -2474,13 +2898,17 @@ class GpowerRectFwilson : public GpowerRect, public Fwilson {
 //! Power rectangle gauge action with clover PowerRect fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerRectFclover : public GpowerRect, public Fclover {
-  private:
+class GpowerRectFclover 
+    : public virtual Lattice, 
+    public GpowerRect, 
+    public Fclover
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GpowerRectFclover();
-    ~GpowerRectFclover();
+ public:
+    GpowerRectFclover(void);
+    virtual ~GpowerRectFclover(void);
 };
 
 
@@ -2488,26 +2916,34 @@ class GpowerRectFclover : public GpowerRect, public Fclover {
 //! Power rectangle gauge action with domain wall fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerRectFdwf : public GpowerRect, public Fdwf {
-  private:
+class GpowerRectFdwf 
+    : public virtual Lattice, 
+    public GpowerRect, 
+    public Fdwf
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GpowerRectFdwf();
-    ~GpowerRectFdwf();
+ public:
+    GpowerRectFdwf(void);
+    virtual ~GpowerRectFdwf(void);
 };
 
 //------------------------------------------------------------------
 //! One Loop Symanzik improved gauge action with no fermions
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprOLSymFnone : public GimprOLSym, public Fnone {
-  private:
+class GimprOLSymFnone
+    : public virtual Lattice,
+    public GimprOLSym,
+    public Fnone
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GimprOLSymFnone();
-    ~GimprOLSymFnone();
+ public:
+    GimprOLSymFnone(void);
+    virtual ~GimprOLSymFnone(void);
 };
 
 
@@ -2515,13 +2951,18 @@ class GimprOLSymFnone : public GimprOLSym, public Fnone {
 //! One Loop Symanzik improved gauge action with staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprOLSymFstag : public GimprOLSym, public Fstag {
-  private:
+class GimprOLSymFstag
+    : public virtual Lattice,
+    public virtual FstagTypes,
+    public GimprOLSym,
+    public Fstag
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GimprOLSymFstag();
-    ~GimprOLSymFstag();
+ public:
+    GimprOLSymFstag(void);
+    virtual ~GimprOLSymFstag(void);
 };
 
 
@@ -2529,13 +2970,18 @@ class GimprOLSymFstag : public GimprOLSym, public Fstag {
 //! One Loop Symanzik improved gauge action with wilson fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprOLSymFwilson : public GimprOLSym, public Fwilson {
-  private:
+class GimprOLSymFwilson
+    : public virtual Lattice,
+    public virtual FwilsonTypes,
+    public GimprOLSym,
+    public Fwilson
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GimprOLSymFwilson();
-    ~GimprOLSymFwilson();
+ public:
+    GimprOLSymFwilson(void);
+    virtual ~GimprOLSymFwilson(void);
 };
 
 
@@ -2543,13 +2989,18 @@ class GimprOLSymFwilson : public GimprOLSym, public Fwilson {
 //! One Loop Symanzik improved gauge action with clover Wilson fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprOLSymFclover : public GimprOLSym, public Fclover{
-  private:
+class GimprOLSymFclover
+    : public virtual Lattice,
+    public virtual FwilsonTypes,
+    public GimprOLSym,
+    public Fclover
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GimprOLSymFclover();
-    ~GimprOLSymFclover();
+ public:
+    GimprOLSymFclover(void);
+    virtual ~GimprOLSymFclover(void);
 };
 
 
@@ -2557,40 +3008,18 @@ class GimprOLSymFclover : public GimprOLSym, public Fclover{
 //! One Loop Symanzik improved gauge action with domain wall fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprOLSymFdwf : public GimprOLSym, public Fdwf {
-  private:
+class GimprOLSymFdwf
+    : public virtual Lattice,
+    public virtual FwilsonTypes,
+    public GimprOLSym,
+    public Fdwf
+{
+ private:
     char *cname;    // Class name.
 
-  public:
-    GimprOLSymFdwf();
-    ~GimprOLSymFdwf();
-};
-
-
-//------------------------------------------------------------------
-//! Trivial gauge action with Asqtad staggered fermion action
-/*! \ingroup latactions */
-//------------------------------------------------------------------
-class GnoneFasqtad : public Gnone, public Fasqtad {
-  private:
-    char *cname;    // Class name.
-
-  public:
-    GnoneFasqtad();
-    ~GnoneFasqtad();
-};
-
-//------------------------------------------------------------------
-//! Wilson gauge action with Asqtad staggered fermion action
-/*! \ingroup latactions */
-//------------------------------------------------------------------
-class GwilsonFasqtad : public Gwilson, public Fasqtad {
-  private:
-    char *cname;    // Class name.
-
-  public:
-    GwilsonFasqtad();
-    ~GwilsonFasqtad();
+ public:
+    GimprOLSymFdwf(void);
+    virtual ~GimprOLSymFdwf(void);
 };
 
 //------------------------------------------------------------------
@@ -2647,7 +3076,6 @@ class GimprOLSymFasqtad : public GimprOLSym, public Fasqtad{
     GimprOLSymFasqtad();
     ~GimprOLSymFasqtad();
 };
-
 
 
 #endif

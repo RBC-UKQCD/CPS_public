@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of methods converting between different data layouts.
 
-  $Id: convert.C,v 1.3 2003-10-23 13:38:59 zs Exp $
+  $Id: convert.C,v 1.4 2004-01-13 20:39:49 chulwoo Exp $
   
   \todo Why not make these (and other) methods of FWilsonTypes and FstagTypes
   to avoid reimplementing them for each fermion class?
@@ -11,19 +11,15 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-10-23 13:38:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v 1.3 2003-10-23 13:38:59 zs Exp $
-//  $Id: convert.C,v 1.3 2003-10-23 13:38:59 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v 1.4 2004-01-13 20:39:49 chulwoo Exp $
+//  $Id: convert.C,v 1.4 2004-01-13 20:39:49 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.2.6.2  2003/08/20 15:42:58  zs
-//  Added some Aqstad stuff; the class f_stagAsqtad is just a clone of f_stag
-//  at this time.
-//
-//  Revision 1.2.6.1  2003/08/20 14:39:43  zs
-//  Moved some methods from Fstag to FtagTypes
+//  Revision 1.3.2.1  2003/11/05 16:32:16  mike
+//  Attempting to create new working branch!
 //
 //  Revision 1.2  2003/07/24 16:53:54  zs
 //  Addition of documentation via doxygen:
@@ -71,7 +67,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: convert.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v $
 //  $State: Exp $
 //
@@ -500,7 +496,7 @@ void Fwilson::Fconvert(Vector *f_field,StrOrdType to,StrOrdType from)
   \param from The current order; either CANONICAL or STAG.
 */
 //------------------------------------------------------------------
-void FstagTypes::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
+void Fstag::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
 {
   VRB.Func(cname,fname_fconvert);
 
@@ -548,6 +544,58 @@ void FstagTypes::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 
 
 
+//------------------------------------------------------------------
+//! Converts the field layout between the canonical and the odd-even order..
+/*!
+  \param f_field The fermionic field to be converted.
+  \param to The new order; either CANONICAL or STAG.
+  \param from The current order; either CANONICAL or STAG.
+*/
+//------------------------------------------------------------------
+void Fasqtad::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
+{
+  VRB.Func(cname,fname_fconvert);
+
+        CAS     cas ;
+
+        cas.lx          = GJP.XnodeSites() ;
+        cas.ly          = GJP.YnodeSites() ;
+        cas.lz          = GJP.ZnodeSites() ;
+        cas.lt          = GJP.TnodeSites() ;
+        cas.nc          = Colors() ;
+        cas.ns          = SpinComponents() ;
+        cas.site_size   = FsiteSize() ;
+        cas.start_ptr   = (Float *) f_field ;
+        cas.vol         = GJP.VolNodeSites() ;
+
+        if (from == to) {
+                VRB.Flow(cname,fname_fconvert,
+                        "No conversion necessary from %d to %d\n",
+                        int(from), int(to));
+                return ;
+        }
+
+        if ((from == CANONICAL) && (to == STAG)) {
+
+          VRB.Flow(cname,fname_fconvert, converting_str,
+                   int(from), int(to));
+          FcanonToStag(&cas) ;
+
+        } else if ((from == STAG) && (to == CANONICAL)) {
+
+          VRB.Flow(cname,fname_fconvert, converting_str,
+                   int(from), int(to));
+
+          FstagToCanon(&cas) ;
+
+        } else {
+                ERR.General(cname,fname_fconvert,
+                        "Unsupported fermion conversion from %d to %d\n",
+                        int(from), int(to)) ;
+        }
+
+        return ;
+}
 
 
 

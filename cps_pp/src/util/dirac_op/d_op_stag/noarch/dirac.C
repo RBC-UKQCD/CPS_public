@@ -3,18 +3,32 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routines used internally in the DiracOpStag class.
 
-  $Id: dirac.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: dirac.C,v 1.3 2004-01-13 20:39:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/dirac.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: dirac.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/dirac.C,v 1.3 2004-01-13 20:39:36 chulwoo Exp $
+//  $Id: dirac.C,v 1.3 2004-01-13 20:39:36 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.10.1  2003/11/06 20:22:21  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:05:05  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.4  2001/08/16 10:50:19  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -39,7 +53,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: dirac.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/dirac.C,v $
 //  $State: Exp $
 //
@@ -81,7 +95,7 @@ static const Matrix* curU_p;
 //-------------------------------------------------------------------
 //  initialize dirac
 //-------------------------------------------------------------------
-void dirac_init(const void * gauge_field_addr)
+extern "C" void stag_dirac_init(const void * gauge_field_addr)
 {
     //-----------------------------------------------------------
     //  nx[4]
@@ -135,7 +149,7 @@ inline int x_offset(const int *x)
 //------------------------------------------------------------------
 
 extern "C"
-void dirac(IFloat* b, IFloat* a, int a_odd, int add_flag, int dir_flag)
+void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag, int dir_flag)
 {
   int x[4], nu=GJP.XiDir();
   const Matrix *uoff;
@@ -231,7 +245,7 @@ void dirac(IFloat* b, IFloat* a, int a_odd, int add_flag, int dir_flag)
 
 
 
-void destroy_dirac_buf()
+extern "C" void stag_destroy_dirac_buf()
 {
 // do nothing
 }

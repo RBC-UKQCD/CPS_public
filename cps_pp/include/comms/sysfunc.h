@@ -1,6 +1,7 @@
 #include<config.h>
 
-#if defined TARGET_QCDSP
+// If not MPI then must be either QCDOC or QCDSP
+#ifndef TARGET_MPI
 #include <sysfunc.h>
 #else
 
@@ -9,7 +10,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations for the MPI implementation of the QCDSP/QCDOC communications  layer.
   
-  $Id: sysfunc.h,v 1.4 2003-10-31 14:15:33 zs Exp $
+  $Id: sysfunc.h,v 1.5 2004-01-13 20:38:56 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   The Sysfunc Comms Interface: sysfunc.h
@@ -21,14 +22,14 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: zs $
-  $Date: 2003-10-31 14:15:33 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v 1.4 2003-10-31 14:15:33 zs Exp $
-  $Id: sysfunc.h,v 1.4 2003-10-31 14:15:33 zs Exp $
+  $Author: chulwoo $
+  $Date: 2004-01-13 20:38:56 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v 1.5 2004-01-13 20:38:56 chulwoo Exp $
+  $Id: sysfunc.h,v 1.5 2004-01-13 20:38:56 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.h,v $
-  $Revision: 1.4 $
+  $Revision: 1.5 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/

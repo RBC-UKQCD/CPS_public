@@ -3,18 +3,29 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStag class methods.
 
-  $Id: d_op_stag.C,v 1.3 2003-08-29 21:00:24 mike Exp $
+  $Id: d_op_stag.C,v 1.4 2004-01-13 20:39:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mike $
-//  $Date: 2003-08-29 21:00:24 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.3 2003-08-29 21:00:24 mike Exp $
-//  $Id: d_op_stag.C,v 1.3 2003-08-29 21:00:24 mike Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.4 2004-01-13 20:39:36 chulwoo Exp $
+//  $Id: d_op_stag.C,v 1.4 2004-01-13 20:39:36 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3.2.1.2.1  2003/11/06 20:22:21  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:05:05  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.3  2003/08/29 21:00:24  mike
+//  Removed specific MatMInv function as not needed.
+//
 //  Revision 1.2  2003/07/24 16:53:54  zs
 //  Addition of documentation via doxygen:
 //  doxygen-parsable comment blocks added to many source files;
@@ -52,7 +63,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: d_op_stag.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v $
 //  $State: Exp $
 //
@@ -215,8 +226,8 @@ void DiracOpStag::MatPcDagMatPc(Vector *out,
   setCbufCntrlReg(3, CBUF_MODE3);
   setCbufCntrlReg(4, CBUF_MODE4);
 
-  dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
-  dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
+  stag_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
+  stag_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
   out->FTimesV1MinusV2(mass_sq, in, out, f_size_cb);
 
   if( dot_prd !=0 ){
@@ -242,7 +253,7 @@ void DiracOpStag::Dslash(Vector *out,
   setCbufCntrlReg(3, CBUF_MODE3);
   setCbufCntrlReg(4, CBUF_MODE4);
 
-  dirac((IFloat *)out, 
+  stag_dirac((IFloat *)out, 
 	(IFloat *)in, 
 	int(cb),
 	int(dag));
@@ -287,7 +298,7 @@ void DiracOpStag::Dslash(Vector *out,
   setCbufCntrlReg(3, CBUF_MODE3);
   setCbufCntrlReg(4, CBUF_MODE4);
 
-  dirac((IFloat *)out, 
+  stag_dirac((IFloat *)out, 
 	(IFloat *)in, 
 	int(cb),
 	int(dag),
@@ -332,7 +343,7 @@ int DiracOpStag::MatInv(Vector *out,
 	      tmp, f_size_cb * sizeof(Float));
 
   // tmp = (2m - D)k
-  dirac((IFloat *)tmp, k_o, 1, 0);
+  stag_dirac((IFloat *)tmp, k_o, 1, 0);
   fTimesV1MinusV2((IFloat *)tmp, 2.*mass_rs, k_e,
   	(IFloat *)tmp, f_size_cb);
 
@@ -343,7 +354,7 @@ int DiracOpStag::MatInv(Vector *out,
   IFloat *x_e = (IFloat *)out;
   IFloat *x_o = x_e+f_size_cb;
   moveMem(x_o, k_o, f_size_cb*sizeof(Float) / sizeof(char));
-  dirac((IFloat *)tmp, x_e, 0, 0);
+  stag_dirac((IFloat *)tmp, x_e, 0, 0);
   vecMinusEquVec(x_o, (IFloat *)tmp, f_size_cb);
   vecTimesEquFloat(x_o, 0.5/mass_rs, f_size_cb);
 

@@ -1,0 +1,55 @@
+#
+#   This is the makefile for all the commands
+#   that are common to this computer.
+#
+#
+#
+#
+
+
+# This should point at the top level directory for the 
+# cps code.
+TOP=../../../../
+
+CC = powerpc-gnu-elf-gcc
+CXX = powerpc-gnu-elf-g++
+LD = powerpc-gnu-elf-ld
+AR = powerpc-gnu-elf-ar
+TOPDIR=$(QOS)
+CXXFLAGS=-O3 -I$(TOPDIR)/quser/include/ -fno-exceptions -fno-hosted
+LDFLAGS = -lm @LDFLAGS@
+
+COMPILER = env GCC_EXEC_PREFIX=$(QOS)/quser/gcc-lib-user//// $(CXX) $(CXXFLAGS)
+
+#
+# include list for the Columbia code
+#
+BUILDDIR=@enable_installdir@
+SRCDIR=@topwd_srcdir@
+INCLIST = -I$(BUILDDIR) -I$(SRCDIR)/include
+
+
+#
+# Libraries for the Columbia code
+#
+# (These are for the scalar version of the code)
+#
+#
+
+
+LIBLIST = $(BUILDDIR)/cps.a 
+
+
+#
+#  flags for the expat xml parser
+#
+TOPEXPAT=$(TOPINC)
+
+#
+#  Include flags for the perl code
+#
+
+
+INCLIST_PERL = -I../../physics_perl -I../..//assert_perl
+
+

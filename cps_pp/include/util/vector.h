@@ -5,18 +5,21 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.3 2003-09-23 16:47:14 zs Exp $
+  $Id: vector.h,v 1.4 2004-01-13 20:38:57 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-09-23 16:47:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.3 2003-09-23 16:47:14 zs Exp $
-//  $Id: vector.h,v 1.3 2003-09-23 16:47:14 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:38:57 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.4 2004-01-13 20:38:57 chulwoo Exp $
+//  $Id: vector.h,v 1.4 2004-01-13 20:38:57 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3.2.1  2003/11/05 16:13:21  mike
+//  Initial attempt at producing working branch
+//
 //  Revision 1.2  2003/07/24 16:53:53  zs
 //  Addition of documentation via doxygen:
 //  doxygen-parsable comment blocks added to many source files;
@@ -60,7 +63,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -295,7 +298,7 @@ class Matrix
     //! Not what you might think.
     void TrLessAntiHermMatrix(const Matrix& this_dag);
 
-    //! Assignment to twice the tensor product of vectors.
+    //! Assignment to tensor product of vectors.
     void Cross2(const Vector& v1, const Vector& v2);
 
     //! Assignment to an traceless antihermitian matrix.

@@ -3,18 +3,27 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: convert_func.C,v 1.3 2004-01-13 20:39:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: convert_func.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.3 2004-01-13 20:39:49 chulwoo Exp $
+//  $Id: convert_func.C,v 1.3 2004-01-13 20:39:49 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.10.1  2003/12/11 20:22:53  cwj
+//  *** empty log message ***
+//
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.5  2002/12/04 17:16:27  zs
 //  Merged the new 2^4 RNG into the code.
 //  This new RNG is implemented in the LatRanGen class.
@@ -52,7 +61,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -130,11 +139,19 @@ void MultStagPhases(CAP cap)
 		site = cap->start_ptr +
 			cap->site_size*(x+cap->lx*(y+cap->ly*(z+cap->lz*t)));
 
+#ifndef MILC_PAHSE
 		if (x%2) negate_link(link_size, (IFloat *)site+link_size);
 
 		if ((x+y)%2) negate_link(link_size, (IFloat *)site+(link_size<<1));
 
 		if ((x+y+z)%2) negate_link(link_size, (IFloat *)site+3*link_size) ;
+#else
+		if (t%2) negate_link(link_size, (IFloat *)site);
+
+		if ((t+x)%2) negate_link(link_size, (IFloat *)site+link_size);
+
+		if ((t+x+y)%2) negate_link(link_size, (IFloat *)site+2*link_size) ;
+#endif
 
 	}
 }

@@ -3,13 +3,27 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac_init.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: dirac_init.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:37 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac_init.C,v 1.2 2004-01-13 20:39:37 chulwoo Exp $
+//  $Id: dirac_init.C,v 1.2 2004-01-13 20:39:37 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1.10.1  2003/11/06 20:22:21  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:05:05  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.1.1.1  2003/06/22 13:34:46  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.4  2001/08/16 10:50:20  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -34,7 +48,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: dirac_init.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac_init.C,v $
 //  $State: Exp $
 //
@@ -48,7 +62,7 @@ CPS_START_NAMESPACE
 
 	Modified by Chulwoo Jung 12/19/96
 
-	void dirac_init()
+	void stag_dirac_init()
 	This version includes the serial communication.
 
     local U storage order:	x,y,z,t
@@ -170,7 +184,7 @@ int scratch_addr = CRAM_SCRATCH_ADDR;
 
 
 
-void destroy_dirac_buf()
+void stag_destroy_dirac_buf()
 {
     sfree(p_rec_buf);
     sfree(p_send_buf);
@@ -182,8 +196,8 @@ void destroy_dirac_buf()
     sfree(e_tab.udagx);
     sfree(o_tab.udagx);
 }
-
-void dirac_init(const void * gauge_field_addr)
+extern "C"
+void stag_dirac_init(const void * gauge_field_addr)
 {
   int x,y,z,t;
   int base_even;

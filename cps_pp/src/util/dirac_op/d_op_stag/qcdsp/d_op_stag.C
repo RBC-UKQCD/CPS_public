@@ -3,13 +3,27 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/d_op_stag.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: d_op_stag.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:37 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/d_op_stag.C,v 1.2 2004-01-13 20:39:37 chulwoo Exp $
+//  $Id: d_op_stag.C,v 1.2 2004-01-13 20:39:37 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1.10.1  2003/11/06 20:22:21  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:05:05  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.1.1.1  2003/06/22 13:34:46  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.7  2002/03/11 22:27:06  anj
 //  This should now be the correct, fully merged code from our two versions. Anj
 //
@@ -41,7 +55,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: d_op_stag.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/d_op_stag.C,v $
 //  $State: Exp $
 //
@@ -77,7 +91,6 @@ const unsigned CBUF_MODE2 = 0xcca52112;
 const unsigned CBUF_MODE3 = 0xc98c6106;
 const unsigned CBUF_MODE4 = 0xcca52112;
 */
-extern void dirac_init_g(void);
 
 //------------------------------------------------------------------
 // Constructor
@@ -113,7 +126,7 @@ DiracOpStag::DiracOpStag(Lattice & latt,
   // Assume that only one DiracStagOp instance exists at any time,
   // otherwise we need a static data member to check initializtions
   //----------------------------------------------------------------
-  dirac_init_g();
+  stag_dirac_init_g();
 
   //----------------------------------------------------------------
   // Set the node checkerboard size of the fermion field
@@ -206,8 +219,8 @@ void DiracOpStag::MatPcDagMatPc(Vector *out,
   setCbufCntrlReg(3, CBUF_MODE3);
   setCbufCntrlReg(4, CBUF_MODE4);
    SUI */ 
-  dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
-  dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
+  stag_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
+  stag_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
   out->FTimesV1MinusV2(mass_sq, in, out, f_size_cb);
 
   if( dot_prd !=0 ){
@@ -233,7 +246,7 @@ void DiracOpStag::Dslash(Vector *out,
   setCbufCntrlReg(3, CBUF_MODE3);
   setCbufCntrlReg(4, CBUF_MODE4);
    SUI */
-  dirac((IFloat *)out, 
+  stag_dirac((IFloat *)out, 
 	(IFloat *)in, 
 	int(cb),
 	int(dag));
@@ -424,7 +437,7 @@ int DiracOpStag::MatInv(Vector *out,
 
   // tmp = (2m - D)k
 
-  dirac((IFloat *)tmp, k_o, 1, 0);
+  stag_dirac((IFloat *)tmp, k_o, 1, 0);
   fTimesV1MinusV2((IFloat *)tmp, 2.*mass_rs, k_e,
   	(IFloat *)tmp, f_size_cb);
 
@@ -434,7 +447,7 @@ int DiracOpStag::MatInv(Vector *out,
   IFloat *x_e = (IFloat *)out;
   IFloat *x_o = x_e+f_size_cb;
   moveMem(x_o, k_o, f_size_cb*sizeof(Float) / sizeof(char));
-  dirac((IFloat *)tmp, x_e, 0, 0);
+  stag_dirac((IFloat *)tmp, x_e, 0, 0);
   vecMinusEquVec(x_o, (IFloat *)tmp, f_size_cb);
   vecTimesEquFloat(x_o, 0.5/mass_rs, f_size_cb);
 

@@ -3,13 +3,27 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot/alg_pot.C,v 1.2 2003-07-24 16:53:53 zs Exp $
-//  $Id: alg_pot.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot/alg_pot.C,v 1.3 2004-01-13 20:39:00 chulwoo Exp $
+//  $Id: alg_pot.C,v 1.3 2004-01-13 20:39:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.10.1  2003/11/06 00:15:41  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:04:58  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.2  2003/07/24 16:53:53  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.5  2002/03/11 22:25:41  anj
 //  This should now be the correct, fully merged code from our two versions. Anj
 //
@@ -33,7 +47,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_pot.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot/alg_pot.C,v $
 //  $State: Exp $
 //

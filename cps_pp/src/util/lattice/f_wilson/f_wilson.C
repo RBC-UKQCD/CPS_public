@@ -1,20 +1,30 @@
 #include<config.h>
+#include<stdio.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: f_wilson.C,v 1.3 2004-01-13 20:39:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: f_wilson.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:50 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v 1.3 2004-01-13 20:39:50 chulwoo Exp $
+//  $Id: f_wilson.C,v 1.3 2004-01-13 20:39:50 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.10.1  2003/12/11 20:22:53  cwj
+//  *** empty log message ***
+//
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.4  2001/08/16 10:50:35  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -39,7 +49,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: f_wilson.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v $
 //  $State: Exp $
 //
@@ -96,6 +106,7 @@ Fwilson::Fwilson()
   //----------------------------------------------------------------
   static Wilson wilson_struct;
   f_dirac_op_init_ptr = &wilson_struct;
+  printf("f_dirac_op_init_ptr=%p\n",f_dirac_op_init_ptr);
   wilson_init((Wilson *) f_dirac_op_init_ptr);
 }
 

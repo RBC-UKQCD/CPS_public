@@ -1,21 +1,39 @@
 #include<config.h>
+#include<stdlib.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: alg_hmd_r.C,v 1.3 2004-01-13 20:38:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.2 2003-07-24 16:53:53 zs Exp $
-//  $Id: alg_hmd_r.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:38:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.3 2004-01-13 20:38:59 chulwoo Exp $
+//  $Id: alg_hmd_r.C,v 1.3 2004-01-13 20:38:59 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.10.2  2003/12/02 16:37:29  cwj
+//  alg_hmd_r.C
+//
+//  Revision 1.2.10.1  2003/11/06 00:12:34  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:04:57  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.2  2003/07/24 16:53:53  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.5  2002/12/04 17:16:27  zs
 //  Merged the new 2^4 RNG into the code.
 //  This new RNG is implemented in the LatRanGen class.
@@ -53,7 +71,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //
@@ -75,6 +93,7 @@ CPS_END_NAMESPACE
 #include <alg/common_arg.h>
 #include <alg/hmd_arg.h>
 #include <alg/cg_arg.h>
+#include <comms/glb.h>
 #include <util/lattice.h>
 #include <util/vector.h>
 #include <util/gjp.h>
@@ -177,14 +196,18 @@ AlgHmdR::AlgHmdR(Lattice& latt,
 
   // Allocate memory for 2 general purpose fermion fields (frm1,frm2).
   //----------------------------------------------------------------
-  frm1 = (Vector *) smalloc(f_size * sizeof(Float));
+  frm1 = (Vector *) smalloc(2*f_size * sizeof(Float));
   if(frm1 == 0)
     ERR.Pointer(cname,fname, "frm1");
   VRB.Smalloc(cname,fname, "frm1", frm1, f_size * sizeof(Float));
+#if 0
   frm2 = (Vector *) smalloc(f_size * sizeof(Float));
   if(frm2 == 0)
     ERR.Pointer(cname,fname, "frm2");
   VRB.Smalloc(cname,fname, "frm2", frm2, f_size * sizeof(Float));
+#else
+  frm2 = &(frm1[GJP.VolNodeSites()/2]);
+#endif
 
 
 }
@@ -202,8 +225,10 @@ AlgHmdR::~AlgHmdR() {
   //----------------------------------------------------------------
   VRB.Sfree(cname,fname, "frm1",frm1);
   sfree(frm1);
+#if 0
   VRB.Sfree(cname,fname, "frm2",frm2);
   sfree(frm2);
+#endif
 
 
   // Free memory for the phi (pseudo fermion) fermion field.
@@ -308,6 +333,9 @@ void AlgHmdR::run(void)
   // generate Gaussian random momentum
   //----------------------------------------------------------------
   lat.RandGaussAntiHermMatrix(mom, 1.0);
+  Float mom_sum = lat.MomHamiltonNode(mom);
+  glb_sum(&mom_sum);
+  printf("mom_sum = %0.16e\n",mom_sum);
 
 
   // Evolve gauge field by dt/2
@@ -332,9 +360,31 @@ void AlgHmdR::run(void)
       lat.EvolveGfield(mom, flavor_time_step[i]);
       lat.MdTimeInc(flavor_time_step[i] / dt);
       VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
-      lat.RandGaussVector(frm1, 0.5, Ncb);
+      lat.RandGaussVector(frm1, 0.5, 2);
+      Float phi_sum = (frm1)->NormSqGlbSum(GJP.VolNodeSites()*6);
+      printf("frm1_sum = %0.16e\n",phi_sum);
+#if 0
       lat.RandGaussVector(frm2, 0.5, Ncb);
+      phi_sum = (frm2)->NormSqGlbSum(GJP.VolNodeSites()/2*6);
+      printf("frm2_sum = %e\n",phi_sum);
+#endif
+      lat.Fconvert(frm1,STAG,CANONICAL);
+	
       lat.SetPhi(phi[i], frm1, frm2, hmd_arg->frm_mass[i]);
+      phi_sum = (phi[i])->NormSqGlbSum(GJP.VolNodeSites()/2*6);
+      Float *phi_p = (Float *)phi[i];
+      printf("phi_sum = %0.16e\n",phi_sum);
+#if 0
+      for(int i = 0; i<GJP.VolNodeSites()/2;i++){
+	printf("%0.4d ",i);
+      for(int j = 0; j<6;j++){
+	printf("%0.8e ",*phi_p);
+	phi_p++;
+      }
+	printf("\n");
+      }
+      exit(1);
+#endif
     }
 
     // Evolve gauge field to the mid-point N*dt + dt/2
@@ -347,14 +397,22 @@ void AlgHmdR::run(void)
     // Evolve momenta by one step using the pure gauge force
     //--------------------------------------------------------------
     lat.EvolveMomGforce(mom, dt);
+  Float mom_sum = lat.MomHamiltonNode(mom);
+  glb_sum(&mom_sum);
+  printf("mom_sum = %0.16e\n",mom_sum);
 
     // Evolve momenta by one step using the fermion force
     //--------------------------------------------------------------
     for(i=0; i<n_frm_masses; i++){
-	lat.RandGaussVector(frm1, 0.5, Ncb);
+	lat.RandGaussVector(frm1, 0.5, 2);
+      lat.Fconvert(frm1,STAG,CANONICAL);
+      Float phi_sum = (frm1)->NormSqGlbSum(GJP.VolNodeSites()*6);
+      printf("frm1_sum = %0.16e\n",phi_sum);
 	cg_iter = 
 	lat.FmatEvlInv(frm1, phi[i], 
 		       frm_cg_arg[i], &true_res, CNV_FRM_NO);
+      phi_sum = (phi[i])->NormSqGlbSum(GJP.VolNodeSites()*6/2);
+      printf("phi_sum = %0.16e\n",phi_sum);
       cg_iter_av = cg_iter_av + cg_iter;
       if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
       if(cg_iter > cg_iter_max) cg_iter_max = cg_iter;
@@ -370,6 +428,9 @@ void AlgHmdR::run(void)
       lat.EvolveMomFforce(mom, frm1, 
 			  hmd_arg->frm_mass[i], 
 			  frm_time_step);
+  Float mom_sum = lat.MomHamiltonNode(mom);
+  glb_sum(&mom_sum);
+  printf("mom_sum = %0.16e\n",mom_sum);
     }
 
     //--------------------------------------------------------------

@@ -2,7 +2,9 @@
 #   source from specific build options
 #
 
-cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
+# The common source to all architectures
+cps_comsrc_obj=\
+    ./src/alg/alg_w_spect/alg_w_spc_ex.o\
     ./src/alg/alg_w_spect/alg_w_spect.o\
     ./src/alg/alg_w_spect/w_axialcurr.o\
     ./src/alg/alg_w_spect/w_baryon.o\
@@ -76,11 +78,6 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
    ./src/util/lattice/lattice_types/lattice_wn.o\
    ./src/util/lattice/lattice_types/lattice_ws.o\
    ./src/util/lattice/lattice_types/lattice_ww.o\
-   ./src/util/lattice/lattice_types/lattice_wa.o\
-   ./src/util/lattice/lattice_types/lattice_na.o\
-   ./src/util/lattice/lattice_types/lattice_pa.o\
-   ./src/util/lattice/lattice_types/lattice_ra.o\
-   ./src/util/lattice/lattice_types/lattice_va.o\
    ./src/util/lattice/lattice_base/lattice_base.o\
    ./src/util/lattice/lattice_base/link_buffer.o\
    ./src/util/lattice/g_wilson/g_wilson.o\
@@ -100,8 +97,6 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
    ./src/util/lattice/f_wilson/f_wilson.o\
    ./src/util/lattice/f_stag_types/f_stag_t.o\
    ./src/util/lattice/f_stag/f_stag.o\
-   ./src/util/lattice/f_asqtad/comsrc/f_asqtad.o\
-   ./src/util/lattice/f_asqtad/noarch/Fforce.o\
    ./src/util/lattice/f_none/f_none.o\
    ./src/util/lattice/fix_gauge/fix_gauge.o\
    ./src/util/lattice/f_dwf/f_dwf.o\
@@ -115,14 +110,12 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
    ./src/util/vector/noarch/vector_util.o\
    ./src/util/vector/comsrc/unitarize.o\
    ./src/util/vector/comsrc/vector.o\
-   ./src/util/smalloc/smalloc.o\
    ./src/util/rfloat/noarch/rfloat_rnd_op.o\
    ./src/util/rcomplex/noarch/rcomplex_sun.o\
    ./src/util/rcomplex/comsrc/rcomplex.o\
    ./src/util/random/noarch/random_asm.o\
    ./src/util/random/comsrc/random.o\
    ./src/util/qcdio/qcdio.o\
-   ./src/util/pmalloc/pmalloc.o\
    ./src/util/mom/mom.o\
    ./src/util/gjp/gjp.o\
    ./src/util/error/error.o\
@@ -131,9 +124,22 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
    ./src/util/dirac_op/d_op_base/jacobi.o\
    ./src/util/dirac_op/d_op_base/ritz.o\
    ./src/util/dirac_op/d_op_base/minvcg.o\
-   ./src/util/dirac_op/d_op_clover/noarch/clover.o\
-   ./src/util/dirac_op/d_op_clover/noarch/d_op_clover.o\
-   ./src/util/dirac_op/d_op_clover/noarch/d_op_clover_s.o\
+   ./src/util/dirac_op/d_op_stag_types/d_op_stag_types.o\
+   ./src/util/dirac_op/d_op_stag_types/eigen_stag.o\
+   ./src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.o\
+   ./src/util/dirac_op/d_op_wilson_types/eigen_wilson.o
+
+# Memory allocation
+cps_noarch_alloc_obj =\
+   ./src/util/alloc/noarch/pmalloc.o\
+   ./src/util/alloc/noarch/smalloc.o
+
+cps_qcdoc_alloc_obj =\
+   ./src/util/alloc/qcdoc/pmalloc.o\
+   ./src/util/alloc/qcdoc/smalloc.o
+
+# Dirac Operators
+cps_noarch_dirac_obj =\
    ./src/util/dirac_op/d_op_clover/noarch/d_op_clover_supp.o\
    ./src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.o\
    ./src/util/dirac_op/d_op_dwf/noarch/dwf_dslash.o\
@@ -146,65 +152,152 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
    ./src/util/dirac_op/d_op_dwf/noarch/dwf_mdagm.o\
    ./src/util/dirac_op/d_op_stag/noarch/d_op_stag.o\
    ./src/util/dirac_op/d_op_stag/noarch/dirac.o\
-   ./src/util/dirac_op/d_op_stag_types/d_op_stag_types.o\
-   ./src/util/dirac_op/d_op_stag_types/eigen_stag.o\
    ./src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.o\
    ./src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.o\
    ./src/util/dirac_op/d_op_wilson/noarch/wilson_end.o\
    ./src/util/dirac_op/d_op_wilson/noarch/wilson_init.o\
    ./src/util/dirac_op/d_op_wilson/noarch/wilson_m.o\
    ./src/util/dirac_op/d_op_wilson/noarch/wilson_mdag.o\
-   ./src/util/dirac_op/d_op_wilson/noarch/wilson_mdagm.o\
-   ./src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.o\
-   ./src/util/dirac_op/d_op_wilson_types/eigen_wilson.o
+   ./src/util/dirac_op/d_op_wilson/noarch/wilson_mdagm.o
+                
+cps_qcdsp_dirac_obj =\
+   ./src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_dslash.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_5_plus.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_end.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_init.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_m.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_mdag.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_mdagm.o\
+   ./src/util/dirac_op/d_op_stag/qcdsp/d_op_stag.o\
+   ./src/util/dirac_op/d_op_stag/qcdsp/dirac.o\
+   ./src/util/dirac_op/d_op_stag/qcdsp/dirac_init.o\
+   ./src/util/dirac_op/d_op_stag/qcdsp/stag_scu.o\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/d_op_wilson.o\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wilson_end.o\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wilson_init.o\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wilson_scu.o\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_comm_backward_l.o\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_comm_forward_l.o\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_copy_backward_l.o\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_copy_forward_l.o\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_sublatt_pointers.o\
+   ./src/util/dirac_op/d_op_clover/qcdsp/clover_mat_mlt_asm.asm\
+   ./src/util/dirac_op/d_op_stag/qcdsp/dirac_serial.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_buffers.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_scu_wait.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_cb_reg0.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_spproj.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_cmat_spproj.asm \
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_spproj_segment.asm \
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_comm_backward.asm \
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_trick.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_comm_forward.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_trick_kappa.asm \
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_dslash.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_trick_kappa_spproj.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_m.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_trick_segment.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_mat_trick.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_trick_spproj.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_mdag.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wilson_dslash.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_mdagm.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wilson_m.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_nga_reg.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wilson_mdag.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wfm_scu_init.asm\
+   ./src/util/dirac_op/d_op_wilson/qcdsp/wilson_mdagm.asm
 
-# default = QCDSP source
+cps_qcdoc_dirac_obj =\
+   ./src/util/dirac_op/d_op_clover/noarch/d_op_clover_supp.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_dslash.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_5_plus.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_end.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_init.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_m.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_mdag.o\
+   ./src/util/dirac_op/d_op_dwf/noarch/dwf_mdagm.o\
+   ./src/util/dirac_op/d_op_stag/qcdoc/copy_buffer.o\
+   ./src/util/dirac_op/d_op_stag/qcdoc/d_op_stag.o\
+   ./src/util/dirac_op/d_op_stag/qcdoc/dirac.o\
+   ./src/util/dirac_op/d_op_stag/qcdoc/dirac_serial.o\
+   ./src/util/dirac_op/d_op_stag/qcdoc/dirac_sum.o\
+   ./src/util/dirac_op/d_op_stag/qcdoc/flush_cache.o\
+   ./src/util/dirac_op/d_op_stag/qcdoc/flush_cache_spinor.o\
+   ./src/util/dirac_op/d_op_stag/qcdoc/save_restore_reg.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/QCDOC_Clover_mat_mlt_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/QCDOC_I_ChDecom_m_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/QCDOC_I_ChDecom_m_hsu3_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/QCDOC_I_ChDecom_p_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/QCDOC_I_ChDecom_p_hsu3_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/QCDOC_I_ChRecon_m_su3_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/QCDOC_I_ChRecon_m_add_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/QCDOC_I_ChRecon_p_add_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/QCDOC_I_ChRecon_p_su3_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/d_op_wilson.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/face_scatter_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/wfm_abi.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/wfm_comm.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/wfm_sublatt_pointers.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/wilson_dslash.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/wilson_end.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/wilson_init.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/wilson_m.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/wilson_mdag.o\
+   ./src/util/dirac_op/d_op_wilson/qcdoc/wilson_mdagm.o
 
-cps_comms_obj =\
-   ./src/comms/qcdsp_comms/cbuf/cbuf.o \
-   ./src/comms/qcdsp_comms/scu/get_data.o \
-   ./src/comms/qcdsp_comms/glb_cpp/glb_min_max.o \
-   ./src/comms/qcdsp_comms/glb_cpp/glb_sum.o \
-   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_dir.o \
-   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_five.o \
-   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_matrix_dir.o\
-   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_multi_dir.o \
-   ./src/comms/qcdsp_comms/glb_cpp/slice_sum.o
+# Communication
+cps_noarch_comms_obj =\
+   ./src/comms/noarch/cbuf_sim/cbuf.o \
+   ./src/comms/noarch/cbuf_sim/cram.o \
+   ./src/comms/noarch/scu_sim/get_data.o \
+   ./src/comms/noarch/glb_sim/glb_min_max.o \
+   ./src/comms/noarch/glb_sim/glb_sum.o \
+   ./src/comms/noarch/glb_sim/glb_sum_dir.o \
+   ./src/comms/noarch/glb_sim/glb_sum_five.o \
+   ./src/comms/noarch/glb_sim/glb_sum_matrix_dir.o\
+   ./src/comms/noarch/glb_sim/glb_sum_multi_dir.o \
+   ./src/comms/noarch/glb_sim/slice_sum.o
 
-ifeq "$(TARGET_QCDSP)" "0"
+cps_qcdsp_comms_obj =\
+   ./src/comms/qcdsp/cbuf/cbuf.o \
+   ./src/comms/qcdsp/scu/get_data.o \
+   ./src/comms/qcdsp/glb_cpp/glb_min_max.o \
+   ./src/comms/qcdsp/glb_cpp/glb_sum.o \
+   ./src/comms/qcdsp/glb_cpp/glb_sum_dir.o \
+   ./src/comms/qcdsp/glb_cpp/glb_sum_five.o \
+   ./src/comms/qcdsp/glb_cpp/glb_sum_matrix_dir.o\
+   ./src/comms/qcdsp/glb_cpp/glb_sum_multi_dir.o \
+   ./src/comms/qcdsp/glb_cpp/slice_sum.o
 
-cps_comms_obj =\
-   ./src/comms/mpi_comms/mpi_scu/scu_dir_arg.o \
-   ./src/comms/mpi_comms/mpi_scu/sysfunc.o \
-   ./src/comms/qcdsp_comms/scu/get_data.o \
-   ./src/comms/qcdsp_comms/glb_cpp/glb_min_max.o \
-   ./src/comms/qcdsp_comms/glb_cpp/glb_sum.o \
-   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_dir.o \
-   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_five.o \
-   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_matrix_dir.o\
-   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_multi_dir.o \
-   ./src/comms/qcdsp_comms/glb_cpp/slice_sum.o \
-    ./src/comms/vanilla_comms/cbuf_sim/cbuf.o \
-   ./src/comms/vanilla_comms/cbuf_sim/cram.o 
+cps_mpi_comms_obj =\
+   ./src/comms/mpi/mpi_scu/scu_dir_arg.o \
+   ./src/comms/mpi/mpi_scu/sysfunc.o 
 
-endif
+cps_qcdoc_comms_obj =\
+   ./src/comms/qcdoc/cbuf/cbuf.o \
+   ./src/comms/qcdoc/cbuf/cram.o \
+   ./src/comms/qcdoc/scu/get_data.o \
+   ./src/comms/qcdoc/glb_cpp/glb_min_max.o \
+   ./src/comms/qcdoc/glb_cpp/glb_sum.o \
+   ./src/comms/qcdoc/glb_cpp/glb_sum_dir.o \
+   ./src/comms/qcdoc/glb_cpp/glb_sum_five.o \
+   ./src/comms/qcdoc/glb_cpp/glb_sum_matrix_dir.o\
+   ./src/comms/qcdoc/glb_cpp/glb_sum_multi_dir.o \
+   ./src/comms/qcdoc/glb_cpp/slice_sum.o
 
-ifeq "$(PARALLEL)" "0"
+NOARCH = $(cps_comsrc_obj) $(cps_noarch_alloc_obj) $(cps_noarch_dirac_obj)\
+	 $(cps_noarch_comms_obj)
 
-cps_comms_obj =\
-    ./src/comms/vanilla_comms/cbuf_sim/cbuf.o \
-   ./src/comms/vanilla_comms/cbuf_sim/cram.o \
-   ./src/comms/vanilla_comms/scu_sim/get_data.o \
-   ./src/comms/vanilla_comms/glb_sim/glb_min_max.o \
-   ./src/comms/vanilla_comms/glb_sim/glb_sum.o \
-   ./src/comms/vanilla_comms/glb_sim/glb_sum_dir.o \
-   ./src/comms/vanilla_comms/glb_sim/glb_sum_five.o \
-   ./src/comms/vanilla_comms/glb_sim/glb_sum_matrix_dir.o\
-   ./src/comms/vanilla_comms/glb_sim/glb_sum_multi_dir.o \
-   ./src/comms/vanilla_comms/glb_sim/slice_sum.o
+MPI = $(cps_comsrc_obj) $(cps_noarch_alloc_obj) $(cps_noarch_dirac_obj)\
+	 $(cps_qcdsp_comms) $(cps_mpi_comms_obj)
 
-endif
+QCDSP = $(cps_comsrc_obj) $(cps_noarch_alloc_obj) $(cps_qcdsp_dirac_obj)\
+	 $(cps_qcdsp_comms_obj)
 
-cps_obj = $(cps_comsrc_obj)  $(cps_comms_obj)
-
-
+QCDOC = $(cps_comsrc_obj) $(cps_qcdoc_alloc_obj)\
+	$(cps_qcdoc_dirac_obj) $(cps_qcdoc_comms_obj)

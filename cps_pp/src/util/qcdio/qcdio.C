@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  The QCD I/O Interface:
 
-  $Id: qcdio.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: qcdio.C,v 1.3 2004-01-13 20:39:54 chulwoo Exp $
 */
 /*  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
-   $Author: zs $ 
-   $Date: 2003-07-24 16:53:54 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-   $Id: qcdio.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+   $Author: chulwoo $ 
+   $Date: 2004-01-13 20:39:54 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v 1.3 2004-01-13 20:39:54 chulwoo Exp $
+   $Id: qcdio.C,v 1.3 2004-01-13 20:39:54 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.C,v $
-   $Revision: 1.2 $
+   $Revision: 1.3 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v $
    $State: Exp $  */ 
 /*----------------------------------------------------------*/
@@ -697,7 +697,7 @@ CPS_START_NAMESPACE
 
 #ifdef PARALLEL
     // Syncronise all processors before beginning to load.
-    sync();
+    //sync();
 #endif
 
     //qprintf_allid("loadsavegauge 2\n");
@@ -869,7 +869,7 @@ CPS_START_NAMESPACE
 
 #ifdef PARALLEL
     // Syncronise all processors before returning control.
-    sync();
+    //sync();
 #endif
     
     //qprintf_allid("loadsavegauge 7\n");

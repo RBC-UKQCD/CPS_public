@@ -1,21 +1,22 @@
 #include<config.h>
+#include<stdio.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.2 2003-10-30 19:28:16 zs Exp $
+  $Id: Fforce.C,v 1.3 2004-01-13 20:39:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/dirac_op.h>
+#include <util/pt.h>
 #include <util/gjp.h>
 #include <stdlib.h>
 #include <comms/scu_enum.h>
 #include <comms/nga_reg.h>
 CPS_START_NAMESPACE
-
 
 
 
@@ -65,9 +66,13 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 
     char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
     VRB.Func(cname,fname);
+    int pos[] = {0,0,0,0};
+    IFloat *link_p = (IFloat *)GetLink(pos,0);
+    printf("GetLink({0,0,0,0},0)(%p)=%e\n",link_p,*link_p );
+   Fconvert(frm,CANONICAL,STAG);
 
     
-    const int N = 1;  // N can be 1, 2 or 4.
+    const int N = 4;  // N can be 1, 2 or 4.
 
     enum{plus, minus, n_sign};
     int size;
@@ -150,7 +155,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
    
     // input/output arrays for the parallel transport routines
     Vector *vin[n_sign*N], *vout[n_sign*N];
-    SCUDir dir[n_sign*N];
+    int dir[n_sign*N];
 	
     int mu[N], nu[N], rho[N], sigma[N];   // Sets of directions
     int w;                                // The direction index 0...N-1
@@ -169,8 +174,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 
 	    for(int i=0; i<N; i++){
 		vin[i] = vin[i+N] = X;
-		dir[n_sign*i] = (SCUDir)(n_sign*nu[i]);        // nu_i
-		dir[n_sign*i+1] = (SCUDir)(n_sign*nu[i]+1);    // -nu_i
+		dir[n_sign*i] = (n_sign*nu[i]);        // nu_i
+		dir[n_sign*i+1] = (n_sign*nu[i]+1);    // -nu_i
 		vout[n_sign*i] = Pnu[minus][i];
 		vout[n_sign*i+1] = Pnu[plus][i];
 	    }
@@ -180,8 +185,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    // ms is the nu sign index, ms is the mu sign index,
 	    // w is the direction index
 	    for(int i=0; i<N; i++){
-		dir[n_sign*i] = (SCUDir)(n_sign*mu[i]);        // mu_i
-		dir[n_sign*i+1] = (SCUDir)(n_sign*mu[i]+1);    // -mu_i
+		dir[n_sign*i] = (n_sign*mu[i]);        // mu_i
+		dir[n_sign*i+1] = (n_sign*mu[i]+1);    // -mu_i
 	    }
 	    for(ns=0; ns<n_sign; ns++){               // ns is the sign of nu
 		for(int i=0; i<N; i++){
@@ -219,8 +224,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		// Prhonu = U_rho Pnu 
 
 		for(int i=0; i<N; i++){
-		    dir[n_sign*i] = (SCUDir)(n_sign*rho[i]);        
-		    dir[n_sign*i+1] = (SCUDir)(n_sign*rho[i]+1);    
+		    dir[n_sign*i] = (n_sign*rho[i]);        
+		    dir[n_sign*i+1] = (n_sign*rho[i]+1);    
 		}
 		for(ns=0; ns<n_sign; ns++){
 		    for(int i=0; i<N; i++){
@@ -234,8 +239,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		// P5 = U_mu Prhonu
 
 		for(int i=0; i<N; i++){
-		    dir[n_sign*i] = (SCUDir)(n_sign*mu[i]);        
-		    dir[n_sign*i+1] = (SCUDir)(n_sign*mu[i]+1);    
+		    dir[n_sign*i] = (n_sign*mu[i]);        
+		    dir[n_sign*i+1] = (n_sign*mu[i]+1);    
 		}
 		for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) {
 		    for(int i=0; i<N; i++){
@@ -258,8 +263,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		// Psigmarhonu = U_sigma P_rhonu
 		
 		for(int i=0; i<N; i++){
-		    dir[n_sign*i] = (SCUDir)(n_sign*sigma[i]);        
-		    dir[n_sign*i+1] = (SCUDir)(n_sign*sigma[i]+1);    
+		    dir[n_sign*i] = (n_sign*sigma[i]);        
+		    dir[n_sign*i+1] = (n_sign*sigma[i]+1);    
 		}
 		for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++){
 		    for(int i=0; i<N; i++){
@@ -272,8 +277,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 
 		// P7 = U_mu P_sigmarhonu
 		for(int i=0; i<N; i++){
-		    dir[n_sign*i] = (SCUDir)(n_sign*mu[i]);        
-		    dir[n_sign*i+1] = (SCUDir)(n_sign*mu[i]+1);    
+		    dir[n_sign*i] = (n_sign*mu[i]);        
+		    dir[n_sign*i+1] = (n_sign*mu[i]+1);    
 		}
 		for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(ss=0; ss<n_sign; ss++){
 		    for(int i=0; i<N; i++){
@@ -314,8 +319,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 
 		// Psigma7 = U_sigma P7 
 		for(int i=0; i<N; i++){
-		    dir[n_sign*i] = (SCUDir)(n_sign*sigma[i]);        
-		    dir[n_sign*i+1] = (SCUDir)(n_sign*sigma[i]+1);    
+		    dir[n_sign*i] = (n_sign*sigma[i]);        
+		    dir[n_sign*i+1] = (n_sign*sigma[i]+1);    
 		}
 		for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++){
 		    for(int i=0; i<N; i++){
@@ -371,8 +376,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		// Prho5 = U_rho P5
 
 		for(int i=0; i<N; i++){
-		    dir[n_sign*i] = (SCUDir)(n_sign*rho[i]);        
-		    dir[n_sign*i+1] = (SCUDir)(n_sign*rho[i]+1);    
+		    dir[n_sign*i] = (n_sign*rho[i]);        
+		    dir[n_sign*i+1] = (n_sign*rho[i]+1);    
 		}
 		for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++){
 		    for(int i=0; i<N; i++){
@@ -413,8 +418,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    // Pnunu = U_nu Pnu
 
 	    for(int i=0; i<N; i++){
-		dir[n_sign*i] = (SCUDir)(n_sign*nu[i]);        
-		dir[n_sign*i+1] = (SCUDir)(n_sign*nu[i]+1);    
+		dir[n_sign*i] = (n_sign*nu[i]);        
+		dir[n_sign*i+1] = (n_sign*nu[i]+1);    
 	    }
 	    for(int i=0; i<N; i++){
 		vin[n_sign*i] = Pnu[minus][i];
@@ -427,8 +432,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    // P5 = U_mu Pnunu
 
 	    for(int i=0; i<N; i++){
-		dir[n_sign*i] = (SCUDir)(n_sign*mu[i]);        
-		dir[n_sign*i+1] = (SCUDir)(n_sign*mu[i]+1);    
+		dir[n_sign*i] = (n_sign*mu[i]);        
+		dir[n_sign*i+1] = (n_sign*mu[i]+1);    
 	    }
 	    for(ns=0; ns<n_sign; ns++){
 		for(int i=0; i<N; i++){
@@ -469,8 +474,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    // Pnu5 = U_nu P5
 
 	    for(int i=0; i<N; i++){
-		dir[n_sign*i] = (SCUDir)(n_sign*nu[i]);        
-		dir[n_sign*i+1] = (SCUDir)(n_sign*nu[i]+1);    
+		dir[n_sign*i] = (n_sign*nu[i]);        
+		dir[n_sign*i+1] = (n_sign*nu[i]+1);    
 	    }
 	    for(ms=0; ms<n_sign; ms++){
 		for(int i=0; i<N; i++){
@@ -523,7 +528,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    // Pnu3 = U_nu P3
 
 	    for(int i=0; i<N; i++)
-		dir[i] = (SCUDir)(n_sign*nu[i]);        
+		dir[i] = (n_sign*nu[i]);        
 	    for(ms=0; ms<n_sign; ms++){
 		for(int i=0; i<N; i++){
 		    vin[i] = P3[ms][plus][i]; 
@@ -584,7 +589,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    // Pnununu = U_nu Pnunu
 
 	    for(int i=0; i<N; i++){
-		dir[i] = (SCUDir)(n_sign*nu[i]);        
+		dir[i] = (n_sign*nu[i]);        
 		vin[i] = Pnunu[minus][i]; 
 		vout[i] = Pnununu[i];
 	    }
@@ -612,13 +617,14 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    mf = force[mu][s];
 	    mfd.Dagger((IFloat*)&mf);
 	    mf.TrLessAntiHermMatrix(mfd);
+	    mf *= 0.5;				// for MILC compatibility
 	    fTimesV1PlusV2((IFloat*)(ip+mu), dt, (IFloat*)&mf,
 			   (IFloat*)(ip+mu)+BANK4_BASE, MATRIX_SIZE);
 	}
     }
     
 	
-    
+   Fconvert(frm,STAG,CANONICAL);
 
 }
 
@@ -648,16 +654,28 @@ int staggered_phase(const int *n, int mu){
     
 }
 
-void Fasqtad::parallel_transport(Vector **vin, const SCUDir *dir,
+static int called=0;
+void Fasqtad::parallel_transport(Vector **vin, const int *dir,
 				     int N, Vector **vout){
 
     Matrix u, ud;
     int n, s[4], spm[4];
+    int pos[] = {0,0,0,0};
+    IFloat *link_p = (IFloat *)GetLink(pos,0);
+//FILE *fp;
+	called++;
+	char filename[200];
+	sprintf(filename,"par_trans_out%d",called);
+//	fp = fopen(filename,"w");
+//	fprintf(fp,"called=%d\n",called);
+	fprintf(stdout,"called=%d\n",called);
+	Convert(STAG);
 
     for(int d=0; d<N; d++){
 
 	bool backwards = false;
 	int mu = (int)dir[d];
+//	fprintf(fp,"dir=%d\n",mu);
 	if(mu%2) backwards = true;
         mu /= 2;
 	
@@ -671,7 +689,7 @@ void Fasqtad::parallel_transport(Vector **vin, const SCUDir *dir,
 			}else spm[mu] = (spm[mu]+1)%GJP.NodeSites(mu);
 			Matrix u = *(const_cast<Matrix*>(GetLink(s, mu)));
 
-			if(staggered_phase(s, mu)==-1) u *= -1.0;
+//			if(staggered_phase(s, mu)==-1) u *= -1.0;
 			
 			if(backwards){
 			    ud.Dagger(u);
@@ -681,10 +699,18 @@ void Fasqtad::parallel_transport(Vector **vin, const SCUDir *dir,
 			
 			uDotXEqual((IFloat*)&vout[d][n], (IFloat*)&u, (IFloat*)&vin[d][FsiteOffset(spm)]);
 			spm[mu] = s[mu];
+	IFloat * vout_p = (IFloat *)(vin[d] + n);
+//	fprintf(fp,"vin[%d][%d]=",d,n);
+//	for(int k=0;k<6;k++) fprintf(fp,"  %0.8e",vout_p[k]);
+//	fprintf(fp,"\n");
+	vout_p = (IFloat *)(vout[d] + n);
+//	fprintf(fp,"vout[%d][%d]=",d,n);
+//	for(int k=0;k<6;k++) fprintf(fp,"  %0.8e",vout_p[k]);
+//	fprintf(fp,"\n");
 		    }
-    }
-    
-}
+   }
+//	fclose(fp);
+}    
 
 
 CPS_END_NAMESPACE

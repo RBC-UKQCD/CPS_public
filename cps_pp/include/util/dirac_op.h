@@ -3,18 +3,34 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.4 2003-08-29 21:02:56 mike Exp $
+  $Id: dirac_op.h,v 1.5 2004-01-13 20:38:56 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mike $
-//  $Date: 2003-08-29 21:02:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.4 2003-08-29 21:02:56 mike Exp $
-//  $Id: dirac_op.h,v 1.4 2003-08-29 21:02:56 mike Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:38:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.5 2004-01-13 20:38:56 chulwoo Exp $
+//  $Id: dirac_op.h,v 1.5 2004-01-13 20:38:56 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.4.2.1  2003/11/05 16:13:21  mike
+//  Initial attempt at producing working branch
+//
+//  Revision 1.2  2003/10/21 17:53:07  chulwoo
+//  added asqtad_KS
+//  changes for stagerred and asqtad action
+//
+//  Revision 1.1.1.1  2003/09/18 22:30:57  chulwoo
+//  Mike's files for single node QCDOC + Parallel transport
+//  I added some hacks for PARALLEL without MPI_SCU
+//  PARALLEL=2 set PARALLEL without MPI_SCU
+//
+//
+//  Revision 1.4  2003/08/29 21:02:56  mike
+//  Removed MatMInv function as was unnecessary.
+//
 //  Revision 1.3  2003/08/29 20:28:55  mike
 //  Added MInvCG, the multishift CG invertor, used by AlgHmcRHMC.
 //
@@ -54,7 +70,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: dirac_op.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v $
 //  $State: Exp $
 //
@@ -410,7 +426,6 @@ class DiracOpStagTypes : public DiracOp
 
 };
 
-
 //------------------------------------------------------------------
 //
 // DiracOpStag is derived from DiracOpStagTypes and is the front
@@ -430,7 +445,6 @@ class DiracOpStag : public DiracOpStagTypes
 
   Vector *frm_tmp;     // Temporary fermion field
 
-
  public:
   DiracOpStag(Lattice& latt,            // Lattice object.
 	      Vector *f_field_out,      // Output fermion field ptr.
@@ -439,6 +453,110 @@ class DiracOpStag : public DiracOpStagTypes
 	      CnvFrmType cnv_frm_flg);  // Fermion conversion flag
 
   virtual ~DiracOpStag();
+
+  void DiracArg(CgArg *arg);
+     // It sets the dirac_arg pointer to arg and initializes
+     // mass_sq = 4 * mass^2
+
+  void MatPcDagMatPc(Vector *out, Vector *in, Float *dot_prd=0);
+     // MatPcDagMatPc is the fermion matrix that appears in the HMC 
+     // evolution. It is a Hermitian matrix where M is
+     // the Dirac Operator matrix.        
+     // MatPcDagMatPc connects only even-->even or odd-->odd sites.
+     // The in, out fields are defined on a checkerboard.
+     // If dot_prd is not 0 then the dot product (on node)
+     // <out, in> = <MatPcDagMatPc*in, in> is returned in dot_prd.
+
+  void Dslash(Vector *out, 
+	      Vector *in,
+	      ChkbType cb, 
+	      DagType dag);
+     // Dslash is the derivative part of the fermion matrix. 
+     // Dslash conects only odd-->even or even-->odd sites.
+     // The in, out fields are defined on a checkerboard.
+     // cb refers to the checkerboard of the in field.
+
+  //! The derivative part of the fermion matrix.
+  void Dslash(Vector *out, 
+	      Vector *in,
+	      ChkbType cb, 
+	      DagType dag,
+	      int dir_flag);
+     // Dslash is the derivative part of the fermion matrix. 
+     // Dslash conects only odd-->even or even-->odd sites.
+     // The in, out fields are defined on a checkerboard.
+     // cb refers to the checkerboard of the in field.
+     // dir_flag is flag which takes value 0 when all direction contribute 
+     // 1 - when only the special anisotropic direction contributes to D,
+     // 2 - when all  except the special anisotropic direction.
+
+  int MatInv(Vector *out, 
+	     Vector *in, 
+	     Float *true_res,
+	     PreserveType prs_in = PRESERVE_YES);
+     // The inverse of the Dirac Operator (D+m)
+     // using Conjugate gradient.
+     // Assume: the vector in contains both even and odd src.
+     //		even part is the 1st part.
+     // Return: the vector out contains both even and odd solutions.
+     // 	the even solution is the 1st part.
+     // If true_res !=0 the value of the true residual is returned
+     // in true_res.
+     // *true_res = |src - MatPcDagMatPc * sol| / |src|
+     // prs_in is not used. The source in is always preserved.
+     // The function returns the total number of CG iterations.
+
+  int MatInv(Vector *out, 
+	     Vector *in,
+	     PreserveType prs_in = PRESERVE_YES);
+     // Same as original but true_res=0.
+
+  int MatInv(Float *true_res,
+	     PreserveType prs_in = PRESERVE_YES);
+     // Same as original but in = f_in and out = f_out.
+
+  int MatInv(PreserveType prs_in = PRESERVE_YES);
+     // Same as original but in = f_in, out = f_out, true_res=0.
+
+  void RitzEigMat(Vector *out, Vector *in);
+     // RitzEigMat is the fermion matrix used in RitzEig
+     // RitzEigMat works on the full lattice or half lattice
+     // The in, out fields are defined on the full or half lattice.
+
+  void RitzMat(Vector *out, Vector *in);
+     // RitzMat is the fermion matrix used in Ritz
+     // RitzMat works on the full lattice or half lattice
+     // The in, out fields are defined on the full or half lattice.
+};
+
+//------------------------------------------------------------------
+//
+// DiracOpAsqtad is derived from DiracOpStagTypes and is the front
+// end for all Dirac operators associated with Staggered fermions.
+
+//! A class describing the Dirac operator for staggered fermions.
+//------------------------------------------------------------------
+class DiracOpAsqtad : public DiracOpStagTypes
+{
+ private:
+  char *cname;         // Class name.
+
+  Float mass_rs;       // rescaled mass
+  Float mass_sq;       // = mass^2
+
+  int f_size_cb;       //The node checkerbrd. size of the ferm. field
+
+  Vector *frm_tmp;     // Temporary fermion field
+
+
+ public:
+  DiracOpAsqtad(Lattice& latt,            // Lattice object.
+	      Vector *f_field_out,      // Output fermion field ptr.
+	      Vector *f_field_in,       // Input fermion field ptr.
+	      CgArg *arg,               // Argument structure
+	      CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+
+  virtual ~DiracOpAsqtad();
 
   void DiracArg(CgArg *arg);
      // It sets the dirac_arg pointer to arg and initializes

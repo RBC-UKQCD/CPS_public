@@ -1,48 +1,58 @@
-# $Id: Makefile_cps.in,v 1.14 2003-10-31 16:00:31 zs Exp $
+# $Id: Makefile_cps.in,v 1.15 2004-01-13 20:38:54 chulwoo Exp $
 #
 #  Template makefile for the Columbia Physics System
+#  Need to add autoconf stuff
 #
 #  Create the library for CPS using: make cps
 #
 MAKEFILE = Makefile_cps
 
-# TARGET_QCDSP = 1 for QCDSP build, 0 otherwise
-TARGET_QCDSP = @TARGET_QCDSP@
 
-# PARALLEL = 1 for parallel compilation, 0 for serial compilation 
-PARALLEL = @PARALLEL@
-
-top_srcdir = @topwd_srcdir@
-
-INCLUDE_FLAGS := -I$(top_srcdir)  -I$(top_srcdir)/include
-
+CC = @CC@
 CXX = @CXX@
-CXXFLAGS = @CXXFLAGS@ $(INCLUDE_FLAGS) 
-LIBS = @LIBS@
+AR = @AR@
+AS = @AS@
+
+CFLAGS = @CFLAGS@
+CXXFLAGS = @CXXFLAGS@
+ASFLAGS = @ASFLAGS@
+
+INCLUDE_FLAGS = @INCLUDE_FLAGS@
+
+DFLAGS = @DFLAGS@
+
+TOPDIR = @topwd_srcdir@
+
+libcps_CXXFLAGS = $(INCLUDE_FLAGS) $(CXXFLAGS) $(DFLAGS)
 
 #
 #   source from specific build options
 #
 include Makefile_cps_src
+cps_obj = $(@ARCH@)
+
 
 .SUFFIXES:
-.SUFFIXES:      .o .C
+.SUFFIXES:      .o .C .S
 
 #  go into the subdirectory and compile
 %.o:%.C
-	cd ${<D} ; $(CXX) $(CXXFLAGS) -c  ${<F} 
+	cd ${<D}; ${CXX} -c ${<F} $(libcps_CXXFLAGS)
+
+%.o:%.S
+	cd ${<D}; 
+	$(CC) -E $(libcps_CXXFLAGS) $< > $*.i
+	$(AS) $(ASFLAGS) -o $*.o $*.i 
+	rm $*.i
 
 
 #
 # make the library for the CPS code
 #
-cps: cps.a
+cps: $(cps_obj)
+	${AR} rcs cps.a ${cps_obj}
 
-cps.a: $(cps_obj)
-	ar rcs cps.a ${cps_obj}
-
-
-.PHONY : cps clean docs webdocs depend
+.PHONY : cps clean docs depend
 
 # change the makefile ==> recompile
 $(cps_obj): $(MAKEFILE) 
@@ -50,7 +60,9 @@ $(cps_obj): $(MAKEFILE)
 cps_SOURCES=  $(cps_obj:.o=.C)
 
 
-ifneq "@have_doxygen@" "yes"
+have_doxygen = @have_doxygen@
+
+ifneq "$(have_doxygen)" "yes"
 
 docs webdocs:
 	@echo doxygen must be installed to make the documentation.
@@ -66,14 +78,13 @@ docs:
 subdirs = $(dir $(shell ls doc/*/Makefile))
 webdocs:
 	@echo Creating documentation for the web page
-	@echo This will delete all source code!
-	@sleep 2
+	@echo This will delete all source code
 	$(MAKE) -f $(MAKEFILE) docs
 	@rm -rf src include tests
 	@for a in $(subdirs); do $(MAKE) -C $$a all clean; done
 	chmod o= `ls`
-	@find . -path "*CVS" -prune -o -type d -print | xargs chmod 775
-	@find doc -name "*.html" -o -name "*.*ps" -o -name "*.gif" -o -name "*.png" -o -name "*.jp*g" -o -name "*.pdf" -o -name "*.tar.gz" |xargs chmod 664
+	@find doc -path "*CVS" -prune -o -type d -print | xargs chmod 775
+	@find doc -name "*.html" -o -name "*.*ps" -o -name "*.gif" -o -name "*.png" -o -name "*.jp*g" -o -name "*.pdf" -o -name "*.tar.gz" |xargs chmod 644
 
 endif
 
@@ -87,20 +98,17 @@ clean:
 ##
 TEST_DIR = tests
 
-test: cps
+test:
 	cd $(TEST_DIR) ; perl regression.pl
 	cd $(TEST_DIR) ; sh regression.sh
 
 
+
 ##
 ## create dependencies
-## 
-# depend:	
-# 	makedepend -f Makefile_depend  $(CXXFLAGS)  $(cps_SOURCES)
-
-depend: 
-	$(CXX) -M $(CXXFLAGS) $(cps_SOURCES) |\
-	sed -e 's/^.*\.o://g' -e 's/\.C/\.o:/g'  > Makefile_depend
+##
+depend:	
+	makedepend -f Makefile_depend  $(DFLAGS) $(INCLUDE_FLAGS) $(cps_SOURCES)
 
 include Makefile_depend
 

@@ -1,21 +1,22 @@
 #include<config.h>
+#include<stdio.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+  $Id: lattice_base.C,v 1.4 2004-01-13 20:39:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-10-31 14:15:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.3 2003-10-31 14:15:33 zs Exp $
-//  $Id: lattice_base.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.4 2004-01-13 20:39:52 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.4 2004-01-13 20:39:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2010,7 +2011,16 @@ void Lattice::RandGaussVector(Vector *frm, Float sigma2,
 //--------------------------------------------------------------------------
 void Lattice::RandGaussVector(Vector *frm, Float sigma2)
 {
-  RandGaussVector(frm, sigma2, 2, FIVE_D);
+  RandGaussVector(frm, sigma2, 2, CANONICAL, FIVE_D);
+}
+
+void Lattice::RandGaussVector(Vector *frm, Float sigma2, int
+chkbds,FermionFieldDimension frm_field_dim  )
+{
+  if (Fclass()==F_CLASS_STAG || Fclass() ==F_CLASS_ASQTAD)
+	RandGaussVector(frm, sigma2, chkbds, STAG, frm_field_dim);
+  else
+	RandGaussVector(frm, sigma2, chkbds, CANONICAL, frm_field_dim);
 }
 
 //--------------------------------------------------------------------------
@@ -2029,7 +2039,7 @@ void Lattice::RandGaussVector(Vector *frm, Float sigma2)
  */  
 //--------------------------------------------------------------------------
 void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
-                        FermionFieldDimension frm_dim /* = FIVE_D */)
+             StrOrdType str, FermionFieldDimension frm_dim /* = FIVE_D */ )
 {
   char * fname = "RandGaussVector(Vector *, Float, int, FermionFieldDimension)";
   VRB.Func(cname, fname);
@@ -2063,6 +2073,17 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
     }
   }
   else if(num_chkbds == 1) {
+    if (str == STAG){           
+      for(x[2] = 0; x[2] < GJP.ZnodeSites(); x[2]++)     // z
+      for(x[1] = 0; x[1] < GJP.YnodeSites(); x[1]++)     // y
+      for(x[0] = 0; x[0] < GJP.XnodeSites(); x[0]++)     // x
+      for(x[3] = 0; x[3] < GJP.TnodeSites(); x[3] += 2) {   // t
+        LRG.AssignGenerator(x);
+        for(k = 0; k < FsiteSize(); k++) {
+          *(ptr++) = LRG.Grand();
+        }
+      }
+    } else
     for(i = 0; i < GJP.VolNodeSites(); i+=2) {
       LRG.AssignGenerator(i);
       for(k = 0; k < FsiteSize(); k++) {

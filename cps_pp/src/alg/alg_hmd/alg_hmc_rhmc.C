@@ -27,7 +27,8 @@ CPS_END_NAMESPACE
 #include<util/error.h>
 #include<comms/glb.h>
 CPS_START_NAMESPACE
-
+const char *filename = CWDPREFIX("mom.dat");
+#define RHMC_DEBUG
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
@@ -64,7 +65,8 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
 
   // Calculate the fermion field size.
   //----------------------------------------------------------------
-  f_size = GJP.VolNodeSites() * latt.FsiteSize() / (latt.FchkbEvl()+1);
+//  f_size = GJP.VolNodeSites() * latt.FsiteSize() / (latt.FchkbEvl()+1);
+  f_size = GJP.VolNodeSites() * latt.FsiteSize() ;
 
   // Allocate memory for the fermion CG arguments.
   //----------------------------------------------------------------
@@ -211,11 +213,11 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
       ERR.Pointer(cname,fname, "frm3");
     VRB.Smalloc(cname,fname, "frm3",frm3, n_masses * sizeof(Vector**));
     for(i=0; i<n_masses; i++){
-      frm1[i] = (Vector *) smalloc(f_size * sizeof(Vector));
+      frm1[i] = (Vector *) smalloc(f_size * sizeof(Float));
       if(frm1[i] == 0)
 	ERR.Pointer(cname,fname, "frm1[i]");
       VRB.Smalloc(cname,fname, "frm1[i]", frm1[i], f_size * sizeof(Vector));
-      frm2[i] = (Vector *) smalloc(f_size * sizeof(Vector));
+      frm2[i] = (Vector *) smalloc(f_size * sizeof(Float));
       if(frm2[i] == 0)
 	ERR.Pointer(cname,fname, "frm2[i]");
       VRB.Smalloc(cname,fname, "frm2[i]", frm2[i], f_size * sizeof(Vector));
@@ -224,12 +226,12 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
       frm3[i] = (Vector**) smalloc(rat_size*sizeof(Vector*));
       if(frm3[i] == 0)
 	ERR.Pointer(cname,fname, "frm3[i]");
-      VRB.Smalloc(cname,fname, "frm3[i]", frm3[i], f_size * sizeof(Vector*));
+      VRB.Smalloc(cname,fname, "frm3[i]", frm3[i], rat_size * sizeof(Vector*));
       for (j=0; j<rat_size; j++) {
-	frm3[i][j] = (Vector*) smalloc(f_size*sizeof(Vector));
+	frm3[i][j] = (Vector*) smalloc(f_size*sizeof(Float));
 	if(frm3[i][j] == 0)
 	  ERR.Pointer(cname,fname, "frm3[i][j]");
-	VRB.Smalloc(cname,fname, "frm3[i][j]", frm3[i][j], f_size * sizeof(Vector));
+	VRB.Smalloc(cname,fname, "frm3[i][j]", frm3[i][j], f_size * sizeof(Float));
       }
     }
   }
@@ -376,8 +378,10 @@ void AlgHmcRHMC::run(void)
 
 #ifdef RHMC_DEBUG
   FILE *rat, *energy;
-  rat = fopen("rhmc_debug.out", "a");
-  energy = fopen("energy.dat","a");
+  char const *rat_filename = CWDPREFIX("rhmc_debug.out");
+  char const *energy_filename = CWDPREFIX("energy.dat");
+  rat = fopen(rat_filename, "a");
+  energy = fopen(energy_filename,"a");
   Float ke, pe, fe;
 #endif
 
@@ -424,8 +428,8 @@ void AlgHmcRHMC::run(void)
   for(i=0; i<n_bsn_masses; i++){
     lat.RandGaussVector(frm1[i], 0.5, Ncb);
     lat.RandGaussVector(frm2[i], 0.5, Ncb);
-    lat.SetPhi(phi[i], frm1[i], frm2[i], hmd_arg->bsn_mass[i]);
     lat.RandGaussVector(bsn[i], 0.5, Ncb);
+    lat.SetPhi(phi[i], frm1[i], frm2[i], hmd_arg->bsn_mass[i]);
     lat.FmatEvlInv(bsn[i], phi[i], bsn_cg_arg[i], CNV_FRM_NO);
   }
   
@@ -448,6 +452,7 @@ void AlgHmcRHMC::run(void)
     cg_iter = 0;
     for (j=0; j<HBRatDeg[i]; j++) {
       frm_cg_arg[i] -> mass = sqrt(trueMass*trueMass + HBRatPole[i][j]/4.0);
+      lat.RandGaussVector(frm3[i][j], 0.5, Ncb);
       cg_iter = lat.FmatEvlInv(frm3[i][j], phi[i], frm_cg_arg[i], &true_res, CNV_FRM_NO);
       //printf("Heatbath: Inv j = %d iterations = %d\n", j, cg_iter);
     }
@@ -482,7 +487,7 @@ void AlgHmcRHMC::run(void)
 #endif
     cg_iter = lat.FmatEvlMInv(frm3[i], phi[i], FRatPole[i], FRatDeg[i],
     		   isz, frm_cg_arg[i], CNV_FRM_NO);    
-    //printf("Force: MInv iterations = %d\n", cg_iter);
+ printf("Force: MInv iterations = %d\n", cg_iter);
 #else
     cg_iter = 0;
     trueMass = frm_cg_arg[i] -> mass;
@@ -505,6 +510,15 @@ void AlgHmcRHMC::run(void)
       lat.prepForce(frm3[i][j]);
       frm3[i][j] -> VecTimesEquFloat(FRatConst[i][j],f_size);
       lat.EvolveMomFforce(mom,frm3[i][j],hmd_arg->frm_mass[i], 0.5*dt);
+#if 0
+      Float * temp = (Float *)mom;
+      fp = fopen(filename,"w");
+      for(int k = 0;k<g_size;k++){
+	fprintf(fp,"%e ",*temp++);
+	if (k%6==5) fprintf(fp,"\n");
+      }
+      exit(1);
+#endif
       h_init += FRatConst[i][j] * lat.FhamiltonNode(phi[i], frm3[i][j]);
     }
 
@@ -694,6 +708,7 @@ void AlgHmcRHMC::run(void)
   // Calculate Final-Initial Hemiltonian 
   //---------------------------------------------------------------
   delta_h = h_final - h_init;
+  printf("h_init=%e h_final=%e delta_h= %e\n",h_init,h_final,delta_h);
   glb_sum(&delta_h);
 
 #ifdef RHMC_DEBUG 

@@ -1,16 +1,102 @@
 #include<config.h>
+#include<stdio.h>
+#include<math.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.1 2003-10-30 06:11:22 cwj Exp $
+  $Id: f_asqtad.C,v 1.2 2004-01-13 20:39:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v 1.2 2004-01-13 20:39:49 chulwoo Exp $
+//  $Id: f_asqtad.C,v 1.2 2004-01-13 20:39:49 chulwoo Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.1.4.3  2003/12/11 20:22:53  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.4.2  2003/11/25 23:18:00  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.4.1  2003/11/13 08:05:56  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:05:15  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.2  2003/09/29 08:41:13  chulwoo
+//
+//  adding Zbigniew's force term
+//
+//  Revision 1.1  2003/09/22 22:22:25  chulwoo
+//   adding asqtad
+//  adding asqtad
+//
+//  Revision 1.1.1.1  2003/09/18 22:30:53  chulwoo
+//  Mike's files for single node QCDOC + Parallel transport
+//  I added some hacks for PARALLEL without MPI_SCU
+//  PARALLEL=2 set PARALLEL without MPI_SCU
+//
+//
+//  Revision 1.3  2003/08/29 20:58:09  mike
+//  Revision to function names regarding multishift solver to make more consistent with convention.
+//
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
+//  Revision 1.4  2001/08/16 10:50:35  anj
+//  The float->Float changes in the previous version were unworkable on QCDSP.
+//  To allow type-flexibility, all references to "float" have been
+//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
+//  (where Float=rfloat), and on all other machines allows the use of
+//  double or float in all cases (i.e. for both Float and IFloat).  The I
+//  stands for Internal, as in "for internal use only". Anj
+//
+//  Revision 1.2  2001/06/19 18:13:23  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:16:09  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
+//  $RCSfile: f_asqtad.C,v $
+//  $Revision: 1.2 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
+//------------------------------------------------------------------
+//
+// f_asqtad.C
+//
+// Fasqtad is derived from FstagTypes and is relevant to
+// staggered fermions
+//
+//------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/verbose.h>
 #include <util/dirac_op.h>
+#include <util/asqtad.h>
 #include <util/vector.h>
 #include <util/gjp.h>
 #include <comms/nga_reg.h>
@@ -19,11 +105,16 @@ CPS_END_NAMESPACE
 #include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
-
+enum{VECT_LEN=6, MATRIX_SIZE=18, SITE_LEN=72};
 
 
 //------------------------------------------------------------------
 // Initialize static variables.
+//------------------------------------------------------------------
+
+
+//------------------------------------------------------------------
+// static variables used only inside this file
 //------------------------------------------------------------------
 
 //  CRAM temp buffer
@@ -34,7 +125,7 @@ static Matrix *mp1 = mp0 + 1;
 // static Matrix *mp2 = mp1 + 1;
 // static Matrix *mp3 = mp2 + 1;
 static Vector *vp0 = (Vector *)
-    (CRAM_SCRATCH_ADDR+2*MATRIX_SIZE*sizeof(IFloat));
+	(CRAM_SCRATCH_ADDR+2*MATRIX_SIZE*sizeof(IFloat));
 static Vector *vp1 = vp0 + 1;
 static Vector *vp2 = vp1 + 1;
 static Vector *vp3 = vp2 + 1;
@@ -50,225 +141,621 @@ static Matrix *mp1 = &mt1;
 // static Matrix *mp2 = &mt2;
 // static Matrix *mp3 = &mt3;
 static Vector vt0;
-//static Vector vt1;
+static Vector vt1;
 static Vector vt2;
 static Vector vt3;
 static Vector *vp0 = &vt0;
-//static Vector *vp1 = &vt1;
+static Vector *vp1 = &vt1;
 static Vector *vp2 = &vt2;
 static Vector *vp3 = &vt3;
 
 #endif 
 
+static Matrix m_tmp1, m_tmp2;
+static int bc[4] = {0,0,0,0};	// boundary on this node
 
 
 
+const unsigned CBUF_MODE1 = 0xcb911548;
+const unsigned CBUF_MODE2 = 0xcca52112;
+const unsigned CBUF_MODE3 = 0xc98c6106;
+const unsigned CBUF_MODE4 = 0xcca52112;
 
 
 
-
-
-Fasqtad::Fasqtad(){
-    cname = "Fasqtad";
-    char *fname = "Fasqtad()";
-    VRB.Func(cname,fname);
-}
-
-
-Fasqtad::~Fasqtad(){
-    char *fname = "~Fasqtad()";
-    VRB.Func(cname,fname);
-}
-
-
-FclassType Fasqtad::Fclass(){
-    return F_CLASS_ASQTAD;
-}
-
-
-int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in, 
-			    CgArg *cg_arg, 
-			    Float *true_res,
-			    CnvFrmType cnv_frm)
+//------------------------------------------------------------------
+// Constructor
+//------------------------------------------------------------------
+Fasqtad::Fasqtad()
 {
-    int iter;
-    char *fname = "FmatEvlInv(CgArg*,V*,V*,F*,CnvFrmType)";
-    VRB.Func(cname,fname);
+  cname = "Fasqtad";
+  char *fname = "Fasqtad()";
+  VRB.Func(cname,fname);
 
-    DiracOpStag stag(*this, f_out, f_in, cg_arg, cnv_frm);
-  
-    iter = stag.InvCg(true_res);
+  //----------------------------------------------------------------
+  // Check if anisotropy is present and exit since Fasqtad has
+  // not been tested for anisotropic lattices.
+  //----------------------------------------------------------------
 
-    stag.Dslash(f_tmp, f_out, CHKB_EVEN, DAG_NO);
+  // Modified for anisotropic lattices
+  //  if(GJP.XiBare() != 1 ||
+  //     GJP.XiV()    != 1 ||
+  //     GJP.XiVXi()  != 1   ){
+  //    ERR.General(cname,fname,
+  //    "XiBare=%g, XiV=%g, XiVXi=%g : Fasqtad has not been tested with anisotropy\n",
+  //		GJP.XiBare(), GJP.XiV(), GJP.XiVXi());
+  //  }
+  // End modification
 
-    // Return the number of iterations
-    return iter;
+  e_vsize = VECT_LEN/2;
+  for(int i = 0; i < 4; ++i) {
+      e_vsize *= node_sites[i];
+  }
+
+  f_tmp = (Vector *)smalloc(e_vsize*sizeof(Float));
+
+  xv[0] = node_sites[3]/2;
+  xv[1] = (node_sites[3]*node_sites[0])/2;
+  xv[2] = (node_sites[3]*node_sites[0]*node_sites[1])/2;
+
+
+  //----------------------------------------------------------------
+  // Initialize boundary condition on this node
+  //----------------------------------------------------------------
+  if(GJP.Xbc() == BND_CND_APRD) bc[0] = GJP.XnodeCoor()
+  	== (GJP.Xnodes()-1) ? 1 : 0 ;
+
+  if(GJP.Ybc() == BND_CND_APRD) bc[1] = GJP.YnodeCoor()
+  	== (GJP.Ynodes()-1) ? 1 : 0;
+
+  if(GJP.Zbc() == BND_CND_APRD) bc[2] = GJP.ZnodeCoor()
+  	== (GJP.Znodes()-1) ? 1 : 0;
+
+  if(GJP.Tbc() == BND_CND_APRD) bc[3] = GJP.TnodeCoor()
+  	== (GJP.Tnodes()-1) ? 1 : 0;
+  IFloat *tmp_p = (IFloat *)GaugeField();
+//  printf("GaugeField(%p)[0] = %e\n",tmp_p,*tmp_p);
+  asqtad_dirac_init(GaugeField());
+
+  // setup CBUF
+    setCbufCntrlReg(1, CBUF_MODE1);
+    setCbufCntrlReg(2, CBUF_MODE2);
+    setCbufCntrlReg(3, CBUF_MODE3);
+    setCbufCntrlReg(4, CBUF_MODE4);
 }
 
 
-int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in, 
-			    CgArg *cg_arg, 
-			    CnvFrmType cnv_frm)
-{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
-
-
-int Fasqtad::FmatInv(Vector *f_out, Vector *f_in, 
-			 CgArg *cg_arg, 
-			 Float *true_res,
-			 CnvFrmType cnv_frm,
-			 PreserveType prs_f_in)
+//------------------------------------------------------------------
+// Destructor
+//------------------------------------------------------------------
+Fasqtad::~Fasqtad()
 {
-    int iter;
-    char *fname = "FmatInv(CgArg*,V*,V*,F*,CnvFrmType)";
-    VRB.Func(cname,fname);
+  char *fname = "~Fasqtad()";
+  VRB.Func(cname,fname);
 
-    DiracOpStag stag(*this, f_out, f_in, cg_arg, cnv_frm);
-  
-    iter = stag.MatInv(true_res, prs_f_in);
-  
-    // Return the number of iterations
-    return iter;
+  asqtad_destroy_dirac_buf();
+  sfree(f_tmp);
 }
 
 
-int Fasqtad::FmatInv(Vector *f_out, Vector *f_in, 
-			 CgArg *cg_arg, 
-			 CnvFrmType cnv_frm,
-			 PreserveType prs_f_in)
-{ return FmatInv(f_out, f_in, cg_arg, 0, cnv_frm, prs_f_in); }
+//------------------------------------------------------------------
+// FclassType Fclass(void):
+// It returns the type of fermion class.
+//------------------------------------------------------------------
+FclassType Fasqtad::Fclass(void){
+  return F_CLASS_STAG;
+}
 
 
-int Fasqtad::FeigSolv(Vector **f_eigenv, Float lambda[], 
-			  Float chirality[], int valid_eig[],
-			  Float **hsum,
-			  EigArg *eig_arg, 
-			  CnvFrmType cnv_frm)
+//-------------------------------------------------------
+// used by getUDagX()
+//-------------------------------------------------------
+static Vector v_tmp1;
+
+
+
+
+//-------------------------------------------------------
+//  // get V_mu(x) = U_mu(x)^dag * X(x+mu)
+//  get V_mu(x) = U_mu(x) * X(x+mu)
+//  end up with BANK3
+//  begin with BANK4_BASE+BANK_SIZE
+//-------------------------------------------------------
+void Fasqtad::
+getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const
 {
-    int iter;
-    char *fname = "FeigSolv(EigArg*,V*,F*,CnvFrmType)";
-    VRB.Func(cname,fname);
-    CgArg cg_arg;
-    cg_arg.mass = 0.0;
-    cg_arg.RitzMatOper = eig_arg->RitzMatOper;
-    int N_eig = eig_arg->N_eig;
-#if 0
-    // IS THIS NECESSARY ???
-    if(cnv_frm == CNV_FRM_YES)
-	for(int i=0; i < N_eig; ++i)
-	    Fconvert(f_eigenv[i], WILSON, StrOrd());
-#endif
+    Matrix *uoff = GaugeField()+GsiteOffset(x)+mu;
 
-    // Call constructor and solve for eigenvectors.
-    // Use null pointers to fake out constructor.
-    Vector *v1 = (Vector *)0;
-    Vector *v2 = (Vector *)0;
+    setCbufCntrlReg(3, CBUF_MODE3);
+    setCbufCntrlReg(4, CBUF_MODE4);
 
-    DiracOpStag wilson(*this, v1, v2, &cg_arg, CNV_FRM_NO);
-  
-    iter = wilson.RitzEig(f_eigenv, lambda, valid_eig, eig_arg);
-  
-#if 0
-    // IS THIS NECESSARY ???
-    if(cnv_frm == CNV_FRM_YES)
-	for(int i=0; i < N_eig; ++i)
-	    Fconvert(f_eigenv[i], CANONICAL, StrOrd());
-#endif
 
-    // Modified for anisotropic lattices
-    Float factor = GJP.XiV()/GJP.XiBare();
-    // Chirality is trivial
-    for(int i=0; i < N_eig; ++i) {
-	chirality[i] = 1.0;
-	lambda[i] *= factor;
-    }
-    // End modification
-
-#if 0
-    // !!! THIS DOES NOT WORK YET !!!
-    // Slice-sum the eigenvector density to make a 1D vector
-    if (eig_arg->print_hsum)
-	for(i=0; i < N_eig; ++i)
-	    slice_sum_sq(hsum[i], f_eigenv[i], eig_arg->hsum_dir);
-#endif
-
-    // Return the number of iterations
-    return iter;
-}
-
-void Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
-			 Float mass){
-    char *fname = "SetPhi(V*,V*,V*,F)";
-    VRB.Func(cname,fname);
-    CgArg cg_arg;
-    cg_arg.mass = mass;
-
-    DiracOpStag stag(*this, phi, frm_o, &cg_arg, CNV_FRM_NO);
-    stag.Dslash(phi, frm_o, CHKB_ODD, DAG_NO);
+    //----------------------------------------
+    // mp1 = U(x)
+    //----------------------------------------
+    // mp1->Dagger((IFloat *)uoff+BANK4_BASE+BANK_SIZE);
+    moveMem(mp1, (IFloat *)uoff+BANK4_BASE+BANK_SIZE,
+    	MATRIX_SIZE*sizeof(IFloat));
 
     // Modified for anisotropic lattices
     //------------------------------------------------------------------
-    fTimesV1MinusV2((IFloat *)phi, 2.*mass*GJP.XiBare()/GJP.XiV(), 
-		    (IFloat *)frm_e, (IFloat *)phi, e_vsize);
+    if (mu == GJP.XiDir()) 
+      vecTimesEquFloat((IFloat *)mp1, GJP.XiVXi()/GJP.XiV(), MATRIX_SIZE);
     // End modification
+
+    //----------------------------------------
+    //  choose the right phase
+    //----------------------------------------
+    int eta_u = 0;
+    for(int u = 0; u < mu; ++u) {
+        eta_u += x[u];
+    }
+    eta_u = (eta_u & 1)? -1 : 1;
+
+    const Vector *p = &v_tmp1;
+    if(x[mu] == node_sites[mu]-1) {	// x+mu off node
+	x[mu] = 0;
+	getPlusData((IFloat *)&v_tmp1, (IFloat *)(cvp+FsiteOffsetChkb(x)),
+	    VECT_LEN, mu);
+        x[mu] = node_sites[mu]-1;
+        if(bc[mu]) eta_u = -eta_u;
+
+    } else { // x+mu on node
+        x[mu]++;
+	p = cvp+FsiteOffsetChkb(x);
+	x[mu]--;
+    }
+
+    //----------------------------------------
+    // copy *p to CRAM
+    //----------------------------------------
+    moveMem(vp0, (IFloat *)p+BANK3_BASE, VECT_LEN*sizeof(IFloat));
+
+    if(eta_u == -1) {
+        vecNegative((IFloat *)mp1, (IFloat *)mp1, MATRIX_SIZE);
+    }
+
+    uDotXEqual((IFloat *)&v, (IFloat *)mp1, (IFloat *)vp0);
 }
 
 
-void Fasqtad::FforceSite(Matrix& force, Vector *frm, int *x, int mu){
-
-    char *fname = "FforceSite(M&,V*,i*,i)";
-    ERR.NotImplemented(cname,fname);
-	
+//------------------------------------------------------------------
+// int ExactFlavors() : 
+// Returns the number of exact flavors of the matrix that
+// is inverted during a molecular dynamics evolution.
+//------------------------------------------------------------------
+int Fasqtad::ExactFlavors(void)
+{
+  return 4;
 }
 
 
-
-
-
-
-Float Fasqtad::BhamiltonNode(Vector *boson, Float mass){
-    char *fname = "BhamiltonNode(V*,F)";
-    VRB.Func(cname,fname);
-    CgArg cg_arg;
-    cg_arg.mass = mass;
-
-    DiracOpStag stag(*this, f_tmp, boson, &cg_arg, CNV_FRM_NO);
-    Float ham;
-    stag.MatPcDagMatPc(f_tmp, boson, &ham);
-
-    return ham;
+//------------------------------------------------------------------
+// int SpinComponents() : 
+// Returns the number of spin components.
+//------------------------------------------------------------------
+int Fasqtad::SpinComponents(void)
+{
+  return 1;
 }
 
 
-
-void Fasqtad::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
-			  CnvFrmType cnv_frm, int dir_flag){
-    int offset;
-    char *fname = "Fdslash(V*,V*,CgArg*,CnvFrmType,int)";
-    VRB.Func(cname,fname);
-  
-    DiracOpStag stag(*this, f_out, f_in, cg_arg, cnv_frm);
-    offset = GJP.VolNodeSites() * FsiteSize() / (2 * VECT_LEN);
-  
-    stag.Dslash(f_out, f_in+offset, CHKB_ODD, DAG_NO, dir_flag);
-    stag.Dslash(f_out+offset, f_in, CHKB_EVEN, DAG_NO, dir_flag);
-
+//------------------------------------------------------------------
+// int FsiteSize() : 
+// Returns the number of fermion field components 
+// (including real/imaginary) on a site of the 4-D lattice.
+//------------------------------------------------------------------
+int Fasqtad::FsiteSize(void)
+{
+  return 2 * Colors() * SpinComponents();  
+  // re/im * colors * spin_components
 }
 
 
-void Fasqtad::prepForce(Vector *frm){
-
-    char *fname = "preopForce";
-    ERR.NotImplemented(cname,fname);
-	
+//------------------------------------------------------------------
+// int FchkbEvl() :
+// returns 1 => The fermion fields in the evolution
+//      or the CG that inverts the evolution matrix
+//      are defined on a single checkerboard (half the 
+//      lattice).
+//------------------------------------------------------------------
+int Fasqtad::FchkbEvl(void)
+{
+  return 1;
 }
 
+
+//------------------------------------------------------------------
+// int FmatEvlInv(Vector *f_out, Vector *f_in, 
+//                CgArg *cg_arg, 
+//                Float *true_res,
+//		  CnvFrmType cnv_frm = CNV_FRM_YES):
+// It calculates f_out where A * f_out = f_in and
+// A is the fermion matrix that appears in the HMC 
+// evolution ([Dirac^dag Dirac]). The inversion is done
+// with the conjugate gradient. cg_arg is the structure
+// that contains all the control parameters, f_in is the
+// fermion field source vector, f_out should be set to be
+// the initial guess and on return is the solution.
+// f_in and f_out are defined on a checkerboard.
+// If true_res !=0 the value of the true residual is returned
+// in true_res.
+// *true_res = |src - MatPcDagMatPc * sol| / |src|
+// The function returns the total number of CG iterations.
+//------------------------------------------------------------------
+int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in, 
+		      CgArg *cg_arg, 
+		      Float *true_res,
+		      CnvFrmType cnv_frm)
+{
+  int iter;
+  char *fname = "FmatEvlInv(CgArg*,V*,V*,F*,CnvFrmType)";
+  VRB.Func(cname,fname);
+
+  printf("f_out^2=%e\n", f_out->NormSqNode(GJP.VolNodeSites() *
+FsiteSize() / 2 ) );
+  printf("f_in^2=%e\n", f_in->NormSqNode(GJP.VolNodeSites() *
+FsiteSize() / 2 ) );
+  DiracOpAsqtad stag(*this, f_out, f_in, cg_arg, cnv_frm);
+  iter = stag.InvCg(true_res);
+
+  stag.Dslash(f_tmp, f_out, CHKB_EVEN, DAG_NO);
+  VRB.Flow(cname,fname,"        InvCG out = %e f_tmp = %e\n", FhamiltonNode(f_out,f_out),
+	 FhamiltonNode(f_tmp,f_tmp));
+
+  // Return the number of iterations
+  return iter;
+}
+
+
+//------------------------------------------------------------------
+// Overloaded function is same as original but with true_res=0;
+//------------------------------------------------------------------
+int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in, 
+		      CgArg *cg_arg, 
+		      CnvFrmType cnv_frm)
+{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
+
+
+
+//------------------------------------------------------------------
+// int FmatEvlMInv(Vector **f_out, Vector *f_in, 
+//                Float shift[], int Nshift, 
+//                CgArg *cg_arg, Float *true_res,
+//		  CnvFrmType cnv_frm = CNV_FRM_YES):
+// It calculates f_out where (A + shift)* f_out = f_in and
+// A is the fermion matrix that appears in the HMC 
+// evolution ([Dirac^dag Dirac]) and shift is a real shift of the 
+// fermion matrix, with Nshift such shifts. The inversion is done 
+// with the multishift conjugate gradient. cg_arg is the structure
+// that contains all the control parameters, f_in is the
+// fermion field source vector, f_out is the array of solution 
+// vectors, f_in and f_out are defined on a checkerboard.
+// The function returns the total number of CG iterations.
+//------------------------------------------------------------------
 int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
-		       int Nshift, int isz, CgArg *cg_arg,
-		       CnvFrmType cnv_frm) {
+		    int Nshift, int isz, CgArg *cg_arg,
+		    CnvFrmType cnv_frm)
+{
+  int iter;
+  char *fname = "FmatMInv(V**, V*, .....)";
+  VRB.Func(cname,fname);
+  printf("Fasqtad::FmatEvlMInv\n");
 
-    char *fname = "FmatMInv";
-    ERR.NotImplemented(cname,fname);    
-    
+  Vector **EigVec=0;
+  int Neig = 0;
+  Float dot = f_in -> NormSqGlbSum(e_vsize);
+  Float RsdCG[Nshift];
+  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
+
+  //Fake the constructor
+  DiracOpAsqtad stag(*this, f_out[0], f_in, cg_arg, cnv_frm);
+
+  return stag.MInvCG(f_out,f_in,sqrt(dot),shift,Nshift,isz,RsdCG,EigVec,Neig);  
+}
+
+
+//------------------------------------------------------------------
+// int FmatInv(Vector *f_out, Vector *f_in, 
+//             CgArg *cg_arg, 
+//             Float *true_res,
+//             CnvFrmType cnv_frm = CNV_FRM_YES,
+//             PreserveType prs_f_in = PRESERVE_YES):
+// It calculates f_out where A * f_out = f_in and
+// A is the fermion matrix (Dirac operator). The inversion
+// is done with the conjugate gradient. cg_arg is the 
+// structure that contains all the control parameters, f_in 
+// is the fermion field source vector, f_out should be set 
+// to be the initial guess and on return is the solution.
+// f_in and f_out are defined on the whole lattice.
+// If true_res !=0 the value of the true residual is returned
+// in true_res.
+// *true_res = |src - MatPcDagMatPc * sol| / |src|
+// cnv_frm is used to specify if f_in should be converted 
+// from canonical to fermion order and f_out from fermion 
+// to canonical. 
+// prs_f_in is used to specify if the source
+// f_in should be preserved or not. If not the memory usage
+// is less by half the size of a fermion vector.
+// The function returns the total number of CG iterations.
+//------------------------------------------------------------------
+int Fasqtad::FmatInv(Vector *f_out, Vector *f_in, 
+		   CgArg *cg_arg, 
+		   Float *true_res,
+		   CnvFrmType cnv_frm,
+		   PreserveType prs_f_in)
+{
+  int iter;
+  char *fname = "FmatInv(CgArg*,V*,V*,F*,CnvFrmType)";
+  VRB.Func(cname,fname);
+
+  DiracOpAsqtad stag(*this, f_out, f_in, cg_arg, cnv_frm);
+  
+  iter = stag.MatInv(true_res, prs_f_in);
+  
+  // Return the number of iterations
+  return iter;
+}
+
+//------------------------------------------------------------------
+// Overloaded function is same as original but with true_res=0;
+//------------------------------------------------------------------
+int Fasqtad::FmatInv(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		   CnvFrmType cnv_frm, PreserveType prs_f_in)
+{ return FmatInv(f_out, f_in, cg_arg, 0, cnv_frm, prs_f_in); }
+
+
+//------------------------------------------------------------------
+// int FeigSolv(Vector **f_eigenv, Float *lambda, int valid_eig[],
+//              EigArg *eig_arg, 
+//              CnvFrmType cnv_frm = CNV_FRM_YES):
+//------------------------------------------------------------------
+int Fasqtad::FeigSolv(Vector **f_eigenv, Float lambda[], 
+		    Float chirality[], int valid_eig[],
+		    Float **hsum,
+		    EigArg *eig_arg, 
+		    CnvFrmType cnv_frm)
+{
+  int iter;
+  char *fname = "FeigSolv(EigArg*,V*,F*,CnvFrmType)";
+  VRB.Func(cname,fname);
+  CgArg cg_arg;
+  cg_arg.mass = eig_arg -> mass;
+  cg_arg.RitzMatOper = eig_arg->RitzMatOper;
+  int N_eig = eig_arg->N_eig;
+#if 0
+  // IS THIS NECESSARY ???
+  if(cnv_frm == CNV_FRM_YES)
+    for(int i=0; i < N_eig; ++i)
+      Fconvert(f_eigenv[i], WILSON, StrOrd());
+#endif
+
+  // Call constructor and solve for eigenvectors.
+  // Use null pointers to fake out constructor.
+  Vector *v1 = (Vector *)0;
+  Vector *v2 = (Vector *)0;
+
+  DiracOpAsqtad stag(*this, v1, v2, &cg_arg, CNV_FRM_NO);
+  
+  iter = stag.RitzEig(f_eigenv, lambda, valid_eig, eig_arg);
+  
+#if 0
+  // IS THIS NECESSARY ???
+  if(cnv_frm == CNV_FRM_YES)
+    for(int i=0; i < N_eig; ++i)
+      Fconvert(f_eigenv[i], CANONICAL, StrOrd());
+#endif
+
+  // Modified for anisotropic lattices
+  Float factor = GJP.XiV()/GJP.XiBare();
+  // Chirality is trivial
+  for(int i=0; i < N_eig; ++i) {
+    chirality[i] = 1.0;
+    lambda[i] *= factor;
+  }
+  // End modification
+
+#if 0
+  // !!! THIS DOES NOT WORK YET !!!
+  // Slice-sum the eigenvector density to make a 1D vector
+  if (eig_arg->print_hsum)
+    for(i=0; i < N_eig; ++i)
+      slice_sum_sq(hsum[i], f_eigenv[i], eig_arg->hsum_dir);
+#endif
+
+  // Return the number of iterations
+  return iter;
+}
+
+//------------------------------------------------------------------
+// SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass):
+// It sets the pseudofermion field phi from frm_e, frm_o.
+//------------------------------------------------------------------
+void Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
+		   Float mass){
+  char *fname = "SetPhi(V*,V*,V*,F)";
+  VRB.Func(cname,fname);
+  CgArg cg_arg;
+  cg_arg.mass = mass;
+
+  DiracOpAsqtad stag(*this, phi, frm_o, &cg_arg, CNV_FRM_NO);
+  stag.Dslash(phi, frm_o, CHKB_ODD, DAG_NO);
+
+  // Modified for anisotropic lattices
+  //------------------------------------------------------------------
+  fTimesV1MinusV2((IFloat *)phi, 2.*mass*GJP.XiBare()/GJP.XiV(), 
+	(IFloat *)frm_e, (IFloat *)phi, e_vsize);
+  // End modification
+}
+
+
+//------------------------------------------------------------------
+// FforceSite(Matrix& force, Vector *frm, int *x, int mu):
+// It calculates the fermion force at site x and direction mu.
+// frm is the fermion field that resulted from the application
+// of the inverter on the pseudofermion field.
+//------------------------------------------------------------------
+void Fasqtad::FforceSite(Matrix& force, Vector *frm, int *x, int mu)
+{
+  char *fname = "FforceSite(M&,V*,i*,i)";
+//  VRB.Func(cname,fname);
+
+    int x_off = FsiteOffsetChkb(x);
+
+    setCbufCntrlReg(3, CBUF_MODE3);
+
+    //----------------------------------------
+    // mp1 and mp2 free
+    //
+    //  calculate fermion part.
+    //
+    //----------------------------------------
+    if((x[0]+x[1]+x[2]+x[3])%2) { // odd, assume base_odd = 0
+
+        //----------------------------------------
+	// U_u(x) X(x+u)
+        //----------------------------------------
+	getUDagX(*vp2, frm, x, mu);
+
+        //----------------------------------------
+	// *vp3 = *vp2;
+        //----------------------------------------
+	moveMem(vp3, vp2, VECT_LEN*sizeof(IFloat));
+
+	vecMinusEquVec((IFloat *)vp3,
+		(IFloat *)&f_tmp[x_off]+BANK3_BASE+BANK_SIZE, VECT_LEN);
+
+    } else {	// even
+	getUDagX(*vp2, f_tmp, x, mu);
+
+        //----------------------------------------
+	// *vp3 = X[x]
+        //----------------------------------------
+	moveMem(vp3, (IFloat *)&frm[x_off]+BANK3_BASE+BANK_SIZE,
+	    VECT_LEN*sizeof(IFloat));
+	*vp2 += *vp3;
+    }
+
+    force.Cross2(*vp2, *vp3);
+
+    mp1->Dagger((IFloat *)&force);
+    force.TrLessAntiHermMatrix(*mp1);
+}
+
+#if 0
+//------------------------------------------------------------------
+// EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, 
+//                 Float step_size):
+// It evolves the canonical momentum mom by step_size
+// using the fermion force. 
+//------------------------------------------------------------------
+void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
+			    Float mass, Float dt){
+  char *fname = "EvolveMomFforce(M*,V*,F,F)";
+  VRB.Func(cname,fname);
+
+  setCbufCntrlReg(4, CBUF_MODE4);
+  int x[4];
+  
+  for(x[0] = 0; x[0] < node_sites[0]; ++x[0]) {
+    for(x[1] = 0; x[1] < node_sites[1]; ++x[1]) {
+      for(x[2] = 0; x[2] < node_sites[2]; ++x[2]) {
+	for(x[3] = 0; x[3] < node_sites[3]; ++x[3]) {
+	  
+	  Matrix *ihp = mom+GsiteOffset(x);
+	  
+	  for (int mu = 0; mu < 4; ++mu) {
+	    FforceSite(*mp0, frm, x, mu);
+	    fTimesV1PlusV2((IFloat *)(ihp+mu), dt,
+			   (IFloat *)mp0,
+			   (IFloat *)(ihp+mu)+BANK4_BASE, 18);
+	  }
+	}
+      }
+    }
+  }
+}
+#endif
+
+void Fasqtad::prepForce(Vector *frm) {
+  char *fname = "prepForce(V*)";
+  VRB.Func(cname,fname);
+
+  // Fake out the constructor
+  CgArg cg_arg;
+  cg_arg.mass = 0.0;
+  Vector *v1=(Vector*)0, *v2=(Vector*)0;
+  DiracOpAsqtad stag(*this, v2, v1, &cg_arg, CNV_FRM_NO);
+  stag.Dslash(f_tmp, frm, CHKB_EVEN, DAG_NO);
+}
+
+
+//------------------------------------------------------------------
+// Float FhamiltonNode(Vector *phi, Vector *chi):
+// The fermion Hamiltonian of the node sublattice.
+// chi must be the solution of Cg with source phi.	       
+//------------------------------------------------------------------
+Float Fasqtad::FhamiltonNode(Vector *phi, Vector *chi){
+  char *fname = "FhamiltonNode(V*,V*)";
+  VRB.Func(cname,fname);
+
+  return dotProduct((IFloat *)phi, (IFloat *)chi, e_vsize);
+}
+
+
+//------------------------------------------------------------------
+// Float BhamiltonNode(Vector *boson, Float mass):
+// The boson Hamiltonian of the node sublattice.
+//------------------------------------------------------------------
+Float Fasqtad::BhamiltonNode(Vector *boson, Float mass){
+  char *fname = "BhamiltonNode(V*,F)";
+  VRB.Func(cname,fname);
+  CgArg cg_arg;
+  cg_arg.mass = mass;
+
+  DiracOpAsqtad stag(*this, f_tmp, boson, &cg_arg, CNV_FRM_NO);
+  Float ham;
+  stag.MatPcDagMatPc(f_tmp, boson, &ham);
+
+  return ham;
+}
+
+
+//------------------------------------------------------------------
+// int FsiteOffset(const int *x):
+// Sets the offsets for the fermion fields on a 
+// checkerboard. The fermion field storage order
+// is the canonical one. X[I] is the
+// ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+//------------------------------------------------------------------
+int Fasqtad::FsiteOffset(const int *x) const {
+// ???
+  return x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+node_sites[2]*x[3]));
+  return 0; 
+}
+
+//------------------------------------------------------------------
+// Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, CnvFrmType cnv_frm,
+//                    int dir_flag) :
+// Fdslash is the derivative part of the fermion matrix. 
+// Fdslash calculates both odd-->even and even-->odd sites.
+// dir_flag is flag which takes value 0 when all direction contribute to D,
+// 1 - when only the special anisotropic direction contributes to D,
+// 2 - when all  except the special anisotropic direction. 
+//------------------------------------------------------------------
+void Fasqtad::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, int dir_flag)
+{
+  int offset;
+  char *fname = "Fdslash(V*,V*,CgArg*,CnvFrmType,int)";
+  VRB.Func(cname,fname);
+  
+  DiracOpAsqtad stag(*this, f_out, f_in, cg_arg, cnv_frm);
+  offset = GJP.VolNodeSites() * FsiteSize() / (2 * VECT_LEN);
+  
+  stag.Dslash(f_out, f_in+offset, CHKB_ODD, DAG_NO, dir_flag);
+  stag.Dslash(f_out+offset, f_in, CHKB_EVEN, DAG_NO, dir_flag);
+
 }
 
 CPS_END_NAMESPACE

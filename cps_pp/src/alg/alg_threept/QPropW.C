@@ -3,14 +3,94 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-10-31 14:15:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v 1.3 2003-10-31 14:15:33 zs Exp $
-//  $Id: QPropW.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v 1.4 2004-01-13 20:39:01 chulwoo Exp $
+//  $Id: QPropW.C,v 1.4 2004-01-13 20:39:01 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.3.4.2  2003/11/06 01:33:03  cwj
+//  *** empty log message ***
+//
+//  Revision 1.3.4.1  2003/11/06 00:18:32  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:04:58  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
+//  Revision 1.8  2002/12/04 17:16:27  zs
+//  Merged the new 2^4 RNG into the code.
+//  This new RNG is implemented in the LatRanGen class.
+//  The following algorithm and utility classes are affected:
+//
+//  AlgEig                  Fdwf
+//  AlgGheatBath            Fstag
+//  AlgHmd                  GlobalJobParameter
+//  AlgNoise                Lattice
+//  AlgPbp                  Matrix
+//  AlgThreept              RandomGenerator
+//                          Vector
+//
+//  Revision 1.7  2001/08/16 10:49:41  anj
+//  The float->Float changes in the previous version were unworkable on QCDSP.
+//  To allow type-flexibility, all references to "float" have been
+//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
+//  (where Float=rfloat), and on all other machines allows the use of
+//  double or float in all cases (i.e. for both Float and IFloat).  The I
+//  stands for Internal, as in "for internal use only". Anj
+//
+//  Revision 1.5  2001/07/03 17:00:46  anj
+//
+//  Multiple minor alterations to change some #include's from referring to
+//  files relative to the top-level source directory to referring to files
+//  relative to the source-file positions.  This alteration makes the code
+//  backwards compatable with the make structure of QCDSP, although this
+//  may have to be changed to a more usual form in the future. Anj.
+//
+//  Revision 1.4  2001/06/28 14:34:10  anj
+//
+//  The core ANSIfication should now be complete.  There are a few
+//  remaining issues, but this version should compile anywhere and be
+//  backward compatable with QCDSP (although this requires the top source
+//  directory (.../phys/ to be added to the include path).
+//
+//  The serial GCC version has also been tested, and all test programs
+//  appear to behave as they should (not to imply that they all work, but
+//  I believe those that should work are ok).  There are minor differences
+//  in the results due to rounding, (see example pbp_gccsun.dat files),
+//  but that is all.
+//
+//  Anj.
+//
+//  Revision 1.3  2001/06/21 15:40:10  anj
+//  Updated the _TARTAN ifdefs, using PARALLEL instead (where appropriate).Anj
+//
+//  Revision 1.2  2001/06/19 18:11:31  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:16:00  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
 //  $RCSfile: QPropW.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v $
 //  $State: Exp $
 //

@@ -3,13 +3,25 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-08-12 16:21:28 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v 1.3 2003-08-12 16:21:28 zs Exp $
-//  $Id: w_baryon.C,v 1.3 2003-08-12 16:21:28 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v 1.4 2004-01-13 20:39:02 chulwoo Exp $
+//  $Id: w_baryon.C,v 1.4 2004-01-13 20:39:02 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3.10.1  2003/11/06 00:26:06  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:04:58  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.3  2003/08/12 16:21:28  zs
+//  Preprocessor commands starting on the first column are more portable and
+//  look nicer in emacs.
+//
 //  Revision 1.2  2003/07/24 16:53:54  zs
 //  Addition of documentation via doxygen:
 //  doxygen-parsable comment blocks added to many source files;
@@ -40,7 +52,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: w_baryon.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v $
 //  $State: Exp $
 //

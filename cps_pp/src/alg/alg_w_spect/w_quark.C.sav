@@ -3,13 +3,27 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_quark.C.sav,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: w_quark.C.sav,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-01-13 20:39:03 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_quark.C.sav,v 1.2 2004-01-13 20:39:03 chulwoo Exp $
+//  $Id: w_quark.C.sav,v 1.2 2004-01-13 20:39:03 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1.10.1  2003/11/06 00:26:06  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:04:59  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.1.1.1  2003/06/22 13:34:46  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.4  2002/03/11 22:25:56  anj
 //  This should now be the correct, fully merged code from our two versions. Anj
 //
@@ -41,7 +55,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: w_quark.C.sav,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_quark.C.sav,v $
 //  $State: Exp $
 //
