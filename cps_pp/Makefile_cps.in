@@ -1,4 +1,4 @@
-# $Id: Makefile_cps.in,v 1.13 2003-10-31 15:58:24 zs Exp $
+# $Id: Makefile_cps.in,v 1.14 2003-10-31 16:00:31 zs Exp $
 #
 #  Template makefile for the Columbia Physics System
 #
@@ -17,7 +17,7 @@ top_srcdir = @topwd_srcdir@
 INCLUDE_FLAGS := -I$(top_srcdir)  -I$(top_srcdir)/include
 
 CXX = @CXX@
-CXXFLAGS = @CXXFLAGS@ -DTARGET_QCDSP=@TARGET_QCDSP@  $(INCLUDE_FLAGS) 
+CXXFLAGS = @CXXFLAGS@ $(INCLUDE_FLAGS) 
 LIBS = @LIBS@
 
 #
