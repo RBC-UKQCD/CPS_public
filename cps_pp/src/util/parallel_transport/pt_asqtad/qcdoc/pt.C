@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of ParTransAsqtad class methods for QCDOC.
   
-  $Id: pt.C,v 1.8 2004-06-04 21:14:14 chulwoo Exp $
+  $Id: pt.C,v 1.9 2004-06-07 17:12:19 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt.C,v 1.8 2004-06-04 21:14:14 chulwoo Exp $
-//  $Id: pt.C,v 1.8 2004-06-04 21:14:14 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-06-07 17:12:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt.C,v 1.9 2004-06-07 17:12:19 mclark Exp $
+//  $Id: pt.C,v 1.9 2004-06-07 17:12:19 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -349,90 +349,90 @@ void ParTransAsqtad::pt_init_g(void){
 
 
 void ParTransAsqtad::run(int n, Matrix **mout, Matrix **min, const int *dir){
-    
-	int wire[n];
-	int i,j;
-	SCUDirArgIR *SCUarg_p[2*n];
-	SCUDirArgMulti SCUmulti;
-	static int call_num = 0;
-
-	call_num++;
-//	printf("run(i,M**,M**,i):call_num=%d\n",call_num);
-	char *fname="run(i,M**,M**,i)";
-//	VRB.Func(cname,fname);
-	
-//	for(i=0;i<n;i++) wire[i] = (dir[i]+2)%(2*NDIM); // from (x,y,z,t) to (t,x,y,z)
-	for(i=0;i<n;i++) wire[i] = dir[i]; 
-	for(i=0;i<n;i++) {
-		Matrix * addr = (min[i]+offset[wire[i]]);
-//		printf("addr=%p\n",addr);
-		SCUarg_p[2*i] = SCUarg_mat[2*wire[i]];
-		SCUarg_p[2*i+1] = SCUarg_mat[2*wire[i]+1];
-		SCUarg_p[2*i+1]->Addr((void *)addr);
-	}
-	SCUmulti.Init(SCUarg_p,n*2);
-	SCUmulti.SlowStartTrans();
-			
-//	Float dtime  = - dclock();
-	for(i=0;i<n;i++)
-	 cmm_agg_cpp(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)min[i],(long)mout[i]);
-	SCUmulti.TransComplete();
-	for(i=0;i<n;i++) cmm_agg_cpp(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)mout[i]);
-//	dtime +=dclock();
-//	print_flops(198*vol*n,dtime);
+  
+  int wire[n];
+  int i,j;
+  SCUDirArgIR *SCUarg_p[2*n];
+  SCUDirArgMulti SCUmulti;
+  static int call_num = 0;
+  
+  call_num++;
+  //	printf("run(i,M**,M**,i):call_num=%d\n",call_num);
+  char *fname="run(i,M**,M**,i)";
+  //	VRB.Func(cname,fname);
+  
+  //	for(i=0;i<n;i++) wire[i] = (dir[i]+2)%(2*NDIM); // from (x,y,z,t) to (t,x,y,z)
+  for(i=0;i<n;i++) wire[i] = dir[i]; 
+  for(i=0;i<n;i++) {
+    Matrix * addr = (min[i]+offset[wire[i]]);
+    //		printf("addr=%p\n",addr);
+    SCUarg_p[2*i] = SCUarg_mat[2*wire[i]];
+    SCUarg_p[2*i+1] = SCUarg_mat[2*wire[i]+1];
+    SCUarg_p[2*i+1]->Addr((void *)addr);
+  }
+  SCUmulti.Init(SCUarg_p,n*2);
+  SCUmulti.SlowStartTrans();
+  
+  //	Float dtime  = - dclock();
+  for(i=0;i<n;i++)
+    cmm_agg_cpp(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)min[i],(long)mout[i]);
+  SCUmulti.TransComplete();
+  for(i=0;i<n;i++) cmm_agg_cpp(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)mout[i]);
+  //	dtime +=dclock();
+  //	print_flops(198*vol*n,dtime);
 #if 0
-	for(i=0;i<n;i++){
-		for(j=0;j<vol;j++){
-			IFloat * temp = (IFloat *)(mout[i]+j);
-			for(int k = 0;k<VECT_LEN*3;k += 3){
-				temp[k+0] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+0);
-				temp[k+1] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+1);
-				temp[k+2] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+2);
- 			}
-		}
-	}
+  for(i=0;i<n;i++){
+    for(j=0;j<vol;j++){
+      IFloat * temp = (IFloat *)(mout[i]+j);
+      for(int k = 0;k<VECT_LEN*3;k += 3){
+	temp[k+0] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+0);
+	temp[k+1] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+1);
+	temp[k+2] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+2);
+      }
+    }
+  }
 #endif
 }
 
 void ParTransAsqtad::run(int n, Vector **vout, Vector **vin, const int *dir){
-	int i,j;
-	SCUDirArgIR *SCUarg_p[2*n];
-//	for(i=0;i<n;i++) printf("dir[%d]=%d\n",i,dir[i]);
-//	Float dtime  = - dclock();
-	int wire[n];
-	SCUDirArgMulti SCUmulti;
-
-	char *fname="run(i,V**,V**,i)";
-//	VRB.Func(cname,fname);
-	
-	for(i=0;i<n;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
-	for(i=0;i<n;i++) {
-		Vector * addr = (vin[i]+offset[wire[i]]);
-		SCUarg_p[2*i] = SCUarg[2*wire[i]];
-		SCUarg_p[2*i+1] = SCUarg[2*wire[i]+1];
-		SCUarg_p[2*i+1]->Addr((void *)addr);
-	}
-	SCUmulti.Init(SCUarg_p,n*2);
-	SCUmulti.SlowStartTrans();
-	
-	for(i=0;i<n;i++) pt_asqtad_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
-	SCUmulti.TransComplete();
-	
-	for(i=0;i<n;i++) pt_asqtad_agg(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
-//	dtime +=dclock();
-//	print_flops(66*n*vol,dtime);
+  int i,j;
+  SCUDirArgIR *SCUarg_p[2*n];
+  //	for(i=0;i<n;i++) printf("dir[%d]=%d\n",i,dir[i]);
+  //	Float dtime  = - dclock();
+  int wire[n];
+  SCUDirArgMulti SCUmulti;
+  
+  char *fname="run(i,V**,V**,i)";
+  //	VRB.Func(cname,fname);
+  
+  for(i=0;i<n;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
+  for(i=0;i<n;i++) {
+    Vector * addr = (vin[i]+offset[wire[i]]);
+    SCUarg_p[2*i] = SCUarg[2*wire[i]];
+    SCUarg_p[2*i+1] = SCUarg[2*wire[i]+1];
+    SCUarg_p[2*i+1]->Addr((void *)addr);
+  }
+  SCUmulti.Init(SCUarg_p,n*2);
+  SCUmulti.SlowStartTrans();
+  
+  for(i=0;i<n;i++) pt_asqtad_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
+  SCUmulti.TransComplete();
+  
+  for(i=0;i<n;i++) pt_asqtad_agg(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
+  //	dtime +=dclock();
+  //	print_flops(66*n*vol,dtime);
 #if 0
-	for(i=0;i<n;i++){
-		for(j=0;j<vol;j++){
-			IFloat * temp = (IFloat *)(vout[i]+j);
-			temp[0] = *(tmp_buf[i]+(j*VECT_LEN2)+0);
-			temp[1] = *(tmp_buf[i]+(j*VECT_LEN2)+1);
-			temp[2] = *(tmp_buf[i]+(j*VECT_LEN2)+2);
-			temp[3] = *(tmp_buf[i]+(j*VECT_LEN2)+3);
-			temp[4] = *(tmp_buf[i]+(j*VECT_LEN2)+4);
-			temp[5] = *(tmp_buf[i]+(j*VECT_LEN2)+5);
-		}
-	}
+  for(i=0;i<n;i++){
+    for(j=0;j<vol;j++){
+      IFloat * temp = (IFloat *)(vout[i]+j);
+      temp[0] = *(tmp_buf[i]+(j*VECT_LEN2)+0);
+      temp[1] = *(tmp_buf[i]+(j*VECT_LEN2)+1);
+      temp[2] = *(tmp_buf[i]+(j*VECT_LEN2)+2);
+      temp[3] = *(tmp_buf[i]+(j*VECT_LEN2)+3);
+      temp[4] = *(tmp_buf[i]+(j*VECT_LEN2)+4);
+      temp[5] = *(tmp_buf[i]+(j*VECT_LEN2)+5);
+    }
+  }
 #endif
 }
 
