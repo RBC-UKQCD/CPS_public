@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.9 2004-10-20 19:10:48 chulwoo Exp $
+  $Id: pt.C,v 1.10 2004-10-28 19:20:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-10-20 19:10:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.9 2004-10-20 19:10:48 chulwoo Exp $
-//  $Id: pt.C,v 1.9 2004-10-20 19:10:48 chulwoo Exp $
+//  $Date: 2004-10-28 19:20:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.10 2004-10-28 19:20:51 chulwoo Exp $
+//  $Id: pt.C,v 1.10 2004-10-28 19:20:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -649,8 +649,7 @@ void pt_vvpd(Vector **vect, int n_vect, const int *dir,
   // Only do communication in forward direction
   for(i=0;i<n_dir;i++) {
     if ( size[wire[i]] <hop)
-      ERR.General("",fname,"size(%d) in direction %d is smaller than the
-hop(%d)\n",size[wire[i]],wire[i],hop);
+      ERR.General("",fname,"size(%d) in direction %d is smaller than the hop(%d)\n",size[wire[i]],wire[i],hop);
     SCUarg_p[2*i] = SCUarg[hop-1][4*wire[i]];
     SCUarg_p[2*i+1] = SCUarg[hop-1][4*wire[i]+1];
     SCUarg_p2[2*i] = SCUarg2[hop-1][4*wire[i]];
