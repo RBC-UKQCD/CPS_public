@@ -1,4 +1,5 @@
-# $Id: mkdocs.sh,v 1.4 2004-08-18 11:57:34 zs Exp $
+# $Id: mkdocs.sh,v 1.5 2004-09-02 16:51:48 zs Exp $
+
 # Runs doxygen to produce the reference manual and the user guide and 
 # installdox to get the cross-references right.
 
@@ -13,19 +14,36 @@
 if [ `basename $PWD` = 'doc' ]
 then
     docdir=`pwd -P`
-    topdir=`echo $docdir | sed -e 's:/doc$::'`
+    topdir=`echo $docdir | sed -e 's|/doc$||'`
 else
     topdir=`pwd -P` 
     docdir=$topdir/doc
 fi
 
+if [ $# -eq 1 ] 
+then
+    srcdir=$1
+else
+    srcdir="."
+fi
+
+tempdoxcfg=/tmp/dox$$
+
+# The version number:
+# I assume that the tag is of the form <something>4_8_0<something>
+
+version=`echo '$Name: not supported by cvs2svn $' | sed -e 's/[^1234567890_]//g' -e 'y/_/./'`
+
+for here in usr ref 
+do
+	sed -e "s/^PROJECT_NUMBER.*/PROJECT_NUMBER = $version/" $docdir/$here/doxygen.cfg > $tempdoxcfg
+	mv $tempdoxcfg $docdir/$here/doxygen.cfg
+done
+
+sed -e "s|^STRIP_FROM_PATH.*|STRIP_FROM_PATH = $srcdir/|" -e "s|^INPUT *=.*|INPUT = ../../config.h $srcdir/include $srcdir/src|" $docdir/ref/doxygen.cfg > $tempdoxcfg
+mv $tempdoxcfg $docdir/ref/doxygen.cfg
 
 
-
-# this is not supported for doxygen pre 1.2.17 or thereabouts
-
-sed -e "s:^STRIP_FROM_PATH.*:STRIP_FROM_PATH $topdir/:" $docdir/ref/doxygen.cfg > /tmp/tempdox
-mv /tmp/tempdox $docdir/ref/doxygen.cfg
 
 # run doxygen  
 
@@ -42,13 +60,12 @@ do
 	doxygen doxygen.cfg		
 done
 
-# hack if this doxygen version cannot strip paths  
-
-for f in `ls $docdir/ref/html/*.html`
-do
-	sed -e s:$topdir/::g $f > /tmp/painful
-	mv /tmp/painful $f
-done
+# Hack if this doxygen version cannot strip paths  
+# for f in `ls $docdir/ref/html/*.html`
+# do
+# 	sed -e s|$topdir/||g $f > /tmp/painful
+# 	mv /tmp/painful $f
+# done
 
 # run doxygen again to pick up all cross references
 
@@ -57,17 +74,20 @@ doxygen doxygen.cfg
 
 # run installdox to edit the cross references 
 
-for here in usr ref  
+cd html
+perl installdox -l doxtag@../../ref/html
+
+
+# Make the examples
+
+cd $docdir/examples
+for d in t_asqtad_pion s_spect t_gauge_rot
 do
-	if [ $here = usr ]
-	then
-		there=ref
-	else
-		there=usr
-	fi
-	cd $docdir/$here/html	    
-	perl installdox -l doxtag@../../$there/html
-done	
+	sed -e "s|^OUTPUT_DIRECTORY.*|OUTPUT_DIRECTORY = $d|" \
+	-e "s|^INPUT .*|INPUT = $srcdir/tests/$d|" doxygen.cfg > $tempdoxcfg
+	doxygen $tempdoxcfg
+done
+rm $tempdoxcfg
 
 echo "$0: Finished!"
 

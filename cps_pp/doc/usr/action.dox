@@ -1,4 +1,4 @@
-//$Id: action.dox,v 1.4 2004-08-18 11:57:35 zs Exp $
+//$Id: action.dox,v 1.5 2004-09-02 16:51:48 zs Exp $
 /*!
 
 \page actionpage Lattice actions in the CPS
@@ -322,39 +322,39 @@ Any one of the fermion actions defined above (\ref fermionactions) can be
 combined with any one of the gauge actions (\ref gaugeactions) to form the
 complete lattice action. The classes which define the complete action are
 
-- Wilson gauge action with no fermions:  GwilsonFnone 
-- Wilson gauge action with staggered fermions:  GwilsonFstag 
-- Wilson gauge action with Wilson fermions:  GwilsonFwilson 
-- Wilson gauge action with Clover fermions:   GwilsonFclover 
-- Wilson gauge action with domain wall fermions:   GwilsonFdwf 
+- %Wilson gauge action with no fermions:  GwilsonFnone 
+- %Wilson gauge action with staggered fermions:  GwilsonFstag 
+- %Wilson gauge action with %Wilson fermions:  GwilsonFwilson 
+- %Wilson gauge action with Clover fermions:   GwilsonFclover 
+- %Wilson gauge action with domain wall fermions:   GwilsonFdwf 
 
 - Power plaquette gauge action with no fermions:  GpowerPlaqFnone 
 - Power plaquette gauge action with staggered fermions:  GpowerPlaqFstag 
-- Power plaquette gauge action with Wilson fermions:  GpowerPlaqFwilson 
-- Power plaquette gauge action with Clover fermions:   GpowerPlaqFclover 
+- Power plaquette gauge action with %Wilson fermions:  GpowerPlaqFwilson 
+- Power plaquette gauge action with %Clover fermions:   GpowerPlaqFclover 
 - Power plaquette gauge action with domain wall fermions:   GpowerPlaqFdwf 
 
 - Improved rectangle gauge action with no fermions:  GimprRectFnone 
 - Improved rectangle gauge action with staggered fermions:  GimprRectFstag 
-- Improved rectangle gauge action with Wilson fermions:  GimprRectFwilson 
-- Improved rectangle gauge action with Clover fermions:   GimprRectFclover 
+- Improved rectangle gauge action with %Wilson fermions:  GimprRectFwilson 
+- Improved rectangle gauge action with %Clover fermions:   GimprRectFclover 
 - Improved rectangle gauge action with domain wall fermions:   GimprRectFdwf 
 
 - Power rectangle gauge action with no fermions:  GpowerRectFnone 
 - Power rectangle gauge action with staggered fermions:  GpowerRectFstag 
-- Power rectangle gauge action with Wilson fermions:  GpowerRectFwilson 
-- Power rectangle gauge action with Clover fermions:   GpowerRectFclover 
+- Power rectangle gauge action with %Wilson fermions:  GpowerRectFwilson 
+- Power rectangle gauge action with %Clover fermions:   GpowerRectFclover 
 - Power rectangle gauge action with domain wall fermions:   GpowerRectFdwf 
 
 - One-loop Symanzik improved gauge action with no fermions:  GimprOLSymFnone 
 - One-loop Symanzik improved gauge action with staggered fermions:  GimprOLSymFstag 
-- One-loop Symanzik improved gauge action with Wilson fermions:  GimprOLSymFwilson 
-- One-loop Symanzik improved gauge action with Clover fermions:   GimprOLSymFclover 
+- One-loop Symanzik improved gauge action with %Wilson fermions:  GimprOLSymFwilson 
+- One-loop Symanzik improved gauge action with %Clover fermions:   GimprOLSymFclover 
 - One-loop Symanzik improved gauge action with domain wall fermions:   GimprOLSymFdwf 
 
 - Staggered fermions with no gauge field (whatever that means): GnoneFstag 
-- Wilson fermions with no gauge field (whatever that means): GnoneFwilson 
-- Clover fermions with no gauge field (whatever that means): GnoneFclover 
+- %Wilson fermions with no gauge field (whatever that means): GnoneFwilson 
+- %Clover fermions with no gauge field (whatever that means): GnoneFclover 
 - Domain wall fermions with no gauge field (whatever that means): GnoneFdwf
 - Null action with no fermions or gauge field (very useful): GnoneFnone
 

@@ -1,4 +1,4 @@
-//$Id: algo.dox,v 1.4 2004-08-18 11:57:35 zs Exp $
+//$Id: algo.dox,v 1.5 2004-09-02 16:51:48 zs Exp $
 /*!
 
 \page algopage Algorithms in the CPS
@@ -75,7 +75,7 @@ the AlgHmcPhi class has the following attributes:
 - A two-step chronological scheme is used to find the starting vectors for the 
 solves in the molecular dynamics. In the \e n th molcular dynamics step 
 the initial guess for the solution 
-<it>X<sub>n</sub></it> is <it>2X<sub>n-1</sub>-X<sub>n-2</sub> </it>
+<i>X<sub>n</sub></i> is <i>2X<sub>n-1</sub>-X<sub>n-2</sub> </i>
 with a random gaussian vector used when a previous solution is unavailable.
 - The algorithm can accomodate any number of doubly/quadrupally degenerate 
 Wilson/staggered dynamical fermion flavours.

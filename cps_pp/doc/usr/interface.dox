@@ -1,4 +1,4 @@
-//$Id: interface.dox,v 1.5 2004-08-18 11:57:35 zs Exp $
+//$Id: interface.dox,v 1.6 2004-09-02 16:51:48 zs Exp $
 /*!
 
 \page interpage User Interface
@@ -196,8 +196,8 @@ tag and value pairs in the format \c {NAME=value} as follows:
 - \c {LOGFILE=filename} If this is specified then log messages
    can be written to files called <tt>filename.</tt><i>nn</i> where <i>nn</i>
 is the number of the node, left padded with zeros, from which the message 
-is written. If its value is \i stderr or \i stdout that stream is used instead.
-This is optional and defaults to \i stderr. Most messages are only logged if
+is written. If its value is \c stderr or \c stdout that stream is used instead.
+This is optional and defaults to \c stderr. Most messages are only logged if
 \c MPISCU_DEBUG is defined at build time.
 - \c {SEED=i} Defines an integer \c i to be used as the system-defined RNG 
 seed. This is optional and defaults to 1.
@@ -231,7 +231,7 @@ looks for a parameter file with the default name \c commsMPI.def.
 
 If COMMS_DEF is not defined, then MPI-SCU expects the 
 the dimensions of the processor grid to have previously been
-communicated to it \i via the function  ::MPISCU_set_pe_grid.
+communicated to it \e via the function  ::MPISCU_set_pe_grid.
 
 If MPI has not been started, then MPI-SCU starts MPI with a call to
 MPI_Init. However,  
@@ -422,7 +422,7 @@ the CPS mimics this behaviour on all platforms by altering the standard
 behaviour of these functions so that only one node writes.
 
 In addition there are special functions which implement the functionality
-of \e printf and \e \fprintf on all nodes. These are
+of \e printf and \e fprintf on all nodes. These are
 - ::qprintf_all
 - ::qfprintf_all
 - ::qprintf_allid

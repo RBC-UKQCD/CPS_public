@@ -1,4 +1,4 @@
-//$Id: programming.dox,v 1.5 2004-08-18 11:57:35 zs Exp $
+//$Id: programming.dox,v 1.6 2004-09-02 16:51:48 zs Exp $
 /*!
 
 \page progpage CPS programming
@@ -26,18 +26,17 @@ because they were not supported in the QCDSP programming environment.
 
 \subsection cppnotthere C++ ideosyncrasies
 
-While the code
-is ANSI compliant the following C++ features appear to be absent from
-the QCDSP code:
+While the code is now ANSI compliant the following C++ features remain absent
+from the QCDSP code.
 
 - Templates
 - The \c bool datatype
 - The keywords \c new, \c delete and \c delete[]. All dynamic memory is 
-controlled with the functions ::pmalloc, ::pfree, ::smalloc and ::sfree, which 
+controlled with the CPS functions (see the \ref malloc section) which
 work essentially the same way as the usual C  malloc and free
 functions declared in stdlib.h.
-- The keywords \c throw, \c try and \c catch for exception handling. It is 
-probably best to avoid 
+- Execptions, and the keywords \c throw, \c try and \c catch for exception 
+handling. It is  probably best to avoid 
 the C functions \c setjmp and \c longjump declared in setjmp.h because, 
 although similar behaviour can be achieved with them, they do not handle 
 object destructors correctly.
@@ -50,7 +49,8 @@ terminated \c char arrays and the C functions declared in string.h, rather than
 the \c string class.
 - The Standard Template Library, so no STL containers, iterators, generic 
 algorithms, \e etc.
-- Namespaces
+- Namespaces, although they are supported on the QCDOC.
+
 
 If you want to include language features that the QCDSP complier does
 not support you should provide some way of compiling them out. In this
@@ -64,7 +64,7 @@ The code is ANSI compliant and so should be reasonably portable.
 There are some differences in the way that the code is built but this should 
 not be a problem.
 
-\subsection qcdspspecific QCDSP/QCDOC specific features
+\subsection qcdspspecific QCDSP specific features
 
 It might be worth noting at this point those features of the code
 which are specific to the original QCDSP platform and which are not
@@ -93,6 +93,13 @@ http://www.epcc.ed.ac.uk/~ukqcd/cps/qcdsp/toplevel.html
 \endlatexonly
 
 \section cpscode CPS programming conventions
+
+\subsection cpsnamespace Namespace
+
+In order to use the CPS with other libraries all code can be put in a cps 
+namespace. This is not backwards-compatible with the QCDSP so by defualt 
+there is no namespace defined on the QCDOC. The code can be configured at 
+build-time to use the namespace (see the \ref config section).
 
 \subsection glob Global variables
 
@@ -124,6 +131,38 @@ the main routine is defined, \e e.g.
 If the MPI-SCU interface is being used then 
 a globally scoped array \c int \c MPISCU_peGrid[4] must be defined. See 
 \ref mpiscuin for details.
+
+\subsection stdio Standard IO
+
+Code that is expected to run on the QCDOC should avoid the C standard library 
+file IO functions like \a fopen, \a fprint and \a fclose and instead use 
+the analogous function described in the Reference Manual (see \ref std_file_io).
+These functions make sure that only a single node handles the file, which is 
+usually what one wants. However, they do provide for an alternative behaviour 
+whereby each node opens its own file and appends its node number to the 
+file name.
+
+On MPI, all the standard IO functions are reimplemented in the cps::MPISCU 
+namespace so that only a single node does the IO. Again, alternatives are 
+provided to allow all nodes to perform IO with the node number prefixed 
+to the string being written.
+
+\subsection malloc Memory allocation
+
+For code expected to run on the QCDOC, the C standard library memory 
+allocation routines should be eschewed in favour of the analogous 
+CPS routines (see \ref  mem_alloc in the Reference Manual). This is because on the QCDOC, memory can be
+allocated from the off-chip DDR or the on-chip EDRAM, and there are 
+three types of caching behaviour: normal caching; transient caching, which 
+usues only 1kB of the cache; and non-caching, which guarantees that the data in
+this allocated memory will not be cached. All this is handled by the \a qalloc 
+QOS system call, but these CPS functions provide a portable wrapper, as 
+well as checking for allocation errors.
+
+In particular, on the QCDOC, smalloc and pmalloc  allocate transient 
+caching DDR space and fmalloc allocates from the EDRAM 
+
+
 
 \subsection things Other things
 
@@ -187,11 +226,14 @@ it writes the makefile \a Makefile and \a Makefile.rules from the templates \a
 Makefile.in and \a Makefile.rules.in and the header file \a config.h from
 the template \a config.h.in. 
 
-The autoconf program does not run on the QCDOC platform, and therefore
-the \a config.h and \a Makefile are designed to be easily editable
-to be suitable for building the CPS code on the QCDOC platform.
+The autoconf program does not run on the QCDOC platform but the configure 
+script will be useable there.
 
-For a non-QCDOC platform, the basic build is achieved by simply typing
+for details of how to use the configure script in order to build the library  
+for various platforms, please read the \a README included in the top cps++ 
+directory. 
+
+For a non-QCDOC platform, the basic build is achieved simply by typing
 
 \verbatim
 $ ./configure
@@ -199,19 +241,8 @@ $ ./configure
 
 This sets up \a Makefile,  and \a config.h for a serial build.
 
-With the option 
-\verbatim
-$ ./configure --enable-parallel-mpi
-\endverbatim
-\a Makefile_cps and \a config.h should be set up for a parallel build
-with MPI.
-
-For a QCDSP build, \a Makefile_cps should be edited so that the variablea \a
-TARGET_QCDSP and \a PARALLEL are set to 1.
-\verbatim
-TARGET_QCDSP = 1
-PARALLEL = 1
-\endverbatim
+The QCDSP build predates this method of configuring the code, so you will have
+to edit the \a Makefile and \a config.h by hand.
 
 The QCDSP build can be a parallel build or a serial build. For the
 former, define the variable \a _TARTAN in \a config.h
@@ -222,24 +253,24 @@ For the latter, make sure it is not defined.
 
 \subsection compiling Compiling a program
 
-Having got the files \a Makefile_cps and \a config.h prepared as
+Having got the files \a Makefile and \a config.h prepared as
 described in section \ref config, the make targets are the same
-regardless of platform.
+regardless of platform. Note that GNU make (http://www.gnu.org/software/make)
+is needed.
 \verbatim
-$ make -f Makefile_cps depend
-$ make -f Makefile_cps cps
+$ gmake 
 \endverbatim
 builds the library \a cps.a.
 
-Other targets are
+Other targets are described in the \a README file. Of particlar interest might be
 \verbatim
-$ make -f Makefile_cps docs
+$ make Makefile docs
 \endverbatim
 which makes this documentation package, and
 \verbatim
-$ make -f Makefile_cps clean
+$ make Makefile realclean
 \endverbatim
-which removes lots of files which can be remade.
+which removes all the files made by the Makefile and  which therefore can be remade. 
 
 
 \section testing Testing  a  CPS program 

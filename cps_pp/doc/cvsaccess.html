@@ -9,6 +9,7 @@
        
 <hr width="100%" size="2" align="Left" noshade="">    
 <table cellpadding="2" cellspacing="2" border="0" width="100%">
+<caption>&nbsp;</caption>
       <tbody>
         <tr>
           <td valign="Top">                            
@@ -35,35 +36,24 @@
      
 <h2><a name="Accessing_the_UKQCD_QCDOC_Code"></a>
  Accessing the CPS Code Repository</h2>
-     To access the CVS repository, you need an account at Columbia.
-To check out the current version of the Columbia code,
-  you need to (in bash):<br>
-       
-<pre wrap=""><span class="moz-txt-citetags"></span>export CVSROOT=:pserver:<font color="#ff0000"><b>YOURUSERNAME</b></font>@localhost:/home/cvs/cps <br><span class="moz-txt-citetags"></span>
-cvs -d :pserver:<font color="#ff0000"><b>YOURUSERNAME</b></font>@localhost:2401/home/cvs/cps login
-<br>
-cvs co -P cps++
-</pre>
-    This will then prompt you for your password at Columbia,
-and then check the 
-entire  codebase out into a directory called `cps++'.<br>
-The -P flag is required so that empty directories are not
-checked out. This will cause the build system to fail.
+
+To access the CVS repository, you need an account at Columbia.
 
 <p>
-The access to CVS is slighty not standard. For example,
-you can not use the standard ssh methods for remote access. As we
-use a
-<a href="http://cvsacl.sourceforge.net/">patched version of CVS</a>
- with secure branches,
-to allow some code to be hidden from other collaborations.
-Access is via the pserver method. For protection this is
-routed through <a href="http://www.stunnel.org/">stunnel</a>.
+The repository is served with a
+<a href="http://cvsacl.sourceforge.net/">patched version</a> of 
+<a href="http://www.gnu.org/software/cvs/">CVS</a>
+to allow limited access to code on branches (N.B. any version can be 
+used on the client side).
+Access is via the pserver method. For security this is routed through a SSL 
+tunnel using 
+<a href="http://www.stunnel.org/">stunnel</a>.
 <p>
-For this to work the machine localhost should be running
+For this to work a machine on your local network should be running
 a stunnel process. This needs to be done by someone
-with root privileges. The following machines are running stunnel.
-
+with root privileges (see <a href="#stunnel_command">below</a>). 
+<p>
+The following machines are running stunnel:
 <ul>
 <li>  qcdanly4    (Columbia)
 <li>  qcdlinux1   (Columbia)
@@ -71,42 +61,98 @@ with root privileges. The following machines are running stunnel.
 <li>  iasc7       (Liverpool)
 </ul>  
 
-At Liverpool I can log into iasc7 using
-<pre> ssh iasc7 </pre>
-from florence. Hence I can remotely check code
-out of the CVS from florence by replacing localhost
-with iasc7 on florence.
-
 <p>
-This is only relevant to the system administrator.
-The command I run as root at Liverpool to get this to all
-work is:
-<pre>
-/usr/sbin/stunnel -c -d 2401 -r qcdserver0.phys.columbia.edu:22401
+To check out the current version of the Columbia code, you need to type
+<pre wrap="">
+$ cvs -d :pserver:<font color="#ee0000"><b>username</b></font>@<font color="#0000ee"><b>host</b></font>:2401/home/cvs/cps login
 </pre>
-Most users do not need to know about stunnel.
+where <font color="#ee0000"><tt>username</tt></font> 
+is your username at Columbia and <font
+color="#0000ee"><tt>host</tt></font> 
+is your local machine from the list above.
+This will prompt you for your password at Columbia. After entering your 
+password, type
+<pre wrap="">
+$ cvs -d :pserver:<font color="#ee0000"><b>username</b></font>@<font color="#0000ee"><b>host</b></font>:2401/home/cvs/cps co -P cps++
+</pre>
+This checks out the entire codebase out into a directory called `cps++'.
+<p>
+If you wish, you can omit the <tt>-d</tt> flag entirely by setting the 
+environment variable <tt>CVSROOT</tt>
+<pre wrap="">
+$ export CVSROOT=:pserver:<font color="#ee0000"><b>username</b></font>@<font color="#0000ee"><b>host</b></font>:/home/cvs/cps
+</pre>
+in bash, or
+<pre wrap="">
+$ setenv CVSROOT :pserver:<font color="#ee0000"><b>username</b></font>@<font color="#0000ee"><b>host</b></font>:/home/cvs/cps
+</pre>
+in tcsh (see the <a href="http://www.gnu.org/software/cvs/manual/">CVS manual</a> for details).
+<p>
+Note that in the <tt>cvs co</tt> command, the <tt>-P</tt> flag is required so that empty directories are not checked out. This will cause the build system to fail.
+Similarly, you should use the read-only flag <pre>cvs -r</pre> because some 
+files need to be writeable in order for the build to work. After checking out 
+the CPS module, you can make the source code read-only with a command like
+<pre wrap="">
+<span class="moz-txt-citetags">find cps++ -name "*.[Ch]" -o -name "*.in" |xargs chmod 440</span><br>
+</pre>
 
-<h2><a name="Submission_of_Changes"></a>
+<h2><a name="Submission_of_Changes"></a>Submission of Changes</h2>
 
-Submission of Changes</h2>
-   Anyone who has checked out the code in the manner described above has
-the  ability to commit their own changes to the repository. &nbsp;For the
-time  being, we request that all changes are cleared/submitted by ourselves
-so that we can retain overall control of the repository.
-Eventually there will (probably) be a committee of people to "approve"
-submissions, comprising of people 
-from UKQCD, Columbia and BNL. The CVS log messages are
-automatically send to the
-<a href="http://forge.nesc.ac.uk/mailman/listinfo/qcd-measure-cps++-auto">qcd-measure-cps++-auto</a> email list. (There may be annoying requests for moderation
-of the emails. These will stop once your email has been added to a list
-of approved people who can post to the list.)
+Developers are always welcome on the CPS project, however those 
+who have permission to commit their own changes to the repository
+are asked to first submit the proposals for discussion on the 
+cps++ mailing list
+<a href="http://forge.nesc.ac.uk/mailman/listinfo/qcd-measure-cps++">
+qcd-measure-cps++</a>.
+
+Your local institution or collaboration may have their own code of practise 
+or protocol to observe.
+
+
+<h2>Stunnel information for system administrators<a name="stunnel_command"></a></h2>
+
+With stunnel version 3.&#42;, root should run
+<pre>
+# stunnel -c -d 2401 -r qcdserver0.phys.columbia.edu:22401
+</pre>
+
+Users should not need to know about stunnel.
+
+With stunnel version 4.&#42;, root should run
+<pre>
+# stunnel stunnel.conf
+</pre>
+where <tt>stunnel.conf</tt> is a file containing the stunnel parameters. I 
+have known this file to work:
+<pre>
+# Sample stunnel configuration file
+
+pid = stunnel.pid
+
+# Some debugging stuff
+debug = 7
+output = stunnel.log
+
+# Use it for client mode
+client = yes
+
+# Service-level configuration
+
+[stunnel]
+accept  = localhost:2401
+connect = qcdserver0.phys.columbia.edu:22401
+</pre
+
+Note that <tt>debug = 7</tt> causes an awful lot of verbose output to be 
+written to the file <tt>stunnel.log</tt> so you might want to reduce this once
+you are sure everything is running correctly.
+
 
 
 </p>
-        <hr width="100%" size="2" align="Left" noshade="">    
-        <div align="Right"><a href="mailto:mcneile@amtp.liv.ac.uk"><small>Craig
-McNeile</small></a>
-     - 2001</div>
+<hr width="100%" size="2" align="Left" noshade="">
+<div align=right><font size=-1>[ $Revision: 1.8 $ - $Date: 2004-09-02 16:51:48 $ ] </font></div>
+
        
         </body>
         </html>
