@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc_common.C,v 1.5 2004-10-27 14:24:31 zs Exp $
+  $Id: smalloc_common.C,v 1.6 2004-11-01 10:26:28 zs Exp $
 */
 
 #include <util/smalloc.h>
@@ -14,15 +14,15 @@ void* smalloc(const char *cname, const char *fname, const char *vname, size_t re
 }
 
 void sfree(const char *cname, const char *fname, const char *vname, void *p){
-    return sfree(cname, fname, vname, p);
+    sfree(p, cname, fname, vname);
 }
 
 void* fmalloc(const char *cname, const char *fname, const char *vname, size_t request){
-  return fmalloc(cname, fname, vname, request);
+    return fmalloc(request, cname, fname, vname);
 }
 
 void ffree(const char *cname, const char *fname, const char *vname, void *p){
-    return ffree(cname, fname, vname, p);
+    ffree(p, cname, fname, vname);
 }
 
 CPS_END_NAMESPACE
