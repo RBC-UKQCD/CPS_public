@@ -10,6 +10,10 @@ FILE *Fopen( FileIoType type, const char *filename, const char *mode){
   if ( type == ZERO_ONLY && UniqueID() ) return &FAKE;
   if(type == ADD_ID){
     char fname[MAX_FILENAME];
+    if(strlen(filename)+6 >MAX_FILENAME){
+	  fprintf(stderr,"Fopen: filename(%s) is too long\n",filename);
+      return NULL;
+    }
     sprintf(fname,"%s.%d",filename,UniqueID());
     return fopen(fname,mode);
   } else {
@@ -33,7 +37,7 @@ int Fprintf( FileIoType type, FILE *stream, const char *format,...){
 #endif
   va_list args;
   va_start(args,format);
-  vfprintf(stream,format,args);
+  return vfprintf(stream,format,args);
 }
 
 int Fprintf( FILE *stream, const char *format,...){
@@ -41,7 +45,7 @@ int Fprintf( FILE *stream, const char *format,...){
   if ( stream == &FAKE )  return 1;
   va_list args;
   va_start(args,format);
-  vfprintf(stream,format,args);
+  return vfprintf(stream,format,args);
 }
 
 int Vfprintf( FileIoType type, FILE *stream, const char *format, va_list ap){
