@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
+  $Id: gjp.C,v 1.18 2004-10-15 06:12:37 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-21 18:25:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
-//  $Id: gjp.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
+//  $Date: 2004-10-15 06:12:37 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.18 2004-10-15 06:12:37 chulwoo Exp $
+//  $Id: gjp.C,v 1.18 2004-10-15 06:12:37 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -318,10 +318,14 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   gjp_scu_wire_map[3] = SCURemap( SCU_YM );
   gjp_scu_wire_map[4] = SCURemap( SCU_ZP );
   gjp_scu_wire_map[5] = SCURemap( SCU_ZM );
+  if(t_nodes > 1){
   gjp_scu_wire_map[6] = SCURemap( SCU_TP );
   gjp_scu_wire_map[7] = SCURemap( SCU_TM );
+  }
+  if(s_nodes > 1){
   gjp_scu_wire_map[8] = SCURemap( SCU_SP );
   gjp_scu_wire_map[9] = SCURemap( SCU_SM );
+  }
 #if TARGET == QCDSP
   if(s_nodes != 1) {
     if (s_axis == SCU_X) {
