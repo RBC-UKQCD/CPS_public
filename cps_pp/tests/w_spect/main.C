@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-17 17:56:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v 1.9 2004-09-17 17:56:21 chulwoo Exp $
-//  $Id: main.C,v 1.9 2004-09-17 17:56:21 chulwoo Exp $
+//  $Date: 2004-09-21 19:32:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v 1.10 2004-09-21 19:32:22 chulwoo Exp $
+//  $Id: main.C,v 1.10 2004-09-21 19:32:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v $
 //  $State: Exp $
 //
@@ -23,12 +23,6 @@
 #include<alg/do_arg.h>
 #include<alg/no_arg.h>
 
-CPS_START_NAMESPACE
-GlobalJobParameter GJP;
-LatRanGen LRG;
-Verbose VRB;
-Error ERR;
-CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 
@@ -36,36 +30,23 @@ USING_NAMESPACE_CPS
 int main(int argc,char *argv[])
 {
 
+  Start();
   FILE *fp;
-
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
   //----------------------------------------------------------------
   DoArg do_arg;
 
-#ifdef PARALLEL
   do_arg.x_node_sites = 2;
   do_arg.y_node_sites = 2;
   do_arg.z_node_sites = 2;
-  do_arg.t_node_sites = 2;
-  do_arg.s_node_sites = 4;
-  do_arg.x_nodes = 1;
-  do_arg.y_nodes = 1;
-  do_arg.z_nodes = 1;
-  do_arg.t_nodes = 2;
-  do_arg.s_nodes = 1;
-#else
-  do_arg.x_node_sites = 2;
-  do_arg.y_node_sites = 2;
-  do_arg.z_node_sites = 2;
-  do_arg.t_node_sites = 2;
+  do_arg.t_node_sites = 4;
   do_arg.s_node_sites = 4;
   do_arg.x_nodes = 1;
   do_arg.y_nodes = 1;
   do_arg.z_nodes = 1;
   do_arg.t_nodes = 1;
   do_arg.s_nodes = 1;
-#endif
 
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
@@ -358,6 +339,7 @@ int main(int argc,char *argv[])
 
 
   }
+  End();
   return(0);
 }
 
