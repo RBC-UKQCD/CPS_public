@@ -1,0 +1,389 @@
+//$Id: interface.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+/*!
+
+\page interpage User Interface
+
+\section input What goes in
+
+Here we look at how the user sets the properties of a CPS a computation.
+Some of these properties are parameters of the physics or the algorithm;
+others might determine how the application behaves.
+
+There are some feature of CPS applications which are hard-wired  \e i.e they
+cannot be changed (without a major rewrite of the code). These are discussed
+in the \ref hardwired section.
+
+Others can, in principle, be decided at run-time. For example, there is an 
+integer parameter called DoArg::x_node_sites which needs to be given a value.
+There appears to be, however, no general way in the CPS to supply an 
+application with parameters at run-time, so you will have to write you own 
+code to do this. Options could be read from the command line \e e.g. something 
+like
+\verbatim 
+#include <stdlib.h>
+
+int main(int argc, char **argv){
+
+    DoArg doarg;
+    doarg.x_node_sites = atoi(argv[1]);	
+\endverbatim 
+which is the sort of thing the GNU \c getopt 
+http://www.gnu.org/software/gengetopt/man_getopt.html
+library was designed to do more flexibly.
+
+Or the values could be stored in a file which your program reads and parses.
+
+Alternatively you could supply these parameters with 
+build-time variables (\#defines, for instance):
+\verbatim
+    #define X_NODE_SITES 12
+
+    DoArg doarg;
+    doarg.x_node_sites = X_NODE_SITES;	
+\endverbatim
+which seems no better than hard-wiring their values into
+the code:
+\verbatim
+    DoArg doarg;
+    doarg.x_node_sites = 12;
+\endverbatim
+but might have some advantage if all the \#defines were in a header file that 
+was included in all your applications, thereby ensuring that they all are
+built with the same parameters.
+
+Alternatively we could end up with some sort of funky XML-defined interface.
+
+Somehow, however, various parameters need to be given values.
+
+\subsection runtimeinput Run-time options
+
+A DoArg structure must be declared at the start of all CPS 
+applications. This structure contains parameters which must be assigned 
+values at the beginning of the program - 
+note, however, that some of them (the more esoteric ones) are
+automatically assigned default values.
+
+Some of these parameters describe the geometry
+of the lattice and how it is decomposed over the processor grid.
+
+- The dimensions of the local lattice
+ - DoArg::x_node_sites
+ - DoArg::y_node_sites  
+ - DoArg::z_node_sites  
+ - DoArg::t_node_sites  
+ .
+These must always be assigned a value. 
+
+- The dimensions of the processor grid
+ - DoArg::x_nodes 
+ - DoArg::y_nodes 
+ - DoArg::z_nodes
+ - DoArg::t_nodes
+ .
+These must always be assigned a value.
+
+
+- Additional parameters for domain wall fermions
+ - DoArg::s_node_sites This defaults to 1 but should be set to a greater value 
+in a domain wall fermion application. 
+ - DoArg::s_nodes  This defaults to 1 but can be set to a greater value 
+in a domain wall fermion application. If it is one of the other grid 
+dimensions must be 1 (the grid can not be more then four-dimensional - see 
+section \ref griddecomp).
+ - DoArg::s_axis This defines the grid direction in which the 5th direction is 
+parallelised and so is ignored inless %Do_arg::s_nodes is assigned a value 
+greter than 1. It cannot be a direction which is already parallel.
+.
+These can be safely ignored if domain wall fermions are not being used.
+
+Others define the parameters of the  action and  the boundary conditions.
+
+- The boundary conditions 
+ - DoArg::x_bc
+ - DoArg::y_bc
+ - DoArg::z_bc
+ - DoArg::t_bc
+ .
+These must be assigned a value.
+
+- DoArg::colors This should \e always be set to 3. It is not a real run-time 
+parameter since the the number of colours is hard-wired as 3 elsewhere in the  
+code.
+
+- Gauge action parameter (see \ref gaugeactions)
+ - DoArg::beta
+
+- Tadpole improvement parameter
+ - DoArg::u0        
+
+- \ref powerplaq parameters
+ - DoArg::power_plaq_cutoff
+ - DoArg::power_plaq_exponent
+
+- \ref powerrect parameters
+ - DoArg::power_rect_cutoff
+ - DoArg::power_rect_exponent 
+
+- Anisotropic action parameters
+ - DoArg::xi_bare
+ - DoArg::xi_dir    
+ - DoArg::xi_v    
+ - DoArg::xi_v_xi 
+ - DoArg::clover_coeff_xi
+ - DoArg::xi_gfix        
+
+- \ref dwaction parameters
+ - DoArg::dwf_height 
+ - DoArg::dwf_a5_inv 
+
+- \ref cloveraction parameter
+ - DoArg::clover_coeff
+
+ Parameters of an action that is not used in an application do not need 
+to be assigned a value - they are either ignored or take on reasonable 
+defaults.
+
+Some describe how the gauge field and RNG are to be started in this 
+application:
+
+- Gauge field initialisation 
+ - DoArg::start_conf_kind Defines how the gauge field is to be initialised
+ - DoArg::start_conf_load_addr The address in memory of the initial gauge field.
+This is ignored if the gauge field is not initialised by already being stored 
+in memory.
+
+- RNG initialisation
+ - DoArg::start_seed_kind Defines how the RNG is to be initialised
+ - DoArg::start_seed_value An RNG seed. This is ignored if the RNG is not to be
+ reseeded with a user-supplied seed.
+
+
+When the members of the DoArg instance have been defined, it is used to
+initialise a globally scoped GlobalJobParameter object named ::GJP (see also
+\ref glob).
+\verbatim
+int main(int argc, char **argv){
+
+    DoArg doarg;
+    doarg.x_node_sites = atoi(argv[1]);	
+	// etc. etc.
+    GJP.Initialize(doarg);
+\endverbatim
+
+Other possible run-time options concern algorithmic parameters and properties:
+These are described elsewhere (see \ref algopage).
+
+Still other possible run-time options determine the behaviour of what is 
+written out by the application. This is described in the section \ref output.
+
+\subsection mpiscuin The MPI-SCU interface
+
+The MPI-SCU layer, described in the \ref parallel section, emulates the system 
+calls provided by the QCDOC operating system. This relies on the run-time 
+environment being set up correctly. This is done with the environment variable
+\c COMMS_DEF. This environment variable can contain either the parameters 
+which the MPI-SCU layer needs or the name of a file containing those 
+parameters.
+
+The parameters themselves must be defined as a series of
+tag and value pairs in the format \c {NAME=value} as follows:
+- \c {GRID=t,x,y,z} Defines the dimensions of the processor drid in each
+   direction. This must be defined.
+- \c {LOGFILE=filename} If this is specified then log messages
+   can be written to files called <tt>filename.</tt><i>nn</i> where <i>nn</i>
+is the number of the node, left padded with zeros, from which the message 
+is written. This only takes place if the \c VERBOSE flag is defined at 
+build-time. If its value is stderr or stdout that stream is used  instead.
+This is optional and defaults to \c  comlog.
+- \c {SEED=i} Defines an integer \c i to be used as the system-defined RNG 
+seed. This is optional and defaults to 1.
+- \c {SEEDFILE=filename}  Specifies a file containing 
+   RNG seeds. This is optional and defaults to \c rng.dat.
+.
+I think the format is reasonably tolerant of whitespace.
+
+The values can be written to a file which is read at runtime, in which case
+the environment variable \c COMMS_DEF should be given the name of the file, 
+\e  e.g. 
+\verbatim
+export COMMS_DEF=mpi.par
+\endverbatim
+in bash, where the file \c mpi.par could contain something like
+\verbatim
+{ GRID=2,4,4,4}
+{ LOGFILE=foo }
+{ SEED=1234 }
+\endverbatim
+
+Alternatively the same information could be supplied by defining 
+\c COMMS_DEF as
+\verbatim
+export COMMS_DEF={GRID=2,4,4,4}{LOGFILE=foo}{SEED=1234}
+\endverbatim
+
+If the environment variable is not defined the code looks for a parameter file
+with the default name \c commsMPI.def.
+
+\subsection buildinput Build-time options
+
+\subsection hardwired Hard-wired limitations/features
+
+- Physical things
+ - The number of colours is 3.
+ - The number of spacetime dimensions is 4
+
+- Algorithmic things
+The implementations of the algorithms described in the section \ref algo
+should be taken as being hardwired unless specified otherwise. 
+
+The solver is CG with odd-even preconditioning.
+
+\section output What comes out
+
+To some extent this depends on what goes in.
+
+\subsection message Information messages
+
+When a program is running it is often useful to have it print messages
+recording its progress. However, during code development, debugging and 
+testing you might want all sorts of detailed information to be dumped that
+you would not want during a normal production run.
+
+The CPS code allows you to configure an application to write various messages 
+to \c stdout in a controlled way. This is done through the Verbose class.
+With this class various categories of messages are defined and each  category 
+is given a number, defining a hierarchy of message categories. This hierarchy,
+defined in the ::VerboseLevelType enumeration type, is
+
+-# General warning messages.
+-# Messages printing results
+-# Messages describing dynamic memory management 
+-# More messages describing to dynamic memory management 
+-# Messages indicating function entry and exit
+-# Messages describing progress through functions
+-# Messages describing function arguments
+-# Debugging messages
+-# Messages printing the clock time on function entry and exit
+-# Messages printing the clock time during progress through functions
+-# Messages printing the clock time
+-# LED control (presumably something specific to QCDSP)
+-# Messages with information about the  RNG seed
+
+You can tell the Verbose class which of these categories should be printed.
+First, as described in the \ref glob section,
+there should be a global instance of the Verbose class called ::VRB.
+
+\verbatim
+    Verbose VRB;
+\endverbatim
+
+The default behaviour is to disable all message categories. 
+To enable printing of a message category
+you set the verbosity level with the Verbose::Level(int) method.
+The argument it takes is an integer which should have the value of
+one of the fields in the ::VerboseLevelType enumeration type. This enables 
+the printing of messages with that category and those above it in the 
+hierarchy.
+
+For example, if we want all messages up to memory allocation messages to be 
+enabled we can look at the definition of ::VerboseLevelType where we see that 
+::VERBOSE_SMALLOC_LEVEL is the level that turns on memory allocation messages.
+Then call
+\verbatim
+    VRB.Level((int)VERBOSE_SMALLOC_LEVEL);
+\endverbatim
+This enables all messages of level 3 and below, i.e. memory allocation 
+messages, "results" messages and "warning" messages.
+
+The message level of VRB can be changed in this manner anywhere in the code
+which is useful for enabling more detailed errors in just a specific part of 
+the code.
+
+There is also a way to enable specific message types, rather than "all message
+types up to and including this one" by calling Verbose::Level with a negative
+argument of the form -<level a><level b><level c> where <level \e i>
+are two-digit numbers (left-padded with zero if necessary) corresponding to 
+the desired message levels.
+
+For example, suppose we want to enable function entry and exit messages, 
+function argument messages and RNG seed messages. We have to look at the 
+definition of ::VerboseLevelType where we see that the message levels we want
+are ::VERBOSE_FUNC_LEVEL, ::VERBOSE_INPUT_LEVEL and ::VERBOSE_RNGSEED_LEVEL.
+These have the numerical values of 4, 6 and 12 respectively. Therefore the 
+argument to VRB::Level should be -040612:
+\verbatim
+    VRB.Level(-40612);
+\endverbatim
+
+Not only is this an unfriendly interface but since this method relies 
+on knowing the numerical values for the message levels, code using this method
+should be considered unstable with respect to the definition of 
+VerboseLevelType.
+
+\subsection doh Error messages
+
+If something goes sufficiently wrong in the program that it cannot sensibly
+continue executing we try to recognise the situation in the code and exit
+gracefully with an informative error message which will, it is hoped, give
+the user a hint as to what went wrong.
+
+These error messages are handled by the Error class.
+As described in the \ref glob section,
+there should be a global instance of the Error class called ::ERR.
+
+The methods of the Error class print messages for the following types of 
+error before causing the program to exit.
+
+- A pointer being unexpectedly uninitialised.
+- Failure to open a file for reading
+- Failure to open a file for writing
+- Failure to open a file for appending
+- Calling a method which is only a stub and not fully implemented.
+- Hardware failure
+- Miscellaneous error (\e i.e. anything else)
+
+\subsection outputdata Output data
+
+The algorithms (see the \ref algo section) in general have the capacity to
+log some data. You can control whether this is done and to where this data
+is dumped.
+
+The data is written to \c stdout if the ::VERBOSE_RESULT_LEVEL of the global 
+Verbose class is enabled (see the \ref message section), \e e.g
+\verbatim
+    VRB.Level((int)VERBOSE_RESULT_LEVEL);
+\endverbatim
+
+The data can be written to a file using ::results field of the CommonArg 
+structure which is an argument of the algorithm class constructor. For example,
+to log the data in a file called \c run.log, we could write
+\verbatim
+    CommonArg common\_arg;
+    common_arg.results = const_cast<char*>("run.log");
+\endverbatim
+
+\section fileformat Filestore interface 
+
+File formats for gauge configurations \&c.
+
+
+\section stdout Writing to files and standard output
+
+QCDSP was designed so that when the \e printf and \e fprintf
+functions were called only one node (node 0) actually wrote data to 
+\c stdout or the file.
+To maintain backwards compatibility,
+the CPS mimics this behaviour on all platforms by altering the standard 
+behaviour of these functions so that only one node writes.
+
+In addition there are special functions which implement the functionality
+of \e printf and \e \fprintf on all nodes. These are
+- ::qprintf_all
+- ::qfprintf_all
+- ::qprintf_allid
+
+These functions cause data to be written from all nodes. The last function 
+prefixes each written string with a node ID and the grid coordinates of the 
+node.
+
+*/

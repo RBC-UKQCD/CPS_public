@@ -1,0 +1,363 @@
+//$Id: action.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+/*!
+
+\page actionpage Lattice actions in the CPS
+
+The CPS is designed to make application code independent of the actual
+lattice action used, and there are many lattice actins to choose from.
+The complete lattice actions implemented in the CPS are described in the 
+\ref latticeclass section. Each action is the combination of a fermion action,
+described in the \ref fermionactions section, and a gauge action,
+described in the \ref gaugeactions section.
+
+\section fermionactions  Fermion actions
+
+The following fermion actions are available:
+
+- \ref wilsonaction 
+- \ref cloveraction 
+- \ref staggeredaction 
+- \ref asqtadaction 
+- \ref dwaction 
+- \ref nullaction
+
+See also \ref factions in the Reference Manual.
+
+The type of fermion action can be determined in the code at runtime with the
+Lattice::Fclass() method, which returns something of type #FclassType.
+
+\subsection wilsonaction Wilson action
+
+The Wilson action is defined with the fermion matrix \f$M = 1-\kappa D_\mathrm{W}\f$
+where
+\f[
+[D_\mathrm{W}]_{xy} = \sum_\mu(1-\gamma_\mu)U_{\mu\,x}\delta_{y\,x+\hat\mu}
++(1+\gamma_\mu)U^\dagger_{\mu\,x+\hat\mu}\delta_{y\,x-\hat\mu}
+\f]
+
+We use the following gamma matrix definition:
+
+\f[
+\gamma_0 = \pmatrix{0&0&0&i \cr 0&0&i&0 \cr 0&-i&0&0 \cr -i&0&0&0 \cr}
+\gamma_1 = \pmatrix{0&0&0&-1 \cr 0&0&1&0 \cr 0&1&0&0 \cr -1&0&0&0 \cr}
+\gamma_2 = \pmatrix{0&0&i&0 \cr 0&0&0&-i \cr -i&0&0&0 \cr 0&i&0&0 \cr}
+\gamma_3 = \pmatrix{0&0&1&0 \cr 0&0&0&1 \cr 1&0&0&0 \cr 0&1&0&0 \cr}
+\f]
+
+How do the numbers 0 - 3 correspond to x,y,z,t directions?
+
+With this action the fermion matrix acts on a complex field with 3 colour 
+by 4 spin components on each lattice site.
+
+This is implemented in the Fwilson class.
+
+\subsection cloveraction Clover action
+
+This is the improved Wilson action with the fermion matrix
+\f$ M = A - \kappa D_\mathrm{W} \f$ where \f$ D_\mathrm{W} \f$ is the defined 
+insection  \ref wilsonaction  
+and the clover term \e A is
+  \f[
+  A(x) = 1 - \frac{1}{2} \kappa c_\mathrm{SW}   \sum_{\mu<\nu}
+  [\gamma_\mu, \gamma_\nu] F_{\mu\nu}(x) 
+  \f]
+  where 
+  the field strength tensor \f$ F_{\mu\nu} \f$ is the matrix
+  \f[
+  F_{\mu\nu}(x) = \frac{1}{4}\frac{1}{2}
+                (P_{\mu\nu}(x) - P^\dagger_{\mu\nu}(x))
+  \f]
+  in which
+\f[
+\renewcommand{\arraystretch}{1.5}
+\setlength{\arraycolsep}{0in}
+\begin{array}{rl}
+P_{\mu\nu}(x)  = 
+& U_{\mu\,x} U_{\nu\,x+\hat\mu} U_{\mu\,x+\hat\nu}^\dagger U_{\nu\,x}^\dagger\\
++& U_{\nu\,x} U_{\mu\,x-\hat\mu+\hat\nu}^\dagger U_{\nu\,x-\hat\mu}^\dagger U_{\mu\,x-\hat\mu} \\
++& U_{\mu\,x-\hat\mu}^\dagger U_{\nu\,x-\hat\mu-\hat\nu}^\dagger U_{\mu\,x-\hat\mu-\hat\nu} U_{\nu\,x-\hat\nu}\\
++& U_{\nu\,x-\hat\nu}^\dagger U_{\mu\,x-\hat\nu} U_{\nu\,x+\hat\mu-\hat\nu} U_{\mu\,x}^\dagger
+\end{array}
+\f]
+
+This is implemented in the Fclover class 
+
+\subsection staggeredaction Staggered action.
+
+The fermion matrix is \f$ M = 2m+D_\mathrm{KS}\f$
+where
+
+\f[
+[D_\mathrm{KS}]_{xy} = 
+\sum_\mu\eta_{\mu\,x}(U_{\mu\,x}\delta_{y\,x+\hat\mu}
+-U^\dagger_{\mu\,x-\hat\mu}\delta_{y\,x+\hat\mu})
+\f]
+
+is the Kogut-Susskind hopping term.
+
+The staggered phases are
+\f[
+\eta_{\mu\,x} = (-1)^{\sum_i^{\mu-1}x_i}
+\f]
+where 
+\latexonly
+$x_i$ 
+\endlatexonly
+\htmlonly
+<em>x<sub>i</sub></em>
+\endhtmlonly
+are the cartesian coordinates of the lattice site \e x.
+
+With this action the fermion matrix acts on a complex field with 3 colour 
+components per lattice site.
+
+\subsection asqtadaction Improved staggered (Asqtad)
+
+This improved staggered action can be written
+\f[
+M = 2m+
+c_\mathrm{KS}D_\mathrm{KS}+c_\mathrm{N}D_\mathrm{N}+c_3D_\mathrm{3}+c_5D_\mathrm{5}+c_7D_\mathrm{7}+c_\mathrm{L}D_\mathrm{L}.
+\f]
+in terms of operators <i>D<sub>i</sub></i> and coefficients 
+<i>c<sub>i</sub></i>. The coefficients should take their values from tadpole 
+improved perturbation theory. 
+
+\f$ D_\mathrm{KS} \f$ is defined in section \ref staggeredaction.
+The the other operators are:
+
+The Naik term
+\f[
+[D_\mathrm{N}]_{xy} = 
+\sum_\mu\eta_{\mu\,x}(
+ U_{\mu\,x}U_{\mu\,x+\hat\mu}U_{\mu\,x+1\hat\mu}\delta_{y\,x+3\hat\mu}
+- U^\dagger_{\mu\,x-\hat\mu}U^\dagger_{\mu\,x-2\hat\mu}U^\dagger_{\mu\,x-3\hat\mu}\delta_{y\,x-3\hat\mu})
+\f]
+The three-staple term
+\f[
+[D_\mathrm{3}]_{xy} = 
+\sum_\mu\eta_{\mu\,x}\sum_{\nu\neq\mu}(
+U_{\pm\nu\,x}U_{\mu\,x\pm\hat\nu}U_{\mp\nu\,x+\hat\mu\pm\hat\nu}\delta_{y\,x+\hat\mu} -
+U_{\pm\nu\,x}U_{-\mu\,x\pm\hat\nu}U_{\mp\nu\,x-\hat\mu\pm\hat\nu}\delta_{y\,x-\hat\mu} )
+\f]
+The five-staple term
+\f[
+\renewcommand{\arraystretch}{1.5}
+\setlength{\arraycolsep}{0in}
+\begin{array}{rl}
+[D_\mathrm{5}]_{xy}=\sum_\mu\eta_{\mu\,x}\sum_{\nu\neq\mu}\sum_{\rho\neq\mu,\nu}
+(&U_{\pm\nu\,x}
+ U_{\pm\rho\,x\pm\hat\nu}
+ U_{\mu\,x\pm\hat\nu\pm\hat\rho}
+ U_{\mp\rho\,x+\hat\mu\hat\pm\nu\pm\hat\rho}
+U_{\mp\nu\,x+\hat\mu\pm\hat\nu}\delta_{y\,x+\hat\mu}\\
+-&U_{\pm\nu\,x}
+ U_{\pm\rho\,x\pm\hat\nu}
+ U_{-\mu\,x\pm\hat\nu\pm\hat\rho}
+ U_{\mp\rho\,x-\hat\mu\hat\pm\nu\pm\hat\rho}
+U_{\mp\nu\,x-\hat\mu\pm\hat\nu}\delta_{y\,x-\hat\mu} )
+\end{array}
+\f]
+
+The seven-staple term
+\f[
+\renewcommand{\arraystretch}{1.5}
+\setlength{\arraycolsep}{0in}
+\begin{array}{rl}
+[D_7]_{xy}=\sum_\mu\eta_{\mu\,x}\sum_{\nu\neq\mu}\sum_{\rho\neq\mu,\nu}
+\sum_{\sigma\neq\rho,\mu,\nu}
+(&U_{\pm\nu\,x}
+ U_{\pm\rho\,x\pm\hat\nu}
+ U_{\pm\sigma\,x\pm\hat\nu\pm\hat\rho}
+ U_{\mu\,x\pm\hat\nu\pm\hat\rho\pm\hat\sigma}
+ U_{\mp\sigma\,x+\hat\mu\pm\hat\nu\pm\hat\rho\pm\hat\sigma}
+ U_{\mp\rho\,x+\hat\mu\pm\hat\nu\pm\hat\rho}
+U_{\mp\nu\,x+\mu\pm\hat\nu}\delta_{y\,x+\hat\mu}\\
+-&U_{\pm\nu\,x}
+ U_{\pm\rho\,x\pm\hat\nu}
+ U_{\pm\sigma\,x\pm\hat\nu\pm\hat\rho}
+ U_{-\mu\,x\pm\hat\nu\pm\hat\rho\pm\sigma}
+ U_{\mp\sigma\,x-\hat\mu\pm\hat\nu\pm\hat\rho\pm\hat\sigma}
+ U_{\mp\rho\,x-\hat\mu\pm\hat\nu\pm\hat\rho}
+U_{\mp\nu\,x-\hat\mu\pm\hat\nu}\delta_{y\,x-\hat\mu} )
+\end{array}
+\f]
+
+The Lepage term
+\f[
+\renewcommand{\arraystretch}{1.5}
+\setlength{\arraycolsep}{0in}
+\begin{array}{rl}
+\sum_\mu\eta_{\mu\,x}\sum_{\nu\neq\mu}(&
+U_{\pm\nu\,x}U_{\pm\nu\,x\pm\hat\nu}U_{\mu\,x\pm2\hat\nu}U_{\mp\nu\,x+\hat\mu\pm2\nu}U_{\mp\nu\,x+\hat\mu\pm\hat\nu}\delta_{y\,x+\hat\mu}\\
+-&
+U_{\pm\nu\,x}U_{\pm\nu\,x\pm\hat\nu}U_{-\mu\,x\pm2\hat\nu}U_{\mp\nu\,x-\hat\mu\pm2\nu}U_{\mp\nu\,x-\hat\mu\pm\hat\nu}\delta_{y\,x-\hat\mu})
+\end{array}
+\f]
+
+\subsection dwaction Domain wall action
+
+The domain wall action acts in a 5-dimensional lattice; the 5th dimension
+has coordinate \e s and size <i>L<sub>s</sub></i>.
+
+The fermion matrix is \f$ M = 1-\kappa D_\mathrm{DW} \f$
+where
+\f[
+ [D_\mathrm{DW}]_{xs\,ys^\prime} = 
+\delta_{ss^\prime}[D_\mathrm{W}]_{xy}+\delta_{xy}D^\perp_{xy}
+\f]
+and
+\f[
+D^\perp_{xs\,ys^\prime}=
+\left\{\begin{array}{cl}
+-m(1+\gamma_5)\delta_{s^\prime\,L_s-1}+(1-\gamma_5)\delta_{s^\prime\,1}&\mbox{ for }s=0\\
+(1+\gamma_5)\delta_{s^\prime\,s-1}+(1-\gamma_5)\delta_{s^\prime\,s+1}&\mbox{ for }0<s<L_s-1\\
+-m(1-\gamma_5)\delta_{s^\prime\,0}+(1+\gamma_5)\delta_{s^\prime\,L_s-2}&\mbox{ for }s=L_s-1
+\end{array}\right.
+\f]
+
+\subsection nullaction Null action
+
+This is a dummy action class for use in a combined lattice action (see \ref 
+latticeclass) which is a 
+pure gauge action. Its use ensures that all the methods  which
+an algorithm might expect to find are defined, even if they do nothing.
+
+This action is implemented in the  Fnone class.
+
+\section gaugeactions Gauge actions
+
+The following gauge actions are available:
+
+- \ref gwilson 
+- \ref powerplaq
+- \ref rectal 
+- \ref powerrect
+- \ref symanzik 
+
+See also \ref gactions in the Reference Manual.
+
+The type of gauge action can be determined in the code at runtime with the
+Lattice::Gclass() method, which returns something of type #GclassType.
+
+\subsection gwilson Wilson action
+
+The Wilson plaquette gauge action,
+
+\f[
+  -\frac{1}{3}\beta \mathrm{ReTr}\sum_p W_p
+\f]
+where the sum is over all unique plaquettes 
+\f[
+\sum_p W_p  = \sum_x\sum_\mu\sum_{\nu>\mu}
+U_{\mu\,x} U_{\nu\,x+\hat\nu} U^\dagger_{\mu\,x+\hat\nu} U^\dagger_{\nu\,x}
+\f]
+
+\subsection powerplaq Power plaquette action
+
+The power plaquette action
+ is the standard \ref gwilson with an irrelevant power 
+plaquette term added to it:
+\f[
+ \sum_p  -\frac{1}{3}\beta \mathrm{ReTr}[W_p] + \left(\frac{1}{c}(1-\frac{1}{3}\mathrm{ReTr}[W_p]) \right)^k 
+\f]
+ where the sum is over all plaquettes as  in the \ref gwilson.
+
+ This action supresses plaquettes with \f$ 1 - \mathrm{ReTr}[W_p]/3 > c \f$
+ and therefore reduces lattice dislocations, apparently.
+
+It is implemented in the GpowerPlaq class.
+
+\subsection rectal Rectangle improved action
+
+This action adds a rectangle term to the \ref gwilson.
+  \f[
+  -\frac{1}{3}\beta \mathrm{ReTr} \left(\sum_p (1-8 c_1) W_p +
+	\sum_r c_1 W_r \right)
+\f]
+where the sum is over unique plaquettes (as in the \ref gwilson)
+and unique rectangular Wilson loops
+\f[
+\sum_r W_r = \sum_x\sum_\mu\sum_{\nu\neq\mu}
+U_{\mu\,x} U_{\mu\,x+\hat\mu} U_{\nu\,x+2\hat\mu} U^\dagger_{\mu\,x+\hat\mu+\hat\nu}
+U^\dagger_{\mu\,x+\hat\nu} U^\dagger_{\nu\,x}
+]
+\f]
+
+It is implemented in the class GimprRect.
+
+\subsection powerrect Power rectangle improved action
+
+The action is
+ \f[
+-\beta \sum_p
+[ (1-8c_1)\frac{1}{3}\mathrm{ReTr}[W_p] + \{ \frac{1}{c}(1-\frac{1}{3}\mathrm{ReTr}[W_p]) \}^k ]
++ \sum_r [c_1\frac{1}{3}\mathrm{ReTr}[W_r] + \{ \frac{1}{c}(1-\frac{1}{3}\mathrm{ReTr}[W_r]) \}^k ]
+\f]
+where the sums over Wilson loops are as defined in the \ref rectal.
+
+ This action supresses plaquettes with \f$ 1 - \mathrm{ReTr}[W_p]/3 > c \f$
+and Wilson loops with \f$ 1 - \mathrm{ReTr}[W_r]/3 > c \f$
+ and therefore reduces lattice dislocations, apparently.
+
+It is implemented in the class GpowerRect
+
+\subsection  symanzik One-loop Symanzik improved action
+
+  This is a sum of the plaquette, rectangle and cube loops:
+\f[
+\sum_p[W_p] - \frac{ 1 + 0.4805 \alpha_s}{20 u_0^2} \sum_r [W_r]
+-  \frac{ 0.03325 \alpha_s}{u_0^2} 
+     \sum_{\rho>\nu} U_{\mu\,x} U_{\nu\,x+\hat\mu} U_{\rho\,x+\hat\mu+\hat\nu}
+ U^\dagger_{\mu\,x+\hat\mu+\hat\nu+\hat\rho}
+ U^\dagger_{\nu\,x+\hat\nu+\hat\rho} U^\dagger_{\rho\,x+\hat\rho}
+\f]
+       where \f$u_0\f$ is the tadpole coefficient
+       and \f$\alpha_s = -4\log(u_0)/3.06839\f$.       
+
+\section latticeclass Combined actions
+
+Any one of the fermion actions defined above (\ref fermionactions) can be 
+combined with any one of the gauge actions (\ref gaugeactions) to form the
+complete lattice action. The classes which define the complete action are
+
+- Wilson gauge action with no fermions:  GwilsonFnone 
+- Wilson gauge action with staggered fermions:  GwilsonFstag 
+- Wilson gauge action with Wilson fermions:  GwilsonFwilson 
+- Wilson gauge action with Clover fermions:   GwilsonFclover 
+- Wilson gauge action with domain wall fermions:   GwilsonFdwf 
+
+- Power plaquette gauge action with no fermions:  GpowerPlaqFnone 
+- Power plaquette gauge action with staggered fermions:  GpowerPlaqFstag 
+- Power plaquette gauge action with Wilson fermions:  GpowerPlaqFwilson 
+- Power plaquette gauge action with Clover fermions:   GpowerPlaqFclover 
+- Power plaquette gauge action with domain wall fermions:   GpowerPlaqFdwf 
+
+- Improved rectangle gauge action with no fermions:  GimprRectFnone 
+- Improved rectangle gauge action with staggered fermions:  GimprRectFstag 
+- Improved rectangle gauge action with Wilson fermions:  GimprRectFwilson 
+- Improved rectangle gauge action with Clover fermions:   GimprRectFclover 
+- Improved rectangle gauge action with domain wall fermions:   GimprRectFdwf 
+
+- Power rectangle gauge action with no fermions:  GpowerRectFnone 
+- Power rectangle gauge action with staggered fermions:  GpowerRectFstag 
+- Power rectangle gauge action with Wilson fermions:  GpowerRectFwilson 
+- Power rectangle gauge action with Clover fermions:   GpowerRectFclover 
+- Power rectangle gauge action with domain wall fermions:   GpowerRectFdwf 
+
+- One-loop Symanzik improved gauge action with no fermions:  GimprOLSymFnone 
+- One-loop Symanzik improved gauge action with staggered fermions:  GimprOLSymFstag 
+- One-loop Symanzik improved gauge action with Wilson fermions:  GimprOLSymFwilson 
+- One-loop Symanzik improved gauge action with Clover fermions:   GimprOLSymFclover 
+- One-loop Symanzik improved gauge action with domain wall fermions:   GimprOLSymFdwf 
+
+- Staggered fermions with no gauge field (whatever that means): GnoneFstag 
+- Wilson fermions with no gauge field (whatever that means): GnoneFwilson 
+- Clover fermions with no gauge field (whatever that means): GnoneFclover 
+- Domain wall fermions with no gauge field (whatever that means): GnoneFdwf
+- Null action with no fermions or gauge field (very useful): GnoneFnone
+
+
+See also \ref latactions in the Reference Manual.
+
+
+*/

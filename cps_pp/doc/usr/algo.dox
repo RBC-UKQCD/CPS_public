@@ -1,0 +1,208 @@
+//$Id: algo.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+/*!
+
+\page algopage Algorithms in the CPS
+
+\section algo The algorithms in general
+
+The basic building blocks of physics application code are known as 
+algorithms in the CPS.
+An algorithm has its own class in the CPS, all of which inherit from a base 
+class Alg.
+
+The parameters used by an algorithm are divided into those which are specific
+to that algorithm and those which are generic to all algorithms. For the former
+there is defined an algorithm-specific  containing structure.
+For the former, each algorithm has a structure containing its parameters:
+These are listed in the \ref algargs section of the Reference Manual and 
+described below.
+For the
+latter there is the CommonArg structure which is used by all algorithm objects.
+This just specifies the name of a file to which the output of an algorithm 
+can be logged.
+These structures are used in the construction of the algorithm object.
+
+The algorithm code is documented in the \ref alg section of the Reference 
+Manual.
+The public interface is simple. The constructor initialises the algorithm 
+parameters as previously described and a method called \c run() performs an
+iteration of the 
+algorithm (in a sense determined by the particular algorithm). \e N.B. this
+simple interface seems to be merely a matter of convention rather than being 
+fixed using pure virtual methods in the base class, so it might not always be
+the case.
+ 
+The following algorithms are available:
+
+- \ref hmc 
+- \ref hmd 
+- and many more!
+
+\section dynamical Dynamical  fermion algorithms
+
+Two dynamical fermion algorithms are available, \e viz. the \e Phi (\ref hmc) 
+and \e R (\ref hmd)
+algorithms, being implementations of the algorithms described in
+Gottlieb, Toussaint, Renken and Sugar; <em>Phys. Rev. D 35 (1987) p. 2531</em>
+(http://link.aps.org/abstract/PRD/V35/P2531/).
+
+Both are algorithms based on molecular dynamics, and so the classes 
+implementing them, AlgHmcPhi and AlgHmdR, are derived from the class AlgHmd.
+
+Both have the following attributes:
+
+- The fermion determinant is odd-even preconditioned, \e i.e the pseudofermion
+fields are defined on odd parity sites only.
+- All solves (of the odd-even preconditioned fermion matrix) are done with the 
+CG algorithm.
+- Dynamical bosons can also be included. In the R algorithm bosons are 
+implemented as fermions with negative flavour number, whereas they have to be 
+considered seperately in the HMC algorithm.
+
+Both algorithms are initialised with the HmdArg structure. Most of the fields
+in this structure are used by both algorithms, but some are relevant to
+just one or the other. Irrelevant parameters are ignored. Some parmeters 
+have slightly different meanings depending on the algorithm.
+
+The \c run method of each algorithm performs a single trajectory.
+
+\subsection hmc The HMC algorithm
+
+In addition to those listed  above (\ref dynamical), the HMC implemented in 
+the AlgHmcPhi class has the following attributes:
+
+- The standard leapfrog integration scheme is used
+- A two-step chronological scheme is used to find the starting vectors for the 
+solves in the molecular dynamics. In the \e n th molcular dynamics step 
+the initial guess for the solution \f$X_n\f$ is \f$ 2X_{n-1}-X_{n-2} \f$
+with a random gaussian vector used when a previous solution is unavailable.
+- The algorithm can accomodate any number of doubly/quadrupally degenerate 
+Wilson/staggered dynamical fermion flavours.
+- The algorithm can also include dynamical bosons, again with any number of 
+doubly/quadrupally degenerate flavours.
+- The metropolis step can be forced to accept always.
+- Reunitarisation of the gauge configuration at the end of a trajectory is 
+optional
+
+the HMC algorithm expects 
+the following fields of the HmdArg struct to be defined:
+
+
+- \c n_frm_masses  The number of dynamical fermion masses. \e N.B. this is not 
+the same as the number of flavours: for instance, a two-flavour Wilson HMC 
+computation requires this number to be 1. This number has a maximum defined by 
+MAX_HMD_MASSES.
+- \c frm_mass An array containing the dynamical fermion masses.
+- \c n_bsn_masses  The number of dynamical boson masses
+- \c bsn_mass An array containing the dynamical boson masses.
+- \c max_num_iter An array containing the maximum number of solver iterations 
+permitted for each fermion mass, presented in the same order as the fermion 
+masses in the \c frm_mass array. 
+When dynamical bosons are used this has an addition meaning:
+The same maximum
+iteration numbers are used for the bosonic inversions in the same order as 
+the boson masses in the \c bsn_mass array. Care should therefore be taken in 
+ordering the masses in these arrays and when the number of bosons is unequal to
+the number fermions.
+- \c stop_rsd An array containing the target residues of the solver
+permitted for each fermion mass, presented in the same order as the fermion 
+masses in the \c frm_mass array. 
+When dynamical bosons are used this has an addition meaning:
+The same target residues
+ are used for the bosonic inversions in the same order as 
+the boson masses in the \c bsn_mass array. Care should therefore be taken in 
+ordering the masses in these arrays and when the number of bosons is unequal to
+the number fermions.
+- \c steps_per_traj Almost the length of the trajectory \e viz. one less than
+the number of timesteps.
+- \c step_size The molecular dynamics step size.
+- \c metropolis Whether to do the metropolis accept/reject step. Setting 
+this to \c METROPOLIS_NO forces acceptance.
+- \c reunitarize  Whether or not to reunitarize the gauge configurations at the end of the trajectory
+All others are ignored.
+
+If desired (see the section \ref outputdata), the following data can be logged
+  - The number of timesteps <em>plus 1</em>.
+  - The change (final - initial) in the hamiltonian over the trajectory
+  - Whether the new configurations is accepted (1) or rejected (0)
+  - A measure (an average L-2 norm; see the comments for Lattice::Reunitarize) 
+of the change in the new configuration due to reunitarisation
+  - Another measure (the L-infinity norm; see the comments for Lattice::Reunitarize) 
+of the change  in the new configuration due to reunitarisation
+  - The average number of solver iterations
+  - The minimum number of solver iterations
+  - The maximum number of solver iterations
+  - The average solver residue
+  - The minimum solver residue
+  - The maximum solver residue
+
+The data are written in the order shown.
+
+The solver statistics are averaged over \e all solves performed in the 
+trajectory.
+
+
+\subsection hmd The R algorithm
+
+Dynamical bosons are implemented in this algorithm as fermions with negative 
+flavour number, and therefore anything here relating to fermions also 
+inmplicitly refers to bosons.
+
+In addition to those listed  above (\ref dynamical), the R algorithm 
+implemented in the AlgHmdR class has the following attributes:
+
+- The integration scheme is essentially the leapfrog but with the  
+complication of double updates of the gauge field necessary for this algorithm.
+- The initial guess for all solves is a random gaussian vector
+- The algorithm can accomodate any number of dynamical fermion flavours.
+- The algorithm can also include dynamical bosons, again with any number of 
+ flavours.
+- Optional reunitarisation of the gauge configuration at the end of a trajectory is 
+
+The R algorithm expects 
+the following fields of the HmdArg struct to be defined:
+
+- \c n_frm_masses  The number of dynamical fermion masses. \e N.B. this is not 
+the same as the number of flavours: for instance, a two-flavour Wilson HMC 
+computation requires this number to be 1. This number has a maximum defined by 
+MAX_HMD_MASSES.
+- \c frm_mass An array containing the dynamical fermion masses.
+- \c frm_flavors The number of flavours for each of the masses specified in the
+array \c frm_mass in the same order.
+- \c max_num_iter An array containing the maximum number of solver iterations 
+permitted for each fermion mass, presented in the same order as the fermion 
+masses in the \c frm_mass array. 
+- \c stop_rsd An array containing the target residues of the solver
+permitted for each fermion mass, presented in the same order as the fermion 
+masses in the \c frm_mass array. 
+- \c steps_per_traj The length of the trajectory \e i.e. the number of 
+timesteps.
+- \c step_size The molecular dynamics step size.
+- \c reunitarize  Whether or not to reunitarize the gauge configurations at the end of the trajectory
+
+All others are ignored.
+
+If desired (see the section \ref outputdata), the following data can be logged
+  - The number of timesteps.
+  - A measure (an average L-2 norm; see the comments for Lattice::Reunitarize) 
+of the change in the new configuration due to reunitarisation
+  - Another measure (the L-infinity norm; see the comments for Lattice::Reunitarize) 
+of the change  in the new configuration due to reunitarisation
+  - The average number of solver iterations
+  - The minimum number of solver iterations
+  - The maximum number of solver iterations
+  - The average solver residue
+  - The minimum solver residue
+  - The maximum solver residue
+
+These data are written in the order shown.
+
+The solver statistics are averaged over \e all solves performed in the 
+trajectory.
+
+\section notyet <Your favourite algorithm here>
+
+
+
+
+*/

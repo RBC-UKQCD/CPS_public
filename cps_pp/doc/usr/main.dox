@@ -1,0 +1,56 @@
+//$Id: main.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+/*!
+  \mainpage 
+<center>
+<h1>User Guide</h1>
+</center>
+\anchor usrguidemain
+This is the user guide for the Columbia Physics System (CPS). 
+
+- \ref intropage 
+	- \ref whatitis 
+	- \ref itwasntme
+	- \ref basis 
+- \ref actionpage
+	- \ref fermionactions
+	- \ref gaugeactions
+	- \ref latticeclass
+- \ref algopage 
+	- \ref algo
+	- \ref dynamical
+		- \ref hmc
+		- \ref hmd
+	- \ref notyet
+- \ref detailpage 
+	- \ref data
+	- \ref orderorder
+		- \ref canonicallayout
+		- \ref wilsonlayout
+		- \ref staggeredlayout
+		- \ref gbh
+		- \ref precon
+		- \ref access
+		- \ref convert
+	- \ref parallel
+		- \ref griddecomp
+		- \ref comms
+	- \ref rng
+- \ref interpage
+	- \ref input
+	- \ref output		 
+	- \ref fileformat
+	- \ref stdout
+- \ref progpage
+	- \ref language
+		- \ref cppnotthere
+	- \ref port
+		- \ref qcdspspecific
+	- \ref cpscode
+		- \ref glob
+		- \ref things
+	- \ref doth
+	- \ref build
+	- \ref testing
+
+
+*/

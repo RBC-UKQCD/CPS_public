@@ -1,0 +1,55 @@
+//$Id: intro.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+/*!
+
+\page intropage Introduction 
+
+\section whatitis Explanation 
+
+The Columbia Physics System (CPS) is a large set of lattice QCD codes. 
+The idea is to use an object oriented approach to make it easy 
+for high level codes to accomodate different types of lattice action.
+A large body of code can be daunting, so this document is intended 
+to give some sort of overview of the system. More specific information
+on the code can be found in the \ref refmanmain "Reference Manual"
+
+This  document is intended to be a general user-level description of the CPS.
+I assume that the general user is one who wants to build and run QCD 
+applications and possibly also to write new applications, but will not 
+be getting involved with hacking about the low level code. This document
+will concentrate on higher level features.
+
+\section itwasntme Disclaimer
+
+This guide is not, by any stretch of the imagination, complete. 
+I do not even claim that everything here is correct. In any event,
+all of the wording is subject to revision.
+
+\section basis CPS basis
+
+A lattice QCD computation means using some particular formulation of QCD on 
+the lattice, \e i.e. the action, and applying numerical algorithms to
+compute the quantities of interest.
+
+In general we have a gauge action and a fermion action, and there are 
+a number of different  types of each. However, although they behave differently
+ we typically want to do the same sorts of operations regardless of the 
+underlying structure. This is the motivation for the Lattice class, in which
+many operations one might want to do with the lattice fields are
+abstracted. The classes representing each action all inherit from this, 
+and so we have a uniform programming interface defining lots of useful things
+we might want to do in an action-independent way. This means that a lattice 
+QCD algorithm can be easily coded to work with any action.
+Of course, in the derived
+action classes some action-specific features can be and are added to give the 
+user the full functionality of that action. 
+
+Broadly, a CPS application is written by specifying the gauge and fermion 
+actions with the appropriate Lattice class derivative, specifying the 
+general parameters of the lattice simulation, choosing an algorithm and 
+specifying its parameters, and finally running the algorithm.
+
+In the rest of the guide we look at the essential 
+components of the CPS in more detail, how to build and run programs and 
+some considerations when it comes to writing CPS code.
+ 
+*/

@@ -1,0 +1,56 @@
+//$Id: main.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+/*!
+
+
+
+  \mainpage
+<center>
+<h1>Reference Manual</h1>
+</center>
+	
+\anchor refmanmain
+
+This is the reference manual for the Columbia Physics System (CPS).
+The CPS is written in C++ and C (with optional assembly kernels). 
+The CPS is pure dead good, so it is.
+
+True to the spirit of encapsulation, the public interface only is documented 
+here: if you really want to know how the CPS works internally you should read 
+and understand the source code, which should be helpfully commented.
+
+The CPS is large; not all the code is documented. Many of the algorithm 
+implementations are not documented;  this may change in time.
+Code which is highly specific
+to some particular hardware is generally not documented; in particular
+there is much code implementing the same routines bur optimised for different 
+hardware, \e etc. Where this is the case the most generic code is documented.
+Much of the "low lying" code, where routines are 
+used solely internally by class methods, is not documented either since these 
+routines are effectively (if not actually) private and therefore fall under 
+the encapsulation considerations mentioned above.
+
+<h2>Other resources</h2>
+
+- The EPCC documentation bundle, including instructions on accessing and 
+installing the code and notes on features specific to QCDSP:
+\htmlonly
+<a href="../../index.html">Local copy</a>
+\endhtmlonly
+or
+http://www.epcc.ed.ac.uk/~ukqcd/cps/
+
+- The CPS \ref usrguidemain "User Guide"
+
+*/
+  
+
+
+
+
+
+
+
+
+
+
+

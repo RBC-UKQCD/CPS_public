@@ -1,0 +1,472 @@
+//$Id: detail.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+/*!
+
+\page detailpage The CPS in more detail
+
+\section data Data
+
+To enable the code to be built in either a single or double precision version,
+a new general type is defined for floating point data which can be chosen at 
+build-time to be of either precision. The use of the keywords \c float and
+\c double is therefore deprecated.
+
+In fact there are several floating point types defined in the CPS. 
+
+The #Float and #IFloat seem to do the same thing, but the latter 
+is supposed to be used "internally"; what this means is unclear, since it is 
+often used in public interfaces. 
+
+Another floating point type is rfloat, which appears to be a class wrapper
+for the #IFloat type, but does not appear to be actually used anywhere.
+
+Complex numbers have a class Rcomplex providing all the operations one
+might expect. It is not used very much though. The type #Complex is  
+synonymous with Rcomplex.
+
+\section orderorder Data layout
+
+The basic floating point numbers can be (and often are) gathered into useful
+objects like the Matrix or Vector class to that they can be handled as 
+complex matrices or colour vectors or as appropriate. These classes enable
+various common operations on the objects to be easily performed.
+
+There is one further level of organisation of the data. Much lattice data 
+exists as a \e field, \e i.e. as something that has  a value at each lattice
+site. So one has a gauge field, which consists of four \e SU(3) matrices at
+each site, or a spin-colour field which has four complex 3-vectors at each 
+site, and so on. 
+We need to know in the code how to access the data at any 
+given lattice site.
+
+Such data is stored as some sort of array
+in the internal workings of the CPS; a difference between fermion fields and 
+the gauge field in the CPS is that a fermion field is declared explicitly
+as an array of Vector objects whereas
+the gauge field is private data inside the
+ Lattice class, thus providing an additional layer of abstraction. 
+In the spirit of object oriented design 
+you should never need to know the details of the storage order;
+code exists to transparently map the cartesian coordinates of a lattice site 
+to its position in the array (see section \ref access). 
+
+However you should probably be aware that there are several different data
+layouts and that the code can rearrange data. 
+
+The differences are mainly in the mapping of lattice site coordinates 
+to array indices. 
+Other layouts arise from the use of odd-even preconditioning of the fermion 
+matrix, which reorders the lattice sites. Odd-even preconditioning
+is described in the \ref precon section.
+
+The different types of data layout are labelled by the StrOrdType type.
+The layout currently in use by the gauge field 
+can be found at runtime with the Lattice::StrOrd()
+method. The type of layout used depends on  the action. 
+
+The following sections present greater detail about the data layouts for gauge 
+fields and fermionic fields. 
+
+\subsection canonicallayout The canonical layout
+
+The basic  layout is labelled ::CANONICAL and is used by all actions.
+
+The lattice site index runs lexicographically in the order of the 
+coordinates X, Y, Z, T increasing, with T running slowest and X fastest.
+
+For gauge fields, the next fastest index after the lattice site is the 
+direction index \c mu, which also goes in the order X, Y, Z, T. 
+Then the colour indices (matrix \c col and \c row) and finally the complex
+component \c comp. In a C array notation, the canonical order is equivalent
+to the following:
+
+\verbatim
+gauge_field[t][z][y][x][mu][col][row][comp]
+\endverbatim
+
+Fermion fields have the same lattice site order in the canonical layout:
+
+\verbatim
+fermion_field[t][z][y][x][spin][colour][comp]
+\endverbatim
+
+Note that staggered fermions have no spin index.
+
+
+\subsection wilsonlayout The Wilson/clover/domain wall layout
+
+When using the Wilson, clover or domain wall actions, data can be rearranged
+into the ::WILSON layout. 
+
+Gauge fields and fermion fields are arranged in odd-even order as described 
+in section \ref precon. The order of the data at each site is unchanged.
+
+\subsection staggeredlayout The staggered layout
+
+The staggered fermion actions use the ::STAG layout.
+
+Fermion fields are arranged in odd-even order as described 
+in section \ref precon. The order of the data at each site is unchanged.
+
+Gauge fields are arranged in the canonical layout, but the hermitian 
+conjugate of each link is stored and each link is multiplied with the 
+phase for that site and direction.
+
+\subsection gbh The heatbath layout
+
+A special ::G_WILSON_HB layout exists for computing a global heathbath on a 
+gauge field. It is equivalent to the following C array
+
+\verbatim
+gauge_field[t][z][y][x][mu][comp][col][row]
+\endverbatim
+
+where in addition, the \c mu index runs in the order T, X, Y, Z.
+
+
+\subsection precon Odd-even preconditioning 
+
+The CPS uses odd-even preconditioning to speed up the fermion matrix 
+inversions.
+
+We define the parity of a lattice site as \e even the sum of its
+cartesian coordinates is even, \o odd otherwise.
+
+This form of preconditioning involves reordering the lattice sites so that
+all the odd sites are numbered first, and then all the even sites (or the 
+other way around; it doesn't matter, but that is the CPS convention). 
+One can write the fermion matrix operator in terms of the odd and even sites 
+
+\f[
+M = \pmatrix{a_{oo}&D_{oe}\cr D_{eo}& a_{ee}}
+\f]
+
+where the diagonal term \e a would be 1 for the Wilson action and domain wall
+action, \a A for the 
+clover action and \e m for the staggered action, and \e D denotes the 
+appropriate hopping term.
+
+One can transform it into a form where the matrix elements
+<em>M<sub>xy</sub></em> are zero if \e x and \e y are sites with different 
+parities 
+This means that the fermion operator on even sites decouples from that on odd
+sites, and we define the preconditioned (sub)matrix on odd sites. The 
+form of the preconditioned matrix for the various fermion actions is as 
+follows:
+
+<b>Wilson/clover action</b>
+
+The preconditioned Wilson/Clover matrix is
+\f[
+\hat{M} = A_{oo}-\kappa^2[D_\mathrm{W}]_{oe}A_{ee}^{-1}[D_\mathrm{W}]_{eo}
+\f]
+where for the Wilson action \e A is 1.
+
+<b>Staggered action</b>
+
+The preconditioned staggered matrix is defined implicitly through
+\f[
+\hat{M}^\dagger\hat{M} = 4m^2_{oo}+[D_\mathrm{KS}]^\dagger_{oe}[D_\mathrm{KS}]_{eo}
+\f]
+with the  obvious generalisation to the Asqtad action.
+
+<b>Domain wall action</b>
+
+The preconditioned domain wall matrix is
+\f[
+\hat{M} = 1_{oo}-\kappa^2[D_\mathrm{DW}]_{oe}[D_\mathrm{DW}]_{eo}
+\f]
+
+The reordering of lattice sites by parity necessary for odd-even 
+preconditioning is realised by storing
+fermionic fields in this odd-even order. This makes it convenient
+when multiplying a vector by a preconditioned matrix acting on sites of a 
+single parity. 
+
+The odd-even storage order is equivalent to the C array
+\verbatim
+field[parity][t][z][y][x][data]
+\endverbatim
+
+
+
+\subsection access Access to data
+
+There are some useful methods which allow you to get access to particular 
+elements of the lattice fields.
+
+
+Lattice::GaugeField() with no argument returns a pointer to the first \e SU(3)
+matrix in the gauge field array.
+
+Lattice::GsiteOffset() takes as an argument an \c int array containing the
+[x,y,z,t] coordinates of a lattice site. It returns the array index of the 
+first of the four gauge field links at that site.
+
+Lattice::GetLink() takes as arguments an \c int array containing the
+[x,y,z,t] coordinates of a lattice site and integer denoted the direction
+index, and returns a pointer to the gauge field link matrix at that site
+and in that direction.
+
+Lattice::FsiteOffset() takes as an argument an \c int array containing the
+[x,y,z,t] coordinates of a lattice site. It returns the CANONICAL order
+ array index of the fermionic field at that site.
+
+Lattice::FsiteOffsetChkb() takes as an argument an \c int array containing the
+[x,y,z,t] coordinates of a lattice site. It returns the odd-even order
+ array index of the fermionic field at that site.
+
+
+\subsection convert Conversion between layouts 
+
+The default layout of the fields is the canonical one; 
+The gauge field is created with the canonical layout and fermion fields can
+be assumed to be in the canonical order upon allocation.
+
+Leaving aside the heatbath layout (section \ref gbh) the layout of the fields
+is converted in methods that do something with the fermion matrix, like 
+multiply or solve for a vector with it
+(\e e.g. Lattice::FmatInv()). These methods have an argument of type
+::CnvFrmType, which can take the value ::CNV_FRM_YES or ::CNV_FRM_NO. 
+
+The former indicates that all relevant fields, \e i.e. the gauge field and 
+any fermion field arguments,
+should be converted to the layout appropriate for
+the fermion action; the method knows which layout is appropriate because it 
+is a method of a class which defines the type of action. If the fields are 
+already in that layout then nothing is done.
+
+The latter indicates that only the gauge field should be converted. This is
+useful when the fermion fields are uniform or uninitialised, in which case 
+rearranging them would have no effect, or when they are only defined on sites
+of one parity, in which case no rearrangement is possible.
+
+Upon leaving such a method the reverse conversion is performed. This leaves
+the gauge field in the canonical order. If ::CNV_FRM_YES was specified, then
+the fermion fields  are also converted to the canonical layout. Otherwise, if 
+::CNV_FRM_NO was specified, then the fermion fields are left in the 
+action-specific order.
+
+This behaviour upon exiting such a method leaves the possibility that the
+gauge field and the fermion fields have different layouts. The programmer 
+needs to remember if the fermion fields are not in canonical order, since
+the Lattice::StrOrd() method returns the layout of the gauge field alone; there
+is no equivalent method for fermion fields. Note that supplying the
+::CNV_FRM_YES argument assumes that both the gauge and fermion fields have 
+the same type of layout.
+
+\section parallel Parallelism
+
+The CPS is designed primarily to run on massively parallel platforms.
+In fact it was originally written especially for the QCDSP. Now,  although
+the main target architecture is the QCDOC it should also be capable of running 
+on other parallel systems. It can also be run on a scalar platform. The 
+target architecture is defined at configure/build time (see section \ref 
+build). 
+
+The CPS is programmed in an essentially SPMD fashion using message passing, 
+since the QCDOC is a distributed memory machine.
+
+On the QCDOC the parallelisation is implemented by a specialised OS which
+the CPS takes advantage of \e via system calls. Communications between nodes 
+are handled directly by the Serial Control Unit (SCU), a subsystem of the 
+custom Node Gate Array (NGA) IC.
+
+On other parallel platforms this behaviour is emulated by an MPI 
+(http://www-unix.mcs.anl.gov/mpi/)
+layer called 
+the MPI-SCU, which provides the same API as the QCDSP OS. The MPI-SCU is in 
+fact a stand-alone system which can be used independently of the CPS. We shall
+henceforth refer to these functions as system calls, but their behaviour should
+be exactly the same on non-QCDOC platforms if the environment has ben set up 
+correctly as described in the \ref mpiscuin section.
+
+The code dealing with the parallelism in the CPS is described in the \ref 
+comms section of the Reference Manual.
+
+\subsection griddecomp Grid decomposition
+
+The lattice is divided up using domain decomposition over a processor grid.
+This grid connot be of more than four dimensions.
+The CPS seems to make a distinction between the  logical grid \e i.e. the nodes
+that you are actually using and the physical grid \ i.e. the nodes that there
+actually are.
+
+The dimensions of the logical grid are assigned to elements of the DoArg 
+structure 
+(see section \ref runtimeinput) 
+ - DoArg::x_nodes 
+ - DoArg::y_nodes 
+ - DoArg::z_nodes
+ - DoArg::t_nodes
+.
+and must divide exactly the values returned by the system calls 
+- SizeX()
+- SizeY()
+- SizeZ()
+- SizeT()
+.
+which give the size of the physical grid.
+
+A five dimensional lattice for domain wall fermions can be 
+parallelised along the fifth dimension if one of the other dimensions is 
+entirely local.
+
+The MPI-SCU layer has an additional interface,
+ described in the section \ref mpiscuin, for specifying the dimensions
+of the physical node grid. 
+
+The size of the lattice is then determined by supplying
+the dimensions of the local lattice to the DoArg structure (see section 
+\ref runtimeinput). These dimensions should usually be even so that odd-even 
+preconditioning (see section \ref precon)
+works properly and the random number streams are reproducible
+(see section \ref rng).
+
+The following system calls, all of which return \c int, can be used to access 
+parameters of the grid:
+
+-  NumNodes()  Returns the total number of nodes in the processor grid. 
+-  UniqueID()  Gets a number which is unique for each node. 
+-  SizeT()  Gets the size of the grid in the T direction. 
+-  SizeX()  Gets the size of the grid in the X direction. 
+-  SizeY()  Gets the size of the grid in the Y direction. 
+-  SizeZ()  Gets the size of the grid in the Z direction. 
+-  CoorT()  Gets the grid coordinate of this node in the T direction.
+-  CoorX()  Gets the grid coordinate of this node in the X direction.
+-  CoorY()  Gets the grid coordinate of this node in the Y direction.
+-  CoorZ()  Gets the grid coordinate of this node in the Z direction.
+
+\subsection comms Communication
+
+<b>Point-to-point communications</b>
+
+Point-to-point communications are used to give a node access to local data 
+on another node. The CPS allows communication between neighbouring nodes.
+
+Data is prepared for communication by initialising a SCUDirArg object.
+One instance is created for the data to be sent, and another for the data
+to be received. A flag of type ::SCUXR indicates whether the object is 
+describing data to be sent or received.
+The object is given the address of the buffer from which data is to be sent, 
+or to which it is to be received, and the number of bytes of data involved.
+Data can be sent using a strided pattern of access from the send buffer by
+defining the block length in bytes, the number of blocks and the stride in 
+units of the block length. The latter two 
+default to 1, indicating that the data is contiguous. The received data can be
+stored according to the same or a different pattern in the receive buffer.
+Methods exist to obtain or alter the data characteristics.
+The object is also (of course) told in which direction to send the data with
+an argument of type ::SCUDir.
+
+After the initialisation of the communication the SCUDirArg objects, the 
+communication is launched using a SCUTrans() function.
+
+In general, this sends a number \e n of data sets in a particular direction
+or receives those data from a particular direction. The data is supplied as an 
+array of initialised SCUDirArg objects. The number of objects defaults to 1.
+One can also specify an array of offsets to be added to the buffer addresses
+of the SCUDir objects.
+
+Note that the array of objects for sending should be in the same order as the 
+array of corresponding receive objects.
+
+Finally, the communications are completed by calling SCUTransComplete().
+This does not return until all outstanding communications are finished.
+
+An alternative set of functions is given by the SCUSetDMA() and SCUTransAddr()
+ routines which are designed to do the work of SCUTrans() but possibly by
+communicating more directly which the underlying communications layer.
+
+Some of these routines have been gathered together into the higher level 
+routines listed in the \ref sendrecv section of the Reference Manual which
+do a generic send/receive of an array in various directions.
+
+<b>Collective communications</b>
+
+Collective communications perform global operations over the grid, \e e.g.
+global sums. These function are described in the \ref collectivecomms section 
+of the Reference Manual and allow various things like the summation of  a 
+single floating point number, or a vector of them, over all the active nodes.
+The sum is then broadcast to all nodes. 
+
+A variation is summation in a direction. Here, 
+ the sum is over all nodes with the same grid coordinates other than in a
+a  given single direction. This results in a seperate sum for each strip of 
+nodes. Also one can sum over all nodes in each three-dimensional hyperplane 
+perpendicular to a given direction.
+
+Finally, the function sync() action as a global barrier to synchronise 
+program execution on all nodes.
+
+Even more finally, if the MPI
+communications layer is used, SCUCommsFinalize() performs a clean exit from it.
+
+
+\section rng Random numbers
+
+An aim of the CPS is to allow reproducible code regardless of the computer
+platform or of the decomposition of the lattice over hte node grid.
+Since many CPS applications use random numbers, the RNG has to be independent
+of these things too. This is achieved by assigning a seperate dedicated random 
+number stream to each minimal 2<sup>4</sup> hypercube of lattice sites.
+By restricting the local lattice dimensions to be even in all directions 
+we can ensure that whatever the decomposition, each lattice site will have the 
+same random number stream. 
+
+This RNG is implemented by the LatRanGen class. The CPS requires a globally 
+scoped instance called LRG to be declared (see section \ref glob). This 
+instance is not actually initialised until the Lattice constructor is called;
+at this point we can be sure that all the global lattice parameters upon which
+the LatRanGen initialisation depends have been fixed.
+
+The RNG is seeded according to the value returned by 
+GlobalJobParameter::StartSeedKind()
+- If this is #START_SEED_UNIFORM, #START_SEED_FIXED_UNIFORM 
+or #START_SEED_INPUT_UNIFORM then the same seed is used for all hypercube RNGs.
+- If this is #START_SEED, #START_SEED_INPUT or #START_SEED_FIXED then a function
+depending on the global lattice coordinates of each hypercube is added to
+the seed, and therefore each hypercube gets a unique seed. 
+- Finally, #START_SEED_INPUT_NODE assigns a seed which depends on the position
+of the node in the grid. This is not reproducible.
+
+DoArg::start_seed_kind also determines the value of the seed itself:
+- It is a reproducible constant number if the 
+DoArg::start_seed_kind is #START_SEED_FIXED or #START_SEED_FIXED_UNIFORM.
+- If it is #START_SEED or #START_SEED_UNIFORM.then the seed is obtained from 
+a  system call and is in general a non-reproducible time-varying number.
+- Finally, with #START_SEED_INPUT, #START_SEED_INPUT_UNIFORM and 
+#START_SEED_INPUT_NODE the value of the seed is supplied by the user and is 
+returned by GlobalJobParameter::StartSeedValue().
+
+Usually the seeding strategy is chosen by assigning a value to 
+DoArg::start_seed_kind, which is then used to initialise GJP as described in
+section \ref runtimeinput. However, the GlobalJobParameter::StartSeedKind()
+method can in principle be used to change this strategy at any time, even 
+though the value of the seed, as returned by returned 
+by GlobalJobParameter::StartSeedValue(), can only be set \e via assignment to 
+DoArg::start_seed_value and GlobalJobParameter::Initialize().
+
+To generate random numbers, first the correct RNG must be assigned depending
+on the lattice site using LatRanGen::AssignGenerator(). 
+Numbers can be drawn from two types of distribution; a gaussian with zero 
+mean and a uniform distribution. The variance of the gaussian distribution
+can be assigned with LatRanGen::SetSigma(); the width of the uniform 
+distribution can be set with LatRanGen::SetInterval(). The methods 
+LatRanGen::Grand() and LatRanGen::Urand() return a gaussian and uniform random
+number respectively. One can also use LatRanGen::Lrand() to obtain a global 
+uniform random number, \e i.e. a single number identical on all nodes.
+
+Here is a simple example, where \c foo is a floating point array the size
+of the local lattice:
+
+\verbatim
+   LRG.SetInterval(1, -1);
+ 
+   for(int site=0; site<GJP.VolNodeSites(); site++){
+       LRG.AssignGenerator(site);
+       foo[site] = LRG.Urand();
+   }
+\endverbatim
+
+
+*/

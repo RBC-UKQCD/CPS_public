@@ -1,0 +1,188 @@
+//$Id: programming.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+/*!
+
+\page progpage CPS programming
+
+An object oriented design should make it very easy to develop application 
+software.
+Here we look at things you need to know when you start hacking: 
+considerations of programming style, CPS programming ideoms, and information
+on building and testing.
+
+\section language Language
+
+The higher level CPS code is written in C++, and for most users this object 
+oriented interface is all that they should have to see.
+
+Lower level code is written in C and, where appropriate, in assembly 
+language, the latter being particularly important to achieve high performance
+on the QCD{SP|OC}.
+
+Because the CPS was originally developed for a specific platform (QCDSP),
+having its very own operating system and using the Tartan C++
+compiler, there are certain language ideosyncrasies in the code, namely
+the absence of a few common C++ features, presumably
+because they were not supported in the QCDSP programming environment.
+
+\subsection cppnotthere C++ ideosyncrasies
+
+While the code
+is ANSI compliant the following C++ features appear to be absent:
+
+- Templates
+- The \c bool datatype
+- The keywords \c new, \c delete and \c delete[]. All dynamic memory is 
+controlled with the functions ::pmalloc, ::pfree, ::smalloc and ::sfree, which 
+work essentially the same way as the usual C  malloc and free
+functions declared in stdlib.h.
+- The keywords \c throw, \c try and \c catch for exception handling. It is 
+probably best to avoid 
+the C functions \c setjmp and \c longjump declared in setjmp.h because, 
+although similar behaviour can be achieved with them, they do not handle 
+object destructors correctly.
+- The IO-stream library. The C functions declared in stdio.h are used instead
+of the \c ostream and \c istream classes and their derivatives (like \c cin 
+and \c cout) and the insertion and extraction operators (\c << and \c >> ).
+- The string library. All stringy operations are handled with C style  
+ASCII-NULL
+terminated \c char arrays and the C functions declared in string.h, rather than
+the \c string class.
+- The Standard Template Library, so no STL containers, iterators, generic 
+algorithms, \e etc.
+- Namespaces
+
+\section port Platforms and portability
+
+The code is ANSI compliant and so should be reasonably portable.
+There are some differences in the way that the code is built but this should 
+not be a problem.
+
+\subsection qcdspspecific QCDSP/QCDOC specific features
+
+It might be worth noting at this point those features of the code
+which are specific to the original QCDSP platform and which are not
+duplicated on other platforms in the way that the QCDSP system calls
+are. These are necessary optimisations on QCDSP but can otherwise be
+ignored. Knowing what platform-specific code one can ignore might make
+it easier to tell the wood from the trees when reading the CPS code.
+
+One such feature is the relocation of code to CRAM. This is
+implemented by the code in p2v.C 
+
+Another is the circular buffer. This is any code which involves 
+variables defined in nga_reg.h
+
+There are many routines optimised for the QCDSP, but usually there is
+a "vanilla" version so it should be possible to understand the
+functionality.
+
+A detailed account of QCDSP programming can found in 
+\htmlonly
+<a href="../../qcdsp/toplevel.html">a separate document</a>.
+\endhtmlonly
+\latexonly
+a seperate document: 
+http://www.epcc.ed.ac.uk/~ukqcd/cps/qcdsp/toplevel.html
+\endlatexonly
+
+\section cpscode CPS programming conventions
+
+\subsection glob Global variables
+
+The CPS code expects certain globally scoped variables to be defined.
+These are
+- An instance of the GlobalJobParameter class named ::GJP
+- An instance of the Verbose class named ::VRB
+- An instance of the Error class named ::ERR
+- An instance of the LatRanGen class named ::LRG
+
+These variables should be defined with global scope in the file in which 
+the main routine is defined, \e e.g.
+
+\verbatim
+    GlobalJobParameter GJP;
+    LatRanGen LRG;
+    Verbose VRB;
+    Error ERR;
+
+    int main(int argc, char **argv){
+
+        // Your code here
+
+        return 0;
+
+    }    
+\endverbatim
+
+\subsection things Other things
+
+The Lattice class allocates memory for the gauge field but the destructor
+does not free this memory. For this reason it is inadvisable to have two
+Lattice instances in scope together.
+This means that it is possible to write an 
+application which uses two different actions on the same configuration by
+starting the second Lattice instance with DoArg::start_conf_kind set to
+::START_CONF_MEM
+ to indicate that the gauge field is already present in memory.
+The DoArg::start_conf_load_addr field must also be supplied with the memory
+address of the configuration.
+
+
+\section doth Header files
+
+What header files should be included where?
+
+
+\section build CPS build structure 
+
+First get a copy of the CPS source from the CVS repository as described
+\htmlonly
+<a href="../../cvsaccess.html">here</a>.
+\endhtmlonly
+\latexonly
+here: http://www.epcc.ed.ac.uk/~ukqcd/cps/cvsaccess.html
+\endlatexonly
+
+\subsection The directory structure 
+
+See
+\htmlonly
+<a href="../../new_structure/structure.html">here</a>.
+\endhtmlonly
+\latexonly
+here: http://www.epcc.ed.ac.uk/~ukqcd/cps/new_structure/structure.html
+\endlatexonly
+and 
+http://www.ph.ed.ac.uk/ukqcd/community/qcdoc/build
+for the discussions on this.
+
+See
+\htmlonly
+<a href="../../structure/structure.html">here</a>.
+\endhtmlonly
+\latexonly
+here: http://www.epcc.ed.ac.uk/~ukqcd/cps/structure/structure.html
+\endlatexonly
+for a description of the old directory structure 
+
+\subsection Configuring the CPS
+
+Configuring the CPS using \e autoconf (http://www.gnu.org/autoconf/).
+
+\subsection Compiling a program
+
+\section testing Testing  a  CPS program 
+
+Some preliminary ideas are presented 
+\htmlonly
+<a href="../../testing/testing.html">here</a>.
+\endhtmlonly
+\latexonly
+here: http://www.epcc.ed.ac.uk/~ukqcd/cps/testing/testing.html
+\endlatexonly
+
+Some further developments are presented here:
+http://www.ph.ed.ac.uk/ukqcd/community/testing
+
+
+*/
