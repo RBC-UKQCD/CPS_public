@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  The QCD I/O Interface:
 
-  $Id: qcdio.C,v 1.3 2004-01-13 20:39:54 chulwoo Exp $
+  $Id: qcdio.C,v 1.4 2004-04-28 14:24:50 cwj Exp $
 */
 /*  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
-   $Author: chulwoo $ 
-   $Date: 2004-01-13 20:39:54 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v 1.3 2004-01-13 20:39:54 chulwoo Exp $
-   $Id: qcdio.C,v 1.3 2004-01-13 20:39:54 chulwoo Exp $
+   $Author: cwj $ 
+   $Date: 2004-04-28 14:24:50 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v 1.4 2004-04-28 14:24:50 cwj Exp $
+   $Id: qcdio.C,v 1.4 2004-04-28 14:24:50 cwj Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.C,v $
-   $Revision: 1.3 $
+   $Revision: 1.4 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v $
    $State: Exp $  */ 
 /*----------------------------------------------------------*/
