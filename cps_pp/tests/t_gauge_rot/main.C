@@ -1,4 +1,4 @@
-///  $Id: main.C,v 1.9 2004-09-03 12:33:06 zs Exp $
+///  $Id: main.C,v 1.10 2004-09-03 13:23:33 zs Exp $
 ///  Demonstrate the random gauge transformation code.
 ///
 
@@ -14,7 +14,7 @@
  The gauge transformation code was orginally written
  by Chris Dawson (using existing code from the BNL group).
 
-$Id: main.C,v 1.9 2004-09-03 12:33:06 zs Exp $
+$Id: main.C,v 1.10 2004-09-03 13:23:33 zs Exp $
 */
 
 #include <config.h>
@@ -73,23 +73,25 @@ static const int nt = 4 ;
 int main(int argc,char *argv[])
 {
 
+    DoArg do_arg;
+    setup_do_arg(do_arg);
 
 #if TARGET==cpsMPI
-  MPISCU::set_pe_grid(rl.do_arg.x_nodes, rl.do_arg.y_nodes, rl.do_arg.z_nodes, rl.do_arg.t_nodes);
+  MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
   using MPISCU::printf;
   using MPISCU::fprintf;
 #endif
 
   printf("Demonstrate random gauge transform code\n") ;
   printf("node_sites[x,y,z,t] = [%d,%d,%d,%d]  \n",
-	 rl.do_arg.x_node_sites  , rl.do_arg.y_node_sites , 
-	 rl.do_arg.z_node_sites  , rl.do_arg.t_node_sites );
-  printf("_nodes[x,y,z,t] = [%d,%d,%d,%d]\n",rl.do_arg.x_nodes,
-	 rl.do_arg.y_nodes,
-	 rl.do_arg.z_nodes,
-	 rl.do_arg.t_nodes) ; 
+	 do_arg.x_node_sites  , do_arg.y_node_sites , 
+	 do_arg.z_node_sites  , do_arg.t_node_sites );
+  printf("_nodes[x,y,z,t] = [%d,%d,%d,%d]\n",do_arg.x_nodes,
+	 do_arg.y_nodes,
+	 do_arg.z_nodes,
+	 do_arg.t_nodes) ; 
   
-  GJP.Initialize(rl.do_arg);
+  GJP.Initialize(do_arg);
   
   GwilsonFnone    lattice;
   CommonArg    common_arg;
