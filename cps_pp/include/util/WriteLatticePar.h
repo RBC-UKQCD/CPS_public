@@ -29,6 +29,14 @@ using namespace std;
 class WriteLatticeParallel : private QioControl
 {
 
+ private:
+    FPConv fpconv;
+    bool unload_good;
+    int data_start;
+    int csum_pos;
+    bool recon_row_3;
+    char *cname;
+
  public:
     // header strings
     string hd_ensemble_id ;
@@ -38,7 +46,6 @@ class WriteLatticeParallel : private QioControl
     string hd_creator_hardware ;
     string hd_creation_date ;
     string hd_archive_date ;
-    char *cname;
 
  public:
     // ctor for 2-step unloading
@@ -76,13 +83,6 @@ class WriteLatticeParallel : private QioControl
     void write(Lattice & lat, const QioArg & wt_arg);
 
     inline bool good() { return unload_good; }
-
- private:
-    FPConv fpconv;
-    bool unload_good;
-    int data_start;
-    int csum_pos;
-    bool recon_row_3;
 
     void defaultHeader();
     void writeHeader(ostream & fout, Float link_trace, Float plaq, const QioArg & wt_arg); 

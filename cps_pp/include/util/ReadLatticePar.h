@@ -36,7 +36,7 @@ class  ReadLatticeParallel : private QioControl {
 public:
   // ctor for 2-step loading
   ReadLatticeParallel()
-    : QioControl(), load_good(false),cname("ReadLatticeParallel")   
+    : QioControl(),cname("ReadLatticeParallel") , load_good(false)
     {  }
 
   // ctor invoking loading behavior
@@ -52,9 +52,8 @@ public:
 
   // ctor invoking loading behavior
   ReadLatticeParallel(Lattice & lat, const QioArg & rd_arg) 
-    : QioControl(), 
-    cname("ReadLatticeParallel"),
-    load_good(false) {
+    : QioControl(), cname("ReadLatticeParallel"), load_good(false)
+  {
     read(lat,rd_arg);
   }
   
