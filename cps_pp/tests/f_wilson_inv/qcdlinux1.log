@@ -1,0 +1,78 @@
+total sites = 4 4 4 4
+Lattice::Lattice() :
+	Disordered starting configuration
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+k=0 FwilsonTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
+	Converting frm field str ord from 0 to 2
+FwilsonTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
+	Converting frm field str ord from 0 to 2
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =4.088092e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 4.088092e+03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.730730e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.525397e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 5.769788e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 7.452658e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 9.062073e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.115354e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.414213e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.757100e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 2.271921e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.876346e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 3.488063e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 4.219659e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 5.272063e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 6.593098e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 8.292425e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 1.053867e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 1.315749e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 1.684411e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 2.053880e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 2.554553e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 3.129745e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 3.717169e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 4.274360e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 5.180677e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 6.335032e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 7.647149e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 9.505082e-22
+8.214528e+06 flops /4.735809e-02 seconds = 1.734556e+02 MFlops
+iter=28
+FwilsonTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
+	Converting frm field str ord from 2 to 0
+FwilsonTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
+	Converting frm field str ord from 2 to 0
+FwilsonTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
+	Converting frm field str ord from 2 to 0
+Max diff between X_in and M*X_out = 1.85e+01
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL

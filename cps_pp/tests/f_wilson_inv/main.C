@@ -141,7 +141,7 @@ int main(int argc,char *argv[]){
 	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
 	bzero(X_in,GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
     if(!X_in) ERR.Pointer("","","X_in");
-#if 0
+#if 1
 	lat.RandGaussVector(X_in,1.0);
 #else
 

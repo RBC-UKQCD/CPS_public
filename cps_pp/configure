@@ -2981,7 +2981,6 @@ fi
 
 topwd_srcdir=`pwd`
 
-INCLUDE_FLAGS="-I\${BUILDDIR} -I\${SRCDIR}/include"
 
 # Check whether --enable-target or --disable-target was given.
 if test "${enable_target+set}" = set; then
