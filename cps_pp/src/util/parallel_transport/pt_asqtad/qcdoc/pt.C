@@ -8,6 +8,7 @@ CPS_START_NAMESPACE
 void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long in, long out);
 void dirac_cmm_jcw_agg_cpp( int sites, long chi, long u,long in, long out);
 extern "C" void dirac_cmv_jcw_agg( int sites, long chi, long u,long in, long out);
+extern "C" void copy_buffer(int n, long src, long dest, long ptable);
 static const int NDIM=4;
 static int size[NDIM];
 enum {GAUGE_LEN=18,VECT_LEN=6, VECT_LEN2=8};
@@ -15,6 +16,9 @@ int vol = 1;
 
 gauge_agg *uc_l[2*SCUMachDim];
 gauge_agg *uc_nl[2*SCUMachDim];
+gauge_agg *uc_l_txyz[2][2*SCUMachDim];
+gauge_agg *uc_nl_txyz[2][2*SCUMachDim];
+int *Toffset[2][2];
 int *local_chi;
 int *non_local_chi;
 int *blklen;
@@ -24,6 +28,7 @@ int *offset;
 
 static SCUDirArgIR *SCUarg[4*SCUMachDim];
 static SCUDirArgIR *SCUarg_mat[4*SCUMachDim];
+static SCUDirArgIR *SCUarg_txyz[4*SCUMachDim];
 
 static void Copy (IFloat *dest, IFloat *src){
 	for(int i=0;i<18;i++)
@@ -42,14 +47,17 @@ static int LexVector(int *x){
 	return  (x[0] + size[0]*(x[1]+size[1]*(x[2]+size[2]*x[3])));
 }
 
+static int LexVector_txyz(int *x){
+	return  (x[3] + size[3]*(x[0]+size[0]*(x[1]+size[1]*x[2])))/2 ;
+}
+
+static int LexSurface(int *x){
+	return  (x[0]+size[0]*(x[1]+size[1]*x[2]))/2 ;
+}
+
 static int LexGauge(int *x, int mu){
-#if 0
-	int temp =  (x[1] + size[1]*(x[2]+size[2]*(x[3]+size[3]*x[0])));
-	return (temp*NDIM + (mu+3)%NDIM);
-#else
 	int temp =  (x[0] + size[0]*(x[1]+size[1]*(x[2]+size[2]*x[3])));
 	return (temp*NDIM + mu);
-#endif
 }
 
 void ParTransAsqtad::pt_init(const void *gauge_u)
@@ -57,10 +65,12 @@ void ParTransAsqtad::pt_init(const void *gauge_u)
 	char *fname = "pt_init()";
 	VRB.Func(cname,fname);
 	IFloat *u_fl = (IFloat *)gauge_u;
-//	printf("pt_init():gauge_u=%p\t u_fl[0]=%e\n",gauge_u,u_fl[0]);
 	int i, x[NDIM],nei[NDIM];
 	int local_count[2*NDIM];
 	int non_local_count[2*NDIM];
+	int local_count_txyz[2][2*NDIM];
+	int non_local_count_txyz[2][2*NDIM];
+	int Tcount[2][2];
 	int vlen = VECT_LEN*sizeof(IFloat); //size of incoming vector
 	int vlen2 =VECT_LEN2*sizeof(IFloat); //size of outgoing vector (maybe different to optimize for QCDOC PEC)
 
@@ -92,9 +102,23 @@ void ParTransAsqtad::pt_init(const void *gauge_u)
     local_count[i]=non_local_count[i]=0;
 		uc_l[i] = (gauge_agg *)smalloc(sizeof(gauge_agg)*local_chi[i]);
 		uc_nl[i] = (gauge_agg *)smalloc(sizeof(gauge_agg)*non_local_chi[i]);
+#if 0
+		for(int j = 0;j<2;j++){
+  		uc_l_txyz[j][i] = (gauge_agg *)smalloc(sizeof(gauge_agg)*local_chi[i]/2);
+  		uc_nl_txyz[j][i] = (gauge_agg *)smalloc(sizeof(gauge_agg)*non_local_chi[i]/2);
+      local_count_txyz[j][i]=non_local_count_txyz[j][i]=0;
+		}
+#endif
 		rcv_buf[i] = (IFloat *)smalloc(non_local_chi[i]*vlen*3);
 		tmp_buf[i] = (IFloat *)smalloc(vol*vlen2*3);
   }
+#if 0
+	Toffset[0][0] = (int *)smalloc(sizeof(int)*size[0]*size[1]*size[2]/2);
+	Toffset[1][0] = (int *)smalloc(sizeof(int)*size[0]*size[1]*size[2]/2);
+	Toffset[0][1] = (int *)smalloc(sizeof(int)*size[0]*size[1]*size[2]/2);
+	Toffset[1][1] = (int *)smalloc(sizeof(int)*size[0]*size[1]*size[2]/2);
+#endif
+
 
 	for(x[3]=0,nei[3]=0;x[3]<size[3];x[3]++,nei[3]++)
 	for(x[2]=0,nei[2]=0;x[2]<size[2];x[2]++,nei[2]++)
@@ -106,13 +130,11 @@ void ParTransAsqtad::pt_init(const void *gauge_u)
 				nei[i] = size[i]-1;  
 				(uc_nl[2*i]+non_local_count[2*i])->src = non_local_count[2*i]*vlen;
 				(uc_nl[2*i]+non_local_count[2*i])->dest = LexVector(nei)*vlen2;
-//				printf("%d %d %d %d non_local_count[%d]=%d LexVector(x)=%d LexVector(nei)=%d\n", x[0],x[1],x[2],x[3],i*2,non_local_count[2*i],LexVector(x),LexVector(nei));
 				non_local_count[i*2]++;
 			} else {
 				nei[i] = x[i]-1;
 				(uc_l[2*i]+local_count[2*i])->src = LexVector(x)*vlen;
 				(uc_l[2*i]+local_count[2*i])->dest = LexVector(nei)*vlen2;
-//				printf("%d %d %d %d local_count[%d]=%d LexVector(x)=%d LexVector(nei)=%d\n", x[0],x[1],x[2],x[3],i*2,local_count[2*i],LexVector(x),LexVector(nei));
 				local_count[i*2]++;
 			}
 // negative direction
@@ -125,22 +147,62 @@ void ParTransAsqtad::pt_init(const void *gauge_u)
 				nei[i] = x[i]+1;
 				(uc_l[2*i+1]+local_count[2*i+1])->src = LexVector(x)*vlen;
 				(uc_l[2*i+1]+local_count[2*i+1])->dest = LexVector(nei)*vlen2;
-//				printf("%d %d %d %d local_count[%d]=%d LexVector(x)=%d LexVector(nei)=%d\n", x[0],x[1],x[2],x[3],i*2+1,local_count[2*i+1],LexVector(x),LexVector(nei));
 				local_count[i*2+1]++;
 			}
 			nei[i] = x[i];
 		}
 	}
+
 	int temp=1;
 	for(i=0;i<NDIM;i++){
 		offset[2*i] = 0;
 		offset[2*i+1] = temp*(size[i]-1);
 		temp *= size[i];
 	}
-//	printf("  blklen numblk stride local_chi non_local_chi offset\n");
-  for(i=0;i<NDIM*2;i++){
-//	printf("%d: %d %d %d %d %d %d\n",i,blklen[i],numblk[i],stride[i],local_chi[i],non_local_chi[i], offset[i]);
-  }
+#if 0
+	for(x[2]=0,nei[2]=0;x[2]<size[2];x[2]++,nei[2]++)
+	for(x[1]=0,nei[1]=0;x[1]<size[1];x[1]++,nei[1]++)
+	for(x[0]=0,nei[0]=0;x[0]<size[0];x[0]++,nei[0]++)
+	for(x[3]=0,nei[3]=0;x[3]<size[3];x[3]++,nei[3]++){
+		int odd = (x[0]+x[1]+x[2]+x[3])%2;
+		for(i=0;i<NDIM;i++){
+// positive direction
+			if(x[i] == 0){
+				nei[i] = size[i]-1;  
+				(uc_nl_txyz[odd][2*i]+non_local_count_txyz[odd][2*i])->src = non_local_count_txyz[odd][2*i]*vlen;
+				(uc_nl_txyz[odd][2*i]+non_local_count_txyz[odd][2*i])->dest = LexVector_txyz(nei)*vlen2;
+				non_local_count_txyz[odd][i*2]++;
+				if( i == 3){ //t
+					Toffset[odd][0][Tcount[odd][0]] = LexVector(x)*vlen;
+					Tcount[odd][0]++;
+				}
+			} else {
+				nei[i] = x[i]-1;
+				(uc_l_txyz[odd][2*i]+local_count_txyz[odd][2*i])->src = LexVector_txyz(x)*vlen;
+				(uc_l_txyz[odd][2*i]+local_count_txyz[odd][2*i])->dest = LexVector_txyz(nei)*vlen2;
+				local_count_txyz[odd][i*2]++;
+			}
+// negative direction
+			if(x[i] == (size[i] -1)){
+				nei[i] = 0;
+				(uc_nl_txyz[odd][2*i+1]+non_local_count_txyz[odd][2*i+1])->src = non_local_count_txyz[odd][2*i+1]*vlen;
+				(uc_nl_txyz[odd][2*i+1]+non_local_count_txyz[odd][2*i+1])->dest = LexVector_txyz(nei)*vlen2;
+				non_local_count_txyz[odd][i*2+1]++;
+				if( i == 3){ //t
+					Toffset[odd][1][Tcount[odd][1]] = LexVector(x)*vlen;
+					Tcount[odd][1]++;
+				}
+			} else {
+				nei[i] = x[i]+1;
+				(uc_l_txyz[odd][2*i+1]+local_count_txyz[odd][2*i+1])->src = LexVector_txyz(x)*vlen;
+				(uc_l_txyz[odd][2*i+1]+local_count_txyz[odd][2*i+1])->dest = LexVector_txyz(nei)*vlen2;
+				local_count_txyz[odd][i*2+1]++;
+			}
+			nei[i] = x[i];
+		}
+	}
+#endif
+
 }
 
 void ParTransAsqtad::pt_delete(){
@@ -156,9 +218,20 @@ void ParTransAsqtad::pt_delete(){
 	for(int i = 0; i < 2*NDIM; i++){
 		sfree(uc_l[i]);
 		sfree(uc_nl[i]);
+#if 0
+		for(int j = 0; j < 2; j++){
+			sfree(uc_l_txyz[j][i]);
+			sfree(uc_nl_txyz[j][i]);
+		}
+#endif
 		sfree(rcv_buf[i]);
 		sfree(tmp_buf[i]);
 	}
+#if 0
+	for(int i = 0; i < 2; i++)
+		for(int j = 0; j < 2; j++)
+			sfree(Toffset[j][i]);
+#endif
 }
 
 void ParTransAsqtad::pt_delete_g(){
@@ -167,6 +240,7 @@ void ParTransAsqtad::pt_delete_g(){
 	for(int i = 0; i < 4*NDIM; i++){
 		delete SCUarg[i];
 		delete SCUarg_mat[i];
+//		delete SCUarg_txyz[i];
 	}
 }
 
@@ -217,7 +291,7 @@ void ParTransAsqtad::pt_init_g(void){
 				nei[i] = 0;
 #if 1
 //				fprintf(fp,"rcv[0]=%e, u[%d][0]=%e\n",rcv[0],LexGauge(x,i),u[LexGauge(x,i)*GAUGE_LEN]);
-				getMinusData( rcv, u+LexGauge(x,i)*GAUGE_LEN, GAUGE_LEN*sizeof(IFloat), i);
+				getMinusData( rcv, u+LexGauge(x,i)*GAUGE_LEN, GAUGE_LEN, i);
 //				fprintf(fp,"rcv[0]=%e, u[%d][0]=%e\n",rcv[0],LexGauge(x,i),u[LexGauge(x,i)*GAUGE_LEN]);
 				Copy((uc_nl[2*i+1]+non_local_count[2*i+1])->mat, rcv);
 #else
@@ -234,10 +308,6 @@ void ParTransAsqtad::pt_init_g(void){
 			nei[i] = x[i];
 		}
 	}
-	for(i=0;i<2*NDIM;i++){
-		VRB.Flow(cname,fname,"local_count[%d]=%d\n",i,local_count[i]);
-		VRB.Flow(cname,fname,"non_local_count[%d]=%d\n",i,non_local_count[i]);
-	}
 	for(i=0;i<2*NDIM;i++) {
 		SCUarg[i*2] = new SCUDirArgIR;
 		SCUarg[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,non_local_chi[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
@@ -249,6 +319,7 @@ void ParTransAsqtad::pt_init_g(void){
 		SCUarg_mat[i*2+1]->Init((void *)0,snd_dir[i],SCU_SEND,blklen[i]*3,numblk[i],stride[i]*3,IR_9);
 	}
 //	fclose(fp);
+	printf("pt_init_g() done\n"); fflush(stdout);
 }
 
 #if 0
@@ -283,14 +354,12 @@ void ParTransAsqtad::run(int n, Matrix **mout, Matrix **min, const int *dir){
 	SCUDirArgMulti SCUmulti;
 
 	char *fname="run(i,M**,M**,i)";
-	VRB.Func(cname,fname);
+//	VRB.Func(cname,fname);
 	
 //	for(i=0;i<n;i++) wire[i] = (dir[i]+2)%(2*NDIM); // from (x,y,z,t) to (t,x,y,z)
 	for(i=0;i<n;i++) wire[i] = dir[i]; 
 	for(i=0;i<n;i++) {
-		printf("wire[%d]=%d\n",i,wire[i]);
 		Matrix * addr = (min[i]+offset[wire[i]]);
-		printf("min[%d]=%p addr=%p\n",i,min[i],addr);
 		SCUarg_p[2*i] = SCUarg_mat[2*wire[i]];
 		SCUarg_p[2*i+1] = SCUarg_mat[2*wire[i]+1];
 		SCUarg_p[2*i+1]->Addr((void *)addr);
@@ -306,9 +375,9 @@ void ParTransAsqtad::run(int n, Matrix **mout, Matrix **min, const int *dir){
 		for(j=0;j<vol;j++){
 			IFloat * temp = (IFloat *)(mout[i]+j);
 			for(int k = 0;k<VECT_LEN*3;k += 3){
-			temp[0] = *(tmp_buf[i]+(j*VECT_LEN2*3)+0);
-			temp[1] = *(tmp_buf[i]+(j*VECT_LEN2*3)+1);
-			temp[2] = *(tmp_buf[i]+(j*VECT_LEN2*3)+2);
+			temp[k+0] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+0);
+			temp[k+1] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+1);
+			temp[k+2] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+2);
       }
 		}
 	}
@@ -321,13 +390,11 @@ void ParTransAsqtad::run(int n, Vector **vout, Vector **vin, const int *dir){
 	SCUDirArgMulti SCUmulti;
 
 	char *fname="run(i,V**,V**,i)";
-	VRB.Func(cname,fname);
+//	VRB.Func(cname,fname);
 	
 	for(i=0;i<n;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
 	for(i=0;i<n;i++) {
-//		printf("wire[%d]=%d\n",i,wire[i]);
 		Vector * addr = (vin[i]+offset[wire[i]]);
-//		printf("vin[%d]=%p addr=%p\n",i,vin[i],addr);
 		SCUarg_p[2*i] = SCUarg[2*wire[i]];
 		SCUarg_p[2*i+1] = SCUarg[2*wire[i]+1];
 		SCUarg_p[2*i+1]->Addr((void *)addr);

@@ -4,18 +4,22 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStag class methods.
 
-  $Id: pt_asqtad.C,v 1.2 2004-01-13 20:39:53 chulwoo Exp $
+  $Id: pt_asqtad.C,v 1.3 2004-01-13 23:25:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v 1.2 2004-01-13 20:39:53 chulwoo Exp $
-//  $Id: pt_asqtad.C,v 1.2 2004-01-13 20:39:53 chulwoo Exp $
+//  $Date: 2004-01-13 23:25:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v 1.3 2004-01-13 23:25:24 chulwoo Exp $
+//  $Id: pt_asqtad.C,v 1.3 2004-01-13 23:25:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.2.3  2003/12/27 21:05:31  cwj
+//
+//  (somewhat) cleaned up for QCDOC + qos-1-8-5
+//
 //  Revision 1.1.2.2  2003/12/11 20:22:53  cwj
 //  *** empty log message ***
 //
@@ -73,7 +77,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: pt_asqtad.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v $
 //  $State: Exp $
 //
@@ -137,7 +141,6 @@ ParTransAsqtad::ParTransAsqtad(Lattice & latt) :
 
   pt_init(lat.GaugeField());
   pt_init_g();
-  printf("pt_init_g() done\n"); 
 
 #if 0
   //----------------------------------------------------------------
@@ -150,7 +153,7 @@ ParTransAsqtad::ParTransAsqtad(Lattice & latt) :
 	      frm_tmp, f_size_cb * sizeof(Float));
 #endif
 
-
+//  printf("ParTransAsqtad() done\n"); fflush(stdout); exit(42);
 }
 
 
@@ -164,7 +167,7 @@ ParTransAsqtad::~ParTransAsqtad() {
   char *fname = "~ParTransAsqtad()";
   VRB.Func(cname,fname);
 
-    lat.Convert(CANONICAL);
+//    lat.Convert(CANONICAL);
 
   //----------------------------------------------------------------
   // Free memory
