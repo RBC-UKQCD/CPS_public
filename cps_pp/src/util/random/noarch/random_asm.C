@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.10 2004-09-02 16:57:00 zs Exp $
+  $Id: random_asm.C,v 1.11 2004-09-17 19:25:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:57:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.10 2004-09-02 16:57:00 zs Exp $
-//  $Id: random_asm.C,v 1.10 2004-09-02 16:57:00 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-17 19:25:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.11 2004-09-17 19:25:46 chulwoo Exp $
+//  $Id: random_asm.C,v 1.11 2004-09-17 19:25:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -50,9 +50,11 @@ IFloat RandomGenerator::Rand(void)
     int mj = ma[inext] - ma[inextp] ;
     if ( mj < 0 ) mj += MBIG ;
     ma[inext] = mj ;
-    if (called %10000==0)
-//    printf("mj = %d mj*FAC=%0.9e\n",mj,mj*FAC);
+#if 0
+    if (called %100==0)
+    printf("mj = %d mj*FAC=%0.16e\n",mj,mj*FAC);
     called++;
+#endif
     return mj*FAC ;
 }
 

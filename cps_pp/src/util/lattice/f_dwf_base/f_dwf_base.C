@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.12 2004-09-02 17:20:07 zs Exp $  
+  $Id: f_dwf_base.C,v 1.13 2004-09-17 19:24:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -215,13 +215,17 @@ int FdwfBase::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 
   int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
   Float dot = f_in -> NormSqGlbSum(f_size);
-  Float RsdCG[Nshift];
+//  Float RsdCG[Nshift];
+  Float *RsdCG = new Float[Nshift];
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
   DiracOpDwf dwf(*this, f_out[0], f_in, cg_arg, cnv_frm);
   cg_arg->true_rsd = RsdCG[isz];
-  return dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+//  return dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+  int return_value= dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+  delete[] RsdCG;
+  return return_value;
 }
 
 //------------------------------------------------------------------
@@ -524,14 +528,8 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float *lambda,
 
   // calculate chirality
   int f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents();
-  Vector *four = (Vector *) smalloc (f_size * sizeof(Float));
-  if (four == 0)
-    ERR.Pointer (cname, fname, "four");
-  VRB.Smalloc (cname,fname, "four", four, f_size * sizeof(Float));
-  Vector *fourg5 = (Vector *) smalloc (f_size * sizeof(Float));
-  if (fourg5 == 0)
-    ERR.Pointer (cname, fname, "fourg5");
-  VRB.Smalloc (cname,fname, "fourg5", fourg5, f_size * sizeof(Float));
+  Vector *four = (Vector *) smalloc (cname,fname, "four", f_size * sizeof(Float));
+  Vector *fourg5 = (Vector *) smalloc (cname,fname, "fourg5", f_size * sizeof(Float));
   Float help;
 
   for (i=0; i<N_eig; i++) {
@@ -555,11 +553,7 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float *lambda,
       for(int i=0; i < N_eig; ++i)
 	Fconvert(f_eigenv[i], CANONICAL, StrOrd());
 
-    Float *f_in = (Float *) 
-      smalloc (GJP.VolNodeSites()*GJP.SnodeSites()*sizeof(Float));
-    if (f_in == 0)
-      ERR.Pointer(cname, fname, "f_in");
-    VRB.Smalloc(cname, fname, "f_in", f_in, 
+    Float *f_in = (Float *) smalloc (cname, fname, "f_in", 
 		GJP.VolNodeSites()*GJP.SnodeSites()*sizeof(Float));
     
     for(i=0; i < N_eig; ++i) {
@@ -577,10 +571,10 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float *lambda,
       f_eigenv[i]->SliceArraySumFive (hsum[i], f_in, eig_arg->hsum_dir);
     }
 
-    VRB.Sfree(cname, fname, "f_in", f_in);
-    sfree(f_in);
+    sfree(cname, fname, "f_in", f_in);
   }
-
+  sfree(cname,fname, "four",four);
+  sfree(cname,fname, "fourg5",fourg5);
   // Return the number of iterations
   return iter;
 }
@@ -655,14 +649,10 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
  
   char *str_v0 = "v[0]" ;
   Vector *v[2];
-  v[0]= (Vector *)smalloc(f_size*sizeof(Float)) ;
-  if (v[0] == 0) ERR.Pointer(cname, fname, str_v0) ;
-  VRB.Smalloc(cname, fname, str_v0, v[0], f_size*sizeof(Float)) ;
+  v[0]= (Vector *)smalloc (cname, fname, str_v0, f_size*sizeof(Float)) ;
 
   char *str_v1 = "v[1]" ;
-  v[1] = (Vector *)smalloc(f_size*sizeof(Float)) ;
-  if (v[1] == 0) ERR.Pointer(cname, fname, str_v1) ;
-  VRB.Smalloc(cname, fname, str_v1, v[1], f_size*sizeof(Float)) ;
+  v[1] = (Vector *)smalloc (cname, fname, str_v1, f_size*sizeof(Float)) ;
 
 
   //----------------------------------------------------------------
@@ -679,74 +669,55 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
     DiracOpDwf dwf(*this, v[0], v[1], &cg_arg, CNV_FRM_YES) ;
     dwf.CalcHmdForceVecs(chi) ;
   }
+
 #ifdef PROFILE
   Float time = -dclock();
   ForceFlops=0;
 #endif
-
-
   Matrix tmp_mat1, tmp_mat2 ;
- 
-
-
   VRB.Clock(cname, fname, "Before loop over links.\n") ;
-
-  //  const int DIM=4;
 
   int x[4];
   int xpm[4];
   int mu,i;
-  
   int offset_4d_x;
   int offset_4d_xpm;
   int vol=GJP.VolNodeSites();
   int ls=node_sites[4];
-
   int v_stride=f_site_size_4d*(vol-1);
   int v_offset,vpm_offset;
   IFloat *v_p,*w_p;
   Matrix m;
   Matrix **out;
   BndCndType bc[4]={GJP.XnodeBc(),GJP.YnodeBc(),GJP.ZnodeBc(),GJP.TnodeBc()};
-  
-
   Float coeff0 = -2 * step_size;
   Float coeff;
-  
+
   //-----------------------------------------------------------
   //allocate memory for color matrix arrays
   //-----------------------------------------------------------
-
-  out = (Matrix **)smalloc(4*sizeof(int));
-  if(out==0) ERR.Pointer(cname,fname,"out");
-  VRB.Smalloc(cname,fname,"out",out,4*sizeof(int));
+  out = (Matrix **)smalloc (cname,fname,"out",4*sizeof(int));
 
   for(i=0;i<4;i++){
-    out[i]=(Matrix *)smalloc(18*vol*sizeof(Float));
-    if(out[i]==0) ERR.Pointer(cname,fname,"out[i]");
-    VRB.Smalloc(cname,fname,"out[i]",out[i],18*vol*sizeof(Float));
+    out[i]=(Matrix *)smalloc(cname,fname,"out[i]",18*vol*sizeof(Float));
   }
-
 
   for(mu=0;mu<4;mu++) 
     for(int n=0;n<vol;n++) out[mu][n].ZeroMatrix();  
   
 #if TARGET==QCDOC
- 
   int is_comm[4]; 
   is_comm[0]=(GJP.Xnodes()>1)?1:0;
   is_comm[1]=(GJP.Ynodes()>1)?1:0;
   is_comm[2]=(GJP.Znodes()>1)?1:0;
   is_comm[3]=(GJP.Tnodes()>1)?1:0;
 
-  //---------------------------------------
+  //--------------------------------------------------------------------
   //The number of consecutive sites for communication for each direction
-  //In the canonical storage order,x runs fastest therefore each block has different 
-  //x coord.
-  //---------------------------------------
+  //In the canonical storage order,x runs fastest therefore each block 
+  //has different x coord.
+  //--------------------------------------------------------------------
   int blk_len[4];
-
-  
   blk_len[0]=1;
   blk_len[1]=blk_len[0]*node_sites[0];
   blk_len[2]=blk_len[1]*node_sites[1];
@@ -758,50 +729,41 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   stride[2]=(node_sites[2]-1)*node_sites[1]*node_sites[0];
   stride[3]=(node_sites[3]-1)*node_sites[2]*node_sites[1]*node_sites[0];
 
- int num_blk[4];
- 
   //--------------------------------------------
   // data length for each 4D site
   //-------------------------------------------
   int site_len=f_site_size_4d*sizeof(Float);
-
   int local_sites[4]={node_sites[0],node_sites[1],node_sites[2],node_sites[3]};
-
 
   //-----------------------------------------
   //number of neighbor sites per direction
   //---------------------------------------
   int nb_sites[4];
-  //----------------------------------------
-  //total neighboring sites
-  //----------------------------------------
-  //  int total_nb_sites;
+  int num_blk[4];
+ 
   for(i=0;i<4;i++) {
     nb_sites[i]=vol/node_sites[i];
     num_blk[i]=nb_sites[i]/blk_len[i];
   }
 
-
   IFloat **rcv_buff;
   rcv_buff=(Float **)smalloc(4*sizeof(int));
   if(rcv_buff==0) ERR.Pointer(cname,fname,"rcv_buff");
-  
   VRB.Smalloc(cname,fname,"rcv_buff",rcv_buff,4*sizeof(int));
 
   for(i=0;i<4;i++){
-    rcv_buff[i]=(IFloat *)smalloc(FsiteSize()*nb_sites[i]*sizeof(Float));
-    if(rcv_buff[i]==0) ERR.Pointer(cname,fname,"rcv_buff[i]");
-    VRB.Smalloc(cname,fname,"rcv_buff[i]",rcv_buff[i],FsiteSize()*nb_sites[i]*sizeof(Float));
+    rcv_buff[i]=(IFloat *)smalloc(cname,fname,"rcv_buff[i]",
+		FsiteSize()*nb_sites[i]*sizeof(Float));
   }
 
 
   v_p = (IFloat *)v[0];
   w_p = (IFloat *)v[1];
   SCUDir dir[]={SCU_XP,SCU_XM,SCU_YP,SCU_YM,SCU_ZP,SCU_ZM,SCU_TP,SCU_TM};
+ 
   //----------------------------------------------
   // array of communication pointers. 
   //---------------------------------------------
- 
   int comms=is_comm[0]+is_comm[1]+is_comm[2]+is_comm[3];
   SCUDirArgIR *scu_arg_p[2*comms];
 
@@ -809,31 +771,36 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
  
   for(i=0;i<4;i++){
     if(is_comm[i]){
-    
-    scu_arg_p[tmp]=new SCUDirArgIR;
-    scu_arg_p[tmp]->Init((void *)(rcv_buff[i]),dir[2*i],SCU_REC,blk_len[i]*site_len,num_blk[i]*ls,0,IR_1);
-    scu_arg_p[tmp+1]=new SCUDirArgIR;
-    scu_arg_p[tmp+1]->Init((void *)v_p,dir[2*i+1],SCU_SEND,blk_len[i]*site_len,num_blk[i]*ls,stride[i]*site_len,IR_1);
-    tmp += 2;
+      scu_arg_p[tmp]=new SCUDirArgIR;
+      scu_arg_p[tmp]->Init((void *)(rcv_buff[i]),dir[2*i],SCU_REC,
+			   blk_len[i]*site_len,num_blk[i]*ls,0,IR_1);
+      scu_arg_p[tmp+1]=new SCUDirArgIR;
+      scu_arg_p[tmp+1]->Init((void *)v_p,dir[2*i+1],SCU_SEND,
+			     blk_len[i]*site_len,num_blk[i]*ls,stride[i]*site_len,IR_1);
+      tmp += 2;
     }
   }
  
   //------------------------------------------
   //loop over 2 fermion fields
-  //----------------------------------------
+  //------------------------------------------
   for(int f=0;f<2;f++){
-    
-    // for(int s=0;s<ls;s++)
-      for(i=0;i<comms;i++)
-	scu_arg_p[2*i+1]->Addr((void*)v[f]); //change the initial address of the send buffer
+    for(i=0;i<comms;i++)
+
+      //---------------------------------------------
+      //change the initial address of the send buffer 
+      //to appropriate fermion field
+      //---------------------------------------------
+      scu_arg_p[2*i+1]->Addr((void*)v[f]);
       
       SCUDirArgMulti scu_multi;
       scu_multi.Init(scu_arg_p,2*comms);
       scu_multi.SlowStartTrans();
       VRB.Debug(cname,fname,"Start transfer v[%d]\n",f);
-      //-------------------------------------------------------//
+
+      //-----------------------------------------
       //do local calculation
-      //------------------------------------------------------//
+      //-----------------------------------------
       for(mu=0;mu<4;mu++){
 	local_sites[mu]-=is_comm[mu];
 	for(xpm[3]=x[3]=0;x[3]<local_sites[3];xpm[3]++,x[3]++)
@@ -854,7 +821,6 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 		VRB.Debug(cname,fname,"site(%d,%d,%d,%d) pointer v_p = 0x%x, pointer w_p = 0x%x\n",x[0],x[1],x[2],x[3],v_p,w_p);
 		
 		sproj_tr[mu+4*f]((IFloat *)&m,v_p,w_p,ls,v_stride,v_stride);
-
 		out[mu][offset_4d_x] += m;
 		
 	      }  
@@ -866,93 +832,87 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       scu_multi.TransComplete();
       
       VRB.Debug(cname,fname,"Transfer complete\n");
-      
       for(mu=0;mu<4;mu++){
 	if(is_comm[mu]){
-	v_p=rcv_buff[mu];
-	switch(mu){
-	case 0: 
-	  x[0]=node_sites[0]-1;
-	  for(x[3]=0;x[3]<node_sites[3];x[3]++)
+	  v_p=rcv_buff[mu];
+	  switch(mu){
+	  case 0: 
+	    x[0]=node_sites[0]-1;
+	    for(x[3]=0;x[3]<node_sites[3];x[3]++)
+	      for(x[2]=0;x[2]<node_sites[2];x[2]++)
+		for(x[1]=0;x[1]<node_sites[1];x[1]++){
+		  offset_4d_x=x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+
+								      node_sites[2]*x[3]));
+		  w_p=(IFloat *)(v[1-f]+4*offset_4d_x);
+		  sproj_tr[mu+f*4]((IFloat *)&m,v_p,w_p,ls,(nb_sites[mu]-1)*24,v_stride);
+		  out[mu][offset_4d_x] += m;
+		  v_p += f_site_size_4d;
+		  
+		}
+	    break;
+	    
+	  case 1:
+	    
+	    x[1]=node_sites[1]-1;
+	    for(x[3]=0;x[3]<node_sites[3];x[3]++)
+	      for(x[2]=0;x[2]<node_sites[2];x[2]++)
+		for(x[0]=0;x[0]<node_sites[0];x[0]++){
+		  offset_4d_x=x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+
+								      node_sites[2]*x[3]));
+		  w_p=(IFloat *)(v[1-f]+4*offset_4d_x);
+		  sproj_tr[mu+f*4]((IFloat *)&m,v_p,w_p,ls,(nb_sites[mu]-1)*24,v_stride);
+		  out[mu][offset_4d_x] += m;
+		  v_p += f_site_size_4d;
+		  
+		}
+	    break;
+	    
+	  case 2:
+	    x[2]=node_sites[2]-1;
+	    for(x[3]=0;x[3]<node_sites[3];x[3]++)
+	      for(x[1]=0;x[1]<node_sites[1];x[1]++)
+		for(x[0]=0;x[0]<node_sites[0];x[0]++){
+		  offset_4d_x=x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+
+								      node_sites[2]*x[3]));
+		  w_p=(IFloat *)(v[1-f]+4*offset_4d_x);
+		  sproj_tr[mu+f*4]((IFloat *)&m,v_p,w_p,ls,(nb_sites[mu]-1)*24,v_stride);
+		  out[mu][offset_4d_x] += m;
+		  v_p += f_site_size_4d;
+		  
+		}
+	    break;
+	    
+	  case 3:
+	    x[3]=node_sites[3]-1;
 	    for(x[2]=0;x[2]<node_sites[2];x[2]++)
-	      for(x[1]=0;x[1]<node_sites[1];x[1]++){
-		offset_4d_x=x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+
-									node_sites[2]*x[3]));
-		w_p=(IFloat *)(v[(f+1)%2]+4*offset_4d_x);
-		sproj_tr[mu+f*4]((IFloat *)&m,v_p,w_p,ls,(nb_sites[mu]-1)*24,v_stride);
-		out[mu][offset_4d_x] += m;
-		v_p += f_site_size_4d;
-
-	      }
-	  break;
-
-	case 1:
-
-	  x[1]=node_sites[1]-1;
-	  for(x[3]=0;x[3]<node_sites[3];x[3]++)
-	    for(x[2]=0;x[2]<node_sites[2];x[2]++)
-	      for(x[0]=0;x[0]<node_sites[0];x[0]++){
-		offset_4d_x=x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+
-									node_sites[2]*x[3]));
-		w_p=(IFloat *)(v[(f+1)%2]+4*offset_4d_x);
-		sproj_tr[mu+f*4]((IFloat *)&m,v_p,w_p,ls,(nb_sites[mu]-1)*24,v_stride);
-		out[mu][offset_4d_x] += m;
-		v_p += f_site_size_4d;
-
-	      }
-	  break;
-
-	
-
-
-      case 2:
-	  x[2]=node_sites[2]-1;
-	  for(x[3]=0;x[3]<node_sites[3];x[3]++)
-	    for(x[1]=0;x[1]<node_sites[1];x[1]++)
-	      for(x[0]=0;x[0]<node_sites[0];x[0]++){
-		offset_4d_x=x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+
-									node_sites[2]*x[3]));
-		w_p=(IFloat *)(v[(f+1)%2]+4*offset_4d_x);
-		sproj_tr[mu+f*4]((IFloat *)&m,v_p,w_p,ls,(nb_sites[mu]-1)*24,v_stride);
-		out[mu][offset_4d_x] += m;
-		v_p += f_site_size_4d;
-
-	      }
-	  break;
-
-      case 3:
-	x[3]=node_sites[3]-1;
-	for(x[2]=0;x[2]<node_sites[2];x[2]++)
-	  for(x[1]=0;x[1]<node_sites[1];x[1]++)
-	    for(x[0]=0;x[0]<node_sites[0];x[0]++){
-	      offset_4d_x=x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+
-									node_sites[2]*x[3]));
-	      w_p=(IFloat *)(v[(f+1)%2]+4*offset_4d_x);
-	      sproj_tr[mu+f*4]((IFloat *)&m,v_p,w_p,ls,(nb_sites[mu]-1)*24,v_stride);
-	      out[mu][offset_4d_x] += m;
-	      v_p += f_site_size_4d;
-	      
-	    }
-	break;
-	
-	}
+	      for(x[1]=0;x[1]<node_sites[1];x[1]++)
+		for(x[0]=0;x[0]<node_sites[0];x[0]++){
+		  offset_4d_x=x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+
+								      node_sites[2]*x[3]));
+		  w_p=(IFloat *)(v[1-f]+4*offset_4d_x);
+		  sproj_tr[mu+f*4]((IFloat *)&m,v_p,w_p,ls,(nb_sites[mu]-1)*24,v_stride);
+		  out[mu][offset_4d_x] += m;
+		  v_p += f_site_size_4d;
+		  
+		}
+	    break;
+	    
+	  }
 	}
       }
       
   }
   
-
+  
   for(i=0;i<2*comms;i++){
     delete scu_arg_p[i];
-    // delete scu_arg_p[2*i+1];
-    
   }
 
   for(i=0;i<4;i++){
     VRB.Sfree(cname,fname,"rcv_buff[i]",rcv_buff[i]);
-    sfree(rcv_buff);
+    sfree(rcv_buff[i]);
   }
-
+  
   VRB.Sfree(cname,fname,"rcv_buff",rcv_buff);
   sfree(rcv_buff);
   
@@ -967,8 +927,6 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       for(xpm[2]=x[2]=0;x[2]<node_sites[2];xpm[2]++,x[2]++)
 	for(xpm[1]=x[1]=0;x[1]<node_sites[1];xpm[1]++,x[1]++)
 	  for(xpm[0]=x[0]=0;x[0]<node_sites[0];xpm[0]++,x[0]++){
-	    
-	    // if(x[mu]==node_sites[mu]-1 && bc[mu]==BND_CND_APRD) coeff = -coeff;
 	    xpm[mu] = (x[mu]+1)%node_sites[mu];
 	    offset_4d_xpm = xpm[0]+node_sites[0]*(xpm[1]+node_sites[1]*(xpm[2]+
 									node_sites[2]*xpm[3]));
@@ -979,53 +937,48 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 	    
 	    v_p = (IFloat *)(v[0]+vpm_offset);
 	    w_p = (IFloat *)(v[1]+v_offset);
-
+	    
 	    sproj_tr[mu]((IFloat *)&m,v_p,w_p,ls,v_stride,v_stride);
 	    out[mu][offset_4d_x] += m;
 	    
 	    v_p = (IFloat *)(v[0]+v_offset);
 	    w_p = (IFloat *)(v[1]+vpm_offset);
-
+	    
 	    sproj_tr[mu+4]((IFloat *)&m,w_p,v_p,ls,v_stride,v_stride);
 	    out[mu][offset_4d_x] += m;
-		  
+	    
 	  }
   
 #endif
-  if (GJP.Snodes()>1)
-    for(int mu=0;mu<4;mu++)
-      glb_sum_multi_dir((Float*)out[mu],4,18*vol);
-
-
+  
   //--------------------------------------------
-  //multiply the above matrix by gauge field
+  //multiply the above matrix out[mu][x] by gauge field
   //and update mom
   //-------------------------------------------
   int gauge_offset;
   for(int mu=0;mu<4;mu++)
-      
+    
     for(x[3]=0;x[3]<node_sites[3];x[3]++)
       for(x[2]=0;x[2]<node_sites[2];x[2]++)
 	for(x[1]=0;x[1]<node_sites[1];x[1]++)
 	  for(x[0]=0;x[0]<node_sites[0];x[0]++){
-
+	    
 	    coeff=coeff0;
 	    if(x[mu]==node_sites[mu]-1&&bc[mu]==BND_CND_APRD) coeff = -coeff;
 
 	    offset_4d_x  = x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+
 								     node_sites[2]*x[3]));
+	    
+	    if(GJP.Snodes()>1) 
+	      glb_sum_multi_dir((Float *)(out[mu]+offset_4d_x),4,sizeof(Matrix)/sizeof(IFloat));
 	    gauge_offset = 4*offset_4d_x+mu;
 	    tmp_mat2.DotMEqual(*(gauge+gauge_offset),out[mu][offset_4d_x]);
-
-#if TARGET != QCDSP
+	    
 	    tmp_mat1.Dagger(tmp_mat2);
 	    tmp_mat2.TrLessAntiHermMatrix(tmp_mat1);
-#else
-	    tmp_mat2.TrLessAntiHermMatrix();
-#endif
 
 	    tmp_mat2 *= coeff;
-
+	    
 	    *(mom+gauge_offset) += tmp_mat2;
 
 	  }
@@ -1039,12 +992,6 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 //------------------------------------------------------------------
 // deallocate smalloc'd space
 //------------------------------------------------------------------
-
-//#if TARGET==QCDOC
-  
-
-
-//#endif
 
   for(i=0;i<4;i++){
     VRB.Sfree(cname,fname,"out[i]",out[i]);
@@ -1117,15 +1064,9 @@ Float FdwfBase::BhamiltonNode(Vector *boson, Float mass){
 
   int f_size = GJP.VolNodeSites() * FsiteSize() / 2 ;
 
-  Vector *bsn_tmp = (Vector *)
-    smalloc(f_size*sizeof(Float));
-
   char *str_tmp = "bsn_tmp" ;
-
-  if (bsn_tmp == 0)
-    ERR.Pointer(cname,fname,str_tmp) ;
-
-  VRB.Smalloc(cname,fname,str_tmp,bsn_tmp,f_size*sizeof(Float));
+  Vector *bsn_tmp = (Vector *)
+    smalloc(cname,fname,str_tmp,f_size*sizeof(Float));
 
   DiracOpDwf dwf(*this, boson, bsn_tmp, &cg_arg, CNV_FRM_NO) ;
 
@@ -1133,9 +1074,7 @@ Float FdwfBase::BhamiltonNode(Vector *boson, Float mass){
 
   Float ret_val = bsn_tmp->NormSqNode(f_size) ;
 
-  VRB.Sfree(cname,fname,str_tmp,bsn_tmp);
-
-  sfree(bsn_tmp) ;
+  sfree(cname,fname,str_tmp,bsn_tmp);
 
   // Sum accross s nodes in case Snodes() != 1
   glb_sum_dir(&ret_val, 4) ;

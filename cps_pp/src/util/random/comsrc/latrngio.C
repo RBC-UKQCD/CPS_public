@@ -482,6 +482,7 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 	  output.seekp(jump,ios_base::cur);
 
 	  for(int xr=xbegin;xr<xend;xr++) {
+//	    printf("%d %d %d %d %d rngid=%d ",xr,yr,zr,tr,sr,rngid);
 	    // dump
 	    ugran[rngid].store((int*)rng);
 	    intconv.host2file(filebuf,(char*)rng,size_rng_ints);
@@ -496,6 +497,11 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 	    Rand2Sum += rn*rn;
 	    // restore
 	    ugran[rngid].load((int*)rng);
+#if 0
+	    Float rn2 = ugran[rngid].Grand();
+	    printf("rn=%0.15e rn2=%0.15e\n",rn,rn2);
+	    ugran[rngid].load((int*)rng);
+#endif
 
 	    output.write(filebuf, size_rng_chars);
 	    
@@ -538,6 +544,7 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 	    csum += intconv.checksum(filebuf,size_rng_ints);
 	    pos_dep_csum += intconv.posDepCsum(filebuf,size_rng_ints) * (uniqueSiteID5d(rngid)+1);
 
+#if 1
 	    // next rand
 	    Float rn = ugran_4d[rngid].Grand();
 	    RandSum += rn;
@@ -545,6 +552,7 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 	    
 	    // restore
 	    ugran_4d[rngid].load((int*)rng);
+#endif
 
 	    output.write(filebuf, size_rng_chars);
 
