@@ -1,7 +1,7 @@
 
 
 %------------------------------------------------------------------
-% $Id: commspec.tex,v 1.2 2003-07-30 16:31:49 zs Exp $
+% $Id: commspec.tex,v 1.3 2004-02-01 16:44:54 mcneile Exp $
 %------------------------------------------------------------------
 %Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
 %
@@ -27,7 +27,7 @@
 \ifthenelse{\pdfoutput = 0}{
 % Not PDF:
 \usepackage{html}
-\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+\newcommand{\hreff}[2]{\htmladdnormallink{#2}{#1}}
 }{
 % PDF: hyperref for pdf with full linkages:
 \usepackage[
@@ -43,7 +43,7 @@ urlcolor=blue,
 pdfpagemode=None,
 %=UseOutlines,
 pdfhighlight={/I},
-pdftitle={QCDSP parallel comms specification \& MPI implementation.  $Revision: 1.2 $ - $Date: 2003-07-30 16:31:49 $.},
+pdftitle={QCDSP parallel comms specification \& MPI implementation.  $Revision: 1.3 $ - $Date: 2004-02-01 16:44:54 $.},
 pdfauthor={A.N. Jackson \& S. Booth},
 plainpages=false
 ]{hyperref}
@@ -69,7 +69,7 @@ plainpages=false
 % title information:
 \title{QCDSP Communications Specification \& the MPI implementation.}
 \author{A.N. Jackson \& S. Booth}
-\date{\mbox{\small $$Revision: 1.2 $$  $$Date: 2003-07-30 16:31:49 $$}}
+\date{\mbox{\small $$Revision: 1.3 $$  $$Date: 2004-02-01 16:44:54 $$}}
 
 %------------------------------------------------------------------
 \begin{document}
@@ -102,14 +102,14 @@ communications are to be carried out.
 
 \begin{tabular}{llll}
 \cde{{\bf enum SCUDir}} & {\bf Name} & {\bf Value} & {\bf Direction} \\
-			&\cde{SCU\_\-TM} & 0 & $-t$\\
-			&\cde{SCU\_\-TP} & 1 & $+t$\\
-			&\cde{SCU\_\-XM} & 2 & $-x$\\
-			&\cde{SCU\_\-XP} & 3 & $+x$\\
-			&\cde{SCU\_\-YM} & 4 & $-y$\\
-			&\cde{SCU\_\-YP} & 5 & $+y$\\
-			&\cde{SCU\_\-ZM} & 6 & $-z$\\
-			&\cde{SCU\_\-ZP} & 7 & $+z$
+                        &\cde{SCU\_\-TM} & 0 & $-t$\\
+                        &\cde{SCU\_\-TP} & 1 & $+t$\\
+                        &\cde{SCU\_\-XM} & 2 & $-x$\\
+                        &\cde{SCU\_\-XP} & 3 & $+x$\\
+                        &\cde{SCU\_\-YM} & 4 & $-y$\\
+                        &\cde{SCU\_\-YP} & 5 & $+y$\\
+                        &\cde{SCU\_\-ZM} & 6 & $-z$\\
+                        &\cde{SCU\_\-ZP} & 7 & $+z$
 \end{tabular}
 
 In the case of QCDSP, this actually mapped the physics directions
@@ -121,18 +121,18 @@ similar fashion:
 
 \begin{tabular}{llll}
 \cde{{\bf enum SCUAxis}} & {\bf Name} & {\bf Value} & {\bf Direction} \\
-			&\cde{SCU\_\-T} & 0 & $t$-axis\\
-			&\cde{SCU\_\-X} & 1 & $x$-axis\\
-			&\cde{SCU\_\-Y} & 2 & $y$-axis\\
-			&\cde{SCU\_\-Z} & 3 & $z$-axis
+                        &\cde{SCU\_\-T} & 0 & $t$-axis\\
+                        &\cde{SCU\_\-X} & 1 & $x$-axis\\
+                        &\cde{SCU\_\-Y} & 2 & $y$-axis\\
+                        &\cde{SCU\_\-Z} & 3 & $z$-axis
 \end{tabular}
 
 Finally, the communications are labelled as being either sends or receives using:
 
 \begin{tabular}{llll}
 \cde{{\bf enum SCUXR}} & {\bf Name} & {\bf Value} & {\bf Meaning} \\
-			&\cde{SCU\_\-REC}  & 0 & Receive from a given direction. \\
-			&\cde{SCU\_\-SEND} & 8 & Send in a given direction.
+                        &\cde{SCU\_\-REC}  & 0 & Receive from a given direction. \\
+                        &\cde{SCU\_\-SEND} & 8 & Send in a given direction.
 \end{tabular}
 
 \subsection{Data structures: The SCUDirArg class}
