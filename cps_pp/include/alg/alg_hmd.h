@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.6 2004-04-27 03:51:16 cwj Exp $
+  $Id: alg_hmd.h,v 1.7 2004-05-10 15:15:11 zs Exp $
 */
 //------------------------------------------------------------------
 
@@ -60,6 +60,8 @@ class AlgHmd : public Alg
   AlgHmd(Lattice& latt, CommonArg *c_arg, HmdArg *arg);
 
   virtual ~AlgHmd();
+
+  virtual Float run() = 0;
 
 };
 
