@@ -1,9 +1,9 @@
 //-------------------------------------------------------------------
-//    12/21/02 HueyWen Lin, Chulwoo Jung
+//    12/02 HueyWen Lin, Chulwoo Jung
 //
 //   Asqtad Dirac operator for QCDOC. Communications and computations
 //   are overlapped.
-//   Uses many functions implemented by CJ for QCDOC
+//   Uses functions implemented by CJ for QCDOC
 //
 //
 //-------------------------------------------------------------------
@@ -26,32 +26,22 @@ CPS_END_NAMESPACE
 #include <emalloc.h>
 CPS_START_NAMESPACE
 
-#undef output // define: print all chi and u fields in files to compare with qcdsp naik opt code 
-
-#undef qcdsp //output result to compare with qcdsp naik code
-#undef qcdsp_1
-#undef qcdsp_0
-
-
-#undef gauge_inv_check
+const char *uc_l_filename = CWDPREFIX("uc_l");
+const char *uc_nl_filename = CWDPREFIX("uc_nl");
+const char *Toffset_filename = CWDPREFIX("Toffset");
+const char *uc_l_agg_filename = CWDPREFIX("uc_l_agg");
+const char *uc_nl_agg_filename = CWDPREFIX("uc_nl_agg");
+const char *chi_l_filename = CWDPREFIX("chi_l");
+const char *chi_nl_filename = CWDPREFIX("chi_nl");
 #define IND_AGG //aggregate index for uc and chi
 
-#define fat_link
-#define naik
-#define staple5
-#define staple7
-
-
-#undef SIMUL
-#undef SIMUL_U
-#undef SIMUL_TBUF
-#undef SIMUL_AGG
 /*****************************************************************
  SIMUL switched on/off the hack CJ put in to help speed up the
 simulation. if SIMUL is undefined, program writes the temporary arraies
 for dirac operator. If SIMUL is defined, it will include (pre-calcuated)
 temporary arraies and skip the generation of arraies.
 ******************************************************************/
+
 #undef CPP
 /****************************************************************
 CPP is a switch for using C++ routine for dirac_cmv.
@@ -538,7 +528,7 @@ void asqtad_dirac_init(const void * gauge_u )
   FILE *fp;
 
 #if 0
-  fp=fopen("/host/chulwoo/chi_l.h","w");
+  fp=fopen(chi_l_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat * chi_l%d[] LOCATE(\"edramtransient\") = {\n",j);
     fprintf(fp," (IFloat *) %d",*(chi_l[j]));
@@ -549,7 +539,7 @@ void asqtad_dirac_init(const void * gauge_u )
   }
   fclose(fp);
 
-  fp=fopen("/host/chulwoo/chi_nl.h","w");
+  fp=fopen(chi_nl_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat * chi_nl%d[] LOCATE(\"edramtransient\") = {\n",j);
     fprintf(fp," (IFloat *) %d",*(chi_nl[j]));
@@ -617,7 +607,7 @@ void asqtad_dirac_init(const void * gauge_u )
   int vol3 = (size[1] * size[2] * size[3])/2;
 
 #if 0
-  fp= fopen("/host/chulwoo/Toffset.h","w");
+  fp= fopen(Toffset_filename,"w");
   for ( k = 0; k < 3; k++ ) 
   for ( i = 0; i < 2; i++ ) {
     fprintf(fp,"int ToffsetP%d%d[] LOCATE(\"edramnormal\") = {\n",k,i);
@@ -827,649 +817,6 @@ static int SetCoord( int sg )
 //  related pointer for Dirac
 //-------------------------------------------------------------------
 
-void TransfP(int off_node, int nflush_g,IFloat * v,IFloat * mtmp
-
-, int n ){
-  		SCUDirArgIR X( 0, scudir[n+4], SCU_SEND, 18 * sizeof(IFloat));
- 		SCUDirArgIR R( 0, scudir[n], SCU_REC, 18 * sizeof(IFloat));
- 	     
-		
- 
-	     if ( off_node ) {
-                //make sure link is in main memory
-                flush_cache(nflush_g, (long)v);
-                //invalidate receive buffer
-                flush_cache(nflush_g, (long)mtmp);
-                //initialize transfer
-	      X.Addr(v);
-              R.Addr(mtmp);
-              X.StartTrans();
-              R.StartTrans();
-              X.TransComplete();
-              R.TransComplete();
-              v = mtmp;
-	      
-	      
-  				}
- 
- }
-
-void TransfM(int off_node, int nflush_g,IFloat * v,IFloat * mtmp, int n ){
- 	      if ( off_node ) {
-  		SCUDirArgIR X( v, scudir[n], SCU_SEND, 18 * sizeof(IFloat));
- 		SCUDirArgIR R( mtmp, scudir[n+4], SCU_REC, 18 * sizeof(IFloat));
-                //make sure link is in main memory
-                flush_cache(nflush_g, (long)v);
-                //invalidate receive buffer
-                flush_cache(nflush_g, (long)mtmp);
-                //initialize transfer
- 
-              X.StartTrans();
-              R.StartTrans();
-              X.TransComplete();
-              R.TransComplete();
-  			}
- }
-void DaggerM (IFloat * w_t1,IFloat * v){
-   	int i, j, c, r;
-     	for ( r = 0; r < 3; r++ ) {
-			for ( c = 0; c < 3; c++ ) {
-        	  i = 6*r + 2*c;
-			  j = 6*c + 2*r;
-			  w_t1[i] = v[j];
-			  w_t1[i+1] = -v[j+1];
-           }
-	       }
- }
-
-void Parallel( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int dir_1, int dir_2, IFloat *v, IFloat * u,int multi_flag ,int tranfs_flag )
-     {
- int nn, nflush_g=1, off_node; 	
- IFloat stp3_1[18], mtmp[18] ;
- if ( dir_1 <4){      //dir_1 positive
-    //U_mu(x+mu)
-      nn = ( dir_1 - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      DaggerM(stp3_1, v); 
- } else{       //dir_1 negative
-    //U_mu(x+mu)~
-      nn = ( dir_1 - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      for (int i=0; i<18; i++){
-	stp3_1[i] = v[i];
-      }
- }//end of dir_1
- 
-if ( multi_flag )
-     mDotMEqual( OutMatrix, stp3_1, InMatrix ) ;
- else {
- for (int i=0; i<18; i++){
- OutMatrix[i] = stp3_1[i];
- }
- }
-
-
-if ( tranfs_flag){
-  if(dir_2<4){ 
-     
-      off_node = CoordNN( dir_2 );
-      coord[ dir_2]= coord_nn[ dir_2];// x+nu-> x
-
-      TransfM( off_node,  nflush_g, OutMatrix, mtmp,dir_2%4  );//transfer OutMatrix to x     
-  }else {
-     dir_2= dir_2%4; 
-      off_node = CoordNN( dir_2+4 );
-      coord[ dir_2]= coord_nn[ dir_2];// x+nu-> x
-
-      TransfP( off_node,  nflush_g, OutMatrix, mtmp,dir_2%4  );//transfer OutMatrix to x     
-  
-  }
-}
-
-     } //Parallel
-
-
-void Staple3_PP( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,
-		 int nu, IFloat *v, IFloat * u, int nflush_g,int sum_flag )
-    { 
- int  nn, i, off_node;
-IFloat  stp3_0[18], stp3_2[18],  stp3_4[18], mtmp[18];
-
-  CoordNN( n ); // 
-  coord[n]= coord_nn[n];// x+mu
-
-  //get U_nu(x+mu)~ and transfer it to  x+nu+mu
-   Parallel( InMatrix,stp3_0, coord, nu+4, nu, v,  u, 1, 1 );
-
-   // transfer U_nu(x+mu)~ to  x+nu
-     off_node = CoordNN( n+4 );// x+mu +nu-> x+nu
-     coord[n]= coord_nn[n];// x+nu
-     TransfP( off_node,  nflush_g, stp3_0, mtmp,  n);//transfer stp3_0 to  x+nu
- 
- //get U_mu(x+nu)& transfer U_mu(x+nu)*U_nu(x+mu)~ from x+nu to x site  
-    Parallel( stp3_0,stp3_2, coord, n, nu+4, v,  u, 1, 1 );
-//get U_nu(x+mu) & mulyiply U_nu(x+mu)*U_mu(x+nu)*U_nu(x+mu)~
-    Parallel( stp3_2,stp3_4, coord, nu, 0, v,  u, 1, 0 );
-
-    for ( i = 0; i < 18; i++ ) {
-               OutMatrix[i] = stp3_4[i];
-           }
-
-    } //Staple3_PP
-
-void Staple3_PN( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,
-		 int nu, IFloat *v, IFloat * u, int nflush_g,int sum_flag ) 
-{
-int nn, i, off_node;
-IFloat  stp3_0[18], stp3_2[18],  stp3_4[18], mtmp[18];
-
-    
-     CoordNN( n );
-     coord[n]= coord_nn[n];// x+mu
-     CoordNN( nu+4 );
-     coord[nu]= coord_nn[nu];// x+mu-nu
-
- //U_nu(x+mu) at x+mu-nu & transfer it to  x-nu
-      Parallel( InMatrix,stp3_0, coord, nu, n+4, v,  u, 1, 1 );
-
-//U_mu(x-nu) *U_nu(x+mu)  at x-nu
-       Parallel(stp3_0 ,stp3_2, coord, n, 0, v,  u, 1, 0 );
-
-//U_nu(x-nu)~ * U_mu(x-nu) *U_nu(x+mu) & transfer it to  x
-        Parallel(stp3_2 ,stp3_4, coord, nu+4, nu, v,  u, 1, 1 );
-
-    for ( i = 0; i < 18; i++ ) {
-               OutMatrix[i] = stp3_4[i];
-           }
-
- 
-     
-}//Staple3_PN
-
-
-void Staple3_NP( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,int nu, IFloat *v, IFloat * u, int nflush_g,int sum_flag )
-    { 
- int  nn, i, off_node;
-IFloat  stp3_0[18], stp3_2[18],  stp3_4[18], mtmp[18];
-  
-
-  CoordNN( n+4 ); // 
-  coord[n]= coord_nn[n];// x-mu
-
-  //get U_nu(x-mu)~ and transfer it to  x+nu-mu
-   Parallel( InMatrix,stp3_0, coord, nu+4, nu, v,  u, 1, 1 );
-   // Parallel( InMatrix,stp3_0, coord, nu+4, nu, v,  u, 0, 1 );
-
- //get U_mu(x-mu+nu)~& transfer U_mu(x-mu+nu~)*U_nu(x-mu)~ from x+nu-mu to x+nu site  
-    Parallel( stp3_0,stp3_2, coord, n+4, n, v,  u, 1, 1 );
-
-    //transfer U_mu(x-mu+nu~)*U_nu(x-mu)~ from x+nu to x site  
-  CoordNN( nu+4 ); // 
-  coord[nu]= coord_nn[nu];// x
- TransfP( off_node,  nflush_g, stp3_2 , mtmp, nu  );
-  // TransfM( off_node,  nflush_g, stp3_2 , mtmp, nu  );
-//get U_nu(x) &  U_nu(x)*U_mu(x+nu-mu)*U_nu(x-mu)~
-    Parallel( stp3_2,stp3_4, coord, nu, 0, v,  u, 1, 0 );
-
-
-    for ( i = 0; i < 18; i++ ) {
-   
-               OutMatrix[i] = stp3_4[i];
-           }
-
-
-
-}
-
-void Staple3_NN( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,int nu, IFloat *v, IFloat * u, int nflush_g, int sum_flag )
-    { 
-
- int nn, i, off_node;
-IFloat  stp3_0[18], stp3_2[18],  stp3_4[18], mtmp[18];
- 
-     
-     CoordNN( n+4 );
-     coord[n]= coord_nn[n];// x-mu
-     CoordNN( nu+4 );
-     coord[nu]= coord_nn[nu];// x-mu-nu
-
- //*U_nu(x-mu-nu ) at x-mu-nu 
-      Parallel( InMatrix,stp3_0, coord, nu, 0, v,  u, 1, 0 );
-      // Parallel( InMatrix,stp3_0, coord, nu, 0, v,  u, 0, 0 );
-
-//U_mu(x-mu-nu)~ *U_nu(x-mu-nu )at x-mu-nu & transfer it to  x-nu
-       Parallel(stp3_0 ,stp3_2, coord, n+4, n, v,  u, 1, 1 );
- 
-       // get U_nu(x-nu)~ & transfer U_nu(x-nu)~ * U_mu(x-mu-nu)~ *U_nu(x-mu-nu ) to  x
-        Parallel(stp3_2 ,stp3_4, coord, nu+4, nu, v,  u, 1, 1 );
-
-    for ( i = 0; i < 18; i++ ) {
-
-               OutMatrix[i] = stp3_4[i];
-           
-           }
-
-   
-}//Staple3_NN
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//first P refers to n dir positive, the second P refers to  ro dir positive 
-//while the nu direction could be taken from 0 to 7 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void Staple5_PP( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,
-		 int nu,int ro, IFloat *v, IFloat * u, int nflush_g )
- { 
-    int  nn, i, off_node;
- IFloat stp5_0[18], stp5_1[18], stp5_2[18], 
-   stp5_3[18] , stp5_4[18], stp5_5[18], mtmp[18];
-     //U_ro(x+mu)~ and transfer it to  x+ro+mu
-     CoordNN( n ); //
-     coord[n]= coord_nn[n];// x+mu
-      nn = ( ro - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-    mDotMEqual( stp5_0, v, InMatrix  ) ;    
-
-     off_node = CoordNN( ro );// x+mu -> x+mu+ro
-     coord[ro]= coord_nn[ro];// x+mu+ro
-     TransfM( off_node,  nflush_g, stp5_0, mtmp,  ro); //transfer stp5_0 to  x+mu+ro
-
-     CoordNN( n+4 ); // 
-     coord[n]= coord_nn[n];//  x+mu+ro -> x+ro
- 
- 
- ///U_nu(x+ro)  *U_mu(x+ro+nu)  * U_nu(x+mu+ro)~ * U_ro(x+mu)~  at x+ro 
- if( nu<4)
-    Staple3_PP(stp5_0,stp5_4, coord, n,nu, v, u, nflush_g,1 );
-else    
-    Staple3_PN(stp5_0,stp5_4, coord, n,nu%4, v, u, nflush_g,1 );
-
- 
-
-   //transfer it to  x 
-     off_node = CoordNN( ro +4 );//  x+ro ->x
-     coord[ro]= coord_nn[ro];//
-     TransfP( off_node,  nflush_g, stp5_4, mtmp, ro);
-
-  ///U_ro(x) * U_nu(x+ro)  *U_mu(x+ro+nu)  * U_nu(x+mu+ro)~ * U_ro(x+mu)~     
-      nn = ( ro - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      DaggerM(stp5_1,v);
-       mDotMEqual( OutMatrix, stp5_1,  stp5_4) ;
-
-
- }
-
-//n, ro 
-void Staple5_PN( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,
-		 int nu,int ro, IFloat *v, IFloat * u, int nflush_g )
-{
-
-    int  nn, i, off_node;
- IFloat stp5_0[18], stp5_1[18], stp5_2[18], 
-   stp5_3[18] , stp5_4[18], stp5_5[18], mtmp[18];
-
-  
-
-    //U_ro(x+mu-ro) and transfer it to  x+mu-ro
-     CoordNN( n ); //
-     coord[n]= coord_nn[n];// x+mu
-     CoordNN( ro+4 ); //
-     coord[ro]= coord_nn[ro];// x+mu-ro
-
-      nn = ( ro - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      DaggerM(stp5_1, v);
-      mDotMEqual( stp5_0, stp5_1 , InMatrix  ) ; 
- 
-      /*     //transfer stp5_0 to  x+mu-ro+nu
-     off_node = CoordNN( nu  );//  x+mu-ro ->x+mu-ro+nu
-     coord[nu]= coord_nn[nu];//
-     TransfP( off_node,  nflush_g, stp5_0, mtmp, nu); 
-
-     CoordNN( nu+4 ); // 
-     coord[nu]= coord_nn[nu];//  x+mu-ro+nu -> x+mu-ro*/
-     CoordNN( n+4 ); // 
-     coord[n]= coord_nn[n];//  x+mu-ro -> x-ro
-
-
-
- if( nu<4)
-    Staple3_PP(stp5_0,stp5_4, coord, n,nu, v, u, nflush_g,1 );
-else    
-    Staple3_PN(stp5_0,stp5_4, coord, n,nu%4, v, u, nflush_g,1 );
-
-
-      
-      nn = ( ro - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;     
-      mDotMEqual( OutMatrix, v,  stp5_4) ;
-
-   //transfer it to  x 
-     off_node = CoordNN( ro  );//  x-ro ->x
-     coord[ro]= coord_nn[ro];//
-     TransfM( off_node,  nflush_g, OutMatrix, mtmp, ro);
-
-}
-
-void Staple5_NP( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,
-		 int nu,int ro, IFloat *v, IFloat * u, int nflush_g )
- { 
-    int  nn, i, off_node;
- IFloat stp5_0[18], stp5_1[18], stp5_2[18], 
-   stp5_3[18] , stp5_4[18], stp5_5[18], mtmp[18];
- 
-
-     //U_ro(x-mu)~ and transfer it to  x+ro+mu
-     CoordNN( n+4 ); //
-     coord[n]= coord_nn[n];// x-mu
-      nn = ( ro - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      mDotMEqual( stp5_0, v, InMatrix  ) ; 
-
-     off_node = CoordNN( ro );// x-mu -> x+mu+ro
-     coord[ro]= coord_nn[ro];// x-mu+ro
-     TransfM( off_node,  nflush_g, stp5_0, mtmp,  ro); //transfer stp5_0 to  x-mu+ro
-
-     CoordNN( n ); // 
-     coord[n]= coord_nn[n];//  x-mu+ro -> x+ro
- 
- 
- ///U_nu(x+ro)  *U_mu(x+ro+nu)  * U_nu(x+mu+ro)~ * U_ro(x+mu)~  at x+ro 
- if( nu<4)
-    Staple3_NP(stp5_0,stp5_4, coord, n,nu, v, u, nflush_g,1 );
-else    
-    Staple3_NN(stp5_0,stp5_4, coord, n,nu%4, v, u, nflush_g,1 );
-
- 
-
-   //transfer it to  x 
-     off_node = CoordNN( ro +4 );//  x+ro ->x
-     coord[ro]= coord_nn[ro];//
-     TransfP( off_node,  nflush_g, stp5_4, mtmp, ro);
-
-  ///U_ro(x) * U_nu(x+ro)  *U_mu(x+ro+nu)  * U_nu(x+mu+ro)~ * U_ro(x+mu)~     
-      nn = ( ro - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      DaggerM(stp5_1,v);
-       mDotMEqual(OutMatrix, stp5_1,  stp5_4) ;
-
-
-
- }
-void Staple5_NN( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,
-		 int nu,int ro, IFloat *v, IFloat * u, int nflush_g )
- { 
-    int  nn, i, off_node;
- IFloat stp5_0[18], stp5_1[18], stp5_2[18], 
-   stp5_3[18] , stp5_4[18], stp5_5[18], mtmp[18];
-
-
-   
-    //U_ro(x-mu-ro) and transfer it to  x+mu-ro
-     CoordNN( n+4 ); //
-     coord[n]= coord_nn[n];// x-mu
-     CoordNN( ro+4 ); //
-     coord[ro]= coord_nn[ro];// x-mu-ro
-
-      nn = ( ro - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      DaggerM(stp5_1, v);
-      mDotMEqual( stp5_0,stp5_1 , InMatrix  ) ; 
-
-     CoordNN( n ); // 
-     coord[n]= coord_nn[n];//  x-mu-ro -> x-ro
-
-
-
- if( nu<4)
-    Staple3_NP(stp5_0,stp5_4, coord, n,nu, v, u, nflush_g,1 );
-else    
-    Staple3_NN(stp5_0,stp5_4, coord, n,nu%4, v, u, nflush_g,1 );
-
-
-      
-      nn = ( ro - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;     
-      mDotMEqual( OutMatrix,v,  stp5_4) ;
-
-   //transfer it to  x 
-     off_node = CoordNN( ro  );//  x-ro ->x
-     coord[ro]= coord_nn[ro];//
-     TransfM( off_node,  nflush_g, OutMatrix, mtmp, ro);
-
-
- }
-
-//#if 0
-#ifdef staple7
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//first P refers to n dir positive, the second P refers to  de dir positive 
-//while the nu & ro direction could be taken from 0 to 7 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-void Staple7_PP( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,
-		 int nu,int ro,int de, IFloat *v, IFloat * u, int nflush_g )
- { 
-    int  nn, i, off_node;
- IFloat stp5_0[18], stp5_1[18], stp5_2[18], 
-   stp5_3[18] , stp5_4[18], stp5_5[18], mtmp[18];
-     //U_ro(x+mu)~ and transfer it to  x+ro+mu
-     CoordNN( n ); //
-     coord[n]= coord_nn[n];// x+mu
-      nn = ( de - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-    mDotMEqual( stp5_0, v, InMatrix  ) ;    
-
-     off_node = CoordNN( de );// x+mu -> x+mu+ro
-     coord[de]= coord_nn[de];// x+mu+ro
-     TransfM( off_node,  nflush_g, stp5_0, mtmp,  de); //transfer stp5_0 to  x+mu+ro
-
-     CoordNN( n+4 ); // 
-     coord[n]= coord_nn[n];//  x+mu+de -> x+de
- 
- 
- ///U_nu(x+ro)  *U_mu(x+ro+nu)  * U_nu(x+mu+ro)~ * U_ro(x+mu)~  at x+ro 
- if( ro<4)
-    Staple5_PP(stp5_0,stp5_4, coord, n,nu,ro, v, u, nflush_g );
-else    
-    Staple5_PN(stp5_0,stp5_4, coord, n,nu,ro%4, v, u, nflush_g );
-
- 
-
-   //transfer it to  x 
-     off_node = CoordNN( de +4 );//  x+de ->x
-     coord[de]= coord_nn[de];//
-     TransfP( off_node,  nflush_g, stp5_4, mtmp, de);
-
-   
-      nn = ( de - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      DaggerM(stp5_1,v);
-       mDotMEqual( OutMatrix, stp5_1,  stp5_4) ;
-
-
- }
-
-
-void Staple7_PN( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,
-		 int nu,int ro,int de, IFloat *v, IFloat * u, int nflush_g )
-{
-
-    int  nn, i, off_node;
- IFloat stp5_0[18], stp5_1[18], stp5_2[18], 
-   stp5_3[18] , stp5_4[18], stp5_5[18], mtmp[18];
-
-  
-
-    //U_de(x+mu-de) and transfer it to  x+mu-de
-     CoordNN( n ); //
-     coord[n]= coord_nn[n];// x+mu
-     CoordNN( de+4 ); //
-     coord[de]= coord_nn[de];// x+mu-de
-
-      nn = ( de - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      DaggerM(stp5_1, v);
-      mDotMEqual( stp5_0, stp5_1 , InMatrix  ) ; 
- 
-     CoordNN( n+4 ); // 
-     coord[n]= coord_nn[n];//  x+mu-de -> x-de
-
-
-
- if( ro<4)
-    Staple5_PP(stp5_0,stp5_4, coord, n,nu,ro, v, u, nflush_g);
- 
-else    
-    Staple5_PN(stp5_0,stp5_4, coord, n,nu,ro%4, v, u, nflush_g );
-
-
-      
-      nn = ( de - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;     
-      mDotMEqual( OutMatrix, v,  stp5_4) ;
-
-   //transfer it to  x 
-     off_node = CoordNN( de  );//  x-de ->x
-     coord[de]= coord_nn[de];//
-     TransfM( off_node,  nflush_g, OutMatrix, mtmp, de);
-
-}
-
-
-void Staple7_NP( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,
-		 int nu,int ro,int de, IFloat *v, IFloat * u, int nflush_g )
-{
-
- 
-    int  nn, i, off_node;
- IFloat stp5_0[18], stp5_1[18], stp5_2[18], 
-   stp5_3[18] , stp5_4[18], stp5_5[18], mtmp[18];
-
-
- /*    //U_de(x-mu)~ and transfer it to  x+de+mu
-     CoordNN( n+4 ); //
-     coord[n]= coord_nn[n];// x-mu
-      nn = ( de - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      mDotMEqual( stp5_0, v, InMatrix  ) ; 
-
-     off_node = CoordNN( de );// x-mu -> x+mu+de
-     coord[ro]= coord_nn[de];// x-mu+de
-     TransfM( off_node,  nflush_g, stp5_0, mtmp,  de); //transfer stp5_0 to  x-mu+ro
-
-     CoordNN( n ); // 
-     coord[n]= coord_nn[n];//  x-mu+de -> x+de
- 
- 
-
- if( ro<4)
-    Staple5_NP(stp5_0,stp5_4, coord, n,nu, ro, v, u, nflush_g );
-else    
-    Staple5_NN(stp5_0,stp5_4, coord, n,nu, ro%4, v, u, nflush_g );
-
- 
-
-   //transfer it to  x 
-     off_node = CoordNN( de +4 );//  x+ro ->x
-     coord[de]= coord_nn[de];//
-     TransfP( off_node,  nflush_g, stp5_4, mtmp, de);
-
-  ///U_ro(x) * U_nu(x+ro)  *U_mu(x+ro+nu)  * U_nu(x+mu+ro)~ * U_ro(x+mu)~     
-      nn = ( de - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      DaggerM(stp5_1,v);
-       mDotMEqual(OutMatrix, stp5_1,  stp5_4) ;
-
- */
- 
-
-     //U_de(x-mu)~ and transfer it to  x+de+mu
-     CoordNN( n+4 ); //
-     coord[n]= coord_nn[n];// x-mu
-      nn = ( de - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      mDotMEqual( stp5_0, v, InMatrix  ) ; 
-
-     off_node = CoordNN( de );// x-mu -> x+mu+de
-     coord[de]= coord_nn[de];// x-mu+de
-     TransfM( off_node,  nflush_g, stp5_0, mtmp,  de); //transfer stp5_0 to  x-mu+de
-
-     CoordNN( n ); // 
-     coord[n]= coord_nn[n];//  x-mu+de -> x+de
- 
- 
- 
- if( ro<4)
-    Staple5_NP(stp5_0,stp5_4, coord, n,nu,ro, v, u, nflush_g);
-else    
-    Staple5_NN(stp5_0,stp5_4, coord, n,nu, ro%4, v, u, nflush_g );
-
-
-
-   //transfer it to  x 
-     off_node = CoordNN( de +4 );//  x+de ->x
-     coord[de]= coord_nn[de];//
-     TransfP( off_node,  nflush_g, stp5_4, mtmp, de);
-
-   
-      nn = ( de - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      DaggerM(stp5_1,v);
-       mDotMEqual(OutMatrix, stp5_1,  stp5_4) ;
-
- 
-
- }
-
-
-void Staple7_NN( IFloat * InMatrix,IFloat *OutMatrix  , int *coord, int n,
-		 int nu,int ro,int de, IFloat *v, IFloat * u, int nflush_g )
-  { 
-    int  nn, i, off_node;
- IFloat stp5_0[18], stp5_1[18], stp5_2[18], 
-   stp5_3[18] , stp5_4[18], stp5_5[18], mtmp[18];
-
-
-   
-    //U_de(x-mu-de) and transfer it to  x+mu-de
-     CoordNN( n+4 ); //
-     coord[n]= coord_nn[n];// x-mu
-     CoordNN( de+4 ); //
-     coord[de]= coord_nn[de];// x-mu-de
-
-      nn = ( de - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-      DaggerM(stp5_1, v);
-      mDotMEqual( stp5_0,stp5_1 , InMatrix  ) ; 
-
-     CoordNN( n ); // 
-     coord[n]= coord_nn[n];//  x-mu-de -> x-de
-
-
-
- if( ro<4)
-    Staple5_NP(stp5_0,stp5_4, coord, n,nu,ro, v, u, nflush_g );
-else    
-    Staple5_NN(stp5_0,stp5_4, coord, n,nu,ro%4, v, u, nflush_g );
-
-
-      
-      nn = ( de - 1 + 4 ) % 4;
-      v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;     
-      mDotMEqual( OutMatrix,v,  stp5_4) ;
-
-   //transfer it to  x 
-     off_node = CoordNN( de  );//  x-de ->x
-     coord[de]= coord_nn[de];//
-     TransfM( off_node,  nflush_g, OutMatrix, mtmp, de);
-
-
-  
-}
-
-#endif //staple7
 extern "C"
 void asqtad_dirac_init_g()
 {
@@ -1794,7 +1141,7 @@ FILE *fp;
   int fd;
   char buf[200];
 #if 0
-  fp=fopen("/host/chulwoo/uc_l.h","w");
+  fp=fopen(uc_l_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
     for(i=0;i< MATRIX_SIZE * ((local_chi+ local_chi_3)/2);i++){
@@ -1808,9 +1155,6 @@ FILE *fp;
   fclose(fp);
 #endif
 
-#ifndef SIMUL_AGG
-
-#if 1
   gauge_agg temp[12*vol];
   int num_ind[vol*6];
   int src;
@@ -1852,7 +1196,7 @@ FILE *fp;
 
 #if 0
   struct gauge_agg *agg_p;
-  fp=fopen("/host/chulwoo/uc_l_agg.h","w");
+  fp=fopen(uc_l_agg_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"struct gauge_agg uc_l_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
     for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
@@ -1874,13 +1218,10 @@ FILE *fp;
   fclose(fp);
 #endif
 
-#endif // 1
-
-#endif //SIMUL_AGG
 
 
 #if 0
-  fp = fopen("/host/chulwoo/uc_nl.h","w");
+  fp = fopen(uc_nl_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat uc_nl%d[] LOCATE(\"edramnormal\") = {\n",j); 
     for(i=0;i< MATRIX_SIZE * ((non_local_chi+non_local_chi_3 )/2);i++){
@@ -1894,9 +1235,6 @@ FILE *fp;
   fclose(fp);
 #endif
 
-#ifndef SIMUL_AGG
-
-#if 1
   for(j=0;j<2;j++){
     for(i=0;i<non_local_chi*3/2;i++) num_ind[i]=0;
     for(i=0;i< ((non_local_chi+ non_local_chi_3)/2);i++){
@@ -1935,7 +1273,7 @@ FILE *fp;
   }
 
 #if 0
-  fp = fopen("/host/chulwoo/uc_nl_agg.h","w");
+  fp = fopen(uc_nl_agg_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"struct gauge_agg uc_nl_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
     for(i=0;i< ((non_local_chi+ non_local_chi_3)/2);i++){
@@ -1958,9 +1296,7 @@ FILE *fp;
   fclose(fp);
 #endif
 
-#endif
 
-#endif // SIMUL_AGG
 
 }
 
@@ -2289,7 +1625,3 @@ if(split) {
 }
 
 CPS_END_NAMESPACE
-
-
-
-

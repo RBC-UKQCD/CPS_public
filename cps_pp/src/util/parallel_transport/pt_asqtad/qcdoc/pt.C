@@ -250,7 +250,6 @@ void ParTransAsqtad::pt_init_g(void){
 	int local_count[2*NDIM];
 	int non_local_count[2*NDIM];
 	int i;
-//	FILE *fp = fopen("/host/chulwoo/pt_init_g.out","w");
 
 	char *fname = "pt_init_g()";
 	VRB.Func(cname,fname);
@@ -259,8 +258,6 @@ void ParTransAsqtad::pt_init_g(void){
 		local_count[i]=non_local_count[i]=0;
 	}
 	IFloat *u = gauge_field_addr;
-//	fprintf(fp,"rcv=%p\n",rcv);fflush(fp);
-//	fprintf(fp,"u=%p\n",u);fflush(fp);
 
 	SCUDir rcv_dir[]={SCU_XP, SCU_XM, SCU_YP, SCU_YM, SCU_ZP, SCU_ZM,SCU_TP,SCU_TM};
 	SCUDir snd_dir[]={SCU_XM, SCU_XP, SCU_YM, SCU_YP, SCU_ZM, SCU_ZP,SCU_TM,SCU_TP};
@@ -268,41 +265,30 @@ void ParTransAsqtad::pt_init_g(void){
 	for(x[2]=0,nei[2]=0;x[2]<size[2];x[2]++,nei[2]++)
 	for(x[1]=0,nei[1]=0;x[1]<size[1];x[1]++,nei[1]++)
 	for(x[0]=0,nei[0]=0;x[0]<size[0];x[0]++,nei[0]++){
-//		fprintf(fp,"x=%d %d %d %d ",x[0],x[1],x[2],x[3]);fflush(fp);
-//		fprintf(fp,"nei=%d %d %d %d ",nei[0],nei[1],nei[2],nei[3]);fflush(fp);
 		for(i=0;i<NDIM;i++){
-//		fprintf(fp,"dir=%d\n",i);fflush(fp);
 // positive direction
 			if(x[i] == 0){
 				nei[i] = size[i]-1;  
 				DagCopy((uc_nl[2*i]+non_local_count[2*i])->mat, u+LexGauge(nei,i)*GAUGE_LEN);
-//fprintf(fp,"uc_nl[%d][%d]->mat=%p\n",2*i,non_local_count[2*i],(uc_nl[2*i]+non_local_count[2*i])->mat); fflush(fp);
-//fprintf(fp,"u[%d]=%e\n",LexGauge(nei,i),*(u+LexGauge(nei,i)*GAUGE_LEN)); fflush(fp);
-//				fprintf(fp,"non_local_count[%d]=%d\n",2*i,non_local_count[2*i]);fflush(fp);
 				non_local_count[i*2]++;
 			} else {
 				nei[i] = x[i]-1;
 				DagCopy((uc_l[2*i]+local_count[2*i])->mat, u+LexGauge(nei,i)*GAUGE_LEN);
-//				fprintf(fp,"local_count[%d]=%d\n",2*i,local_count[2*i]);fflush(fp);
 				local_count[i*2]++;
 			}
 // negative direction
 			if(x[i] == (size[i] -1)){
 				nei[i] = 0;
 #if 1
-//				fprintf(fp,"rcv[0]=%e, u[%d][0]=%e\n",rcv[0],LexGauge(x,i),u[LexGauge(x,i)*GAUGE_LEN]);
 				getMinusData( rcv, u+LexGauge(x,i)*GAUGE_LEN, GAUGE_LEN, i);
-//				fprintf(fp,"rcv[0]=%e, u[%d][0]=%e\n",rcv[0],LexGauge(x,i),u[LexGauge(x,i)*GAUGE_LEN]);
 				Copy((uc_nl[2*i+1]+non_local_count[2*i+1])->mat, rcv);
 #else
 				Copy((uc_nl[2*i+1]+local_count[2*i+1])->mat, u+LexGauge(x,i)*GAUGE_LEN);
 #endif
-//				fprintf(fp,"non_local_count[%d]=%d\n",2*i+1,non_local_count[2*i+1]);fflush(fp);
 				non_local_count[i*2+1]++;
 			} else {
 				nei[i] = x[i]+1;
 				Copy((uc_l[2*i+1]+local_count[2*i+1])->mat, u+LexGauge(x,i)*GAUGE_LEN);
-//				fprintf(fp,"local_count[%d]=%d\n",2*i+1,local_count[2*i+1]);fflush(fp);
 				local_count[i*2+1]++;
 			}
 			nei[i] = x[i];
@@ -318,8 +304,6 @@ void ParTransAsqtad::pt_init_g(void){
 		SCUarg_mat[i*2+1] = new SCUDirArgIR;
 		SCUarg_mat[i*2+1]->Init((void *)0,snd_dir[i],SCU_SEND,blklen[i]*3,numblk[i],stride[i]*3,IR_9);
 	}
-//	fclose(fp);
-//	printf("pt_init_g() done\n"); fflush(stdout);
 }
 
 #if 0

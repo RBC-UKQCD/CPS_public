@@ -21,15 +21,10 @@
 #include <comms/sysfunc.h>
 #include <qcdoc_align.h>
 
-#undef SIMUL
 #undef CPP
 
-#ifdef SIMUL
-#include "uc_l.h"
-#include "uc_nl.h"
-#include "chi.h"
-#include "chi_l.h"
-#endif
+const char *chi_l_filename = CWDPREFIX("chi_l.h");
+const char *chi_nl_filename = CWDPREFIX("chi_nl.h");
 
 void dirac_cmv_l( int sites, long chi, long u, long a, long tmpfrm);
 void dirac_cmv_nl( int sites, long chi, long u, long a, long tmpfrm);
@@ -256,7 +251,6 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   size[1] = GJP.XnodeSites();
   size[2] = GJP.YnodeSites();
   size[3] = GJP.ZnodeSites();
-printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
 
 
   vol = size[0] * size[1] * size[2] * size[3];
@@ -301,24 +295,16 @@ printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
   //-----------------------------------------------------------------
   
 
-#ifdef SIMUL
-  chi[0] = chi0;
-  chi[1] = chi1;
-  chi_l[0] = chi_l0;
-  chi_l[1] = chi_l1;
-#endif
   for ( i = 0; i < 2; i++ ){
 //    chi_l[i] = ( IFloat ** ) pmalloc(2*(local_chi/2)*sizeof(IFloat *));
   VRB.Result(cname,fname,"local_chi=%d sizeof(IFloat)=%d\n",local_chi,
      sizeof(IFloat));
-#ifndef SIMUL
     chi[i] = (IFloat **) smalloc(9 * vol/2 * sizeof(IFloat *));
       if(chi[i] == NULL)
 	ERR.Pointer(cname,fname, "chi[i]");
     chi_l[i] = ( IFloat ** ) smalloc(2*(local_chi/2)*sizeof(IFloat *));
       if(chi_l[i] == NULL)
 	ERR.Pointer(cname,fname, "chi_l[i]");
-#endif
     chi_nl[i] = (IFloat ** ) smalloc(2*(non_local_chi/2)*sizeof(IFloat *));
       if(chi_nl[i] == NULL)
 	ERR.Pointer(cname,fname, "chi_nl[i]");
@@ -361,20 +347,12 @@ printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
 	      // high performance code
 	      //----------------------------------------------------------
 	      //pointer to source field (offset in the receive buffer)
-//  	      if (n % 4 == 0){
-//  	      *( chi_nl[ odd ]  +  2 * non_local_count[ odd ] )
-//  	    = chi_off_node[n] + VECT_LEN * ( LexSurface( coord_nn, n%4 ) );
-//  //	      printf("offset[%d] = %d \n", odd, LexSurface( coord_nn, n%4)); 
-//  	      }
-//  	      else{
 	      *( chi_nl[ odd ]  +  2 * non_local_count[ odd ] )
 	    = chi_off_node[n] + VECT_LEN * ( LexSurface( coord_nn, n%4 ) / 2 );
-//	      }
 	      // pointer to temporary field where U*chi is stored
-	      *( chi_nl[ odd ] + 2 * non_local_count[ odd ] + 1) = 
+		*( chi_nl[ odd ] + 2 * non_local_count[ odd ] + 1) = 
 		( IFloat *) ( VECT_LEN * (NUM_DIR * int(sg/2) + n )
 		              * sizeof(IFloat));
-#ifndef SIMUL
 	      // pointer to the above temporary field 
 	      *( chi[ odd ] + m + n + 1) = 
 		( IFloat *) ( VECT_LEN * (NUM_DIR * int(sg/2) + n) 
@@ -383,11 +361,9 @@ printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
 	      *( chi[ odd ]  +  m ) = 
 		( IFloat * ) ( VECT_LEN * (LexVector( coord ) / 2 ) 
 			       * sizeof(IFloat));  
-#endif
 	      non_local_count[odd]++; 
 	    }
 	    else{//on node
-#ifndef SIMUL
 	      //pointer to source field
 	      *( chi_l[ odd ]  +  2 * local_count[ odd ] )
 		= ( IFloat * ) ( VECT_LEN * ( LexVector( coord_nn ) / 2 )
@@ -404,7 +380,6 @@ printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
 	      *( chi[ odd ]  +  m ) = 
 		( IFloat * ) ( VECT_LEN * (LexVector( coord ) / 2 ) 
 		               * sizeof(IFloat));
-#endif
 	      local_count[odd]++; 
 	    }
 	  }
@@ -434,10 +409,10 @@ printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
   close(fd);
 #endif
 
-#if 1
+#if 0
   char filename[200];
-  sprintf(filename,"/host/chulwoo/chi_l.h%d%d%d%d%d%d",
-  CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
+  sprintf(filename,"%s_%d%d%d%d%d%d",
+  chi_l_filename,CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
   FILE *fp = fopen(filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat * chi_l%d[] LOCATE(\"edramtransient\") = {\n",j); 
@@ -448,12 +423,12 @@ printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
     fprintf(fp,"\n};\n"); 
   }
   fclose(fp);
-#endif /* SIMUL */
+#endif
 
 #if 0
   char filename[200];
-  sprintf(filename,"/host/chulwoo/chi_nl.h%d%d%d%d%d%d",
-  CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
+  sprintf(filename,"%s_%d%d%d%d%d%d",
+  chi_nl_filename, CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
   FILE *fp = fopen(filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat * chi_nl%d[] LOCATE(\"edramtransient\") = {\n",j); 
@@ -466,10 +441,7 @@ printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
 
   fclose(fp);
 
-#endif /* SIMUL */
-
-//  print("dirac_init: Set yp SCU parameters\n");
-
+#endif 
 
   //-------------------------------------------------------------------
   //  Set up SCU buffer parameters.  T direction is special, since
@@ -492,7 +464,6 @@ printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
     sizeof(IFloat) ;
   stride[3] = 0;
 
-//  printf("dirac_init: Set yp SCU parameters\n");
   //-------------------------------------------------------------------
   //  Calculate offsets for T transfers done one word at a time.
   //  We have plus (P) transfers for both the even and odd
@@ -544,29 +515,12 @@ printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
   //-------------------------------------------------------------------
 
   for ( i = 0; i < NUM_DIR; i++ ) {
- 
-//    Rarg[i] = ( SCUDMAInst * ) smalloc ( sizeof( SCUDMAInst ) );
-//    Xarg[i] = ( SCUDMAInst * ) smalloc ( sizeof( SCUDMAInst ) );
     j = i % (NUM_DIR/2);
- //     if ( j == 0 ){//t direction is special
-//        SCUarg[i + 8] = new SCUDirArgIR(chi_off_node[i], scudir[i], SCU_REC,
-//  		     VECT_LEN * sizeof(IFloat) * vol / ( size[j] ), 
-//  				1, 0, IR_5);
-//        buffer_flush[j] = VECT_LEN * sizeof(IFloat) * vol/ (192 * size[j]);
-//      }
-//      else{
-//      printf("new SCUDirArgIR(%d)\n",i+8);
-#if 0
-      SCUarg[i + 8] = new SCUDirArgIR(chi_off_node[i], scudir[i], SCU_REC, 
-#else
       SCUarg[i + 8] = new SCUDirArgIR;
       SCUarg[i + 8] ->Init(chi_off_node[i], scudir[i], SCU_REC, 
-#endif
 		    VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 
 			       1, 0, IR_5);
-//      printf("new SCUDirArgIR(%d)\n",i+8);
       buffer_flush[i] = VECT_LEN * sizeof(IFloat) * vol/ (384 * size[j]);
-//    }
 //send arguments
     if ((i == 0) || ( i == 4)){
       SCUarg[i] = new SCUDirArgIR(Tbuffer[(4 - i)/4], scudir[i], SCU_SEND, 
@@ -577,7 +531,6 @@ printf("size = %d %d %d %d\n",size[0],size[1],size[2],size[3]);
 		       blklen[j], numblk[j], stride[j], IR_5 );
     }
   }
-//  printf("dirac_init: Set yp SCU Multi\n");
   SCUmulti = new SCUDirArgMulti();
   SCUmulti->Init(SCUarg, 16);
   //-------------------------------------------------------------------
@@ -607,14 +560,14 @@ extern "C" void stag_destroy_dirac_buf()
   delete SCUmulti;
   
   for ( i = 0; i < 2; i++ ) {
-//    sfree(Tbuffer[i]);
+#if 0
+    sfree(Tbuffer[i]);
+#endif
     sfree(ToffsetP[i]);
     sfree(ToffsetM[i]);
     sfree(chi_nl[i]);
-#ifndef SIMUL
     sfree(chi[i]);
     sfree(chi_l[i]);
-#endif
   }
     
   for ( i = 0; i < NUM_DIR; i++ ) {
@@ -720,12 +673,6 @@ extern "C" void stag_dirac_init_g()
     size[2]*size[3]*size[0] + size[3]*size[0]*size[1]);
   local_chi = NUM_DIR*vol - non_local_chi;
 
-#ifdef SIMUL
-  uc_l[0] = uc_l0;
-  uc_l[1] = uc_l1;
-  uc_nl[0] = uc_nl0;
-  uc_nl[1] = uc_nl1;
-#else /* SIMUL */
   //-----------------------------------------------------------------
   //  Allocate space for two copies of the gauge fields on this node
   //-----------------------------------------------------------------
@@ -844,13 +791,8 @@ extern "C" void stag_dirac_init_g()
                 //invalidate receive buffer
                 flush_cache(nflush_g, (long)mtmp);
                 //initialize transfer
-#if 0
-  SCUDirArgIR X( v, scudir[n], SCU_SEND, 18 * sizeof(IFloat));
-  SCUDirArgIR R( mtmp, scudir[n+4], SCU_REC, 18 * sizeof(IFloat));
-#else
   X.Addr(v);
   R.Addr(mtmp);
-#endif
 		X.SlowStartTrans();
 		R.SlowStartTrans();
 		X.TransComplete();
@@ -882,7 +824,6 @@ extern "C" void stag_dirac_init_g()
 	}
       }
     }
-#endif /* SIMUL */
 
 #if 0
   char buf[200];
@@ -919,20 +860,17 @@ extern "C" void stag_dirac_init_g()
   }
   close(fd);
 
-#endif /* SIMUL */
+#endif 
   
-//  print("dirac_init_g done\n");
 }
 
 extern "C" void stag_destroy_dirac_buf_g(void)
 {
   int i;
-#ifndef SIMUL
   for ( i = 0; i < 2; i++){
   sfree(uc_l[i]);
   sfree(uc_nl[i]);
   }
-#endif
 }
 
 
@@ -1088,6 +1026,7 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
     printf("%d %e\n",i,tmpfrm[i]);
   }
 #endif
+
   if ( add_flag == 0){
     dirac_sum( vol/2, (long)chi[odd], (long)tmpfrm, (long)b);
   }
