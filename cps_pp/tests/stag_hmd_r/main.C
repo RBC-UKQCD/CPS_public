@@ -29,10 +29,10 @@
 #include <string>
 #include <iostream>
 
-const int nx = 16;
-const int ny = 16;
-const int nz = 8;
-const int nt = 8;
+const int nx = 4;
+const int ny = 2;
+const int nz = 2;
+const int nt = 2;
 
 CPS_START_NAMESPACE
 
@@ -64,7 +64,7 @@ int main(int argc,char *argv[])
   // Set verbose level
   //----------------------------------------------------------------
   VRB.Level(GJP.VerboseLevel());
-  char *cname = "asqtad_hmd_r";
+  char *cname = "stag_hmd_r";
   char *fname = "main";
   VRB.Func(cname,fname);
 
@@ -106,7 +106,7 @@ int main(int argc,char *argv[])
   // Run Wilson Monte Carlo
   //----------------------------------------------------------------
   {
-    GwilsonFasqtad lat;
+    GwilsonFstag lat;
 
     {
 
@@ -219,19 +219,13 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.xi_bare = 1;
   do_arg.xi_v = 1;
   do_arg.xi_v_xi = 1;
+#if 0
   do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
   do_arg.asqtad_naik = -1.0/24.0;
   do_arg.asqtad_lepage = -1.0/16;
   do_arg.asqtad_3staple = (-1.0/8.0)*0.5;
   do_arg.asqtad_5staple = ( 1.0/8.0)*0.25*0.5;
   do_arg.asqtad_7staple = (-1.0/8.0)*0.125*(1.0/6.0);
-#if 0
-  do_arg.asqtad_KS = 1e-20;
-  do_arg.asqtad_naik = 1.0;
-  do_arg.asqtad_lepage = 1e-20;
-  do_arg.asqtad_3staple = 1e-20;
-  do_arg.asqtad_5staple = 1e-20;
-  do_arg.asqtad_7staple = 1e-20;
 #endif
 }
 

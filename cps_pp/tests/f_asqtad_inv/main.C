@@ -23,6 +23,9 @@ CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 
+const char *f_asqtad_test_filename = CWDPREFIX("f_asqtad_test");
+const char *psi_filename = CWDPREFIX("psi");
+
 
 
 int main(int argc,char *argv[]){
@@ -92,9 +95,9 @@ int main(int argc,char *argv[]){
 
 #if TARGET == QCDOC
     char filename [200];
-    sprintf(filename,"/host/chulwoo/f_asqtad_test%0.2d%0.2d%0.2d%0.2d%0.2d%0.2d.out",CoorX(),CoorY(),CoorZ(),CoorT(),CoorS(),CoorW());
+    sprintf(filename,"%s%0.2d%0.2d%0.2d%0.2d%0.2d%0.2d.out",f_asqtad_test_filename,CoorX(),CoorY(),CoorZ(),CoorT(),CoorS(),CoorW());
    fp = fopen(filename,"w");
-    sprintf(filename,"/host/chulwoo/psi%0.2d%0.2d%0.2d%0.2d%0.2d%0.2d.h",CoorX(),CoorY(),CoorZ(),CoorT(),CoorS(),CoorW());
+    sprintf(filename,"%s%0.2d%0.2d%0.2d%0.2d%0.2d%0.2d.h",psi_filename,CoorX(),CoorY(),CoorZ(),CoorT(),CoorS(),CoorW());
     fp2 = fopen(filename,"w");
 #else
     fp = fopen("f_asqtad_test.out","w");
