@@ -4,13 +4,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-16 00:10:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.22 2004-12-16 00:10:58 chulwoo Exp $
-//  $Id: main.C,v 1.22 2004-12-16 00:10:58 chulwoo Exp $
+//  $Date: 2004-12-16 08:07:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.23 2004-12-16 08:07:27 chulwoo Exp $
+//  $Id: main.C,v 1.23 2004-12-16 08:07:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -29,8 +29,8 @@ USING_NAMESPACE_CPS
 static int nx,ny,nz,nt,ns;
 const int SAVE_RNG = 0;
 const int LOAD_RNG = 0;
-const int LOAD_DOARG = 0;
-const int SAVE_DOARG = 0;
+const int LOAD_DOARG = 1;
+const int SAVE_DOARG = 1;
 
 int main(int argc,char *argv[])
 {
@@ -101,10 +101,10 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
 
   VRB.Level(0);
-  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
-  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
-  VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
-  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_CLOCK_LEVEL);
   VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
