@@ -8,13 +8,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 04:15:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.7 2004-07-09 04:15:19 chulwoo Exp $
-//  $Id: f_clover.C,v 1.7 2004-07-09 04:15:19 chulwoo Exp $
+//  $Date: 2004-07-09 05:55:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.8 2004-07-09 05:55:16 chulwoo Exp $
+//  $Id: f_clover.C,v 1.8 2004-07-09 05:55:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_clover.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -181,6 +181,7 @@ int Fclover::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
   VRB.Func(cname, fname);
   ERR.NotImplemented(cname,fname);
+  return -1;
 }
 
 //------------------------------------------------------------------
@@ -364,7 +365,6 @@ void Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
                    (const IFloat *)(A_even), 
                    (const IFloat *)frm1_even, 
                    half_sites);    
-  {IFloat *tmp = (IFloat *)phi_even;
 
   return;
   

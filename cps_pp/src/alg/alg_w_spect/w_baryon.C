@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v 1.6 2004-06-04 21:14:00 chulwoo Exp $
-//  $Id: w_baryon.C,v 1.6 2004-06-04 21:14:00 chulwoo Exp $
+//  $Date: 2004-07-09 05:55:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v 1.7 2004-07-09 05:55:16 chulwoo Exp $
+//  $Id: w_baryon.C,v 1.7 2004-07-09 05:55:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_baryon.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v $
 //  $State: Exp $
 //
@@ -92,8 +92,8 @@ WspectBaryon::WspectBaryon(const IFloat *q1,
   : d_quark1_p(q1),
     d_quark2_p(q2),
     d_quark3_p(q3),
-    d_whr(whr),
     d_flavors(con),
+    d_whr(whr),
     d_diracs(dmats)
 {
   Everything();

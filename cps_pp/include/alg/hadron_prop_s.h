@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-08 22:49:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v 1.4 2004-07-08 22:49:57 chulwoo Exp $
-//  $Id: hadron_prop_s.h,v 1.4 2004-07-08 22:49:57 chulwoo Exp $
+//  $Date: 2004-07-09 05:55:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v 1.5 2004-07-09 05:55:01 chulwoo Exp $
+//  $Id: hadron_prop_s.h,v 1.5 2004-07-09 05:55:01 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v $
 //  $State: Exp $
 //
@@ -26,6 +26,7 @@ CPS_END_NAMESPACE
 #include <alg/myenum.h>
 CPS_START_NAMESPACE
 
+/*
 //```````````````````````````````````````````````````````````````
 // CLASS INHERITANCE:
 // 
@@ -38,6 +39,7 @@ CPS_START_NAMESPACE
 //	|MesonPropS| |NucleonPropS| |NLocalPropS|
 //	-----------  -------------  ------------
 //,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+*/
 //
 //
 //---------------------------------------------------------------

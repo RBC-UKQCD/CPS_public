@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgGheatBath class methods.
   
-  $Id: alg_ghb.C,v 1.5 2004-06-04 20:32:16 chulwoo Exp $
+  $Id: alg_ghb.C,v 1.6 2004-07-09 05:55:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 20:32:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.5 2004-06-04 20:32:16 chulwoo Exp $
-//  $Id: alg_ghb.C,v 1.5 2004-06-04 20:32:16 chulwoo Exp $
+//  $Date: 2004-07-09 05:55:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.6 2004-07-09 05:55:15 chulwoo Exp $
+//  $Id: alg_ghb.C,v 1.6 2004-07-09 05:55:15 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
 //  $State: Exp $
 //
@@ -41,6 +41,7 @@ CPS_START_NAMESPACE
 //Uncomment next line to switch on timing
 //#define GHB_TIMING
 
+#if TARGET == QCDSP
 static int dram_grand_seed[6] = {
   0xbeefcafe,
   0xdefaced, 
@@ -49,6 +50,7 @@ static int dram_grand_seed[6] = {
   1,		// carry bit
   1013904243    // odd const for LCG 
 };
+#endif
   
 
 //------------------------------------------------------------------
@@ -102,7 +104,7 @@ void cmhb_kernel( Float*, Float* );
 void metropolis_kernel( Float*, Float* );
 
 void AlgGheatBath::relocate(){
-#ifdef _TARTAN
+#if TARGET == QCDSP
   /*{
     // relocate assembly code into CRAM
     p2vGhb();
@@ -131,7 +133,7 @@ void AlgGheatBath::relocate(){
 }
 
 void AlgGheatBath::preserve_seed(){
-#ifdef _TARTAN
+#if TARGET == QCDSP
 /*    {
       extern    int*    el_seed_p;
       // put the "fast" seeds back into dram 

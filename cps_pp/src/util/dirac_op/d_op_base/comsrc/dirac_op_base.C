@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class methods.
   
-  $Id: dirac_op_base.C,v 1.5 2004-07-09 04:15:17 chulwoo Exp $
+  $Id: dirac_op_base.C,v 1.6 2004-07-09 05:55:16 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 04:15:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.5 2004-07-09 04:15:17 chulwoo Exp $
-//  $Id: dirac_op_base.C,v 1.5 2004-07-09 04:15:17 chulwoo Exp $
+//  $Date: 2004-07-09 05:55:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.6 2004-07-09 05:55:16 chulwoo Exp $
+//  $Id: dirac_op_base.C,v 1.6 2004-07-09 05:55:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v $
 //  $State: Exp $
 //
@@ -64,7 +64,6 @@ static void BondCond(Lattice& lat, Matrix *u_base)
         for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
           for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
             for(x[3] = 0; x[3] < nx[3]; ++x[3]) {
-		printf("%d %d %d %d %d\n",x[0],x[1],x[2],x[3],lat.GsiteOffset(x));
 	      if(x[u]==nx[u]-1) {
 	        Matrix *m = u_base+lat.GsiteOffset(x)+u;
 	        *m *= -1;

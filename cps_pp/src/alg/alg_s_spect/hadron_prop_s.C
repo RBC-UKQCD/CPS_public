@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.4 2004-06-04 21:13:59 chulwoo Exp $
-//  $Id: hadron_prop_s.C,v 1.4 2004-06-04 21:13:59 chulwoo Exp $
+//  $Date: 2004-07-09 05:55:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.5 2004-07-09 05:55:16 chulwoo Exp $
+//  $Id: hadron_prop_s.C,v 1.5 2004-07-09 05:55:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v $
 //  $State: Exp $
 //
@@ -59,8 +59,8 @@ void HadronPropS::getNeighbors(int t) {}
 HadronPropS::HadronPropS( Lattice &lattice, int num, 
 		        int direction, int srcslice, int incr )
 : lat(lattice),
-  n_props(num), 
   dir(direction),
+  n_props(num), 
   slice(srcslice),
   stride(incr)
 {

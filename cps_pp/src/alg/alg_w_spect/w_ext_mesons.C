@@ -2,7 +2,7 @@
 CPS_START_NAMESPACE
 /*!\file
 
-  $Id: w_ext_mesons.C,v 1.5 2004-06-02 09:36:39 zs Exp $
+  $Id: w_ext_mesons.C,v 1.6 2004-07-09 05:55:16 chulwoo Exp $
 */
 /* class WspectExtendedMesons
  * Thomas and Xiaodong. March 2000.
@@ -65,7 +65,7 @@ struct WMesonStateInfo
 // WspectExtendedMesons::WspectExtendedMesons(...)
 //--------------------------------------------------------------------------- 
 WspectExtendedMesons::WspectExtendedMesons(WspectArg *w_arg_p,const WspectHyperRectangle & whr, int fuzzing_index, int allocatemem)
-  : d_whr(whr),arg_p(w_arg_p), fuzzing_c_index(fuzzing_index)
+  : arg_p(w_arg_p), fuzzing_c_index(fuzzing_index), d_whr(whr)
 {
   
   //const members have been initialized in the initialization list
