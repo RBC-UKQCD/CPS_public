@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.14 2004-11-17 18:26:37 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.15 2004-11-21 21:39:59 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -20,6 +20,7 @@ AS = @AS@
 CFLAGS = @CFLAGS@
 CXXFLAGS = @CXXFLAGS@
 ASFLAGS = @ASFLAGS@
+XLCFLAGS = -qarch=pwr3 -O3 -D_XLC_
 
 INCLUDE_FLAGS = -I${BUILDDIR} -I${SRCDIR}/include @INCLUDE_FLAGS@
 
@@ -108,7 +109,10 @@ OBJS := $(notdir $(OBJS_SRC))
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.xlo:%.C
-	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@
+	cd $(BUILDDIR2)/ ; xlC -F$(BUILDDIR)/XLC.cfg -S $< ${XLCFLAGS}
+	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@ ${XLCFLAGS}
+	cd $(BUILDDIR2) ; objcopy -R .eh_frame $@
+	cd $(BUILDDIR2) ; ar  rcs ${BUILDDIR}/$(LIBNAME).xla $@
 #	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.S
@@ -134,7 +138,7 @@ depend: recurse
 endif
 
 clean: recurse
-	cd $(BUILDDIR2) ; rm -f *.o *.i *.bak
+	cd $(BUILDDIR2) ; rm -f *.o *.i *.xlo *.bak
 
 cleanlib:
 	rm -f $(BUILDDIR)/*.a

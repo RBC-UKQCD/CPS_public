@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of spin projection and trace routines.
 
-  $Id: sproj_tr.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+  $Id: sproj_tr.h,v 1.5 2004-11-21 21:40:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/sproj_tr.h,v 1.4 2004-08-18 11:57:37 zs Exp $
-//  $Id: sproj_tr.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-11-21 21:40:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/sproj_tr.h,v 1.5 2004-11-21 21:40:00 chulwoo Exp $
+//  $Id: sproj_tr.h,v 1.5 2004-11-21 21:40:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: sproj_tr.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/sproj_tr.h,v $
 //  $State: Exp $
 //
@@ -51,7 +51,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 // sprojTr* functions
 //------------------------------------------------------------------
-
+extern "C"{
 void sprojTrXm(IFloat *f, IFloat *v_plus_mu, IFloat *w, int num_blk,
                int v_plus_mu_stride, int w_stride) ;
 //!< Projection with (1 - gamma_0)
@@ -83,6 +83,8 @@ void sprojTrZp(IFloat *f, IFloat *v_plus_mu, IFloat *w, int num_blk,
 void sprojTrTp(IFloat *f, IFloat *v_plus_mu, IFloat *w, int num_blk,
                int v_plus_mu_stride, int w_stride) ;
 //!< Projection with (1 + gamma_3)
+
+}
 
 
 

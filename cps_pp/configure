@@ -3752,8 +3752,8 @@ if test "$enable_target" = "qcdoc"; then
    AR="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${AR}"
    LD="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${LD}"
    INCLUDE_FLAGS=""
-   CFLAGS="-Wall -Wa,-m405 -fno-exceptions -fno-hosted"
-   CXXFLAGS="-Wall -Wa,-m405 -fno-exceptions -fno-hosted"
+   CFLAGS="-Wall -Wa,-m405 -fno-exceptions -fno-hosted -D_GCC_"
+   CXXFLAGS="-Wall -Wa,-m405 -fno-exceptions -fno-hosted -D_GCC_"
    ASFLAGS="-m405"
    LDFLAGS=" -pg -Wa,\"-init _start\""
 

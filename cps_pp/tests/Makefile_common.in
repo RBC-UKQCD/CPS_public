@@ -1,4 +1,4 @@
-# $Id: Makefile_common.in,v 1.19 2004-10-27 16:19:50 zs Exp $
+# $Id: Makefile_common.in,v 1.20 2004-11-21 21:40:01 chulwoo Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -40,8 +40,9 @@ DFLAGS += @DFLAGS@
 .PHONY: cps clean
 
 
-LIBLIST =\
-  $(BUILDDIR)/cps.a \
+LIBLIST = $(BUILDDIR)/cps.a 
+#LIBLIST =  $(BUILDDIR)/cps.xla $(BUILDDIR)/cps.a 
+	 
 
 #
 #  targets
