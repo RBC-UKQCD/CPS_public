@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
+  $Id: random.C,v 1.18 2004-11-08 00:17:10 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-21 18:25:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
-//  $Id: random.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
+//  $Date: 2004-11-08 00:17:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.18 2004-11-08 00:17:10 chulwoo Exp $
+//  $Id: random.C,v 1.18 2004-11-08 00:17:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -37,6 +37,7 @@ CPS_START_NAMESPACE
 
 int  RandomGenerator::MBIG  = 1000000000;
 IFloat  RandomGenerator::FAC = 1.0E-09;			// 1.0/MBIG
+const int RandomGenerator::state_size;
 
 /*!
   This method must be called before the RNG is used
@@ -134,6 +135,7 @@ IFloat GaussianRandomGenerator::sigma2 = 1.0;
 
 
 LatRanGen LRG;
+const int LatRanGen::default_seed;
 //---------------------------------------------------------
 LatRanGen::LatRanGen()
 {
