@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.14 2004-09-02 17:03:38 zs Exp $
+  $Id: f_asqtad.C,v 1.15 2004-09-04 07:29:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -144,7 +144,8 @@ int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 
   Float dot = f_in -> NormSqGlbSum(e_vsize);
 
-  Float RsdCG[Nshift];
+//  Float RsdCG[Nshift];
+  Float *RsdCG = (Float *)smalloc(sizeof(Float)*Nshift);
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
@@ -157,6 +158,7 @@ int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
       asqtad.Dslash(f_out_d[s],f_out[s],CHKB_EVEN,DAG_NO);
   cg_arg->true_rsd = RsdCG[isz];
 
+  sfree(RsdCG);
   return iter;
 
 }
@@ -225,8 +227,8 @@ int Fasqtad::FmatInv(Vector *f_out, Vector *f_in,
 //              EigArg *eig_arg, 
 //              CnvFrmType cnv_frm = CNV_FRM_YES):
 //------------------------------------------------------------------
-int Fasqtad::FeigSolv(Vector **f_eigenv, Float *lambda, 
-		    Float *chirality, int *valid_eig,
+int Fasqtad::FeigSolv(Vector **f_eigenv, Float lambda[], 
+		    Float chirality[], int valid_eig[],
 		    Float **hsum,
 		    EigArg *eig_arg, 
 		    CnvFrmType cnv_frm)
@@ -420,7 +422,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
   Float dtime = -dclock();
   int nflops = 0;
   ParTrans::PTflops=0;
-  int dir[] = {6,0,2,4,7,1,3,5},dirs[N]; //mapping between ParTrans and DiracOpAsqtad
+  int dir[] = {6,0,2,4,7,1,3,5},dirs[8]; //mapping between ParTrans and DiracOpAsqtad
   Matrix *min[NUM_DIR],*mout[NUM_DIR];
   if (NUM_DIR%N !=0) ERR.General(cname,fname,"NUM_DIR(%d)is not divisible by N(%d)\n",NUM_DIR,N);
   for(int mu = 0;mu<POS_DIR;mu += N){

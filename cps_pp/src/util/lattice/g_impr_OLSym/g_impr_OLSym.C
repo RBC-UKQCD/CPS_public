@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprOLSym class methods.
 
-  $Id: g_impr_OLSym.C,v 1.7 2004-09-03 20:53:06 chulwoo Exp $
+  $Id: g_impr_OLSym.C,v 1.8 2004-09-04 07:28:53 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-03 20:53:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.7 2004-09-03 20:53:06 chulwoo Exp $
-//  $Id: g_impr_OLSym.C,v 1.7 2004-09-03 20:53:06 chulwoo Exp $
+//  $Date: 2004-09-04 07:28:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.8 2004-09-04 07:28:53 chulwoo Exp $
+//  $Id: g_impr_OLSym.C,v 1.8 2004-09-04 07:28:53 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v $
 //  $State: Exp $
 //
@@ -39,7 +39,6 @@ CPS_END_NAMESPACE
 #include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/cbuf.h>
-#include <util/error.h>
 CPS_START_NAMESPACE
 
 //-----------------------------------------------------------------------------
