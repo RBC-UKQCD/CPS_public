@@ -1,14 +1,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2005-02-18 20:18:10 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.17 2005-02-18 20:18:10 mclark Exp $
-//  $Id: asqtad_dirac.C,v 1.17 2005-02-18 20:18:10 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:22:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.18 2005-03-07 00:22:22 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.18 2005-03-07 00:22:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -44,13 +44,13 @@ void matrix::Dagger(const Float* a)
 }
 
 
-const char *uc_l_filename = CWDPREFIX("uc_l.h");
-const char *uc_nl_filename = CWDPREFIX("uc_nl.h");
-const char *Toffset_filename = CWDPREFIX("Toffset.h");
-const char *uc_l_agg_filename = CWDPREFIX("uc_l_agg.h");
-const char *uc_nl_agg_filename = CWDPREFIX("uc_nl_agg.h");
-const char *chi_l_filename = CWDPREFIX("chi_l.h");
-const char *chi_nl_filename = CWDPREFIX("chi_nl.h");
+const char *uc_l_filename = "uc_l.h";
+const char *uc_nl_filename = "uc_nl.h";
+const char *Toffset_filename = "Toffset.h";
+const char *uc_l_agg_filename = "uc_l_agg.h";
+const char *uc_nl_agg_filename = "uc_nl_agg.h";
+const char *chi_l_filename = "chi_l.h";
+const char *chi_nl_filename = "chi_nl.h";
 
 /*****************************************************************
  SIMUL switched on/off the hack CJ put in to help speed up the
@@ -64,7 +64,7 @@ temporary arraies and skip the generation of arraies.
 CPP is a switch for using C++ routine for dirac_cmv.
 *****************************************************************/
 
-void dirac_sum_acc_cpp(int s, long chi, long tmpfrm, long b);
+void asqd_sum_acc_cpp(int s, long chi, long tmpfrm, long b);
 void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long a, long tmpfrm);
 void dirac_sum2_64_cpp( int sites, long chi, long tmpfrm,long b);
 
@@ -755,7 +755,7 @@ int AsqD::SetCoord( int sg )
 //-------------------------------------------------------------------
 
 extern "C"
-void AsqD::init_g(Float *frm_p)
+void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
 {
 
   int i,j,m,n;
@@ -766,6 +766,7 @@ void AsqD::init_g(Float *frm_p)
   int x[NUM_DIR/2];
   char *cname = "DiracOpAsqtad";
   char *fname = "asqtad_dirac_init_g()";
+  printf("%s::%s\n",cname,fname);
 //  VRB.Func(cname,fname);
 
   //--------------------------------------------------------------------
@@ -782,6 +783,11 @@ void AsqD::init_g(Float *frm_p)
   Float c6 = GJP.Lepage_coeff();
 #else
 #endif
+  printf("fat=%p naik=%p naik_m=%p\n",fat,naik,naik_m);
+  if (fat_p) fat = (matrix *)fat_p;
+  if (naik_p) naik = (matrix *)naik_p;
+  if (naikm_p) naik_m = (matrix *)naikm_p;
+  printf("fat=%p naik=%p naik_m=%p\n",fat,naik,naik_m);
   frm_tmp = frm_p;
  
 
@@ -941,9 +947,7 @@ l[i] = (matrix *)(uc_l[i]);
     }
     Fat += vol;
   }
-  qfree (rcv_mat);
 
-//matrix * Naik = lat_pt->Fields(1);
 matrix * Naik = naik;
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     for (x[3] = 0; x[3] < size[3]; x[3]++)
@@ -968,7 +972,8 @@ matrix * Naik = naik;
     Naik += vol;
   }
 
-//  Naik = lat_pt->Fields(2);
+  if (naik_m){
+//  if (0){
   Naik = naik_m;
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     for (x[3] = 0; x[3] < size[3]; x[3]++)
@@ -992,26 +997,49 @@ matrix * Naik = naik;
     }
     Naik += vol;
   }
+  } else {
+    printf("USING NAIK INSTEAD OF NAIK_M\n");
+    for(i = 0;i<4;i++)
+    if (size[i]<3) {
+      printf("Asqd::size[%d](%d) <3\n",i,size[i]);
+      exit(13);
+    }
+    Naik = naik;
+    sys_cacheflush(0);
+    for ( n = 0; n < NUM_DIR/2; n++ ) {
+      SCUDirArgIR snd(Naik,snd_dirs[n],SCU_SEND,sizeof(matrix));
+      SCUDirArgIR rcv(rcv_mat,rcv_dirs[n],SCU_REC,sizeof(matrix));
+      for (x[3] = 0; x[3] < size[3]; x[3]++)
+      for (x[2] = 0; x[2] < size[2]; x[2]++)
+      for (x[1] = 0; x[1] < size[1]; x[1]++)
+      for (x[0] = 0; x[0] < size[0]; x[0]++){
+     	for (i = 0; i < 4 ; i++) coord[i] = x[i];
+  	    odd = ( coord[0] + coord[1] + coord[2] + coord[3] ) % 2;
+        if ( CoordkNN( n+4,3 ) ) {		// chi(chi-mu) off-node
+          for(int j=0;j<3;j++)
+          if(coord_knn[n%4]==(size[n%4]-1-j)){
+            snd.Addr(Naik+LexGauge(coord_knn));
+            snd.StartTrans();rcv.StartTrans();
+  	  	  snd.TransComplete();rcv.TransComplete();
+            tmp = (matrix *)(uc_nl[odd] + MATRIX_SIZE * (non_local_count_3[j][odd]+(non_local_chi_3[j]+non_local_chi)/2));
+            tmp->Dagger((const Float *)rcv_mat ); 
+  	        tmp->Negate();
+            non_local_count_3[j][odd]++;
+          }
+        }
+        else {
+          tmp = (matrix *)(uc_l[odd] + MATRIX_SIZE * (local_chi/2+local_count_3[odd]));
+          tmp->Dagger((const Float *)(Naik+LexGauge(coord_knn)) ); 
+  	      tmp->Negate();
+          local_count_3[odd]++;
+        }
+      }
+      Naik += vol;
+    }
+  }
+  qfree (rcv_mat);
 
 }
-
-//  int fd;
-//  char buf[200];
-#if 0
-  FILE *fp;
-  fp=Fopen(uc_l_filename,"w");
-  for(j=0;j<2;j++){
-    Fprintf(fp,"Float uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
-    for(i=0;i< MATRIX_SIZE * ((local_chi+ local_chi_3)/2);i++){
-      Fprintf(fp,"%0.4e, ",*(uc_l[j]+i));
-      if( i%6 == 5){
-        Fprintf(fp,"\n");
-      }
-    }
-    Fprintf(fp,"\n};\n"); 
-  }
-  Fclose(fp);
-#endif
 
 #if 1
   tmpfrm = NULL;
@@ -1090,46 +1118,6 @@ matrix * Naik = naik;
     }
   }
 
-//  gauge_agg *agg_p;
-#if 0
-  fp=Fopen(uc_l_agg_filename,"w");
-  for(j=0;j<2;j++){
-    Fprintf(fp,"struct gauge_agg uc_l_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
-    for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
-      agg_p = &(uc_l_agg[j][i]);
-      Fprintf(fp,"{%d,%d,{\n",agg_p->src,agg_p->dest);
-      for(k=0;k<18;k++){
-        Fprintf(fp,"%0.8e",agg_p->mat[k]);
-	if(k!=17){
-        Fprintf(fp,", ");
-	}
-        if( k%6 == 5){
-          Fprintf(fp,"\n");
-        }
-      }
-      Fprintf(fp,"}},\n");
-    }
-    Fprintf(fp,"\n};\n"); 
-  }
-  Fclose(fp);
-#endif
-
-
-
-#if 0
-  fp = Fopen(uc_nl_filename,"w");
-  for(j=0;j<2;j++){
-    Fprintf(fp,"Float uc_nl%d[] LOCATE(\"edramnormal\") = {\n",j); 
-    for(i=0;i< MATRIX_SIZE * ((non_local_chi+non_local_chi_3[3] )/2);i++){
-      Fprintf(fp,"%0.4e, ",*(uc_nl[j]+i));
-      if( i%6 == 5){
-        Fprintf(fp,"\n");
-      }
-    }
-    Fprintf(fp,"\n};\n"); 
-  }
-  Fclose(fp);
-#endif
 
   for(j=0;j<2;j++){
     for(i=0;i<non_local_chi*3/2;i++) num_ind[i]=0;
@@ -1172,34 +1160,11 @@ matrix * Naik = naik;
   }
   delete[] temp;
 
-#if 0
-  fp = Fopen(uc_nl_agg_filename,"w");
-  for(j=0;j<2;j++){
-    Fprintf(fp,"struct gauge_agg uc_nl_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
-    for(i=0;i< ((non_local_chi+ non_local_chi_3[3])/2);i++){
-      agg_p = &(uc_nl_agg[j][i]);
-      Fprintf(fp,"{%d,%d,{\n",agg_p->src,agg_p->dest);
-      for(k=0;k<18;k++){
-        Fprintf(fp,"%0.8e",agg_p->mat[k]);
-	if(k!=17){
-        Fprintf(fp,", ");
-	}
-        if( k%6 == 5){
-          Fprintf(fp,"\n");
-        }
-      }
-      Fprintf(fp,"}},\n");
-    }
-    Fprintf(fp,"\n};\n"); 
-  }
-  Fclose(fp);
-#endif
-
   for ( i = 0; i < 2; i++){
   Free(uc_l[i]);
   Free(uc_nl[i]);
   }
-
+  printf("init_g done\n");
   
 }
 
@@ -1589,7 +1554,7 @@ if(split) {
     dirac_sum2_64( vol/2, (long)0, (long)tmpfrm, (long)b);
   }
   else{
-    dirac_sum_acc_cpp( vol/2, (long)0, (long)tmpfrm, (long)b);
+    asqd_sum_acc_cpp( vol/2, (long)0, (long)tmpfrm, (long)b);
   }
 #ifdef PROFILE
   dtime +=dclock();

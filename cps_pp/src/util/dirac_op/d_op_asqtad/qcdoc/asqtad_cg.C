@@ -12,13 +12,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-01-13 07:46:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.2 2005-01-13 07:46:17 chulwoo Exp $
-//  $Id: asqtad_cg.C,v 1.2 2005-01-13 07:46:17 chulwoo Exp $
+//  $Date: 2005-03-07 00:22:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.3 2005-03-07 00:22:22 chulwoo Exp $
+//  $Id: asqtad_cg.C,v 1.3 2005-03-07 00:22:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_cg.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v $
 //  $State: Exp $
 //
@@ -67,13 +67,18 @@ CPS_START_NAMESPACE
 #endif
 
 extern "C" { 
-  void vaxmy(Float *scale,vector *mult,vector *sub,int ncvec);
-  void vaxmy_vxdot(Float *scale, vector *mult, vector *sub, int
+  void asqd_vaxmy(Float *scale,vector *mult,vector *sub,int ncvec);
+  void asqd_vaxmy_vxdot(Float *scale, vector *mult, vector *sub, int
 ncvec, Float *norm);
   void invcg_r_norm(Float *resa, Float *scale, Float *mult, Float *add, 
 		      int ncvec, Float *norm);
   void invcg_xp_update(Float *out1, Float *out2, Float *A, Float *B, 
 		       Float *mult, Float *add, int size);
+  void asqd_vaxpy3(Float *res,Float *scale,Float *mult,Float *add, int
+ncvec);
+  void asqd_vaxpy3_norm(Float *res,Float *scale,Float *mult,Float *add,
+int ncvec,Float *norm);
+
 }
 
 // The granularity used in the interleaving
@@ -82,7 +87,11 @@ ncvec, Float *norm);
 void AsqD::MdagM(Float *mass_sq, Float *out, Float *in, 
  Float *dot_prd){
  long nflops = 1146*vol;
-
+ static int called=0;
+ if (!called){
+ printf("mass_sq=%e\n",mass_sq);
+  called=1;
+ }
 #undef PROFILE
 #ifdef PROFILE
   struct timeval start,end;
@@ -94,13 +103,13 @@ void AsqD::MdagM(Float *mass_sq, Float *out, Float *in,
 
 
   if( dot_prd !=0 ){
-	vaxmy_vxdot(mass_sq,in,out,f_size_cb/6,dot_prd);
+	asqd_vaxmy_vxdot(mass_sq,in,out,f_size_cb/6,dot_prd);
 //    CGflOps +=f_size_cb*4;
     nflops +=f_size_cb*4;
   } else {
 //    CGflops +=f_size_cb*2;
     nflops +=f_size_cb*2;
-    vaxmy(mass_sq,in,out,f_size_cb/6);
+    asqd_vaxmy(mass_sq,in,out,f_size_cb/6);
   }
 
 #ifdef PROFILE
@@ -146,6 +155,16 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
   int i, j;
   char *fname = "InvCg(V*,V*,F,F*)";
 
+  printf("AsqD::InvCG\n");
+  Float *tmp_f;
+  tmp_f = (Float *)in;
+  printf("in[0]=%0.14e\n",*tmp_f);
+  tmp_f = (Float *)fat;
+  printf("Fat[0]=%0.14e\n",*tmp_f);
+  tmp_f = (Float *)naik;
+  printf("Naik[0]=%0.14e\n",*tmp_f);
+// Flash the LED and then turn it off
+// Flash the LED and then turn it off
 // Flash the LED and then turn it off
 //------------------------------------------------------------------
 //  VRB.LedFlash(cname,fname,3);
@@ -272,6 +291,7 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
 //------------------------------------------------------------------
   // Mmp = MatPcDagMatPc * sol
   Float mass_sq = 4*inv_arg->mass*inv_arg->mass;
+  printf("mass_sq=%e\n",mass_sq);
   MdagM(&mass_sq,mmp, sol);
 
   // res = src
@@ -385,6 +405,7 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
 
     // if( |res|^2 <= stp_cnd ) we are done
 //    VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", itr, Float(res_norm_sq_cur));
+//    printf("%s::%s:|res[%d]|^2 = %e\n", cname,fname,itr, Float(res_norm_sq_cur));
     if(res_norm_sq_cur <= stp_cnd) break;
 
   }
@@ -420,7 +441,11 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
   if(true_res != 0){
     *true_res = tmp;
   }
-//  VRB.Result(cname,fname, "True |res| / |src| = %e, iter = %d\n", Float(tmp), itr+1);
+  tmp_f = (Float *)sol;
+  printf("out[0]=%0.14e\n",*tmp_f);
+  tmp_f = (Float *)mmp;
+  printf("mmp[0]=%0.14e\n",*tmp_f);
+  printf("%s::%s: True |res| / |src| = %e, iter = %d\n", cname,fname, Float(tmp), itr+1);
 
 #ifdef REPRODUCE_TEST 
   }
@@ -449,6 +474,7 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
 //  VRB.LedOn(cname,fname);
 
   // Return number of iterations
+  printf("AsqD::InvCG\n");
   return itr+1;
 
 }

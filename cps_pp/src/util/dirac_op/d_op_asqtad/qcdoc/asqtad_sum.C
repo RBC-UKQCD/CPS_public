@@ -1,4 +1,4 @@
-#include<config.h>
+//#include<config.h>
 #include<util/asqtad_int.h>
 
 typedef double Double64;
@@ -53,7 +53,7 @@ void AsqD::Sum(Float * float_p)
   for(int i = 0; i < ndir; ++i) 
   if (NP[i] >1) {
       int pos = coor[i];
-//printf("coor[%d]=%d\n",i,coor);
+//printf("coor[%d]=%d\n",i,coor[i]);
       *transmit_buf = gsum_buf[pos]= tmp_sum;
 
       for (int itmp = 1; itmp < NP[i]; itmp++) {
@@ -73,5 +73,3 @@ void AsqD::Sum(Float * float_p)
 
 }
 
-
-CPS_END_NAMESPACE

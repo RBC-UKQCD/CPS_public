@@ -92,7 +92,6 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   // Allocate memory for the temporary fermion vector frm_tmp.
   //----------------------------------------------------------------
   frm_tmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
-  asqtad_dirac_init_g((IFloat *)frm_tmp);
 
   if(frm_tmp == 0){
     frm_tmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
@@ -102,6 +101,7 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
     ERR.Pointer(cname,fname, "frm_tmp");
   VRB.Smalloc(cname,fname, "frm_tmp", 
 	      frm_tmp, f_size_cb * sizeof(Float));
+  asqtad_dirac_init_g((IFloat *)frm_tmp);
 
 
   //----------------------------------------------------------------
@@ -391,6 +391,11 @@ int DiracOpAsqtad::MatInv(Vector *out,
   IFloat *k_o = k_e+f_size_cb;
 
   Vector *tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
+#define TEST_ASQD
+#ifdef TEST_ASQD
+  Vector *out2 = (Vector *) smalloc(f_size_cb * sizeof(Float));
+  memcpy( out2,out,f_size_cb * sizeof(Float));
+#endif
   if(tmp == 0)
     ERR.Pointer(cname,fname, "tmp");
   VRB.Smalloc(cname,fname, "tmp", 
@@ -411,6 +416,18 @@ int DiracOpAsqtad::MatInv(Vector *out,
   gettimeofday(&end,NULL);
   printf("DiracOpAsqtad::InvCg:: ");
   print_flops(1187*iter*GJP.VolNodeSites(),&start,&end);
+#endif
+
+#ifdef TEST_ASQD
+  InvArg inv_arg;
+  inv_arg.mass = dirac_arg->mass; 
+  inv_arg.stop_rsd = dirac_arg->stop_rsd;
+  inv_arg.niter = dirac_arg->max_num_iter;
+  inv_arg.evenodd = 0;
+  printf("asqd.InvCg\n");
+  iter = asqd.InvCg(&inv_arg,(Float *)out2,(Float *)tmp,true_res);
+  printf("asqd.InvCg\n");
+  printf("out=%0.15e out2=%0.15e\n",*((Float*)out),*((Float*)out2));
 #endif
 
   // calculate odd solution
