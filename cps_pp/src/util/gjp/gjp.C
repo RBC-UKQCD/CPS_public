@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.14 2004-08-18 11:58:02 zs Exp $
+  $Id: gjp.C,v 1.15 2004-08-18 13:10:01 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.14 2004-08-18 11:58:02 zs Exp $
-//  $Id: gjp.C,v 1.14 2004-08-18 11:58:02 zs Exp $
+//  $Date: 2004-08-18 13:10:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.15 2004-08-18 13:10:01 zs Exp $
+//  $Id: gjp.C,v 1.15 2004-08-18 13:10:01 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -264,18 +264,19 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
               t_nodes *
               vol_node_sites;
 
-  // Set the "coordinates" of the node
+  // Set the coordinates of the node
   //----------------------------------------------------------------
   x_node_coor = 0;
   y_node_coor = 0;
   z_node_coor = 0;
   t_node_coor = 0;
   s_node_coor = 0;
-#if TARGET == QCDSP
+#ifdef PARALLEL
   if(x_nodes != 1) x_node_coor = CoorX() % x_nodes;
   if(y_nodes != 1) y_node_coor = CoorY() % y_nodes;
   if(z_nodes != 1) z_node_coor = CoorZ() % z_nodes;
   if(t_nodes != 1) t_node_coor = CoorT() % t_nodes;
+#if TARGET == QCDSP
   if(s_nodes != 1) {
     if (s_axis == SCU_X) s_node_coor = CoorX() % s_nodes;
     if (s_axis == SCU_Y) s_node_coor = CoorY() % s_nodes;
@@ -283,11 +284,8 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
     if (s_axis == SCU_T) s_node_coor = CoorT() % s_nodes;
   }
 #else
-  if(x_nodes != 1) x_node_coor = CoorX() % x_nodes;
-  if(y_nodes != 1) y_node_coor = CoorY() % y_nodes;
-  if(z_nodes != 1) z_node_coor = CoorZ() % z_nodes;
-  if(t_nodes != 1) t_node_coor = CoorT() % t_nodes;
   if(s_nodes != 1) s_node_coor = CoorS() % s_nodes;
+#endif
 #endif
 
   // Set the static arrays gjp_local_axis[5], gjp_scu_dir[10],
