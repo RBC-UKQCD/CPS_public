@@ -3,18 +3,24 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStag class methods.
 
-  $Id: d_op_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: d_op_stag.C,v 1.3 2003-08-29 21:00:24 mike Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: d_op_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Author: mike $
+//  $Date: 2003-08-29 21:00:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.3 2003-08-29 21:00:24 mike Exp $
+//  $Id: d_op_stag.C,v 1.3 2003-08-29 21:00:24 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.7  2002/03/11 22:27:05  anj
 //  This should now be the correct, fully merged code from our two versions. Anj
 //
@@ -46,7 +52,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: d_op_stag.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v $
 //  $State: Exp $
 //
@@ -72,6 +78,7 @@ CPS_END_NAMESPACE
 #include <util/stag.h>
 #include <comms/cbuf.h>
 #include <comms/glb.h>
+#include <math.h>
 CPS_START_NAMESPACE
 
 
@@ -112,7 +119,6 @@ DiracOpStag::DiracOpStag(Lattice & latt,
   cname = "DiracOpStag";
   char *fname = "DiracOpStag(L&,V*,V*,CgArg*,CnvFrmType)";
   VRB.Func(cname,fname);
-
 
   //----------------------------------------------------------------
   // Do the necessary conversions
@@ -379,18 +385,54 @@ int DiracOpStag::MatInv(PreserveType prs_in)
 void DiracOpStag::RitzMat(Vector *out, Vector *in) {
   char *fname = "RitzMat(V*,V*)";
   VRB.Func(cname,fname);
+  Float *dot=0;
 
-  Vector *tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
-  if(tmp == 0)
+  /*
+    Vector *tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
+    if(tmp == 0)
     ERR.Pointer(cname,fname, "tmp");
-  VRB.Smalloc(cname,fname, "tmp", tmp, f_size_cb * sizeof(Float));
+    VRB.Smalloc(cname,fname, "tmp", tmp, f_size_cb * sizeof(Float));
+    
+    Dslash(tmp, in, CHKB_EVEN, DAG_NO);
+    Dslash(out, tmp, CHKB_ODD, DAG_YES);
+    
+    out->VecTimesEquFloat(0.25, f_size_cb);
+    
+    sfree(tmp);
+  */
+  Float mass = dirac_arg->mass;
+  Float c = 1.0/(64.0 + 4.0*mass*mass);
 
-  Dslash(tmp, in, CHKB_EVEN, DAG_NO);
-  Dslash(out, tmp, CHKB_ODD, DAG_YES);
+  switch(dirac_arg->RitzMatOper)
+    {
+    case MATDAG_MAT:
+      MatPcDagMatPc(out, in, dot);
+      break;
 
-  out->VecTimesEquFloat(0.25, f_size_cb);
+    case MATPCDAG_MATPC:
+      MatPcDagMatPc(out, in, dot);
+      break;
+      
+    case NEG_MATDAG_MAT:
+      MatPcDagMatPc(out, in, dot);
+      out->VecNegative(out, RitzLatSize());
+      break;
+      
+    case MATDAG_MAT_NORM:
+      MatPcDagMatPc(out, in, dot);
+      out->VecTimesEquFloat(c,RitzLatSize());
+      break;
 
-  sfree(tmp);
+    case NEG_MATDAG_MAT_NORM:
+      MatPcDagMatPc(out, in, dot);
+      out->VecTimesEquFloat(-c,RitzLatSize());
+      break;
+
+    default:
+      ERR.General(cname,fname,"RitzMatOper %d not implemented",
+		  dirac_arg->RitzMatOper);
+    }
+  
 }
 
 //------------------------------------------------------------------
