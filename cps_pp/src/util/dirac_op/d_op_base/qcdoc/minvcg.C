@@ -2,11 +2,11 @@
 
 #include <config.h>
 CPS_START_NAMESPACE
- /*! \file
-   \brief  Definition of DiracOpBase class multishift CG solver method.
+/*! \file
+  \brief  Definition of DiracOpBase class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.10 2004-12-21 19:02:39 chulwoo Exp $
- */
+  $Id: minvcg.C,v 1.11 2005-02-18 20:18:11 mclark Exp $
+*/
 
 CPS_END_NAMESPACE
 #include <util/dirac_op.h>
@@ -35,22 +35,22 @@ extern "C" {
 }
 
 //! Multishift CG invertor used in RHMC.
-int DiracOp::MInvCG(Vector *psi_slow, Vector *chi, Float chi_norm, Float *mass, 
+int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass, 
 		    int Nmass, int isz, Float *RsdCG, MultiShiftSolveType type,
-		    Float *alpha_slow)
+		    Float *alpha)
 {
   char *fname = "MInvCG(V*,V**,...)";
   VRB.Func(cname,fname);
   
-// Flash the LED and then turn it off
-//------------------------------------------------------------------
+  // Flash the LED and then turn it off
+  //------------------------------------------------------------------
   VRB.LedFlash(cname,fname,3);
   VRB.LedOff(cname,fname);
   VRB.Func(cname,fname);
 
 
-// Print out input parameters
-//------------------------------------------------------------------
+  // Print out input parameters
+  //------------------------------------------------------------------
   VRB.Input(cname,fname,
 	    "number of shifts = %d\n",Nmass);
   VRB.Input(cname,fname,
@@ -62,63 +62,60 @@ int DiracOp::MInvCG(Vector *psi_slow, Vector *chi, Float chi_norm, Float *mass,
   VRB.Input(cname,fname,
 	    "src_norm_sq = %e\n",IFloat(chi_norm));
 
-//------------------------------------------------------------------
-// Initializations
-//------------------------------------------------------------------
+  //------------------------------------------------------------------
+  // Initializations
+  //------------------------------------------------------------------
 
   int iz, k, s;
-  int n_vec;
+  int f_size;
   if(lat.Fclass() == F_CLASS_CLOVER)
-      n_vec = GJP.VolNodeSites() / 2;
+    f_size = lat.FsiteSize()*GJP.VolNodeSites() / 2;
   else
-      n_vec = GJP.VolNodeSites() / (lat.FchkbEvl()+1);
-  const int f_size = n_vec * lat.FsiteSize();
-  
+    f_size = lat.FsiteSize()*GJP.VolNodeSites() / (lat.FchkbEvl()+1);
+
   Vector *r = (Vector *)fmalloc(f_size * sizeof(Float),
 				cname,fname, "r");
    
   Vector *Ap = (Vector *)fmalloc(f_size * sizeof(Float),
 				 cname,fname, "Ap");
     
-  Vector **p = (Vector **)fmalloc(Nmass * sizeof(Vector*),
+  Vector **p = (Vector **)smalloc(Nmass * sizeof(Vector*),
 				  cname,fname, "p");
 
-  Vector **psi = (Vector **) fmalloc(Nmass * sizeof(Vector*),
+  Vector **psi = (Vector **)smalloc(Nmass * sizeof(Vector*),
 				     cname,fname, "psi");
   
-  if (type == SINGLE) {
-      *psi = (Vector*)fmalloc(f_size * sizeof(Float),
-			      cname,fname, "psi[0]");
-      psi[0] -> CopyVec(psi_slow,f_size);
-  }
-
   for (s=0; s<Nmass; s++) {
-      *(p+s) = (Vector*)fmalloc(f_size * sizeof(Float),
-				cname,fname, "p[s]");
-      if (type == MULTI) {
-	  *(psi+s) = (Vector*)fmalloc(f_size * sizeof(Float),
-				      cname,fname, "psi[s]");
-	  psi[s] -> CopyVec(psi_slow +n_vec*s, f_size);
-      }
+    p[s] = (Vector*)fmalloc(f_size * sizeof(Float),
+			    cname,fname, "p[s]");
+    if (p[s] == 0) ERR.Pointer(cname,fname,"p[s]");
+
+    if (type == MULTI || s==0) {
+      psi[s] = (Vector*)fmalloc(f_size * sizeof(Float),
+				cname,fname, "psi[s]");
+      if (psi[s] == 0) ERR.Pointer(cname,fname,"psi[s]");
+      if (type == MULTI) psi[s] -> VecTimesEquFloat(0.0,f_size);
+      else psi[s] -> CopyVec(psi_slow[s],f_size);
+    }
 
   }
   
   int convP, converged;
-  int *convsP = (int*)qalloc(0,Nmass*sizeof(int));
+  int *convsP = (int*)smalloc(Nmass*sizeof(int));
   if(convsP == 0) ERR.Pointer(cname,fname, "convsP");
   VRB.Smalloc(cname,fname,"convsP", convsP, Nmass * sizeof(int));
 
   Float a, as, b, bp;
-  Float *bs = (Float*)qalloc(0,Nmass * sizeof(Float));
+  Float *bs = (Float*)smalloc(Nmass * sizeof(Float));
   if(bs == 0) ERR.Pointer(cname,fname, "bs");
   VRB.Smalloc(cname,fname,"bs", bs, Nmass * sizeof(Float));
 
-  Float **z = (Float**)qalloc(0,2 * sizeof(Float*));
+  Float **z = (Float**)smalloc(2 * sizeof(Float*));
   if(z == 0) ERR.Pointer(cname,fname, "z");
   VRB.Smalloc(cname,fname,"z", z, 2 * sizeof(Float*));
 
   for (s=0; s<2; s++) {
-    *(z+s) = (Float*)qalloc(0,Nmass * sizeof(Float));
+    *(z+s) = (Float*)smalloc(Nmass * sizeof(Float));
     if (*(z+s) == 0) ERR.Pointer(cname,fname, "z[s]");
     VRB.Smalloc(cname,fname,"z[s]", z[s], Nmass * sizeof(Float));
   }
@@ -126,28 +123,19 @@ int DiracOp::MInvCG(Vector *psi_slow, Vector *chi, Float chi_norm, Float *mass,
   Float css, ztmp;  
   Float c, cp, d;
   
-  Float *rsd_sq = (Float*)qalloc(0,Nmass*sizeof(Float)); 
+  Float *rsd_sq = (Float*)smalloc(Nmass*sizeof(Float)); 
   if(rsd_sq == 0) ERR.Pointer(cname,fname, "rsd_sq");
   VRB.Smalloc(cname,fname,"rsd_sq", rsd_sq, Nmass * sizeof(Float));
 
-  Float *rsdcg_sq = (Float*)qalloc(0,Nmass*sizeof(Float)); 
+  Float *rsdcg_sq = (Float*)smalloc(Nmass*sizeof(Float)); 
   if(rsdcg_sq == 0) ERR.Pointer(cname,fname, "rsdcg_sq");
   VRB.Smalloc(cname,fname,"rsdcg_sq", rsdcg_sq, Nmass * sizeof(Float));
   
-  Float *at = (Float*)qalloc(0,Nmass*sizeof(Float));
+  Float *at = (Float*)smalloc(Nmass*sizeof(Float));
   if (at == 0) ERR.Pointer(cname,fname, "at");
   VRB.Smalloc(cname,fname,"at", at, Nmass * sizeof(Float));
 
-  Float *alpha, *b_tmp;
-  if (type == SINGLE) {
-    alpha = (Float*)qalloc(0,Nmass*sizeof(Float));
-    if (alpha==0) ERR.Pointer(cname,fname, "alpha");
-    VRB.Smalloc(cname,fname,"alpha", alpha, Nmass * sizeof(Float));
-    for (s=0; s<Nmass; s++) alpha[s] = alpha_slow[s];
-  }
-
-  b_tmp = (Float*)qalloc(0,sizeof(Float));
-  if (b_tmp==0) ERR.Pointer(cname,fname, "b_tmp");
+  Float b_tmp;
 
   // If source norm = 0, solution must be 0
   if (chi_norm == 0.0) {
@@ -192,12 +180,13 @@ int DiracOp::MInvCG(Vector *psi_slow, Vector *chi, Float chi_norm, Float *mass,
   // c = |r[1]|^2
   vaxpy_norm(&b,Ap,r,f_size/6,&c);
   DiracOpGlbSum(&c);
+  VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", 0, IFloat(c));
 
   // Psi[1] -= b[0] p[0] =- b[0] chi;
   if (type == SINGLE) {
-    *b_tmp = 0;
-    for (s=0; s<Nmass; s++) *b_tmp += alpha[s]*bs[s];
-    vaxpy(b_tmp,chi,psi[0],f_size/6);
+    b_tmp = 0;
+    for (s=0; s<Nmass; s++) b_tmp += alpha[s]*bs[s];
+    vaxpy(&b_tmp,chi,psi[0],f_size/6);
   } else {
     for (s=0; s<Nmass; s++) vaxpy(bs+s,chi,psi[s],f_size/6);
   }
@@ -243,7 +232,7 @@ int DiracOp::MInvCG(Vector *psi_slow, Vector *chi, Float chi_norm, Float *mass,
     if (mass[isz] > 0) {
       MatPcDagMatPc(Ap,p[isz]);
       vaxpy_vxdot(mass+isz,p[isz],Ap,f_size/6,&d);
-      CGflops += f_size*2;
+      CGflops += f_size*4;
     } else {
       MatPcDagMatPc(Ap,p[isz],&d);
     }
@@ -265,22 +254,23 @@ int DiracOp::MInvCG(Vector *psi_slow, Vector *chi, Float chi_norm, Float *mass,
     
     // r[k+1] += b[k] A.p[k]
     // c = |r[k]|**2
-    *b_tmp = b*at[isz];
-    vaxpy_norm(b_tmp,Ap,r,f_size/6,&c);
+    b_tmp = b*at[isz];
+    vaxpy_norm(&b_tmp,Ap,r,f_size/6,&c);
     CGflops += f_size*4;
     DiracOpGlbSum(&c);
+    VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", k, IFloat(c));
 
     // Psi[k+1] -= b[k] p[k]
     if (type == SINGLE)
       for (s=0; s<Nmass_loop; s++) {
-	*b_tmp = bs[s]*alpha[s]*at[s];
-	vaxpy(b_tmp,p[s],psi[0],f_size/6);
+	b_tmp = bs[s]*alpha[s]*at[s];
+	vaxpy(&b_tmp,p[s],psi[0],f_size/6);
 	CGflops += f_size*2;
       }
     else 
       for (s=0; s<Nmass_loop; s++) {
-	*b_tmp = bs[s]*at[s];
-	vaxpy(b_tmp,p[s],psi[s],f_size/6);
+	b_tmp = bs[s]*at[s];
+	vaxpy(&b_tmp,p[s],psi[s],f_size/6);
 	CGflops += f_size*2;
       }    
 
@@ -328,44 +318,38 @@ int DiracOp::MInvCG(Vector *psi_slow, Vector *chi, Float chi_norm, Float *mass,
   for (s=0; s<Nmass; s++) {
     if (type == MULTI || s==0) {
       // Copy solution vectors from fast memory to DDR
-      (psi_slow +n_vec*s) -> CopyVec(psi[s],f_size);
-      VRB.Sfree(cname,fname,"psi[s]",*(psi+s));
-      qfree(*(psi+s));
+      psi_slow[s] -> CopyVec(psi[s],f_size);
+      VRB.Sfree(cname,fname,"psi[s]",psi[s]);
+      ffree(psi[s]);
     }
-    VRB.Sfree(cname,fname,"p[s]",*(p+s));
-    qfree(*(p+s));
+    VRB.Sfree(cname,fname,"p[s]",p[s]);
+    ffree(p[s]);
   }
   
   VRB.Sfree(cname,fname,"p",p);
-  qfree(p);
+  sfree(p);
   VRB.Sfree(cname,fname,"psi",psi);
-  qfree(psi);
+  sfree(psi);
   VRB.Sfree(cname,fname,"Ap",Ap);
-  qfree(Ap);
+  ffree(Ap);
   VRB.Sfree(cname,fname,"r",r);
-  qfree(r);
+  ffree(r);
   VRB.Sfree(cname,fname,"bs",bs);
-  qfree(bs);
-  VRB.Sfree(cname,fname,"b_tmp",b_tmp);
-  qfree(b_tmp);
+  sfree(bs);
   VRB.Sfree(cname,fname,"z[1]",z[1]);
-  qfree(*(z+1));
+  sfree(*(z+1));
   VRB.Sfree(cname,fname,"z[0]",z[0]);
-  qfree(*z);
+  sfree(*z);
   VRB.Sfree(cname,fname,"z",z);
-  qfree(z);
+  sfree(z);
   VRB.Sfree(cname,fname,"convsP",convsP);
-  qfree(convsP);
+  sfree(convsP);
   VRB.Sfree(cname,fname,"rsdcg_sq",rsdcg_sq);
-  qfree(rsdcg_sq);
+  sfree(rsdcg_sq);
   VRB.Sfree(cname,fname,"rsd_sq",rsd_sq);
-  qfree(rsd_sq);
+  sfree(rsd_sq);
   VRB.Sfree(cname,fname,"at",at);
-  qfree(at);
-  if (type == SINGLE) {
-    VRB.Sfree(cname,fname,"alpha",alpha);
-    qfree(alpha);
-  }
+  sfree(at);
   
   return k;
 }

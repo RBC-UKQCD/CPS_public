@@ -47,8 +47,7 @@ FstagTypes::FstagTypes()
     e_vsize = VECT_LEN/2;
     for(int i = 0; i < 4; ++i) e_vsize *= node_sites[i];
 
-    f_tmp = (Vector *)smalloc(e_vsize*sizeof(Float));
-    VRB.Smalloc(cname,fname, "f_tmp", f_tmp, e_vsize * sizeof(Float));
+    f_tmp = (Vector *)smalloc(e_vsize*sizeof(Float), cname, fname, "f_tmp");
 
     xv[0] = node_sites[3]/2;
     xv[1] = (node_sites[3]*node_sites[0])/2;
@@ -177,8 +176,7 @@ FstagTypes::~FstagTypes()
 {
   char *fname = "~FstagTypes()";
   VRB.Func(cname,fname);
-  VRB.Sfree(cname,fname,"f_tmp",f_tmp);
-  sfree(f_tmp);
+  sfree(f_tmp, cname, fname, "f_tmp");
 }
 
 CPS_END_NAMESPACE

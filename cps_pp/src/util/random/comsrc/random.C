@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.21 2005-01-19 03:08:33 chulwoo Exp $
+  $Id: random.C,v 1.22 2005-02-18 20:18:16 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2005-01-19 03:08:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.21 2005-01-19 03:08:33 chulwoo Exp $
-//  $Id: random.C,v 1.21 2005-01-19 03:08:33 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 20:18:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.22 2005-02-18 20:18:16 mclark Exp $
+//  $Id: random.C,v 1.22 2005-02-18 20:18:16 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -166,7 +166,7 @@ void LatRanGen::Initialize()
   n_rgen = n_rgen_4d = GJP.VolNodeSites()/16;
 
   if (GJP.SnodeSites()>=2)
-  n_rgen = GJP.VolNodeSites()*GJP.SnodeSites() / 32;
+    n_rgen = GJP.VolNodeSites()*GJP.SnodeSites() / 32;
 //  VRB.Flow(cname,fname,"n_rgen=%d\n",n_rgen);
 
   
@@ -466,7 +466,7 @@ void LatRanGen::GetState(unsigned int *state,
   \param s The state to assigned to the RNG on an assigned site.
 */
 void LatRanGen::SetState(const unsigned int * s,
-FermionFieldDimension frm_dim) {
+			 FermionFieldDimension frm_dim) {
 
    // ugran[rgen_pos].RestoreSeeds(s);
     if (frm_dim == FIVE_D)
@@ -479,10 +479,9 @@ FermionFieldDimension frm_dim) {
 /*!
   \return The total number of RNG states on the local lattice.
 */
-int LatRanGen::NStates() const{
-
-    return n_rgen;
-
+int LatRanGen::NStates(FermionFieldDimension frm_dim) const{
+  if (frm_dim == FOUR_D) return n_rgen_4d;
+  else return n_rgen;
 }
 
 /*!
@@ -513,7 +512,7 @@ void LatRanGen::GetStates(unsigned int **s,
     if (frm_dim == FIVE_D)
     for(int h=0; h<n_rgen; h++) ugran[h].StoreSeeds(s[h]);
     else
-    for(int h=0; h<n_rgen; h++) ugran_4d[h].StoreSeeds(s[h]);
+    for(int h=0; h<n_rgen_4d; h++) ugran_4d[h].StoreSeeds(s[h]);
 
 }
 

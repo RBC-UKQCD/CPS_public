@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOp class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.8 2004-12-21 19:02:39 chulwoo Exp $
+   $Id: minvcg.C,v 1.9 2005-02-18 20:18:11 mclark Exp $
  */
 
 CPS_END_NAMESPACE
@@ -41,7 +41,7 @@ CPS_START_NAMESPACE
 
   \return The number of iterations performed.
  */
-int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass, 
+int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, 
 		    int Nmass, int isz, Float *RsdCG,
 		    MultiShiftSolveType type, Float *alpha)
 {
@@ -73,29 +73,23 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
 //------------------------------------------------------------------
 
   int iz, k, s;
-  int n_vec;
+  int f_size;
 
   if(lat.Fclass() == F_CLASS_CLOVER)
-      n_vec = GJP.VolNodeSites() / 2;
+    f_size = lat.FsiteSize()*GJP.VolNodeSites() / 2;
   else
-      n_vec = GJP.VolNodeSites() / (lat.FchkbEvl()+1);
-  const int f_size = n_vec * lat.FsiteSize();
+    f_size = lat.FsiteSize()*GJP.VolNodeSites() / (lat.FchkbEvl()+1);
+
+  Vector *r = (Vector*)smalloc(f_size*sizeof(Float),cname,fname,"r");
   
+  Vector *Ap = (Vector*)smalloc(f_size*sizeof(Float),cname,fname,"Ap");
   
-  
-  Vector *r = (Vector *)smalloc(f_size * sizeof(Float),
-				cname,fname,"r");
-  
-  Vector *Ap = (Vector *)smalloc(f_size * sizeof(Float),
-				 cname,fname, "Ap");
-  
-  Vector **p = (Vector **)smalloc(Nmass * sizeof(Vector*),
-				  cname,fname, "p");
+  Vector **p = (Vector**)smalloc(Nmass*sizeof(Vector*),cname,fname,"p");
+
   for (s=0; s<Nmass; s++) 
-      *(p+s) = (Vector*)smalloc(f_size * sizeof(Float),
-				cname,fname, "p[i]");
-  
-  
+    *(p+s) = (Vector*)smalloc(f_size * sizeof(Float),
+			      cname,fname, "p[i]");
+    
   int convP;
   int *convsP = (int*)smalloc(Nmass*sizeof(int));
   
@@ -113,8 +107,9 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
 
   // If source norm = 0, solution must be 0
   if (chi_norm == 0.0) {
-    if (type == SINGLE) psi->VecTimesEquFloat(0.0,f_size);
-    else for (k=0; k<Nmass; k++) (psi + n_vec*k)->VecTimesEquFloat(0.0,f_size);
+    if (type == SINGLE) psi[0]->VecTimesEquFloat(0.0,f_size);
+    else for (s=0; s<Nmass; s++)
+      psi[s]->VecTimesEquFloat(0.0,f_size);
     return 0;
   }
   
@@ -163,10 +158,11 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
   if (type == SINGLE) {
     for (s=0; s<Nmass; s++) {
       b_tmp = bs[s] * alpha[s];
-      psi -> FTimesV1PlusV2(-b_tmp,chi,psi,f_size);
+      psi[0] -> FTimesV1PlusV2(-b_tmp,chi,psi[0],f_size);
     }
   } else {
-    for (s=0; s<Nmass; s++) (psi + n_vec*s)-> FTimesV1PlusV2(-bs[s],chi,psi+n_vec*s,f_size);  
+    for (s=0; s<Nmass; s++) 
+      psi[s]-> FTimesV1PlusV2(-bs[s],chi,psi[s],f_size);  
   }
 
   // Check the convergance of the first solution
@@ -182,7 +178,7 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
   for (k=1; k<=dirac_arg->max_num_iter && !convP; k++) {
     // a[k+1] = |r[k]**2/ |r[k-1]|**2
     a = c/cp;
-  VRB.Flow(cname,fname,"a =%e\n",a);
+    VRB.Flow(cname,fname,"a =%e\n",a);
 
     // p[k+1] = r[k+1] + a[k+1] p[k]
     //   Compute the shifted as
@@ -196,8 +192,8 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
 	p[s] -> VecTimesEquFloat(as,f_size);	
 	p[s] -> FTimesV1PlusV2(z[iz][s],r,p[s],f_size);	
       }
-    IFloat *Ap_tmp = (IFloat *)p[s];
-  VRB.Flow(cname,fname,"isz = %d as = %e p[%d] =%e\n",isz, as, s,*Ap_tmp);
+      IFloat *Ap_tmp = (IFloat *)p[s];
+      VRB.Flow(cname,fname,"isz = %d as = %e p[%d] =%e\n",isz, as, s,*Ap_tmp);
     }
     
     // cp = |r[k]**2
@@ -213,7 +209,7 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
       DiracOpGlbSum(&d);
     }
     IFloat *Ap_tmp = (IFloat *)Ap;
-  VRB.Flow(cname,fname,"Ap =%e  |b[%d]^2 =%e\n",*Ap_tmp,k,d);
+    VRB.Flow(cname,fname,"Ap =%e  |b[%d]^2 =%e\n",*Ap_tmp,k,d);
 
     bp = b;
     b = -cp/d;
@@ -242,12 +238,12 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
     if (type == SINGLE)
       for (s=0; s<Nmass; s++) {
 	if (convsP[s]) continue;
-	psi->FTimesV1PlusV2(-bs[s]*alpha[s],p[s],psi,f_size);
+	psi[0]->FTimesV1PlusV2(-bs[s]*alpha[s],p[s],psi[0],f_size);
       }
     else
       for (s=0; s<Nmass; s++) {
 	if (convsP[s]) continue;
-	(psi + n_vec*s)->FTimesV1PlusV2(-bs[s],p[s],psi+n_vec*s,f_size);
+	psi[s]->FTimesV1PlusV2(-bs[s],p[s],psi[s],f_size);
       }
     
     // if |psi[k+1] -psi[k]| <= rsdCG |psi[k+1]| then return

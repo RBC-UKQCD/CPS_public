@@ -1,14 +1,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2005-01-13 07:46:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.16 2005-01-13 07:46:17 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.16 2005-01-13 07:46:17 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 20:18:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.17 2005-02-18 20:18:10 mclark Exp $
+//  $Id: asqtad_dirac.C,v 1.17 2005-02-18 20:18:10 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -1438,6 +1438,7 @@ void AsqD::dirac(Float* b, Float* a, int a_odd, int add_flag)
   //make sure spinor field is in main memory before starting transfers
 
   SCUmulti_1[odd].StartTrans();
+  SCUmulti_1[odd].TransComplete();
 
 #undef PROFILE
 #ifdef PROFILE
@@ -1468,11 +1469,12 @@ void AsqD::dirac(Float* b, Float* a, int a_odd, int add_flag)
   print_flops(num_flops,&start,&end);
 #endif
 
-  SCUmulti_1[odd].TransComplete();
 
 if(split) {
 
   SCUmulti_2[odd].StartTrans();
+  SCUmulti_2[odd].TransComplete();
+
 
 #undef PROFILE
 #ifdef PROFILE
@@ -1491,9 +1493,8 @@ if(split) {
   print_flops(num_flops,&start,&end);
 #endif
 
-  SCUmulti_2[odd].TransComplete();
-
   SCUmulti[odd].StartTrans();
+  SCUmulti[odd].TransComplete();
 
 #ifdef PROFILE
   num_flops = 33*(non_local_chi);
@@ -1510,6 +1511,7 @@ if(split) {
 } else {
 
   SCUmulti[odd].StartTrans();
+  SCUmulti[odd].TransComplete();
 
   //-----------------------------------------------------------------
   //do the computations involving "chi" non-local spinors
@@ -1534,7 +1536,6 @@ if(split) {
   gettimeofday(&end,NULL);
   print_flops(num_flops,&start,&end);
 #endif
-  SCUmulti[odd].TransComplete();
 
  
 

@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class methods.
   
-  $Id: dirac_op_base.C,v 1.8 2004-09-02 16:56:57 zs Exp $
+  $Id: dirac_op_base.C,v 1.9 2005-02-18 20:18:11 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:56:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.8 2004-09-02 16:56:57 zs Exp $
-//  $Id: dirac_op_base.C,v 1.8 2004-09-02 16:56:57 zs Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 20:18:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.9 2005-02-18 20:18:11 mclark Exp $
+//  $Id: dirac_op_base.C,v 1.9 2005-02-18 20:18:11 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v $
 //  $State: Exp $
 //
@@ -166,6 +166,7 @@ DiracOp::DiracOp(Lattice & latt,           // Lattice object
     Float factor = GJP.XiVXi() / GJP.XiV();
     lat.MltFloat(factor, GJP.XiDir());
   }
+
 }
 
 

@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.18 2005-02-11 23:53:39 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.19 2005-02-18 20:18:13 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -204,13 +204,13 @@ int FdwfBase::FmatEvlInv(Vector *f_out, Vector *f_in,
 // vectors, f_in and f_out are defined on a checkerboard.
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
-int FdwfBase::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
+int FdwfBase::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 			  int Nshift, int isz, CgArg *cg_arg, 
 			  CnvFrmType cnv_frm, MultiShiftSolveType type, 
-			  Float *alpha, Vector *f_out_d)
+			  Float *alpha, Vector **f_out_d)
 {
   int iter;
-  char *fname = "FmatMInv(V*, V*, .....)";
+  char *fname = "FmatMInv(V**, V*, .....)";
   VRB.Func(cname,fname);
 
   int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
@@ -220,7 +220,7 @@ int FdwfBase::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift,
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
-  DiracOpDwf dwf(*this, f_out, f_in, cg_arg, cnv_frm);
+  DiracOpDwf dwf(*this, f_out[0], f_in, cg_arg, cnv_frm);
   cg_arg->true_rsd = RsdCG[isz];
 
   int return_value= dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
@@ -623,7 +623,7 @@ void FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 // using the fermion force.
 //------------------------------------------------------------------
 void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi, 
-			   Float mass, Float step_size){
+                               Float mass, Float step_size) {
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
   Matrix *gauge = GaugeField() ;
@@ -649,14 +649,10 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   int f_size_4d = f_site_size_4d * GJP.VolNodeSites() ;
  
   char *str_v1 = "v1" ;
-  Vector *v1 = (Vector *)smalloc(f_size*sizeof(Float)) ;
-  if (v1 == 0) ERR.Pointer(cname, fname, str_v1) ;
-  VRB.Smalloc(cname, fname, str_v1, v1, f_size*sizeof(Float)) ;
+  Vector *v1 = (Vector *)smalloc(f_size*sizeof(Float), cname, fname, str_v1) ;
 
   char *str_v2 = "v2" ;
-  Vector *v2 = (Vector *)smalloc(f_size*sizeof(Float)) ;
-  if (v2 == 0) ERR.Pointer(cname, fname, str_v2) ;
-  VRB.Smalloc(cname, fname, str_v2, v2, f_size*sizeof(Float)) ;
+  Vector *v2 = (Vector *)smalloc(f_size*sizeof(Float), cname, fname, str_v2) ;
 
   //----------------------------------------------------------------
   // allocate buffer space for two fermion fields that are assoc
@@ -664,14 +660,9 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   //----------------------------------------------------------------
 
   char *str_site_v1 = "site_v1" ;
-  Float *site_v1 = (Float *)smalloc(FsiteSize()*sizeof(Float)) ;
-  if (site_v1 == 0) ERR.Pointer(cname, fname, str_site_v1) ;
-  VRB.Smalloc(cname, fname, str_site_v1, site_v1, FsiteSize()*sizeof(Float)) ;
-
+  Float *site_v1 = (Float *)smalloc(FsiteSize()*sizeof(Float),cname,fname,str_site_v1) ;
   char *str_site_v2 = "site_v2" ;
-  Float *site_v2 = (Float *)smalloc(FsiteSize()*sizeof(Float)) ;
-  if (site_v2 == 0) ERR.Pointer(cname, fname, str_site_v2) ;
-  VRB.Smalloc(cname, fname, str_site_v2, site_v2, FsiteSize()*sizeof(Float)) ;
+  Float *site_v2 = (Float *)smalloc(FsiteSize()*sizeof(Float),cname,fname,str_site_v2) ;
 
 
   //----------------------------------------------------------------
@@ -851,31 +842,24 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 //------------------------------------------------------------------
 // deallocate smalloc'd space
 //------------------------------------------------------------------
-  VRB.Sfree(cname, fname, str_site_v2, site_v2) ;
-  sfree(site_v2) ;
- 
-  VRB.Sfree(cname, fname, str_site_v1, site_v1) ;
-  sfree(site_v1) ;
- 
-  VRB.Sfree(cname, fname, str_v2, v2) ;
-  sfree(v2) ;
- 
-  VRB.Sfree(cname, fname, str_v1, v1) ;
-  sfree(v1) ;
+  sfree(site_v2, cname, fname, str_site_v2) ;
+  sfree(site_v1, cname, fname, str_site_v1) ;
+  sfree(v2, cname, fname, str_v2) ;
+  sfree(v1, cname, fname, str_v1) ;
  
   return ;
 }
 // CJ: change end
 #endif
 
-void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
+void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				    Float *alpha, Float mass, Float dt,
-				    Vector *sol_d) {
+				    Vector **sol_d) {
   char *fname = "RHMC_EvolveMomFforce";
 
+  // Temporary fix for the moment.
   int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
-  for (int i=0; i<degree; i++)
-    EvolveMomFforce(mom,sol + f_size*i,mass,dt*alpha[i]);
+  for (int i=0; i<degree; i++) EvolveMomFforce(mom,sol[i],mass,alpha[i]*dt);
 
 }
 

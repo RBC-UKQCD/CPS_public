@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fnone class.
 
-  $Id: f_none.C,v 1.10 2004-12-01 06:38:20 chulwoo Exp $
+  $Id: f_none.C,v 1.11 2005-02-18 20:18:13 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -128,17 +128,17 @@ int Fnone::FmatEvlInv(Vector *f_out, Vector *f_in,
 }
 
 //------------------------------------------------------------------
-// int FmatEvlMInv(Vector *out, Vector *in, Float *shift, 
+// int FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
 //                 int Nshift, int isz, CgArg *cg_arg, 
 //                 CnvFrmType cnv_frm, MultiShiftSolveType type,
-//                 Float *alpha);
+//                 Float *alpha, Vector **f_out_d);
 // It does nothing and returns 0.
 //------------------------------------------------------------------
-int Fnone::FmatEvlMInv(Vector *out, Vector *in, Float *shift, 
+int Fnone::FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
 		       int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm,
-		       MultiShiftSolveType type, Float *alpha, Vector *out_d)
+		       MultiShiftSolveType type, Float *alpha, Vector **out_d)
 {
-  char *fname = "FmatEvlMInv(V*,V*, .....)";
+  char *fname = "FmatEvlMInv(V**,V*, .....)";
   VRB.Func(cname,fname);
 
   // Return the number of iterations
@@ -247,10 +247,10 @@ void Fnone::EvolveMomFforce(Matrix *mom, Vector *frm,
   VRB.Func(cname,fname);
 }
 
-void Fnone::RHMC_EvolveMomFforce(Matrix *mom, Vector *frm, int degree, 
+void Fnone::RHMC_EvolveMomFforce(Matrix *mom, Vector **frm, int degree, 
 				 Float *alpha, Float mass,  Float step_size,
-				 Vector *frm_d){
-  char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
+				 Vector **frm_d){
+  char *fname = "EvolveMomFforce(M*,V**,F,F,F)";
   VRB.Func(cname,fname);
 }
 

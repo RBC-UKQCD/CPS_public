@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.26 2005-01-13 07:46:20 chulwoo Exp $
+  $Id: lattice_base.C,v 1.27 2005-02-18 20:18:15 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2005-01-13 07:46:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.26 2005-01-13 07:46:20 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.26 2005-01-13 07:46:20 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 20:18:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.27 2005-02-18 20:18:15 mclark Exp $
+//  $Id: lattice_base.C,v 1.27 2005-02-18 20:18:15 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.26 $
+//  $Revision: 1.27 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -395,6 +395,28 @@ void Lattice::CopyGaugeField(Matrix* u)
   // Copy from gauge_field to u
   //----------------------------
   moveMem((IFloat *) u, (IFloat *) gauge_field, size);
+}
+
+//------------------------------------------------------------------
+// Compares the gauge configuration to the lattice instance;
+// Returns 1 if identical, 0 if not
+//------------------------------------------------------------------
+int Lattice::CompareGaugeField(Matrix* u)
+{
+  char *fname = "CompareGaugeField(M*)";
+  VRB.Func(cname,fname);
+
+  int m_size = GsiteSize() * GJP.VolNodeSites() * sizeof(Float)/sizeof(int);
+
+  unsigned int g1 = 0;
+  unsigned int g2 = 0;
+  for (int i=0; i<m_size; i++) {
+    g1 += *((unsigned int*)u + i);
+    g2 += *((unsigned int*)gauge_field + i);
+  }
+  if (g1 == g2) return 1;
+  else return 0;
+
 }
 
 //------------------------------------------------------------------

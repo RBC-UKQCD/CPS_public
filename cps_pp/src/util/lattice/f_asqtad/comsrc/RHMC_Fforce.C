@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce.C,v 1.6 2004-12-21 19:02:39 chulwoo Exp $
+  $Id: RHMC_Fforce.C,v 1.7 2005-02-18 20:18:12 mclark Exp $
 */
 //--------------------------------------------------------------------
 
@@ -40,9 +40,9 @@ CPS_START_NAMESPACE
 
 #define PROFILE
 
-void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
+void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				   Float *alpha, Float mass, Float dt,
-				   Vector *sol_d){
+				   Vector **sol_d){
 
     char *fname = "RHMC_EvolveMomFforce";
     VRB.Func(cname,fname);
@@ -54,41 +54,125 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 #endif
 
     // The number of directions to do simultaneously - N can be 1, 2 or 4.
-    const int N = 4;  
+    const int N = 1;  
     enum{plus, minus, n_sign};
 
     const int vol = GJP.VolNodeSites();
+    const int f_size = vol*FsiteSize()/2;
     
     for (int i=0; i<degree; i++)
-	(sol+i*vol/2)->VecTimesEquFloat(alpha[i], vol/2*FsiteSize());
-
-    Vector **X = (Vector**)amalloc(smalloc, sizeof(Vector), 2, degree, vol);
+      sol[i]->VecTimesEquFloat(alpha[i], f_size);
 
     // X_odd = D X_even    
     for (int p=0; p<degree; p++) {
-	moveMem(X[p],       sol+vol/2*p,   vol/2*FsiteSize()*sizeof(Float));
-	moveMem(X[p]+vol/2, sol_d+vol/2*p, vol/2*FsiteSize()*sizeof(Float));
-	Fconvert(X[p], CANONICAL, STAG);
+      Fconvert(sol[p], CANONICAL, STAG);
     }
     Convert(STAG);  // Puts staggered phases into gauge field.
 
     // These are work Matrices used in force_product_sum routines
-    Matrix *mtmp = (Matrix*)fmalloc(vol*sizeof(Matrix));
+    Matrix *mtmp = (Matrix*)fmalloc(vol*sizeof(Matrix), cname, fname, "mtmp");
 
+    /*
     // Matrix fields for which we must allocate memory
     Matrix ***Pnu = (Matrix***)amalloc(fmalloc, sizeof(Matrix), 3, n_sign, N, vol);
     Matrix ****P3 = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
     Matrix ****Prhonu = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
     Matrix *****P5 = (Matrix*****)amalloc(fmalloc, sizeof(Matrix), 5, n_sign, n_sign, n_sign, N, vol);
-    Matrix ******P7 = (Matrix******)amalloc(fmalloc, sizeof(Matrix), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
-    Matrix ******Psigma7 = (Matrix******)amalloc(fmalloc, sizeof(Matrix), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
+    Matrix ******P7 = (Matrix******)amalloc(fmalloc, sizeof(Matrix), 6, n_sign, n_sign, n_sign, n_sign,N,vol);
+    Matrix ******Psigma7 = (Matrix******)amalloc(fmalloc,sizeof(Matrix),6,n_sign,n_sign,n_sign,n_sign,N,vol);
     Matrix **L = (Matrix**)amalloc(fmalloc, sizeof(Matrix), 2, N, vol);
     Matrix ***Lnu = (Matrix***)amalloc(fmalloc, sizeof(Matrix), 3, n_sign, N, vol);
     Matrix ****Lrhonu = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
     Matrix ****Lmusigmarhonu = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
 
+    */
+
+    Matrix ***Pnu = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Pnu");
+    Matrix ****P3 = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P3");
+    Matrix ****Prhonu = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "Prhonu");
+    Matrix *****P5 = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "P5");
+    Matrix ******P7 = (Matrix******)smalloc(n_sign*sizeof(Matrix*****), cname, fname, "P7");
+    Matrix ******Psigma7 = 
+      (Matrix******)smalloc(n_sign*sizeof(Matrix*****), cname, fname, "Psigma7");
+    Matrix ***Lnu = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Lnu");
+    Matrix ****Lrhonu = 
+      (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "Lrhonu");
+    Matrix ****Lmusigmarhonu = 
+      (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "Lmusigmarhonu");
+
+    Matrix **L = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "L");
+    for (int i=0; i<N; i++)  L[i] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "L[i]");
+
+    for (int i=0; i<n_sign; i++) {
+      Pnu[i] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Pnu[i]");
+      Lnu[i] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Lnu[i]");
+      for (int j=0; j<N; j++) {
+	Pnu[i][j] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "Pnu[i][j]");
+	Lnu[i][j] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "Lnu[i][j]");
+      }
+      P3[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "P3[i]");
+      Prhonu[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Prhonu[i]");
+      Lrhonu[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Lrhonu[i]");
+      Lmusigmarhonu[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), 
+					    cname, fname, "Lmusigmarhonu[i]");
+      P5[i] = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P5[i]");
+      P7[i] = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "P7[i]");
+      Psigma7[i] = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "Psigma7[i]");
+      for (int j=0; j<n_sign; j++) {
+	P3[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "P3[i][j]");
+	Prhonu[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Prhonu[i][j]");
+	Lrhonu[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Lrhonu[i][j]");
+	Lmusigmarhonu[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), 
+						cname, fname, "Lmusigmarhonu[i][j]");
+	for (int k=0; k<N; k++) {
+	  P3[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "P3[i][j][k]");
+	  Prhonu[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), "Prhonu[i][j][k]");
+	  Lrhonu[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), "Lrhonu[i][j][k]");
+	  Lmusigmarhonu[i][j][k] = 
+	    (Matrix*)smalloc(vol*sizeof(Matrix), "Lmusigmarhonu[i][j][k]");
+	}
+	P5[i][j] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "P5[i][j]");
+	P7[i][j] = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P7[i][j]");
+	Psigma7[i][j] = (Matrix****)
+	  smalloc(n_sign*sizeof(Matrix***), cname, fname, "Psigma7[i][j]");
+	for (int k=0; k<n_sign; k++) {
+	  P5[i][j][k] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "P5[i][j][k]");
+	  for (int l=0; l<N; l++) {
+	    P5[i][j][k][l] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, 
+					      fname, "P5[i][j][k][l]");
+	  }
+	  P7[i][j][k] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, 
+					   fname, "P7[i][j][k]");
+	  Psigma7[i][j][k] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, 
+						fname, "Psigma7[i][j][k]");
+	  for (int l=0; l<n_sign; l++) {
+	    P7[i][j][k][l] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, 
+					       fname, "P7[i][j][k][l]");
+	    Psigma7[i][j][k][l] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, 
+						    "P7[i][j][k][l]");
+	    for (int m=0; m<N; m++) {
+	      P7[i][j][k][l][m] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, 
+						   "P7[i][j][k][l][m]");
+	      Psigma7[i][j][k][l][m] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, 
+							"Psigma7[i][j][k][l][m]");
+	    }
+	  }
+	}
+      }
+    }
+
+
     // Array in which to accumulate the force term      
     Matrix **force = (Matrix**)amalloc(fmalloc, sizeof(Matrix), 2, 4, vol);
+
+    /*
+    Matrix **force = (Matrix**)smalloc(4*sizeof(Matrix*), cname, fname, "force");
+    for (int i=0; i<4; i++) {
+      force[i] = (Matrix*) fmalloc(vol*sizeof(Matrix), cname, fname, "force[i]");
+    }
+    */
+
+    ParTransAsqtad parallel_transport(*this);
 
     // These fields can be overlapped with previously allocated memory
     
@@ -113,8 +197,6 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
     for(int i=0; i<4; i++)
 	for(int s=0; s<vol; s++) force[i][s].ZeroMatrix();
 
-    ParTransAsqtad parallel_transport(*this);
-
     // input/output arrays for the parallel transport routines
     Matrix *vin[n_sign*N], *vout[n_sign*N];
     int dir[n_sign*N];
@@ -133,7 +215,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 	for(w=0; w<N; w++) mu[w] = (m+w)%4;
 
 	// L = sum X[x]X[x+mu]^dagger
-	parallel_transport.vvpd(X, degree, mu, N, 1, L);
+	parallel_transport.vvpd(sol, degree, mu, N, 1, L);
 
 	// F_mu += U L^dagger
 	for(w=0; w<N; w++)
@@ -188,6 +270,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 		for(ns=0; ns<n_sign; ns++)
 		    force_product_sum(P3[plus][ns][w], Pnu[ns][w], Lnu[ns][w],
 				      -GJP.staple3_coeff(), force[mu[w]], mtmp);
+
 
 	    for(int r=n+1; r<n+4; r++){                     // Loop over rho
 		bool nextr = false;
@@ -691,7 +774,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 	    // Got N new nu's, so do some stuff...
 	
 	    // L3 = sum X[x]X[x+3]^dagger
-	    parallel_transport.vvpd(X, degree, nu, N, 3, L3);
+	    parallel_transport.vvpd(sol, degree, nu, N, 3, L3);
 
 	    // Pnununu = U_nu Pnunu
 
@@ -744,12 +827,76 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
     dtime += dclock();
     print_flops(cname, fname, ParTrans::PTflops+ForceFlops, dtime);
 #endif
-
+    
     // Now that we have computed the force, we can update the momenta
     update_momenta(force, dt, mom);
 
     // Free allocated memory
     
+
+  for (int i=0; i<N; i++) sfree(L[i], cname, fname, "L[i]");
+  sfree(L, cname, fname, "L");
+
+  for (int i=0; i<n_sign; i++) {
+    for (int j=0; j<n_sign; j++) {
+      for (int k=0; k<N; k++) {
+	sfree(P3[i][j][k], cname, fname, "P3[i][j][k]");
+	sfree(Prhonu[i][j][k], cname, fname, "Prhonu[i][j][k]");
+	sfree(Lrhonu[i][j][k], cname, fname, "Lrhonu[i][j][k]");
+	sfree(Lmusigmarhonu[i][j][k], cname, fname, "Lmusigmarhonu[i][j][k]");
+      }
+      for (int k=0; k<n_sign; k++) {
+	for (int l=0; l<n_sign; l++) {
+	  for (int m=0; m<N; m++) {
+	    sfree(P7[i][j][k][l][m], cname, fname, "P7[i][j][k][l][m]");
+	    sfree(Psigma7[i][j][k][l][m], cname, fname, "Psigma7[i][j][k][l][m]");
+	  }
+	  sfree(P7[i][j][k][l], cname, fname, "P7[i][j][k][l]");
+	  sfree(Psigma7[i][j][k][l], cname, fname, "Psigma7[i][j][k][l]");
+	}
+	for (int l=0; l<N; l++) sfree(P5[i][j][k][l], cname, fname, "P5[i][j][k][l]");
+	sfree(P7[i][j][k], cname, fname, "P7[i][j][k]");
+	sfree(Psigma7[i][j][k], cname, fname, "Psigma[i][j][k]");
+	sfree(P5[i][j][k], cname, fname, "P5[i][j][k]");
+      }
+      sfree(P3[i][j], cname, fname, "P3[i][j]");
+      sfree(Prhonu[i][j], cname, fname, "Prhonu[i][j]");
+      sfree(Lrhonu[i][j], cname, fname, "Lrhonu[i][j]");
+      sfree(Lmusigmarhonu[i][j], cname, fname, "Lmusigmarhonu[i][j]");
+      sfree(P5[i][j], cname, fname, "P5[i][j]");
+      sfree(P7[i][j], cname, fname, "P7[i][j]");
+      sfree(Psigma7[i][j], cname, fname, "Psigma[i][j]");
+    }
+    for (int j=0; j<N; j++) {
+      sfree(Pnu[i][j], cname, fname, "Pnu[i][j]");
+      sfree(Lnu[i][j], cname, fname, "Lnu[i][j]");
+    }
+    sfree(Pnu[i], cname, fname, "Pnu[i]");
+    sfree(Lnu[i], cname, fname, "Lnu[i]");
+    sfree(P3[i], cname, fname, "P3[i]");
+    sfree(Prhonu[i], cname, fname, "Prhonu[i]");
+    sfree(P5[i], cname, fname, "P5[i]");
+    sfree(P7[i], cname, fname, "P7[i]");
+    sfree(Psigma7[i], cname, fname, "Psigma[i]");
+    sfree(Lrhonu[i], cname, fname, "Lrhonu[i]");
+    sfree(Lmusigmarhonu[i], cname, fname, "Lmusigmarhonu[i]");
+  }
+  sfree(Pnu, cname, fname, "Pnu");
+  sfree(Lnu, cname, fname, "Lnu");
+  sfree(P3, cname, fname, "P3");
+  sfree(Prhonu, cname, fname, "Prhonu");
+  sfree(P5, cname, fname, "P5");
+  sfree(P7, cname, fname, "P7");
+  sfree(Psigma7, cname, fname, "Psigma");
+  sfree(Lrhonu, cname, fname, "Lrhonu");
+  sfree(Lmusigmarhonu, cname, fname, "Lmusigmarhonu");
+
+  ffree(mtmp, cname, fname, "mtmp");
+  //for (int i=0; i<4; i++) ffree(force[i], cname, fname, "force[i]");
+  ffree(force, cname, fname, "force");
+
+  
+    /*
     ffree(Pnu);
     ffree(P3);
     ffree(Prhonu);
@@ -760,11 +907,12 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
     ffree(Lnu);
     ffree(Lrhonu);
     ffree(Lmusigmarhonu);
-    ffree(force);
-    sfree(X);
-    ffree(mtmp);
-   
+*/
+
     Convert(CANONICAL);
+  for (int p=0; p<degree; p++) {
+    Fconvert(sol[p], STAG, CANONICAL);
+  }
 
 }
 

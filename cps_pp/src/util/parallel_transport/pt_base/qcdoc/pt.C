@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.16 2005-01-19 03:08:33 chulwoo Exp $
+  $Id: pt.C,v 1.17 2005-02-18 20:18:15 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2005-01-19 03:08:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.16 2005-01-19 03:08:33 chulwoo Exp $
-//  $Id: pt.C,v 1.16 2005-01-19 03:08:33 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 20:18:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.17 2005-02-18 20:18:15 mclark Exp $
+//  $Id: pt.C,v 1.17 2005-02-18 20:18:15 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -67,6 +67,17 @@ extern "C"{
   //matrix vector multiply for checkerboarded fields
   void cmv_agg_cpp_cb(int sites, long u, long in, long out, IFloat * gauge_field, int pad=0);
   //---------------------------------------------------------------------------
+
+  void m1m2_lookup(Matrix *result, Matrix *m1, Matrix *m2, int length,
+		   unsigned long *dest, unsigned long *dest, unsigned long *src);
+  void m1m2_lookup_copy(Matrix *result2, Matrix *result, Matrix *m1, Matrix *m2, 
+			int length, unsigned long *dest2,  
+			unsigned long *dest, unsigned long *dest, 
+			unsigned long *src);
+  void m1m2_lin_copy(Matrix *result2, Matrix *result, Matrix *m1, Matrix *m2, 
+		     int length, unsigned long *dest2,
+		     unsigned long *dest, unsigned long *dest);
+  
 }
 
 #if 0
@@ -607,10 +618,12 @@ void PT::init(PTArg *pt_arg)
     if(vol> 4096){
       uc_l[i]=uc_nl[i]=NULL;
     } else {	
-      uc_l[i] = (gauge_agg *)qalloc(QFAST,sizeof(gauge_agg)*(1+local_chi[i]));
-      uc_nl[i] = (gauge_agg *)qalloc(QFAST,sizeof(gauge_agg)*(1+non_local_chi[i]));
+      uc_l[i] = (gauge_agg *)fmalloc(cname,fname,"uc_l[i]",
+				     sizeof(gauge_agg)*(1+local_chi[i]));
+      uc_nl[i] = (gauge_agg *)fmalloc(cname,fname,"uc_nl[i]",
+				      sizeof(gauge_agg)*(1+non_local_chi[i]));
     }
-
+      
     //Otherwise, we will have to allocate using smalloc
     if(uc_l[i]==NULL) {
       uc_l[i] = (gauge_agg *)Alloc(cname,fname,"uc_l[i]",sizeof(gauge_agg)*(1+local_chi[i]));
@@ -626,6 +639,7 @@ void PT::init(PTArg *pt_arg)
       uc_l_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_l_cb[parity][i]",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
       uc_nl_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
     }
+
     //-------------------------------------------------------------------------
 
     // This buffer is actually overkill, but ensures will work if
@@ -640,6 +654,7 @@ void PT::init(PTArg *pt_arg)
 
   //---------------------------------------------------------------------------
   //Allocate memory for send buffer
+
   for(i=0; i<NDIM;i++)
     {
       snd_buf_cb[i] = (IFloat *)qalloc(QCOMMS,3*non_local_chi_cb[2*i+1]*vlen);
@@ -652,6 +667,7 @@ void PT::init(PTArg *pt_arg)
     Toffset[i] = (int *)Alloc(cname,fname,"Toffset[parity]",non_local_chi_cb[6]*sizeof(int));
 
   //Allocate memory for the gauge_agg_cb used for matrix pre-multiplication
+
   for(i = 0; i< NDIM;i++)
     for(int parity = 0; parity<2;parity++)
       uc_nl_cb_pre[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb_pre[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[2*i+1]));
@@ -867,11 +883,13 @@ void PT::init(PTArg *pt_arg)
 
   //-------------------------------------------------------------------
   temp = 1;
+  /*
   for(i = 0;i<NDIM;i++)
     {
       offset_cb[2*i] = 0;
       offset_cb[2*i+1] = stride_cb[2*i+1]/sizeof(IFloat);
     }
+  */
   //-------------------------------------------------------------------
 
   // Allocate memory for hop pointers
@@ -882,13 +900,12 @@ void PT::init(PTArg *pt_arg)
       //Calculate the number of local and non-local sites needed 
       //j+1 is the length of the hop
       //i indicates the communication direction
-      int nl_size = (j+1)*non_local_chi[i];
-      int l_size = vol - nl_size;
-      if (l_size>0){
-        hp_l[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
-        src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
-        dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
-      }
+      int nl_size = (j+1)*non_local_chi[i] + 1;
+      int l_size = vol - nl_size + 1;
+
+      hp_l[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
+      src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
+      dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
       
       hp_nl[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
       dest_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
@@ -924,40 +941,44 @@ void PT::delete_buf(){
 //  VRB.Func("",fname);
 	
   for(int i = 0; i < 2*NDIM; i++){
-    qfree(uc_l[i]);
-    qfree(uc_nl[i]);
+    ffree(uc_l[i],cname,fname,"uc_l[i]");
+    ffree(uc_nl[i],cname,fname,"uc_nl[i]");
     //--------------------------------------------------------------------
+
     for(int parity = 0; parity < 2; parity++)
       {
 	Free(uc_l_cb[parity][i]);
 	Free(uc_nl_cb[parity][i]);
       }
+
     //-------------------------------------------------------------------
-    qfree(rcv_buf[i]);
-    qfree(rcv_buf2[i]);
+    sfree(rcv_buf[i],cname,fname,"rcv_buf[i]");
+    sfree(rcv_buf2[i],cname,fname,"rcv_buf2[i]");
   }
 
   //-----------------------------------------------------------------------
+
   for(int i = 0; i < NDIM; i++)
     {
-      qfree(snd_buf_cb[i]);
+      sfree(snd_buf_cb[i],cname,fname,"snd_buf_cb[i]");
       for(int parity = 0; parity < 2; parity++)
 	Free(uc_nl_cb_pre[parity][i]);
     }
   Free(snd_buf_t_cb);
+
   for(int i = 0; i < 2; i++)
     Free(Toffset[i]);    
+
   //-----------------------------------------------------------------------
 
   for (int hop=0; hop<MAX_HOP; hop++) {
     for(int i = 0; i < 2*NDIM; i++){
-      int nl_size = (hop+1)*non_local_chi[i];
-      int l_size = vol - nl_size;
-      if (l_size>0){
-        Free(hp_l[hop][i]);
-        qfree(src_l[hop][i]);
-        qfree(dest_l[hop][i]);
-      }
+      int nl_size = (hop+1)*non_local_chi[i]+1;
+      int l_size = vol - nl_size+1;
+      Free(hp_l[hop][i]);
+      qfree(src_l[hop][i]);
+      qfree(dest_l[hop][i]);
+
       Free(hp_nl[hop][i]);
       qfree(src_nl[hop][i]);
       qfree(dest_nl[hop][i]);
@@ -994,7 +1015,7 @@ void PT::init_g(void){
   int i;
 
   char *fname = "init_g()";
-//  VRB.Func("",fname);
+
   for(i=0; i<2*NDIM;i++){
     local_count[i]=non_local_count[i]=0;
   }
@@ -1007,8 +1028,10 @@ void PT::init_g(void){
 
   //Temporary buffer (allocated on cache) that receives an SU(3) matrix
   IFloat *rcv_mat = (IFloat *)qalloc(QFAST|QNONCACHE,18*sizeof(IFloat));
-  sys_cacheflush(0);
+  if (!rcv_mat) ERR.Pointer("",fname,"rcv_mat");
+  VRB.Smalloc(cname,fname,"rcv_mat",rcv_mat,18*sizeof(IFloat));
 
+  sys_cacheflush(0);
 
   for(i=0;i<NDIM;i++){
     //Initialize SCUDirArg for sending and receiving the one-hop term
@@ -1141,7 +1164,6 @@ void PT::init_g(void){
   }
 #endif
   qfree(rcv_mat);
-//  VRB.FuncEnd("",fname);
 }
 
 
@@ -1231,15 +1253,14 @@ parity)
 
   //Begin transmission
   SCUmulti.SlowStartTrans();
+  //End transmission
+  SCUmulti.TransComplete();
 
   //Do local calculations
   for(i=0;i<n;i++)
     {
       cmm_agg_cpp_cb(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)min[i],(long)mout[i],gauge_field_addr);
     }
-
-  //End transmission
-  SCUmulti.TransComplete();
 
   //If wire[i] is even, then we have transport in the negative direction
   //In this case, the vector field is multiplied by the SU(3) link matrix
@@ -1402,6 +1423,8 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 
   //Begin transmission
   SCUmulti.SlowStartTrans();
+  //End transmission
+  SCUmulti.TransComplete();
 
   //for(int i = 0; i < 4; i++)
   //  for(int j = 0; j < VECT_LEN*non_local_chi_cb[2*i+1]; j++)
@@ -1416,8 +1439,6 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	cmv_agg_cpp_cb(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],gauge);
     }
 
-  //End transmission
-  SCUmulti.TransComplete();
 
   //If wire[i] is even, then we have transport in the negative direction.
   //In this case, the vector field is multiplied by the SU(3) link matrix
@@ -1553,6 +1574,9 @@ parity,int pad, IFloat * gauge)
 
   //Begin transmission
   SCUmulti.SlowStartTrans();
+  //End transmission
+  SCUmulti.TransComplete();
+
 
   //  for(int i = 0; i < 4; i++)
   //  for(int j = 0; j < VECT_LEN*non_local_chi_cb[2*i+1]; j++)
@@ -1567,9 +1591,6 @@ parity,int pad, IFloat * gauge)
       //printf("local, dir = %d\n",i);
       cmv_agg_cpp_cb(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long) vin[i],(long)vout,gauge,pad);
     }
-
-  //End transmission
-  SCUmulti.TransComplete();
 
   //If wire[i] is even, then we have transport in the negative direction.
   //In this case, the vector field is multiplied by the SU(3) link matrix
@@ -1658,7 +1679,9 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   SCUmulti.Init(SCUarg_p,n*2);
   //Start transmission
   SCUmulti.SlowStartTrans();
-
+  //End transmission
+  SCUmulti.TransComplete();
+  //#define CPP
   //Initerleaving of local computation of matrix multiplication
   for(i=0;i<n;i++){
 #ifdef CPP
@@ -1667,8 +1690,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
     cmm_agg(uc_l[wire[i]],min[i],mout[i],local_chi[wire[i]]/2);
 #endif
   }
-  //End transmission
-  SCUmulti.TransComplete();
+
   //Do non-local computations
   for(i=0;i<n;i++){ 
 #ifdef CPP
@@ -1676,6 +1698,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
 #else
     cmm_agg(uc_nl[wire[i]],(matrix *)rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
 #endif
+    //#undef CPP
   }
 #ifdef PROFILE
   dtime +=dclock();
@@ -1720,6 +1743,7 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
   }
   SCUmulti.Init(SCUarg_p,n*2);
   SCUmulti.SlowStartTrans();
+  SCUmulti.TransComplete();
 	
 #ifndef CPP
   for(i=0;i<n;i++) pt_asqtad_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
@@ -1727,7 +1751,6 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
   for(i=0;i<n;i++) 
     cmv_agg_cpp(local_chi[wire[i]],(long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
 #endif
-  SCUmulti.TransComplete();
 	
 #ifndef CPP
   for(i=0;i<n;i++) pt_asqtad_agg(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
@@ -1788,6 +1811,8 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
       SCUmulti.Init(SCUarg_p2,2*n_dir);
     }
     SCUmulti.SlowStartTrans();
+    // Finalise communication
+    SCUmulti.TransComplete();
 
     // Perform non-local calculation for previous v
     if (v>0)
@@ -1814,9 +1839,6 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
       for(i=0; i<n_dir; i++)
 	cross_look(sum[i], &f, vect[v], vect[v], vol-hop*non_local_chi[2*wire[i]], 
 	      src_l[hop-1][2*wire[i]], dest_l[hop-1][2*wire[i]]);
-
-    // Finalise communication
-    SCUmulti.TransComplete();
 
   }
 
@@ -1856,15 +1878,14 @@ void PT::shift_field(IFloat **v, const int *dir, int n_dir,
 
   SCUmulti.Init(SCUarg_p,2*n_dir);
   SCUmulti.SlowStartTrans();
-
+  SCUmulti.TransComplete();
+  
   for (i=0; i<n_dir; i++) {
     length = vol-hop*non_local_chi[wire[i]];
     copy_matrix(u[i],v[i],&length,dest_l[hop-1][wire[i]],
 		src_l[hop-1][wire[i]]);
   }
 
-  SCUmulti.TransComplete();
-  
   for (i=0; i<n_dir; i++) {
     length = hop*non_local_chi[wire[i]];
     copy_matrix(u[i],(IFloat*)rcv_buf[wire[i]],&length,

@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.15 2004-12-01 06:38:20 chulwoo Exp $
+  $Id: f_stag.C,v 1.16 2005-02-18 20:18:14 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -224,10 +224,10 @@ int Fstag::FmatEvlInv(Vector *f_out, Vector *f_in,
 // vectors, f_in and f_out are defined on a checkerboard.
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
-int Fstag::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
+int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 		       int Nshift, int isz, CgArg *cg_arg,
 		       CnvFrmType cnv_frm, MultiShiftSolveType type, 
-		       Float *alpha, Vector *f_out_d)
+		       Float *alpha, Vector **f_out_d)
 {
   char *fname = "FmatMInv(V*, V*, .....)";
   VRB.Func(cname,fname);
@@ -238,12 +238,12 @@ int Fstag::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift,
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
-  DiracOpStag stag(*this, f_out, f_in, cg_arg, cnv_frm);
+  DiracOpStag stag(*this, f_out[0], f_in, cg_arg, cnv_frm);
   int iter = stag.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
 
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
-      stag.Dslash(f_out_d + e_vsize*s,f_out + e_vsize*s,CHKB_EVEN,DAG_NO);
+      stag.Dslash(f_out_d[s], f_out[s], CHKB_EVEN, DAG_NO);
   cg_arg->true_rsd = RsdCG[isz];
 
   delete[] RsdCG;
@@ -481,14 +481,14 @@ void Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
 
 }
 
-void Fstag::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
+void Fstag::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				 Float *alpha, Float mass, Float dt,
-				 Vector *sol_d) {
+				 Vector **sol_d) {
   char *fname = "RHMC_EvolveMomFforce";
 
   for (int i=0; i<degree; i++) {
-    f_tmp -> CopyVec(sol_d+i*e_vsize, e_vsize);
-    EvolveMomFforce(mom,sol+i*e_vsize,mass,dt*alpha[i]);
+    f_tmp -> CopyVec(sol_d[i], e_vsize);
+    EvolveMomFforce(mom,sol[i],mass,dt*alpha[i]);
   }
 
 }
