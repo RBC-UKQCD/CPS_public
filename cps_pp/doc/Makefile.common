@@ -1,0 +1,38 @@
+# $Id: Makefile.common,v 1.1 2003-07-30 15:59:19 zs Exp $
+
+PDFLATEX=pdflatex
+LATEX = latex
+DVIPS = dvips
+
+
+all:	$(SRC).pdf  $(SRC).ps $(SRC).tar.gz  #$(SRC).html
+
+%.pdf: %.tex
+	$(PDFLATEX) $<
+	$(PDFLATEX) $<
+	$(PDFLATEX) $<
+
+%.ps: %.dvi
+	$(DVIPS) -o $@ $<
+
+%.dvi: %.tex
+	$(LATEX) $<
+	$(LATEX) $<
+	$(LATEX) $<
+
+%.html: %.pdf
+	tth -e2 -a -w1 -i -V $(SRC)
+
+%.tar: %.tex
+	tar -c --exclude=CVS --exclude=$(SRC).ps --exclude=$(SRC).pdf -f $@ *
+
+%.tar.gz: %.tar
+	gzip $<
+
+clean:
+	rm -f "#"*"#" *~ core *.toc *.lof *.log *.aux *.dvi texput.log *.out
+
+realclean: clean
+	rm -f $(SRC).tar.gz $(SRC).ps $(SRC).pdf 
+
+
