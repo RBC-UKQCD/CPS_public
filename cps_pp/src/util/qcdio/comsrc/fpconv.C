@@ -247,6 +247,7 @@ enum FP_FORMAT  FPConv::testHostFormat() { // test the type of CPS::Float
     else
       hostFormat = FP_TIDSP32;
   }
+  cout << "Host FP Format : " << name(hostFormat) << endl;
 
   return hostFormat;
 }
@@ -279,7 +280,7 @@ enum FP_FORMAT  FPConv::setFileFormat(const char * desc) {
   return fileFormat;
 }
 
-unsigned long FPConv::checksum(char * data, const int data_len,
+unsigned int FPConv::checksum(char * data, const int data_len,
 			       const enum FP_FORMAT dataFormat){
   // checksum always done on 32-bits
 
@@ -291,19 +292,14 @@ unsigned long FPConv::checksum(char * data, const int data_len,
     return 0;
   }
 
-  cout << "First 16 bytes: ";
-  for(int i=0;i<16;i++) cout << hex << (unsigned int)data[i] << " ";
-  cout << dec << endl << endl;
-
-
   int csumcnt = data_len;
   if(size(chkFormat) == 8)  csumcnt *= 2; // always sum as 32 bits data
 
   if(big_endian(hostFormat) != big_endian(chkFormat))
     byterevn((type32*)data, csumcnt);
 
-  unsigned long *buf = (unsigned long*)data;
-  unsigned long s = 0;
+  unsigned int *buf = (unsigned int*)data;
+  unsigned int s = 0;
   for(int i=0;i<csumcnt;i++)  {
     s += *buf;
     buf++;

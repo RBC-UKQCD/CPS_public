@@ -1,0 +1,238 @@
+#include <string.h>
+#include <iostream>
+#include <util/data_types.h>
+#include <util/intconv.h>
+
+CPS_START_NAMESPACE
+using namespace std;
+
+const char * INT_FORMAT_NAME[] = { 
+  "n/a",
+  "AUTOMATIC",
+  "INT32BIG",
+  "INT32LITTLE"
+};
+
+const int INT_FORMAT_ENTRIES = sizeof(INT_FORMAT_NAME)/sizeof(INT_FORMAT_NAME[0]);
+
+
+IntConv::IntConv() 
+  : fileFormat(INT_UNKNOWN) { 
+  testHostFormat();
+
+}
+
+IntConv::~IntConv() {
+}
+
+
+const char * IntConv::name(const enum INT_FORMAT format) {
+  return INT_FORMAT_NAME[int(format)];
+}
+
+char * IntConv::file2host(char * hbuf, const char * fdat, const int fdat_len) {
+  // trivial case
+  if(hostFormat == fileFormat) {
+    memcpy(hbuf,fdat,fdat_len*size(hostFormat));
+    return hbuf;
+  }
+  
+  // if needs conversion
+  // adjust endian  (currently the only conversion needed...)
+  if(big_endian(hostFormat) != big_endian(fileFormat)) {
+    byterevn((type32*)fdat,fdat_len);
+    copy32((type32*)hbuf, (type32*)fdat, fdat_len);
+  }
+
+  return hbuf;
+}
+
+char * IntConv::host2file(char *fbuf, const char * hdat, const int hdat_len) {
+  // trivial case
+  if(hostFormat == fileFormat) {
+    memcpy(fbuf,hdat,hdat_len*size(fileFormat));
+    return fbuf;
+  }
+  
+  // if needs conversion
+  // adjust endian (currently the only conversion needed)
+  if(big_endian(hostFormat) != big_endian(fileFormat)) {  
+    copy32((type32*)fbuf, (type32*)hdat, hdat_len);
+    byterevn((type32*)fbuf, hdat_len);
+  }
+
+  return fbuf;
+}
+
+
+void IntConv::byterevn(type32 w[], int n) {
+  /*  char * buf = (char*)w;
+  cout << "First 16 bytes: ";
+  for(int i=0;i<16;i++) cout << hex << (unsigned int)buf[i] << " ";
+  cout << dec << endl;
+  */
+  //  cout << "Byte reverse 32 bits" << endl;
+
+  register type32 oldv, newv;
+
+  for(int i=0;i<n;i++) {
+    oldv = w[i];
+    newv = 0;
+    for(int j=0;j<4;j++) {
+      newv = (newv << 8) | (oldv & 0xff);
+      oldv >>= 8;
+    }
+    w[i] = newv;
+  }
+  /*
+  cout << "First 16 bytes: ";
+  for(int i=0;i<16;i++) cout << hex << (unsigned int)buf[i] << " ";
+  cout << dec << endl;
+  */
+}
+
+void IntConv::copy32(type32 tgt[], type32 src[], int n) {
+  float *s = (float*)src;
+  float *t = (float*)tgt;
+  for(int i=0;i<n;i++)  *t++ = *s++;
+}
+
+enum INT_FORMAT  IntConv::testHostFormat() { // test the type of CPS::Float
+  // 1. endian
+  char end_check[4] = {1,0,0,0};
+  unsigned long *lp = (unsigned long *)end_check;
+  int host_big;
+
+  if ( *lp == 0x1 ) { 
+    cout << "Host is little-endian\n";
+    host_big = 0;
+  } else {
+    cout << "Host is big-endian\n";
+    host_big = 1;
+  }
+
+  // 2. pi test
+  if(sizeof(int) == 4) {
+    if(host_big)  hostFormat = INT_32BIG;
+    else          hostFormat = INT_32LITTLE;
+  }
+  else {
+    cout << "IntConv::testHostFormat() : non-32 bit int not supported" << endl;
+    exit(13);
+  }
+
+  return hostFormat;
+}
+
+enum INT_FORMAT  IntConv::setFileFormat(const enum INT_FORMAT dataFormat) {
+  fileFormat = dataFormat;
+  if(dataFormat == INT_AUTOMATIC) 
+    fileFormat = hostFormat;
+  if(fileFormat == INT_UNKNOWN) {
+    cout << "Floating point format setting error!" << endl;
+  }
+  return fileFormat;
+}
+
+enum INT_FORMAT  IntConv::setFileFormat(const char * desc) {
+  fileFormat = INT_UNKNOWN;
+  for(int i=1;i<INT_FORMAT_ENTRIES;i++) {
+    if(!strcmp(INT_FORMAT_NAME[i],desc)) {
+      fileFormat = INT_FORMAT(i);
+      break;
+    }
+  }
+  if(fileFormat == INT_UNKNOWN) {
+    cout << "Floating point format \"" << desc << "\" not recognized!" << endl;
+  }
+  else if(fileFormat == INT_AUTOMATIC)  {
+    fileFormat = hostFormat;
+  }
+
+  return fileFormat;
+}
+
+unsigned int IntConv::checksum(char * data, const int data_len,
+			       const enum INT_FORMAT dataFormat){
+  // checksum always done on 32-bits
+
+  enum INT_FORMAT chkFormat = dataFormat;
+  if(dataFormat == INT_AUTOMATIC)  chkFormat = fileFormat;
+
+  if(chkFormat == INT_UNKNOWN) {
+    cout << "checksum data format not recognized!" << endl;
+    return 0;
+  }
+
+  int csumcnt = data_len;
+
+  if(big_endian(hostFormat) != big_endian(chkFormat))
+    byterevn((type32*)data, csumcnt);
+
+  unsigned int *buf = (unsigned int*)data;
+  unsigned int s = 0;
+  for(int i=0;i<csumcnt;i++)  {
+    s += *buf;
+    buf++;
+  }
+
+  if(big_endian(hostFormat) != big_endian(chkFormat))
+    byterevn((type32*)data, csumcnt);
+
+  return s;
+}
+
+unsigned int IntConv::posDepCsum(char * data, const int data_len,
+				 const enum INT_FORMAT dataFormat){
+  // checksum always done on 32-bits
+
+  enum INT_FORMAT chkFormat = dataFormat;
+  if(dataFormat == INT_AUTOMATIC)  chkFormat = fileFormat;
+
+  if(chkFormat == INT_UNKNOWN) {
+    cout << "checksum data format not recognized!" << endl;
+    return 0;
+  }
+
+  int csumcnt = data_len;
+
+  if(big_endian(hostFormat) != big_endian(chkFormat))
+    byterevn((type32*)data, csumcnt);
+
+  unsigned int *buf = (unsigned int*)data;
+  unsigned int s = 0;
+  for(int i=0;i<csumcnt;i++)  {
+    s += *buf * (i+1); // position-dep. checksum
+    buf++;
+  }
+
+  if(big_endian(hostFormat) != big_endian(chkFormat))
+    byterevn((type32*)data, csumcnt);
+
+  return s;
+}
+
+
+int IntConv::size(const enum INT_FORMAT datatype) {
+  switch(datatype) {
+  case INT_32BIG:
+  case INT_32LITTLE:
+    return 4;
+  default:
+    return 0;
+  }
+}
+
+bool IntConv::big_endian(const enum INT_FORMAT datatype) {
+  switch(datatype) {
+  case INT_32BIG:
+    return true;
+  case INT_32LITTLE:
+    return false;
+  default:
+    return false;
+  }
+}
+
+
+CPS_END_NAMESPACE

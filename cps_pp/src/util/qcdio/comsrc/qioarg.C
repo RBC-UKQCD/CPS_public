@@ -4,6 +4,10 @@ using namespace std;
 
 #include <util/qioarg.h>
 
+#if TARGET == QCDOC
+#include <util/gsum64ext.h>
+#endif
+
 CPS_START_NAMESPACE
 
 
@@ -11,19 +15,16 @@ CPS_START_NAMESPACE
 // QioArg members////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 void QioArg::init(const char * file, const int concur_io_number, const Float chk_prec,
-		  const FP_FORMAT file_format, const int recon_row_3) {
-  Xnodes = GJP.Xnodes();  Ynodes = GJP.Ynodes();  Znodes = GJP.Znodes();  Tnodes = GJP.Tnodes(); 
-  Snodes = 1;
+		  const FP_FORMAT file_format, const INT_FORMAT file_int_format,
+		  const int recon_row_3) {
+  for(int dir=0;dir<5;dir++) {
+    nodes[dir] = GJP.Nodes(dir);
+    node_sites[dir] = GJP.NodeSites(dir);
+    coor[dir] = GJP.NodeCoor(dir);
+  }
 
-  XnodeSites = GJP.XnodeSites();  YnodeSites = GJP.YnodeSites(); 
-  ZnodeSites = GJP.ZnodeSites();  TnodeSites = GJP.TnodeSites(); 
-  SnodeSites = 1;
-
-  Xcoor = GJP.XnodeCoor(); Ycoor = GJP.YnodeCoor(); Zcoor = GJP.ZnodeCoor(); Tcoor = GJP.TnodeCoor();
-  Scoor = 0;
-
-//  Xbc = GJP.Xbc(); Ybc = GJP.Ybc(); Zbc = GJP.Zbc(); Tbc = GJP.Tbc();
-  Xbc =  Ybc = Zbc = Tbc = BND_CND_PRD;
+  for(int dir=0;dir<4;dir++) 
+    bc[dir] = GJP.Bc(dir);
 
   StartConfLoadAddr = GJP.StartConfLoadAddr();
 
@@ -32,6 +33,7 @@ void QioArg::init(const char * file, const int concur_io_number, const Float chk
   strcpy(FileName, file);
   CheckPrecision = chk_prec;
   FileFpFormat = file_format;
+  FileIntFormat = file_int_format;
   ReconRow3 = recon_row_3;
 }
 
@@ -42,32 +44,16 @@ void QioArg::init(const char * file, const int concur_io_number, const Float chk
 QioControl::QioControl() 
   : num_concur_io(8)
 {
-  // TODO: set nodes[4], set coor[4], set unique_id
-  // waiting for Bob's reply...
-
   cout << "I am on a " << GJP.Xnodes() << "x"<< GJP.Ynodes() << "x"<< GJP.Znodes() 
-       << "x"<< GJP.Tnodes() <<"x"<<GJP.Snodes() << " lattice" << endl;
+       << "x"<< GJP.Tnodes() <<"x"<<GJP.Snodes() << " machine" << endl;
   cout << "My pos is (" << GJP.XnodeCoor() << ","<< GJP.YnodeCoor() << ","<< GJP.ZnodeCoor() << ","
        << GJP.TnodeCoor() << "," << GJP.SnodeCoor() << ")" << endl;
 
-  // naive version, just check dim_s = 1, dim_w = 1, and other 4 directions are used
-  if(GJP.Snodes()!= 1) {
-    cout << "Dimension > 4 not implemented!" << endl;
-    exit(13);
-  }
-  nodes[0] = GJP.Xnodes();
-  nodes[1] = GJP.Ynodes();
-  nodes[2] = GJP.Znodes();
-  nodes[3] = GJP.Tnodes();
-
-  coor[0] = GJP.XnodeCoor();
-  coor[1] = GJP.YnodeCoor();
-  coor[2] = GJP.ZnodeCoor();
-  coor[3] = GJP.TnodeCoor();
-
-  unique_id = GJP.XnodeCoor() + GJP.Xnodes() * (GJP.YnodeCoor() + GJP.Ynodes() * 
-						(GJP.ZnodeCoor() + GJP.Znodes() * GJP.TnodeCoor()));
+  unique_id = GJP.XnodeCoor() + GJP.Xnodes() * (GJP.YnodeCoor() + GJP.Ynodes() * (GJP.ZnodeCoor() + GJP.Znodes() * (GJP.TnodeCoor() + GJP.Tnodes() * GJP.SnodeCoor() ) ) );
   cout << "My UniqueID() = " << unique_id << endl;
+
+  number_nodes = GJP.Xnodes() * GJP.Ynodes() * GJP.Znodes() * GJP.Tnodes() * GJP.Snodes();
+  cout << "Total number of nodes = " << number_nodes << endl;
 
 }
 
@@ -84,7 +70,6 @@ int QioControl::synchronize(const int errorStatus)  const {
   int error = errorStatus;
  
   if(NumNodes()>1) {
-    //    QMP_sum_int(&error);
     error = globalSumInt(error);
     if(error > 0) {
       cout << "Totally " << error << " nodes reported error!" << endl;
@@ -98,7 +83,7 @@ void QioControl::broadcastInt(int * data, int fromID)  const {
     if(unique_id != fromID) {
       *data = 0;
     }
-    //    QMP_sum_int(data);
+
     *data = globalSumInt(*data);
   }
 }
@@ -108,62 +93,36 @@ void QioControl::broadcastFloat(Float * data, int fromID) const {
     if(unique_id != fromID) {
       * data = 0;
     }
-    //    QMP_float_t  buf = *data;
-    //    QMP_sum_float(&buf);
+
     *data = globalSumFloat(*data);
-    //    *data = buf;
   }
 }
 
 int QioControl::globalSumInt(const int data) const{
-//  Gsum64Ext  gsum;
-//  return gsum.Sum(data);
-    return data;
+#if TARGET == QCDOC
+  Gsum64Ext  gsum;
+  return gsum.Sum(data);
+#else
+  return data;
+#endif
 }
 
 unsigned int QioControl::globalSumUint(const unsigned int data) const{
-//  Gsum64Ext  gsum;
-//  return gsum.Sum(data);
-   return data;
-
-  /*
-  if(NumNodes() > 1) {
-    // i cannot find global sum on uint, so sum on 2 halves respectively
-    // on 32-bit int machine, this proc may break down when more then 32768 nodes
-    int halfword[2];
-    int shift = sizeof(unsigned int) / 2 * 8;
-    int mask = (0x1<<shift)-0x1;
-    halfword[0] = data & mask;             // right bits
-    halfword[1] = data >> shift;           // left bits
-
-    QMP_sum_int(&halfword[0]);
-    QMP_sum_int(&halfword[1]);
-    
-    unsigned int result;
-    result = halfword[1];
-    result = (result << shift) + halfword[0];
-    
-    return result;
-  }
-  else
-    return data;
-  */
+#if TARGET == QCDOC
+  Gsum64Ext  gsum;
+  return gsum.Sum(data);
+#else
+  return data;
+#endif
 }
 
 Float QioControl::globalSumFloat(const Float data) const {
-//  Gsum64Ext  gsum;
-//  return gsum.Sum(data);
+#if TARGET == QCDOC
+  Gsum64Ext  gsum;
+  return gsum.Sum(data);
+#else
   return data;
-
-  /*
-  QMP_float_t buf = data;
-  
-  if(NumNodes() > 1) {
-    QMP_sum_float(&buf);
-  }
-
-  return buf;
-  */
+#endif
 }
 
 // IO control pattern:  two broadcast to set id range who got control
@@ -192,6 +151,7 @@ int QioControl::getIOTimeSlot(int block) const {
       }
     }
   }
+
   return 1;
 }
 
@@ -215,6 +175,7 @@ int QioControl::finishIOTimeSlot(int block) const {
       }
     }
   }
+
   return 0;
 }
 
@@ -264,6 +225,95 @@ int QioControl::IOCommander(int caller, int block) const {
 }
 
 
+
+
+///////////////////////////////////////////////////////////////////
+// GCFheaderPar class members
+string elmSpacePar(string str)
+{
+  const int i0(str.find_first_not_of(" "));
+  const int i1(str.find_last_not_of (" "));
+  if(i1 - i0>0){ return(str.substr(i0,i1-i0+1)); }
+  else         { return(str);  }
+}
+
+bool GCFheaderPar::add(string key_eq_value)
+{
+  const int eqp(key_eq_value.find("="));
+  if( eqp  > 0  )
+    {
+      const string key( elmSpacePar( key_eq_value.substr(0,eqp) ) );
+      const string val( elmSpacePar( key_eq_value.substr(eqp+1) ) );
+      headerMap.insert(GCFHMapParT::value_type(key,val));
+      return true;
+    } 
+  else 
+    {
+      return false;
+    }
+}
+
+
+void GCFheaderPar::Show()
+{
+  for (GCFHMapParT::const_iterator iter = headerMap.begin(); 
+       iter != headerMap.end(); ++iter) 
+    {
+      cout << iter->first << ":" << iter->second << endl;
+    }
+};
+
+
+string GCFheaderPar::asString( const string key ) 
+{
+  GCFHMapParT::const_iterator n(headerMap.find(key));
+
+  if (n == headerMap.end()) {
+    cout << "header::asString key " << key << " not found. use Default." << endl;
+    prevFound = false;
+    return string("");
+  }
+  else {
+    prevFound = true;
+    return ( n->second );
+  }
+}		  
+
+
+int GCFheaderPar::asInt( const string key ) 
+{
+  GCFHMapParT::const_iterator n(headerMap.find(key));
+
+  if (n == headerMap.end()) {
+    cout << "header::asInt key "<<key<<" not found. use Default." << endl;
+    prevFound = false;
+    return int(0);
+  }
+
+  else {
+    prevFound = true;
+    int tmp;
+    sscanf((n->second).c_str() , "%d ", &tmp);
+    return ( tmp );
+  }
+}		  
+
+Float GCFheaderPar::asFloat( const string key ) 
+{
+  GCFHMapParT::const_iterator n(headerMap.find(key));
+
+  if (n == headerMap.end()) {
+    cout << "header::asFloat key " << key << " not found. use Default." << endl;
+    prevFound = false;
+    return Float(0.0);
+  }
+  else {
+    prevFound = true;
+    float tmp;
+    sscanf((n->second).c_str() , "%f ", &tmp);
+    return ( (Float) tmp );
+  }
+}
 
 
 

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.12 2004-08-18 11:58:07 zs Exp $
+  $Id: random.C,v 1.13 2004-09-01 13:36:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.12 2004-08-18 11:58:07 zs Exp $
-//  $Id: random.C,v 1.12 2004-08-18 11:58:07 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-01 13:36:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.13 2004-09-01 13:36:23 chulwoo Exp $
+//  $Id: random.C,v 1.13 2004-09-01 13:36:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -30,6 +30,7 @@ CPS_END_NAMESPACE
 #include <util/random.h>
 #include <util/gjp.h>
 #include <util/error.h>
+#include <util/latrngio.h>
 #include <comms/glb.h>
 #ifdef PARALLEL
 #include <comms/sysfunc.h>
@@ -527,6 +528,22 @@ FermionFieldDimension frm_dim) const {
     else
     for(int h=0; h<n_rgen; h++) ugran_4d[h].StoreSeeds(s[h]);
 
+}
+
+
+bool LatRanGen::Read(const char * filename) {
+  QioArg rd_arg(filename);
+  LatRngRead  rd;
+  rd.read(ugran,ugran_4d,rd_arg);
+  return rd.good();
+}
+
+
+bool LatRanGen::Write(const char * filename) {
+  QioArg wt_arg(filename);
+  LatRngWrite  wt;
+  wt.write(ugran,ugran_4d,wt_arg);
+  return wt.good();
 }
 
 CPS_END_NAMESPACE

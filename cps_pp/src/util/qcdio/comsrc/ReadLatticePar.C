@@ -8,102 +8,14 @@
 // from QCDSP {load,unload}_lattice format
 
 #include <config.h>
+
 #include <math.h>
 #include <util/gjp.h>
 #include <util/ReadLatticePar.h>
 #include <util/fpconv.h>
 CPS_START_NAMESPACE
 
-// GCFheaderPar class members
-string elmSpacePar(string str)
-{
-  const int i0(str.find_first_not_of(" "));
-  const int i1(str.find_last_not_of (" "));
-  if(i1 - i0>0){ return(str.substr(i0,i1-i0+1)); }
-  else         { return(str);  }
-}
 
-bool GCFheaderPar::add(string key_eq_value)
-{
-  const int eqp(key_eq_value.find("="));
-  if( eqp  > 0  )
-    {
-      const string key( elmSpacePar( key_eq_value.substr(0,eqp) ) );
-      const string val( elmSpacePar( key_eq_value.substr(eqp+1) ) );
-      headerMap.insert(GCFHMapParT::value_type(key,val));
-      return true;
-    } 
-  else 
-    {
-      return false;
-    }
-}
-
-
-void GCFheaderPar::Show()
-{
-  for (GCFHMapParT::const_iterator iter = headerMap.begin(); 
-       iter != headerMap.end(); ++iter) 
-    {
-      cout << iter->first << ":" << iter->second << endl;
-    }
-};
-
-
-string GCFheaderPar::asString( const string key ) 
-{
-  GCFHMapParT::const_iterator n(headerMap.find(key));
-
-  if (n == headerMap.end()) {
-    cout << "header::asString key " << key << " not found. use Default." << endl;
-    prevFound = false;
-    return string("");
-  }
-  else {
-    prevFound = true;
-    return ( n->second );
-  }
-}		  
-
-
-int GCFheaderPar::asInt( const string key ) 
-{
-  GCFHMapParT::const_iterator n(headerMap.find(key));
-
-  if (n == headerMap.end()) {
-    cout << "header::asInt key "<<key<<" not found. use Default." << endl;
-    prevFound = false;
-    return int(0);
-  }
-
-  else {
-    prevFound = true;
-    int tmp;
-    sscanf((n->second).c_str() , "%d ", &tmp);
-    return ( tmp );
-  }
-}		  
-
-Float GCFheaderPar::asFloat( const string key ) 
-{
-  GCFHMapParT::const_iterator n(headerMap.find(key));
-
-  if (n == headerMap.end()) {
-    cout << "header::asFloat key " << key << " not found. use Default." << endl;
-    prevFound = false;
-    return Float(0.0);
-  }
-  else {
-    prevFound = true;
-    float tmp;
-    sscanf((n->second).c_str() , "%f ", &tmp);
-    return ( (Float) tmp );
-  }
-}
-
-
-/////////////////////////////////////////////////////////////////
-// ReadLatticeParallel class members
 void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 {
   // most codes coped from ReadLattice::read( ), modification added to enable parallel IO
@@ -152,10 +64,10 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 
 
   // check dimensions, b.c, etc
-  int nx = rd_arg.Xnodes * rd_arg.XnodeSites;
-  int ny = rd_arg.Ynodes * rd_arg.YnodeSites;
-  int nz = rd_arg.Znodes * rd_arg.ZnodeSites;
-  int nt = rd_arg.Tnodes * rd_arg.TnodeSites;
+  int nx = rd_arg.Xnodes() * rd_arg.XnodeSites();
+  int ny = rd_arg.Ynodes() * rd_arg.YnodeSites();
+  int nz = rd_arg.Znodes() * rd_arg.ZnodeSites();
+  int nt = rd_arg.Tnodes() * rd_arg.TnodeSites();
 
   if(isRoot()) {
     int rdnx,rdny,rdnz,rdnt;
@@ -193,8 +105,8 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
     cout << "Z bc:" << (z_bc==BND_CND_PRD ? "PERIODIC":"ANTI-PERIODIC") << endl;
     cout << "T bc:" << (t_bc==BND_CND_PRD ? "PERIODIC":"ANTI-PERIODIC") << endl;
     
-    if(x_bc != rd_arg.Xbc || y_bc != rd_arg.Ybc || z_bc != rd_arg.Zbc || t_bc != rd_arg.Tbc) {
-      cout << "Boundary conditions in file Contradicts GlobalJobParameter!" << endl;
+    if(x_bc != rd_arg.Xbc() || y_bc != rd_arg.Ybc() || z_bc != rd_arg.Zbc() || t_bc != rd_arg.Tbc()) {
+      cout << "Boundary conditions in file DISAGREE with GlobalJobParameter!" << endl;
       error = 1;
     }
   }
@@ -211,11 +123,8 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   }
 
 
-  int size_matrices( rd_arg.XnodeSites * rd_arg.YnodeSites 
-		     * rd_arg.ZnodeSites * rd_arg.TnodeSites * 4); 
-
-  int size_ints = recon_row_3 ? size_matrices*12 : size_matrices*18;
-  int size_chars   ( size_ints * fpconv.fileFpSize()  );
+  int size_matrices( rd_arg.XnodeSites() * rd_arg.YnodeSites() 
+		     * rd_arg.ZnodeSites() * rd_arg.TnodeSites() * 4); 
 
   cout << "size_matrices = " << size_matrices << endl;
 
@@ -225,28 +134,33 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   if(isRoot())  hd.Show();
 
   // start reading data
-  int size_per_mat = recon_row_3 ? 12*fpconv.fileFpSize() : 18*fpconv.fileFpSize();
-  int size_per_site = size_per_mat * 4;
+  //  int size_per_mat = recon_row_3 ? 12*fpconv.fileFpSize() : 18*fpconv.fileFpSize();
+  //  int size_per_site = size_per_mat * 4;
+  int Floats_per_site = recon_row_3? 4*12 : 4*18;
+  int chars_per_site  = Floats_per_site * fpconv.fileFpSize();
 
-  char *fpoint = new char [size_chars];
 
-  int xbegin = rd_arg.XnodeSites * rd_arg.Xcoor, xend = rd_arg.XnodeSites * (rd_arg.Xcoor+1);
-  int ybegin = rd_arg.YnodeSites * rd_arg.Ycoor, yend = rd_arg.YnodeSites * (rd_arg.Ycoor+1);
-  int zbegin = rd_arg.ZnodeSites * rd_arg.Zcoor, zend = rd_arg.ZnodeSites * (rd_arg.Zcoor+1);
-  int tbegin = rd_arg.TnodeSites * rd_arg.Tcoor, tend = rd_arg.TnodeSites * (rd_arg.Tcoor+1);
+  // TempBufAlloc is a Mem Allocator that prevents mem leak on "return"s
+  TempBufAlloc fbuf(chars_per_site);  // buffer only stores one site
 
-  int tblk = nx*ny*nz*size_per_site;
-  int zblk = nx*ny*size_per_site;
-  int yblk = nx*size_per_site;
 
-  cout << endl;
-  cout << "Trying to read " << size_chars << " bytes"<<endl;
+  int xbegin = rd_arg.XnodeSites() * rd_arg.Xcoor(), xend = rd_arg.XnodeSites() * (rd_arg.Xcoor()+1);
+  int ybegin = rd_arg.YnodeSites() * rd_arg.Ycoor(), yend = rd_arg.YnodeSites() * (rd_arg.Ycoor()+1);
+  int zbegin = rd_arg.ZnodeSites() * rd_arg.Zcoor(), zend = rd_arg.ZnodeSites() * (rd_arg.Zcoor()+1);
+  int tbegin = rd_arg.TnodeSites() * rd_arg.Tcoor(), tend = rd_arg.TnodeSites() * (rd_arg.Tcoor()+1);
+
+  int tblk = nx*ny*nz*chars_per_site;
+  int zblk = nx*ny*chars_per_site;
+  int yblk = nx*chars_per_site;
 
   // read in parallel manner, node 0 will assign & dispatch IO time slots
+  int mat=0;
+  unsigned int csum = 0;
+  Matrix * lpoint = rd_arg.StartConfLoadAddr;
+
   setConcurIONumber(rd_arg.ConcurIONumber);
   getIOTimeSlot();
 
-  char *buf = fpoint;
   input.seekg(data_start,ios_base::beg);
 
   int jump = tbegin * tblk;
@@ -255,13 +169,19 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
     for(int zr=zbegin;zr<zend;zr++) {
       jump += ybegin * yblk;
       for(int yr=ybegin;yr<yend;yr++) {
-	jump += xbegin * size_per_site;
+	jump += xbegin * chars_per_site;
 	input.seekg(jump,ios_base::cur);
 
-	input.read(buf,(xend-xbegin) * size_per_site);
-	buf += (xend-xbegin) * size_per_site;
+	for(int xr=xbegin;xr<xend;xr++) {
+	  input.read(fbuf,chars_per_site);
+	  csum += fpconv.checksum(fbuf,Floats_per_site);
+	  for(int i=0;i<4;i++) {
+	    fpconv.file2host((char*)&lpoint[mat++],(char*)fbuf+chars_per_site/4*i,
+			     Floats_per_site/4);
+	  }
+	}
 
-	jump = (nx-xend) * size_per_site;  // "jump" restart from 0 and count
+	jump = (nx-xend) * chars_per_site;  // "jump" restart from 0 and count
       }
       jump += (ny-yend) * yblk;
     }
@@ -274,69 +194,19 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   
   input.close();
 
-  cout << "Actually read " << buf-fpoint << " bytes" << endl;
-
   if(synchronize(error) != 0)  return;
 
   // STEP 1: checksum
-  if(!CheckSum(fpoint, size_ints)) return;
-
-  // STEP 2: floating format checking/transferring
-  cout << "Transferring " << fpconv.name(fpconv.fileFormat) << " ==> " << fpconv.name(fpconv.hostFormat) << endl;
-
-  Matrix * lpoint = rd_arg.StartConfLoadAddr;
-
-  if(recon_row_3) {
-    cout << "Reconstructing row 3" << endl;
-    for(int mat=0; mat<size_matrices; mat++) {
-      char * src = fpoint + mat * size_per_mat;
-      Float * rec = (Float*)&lpoint[mat];
-      fpconv.file2host((char*)rec,src,12);
-      // reconstruct the 3rd row
-      rec[12] =  rec[2] * rec[10] - rec[3] * rec[11] - rec[4] * rec[8] + rec[5] * rec[9];
-      rec[13] = -rec[2] * rec[11] - rec[3] * rec[10] + rec[4] * rec[9] + rec[5] * rec[8];
-      rec[14] = -rec[0] * rec[10] + rec[1] * rec[11] + rec[4] * rec[6] - rec[5] * rec[7];
-      rec[15] =  rec[0] * rec[11] + rec[1] * rec[10] - rec[4] * rec[7] - rec[5] * rec[6];
-      rec[16] =  rec[0] * rec[ 8] - rec[1] * rec[ 9] - rec[2] * rec[6] + rec[3] * rec[7];
-      rec[17] = -rec[0] * rec[ 9] - rec[1] * rec[ 8] + rec[2] * rec[7] + rec[3] * rec[6];
-    }
-  }
-  else {
-    fpconv.file2host((char*)lpoint,fpoint,size_ints);
-  }
-
-  delete[] fpoint;
-  
-
-  // STEP 3: check plaq and linktrace
-  Float plaq_inheader;
-  Float linktrace_inheader;
-  if(isRoot()) {
-    plaq_inheader = hd.asFloat("PLAQUETTE");
-    linktrace_inheader = hd.asFloat("LINK_TRACE");
-  }
-  broadcastFloat(&plaq_inheader);
-  broadcastFloat(&linktrace_inheader);    
-
-  if(lat.GaugeField() != lpoint) lat.GaugeField(lpoint);
-  if(! CheckPlaqLinktrace(lat,rd_arg,plaq_inheader, linktrace_inheader))  return;
-
-  load_good = true;
-
-};
-
-// checksum check
-bool ReadLatticeParallel::CheckSum(char * fpoint, int size_ints)
-{
-  unsigned int csum = globalSumUint(fpconv.checksum(fpoint,size_ints));
-
-  int error = 0;
+  if(rd_arg.Scoor() == 0)
+    csum = globalSumUint(csum);
+  else
+    globalSumUint(0);
 
   if(isRoot()) {
-    unsigned long tmp;
-    sscanf(hd.asString("CHECKSUM").c_str() , "%lx ", &tmp);
+    unsigned int cshead;
+    sscanf(hd.asString("CHECKSUM").c_str() , "%lx ", &cshead);
   
-    if( tmp != csum ) {
+    if( cshead != csum ) {
       cout << "CheckSUM error !! Header:" 
 	   << hd.asString("CHECKSUM") << " Host calc:"
 	   <<hex << csum << dec << "\n";
@@ -346,20 +216,52 @@ bool ReadLatticeParallel::CheckSum(char * fpoint, int size_ints)
       cout << "CheckSUM is ok\n";
   }
 
-  if(synchronize(error) != 0) return false;
+  if(synchronize(error) != 0) return;
 
-  return true;
-}
+
+  // STEP 2: reconstruct row 3
+  if(recon_row_3) {
+    cout << "Reconstructing row 3" << endl;
+    for(int mat=0; mat<size_matrices; mat++) {
+      Float * rec = (Float*)&lpoint[mat];
+      // reconstruct the 3rd row
+      rec[12] =  rec[2] * rec[10] - rec[3] * rec[11] - rec[4] * rec[8] + rec[5] * rec[9];
+      rec[13] = -rec[2] * rec[11] - rec[3] * rec[10] + rec[4] * rec[9] + rec[5] * rec[8];
+      rec[14] = -rec[0] * rec[10] + rec[1] * rec[11] + rec[4] * rec[6] - rec[5] * rec[7];
+      rec[15] =  rec[0] * rec[11] + rec[1] * rec[10] - rec[4] * rec[7] - rec[5] * rec[6];
+      rec[16] =  rec[0] * rec[ 8] - rec[1] * rec[ 9] - rec[2] * rec[6] + rec[3] * rec[7];
+      rec[17] = -rec[0] * rec[ 9] - rec[1] * rec[ 8] + rec[2] * rec[7] + rec[3] * rec[6];
+    }
+  }
+
+  // STEP 3: check plaq and linktrace
+  Float plaq_inheader(0.0);
+  Float linktrace_inheader(0.0);
+  if(isRoot()) {
+    plaq_inheader = hd.asFloat("PLAQUETTE");
+    linktrace_inheader = hd.asFloat("LINK_TRACE");
+  }
+
+  if(lat.GaugeField() != lpoint) lat.GaugeField(lpoint);
+  if(! CheckPlaqLinktrace(lat,rd_arg,plaq_inheader, linktrace_inheader))  return;
+
+  load_good = true;
+
+};
 
 // just add a extra level of sum (the global sum)
 bool ReadLatticeParallel::CheckPlaqLinktrace(Lattice &lat, const QioArg & rd_arg,
 					     const Float plaq_inheader, const Float linktrace_inheader) 
 {
-  Float plaq = lat.SumReTrPlaq() / 18.0 / rd_arg.VolSites() ;
-  Float devplaq =   fabs(  (plaq - plaq_inheader) / plaq ) ;
-  printf("plaqerr::  calc: %f  header: %f dev.: %f\n",
-         (float)plaq, (float)plaq_inheader,(float)devplaq);
+  int error = 0;
 
+  Float plaq = lat.SumReTrPlaq() / 18.0 / rd_arg.VolSites() ;
+  Float devplaq(0.0);
+  if(isRoot()) {
+    devplaq =   fabs(  (plaq - plaq_inheader) / plaq ) ;
+    printf("plaqerr::  calc: %f  header: %f dev.: %f\n",
+	   (float)plaq, (float)plaq_inheader,(float)devplaq);
+  }
 
   Float linktrace(0);
   int is;
@@ -368,19 +270,28 @@ bool ReadLatticeParallel::CheckPlaqLinktrace(Lattice &lat, const QioArg & rd_arg
     linktrace += m->ReTr();
     m++;
   }
-  linktrace = globalSumFloat(linktrace) / (rd_arg.VolSites()*12.0);
-  Float devlinktrace =   
-    fabs(  (linktrace - linktrace_inheader) / linktrace );
+  if(rd_arg.Scoor() == 0) 
+    linktrace = globalSumFloat(linktrace) / (rd_arg.VolSites()*12.0);
+  else
+    globalSumFloat(0.0);
 
-  printf("linktrace::  calc: %f  header: %f dev.: %f\n",
-         (float) linktrace, (float)linktrace_inheader,
-         (float)devlinktrace);
+  if(isRoot()) {
+    Float devlinktrace =   
+      fabs(  (linktrace - linktrace_inheader) / linktrace );
+
+    printf("linktrace::  calc: %f  header: %f dev.: %f\n",
+	   (float) linktrace, (float)linktrace_inheader,
+	   (float)devlinktrace);
   
-  Float chkprec = rd_arg.CheckPrecision;
-  if(devplaq > chkprec || devlinktrace > chkprec) {
-    cout << "Plaq trace and/or Link trace different from header" << endl;
-    return false;
+    Float chkprec = rd_arg.CheckPrecision;
+    if(devplaq > chkprec || devlinktrace > chkprec) {
+      cout << "Plaq trace and/or Link trace different from header" << endl;
+      error = 1;
+    }
   }
+
+  if(synchronize(error) != 0) return false;
+
   return true;
 }
 

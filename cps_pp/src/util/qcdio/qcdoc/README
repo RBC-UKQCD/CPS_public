@@ -26,12 +26,12 @@ Usage:
 
 
 6. to run the test,
-qrun QCDOC.x   -[r|w]   conf.file  <x/y/z sites>  <t sites>  <Xbc> <Ybc> <Zbc> <Tbc> 
+qrun QCDOC.x   -[r|w]   conf.file  <x/y/z sites>  <t sites>  <s sites>  <Xbc> <Ybc> <Zbc> <Tbc> 
 
 eg,
-qrun QCDOC.x  -r  conf8x8x8x8.file  8   8  P  P  P  P
+qrun QCDOC.x  -r  conf8x8x8x8.file  8   8  1    P  P  P  P
 	or
-qrun QCDOC.x  -w  conf4x4x4x16.file 4  16  P  P  A  A
+qrun QCDOC.x  -w  conf4x4x4x16.file 4  16  32   P  P  A  A
 
 
 7. sorry for the long argument list....
