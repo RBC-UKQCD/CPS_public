@@ -6,18 +6,21 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: pt.h,v 1.2 2004-01-13 20:38:57 chulwoo Exp $
+  $Id: pt.h,v 1.3 2004-01-14 07:42:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-01-13 20:38:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.2 2004-01-13 20:38:57 chulwoo Exp $
-//  $Id: pt.h,v 1.2 2004-01-13 20:38:57 chulwoo Exp $
+//  $Date: 2004-01-14 07:42:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.3 2004-01-14 07:42:59 chulwoo Exp $
+//  $Id: pt.h,v 1.3 2004-01-14 07:42:59 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.2.1.2.1  2003/12/15 18:52:21  cwj
+//  *** empty log message ***
+//
 //  Revision 1.1.2.1  2003/11/05 16:13:21  mike
 //  Initial attempt at producing working branch
 //
@@ -73,7 +76,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -178,10 +181,12 @@ class ParTransAsqtad : public ParTransStagTypes
 
   void pt_init(const void *);
   void pt_init_g();
-	void pt_delete();
+  void pt_delete();
+  void pt_delete_g();
  public:
   ParTransAsqtad(Lattice& latt);            // Lattice object.
   void run(int n, Vector **vout, Vector **vin, const int *dir );
+  void run(int n, Matrix **mout, Matrix **min, const int *dir );
   void run(Vector *vout, Vector *vin, const int dir );
 
   ~ParTransAsqtad();

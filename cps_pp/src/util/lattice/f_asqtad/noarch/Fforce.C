@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.3 2004-01-13 20:39:50 chulwoo Exp $
+  $Id: Fforce.C,v 1.4 2004-01-14 07:43:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -69,7 +69,15 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
     int pos[] = {0,0,0,0};
     IFloat *link_p = (IFloat *)GetLink(pos,0);
     printf("GetLink({0,0,0,0},0)(%p)=%e\n",link_p,*link_p );
-   Fconvert(frm,CANONICAL,STAG);
+    int f_size = GJP.VolNodeSites()*FsiteSize()*sizeof(Float)/2;
+
+    Vector *tmp = (Vector *)smalloc(2*f_size);
+    Vector *tmp_o = &(tmp[GJP.VolNodeSites()/2]);
+    moveMem(tmp,frm,f_size);
+    moveMem(tmp_o,f_tmp,f_size);
+    
+    Fconvert(tmp,CANONICAL,STAG);
+    Convert(STAG);
 
     
     const int N = 4;  // N can be 1, 2 or 4.
@@ -141,7 +149,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	}
     }
 
-    Vector *X = frm;	
+    Vector *X = tmp;	
 
     // Array in which to accumulate the force term
     // This must be initialised to zero 
@@ -624,7 +632,9 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
     }
     
 	
-   Fconvert(frm,STAG,CANONICAL);
+	sfree(tmp);
+  printf("EvolveMomFforce() done\n");
+//   Fconvert(tmp,STAG,CANONICAL);
 
 }
 
@@ -654,6 +664,7 @@ int staggered_phase(const int *n, int mu){
     
 }
 
+#undef FILE_PRINT
 static int called=0;
 void Fasqtad::parallel_transport(Vector **vin, const int *dir,
 				     int N, Vector **vout){
@@ -662,20 +673,24 @@ void Fasqtad::parallel_transport(Vector **vin, const int *dir,
     int n, s[4], spm[4];
     int pos[] = {0,0,0,0};
     IFloat *link_p = (IFloat *)GetLink(pos,0);
-//FILE *fp;
+	FILE *fp;
 	called++;
 	char filename[200];
+#ifdef FILE_PRINT
 	sprintf(filename,"par_trans_out%d",called);
-//	fp = fopen(filename,"w");
-//	fprintf(fp,"called=%d\n",called);
+	fp = fopen(filename,"w");
+	fprintf(fp,"called=%d\n",called);
 	fprintf(stdout,"called=%d\n",called);
-	Convert(STAG);
+#endif
+//	Convert(STAG);
 
     for(int d=0; d<N; d++){
 
 	bool backwards = false;
 	int mu = (int)dir[d];
-//	fprintf(fp,"dir=%d\n",mu);
+#ifdef FILE_PRINT
+	fprintf(fp,"dir=%d\n",mu);
+#endif
 	if(mu%2) backwards = true;
         mu /= 2;
 	
@@ -697,19 +712,23 @@ void Fasqtad::parallel_transport(Vector **vin, const int *dir,
 			    ++s[mu];
 			}
 			
-			uDotXEqual((IFloat*)&vout[d][n], (IFloat*)&u, (IFloat*)&vin[d][FsiteOffset(spm)]);
+			uDagDotXEqual((IFloat*)&vout[d][n], (IFloat*)&u, (IFloat*)&vin[d][FsiteOffset(spm)]);
 			spm[mu] = s[mu];
 	IFloat * vout_p = (IFloat *)(vin[d] + n);
-//	fprintf(fp,"vin[%d][%d]=",d,n);
-//	for(int k=0;k<6;k++) fprintf(fp,"  %0.8e",vout_p[k]);
-//	fprintf(fp,"\n");
+#ifdef FILE_PRINT
+	fprintf(fp,"vin[%d][%d]=",d,n);
+	for(int k=0;k<6;k++) fprintf(fp,"  %0.8e",vout_p[k]);
+	fprintf(fp,"\n");
 	vout_p = (IFloat *)(vout[d] + n);
-//	fprintf(fp,"vout[%d][%d]=",d,n);
-//	for(int k=0;k<6;k++) fprintf(fp,"  %0.8e",vout_p[k]);
-//	fprintf(fp,"\n");
+	fprintf(fp,"vout[%d][%d]=",d,n);
+	for(int k=0;k<6;k++) fprintf(fp,"  %0.8e",vout_p[k]);
+	fprintf(fp,"\n");
+#endif
 		    }
    }
-//	fclose(fp);
+#ifdef FILE_PRINT
+	fclose(fp);
+#endif
 }    
 
 

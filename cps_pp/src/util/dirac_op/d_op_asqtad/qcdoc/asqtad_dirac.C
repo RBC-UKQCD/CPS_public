@@ -1579,7 +1579,7 @@ int non_local_count_3[3][2];
      if(uc_l[i] == 0){
        ERR.Pointer(cname,fname, "uc_l[i]"); exit(3);
 	}
-    for(int j=0;j<MATRIX_SIZE*(local_chi+local_chi_3)/2;j++)
+    for(j=0;j<MATRIX_SIZE*(local_chi+local_chi_3)/2;j++)
 	uc_l[i][j]=0.;
     uc_l_agg[i]  = (gauge_agg *)smalloc(((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
 
@@ -1639,8 +1639,8 @@ printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
   Matrix *P6mu = P5mu;
   Matrix *Pmumu = P7;
   Matrix *Pmumumu = P7mu;
-  for(int j = 0;j<vol;j++) Unit[j].UnitMatrix();
-  for(int j = 0;j<NUM_DIR;j++){
+  for(j = 0;j<vol;j++) Unit[j].UnitMatrix();
+  for(j = 0;j<NUM_DIR;j++){
      result[j] = new Matrix[vol];
   printf("result[%d]=%p\n",j,result[j]);fflush(stdout);
      for(int k = 0;k<vol;k++) result[j][k].ZeroMatrix();

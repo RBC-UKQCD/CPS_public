@@ -1,10 +1,14 @@
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_builddir@
+QOS = @QOS@
 
 PWD := $(shell pwd)
-DIR := $(subst $(SRCDIR),,$(PWD))
-DIR := $(subst $(BUILDDIR),,$(DIR))
-VPATH:=${SRCDIR}/$(DIR) ${BUILDDIR}/$(DIR)
+DIR := $(subst $(BUILDDIR),,$(PWD))
+DIR := $(subst $(SRCDIR),,$(DIR))/
+DIRB:= $(subst /src,/objs/,$(DIR))
+DIR:= $(subst /objs/,/src/,$(DIRB))
+#DIRB:= $(DIR)
+VPATH:=${SRCDIR}/$(DIR) ${BUILDDIR}/$(DIRB)
 
 CC = @CC@
 CXX = @CXX@
@@ -16,6 +20,25 @@ CXXFLAGS = @CXXFLAGS@
 ASFLAGS = @ASFLAGS@
 
 INCLUDE_FLAGS = @INCLUDE_FLAGS@
+
+ifeq	($(LIB_NAME_SET),yes)
+SEPARATE_LIB = yes
+endif
+
+ifeq	($(SEPARATE_LIB),yes)
+DIR2 := $(subst /src/,,$(DIR))
+DIR2 := $(subst util/,,$(DIR2))
+DIR2 := $(subst dirac_op/,,$(DIR2))
+DIR2 := $(subst mem/,,$(DIR2))
+DIR2 := $(subst alg/,,$(DIR2))
+LIBNAME := XXX$(subst /,_,$(DIR2))XXX
+LIBNAME := $(subst XXX_,,$(LIBNAME))
+LIBNAME := $(subst _XXX,,$(LIBNAME))
+LIBNAME := $(subst XXX,,$(LIBNAME))
+else
+LIBNAME = cps
+endif
+LIBNAME ?= cps
 
 DFLAGS = @DFLAGS@
 
@@ -36,14 +59,24 @@ libcps_CXXFLAGS = $(INCLUDE_FLAGS) $(CXXFLAGS) $(DFLAGS)
 all: cps 
 
 recurse: $(RECURSEDIRS)
-#	@echo RECURSEDIRS = $(RECURSEDIRS)
 
 $(RECURSEDIRS):
 #	@echo PWD = $(PWD)
-	mkdir -p $(BUILDDIR)/$(DIR)/$@
-	touch -a $(BUILDDIR)/$(DIR)/$@/Makefile_depend
-	cp -p $(SRCDIR)/$(DIR)/$@/Makefile $(BUILDDIR)/$(DIR)/$@/
+	@echo PWD = $(BUILDDIR)/$(DIRB)
+	@echo DIR = $(DIR)
+	@echo DIRB = $(DIRB)
+	mkdir -p $(BUILDDIR)/$(DIRB)/$@
+	touch -a $(BUILDDIR)/$(DIRB)/$@/Makefile_depend
+	cp -p $(SRCDIR)/$(DIR)/$@/Makefile $(BUILDDIR)/$(DIRB)/$@
+ifeq	($(LIB_NAME_SET),yes)
+	$(MAKE) -C $@ LIBNAME=$(LIBNAME) $(MAKECMDGOALS)
+else
+ifeq	($(SEPARATE_LIB),yes)
+	$(MAKE) -C $@ SEPARATE_LIB=$(SEPARATE_LIB) $(MAKECMDGOALS)
+else
 	$(MAKE) -C $@ $(MAKECMDGOALS)
+endif
+endif
 
 
 .SUFFIXES:
@@ -62,40 +95,33 @@ OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
 OBJS := $(notdir $(OBJS_SRC))
 
 %.o:%.c
-#	@echo CSRC = $(CSRC)
-#	@echo TARGET = $@
-	mkdir -p $(BUILDDIR)/$(DIR)
-	${CC} -c $< -o $(BUILDDIR)/$(DIR)/$@ ${libcps_CXXFLAGS}
-	cd $(BUILDDIR)/$(DIR) ; ${AR} rcs ${BUILDDIR}/cps.a $@
+	mkdir -p $(BUILDDIR)/$(DIRB)
+	${CC} -c $< -o $(BUILDDIR)/$(DIRB)/$@ ${libcps_CXXFLAGS}
+	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.C
-#	@echo CCSRC = $(CCSRC)
-#	@echo TARGET = $@
-#	mkdir -p $(BUILDDIR)/$(DIR)
-	${CXX} -c $< -o $(BUILDDIR)/$(DIR)/$@ ${libcps_CXXFLAGS}
-#	${CXX} -c $< -o $@ ${libcps_CXXFLAGS}
-	cd $(BUILDDIR)/$(DIR) ; ${AR} rcs ${BUILDDIR}/cps.a $@
+	${CXX} -c $< -o $(BUILDDIR)/$(DIRB)/$@ ${libcps_CXXFLAGS}
+	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.S
-#	@echo SSRC = $(SSRC)
-#	@echo TARGET = $@
-	$(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR)/$(DIR)/$*.i
-	$(AS) $(ASFLAGS) -o $(BUILDDIR)/$(DIR)/$@ $(BUILDDIR)/$(DIR)/$*.i
-	cd $(BUILDDIR)/$(DIR) ; ${AR} rcs ${BUILDDIR}/cps.a $@
-#	rm $*.i
+	$(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR)/$(DIRB)/$*.i
+	$(AS) $(ASFLAGS) -o $(BUILDDIR)/$(DIRB)/$@ $(BUILDDIR)/$(DIRB)/$*.i
+	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 
 depend: recurse
-	echo > $(BUILDDIR)/$(DIR)/Makefile_depend
-	cd $(SRCDIR)/$(DIR) ;makedepend -f$(BUILDDIR)/$(DIR)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
+	echo > $(BUILDDIR)/$(DIRB)/Makefile_depend
+	cd $(SRCDIR)/$(DIR) ;makedepend -f$(BUILDDIR)/$(DIRB)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
 
 clean: recurse
-	cd $(BUILDDIR)/$(DIR) ; rm -f *.o *.i *.bak
+	cd $(BUILDDIR)/$(DIRB) ; rm -f *.o *.i *.bak
+
+cleanlib:
+	cd $(BUILDDIR) ; rm -f *.a
 
 cps: recurse $(OBJS) 
-#	@echo OBJS = $(OBJS)
-#	@echo DIR = $(DIR)
-#	@echo CCOBJ = $(CCOBJ)
-#	cd $(BUILDDIR)/$(DIR) ; ${AR} rcs ${BUILDDIR}/cps.a $(OBJS)
+#	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $(OBJS)
 
-include $(BUILDDIR)/$(DIR)/Makefile_depend
+$(BUILDDIR)/$(DIRB)/Makefile_depend: depend
+
+include $(BUILDDIR)/$(DIRB)/Makefile_depend

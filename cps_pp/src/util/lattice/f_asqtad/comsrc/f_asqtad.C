@@ -1,22 +1,29 @@
 #include<config.h>
 #include<stdio.h>
+#include<stdlib.h>
 #include<math.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.2 2004-01-13 20:39:49 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.3 2004-01-14 07:43:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v 1.2 2004-01-13 20:39:49 chulwoo Exp $
-//  $Id: f_asqtad.C,v 1.2 2004-01-13 20:39:49 chulwoo Exp $
+//  $Date: 2004-01-14 07:43:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v 1.3 2004-01-14 07:43:00 chulwoo Exp $
+//  $Id: f_asqtad.C,v 1.3 2004-01-14 07:43:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.4.5  2003/12/24 00:22:45  cwj
+//  ../../dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C
+//
+//  Revision 1.1.4.4  2003/12/15 18:22:08  cwj
+//  *** empty log message ***
+//
 //  Revision 1.1.4.3  2003/12/11 20:22:53  cwj
 //  *** empty log message ***
 //
@@ -78,7 +85,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: f_asqtad.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v $
 //  $State: Exp $
 //
@@ -106,6 +113,9 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 enum{VECT_LEN=6, MATRIX_SIZE=18, SITE_LEN=72};
+#if TARGET == QCDOC
+void  set_pt (Fasqtad *lat);
+#endif
 
 
 //------------------------------------------------------------------
@@ -214,8 +224,10 @@ Fasqtad::Fasqtad()
   if(GJP.Tbc() == BND_CND_APRD) bc[3] = GJP.TnodeCoor()
   	== (GJP.Tnodes()-1) ? 1 : 0;
   IFloat *tmp_p = (IFloat *)GaugeField();
-//  printf("GaugeField(%p)[0] = %e\n",tmp_p,*tmp_p);
   asqtad_dirac_init(GaugeField());
+#if TARGET == QCDOC
+  set_pt (this);
+#endif
 
   // setup CBUF
     setCbufCntrlReg(1, CBUF_MODE1);
@@ -440,7 +452,6 @@ int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   int iter;
   char *fname = "FmatMInv(V**, V*, .....)";
   VRB.Func(cname,fname);
-  printf("Fasqtad::FmatEvlMInv\n");
 
   Vector **EigVec=0;
   int Neig = 0;
@@ -577,15 +588,40 @@ void Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o,
   VRB.Func(cname,fname);
   CgArg cg_arg;
   cg_arg.mass = mass;
+//  static int called=0;
+  char *tmp = (char *)smalloc(4);
+  printf("SetPhi::tmp=%p\n",tmp);
+  sfree(tmp);
 
   DiracOpAsqtad stag(*this, phi, frm_o, &cg_arg, CNV_FRM_NO);
   stag.Dslash(phi, frm_o, CHKB_ODD, DAG_NO);
+#if 0
+  Float * tmp_p = (Float *)frm_o;
+  printf("frm_o = \n");
+  for(int i = 0;i<GJP.VolNodeSites()*3;i++){
+	printf("%e ",*tmp_p);
+	if(i%6==5) printf("\n");
+	tmp_p++;
+  }
+  tmp_p = (Float *)phi;
+  printf("phi = \n");
+  for(int i = 0;i<GJP.VolNodeSites()*3;i++){
+	printf("%e ",*tmp_p);
+	if(i%6==5) printf("\n");
+	tmp_p++;
+  }
+#endif
 
   // Modified for anisotropic lattices
   //------------------------------------------------------------------
   fTimesV1MinusV2((IFloat *)phi, 2.*mass*GJP.XiBare()/GJP.XiV(), 
 	(IFloat *)frm_e, (IFloat *)phi, e_vsize);
   // End modification
+//  called++;
+//  if(called ==10) exit(56);
+  tmp = (char *)smalloc(4);
+  printf("SetPhi::tmp=%p\n",tmp);
+  sfree(tmp);
 }
 
 
@@ -642,41 +678,6 @@ void Fasqtad::FforceSite(Matrix& force, Vector *frm, int *x, int mu)
     force.TrLessAntiHermMatrix(*mp1);
 }
 
-#if 0
-//------------------------------------------------------------------
-// EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, 
-//                 Float step_size):
-// It evolves the canonical momentum mom by step_size
-// using the fermion force. 
-//------------------------------------------------------------------
-void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
-			    Float mass, Float dt){
-  char *fname = "EvolveMomFforce(M*,V*,F,F)";
-  VRB.Func(cname,fname);
-
-  setCbufCntrlReg(4, CBUF_MODE4);
-  int x[4];
-  
-  for(x[0] = 0; x[0] < node_sites[0]; ++x[0]) {
-    for(x[1] = 0; x[1] < node_sites[1]; ++x[1]) {
-      for(x[2] = 0; x[2] < node_sites[2]; ++x[2]) {
-	for(x[3] = 0; x[3] < node_sites[3]; ++x[3]) {
-	  
-	  Matrix *ihp = mom+GsiteOffset(x);
-	  
-	  for (int mu = 0; mu < 4; ++mu) {
-	    FforceSite(*mp0, frm, x, mu);
-	    fTimesV1PlusV2((IFloat *)(ihp+mu), dt,
-			   (IFloat *)mp0,
-			   (IFloat *)(ihp+mu)+BANK4_BASE, 18);
-	  }
-	}
-      }
-    }
-  }
-}
-#endif
-
 void Fasqtad::prepForce(Vector *frm) {
   char *fname = "prepForce(V*)";
   VRB.Func(cname,fname);
@@ -687,6 +688,7 @@ void Fasqtad::prepForce(Vector *frm) {
   Vector *v1=(Vector*)0, *v2=(Vector*)0;
   DiracOpAsqtad stag(*this, v2, v1, &cg_arg, CNV_FRM_NO);
   stag.Dslash(f_tmp, frm, CHKB_EVEN, DAG_NO);
+//  printf("prefForce() done\n"); fflush(stdout);
 }
 
 

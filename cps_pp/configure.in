@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2004-01-13 20:38:56 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.4 2004-01-13 20:38:56 chulwoo Exp $
-dnl  $Id: configure.in,v 1.4 2004-01-13 20:38:56 chulwoo Exp $
+dnl  $Date: 2004-01-14 07:42:59 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.5 2004-01-14 07:42:59 chulwoo Exp $
+dnl  $Id: configure.in,v 1.5 2004-01-14 07:42:59 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.4 $
+dnl  $Revision: 1.5 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -50,14 +50,6 @@ dnl If using this script, then we are not making the QCDSP version.
 NOT_TESTING_QCDSP="yes"
 AC_SUBST(NOT_TESTING_QCDSP)
 
-dnl installdir
-AC_ARG_ENABLE(installdir,
-[  --enable-installdir   What target are we compiling for? (default=noarch)] ,
-, [enable_installdir=`pwd`])
-AC_SUBST(enable_installdir)
-AC_MSG_CHECKING("Install directory")
-AC_MSG_RESULT($enable_installdir)
-
 dnl Check for maths library
 AC_CHECK_LIB(m, sin, ,echo "CPS needs the math library - bailing out"; exit 1)
 
@@ -89,7 +81,7 @@ if test "$enable_target" = "qcdoc"; then
 
    ARCH="QCDOC"
    ARCHDIR="QCDOC_DIR"
-   DFLAGS="-DTARGET=1 -DPARALLEL=1"
+   DFLAGS=""
    TESTING_PARALLEL="yes";
 
 elif test "$enable_target" = "mpi"; then
@@ -98,7 +90,7 @@ elif test "$enable_target" = "mpi"; then
      AC_MSG_WARN([Using g++])
      AC_SEARCH_LIBS(MPI_Init, mpi mpich, ,echo "CPS needs the MPI library for a parallel build - bailing out."; exit 1)
    fi
-   DFLAGS="-DTARGET=3 -DPARALLEL=1"
+   DFLAGS=""
    LDFLAGS="-lmpi"
    TESTING_PARALLEL="yes";
    ARCH=MPI
@@ -106,7 +98,7 @@ elif test "$enable_target" = "mpi"; then
 
 else
 
-   DFLAGS="-DTARGET=0 -DPARALLEL=0"
+   DFLAGS=""
    ARCH=NOARCH
    ARCHDIR="NOARCH_DIR"
    TESTING_PARALLEL="no";
@@ -156,6 +148,8 @@ AC_SUBST(LD)
 AC_SUBST(LDFLAGS)
 AC_SUBST(TESTING_PARALLEL)
 AC_SUBST(ENABLE_PARALLEL)
+AC_SUBST(QOS)
+
 
 dnl temporary hack until qos is more mature
 if test "$enable_target" = "qcdoc"; then
@@ -193,7 +187,6 @@ AC_OUTPUT(Makefile_cps\
 	  Makefile.vars \
 	  Makefile.rules \
 	  Makefile.compile \
-	  Makefile_depend \
           tests/Makefile_common \
           tests/Makefile_common2 \
           tests/regression.pl )

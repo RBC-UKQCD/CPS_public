@@ -8,7 +8,7 @@ cd <builddir>
 or
 
 <srcdir>/configure --build=sparc-sun-solaris2.9 --host=powerpc-gnu-elf
---enable-target=qcdoc QOS=/home/chulwoo/QCDOC/qos-1-9-2/qos for QCDOC on qcdochost0
+--enable-target=qcdoc QOS=(QOS directory)  for QCDOC on qcdochost0
 
 Variable QOS should be set to point where QOS is installed.
 
@@ -16,7 +16,7 @@ If you don't want to figure out what the build and host should be, you
 can use 'conf' script which generates command for configure:
 
 <srcdir>/conf for NOARCH or
-<srcdir>/conf --enable-target=qcdoc QOS=/home/chulwoo/QCDOC/qos-1-9-2/qos for QCDOC 
+<srcdir>/conf --enable-target=qcdoc QOS=(QOS directory) for QCDOC, then
 
 source config_wrapper
 
@@ -32,6 +32,7 @@ You could copy this into your directories or use Makefile_regression which point
 
 in the subdirectories, Makfiles look like this:
 SEPARATE_LIB = yes
+#LIB_NAME_SET = yes
 NORECURSE_DIR = CVS  noarch qcdoc qcdsp 
 QCDOC_DIR = noarch
 QCDOC_SERIAL_DIR = noarch
@@ -60,8 +61,8 @@ src/util/dirac_op/d_op_wilson  /qcdoc1 /qcdoc1_1
 				/qcdsp2
 				/noarch
 				
-
+QCDOC_DIR = qcdoc1 qcdoc2
 If SEPARATE_LIB is defined at src/util/dirac_op/d_op_wilson/Makefile, a
-separate library d_op_wilson_qcdoc1_1.a, d_op_wilson_qcdoc_1_2.a, d_op_wilson_qcdoc2.a will be created if compiled for QCDOC. 
+separate library d_op_wilson_qcdoc1_qcdoc1_1.a, d_op_wilson_qcdoc1_qcdoc_1_2.a, d_op_wilson_qcdoc2.a will be created if compiled for QCDOC. 
 
 If LIB_NAME_SET is defined at src/util/dirac_op/d_op_wilson/qcdoc1/Makefile, d_op_wilson_qcdoc1.a will be generated instead.
