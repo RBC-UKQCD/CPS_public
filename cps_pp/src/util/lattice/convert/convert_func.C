@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.4 2004-04-27 03:51:20 cwj Exp $
+  $Id: convert_func.C,v 1.5 2004-05-10 15:26:54 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.4 2004-04-27 03:51:20 cwj Exp $
-//  $Id: convert_func.C,v 1.4 2004-04-27 03:51:20 cwj Exp $
+//  $Author: zs $
+//  $Date: 2004-05-10 15:26:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.5 2004-05-10 15:26:54 zs Exp $
+//  $Id: convert_func.C,v 1.5 2004-05-10 15:26:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -93,18 +93,14 @@ void MultStagPhases(CAP cap)
 		site = cap->start_ptr +
 			cap->site_size*(x+cap->lx*(y+cap->ly*(z+cap->lz*t)));
 
-#ifndef MILC_PHASE
-		if (x%2) negate_link(link_size, (IFloat *)site+link_size);
-
-		if ((x+y)%2) negate_link(link_size, (IFloat *)site+(link_size<<1));
-
-		if ((x+y+z)%2) negate_link(link_size, (IFloat *)site+3*link_size) ;
-#else
+#ifdef MILC_COMPATIBILITY  // MILC phase convention - note that this breaks regression tests
 		if (t%2) negate_link(link_size, (IFloat *)site);
-
 		if ((t+x)%2) negate_link(link_size, (IFloat *)site+link_size);
-
 		if ((t+x+y)%2) negate_link(link_size, (IFloat *)site+2*link_size) ;
+#else	// usual CPS phase definition
+		if (x%2) negate_link(link_size, (IFloat *)site+link_size);
+		if ((x+y)%2) negate_link(link_size, (IFloat *)site+2*link_size);
+		if ((x+y+z)%2) negate_link(link_size, (IFloat *)site+3*link_size) ;
 #endif
 
 	}

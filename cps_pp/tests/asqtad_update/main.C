@@ -6,12 +6,8 @@
 #include<util/gjp.h>
 #include<util/verbose.h>
 #include<util/error.h>
-#include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
-#include<alg/common_arg.h>
-#include<alg/cg_arg.h>
-#include<alg/hmd_arg.h>
-#include<alg/ghb_arg.h>
+//#include<alg/common_arg.h>
 
 namespace cps
 {
@@ -75,7 +71,7 @@ int main(int argc,char *argv[]){
 //     do_arg.asqtad_3staple = 0.0;
 //     do_arg.asqtad_lepage = 0.0; 
 //     do_arg.asqtad_5staple = 0.0;
-//    do_arg.asqtad_7staple = 0.0;
+//     do_arg.asqtad_7staple = 0.0;
     
     GJP.Initialize(do_arg);
 
@@ -85,9 +81,12 @@ int main(int argc,char *argv[]){
 	(Matrix*)smalloc(GJP.VolNodeSites()*lat.GsiteSize()*sizeof(IFloat));
     if(!mom) ERR.Pointer("","","mom");
 
-    Vector *X =
-	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-    if(!X) ERR.Pointer("","","X");
+    const int degree = 2; 
+    Vector *X[degree];
+    for(int d=0; d<degree; d++){
+	X[d] = (Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+	if(!X[d]) ERR.Pointer("","","X");
+    }
 
     Matrix *gf = lat.GaugeField();
 
@@ -97,46 +96,59 @@ int main(int argc,char *argv[]){
 	    for(s[1]=0; s[1]<GJP.NodeSites(1); s[1]++)
 		for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
 
-		    int n = lat.FsiteOffset(s);
+		    int oe = lat.FsiteOffsetChkb_all(s);
+		    int lex = lat.GsiteOffset(s);
 
 		    IFloat crd = 1.0*s[0]+0.1*s[1]+0.01*s[2]+0.001*s[3];
-					
-		    for(int v=0; v<6; v++) *((IFloat*)&X[n]+v) = crd;
+
+		    for(int d=0; d<degree; d++)
+			for(int v=0; v<6; v++) *((IFloat*)&X[d] [oe]+v) = crd;
 
 		    for(int d=0; d<4; d++){
 			Complex icrd(0, crd+0.0001*d);
-			*(mom+4*n+d) = *(gf+4*n+d) = icrd;
-			(*(mom+4*n+d))(2,2) = -2.0*icrd;
+			*(mom+lex+d) = *(gf+lex+d) = icrd;
+			(*(mom+lex+d))(2,2) = -2.0*icrd;
 		    }
 		    if(s[3]==GJP.NodeSites(3)-1)  // MILC bound. conds.
-			*(gf+4*n+3) *= -1.0;
+			*(gf+lex+3) *= -1.0;
 		}
-
 
     Float dummy;
     Float dt = 2;
-    
-    lat.EvolveMomFforce(mom, X, dummy, dt);
+    VRB.Level(5);
 
-    printf(" x y z t\n");
+//     for(int d=0; d<degree; d++)
+// 	lat.EvolveMomFforce(mom, X[d], dummy, dt);
+
+    lat.RHMC_EvolveMomFforce(mom, X, degree, dummy, dt);
+		
+
+    FILE *fp;
+    if( (fp = fopen("update.dat.all", "w")) == NULL ) 
+	ERR.FileA(" ","main", "update.dat");
+    
+
+    fprintf(fp, " x y z t\n");
     
     for(s[3]=0; s[3]<GJP.NodeSites(3); s[3]++) 
 	for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
 	    for(s[1]=0; s[1]<GJP.NodeSites(1); s[1]++)
 		for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
+		    int n = lat.GsiteOffset(s);		    
 
-		    printf("\n %d %d %d %d", s[0], s[1], s[2], s[3]);
-		    int n = lat.FsiteOffset(s);
+ 		    fprintf(fp, "\nsite (%d %d %d %d) = %d",
+ 			    s[0], s[1], s[2], s[3], n/4);
 
 		    for(int d=0; d<4; d++){
 			printf("\n         %d\n\n", d);
 			for(int i=0; i<3; i++){
 			    for(int j=0; j<3; j++)
-				printf(" (%+7e %+7e)",
-				       (*(mom+4*n+d))(i,j).real(),
-				       (*(mom+4*n+d))(i,j).imag());
-			    printf("\n");
+				fprintf(fp, " (%+7e %+7e)",
+					(*(mom+n+d))(i,j).real(),
+					(*(mom+n+d))(i,j).imag());
+			    fprintf(fp, "\n");
 			}
+			
 		    }
 		}
     

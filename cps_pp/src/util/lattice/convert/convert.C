@@ -3,22 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of methods converting between different data layouts.
 
-  $Id: convert.C,v 1.6 2004-04-27 03:51:20 cwj Exp $
-  
-  \todo Why not make these (and other) methods of FWilsonTypes and FstagTypes
-  to avoid reimplementing them for each fermion class?
+  $Id: convert.C,v 1.7 2004-05-10 15:26:54 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v 1.6 2004-04-27 03:51:20 cwj Exp $
-//  $Id: convert.C,v 1.6 2004-04-27 03:51:20 cwj Exp $
+//  $Author: zs $
+//  $Date: 2004-05-10 15:26:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v 1.7 2004-05-10 15:26:54 zs Exp $
+//  $Id: convert.C,v 1.7 2004-05-10 15:26:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v $
 //  $State: Exp $
 //
@@ -74,6 +71,7 @@ extern void FstagToCanon(CAP cap, int number_of_checkerboards = 2) ;
 // configuration and the two fermion fields f_field_1, 
 // f_field_2 to new_str_ord.
 /*!
+  The fields exist on all lattice sites (both parities).
   \param new_str_ord The new order in which the fields will be laid out.
   \param f_field_1 A fermion  field.
   \param f_field_2 A fermion  field.
@@ -123,6 +121,7 @@ void Lattice::Convert(StrOrdType new_str_ord,
 //------------------------------------------------------------------
 // Convert(StrOrdType new_str_ord):
 /*!
+  The field exists on all lattice sites (both parities).
   \param new_str_ord The new order in which the field will be laid out.
   \post The gauge field is arranged in the new order.
 */
@@ -363,8 +362,8 @@ void Lattice::Convert(StrOrdType new_str_ord)
 //  End  GRF
 }
 
-char *fname_fconvert = "Fconvert(V*,StrOrdType,StrOrdType, int)";
-char *converting_str = "Converting frm field str ord from %d to %d\n";
+static char *fname_fconvert = "Fconvert(V*,StrOrdType,StrOrdType, int)";
+static char *converting_str = "Converting frm field str ord from %d to %d\n";
 
 
 //------------------------------------------------------------------
@@ -445,6 +444,7 @@ void FstagTypes::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 
         CAS     cas ;
 
+	
         cas.lx          = GJP.XnodeSites() ;
         cas.ly          = GJP.YnodeSites() ;
         cas.lz          = GJP.ZnodeSites() ;

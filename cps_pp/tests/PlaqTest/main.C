@@ -4,16 +4,13 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-04-30 12:18:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v 1.2 2004-04-30 12:18:00 zs Exp $
-//  $Id: main.C,v 1.2 2004-04-30 12:18:00 zs Exp $
+//  $Date: 2004-05-10 15:26:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v 1.3 2004-05-10 15:26:55 zs Exp $
+//  $Id: main.C,v 1.3 2004-05-10 15:26:55 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  Revision 1.2  2001/05/25 06:16:04  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: main.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v $
 //  $State: Exp $
 //

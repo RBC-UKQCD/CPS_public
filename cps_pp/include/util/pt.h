@@ -4,21 +4,21 @@
 #endif
 CPS_START_NAMESPACE
 /*!\file
-  \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
+  \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.5 2004-04-27 03:51:16 cwj Exp $
+  $Id: pt.h,v 1.6 2004-05-10 15:26:54 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.5 2004-04-27 03:51:16 cwj Exp $
-//  $Id: pt.h,v 1.5 2004-04-27 03:51:16 cwj Exp $
+//  $Author: zs $
+//  $Date: 2004-05-10 15:26:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.6 2004-05-10 15:26:54 zs Exp $
+//  $Id: pt.h,v 1.6 2004-05-10 15:26:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -35,10 +35,17 @@ CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
-//! A class representing operations on the Dirac operator.
+//! A class implementing parallel transports.
 /*!
-  This is an abstract base class, so the details specific to the various
-  types of fermion action are defined in the derived classes.
+  These are operations of the form
+  \f$ u(x) = U_\mu(x) v(x+\mu) \f$
+  where \e u and \e v are fermionic vectors or 3x3 matrices which are
+  defined as a  lattice field on all  lattice sites.
+
+  The class is designed to perform a number of such parallel transports,
+  each with an independent input field, output field and direction.
+  
+  This should used like an abstract base class.
  */
 //------------------------------------------------------------------
 class ParTrans
@@ -53,10 +60,11 @@ class ParTrans
 
 
  public:
+
   static int scope_lock;           // lock that forbids more than
                                    // one ParTrans object to be on
                                    // scope at any time.
-  ParTrans(Lattice& latt);           // Lattice object.
+  ParTrans(Lattice& latt);         
 
   virtual ~ParTrans();
 
@@ -64,23 +72,14 @@ class ParTrans
 
 
 //------------------------------------------------------------------
-//
-// DiracOpStagTypes class.
-//
-//! A class describing the Dirac operator for all sorts of staggered fermions.
+
+//! A class describing parallel transports for all sorts of staggered fermions.
 /*!
-  This is an abstract base class from which the staggered fermion Dirac
-  operator classes are derived.
+  These are operations of the form
+  \f$ u(x) = U_\mu(x) v(x+\mu) \f$
+  where \e u and \e v are fermionic vectors or 3x3 matrices.
 
-  The staggered fermion is
-  \f[
-  M_{xy} =
-  m_0 - \sum_mu e^{\sum_{i=0}^{\mu-1}x_i} 
-  [ U^\dagger_\mu(x) \delta_{x\,y+\mu} - U_\mu(x-\mu) \delta_{x\,y-\mu} ]
-  \f]
-
-  \e N.B  The phases are implemented in the gauge field when it is
-  converted to staggered (::STAG) storage order.
+  This class just reimplements ParTrans; the derived class should be used.
 */
 //------------------------------------------------------------------
 class ParTransStagTypes : public ParTrans
@@ -95,43 +94,80 @@ class ParTransStagTypes : public ParTrans
 
 };
 
-typedef struct gaguge_agg{
+struct gauge_agg{
   int src;
   int dest;
   IFloat mat[18];
-} gauge_agg;
+};
 
 //------------------------------------------------------------------
-//
-// DiracOpStag is derived from DiracOpStagTypes and is the front
-// end for all Dirac operators associated with Staggered fermions.
-
 //! A class describing the Parallel Transport operator for staggered fermions.
+/*!
+  These are operations of the form
+  \f$ u(x) = U_\mu(x) v(x+\mu) \f$
+  where \e u and \e v are fermionic vectors or 3x3 matrices.
+
+  All fields involved are assumed to be in staggered ::STAG order.
+*/
 //------------------------------------------------------------------
 class ParTransAsqtad : public ParTransStagTypes
 {
- private:
-  char *cname;         // Class name.
+  private:
 
-  int f_size_cb;       //The node checkerbrd. size of the ferm. field
+    char *cname;         // Class name.
 
-  Vector *frm_tmp;     // Temporary fermion field
+    int f_size_cb;       //The node checkerbrd. size of the ferm. field
 
-	IFloat * rcv_buf[2*6];
-	IFloat * tmp_buf[2*6];
-	IFloat *gauge_field_addr;
+    Vector *frm_tmp;     // Temporary fermion field
 
-  void pt_init(const void *);
-  void pt_init_g();
-  void pt_delete();
-  void pt_delete_g();
- public:
-  ParTransAsqtad(Lattice& latt);            // Lattice object.
-  void run(int n, Vector **vout, Vector **vin, const int *dir );
-  void run(int n, Matrix **mout, Matrix **min, const int *dir );
-  void run(Vector *vout, Vector *vin, const int dir );
+    IFloat * rcv_buf[2*6];
+    IFloat * tmp_buf[2*6];
+    IFloat *gauge_field_addr;
 
-  ~ParTransAsqtad();
+    void pt_init(const void *);
+    void pt_init_g();
+    void pt_delete();
+    void pt_delete_g();
+
+    CnvFrmType converted;
+    
+  public:
+
+    /*!
+      \param latt The lattice containing the gauge field on which this
+      operation is defined.
+      \pre The gauge field should be in staggered order (::STAG).
+    */
+    ParTransAsqtad(Lattice& latt);            // Lattice object.
+
+    //! Parallel transports fields of 3x3 matrices.
+    /*!
+      \param n The number of fields.
+      \param vout Array of the transported fields.
+      \param vin Array of the fields to be transported.
+      \param dir Array of directions in which the transports are performed.
+      \pre The gauge field should be in staggered odd-even order (::STAG).
+      \pre \a vin should be in staggered (::STAG) order.
+      \post \a vout will be in staggered (::STAG) order.
+     */
+    void run(int n, Vector **vout, Vector **vin, const int *dir );
+
+    //! Parallel transports fields of staggered fermionic vectors.
+    /*!
+      \param n The number of fields.
+      \param vout Array of the transported fields.
+      \param vin Array of the fields to be transported.
+      \param dir Array of directions in which the transports are performed.
+      \pre The gauge field should be in staggered odd-even order (::STAG).
+      \pre \a vin should be in staggered (::STAG) order.
+      \post \a vout will be in staggered (::STAG) order.
+     */
+    void run(int n, Matrix **mout, Matrix **min, const int *dir );
+
+    //! Not implemented
+    void run(Vector *vout, Vector *vin, int dir );
+
+    ~ParTransAsqtad();
 
 };
 

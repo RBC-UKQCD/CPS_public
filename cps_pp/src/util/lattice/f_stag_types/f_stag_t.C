@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definition of FstagTypes methods.
 
-  $Id: f_stag_t.C,v 1.5 2004-02-16 13:21:42 zs Exp $
+  $Id: f_stag_t.C,v 1.6 2004-05-10 15:26:55 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-02-16 13:21:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag_types/f_stag_t.C,v 1.5 2004-02-16 13:21:42 zs Exp $
-//  $Id: f_stag_t.C,v 1.5 2004-02-16 13:21:42 zs Exp $
+//  $Date: 2004-05-10 15:26:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag_types/f_stag_t.C,v 1.6 2004-05-10 15:26:55 zs Exp $
+//  $Id: f_stag_t.C,v 1.6 2004-05-10 15:26:55 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_stag_t.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag_types/f_stag_t.C,v $
 //  $State: Exp $
 //
@@ -84,8 +84,33 @@ FstagTypes::FstagTypes()
   
 }
 
-int FstagTypes::FsiteOffsetChkb(const int *x) const
-        { return (x[3]>>1)+xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2] ; }
+    /*!
+      When a field is stored in an odd-even (checkerboard) STAG order,
+      this method converts a site's
+      cartesian coordinates into its lattice site index. Note that this
+      works for a field defined on a single parity only.
+      \param x The cartesian lattice site coordinates.
+      \return The single parity lattice site index.
+    */
+int FstagTypes::FsiteOffsetChkb(const int *x) const{
+    return (x[3]>>1)+xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2] ;
+}
+
+    /*!
+      When a field is stored in an odd-even (checkerboard) STAG order,
+      this method converts a site's
+      cartesian coordinates into its lattice site index. Note that this
+      works for a field defined over the entire lattice.
+      \param x The cartesian lattice site coordinates.
+      \return The lattice site index.
+    */
+int FstagTypes::FsiteOffsetChkb_all(const int *x) const{
+
+    return (x[3]+node_sites[3]*(x[0]+node_sites[0]*(x[1]+node_sites[1]*x[2]))
+	+GJP.VolNodeSites()*((x[0]+x[1]+x[2]+x[3])%2))/2;
+
+}
+
 
 //------------------------------------------------------------------
 // Returns the number of exact flavors of the matrix that

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.h,v 1.7 2004-04-27 03:51:16 cwj Exp $
+  $Id: enum.h,v 1.8 2004-05-10 15:26:54 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.7 2004-04-27 03:51:16 cwj Exp $
-//  $Id: enum.h,v 1.7 2004-04-27 03:51:16 cwj Exp $
+//  $Author: zs $
+//  $Date: 2004-05-10 15:26:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.8 2004-05-10 15:26:54 zs Exp $
+//  $Id: enum.h,v 1.8 2004-05-10 15:26:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: enum.h,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v $
 //  $State: Exp $
 //
@@ -66,33 +66,63 @@ enum GclassType {
 enum StrOrdType {
     CANONICAL = 0, /*!< Canonical storage order: %Lattice sites are ordered
 		     so that the site with cartesian coordinates
-		     (x, y, z, t) on a local lattice of dimensions Nx, Ny, 
-		     Nz, Nt has the index
+		     (x, y, z, t) on a local lattice of dimensions
+	     (N<sub>x</sub>, N<sub>y</sub>, N<sub>z</sub>, N<sub>t</sub>)
+		     has the index
 		     
-		     n = x + Nx y + Nx Ny z + Nx Ny Nz t
+		     n = x + N<sub>x</sub> y + N<sub>x</sub>N<sub>y</sub> z + N<sub>x</sub>N<sub>y</sub>N<sub>z</sub> t
 
+		     <em>i.e</em> the x coordinate runs fastest, then y,
+		     then z and t slowest.
 		     The gauge link direction index is
 		     0, 1, 2 or 3  for direction X, Y, Z and T respectively.
 
-		     This order is expected by most Lattice functions. */
-    STAG      = 1,  /*!< Staggered fermion storage order is the same as WILSON
-		      except that the staggered phases are included in the
-		      gauge field.
-		      This is expected by DiracOpStag functions */
-    WILSON    = 2,  /*!<
-		      %Lattice sites are ordered by parity.
+		     This order is expected by most Lattice functions.
+		   */
+    STAG      = 1,  /*!<
+		      This order is used by actions with staggered fermions.
+		      Gauge links are stored in the canonical order, but they 
+		      are multiplied by the staggered phases and the hermitian
+		      conjugate of each link  is stored.
+		      
+		      Fermions are stored in an odd-even order, where lattice
+		      sites are ordered by parity.
 		      The parity of a site with cartesian coordinates
-		      (x, y, z, t) is (-1)^{x+y+z+t}. Odd parity sites are
-		      numbered before even parity sites.
-		      On a local lattice of dimensions Nx, Ny, Nz, Nt each site
-		      has the index
+		      (x, y, z, t) is (-1)<sup>(x+y+z+t)</sup>.
+		      Even parity sites are numbered before odd parity sites.
 
-		      n = [x-x%2 + Nx y + Nx Ny z + Nx Ny Nz t
-		      + Nx Ny Nz Nt ((x+y+z+t+1)%2)]/2
+			On a local lattice of dimensions
+	     (N<sub>x</sub>, N<sub>y</sub>, N<sub>z</sub>, N<sub>t</sub>)
+		     has the index
 
-		      This order is expected by DiracOpWilson,
-		      DiracOpClover and DiracOpDwf functions. */
-    G_WILSON_HB  = 3 /*!< Storage order for the Wilson gauge action heat bath:
+		     n = [t + N<sub>t</sub> x +
+		     N<sub>t</sub> N<sub>x</sub> y +
+		     N<sub>t</sub> N<sub>x</sub> N<sub>y</sub> z
+   + N<sub>t</sub> N<sub>x</sub> N<sub>y</sub> N<sub>z</sub> ((x+y+z+t)%2)]/2
+
+   		     <em>i.e</em> the t coordinate runs fastest, then x,
+		     then y and z slowest.
+		    */
+    WILSON    = 2,  /*!<
+		      This is used with actions with wilson-type fermions.
+		      %Lattice sites for both gauge and fermion fields
+		      are ordered by parity.
+		      The parity of a site with cartesian coordinates
+		      (x, y, z, t) is (-1)<sup>(x+y+z+t)</sup>.
+		      Even parity sites are numbered before odd parity sites.
+		      On a local lattice of dimensions
+	      (N<sub>x</sub>, N<sub>y</sub>, N<sub>z</sub>, N<sub>t</sub>)
+		      each site has the index
+
+		      n = [x-x%2 + N<sub>x</sub> y +
+		      N<sub>x</sub> N<sub>y</sub> z +
+		      N<sub>x</sub> N<sub>y</sub> N<sub>z</sub> t
+     + N<sub>x</sub> N<sub>y</sub> N<sub>z</sub> N<sub>t</sub> ((x+y+z+t+1)%2)]/2
+
+		     <em>i.e</em> the x coordinate runs fastest,
+		     then y, then z and t slowest.
+		    */
+    G_WILSON_HB  = 3 /*!< Storage order for the %Wilson gauge action heat bath:
 		       Canonical site ordering but the link direction indices
 		       are 0, 1, 2 or 3  for direction T, X, Y and Z
 		       respectively.

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.14 2004-04-27 03:51:16 cwj Exp $
+  $Id: lattice.h,v 1.15 2004-05-10 15:26:54 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.14 2004-04-27 03:51:16 cwj Exp $
-//  $Id: lattice.h,v 1.14 2004-04-27 03:51:16 cwj Exp $
+//  $Author: zs $
+//  $Date: 2004-05-10 15:26:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.15 2004-05-10 15:26:54 zs Exp $
+//  $Id: lattice.h,v 1.15 2004-05-10 15:26:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -183,7 +183,7 @@ class Lattice
 // public:
     friend class LinkBuffer;
 
-    int LinkBufferIsEnabled(){return ((int) link_buffer);}
+    int LinkBufferIsEnabled() {return ((int) link_buffer);}
     //!< Returns true if there is a buffer for the links, false otherwise.
 
     int EnableLinkBuffer(int buf_sz);
@@ -234,7 +234,7 @@ class Lattice
     void GaugeField(Matrix *u);
         //!< Copies an array into the gauge configuration.
 
-    int GsiteOffset(int *x) const
+    int GsiteOffset(const int *x) const
         { return x[0]*g_dir_offset[0]+x[1]*g_dir_offset[1]
 	+x[2]*g_dir_offset[2]+x[3]*g_dir_offset[3];  }
 
@@ -248,7 +248,7 @@ class Lattice
 
 
     void CopyGaugeField(Matrix* u);
-        //!< Copies the  gauge configuration into an array/
+        //!< Copies the  gauge configuration into an array;
 
     StrOrdType StrOrd();
         //!< Returns the storage order.
@@ -612,8 +612,8 @@ class Lattice
     virtual int FsiteOffsetChkb(const int *x) const = 0;
     //!< Gets the lattice site index for the odd-even (checkerboard) order.
     /*!<
-      When the fermion field is stored in the odd-even (checkerboard) order,
-      defined by ::StrOrdType = WILSON, this method converts a sites
+      When a field is stored in an odd-even (checkerboard) order,
+      this method converts a site's
       cartesian coordinates into its lattice site index.
       \param x The cartesian lattice site coordinates.
       \return The lattice site index.
@@ -846,6 +846,9 @@ class Lattice
       The momentum is evolved for a single molecular dynamics timestep
       using the force from the fermion action.
       \param mom The momentum matrices on all links of the local lattice.
+      \param frm The solution of the fermion matrix inverse with the
+      pseudofermion vector source, as computed by FmatEvlInv.
+      \param mass The fermion mass (not used in staggered fermion classes).
       \param step_size The molecular dynamics timestep used in the numerical
       integration.
       \post \a mom is assigned the value of the momentum after the molecular
@@ -873,6 +876,7 @@ class Lattice
     /*!
       Exactly which data layouts are supported depends on the type of
       fermion action.
+      The field exists on all lattice sites (both parities).
       \param f_field The field to be converted.
       \param to The new order.
       \param from The current order.
@@ -1366,7 +1370,7 @@ class Fnone : public virtual Lattice
 //------------------------------------------------------------------
 class FstagTypes : public virtual Lattice
 {
- private:
+	 private:
     char *cname;    // Class name.
     int xv[3];
     
@@ -1387,7 +1391,7 @@ class FstagTypes : public virtual Lattice
     static const unsigned CBUF_MODE4 = 0xcca52112;
 
     Vector *f_tmp;
-
+    
  public:
 
     FstagTypes();
@@ -1397,6 +1401,9 @@ class FstagTypes : public virtual Lattice
     virtual FclassType Fclass() const = 0;
 
     int FsiteOffsetChkb(const int*) const;
+
+    //!< Gets the lattice site index for the odd-even (checkerboard) order.
+    int FsiteOffsetChkb_all(const int*) const;
 	
     int FsiteOffset(const int*) const;
 
@@ -1489,12 +1496,6 @@ class Fasqtad : public virtual FstagTypes
  private:
     char *cname;    // Class name.
 
-    ChkbType parity(const int*);
-    void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
-//    void parallel_transport(Vector**, const SCUDir*, int, Vector**);
-    void parallel_transport(Vector**, const int*, int, Vector**);
-    void parallel_transport(ParTransAsqtad &pt, Vector**, int*, int, Vector**);
-
  public:
 
     Fasqtad();
@@ -1536,6 +1537,38 @@ class Fasqtad : public virtual FstagTypes
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int dir_flag);
 
+
+    //! Momentum update in the RHMC algorithm.
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+			      Float dummy, Float dt);
+
+    // Various utility routines for the momentum force computation.
+    
+  private:
+
+    void vvpd(Vector**, int, const int*, int, int, Matrix**);
+
+    void shift_field(Matrix**, const int*, int, int, Matrix**);
+
+    void shift_link(Matrix**, const int*, int);
+
+    void update_momenta(Matrix**, IFloat, Matrix*);
+    
+    ChkbType parity(const int*);
+
+    void force_product_sum(const Matrix*,  int, IFloat, Matrix*);
+    
+    void force_product_sum(const Matrix*, const Matrix*,
+			   const Matrix*, IFloat, Matrix*);
+
+    void force_product_sum(const Matrix*, const Matrix*, IFloat, Matrix*);
+
+    void force_product_d_sum(const Matrix*, const Matrix*, IFloat, Matrix*);
+
+    void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
+
+
+    
 };
 
 
