@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.19 2005-02-18 20:18:13 mclark Exp $
+  $Id: f_dwf_base.C,v 1.20 2005-03-07 00:33:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -857,9 +857,32 @@ void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				    Vector **sol_d) {
   char *fname = "RHMC_EvolveMomFforce";
 
+#if 0
+  printf("bc =");
+  for(int i = 0;i<4;i++) printf("%d ",GJP.Bc(i));
+  printf("\n");
+  printf("node_bc =");
+  for(int i = 0;i<4;i++) printf("%d ",GJP.NodeBc(i));
+  printf("\n");
+  printf("node_bc =");
+  printf("%d ",GJP.XnodeBc());
+  printf("%d ",GJP.YnodeBc());
+  printf("%d ",GJP.ZnodeBc());
+  printf("%d ",GJP.TnodeBc());
+  printf("\n");
+#endif
   // Temporary fix for the moment.
   int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
-  for (int i=0; i<degree; i++) EvolveMomFforce(mom,sol[i],mass,alpha[i]*dt);
+  for (int i=0; i<degree; i++){
+    EvolveMomFforce(mom,sol[i],mass,alpha[i]*dt);
+if (0)
+{
+  IFloat *tmp_p = (IFloat *)mom;
+  for(int ii = 0;ii<18*4*GJP.VolNodeSites();ii++)
+  printf("mom(RHMC(%d))[%d]= %0.14e\n",i,ii,tmp_p[ii]);
+  exit(4);
+}
+  }
 
 }
 

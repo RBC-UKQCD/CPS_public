@@ -30,6 +30,7 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
   Float time = -dclock();
   ForceFlops=0;
 #endif
+
   
   setCbufCntrlReg(4, CBUF_MODE4);
 

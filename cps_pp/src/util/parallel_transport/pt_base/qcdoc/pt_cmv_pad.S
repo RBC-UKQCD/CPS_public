@@ -222,9 +222,7 @@ lab1:
 	stfd	   30,	56(%r23)
 #<<<<<< Break 5
 	lfd	   20,	32(%r28)
-	mr	 %r20,	 %r22
 	fmadd	12, 18,  2, 12
-	mr	 %r28,	 %r30
 	dcbt	 %r9,	 %r30
 	fmadd	13, 18,  3, 13
 	lfd	   21,	40(%r28)
@@ -257,9 +255,9 @@ lab1:
 	fmadd	12, 20,  4, 12
 	addi %r4, %r4, 24 
 
-
+	mr	 %r20,	 %r22
 	fmadd	13, 20,  5, 13
-
+	mr	 %r28,	 %r30
 	lfd	   19,	8(%r29)
 
 	fmadd	14, 24,  4, 14
@@ -271,7 +269,9 @@ lab1:
 	lfd	   22,	48(%r29)
 
 	fmadd	16, 28,  4, 16
+
 	dcbt	 %r10,	 %r22
+
 	fmadd	17, 28,  5, 17
 	lfd	   23,	56(%r29)
 	fnmsub	12, 21,  5, 12

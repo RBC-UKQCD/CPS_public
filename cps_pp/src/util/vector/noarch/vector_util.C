@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.5 2004-08-18 11:58:08 zs Exp $
+  $Id: vector_util.C,v 1.6 2005-03-07 00:33:44 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/vector_util.C,v 1.5 2004-08-18 11:58:08 zs Exp $
-//  $Id: vector_util.C,v 1.5 2004-08-18 11:58:08 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:33:44 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/vector_util.C,v 1.6 2005-03-07 00:33:44 chulwoo Exp $
+//  $Id: vector_util.C,v 1.6 2005-03-07 00:33:44 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/vector_util.C,v $
 //  $State: Exp $
 //
@@ -30,6 +30,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <string.h>		/* memcpy */
 #include <util/vector.h>
+#include <util/time.h>
 CPS_START_NAMESPACE
 
 
@@ -45,6 +46,15 @@ void moveMem(void *b, const void *a, int len)
 {
     memcpy(b, a, len); 
 }
+void moveFloat(Float *b, const Float *a, int len) 
+{
+    memcpy(b, a, len*sizeof(Float)); 
+}
+void moveVec(Float *b, const Float *a, int len) 
+{
+    memcpy(b, a, len*sizeof(Vector)); 
+}
+
 //---------------------------------------------------------------//
 
 

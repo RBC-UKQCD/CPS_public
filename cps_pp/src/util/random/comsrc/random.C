@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.22 2005-02-18 20:18:16 mclark Exp $
+  $Id: random.C,v 1.23 2005-03-07 00:33:44 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2005-02-18 20:18:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.22 2005-02-18 20:18:16 mclark Exp $
-//  $Id: random.C,v 1.22 2005-02-18 20:18:16 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:33:44 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.23 2005-03-07 00:33:44 chulwoo Exp $
+//  $Id: random.C,v 1.23 2005-03-07 00:33:44 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -273,7 +273,7 @@ for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
 				 (x[2]/2 + vx[2]*(x[3]/2) )));
 		  }
 //		  Fprintf(stderr,"%d %d %d %d %d",x[0],x[1],x[2],x[3],x[4]);
-//		  Fprintf(stderr,"index=%d start_seed= %d\n",index,start_seed);
+//		  Fprintf(stdout,"index=%d start_seed= %d\n",index,start_seed);
 		  ugran[index++].Reset(start_seed);
 		  if(x[4]==x_o[4]) ugran_4d[index_4d++].Reset(start_seed_4d);
 	      }

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.25 2004-12-22 08:39:18 chulwoo Exp $
+  $Id: gjp.C,v 1.26 2005-03-07 00:33:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-22 08:39:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.25 2004-12-22 08:39:18 chulwoo Exp $
-//  $Id: gjp.C,v 1.25 2004-12-22 08:39:18 chulwoo Exp $
+//  $Date: 2005-03-07 00:33:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.26 2005-03-07 00:33:40 chulwoo Exp $
+//  $Id: gjp.C,v 1.26 2005-03-07 00:33:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.25 $
+//  $Revision: 1.26 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -188,6 +188,8 @@ void GlobalJobParameter::Initialize() {
       node_sites[4] = doarg_int.s_sites/nodes[4];
     }
 
+  for(i = 0; i<5 ; i++)
+  if (node_sites[i] ==0 ) node_sites[i] = 1;
   for(i = 0; i<4 ; i++)
   if (node_sites[i]<=0 ||node_sites[i]%2!=0)
       ERR.General(cname,fname,

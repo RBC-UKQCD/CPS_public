@@ -1,5 +1,7 @@
 #include <util/momentum.h>
 
+CPS_START_NAMESPACE
+
 #define TWO_PI 6.283185308
 void ThreeMom::CalcLatMom(void){
   pp[0] = TWO_PI/(GJP.XnodeSites()*GJP.Xnodes()) ;
@@ -106,3 +108,4 @@ ThreeMom::ThreeMom(const ThreeMom& rhs)
   pp[2] = rhs.pp[2] ;
   ZeroMom = rhs.ZeroMom ;
 }
+CPS_END_NAMESPACE

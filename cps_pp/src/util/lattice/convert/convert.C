@@ -551,14 +551,16 @@ void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 	  // copy intermediate converted vector to a buffer
 	  field_ptr = (Float *) f_field;
 	  tmp_field_ptr = (Float *) tmp_f_field;
-	  moveMem(tmp_field_ptr, field_ptr, f_size * sizeof(Float));
+//	  moveMem(tmp_field_ptr, field_ptr, f_size * sizeof(Float));
+	  moveFloat(tmp_field_ptr, field_ptr, f_size );
 
 	  // Set odd part
 	  field_ptr = (Float *) f_field;
 	  tmp_field_ptr = (Float *) tmp_f_field;
 	  for(i=0; i<ls; i++){
 	    parity = (i+1) % 2;
-	    moveMem(field_ptr, tmp_field_ptr, half_stride * sizeof(Float));
+//	    moveMem(field_ptr, tmp_field_ptr, half_stride * sizeof(Float));
+	    moveFloat(field_ptr, tmp_field_ptr, half_stride );
 	    field_ptr = field_ptr + half_stride;
 	    tmp_field_ptr = tmp_field_ptr + (2 * parity + 1) * half_stride; 
 	  }
@@ -568,7 +570,8 @@ void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 	  tmp_field_ptr = tmp_field_ptr + half_stride;
 	  for(i=0; i<ls; i++){
 	    parity = i % 2;
-	    moveMem(field_ptr, tmp_field_ptr, half_stride * sizeof(Float));
+//	    moveMem(field_ptr, tmp_field_ptr, half_stride * sizeof(Float));
+	    moveFloat(field_ptr, tmp_field_ptr, half_stride );
 	    field_ptr = field_ptr + half_stride;
 	    tmp_field_ptr = tmp_field_ptr + (2 * parity + 1) * half_stride; 
 	  }
@@ -582,7 +585,8 @@ void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 	  // copy vector to a buffer for intermediate conversion
 	  field_ptr = (Float *) f_field;
 	  tmp_field_ptr = (Float *) tmp_f_field;
-	  moveMem(tmp_field_ptr, field_ptr, f_size * sizeof(Float));
+//	  moveMem(tmp_field_ptr, field_ptr, f_size * sizeof(Float));
+	  moveFloat(tmp_field_ptr, field_ptr, f_size);
 
 
 	  // convert odd part to intermediate conversion
@@ -590,7 +594,8 @@ void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 	  tmp_field_ptr = (Float *) tmp_f_field;
 	  for(i=0; i<ls; i++){
 	    parity = (i+1) % 2;
-	    moveMem(field_ptr, tmp_field_ptr, half_stride * sizeof(Float));
+//	    moveMem(field_ptr, tmp_field_ptr, half_stride * sizeof(Float));
+	    moveFloat(field_ptr, tmp_field_ptr, half_stride );
 	    field_ptr = field_ptr + (2 * parity + 1) * half_stride; 
 	    tmp_field_ptr = tmp_field_ptr + half_stride;
 	  }
@@ -600,7 +605,8 @@ void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 	  field_ptr = field_ptr + half_stride;
 	  for(i=0; i<ls; i++){
 	    parity = i % 2;
-	    moveMem(field_ptr, tmp_field_ptr, half_stride * sizeof(Float));
+//	    moveMem(field_ptr, tmp_field_ptr, half_stride * sizeof(Float));
+	    moveFloat(field_ptr, tmp_field_ptr, half_stride );
 	    field_ptr = field_ptr + (2 * parity + 1) * half_stride; 
 	    tmp_field_ptr = tmp_field_ptr + half_stride;
 	  }

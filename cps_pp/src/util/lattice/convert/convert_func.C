@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.7 2004-08-18 11:58:02 zs Exp $
+  $Id: convert_func.C,v 1.8 2005-03-07 00:33:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.7 2004-08-18 11:58:02 zs Exp $
-//  $Id: convert_func.C,v 1.7 2004-08-18 11:58:02 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:33:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.8 2005-03-07 00:33:40 chulwoo Exp $
+//  $Id: convert_func.C,v 1.8 2005-03-07 00:33:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -122,13 +122,21 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 // cram1, cram2 should be in CRAM
 //-------------------------------------------------------------------------
 
+#if 0
+	cram1 = (Float *) qalloc(0,cap->site_size*sizeof(Float)) ;
+#else
 	cram1 = (Float *) smalloc(cap->site_size*sizeof(Float)) ;
+#endif
 	if(cram1 == 0)
 	  ERR.Pointer(cname_none,fname, "cram1"); 
 	VRB.Smalloc(cname_none,fname,
 		    "cram1" , cram1,
 		    cap->site_size*sizeof(Float)) ;
+#if 0
+	cram2 = (Float *) qalloc(0,cap->site_size*sizeof(Float)) ;
+#else
 	cram2 = (Float *) smalloc(cap->site_size*sizeof(Float)) ;
+#endif
 	if(cram2 == 0)
 	  ERR.Pointer(cname_none,fname, "cram2"); 
 	VRB.Smalloc(cname_none,fname,

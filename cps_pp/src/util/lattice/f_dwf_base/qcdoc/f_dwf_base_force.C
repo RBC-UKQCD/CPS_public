@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.4 2005-02-14 05:44:25 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.5 2005-03-07 00:33:41 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -147,7 +147,10 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
     v2_buf[i]=(Float *)fmalloc(cname,fname,"v2_buf",surf[i]*FsiteSize()*sizeof(Float)) ;
   }
 
-  Matrix tmp_mat1, tmp_mat2 ;
+//  Matrix tmp_mat1, tmp_mat2 ;
+  Matrix *tmp_mat1,*tmp_mat2;
+  tmp_mat1 = (Matrix *)fmalloc(cname,fname,"tmp_mat1",sizeof(Matrix)*2);
+  tmp_mat2 = tmp_mat1+1;
 
   SCUDirArgIR Send[4];
   SCUDirArgIR Recv[4];
@@ -204,36 +207,38 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
             v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
             v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
             vec_plus_mu_stride = f_size_4d - f_site_size_4d ;
+            if ((pos[mu]+1) == size[mu])
+            if (GJP.NodeBc(mu)==BND_CND_APRD) coeff = -coeff ;
 
 //     Float time2 = -dclock();
-      sproj_tr[mu]( (IFloat *)&tmp_mat1,
+      sproj_tr[mu]( (IFloat *)tmp_mat1,
                     (IFloat *)v1_plus_mu,
                     (IFloat *)v2+vec_offset,
                     ls, vec_plus_mu_stride, f_size_4d-f_site_size_4d) ;
 
-      sproj_tr[mu+4]( (IFloat *)&tmp_mat2,
+      sproj_tr[mu+4]( (IFloat *)tmp_mat2,
                       (IFloat *)v2_plus_mu,
                       (IFloat *)v1+vec_offset,
                       ls, vec_plus_mu_stride, f_size_4d-f_site_size_4d) ;
  //    time2 += dclock();
  //    print_flops("","sproj",2*9*16*ls,time2);
 
-      tmp_mat1 += tmp_mat2 ;
+      *tmp_mat1 += *tmp_mat2 ;
 
       // If GJP.Snodes > 1 sum up contributions from all s nodes
       if(GJP.Snodes() != 1) {
-	  glb_sum_multi_dir((Float *)&tmp_mat1, 4, sizeof(Matrix)/sizeof(IFloat) ) ;
+	  glb_sum_multi_dir((Float *)tmp_mat1, 4, sizeof(Matrix)/sizeof(IFloat) ) ;
       }
 
-      tmp_mat2.DotMEqual(*(gauge+gauge_offset), tmp_mat1) ;
+      tmp_mat2->DotMEqual(*(gauge+gauge_offset), *tmp_mat1) ;
 
-      tmp_mat1.Dagger(tmp_mat2) ;
+      tmp_mat1->Dagger(*tmp_mat2) ;
 
-      tmp_mat2.TrLessAntiHermMatrix(tmp_mat1) ;
+      tmp_mat2->TrLessAntiHermMatrix(*tmp_mat1) ;
 
-      tmp_mat2 *= coeff ;
+      *tmp_mat2 *= coeff ;
 
-      *(mom+gauge_offset) += tmp_mat2 ;
+      *(mom+gauge_offset) += *tmp_mat2 ;
     }
 
     } } } } // end for x,y,z,t
@@ -282,34 +287,34 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
             if (GJP.NodeBc(mu)==BND_CND_APRD) coeff = -coeff ;
 
 //     Float time2 = -dclock();
-      sproj_tr[mu]( (IFloat *)&tmp_mat1,
+      sproj_tr[mu]( (IFloat *)tmp_mat1,
                     (IFloat *)v1_plus_mu,
                     (IFloat *)v2+vec_offset,
                     ls, vec_plus_mu_stride, f_size_4d-f_site_size_4d) ;
 
-      sproj_tr[mu+4]( (IFloat *)&tmp_mat2,
+      sproj_tr[mu+4]( (IFloat *)tmp_mat2,
                       (IFloat *)v2_plus_mu,
                       (IFloat *)v1+vec_offset,
                       ls, vec_plus_mu_stride, f_size_4d-f_site_size_4d) ;
  //    time2 += dclock();
  //    print_flops("","sproj",2*9*16*ls,time2);
 
-      tmp_mat1 += tmp_mat2 ;
+      *tmp_mat1 += *tmp_mat2 ;
 
       // If GJP.Snodes > 1 sum up contributions from all s nodes
       if(GJP.Snodes() != 1) {
-	  glb_sum_multi_dir((Float *)&tmp_mat1, 4, sizeof(Matrix)/sizeof(IFloat) ) ;
+	  glb_sum_multi_dir((Float *)tmp_mat1, 4, sizeof(Matrix)/sizeof(IFloat) ) ;
       }
 
-      tmp_mat2.DotMEqual(*(gauge+gauge_offset), tmp_mat1) ;
+      tmp_mat2->DotMEqual(*(gauge+gauge_offset), *tmp_mat1) ;
 
-      tmp_mat1.Dagger(tmp_mat2) ;
+      tmp_mat1->Dagger(*tmp_mat2) ;
 
-      tmp_mat2.TrLessAntiHermMatrix(tmp_mat1) ;
+      tmp_mat2->TrLessAntiHermMatrix(*tmp_mat1) ;
 
-      tmp_mat2 *= coeff ;
+      *tmp_mat2 *= coeff ;
 
-      *(mom+gauge_offset) += tmp_mat2 ;
+      *(mom+gauge_offset) += *tmp_mat2 ;
     }
 
     } } } } // end for x,y,z,t
@@ -326,8 +331,8 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 //------------------------------------------------------------------
 
   for(int i =0;i<4;i++) {
-    ffree(cname,fname,"v1_buf",v1_buf[i]);
-    ffree(cname,fname,"v2_buf",v2_buf[i]);
+    ffree(v1_buf[i],cname,fname,"v1_buf");
+    ffree(v2_buf[i],cname,fname,"v2_buf");
   }
  
   VRB.Sfree(cname, fname, str_v2, v2) ;
@@ -335,6 +340,8 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
  
   VRB.Sfree(cname, fname, str_v1, v1) ;
   ffree(v1) ;
+
+  ffree(tmp_mat1);
  
   return ;
 }

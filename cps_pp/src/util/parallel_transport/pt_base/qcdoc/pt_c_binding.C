@@ -1,5 +1,6 @@
 #include <config.h>
 #include <util/pt_int.h>
+#include <util/pt.h>
 #include <util/gjp.h>
 
 static PT StaticPT;
@@ -63,16 +64,18 @@ void pt_delete_g(){
 
 void pt_1vec(int n, IFloat **mout, IFloat **min, int const *dir){
   StaticPT.vec(n,mout,min,dir);
+  ParTrans::PTflops +=66*n*PT::vol;
 }
 
 void pt_mat(int n, IFloat **mout, IFloat **min, int const *dir){
   StaticPT.mat(n,(matrix**)mout,(matrix**)min,dir);
+  ParTrans::PTflops +=198*n*PT::vol;
 }
 
 void pt_vvpd(IFloat **vect, int n_vect, const int *dir,
              int n_dir, int hop, IFloat **sum){
-  StaticPT.vvpd(vect, n_vect, dir,
-             n_dir, hop, sum);
+  StaticPT.vvpd(vect, n_vect, dir, n_dir, hop, sum);
+  ParTrans::PTflops +=90*n_vect*n_dir*PT::vol;
 }
 
 void pt_shift_link(IFloat **u, const int *dir, int n_dir){

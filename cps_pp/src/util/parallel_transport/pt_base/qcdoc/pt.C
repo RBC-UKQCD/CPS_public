@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.17 2005-02-18 20:18:15 mclark Exp $
+  $Id: pt.C,v 1.18 2005-03-07 00:33:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2005-02-18 20:18:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.17 2005-02-18 20:18:15 mclark Exp $
-//  $Id: pt.C,v 1.17 2005-02-18 20:18:15 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:33:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.18 2005-03-07 00:33:43 chulwoo Exp $
+//  $Id: pt.C,v 1.18 2005-03-07 00:33:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -68,13 +68,13 @@ extern "C"{
   void cmv_agg_cpp_cb(int sites, long u, long in, long out, IFloat * gauge_field, int pad=0);
   //---------------------------------------------------------------------------
 
-  void m1m2_lookup(Matrix *result, Matrix *m1, Matrix *m2, int length,
+  void m1m2_lookup(matrix *result, matrix *m1, matrix *m2, int length,
 		   unsigned long *dest, unsigned long *dest, unsigned long *src);
-  void m1m2_lookup_copy(Matrix *result2, Matrix *result, Matrix *m1, Matrix *m2, 
+  void m1m2_lookup_copy(matrix *result2, matrix *result, matrix *m1, matrix *m2, 
 			int length, unsigned long *dest2,  
 			unsigned long *dest, unsigned long *dest, 
 			unsigned long *src);
-  void m1m2_lin_copy(Matrix *result2, Matrix *result, Matrix *m1, Matrix *m2, 
+  void m1m2_lin_copy(matrix *result2, matrix *result, matrix *m1, matrix *m2, 
 		     int length, unsigned long *dest2,
 		     unsigned long *dest, unsigned long *dest);
   
@@ -618,9 +618,9 @@ void PT::init(PTArg *pt_arg)
     if(vol> 4096){
       uc_l[i]=uc_nl[i]=NULL;
     } else {	
-      uc_l[i] = (gauge_agg *)fmalloc(cname,fname,"uc_l[i]",
+      uc_l[i] = (gauge_agg *)Alloc(cname,fname,"uc_l[i]",
 				     sizeof(gauge_agg)*(1+local_chi[i]));
-      uc_nl[i] = (gauge_agg *)fmalloc(cname,fname,"uc_nl[i]",
+      uc_nl[i] = (gauge_agg *)Alloc(cname,fname,"uc_nl[i]",
 				      sizeof(gauge_agg)*(1+non_local_chi[i]));
     }
       
@@ -941,8 +941,8 @@ void PT::delete_buf(){
 //  VRB.Func("",fname);
 	
   for(int i = 0; i < 2*NDIM; i++){
-    ffree(uc_l[i],cname,fname,"uc_l[i]");
-    ffree(uc_nl[i],cname,fname,"uc_nl[i]");
+    Free(uc_l[i]);
+    Free(uc_nl[i]);
     //--------------------------------------------------------------------
 
     for(int parity = 0; parity < 2; parity++)
@@ -952,15 +952,18 @@ void PT::delete_buf(){
       }
 
     //-------------------------------------------------------------------
-    sfree(rcv_buf[i],cname,fname,"rcv_buf[i]");
-    sfree(rcv_buf2[i],cname,fname,"rcv_buf2[i]");
+//    sfree(rcv_buf[i],cname,fname,"rcv_buf[i]");
+//    sfree(rcv_buf2[i],cname,fname,"rcv_buf2[i]");
+    Free(rcv_buf[i]);
+    Free(rcv_buf2[i]);
   }
 
   //-----------------------------------------------------------------------
 
   for(int i = 0; i < NDIM; i++)
     {
-      sfree(snd_buf_cb[i],cname,fname,"snd_buf_cb[i]");
+//      sfree(snd_buf_cb[i],cname,fname,"snd_buf_cb[i]");
+      Free(snd_buf_cb[i]);
       for(int parity = 0; parity < 2; parity++)
 	Free(uc_nl_cb_pre[parity][i]);
     }
@@ -1028,8 +1031,8 @@ void PT::init_g(void){
 
   //Temporary buffer (allocated on cache) that receives an SU(3) matrix
   IFloat *rcv_mat = (IFloat *)qalloc(QFAST|QNONCACHE,18*sizeof(IFloat));
-  if (!rcv_mat) ERR.Pointer("",fname,"rcv_mat");
-  VRB.Smalloc(cname,fname,"rcv_mat",rcv_mat,18*sizeof(IFloat));
+//  if (!rcv_mat) ERR.Pointer("",fname,"rcv_mat");
+//  VRB.Smalloc(cname,fname,"rcv_mat",rcv_mat,18*sizeof(IFloat));
 
   sys_cacheflush(0);
 
@@ -1253,6 +1256,7 @@ parity)
 
   //Begin transmission
   SCUmulti.SlowStartTrans();
+
   //End transmission
   SCUmulti.TransComplete();
 
@@ -1438,7 +1442,6 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
     {
 	cmv_agg_cpp_cb(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],gauge);
     }
-
 
   //If wire[i] is even, then we have transport in the negative direction.
   //In this case, the vector field is multiplied by the SU(3) link matrix
@@ -1799,13 +1802,13 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
 
     if (v%2==0) {
       for(i=0;i<n_dir;i++)
-	SCUarg_p[2*i+1]->Addr((void *)(vect[v]+set_offset(2*wire[i], hop)));
+	SCUarg_p[2*i+1]->Addr((void *)(vect[v]+VECT_LEN*set_offset(2*wire[i], hop)));
 
       // Start communication
       SCUmulti.Init(SCUarg_p,2*n_dir);
     } else {
       for(i=0;i<n_dir;i++)
-	SCUarg_p2[2*i+1]->Addr((void *)(vect[v]+set_offset(2*wire[i], hop)));
+	SCUarg_p2[2*i+1]->Addr((void *)(vect[v]+VECT_LEN*set_offset(2*wire[i], hop)));
 
       // Start communication
       SCUmulti.Init(SCUarg_p2,2*n_dir);
@@ -1873,7 +1876,7 @@ void PT::shift_field(IFloat **v, const int *dir, int n_dir,
   for (i=0; i<n_dir; i++) {
     SCUarg_p[2*i] = SCUarg_mat[hop-1][2*wire[i]];
     SCUarg_p[2*i+1] = SCUarg_mat[hop-1][2*wire[i]+1];
-    SCUarg_p[2*i+1]->Addr((void *)(v[i]+set_offset(wire[i], hop)));
+    SCUarg_p[2*i+1]->Addr((void *)(v[i]+GAUGE_LEN*set_offset(wire[i], hop)));
   }
 
   SCUmulti.Init(SCUarg_p,2*n_dir);

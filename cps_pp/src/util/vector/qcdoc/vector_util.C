@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.5 2004-08-18 11:58:09 zs Exp $
+  $Id: vector_util.C,v 1.6 2005-03-07 00:33:45 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdoc/vector_util.C,v 1.5 2004-08-18 11:58:09 zs Exp $
-//  $Id: vector_util.C,v 1.5 2004-08-18 11:58:09 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:33:45 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdoc/vector_util.C,v 1.6 2005-03-07 00:33:45 chulwoo Exp $
+//  $Id: vector_util.C,v 1.6 2005-03-07 00:33:45 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdoc/vector_util.C,v $
 //  $State: Exp $
 //
@@ -30,6 +30,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <string.h>		/* memcpy */
 #include <util/vector.h>
+#include <util/time.h>
 CPS_START_NAMESPACE
 
 
@@ -43,8 +44,44 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------//
 void moveMem(void *b, const void *a, int len) 
 {
+#undef PROFILE
+#ifdef PROFILE
+    double time  = -dclock();
+#endif
     memcpy(b, a, len); 
+#ifdef PROFILE
+    time += dclock();
+    print_flops("","moveMem",len,time);
+#endif
 }
+
+void moveFloat(Float *b, const Float *a, int len) {
+#undef PROFILE
+#ifdef PROFILE
+    double time  = -dclock();
+#endif
+//    for(int i =0;i<len;i++) *b++ = *a++; 
+    memcpy(b, a, len*sizeof(Float)); 
+#ifdef PROFILE
+    time += dclock();
+    print_flops("","moveFloat",len*sizeof(Float),time);
+#endif
+}
+
+void moveVec(Float *b, const Float *a, int len) {
+#undef PROFILE
+#ifdef PROFILE
+    double time  = -dclock();
+#endif
+    for(int i =0;i<len*6;i++) *b++ = *a++; 
+    memcpy(b, a, len*sizeof(Vector)); 
+#ifdef PROFILE
+    time += dclock();
+    print_flops("","moveVec",len*sizeof(Float),time);
+#endif
+}
+
+
 //---------------------------------------------------------------//
 
 
