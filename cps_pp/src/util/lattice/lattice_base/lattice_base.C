@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.4 2004-01-13 20:39:52 chulwoo Exp $
+  $Id: lattice_base.C,v 1.5 2004-02-16 13:21:43 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.4 2004-01-13 20:39:52 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.4 2004-01-13 20:39:52 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-02-16 13:21:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.5 2004-02-16 13:21:43 zs Exp $
+//  $Id: lattice_base.C,v 1.5 2004-02-16 13:21:43 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -371,7 +371,7 @@ StrOrdType Lattice::StrOrd(void)
 // int Colors();
 // Returns the number of colors.	  
 //------------------------------------------------------------------
-int Lattice::Colors(void)
+int Lattice::Colors(void) const
 {
   return GJP.Colors();
 }

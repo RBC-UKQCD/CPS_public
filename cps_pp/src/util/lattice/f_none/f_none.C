@@ -3,35 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fnone class.
 
-  $Id: f_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: f_none.C,v 1.3 2004-02-16 13:21:42 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: f_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2004-02-16 13:21:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v 1.3 2004-02-16 13:21:42 zs Exp $
+//  $Id: f_none.C,v 1.3 2004-02-16 13:21:42 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.2  2001/06/19 18:13:22  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:09  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: f_none.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v $
 //  $State: Exp $
 //
@@ -84,7 +68,7 @@ Fnone::~Fnone()
 // FclassType Fclass(void):
 // It returns the type of fermion class.
 //------------------------------------------------------------------
-FclassType Fnone::Fclass(void){
+FclassType Fnone::Fclass(void) const{
   return F_CLASS_NONE;
 }
 
@@ -93,7 +77,7 @@ FclassType Fnone::Fclass(void){
 // Returns the number of exact flavors of the matrix that
 // is inverted during a molecular dynamics evolution.
 //------------------------------------------------------------------
-int Fnone::ExactFlavors(void)
+int Fnone::ExactFlavors(void) const
 {
   return 0;
 }
@@ -103,7 +87,7 @@ int Fnone::ExactFlavors(void)
 // int SpinComponents() : 
 // Returns the number of spin components.
 //------------------------------------------------------------------
-int Fnone::SpinComponents(void)
+int Fnone::SpinComponents(void) const
 {
   return 0;
 }
@@ -114,7 +98,7 @@ int Fnone::SpinComponents(void)
   \return 1, in order for memory allocation to proceed normally.
 */
 //------------------------------------------------------------------
-int Fnone::FsiteSize(void)
+int Fnone::FsiteSize(void) const
 {
   return 1;
 }
@@ -126,7 +110,7 @@ int Fnone::FsiteSize(void)
 //      are defined on a single checkerboard (half the 
 //      lattice).
 //------------------------------------------------------------------
-int Fnone::FchkbEvl(void)
+int Fnone::FchkbEvl(void) const
 {
   return 1;
 }
@@ -155,10 +139,10 @@ int Fnone::FmatEvlInv(Vector *f_out, Vector *f_in,
 //------------------------------------------------------------------
 // Overloaded function is same as original but with true_res=0;
 //------------------------------------------------------------------
-int Fnone::FmatEvlInv(Vector *f_out, Vector *f_in, 
-		      CgArg *cg_arg, 
-		      CnvFrmType cnv_frm)
-{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
+// int Fnone::FmatEvlInv(Vector *f_out, Vector *f_in, 
+// 		      CgArg *cg_arg, 
+// 		      CnvFrmType cnv_frm)
+// { return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
 
 
 //------------------------------------------------------------------
@@ -186,11 +170,11 @@ int Fnone::FmatInv(Vector *f_out, Vector *f_in,
 //------------------------------------------------------------------
 // Overloaded function is same as original but with true_res=0;
 //------------------------------------------------------------------
-int Fnone::FmatInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   CnvFrmType cnv_frm,
-		   PreserveType prs_f_in)
-{ return FmatInv(f_out, f_in, cg_arg, 0, cnv_frm, prs_f_in); }
+// int Fnone::FmatInv(Vector *f_out, Vector *f_in, 
+// 		   CgArg *cg_arg, 
+// 		   CnvFrmType cnv_frm,
+// 		   PreserveType prs_f_in)
+// { return FmatInv(f_out, f_in, cg_arg, 0, cnv_frm, prs_f_in); }
 
 
 //------------------------------------------------------------------

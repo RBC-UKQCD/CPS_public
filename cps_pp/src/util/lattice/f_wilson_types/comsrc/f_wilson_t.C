@@ -3,43 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FwilsonTypes class.
 
-  $Id: f_wilson_t.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: f_wilson_t.C,v 1.3 2004-02-16 13:21:43 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: f_wilson_t.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2004-02-16 13:21:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.3 2004-02-16 13:21:43 zs Exp $
+//  $Id: f_wilson_t.C,v 1.3 2004-02-16 13:21:43 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.4  2001/08/16 10:50:35  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:13:25  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:09  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: f_wilson_t.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v $
 //  $State: Exp $
 //
@@ -147,6 +123,67 @@ void FwilsonTypes::Gamma5(Vector *v_out, Vector *v_in, int num_sites)
   gamma_5((IFloat *)v_out, (IFloat *)v_in, num_sites) ;
 }
 
+//------------------------------------------------------------------
+// int ExactFlavors() : 
+// Returns the number of exact flavors of the matrix that
+// is inverted during a molecular dynamics evolution.
+//------------------------------------------------------------------
+int FwilsonTypes::ExactFlavors() const
+{
+  return 2;
+}
 
+int FwilsonTypes::FsiteSize() const
+{
+  return 2 * Colors() * SpinComponents();  
+  // re/im * colors * spin_components
+}
+
+//------------------------------------------------------------------
+// Float FhamiltonNode(Vector *phi, Vector *chi):
+// The fermion Hamiltonian of the node sublattice.
+// chi must be the solution of Cg with source phi.	       
+//------------------------------------------------------------------
+Float FwilsonTypes::FhamiltonNode( Vector *phi,  Vector *chi) {
+  char *fname = "FhamiltonNode(V*,V*)";
+  VRB.Func(cname,fname);
+
+  if (phi == 0)
+    ERR.Pointer(cname,fname,"phi") ;
+
+  if (chi == 0)
+    ERR.Pointer(cname,fname,"chi") ;
+
+  return phi->ReDotProductNode(chi,(GJP.VolNodeSites()*FsiteSize())>>1) ;
+}
+
+//------------------------------------------------------------------
+// int FsiteOffsetChkb(const int *x):
+// Sets the offsets for the fermion fields on a 
+// checkerboard. The fermion field storage order
+// is not the canonical one but it is particular
+// to the fermion type. x[i] is the 
+// ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+//------------------------------------------------------------------
+int FwilsonTypes::FsiteOffsetChkb(const int *x) const {
+
+  return ( x[0] - x[0]%2 + GJP.XnodeSites() *
+           ( x[1] + GJP.YnodeSites() *
+             (x[2] + GJP.ZnodeSites() * x[3])) +
+           ((x[0]+x[1]+x[2]+x[3]+1)%2)*GJP.VolNodeSites()
+         )>>1 ;
+}
+
+int FwilsonTypes::FsiteOffset(const int *x) const {
+
+  return ( x[0] + GJP.XnodeSites() *
+	   ( x[1] + GJP.YnodeSites() *
+	     ( x[2] + GJP.ZnodeSites() * x[3])));
+}
+
+int FwilsonTypes::SpinComponents() const
+{
+  return 4;
+}
 
 CPS_END_NAMESPACE

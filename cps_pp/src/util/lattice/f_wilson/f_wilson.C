@@ -4,52 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.3 2004-01-13 20:39:50 chulwoo Exp $
+  $Id: f_wilson.C,v 1.4 2004-02-16 13:21:43 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v 1.3 2004-01-13 20:39:50 chulwoo Exp $
-//  $Id: f_wilson.C,v 1.3 2004-01-13 20:39:50 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-02-16 13:21:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v 1.4 2004-02-16 13:21:43 zs Exp $
+//  $Id: f_wilson.C,v 1.4 2004-02-16 13:21:43 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.2.10.1  2003/12/11 20:22:53  cwj
-//  *** empty log message ***
-//
-//  Revision 1.2  2003/07/24 16:53:54  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.4  2001/08/16 10:50:35  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:13:23  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:09  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: f_wilson.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v $
 //  $State: Exp $
 //
@@ -127,45 +94,15 @@ Fwilson::~Fwilson()
 
 
 //------------------------------------------------------------------
-// FclassType Fclass(void):
+// FclassType Fclass():
 // It returns the type of fermion class.
 //------------------------------------------------------------------
-FclassType Fwilson::Fclass(void){
+FclassType Fwilson::Fclass() const{
   return F_CLASS_WILSON;
 }
 
 
-//------------------------------------------------------------------
-// int ExactFlavors() : 
-// Returns the number of exact flavors of the matrix that
-// is inverted during a molecular dynamics evolution.
-//------------------------------------------------------------------
-int Fwilson::ExactFlavors(void)
-{
-  return 2;
-}
 
-
-//------------------------------------------------------------------
-// int SpinComponents() : 
-// Returns the number of spin components.
-//------------------------------------------------------------------
-int Fwilson::SpinComponents(void)
-{
-  return 4;
-}
-
-
-//------------------------------------------------------------------
-// int FsiteSize() : 
-// Returns the number of fermion field components 
-// (including real/imaginary) on a site of the 4-D lattice.
-//------------------------------------------------------------------
-int Fwilson::FsiteSize(void)
-{
-  return 2 * Colors() * SpinComponents();  
-  // re/im * colors * spin_components
-}
 
 //------------------------------------------------------------------
 // int FchkbEvl() :
@@ -174,7 +111,7 @@ int Fwilson::FsiteSize(void)
 //      are defined on a single checkerboard (half the 
 //      lattice).
 //------------------------------------------------------------------
-int Fwilson::FchkbEvl(void)
+int Fwilson::FchkbEvl() const
 {
   return 1;
 }
@@ -216,14 +153,6 @@ int Fwilson::FmatEvlInv(Vector *f_out, Vector *f_in,
   return iter;
 }
 
-
-//------------------------------------------------------------------
-// Overloaded function is same as original but with true_res=0;
-//------------------------------------------------------------------
-int Fwilson::FmatEvlInv(Vector *f_out, Vector *f_in, 
-			CgArg *cg_arg, 
-			CnvFrmType cnv_frm)
-{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
 
 
 //------------------------------------------------------------------
@@ -268,15 +197,6 @@ int Fwilson::FmatInv(Vector *f_out, Vector *f_in,
   return iter;
 }
 
-
-//------------------------------------------------------------------
-// Overloaded function is same as original but with true_res=0;
-//------------------------------------------------------------------
-int Fwilson::FmatInv(Vector *f_out, Vector *f_in, 
-		     CgArg *cg_arg, 
-		     CnvFrmType cnv_frm,
-		     PreserveType prs_f_in)
-{ return FmatInv(f_out, f_in, cg_arg, 0, cnv_frm, prs_f_in); }
 
 
 //------------------------------------------------------------------
@@ -586,24 +506,6 @@ void Fwilson::EvolveMomFforce(Matrix *mom, Vector *chi,
 }
 
 
-//------------------------------------------------------------------
-// Float FhamiltonNode(Vector *phi, Vector *chi):
-// The fermion Hamiltonian of the node sublattice.
-// chi must be the solution of Cg with source phi.	       
-//------------------------------------------------------------------
-Float Fwilson::FhamiltonNode(Vector *phi, Vector *chi){
-  char *fname = "FhamiltonNode(V*,V*)";
-  VRB.Func(cname,fname);
-
-  if (phi == 0)
-    ERR.Pointer(cname,fname,"phi") ;
-
-  if (chi == 0)
-    ERR.Pointer(cname,fname,"chi") ;
-
-  return phi->ReDotProductNode(chi,(GJP.VolNodeSites()*FsiteSize())>>1) ;
-}
-
 
 //------------------------------------------------------------------
 // Float BhamiltonNode(Vector *boson, Float mass):
@@ -644,36 +546,6 @@ Float Fwilson::BhamiltonNode(Vector *boson, Float mass){
 }
 
 
-//------------------------------------------------------------------
-// int FsiteOffsetChkb(const int *x):
-// Sets the offsets for the fermion fields on a 
-// checkerboard. The fermion field storage order
-// is not the canonical one but it is particular
-// to the fermion type. x[i] is the 
-// ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-//------------------------------------------------------------------
-int Fwilson::FsiteOffsetChkb(const int *x) const {
-
-  return ( x[0] - x[0]%2 + GJP.XnodeSites() *
-           ( x[1] + GJP.YnodeSites() *
-             (x[2] + GJP.ZnodeSites() * x[3])) +
-           ((x[0]+x[1]+x[2]+x[3]+1)%2)*GJP.VolNodeSites()
-         )>>1 ;
-}
-
-
-//------------------------------------------------------------------
-// int FsiteOffset(const int *x):
-// Sets the offsets for the fermion fields on a 
-// checkerboard. The fermion field storage order
-// is the canonical one. X[I] is the
-// ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-//------------------------------------------------------------------
-int Fwilson::FsiteOffset(const int *x) const {
-// ???
-  ERR.NotImplemented(cname, "FsiteOffset");
-  return 0; 
-}
 
 
 

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.12 2004-02-06 12:20:43 zs Exp $
+  $Id: lattice.h,v 1.13 2004-02-16 13:21:43 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-02-06 12:20:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.12 2004-02-06 12:20:43 zs Exp $
-//  $Id: lattice.h,v 1.12 2004-02-06 12:20:43 zs Exp $
+//  $Date: 2004-02-16 13:21:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.13 2004-02-16 13:21:43 zs Exp $
+//  $Id: lattice.h,v 1.13 2004-02-16 13:21:43 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -224,11 +224,11 @@ class Lattice
 // Base class functions
 //------------------------------------------------------------------
 
-    Lattice(void);
+    Lattice();
 
-    virtual ~Lattice(void);
+    virtual ~Lattice();
 
-    Matrix *GaugeField(void) const;
+    Matrix *GaugeField() const;
     	//!< Returns the pointer to the gauge field configuration.
 
     void GaugeField(Matrix *u);
@@ -250,13 +250,13 @@ class Lattice
     void CopyGaugeField(Matrix* u);
         //!< Copies the  gauge configuration into an array/
 
-    StrOrdType StrOrd(void);
+    StrOrdType StrOrd();
         //!< Returns the storage order.
 
-    int Colors(void);
+    int Colors() const;
         //!< Returns the number of colors.	  
 
-    int GsiteSize(void);
+    int GsiteSize();
         //!< Gets the number of gauge field  components per lattice site.
 
     void Staple(Matrix& stap, int *x, int mu);
@@ -337,10 +337,10 @@ class Lattice
         //
         //   U_u(x) U_v(x+u) U_u(x+v)~ U_v(x)~
 
-    Float SumReTrPlaqNode(void) const;
+    Float SumReTrPlaqNode() const;
        //!< Calculates the local sum of the real part of the trace of the plaquette 
 
-    Float SumReTrPlaq(void) const;
+    Float SumReTrPlaq() const;
        //!< Calculates the global sum of the real part of the trace of the plaquette 
 
     Float ReTrRect(int *x, int mu, int nu) const;
@@ -353,12 +353,12 @@ class Lattice
        //   U_u(x) U_u(x+u) U_v(x+2u) U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
        //
 
-    Float SumReTrRectNode(void) const;
+    Float SumReTrRectNode() const;
         //!< Calculates the local sum of the real part of the trace of the 6-link rectangle.
        // It calculates the sum of the real part of the trace of the
        // rectangle field at each site of the node sublattice.
 
-    Float SumReTrRect(void) const;
+    Float SumReTrRect() const;
         //!< Calculates the global sum of the real part of the trace of the 6-link rectangle.
        // It calculates the sum of the real part of the trace of the
        // rectangle field at each site of the whole lattice.
@@ -366,28 +366,28 @@ class Lattice
     Float ReTrLoop(const int *x, const int *dir,  int length) ;
     //!< Computes the real trace of the product of links along a path.
 
-    Float SumReTrCubeNode(void) ;
+    Float SumReTrCubeNode() ;
     //!< Calculates the local sum of the real part of the trace of the cube
 
-    Float SumReTrCube(void) ;
+    Float SumReTrCube() ;
     //!< Calculates the global sum of the real part of the trace of the cube
 
   // Added in by Ping for anisotropic lattices
   //------------------------------------------------------------------
-  Float AveReTrPlaqNodeNoXi(void) const;
+  Float AveReTrPlaqNodeNoXi() const;
   //!< Calculates the local average of the real part of the trace of the plaquettes perpendicular to the special anisotropic direction.
   // Normalization:  1 for ordered links
 
-  Float AveReTrPlaqNodeXi(void) const;
+  Float AveReTrPlaqNodeXi() const;
   //!< Calculates the local average of the real part of the trace of the plaquettes parallel to the special anisotropic direction.
   // Normalization:  1 for ordered links
 
-  Float AveReTrPlaqNoXi(void) const;
+  Float AveReTrPlaqNoXi() const;
   //!< Calculates the global average of the real part of the trace of the plaquettes perpendicular to the special anisotropic direction.  
   // Normalization:  1 for ordered links
   // Average over plaq's perpendicular to the special anisotropic dir.
 
-  Float AveReTrPlaqXi(void) const;
+  Float AveReTrPlaqXi() const;
   //!< Calculates the global average of the real part of the trace of the plaquettes parallel to the special anisotropic direction.
   // Normalization:  1 for ordered links
   // Average over plaq's parallel to the special anisotropic dir.
@@ -404,7 +404,7 @@ class Lattice
     \post The  gauge field  links in direction \a dir are scaled.
   */
  
-    void Reunitarize(void);
+    void Reunitarize();
     //!< Re-unitarize the gauge field configuration.
 
     void Reunitarize(Float &dev, Float &max_diff);
@@ -463,13 +463,13 @@ class Lattice
         // but can also produce even and odd checkerboards.
         // If keep_snodes == 1, then we divide the site size by SnodeSites()
 
-    void SetGfieldOrd(void);
+    void SetGfieldOrd();
     //!< Creates a unit gauge field.
 
-    void SetGfieldDisOrd(void);
+    void SetGfieldDisOrd();
     //!< Creates a random (disordered) gauge field.
 
-    int GupdCnt(void);
+    int GupdCnt();
     //!< Reads the gauge field updates counter.
 
     int GupdCnt(int set_val);
@@ -478,7 +478,7 @@ class Lattice
     int GupdCntInc(int inc_val = 1);
     //!< Increments the gauge field updates counter.
 
-    Float MdTime(void);
+    Float MdTime();
       // Returns the value of md_time.
 
     Float MdTime(Float set_val);
@@ -487,7 +487,7 @@ class Lattice
     Float MdTimeInc(Float inc_val = 0.5);
       // Increments md_time by inc_val and returns new value.
 
-    void *FdiracOpInitPtr(void)
+    void *FdiracOpInitPtr()
       { return f_dirac_op_init_ptr; }
       // Returns a pointer that is used by the fermion classes to
       // point to data that need only be initialized by the fermion
@@ -506,22 +506,22 @@ class Lattice
         //
         // int MaxIterNum - issues a warning if reached
 
-    void FixGaugeFree(void);
+    void FixGaugeFree();
         //!< Free memory used by the gauge fixing matrices.
 
-    Matrix **FixGaugePtr(void);
+    Matrix **FixGaugePtr();
       //!< Returns (a pointer to the first element of) an array of pointers to gauge-fixed hyperplanes.
 
-    FixGaugeType FixGaugeKind(void);
+    FixGaugeType FixGaugeKind();
       //!< Returns the kind of gauge fixing.
 
-    void *Aux0Ptr(void);
+    void *Aux0Ptr();
      //!< Returns a general purpose auxiliary pointer.
 
-    void *Aux1Ptr(void);
+    void *Aux1Ptr();
       //!< Returns a general purpose auxiliary pointer.
 
-    void GsoCheck(void);
+    void GsoCheck();
     //!< Checks that the gauge field is identical on 5th dimension local lattice slices.
 
       // If GJP.Snodes() == 1 it just returns.
@@ -570,7 +570,7 @@ class Lattice
 
 // Gauge action related pure virtual functions
 //------------------------------------------------------------------
-    virtual GclassType Gclass(void) = 0;
+    virtual GclassType Gclass() = 0;
         //!< Returns the type of gauge action
 
     virtual void GactionGradient(Matrix &grad, int *x, int mu) = 0;
@@ -593,7 +593,7 @@ class Lattice
       dynamics evolution.
     */
 
-    virtual Float GhamiltonNode(void) = 0;
+    virtual Float GhamiltonNode() = 0;
     //!< Computes the pure gauge action on the local sublattice.
     /*!<
       \return The value of the pure gauge action on this node.
@@ -602,7 +602,7 @@ class Lattice
 
 // Fermion action related pure virtual functions 
 //------------------------------------------------------------------
-    virtual FclassType Fclass(void) = 0;
+    virtual FclassType Fclass() const = 0;
         //!< Returns the type of fermion action.
 
     virtual int FsiteOffsetChkb(const int *x) const = 0;
@@ -625,24 +625,24 @@ class Lattice
       \return The lattice site index.
     */
 
-    virtual int ExactFlavors(void) = 0;
+    virtual int ExactFlavors() const = 0;
     //!<  The number of dynamical flavors.
     /*!<
       \return The number of flavours defined  when this action is used in
       molecular dynamics dynamical fermion algorithms.
     */
 
-    virtual int SpinComponents(void) = 0;
+    virtual int SpinComponents() const = 0;
         //!< Returns the number of spin components.
 
-    virtual int FsiteSize(void) = 0;
+    virtual int FsiteSize() const = 0;
     //!< Gets the size of a fermion field per 4-dim. lattice site.
     /*!<
       \return The total number of all fermionic field components, \e i.e.
       the number of floating point numbers, at each site of the 4-dim. lattice.
     */
     
-    virtual int FchkbEvl(void) = 0;
+    virtual int FchkbEvl() const = 0;
     //!< Determines whether one or both parities are used in the molecular dynamics evolution.
     /*!<
       Are the fields used in the molecular dynamics algorithms defined on
@@ -678,9 +678,12 @@ class Lattice
       \post true_res The true residual, if this was non-zero to start with.
       The residual is \f$ |f_{in} - M^\dagger M f_{out}| / |f_{in}| \f$.
     */
-    virtual int FmatEvlInv(Vector *f_out, Vector *f_in,  
+
+    int FmatEvlInv(Vector *f_out, Vector *f_in,  
 			   CgArg *cg_arg,  
-			   CnvFrmType cnv_frm = CNV_FRM_YES) = 0; 
+			   CnvFrmType cnv_frm = CNV_FRM_YES)
+	{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
+    
     //!< The matrix inversion used in the molecular dynamics algorithms.
     /*!<
       Solves \f$ M^\dagger M f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
@@ -760,10 +763,12 @@ class Lattice
       The residual is  <em>  |f_in - A f_out| / |f_in| </em>
     */
 
-    virtual int FmatInv(Vector *f_out, Vector *f_in, 
+    int FmatInv(Vector *f_out, Vector *f_in,
 			CgArg *cg_arg, 
 			CnvFrmType cnv_frm = CNV_FRM_YES,
-			PreserveType prs_f_in = PRESERVE_YES) = 0;
+			PreserveType prs_f_in = PRESERVE_YES)
+	{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
+    
     //!< Fermion matrix inversion.
     /*!<
       Solves <em> A f_out = f_in </em> for \a f_out, where \a A is the
@@ -898,11 +903,11 @@ class Gnone : public virtual Lattice
 
  public:
 
-    Gnone(void);
+    Gnone();
 
-    virtual ~Gnone(void);
+    virtual ~Gnone();
 
-    GclassType Gclass(void);
+    GclassType Gclass();
         // It returns the type of gauge class
 
     void GactionGradient(Matrix &grad, int *x, int mu) ;
@@ -917,7 +922,7 @@ class Gnone : public virtual Lattice
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
-    Float GhamiltonNode(void);
+    Float GhamiltonNode();
        // The pure gauge Hamiltonian of the node sublattice.
 
     void AllStaple(Matrix &stap, const int *x, int mu);
@@ -938,11 +943,11 @@ class Gwilson : public virtual Lattice
 
  public:
 
-    Gwilson(void);
+    Gwilson();
 
-    virtual ~Gwilson(void);
+    virtual ~Gwilson();
 
-    GclassType Gclass(void);
+    GclassType Gclass();
         // It returns the type of gauge class
 
     void GactionGradient(Matrix &grad, int *x, int mu) ;
@@ -957,7 +962,7 @@ class Gwilson : public virtual Lattice
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
-    Float GhamiltonNode(void);
+    Float GhamiltonNode();
        // The pure gauge Hamiltonian of the node sublattice.
 
     void AllStaple(Matrix &stap, const int *x, int mu);
@@ -991,11 +996,11 @@ class GpowerPlaq : public virtual Lattice
 
  public:
 
-    GpowerPlaq(void);
+    GpowerPlaq();
 
-    virtual ~GpowerPlaq(void);
+    virtual ~GpowerPlaq();
 
-    GclassType Gclass(void);
+    GclassType Gclass();
         // It returns the type of gauge class
 
     void GactionGradient(Matrix &grad, int *x, int mu) ;
@@ -1010,7 +1015,7 @@ class GpowerPlaq : public virtual Lattice
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
-    Float GhamiltonNode(void);
+    Float GhamiltonNode();
        // The pure gauge Hamiltonian of the node sublattice.
 
     void PowerStaple(Matrix& pstap, int *x, int mu);
@@ -1019,10 +1024,10 @@ class GpowerPlaq : public virtual Lattice
     Float PowerPlaq(int *x, int mu, int nu) const;
         //!< Calculates the power plaquette term.
 
-    Float SumPowerPlaqNode(void) const;
+    Float SumPowerPlaqNode() const;
         //!< Calculates the local sum of the power plaquette term.
 
-    Float SumPowerPlaq(void) const;
+    Float SumPowerPlaq() const;
         //!< Calculates the global sum of the power plaquette term.    
 
     void AllStaple(Matrix &stap, const int *x, int mu);
@@ -1055,11 +1060,11 @@ class GimprRect : public virtual Lattice
 
  public:
 
-    GimprRect(void);
+    GimprRect();
 
-    virtual ~GimprRect(void);
+    virtual ~GimprRect();
 
-    GclassType Gclass(void);
+    GclassType Gclass();
         // It returns the type of gauge class
 
     void GactionGradient(Matrix &grad, int *x, int mu) ;
@@ -1077,7 +1082,7 @@ class GimprRect : public virtual Lattice
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
-    Float GhamiltonNode(void);
+    Float GhamiltonNode();
        // The pure gauge Hamiltonian of the node sublattice.
 
     //! Computes sum of the plaquette and rectangle staples around a link.
@@ -1102,7 +1107,7 @@ The action is:
     and all rectangles
 \f[
   W_r(x, \mu, \nu) = U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
-\f]
+\f] 
 
  This action supresses plaquettes with \f$ 1 - \mathrm{ReTr}[U_p]/3 > c \f$
  and rectangles with \f$ 1 - \mathrm{ReTr}[W_r]/3 > c \f$
@@ -1123,11 +1128,11 @@ class GpowerRect : public virtual Lattice
 
  public:
 
- GpowerRect(void);
+ GpowerRect();
 
-    virtual ~GpowerRect(void);
+    virtual ~GpowerRect();
 
-    GclassType Gclass(void);
+    GclassType Gclass();
         // It returns the type of gauge class
 
     void GactionGradient(Matrix &grad, int *x, int mu) ;
@@ -1145,7 +1150,7 @@ class GpowerRect : public virtual Lattice
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
-    Float GhamiltonNode(void);
+    Float GhamiltonNode();
        // The pure gauge Hamiltonian of the node sublattice.
 
     void PowerStaple(Matrix& pstap, int *x, int mu);
@@ -1154,10 +1159,10 @@ class GpowerRect : public virtual Lattice
     Float PowerPlaq(int *x, int mu, int nu) const;
         //!< Calculates the real part of the trace of the power plaquette.
 
-    Float SumPowerPlaqNode(void) const;
+    Float SumPowerPlaqNode() const;
         //!< Calculates the local sum of the real part of the trace of the power plaquette.
 
-    Float SumPowerPlaq(void) const;
+    Float SumPowerPlaq() const;
         //!< Calculates the global sum of the real part of the trace of the power plaquette.
 
     void PowerRectStaple(Matrix& pstap, int *x, int mu);
@@ -1166,10 +1171,10 @@ class GpowerRect : public virtual Lattice
     Float PowerRect(int *x, int mu, int nu) const;
         //!< Calculates the the real part of the trace of the power rectangle.
 
-    Float SumPowerRectNode(void) const;
+    Float SumPowerRectNode() const;
         //!< Calculates the local sum of the real part of the trace of the power rectangle.
 
-    Float SumPowerRect(void) const;
+    Float SumPowerRect() const;
         //!< Calculates the global sum of the real part of the trace of the power rectangle.
 
     void AllStaple(Matrix &stap, const int *x, int mu);
@@ -1210,11 +1215,11 @@ class GimprOLSym : public virtual Lattice
 
  public:
 
-    GimprOLSym(void);
+    GimprOLSym();
 
-    virtual ~GimprOLSym(void);
+    virtual ~GimprOLSym();
 
-    GclassType Gclass(void);
+    GclassType Gclass();
         // It returns the type of gauge class
 
     void GactionGradient(Matrix &grad, int *x, int mu) ;
@@ -1232,7 +1237,7 @@ class GimprOLSym : public virtual Lattice
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
-    Float GhamiltonNode(void);
+    Float GhamiltonNode();
        // The pure gauge Hamiltonian of the node sublattice.
 
     void AllStaple(Matrix &stap, const int *x, int mu);
@@ -1261,11 +1266,11 @@ class Fnone : public virtual Lattice
     
  public:
 
-    Fnone(void);
+    Fnone();
 
-    virtual ~Fnone(void);
+    virtual ~Fnone();
 
-    FclassType Fclass(void);
+    FclassType Fclass() const;
         // It returns the type of fermion class
 
     int FsiteOffsetChkb(const int *x) const;
@@ -1283,17 +1288,17 @@ class Fnone : public virtual Lattice
         // is the canonical one. X[I] is the
         // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
 
-    int ExactFlavors(void);
+    int ExactFlavors() const;
         // Returns the number of exact flavors of the matrix that
         // is inverted during a molecular dynamics evolution.
 
-    int SpinComponents(void);
+    int SpinComponents() const;
         // Returns the number of spin components.
 
-    int FsiteSize(void);
+    int FsiteSize() const;
     //!< Gets the size per lattice site of the fermion field.
 
-    int FchkbEvl(void);
+    int FchkbEvl() const;
 	// returns 1 => The fermion fields in the evolution
         //      or the CG that inverts the evolution matrix
 	//      are defined on a single checkerboard (half the 
@@ -1305,11 +1310,6 @@ class Fnone : public virtual Lattice
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
         // It does nothing and returns 0.
 
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   CnvFrmType cnv_frm = CNV_FRM_YES);
-        // Same as original but with true_res=0;
-
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
@@ -1317,12 +1317,6 @@ class Fnone : public virtual Lattice
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
         // It does nothing and returns 0.
-
-    int FmatInv(Vector *f_out, Vector *f_in, 
-		CgArg *cg_arg, 
-		CnvFrmType cnv_frm = CNV_FRM_YES,
-		PreserveType prs_f_in = PRESERVE_YES);
-    // Same as original but with true_res=0;
 	
     int FeigSolv(Vector **f_eigenv, Float *lambda,
 		 Float chirality[], int valid_eig[],
@@ -1387,20 +1381,50 @@ class FstagTypes : public virtual Lattice
 {
  private:
     char *cname;    // Class name.
+    int xv[3];
     
- protected:
-	enum{
+  protected:
+
+    enum{
 	VECT_LEN=6,          //!< Number of floats in  a Vector
 	    MATRIX_SIZE=18,  //!< Number of floats in  a Matrix
 	    SITE_LEN=72      //!< Number of floats in four Matrix's
 	    };
     
+    int bc[4];	        //!< Boundary conditions
+    int e_vsize;	//!< Size of a single parity vector field
+
+    static const unsigned CBUF_MODE1 = 0xcb911548;
+    static const unsigned CBUF_MODE2 = 0xcca52112;
+    static const unsigned CBUF_MODE3 = 0xc98c6106;
+    static const unsigned CBUF_MODE4 = 0xcca52112;
+
+    Vector *f_tmp;
 
  public:
 
-    FstagTypes(void);
+    FstagTypes();
 
-    virtual ~FstagTypes(void);
+    virtual ~FstagTypes();
+
+    virtual FclassType Fclass() const = 0;
+
+    int FsiteOffsetChkb(const int*) const;
+	
+    int FsiteOffset(const int*) const;
+
+    int ExactFlavors() const;
+
+    int SpinComponents() const;
+
+    int FsiteSize() const;
+
+    int FchkbEvl() const;
+
+    void Fconvert(Vector*, StrOrdType, StrOrdType);
+    
+    Float FhamiltonNode( Vector*,  Vector*) ;
+    
 };
 
 //------------------------------------------------------------------
@@ -1413,364 +1437,114 @@ class Fstag : public virtual FstagTypes
 {
  private:
     char *cname;    // Class name.
-
-    int e_vsize;	// even(odd) vector size
-    int xv[3];
-
-    Vector *f_tmp;
-
     void getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const;
     
  public:
 
-    Fstag(void);
+    Fstag();
 
-    virtual ~Fstag(void);
+    virtual ~Fstag();
 
-    FclassType Fclass(void);
-        // It returns the type of fermion class
-
-    int FsiteOffsetChkb(const int *x) const
-        { return (x[3]>>1)+xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2] ; }
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is not the canonical one but it is particular
-        // to the Staggered fermion type. x[i] is the 
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-
-    int FsiteOffset(const int *x) const;
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is the canonical one. X[I] is the
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-
-    int ExactFlavors(void);
-        // Returns the number of exact flavors of the matrix that
-        // is inverted during a molecular dynamics evolution.
-
-    int SpinComponents(void);
-        // Returns the number of spin components.
-
-    int FsiteSize(void);
-        // Returns the number of fermion field 
-        // components (including real/imaginary) on a
-        // site of the 4-D lattice.
-
-    int FchkbEvl(void);
-	// returns 1 => The fermion fields in the evolution
-        //      or the CG that inverts the evolution matrix
-	//      are defined on a single checkerboard (half the 
-	//      lattice).
+    FclassType Fclass() const; 
 
     int FmatEvlInv(Vector *f_out, Vector *f_in, 
 		   CgArg *cg_arg, 
 		   Float *true_res,
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
-        // It calculates f_out where A * f_out = f_in and
-        // A is the fermion matrix that appears in the HMC 
-        // evolution ([Dirac^dag Dirac]). The inversion is done
-	// with the conjugate gradient. cg_arg is the structure
-        // that contains all the control parameters, f_in is the
-        // fermion field source vector, f_out should be set to be
-        // the initial guess and on return is the solution.
-	// f_in and f_out are defined on a checkerboard.
-        // If true_res !=0 the value of the true residual is returned
-        // in true_res.
-        // *true_res = |src - MatPcDagMatPc * sol| / |src|
-	// The function returns the total number of CG iterations.
-
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   CnvFrmType cnv_frm = CNV_FRM_YES);
-        // Same as original but with true_res=0;
 
     int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 		 int Nshift, int isz, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm);
-    //!< The matrix inversion used in the molecular dynamics algorithms.
-    /*!<
-      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
-      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
-
-      \param f_out The solution vectors.
-      \param f_in The source vector
-      \param shift The shifts of the fermion matrix.
-      \param Nshift The number of shifts
-      \param isz The smallest shift (required by MInvCG)
-      \param cg_arg The solver parameters
-      \param cnv_frm Whether the lattice fields need to be converted to
-  to a new storage order appropriate for the type of fermion action.
-  If this is ::CNV_FRM_NO, then just the gauge field is converted.
-  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
-  are also converted: This assumes they are initially in the same order as
-  the gauge field. Fields that are converted are restored to their original
-  order upon exit of this method. \e N.B. If the fields are already in the
-  suitable order, then specifying ::CNV_FRM_YES here has not effect.
-      \return The number of solver iterations.
-      \post \a f_out contains the solution vector.
-    */
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
-        // It calculates f_out where A * f_out = f_in and
-        // A is the fermion matrix (Dirac operator). The inversion
-	// is done with the conjugate gradient. cg_arg is the 
-        // structure that contains all the control parameters, f_in 
-        // is the fermion field source vector, f_out should be set 
-        // to be the initial guess and on return is the solution.
-	// f_in and f_out are defined on the whole lattice.
-        // If true_res !=0 the value of the true residual is returned
-        // in true_res.
-        // *true_res = |src - MatPcDagMatPc * sol| / |src|.
-        // cnv_frm is used to specify if f_in should be converted 
-        // from canonical to fermion order and f_out from fermion 
-        // to canonical. 
-        // prs_f_in is not used. The source f_in is always preserved.
-	// The function returns the total number of CG iterations.
-
-    int FmatInv(Vector *f_out, Vector *f_in, 
-		CgArg *cg_arg, 
-		CnvFrmType cnv_frm = CNV_FRM_YES,
-		PreserveType prs_f_in = PRESERVE_YES);
-        // Same as original but with true_res=0;
 
     int FeigSolv(Vector **f_eigenv, Float lambda[], 
 		 Float chirality[], int valid_eig[],
 		 Float **hsum,
 		 EigArg *eig_arg,
 		 CnvFrmType cnv_frm = CNV_FRM_YES);
-        // It finds the eigenvectors and eigenvalues of A where
-        // A is the fermion matrix (Dirac operator). The solution
-	// uses Ritz minimization. eig_arg is the 
-        // structure that contains all the control parameters, f_eigenv
-        // are the fermion field source vectors which should be
-        // defined initially, lambda are the eigenvalues returned 
-        // on solution. f_eigenv is defined on the whole lattice.
-	// The function returns the total number of Ritz iterations.
 
     void SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 			Float mass);
-	// It sets the pseudofermion field phi from frm1, frm2.
 
     void FforceSite(Matrix& force, Vector *frm, 
                             int *x, int mu);
     //!< Calculates the pseudofermion force at site x and direction mu.
-        // It calculates the fermion force per site x
-        // and direction mu. frm is the fermion field that 
-        // resulted from the application of the inverter on 
-        // the pseudofermion field.
 
     void EvolveMomFforce(Matrix *mom, Vector *frm, 
 			 Float mass, Float step_size);
-        // It evolves the canonical momentum mom by step_size
-        // using the fermion force.
 
     void prepForce(Vector* out);
 
-    Float FhamiltonNode(Vector *phi, Vector *chi);
-        // The fermion Hamiltonian of the node sublattice.
-        // chi must be the solution of Cg with source phi.	       
-
-    void Fconvert(Vector *f_field,
-			  StrOrdType to,
-			  StrOrdType from);
-        // Convert fermion field f_field from -> to
-
     Float BhamiltonNode(Vector *boson, Float mass);
-        // The boson Hamiltonian of the node sublattice.
 
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int dir_flag);
 
 };
 
+
 class ParTransAsqtad; //forward declaration
+
 //------------------------------------------------------------------
-//! A class implementing staggered fermions.
+//! A class implementing improved staggered fermions (the asqtad action).
 /*!
   \ingroup factions
 */
 //------------------------------------------------------------------
+
 class Fasqtad : public virtual FstagTypes
 {
  private:
     char *cname;    // Class name.
 
-    int e_vsize;	// even(odd) vector size
-    int xv[3];
     ChkbType parity(const int*);
     void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
 //    void parallel_transport(Vector**, const SCUDir*, int, Vector**);
     void parallel_transport(Vector**, const int*, int, Vector**);
     void parallel_transport(ParTransAsqtad &pt, Vector**, int*, int, Vector**);
 
-    Vector *f_tmp;
-
-    void getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const;
-    
  public:
 
-    Fasqtad(void);
+    Fasqtad();
+    virtual ~Fasqtad();
 
-    virtual ~Fasqtad(void);
-
-    FclassType Fclass(void);
-        // It returns the type of fermion class
-
-    int FsiteOffsetChkb(const int *x) const
-        { return (x[3]>>1)+xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2] ; }
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is not the canonical one but it is particular
-        // to the Staggered fermion type. x[i] is the 
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-
-    int FsiteOffset(const int *x) const;
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is the canonical one. X[I] is the
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-
-    int ExactFlavors(void);
-        // Returns the number of exact flavors of the matrix that
-        // is inverted during a molecular dynamics evolution.
-
-    int SpinComponents(void);
-        // Returns the number of spin components.
-
-    int FsiteSize(void);
-        // Returns the number of fermion field 
-        // components (including real/imaginary) on a
-        // site of the 4-D lattice.
-
-    int FchkbEvl(void);
-	// returns 1 => The fermion fields in the evolution
-        //      or the CG that inverts the evolution matrix
-	//      are defined on a single checkerboard (half the 
-	//      lattice).
-
+    FclassType Fclass() const;
+    
     int FmatEvlInv(Vector *f_out, Vector *f_in, 
 		   CgArg *cg_arg, 
 		   Float *true_res,
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
-        // It calculates f_out where A * f_out = f_in and
-        // A is the fermion matrix that appears in the HMC 
-        // evolution ([Dirac^dag Dirac]). The inversion is done
-	// with the conjugate gradient. cg_arg is the structure
-        // that contains all the control parameters, f_in is the
-        // fermion field source vector, f_out should be set to be
-        // the initial guess and on return is the solution.
-	// f_in and f_out are defined on a checkerboard.
-        // If true_res !=0 the value of the true residual is returned
-        // in true_res.
-        // *true_res = |src - MatPcDagMatPc * sol| / |src|
-	// The function returns the total number of CG iterations.
-
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   CnvFrmType cnv_frm = CNV_FRM_YES);
-        // Same as original but with true_res=0;
 
     int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 		 int Nshift, int isz, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm);
-    //!< The matrix inversion used in the molecular dynamics algorithms.
-    /*!<
-      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
-      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
-
-      \param f_out The solution vectors.
-      \param f_in The source vector
-      \param shift The shifts of the fermion matrix.
-      \param Nshift The number of shifts
-      \param isz The smallest shift (required by MInvCG)
-      \param cg_arg The solver parameters
-      \param cnv_frm Whether the lattice fields need to be converted to
-  to a new storage order appropriate for the type of fermion action.
-  If this is ::CNV_FRM_NO, then just the gauge field is converted.
-  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
-  are also converted: This assumes they are initially in the same order as
-  the gauge field. Fields that are converted are restored to their original
-  order upon exit of this method. \e N.B. If the fields are already in the
-  suitable order, then specifying ::CNV_FRM_YES here has not effect.
-      \return The number of solver iterations.
-      \post \a f_out contains the solution vector.
-    */
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
-        // It calculates f_out where A * f_out = f_in and
-        // A is the fermion matrix (Dirac operator). The inversion
-	// is done with the conjugate gradient. cg_arg is the 
-        // structure that contains all the control parameters, f_in 
-        // is the fermion field source vector, f_out should be set 
-        // to be the initial guess and on return is the solution.
-	// f_in and f_out are defined on the whole lattice.
-        // If true_res !=0 the value of the true residual is returned
-        // in true_res.
-        // *true_res = |src - MatPcDagMatPc * sol| / |src|.
-        // cnv_frm is used to specify if f_in should be converted 
-        // from canonical to fermion order and f_out from fermion 
-        // to canonical. 
-        // prs_f_in is not used. The source f_in is always preserved.
-	// The function returns the total number of CG iterations.
-
-    int FmatInv(Vector *f_out, Vector *f_in, 
-		CgArg *cg_arg, 
-		CnvFrmType cnv_frm = CNV_FRM_YES,
-		PreserveType prs_f_in = PRESERVE_YES);
-        // Same as original but with true_res=0;
 
     int FeigSolv(Vector **f_eigenv, Float lambda[], 
 		 Float chirality[], int valid_eig[],
 		 Float **hsum,
 		 EigArg *eig_arg,
 		 CnvFrmType cnv_frm = CNV_FRM_YES);
-        // It finds the eigenvectors and eigenvalues of A where
-        // A is the fermion matrix (Dirac operator). The solution
-	// uses Ritz minimization. eig_arg is the 
-        // structure that contains all the control parameters, f_eigenv
-        // are the fermion field source vectors which should be
-        // defined initially, lambda are the eigenvalues returned 
-        // on solution. f_eigenv is defined on the whole lattice.
-	// The function returns the total number of Ritz iterations.
 
     void SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 			Float mass);
-	// It sets the pseudofermion field phi from frm1, frm2.
-
-    void FforceSite(Matrix& force, Vector *frm, 
-                            int *x, int mu);
-    //!< Calculates the pseudofermion force at site x and direction mu.
-        // It calculates the fermion force per site x
-        // and direction mu. frm is the fermion field that 
-        // resulted from the application of the inverter on 
-        // the pseudofermion field.
 
     void EvolveMomFforce(Matrix *mom, Vector *frm, 
 			 Float mass, Float step_size);
-        // It evolves the canonical momentum mom by step_size
-        // using the fermion force.
 
     void prepForce(Vector* out);
 
-    Float FhamiltonNode(Vector *phi, Vector *chi);
-        // The fermion Hamiltonian of the node sublattice.
-        // chi must be the solution of Cg with source phi.	       
-
-    void Fconvert(Vector *f_field,
-			  StrOrdType to,
-			  StrOrdType from);
-        // Convert fermion field f_field from -> to
-
     Float BhamiltonNode(Vector *boson, Float mass);
-        // The boson Hamiltonian of the node sublattice.
 
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int dir_flag);
@@ -1844,9 +1618,9 @@ class FwilsonTypes : public virtual Lattice
 
  public:
 
-    FwilsonTypes(void);
+    FwilsonTypes();
 
-    virtual ~FwilsonTypes(void);
+    virtual ~FwilsonTypes();
 
     //! Multiplication of a lattice spin-colour vector by gamma_5.
     void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
@@ -1856,17 +1630,33 @@ class FwilsonTypes : public virtual Lattice
       {
 	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
 	VRB.Func(cname, fname);
-	ERR.General(cname,fname,"MatMInv not yet implemented for Wilson fermions");
-	return 0;
+	ERR.NotImplemented(cname,fname);
       }
     
     
     void prepForce(Vector* out) 
       {
-	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
+	char *fname = "prepForce(Vector *)";
 	VRB.Func(cname, fname);
-	ERR.General(cname,fname,"MatMInv not yet implemented for Wilson fermions");
+	ERR.NotImplemented(cname,fname);
       }
+
+    void Fconvert(Vector*, StrOrdType, StrOrdType);
+
+    Float FhamiltonNode( Vector*,  Vector*) ;
+
+    int FsiteOffsetChkb(const int*) const;
+
+    int FsiteOffset(const int*) const;
+
+    int FsiteSize() const;
+	
+    virtual FclassType Fclass() const = 0;
+    
+    int SpinComponents() const;
+
+    int ExactFlavors() const;
+    
 };
 
 
@@ -1883,39 +1673,13 @@ class Fwilson : public virtual FwilsonTypes
     
  public:
 
-    Fwilson(void);
+    Fwilson();
 
-    virtual ~Fwilson(void);
+    virtual ~Fwilson();
 
-    FclassType Fclass(void);
-        // It returns the type of fermion class
+    FclassType Fclass() const; 
 
-    int FsiteOffsetChkb(const int *x) const;
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is not the canonical one but it is particular
-        // to the Wilson fermion type. x[i] is the 
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-
-    int FsiteOffset(const int *x) const;
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is the canonical one. X[I] is the
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-
-    int ExactFlavors(void);
-        // Returns the number of exact flavors of the matrix that
-        // is inverted during a molecular dynamics evolution.
-
-    int SpinComponents(void);
-        // Returns the number of spin components.
-
-    int FsiteSize(void);
-        // Returns the number of fermion field 
-        // components (including real/imaginary) on a
-        // site of the 4-D lattice.
-
-    int FchkbEvl(void);
+    int FchkbEvl() const;
 	// returns 1 => The fermion fields in the evolution
         //      or the CG that inverts the evolution matrix
 	//      are defined on a single checkerboard (half the 
@@ -1938,11 +1702,6 @@ class Fwilson : public virtual FwilsonTypes
         // in true_res.
         // *true_res = |src - MatPcDagMatPc * sol| / |src|
 	// The function returns the total number of CG iterations.
-
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   CnvFrmType cnv_frm = CNV_FRM_YES);
-        // Same as original but with true_res=0;
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
@@ -1967,12 +1726,6 @@ class Fwilson : public virtual FwilsonTypes
         // is less by half the size of a fermion vector.
 	// The function returns the total number of CG iterations.
 
-    int FmatInv(Vector *f_out, Vector *f_in, 
-		CgArg *cg_arg, 
-		CnvFrmType cnv_frm = CNV_FRM_YES,
-		PreserveType prs_f_in = PRESERVE_YES);
-        // Same as original but with true_res=0;
-
     int FeigSolv(Vector **f_eigenv, Float lambda[], 
 		 Float chirality[], int valid_eig[],
 		 Float **hsum,
@@ -1995,15 +1748,6 @@ class Fwilson : public virtual FwilsonTypes
 				 Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force. 
-
-    Float FhamiltonNode(Vector *phi, Vector *chi);
-        // The fermion Hamiltonian of the node sublattice.
-        // chi must be the solution of Cg with source phi.	       
-
-    void Fconvert(Vector *f_field,
-			  StrOrdType to,
-			  StrOrdType from);
-        // Convert fermion field f_field from -> to
 
     Float BhamiltonNode(Vector *boson, Float mass);
         // The boson Hamiltonian of the node sublattice.
@@ -2029,44 +1773,19 @@ class Fclover : public virtual FwilsonTypes
 
  public:
 
-    Fclover(void);
+    Fclover();
         // Among other things the constructor allocates
         // memory for the even/odd checkerpoard clover
         // matrices. aux0_ptr of the base class is set
         // to the pointer of the even checkerboard matrices
         // and aux1_ptr to the odd.
 
-    virtual ~Fclover(void);
+    virtual ~Fclover();
 
-    FclassType Fclass(void);
+    FclassType Fclass() const; 
         // It returns the type of fermion class
 
-    int FsiteOffsetChkb(const int *x) const;
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is not the canonical one but it is particular
-        // to the Clover fermion type. x[i] is the 
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-
-    int FsiteOffset(const int *x) const;
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is the canonical one. X[I] is the
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-
-    int ExactFlavors(void);
-        // Returns the number of exact flavors of the matrix that
-        // is inverted during a molecular dynamics evolution.
-
-    int SpinComponents(void);
-        // Returns the number of spin components.
-
-    int FsiteSize(void);
-        // Returns the number of fermion field 
-        // components (including real/imaginary) on a
-        // site of the 4-D lattice.
-
-    int FchkbEvl(void);
+    int FchkbEvl() const;
         // returns 0 => The fermion fields in the evolution
         // are defined on ODD-EVEN checkerboard (whole
         // lattice).
@@ -2091,11 +1810,6 @@ class Fclover : public virtual FwilsonTypes
         // is returned in true_res.
         // *true_res = |src - MatPcDagMatPc * sol| / |src|
         // The function returns the total number of CG iterations.
-
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   CnvFrmType cnv_frm = CNV_FRM_YES);
-        // Same as original but with true_res=0;
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
@@ -2126,11 +1840,6 @@ class Fclover : public virtual FwilsonTypes
         // is less by the size of one fermion vector.
         // The function returns the total number of CG iterations.
 
-    int FmatInv(Vector *f_out, Vector *f_in, 
-		CgArg *cg_arg, 
-		CnvFrmType cnv_frm = CNV_FRM_YES,
-		PreserveType prs_f_in = PRESERVE_YES);
-        // Same as original but with true_res=0;
 
     int FeigSolv(Vector **f_eigenv, Float lambda[],
 		 Float chirality[], int valid_eig[],
@@ -2155,18 +1864,10 @@ class Fclover : public virtual FwilsonTypes
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
 
-    Float FhamiltonNode(Vector *phi, Vector *frm);
-        // The fermion Hamiltonian of the node sublattice.
-        // frm must be the solution of FmatEvlInv with source phi.
-
-
-    void Fconvert(Vector *f_field,
-			  StrOrdType to,
-			  StrOrdType from);
-        // Convert fermion field f_field from -> to
 
     Float BhamiltonNode(Vector *boson, Float mass);
-        // The boson Hamiltonian of the node sublattice
+    // The boson Hamiltonian of the node sublattice
+    
 };
 
 
@@ -2183,11 +1884,11 @@ class Fdwf : public virtual FwilsonTypes
     
  public:
 
-    Fdwf(void);
+    Fdwf();
 
-    virtual ~Fdwf(void);
+    virtual ~Fdwf();
 
-    FclassType Fclass(void);
+    FclassType Fclass() const;
         // It returns the type of fermion class
 
     int FsiteOffsetChkb(const int *x) const;
@@ -2203,19 +1904,12 @@ class Fdwf : public virtual FwilsonTypes
         // is the canonical one. X[I] is the
         // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
 
-    int ExactFlavors(void);
-        // Returns the number of exact flavors of the matrix that
-        // is inverted during a molecular dynamics evolution.
-
-    int SpinComponents(void);
-        // Returns the number of spin components.
-
-    int FsiteSize(void);
+    int FsiteSize() const;
         // Returns the number of fermion field 
         // components (including real/imaginary) on a
         // site of the 4-D lattice.
 
-    int FchkbEvl(void);
+    int FchkbEvl() const;
         // Returns 0 => If no checkerboard is used for the evolution
         //      or the CG that inverts the evolution matrix.
 
@@ -2236,11 +1930,6 @@ class Fdwf : public virtual FwilsonTypes
         // in true_res.
         // *true_res = |src - MatPcDagMatPc * sol| / |src|
 	// The function returns the total number of CG iterations.
-
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   CnvFrmType cnv_frm = CNV_FRM_YES);
-        // Same as original but with true_res=0;
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
@@ -2264,12 +1953,6 @@ class Fdwf : public virtual FwilsonTypes
         // f_in should be preserved or not. If not the memory usage
         // is less by half the size of a fermion vector.
 	// The function returns the total number of CG iterations.
-
-    int FmatInv(Vector *f_out, Vector *f_in, 
-		CgArg *cg_arg, 
-		CnvFrmType cnv_frm = CNV_FRM_YES,
-		PreserveType prs_f_in = PRESERVE_YES);
-        // Same as original but with true_res=0;
 	
     void Ffour2five(Vector *five, Vector *four, int s_u, int s_l);
     //!< Transforms a 4-dimensional fermion field into a 5-dimensional field.
@@ -2319,7 +2002,7 @@ class Fdwf : public virtual FwilsonTypes
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
 
-    Float FhamiltonNode(Vector *phi, Vector *chi);
+    Float FhamiltonNode( Vector *phi,  Vector *chi) ;
         // The fermion Hamiltonian of the node sublattice.
         // chi must be the solution of Cg with source phi.	       
 
@@ -2364,8 +2047,8 @@ class GnoneFnone
     char *cname;    // Class name.
 
  public:
-    GnoneFnone(void);
-    virtual ~GnoneFnone(void);
+    GnoneFnone();
+    virtual ~GnoneFnone();
 };
 
 
@@ -2383,8 +2066,8 @@ class GnoneFasqtad
     char *cname;    // Class name.
 
  public:
-    GnoneFasqtad(void);
-    virtual ~GnoneFasqtad(void);
+    GnoneFasqtad();
+    virtual ~GnoneFasqtad();
 };
 
 //------------------------------------------------------------------
@@ -2401,8 +2084,8 @@ class GnoneFstag
     char *cname;    // Class name.
 
  public:
-    GnoneFstag(void);
-    virtual ~GnoneFstag(void);
+    GnoneFstag();
+    virtual ~GnoneFstag();
 };
 
 
@@ -2420,8 +2103,8 @@ class GnoneFwilson
     char *cname;    // Class name.
 
  public:
-    GnoneFwilson(void);
-    virtual ~GnoneFwilson(void);
+    GnoneFwilson();
+    virtual ~GnoneFwilson();
 };
 
 
@@ -2439,8 +2122,8 @@ class GnoneFclover
     char *cname;    // Class name.
 
  public:
-    GnoneFclover(void);
-    virtual ~GnoneFclover(void);
+    GnoneFclover();
+    virtual ~GnoneFclover();
 };
 
 
@@ -2458,8 +2141,8 @@ class GnoneFdwf
     char *cname;    // Class name.
 
  public:
-    GnoneFdwf(void);
-    virtual ~GnoneFdwf(void);
+    GnoneFdwf();
+    virtual ~GnoneFdwf();
 };
 
 
@@ -2476,8 +2159,8 @@ class GwilsonFnone
     char *cname;    // Class name.
 
  public:
-    GwilsonFnone(void);
-    virtual ~GwilsonFnone(void);
+    GwilsonFnone();
+    virtual ~GwilsonFnone();
 };
 
 
@@ -2495,8 +2178,8 @@ class GwilsonFstag
     char *cname;    // Class name.
 
  public:
-    GwilsonFstag(void);
-    virtual ~GwilsonFstag(void);
+    GwilsonFstag();
+    virtual ~GwilsonFstag();
 };
 
 //------------------------------------------------------------------
@@ -2513,8 +2196,8 @@ class GwilsonFasqtad
     char *cname;    // Class name.
 
  public:
-    GwilsonFasqtad(void);
-    virtual ~GwilsonFasqtad(void);
+    GwilsonFasqtad();
+    virtual ~GwilsonFasqtad();
 };
 
 
@@ -2532,8 +2215,8 @@ class GwilsonFwilson
     char *cname;    // Class name.
 
  public:
-    GwilsonFwilson(void);
-    virtual ~GwilsonFwilson(void);
+    GwilsonFwilson();
+    virtual ~GwilsonFwilson();
 };
 
 
@@ -2551,8 +2234,8 @@ class GwilsonFclover
     char *cname;    // Class name.
 
  public:
-    GwilsonFclover(void);
-    virtual ~GwilsonFclover(void);
+    GwilsonFclover();
+    virtual ~GwilsonFclover();
 };
 
 
@@ -2570,8 +2253,8 @@ class GwilsonFdwf
     char *cname;    // Class name.
 
  public:
-    GwilsonFdwf(void);
-    virtual ~GwilsonFdwf(void);
+    GwilsonFdwf();
+    virtual ~GwilsonFdwf();
 };
 
 
@@ -2588,8 +2271,8 @@ class GpowerPlaqFnone
     char *cname;    // Class name.
 
  public:
-    GpowerPlaqFnone(void);
-    virtual ~GpowerPlaqFnone(void);
+    GpowerPlaqFnone();
+    virtual ~GpowerPlaqFnone();
 };
 
 
@@ -2607,8 +2290,8 @@ class GpowerPlaqFstag
     char *cname;    // Class name.
 
  public:
-    GpowerPlaqFstag(void);
-    virtual ~GpowerPlaqFstag(void);
+    GpowerPlaqFstag();
+    virtual ~GpowerPlaqFstag();
 };
 
 
@@ -2625,8 +2308,8 @@ class GpowerPlaqFwilson
     char *cname;    // Class name.
 
  public:
-    GpowerPlaqFwilson(void);
-    virtual ~GpowerPlaqFwilson(void);
+    GpowerPlaqFwilson();
+    virtual ~GpowerPlaqFwilson();
 };
 
 
@@ -2643,8 +2326,8 @@ class GpowerPlaqFclover
     char *cname;    // Class name.
 
  public:
-    GpowerPlaqFclover(void);
-    virtual ~GpowerPlaqFclover(void);
+    GpowerPlaqFclover();
+    virtual ~GpowerPlaqFclover();
 };
 
 
@@ -2661,8 +2344,8 @@ class GpowerPlaqFdwf
     char *cname;    // Class name.
 
  public:
-    GpowerPlaqFdwf(void);
-    virtual ~GpowerPlaqFdwf(void);
+    GpowerPlaqFdwf();
+    virtual ~GpowerPlaqFdwf();
 };
 
 
@@ -2679,8 +2362,8 @@ class GimprRectFnone
     char *cname;    // Class name.
 
  public:
-    GimprRectFnone(void);
-    virtual ~GimprRectFnone(void);
+    GimprRectFnone();
+    virtual ~GimprRectFnone();
 };
 
 
@@ -2698,8 +2381,8 @@ class GimprRectFstag
     char *cname;    // Class name.
 
  public:
-    GimprRectFstag(void);
-    virtual ~GimprRectFstag(void);
+    GimprRectFstag();
+    virtual ~GimprRectFstag();
 };
 
 
@@ -2717,8 +2400,8 @@ class GimprRectFwilson
     char *cname;    // Class name.
 
  public:
-    GimprRectFwilson(void);
-    virtual ~GimprRectFwilson(void);
+    GimprRectFwilson();
+    virtual ~GimprRectFwilson();
 };
 
 
@@ -2736,8 +2419,8 @@ class GimprRectFclover
     char *cname;    // Class name.
 
  public:
-    GimprRectFclover(void);
-    virtual ~GimprRectFclover(void);
+    GimprRectFclover();
+    virtual ~GimprRectFclover();
 };
 
 
@@ -2755,8 +2438,8 @@ class GimprRectFdwf
     char *cname;    // Class name.
 
  public:
-    GimprRectFdwf(void);
-    virtual ~GimprRectFdwf(void);
+    GimprRectFdwf();
+    virtual ~GimprRectFdwf();
 };
 
 
@@ -2773,8 +2456,8 @@ class GpowerRectFnone
     char *cname;    // Class name.
 
  public:
-    GpowerRectFnone(void);
-    virtual ~GpowerRectFnone(void);
+    GpowerRectFnone();
+    virtual ~GpowerRectFnone();
 };
 
 
@@ -2792,8 +2475,8 @@ class GpowerRectFstag
     char *cname;    // Class name.
 
  public:
-    GpowerRectFstag(void);
-    virtual ~GpowerRectFstag(void);
+    GpowerRectFstag();
+    virtual ~GpowerRectFstag();
 };
 
 
@@ -2810,8 +2493,8 @@ class GpowerRectFwilson
     char *cname;    // Class name.
 
  public:
-    GpowerRectFwilson(void);
-    virtual ~GpowerRectFwilson(void);
+    GpowerRectFwilson();
+    virtual ~GpowerRectFwilson();
 };
 
 
@@ -2828,8 +2511,8 @@ class GpowerRectFclover
     char *cname;    // Class name.
 
  public:
-    GpowerRectFclover(void);
-    virtual ~GpowerRectFclover(void);
+    GpowerRectFclover();
+    virtual ~GpowerRectFclover();
 };
 
 
@@ -2846,8 +2529,8 @@ class GpowerRectFdwf
     char *cname;    // Class name.
 
  public:
-    GpowerRectFdwf(void);
-    virtual ~GpowerRectFdwf(void);
+    GpowerRectFdwf();
+    virtual ~GpowerRectFdwf();
 };
 
 //------------------------------------------------------------------
@@ -2863,8 +2546,8 @@ class GimprOLSymFnone
     char *cname;    // Class name.
 
  public:
-    GimprOLSymFnone(void);
-    virtual ~GimprOLSymFnone(void);
+    GimprOLSymFnone();
+    virtual ~GimprOLSymFnone();
 };
 
 
@@ -2882,8 +2565,8 @@ class GimprOLSymFstag
     char *cname;    // Class name.
 
  public:
-    GimprOLSymFstag(void);
-    virtual ~GimprOLSymFstag(void);
+    GimprOLSymFstag();
+    virtual ~GimprOLSymFstag();
 };
 
 
@@ -2901,8 +2584,8 @@ class GimprOLSymFwilson
     char *cname;    // Class name.
 
  public:
-    GimprOLSymFwilson(void);
-    virtual ~GimprOLSymFwilson(void);
+    GimprOLSymFwilson();
+    virtual ~GimprOLSymFwilson();
 };
 
 
@@ -2920,8 +2603,8 @@ class GimprOLSymFclover
     char *cname;    // Class name.
 
  public:
-    GimprOLSymFclover(void);
-    virtual ~GimprOLSymFclover(void);
+    GimprOLSymFclover();
+    virtual ~GimprOLSymFclover();
 };
 
 
@@ -2939,8 +2622,8 @@ class GimprOLSymFdwf
     char *cname;    // Class name.
 
  public:
-    GimprOLSymFdwf(void);
-    virtual ~GimprOLSymFdwf(void);
+    GimprOLSymFdwf();
+    virtual ~GimprOLSymFdwf();
 };
 
 //------------------------------------------------------------------

@@ -1,94 +1,22 @@
 #include<config.h>
-#include<stdio.h>
-#include<stdlib.h>
 #include<math.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.4 2004-01-14 20:05:03 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.5 2004-02-16 13:21:42 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-14 20:05:03 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v 1.4 2004-01-14 20:05:03 chulwoo Exp $
-//  $Id: f_asqtad.C,v 1.4 2004-01-14 20:05:03 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-02-16 13:21:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v 1.5 2004-02-16 13:21:42 zs Exp $
+//  $Id: f_asqtad.C,v 1.5 2004-02-16 13:21:42 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.3  2004/01/14 07:43:00  chulwoo
-//  *** empty log message ***
-//
-//  Revision 1.1.4.5  2003/12/24 00:22:45  cwj
-//  ../../dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C
-//
-//  Revision 1.1.4.4  2003/12/15 18:22:08  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.4.3  2003/12/11 20:22:53  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.4.2  2003/11/25 23:18:00  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.4.1  2003/11/13 08:05:56  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.1.1  2003/11/04 05:05:15  chulwoo
-//
-//  starting again
-//
-//
-//  Revision 1.2  2003/09/29 08:41:13  chulwoo
-//
-//  adding Zbigniew's force term
-//
-//  Revision 1.1  2003/09/22 22:22:25  chulwoo
-//   adding asqtad
-//  adding asqtad
-//
-//  Revision 1.1.1.1  2003/09/18 22:30:53  chulwoo
-//  Mike's files for single node QCDOC + Parallel transport
-//  I added some hacks for PARALLEL without MPI_SCU
-//  PARALLEL=2 set PARALLEL without MPI_SCU
-//
-//
-//  Revision 1.3  2003/08/29 20:58:09  mike
-//  Revision to function names regarding multishift solver to make more consistent with convention.
-//
-//  Revision 1.2  2003/07/24 16:53:54  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.4  2001/08/16 10:50:35  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:13:23  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:09  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: f_asqtad.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v $
 //  $State: Exp $
 //
@@ -109,70 +37,14 @@ CPS_END_NAMESPACE
 #include <util/asqtad.h>
 #include <util/vector.h>
 #include <util/gjp.h>
-#include <comms/nga_reg.h>
-#include <comms/scu.h>
-#include <comms/glb.h>
-#include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
-enum{VECT_LEN=6, MATRIX_SIZE=18, SITE_LEN=72};
+
 #if TARGET == QCDOC
 void  set_pt (Fasqtad *lat);
 #endif
 
 
-//------------------------------------------------------------------
-// Initialize static variables.
-//------------------------------------------------------------------
-
-
-//------------------------------------------------------------------
-// static variables used only inside this file
-//------------------------------------------------------------------
-
-//  CRAM temp buffer
-#ifdef _TARTAN
-
-static Matrix *mp0 = (Matrix *)CRAM_SCRATCH_ADDR;	// ihdot
-static Matrix *mp1 = mp0 + 1;
-// static Matrix *mp2 = mp1 + 1;
-// static Matrix *mp3 = mp2 + 1;
-static Vector *vp0 = (Vector *)
-	(CRAM_SCRATCH_ADDR+2*MATRIX_SIZE*sizeof(IFloat));
-static Vector *vp1 = vp0 + 1;
-static Vector *vp2 = vp1 + 1;
-static Vector *vp3 = vp2 + 1;
-
-#else
-
-static Matrix mt0;
-static Matrix mt1;
-static Matrix mt2;
-static Matrix mt3;
-static Matrix *mp0 = &mt0;		// ihdot
-static Matrix *mp1 = &mt1;
-// static Matrix *mp2 = &mt2;
-// static Matrix *mp3 = &mt3;
-static Vector vt0;
-static Vector vt1;
-static Vector vt2;
-static Vector vt3;
-static Vector *vp0 = &vt0;
-static Vector *vp1 = &vt1;
-static Vector *vp2 = &vt2;
-static Vector *vp3 = &vt3;
-
-#endif 
-
-static Matrix m_tmp1, m_tmp2;
-static int bc[4] = {0,0,0,0};	// boundary on this node
-
-
-
-const unsigned CBUF_MODE1 = 0xcb911548;
-const unsigned CBUF_MODE2 = 0xcca52112;
-const unsigned CBUF_MODE3 = 0xc98c6106;
-const unsigned CBUF_MODE4 = 0xcca52112;
 
 
 
@@ -185,58 +57,13 @@ Fasqtad::Fasqtad()
   char *fname = "Fasqtad()";
   VRB.Func(cname,fname);
 
-  //----------------------------------------------------------------
-  // Check if anisotropy is present and exit since Fasqtad has
-  // not been tested for anisotropic lattices.
-  //----------------------------------------------------------------
 
-  // Modified for anisotropic lattices
-  //  if(GJP.XiBare() != 1 ||
-  //     GJP.XiV()    != 1 ||
-  //     GJP.XiVXi()  != 1   ){
-  //    ERR.General(cname,fname,
-  //    "XiBare=%g, XiV=%g, XiVXi=%g : Fasqtad has not been tested with anisotropy\n",
-  //		GJP.XiBare(), GJP.XiV(), GJP.XiVXi());
-  //  }
-  // End modification
-
-  e_vsize = VECT_LEN/2;
-  for(int i = 0; i < 4; ++i) {
-      e_vsize *= node_sites[i];
-  }
-
-  f_tmp = (Vector *)smalloc(e_vsize*sizeof(Float));
-
-  xv[0] = node_sites[3]/2;
-  xv[1] = (node_sites[3]*node_sites[0])/2;
-  xv[2] = (node_sites[3]*node_sites[0]*node_sites[1])/2;
-
-
-  //----------------------------------------------------------------
-  // Initialize boundary condition on this node
-  //----------------------------------------------------------------
-  if(GJP.Xbc() == BND_CND_APRD) bc[0] = GJP.XnodeCoor()
-  	== (GJP.Xnodes()-1) ? 1 : 0 ;
-
-  if(GJP.Ybc() == BND_CND_APRD) bc[1] = GJP.YnodeCoor()
-  	== (GJP.Ynodes()-1) ? 1 : 0;
-
-  if(GJP.Zbc() == BND_CND_APRD) bc[2] = GJP.ZnodeCoor()
-  	== (GJP.Znodes()-1) ? 1 : 0;
-
-  if(GJP.Tbc() == BND_CND_APRD) bc[3] = GJP.TnodeCoor()
-  	== (GJP.Tnodes()-1) ? 1 : 0;
-  IFloat *tmp_p = (IFloat *)GaugeField();
+//  IFloat *tmp_p = (IFloat *)GaugeField();
   asqtad_dirac_init(GaugeField());
 #if TARGET == QCDOC
   set_pt (this);
 #endif
 
-  // setup CBUF
-    setCbufCntrlReg(1, CBUF_MODE1);
-    setCbufCntrlReg(2, CBUF_MODE2);
-    setCbufCntrlReg(3, CBUF_MODE3);
-    setCbufCntrlReg(4, CBUF_MODE4);
 }
 
 
@@ -247,137 +74,17 @@ Fasqtad::~Fasqtad()
 {
   char *fname = "~Fasqtad()";
   VRB.Func(cname,fname);
-
   asqtad_destroy_dirac_buf();
-  sfree(f_tmp);
 }
 
 
 //------------------------------------------------------------------
-// FclassType Fclass(void):
-// It returns the type of fermion class.
+// Returns the type of fermion class.
 //------------------------------------------------------------------
-FclassType Fasqtad::Fclass(void){
-  return F_CLASS_STAG;
+FclassType Fasqtad::Fclass() const{
+  return F_CLASS_ASQTAD;
 }
 
-
-//-------------------------------------------------------
-// used by getUDagX()
-//-------------------------------------------------------
-static Vector v_tmp1;
-
-
-
-
-//-------------------------------------------------------
-//  // get V_mu(x) = U_mu(x)^dag * X(x+mu)
-//  get V_mu(x) = U_mu(x) * X(x+mu)
-//  end up with BANK3
-//  begin with BANK4_BASE+BANK_SIZE
-//-------------------------------------------------------
-void Fasqtad::
-getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const
-{
-    Matrix *uoff = GaugeField()+GsiteOffset(x)+mu;
-
-    setCbufCntrlReg(3, CBUF_MODE3);
-    setCbufCntrlReg(4, CBUF_MODE4);
-
-
-    //----------------------------------------
-    // mp1 = U(x)
-    //----------------------------------------
-    // mp1->Dagger((IFloat *)uoff+BANK4_BASE+BANK_SIZE);
-    moveMem(mp1, (IFloat *)uoff+BANK4_BASE+BANK_SIZE,
-    	MATRIX_SIZE*sizeof(IFloat));
-
-    // Modified for anisotropic lattices
-    //------------------------------------------------------------------
-    if (mu == GJP.XiDir()) 
-      vecTimesEquFloat((IFloat *)mp1, GJP.XiVXi()/GJP.XiV(), MATRIX_SIZE);
-    // End modification
-
-    //----------------------------------------
-    //  choose the right phase
-    //----------------------------------------
-    int eta_u = 0;
-    for(int u = 0; u < mu; ++u) {
-        eta_u += x[u];
-    }
-    eta_u = (eta_u & 1)? -1 : 1;
-
-    const Vector *p = &v_tmp1;
-    if(x[mu] == node_sites[mu]-1) {	// x+mu off node
-	x[mu] = 0;
-	getPlusData((IFloat *)&v_tmp1, (IFloat *)(cvp+FsiteOffsetChkb(x)),
-	    VECT_LEN, mu);
-        x[mu] = node_sites[mu]-1;
-        if(bc[mu]) eta_u = -eta_u;
-
-    } else { // x+mu on node
-        x[mu]++;
-	p = cvp+FsiteOffsetChkb(x);
-	x[mu]--;
-    }
-
-    //----------------------------------------
-    // copy *p to CRAM
-    //----------------------------------------
-    moveMem(vp0, (IFloat *)p+BANK3_BASE, VECT_LEN*sizeof(IFloat));
-
-    if(eta_u == -1) {
-        vecNegative((IFloat *)mp1, (IFloat *)mp1, MATRIX_SIZE);
-    }
-
-    uDotXEqual((IFloat *)&v, (IFloat *)mp1, (IFloat *)vp0);
-}
-
-
-//------------------------------------------------------------------
-// int ExactFlavors() : 
-// Returns the number of exact flavors of the matrix that
-// is inverted during a molecular dynamics evolution.
-//------------------------------------------------------------------
-int Fasqtad::ExactFlavors(void)
-{
-  return 4;
-}
-
-
-//------------------------------------------------------------------
-// int SpinComponents() : 
-// Returns the number of spin components.
-//------------------------------------------------------------------
-int Fasqtad::SpinComponents(void)
-{
-  return 1;
-}
-
-
-//------------------------------------------------------------------
-// int FsiteSize() : 
-// Returns the number of fermion field components 
-// (including real/imaginary) on a site of the 4-D lattice.
-//------------------------------------------------------------------
-int Fasqtad::FsiteSize(void)
-{
-  return 2 * Colors() * SpinComponents();  
-  // re/im * colors * spin_components
-}
-
-
-//------------------------------------------------------------------
-// int FchkbEvl() :
-// returns 1 => The fermion fields in the evolution
-//      or the CG that inverts the evolution matrix
-//      are defined on a single checkerboard (half the 
-//      lattice).
-//------------------------------------------------------------------
-int Fasqtad::FchkbEvl(void)
-{
-  return 1;
-}
 
 
 //------------------------------------------------------------------
@@ -418,14 +125,6 @@ int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in,
   return iter;
 }
 
-
-//------------------------------------------------------------------
-// Overloaded function is same as original but with true_res=0;
-//------------------------------------------------------------------
-int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in, 
-		      CgArg *cg_arg, 
-		      CnvFrmType cnv_frm)
-{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
 
 
 
@@ -507,12 +206,6 @@ int Fasqtad::FmatInv(Vector *f_out, Vector *f_in,
   return iter;
 }
 
-//------------------------------------------------------------------
-// Overloaded function is same as original but with true_res=0;
-//------------------------------------------------------------------
-int Fasqtad::FmatInv(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
-		   CnvFrmType cnv_frm, PreserveType prs_f_in)
-{ return FmatInv(f_out, f_in, cg_arg, 0, cnv_frm, prs_f_in); }
 
 
 //------------------------------------------------------------------
@@ -612,64 +305,10 @@ void Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o,
   //------------------------------------------------------------------
   fTimesV1MinusV2((IFloat *)phi, 2.*mass*GJP.XiBare()/GJP.XiV(), 
 	(IFloat *)frm_e, (IFloat *)phi, e_vsize);
-  // End modification
-//  called++;
-//  if(called ==10) exit(56);
+
 }
 
 
-//------------------------------------------------------------------
-// FforceSite(Matrix& force, Vector *frm, int *x, int mu):
-// It calculates the fermion force at site x and direction mu.
-// frm is the fermion field that resulted from the application
-// of the inverter on the pseudofermion field.
-//------------------------------------------------------------------
-void Fasqtad::FforceSite(Matrix& force, Vector *frm, int *x, int mu)
-{
-  char *fname = "FforceSite(M&,V*,i*,i)";
-//  VRB.Func(cname,fname);
-
-    int x_off = FsiteOffsetChkb(x);
-
-    setCbufCntrlReg(3, CBUF_MODE3);
-
-    //----------------------------------------
-    // mp1 and mp2 free
-    //
-    //  calculate fermion part.
-    //
-    //----------------------------------------
-    if((x[0]+x[1]+x[2]+x[3])%2) { // odd, assume base_odd = 0
-
-        //----------------------------------------
-	// U_u(x) X(x+u)
-        //----------------------------------------
-	getUDagX(*vp2, frm, x, mu);
-
-        //----------------------------------------
-	// *vp3 = *vp2;
-        //----------------------------------------
-	moveMem(vp3, vp2, VECT_LEN*sizeof(IFloat));
-
-	vecMinusEquVec((IFloat *)vp3,
-		(IFloat *)&f_tmp[x_off]+BANK3_BASE+BANK_SIZE, VECT_LEN);
-
-    } else {	// even
-	getUDagX(*vp2, f_tmp, x, mu);
-
-        //----------------------------------------
-	// *vp3 = X[x]
-        //----------------------------------------
-	moveMem(vp3, (IFloat *)&frm[x_off]+BANK3_BASE+BANK_SIZE,
-	    VECT_LEN*sizeof(IFloat));
-	*vp2 += *vp3;
-    }
-
-    force.Cross2(*vp2, *vp3);
-
-    mp1->Dagger((IFloat *)&force);
-    force.TrLessAntiHermMatrix(*mp1);
-}
 
 void Fasqtad::prepForce(Vector *frm) {
   char *fname = "prepForce(V*)";
@@ -681,21 +320,9 @@ void Fasqtad::prepForce(Vector *frm) {
   Vector *v1=(Vector*)0, *v2=(Vector*)0;
   DiracOpAsqtad stag(*this, v2, v1, &cg_arg, CNV_FRM_NO);
   stag.Dslash(f_tmp, frm, CHKB_EVEN, DAG_NO);
-//  printf("prefForce() done\n"); fflush(stdout);
+
 }
 
-
-//------------------------------------------------------------------
-// Float FhamiltonNode(Vector *phi, Vector *chi):
-// The fermion Hamiltonian of the node sublattice.
-// chi must be the solution of Cg with source phi.	       
-//------------------------------------------------------------------
-Float Fasqtad::FhamiltonNode(Vector *phi, Vector *chi){
-  char *fname = "FhamiltonNode(V*,V*)";
-  VRB.Func(cname,fname);
-
-  return dotProduct((IFloat *)phi, (IFloat *)chi, e_vsize);
-}
 
 
 //------------------------------------------------------------------
@@ -716,18 +343,6 @@ Float Fasqtad::BhamiltonNode(Vector *boson, Float mass){
 }
 
 
-//------------------------------------------------------------------
-// int FsiteOffset(const int *x):
-// Sets the offsets for the fermion fields on a 
-// checkerboard. The fermion field storage order
-// is the canonical one. X[I] is the
-// ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-//------------------------------------------------------------------
-int Fasqtad::FsiteOffset(const int *x) const {
-// ???
-  return x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+node_sites[2]*x[3]));
-  return 0; 
-}
 
 //------------------------------------------------------------------
 // Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, CnvFrmType cnv_frm,

@@ -3,43 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fdwf class.
 
-  $Id: f_dwf.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: f_dwf.C,v 1.3 2004-02-16 13:21:42 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_dwf/f_dwf.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: f_dwf.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2004-02-16 13:21:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_dwf/f_dwf.C,v 1.3 2004-02-16 13:21:42 zs Exp $
+//  $Id: f_dwf.C,v 1.3 2004-02-16 13:21:42 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.4  2001/08/16 10:50:33  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:13:22  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:09  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: f_dwf.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_dwf/f_dwf.C,v $
 //  $State: Exp $
 //
@@ -119,33 +95,14 @@ Fdwf::~Fdwf()
 
 
 //------------------------------------------------------------------
-// FclassType Fclass(void):
+// FclassType Fclass():
 // It returns the type of fermion class.
 //------------------------------------------------------------------
-FclassType Fdwf::Fclass(void){
+FclassType Fdwf::Fclass() const{
   return F_CLASS_DWF;
 }
 
 
-//------------------------------------------------------------------
-// int ExactFlavors() : 
-// Returns the number of exact flavors of the matrix that
-// is inverted during a molecular dynamics evolution.
-//------------------------------------------------------------------
-int Fdwf::ExactFlavors(void)
-{
-  return 2;
-}
-
-
-//------------------------------------------------------------------
-// int SpinComponents() : 
-// Returns the number of spin components.
-//------------------------------------------------------------------
-int Fdwf::SpinComponents(void)
-{
-  return 4;
-}
 
 
 //------------------------------------------------------------------
@@ -153,7 +110,7 @@ int Fdwf::SpinComponents(void)
 // Returns the number of fermion field components 
 // (including real/imaginary) on a site of the 4-D lattice.
 //------------------------------------------------------------------
-int Fdwf::FsiteSize(void)
+int Fdwf::FsiteSize() const
 {
   return 2 * Colors() * SpinComponents() * GJP.SnodeSites();  
   // re/im * colors * spin_components * Ls
@@ -166,7 +123,7 @@ int Fdwf::FsiteSize(void)
 //      are defined on a single checkerboard (half the 
 //      lattice).
 //------------------------------------------------------------------
-int Fdwf::FchkbEvl(void)
+int Fdwf::FchkbEvl() const
 {
   return 1;
 }
@@ -209,13 +166,6 @@ int Fdwf::FmatEvlInv(Vector *f_out, Vector *f_in,
 }
 
 
-//------------------------------------------------------------------
-// Overloaded function is same as original but with true_res=0;
-//------------------------------------------------------------------
-int Fdwf::FmatEvlInv(Vector *f_out, Vector *f_in, 
-		     CgArg *cg_arg, 
-		     CnvFrmType cnv_frm)
-{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
 
 
 //------------------------------------------------------------------
@@ -260,15 +210,6 @@ int Fdwf::FmatInv(Vector *f_out, Vector *f_in,
   return iter;
 }
 
-
-//------------------------------------------------------------------
-// Overloaded function is same as original but with true_res=0;
-//------------------------------------------------------------------
-int Fdwf::FmatInv(Vector *f_out, Vector *f_in, 
-		  CgArg *cg_arg, 
-		  CnvFrmType cnv_frm,
-		  PreserveType prs_f_in)
-{ return FmatInv(f_out, f_in, cg_arg, 0, cnv_frm, prs_f_in); }
 
 
 //------------------------------------------------------------------
@@ -840,7 +781,7 @@ void Fdwf::EvolveMomFforce(Matrix *mom, Vector *chi,
 // The fermion Hamiltonian of the node sublattice
 // chi must be the solution of Cg with source phi.	       
 //------------------------------------------------------------------
-Float Fdwf::FhamiltonNode(Vector *phi, Vector *chi){
+Float Fdwf::FhamiltonNode(Vector *phi,  Vector *chi) {
   char *fname = "FhamiltonNode(V*,V*)";
   VRB.Func(cname,fname);
 
