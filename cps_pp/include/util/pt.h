@@ -9,19 +9,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.17 2005-01-13 07:46:14 chulwoo Exp $
+  $Id: pt.h,v 1.18 2005-02-18 19:50:20 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2005-01-13 07:46:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.17 2005-01-13 07:46:14 chulwoo Exp $
-//  $Id: pt.h,v 1.17 2005-01-13 07:46:14 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 19:50:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.18 2005-02-18 19:50:20 mclark Exp $
+//  $Id: pt.h,v 1.18 2005-02-18 19:50:20 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -250,6 +250,19 @@ class ParTransAsqtad : public ParTransStagTypes
     void shift_link(Matrix **u, const int *dir, int n_dir){
         pt_shift_link((IFloat **)u,dir,n_dir);
     }
+
+    /*
+    void shift_field_m1m2(Matrix **v, const int *dir, int n_dir,
+			  int hop, Matrix **u, Matrix **x, Matrix **y){
+      pt_shift_field_m1m2(v,dir,n_dir,hop,u,x,y);
+    }
+    
+
+    void m1m2(Matrix **v, Matrix **x, const int *dir, int n_dir,
+		     int hop, Matrix **u){
+      pt_m1m2(v,x,dir,n_dir,hop,u);
+    }
+    */
 
     ~ParTransAsqtad();
 

@@ -8,7 +8,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.6 2005-01-13 07:46:14 chulwoo Exp $
+  $Id: pt_int.h,v 1.7 2005-02-18 19:50:20 mclark Exp $
   Why are (at least some of) these not class methods?
 */
 //#include <util/lattice.h>
@@ -23,6 +23,7 @@ void pt_1vec(int n, Float **vout, Float **vin, int const *dir);
 void pt_2vec(int n, Float **vout, Float **vin, const int *dir);
 //void pt_set_hop_pointer();
 int pt_offset(int dir, int hop);
+
 void pt_vvpd(Float **vect, int n_vect, const int *dir,
 	     int n_dir, int hop, Float **sum);
 void pt_shift_field(Float **v, const int *dir, int n_dir,

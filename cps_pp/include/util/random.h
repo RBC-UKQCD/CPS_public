@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.20 2004-12-21 19:02:38 chulwoo Exp $
+  $Id: random.h,v 1.21 2005-02-18 19:50:20 mclark Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-12-21 19:02:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.20 2004-12-21 19:02:38 chulwoo Exp $
-//  $Id: random.h,v 1.20 2004-12-21 19:02:38 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 19:50:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.21 2005-02-18 19:50:20 mclark Exp $
+//  $Id: random.h,v 1.21 2005-02-18 19:50:20 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -322,7 +322,7 @@ class LatRanGen
         FermionFieldDimension frm_dim =FIVE_D );
 
     //! Get the total number of states
-    int NStates() const;
+    int NStates(FermionFieldDimension frm_dim =FIVE_D) const;
     
     //! Retrieve the state of a single RNG
     void GetState(unsigned int *, 

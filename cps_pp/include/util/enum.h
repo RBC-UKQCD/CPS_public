@@ -174,6 +174,12 @@ enum MultiShiftSolveType {
 };
 typedef enum MultiShiftSolveType MultiShiftSolveType;
 
+enum MassRenormaliseDir {
+  RENORM_BACKWARDS = 0,
+  RENORM_FORWARDS = 1,
+};
+typedef enum MassRenormaliseDir MassRenormaliseDir;
+
 enum WbaryonFold {
 	BARYON_FOLD = 0,
 	BARYON_RAW = 1,

@@ -146,7 +146,6 @@ Float AlgRemez::generateApprox(int degree, unsigned long pnum, unsigned long pde
 Float AlgRemez::generateApprox(int num_degree, int den_degree, unsigned long pnum, unsigned long pden)
 {
   char *fname = "generateApprox(int, unsigned long, unsigned long)";
-//  VRB.Func(cname,fname);
 
   // Reallocate arrays, since degree has changed
   if (num_degree != n || den_degree != d) allocate(num_degree,den_degree);
