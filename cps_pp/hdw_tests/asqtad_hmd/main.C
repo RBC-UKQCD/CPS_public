@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.1 2004-09-29 17:04:51 chulwoo Exp $
+  $Id: main.C,v 1.1 2004-10-14 22:13:50 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -53,8 +53,9 @@ int main(int argc,char *argv[])
   VRB.Level(0);
 //  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
   VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+// VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
   VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
-  char *cname = "asqtad_hmd_r";
+  char *cname = "asqtad_hmc";
   char *fname = "main";
   VRB.Func(cname,fname);
 

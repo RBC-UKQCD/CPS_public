@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc_common.C,v 1.3 2004-09-28 16:10:28 chulwoo Exp $
+  $Id: smalloc_common.C,v 1.4 2004-10-14 22:09:59 chulwoo Exp $
 */
 
 #include <util/smalloc.h>
@@ -38,7 +38,7 @@ void ffree(char *cname, char *fname, char *vname, void *p){
   VRB.Sfree(cname,fname,vname,p);
   if (p == 0)
     ERR.Pointer(cname,fname,vname);
-  sfree(p);
+  ffree(p);
 }
 
 CPS_END_NAMESPACE

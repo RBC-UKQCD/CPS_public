@@ -1,14 +1,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.14 2004-08-18 11:57:48 zs Exp $
-//  $Id: asqtad_dirac.C,v 1.14 2004-08-18 11:57:48 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-10-14 22:09:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.15 2004-10-14 22:09:59 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.15 2004-10-14 22:09:59 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -340,18 +340,6 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
   // flush_cache_spinor() function will flush 192 bytes * nflush 
   //-------------------------------------------------------------
   nflush = vol/8;
-
-#if 0
-  tmpfrm = NULL;
-  if (vol<=4096)
-  tmpfrm = (IFloat *) qalloc (QFAST|QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
-  if(tmpfrm == NULL){ 
-    tmpfrm = (IFloat *) qalloc (QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
-    printf("tmpfrm is allocated at (%p),length 0x%x \n",tmpfrm,NUM_DIR*vol*VECT_LEN2*sizeof(IFloat));
-  }
-  if(tmpfrm == 0) 
-    ERR.Pointer(cname,fname, "tmpfrm");
-#endif
 
   //-----------------------------------------------------------------
   //  Allocate 8 receive buffers for off-node vectors
@@ -838,9 +826,6 @@ void asqtad_destroy_dirac_buf()
 {
   int i,k;
 
-#if 0
-  qfree (tmpfrm);
-#endif
   qfree(chi_off_node_total);
 
   for ( i = 0; i < 2; i++ ) {
@@ -1312,57 +1297,6 @@ Matrix * Naik = lat_pt->Fields(1);
   Fclose(fp);
 #endif
 
-#if 0
-  //-----------------------------------------------------------------
-  //  Allocate 8 receive buffers for off-node vectors
-  //-----------------------------------------------------------------
-  if(vol>1024) chi_off_node_total=NULL;
-    else
-    chi_off_node_total = ( IFloat * ) qalloc(QFAST|QCOMMS, 3*non_local_chi*
-      VECT_LEN * sizeof( IFloat ) / 2 );
-  if(chi_off_node_total == NULL){ 
-    chi_off_node_total = ( IFloat * ) qalloc(QCOMMS, 3*non_local_chi*
-      VECT_LEN * sizeof( IFloat ) / 2 );
-    printf("chi_off_node_total is allocated at DDR (%p)\n",chi_off_node_total);
-  }
-    if(chi_off_node_total == 0)
-      ERR.Pointer(cname,fname, "chi_off_node_total");
- for ( j= 0; j < 3; j++ ){
-    chi_off_node[j][0] = &(chi_off_node_total[ non_local_chi*j* VECT_LEN/2 ] ); 
-//    Fprintf(stderr,"chi_off_node[%d][0] =%d\n",j,(chi_off_node[j][0]-chi_off_node_total)/VECT_LEN);
-    chi_off_node_p[j][0] = (IFloat *)(sizeof (IFloat)*non_local_chi*j* VECT_LEN/2 );
-  for ( i = 1; i < NUM_DIR; i++ ){
-    chi_off_node[j][i] = chi_off_node[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
-//    Fprintf(stderr,"chi_off_node[%d][%d] =%d\n",j,i,(chi_off_node[j][i]-chi_off_node_total)/VECT_LEN);
-    chi_off_node_p[j][i] = chi_off_node_p[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
-  }
- }
-
-  for( int odd=0;odd<2;odd++){
-    for ( i = 0; i < NUM_DIR; i++ ) {
-      j = i % (NUM_DIR/2);
-	  SCUarg[odd][i+NUM_DIR].Addr(chi_off_node[2][i]);
-      if( split ){
-          SCUarg_1[odd][i + NUM_DIR].Addr(chi_off_node[0][i]);
-          SCUarg_2[odd][i + NUM_DIR].Addr(chi_off_node[1][i]);
-      } else {
-		void *addr[2];
-		addr[0] = chi_off_node[0][i];
-		addr[1] = chi_off_node[1][i];
-        SCUarg_1[odd][i + NUM_DIR].Addr(addr,2);
-      }
-      //send arguments
-      if ((i == 0) || ( i == 4)){
-		if (size[j]<=2)
-          SCUarg[odd][i].Addr(chi_off_node[0][4-i]);
-      }
-      else{
-        if(size[j]<=2)
-          SCUarg[odd][i].Addr(chi_off_node[0][(i+4)%NUM_DIR]);
-      }
-    }// end of NUM_DIR loop
-  } // end of odd loop
-#endif
   for ( i = 0; i < 2; i++){
   sfree(uc_l[i]);
   sfree(uc_nl[i]);
@@ -1544,6 +1478,8 @@ void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
 //  int num_flops;
 // Float dtime;
 //  struct timeval start,end;
+//  VRB.Func("","asqtad_dirac");
+//  printf("b=%p a=%p\n",b,a);
   
 
 #undef PROFILE
@@ -1771,6 +1707,7 @@ if(split) {
 #endif
   DiracOp::CGflops +=573*vol;
 
+//  VRB.FuncEnd("","asqtad_dirac");
 }
 
 CPS_END_NAMESPACE

@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-30 04:31:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.12 2004-08-30 04:31:39 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.12 2004-08-30 04:31:39 chulwoo Exp $
+//  $Date: 2004-10-14 22:10:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.13 2004-10-14 22:10:00 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.13 2004-10-14 22:10:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -53,8 +53,8 @@ void report_flops(int flops, struct timeval *start,struct timeval *end);
 
 #ifdef  PARALLEL
 //Uncomment the following line to activate reproducibility test
-//#define REPRODUCE_TEST
 #undef REPRODUCE_TEST
+//#undef REPRODUCE_TEST
 #endif
 
 #ifdef  REPRODUCE_TEST
@@ -166,7 +166,7 @@ int DiracOp::InvCg(Vector *out,
 // Allocate memory for the direction vector dir.
 //------------------------------------------------------------------
   Vector *dir;
-  if(GJP.VolNodeSites() >4096) dir=0;
+  if(GJP.VolNodeSites() >1024) dir=0;
     else dir = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
   if(dir == 0){
     dir = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
@@ -178,7 +178,7 @@ int DiracOp::InvCg(Vector *out,
 // Allocate mem. for the result vector of matrix multiplication mmp.
 //------------------------------------------------------------------
   Vector *mmp;
-  if(GJP.VolNodeSites() >4096) mmp=0;
+  if(GJP.VolNodeSites() >1024) mmp=0;
     else mmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
   if(mmp == 0){
     mmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
