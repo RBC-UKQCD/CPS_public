@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-06-02 09:36:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/WilsonMatrix.C,v 1.5 2004-06-02 09:36:39 zs Exp $
-//  $Id: WilsonMatrix.C,v 1.5 2004-06-02 09:36:39 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/WilsonMatrix.C,v 1.6 2004-06-04 21:14:00 chulwoo Exp $
+//  $Id: WilsonMatrix.C,v 1.6 2004-06-04 21:14:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: WilsonMatrix.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/WilsonMatrix.C,v $
 //  $State: Exp $
 //

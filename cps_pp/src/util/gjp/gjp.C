@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.6 2004-04-30 12:18:00 zs Exp $
+  $Id: gjp.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-04-30 12:18:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.6 2004-04-30 12:18:00 zs Exp $
-//  $Id: gjp.C,v 1.6 2004-04-30 12:18:00 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
+//  $Id: gjp.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //

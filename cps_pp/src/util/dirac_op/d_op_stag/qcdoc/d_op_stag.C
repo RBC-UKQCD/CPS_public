@@ -3,78 +3,13 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdoc/d_op_stag.C,v 1.3 2004-04-27 03:51:19 cwj Exp $
-//  $Id: d_op_stag.C,v 1.3 2004-04-27 03:51:19 cwj Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdoc/d_op_stag.C,v 1.4 2004-06-04 21:14:06 chulwoo Exp $
+//  $Id: d_op_stag.C,v 1.4 2004-06-04 21:14:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.2.2.2  2004/03/29 19:28:20  mike
-//  Fixed stupid bug of my own doing.
-//
-//  Revision 1.2.2.1  2004/03/19 21:51:36  mike
-//  Added NEG_MATPCDAG_MATPC type.
-//
-//  Revision 1.2  2004/01/13 20:39:36  chulwoo
-//  Merging with multibuild
-//
-//  Revision 1.1.2.1.2.1  2003/11/06 20:22:21  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.1.1  2003/11/04 05:05:06  chulwoo
-//
-//  starting again
-//
-//
-//  Revision 1.1  2003/09/19 21:37:45  chulwoo
-//
-//  adding staggered inverter for QCDOC
-//
-//  Revision 1.1.1.1  2003/09/18 22:30:47  chulwoo
-//  Mike's files for single node QCDOC + Parallel transport
-//  I added some hacks for PARALLEL without MPI_SCU
-//  PARALLEL=2 set PARALLEL without MPI_SCU
-//
-//
-//  Revision 1.1.1.1  2003/06/22 13:34:46  mcneile
-//  This is the cleaned up version of the Columbia Physics System.
-//  The directory structure has been changed.
-//  The include paths have been updated.
-//
-//
-//  Revision 1.7  2002/03/11 22:27:06  anj
-//  This should now be the correct, fully merged code from our two versions. Anj
-//
-//  Revision 1.4.2.1  2002/03/08 16:36:43  anj
-//  Checking in the Columbia code branch on tag Columbia4_1_1_test-branch, to be
-//  merged with the UKQCD head branch shortly.  Anj
-//
-//  Revision 1.4  2001/08/16 10:50:20  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:12:46  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:06  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
-//  $RCSfile: d_op_stag.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdoc/d_op_stag.C,v $
 //  $State: Exp $
 //

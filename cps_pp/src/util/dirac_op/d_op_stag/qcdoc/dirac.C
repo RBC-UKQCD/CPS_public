@@ -490,7 +490,7 @@ extern "C" void stag_dirac_init(const void * gauge_u )
     countM[i] = 0;
   }
 
-//  printf("dirac_init: Set yp SCU parameters\n");
+//  printf("dirac_init: Set up SCU parameters\n");
   for ( sg = 0; sg < vol; sg++ ) { 
 
     odd = SetCoord( sg );
@@ -507,7 +507,7 @@ extern "C" void stag_dirac_init(const void * gauge_u )
       countP[ odd ]++;
     }
   }
-//  printf("dirac_init: Set yp SCU parameters\n");
+//  printf("dirac_init: Set up SCU parameters\n");
 
   //-------------------------------------------------------------------
   //  Index i says data has been received from TP, XP, YP, ZP, TM, XM,

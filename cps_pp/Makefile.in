@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.14 2004-05-12 17:59:30 mcneile Exp $
+# $Id: Makefile.in,v 1.15 2004-06-04 21:13:56 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -36,6 +36,18 @@ copy_makefile:
 copy_include:
 	rm -rf $(BUILDDIR)/include
 	cp -r $(SRCDIR)/include $(BUILDDIR)
+
+TESTDIRS :=$(shell ls -p $(SRCDIR)/tests/*/Makefile_regression)
+TESTDIRS :=$(dir $(TESTDIRS))
+TESTDIRS :=$(subst $(SRCDIR)/tests,,$(TESTDIRS))
+TESTDIRS :=$(subst /,,$(TESTDIRS))
+
+copy_testdir: $(TESTDIRS)
+	@echo TESTDIRS = $(TESTDIRS)
+
+$(TESTDIRS):
+	mkdir -p tests/$@
+	cp -p $(SRCDIR)/tests/$@/Makefile_regression  tests/$@
 
 #  Create the documentation
 

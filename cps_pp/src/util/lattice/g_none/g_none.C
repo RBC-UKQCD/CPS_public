@@ -3,44 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Gnone class.
 
-  $Id: g_none.C,v 1.3 2003-10-23 13:38:59 zs Exp $
+  $Id: g_none.C,v 1.4 2004-06-04 21:14:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-10-23 13:38:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v 1.3 2003-10-23 13:38:59 zs Exp $
-//  $Id: g_none.C,v 1.3 2003-10-23 13:38:59 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v 1.4 2004-06-04 21:14:13 chulwoo Exp $
+//  $Id: g_none.C,v 1.4 2004-06-04 21:14:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.2.6.1  2003/09/23 21:39:20  zs
-//  Gnone needs an AllStaple method
-//
-//  Revision 1.2  2003/07/24 16:53:54  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.2  2001/06/19 18:13:27  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:10  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
-//  $RCSfile: g_none.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v $
 //  $State: Exp $
 //

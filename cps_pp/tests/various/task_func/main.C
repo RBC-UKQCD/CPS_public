@@ -3,53 +3,13 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/task_func/main.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: main.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/task_func/main.C,v 1.2 2004-06-04 21:14:18 chulwoo Exp $
+//  $Id: main.C,v 1.2 2004-06-04 21:14:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.5  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
-//  Revision 1.4  2001/08/17 20:03:39  anj
-//  Multiple (extra) changes to make the test suite smaller (16CPUs
-//  required, not 64) and faster.  Anj
-//
-//  Revision 1.3  2001/08/16 12:54:20  anj
-//  Some fixes follosin the float-> float change, mostly of the (variable
-//  anme) float_p -> float_p type.  A few fixes to ensure the test
-//  programs use the same level of verbosity throughout, and an update of
-//  the regression.pl script to make it more useful. Anj
-//
-//  Revision 1.2  2001/06/19 18:12:33  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:04  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
-//  $RCSfile: main.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/task_func/main.C,v $
 //  $State: Exp $
 //

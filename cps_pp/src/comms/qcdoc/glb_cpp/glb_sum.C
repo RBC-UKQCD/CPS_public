@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definition of glb_sum routine.
 
-  $Id: glb_sum.C,v 1.3 2004-04-27 03:51:17 cwj Exp $ 
+  $Id: glb_sum.C,v 1.4 2004-06-04 21:14:01 chulwoo Exp $ 
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/glb_sum.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
-//  $Id: glb_sum.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/glb_sum.C,v 1.4 2004-06-04 21:14:01 chulwoo Exp $
+//  $Id: glb_sum.C,v 1.4 2004-06-04 21:14:01 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: glb_sum.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/glb_sum.C,v $
 //  $State: Exp $
 //

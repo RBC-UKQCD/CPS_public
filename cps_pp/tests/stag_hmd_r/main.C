@@ -63,7 +63,9 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   // Set verbose level
   //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
+  VRB.Level(0);
+  VRB.Level(VERBOSE_RNGSEED_LEVEL);
+  VRB.Level(VERBOSE_FLOW_LEVEL);
   char *cname = "stag_hmd_r";
   char *fname = "main";
   VRB.Func(cname,fname);
@@ -213,20 +215,10 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.t_bc = BND_CND_PRD;
   do_arg.start_conf_kind = START_CONF_ORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
-  do_arg.colors = 3;
   do_arg.beta = 5.6;
-  do_arg.verbose_level = -1205;
   do_arg.xi_bare = 1;
   do_arg.xi_v = 1;
   do_arg.xi_v_xi = 1;
-#if 0
-  do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
-  do_arg.asqtad_naik = -1.0/24.0;
-  do_arg.asqtad_lepage = -1.0/16;
-  do_arg.asqtad_3staple = (-1.0/8.0)*0.5;
-  do_arg.asqtad_5staple = ( 1.0/8.0)*0.25*0.5;
-  do_arg.asqtad_7staple = (-1.0/8.0)*0.125*(1.0/6.0);
-#endif
 }
 
 

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStagTypes class constructor and destructor.
 
-  $Id: d_op_stag_types.C,v 1.3 2004-04-27 03:51:19 cwj Exp $
+  $Id: d_op_stag_types.C,v 1.4 2004-06-04 21:14:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/d_op_stag_types.C,v 1.3 2004-04-27 03:51:19 cwj Exp $
-//  $Id: d_op_stag_types.C,v 1.3 2004-04-27 03:51:19 cwj Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/d_op_stag_types.C,v 1.4 2004-06-04 21:14:07 chulwoo Exp $
+//  $Id: d_op_stag_types.C,v 1.4 2004-06-04 21:14:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_stag_types.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/d_op_stag_types.C,v $
 //  $State: Exp $
 //

@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-06 12:12:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/cbuf/cbuf.C,v 1.1 2004-02-06 12:12:41 zs Exp $
-//  $Id: cbuf.C,v 1.1 2004-02-06 12:12:41 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/cbuf/cbuf.C,v 1.2 2004-06-04 21:14:00 chulwoo Exp $
+//  $Id: cbuf.C,v 1.2 2004-06-04 21:14:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: cbuf.C,v $
-//  $Revision: 1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/cbuf/cbuf.C,v $
 //  $State: Exp $
 //

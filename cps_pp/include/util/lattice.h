@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.15 2004-05-10 15:26:54 zs Exp $
+  $Id: lattice.h,v 1.16 2004-06-04 21:13:58 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-05-10 15:26:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.15 2004-05-10 15:26:54 zs Exp $
-//  $Id: lattice.h,v 1.15 2004-05-10 15:26:54 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:13:58 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.16 2004-06-04 21:13:58 chulwoo Exp $
+//  $Id: lattice.h,v 1.16 2004-06-04 21:13:58 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -1651,6 +1651,7 @@ class FwilsonTypes : public virtual Lattice
 	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
 	VRB.Func(cname, fname);
 	ERR.NotImplemented(cname,fname);
+	return 0;
       }
     
     

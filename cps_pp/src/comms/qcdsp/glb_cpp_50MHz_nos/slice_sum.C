@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_50MHz_nos/slice_sum.C,v 1.2 2004-01-13 20:39:12 chulwoo Exp $
-//  $Id: slice_sum.C,v 1.2 2004-01-13 20:39:12 chulwoo Exp $
+//  $Date: 2004-06-04 21:14:03 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_50MHz_nos/slice_sum.C,v 1.3 2004-06-04 21:14:03 chulwoo Exp $
+//  $Id: slice_sum.C,v 1.3 2004-06-04 21:14:03 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: slice_sum.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_50MHz_nos/slice_sum.C,v $
 //  $State: Exp $
 //

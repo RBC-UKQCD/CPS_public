@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
+  $Id: d_op_dwf.C,v 1.4 2004-06-04 21:14:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
-//  $Id: d_op_dwf.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v 1.4 2004-06-04 21:14:05 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.4 2004-06-04 21:14:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v $
 //  $State: Exp $
 //

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.2 2004-05-10 15:26:55 zs Exp $
+  $Id: f_asqtad.C,v 1.3 2004-06-04 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-05-10 15:26:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/f_asqtad.C,v 1.2 2004-05-10 15:26:55 zs Exp $
-//  $Id: f_asqtad.C,v 1.2 2004-05-10 15:26:55 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/f_asqtad.C,v 1.3 2004-06-04 21:14:12 chulwoo Exp $
+//  $Id: f_asqtad.C,v 1.3 2004-06-04 21:14:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_asqtad.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/f_asqtad.C,v $
 //  $State: Exp $
 //

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgThreePt class methods.
   
-  $Id: alg_threept.C,v 1.4 2004-06-02 09:36:39 zs Exp $
+  $Id: alg_threept.C,v 1.5 2004-06-04 21:14:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-06-02 09:36:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/alg_threept.C,v 1.4 2004-06-02 09:36:39 zs Exp $
-//  $Id: alg_threept.C,v 1.4 2004-06-02 09:36:39 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/alg_threept.C,v 1.5 2004-06-04 21:14:00 chulwoo Exp $
+//  $Id: alg_threept.C,v 1.5 2004-06-04 21:14:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_threept.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/alg_threept.C,v $
 //  $State: Exp $
 //

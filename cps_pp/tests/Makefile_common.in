@@ -1,4 +1,4 @@
-# $Id: Makefile_common.in,v 1.11 2004-06-02 09:36:41 zs Exp $
+# $Id: Makefile_common.in,v 1.12 2004-06-04 21:14:16 chulwoo Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -8,10 +8,15 @@
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_top_builddir@
 QOS = @QOS@
-COMPILER = @CXX@
+CC = @CC@
+CXX = @CXX@
+AS  = @AS@
 LDFLAGS = @LDFLAGS@
 
-BIN = @ARCH@.x
+me = $(notdir $(PWD))
+BIN = $(me).x
+
+VPATH :=$(SRCDIR)/tests/$(me)
 
 
 
@@ -20,7 +25,9 @@ BIN = @ARCH@.x
 #
 INCLIST = -I${BUILDDIR} -I${SRCDIR}/include @INCLUDE_FLAGS@
 
+CFLAGS= @CFLAGS@
 CXXFLAGS= @CXXFLAGS@
+ASFLAGS= @ASFLAGS@
 DFLAGS += @DFLAGS@
 
 CFLAGS = ${CXXFLAGS} ${DFLAGS}
@@ -42,15 +49,33 @@ LIBLIST =\
 #  targets
 #
 
-me = $(notdir $(PWD))
 
 all:$(BIN)
 
-$(BIN):  main.o
-	$(COMPILER) -o $(BIN) main.o $(LIBLIST) $(LDFLAGS)
+.SUFFIXES:
+.SUFFIXES:  .o .C .S .c
 
-main.o: main.C
-	$(COMPILER) -o main.o $(CFLAGS) -c $(INCLIST) main.C
+CSRC :=$(wildcard $(SRCDIR)/tests/$(me)/*.c)
+CCSRC :=$(wildcard $(SRCDIR)/tests/$(me)/*.C)
+SSRC :=$(wildcard $(SRCDIR)/tests/$(me)/*.S)
+
+COBJ=$(CSRC:.c=.o)
+CCOBJ=$(CCSRC:.C=.o)
+SOBJ=$(SSRC:.S=.o)
+
+OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
+OBJS := $(notdir $(OBJS_SRC))
+
+$(BIN):  $(OBJS) $(LIBLIST)
+	@echo OBJS = $(OBJS)
+	$(CXX) $(OBJS) $(LIBLIST) $(LDFLAGS) -o $(BIN)
+
+.c.o:
+	$(CC) -o $@ $(CFLAGS) -c $(INCLIST) $<
+.C.o:
+	$(CXX) -o $@ $(CXXFLAGS) -c $(INCLIST) $<
+.S.o:
+	$(AS) -o $@ $(ASFLAGS) -c $(INCLIST) $<
 
 cps:
 	$(MAKE) -C $(BUILDDIR)

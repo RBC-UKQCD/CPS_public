@@ -32,6 +32,8 @@ CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 
+extern unsigned long WfmFlops;
+
 const char *f_wilson_test_filename = CWDPREFIX("f_wilson_test");
 const char *psi_filename = CWDPREFIX("psi");
 const char *input_filename = CWDPREFIX("f_wilson_inv.in");
@@ -39,6 +41,7 @@ const char *input_filename = CWDPREFIX("f_wilson_inv.in");
 
 int main(int argc,char *argv[]){
 
+WfmFlops = 0;
 
 #if TARGET == QCDOC
     DefaultSetup();
@@ -93,11 +96,10 @@ int main(int argc,char *argv[]){
     do_arg.start_conf_kind = START_CONF_DISORD;
 
     do_arg.start_seed_kind = START_SEED_FIXED;
-    do_arg.colors = 3;
     do_arg.beta = 5.5;
     do_arg.dwf_height = 0.9;
     do_arg.clover_coeff = 2.0171;
-    do_arg.verbose_level = -1205;
+ //   do_arg.verbose_level = -1205;
 
     do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
     do_arg.asqtad_naik = -1.0/24.0;
@@ -105,6 +107,9 @@ int main(int argc,char *argv[]){
     do_arg.asqtad_5staple = ( 1.0/8.0)*0.25*0.5;
     do_arg.asqtad_7staple = (-1.0/8.0)*0.125*(1.0/6.0);
     do_arg.asqtad_lepage = -1.0/16;
+
+	VRB.Level(0);
+	VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
     
     CgArg cg_arg;
 
@@ -113,7 +118,7 @@ int main(int argc,char *argv[]){
     cg_arg.max_num_iter = 500;
     GJP.Initialize(do_arg);
 
-    VRB.Level(GJP.VerboseLevel());
+//    VRB.Level(GJP.VerboseLevel());
 
 #if TARGET == QCDOC
     char filename [200];
@@ -197,7 +202,7 @@ int main(int argc,char *argv[]){
 		dtime = -dclock();
    		int iter = dirac.MatInv(out,X_in);
 		dtime +=dclock();
-		print_flops(1146*iter*vol,dtime);
+		print_flops(WfmFlops,dtime);
 		printf("iter=%d\n",iter);
 #else
 		dirac.Dslash(out,X_in+offset,CHKB_EVEN,DAG_NO);

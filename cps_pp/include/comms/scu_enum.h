@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  The MPI communication direction and flag enumerations:
 
-  $Id: scu_enum.h,v 1.8 2003-10-23 13:38:59 zs Exp $
+  $Id: scu_enum.h,v 1.9 2004-06-04 21:13:58 chulwoo Exp $
 */
 /*---------------------------------------------------------------
   This is very closely based on the original scu_enum.h from QCDSP.
@@ -20,14 +20,14 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: zs $
-  $Date: 2003-10-23 13:38:59 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.8 2003-10-23 13:38:59 zs Exp $
-  $Id: scu_enum.h,v 1.8 2003-10-23 13:38:59 zs Exp $
+  $Author: chulwoo $
+  $Date: 2004-06-04 21:13:58 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.9 2004-06-04 21:13:58 chulwoo Exp $
+  $Id: scu_enum.h,v 1.9 2004-06-04 21:13:58 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_enum.h,v $
-  $Revision: 1.8 $
+  $Revision: 1.9 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
   
-  $Id: alg_hmc_phi.C,v 1.5 2004-06-02 09:36:38 zs Exp $
+  $Id: alg_hmc_phi.C,v 1.6 2004-06-04 21:13:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-06-02 09:36:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.5 2004-06-02 09:36:38 zs Exp $
-//  $Id: alg_hmc_phi.C,v 1.5 2004-06-02 09:36:38 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:13:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.6 2004-06-04 21:13:59 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.6 2004-06-04 21:13:59 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //

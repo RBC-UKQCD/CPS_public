@@ -11,6 +11,7 @@
 #include <util/error.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
+CPS_START_NAMESPACE
 
 FimprDwf::FimprDwf(){
 }
@@ -255,7 +256,7 @@ void FimprDwf::EvolveMomFforce(Matrix *mom, Vector *chi,
 //------------------------------------------------------------------
 
   VRB.Clock(cname, fname, "Before loop over links.\n") ;
-#if 1
+#if 0
     
     const int N = 4;  // N can be 1, 2 or 4.
 	Fconvert(tmp,CANONICAL,STAG);
@@ -829,9 +830,4 @@ void FimprDwf::ForceProductSum(const Vector *v, const Vector *w,
 		IFloat coeff, Matrix *f){
 }
 
-
-//------------------------------------------------------------------
-// Float FhamiltonNode(Vector *phi, Vector *chi):
-// The fermion Hamiltonian of the node sublattice
-// chi must be the solution of Cg with source phi.	       
-//------------------------------------------------------------------
+CPS_END_NAMESPACE

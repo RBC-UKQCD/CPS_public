@@ -1,14 +1,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v 1.5 2004-04-27 03:51:17 cwj Exp $
-//  $Id: d_op_asqtad.C,v 1.5 2004-04-27 03:51:17 cwj Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v 1.6 2004-06-04 21:14:05 chulwoo Exp $
+//  $Id: d_op_asqtad.C,v 1.6 2004-06-04 21:14:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_asqtad.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v $
 //  $State: Exp $
 //

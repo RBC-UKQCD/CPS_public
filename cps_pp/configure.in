@@ -1,14 +1,14 @@
 dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
-dnl  $Author: zs $
-dnl  $Date: 2004-05-10 15:26:54 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.11 2004-05-10 15:26:54 zs Exp $
-dnl  $Id: configure.in,v 1.11 2004-05-10 15:26:54 zs Exp $
+dnl  $Author: chulwoo $
+dnl  $Date: 2004-06-04 21:13:57 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.12 2004-06-04 21:13:57 chulwoo Exp $
+dnl  $Id: configure.in,v 1.12 2004-06-04 21:13:57 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.11 $
+dnl  $Revision: 1.12 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -74,8 +74,8 @@ if test "$enable_target" = "qcdoc"; then
    AR="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${AR}"
    LD="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${LD}"
    INCLUDE_FLAGS="-I\${QOS}/quser/include -I\${QOS}/quser_qker/include -I\${QOS}/qhost_qker -I\${QOS}/qhost_qker_quser/include ${INCLUDE_FLAGS}"
-   CFLAGS="-Wa,-m405 -fno-exceptions -fno-hosted"
-   CXXFLAGS="-Wa,-m405 -fno-exceptions -fno-hosted"
+   CFLAGS="-Wall -Wa,-m405 -fno-exceptions -fno-hosted"
+   CXXFLAGS="-Wall -Wa,-m405 -fno-exceptions -fno-hosted"
    ASFLAGS="-m405"
    LDFLAGS="-Wa,\"-init _start\""
 

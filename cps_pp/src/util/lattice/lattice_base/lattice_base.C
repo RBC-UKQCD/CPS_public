@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.7 2004-04-30 12:18:00 zs Exp $
+  $Id: lattice_base.C,v 1.8 2004-06-04 21:14:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-04-30 12:18:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.7 2004-04-30 12:18:00 zs Exp $
-//  $Id: lattice_base.C,v 1.7 2004-04-30 12:18:00 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.8 2004-06-04 21:14:13 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.8 2004-06-04 21:14:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //

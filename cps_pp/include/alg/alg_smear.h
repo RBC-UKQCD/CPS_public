@@ -20,7 +20,7 @@
   to exclude links from being smeared with paths that move in
   that direction.
 */
-
+CPS_START_NAMESPACE
 class AlgSmear:public Alg
 {
 private:
@@ -159,5 +159,6 @@ public:
 };
 
 
+CPS_END_NAMESPACE
 #endif /* _ALG_SMEAR_CD_ */
 

@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.8 2004-06-02 09:36:41 zs Exp $
+  $Id: main.C,v 1.9 2004-06-04 21:14:16 chulwoo Exp $
 */
 
 #include<config.h>
@@ -114,6 +114,7 @@ int main(int argc,char *argv[]){
     
     GJP.Initialize(do_arg);
 
+	VRB.Level(0);
     VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
 #if TARGET == QCDOC
@@ -198,7 +199,7 @@ int main(int argc,char *argv[]){
 	dtime = -dclock();
 	int iter = dirac.MatInv(out,X_in);
 	dtime +=dclock();
-	print_flops(1146*iter*vol,dtime);
+	print_flops(1182*iter*vol,dtime);
 	printf("iter=%d\n",iter);
 #else
 	dirac.Dslash(out,X_in+offset,CHKB_ODD,DAG_NO);

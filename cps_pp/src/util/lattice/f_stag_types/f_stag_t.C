@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definition of FstagTypes methods.
 
-  $Id: f_stag_t.C,v 1.6 2004-05-10 15:26:55 zs Exp $
+  $Id: f_stag_t.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-05-10 15:26:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag_types/f_stag_t.C,v 1.6 2004-05-10 15:26:55 zs Exp $
-//  $Id: f_stag_t.C,v 1.6 2004-05-10 15:26:55 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag_types/f_stag_t.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
+//  $Id: f_stag_t.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_stag_t.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag_types/f_stag_t.C,v $
 //  $State: Exp $
 //

@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/scu_nos/get_data.C,v 1.2 2004-01-13 20:39:16 chulwoo Exp $
-//  $Id: get_data.C,v 1.2 2004-01-13 20:39:16 chulwoo Exp $
+//  $Date: 2004-06-04 21:14:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/scu_nos/get_data.C,v 1.3 2004-06-04 21:14:05 chulwoo Exp $
+//  $Id: get_data.C,v 1.3 2004-06-04 21:14:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/scu_nos/get_data.C,v $
 //  $State: Exp $
 //

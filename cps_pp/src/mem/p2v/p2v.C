@@ -3,41 +3,13 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/mem/p2v/p2v.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: p2v.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/mem/p2v/p2v.C,v 1.3 2004-06-04 21:14:05 chulwoo Exp $
+//  $Id: p2v.C,v 1.3 2004-06-04 21:14:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.4  2001/07/03 17:00:48  anj
-//
-//  Multiple minor alterations to change some #include's from referring to
-//  files relative to the top-level source directory to referring to files
-//  relative to the source-file positions.  This alteration makes the code
-//  backwards compatable with the make structure of QCDSP, although this
-//  may have to be changed to a more usual form in the future. Anj.
-//
-//  Revision 1.3  2001/06/21 15:40:11  anj
-//  Updated the _TARTAN ifdefs, using PARALLEL instead (where appropriate).Anj
-//
-//  Revision 1.2  2001/06/19 18:11:41  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:01  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
-//  $RCSfile: p2v.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/mem/p2v/p2v.C,v $
 //  $State: Exp $
 //

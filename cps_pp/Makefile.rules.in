@@ -1,3 +1,4 @@
+#$Id $
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_builddir@
 QOS = @QOS@
@@ -29,6 +30,7 @@ DIR2 := $(subst /src/,,$(DIR))
 DIR2 := $(subst util/,,$(DIR2))
 DIR2 := $(subst dirac_op/,,$(DIR2))
 DIR2 := $(subst mem/,,$(DIR2))
+DIR2 := $(subst comms/,,$(DIR2))
 DIR2 := $(subst alg/,,$(DIR2))
 LIBNAME := XXX$(subst /,_,$(DIR2))XXX
 LIBNAME := $(subst XXX_,,$(LIBNAME))
@@ -41,10 +43,11 @@ LIBNAME ?= cps
 
 DFLAGS += @DFLAGS@
 
-
-DIRLIST := $(shell ls -p $(SRCDIR)/$(DIR) )
-DIRLIST := $(filter %/ ,$(DIRLIST))
-DIRLIST := $(DIRLIST:/=)
+DIRLIST0 := $(shell ls -p $(SRCDIR)/$(DIR)/*/Makefile )
+DIRLIST0 := $(subst $(SRCDIR)/$(DIR),,$(DIRLIST0))
+DIRLIST1 := $(filter %/Makefile ,$(DIRLIST0))
+DIRLIST := $(DIRLIST1:/Makefile=)
+DIRLIST := $(subst /,,$(DIRLIST))
 
 ARCH = @ARCH@
 ARCHDIR := $(@ARCHDIR@)
@@ -68,9 +71,7 @@ all: cps
 recurse: $(RECURSEDIRS)
 
 $(RECURSEDIRS):
-	@echo PWD = $(BUILDDIR)/$(DIRB)
-	@echo DIR = $(DIR)
-	@echo DIRB = $(DIRB)
+	@echo RECURSEDIRS = $(RECURSEDIRS)
 	mkdir -p $(BUILDDIR)/$(DIRB)/$@
 	touch -a $(BUILDDIR)/$(DIRB)/$@/Makefile_depend
 	cp -p $(SRCDIR)/$(DIR)/$@/Makefile $(BUILDDIR)/$(DIRB)/$@
@@ -86,7 +87,7 @@ endif
 
 
 .SUFFIXES:
-.SUFFIXES:  .o .C .S
+.SUFFIXES:  .o .C .S .c
 
 CSRC :=$(wildcard $(SRCDIR)/$(DIR)/*.c)
 CCSRC:=$(wildcard $(SRCDIR)/$(DIR)/*.C)

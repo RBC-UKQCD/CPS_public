@@ -1,16 +1,17 @@
 #include<config.h>
+#include<stdio.h>
 
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-06-02 09:36:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_dwf_pbp/main.C,v 1.3 2004-06-02 09:36:41 zs Exp $
-//  $Id: main.C,v 1.3 2004-06-02 09:36:41 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_dwf_pbp/main.C,v 1.4 2004-06-04 21:14:16 chulwoo Exp $
+//  $Id: main.C,v 1.4 2004-06-04 21:14:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_dwf_pbp/main.C,v $
 //  $State: Exp $
 //
@@ -36,10 +37,18 @@ CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 
+static  const char * pbp_filename = CWDPREFIX ("pbp.dat");
+static  const char * plaq_filename = CWDPREFIX ("plaq.dat");
+static  const char * info_filename = CWDPREFIX ("info.dat");
+
 int main(int argc,char *argv[])
 {
 
   FILE *fp;
+#if TARGET == QCDOC
+  DefaultSetup();
+  printf("sizes= %d %d %d %d\n",SizeX(),SizeY(),SizeZ(),SizeT());
+#endif
   
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
@@ -47,15 +56,16 @@ int main(int argc,char *argv[])
   DoArg do_arg;
 
 #ifdef PARALLEL
-  do_arg.x_node_sites = 2;
-  do_arg.y_node_sites = 4;
-  do_arg.z_node_sites = 4;
-  do_arg.t_node_sites = 4;
+
+  do_arg.x_node_sites = 4/SizeX();
+  do_arg.y_node_sites = 4/SizeY();
+  do_arg.z_node_sites = 4/SizeZ();
+  do_arg.t_node_sites = 4/SizeT();
   do_arg.s_node_sites = 4;
-  do_arg.x_nodes = 2;
-  do_arg.y_nodes = 1;
-  do_arg.z_nodes = 1;
-  do_arg.t_nodes = 1;
+  do_arg.x_nodes = SizeX();
+  do_arg.y_nodes = SizeY();
+  do_arg.z_nodes = SizeZ();
+  do_arg.t_nodes = SizeT();
   do_arg.s_nodes = 1;
 #else
   do_arg.x_node_sites = 4;
@@ -75,7 +85,6 @@ int main(int argc,char *argv[])
   do_arg.z_bc = BND_CND_PRD;
   do_arg.t_bc = BND_CND_PRD;
   do_arg.start_conf_kind = START_CONF_DISORD;
-  do_arg.start_conf_load_addr = (Matrix *) 0x12f13;
   do_arg.start_seed_kind = START_SEED_FIXED;
   do_arg.start_seed_value = 1111;
   do_arg.beta = 5.8;
@@ -86,6 +95,10 @@ int main(int argc,char *argv[])
     using MPISCU::fprintf;
     using MPISCU::printf;
 #endif
+
+  VRB.Level(0);
+  VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
 
   GJP.Initialize(do_arg);
 
@@ -161,7 +174,7 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   {
     GwilsonFnone lat;
-    common_arg.results = CAST_AWAY_CONST("plaq.dat");
+    common_arg.results = CAST_AWAY_CONST(plaq_filename);
     AlgPlaq plaq(lat,&common_arg,&plaq_arg);
     
     plaq.run();
@@ -185,7 +198,7 @@ int main(int argc,char *argv[])
 	cur_g_upd_cnt = lat.GupdCnt() - init_g_upd_cnt;
       }
 
-      if( (fp = fopen("info.dat", "a")) == NULL ) {
+      if( (fp = fopen(info_filename, "a")) == NULL ) {
 	ERR.FileA(" ","main", "info.dat");
       }
       fprintf(fp,"%d %d %f\n",
@@ -274,7 +287,7 @@ int main(int argc,char *argv[])
 	  //------------------------------------------------------------
 	  if(num_hits != 0)
 	    {
-	      common_arg.results = CAST_AWAY_CONST("pbp.dat");
+	      common_arg.results = CAST_AWAY_CONST(pbp_filename);
 	      pbp_arg.mass[0] = mass;
 	      pbp_arg.src_u_s = 0;
 	      pbp_arg.src_l_s = ls-1;

@@ -3,44 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of the GwilsonFimprDwf class.
 
-  $Id: lattice_wi.C,v 1.2 2004-04-27 03:51:21 cwj Exp $
+  $Id: lattice_wi.C,v 1.3 2004-06-04 21:14:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_types/lattice_wi.C,v 1.2 2004-04-27 03:51:21 cwj Exp $
-//  $Id: lattice_wi.C,v 1.2 2004-04-27 03:51:21 cwj Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_types/lattice_wi.C,v 1.3 2004-06-04 21:14:14 chulwoo Exp $
+//  $Id: lattice_wi.C,v 1.3 2004-06-04 21:14:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.1.2.1  2004/04/26 01:48:46  cwj
-//  *** empty log message ***
-//
-//  Revision 1.2  2003/07/24 16:53:54  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.2  2001/06/19 18:13:33  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:10  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
-//  $RCSfile: lattice_wi.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_types/lattice_wi.C,v $
 //  $State: Exp $
 //

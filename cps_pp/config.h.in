@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.10 2004-06-02 09:33:08 zs Exp $
+  $Id: config.h.in,v 1.11 2004-06-04 21:13:56 chulwoo Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -13,14 +13,14 @@
  *--------------------------------------------------------------------
  *  CVS keywords
  *
- *  $Author: zs $
- *  $Date: 2004-06-02 09:33:08 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.10 2004-06-02 09:33:08 zs Exp $
- *  $Id: config.h.in,v 1.10 2004-06-02 09:33:08 zs Exp $
+ *  $Author: chulwoo $
+ *  $Date: 2004-06-04 21:13:56 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.11 2004-06-04 21:13:56 chulwoo Exp $
+ *  $Id: config.h.in,v 1.11 2004-06-04 21:13:56 chulwoo Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.10 $
+ *  $Revision: 1.11 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -88,6 +88,8 @@
 #include<util/qcdio_qprintf.h>
 #undef CPS_START_NAMESPACE
 #define CPS_START_NAMESPACE  namespace cps{ using MPISCU::printf; 
+#else
+#define COMMS_DATASIZE (sizeof(@LOCALPRECISION@))
 #endif
 
 /* ------------------------------------------------------------------*/

@@ -92,11 +92,11 @@ int main(int argc,char *argv[]){
     do_arg.start_conf_kind = START_CONF_DISORD;
 
     do_arg.start_seed_kind = START_SEED_FIXED;
-    do_arg.colors = 3;
+//    do_arg.colors = 3;
     do_arg.beta = 5.5;
     do_arg.dwf_height = 0.9;
     do_arg.clover_coeff = 2.0171;
-    do_arg.verbose_level = -1205;
+//    do_arg.verbose_level = -1205;
 
     CgArg cg_arg;
 
@@ -105,7 +105,9 @@ int main(int argc,char *argv[]){
     cg_arg.max_num_iter = 500;
     GJP.Initialize(do_arg);
 
-    VRB.Level(GJP.VerboseLevel());
+//   VRB.Level(GJP.VerboseLevel());
+	VRB.Level(0);
+	VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
 #if TARGET == QCDOC
     char filename [200];
@@ -188,7 +190,7 @@ int main(int argc,char *argv[]){
 		dtime = -dclock();
    		int iter = dirac.MatInv(out,X_in);
 		dtime +=dclock();
-		print_flops(1146*iter*vol,dtime);
+		print_flops(606*iter*vol,dtime);
 		printf("iter=%d\n",iter);
 #else
 		dirac.Dslash(out,X_in+offset,CHKB_ODD,DAG_NO);

@@ -111,7 +111,7 @@ void QOP_init(QcdApiArg *arg)
 	  do_arg.start_conf_kind = START_CONF_LOAD;
 	  do_arg.start_conf_load_addr       = gauge;
 	  do_arg.start_seed_kind = START_SEED_FIXED;
-	  do_arg.colors = 3;
+//	  do_arg.colors = 3;
 	  do_arg.beta = 6.0;
 	  do_arg.dwf_height = 0.9;
 //	  do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
@@ -121,11 +121,11 @@ void QOP_init(QcdApiArg *arg)
 	  do_arg.asqtad_5staple = arg->asqtad_5staple;
 	  do_arg.asqtad_7staple = arg->asqtad_7staple;
 	  do_arg.asqtad_lepage = arg->asqtad_lepage;
-	  do_arg.verbose_level = -12;
+//	  do_arg.verbose_level = -12;
 
 	  GJP.Initialize(do_arg);
 //	printf("GJP.VerboseLevel()=%d\n",GJP.VerboseLevel());
-	VRB.Level(GJP.VerboseLevel());
+//	VRB.Level(GJP.VerboseLevel());
 
 	size[0] = GJP.XnodeSites();
 	size[1] = GJP.YnodeSites();

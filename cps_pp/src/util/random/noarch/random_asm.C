@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.3 2004-04-30 12:18:00 zs Exp $
+  $Id: random_asm.C,v 1.4 2004-06-04 21:14:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-04-30 12:18:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.3 2004-04-30 12:18:00 zs Exp $
-//  $Id: random_asm.C,v 1.3 2004-04-30 12:18:00 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:14:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.4 2004-06-04 21:14:14 chulwoo Exp $
+//  $Id: random_asm.C,v 1.4 2004-06-04 21:14:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //

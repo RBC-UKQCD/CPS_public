@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Alg class methods.
   
-  $Id: alg_base.C,v 1.4 2004-04-27 03:51:17 cwj Exp $
+  $Id: alg_base.C,v 1.5 2004-06-04 21:13:58 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_base/alg_base.C,v 1.4 2004-04-27 03:51:17 cwj Exp $
-//  $Id: alg_base.C,v 1.4 2004-04-27 03:51:17 cwj Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-06-04 21:13:58 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_base/alg_base.C,v 1.5 2004-06-04 21:13:58 chulwoo Exp $
+//  $Id: alg_base.C,v 1.5 2004-06-04 21:13:58 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_base.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_base/alg_base.C,v $
 //  $State: Exp $
 //
