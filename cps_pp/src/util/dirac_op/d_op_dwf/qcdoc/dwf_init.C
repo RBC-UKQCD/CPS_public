@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-30 04:32:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.7 2004-08-30 04:32:43 chulwoo Exp $
-//  $Id: dwf_init.C,v 1.7 2004-08-30 04:32:43 chulwoo Exp $
+//  $Date: 2004-10-14 22:03:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.8 2004-10-14 22:03:48 chulwoo Exp $
+//  $Id: dwf_init.C,v 1.8 2004-10-14 22:03:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_init.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v $
 //  $State: Exp $
 //
@@ -128,7 +128,7 @@ void dwf_init(Dwf *dwf_p)
   VRB.Smalloc(cname,fname,
 	      "comm_buf", dwf_p->comm_buf, 12*sizeof(IFloat));
 
-
+  if (ls >1){
   dwf_p->PlusArg[0] = new SCUDirArgIR;
     (dwf_p->PlusArg[0]) ->Init (dwf_p->comm_buf,SCU_SP,SCU_SEND, ls_stride*sizeof(IFloat),1,0,IR_14);
   dwf_p->PlusArg[1] = new SCUDirArgIR;
@@ -142,10 +142,7 @@ void dwf_init(Dwf *dwf_p)
     (dwf_p->MinusArg[1])->Init(dwf_p->comm_buf,SCU_SP,SCU_REC, ls_stride*sizeof(IFloat),1,0,IR_15);
 	dwf_p->Minus = new SCUDirArgMulti;
     (dwf_p->Minus)->Init(dwf_p->MinusArg,2);
-
-
-  
-
+  }
 
 }
 void dwf_end( Dwf *dwf_p)

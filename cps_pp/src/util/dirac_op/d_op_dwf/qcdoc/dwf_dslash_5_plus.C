@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v 1.6 2004-08-18 11:57:50 zs Exp $
-//  $Id: dwf_dslash_5_plus.C,v 1.6 2004-08-18 11:57:50 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-10-14 22:03:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v 1.7 2004-10-14 22:03:48 chulwoo Exp $
+//  $Id: dwf_dslash_5_plus.C,v 1.7 2004-10-14 22:03:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_5_plus.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v $
 //  $State: Exp $
 //
@@ -134,7 +134,6 @@ void dwf_dslash_5_plus(Vector *out,
 
 // Initializations
 //------------------------------------------------------------------
-  sys_cacheflush(0);
   int local_ls = GJP.SnodeSites(); 
   int s_nodes = GJP.Snodes();
   int s_node_coor = GJP.SnodeCoor();
@@ -151,8 +150,11 @@ void dwf_dslash_5_plus(Vector *out,
 //  VRB.Func("DiracOpDwf","dwf_dslash_5_plus()");
   f_in  = (IFloat *) in;
 
-  (dwf_lib_arg->PlusArg[0])->Addr(f_in+(local_ls-1)*ls_stride);
-  (dwf_lib_arg->MinusArg[0])->Addr(f_in);
+  if (s_nodes>1){
+    sys_cacheflush(0);
+    (dwf_lib_arg->PlusArg[0])->Addr(f_in+(local_ls-1)*ls_stride);
+    (dwf_lib_arg->MinusArg[0])->Addr(f_in);
+  }
 
 // [1 + gamma_5] term (if dag=1 [1 - gamma_5] term)
 //
