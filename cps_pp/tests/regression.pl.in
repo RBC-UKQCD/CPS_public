@@ -99,17 +99,17 @@ for( $tsi = 0; $tsi < scalar(@test_dirs); $tsi++ ) {
 # State which test is about to run, run it, and store the results:
 	print SHOUT "echo Starting test ".$test_names[$tni]."\n";
 	print SHOUT "cd ".$test_names[$tni]."\n";
+# Remove any files associated with previous runs (i.e. *.dat)
+	print SHOUT 'rm -f '.$exec_cmd'. *.dat'."\n";
 #       compile the code
 	print SHOUT 'make -f Makefile_regression'."\n";
-
-# Remove any files associated with previous runs (i.e. *.dat)
-	print SHOUT 'rm -f *.dat'."\n";
 # Run the program:
 	$exec_cmd = $exec_prefix.$executable;
 ##	print SHOUT "echo Running $exec_cmd...\n";
 	print SHOUT "$exec_cmd > $res_file\n";
 # Grab all of the *.dat output files and sling them into a single file:
 	print SHOUT "more *.dat > $dat_file\n";
+	print SHOUT "perl ../combine_files.pl *.dat > $dat_file\n";
 
 # Inform the user about the directory being looked at:
 	print "[$tni]: '$exec_cmd'.\n";
