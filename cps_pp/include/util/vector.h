@@ -5,18 +5,24 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: vector.h,v 1.3 2003-09-23 16:47:14 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.2 2003-07-24 16:53:53 zs Exp $
-//  $Id: vector.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Date: 2003-09-23 16:47:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.3 2003-09-23 16:47:14 zs Exp $
+//  $Id: vector.h,v 1.3 2003-09-23 16:47:14 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2003/07/24 16:53:53  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.5  2002/12/04 17:16:27  zs
 //  Merged the new 2^4 RNG into the code.
 //  This new RNG is implemented in the LatRanGen class.
@@ -54,7 +60,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -289,7 +295,7 @@ class Matrix
     //! Not what you might think.
     void TrLessAntiHermMatrix(const Matrix& this_dag);
 
-    //! Assignment to tensor product of vectors.
+    //! Assignment to twice the tensor product of vectors.
     void Cross2(const Vector& v1, const Vector& v2);
 
     //! Assignment to an traceless antihermitian matrix.

@@ -3,18 +3,24 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Utility routines for SU(3) matrices.
 
-  $Id: su3_util.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: su3_util.C,v 1.3 2003-09-23 16:47:14 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: su3_util.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2003-09-23 16:47:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v 1.3 2003-09-23 16:47:14 zs Exp $
+//  $Id: su3_util.C,v 1.3 2003-09-23 16:47:14 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.4  2001/08/16 10:50:40  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -39,7 +45,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: su3_util.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v $
 //  $State: Exp $
 //
@@ -105,7 +111,7 @@ void Matrix::TrLessAntiHermMatrix(const Matrix& dag)
 /*!
   \param v1 A complex 3-vector \a u
   \param v2 A complex 3-vector \a v
-  \post This matrix is assigned the values M(i,j) = u(i)v(j)*
+  \post This matrix is assigned the values M(i,j) = 2 u(i)v(j)*
 */
 void Matrix::Cross2(const Vector& v1, const Vector& v2)
 {
