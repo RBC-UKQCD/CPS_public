@@ -8,15 +8,11 @@
 CPS_START_NAMESPACE
 
 LatData::LatData(const LatData &lat){
-        ERR.General("LatData","LatData(&LatData)","Copy constructor not
-allowed"
-);
+	ERR.General("LatData","LatData(&LatData)","Copy constructor not allowed");
 }
 
 LatData &LatData::operator=(const LatData &lat){
-        ERR.General("LatData","LatData(&LatData)","Copy constructor not
-allowed"
-);
+	ERR.General("LatData","LatData(&LatData)","Copy constructor not allowed");
 }
 
 void LatVector::Init(int flag, int n_vec, int vol)
