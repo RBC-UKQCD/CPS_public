@@ -1,0 +1,22 @@
+CC= gcc
+CXX= g++
+CSRC:= 
+CPPSRC:= vml.C vml_encoder.C xml_encoder.C
+COBJ=$(CSRC:.c=.o)
+CPPOBJ=$(CPPSRC:.C=.o)
+CFLAGS=-g -I../../../include/util/vml
+.SUFFIXES: .C .c .o
+
+.c.o: $(CSRC)
+	$(CC) $(CFLAGS) -c $< -o $@
+.C.o: $(CPPSRC)
+	$(CXX) $(CFLAGS) -c $< -o $@
+
+all: lib 
+
+lib: $(COBJ) $(CPPOBJ) 
+	$(AR) cr libmarshall.a $(COBJ) $(CPPOBJ)
+
+clean: 
+	- rm -f $(COBJ) $(CPPOBJ) libmarshall.a
+
