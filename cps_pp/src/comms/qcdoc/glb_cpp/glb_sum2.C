@@ -65,7 +65,8 @@ void glb_sum_internal2(Float * float_p,int ndir)
       transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64)*2);
       receive_buf = transmit_buf+1;
       gsum_buf = (Double64 *)qalloc(QFAST,sizeof(Double64)*max);
-      for(int i = 0;i<5;i++){
+      for(int i = 0;i<5;i++)
+      if (NP[i]>1){
       Send[i] = new SCUDirArgIR(transmit_buf, gjp_scu_dir[2*i+1], SCU_SEND, sizeof(Double64));
       Recv[i] = new SCUDirArgIR(receive_buf, gjp_scu_dir[2*i], SCU_REC, sizeof(Double64));
       }
@@ -99,23 +100,6 @@ void glb_sum_internal2(Float * float_p,int ndir)
   }
   *float_p = (Float)tmp_sum;
 
-#if 0
-  *transmit_buf = *gsum_buf;
-  for(i = 0; i < ndir; ++i) 
-  if ( NP[i] >1){ 
-      	int coor = GJP.NodeCoor[i];
-	if (coor ==0 )Send[i]->StartTrans();Send[i] ->TransComplete();
-	else {
-		Recv[i]->StartTrans(); Recv[i]->TransComplete();
-		if (GJP.NodeCoor[i] <NP[i]-1 ){
-			Send[i]->StartTrans(); Send[i]->TransComplete();
-		}
-        	*transmit_buf = *receive_buf;
-	}
-
-  }
-  *float_p = (Float)*transmit_buf;
-#endif
 }
 
 
