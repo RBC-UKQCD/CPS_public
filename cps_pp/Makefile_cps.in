@@ -1,4 +1,4 @@
-# $Id: Makefile_cps.in,v 1.11 2003-10-23 13:38:58 zs Exp $
+# $Id: Makefile_cps.in,v 1.12 2003-10-24 13:30:06 zs Exp $
 #
 #  Template makefile for the Columbia Physics System
 #
@@ -71,13 +71,14 @@ docs:
 subdirs = $(dir $(shell ls doc/*/Makefile))
 webdocs:
 	@echo Creating documentation for the web page
-	@echo This will delete all source code
+	@echo This will delete all source code!
+	@sleep 2
 	$(MAKE) -f $(MAKEFILE) docs
 	@rm -rf src include tests
 	@for a in $(subdirs); do $(MAKE) -C $$a all clean; done
 	chmod o= `ls`
-	@find doc -path "*CVS" -prune -o -type d -print | xargs chmod 775
-	@find doc -name "*.html" -o -name "*.*ps" -o -name "*.gif" -o -name "*.png" -o -name "*.jp*g" -o -name "*.pdf" -o -name "*.tar.gz" |xargs chmod 644
+	@find . -path "*CVS" -prune -o -type d -print | xargs chmod 775
+	@find doc -name "*.html" -o -name "*.*ps" -o -name "*.gif" -o -name "*.png" -o -name "*.jp*g" -o -name "*.pdf" -o -name "*.tar.gz" |xargs chmod 664
 
 endif
 
