@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.12 2004-12-01 06:38:13 chulwoo Exp $
+  $Id: alg_hmd.h,v 1.13 2005-02-18 19:44:28 mclark Exp $
 */
 //------------------------------------------------------------------
 
@@ -54,6 +54,8 @@ class AlgHmd : public Alg
     /*!<
       This is \e i times the actual conjugate momentum.
      */	
+
+    int alloc_sum;
 
  public:
 
@@ -337,6 +339,12 @@ class AlgHmcRHMC : public AlgHmd
  private:
     char *cname;
 
+    //! Does the main work of the constructors.
+    void init();
+
+    //! Renormalises the shifts into the mass for staggered fermions
+    void massRenormalise(Float *mass, Float *trueMass, int degree, 
+			 Float *shift, MassRenormaliseDir direction);
 
  protected:
 
@@ -346,6 +354,9 @@ class AlgHmcRHMC : public AlgHmd
     int n_bsn_masses;     
         //!< The number of dynamical boson masses.
 
+    int f_sites;       
+    int f_vec_count;       
+    int f_count;       
     int f_size;       
     //!< The size of a fermion field.
     /*!< The size is given in terms of the total number of floating point
@@ -379,13 +390,22 @@ class AlgHmcRHMC : public AlgHmd
 
 
     Matrix* gauge_field_init;
+    //!< The final gauge field configuration
+
+    unsigned int **rng4d_init;
+    unsigned int **rng5d_init;
+    //!< The initial random numbers
+
+    Matrix* gauge_field_final;
     //!< The initial gauge field configuration
 
-    Vector* frmn;
+    Vector* frm;
+
+    Vector** frmn;
     //!< Array of vectors
     /*!< These will hold the solutions from the solves. */
 
-    Vector* frmn_d;
+    Vector** frmn_d;
     //!< Array of vectors
     /*!< These will hold the solutions from the solves multiplied by
       the D-slash operator. */ 
@@ -424,6 +444,8 @@ class AlgHmcRHMC : public AlgHmd
     EigArg *eig_arg;
     //!< ?
 
+    Float **alpha;
+
  public:
 
   //!  Constructor for when the rational approximation is fixed.
@@ -431,9 +453,6 @@ class AlgHmcRHMC : public AlgHmd
 
   //!   Constructor for when the rational approximations are to be generated dynamically.
   AlgHmcRHMC(Lattice& latt, CommonArg *c_arg, HmdArg *arg, EigArg *e_arg);
-
-  //! Does the main work of the constructors.
-  void init();
 
   virtual ~AlgHmcRHMC();
 

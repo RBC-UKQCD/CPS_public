@@ -171,6 +171,7 @@ typedef enum RatApproxType RatApproxType;
 enum MultiShiftSolveType {
 	SINGLE = 0,
 	MULTI = 1,
+	GENERAL = 2,
 };
 typedef enum MultiShiftSolveType MultiShiftSolveType;
 

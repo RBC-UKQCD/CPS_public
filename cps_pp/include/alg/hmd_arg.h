@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the HmdArg structure.
 
-  $Id: hmd_arg.h,v 1.9 2004-09-02 17:00:36 zs Exp $
+  $Id: hmd_arg.h,v 1.10 2005-02-18 19:44:28 mclark Exp $
 */
 //------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ enum MetropolisType { METROPOLIS_NO    = 0,
 
 
 
-#define MAX_HMD_MASSES  4       //!< The maximum number of dynamical masses.
+#define MAX_HMD_MASSES  8       //!< The maximum number of dynamical masses.
 
 #define MAX_RAT_DEGREE  20          /* The maximum degree of the rational
 				       approximation. */
@@ -172,6 +172,12 @@ struct HmdArg {
       guess (HMC only).
     */
     int chrono;
+
+    //! Reproduce test? 1 = TRUE, 0 = FALSE
+    int reproduce;
+
+    //! How many attempts do we try to reproduce?
+    int reproduce_attempt_limit;
 
 };
 
