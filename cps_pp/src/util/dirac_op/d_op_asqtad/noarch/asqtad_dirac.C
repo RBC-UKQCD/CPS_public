@@ -255,8 +255,8 @@ void asqtad_dirac_init(const void * gauge_u )
   int local_count[2];
   int non_local_count[2];
   int local_count_3[2];
- int non_local_count_3[3][2];
- int off_node;
+  int non_local_count_3[3][2];
+  int off_node;
   int x[NUM_DIR/2];
   char buf[200];
   int fd;
@@ -328,7 +328,8 @@ void asqtad_dirac_init(const void * gauge_u )
   //-----------------------------------------------------------------
   //  Allocate 8 receive buffers for off-node vectors
   //-----------------------------------------------------------------
-  
+
+
 #ifndef NEW_CHI_OFF
  for ( j= 0; j < 3; j++ ){
   for ( i = 0; i < NUM_DIR; i++ ){
@@ -395,6 +396,7 @@ void asqtad_dirac_init(const void * gauge_u )
      ERR.General(cname, fname, 
 		 "Assembly functions implemented only for double precision!");
   }
+
 
 
 #ifndef SIMUL
@@ -813,7 +815,6 @@ void asqtad_destroy_dirac_buf()
 {
   int i,k;
 
-
   for ( i = 0; i < 2; i++ ) {
     for ( k = 0; k < 3; k++ ) {
 #ifndef SIMUL_TBUF
@@ -843,8 +844,8 @@ void asqtad_destroy_dirac_buf()
     for(k=0;k<3;k++)
     sfree(chi_off_node[k][i]);
 #endif
-    sfree(tmpfrm);
   }
+  sfree(tmpfrm);
 }
 //-------------------------------------------------------------------
 //  Given a lexical value for gauge fields, set the coordinates.
@@ -1580,7 +1581,6 @@ int non_local_count_3[3][2];
   //  SCU transfer structure to get links from off node and a
   //  location where one link matrix can be stored.
   //-----------------------------------------------------------
-
   VRB.Func(cname,fname);
 #if 0
   size[0] = GJP.TnodeSites();
@@ -1649,7 +1649,6 @@ int non_local_count_3[3][2];
        
 
   }
-
 
   //-----------------------------------------------------------
   //  Copy links in POSTIVE directions.  These are all on-node
@@ -1728,7 +1727,6 @@ int non_local_count_3[3][2];
   off_node= CoordNN( n+4 ); // x+mu -> x
   coord[n]=coord_nn[n];
   TransfP( off_node,  nflush_g, w_t3, mtmp,  n);
-
      //---------------------------------------------------------------
     //U_mu(x) ~U_mu(x+mu) ~U_mu(x+2mu) ~   (1 transformation  max)
      //---------------------------------------------------------------
@@ -1783,7 +1781,6 @@ int non_local_count_3[3][2];
 	       stp7_f[i] = 0.;
 	       UnitMatrix[i] = 0.;
            }
-
 
 
     UnitMatrix[0]=1.;
@@ -1847,7 +1844,6 @@ if  ( ( (nu%4)!= n )&&( (nu%4)!=(ro%4)) )
 
 
 #endif //staple5
-
 #ifdef staple7
 
 for (int de=0; de < 4 ;de++){  //positive de direction
@@ -1961,7 +1957,6 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
 	      }  //end of "else"
 
 	//U_mu (x-mu) -> x  
-	
  for ( i = 0; i < 18; i++ ) {
          	w[i] = -v[i];
            }
@@ -2105,8 +2100,7 @@ if  (nu%4 != n && nu%4 != ro%4)
 
 #endif // staple5
 
-
-
+	    
 #ifdef staple7
 
 for (int de=0; de < 4 ;de++){  //positive de direction
@@ -2266,7 +2260,7 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
 #ifndef SIMUL_AGG
 
 #if 1
-  gauge_agg temp[12*vol];
+  gauge_agg *temp = (gauge_agg *) smalloc (12*vol * sizeof(gauge_agg));
   int num_ind[vol*6];
   int src;
   for(j=0;j<2;j++){
@@ -2305,6 +2299,7 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
     }
   }
 
+
 #if 0
   struct gauge_agg *agg_p;
   sprintf(buf,"uc_l_agg.h");
@@ -2336,7 +2331,6 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
   }
   close(fd);
 #endif
-
 #else
 
 #if 0
@@ -2374,7 +2368,6 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
 
 #endif // 1
 
-  fflush(stdout);
 #endif //SIMUL_AGG
 
 #ifndef SIMUL_U
@@ -2435,6 +2428,7 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
     }
 
   }
+  sfree(temp);
 
 #if 0
   sprintf(buf,"uc_nl_agg.h");
@@ -2517,6 +2511,7 @@ void asqtad_destroy_dirac_buf_g(void)
     sfree(uc_l_agg[i]);
     sfree(uc_nl_agg[i]);
   }
+
 }
 //---------------------------------------------------------------------
 //  Find nearest neighbor coordinate for coordinates given.  Nearest
