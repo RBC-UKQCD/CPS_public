@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprOLSym class methods.
 
-  $Id: g_impr_OLSym.C,v 1.4 2004-08-18 11:58:04 zs Exp $
+  $Id: g_impr_OLSym.C,v 1.5 2004-08-30 04:48:21 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.4 2004-08-18 11:58:04 zs Exp $
-//  $Id: g_impr_OLSym.C,v 1.4 2004-08-18 11:58:04 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-30 04:48:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.5 2004-08-30 04:48:21 chulwoo Exp $
+//  $Id: g_impr_OLSym.C,v 1.5 2004-08-30 04:48:21 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v $
 //  $State: Exp $
 //
@@ -157,7 +157,7 @@ void GimprOLSym::GforceSite(Matrix& force, int *x, int mu)
   force.TrLessAntiHermMatrix(*mp1);
 }
 
-
+#if 1
 //-----------------------------------------------------------------------------
 // EvolveMomGforce(Matrix *mom, Float step_size):
 // It evolves the canonical momentum mom by step_size
@@ -187,6 +187,7 @@ void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size){
     }
   }
 }
+#endif
 
 
 //-----------------------------------------------------------------------------

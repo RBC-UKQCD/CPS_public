@@ -4,13 +4,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-30 04:46:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.8 2004-08-30 04:46:19 chulwoo Exp $
-//  $Id: main.C,v 1.8 2004-08-30 04:46:19 chulwoo Exp $
+//  $Date: 2004-08-30 04:47:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.9 2004-08-30 04:47:04 chulwoo Exp $
+//  $Id: main.C,v 1.9 2004-08-30 04:47:04 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -117,8 +117,8 @@ int main(int argc,char *argv[])
   hmd_arg.n_bsn_masses = 0;
   hmd_arg.max_num_iter[0] = 5;
   hmd_arg.stop_rsd[0] = 1.0E-12;
-  hmd_arg.step_size = 0.01;
-  hmd_arg.steps_per_traj = 1;
+  hmd_arg.step_size = 0.02;
+  hmd_arg.steps_per_traj = 20;
   hmd_arg.metropolis = METROPOLIS_YES;
   hmd_arg.reunitarize = REUNITARIZE_YES;
 

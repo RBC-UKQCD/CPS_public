@@ -15,6 +15,7 @@ CPS_START_NAMESPACE
 // It evolves the canonical momentum mom by step_size
 // using the pure gauge force.
 //-----------------------------------------------------------------------------
+#define PROFILE
 void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
 {
   char *fname = "EvolveMomGforce(M*,F)";  //Name of our function
