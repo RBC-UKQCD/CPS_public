@@ -1,4 +1,4 @@
-//$Id: programming.dox,v 1.6 2004-09-02 16:51:48 zs Exp $
+//$Id: programming.dox,v 1.7 2004-11-02 15:06:40 zs Exp $
 /*!
 
 \page progpage CPS programming
@@ -103,34 +103,13 @@ build-time to use the namespace (see the \ref config section).
 
 \subsection glob Global variables
 
-The CPS code expects certain globally scoped variables to be defined.
+The CPS code defines certain globally scoped variables.
 These are
 - An instance of the GlobalJobParameter class named ::GJP
 - An instance of the Verbose class named ::VRB
 - An instance of the Error class named ::ERR
 - An instance of the LatRanGen class named ::LRG
 
-These variables should be defined with global scope in the file in which 
-the main routine is defined, \e e.g.
-
-\verbatim
-    GlobalJobParameter GJP;
-    LatRanGen LRG;
-    Verbose VRB;
-    Error ERR;
-
-    int main(int argc, char **argv){
-
-        // Your code here
-
-        return 0;
-
-    }    
-\endverbatim
-
-If the MPI-SCU interface is being used then 
-a globally scoped array \c int \c MPISCU_peGrid[4] must be defined. See 
-\ref mpiscuin for details.
 
 \subsection stdio Standard IO
 
@@ -146,6 +125,13 @@ On MPI, all the standard IO functions are reimplemented in the cps::MPISCU
 namespace so that only a single node does the IO. Again, alternatives are 
 provided to allow all nodes to perform IO with the node number prefixed 
 to the string being written.
+
+\subsection fileio File IO
+
+Rather than the C++ \a fstream class or the standard C file IO functions, 
+one should use ::Fopen and ::Fclose to open and close files.
+This  
+
 
 \subsection malloc Memory allocation
 
