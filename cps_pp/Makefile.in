@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.13 2004-04-30 12:17:59 zs Exp $
+# $Id: Makefile.in,v 1.14 2004-05-12 17:59:30 mcneile Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -51,6 +51,7 @@ docs:
 	cd ${SRCDIR}/doc ; sh mkdocs.sh 
 	cd ${SRCDIR}/tests/t_asqtad_pion ; doxygen Doxyfile
 	cd ${SRCDIR}/tests/s_spect ; doxygen Doxyfile
+	cd ${SRCDIR}/tests/t_gauge_rot ; doxygen Doxyfile
 
 
 #  Documentation for the web pages
