@@ -1,14 +1,21 @@
-//
-// This is an example program that shows how
-// to perform a random gauge trasformation on the 
-// gauge fields. A random gauge transformation is 
-// done on a unit gauge configuration. The plaquette
-// is computed and the link trace.
-//
-//
-// The gauge transformation code was orginally written
-// by Chris Dawson (using existing code from the BNL group).
-//
+///  \brief
+///  Demonstrate the random gauge transformation code.
+///
+
+
+/*!------------------------------
+
+ This is an example program that shows how
+ to perform a random gauge trasformation on the 
+ gauge fields. A random gauge transformation is 
+ done on a unit gauge configuration. The plaquette
+ is computed and the link trace.
+
+ The gauge transformation code was orginally written
+ by Chris Dawson (using existing code from the BNL group).
+
+$Id: main.C,v 1.4 2004-05-12 18:21:54 mcneile Exp $
+*/
 
 #include <config.h>
 #include <stdio.h>
