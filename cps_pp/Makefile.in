@@ -1,11 +1,32 @@
-NORECURSE_DIR = autom4te.cache CVS doc tests include
-QCDOC_DIR = 
-QCDOC_SERIAL_DIR =
-QCDSP_DIR =
-MPI_DIR = mpi
-NOARCH_DIR = noarch
-include Makefile.rules
+#NORECURSE_DIR = autom4te.cache CVS doc tests include
+#QCDOC_DIR = 
+#QCDOC_SERIAL_DIR =
+#QCDSP_DIR =
+#MPI_DIR = mpi
+#NOARCH_DIR = noarch
+#include Makefile.rules
+SRCDIR = @abs_top_srcdir@
+BUILDDIR = @abs_builddir@
+QOS = @QOS@
+
+all: recurse
+
+cps: recurse
+
+depend: recurse
+
+clean: recurse
+
+recurse:
+	mkdir -p $(BUILDDIR)/objs
+	touch -a $(BUILDDIR)/objs/Makefile_depend
+	cp -p $(SRCDIR)/src/Makefile $(BUILDDIR)/objs
+	$(MAKE) -C $(BUILDDIR)/objs $(MAKECMDGOALS)
+
+cleanlib: clean
+	rm -f *.a
 
 install:
 	cp Makefile Makefile.rules Makefile.vars Makefile.compile ${SRCDIR}
 	cp tests/Makefile_common* ${SRCDIR}/tests
+
