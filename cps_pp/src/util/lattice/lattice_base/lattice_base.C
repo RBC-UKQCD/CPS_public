@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.20 2004-09-02 16:56:26 zs Exp $
+  $Id: lattice_base.C,v 1.21 2004-09-17 19:14:41 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:56:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.20 2004-09-02 16:56:26 zs Exp $
-//  $Id: lattice_base.C,v 1.20 2004-09-02 16:56:26 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-17 19:14:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.21 2004-09-17 19:14:41 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.21 2004-09-17 19:14:41 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -1206,7 +1206,6 @@ Float Lattice::SumReTrPlaqNode(void) const
       }
     }
   }
-  
   return sum;
 }
 
@@ -1230,6 +1229,7 @@ Float Lattice::SumReTrPlaq(void) const
 
   Float sum = SumReTrPlaqNode();
   glb_sum(&sum);
+//  printf("sum= %0.18e\n",sum);
   return sum;
 }
 
@@ -2154,7 +2154,10 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
       for(x[3] = 0; x[3] < GJP.TnodeSites(); x[3] += 2) {   // t
         LRG.AssignGenerator(x);
         for(k = 0; k < FsiteSize(); k++) {
-          *(ptr++) = LRG.Grand(frm_dim);
+          *(ptr) = LRG.Grand(frm_dim);
+          sum += *ptr;
+          square += (*ptr)*(*ptr);
+          ptr++;
         }
       }
     } else {
@@ -2172,7 +2175,7 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
 #if 0
   glb_sum_five(&sum);
   glb_sum_five(&square);
-  printf("sum=%e square=%e\n",sum,square);
+  printf("sum=%0.18e square=%0.18e\n",sum,square);
 #endif
 
 }
