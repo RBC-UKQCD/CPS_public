@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.9 2004-08-18 11:57:38 zs Exp $
+  $Id: alg_eig.C,v 1.10 2004-09-06 05:36:35 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.9 2004-08-18 11:57:38 zs Exp $
-//  $Id: alg_eig.C,v 1.9 2004-08-18 11:57:38 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-06 05:36:35 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.10 2004-09-06 05:36:35 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.10 2004-09-06 05:36:35 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -87,33 +87,18 @@ AlgEig::AlgEig(Lattice& latt,
 
   // Allocate memory for the eigenvectors and eigenvalues
   //----------------------------------------------------------------
-  eigenv = (Vector **) smalloc(N_eig * sizeof(Vector *));
-  if(eigenv == 0)
-    ERR.Pointer(cname,fname, "eigenv");
-  VRB.Smalloc(cname,fname, "eigenv", eigenv, N_eig * sizeof(Vector *));
+  eigenv = (Vector **) smalloc(cname,fname,"eigenv",N_eig * sizeof(Vector *));
   
   for(int n = 0; n < N_eig; ++n)
   {
-    eigenv[n] = (Vector *) smalloc(f_size * sizeof(Float));
-    if(eigenv[n] == 0)
-      ERR.Pointer(cname,fname, "eigenv[n]");
-    VRB.Smalloc(cname,fname, "eigenv[n]", eigenv[n], f_size * sizeof(Float));
+    eigenv[n] = (Vector *) smalloc(cname,fname,"eigenv[n]",f_size * sizeof(Float));
   }
 
-  lambda = (Float *) smalloc(N_eig * sizeof(Float));
-  if(lambda == 0)
-    ERR.Pointer(cname,fname, "lambda");
-  VRB.Smalloc(cname,fname, "lambda", lambda, N_eig * sizeof(Float));
+  lambda = (Float *) smalloc(cname,fname,"lambda",N_eig * sizeof(Float));
 
-  chirality = (Float *) smalloc(N_eig * sizeof(Float));
-  if(chirality == 0)
-    ERR.Pointer(cname,fname, "chirality");
-  VRB.Smalloc(cname,fname, "chirality", chirality, N_eig * sizeof(Float));
+  chirality = (Float *) smalloc(cname,fname,"chirality",N_eig * sizeof(Float));
 
-  valid_eig = (int *) smalloc(N_eig * sizeof(int));
-  if(valid_eig == 0)
-    ERR.Pointer(cname,fname, "valid_eig");
-  VRB.Smalloc(cname,fname, "valid_eig", valid_eig, N_eig * sizeof(int));
+  valid_eig = (int *) smalloc(cname,fname,"valid_eig",N_eig * sizeof(int));
 
   // Print out input parameters
   //----------------------------------------------------------------
@@ -142,7 +127,7 @@ AlgEig::~AlgEig() {
   // Free memory
   //----------------------------------------------------------------
   VRB.Sfree(cname,fname, "valid_eig", valid_eig);
-  sfree(lambda);
+  sfree(valid_eig);
 
   VRB.Sfree(cname,fname, "chirality", chirality);
   sfree(chirality);
@@ -216,17 +201,11 @@ void AlgEig::run()
       ERR.General(cname,fname,"Invalid direction\n");
     }
 
-    hsum = (Float **) smalloc(N_eig * sizeof(Float)); // surely Float* ?
-    if(hsum == 0)
-      ERR.Pointer(cname,fname, "hsum");
-    VRB.Smalloc(cname,fname, "hsum", hsum, N_eig * sizeof(Float));
+    hsum = (Float **) smalloc(cname,fname,"hsum",N_eig * sizeof(Float*)); // surely Float* ?
   
     for(int n = 0; n < N_eig; ++n)
     {
-      hsum[n] = (Float *) smalloc(hsum_len * sizeof(Float));
-      if(hsum[n] == 0)
-	ERR.Pointer(cname,fname, "hsum[n]");
-      VRB.Smalloc(cname,fname, "hsum[n]", hsum[n], hsum_len*sizeof(Float));
+      hsum[n] = (Float *) smalloc(cname,fname,"hsum[n]",hsum_len * sizeof(Float));
     }
   }
   else
