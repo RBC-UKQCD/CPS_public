@@ -3,18 +3,21 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.9 2004-01-13 20:38:57 chulwoo Exp $
+  $Id: lattice.h,v 1.10 2004-01-13 21:11:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-01-13 20:38:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.9 2004-01-13 20:38:57 chulwoo Exp $
-//  $Id: lattice.h,v 1.9 2004-01-13 20:38:57 chulwoo Exp $
+//  $Date: 2004-01-13 21:11:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.10 2004-01-13 21:11:07 chulwoo Exp $
+//  $Id: lattice.h,v 1.10 2004-01-13 21:11:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.9  2004/01/13 20:38:57  chulwoo
+//  Merging with multibuild
+//
 //  Revision 1.8.2.1.2.3  2003/11/07 22:24:56  cwj
 //  *** empty log message ***
 //
@@ -98,7 +101,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -536,6 +539,8 @@ class Lattice
     //! Creates a random gaussian spin-colour field.
     void RandGaussVector(Vector *vect, Float sigma, int num_chckbds,
                               FermionFieldDimension frm_field_dim = FIVE_D);
+    void RandGaussVector(Vector *vect, Float sigma, int num_chckbds,
+            StrOrdType str, FermionFieldDimension frm_field_dim = FIVE_D);
         // It produces 3-vectors in canonical storage order
         // for each site of the lattice with random
         // entries weighted according to
@@ -1683,7 +1688,6 @@ class Fasqtad : public virtual FstagTypes
     int xv[3];
     ChkbType parity(const int*);
     void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
-//    void parallel_transport(Vector**, const SCUDir*, int, Vector**);
     void parallel_transport(Vector**, const int*, int, Vector**);
 
     Vector *f_tmp;
