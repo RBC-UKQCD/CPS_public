@@ -54,7 +54,7 @@ subdirs = $(dir $(shell ls doc/*/Makefile))
 webdocs:
 	@echo Creating documentation for the web page
 	@echo This will delete all source code
-	$(MAKE) -f $(MAKEFILE) docs
+	$(MAKE)  docs
 	@rm -rf src include tests
 	@for a in $(subdirs); do $(MAKE) -C $$a all clean; done
 	chmod o= `ls`
