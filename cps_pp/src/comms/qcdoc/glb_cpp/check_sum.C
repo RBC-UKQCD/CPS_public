@@ -44,14 +44,19 @@ unsigned int local_checksum(Float * float_p, int len) {
   return csum;
 }
 
-#if 0
 unsigned int global_checksum(Float * float_p, int len) {
+  unsigned int locsum = local_checksum(float_p, len);
+  unsigned int glbsum = glb_sum_internal2(&locsum,4,0); // 0 for XOR
+  return glbsum;
+}
+
+unsigned int test_checksum(Float * float_p, int len) {
   static int gcsum_count = 1;
   unsigned int locsum = local_checksum(float_p, len);
   unsigned int bosssum;
   if(UniqueID() == 0) bosssum = locsum;
   else                bosssum = 0;
-  glb_sum_internal2(&bosssum,4);
+  glb_sum_internal2(&bosssum,4,0); // 0 for XOR
   if(bosssum != locsum) {
       fprintf( stderr,
                "GCheckSum %d : Node %d : Oops I did it again: me (%d,%d,%d,%d,%d) %u != boss %u\n",
@@ -68,6 +73,5 @@ unsigned int global_checksum(Float * float_p, int len) {
 
   return bosssum;
 }
-#endif
 
 CPS_END_NAMESPACE

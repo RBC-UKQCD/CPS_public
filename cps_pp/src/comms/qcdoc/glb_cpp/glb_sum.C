@@ -47,11 +47,11 @@ static int output = 0;
 */
 //---------------------------------------------------------------------- 
 void glb_sum(Float * float_p)
-#if 1
 {
-	glb_sum_internal2(float_p,4);
+  glb_sum_internal2(float_p,4);
 }
-#else
+
+void glb_sum_gimp(Float * float_p)
 {
   int NP[4] = {GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes()};
   static int counter = 0;
@@ -85,5 +85,5 @@ void glb_sum(Float * float_p)
   if (output)   printf("after = %e\n", (double)*float_p);
   counter++;
 }
-#endif
+
 CPS_END_NAMESPACE

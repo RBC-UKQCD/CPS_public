@@ -27,6 +27,10 @@ CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 
+union DoubleBytes {
+    Float dblval;
+    char byte[8];
+};
 
 static Double64 *transmit_buf = NULL;
 static Double64 *receive_buf = NULL;
@@ -46,12 +50,12 @@ static Double64 *gsum_buf = NULL;
 //---------------------------------------------------------------------- 
 
 static int initted=0;
-static SCUDirArgIR *Send[5];
-static SCUDirArgIR *Recv[5];
 void glb_sum_internal2(Float * float_p,int ndir)
 {
   static int NP[5] ={0,0,0,0,0};
   static int coor[5] ={0,0,0,0,0};
+  static SCUDirArgIR *Send[5];
+  static SCUDirArgIR *Recv[5];
 
   if (!initted){
       NP[0] = GJP.Xnodes();
@@ -99,6 +103,68 @@ void glb_sum_internal2(Float * float_p,int ndir)
       }
   }
   *float_p = (Float)tmp_sum;
+
+}
+
+static int initted_u=0;
+
+static unsigned long long *transmit_buf_u = NULL;
+static unsigned long long *receive_buf_u = NULL;
+static unsigned long long *gsum_buf_u = NULL;
+
+void glb_sum_internal2(unsigned int *uint_p, int ndir, int sum_flag) {
+  static int NP[5] = {0,0,0,0,0};
+  static int coor[5] = {0,0,0,0,0};
+  static SCUDirArgIR *Send[5];
+  static SCUDirArgIR *Recv[5];
+  
+  if (!initted_u) {
+	NP[0] = GJP.Xnodes();
+	int max = NP[0];
+	NP[1] = GJP.Ynodes();
+	NP[2] = GJP.Znodes();
+	NP[3] = GJP.Tnodes();
+	NP[4] = GJP.Snodes();
+	for (int i = 1;i<5;i++)
+	  if (max<NP[i]) max = NP[i];
+	transmit_buf_u = (unsigned long long*)qalloc(QFAST|QNONCACHE,sizeof(unsigned long long)*2);
+	receive_buf_u = transmit_buf_u+1;
+	gsum_buf_u = (unsigned long long*)qalloc(QFAST,sizeof(unsigned long long)*max);
+	for(int i=0; i<5; i++)
+      if (NP[i]>1) {
+		Send[i] = new SCUDirArgIR(transmit_buf_u, gjp_scu_dir[2*i+1], SCU_SEND, sizeof(unsigned long long));
+		Recv[i] = new SCUDirArgIR(receive_buf_u, gjp_scu_dir[2*i], SCU_REC, sizeof(unsigned long long));
+      }
+  }
+  initted_u = 1;
+  
+  // Sum over the "virtual" 5-dimensional mesh
+  //------------------------------------------------------------
+  //  gsum_buf_u[0] = (unsigned long long)*float_p;
+  
+  unsigned int tmp_sum = *uint_p;
+  
+  for(int i=0; i<ndir; ++i) 
+	if (NP[i] > 1) {
+      int coor = GJP.NodeCoor(i);
+	  //printf("coor[%d]=%d\n",i,coor);
+      *transmit_buf_u = gsum_buf_u[coor] = (unsigned long long)tmp_sum;
+	  
+      for (int itmp = 1; itmp < NP[i]; itmp++) {
+		coor = (coor+1)%NP[i];
+		Send[i]->StartTrans(); Recv[i]->StartTrans();
+		Send[i]->TransComplete(); Recv[i]->TransComplete();
+		
+        gsum_buf_u[coor] = *receive_buf_u;
+        *transmit_buf_u = *receive_buf_u;
+      }
+      tmp_sum = (unsigned int)gsum_buf_u[0];
+      for (int itmp = 1; itmp < NP[i]; itmp++) {
+	if (sum_flag) tmp_sum += (unsigned int)gsum_buf_u[itmp];
+	else  tmp_sum ^= (unsigned int)gsum_buf_u[itmp];
+      }
+	}
+  *uint_p = tmp_sum;
 
 }
 
