@@ -3,18 +3,24 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class Ritz eigensolver methods.
 
-  $Id: ritz.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: ritz.C,v 1.3 2003-08-29 21:21:48 mike Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/ritz.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: ritz.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Author: mike $
+//  $Date: 2003-08-29 21:21:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/ritz.C,v 1.3 2003-08-29 21:21:48 mike Exp $
+//  $Id: ritz.C,v 1.3 2003-08-29 21:21:48 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.4  2001/08/16 10:50:16  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -39,7 +45,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: ritz.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/ritz.C,v $
 //  $State: Exp $
 //
@@ -150,7 +156,7 @@ CPS_START_NAMESPACE
   \post Each vector in the array \a psi is orthogonal to all of the vectors
   in the array \a vec.
 */
-void GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size) 
+void DiracOp::GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size) 
 {
   Complex xp;
 
@@ -290,7 +296,7 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   /*  IF |g[0]| <= min(RsdR_a, RsdR_r |mu[0]|) THEN RETURN; */
   rsd = rsdr_sq * lambda * lambda;
   rsd = (rsda_sq > rsd) ? rsda_sq : rsd;
-  if ( Kalk_Sim == 0 && g2 <= rsd )
+  if ( Kalk_Sim == 0 && N_min <= 0 && g2 <= rsd )
   {
     /*  Copy psi back into psi_all(N_eig-1)  */
     psi_all[nn]->CopyVec(psi, f_size);
@@ -393,7 +399,7 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
     st = Rsdlam * fabs(mu);	/* old value of st is no longer needed */
 
 /*    if ( TO_REAL(g2) <= rsd && del_lam <= st ) */
-    if ( (Kalk_Sim == 0 && (fabs(mu) < Cutl_zero ||
+    if ( (Kalk_Sim == 0 && k >= N_min && (fabs(mu) < Cutl_zero ||
 	       (g2 <=  rsd && del_lam <= st ) ) ) ||
 	 (Kalk_Sim == 1 && ( del_lam <= st || fabs(mu) < Cutl_zero ||
 	       (k >= N_min && (g2 < g2_0 || k >= N_max ) ) ) ) )
