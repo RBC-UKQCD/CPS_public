@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.1 2003-10-30 06:11:22 cwj Exp $
+  $Id: Fforce.C,v 1.2 2003-10-30 19:28:16 zs Exp $
 */
 //--------------------------------------------------------------------
 
@@ -612,7 +612,6 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    mf = force[mu][s];
 	    mfd.Dagger((IFloat*)&mf);
 	    mf.TrLessAntiHermMatrix(mfd);
-	    mf *= 0.5;				// for MILC compatibility
 	    fTimesV1PlusV2((IFloat*)(ip+mu), dt, (IFloat*)&mf,
 			   (IFloat*)(ip+mu)+BANK4_BASE, MATRIX_SIZE);
 	}
