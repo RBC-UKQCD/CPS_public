@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-10-14 22:03:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.8 2004-10-14 22:03:48 chulwoo Exp $
-//  $Id: dwf_init.C,v 1.8 2004-10-14 22:03:48 chulwoo Exp $
+//  $Date: 2004-10-15 03:59:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.9 2004-10-15 03:59:06 chulwoo Exp $
+//  $Id: dwf_init.C,v 1.9 2004-10-15 03:59:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_init.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v $
 //  $State: Exp $
 //
@@ -118,7 +118,7 @@ void dwf_init(Dwf *dwf_p)
 //------------------------------------------------------------------
   int ls_stride = 12*dwf_p->vol_4d;
 //  dwf_p->comm_buf = (IFloat *) fmalloc(ls_stride*sizeof(IFloat));
-  int ls = dwf_p->ls;
+  int ls = GJP.Snodes();
   if (ls >1)
   dwf_p->comm_buf = (IFloat *) qalloc(QFAST|QNONCACHE,ls_stride*sizeof(IFloat));
   else
@@ -150,14 +150,15 @@ void dwf_end( Dwf *dwf_p)
   char *cname = " ";
   char *fname = "dwf_end(Dwf*)";
   VRB.Func(cname,fname);
-
+int ls = GJP.Snodes();
   //------------------------------------------------------------------
   // Free memory of the 12 word communications buffer needed
   // for the spread-out case.
   //------------------------------------------------------------------
+ 
   VRB.Sfree(cname,fname, "comm_buf", dwf_p->comm_buf);
   ffree(dwf_p->comm_buf);
-
+ 
   //----------------------------------------------------------------
   // Free temporary femrion fields 2 and 1
   //----------------------------------------------------------------
@@ -167,14 +168,14 @@ void dwf_end( Dwf *dwf_p)
   VRB.Sfree(cname,fname, "frm_tmp1", dwf_p->frm_tmp1);
   sfree(dwf_p->frm_tmp1);
 
+ if(ls>1){
   for(int i = 0;i<2;i++){
     delete (dwf_p->PlusArg[i]);
     delete (dwf_p->MinusArg[i]);
   }
   delete (dwf_p->Plus);
   delete (dwf_p->Minus);
-
-
+ }
 
   //----------------------------------------------------------------
   // Un-initialize the wilson library. Memory is set free here.
