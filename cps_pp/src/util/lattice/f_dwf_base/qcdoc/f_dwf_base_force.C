@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.3 2005-02-14 00:10:14 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.4 2005-02-14 05:44:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -124,10 +124,8 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 	numblk[i] = numblk[i-1] / size[i];
     stride[i] = blklen[i] * (size[i]-1);
   }
-//  printf("blklen numblk stride surf\n");
   for (int i =0;i<4;i++){
     surf[i] = GJP.VolNodeSites()/size[i];
-//	printf("%d %d %d %d\n",blklen[i],numblk[i],stride[i],surf[i]);
   }
 
   //----------------------------------------------------------------
@@ -141,18 +139,13 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   char *str_site_v2 = "site_v2" ;
 
   Float *v1_buf[4],*v2_buf[4];
+  int pos[4];
+  Float *v1_buf_pos[4];
+  Float *v2_buf_pos[4];
   for(int i =0;i<4;i++) {
-    v1_buf[i]=(Float *)smalloc(cname,fname,"v1_buf",surf[i]*FsiteSize()*sizeof(Float)) ;
-    v2_buf[i]=(Float *)smalloc(cname,fname,"v2_buf",surf[i]*FsiteSize()*sizeof(Float)) ;
+    v1_buf[i]=(Float *)fmalloc(cname,fname,"v1_buf",surf[i]*FsiteSize()*sizeof(Float)) ;
+    v2_buf[i]=(Float *)fmalloc(cname,fname,"v2_buf",surf[i]*FsiteSize()*sizeof(Float)) ;
   }
-
-    Float *site_v1=(Float *)qalloc(QFAST|QNONCACHE,FsiteSize()*sizeof(Float)) ;
-    if (site_v1 == 0) ERR.Pointer(cname, fname, str_site_v1) ;
-    VRB.Smalloc(cname, fname, str_site_v1, site_v1, FsiteSize()*sizeof(Float)) ;
-    Float *site_v2=(Float *)qalloc(QFAST|QNONCACHE,FsiteSize()*sizeof(Float)) ;
-    if (site_v2 == 0) ERR.Pointer(cname, fname, str_site_v2) ;
-    VRB.Smalloc(cname, fname, str_site_v2, site_v2, FsiteSize()*sizeof(Float)) ;
-
 
   Matrix tmp_mat1, tmp_mat2 ;
 
@@ -190,32 +183,10 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
     }
   }
   for (mu=0; mu<4; mu++){
-    if ( GJP.Nodes(mu) >1){
-      Recv[mu].TransComplete();
-      Send[mu].TransComplete();
-    }
-  }
- 
-//------------------------------------------------------------------
-// start by summing first over direction (mu) and then over site
-// to allow SCU transfers to happen face-by-face in the outermost
-// loop.
-//------------------------------------------------------------------
-
-  int pos[4];
-  Float *v1_buf_pos[4];
-  Float *v2_buf_pos[4];
-  for(int i = 0;i<4;i++){
-    v1_buf_pos[i] = v1_buf[i];
-    v2_buf_pos[i] = v2_buf[i];
- //   printf("v1_buf v2_buf (%d)= %x %x\n",mu,v1_buf_pos[i],v2_buf_pos[i]);
-  }
-  for (mu=0; mu<4; mu++){
     for (pos[3]=0; pos[3]<size[3]; pos[3]++){
     for (pos[2]=0; pos[2]<size[2]; pos[2]++){
     for (pos[1]=0; pos[1]<size[1]; pos[1]++){
     for (pos[0]=0; pos[0]<size[0]; pos[0]++){
-//      int gauge_offset = x+lx*(y+ly*(z+lz*t)) ;
       int gauge_offset = offset(size,pos);
       int vec_offset = f_site_size_4d*gauge_offset ;
       gauge_offset = mu+4*gauge_offset ;
@@ -228,34 +199,11 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       Float coeff = -2.0 * step_size ;
 
           vec_plus_mu_offset *= offset(size,pos,mu);
-          if ((GJP.Nodes(mu)>1)&&((pos[mu]+1) == size[mu]) ) {
-#if 0
-            for (s=0; s<ls; s++) {
-              getPlusData( (IFloat *)site_v1+s*f_site_size_4d,
-                (IFloat *)v1+vec_plus_mu_offset+s*f_size_4d,
-                f_site_size_4d, mu) ;
-              getPlusData( (IFloat *)site_v2+s*f_site_size_4d,
-                (IFloat *)v2+vec_plus_mu_offset+s*f_size_4d,
-                f_site_size_4d, mu) ;
-//			printf("site_v1 site_v2= %e %e\n",*(site_v1+s*f_site_size_4d),*(site_v2+s*f_site_size_4d));
-            } // end for s
-#endif
-            v1_plus_mu = v1_buf_pos[mu] ;
-            v2_plus_mu = v2_buf_pos[mu] ;
-//			printf("v1_buf v2_buf= %x %x\n",v1_plus_mu,v2_plus_mu);
-//			printf("v1_buf v2_buf= %e %e\n",*v1_plus_mu,*v2_plus_mu);
-			fflush(stdout);
- 			v1_buf_pos[mu] += f_site_size_4d;
- 			v2_buf_pos[mu] += f_site_size_4d;
-            vec_plus_mu_stride = (surf[mu] -1)*f_site_size_4d ;
-//			printf("v1_buf v2_buf= %e %e\n",*(v1_plus_mu+surf[mu]*f_site_size_4d),*(v2_plus_mu+surf[mu]*f_site_size_4d));
-//            if (GJP.XnodeBc()==BND_CND_APRD) coeff = -coeff ;
-            if (GJP.NodeBc(mu)==BND_CND_APRD) coeff = -coeff ;
-          } else {
+      if ((GJP.Nodes(mu)>1)&&((pos[mu]+1) == size[mu]) ) {
+      } else {
             v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
             v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
             vec_plus_mu_stride = f_size_4d - f_site_size_4d ;
-          }
 
 //     Float time2 = -dclock();
       sproj_tr[mu]( (IFloat *)&tmp_mat1,
@@ -286,9 +234,87 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       tmp_mat2 *= coeff ;
 
       *(mom+gauge_offset) += tmp_mat2 ;
+    }
 
     } } } } // end for x,y,z,t
   } // end for mu
+  for (mu=0; mu<4; mu++){
+    if ( GJP.Nodes(mu) >1){
+      Recv[mu].TransComplete();
+      Send[mu].TransComplete();
+    }
+  }
+ 
+//------------------------------------------------------------------
+// start by summing first over direction (mu) and then over site
+// to allow SCU transfers to happen face-by-face in the outermost
+// loop.
+//------------------------------------------------------------------
+
+  for(int i = 0;i<4;i++){
+    v1_buf_pos[i] = v1_buf[i];
+    v2_buf_pos[i] = v2_buf[i];
+  }
+
+  for (mu=0; mu<4; mu++){
+    for (pos[3]=0; pos[3]<size[3]; pos[3]++){
+    for (pos[2]=0; pos[2]<size[2]; pos[2]++){
+    for (pos[1]=0; pos[1]<size[1]; pos[1]++){
+    for (pos[0]=0; pos[0]<size[0]; pos[0]++){
+      int gauge_offset = offset(size,pos);
+      int vec_offset = f_site_size_4d*gauge_offset ;
+      gauge_offset = mu+4*gauge_offset ;
+
+      Float *v1_plus_mu ;
+      Float *v2_plus_mu ;
+      int vec_plus_mu_stride ;
+      int vec_plus_mu_offset = f_site_size_4d ;
+
+      Float coeff = -2.0 * step_size ;
+
+          vec_plus_mu_offset *= offset(size,pos,mu);
+      if ((GJP.Nodes(mu)>1)&&((pos[mu]+1) == size[mu]) ) {
+            v1_plus_mu = v1_buf_pos[mu] ;
+            v2_plus_mu = v2_buf_pos[mu] ;
+ 			v1_buf_pos[mu] += f_site_size_4d;
+ 			v2_buf_pos[mu] += f_site_size_4d;
+            vec_plus_mu_stride = (surf[mu] -1)*f_site_size_4d ;
+            if (GJP.NodeBc(mu)==BND_CND_APRD) coeff = -coeff ;
+
+//     Float time2 = -dclock();
+      sproj_tr[mu]( (IFloat *)&tmp_mat1,
+                    (IFloat *)v1_plus_mu,
+                    (IFloat *)v2+vec_offset,
+                    ls, vec_plus_mu_stride, f_size_4d-f_site_size_4d) ;
+
+      sproj_tr[mu+4]( (IFloat *)&tmp_mat2,
+                      (IFloat *)v2_plus_mu,
+                      (IFloat *)v1+vec_offset,
+                      ls, vec_plus_mu_stride, f_size_4d-f_site_size_4d) ;
+ //    time2 += dclock();
+ //    print_flops("","sproj",2*9*16*ls,time2);
+
+      tmp_mat1 += tmp_mat2 ;
+
+      // If GJP.Snodes > 1 sum up contributions from all s nodes
+      if(GJP.Snodes() != 1) {
+	  glb_sum_multi_dir((Float *)&tmp_mat1, 4, sizeof(Matrix)/sizeof(IFloat) ) ;
+      }
+
+      tmp_mat2.DotMEqual(*(gauge+gauge_offset), tmp_mat1) ;
+
+      tmp_mat1.Dagger(tmp_mat2) ;
+
+      tmp_mat2.TrLessAntiHermMatrix(tmp_mat1) ;
+
+      tmp_mat2 *= coeff ;
+
+      *(mom+gauge_offset) += tmp_mat2 ;
+    }
+
+    } } } } // end for x,y,z,t
+  } // end for mu
+
   ForceFlops += (2*9*16*ls + 18+ 198+36+24)*lx*ly*lz*lt*4;
 #ifdef PROFILE
   time += dclock();
@@ -298,15 +324,10 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 //------------------------------------------------------------------
 // deallocate smalloc'd space
 //------------------------------------------------------------------
-  VRB.Sfree(cname, fname, str_site_v2, site_v2) ;
-  qfree(site_v2) ;
- 
-  VRB.Sfree(cname, fname, str_site_v1, site_v1) ;
-  qfree(site_v1) ;
 
   for(int i =0;i<4;i++) {
-    sfree(cname,fname,"v1_buf",v1_buf[i]);
-    sfree(cname,fname,"v2_buf",v2_buf[i]);
+    ffree(cname,fname,"v1_buf",v1_buf[i]);
+    ffree(cname,fname,"v2_buf",v2_buf[i]);
   }
  
   VRB.Sfree(cname, fname, str_v2, v2) ;
