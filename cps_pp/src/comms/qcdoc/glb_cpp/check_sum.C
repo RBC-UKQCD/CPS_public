@@ -46,8 +46,8 @@ unsigned int local_checksum(Float * float_p, int len) {
 
 unsigned int global_checksum(Float * float_p, int len) {
   unsigned int locsum = local_checksum(float_p, len);
-  unsigned int glbsum = glb_sum_internal2(&locsum,4,0); // 0 for XOR
-  return glbsum;
+  glb_sum_internal2(&locsum,4,0); // 0 for XOR
+  return locsum;
 }
 
 unsigned int test_checksum(Float * float_p, int len) {

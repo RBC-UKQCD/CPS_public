@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations of collective communications routines
 
-  $Id: glb.h,v 1.5 2005-03-07 00:03:22 chulwoo Exp $
+  $Id: glb.h,v 1.6 2005-03-07 22:37:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:03:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v 1.5 2005-03-07 00:03:22 chulwoo Exp $
-//  $Id: glb.h,v 1.5 2005-03-07 00:03:22 chulwoo Exp $
+//  $Date: 2005-03-07 22:37:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v 1.6 2005-03-07 22:37:25 chulwoo Exp $
+//  $Id: glb.h,v 1.6 2005-03-07 22:37:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v $
 //  $State: Exp $
 //
@@ -79,9 +79,8 @@ slice_sum(Float * float_p, int blcklength, int dir);
 
 
 extern unsigned int local_checksum(Float * float_p, int len);
-#if 0
 extern unsigned int global_checksum(Float * float_p, int len);
-#endif
+extern unsigned int test_checksum(Float * float_p, int len);
 
 #endif
 

@@ -1,5 +1,4 @@
 #include<config.h>
-#include<qalloc.h>
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
@@ -24,13 +23,8 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include <util/data_types.h>
+//#include <util/data_types.h>
 #include<comms/glb.h>
-#include "glb_sum_internal.h"
-//#include<comms/scu.h>
-//#include<util/gjp.h>
-//#include<comms/double64.h>
-//#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 
 unsigned int local_checksum(Float * float_p, int len) {

@@ -207,8 +207,8 @@ extern void vml_struct_end   (VML *vmls, char *type, char *instance);
 extern void vml_class_begin (VML *vmls, char *type, char *instance);
 extern void vml_class_end   (VML *vmls, char *type, char *instance);
 
-  #ifdef __cplusplus 
-  }
-  #endif
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* rpc/vml.h */

@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.18 2005-03-07 00:33:43 chulwoo Exp $
+  $Id: pt.C,v 1.19 2005-03-07 22:37:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:33:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.18 2005-03-07 00:33:43 chulwoo Exp $
-//  $Id: pt.C,v 1.18 2005-03-07 00:33:43 chulwoo Exp $
+//  $Date: 2005-03-07 22:37:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.19 2005-03-07 22:37:27 chulwoo Exp $
+//  $Id: pt.C,v 1.19 2005-03-07 22:37:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -1684,7 +1684,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   SCUmulti.SlowStartTrans();
   //End transmission
   SCUmulti.TransComplete();
-  //#define CPP
+//  #define CPP
   //Initerleaving of local computation of matrix multiplication
   for(i=0;i<n;i++){
 #ifdef CPP
@@ -1708,6 +1708,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   print_flops("",fname,198*vol*n,dtime);
 #endif
 //  ParTrans::PTflops +=198*n*vol;
+  #undef CPP
 }
 
 
@@ -1901,7 +1902,6 @@ void PT::shift_field(IFloat **v, const int *dir, int n_dir,
 void PT::shift_link(IFloat **u, const int *dir, int n_dir){
 
   char *fname = "pt_shift_link()";
-//  VRB.Func("",fname);
   int length;
   for (int i=0; i<n_dir; i++) {
     

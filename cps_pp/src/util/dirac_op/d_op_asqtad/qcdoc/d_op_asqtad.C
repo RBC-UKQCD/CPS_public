@@ -391,7 +391,7 @@ int DiracOpAsqtad::MatInv(Vector *out,
   IFloat *k_o = k_e+f_size_cb;
 
   Vector *tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
-#define TEST_ASQD
+#undef TEST_ASQD
 #ifdef TEST_ASQD
   Vector *out2 = (Vector *) smalloc(f_size_cb * sizeof(Float));
   memcpy( out2,out,f_size_cb * sizeof(Float));

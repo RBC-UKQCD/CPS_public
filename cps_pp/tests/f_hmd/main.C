@@ -4,13 +4,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:46:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.25 2005-03-07 00:46:16 chulwoo Exp $
-//  $Id: main.C,v 1.25 2005-03-07 00:46:16 chulwoo Exp $
+//  $Date: 2005-03-07 22:35:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.26 2005-03-07 22:35:01 chulwoo Exp $
+//  $Id: main.C,v 1.26 2005-03-07 22:35:01 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.25 $
+//  $Revision: 1.26 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -29,8 +29,8 @@ USING_NAMESPACE_CPS
 static int nx,ny,nz,nt,ns;
 const int SAVE_RNG = 0;
 const int LOAD_RNG = 0;
-const int LOAD_DOARG = 0;
-const int SAVE_DOARG = 0;
+const int LOAD_DOARG = 1;
+const int SAVE_DOARG = 1;
 
 int main(int argc,char *argv[])
 {

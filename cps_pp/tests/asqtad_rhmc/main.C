@@ -54,7 +54,7 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   VRB.Level(0);
 //  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
-  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
 
   char *cname = "asqtad_rhmc";

@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.14 2005-02-18 19:56:00 mclark Exp $
+  $Id: alg_hmd_r.C,v 1.15 2005-03-07 22:37:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2005-02-18 19:56:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.14 2005-02-18 19:56:00 mclark Exp $
-//  $Id: alg_hmd_r.C,v 1.14 2005-02-18 19:56:00 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 22:37:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.15 2005-03-07 22:37:25 chulwoo Exp $
+//  $Id: alg_hmd_r.C,v 1.15 2005-03-07 22:37:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //
@@ -324,8 +324,8 @@ Float AlgHmdR::run(void)
     // and gaussian random vector.
     //--------------------------------------------------------------
     for(i=0; i<n_frm_masses; i++){
-      if (flavor_time_step[i] > 0.0) 
-	lat.EvolveGfield(mom, flavor_time_step[i]);
+//      if (flavor_time_step[i] > 0.0) 
+      lat.EvolveGfield(mom, flavor_time_step[i]);
       lat.MdTimeInc(flavor_time_step[i] / dt);
       VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
       lat.RandGaussVector(frm1, 0.5, Ncb);

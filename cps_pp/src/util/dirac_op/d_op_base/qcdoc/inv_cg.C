@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:24:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.14 2005-03-07 00:24:47 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.14 2005-03-07 00:24:47 chulwoo Exp $
+//  $Date: 2005-03-07 22:37:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.15 2005-03-07 22:37:27 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.15 2005-03-07 22:37:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -35,8 +35,7 @@ CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/verbose.h>
 #include <util/error.h>
-#include <comms/nga_reg.h>
-#include <comms/cbuf.h>
+#include <comms/glb.h>
 #include <math.h>
 #include <stdio.h>
 #include <qcdocos/gint.h>
@@ -49,12 +48,6 @@ CPS_START_NAMESPACE
 #include <time.h>
 #include <sys/time.h>
 void report_flops(int flops, struct timeval *start,struct timeval *end);
-#endif
-
-#ifdef  PARALLEL
-//Uncomment the following line to activate reproducibility test
-#undef REPRODUCE_TEST
-//#undef REPRODUCE_TEST
 #endif
 
 CPS_END_NAMESPACE
@@ -147,7 +140,8 @@ int DiracOp::InvCg(Vector *out,
   } else {
     f_size_cb = GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
   }
-  
+  VRB.Result(cname,fname, "Input checksum = %p\n",
+      global_checksum((Float *)in,f_size_cb));
   if (f_size_cb % GRAN != 0) 
     ERR.General(cname,fname,"Field length %d is not a multiple of granularity %d\n", GRAN, f_size_cb);
 
@@ -181,7 +175,6 @@ int DiracOp::InvCg(Vector *out,
   if(mmp == 0){
     mmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
   }
-  printf("dir=%p mmp=%p\n",dir,mmp);
   if(mmp == 0)
     ERR.Pointer(cname,fname, "mmp");
   VRB.Smalloc(cname,fname, "mmp", mmp, f_size_cb * sizeof(Float));
@@ -192,13 +185,6 @@ int DiracOp::InvCg(Vector *out,
     src_norm_sq = src->NormSqNode(f_size_cb);
     DiracOpGlbSum(&src_norm_sq);
   }
-#if 0
-  {
-    IFloat *tmp = (IFloat *)src;
-    printf("src[0]=%e src_norm_sq=%e\n",*tmp,src_norm_sq);
-
-  }
-#endif
 
 // Calculate stopping condition
 //------------------------------------------------------------------
@@ -207,7 +193,7 @@ int DiracOp::InvCg(Vector *out,
 
 
   Vector *sol_store;
-  Float *d_store;
+  unsigned int *d_store;
   int test_num = 0;
 
   int test_freq = GJP.CGreprodFreq();
@@ -223,7 +209,7 @@ int DiracOp::InvCg(Vector *out,
   
 // Allocate space for storing d
 //------------------------------------------------------------------
-    d_store = (Float *) smalloc( (dirac_arg->max_num_iter-1) * sizeof(Float));
+    d_store = (unsigned int *) smalloc( (dirac_arg->max_num_iter-1) * sizeof(unsigned int));
   
     if(d_store == 0) ERR.Pointer(cname,fname, "d_store");
     VRB.Smalloc(cname,fname, "d_store", d_store, (dirac_arg->max_num_iter-1) * sizeof(Float));
@@ -314,11 +300,12 @@ int DiracOp::InvCg(Vector *out,
       MatPcDagMatPc(mmp, dir, &d);
   
     if (test_num) {
-  
+      unsigned int mmp_checksum = local_checksum((Float *)mmp,f_size_cb);
       /* Check reproducibility */
-      if ( test == 0) d_store[ i ] = d;
-      else if ( d != d_store[ i ] ){
+      if ( test == 0) d_store[ i ] = mmp_checksum;
+      else if ( mmp_checksum != d_store[ i ] ){
         fprintf(stderr, "NODE FAILS TO REPRODUCE");
+        fprintf(stderr,"mmp =%p mmp_store = %p\n",mmp_checksum,d_store[i]);
         InterruptExit(-1, "NODE FAILS TO REPRODUCE");
       }
       /* End of Check */
@@ -403,6 +390,8 @@ int DiracOp::InvCg(Vector *out,
     }
     VRB.Result(cname,fname, "True |res| / |src| = %e, iter = %d\n", 
   	     IFloat(tmp), itr+1);
+    VRB.Result(cname,fname, "Output checksum = %p\n",
+      global_checksum((Float *)out,f_size_cb));
   }
 
   if (test_num) {
