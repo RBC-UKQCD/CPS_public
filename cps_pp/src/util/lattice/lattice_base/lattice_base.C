@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.11 2004-07-09 04:15:19 chulwoo Exp $
+  $Id: lattice_base.C,v 1.12 2004-07-15 22:27:37 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 04:15:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.11 2004-07-09 04:15:19 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.11 2004-07-09 04:15:19 chulwoo Exp $
+//  $Date: 2004-07-15 22:27:37 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.12 2004-07-15 22:27:37 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.12 2004-07-15 22:27:37 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -1981,7 +1981,7 @@ void Lattice::RandGaussAntiHermMatrix(Matrix *mat, Float sigma2)
   char *fname = "RandGaussAntiHermMatrix(M*,F)";
   VRB.Func(cname,fname);
 
-#ifdef _TARTAN
+#if TARGET == QCDSP
     IFloat *a = (IFloat *)CRAM_SCRATCH_ADDR;
 #else
     IFloat a[8];
@@ -1994,7 +1994,7 @@ void Lattice::RandGaussAntiHermMatrix(Matrix *mat, Float sigma2)
 	LRG.AssignGenerator(n);
 	for(int j = 0; j < 4; j++) {
 	    for(int i = 0; i < 8; ++i) {
-		*(a+i) = LRG.Grand();
+		*(a+i) = LRG.Grand(FOUR_D);
 	    }
 	    p->AntiHermMatrix(a);
 	    p++;
@@ -2072,12 +2072,13 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
 
   int s_node_sites = GJP.SnodeSites();
   if(frm_dim == FOUR_D || s_node_sites == 0  || Fclass() != F_CLASS_DWF) {
-    s_node_sites = 1;
+    s_node_sites = 1; frm_dim = FOUR_D;
   }
   LRG.SetSigma(sigma2);
 
   IFloat * ptr = (IFloat *) frm;
   int checker, i, k, s, x[4];
+  IFloat sum=0.0,square=0.0;
 
 
 //  printf("num_chkbds=%d vec_size=%d s_node_sites=%d \n",num_chkbds,vec_size,s_node_sites);fflush(stdout);
@@ -2093,7 +2094,7 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
           LRG.AssignGenerator(x[0],x[1],x[2],x[3],s);
 //	printf("%d %d %d %d %d \n",x[0],x[1],x[2],x[3],s);
           for(k = 0; k < vec_size; k++) {
-            *(ptr++) = LRG.Grand();
+            *(ptr++) = LRG.Grand(frm_dim);
           }
         }
       }
@@ -2107,7 +2108,7 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
       for(x[3] = 0; x[3] < GJP.TnodeSites(); x[3] += 2) {   // t
         LRG.AssignGenerator(x);
         for(k = 0; k < FsiteSize(); k++) {
-          *(ptr++) = LRG.Grand();
+          *(ptr++) = LRG.Grand(frm_dim);
         }
       }
     } else {
@@ -2115,11 +2116,20 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
         LRG.AssignGenerator(i);
 //	printf("i=%d\n",i);
         for(k = 0; k < vec_size; k++) {
-          *(ptr++) = LRG.Grand();
+          *(ptr) = LRG.Grand(frm_dim);
+//	  if(k==0) fprintf(stderr,"%e\n",*ptr);fflush(stderr);
+          sum += *ptr;
+          square += (*ptr)*(*ptr);
+ 	  ptr++;
         }
       }
     }
   }
+#if 0
+  glb_sum_five(&sum);
+  glb_sum_five(&square);
+  printf("sum=%e square=%e\n",sum,square);
+#endif
 
 }
 
@@ -2162,7 +2172,7 @@ void Lattice::SetGfieldDisOrd(void){
   for(int i=0; i<GJP.VolNodeSites(); i++) {
     LRG.AssignGenerator(i);
     for(int k = 0; k < site_size; k++) {
-      *(pmat++) = LRG.Urand();
+      *(pmat++) = LRG.Urand(FOUR_D);
 //      printf("i=%d *pmat=%e\n",i,*(pmat-1));
     }
   }
