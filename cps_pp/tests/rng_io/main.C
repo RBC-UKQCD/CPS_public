@@ -1,7 +1,8 @@
+#include <config.h>
 #include <util/latrngio.h>
 #include <util/gjp.h>
 #include <alg/do_arg.h>
-
+#include <comms/sysfunc.h>
 #include <stdlib.h>
 
 
