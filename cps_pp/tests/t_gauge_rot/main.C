@@ -1,4 +1,4 @@
-///  $Id: main.C,v 1.11 2004-09-21 20:16:55 chulwoo Exp $
+///  $Id: main.C,v 1.12 2004-10-27 14:34:22 zs Exp $
 ///  Demonstrate the random gauge transformation code.
 ///
 
@@ -14,7 +14,6 @@
  The gauge transformation code was orginally written
  by Chris Dawson (using existing code from the BNL group).
 
-$Id: main.C,v 1.11 2004-09-21 20:16:55 chulwoo Exp $
 */
 
 #include <config.h>
@@ -30,6 +29,7 @@ $Id: main.C,v 1.11 2004-09-21 20:16:55 chulwoo Exp $
 #include <alg/alg_rnd_gauge.h>
 #include<util/testing_framework.h>
 #include<util/dump_xml.h>
+#include <comms/sysfunc.h>
 
 USING_NAMESPACE_CPS
 
