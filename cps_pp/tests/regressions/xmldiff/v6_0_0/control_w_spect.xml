@@ -1,0 +1,424 @@
+<?xml version="1.0"?>
+<CpsDataStore>
+<a0.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+-1.4003954066e+00   -1.0403947310e+00
+</last>
+</fileContent>
+</a0.dat>
+<a0_prime.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+2.2492961048e+00   -6.7672838306e-01
+</last>
+</fileContent>
+</a0_prime.dat>
+<a1_x.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+2.5515369597e-01   9.1861431946e-01
+</last>
+</fileContent>
+</a1_x.dat>
+<a1_y.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+2.7746712823e-01   9.8710832403e-01
+</last>
+</fileContent>
+</a1_y.dat>
+<a1_z.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+2.3198752567e-02   7.6938179041e-01
+</last>
+</fileContent>
+</a1_z.dat>
+<b1_x.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+-1.0915654966e+00   7.2911218243e-01
+</last>
+</fileContent>
+</b1_x.dat>
+<b1_y.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+-1.1124445068e+00   7.0155887414e-01
+</last>
+</fileContent>
+</b1_y.dat>
+<b1_z.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+-8.5962120382e-01   8.9031332438e-01
+</last>
+</fileContent>
+</b1_z.dat>
+<delta_t.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+1.676470e+00   -4.754555e-01
+</last>
+</fileContent>
+</delta_t.dat>
+<delta_x.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+5.797986e-01   8.054673e-01
+</last>
+</fileContent>
+</delta_x.dat>
+<delta_y.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+8.768911e-01   8.217062e-01
+</last>
+</fileContent>
+</delta_y.dat>
+<delta_z.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+1.027718e+00   8.224375e-01
+</last>
+</fileContent>
+</delta_z.dat>
+<info.dat>
+<fileContent>
+<combine_files_xml_ERROR>All row must have same number of columns
+</combine_files_xml_ERROR></fileContent>
+</info.dat>
+<nucleon.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+1.179528e+00   5.823434e-01
+</last>
+</fileContent>
+</nucleon.dat>
+<nucleon_prime.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+-6.720067e-01   -4.095565e-01
+</last>
+</fileContent>
+</nucleon_prime.dat>
+<pbp.dat>
+<fileContent>
+<Column0>
+0.000000e+00
+</Column0>
+<Column1>
+2.587522e-02
+</Column1>
+<Column2>
+-1.182709e-03
+</Column2>
+<Column3>
+44
+</Column3>
+<last>
+5.003743e-13
+</last>
+</fileContent>
+</pbp.dat>
+<pion.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+2.4949936056e+00   1.5681429497e+00
+</last>
+</fileContent>
+</pion.dat>
+<pion_prime.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+1.1883378275e+00   -1.0281982687e+00
+</last>
+</fileContent>
+</pion_prime.dat>
+<plaq.dat>
+<fileContent>
+<Column0>
+5.725002e-02
+</Column0>
+<Column1>
+6.090834e-02
+</Column1>
+<Column2>
+6.610346e-01
+</Column2>
+<Column3>
+-4.179970e-01
+</Column3>
+<Column4>
+4.740920e-02
+</Column4>
+<last>
+6.709085e-02
+</last>
+</fileContent>
+</plaq.dat>
+<rho_x.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+1.2969348508e+00   1.3833866280e+00
+</last>
+</fileContent>
+</rho_x.dat>
+<rho_x_prime.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+5.3021884876e-02   -1.1004785044e+00
+</last>
+</fileContent>
+</rho_x_prime.dat>
+<rho_y.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+1.3326026792e+00   1.4200885407e+00
+</last>
+</fileContent>
+</rho_y.dat>
+<rho_y_prime.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+7.4558241382e-02   -1.0958428997e+00
+</last>
+</fileContent>
+</rho_y_prime.dat>
+<rho_z.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+1.0753767199e+00   1.2010707969e+00
+</last>
+</fileContent>
+</rho_z.dat>
+<rho_z_prime.dat>
+<fileContent>
+<Column0>
+1   1
+</Column0>
+<Column1>
+0   1
+</Column1>
+<Column2>
+0   0
+</Column2>
+<last>
+-1.8196845377e-01   -1.2888750000e+00
+</last>
+</fileContent>
+</rho_z_prime.dat>
+<w_pbp.dat>
+<fileContent>
+<Column0>
+0.000000e+00
+</Column0>
+<Column1>
+2.581003e-02
+</Column1>
+<last>
+9.310135e-05
+</last>
+</fileContent>
+</w_pbp.dat>
+<w_spect.dat>
+<fileContent>
+<Column0>
+43   43   43   43   43   43   44   43   43   43   43   43
+</Column0>
+<last>
+8.1252994405e-13   9.7788708149e-13   9.2655875517e-13   9.9192236058e-13   9.0867934185e-13   9.1176086560e-13   2.9702903702e-13   9.4389559645e-13   5.8775236167e-13   6.4286283344e-13   5.6643342030e-13   5.4951291023e-13
+</last>
+</fileContent>
+</w_spect.dat>
+</CpsDataStore>

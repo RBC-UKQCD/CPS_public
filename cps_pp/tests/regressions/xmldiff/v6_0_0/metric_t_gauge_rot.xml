@@ -2,7 +2,7 @@
 
 <assertions>
 
-<assertion xpath="//pion" type="double_array"
+<assertion xpath="//link_trace" type="double"
 comparison="relative" tolerance="0.001"/>
 
 </assertions>
