@@ -126,13 +126,13 @@ int main(int argc,char *argv[])
           VRB.Flow(cname,fname,"warmup iteration # = %d/%d\n",n,no_warmup_sweep);
 	  Float sum_plaq0 = lat.SumReTrPlaq();
 	  Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
-	  VRB.Flow(cname,fname,"%d plaquette = %e\n",n,(float)aver_plaq0); 
+	  VRB.Flow(cname,fname,"%d plaquette = %e\n",n,(Float)aver_plaq0); 
 	  //if ( UniqueID() == 0  ) { 
-	    fprintf(plaquette,"%d %e\n",n,(float)aver_plaq0);
+	    fprintf(plaquette,"%d %e\n",n,(Float)aver_plaq0);
 	    fflush(plaquette);
 	  //}
           unsigned long *binary = (unsigned long *)&aver_plaq0;
-          printf("%d %e %x:%x\n",n,(float)aver_plaq0,binary[0],binary[1]);
+          printf("%d %e %x:%x\n",n,(Float)aver_plaq0,binary[0],binary[1]);
 	  fflush(stdout);
        	  hmc_r.run();
 	  sweep_counter++; 
@@ -149,10 +149,10 @@ int main(int argc,char *argv[])
 
 	Float sum_plaq0 = lat.SumReTrPlaq();
 	Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
-	VRB.Flow(cname,fname,"%d plaquette = %e\n",i,(float)aver_plaq0); 
-	printf("%d %e\n",i,(float)aver_plaq0);
+	VRB.Flow(cname,fname,"%d plaquette = %e\n",i,(Float)aver_plaq0); 
+	printf("%d %e\n",i,(Float)aver_plaq0);
 	//if ( UniqueID() == 0 ) {
-	  fprintf(plaquette,"%d %e\n",i,(float)aver_plaq0);
+	  fprintf(plaquette,"%d %e\n",i,(Float)aver_plaq0);
 	  fflush(plaquette);
 	//}
 	printf("Written\n");
