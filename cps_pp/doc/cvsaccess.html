@@ -77,7 +77,14 @@ from florence. Hence I can remotely check code
 out of the CVS from florence by replacing localhost
 with iasc7 on florence.
 
-
+<p>
+This is only relevant to the system administrator.
+The command I run as root at Liverpool to get this to all
+work is:
+<pre>
+/usr/sbin/stunnel -c -d 2401 -r qcdserver0.phys.columbia.edu:22401
+</pre>
+Most users do not need to know about stunnel.
 
 <h2><a name="Submission_of_Changes"></a>
 
