@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpBase class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.7 2004-08-17 03:33:13 chulwoo Exp $
+   $Id: minvcg.C,v 1.8 2004-08-17 20:59:59 mclark Exp $
  */
 
 CPS_END_NAMESPACE
@@ -120,25 +120,25 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   }
   
   int convP, converged;
-  int *convsP = (int*)qalloc(QCOMMS|QFAST,Nmass*sizeof(int));
-  if(convsP == 0) convsP = (int*)qalloc(QCOMMS,Nmass*sizeof(int));
+  int *convsP = (int*)qalloc(QFAST,Nmass*sizeof(int));
+  if(convsP == 0) convsP = (int*)qalloc(0,Nmass*sizeof(int));
   if(convsP == 0) ERR.Pointer(cname,fname, "convsP");
   VRB.Smalloc(cname,fname,"convsP", convsP, Nmass * sizeof(int));
 
   Float a, as, b, bp;
-  Float *bs = (Float*)qalloc(QCOMMS|QFAST,Nmass * sizeof(Float));
-  if(bs == 0) bs = (Float*)qalloc(QCOMMS,Nmass * sizeof(Float));
+  Float *bs = (Float*)qalloc(QFAST,Nmass * sizeof(Float));
+  if(bs == 0) bs = (Float*)qalloc(0,Nmass * sizeof(Float));
   if(bs == 0) ERR.Pointer(cname,fname, "bs");
   VRB.Smalloc(cname,fname,"bs", bs, Nmass * sizeof(Float));
 
-  Float **z = (Float**)qalloc(QCOMMS|QFAST,2 * sizeof(Float*));
-  if(z == 0) z = (Float**)qalloc(QCOMMS,2 * sizeof(Float*));
+  Float **z = (Float**)qalloc(QFAST,2 * sizeof(Float*));
+  if(z == 0) z = (Float**)qalloc(0,2 * sizeof(Float*));
   if(z == 0) ERR.Pointer(cname,fname, "z");
   VRB.Smalloc(cname,fname,"z", z, 2 * sizeof(Float*));
 
   for (s=0; s<2; s++) {
-    *(z+s) = (Float*)qalloc(QCOMMS|QFAST,Nmass * sizeof(Float));
-    if (*(z+s) == 0) *(z+s) = (Float*)qalloc(QCOMMS,Nmass * sizeof(Float));
+    *(z+s) = (Float*)qalloc(QFAST,Nmass * sizeof(Float));
+    if (*(z+s) == 0) *(z+s) = (Float*)qalloc(0,Nmass * sizeof(Float));
     if (*(z+s) == 0) ERR.Pointer(cname,fname, "z[s]");
     VRB.Smalloc(cname,fname,"z[s]", z[s], Nmass * sizeof(Float));
   }
@@ -146,32 +146,32 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   Float css, ztmp;  
   Float c, cp, d;
   
-  Float *rsd_sq = (Float*)qalloc(QCOMMS|QFAST,Nmass*sizeof(Float)); 
-  if(rsd_sq == 0) rsd_sq = (Float*)qalloc(QCOMMS,Nmass*sizeof(Float)); 
+  Float *rsd_sq = (Float*)qalloc(QFAST,Nmass*sizeof(Float)); 
+  if(rsd_sq == 0) rsd_sq = (Float*)qalloc(0,Nmass*sizeof(Float)); 
   if(rsd_sq == 0) ERR.Pointer(cname,fname, "rsd_sq");
   VRB.Smalloc(cname,fname,"rsd_sq", rsd_sq, Nmass * sizeof(Float));
 
-  Float *rsdcg_sq = (Float*)qalloc(QCOMMS|QFAST,Nmass*sizeof(Float)); 
-  if(rsdcg_sq == 0) rsdcg_sq = (Float*)qalloc(QCOMMS,Nmass*sizeof(Float)); 
+  Float *rsdcg_sq = (Float*)qalloc(QFAST,Nmass*sizeof(Float)); 
+  if(rsdcg_sq == 0) rsdcg_sq = (Float*)qalloc(0,Nmass*sizeof(Float)); 
   if(rsdcg_sq == 0) ERR.Pointer(cname,fname, "rsdcg_sq");
   VRB.Smalloc(cname,fname,"rsdcg_sq", rsdcg_sq, Nmass * sizeof(Float));
   
-  Float *at = (Float*)qalloc(QCOMMS|QFAST,Nmass*sizeof(Float));
-  if (at == 0) at = (Float*)qalloc(QCOMMS,Nmass*sizeof(Float));
+  Float *at = (Float*)qalloc(QFAST,Nmass*sizeof(Float));
+  if (at == 0) at = (Float*)qalloc(0,Nmass*sizeof(Float));
   if (at == 0) ERR.Pointer(cname,fname, "at");
   VRB.Smalloc(cname,fname,"at", at, Nmass * sizeof(Float));
 
   Float *alpha, *b_tmp;
   if (type == SINGLE) {
-    alpha = (Float*)qalloc(QCOMMS|QFAST,Nmass*sizeof(Float));
-    if (alpha==0) alpha = (Float*)qalloc(QCOMMS|QFAST,Nmass*sizeof(Float));
+    alpha = (Float*)qalloc(QFAST,Nmass*sizeof(Float));
+    if (alpha==0) alpha = (Float*)qalloc(0,Nmass*sizeof(Float));
     if (alpha==0) ERR.Pointer(cname,fname, "alpha");
     VRB.Smalloc(cname,fname,"alpha", alpha, Nmass * sizeof(Float));
     for (s=0; s<Nmass; s++) alpha[s] = alpha_slow[s];
   }
 
-  b_tmp = (Float*)qalloc(QCOMMS|QFAST,sizeof(Float));
-  if (b_tmp==0) b_tmp = (Float*)qalloc(QCOMMS,sizeof(Float));
+  b_tmp = (Float*)qalloc(QFAST,sizeof(Float));
+  if (b_tmp==0) b_tmp = (Float*)qalloc(0,sizeof(Float));
   if (b_tmp==0) ERR.Pointer(cname,fname, "b_tmp");
 
   // If source norm = 0, solution must be 0
@@ -198,8 +198,6 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     MatPcDagMatPc(Ap,p[isz],&d);
   }
   DiracOpGlbSum(&d);
-  IFloat *Ap_tmp = (IFloat *)Ap;
-  VRB.Flow(cname,fname,"Ap= %e pAp =%e\n",*Ap_tmp,d);
  
   b = -cp/d;
   
@@ -219,7 +217,6 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   // c = |r[1]|^2
   vaxpy_norm(&b,Ap,r,f_size/6,&c);
   DiracOpGlbSum(&c);
-  VRB.Flow(cname,fname,"|r[1]^2 =%e\n",c);
 
   // Psi[1] -= b[0] p[0] =- b[0] chi;
   if (type == SINGLE) {
@@ -250,33 +247,18 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   // for k=1 until MaxCG do
   // if |psi[k+1] - psi[k]| <= RsdCG |psi[k+1]| then return
   for (k=1; k<=dirac_arg->max_num_iter && !convP; k++) {
-    timeval start,end;
     // a[k+1] = |r[k]**2/ |r[k-1]|**2
     a = c/cp;
-  VRB.Flow(cname,fname,"a =%e\n",a);
 
     // p[k+1] = r[k+1] + a[k+1] p[k]
     //   Compute the shifted as
     //   ps[k+1] = zs[k+1] r[k+1] + a[k+1] ps[k]
-    as = 0.;
     for (s=0; s<Nmass_loop; s++) {
-      if(s == isz)
-        p[s] -> FTimesV1PlusV2(a,p[s],r,f_size);
-      else{
-#if 0
       as = -a * (z[iz][s] * bs[s]) / (z[1-iz][s] * b);
       at[s] *= as;
       as = z[iz][s]/at[s];
       vaxpy(&as,r,p[s],f_size/6);
-#else
-      as = -a * (z[iz][s] * bs[s]) / (z[1-iz][s] * b);
-        p[s] -> VecTimesEquFloat(as,f_size);
-        p[s] -> FTimesV1PlusV2(z[iz][s],r,p[s],f_size);
-#endif
-      }
       CGflops += f_size*2;
-    IFloat *Ap_tmp = (IFloat *)p[s];
-  VRB.Flow(cname,fname,"isz = %d as = %e p[%d] =%e\n",isz, as, s,*Ap_tmp);
     }
 
     // cp = |r[k]**2
@@ -291,8 +273,6 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
       MatPcDagMatPc(Ap,p[isz],&d);
     }
     DiracOpGlbSum(&d);
-    IFloat *Ap_tmp = (IFloat *)Ap;
-  VRB.Flow(cname,fname,"Ap =%e  |b[%d]^2 =%e\n",*Ap_tmp,k,d);
     
     bp = b;
     b = -cp/(d*at[isz]*at[isz]);
@@ -338,9 +318,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
       css = c * z[iz][s] * z[iz][s];
       convsP[s] = (css < rsd_sq[s]) ? 1 : 0;
       if (convsP[s]) {
-	convsP[s] = k;
-//	RsdCG[s] = sqrt(css);
 	RsdCG[s] = css;
+	convsP[s] = k;
 	converged++;
       }
     }
@@ -353,12 +332,22 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  report_flops(CGflops,&start,&end); 
+  print_flops(cname,fname,CGflops,&start,&end); 
 #endif
 
-  for (s=0; s<Nmass; s++)
-    VRB.Result(cname,fname,"%d shift converged, iter = %d, res^2 = %e\n",s,convsP[s],RsdCG[s]);
+  if (k >= dirac_arg->max_num_iter)  // It has not reached stp_cnd: Issue a warning
+    VRB.Warn(cname,fname,"CG reached max iterations = %d. |res| = %e\n",k, css);
 
+  for (s=0; s<Nmass; s++) {
+    if (convsP[s]) {
+      VRB.Result(cname,fname,"%d shift converged, iter = %d, res^2 = %e\n",s,convsP[s],RsdCG[s]);
+      RsdCG[s] = sqrt(RsdCG[s]);
+    } else {
+      RsdCG[s] = c*z[iz][s]*z[iz][s];
+      VRB.Result(cname,fname,"%d shift did not converge, iter = %d, res^2 = %e\n",s,k,RsdCG[s]);
+      RsdCG[s] = sqrt(RsdCG[s]);
+    }
+  }
 
   // free arrays and vectors
   for (s=0; s<Nmass; s++) {
@@ -403,8 +392,6 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     qfree(alpha);
   }
   
-  if (k >= dirac_arg->max_num_iter)   // It has not reached stp_cnd: Issue a warning
-    VRB.Warn(cname,fname,"CG reached max iterations = %d. |res| = %e\n",k, css);
   return k;
 }
 
