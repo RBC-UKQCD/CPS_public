@@ -3,7 +3,7 @@
 //
 //
 //
-//  $Id: testing_framework_cmp.C,v 1.2 2004-05-11 15:11:08 mcneile Exp $
+//  $Id: testing_framework_cmp.C,v 1.3 2004-05-12 17:31:58 mcneile Exp $
 //--------------------------------------------------------------------
 
 
@@ -68,6 +68,45 @@ void compare_array_relative(Float* pion_corr_A,
 
   // write some text for the test
     printf("test_type       = relative_float_array\n") ; 
+    printf("test_toleration = %g\n",tol) ; 
+
+  if (pass_test) 
+    printf("test_result = PASS\n") ; 
+  else 
+    printf("test_result = FAIL\n") ; 
+
+
+  printf("End_regression_test\n") ; 
+}
+
+
+void compare_float_relative(Float pion_corr_A, 
+			    Float pion_corr_B, 
+			    Float tol)
+{
+  printf("Start_regression_test\n") ; 
+  int pass_test = 1 ; 
+  
+  Float pA = pion_corr_A ; 
+  Float pB = pion_corr_B ; 
+
+ Float rel ;
+ if( ! almost_zero(pA)  )
+   {
+     rel = fabs( (pA-pB)/pA   ) ; 
+   }
+ else
+   {
+     rel = fabs(pB) ; 
+   }
+ if( rel > tol) 
+   pass_test = 0 ; 
+ 
+ printf("|(%g - %g) / %g | = %g\n",pA,pB,pA,rel ) ; 
+
+
+  // write some text for the test
+    printf("test_type       = relative_float\n") ; 
     printf("test_toleration = %g\n",tol) ; 
 
   if (pass_test) 
