@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 21:26:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
-//  $Id: dwf_dslash.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
+//  $Date: 2004-07-15 22:23:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
+//  $Id: dwf_dslash.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash.C,v $
 //  $State: Exp $
 //
@@ -47,6 +47,10 @@ void dwf_dslash(Vector *out,
 // Apply 4-dimensional Dslash
 //------------------------------------------------------------------
   dwf_dslash_4(out, gauge_field, in, cb, dag, dwf_lib_arg);
+#if 0
+{IFloat *tmp = (IFloat *)out;
+printf("dwf_dslash_4:out[0]=%e\n",*tmp);}
+#endif
   int temp_size = 49152;
 
 
@@ -57,6 +61,10 @@ void dwf_dslash(Vector *out,
 // Apply 5th-direction Dslash
 //------------------------------------------------------------------
   dwf_dslash_5_plus(out, in, mass, dag, dwf_lib_arg);
+#if 0
+{IFloat *tmp = (IFloat *)out;
+printf("dwf_dslash_5_plus:out[0]=%e\n",*tmp);}
+#endif
 //  printf("dslash 5 plus : %e %e\n",out->NormSqNode(temp_size),in->NormSqNode(temp_size));
 
 }

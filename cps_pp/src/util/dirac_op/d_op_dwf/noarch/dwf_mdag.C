@@ -1,4 +1,5 @@
 #include<config.h>
+#include<stdlib.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords

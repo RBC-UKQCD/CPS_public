@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 21:26:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
-//  $Id: dwf_init.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
+//  $Date: 2004-07-15 22:23:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
+//  $Id: dwf_init.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_init.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v $
 //  $State: Exp $
 //
@@ -101,16 +101,6 @@ void dwf_init(Dwf *dwf_p)
 	      "frm_tmp2", dwf_p->frm_tmp2, f_size*sizeof(IFloat));
 //  for(int i=0;i<f_size;i++) (dwf_p->frm_tmp2)[i]=0.0;
 
-//------------------------------------------------------------------
-// Allocate memory for a 12 word communications buffer needed
-// for the spread-out case.
-//------------------------------------------------------------------
-  dwf_p->comm_buf = (IFloat *) smalloc(12 * sizeof(IFloat));
-  if(dwf_p->comm_buf == 0)
-    ERR.Pointer(cname,fname, "comm_buf");
-  VRB.Smalloc(cname,fname,
-	      "comm_buf", dwf_p->comm_buf, 12*sizeof(IFloat));
-
 
 //------------------------------------------------------------------
 // Set the dwf coefficients
@@ -120,7 +110,37 @@ void dwf_init(Dwf *dwf_p)
   dwf_p->dwf_kappa = 
     1.0 / ( 2 * ( 4 + GJP.DwfA5Inv() - GJP.DwfHeight() ) );
 
+//------------------------------------------------------------------
+// Allocate memory for a communications buffer needed
+// for the spread-out case.
+//------------------------------------------------------------------
+  int ls_stride = 24*dwf_p->vol_4d;
+  dwf_p->comm_buf = (IFloat *) fmalloc(ls_stride*sizeof(IFloat));
+//  dwf_p->comm_buf = (IFloat *) smalloc(12 * sizeof(IFloat));
+  if(dwf_p->comm_buf == 0)
+    ERR.Pointer(cname,fname, "comm_buf");
+  VRB.Smalloc(cname,fname,
+	      "comm_buf", dwf_p->comm_buf, 12*sizeof(IFloat));
+
   int ls = dwf_p->ls;
+
+  dwf_p->PlusArg[0] = new SCUDirArgIR;
+    (dwf_p->PlusArg[0]) ->Init (dwf_p->comm_buf,SCU_SP,SCU_SEND, ls_stride*sizeof(IFloat),1,0,IR_14);
+  dwf_p->PlusArg[1] = new SCUDirArgIR;
+    (dwf_p->PlusArg[1])->Init(dwf_p->comm_buf,SCU_SM,SCU_REC, ls_stride*sizeof(IFloat),1,0,IR_14);
+	dwf_p->Plus = new SCUDirArgMulti;
+    (dwf_p->Plus)->Init(dwf_p->PlusArg,2);
+
+  dwf_p->MinusArg[0] = new SCUDirArgIR;
+    (dwf_p->MinusArg[0]) ->Init (dwf_p->comm_buf ,SCU_SM,SCU_SEND,ls_stride*sizeof(IFloat),1,0,IR_15);
+  dwf_p->MinusArg[1] = new SCUDirArgIR;
+    (dwf_p->MinusArg[1])->Init(dwf_p->comm_buf,SCU_SP,SCU_REC, ls_stride*sizeof(IFloat),1,0,IR_15);
+	dwf_p->Minus = new SCUDirArgMulti;
+    (dwf_p->Minus)->Init(dwf_p->MinusArg,2);
+
+
+  
+
 
 }
 void dwf_end( Dwf *dwf_p)
@@ -134,7 +154,7 @@ void dwf_end( Dwf *dwf_p)
   // for the spread-out case.
   //------------------------------------------------------------------
   VRB.Sfree(cname,fname, "comm_buf", dwf_p->comm_buf);
-  sfree(dwf_p->comm_buf);
+  ffree(dwf_p->comm_buf);
 
   //----------------------------------------------------------------
   // Free temporary femrion fields 2 and 1
@@ -144,6 +164,15 @@ void dwf_end( Dwf *dwf_p)
 
   VRB.Sfree(cname,fname, "frm_tmp1", dwf_p->frm_tmp1);
   sfree(dwf_p->frm_tmp1);
+
+  for(int i = 0;i<2;i++){
+    delete (dwf_p->PlusArg[i]);
+    delete (dwf_p->MinusArg[i]);
+  }
+  delete (dwf_p->Plus);
+  delete (dwf_p->Minus);
+
+
 
   //----------------------------------------------------------------
   // Un-initialize the wilson library. Memory is set free here.

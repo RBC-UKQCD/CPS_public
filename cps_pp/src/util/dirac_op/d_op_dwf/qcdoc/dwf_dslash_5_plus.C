@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 21:26:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
-//  $Id: dwf_dslash_5_plus.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
+//  $Date: 2004-07-15 22:23:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
+//  $Id: dwf_dslash_5_plus.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_5_plus.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v $
 //  $State: Exp $
 //
@@ -134,6 +134,7 @@ void dwf_dslash_5_plus(Vector *out,
 
 // Initializations
 //------------------------------------------------------------------
+  sys_cacheflush(0);
   int local_ls = GJP.SnodeSites(); 
   int s_nodes = GJP.Snodes();
   int s_node_coor = GJP.SnodeCoor();
@@ -141,15 +142,43 @@ void dwf_dslash_5_plus(Vector *out,
   int ls_stride = 24 * vol_4d_cb;
   IFloat *f_in;
   IFloat *f_out;
-  IFloat *f_temp;
-  IFloat *comm_buf = dwf_lib_arg->comm_buf;
+  IFloat *f_temp = dwf_lib_arg->comm_buf;
+//  IFloat *f_temp= (IFloat *) fmalloc(ls_stride*sizeof(IFloat));
+//  IFloat *comm_buf = dwf_lib_arg->comm_buf;
   IFloat two_over_a5 = 2.0 * GJP.DwfA5Inv();
   IFloat neg_mass_two_over_a5 = -2.0 * mass * GJP.DwfA5Inv();
+
+//  VRB.Func("DiracOpDwf","dwf_dslash_5_plus()");
+  f_in  = (IFloat *) in;
+
+#if 0
+  SCUDirArgIR *PlusArg[2];
+  PlusArg[0] = new SCUDirArgIR;
+    PlusArg[0] ->Init ((f_in + (local_ls-1)*ls_stride),SCU_SP,SCU_SEND, ls_stride*sizeof(IFloat),1,0,IR_14);
+  PlusArg[1] = new SCUDirArgIR;
+    PlusArg[1]->Init(f_temp,SCU_SM,SCU_REC, ls_stride*sizeof(IFloat),1,0,IR_14);
+  SCUDirArgMulti Plus;
+    Plus.Init(PlusArg,2);
+
+  SCUDirArgIR *MinusArg[2];
+  MinusArg[0] = new SCUDirArgIR;
+    MinusArg[0] ->Init (f_in ,SCU_SM,SCU_SEND,ls_stride*sizeof(IFloat),1,0,IR_15);
+  MinusArg[1] = new SCUDirArgIR;
+    MinusArg[1]->Init(f_temp,SCU_SP,SCU_REC, ls_stride*sizeof(IFloat),1,0,IR_15);
+  SCUDirArgMulti Minus;
+    Minus.Init(MinusArg,2);
+#else
+  (dwf_lib_arg->PlusArg[0])->Addr(f_in+(local_ls-1)*ls_stride);
+  (dwf_lib_arg->MinusArg[0])->Addr(f_in);
+#endif
 
 // [1 + gamma_5] term (if dag=1 [1 - gamma_5] term)
 //
 // out[s] = [1 + gamma_5] in[s-1]
 //------------------------------------------------------------------
+
+  SCUDirArgMulti *Plus = dwf_lib_arg->Plus;
+  if (s_nodes >1)  Plus->StartTrans();
   f_in  = (IFloat *) in;
   f_out = (IFloat *) out;
   if(dag == 1){
@@ -174,16 +203,19 @@ void dwf_dslash_5_plus(Vector *out,
 //
 //------------------------------------------------------------------
 
-  f_in  = (IFloat *) in;  
-  f_in = f_in + (local_ls-1)*ls_stride; 
+  if( s_nodes>1) f_in = f_temp;
+  else{
+    f_in  = (IFloat *) in;  
+    f_in = f_in + (local_ls-1)*ls_stride; 
+  }
   f_out = (IFloat *) out;
   
   if(dag == 1){
     f_in  =  f_in + 12;
     f_out = f_out + 12;
   }
+    if (s_nodes >1) Plus->TransComplete();
  
-// this version is not working when s_nodes != 1
     if(s_node_coor == 0) { 
       FtV1pV2Skip_asm(f_out, &neg_mass_two_over_a5, f_in, f_out, vol_4d_cb);
     }
@@ -197,6 +229,8 @@ void dwf_dslash_5_plus(Vector *out,
 // 
 // out[s] = [1 - gamma_5] in[s+1]
 //------------------------------------------------------------------
+  SCUDirArgMulti *Minus = dwf_lib_arg->Minus;
+  if (s_nodes >1) Minus->StartTrans();
   f_in  = (IFloat *) in;
   f_out = (IFloat *) out;
   if(dag == 0){
@@ -217,7 +251,9 @@ void dwf_dslash_5_plus(Vector *out,
 //
 //------------------------------------------------------------------
 
-  f_in  = (IFloat *) in;
+
+  if (s_nodes >1) f_in  = f_temp;
+  else   f_in  = (IFloat *) in;
   f_out = (IFloat *) out;
 
   if(dag == 0){
@@ -227,6 +263,7 @@ void dwf_dslash_5_plus(Vector *out,
 
   f_out = f_out + (local_ls-1)*ls_stride;
 
+  if (s_nodes >1) Minus->TransComplete();
   if(s_node_coor == s_nodes - 1) { 
     FtV1pV2Skip_asm(f_out, &neg_mass_two_over_a5, f_in, f_out, vol_4d_cb);
   } else {
@@ -241,6 +278,13 @@ void dwf_dslash_5_plus(Vector *out,
   //  micros +=  (stop.tv_sec - start.tv_sec)*1.E6;
 
   //  printf("Dslash_5: %f mflops\n",flops/micros );
+#if 0
+  ffree(f_temp);
+  delete(PlusArg[0]);
+  delete(PlusArg[1]);
+  delete(MinusArg[0]);
+  delete(MinusArg[1]);
+#endif
 }
 
 
