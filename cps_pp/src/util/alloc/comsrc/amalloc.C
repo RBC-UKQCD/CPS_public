@@ -3,7 +3,7 @@
   \file
   \brief Functions for dynamical array allocation.
 
-  $Id: amalloc.C,v 1.7 2004-10-27 14:24:30 zs Exp $
+  $Id: amalloc.C,v 1.8 2004-10-29 13:08:29 zs Exp $
 */
 #include <util/smalloc.h>
 #include <stdarg.h>
@@ -117,7 +117,7 @@ void *amalloc(void*  (*allocator)(size_t, const char *vname="",
     // if the size of all the pointers happens to be a multiple of the
     //alignment length  then no padding is necessary here, right?
     size_t align;   
-    if(n_ptr*sizeof(void*)%align==0) align = 0;
+    if(n_ptr*sizeof(void*)%alignment==0) align = 0;
     else align = alignment;
 
     void **start = (void**)allocator(n_data*size+align+n_ptr*sizeof(void*));
