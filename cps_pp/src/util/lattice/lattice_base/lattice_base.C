@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.23 2004-12-15 07:32:12 chulwoo Exp $
+  $Id: lattice_base.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-15 07:32:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.23 2004-12-15 07:32:12 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.23 2004-12-15 07:32:12 chulwoo Exp $
+//  $Date: 2004-12-21 19:45:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -162,8 +162,8 @@ Lattice::Lattice()
     //--------------------------------------------------------------
     array_size = GsiteSize() * GJP.VolNodeSites() * sizeof(Float);  
 
-    if(start_conf_kind != START_CONF_LOAD &&
-       start_conf_kind!=START_CONF_FILE){
+    if(start_conf_kind != START_CONF_LOAD ){
+//       start_conf_kind!=START_CONF_FILE){
 #if TARGET == QCDOC
        gauge_field = (Matrix *) qalloc(GJP.StartConfAllocFlag(),array_size);
     VRB.Flow(cname,fname,"gauge_field=%p\n",gauge_field);
@@ -172,6 +172,7 @@ Lattice::Lattice()
 #endif
       if( gauge_field == 0) ERR.Pointer(cname,fname, "gauge_field");
       VRB.Pmalloc(cname, fname, "gauge_field", gauge_field, array_size);
+      GJP.StartConfLoadAddr(gauge_field);
     }
 
     //--------------------------------------------------------------

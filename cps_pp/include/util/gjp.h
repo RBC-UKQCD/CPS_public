@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.15 2004-12-11 20:57:40 chulwoo Exp $
+  $Id: gjp.h,v 1.16 2004-12-21 19:45:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-11 20:57:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.15 2004-12-11 20:57:40 chulwoo Exp $
-//  $Id: gjp.h,v 1.15 2004-12-11 20:57:40 chulwoo Exp $
+//  $Date: 2004-12-21 19:45:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.16 2004-12-21 19:45:14 chulwoo Exp $
+//  $Id: gjp.h,v 1.16 2004-12-21 19:45:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -527,6 +527,8 @@ public:
 
   Matrix *StartConfLoadAddr() const
       {return (Matrix *)doarg_int.start_conf_load_addr;}
+  void StartConfLoadAddr( Matrix * addr) 
+      { doarg_int.start_conf_load_addr = (unsigned long) addr;}
   //!< Gets the initial configuration.
   /*!<
     \return The address of the starting configuration

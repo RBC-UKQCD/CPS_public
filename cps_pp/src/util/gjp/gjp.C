@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.23 2004-12-20 22:09:26 chulwoo Exp $
+  $Id: gjp.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-20 22:09:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.23 2004-12-20 22:09:26 chulwoo Exp $
-//  $Id: gjp.C,v 1.23 2004-12-20 22:09:26 chulwoo Exp $
+//  $Date: 2004-12-21 19:45:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
+//  $Id: gjp.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -174,8 +174,6 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
       node_sites[3] = rda.t_sites/nodes[3];
       node_sites[4] = rda.s_sites/nodes[4];
     }
-#ifdef PARALLEL
-#endif
 
   // Set the volume values
   //----------------------------------------------------------------
@@ -256,10 +254,9 @@ nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
   //----------------------------------------------------------------
   StartConfType conf_kind = doarg_int.start_conf_kind;
    if(conf_kind != START_CONF_MEM && 
-      conf_kind != START_CONF_LOAD &&
+      conf_kind != START_CONF_LOAD )
       conf_kind != START_CONF_FILE)
    doarg_int.start_conf_load_addr = 0;
-
 
 #if 0
   if(start_conf_kind == START_CONF_FILE){
