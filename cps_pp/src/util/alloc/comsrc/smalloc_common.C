@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc_common.C,v 1.2 2004-09-07 05:21:48 chulwoo Exp $
+  $Id: smalloc_common.C,v 1.3 2004-09-28 16:10:28 chulwoo Exp $
 */
 
 #include <util/smalloc.h>
@@ -12,6 +12,8 @@
 CPS_START_NAMESPACE
 
 void* smalloc(char *cname, char *fname, char *vname, int request){
+  if (request < 1)
+    ERR.General(cname,fname,"requested size of %s is %d\n",vname,request);
   void *p = smalloc(request);
   if (p == 0)
     ERR.Pointer(cname,fname,vname);

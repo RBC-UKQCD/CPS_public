@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
+  $Id: pt.C,v 1.8 2004-09-28 16:10:28 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-07 05:21:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
-//  $Id: pt.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
+//  $Date: 2004-09-28 16:10:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.8 2004-09-28 16:10:28 chulwoo Exp $
+//  $Id: pt.C,v 1.8 2004-09-28 16:10:28 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -367,26 +367,27 @@ void pt_init(Lattice &lat)
   for (j=0; j<MAX_HOP; j++) {
   
     for(i=0; i<2*NDIM; i++){
-      
       int nl_size = (j+1)*non_local_chi[i];
       int l_size = vol - nl_size;
-      
-      hp_l[j][i] = (hop_pointer*) smalloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
+      if (l_size>0){
+        hp_l[j][i] = (hop_pointer*) smalloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
+        src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
+        dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
+      }
 
       hp_nl[j][i] = (hop_pointer*) smalloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
-
-      src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
-      dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
       src_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
       dest_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
+
     }
   }
-  
+
   pt_set_hop_pointer();
   for (j=0; j<MAX_HOP; j++) {
     for(i=0; i<2*NDIM; i++){
       int nl_size = (j+1)*non_local_chi[i]+1;
       int l_size = vol - nl_size+2;
+      if ( l_size>2)
       for (int s=0; s<l_size; s++) {
 	src_l[j][i][s] = hp_l[j][i][s].src/(VECT_LEN*sizeof(IFloat));
 	dest_l[j][i][s] = hp_l[j][i][s].dest/(VECT_LEN2*sizeof(IFloat));
@@ -399,6 +400,7 @@ void pt_init(Lattice &lat)
   }
 
 	
+  VRB.FuncEnd(cname,fname);
 }
 
 void pt_delete(){
@@ -642,6 +644,9 @@ void pt_vvpd(Vector **vect, int n_vect, const int *dir,
 
   // Only do communication in forward direction
   for(i=0;i<n_dir;i++) {
+    if ( size[wire[i]] <hop)
+      ERR.General("",fname,"size(%d) in direction %d is smaller than the
+hop(%d)\n",size[wire[i]],wire[i],hop);
     SCUarg_p[2*i] = SCUarg[hop-1][4*wire[i]];
     SCUarg_p[2*i+1] = SCUarg[hop-1][4*wire[i]+1];
     SCUarg_p2[2*i] = SCUarg2[hop-1][4*wire[i]];
