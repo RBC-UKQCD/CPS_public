@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.20 2004-12-21 19:02:43 chulwoo Exp $
+  $Id: random.C,v 1.21 2005-01-19 03:08:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-21 19:02:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.20 2004-12-21 19:02:43 chulwoo Exp $
-//  $Id: random.C,v 1.20 2004-12-21 19:02:43 chulwoo Exp $
+//  $Date: 2005-01-19 03:08:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.21 2005-01-19 03:08:33 chulwoo Exp $
+//  $Id: random.C,v 1.21 2005-01-19 03:08:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -257,7 +257,7 @@ for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
 	  for(x[1] = x_o[1]; x[1] <= x_f[1]; x[1]+=2) {
 	      for(x[0] = x_o[0]; x[0] <= x_f[0]; x[0]+=2) {
 
-		  start_seed = base_seed;
+		  start_seed = start_seed_4d = base_seed;
 		  
 		  if(GJP.StartSeedKind()==START_SEED||
 		     GJP.StartSeedKind()==START_SEED_INPUT||

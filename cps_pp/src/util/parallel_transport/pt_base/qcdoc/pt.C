@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.15 2005-01-13 07:46:20 chulwoo Exp $
+  $Id: pt.C,v 1.16 2005-01-19 03:08:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-01-13 07:46:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.15 2005-01-13 07:46:20 chulwoo Exp $
-//  $Id: pt.C,v 1.15 2005-01-13 07:46:20 chulwoo Exp $
+//  $Date: 2005-01-19 03:08:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.16 2005-01-19 03:08:33 chulwoo Exp $
+//  $Id: pt.C,v 1.16 2005-01-19 03:08:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -889,7 +889,6 @@ void PT::init(PTArg *pt_arg)
         src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
         dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
       }
-=======
       
       hp_nl[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
       dest_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));

@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.13 2004-12-07 06:19:32 chulwoo Exp $
+  $Id: main.C,v 1.14 2005-01-19 03:08:34 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -16,10 +16,10 @@
 #include <util/random.h>
 #include <comms/sysfunc.h>
 
-const int nx = 4;
-const int ny = 4;
-const int nz = 4;
-const int nt = 4;
+const int nx = 8;
+const int ny = 8;
+const int nz = 8;
+const int nt = 8;
 
 
 USING_NAMESPACE_CPS
