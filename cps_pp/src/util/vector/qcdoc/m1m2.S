@@ -8,16 +8,16 @@
  */  
 .text
 .align 2
-.globl m1timesm2
-m1timesm2:
+.globl m1m2
+m1m2:
 
-	or    %r10 , %r4 , %r4
+	or    %r9 , %r3 , %r3
 	la   %r1,	-736(%r1)
+	or    %r10 , %r4 , %r4
 	or    %r11 , %r5 , %r5
-	or    %r9 , %r6 , %r6
 	stw   %r14,	368(%r1)
 	stw   %r15,	376(%r1)
-	or    %r14 , %r3 , %r3
+	or    %r14 , %r6 , %r6
 	stw   %r16,	384(%r1)
 	stw   %r17,	392(%r1)
 	stw   %r18,	400(%r1)
@@ -54,7 +54,7 @@ m1timesm2:
 	stfd  31,	248(%r1)
 	lwz   %r13,	0(%r14)
 	or.  %r13 , %r13 , %r13
-	bf gt,  m1timesm2_lab0
+	bf gt,  m1m2_lab0
 	or    %r12 , %r9 , %r9
 	li   %r15,128
 	li   %r16,160
@@ -72,9 +72,9 @@ m1timesm2:
 	lfd   10,	32(%r11)
 	lfd   11,	40(%r11)
 	mtctr 	%r13
-	b       m1timesm2_lab1
+	b       m1m2_lab1
 .align 4
-m1timesm2_lab1:
+m1m2_lab1:
 	fmul   24 , 0 , 6
 	stfd  26,	112(%r12)
 	fmul   25 , 0 , 7
@@ -198,51 +198,51 @@ m1timesm2_lab1:
 	fmul   29 , 0 , 11
 	dcbt 	%r19,%r11
 	fmul   24 , 0 , 6
-	stfd  25,	56(%r9)
+	la   %r11,	144(%r11)
 	fnmsub 28 , 1 , 11 , 28
+	stfd  25,	56(%r9)
+	fmadd  29 , 1 , 10 , 29
 	stfd  26,	64(%r9)
 	fmul   25 , 0 , 7
-	la   %r11,	144(%r11)
 	fmul   26 , 0 , 8
 	stfd  27,	72(%r9)
 	fnmsub 24 , 1 , 7 , 24
 	lfd   5,	136(%r10)
 	fmul   27 , 0 , 9
-	fmadd  29 , 1 , 10 , 29
-	stfd  30,	80(%r9)
-	fmadd  25 , 1 , 6 , 25
-	stfd  31,	88(%r9)
-	fnmsub 26 , 1 , 9 , 26
-	la   %r10,	144(%r10)
-	fmadd  24 , 2 , 12 , 24
-	la   %r9,	144(%r9)
-	fmadd  27 , 1 , 8 , 27
-	lfd   0,	0(%r10)
 	fmadd  28 , 2 , 16 , 28
-	lfd   6,	0(%r11)
+	la   %r10,	144(%r10)
+	fmadd  25 , 1 , 6 , 25
+	stfd  30,	80(%r9)
+	fnmsub 26 , 1 , 9 , 26
+	stfd  31,	88(%r9)
+	fmadd  24 , 2 , 12 , 24
+	fmadd  27 , 1 , 8 , 27
+	la   %r9,	144(%r9)
+	fmadd  29 , 2 , 17 , 29
+	lfd   0,	0(%r10)
 	fmadd  25 , 2 , 13 , 25
 	lfd   1,	8(%r10)
 	fmadd  26 , 2 , 14 , 26
-	fmadd  29 , 2 , 17 , 29
-	lfd   7,	8(%r11)
-	fmadd  27 , 2 , 15 , 27
-	lfd   8,	16(%r11)
 	fnmsub 24 , 3 , 13 , 24
+	lfd   6,	0(%r11)
+	fmadd  27 , 2 , 15 , 27
+	lfd   7,	8(%r11)
+	fnmsub 28 , 3 , 17 , 28
 	fmadd  25 , 3 , 12 , 25
 	lfd   2,	16(%r10)
 	fnmsub 26 , 3 , 15 , 26
-	lfd   9,	24(%r11)
-	fnmsub 28 , 3 , 17 , 28
-	fmadd  27 , 3 , 14 , 27
-	lfd   10,	32(%r11)
+	lfd   8,	16(%r11)
 	fmadd  29 , 3 , 16 , 29
-	lfd   11,	40(%r11)
+	fmadd  27 , 3 , 14 , 27
+	lfd   9,	24(%r11)
 	fmadd  24 , 4 , 18 , 24
+	lfd   10,	32(%r11)
 	fmadd  25 , 4 , 19 , 25
 	lfd   3,	24(%r10)
 	fmadd  26 , 4 , 20 , 26
-	fmadd  27 , 4 , 21 , 27
 	fmadd  30 , 4 , 22 , 28
+	lfd   11,	40(%r11)
+	fmadd  27 , 4 , 21 , 27
 	fmadd  31 , 4 , 23 , 29
 	fnmsub 24 , 5 , 19 , 24
 	fmadd  25 , 5 , 18 , 25
@@ -252,12 +252,12 @@ m1timesm2_lab1:
 	fmadd  31 , 5 , 22 , 31
 	stfd  24,	96(%r12)
 	stfd  25,	104(%r12)
-	bdnz    m1timesm2_lab1
+	bdnz    m1m2_lab1
 	stfd  26,	112(%r12)
 	stfd  27,	120(%r12)
 	stfd  30,	128(%r12)
 	stfd  31,	136(%r12)
-m1timesm2_lab0:
+m1m2_lab0:
 	lwz   %r14,	368(%r1)
 	lwz   %r15,	376(%r1)
 	lwz   %r16,	384(%r1)
