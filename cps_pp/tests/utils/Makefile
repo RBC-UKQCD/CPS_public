@@ -3,13 +3,6 @@ CPS_START_NAMESPACE
 ##--------------------------------------------------------------------
 ##  CVS keywords
 ##
-##  $Author: chulwoo $
-##  $Date: 2004-06-04 21:14:17 $
-##  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/Makefile,v 1.2 2004-06-04 21:14:17 chulwoo Exp $
-##  $Id: Makefile,v 1.2 2004-06-04 21:14:17 chulwoo Exp $
-##  $Name: not supported by cvs2svn $
-##  $Locker:  $
-##  $Revision: 1.2 $
 ##  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/Makefile,v $
 ##  $State: Exp $
 ##

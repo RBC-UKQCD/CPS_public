@@ -3,13 +3,11 @@ CPS_START_NAMESPACE
 ##--------------------------------------------------------------------
 ##  CVS keywords
 ##
-##  $Author: chulwoo $
-##  $Date: 2004-06-04 21:14:16 $
-##  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_pbp/Makefile,v 1.2 2004-06-04 21:14:16 chulwoo Exp $
-##  $Id: Makefile,v 1.2 2004-06-04 21:14:16 chulwoo Exp $
-##  $Name: not supported by cvs2svn $
-##  $Locker:  $
-##  $Revision: 1.2 $
+##  $Log: not supported by cvs2svn $
+##  Revision 1.1.1.1  2003/06/22 13:34:49  mcneile
+##  This is the cleaned up version of the Columbia Physics System.
+##  The directory structure has been changed.
+##  The include paths have been updated.
 ##  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_pbp/Makefile,v $
 ##  $State: Exp $
 ##
