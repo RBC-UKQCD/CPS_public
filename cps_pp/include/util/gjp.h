@@ -3,15 +3,15 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: gjp.h,v 1.3 2003-08-12 16:22:51 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.2 2003-07-24 16:53:53 zs Exp $
-//  $Id: gjp.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Date: 2003-08-12 16:22:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.3 2003-08-12 16:22:51 zs Exp $
+//  $Id: gjp.h,v 1.3 2003-08-12 16:22:51 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -39,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //
@@ -140,11 +140,11 @@ class GlobalJobParameter
   int s_nodes;      // Number of nodes along the s direction
                     // (5th dir.), relevant to DWF only
 
-  #ifdef PARALLEL
+#ifdef PARALLEL
   SCUAxis s_axis;   // The machine axis on which the 5th direction
                     // axis is mapped. Relevant to DWF with s_nodes
                     // different than 1.
-  #endif
+#endif
 
   int vol_node_sites;  // The number of sites (4-D) of a single node.
   int vol_sites;       // The number of sites (4-D) of the whole lattice
@@ -255,6 +255,14 @@ class GlobalJobParameter
      // implemented by the GpowerRect class.
 
 
+  // Asqtad improved staggered action parameters
+  
+  Float asqtad_naik;
+  Float asqtad_3staple;
+  Float asqtad_5staple;
+  Float asqtad_7staple;
+  Float asqtad_lepage;
+ 
 public:
   GlobalJobParameter();
 
@@ -708,6 +716,41 @@ public:
     \return The exponent.
   */
 
+  // Asqtad improved staggered action parameters
+
+  //! Gets the coefficient of the Naik term in the Asqtad improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float Naik_coeff(){ return asqtad_naik; }
+
+  //! Gets the coefficient of the 3-staple term in the Asqtad improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float staple3_coeff(){ return asqtad_3staple; }
+
+  //! Gets the coefficient of the 5-staple term in the Asqtad improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float staple5_coeff(){ return asqtad_5staple; }
+
+  //! Gets the coefficient of the 7-staple term in the Asqtad improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float staple7_coeff(){ return asqtad_7staple; }
+  
+  //! Gets the coefficient of the Lepage term in the Asqtad improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float Lepage_coeff(){ return asqtad_lepage; }
+
+  
+  /*! @} */
+  
   
   /*!\defgroup gjp_set_methods Methods that set the value of a global variable
     @{ */

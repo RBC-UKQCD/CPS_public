@@ -1,17 +1,32 @@
 #include<config.h>
 CPS_START_NAMESPACE
+//----------------------------------------------------------------------
 /*!\file
-
-\brief  Definition of the DoArg structure.
+  \brief  Definition of the DoArg structure.
   
-  $Id: do_arg.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: do_arg.h,v 1.3 2003-08-12 16:22:51 zs Exp $
 */
+//--------------------------------------------------------------------
 /* CIM Sun Jul  6 23:30:27 GMT 1997 */
 /* This file contains the  structure called DoArg where 
    the arguments on the #DO line are stored during program execution. */
-
+//--------------------------------------------------------------------
 #ifndef INCLUDED_DO_ARG_H
-#define INCLUDED_DO_ARG_H  //!< Prevent multiple inclusion.
+#define INCLUDED_DO_ARG_H
+
+typedef struct {
+  int ntb;
+  int nxb;
+  int nyb;
+  int nzb;
+  int bct;	/* Boundary conditions in t,x,y,z directions.	*/
+  int bcx;
+  int bcy;
+  int bcz;	/* 0 -- periodic, 1 -- antiperiodic		*/
+  int base_odd;
+  IFloat *u_base_addr;
+} DO_ARG;
+
 
 CPS_END_NAMESPACE
 #include <util/gjp.h>
@@ -130,6 +145,19 @@ struct DoArg {
   int  gsum_fast_mode;      //!< 0 (by default) for 25MHz; 50MHz otherwise.
   int  gsum_max_try;        //!< Maximum number of tries of global sum; 2 by default.
 
+    // Parameters for the asqtad improved staggered action.
+
+    //! Coefficient of the Naik term in the Asqtad improved staggered fermion action.
+    Float asqtad_naik;	
+    //! Coefficient of the 3-staple term in the Asqtad improved staggered fermion action.
+    Float asqtad_3staple;
+    //! Coefficient of the 5-staple term in the Asqtad improved staggered fermion action.
+    Float asqtad_5staple;
+    //! Coefficient of the 7-staple term in the Asqtad improved staggered fermion action.    
+    Float asqtad_7staple;
+    //! Coefficient of the Lepage term in the Asqtad improved staggered fermion action.
+    Float asqtad_lepage; 
+    
 
   //------------------------------------------------------------------
   // Added in by Ping for anisotropy, clover and global sum.
@@ -149,8 +177,10 @@ struct DoArg {
     xi_gfix(1.0),           
     gsum_fast_mode(0),      
     gsum_max_try(2),        
-    dwf_a5_inv(1.0)
-    {}
+	dwf_a5_inv(1.0),
+	asqtad_naik(0.0), asqtad_3staple(0.0),asqtad_5staple(0.0),
+	asqtad_7staple(0.0),asqtad_lepage(0.0)
+	{}
     
 //!< Default values of some parameters.
 /*!<

@@ -3,15 +3,15 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: gjp.C,v 1.3 2003-08-12 16:22:51 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: gjp.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2003-08-12 16:22:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.3 2003-08-12 16:22:51 zs Exp $
+//  $Id: gjp.C,v 1.3 2003-08-12 16:22:51 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -58,7 +58,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -524,6 +524,14 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   verbose_level = rda.verbose_level;
 
 
+  // Set the asqtad improved  staggered fermion action parameters.
+
+  asqtad_naik = rda.asqtad_naik;	  
+  asqtad_3staple = rda.asqtad_3staple; 
+  asqtad_5staple = rda.asqtad_5staple; 
+  asqtad_7staple = rda.asqtad_7staple; 
+  asqtad_lepage = rda.asqtad_lepage;  
+ 
   //================================================================
   // Other initializations
   //================================================================
