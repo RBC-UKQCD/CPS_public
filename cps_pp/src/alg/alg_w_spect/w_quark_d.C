@@ -73,9 +73,9 @@ void WspectQuark::doSinkOperator(int lclW, DEVOperatorKind sink_op_kind, Float*p
       //extract propagator on a single
       //time slice from (Float *)d_data_p, and store in prop_out
       pol_dir=-1;//UNIT in sink_dev
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_out,pol_dir);
       break;
       
@@ -83,133 +83,133 @@ void WspectQuark::doSinkOperator(int lclW, DEVOperatorKind sink_op_kind, Float*p
       //pol_dir is determined from propagation direction
       //At present, pol_dir can't be the same as prop_direction
       pol_dir=devDirToPolDir(1,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_out,pol_dir);
       break;
     case DEV2:
       pol_dir=devDirToPolDir(2,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_out,pol_dir);
       break;
     case DEV3:
       pol_dir=devDirToPolDir(3,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_out,pol_dir);
       break;
     case DEV1DEV2:
       pol_dir=devDirToPolDir(2,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_tmp,pol_dir);
       pol_dir=devDirToPolDir(1,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,0,prop_tmp, prop_out,pol_dir); 
       break;
     case DEV2DEV1:
       pol_dir=devDirToPolDir(1,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_tmp,pol_dir);
       pol_dir=devDirToPolDir(2,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,0,prop_tmp, prop_out,pol_dir); 
       break;
     case DEV2DEV3:
       pol_dir=devDirToPolDir(3,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_tmp,pol_dir);
       pol_dir=devDirToPolDir(2,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,0,prop_tmp, prop_out,pol_dir); 
       break;
     case DEV3DEV2:
       pol_dir=devDirToPolDir(2,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_tmp,pol_dir);
       pol_dir=devDirToPolDir(3,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,0,prop_tmp, prop_out,pol_dir); 
       break;
     case DEV1DEV3:
       pol_dir=devDirToPolDir(3,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_tmp,pol_dir);
       pol_dir=devDirToPolDir(1,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,0,prop_tmp, prop_out,pol_dir); 
       break;
     case DEV3DEV1:
       pol_dir=devDirToPolDir(1,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_tmp,pol_dir);
       pol_dir=devDirToPolDir(3,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,0,prop_tmp, prop_out,pol_dir); 
       break;
     case DEV1DEV1:
       pol_dir=devDirToPolDir(1,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_tmp,pol_dir);
       pol_dir=devDirToPolDir(1,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,0,prop_tmp, prop_out,pol_dir);
       break;
 
     case DEV2DEV2:
       pol_dir=devDirToPolDir(2,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_tmp,pol_dir);
       pol_dir=devDirToPolDir(2,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,0,prop_tmp, prop_out,pol_dir);
       break;
 
     case DEV3DEV3:
       pol_dir=devDirToPolDir(3,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,1,(Float *)d_data_p, prop_tmp,pol_dir);
       pol_dir=devDirToPolDir(3,prop_direction);
-      #ifdef DEBUG_WQUARK_D
+#ifdef DEBUG_WQUARK_D
       printf("call sink_dev for direction %d\n",pol_dir);
-      #endif
+#endif
       sink_deriv(lclW,0,prop_tmp, prop_out,pol_dir);
       break;
     
@@ -236,10 +236,10 @@ void WspectQuark::sink_deriv(int lclW, int isFullProp,const Float *prop_in, Floa
 
 
   /* set cbuf registers
-  #ifdef USE_CBUF
+#ifdef USE_CBUF
   setCbufCntrlReg(2, CBUF_MODE2);
   setCbufCntrlReg(4, CBUF_MODE4);
-  #endif
+#endif
   */
 
   //local dimensions are in WspectGinfo::lcl_sites[LORENTZs]
@@ -325,9 +325,9 @@ void WspectQuark::sink_deriv(int lclW, int isFullProp,const Float *prop_in, Floa
 	    }else{
 	      glink=sink_fuzz_p->GetLink(site, dir);
 	    }
-	    #ifdef DEBUG_CHECKSU3
+#ifdef DEBUG_CHECKSU3
 	    CheckSU3((const Float *)glink);
-            #endif
+#endif
 	  
 	    glink1=*glink;
 	    

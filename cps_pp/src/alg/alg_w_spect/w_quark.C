@@ -319,9 +319,9 @@ WspectQuark::WspectQuark(Lattice &lat,
   if(whr.onNode()){
     if (warg.source_kind == BOX_W || warg.source_kind == WALL_W){
       src_matrix = (const Float *)((lat.FixGaugePtr())[src_plane_position]); // G(x)
-      #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
       printf("copy gauge fixing matrix onto source \n");
-      #endif
+#endif
       copyGaugefixToSource(src_matrix, whr);   // copy G^{\dag}(x) --> S(x) 
       //copied from src_matrix to source_matrix_p
     }
@@ -351,9 +351,9 @@ WspectQuark::WspectQuark(Lattice &lat,
   // modifies source S(x) --> S(x) = O S(x)
   if (source_operator_kind != UNIT) {  // modify source_matrix_p
     doSourceOperator(lat, whr, source_operator_kind);
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("finished source_operator_kind %i  \n",source_operator_kind);
-    #endif
+#endif
   }
   
 #ifdef DEBUG_W_QUARK
@@ -840,9 +840,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   if (src_op == DEV1 || src_op == SUM_F || 
       src_op == SUM_F_S_ANTISYM || src_op == SUM_UNIT_F_S_ANTISYM  ) {
     
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("calculate: DEV1\n");
-    #endif
+#endif
     //  if (prop_direction >  0 ) polarisation = 0; // normal 1=x
     //  if (prop_direction == 0 ) polarisation = 1;
     //  To save code space replaced by:
@@ -857,9 +857,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   weight=1.0; //weight of this operator
   if (src_op == DEV2 ||  src_op == SUM_F || 
       src_op == SUM_F_S_ANTISYM || src_op == SUM_UNIT_F_S_ANTISYM  ) {
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("calculate: DEV2\n");
-    #endif
+#endif
   
     polarisation=devDirToPolDir(2,prop_direction);
     symmetricDerivative(lat, whr, polarisation);
@@ -873,9 +873,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   weight=1.0; //weight of this operator
   if (src_op == DEV3 || src_op == SUM_F || 
       src_op == SUM_F_S_ANTISYM || src_op == SUM_UNIT_F_S_ANTISYM ) {
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("calculate: DEV3\n"); 
-    #endif
+#endif
     
     polarisation=devDirToPolDir(3,prop_direction);
     symmetricDerivative(lat, whr, polarisation);
@@ -892,9 +892,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   weight=1.0; //weight of this operator
   if (src_op == DEV1DEV1 || src_op == SUM_S_DIAG ||  
       src_op == SUM_S_SYM_DIAG ) {
-  #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("calculate: DEV11\n");
-  #endif
+#endif
     polarisation=devDirToPolDir(1,prop_direction);
     symmetricDerivative(lat, whr, polarisation);
     // DisplayAllSource(whr);
@@ -909,9 +909,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   
   if (src_op == DEV2DEV2 || src_op == SUM_S_DIAG ||  
       src_op == SUM_S_SYM_DIAG ) {
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("calculate: DEV22\n");
-    #endif
+#endif
     polarisation=devDirToPolDir(2,prop_direction);
     symmetricDerivative(lat, whr, polarisation);
     // DisplayAllSource(whr);
@@ -948,9 +948,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   if (src_op == DEV1DEV2 || src_op == SUM_S_SYM || src_op== SUM_S_SYM_DIAG || 
       src_op == SUM_S_ANTISYM || src_op == SUM_F_S_ANTISYM || 
       src_op == SUM_UNIT_F_S_ANTISYM ){
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("calculate: DEV12\n");
-    #endif
+#endif
     polarisation=devDirToPolDir(2,prop_direction);
     symmetricDerivative(lat, whr, polarisation);
     // DisplayAllSource(whr);
@@ -969,7 +969,7 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
       src_op == SUM_UNIT_F_S_ANTISYM ){
 #ifdef DEBUG_W_QUARK
     printf("calculate: DEV21\n");
-    #endif
+#endif
     polarisation=devDirToPolDir(1,prop_direction);
     symmetricDerivative(lat, whr, polarisation);
     // DisplayAllSource(whr);
@@ -993,9 +993,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   if (src_op == DEV2DEV3 || src_op == SUM_S_SYM ||  src_op== SUM_S_SYM_DIAG ||
       src_op == SUM_S_ANTISYM || src_op == SUM_F_S_ANTISYM || 
       src_op == SUM_UNIT_F_S_ANTISYM ){
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("calculate: DEV23\n"); 
-    #endif
+#endif
     polarisation=devDirToPolDir(3,prop_direction);
     symmetricDerivative(lat, whr, polarisation);
     // DisplayAllSource(whr);
@@ -1012,9 +1012,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   if (src_op == DEV3DEV2 || src_op == SUM_S_SYM ||  src_op== SUM_S_SYM_DIAG ||
       src_op == SUM_S_ANTISYM || src_op == SUM_F_S_ANTISYM || 
       src_op == SUM_UNIT_F_S_ANTISYM ){
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("calculate: DEV32\n");
-    #endif
+#endif
     polarisation=devDirToPolDir(2,prop_direction);
     symmetricDerivative(lat, whr, polarisation);
     // DisplayAllSource(whr);
@@ -1037,9 +1037,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   if (src_op == DEV1DEV3 || src_op == SUM_S_SYM ||  src_op== SUM_S_SYM_DIAG ||
       src_op == SUM_S_ANTISYM || src_op == SUM_F_S_ANTISYM || 
       src_op == SUM_UNIT_F_S_ANTISYM ){
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("calculate: DEV13\n"); 
-    #endif
+#endif
     polarisation=devDirToPolDir(3,prop_direction);
     symmetricDerivative(lat, whr, polarisation);
     // DisplayAllSource(whr);
@@ -1056,9 +1056,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   if (src_op == DEV3DEV1 || src_op == SUM_S_SYM ||  src_op== SUM_S_SYM_DIAG ||
       src_op == SUM_S_ANTISYM || src_op == SUM_F_S_ANTISYM || 
       src_op == SUM_UNIT_F_S_ANTISYM ){
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("calculate: DEV31\n"); 
-    #endif
+#endif
     polarisation=devDirToPolDir(1,prop_direction);
     symmetricDerivative(lat, whr, polarisation);
     // DisplayAllSource(whr);
@@ -1098,9 +1098,9 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   weight=1.0; //weight of this operator
   //copy sum to source matrix
   if (src_op >= SUM_F && src_op<END_SUM_OP) {
-    #ifdef DEBUG_W_QUARK
+#ifdef DEBUG_W_QUARK
     printf("sum --> source_matrix\n");
-    #endif
+#endif
     Equal(sum);            // set source_matrix to sum
     // moveMem((Float *)source_matrix_p, (Float *)sum, source_matrix_size**sizeof(Float));
     VRB.Func(d_class_name, dtor_str);
@@ -1216,9 +1216,9 @@ WspectQuark::symmetricDerivative(Lattice &lat, const WspectHyperRectangle &whr, 
 	  gauge = src_fuzz_p->GetLink(lcl, polarisation);
 	  }
 	  //DisplayMatrix((const Float *) gauge, "U_i(x) in symmderiv");
-	  #ifdef DEBUG_CHECKSU3
+#ifdef DEBUG_CHECKSU3
 	  CheckSU3((const Float *)gauge);
-          #endif
+#endif
 	  // get 3x3 "source matrix" from shifted source_matrix (3x3xsites)
 	  // which lives only on a 3-dim hyperplane orthogonal to 
 	  // the propagation direction, GetSource does the job
@@ -1255,9 +1255,9 @@ WspectQuark::symmetricDerivative(Lattice &lat, const WspectHyperRectangle &whr, 
 	    gauge  = src_fuzz_p->GetLink(lcl_shift, polarisation);
 	  }
  	  // DisplayMatrix((const Float *)gauge, "U_i(x-i) in symmderiv");
-	  #ifdef DEBUG_CHECKSU3
+#ifdef DEBUG_CHECKSU3
 	  CheckSU3((const Float *)gauge);
-          #endif
+#endif
 	  //  U_i(x-i) = U_i^{\dag}(x-i)
 	  // couldn't get dag to work
 	  dag.Dagger((const IFloat*)gauge); 

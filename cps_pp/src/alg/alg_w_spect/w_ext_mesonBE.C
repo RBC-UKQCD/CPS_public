@@ -274,9 +274,9 @@ void WspectExtendedMesonsBE::print()const{
     }
 
     if(measure_flag){
-      #ifdef DEBUG_W_EXT_MESON
+#ifdef DEBUG_W_EXT_MESON
       printf("Writing extended meson#%d data to file %s\n",meson,outputfilename);   
-      #endif
+#endif
       
       if ( !(fp = fopen(outputfilename, "a")) )
 	ERR.FileA(d_class_name,fname, outputfilename);

@@ -169,22 +169,22 @@ void FermionVector::printWaveFunc(char *file) const{
 	  for(int D1=0;D1<DIRACs;D1++){
 	    for(int C1=0; C1<COLORs; C1++){
 	      //Note: Do not use rcomplex::abs which uses "math64.h"!
-              #ifdef _TARTAN
+#ifdef _TARTAN
               abs=(sqrt(spinor[s]*spinor[s]+spinor[s+1]*spinor[s+1]));
-              #else
+#else
               abs=sqrt(spinor[s]*spinor[s]+spinor[s+1]*spinor[s+1]);
-              #endif   
+#endif   
 	      sum=sum+abs;
 	      s=s+COMPLEXs;
 	    }
 	  }
 
 	  sum=sum/(DIRACs*COLORs);
-	#ifdef _TARTAN
+#ifdef _TARTAN
 	  radius=(sqrt(glb[0]*glb[0]+glb[1]*glb[1]+glb[2]*glb[2]));
-        #else
+#else
 	  radius=sqrt(glb[0]*glb[0]+glb[1]*glb[1]+glb[2]*glb[2]);
-        #endif 
+#endif 
 	  time=glb[3];
 	  
 	  fprintf(fp,"%g %g %g\n", radius, time, sum);

@@ -10,12 +10,18 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: link_buffer.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2003-08-12 16:21:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.3 2003-08-12 16:21:28 zs Exp $
+//  $Id: link_buffer.C,v 1.3 2003-08-12 16:21:28 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.4  2001/08/16 10:50:38  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -40,7 +46,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: link_buffer.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v $
 //  $State: Exp $
 //
@@ -869,7 +875,7 @@ PathOrdProd(Matrix & mat, const int * x, const int* dirs, int n){
     moveMem((IFloat*)buf1_mp, (IFloat*)p1, MATRIX_SIZE);
       //didn't hit the boundary, directly move the cram
 
-  #define SWAP(a, b) {Matrix* tmp_mp = (a); (a)=(b); (b)=tmp_mp;}
+#define SWAP(a, b) {Matrix* tmp_mp = (a); (a)=(b); (b)=tmp_mp;}
 
   if (dir_sign) 
      //link going backward so take its hermite conjugate 
@@ -931,7 +937,7 @@ PathOrdProd(Matrix & mat, const int * x, const int* dirs, int n){
        //recent result of the products.
       SWAP(r1_mp, r_mp)
         
-    #undef SWAP
+#undef SWAP
   }
   moveMem((IFloat*)&mat, (IFloat*)r1_mp, MATRIX_SIZE* sizeof(IFloat));
 }

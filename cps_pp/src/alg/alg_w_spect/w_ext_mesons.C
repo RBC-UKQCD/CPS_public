@@ -243,18 +243,18 @@ void WspectExtendedMesons::collect(const WspectQuark &q_l, WspectQuark &q_nl, Ws
     // step 1:  map sink_op to sink_op_tmp according to the propagation direction
     // not yet implemented !!!
     sink_op_tmp=(DEVOperatorKind)sink_op;
-    #ifdef  DEBUG_W_EXT_MESON
+#ifdef  DEBUG_W_EXT_MESON
      printf("src_op=%d sink_op= %d\n", sour_op,sink_op);
-    #endif
+#endif
     // step 2: check if (sink_op, sour_op) is relevant 
     // for any state to be calculated according to the weight table
 
     Float weight_test=0.;
     testCombination(sour_op,sink_op, weight_test);
 
-    #ifdef  DEBUG_W_EXT_MESON
+#ifdef  DEBUG_W_EXT_MESON
      printf("weight = %e \n", weight_test);
-    #endif
+#endif
 
     // if the combination (sour_op,sink_op) is not needed skip the remainder
     // and continue loop over the next sink operator
@@ -275,9 +275,9 @@ void WspectExtendedMesons::collect(const WspectQuark &q_l, WspectQuark &q_nl, Ws
     if (!prop_sink_p) ERR.Pointer(d_class_name, fname, "prop_sink_p");
 
 
-    #ifdef DEBUG_W_EXT_MESON
+#ifdef DEBUG_W_EXT_MESON
     printf("Apply sink operator %d\n",sink_op);
-    #endif
+#endif
     
     //if sink_op is second derivative operator
     //allocate extra temprary buffer for it
@@ -362,9 +362,9 @@ WspectExtendedMesons::DiracAlgebra(const Float* qp1, const Float* qp2, int lclW,
     *p++ = 0.0;
   
   // For fixed Dirac indices do Mom Projection and Color Trace
-  #ifdef DEBUG_W_EXT_MESON
+#ifdef DEBUG_W_EXT_MESON
   //  printf("MomProj..\n");
-  #endif
+#endif
   int D1x, D2x, D1y, D2y;
   for (D1x = 0; D1x < DIRACs; D1x++) {    
     for (D1y = 0; D1y < DIRACs; D1y++) {      
@@ -382,9 +382,9 @@ WspectExtendedMesons::DiracAlgebra(const Float* qp1, const Float* qp2, int lclW,
     }
   } // endfor D1x
 
-  #ifdef DEBUG_W_EXT_MESON
+#ifdef DEBUG_W_EXT_MESON
   //  printf("MomProj done\n");
-  #endif
+#endif
 
   for(int sour_gamma=0;sour_gamma< SOUR_GAMMAS;sour_gamma++){ 
     for(int sink_gamma=0;sink_gamma< SINK_GAMMAS;sink_gamma++){ 
@@ -707,9 +707,9 @@ WspectExtendedMesons::print() const {
     }
 
     if(measure_flag){
-      #ifdef DEBUG_W_EXT_MESON
+#ifdef DEBUG_W_EXT_MESON
       printf("Writing extended meson#%d data to file %s\n",meson,outputfilename);   
-      #endif
+#endif
       
       if ( !(fp = fopen(outputfilename, "a")) )
 	ERR.FileA(d_class_name,fname, outputfilename);
@@ -2119,33 +2119,33 @@ void WspectExtendedMesons::initWMesonStateTable(WspectArg *arg){
       //WMesonStateTable[stateId].measure=measure_normal_mesons;
     }
     else if(cat==EXT_FIRSTDEV_MESON){
-     #ifdef DEBUG_W_EXT_MESON
+#ifdef DEBUG_W_EXT_MESON
      printf("InitTable: first dev on=%d\n",arg->extended_mesons_first_dev_on);
-     #endif	
+#endif	
       WMesonStateTable[stateId].measure=arg->extended_mesons_first_dev_on;
     }
     else if(cat==EXT_SECONDDEV_SYM_MESON){
-     #ifdef DEBUG_W_EXT_MESON
+#ifdef DEBUG_W_EXT_MESON
      printf("InitTable: second sym dev on=%d\n",arg->extended_mesons_second_sym_dev_on);
-     #endif
+#endif
      WMesonStateTable[stateId].measure=arg->extended_mesons_second_sym_dev_on;
     }
     else if(cat==EXT_SECONDDEV_ANTISYM_MESON){
-     #ifdef DEBUG_W_EXT_MESON
+#ifdef DEBUG_W_EXT_MESON
      printf("InitTable: second antisym dev on=%d\n",arg->extended_mesons_second_antisym_dev_on);
-     #endif
+#endif
       WMesonStateTable[stateId].measure=arg->extended_mesons_second_antisym_dev_on;
     }
     else if(cat==EXT_SECONDDEV_DIAG_MESON){
-      #ifdef DEBUG_W_EXT_MESON
+#ifdef DEBUG_W_EXT_MESON
       printf("InitTable: second diag dev on=%d\n",arg->extended_mesons_second_diag_dev_on);
-     #endif
+#endif
       WMesonStateTable[stateId].measure=arg->extended_mesons_second_diag_dev_on;
     }
     else if(cat==MIXING){
-      #ifdef MIXING_ON
+#ifdef MIXING_ON
       WMesonStateTable[stateId].measure=1;
-      #endif
+#endif
     }
     //if(WMesonStateTable[stateId].measure) printf("%d State measure==1\n");
   }

@@ -43,7 +43,7 @@ CPS_START_NAMESPACE
 
 #ifdef  TIMING_ALG_W_SPECT
 CPS_END_NAMESPACE
-  #include <time.h>                 // clock()
+#include <time.h>                 // clock()
 CPS_START_NAMESPACE
 #endif
 
@@ -152,10 +152,10 @@ void AlgWspectExtMeson::run()
       //calculate additional quark propagator with source_operator
       
       if(d_arg_p->extended_mesons_on){
-	#ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 	printf("Starting extended meson...\n");
 	printf("Operator groupID = %d\n",d_arg_p->extended_mesons_op_groupId);
-	#endif
+#endif
 	//extended mesons here
 
 	//fuzzing object pointers, initialized to be zero
@@ -201,15 +201,15 @@ void AlgWspectExtMeson::run()
 
 	  //RUN fuzzing
 	  if(d_arg_p->fuzzing_on){
-            #ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 	    printf("Start fuzzing at source...\n");
-            #endif
+#endif
 	    src_fuzz_p=new WspectFuzzing(lat,d_arg_p[0],0,src_fuzz_count);
 	    src_fuzz_p->run();
 	    sink_fuzz_p=src_fuzz_p;
-	    #ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 	    printf("Fuzzing done\n");
-	    #endif
+#endif
 	  }
 
 	  //loop over all possible source_operators
@@ -232,9 +232,9 @@ void AlgWspectExtMeson::run()
 		if(d_arg_p->fuzzing_on && d_arg_p->sink_fuzzing_only){
 		  
 		  for(sink_fuzz_count=0;sink_fuzz_count<sink_fuzz_num; sink_fuzz_count++){
-		    #ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 		    printf("sink fuzz only mode, sink_fuzz index #%d\n",sink_fuzz_count);
-		    #endif
+#endif
 		    //if sink_fuzz_only, need to rerun fuzzing for each fuzzing parameter
 		    //run fuzzing
 		    if(!sink_fuzz_p){
@@ -286,9 +286,9 @@ void AlgWspectExtMeson::run()
 	    
 	  //call finish to do global sum and print out data, then delete extmeson objects
 	  for(sink_fuzz_count=0;sink_fuzz_count<sink_fuzz_num;sink_fuzz_count++){
-	    #ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 	    printf("Finish and print out extended mesons(fuzzing index #%d)\n",sink_fuzz_count);
-	    #endif
+#endif
 	    ext_meson_p[sink_fuzz_count]->finish();
 	    //print out all correlators(if non-zero) to files
 	    ext_meson_p[sink_fuzz_count]->print();
@@ -301,9 +301,9 @@ void AlgWspectExtMeson::run()
 	  sink_fuzz_p=0;
 	  
 	}//loop over source fuzzing parameters
-	#ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 	printf("Extended mesons done...\n");
-	#endif
+#endif
       }//if ext_meson_on
 	 
     }//end of extended mesons
@@ -321,10 +321,10 @@ void AlgWspectExtMeson::run()
       //print out the result, delete ext_meson object
       //
        if(d_arg_p->extended_mesonsBE_on){
-	#ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 	printf("Starting extended meson BE ...\n");
 	printf("Operator groupID = %d\n",d_arg_p->extended_mesonsBE_op_groupId);
-	#endif
+#endif
 	//extended mesons here
 
 	//fuzzing object pointers, initialized to be zero
@@ -348,14 +348,14 @@ void AlgWspectExtMeson::run()
 
 	  //RUN fuzzing
 	  if(d_arg_p->BEfuzzing_on){
-            #ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 	    printf("Start fuzzing.....\n");
-            #endif
+#endif
 	    fuzz_p=new WspectFuzzing(lat,d_arg_p[0],0,fuzz_count);
 	    fuzz_p->run();
-            #ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 	    printf("Fuzzing done\n");
-	    #endif
+#endif
 	  }
 
 	  //Calculate Fields
@@ -405,9 +405,9 @@ void AlgWspectExtMeson::run()
 	  }//for(src_op,...)  
 	    
 	  //call finish to do global sum and print out data, then delete extmeson objects
-          #ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 	  printf("Finish and print out BE extended mesons(fuzzing index #%d)\n",fuzz_count);
-	  #endif
+#endif
 	  ext_mesonBE_p->finish();
 	  //print out all correlators(if non-zero) to files
 	  ext_mesonBE_p->print();
@@ -416,9 +416,9 @@ void AlgWspectExtMeson::run()
 	  if(fuzz_p) delete fuzz_p;
 	  
 	}//loop over source fuzzing parameters
-	#ifdef DEBUG_ALG_W_EXT_SPECT
+#ifdef DEBUG_ALG_W_EXT_SPECT
 	printf("Extended BE mesons done...\n");
-	#endif
+#endif
        }//if ext_mesonBE_on
     }
    

@@ -95,9 +95,9 @@ WspectFuzzing::WspectFuzzing(Lattice &lat, WspectArg & warg, int singleslice,int
   
   
   
-   #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
    printf("Fuzzedlink_p allocated at %x(size=%x)\n",fuzzedlink_p,d_size);
-   #endif
+#endif
 
    //zero out
    IFloat *fp=(IFloat *) fuzzedlink_p;
@@ -142,14 +142,14 @@ void WspectFuzzing::run(int wall){
    
    printf("Fuzzing::run(), c=%f, level=%d, hits=%d\n",fuzzing_c, fuzzing_level, fuzzing_hits);
    
-    #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
      printf("Call fuzz() wall=%d, level=%d\n",wall,fuzzing_level);
-    #endif
+#endif
     fuzz(fuzzedlink_p, gf_p, wall,fuzzing_c,fuzzing_level,fuzzing_hits);
   
-  #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
   //  display();
-  #endif
+#endif
 
   //deallocate memory of fuzzedlink_tmp_p
   VRB.Sfree(d_class_name, fname, "fuzzedlink_tmp_p", fuzzedlink_tmp_p);
@@ -178,14 +178,14 @@ void WspectFuzzing::run(){
 
   printf("Fuzzing::run(), c=%f, level=%d, hits=%d\n",fuzzing_c, fuzzing_level, fuzzing_hits);
   for(int wall=0;wall<lclWalls;wall++){
-    #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
     printf("Call fuzz() wall=%d, level=%d\n",wall,fuzzing_level);
-    #endif
+#endif
     fuzz(fuzzedlink_p, gf_p, wall,fuzzing_c,fuzzing_level,fuzzing_hits);
   }
-  #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
   //  display();
-  #endif
+#endif
 
   //deallocate memory of fuzzedlink_tmp_p
   VRB.Sfree(d_class_name, fname, "fuzzedlink_tmp_p", fuzzedlink_tmp_p);
@@ -256,9 +256,9 @@ void  WspectFuzzing::fuzz(Matrix *FU, const Matrix *U, int lclWall, Float c, int
 
   //do fuzzing
   //temporary buffers(time slice)
-  #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
   //printf("WspectFuzzing::fuzz() with fuzzing_on==1\n");
-  #endif
+#endif
 
  
   Matrix FUZZM;
@@ -269,15 +269,15 @@ void  WspectFuzzing::fuzz(Matrix *FU, const Matrix *U, int lclWall, Float c, int
   int siteoffset;
 
   for(int iter=0;iter<flevel;iter++){
-    #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
     printf("Fuzzing iteration #%d\n",iter);
-    #endif
+#endif
     for(dir=0;dir<=2;dir++){
       //convert dir to one of the three directions!=prop_direction
       dir1=(dir+1+prop_dir)%4;
-      #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
       printf("Dir #%d\n",dir1);
-      #endif
+#endif
       //for all sites on the wall
       for(site[3]=siteMin[3];site[3]<=siteMax[3];site[3]++){
 	for(site[2]=siteMin[2];site[2]<=siteMax[2];site[2]++){
@@ -299,10 +299,10 @@ void  WspectFuzzing::fuzz(Matrix *FU, const Matrix *U, int lclWall, Float c, int
 	      FUZZOld=FUZZM;
 	      
 	      FUZZM.Unitarize();
-	      #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
 	      printf("---------After projSU3: check=%f\n",FUZZM.ErrorSU3());
 	      //displaySU3(&FUZZM);
-	      #endif
+#endif
 	      //multiM=Dag(FUZZOLD)*FUZZM;
 	      dagM.Dagger((IFloat *)&FUZZOld);
 	      mDotMEqual((IFloat *)&multiM,(const IFloat *)&dagM, (const IFloat *)&FUZZM);
@@ -312,10 +312,10 @@ void  WspectFuzzing::fuzz(Matrix *FU, const Matrix *U, int lclWall, Float c, int
 		cabbibo(hit,hit_iter,multiM,FUZZM);
 	      }//hit
 	      //check SU3 of fuzzed link
-	      #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
 	      printf("---------After cooling: SU3 check=%f\n",FUZZM.ErrorSU3());
 	      // displaySU3(&FUZZM);
-	      #endif
+#endif
 	      //copy FUZZ to temp buffer
 	      FUTMPM_p=fuzzedlink_tmp_p+siteoffset*DIM+dir1;
 	      *(FUTMPM_p)=FUZZM;
@@ -329,9 +329,9 @@ void  WspectFuzzing::fuzz(Matrix *FU, const Matrix *U, int lclWall, Float c, int
     for(dir=0;dir<=2;dir++){
       //convert dir to one of the three directions!=prop_direction
       dir1=(dir+1+prop_dir)%4;
-      #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
       printf("Dir #%d\n",dir1);
-      #endif
+#endif
       //for all sites on the wall
       for(site[3]=siteMin[3];site[3]<=siteMax[3];site[3]++){
 	for(site[2]=siteMin[2];site[2]<=siteMax[2];site[2]++){
@@ -366,10 +366,10 @@ WspectFuzzing::GetLink(const int *site, int dir) const
   
   //VRB.Debug(cname, fname, "link %3i %3i %3i %3i ; %i\n",
   //  site[0], site[1], site[2], site[3], dir) ;
-  #ifdef DEBUG_FUZZING
+#ifdef DEBUG_FUZZING
   //printf("Getlink %3i %3i %3i %3i ; %i\n",
   //	    site[0], site[1], site[2], site[3], dir) ;
-  #endif
+#endif
 
   // offset out-of-range coordinates site[] into on_node_site[]
   // in order to locate the link
