@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.6 2004-08-18 11:57:50 zs Exp $
-//  $Id: dwf_init.C,v 1.6 2004-08-18 11:57:50 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-30 04:32:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.7 2004-08-30 04:32:43 chulwoo Exp $
+//  $Id: dwf_init.C,v 1.7 2004-08-30 04:32:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_init.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v $
 //  $State: Exp $
 //
@@ -116,15 +116,18 @@ void dwf_init(Dwf *dwf_p)
 // Allocate memory for a communications buffer needed
 // for the spread-out case.
 //------------------------------------------------------------------
-  int ls_stride = 24*dwf_p->vol_4d;
-  dwf_p->comm_buf = (IFloat *) fmalloc(ls_stride*sizeof(IFloat));
-//  dwf_p->comm_buf = (IFloat *) smalloc(12 * sizeof(IFloat));
+  int ls_stride = 12*dwf_p->vol_4d;
+//  dwf_p->comm_buf = (IFloat *) fmalloc(ls_stride*sizeof(IFloat));
+  int ls = dwf_p->ls;
+  if (ls >1)
+  dwf_p->comm_buf = (IFloat *) qalloc(QFAST|QNONCACHE,ls_stride*sizeof(IFloat));
+  else
+  dwf_p->comm_buf = (IFloat *) smalloc(12*sizeof(IFloat));
   if(dwf_p->comm_buf == 0)
     ERR.Pointer(cname,fname, "comm_buf");
   VRB.Smalloc(cname,fname,
 	      "comm_buf", dwf_p->comm_buf, 12*sizeof(IFloat));
 
-  int ls = dwf_p->ls;
 
   dwf_p->PlusArg[0] = new SCUDirArgIR;
     (dwf_p->PlusArg[0]) ->Init (dwf_p->comm_buf,SCU_SP,SCU_SEND, ls_stride*sizeof(IFloat),1,0,IR_14);

@@ -122,6 +122,8 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
   spinor_words = SPINOR_SIZE * vol;
 
   spinor_tmp = (Float *) ALLOC(spinor_words*sizeof(Float)*2);
+  if(spinor_tmp == 0)
+  	spinor_tmp = (Float *) qalloc(QCOMMS,spinor_words*sizeof(Float)*2);
   if(spinor_tmp == 0){
     printf("wfm::spinor_tmp allocate\n");
     exit(-1);
@@ -139,11 +141,12 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
   /*PAB 10/1/2001 */
   half_spinor_words = NMinusPlus * ND * PAD_HALF_SPINOR_SIZE * vol;
   two_spinor = (Float *)ALLOC(half_spinor_words*sizeof(Float));
+  if(two_spinor == 0)
+  	two_spinor = (Float *)qalloc(QCOMMS,half_spinor_words*sizeof(Float));
   if(two_spinor == 0){
     printf("wfm::two_spinor allocate\n");
     exit(-1);
   }
-//  printf("two_spinor is %x\n",two_spinor);
 
   for ( int pm = 0;pm<2;pm++ ) {
     for ( mu = 0 ; mu < 4 ; mu ++) {

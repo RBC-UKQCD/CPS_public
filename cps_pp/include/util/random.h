@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.14 2004-08-18 11:57:37 zs Exp $
+  $Id: random.h,v 1.15 2004-08-30 04:31:06 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.14 2004-08-18 11:57:37 zs Exp $
-//  $Id: random.h,v 1.14 2004-08-18 11:57:37 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-30 04:31:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.15 2004-08-30 04:31:06 chulwoo Exp $
+//  $Id: random.h,v 1.15 2004-08-30 04:31:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -244,10 +244,10 @@ class LatRanGen
     void Initialize();  
 
     //! Get a uniform random number.
-    IFloat Urand(FermionFieldDimension frm_dim=FIVE_D);
+    IFloat Urand(FermionFieldDimension frm_dim=FOUR_D);
 
     //! Get a gaussian random number
-    IFloat Grand(FermionFieldDimension frm_dim=FIVE_D);
+    IFloat Grand(FermionFieldDimension frm_dim=FOUR_D);
 
     //! Get a uniform random number which is the same on all nodes.
     IFloat Lrand(); 

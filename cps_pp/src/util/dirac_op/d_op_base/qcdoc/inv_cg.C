@@ -10,14 +10,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.11 2004-08-18 11:57:49 zs Exp $
-//  $Id: inv_cg.C,v 1.11 2004-08-18 11:57:49 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-30 04:31:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.12 2004-08-30 04:31:39 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.12 2004-08-30 04:31:39 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -194,6 +194,13 @@ int DiracOp::InvCg(Vector *out,
     src_norm_sq = src->NormSqNode(f_size_cb);
     DiracOpGlbSum(&src_norm_sq);
   }
+#if 0
+  {
+    IFloat *tmp = (IFloat *)src;
+    printf("src[0]=%e src_norm_sq=%e\n",*tmp,src_norm_sq);
+
+  }
+#endif
 
 // Calculate stopping condition
 //------------------------------------------------------------------

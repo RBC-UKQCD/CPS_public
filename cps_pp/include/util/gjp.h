@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.11 2004-08-18 11:57:37 zs Exp $
+  $Id: gjp.h,v 1.12 2004-08-30 04:30:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.11 2004-08-18 11:57:37 zs Exp $
-//  $Id: gjp.h,v 1.11 2004-08-18 11:57:37 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-30 04:30:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.12 2004-08-30 04:30:51 chulwoo Exp $
+//  $Id: gjp.h,v 1.12 2004-08-30 04:30:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //
@@ -154,6 +154,8 @@ class GlobalJobParameter
 		       // Otherwise it is 0.
   char start_conf_filename[MAX_FILENAME_LEN];
 			//Filename for START_CONF_FILENAME
+
+  int start_conf_alloc_flag;
 
   StartSeedType start_seed_kind;  // The kind of initial 
                                   // random generator seed
@@ -518,10 +520,9 @@ public:
 
   const char * StartConfFilename() const
       {return start_conf_filename;}
-  //!< Gets the type of initial  gauge configuration.
-  /*!<
-    \return The type of initial gauge configuration.
-  */    
+
+  const int StartConfAllocFlag() 
+      {return start_conf_alloc_flag;}
 
   StartSeedType StartSeedKind() const
       {return start_seed_kind;}
@@ -810,6 +811,17 @@ public:
 
 };
 
+/*! declaration for Start() and End() which should be called at the
+start and end of main()
+*/
+
+#if TARGET == QCDOC
+void Start();
+void End();
+#else
+inline void Start(){}
+inline void End(){}
+#endif
 
 /*! An instance of the GlobalJobParameter class, named GJP, should be
   created at the highest scope (outside main). This external declaration

@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.13 2004-08-18 11:57:33 zs Exp $
+  $Id: config.h.in,v 1.14 2004-08-30 04:28:41 chulwoo Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -13,14 +13,14 @@
  *--------------------------------------------------------------------
  *  CVS keywords
  *
- *  $Author: zs $
- *  $Date: 2004-08-18 11:57:33 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.13 2004-08-18 11:57:33 zs Exp $
- *  $Id: config.h.in,v 1.13 2004-08-18 11:57:33 zs Exp $
+ *  $Author: chulwoo $
+ *  $Date: 2004-08-30 04:28:41 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.14 2004-08-30 04:28:41 chulwoo Exp $
+ *  $Id: config.h.in,v 1.14 2004-08-30 04:28:41 chulwoo Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.13 $
+ *  $Revision: 1.14 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -33,6 +33,11 @@
 #define QCDOC  1
 #define QCDSP  2
 #define cpsMPI    3
+
+#define VERSION_MAJOR @VERSION_MAJOR@
+#define VERSION_MINOR @VERSION_MINOR@
+#define VERSION_SUB @VERSION_SUB@
+#define VERSION_STR @VERSION_STR@
 
 #define TARGET @ARCH@
 #@ENABLE_PARALLEL@

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the DoArg structure.
   
-  $Id: do_arg.h,v 1.11 2004-08-18 11:47:03 zs Exp $
+  $Id: do_arg.h,v 1.12 2004-08-30 04:29:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /* CIM Sun Jul  6 23:30:27 GMT 1997 */
@@ -14,6 +14,13 @@ CPS_START_NAMESPACE
 #ifndef INCLUDED_DO_ARG_H
 #define INCLUDED_DO_ARG_H
 
+
+#if TARGET == QCDOC
+#include <qalloc.h>
+const int DEFAULT_ALLOC  = QCOMMS;
+#else
+const int DEFAULT_ALLOC  = 0;
+#endif
 
 
 CPS_END_NAMESPACE
@@ -62,6 +69,7 @@ struct DoArg {
 				  ::START_CONF_MEM or ::START_CONF_LOAD. */
   char *start_conf_filename;
 				// Filename for START_CONF_FILENAME
+  int start_conf_alloc_flag;
 
   StartSeedType start_seed_kind;  //!< The kind of initial random number generator seed
 
@@ -152,7 +160,8 @@ struct DoArg {
   DoArg()     :  
     s_node_sites(1),
     s_nodes(1),
-    start_conf_filename(0),
+    start_conf_filename(NULL),
+    start_conf_alloc_flag(DEFAULT_ALLOC),
     c_1(0.0),               
     u0(1.0),                
     dwf_a5_inv(1.0),

@@ -3406,6 +3406,16 @@ fi
 
 
 
+.  $srcdir/VERSION
+echo $srcdir
+echo MAJOR ${VERSION_MAJOR}
+echo MINOR ${VERSION_MINOR}
+echo SUB   ${VERSION_SUB}
+echo Version ${VERSION_STR}
+
+
+
+
 
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
@@ -4204,6 +4214,10 @@ s,@USING_NAMESPACE_CPS@,$USING_NAMESPACE_CPS,;t t
 s,@CWD@,$CWD,;t t
 s,@GSUMPRECISION@,$GSUMPRECISION,;t t
 s,@LOCALPRECISION@,$LOCALPRECISION,;t t
+s,@VERSION_MAJOR@,$VERSION_MAJOR,;t t
+s,@VERSION_MINOR@,$VERSION_MINOR,;t t
+s,@VERSION_SUB@,$VERSION_SUB,;t t
+s,@VERSION_STR@,$VERSION_STR,;t t
 s,@INSTALL_PROGRAM@,$INSTALL_PROGRAM,;t t
 s,@INSTALL_SCRIPT@,$INSTALL_SCRIPT,;t t
 s,@INSTALL_DATA@,$INSTALL_DATA,;t t

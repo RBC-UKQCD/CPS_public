@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.15 2004-08-18 13:10:01 zs Exp $
+  $Id: gjp.C,v 1.16 2004-08-30 04:34:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 13:10:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.15 2004-08-18 13:10:01 zs Exp $
-//  $Id: gjp.C,v 1.15 2004-08-18 13:10:01 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-30 04:34:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.16 2004-08-30 04:34:34 chulwoo Exp $
+//  $Id: gjp.C,v 1.16 2004-08-30 04:34:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -308,6 +308,8 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   gjp_scu_dir[5] = SCU_ZM;
   gjp_scu_dir[6] = SCU_TP;
   gjp_scu_dir[7] = SCU_TM;
+  gjp_scu_dir[8] = SCU_SP;
+  gjp_scu_dir[9] = SCU_SM;
 
   gjp_scu_wire_map[0] = SCURemap( SCU_XP );
   gjp_scu_wire_map[1] = SCURemap( SCU_XM );
@@ -317,8 +319,9 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   gjp_scu_wire_map[5] = SCURemap( SCU_ZM );
   gjp_scu_wire_map[6] = SCURemap( SCU_TP );
   gjp_scu_wire_map[7] = SCURemap( SCU_TM );
-
-#if TARGET==QCDSP 
+  gjp_scu_wire_map[8] = SCURemap( SCU_SP );
+  gjp_scu_wire_map[9] = SCURemap( SCU_SM );
+#if TARGET == QCDSP
   if(s_nodes != 1) {
     if (s_axis == SCU_X) {
       gjp_scu_dir[8] = SCU_XP;
@@ -345,12 +348,9 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
       gjp_scu_wire_map[9] = SCURemap( SCU_TM );
     }
   }
-#else
-      gjp_scu_dir[8] = SCU_SP;
-      gjp_scu_dir[9] = SCU_SM;
-      gjp_scu_wire_map[8] = SCURemap( SCU_SP );
-      gjp_scu_wire_map[9] = SCURemap( SCU_SM );
-#endif // QCDSP
+#endif
+//  for(int i = 0;i<10;i++) fprintf(stderr,"SCURemap(%d)= %d\n",gjp_scu_dir[i],gjp_scu_wire_map[i]);
+
 
 
 #endif //PARALLEL
@@ -397,6 +397,9 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
     } else
     strcpy(start_conf_filename,rda.start_conf_filename);
   }
+
+    start_conf_alloc_flag = rda.start_conf_alloc_flag;
+    VRB.Flow(cname,fname,"start_conf_alloc_flag=%d\n",start_conf_alloc_flag);
     
 
   // Set the initial seed type.
