@@ -5,6 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
+  $Id: f_asqtad.C,v 1.14 2004-09-02 17:03:38 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -224,8 +225,8 @@ int Fasqtad::FmatInv(Vector *f_out, Vector *f_in,
 //              EigArg *eig_arg, 
 //              CnvFrmType cnv_frm = CNV_FRM_YES):
 //------------------------------------------------------------------
-int Fasqtad::FeigSolv(Vector **f_eigenv, Float lambda[], 
-		    Float chirality[], int valid_eig[],
+int Fasqtad::FeigSolv(Vector **f_eigenv, Float *lambda, 
+		    Float *chirality, int *valid_eig,
 		    Float **hsum,
 		    EigArg *eig_arg, 
 		    CnvFrmType cnv_frm)

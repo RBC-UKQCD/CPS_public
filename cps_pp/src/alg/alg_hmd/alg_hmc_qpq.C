@@ -1,4 +1,22 @@
 //------------------------------------------------------------------
+/*!\file
+  \brief Definitions of the AlgHmcRHMC methods.
+
+  $Id: alg_hmc_qpq.C,v 1.4 2004-09-02 17:10:20 zs Exp $
+*/
+//--------------------------------------------------------------------
+//  $Author: zs $
+//  $Date: 2004-09-02 17:10:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_qpq.C,v 1.4 2004-09-02 17:10:20 zs Exp $
+//  $Id: alg_hmc_qpq.C,v 1.4 2004-09-02 17:10:20 zs Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $RCSfile: alg_hmc_qpq.C,v $
+//  $Revision: 1.4 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_qpq.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
 //
 // alg_hmc_qpq.C
 //
@@ -365,9 +383,20 @@ AlgHmcQPQ::~AlgHmcQPQ() {
 //------------------------------------------------------------------
 //! Run the HMC algorithm.
 /*!
-  This performs a single  HMC trajectory.
-  \post The results are written to the file specified in the common_arg
-  structure.
+  \return The probability used in the metropolis step.  
+  \post The following results are written to the file specified in the
+  CommonArg structure:
+  -# Number of molecular dynamics steps + 1
+  -# Change in the hamiltonian
+  -# 1/0 if accepted/rejected
+  -# A measure of the change in the gauge field due to reunitarisation
+  -# Another measure of the change in the gauge field due to reunitarisation
+  -# Average number of solver iterations.
+  -# Minimum number of solver iterations.
+  -# Maximum number of solver iterations.
+  -# Average solver residue
+  -# Minimum solver residue
+  -# Maximum solver residue
 */
 //------------------------------------------------------------------
 Float AlgHmcQPQ::run(void)

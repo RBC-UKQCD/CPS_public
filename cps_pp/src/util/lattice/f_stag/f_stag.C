@@ -5,6 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
+  $Id: f_stag.C,v 1.13 2004-09-02 17:09:19 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -307,12 +308,12 @@ int Fstag::FmatInv(Vector *f_out, Vector *f_in,
 
 
 //------------------------------------------------------------------
-// int FeigSolv(Vector **f_eigenv, Float *lambda, int valid_eig[],
+// int FeigSolv(Vector **f_eigenv, Float *lambda, int *valid_eig,
 //              EigArg *eig_arg, 
 //              CnvFrmType cnv_frm = CNV_FRM_YES):
 //------------------------------------------------------------------
-int Fstag::FeigSolv(Vector **f_eigenv, Float lambda[], 
-		    Float chirality[], int valid_eig[],
+int Fstag::FeigSolv(Vector **f_eigenv, Float *lambda, 
+		    Float *chirality, int *valid_eig,
 		    Float **hsum,
 		    EigArg *eig_arg, 
 		    CnvFrmType cnv_frm)

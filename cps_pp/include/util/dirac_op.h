@@ -3,6 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
+  $Id: dirac_op.h,v 1.12 2004-09-02 17:04:17 zs Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -53,18 +54,17 @@ class DiracOp
 
 
  public:
-  static int scope_lock;           // lock that forbids more than
-                                   // one DiracOp object to be on
-                                   // scope at any time.
+  static int scope_lock;
+  //!< lock that prevents more than one DiracOp object to be on scope at any time.
 
   // PAB... uniform performance counting
-  static int CGflops;
+  static int CGflops; //!< Flops counter.
 
   DiracOp(Lattice& latt,           // Lattice object.
 	  Vector *f_field_out,     // Output fermion field ptr.
 	  Vector *f_field_in,      // Input fermion field ptr.
 	  CgArg *arg,              // Argument structure
-	  CnvFrmType cnv_frm_flg); // Fermion conversion flag
+	  CnvFrmType convert); // Fermion conversion flag
 
   virtual ~DiracOp();
 
@@ -127,8 +127,8 @@ class DiracOp
   void GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size);
 
   //! Jacobi diagonalisation of a matrix.
-  int Jacobi(Vector **psi, int N_eig, Float lambda[], 
-	     Complex off_diag[], 
+  int Jacobi(Vector **psi, int N_eig, Float *lambda, 
+	     Complex *off_diag, 
 	     Float Toler, int N_max);
      // Jacobi diagonalizer of a single site matrix.
 
@@ -137,7 +137,7 @@ class DiracOp
 	     int Nshift, int isz, Float *RsdCG, 
 	     MultiShiftSolveType type, Float *alpha);
 
-  //! Minimum Residual Extrapolation (Chronological Inverter)
+  //! Chronological initial guess for the solver. 
   Float MinResExt(Vector *psi, Vector *phi, Vector **psi_old, 
 		  Vector **vm, int degree);
 
@@ -161,7 +161,7 @@ class DiracOp
     preconditioned fermion matrix.
     \param out The result
     \param in The vector to be multiplied.
-    \param dot_prod Whether or not to compute the real part of the
+    \param dot_prd Whether or not to compute the real part of the
     local dot product (\e i.e. with no global sum)
     of the vectors \a out and \a in. If \a dot_prod is initially
     non-zero then this is computed and the result placed here.
@@ -341,7 +341,7 @@ class DiracOpStagTypes : public DiracOp
 		   Vector *f_field_out,      // Output fermion field ptr.
 		   Vector *f_field_in,       // Input fermion field ptr.
 		   CgArg *arg,               // Argument structure
-		   CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+		   CnvFrmType convert);  // Fermion conversion flag
 
   virtual ~DiracOpStagTypes();
 
@@ -399,7 +399,7 @@ class DiracOpStag : public DiracOpStagTypes
 	      Vector *f_field_out,      // Output fermion field ptr.
 	      Vector *f_field_in,       // Input fermion field ptr.
 	      CgArg *arg,               // Argument structure
-	      CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+	      CnvFrmType convert);  // Fermion conversion flag
 
   virtual ~DiracOpStag();
 
@@ -513,7 +513,7 @@ class DiracOpAsqtad : public DiracOpStagTypes
 	      Vector *f_field_out,      // Output fermion field ptr.
 	      Vector *f_field_in,       // Input fermion field ptr.
 	      CgArg *arg,               // Argument structure
-	      CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+	      CnvFrmType convert);  // Fermion conversion flag
 
   virtual ~DiracOpAsqtad();
 
@@ -680,7 +680,7 @@ class DiracOpWilsonTypes : public DiracOp
 		     Vector *f_field_out,      // Output fermion field ptr.
 		     Vector *f_field_in,       // Input fermion field ptr.
 		     CgArg *arg,               // Argument structure
-		     CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+		     CnvFrmType convert);  // Fermion conversion flag
 
   virtual ~DiracOpWilsonTypes();
 
@@ -770,7 +770,7 @@ class DiracOpWilson : public DiracOpWilsonTypes
 		Vector *f_field_out,      // Output fermion field ptr.
 		Vector *f_field_in,       // Input fermion field ptr.
 		CgArg *arg,               // Argument structure
-		CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+		CnvFrmType convert);  // Fermion conversion flag
 
   virtual ~DiracOpWilson();
 
@@ -889,7 +889,7 @@ class DiracOpClover : public DiracOpWilsonTypes
 		Vector *f_field_out,      // Output fermion field ptr.
 		Vector *f_field_in,       // Input fermion field ptr.
 		CgArg *arg,               // Argument structure
-		CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+		CnvFrmType convert);  // Fermion conversion flag
 
   virtual ~DiracOpClover();
 
@@ -1110,7 +1110,7 @@ class DiracOpDwf : public DiracOpWilsonTypes
 	     Vector *f_field_out,      // Output fermion field ptr.
 	     Vector *f_field_in,       // Input fermion field ptr.
 	     CgArg *arg,               // Argument structure
-	     CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+	     CnvFrmType convert);  // Fermion conversion flag
 
   virtual ~DiracOpDwf();
 
@@ -1232,7 +1232,7 @@ class DiracOpImprDwf : public DiracOpWilsonTypes
 	     Vector *f_field_out,      // Output fermion field ptr.
 	     Vector *f_field_in,       // Input fermion field ptr.
 	     CgArg *arg,               // Argument structure
-	     CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+	     CnvFrmType convert);  // Fermion conversion flag
 
   virtual ~DiracOpImprDwf();
 
