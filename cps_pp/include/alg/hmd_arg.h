@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the HmdArg structure.
 
-  $Id: hmd_arg.h,v 1.3 2003-08-11 22:15:45 mike Exp $
+  $Id: hmd_arg.h,v 1.4 2003-08-29 20:15:44 mike Exp $
 */
 //------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ enum MetropolisType { METROPOLIS_NO    = 0,
 
 #define MAX_HMD_MASSES  4       //!< The maximum number of dynamical masses.
 
-#define MAX_RAT_DEGREE  10          /* The maximum degree of the rational
+#define MAX_RAT_DEGREE  20          /* The maximum degree of the rational
 				       approximation. */
 
 //! A structure holding the parameters relevant to the HMD algorithms.
@@ -84,25 +84,28 @@ struct HmdArg {
 				      <em> one less than </em> the number of
 				      steps per trajectory.
 				    */
-
+  
   Float step_size;		    /*!< The molecular dynamics step size. */
-
-    MetropolisType metropolis;        /*!< Whether to do the metropolis
-					accept/reject step.
-                                    This is relevant to the Phi
-				    algorithm only. */ 
-
-    ReunitarizeType reunitarize;      /*!< Whether to reunitarize at the end of
-					the trajectory before the metropolis
-					step. */
-
-  /* The parameters for the rational approximation*/
+  
+  MetropolisType metropolis;        /*!< Whether to do the metropolis
+				      accept/reject step.
+				      This is relevant to the Phi
+				      algorithm only. */ 
+  
+  ReunitarizeType reunitarize;      /*!< Whether to reunitarize at the end of
+				      the trajectory before the metropolis
+				      step. */
+  
+  /*!< The parameters for the rational approximation*/
   int FRatDeg[MAX_HMD_MASSES], HBRatDeg[MAX_HMD_MASSES];
   Float FRatNorm[MAX_HMD_MASSES], HBRatNorm[MAX_HMD_MASSES];
   Float FRatConst[MAX_HMD_MASSES][MAX_RAT_DEGREE];
   Float FRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
   Float HBRatConst[MAX_HMD_MASSES][MAX_RAT_DEGREE];
   Float HBRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+
+  int isz; /*!< The smallest polar shift in the rational approximation 
+	    (used by MInvCG)*/
 
 };
 

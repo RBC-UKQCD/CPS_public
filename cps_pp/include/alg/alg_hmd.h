@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.3 2003-08-11 22:15:45 mike Exp $
+  $Id: alg_hmd.h,v 1.4 2003-08-29 20:15:44 mike Exp $
 */
 //------------------------------------------------------------------
 
@@ -176,16 +176,6 @@ class AlgHmcPhi : public AlgHmd
     //!< The change in the value of the boson action.
     /*!< The final value - the initial value. One for each mass */
 
-    int *FRatDeg;
-    Float *FRatNorm;
-    Float **FRatConst;
-    Float **FRatPole;
-
-    int *HBRatDeg;
-    Float *HBRatNorm;
-    Float **HBRatConst;
-    Float **HBRatPole;
-
  public:
 
   AlgHmcPhi(Lattice& latt, CommonArg *c_arg, HmdArg *arg);
@@ -238,6 +228,8 @@ class AlgHmcRHMC : public AlgHmd
     Vector** frm1;
     Vector** frm2;
         // 2 general purpose fermion/boson field arrays (checkerboarded).
+    Vector*** frm3;
+
 
     Vector** cg_sol_cur; 
     Vector** cg_sol_prev;
@@ -270,6 +262,8 @@ class AlgHmcRHMC : public AlgHmd
     Float *HBRatNorm;
     Float **HBRatConst;
     Float **HBRatPole;
+
+    int isz; // smallest polar shift of rational approximation
 
  public:
 
