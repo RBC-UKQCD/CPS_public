@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.20 2004-09-29 17:18:56 chulwoo Exp $
+# $Id: Makefile.in,v 1.21 2004-10-27 14:36:24 zs Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -97,7 +97,7 @@ endif
 test: cps
 	-cp $(TESTDIR)/Makefile_common tests/regression.pl $(SRCDIR)/${TESTDIR}
 	cd $(SRCDIR)/$(TESTDIR); perl regression.pl
-#	cd $(SRCDIR)/$(TESTDIR); sh regression.sh
+
 
 
 # Remove everything made by this makefile

@@ -1,12 +1,7 @@
-# $Id: regression.pl.in,v 1.19 2004-09-21 20:16:50 chulwoo Exp $
+# $Id: regression.pl.in,v 1.20 2004-10-27 14:36:24 zs Exp $
 # tests/regression.pl.  Generated from regression.pl.in by configure.
-# $Id: regression.pl.in,v 1.19 2004-09-21 20:16:50 chulwoo Exp $ 
 #--------------------------------------------------------------------
-# 
-# This perl script writes a shell script "regression.sh"
-# that actually runs the tests. (This dual mode is
-# required because of the limitations of QCDSP).
-#
+ 
 
 # directory with good test data in it
 $control_dir = "regressions/xmldiff/v6_0_0" ; 
