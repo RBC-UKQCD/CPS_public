@@ -1,15 +1,20 @@
 #include<config.h>
-CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: main.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Date: 2003-07-28 13:56:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.2 2003-07-28 13:56:38 mcneile Exp $
+//  $Id: main.C,v 1.2 2003-07-28 13:56:38 mcneile Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1  2003/06/22 13:34:47  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.14  2003/01/30 14:30:53  mcneile
 //  I have made two minor changes so that the code runs on a scalar
 //  machine.
@@ -99,7 +104,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: main.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v $
 //  $State: Exp $
 //
@@ -107,11 +112,10 @@ CPS_START_NAMESPACE
 /*
  *  test for alg
  */
-CPS_END_NAMESPACE
-#include<util/random.h>
-CPS_START_NAMESPACE
 
-CPS_END_NAMESPACE
+#include<util/random.h>
+
+
 #include <stdio.h>
 #include <stdlib.h>	// exit()
 #include<config.h>
@@ -131,12 +135,19 @@ CPS_END_NAMESPACE
 #include<alg/aots_s.h>
 #include<util/vector.h>
 #include<util/random.h>
-CPS_START_NAMESPACE
 
+
+
+namespace cps
+{
 GlobalJobParameter GJP;
 LatRanGen LRG;
 Verbose VRB;
 Error ERR;
+}
+
+using namespace cps ;
+
 
 int main(int argc,char *argv[])
 {
@@ -518,4 +529,3 @@ int main(int argc,char *argv[])
   return(0);
 }
 
-CPS_END_NAMESPACE
