@@ -89,7 +89,7 @@ foreach $tni (@test_names){
 #       compile the code (do not echo the commands)
 	print SHOUT 'make -s -f Makefile_regression'."\n";
 #       check that the executable has been created
-	print SHOUT 'if ! test -f '.$exec_cmd.' ; then'."\n";
+	print SHOUT 'if test ! -f '.$exec_cmd.' ; then'."\n";
 	print SHOUT 'echo '.$tni." COMPILATION FAILURE\n";
 	print SHOUT "cd ..\n";
 
