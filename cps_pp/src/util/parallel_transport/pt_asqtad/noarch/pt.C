@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of ParTransAsqtad class methods.
   
-  $Id: pt.C,v 1.4 2004-08-05 19:00:56 mclark Exp $
+  $Id: pt.C,v 1.5 2004-08-05 20:37:20 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: mclark $
-//  $Date: 2004-08-05 19:00:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/noarch/pt.C,v 1.4 2004-08-05 19:00:56 mclark Exp $
-//  $Id: pt.C,v 1.4 2004-08-05 19:00:56 mclark Exp $
+//  $Date: 2004-08-05 20:37:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/noarch/pt.C,v 1.5 2004-08-05 20:37:20 mclark Exp $
+//  $Id: pt.C,v 1.5 2004-08-05 20:37:20 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/noarch/pt.C,v $
 //  $State: Exp $
 //
@@ -24,12 +24,15 @@
 
 USING_NAMESPACE_CPS
 
+int vol = 1;
+
 /*!
   \param latt The lattice object containing the gauge field on which the
   parallel tranport operates.
   \post The gauge field storage order is converted to STAG order if it is not
   already.
 */
+
 ParTransAsqtad::ParTransAsqtad(Lattice &latt): ParTransStagTypes(latt) {
 
   cname = "ParTransAsqtad";
@@ -41,6 +44,7 @@ ParTransAsqtad::ParTransAsqtad(Lattice &latt): ParTransStagTypes(latt) {
     converted = CNV_FRM_YES;
   }
 
+  vol = GJP.VolNodeSites();
 }
 
 /*!
@@ -92,9 +96,8 @@ void ParTransAsqtad::run(int N, Matrix **vout, Matrix **vin, const int *dir){
 	    spm[mu] = s[mu];
 
 	  }
-			
   }
-    
+  PTflops +=198*N*vol; 
 }
 
 void ParTransAsqtad::run(int N, Vector **vout, Vector **vin, const int *dir){
@@ -129,9 +132,8 @@ void ParTransAsqtad::run(int N, Vector **vout, Vector **vin, const int *dir){
 	    spm[mu] = s[mu];
 
 	  }
-			
   }
-
+  PTflops += 66*N*vol;
 }
 
 /*! 
@@ -183,6 +185,7 @@ void ParTransAsqtad::vvpd(Vector **vect, int n_vect,
 	  }
 	}
 
+  PTflops += 90*n_vect*n_dir*vol;
 }
 
 
@@ -316,6 +319,7 @@ void ParTransAsqtad::pt_init_g(){
 
 int ParTransAsqtad::Offset(int dir, int hop){
     ERR.NotImplemented(cname, "Offset");
+    return 0;
 }
 
 void ParTransAsqtad::setHopPointer(){

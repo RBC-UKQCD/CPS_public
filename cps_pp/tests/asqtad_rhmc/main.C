@@ -24,11 +24,6 @@
 #include <alg/alg_remez.h>
 #include <util/random.h>
 
-const int X = 8;
-const int Y = 8;
-const int Z = 8;
-const int T = 8;
-
 CPS_START_NAMESPACE
   GlobalJobParameter GJP;
   Verbose VRB;
@@ -78,7 +73,7 @@ int main(int argc,char *argv[])
   const int no_warmup_sweep = 10; 
   const int no_measure_sweep = 1 ; 
   int sweep_counter = 0 ;
-  const int total_measure = 100;
+  const int total_measure = 10;
   
   // acceptance probability
   Float acceptance=0.0;
@@ -150,6 +145,7 @@ int main(int argc,char *argv[])
 	VRB.Flow(cname,fname,"AlgHmcRHMC starts....\n");
 	{
  	  AlgHmcRHMC rhmc(lat,&common_arg,&hmd_arg,&eig_arg);
+ 	  //AlgHmdR rhmc(lat,&common_arg,&hmd_arg);
           for (int n = 0 ; n < no_measure_sweep; n++)
 	    {
 	      VRB.Flow(cname,fname,"HMD sweep n= %d/%d\n",n,no_measure_sweep) ;
@@ -196,10 +192,10 @@ void setup_do_arg(DoArg& do_arg)
 {
   
 #ifdef PARALLEL
-  do_arg.x_node_sites = X/SizeX();
-  do_arg.y_node_sites = Y/SizeY();
-  do_arg.z_node_sites = Z/SizeZ();
-  do_arg.t_node_sites = T/SizeT();
+  do_arg.x_node_sites = 4;
+  do_arg.y_node_sites = 4;
+  do_arg.z_node_sites = 4;
+  do_arg.t_node_sites = 4;
   do_arg.s_node_sites = 0;
   do_arg.x_nodes = SizeX();
   do_arg.y_nodes = SizeY();
@@ -207,10 +203,10 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.t_nodes = SizeT();
   do_arg.s_nodes = 1;
 #else
-  do_arg.x_node_sites = X;
-  do_arg.y_node_sites = Y;
-  do_arg.z_node_sites = T;
-  do_arg.t_node_sites = Z;
+  do_arg.x_node_sites = 4;
+  do_arg.y_node_sites = 4;
+  do_arg.z_node_sites = 4;
+  do_arg.t_node_sites = 4;
   do_arg.s_node_sites = 0;
   do_arg.x_nodes = 1;
   do_arg.y_nodes = 1;
@@ -228,6 +224,8 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.start_seed_value = 1213;
   do_arg.beta = 4.8;
   do_arg.dwf_height = 1.8;
+  do_arg.clover_coeff = 2.3;
+
   do_arg.xi_bare = 1;
   do_arg.xi_v = 1;
   do_arg.xi_v_xi = 1;
@@ -245,24 +243,30 @@ void setup_do_arg(DoArg& do_arg)
 void setup_hmd_arg(HmdArg& hmd_arg)
 {
   Float tau = 1.0;
-  hmd_arg.n_frm_masses = 1;
+  hmd_arg.n_frm_masses = 2;
   hmd_arg.frm_mass[0] = 0.25;
-  hmd_arg.frm_flavors[0] = 1; // => -3/4 rational approximation required
+  hmd_arg.frm_mass[1] = 0.25;
+  hmd_arg.frm_flavors[0] = 1; // For the R algorithm
+  hmd_arg.frm_flavors[1] = 1; // For the R algorithm
   hmd_arg.frm_power_num[0] = 1;
   hmd_arg.frm_power_den[0] = 2;
+  hmd_arg.frm_power_num[1] = 1;
+  hmd_arg.frm_power_den[1] = 2;
   hmd_arg.n_bsn_masses = 0;
   hmd_arg.steps_per_traj = 10;
   hmd_arg.step_size = tau/hmd_arg.steps_per_traj;
   hmd_arg.metropolis = METROPOLIS_YES;
   hmd_arg.reunitarize = REUNITARIZE_YES;
   hmd_arg.isz = 0; // Location of smallest polar shift
-  hmd_arg.sw = 3; // Sexton-Weingarten term (gauge contribution per fermion)
+  hmd_arg.sw = 2; // Sexton-Weingarten term (gauge contribution per fermion)
 
   // Set the required degree of approximation
   hmd_arg.FRatDeg[0] = 3;
   hmd_arg.SRatDeg[0] = 6;
-  hmd_arg.FRatDegNew[0] = hmd_arg.FRatDeg[0];
-  hmd_arg.SRatDegNew[0] = hmd_arg.SRatDeg[0];
+  hmd_arg.FRatDeg[1] = 3;
+  hmd_arg.SRatDeg[1] = 6;
+  //hmd_arg.FRatDegNew[0] = hmd_arg.FRatDeg[0];
+  //hmd_arg.SRatDegNew[0] = hmd_arg.SRatDeg[0];
 
   hmd_arg.precision = 30;
   hmd_arg.approx_type = CONSTANT;
@@ -270,6 +274,7 @@ void setup_hmd_arg(HmdArg& hmd_arg)
 
   // Construct approximations
   for (int i=0; i<hmd_arg.n_frm_masses; i++) {
+    int copy =0;
     hmd_arg.lambda_low[i] = 4*pow(hmd_arg.frm_mass[i],2);
     hmd_arg.lambda_high[i] = 64.0 + hmd_arg.lambda_low[i];
     //hmd_arg.lambda_low[i] = 0.001;
@@ -277,16 +282,44 @@ void setup_hmd_arg(HmdArg& hmd_arg)
     hmd_arg.lambda_min[i] = hmd_arg.lambda_low[i];
     hmd_arg.lambda_max[i] = hmd_arg.lambda_high[i];
 
-    AlgRemez remez(hmd_arg.lambda_low[i],hmd_arg.lambda_high[i],hmd_arg.precision);
-    remez.generateApprox(hmd_arg.FRatDeg[i],hmd_arg.frm_power_num[i],hmd_arg.frm_power_den[i]);
-    remez.getIPFE(hmd_arg.FRatRes[i],hmd_arg.FRatPole[i],&hmd_arg.FRatNorm[i]);
-    remez.generateApprox(hmd_arg.SRatDeg[i],hmd_arg.frm_power_num[i],2*hmd_arg.frm_power_den[i]);
-    remez.getIPFE(hmd_arg.SRatRes[i],hmd_arg.SRatPole[i],&hmd_arg.SRatNorm[i]);
-    remez.getPFE(hmd_arg.SIRatRes[i],hmd_arg.SIRatPole[i],&hmd_arg.SIRatNorm[i]);
+    for (int j=0; j<i; j++) {
+      // no need to recalculate approximation if same mass
+      if (hmd_arg.frm_mass[j] == hmd_arg.frm_mass[i]) {
+	hmd_arg.FRatDeg[i] = hmd_arg.FRatDeg[j];
+	hmd_arg.FRatNorm[i] = hmd_arg.FRatNorm[j];
+	for (int k=0; k<hmd_arg.FRatDeg[i]; k++) {
+	  hmd_arg.FRatRes[i][k] = hmd_arg.FRatRes[j][k];
+	  hmd_arg.FRatPole[i][k] = hmd_arg.FRatPole[j][k];
+	}
+	hmd_arg.SRatDeg[i] = hmd_arg.SRatDeg[j];
+	hmd_arg.SRatNorm[i] = hmd_arg.SRatNorm[j];
+	hmd_arg.SIRatNorm[i] = hmd_arg.SIRatNorm[j];
+	for (int k=0; k<hmd_arg.SRatDeg[i]; k++) {
+	  hmd_arg.SRatRes[i][k] = hmd_arg.SRatRes[j][k];
+	  hmd_arg.SRatPole[i][k] = hmd_arg.SRatPole[j][k];
+	  hmd_arg.SIRatRes[i][k] = hmd_arg.SIRatRes[j][k];
+	  hmd_arg.SIRatPole[i][k] = hmd_arg.SIRatPole[j][k];
+	}
+	copy = 1;
+      }
+    }
+
+    if (!copy) {
+      AlgRemez remez(hmd_arg.lambda_low[i],hmd_arg.lambda_high[i],hmd_arg.precision);
+      hmd_arg.FRatError[i] = remez.generateApprox(hmd_arg.FRatDeg[i],hmd_arg.frm_power_num[i],
+						  hmd_arg.frm_power_den[i]);
+      remez.getIPFE(hmd_arg.FRatRes[i],hmd_arg.FRatPole[i],&hmd_arg.FRatNorm[i]);
+      hmd_arg.SRatError[i] = remez.generateApprox(hmd_arg.SRatDeg[i],hmd_arg.frm_power_num[i],
+						  2*hmd_arg.frm_power_den[i]);
+      remez.getIPFE(hmd_arg.SRatRes[i],hmd_arg.SRatPole[i],&hmd_arg.SRatNorm[i]);
+      remez.getPFE(hmd_arg.SIRatRes[i],hmd_arg.SIRatPole[i],&hmd_arg.SIRatNorm[i]);
+    }      
     
     // set any other common variables
-    hmd_arg.stop_rsd[i] = 1.0E-6;
     hmd_arg.max_num_iter[i] = 5000;
+    hmd_arg.stop_rsd[i] = 1.0E-6;
+    hmd_arg.stop_rsd_md[i] = 1e-6;
+    hmd_arg.stop_rsd_mc[i] = 1e-10;
   }
   
 }

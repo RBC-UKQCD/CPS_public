@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.9 2004-08-05 18:53:19 mclark Exp $
+  $Id: pt.h,v 1.10 2004-08-05 20:37:20 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: mclark $
-//  $Date: 2004-08-05 18:53:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.9 2004-08-05 18:53:19 mclark Exp $
-//  $Id: pt.h,v 1.9 2004-08-05 18:53:19 mclark Exp $
+//  $Date: 2004-08-05 20:37:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.10 2004-08-05 20:37:20 mclark Exp $
+//  $Id: pt.h,v 1.10 2004-08-05 20:37:20 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -60,7 +60,6 @@ class ParTrans
   Matrix *gauge_field;             //!< Pointer to the gauge field.
   static int node_sites[5];
   static int bc[4];
-
 
  public:
 
@@ -148,6 +147,7 @@ class ParTransAsqtad : public ParTransStagTypes
     void pt_init_g();
     void pt_delete();
     void pt_delete_g();
+
 
     CnvFrmType converted;
 
