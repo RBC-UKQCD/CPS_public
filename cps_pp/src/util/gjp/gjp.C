@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.10 2004-07-28 05:36:47 chulwoo Exp $
+  $Id: gjp.C,v 1.11 2004-07-28 17:13:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-28 05:36:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.10 2004-07-28 05:36:47 chulwoo Exp $
-//  $Id: gjp.C,v 1.10 2004-07-28 05:36:47 chulwoo Exp $
+//  $Date: 2004-07-28 17:13:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.11 2004-07-28 17:13:12 chulwoo Exp $
+//  $Id: gjp.C,v 1.11 2004-07-28 17:13:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -325,7 +325,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   gjp_scu_wire_map[6] = SCURemap( SCU_TP );
   gjp_scu_wire_map[7] = SCURemap( SCU_TM );
 
-#if TARGET ==QCDOC
+#if TARGET == QCDSP
   if(s_nodes != 1) {
     if (s_axis == SCU_X) {
       gjp_scu_dir[8] = SCU_XP;
