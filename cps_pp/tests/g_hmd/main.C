@@ -1,15 +1,20 @@
 #include<config.h>
-CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.1.1.1 2003-06-22 13:34:49 mcneile Exp $
-//  $Id: main.C,v 1.1.1.1 2003-06-22 13:34:49 mcneile Exp $
+//  $Date: 2003-07-29 11:13:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.2 2003-07-29 11:13:21 mcneile Exp $
+//  $Id: main.C,v 1.2 2003-07-29 11:13:21 mcneile Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1  2003/06/22 13:34:49  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.10  2002/12/04 17:16:27  zs
 //  Merged the new 2^4 RNG into the code.
 //  This new RNG is implemented in the LatRanGen class.
@@ -71,12 +76,11 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: main.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdlib.h>	// exit()
 #include<config.h>
@@ -92,19 +96,21 @@ CPS_END_NAMESPACE
 #include<alg/hmd_arg.h>
 #include<alg/common_arg.h>
 #include<util/random.h>
-CPS_START_NAMESPACE
 
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <sysfunc.h>
-CPS_START_NAMESPACE
 #endif
 
-
+namespace cps
+{
 GlobalJobParameter GJP;
 LatRanGen LRG;
 Verbose VRB;
 Error ERR;
+}
+
+using namespace cps ;
+
 
 int main(int argc,char *argv[])
 {
@@ -267,4 +273,3 @@ int main(int argc,char *argv[])
 
 
 
-CPS_END_NAMESPACE
