@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.11 2004-07-28 17:13:12 chulwoo Exp $
+  $Id: gjp.C,v 1.12 2004-07-30 20:53:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-28 17:13:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.11 2004-07-28 17:13:12 chulwoo Exp $
-//  $Id: gjp.C,v 1.11 2004-07-28 17:13:12 chulwoo Exp $
+//  $Date: 2004-07-30 20:53:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.12 2004-07-30 20:53:12 chulwoo Exp $
+//  $Id: gjp.C,v 1.12 2004-07-30 20:53:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -351,13 +351,13 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
       gjp_scu_wire_map[8] = SCURemap( SCU_TP );
       gjp_scu_wire_map[9] = SCURemap( SCU_TM );
     }
+  }
 #else
       gjp_scu_dir[8] = SCU_SP;
       gjp_scu_dir[9] = SCU_SM;
       gjp_scu_wire_map[8] = SCURemap( SCU_SP );
       gjp_scu_wire_map[9] = SCURemap( SCU_SM );
 #endif
-  }
 
 
 
