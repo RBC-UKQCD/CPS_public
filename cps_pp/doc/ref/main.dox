@@ -1,4 +1,4 @@
-//$Id: main.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+//$Id: main.dox,v 1.2 2003-07-28 09:35:52 mcneile Exp $
 /*!
 
 
@@ -12,7 +12,6 @@
 
 This is the reference manual for the Columbia Physics System (CPS).
 The CPS is written in C++ and C (with optional assembly kernels). 
-The CPS is pure dead good, so it is.
 
 True to the spirit of encapsulation, the public interface only is documented 
 here: if you really want to know how the CPS works internally you should read 
