@@ -2,7 +2,7 @@
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include <util/pmalloc.h>
+#include <util/smalloc.h>
 #include <util/verbose.h>
 #include <stdlib.h>
 #include <emalloc.h>
@@ -15,10 +15,10 @@ static unsigned long extra_heap[1048576] LOCATE(".dheap");
   \param request The amount of memory (in bytes) to allocate
   \return A pointer to the allocated memory
 */
-void* pmalloc(int request){
+void* smalloc(int request){
   void* ptr;
   ptr = malloc(request);
-  VRB.Pmalloc("","pmalloc(i)","", ptr, request);
+  VRB.Smalloc("","smalloc(i)","", ptr, request);
   return ptr;
 }
 
@@ -26,12 +26,12 @@ void* pmalloc(int request){
 /*!
   \param p Pointer to the memory to be freed.
 */
-void pfree(void* p){
-  VRB.Pfree("","pfree(v*)","",p);
+void sfree(void* p){
+  VRB.Sfree("","sfree(v*)","",p);
   free((char*) p);
 }
 
-void pclear(void){};
+void sclear(void){};
 
 
 
