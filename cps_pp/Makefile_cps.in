@@ -1,4 +1,4 @@
-# $Id: Makefile_cps.in,v 1.8 2003-08-07 16:08:33 mcneile Exp $
+# $Id: Makefile_cps.in,v 1.9 2003-08-08 10:10:46 mcneile Exp $
 #
 #  Template makefile for the Columbia Physics System
 #  Need to add autoconf stuff
@@ -90,7 +90,7 @@ TEST_DIR = tests
 
 test:
 	cd $(TEST_DIR) ; perl regression.pl
-	cd $(TEST_DIR) ; source regression.sh
+	cd $(TEST_DIR) ; sh regression.sh
 
 
 
