@@ -78,6 +78,8 @@ void wfm::pointers_init(void)
     //ND * plus_minus * hvol * parities
     table_size = NMinusPlus*vol*Nmu;
     shift_table[cb]=(unsigned long *)ALLOC( table_size*sizeof(unsigned long));
+    if (!shift_table[cb]){ 
+      printf("shift_table=%p\n",shift_table[cb]);exit(-1);}
   }
 
   for(cb=0;cb<2;cb++){
@@ -85,6 +87,8 @@ void wfm::pointers_init(void)
       for(mu=0; mu<4;mu++){
 	face_table[cb][pm][mu]= (unsigned long *)
 	  ALLOC(allbound*sizeof(unsigned long));
+    if (!face_table[cb][pm][mu]){
+      printf("face_table=%p\n",face_table[cb][pm][mu]);exit(-1);}
       }
     }
   }
