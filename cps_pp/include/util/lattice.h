@@ -3,105 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.11 2004-01-14 07:42:59 chulwoo Exp $
+  $Id: lattice.h,v 1.12 2004-02-06 12:20:43 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-14 07:42:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.11 2004-01-14 07:42:59 chulwoo Exp $
-//  $Id: lattice.h,v 1.11 2004-01-14 07:42:59 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-02-06 12:20:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.12 2004-02-06 12:20:43 zs Exp $
+//  $Id: lattice.h,v 1.12 2004-02-06 12:20:43 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.8.2.1.2.4  2003/12/15 18:52:21  cwj
-//  *** empty log message ***
-//
-//  Revision 1.8.2.1.2.3  2003/11/07 22:24:56  cwj
-//  *** empty log message ***
-//
-//  Revision 1.8.2.1.2.2  2003/11/07 19:17:06  cwj
-//  *** empty log message ***
-//
-//  Revision 1.8.2.1  2003/11/05 16:13:21  mike
-//  Initial attempt at producing working branch
-//
-//  Revision 1.2  2003/10/21 17:53:08  chulwoo
-//  added asqtad_KS
-//  changes for stagerred and asqtad action
-//
-//  Revision 1.1.1.1  2003/09/18 22:30:57  chulwoo
-//  Mike's files for single node QCDOC + Parallel transport
-//  I added some hacks for PARALLEL without MPI_SCU
-//  PARALLEL=2 set PARALLEL without MPI_SCU
-//
-//
-//  Revision 1.5  2003/09/03 21:41:22  mike
-//  Implemented dummy functions for Fnone and FWilsonTypes for prepForce and
-//  FMatEvlInv() to avoid abstract instances.
-//
-//  Revision 1.4  2003/08/29 20:43:59  mike
-//  Small bug fixes to RHMC related material.
-//
-//  Revision 1.3  2003/08/29 20:27:38  mike
-//  Added new function prepForce for use by RHMC to avoid storing Dslash psi for all
-//  evaluated poles simultaneusly.
-//
-//  Revision 1.2  2003/07/24 16:53:53  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.9  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
-//  Revision 1.8  2002/03/11 22:27:10  anj
-//  This should now be the correct, fully merged code from our two versions. Anj
-//
-//  Revision 1.5.2.1  2002/03/08 16:36:49  anj
-//  Checking in the Columbia code branch on tag Columbia4_1_1_test-branch, to be
-//  merged with the UKQCD head branch shortly.  Anj
-//
-//  Revision 1.5  2001/11/08 14:39:38  anj
-//  A couple of monir portability tweaks.  Anj
-//
-//  Revision 1.4  2001/08/16 10:50:30  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:13:17  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:09  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -134,7 +48,7 @@ CPS_END_NAMESPACE
 #include <alg/ghb_arg.h>
 #include <alg/eig_arg.h>
 #ifdef PARALLEL
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 #endif
 CPS_START_NAMESPACE
 
