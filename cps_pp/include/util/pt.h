@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.6 2004-05-10 15:26:54 zs Exp $
+  $Id: pt.h,v 1.7 2004-05-12 17:23:57 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-05-10 15:26:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.6 2004-05-10 15:26:54 zs Exp $
-//  $Id: pt.h,v 1.6 2004-05-10 15:26:54 zs Exp $
+//  $Date: 2004-05-12 17:23:57 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.7 2004-05-12 17:23:57 zs Exp $
+//  $Id: pt.h,v 1.7 2004-05-12 17:23:57 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -107,7 +107,7 @@ struct gauge_agg{
   \f$ u(x) = U_\mu(x) v(x+\mu) \f$
   where \e u and \e v are fermionic vectors or 3x3 matrices.
 
-  All fields involved are assumed to be in staggered ::STAG order.
+  The gauge field must be in staggered ::STAG order.
 */
 //------------------------------------------------------------------
 class ParTransAsqtad : public ParTransStagTypes
@@ -146,9 +146,8 @@ class ParTransAsqtad : public ParTransStagTypes
       \param vout Array of the transported fields.
       \param vin Array of the fields to be transported.
       \param dir Array of directions in which the transports are performed.
-      \pre The gauge field should be in staggered odd-even order (::STAG).
-      \pre \a vin should be in staggered (::STAG) order.
-      \post \a vout will be in staggered (::STAG) order.
+      \pre The gauge field should be in staggered order (::STAG).
+      \pre The Vector fields should be in CANONICAL order.
      */
     void run(int n, Vector **vout, Vector **vin, const int *dir );
 
@@ -158,9 +157,8 @@ class ParTransAsqtad : public ParTransStagTypes
       \param vout Array of the transported fields.
       \param vin Array of the fields to be transported.
       \param dir Array of directions in which the transports are performed.
-      \pre The gauge field should be in staggered odd-even order (::STAG).
-      \pre \a vin should be in staggered (::STAG) order.
-      \post \a vout will be in staggered (::STAG) order.
+      \pre The gauge field should be in staggered order (::STAG).
+      \pre The Matrix fields should be in CANONICAL order.      
      */
     void run(int n, Matrix **mout, Matrix **min, const int *dir );
 
