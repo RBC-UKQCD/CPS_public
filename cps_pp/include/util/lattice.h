@@ -766,6 +766,10 @@ class Lattice
       \post \a f_out contains the solution vector.
     */
 
+    //!< Lattice front end to the chronological inverter
+    virtual Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+			    Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm) = 0;
+
     virtual int FmatInv(Vector *f_out, Vector *f_in, 
 			CgArg *cg_arg, 
                         Float *true_res,
@@ -1359,6 +1363,10 @@ class Fnone : public virtual Lattice
 		    Float *alpha, Vector**f_out_d);
         // It does nothing and returns 0.    
 
+    Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
+        // It does nothing and returns 0.    
+
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
@@ -1496,6 +1504,9 @@ class Fstag : public virtual FstagTypes
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
 		    Vector **f_out_d);
 
+    Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
+
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
@@ -1561,6 +1572,9 @@ class Fasqtad : public virtual FstagTypes
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
 		    Vector **f_out_d);
 
+    Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
+
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
@@ -1594,24 +1608,20 @@ class Fasqtad : public virtual FstagTypes
     
   private:
 
-    void vvpd(Vector**, int, const int*, int, int, Matrix**);
-
-    void shift_field(Matrix**, const int*, int, int, Matrix**);
-
-    void shift_link(Matrix**, const int*, int);
-
-    void update_momenta(Matrix**, IFloat, Matrix*, int parity = 0);
+    void update_momenta(Matrix**, IFloat, Matrix*);
     
     ChkbType parity(const int*);
 
-    void force_product_sum(const Matrix*,  int, IFloat, Matrix*);
+    void force_product_sum(const Matrix*,  int, IFloat, Matrix*, Matrix*);
     
-    void force_product_sum(const Matrix*, const Matrix*,
-			   const Matrix*, IFloat, Matrix*);
+    void force_product_sum(const Matrix*, const Matrix*, const Matrix*, 
+			   IFloat, Matrix*, Matrix*, Matrix*);
 
-    void force_product_sum(const Matrix*, const Matrix*, IFloat, Matrix*);
+    void force_product_sum(const Matrix*, const Matrix*, IFloat, 
+			   Matrix*, Matrix*);
 
-    void force_product_d_sum(const Matrix*, const Matrix*, IFloat, Matrix*);
+    void force_product_d_sum(const Matrix*, const Matrix*, IFloat, 
+			     Matrix*, Matrix*);
 
     void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
 
@@ -1787,6 +1797,9 @@ class Fwilson : public virtual FwilsonTypes
       \post \a f_out contains the solution vector.
     */
 
+    Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
+
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
@@ -1931,34 +1944,37 @@ class Fclover : public virtual FwilsonTypes
       \post \a f_out contains the solution vector.
     */
 
+    Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
+
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
-        // It calculates f_out where A * f_out = f_in and
-        // A is the fermion matrix (Dirac operator) with no 
-        // preconditioning. The preconditioned matrix is inverted 
-        // and from the result the non-preconditioned f_out is 
-        // calculated . The inversion of the odd checkerboard
-        // piece is done with the conjugate gradient algorithm
-        // while the inversion of the even checkerboard is done
-        // using standard explicit hermitian matrix inversion of the
-        // clover matrix. cg_arg is the structure that contains
-        // all the control parameters for the CG, f_in is the
-        // fermion field source vector, f_out should be set to be
-        // the initial guess and on return is the solution.
-        // f_in and f_out are defined on the whole latice.
-        // If true_res !=0 the value of the true residual of the CG and
-        // is returned in true_res.
-        // *true_res = |src - MatPcDagMatPc * sol| / |src|
-        // cnv_frm is used to specify if f_in should be converted 
-        // from canonical to fermion order and f_out from fermion 
-        // to canonical. 
-        // prs_f_in is used to specify if the source
-        // f_in should be preserved or not. If not the memory usage
-        // is less by the size of one fermion vector.
-        // The function returns the total number of CG iterations.
+    // It calculates f_out where A * f_out = f_in and
+    // A is the fermion matrix (Dirac operator) with no 
+    // preconditioning. The preconditioned matrix is inverted 
+    // and from the result the non-preconditioned f_out is 
+    // calculated . The inversion of the odd checkerboard
+    // piece is done with the conjugate gradient algorithm
+    // while the inversion of the even checkerboard is done
+    // using standard explicit hermitian matrix inversion of the
+    // clover matrix. cg_arg is the structure that contains
+    // all the control parameters for the CG, f_in is the
+    // fermion field source vector, f_out should be set to be
+    // the initial guess and on return is the solution.
+    // f_in and f_out are defined on the whole latice.
+    // If true_res !=0 the value of the true residual of the CG and
+    // is returned in true_res.
+    // *true_res = |src - MatPcDagMatPc * sol| / |src|
+    // cnv_frm is used to specify if f_in should be converted 
+    // from canonical to fermion order and f_out from fermion 
+    // to canonical. 
+    // prs_f_in is used to specify if the source
+    // f_in should be preserved or not. If not the memory usage
+    // is less by the size of one fermion vector.
+    // The function returns the total number of CG iterations.
 
 
     int FeigSolv(Vector **f_eigenv, Float lambda[],
@@ -2089,6 +2105,9 @@ class FdwfBase : public virtual FwilsonTypes
       \post \a f_out contains the solution vector.
     */
 
+    Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
+    
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,

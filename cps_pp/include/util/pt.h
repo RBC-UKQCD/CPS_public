@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.8 2004-07-01 17:43:40 chulwoo Exp $
+  $Id: pt.h,v 1.9 2004-08-05 18:53:19 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.8 2004-07-01 17:43:40 chulwoo Exp $
-//  $Id: pt.h,v 1.8 2004-07-01 17:43:40 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-08-05 18:53:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.9 2004-08-05 18:53:19 mclark Exp $
+//  $Id: pt.h,v 1.9 2004-08-05 18:53:19 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -31,6 +31,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/vector.h>
+#include <comms/scu.h>
 CPS_START_NAMESPACE
 
 
@@ -57,17 +58,22 @@ class ParTrans
  protected:
   Lattice& lat;                    //!< The lattice..
   Matrix *gauge_field;             //!< Pointer to the gauge field.
+  static int node_sites[5];
+  static int bc[4];
 
 
  public:
 
   static int scope_lock;           // lock that forbids more than
-  static int PTflops;
                                    // one ParTrans object to be on
                                    // scope at any time.
+  static int PTflops;              //! Count the flops 
+
   ParTrans(Lattice& latt);         
 
   virtual ~ParTrans();
+
+  static void BondCond(Lattice& lat, Matrix *u_base);
 
 };
 
@@ -93,12 +99,25 @@ class ParTransStagTypes : public ParTrans
 
   virtual ~ParTransStagTypes();
 
+ protected:
+  enum
+    {
+      VECT_LEN=6,          //!< Number of floats in  a Vector
+      MATRIX_SIZE=18,  //!< Number of floats in  a Matrix
+      SITE_LEN=72      //!< Number of floats in four Matrix's
+    };
+
 };
 
 struct gauge_agg{
   int src;
   int dest;
   IFloat mat[18];
+};
+
+struct hop_pointer {
+  int src;
+  int dest;
 };
 
 //------------------------------------------------------------------
@@ -121,8 +140,8 @@ class ParTransAsqtad : public ParTransStagTypes
 
     Vector *frm_tmp;     // Temporary fermion field
 
-    IFloat * rcv_buf[2*6];
-    IFloat * tmp_buf[2*6];
+    IFloat *rcv_buf[2*6];
+    IFloat *tmp_buf[2*6];
     IFloat *gauge_field_addr;
 
     void pt_init(const void *);
@@ -131,7 +150,10 @@ class ParTransAsqtad : public ParTransStagTypes
     void pt_delete_g();
 
     CnvFrmType converted;
-    
+
+    int Offset(int dir, int hop);
+    void setHopPointer();
+
   public:
 
     /*!
@@ -165,6 +187,19 @@ class ParTransAsqtad : public ParTransStagTypes
 
     //! Not implemented
     void run(Vector *vout, Vector *vin, int dir );
+
+    /*! Computes sum[x] = vect[x] vect[x + hop dir]^dagger
+      where the sum is over n_vect vectors and the hop is in a forward direction.
+    */
+    void vvpd(Vector **vect, int n_vect,
+	      const int *dir, int n_dir, int hop, Matrix **sum);
+
+    //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
+    void shift_field(Matrix **v, const int *dir, int n_dir,
+		     int hop, Matrix **u);
+
+    //! u[-/+nu](x) = U_[-/+nu](x)
+    void shift_link(Matrix **u, const int *dir, int n_dir);
 
     ~ParTransAsqtad();
 

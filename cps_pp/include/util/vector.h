@@ -5,23 +5,26 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.6 2004-07-08 22:49:58 chulwoo Exp $
+  $Id: vector.h,v 1.7 2004-08-05 18:53:19 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-08 22:49:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.6 2004-07-08 22:49:58 chulwoo Exp $
-//  $Id: vector.h,v 1.6 2004-07-08 22:49:58 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-08-05 18:53:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.7 2004-08-05 18:53:19 mclark Exp $
+//  $Id: vector.h,v 1.7 2004-08-05 18:53:19 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.6  2004/07/08 22:49:58  chulwoo
+//  *** empty log message ***
+//
 //  Revision 1.5  2004/07/01 17:43:41  chulwoo
 //  merging with qos-2-3-pre1-CJ
 //
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -581,18 +584,23 @@ class Vector
 #if TARGET == QCDOC
 
 extern "C" {
-void xaxpy (Float *scalep,Float *InOutScale, Float *Add, int len);
-void xaxpy_norm (Float *scalep, Float *InOutScale, Float *Add, int len, Float *res);
+  void xaxpy (Float *scalep,Float *InOutScale, Float *Add, int len);
+  void xaxpy_norm (Float *scalep, Float *InOutScale, Float *Add, int len, Float *res);
+  
+  void vaxpy3(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec);
+  inline void vaxpy3_m(Matrix *res,Float *scale,Matrix *mult,Matrix *add, int ncvec){
+    vaxpy3((Vector *)res, scale, (Vector *)mult,(Vector *)add,ncvec);
+  }
 
-void vaxpy3(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec);
-inline void vaxpy3_m(Matrix *res,Float *scale,Matrix *mult,Matrix *add, int ncvec){
-vaxpy3((Vector *)res, scale, (Vector *)mult,(Vector *)add,ncvec);
-}
+  void vaxpy3_norm(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec,Float *norm);
+  inline void vaxpy3_norm_m(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec,Float *norm){
+    vaxpy3_norm((Vector *)res, scale, (Vector *)mult,(Vector *)add,ncvec,norm);
+  }
 
-void vaxpy3_norm(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec,Float *norm);
-inline void vaxpy3_norm_m(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec,Float *norm){
-vaxpy3_norm((Vector *)res, scale, (Vector *)mult,(Vector *)add,ncvec,norm);
-}
+  void m1timesm2(int *length, const Matrix *m1, const Matrix *m2, Matrix *res);
+  void m1timesm2dag(int *length, const Matrix *m1, const Matrix *m2, Matrix *res);
+  void m1dagtimesm2dag(int *length, const Matrix *m1, const Matrix *m2, Matrix *res);
+  void gdagtimesmdag(int *length, const Matrix *g, const Matrix *m, Matrix *res);
 
 }
 

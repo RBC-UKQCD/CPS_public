@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the HmdArg structure.
 
-  $Id: hmd_arg.h,v 1.6 2004-06-07 19:41:08 mclark Exp $
+  $Id: hmd_arg.h,v 1.7 2004-08-05 18:53:18 mclark Exp $
 */
 //------------------------------------------------------------------
 
@@ -77,6 +77,14 @@ struct HmdArg {
 				      stopping condition for each mass 
 				      of dynamical fermions/bosons */
 
+  Float stop_rsd_md[MAX_HMD_MASSES];   /*!< The target residual for the solver
+				      stopping condition for each mass 
+				      of dynamical fermions/bosons */
+
+  Float stop_rsd_mc[MAX_HMD_MASSES];   /*!< The target residual for the solver
+				      stopping condition for each mass 
+				      of dynamical fermions/bosons */
+
   int steps_per_traj;		    /*!<
 				      For the R algorithm, this is
 				      the number of steps per trajectory. For
@@ -98,12 +106,14 @@ struct HmdArg {
   
   /*!< The parameters for the force rational approximations*/
   int FRatDeg[MAX_HMD_MASSES];
+  Float FRatError[MAX_HMD_MASSES];
   Float FRatNorm[MAX_HMD_MASSES];
   Float FRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
   Float FRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
 
   /*!< The parameters for the action rational approximations*/
   int SRatDeg[MAX_HMD_MASSES];
+  Float SRatError[MAX_HMD_MASSES];
   Float SRatNorm[MAX_HMD_MASSES];
   Float SRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
   Float SRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
@@ -132,11 +142,14 @@ struct HmdArg {
   /*!< The precision used in the Remez algorithm of the approximation (RHMC only)*/
   long precision;
 
-  /*!< The location of the smallest polar shift in the rational approximations*/
+  /*!< The location of the smallest polar shift in the rational approximations (RHMC only)*/
   int isz;
 
-  /*!< The Sexton-Weigngarten factor*/
+  /*!< The Sexton-Weigngarten factor (RHMC only)*/
   int sw;
+
+  /*!< The number of previous solutions used to form the intial guess (HMC only)*/
+  int chrono;
 
 };
 

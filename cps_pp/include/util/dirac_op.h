@@ -137,6 +137,10 @@ class DiracOp
 	     int Nshift, int isz, Float *RsdCG, 
 	     MultiShiftSolveType type, Float *alpha);
 
+  //! Minimum Residual Extrapolation (Chronological Inverter)
+  Float MinResExt(Vector *psi, Vector *phi, Vector **psi_old, 
+		  Vector **vm, int degree);
+
 // Pure virtual functions
 //------------------------------------------------------------------
 

@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the CgArg structure..
 
-  $Id: cg_arg.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: cg_arg.h,v 1.3 2004-08-05 18:53:18 mclark Exp $
 */
 //---------------------------------------------------------------------------
 
@@ -18,15 +18,16 @@ CPS_START_NAMESPACE
 //! A structure to hold the solver parameters.
 struct CgArg {
 
-    Float mass;			/*!<  The mass parameter. */
+  Float mass;			/*!<  The mass parameter. */
 
   int max_num_iter;		/*!<  The maximum number of solver
 				 iterations to do. */
 
-    Float stop_rsd;		/*!<  The target residual. */
+  Float stop_rsd;		/*!<  The target residual. */
+  Float true_rsd;               /*!<  The true residual. */
 
-    enum RitzMatType RitzMatOper; /*!< Which operator to determine eigenvalues
-				    of, if any. */
+  enum RitzMatType RitzMatOper; /*!< Which operator to determine eigenvalues
+				  of, if any. */
 };
 
 #endif /* !INCLUDED_CG_ARG_H */

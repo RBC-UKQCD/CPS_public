@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.9 2004-07-28 06:13:52 chulwoo Exp $
+  $Id: random.h,v 1.10 2004-08-05 18:53:19 mclark Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-28 06:13:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.9 2004-07-28 06:13:52 chulwoo Exp $
-//  $Id: random.h,v 1.9 2004-07-28 06:13:52 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-08-05 18:53:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.10 2004-08-05 18:53:19 mclark Exp $
+//  $Id: random.h,v 1.10 2004-08-05 18:53:19 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -46,11 +46,13 @@ class RandomGenerator {
     int inext;
     int inextp;
     static const int MBIG  = 1000000000;
-    static const IFloat FAC = 1.0e-9;			// 1.0/MBIG
+    IFloat FAC;			// 1.0/MBIG
     
   public:
 
-    RandomGenerator() {};
+    RandomGenerator() {
+      FAC = 1e-9;
+    }
 
     //! Gets a random number 
     virtual IFloat Rand();

@@ -102,7 +102,7 @@ class AlgRemez
   int simq(bigfloat *A, bigfloat *B, bigfloat *X, int n);
 
   // Free memory and reallocate as necessary
-  void allocate(int degree);
+  void allocate(int num_degree, int den_degree);
  public:
   
   // Constructor
@@ -115,6 +115,7 @@ class AlgRemez
   void setBounds(Float lower, Float upper);
 
   // Generate the rational approximation x^(pnum/pden)
+  Float generateApprox(int num_degree, int den_degree, unsigned long power_num, unsigned long power_den);
   Float generateApprox(int degree, unsigned long power_num, unsigned long power_den);
 
   // Return the partial fraction expansion of the approximation x^(pnum/pden)
@@ -150,6 +151,7 @@ class AlgRemez
   }
   ~AlgRemez() {;}
   void setBounds(Float lower, Float upper) {;}
+  Float generateApprox(int num_degree, int den_degree, unsigned long power_num, unsigned long power_den);
   Float generateApprox(int degree, unsigned long power_num, unsigned long power_den)
     {return 0;}
   int getPFE(Float *res, Float *pole, Float *norm) {return 0;}
