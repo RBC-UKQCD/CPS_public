@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.17 2004-11-07 23:43:59 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.18 2004-12-01 06:38:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -134,10 +134,10 @@ int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in,
 // vectors, f_in and f_out are defined on a checkerboard.
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
-int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+int Fasqtad::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 			 int Nshift, int isz, CgArg *cg_arg,
 			 CnvFrmType cnv_frm, MultiShiftSolveType type, 
-			 Float *alpha, Vector** f_out_d)
+			 Float *alpha, Vector* f_out_d)
 {
   char *fname = "FmatMInv(V**, V*, .....)";
   VRB.Func(cname,fname);
@@ -149,13 +149,13 @@ int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
-  DiracOpAsqtad asqtad(*this, f_out[0], f_in, cg_arg, cnv_frm);
+  DiracOpAsqtad asqtad(*this, f_out, f_in, cg_arg, cnv_frm);
 
   int iter = asqtad.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);
 
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
-      asqtad.Dslash(f_out_d[s],f_out[s],CHKB_EVEN,DAG_NO);
+      asqtad.Dslash(f_out_d + e_vsize*s,f_out + e_vsize*s,CHKB_EVEN,DAG_NO);
   cg_arg->true_rsd = RsdCG[isz];
 
   sfree(RsdCG);

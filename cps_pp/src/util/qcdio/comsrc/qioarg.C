@@ -1,5 +1,9 @@
 #include <iostream>
+#include <unistd.h>
 #include <util/gjp.h>
+#include <sys/time.h>
+#include <iomanip>
+#include <cstring>
 using namespace std;
 
 #include <util/qioarg.h>
@@ -221,97 +225,6 @@ int QioControl::IOCommander(int caller, int block) const {
 
     synchronize(-1);  // io finished
     return 0;
-  }
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////
-// GCFheaderPar class members
-string elmSpacePar(string str)
-{
-  const int i0(str.find_first_not_of(" "));
-  const int i1(str.find_last_not_of (" "));
-  if(i1 - i0>0){ return(str.substr(i0,i1-i0+1)); }
-  else         { return(str);  }
-}
-
-bool GCFheaderPar::add(string key_eq_value)
-{
-  const int eqp(key_eq_value.find("="));
-  if( eqp  > 0  )
-    {
-      const string key( elmSpacePar( key_eq_value.substr(0,eqp) ) );
-      const string val( elmSpacePar( key_eq_value.substr(eqp+1) ) );
-      headerMap.insert(GCFHMapParT::value_type(key,val));
-      return true;
-    } 
-  else 
-    {
-      return false;
-    }
-}
-
-
-void GCFheaderPar::Show()
-{
-  for (GCFHMapParT::const_iterator iter = headerMap.begin(); 
-       iter != headerMap.end(); ++iter) 
-    {
-      cout << iter->first << ":" << iter->second << endl;
-    }
-};
-
-
-string GCFheaderPar::asString( const string key ) 
-{
-  GCFHMapParT::const_iterator n(headerMap.find(key));
-
-  if (n == headerMap.end()) {
-    cout << "header::asString key " << key << " not found. use Default." << endl;
-    prevFound = false;
-    return string("");
-  }
-  else {
-    prevFound = true;
-    return ( n->second );
-  }
-}		  
-
-
-int GCFheaderPar::asInt( const string key ) 
-{
-  GCFHMapParT::const_iterator n(headerMap.find(key));
-
-  if (n == headerMap.end()) {
-    cout << "header::asInt key "<<key<<" not found. use Default." << endl;
-    prevFound = false;
-    return int(0);
-  }
-
-  else {
-    prevFound = true;
-    int tmp;
-    sscanf((n->second).c_str() , "%d ", &tmp);
-    return ( tmp );
-  }
-}		  
-
-Float GCFheaderPar::asFloat( const string key ) 
-{
-  GCFHMapParT::const_iterator n(headerMap.find(key));
-
-  if (n == headerMap.end()) {
-    cout << "header::asFloat key " << key << " not found. use Default." << endl;
-    prevFound = false;
-    return Float(0.0);
-  }
-  else {
-    prevFound = true;
-    float tmp;
-    sscanf((n->second).c_str() , "%f ", &tmp);
-    return ( (Float) tmp );
   }
 }
 

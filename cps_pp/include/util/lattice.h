@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.29 2004-11-17 18:27:07 chulwoo Exp $
+  $Id: lattice.h,v 1.30 2004-12-01 06:38:14 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2004-11-17 18:27:07 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.29 2004-11-17 18:27:07 chulwoo Exp $
-  $Id: lattice.h,v 1.29 2004-11-17 18:27:07 chulwoo Exp $
+  $Date: 2004-12-01 06:38:14 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.30 2004-12-01 06:38:14 chulwoo Exp $
+  $Id: lattice.h,v 1.30 2004-12-01 06:38:14 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.29 $
+  $Revision: 1.30 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -702,10 +702,10 @@ class Lattice
       \post \a f_out contains the solution vector.
     */
 
-    virtual int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    virtual int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 			    int Nshift, int isz, CgArg *cg_arg, 
 			    CnvFrmType cnv_frm, MultiShiftSolveType type, 
-			    Float *alpha, Vector**f_out_d) = 0;
+			    Float *alpha, Vector *f_out_d) = 0;
     //!< The multishift matrix inversion used in the RHMC molecular dynamics algorithms.
     /*!<
       Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out}\f$
@@ -742,11 +742,11 @@ class Lattice
       \post \a f_out contains the solution vector(s).
     */
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm,
 		    MultiShiftSolveType type, Float *alpha)
 	{
-	    Vector **f_out_d = 0;
+	    Vector *f_out_d = 0;
 	    return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
 			       type,alpha, f_out_d);
 	}
@@ -781,9 +781,9 @@ class Lattice
       \post \a f_out contains the solution vector(s).
     */
     
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm,
-		    Vector **f_out_d)
+		    Vector *f_out_d)
 	{
 	    Float *alpha = 0;
 	    return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
@@ -818,11 +818,11 @@ class Lattice
       \post \a f_out contains the solution vectors.
     */
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
 	{
 	    Float *alpha=0;
-	    Vector **f_out_d=0; 
+	    Vector *f_out_d=0; 
 	    return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
 			       MULTI,alpha,f_out_d);
 
@@ -1002,9 +1002,9 @@ class Lattice
       dynamics evolution.
     */
 
-    virtual void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    virtual void RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 				      Float *alpha, Float mass, Float dt,
-				      Vector **sol_d) = 0;
+				      Vector *sol_d) = 0;
 
     virtual Float FhamiltonNode(Vector *phi, Vector *chi) = 0;
     //!< Computes the pseudofermionic action on the local sublattice.
@@ -1508,10 +1508,10 @@ class Fnone : public virtual Lattice
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
         // It does nothing and returns 0.
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, 
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, 
-		    Float *alpha, Vector**f_out_d);
+		    Float *alpha, Vector *f_out_d);
         // It does nothing and returns 0.    
 
     Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
@@ -1549,9 +1549,9 @@ class Fnone : public virtual Lattice
         // It evolves the canonical momentum mom by step_size
         // using the fermion force. 
 
-    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 			      Float *alpha, Float mass, Float dt,
-			      Vector **sol_d);
+			      Vector *sol_d);
 
     Float FhamiltonNode(Vector *phi, Vector *chi);
         // The fermion Hamiltonian of the node sublattice.
@@ -1650,10 +1650,10 @@ class Fstag : public virtual FstagTypes
 		   Float *true_res,
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, 
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
-		    Vector **f_out_d);
+		    Vector *f_out_d);
 
     Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
@@ -1680,9 +1680,9 @@ class Fstag : public virtual FstagTypes
     void EvolveMomFforce(Matrix *mom, Vector *frm, 
 			 Float mass, Float step_size);
 
-    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 			      Float *alpha, Float mass, Float dt,
-			      Vector **sol_d);
+			      Vector *sol_d);
 
     Float BhamiltonNode(Vector *boson, Float mass);
 
@@ -1718,10 +1718,10 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
 		   Float *true_res,
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, 
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
-		    Vector **f_out_d);
+		    Vector *f_out_d);
 
     Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
@@ -1751,9 +1751,9 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
 
 
     //! Momentum update in the RHMC algorithm.
-    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 			      Float *alpha, Float mass, Float dt,
-			      Vector **sol_d);
+			      Vector *sol_d);
 
     // Various utility routines for the momentum force computation.
 
@@ -1918,10 +1918,10 @@ class Fwilson : public virtual FwilsonTypes
         // *true_res = |src - MatPcDagMatPc * sol| / |src|
 	// The function returns the total number of CG iterations.
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, 
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, 
-		    Float *alpha, Vector **f_out_d);
+		    Float *alpha, Vector *f_out_d);
     //!< The matrix inversion used in the molecular dynamics algorithms.
     /*!<
       Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
@@ -2000,9 +2000,9 @@ class Fwilson : public virtual FwilsonTypes
         // It evolves the canonical momentum mom by step_size
         // using the fermion force. 
 
-    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 			      Float *alpha, Float mass, Float dt,
-			      Vector **sol_d);
+			      Vector *sol_d);
 
     Float BhamiltonNode(Vector *boson, Float mass);
         // The boson Hamiltonian of the node sublattice.
@@ -2066,10 +2066,10 @@ class Fclover : public virtual FwilsonTypes
         // *true_res = |src - MatPcDagMatPc * sol| / |src|
         // The function returns the total number of CG iterations.
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, 
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
-		    Vector **f_out_d);
+		    Vector *f_out_d);
     //!< The matrix inversion used in the molecular dynamics algorithms.
     /*!<
       Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
@@ -2155,9 +2155,9 @@ class Fclover : public virtual FwilsonTypes
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
 
-    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 			      Float *alpha, Float mass, Float dt,
-			      Vector **sol_d);
+			      Vector *sol_d);
 
     Float BhamiltonNode(Vector *boson, Float mass);
     // The boson Hamiltonian of the node sublattice
@@ -2228,10 +2228,10 @@ class FdwfBase : public virtual FwilsonTypes
 		   CgArg *cg_arg, 
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    int FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, 
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
-		    Vector **f_out_d);
+		    Vector *f_out_d);
 
     Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
@@ -2311,9 +2311,9 @@ class FdwfBase : public virtual FwilsonTypes
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
 
-    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 			      Float *alpha, Float mass, Float dt,
-			      Vector **sol_d);
+			      Vector *sol_d);
 
     Float FhamiltonNode( Vector *phi,  Vector *chi) ;
         // The fermion Hamiltonian of the node sublattice.

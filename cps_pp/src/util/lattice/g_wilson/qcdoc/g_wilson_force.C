@@ -71,12 +71,7 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
     for(mu = 0;mu<4;mu++){
       Matrix *mtmp = result[mu];
       for(int i = 0;i<vol;i++) {
-#if 0
-        mp1.Dagger((IFloat *)mtmp);
-        mtmp->TrLessAntiHermMatrix(mp1);
-#else
         mtmp->TrLessAntiHermMatrix();
-#endif
         mtmp++;
       }
     }
@@ -92,10 +87,8 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
 	  int uoff = GsiteOffset(x);
 	  
 	  for (int mu = 0; mu < 4; ++mu) {
-//	    GforceSite(*mp0, x, mu);
 	    
 	    IFloat *ihp = (IFloat *)(mom+uoff+mu);
-	    IFloat *dotp = (IFloat *)mp0;
 	    IFloat *dotp2 = (IFloat *) (result[mu]+(uoff/4));
 	    fTimesV1PlusV2(ihp, step_size, dotp2, ihp, 18);
 	  }

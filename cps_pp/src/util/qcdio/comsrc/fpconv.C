@@ -3,6 +3,7 @@
 #include <iostream>
 #include <util/data_types.h>
 #include <util/fpconv.h>
+#include <util/qioarg.h>
 
 CPS_START_NAMESPACE
 using namespace std;
@@ -36,7 +37,7 @@ const char * FPConv::name(const enum FP_FORMAT format) {
   return FP_FORMAT_NAME[int(format)];
 }
 
-char * FPConv::file2host(char * hbuf, const char * fdat, const int fdat_len) {
+char * FPConv::file2host(char * hbuf, const char * fdat, const int fdat_len)const {
   // trivial case
   if(hostFormat == fileFormat) {
     memcpy(hbuf,fdat,fdat_len*size(hostFormat));
@@ -87,7 +88,7 @@ char * FPConv::file2host(char * hbuf, const char * fdat, const int fdat_len) {
   return hbuf;
 }
 
-char * FPConv::host2file(char *fbuf, const char * hdat, const int hdat_len) {
+char * FPConv::host2file(char *fbuf, const char * hdat, const int hdat_len) const{
   // trivial case
   if(hostFormat == fileFormat) {
     memcpy(fbuf,hdat,hdat_len*size(fileFormat));
@@ -139,7 +140,7 @@ char * FPConv::host2file(char *fbuf, const char * hdat, const int hdat_len) {
 }
 
 
-void FPConv::byterevn(type32 w[], int n) {
+void FPConv::byterevn(type32 w[], int n) const{
   /*  char * buf = (char*)w;
   cout << "First 16 bytes: ";
   for(int i=0;i<16;i++) cout << hex << (unsigned int)buf[i] << " ";
@@ -165,7 +166,7 @@ void FPConv::byterevn(type32 w[], int n) {
   */
 }
 
-void FPConv::byterevn64(type64 w[], int n) {
+void FPConv::byterevn64(type64 w[], int n) const{
   /*
   char * buf = (char*)w;
   cout << "First 16 bytes: ";
@@ -192,27 +193,27 @@ void FPConv::byterevn64(type64 w[], int n) {
   */
 }
 
-void FPConv::conv64to32(type32 tgt[], type64 src[], int n) {
+void FPConv::conv64to32(type32 tgt[], type64 src[], int n) const{
   //  cout << "Conversion 64 ==> 32" << endl;
   double *s = (double*)src;
   float  *t = (float*)tgt;
   for(int i=0;i<n;i++)  *t++ = *s++;
 }
 
-void FPConv::conv32to64(type64 tgt[], type32 src[], int n) {
+void FPConv::conv32to64(type64 tgt[], type32 src[], int n) const{
   //  cout << "Convesion 32 ==> 64 " << endl;
   float  *s = (float*) src;
   double *t = (double*)tgt;
   for(int i=0;i<n;i++)  *t++ = *s++;
 }
 
-void FPConv::copy64(type64 tgt[], type64 src[], int n) {
+void FPConv::copy64(type64 tgt[], type64 src[], int n) const{
   double *s = (double*)src;
   double *t = (double*)tgt;
   for(int i=0;i<n;i++)  *t++ = *s++;
 }
 
-void FPConv::copy32(type32 tgt[], type32 src[], int n) {
+void FPConv::copy32(type32 tgt[], type32 src[], int n) const{
   float *s = (float*)src;
   float *t = (float*)tgt;
   for(int i=0;i<n;i++)  *t++ = *s++;
@@ -233,20 +234,37 @@ enum FP_FORMAT  FPConv::testHostFormat() { // test the type of CPS::Float
   }
 
   // 2. pi test
-  if(sizeof(Float) == 8) {
+  if(sizeof(Float) == 8) {  // 64 bits
     if(host_big)  hostFormat = FP_IEEE64BIG;
     else          hostFormat = FP_IEEE64LITTLE;
   }
-  else {
-    Float  cpspi = FPConv_PI;
-    unsigned long * lp2 = (unsigned long*)&cpspi;
-    if(*lp2 == FPConv_ieee32pi) {
-      if(host_big) hostFormat = FP_IEEE32BIG;
-      else         hostFormat = FP_IEEE32LITTLE;
+  else {  // 32 bits
+    union { 
+      float pinum;
+      char pichar[4];
+    }cpspi;
+
+    cpspi.pinum = FPConv_PI;
+    if(host_big) {
+      hostFormat = FP_IEEE32BIG;
+      for(int i=0;i<4;i++) {
+	if(cpspi.pichar[i] != FPConv_ieee32pi_big[i]) {
+	  hostFormat = FP_TIDSP32;
+	  break;
+	}
+      }
     }
-    else
-      hostFormat = FP_TIDSP32;
-  }
+    else {
+      hostFormat = FP_IEEE32LITTLE;
+      for(int i=0;i<4;i++) {
+	if(cpspi.pichar[i] != FPConv_ieee32pi_big[3-i]) {
+	  hostFormat = FP_TIDSP32;
+	  break;
+	}
+      }
+    }
+
+  } // end of 32 bits
   cout << "Host FP Format : " << name(hostFormat) << endl;
 
   return hostFormat;
@@ -281,7 +299,7 @@ enum FP_FORMAT  FPConv::setFileFormat(const char * desc) {
 }
 
 unsigned int FPConv::checksum(char * data, const int data_len,
-			       const enum FP_FORMAT dataFormat){
+			       const enum FP_FORMAT dataFormat) const{
   // checksum always done on 32-bits
 
   enum FP_FORMAT chkFormat = dataFormat;
@@ -311,7 +329,7 @@ unsigned int FPConv::checksum(char * data, const int data_len,
   return s;
 }
 
-int FPConv::size(const enum FP_FORMAT datatype) {
+int FPConv::size(const enum FP_FORMAT datatype) const {
   switch(datatype) {
   case FP_TIDSP32:
   case FP_IEEE32:
@@ -327,7 +345,7 @@ int FPConv::size(const enum FP_FORMAT datatype) {
   }
 }
 
-bool FPConv::big_endian(const enum FP_FORMAT datatype) {
+bool FPConv::big_endian(const enum FP_FORMAT datatype) const {
   switch(datatype) {
   case FP_TIDSP32:
   case FP_IEEE32:
@@ -357,7 +375,7 @@ bool FPConv::big_endian(const enum FP_FORMAT datatype) {
 #define DEB(x)  
 
 
-void FPConv::ti2ieee(type32 *ti, int Num){
+void FPConv::ti2ieee(type32 *ti, int Num) const{
   register type32 tmp, tisave;
   
   type32 sign(0);
@@ -461,7 +479,7 @@ void FPConv::ti2ieee(type32 *ti, int Num){
 }
 
 
-void FPConv::ieee2ti(type32 *ti, int Num){
+void FPConv::ieee2ti(type32 *ti, int Num) const{
   cout << "FPConv::ieee2ti()  not implemented" << endl;
   exit(13);
 }

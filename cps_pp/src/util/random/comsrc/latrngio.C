@@ -5,57 +5,18 @@
 #include <math.h>
 #include <util/latrngio.h>
 #include <util/qioarg.h>
+#include <util/iostyle.h>
 #include <util/intconv.h>
 #include <util/random.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <sys/time.h>
+#include <unistd.h>
 
 CPS_START_NAMESPACE
 using namespace std;
-
-///////////////////////////////////////////////////////////////
-// LatRngIO functions, common function for Read & Write
-void LatRngIO::calcDim(const QioArg & io_arg) {
-  for(int i=0;i<5;i++) local_n[i] = io_arg.NodeSites(i) / 2;
-  if(local_n[4]==0)  local_n[4] = 1;
-  for(int i=0;i<5;i++) {
-    global_n[i] = io_arg.Nodes(i) * local_n[i];
-    coor[i] = io_arg.Coor(i);
-  }
-}
-
-int LatRngIO::uniqueSiteID5d(int local_id_5d) {
-  int loc[5];
-  for(int i=0; i<5;i++) {
-    loc[i] = local_id_5d % local_n[i];
-    local_id_5d /= local_n[i];
-    loc[i] += local_n[i] * coor[i];
-  }
-  
-  int global_id = loc[4];
-  for(int i=3;i>=0;i--) {
-    global_id = global_id * global_n[i+1] + loc[i];
-  }
-  return global_id;
-}
-
-int LatRngIO::uniqueSiteID4d(int local_id_4d) {
-  int loc[4];
-  for(int i=0; i<4;i++) {
-    loc[i] = local_id_4d % local_n[i];
-    local_id_4d /= local_n[i];
-    loc[i] += local_n[i] * coor[i];
-  }
-  
-  int global_id = loc[3];
-  for(int i=2;i>=0;i--) {
-    global_id = global_id * global_n[i+1] + loc[i];
-  }
-  return global_id;
-}
-
 
 
 ///////////////////////////////////////////////////////////////
@@ -75,40 +36,31 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   io_good = false;
   int error = 0;
 
-  // prepare for pos-dep. checksum calc.
-  calcDim(rd_arg);
-
-  // all open file and check error
-  ifstream input(rd_arg.FileName);
-  if ( !input.good() )
-    {
+  if(isRoot()) {
+    // all open file and check error
+    ifstream input(rd_arg.FileName);
+    if ( !input.good() ) {
       cout << "Could not open file:\n   "
 	   << rd_arg.FileName
-           << "\nfor input.\n";
+	   << "\nfor input.\n";
       error = 1;
     }
+
+    if(!error) {
+      hd.read(input);
+      input.close();
+    }
+  }
   // first sync point
   // executed by all, sync and share error status information
   if(synchronize(error) != 0)   return;
 
-
-  int data_start;
-  if (isRoot()) { // commander, analyze file header
-    string line;
-    do {
-      getline(input,line); // read one line
-      hd.add(line);
-    } while( line.find("END_HEADER") == string::npos);
-    
-    data_start = input.tellg();
-  }
-  broadcastInt(&data_start);
+  broadcastInt(&hd.data_start);
 
 
   if(isRoot()) {
-    if(hd.asString("DATATYPE") != "LATTICE_RNG_5D_4D"){  // need both 5d & 4d
-      cout << "Invalid RNG type: "
-	   << hd.asString("DATATYPE") << endl;
+    if(hd.datatype != "LATTICE_RNG_5D_4D"){  // need both 5d & 4d
+      cout << "Invalid RNG type: " << hd.datatype << endl;
       error = 1;
     }
   }
@@ -123,21 +75,8 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   int ns = rd_arg.Snodes() * rd_arg.SnodeSites();
 
   if(isRoot()) {
-    int rdnx,rdny,rdnz,rdnt,rdns;
-
-    //====================================
-    // initialise the size of the lattice
-    // int characters
-    
-    rdnx=hd.asInt("DIMENSION_1");
-    rdny=hd.asInt("DIMENSION_2");
-    rdnz=hd.asInt("DIMENSION_3");
-    rdnt=hd.asInt("DIMENSION_4");
-    rdns=hd.asInt("DIMENSION_5");
-    if(!hd.found())  rdns = 1;  // s-dim not found, use default value
-
-    cout << "Lattice dimensions: " << rdnx <<"x" << rdny <<"x" << rdnz <<"x" << rdnt <<"x" << rdns<< endl;
-    if(rdnx != nx || rdny != ny || rdnz != nz || rdnt != nt || rdns!=ns) {
+    cout << "Lattice Dimensions in File: " << hd.dimension[0] <<"x" << hd.dimension[1] <<"x" << hd.dimension[2] <<"x" << hd.dimension[3] <<"x" << hd.dimension[4]<< endl;
+    if(hd.dimension[0] != nx || hd.dimension[1] != ny || hd.dimension[2] != nz || hd.dimension[3] != nt || hd.dimension[4]!=ns) {
       cout << "Dimensions in file DISAGREE with GlobalJobParameter!"<<endl;
       error = 1;
     }
@@ -147,7 +86,7 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
   // check floating point format
   if(isRoot()) {
-    intconv.setFileFormat(hd.asString("INT_FORMAT").c_str());
+    intconv.setFileFormat(hd.int_format);
   }
   broadcastInt((int*)&intconv.fileFormat);
   if(intconv.fileFormat == INT_UNKNOWN) {
@@ -155,147 +94,69 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
     return;
   }
 
-
-  if(isRoot())  hd.Show();
+  if(isRoot())  hd.show();
 
   // the UGrandomGenerator has multiple type members, need a universal
   // format to make it cross-platform
   int size_rng_ints = ugran[0].RNGints();
-  cout << "size_rng_ints = " << size_rng_ints << endl;
   int size_rng_chars = size_rng_ints * intconv.fileIntSize();
 
-  // start reading data
+  QioArg rng_arg(rd_arg);
+  rng_arg.cutHalf();
 
-  int xbegin = rd_arg.XnodeSites()/2 * rd_arg.Xcoor(), xend = rd_arg.XnodeSites()/2 * (rd_arg.Xcoor()+1);
-  int ybegin = rd_arg.YnodeSites()/2 * rd_arg.Ycoor(), yend = rd_arg.YnodeSites()/2 * (rd_arg.Ycoor()+1);
-  int zbegin = rd_arg.ZnodeSites()/2 * rd_arg.Zcoor(), zend = rd_arg.ZnodeSites()/2 * (rd_arg.Zcoor()+1);
-  int tbegin = rd_arg.TnodeSites()/2 * rd_arg.Tcoor(), tend = rd_arg.TnodeSites()/2 * (rd_arg.Tcoor()+1);
-  int sbegin = rd_arg.SnodeSites()/2 * rd_arg.Scoor(), send = rd_arg.SnodeSites()/2 * (rd_arg.Scoor()+1);
-  if(rd_arg.SnodeSites()==1) send=sbegin+1;
+  unsigned int csum[2] = {0}, pos_dep_csum[2] = {0};
+  Float RandSum[2]={0.0}, Rand2Sum[2]={0.0};
 
-  nx/=2; ny/=2; nz/=2; nt/=2; ns/=2;
-  if(ns==0) ns = 1;
+#if TARGET != QCDOC  // when on LINUX, only parallel (direct IO) mode is used
+  setParallel();
+#endif
 
-  int sblk = nx*ny*nz*nt*size_rng_chars;
-  int tblk = nx*ny*nz*size_rng_chars;
-  int zblk = nx*ny*size_rng_chars;
-  int yblk = nx*size_rng_chars;
+  if(parIO()) {
+    cout << endl << "================= Loading 5-D RNGs =================" << endl << endl;
 
-  
-  // Step 1: read RNG to a buffer (Note: not all data in LatRanGen are stored)
-  // and calc. checksum and pos_dep_csum at the same time
+    ParallelIO pario(rng_arg);
+    if(! pario.load((char*)ugran, size_rng_ints, sizeof(UGrandomGenerator),
+		    hd, intconv, 5,
+		    &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0])) return;
 
-  // TempBufAlloc is a mem allocator that prevents mem leak on "return"s
-  // see latrngio.h
-  TempBufAlloc  filebuf(size_rng_chars);
-
-  unsigned int csum = 0, pos_dep_csum = 0;
-  int rngid=0;
-  TempBufAlloc rng(size_rng_ints * sizeof(int));
-  Float RandSum=0.0, Rand2Sum=0.0;
-
-  // read in parallel manner, node 0 will assign & dispatch IO time slots
-  setConcurIONumber(rd_arg.ConcurIONumber);
-  getIOTimeSlot();
-
-  input.seekg(data_start,ios_base::beg);
-
-  // read 5d
-  int jump = sbegin * sblk;
-  for(int sr=sbegin;sr<send;sr++) {
-    jump += tbegin * tblk;
-    for(int tr=tbegin;tr<tend;tr++) {
-      jump += zbegin * zblk;
-      for(int zr=zbegin;zr<zend;zr++) {
-	jump += ybegin * yblk;
-	for(int yr=ybegin;yr<yend;yr++) {
-	  jump += xbegin * size_rng_chars;
-	  input.seekg(jump,ios_base::cur);
-
-	  for(int xr=xbegin;xr<xend;xr++) {
-	    input.read(filebuf,size_rng_chars);
-	    csum += intconv.checksum(filebuf,size_rng_ints);
-	    pos_dep_csum += intconv.posDepCsum(filebuf,size_rng_ints) * (uniqueSiteID5d(rngid)+1);
-	    // load
-	    intconv.file2host((char*)rng,filebuf,size_rng_ints);
-	    ugran[rngid].load((int*)rng);
-	    // next rand
-	    Float rn = ugran[rngid].Grand();
-	    RandSum += rn;
-	    Rand2Sum += rn*rn;
-	    // recover
-	    ugran[rngid].load((int*)rng);
-	    rngid++;
-	  }
-
-	  jump = (nx-xend) * size_rng_chars;  // "jump" restart from 0 and count
-	}
-	jump += (ny-yend) * yblk;
-      }
-      jump += (nz-zend) * zblk;
-    }
-    jump += (nt-tend) * tblk;
+    hd.data_start += size_rng_chars * rng_arg.VolSites() * 
+                     rng_arg.Snodes() * rng_arg.SnodeSites();
+ 
+    cout << endl << "================= Loading 4-D RNGs =================" << endl << endl;
+    if(! pario.load((char*)ugran_4d, size_rng_ints, sizeof(UGrandomGenerator),
+		    hd, intconv, 4,
+		    &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1])) return;
   }
-  jump += (ns-send) * sblk;
-  input.seekg(jump,ios_base::cur); // jump to the start of 4d data
+#if TARGET == QCDOC
+  else {
+    cout << endl << "================= Loading 5-D RNGs =================" << endl << endl;
 
-  // read 4d
-  // note: unlike write, all nodes in S dim. should read
-  rngid = 0;
-  jump = tbegin * tblk;
-  for(int tr=tbegin;tr<tend;tr++) {
-    jump += zbegin * zblk;
-    for(int zr=zbegin;zr<zend;zr++) {
-      jump += ybegin * yblk;
-      for(int yr=ybegin;yr<yend;yr++) {
-	jump += xbegin * size_rng_chars;
-	input.seekg(jump,ios_base::cur);
-	
-	for(int xr=xbegin;xr<xend;xr++) {
-	  input.read(filebuf,size_rng_chars);
-	  if(rd_arg.Scoor() == 0) {
-	    csum += intconv.checksum(filebuf,size_rng_ints);
-	    pos_dep_csum += intconv.posDepCsum(filebuf,size_rng_ints) * (uniqueSiteID4d(rngid)+1);
-	  }
-	  // load
-	  intconv.file2host((char*)rng,filebuf,size_rng_ints);
-	  ugran_4d[rngid].load((int*)rng);
-	  if(rd_arg.Scoor() == 0) {
-	    // next rand
-	    Float rn = ugran_4d[rngid].Grand();
-	    RandSum += rn;
-	    Rand2Sum += rn*rn;
-	    // recover
-	    ugran_4d[rngid].load((int*)rng);
-	  }
-	  rngid++;
-	}
-	
-	jump = (nx-xend) * size_rng_chars;  // "jump" restart from 0 and count
-      }
-      jump += (ny-yend) * yblk;
-    }
-    jump += (nz-zend) * zblk;
+    SerialIO serio(rng_arg);
+    if(! serio.load((char*)ugran, size_rng_ints, sizeof(UGrandomGenerator),
+		    hd, intconv, 5,
+		    &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0])) return;
+
+    hd.data_start += size_rng_chars * rng_arg.VolSites() * 
+                     rng_arg.Snodes() * rng_arg.SnodeSites();
+    
+    cout << endl << "================= Loading 4-D RNGs =================" << endl << endl;
+
+    if(! serio.load((char*)ugran_4d, size_rng_ints, sizeof(UGrandomGenerator),
+		    hd, intconv, 4,
+		    &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1])) return;
   }
+#endif
 
-  finishIOTimeSlot();
-  //
-
-  if ( !input.good() ) { cout << "Input stream error!" << endl; error = 1; }
-  input.close();  
-  if(synchronize(error) != 0)  return;
+  cout << endl << "================= Verification =================" << endl << endl;
 
   // Step 2.1: verify  checksum
-  csum = globalSumUint(csum);
+  csum[0] += csum[1];
+  csum[0] = globalSumUint(csum[0]);
 
   if(isRoot()) {
-    unsigned int cshead;
-    sscanf(hd.asString("CHECKSUM").c_str() , "%lx ", &cshead);
-  
-    if( cshead != csum ) {
-      cout << "CheckSUM error !! Header:" 
-	   << hd.asString("CHECKSUM") << " Host calc:"
-	   <<hex << csum << dec << "\n";
+    if( hd.checksum != csum[0] ) {
+      cout << "CheckSUM error !! Header:" << hex << hd.checksum << dec 
+	   << " Host calc:" <<hex << csum[0] << dec << endl;
       error = 1;
     }
     else
@@ -305,15 +166,14 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   if(synchronize(error) != 0) return;
 
   // Step 2.2: verify position-dep. Checksum
-  pos_dep_csum = globalSumUint(pos_dep_csum);
+  pos_dep_csum[0] += pos_dep_csum[1];
+  pos_dep_csum[0] = globalSumUint(pos_dep_csum[0]);
   if(isRoot()) {
-    unsigned int cshead;
-    sscanf(hd.asString("POS_DEP_CSUM").c_str() , "%lx ", &cshead);
-  
-    if( cshead != pos_dep_csum ) {
-      cout << "Position Dependent CheckSUM error !! Header:" 
-	   << hd.asString("POS_DEP_CSUM") << " Host_calc:"
-	   <<hex << pos_dep_csum << dec << "\n";
+    // pos_dep_csum could be absent
+    if( hd.pos_dep_csum > 0 && hd.pos_dep_csum != pos_dep_csum[0] ) { 
+      cout << "Position Dependent CheckSUM error!!" 
+	   << " Header:" <<hex << hd.pos_dep_csum << dec
+	   << " Host_calc:" <<hex << pos_dep_csum[0] << dec << endl;
       error = 1;
     }
     else
@@ -324,23 +184,21 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
 
   // STEP 3: Verify Rand Average and Variance
-  int total_rngs_4d = rd_arg.VolSites() / 16;
-  int total_rngs_5d = total_rngs_4d * ns; 
-  Float RandAvg = globalSumFloat(RandSum) / (total_rngs_5d + total_rngs_4d);
-  Float RandVar = globalSumFloat(Rand2Sum) / (total_rngs_5d + total_rngs_4d)
+  RandSum[0] += RandSum[1];
+  Rand2Sum[0] += Rand2Sum[1];
+  int total_rngs_4d = rng_arg.VolSites();
+  int total_rngs_5d = total_rngs_4d * rng_arg.Snodes() * rng_arg.SnodeSites(); 
+  Float RandAvg = globalSumFloat(RandSum[0]) / (total_rngs_5d + total_rngs_4d);
+  Float RandVar = globalSumFloat(Rand2Sum[0]) / (total_rngs_5d + total_rngs_4d)
                   - RandAvg * RandAvg;
-  Float AvgInHeader, VarInHeader;
   if(isRoot()) {
-    AvgInHeader = hd.asFloat("AVERAGE");
-    VarInHeader = hd.asFloat("VARIANCE");
+  cout << "Average::  calc: " << RandAvg << "  header: " << hd.average 
+       << "  rel.dev.: " << fabs((RandAvg-hd.average)/RandAvg) <<  endl;
+  cout << "Variance:: calc: " << RandVar << "  header: " << hd.variance 
+       << "  rel.dev.: " << fabs((RandVar-hd.variance)/RandVar) << endl;
   }
-  broadcastFloat(&AvgInHeader);
-  broadcastFloat(&VarInHeader);
 
-  cout << "Average::  calc: " << RandAvg << "  header: " << AvgInHeader 
-       << "  dev.: " << fabs((RandAvg-AvgInHeader)/RandAvg) <<  endl;
-  cout << "Variance:: calc: " << RandVar << "  header: " << VarInHeader 
-       << "  dev.: " << fabs((RandVar-VarInHeader)/RandVar) << endl;
+  cout << endl << "================= Loading Complete =================" << endl << endl;
 
   io_good = true;
 
@@ -367,9 +225,6 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   io_good = false;
   int error = 0;
 
-  // prepare for pos-dep. checksum calc.
-  calcDim(wt_arg);
-
   // some cross-platform issued to be discussed
   intconv.setFileFormat(wt_arg.FileIntFormat);
   cout << "Set File INT format : " << intconv.name(intconv.fileFormat) << endl;
@@ -388,224 +243,121 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   cout << "size_rng_ints = " << size_rng_ints << endl;
   int size_rng_chars = size_rng_ints * intconv.fileIntSize();
 
-  // TempBufAlloc is an mem allocator that prevents memory leak on "return"s
-  TempBufAlloc  filebuf(size_rng_chars);
-  TempBufAlloc  rng(size_rng_ints * sizeof(int));
+#if TARGET != QCDOC
+  setParallel();
+#endif
 
   // start writing file
-  ofstream output(wt_arg.FileName);
-  if(!output.good())
-    {
-      cout << "Could not open file:\n   "
-	   << wt_arg.FileName
-           << "\nfor output.\n";
-      error = 1;
-    }
+  ofstream output;
 
+  if(parIO()) {
+    output.open(wt_arg.FileName);
+    if(!output.good())
+      {
+	cout << "Could not open file:\n   "
+	     << wt_arg.FileName
+	     << "\nfor output.\n";
+	error = 1;
+      }
+  }
+#if TARGET == QCDOC
+  else {
+    if(isRoot()) {
+      output.open(wt_arg.FileName);
+      if(!output.good())
+	{
+	  cout << "Could not open file:\n   "
+	       << wt_arg.FileName
+	       << "\nfor output.\n";
+	  error = 1;
+	}
+    }    
+  }  
+#endif
   if(synchronize(error) > 0)  return;
 
   // write header
-  int csum_pos, pdcsum_pos;
-  int avg_pos, var_pos;
-  int data_start;
-
   if(isRoot()) {
-    output << "BEGIN_HEADER" << endl;
-    output << "HDR_VERSION = 1.0" << endl;
-    output << "DATATYPE = LATTICE_RNG_5D_4D" << endl;
-    output << "STORAGE_FORMAT = 1.0" << endl;
-    for(int i=1;i<=5;i++){
-      output << "DIMENSION_" << i << " = " << wt_arg.Nodes(i-1)*wt_arg.NodeSites(i-1) << "\n" ;
-    }
-    output << "CHECKSUM = ";
-    csum_pos = output.tellp();
-    output << hex << setw(8) << 0 << dec << endl;
+    hd.init(wt_arg, intconv.fileFormat);
+    hd.write(output);
+  }
+  broadcastInt(&hd.data_start); // from 0 to all
 
-    output << "POS_DEP_CSUM = ";
-    pdcsum_pos = output.tellp();
-    output << hex << setw(8) << 0 << dec << endl;
+  unsigned int csum[2]={0}, pos_dep_csum[2] = {0};
+  Float RandSum[2]={0.0}, Rand2Sum[2] = {0.0};
 
-    output << "INT_FORMAT = " << intconv.name(intconv.fileFormat) << endl;
+  QioArg rng_arg(wt_arg);
+  rng_arg.cutHalf();
+
+  if(parIO()) {
+    cout << endl << "================= Unloading 5-D RNGs =================" << endl << endl;
+
+    ParallelIO pario(rng_arg);
+    if(! pario.store(output, (char*)ugran, size_rng_ints,
+		     sizeof(UGrandomGenerator), hd, intconv, 5,
+		     &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0])) return;
+
+    hd.data_start += size_rng_chars * rng_arg.VolSites() * 
+                     rng_arg.Snodes() * rng_arg.SnodeSites();
+ 
+    cout << endl << "================= Unloading 4-D RNGs =================" << endl << endl;
+
+    if(! pario.store(output, (char*)ugran_4d, size_rng_ints, 
+		     sizeof(UGrandomGenerator), hd, intconv, 4,
+		     &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1])) return;
+  }
+#if TARGET == QCDOC
+  else {
+    cout << endl << "================= Unloading 5-D RNGs =================" << endl << endl;
+
+    SerialIO serio(rng_arg);
+    if(! serio.store(output, (char*)ugran, size_rng_ints, 
+		     sizeof(UGrandomGenerator), hd, intconv, 5,
+		     &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0])) return;
+
+    hd.data_start += size_rng_chars * rng_arg.VolSites() * 
+                     rng_arg.Snodes() * rng_arg.SnodeSites();
+
+    cout << endl << "================= Unloading 4-D RNGs =================" << endl << endl;
     
-    output << "AVERAGE = ";
-    avg_pos = output.tellp();
-    output << setw(20) << left << ' ' << endl;  // 20 whitespaces, hopefully
-
-    output << "VARIANCE = ";
-    var_pos = output.tellp();
-    output<< setw(20) << left << ' ' << endl;
-
-    output << "END_HEADER" << endl;
-
-    data_start = output.tellp();
+    if(! serio.store(output, (char*)ugran_4d, size_rng_ints, 
+		     sizeof(UGrandomGenerator), hd, intconv, 4,
+		     &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1])) return;
   }
-  
-  broadcastInt(&data_start); // from 0 to all
-
-
-  // start writing data
-  int xbegin = wt_arg.XnodeSites()/2 * wt_arg.Xcoor(), xend = wt_arg.XnodeSites()/2 * (wt_arg.Xcoor()+1);
-  int ybegin = wt_arg.YnodeSites()/2 * wt_arg.Ycoor(), yend = wt_arg.YnodeSites()/2 * (wt_arg.Ycoor()+1);
-  int zbegin = wt_arg.ZnodeSites()/2 * wt_arg.Zcoor(), zend = wt_arg.ZnodeSites()/2 * (wt_arg.Zcoor()+1);
-  int tbegin = wt_arg.TnodeSites()/2 * wt_arg.Tcoor(), tend = wt_arg.TnodeSites()/2 * (wt_arg.Tcoor()+1);
-  int sbegin = wt_arg.SnodeSites()/2 * wt_arg.Scoor(), send = wt_arg.SnodeSites()/2 * (wt_arg.Scoor()+1);
-  if(wt_arg.SnodeSites()==1) send=sbegin+1;
-
-  nx/=2; ny/=2; nz/=2; nt/=2; ns/=2;
-  if(ns==0) ns = 1;
-
-  int sblk = nx*ny*nz*nt*size_rng_chars;
-  int tblk = nx*ny*nz*size_rng_chars;
-  int zblk = nx*ny*size_rng_chars;
-  int yblk = nx*size_rng_chars;
-
-  // write in parallel manner, node 0 will assign & dispatch IO time slots
-  unsigned int csum=0, pos_dep_csum = 0;
-  Float RandSum=0.0, Rand2Sum = 0.0;
-  int rngid=0;
-
-  setConcurIONumber(wt_arg.ConcurIONumber);
-  getIOTimeSlot();
-
-  output.seekp(data_start,ios_base::beg);
-
-  // write 5d
-  int jump = sbegin * sblk;
-  for(int sr=sbegin;sr<send;sr++) {
-    jump += tbegin * tblk;
-    for(int tr=tbegin;tr<tend;tr++) {
-      jump += zbegin * zblk;
-      for(int zr=zbegin;zr<zend;zr++) {
-	jump += ybegin * yblk;
-	for(int yr=ybegin;yr<yend;yr++) {
-	  jump += xbegin * size_rng_chars;
-	  output.seekp(jump,ios_base::cur);
-
-	  for(int xr=xbegin;xr<xend;xr++) {
-//	    printf("%d %d %d %d %d rngid=%d ",xr,yr,zr,tr,sr,rngid);
-	    // dump
-	    ugran[rngid].store((int*)rng);
-	    intconv.host2file(filebuf,(char*)rng,size_rng_ints);
-
-	    // checksum used for verification
-	    csum += intconv.checksum(filebuf,size_rng_ints);
-	    pos_dep_csum += intconv.posDepCsum(filebuf,size_rng_ints) * (uniqueSiteID5d(rngid)+1);
-
-	    // next rand
-	    Float rn = ugran[rngid].Grand();
-	    RandSum += rn;
-	    Rand2Sum += rn*rn;
-	    // restore
-	    ugran[rngid].load((int*)rng);
-#if 0
-	    Float rn2 = ugran[rngid].Grand();
-	    printf("rn=%0.15e rn2=%0.15e\n",rn,rn2);
-	    ugran[rngid].load((int*)rng);
 #endif
 
-	    output.write(filebuf, size_rng_chars);
-	    
-	    rngid++;
-	  }
-
-	  jump = (nx-xend) * size_rng_chars;  // "jump" restart from 0 and count
-	}
-	jump += (ny-yend) * yblk;
-      }
-      jump += (nz-zend) * zblk;
-    }
-    jump += (nt-tend) * tblk;
-  }
-  jump += (ns-send) * sblk;
-  output.seekp(jump,ios_base::cur); // jump to the start of 4d data
-
-
-  // write 4d
-  rngid=0;
-
-  if(wt_arg.Scoor() == 0) { 
-    // only nodes on S==0 face will write ugran_4d
-    // and nodes w/ S>0 should have identical ugran_4d as node w/ S=0
-    jump = tbegin * tblk;
-    for(int tr=tbegin;tr<tend;tr++) {
-      jump += zbegin * zblk;
-      for(int zr=zbegin;zr<zend;zr++) {
-	jump += ybegin * yblk;
-	for(int yr=ybegin;yr<yend;yr++) {
-	  jump += xbegin * size_rng_chars;
-	  output.seekp(jump,ios_base::cur);
-	  
-	  for(int xr=xbegin;xr<xend;xr++) {
-	    // dump
-	    ugran_4d[rngid].store((int*)rng);
-	    intconv.host2file(filebuf,(char*)rng,size_rng_ints);
-
-	    // checksum used for verification
-	    csum += intconv.checksum(filebuf,size_rng_ints);
-	    pos_dep_csum += intconv.posDepCsum(filebuf,size_rng_ints) * (uniqueSiteID5d(rngid)+1);
-
-#if 1
-	    // next rand
-	    Float rn = ugran_4d[rngid].Grand();
-	    RandSum += rn;
-	    Rand2Sum += rn*rn;
-	    
-	    // restore
-	    ugran_4d[rngid].load((int*)rng);
-#endif
-
-	    output.write(filebuf, size_rng_chars);
-
-	    rngid++;
-	  }
-	  
-	  jump = (nx-xend) * size_rng_chars;  // "jump" restart from 0 and count
-	}
-	jump += (ny-yend) * yblk;
-      }
-      jump += (nz-zend) * zblk;
-    }
-  }  // end if (S==0)
-  
-  finishIOTimeSlot();
-  //
-  
-  csum = globalSumUint(csum);
-  pos_dep_csum = globalSumUint(pos_dep_csum);
 
   // fill in verification information
-  if(isRoot()) {
-    output.seekp(csum_pos,ios::beg);
-    output << hex << setw(8) << csum << dec;
-  
-    output.seekp(pdcsum_pos, ios::beg);
-    output <<hex << setw(8) << pos_dep_csum << dec;
-  }
+  csum[0] += csum[1];
+  csum[0] = globalSumUint(csum[0]);
+  pos_dep_csum[0] += pos_dep_csum[1];
+  pos_dep_csum[0] = globalSumUint(pos_dep_csum[0]);
 
-  int total_rngs_4d = wt_arg.VolSites() / 16;
-  int total_rngs_5d = total_rngs_4d * ns; 
-  Float RandAvg = globalSumFloat(RandSum) / (total_rngs_5d + total_rngs_4d);
-  Float RandVar = globalSumFloat(Rand2Sum) / (total_rngs_5d + total_rngs_4d)
+  RandSum[0] += RandSum[1];
+  Rand2Sum[0] += Rand2Sum[1];
+  int total_rngs_4d = rng_arg.VolSites();
+  int total_rngs_5d = total_rngs_4d * rng_arg.Snodes() * rng_arg.SnodeSites(); 
+  Float RandAvg = globalSumFloat(RandSum[0]) / (total_rngs_5d + total_rngs_4d);
+  Float RandVar = globalSumFloat(Rand2Sum[0]) / (total_rngs_5d + total_rngs_4d)
                   - RandAvg * RandAvg;
 
-  char numstr[100];
-
   if(isRoot()) {
-    output.seekp(avg_pos, ios::beg);
-    sprintf(numstr,"%-20.10lf",RandAvg);
-    output << numstr;
-
-    output.seekp(var_pos, ios::beg);
-    sprintf(numstr,"%-20.10lf",RandVar);
-    output << numstr;
+    hd.fillInCheckInfo(output, csum[0], pos_dep_csum[0], RandAvg, RandVar);
+    if ( !output.good() ) { cout << "Output stream error!" << endl; error = 1; }
   }
 
-  if ( !output.good() ) { cout << "Output stream error!" << endl; error = 1; }
-  output.close();  
   if(synchronize(error) != 0)  return;
+
+  if(parIO()) 
+    output.close();
+  else
+    if(isRoot()) output.close();
+  
+  cout << endl << "================= Unloading Complete =================" << endl << endl;
 
   io_good = true;
 }
+
 
 
 CPS_END_NAMESPACE

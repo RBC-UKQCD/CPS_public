@@ -20,19 +20,11 @@ int main(int argc, char ** argv) {
   // init  GJP
   DoArg do_arg;
 
-#if TARGET == QCDOC 
   do_arg.x_nodes = SizeX();
   do_arg.y_nodes = SizeY();
   do_arg.z_nodes = SizeZ();
   do_arg.t_nodes = SizeT();
   do_arg.s_nodes = SizeS();
-#else
-  do_arg.x_nodes = 1;
-  do_arg.y_nodes = 1;
-  do_arg.z_nodes = 1;
-  do_arg.t_nodes = 1;
-  do_arg.s_nodes = 1;
-#endif
 
   int nx = atoi(argv[3]);
   int ny = atoi(argv[3]);
@@ -67,7 +59,7 @@ int main(int argc, char ** argv) {
   int shuffletime = rand()%100+1;
   cout << "Shuffle for " << shuffletime << " times" << endl;
   
-  for(int s=0;s<shuffletime;s++)
+  for(int s=0;s<shuffletime;s++) {
     for(int x=0;x<GJP.XnodeSites();x++)
       for(int y=0;y<GJP.YnodeSites();y++)
 	for(int z=0;z<GJP.ZnodeSites();z++)
@@ -77,24 +69,48 @@ int main(int argc, char ** argv) {
 	      LRG.Grand(FIVE_D);
 	      LRG.Grand(FOUR_D);
 	    }
+    cout << "Shuffling #" << s+1 << " done!" << endl;
+  }
   
   cout << "Shuffling done!"<< endl;
   
 
   if(!strcmp(argv[1],"-r")) { // read
+    cout << endl << "***********************  PARALLEL MODE  **************************" << endl;
     if(LRG.Read(argv[2])) {
-      cout << "Read from file [" << argv[2] << "] success!" << endl;
+      cout << "Parallel Reading from file [" << argv[2] << "] success!" << endl;
     }
     else {
-      cout << "Read from file [" << argv[2] << "] failed!" << endl;
+      cout << "Parallel Reading from file [" << argv[2] << "] failed!" << endl;
+    }
+
+    cout << endl << "***********************  SERIAL MODE  **************************" << endl;
+    if(LRG.Read(argv[2], 0)) {
+      cout << "Serial Reading from file [" << argv[2] << "] success!" << endl;
+    }
+    else {
+      cout << "Serial Reading from file [" << argv[2] << "] failed!" << endl;
     }
   }
   else if(!strcmp(argv[1],"-w")) {  // write
+    cout << endl << "***********************  PARALLEL MODE  **************************" << endl;
     if(LRG.Write(argv[2])) {
-      cout << "Write to file [" << argv[2] << "] success!" << endl;
+      cout << "Parallel Writing to file [" << argv[2] << "] success!" << endl;
     }
     else {
-      cout << "Write to file [" << argv[2] << "] failed!" << endl;
+      cout << "Parallel Writing to file [" << argv[2] << "] failed!" << endl;
+    }
+
+    char fname[256];
+    strcpy(fname,argv[2]);
+    strcat(fname,".serial");
+
+    cout << endl << "***********************  SERIAL MODE  **************************" << endl;
+    if(LRG.Write(fname,0)) {
+      cout << "Serial Writing to file [" << fname << "] success!" << endl;
+    }
+    else {
+      cout << "Serial Writing to file [" << fname << "] failed!" << endl;
     }
   }
   else {

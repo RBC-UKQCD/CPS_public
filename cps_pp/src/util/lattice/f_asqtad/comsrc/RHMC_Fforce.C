@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce.C,v 1.4 2004-10-27 14:49:54 zs Exp $
+  $Id: RHMC_Fforce.C,v 1.5 2004-12-01 06:38:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -16,9 +16,6 @@
 #include <util/amalloc.h>
 #include <comms/glb.h>
 #include <util/time.h>
-#if TARGET==QCDOC
-#include <qalloc.h>
-#endif
 
 CPS_START_NAMESPACE
 
@@ -43,9 +40,9 @@ CPS_START_NAMESPACE
 
 #define PROFILE
 
-void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 				   Float *alpha, Float mass, Float dt,
-				   Vector **sol_d){
+				   Vector *sol_d){
 
     char *fname = "RHMC_EvolveMomFforce";
     VRB.Func(cname,fname);
@@ -59,50 +56,43 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
     // The number of directions to do simultaneously - N can be 1, 2 or 4.
     const int N = 4;  
     enum{plus, minus, n_sign};
-    
-    for (int i=0; i<degree; i++) sol[i] -> VecTimesEquFloat(alpha[i],e_vsize);
 
     int vol = GJP.VolNodeSites();
     size_t size = vol*FsiteSize()/2*sizeof(Float);
-
-    Vector **X = (Vector**)amalloc(smalloc, sizeof(Vector), 2, degree, vol);
+    int m_size = sizeof(Matrix);
+    int v_size = sizeof(Vector);
     
+    for (int i=0; i<degree; i++) 
+      (sol+i*size) -> VecTimesEquFloat(alpha[i],size);
+
+    Vector **X = (Vector**)smalloc(degree*sizeof(Vector*));
+    for (int p=0; p<degree; p++) X[p] = (Vector*)smalloc(vol*sizeof(Vector));
+
     // X_odd = D X_even    
     for (int p=0; p<degree; p++) {
-	moveMem(X[p], sol[p], size);
-	moveMem(X[p]+vol/2, sol_d[p], size);
-	Fconvert(X[p], CANONICAL, STAG);
+      moveMem(X[p], sol+size*p, size);
+      moveMem(X[p]+vol/2, sol_d+size*p, size);
+      Fconvert(X[p], CANONICAL, STAG);
     }
     Convert(STAG);  // Puts staggered phases into gauge field.
 
-    
+    // These are work Matrices used in force_product_sum routines
+    Matrix *mtmp = (Matrix*)fmalloc(vol*m_size);
+
     // Matrix fields for which we must allocate memory
+    Matrix ***Pnu = (Matrix***)amalloc(fmalloc, m_size, 3, n_sign, N, vol);
+    Matrix ****P3 = (Matrix****)amalloc(fmalloc, m_size, 4, n_sign, n_sign, N, vol);
+    Matrix ****Prhonu = (Matrix****)amalloc(fmalloc, m_size, 4, n_sign, n_sign, N, vol);
+    Matrix *****P5 = (Matrix*****)amalloc(fmalloc, m_size, 5, n_sign, n_sign, n_sign, N, vol);
+    Matrix ******P7 = (Matrix******)amalloc(fmalloc, m_size, 6, n_sign, n_sign, n_sign, n_sign, N, vol);
+    Matrix ******Psigma7 = (Matrix******)amalloc(fmalloc, m_size, 6, n_sign, n_sign, n_sign, n_sign, N, vol);
+    Matrix **L = (Matrix**)amalloc(fmalloc, m_size, 2, N, vol);
+    Matrix ***Lnu = (Matrix***)amalloc(fmalloc, m_size, 3, n_sign, N, vol);
+    Matrix ****Lrhonu = (Matrix****)amalloc(fmalloc, m_size, 4, n_sign, n_sign, N, vol);
+    Matrix ****Lmusigmarhonu = (Matrix****)amalloc(fmalloc, m_size, 4, n_sign, n_sign, N, vol);
 
-    Matrix ***Pnu = (Matrix***)amalloc(fmalloc, sizeof(Matrix), 3, n_sign, N, vol);
-    
-    Matrix ****P3 = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
-
-    Matrix ****Prhonu = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
-
-    Matrix *****P5 = (Matrix*****)amalloc(fmalloc, sizeof(Matrix), 5, n_sign, n_sign, n_sign, N, vol);
-
-    Matrix ******P7 = (Matrix******)amalloc(fmalloc, sizeof(Matrix), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
-
-    Matrix ******Psigma7 = (Matrix******)amalloc(fmalloc, sizeof(Matrix), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
-      
-    Matrix **L = (Matrix**)amalloc(fmalloc, sizeof(Matrix), 2, N, vol);
-
-    Matrix ***Lnu = (Matrix***)amalloc(fmalloc, sizeof(Matrix), 3, n_sign, N, vol);
-
-    Matrix ****Lrhonu = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
-
-    Matrix ****Lmusigmarhonu = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
-
-    size = vol*sizeof(Matrix);
-
-    // Array in which to accumulate the force term
-      
-    Matrix **force = (Matrix**)amalloc(fmalloc, sizeof(Matrix), 2, 4, vol);
+    // Array in which to accumulate the force term      
+    Matrix **force = (Matrix**)amalloc(fmalloc, m_size, 2, 4, vol);
 
     // These fields can be overlapped with previously allocated memory
     
@@ -124,19 +114,8 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
     Matrix **L3nunu = Psigma7[1][0][0][0];	
 
 
-    // These are work Matrices used in force_product_sum routines
-    // (only applies to QCDOC target)
-
-    Matrix *mtmp = 0;
-#if TARGET == QCDOC
-    mtmp = (Matrix*)qalloc(QCOMMS|QFAST,vol*sizeof(Matrix)); 
-    if(mtmp == 0) mtmp = (Matrix*)qalloc(QCOMMS,vol*sizeof(Matrix));
-    if(!mtmp) ERR.Pointer(cname, fname, "mtmp");
-#endif
-
     for(int i=0; i<4; i++)
-	for(int s=0; s<vol; s++) force[i][s].ZeroMatrix();
-    
+      for(int s=0; s<vol; s++) force[i][s].ZeroMatrix();
 
     ParTransAsqtad parallel_transport(*this);
 
@@ -775,20 +754,21 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 
     // Free allocated memory
     
-    sfree(Pnu);
-    sfree(P3);
-    sfree(Prhonu);
-    sfree(P5);
-    sfree(P7);
-    sfree(Psigma7);
-    sfree(L);
-    sfree(Lnu);
-    sfree(Lrhonu);
-    sfree(Lmusigmarhonu);
-    sfree(force);
+    ffree(Pnu);
+    ffree(P3);
+    ffree(Prhonu);
+    ffree(P5);
+    ffree(P7);
+    ffree(Psigma7);
+    ffree(L);
+    ffree(Lnu);
+    ffree(Lrhonu);
+    ffree(Lmusigmarhonu);
+    ffree(force);
+    for (int p=0; p<degree; p++) sfree(X[p]);
     sfree(X);
-    if(mtmp) sfree(mtmp);
-    
+    ffree(mtmp);
+   
     Convert(CANONICAL);
 
 }

@@ -1,0 +1,28 @@
+Usage:
+
+1. init do_arg then GJP  (both load & unload)  as usual
+
+
+2. for loading
+   LRG.Read(file)  or  LRG.Read(file, 1);     parallel mode
+   LRG.Read(file, 0);                         serial mode
+
+
+3. for unloading
+   LRG.Write(file)  or LRG.Write(file, 1);    parallel mode
+   LRG.Write(file, 0);                        serial mode
+
+
+4. to run the test,
+qrun QCDOC.x   -[r|w]   rng.file  <x/y/z sites>  <t sites>  <s sites> 
+
+eg,
+qrun QCDOC.x  -r  rng8x8x8x8x1.file  8   8  1   
+	or
+qrun QCDOC.x  -w  conf4x4x4x16x32.file 4  16  32  
+
+
+5. sorry for the long argument list....
+
+
+6. NOTE: on non-QCDOC machine, only parallel mode (direct-io mode) is applicable

@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.12 2004-09-02 17:04:17 zs Exp $
+  $Id: dirac_op.h,v 1.13 2004-12-01 06:38:13 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -133,7 +133,7 @@ class DiracOp
      // Jacobi diagonalizer of a single site matrix.
 
   //! Multishift CG invertor used in RHMC.
-  int MInvCG(Vector **out, Vector *in, Float in_norm, Float *shift, 
+  int MInvCG(Vector *out, Vector *in, Float in_norm, Float *shift, 
 	     int Nshift, int isz, Float *RsdCG, 
 	     MultiShiftSolveType type, Float *alpha);
 

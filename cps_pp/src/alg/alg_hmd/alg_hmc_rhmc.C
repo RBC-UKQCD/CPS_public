@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.11 2004-09-02 17:00:17 zs Exp $
+  $Id: alg_hmc_rhmc.C,v 1.12 2004-12-01 06:38:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
-  $Author: zs $
-  $Date: 2004-09-02 17:00:17 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.11 2004-09-02 17:00:17 zs Exp $
-  $Id: alg_hmc_rhmc.C,v 1.11 2004-09-02 17:00:17 zs Exp $
+  $Author: chulwoo $
+  $Date: 2004-12-01 06:38:15 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.12 2004-12-01 06:38:15 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.12 2004-12-01 06:38:15 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.11 $
+  $Revision: 1.12 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -140,10 +140,9 @@ void AlgHmcRHMC::init()
   // Allocate memory for the fermion CG arguments.
   //----------------------------------------------------------------
   if(n_frm_masses != 0){
-    frm_cg_arg = (CgArg **) smalloc(n_frm_masses * sizeof(CgArg*));
+    frm_cg_arg = (CgArg **) smalloc (cname,fname, "frm_cg_arg", 
+	n_frm_masses * sizeof(CgArg*));
     if(frm_cg_arg == 0) ERR.Pointer(cname,fname, "frm_cg_arg");
-    VRB.Smalloc(cname,fname,
-		"frm_cg_arg",frm_cg_arg, n_frm_masses * sizeof(CgArg*));
     
     for(i=0; i<n_frm_masses; i++){
       frm_cg_arg[i] = (CgArg *) smalloc(sizeof(CgArg));
@@ -158,7 +157,7 @@ void AlgHmcRHMC::init()
   for(i=0; i<n_frm_masses; i++){
     frm_cg_arg[i]->mass = hmd_arg->frm_mass[i];
     frm_cg_arg[i]->max_num_iter = hmd_arg->max_num_iter[i];
-    frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_md[i];
+    frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_mc[i];
   }
 
   // Allocate memory for the boson CG arguments.
@@ -205,14 +204,15 @@ void AlgHmcRHMC::init()
   total_size = 0;
   for (i=0; i<n_frm_masses; i++) total_size += hmd_arg->FRatDeg[i];
 
-  frmn = (Vector **) smalloc(total_size * sizeof(Vector*));
+  frmn = (Vector *) smalloc(f_size*total_size * sizeof(Vector));
   if(frmn == 0) ERR.Pointer(cname,fname, "frmn");
-  VRB.Smalloc(cname,fname, "frmn",frmn, total_size * sizeof(Vector*));
+  VRB.Smalloc(cname,fname, "frmn",frmn, f_size*total_size * sizeof(Vector));
 
-  frmn_d = (Vector **)smalloc(total_size * sizeof(Vector*));
+  frmn_d = (Vector *)smalloc(f_size*total_size * sizeof(Vector));
   if(frmn_d == 0) ERR.Pointer(cname,fname, "frmn_d");
-  VRB.Smalloc(cname,fname, "frmn_d",frmn_d, total_size * sizeof(Vector*));
+  VRB.Smalloc(cname,fname, "frmn_d",frmn_d, f_size*total_size * sizeof(Vector));
 
+  /*
   for (i=0; i<total_size; i++) {
     frmn[i] = (Vector *) smalloc(f_size *sizeof(Float));
     if(frmn[i] == 0) ERR.Pointer(cname,fname, "frmn[i]");
@@ -222,6 +222,7 @@ void AlgHmcRHMC::init()
     if(frmn_d[i] == 0) ERR.Pointer(cname,fname, "frmn_d[i]");
     VRB.Smalloc(cname,fname, "frmn_d[i]", frmn_d[i], f_size * sizeof(Float));
   }
+  */
 
   // Allocate memory for the boson field bsn.
   //----------------------------------------------------------------
@@ -302,12 +303,15 @@ AlgHmcRHMC::~AlgHmcRHMC() {
 
   // Free memory for the frmn (pseudo fermion) solution fields.
   //----------------------------------------------------------------
+  /*
   for(i=0; i<total_size; i++){
     VRB.Sfree(cname,fname, "frmn[i]",frmn[i]);
     sfree(frmn[i]);
     VRB.Sfree(cname,fname, "frmn_d[i]",frmn_d[i]);
     sfree(frmn_d[i]);
-  }
+    }
+  */
+
   VRB.Sfree(cname,fname, "frmn",frmn);
   sfree(frmn);
   VRB.Sfree(cname,fname, "frmn_d",frmn_d);
@@ -427,9 +431,9 @@ Float AlgHmcRHMC::run(void)
   // Heat Bath for the boson field bsn
   //----------------------------------------------------------------
   for(i=0; i<n_bsn_masses; i++){
-    lat.RandGaussVector(frmn[0], 0.5, Ncb);
+    lat.RandGaussVector(frmn, 0.5, Ncb);
     lat.RandGaussVector(bsn[i], 0.5, Ncb);
-    lat.SetPhi(phi[i], frmn[0], bsn[i], hmd_arg->bsn_mass[i]);
+    lat.SetPhi(phi[i], frmn, bsn[i], hmd_arg->bsn_mass[i]);
     lat.RandGaussVector(bsn[i], 0.5, Ncb);
     lat.FmatEvlInv(bsn[i], phi[i], bsn_cg_arg[i], CNV_FRM_NO);
   }
@@ -441,10 +445,10 @@ Float AlgHmcRHMC::run(void)
   h_init = lat.GhamiltonNode() + lat.MomHamiltonNode(mom);
   for(i=0; i<n_frm_masses; i++){
     
-    lat.RandGaussVector(frmn[0], 0.5, Ncb);
-    h_init += lat.FhamiltonNode(frmn[0],frmn[0]);
+    lat.RandGaussVector(frmn, 0.5, Ncb);
+    h_init += lat.FhamiltonNode(frmn,frmn);
 
-    phi[i] -> CopyVec(frmn[0],f_size);
+    phi[i] -> CopyVec(frmn,f_size);
     phi[i] -> VecTimesEquFloat(hmd_arg->SIRatNorm[i], f_size);
 
     // Can only renormalise mass for staggered or asqtad cases
@@ -455,7 +459,7 @@ Float AlgHmcRHMC::run(void)
       for (j=0; j<hmd_arg->SRatDeg[i]; j++) hmd_arg->SIRatPole[i][j] -= zeroPole;
     }
 
-    cg_iter = lat.FmatEvlMInv(phi+i, frmn[0], hmd_arg->SIRatPole[i], hmd_arg->SRatDeg[i],
+    cg_iter = lat.FmatEvlMInv(phi[i], frmn, hmd_arg->SIRatPole[i], hmd_arg->SRatDeg[i],
     			      hmd_arg->isz, frm_cg_arg[i], CNV_FRM_NO, SINGLE, hmd_arg->SIRatRes[i]);
 
     if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
@@ -484,7 +488,7 @@ Float AlgHmcRHMC::run(void)
 
   // Reset the residual error for the Molecular Dynamics
   //--------------------------------------------------------------
-  for (i=0; i<n_bsn_masses; i++)
+  for (i=0; i<n_frm_masses; i++)
     frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_md[i];
 
   // Perform initial UQPQ integration
@@ -520,11 +524,12 @@ Float AlgHmcRHMC::run(void)
 	for (j=0; j<hmd_arg->FRatDeg[i]; j++) hmd_arg->FRatPole[i][j] -= zeroPole;
       }
       
-      for (j=0; j<hmd_arg->FRatDeg[i]; j++) frmn[j+shift] -> VecTimesEquFloat(0.0,f_size);
+      for (j=0; j<hmd_arg->FRatDeg[i]; j++) 
+	(frmn+f_size*(j+shift)) -> VecTimesEquFloat(0.0,f_size);
       
-      cg_iter = lat.FmatEvlMInv(frmn+shift, phi[i], hmd_arg->FRatPole[i], hmd_arg->FRatDeg[i],
-				hmd_arg->isz, frm_cg_arg[i], CNV_FRM_NO, frmn_d+shift);
-      
+      cg_iter = lat.FmatEvlMInv(frmn+f_size*shift, phi[i], hmd_arg->FRatPole[i], hmd_arg->FRatDeg[i],
+				hmd_arg->isz, frm_cg_arg[i], CNV_FRM_NO, frmn_d+f_size*shift);
+
       if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
 	for (j=0; j<hmd_arg->FRatDeg[i]; j++) hmd_arg->FRatPole[i][j] += zeroPole;
 	frm_cg_arg[i] -> mass = trueMass;
@@ -539,8 +544,8 @@ Float AlgHmcRHMC::run(void)
       cg_calls++;      
       
       if (lat.Fclass() != F_CLASS_ASQTAD)
-	lat.RHMC_EvolveMomFforce(mom, frmn+shift, hmd_arg->FRatDeg[i], hmd_arg->FRatRes[i], 
-				 hmd_arg->frm_mass[i], dt, frmn_d+shift);
+	lat.RHMC_EvolveMomFforce(mom, frmn+f_size*shift, hmd_arg->FRatDeg[i], hmd_arg->FRatRes[i], 
+				 hmd_arg->frm_mass[i], dt, frmn_d+f_size*shift);
       shift += hmd_arg->FRatDeg[i];
     }
     
@@ -613,8 +618,8 @@ Float AlgHmcRHMC::run(void)
   //---------------------------------------------------------------
   shift = 0;
   for (i=0; i<n_frm_masses; i++) {
-    frmn[shift] -> CopyVec(phi[i],f_size);
-    frmn[shift] -> VecTimesEquFloat(hmd_arg->SRatNorm[i], f_size);
+    (frmn+f_size*shift) -> CopyVec(phi[i],f_size);
+    (frmn+f_size*shift) -> VecTimesEquFloat(hmd_arg->SRatNorm[i], f_size);
 
     // Can only renormalise mass for staggered or asqtad cases
     if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
@@ -626,7 +631,7 @@ Float AlgHmcRHMC::run(void)
 
     // Reset the residual error to the error in the approximation
     frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_mc[i];
-    cg_iter = lat.FmatEvlMInv(frmn+shift, phi[i], hmd_arg->SRatPole[i], hmd_arg->SRatDeg[i],
+    cg_iter = lat.FmatEvlMInv(frmn+f_size*shift, phi[i], hmd_arg->SRatPole[i], hmd_arg->SRatDeg[i],
     			      hmd_arg->isz, frm_cg_arg[i], CNV_FRM_NO, SINGLE, hmd_arg->SRatRes[i]);
     if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
       for (j=0; j<hmd_arg->SRatDeg[i]; j++) hmd_arg->SRatPole[i][j] += zeroPole;
@@ -641,7 +646,7 @@ Float AlgHmcRHMC::run(void)
     if(frm_cg_arg[i]->true_rsd > true_res_max) true_res_max = frm_cg_arg[i]->true_rsd;
     cg_calls++;      
 
-    h_final += lat.FhamiltonNode(frmn[shift], frmn[shift]);
+    h_final += lat.FhamiltonNode(frmn+f_size*shift, frmn+f_size*shift);
     shift += hmd_arg->FRatDeg[i];
 
   }
@@ -861,12 +866,14 @@ void AlgHmcRHMC::dynamicalApprox()
       // Free and Allocate memory for force approximation if necessary
        if (hmd_arg->FRatDeg[i] != hmd_arg->FRatDegNew[i]) {
 
+	 /*
 	for(i=0; i<total_size; i++){
 	  VRB.Sfree(cname,fname, "frmn[i]",frmn[i]);
 	  sfree(frmn[i]);
 	  VRB.Sfree(cname,fname, "frmn_d[i]",frmn_d[i]);
 	  sfree(frmn_d[i]);
 	}
+	 */
 
 	VRB.Sfree(cname,fname, "frmn",frmn);
 	sfree(frmn);
@@ -876,15 +883,16 @@ void AlgHmcRHMC::dynamicalApprox()
 	total_size = 0;
 	for (i=0; i<n_frm_masses; i++) total_size += hmd_arg->FRatDeg[i];
 	
-	frmn = (Vector **) smalloc(total_size * sizeof(Vector*));
+	frmn = (Vector *) smalloc(f_size * total_size * sizeof(Vector));
 	if(frmn == 0) ERR.Pointer(cname,fname, "frmn");
-	VRB.Smalloc(cname,fname, "frmn",frmn, total_size * sizeof(Vector*));
-	frmn_d = (Vector **)smalloc(total_size * sizeof(Vector*));
+	VRB.Smalloc(cname,fname, "frmn",frmn, f_size * total_size * sizeof(Vector));
+	frmn_d = (Vector *)smalloc(f_size * total_size * sizeof(Vector));
 	if(frmn_d == 0) ERR.Pointer(cname,fname, "frmn_d");
-	VRB.Smalloc(cname,fname, "frmn_d",frmn_d, total_size * sizeof(Vector*));
+	VRB.Smalloc(cname,fname, "frmn_d",frmn_d, f_size * total_size * sizeof(Vector));
 
+	/*
 	for (i=0; i<total_size; i++) {
-	  frmn[i] = (Vector *) smalloc(f_size *sizeof(Float));
+	  frmn[i] = (Vector *) smalloc(*sizeof(Float));
 	  if(frmn[i] == 0) ERR.Pointer(cname,fname, "frmn[i]");
 	  VRB.Smalloc(cname,fname, "frmn[i]", frmn[i], f_size *sizeof(Float));
 
@@ -892,6 +900,7 @@ void AlgHmcRHMC::dynamicalApprox()
 	  if(frmn_d[i] == 0) ERR.Pointer(cname,fname, "frmn_d[i]");
 	  VRB.Smalloc(cname,fname, "frmn_d[i]", frmn_d[i], f_size * sizeof(Float));
 	}
+	*/
 	hmd_arg->FRatDeg[i] = hmd_arg->FRatDegNew[i];
       }
 

@@ -1,0 +1,47 @@
+Usage:
+
+1. init do_arg then GJP  (both load & unload)  as usual
+   for loading, have to allocate enough memory for do_arg.start_conf_load_addr
+
+
+2. create Lattice object  (both loading & unloading)
+
+
+3. for loading
+   ReadLatticeParallel  rd(Lattice & lat, char * filename);                  (1-stop method)
+	-or-
+   QioArg  rd_arg(filename, check_plaq_link_precision /*optional*/);         (to gain more control)
+   // if needed, modify rd_arg members (default use GJP)
+   ReadLatticeParallel  rd(Lattice & lat, rd_arg);
+
+
+4. for unloading
+   WriteLatticeParallel  wt(Lattice & lat, char * filename);                 (1-stop method)
+	-or-
+									     (to gain more control)
+   QioArg  wt_arg(filename, file_floating_format /* optional,see fpconv.h */, 
+		  reconstruct_row_3 /* optional */)
+   // if needed, modify wt_arg information (CREATOR, CREATION HARDWARE, etc...)
+   WriteLatticeParallel  wt(Lattice & lat, wt_arg);
+
+
+5. QMP no longer needed, as well as the link flag "-lqcd_api" (now use Gsum64Ext class)
+
+
+6. to run the test,
+qrun QCDOC.x   -[r|w]   conf.file  <x/y/z sites>  <t sites>  <Xbc> <Ybc> <Zbc> <Tbc> 
+
+eg,
+qrun QCDOC.x  -r  conf8x8x8x8.file  8   8     P  P  P  P
+	or
+qrun QCDOC.x  -w  conf4x4x4x16.file 4  16     P  P  A  A
+
+
+7. sorry for the long argument list....
+
+
+8. Parallel/Serial IO switch:
+     use function:  Read/WriteLatticeParallel::setParallel()  and  setSerial()
+     use class:     Read/WriteLatticeParallel  default   use parallel
+		    Read/WriteLatticeSerial    default   use serial
+

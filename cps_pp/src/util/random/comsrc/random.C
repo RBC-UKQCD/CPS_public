@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.18 2004-11-08 00:17:10 chulwoo Exp $
+  $Id: random.C,v 1.19 2004-12-01 06:38:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-11-08 00:17:10 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.18 2004-11-08 00:17:10 chulwoo Exp $
-//  $Id: random.C,v 1.18 2004-11-08 00:17:10 chulwoo Exp $
+//  $Date: 2004-12-01 06:38:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.19 2004-12-01 06:38:26 chulwoo Exp $
+//  $Id: random.C,v 1.19 2004-12-01 06:38:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -322,7 +322,8 @@ IFloat LatRanGen::Grand(FermionFieldDimension frm_dim)
 //----------------------------------------------------------------------
 void LatRanGen::SetInterval(IFloat high, IFloat low)
 {
-  ugran[0].SetInterval(high,low);
+//  ugran[0].SetInterval(high,low);
+    UniformRandomGenerator::SetInterval(high,low);
 }
 
 //---------------------------------------------------------
@@ -333,7 +334,8 @@ void LatRanGen::SetInterval(IFloat high, IFloat low)
 //----------------------------------------------------------------------
 void LatRanGen::SetSigma(IFloat sigma)
 {
-  ugran[0].SetSigma(sigma);
+//  ugran[0].SetSigma(sigma);
+    GaussianRandomGenerator::SetSigma(sigma);
 }
 
 //---------------------------------------------------------
@@ -514,17 +516,21 @@ void LatRanGen::GetStates(unsigned int **s,
 }
 
 
-bool LatRanGen::Read(const char * filename) {
+bool LatRanGen::Read(const char * filename, const int ParIO) {
   QioArg rd_arg(filename);
   LatRngRead  rd;
+  if(ParIO) rd.setParallel();
+  else      rd.setSerial();
   rd.read(ugran,ugran_4d,rd_arg);
   return rd.good();
 }
 
 
-bool LatRanGen::Write(const char * filename) {
+bool LatRanGen::Write(const char * filename, const int ParIO) {
   QioArg wt_arg(filename);
   LatRngWrite  wt;
+  if(ParIO) wt.setParallel();
+  else      wt.setSerial();
   wt.write(ugran,ugran_4d,wt_arg);
   return wt.good();
 }

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.11 2004-09-02 16:56:39 zs Exp $
+  $Id: alg_hmd.h,v 1.12 2004-12-01 06:38:13 chulwoo Exp $
 */
 //------------------------------------------------------------------
 
@@ -381,11 +381,11 @@ class AlgHmcRHMC : public AlgHmd
     Matrix* gauge_field_init;
     //!< The initial gauge field configuration
 
-    Vector** frmn;
+    Vector* frmn;
     //!< Array of vectors
     /*!< These will hold the solutions from the solves. */
 
-    Vector** frmn_d;
+    Vector* frmn_d;
     //!< Array of vectors
     /*!< These will hold the solutions from the solves multiplied by
       the D-slash operator. */ 

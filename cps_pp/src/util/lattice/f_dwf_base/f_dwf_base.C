@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.16 2004-11-09 18:34:12 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.17 2004-12-01 06:38:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -190,7 +190,7 @@ int FdwfBase::FmatEvlInv(Vector *f_out, Vector *f_in,
 
 
 //------------------------------------------------------------------
-// int FmatEvlMInv(Vector **f_out, Vector *f_in, 
+// int FmatEvlMInv(Vector *f_out, Vector *f_in, 
 //                Float shift[], int Nshift, 
 //                CgArg *cg_arg, Float *true_res,
 //		  CnvFrmType cnv_frm = CNV_FRM_YES):
@@ -204,25 +204,25 @@ int FdwfBase::FmatEvlInv(Vector *f_out, Vector *f_in,
 // vectors, f_in and f_out are defined on a checkerboard.
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
-int FdwfBase::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+int FdwfBase::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 			  int Nshift, int isz, CgArg *cg_arg, 
 			  CnvFrmType cnv_frm, MultiShiftSolveType type, 
-			  Float *alpha, Vector **f_out_d)
+			  Float *alpha, Vector *f_out_d)
 {
   int iter;
-  char *fname = "FmatMInv(V**, V*, .....)";
+  char *fname = "FmatMInv(V*, V*, .....)";
   VRB.Func(cname,fname);
 
   int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
   Float dot = f_in -> NormSqGlbSum(f_size);
-//  Float RsdCG[Nshift];
+
   Float *RsdCG = new Float[Nshift];
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
-  DiracOpDwf dwf(*this, f_out[0], f_in, cg_arg, cnv_frm);
+  DiracOpDwf dwf(*this, f_out, f_in, cg_arg, cnv_frm);
   cg_arg->true_rsd = RsdCG[isz];
-//  return dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+
   int return_value= dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
   delete[] RsdCG;
   return return_value;
@@ -866,13 +866,14 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 }
 // CJ: change end
 
-void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 				    Float *alpha, Float mass, Float dt,
-				    Vector **sol_d) {
+				    Vector *sol_d) {
   char *fname = "RHMC_EvolveMomFforce";
 
+  int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
   for (int i=0; i<degree; i++)
-    EvolveMomFforce(mom,sol[i],mass,dt*alpha[i]);
+    EvolveMomFforce(mom,sol + f_size*i,mass,dt*alpha[i]);
 
 }
 

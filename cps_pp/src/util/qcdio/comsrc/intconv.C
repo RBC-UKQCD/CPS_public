@@ -2,6 +2,7 @@
 #include <iostream>
 #include <util/data_types.h>
 #include <util/intconv.h>
+#include <util/qioarg.h>
 
 CPS_START_NAMESPACE
 using namespace std;
@@ -30,7 +31,7 @@ const char * IntConv::name(const enum INT_FORMAT format) {
   return INT_FORMAT_NAME[int(format)];
 }
 
-char * IntConv::file2host(char * hbuf, const char * fdat, const int fdat_len) {
+char * IntConv::file2host(char * hbuf, const char * fdat, const int fdat_len) const {
   // trivial case
   if(hostFormat == fileFormat) {
     memcpy(hbuf,fdat,fdat_len*size(hostFormat));
@@ -47,7 +48,7 @@ char * IntConv::file2host(char * hbuf, const char * fdat, const int fdat_len) {
   return hbuf;
 }
 
-char * IntConv::host2file(char *fbuf, const char * hdat, const int hdat_len) {
+char * IntConv::host2file(char *fbuf, const char * hdat, const int hdat_len) const {
   // trivial case
   if(hostFormat == fileFormat) {
     memcpy(fbuf,hdat,hdat_len*size(fileFormat));
@@ -65,7 +66,7 @@ char * IntConv::host2file(char *fbuf, const char * hdat, const int hdat_len) {
 }
 
 
-void IntConv::byterevn(type32 w[], int n) {
+void IntConv::byterevn(type32 w[], int n) const {
   /*  char * buf = (char*)w;
   cout << "First 16 bytes: ";
   for(int i=0;i<16;i++) cout << hex << (unsigned int)buf[i] << " ";
@@ -91,7 +92,7 @@ void IntConv::byterevn(type32 w[], int n) {
   */
 }
 
-void IntConv::copy32(type32 tgt[], type32 src[], int n) {
+void IntConv::copy32(type32 tgt[], type32 src[], int n) const {
   float *s = (float*)src;
   float *t = (float*)tgt;
   for(int i=0;i<n;i++)  *t++ = *s++;
@@ -153,7 +154,7 @@ enum INT_FORMAT  IntConv::setFileFormat(const char * desc) {
 }
 
 unsigned int IntConv::checksum(char * data, const int data_len,
-			       const enum INT_FORMAT dataFormat){
+			       const enum INT_FORMAT dataFormat) const{
   // checksum always done on 32-bits
 
   enum INT_FORMAT chkFormat = dataFormat;
@@ -182,8 +183,10 @@ unsigned int IntConv::checksum(char * data, const int data_len,
   return s;
 }
 
-unsigned int IntConv::posDepCsum(char * data, const int data_len,
-				 const enum INT_FORMAT dataFormat){
+unsigned int IntConv::posDepCsum(char * data, const int data_len, 
+				 const int dimension, const QioArg & qio_arg, 
+				 const int siteid, const int global_id,
+				 const enum INT_FORMAT dataFormat) const {
   // checksum always done on 32-bits
 
   enum INT_FORMAT chkFormat = dataFormat;
@@ -199,6 +202,7 @@ unsigned int IntConv::posDepCsum(char * data, const int data_len,
   if(big_endian(hostFormat) != big_endian(chkFormat))
     byterevn((type32*)data, csumcnt);
 
+  // s = pdcsum within a site
   unsigned int *buf = (unsigned int*)data;
   unsigned int s = 0;
   for(int i=0;i<csumcnt;i++)  {
@@ -209,11 +213,29 @@ unsigned int IntConv::posDepCsum(char * data, const int data_len,
   if(big_endian(hostFormat) != big_endian(chkFormat))
     byterevn((type32*)data, csumcnt);
 
-  return s;
+  // s * (uniqueSiteId+1) = global pdcsum
+  int sid = siteid;
+  int gid = global_id;
+
+  if(sid >= 0) { // calculate global_id via siteid
+    int loc[5];
+    for(int i=0;i<5;i++) {
+      loc[i] = sid % qio_arg.NodeSites(i);
+      sid /= qio_arg.NodeSites(i);
+      loc[i] += qio_arg.NodeSites(i) * qio_arg.Coor(i);
+    }
+    
+    gid = 0;
+    if(dimension==5) gid = loc[4];
+    for(int i=3;i>=0;i--) 
+      gid = gid * qio_arg.Nodes(i) * qio_arg.NodeSites(i) + loc[i];
+  }
+
+  return s * (gid+1);
 }
 
 
-int IntConv::size(const enum INT_FORMAT datatype) {
+int IntConv::size(const enum INT_FORMAT datatype) const {
   switch(datatype) {
   case INT_32BIG:
   case INT_32LITTLE:
@@ -223,7 +245,7 @@ int IntConv::size(const enum INT_FORMAT datatype) {
   }
 }
 
-bool IntConv::big_endian(const enum INT_FORMAT datatype) {
+bool IntConv::big_endian(const enum INT_FORMAT datatype) const {
   switch(datatype) {
   case INT_32BIG:
     return true;

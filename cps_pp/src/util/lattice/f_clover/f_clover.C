@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fclover class.
 
-  $Id: f_clover.C,v 1.13 2004-09-02 16:59:30 zs Exp $
+  $Id: f_clover.C,v 1.14 2004-12-01 06:38:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:59:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.13 2004-09-02 16:59:30 zs Exp $
-//  $Id: f_clover.C,v 1.13 2004-09-02 16:59:30 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-12-01 06:38:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.14 2004-12-01 06:38:18 chulwoo Exp $
+//  $Id: f_clover.C,v 1.14 2004-12-01 06:38:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_clover.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -174,12 +174,12 @@ int Fclover::FmatEvlInv(Vector *f_out, Vector *f_in,
   return iter;
 }
 
-int Fclover::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+int Fclover::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift, 
 			 int Nshift, int isz, CgArg *cg_arg, 
 			 CnvFrmType cnv_frm, MultiShiftSolveType type, 
-			 Float *alpha, Vector **f_out_d)
+			 Float *alpha, Vector *f_out_d)
 {
-  char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
+  char *fname = "MatMInv(Vector *out, Vector *in, Float *shift,...";
   VRB.Func(cname, fname);
   ERR.NotImplemented(cname,fname);
   return -1;
@@ -662,9 +662,9 @@ void Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
   return ;
 }
 
-void Fclover::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+void Fclover::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 				   Float *alpha, Float mass, Float dt,
-				   Vector **sol_d) {
+				   Vector *sol_d) {
   char *fname = "RHMC_EvolveMomFforce";
 
   ERR.General(cname,fname,"Not implemented\n");

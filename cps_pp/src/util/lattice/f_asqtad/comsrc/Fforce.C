@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.4 2004-11-08 00:00:50 chulwoo Exp $
+  $Id: Fforce.C,v 1.5 2004-12-01 06:38:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     // The FstagTypes protected pointer f_tmp should contain Dslash frm
 
     moveMem(X_e, frm, size);
-#define DEBUGGING
+#undef DEBUGGING
 #ifdef DEBUGGING
     Vector * f_tmp_save = f_tmp;      // FstagTypes destructor needs this.
     f_tmp = frm+GJP.VolNodeSites()/2; // Debugging only.

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpBase class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.6 2004-09-02 16:53:08 zs Exp $
+   $Id: minvcg.C,v 1.7 2004-12-01 06:38:15 chulwoo Exp $
  */
 
 CPS_END_NAMESPACE
@@ -42,7 +42,7 @@ CPS_START_NAMESPACE
 
   \return The number of iterations performed.
  */
-int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, 
+int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass, 
 		    int Nmass, int isz, Float *RsdCG,
 		    MultiShiftSolveType type, Float *alpha)
 {
@@ -115,8 +115,8 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
 
   // If source norm = 0, solution must be 0
   if (chi_norm == 0.0) {
-    if (type == SINGLE) psi[0]->VecTimesEquFloat(0.0,f_size);
-    else for (k=0; k<Nmass; k++) psi[k]->VecTimesEquFloat(0.0,f_size);
+    if (type == SINGLE) psi->VecTimesEquFloat(0.0,f_size);
+    else for (k=0; k<Nmass; k++) (psi + f_size*k)->VecTimesEquFloat(0.0,f_size);
     return 0;
   }
   
@@ -165,10 +165,10 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
   if (type == SINGLE) {
     for (s=0; s<Nmass; s++) {
       b_tmp = bs[s] * alpha[s];
-      psi[0]-> FTimesV1PlusV2(-b_tmp,chi,psi[0],f_size);
+      psi -> FTimesV1PlusV2(-b_tmp,chi,psi,f_size);
     }
   } else {
-    for (s=0; s<Nmass; s++) psi[s]-> FTimesV1PlusV2(-bs[s],chi,psi[s],f_size);  
+    for (s=0; s<Nmass; s++) (psi + f_size*s)-> FTimesV1PlusV2(-bs[s],chi,psi+f_size*s,f_size);  
   }
 
   // Check the convergance of the first solution
@@ -244,12 +244,12 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
     if (type == SINGLE)
       for (s=0; s<Nmass; s++) {
 	if (convsP[s]) continue;
-	psi[0]->FTimesV1PlusV2(-bs[s]*alpha[s],p[s],psi[0],f_size);
+	psi->FTimesV1PlusV2(-bs[s]*alpha[s],p[s],psi,f_size);
       }
     else
       for (s=0; s<Nmass; s++) {
 	if (convsP[s]) continue;
-	psi[s]->FTimesV1PlusV2(-bs[s],p[s],psi[s],f_size);
+	(psi + f_size*s)->FTimesV1PlusV2(-bs[s],p[s],psi+f_size*s,f_size);
       }
     
     // if |psi[k+1] -psi[k]| <= rsdCG |psi[k+1]| then return

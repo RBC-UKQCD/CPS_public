@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.11 2004-10-28 19:29:23 cvs Exp $
+  $Id: pt.C,v 1.12 2004-12-01 06:38:21 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cvs $
-//  $Date: 2004-10-28 19:29:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.11 2004-10-28 19:29:23 cvs Exp $
-//  $Id: pt.C,v 1.11 2004-10-28 19:29:23 cvs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-12-01 06:38:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.12 2004-12-01 06:38:21 chulwoo Exp $
+//  $Id: pt.C,v 1.12 2004-12-01 06:38:21 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -103,8 +103,6 @@ static void dag_cpy (IFloat *dest, IFloat *src){
 }
 
 static int lex_xyzt(int *x){
-  static char *fname = "lex_xyzt()";
-  //	printf("%s: %d %d %d %d\n",fname,x[0],x[1],x[2],x[3]);
   int result = x[0] + size[0]*(x[1]+size[1]*(x[2]+size[2]*x[3]));
   return result;
 }
@@ -649,7 +647,9 @@ void pt_vvpd(Vector **vect, int n_vect, const int *dir,
   // Only do communication in forward direction
   for(i=0;i<n_dir;i++) {
     if ( size[wire[i]] <hop)
-      ERR.General("",fname,"size(%d) in direction %d is smaller than the hop(%d)\n",size[wire[i]],wire[i],hop);
+      ERR.General("",fname,
+		"size(%d) in direction %d is smaller than the hop(%d)\n",
+		size[wire[i]],wire[i],hop);
     SCUarg_p[2*i] = SCUarg[hop-1][4*wire[i]];
     SCUarg_p[2*i+1] = SCUarg[hop-1][4*wire[i]+1];
     SCUarg_p2[2*i] = SCUarg2[hop-1][4*wire[i]];

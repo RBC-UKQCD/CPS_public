@@ -1,102 +1,8 @@
-// A slight modification to WriteLattice class
-// to enable parallel writing of Gauge Connection Format
-
-// Write the format of Gauge Connection Format
-// of QCDSP {load,unload}_lattice format
-
-#include <config.h>
 #include <util/WriteLatticePar.h>
-#include <util/time.h>
-#include <iomanip>
-#include <fstream>
-#include <iostream>
+#include <util/iostyle.h>
 
-#define PROFILE
 CPS_START_NAMESPACE
 using namespace std;
-
-// code from cdawson/kostas
-
-void WriteLatticeParallel::defaultHeader() {
-    // default archive time is current time
-    time_t ptm;
-    time(&ptm);
-    cout << "time = " << ptm << endl;
-    hd_archive_date = asctime(localtime(&ptm));
-    int i1( hd_archive_date.find_last_not_of("\n"));
-    hd_archive_date = hd_archive_date.substr(0,i1+1);
-
-    hd_ensemble_id = "unspecified";
-    hd_ensemble_label = "unspecified";
-    hd_sequence_number = 0;
-    hd_creator = "unspecified";
-
-#if TARGET == QCDOC
-    hd_creator_hardware = "QCDOC";
-#else
-#if TARGET == QCDSP
-    hd_creator_hardware = "QCDSP";
-#else
-    hd_creator_hardware = "NOARCH";
-#endif
-#endif
-
-    hd_creation_date = hd_archive_date;
-}
-
-void WriteLatticeParallel::setHeader(const char * EnsembleId, const char * EnsembleLabel, const int SequenceNumber, const char * Creator) {
-  hd_ensemble_id = EnsembleId;
-  hd_ensemble_label= EnsembleLabel;
-  hd_sequence_number = SequenceNumber;
-  hd_creator = Creator;
-}
-
-
-void WriteLatticeParallel::writeHeader(ostream & fout, Float link_trace, Float plaq, const QioArg & wt_arg)
-{
-  if(isRoot()) {
-    fout.seekp(0,ios::beg);
-    fout << "BEGIN_HEADER\n";
-    fout << "HDR_VERSION = 1.0\n";
-    if(recon_row_3) 
-      fout << "DATATYPE = 4D_SU3_GAUGE\n";
-    else
-      fout << "DATATYPE = 4D_SU3_GAUGE_3x3\n";
-    fout << "STORAGE_FORMAT = 1.0\n";
-    for(int i=1;i<=4;i++){
-      fout << "DIMENSION_" << i << " = " << wt_arg.Nodes(i-1)*wt_arg.NodeSites(i-1) << "\n" ;
-    }
-    // just to keep the space and write it later
-    fout << "LINK_TRACE = " << setprecision(10) << link_trace  << "\n";
-    fout << "PLAQUETTE  = " << setprecision(10) << plaq << "\n";
-    for(int i=1;i<=4;i++){
-      fout << "BOUNDARY_"<<i<<" = " <<
-	( (wt_arg.Bc(i-1) == BND_CND_APRD ) ? "ANTIPERIODIC\n" :"PERIODIC\n");
-    }
-    fout << "CHECKSUM = ";
-
-    // store checksum position
-    csum_pos = fout.tellp();
-
-    fout << hex << setw(8) << 0 << dec << endl;
-
-    fout << "ENSEMBLE_ID = " << hd_ensemble_id << endl;
-    fout << "ENSEMBLE_LABEL = "<< hd_ensemble_label << endl;
-    fout << "SEQUENCE_NUMBER = " << hd_sequence_number << endl;
-    fout << "CREATOR = " << hd_creator << endl;
-    fout << "CREATOR_HARDWARE = " << hd_creator_hardware << endl;
-    fout << "CREATION_DATE = " << hd_creation_date << endl;
-    fout << "ARCHIVE_DATE = " << hd_archive_date << endl;
-    fout << "FLOATING_POINT = " << fpconv.name(fpconv.fileFormat) << endl;
-    fout << "END_HEADER" << endl;
-
-    cout << "header written" << endl;
-
-    data_start = fout.tellp();
-  }    
-
-  broadcastInt(&data_start); // from 0 to all
-}
 
 void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 {
@@ -111,19 +17,18 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   int error = 0;
   unload_good = false;
 
-  const char * filename = wt_arg.FileName;
+  //  const char * filename = wt_arg.FileName;
   recon_row_3 = wt_arg.ReconRow3;
   FP_FORMAT dataFormat = wt_arg.FileFpFormat;
-
   fpconv.setFileFormat(dataFormat);
   if(fpconv.fileFormat == FP_UNKNOWN) {
     cout << "Output Floating Point format UNKNOWN"<< endl;
     return;
   }
 
-  //  calc Plaq and LinkTrace
+  // calc Plaq and LinkTrace
   const int size_matrices(wt_arg.VolNodeSites()*4);
-  Matrix *lpoint =  lat.GaugeField();
+  Matrix * lpoint = lat.GaugeField();
   cout << "Writing Gauge Field at Lattice::GaugeField() = " << hex << lpoint << dec << endl;
 
   Float plaq = lat.SumReTrPlaq()/(18*wt_arg.VolSites()) ;
@@ -137,102 +42,84 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   else
     globalSumFloat(0.0);  // everyone has to participate in global ops
 
+  
+  // write lattice data, in Parallel or Serial manner
+  // determined by the template parameter "IoStyle" of this class
+  int data_per_site = recon_row_3 ? 4*12 : 4*18;
+  const int chars_per_site = data_per_site * fpconv.fileFpSize();
 
-  // all open file, start writing
-  ofstream output(filename);
-
-  if(!output.good())
-    {
-      cout << "Could not open file:\n   "
-	   << filename
-           << "\nfor output.\nNot even a little bit.\n";
-      error = 1;
-    }
-
-  if(synchronize(error) > 0)  return;
-
-  writeHeader(output, ltrace, plaq, wt_arg);// write a header without CSUM
-
-
-  const int Floats_per_site = recon_row_3 ? 4*12 : 4*18;
-  const int chars_per_site = Floats_per_site * fpconv.fileFpSize();
-
-
-  // TempBufAlloc is a mem allocator that prevents mem leak on "return"
-  TempBufAlloc  fbuf(chars_per_site);
-
-  int xbegin = wt_arg.XnodeSites() * wt_arg.Xcoor(), xend = wt_arg.XnodeSites() * (wt_arg.Xcoor()+1);
-  int ybegin = wt_arg.YnodeSites() * wt_arg.Ycoor(), yend = wt_arg.YnodeSites() * (wt_arg.Ycoor()+1);
-  int zbegin = wt_arg.ZnodeSites() * wt_arg.Zcoor(), zend = wt_arg.ZnodeSites() * (wt_arg.Zcoor()+1);
-  int tbegin = wt_arg.TnodeSites() * wt_arg.Tcoor(), tend = wt_arg.TnodeSites() * (wt_arg.Tcoor()+1);
-
-  int nx = wt_arg.XnodeSites() * wt_arg.Xnodes();
-  int ny = wt_arg.YnodeSites() * wt_arg.Ynodes();
-  int nz = wt_arg.ZnodeSites() * wt_arg.Znodes();
-  //  int nt = wt_arg.TnodeSites() * wt_arg.Tnodes();  // not needed
-
-
-  int tblk = nx*ny*nz*chars_per_site;
-  int zblk = nx*ny*chars_per_site;
-  int yblk = nx*chars_per_site;
-
-  cout << endl;
-  cout << "Trying to write " << wt_arg.VolNodeSites() * chars_per_site << " bytes"<<endl;
-
-  // write in parallel manner, node 0 will assign & dispatch IO time slots
-  int mat=0;
   unsigned int csum = 0;
 
-  setConcurIONumber(wt_arg.ConcurIONumber);
-  getIOTimeSlot();
+#if TARGET != QCDOC   // when not on QCDOC(like on LINUX), use parallel(direct IO) mode
+  setParallel();
+#endif
+  
+  ofstream output;
 
-  if(wt_arg.Scoor() == 0) {
-    output.seekp(data_start,ios_base::beg);
-    int jump = tbegin * tblk;
-    for(int tr=tbegin;tr<tend;tr++) {
-      jump += zbegin * zblk;
-      for(int zr=zbegin;zr<zend;zr++) {
-	jump += ybegin * yblk;
-	for(int yr=ybegin;yr<yend;yr++) {
-	  jump += xbegin * chars_per_site;
-	  output.seekp(jump, ios_base::cur);
-
-	  for(int xr=xbegin;xr<xend;xr++) {
-	    for(int i=0;i<4;i++) {
-	      fpconv.host2file((char*)fbuf + chars_per_site/4*i, (char*)&lpoint[mat++],
-			       Floats_per_site/4);
-	    }
-	    csum += fpconv.checksum((char*)fbuf,Floats_per_site);
-	    output.write(fbuf,chars_per_site);
-	  }	  
-	  
-	  jump = (nx-xend) * chars_per_site;  // jump restarted from 0
-	}
-	jump += (ny-yend) * yblk;
-      }
-      jump += (nz-zend) * zblk;
+  if(parIO()) {
+    // all open file, start writing
+    output.open(wt_arg.FileName);
+    if(!output.good())    {
+      cout << "Could not open file:\n   "
+	   << wt_arg.FileName
+	   << "\nfor output.\nUSER: maybe you should kill the process\n\n";
+      error = 1;
     }
-    if ( !output.good() ) { cout << "Output stream error!" << endl; error = 1; }
   }
-
-  finishIOTimeSlot();
-  //
-
-  if(wt_arg.Scoor() == 0) {
-    csum = globalSumUint(csum);
+  else {
+    // only node 0 open file, start writing
+    if(isRoot()) {
+      output.open(wt_arg.FileName);
+      if(!output.good())    {
+	cout << "Could not open file:\n   "
+	     << wt_arg.FileName
+	     << "\nfor output.\nUSER: maybe you should kill the process\n\n";
+	error = 1;
+      }
+    }
   }
-  else
-    globalSumUint(0);
+  if(synchronize(error) > 0)  return;
 
-  // fill in checksum
-  if(isRoot()) {
-    output.seekp(csum_pos,ios::beg);
-    output << hex << setw(8) << csum << dec;
+  // write header
+  if(isRoot()){
+    hd.init(wt_arg, fpconv.fileFormat, ltrace, plaq);
+    hd.write(output);
   }
+  if(synchronize(error) > 0) return;
 
-  output.close();
+  broadcastInt(&hd.data_start);
 
+  if(parIO()) {
+    ParallelIO pario(wt_arg);
+    if(!pario.store(output, (char*)lpoint, data_per_site, sizeof(Matrix)*4,
+		    hd, fpconv, 4, &csum)) return;
+    if(wt_arg.Scoor() == 0) 
+      csum = globalSumUint(csum);
+    else 
+      globalSumUint(0);
+  }
+#if TARGET == QCDOC
+  else {
+    SerialIO serio(wt_arg);
+    if(!serio.store(output, (char*)lpoint, data_per_site, sizeof(Matrix)*4,
+		    hd, fpconv, 4, &csum)) return;
+  }
+#endif
+
+  // after unloading, fill in checksum
+  if(isRoot()) 
+    hd.fillInChecksum(output,csum);
+
+  if(parIO()) {
+    output.close();
+  }
+  else {
+    if(isRoot())
+      output.close();
+  }
   if(synchronize(error) != 0)  return;
+  
+  cout << "Unloading Finished!" << endl << endl;
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
@@ -241,6 +128,8 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 
   unload_good = true;
 }
+
+
 
 
 CPS_END_NAMESPACE
