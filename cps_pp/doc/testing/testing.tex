@@ -1,7 +1,7 @@
 
 
 %------------------------------------------------------------------
-% $Id: testing.tex,v 1.4 2003-08-08 13:29:39 mcneile Exp $
+% $Id: testing.tex,v 1.5 2003-08-14 13:54:39 mcneile Exp $
 %------------------------------------------------------------------
 %Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
 %
@@ -27,7 +27,7 @@
 \ifthenelse{\pdfoutput = 0}{
 % Not PDF:
 \usepackage{html}
-%%\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
 }{
 % PDF: hyperref for pdf with full linkages:
 \usepackage[
@@ -43,7 +43,7 @@ urlcolor=blue,
 pdfpagemode=None,
 %=UseOutlines,
 pdfhighlight={/I},
-pdftitle={Frameworks For Testing. $Revision: 1.4 $ - $Date: 2003-08-08 13:29:39 $.},
+pdftitle={Frameworks For Testing. $Revision: 1.5 $ - $Date: 2003-08-14 13:54:39 $.},
 pdfauthor={A.N. Jackson, C. McNeile \& S. Booth},
 plainpages=false
 ]{hyperref}
@@ -69,7 +69,7 @@ plainpages=false
 % title information:
 \title{Testing the Columbia code.}
 \author{A.N. Jackson, C. McNeile,  \& S. Booth}
-\date{\mbox{\small $$Revision: 1.4 $$  $$Date: 2003-08-08 13:29:39 $$}}
+\date{\mbox{\small $$Revision: 1.5 $$  $$Date: 2003-08-14 13:54:39 $$}}
 
 %------------------------------------------------------------------
 \begin{document}
@@ -102,18 +102,29 @@ make -f Makefile_cps test
 %%
 This should produce output like
 \begin{verbatim}
-Starting test w_spect
-make[1]: Entering directory `/raidz/mcneile/qcdoc/cps++/tests/w_spect'
-g++ -o regression_cps.x -DPARALLEL=0 -DTARGET_QCDSP=0  -O2
--I../../../cps++ -I../.../cps++/include  main.C
-``../../../cps++''/cps.a  -lm
-make[1]: Leaving directory `/raidz/mcneile/qcdoc/cps++/tests/w_spect'
+f_hmd    PASS
+f_hmd_dwfso    FAIL
+g_hb    FAIL
+g_hmd    FAIL
+s_spect    PASS
 w_spect    PASS
+f_wilson_eig  NO_CORRECT_OUTPUT
+xi_spect_gsum  NO_CORRECT_OUTPUT
+f_stag_pbp  NO_CORRECT_OUTPUT
+------------------------------
+DISCLAIMER
+Please also test this code on
+a physical system before using in
+production runs
+------------------------------
+
 \end{verbatim}
 
 A perl script loops over the test cases, compiles the code,
 and then runs it. The output is compared against
 previous output and a PASS/FAIL tag is generated.
+If there is no test data to compare against the
+NO\_CORRECT\_OUTPUT tag is printed.
 
 \subsection{Philosophy behind the testing framework}
 
@@ -127,7 +138,8 @@ philosophy that only an important subset of the data needs to be
 tested. For example, a regression test may only need to check that the
 pion correlator at a single timeslice is correct. If the pion
 correlator at timeslice 2 is correct, then it is likely that all the
-meson correlators are correct.
+meson correlators are correct. This will trigger a PASS/FAIL
+print out, but we would still keep a snapshot of all the output.
 
 In this testing framework, we use perl scripts to
 extract a subset of the correlators. The important
@@ -136,6 +148,56 @@ regressions/check\_data.pl. This compares the output from
 the program to previous output stored in a special format.
 
 \subsection{Adding a new test to the testing framework}
+
+In the older testing framework all the files were 
+combined together to form a single file of the form.
+
+\begin{verbatim}
+-------------------
+a0.dat
+--------------------
+1 0 0 -1.4003954066e+00
+1 1 0 -1.0403947310e+00
+--------------------
+a0_prime.dat
+--------------------
+1 0 0 2.2492961048e+00
+1 1 0 -6.7672838306e-01
+\end{verbatim}
+
+The script regressions/check\_data.pl stores selected data
+from the file in the format
+%%%
+\begin{center}
+name:column:row\_from\_name:value
+\end{center}
+%%
+In the above example the testing data for the w\_spect
+test is:
+
+\begin{verbatim}
+a0.dat:2:3:-1.4003954061e+00
+pion.dat:3:3:1.5681429497e+00
+nucleon.dat:2:3:1.179528e+00
+\end{verbatim}
+
+
+\subsection{Structure of makefile target}
+
+The test target in the Makefile\_cps looks like:
+%%%%
+\begin{verbatim}
+TEST_DIR = tests
+
+test:
+        cd $(TEST_DIR) ; perl regression.pl
+        cd $(TEST_DIR) ; sh regression.sh
+\end{verbatim}
+
+The perl script regression.pl writes the script 
+regression.sh. The script regression.sh compiles the codes,
+runs them and checks the output. This two step solution
+was required for running on QCDSP.
 
 %-------------------------------------------------------------------
 \section{What is required from a  Testing Framework}
