@@ -25,6 +25,7 @@
 #include <util/ReadLattice.h>
 //#include <util/command_line.h>
 #include <alg/alg_rnd_gauge.h>
+#include<util/testing_framework.h>
 
 
 CPS_START_NAMESPACE
@@ -37,7 +38,7 @@ CPS_END_NAMESPACE
 USING_NAMESPACE_CPS
 
 
-void link_trace(Lattice& lattice)
+Float link_trace(Lattice& lattice)
 {
   Float linktrace(0);
   int is;
@@ -48,6 +49,9 @@ void link_trace(Lattice& lattice)
   }
   linktrace /= (GJP.VolSites()*12.0);
   printf(" link trace %e\n",linktrace );
+
+
+  return linktrace ; 
 }
 
 void setup_do_arg(DoArg& do_arg) ; 
@@ -81,7 +85,7 @@ int main(int argc,char *argv[])
   AlgPlaq plaq(lattice,&common_arg,&no_arg);
 
   plaq.run();
-  link_trace(lattice);
+  Float tmp = link_trace(lattice);
 
   AlgRandomGauge rnd( lattice, &common_arg );
 
@@ -94,7 +98,14 @@ int main(int argc,char *argv[])
   rot.run ();
 
   plaq.run();
-  link_trace(lattice);
+  Float new_trace = link_trace(lattice);
+
+  //------------------------------ 
+  // testing framework, compare the test against the old value
+  Float tol = 0.0001 ; 
+  Float old_trace = 0.62115 ;
+  compare_float_relative(new_trace,old_trace,tol) ; 
+  // ----- end of testing framework -------------
 
   rnd.free();
 
