@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations for the serial emulation of the QCDSP/QCDOC communications  layer.
   
-  $Id: sysfunc_noarch.h,v 1.5 2004-09-17 18:07:29 chulwoo Exp $
+  $Id: sysfunc_noarch.h,v 1.6 2004-09-21 18:07:14 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   The Sysfunc Comms Interface: sysfunc.h
@@ -17,13 +17,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: chulwoo $
-  $Date: 2004-09-17 18:07:29 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v 1.5 2004-09-17 18:07:29 chulwoo Exp $
-  $Id: sysfunc_noarch.h,v 1.5 2004-09-17 18:07:29 chulwoo Exp $
+  $Date: 2004-09-21 18:07:14 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v 1.6 2004-09-21 18:07:14 chulwoo Exp $
+  $Id: sysfunc_noarch.h,v 1.6 2004-09-21 18:07:14 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc_noarch.h,v $
-  $Revision: 1.5 $
+  $Revision: 1.6 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -55,12 +55,14 @@ inline int CoorX(){return 0;}  //!< Gets the grid coordinate of this node in the
 inline int CoorY(){return 0;}  //!< Gets the grid coordinate of this node in the Y direction.
 inline int CoorZ(){return 0;}  //!< Gets the grid coordinate of this node in the Z direction.
 inline int CoorS(){return 0;}  //!< Gets the grid coordinate of this node in the Z direction.
+inline int CoorW(){return 0;}  //!< Gets the grid coordinate of this node in the Z direction.
 
 inline int SizeT(){return 1;} //!< Gets the size of the grid  in the T direction.
 inline int SizeX(){return 1;} //!< Gets the size of the grid  in the X direction.
 inline int SizeY(){return 1;} //!< Gets the size of the grid  in the Y direction.
 inline int SizeZ(){return 1;} //!< Gets the size of the grid  in the Z direction.
 inline int SizeS(){return 1;} //!< Gets the size of the grid  in the Z direction.
+inline int SizeW(){return 1;} //!< Gets the size of the grid  in the Z direction.
 
 //! Returns the total number of nodes in the processor grid.
 inline int NumNodes(){return 1;}

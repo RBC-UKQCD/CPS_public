@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.11 2004-08-19 22:22:01 mclark Exp $
+  $Id: vector.h,v 1.12 2004-09-21 18:07:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-08-19 22:22:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.11 2004-08-19 22:22:01 mclark Exp $
-//  $Id: vector.h,v 1.11 2004-08-19 22:22:01 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-21 18:07:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.12 2004-09-21 18:07:15 chulwoo Exp $
+//  $Id: vector.h,v 1.12 2004-09-21 18:07:15 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -312,7 +312,12 @@ class Matrix
       \return The ([i - i mod 3]/3, i mod 3) matrix element
     */
     const Complex& operator[](int i) const { return ((Complex*)u)[i]; }
-
+    IFloat elem(int i) { return u[i]; }
+    //! Read access.
+    /*!
+      \param i A number between 0 and 17
+      \return  element of the array
+    */
     //! The determinant.
     void Det(IFloat* c) const;
 
