@@ -4195,7 +4195,7 @@ fi
 
 
 
-                                                            ac_config_files="$ac_config_files config.h Makefile Makefile.rules Makefile.users tests/Makefile_common tests/regression.pl"
+                                                                      ac_config_files="$ac_config_files config.h Makefile Makefile.rules Makefile.users tests/Makefile_common hdw_tests/Makefile_common tests/regression.pl"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -4725,6 +4725,7 @@ do
   "Makefile.rules" ) CONFIG_FILES="$CONFIG_FILES Makefile.rules" ;;
   "Makefile.users" ) CONFIG_FILES="$CONFIG_FILES Makefile.users" ;;
   "tests/Makefile_common" ) CONFIG_FILES="$CONFIG_FILES tests/Makefile_common" ;;
+  "hdw_tests/Makefile_common" ) CONFIG_FILES="$CONFIG_FILES hdw_tests/Makefile_common" ;;
   "tests/regression.pl" ) CONFIG_FILES="$CONFIG_FILES tests/regression.pl" ;;
   "conf.h" ) CONFIG_HEADERS="$CONFIG_HEADERS conf.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

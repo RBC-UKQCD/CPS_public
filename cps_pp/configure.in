@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2004-09-17 18:06:08 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.22 2004-09-17 18:06:08 chulwoo Exp $
-dnl  $Id: configure.in,v 1.22 2004-09-17 18:06:08 chulwoo Exp $
+dnl  $Date: 2004-09-29 17:18:56 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.23 2004-09-29 17:18:56 chulwoo Exp $
+dnl  $Id: configure.in,v 1.23 2004-09-29 17:18:56 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.22 $
+dnl  $Revision: 1.23 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -262,5 +262,6 @@ AC_OUTPUT(config.h \
 	  Makefile.rules \
 	  Makefile.users \
           tests/Makefile_common \
+          hdw_tests/Makefile_common \
           tests/regression.pl )
 
