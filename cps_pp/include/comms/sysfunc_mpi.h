@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations for the MPI implementation of the QCDSP/QCDOC communications  layer.
   
-  $Id: sysfunc_mpi.h,v 1.2 2004-09-02 19:05:39 chulwoo Exp $
+  $Id: sysfunc_mpi.h,v 1.3 2004-09-03 12:34:14 zs Exp $
 */
 /*----------------------------------------------------------------------
   The Sysfunc Comms Interface: sysfunc.h
@@ -17,14 +17,14 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: chulwoo $
-  $Date: 2004-09-02 19:05:39 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_mpi.h,v 1.2 2004-09-02 19:05:39 chulwoo Exp $
-  $Id: sysfunc_mpi.h,v 1.2 2004-09-02 19:05:39 chulwoo Exp $
+  $Author: zs $
+  $Date: 2004-09-03 12:34:14 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_mpi.h,v 1.3 2004-09-03 12:34:14 zs Exp $
+  $Id: sysfunc_mpi.h,v 1.3 2004-09-03 12:34:14 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc_mpi.h,v $
-  $Revision: 1.2 $
+  $Revision: 1.3 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_mpi.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -59,19 +59,18 @@ int UniqueID();
 int CoorT();  //!< Gets the grid coordinate of this node in the T direction.
 int CoorX();  //!< Gets the grid coordinate of this node in the X direction.
 int CoorY();  //!< Gets the grid coordinate of this node in the Y direction.
-int CoorZ();  //!< Gets the grid coordinate of this node in the Z direction.
+int CoorZ();  //!< Gets the grid coordinate of this node in the Z direction
+int CoorS();  //!< Gets the grid coordinate of this node in the S direction.
 
 int SizeT(); //!< Gets the size of the grid  in the T direction.
 int SizeX(); //!< Gets the size of the grid  in the X direction.
 int SizeY(); //!< Gets the size of the grid  in the Y direction.
 int SizeZ(); //!< Gets the size of the grid  in the Z direction.
+int SizeS(); //!< Gets the size of the grid  in the S direction.
 
 //! Returns the total number of nodes in the processor grid.
 int NumNodes();
 
-/* Random number seeds that on QCDSP were loaded at boot time by the
-  QOS.  N.B. Note that the MPI implementation of these functions are
-  not currently compliant with the function comments */
 unsigned int Seed();   //!< Gets a RNG seed.
 unsigned int SeedS();  //!< Gets a RNG seed.
 unsigned int SeedT();  //!< Gets a RNG seed.
@@ -120,7 +119,7 @@ namespace MPISCU {
 
 
 //! Communicates the processor grid dimensions to the MPI-SCU layer.
-    void set_pe_grid(int x, int y, int z, int t);
+    void set_pe_grid(int x, int y, int z, int t, int s=1);
 
 //! Initialises the MPI communications layer.
     void CommsInit();

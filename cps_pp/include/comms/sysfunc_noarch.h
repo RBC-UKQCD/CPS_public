@@ -1,13 +1,11 @@
 #include<config.h>
 
-// If not MPI then must be either QCDOC or QCDSP
-
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 /*!\file
-  \brief  Declarations for the MPI implementation of the QCDSP/QCDOC communications  layer.
+  \brief  Declarations for the serial emulation of the QCDSP/QCDOC communications  layer.
   
-  $Id: sysfunc_noarch.h,v 1.3 2004-09-03 08:43:06 zs Exp $
+  $Id: sysfunc_noarch.h,v 1.4 2004-09-03 12:34:14 zs Exp $
 */
 /*----------------------------------------------------------------------
   The Sysfunc Comms Interface: sysfunc.h
@@ -19,13 +17,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2004-09-03 08:43:06 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v 1.3 2004-09-03 08:43:06 zs Exp $
-  $Id: sysfunc_noarch.h,v 1.3 2004-09-03 08:43:06 zs Exp $
+  $Date: 2004-09-03 12:34:14 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v 1.4 2004-09-03 12:34:14 zs Exp $
+  $Id: sysfunc_noarch.h,v 1.4 2004-09-03 12:34:14 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc_noarch.h,v $
-  $Revision: 1.3 $
+  $Revision: 1.4 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -67,9 +65,10 @@ inline int SizeS(){return 1;} //!< Gets the size of the grid  in the Z direction
 //! Returns the total number of nodes in the processor grid.
 inline int NumNodes(){return 1;}
 
-/* Random number seeds that on QCDSP were loaded at boot time by the
-  QOS.  N.B. Note that the MPI implementation of these functions are
-  not currently compliant with the function comments */
+// Random number seeds that on QCDSP were loaded at boot time by the QOS.
+
+static const unsigned int SERIAL_SEED = 112319;
+
 inline unsigned int Seed(){return SERIAL_SEED;}   //!< Gets a RNG seed.
 inline unsigned int SeedS(){return SERIAL_SEED;}  //!< Gets a RNG seed.
 inline unsigned int SeedT(){return SERIAL_SEED;}  //!< Gets a RNG seed.
