@@ -1,4 +1,4 @@
-# $Id: Makefile_common.in,v 1.12 2004-06-04 21:14:16 chulwoo Exp $
+# $Id: Makefile_common.in,v 1.13 2004-06-04 22:46:23 chulwoo Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -14,7 +14,7 @@ AS  = @AS@
 LDFLAGS = @LDFLAGS@
 
 me = $(notdir $(PWD))
-BIN = $(me).x
+BIN = @ARCH@.x
 
 VPATH :=$(SRCDIR)/tests/$(me)
 
