@@ -12,9 +12,6 @@
 
 struct VML;
 
-#ifdef __cplusplus 
-extern "C" { 
-#endif
 /*
  *
  * Each data type provides a single procedure which takes two arguments:
@@ -78,6 +75,9 @@ struct VML
     bool_t Create(FILE *file, vml_op op);
     void Destroy(void);
   };
+#ifdef __cplusplus 
+extern "C" { 
+#endif
 
 /*
  * A vmlproc_t exists for each data type which is to be encoded or decoded.
