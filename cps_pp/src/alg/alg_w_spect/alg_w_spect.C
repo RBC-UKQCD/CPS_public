@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2005-02-18 19:53:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.8 2005-02-18 19:53:31 mclark Exp $
-//  $Id: alg_w_spect.C,v 1.8 2005-02-18 19:53:31 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:46:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.9 2005-03-07 00:46:15 chulwoo Exp $
+//  $Id: alg_w_spect.C,v 1.9 2005-03-07 00:46:15 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_w_spect.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v $
 //  $State: Exp $
 //
@@ -80,9 +80,10 @@ AlgWspect::AlgWspect(Lattice& latt,
 		     int n_quark_masses) 
   : Alg(latt, c_arg),
     d_arg_p(w_arg),
+    cg_arg_p(cg),
     d_num_args(n_quark_masses)
 {
-  cg_arg = cg;
+//  cg_arg = cg;
 
   // Obtain an instance of the support class WspectGinfo
   //------------------------------------------------------------------------
@@ -106,6 +107,12 @@ AlgWspect::AlgWspect(Lattice& latt,
 		g_info.ctor_str, 
 		"arg");
   }
+  if (cg_arg_p == 0) {
+    ERR.Pointer(d_class_name,
+                g_info.ctor_str,
+                "arg");
+  }
+
 
   // Check the num of masses, prop_dir and AOTS
   //------------------------------------------------------------------------
@@ -157,59 +164,59 @@ void AlgWspect::run()
   int total_b = clock();
   int total_e;  
 #endif
-  //CgArg cg;
-  char *fname = "run()";
-  VRB.Func(d_class_name,fname);
+	  CgArg cg = *cg_arg_p;
+	  char *fname = "run()";
+	  VRB.Func(d_class_name,fname);
 
-  // printf("in AlgWspect::run \n");
+	  // printf("in AlgWspect::run \n");
 
-  WspectOutput * output = (WspectOutput *)common_arg->results;
-  
+	  WspectOutput * output = (WspectOutput *)common_arg->results;
+	  
 
-  // Set the Lattice pointer
-  //------------------------------------------------------------------------
-  Lattice& lat = AlgLattice();
+	  // Set the Lattice pointer
+	  //------------------------------------------------------------------------
+	  Lattice& lat = AlgLattice();
 
-  int src_slice = d_arg_p->aots_start;
-  int src_slice_step = d_arg_p->aots_step;
-  int src_slice_end  = src_slice_step * d_arg_p->aots_num;
+	  int src_slice = d_arg_p->aots_start;
+	  int src_slice_step = d_arg_p->aots_step;
+	  int src_slice_end  = src_slice_step * d_arg_p->aots_num;
 
-  // printf("%d %d %d \n",src_slice,src_slice_step, src_slice_end);
+	  // printf("%d %d %d \n",src_slice,src_slice_step, src_slice_end);
 
-  for ( ; src_slice < src_slice_end; src_slice += src_slice_step) {
+	  for ( ; src_slice < src_slice_end; src_slice += src_slice_step) {
 
 
-    // Calculate quark propagator
-    //----------------------------------------------------------------------
-    // Ping:  certainly more work here to be done about the desired
-    //        combinations of non-degenerate quarks.
-    //        Presumably, more arguments will have to be passed in.
-    //        One way: for three flavors, [100] means use only q1
-    //                 to caculate spectrum.
-    //        Also some care needed to get the scope (CTOR and DTOR) 
-    //        of each quark propagator right.
-    //    const WspectQuark & q2 = q;
-    //    const WspectQuark & q3 = q;
+	    // Calculate quark propagator
+	    //----------------------------------------------------------------------
+	    // Ping:  certainly more work here to be done about the desired
+	    //        combinations of non-degenerate quarks.
+	    //        Presumably, more arguments will have to be passed in.
+	    //        One way: for three flavors, [100] means use only q1
+	    //                 to caculate spectrum.
+	    //        Also some care needed to get the scope (CTOR and DTOR) 
+	    //        of each quark propagator right.
+	    //    const WspectQuark & q2 = q;
+	    //    const WspectQuark & q3 = q;
 
-    // Xiaodong & Thomas:
-    // Modified to calculate also extended mesons
-    // q1 is the usual propagator(no source operator), which can be
-    // used to pass propagation direction and src_slice infomation
-    // to spectrum class
+	    // Xiaodong & Thomas:
+	    // Modified to calculate also extended mesons
+	    // q1 is the usual propagator(no source operator), which can be
+	    // used to pass propagation direction and src_slice infomation
+	    // to spectrum class
 
-    // there is a problem here --> check !
-    printf("prop_dir = %d , src_slice = %d \n",d_arg_p->prop_dir, src_slice);
+	    // there is a problem here --> check !
+	    printf("prop_dir = %d , src_slice = %d \n",d_arg_p->prop_dir, src_slice);
 
-    WspectHyperRectangle hyperRect(d_arg_p->prop_dir, src_slice);    
+	    WspectHyperRectangle hyperRect(d_arg_p->prop_dir, src_slice);    
 
-#ifdef  TIMING_ALG_W_SPECT
-    quark_b = clock();
-#endif
+	#ifdef  TIMING_ALG_W_SPECT
+	    quark_b = clock();
+	#endif
 
-    // create local quark propagator
-    // printf("create quark q1 \n");
-     WspectQuark q1(lat, output->cg, output->pbp,
-                  output->mid_point, output->a0_p, d_arg_p[0], *cg_arg,hyperRect);
+	    // create local quark propagator
+	    // printf("create quark q1 \n");
+	     WspectQuark q1(lat, output->cg, output->pbp,
+			  output->mid_point, output->a0_p, d_arg_p[0], cg,hyperRect);
 		  
      // printf("finished quark q1 \n");
 #ifdef  TIMING_ALG_W_SPECT

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgPbp class.
   
-  $Id: alg_pbp.C,v 1.8 2004-08-18 11:57:39 zs Exp $
+  $Id: alg_pbp.C,v 1.9 2005-03-07 00:46:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.8 2004-08-18 11:57:39 zs Exp $
-//  $Id: alg_pbp.C,v 1.8 2004-08-18 11:57:39 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:46:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.9 2005-03-07 00:46:13 chulwoo Exp $
+//  $Id: alg_pbp.C,v 1.9 2005-03-07 00:46:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_pbp.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v $
 //  $State: Exp $
 //
@@ -418,7 +418,9 @@ void AlgPbp::run()
   //----------------------------------------------------------------
   // Staggered fermions
   //----------------------------------------------------------------
-  else if (lat.Fclass() == F_CLASS_STAG) {
+  else if ( (lat.Fclass() == F_CLASS_STAG)
+	   || (lat.Fclass() == F_CLASS_P4)
+	   || (lat.Fclass() == F_CLASS_ASQTAD)   ) {  
 
     Vector*  alt_sol = (Vector *) smalloc(f_size * sizeof(Float));
     if(alt_sol == 0)

@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.25 2004-12-22 21:57:39 chulwoo Exp $
+# $Id: Makefile.in,v 1.26 2005-03-07 00:46:09 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -8,6 +8,7 @@ TESTDIR = tests
 HDW_TESTDIR= hdw_tests
 DOCDIR = doc
 QOS = @QOS@
+QOSLIB = ${QOS}/quser/gcc-lib-user///
 
 ifneq "$(BUILDDIR)"  "$(SRCDIR)"
 builddir_isnt_srcdir="yes"

@@ -1,4 +1,4 @@
-# $Id: Makefile.users.in,v 1.3 2004-08-30 04:28:41 chulwoo Exp $
+# $Id: Makefile.users.in,v 1.4 2005-03-07 00:46:10 chulwoo Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -8,6 +8,7 @@
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_builddir@
 QOS = @QOS@
+QOSLIB = ${QOS}/quser/gcc-lib-user///
 CC = @CC@
 CXX = @CXX@
 AS  = @AS@

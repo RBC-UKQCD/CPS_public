@@ -60,7 +60,7 @@ int main(int argc,char *argv[]){
     do_arg.y_node_sites = ny/SizeY();
     do_arg.z_node_sites = nz/SizeZ();
     do_arg.t_node_sites = nt/SizeT();
-    do_arg.s_node_sites = 0;
+    do_arg.s_node_sites = 1;
     do_arg.x_nodes = SizeX();
     do_arg.y_nodes = SizeY();
     do_arg.z_nodes = SizeZ();
@@ -101,6 +101,8 @@ int main(int argc,char *argv[]){
 
 //   VRB.Level(GJP.VerboseLevel());
 	VRB.Level(0);
+	VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+	VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
 	VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
 #if TARGET == QCDOC

@@ -29,6 +29,7 @@
                         // compile on p.c's
 #include <alg/qpropw.h>
 
+CPS_START_NAMESPACE
 
 // Free prop.
 void QPropW::Delete(int mid)
@@ -1631,4 +1632,6 @@ void QPropWSeqProtUSrc::SetSource(FermionVectorTp& src, int spin, int color)
 	src.GFWallSource(AlgLattice(), ss, 3, Arg.t);
     }
 }
+
+CPS_END_NAMESPACE
 

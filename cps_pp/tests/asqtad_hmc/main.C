@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.14 2005-01-19 03:08:34 chulwoo Exp $
+  $Id: main.C,v 1.15 2005-03-07 00:46:16 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -16,11 +16,13 @@
 #include <util/random.h>
 #include <comms/sysfunc.h>
 
-const int nx = 8;
-const int ny = 8;
-const int nz = 8;
-const int nt = 8;
+const int nx = 4;
+const int ny = 4;
+const int nz = 4;
+const int nt = 4;
 
+const int SAVE_DOARG = 1;
+const int LOAD_DOARG = 0;
 
 USING_NAMESPACE_CPS
 
@@ -38,12 +40,14 @@ int main(int argc,char *argv[])
   // Initializes all Global Job Parameters
   //----------------------------------------------------------------
   DoArg do_arg;
-  setup_do_arg(do_arg); 
+  if (LOAD_DOARG) do_arg.Decode("asqtad_hmc.in","do_arg");
+  else setup_do_arg(do_arg); 
 #if TARGET==cpsMPI
   MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
   using MPISCU::fprintf;
   using MPISCU::printf;  
 #endif
+  if (SAVE_DOARG) do_arg.Encode("asqtad_hmc.out","do_arg");
   GJP.Initialize(do_arg);
 
   //----------------------------------------------------------------
@@ -52,7 +56,7 @@ int main(int argc,char *argv[])
 
   VRB.Level(0);
 //  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
-//  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
   char *cname = "asqtad_hmd_r";
   char *fname = "main";
@@ -70,7 +74,7 @@ int main(int argc,char *argv[])
   const int no_warmup_sweep = 0 ; 
   const int no_measure_sweep = 1 ; 
   int sweep_counter = 0 ;
-  const int total_measure = 10 ;
+  const int total_measure = 10;
   
   //----------------------------------------------------------------
   // Initialize argument structures
@@ -208,6 +212,8 @@ void setup_hmd_arg(HmdArg& hmd_arg)
   hmd_arg.stop_rsd[0] = 1.0E-06;
   hmd_arg.step_size = 0.001;
   hmd_arg.steps_per_traj = 50;
+//  hmd_arg.step_size = 0.005;
+//  hmd_arg.steps_per_traj = 100;
   hmd_arg.metropolis = METROPOLIS_YES;
   hmd_arg.reunitarize = REUNITARIZE_YES;
 

@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2005-01-13 07:46:13 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.31 2005-01-13 07:46:13 chulwoo Exp $
-dnl  $Id: configure.in,v 1.31 2005-01-13 07:46:13 chulwoo Exp $
+dnl  $Date: 2005-03-07 00:46:11 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.32 2005-03-07 00:46:11 chulwoo Exp $
+dnl  $Id: configure.in,v 1.32 2005-03-07 00:46:11 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.31 $
+dnl  $Revision: 1.32 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -22,10 +22,11 @@ AC_CANONICAL_TARGET
 
 dnl Set correct compiler information
 if test "$cross_compiling" = "yes"; then
-   AC_CHECK_PROGS(CXX, ${host_alias}-g++)
-   AC_CHECK_PROGS(LD, ${host_alias}-ld)
-   AC_CHECK_PROGS(AR, ${host_alias}-ar)
-   AC_CHECK_PROGS(AS, ${host_alias}-as)
+   AC_PATH_PROGS(CC, ${host_alias}-gcc)
+   AC_PATH_PROGS(CXX, ${host_alias}-g++)
+   AC_PATH_PROGS(LD, ${host_alias}-ld)
+   AC_PATH_PROGS(AR, ${host_alias}-ar)
+   AC_PATH_PROGS(AS, ${host_alias}-as)
    if test -z "$CXX" || test -z "$LD" || test -z "$AR" || test -z "$AS"; then
      echo "Missing required cross-compilation tools"
      exit 1
@@ -80,16 +81,16 @@ CFLAGS=""
 CXXFLAGS=""
 dnl Can add more cases as we need to, e.g. QCDSP
 if test "$enable_target" = "qcdoc"; then
-   CC="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${CC}"
-   CXX="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${CXX}"
-   AS="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${AS}"
-   AR="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${AR}"
-   LD="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${LD}"
+   CC="env QGCC_EXEC_PREFIX=\${QOSLIB} ${CC}"
+   CXX="env QGCC_EXEC_PREFIX=\${QOSLIB} ${CXX}"
+   AS="env QGCC_EXEC_PREFIX=\${QOSLIB} ${AS}"
+   AR="env QGCC_EXEC_PREFIX=\${QOSLIB} ${AR}"
+   LD="env QGCC_EXEC_PREFIX=\${QOSLIB} ${LD}"
    INCLUDE_FLAGS=""
-   CFLAGS="-Wall -Wa,-m405 -fno-exceptions -fno-hosted -D_GCC_"
-   CXXFLAGS="-Wall -Wa,-m405 -fno-exceptions -fno-hosted -D_GCC_"
-   ASFLAGS="-m405"
-   LDFLAGS=" -pg -Wa,\"-init _start\""
+   CFLAGS="-D_GCC_"
+   CXXFLAGS="-D_GCC_"
+   ASFLAGS=""
+   LDFLAGS="-pg"
 
    ARCH="QCDOC"
    ARCHDIR="QCDOC_DIR"
@@ -268,9 +269,8 @@ AC_CHECK_TYPES(uint32_t)
 AC_CHECK_TYPES(uint64_t)
 AC_CHECK_TYPES(u_quad_t)
 AC_CHECK_TYPES(netobj)
+AC_CHECK_FUNCS(sync)
 AC_CONFIG_HEADERS([conf.h])
-dnl AC_CHECK_HEADERS([string.h])
-dnl AC_CHECK_HEADERS([strings.h])
 
 
 AC_OUTPUT(config.h \

@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.14 2005-02-18 19:56:00 mclark Exp $
+  $Id: alg_hmc_rhmc.C,v 1.15 2005-03-07 00:46:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
-  $Author: mclark $
-  $Date: 2005-02-18 19:56:00 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.14 2005-02-18 19:56:00 mclark Exp $
-  $Id: alg_hmc_rhmc.C,v 1.14 2005-02-18 19:56:00 mclark Exp $
+  $Author: chulwoo $
+  $Date: 2005-03-07 00:46:13 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.15 2005-03-07 00:46:13 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.15 2005-03-07 00:46:13 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.14 $
+  $Revision: 1.15 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -76,7 +76,11 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
        GJP.TnodeSites()==2 ) )
     ERR.General(cname,fname," RHMC force term is not implemented for Fasqtad with any dimension less than 4\n");
 
+  // construct approximation if necessary
+  generateApprox(arg);
+
   init();
+
 
 }
 
@@ -98,7 +102,11 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt, CommonArg *c_arg, HmdArg *arg,
   char *fname = "AlgHmcRHMC(L&,CommonArg*,HmdArg*)";
   VRB.Func(cname,fname);
 
+  // construct approximation if necessary
+  generateApprox(arg);
+
   init();
+
   eig_arg = e_arg;
 }
 
@@ -189,6 +197,13 @@ void AlgHmcRHMC::init()
   total_size = 0;
   for (i=0; i<n_frm_masses; i++) total_size += hmd_arg->FRatDeg[i];
   
+  // array holding coefficents used in dwf force, folded into MInv
+  alpha = (Float**) smalloc(f_size*hmd_arg->n_frm_masses*sizeof(Float*),
+			    cname,fname,"alpha");
+  for (i=0; i<n_frm_masses; i++)
+    alpha[i] = (Float*) smalloc(f_size*hmd_arg->FRatDeg[i]*sizeof(Float),
+				cname,fname,"alpha[i]");    
+
   if (AlgLattice().Fclass() == F_CLASS_DWF) {
     // For dwf we need the solution vector contiguous in memory
     frmn = (Vector**) smalloc(total_size*sizeof(Vector*), cname, fname, "frmn");
@@ -198,11 +213,6 @@ void AlgHmcRHMC::init()
     
     for (i=1; i<total_size; i++) frmn[i] = frmn[0] + i*f_vec_count;
 
-    // array holding coefficents used in dwf force, folded into MInv
-    alpha = (Float**) smalloc(f_size*hmd_arg->n_frm_masses*sizeof(Float*),cname,fname,"alpha");
-    for (i=0; i<n_frm_masses; i++)
-      alpha[i] = (Float*) smalloc(f_size*hmd_arg->FRatDeg[i]*sizeof(Float),
-				  cname,fname,"alpha[i]");    
     frmn_d = 0;
   } else {
     // For asqtad we need them checkerboarded with dslash applied
@@ -213,7 +223,7 @@ void AlgHmcRHMC::init()
       frmn[i] = (Vector*) smalloc(2*f_size*sizeof(Float));
       frmn_d[i] = frmn[i] + f_vec_count;
     }
-    alpha = 0;
+
   }	
 
   // Allocate memory for the boson field bsn.
@@ -324,9 +334,6 @@ AlgHmcRHMC::~AlgHmcRHMC() {
     // Free memory for the frmn (pseudo fermion) solution fields.
     //----------------------------------------------------------------
     if (AlgLattice().Fclass() == F_CLASS_DWF) {
-      for (i=0; i<n_frm_masses; i++)
-	sfree(alpha[i],cname,fname,"alpha[i]");
-      sfree(alpha,cname,fname,"alpha");
       sfree(frmn[0], cname, fname, "frmn[0]");
     } else {
       sfree(frmn_d, cname,fname, "frmn_d");    
@@ -334,6 +341,12 @@ AlgHmcRHMC::~AlgHmcRHMC() {
     }
     sfree(frmn, cname, fname, "frmn");
   }
+
+  // Free memory for alpha coefficients
+  //----------------------------------------------------------------
+  for (i=0; i<n_frm_masses; i++)
+    sfree(alpha[i],cname,fname,"alpha[i]");
+  sfree(alpha,cname,fname,"alpha");
 
   // Free memory for the boson CG arguments
   //----------------------------------------------------------------
@@ -439,6 +452,7 @@ Float AlgHmcRHMC::run(void)
     // Need to save initial lattice if have not already done so
     if (!hmd_arg->metropolis)
       lat.CopyGaugeField(gauge_field_init);
+
     if (hmd_arg->reproduce_attempt_limit < 1 ||
 	hmd_arg->reproduce_attempt_limit > 5)
       hmd_arg->reproduce_attempt_limit = 3;
@@ -518,7 +532,7 @@ Float AlgHmcRHMC::run(void)
 	
 	massRenormalise(&(frm_cg_arg[i]->mass), &trueMass, hmd_arg->SRatDeg[i], 
 			hmd_arg->SIRatPole[i], RENORM_FORWARDS);
-	
+
 	phi[i] -> CopyVec(frmn[i], f_size);
 	phi[i] -> VecTimesEquFloat(hmd_arg->SIRatNorm[i], f_size);
 	cg_iter = lat.FmatEvlMInv(phi+i, frmn[i], hmd_arg->SIRatPole[i], hmd_arg->SRatDeg[i],
@@ -681,7 +695,7 @@ Float AlgHmcRHMC::run(void)
       shift = 0;
       for (i=0; i<n_frm_masses; i++) {
 	massRenormalise(&(frm_cg_arg[i]->mass), &trueMass, hmd_arg->SRatDeg[i], 
-			hmd_arg->SRatPole[i], RENORM_BACKWARDS);
+			hmd_arg->SRatPole[i], RENORM_FORWARDS);
 
 	// Reset the residual error to the mc error
 	frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_mc[i];
@@ -876,7 +890,8 @@ void AlgHmcRHMC::massRenormalise(Float *mass, Float *trueMass, int degree,
     if (direction == RENORM_FORWARDS) {
       *trueMass = *mass;
       *mass = sqrt((*trueMass)*(*trueMass) + shift[hmd_arg->isz]/4.0);
-      for (int j=0; j<degree; j++) shift[j] -= shift[hmd_arg->isz];
+      Float zeroPole = shift[hmd_arg->isz];
+      for (int j=0; j<degree; j++) shift[j] -= zeroPole;
     } else if (direction == RENORM_BACKWARDS) {
       Float zeroPole = 4.0*((*mass)*(*mass) - (*trueMass)*(*trueMass));
       for (int j=0; j<degree; j++) shift[j] += zeroPole;
@@ -886,6 +901,62 @@ void AlgHmcRHMC::massRenormalise(Float *mass, Float *trueMass, int degree,
 
 }
 
+/*!
+  Generate the optimal rational approximation for the RHMC simulation
+*/
+void AlgHmcRHMC::generateApprox(HmdArg *hmd_arg)
+{
+
+  // Construct approximations
+  for (int i=0; i<hmd_arg->n_frm_masses; i++) {
+    for (int j=0; j<i; j++) {
+      // no need to recalculate approximation if same mass
+      if (hmd_arg->frm_mass[j] == hmd_arg->frm_mass[i] &&
+	  hmd_arg->field_type[j] == hmd_arg->field_type[i]) {
+	hmd_arg->FRatDeg[i] = hmd_arg->FRatDeg[j];
+	hmd_arg->FRatNorm[i] = hmd_arg->FRatNorm[j];
+	for (int k=0; k<hmd_arg->FRatDeg[i]; k++) {
+	  hmd_arg->FRatRes[i][k] = hmd_arg->FRatRes[j][k];
+	  hmd_arg->FRatPole[i][k] = hmd_arg->FRatPole[j][k];
+	}
+	hmd_arg->SRatDeg[i] = hmd_arg->SRatDeg[j];
+	hmd_arg->SRatNorm[i] = hmd_arg->SRatNorm[j];
+	hmd_arg->SIRatNorm[i] = hmd_arg->SIRatNorm[j];
+	for (int k=0; k<hmd_arg->SRatDeg[i]; k++) {
+	  hmd_arg->SRatRes[i][k] = hmd_arg->SRatRes[j][k];
+	  hmd_arg->SRatPole[i][k] = hmd_arg->SRatPole[j][k];
+	  hmd_arg->SIRatRes[i][k] = hmd_arg->SIRatRes[j][k];
+	  hmd_arg->SIRatPole[i][k] = hmd_arg->SIRatPole[j][k];
+	}
+	hmd_arg->valid_approx[i] = 1;
+      }
+    }
+
+    if (!hmd_arg->valid_approx[i]) {
+      AlgRemez remez(hmd_arg->lambda_low[i],hmd_arg->lambda_high[i],hmd_arg->precision);
+      hmd_arg->FRatError[i] = remez.generateApprox(hmd_arg->FRatDeg[i],hmd_arg->frm_power_num[i],
+						  hmd_arg->frm_power_den[i]);
+      if (hmd_arg->field_type[i] == BOSON) {
+	remez.getPFE(hmd_arg->FRatRes[i],hmd_arg->FRatPole[i],&hmd_arg->FRatNorm[i]);
+      } else {
+	remez.getIPFE(hmd_arg->FRatRes[i],hmd_arg->FRatPole[i],&hmd_arg->FRatNorm[i]);
+      }
+
+      hmd_arg->SRatError[i] = remez.generateApprox(hmd_arg->SRatDeg[i],hmd_arg->frm_power_num[i],
+						  2*hmd_arg->frm_power_den[i]);
+      if (hmd_arg->field_type[i] == BOSON) {
+	remez.getPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i],&hmd_arg->SRatNorm[i]);
+	remez.getIPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i],&hmd_arg->SIRatNorm[i]);
+      } else {
+	remez.getIPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i],&hmd_arg->SRatNorm[i]);
+	remez.getPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i],&hmd_arg->SIRatNorm[i]);
+      }
+      hmd_arg->valid_approx[i] = 1;
+    }      
+    
+  }
+  
+}
 
 /*!
   Measures the eigenvalue bounds and regenerates the approximation
@@ -935,7 +1006,7 @@ void AlgHmcRHMC::dynamicalApprox()
   }
   hsum[0] = (Float*) smalloc(hsum_size, cname,fname, "hsum[0]");
   psi[0] = (Vector*) smalloc(f_size*sizeof(Float), cname,fname, "psi[0]");
-  
+
   for (int i=0; i<n_frm_masses; i++) {
     // Reset the required degree of approximation
     if (hmd_arg->FRatDegNew[i] == 0)
@@ -966,7 +1037,7 @@ void AlgHmcRHMC::dynamicalApprox()
     // interval or if it moves much inside the interval
     
     Float delta = eig_arg->Rsdlam + hmd_arg->spread;
-
+    
     if (lambda[0] < hmd_arg->lambda_low[i]  || // below interval
 	lambda[1] > hmd_arg->lambda_high[i] || // above interval
 	lambda[0] > hmd_arg->lambda_low[i]  * (1.0+delta) || //inside from below
@@ -975,56 +1046,9 @@ void AlgHmcRHMC::dynamicalApprox()
 	hmd_arg->SRatDeg[i] != hmd_arg->SRatDegNew[i] ) { // inside from above
       VRB.Result(cname,fname,"Reconstructing approximation\n");
       
-      // the below code is buggy
-      // Free and Allocate memory for force approximation if necessary
-      if (hmd_arg->FRatDeg[i] != hmd_arg->FRatDegNew[i]) {
-	if (AlgLattice().Fclass() == F_CLASS_DWF) {
-	  sfree(frmn[0], cname, fname, "frmn[0]");
-	} else {
-	  sfree(frmn_d, cname,fname, "frmn_d");    
-	  for (i=0; i<total_size; i++) sfree(frmn[i], cname, fname, "frmn[i]");
-	}
-	sfree(frmn, cname, fname, "frmn");
-	
-	hmd_arg->FRatDeg[i] = hmd_arg->FRatDegNew[i];
-	
-	// Allocate memory for the frmn solution fermion fields.
-	//----------------------------------------------------------------
-	total_size = 0;
-	for (i=0; i<n_frm_masses; i++) total_size += hmd_arg->FRatDeg[i];
-	
-	if (AlgLattice().Fclass() == F_CLASS_DWF) {
-	  // For dwf we need the solution vector contiguous in memory
-	  frmn = (Vector**) 
-	    smalloc(total_size*sizeof(Vector*), cname, fname, "frmn");
-	  if (frmn == 0) ERR.Pointer(cname,fname,"frmn");
-	  
-	  frmn[0] = (Vector*) smalloc(f_size*total_size*sizeof(Float), 
-				      cname, fname, "frmn[0]");
-	  if (frmn[0] == 0) ERR.Pointer(cname,fname,"frmn[0]");
-	  
-	  for (i=1; i<total_size; i++) frmn[i] = frmn[0] + i*f_vec_count;
-	} else {
-	  // For asqtad we need them checkerboarded with dslash applied
-	  frmn = (Vector**) 
-	    smalloc(total_size*sizeof(Vector*), cname, fname, "frmn");
-	  if (frmn_d == 0) ERR.Pointer(cname,fname,"frmn");
-	  
-	  frmn_d = (Vector**) 
-	    smalloc(total_size*sizeof(Vector*), cname, fname, "frmn_d");
-	  if (frmn_d == 0) ERR.Pointer(cname,fname,"frmn_d");
-	  
-	  for (i=0; i<total_size; i++) {
-	    frmn[i] = (Vector*) smalloc(2*f_size*sizeof(Float));
-	    if (frmn[i] == 0) ERR.Pointer(cname,fname,"frmn[i]");
-	    frmn_d[i] = frmn[i] + f_vec_count;
-	  }
-	}	
-      }
-
       if (hmd_arg->SRatDeg[i] != hmd_arg->SRatDegNew[i])
 	hmd_arg->SRatDeg[i] = hmd_arg->SRatDegNew[i];
-
+      
       // If bounded, remain within bounds
       if (lambda[0]*(1-delta) > hmd_arg->lambda_min[i]) 
 	hmd_arg->lambda_low[i] = lambda[0]*(1-delta);
@@ -1040,11 +1064,22 @@ void AlgHmcRHMC::dynamicalApprox()
       
       remez.generateApprox(hmd_arg->FRatDeg[i],hmd_arg->frm_power_num[i], 
 			   hmd_arg->frm_power_den[i]);
-      remez.getIPFE(hmd_arg->FRatRes[i], hmd_arg->FRatPole[i], hmd_arg->FRatNorm+i);
+      if (hmd_arg->field_type[i] == BOSON) {
+	remez.getPFE(hmd_arg->FRatRes[i], hmd_arg->FRatPole[i], &hmd_arg->FRatNorm[i]);
+      } else {
+	remez.getIPFE(hmd_arg->FRatRes[i], hmd_arg->FRatPole[i], &hmd_arg->FRatNorm[i]);
+      }
+
       remez.generateApprox(hmd_arg->SRatDeg[i],hmd_arg->frm_power_num[i],
 			   2*hmd_arg->frm_power_den[i]);
-      remez.getIPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i], hmd_arg->SRatNorm+i);
-      remez.getPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i], hmd_arg->SIRatNorm+i);
+
+      if (hmd_arg->field_type[i] == BOSON) {
+	remez.getPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i], &hmd_arg->SRatNorm[i]);
+	remez.getIPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i], &hmd_arg->SIRatNorm[i]);
+      } else {
+	remez.getIPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i], &hmd_arg->SRatNorm[i]);
+	remez.getPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i], &hmd_arg->SIRatNorm[i]);
+      }
     } else {
       VRB.Result(cname,fname,"Reconstruction not necessary\n");
     }

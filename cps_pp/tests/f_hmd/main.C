@@ -4,13 +4,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-22 08:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.24 2004-12-22 08:34:47 chulwoo Exp $
-//  $Id: main.C,v 1.24 2004-12-22 08:34:47 chulwoo Exp $
+//  $Date: 2005-03-07 00:46:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.25 2005-03-07 00:46:16 chulwoo Exp $
+//  $Id: main.C,v 1.25 2005-03-07 00:46:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.24 $
+//  $Revision: 1.25 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -29,8 +29,8 @@ USING_NAMESPACE_CPS
 static int nx,ny,nz,nt,ns;
 const int SAVE_RNG = 0;
 const int LOAD_RNG = 0;
-const int LOAD_DOARG = 1;
-const int SAVE_DOARG = 1;
+const int LOAD_DOARG = 0;
+const int SAVE_DOARG = 0;
 
 int main(int argc,char *argv[])
 {
@@ -76,8 +76,8 @@ int main(int argc,char *argv[])
     do_arg.z_bc = BND_CND_PRD;
     do_arg.t_bc = BND_CND_APRD;
 #if TARGET ==QCDOC
-  //  do_arg.start_conf_alloc_flag = QFAST;
-    do_arg.start_conf_alloc_flag = QCOMMS;
+    do_arg.start_conf_alloc_flag = QFAST;
+ //   do_arg.start_conf_alloc_flag = QCOMMS;
 #endif
     do_arg.start_conf_kind = START_CONF_DISORD;
     do_arg.start_seed_kind = START_SEED_FIXED;
@@ -101,7 +101,7 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
 
   VRB.Level(0);
-//  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
+  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
 //  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
 //  VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
 //  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);

@@ -17,6 +17,7 @@
 #endif
 #include <alg/fermion_vector.h>
 
+CPS_START_NAMESPACE
 
 const Float& FermionVectorTp::operator[](int i)
 {
@@ -716,3 +717,4 @@ void FermionVectorTp::DiracToChiral()
   for(int s(0);s<GJP.VolNodeSites();s++)
     ((WilsonVector *)fv_ + s )->DiracToChiral() ;
 }
+CPS_END_NAMESPACE

@@ -1,9 +1,12 @@
+#include <config.h>
 #include  <alg/diquark.h>
 // This makes sure that the static memeber initialization
 // only gets compiled once
 #define COMPILE_THE_EPSILON
 #include "epsilon.h"
 #undef COMPILE_THE_EPSILON
+
+CPS_START_NAMESPACE
 
 void Diquark::Project(WilsonVector& res, ProjectType P)
 {
@@ -320,4 +323,4 @@ void Diquark::U_diquark(WilsonMatrix& Q1, WilsonMatrix& Q2, int spin,int color)
       }
 }
 
-
+CPS_END_NAMESPACE

@@ -11,6 +11,8 @@
 
 #include <alg/spin_matrix.h>
 
+CPS_START_NAMESPACE
+
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 // The SpinMatrix class.
@@ -96,4 +98,6 @@ Complex SpinMatrix::Tr() const
 { return ((Complex*)u)[0] + ((Complex*)u)[5] + 
 		((Complex*)u)[10] + ((Complex*)u)[15];
 }
+
+CPS_END_NAMESPACE
 

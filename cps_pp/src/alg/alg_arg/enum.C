@@ -207,6 +207,26 @@ vml_MultiShiftSolveType (VML *vmls, char *name,MultiShiftSolveType *objp)
 }
 
 bool_t
+vml_MassRenormaliseDir (VML *vmls, char *name,MassRenormaliseDir *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp))
+		return VML_FALSE;
+	return VML_TRUE;
+}
+
+bool_t
+vml_FieldType (VML *vmls, char *name,FieldType *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp))
+		return VML_FALSE;
+	return VML_TRUE;
+}
+
+bool_t
 vml_WbaryonFold (VML *vmls, char *name,WbaryonFold *objp)
 {
 	register int32_t *buf;

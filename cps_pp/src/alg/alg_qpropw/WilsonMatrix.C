@@ -16,6 +16,8 @@
 #include <stdio.h>
 #include <alg/wilson_matrix.h>
 
+CPS_START_NAMESPACE
+
 //------------------------------------------------------------------
 //------------------------------------------------------------------
 // The WilsonMatrix class member functions.
@@ -1378,3 +1380,4 @@ WilsonMatrix& WilsonMatrix::sigmaR(int mu, int nu)
   return *this;
 }
 
+CPS_END_NAMESPACE

@@ -76,7 +76,7 @@ int main(int argc,char *argv[])
   const int no_warmup_sweep = 0 ; 
   const int no_measure_sweep = 1 ; 
   int sweep_counter = 0 ;
-  const int total_measure = 20000 ;
+  const int total_measure = 20 ;
   
   //----------------------------------------------------------------
   // Initialize argument structures
@@ -220,12 +220,15 @@ void setup_do_arg(DoArg& do_arg)
 void setup_hmd_arg(HmdArg& hmd_arg)
 {
 
-  hmd_arg.n_frm_masses = 1;
+  hmd_arg.n_frm_masses = 2;
   hmd_arg.frm_mass[0] = 0.1;
-  hmd_arg.frm_flavors[0] = 2;
+  hmd_arg.frm_mass[1] = 0.01;
+  hmd_arg.frm_flavors[0] = 1;
+  hmd_arg.frm_flavors[1] = 2;
   hmd_arg.n_bsn_masses = 0;
   hmd_arg.max_num_iter[0] = 5000;
   hmd_arg.stop_rsd[0] = 1.0E-12;
+  hmd_arg.stop_rsd[1] = 1.0E-12;
   hmd_arg.step_size = 0.01;
   hmd_arg.steps_per_traj = 50;
   hmd_arg.metropolis = METROPOLIS_NO;

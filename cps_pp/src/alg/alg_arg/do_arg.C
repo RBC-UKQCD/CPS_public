@@ -69,6 +69,8 @@ vml_DoArg (VML *vmls, char *name,DoArg *objp)
 		 return VML_FALSE;
 	 if (!vml_int (vmls, "measurefreq", &objp->measurefreq))
 		 return VML_FALSE;
+	 if (!vml_int (vmls, "cg_reprod_freq", &objp->cg_reprod_freq))
+		 return VML_FALSE;
 	 if (!vml_BndCndType (vmls, "x_bc", &objp->x_bc))
 		 return VML_FALSE;
 	 if (!vml_BndCndType (vmls, "y_bc", &objp->y_bc))

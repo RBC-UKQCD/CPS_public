@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.9 2004-11-30 22:48:55 chulwoo Exp $
+  $Id: get_data.C,v 1.10 2005-03-07 00:46:16 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-11-30 22:48:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.9 2004-11-30 22:48:55 chulwoo Exp $
-//  $Id: get_data.C,v 1.9 2004-11-30 22:48:55 chulwoo Exp $
+//  $Date: 2005-03-07 00:46:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.10 2005-03-07 00:46:16 chulwoo Exp $
+//  $Id: get_data.C,v 1.10 2005-03-07 00:46:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -49,14 +49,18 @@ CPS_START_NAMESPACE
   \ingroup comms
 */
 //------------------------------------------------------------------
-const int MAX_LENGTH = 1024;
+const int MAX_LENGTH = 4096;
 const int MAX_COPY = 128;
 static IFloat *rcv_noncache=NULL;
 static IFloat *send_noncache=NULL;
 void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
 {
   if(rcv_noncache==NULL) rcv_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
+  if(rcv_noncache==NULL)
+    ERR.Pointer("","getPlusData","rcv_noncache");
   if(send_noncache==NULL) send_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
+  if(send_noncache==NULL)
+    ERR.Pointer("","getPlusData","send_noncache");
 //  printf("rcv_buf=%p send_buf=%p len=%d \n",rcv_buf,send_buf,len);
 	
   int i = 0;

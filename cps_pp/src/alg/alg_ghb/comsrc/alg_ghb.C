@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgGheatBath class methods.
   
-  $Id: alg_ghb.C,v 1.11 2004-08-18 11:57:38 zs Exp $
+  $Id: alg_ghb.C,v 1.12 2005-03-07 00:46:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.11 2004-08-18 11:57:38 zs Exp $
-//  $Id: alg_ghb.C,v 1.11 2004-08-18 11:57:38 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:46:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.12 2005-03-07 00:46:12 chulwoo Exp $
+//  $Id: alg_ghb.C,v 1.12 2005-03-07 00:46:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
 //  $State: Exp $
 //
@@ -376,6 +376,7 @@ void AlgGheatBath::NodeCheckerBoardRun()
       for( y[0] = 0; y[0] < 2; y[0]++)
       if( (y[0]+y[1]+y[2]+y[3])%2 == checker)  {
 
+ //     printf("y = %d %d %d %d\n",y[0],y[1],y[2],y[3]);
       for( x[3] = y[3]; x[3] < GJP.TnodeSites(); x[3]+=2)
       for( x[2] = y[2]; x[2] < GJP.ZnodeSites(); x[2]+=2)
       for( x[1] = y[1]; x[1] < GJP.YnodeSites(); x[1]+=2)
@@ -384,6 +385,7 @@ void AlgGheatBath::NodeCheckerBoardRun()
 
 
         for( int mu=0; mu<4; mu++ )   {
+//      printf("x = %d %d %d %d\n",x[0],x[1],x[2],x[3]);fflush(stdout);
 
 
 #ifdef GHB_TIMING  
@@ -498,6 +500,7 @@ AlgGheatBath::UpdateLink(Matrix * pmLink, const Matrix & mStaple){
 	  Float link_buf[18];
 	  pfLinkCMHBorder = (Float*)link_buf;
 
+//	  printf("link_buf = %p  pfLinkCMHBorder = %p pmLink = %p\n",link_buf,pfLinkCMHBorder,pmLink);
 // # endif
 
           *(pfLinkCMHBorder +  0) = *((Float*)pmLink +  0 );
@@ -521,8 +524,8 @@ AlgGheatBath::UpdateLink(Matrix * pmLink, const Matrix & mStaple){
 
           // Call the heat bath
           {
-	    //metropolis_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
-            cmhb_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
+	    metropolis_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
+   //         cmhb_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
           }
           
           // Copy the link back into the lattice, and

@@ -69,15 +69,18 @@ void glb_sum_internal (Float * float_p, int dir,int len)
     receive_buf = transmit_buf +MAX_BUF;
     gsum_buf = (Double64 *)qalloc(0,sizeof(Double64)*MAX_BUF*max);
 //    printf("gsum_buf=%p\n",gsum_buf);
-    for(int i = 0;i<5;i++){
+    for(int i = 0;i<5;i++)
+    if (NP[i] >1){
 	  length[i] = 1;
       Send[i]= new SCUDirArgIR(transmit_buf,gjp_scu_dir[2*i+1],SCU_SEND,length[i]*sizeof(Double64));
        Recv[i]= new SCUDirArgIR(receive_buf,gjp_scu_dir[2*i],SCU_REC,length[i]*sizeof(Double64));
     }
   }
+  if (NP[dir]==1) return;
+
   static Double64 tmp_sum[MAX_BUF];
 //  if (output) printf"glb_sum cpp %d before = %e ", counter, (double)*float_p);
-  if (length[dir] !=len){
+  if (length[dir] !=len && NP[dir]>1 ){
 		 length[dir] = len;
 		 delete Send[dir]; 
          Send[dir]= new SCUDirArgIR(transmit_buf,gjp_scu_dir[2*dir+1],SCU_SEND,length[dir]*sizeof(Double64));
@@ -94,6 +97,7 @@ void glb_sum_internal (Float * float_p, int dir,int len)
 
  //     *transmit_buf = *gsum_buf;
 
+    if (NP[dir]>1)
     for (int itmp = 1; itmp < NP[dir]; itmp++) {
 //      printf("dir=%d itmp=%d\n",dir,itmp);
       coor = (coor+1)%NP[dir];
@@ -109,6 +113,7 @@ void glb_sum_internal (Float * float_p, int dir,int len)
   }
   for(int i = 0;i<len;i++){
     tmp_sum[i] = gsum_buf[i];
+    if (NP[dir]>1)
     for( int itmp=1;itmp<NP[dir];itmp++){
       tmp_sum[i] += gsum_buf[itmp*len+i];
     }
