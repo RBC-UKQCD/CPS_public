@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.7 2004-07-01 17:43:40 chulwoo Exp $
+  $Id: random.h,v 1.8 2004-07-15 22:19:00 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.7 2004-07-01 17:43:40 chulwoo Exp $
-//  $Id: random.h,v 1.7 2004-07-01 17:43:40 chulwoo Exp $
+//  $Date: 2004-07-15 22:19:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.8 2004-07-15 22:19:00 chulwoo Exp $
+//  $Id: random.h,v 1.8 2004-07-15 22:19:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -225,6 +225,8 @@ class LatRanGen
     int is_initialized; // = 0 when LatRanGen is not initialized
                                 // = 1 when LatRanGen is initialized
     UGrandomGenerator *ugran;
+    int n_rgen_4d ;  // CJ: Gives the number of 4d generators (and hypercubes)
+    UGrandomGenerator *ugran_4d; // CJ: 4D RNG for gauge field
 
     char *cname;
     
@@ -234,10 +236,10 @@ class LatRanGen
     void Initialize();  
 
     //! Get a uniform random number.
-    IFloat Urand();
+    IFloat Urand(FermionFieldDimension frm_dim=FIVE_D);
 
     //! Get a gaussian random number
-    IFloat Grand();
+    IFloat Grand(FermionFieldDimension frm_dim=FIVE_D);
 
     //! Get a uniform random number which is the same on all nodes.
     IFloat Lrand(); 

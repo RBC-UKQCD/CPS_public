@@ -20,8 +20,8 @@
 #include <util/error.h>
 #include <alg/do_arg.h>
 
-#include "parctrl.h"
-#include "fpconv.h"
+#include <util/parctrl.h>
+#include <util/fpconv.h>
 
 CPS_START_NAMESPACE
 using namespace std;

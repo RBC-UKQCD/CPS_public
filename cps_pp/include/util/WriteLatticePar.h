@@ -15,8 +15,8 @@
 #include <util/verbose.h>
 #include <util/error.h>
 
-#include "parctrl.h"
-#include "fpconv.h"
+#include <util/parctrl.h>
+#include <util/fpconv.h>
 
 
 CPS_START_NAMESPACE
