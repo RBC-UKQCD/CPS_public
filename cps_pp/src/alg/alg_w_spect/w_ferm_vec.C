@@ -1,38 +1,22 @@
+/*! \file
+
+  $Id: w_ferm_vec.C,v 1.4 2004-06-02 09:36:39 zs Exp $
+*/
+
 #include<config.h>
-CPS_START_NAMESPACE
-CPS_END_NAMESPACE
 #include <alg/w_all.h>
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
-#include <stdlib.h>
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <util/gjp.h>              // GJP
 #include <util/error.h>            // ERR
 #include <util/verbose.h>          // VRB
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <util/lattice.h>          // Lattice::FixGaugePtr()
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <comms/glb.h>               // glb_sum(...)
 #include <comms/scu.h>              //getMinusData, getPlusData
-CPS_START_NAMESPACE
+
 //Warning: do not use math64.h, seems to use some rsgisters that
 //is in conflict with optimized code.
-#ifdef _TARTAN
-CPS_END_NAMESPACE
-#include <math.h>                       //for sqrt()
-CPS_START_NAMESPACE
-#else
-CPS_END_NAMESPACE
 #include <math.h>
+
 CPS_START_NAMESPACE
-#endif
 
 #define DEBUG_FERMIONVECTOR
 //---------------------------------------------------------------------------
@@ -134,7 +118,11 @@ void FermionVector::print(char *file) const
 //void FermionVector::printWaveFunc(char *filename)
 //---------------------------------
 void FermionVector::printWaveFunc(char *file) const{
-  FILE *fp;
+
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
+    FILE *fp;
   if (!file || !(fp = fopen(file, "a"))) 
     ERR.FileA(d_class_name,"print", file);
   

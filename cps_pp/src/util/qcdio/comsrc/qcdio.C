@@ -2,23 +2,23 @@
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 /*!\file
-  \brief  The QCD I/O Interface:
+  \brief  The QCD I/O Interface.
 
-  $Id: qcdio.C,v 1.6 2004-04-28 14:42:20 cwj Exp $
+  $Id: qcdio.C,v 1.2 2004-06-02 09:36:40 zs Exp $
 */
 /*  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
-   $Author: cwj $ 
-   $Date: 2004-04-28 14:42:20 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v 1.6 2004-04-28 14:42:20 cwj Exp $
-   $Id: qcdio.C,v 1.6 2004-04-28 14:42:20 cwj Exp $
+   $Author: zs $ 
+   $Date: 2004-06-02 09:36:40 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v 1.2 2004-06-02 09:36:40 zs Exp $
+   $Id: qcdio.C,v 1.2 2004-06-02 09:36:40 zs Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.C,v $
-   $Revision: 1.6 $
-   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v $
+   $Revision: 1.2 $
+   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v $
    $State: Exp $  */ 
 /*----------------------------------------------------------*/
 
@@ -28,137 +28,22 @@ CPS_END_NAMESPACE
 #include <stdarg.h>
 #include <math.h>
 #include <util/qcdio.h>
+CPS_START_NAMESPACE
 #ifdef PARALLEL
+CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
+CPS_START_NAMESPACE
 #endif
+CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/error.h>
 CPS_START_NAMESPACE
 
-/* Could use a flag HAVE_VPRINTF to check this is possible. */
-
-  /* ------------------------------------------------------
-	Global data store:
-    ------------------------------------------------------ */
-  char* qcdio_fprefix;
-  double qcdio_beta;
-  int qcdio_latt[4], qcdio_nodelatt[4];
-  int qcdio_normalize_the_data = 1;
-
-#ifdef PARALLEL
-
-  // -------------------------------------------------------------------------------
-
-  /* ------------------------------------------------------
-  	Basic standard I/O:
-    ------------------------------------------------------ */
-  
-  /*!
-    Works just like printf.
-    \param format The format string
-    \param ... Optional arguments to the format string 
-   */
-  int qprintf( const char *format, ... ) {
-        va_list ap;
-        int nbytes;
-	
-	if( UniqueID() == 1 ) {
-	    va_start(ap, format);
-	    nbytes = vprintf( format, ap );
-	    va_end(ap);
-	} else {
-	    nbytes = 0;
-	}
-
-        return nbytes;
-  }
-
-  /*!
-    Works just like fprintf.
-    \param stream The file handle to which to print
-    \param format The format string
-    \param ... Optional arguments to the format string 
-   */
-  int qfprintf( FILE *stream, const char *format, ... ) {
-        va_list ap;
-        int nbytes;
-
-	if( UniqueID() == 1 ) {
-	    va_start(ap, format);
-	    nbytes = vfprintf( stream, format, ap );
-	    va_end(ap);
-	} else {
-	    nbytes = 0;
-	}
-
-        return nbytes;
-  }
-  
-  /*!
-    Works just like printf.
-    \param format The format string
-    \param ... Optional arguments to the format string 
-   */
-  int qprintf_all( const char *format, ... ) {
-        va_list ap;
-        int nbytes;
-	
-	va_start(ap, format);
-	nbytes = vprintf( format, ap );
-	va_end(ap);
-
-        return nbytes;
-  }
- 
-  /*!
-    Works just like printf, but prefixes the message with the node ID number
-    and the cartesian coordinates of the node in the node grid.
-    \param format The format string
-    \param ... Optional arguments to the format string 
-   */
-  int qprintf_allid( const char *format, ... ) {
-        va_list ap;
-        int nbytes;
-	char* newformat = new char[strlen(format)+100];
-	
-	sprintf(newformat,"%i [%i,%i,%i,%i] %s",
-			UniqueID(),
-			GJP.XnodeCoor(),
-			GJP.YnodeCoor(),
-			GJP.ZnodeCoor(),
-			GJP.TnodeCoor(),
-			format );
-	
-	va_start(ap, newformat);
-	nbytes = vprintf( newformat, ap );
-	va_end(ap);
-
-        return nbytes;
-  }
 
 
-  /*!
-    Works just like fprintf.
-    \param stream The file handle to which to print    
-    \param format The format string
-    \param ... Optional arguments to the format string 
-   */
 
-  int qfprintf_all( FILE *stream, const char *format, ... ) {
-        va_list ap;
-        int nbytes;
-
-	va_start(ap, format);
-	nbytes = vfprintf( stream, format, ap );
-	va_end(ap);
-
-        return nbytes;
-  }
-
-#endif /* ifdef PARALLEL */
-
-
-  // -------------------------------------------------------------------------------
+static int qcdio_latt[4];
+static  int qcdio_normalize_the_data = 1;
 
   /* ------------------------------------------------------
   	Gauge configuration I/O:
@@ -606,7 +491,7 @@ CPS_START_NAMESPACE
 
     // Store the file prefix, construct the parameter filename:
     // This is fairly ugly because I don't want to rely on "external" libraries.   
-    qcdio_fprefix = new char[fprelen];
+    char *qcdio_fprefix = new char[fprelen];
     parfname = new char[fprelen+4];
     ftoload = new char[fprelen+4];
     for( int i = 0; i <= fprelen; i++ ) {
@@ -624,7 +509,8 @@ CPS_START_NAMESPACE
     if( fp == NULL ) {
       ERR.General("","qload_guage","Could not open file %s!\n", parfname);
     }
-    
+
+      double qcdio_beta;
     // Parse the parameters from the file:
     fscanf(fp,"%s %lf\n", dummystr, &qcdio_beta );
     fscanf(fp,"%s %i\n", dummystr, &(qcdio_latt[0]) );

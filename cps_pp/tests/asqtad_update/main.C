@@ -7,22 +7,18 @@
 #include<util/verbose.h>
 #include<util/error.h>
 #include<alg/do_arg.h>
-//#include<alg/common_arg.h>
 
-namespace cps
-{
+CPS_START_NAMESPACE
 GlobalJobParameter GJP;
 LatRanGen LRG;
 Verbose VRB;
 Error ERR;
-}
+CPS_END_NAMESPACE
 
-using namespace cps ;
+USING_NAMESPACE_CPS
 
 
 int main(int argc,char *argv[]){
-
-    FILE *fp;
 
     //----------------------------------------------------------------
     // Initializes all Global Job Parameters
@@ -33,19 +29,16 @@ int main(int argc,char *argv[]){
     do_arg.y_node_sites = 2;
     do_arg.z_node_sites = 2;
     do_arg.t_node_sites = 2;
-    do_arg.s_node_sites = 0;
 #ifdef PARALLEL
     do_arg.x_nodes = 2;
     do_arg.y_nodes = 2;
     do_arg.z_nodes = 2;
     do_arg.t_nodes = 2;
-    do_arg.s_nodes = 1;
 #else
     do_arg.x_nodes = 1;
     do_arg.y_nodes = 1;
     do_arg.z_nodes = 1;
     do_arg.t_nodes = 1;
-    do_arg.s_nodes = 1;
 #endif 
     do_arg.x_bc = BND_CND_PRD;
     do_arg.y_bc = BND_CND_PRD;
@@ -73,6 +66,12 @@ int main(int argc,char *argv[]){
 //     do_arg.asqtad_5staple = 0.0;
 //     do_arg.asqtad_7staple = 0.0;
     
+#if TARGET==cpsMPI
+    MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
+    using MPISCU::printf;
+    using MPISCU::fprintf;
+#endif
+
     GJP.Initialize(do_arg);
 
     GnoneFasqtad lat;

@@ -1,4 +1,7 @@
-
+/*!\file
+  
+  $Id: ReadLattice.C,v 1.1 2004-06-02 09:36:40 zs Exp $
+*/
 
 // Read the format of Gauge Connection Format
 // from QCDSP {load,unload}_lattice format
@@ -243,8 +246,6 @@ void ReadLattice::read( const char* file )
   do_arg.start_conf_load_addr = lpoint;
   do_arg.start_seed_kind      = START_SEED_UNIFORM ;
   do_arg.start_seed_value     = 5296;
-  do_arg.colors               = 3; 
-  do_arg.verbose_level        = 3;
 
   
   hd.Show();

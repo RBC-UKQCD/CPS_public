@@ -1,4 +1,4 @@
-# $Id: Makefile_common.in,v 1.10 2004-04-27 18:18:10 cwj Exp $
+# $Id: Makefile_common.in,v 1.11 2004-06-02 09:36:41 zs Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -21,7 +21,7 @@ BIN = @ARCH@.x
 INCLIST = -I${BUILDDIR} -I${SRCDIR}/include @INCLUDE_FLAGS@
 
 CXXFLAGS= @CXXFLAGS@
-DFLAGS= @DFLAGS@
+DFLAGS += @DFLAGS@
 
 CFLAGS = ${CXXFLAGS} ${DFLAGS}
 

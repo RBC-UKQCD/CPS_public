@@ -1,4 +1,4 @@
-//$Id: detail.dox,v 1.2 2004-04-30 12:17:59 zs Exp $
+//$Id: detail.dox,v 1.3 2004-06-02 09:36:38 zs Exp $
 /*!
 
 \page detailpage The CPS in more detail
@@ -315,7 +315,7 @@ parallelised along the fifth dimension if one of the other dimensions is
 entirely local.
 
 The MPI-SCU layer has an additional interface,
- described in the section \ref mpiscuin, for specifying the dimensions
+described in the section \ref mpiscuin, for specifying the dimensions
 of the physical node grid. 
 
 The size of the lattice is then determined by supplying

@@ -3,66 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.4 2004-01-13 20:39:01 chulwoo Exp $
-//  $Id: quark_prop_s.C,v 1.4 2004-01-13 20:39:01 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-06-02 09:36:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.5 2004-06-02 09:36:39 zs Exp $
+//  $Id: quark_prop_s.C,v 1.5 2004-06-02 09:36:39 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.3.4.2  2003/11/06 01:33:03  cwj
-//  *** empty log message ***
-//
-//  Revision 1.3.4.1  2003/11/06 00:17:43  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.1.1  2003/11/04 05:04:58  chulwoo
-//
-//  starting again
-//
-//
-//  Revision 1.2  2003/07/24 16:53:53  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.6  2001/08/16 10:49:41  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.4  2001/07/03 17:00:45  anj
-//
-//  Multiple minor alterations to change some #include's from referring to
-//  files relative to the top-level source directory to referring to files
-//  relative to the source-file positions.  This alteration makes the code
-//  backwards compatable with the make structure of QCDSP, although this
-//  may have to be changed to a more usual form in the future. Anj.
-//
-//  Revision 1.3  2001/06/21 15:40:10  anj
-//  Updated the _TARTAN ifdefs, using PARALLEL instead (where appropriate).Anj
-//
-//  Revision 1.2  2001/06/19 18:11:31  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:00  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: quark_prop_s.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v $
 //  $State: Exp $
 //
@@ -77,17 +25,13 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 #include <string.h>			// memcpy()
-#include <stdlib.h>
-CPS_START_NAMESPACE
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
-CPS_END_NAMESPACE
 #include <alg/myenum.h>
 #include <stdio.h>
 CPS_START_NAMESPACE
+
 //------------------------------------------------------------
 //  class static members initializations
 //------------------------------------------------------------
@@ -408,6 +352,9 @@ void QuarkPropS::setWallSrc(Matrix **gm, StagQuarkSrc& qs, int color )
 
 void QuarkPropS::getQuarkPropS(char *results)
 {
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
     char *fname = "getQuarkPropS(const char *)";
     VRB.Func(cname, fname);
 

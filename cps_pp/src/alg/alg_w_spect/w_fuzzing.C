@@ -1,5 +1,10 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*! \file
+
+  $Id :$
+*/
+  
 /*w_fuzzing.C
  *class WspectFuzzing:public WspectGinfo
  *
@@ -14,52 +19,23 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <alg/w_all.h>
-CPS_START_NAMESPACE
 
-CPS_END_NAMESPACE
-#include <stdlib.h>
-CPS_START_NAMESPACE
- 
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
- 
-CPS_END_NAMESPACE
+
 #include <util/error.h>                // ERR
 #include <util/verbose.h>              // VRB
-CPS_START_NAMESPACE
- 
-
-CPS_END_NAMESPACE
 #include <util/vector.h>               // dotProduct
-CPS_START_NAMESPACE
- 
-CPS_END_NAMESPACE
-#include <comms/glb.h>                   // glb_sum
-#include <alg/common_arg.h>
-CPS_START_NAMESPACE
- 
-CPS_END_NAMESPACE
 #include <alg/alg_w_spect.h>          // AlgWspect::GetCounter()
-CPS_START_NAMESPACE
- 
-CPS_END_NAMESPACE
+
 #include <comms/glb.h>               // glb_sum(...)
 #include <comms/scu.h>              //getMinusData, getPlusData
 #include <comms/cbuf.h>              
-CPS_START_NAMESPACE
 
-#ifdef _TARTAN
-CPS_END_NAMESPACE
-#include <math.h>                       //for sqrt()
-CPS_START_NAMESPACE
-#else
-CPS_END_NAMESPACE
 #include <math.h>
 CPS_START_NAMESPACE
-#endif
+
 
 
 //#define DEBUG_FUZZING

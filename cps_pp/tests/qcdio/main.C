@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2004-04-30 12:18:01 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.2 2004-04-30 12:18:01 zs Exp $
-  $Id: main.C,v 1.2 2004-04-30 12:18:01 zs Exp $
+  $Date: 2004-06-02 09:36:41 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.3 2004-06-02 09:36:41 zs Exp $
+  $Id: main.C,v 1.3 2004-06-02 09:36:41 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: main.C,v $
-  $Revision: 1.2 $
+  $Revision: 1.3 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -154,10 +154,6 @@ int main( int argc, char** argv ) {
   DoArg do_arg;
 
 
-#ifdef PARALLEL
-#if INCLUDE_MPI_SCU == 1
-  SCUCommsInit();  /* Not present on QCDSP */
-#endif
 
   do_arg.x_node_sites = 8;
   do_arg.y_node_sites = 8;

@@ -1,5 +1,5 @@
 #include<config.h>
-CPS_START_NAMESPACE
+
 /*----------------------------------------------------------*/
 /*!\file
   \brief Basic IO function declarations,
@@ -7,7 +7,7 @@ CPS_START_NAMESPACE
   Separated from the rest of qcdio.h to avoid troublesome
   header file interdependancies.
 
-  $Id: qcdio_qprintf.h,v 1.2 2003-07-24 16:53:53 zs Exp $  
+  $Id: qcdio_qprintf.h,v 1.3 2004-06-02 09:36:38 zs Exp $  
 */
 /*  A.N.Jackson: ajackson@epcc.ed.ac.uk                       */
 /*----------------------------------------------------------*/
@@ -15,33 +15,32 @@ CPS_START_NAMESPACE
 #ifndef INCLUDED_QCDIO_QPRINTF_H_
 #define INCLUDED_QCDIO_QPRINTF_H_
 
-CPS_END_NAMESPACE
+
 #include <stdio.h>
-#include <util/data_types.h>
-CPS_START_NAMESPACE
 
 
-#ifdef PARALLEL
-#define printf qprintf           //!<Parallel reimplementation of printf
-#define fprintf qfprintf         //!<Parallel reimplementation of fprintf
+#if TARGET == cpsMPI
 
-  //! Reimplementation of printf that prints on only the zeroth node
-  int qprintf( const char *format, ... );
+namespace cps{
 
-  //! Reimplementation of fprintf that prints on only the zeroth node
-  int qfprintf( FILE *stream, const char *format, ... );
+namespace MPISCU{
+  //! Reimplementation of printf that prints from only a single node
+  int printf( const char *format, ... );
+
+  //! Reimplementation of fprintf that prints from only a single node
+  int fprintf( FILE *stream, const char *format, ... );
   
   //! Reimplementation of printf that prints on all nodes
-  int qprintf_all( const char *format, ... );
+  int printf_all( const char *format, ... );
 
   //! Reimplementation of printf that prints on all nodes with node ID prefix
-  int qprintf_allid( const char *format, ... );
+  int printf_allid( const char *format, ... );
 
   //! Reimplementation of fprintf that prints on all nodes
-  int qfprintf_all( FILE *stream, const char *format, ... );
-
+  int fprintf_all( FILE *stream, const char *format, ... );
+}
 #endif
 
-#endif
+} //CPS_END_NAMESPACE
 
-CPS_END_NAMESPACE
+#endif

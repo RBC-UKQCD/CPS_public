@@ -3,19 +3,18 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-04-30 12:18:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v 1.4 2004-04-30 12:18:02 zs Exp $
-//  $Id: main.C,v 1.4 2004-04-30 12:18:02 zs Exp $
+//  $Date: 2004-06-02 09:36:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v 1.5 2004-06-02 09:36:42 zs Exp $
+//  $Id: main.C,v 1.5 2004-06-02 09:36:42 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 #include <stdio.h>
-//#include <stdlib.h>	// exit()
 #include<util/lattice.h>
 #include<alg/alg_hmd.h>
 #include<alg/alg_pbp.h>
@@ -50,9 +49,9 @@ int main(int argc,char *argv[])
   do_arg.z_node_sites = 2;
   do_arg.t_node_sites = 2;
   do_arg.s_node_sites = 4;
-  do_arg.x_nodes = 2;
-  do_arg.y_nodes = 2;
-  do_arg.z_nodes = 2;
+  do_arg.x_nodes = 1;
+  do_arg.y_nodes = 1;
+  do_arg.z_nodes = 1;
   do_arg.t_nodes = 2;
   do_arg.s_nodes = 1;
 #else
@@ -79,9 +78,13 @@ int main(int argc,char *argv[])
   do_arg.beta = 5.8;
   do_arg.dwf_height = 0.9;
 
+#if TARGET==cpsMPI
+    MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
+    using MPISCU::printf;
+    using MPISCU::fprintf;
+#endif
+
   GJP.Initialize(do_arg);
-
-
 
   //----------------------------------------------------------------
   // Initialize arguments for the new Wilson spectrum code. -- Ping

@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-10-31 14:15:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.3 2003-10-31 14:15:33 zs Exp $
-//  $Id: alg_s_spect.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+//  $Date: 2004-06-02 09:36:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.4 2004-06-02 09:36:39 zs Exp $
+//  $Id: alg_s_spect.C,v 1.4 2004-06-02 09:36:39 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_s_spect.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v $
 //  $State: Exp $
 //
@@ -29,7 +29,6 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include <stdlib.h>	// exit()
 #include <stdio.h>
 #include <alg/quark_prop_s.h>
 #include <alg/meson_prop_s.h>
@@ -46,14 +45,13 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/verbose.h>
 #include <util/error.h>
-//#include <util/mom.h>
 #include <alg/myenum.h>
-CPS_START_NAMESPACE
+
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
+
+CPS_START_NAMESPACE
 
 QuarkPropSMng AlgStagQuark::sqpm;
 
@@ -69,6 +67,10 @@ static void write_to_file(const Float *data_p, FILE *fp,
 			  int num_IFloats, int num_slices, int mom, 
 			  HadronType type, BndCndType bc)
 {
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
+
   // printf("write_to_file: no_of_momenta = %d \n",mom);
   int unit;
   switch(type) {

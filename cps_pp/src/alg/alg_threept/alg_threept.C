@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgThreePt class methods.
   
-  $Id: alg_threept.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+  $Id: alg_threept.C,v 1.4 2004-06-02 09:36:39 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-10-31 14:15:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/alg_threept.C,v 1.3 2003-10-31 14:15:33 zs Exp $
-//  $Id: alg_threept.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+//  $Date: 2004-06-02 09:36:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/alg_threept.C,v 1.4 2004-06-02 09:36:39 zs Exp $
+//  $Id: alg_threept.C,v 1.4 2004-06-02 09:36:39 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_threept.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/alg_threept.C,v $
 //  $State: Exp $
 //
@@ -33,11 +33,8 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdlib.h>	// exit()
 #include <stdio.h>
-#include <alg/common_arg.h>
 #include <alg/alg_threept.h>
-#include <alg/threept_arg.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <util/smalloc.h>
@@ -47,13 +44,10 @@ CPS_END_NAMESPACE
 #include <comms/glb.h>
 #include <alg/wilson_matrix.h>
 #include <alg/spin_matrix.h>
-CPS_START_NAMESPACE
-
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
+CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
 /*!
@@ -107,6 +101,9 @@ AlgThreePt::~AlgThreePt() {
 //------------------------------------------------------------------
 void AlgThreePt::run()
 {
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
   char *fname = "run()";
   VRB.Func(cname,fname);
 
@@ -392,6 +389,9 @@ void AlgThreePt::figure8(QPropWWallSrc& prop, QPropWWallSrc& prop2)
 //----------------------------------------------------------------
 void AlgThreePt::figure8_mix(QPropWWallSrc& prop, QPropWWallSrc& prop2)
   {
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
 
   cname = "AlgThreePt";
   char *fname = "figure8_mix()";
@@ -469,6 +469,9 @@ void AlgThreePt::figure8_mix(QPropWWallSrc& prop, QPropWWallSrc& prop2)
 void AlgThreePt::eye(QPropWWallSrc& prop, QPropWWallSrc& prop2,
 	QPropWRandWallSrc& prop3, int t_Op, int t_sink)
   { 
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
 
   cname = "AlgThreePt";
   char *fname = "eye()";
@@ -624,6 +627,9 @@ void AlgThreePt::eye(QPropWWallSrc& prop, QPropWWallSrc& prop2,
 void AlgThreePt::k_to_vac(QPropWWallSrc& prop, QPropWWallSrc& prop2,
 	QPropWRandWallSrc& prop3, int t_Op)
   { 
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
 
   cname = "AlgThreePt";
   char *fname = "k_to_vac()";
@@ -729,6 +735,9 @@ void AlgThreePt::eye_mix_c4(QPropWWallSrc& prop, QPropWWallSrc& prop2,
 	QPropWRandWallSrc& prop3, int t_Op, int t_sink)
   { 
 
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
   cname = "AlgThreePt";
   char *fname = "eye_mix_c4()";
 
@@ -838,6 +847,9 @@ void AlgThreePt::k_to_vac_mix_c3(QPropWWallSrc& prop, QPropWWallSrc& prop2,
 	QPropWRandWallSrc& prop3, int t_Op)
   { 
 
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
   cname = "AlgThreePt";
   char *fname = "k_to_vac_mix_c3()";
 
@@ -927,6 +939,9 @@ void AlgThreePt::eye_mix_c31(QPropWWallSrc& prop, QPropWWallSrc& prop2,
 	QPropWRandWallSrc& prop3, int t_Op, int t_sink)
   { 
 
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
   cname = "AlgThreePt";
   char *fname = "eye_mix_c31()";
 
@@ -1035,6 +1050,9 @@ void AlgThreePt::k_to_vac_mix_c21(QPropWWallSrc& prop, QPropWWallSrc& prop2,
 	QPropWRandWallSrc& prop3, int t_Op)
   { 
 
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
   cname = "AlgThreePt";
   char *fname = "k_to_vac_mix_c21()";
 
@@ -1122,6 +1140,9 @@ void AlgThreePt::k_to_vac_mix_c21(QPropWWallSrc& prop, QPropWWallSrc& prop2,
 void AlgThreePt::spectrum(QPropWWallSrc& prop, QPropWWallSrc& prop2)
   { 
 
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
   cname = "AlgThreePt";
   char *fname = "spectrum()";
 
@@ -1200,6 +1221,9 @@ void AlgThreePt::spectrum(QPropWWallSrc& prop, QPropWWallSrc& prop2)
 void AlgThreePt::wall_spectrum(QPropWWallSrc& prop, QPropWWallSrc& prop2)
   { 
 
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
   cname = "AlgThreePt";
   char *fname = "wall_spectrum()";
 

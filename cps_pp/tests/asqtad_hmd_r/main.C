@@ -3,18 +3,19 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-04-30 12:18:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v 1.4 2004-04-30 12:18:00 zs Exp $
-//  $Id: main.C,v 1.4 2004-04-30 12:18:00 zs Exp $
+//  $Date: 2004-06-02 09:36:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v 1.5 2004-06-02 09:36:41 zs Exp $
+//  $Id: main.C,v 1.5 2004-06-02 09:36:41 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-/* Monte Carlo code which measures the plaquette on each trajectory. */
+/* R algorithm with Asqtad fermions and Wilson gauge action
+   which measures the plaquette on each trajectory. */
 
 
 
@@ -24,16 +25,9 @@
 
 #include <util/qcdio.h>
 #include <alg/alg_hmd.h>
-#include <alg/alg_s_spect.h>
 #include <alg/do_arg.h>
-#include <alg/alg_fix_gauge.h>
-#include <alg/aots_s.h>
 
 
-// const int nx = 16;
-// const int ny = 16;
-// const int nz = 8;
-// const int nt = 8;
 const int nx = 4;
 const int ny = 4;
 const int nz = 4;
@@ -48,21 +42,29 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 USING_NAMESPACE_CPS
 
-const char *plaq_filename = CWDPREFIX("plaquette");
+
+
 // some function prototypes
 void setup_do_arg(DoArg& do_arg) ; 
 void setup_hmd_arg(HmdArg& hmd_arg) ;
 
 int main(int argc,char *argv[])
 {
-#ifdef PARALLEL
+#if TARGET==QCDOC
   DefaultSetup(); 
 #endif
+
+
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
   //----------------------------------------------------------------
   DoArg do_arg;
   setup_do_arg(do_arg); 
+#if TARGET==cpsMPI
+  MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
+  using MPISCU::fprintf;
+  using MPISCU::printf;
+#endif
   GJP.Initialize(do_arg);
 
   VRB.DeactivateAll();
@@ -88,8 +90,7 @@ int main(int argc,char *argv[])
   const int no_warmup_sweep = 0 ; 
   const int no_measure_sweep = 1 ; 
   int sweep_counter = 0 ;
-//  const int total_measure = 20000 ;
-    const int total_measure = 1 ;
+    const int total_measure = 2 ;
   
   //----------------------------------------------------------------
   // Initialize argument structures
@@ -104,6 +105,7 @@ int main(int argc,char *argv[])
   FILE *plaq;
 #if TARGET == QCDOC
   char filename[200];
+  const char *plaq_filename = CWDPREFIX("plaquette");
   sprintf(filename, "%s%d%d%d%d%d%d.test2",
 	plaq_filename,CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
 #else
@@ -186,35 +188,24 @@ void setup_do_arg(DoArg& do_arg)
 {
 
 
-#ifdef PARALLEL
-#if 1
+#if TARGET==QCDOC
   do_arg.x_node_sites = nx/SizeX();
   do_arg.y_node_sites = ny/SizeY();
   do_arg.z_node_sites = nz/SizeZ();
   do_arg.t_node_sites = nt/SizeT();
-#else
-  do_arg.x_node_sites = 2;
-  do_arg.y_node_sites = 2;
-  do_arg.z_node_sites = 2;
-  do_arg.t_node_sites = 2;
-#endif
-  do_arg.s_node_sites = 0;
   do_arg.x_nodes = SizeX();
   do_arg.y_nodes = SizeY();
   do_arg.z_nodes = SizeZ();
   do_arg.t_nodes = SizeT();
-  do_arg.s_nodes = 1;
 #else
   do_arg.x_node_sites = nx ;
   do_arg.y_node_sites = ny ;
   do_arg.z_node_sites = nz ;
   do_arg.t_node_sites = nt ;
-  do_arg.s_node_sites = 0;
-  do_arg.x_nodes = 1;
+  do_arg.x_nodes = 2;
   do_arg.y_nodes = 1;
   do_arg.z_nodes = 1;
   do_arg.t_nodes = 1;
-  do_arg.s_nodes = 1;
 #endif
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
@@ -224,9 +215,6 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.start_seed_kind = START_SEED_FIXED;
   do_arg.beta = 5.6;
 
-  do_arg.xi_bare = 1;
-  do_arg.xi_v = 1;
-  do_arg.xi_v_xi = 1;
   do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
   do_arg.asqtad_naik = -1.0/24.0;
   do_arg.asqtad_lepage = -1.0/16;
@@ -252,13 +240,10 @@ void setup_hmd_arg(HmdArg& hmd_arg)
   hmd_arg.frm_mass[0] = 0.1;
   hmd_arg.frm_flavors[0] = 2;
   hmd_arg.n_bsn_masses = 0;
-//  hmd_arg.max_num_iter[0] = 5000;
-    hmd_arg.max_num_iter[0] = 2;
-//  hmd_arg.stop_rsd[0] = 1.0E-12;
-    hmd_arg.stop_rsd[0] = 1.0E-7;
-  hmd_arg.step_size = 0.01;
-//  hmd_arg.steps_per_traj = 50;
-    hmd_arg.steps_per_traj = 1;
+  hmd_arg.max_num_iter[0] = 500;
+  hmd_arg.stop_rsd[0] = 1.0E-7;
+  hmd_arg.step_size = 0.02;
+  hmd_arg.steps_per_traj = 50;
   hmd_arg.metropolis = METROPOLIS_NO;
   hmd_arg.reunitarize = REUNITARIZE_YES;
 

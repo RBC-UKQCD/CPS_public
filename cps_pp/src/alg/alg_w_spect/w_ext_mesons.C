@@ -1,5 +1,9 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+
+  $Id: w_ext_mesons.C,v 1.5 2004-06-02 09:36:39 zs Exp $
+*/
 /* class WspectExtendedMesons
  * Thomas and Xiaodong. March 2000.
  * calculates all correlators from a given set of basis operators
@@ -18,33 +22,15 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <alg/w_all.h>
 #include <alg/w_gamma_mat.h>
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
-#include <stdlib.h>
-CPS_START_NAMESPACE
-
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
 
-CPS_END_NAMESPACE
 #include <util/error.h>                // ERR
 #include <util/verbose.h>              // VRB
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <util/vector.h>               // dotProduct
-CPS_START_NAMESPACE
 
-CPS_END_NAMESPACE
 #include <comms/glb.h>                   // glb_sum
-#include <alg/common_arg.h>
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <alg/alg_w_spect.h>          // AlgWspect::GetCounter()
 #include <comms/cbuf.h> 
 CPS_START_NAMESPACE
@@ -636,6 +622,10 @@ void WspectExtendedMesons::traceDirac(Float* gam1, Float* gam2,Complex &result)
 //--------------------------------------------------------------------------- 
 void
 WspectExtendedMesons::print() const {
+
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
   char *fname = "print";
   char outputfilename[100];//generated according to WpsectArg.filetail and stateName
   VRB.Func(d_class_name, fname);

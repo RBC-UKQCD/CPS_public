@@ -13,14 +13,9 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<string.h>
 #include<stdio.h>
-#include<stdlib.h>
 #include<math.h>
 #include<alg/alg_hmd.h>
-#include<alg/common_arg.h>
-#include<alg/hmd_arg.h>
-#include<alg/cg_arg.h>
 #include<util/lattice.h>
 #include<util/vector.h>
 #include<util/gjp.h>
@@ -341,6 +336,9 @@ AlgHmcRHMC::~AlgHmcRHMC() {
 //------------------------------------------------------------------
 Float AlgHmcRHMC::run(void)
 {
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
   int step;                            // Trajectory step
   Float h_init=0;                        // Initial Hamiltonian
   Float h_final=0;                       // Final Hamiltonian

@@ -4,70 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgPlaq class methods.
   
-  $Id: alg_plaq.C,v 1.4 2004-04-30 12:18:00 zs Exp $
+  $Id: alg_plaq.C,v 1.5 2004-06-02 09:36:39 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-04-30 12:18:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.4 2004-04-30 12:18:00 zs Exp $
-//  $Id: alg_plaq.C,v 1.4 2004-04-30 12:18:00 zs Exp $
+//  $Date: 2004-06-02 09:36:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.5 2004-06-02 09:36:39 zs Exp $
+//  $Id: alg_plaq.C,v 1.5 2004-06-02 09:36:39 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.3.4.2  2004/04/20 12:20:39  zs
-//  Restore original version.
-//
-//  Revision 1.3  2004/01/13 20:39:00  chulwoo
-//  Merging with multibuild
-//
-//  Revision 1.2.10.1  2003/11/06 00:15:15  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.1.1  2003/11/04 05:04:58  chulwoo
-//
-//  starting again
-//
-//
-//  Revision 1.2  2003/07/24 16:53:53  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.7  2002/03/11 22:25:40  anj
-//  This should now be the correct, fully merged code from our two versions. Anj
-//
-//  Revision 1.4.2.1  2002/03/08 16:34:57  anj
-//  Checking in the Columbia code branch on tag Columbia4_1_1_test-branch, to be
-//  merged with the UKQCD head branch shortly.  Anj
-//
-//  Revision 1.4  2001/08/16 10:49:40  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:11:28  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:15:59  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: alg_plaq.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v $
 //  $State: Exp $
 //
@@ -82,22 +31,14 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdlib.h>	// exit()
-#include <stdio.h>
 #include <alg/alg_plaq.h>
-#include <alg/common_arg.h>
-#include <alg/no_arg.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
-#include <util/smalloc.h>
-#include <util/vector.h>
 #include <util/verbose.h>
 #include <util/error.h>
 #include <comms/glb.h>
 CPS_START_NAMESPACE
 
-#define max(A, B) ((A) > (B) ? (A) : (B))
-#define min(A, B) ((A) < (B) ? (A) : (B))
 
 //------------------------------------------------------------------
 /*!
@@ -111,7 +52,8 @@ AlgPlaq::AlgPlaq(Lattice& latt,
 	     NoArg *arg) : 
 	     Alg(latt, c_arg) 
 {
-  cname = "AlgPlaq";
+
+    cname = "AlgPlaq";
   char *fname = "AlgPlaq(L&,CommonArg*,NoArg*)";
   VRB.Func(cname,fname);
 
@@ -143,8 +85,16 @@ AlgPlaq::~AlgPlaq() {
 //------------------------------------------------------------------
 //! Performs the computation.
 /*!
-  \post The results are written to the file specified in the common_arg
-  structure.
+  The real trace of the plaquette is averaged over the lattice and normalised
+  to unity.
+  \post The following data are written to the file specified in the
+  common_arg structure:
+  -# mean plaquette
+  -# variance of mean plaquette
+  -# maximum plaquette
+  -# minimum plaquette
+  -# mean temporal plaquette
+  -# mean spatial plaquette
 */
 //------------------------------------------------------------------
 void AlgPlaq::run()
@@ -152,6 +102,10 @@ void AlgPlaq::run()
   char *fname = "run()";
   VRB.Func(cname,fname);
 
+#if TARGET==cpsMPI
+  using MPISCU::fprintf;
+#endif
+  
   // Set the Lattice pointer
   //----------------------------------------------------------------
   Lattice& lat = AlgLattice();
@@ -174,26 +128,30 @@ void AlgPlaq::run()
     }
     return;
   }
-  
+
+  Float p_temporal, p_spatial;
+  p_temporal = p_spatial = 0.0;
 
   Float p_sum    =  0.0 ;
   Float p_sq_sum =  0.0 ;
   Float p_min    =  3.0 ;
   Float p_max    = -3.0 ;
-  int x[4];
 
-  int mu; 
+
+  int x[4];
   for (x[0] = 0; x[0] < GJP.XnodeSites(); ++x[0]) {
     for (x[1] = 0; x[1] < GJP.YnodeSites(); ++x[1]) {
       for (x[2] = 0; x[2] < GJP.ZnodeSites(); ++x[2]) {
   	for (x[3] = 0; x[3] < GJP.TnodeSites(); ++x[3]) {
-  	  for (mu = 0; mu < 3; ++mu) {
+  	  for (int mu = 0; mu < 3; ++mu) {
     	    for (int nu = mu+1; nu < 4; ++nu) {
       		Float tmp_flt = lat.ReTrPlaq(x, mu, nu) ;
       		p_sum    += tmp_flt ;
       		p_sq_sum += tmp_flt * tmp_flt ;
-      		p_min    =  min(p_min, tmp_flt) ;
-      		p_max    =  max(p_max, tmp_flt) ;
+      		p_min    =  p_min<tmp_flt ? p_min : tmp_flt;
+      		p_max    =  p_max>tmp_flt ? p_max : tmp_flt;
+		if(nu==DIR_T||mu==DIR_T) p_temporal += tmp_flt;
+		else p_spatial += tmp_flt;
 	    }
 	  }
 	}
@@ -205,6 +163,9 @@ void AlgPlaq::run()
   glb_sum(&p_sq_sum) ;
   glb_min(&p_min) ;
   glb_max(&p_max) ;
+  glb_sum(&p_spatial);
+  glb_sum(&p_temporal);
+  
 
   Float one_third = 1.0 / 3.0 ;
 
@@ -216,21 +177,22 @@ void AlgPlaq::run()
   Float p_var = norm_fac * (1.0 + norm_fac) \
                 * (p_sq_sum - norm_fac*p_sum*p_sum) ;
   p_sum *= norm_fac ;
+  p_spatial *= 2.0*norm_fac*one_third;
+  p_temporal *= 2.0*norm_fac*one_third;
 
-  x[0]=0 ; x[1]=0 ; x[2]=0 ; x[3]=0 ;
 
   // Print out results
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
-      ERR.FileA(cname,fname, (char *)common_arg->results);
-    }
-    fprintf(fp, "%e %e %e %e %e\n", IFloat(p_sum),
-                                 IFloat(p_var),
-                                 IFloat(p_max),
-                                 IFloat(p_min),
-				 IFloat(one_third*lat.ReTrPlaq(x, 0, 1)) ) ;
+
+    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) 
+	ERR.FileA(cname,fname, (char *)common_arg->results);
+    
+    fprintf(fp, "%e %e %e %e %e %e\n",
+	     p_sum, p_var,
+	     p_max, p_min,
+	     p_temporal, p_spatial);
     fclose(fp);
   }
 

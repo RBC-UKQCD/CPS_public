@@ -1,9 +1,0 @@
-#include<config.h>
-CPS_START_NAMESPACE
-
-
-====================================================================
-/tmp_mnt/home/cmm80/phys/phys_v4.1.1.test/tests/PlaqTest/main.C
-====================================================================
-diff: //tmp_mnt/home/cmm80/phys/phys_v4.1.1.beta/tests/PlaqTest/main.C: No such file or directory
-CPS_END_NAMESPACE

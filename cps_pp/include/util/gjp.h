@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.8 2004-04-30 12:17:59 zs Exp $
+  $Id: gjp.h,v 1.9 2004-06-02 09:36:38 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-04-30 12:17:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.8 2004-04-30 12:17:59 zs Exp $
-//  $Id: gjp.h,v 1.8 2004-04-30 12:17:59 zs Exp $
+//  $Date: 2004-06-02 09:36:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.9 2004-06-02 09:36:38 zs Exp $
+//  $Id: gjp.h,v 1.9 2004-06-02 09:36:38 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //
@@ -665,15 +665,6 @@ public:
     \return The exponent.
   */
 
-  int VerboseLevel() const {
-      return VRB.Level();
-  } 
-  //!< Gets the verbosity level.
-  /*!<
-    This is really here just for backwards compatibility.
-    See the Verbose class for details.
-    \return The verbosity level.
-  */
 
   Float PowerRectCutoff() const
       {return power_rect_cutoff;}

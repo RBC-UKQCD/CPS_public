@@ -10,7 +10,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations for the MPI implementation of the QCDSP/QCDOC communications  layer.
   
-  $Id: sysfunc.h,v 1.6 2004-02-06 12:20:43 zs Exp $
+  $Id: sysfunc.h,v 1.7 2004-06-02 09:36:38 zs Exp $
 */
 /*----------------------------------------------------------------------
   The Sysfunc Comms Interface: sysfunc.h
@@ -23,13 +23,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2004-02-06 12:20:43 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v 1.6 2004-02-06 12:20:43 zs Exp $
-  $Id: sysfunc.h,v 1.6 2004-02-06 12:20:43 zs Exp $
+  $Date: 2004-06-02 09:36:38 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v 1.7 2004-06-02 09:36:38 zs Exp $
+  $Id: sysfunc.h,v 1.7 2004-06-02 09:36:38 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.h,v $
-  $Revision: 1.6 $
+  $Revision: 1.7 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -41,43 +41,13 @@ CPS_START_NAMESPACE
 #define INCLUDED_SYSFUNC_H
 
 CPS_END_NAMESPACE
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 #include <comms/scu_dir_arg.h>
 #include <comms/mpi_requests.h>
 CPS_START_NAMESPACE
 
-//! Number of dimensions.
-#ifndef NDIM                     /* If NDIM has not been specified: */
-#define NDIM 4                   
-#endif
 
-/* Macros for the required environment variable names: */
 
-//! Name of the environment variable with the parallel execution parameters.
-/*! This environment variable might define the parameters directly or
-  name a file which does.
-*/
-#ifndef COMMS_ENVVAR
-#define COMMS_ENVVAR "COMMS_DEF" 
-#endif
 
-//! Default name for the file containing the parallel execution parameters.
-#ifndef COMMS_DEFFILE
-#define COMMS_DEFFILE "commsMPI.def"
-#endif
-
-/*! Max size of temporary strings */
-#define STRING_MAX_LEN  10000 
-
-/* Note that this interface cannot be extern C'd because it uses
-  overloaded subroutines */
-//extern "C" {
-
-//! The global comms-layer initialization flag.
-extern int commsMPI_init;
 
 //--------------------------------------------------------------------
 /* Public interface subroutines for the comms: */
@@ -145,24 +115,32 @@ void SCUTransAddr( SCUDirArg ** arg, int n );
 void SCUTransComplete(void);
 
 
-/*-------------------------------------------------------------------------*/
-/*             Useful extra subroutines, part of the MPI version:          */
-/*-------------------------------------------------------------------------*/
-  
+namespace MPISCU {
+
+//! The global comms-layer initialization flag.
+    extern bool Is_Initialised;
+
+
+/* Useful extra subroutines, part of the MPI version:          */
+
+
+//! Communicates the processor grid dimensions to the MPI-SCU layer.
+    void set_pe_grid(int x, int y, int z, int t);
+
 //! Initialises the MPI communications layer.
-void SCUCommsInit( void );
+    void CommsInit();
 
 //! Performs a clean exit from the MPI communications layer.
-void SCUCommsFinalize( void );
+    void CommsFinalize();
 
 //! Computes a global sum directly using MPI 
-void SCUGlobalSum(Type_tag t, size_t tsize, int n, void *ivec, void *ovec );
+    void GlobalSum(Type_tag t, size_t tsize, int n, void *ivec, void *ovec );
 
 //! Reports an error.
-void SCURaiseError( char* errstr );
+    void RaiseError( char* errstr );
 
 //! Reports an error.
-void SCURaiseError( const char* errstring );
+    void RaiseError( const char* errstring );
 
 /*! @} */
 
@@ -172,25 +150,29 @@ void SCURaiseError( const char* errstring );
 /*-------------------------------------------------------------------------*/
 
 //! An implementation-specific internal subroutine
-void SCUTrans_mpi( void* addr, MPI_Datatype mpi_dt, SCUDir dir, SCUXR sendrx );
+    void Trans( void* addr, MPI_Datatype mpi_dt, SCUDir dir, SCUXR sendrx );
 
 //! An implementation-specific internal subroutine
-void MPIParseCommsParam(void);
+    void ParseCommsParam( char *);
 
 //! An implementation-specific internal subroutine
-char *MPICommsStringTokenizer(char* str, const char* tokens, char** tok_pos );
+    char *CommsStringTokenizer(char* str, const char* tokens, char** tok_pos );
 
 //! An implementation-specific internal subroutine
-MPI_Datatype SCUMPITypeConv( Type_tag t, size_t tsize );
+    MPI_Datatype MPITypeConv( Type_tag t, size_t tsize );
 
 //! An implementation-specific internal subroutine
-unsigned int SCUReadSeedFile( void );
+    unsigned int ReadSeedFile(  );
 
 
-//}// End of extern "C".
+} //namespace MPSICU
+
 #endif
-
 
 
 CPS_END_NAMESPACE
-#endif
+#endif // TARGET
+
+
+
+

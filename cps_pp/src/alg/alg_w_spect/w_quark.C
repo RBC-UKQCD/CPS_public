@@ -1,24 +1,17 @@
-#include<config.h>
-CPS_START_NAMESPACE
-CPS_END_NAMESPACE
-#include <stdlib.h>
-CPS_START_NAMESPACE
+/*! \file
 
-CPS_END_NAMESPACE
+  $Id: w_quark.C,v 1.4 2004-06-02 09:36:40 zs Exp $
+*/
+#include<config.h>
 #include <util/gjp.h>              // GJP
 #include <util/error.h>            // ERR
 #include <util/verbose.h>          // VRB
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <util/lattice.h>          // Lattice::FixGaugePtr()
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <comms/glb.h>               // glb_sum(...)
 #include <comms/scu.h>               // getMinusData, getPlusData
 #include <alg/w_all.h>
 #include <alg/w_ginfo.h>
+
 CPS_START_NAMESPACE
 
  
@@ -58,6 +51,11 @@ WspectQuark::WspectQuark(Lattice &lat,
 			 WspectField *fld_ptr)
   : d_size(GJP.VolNodeSites() * (COLORs*COLORs*DIRACs*DIRACs*COMPLEXs)), prop_direction(whr.dir()), src_plane_position(whr.lclCoord()),d_lat(lat), src_op_kind(source_operator_kind), src_fuzz_p(src_fuzz_ptr), fld_p(fld_ptr)
 {
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
+
+
   VRB.Func(d_class_name, ctor_str);
 
 
@@ -603,6 +601,10 @@ WspectQuark::WspectQuark(Lattice &lat,
 void
 WspectQuark::dumpData(char *filename) const {
 
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
+
   FILE *fp;
   
   if (filename && (fp = fopen(filename, "a"))) {
@@ -651,6 +653,11 @@ WspectQuark::~WspectQuark()
 void
 WspectQuark::dumpSource(char *filename, FermionVector &source) const {
   //print out non-zero source components
+
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+#endif
+   
   FILE *fp;
   
   Float *pp = source.data();

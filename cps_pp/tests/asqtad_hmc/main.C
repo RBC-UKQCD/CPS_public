@@ -1,33 +1,19 @@
+/*
+  $Id: main.C,v 1.3 2004-06-02 09:36:41 zs Exp $
+*/
+
 /* Quick Wilson Monte Carlo code, which measures the plaquette on each trajectory. */
 
 #include <stdio.h>
-#include <stdlib.h>	// exit()
 #include <config.h>
 
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <util/verbose.h>
 #include <util/error.h>
-#include <util/qcdio.h>
 #include <alg/alg_hmd.h>
-#include <alg/alg_s_spect.h>
 #include <alg/do_arg.h>
-#include <alg/common_arg.h>
-#include <alg/cg_arg.h>
-#include <alg/hmd_arg.h>
-#include <alg/s_spect_arg.h>
-#include <alg/fix_gauge_arg.h>
-#include <alg/alg_fix_gauge.h>
-#include <alg/aots_s.h>
-#include <util/vector.h>
 #include <util/random.h>
-
-
-// ANSI stuff
-#include <string>
-#include <iostream>
-
-extern "C" void _mcleanup(void);
 
 const int nx = 4;
 const int ny = 4;
@@ -35,36 +21,49 @@ const int nz = 4;
 const int nt = 4;
 
 CPS_START_NAMESPACE
-
   GlobalJobParameter GJP;
   Verbose VRB;
   Error ERR;
   LatRanGen LRG;
 CPS_END_NAMESPACE
+
 USING_NAMESPACE_CPS
 
-const char *plaq_filename = CWDPREFIX("plaquette");
+
 // some function prototypes
 void setup_do_arg(DoArg& do_arg) ; 
 void setup_hmd_arg(HmdArg& hmd_arg) ;
+#if TARGET == QCDOC
+extern "C" void _mcleanup(void);
+#endif
+
 
 int main(int argc,char *argv[])
 {
 #if TARGET == QCDOC
   DefaultSetup(); 
 #endif
+
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
   //----------------------------------------------------------------
   DoArg do_arg;
   setup_do_arg(do_arg); 
+#if TARGET==cpsMPI
+  MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
+  using MPISCU::fprintf;
+  using MPISCU::printf;  
+#endif
   GJP.Initialize(do_arg);
 
   //----------------------------------------------------------------
   // Set verbose level
   //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
-  char *cname = "asqtad_hmd_r";
+  VRB.DeactivateAll();
+  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+  VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
+  
+  char *cname = "asqtad_hmc";
   char *fname = "main";
   VRB.Func(cname,fname);
 
@@ -80,7 +79,7 @@ int main(int argc,char *argv[])
   const int no_warmup_sweep = 0 ; 
   const int no_measure_sweep = 1 ; 
   int sweep_counter = 0 ;
-  const int total_measure = 10 ;
+  const int total_measure = 2 ;
   
   //----------------------------------------------------------------
   // Initialize argument structures
@@ -95,6 +94,7 @@ int main(int argc,char *argv[])
   FILE *plaq;
 #if TARGET == QCDOC
   char filename[200];
+  const char *plaq_filename = CWDPREFIX("plaquette");
   sprintf(filename, "%s%d%d%d%d%d%d.test2",
 	plaq_filename,CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
 #else
@@ -169,7 +169,7 @@ int main(int argc,char *argv[])
   fclose(plaq); 
   }
 #if TARGET == QCDOC
-_mcleanup();
+  _mcleanup();
 #endif
 
   return(0);
@@ -185,23 +185,19 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.y_node_sites = ny/SizeY();
   do_arg.z_node_sites = nz/SizeZ();
   do_arg.t_node_sites = nt/SizeT();
-  do_arg.s_node_sites = 0;
   do_arg.x_nodes = SizeX();
   do_arg.y_nodes = SizeY();
   do_arg.z_nodes = SizeZ();
   do_arg.t_nodes = SizeT();
-  do_arg.s_nodes = 1;
 #else
   do_arg.x_node_sites = nx ;
   do_arg.y_node_sites = ny ;
   do_arg.z_node_sites = nz ;
   do_arg.t_node_sites = nt ;
-  do_arg.s_node_sites = 0;
   do_arg.x_nodes = 1;
   do_arg.y_nodes = 1;
   do_arg.z_nodes = 1;
   do_arg.t_nodes = 1;
-  do_arg.s_nodes = 1;
 #endif
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
@@ -209,12 +205,7 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.t_bc = BND_CND_APRD;
   do_arg.start_conf_kind = START_CONF_DISORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
-  do_arg.colors = 3;
   do_arg.beta = 5.6;
-  do_arg.verbose_level = -1205;
-  do_arg.xi_bare = 1;
-  do_arg.xi_v = 1;
-  do_arg.xi_v_xi = 1;
   do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
   do_arg.asqtad_naik = -1.0/24.0;
   do_arg.asqtad_lepage = -1.0/16;
@@ -240,9 +231,9 @@ void setup_hmd_arg(HmdArg& hmd_arg)
   hmd_arg.frm_mass[0] = 0.1;
   hmd_arg.frm_flavors[0] = 2;
   hmd_arg.n_bsn_masses = 0;
-  hmd_arg.max_num_iter[0] = 5000;
-  hmd_arg.stop_rsd[0] = 1.0E-12;
-  hmd_arg.step_size = 0.001;
+  hmd_arg.max_num_iter[0] = 500;
+  hmd_arg.stop_rsd[0] = 1.0E-6;
+  hmd_arg.step_size = 0.02;
   hmd_arg.steps_per_traj = 50;
   hmd_arg.metropolis = METROPOLIS_NO;
   hmd_arg.reunitarize = REUNITARIZE_YES;

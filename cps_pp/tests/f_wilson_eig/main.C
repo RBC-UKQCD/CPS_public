@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-04-30 12:18:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_eig/main.C,v 1.4 2004-04-30 12:18:01 zs Exp $
-//  $Id: main.C,v 1.4 2004-04-30 12:18:01 zs Exp $
+//  $Date: 2004-06-02 09:36:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_eig/main.C,v 1.5 2004-06-02 09:36:41 zs Exp $
+//  $Id: main.C,v 1.5 2004-06-02 09:36:41 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_eig/main.C,v $
 //  $State: Exp $
 //
@@ -21,7 +21,6 @@
 #include<alg/alg_plaq.h>
 #include<alg/alg_eig.h>
 #include<alg/do_arg.h>
-#include<alg/no_arg.h>
 
 CPS_START_NAMESPACE
 GlobalJobParameter GJP;
@@ -45,20 +44,17 @@ int main(int argc,char *argv[])
   do_arg.y_node_sites = 2;
   do_arg.z_node_sites = 2;
   do_arg.t_node_sites = 2;
-  do_arg.s_node_sites = 1;
 
 #ifdef PARALLEL
   do_arg.x_nodes = 2; //SizeX();
-  do_arg.y_nodes = 2; //SizeY();
-  do_arg.z_nodes = 2; //SizeZ();
-  do_arg.t_nodes = 2; //SizeT();
-  do_arg.s_nodes = 1;
+  do_arg.y_nodes = 1; //SizeY();
+  do_arg.z_nodes = 1; //SizeZ();
+  do_arg.t_nodes = 1; //SizeT();
 #else
   do_arg.x_nodes = 1;
   do_arg.y_nodes = 1;
   do_arg.z_nodes = 1;
   do_arg.t_nodes = 1;
-  do_arg.s_nodes = 1;
 #endif
 
   do_arg.x_bc = BND_CND_PRD;
@@ -68,8 +64,12 @@ int main(int argc,char *argv[])
   do_arg.start_conf_kind = START_CONF_ORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
   do_arg.beta = 5.3;
-  do_arg.dwf_height = 0.9;
 
+#if TARGET==cpsMPI
+    MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);    
+    using MPISCU::fprintf;
+    using MPISCU::printf;
+#endif
 
   GJP.Initialize(do_arg);
 

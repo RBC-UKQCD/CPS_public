@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the SCUDirArg class.
 
-  $Id: scu_dir_arg.C,v 1.1 2004-02-06 12:12:41 zs Exp $
+  $Id: scu_dir_arg.C,v 1.2 2004-06-02 09:36:40 zs Exp $
 */
 /*----------------------------------------------------------*/
 /* The SCUDirArg Class: scu_dir_arg.C
@@ -18,13 +18,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2004-02-06 12:12:41 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/scu_dir_arg.C,v 1.1 2004-02-06 12:12:41 zs Exp $
-  $Id: scu_dir_arg.C,v 1.1 2004-02-06 12:12:41 zs Exp $
+  $Date: 2004-06-02 09:36:40 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/scu_dir_arg.C,v 1.2 2004-06-02 09:36:40 zs Exp $
+  $Id: scu_dir_arg.C,v 1.2 2004-06-02 09:36:40 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_dir_arg.C,v $
-  $Revision: 1.1 $
+  $Revision: 1.2 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/scu_dir_arg.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -286,7 +286,7 @@ void SCUDirArg::Create_Datatype() {
     MPI_Datatype mpitype;
 
     // Initalize the MPI layer, if necessary:
-    if( !commsMPI_init ) SCUCommsInit();
+    if( !MPISCU::Is_Initialised ) MPISCU::CommsInit();
 
     // Check all the args.
 
@@ -298,7 +298,7 @@ void SCUDirArg::Create_Datatype() {
 
     // Define the (new) datatype.
     /* Translate the Type_tag+size_t into an MPI type */
-    mpitype = SCUMPITypeConv( TYPE_IFloat, mpi_datasize_ );
+    mpitype = MPISCU::MPITypeConv( TYPE_IFloat, mpi_datasize_ );
     
 
     if( stride_ <= 1 && numblk_ <= 1 ) {

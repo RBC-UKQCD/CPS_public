@@ -1,21 +1,21 @@
 #include<config.h>
-CPS_START_NAMESPACE
+
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-04-30 12:18:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_dwf_pbp/main.C,v 1.2 2004-04-30 12:18:01 zs Exp $
-//  $Id: main.C,v 1.2 2004-04-30 12:18:01 zs Exp $
+//  $Date: 2004-06-02 09:36:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_dwf_pbp/main.C,v 1.3 2004-06-02 09:36:41 zs Exp $
+//  $Id: main.C,v 1.3 2004-06-02 09:36:41 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_dwf_pbp/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-CPS_END_NAMESPACE
+
 #include<util/lattice.h>
 #include<util/gjp.h>
 #include<util/verbose.h>
@@ -25,17 +25,16 @@ CPS_END_NAMESPACE
 #include<alg/alg_pbp.h>
 #include<alg/alg_plaq.h>
 #include<alg/do_arg.h>
-#include<alg/common_arg.h>
-#include<alg/hmd_arg.h>
-#include<alg/pbp_arg.h>
 #include<alg/no_arg.h>
+
 CPS_START_NAMESPACE
-
-
 GlobalJobParameter GJP;
 LatRanGen LRG;
 Verbose VRB;
 Error ERR;
+CPS_END_NAMESPACE
+
+USING_NAMESPACE_CPS
 
 int main(int argc,char *argv[])
 {
@@ -49,14 +48,14 @@ int main(int argc,char *argv[])
 
 #ifdef PARALLEL
   do_arg.x_node_sites = 2;
-  do_arg.y_node_sites = 2;
+  do_arg.y_node_sites = 4;
   do_arg.z_node_sites = 4;
-  do_arg.t_node_sites = 2;
+  do_arg.t_node_sites = 4;
   do_arg.s_node_sites = 4;
   do_arg.x_nodes = 2;
-  do_arg.y_nodes = 2;
-  do_arg.z_nodes = 2;
-  do_arg.t_nodes = 2;
+  do_arg.y_nodes = 1;
+  do_arg.z_nodes = 1;
+  do_arg.t_nodes = 1;
   do_arg.s_nodes = 1;
 #else
   do_arg.x_node_sites = 4;
@@ -82,6 +81,11 @@ int main(int argc,char *argv[])
   do_arg.beta = 5.8;
   do_arg.dwf_height = 0.9;
 
+#if TARGET==cpsMPI
+    MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);    
+    using MPISCU::fprintf;
+    using MPISCU::printf;
+#endif
 
   GJP.Initialize(do_arg);
 
@@ -299,4 +303,4 @@ int main(int argc,char *argv[])
 
 
 
-CPS_END_NAMESPACE
+

@@ -1,4 +1,4 @@
-//$Id: interface.dox,v 1.2 2004-04-30 12:17:59 zs Exp $
+//$Id: interface.dox,v 1.3 2004-06-02 09:36:38 zs Exp $
 /*!
 
 \page interpage User Interface
@@ -175,11 +175,19 @@ written out by the application. This is described in the section \ref output.
 \subsection mpiscuin The MPI-SCU interface
 
 The MPI-SCU layer, described in the \ref parallel section, emulates the system 
-calls provided by the QCDOC operating system. This relies on the run-time 
-environment being set up correctly. This is done with the environment variable
-\c COMMS_DEF. This environment variable can contain either the parameters 
-which the MPI-SCU layer needs or the name of a file containing those 
-parameters.
+calls provided by the QCDOC operating system. 
+
+User code does not to start the MPI-SCU
+emulation directly; instead, it is started the first time a SCU system
+call is made. For most CPS applications this will be when ::GJP is
+initialised with GlobalJobParameters::Initialize.
+
+Starting the MPI-SCU layer depends on how the run-time 
+environment is set up. MPI-SCU checks whether 
+the environment variable \c COMMS_DEF is defined. 
+If defined, this environment variable can contain either the parameters  
+which the MPI-SCU layer needs, the name of a file containing those 
+parameters, or nothing at all.
 
 The parameters themselves must be defined as a series of
 tag and value pairs in the format \c {NAME=value} as follows:
@@ -188,9 +196,9 @@ tag and value pairs in the format \c {NAME=value} as follows:
 - \c {LOGFILE=filename} If this is specified then log messages
    can be written to files called <tt>filename.</tt><i>nn</i> where <i>nn</i>
 is the number of the node, left padded with zeros, from which the message 
-is written. This only takes place if the \c VERBOSE flag is defined at 
-build-time. If its value is stderr or stdout that stream is used  instead.
-This is optional and defaults to \c  comlog.
+is written. If its value is \i stderr or \i stdout that stream is used instead.
+This is optional and defaults to \i stderr. Most messages are only logged if
+\c MPISCU_DEBUG is defined at build time.
 - \c {SEED=i} Defines an integer \c i to be used as the system-defined RNG 
 seed. This is optional and defaults to 1.
 - \c {SEEDFILE=filename}  Specifies a file containing 
@@ -198,8 +206,9 @@ seed. This is optional and defaults to 1.
 .
 I think the format is reasonably tolerant of whitespace.
 
-The values can be written to a file which is read at runtime, in which case
-the environment variable \c COMMS_DEF should be given the name of the file, 
+These values can be written in a file which is read at
+runtime, in which case the environment variable \c COMMS_DEF should be
+given the name of the file,  
 \e  e.g. 
 \verbatim
 export COMMS_DEF=mpi.par
@@ -217,8 +226,20 @@ Alternatively the same information could be supplied by defining
 export COMMS_DEF={GRID=2,4,4,4}{LOGFILE=foo}{SEED=1234}
 \endverbatim
 
-If the environment variable is not defined the code looks for a parameter file
-with the default name \c commsMPI.def.
+If COMMS_DEF is defined but not given a value, MPI-SCU
+looks for a parameter file with the default name \c commsMPI.def.
+
+If COMMS_DEF is not defined, then MPI-SCU expects the 
+the dimensions of the processor grid to have previously been
+communicated to it \i via the function  ::MPISCU_set_pe_grid.
+
+If MPI has not been started, then MPI-SCU starts MPI with a call to
+MPI_Init. However,  
+the CPS application or another library can safely start MPI before any
+SCU system calls are made. 
+
+The MPI-SCU initialisation function SCUCommsInit() will create a 
+cartesian communicator based on the information supplied.
 
 \subsection buildinput Build-time options
 

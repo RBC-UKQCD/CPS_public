@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the DoArg structure.
   
-  $Id: do_arg.h,v 1.7 2004-04-30 12:17:59 zs Exp $
+  $Id: do_arg.h,v 1.8 2004-06-02 09:36:38 zs Exp $
 */
 //--------------------------------------------------------------------
 /* CIM Sun Jul  6 23:30:27 GMT 1997 */
@@ -67,7 +67,6 @@ struct DoArg {
                           /*!< Used if ::start_seed_kind is ::START_SEED_INPUT
 			    or ::START_SEED_INPUT_UNIFORM. */  
 
-  int colors;       //!< Obsolete.
     
   Float beta;       //!< The pure gauge action "beta" parameter.
 
@@ -97,8 +96,6 @@ struct DoArg {
     //!< The exponent for the power rectangle term in the pure gauge action.
     
 
-    int verbose_level;           //!< Not used.
-    /*!<Retained for backward compatibility. */
     
   int exec_task_list; //!< Not used
 

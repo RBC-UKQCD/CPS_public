@@ -1,4 +1,4 @@
-///  \brief
+///  $Id: main.C,v 1.5 2004-06-02 09:36:42 zs Exp $
 ///  Demonstrate the random gauge transformation code.
 ///
 
@@ -14,7 +14,7 @@
  The gauge transformation code was orginally written
  by Chris Dawson (using existing code from the BNL group).
 
-$Id: main.C,v 1.4 2004-05-12 18:21:54 mcneile Exp $
+$Id: main.C,v 1.5 2004-06-02 09:36:42 zs Exp $
 */
 
 #include <config.h>
@@ -26,7 +26,7 @@ $Id: main.C,v 1.4 2004-05-12 18:21:54 mcneile Exp $
 #include <util/random.h>
 #include <alg/alg_plaq.h>
 #include <alg/do_arg.h>
-#include <alg/common_arg.h>
+//#include <alg/common_arg.h>
 //#include <alg/alg_smear.h>
 //#include <alg/alg_tcharge.h>
 #include <util/ReadLattice.h>
@@ -47,6 +47,11 @@ USING_NAMESPACE_CPS
 
 Float link_trace(Lattice& lattice)
 {
+#if TARGET==cpsMPI
+  using MPISCU::printf;
+  using MPISCU::fprintf;
+#endif
+    
   Float linktrace(0);
   int is;
   Matrix *m =  lattice.GaugeField(); 
@@ -71,7 +76,8 @@ const int nt = 4 ;
 
 int main(int argc,char *argv[])
 {
-  printf("Demonstrate random gauge transform code\n") ; 
+
+
   //  CommandLine::is(argc,argv);
   
   //  ReadLattice rl(CommandLine::arg());
@@ -81,6 +87,21 @@ int main(int argc,char *argv[])
   
   setup_do_arg(rl.do_arg) ; 
 
+#if TARGET==cpsMPI
+  MPISCU::set_pe_grid(rl.do_arg.x_nodes, rl.do_arg.y_nodes, rl.do_arg.z_nodes, rl.do_arg.t_nodes);
+  using MPISCU::printf;
+  using MPISCU::fprintf;
+#endif
+
+  printf("Demonstrate random gauge transform code\n") ;
+  printf("node_sites[x,y,z,t] = [%d,%d,%d,%d]  \n",
+	 rl.do_arg.x_node_sites  , rl.do_arg.y_node_sites , 
+	 rl.do_arg.z_node_sites  , rl.do_arg.t_node_sites );
+  printf("_nodes[x,y,z,t] = [%d,%d,%d,%d]\n",rl.do_arg.x_nodes,
+	 rl.do_arg.y_nodes,
+	 rl.do_arg.z_nodes,
+	 rl.do_arg.t_nodes) ; 
+  
   GJP.Initialize(rl.do_arg);
   
   GwilsonFnone    lattice;
@@ -125,7 +146,6 @@ int main(int argc,char *argv[])
 void setup_do_arg(DoArg& do_arg)
 {
 
-
 #ifdef PARALLEL
 #if 1
   do_arg.x_node_sites = nx/SizeX();
@@ -143,18 +163,15 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.y_nodes = SizeY();
   do_arg.z_nodes = SizeZ();
   do_arg.t_nodes = SizeT();
-  do_arg.s_nodes = 1;
 #else
   do_arg.x_node_sites = nx ;
   do_arg.y_node_sites = ny ;
   do_arg.z_node_sites = nz ;
   do_arg.t_node_sites = nt ;
-  do_arg.s_node_sites = 0;
   do_arg.x_nodes = 1;
   do_arg.y_nodes = 1;
   do_arg.z_nodes = 1;
   do_arg.t_nodes = 1;
-  do_arg.s_nodes = 1;
 #endif
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
@@ -163,15 +180,6 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.start_conf_kind = START_CONF_ORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
   do_arg.beta = 5.6;
-
-  printf("node_sites[x,y,z,t] = [%d,%d,%d,%d]  \n",
-	 do_arg.x_node_sites  , do_arg.y_node_sites , 
-	 do_arg.z_node_sites  , do_arg.t_node_sites );
-
-  printf("_nodes[x,y,z,t] = [%d,%d,%d,%d]\n",do_arg.x_nodes,
-	 do_arg.y_nodes,
-	 do_arg.z_nodes,
-	 do_arg.t_nodes) ; 
 
 }
 
