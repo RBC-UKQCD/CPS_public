@@ -54,7 +54,7 @@ void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
       tmp1[i] = (Matrix *) fmalloc(vol*sizeof(Matrix));
       tmp2[i] = (Matrix *) fmalloc(vol*sizeof(Matrix));
       //Set all bytes in tmp2
-      bzero(tmp2[i],vol*sizeof(Matrix));
+      bzero((char*)tmp2[i],vol*sizeof(Matrix));
     }
 
   //Holds the sum of staples associated with each lattice site

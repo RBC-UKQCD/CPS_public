@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Routines used by the AlgOverRelax class methods:
 
-  $Id: alg_overrelax_kern.C,v 1.2 2004-09-21 18:08:21 chulwoo Exp $
+  $Id: alg_overrelax_kern.C,v 1.3 2004-10-27 10:26:09 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-09-21 18:08:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_overrelax/noarch/alg_overrelax_kern.C,v 1.2 2004-09-21 18:08:21 chulwoo Exp $
-//  $Id: alg_overrelax_kern.C,v 1.2 2004-09-21 18:08:21 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-10-27 10:26:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_overrelax/noarch/alg_overrelax_kern.C,v 1.3 2004-10-27 10:26:09 mclark Exp $
+//  $Id: alg_overrelax_kern.C,v 1.3 2004-10-27 10:26:09 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_overrelax_kern.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_overrelax/noarch/alg_overrelax_kern.C,v $
 //  $State: Exp $
 //
@@ -67,8 +67,6 @@ void AlgOverRelax::kernel(  Float *sigma, Float *U)
   Float  old_action;
   Float  new_action;
   Float  accept_probability;
-  Float  die_roll;
-  
 
   
   // remember - you cannot use multi-hit here, it breaks detailed balance
@@ -91,9 +89,7 @@ void AlgOverRelax::kernel(  Float *sigma, Float *U)
   accept_probability = exp( old_action - new_action );
   
   
-  if(abs(LRG.Urand()) < accept_probability ) {
-   
-    
+  if(fabs(LRG.Urand()) < accept_probability ) {
     m_equal( U, u_sigma );
   }
 
