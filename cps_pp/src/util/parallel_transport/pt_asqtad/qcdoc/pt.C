@@ -1,23 +1,24 @@
 /*! \file
   \brief  Definition of ParTransAsqtad class methods for QCDOC.
   
-  $Id: pt.C,v 1.11 2004-08-05 19:00:56 mclark Exp $
+  $Id: pt.C,v 1.12 2004-08-09 07:47:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-08-05 19:00:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt.C,v 1.11 2004-08-05 19:00:56 mclark Exp $
-//  $Id: pt.C,v 1.11 2004-08-05 19:00:56 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-09 07:47:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt.C,v 1.12 2004-08-09 07:47:25 chulwoo Exp $
+//  $Id: pt.C,v 1.12 2004-08-09 07:47:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
+#if 0
 #include <config.h>
 #include <util/gjp.h>
 #include <util/pt.h>
@@ -764,3 +765,4 @@ void ParTransAsqtad::shift_link(Matrix **u, const int *dir, int n_dir){
 
 
 CPS_END_NAMESPACE
+#endif

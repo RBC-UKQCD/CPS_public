@@ -3,20 +3,20 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of ParTransStagTypes class constructor and destructor.
 
-  $Id: pt_stag_types.C,v 1.5 2004-08-09 07:47:26 chulwoo Exp $
+  $Id: pt_gauge.C,v 1.2 2004-08-09 07:47:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
 //  $Date: 2004-08-09 07:47:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_stag_types/pt_stag_types.C,v 1.5 2004-08-09 07:47:26 chulwoo Exp $
-//  $Id: pt_stag_types.C,v 1.5 2004-08-09 07:47:26 chulwoo Exp $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_gauge/pt_gauge.C,v 1.2 2004-08-09 07:47:26 chulwoo Exp $
+//  $Id: pt_gauge.C,v 1.2 2004-08-09 07:47:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $RCSfile: pt_stag_types.C,v $
-//  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_stag_types/pt_stag_types.C,v $
+//  $RCSfile: pt_gauge.C,v $
+//  $Revision: 1.2 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_gauge/pt_gauge.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -34,15 +34,15 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 static StrOrdType old_str_ord;
-ParTransStagTypes::ParTransStagTypes(Lattice & latt) :
+ParTransGauge::ParTransGauge(Lattice & latt) :
                                    ParTrans(latt)
 {
-  cname = "ParTransStagTypes";
-  char *fname = "ParTransStagTypes(Lattice&)";
+  cname = "ParTransGauge";
+  char *fname = "ParTransGauge(Lattice&)";
   VRB.Func(cname,fname);
-  old_str_ord = lat.StrOrd();
-  if (old_str_ord != STAG){
-    lat.Convert(STAG);
+  if (lat.StrOrd() != WILSON && lat.StrOrd() != CANONICAL ){
+    old_str_ord = lat.StrOrd();
+    lat.Convert(CANONICAL);
   }
   pt_init(lat);
   pt_init_g();
@@ -50,14 +50,14 @@ ParTransStagTypes::ParTransStagTypes(Lattice & latt) :
 
 
 //------------------------------------------------------------------
-ParTransStagTypes::~ParTransStagTypes() {
-  char *fname = "~ParTransStagTypes()";
+ParTransGauge::~ParTransGauge() {
+  char *fname = "~ParTransGauge()";
   VRB.Func(cname,fname);
-  if ( old_str_ord !=STAG){
-    lat.Convert(old_str_ord);
-  }
   pt_delete_g();
   pt_delete();
+  if (old_str_ord != WILSON && old_str_ord != CANONICAL ){
+    lat.Convert(old_str_ord);
+  }
 }
 
 CPS_END_NAMESPACE

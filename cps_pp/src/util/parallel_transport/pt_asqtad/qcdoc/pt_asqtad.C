@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief    Definition of ParTransAsqtad class methods for QCDOC.
 
-  $Id: pt_asqtad.C,v 1.6 2004-06-04 21:14:14 chulwoo Exp $
+  $Id: pt_asqtad.C,v 1.7 2004-08-09 07:47:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v 1.6 2004-06-04 21:14:14 chulwoo Exp $
-//  $Id: pt_asqtad.C,v 1.6 2004-06-04 21:14:14 chulwoo Exp $
+//  $Date: 2004-08-09 07:47:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v 1.7 2004-08-09 07:47:25 chulwoo Exp $
+//  $Id: pt_asqtad.C,v 1.7 2004-08-09 07:47:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_asqtad.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v $
 //  $State: Exp $
 //
@@ -59,15 +59,15 @@ ParTransAsqtad::ParTransAsqtad(Lattice & latt) :
   //----------------------------------------------------------------
   // Do the necessary conversions
   //----------------------------------------------------------------
-    lat.Convert(STAG);
+//    lat.Convert(STAG);
 
   //----------------------------------------------------------------
   // Set the node checkerboard size of the fermion field
   //----------------------------------------------------------------
   f_size_cb = GJP.VolNodeSites() * lat.FsiteSize() / 2;
 
-  pt_init(lat.GaugeField());
-  pt_init_g();
+//  pt_init(lat.StrOrd(),lat.GaugeField());
+//  pt_init_g();
 
 #if 0
   //----------------------------------------------------------------
@@ -93,8 +93,8 @@ ParTransAsqtad::~ParTransAsqtad() {
   //----------------------------------------------------------------
   // Free memory
   //----------------------------------------------------------------
-  pt_delete_g();
-  pt_delete();
+//  pt_delete_g();
+//  pt_delete();
 }
 
 CPS_END_NAMESPACE

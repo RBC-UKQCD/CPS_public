@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-15 22:23:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
-//  $Id: dwf_init.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
+//  $Date: 2004-08-09 07:47:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.5 2004-08-09 07:47:23 chulwoo Exp $
+//  $Id: dwf_init.C,v 1.5 2004-08-09 07:47:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_init.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v $
 //  $State: Exp $
 //
@@ -86,7 +86,8 @@ void dwf_init(Dwf *dwf_p)
 //------------------------------------------------------------------
   int f_size = 24 * GJP.VolNodeSites() * GJP.SnodeSites() / 2; 
 
-  dwf_p->frm_tmp1 = (IFloat *) smalloc(f_size*sizeof(IFloat));
+//  dwf_p->frm_tmp1 = (IFloat *) smalloc(f_size*sizeof(IFloat));
+  dwf_p->frm_tmp1 = (IFloat *) fmalloc(f_size*sizeof(IFloat));
   if(dwf_p->frm_tmp1 == 0)
     ERR.Pointer(cname,fname, "frm_tmp1");
   VRB.Smalloc(cname,fname,
@@ -94,7 +95,8 @@ void dwf_init(Dwf *dwf_p)
 
 //  for(int i=0;i<f_size;i++) (dwf_p->frm_tmp1)[i]=0.0;
 
-  dwf_p->frm_tmp2 = (IFloat *) smalloc(f_size*sizeof(IFloat));
+//  dwf_p->frm_tmp2 = (IFloat *) smalloc(f_size*sizeof(IFloat));
+  dwf_p->frm_tmp2 = (IFloat *) fmalloc(f_size*sizeof(IFloat));
   if(dwf_p->frm_tmp2 == 0)
     ERR.Pointer(cname,fname, "frm_tmp2");
   VRB.Smalloc(cname,fname,

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of ParTrans class methods.
   
-  $Id: pt_base.C,v 1.7 2004-08-05 19:00:56 mclark Exp $
+  $Id: pt_base.C,v 1.8 2004-08-09 07:47:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-08-05 19:00:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v 1.7 2004-08-05 19:00:56 mclark Exp $
-//  $Id: pt_base.C,v 1.7 2004-08-05 19:00:56 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-09 07:47:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v 1.8 2004-08-09 07:47:25 chulwoo Exp $
+//  $Id: pt_base.C,v 1.8 2004-08-09 07:47:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_base.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v $
 //  $State: Exp $
 //
@@ -126,6 +126,7 @@ ParTrans::ParTrans(Lattice & latt) :
   if(DiracOp::scope_lock ==0)
   BondCond(latt, gauge_field);
 
+//  lat.Convert(STAG);
 
 
   // Added in by Ping for anisotropic lattices

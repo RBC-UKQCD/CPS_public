@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.5 2004-07-02 14:13:43 chulwoo Exp $
+  $Id: random_asm.C,v 1.6 2004-08-09 07:47:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-02 14:13:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.5 2004-07-02 14:13:43 chulwoo Exp $
-//  $Id: random_asm.C,v 1.5 2004-07-02 14:13:43 chulwoo Exp $
+//  $Date: 2004-08-09 07:47:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.6 2004-08-09 07:47:26 chulwoo Exp $
+//  $Id: random_asm.C,v 1.6 2004-08-09 07:47:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -49,7 +49,7 @@ IFloat RandomGenerator::Rand(void)
     int mj = ma[inext] - ma[inextp] ;
     if ( mj < 0 ) mj += MBIG ;
     ma[inext] = mj ;
-//    printf("mj=%d\n",mj);
+//    printf("mj*FAC=%e\n",mj*FAC);
     return mj*FAC ;
 }
 

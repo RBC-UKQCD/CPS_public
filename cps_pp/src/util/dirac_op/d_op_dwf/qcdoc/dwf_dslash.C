@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-15 22:23:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
-//  $Id: dwf_dslash.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
+//  $Date: 2004-08-09 07:47:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash.C,v 1.5 2004-08-09 07:47:23 chulwoo Exp $
+//  $Id: dwf_dslash.C,v 1.5 2004-08-09 07:47:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash.C,v $
 //  $State: Exp $
 //
@@ -29,12 +29,14 @@ CPS_END_NAMESPACE
 #include<util/dwf.h>
 #include<util/gjp.h>
 #include<util/vector.h>
+#include<util/dirac_op.h>
+#include<util/time.h>
 #include<util/verbose.h>
 #include<util/error.h>
 #include<stdio.h>
 CPS_START_NAMESPACE
 
-
+#undef PROFILE
 void dwf_dslash(Vector *out, 
 		Matrix *gauge_field, 
 		Vector *in, 
@@ -46,12 +48,19 @@ void dwf_dslash(Vector *out,
 //------------------------------------------------------------------
 // Apply 4-dimensional Dslash
 //------------------------------------------------------------------
+#ifdef PROFILE
+  DiracOp::CGflops=0;
+  Float time = -dclock();
+#endif
+//  printf("out=%p gauge_field=%p in=%p\n",out,gauge_field,in);
   dwf_dslash_4(out, gauge_field, in, cb, dag, dwf_lib_arg);
-#if 0
-{IFloat *tmp = (IFloat *)out;
-printf("dwf_dslash_4:out[0]=%e\n",*tmp);}
+
+#ifdef PROFILE
+  time += dclock();
+  print_flops("","dwf_dslash_4()",DiracOp::CGflops,time);
 #endif
   int temp_size = 49152;
+
 
 
 //  printf("dslash : %e %e\n",out->NormSqNode(temp_size),in->NormSqNode(temp_size));
@@ -60,13 +69,17 @@ printf("dwf_dslash_4:out[0]=%e\n",*tmp);}
 //------------------------------------------------------------------
 // Apply 5th-direction Dslash
 //------------------------------------------------------------------
-  dwf_dslash_5_plus(out, in, mass, dag, dwf_lib_arg);
-#if 0
-{IFloat *tmp = (IFloat *)out;
-printf("dwf_dslash_5_plus:out[0]=%e\n",*tmp);}
+#ifdef PROFILE
+  time = -dclock();
+  DiracOp::CGflops=0;
 #endif
-//  printf("dslash 5 plus : %e %e\n",out->NormSqNode(temp_size),in->NormSqNode(temp_size));
+  dwf_dslash_5_plus(out, in, mass, dag, dwf_lib_arg);
 
+
+#ifdef PROFILE
+  time += dclock();
+  print_flops("","dwf_dslash_5_plus()",DiracOp::CGflops,time);
+#endif
 }
 
 CPS_END_NAMESPACE

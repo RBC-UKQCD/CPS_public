@@ -3092,7 +3092,7 @@ if test "$enable_target" = "qcdoc"; then
    CFLAGS="-Wall -Wa,-m405 -fno-exceptions -fno-hosted"
    CXXFLAGS="-Wall -Wa,-m405 -fno-exceptions -fno-hosted"
    ASFLAGS="-m405"
-   LDFLAGS="-Wa,\"-init _start\""
+   LDFLAGS=" -pg -Wa,\"-init _start\""
 
    ARCH="QCDOC"
    ARCHDIR="QCDOC_DIR"

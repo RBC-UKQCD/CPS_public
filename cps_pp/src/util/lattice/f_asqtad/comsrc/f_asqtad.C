@@ -28,6 +28,9 @@ CPS_END_NAMESPACE
 #include <util/dirac_op.h>
 #include <util/asqtad.h>
 #include <util/vector.h>
+#include <util/smalloc.h>
+#include <util/pt.h>
+#include <util/time.h>
 #include <util/gjp.h>
 CPS_START_NAMESPACE
 
@@ -42,6 +45,7 @@ void  set_pt (Fasqtad *lat);
 // Constructor
 //------------------------------------------------------------------
 Fasqtad::Fasqtad()
+	: Fsmear(3)
 {
   cname = "Fasqtad";
   char *fname = "Fasqtad()";
@@ -150,7 +154,7 @@ int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
       asqtad.Dslash(f_out_d[s],f_out[s],CHKB_EVEN,DAG_NO);
-  cg_arg->true_rsd = RsdCG[isz];
+  cg_arg->true_rsd - RsdCG[isz];
 
   return iter;
 
@@ -331,4 +335,280 @@ void Fasqtad::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
 
 }
 
+
+static int Rotate (int mu, int i){
+	int mu_p = (mu+i)%4;
+	if( mu >= 4)
+		mu_p += 4;
+//	printf("Rotate(%d, %d)=%d)\n",mu,i,mu_p);
+	return mu_p;
+}
+static int NotParallel( int mu, int nu){
+	int dif = mu-nu;
+	if (dif==0 ||dif==-4||dif==4)return 0;
+	else return 1;
+}
+
+#if TARGET != QCDOC
+  inline void vaxpy3_m(Matrix *res,Float *scale,Matrix *mult,Matrix
+*add, int ncvec){
+  fTimesV1PlusV2((IFloat *)res, (IFloat)*scale, (IFloat *)mult,
+    (IFloat *)add, ncvec*6);
+}
+#endif
+
+enum {NUM_DIR=8,POS_DIR=4};
+
+void Fasqtad::Smear(){
+  char *fname = "Smear()";
+  VRB.Func(cname,fname);
+  if (smeared) return;
+
+//--------------------------------------------------------------------
+// c1 -> one link; c2 -> 3-link; c3 -> 3-link staple; c5 -> 5-link staple;
+// c7 -> 7-link staple; c6 -> 5-link "straight" staple
+//--------------------------------------------------------------------
+
+  IFloat c1 = GJP.KS_coeff();
+  IFloat c2 = GJP.Naik_coeff();
+  IFloat c3 = GJP.staple3_coeff();
+  IFloat c5 = GJP.staple5_coeff();
+  IFloat c7 = GJP.staple7_coeff();
+  IFloat c6 = GJP.Lepage_coeff();
+
+  int i, j, N = 4;
+  int vol = GJP.VolNodeSites();
+  if (vol>1024) N=1;
+  ParTransAsqtad pt(*this);
+  Matrix *result[NUM_DIR];
+  Matrix *Unit;
+  Matrix *P3[N];
+  Matrix *P3mu[N];
+  Matrix *P5[N];
+  Matrix *P5mu[N];
+  Matrix *P7[N];
+  Matrix *P7mu[N];
+  Matrix *P6[N];
+  Matrix *P6mu[N];
+  Matrix *Pmumu[N];
+  Matrix *Pmumumu[N];
+VRB.Flow(cname,fname,"vol=%d\n",vol);
+  Unit = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    Pmumumu[i] = P7mu[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    Pmumu[i] = P7[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    P6mu[i] = P5mu[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    P6[i] = P5[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    P3mu[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    P3[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(j = 0;j<POS_DIR;j++){
+     result[j] = fields[0] + vol*j;
+//    result[j+POS_DIR] = fields[1] + vol*j;
+     VRB.Flow(cname,fname,"result[%d]=%p\n",j,result[j]);
+  }
+//     result[j] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+
+  for(j = 0;j<vol;j++) Unit[j] = c1;
+  for(j = 0;j<POS_DIR;j++)
+     for(int k = 0;k<vol;k++) (result[j]+k)->ZeroMatrix();
+  Float dtime = -dclock();
+  int nflops = 0;
+  ParTrans::PTflops=0;
+  int dir[] = {6,0,2,4,7,1,3,5},dirs[N]; //mapping between ParTrans and DiracOpAsqtad
+  Matrix *min[N],*mout[N];
+  if (NUM_DIR%N !=0) ERR.General(cname,fname,"NUM_DIR(%d)is not divisible by N(%d)\n",NUM_DIR,N);
+  for(int mu = 0;mu<POS_DIR;mu += N){
+	int mu_p,nu_p,rho_p,sigma_p;
+    for(i  = 0;i<N;i++){
+      mu_p = Rotate(mu,i);
+      min[i] = Unit;
+      mout[i] = result[mu_p];
+      dirs[i] = dir[mu_p];
+    }
+    pt.run(N,mout,min,dirs);
+    for(int nu = 0;nu<NUM_DIR;nu++)
+    if(NotParallel(mu,nu)){
+      for(i  = 0;i<N;i++){
+		nu_p = Rotate(nu,i);
+        min[i] = Unit;
+        mout[i] = P3[i];
+        dirs[i] = dir[nu_p];
+      }
+      pt.run(N,mout,min,dirs);
+      for(i  = 0;i<N;i++){
+		mu_p = Rotate(mu,i);
+        min[i] = P3[i];
+        mout[i] = P3mu[i];
+        dirs[i] = dir[mu_p];
+      }
+      pt.run(N,mout,min,dirs);
+      for(int rho = 0;rho<NUM_DIR;rho++)
+      if(NotParallel(mu,rho) && NotParallel(nu,rho)){
+        for(i  = 0;i<N;i++){
+  	   	  rho_p = Rotate(rho,i);
+          min[i] = P3[i];
+          mout[i] = P5[i];
+          dirs[i] = dir[rho_p];
+        }
+        pt.run(N,mout,min,dirs);
+        for(i  = 0;i<N;i++){
+	  	mu_p = Rotate(mu,i);
+          min[i] = P5[i];
+          mout[i] = P5mu[i];
+          dirs[i] = dir[mu_p];
+        }
+        pt.run(N,mout,min,dirs);
+        for(int sigma = 0;sigma<NUM_DIR;sigma++)
+        if(NotParallel(mu,sigma) && NotParallel(nu,sigma)&&NotParallel(rho,sigma)){
+          for(i  = 0;i<N;i++){
+    		sigma_p = Rotate(sigma,i);
+            min[i] = P5[i];
+            mout[i] = P7[i];
+            dirs[i] = dir[sigma_p];
+          }
+          pt.run(N,mout,min,dirs);
+          for(i  = 0;i<N;i++){
+    		mu_p = Rotate(mu,i);
+            min[i] = P7[i];
+            mout[i] = P7mu[i];
+            dirs[i] = dir[mu_p];
+          }
+          pt.run(N,mout,min,dirs);
+          for(i  = 0;i<N;i++){
+    		sigma_p = Rotate(sigma,i);
+            int sig_n = (sigma_p+4)%8;
+            min[i] = P7mu[i];
+            mout[i] = P7[i];
+            dirs[i] = dir[sig_n];
+          }
+          pt.run(N,mout,min,dirs);
+		  Float c75 = c7/c5;
+          for(i  = 0;i<N;i++)
+            vaxpy3_m(P5mu[i],&c75,P7[i],P5mu[i],vol*3);
+	  nflops +=vol*18*2*N;
+        }
+        for(i  = 0;i<N;i++){
+            rho_p = Rotate(rho,i);
+            int rho_n = (rho_p+4)%8;
+            min[i] = P5mu[i];
+            mout[i] = P5[i];
+            dirs[i] = dir[rho_n];
+        }
+        pt.run(N,mout,min,dirs);
+		Float c53 = c5/c3;
+        for(i  = 0;i<N;i++)
+          vaxpy3_m(P3mu[i],&c53,P5[i],P3mu[i],vol*3);
+		nflops +=vol*18*2*N;
+      }
+      for(i  = 0;i<N;i++){
+        nu_p = Rotate(nu,i);
+        min[i] = P3[i];
+        mout[i] = P6[i];
+        dirs[i] = dir[nu_p];
+      }
+      pt.run(N,mout,min,dirs);
+      for(i  = 0;i<N;i++){
+        mu_p = Rotate(mu,i);
+        min[i] = P6[i];
+        mout[i] = P6mu[i];
+        dirs[i] = dir[mu_p];
+      }
+      pt.run(N,mout,min,dirs);
+      for(i  = 0;i<N;i++){
+        nu_p = Rotate(nu,i);
+        int nu_n = (nu_p+4)%8;
+        min[i] = P6mu[i];
+        mout[i] = P6[i];
+        dirs[i] = dir[nu_n];
+      }
+      pt.run(N,mout,min,dirs);
+	  Float c63 = c6/c3;
+      for(i  = 0;i<N;i++)
+        vaxpy3_m(P3mu[i],&c63,P6[i],P3mu[i],vol*3);
+	  nflops +=vol*18*2*N;
+      for(i  = 0;i<N;i++){
+        nu_p = Rotate(nu,i);
+        int nu_n = (nu_p+4)%8;
+        min[i] = P3mu[i];
+        mout[i] = P3[i];
+        dirs[i] = dir[nu_n];
+      }
+      pt.run(N,mout,min,dirs);
+
+	  Float c31 = c3/c1;
+	  for(i  = 0;i<N;i++){
+	    mu_p =Rotate(mu,i);
+        vaxpy3_m(result[mu_p],&c31,P3[i],result[mu_p],vol*3);
+      }
+	  nflops +=vol*18*2*N;
+    }
+  }
+  
+  for(j = 0;j<POS_DIR;j++){
+     result[j] = fields[1] + vol*j;
+     result[j+POS_DIR] = fields[2] + vol*j;
+     VRB.Flow(cname,fname,"result[%d]=%p\n",j,result[j]);
+  }
+  N = 4;  
+  for(j = 0;j<vol;j++) Unit[j] = c2;
+  for(int mu = 0;mu<NUM_DIR;mu += N){
+    if (mu == 4) for(j = 0;j<vol;j++) Unit[j] = -c2;
+    int mu_p;
+    for(i  = 0;i<N;i++){
+      mu_p = Rotate(mu,i);
+      min[i] =  Unit;
+      mout[i] = result[mu_p];
+      dirs[i] = dir[mu_p];
+    }
+    pt.run(N,mout,min,dirs);
+//    pt.run(1,&(result[mu]),&Unit,&dir[mu]);
+    for(i  = 0;i<N;i++){
+      mu_p = Rotate(mu,i);
+      min[i] =  result[mu_p];
+      mout[i] = Pmumu[i];
+      dirs[i] = dir[mu_p];
+    }
+    pt.run(N,mout,min,dirs);
+//    pt.run(1,Pmumu,&result[mu],&dir[mu]);
+    for(i  = 0;i<N;i++){
+      mu_p = Rotate(mu,i);
+      min[i] = Pmumu[i];
+      mout[i] =  result[mu_p];
+      dirs[i] = dir[mu_p];
+    }
+    pt.run(N,mout,min,dirs);
+//    pt.run(1,&(result[mu]),Pmumu,&dir[mu]);
+  }
+  ffree( Unit);
+  for(j = 0;j<N;j++){
+    ffree( P3[j]);
+    ffree( P3mu[j]);
+    ffree( P5[j]);
+    ffree( P5mu[j]);
+    ffree( P7[j]);
+    ffree( P7mu[j]);
+  }
+  dtime +=dclock();
+  nflops += ParTrans::PTflops;
+  printf("%s:%s:",cname,fname);
+  print_flops(nflops,dtime);
+
+#if 0
+  printf("%s:%s:",cname,fname);
+  for(i = 0;i<3;i++){
+  for(j = 0;j<POS_DIR;j++){
+	IFloat *tmp = (IFloat *)(fields[i]+vol*j);
+  printf("%e ",*tmp);
+  }
+  printf("\n");
+  }
+#endif
+
+  smeared=1;
+}
 CPS_END_NAMESPACE

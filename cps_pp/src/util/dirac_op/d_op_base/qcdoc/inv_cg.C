@@ -10,14 +10,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-08-05 19:00:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.8 2004-08-05 19:00:56 mclark Exp $
-//  $Id: inv_cg.C,v 1.8 2004-08-05 19:00:56 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-09 07:47:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.9 2004-08-09 07:47:23 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.9 2004-08-09 07:47:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -44,8 +44,6 @@ CPS_START_NAMESPACE
 
 #define PROFILE
 
-// PAB generic Dop flops reporting
-//int DiracOp::CGflops;
 
 #ifdef PROFILE
 #include <time.h>
@@ -356,7 +354,7 @@ int DiracOp::InvCg(Vector *out,
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  report_flops(CGflops,&start,&end); 
+  print_flops(cname,fname,CGflops,&start,&end); 
 #endif
 
   // It has not reached stp_cnd: Issue a warning

@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-15 22:23:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
-//  $Id: dwf_dslash_5_plus.C,v 1.4 2004-07-15 22:23:05 chulwoo Exp $
+//  $Date: 2004-08-09 07:47:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v 1.5 2004-08-09 07:47:23 chulwoo Exp $
+//  $Id: dwf_dslash_5_plus.C,v 1.5 2004-08-09 07:47:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_5_plus.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v $
 //  $State: Exp $
 //
@@ -151,26 +151,8 @@ void dwf_dslash_5_plus(Vector *out,
 //  VRB.Func("DiracOpDwf","dwf_dslash_5_plus()");
   f_in  = (IFloat *) in;
 
-#if 0
-  SCUDirArgIR *PlusArg[2];
-  PlusArg[0] = new SCUDirArgIR;
-    PlusArg[0] ->Init ((f_in + (local_ls-1)*ls_stride),SCU_SP,SCU_SEND, ls_stride*sizeof(IFloat),1,0,IR_14);
-  PlusArg[1] = new SCUDirArgIR;
-    PlusArg[1]->Init(f_temp,SCU_SM,SCU_REC, ls_stride*sizeof(IFloat),1,0,IR_14);
-  SCUDirArgMulti Plus;
-    Plus.Init(PlusArg,2);
-
-  SCUDirArgIR *MinusArg[2];
-  MinusArg[0] = new SCUDirArgIR;
-    MinusArg[0] ->Init (f_in ,SCU_SM,SCU_SEND,ls_stride*sizeof(IFloat),1,0,IR_15);
-  MinusArg[1] = new SCUDirArgIR;
-    MinusArg[1]->Init(f_temp,SCU_SP,SCU_REC, ls_stride*sizeof(IFloat),1,0,IR_15);
-  SCUDirArgMulti Minus;
-    Minus.Init(MinusArg,2);
-#else
   (dwf_lib_arg->PlusArg[0])->Addr(f_in+(local_ls-1)*ls_stride);
   (dwf_lib_arg->MinusArg[0])->Addr(f_in);
-#endif
 
 // [1 + gamma_5] term (if dag=1 [1 - gamma_5] term)
 //
@@ -278,13 +260,6 @@ void dwf_dslash_5_plus(Vector *out,
   //  micros +=  (stop.tv_sec - start.tv_sec)*1.E6;
 
   //  printf("Dslash_5: %f mflops\n",flops/micros );
-#if 0
-  ffree(f_temp);
-  delete(PlusArg[0]);
-  delete(PlusArg[1]);
-  delete(MinusArg[0]);
-  delete(MinusArg[1]);
-#endif
 }
 
 

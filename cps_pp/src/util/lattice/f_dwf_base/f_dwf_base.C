@@ -31,6 +31,7 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/random.h>
 #include <util/error.h>
+#include <util/time.h>
 #include <comms/scu.h> // GRF
 #include <comms/glb.h>
 CPS_START_NAMESPACE
@@ -616,6 +617,7 @@ void FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
   return ;
 }
 
+#define PROFILE
 
 //------------------------------------------------------------------
 // EvolveMomFforce(Matrix *mom, Vector *chi, Float mass, 
@@ -627,7 +629,6 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 			   Float mass, Float step_size){
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
-
   Matrix *gauge = GaugeField() ;
 
   if (Colors() != 3)
@@ -690,6 +691,10 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
     DiracOpDwf dwf(*this, v1, v2, &cg_arg, CNV_FRM_YES) ;
     dwf.CalcHmdForceVecs(chi) ;
   }
+#ifdef PROFILE
+  Float time = -dclock();
+  ForceFlops=0;
+#endif
 
   int mu, x, y, z, t, s, lx, ly, lz, lt, ls ;
  
@@ -840,6 +845,11 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
     } } } } // end for x,y,z,t
   } // end for mu
+  ForceFlops += (2*9*16*ls + 18+ 198+36+24)*lx*ly*lz*lt*4;
+#ifdef PROFILE
+  time += dclock();
+  print_flops(cname,fname,ForceFlops,time);
+#endif
  
 //------------------------------------------------------------------
 // deallocate smalloc'd space

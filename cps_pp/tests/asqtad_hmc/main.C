@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.5 2004-06-04 21:14:16 chulwoo Exp $
+  $Id: main.C,v 1.6 2004-08-09 07:47:26 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -15,9 +15,9 @@
 #include <alg/do_arg.h>
 #include <util/random.h>
 
-const int nx = 4;
-const int ny = 4;
-const int nz = 4;
+const int nx = 8;
+const int ny = 8;
+const int nz = 8;
 const int nt = 4;
 
 CPS_START_NAMESPACE
@@ -61,6 +61,8 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
 
   VRB.Level(0);
+//  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
   char *cname = "asqtad_hmd_r";
   char *fname = "main";

@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 04:15:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_mdagm.C,v 1.4 2004-07-09 04:15:18 chulwoo Exp $
-//  $Id: dwf_mdagm.C,v 1.4 2004-07-09 04:15:18 chulwoo Exp $
+//  $Date: 2004-08-09 07:47:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_mdagm.C,v 1.5 2004-08-09 07:47:23 chulwoo Exp $
+//  $Id: dwf_mdagm.C,v 1.5 2004-08-09 07:47:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_mdagm.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_mdagm.C,v $
 //  $State: Exp $
 //
@@ -52,6 +52,7 @@ void dwf_mdagm(Vector *out,
 // Apply M frm_tmp1 <- in
 //------------------------------------------------------------------
 
+
   //  dwf_m(frm_tmp1, gauge_field, in, mass, dwf_lib_arg);
 
   //------------------------------------------------------------------
@@ -78,6 +79,7 @@ void dwf_mdagm(Vector *out,
     DiracOp::CGflops+=2*f_size;
 
   }
+
 
 //------------------------------------------------------------------
 // Apply M^dag out <- frm_tmp1

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgGheatBath class methods.
   
-  $Id: alg_ghb.C,v 1.7 2004-07-28 05:38:20 chulwoo Exp $
+  $Id: alg_ghb.C,v 1.8 2004-08-09 07:47:22 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-28 05:38:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.7 2004-07-28 05:38:20 chulwoo Exp $
-//  $Id: alg_ghb.C,v 1.7 2004-07-28 05:38:20 chulwoo Exp $
+//  $Date: 2004-08-09 07:47:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.8 2004-08-09 07:47:22 chulwoo Exp $
+//  $Id: alg_ghb.C,v 1.8 2004-08-09 07:47:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
 //  $State: Exp $
 //
@@ -168,7 +168,7 @@ void AlgGheatBath::run()
   //--------------------------------------------------
   relocate();
 
-  LRG.SetInterval(1,0);
+//  LRG.SetInterval(1,0);
 
   // Run the gauge heat bath
   //----------------------------------------------------------------

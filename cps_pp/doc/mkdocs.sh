@@ -1,4 +1,4 @@
-# $Id: mkdocs.sh,v 1.2 2003-07-30 16:31:11 zs Exp $
+# $Id: mkdocs.sh,v 1.3 2004-08-09 07:47:22 chulwoo Exp $
 # Runs doxygen to produce the reference manual and the user guide and 
 # installdox to get the cross-references right.
 
@@ -10,7 +10,7 @@
 # to be called from its own directory or its parent directory.
 
 
-if [ `basename $PWD` == 'doc' ]
+if [ `basename $PWD` = 'doc' ]
 then
     docdir=`pwd -P`
     topdir=`echo $docdir | sed -e 's:/doc$::'`

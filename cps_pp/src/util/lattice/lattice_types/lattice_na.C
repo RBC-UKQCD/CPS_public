@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GnoneFasqtad class.
 
-  $Id: lattice_na.C,v 1.3 2003-10-30 05:39:12 cwj Exp $
+  $Id: lattice_na.C,v 1.4 2004-08-09 07:47:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -18,6 +18,7 @@ CPS_START_NAMESPACE
 // No gauge action + asqtad staggered fermion action
 //------------------------------------------------------------------
 GnoneFasqtad::GnoneFasqtad()
+	: Gnone(),Fasqtad(),Fsmear(3)
 {
   cname = "GnoneFasqtad";
   char *fname = "GnoneFasqtad()";

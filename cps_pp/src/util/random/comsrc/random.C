@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.8 2004-07-15 22:42:58 chulwoo Exp $
+  $Id: random.C,v 1.9 2004-08-09 07:47:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-15 22:42:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.8 2004-07-15 22:42:58 chulwoo Exp $
-//  $Id: random.C,v 1.8 2004-07-15 22:42:58 chulwoo Exp $
+//  $Date: 2004-08-09 07:47:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.9 2004-08-09 07:47:26 chulwoo Exp $
+//  $Id: random.C,v 1.9 2004-08-09 07:47:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -44,12 +44,12 @@ CPS_START_NAMESPACE
   This method must be called before the RNG is used
   \param idum The seed.	
  */
-void RandomGenerator::Reset(int idum)
+void RandomGenerator::Reset(long long idum)
 {
     int i, k, ii;
-    int mk, mj;
+    long long mk, mj;
 
-    const int MSEED = 161803398;
+    const long long MSEED = 161803398;
     
     //-----------------------------------------------------
     //  Initialize ma[state_size] using the seed idum and the large
@@ -98,21 +98,21 @@ void RandomGenerator::Reset(int idum)
 //---------------------------------------------------------------
 
 /*!
-  \param to Pointer to a buffer of size at least 57*sizeof(int).
+  \param to Pointer to a buffer of size at least 57*sizeof(long long).
 */
 
-void RandomGenerator::StoreSeeds(unsigned *to) const
+void RandomGenerator::StoreSeeds(unsigned long long *to) const
 {
-    *to++ = (unsigned )inext;
-    *to++ = (unsigned )inextp;
+    *to++ = (unsigned long long)inext;
+    *to++ = (unsigned long long)inextp;
     for(int i = 0; i < 55; ++i) *to++ = ma[i];
 }
 
 /*!
-  \param from Pointer to a buffer of size at least 57*sizeof(int).
+  \param from Pointer to a buffer of size at least 57*sizeof(long long).
 */
 
-void RandomGenerator::RestoreSeeds(const unsigned *from)
+void RandomGenerator::RestoreSeeds(const unsigned long long *from)
 {
     inext = *from++;
     inextp = *from++;
@@ -460,7 +460,7 @@ int LatRanGen::StateSize() const{
 
   \param state The state to be copied from the RNG.
 */
-void LatRanGen::GetState(unsigned *state) const{
+void LatRanGen::GetState(unsigned long long *state) const{
 
     ugran[rgen_pos].StoreSeeds(state);        
     
@@ -471,7 +471,7 @@ void LatRanGen::GetState(unsigned *state) const{
   \pre \a s must be an array with length given by ::StateSize.
   \param s The state to assigned to the RNG on an assigned site.
 */
-void LatRanGen::SetState(const unsigned* s){
+void LatRanGen::SetState(const unsigned long long * s){
 
     ugran[rgen_pos].RestoreSeeds(s);
 
@@ -491,7 +491,7 @@ int LatRanGen::NStates() const{
   ::StateSize.
   \param s The state to assigned to the RNGs on the entire local lattice.
 */
-void LatRanGen::SetStates(unsigned **s){
+void LatRanGen::SetStates(unsigned long long **s){
 
     for(int h=0; h<n_rgen; h++) ugran[h].RestoreSeeds(s[h]);
 
@@ -503,7 +503,7 @@ void LatRanGen::SetStates(unsigned **s){
   ::StateSize.
   \param s The state to be copied from the RNGs on the entire local lattice. 
 */
-void LatRanGen::GetStates(unsigned **s) const{
+void LatRanGen::GetStates(unsigned long long **s) const{
 
     for(int h=0; h<n_rgen; h++) ugran[h].StoreSeeds(s[h]);
 

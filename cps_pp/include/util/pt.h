@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
+  $Id: pt.h,v 1.12 2004-08-09 07:47:22 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-08 05:05:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
-//  $Id: pt.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
+//  $Date: 2004-08-09 07:47:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.12 2004-08-09 07:47:22 chulwoo Exp $
+//  $Id: pt.h,v 1.12 2004-08-09 07:47:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -183,14 +183,21 @@ class ParTransAsqtad : public ParTransStagTypes
       where the sum is over n_vect vectors and the hop is in a forward direction.
     */
     void vvpd(Vector **vect, int n_vect,
-	      const int *dir, int n_dir, int hop, Matrix **sum);
+	      const int *dir, int n_dir, int hop, Matrix **sum){
+	pt_vvpd(vect,n_vect,dir,n_dir,hop,sum);
+     }
 
     //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
     void shift_field(Matrix **v, const int *dir, int n_dir,
-		     int hop, Matrix **u);
+		     int hop, Matrix **u){
+        pt_shift_field(v,dir,n_dir,hop,u);
+    }
+    
 
     //! u[-/+nu](x) = U_[-/+nu](x)
-    void shift_link(Matrix **u, const int *dir, int n_dir);
+    void shift_link(Matrix **u, const int *dir, int n_dir){
+        shift_link(u,dir,n_dir);
+    }
 
     ~ParTransAsqtad();
 

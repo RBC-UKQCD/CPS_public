@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprRect class.
 
-  $Id: g_impr_rect.C,v 1.3 2004-06-04 21:14:13 chulwoo Exp $
+  $Id: g_impr_rect.C,v 1.4 2004-08-09 07:47:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.3 2004-06-04 21:14:13 chulwoo Exp $
-//  $Id: g_impr_rect.C,v 1.3 2004-06-04 21:14:13 chulwoo Exp $
+//  $Date: 2004-08-09 07:47:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.4 2004-08-09 07:47:24 chulwoo Exp $
+//  $Id: g_impr_rect.C,v 1.4 2004-08-09 07:47:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v $
 //  $State: Exp $
 //
@@ -28,6 +28,7 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/gjp.h>
 #include <util/gw_hb.h>
+#include <util/time.h>
 #include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/cbuf.h>
@@ -129,6 +130,7 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
   //     mp1 = staple
   //----------------------------------------------------------------------------
   Staple(*mp1, x, mu);	
+  ForceFlops += 198*3*3+12+216*3;
 
   //----------------------------------------------------------------------------
   // mp2 = U_mu(x)
@@ -149,6 +151,7 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
   //     mp1 = rect_stap
   //----------------------------------------------------------------------------
   RectStaple(*mp1, x, mu) ;
+  ForceFlops += 198*3*18+216*3*6;
 
   //----------------------------------------------------------------------------
   // mp2 = -(beta*c_1/3)*U_mu(x)
@@ -158,6 +161,7 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
 
   tmp = rect_coeff ;
   vecTimesEquFloat((IFloat *)mp2, tmp, MATRIX_SIZE) ;
+  ForceFlops +=234;
 
   //----------------------------------------------------------------------------
   // force += -(beta*c_1/3)*U_mu(x)*rect_stap
@@ -166,9 +170,10 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
 
   mp1->Dagger((IFloat *)&force);
   force.TrLessAntiHermMatrix(*mp1);
+  ForceFlops +=198+24;
 }
 
-
+#define PROFILE
 //------------------------------------------------------------------------------
 // EvolveMomGforce(Matrix *mom, Float step_size):
 // It evolves the canonical momentum mom by step_size
@@ -177,6 +182,10 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
 void GimprRect::EvolveMomGforce(Matrix *mom, Float step_size){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
+#ifdef PROFILE
+  Float time = -dclock();
+  ForceFlops = 0;
+#endif
   
   setCbufCntrlReg(4, CBUF_MODE4);
 
@@ -197,6 +206,11 @@ void GimprRect::EvolveMomGforce(Matrix *mom, Float step_size){
       fTimesV1PlusV2(ihp, step_size, dotp, ihp+BANK4_BASE, 18);
     }
   }
+  ForceFlops +=GJP.VolNodeSites()*4*18*2;
+#ifdef PROFILE
+  time += dclock();
+  print_flops(cname,fname,ForceFlops,time);
+#endif
 }
 
 

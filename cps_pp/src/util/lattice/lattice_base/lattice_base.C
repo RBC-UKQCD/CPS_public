@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.14 2004-08-05 19:00:28 mclark Exp $
+  $Id: lattice_base.C,v 1.15 2004-08-09 07:47:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-08-05 19:00:28 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.14 2004-08-05 19:00:28 mclark Exp $
-//  $Id: lattice_base.C,v 1.14 2004-08-05 19:00:28 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-09 07:47:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.15 2004-08-09 07:47:24 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.15 2004-08-09 07:47:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -148,6 +148,7 @@ Lattice::Lattice()
     // Allocate memory for the gauge field.
     //--------------------------------------------------------------
     array_size = GsiteSize() * GJP.VolNodeSites() * sizeof(Float);  
+    printf("array_size=%x\n",array_size);
     if(start_conf_kind != START_CONF_LOAD &&
        start_conf_kind!=START_CONF_FILE){
       gauge_field = (Matrix *) pmalloc(array_size);
@@ -430,9 +431,6 @@ Lattice::GetLink(const int *site, int dir) const
 {
 char *fname = "GetLink()";
 //VRB.Func(cname,fname);
-
-VRB.Flow(cname, fname, "link %3i %3i %3i %3i ; %i\n",
-  site[0], site[1], site[2], site[3], dir) ;
 
   // offset out-of-range coordinates site[] into on_node_site[]
   // in order to locate the link
@@ -1749,6 +1747,7 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
     mDotMEqual((IFloat *)(curU_p+i),(const IFloat *)mp3,
 	       (const IFloat *)mp2);
   }
+  smeared = 0;
 }
 
 

@@ -14,10 +14,22 @@ Float print_flops(int nflops, struct timeval *start, struct timeval *end){
 	int usec = end->tv_usec - start->tv_usec; 
 	Float time = sec + 1.e-6*usec;
 	printf("%e flops /%e seconds = %e MFlops\n",(Float)nflops,time,(Float)nflops/(time*1.e6));
+	return nflops/time;
+}
+
+Float print_flops(char *cname, char *fname, int nflops, struct timeval *start, struct timeval *end){
+	printf("%s:%s: ",cname,fname);
+	return print_flops(nflops,start,end);
 }
 
 Float print_flops(int nflops, Float time){
 	printf("%e flops /%e seconds = %e MFlops\n",(Float)nflops,time,(Float)nflops/(time*1.e6));
+	return nflops/time;
+}
+
+Float print_flops(char *cname, char *fname, int nflops, Float time){
+	printf("%s:%s: ",cname,fname);
+	return print_flops(nflops,time);
 }
 
 CPS_END_NAMESPACE
