@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v 1.7 2004-08-18 11:57:40 zs Exp $
-//  $Id: w_axialcurr.C,v 1.7 2004-08-18 11:57:40 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-11-30 22:56:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v 1.8 2004-11-30 22:56:02 chulwoo Exp $
+//  $Id: w_axialcurr.C,v 1.8 2004-11-30 22:56:02 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_axialcurr.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v $
 //  $State: Exp $
 //
@@ -45,14 +45,14 @@ char *      WspectAxialCurrent::d_class_name = "WspectAxialCurrent";
 WspectAxialCurrent::WspectAxialCurrent(Lattice &     lat, 
 				       const WspectHyperRectangle & whr,
 				       char * ap_corr_outfile )
-  :  d_lat(lat), d_whr(whr)
+  :  d_lat(lat), d_whr(whr), ap_filename(ap_corr_outfile)
 {
 
   VRB.Func(d_class_name, ctor_str);
+//    ap_filename = ap_corr_outfile;
 
   if (lat.Fclass() == F_CLASS_DWF && ap_corr_outfile != 0) {
     
-    ap_filename = ap_corr_outfile;
 
     // Initiate total Ls, propagation direction and its length, ...
     //-----------------------------------------------------------------------
@@ -153,11 +153,12 @@ WspectAxialCurrent::WspectAxialCurrent(Lattice &     lat,
       VRB.Smalloc(d_class_name, ctor_str, "v1_g5", v1_g5,
 		  SPINORs * sizeof(Float)) ;
       
-      v1_next_g5 = (Float *)smalloc(SPINORs * sizeof(Float));
+      v1_next_g5 = (Float *)smalloc(d_class_name, ctor_str,
+	"v1_next_g5", SPINORs * sizeof(Float));
       if (v1_next_g5 == 0)
 	ERR.Pointer(d_class_name, ctor_str, "v1_next_g5") ;
-      VRB.Smalloc(d_class_name, ctor_str, "v1_next_g5", v1_next_g5,
-		  SPINORs * sizeof(Float)) ;
+//      VRB.Smalloc(d_class_name, ctor_str, "v1_next_g5", v1_next_g5,
+//		  SPINORs * sizeof(Float)) ;
       
     }
 
@@ -190,8 +191,8 @@ WspectAxialCurrent::~WspectAxialCurrent()
 
   if (d_lat.Fclass() == F_CLASS_DWF && ap_filename != 0) {
 
-    VRB.Sfree(d_class_name, dtor_str, empty_str, v1_next_g5);
-    sfree(v1_next_g5);
+    sfree(d_class_name, dtor_str, "v1_next_g5", v1_next_g5);
+//    sfree(v1_next_g5);
     
     VRB.Func(d_class_name, dtor_str);
     VRB.Sfree(d_class_name, dtor_str, empty_str, v1_g5);
