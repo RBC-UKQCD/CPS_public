@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.13 2004-12-07 06:11:59 chulwoo Exp $
+  $Id: pt.C,v 1.14 2004-12-22 08:39:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-07 06:11:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.13 2004-12-07 06:11:59 chulwoo Exp $
-//  $Id: pt.C,v 1.13 2004-12-07 06:11:59 chulwoo Exp $
+//  $Date: 2004-12-22 08:39:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.14 2004-12-22 08:39:18 chulwoo Exp $
+//  $Id: pt.C,v 1.14 2004-12-22 08:39:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -810,15 +810,15 @@ void pt_init(Lattice &lat)
       //i indicates the communication direction
       int nl_size = (j+1)*non_local_chi[i];
       int l_size = vol - nl_size;
-      
-      hp_l[j][i] = (hop_pointer*) smalloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
+      if (l_size>0){
+        hp_l[j][i] = (hop_pointer*) smalloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
+        src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
+        dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
+      }
 
       hp_nl[j][i] = (hop_pointer*) smalloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
-
-      src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
-      dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
-      src_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
       dest_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
+      src_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
     }
   }
   
@@ -829,6 +829,7 @@ void pt_init(Lattice &lat)
     for(i=0; i<2*NDIM; i++){
       int nl_size = (j+1)*non_local_chi[i]+1;
       int l_size = vol - nl_size+2;
+      if (l_size>2)
       for (int s=0; s<l_size; s++) {
 	src_l[j][i][s] = hp_l[j][i][s].src/(VECT_LEN*sizeof(IFloat));
 	dest_l[j][i][s] = hp_l[j][i][s].dest/(VECT_LEN2*sizeof(IFloat));

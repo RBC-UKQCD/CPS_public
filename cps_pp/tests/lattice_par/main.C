@@ -185,7 +185,7 @@ int main(int argc, char ** argv) {
   }
   else {
     do_arg.start_conf_load_addr =
-      (Matrix*)smalloc(do_arg.x_node_sites * do_arg.y_node_sites *
+      (unsigned long)smalloc(do_arg.x_node_sites * do_arg.y_node_sites *
 		       do_arg.z_node_sites * do_arg.t_node_sites * 
 		       4 * sizeof(Matrix));
 #if 1
@@ -233,7 +233,7 @@ int main(int argc, char ** argv) {
     WriteLatticeParallel(lat,write_file_name,FP_IEEE32BIG,1);
 #endif
 
-    sfree(do_arg.start_conf_load_addr);
+    sfree((Matrix *)do_arg.start_conf_load_addr);
   }
 
 

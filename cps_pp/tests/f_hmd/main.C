@@ -4,13 +4,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-16 08:07:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.23 2004-12-16 08:07:27 chulwoo Exp $
-//  $Id: main.C,v 1.23 2004-12-16 08:07:27 chulwoo Exp $
+//  $Date: 2004-12-22 08:34:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.24 2004-12-22 08:34:47 chulwoo Exp $
+//  $Id: main.C,v 1.24 2004-12-22 08:34:47 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -51,7 +51,7 @@ int main(int argc,char *argv[])
   DoArg do_arg;
 
   if (LOAD_DOARG){
-    do_arg.Decode("do_arg.in", (char *)&do_arg);
+    do_arg.Decode("do_arg.in", "do_arg");
   } else {
     if (argc<6) {printf("usage: %s nx ny nz nt ns\n",argv[0]);exit(-2);}
     sscanf(argv[1],"%d",&nx);
@@ -88,7 +88,7 @@ int main(int argc,char *argv[])
   }
 
   if(SAVE_DOARG)
-  do_arg.Encode("do_arg.out", (char *)&do_arg);
+  do_arg.Encode("do_arg.out", "do_arg");
 
 #if TARGET==cpsMPI
     MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);    

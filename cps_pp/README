@@ -1,5 +1,9 @@
 Welcome to the Columbia Physics System 
 
+**********************************************************
+PLEASE CHECK the entries bracked with "CHANGES in v4_8_11"
+**********************************************************
+
 	0. Preliminaries
 
 The CPS consists of code to build a library which is can be statically
@@ -23,8 +27,8 @@ The source and build directories can be identical.
 
 ************ CHANGES in v4_8_11
 (De)serialization of input structures to files are available vil VML.
-Currently, CgArg, DoArg, WspectArg are processed via VML. Refer to 
-tests/f_hmd/main.C for usage example.
+Currently, CgArg, DoArg, WspectArg,WspecOutput are processed via VML. Refer to 
+tests/f_hmd/main.C for usage example. Also, refer to section 2.
 ************ CHANGES in v4_8_11 (end)
 
 	1. Configuring.
@@ -113,12 +117,14 @@ Note that GNU make is needed. Having configured the system, the
 library is built by simply running GNU make: 
 
 ************ CHANGES in v4_8_11
-$ gmake headers
+($ gmake vml)
 $ gmake
 
-'gmake headers' is needed to generate headers for input structures via VML.
-If you have multiple targets with different precision for (I)Floats, you need to
-run 'gmake headers' each time you switch targets. Otherwise, 'gmake headers' is needed only once.
+'gmake vml' is needed to generate headers for input structures via VML.
+Results of it with both (I)Floats as double are included in the source
+tree. If you want different precision for (I)Floats or made changes in
+the VML-processed classes (DoArg, CgArg, WspectArg, WspectOutput), you need to
+run 'gmake vml' each time you switch targets. Otherwise, 'gmake vml' is needed only once.
 ************ CHANGES in v4_8_11 (end)
 
 This produces  directory tree called objs containing all the object

@@ -1,7 +1,7 @@
 /*!\file
   Staggered Dirac operator for QCDOC
 
-  $Id: dirac.C,v 1.11 2004-08-18 11:57:51 zs Exp $
+  $Id: dirac.C,v 1.12 2004-12-22 08:39:17 chulwoo Exp $
 */
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian
@@ -1035,7 +1035,8 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
     dirac_sum_acc( vol/2, (long)chi[odd], (long)tmpfrm, (long)b);
   }
 
-//  restore_reg((long)intreg, (long)dreg);
+  DiracOp::CGflops += 285*vol;
+
 
 }
 

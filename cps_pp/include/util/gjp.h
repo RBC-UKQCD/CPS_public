@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.16 2004-12-21 19:45:14 chulwoo Exp $
+  $Id: gjp.h,v 1.17 2004-12-22 08:39:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-21 19:45:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.16 2004-12-21 19:45:14 chulwoo Exp $
-//  $Id: gjp.h,v 1.16 2004-12-21 19:45:14 chulwoo Exp $
+//  $Date: 2004-12-22 08:39:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.17 2004-12-22 08:39:17 chulwoo Exp $
+//  $Id: gjp.h,v 1.17 2004-12-22 08:39:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -798,7 +798,9 @@ public:
     @{ */
 
   //!  Initializes all global variables
+  void Initialize(char *filename);
   void Initialize(const DoArg& do_arg);
+  void Initialize();
 
   void SnodeSites(int sites)
       {node_sites[4] = sites;}

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
+  $Id: gjp.C,v 1.25 2004-12-22 08:39:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-21 19:45:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
-//  $Id: gjp.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
+//  $Date: 2004-12-22 08:39:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.25 2004-12-22 08:39:18 chulwoo Exp $
+//  $Id: gjp.C,v 1.25 2004-12-22 08:39:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.24 $
+//  $Revision: 1.25 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -116,21 +116,23 @@ GlobalJobParameter::~GlobalJobParameter() {
   checks to make sure the values are suitable.
   \param rda Structure containing the initial values of the global variables
 */
+
+void GlobalJobParameter::Initialize(char *filename) {
+  doarg_int.Decode(filename,"doarg_int");
+  Initialize();
+}
+
 void GlobalJobParameter::Initialize(const DoArg& rda) {
+  doarg_int = rda;
+  Initialize();
+}
+
+void GlobalJobParameter::Initialize() {
   char *fname = "Initialize()";
   VRB.Func(cname,fname);
   int i, j;
   char *dim_name[5] = {"X","Y","Z","T","S"};
 
-  doarg_int = rda;
-
-  // Set the number of sites of a single node
-  //----------------------------------------------------------------
-  node_sites[0] = doarg_int.x_node_sites;
-  node_sites[1] = doarg_int.y_node_sites;
-  node_sites[2] = doarg_int.z_node_sites;
-  node_sites[3] = doarg_int.t_node_sites;
-  node_sites[4] = doarg_int.s_node_sites;
 
   // Set the number of nodes
   //----------------------------------------------------------------
@@ -139,12 +141,15 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   nodes[2] = doarg_int.z_nodes;
   nodes[3] = doarg_int.t_nodes;
   nodes[4] = doarg_int.s_nodes;
-  if (nodes[4] == 0) nodes[4] = 1;
 
-  for(i = 0; i<4 ; i++)
-  if (node_sites[i]<=0 ||node_sites[i]%2!=0)
-      ERR.General(cname,fname,
-	"Bad value %d for %s_node_sites; must be divisible by 2\n", node_sites[i], dim_name[i]);
+  if( nodes[0]==0 && nodes[1]==0 && nodes[2]==0 && nodes[3]==0 && nodes[4] == 0 )
+  {
+    nodes[0] = SizeX();
+    nodes[1] = SizeY();
+    nodes[2] = SizeZ();
+    nodes[3] = SizeT();
+    nodes[4] = SizeS();
+  }
 
   // Check that the number of nodes divides the machine into
   // same size partitions.
@@ -166,14 +171,27 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
 		  dim_name[i], size[i], nodes[i] );
   
 
+  // Set the number of sites of a single node
+  //----------------------------------------------------------------
+  node_sites[0] = doarg_int.x_node_sites;
+  node_sites[1] = doarg_int.y_node_sites;
+  node_sites[2] = doarg_int.z_node_sites;
+  node_sites[3] = doarg_int.t_node_sites;
+  node_sites[4] = doarg_int.s_node_sites;
+
   if( node_sites[0]==0 && node_sites[1]==0 && node_sites[2]==0 && node_sites[3]==0 && node_sites[4] == 0 )
     {
-      node_sites[0] = rda.x_sites/nodes[0];
-      node_sites[1] = rda.y_sites/nodes[1];
-      node_sites[2] = rda.z_sites/nodes[2];
-      node_sites[3] = rda.t_sites/nodes[3];
-      node_sites[4] = rda.s_sites/nodes[4];
+      node_sites[0] = doarg_int.x_sites/nodes[0];
+      node_sites[1] = doarg_int.y_sites/nodes[1];
+      node_sites[2] = doarg_int.z_sites/nodes[2];
+      node_sites[3] = doarg_int.t_sites/nodes[3];
+      node_sites[4] = doarg_int.s_sites/nodes[4];
     }
+
+  for(i = 0; i<4 ; i++)
+  if (node_sites[i]<=0 ||node_sites[i]%2!=0)
+      ERR.General(cname,fname,
+	"Bad value %d for %s_node_sites; must be divisible by 2\n", node_sites[i], dim_name[i]);
 
   // Set the volume values
   //----------------------------------------------------------------
@@ -255,7 +273,7 @@ nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
   StartConfType conf_kind = doarg_int.start_conf_kind;
    if(conf_kind != START_CONF_MEM && 
       conf_kind != START_CONF_LOAD )
-      conf_kind != START_CONF_FILE)
+//      conf_kind != START_CONF_FILE)
    doarg_int.start_conf_load_addr = 0;
 
 #if 0
@@ -285,7 +303,7 @@ nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
   // anisotropic implementations]. 
   //----------------------------------------------------------------
   if (fabs(doarg_int.xi_bare - 1.0)> SMALL ) {
-    doarg_int.clover_coeff_xi = rda.clover_coeff_xi;
+//    doarg_int.clover_coeff_xi = rda.clover_coeff_xi;
     doarg_int.beta /= doarg_int.xi_bare;    
     doarg_int.xi_gfix *= doarg_int.xi_bare;
   } else {

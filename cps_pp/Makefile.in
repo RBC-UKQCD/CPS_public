@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.23 2004-12-21 19:02:35 chulwoo Exp $
+# $Id: Makefile.in,v 1.24 2004-12-22 08:39:16 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -33,7 +33,7 @@ recurse:
 	cp -p $(SRCDIR)/src/Makefile $(BUILDDIR)/objs
 	$(MAKE) -C $(BUILDDIR)/objs $(filter-out test, $(MAKECMDGOALS))
 
-headers:
+vml:
 	-cp $(BUILDDIR)/include/input/Makefile ${SRCDIR}/include/input
 	$(MAKE) -C $(SRCDIR)/include/input
 
@@ -62,6 +62,7 @@ copy_testdir: $(TESTSUBDIRS) $(HDW_TESTSUBDIRS)
 $(TESTSUBDIRS):
 	$(if $(builddir_isnt_srcdir), mkdir -p $(TESTDIR)/$@)
 	-cp -p $(SRCDIR)/$(TESTDIR)/$@/Makefile_regression  $(TESTDIR)/$@
+	-cp -p $(SRCDIR)/$(TESTDIR)/$@/*.in  $(TESTDIR)/$@
 
 $(HDW_TESTSUBDIRS):
 	$(if $(builddir_isnt_srcdir), mkdir -p $(HDW_TESTDIR)/$@)
