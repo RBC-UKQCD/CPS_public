@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.12 2004-09-17 18:11:21 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.13 2004-09-21 18:11:15 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -1407,8 +1407,8 @@ void asqtad_dirac_init_g()
   int local_count_3[2];
 int non_local_count_3[3][2];
   int x[NUM_DIR/2];
-  char *cname = "DiracOpStag";
-  char *fname = "dirac_init_g()";
+  char *cname = "";
+  char *fname = "asqtad_dirac_init_g()";
 
   //--------------------------------------------------------------------
   // c1 -> one link; c2 -> 3-link; c3 -> 3-link staple; c5 -> 5-link staple;
@@ -2365,19 +2365,22 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
 
 #endif // SIMUL_AGG
 
+  VRB.FuncEnd(cname,fname);
 }
 
 extern "C"
 void asqtad_destroy_dirac_buf_g(void)
 {
   int i;
+  char *fname = "asqtad_destroy_dirac_buf_g()";
+  VRB.Func("",fname);
   for ( i = 0; i < 2; i++){
     sfree(uc_l[i]);
     sfree(uc_nl[i]);
     sfree(uc_l_agg[i]);
     sfree(uc_nl_agg[i]);
   }
-
+  VRB.FuncEnd("",fname);
 }
 //---------------------------------------------------------------------
 //  Find nearest neighbor coordinate for coordinates given.  Nearest
@@ -2527,7 +2530,7 @@ void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   //  Transfer chi's on faces.  
   //-----------------------------------------------------------------
 
-
+#if 0
   copy_buffer_cpp(countM[0][a_odd], (long)a, (long)Tbuffer[0][0], (long)ToffsetM[0][a_odd]);
   copy_buffer_cpp(countP[0][a_odd], (long)a, (long)Tbuffer[0][1], (long)ToffsetP[0][a_odd]);
   if(size[0]>2) {
@@ -2538,6 +2541,7 @@ void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   copy_buffer_cpp(countP[2][a_odd], (long)a, (long)Tbuffer[2][1], (long)ToffsetP[2][a_odd]);
   }
   }
+#endif
 
   //make sure spinor field is in main memory before starting transfers
 

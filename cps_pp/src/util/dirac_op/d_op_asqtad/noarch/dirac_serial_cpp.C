@@ -1,8 +1,11 @@
 /*!----------------------------------------------------------------------
-  $Id: dirac_serial_cpp.C,v 1.4 2004-08-18 11:57:48 zs Exp $
+  $Id: dirac_serial_cpp.C,v 1.5 2004-09-21 18:11:16 chulwoo Exp $
 
 ----------------------------------------------------------------------*/
 
+
+#include <config.h>
+#include <stdio.h>
 #include <util/data_types.h>
 
 CPS_START_NAMESPACE
@@ -315,7 +318,7 @@ void copy_buffer_cpp(int n, long src, long dest, long ptable){
   IFloat *fp1,*fp0;
   int * chi = (int *)ptable;
   for(i=0;i<n;i++){
-    fp1 = (IFloat *) (src + chi[i]);
+    fp1 = (IFloat *) (src + chi[i]*sizeof(IFloat));
     fp0 = (IFloat *) (dest + i*6*sizeof(IFloat));
     for(j=0;j<6;j++)
       *(fp0+j) = *(fp1+j);
