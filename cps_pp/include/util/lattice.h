@@ -733,7 +733,7 @@ class Lattice
     int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm,
 		    Vector **f_out_d)
-      {	Float *alpha; return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
+      {	Float *alpha = 0; return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
 					 MULTI,alpha, f_out_d);}
 
     int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 

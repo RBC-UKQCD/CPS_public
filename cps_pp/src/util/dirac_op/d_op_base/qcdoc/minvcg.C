@@ -20,7 +20,6 @@ CPS_END_NAMESPACE
 #include <math.h>
 #include <util/time.h>
 #include <util/enum.h>
-#include <alg/bigfloat.h>
 CPS_START_NAMESPACE
 
 extern "C" { 
@@ -125,7 +124,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   }
   Float css, ztmp;
   
-  Float c, cs, cp, d;
+  Float c, cp, d;
   
   Float *rsd_sq = (Float*)qalloc(QCOMMS|QFAST,Nmass*sizeof(Float)); 
   if(rsd_sq == 0) rsd_sq = (Float*)qalloc(QCOMMS,Nmass*sizeof(Float)); 

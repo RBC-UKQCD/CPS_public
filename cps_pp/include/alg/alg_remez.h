@@ -1,21 +1,16 @@
-#include<config.h>
-
-#ifdef GMP
-
-CPS_START_NAMESPACE
-
 #ifndef INCLUDED_ALG_REMEZ_H
 #define INCLUDED_ALG_REMEZ_H
 
-CPS_END_NAMESPACE
+#include<config.h>
+
+#ifdef GMP        // If GMP is defined 
+
 #include <util/lattice.h>
 #include <util/smalloc.h>
 #include <util/pmalloc.h>
 #include <alg/common_arg.h>
 #include <alg/bigfloat.h>
 CPS_START_NAMESPACE
-
-
 //------------------------------------------------------------------
 //
 // alg_remez.h
@@ -129,19 +124,15 @@ class AlgRemez
   int getIPFE(Float *res, Float *pole, Float *norm);
 
 };
-
-#endif
-
 CPS_END_NAMESPACE
 
-#else
+#else             // If not defined GMP
+
 
 #include <util/error.h>
 #include <util/data_types.h>
 CPS_START_NAMESPACE
 
-#ifndef INCLUDED_ALG_REMEZ_H
-#define INCLUDED_ALG_REMEZ_H
 
 // Dummy class for case when gmp is not present
 
@@ -165,9 +156,11 @@ class AlgRemez
   int getIPFE(Float *res, Float *pole, Float *norm) {return 0;}
 
 };
-
-#endif
-
 CPS_END_NAMESPACE
 
-#endif
+#endif  // Ifdef GMP
+
+#endif  // Include guard
+
+
+

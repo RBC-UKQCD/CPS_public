@@ -506,7 +506,7 @@ int AlgRemez::simq(bigfloat A[], bigfloat B[], bigfloat X[], int n) {
   int k, kp, kp1, kpk, kpn;
   int nip, nkp, nm1;
   bigfloat em, q, rownrm, big, size, pivot, sum;
-  bigfloat *aa, *bb;
+  bigfloat *aa;
 
   int *IPS = (int*)smalloc((neq) * sizeof(int));		// simq() work vector
   if(IPS == 0) ERR.Pointer(cname,fname,"IPS");
