@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_ferm_vec.C,v 1.7 2004-08-18 11:57:40 zs Exp $
+  $Id: w_ferm_vec.C,v 1.8 2004-09-04 07:22:29 chulwoo Exp $
 */
 
 #include<config.h>
@@ -172,7 +172,7 @@ void FermionVector::printWaveFunc(char *file) const{
 #ifdef _TARTAN
 	  radius=(sqrt(glb[0]*glb[0]+glb[1]*glb[1]+glb[2]*glb[2]));
 #else
-	  radius=sqrt(glb[0]*glb[0]+glb[1]*glb[1]+glb[2]*glb[2]);
+	  radius=sqrt((Float)(glb[0]*glb[0]+glb[1]*glb[1]+glb[2]*glb[2]));
 #endif 
 	  time=glb[3];
 	  

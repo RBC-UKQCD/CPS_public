@@ -3,13 +3,13 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/qpropw.h,v 1.4 2004-08-18 11:57:36 zs Exp $
-//  $Id: qpropw.h,v 1.4 2004-08-18 11:57:36 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-04 07:20:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/qpropw.h,v 1.5 2004-09-04 07:20:36 chulwoo Exp $
+//  $Id: qpropw.h,v 1.5 2004-09-04 07:20:36 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/qpropw.h,v $
 //  $State: Exp $
 //
@@ -71,11 +71,11 @@ public:
   void setPointSource(int color, int spin, int x, int y, int z, int t);
   void setWallSource(int color, int spin, int time_slice);
   void setWallSource(int color, int spin, int time_slice, Float* src);
-  void FermionVectorTp::GaugeFixSink(Lattice& lat, int dir);
-  void FermionVectorTp::LandauGaugeFixSink(Lattice& lat, int dir);
-  void FermionVectorTp::setLandauWallSource(Lattice& lat, int color, int spin,
+  void GaugeFixSink(Lattice& lat, int dir);
+  void LandauGaugeFixSink(Lattice& lat, int dir);
+  void setLandauWallSource(Lattice& lat, int color, int spin,
                 int source_time);
-  void FermionVectorTp::setGFWallSource(Lattice& lat, int color, int spin,
+  void setGFWallSource(Lattice& lat, int color, int spin,
                 int dir, int source_time);
   void setVolSource();
   void setVolSource(int color, int spin);
@@ -118,7 +118,7 @@ class QPropWRandWallSrc: public QPropW
     QPropWRandWallSrc();
     QPropWRandWallSrc(Lattice& lat, CgArg* cg, int source_time, 
 			int seed, CommonArg*);
-    QPropWRandWallSrc::QPropWRandWallSrc(Lattice& lat, CgArg *arg,
+    QPropWRandWallSrc(Lattice& lat, CgArg *arg,
                 QPropWRandWallSrc* prop1, QPropWRandWallSrc* prop2 );
     
     //MANIPULATORS
@@ -142,9 +142,9 @@ class QPropWWallSrc: public QPropW
     QPropWWallSrc();
     QPropWWallSrc(Lattice& lat, CgArg* cg, int source_time,
 			CommonArg* c_arg);
-    QPropWWallSrc::QPropWWallSrc(Lattice& lat, CgArg *arg,
+    QPropWWallSrc(Lattice& lat, CgArg *arg,
                 	QPropWWallSrc& prop1, QPropWWallSrc& prop2 );
-    QPropWWallSrc::QPropWWallSrc(Lattice& lat, CgArg *arg,
+    QPropWWallSrc(Lattice& lat, CgArg *arg,
 			QPropWWallSrc* prop1, QPropWWallSrc* prop2 );
 
     // DESTRUCTOR

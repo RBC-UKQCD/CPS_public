@@ -1,16 +1,17 @@
 #include<config.h>
+#include<math.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v 1.8 2004-08-18 11:57:40 zs Exp $
-//  $Id: QPropW.C,v 1.8 2004-08-18 11:57:40 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-04 07:22:29 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v 1.9 2004-09-04 07:22:29 chulwoo Exp $
+//  $Id: QPropW.C,v 1.9 2004-09-04 07:22:29 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: QPropW.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v $
 //  $State: Exp $
 //
@@ -395,7 +396,7 @@ QPropWRandWallSrc::QPropWRandWallSrc(Lattice &lat, CgArg *arg,
    for(i=0; i< 2*wall_size; i++)rsrc[i] = 0.0;
 
    int num_src=1, x[4];
-   Float norm=1/sqrt(num_src);
+   Float norm=1/sqrt((Float)num_src);
 
 
    x[3] = source_time % GJP.TnodeSites();

@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Prototypes of gauge configuration IO functions.
 
-  $Id: qcdio.h,v 1.5 2004-09-02 16:57:11 zs Exp $
+  $Id: qcdio.h,v 1.6 2004-09-04 07:20:31 chulwoo Exp $
 */
 /*2  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
-   $Author: zs $
-   $Date: 2004-09-02 16:57:11 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.5 2004-09-02 16:57:11 zs Exp $
-   $Id: qcdio.h,v 1.5 2004-09-02 16:57:11 zs Exp $
+   $Author: chulwoo $
+   $Date: 2004-09-04 07:20:31 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.6 2004-09-04 07:20:31 chulwoo Exp $
+   $Id: qcdio.h,v 1.6 2004-09-04 07:20:31 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.h,v $
-   $Revision: 1.5 $
+   $Revision: 1.6 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v $
    $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -31,6 +31,8 @@ CPS_END_NAMESPACE
 #include <util/data_types.h>
 #include <util/lattice.h>
 #include <util/qcdio_qprintf.h>
+#include <util/ReadLatticePar.h>
+#include <util/WriteLatticePar.h>
 CPS_START_NAMESPACE
 
 #ifndef GAUGE_CONF_PREC

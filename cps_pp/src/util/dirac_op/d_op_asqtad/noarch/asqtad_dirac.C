@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.10 2004-08-18 11:57:48 zs Exp $
+//  $Id: asqtad_dirac.C,v 1.11 2004-09-04 07:23:13 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -2130,7 +2130,7 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
 #ifndef SIMUL_AGG
 
   gauge_agg *temp = (gauge_agg *)smalloc(12*vol*sizeof(gauge_agg));
-  int num_ind[vol*6];
+  int *num_ind = (int *)smalloc(6*vol*sizeof(int));
   int src;
   for(j=0;j<2;j++){
     for(i=0;i<vol;i++) num_ind[i]=0;
@@ -2296,6 +2296,7 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
 
   }
   sfree(temp);
+  sfree(num_ind);
 
 #if 0
   sprintf(buf,"uc_nl_agg.h");
