@@ -1,71 +1,75 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.14 2004-12-22 08:39:18 chulwoo Exp $
+  $Id: pt.C,v 1.15 2005-01-13 07:46:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-22 08:39:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.14 2004-12-22 08:39:18 chulwoo Exp $
-//  $Id: pt.C,v 1.14 2004-12-22 08:39:18 chulwoo Exp $
+//  $Date: 2005-01-13 07:46:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.15 2005-01-13 07:46:20 chulwoo Exp $
+//  $Id: pt.C,v 1.15 2005-01-13 07:46:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 #include <config.h>
+#include <util/pt_int.h>
+#include <qalloc.h>
+#if 0
 #include <util/gjp.h>
 #include <util/pt.h>
 #include <util/time.h>
 #include <sysfunc.h>
 #include <comms/scu.h>
 #include <stdio.h>
-#include <qalloc.h>
+#endif
 
 #undef CPP
-CPS_START_NAMESPACE
-void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long in, long out);
+//CPS_START_NAMESPACE
+//void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long in, long out);
 
 //External function definitions
 extern "C"{
-  void cmm_agg(gauge_agg *chi, IFloat *phi,IFloat *result, int counter);
+  void cmm_agg(gauge_agg *chi, matrix *phi,matrix *result, int counter);
   void cmm_agg_cpp( int sites, long chi, long u,long in, long out);
   void cmv_agg_cpp( int sites, long u,long in, long out);
   void pt_asqtad_agg( int sites, long chi, long u,long in, long out);
   void copy_buffer(int n, long src, long dest, long ptable);
   // Assembler copying routines
-  void copy_matrix(Matrix *res, Matrix *src, int *length, 
+  void copy_matrix(IFloat *res, IFloat *src, int *length, 
 		   unsigned long *res_ptr, unsigned long *src_ptr);
-  void copy_gauge(Matrix *res, struct gauge_agg *src, int *length,
+  void copy_gauge(IFloat *res, struct gauge_agg *src, int *length,
 		  unsigned long *res_ptr);
   // This is perhaps overkill but gives a couple of extra flops
   // cross_look - all input fields are lookup and sum to result
-  void cross_look(Matrix *result, Float *fac, const Vector *chi, const Vector *phi,  
+  void cross_look(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
 	     int counter, unsigned long *src, unsigned long *dest);
   // cross_lin - one input field is linear and sum to result
-  void cross_lin(Matrix *result, Float *fac, const Vector *chi, const Vector *phi,  
+  void cross_lin(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
 	     int counter, unsigned long *dest, unsigned long *dest);
   // cross_over_look - all input fields are lookup and overwrite result
-  void cross_over_look(Matrix *result, Float *fac, const Vector *chi, const Vector *phi,  
+  void cross_over_look(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
 	     int counter, unsigned long *src, unsigned long *dest);
   // cross_over_lin - one input field is linear and overwrite result
-  void cross_over_lin(Matrix *result, Float *fac, const Vector *chi, const Vector *phi,  
+  void cross_over_lin(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
 	     int counter, unsigned long *dest, unsigned long *dest);
 
   //---------------------------------------------------------------------------
-  //Matrix multiply for checkerboarded fields
+  //matrix multiply for checkerboarded fields
   void cmm_agg_cpp_cb(int sites, long u, long in, long out, IFloat *gauge_field, int pad=0);
 
-  //Matrix vector multiply for checkerboarded fields
+  //matrix vector multiply for checkerboarded fields
   void cmv_agg_cpp_cb(int sites, long u, long in, long out, IFloat * gauge_field, int pad=0);
   //---------------------------------------------------------------------------
 }
 
+#if 0
 //Number of dimensions
 static const int NDIM=4;
 //Maximum length of parallel transport.  3 links for the Naik term
@@ -182,15 +186,18 @@ static int (*LexGauge) (int *x,int mu);
 //Added for checkerboarded parallel transport
 static int (*LexVector_cb)(int *x);
 //------------------------------------------------------------
+#endif
 
+int PT::size[NDIM];
+int PT::vol;
 //dest=src
-static void cpy (IFloat *dest, IFloat *src){
+void PT::cpy (IFloat *dest, IFloat *src){
   for(int i=0;i<18;i++)
     dest[i]=src[i];
 }
 
 //dest=src.Dagger()
-static void dag_cpy (IFloat *dest, IFloat *src){
+void PT::dag_cpy (IFloat *dest, IFloat *src){
   for(int i=0;i<3;i++)
     for(int j=0;j<3;j++){
       dest[2*(3*i+j)]=src[2*(3*j+i)];
@@ -200,13 +207,15 @@ static void dag_cpy (IFloat *dest, IFloat *src){
 
 //Returns lexical index associated with coordinate x[4]
 //where the 0th coordinate runs fastest, 3rd coordinate runs slowest
-static int lex_xyzt(int *x){
+int PT::lex_xyzt(int *x){
+//  printf("lex_xyzt(%d %d %d %d)\n",x[0],x[1],x[2],x[3]);
   int result = x[0] + size[0]*(x[1]+size[1]*(x[2]+size[2]*x[3]));
   return result;
 }
 
 //Returns checkerboard index associated with coordinate x[4]
-static int lex_xyzt_cb_o(int *x){
+int PT::lex_xyzt_cb_o(int *x){
+//  printf("lex_xyzt_cb_o(%d %d %d %d)\n",x[0],x[1],x[2],x[3]);
   int result = x[0] + size[0]*(x[1]+size[1]*(x[2]+size[2]*x[3]));
   if ( (x[0]+x[1]+x[2]+x[3])%2 == 0) result = result/2+vol/2;
   else result = result/2;
@@ -216,40 +225,41 @@ static int lex_xyzt_cb_o(int *x){
 //---------------------------------------------------------------------------
 //Returns index for fields in the STAG storage order on lattice
 //sites of a given parity
-static int lex_txyz_cb(int *x)
+int PT:: lex_txyz_cb(int *x)
 {
+//  printf("lex_txyz_cb(%d %d %d %d)\n",x[0],x[1],x[2],x[3]);
   int result = x[3]+size[3]*(x[0]+size[0]*(x[1]+size[1]*x[2]));
   return result/2;
 }
 //---------------------------------------------------------------------------
 
 //Returns index associated with x[4] for txyz ordering
-static int lex_txyz(int *x){
+int PT:: lex_txyz(int *x){
   return  (x[3] + size[3]*(x[0]+size[0]*(x[1]+size[1]*x[2])))/2 ;
 }
 
 //Returns first index associated with the surface x[3] = 0, on
 //a checkerboarded lattice
-static int LexSurface(int *x){
+int PT:: LexSurface(int *x){
   return  (x[0]+size[0]*(x[1]+size[1]*x[2]))/2 ;
 }
 
 //Returns index associated with gauge link in the mu direction 
 //and coordinate x
-static int lex_g_xyzt(int *x, int mu){
+int PT::lex_g_xyzt(int *x, int mu){
   int temp =  lex_xyzt(x);
   return (temp*NDIM + mu);
 }
 
 //Returns index associated with gauge link in the mu direction and 
 //coordinate x for checkerboarded storage
-static int lex_g_xyzt_cb_o(int *x, int mu){
+int PT:: lex_g_xyzt_cb_o(int *x, int mu){
   int temp =  lex_xyzt_cb_o(x);
   return (temp*NDIM + mu);
 }
 
 // Calculate the required offset given the direction and hop
-int pt_offset(int dir, int hop) {
+int PT::set_offset(int dir, int hop) {
 
   // if positive direction then start at 0
   if (dir%2 == 0) return 0;
@@ -264,15 +274,16 @@ int pt_offset(int dir, int hop) {
 
 }
 
-void pt_set_hop_pointer() {
+void PT::set_hop_pointer() {
 
   char *fname = "set_hop_pointer()";
 
+//  VRB.Func("PT",fname);
   //Actual memory usage of vectors
   int vlen = VECT_LEN*sizeof(IFloat);
   int vlen2 =VECT_LEN2*sizeof(IFloat);
 
-  int size[NDIM], x[NDIM], nei[NDIM];
+  int x[NDIM], nei[NDIM];
   
   //Counts how many parallel transports of given length and direction are local
   //and non-local, respectively
@@ -280,13 +291,16 @@ void pt_set_hop_pointer() {
   int hp_non_local_count[MAX_HOP][2*NDIM];
   int hop, i;
 
+#if 0
   //Local volume size in four directions
   size[0] = GJP.XnodeSites();
   size[1] = GJP.YnodeSites();
   size[2] = GJP.ZnodeSites();
   size[3] = GJP.TnodeSites();
+#endif
 
   //Initialize local and non-local hop counters.
+      printf("start\n");
   for (hop=0; hop<MAX_HOP; hop++) {
     for (i=0; i<2*NDIM; i++) {
       hp_non_local_count[hop][i] = 0;
@@ -309,7 +323,7 @@ void pt_set_hop_pointer() {
       //Total number of sites that require non-local communication
       int non_local_check = hop*non_local_chi[i*2];
       //Total number of sites where parallel transport can be done locally
-      int local_check = vol - non_local_check;;
+      int local_check = vol - non_local_check;
 
       //Loop through all the sites on the lattice
       //nei represents the coordinates of the neighboring site.
@@ -317,7 +331,6 @@ void pt_set_hop_pointer() {
 	for(x[2]=0,nei[2]=0;x[2]<size[2];x[2]++,nei[2]++)
 	  for(x[1]=0,nei[1]=0;x[1]<size[1];x[1]++,nei[1]++)
 	    for(x[0]=0,nei[0]=0;x[0]<size[0];x[0]++,nei[0]++){
-	      //printf("%d %d %d %d %d hop=%d\n",x[0],x[1],x[2],x[3],i,hop);
 
 	      //This is the parallel transport of the field in the 
 	      //negative direction to another node
@@ -339,8 +352,9 @@ void pt_set_hop_pointer() {
 
 		//Make sure we haven't gone over the non non-local check
 		if (non_local_count[i*2]>non_local_check)
-		  ERR.General("",fname,"non_local_count[%d](%d)>non_local_check[%d](%d)\n",
-			      2*i,non_local_count[2*i],2*i,non_local_check);
+		  fprintf(stderr,
+			"%s:non_local_count[%d](%d)>non_local_check[%d](%d)\n",
+			 fname,2*i,non_local_count[2*i],2*i,non_local_check);
 		//The rest of the parallel transports in the local volume can 
 		//be handled locally
 	      } else {
@@ -355,8 +369,8 @@ void pt_set_hop_pointer() {
 		local_count[i*2]++;
 		//Make sure we haven't exceeded the number of local sites
 		if (local_count[i*2]>local_check)
-		  ERR.General("",fname,"local_count[%d](%d)>local_check[%d](%d)\n",
-			      2*i,local_count[2*i],2*i,local_check);
+		  fprintf(stderr,"%s:local_count[%d](%d)>local_check[%d](%d)\n",
+			      fname,2*i,local_count[2*i],2*i,local_check);
 	      }
 	      
 	      //Consider hopping in the negative direction, which is parallel 
@@ -373,8 +387,8 @@ void pt_set_hop_pointer() {
 		//been exceeded
 		non_local_count[i*2+1]++;
 		if (non_local_count[i*2]>non_local_check)
-		  ERR.General("",fname,"non_local_count[%d](%d)>non_local_check[%d](%d)\n",
-			      2*i,non_local_count[2*i],2*i,non_local_check);
+		  fprintf(stderr,"%s:non_local_count[%d](%d)>non_local_check[%d](%d)\n",
+			      fname,2*i,non_local_count[2*i],2*i,non_local_check);
 	      } else {
 		//Calculate the local coordinate for this hop
 		nei[i] = x[i]+hop;
@@ -384,23 +398,25 @@ void pt_set_hop_pointer() {
 		//Increment local count, check that bounds not exceeded
 		local_count[i*2+1]++;
 		if (local_count[i*2]>local_check)
-		  ERR.General("",fname,"local_count[%d](%d)>local_check[%d](%d)\n",
-			      2*i,local_count[2*i],2*i,local_check);
+		  fprintf(stderr,"%s:local_count[%d](%d)>local_check[%d](%d)\n",
+			      fname,2*i,local_count[2*i],2*i,local_check);
 	      }
 	      // Need to reset the neighbour pointer
 	      nei[i] = x[i];
 	    }
     }
   }
-
+//  VRB.Func("PT",fname);
+//  exit(44);
 }
 
+
 //Initialization of Parallel Transport class
-void pt_init(Lattice &lat)
+void PT::init(PTArg *pt_arg)
 {
   char *cname = "";
   char *fname = "pt_init()";
-  VRB.Func("",fname);
+//  VRB.Func("",fname);
   int i, j, x[NDIM],nei[NDIM];
   int local_count[2*NDIM];
   int non_local_count[2*NDIM];
@@ -412,6 +428,55 @@ void pt_init(Lattice &lat)
   int non_local_count_cb[2][2*NDIM];
   //---------------------------------------------------------------------------
 
+  size[0] = pt_arg->size[0];
+  size[1] = pt_arg->size[1];
+  size[2] = pt_arg->size[2];
+  size[3] = pt_arg->size[3];
+  gauge_field_addr = pt_arg->gauge_field_addr;
+  g_str_ord = pt_arg->g_str_ord;
+  g_conj = pt_arg->g_conj;
+  v_str_ord = pt_arg->v_str_ord;
+  v_str_ord_cb = pt_arg->v_str_ord_cb;
+  evenodd = pt_arg->evenodd;
+  prec = pt_arg->prec;
+
+  switch(g_str_ord){
+    case PT_XYZT:
+      LexGauge = lex_g_xyzt;
+      break;
+    case PT_XYZT_CB_O:
+      LexGauge = lex_g_xyzt_cb_o;
+      break;
+    default:
+      fprintf(stderr,"PT::init got invalid g_str_ord\n");
+      break;
+  }
+
+  switch(v_str_ord){
+    case PT_XYZT:
+      LexVector = lex_xyzt;
+      break;
+    case PT_XYZT_CB_O:
+      LexVector = lex_xyzt_cb_o;
+      break;
+    default:
+      fprintf(stderr,"PT::init got invalid v_str_ord\n");
+      break;
+  }
+
+  switch(v_str_ord_cb){
+    case PT_TXYZ:
+      LexVector_cb = lex_txyz_cb;
+      break;
+    default:
+      fprintf(stderr,"PT::init got invalid v_str_ord_cb\n");
+      break;
+  }
+  
+  if (g_conj) { Copy = &dag_cpy; DagCopy = &cpy; conjugated = PT_DAG_YES;}
+  else        { Copy = &cpy; DagCopy = &dag_cpy; conjugated = PT_DAG_NO;}
+
+#if 0
   //Size of local volume in all four directions
   size[0] = GJP.XnodeSites();
   size[1] = GJP.YnodeSites();
@@ -428,7 +493,7 @@ void pt_init(Lattice &lat)
   //fields and the guage links.
 
   //Canonical ordering xyzt without checkerboarding
-  if (str_ord == CANONICAL){
+  if (str_ord == PT_CANONICAL){
     Copy = cpy; DagCopy = dag_cpy;
     LexVector = lex_xyzt;
     LexGauge = lex_g_xyzt;
@@ -461,7 +526,8 @@ void pt_init(Lattice &lat)
     //----------------------------------------------------------------------
 
   } else
-    ERR.General(cname,fname,"storage ordering not implemented");
+    fprintf(stderr,"storage ordering not implemented");
+#endif
 
   //For the fastest changing index, data must be sent in many short messages
   //For the slowest changing index, the boundaries of the hypersurface are 
@@ -547,29 +613,29 @@ void pt_init(Lattice &lat)
 
     //Otherwise, we will have to allocate using smalloc
     if(uc_l[i]==NULL) {
-      uc_l[i] = (gauge_agg *)smalloc(cname,fname,"uc_l[i]",sizeof(gauge_agg)*(1+local_chi[i]));
+      uc_l[i] = (gauge_agg *)Alloc(cname,fname,"uc_l[i]",sizeof(gauge_agg)*(1+local_chi[i]));
     }
     if(uc_nl[i]==NULL) {
-      uc_nl[i] = (gauge_agg *)smalloc(cname,fname,"uc_nl[i]",sizeof(gauge_agg)*(1+non_local_chi[i]));
+      uc_nl[i] = (gauge_agg *)Alloc(cname,fname,"uc_nl[i]",sizeof(gauge_agg)*(1+non_local_chi[i]));
     }
 
     //-------------------------------------------------------------------------
     //Allocate memory for gauge_agg_cb
     for(int parity = 0; parity < 2; parity++)
     {
-      uc_l_cb[parity][i] = (gauge_agg_cb *)smalloc(cname,fname,"uc_l_cb[parity][i]",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
-      uc_nl_cb[parity][i] = (gauge_agg_cb *)smalloc(cname,fname,"uc_nl_cb[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
+      uc_l_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_l_cb[parity][i]",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
+      uc_nl_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
     }
     //-------------------------------------------------------------------------
 
     // This buffer is actually overkill, but ensures will work if
     // shift_field is called with hop>1
     rcv_buf[i] = (IFloat *)qalloc(QCOMMS,3*MAX_HOP*non_local_chi[i]*vlen);
-    if(rcv_buf[i]==NULL)ERR.Pointer("",fname,"rcv_buf[i]");
+    if(rcv_buf[i]==NULL)PointerErr("",fname,"rcv_buf[i]");
 
     //Used buffer used in vvpd
     rcv_buf2[i] = (IFloat *)qalloc(QCOMMS,MAX_HOP*non_local_chi[i]*vlen);
-    if(rcv_buf2[i]==NULL)ERR.Pointer("",fname,"rcv_buf2[i]");
+    if(rcv_buf2[i]==NULL)PointerErr("",fname,"rcv_buf2[i]");
   }
 
   //---------------------------------------------------------------------------
@@ -577,18 +643,18 @@ void pt_init(Lattice &lat)
   for(i=0; i<NDIM;i++)
     {
       snd_buf_cb[i] = (IFloat *)qalloc(QCOMMS,3*non_local_chi_cb[2*i+1]*vlen);
-      if(snd_buf_cb[i]==NULL)ERR.Pointer("",fname,"snd_buf_cb[i]");
+      if(snd_buf_cb[i]==NULL)PointerErr("",fname,"snd_buf_cb[i]");
     }
   snd_buf_t_cb = (IFloat *)qalloc(QCOMMS,3*non_local_chi_cb[6]*vlen);
-  if(snd_buf_t_cb==NULL) ERR.Pointer("",fname,"snd_buf_t_cb");
+  if(snd_buf_t_cb==NULL) PointerErr("",fname,"snd_buf_t_cb");
 
   for(i = 0; i < 2;i++)
-    Toffset[i] = (int *)smalloc(cname,fname,"Toffset[parity]",non_local_chi_cb[6]*sizeof(int));
+    Toffset[i] = (int *)Alloc(cname,fname,"Toffset[parity]",non_local_chi_cb[6]*sizeof(int));
 
   //Allocate memory for the gauge_agg_cb used for matrix pre-multiplication
   for(i = 0; i< NDIM;i++)
     for(int parity = 0; parity<2;parity++)
-      uc_nl_cb_pre[parity][i] = (gauge_agg_cb *)smalloc(cname,fname,"uc_nl_cb_pre[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[2*i+1]));
+      uc_nl_cb_pre[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb_pre[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[2*i+1]));
 
   int parity = 0;
   //---------------------------------------------------------------------------
@@ -613,16 +679,19 @@ void pt_init(Lattice &lat)
 	      (uc_nl[2*i]+non_local_count[2*i])->dest = LexVector(nei)*vlen2;
 	      non_local_count[i*2]++;
 	      if (non_local_count[i*2]>non_local_chi[i*2])
-		ERR.General(cname,fname,"non_local_count[%d](%d)>non_local_chi[%d](%d)\n",2*i,non_local_count[2*i],2*i,non_local_chi[2*i]);
+		fprintf(stderr,"%s:non_local_count[%d](%d)>non_local_chi[%d](%d)\n",
+			fname,2*i,non_local_count[2*i],2*i,non_local_chi[2*i]);
 	    } 
 	    else {
 	      nei[i] = x[i]-1;
-	      if(local_count[2*i]<0) ERR.General(cname,fname,"local_count[%d]=%d]n",2*i,local_count[2*i]);
+	      if(local_count[2*i]<0) fprintf(stderr,"%s:local_count[%d]=%d]n",
+			fname,2*i,local_count[2*i]);
 	      (uc_l[2*i]+local_count[2*i])->src = LexVector(x)*vlen;
 	      (uc_l[2*i]+local_count[2*i])->dest = LexVector(nei)*vlen2;
 	      local_count[i*2]++;
 	      if (local_count[i*2]>local_chi[i*2])
-		ERR.General(cname,fname,"local_count[%d](%d)>local_chi[%d](%d)\n",2*i,local_count[2*i],2*i,local_chi[2*i]);
+		fprintf(stderr,"%s:local_count[%d](%d)>local_chi[%d](%d)\n",
+			fname,2*i,local_count[2*i],2*i,local_chi[2*i]);
 	    }
 	    // negative direction
 	    //This is parallel transport in the positive direction
@@ -634,16 +703,19 @@ void pt_init(Lattice &lat)
 	      (uc_nl[2*i+1]+non_local_count[2*i+1])->dest = LexVector(nei)*vlen2;
 	      non_local_count[i*2+1]++;
 	      if (non_local_count[i*2+1]>non_local_chi[i*2+1])
-		ERR.General(cname,fname,"non_local_count[%d](%d)>non_local_chi[%d](%d)\n",2*i+1,non_local_count[2*i+1],2*i+1,non_local_chi[2*i+1]);
+		fprintf(stderr,"%s:non_local_count[%d](%d)>non_local_chi[%d](%d)\n",
+			fname,2*i+1,non_local_count[2*i+1],2*i+1,non_local_chi[2*i+1]);
 	    } 
 	    else {
 	      nei[i] = x[i]+1;
-	      if(local_count[2*i+1]<0) ERR.General(cname,fname,"local_count[%d]=%d]n",2*i+local_count[2*i+1]);
+	      if(local_count[2*i+1]<0) fprintf(stderr,"%s:local_count[%d]=%d]n",
+			fname,2*i+local_count[2*i+1]);
 	      (uc_l[2*i+1]+local_count[2*i+1])->src = LexVector(x)*vlen;
 	      (uc_l[2*i+1]+local_count[2*i+1])->dest = LexVector(nei)*vlen2;
 	      local_count[i*2+1]++;
 	      if (local_count[i*2+1]>local_chi[i*2+1])
-		ERR.General(cname,fname,"local_count[%d](%d)>local_chi[%d](%d)\n",2*i+1,local_count[2*i+1],2*i+1,local_chi[2*i+1]);
+		fprintf(stderr,"%s:local_count[%d](%d)>local_chi[%d](%d)\n",
+			fname,2*i+1,local_count[2*i+1],2*i+1,local_chi[2*i+1]);
 	    }
 	    nei[i] = x[i];
 	  }
@@ -696,7 +768,9 @@ void pt_init(Lattice &lat)
 
 	      non_local_count_cb[parity][i*2]++;
 	      if(non_local_count_cb[parity][i*2]>non_local_chi_cb[i*2])
-		ERR.General(cname,fname,"non_local_count_cb[%d][%d](%d)>non_local_chi_cb[%d](%d)\n",parity,2*i,non_local_count_cb[parity][2*i],2*i,non_local_chi[2*i]);
+		fprintf(stderr,
+			"%s:non_local_count_cb[%d][%d](%d)>non_local_chi_cb[%d](%d)\n",
+			fname,parity,2*i,non_local_count_cb[parity][2*i],2*i,non_local_chi[2*i]);
 	    } 
 	    else 
 	      {
@@ -709,7 +783,7 @@ void pt_init(Lattice &lat)
 	      (uc_l_cb[parity][2*i]+local_count_cb[parity][2*i])->dagger = (int) conjugated;
 	      local_count_cb[parity][i*2]++;
 	      if(local_count_cb[parity][i*2]>local_chi_cb[i*2])
-		ERR.General(cname,fname,"local_count_cb[%d][%d](%d)>local_chi_cb[%d](%d)\n",parity,2*i,local_count_cb[parity][2*i],2*i,local_chi[2*i]);
+		fprintf(stderr,"%s:local_count_cb[%d][%d](%d)>local_chi_cb[%d](%d)\n",parity,2*i,local_count_cb[parity][2*i],2*i,local_chi[2*i]);
 	      }
 
 	    // negative direction
@@ -745,7 +819,7 @@ void pt_init(Lattice &lat)
 
 	      non_local_count_cb[parity][i*2+1]++;
 	      if(non_local_count_cb[parity][i*2+1]>non_local_chi_cb[i*2+1])
-		ERR.General(cname,fname,"non_local_count_cb[%d][%d](%d)>non_local_chi_cb[%d](%d)\n",parity,2*i+1,non_local_count_cb[parity][2*i+1],2*i+1,non_local_chi[2*i+1]);
+		fprintf(stderr,"%s:non_local_count_cb[%d][%d](%d)>non_local_chi_cb[%d](%d)\n",parity,2*i+1,non_local_count_cb[parity][2*i+1],2*i+1,non_local_chi[2*i+1]);
 	      } 
 	    else 
 	      {
@@ -759,7 +833,7 @@ void pt_init(Lattice &lat)
 
 	      local_count_cb[parity][i*2+1]++;
 	      if(local_count_cb[parity][i*2+1]>local_chi_cb[i*2+1])
-		ERR.General(cname,fname,"local_count_cb[%d][%d](%d)>local_chi_cb[%d](%d)\n",parity,2*i+1,local_count_cb[parity][2*i+1],2*i+1,local_chi[2*i+1]);
+		fprintf(stderr,"%s:local_count_cb[%d][%d](%d)>local_chi_cb[%d](%d)\n",parity,2*i+1,local_count_cb[parity][2*i+1],2*i+1,local_chi[2*i+1]);
 	    }
 	    nei[i] = x[i];
 	  }
@@ -811,18 +885,19 @@ void pt_init(Lattice &lat)
       int nl_size = (j+1)*non_local_chi[i];
       int l_size = vol - nl_size;
       if (l_size>0){
-        hp_l[j][i] = (hop_pointer*) smalloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
+        hp_l[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
         src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
         dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
       }
-
-      hp_nl[j][i] = (hop_pointer*) smalloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
+=======
+      
+      hp_nl[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
       dest_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
       src_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
     }
   }
   
-  pt_set_hop_pointer();
+  set_hop_pointer();
 
   //Calculate the indices for the source and destination
   for (j=0; j<MAX_HOP; j++) {
@@ -845,9 +920,9 @@ void pt_init(Lattice &lat)
 }
 
 //Free memory associated with the parallel transport of the fermions
-void pt_delete(){
+void PT::delete_buf(){
   char *fname = "pt_delete()";
-  VRB.Func("",fname);
+//  VRB.Func("",fname);
 	
   for(int i = 0; i < 2*NDIM; i++){
     qfree(uc_l[i]);
@@ -855,8 +930,8 @@ void pt_delete(){
     //--------------------------------------------------------------------
     for(int parity = 0; parity < 2; parity++)
       {
-	sfree(uc_l_cb[parity][i]);
-	sfree(uc_nl_cb[parity][i]);
+	Free(uc_l_cb[parity][i]);
+	Free(uc_nl_cb[parity][i]);
       }
     //-------------------------------------------------------------------
     qfree(rcv_buf[i]);
@@ -868,11 +943,11 @@ void pt_delete(){
     {
       qfree(snd_buf_cb[i]);
       for(int parity = 0; parity < 2; parity++)
-	sfree(uc_nl_cb_pre[parity][i]);
+	Free(uc_nl_cb_pre[parity][i]);
     }
-  qfree(snd_buf_t_cb);
+  Free(snd_buf_t_cb);
   for(int i = 0; i < 2; i++)
-    sfree(Toffset[i]);    
+    Free(Toffset[i]);    
   //-----------------------------------------------------------------------
 
   for (int hop=0; hop<MAX_HOP; hop++) {
@@ -880,11 +955,11 @@ void pt_delete(){
       int nl_size = (hop+1)*non_local_chi[i];
       int l_size = vol - nl_size;
       if (l_size>0){
-        sfree(hp_l[hop][i]);
+        Free(hp_l[hop][i]);
         qfree(src_l[hop][i]);
         qfree(dest_l[hop][i]);
       }
-      sfree(hp_nl[hop][i]);
+      Free(hp_nl[hop][i]);
       qfree(src_nl[hop][i]);
       qfree(dest_nl[hop][i]);
     }
@@ -892,9 +967,9 @@ void pt_delete(){
 }
 
 //Free memory associated with gauge parallel transport
-void pt_delete_g(){
+void PT::delete_g_buf(){
   char *fname = "pt_delete_g()";
-  VRB.Func("",fname);
+//  VRB.Func("",fname);
   for(int hop = 0; hop < MAX_HOP; hop++)
     for(int i = 0; i < 4*NDIM; i++)
       {
@@ -913,14 +988,14 @@ void pt_delete_g(){
   //---------------------------------------------------------------------
 }
 
-void pt_init_g(void){
+void PT::init_g(void){
   int x[NDIM], nei[NDIM];
   int local_count[2*NDIM];
   int non_local_count[2*NDIM];
   int i;
 
-  char *fname = "pt_init_g()";
-  VRB.Func("",fname);
+  char *fname = "init_g()";
+//  VRB.Func("",fname);
   for(i=0; i<2*NDIM;i++){
     local_count[i]=non_local_count[i]=0;
   }
@@ -938,8 +1013,8 @@ void pt_init_g(void){
 
   for(i=0;i<NDIM;i++){
     //Initialize SCUDirArg for sending and receiving the one-hop term
-    SCUDirArgIR snd(u,snd_dir[i*2+1],SCU_SEND,sizeof(Matrix));
-    SCUDirArgIR rcv(rcv_mat,rcv_dir[i*2+1],SCU_REC,sizeof(Matrix));
+    SCUDirArgIR snd(u,snd_dir[i*2+1],SCU_SEND,sizeof(matrix));
+    SCUDirArgIR rcv(rcv_mat,rcv_dir[i*2+1],SCU_REC,sizeof(matrix));
 
     for(x[3]=0,nei[3]=0;x[3]<size[3];x[3]++,nei[3]++)
       for(x[2]=0,nei[2]=0;x[2]<size[2];x[2]++,nei[2]++)
@@ -1067,6 +1142,7 @@ void pt_init_g(void){
   }
 #endif
   qfree(rcv_mat);
+//  VRB.FuncEnd("",fname);
 }
 
 
@@ -1085,7 +1161,8 @@ void pt_init_g(void){
 //cb - Checkerboard parity of the vector min
 
 #undef PROFILE
-void pt_mat_cb(int n, IFloat **mout, IFloat **min, const int *dir, ChkbType cb)
+void PT::mat_cb(int n, IFloat **mout, IFloat **min, const int *dir, int
+parity)
 {
   //List of the different directions
   int wire[n];
@@ -1094,7 +1171,7 @@ void pt_mat_cb(int n, IFloat **mout, IFloat **min, const int *dir, ChkbType cb)
   SCUDirArgIR *SCUarg_p[2*n];
   SCUDirArgMulti SCUmulti;
   static int call_num = 0;
-  int parity = (int) cb;
+//  int parity = (int) cb;
   int vlen = VECT_LEN;
   int vlen2 = VECT_LEN2;
 
@@ -1102,7 +1179,7 @@ void pt_mat_cb(int n, IFloat **mout, IFloat **min, const int *dir, ChkbType cb)
   
   //Name our function
   char *fname="pt_mat_cb()";
-  VRB.Func("",fname);
+//  VRB.Func("",fname);
   
   //Set the transfer directions
   //If wire[i] is even, then we have communication in the negative direction
@@ -1197,7 +1274,7 @@ void pt_mat_cb(int n, IFloat **mout, IFloat **min, const int *dir, ChkbType cb)
   dtime +=dclock();
   print_flops("",fname,99*vol*n,dtime);
 #endif
-  ParTrans::PTflops +=99*n*vol;
+//  ParTrans::PTflops +=99*n*vol;
 }
 
 //Parallel transport of a vector defined on single parity sites
@@ -1213,34 +1290,38 @@ void pt_mat_cb(int n, IFloat **mout, IFloat **min, const int *dir, ChkbType cb)
 
 //Normal parallel transport with normal gauge fields
 #undef PROFILE
-void pt_1vec_cb(int n, IFloat **vout, IFloat **vin, const int *dir, ChkbType cb)
+void PT::vec_cb(int n, IFloat **vout, IFloat **vin, const int *dir, int
+ parity)
 {
-  pt_1vec_cb_norm(n,vout,vin,dir,cb,gauge_field_addr);
+  PT::vec_cb_norm(n,vout,vin,dir,parity,gauge_field_addr);
 }
 
 //Normal parallel transport, but with user-specified gauge fields
 #undef PROFILE
-void pt_1vec_cb(int n, IFloat **vout, IFloat **vin, const int *dir, ChkbType cb, IFloat * new_gauge_field)
+void PT::vec_cb(int n, IFloat **vout, IFloat **vin, const int *dir, int
+parity, IFloat * new_gauge_field)
 {
-  pt_1vec_cb_norm(n,vout,vin,dir,cb,new_gauge_field);
+  vec_cb_norm(n,vout,vin,dir,parity,new_gauge_field);
 }
 
 //Padded parallel transport with normal gauge fields
 #undef PROFILE
-void pt_1vec_cb(int n, IFloat *vout, IFloat **vin, const int *dir, ChkbType cb, int pad)
+void PT::vec_cb(int n, IFloat *vout, IFloat **vin, const int *dir, int
+parity, int pad)
 {
-  pt_1vec_cb_pad(n,vout,vin,dir,cb,pad,gauge_field_addr);
+  vec_cb_pad(n,vout,vin,dir,parity,pad,gauge_field_addr);
 }
 
 //Padded parallel transport, but with user-specified gauge fields
 #undef PROFILE
-void pt_1vec_cb(int n, IFloat *vout, IFloat **vin, const int *dir, ChkbType cb, int pad, IFloat * new_gauge_field)
+void PT::vec_cb(int n, IFloat *vout, IFloat **vin, const int *dir, int
+parity, int pad, IFloat * new_gauge_field)
 {
-  pt_1vec_cb_pad(n,vout,vin,dir,cb,pad,new_gauge_field);
+  vec_cb_pad(n,vout,vin,dir,parity,pad,new_gauge_field);
 }
 
 #undef PROFILE
-void pt_1vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,ChkbType cb, IFloat * gauge)
+void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
   //List of the different directions
   int wire[n];
@@ -1249,7 +1330,6 @@ void pt_1vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,ChkbType
   SCUDirArgIR *SCUarg_p[2*n];
   SCUDirArgMulti SCUmulti;
   static int call_num = 0;
-  int parity = (int) cb;
   int vlen = VECT_LEN;
   int vlen2 = VECT_LEN;
 
@@ -1267,7 +1347,7 @@ void pt_1vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,ChkbType
   
   //Name our function
   char *fname="pt_1vec_cb_norm()";
-  VRB.Func("",fname);
+//  VRB.Func("",fname);
   
   //Set the transfer directions
   //If wire[i] is even, then we have communication in the negative direction
@@ -1388,11 +1468,12 @@ void pt_1vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,ChkbType
   dtime +=dclock();
   print_flops("",fname,33*vol*n,dtime);
 #endif
-  ParTrans::PTflops +=33*n*vol;
+//  ParTrans::PTflops +=33*n*vol;
 }
 
 #undef PROFILE
-void pt_1vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,ChkbType cb,int pad, IFloat * gauge)
+void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int
+parity,int pad, IFloat * gauge)
 {
   //List of the different directions
   int wire[n];
@@ -1401,7 +1482,6 @@ void pt_1vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,ChkbType c
   SCUDirArgIR *SCUarg_p[2*n];
   SCUDirArgMulti SCUmulti;
   static int call_num = 0;
-  int parity = (int) cb;
   int vlen = VECT_LEN;
   int vlen2 = VECT_LEN;
   if(pad)
@@ -1421,7 +1501,7 @@ void pt_1vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,ChkbType c
   
   //Name our function
   char *fname="pt_1vec_cb_pad()";
-  VRB.Func("",fname);
+//  VRB.Func("",fname);
   
   //Set the transfer directions
   //If wire[i] is even, then we have communication in the negative direction
@@ -1541,7 +1621,7 @@ void pt_1vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,ChkbType c
   dtime +=dclock();
   print_flops("",fname,33*vol*n,dtime);
 #endif
-  ParTrans::PTflops +=33*n*vol;
+//  ParTrans::PTflops +=33*n*vol;
 }
 
 
@@ -1550,7 +1630,7 @@ void pt_1vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,ChkbType c
 //Parallel transport of a matrix. through one hop.
 //The matrix min is parallel transported and the result is placed in mout
 #undef PROFILE
-void pt_mat(int n, IFloat **mout, IFloat **min, const int *dir){
+void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
     
   int wire[n];
   int i;
@@ -1560,7 +1640,7 @@ void pt_mat(int n, IFloat **mout, IFloat **min, const int *dir){
 
   call_num++;
   char *fname="pt_mat()";
-  VRB.Func("",fname);
+//  VRB.Func("",fname);
 	
   for(i=0;i<n;i++) wire[i] = dir[i]; 
 #ifdef PROFILE
@@ -1568,7 +1648,7 @@ void pt_mat(int n, IFloat **mout, IFloat **min, const int *dir){
 #endif
   for(i=0;i<n;i++) {
     //Calculate the address for transfer in a particular direction
-    IFloat * addr = (min[i]+GAUGE_LEN*offset[wire[i]]);
+    Float * addr = ((Float *)min[i]+GAUGE_LEN*offset[wire[i]]);
     //This should point to the appropriate SCUDirArg for receiving
     SCUarg_p[2*i] = SCUarg_mat[0][2*wire[i]];
     //This points to the appropriate SCUDirArg for sending
@@ -1595,20 +1675,20 @@ void pt_mat(int n, IFloat **mout, IFloat **min, const int *dir){
 #ifdef CPP
     cmm_agg_cpp(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)mout[i]);
 #else
-    cmm_agg(uc_nl[wire[i]],rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
+    cmm_agg(uc_nl[wire[i]],(matrix *)rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
 #endif
   }
 #ifdef PROFILE
   dtime +=dclock();
   print_flops("",fname,198*vol*n,dtime);
 #endif
-  ParTrans::PTflops +=198*n*vol;
+//  ParTrans::PTflops +=198*n*vol;
 }
 
 
 #undef PROFILE
 //Parallel transport of a vector through one hop
-void pt_1vec(int n, IFloat **vout, IFloat **vin, const int *dir){
+void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
   int i;
   static int call_num=0;
   SCUDirArgIR *SCUarg_p[2*n];
@@ -1630,7 +1710,7 @@ void pt_1vec(int n, IFloat **vout, IFloat **vin, const int *dir){
   SCUDirArgMulti SCUmulti;
 
   char *fname="pt_1vec";
-  VRB.Func("",fname);
+//  VRB.Func("",fname);
 	
   for(i=0;i<n;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
   for(i=0;i<n;i++) {
@@ -1661,17 +1741,17 @@ void pt_1vec(int n, IFloat **vout, IFloat **vin, const int *dir){
   dtime +=dclock();
   print_flops("",fname,66*n*vol,dtime);
 #endif
-  ParTrans::PTflops +=66*n*vol;
+//  ParTrans::PTflops +=66*n*vol;
 }
 
 /*! 
   Computes sum[x] = vect[x] vect[x + hop dir]^dagger
   where the sum is over n_vect vectors and the hop is in a forward direction.
 */
-void pt_vvpd(Vector **vect, int n_vect, const int *dir, 
-	     int n_dir, int hop, Matrix **sum){
+void PT::vvpd(IFloat **vect, int n_vect, const int *dir, 
+	     int n_dir, int hop, IFloat **sum){
   char *fname = "pt_vvpd()";
-  VRB.Func("",fname);
+//  VRB.Func("",fname);
   int i, s, v;
   Float f = 2.0;
   int wire[n_dir];
@@ -1683,9 +1763,9 @@ void pt_vvpd(Vector **vect, int n_vect, const int *dir,
   // Only do communication in forward direction
   for(i=0;i<n_dir;i++) {
     if ( size[wire[i]] <hop)
-      ERR.General("",fname,
-		"size(%d) in direction %d is smaller than the hop(%d)\n",
-		size[wire[i]],wire[i],hop);
+      fprintf(stderr, 
+		"%s:size(%d) in direction %d is smaller than the hop(%d)\n",
+		fname,size[wire[i]],wire[i],hop);
     SCUarg_p[2*i] = SCUarg[hop-1][4*wire[i]];
     SCUarg_p[2*i+1] = SCUarg[hop-1][4*wire[i]+1];
     SCUarg_p2[2*i] = SCUarg2[hop-1][4*wire[i]];
@@ -1697,13 +1777,13 @@ void pt_vvpd(Vector **vect, int n_vect, const int *dir,
 
     if (v%2==0) {
       for(i=0;i<n_dir;i++)
-	SCUarg_p[2*i+1]->Addr((void *)(vect[v]+pt_offset(2*wire[i], hop)));
+	SCUarg_p[2*i+1]->Addr((void *)(vect[v]+set_offset(2*wire[i], hop)));
 
       // Start communication
       SCUmulti.Init(SCUarg_p,2*n_dir);
     } else {
       for(i=0;i<n_dir;i++)
-	SCUarg_p2[2*i+1]->Addr((void *)(vect[v]+pt_offset(2*wire[i], hop)));
+	SCUarg_p2[2*i+1]->Addr((void *)(vect[v]+set_offset(2*wire[i], hop)));
 
       // Start communication
       SCUmulti.Init(SCUarg_p2,2*n_dir);
@@ -1714,15 +1794,15 @@ void pt_vvpd(Vector **vect, int n_vect, const int *dir,
     if (v>0)
       if (v==1) {
 	for(i=0; i<n_dir; i++) 
-	  cross_over_lin(sum[i], &f, vect[v-1],(Vector*)rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
+	  cross_over_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
 		src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
       } else if (v%2==1) {
 	for(i=0; i<n_dir; i++) 
-	  cross_lin(sum[i], &f, vect[v-1],(Vector*)rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
+	  cross_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
 		src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
       } else {
 	for(i=0; i<n_dir; i++) 
-	  cross_lin(sum[i], &f,vect[v-1],(Vector*)rcv_buf2[2*wire[i]], hop*non_local_chi[2*wire[i]],
+	  cross_lin(sum[i], &f,vect[v-1],rcv_buf2[2*wire[i]], hop*non_local_chi[2*wire[i]],
 		src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
       }
     
@@ -1743,25 +1823,25 @@ void pt_vvpd(Vector **vect, int n_vect, const int *dir,
 
   if (v==1) {
     for(i=0; i<n_dir; i++) 
-      cross_over_lin(sum[i], &f, vect[v-1],(Vector*)rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
+      cross_over_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
 	    src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
   } else if (v%2==1) {
     for(i=0; i<n_dir; i++) 
-      cross_lin(sum[i], &f, vect[v-1],(Vector*)rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
+      cross_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
 	    src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
   } else {
     for(i=0; i<n_dir; i++) 
-      cross_lin(sum[i], &f,vect[v-1],(Vector*)rcv_buf2[2*wire[i]], hop*non_local_chi[2*wire[i]],
+      cross_lin(sum[i], &f,vect[v-1],rcv_buf2[2*wire[i]], hop*non_local_chi[2*wire[i]],
 	    src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
   }
   
-  ParTrans::PTflops += 90*n_vect*n_dir*vol;
+//  ParTrans::PTflops += 90*n_vect*n_dir*vol;
   
 }
 
 //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
-void pt_shift_field(Matrix **v, const int *dir, int n_dir,
-		    int hop, Matrix **u){
+void PT::shift_field(IFloat **v, const int *dir, int n_dir,
+		    int hop, IFloat **u){
 
   int i, length;
   int wire[n_dir];
@@ -1772,7 +1852,7 @@ void pt_shift_field(Matrix **v, const int *dir, int n_dir,
   for (i=0; i<n_dir; i++) {
     SCUarg_p[2*i] = SCUarg_mat[hop-1][2*wire[i]];
     SCUarg_p[2*i+1] = SCUarg_mat[hop-1][2*wire[i]+1];
-    SCUarg_p[2*i+1]->Addr((void *)(v[i]+pt_offset(wire[i], hop)));
+    SCUarg_p[2*i+1]->Addr((void *)(v[i]+set_offset(wire[i], hop)));
   }
 
   SCUmulti.Init(SCUarg_p,2*n_dir);
@@ -1788,17 +1868,17 @@ void pt_shift_field(Matrix **v, const int *dir, int n_dir,
   
   for (i=0; i<n_dir; i++) {
     length = hop*non_local_chi[wire[i]];
-    copy_matrix(u[i],(Matrix*)rcv_buf[wire[i]],&length,
+    copy_matrix(u[i],(IFloat*)rcv_buf[wire[i]],&length,
 		dest_nl[hop-1][wire[i]],src_nl[hop-1][wire[i]]);
   }
 
 }
 
 //! u[-/+nu](x) = U_[-/+nu](x) 
-void pt_shift_link(Matrix **u, const int *dir, int n_dir){
+void PT::shift_link(IFloat **u, const int *dir, int n_dir){
 
   char *fname = "pt_shift_link()";
-  VRB.Func("",fname);
+//  VRB.Func("",fname);
   int length;
   for (int i=0; i<n_dir; i++) {
     

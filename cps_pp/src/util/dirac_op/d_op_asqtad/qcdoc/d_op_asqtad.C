@@ -46,6 +46,7 @@ extern SCUDirArgIR *SCUarg_1;
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
+static long flops;
 DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
 			 Vector *f_field_out,
 			 Vector *f_field_in,
@@ -61,6 +62,7 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   char *fname = "DiracOpAsqtad(L&,V*,V*,CgArg*,CnvFrmType)";
   VRB.Func(cname,fname);
 
+  flops = (1146)*GJP.VolNodeSites();
 
   //----------------------------------------------------------------
   // Do the necessary conversions
@@ -79,7 +81,6 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
 #if 0
   asqtad_dirac_init(latt.GaugeField());
 #endif
-  asqtad_dirac_init_g();
 
   //----------------------------------------------------------------
   // Set the node checkerboard size of the fermion field
@@ -91,6 +92,8 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   // Allocate memory for the temporary fermion vector frm_tmp.
   //----------------------------------------------------------------
   frm_tmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
+  asqtad_dirac_init_g((IFloat *)frm_tmp);
+
   if(frm_tmp == 0){
     frm_tmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
     printf("frm_tmp is allocated int DDR (%p)\n",frm_tmp);
@@ -168,7 +171,7 @@ DiracOpAsqtad::~DiracOpAsqtad() {
 void DiracOpAsqtad::MatPcDagMatPc(Vector *out, 
 			       Vector *in, 
 			       Float *dot_prd){
- static long nflops = (1146)*GJP.VolNodeSites();
+ long nflops = flops;
 
 #undef PROFILE
 #ifdef PROFILE
@@ -177,6 +180,7 @@ void DiracOpAsqtad::MatPcDagMatPc(Vector *out,
 #endif
   asqtad_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
   asqtad_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
+  CGflops += nflops;
 
   if( dot_prd !=0 ){
 	vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);

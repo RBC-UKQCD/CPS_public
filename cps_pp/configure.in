@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2004-12-20 22:09:25 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.30 2004-12-20 22:09:25 chulwoo Exp $
-dnl  $Id: configure.in,v 1.30 2004-12-20 22:09:25 chulwoo Exp $
+dnl  $Date: 2005-01-13 07:46:13 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.31 2005-01-13 07:46:13 chulwoo Exp $
+dnl  $Id: configure.in,v 1.31 2005-01-13 07:46:13 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.30 $
+dnl  $Revision: 1.31 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -229,12 +229,15 @@ AC_MSG_RESULT($enable_double_precision)
 if test "$enable_double_precision" = "yes"; then
   GSUMPRECISION="double"
   LOCALPRECISION="double"
+  PRECDIR="DOUBLE_DIR"
 else
   GSUMPRECISION="double"
   LOCALPRECISION="float"
+  PRECDIR="FLOAT_DIR"
 fi
 AC_SUBST(GSUMPRECISION)
 AC_SUBST(LOCALPRECISION)
+AC_SUBST(PRECDIR)
 
 dnl configuring version number
 .  $srcdir/VERSION

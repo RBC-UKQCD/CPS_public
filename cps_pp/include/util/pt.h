@@ -2,24 +2,26 @@
 #ifdef PARALLEL
 #include<comms/sysfunc.h>
 #endif
+#if TARGET == QCDOC
 #include<util/pt_int.h>
+#endif
 CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.16 2004-12-07 05:23:18 chulwoo Exp $
+  $Id: pt.h,v 1.17 2005-01-13 07:46:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-07 05:23:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.16 2004-12-07 05:23:18 chulwoo Exp $
-//  $Id: pt.h,v 1.16 2004-12-07 05:23:18 chulwoo Exp $
+//  $Date: 2005-01-13 07:46:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.17 2005-01-13 07:46:14 chulwoo Exp $
+//  $Id: pt.h,v 1.17 2005-01-13 07:46:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -34,6 +36,32 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <comms/scu.h>
 CPS_START_NAMESPACE
+
+void pt_init(Lattice &lat);  //!< Initialization for parallel transporters
+void pt_init_g();
+void pt_delete();
+void pt_delete_g();
+void pt_mat(int n, Float **mout, Float **min, const int *dir);
+void pt_1vec(int n, Float **vout, Float **vin, int const *dir);
+void pt_2vec(int n, Float **vout, Float **vin, const int *dir);
+//void pt_set_hop_pointer();
+int pt_offset(int dir, int hop);
+void pt_vvpd(Float **vect, int n_vect, const int *dir,
+	     int n_dir, int hop, Float **sum);
+void pt_shift_field(Float **v, const int *dir, int n_dir,
+		    int hop, Float **u);
+void pt_shift_link(Float **u, const int *dir, int n_dir);
+
+//---------------------------------------------------------------
+//Checkerboarding methods
+void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb);  //!<Parallel transport for checkerboarded Matrix fields
+void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb); //!<Parallel transport for checkerboarded Vector fields
+void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb, Float * new_gauge_field); //!<Parallel transport for checkerboarded Vector fields
+void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, int pad); //!<Parallel transport for padded checkerboarded Vector fields
+void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, int pad, Float * new_gauge_field); //!<Parallel transport for padded checkerboarded Vector fields
+void pt_1vec_cb_norm(int n, Float **vout, Float **vin, const int *dir,ChkbType cb, Float * gauge);
+void pt_1vec_cb_pad(int n, Float *vout, Float **vin, const int *dir,ChkbType cb,int pad, Float * gauge);
+//---------------------------------------------------------------
 
 
 //------------------------------------------------------------------
@@ -109,6 +137,7 @@ class ParTransStagTypes : public ParTrans
 
 };
 
+#if 0
 struct gauge_agg{
   int src;
   int dest;
@@ -141,6 +170,7 @@ struct hop_pointer {
   int src;
   int dest;
 };
+#endif
 
 //------------------------------------------------------------------
 //! A class describing the Parallel Transport operator for staggered fermions.
@@ -206,19 +236,19 @@ class ParTransAsqtad : public ParTransStagTypes
     */
     void vvpd(Vector **vect, int n_vect,
 	      const int *dir, int n_dir, int hop, Matrix **sum){
-	pt_vvpd(vect,n_vect,dir,n_dir,hop,sum);
+	pt_vvpd((IFloat **)vect,n_vect,dir,n_dir,hop,(IFloat **)sum);
      }
 
     //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
     void shift_field(Matrix **v, const int *dir, int n_dir,
 		     int hop, Matrix **u){
-        pt_shift_field(v,dir,n_dir,hop,u);
+        pt_shift_field((IFloat **)v,dir,n_dir,hop,(IFloat **)u);
     }
     
 
     //! u[-/+nu](x) = U_[-/+nu](x)
     void shift_link(Matrix **u, const int *dir, int n_dir){
-        pt_shift_link(u,dir,n_dir);
+        pt_shift_link((IFloat **)u,dir,n_dir);
     }
 
     ~ParTransAsqtad();

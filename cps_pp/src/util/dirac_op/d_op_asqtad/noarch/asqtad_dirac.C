@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.14 2004-12-15 07:32:12 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.15 2005-01-13 07:46:14 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -222,9 +222,9 @@ int k;
 //  Fermion initializations: pointer tables 
 //-------------------------------------------------------------------
 extern "C"
-void asqtad_dirac_init(const void * gauge_u )
+void asqtad_dirac_init(Fasqtad * lat )
 {
-  gauge_field_addr = ( IFloat * ) gauge_u;
+  gauge_field_addr = ( IFloat * ) lat->GaugeField();
   int r,c,i,j,m,n,nn;
   int local_count[2];
   int non_local_count[2];

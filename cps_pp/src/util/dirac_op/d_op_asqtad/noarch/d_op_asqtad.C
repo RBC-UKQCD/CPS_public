@@ -54,14 +54,6 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
     lat.Convert(STAG);
 
   //----------------------------------------------------------------
-  // Make a copy of gauge fields and rearrange them
-  // so that it is suitable for Dirac operation. Here we
-  // Assume that only one DiracStagOp instance exists at any time,
-  // otherwise we need a static data member to check initializtions
-  //----------------------------------------------------------------
-  asqtad_dirac_init_g();
-
-  //----------------------------------------------------------------
   // Set the node checkerboard size of the fermion field
   //----------------------------------------------------------------
   f_size_cb = GJP.VolNodeSites() * lat.FsiteSize() / 2;
@@ -76,6 +68,13 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   VRB.Smalloc(cname,fname, "frm_tmp", 
 	      frm_tmp, f_size_cb * sizeof(Float));
 
+  //----------------------------------------------------------------
+  // Make a copy of gauge fields and rearrange them
+  // so that it is suitable for Dirac operation. Here we
+  // Assume that only one DiracStagOp instance exists at any time,
+  // otherwise we need a static data member to check initializtions
+  //----------------------------------------------------------------
+  asqtad_dirac_init_g((IFloat *)frm_tmp);
 
   //----------------------------------------------------------------
   // Initialize parameters

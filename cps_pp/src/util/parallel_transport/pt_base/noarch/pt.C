@@ -1,19 +1,19 @@
 /*! \file
   \brief  Functions used by the ParTransAsqtad class.
   
-  $Id: pt.C,v 1.6 2004-09-02 17:00:05 zs Exp $
+  $Id: pt.C,v 1.7 2005-01-13 07:46:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 17:00:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.6 2004-09-02 17:00:05 zs Exp $
-//  $Id: pt.C,v 1.6 2004-09-02 17:00:05 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-01-13 07:46:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.7 2005-01-13 07:46:20 chulwoo Exp $
+//  $Id: pt.C,v 1.7 2005-01-13 07:46:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v $
 //  $State: Exp $
 //
@@ -115,9 +115,11 @@ void pt_1vec(int N, IFloat **fout, IFloat **fin, const int *dir){
   Computes sum[x] = vect[x] vect[x + hop dir]^dagger
   where the sum is over n_vect vectors and the hop is in a forward direction.
 */
-void pt_vvpd(Vector **vect, int n_vect,
-	     const int *dir, int n_dir, int hop, Matrix **sum){
+void pt_vvpd(IFloat **vect_v, int n_vect,
+	     const int *dir, int n_dir, int hop, IFloat **sum_m){
   
+  Vector **vect = (Vector **) vect_v;
+  Matrix **sum = (Matrix **) sum_m;
   int s[4];
   Matrix m;
   
@@ -166,10 +168,12 @@ void pt_vvpd(Vector **vect, int n_vect,
 
 
 //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
-void pt_shift_field(Matrix **v, const int *dir, int n_dir,
-		    int hop, Matrix **u){
+void pt_shift_field(IFloat **v_m, const int *dir, int n_dir,
+		    int hop, IFloat **u_m){
     
 
+    Matrix **v = (Matrix **)v_m;
+    Matrix **u = (Matrix **)u_m;
     int s[4];
   
     for(int d=0; d<n_dir; d++){
@@ -232,8 +236,9 @@ void pt_shift_field(Matrix **v, const int *dir, int n_dir,
 }
 
 //! u[-/+nu](x) = U_[-/+nu](x) 
-void pt_shift_link(Matrix **u, const int *dir, int n_dir){
+void pt_shift_link(IFloat **u_m, const int *dir, int n_dir){
 
+    Matrix **u = (Matrix **)u_m;
     int s[4];
     Matrix m; 
   

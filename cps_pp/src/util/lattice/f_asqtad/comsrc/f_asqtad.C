@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of some Fasqtad class methods.
 
-  $Id: f_asqtad.C,v 1.19 2004-12-21 19:02:40 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.20 2005-01-13 07:46:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -36,9 +36,6 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 
-#if TARGET == QCDOC
-void  set_pt (Fasqtad *lat);
-#endif
 
 
 //int Fasqtad::ForceFlops=0;
@@ -52,10 +49,7 @@ Fasqtad::Fasqtad()
   char *fname = "Fasqtad()";
   VRB.Func(cname,fname);
 
-  asqtad_dirac_init(GaugeField());
-#if TARGET == QCDOC
-  set_pt (this);
-#endif
+  asqtad_dirac_init(this);
 
 }
 

@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.15 2004-12-06 21:18:04 chulwoo Exp $
+  $Id: main.C,v 1.16 2005-01-13 07:46:25 chulwoo Exp $
 */
 
 #include<config.h>
@@ -94,6 +94,15 @@ int main(int argc,char *argv[]){
     do_arg.asqtad_5staple = ( 1.0/8.0)*0.25*0.5;
     do_arg.asqtad_7staple = (-1.0/8.0)*0.125*(1.0/6.0);
     do_arg.asqtad_lepage = -1.0/16;
+
+#if 0
+    do_arg.asqtad_naik = 1e-16;
+    do_arg.asqtad_KS = 1.;
+    do_arg.asqtad_3staple = 1e-16;
+    do_arg.asqtad_5staple = 1e-16;
+    do_arg.asqtad_7staple = 1e-16;
+    do_arg.asqtad_lepage = 1e-16;
+#endif
     
     CgArg cg_arg;
 
@@ -112,6 +121,7 @@ int main(int argc,char *argv[]){
     GJP.Initialize(do_arg);
 
     VRB.Level(0);
+    VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
     VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
     fp = Fopen(ADD_ID,"f_asqtad_test.out","w");
@@ -179,7 +189,7 @@ int main(int argc,char *argv[]){
 	printf("iter=%d\n",iter);
 #else
 	dirac.Dslash(out->Vec(),X_in->Vec(offset),CHKB_ODD,DAG_NO);
-	dirac.Dslash(out->Vec(offset),X_in,CHKB_EVEN,DAG_NO);
+	dirac.Dslash(out->Vec(offset),X_in->Vec(),CHKB_EVEN,DAG_NO);
 #endif
 
 	if (k == 0){

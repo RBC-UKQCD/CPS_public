@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX LD AR AS CXXFLAGS ac_ct_CXX NOT_TESTING_QCDSP topwd_srcdir ARCH ARCHDIR ASFLAGS DFLAGS INCLUDE_FLAGS TESTING_PARALLEL ENABLE_PARALLEL QOS DO_GMP CPS_END_NAMESPACE CPS_START_NAMESPACE USING_NAMESPACE_CPS CWD GSUMPRECISION LOCALPRECISION VERSION_MAJOR VERSION_MINOR VERSION_SUB VERSION_STR INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA have_doxygen LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX LD AR AS CXXFLAGS ac_ct_CXX NOT_TESTING_QCDSP topwd_srcdir ARCH ARCHDIR ASFLAGS DFLAGS INCLUDE_FLAGS TESTING_PARALLEL ENABLE_PARALLEL QOS DO_GMP CPS_END_NAMESPACE CPS_START_NAMESPACE USING_NAMESPACE_CPS CWD GSUMPRECISION LOCALPRECISION PRECDIR VERSION_MAJOR VERSION_MINOR VERSION_SUB VERSION_STR INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA have_doxygen LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -4060,10 +4060,13 @@ echo "${ECHO_T}$enable_double_precision" >&6
 if test "$enable_double_precision" = "yes"; then
   GSUMPRECISION="double"
   LOCALPRECISION="double"
+  PRECDIR="DOUBLE_DIR"
 else
   GSUMPRECISION="double"
   LOCALPRECISION="float"
+  PRECDIR="FLOAT_DIR"
 fi
+
 
 
 
@@ -5643,6 +5646,7 @@ s,@USING_NAMESPACE_CPS@,$USING_NAMESPACE_CPS,;t t
 s,@CWD@,$CWD,;t t
 s,@GSUMPRECISION@,$GSUMPRECISION,;t t
 s,@LOCALPRECISION@,$LOCALPRECISION,;t t
+s,@PRECDIR@,$PRECDIR,;t t
 s,@VERSION_MAJOR@,$VERSION_MAJOR,;t t
 s,@VERSION_MINOR@,$VERSION_MINOR,;t t
 s,@VERSION_SUB@,$VERSION_SUB,;t t

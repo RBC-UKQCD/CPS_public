@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.16 2004-12-21 19:02:35 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.17 2005-01-13 07:46:12 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -52,7 +52,9 @@ DIRLIST := $(patsubst $(SRCDIR2)/%/Makefile, %, $(DIRLIST))
 ARCH = @ARCH@
 ARCHDIR := $(@ARCHDIR@)
 
-FILTERDIR := $(filter-out $(ARCHDIR) , $(NORECURSE_DIR))
+PRECDIR := $(@PRECDIR@)
+
+FILTERDIR := $(filter-out $(ARCHDIR) $(PRECDIR), $(NORECURSE_DIR))
 RECURSEDIRS := $(filter-out $(FILTERDIR) , $(DIRLIST))
 
 ifeq "$(ARCH)" "cpsMPI"
