@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of some Fasqtad class methods.
 
-  $Id: f_asqtad.C,v 1.21 2005-02-18 20:18:12 mclark Exp $
+  $Id: f_asqtad.C,v 1.22 2005-03-09 18:23:55 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -365,9 +365,9 @@ void Fasqtad::Smear(){
 
   IFloat c1 = GJP.KS_coeff();
   IFloat c2 = GJP.Naik_coeff();
-  IFloat c3 = GJP.staple3_coeff();
+  IFloat c3 = -GJP.staple3_coeff();
   IFloat c5 = GJP.staple5_coeff();
-  IFloat c7 = GJP.staple7_coeff();
+  IFloat c7 = -GJP.staple7_coeff();
   IFloat c6 = GJP.Lepage_coeff();
 
   int i, j; 

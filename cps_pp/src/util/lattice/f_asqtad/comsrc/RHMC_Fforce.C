@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce.C,v 1.7 2005-02-18 20:18:12 mclark Exp $
+  $Id: RHMC_Fforce.C,v 1.8 2005-03-09 18:23:54 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -269,7 +269,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 	    for(w=0; w<N; w++)
 		for(ns=0; ns<n_sign; ns++)
 		    force_product_sum(P3[plus][ns][w], Pnu[ns][w], Lnu[ns][w],
-				      -GJP.staple3_coeff(), force[mu[w]], mtmp);
+				      GJP.staple3_coeff(), force[mu[w]], mtmp);
 
 
 	    for(int r=n+1; r<n+4; r++){                     // Loop over rho
@@ -393,7 +393,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		for(w=0; w<N; w++)
 		    for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(ss=0; ss<n_sign; ss++)
 			force_product_sum(P7[plus][ns][rs][ss][w], Psigmarhonu[ns][rs][ss][w],
-					  Lsigmarhonu[ns][rs][ss][w], -GJP.staple7_coeff(),
+					  Lsigmarhonu[ns][rs][ss][w], GJP.staple7_coeff(),
 					  force[mu[w]], mtmp);
 	
 		// F_sigma += P7 (Psigmarhonu Lsigmarhonu)^\dagger
@@ -402,7 +402,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		for(w=0; w<N; w++)
 		    for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) 
 			force_product_sum(P7[plus][ns][rs][minus][w], Psigmarhonu[ns][rs][minus][w],
-					  Lsigmarhonu[ns][rs][minus][w], GJP.staple7_coeff(),
+					  Lsigmarhonu[ns][rs][minus][w], -GJP.staple7_coeff(),
 					  force[sigma[w]], mtmp);
 
 		// Lmusigmarhonu = Lsigmarhonu[x-mu]
@@ -422,7 +422,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		for(w=0; w<N; w++)
 		    for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) 
 			force_product_sum(Psigmarhonu[ns][rs][minus][w], P7[minus][ns][rs][minus][w],
-					  Lmusigmarhonu[ns][rs][w], GJP.staple7_coeff(),
+					  Lmusigmarhonu[ns][rs][w], -GJP.staple7_coeff(),
 					  force[sigma[w]], mtmp);
 
 		// Psigma7 = U_sigma P7 
@@ -445,7 +445,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		for(w=0; w<N; w++)
 		    for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) 
 			force_product_sum(Psigma7[plus][ns][rs][plus][w],	Prhonu[ns][rs][w],
-					  Lrhonu[ns][rs][w], GJP.staple7_coeff(),
+					  Lrhonu[ns][rs][w], -GJP.staple7_coeff(),
 					  force[sigma[w]], mtmp);
 
 		// Lmurhonu = Lrhonu[x-mu]
@@ -464,11 +464,11 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		for(w=0; w<N; w++)
 		    for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) 
 			force_product_sum(Prhonu[ns][rs][w], Psigma7[minus][ns][rs][plus][w],
-					  Lmurhonu[ns][rs][w], GJP.staple7_coeff(),
+					  Lmurhonu[ns][rs][w], -GJP.staple7_coeff(),
 					  force[sigma[w]], mtmp);
 	  
 		if(GJP.staple5_coeff()!=0.0) {
-		    Float tmp = GJP.staple7_coeff()/GJP.staple5_coeff();
+		    Float tmp = -GJP.staple7_coeff()/GJP.staple5_coeff();
 		    for(ms=0; ms<n_sign; ms++) 
 			for(ns=0; ns<n_sign; ns++) 
 			    for(rs=0; rs<n_sign; rs++) 
@@ -555,7 +555,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		// P3 += c_5/c_3 Prho5
 	  
 		if(GJP.staple3_coeff()!=0.0) {
-		    Float tmp = GJP.staple5_coeff()/GJP.staple3_coeff();
+		    Float tmp = -GJP.staple5_coeff()/GJP.staple3_coeff();
 		    for(ms=0; ms<n_sign; ms++) 
 			for(ns=0; ns<n_sign; ns++) 
 			    for(rs=0; rs<n_sign; rs++) 
@@ -690,7 +690,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 	    // P3 += c_L/c_3 Pnu5
 	
 	    if(GJP.staple3_coeff()!=0.0) {
-		Float tmp = GJP.Lepage_coeff()/GJP.staple3_coeff();
+		Float tmp = -GJP.Lepage_coeff()/GJP.staple3_coeff();
 		for(ms=0; ms<n_sign; ms++) 
 		    for(ns=0; ns<n_sign; ns++) 
 			for(w=0; w<N; w++)
@@ -718,13 +718,13 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 	
 	    for(w=0; w<N; w++)
 		force_product_sum(P3[plus][minus][w], Pnu[minus][w], Lnu[minus][w], 
-				  GJP.staple3_coeff(), force[nu[w]], mtmp);
+				  -GJP.staple3_coeff(), force[nu[w]], mtmp);
 
 	    // F_nu +=  Pnu (P3 Lmunu)^\dagger
 	
 	    for(w=0; w<N; w++)
 		force_product_sum(Pnu[minus][w], P3[minus][minus][w], Lmunu[minus][w],
-				  GJP.staple3_coeff(), force[nu[w]], mtmp);
+				  -GJP.staple3_coeff(), force[nu[w]], mtmp);
 
 	    // Pnu3 = U_nu P3
 	
@@ -740,7 +740,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 	    // F_nu += Pnu3 L^\dagger
 	
 	    for(w=0; w<N; w++)
-		force_product_sum(Pnu3[plus][plus][w], L[w], GJP.staple3_coeff(),
+		force_product_sum(Pnu3[plus][plus][w], L[w], -GJP.staple3_coeff(),
 				  force[nu[w]]);
 
 	    // Lmu = L[x-mu]
@@ -756,7 +756,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 	    // F_nu += (Pnu3 Lmu)^\dagger
 	
 	    for(w=0; w<N; w++)
-		force_product_d_sum(Pnu3[minus][plus][w], Lmu[w], GJP.staple3_coeff(),
+		force_product_d_sum(Pnu3[minus][plus][w], Lmu[w], -GJP.staple3_coeff(),
 				    force[nu[w]]);
 	
 	    // This stuff is to be done once only for each value of nu[w].
