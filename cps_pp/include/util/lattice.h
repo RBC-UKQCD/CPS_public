@@ -3,18 +3,22 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.3 2003-08-29 20:27:38 mike Exp $
+  $Id: lattice.h,v 1.4 2003-08-29 20:43:59 mike Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: mike $
-//  $Date: 2003-08-29 20:27:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.3 2003-08-29 20:27:38 mike Exp $
-//  $Id: lattice.h,v 1.3 2003-08-29 20:27:38 mike Exp $
+//  $Date: 2003-08-29 20:43:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.4 2003-08-29 20:43:59 mike Exp $
+//  $Id: lattice.h,v 1.4 2003-08-29 20:43:59 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3  2003/08/29 20:27:38  mike
+//  Added new function prepForce for use by RHMC to avoid storing Dslash psi for all
+//  evaluated poles simultaneusly.
+//
 //  Revision 1.2  2003/07/24 16:53:53  zs
 //  Addition of documentation via doxygen:
 //  doxygen-parsable comment blocks added to many source files;
@@ -68,7 +72,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -749,6 +753,31 @@ class Lattice
       \post \a f_out contains the solution vector.
     */
 
+    virtual int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+			 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm) = 0;
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The solution vectors.
+      \param f_in The source vector
+      \param shift The shifts of the fermion matrix.
+      \param Nshift The number of shifts
+      \param isz The smallest shift (required by MInvCG)
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field. Fields that are converted are restored to their original
+  order upon exit of this method. \e N.B. If the fields are already in the
+  suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
+
     virtual int FmatInv(Vector *f_out, Vector *f_in, 
 			CgArg *cg_arg, 
                         Float *true_res,
@@ -811,9 +840,6 @@ class Lattice
       \post \a f_out contains the solution vector.
     */
     
-    virtual int FmatMInv(Vector **f_out, Vector *f_in, Float *shift, 
-			 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm) = 0;
-
     virtual int FeigSolv(Vector **f_eigenv, Float lambda[], 
 			 Float chirality[], int valid_eig[],
 			 Float **hsum,
@@ -1487,6 +1513,32 @@ class Fstag : public virtual FstagTypes
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
         // Same as original but with true_res=0;
 
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
+		 int Nshift, int isz, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm);
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The solution vectors.
+      \param f_in The source vector
+      \param shift The shifts of the fermion matrix.
+      \param Nshift The number of shifts
+      \param isz The smallest shift (required by MInvCG)
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field. Fields that are converted are restored to their original
+  order upon exit of this method. \e N.B. If the fields are already in the
+  suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
+
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
@@ -1513,10 +1565,6 @@ class Fstag : public virtual FstagTypes
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
         // Same as original but with true_res=0;
-
-    int FmatMInv(Vector **f_out, Vector *f_in, Float *shift,
-		 int Nshift, int isz, CgArg *cg_arg, 
-		 CnvFrmType cnv_frm);
 
     int FeigSolv(Vector **f_eigenv, Float lambda[], 
 		 Float chirality[], int valid_eig[],
@@ -1787,7 +1835,7 @@ class FwilsonTypes : public virtual Lattice
 
     FwilsonTypes(void);
 
-    int FmatMInv(Vector **out, Vector *in, Float *shift, 
+    int FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
 		 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
       {
 	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
