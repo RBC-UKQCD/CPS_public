@@ -4,7 +4,6 @@
 #include <util/lat_data.h>
 #include <util/vector.h>
 #include <util/smalloc.h>
-#include <malloc.h>
 
 CPS_START_NAMESPACE
 int LatData::DEFAULT_FLAG = 0;
@@ -15,7 +14,7 @@ void LatData::Init(int flags, int len, int volume){
 	ERR.General(cname,"Init()","not allowed to initialize twice\n");
 	size = len;
 	vol = volume;
-	data = (IFloat *)malloc(sizeof(IFloat)*size*vol);
+	data = (IFloat *)smalloc(sizeof(IFloat)*size*vol);
 	if (data == NULL)
         ERR.General("LatData","Init()","out of memory");
 //	printf("size=%d vol=%d data(%p)=%p\n",size,vol,&data,data);
