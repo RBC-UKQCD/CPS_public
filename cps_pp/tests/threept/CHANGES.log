@@ -1,0 +1,19 @@
+#include<config.h>
+CPS_START_NAMESPACE
+
+
+====================================================================
+/tmp_mnt/home/cmm80/phys/phys_v4.1.1.test/tests/threept/main.C
+====================================================================
+109,111c109,111
+<   do_arg.x_node_sites = 4;
+<   do_arg.y_node_sites = 4;
+<   do_arg.z_node_sites = 4;
+---
+>   do_arg.x_node_sites = 2;
+>   do_arg.y_node_sites = 2;
+>   do_arg.z_node_sites = 2;
+133,134d132
+<   //do_arg.verbose_level = 10;
+< 
+CPS_END_NAMESPACE

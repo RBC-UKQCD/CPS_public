@@ -1,0 +1,107 @@
+/*
+ * Global options for compiling the Colombia code:
+ * @configure_input@
+ * 
+ *    Currently, this fine copes with two different build environments,
+ *       on QCDSP or not on QCDSP, as determined by a flag.
+ *--------------------------------------------------------------------
+ *  CVS keywords
+ *
+ *  $Author: mcneile $
+ *  $Date: 2003-06-22 13:34:45 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+ *  $Id: config.h.in,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+ *  $Name: not supported by cvs2svn $
+ *  $Locker:  $
+ *  $RCSfile: config.h.in,v $
+ *  $Revision: 1.1.1.1 $
+ *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
+ *  $State: Exp $
+ */
+/* ------------------------------------------------------------------*/
+
+#ifndef INCLUDED_CONFIG_H_
+#define INCLUDED_CONFIG_H_
+
+/* Define this flag if you are using QCDSP (default): */
+#ifndef TARGET_QCDSP
+#define TARGET_QCDSP 1
+#endif
+
+
+#if TARGET_QCDSP == 0   /* General non-QCDSP version: */
+
+/* For parallel compilation? default is serial (PARALLEL undefined) */
+#if PARALLEL == 0
+#undef PARALLEL
+#endif
+
+/* Explicit casting away of the const-ness  */
+#define CAST_AWAY_CONST(x) ( const_cast<char*>(x) )
+
+/* For the global sum: precision (undefined gives QCDSP behaviour): */
+#define GLOBALSUM_TYPE @GSUMPRECISION@
+
+/* Precision of the local calculations: rfloat, float, double. */
+#define LOCALCALC_TYPE @LOCALPRECISION@
+/* Precision of other internal calcs: float, double. */
+#define INTERNAL_LOCALCALC_TYPE @LOCALPRECISION@
+
+/* If parallel (and not QCDSP), include the MPI layer in the make: */
+#ifdef PARALLEL
+#define INCLUDE_MPI_SCU 1
+#endif
+
+/* Data size for the MPI comms layer: */
+#define COMMS_DATASIZE (sizeof(@LOCALPRECISION@))
+
+/* Debug flag: */
+#ifndef VERBOSE
+#define VERBOSE 1
+#endif
+
+#define CPS_END_NAMESPACE } 
+#define CPS_START_NAMESPACE  namespace cps {
+
+
+/* Override printf to only print on one proc (Not nec. on QCDSP, only
+ *    expected to work via the MPI layer. */
+#include<util/qcdio_qprintf.h>
+
+/* ------------------------------------------------------------------*/
+#else /* For compiling on QCDSP: */
+
+#define CPS_END_NAMESPACE 
+#define CPS_START_NAMESPACE  
+
+
+#ifndef _TARTAN  /* Not using TARTAN, so under the Sun CC compiler: */
+
+#define CAST_AWAY_CONST(x) ( x )
+#define LOCALCALC_TYPE rfloat
+#define INTERNAL_LOCALCALC_TYPE float
+#define COMMS_DATASIZE 4
+#include<util/qcdio_qprintf.h>
+
+#else  /* ELSE using TARTAN */
+
+#define CAST_AWAY_CONST(x) ( x )
+#define PARALLEL 1
+#define LOCALCALC_TYPE rfloat
+#define INTERNAL_LOCALCALC_TYPE float
+#define COMMS_DATASIZE 4
+
+#endif /* END of TARTAN */
+
+#endif /* END of TARGET_QCDSP */
+
+/* ------------------------------------------------------------------*/
+/* Other overall definitions:   */
+/* ------------------------------------------------------------------*/
+
+#define SERIAL_SEED 112319
+
+#define DEFAULT_VERBOSE_LEVEL -12100502
+
+#endif /* INCLUDED_CONFIG_H_ */
+

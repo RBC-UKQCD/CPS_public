@@ -1,0 +1,666 @@
+#include<config.h>
+CPS_START_NAMESPACE
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: mcneile $
+//  $Date: 2003-06-22 13:34:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Id: convert_func.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.5  2002/12/04 17:16:27  zs
+//  Merged the new 2^4 RNG into the code.
+//  This new RNG is implemented in the LatRanGen class.
+//  The following algorithm and utility classes are affected:
+//
+//  AlgEig                  Fdwf
+//  AlgGheatBath            Fstag
+//  AlgHmd                  GlobalJobParameter
+//  AlgNoise                Lattice
+//  AlgPbp                  Matrix
+//  AlgThreept              RandomGenerator
+//                          Vector
+//
+//  Revision 1.4  2001/08/16 10:50:32  anj
+//  The float->Float changes in the previous version were unworkable on QCDSP.
+//  To allow type-flexibility, all references to "float" have been
+//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
+//  (where Float=rfloat), and on all other machines allows the use of
+//  double or float in all cases (i.e. for both Float and IFloat).  The I
+//  stands for Internal, as in "for internal use only". Anj
+//
+//  Revision 1.2  2001/06/19 18:13:21  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:16:09  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
+//  $RCSfile: convert_func.C,v $
+//  $Revision: 1.1.1.1 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
+CPS_END_NAMESPACE
+#include<util/vector.h>
+#include<util/smalloc.h>
+#include<util/verbose.h>
+#include<util/lattice.h>
+#include<comms/nga_reg.h>
+#include<comms/cbuf.h>
+CPS_START_NAMESPACE
+
+typedef struct ConvertArgStruct {
+        unsigned        lx ;
+        unsigned        ly ;
+        unsigned        lz ;
+        unsigned        lt ;
+        unsigned        nc ;
+	unsigned	ns ;
+        unsigned        vol ;
+        unsigned        site_size ;
+        Float           *start_ptr ;
+} CAS, *CAP ;
+ 
+const unsigned CBUF_MODE4 = 0xcca52112;
+#ifdef _TARTAN
+static Matrix *mp2 = (Matrix *)CRAM_SCRATCH_ADDR+2;
+#else
+static Matrix tmp_2;
+static Matrix *mp2 = &tmp_2;
+#endif
+
+void MultStagPhases(CAP cap) ;
+void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl) ;
+void CanonToAnything(CAP cap, StrOrdType new_str_ord) ;
+
+void FcanonToWilson(CAP cap, int number_of_checkerboards) ;
+void FwilsonToCanon(CAP cap, int number_of_checkerboards) ;
+void FcanonToStag(CAP cap, int number_of_checkerboards) ;
+void FstagToCanon(CAP cap, int number_of_checkerboards) ;
+
+
+char *cname_none = "(none)" ;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern void negate_link(unsigned link_size, IFloat *link) ;
+extern void site2cram(void *src, void *dst, unsigned site_size) ;
+extern void site2dram(void *src, void *dst, unsigned *link_tbl, unsigned site_size) ;
+
+#ifdef __cplusplus
+}
+#endif
+
+
+void MultStagPhases(CAP cap)
+{
+	unsigned x,y,t,z,link_size ;
+	Float *site ;
+
+//-------------------------------------------------------------------------
+//  for all that follows, assume euclidean spacetime dimension is 4
+//-------------------------------------------------------------------------
+
+	link_size = cap->site_size>>2 ;
+
+	for (t=0; t<cap->lt; t++)
+	for (z=0; z<cap->lz; z++)
+	for (y=0; y<cap->ly; y++)
+	for (x=0; x<cap->lx; x++) {
+
+		site = cap->start_ptr +
+			cap->site_size*(x+cap->lx*(y+cap->ly*(z+cap->lz*t)));
+
+		if (x%2) negate_link(link_size, (IFloat *)site+link_size);
+
+		if ((x+y)%2) negate_link(link_size, (IFloat *)site+(link_size<<1));
+
+		if ((x+y+z)%2) negate_link(link_size, (IFloat *)site+3*link_size) ;
+
+	}
+}
+
+
+void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
+{
+	unsigned 	low,
+			current,
+			desired,
+			tmp ;
+	Float		*cram1,
+			*cram2,
+			*cram_tmp ;
+	char *fname = "RunGConverter";
+
+//-------------------------------------------------------------------------
+// cram1, cram2 should be in CRAM
+//-------------------------------------------------------------------------
+
+	cram1 = (Float *) smalloc(cap->site_size*sizeof(Float)) ;
+	if(cram1 == 0)
+	  ERR.Pointer(cname_none,fname, "cram1"); 
+	VRB.Smalloc(cname_none,fname,
+		    "cram1" , cram1,
+		    cap->site_size*sizeof(Float)) ;
+	cram2 = (Float *) smalloc(cap->site_size*sizeof(Float)) ;
+	if(cram2 == 0)
+	  ERR.Pointer(cname_none,fname, "cram2"); 
+	VRB.Smalloc(cname_none,fname,
+		    "cram2" , cram2,
+		    cap->site_size*sizeof(Float)) ;
+
+	for (low=0; low<cap->vol; low++) {
+		current = low ;
+		desired = *(site_tbl+low) ;
+
+		if (desired & 1) {	// test if site needs conversion
+
+			site2cram(cap->start_ptr+cap->site_size*current,
+				cram1, cap->site_size) ;
+
+			while (low != desired>>1) {
+				tmp = *(site_tbl + (desired>>1)) ;
+				site2cram(cap->start_ptr +
+					cap->site_size*(desired>>1),
+					cram2, cap->site_size) ;
+
+				site2dram(cram1, cap->start_ptr +
+					cap->site_size*(desired>>1),
+					link_tbl,
+					cap->site_size) ;
+
+				*(site_tbl+(desired>>1)) =
+					desired & 0xFFFFFFFE ;
+
+				current = desired >> 1 ;
+				desired = tmp ;
+
+				cram_tmp = cram1 ;
+				cram1 = cram2 ;
+				cram2 = cram_tmp ;
+			} ;
+
+			site2dram(cram1,
+				cap->start_ptr+cap->site_size*low,
+				link_tbl,
+				cap->site_size) ;
+
+			*(site_tbl+low) = desired & 0xFFFFFFFE ;
+		}
+	}
+
+	VRB.Sfree(cname_none,fname, "cram2", cram2);
+	sfree(cram2) ;
+	VRB.Sfree(cname_none,fname, "cram1", cram1);
+	sfree(cram1) ;
+}
+
+void CanonToAnything(CAP cap, StrOrdType new_str_ord)
+{
+	unsigned offset,x,y,z,t,r,row,col,mu ;
+	unsigned *site_sort_tbl, *link_sort_tbl ;
+
+	char *fname = "CanonToAnything(CAP,StrOrdType)" ;
+
+	switch (new_str_ord) {
+		case STAG :
+
+			VRB.Flow(cname_none,fname,
+			"Converting gauge field order: CANONICAL -> STAG\n");
+
+			MultStagPhases(cap) ; // CANONICAL -> STAG
+
+			//---------------------------------------------------
+			//  Dagger all links
+			//---------------------------------------------------
+			{
+			  Matrix *p = (Matrix *) cap->start_ptr;
+			  int n_links = 4 * cap->vol;
+			  
+			  setCbufCntrlReg(4, CBUF_MODE4);
+			  
+			  for(int i = 0; i < n_links; ++i) {
+			    mp2->Dagger((IFloat *)p+BANK4_BASE+BANK_SIZE);
+			    moveMem((IFloat *)(p++), (IFloat *)mp2,
+				    18*sizeof(IFloat));
+			  }
+			}
+
+			break ;
+
+		case WILSON :
+		case G_WILSON_HB :
+
+			if (new_str_ord == WILSON)
+				VRB.Flow(cname_none,fname,
+				"Converting gauge field order: %s",
+				"CANONICAL -> WILSON\n");
+			else
+				VRB.Flow(cname_none,fname,
+				"Converting gauge field order: %s",
+				"CANONICAL -> G_WILSON_HB\n");
+
+			site_sort_tbl = (unsigned *)
+				smalloc(cap->vol*sizeof(unsigned)) ;
+			if(site_sort_tbl == 0)
+			  ERR.Pointer(cname_none,fname, "site_sort_tbl"); 
+			VRB.Smalloc(cname_none,fname,
+				    "site_sort_tbl" , site_sort_tbl,
+				    cap->vol*sizeof(unsigned)) ;
+
+
+
+			offset = 0 ;
+
+//-------------------------------------------------------------------------
+// Loop over current (CANONICAL) equation for site sequence number
+//-------------------------------------------------------------------------
+
+			for (t=0; t<cap->lt; t++)
+			for (z=0; z<cap->lz; z++)
+			for (y=0; y<cap->ly; y++)
+			for (x=0; x<cap->lx; x++) {
+
+//-------------------------------------------------------------------------
+// Use desired (WILSON or G_WILSON_HB) equation for site sequence number
+// actual WILSON formula is (x-x%2+lx*(y+ly*(z+lz*t))+vol*((x+y+z+t)%2))/2
+// LSB = 1 indicates site needs converting
+//-------------------------------------------------------------------------
+
+				if (new_str_ord == WILSON)
+					*(site_sort_tbl+offset) = (x - x%2
+					+ cap->lx*(y+cap->ly*(z+cap->lz*t))
+					+ cap->vol*((x+y+z+t)%2)) | 1 ;
+				else		// G_WILSON_HB
+					*(site_sort_tbl+offset) = 
+					z+cap->lz*(y+cap->ly*(x+cap->lx*t))
+					<< 1 | 1 ;
+
+				offset++ ;
+			}
+
+			link_sort_tbl = (unsigned *)
+				smalloc(cap->site_size*sizeof(unsigned)) ;
+			if(link_sort_tbl == 0)
+			  ERR.Pointer(cname_none,fname, "link_sort_tbl"); 
+			VRB.Smalloc(cname_none,fname,
+				    "link_sort_tbl" , link_sort_tbl,
+				    cap->site_size*sizeof(unsigned)) ;
+
+//-------------------------------------------------------------------------
+// Loop over current (CANONICAL) order of reals in site
+//-------------------------------------------------------------------------
+
+			offset = 0 ;
+
+			for (mu=0; mu<4; mu++)          // 4 is spacetime dim
+			for (row=0; row<cap->nc; row++)
+			for (col=0; col<cap->nc; col++)
+			for (r=0; r<2; r++) {           // 2 is # cplx comp
+
+//-------------------------------------------------------------------------
+// Use desired (WILSON or G_WILSON_HB) equation for reals in site
+//-------------------------------------------------------------------------
+
+				if (new_str_ord == WILSON)
+					*(link_sort_tbl+offset) =
+					r+2*(row+cap->nc*(col+cap->nc*mu)) ;
+				else
+					*(link_sort_tbl+offset) = col+cap->nc*
+					(row+cap->nc*(r+2*((mu+1)%4))) ;
+				
+				offset++ ;
+			}
+
+			RunGConverter(cap, site_sort_tbl, link_sort_tbl) ;
+
+			VRB.Sfree(cname_none,fname, "link_sort_tbl", link_sort_tbl);
+			sfree(link_sort_tbl);
+			VRB.Sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
+			sfree(site_sort_tbl) ;
+
+			break ;
+		case CANONICAL :
+		default :
+			break ;
+	}
+}
+
+
+void FcanonToWilson(CAP cap, int num_chkbds)
+{
+	char *fname = "FcanonToWilson(CAP, int)";
+	VRB.Func(cname_none,fname);
+
+	unsigned idx,x,y,z,t,r,color,spin ;
+
+	unsigned *site_sort_tbl ;
+	unsigned *component_sort_tbl ;
+
+	site_sort_tbl = (unsigned *) smalloc(cap->vol * sizeof(unsigned)) ;
+	if(site_sort_tbl == 0)
+	  ERR.Pointer(cname_none,fname, "site_sort_tbl"); 
+	VRB.Smalloc(cname_none,fname,
+		    "site_sort_tbl" , site_sort_tbl,
+		    cap->vol * sizeof(unsigned)) ;
+
+//-------------------------------------------------------------------------
+// component_sort_tbl should be in CRAM
+//-------------------------------------------------------------------------
+
+	component_sort_tbl = 
+		(unsigned *) smalloc(cap->site_size * sizeof(unsigned));
+	if(component_sort_tbl == 0)
+	  ERR.Pointer(cname_none,fname, "component_sort_tbl"); 
+	VRB.Smalloc(cname_none,fname,
+		    "component_sort_tbl" , component_sort_tbl,
+		    cap->site_size * sizeof(unsigned));
+
+//-------------------------------------------------------------------------
+// Loop over current (CANONICAL) order of sites in local volume
+// Use desired (WILSON) equation for site sequence number
+// actual WILSON formula is (x-x%2+lx*(y+ly*(z+lz*t))+vol*((x+y+z+t)%2))/2
+// LSB = 1 indicates site needs converting
+//-------------------------------------------------------------------------
+
+	idx = 0 ;
+        if(num_chkbds == 2)  {
+	for (t=0; t<cap->lt; t++)
+	for (z=0; z<cap->lz; z++)
+	for (y=0; y<cap->ly; y++)
+	for (x=0; x<cap->lx; x++) {
+
+		*(site_sort_tbl+idx) = (x - x%2 
+			+ cap->lx*(y+cap->ly*(z+cap->lz*t)) 
+			+ cap->vol*((x+y+z+t+1)%2)) | 1 ;
+
+		idx++ ;
+	  }
+	}
+	else if(num_chkbds == 1) {
+	  return; 	// No conversion is necessary for a half lattice
+	}
+//-------------------------------------------------------------------------
+// Loop over current (CANONICAL) order of reals in site
+// Use desired (WILSON) equation for reals in site
+//-------------------------------------------------------------------------
+	idx = 0 ;
+
+	for (spin=0; spin<cap->ns; spin++)
+	for (color=0; color<cap->nc; color++)
+	for (r=0; r<2; r++) {			// 2 is # cplx comp
+	
+		*(component_sort_tbl+idx) = r + 2*(color + cap->nc*spin) ;
+
+		idx++ ;
+	}
+
+	RunGConverter(cap, site_sort_tbl, component_sort_tbl);
+
+	VRB.Sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
+	sfree(component_sort_tbl);
+	VRB.Sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
+	sfree(site_sort_tbl);
+}
+
+void FwilsonToCanon(CAP cap, int num_chkbds)
+{
+	char *fname = "FwilsonToCanon(CAP, int)";
+	VRB.Func(cname_none,fname);
+
+	unsigned idx,x,y,z,t,r,color,spin,cb ;
+
+	unsigned *site_sort_tbl ;
+	unsigned *component_sort_tbl ;
+
+	site_sort_tbl = (unsigned *) smalloc(cap->vol * sizeof(unsigned)) ;
+	if(site_sort_tbl == 0)
+	  ERR.Pointer(cname_none,fname, "site_sort_tbl"); 
+	VRB.Smalloc(cname_none,fname,
+		    "site_sort_tbl" , site_sort_tbl,
+		    cap->vol * sizeof(unsigned)) ;
+
+//-------------------------------------------------------------------------
+// component_sort_tbl should be in CRAM
+//-------------------------------------------------------------------------
+
+	component_sort_tbl = 
+		(unsigned *) smalloc(cap->site_size * sizeof(unsigned));
+	if(component_sort_tbl == 0)
+	  ERR.Pointer(cname_none,fname, "component_sort_tbl"); 
+	VRB.Smalloc(cname_none,fname,
+		    "component_sort_tbl" , component_sort_tbl,
+		    cap->site_size * sizeof(unsigned));
+
+//-------------------------------------------------------------------------
+// Loop over current (WILSON) order of sites in local volume
+// Use desired (CANONICAL) equation for site sequence number
+// LSB = 1 indicates site needs converting
+//-------------------------------------------------------------------------
+
+	idx = 0 ;
+	if(num_chkbds == 2) {
+	for (cb=0; cb<2; cb++)
+	for (t=0; t<cap->lt; t++)
+	for (z=0; z<cap->lz; z++)
+	for (y=0; y<cap->ly; y++)
+	for (x=0; x<cap->lx; x++) {
+		if ((x+y+z+t+1)%2 == cb) {
+			*(site_sort_tbl+idx) = 
+			x + cap->lx*(y+cap->ly*(z+cap->lz*t))<<1 | 1 ;
+			idx++ ;
+		}
+	  }
+	}
+	else if(num_chkbds == 1) {
+	  return;	// No conversion is necessary for a half lattice
+	}			// in the WILSON storage ordering
+//-------------------------------------------------------------------------
+// Loop over current (WILSON) order of reals in site
+// Use desired (CANONICAL) equation for reals in site
+//-------------------------------------------------------------------------
+
+	idx = 0 ;
+
+	for (spin=0; spin<cap->ns; spin++)
+	for (color=0; color<cap->nc; color++)
+	for (r=0; r<2; r++) {			// 2 is # cplx comp
+	
+		*(component_sort_tbl+idx) = r + 2*(color + cap->nc*spin) ;
+
+		idx++ ;
+	}
+
+	RunGConverter(cap, site_sort_tbl, component_sort_tbl);
+
+	VRB.Sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
+	sfree(component_sort_tbl);
+	VRB.Sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
+	sfree(site_sort_tbl);
+}
+
+void FcanonToStag(CAP cap, int num_chkbds)
+{
+        char *fname = "FcanonToStag(CAP)";
+        VRB.Func(cname_none ,fname);
+
+        unsigned idx, x, y, z, t, r, color, spin;
+
+        unsigned *site_sort_tbl ;
+        unsigned *component_sort_tbl ;
+
+        site_sort_tbl = (unsigned *) smalloc(cap->vol * sizeof(unsigned)) ;
+        if(site_sort_tbl == 0)
+          ERR.Pointer(cname_none,fname, "site_sort_tbl");
+        VRB.Smalloc(cname_none,fname,
+                    "site_sort_tbl" , site_sort_tbl,
+                    cap->vol * sizeof(unsigned)) ;
+
+//-------------------------------------------------------------------------
+// component_sort_tbl should be in CRAM
+//-------------------------------------------------------------------------
+
+        component_sort_tbl =
+                (unsigned *) smalloc(cap->site_size * sizeof(unsigned));
+        if(component_sort_tbl == 0)
+          ERR.Pointer(cname_none,fname, "component_sort_tbl");
+        VRB.Smalloc(cname_none,fname,
+                    "component_sort_tbl" , component_sort_tbl,
+                    cap->site_size * sizeof(unsigned));
+
+//-------------------------------------------------------------------------
+// Loop over current (CANONICAL) order of sites in local volume
+// Use desired (STAG) equation for site sequence number
+// actual STAG formula is
+// {(t + lt*(x + lx*(y + ly * z))) + vol * ((x+y+z+t)%2) } / 2
+// LSB = 1 indicates site needs converting
+//-------------------------------------------------------------------------
+
+        idx = 0 ;
+
+        if(num_chkbds == 2) {
+          for (t=0; t < cap->lt; t++)
+          for (z=0; z < cap->lz; z++)
+          for (y=0; y < cap->ly; y++)
+          for (x=0; x < cap->lx; x++) {
+            *(site_sort_tbl + idx) = (t + cap->lt * (x + cap->lx *
+                (y + cap->ly * z)) + cap->vol*((x+y+z+t)%2)) | 1 ;
+            idx++ ;
+          }
+        }
+        else if(num_chkbds == 1) {
+          for (t=0; t < cap->lt; t++)
+          for (z=0; z < cap->lz; z++)
+          for (y=0; y < cap->ly; y++)
+          for (x=0; x < cap->lx; x++)
+            if( (x+y+z+t)%2 == 0)     {
+              *(site_sort_tbl + idx) =
+                (t + cap->lt * (x + cap->lx * (y + cap->ly * z))) | 1 ;
+              idx++ ;
+            }
+        }
+
+
+//-------------------------------------------------------------------------
+// Loop over current (CANONICAL) order of reals in site
+// Use desired (STAG) equation for reals in site
+//-------------------------------------------------------------------------
+        idx = 0 ;
+
+        for (spin=0; spin<cap->ns; spin++)
+        for (color=0; color<cap->nc; color++)
+        for (r=0; r<2; r++) {                   // 2 is # cplx comp
+
+                *(component_sort_tbl+idx) = r + 2*(color + cap->nc*spin) ;
+
+                idx++ ;
+        }
+
+        RunGConverter(cap, site_sort_tbl, component_sort_tbl);
+
+        VRB.Sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
+        sfree(component_sort_tbl);
+
+        VRB.Sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
+        sfree(site_sort_tbl);
+}
+
+void FstagToCanon(CAP cap, int num_chkbds)
+{
+        char * fname = "FstagToCanon(CAP)";
+        VRB.Func(cname_none, fname);
+
+        unsigned idx, x, y, z, t, cb, r, color, spin;
+
+        unsigned *site_sort_tbl ;
+        unsigned *component_sort_tbl ;
+
+        site_sort_tbl = (unsigned *) smalloc(cap->vol * sizeof(unsigned)) ;
+        if(site_sort_tbl == 0)
+          ERR.Pointer(cname_none,fname, "site_sort_tbl");
+        VRB.Smalloc(cname_none,fname,
+                    "site_sort_tbl" , site_sort_tbl,
+                    cap->vol * sizeof(unsigned)) ;
+
+//-------------------------------------------------------------------------
+// component_sort_tbl should be in CRAM
+//-------------------------------------------------------------------------
+
+        component_sort_tbl =
+                (unsigned *) smalloc(cap->site_size * sizeof(unsigned));
+        if(component_sort_tbl == 0)
+          ERR.Pointer(cname_none,fname, "component_sort_tbl");
+        VRB.Smalloc(cname_none,fname,
+                    "component_sort_tbl" , component_sort_tbl,
+                    cap->site_size * sizeof(unsigned));
+
+//-------------------------------------------------------------------------
+// Loop over current (WILSON) order of sites in local volume
+// Use desired (CANONICAL) equation for site sequence number
+// LSB = 1 indicates site needs converting
+//-------------------------------------------------------------------------
+
+        idx = 0 ;
+
+        if(num_chkbds == 2)       {
+          for (cb = 0; cb < 2; cb++)
+          for (z=0; z < cap->lz; z++)
+          for (y=0; y < cap->ly; y++)
+          for (x=0; x < cap->lx; x++)
+          for (t=0; t < cap->lt; t++)
+          if( (x+y+z+t)%2 == cb)      {
+             *(site_sort_tbl+idx) =
+                  (x + cap->lx*(y+cap->ly*(z+cap->lz*t))) << 1 | 1 ;
+             idx++ ;
+          }
+        }
+        else if(num_chkbds == 1)       {
+          for (z=0; z < cap->lz; z++)
+          for (y=0; y < cap->ly; y++)
+          for (x=0; x < cap->lx; x++)
+          for (t=0; t < cap->lt; t++)
+          if( (x+y+z+t)%2 == 0)      {
+             *(site_sort_tbl+idx) =
+                  (x + cap->lx*(y+cap->ly*(z+cap->lz*t))) | 1 ;
+             idx++ ;
+          }
+        }
+//-------------------------------------------------------------------------
+// Loop over current (STAG) order of reals in site
+// Use desired (CANONICAL) equation for reals in site
+//-------------------------------------------------------------------------
+
+        idx = 0 ;
+
+        for (spin=0; spin<cap->ns; spin++)
+        for (color=0; color<cap->nc; color++)
+        for (r=0; r<2; r++) {                   // 2 is # cplx comp
+
+                *(component_sort_tbl+idx) = r + 2*(color + cap->nc*spin) ;
+
+                idx++ ;
+        }
+
+        RunGConverter(cap, site_sort_tbl, component_sort_tbl);
+
+        VRB.Sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
+        sfree(component_sort_tbl);
+        VRB.Sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
+        sfree(site_sort_tbl);
+}
+
+CPS_END_NAMESPACE

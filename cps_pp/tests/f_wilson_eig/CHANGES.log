@@ -1,0 +1,14 @@
+#include<config.h>
+CPS_START_NAMESPACE
+
+
+====================================================================
+/tmp_mnt/home/cmm80/phys/phys_v4.1.1.test/tests/f_wilson_eig/main.C
+====================================================================
+124,126c124
+<   //do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
+<   do_arg.verbose_level = 10;
+< 
+---
+>   do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
+CPS_END_NAMESPACE

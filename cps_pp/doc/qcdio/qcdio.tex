@@ -1,0 +1,318 @@
+#include<config.h>
+CPS_START_NAMESPACE
+%------------------------------------------------------------------
+% $Id: qcdio.tex,v 1.1.1.1 2003-06-22 13:34:51 mcneile Exp $
+%------------------------------------------------------------------
+%Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
+%
+% For best results, this latex file should be compiled using pdflatex.
+% However it will also compile under normal latex, if you prefer.
+%
+%------------------------------------------------------------------
+\documentclass[12pt]{article}
+
+% importing other useful packages:
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{tabularx}
+% color for the pdf links:
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.5}
+% for conditional latex source:
+\usepackage{ifthen}
+% pdftex specifications, these are only included if we are using pdflatex:
+\providecommand{\pdfoutput}{0}
+\ifthenelse{\pdfoutput = 0}{
+% Not PDF:
+\usepackage{html}
+\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+}{
+% PDF: hyperref for pdf with full linkages:
+\usepackage[
+pagebackref,
+hyperindex,
+hyperfigures,
+colorlinks,
+linkcolor=darkblue,
+citecolor=darkblue,
+pagecolor=darkblue,
+urlcolor=blue,
+%bookmarksopen,
+pdfpagemode=None,
+%=UseOutlines,
+pdfhighlight={/I},
+pdftitle={The QCDIO API. $Revision: 1.1.1.1 $ - $Date: 2003-06-22 13:34:51 $.},
+pdfauthor={A.N. Jackson \& S. Booth},
+plainpages=false
+]{hyperref}
+}
+
+
+% Code style commands:
+\newcommand{\cls}[1]{{\bf #1}}            % Classes
+\newcommand{\struct}[1]{{\bf #1}}         % Structs
+\newcommand{\cde}[1]{{\tt #1}}            % Code fragments
+
+% document style modifications:
+\setlength{\parskip}{2.0mm}
+\setlength{\parindent}{0mm}
+
+% Questionbox commands:
+\newcounter{quescount}
+\setcounter{quescount}{0}
+\newcommand{\quesbox}[2]{\begin{center}\refstepcounter{quescount}\fbox{\parbox{130mm}{
+\label{#1}{\bf Q. \arabic{quescount}:} #2} } \end{center} }
+
+
+% title information:
+\title{The QCDIO API}
+\author{A.N. Jackson \& S. Booth}
+\date{\mbox{\small $$Revision: 1.1.1.1 $$  $$Date: 2003-06-22 13:34:51 $$}}
+
+%------------------------------------------------------------------
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+%-------------------------------------------------------------------
+\section{Introduction}
+This document outlines our current proposal for the QCDIO API, as (to be)
+implemented in the Columbia code.  The code implementing this API can fe found
+at: 
+\begin{itemize}
+ \item
+ \href{../doxygen/html/qcdio_h.html}{./phys/util/include/qcdio.h}
+ \item
+ \href{../doxygen/html/qcdio_C.html}{./phys/util/qcdio/qcdio.C}
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{Standard Output}
+By default, when running of QCDSP, only the output from node 0 is returned to
+Q shell.  In order to reproduce this behaviour elsewhere (for regression testing
+purposes), the qcdio.h file overrides [f]printf to map it onto q[f]printf
+which are defined in qcdio.C.
+
+%-------------------------------------------------------------------
+\section{Loading/Saving Gauge Configurations}
+Again, for testing purposes, we need a simple API for loading and saving the
+gauge configurations.  The suggested form is:
+\begin{itemize}
+\item{qload\_gauge( char* filename\_prefix, Lattice lat )}
+Load the configuration from a set of files specified by the UKQCD filename
+prefix into the Lattice object lat.
+\item{qload\_gauge( char* filename\_prefix, Lattice lat)}
+Save the current gauge configuration from the Lattice object lat to a set of 
+files using the specified UKQCD filename prefix.
+\end{itemize}
+
+EPCC will write a very simple gauge configuration
+reader for the Columbia code. Because of the DOE SciDAC project, there is no point in putting too much work into modifying the infrastructure of the code. The plan would be to just read the configurations in UKQCD format.
+
+Craig McNeile will write a conversion code to convert the following formats:
+\begin{itemize}
+    \item NERSC
+    \item MILC
+    \item SZIN
+\end{itemize}
+into ukqcd format (using \href{http://www.ph.ed.ac.uk/ukqcd/public/misc.html}{http://www.ph.ed.ac.uk/ukqcd/public/misc.html} as a starting point).
+
+\subsection{The UKQCD gauge configuration file format}
+In general a "configuration" is  tar (UNIX tape archive) file with 
+name
+\begin{verbatim}
+D<Beta>C<Clover>K<Kappa>U<Trajectory>.tar
+\end{verbatim}
+where 
+\begin{itemize}
+\item Beta is the beta value without the decimal point.
+\item Clover is the clover value without the decimal point (probably rounded)
+\item Kappa  is the kappa\_sea value without the '0.1' at the start
+\item Trajectory is a 6 digit number designating the HMC trajectory.
+\end{itemize}
+For example D52C202K3500U007000.tar
+contains the information for trajectory serial no 7000 with
+\begin{verbatim}
+beta = 5.2
+clover ~ 2.02 (as to how to find the exact value see later)
+kappa\_sea = .1350
+\end{verbatim}
+This tar file contains the following files:
+
+{\tt D<Beta>C<Clover>K<Kappa>U<trajectory>T<timeslice>} -- these are the gauge timeslices
+
+{\tt D<Beta>C<Clover>K<Kappa>U<trajectory>PT<timeslice>} -- these are the conjugate momenta timeslices
+
+{\tt D<Beta>C<Clover>K<Kappa>U<Trajectory>.par} -- The parameter file
+
+{\tt D<Beta>C<Clover>K<Kappa>U<Trajectory>.rng} -- The random number state
+
+The random number state and the conjugate momenta are probably not useful
+for analysis, their purpose in the parameter file was just to allow 
+consistent restarts from the configuration using the HMC code should 
+we have wished to do so.
+
+The parameter file is useful as it contains all the simulation  parameters
+such as the precise values of beta, c\_sw, and kappa\_sea which may have
+been truncated to keep filenames a manageable length. It also contains 
+the lattice dimensions and validation information for the 
+configuration such as the plaquette.
+
+The parameters plaquette\_real, plaquette\_image refer to the plaquette 
+over the whole configuration
+whereas the parameters tplaquette\_real[index], tplaquette\_imag[index]
+refer to the spatial plaquette on timeslice <index>
+
+The gauge configurations are saved in timeslices in files with names
+\begin{verbatim}
+D<Beta>C<Clover>K<Kappa>U<Trajectory>T<Timeslice - always 2 digits>
+\end{verbatim}
+The precision of the saved gauges is usually 4 bytes 
+(This is {\tt REAL, KIND=4} in Fortran 90 and
+{\tt sizeof(float)} in C for  most architectures.
+The ghmc code can save with 8 bytes precision also, but this
+is almost never used)
+
+The byte ordering of the configurations is the cray t3e byte ordering.
+[I believe this is ``big-endian'' - ANJ].
+This is the same as the byte ordering for Sun workstations but 
+is the opposite of the byte ordering for the alpha systems.
+
+WIthin a timeslice array indexing runs as follows (fastes index first)
+
+complex components, rows (2 rows only), columns, direction, x, y, z
+
+where 
+\begin{tabular}{lll}
+      complex components &= 0 - 1    &(Real Part = 0, Imaginary Part = 1)\\
+      rows               &= {0 - 1}  &(Two rows only) \\
+      columns            &= {0 - 2}  &(Three columns)\\
+      direction(mu)      &= {0 - 3} &\\
+      x                  &= {0 - Latt\_x-1} & \\
+      y                  &= {0 - Latt\_y-1} & \\
+      z                  &= {0 - Latt\_y-1} & 
+\end{tabular}
+
+Where Latt\_x, Latt\_y, Latt\_z are sizes of the lattice in the various directions.
+In our production runs these are always 16.
+
+The last row of the gauges has to be regenerated as it is not stored.
+
+Thus to read in a gauge configuration one must 
+read
+
+4 * 2 * 2 * 3 * 4 * Latt\_x * Latt\_y * Latt\_z 
+
+bytes into a buffer
+
+(These are 
+	precision * No of complex components * 2 rows * 3 columns *
+       	   4 directions * Spatial dimensions  in order
+)
+
+Byte swap the buffer (depending on architecture) if necessary
+
+Pack the buffer away into your lattice data structure in memory usually by
+looping over all the components in the order described above 
+(complex fastest, z slowest)
+
+\subsubsection{Regenerate the third row}
+Include is a set of very simple C++ routines that can be used
+to handle gauges on a workstation. Our Fortran code is also
+available but is horribly complicated as it has been designed for
+MPP use and involves a lot of preprocessing, conditional compilation,
+header files,  dealing with processor layout etc which are much 
+harder to glean information from. This code is available as gauge.tar.gz
+on the web page.
+
+The most important of all these files is gauge.cpp which is the 
+code for all the methods of the SU3GaugeTimeslice and the program
+gaugetest.cpp which illustrates how the class can be used to read in 
+a gauge. The rest of the classes are just support ( a very primitive
+complex number class, and an su3 matrix class -- also primitive ).
+One should be able to compile gaugetest.cpp using the Makefile supplied.
+It has been tested with Dec C++ on an Alpha running Digital Unix.
+
+The SU3Matrix class illustrates the technique used to regenerate the 
+third row. The swap.cpp subroutines carry out the byte swapping.
+
+To change the C++ compiler to any other, edit the Makefile and change
+the CC macro to the C++ compiler of your choice. Currently it is set to 
+cxx.
+
+For suns the byte swap flag in gaugetest.cpp should be set to 0.
+
+To compile the test program copy  the test file gauge.tar.gz
+to its final location.
+
+Unzip it using gunzip:
+\begin{verbatim}
+$ gunzip gauge.tar.gz
+\end{verbatim}
+Untar it
+\begin{verbatim}
+$ tar xvf gauge.tar
+\end{verbatim}
+
+It should create its own directory called gauge and untar there.
+To compile go into this directory and make:
+\begin{verbatim}
+$ cd gauge; make
+\end{verbatim}
+The code can be run to read in a gauge configuration by typing
+\begin{verbatim}
+$ ./gaugetest <Xsize> <Ysize> <Zsize> <Tsize> <ByteSwap> <Prefix>
+\end{verbatim}
+Xsize, Ysize, Zsize are the lattice spatial dimensions in the directions 
+of x, y, and z respectively.
+
+Tsize is the number of timeslices
+
+Byte swap is a flag indicating wether or not the gauge should have
+its byte order reversed.
+
+Prefix is the path of the gauge timeslice files without the T<timeslice>
+
+Eg to read a 16$^3$ x 32 configuration in the current directory 
+with filename stem of D52C202K3500U007000 on an Alpha where one has to 
+reverse the byte order of the floating point numbers ons could run
+\begin{verbatim}
+$ ./gaugetest 16 16 16 32 1 ./D52C202K3500U007000
+\end{verbatim}
+If all goes well you should get output of the following nature:
+\begin{verbatim}
+Reading timeslice ./D52C202K3500U007000T00
+Re Tr Plaq = 0.533327  Im Tr Plaq = 0.000494551
+Reading timeslice ./D52C202K3500U007000T01
+Re Tr Plaq = 0.528731  Im Tr Plaq = -0.000777869
+Reading timeslice ./D52C202K3500U007000T02
+Re Tr Plaq = 0.533354  Im Tr Plaq = 0.000177485
+Reading timeslice ./D52C202K3500U007000T03
+Re Tr Plaq = 0.530886  Im Tr Plaq = -0.000693423
+Reading timeslice ./D52C202K3500U007000T04
+.
+. (etc)
+.
+\end{verbatim}
+
+If gaugetest dies with a segfault or gets the plaquette wrong it can be 
+because the gauge dimensions are wrong or that the byte swap flag is 
+set incorrectly or that something horrible happened on the way to the
+transport of the gauge or that my C++ is not as portable as I like to think
+
+If you have problems even despite this assistance pleas contact me
+via email at B.Joo@ed.ac.uk
+
+
+
+
+
+
+%-------------------------------------------------------------------
+\end{document}
+CPS_END_NAMESPACE

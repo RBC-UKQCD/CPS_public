@@ -1,0 +1,133 @@
+#include<config.h>
+CPS_START_NAMESPACE
+
+Qdaemon state is:
+	qdaemon task is LOAD
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+
+Qdaemon state is:
+	qdaemon task is LOAD
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+
+Qdaemon state is:
+	qdaemon task is LOAD_ARGS
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+
+Qdaemon state is:
+	qdaemon task is LOAD_ARGS
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+
+Qdaemon state is:
+	qdaemon task is EXEC_IO
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+Lattice::Lattice() :Reset random number generator with seed = 678040585
+Lattice::Lattice() :
+	Disordered starting configuration
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (12.5 MHz cycles) = 25117193
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+ ::p2vWilsoLib() :
+	Moving wfm0 to CRAM0, dest=809800, start= 51491, end = 5176d, len = 2dc
+ ::p2vWilsoLib() :
+	Moving wfm1 to CRAM1, dest=809c00, start= 5176d, end = 51912, len = 1a5
+ ::p2vCloverLib() :
+	Moving cfm to CRAM, dest=809e00, start= 51912, end = 519d3, len = c1
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =4.254887e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 8.178423e+03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 7.612729e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.221554e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 2.334854e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 4.598347e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 8.953434e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.737480e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 3.412923e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 6.672730e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.283172e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.483595e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 4.768860e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 9.287010e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 1.841718e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 3.645805e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 7.074999e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 1.314197e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 2.573384e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 4.895279e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 9.529957e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 1.838773e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 3.639256e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 6.840035e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 1.342608e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 2.555399e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 4.750281e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 9.403179e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 1.807341e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 3.332903e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 6.470318e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 1.233503e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 2.283506e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 4.275650e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 8.202547e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 1.596163e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.759871e-07, iter = 35
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (12.5 MHz cycles) = 146418105
+	Exiting
+MkerExecAck:  starting to check program exit status
+AnalyzeQCDSP::SCUCheck:  SCUDebug mode 0 doesn't allow analysis
+MkerExecAck:  SCUCheck could not be run
+
+Qdaemon state is:
+	qdaemon task is EXEC_IO
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+CPS_END_NAMESPACE

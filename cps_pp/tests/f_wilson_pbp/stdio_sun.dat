@@ -1,0 +1,74 @@
+#include<config.h>
+CPS_START_NAMESPACE
+Lattice::Lattice() :Reset random number generator with seed = 112319
+Lattice::Lattice() :
+	Disordered starting configuration
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 0
+	Just entered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =1.004432e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.877376e+03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.568221e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.715391e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 2.275813e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.607314e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 3.141799e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 3.984981e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 5.181404e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 6.673703e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 8.280874e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 9.944391e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 1.190903e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.490262e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 1.717129e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 1.998424e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 2.656068e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 3.169258e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 3.873086e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 4.760670e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 5.527382e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 6.592870e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 8.014006e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 9.530335e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 1.099117e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 1.341291e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 1.626116e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 1.987603e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 2.423943e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.777179e-07, iter = 28
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 51197952
+	Exiting
+CPS_END_NAMESPACE

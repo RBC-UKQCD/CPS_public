@@ -1,0 +1,32 @@
+#include<config.h>
+CPS_START_NAMESPACE
+
+
+====================================================================
+/tmp_mnt/home/cmm80/phys/phys_v4.1.1.test/tests/various/convert/main.C
+====================================================================
+104c104
+< 		IFloat *base, comp ;
+---
+> 		float *base, comp ;
+109c109
+< 		base = (IFloat *)lat.GaugeField() ;
+---
+> 		base = (float *)lat.GaugeField() ;
+159c159
+< 			IFloat eta ;
+---
+> 			float eta ;
+375c375
+< 		IFloat *f1, *f2, comp ;
+---
+> 		float *f1, *f2, comp ;
+382c382
+< 		f1 = (IFloat *)smalloc((size_t)vol*sizeof(IFloat)) ;
+---
+> 		f1 = (float *)smalloc((size_t)vol*sizeof(float)) ;
+387c387
+< 		f2 = (IFloat *)smalloc((size_t)vol*sizeof(IFloat)) ;
+---
+> 		f2 = (float *)smalloc((size_t)vol*sizeof(float)) ;
+CPS_END_NAMESPACE

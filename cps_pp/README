@@ -1,0 +1,246 @@
+
+
+
+
+See phys/doc/changelog/changelog.html for more information.
+
+----------------------------------------------------------------------
+Version 4.1.0 beta (23rd January 2002) tag: phys_4_1_0_beta_open
+
+Slightly restyled (superficially) for portability. 
+----------------------------------------------------------------------
+From now on the change log will be in phys/doc/changelog/.
+Andy Jackson - EPCC - A.N.Jackson@ed.ac.uk.
+
+
+----------------------------------------------------------------------
+Version 4.1 alpha (6th September 2001) tag: phys_4_1_0_alpha_open
+
+Initial version of EPCC's changes to the code, aiming to make it
+portable, ANSI-compliant and to allow variable levels of precision.
+----------------------------------------------------------------------
+A large number of small changes have been made throughout the code, to
+turn it into more standard C++.  The code will now compile under gcc
+(only tested under 2.95.2, but 2.95.3 should present few serious
+issues).  The MPI implementation of the SCU layer has been added to
+the nga directory.  All references to rfloat have been typedef'd to
+the Float type.  All references to floats have been typedef'd to the
+IFloat type.  Using Float = rfloat and IFloat = float, the original
+functionality is recovered.  Using Float = IFloat = double should
+allow the code to run in double precision.
+
+Following all of these changes, the code has been tested using a
+slightly modified implementation of the original Qrun testing script.
+A perl script (tests/regression.pl) is used to generate a batch script
+(tests/regression.sh).  Running this script will place the output of
+each code (both from stdio and from and .dat files) into the
+tests/regressions directory.  This output can be checked against that
+provided in the following subdirectories.
+
+ - tests/regressions/v4_0_0/parallel
+ - tests/regressions/v4_0_0/serial
+
+These contain the output from the original version of the code that
+EPCC received, prior to any of our changes.
+
+ - tests/regressions/v4_1_0/parallel
+ - tests/regressions/v4_1_0/serial
+
+These contain the output from the current version of the code.  The
+two sets of files differ only trivially, in that the Clock timings are
+different, the CRAM addresses have changed, and that the conditions
+for the outputting of the RNG printing string have been altered.
+
+On QCDSP, this distribution should still compile straight of of the
+box.  On other platforms, the process is slightly more involved.  See
+the INSTALL file for more information.
+
+Andy Jackson - EPCC - A.N.Jackson@ed.ac.uk.
+----------------------------------------------------------------------
+
+
+----------------------------------------------------------------------
+Tests linked with qos.5.3.3
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+Info
+----------------------------------------------------------------------
+4/30/2001
+modified  nga/include/nga_reg.h 
+diff:
+34c34
+< extern unsigned int CRAM_SCRATCH_ADDR ; 
+---
+> extern void* CRAM_SCRATCH_ADDR ; 
+
+This fixes compilation error of clover.C on the sun workstation
+
+--------------
+4/11/2001
+modified  nga/include/nga_reg.h 
+diff:
+27a28
+> 
+29d29
+< #ifdef _TARTAN
+31,35c31
+< #else
+< // initialized in ../cbuf_sim/cram.C where memory is allocated
+< // in order to imitate the scratch cram.
+< extern void* CRAM_SCRATCH_ADDR ; 
+< #endif
+---
+> 
+added nga/cbuf_sim/cram.C
+defines storage for the CRAM_SCRATCH when the code is compiled
+on a workstation
+-----------------------------------------------------
+4/10/2001
+Kostas Orginos 
+ In util/lattice/lattice_base/link_buffer.C replaced
+----------
+Matrix & mat1 = * ((Matrix*) CRAM_SCRATCH_ADDR);
+Matrix & mat2 = * (&mat1+1);
+Matrix & mat3 = * (&mat2+1);
+Matrix & mat4 = * (&mat3+1);
+Matrix & mat5 = * (&mat4+1);
+
+const Matrix *new_mp = &mat1;
+Matrix *result1_mp = &mat2;
+Matrix *result_mp = &mat3;
+Matrix *acumulate_mp =&mat4;
+------
+with
+------
+//  CRAM temp buffer
+#ifdef _TARTAN
+Matrix & mat1 = * ((Matrix*) CRAM_SCRATCH_ADDR);
+Matrix & mat2 = * (&mat1+1);
+Matrix & mat3 = * (&mat2+1);
+Matrix & mat4 = * (&mat3+1);
+Matrix & mat5 = * (&mat4+1);
+
+const Matrix *new_mp = &mat1;
+Matrix *result1_mp = &mat2;
+Matrix *result_mp = &mat3;
+Matrix *acumulate_mp =&mat4;
+#else
+
+Matrix CRAM_SCRATCH[5] ;
+
+Matrix & mat1 = CRAM_SCRATCH[0] ;
+Matrix & mat2 = CRAM_SCRATCH[1] ;
+Matrix & mat3 = CRAM_SCRATCH[2] ;
+Matrix & mat4 = CRAM_SCRATCH[3] ;
+Matrix & mat5 = CRAM_SCRATCH[4] ;
+
+const Matrix *new_mp = &mat1;
+Matrix *result1_mp = &mat2;
+Matrix *result_mp = &mat3;
+Matrix *acumulate_mp =&mat4;
+#endif
+--------
+ This solves a segmentation fault caused running in a Unix system
+
+
+ 
+2/27/2001
+ Tested against Calin's code the ghb and the meson spectrum.
+ They work. The spectrum shows machine presision differences
+ but this is due to the replacement of the CG code with the
+ reproducing CG. 
+
+2/24/2001
+Kostas Orginos
+Added g_impr_OLSym/ in util/lattice/
+Added the g_impr_OLSym stuff in to util/lattice/lattice_base/lattice_base.C
+Added u0 in GlobalJobParameter::Initialize in util/gjp/gjp.C
+      and in util/include/gjp.h  
+Modified alg/alg_ghb/qcdsp_sun/alg_ghb.C
+    Changed the position of the reunitarization. It is now done
+    at the end of the heatbath iteration loop.
+    Added a #define to be able to switch on and off timing at compile time.
+Modified util/include/lattice.h to include g_impr_OLSym
+Modified alg/include/do_arg.h to include u0. 
+        u0 is initialized to 1 by default and 
+        c1 is initialized to 0.0 (c1 is the Iwasaki coefficient)	
+Made the constructor of both the Iwasaki and the Symanzik action
+        to fail if anisotropic lattice is used.
+Replaced util/dirac_op/d_op_base/inv_cg.C with the reproducing cg code.
+
+Xiaodong:
+1) gjp.h: Added gjp_scu_wire_map(10)
+2) gjp.C set that array
+3) added new library scu_nos. In that library
+get_plus_data and get_minus_data use the bsm routine
+that bypasses the qos.
+4) Added new libraries 
+glb_cpp_nos
+glb_cpp_hdw_nos  
+glb_cpp_25MHz_nos  
+glb_cpp_50MHz_nos  
+
+2/8/2001/
+
+Guofeng:
+Modified lattice.h gjp.h in util/include
+Added list.h link_buffer.h into util/include
+Added link_buffer.C into util/lattice/lattice_base/
+Modified lattice_base.C in util/lattice/lattice_base
+Modified g_wilson.C in util/lattice/g_wilson
+Modified g_impr_rect.C in util/lattice/g_impr_rect
+Modified alg_ghb.h in alg/include
+Modified alg_ghb.C in alg/alg_ghb
+Modified g_power_plaq.C in util/lattice/g_power_plaq
+Modified g_power_rect.C in util/lattice/g_power_rect
+
+Thomas:
+Copied alg_pot.C into alg/alg_pot
+Copied alg_pot.h into alg/include
+
+Calin:
+Added SyncMax in util/dirac_op/d_op_dwf/ddwf_dslash_4.C
+
+Lingling:
+Modified alg/include/w_spect_arg.h
+Modified alg/alg_w_spect/alg_w_spect.C
+Modified alg/alg_w_spect/w_all.h
+Modified alg/alg_w_spect/w_quark.C (later changed the initial guess)
+Modified alg/alg_w_spect/w_mesons.C
+Added w_axialcurrent.C in alg/alg_w_spect (bug fixed on Sep 21st)
+
+Bug fixed (memory) in alg/alg_hmd/alg_hmd_r.C
+Modified util/dirac_op/d_op_stag_opt_rdm/dirac.C to fix memory leak.
+
+Staggered Anisotropy:
+
+----- small changes -----
+Modifiled util/lattice/f_stag/f_stag.C  ==> Change SetPhi, Force
+Modifiled util/lattice/fix_gauge/fix_gauge.C ==> Change findA
+Modifiled util/dirac_op/d_op_stag_cpp/d_op_stag.C ==> Redefine mass
+Modifiled util/dirac_op/d_op_stag_opt/d_op_stag.C
+Modifiled util/dirac_op/d_op_stag_opt_rdm/d_op_stag.C
+Modifiled alg/alg_pbp/alg_pbp.C    ==> Change normalization
+Modifiled util/include/gjp.h       ==> Add xi_gfix
+Modifiled util/gjp/gjp.C           ==> Initialize xi_gfix
+Modifiled alg/include/do_arg.h     ==> Initialize xi_gfix
+Modifiled alg/alg_eq_state/alg_eq_state.C ==> Change Pss, Pst
+Modifiled alg/alg_wline/alg_wline.C ==> Change normalization 
+Modifiled alg/alg_s_spect/quark_prop_s.C ==> Normalize propagator
+Modifiled alg/alg_rect/alg_rect.C	==> ERROR output
+Modifiled alg/alg_inst/alg_inst.C	==> ERROR output
+Modifiled alg/alg_plaq/alg_plaq.C
+
+----- calculating dslash -----
+Modifiled util/dirac_op/d_op_stag_cpp/dirac.C
+Modifiled util/dirac_op/d_op_stag_cpp/d_op_stag.C
+Modifiled util/dirac_op/d_op_stag_opt/d_op_stag.C
+Modifiled util/dirac_op/d_op_stag_opt_rdm/d_op_stag.C
+Modifiled util/inlcude/stag.h
+Modifiled util/inlcude/dirac_op.h
+Modifiled util/inlcude/lattice.h
+Modifiled util/lattice/f_stag/f_stag.C
+Modifiled util/lattice/lattice_base/lattice_base.C
+Modifiled alg/alg_pbp/alg_pbp.C
+

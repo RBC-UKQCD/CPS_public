@@ -1,0 +1,65 @@
+#include<config.h>
+CPS_START_NAMESPACE
+\documentclass[12pt]{report}
+\usepackage{epsfig}
+\usepackage{times}
+\title{An Introduction to Using the QCDSP Computer}
+\author{B\'alint Jo\'o and Robert D. Mawhinney}
+\parindent=0in
+\parskip=0.1in
+
+
+% importing other useful packages:
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{tabularx}
+% color for the pdf links:
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.5}
+% for conditional latex source:
+\usepackage{ifthen}
+% pdftex specifications, these are only included if we are using pdflatex:
+\providecommand{\pdfoutput}{0}
+\ifthenelse{\pdfoutput = 0}{
+% Not PDF:
+\usepackage{html}
+\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+}{
+% PDF: hyperref for pdf with full linkages:
+\usepackage[
+pagebackref,
+hyperindex,
+hyperfigures,
+colorlinks,
+linkcolor=darkblue,
+citecolor=darkblue,
+pagecolor=darkblue,
+urlcolor=blue,
+%bookmarksopen,
+pdfpagemode=None,
+%=UseOutlines,
+pdfhighlight={/I},
+pdftitle={An Introduction to Using the QCDSP Computer},
+pdfauthor={B\'alint Jo\'o and Robert D. Mawhinney},
+plainpages=false
+]{hyperref}
+}
+
+
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\include{ch1}
+\include{ch2}
+\include{ch3}
+\include{ch4}
+\include{ch5}
+\include{ch6}
+\include{ch7}
+\end{document}
+CPS_END_NAMESPACE

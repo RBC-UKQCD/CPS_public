@@ -1,0 +1,250 @@
+#include<config.h>
+CPS_START_NAMESPACE
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: mcneile $
+//  $Date: 2003-06-22 13:34:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Id: d_op_wilson_types.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.4  2001/08/16 10:50:29  anj
+//  The float->Float changes in the previous version were unworkable on QCDSP.
+//  To allow type-flexibility, all references to "float" have been
+//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
+//  (where Float=rfloat), and on all other machines allows the use of
+//  double or float in all cases (i.e. for both Float and IFloat).  The I
+//  stands for Internal, as in "for internal use only". Anj
+//
+//  Revision 1.2  2001/06/19 18:13:15  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:16:08  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
+//  $RCSfile: d_op_wilson_types.C,v $
+//  $Revision: 1.1.1.1 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
+//------------------------------------------------------------------
+//
+// d_op_wilson_types.C
+//
+// Is derived from DiracOp and is relevant to
+// all DiracOp classes with Wilson type fermions 
+// (e.g DiracOpWilson, DiracOpClover, DiracOpDwf, ...). 
+//  These classes are derived from DiracOpWilsonTypes
+//
+//------------------------------------------------------------------
+
+CPS_END_NAMESPACE
+#include<util/dirac_op.h>
+#include<util/lattice.h>
+#include<util/gjp.h>
+#include<util/verbose.h>
+#include<util/error.h>
+CPS_START_NAMESPACE
+
+
+//------------------------------------------------------------------
+// Constructor
+//------------------------------------------------------------------
+DiracOpWilsonTypes::DiracOpWilsonTypes(Lattice & latt,
+				       Vector *f_field_out,
+				       Vector *f_field_in,
+				       CgArg *arg,
+				       CnvFrmType cnv_frm_flg) :
+                                       DiracOp(latt, 
+					       f_field_out,
+					       f_field_in, 
+					       arg,
+					       cnv_frm_flg)
+{
+  cname = "DiracOpWilsonTypes";
+  char *fname = "DiracOpWilsonTypes(L&,V*,V*,CgArg*,CnvFrmType)";
+  VRB.Func(cname,fname);
+}
+
+
+//------------------------------------------------------------------
+// Destructor
+//------------------------------------------------------------------
+DiracOpWilsonTypes::~DiracOpWilsonTypes() {
+  char *fname = "~DiracOpWilsonTypes()";
+  VRB.Func(cname,fname);
+}
+
+
+//------------------------------------------------------------------
+// MultGamma(Vector *out, const Vector *in, int gamma_num, int nodevol):
+// Multiply vector on left by 
+// gamma_1^n1 * gamma_2^n2 * gamma_3^n3 * gamma_4^n4
+// Where  (n1,n2,n3,n4) = bit wise decomposition of gamma_num
+// Vector has nodevol number of sites to run over
+// v = gamma_1^n1*gamma_2^n2*gamma_3^n3*gamma_4^n4 * in
+//------------------------------------------------------------------
+void DiracOpWilsonTypes::MultGamma(Vector *out,
+				   const Vector *in, 
+				   int gamma_num, 
+				   int nodevol){
+  char *fname = "MultGamma(V*,V*,i,i)";
+  VRB.Func(cname,fname);
+
+  // For the moment, only support gamma_5 * in
+  if (gamma_num != 15)
+    ERR.General(cname,fname, "only gamma_5 supported");
+
+  IFloat *p = (IFloat *)out;
+  IFloat *q = (IFloat *)in;
+  for(int n = 0; n < nodevol; ++n)
+    {
+    int i;
+    for(i = 0; i < 12; ++i)
+      *p++ = *q++;
+
+    for(i = 0; i < 12; ++i)
+      *p++ = - *q++;
+    }
+}
+
+//------------------------------------------------------------------
+// RitzLatSize returns the size of a fermion on a node
+// It uses the RitzMatType flag to determine the operator
+// to use and relevant checkerboard sizes.
+//------------------------------------------------------------------
+int DiracOpWilsonTypes::RitzLatSize() {
+  char *fname = "RitzLatSize()";
+  VRB.Func(cname,fname);
+
+  int f_size = GJP.VolNodeSites() * lat.FsiteSize();
+
+  switch(dirac_arg->RitzMatOper)
+  {
+  case MAT_HERM:
+  case MATDAG_MAT:
+  case NEG_MATDAG_MAT:
+    break;
+
+  case MATPC_HERM:
+  case MATPCDAG_MATPC:
+    f_size >>= 1;
+    break;
+
+  default:
+    ERR.General(cname,fname,"RitzMatOper %d not implemented",
+		dirac_arg->RitzMatOper);
+  }
+
+  return f_size;
+}
+
+//------------------------------------------------------------------
+// RitzMat(Vector *out, Vector *in) :
+// RitzMat is the base operator used in in Ritz.
+// RitzMat works on the full or half lattice.
+// The in, out fields are defined on the full or half lattice.
+//------------------------------------------------------------------
+void DiracOpWilsonTypes::RitzMat(Vector *out, Vector *in) {
+  char *fname = "RitzMat(V*,V*)";
+  VRB.Func(cname,fname);
+
+  switch(dirac_arg->RitzMatOper)
+  {
+  case MAT_HERM:
+  case MATDAG_MAT:
+    MatDagMat(out, in);
+    break;
+
+//  case MATPC_HERM:
+//  case MATPCDAG_MATPC:
+//    MatDagPcMatPc(out, in);
+//    break;
+
+  case NEG_MATDAG_MAT:
+    MatDagMat(out, in);
+    out->VecNegative(out, RitzLatSize());
+    break;
+
+  default:
+    ERR.General(cname,fname,"RitzMatOper %d not implemented",
+		dirac_arg->RitzMatOper);
+  }
+}
+
+//------------------------------------------------------------------
+// RitzEigMat(Vector *out, Vector *in) :
+// RitzEigMat is the base operator used in in RitzEig.
+// RitzEigMat works on the full or half lattice.
+// The in, out fields are defined on the full or half lattice.
+//------------------------------------------------------------------
+void DiracOpWilsonTypes::RitzEigMat(Vector *out, Vector *in) {
+  char *fname = "RitzEigMat(V*,V*)";
+  VRB.Func(cname,fname);
+
+  switch(dirac_arg->RitzMatOper)
+  {
+  case MAT_HERM:
+    MatHerm(out, in);
+    break;
+
+  case MATDAG_MAT:
+    MatDagMat(out, in);
+    break;
+
+//  case MATPCDAG_MATPC:
+//    MatDagPcMatPc(out, in);
+    //   break;
+
+  case NEG_MATDAG_MAT:
+    MatDagMat(out, in);
+    out->VecNegative(out, RitzLatSize());
+    break;
+
+//  case MATPC_HERM:
+    // This is not implemented (or defined)
+    // MatPcHerm(out, in);
+
+  default:
+    ERR.General(cname,fname,"RitzMatOper %d not implemented",
+		dirac_arg->RitzMatOper);
+  }
+}
+
+
+//------------------------------------------------------------------
+// MatDagMat(Vector *out, Vector *in) :
+// MatDagMat is MatDag*Mat. This is common to all WilsonTypes type dirac operators.
+// MatDagMat works on the full lattice.
+// The in, out fields are defined on the full lattice.
+//------------------------------------------------------------------
+void DiracOpWilsonTypes::MatDagMat(Vector *out, Vector *in) {
+  char *fname = "MatDagMat(V*,V*)";
+  VRB.Func(cname,fname);
+
+  int temp_size = RitzLatSize();
+  Vector *temp = (Vector *) smalloc(temp_size * sizeof(Float));
+  if (temp == 0) 
+    ERR.Pointer(cname, fname, "temp");
+  VRB.Smalloc(cname,fname, "temp", temp, temp_size);
+
+  Mat(temp, in);
+  MatDag(out, temp);
+  
+  VRB.Sfree(cname, fname, "temp", temp);
+  sfree(temp);
+}
+
+CPS_END_NAMESPACE

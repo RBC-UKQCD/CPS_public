@@ -1,0 +1,250 @@
+#include<config.h>
+CPS_START_NAMESPACE
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+           "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="TtH 2.92">
+
+                                 
+<title> Installing the Columbia Physics System </title>
+</head>
+<body>
+ 
+<h1 align="center">Installing the Columbia Physics System </h1>
+
+<h3 align="center">A.N. Jackson &amp; S. Booth </h3>
+
+<h3 align="center"><font size="-1">
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Revision</i>: 1.6 </td></tr></table>
+</td></tr></table>
+
+  
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Date</i>: 2002/03/11 19:34:56 </td></tr></table>
+</td></tr></table>
+
+</font> </h3>
+
+<p>
+   
+<div align=right><a href="mailto:A.N.Jackson@ed.ac.uk">A.N.Jackson@ed.ac.uk</a>.
+</div>
+
+<p>
+
+<h1>Contents </h1><a href="#tth_sEc1"
+>1&nbsp; Downloading the CPS source code</a><br />
+<a href="#tth_sEc2"
+>2&nbsp; Compiling the code</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.1"
+>2.1&nbsp; INSTALLATION ON QCDSP</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2"
+>2.2&nbsp; INSTALLATION ELSEWHERE</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2.1"
+>2.2.1&nbsp; The configure script</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2.2"
+>2.2.2&nbsp; Manual configuration</a><br />
+<a href="#tth_sEc3"
+>3&nbsp; Platforms</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.1"
+>3.1&nbsp; Columbia: QCDSP</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2"
+>3.2&nbsp; EPCC: Cray T3E</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.3"
+>3.3&nbsp; UKQCD: Ukqcd2; an Alpha</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.4"
+>3.4&nbsp; EPCC: Bronzite; a Sun workstation</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.5"
+>3.5&nbsp; EPCC: Lomond; a Sunfire 6800 SMP</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.6"
+>3.6&nbsp; EPCC: Bobcat; a Beowulf cluster</a><br />
+ 
+
+<p>
+
+ <h2><a name="tth_sEc1">
+1</a>&nbsp;&nbsp;Downloading the CPS source code</h2>
+
+<p>
+
+ <h2><a name="tth_sEc2">
+2</a>&nbsp;&nbsp;Compiling the code</h2>
+
+<p>
+     <h3><a name="tth_sEc2.1">
+2.1</a>&nbsp;&nbsp;INSTALLATION ON QCDSP</h3> 
+The original make structure has been retained, and the configuration
+files are set up to default to the target being QCDSP.  Therefore, the
+code should compile straight away by simply running make in the phys/
+directory.
+
+<p>
+     <h3><a name="tth_sEc2.2">
+2.2</a>&nbsp;&nbsp;INSTALLATION ELSEWHERE</h3>
+
+<p>
+<font size="+1"><em>You will require gmake (GNU make ) to compile this program, and to
+run it in parallel you will require some implementation of MPI.</em> </font>
+
+<p>
+The code configuration is done in config.h. The compilation
+configuration is done in Makefile.gnu and Makefile.gnutests.  The
+regression-testing configuration is done in tests/regression.pl.
+
+<p>
+      <h4><a name="tth_sEc2.2.1">
+2.2.1</a>&nbsp;&nbsp;The configure script</h4>
+The code uses a fairly standard configure script for cross-platform
+configuration of the makefiles etcetera.  The script should be run from the
+phys/ directory as ``./configure''.  There are a large number of general
+configuration flags (use ``./configure -help'' to see them all) but only a
+few of these influence the behaviour of the physics code itself:
+
+<ul>
+<li><tt>-enable-parallel-mpi</tt> - Compile as a parallel code, using MPI. (default=no)</li>
+
+<li><tt>-enable-double-prec</tt> - Force the code to use double precision (instead of float) throughout (default=yes)</li>
+</ul>
+
+<p>
+If all goes well, you may build via the GNU make files using:
+
+<ul>
+<li><tt>gmake -f Makefile.gnu [all]</tt> - Makes everything.</li>
+
+<li><tt>gmake -f Makefile.gnu clean</tt> - Cleans everything.</li>
+
+<li><tt>gmake -f Makefile.gnu testprogs</tt> - Makes only the test suite.</li>
+
+<li><tt>gmake -f Makefile.gnu cleantests</tt> - Cleans only the test suite.</li>
+</ul>
+
+<p>
+      <h4><a name="tth_sEc2.2.2">
+2.2.2</a>&nbsp;&nbsp;Manual configuration</h4>
+The current configure script handles ome things (e.g. the MPI include/linkage)
+in a platform (Solaris) specific manner.  Therefore compilation for anything but serial gcc
+may require some minor tuning.  The files that you may have to change are as
+follows:
+
+<p>
+
+<ul>
+<li><tt>config.h</tt><br />
+
+<p>
+This file contains the following flags:
+
+<ul>
+<li><tt>PARALLEL</tt> If defined, compile for a parallel (MPI) environment.</li>
+
+<li><tt>CAST_AWAY_CONST</tt>  A macro describing how the current compiler casts
+                     away the const-ness of strings (inline const
+                     char*).  This is not strictly necessary and you
+                     should not have to change it.</li>
+
+<li><tt>GLOBALSUM_TYPE</tt> Precision/type for global summations.  On QCDSP
+ this was a custon double64 type, but on other platforms double should be
+ used.</li>
+
+<li><tt>LOCALCALC_TYPE</tt> Precision/type for Floats.  On QCDSP ths was a
+ custom float type (rfloat), but a native type should be used elsewhere.</li>
+
+<li><tt>INTERNAL_LOCALCALC_TYPE</tt> Precision/type for IFloat.  Should be the
+                             same as LOCALCALC_TYPE anywhere but on
+                             QCDSP, where float should be used (IFloats used
+			     to be floats in the original code).</li>
+
+<li><tt>COMMS_DATASIZE</tt> Default size of the individual items of data to be
+                    transmitted via the MPISCU.  Should be consistent
+                    with the size of Float and IFloat.</li>
+
+<li><tt>VERBOSE</tt> If defined, the MPISCU will print information concerning
+             each of the SCU calls.</li>
+</ul>
+
+<p>
+The #include of qcdio.h means that printf is overridden with qprintf,
+which is an implementation of printf designed to print only the
+information from the zeroth node.  This makes the code output consistent
+with the default code output on QCDSP.</li>
+
+<li><tt>Makefile.gnu &amp; Makefile.gnutests</tt><br />
+The elements you may have to change
+lie between the ***COMPILATION FLAGS*** markers.  
+
+<p>
+In Makefile.gnu, this concerns the compiler name and flags (the
+<tt>-I(top_dir)/nga/mpi_scu</tt> tells the code where the MPISCU include files
+are).
+
+<p>
+In Makefile.gnutests, you must choose which set of library files to
+compile against (depending on whether the code is serial or
+MPI-parallel) and define the compilation and linking flags.</li>
+
+<li>Testing Script <tt>tests/regression.pl</tt><br />
+At the start of tests/regression.pl three different examples of
+testing configuration are given.  The first set runs the parallel
+QCDSP version, the second set runs the serial QCDSP version and the
+third set runs the non-QCDSP version.</li>
+</ul>
+
+<p>
+
+ <h2><a name="tth_sEc3">
+3</a>&nbsp;&nbsp;Platforms</h2>
+The code has been used on the following platforms.
+
+<p>
+     <h3><a name="tth_sEc3.1">
+3.1</a>&nbsp;&nbsp;Columbia: QCDSP</h3>
+The serial and parallel versions compile straight out of the box using
+the "gmake -f Makefile.gnu" and "make" commands respectively.
+
+<p>
+     <h3><a name="tth_sEc3.2">
+3.2</a>&nbsp;&nbsp;EPCC: Cray T3E</h3>
+For compilation the following set of commands seems to work:
+
+<pre>
+bash$ export PATH=/opt/open/bin:$PATH
+bash$ autoconf
+bash$ ./configure --enable-parallel-mpi CC=CC CFLAGS="-O3 -h conform"
+bash$ make -f Makefile.gnu all
+
+</pre>
+
+<p>
+I don't know why you have to run autoconf on the T3E.  It must be some
+localised abberation because it is not necessary on other platforms.
+
+<p>
+     <h3><a name="tth_sEc3.3">
+3.3</a>&nbsp;&nbsp;UKQCD: Ukqcd2; an Alpha</h3>
+
+<p>
+     <h3><a name="tth_sEc3.4">
+3.4</a>&nbsp;&nbsp;EPCC: Bronzite; a Sun workstation</h3>
+
+<p>
+     <h3><a name="tth_sEc3.5">
+3.5</a>&nbsp;&nbsp;EPCC: Lomond; a Sunfire 6800 SMP</h3>
+
+<p>
+     <h3><a name="tth_sEc3.6">
+3.6</a>&nbsp;&nbsp;EPCC: Bobcat; a Beowulf cluster</h3>
+
+<p>
+
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 2.92.<br />On  4 Jul 2002, 16:37.</small>
+</body></html>
+CPS_END_NAMESPACE

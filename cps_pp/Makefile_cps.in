@@ -1,0 +1,63 @@
+#  Template makefile for the Columbia Physics System
+#  Need to add autoconf stuff
+#
+#  Create the library for CPS using: make cps
+#
+MAKEFILE = Makefile_cps
+
+
+CC = @CC@
+CXX = @CC@
+
+top_srcdir = @topwd_srcdir@
+INCLUDE_FLAGS = -I$(top_srcdir)  -I$(top_srcdir)/include
+
+
+
+
+libcps_CXXFLAGS = -DPARALLEL=0 -DTARGET_QCDSP=0  $(INCLUDE_FLAGS) 
+
+
+#
+#   source from specifiv build options
+#
+include Makefile_cps_src
+
+.SUFFIXES:
+
+.SUFFIXES:      .o .C
+
+#  go into the subdirectory and compile
+%.o:%.C
+	cd ${<D} ; g++ -c  ${<F} $(libcps_CXXFLAGS)
+
+
+
+
+#
+# make the library for the CPS code
+#
+cps: $(cps_obj)
+	ar rcs cps.a ${cps_obj}
+
+.PHONY : cps
+
+# change the makefile ==> recompile
+$(cps_obj): $(MAKEFILE) 
+
+cps_SOURCES=  $(cps_obj:.o=.C)
+
+
+
+clean:
+	rm $(cps_obj) cps.a
+
+
+##
+## create dependencies
+##
+depend:	
+	makedepend -f Makefile_depend  $(libcps_CXXFLAGS)  $(cps_SOURCES)
+
+include Makefile_depend
+

@@ -1,0 +1,2154 @@
+#include<config.h>
+CPS_START_NAMESPACE
+Lattice::Lattice() :Reset random number generator with seed = 1357
+Lattice::Lattice() :
+	Ordered starting configuration
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 0
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 433316
+	Exiting
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 449982
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.869623e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 7.384952e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.240435e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 8.148916e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 6.227253e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.487229e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.564074e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.606452e-07, iter = 6
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 6549738
+	Exiting
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 6566404
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 6999720
+	Exiting
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 7133048
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 5.726934e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.178796e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 5.772662e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.585377e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.843198e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 4.532504e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.111542e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.728490e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 8.157034e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.733004e-07, iter = 9
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 15866032
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 15866032
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 15866032
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 16749330
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 16765996
+	Before loop over links.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 16815994
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 17249310
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 17249310
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 17249310
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 18132608
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 18132608
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 18265936
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 4.920490e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 7.773320e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.941536e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 4.996268e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 6.555190e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.247535e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 2.027345e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.049698e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 4.997305e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.284722e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 8.933854e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 7.265663e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.286662e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.809793e-07, iter = 13
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 30232124
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 30232124
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 30232124
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 31098756
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 31098756
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 31148754
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 31148754
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 32015386
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 32015386
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 32148714
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.582729e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.659113e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.424455e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.018825e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.750693e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 2.748363e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 6.031449e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 8.115918e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 4.436457e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 8.602149e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 5.521004e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.823517e-07, iter = 11
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 42398304
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 42398304
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 42398304
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 43281602
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 43281602
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 43314934
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 43314934
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 44181566
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 44181566
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 44331560
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.564714e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.636680e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.309159e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.023877e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.770747e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 2.884227e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 6.548718e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.709461e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 9.256383e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.556849e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.268914e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.842250e-07, iter = 11
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 54581150
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 54581150
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 54581150
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 55447782
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 55447782
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 55481114
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 55481114
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 56347746
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 56347746
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 56481074
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.545564e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.622497e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.207668e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.040484e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.832240e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 3.122232e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 7.335528e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 2.970956e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.489870e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 2.500758e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.409419e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.984403e-07, iter = 11
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 66730664
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 66730664
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 66730664
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 67580630
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 67597296
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 67630628
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 67630628
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 68497260
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 68497260
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 68630588
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.525269e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.616970e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.121117e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.066691e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.933866e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 3.459449e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 8.374858e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 4.642029e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 2.109170e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 3.721651e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 4.158088e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 5.030342e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.870099e-07, iter = 12
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 79763476
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 79763476
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 79763476
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 80630108
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 80630108
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 80680106
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 80680106
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 81546738
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 81546738
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 81680066
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.504112e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.620863e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.051204e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.099907e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.073357e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 3.891256e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 9.655067e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 6.808202e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 2.794478e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 5.271704e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 6.766588e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 9.159777e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.885472e-07, iter = 12
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 92779622
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 92779622
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 92796288
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 93646254
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 93646254
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 93696252
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 93696252
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 94562884
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 94562884
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 94696212
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.482688e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.636172e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.009464e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.139628e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.251333e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 4.427990e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.119315e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 9.608851e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 3.591910e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 7.253399e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.057339e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 1.575523e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.901900e-07, iter = 12
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 105845766
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 105845766
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 105845766
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 106695732
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 106695732
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 106745730
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 106745730
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 107612362
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 107612362
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 107762356
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.461113e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.663515e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.001765e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.184710e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.465942e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 5.077029e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.303102e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.324218e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 4.572903e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 9.836387e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.601717e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 2.575350e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.006324e-07, iter = 12
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 118861912
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 118861912
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 118861912
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 119728544
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 119728544
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 119761876
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 119761876
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 120645174
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 120645174
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 120778502
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.440212e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.704019e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.037145e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.235649e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.716437e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 5.853373e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.524467e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.798413e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 5.836858e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.327429e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.367405e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 4.037651e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.183759e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.807776e-07, iter = 13
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 132778022
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 132778022
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 132778022
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 133627988
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 133627988
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 133677986
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 133677986
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 134544618
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 134544618
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 134677946
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.419844e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.758443e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.130055e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.296670e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 3.008548e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 6.787671e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.795870e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 2.422319e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 7.525922e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.793589e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 3.435098e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 6.137467e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.764086e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.002852e-07, iter = 13
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 146660800
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 146660800
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 146660800
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 147527432
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 147527432
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 147560764
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 147560764
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 148427396
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 148427396
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 148627388
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.068823e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.400474e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.827467e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.290752e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.372513e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 3.351183e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 7.918881e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 2.137203e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 3.250976e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 9.826079e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 2.432556e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 4.923966e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 9.162735e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 2.626969e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.034647e-07, iter = 13
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 160610242
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 160610242
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 160610242
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 161476874
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 161476874
+	Before loop over links.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 161526872
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 161960188
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 161960188
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 161960188
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 162810154
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 162826820
+	Before loop over links.
+AlgHmcPhi::run() :
+	No Metropolis step -> Accepted
+AlgHmcPhi::run() :
+	Hmc steps = 12, Delta_hamilton = 4.425049e-02, accept = 1, dev = 5.726446e-08, max_diff = 3.576279e-07
+AlgHmcPhi::run() :
+	CG iterations: average = 1.183333e+01, min = 9, max = 13
+AlgHmcPhi::run() :
+	True Residual / |source|: average = 1.891836e-07, min = 1.733004e-07, max = 2.034647e-07
+AlgHmcPhi::run() :
+	Configuration number = 1
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 162910150
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 163343466
+	Exiting
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 163343466
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.823314e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 8.273501e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.679024e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.623103e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 6.014043e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 3.362685e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.202157e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 4.872496e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 3.367781e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 8.806340e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 4.591005e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.939084e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 6.365542e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.055825e-07, iter = 12
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 174459688
+	Exiting
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 174476354
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 174909670
+	Exiting
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 174993000
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 6.658688e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.505746e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 6.420537e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 2.038108e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 5.300124e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.187012e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 3.169164e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 5.340022e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.023007e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 3.048909e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 9.642502e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 1.306223e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 3.907266e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 9.824321e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 1.984637e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 4.569383e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 1.121113e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 2.676327e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 5.648618e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 1.788331e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 3.062155e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 6.267698e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 1.827998e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.601375e-07, iter = 23
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 195475514
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 195475514
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 195475514
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 196342146
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 196342146
+	Before loop over links.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 196392144
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 196825460
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 196825460
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 196825460
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 197692092
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 197692092
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 197825420
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 5.751450e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.022626e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 2.853890e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 8.151820e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.412488e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 3.208624e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 8.402583e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.310750e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 4.889577e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.120479e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.868939e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 2.905168e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 9.118978e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 2.139290e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 4.580398e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 1.405005e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 2.849766e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.099727e-07, iter = 17
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 213224804
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 213224804
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 213224804
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 214124768
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 214124768
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 214174766
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 214174766
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 215074730
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 215074730
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 215241390
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.079683e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 2.883409e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 7.912540e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 2.479578e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 5.898752e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.346030e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 3.680648e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 5.115746e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.581721e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 4.052927e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 9.087828e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 1.871540e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 5.729374e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 1.481526e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.000582e-07, iter = 14
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 228107542
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 228107542
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 228107542
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 228974174
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 228974174
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 229007506
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 229007506
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 229874138
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 229874138
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 230024132
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.075658e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 2.954610e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 8.209579e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 2.601175e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 6.211617e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.450236e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 4.008659e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 5.705386e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.798537e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 4.695878e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.078231e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 2.342356e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 7.201991e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 1.817787e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.073858e-07, iter = 14
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 242873618
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 242873618
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 242873618
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 243740250
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 243740250
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 243790248
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 243790248
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 244656880
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 244656880
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 244790208
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.074129e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.036643e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 8.535769e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 2.745937e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 6.616852e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.586995e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 4.459951e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 6.558170e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 2.118074e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 5.650722e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.323887e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 3.032052e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 9.311559e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 2.294062e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.134225e-07, iter = 14
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 257656360
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 257656360
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 257656360
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 258522992
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 258522992
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 258556324
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 258556324
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 259439622
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 259439622
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 259572950
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.073713e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.126276e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 8.880100e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 2.911713e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 7.116279e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.760567e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 5.059512e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 7.757544e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 2.576486e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 7.017666e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.672151e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 4.023846e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.228401e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 2.969502e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.233058e-07, iter = 14
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 272389104
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 272389104
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 272389104
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 273255736
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 273255736
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 273305734
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 273305734
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 274172366
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 274172366
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 274305694
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.075573e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.222380e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 9.234554e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 3.097087e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 7.714805e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.976295e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 5.838636e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 9.408478e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 3.218605e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 8.927981e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.159964e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 5.433880e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.646849e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 3.949466e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 7.565610e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.113558e-07, iter = 15
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 288021812
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 288021812
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 288021812
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 288888444
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 288888444
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 288921776
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 288921776
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 289788408
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 289788408
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 289921736
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.078804e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.322499e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 9.593927e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 3.300520e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 8.408813e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 2.237428e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 6.829419e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.163557e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 4.098907e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.154820e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.837435e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 7.425415e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 2.244959e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 5.424379e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 1.112120e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.190345e-07, iter = 15
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 303604522
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 303604522
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 303604522
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 304454488
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 304454488
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 304504486
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 304504486
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 305371118
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 305371118
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 305504446
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.082950e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.424586e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 9.948837e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 3.516162e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 9.191966e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 2.546388e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 8.062464e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.459310e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 5.284547e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.510757e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 3.771679e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 1.022223e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 3.114967e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 7.698064e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 1.689706e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.038297e-07, iter = 15
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 319203898
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 319203898
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 319203898
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 320087196
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 320087196
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 320120528
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 320120528
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 320987160
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 320987160
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 321137154
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.088223e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.528314e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.030549e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 3.742879e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.005791e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 2.903220e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 9.561412e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.843248e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 6.846458e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.988825e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 5.045994e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 1.413605e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 4.392019e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 1.119386e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 2.612366e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.240286e-07, iter = 15
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 334803274
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 334803274
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 334803274
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 335669906
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 335669906
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 335703238
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 335703238
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 336603202
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 336603202
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 336736530
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.093799e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.631114e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.065532e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 3.974958e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.099225e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 3.304504e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.133631e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 2.330360e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 8.861357e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 2.624524e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 6.770174e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 1.957967e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 6.258356e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 1.643870e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 4.034710e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 1.258589e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.993356e-07, iter = 16
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 351269282
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 351269282
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 351269282
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 352135914
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 352135914
+	Before loop over links.
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 352185912
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 352185912
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 353035878
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 353035878
+	Before loop over links.
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.000000
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 353252536
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.156862e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.099538e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.734513e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.101291e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 4.212346e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.199030e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 3.746382e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.337925e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 2.931951e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.140643e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 3.462227e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 9.100040e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 2.716541e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 8.969136e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 2.414234e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 6.175898e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 1.923142e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.149982e-07, iter = 16
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 367801954
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 367801954
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 367801954
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 368668586
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 368668586
+	Before loop over links.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 368718584
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 369135234
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 369135234
+	Before calc force vecs.
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 369135234
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 370018532
+	Exiting
+Fdwf::EvolveMomFforce(M*,V*,F,F,F) : Clock (1.0 MHz) = 370018532
+	Before loop over links.
+AlgHmcPhi::run() :
+	No Metropolis step -> Accepted
+AlgHmcPhi::run() :
+	Hmc steps = 12, Delta_hamilton = 3.656006e-02, accept = 1, dev = 6.967196e-08, max_diff = 4.768372e-07
+AlgHmcPhi::run() :
+	CG iterations: average = 1.566667e+01, min = 14, max = 23
+AlgHmcPhi::run() :
+	True Residual / |source|: average = 2.155721e-07, min = 1.993356e-07, max = 2.601375e-07
+AlgHmcPhi::run() :
+	Configuration number = 2
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+CPS_END_NAMESPACE

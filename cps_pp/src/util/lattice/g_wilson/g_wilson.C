@@ -1,0 +1,246 @@
+#include<config.h>
+CPS_START_NAMESPACE
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: mcneile $
+//  $Date: 2003-06-22 13:34:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Id: g_wilson.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.4  2001/08/16 10:50:37  anj
+//  The float->Float changes in the previous version were unworkable on QCDSP.
+//  To allow type-flexibility, all references to "float" have been
+//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
+//  (where Float=rfloat), and on all other machines allows the use of
+//  double or float in all cases (i.e. for both Float and IFloat).  The I
+//  stands for Internal, as in "for internal use only". Anj
+//
+//  Revision 1.2  2001/06/19 18:13:29  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:16:10  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
+//  $RCSfile: g_wilson.C,v $
+//  $Revision: 1.1.1.1 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
+//------------------------------------------------------------------
+//
+// g_wilson.C
+//
+// Gwilson is derived from Lattice and is relevant to the 
+// standard Wilson single plaquette action.
+//
+//------------------------------------------------------------------
+
+CPS_END_NAMESPACE
+#include<util/lattice.h>
+#include<util/verbose.h>
+#include<util/vector.h>
+#include<util/gjp.h>
+#include<util/gw_hb.h>
+#include<comms/nga_reg.h>
+#include<comms/glb.h>
+#include<comms/cbuf.h>
+CPS_START_NAMESPACE
+
+
+//------------------------------------------------------------------
+enum { MATRIX_SIZE = 18 };
+//------------------------------------------------------------------
+
+//------------------------------------------------------------------
+// static variables used only inside this file
+//------------------------------------------------------------------
+static IFloat invs3 = -1./3.;
+
+
+
+
+//  CRAM temp buffer
+#ifdef _TARTAN
+static Matrix *mp0 = (Matrix *)CRAM_SCRATCH_ADDR;	// ihdot
+static Matrix *mp1 = mp0 + 1;
+static Matrix *mp2 = mp1 + 1;
+//static Matrix *mp3 = mp2 + 1;
+#else
+static Matrix mt0;
+static Matrix mt1;
+static Matrix mt2;
+//static Matrix mt3;
+static Matrix *mp0 = &mt0;		// ihdot
+static Matrix *mp1 = &mt1;
+static Matrix *mp2 = &mt2;
+//static Matrix *mp3 = &mt3;
+#endif 
+
+
+//------------------------------------------------------------------
+// Constructor
+//------------------------------------------------------------------
+Gwilson::Gwilson()
+{
+  cname = "Gwilson";
+  char *fname = "Gwilson()";
+  VRB.Func(cname,fname);
+}
+
+
+//------------------------------------------------------------------
+// Destructor
+//------------------------------------------------------------------
+Gwilson::~Gwilson()
+{
+  char *fname = "~Gwilson()";
+  VRB.Func(cname,fname);
+}
+
+
+//------------------------------------------------------------------
+// GclassType Gclass(void):
+// It returns the type of gauge class
+//------------------------------------------------------------------
+GclassType Gwilson::Gclass(void){
+  return G_CLASS_WILSON;
+}
+
+const unsigned CBUF_MODE4 = 0xcca52112;
+
+
+//------------------------------------------------------------------
+// GforceSite(Matrix& force, int *x, int mu):
+// It calculates the gauge force at site x and direction mu.
+//------------------------------------------------------------------
+void Gwilson::GforceSite(Matrix& force, int *x, int mu)
+{
+  char *fname = "GforceSite(M&,i*,i)";
+  VRB.Func(cname,fname);
+
+  setCbufCntrlReg(4, CBUF_MODE4);
+
+  Matrix *u_off = GaugeField()+GsiteOffset(x)+mu;
+
+
+  //----------------------------------------
+  //  get staple
+  //     mp1 = staple
+  //----------------------------------------
+  Staple(*mp1, x, mu);	
+  
+
+  //----------------------------------------
+  // mp2 = U_mu(x)
+  //----------------------------------------
+  moveMem((IFloat *)mp2, (IFloat *)u_off+BANK4_BASE+BANK_SIZE,
+  	MATRIX_SIZE * sizeof(IFloat));
+
+  
+  //----------------------------------------
+  // force = -beta/3*U_mu(x)*stap
+  // "-" because no staggered phase
+  //----------------------------------------
+  mDotMEqual((IFloat *)&force, (const IFloat *)mp2, (const IFloat *)mp1);
+
+  Float tmp = GJP.Beta()*invs3;
+  vecTimesEquFloat((IFloat *)&force, tmp, MATRIX_SIZE);
+
+  
+  // mp1 and mp2 free
+
+  mp1->Dagger((IFloat *)&force);
+  force.TrLessAntiHermMatrix(*mp1);
+}
+
+
+//------------------------------------------------------------------
+// EvolveMomGforce(Matrix *mom, Float step_size):
+// It evolves the canonical momentum mom by step_size
+// using the pure gauge force.
+//------------------------------------------------------------------
+void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
+  char *fname = "EvolveMomGforce(M*,F)";
+  VRB.Func(cname,fname);
+  
+  setCbufCntrlReg(4, CBUF_MODE4);
+
+  int x[4];
+  
+  for(x[0] = 0; x[0] < GJP.XnodeSites(); ++x[0]) {
+    for(x[1] = 0; x[1] < GJP.YnodeSites(); ++x[1]) {
+      for(x[2] = 0; x[2] < GJP.ZnodeSites(); ++x[2]) {
+	for(x[3] = 0; x[3] < GJP.TnodeSites(); ++x[3]) {
+	  
+	  int uoff = GsiteOffset(x);
+	  
+	  for (int mu = 0; mu < 4; ++mu) {
+	    GforceSite(*mp0, x, mu);
+	    
+	    IFloat *ihp = (IFloat *)(mom+uoff+mu);
+	    IFloat *dotp = (IFloat *)mp0;
+	    fTimesV1PlusV2(ihp, step_size, dotp, ihp+BANK4_BASE, 18);
+	  }
+	}
+      }
+    }
+  }
+}
+
+//------------------------------------------------------------------
+// Float GhamiltonNode(void):
+// The pure gauge Hamiltonian of the node sublattice.
+//------------------------------------------------------------------
+Float Gwilson::GhamiltonNode(void){
+  char *fname = "GhamiltonNode()";
+  VRB.Func(cname,fname);
+
+  Float tmp = GJP.Beta()*invs3;
+  Float sum = SumReTrPlaqNode();
+  sum *= tmp;
+  return sum;
+
+}
+
+//------------------------------------------------------------------------------
+// void GactionGradient(Matrix &grad, int *x, int mu)
+//   Calculates the partial derivative of the gauge action
+//   w.r.t. the link U_mu(x).
+//------------------------------------------------------------------------------
+void Gwilson::GactionGradient(Matrix &grad, int *x, int mu)
+{
+  char *fname = "GactionGradient(M&,I*,I)" ;
+  VRB.Func(cname, fname) ;
+
+  //----------------------------------------------------------------------------
+  // get staple
+  //----------------------------------------------------------------------------
+  Staple(grad, x, mu) ;
+
+  //----------------------------------------------------------------------------
+  // grad = - (beta/3) * staple
+  //   N.B. invs3 should be -1/3
+  //----------------------------------------------------------------------------
+  Float tmp = GJP.Beta() * invs3 ;
+  vecTimesEquFloat((IFloat *)&grad, tmp, MATRIX_SIZE) ;
+}
+
+void Gwilson::AllStaple(Matrix & stap, const int *x, int mu){
+  char * fname = "AllStaple()";
+  VRB.Func(cname, fname);
+  BufferedStaple(stap, x, mu); 
+}
+CPS_END_NAMESPACE

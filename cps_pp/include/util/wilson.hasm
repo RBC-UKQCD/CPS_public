@@ -1,0 +1,79 @@
+#include<config.h>
+CPS_START_NAMESPACE
+**--------------------------------------------------------------------
+**  CVS keywords
+**
+**  $Author: mcneile $
+**  $Date: 2003-06-22 13:34:52 $
+**  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.hasm,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+**  $Id: wilson.hasm,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+**  $Name: not supported by cvs2svn $
+**  $Locker:  $
+**  $Log: not supported by cvs2svn $
+**  Revision 1.2  2001/06/19 18:13:20  anj
+**  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+**  Next version will contain the new nga/include/double64.h.  Also,
+**  Makefile.gnutests has been modified to work properly, propagating the
+**  choice of C++ compiler and flags all the way down the directory tree.
+**  The mpi_scu code has been added under phys/nga, and partially
+**  plumbed in.
+**
+**  Everything has newer dates, due to the way in which this first alteration was handled.
+**
+**  Anj.
+**
+**  Revision 1.2  2001/05/25 06:16:09  cvs
+**  Added CVS keywords to phys_v4_0_0_preCVS
+**
+**  $RCSfile: wilson.hasm,v $
+**  $Revision: 1.1.1.1 $
+**  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.hasm,v $
+**  $State: Exp $
+**
+**--------------------------------------------------------------------
+****************************************************************************
+* 10/16/97                                                                 *
+*                                                                          *
+* wilson.hasm:                                                             *
+*                                                                          *
+* Assembly header file for the wilson fermion library wilson.lib           *
+*                                                                          *
+****************************************************************************
+
+*--------------------------------------------------------------------------*
+* Definitions                                                              *
+*--------------------------------------------------------------------------*
+SPINOR_SIZE             .set    24
+HALF_SPINOR_SIZE        .set    12
+COLUMN_SPINOR_SIZE      .set    6
+GAUGE_SIZE              .set    72
+
+ND			.set	4 
+U_SIZE			.set	ND*18		; 4 directions of a gauge field 
+PSI_SIZE 		.set	24		; 4 component spinor 
+CHI_SIZE 		.set	PSI_SIZE	; 4 component spinor 
+AF_SIZE			.set	ND*12		; spin projected spinor
+AB_SIZE			.set	AF_SIZE		; spin projected spinor
+
+
+*--------------------------------------------------------------------------*
+* The Wilson structure.
+*--------------------------------------------------------------------------*
+Wilson			.struct 
+ptr			.int			; pointer to data
+yztmax		     	.int
+offset			.int
+comm_offset		.int	ND
+comm_stride		.int	ND
+comm_blklen		.int	ND
+comm_numblk 	        .int	ND
+comm   		        .int    ND	        ; :numblk:10-blklen:10:-stride:12:
+vol			.int	2		; subgrid vol of each cb
+padded_subgrid_vol 	.int	ND		; subgrid vol of padded temporary
+spinor_tmp		.int		        ; temp spinor needed by mdagm
+af			.int	ND       	; point. array to 4 fwd spin projected half spinors
+ab         		.int	ND		; point. array to 4 bwd spin projected half spinors
+size_ptrtab		.endstruct
+
+
+CPS_END_NAMESPACE

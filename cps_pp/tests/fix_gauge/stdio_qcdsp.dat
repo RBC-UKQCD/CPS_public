@@ -1,0 +1,175 @@
+#include<config.h>
+CPS_START_NAMESPACE
+
+Qdaemon state is:
+	qdaemon task is LOAD
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+	Load file is /home/cmm80/phys/phys_v4.1.1.test/tests/fix_gauge/qcdsp.out
+	Read address (hex) 0, blksize 0 (hex) from screen
+	Read output to screen in node tagged format
+	Run entry address from file
+	SCSI packet and payload size:  512  488
+	Run kernels not installed on all nodes
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+LoadFile:  Payload for all nodes (SCSI tree coordinates)
+
+Qdaemon state is:
+	qdaemon task is LOAD
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+	Load file is /home/cmm80/phys/phys_v4.1.1.test/tests/fix_gauge/qcdsp.out
+	Read address (hex) 0, blksize 0 (hex) from screen
+	Read output to screen in node tagged format
+	Run entry address from file
+	SCSI packet and payload size:  512  488
+	Run kernels not installed on all nodes
+
+Qdaemon state is:
+	qdaemon task is LOAD_ARGS
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+	Load file is /home/cmm80/phys/phys_v4.1.1.test/tests/fix_gauge/qcdsp.out
+	Read address (hex) 0, blksize 0 (hex) from screen
+	Read output to screen in node tagged format
+	Run entry address from file
+	SCSI packet and payload size:  512  488
+	Run kernels not installed on all nodes
+
+Qdaemon state is:
+	qdaemon task is LOAD_ARGS
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+	Load file is /home/cmm80/phys/phys_v4.1.1.test/tests/fix_gauge/qcdsp.out
+	Read address (hex) 0, blksize 0 (hex) from screen
+	Read output to screen in node tagged format
+	Run entry address from file
+	SCSI packet and payload size:  512  488
+	Run kernels not installed on all nodes
+
+Qdaemon state is:
+	qdaemon task is EXEC_IO
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+	Load file is /home/cmm80/phys/phys_v4.1.1.test/tests/fix_gauge/qcdsp.out
+	Read address (hex) 0, blksize 0 (hex) from screen
+	Read output to screen in node tagged format
+	Run entry address from file
+	SCSI packet and payload size:  512  488
+	Run kernels not installed on all nodes
+Lattice::Lattice() :Reset random number generator with seed = 678040585
+Lattice::Lattice() :
+	Disordered starting configuration
+Szm::readpkt:  read unsuccessful after 100 attempts
+Lattice::Lattice() :
+	Memory starting configuration addr = 16577
+Lattice::Convert(StrOrdType) :
+	No conversion necessary from 0 to 0
+Szm::readpkt:  read unsuccessful after 100 attempts
+MkerExecAck:  starting to check program exit status
+AnalyzeQCDSP::SCUCheck:  SCUDebug mode 0 doesn't allow analysis
+MkerExecAck:  SCUCheck could not be run
+
+Qdaemon state is:
+	qdaemon task is EXEC_IO
+	qdaemon abort no and resume no
+	QCDSP synchronous
+	All nodes selected with SCSI tree coordinates
+	Load file is /home/cmm80/phys/phys_v4.1.1.test/tests/fix_gauge/qcdsp.out
+	Read address (hex) 0, blksize 0 (hex) from screen
+	Read output to screen in node tagged format
+	Run entry address from file
+	SCSI packet and payload size:  512  488
+	Run kernels not installed on all nodes
+CPS_END_NAMESPACE

@@ -1,0 +1,81 @@
+#include<config.h>
+CPS_START_NAMESPACE
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+               
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <title>CVS Access</title>
+</head>
+ <body>
+       
+<hr width="100%" size="2" align="Left" noshade="">    
+<table cellpadding="2" cellspacing="2" border="0" width="100%">
+      <tbody>
+        <tr>
+          <td valign="Top">                            
+      <h1>CVS Access<br>
+          </h1>
+          </td>
+          <td valign="Bottom" align="Right">The QCDOC Collaboration<br>
+          </td>
+        </tr>
+               
+  </tbody>    
+</table>
+       
+<hr width="100%" size="2" align="Left" noshade=""><br>
+ 
+<div align="Center"><font><small><a href="#Accessing_the_UKQCD_QCDOC_Code">
+ access</a>
+ </small></font><font><small> | </small></font><font><small><a href="#Submission_of_Changes">
+ submission</a>
+ </small></font><font><small> | </small></font><font><small><a href="#Using_ssh">
+ ssh</a>
+ </small></font><br>
+ </div>
+     
+<h2><a name="Accessing_the_UKQCD_QCDOC_Code"></a>
+ Accessing the UKQCD QCDOC Code Repository</h2>
+     To access the CVS repository, you need an account on trumpton.ph.ed.ac.uk
+  (contact <a href="cmaynard@ph.ed.ac.uk">Chris Maynard</a>
+     for this). &nbsp;To check out the current version of the Columbia code,
+  you need to (in bash):<br>
+       
+<pre wrap="">export&nbsp;CVS_SERVER=/usr/bin/cvs <br>export CVS_RSH=ssh<br><span class="moz-txt-citetags"></span>export CVSROOT=:ext:<font color="#ff0000"><b>YOURUSERNAME</b></font>@trumpton.ph.ed.ac.uk:/Disk/ukqcd/QCDOC/CVS <br><span class="moz-txt-citetags"></span>cvs co phys</pre>
+    This will then prompt you for your trumpton password, and then check the 
+entire  codebase out into a directory called `phys'.<br>
+       
+<h2><a name="Submission_of_Changes"></a>
+ Submission of Changes</h2>
+   Anyone who has checked out the code in the manner described above has
+the  ability to commit their own changes to the repository. &nbsp;For the
+time  being, we request that all changes are cleared/submitted by ourselves
+(via  <a href="mailto:S.Booth@epcc.ed.ac.uk">Stephen Booth</a>
+   ) so that we can retain overall control of the repository.<br>
+ 
+<h2><a name="Using_ssh"></a>
+ Using ssh</h2>
+<p>
+ Using the mechanism descibed above, the secure login process means that
+you have to type in your password every time you perform a cvs operation,
+and sometime twice when checking in changes. &nbsp;This can be avoided by
+setting up your own ssh-agent to remember your passphrase locally and perform
+the identity check automatically. 
+</p>
+<p>
+Getting you ssh-agent set up is rather fiddly so...
+Here is a local copy of <a href="keychain.html">SSH and keychain</a> by Stewart
+V. Wright (taken from <a
+href="http://www.liv.ac.uk/~svwright/security/keychain.html">here</a>).  You
+can also try looking at these tutorials [<a href="http://www.deadman.org/ssh-tut.html">1</a>
+ ,<a href="http://mah.everybody.org/docs/ssh">2</a> ].
+</p>
+        <hr width="100%" size="2" align="Left" noshade="">    
+        <div align="Right"><a href="mailto:A.N.Jackson@ed.ac.uk"><small>Andrew
+Jackson</small></a>
+     - 2001</div>
+       
+        </body>
+        </html>
+CPS_END_NAMESPACE

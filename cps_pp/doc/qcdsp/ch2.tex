@@ -1,0 +1,698 @@
+#include<config.h>
+CPS_START_NAMESPACE
+\chapter{Hello World}\label{c:HelloWorld}
+\section{Foo or Bar?}
+It is the long and honourable tradition of user guides to 
+begin by a walk through example of how to get a simple program
+(usually named {\bf foo.c} or {\bf bar.c} in more reputable 
+texts) to run on a certain development platform. Such a program
+usually does something simple like write the message {\em ``Hello World''}
+to the screen. In this chapter we should like to show how to 
+get such a program running on a QCDSP computer.
+
+\section{Front End and Logging In}
+The QCDSP is a parallel system that is accessible through a {\em front end}
+ \ host, which is a possibly simpler, serial computer such as a Sun Workstation.
+
+This is an accepted principle in supercomputing circles. For example,
+the Thinking Machines Corporation Connection machines were often 
+accessed from a Sun front end, as were some of the Elenia--Quadrics
+supercomputers. Cray T3E computers often have another Cray supercomputer 
+(such as a J90 or a YMP) as their front end.
+
+It is important to point out, however, that the Connection Machine and 
+Quadrics machines were true {\em back end} machines in the sense that
+user programs ran on the front end Sun workstation, and the parallel hardware
+was controlled entirely by the front end, usually for array operations.
+The Cray and QCDSP supercomputers are different. They compute independently
+of the front end. The front end however provides important services such
+as a compilation environment, control to boot the parallel machines and
+disk space for the data produced by the QCDSP. 
+
+The QCDSP front end discussed in the rest of this section is a Sun
+workstation running the SunOS 4 variant of the UNIX operating system.
+Before being able to log in one requires an account to be set up
+on the system, which should be requested from one of the systems staff
+of the QCDSP collaboration\footnote{Currently Bob Mawhinney, email {\tt rdm@phys.columbia.edu}}.
+
+\subsection{Login Procedures}
+In the following example I shall use a host called 
+{\em qcdhost.phys.columbia.edu}, which is the front end to two QCDSP 
+boards (each containing 64 processors). The QCDSP boards are themselves
+known as {\em q\_1} and {\em q\_2}. This machine 
+is also the front end to some other machines of which more will be said later.
+
+Logging in to QCDSP is done according to the standard network login procedure.
+One can use {\tt telnet} to reach the host from anywhere on the Internet
+although nowadays the more secure SSH login is recommended, which apart
+from forwarding X-Windows connections also encrypts the network 
+communications and does strict host--name resolutions. As an example I use
+my current machine which is named {\em lattice2} \ to log into {\em qcdhost} \
+via {\tt ssh}.
+
+\begin{verbatim}
+[bj@lattice2 bj]$ ssh bj@qcdhost.phys.columbia.edu
+bj@qcdhost.phys.columbia.edu's password: 
+Last login: Wed Mar 29 11:15:05 2000 from lattice2.pa.uky.
+SunOS Release 4.1.4 (QCDHOST.sz) #2: Fri Nov 20 14:32:57 EST 1998
+(qcdhost:/homeqs0/bj)%
+\end{verbatim}
+
+Note that the password needs to be entered at the prompt in the second
+line, but, as is characteristic of UNIX the password is not echoed back to the 
+terminal. If {\tt ssh} is not available one can use {\tt telnet} \ :
+\begin{verbatim}
+[bj@lattice2 bj]$ telnet qcdhost.phys.columbia.edu
+Trying 128.59.196.11...
+Connected to qcdhost.phys.columbia.edu.
+Escape character is '^]'.
+
+
+SunOS UNIX (qcdhost)
+
+login: bj
+password:
+Last login: Wed Mar 29 11:20:05 2000 from lattice2.pa.uky.
+SunOS Release 4.1.4 (QCDHOST.sz) #2: Fri Nov 20 14:32:57 EST 1998
+(qcdhost:/homeqs0/bj)%
+\end{verbatim}
+or {\tt rlogin}:
+\begin{verbatim}
+[bj@lattice2 bj]$ rlogin -lbj qcdhost.phys.columbia.edu
+bj@qcdhost.phys.columbia.edu's password: 
+Last login: Wed Mar 29 11:25:05 2000 from lattice2.pa.uky.
+SunOS Release 4.1.4 (QCDHOST.sz) #2: Fri Nov 20 14:32:57 EST 1998
+\end{verbatim}
+although in the latter two cases the protocols send the user
+passwords over the networks unencrypted and liable to interception
+by pesky hacksters worldwide. We note that when using {\em rlogin}
+one ends up talking to a {\em SSH} connection at the QCDSP end.
+
+\section{QOS and Environment Variables}
+\subsection{QOS Version}
+The QCDSP computer runs an operating system entitled {\em QOS}.
+Numerous revisions of {\em QOS} exist with the current version at the
+time of writing this note being {\em QOS 5.3.3}. A UNIX shell
+environment variable, {\tt QOS\_VERS} is used to identify the version
+of {\em QOS} that a given user will be using.  This environment
+variable should be set automatically be the shell startup files at the
+time the user logs in. In particular {\em qcdhost} supports the {\em
+TC-Shell} ({\tt tcsh}) and the startup file in which  the environment 
+variables are set is {\bf .cshrc}.
+
+The toplevel {\em QOS} directory on {\em qcdhost} is
+
+{\tt /qcdsp/sfw/qos.<version>}, 
+
+where {\tt version} refers to the
+operating system revision held by the variable {\tt QOS\_VERS}. For version
+5.3.3 the relevant directory is 
+
+{\tt /qcdsp/sfw/qos.5.3.3}\ .
+
+\subsection{The Tartan C++ Compiler}
+Another set of environmental variables that need to be set are related
+to the installation of the Tartan C++ compiler. The two variables in 
+my {\bf .cshrc} file at the time of writing are {\tt TC\_DIR} and {\tt TC\_BOARD}.
+Currently these two variables are set to the following values:\begin{verbatim}
+TC_DIR=/qcdsp/sfw/qos.<version>/usr:/usr/local/tartan/v2.1
+TC_BOARD=qcdsp_v<version>
+\end{verbatim}
+where {\tt version} is the value of the variable {\tt QOS\_VERS}. I believe
+that {\tt TC\_DIR} is a list of directories which contain subdirectories
+for {\tt \#include} files, run time libraries etc. I suspect that {\tt TC\_BOARD}
+identifies, which QOS operating system version interfaces the hardware
+is compliant with ({\em but this is guesswork on my part. Bob, please enlighten us here}.) In any case these variables need to be set to sensible values
+for code to compile, link, resolve and run successfully on the QCDSP computer.
+
+\subsection{The QOS Toplevel Directory}
+Let us now pass a cursory glance at the toplevel QOS directory.
+A simple listing of files therein reveals the following directory 
+contents
+\begin{verbatim}
+(qcdhost:/qcdsp/sfw/qos.5.3.3)%	ls
+Makefile                        make.log
+README                          os_03_20_00_18:36.tar.gz
+announce                        plaq/
+bug/                            qio/
+diag/                           qio_qker/
+distrib/                        qker/
+example/                        rts/
+include/                        usr/
+lib/                            util_prog/
+machines/
+\end{verbatim}
+
+Currently for us the most interesting of these are going to be 
+the subdirectories called {\tt machines} and {\tt usr}. In the
+former are defined the various machine partitions available, whereas
+in the latter reside some useful header files describing the
+parallel programming communications objects.
+
+Looking at the machines directory reveals the following list:
+\begin{verbatim}
+(qcdhost:/qcdsp/sfw/qos.5.3.3)%	cd machines/
+(qcdhost:/qcdsp/sfw/qos.5.3.3/machines)% ls
+Makefile      cc_1/         q4_1/          q6_2/          q_1/
+c4_1/         cc_2/         q4_2/          q7_1/          q_2/
+c4_2/         cc_3/         q5_1/          q7_2/          src/
+cb_2/         q3_1/         q5_2/          q8_1/
+cb_3/         q3_2/         q6_1/          q8_2/
+\end{verbatim}
+
+Each directory with the exception of {\tt src} refers to a QCDSP processor
+partition. We are qoing to use machines {\tt q\_1} and {\tt q\_2} for the 
+rest of this guide so let us examine {\tt q\_1}:
+\begin{verbatim}
+(qcdhost:/qcdsp/sfw/qos.5.3.3/machines/q_1)% ls
+boot_n0_notest.qrb      notest.qrb              q_1_sec4/
+boot_n0_notest_25.qrb   notest_25.qrb           q_1_sec5/
+debug.qrb               q_1@                    q_1_sec6/
+debug_25.qrb            q_1_pri0/               standard.qrb
+debug_notest.qrb        q_1_sec1/               standard_25.qrb
+debug_notest_25.qrb     q_1_sec2/
+dev                     q_1_sec3/
+\end{verbatim}
+
+Most of the files in this directory have the suffix {\bf .qrb}. 
+These files are the configuration files for booting the QCDSP computer.
+They specify which operating systems kernels are to be sent to the
+QCDSP daughterboards, what speed the inter processor communications 
+should run at, what self test procedures to carry out at boot time, {\em etc}\ .
+In normal usage, the file {\bf standard.qrb} should probably be used
+(the manner of its use will be described in the next section).
+
+The file {\bf q\_1} is a symbolic link to a program called the 
+{\em QC-Shell}, which is the shell environment used to boot, and 
+run programs on the QCDSP, of which we shall say more below.
+
+\section{The QC-Shell and Booting the QCDSP}
+\subsection{The QC-Shell -- {\tt qcsh}}
+So far we have been happily romping around the filesystem of the 
+front end host. Now comes the time to actually boot a set of processors
+for our use.
+
+Interaction with the QCDSP generally takes place through the aforementioned
+{\em QC-Shell}. This effectively is the usual {\em TC-Shell} \ with some 
+bolted on features (in the form of built in commands) to manipulate the 
+QCDSP computer. Commands for manipulating the QCDSP begin with the letter
+{\tt q}. Some useful commands which we shall be using later are 
+{\tt qreset\_boot}, {\tt qrun} and {\tt qprintf}. 
+
+We note the distinction between a shell built in command and UNIX
+commands. For example in a normal UNIX {\em TC-Shell} \ the command
+{\tt echo} is a built in command of the shell, while the usual
+UNIX command {\tt ls} is an executable program usually residing in
+the directory {\tt /bin}.  Hence the command {\tt ls} is available to
+all shells, whereas the command {\tt echo} is shell specific (although
+it is implemented in almost all UNIX shells). 
+
+Like most UNIX--shell like shells the {\em QC-Shell} \ allows for
+self initialisation through a startup file. In the case of the {\em
+QC-Shell} this file is called {\bf .qcshrc}. If your account has been
+set up properly you should find a {\bf .qcshrc} file in your toplevel
+homedirectory. My one reads as follows:
+\begin{verbatim}
+source ~/.cshrc
+qinit
+set curdir = `pwd`
+source $curdir/dev
+qset_qd_verbose 2
+qset_qd_scsi_tree_verbose 2
+qset_reset_boot f standard.qrb
+qset_exit_info 5 exit.info
+qreset_boot
+\end{verbatim}
+
+One of the chief functions of the {\bf .qcshrc} file is to boot the 
+QCDSP computer. This is accomplished by various commands in the 
+{\bf .qcshrc} file. 
+
+The {\tt qinit} command initialises the QCDSP system and starts up
+the {\tt Qdaemon} system daemon which is responsible for for booting
+the QCDSP machine, loading and executing programs, performing self tests
+and other important tasks.  By ``sourcing''
+the {\bf dev} file in the current directory, several variables are 
+defined in the shell specifying amongst other things the boot--debug
+network device (in this case SCSI ID) which is used to communicate
+with the QCDSP boards. {\bf Note that this .qcshrc expects you to be
+in the correct machine directory at the time of invocation of the 
+QC-Shell, where the file dev resides}.
+
+Thereafter some boot time verbosity levels are set to specify how 
+much of the various Qdaemon messages and other test results should be sent
+to the standard output for boot time diagnostic purposes. These levels 
+are set by the {\tt qset\_qd\_verbose} and the 
+{\tt qset\_qd\_scsi\_tree\_verbose} 
+commands.
+
+The configuration ({\bf .qrb}) file to use when booting, or resetting
+the QCDSP is specified with the command {\tt qset\_reset\_boot}. In
+my case it is the {\bf standard.qrb} file which was mentioned in the
+last section. 
+
+The {\tt qset\_exit\_info} command itself is used to {\em what's it 
+used to do then ?} 
+
+Once all these settings have been put into effect the machine is 
+finally booted through the command {\tt qreset\_boot}. Incidentally
+this is also a useful bail out command. Should the QCDSP crash or deadlock,
+or for whatever reason we may want to reboot the computer, it can be 
+done using the {\tt qreset\_boot} command in the {\em QC-Shell}.
+
+More information on these commands will be given in the
+advances stages of this manual (if it ever gets that far...)
+
+\section{Booting the QCDSP}
+Now that we have examined how one boots the QCDSP, let us do it
+by invoking the {\em QC-Shell}. The magic incantation for machine {\em q\_1}
+is:
+\begin{verbatim}
+(qcdhost:/homeqs0/bj)% cd /qcdsp/sfw/qos.5.3.3/machines/q_1
+(qcdhost:/qcdsp/sfw/qos.5.3.3/machines/q_1)% ./q_1
+\end{verbatim}
+
+The first command takes to the machine directory, where the {\bf dev}
+and {\bf .qrb} files live. Recalling that {\tt q\_1} is a symbolic link
+the {\tt qcsh} command, it can be seen that the second command invokes
+the {\em QC-Shell}.
+
+{\bf Aside: }
+Since getting to the correct machine directory involves a lot of typing
+it might be useful to set up some sort of shell alias to allow us
+reaching the directory more quickly. In my {\bf \~\/.cshrc} file I have 
+two variables set:
+\begin{verbatim}
+set q_1 = /qcdsp/sfw/qos."$QOS_VERS"/machines/q_1
+set q_2 = /qcdsp/sfw/qos."$QOS_VERS"/machines/q_2 
+\end{verbatim}
+Hence I can reach the {\em q\_1} and {\em q\_2} directories respectively
+by just typing {\tt cd q\_1} and {\tt cd q\_2} respectively.
+
+The invoking of the {\em QC-Shell} should start a large set of messages
+scrolling up your screen, giving you the results of boot time diagnostics
+and self tests. Some important ones to look out for:
+\begin{verbatim}
+qinit:  qcsh initialized
+
+Qdaemon state is:
+        qdaemon task is INITIALIZE_DAEMON
+        qdaemon abort no and resume no
+        QCDSP not synchronous
+        SCSI tree coordinates selected:  mb 0,  db 0,  
+        Load address 0 (hex), data 0 (hex) from screen
+        Read address (hex) 0, blksize 0 (hex) from screen
+        Read output to screen in node tagged format
+        Run entry address from file
+        SCSI packet and payload size:  512  488
+        Run kernels not installed on all nodes
+        Hardware debugging level is 0
+        Not decoding packet headers
+\end{verbatim}
+This message signifies that the {\em QC-Shell} has been initialized
+and the so called {\tt Qdaemon} has been started. The {\tt Qdaemon}
+is the primary source of interaction with the QCDSP. Note also 
+the {\tt Qdaemon} message has been displayed twice, once for entry 
+into the specific service routine and once at the exit. This is the 
+result of setting the verbosity level in the {\bf .qcshrc} file.
+Carrying on with the boot process the following messages should appear
+at some point:
+\begin{verbatim}
+qset_boot_szdevice: /dev/rsz8 open
+qset_boot_szdevice:  status directory /qcdsp/machines/status/qcdhost.rsz8
+qdaemon verbose level: 2
+SCSI tree verbose level: 2
+        exit info level and filename:  5   exit.info
+Qdaemon:  PRIMARY Q-SHELL - hardware reset enabled
+Qdaemon:  pause between unsuccessful SCSI bus reads is 10000 microseconds
+
+Qdaemon state is:
+        qdaemon task is RESET_BOOT
+        qdaemon abort no and resume no
+        QCDSP not synchronous
+        SCSI tree coordinates selected:  mb 0,  db 0,  
+ResetBoot::ResetBoot:  Hello
+\end{verbatim}
+These messages show the results of trying to talk via
+the SCSI bus to the QCDSP, in particular that the SCSI bus has been 
+found and that the Qdaemon has now entered the machine reset and boot
+service. If all is well the QCDSP should reply as:
+\begin{verbatim}
+Szm::inquiry:   COLUMBIA QCDSP
+ResetBoot::ResetBoot:  Mb 0 found
+ResetBoot:  Working on scsi layer 0
+ResetBoot:  turning off LED's on layer 0
+ResetBoot:  starting non SCU NGA setup on layer 0
+ResetBoot:  starting DramStdTest0 on layer 0
+ResetBoot:  DramStdTest0 passed for layer 0
+ResetBoot:  loading run kernels to layer 0
+\end{verbatim}
+If you do not get the {\tt COLUMBIA QCDSP} message then
+something is wrong. The rest of the messages display various test 
+results.
+
+The various motherboards are arranged in a tree structure with
+boot time communication being done via a SCSI bus. One of the
+next tasks of the boot process is to find out about the SCSI tree.
+This information is also echoed back at boot time (given the verbosity
+levels in my startup files):
+\begin{verbatim}
+SCSITree:  Summary of SCSITree object
+
+  SCSIPath information for motherboard 0
+    SCSI ID path:       
+    SCSI branch path:   
+
+  SCSIBranch information for branch 0
+
+  SCSIBranch:  information for branch 0
+
+    For SCSI ID 0 the device is motherboard 0 (serial number 38)
+        at slot 0 and crate 0xf1
+
+    For SCSI ID 1  no device is present
+
+    For SCSI ID 2  no device is present
+
+    For SCSI ID 3  no device is present
+
+    For SCSI ID 4  no device is present
+
+    For SCSI ID 5  no device is present
+
+    For SCSI ID 6  no device is present
+
+    For SCSI ID 7  no device is present
+
+  SCSILayer information for layer 0
+    SCSILayer:  Motherboards in this layer
+          0
+\end{verbatim}
+Hence we see that in booting {\em q\_1} there is only one motherboard
+on SCSI Id 0.
+
+The machine then proceeds to boot all the daughter boards in turn.
+This is done by sending boot kernels to all the daughter boards. 
+Useful messages to look out for are 
+\begin{verbatim}
+DSPSerialInit:  getting information for all motherboards
+DSPSerialInit:  All MB's responded with no errors
+
+DBBoot:  Booting all Db's on all Mb's
+        All nodes 1 to 63 on MB   0 booted and responded
+DBBoot:  All MB's responded after Db boot
+ResetBoot:  finished send of boot kernels to dbs
+
+DSPSerialInit:  getting information for all motherboards
+DSPSerialInit:  All MB's responded with no errors
+
+DSPSerSwitchTest:  Starting to check status for all motherboards
+        Network switched over all routes 10 times.
+        Maximum of 10 reads done to clear receive buffer
+        Mb   0 passed test
+DSPSerSwitchTest:  All requested MB's responded.
+        All DSP serial connections OK.
+\end{verbatim} 
+that show that all the motherboards and daughterboards booted OK and 
+that the serial connections have been checked and are responding.
+If the machine gets this far, the boot kernels boot the node gate
+arrays (NGA-s) and perform a DRAM memory test. If this succeeds
+the runtime kernels are downloaded to the daughterboards as 
+evidenced by messages such as:
+\begin{verbatim}
+ResetBoot:  starting NGA boot for dbs
+ResetBoot:  finished NGA boot for dbs
+ResetBoot:  starting DRAM stdtest for dbs
+	Checking DRAM stdtest for dbs on Mb 0
+ResetBoot:  DRAM Stdtest on all dbs passed
+ResetBoot:  loading run kernels to dbs
+\end{verbatim}
+Finally the machine is synchronised and the Serial Communications
+are set up. At this point some communications tests are performed
+(even and odd wire tests). Healthy messages look along the lines
+of
+\begin{verbatim}
+ResetBoot::SCUSetup:  Beginning SCU setup of all nodes
+ResetBoot::Sync:  Beginning to synchronize QCDSP
+ResetBoot::Sync:  Checking that all nodes have sync set
+ResetBoot::Sync:  QCDSP synchronous
+ResetBoot:  running even wire send SCU test 
+
+ResetBoot:  running odd wire send SCU test 
+
+ResetBoot:  SCU test passed
+ResetBoot::InitNodeStat:  starting send of NodeStat
+ResetBoot::InitNodeStat:  starting build of NodeTable
+NodeTable::NodeTable:  constructor invoked for 1 motherboards
+ResetBoot::InitNodeStat:  NodeTable complete
+\end{verbatim}
+
+Finally if all goes well the Qdaemon will report that it has exited
+the boot service by the message
+\begin{verbatim}
+Qdaemon state is:
+        qdaemon task is RESET_BOOT
+        qdaemon abort no and resume no
+        QCDSP synchronous
+        SCSI tree coordinates selected:  mb 0,  db 0,  
+\end{verbatim}
+and the {\em QC-Shell} will likewise show its status message
+\begin{verbatim}
+qcsh after RESET_BOOT:
+	All nodes selected with SCSI tree coordinates
+\end{verbatim}
+and the {\bf boot process is complete}. Your shell prompt should
+turn into something along the lines of 
+\begin{verbatim}
+(qcdhost/qcdsp/sfw/qos.5.3.3/machines/q_1: qcsh[q_1])% 
+\end{verbatim}
+
+Congratulations! You have now booted a QCDSP supercomputer.
+Some things to be aware of
+\begin{itemize}
+\item
+The {\em QC-Shell} does not really like lots of processes going on in parallel.
+Recall that it is designed to interact with the QCDSP. This shell really
+should be run only to submit QCDSP jobs. Compiling, editing, e--mailing
+and the like should be carried out from the usual login {\em TC-Shell}.
+\item
+While in the {\em QC-Shell} you are blocking everyone else's access to a potential
+HPC resource. (From a 3.2Gflop board up to a Tflops scale supercomputer.)
+Spend your time in it wisely.
+\item
+If things become messy you can always type {\tt qreset\_boot} to reboot
+the system.
+\end{itemize}
+
+\section{Hello World} 
+\subsection{Compiling the Program}
+The time has now come to execute the {\em Hello World}\ application.
+The easiest method is to take a copy from the directory of programming
+examples. You can do this by typing:
+\begin{verbatim}
+(qcdhost:/homeqs0/bj)% cd /qcdsp/sfw/qos.5.3.3/example/
+(qcdhost:/qcdsp/sfw/qos.5.3.3/example)% tar cf - hello_world | ( cd ; tar xvf - )
+x hello_world/Makefile, 608 bytes, 2 tape blocks
+x hello_world/main.C, 1233 bytes, 3 tape blocks
+x hello_world/hello_world.ctl, 188 bytes, 1 tape blocks
+x hello_world/main.tof, 3076 bytes, 7 tape blocks
+x hello_world/main.lst, 2113 bytes, 5 tape blocks
+x hello_world/hello_world.map, 14453 bytes, 29 tape blocks
+x hello_world/hello_world.outtof, 15276 bytes, 30 tape blocks
+x hello_world/hello_world.out, 14654 bytes, 29 tape blocks
+\end{verbatim}
+This should copy the {\bf hello\_world} directory to your homedirectory.
+A nice makefile has been provided so that we can build the application
+by executing the commands:
+\begin{verbatim}
+(qcdhost:/homeqs0/bj)% cd hello_world/
+\end{verbatim}
+to go to the source directory and then:
+\begin{verbatim}
+(qcdhost:/homeqs0/bj/hello_world)% make clean
+\end{verbatim} 
+to remove the currently built stuff so we can do a clean 
+rebuild. The computer should respond with 
+\begin{verbatim}
+rm -f  *.tof *.lst *.map core *.qin *.out *.outtof *.ctl \ .
+\end{verbatim}
+We perform the build by using the command {\tt make}\ :
+\begin{verbatim}
+(qcdhost:/homeqs0/bj/hello_world)% make
+\end{verbatim}
+to which the computer should reply:
+\begin{verbatim}
+tcpp -c -mb -km -kc -kl -q main.C
+tcpp  -e hello_world.outtof -mb -km -kc -kl -q main.tof  \
+   tcio30bs.olb 
+Tartan Linker for QCDSP version 5.3.2, modified 1/11/99 by RDM
+Memory = 0x80000, stack = 0x1000, heap = 0x1000
+
+(See transcript written on "/homeqs0/bj/hello_world/hello_world.map"
+for additional information.)
+t2c hello_world.outtof hello_world.out
+\end{verbatim}
+In the first line, the {\tt make} system instructs the
+Tartan C++ {\tt tcpp} compiler to compile the source file {\bf main.C}
+which is the source for the actual {\em hello\_world} application. The second
+invocation of {\tt tcpp} links the result of the compilation with the run time 
+system to produce a file in the common object format. Finally the {\tt t2c}
+command creates an executable format suitable for the QCDSP. The QCDSP 
+executable is the one called {\bf hello\_world.out}.
+
+\subsection{Running The Application}
+Once the application has been built, it should be run.
+First boot the QCDSP. This time around we will use machine {\em q\_2}.
+\begin{verbatim}
+(qcdhost:/homeqs0/bj/hello_world)% cd /qcdsp/sfw/qos.5.3.3/machines/q_2
+(qcdhost:/qcdsp/sfw/qos.5.3.3/machines/q_2)% ./q_2
+\end{verbatim}
+after booting has completed we get the prompt:
+\begin{verbatim}
+(qcdhost/qcdsp/sfw/qos.5.3.3/machines/q_2: qcsh[q_2])% 
+\end{verbatim}
+
+To run the {\tt hello\_world} application we use the {\tt qrun} 
+command:
+\begin{verbatim}
+(qcdhost/qcdsp/sfw/qos.5.3.3/machines/q_2: qcsh[q_2])% cd ~/hello_world/
+(qcdhost/homeqs0/bj/hello_world: qcsh[q_2])% qrun hello_world.out
+\end{verbatim}
+The results should be a bunch of {\tt Qdaemon} messages,
+indicating that the executable is being loaded to the 
+QCDSP, followed by the output from Motherboard 0,
+daughterboard 0:
+\begin{verbatim}
+Hello world
+Motherboard and daughterboard numbers for this node:  0 0
+Unique ID for this node:  0
+Physics coordinates for this node:  0, 0, 0, 0
+The square of 0 is 0
+The square of 1 is 1
+The square of 2 is 4
+The square of 3 is 9
+The square of 4 is 16
+The square of 5 is 25
+The square of 6 is 36
+The square of 7 is 49
+The square of 8 is 64
+The square of 9 is 81
+\end{verbatim}
+followed by various exit information messages.
+
+The output of node 0 (Motherboard 0, Daughterboard 0) is always
+echoed to the standard output. The output of other nodes are 
+saved to various buffers on the nodes. We can retrieve the saved
+output from the processors using the {\tt qprintf} command, which
+sends the saved messages to the standard output. After some Qdaemon
+messages the results should look like
+\begin{verbatim}
+Qdaemon state is:
+        qdaemon task is PRINTF
+        qdaemon abort no and resume no
+        QCDSP synchronous
+        All nodes selected with SCSI tree coordinates
+
+Qdaemon:  user print buffer for Mb 0 and Db 0 (SCSI tree coordinates)
+Buffer wrap count 0
+
+Hello world
+Motherboard and daughterboard numbers for this node:  0 0
+Unique ID for this node:  0
+Physics coordinates for this node:  0, 0, 0, 0
+The square of 0 is 0
+The square of 1 is 1
+The square of 2 is 4
+The square of 3 is 9
+The square of 4 is 16
+The square of 5 is 25
+The square of 6 is 36
+The square of 7 is 49
+The square of 8 is 64
+The square of 9 is 81
+
+Qdaemon:  user print buffer for Mb 0 and Db 1 (SCSI tree coordinates)
+Buffer wrap count 0
+
+Hello world
+Motherboard and daughterboard numbers for this node:  0 1
+Unique ID for this node:  1
+Physics coordinates for this node:  0, 0, 0, 1
+The square of 0 is 0
+The square of 1 is 1
+The square of 2 is 4
+The square of 3 is 9
+The square of 4 is 16
+The square of 5 is 25
+The square of 6 is 36
+The square of 7 is 49
+The square of 8 is 64
+The square of 9 is 81
+\end{verbatim} 
+and so on for all the processors on the machine.
+
+Congratulations! If you have followed all that I detailed here you
+have now wasted the computer time of a 3.2GFlop peak speed development
+board to print ``Hello World'' and some squares of numbers on the screen.
+
+\subsection{Exiting QCDSP}
+To exit fromt the QCDSP simply logout of the {\em QC-Shell} by typing
+{\tt exit}.
+
+\section{Summary}
+After discussing logging in to the QCDSP system. I said a few introductory
+remarks about QOS and the environmental variables needed in the shell
+to be able to use QCDSP properly. I then described the boot process for the
+machine. Finally I have gone through the process of building the example
+{\em Hello\_World} \ application, running it and retrieving the standard
+output from the various QCDSP processor buffers to where they were saved.
+
+This is the minimal subset of knowledge needed to be able to write and
+execute programs on the QCDSP computer.
+
+\subsection{QOS and Shell Environment Summary}
+The login startup files should set the environmental variables {\tt QOS\_VERS}
+, {\tt TC\_DIR} and {\tt TC\_BOARD}. The current QOS version at the time
+of writing this document is version 5.3.3.
+
+The toplevel QOS directory is {\tt /qcdsp/sfw/qos.<version>}. The 
+available machine partitions are in {\tt /qcdsp/sfw/qos.<version>/machines}.
+The QCDSP specific include files are in {\tt /qcdsp/sfw/qos.<version>/usr/include} and the QCDSP run time libraries are in {\tt /qcdsp/sfw/qos.<version>/usr/lib}, where {\tt version} is the value held in the {\tt QOS\_VERS}.
+
+\subsection{Booting Summary}
+Go to the relevant machine directory, and invoke the {\em QC-Shell} using
+the symbolic link provided (usually the same as the machine name). To use
+machine {\em q\_2} for example the incantation is 
+\begin{verbatim}
+(qcdhost:/homeqs0/bj)% cd /qcdsp/sfw/qos.5.3.3/machines/q_2
+(qcdhost:/homeqs0/bj)% ./q_2
+\end{verbatim}
+The machine should then boot if all goes well.
+
+\subsection{Compilation Summary} 
+Currently we did not detail compilation. We simply used the 
+makefiles provided, which set the required compilation flags,
+and performed the linking. We recommend copying these makefiles
+for now. 
+
+The compiler is named {\tt tcpp}, which is the Tartan C++ compiler.
+There is also a utility {\tt t2c} which turns the output of the 
+compilation and linking into an executable suitable for the QCDSP.
+The QCDSP executables produced by the makefile have the {\bf .out}
+suffix.
+
+\subsection{Running Summary}
+Once the executable has been built, it can be run using the {\tt qrun}
+command. The output from processor 0 (Motherboard 0, Daughterboard 0),
+is automatically echoed to the standard output. The saved standard output
+buffers from the QCDSP processors can be retrieved to the standard output
+of the front end host using the {\tt qprintf} command. 
+
+\subsection{Miscalleny}
+The QCDSP computer can be reset with the {\tt qreset\_boot}. The 
+QCDSP machine can be freed up for others by simply logging out of 
+the {\em QC--Shell}\ using the {\tt exit} command.
+
+This concludes the ``Hello World'' chapter. In the next chapter
+we shall discuss interprocessor communications.
+CPS_END_NAMESPACE

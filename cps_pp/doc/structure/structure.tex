@@ -1,0 +1,251 @@
+#include<config.h>
+CPS_START_NAMESPACE
+%------------------------------------------------------------------
+% $Id: structure.tex,v 1.1.1.1 2003-06-22 13:34:49 mcneile Exp $
+%------------------------------------------------------------------
+%Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
+%
+% For best results, this latex file should be compiled using pdflatex.
+% However it will also compile under normal latex, if you prefer.
+%
+%------------------------------------------------------------------
+\documentclass[12pt]{article}
+
+% importing other useful packages:
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{tabularx}
+% color for the pdf links:
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.5}
+% for conditional latex source:
+\usepackage{ifthen}
+% pdftex specifications, these are only included if we are using pdflatex:
+\providecommand{\pdfoutput}{0}
+\ifthenelse{\pdfoutput = 0}{
+% Not PDF:
+\usepackage{html}
+\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+}{
+% PDF: hyperref for pdf with full linkages:
+\usepackage[
+pagebackref,
+hyperindex,
+hyperfigures,
+colorlinks,
+linkcolor=darkblue,
+citecolor=darkblue,
+pagecolor=darkblue,
+urlcolor=blue,
+%bookmarksopen,
+pdfpagemode=None,
+%=UseOutlines,
+pdfhighlight={/I},
+pdftitle={CPS: Overall Code Structure. $Revision: 1.1.1.1 $ - $Date: 2003-06-22 13:34:49 $.},
+pdfauthor={A.N. Jackson \& S. Booth},
+plainpages=false
+]{hyperref}
+}
+
+% CVS tag shorthand:
+\newcommand{\ukqcdtag}[1]{{\small{UKQCD CVS Repository Tag: }{\bf{\tt{#1}}}}}
+
+% Code style commands:
+\newcommand{\cls}[1]{{\bf #1}}            % Classes
+\newcommand{\struct}[1]{{\bf #1}}         % Structs
+\newcommand{\cde}[1]{{\tt #1}}            % Code fragments
+
+% document style modifications:
+\setlength{\parskip}{2.0mm}
+\setlength{\parindent}{0mm}
+
+% Questionbox commands:
+\newcounter{quescount}
+\setcounter{quescount}{0}
+\newcommand{\quesbox}[2]{\begin{center}\refstepcounter{quescount}\fbox{\parbox{130mm}{
+\label{#1}{\bf Q. \arabic{quescount}:} #2} } \end{center} }
+
+
+% title information:
+\title{CPS: Overall Code Structure.}
+\author{A.N. Jackson \& S. Booth}
+\date{\mbox{\small $$Revision: 1.1.1.1 $$  $$Date: 2003-06-22 13:34:49 $$}}
+
+%------------------------------------------------------------------
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+%-------------------------------------------------------------------
+\section{File types and filename extensions}
+\begin{tabular}{|l|llll|l|l|}
+\hline
+{\bf Type} & \multicolumn{4}{c|}{{\bf QCDSP}} & {\bf Elsewhere} & \multicolumn{1}{c|}{\bf GNU}\\
+     & General & Tartan & T.I. & Sun &  & \\
+\hline
+C++ source & .C & - & - & .C & .C & .[cc$|$cxx$|$cpp$|$c++$|$C] \\
+C/C++ header & .h & - & - & .h & .h & .h\\ 
+Pre-processed file & .i & - & - & .i & .i & .i\\
+Assembler source & .asm & - & - & .asm & .asm & .[s$|$S] \\
+Object & - & .tof & .obj & .o & .o & .o \\
+Archive/Library & - & .olb & .lib & .lib & .a & .a \\
+Binary & - & .outtof & .out & .out & .out & - \\
+Output Data & .dat & - & - & .dat & .dat & - \\
+GNU build input files & - & - & - & - & .in & .in \\
+\hline
+\end{tabular}
+
+Note that QCDSP also uses linker control files (.lcf), object list files
+(.ctl), linker map files (.map) and processed assembler files (.lst) [???].  
+See the \href{../qcdsp/toplevel.html#tth_chAp6}{QCDSP manual}
+for more information on all the file types used on that platform.
+
+
+%-------------------------------------------------------------------
+\section{./phys/ - The Physics Code}
+This is the top level directory.  It contains global configuration files (e.g.
+config.h) and the makefiles.
+
+\subsection{./phys/alg/ - Algorithms}
+\label{phys:alg}
+Physical simulation algorithms.
+
+\subsection{./phys/doc/ - Documentation}
+\label{phys:doc}
+Documentation for the code, starting at
+\href{../index.html}{./phys/doc/index.html}.
+
+\subsection{./phys/lib/ - Library Files}
+\label{phys:lib}
+All the library archive files from all the other code directories are placed
+here to be linked against.
+
+\subsection{./phys/mem/ - Memory Routines}
+\label{phys:mem}
+Mainly p2v.C, which copies assembler routines into CRAM for the QCDSP machine.
+
+\subsection{./phys/nga/ - Node Gate Array Routines}
+\label{phys:nga}
+The hardware interface routines.  The global sums and the circular buffer
+routines are defined in here.  This directory also contains the MPI
+implementation of the SCU layer.
+
+\subsection{./phys/task/ - Task \& Scripting Routines}
+\label{phys:task}
+Mainly for QCDSP, these routines parse and execute scripts describing
+sequences of QCD computations.
+
+\subsection{./phys/tests/ - The Regression Testing Programs}
+\label{phys:tests}
+A set of programs for regression testing of the code suite.
+
+\subsection{./phys/util/ - The Physics Utilies Library}
+\label{phys:util}
+This contains the core code, defining the data structures and the essential 
+mathematical algorithms. e.g. the CG solver is defined in here, in context,
+but called from ./phys/alg/.
+
+%-------------------------------------------------------------------
+\section{The GNU build system}
+When not running on QCDSP, the CPS is built using standard GNU tools to make
+the platform dependencies as simple to deal with as possible.  The tools are
+autoconf (\href{http://www.gnu.org/manual/autoconf/}{http://www.gnu.org/manual/autoconf/}) and GNU make (gmake, \href{http://www.gnu.org/manual/make/}{http://www.gnu.org/manual/make/}). 
+
+\subsection{autoconf: resolving platform dependancies and build options}
+The core of this standard automatic configuration system is the developer's
+configure script `configure.in' (in the root ./phys/ directory of the CPS).  
+This defines which files are system/build dependent, and defines macro 
+substitutions to produce versions of those files suitable for a particular
+build.  The configure.in script cannot be run directly, so we need to
+translate this file into a shell script that will run on as wide a range of
+platforms as possible.  This is what autoconf does; it takes configure.in and
+produces a shell script called `configure' which should run on any flavour of 
+UNIX.  The user invokes the `./configure' command to
+configure the build.
+
+The build dependant files are:
+
+\begin{tabular}{lll}
+{\bf Input} & {\bf Output} & {\bf Description}\\
+ Makefile.gnu.in & Makefile.gnu & The makefile for building the CPS library.
+ \\
+ Makefile.gnutests.in & Makefile.gnutests & The makefile for building the test
+ suite. \\
+ config.h.in & config.h & The global code-configuration header file. \\
+ tests/regression.pl.in & tests/regression.pl & A perl script to generate
+ shell scripts for running the test suite. \\
+\end{tabular}
+
+So, for example, config.h is produced from config.h.in, by performing
+macrosubstitution of all the @MACRO\_NAME@ macros in that file.  The full list
+of macros is:
+
+\begin{tabular}{lll}
+{\bf Macro} & {\bf Description} & {\bf Default}\\
+@CC@ & The C compiler & ``gcc'' \\
+@CFLAGS@ & Flags for the C compiler & ``-O'' \\
+@NOT\_TESTING\_QCDSP@ & Is this not QCDSP & ``yes'' \\
+@PARALLELDEF@ & Define the PARALLEL macro & ``-DPARALLEL=0'' \\
+@MPILINK@ & To link with MPI use e.g. -lmpi &  ``'' \\
+@PARALLELLINK@ & Link with parallel or serial libraries & ``SERIALLIB'' \\
+@TESTING\_PARALLEL@ & Should the tests be run as parallel & ``no'' \\
+@GSUMPRECISION@ & Floating-point precision to use for global sums & ``double''
+\\
+@LOCALPRECISION@ & Floating-point precision to use elsewhere & ``double'' \\
+@topwd\_srcdir@ & Absolute location of the top-level source directory & - \\
+\end{tabular}
+
+The user can use the configure script to change the behaviour away from the
+default.  Currently, the build options are:
+\begin{itemize}
+\item {\bf --enable-parallel-mpi} which turns the build into a parallel build using
+the MPI implementation of the SCU.
+\item {\bf --enable-double-prec=``no''} which forces the build to use floats
+instead of doubles for all calculations except the global summations.
+\end{itemize}
+There are other standard ./configure options (use ``./configure --help'' to
+see them) but these are not really used in the CPS.
+
+Note that mny of the macros can be overriden using shell environment
+variables.  For example, if you want to use the Sun C++ compiler with
+debugging information switched on, i.e. CC -g , you should use (in bash):
+
+\begin{verbatim}
+export CC=CC
+export CFLAGS=-g
+./configure
+\end{verbatim}
+
+You should be warned, however, that the configure script stores a record of
+the build options in a file called config.status or config.cache.  You may have
+to remove this file to force the build behaviour to change.
+
+There are a number of other special files that autoconf creates to store
+information and to ensure that the ./configure system will run anywhere.  They
+are config.cache, config.guess, config.log, config.status, config.sub,
+install-sh, missing, mkinstalldirs, uname.  See the autoconf manual for
+detailed information on what these files do.
+
+
+
+\subsection{gmake: the GNU make program}
+The GNU version of make is used simply because it has a little more
+functionality that standard make programs.  In particular, the makefiles can
+be (and are) recursive.
+
+\section{Outline of the new code structure}
+
+\subsection{A unified build system}
+
+\subsection{Cross-platform portability}
+
+\subsection{Cross-platform testing suite}
+
+%-------------------------------------------------------------------
+\end{document}
+CPS_END_NAMESPACE

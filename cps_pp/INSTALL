@@ -1,0 +1,21 @@
+----------------------------------------------------------------------
+INSTALL: The Columbia Code
+----------------------------------------------------------------------
+
+The new system only creates one library: cps.a
+The system probably requires gnu make, so 
+you may need to use gmake.
+
+ln -s Makefile_cps  makefile
+make depend
+make cps
+
+
+Full instructions for comfiguration and compilation can be found in
+
+./doc/porting/porting.html
+
+
+Andy Jackson  - EPCC      - A.N.Jackson@ed.ac.uk.
+Craig McNeile - Liverpool -  mcneile@amtp.liv.ac.uk
+----------------------------------------------------------------------

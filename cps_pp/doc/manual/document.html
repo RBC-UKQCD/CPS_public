@@ -1,0 +1,957 @@
+#include<config.h>
+CPS_START_NAMESPACE
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+           "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="TtH 2.92">
+
+                                    
+<title> \bf Physics Environment </title>
+</head>
+<body>
+ 
+<h1 align="center"><b>Physics Environment</b> </h1>
+<br /><br /><br /><br /><br /><br /><br />
+
+<h3 align="center">QCDSP Group </h3>
+
+
+<p>
+
+<p>
+
+<h1>Contents </h1><a href="#tth_sEc1"
+>1&nbsp; Introduction</a><br />
+<a href="#tth_sEc2"
+>2&nbsp; Global Variables</a><br />
+<a href="#tth_sEc3"
+>3&nbsp; Coding Style</a><br />
+<a href="#tth_sEc4"
+>4&nbsp; Internal Data Formats</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc4.1"
+>4.1&nbsp; Lattice: The Gauge Configuration</a><br />
+<a href="#tth_sEc5"
+>5&nbsp; Introduction</a><br />
+<a href="#tth_sEc6"
+>6&nbsp; Functionality Specification for the QCD-OC code</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc6.1"
+>6.1&nbsp; The Physical System</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc6.2"
+>6.2&nbsp; Evolution Mechanisms</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc6.3"
+>6.3&nbsp; Measurement Capabilities</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc6.4"
+>6.4&nbsp; Constraints &amp; Overall Priorities</a><br />
+<a href="#tth_sEc7"
+>7&nbsp; Available Codes</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc7.1"
+>7.1&nbsp; Colombia/QCD-SP</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc7.2"
+>7.2&nbsp; SZIN</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc7.2.1"
+>7.2.1&nbsp; SZIN: The Language </a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc7.2.2"
+>7.2.2&nbsp; SZIN: The Application Code</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc7.3"
+>7.3&nbsp; UKQCD</a><br />
+<a href="#tth_sEc8"
+>8&nbsp; Overview of the Colombia/QCD-SP code</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.1"
+>8.1&nbsp; Global Parameters</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.1.1"
+>8.1.1&nbsp; The GlobalJobParameter class and the DoArg &amp; CommonArg structs</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.1.2"
+>8.1.2&nbsp; The CommonArg struct</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.1.3"
+>8.1.3&nbsp; Verbosity: The Verbose class</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.1.4"
+>8.1.4&nbsp; Error Reporting: The Error class</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.2"
+>8.2&nbsp; The Lattice Class</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.2.1"
+>8.2.1&nbsp; Gauge Field Types</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.2.2"
+>8.2.2&nbsp; Gauge Operations Interface</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.2.3"
+>8.2.3&nbsp; Fermion Action Types</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.2.4"
+>8.2.4&nbsp; Fermion Operations Interface</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.2.5"
+>8.2.5&nbsp; Putting the fermion &amp; gauge fields together</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.3"
+>8.3&nbsp; Dirac Operators</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.4"
+>8.4&nbsp; The Algorithms</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc8.4.1"
+>8.4.1&nbsp; Algorithm Parameters</a><br />
+ 
+
+<p>
+
+ <h2><a name="tth_sEc1">
+1</a>&nbsp;&nbsp;Introduction</h2>
+<a name="sec-introduction">
+</a>
+
+<p>
+
+ <h2><a name="tth_sEc2">
+2</a>&nbsp;&nbsp;Global Variables</h2>
+<a name="sec-global">
+</a>
+
+<p>
+Objects with the following names are declared external in the corresponding
+header files. These objects are defined outside main.
+
+<p>
+<br /><b>GJP</b> Global Job Parameter is a class that
+contains all globally needed parameters such as lattice size, verbose
+level etc.
+ <br />
+Header File: util/include/global_job_parameters.h
+ <br />
+Source Directory: util/global_job_parameter
+
+<p>
+<br /><b>VRB</b> VeRBose is a class that controls all verbose output.
+ <br />
+Header File: util/include/verbose.h
+ <br />
+Source Directory: util/verbose
+
+<p>
+<br /><b>ERR</b> Error is a class that controls all error output.
+It prints a message and exits with a given exit value.
+ <br />
+Header File: util/include/error.h
+ <br />
+Source Directory: util/error
+
+<p>
+
+ <h2><a name="tth_sEc3">
+3</a>&nbsp;&nbsp;Coding Style</h2>
+
+<ul>
+<li> There should be no explicit use of the <tt>float</tt> or <tt>double</tt>
+native types in the code.  The <tt>Float</tt> typedef should be used instead,
+thus allowing compile-time precision control.</li>
+
+<li> One may use slightly more modern c++ techniques (template, standard template
+library), as long as this code is distinct from the Columbia code, and does not affect up the compilation on the qcdsp.</li>
+</ul>
+
+<p>
+
+ <h2><a name="tth_sEc4">
+4</a>&nbsp;&nbsp;Internal Data Formats</h2>
+
+<p>
+     <h3><a name="tth_sEc4.1">
+4.1</a>&nbsp;&nbsp;Lattice: The Gauge Configuration</h3>
+Each instance of the <a href="../doxygen/html/class_Lattice.html">Lattice</a> 
+class contains a pointer to the guage
+configuration, <tt>gauge_field</tt>, which is a pointer to an array of
+<a href="../doxygen/html/class_Matrix.html">Matrix</a> objects.  
+The value of this pointer can be accessed using the
+<a href="../doxygen/html/class_Lattice.html#a11">Lattice::GaugeField()</a> method.
+
+<p>
+While the internal format of the guage configuration can be changed, the
+"canonical" format will be described here.  The array consists of
+4*GPJ.VolNodesSites() Matrix objects, i.e. there four SU(3) matricies
+(0, 1, 2, 3 for Ux, Uy, Uz, Ut) for each site on that processor node.
+This is the ``fastest-moving index''.  The next is the count in the
+x-direction, then the y-direction, then z and finally t.  This detail is
+hidden from the user via a simple method: 
+<a href="../doxygen/html/class_Lattice.html#a13">Lattice::GsiteOffset(int* x)</a>.
+Given an integer array indicating the <em>local</em> position of a site (such
+that x[i] is the ith coordinate where i = 0,1,2,3 = x,y,z,t), this method
+returns a pointer to the first of the four matrix objects associated with that
+site.
+
+<p>
+Each Matrix object is a single SU(3) matrix, build of 2&times;3&times;3 Floats 
+(i.e. two floats to one complex number, and three by three colors).  [It is
+not clear what the internal structure of the SU(3) matrix is, but presumably
+the rows and colums of this matrix must map onto the rows and colums of the
+matricies read from other codes if binary reproducibility is to be ensured.  -
+SHOULD CHECK THIS - ANJ ]. [UPDATE - ADDING A TRANSPOSE FLAG]
+
+<p>
+ <h2><a name="tth_sEc5">
+5</a>&nbsp;&nbsp;Introduction</h2>
+The aim of this document is to put forward a plan for the way in which
+currently available lattice QCD codes can be adapted to run on the
+forthcoming QCD-OC hardware.  This will focus on the C++ QCD-SP code,
+and in particular on how this code may be made a portable as possible,
+so that a minimum of new code will be required for it to run on
+any future hardware platform.
+
+<p>
+
+<h3>The Core Aim:</h3>
+
+<blockquote>
+To develop the codes required to produce good science using the QCD-OC
+machine.
+</blockquote>
+
+<p>
+The quality of the science that can be determined using the code is
+predominately determined by the functionality supplied by it.  This is
+primary issue is outlined in &#167;<a href="#codefunc">6</a> below.  Having defined
+the functionality we require, we can then consider the best route by
+which to produce such a code.  There is a large volume of trusted code
+already in existence, and so this secondary issue breaks down as
+follows.  We evaluate the available codes, estimating the pro's and
+con's of each (see &#167;<a href="#oldcodes">7</a>), and then put forward plans for
+ways in which these code may be developed to meet our aims
+(&#167;).
+
+<p>
+
+<h3>Overall Constraints</h3>
+
+<ul>
+<li> The most important constraint is the project time-scale.  The
+hardware may be available in as little as 12 months, and the software
+development plan should fit <em>within</em> this ETA.</li>
+</ul>
+
+<p>
+
+ <h2><a name="tth_sEc6">
+6</a>&nbsp;&nbsp;Functionality Specification for the QCD-OC code</h2>
+<a name="codefunc">
+</a>
+The follow specification is a breakdown of the <em>ideal</em>
+functionality that the new code could provide.  A version of the code
+which contains all of the assorted bells &amp; whistles listed below is
+probably unattainable on the project time-scale.  However, all HIGH
+priority functionality should be included, and the code-developers
+will keep in mind the possible implementation of the lower-priority
+aims at a later date.
+
+<p>
+
+     <h3><a name="tth_sEc6.1">
+6.1</a>&nbsp;&nbsp;The Physical System</h3>
+
+<center>
+ 
+<table>
+<tr><td><b>Description </td><td align="center"><b>Priority</td></tr>
+<tr><td>Wilson gauge field </td><td align="center">HIGH </td></tr>
+<tr><td>Wilson-clover fermions </td><td align="center">HIGH </td></tr>
+<tr><td>Ginsburg-Wilson fermion action </td><td align="center">Medium (long-term HIGH)</td></tr></b></b></table>
+
+</center>
+
+<p>
+
+     <h3><a name="tth_sEc6.2">
+6.2</a>&nbsp;&nbsp;Evolution Mechanisms</h3>
+
+<center>
+ 
+<table>
+<tr><td><b>Description </td><td align="center"><b>Priority</td></tr>
+<tr><td>Hybrid MC. </td><td align="center">HIGH </td></tr>
+<tr><td>Tweakability of algorithm parameters. </td><td align="center">HIGH </td></tr>
+<tr><td>Output options? </td><td align="center">? </td></tr></b></b></table>
+
+</center>
+
+<p>
+
+     <h3><a name="tth_sEc6.3">
+6.3</a>&nbsp;&nbsp;Measurement Capabilities</h3>
+
+<center>
+ 
+<table>
+<tr><td><b>Description </td><td align="center"><b>Priority</td></tr>
+<tr><td>[<font face="symbol">`</font
+>(<font face="symbol">y</font
+>)]<font face="symbol">y</font
+>? </td><td align="center">?</td></tr></b></b></table>
+
+</center>
+
+<p>
+
+     <h3><a name="tth_sEc6.4">
+6.4</a>&nbsp;&nbsp;Constraints &amp; Overall Priorities</h3>
+
+<center>
+ 
+<table>
+<tr><td><b>Description </td><td align="center"><b>Priority</td></tr>
+<tr><td>Usable within <font face="symbol"> ~ </font
+>12 months. </td><td align="center">HIGH </td></tr>
+<tr><td>Capable of using 5x5x5x5 sublattices, i.e. the odd local lattice
+ size issue. </td><td align="center">HIGH </td></tr>
+<tr><td>Run-time machine partitioning in software </td><td align="center">Medium </td></tr>
+<tr><td>Portability and future proofing against future hardware. </td><td align="center">Medium/low </td></tr></b></b></table>
+
+</center>
+
+<p>
+
+ <h2><a name="tth_sEc7">
+7</a>&nbsp;&nbsp;Available Codes</h2>
+<a name="oldcodes">
+</a>
+
+<p>
+     <h3><a name="tth_sEc7.1">
+7.1</a>&nbsp;&nbsp;Colombia/QCD-SP</h3>
+Written in pre-ANSI C++.  What do to about this? (what are Colombia
+going to do?)  See &#167;. But review of this code in
+&#167;<a href="#col:code">8</a>. 
+
+<p>
+     <h3><a name="tth_sEc7.2">
+7.2</a>&nbsp;&nbsp;SZIN</h3>
+This is a macro-based application code, and as such its treatment is
+split into two parts.  Firstly, the definition of the language itself,
+and secondly the application code that has been built up using that language.
+
+<p>
+      <h4><a name="tth_sEc7.2.1">
+7.2.1</a>&nbsp;&nbsp;SZIN: The Language </h4>
+[m4 macros? links?]
+
+<p>
+
+<ul>
+<li> In Brief:
+	<a href="http://www.jlab.org/~edwards/szin_manual.html">http://www.jlab.org/ edwards/szin_manual.html</a></li>
+
+<li> Manual:
+	<a href="http://www.jlab.org/~edwards/macros_v2.ps">http://www.jlab.org/ edwards/macros_v2.ps</a></li>
+</ul>
+
+<p>
+      <h4><a name="tth_sEc7.2.2">
+7.2.2</a>&nbsp;&nbsp;SZIN: The Application Code</h4>
+
+<p>
+     <h3><a name="tth_sEc7.3">
+7.3</a>&nbsp;&nbsp;UKQCD</h3>
+[What fortran codes are availible, and are there any ways in which
+this code may be of use to use despite the (probable???) lack of a
+compiler.] 
+
+<p>
+
+ <h2><a name="tth_sEc8">
+8</a>&nbsp;&nbsp;Overview of the Colombia/QCD-SP code</h2>
+<a name="col:code">
+</a>
+The core concept behing this implementation of a lattice QCD library
+is the unification of the way in which different gauge and fermion
+actions are treated, via <tt>lattice</tt> abstract class
+(&#167;<a href="#col:latticeclass">8.2</a>).  The algorithms to be applied to the
+chosen system are also abstracted in order to unify the interface by
+which algorithms are `run' on the system (&#167;<a href="#col:algclass">8.4</a>).
+These classes, along with simple mechanisms for specifing the simulation
+parameters, allow the user to construct LQCD applications using
+relatively little source code.  A simple source file can be
+constructed as follows:
+
+<ul>
+<li> Specify the global parameters, such as the size of the
+processor array (&#167;<a href="#col:globalparam">8.1</a>).</li>
+
+<li> Define the system by choosing the gauge and fermion types
+(&#167;<a href="#col:latticeclass">8.2</a>).</li>
+
+<li> Choose an algorithm from the suite available
+(&#167;<a href="#col:algclass">8.4</a>).</li>
+
+<li> Specify any parameters specific to the algorithm (&#167;<a href="#col:algparam">8.4.1</a>).</li>
+
+<li> Run the algorithm for a given number of steps (&#167;<a href="#col:algclass">8.4</a>).</li>
+</ul>
+
+<p>
+The central aim of the following code breakdown is twofold:
+
+<ol type="1">
+<li> To clarify the library interface, so that any shortcomings in
+  the way in which the application interacts with the library are made
+  clear.</li>
+
+<li> To indicate any gaps between the desired code functionality
+  and that supplied by this code, particularly where the gaps are due
+  to QCD-SP specific parts of the code.</li>
+</ol>
+
+<p>
+[???, What to say about sub-lattice size limitations???]
+[???, What to say about software partiioning issue???]
+
+<p>
+
+     <h3><a name="tth_sEc8.1">
+8.1</a>&nbsp;&nbsp;Global Parameters</h3>
+<a name="col:globalparam">
+</a>
+These either specify some property of the simulation itself
+(&#167;<a href="#col:gjp">8.1.1</a> &amp; &#167;<a href="#col:commarg">8.1.2</a>), or control the textual output
+of the code (&#167;<a href="#col:verboseclass">8.1.3</a> &amp; &#167;<a href="#col:errorclass">8.1.4</a>).
+
+<p>
+      <h4><a name="tth_sEc8.1.1">
+8.1.1</a>&nbsp;&nbsp;The GlobalJobParameter class and the DoArg &amp; CommonArg structs</h4>
+<a name="col:gjp">
+</a>
+To control the most general parameters of the simulation, a specific  instance
+of <b>GlobalJobParameter</b> class (called <tt>GJP</tt> and with global scope)
+<em>must</em> be created. The parameters contained in the <tt>GJP</tt> can
+be read via a set of methods, but these parameters should be set by
+using a single call and a <b>DoArg</b> struct.
+
+<p>
+The parameters held in an instance of <b>DoArg</b> are listed in full
+in table .  In brief, this allows the user to set:
+
+<ul>
+<li> The parameters of the regular domain decomposition, i.e. the
+ size of the processor grid and the size of the lattice on each
+ processor.</li>
+
+<li> The boundary conditions (periodic or antiperiodic in each
+ direction).</li>
+
+<li> The kind of initial configuration.</li>
+
+<li> The initial value of the random number generator seed.</li>
+
+<li> The number of colors.</li>
+
+<li> Various parameters for controlling the different gauge/fermion actions,
+ such as the value of the gauge <font face="symbol">b</font
+>.</li>
+</ul>
+The parameters held within a <b>DoArg</b> structure are then used to
+initialise the global job parameters held in <tt>GJP</tt>.
+
+<p>
+      <h4><a name="tth_sEc8.1.2">
+8.1.2</a>&nbsp;&nbsp;The CommonArg struct</h4>
+<a name="col:commarg">
+</a>
+This structure is used to control the output of the code, and an
+instance of it is used to initialise each of the algorithms
+(&#167;<a href="#col:algclass">8.4</a>).  It contains a unique simulation identifier
+and the name of the file to be used for simulation output.
+[???, The unique ID is not used in the test codes, it seems.  Does
+this have something to do with the task list and job manager stuff???]
+
+<p>
+      <h4><a name="tth_sEc8.1.3">
+8.1.3</a>&nbsp;&nbsp;Verbosity: The Verbose class</h4>
+<a name="col:verboseclass">
+</a>
+As in the case of the <b>GlobalJobParameter</b> class, a specific
+instance of the <b>Verbose</b> class (called <tt>VRB</tt>) is used to control
+the diagnostic textual output of the code.  This information includes
+subroutine call traces, memory allocation and deallocation and so on.
+It also allows the program to control the LED status.  The level of
+diagnostic output is initially set via the <b>GlobalJobParameter</b>
+initialisation, but can be explicitly set using <tt>VRB.Level</tt>.
+
+<p>
+      <h4><a name="tth_sEc8.1.4">
+8.1.4</a>&nbsp;&nbsp;Error Reporting: The Error class</h4>
+<a name="col:errorclass">
+</a>
+Again, a specific global instance of the <b>Error</b> class (called
+<tt>ERR</tt>) is used to control the error reporting mechanism.  This is
+very similar to the <b>Verbose</b> class, but for serious problems
+(such as attempts to use <tt>NULL</tt> pointers, file I/O failures and so
+on) which require the code to cease execution.
+
+<p>
+
+     <h3><a name="tth_sEc8.2">
+8.2</a>&nbsp;&nbsp;The Lattice Class</h3>
+<a name="col:latticeclass">
+</a>
+This class forms the core of the QCDSP code.  It holds the gauge-field
+configuration, and defines the interface for the gauge-field and
+fermion-field operations in such a way as to ensure that the interface
+remains the same no matter what specific action is used.  It also
+defines the interface to the random number generator. [???, anything
+else??? Converting???]
+Note that the fermion field is actually stored elsewhere (usually in
+the <b>Alg</b> class, &#167;<a href="#col:algclass">8.4</a>). A large number of classes
+are derived from this base class, for each fermion and gauge action.
+The actual class that is used for a simulation will be one of these
+derived classes, chosen by the dessired combination of actions.
+
+<p>
+      <h4><a name="tth_sEc8.2.1">
+8.2.1</a>&nbsp;&nbsp;Gauge Field Types</h4>
+There are four possible gauge-field types (see table
+<a href="#tab:gauges">8.2.1</a>), each of which implements the gauge-operation
+interface specified by the <b>Lattice</b> class (see
+&#167;<a href="#sss:gaugeops">8.2.2</a>).
+
+<p>
+
+<p>
+<a name="tth_tAb1">
+</a> 
+<center> 
+<table>
+<tr><td><b>Class </td><td width="39"><b>Description </td><td><b>Dependencies</td></tr>
+<tr><td>Gnone </td><td width="39">Acts as if there is no gauge action (i.e. <font face="symbol">b</font
+> = 0) </td><td>???</td></tr>
+<tr><td>Gwilson </td><td width="39">Uses the standard Wilson single plaquette action. </td><td>???,The
+ Wilson Library?</td></tr>
+<tr><td>GimprRect </td><td width="39">Uses the standard Wilson plaquette operator plus
+the second order rectangle operator. ???</td><td></td></tr>
+<tr><td>GpowerPlaq </td><td width="39">This action is the same as the standard Wilson action
+with the irrelevant power plaquette term added to it. The full action
+is: <font face="symbol">å</font
+><sub><i>p</i></sub> [ <font face="symbol">b</font
+>*  <font face="symbol">-</font
+><i>Tr</i>[<i>U</i><sub><i>p</i></sub>]/3 + ( 1 <font face="symbol">-</font
+> <i>Tr</i>[<i>U</i><sub><i>p</i></sub>]/3 / <i>c</i> )<sup><i>k</i></sup> ]
+with <tt>c = GJP.PowerPlaqCutoff()</tt> and <tt>k =
+GJP.PowerPlaqExponent()</tt>.  This action supresses plaquettes with 1 <font face="symbol">-</font
+><i>ReTr</i>[<i>U</i><sub><i>p</i></sub>]/3  &gt;  <i>c</i> and threfore reduces lattice dislocations. </td><td>???</td></tr>
+<tr><td>GpowerRect </td><td width="39">Uses the standard Wilson plaquette operator plus the
+second order rectangle operator plus a power plaquette term plus a
+power rectangle term.  The full action is: ( <font face="symbol">å</font
+><sub><i>p</i></sub> [ <i>c</i><sub>0</sub>*<font face="symbol">b</font
+>* <font face="symbol">-</font
+><i>Tr</i>[<i>U</i><sub><i>p</i></sub>]/3 + ( 1 <font face="symbol">-</font
+> <i>Tr</i>[<i>U</i><sub><i>p</i></sub>]/3 / <i>c</i> )<sup><i>k</i></sup> ] + <font face="symbol">å</font
+><sub><i>r</i></sub> [ <i>c</i><sub>1</sub>*<font face="symbol">b</font
+>* <font face="symbol">-</font
+><i>Tr</i>[<i>U</i><sub><i>r</i></sub>]/3 + ( 1 <font face="symbol">-</font
+> <i>Tr</i>[<i>U</i><sub><i>r</i></sub>]/3 / <i>c</i> )<sup><i>k</i></sup> ] ) with <tt>c =
+GJP.PowerPlaqCutoff()</tt>, <tt>k = GJP.PowerPlaqExponent()</tt> <tt>c_0 = 1
+- 8 * c_1</tt>, <tt>c_1 = GJP.C1()</tt>. This action supresses plaquettes
+with 1 <font face="symbol">-</font
+> <i>ReTr</i>[<i>U</i><sub><i>p</i></sub>]/3  &gt;  <i>c</i> and rectangles with 1 <font face="symbol">-</font
+> <i>ReTr</i>[<i>U</i><sub><i>r</i></sub>]/3  &gt; <i>c</i> and therefore reduces lattice dislocations.</td><td>???</td></tr></b></b></b></table>
+
+ <a name="tab:gauges">
+</a>
+ 
+<center>Table 1: Gauge fields supported by the QCD-SP code.</center>
+</center>
+
+<p>
+      <h4><a name="tth_sEc8.2.2">
+8.2.2</a>&nbsp;&nbsp;Gauge Operations Interface</h4>
+<a name="sss:gaugeops">
+</a>
+[What functionality for acting upon the Lattices is supplied within Lattice.]
+
+<ul>
+<li> <b>GclassType</b> <b>Gclass</b> (void)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>It returns the type of gauge
+class.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+void <b>GactionGradient</b> (<b>Matrix</b> &amp;grad, int <font face="symbol">*</font
+>x, int
+mu)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>Calculates the partial derivative of the gauge action w.r.t. the link U_mu(x). Typical implementation has this func called with <b>Matrix</b> &amp;grad = <font face="symbol">*</font
+>mp0, so avoid using it.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+void <b>GforceSite</b> (<b>Matrix</b> &amp;force, int <font face="symbol">*</font
+>x, int mu)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>It calculates the gauge force at site x and
+direction mu.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+void <b>EvolveMomGforce</b> (<b>Matrix</b> <font face="symbol">*</font
+>mom, <b>Float</b> step_size)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>It evolves the canonical momentum mom by step_size using the pure gauge force.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+<b>Float</b> <b>GhamiltonNode</b> (void)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>Returns the value of the pure gauge Hamiltonian of the node
+sublattice.</em></dd>
+
+	<dd></dd>
+</dl></li>
+</ul>
+
+<p>
+[Plus some action specific functions.]
+
+<p>
+[Details of dependencies.vector_util, Matrix, Float, cbuf (this last
+one turns into nothing on a workstation, I think).]
+
+<p>
+      <h4><a name="tth_sEc8.2.3">
+8.2.3</a>&nbsp;&nbsp;Fermion Action Types</h4>
+
+<p>
+
+<p>
+<a name="tth_tAb2">
+</a> 
+<center> 
+<table>
+<tr><td><b>Class </td><td width="39"><b>Description </td><td><b>Dependencies</td></tr>
+<tr><td>Fnone </td><td width="39">Its functions do nothing and return values as if there is no
+ fermion action or fermion fields. The number of spin components is
+ zero </td><td>???</td></tr>
+<tr><td>FstagTypes: </td><td width="39">Staggered fermions: </td><td></td></tr>
+<tr><td>Fstag </td><td width="39">Defines the <b>Lattice</b> functions for
+ staggered fermions. </td><td>???</td></tr>
+<tr><td>FwilsonTypes: </td><td width="39">Wilson fermions:</td><td></td></tr>
+<tr><td>Fclover </td><td width="39">Wilson-clover fermions. </td><td>???,The Wilson Library?</td></tr>
+<tr><td>Fdwf </td><td width="39">Wilson-domain-wall fermions. </td><td>???</td></tr>
+<tr><td>Fwilson </td><td width="39">Wilson fermions. </td><td>???</td></tr></b></b></b></table>
+
+ <a name="tab:factions">
+</a>
+ 
+<center>Table 2: Fermion actions supported by the QCD-SP code.</center>
+</center>
+
+<p>
+      <h4><a name="tth_sEc8.2.4">
+8.2.4</a>&nbsp;&nbsp;Fermion Operations Interface</h4>
+[What functionality for acting upon the Lattices is supplied within Lattice.]
+[NB It contains an interface for a Ritz eigenvec/val solver... Which
+is implemented in eigen_wilson.C.  This is relevant to the GW stuff]
+
+<p>
+
+<ul>
+<li> <b>FclassType</b> <b>Fclass</b> (void)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>It returns the type of fermion
+class.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>FsiteOffsetChkb</b> (const int <font face="symbol">*</font
+>x) const
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>
+Sets the offsets for the fermion fields on a  checkerboard. The
+fermion field storage order is not the canonical one but it is
+particular to the fermion type. This function is not relevant to
+fermion types that do not use even/odd checkerboarding. x[i] is the
+ith coordinate where i = {0,1,2,3} = {x,y,z,t}.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>FsiteOffset</b> (const int <font face="symbol">*</font
+>x) const
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>
+Sets the offsets for the fermion fields on a  checkerboard. The
+fermion field storage order is the canonical one. X[I] is the ith
+coordinate where i = {0,1,2,3} = {x,y,z,t}.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>ExactFlavors</b> (void)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>
+Returns the number of exact flavors of the matrix that is inverted
+during a molecular dynamics evolution.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>SpinComponents</b> (void)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>Returns the number of spin
+components.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>FsiteSize</b> (void)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>
+Returns the number of fermion field  components (including
+real/imaginary) on a site of the 4-D lattice.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>FchkbEvl</b> (void)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>
+0 - &gt;  If no checkerboard is used for the evolution or the CG that
+inverts the evolution matrix. 1 - &gt;  If the fermion fields in the
+evolution or the CG that inverts the evolution matrix are defined on a
+single checkerboard (half the  lattice).</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>FmatEvlInv</b> (<b>Vector</b> <font face="symbol">*</font
+>f_out, <b>Vector</b> <font face="symbol">*</font
+>f_in, <b>CgArg</b> <font face="symbol">*</font
+>cg_arg, <b>Float</b> <font face="symbol">*</font
+>true_res, <b>CnvFrmType</b> cnv_frm=CNV_FRM_YES)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>
+It calculates f_out where A <font face="symbol">*</font
+> f_out = f_in and A is the
+preconditioned (if relevant) fermion matrix that appears in the HMC
+evolution (typically some preconditioned  form of [Dirac<sup><font face="symbol">Ù</font
+></sup>dag
+Dirac]). The inversion is done with the conjugate gradient. cg_arg
+is the structure that contains all the control parameters, f_in is
+the fermion field source vector, f_out should be set to be the
+initial guess and on return is the solution. f_in and f_out are
+defined on a checkerboard. If true_res !=0 the value of the true
+residual is returned in true_res. true_res = <font face="symbol">|</font
+>src -
+MatPcDagMatPc <font face="symbol">*</font
+> sol<font face="symbol">|</font
+> / <font face="symbol">|</font
+>src<font face="symbol">|</font
+> The function returns
+the total number of CG iterations.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>FmatEvlInv</b> (<b>Vector</b> <font face="symbol">*</font
+>f_out, <b>Vector</b> <font face="symbol">*</font
+>f_in, <b>CgArg</b> <font face="symbol">*</font
+>cg_arg, <b>CnvFrmType</b> cnv_frm=CNV_FRM_YES)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>Same as original but with
+true_res=0;.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>FmatInv</b> (<b>Vector</b> <font face="symbol">*</font
+>f_out, <b>Vector</b> <font face="symbol">*</font
+>f_in, <b>CgArg</b> <font face="symbol">*</font
+>cg_arg, <b>Float</b> <font face="symbol">*</font
+>true_res, <b>CnvFrmType</b> cnv_frm=CNV_FRM_YES, <b>PreserveType</b> prs_f_in=PRESERVE_YES)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>
+It calculates f_out where A <font face="symbol">*</font
+> f_out = f_in and A is the
+fermion matrix (Dirac operator). The inversion is done with the
+conjugate gradient. cg_arg is the  structure that contains all the
+control parameters, f_in  is the fermion field source vector,
+f_out should be set  to be the initial guess and on return is the
+solution. f_in and f_out are defined on the whole lattice. If
+true_res !=0 the value of the true residual is returned in
+true_res. true_res = <font face="symbol">|</font
+>src - MatPcDagMatPc <font face="symbol">*</font
+>
+sol<font face="symbol">|</font
+> / <font face="symbol">|</font
+>src<font face="symbol">|</font
+> cnv_frm is used to specify if f_in should be
+converted  from canonical to fermion order and f_out from fermion
+to canonical.  prs_f_in is used to specify if the source f_in
+should be preserved or not. If not the memory usage is less by the
+size of one fermion vector or by the size  of one checkerboard fermion
+vector (half a fermion vector). For staggered fermions f_in is
+preserved regardles of the value of prs_f_in.  The function
+returns the total number of CG iterations.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>FmatInv</b> (<b>Vector</b> <font face="symbol">*</font
+>f_out, <b>Vector</b> <font face="symbol">*</font
+>f_in, <b>CgArg</b> <font face="symbol">*</font
+>cg_arg, <b>CnvFrmType</b> cnv_frm=CNV_FRM_YES, <b>PreserveType</b> prs_f_in=PRESERVE_YES)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>Same as original but with
+true_res=0;.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+int <b>FeigSolv</b> (<b>Vector</b> <font face="symbol">*</font
+><font face="symbol">*</font
+>f_eigenv, <b>Float</b> <font face="symbol">*</font
+>lambda, <b>Float</b> chirality[&nbsp;], int valid_eig[&nbsp;], <b>Float</b> <font face="symbol">*</font
+><font face="symbol">*</font
+>hsum, <b>EigArg</b> <font face="symbol">*</font
+>eig_arg, <b>CnvFrmType</b> cnv_frm=CNV_FRM_YES)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>
+It finds the eigenvectors and eigenvalues of A where A is the fermion
+matrix (Dirac operator). The solution uses Ritz
+minimization. eig_arg is the  structure that contains all the
+control parameters, f_eigenv are the fermion field source vectors
+which should be defined initially, lambda are the eigenvalues returned
+on solution. f_eigenv is defined on the whole lattice. hsum are
+projected eigenvectors. The function returns the total number of Ritz
+iterations.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+void <b>SetPhi</b> (<b>Vector</b> <font face="symbol">*</font
+>phi, <b>Vector</b> <font face="symbol">*</font
+>frm1, <b>Vector</b> <font face="symbol">*</font
+>frm2, <b>Float</b> mass)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>It sets the pseudofermion field phi from
+frm1, frm2.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+void <b>EvolveMomFforce</b> (<b>Matrix</b> <font face="symbol">*</font
+>mom, <b>Vector</b> <font face="symbol">*</font
+>frm, <b>Float</b> mass, <b>Float</b> step_size)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>
+It evolves the canonical momentum mom by step_size using the
+fermion force.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+<b>Float</b> <b>FhamiltonNode</b> (<b>Vector</b> <font face="symbol">*</font
+>phi, <b>Vector</b> <font face="symbol">*</font
+>chi)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>
+The fermion Hamiltonian of the node sublattice. chi must be the
+solution of Cg with source phi.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+void <b>Fconvert</b> (<b>Vector</b> <font face="symbol">*</font
+>f_field, <b>StrOrdType</b> to, <b>StrOrdType</b> from)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>Convert fermion field f_field from - &gt; 
+to.</em></dd>
+
+	<dd></dd>
+</dl></li>
+
+<li> 
+<b>Float</b> <b>BhamiltonNode</b> (<b>Vector</b> <font face="symbol">*</font
+>boson, <b>Float</b> mass)
+
+<dl compact="compact"><font size="-1"></font>
+	<dd><em>The boson Hamiltonian of the node
+sublattice.</em></dd>
+
+	<dd></dd>
+</dl></li>
+</ul>
+
+<p>
+[Plus action specific functions.]
+
+<p>
+[Details of dependencies.]
+
+<p>
+      <h4><a name="tth_sEc8.2.5">
+8.2.5</a>&nbsp;&nbsp;Putting the fermion &amp; gauge fields together</h4>
+[The system is chosen from a list of all possible F and G
+combinations: GtypeFtype]
+
+<p>
+
+     <h3><a name="tth_sEc8.3">
+8.3</a>&nbsp;&nbsp;Dirac Operators</h3>
+
+<p>
+
+     <h3><a name="tth_sEc8.4">
+8.4</a>&nbsp;&nbsp;The Algorithms</h3>
+<a name="col:algclass">
+</a>
+
+<p>
+      <h4><a name="tth_sEc8.4.1">
+8.4.1</a>&nbsp;&nbsp;Algorithm Parameters</h4>
+<a name="col:algparam">
+</a>
+
+<p>
+
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 2.92.<br />On  4 Jul 2002, 16:36.</small>
+</body></html>
+CPS_END_NAMESPACE

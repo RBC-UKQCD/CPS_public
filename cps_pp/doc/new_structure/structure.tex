@@ -1,0 +1,483 @@
+#include<config.h>
+CPS_START_NAMESPACE
+%------------------------------------------------------------------
+% $Id: structure.tex,v 1.1.1.1 2003-06-22 13:34:51 mcneile Exp $
+%------------------------------------------------------------------
+% Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
+%
+% For best results, this latex file should be compiled using pdflatex.
+% However it will also compile under normal latex, if you prefer.
+%
+%------------------------------------------------------------------
+\documentclass[12pt]{article}
+
+% importing other useful packages:
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{tabularx}
+% color for the pdf links:
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.5}
+% for conditional latex source:
+\usepackage{ifthen}
+% pdftex specifications, these are only included if we are using pdflatex:
+\providecommand{\pdfoutput}{0}
+\ifthenelse{\pdfoutput = 0}{
+% Not PDF:
+\usepackage{html}
+\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+}{
+% PDF: hyperref for pdf with full linkages:
+\usepackage[
+pagebackref,
+hyperindex,
+hyperfigures,
+colorlinks,
+linkcolor=darkblue,
+citecolor=darkblue,
+pagecolor=darkblue,
+urlcolor=blue,
+%bookmarksopen,
+pdfpagemode=None,
+%=UseOutlines,
+pdfhighlight={/I},
+pdftitle={CPS: Overall Code Structure. $Revision: 1.1.1.1 $ - $Date: 2003-06-22 13:34:51 $.},
+pdfauthor={A.N. Jackson \& B\'{a}lint Jo\'{o}},
+plainpages=false
+]{hyperref}
+}
+
+% CVS tag shorthand:
+\newcommand{\ukqcdtag}[1]{{\small{UKQCD CVS Repository Tag: }{\bf{\tt{#1}}}}}
+
+% Code style commands:
+\newcommand{\cls}[1]{{\bf #1}}            % Classes
+\newcommand{\struct}[1]{{\bf #1}}         % Structs
+\newcommand{\cde}[1]{{\tt #1}}            % Code fragments
+
+% document style modifications:
+\setlength{\parskip}{2.0mm}
+\setlength{\parindent}{0mm}
+
+% Query Box:
+\newcounter{quescount}
+\setcounter{quescount}{0}
+\newcommand{\query}[1]{\begin{center}\refstepcounter{quescount}\fbox{\parbox{10cm}{ {\bf Query.\arabic{quescount}:} #1} } \end{center} }
+
+% title information:
+\title{CPS: Overall Code Structure.}
+\author{A.N. Jackson \& B\'{a}lint Jo\'{o}}
+\date{\mbox{\small $$Revision: 1.1.1.1 $$  $$Date: 2003-06-22 13:34:51 $$}}
+
+%------------------------------------------------------------------
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+%-------------------------------------------------------------------
+\section{Overall aims}
+The CPS code structure and build system aims to:
+\begin{itemize}
+\setlength{\itemsep}{0.0cm}
+ \item Use standard GNU filenames, extensions, directory structures, and
+ compile using standard UNIX/GNU tools.
+ \item Reflect the structure of the object-oriented code in the structure of
+ the source directory tree.
+ \item Allow sources, libraries and binaries for different platforms to coexist.
+ \item Build all libraries relevant to a given platform, so that the specific
+ implementation can be chosen at link time.
+\item Maintain Compatibility with the current QCDSP hardware and development environment.
+\end{itemize}
+
+%-------------------------------------------------------------------
+\section{The Directory Structure}
+\label{sec:dirs}
+
+%----------------------------------------
+\subsection{The top-level of the tree}
+All files are held in a directory called \emph{cps/}, for the Columbia Physics System.
+The directory structure at this uppermost level reflects standard GNU practice
+for organising software distributions.
+
+\subsubsection{Files}
+\begin{itemize}
+\setlength{\itemsep}{0.0cm}
+ \item \emph{cps/Makefile}
+ \item \emph{cps/configure}
+ \item \emph{cps/README}
+ \item \emph{cps/INSTALL}
+ \item \emph{cps/...etc...}
+\end{itemize}
+The autoconf-based configure script, the overall makefile and other top-level 
+files are examined further in section \ref{sec:build} below.
+
+\subsubsection{Directories}
+\begin{itemize}
+\setlength{\itemsep}{0.0cm}
+ \item \emph{cps/src/} - Directory containing the source tree.
+ \item \emph{cps/include/} - Directory containing the source header files.
+ \item \emph{cps/lib/} - Directory holding the binary library files for a given platform.
+ \item \emph{cps/docs/} - The documentation directory.
+ \item \emph{cps/test/} - The test suite (see section \ref{sec:tests}).
+\end{itemize}
+
+We consider each directory in turn.
+
+%----------------------------------------
+\subsection{The Source Tree: \emph{cps/src/...}}
+There are three design criteria for the organisation of the source tree:
+\begin{itemize}
+\setlength{\itemsep}{0.0cm}
+\item The top-level of the source tree should reflect logically separable
+classes of code.
+\item The deeper directory structure should accurately reflect the
+object-oriented structure of the code.
+\item The final leaves of the directory-tree should effectively separate code
+for different platforms, so that the source files for a particular platform can be
+easily identified.
+\end{itemize}
+
+\subsubsection{The top-level of the source tree}
+The source directory in this version of the code corresponds to a combination of the 
+source files from \emph{phys/[util,alg,nga,task,mem]}.  The original layout
+was driven by the target platform, whereas the new layout moves the
+platform-dependencies further down the tree. However on Consultation with 
+Bob, we decided to keep the original \emph{util, alg, nga, task, mem}
+layout to separate cleanly the functions in these directories. The 
+functions outlined by Bob are:
+\begin{description}
+\setlength{\itemsep}{0.0cm}
+ \item{\emph{util}} -- These are physics related utilities, to do with
+lattices, Dirac Operators, Vectors, linear algebra and the like.
+ \item{\emph{alg}} -- The classes herein correspond to algorithms to 
+perform measurements, such as quark propagators, $\bar{\psi}\psi$ etc.
+ \item{\emph{task}} -- The original intention here was to have combinations
+of \emph{alg} classes to perform more complicated tasks, such as a Hybrid Monte Calro, with inline measurements and so forth, including running scripts. However, the original development ``ran out of energy'' and so this directory is 
+somewhat disorganised.
+ \item{\emph{nga}} -- This directory contains routines to perform various 
+kinds of communications (NGA stands for Node Gate Array -- the communications hardware of the QCDSP). It is envisaged that we rename this to something like \emph{comms}.
+ \item{\emph{mem}} -- This directory contained code to deal with loading 
+data in and out of internal memory of the DSP chips on QCDSP. It is highly
+likely that future machines, may need similar routines, for example the 
+QCDOC will have some EDRAM that may need to be accessed through specialised
+routines.
+\end{description}
+
+Bearing in mind our consultation by video conference on Aug 20, 2002,
+the suggested code structure at this level is as follows:
+\begin{itemize}
+\setlength{\itemsep}{0.0cm}
+ \item \emph{cps/src/alg/} - Directory containing the Alg class.
+ \item \emph{cps/src/comms/} - The comms routines.
+ \item \emph{cps/src/comms/gsum/} - The global sum routines.
+ \item \emph{cps/src/io/} - I/O routines.
+ \item \emph{cps/src/io/qcdio} -- The currend QCDIO library
+ \item \emph{cps/src/mem} - Routines for managing internal memories
+ \item \emph{cps/src/task/} - Directory containing the tasks.
+ \item \emph{cps/src/util/DiracOp/} - Directory containing the DiracOp class.
+ \item \emph{cps/src/util/Error/} - Directory containing the Error class.
+ \item \emph{cps/src/util/GlobalJobParameter/} - Directory containing the GlobalJobParameter class.
+ \item \emph{cps/src/util/lapack/} - The lapack linear algebra routines.
+ \item \emph{cps/src/util/Lattice/} - Directory containing the Lattice class.
+ \item \emph{cps/src/util/Mom/} - Directory containing the Mom class.
+ \item \emph{cps/src/util/pmalloc/} - The pmalloc routines.
+ \item \emph{cps/src/util/Random/} - Directory containing the Random class.
+ \item \emph{cps/src/util/RComplex/} - Directory containing the RComplex class.
+ \item \emph{cps/src/util/RFloat/} - Directory containing the RFloat class.
+ \item \emph{cps/src/util/smalloc/} - The smalloc routines.
+ \item \emph{cps/src/util/Vector/} - Directory containing the Vector class.
+ \item \emph{cps/src/util/Verbose/} - Directory containing the Verbose class.
+\end{itemize}
+
+Here we have added an \emph{io} directory which is expected to contain
+functions for loading and saving configurations, propagators and the like.
+
+In ``leaf'' directories, upper-case names indicate a corresponding class exists
+(i.e. the class DiracOp is defined in DiracOp.C in
+\emph{cps/src/DiracOp}).  Lowercase directory names indicate that this
+directory contains utility functions that are not wrapped in C++
+classes.
+
+It has been agreed in the videoconference that leaf directories 
+and library names should follow the names of the classes (ie libDiracOp.a,
+on UNIX and DiracOp.olb on QCDSP). After some testing it appears that
+the Compiler/Linker/Archiver toolchains can deal with this naming 
+convention on QCDSP (Tartan), Solaris (cc/CC), AIX (xlc) and Linux
+(gcc). Hence this naming scheme will be adopted in the new code structure.
+
+There exist currently some functions that are not wrapped in C++ classes,
+in the short term it is acceptable to put these in a \emph{cps/src/notCPP}
+directory, but in the long term such a directory ought to be eliminated. 
+Insofar as the pure C / Assembler functions are related to a C++ class, 
+they should reside in the same directory as that class.
+separate \emph{cps/src/misc/} directory?
+
+\query{Should pmalloc and smalloc be combined into one ``memory'' directory,
+including all from \emph{phys/mem/}.}
+
+\subsubsection{The deeper directory structure}
+This should reflect the OO structure.  So, if we look at the Doxygen
+documentation \\
+(see \href{http://www.epcc.ed.ac.uk/~ukqcd/cps/}{http://www.epcc.ed.ac.uk/\~{}ukqcd/cps/} ) \\
+for a given class, e.g. the Dirac Operators:\\
+\href{http://www.epcc.ed.ac.uk/~ukqcd/cps/doxygen/html/class_DiracOp.html}{http://www.epcc.ed.ac.uk/\~{}ukqcd/cps/doxygen/html/class\_DiracOp.html}
+
+This suggests the following structure:
+\begin{itemize}
+\setlength{\itemsep}{0.0cm}
+ \item \emph{cps/src/DiracOp/} 
+ \item \emph{cps/src/DiracOp/DiracOpStagTypes/} 
+ \item \emph{cps/src/DiracOp/DiracOpStagTypes/DiracOpStag/}
+ \item \emph{cps/src/DiracOp/DiracOpWilsonTypes/}
+ \item \emph{cps/src/DiracOp/DiracOpWilsonTypes/DiracOpClover/}
+ \item \emph{cps/src/DiracOp/DiracOpWilsonTypes/DiracOpDwf/}
+ \item \emph{cps/src/DiracOp/DiracOpWilsonTypes/DiracOpWilson/}
+\end{itemize}
+
+\subsubsection{Separating code for different platforms}
+\label{sssec:sepcode}
+File common to all platforms are held in the object's directory.  e.g. The
+pure-C++ file that defines the abstract base class \cde{DiracOp} is held in
+\emph{cps/src/DiracOp/DiracOp.C}.  Any platform dependent files are stored in
+further subdirectories:
+\begin{itemize}
+\setlength{\itemsep}{0.0cm}
+ \item \emph{cps/src/DiracOp/} - Source common to all platforms. 
+ \item \emph{cps/src/DiracOp/noarch/} - Portable versions of usually
+ platform-dependent code. 
+ \item \emph{cps/src/DiracOp/qcdsp/} - QCDSP-only files.
+ \item \emph{cps/src/DiracOp/qcdoc/} - QCDOC-only files.
+ \item \emph{cps/src/DiracOp/alpha/} - Alpha-chipset-only files.
+ \item \emph{cps/src/DiracOp/x86linux/} - (x86 chip-series, Linux OS)-only files.
+\end{itemize}
+
+In some cases, for a given platform, multiple implementations of the same
+functionality are present.  For example, there are a large number of
+QCDSP-specific global sum routines and Dirac operation routines that fulfill
+the same function.   Each of these will be held in a separate directory within
+the \emph{.../qcdsp/} directory and each will be compiled into a separate
+library using the name of the directory as the library name.  e.g.
+
+\emph{phys/util/dirac\_op/d\_op\_wilson\_opt\_lcl\_nos/}
+
+becomes
+
+\emph{cps/src/DiracOp/DiracOpWilsonTypes/DiracOpWilson/qcdsp/d\_op\_wilson\_opt\_lcl\_nos/}
+
+and (on QCDSP only) will result in a library file called 
+
+\emph{cps/lib/libd\_op\_wilson\_opt\_lcl\_nos.a}, 
+
+sitting alongside the more general 
+
+\emph{cps/lib/libDiracOp.a}.
+
+There is a large amount of code replication in the global sum and Dirac
+operator directories. It is not expected that such a large number of 
+classes / libraries will exist in general. The current strategy is 
+to put all the sources and libraries into a machine specific \\
+\emph{cps/src/DiracOp/DiracOpWilsonTypes/DiracOpWilson/qcdsp} directory and build them 
+all as is done currently. A second pass may then try and eliminate the
+replication of codes.
+
+
+%----------------------------------------
+\subsection{The Include Files: \emph{cps/include/...}}
+
+The current code structure has separated include files to reside 
+relatively close to the source files:
+
+\begin{itemize}
+\setlength{\itemsep}{0.0cm}
+\item \emph{phys/util/include} -- Include files for the sources in \emph{util}
+\item \emph{phys/alg/include} -- Include files for the sources in \emph{alg}
+\item \emph{phys/mem/include} -- Include files for the sources in \emph{mem}
+\item \emph{phys/nga/include} -- Include files for the sources in \emph{nga}
+\end{itemize}
+
+It is intended to reorganise these, into one single include directory.
+To prevent undue flattaning of the current structure and mixing of names
+we envisage keeping the current distinctions within this include directory
+as in:
+
+\begin{itemize}
+\setlength{\itemsep}{0.0cm}
+\item \emph{cps/include/util} -- Include files for the sources in \emph{util}
+\item \emph{cps/include/alg} -- Include files for the sources in \emph{alg}
+\item \emph{cps/include/mem} -- Include files for the sources in \emph{mem}
+\item \emph{cps/include/comms} -- Include files for the sources in \emph{comms}
+-- the new name for the \emph{nga} directory.
+\end{itemize}
+
+This has the advantage of maintaining current distinctions. A user can then 
+set his ``include path'' to \emph{cps/include}, and include files with 
+directives such as \#include $<$util/lattice.h$>$ and so forth. Alternatively,
+several include paths can be set (for the GNU compiler:\emph{ -Icps/include/util -Icps/include/alg/mem -Icps/include/comms}) in which case one can include
+headers in sources with directives such as \#include$<$lattice.h$>$.
+
+\query{Which of the above two are preferred?}
+
+%----------------------------------------
+\subsection{The Library Files: \emph{cps/lib/...}}
+All the library files, one for each of the main directories in \emph{cps/src/}
+plus ones for platform-dependent variants of a given library (as described at
+the end of section \ref{sssec:sepcode}).
+
+%----------------------------------------
+\subsection{The Documentation: \emph{cps/docs/...}}
+This is essentially the same as in the original EPCC-Columbia distribution,
+with HTML as the primary format, and including the Doxygen-ized version of the
+code.
+
+%----------------------------------------
+\subsection{The Test Suite: \emph{cps/test/...}}
+At first, this will be a copy of the original CPS test suite, or at
+least the parts of that suite that work on all platforms.  
+
+Eventually a more general test suite must be defined and implemented, taking
+advantage of the new hypercubic RNG implemented at Columbia.
+
+
+%-------------------------------------------------------------------
+\section{The Build System}
+\label{sec:build}
+The build strategy is simple.  We use a {\tt{configure;make;make install}}
+scheme, where the install can be made to separate binaries for different
+platforms.  For any given target platform, we make every library that is relevant 
+to that platform.  The only compilation option that cannot be separated out
+into a separate library is the decision whether to use float or double
+precision floating-point arithmetic.  Broadly:
+
+\begin{verbatim}
+%./configure --target=[TARGET]  \
+             --prefix=/cps/[TARGET]/  \
+             --enable-double-precision=[yes|no]
+%make
+%make install
+\end{verbatim}
+
+The parallel/serial and other platform-specific options are chosen at the link
+stage, the tests do this and thus require a separate configure+make system.
+
+{\tt{make install}} will make and populate a directory called (generically)
+instdir, by creating the following structure
+\begin{itemize}
+ \item \emph{instdir/}
+ \begin{itemize}
+  \item \emph{arch/}
+  \begin{itemize}
+   \item \emph{include/} copy of include directory.
+   \item \emph{lib/} all libs for target.
+   \item \emph{doc/} documents.
+   \begin{itemize}
+    \item \emph{doxygen/} doxygened docs, for source used in build.
+   \end{itemize}
+   \item \emph{bin/} executables created by build.
+   \item \emph{src/} a copy of the sources used in this build.
+  \end{itemize}
+ \end{itemize}
+\end{itemize}
+  
+instdir would be specified as usual by the --prefix option to configure.  Note
+that arch/ may be superfluous, as may bin/ the bin is suggested by the facts
+that there would always be some stock executables that would be built (e.g. the
+test ones)
+
+
+%----------------------------------------
+\subsection{Makefile Rules}
+It is envisaged that there would be some file called Makefile.rules say, that
+encapsulates the rules for building the particular application. This would
+live in the top-level source directory.  The rules could contain:
+\begin{itemize}
+ \item Invocations for the compiler, archiver, assembler etc.
+ \item Various compiler and assembler flags (include paths, preprocessing options such as -DHAVE\_CONFIG).
+ \item Definitions of suffixes and rules for building object files, e.g. from C++ and from assembler files.
+\end{itemize}
+
+Makefile rules could be either pre-written for specific systems, e.g.
+Makefile.rules.alpha Makefile.rules.sparc or could have their values filled in
+by autoconf, or perhaps be generated through some combination. (e.g.: Autoconf
+fills in path information and optimisation flags, whereas the rest are pre
+written) (Makefile.rules.alpha.in...)
+
+In subdirectories, one would use recursive files, just like the current QCDSP
+build system (using the more portable GNU make). The leaf makefiles
+could all include the top-level rules file. The leaf makefiles would presumably
+work on some wildcard mechanism (i.e. compile all .C and .S files in the current
+directory).  Library names would be specified by base names of current
+directory.
+
+Working out how to traverse the right set of directories for a particular
+architecture, is a problem to be solved by us. Our goals in this direction 
+are that the build system be as simple as possible, for future maintenance.
+
+As a final statement, we need to describe why building the executables is
+harder than to build the library. We don't know what mode of operation is
+expected as there are so many options:
+\begin{itemize}
+ \item Should we run with no safety (nos)?
+ \item Should we run with dirac\_opt\_stag or dirac\_opt\_stag\_rdm?
+ \item Should we run a parallel build with a simulated SCU?
+ \item Should we run with QMP?
+ \item ...
+\end{itemize}
+One way around this would be to have independent makefiles for the executables
+(for the most common targets) that could include the rules from the first
+level configuration -- this punts the issue of what options we need to pass to
+autoconf, and may fit well into the current testing framework. The list of
+builds is relatively easy (already exists on QCDSP -- and doesn't really exist
+in a crystallised form for other targets). One possibility is to have a
+test/qcdsp test/alpha etc etc directories where we could have the different
+architectural tests (e.g. tests that exercise hardware like SCUs and so worth)
+another possibility is to have a single directory of test cases with makefiles
+for all architectures in them (the top-level rules would be used for building,
+but the library lists would need to be hardwired depending on the test in
+question.)  I lean towards the first option myself. We should discuss with
+Chris Miller how this fits into his testing environment. Similar setup could
+be used to build stock applications (hmc, etc etc)
+
+An alternative scheme for building the executables has been suggested by
+Craig McNeile, which would involve having some generic GUI interface,
+through which users can choose the particular library versions they desire.
+This has the advantage, that the choice of libraries for a particular
+architecture can be ``institutionalised''. Whether such a GUI is to be 
+a C++ program, Tcl/Tk script, Jave applet or a web form is yet open to debate.
+
+{\bf It is not in the remit of this particular reorganisation to decide on, 
+or implement this strategy. Our current brief is to make sure that the libraries can be built and installed}.
+
+%----------------------------------------
+\subsection{External Libraries}
+Somehow we need to tell the compiler about where these live (e.g.
+--with-mpi=/usr/mpich, or --with-mpi-include=/usr/mpich/include -- so that the
+right include files can be found -- for the libraries only the include files
+matter. However for the executables obviously the libraries are needed too.
+
+What would be classed as an external library?
+\begin{itemize}
+ \item \emph{MPI} (for sure)
+ \item \emph{GM} (on clusters say)
+ \item \emph{QMP}  (default no -- could be based on MPI or SCU or implemented directly...)
+ \item \emph{SCU}  (default no -- too ingrained in the code)
+\end{itemize}
+
+
+%-------------------------------------------------------------------
+\section{The Test Suite}
+\label{sec:tests}
+This will require a complex configure script to allow the user to choose
+between the different possible libraries available for a given platform.
+However, for a general platform, the core option is whether to run in serial
+or in parallel.
+
+
+
+%-------------------------------------------------------------------
+\end{document}
+CPS_END_NAMESPACE

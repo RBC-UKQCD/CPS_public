@@ -1,0 +1,420 @@
+#include<config.h>
+CPS_START_NAMESPACE
+Lattice::Lattice() :Reset random number generator with seed = 112319
+Lattice::Lattice() :
+	Ordered starting configuration
+ ::main :
+	Total sites :    16
+ ::main :
+	 Xn=1 Yn=1 Zn=1 Tn=1
+ ::main :
+	 Lx=2 Ly=2 Lz=2 Lt=2
+ ::main :
+	 Bx=0 By=0 Bz=0 Bt=0
+ ::main :
+	 Bxn=0 Byn=0 Bzn=0 Btn=0
+ ::main :
+	gauge = 733d0
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Fwilson::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fwilson::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 0
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=1.58292, g2=1.19645, g2_0=0.119645
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.055635, g2=0.0098337, g2_0=0.119645
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 10, lambda = 0.048776, del_lam = 0.00685903
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 0.00683251, g2_0 = 0.119645
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: -2.22045e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.048776 vs. nn 0.048776
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=1.55576, g2=1.2203, g2_0=0.12203
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.073473, g2=0.0184055, g2_0=0.12203
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 10, lambda = 0.0606055, del_lam = 0.0128675
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 0.0123491, g2_0 = 0.12203
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: 4.44089e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0606055 vs. nn 0.0606055
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 1 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=1: lambda[0] = 0.0442629
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=1: lambda[1] = 0.0651185
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0442629, g2=0.00775824, g2_0=0.000775824
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.026186, g2=0.000257464, g2_0=0.000775824
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 10, lambda = 0.0259649, del_lam = 0.000221171
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 0.000158687, g2_0 = 0.000775824
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: -2.22045e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0259649 vs. nn 0.0259649
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0658702, g2=0.0113564, g2_0=0.00113564
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0342191, g2=0.00146041, g2_0=0.00113564
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 10, lambda = 0.0328553, del_lam = 0.00136382
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 0.000964955, g2_0 = 0.00113564
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: 6.66134e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0328553 vs. nn 0.0328553
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 1 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=2: lambda[0] = 0.0247107
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=2: lambda[1] = 0.0341094
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0247107, g2=0.00030754, g2_0=3.0754e-05
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0234769, g2=6.25361e-05, g2_0=3.0754e-05
+DiracOp::Ritz(V*,F,...) :
+	Deviation at iter 15: 2.22045e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at iter 15: old 0.022938 vs. new 0.022938
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0227382, g2=3.13654e-05, g2_0=3.0754e-05
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 20, lambda = 0.0227016, del_lam = 3.66113e-05
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 2.5463e-05, g2_0 = 3.0754e-05
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: -1.11022e-15
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0227016 vs. nn 0.0227016
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.034371, g2=0.000813957, g2_0=8.13957e-05
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.028943, g2=0.00036463, g2_0=8.13957e-05
+DiracOp::Ritz(V*,F,...) :
+	Deviation at iter 15: 4.44089e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at iter 15: old 0.027305 vs. new 0.027305
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0264975, g2=0.000270274, g2_0=8.13957e-05
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 26, lambda = 0.0247137, del_lam = 9.23409e-05
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 8.01369e-05, g2_0 = 8.13957e-05
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: -3.33067e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0247137 vs. nn 0.0247137
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 1 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=3: lambda[0] = 0.0223707
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=3: lambda[1] = 0.0250446
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0223707, g2=3.09126e-05, g2_0=3.09126e-06
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0222715, g2=4.53191e-06, g2_0=3.09126e-06
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 12, lambda = 0.0222612, del_lam = 2.14561e-06
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 1.71537e-06, g2_0 = 3.09126e-06
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: 0
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0222612 vs. nn 0.0222612
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0250447, g2=7.39033e-05, g2_0=7.39033e-06
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0247859, g2=8.02175e-06, g2_0=7.39033e-06
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 10, lambda = 0.0247788, del_lam = 7.17141e-06
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 5.09003e-06, g2_0 = 7.39033e-06
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: 4.44089e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0247788 vs. nn 0.0247788
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 1 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=4: lambda[0] = 0.0222592
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=4: lambda[1] = 0.0247808
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0222592, g2=1.70355e-06, g2_0=1.70355e-07
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0222526, g2=6.03197e-07, g2_0=1.70355e-07
+DiracOp::Ritz(V*,F,...) :
+	Deviation at iter 15: 0
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at iter 15: old 0.0222493 vs. new 0.0222493
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 16, lambda = 0.0222491, del_lam = 2.18393e-07
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 1.30498e-07, g2_0 = 1.70355e-07
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: -6.66134e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0222491 vs. nn 0.0222491
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0247808, g2=5.09654e-06, g2_0=5.09654e-07
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0247634, g2=1.09955e-06, g2_0=5.09654e-07
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 15, lambda = 0.0247548, del_lam = 7.15734e-07
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 4.64402e-07, g2_0 = 5.09654e-07
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: 6.66134e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0247548 vs. nn 0.0247548
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 1 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=5: lambda[0] = 0.0222491
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=5: lambda[1] = 0.0247549
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0222491, g2=1.30641e-07, g2_0=1.30641e-08
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 1, lambda = 0.022249, del_lam = 6.15869e-08
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 6.29084e-08, g2_0 = 1.30641e-08
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: -2.22045e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.022249 vs. nn 0.022249
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0247549, g2=4.64168e-07, g2_0=4.64168e-08
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 1, lambda = 0.0247546, del_lam = 2.35796e-07
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 2.42882e-07, g2_0 = 4.64168e-08
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: 2.22045e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0247546 vs. nn 0.0247546
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 0 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=6: lambda[0] = 0.022249
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=6: lambda[1] = 0.0247546
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 1 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	Final Jacobi: n_jacob=1 n_valid=2 NCG=141
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	lambda_old[0] = 0.149159
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	lambda_old[1] = 0.157313
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	lambda_H[0] = 0.149159
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	lambda_H[1] = -0.157313
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	valid_eig[0] = 1
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	valid_eig[1] = 1
+Fwilson::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fwilson::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 790000
+	Exiting
+Fwilson::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fwilson::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 790000
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0211472, g2=5.48514e-05, g2_0=5.48514e-06
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0210371, g2=9.00251e-07, g2_0=5.48514e-06
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 10, lambda = 0.0210361, del_lam = 1.03515e-06
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 1.10485e-06, g2_0 = 5.48514e-06
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: 0
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0210361 vs. nn 0.0210361
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0238167, g2=5.45928e-05, g2_0=5.45928e-06
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0237036, g2=1.17387e-06, g2_0=5.45928e-06
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 10, lambda = 0.0237025, del_lam = 1.11822e-06
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 9.74072e-07, g2_0 = 5.45928e-06
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: -8.88178e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0237025 vs. nn 0.0237025
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 1 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=1: lambda[0] = 0.0210346
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=1: lambda[1] = 0.023704
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0210346, g2=1.10104e-06, g2_0=1.10104e-07
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0210288, g2=5.15766e-07, g2_0=1.10104e-07
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 13, lambda = 0.0210273, del_lam = 1.77972e-07
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 1.42716e-07, g2_0 = 1.10104e-07
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: -3.33067e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0210273 vs. nn 0.0210273
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.023704, g2=9.73943e-07, g2_0=9.73943e-08
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.023699, g2=3.99037e-07, g2_0=9.73943e-08
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 13, lambda = 0.0236977, del_lam = 1.73825e-07
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 1.73005e-07, g2_0 = 9.73943e-08
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: -1.11022e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0236977 vs. nn 0.0236977
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 1 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=2: lambda[0] = 0.0210273
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=2: lambda[1] = 0.0236977
+DiracOp::Ritz(V*,F,...) :
+	nn = 0, lambda=0.0210273, g2=1.42712e-07, g2_0=1.42712e-08
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 1, lambda = 0.0210272, del_lam = 7.71512e-08
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 8.04006e-08, g2_0 = 1.42712e-08
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: 2.22045e-16
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0210272 vs. nn 0.0210272
+DiracOp::Ritz(V*,F,...) :
+	nn = 1, lambda=0.0236977, g2=1.73007e-07, g2_0=1.73007e-08
+DiracOp::Ritz(V*,F,...) :
+	Converged at iter 1, lambda = 0.0236976, del_lam = 9.65503e-08
+DiracOp::Ritz(V*,F,...) :
+	  rsd = 1e-10, g2 = 1.20718e-07, g2_0 = 1.73007e-08
+DiracOp::Ritz(V*,F,...) :
+	Deviation at convergence: 0
+DiracOp::Ritz(V*,F,...) :
+	Mu-s at convergence: old 0.0236976 vs. nn 0.0236976
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 0 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=3: lambda[0] = 0.0210272
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	KS=3: lambda[1] = 0.0236976
+DiracOp::Jacobi(V*,F,...) :
+	Jacobi converged after 1 iters
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	Final Jacobi: n_jacob=1 n_valid=2 NCG=48
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	lambda_old[0] = 0.144996
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	lambda_old[1] = 0.153868
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	lambda_H[0] = 0.144996
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	lambda_H[1] = -0.153868
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	valid_eig[0] = 1
+DiracOpWilsonTypes::RitzEig(V**,V**,I) :
+	valid_eig[1] = 1
+Fwilson::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fwilson::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 1090000
+	Exiting
+CPS_END_NAMESPACE

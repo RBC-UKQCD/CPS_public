@@ -1,0 +1,746 @@
+#include<config.h>
+CPS_START_NAMESPACE
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+           "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="TtH 2.92">
+
+                                 
+<title> QCDSP Communications Specification \&amp; the MPI implementation. </title>
+</head>
+<body>
+ 
+<h1 align="center">QCDSP Communications Specification &amp; the MPI implementation. </h1>
+
+<h3 align="center">A.N. Jackson &amp; S. Booth </h3>
+
+<h3 align="center"><font size="-1">
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Revision</i>: 1.1 </td></tr></table>
+</td></tr></table>
+
+  
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Date</i>: 2001/09/11 13:03:35 </td></tr></table>
+</td></tr></table>
+
+</font> </h3>
+
+<p>
+   
+<h1>Contents </h1><a href="#tth_sEc1"
+>1&nbsp; QCDSP OS Communications</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc1.1"
+>1.1&nbsp; Communications Flags</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc1.2"
+>1.2&nbsp; Data structures: The SCUDirArg class</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc1.3"
+>1.3&nbsp; The OS Interface</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc1.4"
+>1.4&nbsp; Questions concerning the interface.</a><br />
+<a href="#tth_sEc2"
+>2&nbsp; MPI Implementation: MPI-SCU</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.1"
+>2.1&nbsp; Introduction</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2"
+>2.2&nbsp; Contents Of This Distribution</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.3"
+>2.3&nbsp; Integrating MPI-SCU Into The QCDSP Code</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.4"
+>2.4&nbsp; Compiler Options</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.5"
+>2.5&nbsp; Run-time Control</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.6"
+>2.6&nbsp; The Communications Flags</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.7"
+>2.7&nbsp; The SCUDirArg Class</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.8"
+>2.8&nbsp; The OS Interface</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.9"
+>2.9&nbsp; Test Programs</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.9.1"
+>2.9.1&nbsp; <tt>tests/simple/commstest.C</tt></a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.9.2"
+>2.9.2&nbsp; <tt>tests/stride/stridetest.C</tt></a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.10"
+>2.10&nbsp; Unresolved Issues</a><br />
+ 
+
+
+<p>
+
+ <h2><a name="tth_sEc1">
+1</a>&nbsp;&nbsp;QCDSP OS Communications</h2>
+On QCDSP, the parallel communication subroutines were defined within
+the OS, and this will also be the case for QCDOC.  However, for
+development purposes, we need a parallel implementation of the code
+that can be run here at EPCC while the QCDOC hardware is being
+developed.  To do this, we intend to implement the communications
+using MPI (v.1), via the interface defined in <tt>sysfunc.h</tt>.  This
+interface appears to offer a greater level of functionality than is
+currently required, as only a subset of the available subroutines are
+used by the C++ QCDSP code.  For now, only the essential elements of
+the interface will be included here, while keeping in mind the
+possibility of extending the interface as the need arises.
+
+<p>
+     <h3><a name="tth_sEc1.1">
+1.1</a>&nbsp;&nbsp;Communications Flags</h3>
+<a name="col:comm:flags">
+</a>
+There are a number of constants defined in <tt>scu_enum.h</tt> which
+associate unique numbers with various communications parameters.  The
+first set of definitions identifies the physical directions in which
+communications are to be carried out.
+
+<p>
+
+<table>
+<tr><td><tt><b>enum SCUDir</b></tt> </td><td><b>Name</b> </td><td><b>Value</b> </td><td><b>Direction</b> </td></tr>
+<tr><td></td><td><tt>SCU_TM</tt> </td><td>0 </td><td><font face="symbol">-</font
+><i>t</i></td></tr>
+<tr><td></td><td><tt>SCU_TP</tt> </td><td>1 </td><td>+<i>t</i></td></tr>
+<tr><td></td><td><tt>SCU_XM</tt> </td><td>2 </td><td><font face="symbol">-</font
+><i>x</i></td></tr>
+<tr><td></td><td><tt>SCU_XP</tt> </td><td>3 </td><td>+<i>x</i></td></tr>
+<tr><td></td><td><tt>SCU_YM</tt> </td><td>4 </td><td><font face="symbol">-</font
+><i>y</i></td></tr>
+<tr><td></td><td><tt>SCU_YP</tt> </td><td>5 </td><td>+<i>y</i></td></tr>
+<tr><td></td><td><tt>SCU_ZM</tt> </td><td>6 </td><td><font face="symbol">-</font
+><i>z</i></td></tr>
+<tr><td></td><td><tt>SCU_ZP</tt> </td><td>7 </td><td>+<i>z</i>
+</td></tr></table>
+
+
+<p>
+In the case of QCDSP, this actually mapped the physics directions
+onto physical wires.  For QCDOC, this will also map onto a set of
+wires using the same numbers (0-7), but the actual physical wire being
+used will be decided by the OS, for the purposes of machine
+partitioning. The four different axes of the system are labelled in a
+similar fashion:
+
+<p>
+
+<table>
+<tr><td><tt><b>enum SCUAxis</b></tt> </td><td><b>Name</b> </td><td><b>Value</b> </td><td><b>Direction</b> </td></tr>
+<tr><td></td><td><tt>SCU_T</tt> </td><td>0 </td><td><i>t</i>-axis</td></tr>
+<tr><td></td><td><tt>SCU_X</tt> </td><td>1 </td><td><i>x</i>-axis</td></tr>
+<tr><td></td><td><tt>SCU_Y</tt> </td><td>2 </td><td><i>y</i>-axis</td></tr>
+<tr><td></td><td><tt>SCU_Z</tt> </td><td>3 </td><td><i>z</i>-axis
+</td></tr></table>
+
+
+<p>
+Finally, the communications are labelled as being either sends or receives using:
+
+<p>
+
+<table>
+<tr><td><tt><b>enum SCUXR</b></tt> </td><td><b>Name</b> </td><td><b>Value</b> </td><td><b>Meaning</b> </td></tr>
+<tr><td></td><td><tt>SCU_REC</tt>  </td><td>0 </td><td>Receive from a given direction. </td></tr>
+<tr><td></td><td><tt>SCU_SEND</tt> </td><td>8 </td><td>Send in a given direction.
+</td></tr></table>
+
+
+<p>
+     <h3><a name="tth_sEc1.2">
+1.2</a>&nbsp;&nbsp;Data structures: The SCUDirArg class</h3>
+<a name="col:comm:data">
+</a>
+Each instance of the <tt>SCUDirArg</tt> class (defined in
+<tt>scu_dir_arg.h</tt>) describes the type of data-structure to be
+transmitted, whether this data should be sent or received, and also
+the direction in which the data is to communicated.  The data types
+are either contiguous or block-strided, and are defined using the
+following parameters:
+
+<p>
+
+<table>
+<tr><td><b>Type</b>  </td><td><b>Name</b> </td><td><b>Description</b> </td></tr>
+<tr><td><tt>void<font face="symbol">*</font
+></tt>  </td><td><tt>addr</tt>       </td><td>Base address of the data-block. </td></tr>
+<tr><td><tt>SCUDir</tt>      </td><td><tt>dir</tt>        </td><td>Direction of this communication. </td></tr>
+<tr><td><tt>SCUXR</tt>       </td><td><tt>xr</tt>         </td><td>The send or receive flag.</td></tr>
+<tr><td><tt>int</tt>         </td><td><tt>blklen</tt>     </td><td>Number of elements in each block of data. </td></tr>
+<tr><td><tt>int</tt>         </td><td><tt>numblk</tt>     </td><td>Number of blocks.</td></tr>
+<tr><td><tt>int</tt>         </td><td><tt>stride</tt>     </td><td>Number of elements between the
+start of the last element of one block and the first element of the successive block.
+</td></tr></table>
+
+
+<p>
+If this is unclear, consider this simple example of a strided data set:
+
+<center>
+  <img src="stridedef.png" alt="stridedef.png" />
+</center>
+
+<p>
+The most important issue here, from our perspective, concerns the
+units in which both the block-length and the stride are specified.
+The unit appears to be the number of <tt>float</tt> or <tt>int</tt>
+elements, as opposed to the number of bytes.  This has serious
+implications for our aim of allowing both <tt>float</tt> and <tt>double</tt>
+precision calculations.  However, if no <tt>int</tt> data is being
+transferred between processors, then we can safely assume that the
+number of bytes associated with each element is that associated with
+the chosen level of precision, and the problem disappears.
+
+<p>
+A number of methods are also defined by the <tt>SCUDirArg</tt> class to
+allow the data-structures to be defined and manipulated.
+
+<p>
+
+<tt>SCUDirArg::SCUDirArg (void<font face="symbol">*</font
+> <em>addr</em>, <b>SCUDir</b> <em>
+dir</em>, <b>SCUXR</b> <em>xr</em>, int <em>blklen</em>, int <em>numblk</em> = 1,
+int <em>stride</em> = 1)</tt>
+
+<p>
+This constructor allows the parameters
+of the communication to be set when an instance of the <tt>SCUDirArg</tt>
+class is created.  Note that <tt>numblk</tt> and <tt>stride</tt> will both
+default to 1 if other values are not supplied.
+
+<p>
+
+<tt>void SCUDirArg::Init (void<font face="symbol">*</font
+> <em>addr</em>, <b>SCUDir</b> <em>
+dir</em>, <b>SCUXR</b> <em>xr</em>, int <em>blklen</em>, int <em>numblk</em> = 1,
+int <em>stride</em> = 1)</tt>
+
+<p>
+Used to initialise an `empty' instance of
+the SCUDirArg class.  Like the previous constructor subroutine,
+<tt>numblk</tt> and <tt>stride</tt> will both default to 1.
+
+<p>
+
+<tt>void<font face="symbol">*</font
+> SCUDirArg::Addr ()</tt>
+
+<p>
+Returns the base address associated with
+this <tt>SCUDirArg</tt>.
+
+<p>
+
+<tt>void<font face="symbol">*</font
+> SCUDirArg::Addr (void<font face="symbol">*</font
+><em>addr</em>)</tt>
+
+<p>
+
+<tt>void SCUDirArg::Reload (void<font face="symbol">*</font
+> <em>a</em>, int <em>blklen</em>,
+int <em>numblk</em> = 1, int <em>stride</em> = 1)</tt>
+
+<p>
+Used to change the block-length, the number of
+blocks and value of the stride.  On QCDSP, this also reloaded the
+communication pattern into the DMA.
+
+<p>
+
+     <h3><a name="tth_sEc1.3">
+1.3</a>&nbsp;&nbsp;The OS Interface</h3>
+<a name="col:comm:func">
+</a>
+On both QCDSP and QCDOC, the operating system interface is defined in
+the header file <tt>sysfunc.h</tt>, apart from standard subroutines such
+as <tt>printf</tt> which are defined elsewhere.  In the original
+implementation, every subroutine in the communications layer is given
+``friend function'' access to the <tt>SCUDirArg</tt> class, so they can
+look up the values of the instance variables directly.
+
+<p>
+
+<tt>int UniqueID ()</tt>
+
+<p>
+Returns a number which is unique for each
+node.  These numbers have no particular significance, but one part of
+the library does attempt to used them to seed an RNG, and therefore
+zerois not advisable.
+
+<p>
+
+<tt>int CoorT ()</tt><br />
+<tt>int CoorX ()</tt><br />
+<tt>int CoorY ()</tt><br />
+<tt>int CoorZ ()</tt>
+
+<p>
+Functions to return four-dimensional
+coordinates of the node.
+
+<p>
+
+<tt>int SizeT ()</tt><br />
+<tt>int SizeX ()</tt><br />
+<tt>int SizeY ()</tt><br />
+<tt>int SizeZ ()</tt>
+
+<p>
+Functions to return the size of the 4-D processor
+grid in each direction.
+
+<p>
+
+<tt>int NumNodes ()</tt>
+
+<p>
+Returns the total number of nodes.
+
+<p>
+
+<tt>unsigned int Seed ()</tt><br />
+<tt>unsigned int SeedS ()</tt><br />
+<tt>unsigned int SeedT ()</tt><br />
+<tt>unsigned int SeedST ()</tt>
+
+<p>
+For initialising the random number seeds,
+using numbers which on QCDSP were loaded at boot time. For
+<tt>Seed()</tt>, the seed is different for each node and is changed every
+time the machine is reset. <tt>SeedS</tt> is the same for each node
+(spatially fixed, hence the S), but changes in time. <tt>SeedT</tt> is
+different for each node, but is fixed in time (the T), so it is
+unchanged by a reset. <tt>SeedST</tt> is the same for each node
+(spatially fixed, hence the S), and the same after every reset (fixed
+time, hence T).
+
+<p>
+
+<tt>unsigned int sync ()</tt>
+
+<p>
+Synchronises all the processors.
+
+<p>
+
+<tt>int SCURemap (<b>SCUDir</b> <em>dir</em>)</tt>
+
+<p>
+This subroutine looks up the `wire number' associated with a given
+direction.  This can be used to create a mapping table, which maps
+directions #0-7 onto wires #0-7 in whichever order is most
+appropriate.
+
+<p>
+
+<tt>void SCUTrans (<b>SCUDirArg</b><font face="symbol">*</font
+> <em>arg</em>)</tt>
+
+<p>
+Performs a single data-transfer, as specified by the <tt>SCUDirArg</tt>
+object pointed to by <tt>arg</tt>.
+
+<p>
+
+<tt>void SCUTrans (<b>SCUDirArg</b><font face="symbol">*</font
+><font face="symbol">*</font
+> <em>arg</em>, int <em>n</em>)</tt>
+
+<p>
+ Used to perform <tt>n</tt> simultaneous
+data-transfers, as specified by the array of <tt>SCUDirArg</tt> objects
+passed through <tt>arg</tt>.  
+
+<p>
+
+<tt>void SCUTrans (<b>SCUDirArg</b><font face="symbol">*</font
+> <em>arg</em>, unsigned
+int<font face="symbol">*</font
+> <em>offset</em>, int <em>n</em>)</tt>
+
+<p>
+ Perform <tt>n</tt> transfers, all of which
+have the same block, stride and number of blocks, but have different
+addresses.  Each transfer is started at a specified offset
+(<tt>offset[i]</tt>) relative to the base-address held in the
+<tt>SCUDirArg</tt>.
+
+<p>
+
+<tt>void SCUSetDMA (<b>SCUDirArg</b><font face="symbol">*</font
+> <em>arg</em>)</tt><br />
+<tt>void SCUSetDMA (<b>SCUDirArg</b><font face="symbol">*</font
+><font face="symbol">*</font
+> <em>arg</em>, int
+<em>n</em>)</tt>
+
+<p>
+On QCDSP, this is used to set up the DMA,
+using the array of comms definitions held in <tt>arg</tt> (no transfers
+are done).
+
+<p>
+<tt>void SCUTransAddr (<b>SCUDirArg</b><font face="symbol">*</font
+> <em>arg</em>)</tt><br />
+<tt>void SCUTransAddr (<b>SCUDirArg</b><font face="symbol">*</font
+><font face="symbol">*</font
+> <em>arg</em>,
+int <em>n</em>)</tt>
+
+<p>
+This function performs SCU transfers, but
+does not alter the existing block, stride and number of blocks held in
+the registers of the SCU.  This call must be preceded by a
+<tt>SCUSetDMA</tt> call.  The base-addresses of the data to be
+communicated are taken from the array <tt>SCUDirArg</tt> objects pointed
+to by <tt>arg</tt>. 
+
+<p>
+
+<tt>void SCUTransComplete ()</tt>
+
+<p>
+The function does not
+return until all of the transfers on this PE have been completed.
+
+<p>
+     <h3><a name="tth_sEc1.4">
+1.4</a>&nbsp;&nbsp;Questions concerning the interface.</h3>
+These last few points can be resolved when we have access
+to the original <tt>scu_dir_arg.C</tt> from the QCDSP code.
+
+<ul>
+<li> <tt>Addr()</tt> is assumed to set the base-address of this instance of
+<tt>SCUDirArg</tt> to <tt>addr</tt>, and then returns the <em>previous</em>
+base-address. Is this the case.</li>
+
+<li> Has the <tt>Reload()</tt> command been interpreted correctly?</li>
+</ul>
+
+<p>
+
+
+ <h2><a name="tth_sEc2">
+2</a>&nbsp;&nbsp;MPI Implementation: MPI-SCU</h2>
+
+     <h3><a name="tth_sEc2.1">
+2.1</a>&nbsp;&nbsp;Introduction</h3>
+The MPI implementation of the QCDSP SCU layer is a stand-alone system,
+which may be compiled with or without the QCDSP code.  Only MPI
+version 1 directives are used.
+
+<p>
+     <h3><a name="tth_sEc2.2">
+2.2</a>&nbsp;&nbsp;Contents Of This Distribution</h3>
+The MPI-SCU distribution contains the following files:
+
+<p>
+
+<table>
+<tr><td><b>File</b> </td><td><b>Description</b> </td></tr>
+<tr><td><tt>scu_enum.h</tt> </td><td>Slightly modified re-implementation of the
+communications enums. </td></tr>
+<tr><td><tt>scu_dir_arg.h</tt> </td><td>Headers for the data-structure definition routines. </td></tr>
+<tr><td><tt>scu_dir_arg.C</tt> </td><td>Implementation of the above. </td></tr>
+<tr><td><tt>sysfunc.h</tt> </td><td>Headers for the MPI-emulated QOS calls. </td></tr>
+<tr><td><tt>sysfunc.C</tt> </td><td>Implementation of the above. </td></tr>
+<tr><td><tt>mpi_requests.h</tt> </td><td>Source for the MPI-implementation-specific request handler. </td></tr>
+<tr><td><tt>Makefile</tt> </td><td>Makefile for the MPI-SCU library. Does not make the test-programs. </td></tr>
+<tr><td><tt>commsMPI.def</tt> </td><td>Example comms-definition file. </td></tr>
+<tr><td><tt>doc/</tt> </td><td>MPI-SCU documentation, including this file. </td></tr>
+<tr><td><tt>lib/</tt> </td><td>Directory where the MPI-SCU library is placed. </td></tr>
+<tr><td><tt>test/</tt> </td><td>Directory for MPI-SCU test programs. </td></tr></table>
+
+
+<p>
+Note that the MPI-SCU Makefile will have to altered in order to work at an
+institution other that EPCC.  The parts that will need to be altered
+are specified at the top of the Makefile, and concern the MPI compiler
+name and include/link paths.
+
+<p>
+     <h3><a name="tth_sEc2.3">
+2.3</a>&nbsp;&nbsp;Integrating MPI-SCU Into The QCDSP Code</h3>
+It should be fairly straightforward to integrate the MPI-SCU library into
+the QCDSP code.
+
+<ul>
+<li> Compile the MPI-SCU library on its own (see the above point concerning the
+Makefile's portability).</li>
+
+<li> Add the <tt>.../MPI-SCU/</tt> directory to the include path.</li>
+
+<li> Add the <tt>.../MPI-SCU/lib/</tt> directory to the link path.</li>
+
+<li> Add the <tt>-lcommsMPI</tt> flag to the compile/link command.</li>
+</ul>
+The only problem could be that any given version of the QCDSP code may
+contain its own versions of some of the files in this distribution (in
+particular, <tt>scu_enum.h</tt>).  For now, we suggest simply moving the
+non-MPI versions of the conflicting files out of the way. In the
+future, this should be remedied by adding a suitable MPI flag to the
+QCDSP code's Makefile.
+
+<p>
+     <h3><a name="tth_sEc2.4">
+2.4</a>&nbsp;&nbsp;Compiler Options</h3>
+These compiler switches specify some of the basic parameters of the
+MPI-SCU layer.  All of these can be overridden in the Makefile, using
+the <tt>-D</tt> flag in the compiler flags.
+
+<p>
+
+<table>
+<tr><td><b>Name</b> </td><td><b>Default</b> </td><td><b>Description</b></td></tr>
+<tr><td><tt>VERBOSE</tt> </td><td><tt>UNDEFINED</tt> </td><td>Outputs detailed information
+concerning the comms calls to a set of log-files (one for each
+processor).</td></tr>
+<tr><td><tt>NDIM</tt> </td><td><tt>4</tt> </td><td>Dimensionality of the system.  Currently, only NDIM = 4 is
+meaningful because the interface does not allow access to anything
+other than 4 dimensions. </td></tr>
+<tr><td><tt>COMMS_ENVVAR</tt> </td><td><tt>"COMMS_DEF"</tt> </td><td>Name of the environment variable used
+to specify the run-time parameters of the MPI-SCU layer.  If no such
+environment variable exists, then the <tt>COMMS_DEFFILE</tt> is
+used instead.</td></tr>
+<tr><td><tt>COMMS_DEFFILE</tt> </td><td><tt>"commsMPI.def"</tt> </td><td>Default filename
+(relative to the location of the executable) of a file that contains
+the run-time parameters of the MPI-SCU layer.  </td></tr>
+<tr><td><tt>COMMS_DATASIZE</tt> </td><td><tt>4</tt> </td><td>Default size (in bytes) of
+the fundamental data type to be transferred between processors
+(i.e. the size of integer or floating-point numbers). This can be
+overridden at the software (<tt>SCUDirArg</tt>) level.</td></tr></table>
+
+
+<p>
+     <h3><a name="tth_sEc2.5">
+2.5</a>&nbsp;&nbsp;Run-time Control</h3>
+The parallel environment of the code can be specified at run-time, via
+the environment variable specified by <tt>COMMS_ENVVAR</tt>, or the file
+specified by <tt>COMMS_DEFFILE</tt>.  The environment variable can
+either directly specify the MPI-SCU parameters, or point to a file
+containing those definitions.  The definitions themselves consist of a
+series of tag &amp; value pairs, in the format <tt>{NAME=</tt>value},
+specifying the following aspects of the parallel environment:
+
+<p>
+
+<table>
+<tr><td><b>Item</b> </td><td><b>Level</b> </td><td><b>Description</b> </td><td><b>Default</b> </td></tr>
+<tr><td><tt>{GRID=</tt>t,x,y,z<tt>}</tt> </td><td>REQUIRED </td><td>Defines the number of processors in each
+direction.  </td><td>n/a </td></tr>
+<tr><td><tt>{LOGFILE=</tt><font face="symbol">á</font
+>filename<font face="symbol">ñ</font
+><tt>}</tt> </td><td>Optional </td><td>This should specify the absolute or
+relative path of a file to which <tt>VERBOSE</tt> textual output should be placed.  If its value is <tt>stderr</tt> or <tt>stdout</tt> that stream is used instead. </td><td><tt>comlog</tt> </td></tr>
+<tr><td><tt>{SEED=</tt><font face="symbol">á</font
+>integer<font face="symbol">ñ</font
+><tt>}</tt> </td><td>Optional </td><td>Specify the RNG seed that SeedS or SeedST will
+return </td><td><tt>1</tt> </td></tr>
+<tr><td><tt>{SEEDFILE=</tt><font face="symbol">á</font
+>filename<font face="symbol">ñ</font
+><tt>}</tt> </td><td>Optional </td><td>Specifies a file containing a 
+number of RNG seeds.  This is used by Seed and SeedT to define a
+different seed for every processor. </td><td><tt>rng.dat</tt> </td></tr></table>
+
+
+<p>
+The environment variable is determined as either pointing to a file or
+containing the tags based on the whether or not it contains a ``{'' or not
+(ignoring whitespace).  The contents of the string or the file is
+turned into a stream of tokens, using the characters [{} ,=\n\t] as
+delimiting whitespace.  The order of the definition items is not
+important, but the case is.
+
+<p>
+For example, consider setting the environment variable to a filename
+(in bash)
+
+<pre>
+export COMMS_DEF="commsMPI.def"
+
+</pre>
+where the file <tt>commsMPI.def</tt> contains the following information:
+
+<pre>
+{ GRID = 64,32,32,32 }
+{ LOGFILE = comms.log }
+{ SEED = 128366328 }{ SEEDFILE = rngseeds.dat }
+
+</pre>
+This will use a (<i>t</i>,<i>x</i>,<i>y</i>,<i>z</i>) = 64&times;32&times;32&times;32
+processor grid, and all <tt>VERBOSE</tt> output will be sent to log-files
+called <tt>comms.log.X</tt> where <tt>X</tt> is the processor number.
+<tt>SeedS()</tt> &amp; <tt>SeedST()</tt> will return <tt>128366328</tt>, and
+<tt>Seed()</tt> &amp; <tt>SeedT()</tt> will return a RNG seed taken from the
+file <tt>rndseeds.dat</tt>.  
+
+<p>
+This could also be achieved using the environment variable alone.  For
+example, in <tt>bash</tt> one can use:
+
+<pre>  
+export COMMS_DEF="{LOGFILE=comms.log}{SEED=128366328}
+{GRID=64,32,32,32}{SEEDFILE=rngseeds.dat}"
+
+</pre>
+This will produce exactly the same behaviour as the previous
+file-based approach.
+
+<p>
+     <h3><a name="tth_sEc2.6">
+2.6</a>&nbsp;&nbsp;The Communications Flags</h3>
+The flags specified by <tt>scu_enum.h</tt> have only been changed very
+slightly:  An extra flag has been added to the end of each enum to
+clearly distinguish between undefined and defined values.
+
+<p>
+Enumeration <tt>SCUDir</tt> now also defines <tt>SCU_NoDir = -1</tt>.<br />
+Enumeration <tt>SCUAxis</tt> now also defines <tt>SCU_NoAxis = -1</tt>.<br />
+Enumeration <tt>SCUXR</tt> now also defines <tt>SCU_NoXR = -1</tt>.
+
+<p>
+     <h3><a name="tth_sEc2.7">
+2.7</a>&nbsp;&nbsp;The SCUDirArg Class</h3>
+Each instance of the <tt>SCUDirArg</tt> class defines and commits a
+MPI_Datatype appropriate for the specified number of blocks,
+block-length and stride.  The basic data type is always defined as
+being floating-point, but the number of bytes for each float (which
+defaults to <tt>COMMS_DATASIZE</tt>) an be specified using the following
+method:<br />
+<tt>SCUDirArg::SetDataSize( int mpi_datasize);</tt><br />
+where the integer argument specifies the number of bytes required for
+every element of data.  For example, if we wish to use an instance of
+<tt>SCUDirArg</tt> called <tt>scudat</tt> to transfer <tt>double</tt> data, we
+simply set:<br />
+<tt>scudat.SetDataSize(8)</tt>
+
+<p>
+This class also defines a few extra methods to allow the OS interface
+to access the MPI datatype and other data-transfer parameters.  These
+are straightforward, and are described in the <tt>scu_dir_arg.h</tt>
+header file.
+
+<p>
+     <h3><a name="tth_sEc2.8">
+2.8</a>&nbsp;&nbsp;The OS Interface</h3>
+The subroutines defined in &#167;<a href="#col:comm:func">1.3</a> have all been
+implemented in this version of MPI-SCU.  As well as these, the MPI
+version adds a number of new interface routines:
+
+<p>
+<tt>void SCUCommsInit( void );</tt>
+
+<p>
+Initialisation: Parses the communication parameters, calls
+<tt>MPI_Init</tt>, etc.  This will be called automatically when the code
+attempts to perform any <tt>SCUDirArg</tt> operations, but is supplied here so that
+it can be explicitly called at the start of the program.
+
+<p>
+<tt>void SCUGlobalSum(Type_tag t, size_t tsize, int n, void <font face="symbol">*</font
+>ivec, void <font face="symbol">*</font
+>ovec );</tt>
+
+<p>
+Perform a global sum directly using
+<tt>MPI_Allreduce</tt>.  This avoids using the standard global sum
+calculation, which is implemented via a set of <tt>SCUTrans</tt> calls,
+and so this version will probably be more efficient on most
+architectures.  The results are sent to all processors.<br />
+<tt>Type_tag t</tt> Indicates the type of the data: one of <tt>TYPE_float</tt> &amp; <tt>TYPE_int</tt>.<br />
+<tt>size_t tsize</tt> Indicates the size of the individual
+floats or ints (in bytes).<br />
+<tt>int n</tt> The number of items to be summed.<br />
+<tt>void <font face="symbol">*</font
+>ivec</tt> The input vector for the summation.<br />
+<tt>void <font face="symbol">*</font
+>ovec</tt> The output vector for the summed result.<br />
+
+
+<p>
+<tt>void SCURaiseError( char<font face="symbol">*</font
+> errstr );</tt><br />
+<tt>void SCURaiseError( const char<font face="symbol">*</font
+> errstring );</tt>
+
+<p>
+Wrapper for the comms-error reporting
+mechanism.  This currently prints the error to the standard output and
+then exits, but will eventually be made to use the QCDSP code's error
+reporting mechanism (the <tt>Error</tt> class).
+
+<p>
+Note that the implementation only identifies data transfers by their
+direction, but that MPI retains the order of communications.
+Therefore, multiple transfers in a single direction will work as long
+as the order of the send commands matches the order of the receives.
+
+<p>
+     <h3><a name="tth_sEc2.9">
+2.9</a>&nbsp;&nbsp;Test Programs</h3>
+There is currently a single test program for the MPI-SCU layer, which
+also does not require the QCDSP code in order to work.  The next stage
+will be add a test based on the original SCU-based global sum which
+will also compare this mechanism to the <tt>SCUGlobalSum</tt> routine.
+In the longer term, the aim will be to get one of the dynamical Wilson
+fermion test-codes running via MPI-SCU.
+
+<p>
+      <h4><a name="tth_sEc2.9.1">
+2.9.1</a>&nbsp;&nbsp;<tt>tests/simple/commstest.C</tt></h4>
+This tests the parsing of the communication parameters, and sets up a
+few strided and contiguous <tt>float</tt>, <tt>int</tt> and <tt>double</tt>
+transfers between processors.  The data thus transmitted is checked
+for correctness at every stage.  See the source files for more
+information.
+
+<p>
+      <h4><a name="tth_sEc2.9.2">
+2.9.2</a>&nbsp;&nbsp;<tt>tests/stride/stridetest.C</tt></h4>
+To test that the stride had been correctly implemented in MPI, this
+code (from GF) was compiled and tested on QCDSP, and then re-compiled
+and re-tested using the MPI-SCU layer here at EPCC.  The results were
+identical.  The original QCDSP code did not call SCUTransComplete, and
+in the MPI version this lead to incorrect answers.  On QCDSP, it may
+be possible to skip the SCUTransComplete call under certain
+conditions, but this cannot be supported in the MPI implementation.
+
+<p>
+     <h3><a name="tth_sEc2.10">
+2.10</a>&nbsp;&nbsp;Unresolved Issues</h3>
+
+<ul>
+<li> The entire <tt>sysfunc</tt> interface cannot be made <tt>extern
+"C"</tt>, because there are overloaded subroutines.  If external code
+requires access to the communication-calls with un-munged names, some
+kind of wrapping or selective <tt>extern "C"</tt> usage may be required.</li>
+
+<li> In QCDSP, only the root processor could actually perform input
+and output, whereas under MPI all processors can write to disk.
+Therefore, as things stand, the code will produce multiple identical
+output files.  This may cause more serious problems for
+the <em>inputting</em> of data files.</li>
+
+<li> On a related point, in its current formulation, the MPI-SCU
+layer works be allowing <em>all</em> processors to access the various
+definitions files.  This is simpler than only allowing a single
+processor to read the files and then distributing the data, but may
+cause problems on some platforms.</li>
+
+<li> The request handler defined in <tt>mpi_requests.h</tt> is
+currently rather poor, and has an arbitrary upper limit of 100
+requests per node.  This will be changed to handle things properly,
+via a linked list.</li>
+</ul>
+
+<p>
+
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 2.92.<br />On  4 Jul 2002, 16:36.</small>
+</body></html>
+CPS_END_NAMESPACE

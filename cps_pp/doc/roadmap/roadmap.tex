@@ -1,0 +1,149 @@
+#include<config.h>
+CPS_START_NAMESPACE
+%------------------------------------------------------------------
+% $Id: roadmap.tex,v 1.1.1.1 2003-06-22 13:34:49 mcneile Exp $
+%------------------------------------------------------------------
+%Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
+%
+% For best results, this latex file should be compiled using pdflatex.
+% However it will also compile under normal latex, if you prefer.
+%
+%------------------------------------------------------------------
+\documentclass[12pt]{article}
+
+% importing other useful packages:
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{tabularx}
+% color for the pdf links:
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.5}
+% for conditional latex source:
+\usepackage{ifthen}
+% pdftex specifications, these are only included if we are using pdflatex:
+\providecommand{\pdfoutput}{0}
+\ifthenelse{\pdfoutput = 0}{
+% Not PDF:
+\usepackage{html}
+\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+}{
+% PDF: hyperref for pdf with full linkages:
+\usepackage[
+pagebackref,
+hyperindex,
+hyperfigures,
+colorlinks,
+linkcolor=darkblue,
+citecolor=darkblue,
+pagecolor=darkblue,
+urlcolor=blue,
+%bookmarksopen,
+pdfpagemode=None,
+%=UseOutlines,
+pdfhighlight={/I},
+pdftitle={CPS: Development Roadmap. $Revision: 1.1.1.1 $ - $Date: 2003-06-22 13:34:49 $.},
+pdfauthor={A.N. Jackson \& S. Booth},
+plainpages=false
+]{hyperref}
+}
+
+% CVS tag shorthand:
+\newcommand{\ukqcdtag}[1]{{\small{UKQCD CVS Repository Tag: }{\bf{\tt{#1}}}}}
+
+% Code style commands:
+\newcommand{\cls}[1]{{\bf #1}}            % Classes
+\newcommand{\struct}[1]{{\bf #1}}         % Structs
+\newcommand{\cde}[1]{{\tt #1}}            % Code fragments
+
+% document style modifications:
+\setlength{\parskip}{2.0mm}
+\setlength{\parindent}{0mm}
+
+% Questionbox commands:
+\newcounter{quescount}
+\setcounter{quescount}{0}
+\newcommand{\quesbox}[2]{\begin{center}\refstepcounter{quescount}\fbox{\parbox{130mm}{
+\label{#1}{\bf Q. \arabic{quescount}:} #2} } \end{center} }
+
+
+% title information:
+\title{CPS: Code Development Progress \& Roadmap.}
+\author{A.N. Jackson \& S. Booth}
+\date{\mbox{\small $$Revision: 1.1.1.1 $$  $$Date: 2003-06-22 13:34:49 $$}}
+
+%------------------------------------------------------------------
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+%-------------------------------------------------------------------
+\section{Code development: Work Completed So Far}
+
+\subsection{4.0.0 Columbia [2001/06/15]}
+The original version of the code recieved by EPCC from Columbia.
+
+\ukqcdtag{phys\_4\_0\_0\_open}
+
+\subsection{4.1.0  UKQCD [2002/03/06]}
+ANSIfication, initial MPI SCU, type flexibility (float/double), basic qcdio
+support includuing the qload guage configuration loader.  Off-QCDSP
+compatability for the make structure and the regression testing.  Modified the
+test suite to streamline the required output.
+
+\ukqcdtag{phys\_4\_1\_0\_alpha\_open}
+
+\ukqcdtag{phys\_4\_1\_0\_beta\_open}
+
+\ukqcdtag{Root-of-Columbia4\_1\_1\_test}
+
+\subsection{4.1.0 Columbia [2002/01/21]}
+Integration of new physics components at Columbia.
+
+\ukqcdtag{Columbia4\_1\_1\_test-branch}
+
+\subsection{4.1.1 Assimilation [2002/03/11]}
+UKQCD \& Columbia 4.1.0 code merge.
+
+\ukqcdtag{Merged-from-Columbia4\_1\_1\_test}
+
+\subsection{4.1.2 UKQCD Gauge Configuration I/O [2002/05/31]}
+Added routines to load and save UKQCD-format gauge configurations into and out
+of the CPS.  Also the qcdio test program now creates dummy data and valudates
+the data recieved by the processor nodes, and well as producing output files
+that are bitwise-identical to the original data.
+
+\ukqcdtag{phys\_4\_1\_2}
+
+%-------------------------------------------------------------------
+\section{Code development: Work Outstanding}
+
+\subsection{4.2.0 Hypercube RNG}
+Assimilation of the hypercube RNG, with initial cross-platform testing complete.
+
+\subsection{New Code Structure}
+A unified build system, dealing with cross-platform portability and basic 
+cross-platform testing.
+
+\subsection{Testing}
+Ensure a sensible subset of the test programs can be run easily and
+automatically tested against expected results.
+
+\subsection{Assimilation of Brookhaven Code}
+Code modifications from Brookhaven.
+
+\subsection{QMP Compatability}
+Serial and parallel (SCU) implementations of the QMP.
+
+\subsection{OS Standardization}
+Ensuring that the code uses the QMP standard for the communications calls.
+
+
+
+%-------------------------------------------------------------------
+\end{document}
+CPS_END_NAMESPACE

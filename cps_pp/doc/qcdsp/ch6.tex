@@ -1,0 +1,499 @@
+#include<config.h>
+CPS_START_NAMESPACE
+\chapter{Compiling, Linking and Libraries}
+\section{Overview}
+Until now, we have been able to do all our compilation and linking
+with the default makefiles. In the last chapter I discussed that
+for QCDSP applications we may also need an idea of where free memory
+starts (where I mean free in the sense, that runtime dynamic memory 
+allocation shall not encroach upon it), so that we can use the 
+commands for parallel IO effectively. This information is given by
+the linker {\em map} file as discussed previously.
+
+I have mentioned briefly that our control of the stack and the heap 
+sizes is affected through the use of a {\em linker control file}. This 
+file is also important as it lets us define so called {\em overlays}
+which we need to be able to run subroutines in on chip RAM.
+
+\subsection{What this chapter does not do}
+However, {\bf this chapter is not intended to be a full Tartan C++ manual}.
+There is a perfectly good Tartan C++ Manual out there\footnote{This product is no longer supported by Texas Instruments but it may be ``borrowed'' from the 
+Columbia University Group} which explains everything in gory detail.
+
+Secondly {\bf this chapter is not documentation for the UNIX {\tt make}}
+system. There are hundreds (thousands) of other documents describing the 
+workings of {\tt make} available out there\footnote{One of my favourite books explaining all this stuff used to be Graham Glass published by Prentice--Hall. This is now in a second edition. I do not know how good the second edition is}.
+
+However we will explain the compiler flags used in the default makefiles, 
+and also mention a few other switches which might be useful. 
+
+\subsection{What this chapter does cover}
+Basically, we would like to cover the following areas in this chapter
+\begin{itemize}
+\item
+What tools are available
+\item
+What do these tools do
+\item
+What comprises your program.
+\item
+How to control linking via linker control files
+\item
+Where you can find exemplar files that you can hack.
+\end{itemize}
+
+\section{Tartan C++ Software Tools}
+The Tartan C++ Software suite includes a supposedly industry standard C++
+compiler (although its probably not compliant to the level of the latest 
+ANSI standard. Very few C++ compilers are) a linker and a set of object file
+utilities including an archiver for creating libraries. We now describe 
+some of these utilities in turn.
+
+\section{The C++ Compiler}
+The compilation and linking environment is controlled through the so
+called Tartan C++ Shell. However this is not an interactive shell in the 
+UNIX sense. Rather one should think about it as akin the standard {\tt cc} 
+command that in turn calls the preprocessor, the various compilation 
+stages and then finally the linker to link all the object files and libraries.
+
+The command name for invoking the Tartan C++ shell is {\tt tcpp}. Invoking
+the command with no arguments lists a help--screen giving all the command
+line options and flags. According to the manual, the standard invocation is
+\begin{center}
+{\tt tcpp} {\em options... } {\em filename... }
+\end{center}
+where
+\begin{itemize}
+\item
+{\em options...} is zero or more options defining the behaviour of the
+compilation and linking 
+\item
+{\em filename...} is on or more C or C++ source files, assembly source files, object files or library files.
+\end{itemize} 
+
+\subsection{File Suffices}
+Certain file suffixes are recognised by the shell. For example files
+with suffices {\tt .C} or {\tt .cpp} are treated as C++ files. Files
+with suffix {\tt .c} are assumed to be C source files. The full set
+of standard suffices are listed in figure \ref{f:SuffixTable}.
+\begin{figure}[ht]
+\begin{center}
+\leavevmode
+\hbox{
+\begin{tabular}{lll}
+\hline
+Extension & File Type & Input or Output \\
+\hline
+{\tt .cpp}, {\tt .C} & C++ Source file (.C recognised under UNIX only) & Input \\
+{\tt .c} & C Source file & Input \\
+{\tt .asm} & Assembly source file & Input and output \\
+{\tt .tof} & TOFF (Tartan) object file & Input and output \\
+{\tt .obj} & COFF (Texas Instruments) object file & Input \\
+{\tt .olb} & TOFF (Tartan) library file & Input \\
+{\tt .lib} & COFF (Texas Instruments) object file & Input \\
+{\tt .lcf} & Linker Control File & Input \\
+{\tt .ctl} & Object file list used with linker control file & Output \\
+{\tt .i}   & Preprocessed file & Output \\
+{\tt .map} & Linker map file & Output \\
+\hline
+\end{tabular}}
+\end{center}
+\caption{The conventional file suffixes for the Tartan Shell. Input
+or output refers to whether the files are input or output of the shell}
+\label{f:SuffixTable}
+\end{figure}
+
+\subsection{Some Common Flags}
+We now list a few flags commonly used by the shell.
+\begin{description}
+\item{\tt -c \ } Compile / assemble only. Input source files are compiled
+into TOFF {\tt .toff} object files
+\item{{\tt -fa} {\em file} \ } Treat {\em file} as an assembly source file
+\item{{\tt -fc} {\em file} \ } Treat {\em file} as a C source file
+\item{{\tt -fp} {\em file} \ } Treat {\em file} as a C++ source file
+\item{{\tt -fl} {\em file} \ } Treat {\em file} as a linker control file
+\item{{\tt -e } {\em file} \ } Produce executable named {\em file}. Analogue 
+of {\tt -o} flag on Standard UNIX compilers.
+\item{{\tt -d}{\em name=\[value\]}\ } Define preprocessor variable {\em name}.
+\item{{\tt -u}{\em name} \ } Undefine preprocessor variable {\em name}.
+\item{{\tt -i}{\em dir}\ } Include directory list {\em dir} in the default
+include path. A directory list is a colon (:) separated list of directories.
+Analogue of the {\tt -I} flag on standard UNIX compilers.
+\item{{\tt -lk}\ } All C files are assumed to be in K\&R style.
+\item{{\tt -lc}\ } All C++ files are assumed to be in {\tt cfront} mode.
+\item{{\tt -ln}\ } Normal mode. C and C++ files may contain Tartan's ``normal'' extensions to the ANSI/ISO standard (default).
+\item{{\tt -ka}\ } Keep assembly files.
+\item{{\tt -kc}\ } Keep local control file ({\tt .ctl}).
+\item{{\tt -ke}\ } Keep the compiler error file 
+\item{{\tt -kl}\ } Keep the compiler listing and cross reference file ({\tt .lst}).
+\item{{\tt -km}\ } Keep the linker map file.
+\item{{\tt -v30}\ } Generate code for TMS320C3x DSP processors (defaul). These are the ones we use.
+\item{{\tt -lxs} \ } I see this in the Makefile but can't find in manual.{\em Bob can you help out?}
+\item{{\tt -mb} \ } Use big memory model.
+\item{\tt -o0 \ } Use no optimisation.
+\item{\tt -o1 \ } Use low optimisation.
+\item{\tt -o \ } Optimise; space and time (memory and speed) optimisations
+are balanced (defaul).
+\item{\tt -os \ } Use space (memory) optimisation.
+\item{\tt -ot \ } Use time (speed) optimisation.
+\item{\tt -q \ } Be quiet; display the minimum amount of information.
+\end{description}
+
+\subsection{Sensible/Necessary Compiler Flags}
+We need to produce ({\tt .ctl}) files if we are to link. It is not unhelpful
+to keep these. We also definitely want a map file at the end of the day so 
+we need to set that. It is often useful to have the listing file ({\tt .lst})
+file around as well and we use the big memory model so a reasonable minimal
+set of compiler flags is ``{\tt -km -kc -kl -mb}''. 
+Hence I usually have the following Makefile macros and rules for compilation.
+\begin{verbatim}
+TCPP 	= tcpp
+TCPPFLAGS = -km -kc -kl -mb -q
+# Set this to your own include path 
+INCFLAGS  = -i.
+
+.SUFFIXES: .C .tof
+.C.tof:
+	$(TCPP) $(INCFLAGS) $(TCPPFLAGS) -c $<
+\end{verbatim}
+
+\section{QCDSP Runtime and IO Libraries}
+The QCDSP runtime library is called {\tt tcrt30bs.olb} and lives in the 
+directory {\tt/usr/local/tartan/v2.1/etc/qcdsp\_v5.3.3}. This program is usually automatically linked into your applications so you need not worry about it.
+
+The QCDSP I/O libraries (necessary if you want to go and use things like {\tt printf}) is called {\tt tcio30bs.olb}. {\bf This file is in the default link path
+but is not automatically linked at run time. You have to do it manually}. If you
+do not link this file you will not be able to do serial IO from your programs.
+This file is usually linked in by the default makefiles if you use those, but
+be aware that you have to link it by hand if you start building your
+own makefiles.
+
+\section{Converting TOFF to COFF}
+The Tartan C++ compiler in general produces code in the TOFF object format.
+However the QCDSP nodes prefer executables to be in the Texas Instruments
+COFF format. A utility {\tt t2c} is available to convert from one form to
+the other. The invocation syntax is:
+\begin{center}
+{\tt t2c} {\em TOFF file} {\em COFF file}
+\end{center}
+where the {\em TOFF} file is a Tartan object file, and the {\em COFF file}
+is the desired name of the executable. The filename convention is for executable
+files to have the {\tt .out} file suffix.
+
+\section{A typical Makefile}
+A typical makefile (named {\tt Makefile}) to produce an executable would start to look something like this:
+{\scriptsize
+\begin{verbatim}
+# Name of makefile so we can recompile if changed
+MAKEFILE = Makefile
+# The tartan C++ compiler
+TCPP	= tcpp
+# The minimal set of flags
+TCPPFLAGS = -km -kc -kl -mb -q
+# My custom include directories
+INCFLAGS  = -i .:./include
+# Base (Unsuffixed) name of the executable 
+EXEC_BASE = my_executable
+# My C++ Sources
+SRCS        = foo.C bar.C main.C
+# My Include dependencies
+INCLUDES    = foo.h bar.h
+# My object files: (all my .C files with suffix changed to .tof) 
+TOF_OBJS    = $(SRCS:.C=.tof)
+# My Custom libraries
+LIBS	    = mylib1.olb mylib2.olb
+# System IO library (Run time library is linked automaticaly)
+SYSLIBS     = tcio30bs.olb
+# Define suffixes
+.SUFFIXES: .C .tof
+
+# Build executable
+$(EXEC_BASE).out: $(MAKEFILE) $(INCLUDES) $(TOF_OBJS) $(LIBS) $(SYSLIBS)
+	$(TCPP) -e $(EXEC_BASE).outtof $(INCFLAGS) $(TCPPFLAGS) \
+	        $(SYSLIB) $(LIBS)
+	t2c $(EXEC_BASE).outtof $(EXEC_BASE).out
+
+# Default C++ to .tof compilation rule
+.C.tof:
+	$(TCPP) $(INCFLAGS) $(TCPPFLAGS) -c $<
+
+# Remove pesky intermediate files 
+clean:
+	rm -rf *.tof *.lst *.map core *.outtof *.ctl
+\end{verbatim}
+}
+
+\section{Linker Control Files}
+Linker Control files allow us to have fine tuning over how the linker
+links our numerous object files into an overall executable. Amongst 
+other things it lets us change the size of the stack and the heap, 
+and allows us to define overlays to use the on chip memory of a node
+(The so called CRAM).
+
+Before going further a word or two must be said about the linker. It
+treats your program as a series of modules, containing sections. A module
+from the linker point of view is an object file. A section can be 
+a defined data section, or a given function entry point. The linker
+contro file not only gives you power over the memory layout of the 
+program but also, you can individually select (should you so choose)
+which sections to use, not use etc.
+
+Perhaps the easiest way to explain a linker control file is to examine
+the default one. You can find it in {\tt /usr/local/tartan/v2.1/etc/qcdsp\_v5.3.3}. The actual file itself is called {\tt link.lcf}.
+
+I list it below:
+{\scriptsize
+\begin{verbatim}
+/*
+//
+// C and C++ Linker Control File
+// for the TI TMS320C30 Application Board
+// Startup Configuration
+//
+// Modified by RDM 9/8/96 for qcdsp.  Assume here that the
+// boot kernels have already been used to initialize the hardware,
+// including the NGA.
+//
+// Modified by RDM 10/9/97.
+// Changed banner to read version 5 
+//
+*/
+
+link  
+
+/*
+// Display Banner
+*/
+
+banner "Tartan Linker for QCDSP version 5.3.2, modified 1/11/99 by RDM";
+banner "Memory = 0x80000, stack = 0x1000, heap = 0x1000";
+
+/*
+// Options
+*/
+
+resolve sections;                       // optimize linking
+options romcopy;                        // init RAM variables from ROM
+
+/*
+// Configuration Constants
+*/
+
+define __STACK_SIZE     = 0x1000;       // 1K stack
+
+define __SYSMEM_SIZE    = 0x1000;       // 1K heap
+
+// These constants define bus control register values loaded at startup
+define tc_PBCR_startup  = 0xF00;        // primary bus control value
+// define tc_EBCR_startup       = 0x0;          // expansion bus control value
+
+// These constants define ST, IE registers during initialization
+define tc_ST_startup    = 0x2800;       // status register
+define tc_IE_init       = 0x7FFF;       // interrupt mask
+
+/*
+// System Configuration
+*/
+
+define TDB_BREAKPOINT   = 0x66000000;   // breakpoint for Tartan debugger
+
+control "*.ctl";                        // list of obj/lib files to link
+                                        // *.ctl file built by Tartan shell
+
+list "*.map";                           // default extension for link maps
+
+space .stack, __STACK_SIZE;             // declare memory for program stack
+space .sysmem, __SYSMEM_SIZE;           // declare memory for program heap
+
+/*
+// Explicit Modules
+*/
+
+use module = qcdsp_tcroot;              // general startup code
+use module = tcrpc;                     // needed for Tartan debugger
+use section = .cinit nowarn;            // link in .cinit tables
+
+use kind = debug;                       // include debug information
+use kind = dstring;                     // include debug strings
+use kind = linenumber;                  // include debug line mapping
+/*
+// Define Memory Layout
+*/
+
+memory (
+        limit = 0x80000;                //
+        avoid = 0x0, 0x1000;            // 0x1000 - 0x7FFFF
+);
+ 
+/*
+// Define Program Layout
+*/
+
+allocate ".bss" kind = data image (
+                origin = 0x1000 kind=data
+        );
+
+allocate ".data" kind = constant image (
+                kind=constant
+        );
+
+allocate ".text" kind = code image   (
+                kind = code 
+        );
+
+/*
+// Debug Directives
+//
+// These commands are for debugger symbol information, and do
+// not affect the size or location of the program
+*/
+
+allocate debug_directives image kind = debug
+        (origin = 0 kind = debug);
+
+allocate debug_strings image kind = dstring
+        (origin = 0 kind = dstring);
+
+allocate debug_strings image kind = dstring
+        (origin = 0 kind = dstring);
+
+allocate debug_source_location image kind = linenumber
+        (origin = 0 kind = linenumber);
+
+end link;
+\end{verbatim}
+}
+You can see that the LCF has a C like command syntax. This file begins
+with a bunch of comments. The banner instructions are displayed on screen
+at link time so as to supply you with information about what is going on.
+
+After the banner section you come to the options section. The first command
+there {\tt resolve sections} is an instruction to the linker that it
+should try to optimize the link by missing out (eliminating) sections
+that have not been referenced. The {\tt options romcopy} command indicates
+a particular way of initialising constants. I tend to leave these two well
+alone.
+
+Next comes the configuration section where we can set the stack and heap
+sizes. These are done through defining system labels {\tt \_\_STACK\_SIZE}
+for the stack and {\tt \_\_SYSMEM\_SIZE} for the heap. You can see that
+the default link file specifies a measly 1K for stack and 1K for heap.
+In the Columbia physics system {\_\_STACK\_SIZE} is usually set to 0x010000
+(64K) and {\_\_SYSMEM\_SIZE} is usually set to 0x030000 (192K).
+The following symbol definitions deal with breakpoints and interrupts and 
+are probably best left alone. 
+
+Then follow two commands {\tt control "*.ctl"} and {\tt list "*.map"}.
+The first of these has been built by the compiler during the compilation
+process. It contains statements like {\tt "WITH xxxxxx"} where
+the {\tt xxxxx} refers to section names. By specifying that the control should
+come from all the {\tt .ctl} files, I as a user don't have to type {\tt "WITH xxxx} manually for each section I want linked into the file. Instead all the 
+referenced sections will be automatically linked for me. The {\tt list} 
+command merely specifies that the default extention for output map files
+is {\tt .map}.
+
+Following these statements come the commands that reserve space
+for the stack and the heap. These are {\tt space .stack, \_\_STACK\_SIZE}
+and {\tt space .sysmem, \_\_SYSMEM\_SIZE}. They create two sections named
+{\tt .stack} and {\tt .sysmem} and these will each have the requisite number
+of words reserved for them.
+
+After this are a couple of {\tt use} statements. These include entire modules
+that are I presume part of the run time environment. All this is best left
+alone.
+
+The command 
+\begin{verbatim}
+memory (
+        limit = 0x80000;                //
+        avoid = 0x0, 0x1000;            // 0x1000 - 0x7FFFF
+);
+\end{verbatim}
+defines the virtual address space. This happens to be the same as the
+physical address space except when you deal with overlays -- see next chapter.
+The statement is that we have a limite of 0x080000 words which sets the 
+upper limit of memory to 0x07FFFF. The second line states that we must
+avoid locating code between 0x000000 and 0x001000 which is the lower 1K
+of the memory.
+
+Thereafter we define the layout of the program using allocate statements.
+Here only the standard sections were allocated, namely the BSS area 
+the constant data area and area for the program text. The total allocation
+will include the stack and the heap as well. The first {\tt allocate} command
+specifies an explicit origin, so that the BSS will start
+at 0x001000,. The other sections will follow it in memory. Note that
+each allocated section also has a kind value specifying whether it 
+holds data, constant data or code.
+
+This control file also contains some allocate statements to do with 
+debugging, before it is finished off with the final command
+{\tt END LINK;}.
+
+\subsection{Linking With a Linker Control file}
+To link with a particular linker control file add it to the {\tt tcpp} 
+command with the {\tt -fl} flag. A Makefile that uses a linker control
+file might look something like this:
+{\scriptsize
+\begin{verbatim}
+# Name of makefile so we can recompile if changed
+MAKEFILE = Makefile
+# The tartan C++ compiler
+TCPP	= tcpp
+# The minimal set of flags
+TCPPFLAGS = -km -kc -kl -mb -q
+# My custom include directories
+INCFLAGS  = -i .:./include
+# Base (Unsuffixed) name of the executable 
+EXEC_BASE = my_executable
+# My C++ Sources
+SRCS        = foo.C bar.C main.C
+# My Include dependencies
+INCLUDES    = foo.h bar.h
+# My object files: (all my .C files with suffix changed to .tof) 
+TOF_OBJS    = $(SRCS:.C=.tof)
+# My Custom libraries
+LIBS	    = mylib1.olb mylib2.olb
+# System IO library (Run time library is linked automaticaly)
+SYSLIBS     = tcio30bs.olb
+# Set up the flags to specify a linker control file
+LINK_CONTROL= -fl mylink.lcf
+# Define suffixes
+.SUFFIXES: .C .tof
+
+# Build executable
+$(EXEC_BASE).out: $(MAKEFILE) $(INCLUDES) $(TOF_OBJS) $(LIBS) $(SYSLIBS)
+	$(TCPP) -e $(EXEC_BASE).outtof $(INCFLAGS) $(TCPPFLAGS) \
+	        $(SYSLIB) $(LIBS) $(LINK_CONTROL)
+	t2c $(EXEC_BASE).outtof $(EXEC_BASE).out
+
+# Default C++ to .tof compilation rule
+.C.tof:
+	$(TCPP) $(INCFLAGS) $(TCPPFLAGS) -c $<
+
+# Remove pesky intermediate files 
+clean:
+	rm -rf *.tof *.lst *.map core *.outtof *.ctl
+\end{verbatim}}
+
+\section{The Tartan Archiver}
+The Tartan software suite comes with an archiver/librarian called {\tt olib},
+which is the analogue of the UNIX {\tt ar} command. It can be invoked without
+any arguments in which case it will present a list of its command line
+options. Otherwise the syntax is similar to the {\tt ar} command:
+\begin{center}
+{\tt olib <options> <library file> <files>}
+\end{center}
+
+For example the command
+\begin{verbatim}
+olib -create foo.olb foo1.tof foo2.tof foo3.tof
+\end{verbatim}
+will create the library file {\tt foo.olb} containing the modules
+in {\tt foo1.tof} {\tt foo2.tof} and {\tt foo3.tof}.
+
+\section{Summary}
+In this short chapter we have given some of the more important compiler
+flags for the tartan C++ compiler and explained meanings of the basic 
+default Linker Control file. We also pointed out how this file could
+be changed to change the stack and heap sizes used by a given user program.
+CPS_END_NAMESPACE

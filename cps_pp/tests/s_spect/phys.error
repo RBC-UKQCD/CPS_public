@@ -1,0 +1,5 @@
+#include<config.h>
+CPS_START_NAMESPACE
+Error in GlobalJobParameter::Initialize() :
+	Illegal machine partition, Y_physical_nodes = 1, Y_partition_nodes = 2
+CPS_END_NAMESPACE

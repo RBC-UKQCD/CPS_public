@@ -1,0 +1,870 @@
+#include<config.h>
+CPS_START_NAMESPACE
+Lattice::Lattice() :Reset random number generator with seed = 112319
+Lattice::Lattice() :
+	Disordered starting configuration
+Lattice::Lattice() :
+	Memory starting configuration addr = 76580
+Lattice::Convert(StrOrdType) :
+	No conversion necessary from 0 to 0
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 51.000000
+AlgHmcPhi::run() :
+	No Metropolis step -> Accepted
+AlgHmcPhi::run() :
+	Hmc steps = 52, Delta_hamilton = -2.276789e-02, accept = 1, dev = 3.425135e-16, max_diff = 1.554312e-15
+AlgHmcPhi::run() :
+	CG iterations: average = 0.000000e+00, min = 0, max = 0
+AlgHmcPhi::run() :
+	True Residual / |source|: average = 0.000000e+00, min = 0.000000e+00, max = 0.000000e+00
+AlgHmcPhi::run() :
+	Configuration number = 1
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+Lattice::Lattice() :
+	Memory starting configuration addr = 76580
+Lattice::Convert(StrOrdType) :
+	No conversion necessary from 0 to 0
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 51.000000
+AlgHmcPhi::run() :
+	Metropolis step -> Accepted
+AlgHmcPhi::run() :
+	Hmc steps = 52, Delta_hamilton = -1.392980e-02, accept = 1, dev = 3.251405e-16, max_diff = -1.831868e-15
+AlgHmcPhi::run() :
+	CG iterations: average = 0.000000e+00, min = 0, max = 0
+AlgHmcPhi::run() :
+	True Residual / |source|: average = 1.000000e+00, min = 1.000000e+00, max = 1.000000e+00
+AlgHmcPhi::run() :
+	Configuration number = 2
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+Lattice::Lattice() :
+	Memory starting configuration addr = 76580
+Lattice::Convert(StrOrdType) :
+	No conversion necessary from 0 to 0
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 51.000000
+AlgHmcPhi::run() :
+	Metropolis step -> Accepted
+AlgHmcPhi::run() :
+	Hmc steps = 52, Delta_hamilton = -2.326356e-04, accept = 1, dev = 3.125006e-16, max_diff = -1.443290e-15
+AlgHmcPhi::run() :
+	CG iterations: average = 0.000000e+00, min = 0, max = 0
+AlgHmcPhi::run() :
+	True Residual / |source|: average = 1.000000e+00, min = 1.000000e+00, max = 1.000000e+00
+AlgHmcPhi::run() :
+	Configuration number = 3
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+Lattice::Lattice() :
+	Memory starting configuration addr = 76580
+Lattice::Convert(StrOrdType) :
+	No conversion necessary from 0 to 0
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 0
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =1.254592e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 4.576929e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 2.393086e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 3.575490e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.016558e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 3.206465e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 6.771514e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.325793e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 2.825460e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 7.130436e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.643289e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 3.748803e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 9.607866e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.925010e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 3.518543e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 6.268154e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 1.034156e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 2.022489e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 4.262318e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 7.732625e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 1.415183e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 2.842798e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 7.657567e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 2.677174e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 5.463118e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 8.643914e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 1.355277e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 2.213731e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 4.377127e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 1.211921e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 2.502959e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 4.239093e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 6.534143e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 1.252184e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 2.723475e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 5.319975e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 7.992809e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 7.981645e-13, iter = 36
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 480000
+	Exiting
+Lattice::Lattice() :
+	Memory starting configuration addr = 76580
+Lattice::Convert(StrOrdType) :
+	No conversion necessary from 0 to 0
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 490000
+	Just enetered
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =1.355543e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 5.418531e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.120908e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 4.328296e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.143793e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 3.556210e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.089902e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 2.835886e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 6.385563e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.541202e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 4.505020e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.301077e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 3.314699e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 7.008404e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 1.711376e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 4.642410e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 8.569843e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 1.745871e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 3.661556e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 8.193825e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 1.931437e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 4.105591e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 9.717379e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 3.173222e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 1.188545e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 2.777844e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 5.070635e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 1.028727e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 2.518776e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 7.444209e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 1.965842e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 4.097570e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 6.315974e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 1.400141e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 3.536948e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 7.654973e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 1.538703e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 2.939318e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 4.093229e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 5.357754e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 6.286662e-13, iter = 39
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fdwf::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 1170000
+	Exiting
+CPS_END_NAMESPACE

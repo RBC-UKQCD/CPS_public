@@ -1,0 +1,317 @@
+#include<config.h>
+CPS_START_NAMESPACE
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: mcneile $
+//  $Date: 2003-06-22 13:34:45 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Id: alg_eig.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.5  2002/12/04 17:16:27  zs
+//  Merged the new 2^4 RNG into the code.
+//  This new RNG is implemented in the LatRanGen class.
+//  The following algorithm and utility classes are affected:
+//
+//  AlgEig                  Fdwf
+//  AlgGheatBath            Fstag
+//  AlgHmd                  GlobalJobParameter
+//  AlgNoise                Lattice
+//  AlgPbp                  Matrix
+//  AlgThreept              RandomGenerator
+//                          Vector
+//
+//  Revision 1.4  2001/08/16 10:49:38  anj
+//  The float->Float changes in the previous version were unworkable on QCDSP.
+//  To allow type-flexibility, all references to "float" have been
+//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
+//  (where Float=rfloat), and on all other machines allows the use of
+//  double or float in all cases (i.e. for both Float and IFloat).  The I
+//  stands for Internal, as in "for internal use only". Anj
+//
+//  Revision 1.2  2001/06/19 18:11:21  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:15:59  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
+//  $RCSfile: alg_eig.C,v $
+//  $Revision: 1.1.1.1 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
+//------------------------------------------------------------------
+//
+// alg_eig.C
+//
+// AlgEig is derived from Alg and is relevant to the 
+// Ritz eigenvector finder. The type of fermion is
+// determined by the argument to the constructor.
+//
+//------------------------------------------------------------------
+
+CPS_END_NAMESPACE
+#include <stdlib.h>	// exit()
+#include <stdio.h>
+#include <math.h>
+#include<alg/alg_eig.h>
+#include<alg/common_arg.h>
+#include<alg/eig_arg.h>
+#include<util/lattice.h>
+#include<util/gjp.h>
+#include<util/smalloc.h>
+#include<util/vector.h>
+#include<util/verbose.h>
+#include<util/error.h>
+CPS_START_NAMESPACE
+
+
+//------------------------------------------------------------------
+// Constructor 
+//------------------------------------------------------------------
+AlgEig::AlgEig(Lattice& latt, 
+	       CommonArg *c_arg,
+	       EigArg *arg) : 
+	       Alg(latt, c_arg) 
+{
+  cname = "AlgEig";
+  char *fname = "AlgEig(L&,CommonArg*,EigArg*)";
+  VRB.Func(cname,fname);
+
+  // Initialize the argument pointer
+  //----------------------------------------------------------------
+  if(arg == 0)
+    ERR.Pointer(cname,fname, "arg");
+  alg_eig_arg = arg;
+
+  // Determine the number of checkerboards
+  switch(alg_eig_arg->RitzMatOper)
+  {
+  case MAT_HERM:
+  case MATDAG_MAT:
+  case NEG_MATDAG_MAT:
+    Ncb = 2;
+    break;
+
+  case MATPC_HERM:
+  case MATPCDAG_MATPC:
+    Ncb = 1;
+    break;
+
+  default:
+    ERR.General(cname,fname,"RitzMatOper %d not implemented",
+		alg_eig_arg->RitzMatOper);
+  }
+
+  // Set the node size of the full (non-checkerboarded) fermion field
+  // NOTE: at this point we must know on what lattice size the operator 
+  // will act.
+  //----------------------------------------------------------------
+  int f_size = GJP.VolNodeSites() * latt.FsiteSize() * Ncb / 2;
+  int N_eig = alg_eig_arg->N_eig;
+
+  // Allocate memory for the eigenvectors and eigenvalues
+  //----------------------------------------------------------------
+  eigenv = (Vector **) smalloc(N_eig * sizeof(Vector *));
+  if(eigenv == 0)
+    ERR.Pointer(cname,fname, "eigenv");
+  VRB.Smalloc(cname,fname, "eigenv", eigenv, N_eig * sizeof(Vector *));
+  
+  for(int n = 0; n < N_eig; ++n)
+  {
+    eigenv[n] = (Vector *) smalloc(f_size * sizeof(Float));
+    if(eigenv[n] == 0)
+      ERR.Pointer(cname,fname, "eigenv[n]");
+    VRB.Smalloc(cname,fname, "eigenv[n]", eigenv[n], f_size * sizeof(Float));
+  }
+
+  lambda = (Float *) smalloc(N_eig * sizeof(Float));
+  if(lambda == 0)
+    ERR.Pointer(cname,fname, "lambda");
+  VRB.Smalloc(cname,fname, "lambda", lambda, N_eig * sizeof(Float));
+
+  chirality = (Float *) smalloc(N_eig * sizeof(Float));
+  if(chirality == 0)
+    ERR.Pointer(cname,fname, "chirality");
+  VRB.Smalloc(cname,fname, "chirality", chirality, N_eig * sizeof(Float));
+
+  valid_eig = (int *) smalloc(N_eig * sizeof(int));
+  if(valid_eig == 0)
+    ERR.Pointer(cname,fname, "valid_eig");
+  VRB.Smalloc(cname,fname, "valid_eig", valid_eig, N_eig * sizeof(int));
+
+  // Print out input parameters
+  //----------------------------------------------------------------
+  VRB.Input(cname,fname,
+	    "N_eig = %d\n",int(N_eig));
+  VRB.Input(cname,fname,
+	    "MaxCG = %d\n",alg_eig_arg->MaxCG);
+  VRB.Input(cname,fname,
+	    "Mass_init = %g\n",IFloat(alg_eig_arg->Mass_init));
+  VRB.Input(cname,fname,
+	    "Mass_final = %g\n",IFloat(alg_eig_arg->Mass_final));
+  VRB.Input(cname,fname,
+	    "Mass_step = %g\n",IFloat(alg_eig_arg->Mass_step));
+
+  //???
+}
+
+
+//------------------------------------------------------------------
+// Destructor
+//------------------------------------------------------------------
+AlgEig::~AlgEig() {
+  char *fname = "~AlgEig()";
+  VRB.Func(cname,fname);
+
+  // Free memory
+  //----------------------------------------------------------------
+  VRB.Sfree(cname,fname, "valid_eig", valid_eig);
+  sfree(lambda);
+
+  VRB.Sfree(cname,fname, "chirality", chirality);
+  sfree(chirality);
+
+  VRB.Sfree(cname,fname, "lambda", lambda);
+  sfree(lambda);
+
+  for(int n = alg_eig_arg->N_eig - 1; n >= 0; --n)
+  {
+    VRB.Sfree(cname,fname, "eigenv[n] ",eigenv[n]);
+    sfree(eigenv[n]);
+  }
+
+  VRB.Sfree(cname,fname, "eigenv", eigenv);
+  sfree(eigenv);
+
+  //???
+}
+
+
+//------------------------------------------------------------------
+//
+//------------------------------------------------------------------
+void AlgEig::run()
+{
+  int iter;
+  EigArg *eig_arg;
+  char *fname = "run()";
+  VRB.Func(cname,fname);
+
+  // Set the Lattice pointer eig_arg
+  //----------------------------------------------------------------
+  Lattice& lat = AlgLattice();
+  eig_arg = alg_eig_arg;
+  Float **hsum;
+  int N_eig = eig_arg->N_eig;
+  int f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
+  int hsum_len = 0;
+
+  if (eig_arg->print_hsum)
+  {
+    switch(eig_arg->hsum_dir)
+    {
+    case 0:
+      hsum_len = GJP.Xnodes()*GJP.XnodeSites();
+      break;
+    case 1:
+      hsum_len = GJP.Ynodes()*GJP.YnodeSites();
+      break;
+    case 2:
+      hsum_len = GJP.Znodes()*GJP.ZnodeSites();
+      break;
+    case 3:
+      hsum_len = GJP.Tnodes()*GJP.TnodeSites();
+      break;
+    case 4:
+      if (lat.Fclass() == F_CLASS_DWF) 
+        hsum_len = GJP.Snodes()*GJP.SnodeSites();
+      else
+        ERR.General(cname,fname,"Invalid direction\n");
+      break;
+     default:
+      ERR.General(cname,fname,"Invalid direction\n");
+    }
+
+    hsum = (Float **) smalloc(N_eig * sizeof(Float));
+    if(hsum == 0)
+      ERR.Pointer(cname,fname, "hsum");
+    VRB.Smalloc(cname,fname, "hsum", hsum, N_eig * sizeof(Float));
+  
+    for(int n = 0; n < N_eig; ++n)
+    {
+      hsum[n] = (Float *) smalloc(hsum_len * sizeof(Float));
+      if(hsum[n] == 0)
+	ERR.Pointer(cname,fname, "hsum[n]");
+      VRB.Smalloc(cname,fname, "hsum[n]", hsum[n], hsum_len*sizeof(Float));
+    }
+  }
+  else
+  {
+    hsum = (Float **) 0;
+  }
+
+  // Initialize eigenvectors to gaussian
+  // and compute eigenvectors
+  //----------------------------------------------------------------
+  for(int n = 0; n < eig_arg->N_eig; ++n)
+    lat.RandGaussVector(eigenv[n], 0.5, Ncb);
+  
+  // Loop over mass values
+  int sign_dm = (eig_arg->Mass_step < 0.0) ? -1 : 1;
+  if (sign_dm*eig_arg->Mass_init > sign_dm*eig_arg->Mass_final)
+    ERR.General(cname,fname,"initial and final mass not valid\n");
+
+  for(Float mass = eig_arg->Mass_init; 
+      sign_dm*mass <= sign_dm*eig_arg->Mass_final;
+      mass += eig_arg->Mass_step)
+  {
+    eig_arg->mass = mass;
+
+    // Solve for eigenvectors and eigenvalues.
+    // Use eigenv as initial guess. Lambda is not used initially.
+    iter = lat.FeigSolv(eigenv, lambda, chirality, valid_eig, 
+			hsum, eig_arg, CNV_FRM_YES);
+
+    // Print out number of iterations and eigs
+    //----------------------------------------------------------------
+    if(common_arg->results != 0)
+    {
+      FILE *fp;
+      if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+	ERR.FileA(cname,fname, (char *)common_arg->results);
+      }
+
+      fprintf(fp, "mass = %g\n", (IFloat)(eig_arg->mass));
+      fprintf(fp, "  iter = %d\n", iter);
+      for(int n = 0; n < eig_arg->N_eig; ++n)
+      {
+	fprintf(fp, "  lambda[%d] = %g  chirality = %g  valid = %d\n", 
+		n, (IFloat)lambda[n], (IFloat)chirality[n], valid_eig[n]);
+      }
+      
+      if (eig_arg->print_hsum)
+      {
+	for(int n = 0; n < eig_arg->N_eig; ++n)
+	  for(int i = 0; i < hsum_len; ++i)
+	    fprintf(fp, "  hsum[%d][%d] = %g\n",n,i,(IFloat)hsum[n][i]);
+      }
+      
+      fclose(fp);
+    }
+  }
+
+}
+CPS_END_NAMESPACE

@@ -1,0 +1,1750 @@
+#include<config.h>
+CPS_START_NAMESPACE
+\chapter{I/O on the QCDSP}
+\section{Introduction}
+In this chapter we discuss the facilities afforded by QCDSP to perform
+input and output (I/O). We consider three aspects: parallel I/O. 
+Serial File I/O and I/O to the terminal screen during job runtime.
+
+\section{Parallel I/O}
+The QCDSP is a massively parallel supercomputer. Hence there is a high
+likelihood (in the case of Lattice QCD it is virtually a certainty) that data
+is in some way distributed amongst the numerous QCDSP nodes. The question
+then is, how to collect data from the nodes of the QCDSP so that it 
+can be written to disk, or alternatively, how to get data from a disk
+onto the nodes of QCDSP.
+
+A complication is that on the QCDSP only one processor, to which we
+shall refer hereafter as the root node (Motherboard 0, Daughterboard 0,
+Unique ID=0) is allowed to actually perform I/O onto a disk on the
+host computer. The other nodes can output to what in a UNIX system
+would be the {\em standard output} stream. This however is merely a
+storage buffer on the memory of the node in question, that has to be
+retrieved later using the {\bf qprintf} command (as discussed in
+section one).  In fact only node 0 can write to the output stream
+during run time in a way that it is echoed on the screen of a user or
+can be redirected into a file.  The QOS has no concept of other
+streams such as the UNIX {\em standard input} and {\em standard
+error}. On the other hand the {\bf qrun} command does allow the
+passing of {\em command line arguments} to executing programs as will
+be demonstrated later.
+
+Hence, one would think that the best way to read a serial file and
+distribute its data amongst processors is for the root node to read
+the data and perform various scatter operations to distribute the
+data.  Alternatively, saving of data could be done by the root
+processor gathering data from the other processors and then writing it
+out to disk. This is all very well, as long as the root processor can
+hold the whole overall dataset in memory. However, a the amount of
+DRAM memory on a single node is quite small, a mere
+0.5Mwords\footnote{The wordsize of the DSP is 32bits. The physical
+size of a word in DRAM is 40bits of which 8 are reserved for error
+correction. Hence 0.5Mwords corresponds to 2Mb of useable
+memory. However since everything is word size for the DSP from
+characters to floating point numbers it makes more sense to discuss
+memory in terms of words than bytes.}. Of this the run time operating
+system occupies 128Kwords leaving a mere 384Kwords to the user. This
+has to include the user code as well as the user data. Hence one
+would be reduced to communicating the data from the nodes to the root node, at 
+a rate of one pair of processors at a time. Since the QCDSP has no general
+point to point communication routines, this process would have to be implemented
+using the usual nearest neighbour communications.
+
+Another alternative would be to use a parallel file system. There is 
+such a system currently under development for the QCDSP, however it
+is not yet an integral part of the QOS, and hence it shall not be 
+discussed any further here. 
+
+The question then remains: How can parallel data be loaded and
+distributed in a straightforward manner on the QCDSP, and how can the
+data be saved from amongst all the processors into one file. On the
+QCDSP this is done via the {\bf qread} and {\bf qload} commands using
+objects called Node Tagged Tiles (NTFs). An NTF is a single serial
+file written in ASCII (can we do binary Bob?) that contains the
+relevant data from all the nodes of the QCDSP. Preceeding the data
+from a given node is a tag identifying the node which is to host the
+data. We will discuss their detailed. One can then develop
+workstation tools to convert between these NTFs and regular serial
+files. For those readers who intend to load and save lattices to and
+from the Columbia Physics environment (stored in the Gauge Connection
+Archive Format\footnote{See the Gauge Connection Web site {\tt http://qcd.nersc.gov}}) QOS provides the more specialised commands: {\bf
+qload\_lattice} and {\bf qunload\_lattice}. 
+
+\section{Parallel I/O with NTFs, qread and qload}
+When a QCDSP program exits and the QOS returns control to the front end,
+the memory space of the program prior to exit is left untouched. The 
+{\bf qread} and {\bf qunload\_lattice} routines access this memory directly
+and dump a user specified number of data blocks from a 
+user specified memory address to a file. The {\bf qread} command can 
+dump either to a screen or to a NTF. Its output is always in ASCII
+format. The {\bf qunload\_gauge} command writes directly to a file
+in the Gauge Connection Archiver format.
+
+The {\bf qload} command can be used to place data into processor
+memory prior to execution. It works in two ways:
+\begin{itemize}
+\item
+One can specify a memory address and the value to be placed there
+as command line arguments to {\bf qload}. The {\bf qload} command will
+then place the given value into the given memory address. The user program
+can then be run. It can be passed the address of the data and the number
+of data blocks as command line parameters. Once running the code can set
+a pointer to the given address and copy the relevant data to some 
+of its own memory.
+\item
+The qload command can be given the name of an NTF. The NTF contains
+the starting address and the number of blocks for the data,as well as the
+data itself, for each processor.
+The program can access the data by setting a pointer to the  address.
+which can be passed as a command line argument.
+\end{itemize}
+
+The {\bf qload\_lattice} command works similarly to the {\bf qload}
+command. However the gauge connection format lattice file is not node tagged. 
+The user passes the address where the first lattice site is to be placed
+on each processor, and the name of the lattice file to the {\bf qload\_lattice}
+command. The lattice sites are then placed into processor memory. A 
+lattice object can then be instantiated giving the address of the first
+lattice element to the lattice object constructor.
+
+Of course in both the above cases dealing with {\bf qload}, the data
+may be copied directly into the program data area. This can be made to
+be safe, as the linker produces resolved code. This means that the
+code produced by the linker will not be relocated afterwards at the
+start of execution. Hence one can print out the address of a declared
+array in the program, safe in the knowledge that the next time the
+program will run, the array will have the same address. {\bf WARNING:
+This behaviour is peculiar to the QCDSP.} Furthermore one can glean
+information about the addresses of symbols after the compilation and
+linking by looking through the linker map file. We shall discuss this
+in more detail in the next chapter.
+
+Before describing the details of the NTFs, and giving examples of using
+the {\bf qload} and {\bf qread} lattices we should say a few words about
+the organisation of memory on each node of the QCDSP. Even before that
+here is possibly our most severe {\bf WARNING: The command {\bf qload}
+can (and will) if incorrectly used, overwrite memory used by  the QOS 
+operating system. This can have UNPREDICTABLE results ranging from no
+effect, through subtle bugs, to system crashes. Be careful with it!!!}.
+
+\subsection{The DSP memory Map Part 1}
+The complete memory map of the DSP is quite complicated. In this section
+we shall just describe a small part of it, that pertains to compiling
+and running programs. 
+
+The memory addresses on a single QCDSP node can range from 000000 to 
+FFFFFF (remember your hexadecimal numbers?). This space however is 
+not all memory and some of it is not accessible. In particular 
+the 0.5Mwords of DRAM are mapped between addresses 001000
+to 07FFFF. The addresses from 000000 to 001000 are not accessible by 
+the DSP in the mode it is used. Memory addresses 080000 and upwards
+are special. They either contain views of the data in real memory
+(ie that between 000000 and 07FFFF) for use by other hardware such
+as the circular buffer, or they contain the memory mapped
+images of the DSP internal memory and control registers. We may
+deal with some of these latter in the chapter on optimisation.
+
+The run time operating system starts at 060000 and can stretch
+until 07FFFF. Consequently {\bf only the memory area from address
+001000 to 05FFFF (inclusive) is available for user programs.}
+
+This rough sketch of the memory map is illustrated in figure 
+\ref{f:MMap1}.
+
+\begin{figure}[h]
+\begin{center}
+\leavevmode
+\hbox{
+\begin{tabular}{|c|l|} 
+\hline 
+{\bf Address Range} & {\bf Function } \\
+\hline
+D00000 -- FFFFFF & \begin{tabular}{l} Used on node 0. Unused elsewhere. Generally reading \\ from or writing to here will cause the DSP to hang \end{tabular} \\
+\hline 
+880000 -- CFFFFF & \begin{tabular}{l} Various images of the 0.5Mwords of DRAM between \\  000000 -- 07FFFF for use of the circular buffer \end{tabular}  \\ 
+\hline
+820000 -- 87FFFF & Not used \\
+\hline 
+810000 -- 81FFFF & Addresses of registers for controlling the NGA \\
+\hline
+800000 -- 80FFFF & Inernal DSP Memory and control register area \\
+\hline 
+080000 -- 7FFFFF & \begin{tabular}{l} Images of 0.5Mwords of DRAM between 000000 -- 07FFFF \\  for use of the circular buffer \end{tabular} \\
+\hline 
+{\bf 060000 -- 07FFFF} & {\bf 128Kwords of DRAM reserved for Operating system} \\
+\hline
+{\bf 001000 -- 05FFFF} & {\bf 384Kwords of DRAM for User programs} \\
+\hline
+ 000000 -- 000FFF & Inaccessible \\ \hline 
+\end{tabular}}
+\end{center}
+\caption{Memory Map of a DSP node. The Memory is word addressed.}
+\label{f:MMap1}
+\end{figure}
+
+\subsection{Program Images} 
+If you have been using the default Makefiles you should find that 
+usually a file is produced with the {\bf .map} suffix alongside your
+executable. In the case of the ``Hello Wold'' program this file would
+be called something like {\tt hello\_world.out}. (The default makefile
+always names output files after the directory in which the source files live).
+
+The map file is quite useful as it tells you about how much memory 
+your program has allocated statically during compilation, allowing you
+to figure out how much space you have to {\em qload} your NTF into. 
+
+Your program, as far as the linker is concerned consists of 6 parts 
+of which 3 are negligible. The important three parts go by the names of
+{\em data segment}, {\em binary stack segment (BSS)} and the {\em text segment}.
+The unimportant parts are there mostly to supply information to debugging tools.
+In the case of the Tartan Linker these are called the {\em debug directives} 
+segment, the {\em debug strings} segment and the {\em debug source location}
+segment. You need not care about these right now. Unless you switch on the
+option on the compiler to produce debugging information, these latter three
+segments will be empty.
+
+The BSS contains amongst other things your runtime stack, on 
+which C++ allocates automatic variables. The data segment is used
+to hold various constant data items and the text segment holds the
+actual machine level instructions of your program. Any free memory outside
+these segments is unallocated and should be placed onto the heap when your
+program starts running so that you can allocate memory from it dynamically.
+
+The map file tells you about how your program is laid out in memory.
+It starts off by telling you how much space is allocated to the various
+segments. For example here are some excerpts from my {\bf hello\_world.map}
+file
+
+{\small
+\begin{verbatim}
+Tartan Linker, SPARC/C40, v5.1.0        4/4/100 13:33:37                Page   1
+Copyright (c) 1986-1992 by Tartan, Inc., All Rights Reserved
+
+
+Allocation to Output Section ".bss" in module *unnamed* in file
+"/homeqs0/bj/hello_world/hello_world.outtof"
+
+  Offset   Length               Input Section
+
+    1000      162       "TL.Init" in module "main" in file
+                        "/homeqs0/bj/hello_world/main.tof"
+    1162        1       ".bss" in module "qcdsp_tcroot" in file
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/tcrt30bs.olb"
+    1163       21       "OWN" in module "inifin" in file
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/tcrt30bs.olb"
+    1184     1000       ".stack" in file
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/link.lcf"
+
+  Total Allocation = 1184 (hex)
+
+Allocation to Output Section ".data" in module *unnamed* in file
+"/homeqs0/bj/hello_world/hello_world.outtof"
+  Offset   Length               Input Section
+
+    2184        D       "DEFALT" in module "qcdsp_tcroot" in file
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/tcrt30bs.olb"
+    2191      16E       ".cinit" in file
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/link.lcf"
+
+  Total Allocation = 17B (hex)
+
+Allocation to Output Section ".text" in module *unnamed* in file
+"/homeqs0/bj/hello_world/hello_world.outtof"
+
+  Offset   Length               Input Section
+
+    22FF       6C       "_main" in module "main" in file
+                        "/homeqs0/bj/hello_world/main.tof"
+    236B       2A       ".text" in module "sysfunc" in file
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/tcio30bs.olb"
+    2395       56       ".text" in module "qcdsp_tcroot" in file
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/tcrt30bs.olb"
+    23EB       26       "dbgrpc" in module "tcrpc" in file
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/tcrt30bs.olb"
+    2411        7       ".text" in module "tcrpc" in file
+                         "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/tcrt30bs.olb"
+    2418       32       ".text" in module "tcinit" in file
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/tcrt30bs.olb"
+    244A       22       "_exit" in module "inifin" in file
+
+Tartan Linker, SPARC/C40, v5.1.0        4/4/100 13:33:37                Page   2
+Copyright (c) 1986-1992 by Tartan, Inc., All Rights Reserved
+
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/tcrt30bs.olb"
+    246C        2       "__main" in module "inifin" in file
+                        "/usr/local/tartan/v2.1/etc/qcdsp_v5.3.3/tcrt30bs.olb"
+
+  Total Allocation = 16F (hex)
+\end{verbatim}
+}
+You can clearly identify the three sections for the BSS, data and text segments.
+(They are referred to as output sections {\tt .bss}, {\tt .data} and {\tt .text}.)
+
+Following all this information is a summary of the output sections that
+tells you the total amount of memory allocated to each individual section.
+In my {\bf hello\_world.map} file this looks like:
+{\small
+\begin{verbatim}
+
+                Output Sections
+
+Section List for Module *unnamed* in file
+"/homeqs0/bj/hello_world/hello_world.outtof"
+
+Number  Physical   Start   Length  Kind         Access  Name
+  1                  1000     1184 data                 ".bss"
+  2                  2184      17B constant             ".data"
+  3                  22FF      16F code                 ".text"
+  4                     0        0 debug                "debug_directives"
+  5                     0        0 debugstring          "debug_strings"
+  6                     0        0 line number          "debug_source_location"
+}
+\end{verbatim}}
+This is perhaps the most useful piece of information in the map file.
+It tells me the starting addresses of each of my program segments and 
+how long they are (the columns Start and Length). I can see from here that 
+my program uses memory from address 001000 to 0022FF + 16F = 00246E inclusive.
+Hence if this program were to take any input via {\tt qload} I would 
+know that it should be safe to fill up memory from 0246F upwards.
+
+The remainder of the map file lists every single symbol used in your
+program. You may find it amusing to see how few of them you recognise.
+Here are some symbols from the {\bf hello\_world.map} file that you 
+may recognise
+{\small
+\begin{verbatim}
+Kind  Offset Sect Virtual Physical      Name
+          6F   3     236E          "_CoorT"
+          70   3     236F          "_CoorX"
+          71   3     2370          "_CoorY"
+          72   3     2371          "_CoorZ"
+          93   3     2392          "_CurrentStatus__FiPc"
+ W        97   3     2396          "_c_int00"
+          6D   3     236C          "_DbNum"
+         14C   3     244B          "_exit"
+         14B   3     244A          "_exit$LAJ"
+          8E   3     238D          "_fclose"
+          8C   3     238B          "_fopen"
+          8D   3     238C          "_fprintf"
+          91   3     2390          "_HdwCheck__Fi"
+          94   3     2393          "_InterruptExit__FiPc"
+           1   3     2300          "_main"
+           0   3     22FF          "_main$LAJ"
+          6C   3     236B          "_MbNum"
+          90   3     238F          "_NodeStatUpdate__Fv"
+          77   3     2376          "_NumNodes"
+          7C   3     237B          "_printf"
+\end{verbatim}
+}
+You may be worried here that at startup, spurious memory allocation
+might overwrite your qloaded data. This is not a worry here as the
+map file includes the heap area as well. Hence if you place something
+above the last address in the map file, it is guaranteed that it 
+will not be malloced over. 
+
+You can configure the size of the heap and other program layout
+options in a file called the Linker Control File. If you do not 
+use one of these the program will be linked under the control of 
+a default linker control file which allocates a pitifully small heap.
+(0x1000 words). Hence when you come to code bigger projects you
+will have to allocate the heap yourself in your own LCF. This will
+involve a partitioning of the available memory between room for 
+your program, data you intend to allocate dynamically (heap) and data
+you intend to qload. 
+
+The standard procedure is to qload data very high in memory, just
+below the operating system. Suppose you have data of say 32Kwords per
+processor (0x8000 words (hex)). The operating system starts at address
+0x060000 and so you might want to load the data to 0x06000 - 0x008000
+= 0x058000. Then you can set up your LCF so that your program cannot
+extend beyond 0x057fff (heap included). It is of course prudent to
+leave a bit of room here and there in case you modify your program. In
+the words of investment brokers ``The size of your program can go down
+as well as up.''.
+
+We will discuss linking, program sections and control files in more detail
+in the next chapter about compiling and linking.
+
+\subsection{Node Tagged File Formats}
+We now discuss node tagged files.
+Node tagged files are written in ASCII and contain hexadecimal numbers.
+Although this can cause the files to be large and slow to read and write,
+it does have the advantage that the files are readable without needing
+specialist dump programs.
+
+The file format consists of one hexadecimal entry on each line 
+written in ASCII. The structure of the entries is given below.
+below. Each heading and sub--heading corresponds to an entry 
+in the NFT.
+\begin{description}
+\item{\bf A 'Magic Number' : \ } -- This is an integer for identifying
+which of the 3 types of node tagged files one is dealing with. The
+three types are: \begin{description} \item{tree \ } -- the nodes are
+tagged according to their position on the SCSI tree by a pair of
+numbers (M,D) representing the node's motherboard and daughterboard
+number respectively. Each of these numbers corresponds to a new entry
+on a new line in the NTF. The magic number for this mode is 2.  This
+is the 'default' tag mode. Node tagged files in this format usually
+have a {\bf .tree} file suffix.  \item{Machine 4D \ } -- the nodes are
+tagged with their 4D coordinates within the processor grid (A
+four-tuple of integers, each of these on a new line in the NTF). The
+magic number for this tag mode is 3. Node tagged files in this mode
+usually have a {\bf .m4d} file suffix.  \item{Physics 4D \ } -- to all
+intents and purposes this format the same as the machine 4D. Nodes are
+tagged by their 4D coordinates. The meaning of fields however is
+different. In terms of machine coordinates, everything is
+fixed. However the machine coordinates can be re mapped at boot time to
+interchange the order of coordinates. Hence (T,X,Y,Z) coordinates can
+be re mapped to (X,Y,Z,T) coordinates etc. The machine 4D file never
+changes the data layout. However the physics 4D file can shift the
+data around depending on the current 4D mapping. The magic number for
+this mode is 4. Node tagged files in this mode usually have the {\bf
+.p4d} file suffix.  \end{description}
+\item{\bf A sequence of Node Records} -- for each node in the processor there is
+a record. A record has the following structure.
+	\begin{description}
+	\item{A Node Tag \ } -- A tag identifying the node. For the tree structure this consists of the  motherboard number followed by the daughterboard
+number. For the 4D modes this is a four tuple of integers identifying the
+4D coordinates of the node.
+	\item{The number of blocks for the Node \ } -- An integer indicating
+how many blocks of data are to be loaded into the memory of the node (Hexadecimal without leading 0x)
+	\item{Base Address \ }--  A hexadecimal address (without leading 0x) specifying the location in memory where the first data item is to be placed.
+	\item{Data Blocks \ } -- An ASCII representation of each data block. In the case of integers this is quite readable. In the case of floats it is not
+	\item{A terminator \ } -- An ASCII zero follows the final record as a 
+record termination signal.
+	\end{description}
+\end{description}
+
+The formats of the NTFs, the magic numbers, node tags and file extensions
+are summarised in figures \ref{f:NTFStructure}, \ref{f:NTFRecStructure} 
+and \ref{f:NTFTypeSummary}.
+
+\begin{figure}[ht]
+\begin{center}
+\leavevmode
+\hbox{%
+\begin{tabular}{|c|}
+\hline
+Magic Number \\
+\hline
+Record No 1 \\
+\hline
+Record No 2 \\
+\hline 
+$ \vdots $ \\
+\hline
+Last Record \\
+\hline
+\end{tabular}}
+\end{center}
+\caption{Structure of a Node Tagged file -- Components are sequential in an ASCII file. Each component starts on a new line}
+\label{f:NTFStructure}
+\end{figure}
+
+\begin{figure}[ht]
+\begin{center}
+\leavevmode
+\hbox{%
+\begin{tabular}{|c|} \hline
+Node Tag \\
+\hline 
+$n$ -- Number of blocks \\
+\hline 
+Base Address \\
+\hline 
+block[0] \\
+\hline
+block[1] \\
+\hline
+$\vdots $ \\
+\hline
+block[ $n-1$ ] \\
+\hline
+0 (terminator) \\
+\hline
+\end{tabular}}
+\end{center}
+\caption{Structure of a Node tag record -- Each component is in ASCII on a new line}
+\label{f:NTFRecStructure}
+\end{figure}
+
+\begin{figure}[ht]
+\begin{center}
+\leavevmode
+\hbox{%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+{ \bf File Type}  & {\bf Magic Number} & {\bf Node Tag Components} & {\bf File Suffix } \\
+\hline
+Tree & 2 & \begin{tabular}{c} Motherboard No \\ Daughterboard No \end{tabular} & {\tt .tree} \\
+\hline
+Machine 4D & 3 & \begin{tabular}{c} T Coordinate \\ X Coordinate \\ Y Coordinate \\ Z Coordinate \end{tabular} & {\tt .m4d} \\
+\hline
+Physics 4D & 4 &  \begin{tabular}{c} T Coordinate \\ X Coordinate \\ Y Coordinate \\ Z Coordinate \end{tabular} & {\tt .p4d} \\
+\hline
+\end{tabular}}
+\end{center}
+\caption{Magic Number Node Tag and File Suffix information for the three node tagged file types. The magic number is the first number of any node tagged
+file. It should be an ASCII integer on the first line. The node tag
+fields should be ASCII integers. Each entry should take a separate
+line in the file.}
+\label{f:NTFTypeSummary}
+\end{figure}
+
+Perhaps the easiest way of creating a node tagged file is to dump
+some memory from a program. We now proceed to demonstrate how this is done.
+
+\section{Creating Node Tagged files using qread}
+Consider the following little program:
+{\scriptsize
+\begin{verbatim}
+CPS_END_NAMESPACE
+#include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
+#include <sysfunc.h>
+CPS_START_NAMESPACE
+
+
+int main( int argc, char *argv[] ) 
+{
+  float i[5]={1.0,2.0,3.0,4.0,5.0};
+
+  printf("The address of i is %x and its length is %x blocks\n",
+           i, 5*sizeof(int));
+
+  return(EXIT_SUCCESS); 
+}
+\end{verbatim}
+}
+
+The code itself does nothing, but prints out the address of the first 
+element of the floating point number array {\tt i}. We can use this 
+information to dump the floating point array into an NTF.
+
+\subsection{Setting options for qread}
+There are several options that allow you to control how you want to
+perform the dump. For example, you can dump to a screen or a named 
+file. You can dump into an NTF of either the tree, machine 4D or 
+of the physics 4D variety. You can rewrite an existing file or 
+append to it. These options are set by the following {\tt qcsh} commands:
+\begin{description}
+\item{{\tt qset\_read\_output\_filename} : \ } This command takes one 
+argument which is the name of the file you want {\tt qread} to 
+dump your data to.
+\item{{\tt qset\_read\_output\_file\_access} : \ } This command 
+takes a single argument to determine whether you wish to use
+the append write mode or the overwrite mode. The possible arguments
+are 
+	\begin{description}
+	\item{\tt a \ } -- append mode
+	\item{\tt w \ } -- write mode
+	\end{description}
+\item{{\tt qset\_read\_output\_select } : \ } This command determines 
+whether you wish your dump to go to the screen or to a named file
+(that you have to name using {\tt qset\_read\_output\_filename}.
+It takes a single argument. The argument can have the following values:
+\begin{description}
+	\item{\tt f \ } -- dump to named file
+	\item{\tt s \ } -- dump to screen
+\end{description}
+\item{{\tt qset\_read\_output\_tagged} : \ } This command determines
+the tag type of your dump file. It takes a single argument. Allowed 
+argument values are
+\begin{description}
+\item{ \tt no \ } -- Do not node tag the file. I do not describe the
+results of this option. 
+\item{ \tt yes \ } -- Place node tags into file. Use default tag mode (tree).
+\item{ \tt tree \ } -- Use tree tag mode.
+\item{ \tt m4d \ } -- Use machine 4D tag mode.
+\item{ \tt p4d \ } -- Use physics 4D tag mode.
+\end{description}
+\end{description}
+
+\subsection{Using qread to dump to a file}
+Let us now have a go at dumping the floating point array in the previous
+code snippet. Create a directory called {\tt dump} somewhere and copy
+the program listing above into a file named {\tt main.C} (alternatively
+the directory may be available under {\tt <QOS\_VERS>/examples/ParIO/dump}).
+
+If you are doing things by hand, you probably want to copy a 
+default {\tt Makefile} from the {\tt hello\_world} directory and
+build the program by typing {\tt make}. This should produce a program
+called {\tt dump.out}. If you are copying the directory structure it should
+have a Makefile with it.
+
+Boot the machine and enter the QC-Shell.I will use the machine {\tt
+q\_1}.  Now let us suppose that we want to dump the {\tt float} array
+from each PE into a file called {\tt foo}.  Let us try first with the
+tree node tag mode. We set up the dump using the following {\tt qcsh}
+commands (I removed the Qdaemon responses to save space).
+\begin{verbatim}
+(dump: qcsh[q_1])% qset_read_output_select f
+(dump: qcsh[q_1])% qset_read_output_filename foo.tree
+(dump: qcsh[q_1])% qset_read_output_file_access w
+(dump: qcsh[q_1])% qset_read_output_file_tagged tree
+\end{verbatim}
+
+Now run the program using {\tt qrun} as before (Qdaemon messages removed):
+\begin{verbatim}
+(dump: qcsh[q_1])% qrun dump.out
+The address of i is 105d and its length is 5 blocks
+\end{verbatim}
+Now I can dump to the NTF using {\tt qread}. This command takes the 
+base memory address and the number of blocks as two hexadecimal numbers
+respectively (without the leading 0x in terms of notation). I dump the 
+array with the command (of course you may find a different base 
+address to 105d in which case you have to substitute that in what
+follows) :
+\begin{verbatim}
+(dump: qcsh[q_1])% qread 105d 5
+\end{verbatim}
+to which the machine responds:
+\begin{verbatim}
+Qdaemon state is:
+        qdaemon task is READ
+        qdaemon abort no and resume no
+        QCDSP synchronous
+        All nodes selected with SCSI tree coordinates
+
+Qdaemon:  Parameters for read from QCDSP:
+        Read address:           0x105d
+        Read blocksize:         0x5
+        Filename:               foo.tree
+        File access:            write
+        File format:            node tagged tree
+
+
+Qdaemon state is:
+        qdaemon task is READ
+        qdaemon abort no and resume no
+        QCDSP synchronous
+        All nodes selected with SCSI tree coordinates
+\end{verbatim}
+and the file {\tt foo.tree} magically appears in the directory.
+
+We can actually look at the {\bf foo.tree} file. My one looks like:
+{\small
+\begin{verbatim}
+2
+0
+0
+5
+105d
+0
+1000000
+1400000
+2000000
+2200000
+0
+0
+1
+5
+105d
+0
+1000000
+1400000
+2000000
+2200000
+0
+.
+.
+.
+0
+3f
+5
+105d
+0
+1000000
+1400000
+2000000
+2200000
+0
+\end{verbatim}
+}
+
+You can clearly see the structure here. The first number in the file
+is the magic number 2. The next two are the node tag for the tree
+coordinates.  These are motherboard and daughterboard identifiers (the
+last daughterboard identifier is 3f which is hex for 63.  This is
+because I am using only a 64 PE single motherboard machine).  After
+this you have the number of blocks -- 5 -- followed by the base
+address 105d. You have 5 lines of data. They are the hex
+representations of the bit pattern that makes up our 5 floating point
+numbers. Finally you have a 0 as an end of record marker.
+
+\section{Loading data with qload}
+\subsection{Poking individual words with qload}
+The command {\tt qload} allows you to either load node tagged files or to place
+individual words into memory. Like qread it also has a number of options
+you can set. In this subsection we discuss first how to place individual 
+words in memory (ever hear of the POKE keyword in BASIC? This is kind of
+the same stuff).
+
+The incantation to load a word into a particular location in memory is
+of the format 
+\begin{verbatim}
+qload <address> <data>
+\end{verbatim}
+where both the address and the data are hexadecimal values. For example
+to load the value 5 into the memories of all the processors at address
+04EFFF I would type a magic incantation like:
+\begin{verbatim}
+(qcdhost/homeqs0/bj/QCDSP/IO/load: qcsh[q_1])% qload 04EFFF 5
+\end{verbatim}
+
+To that this has worked consider the following program:
+{\scriptsize
+\begin{verbatim}
+CPS_END_NAMESPACE
+#include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
+#include <sysfunc.h>
+CPS_START_NAMESPACE
+
+int main( int argc, char *argv[] )
+{
+  // -----------------------------------------------
+  // qload will put (poke?) the distributed memory
+  // into the data. User passes in the address the
+  // data has been load to through command line
+  // arguments
+  // -----------------------------------------------
+  int *loaded_ints;
+  int nblocks;
+
+  // -----------------------------------------------
+  // Check command line arguments
+  // -----------------------------------------------
+  if( argc != 3) {
+    printf("Usage: qrun load.out <base address(in hex)> <no of blocks(in hex)>\n
+");
+    return(EXIT_FAILURE);
+  }
+
+  // -------------------------------------------------------------
+  // Convert HEX base address string into an integer pointer value
+  // and point loaded_ints there
+  // -------------------------------------------------------------
+  loaded_ints = (int *)strtol(argv[1],  (char **)NULL, 16);
+
+  // -------------------------------------------------------------
+  // Convert no_of_blocks string into an integer value
+  // -------------------------------------------------------------
+  nblocks = (int)strtol(argv[2], (char **)NULL, 16);
+
+  // -------------------------------------------------------------
+  // Confirm values to the user
+  // -------------------------------------------------------------
+  printf("%x (%d) blocks of data at %x\n", nblocks, nblocks,
+         (unsigned int)loaded_ints);
+
+  // -------------------------------------------------------------
+  // Print back the data
+  // -------------------------------------------------------------
+  for(int i = 0; i < nblocks; i++) {
+    printf("%d ",loaded_ints[i]);
+  }
+  printf("\n");
+
+  return(EXIT_SUCCESS);
+}
+\end{verbatim}
+}
+
+This program basically checks your {\tt qload}.You need to  pass it the base
+address to where you have loaded your data as well as the number of blocks 
+comprising the data. These are passed on to the program as strings
+in the {\tt argv} array, so first we have to convert them to addresses.
+This is done using the {\tt strtol} function call which converts a 
+string to a long integer.
+
+The number 16 in the third argument tells {\tt strtol}\footnote{{\tt
+strtol} is a very useful function. For details look at the {\tt man}
+page in section 3 of the manual} that the string is supposed to
+represent a hexadecimal number. We set a pointer {\tt loaded\_ints} to
+the results of the string conversion, in other words to our base
+address.
+
+We then also need to convert the number of blocks to an integer. This is
+done by the second call to {\tt strtol}. 
+
+After confirming to the user that the input values have been read correctly,
+the code proceeds to list the specified number of words from the base 
+address, treating them as integers and prints them to the screen.
+
+Compile up this little program. You should also find it already written
+on the QCDSP in the directory {\tt <QOS\_VERS>/examples/ParIO/load} with
+a suitable default Makefile (Replace this with wherever we put it...)
+Now lets have a look in the map file (in my case its called {\tt load.map}):
+{\scriptsize
+\begin{verbatim}
+                Output Sections
+
+Section List for Module *unnamed* in file
+"/homeqs0/bj/QCDSP/intro/IO/load/load.outtof"
+
+Number  Physical   Start   Length  Kind         Access  Name
+  1                  1000     110C data                 ".bss"
+  2                  210C      102 constant             ".data"
+  3                  220E      26F code                 ".text"
+  4                     0        0 debug                "debug_directives"
+  5                     0        0 debugstring          "debug_strings"
+  6                     0        0 line number          "debug_source_location"
+\end{verbatim}
+}
+This tells me that it is safe for me to load things above the address 220E+26F = 247D. However it is good practice to load things high in the memory so I will
+load the data to 05FFE0. I do this by typing
+\begin{verbatim}
+(qcdhost/homeqs0/bj/QCDSP/intro/IO/load: qcsh[q_1])% qload 05FFE0 5
+\end{verbatim}
+Now I run my program 
+\begin{verbatim}
+(qcdhost/homeqs0/bj/QCDSP/intro/IO/load: qcsh[q_1])% qrun load.out 05FFE0 1
+\end{verbatim}
+The computer replies
+\begin{verbatim}
+1 (1) blocks of data at 5ffe0
+5 
+\end{verbatim}
+on all the processors.
+
+\subsection{Loading NTFs using qload}
+The qload command can also be used to load NTFs. Since all the information
+about the data is in the NFT (processor coordinates, base addresses, number of blocks and the actual data) is present in the NTF file. There is no need
+to specify these. The command is simply
+\begin{verbatim}
+qload <filename>
+\end{verbatim}
+The command can identify the tag type used in the file from the magic number.
+
+Consider the little program above but now converted to dump floats instead 
+of ints:
+{\scriptsize
+\begin{verbatim}
+CPS_END_NAMESPACE
+#include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
+#include <sysfunc.h>
+CPS_START_NAMESPACE
+
+int main( int argc, char *argv[] )
+{
+  // -----------------------------------------------
+  // qload will put (poke?) the distributed memory
+  // into the data. User passes in the address the
+  // data has been load to through command line
+  // arguments
+  // -----------------------------------------------
+  float *loaded_floats;
+  int nblocks;
+
+  // -----------------------------------------------
+  // Check command line arguments
+  // -----------------------------------------------
+  if( argc != 3) {
+    printf("Usage: qrun load.out <base address(in hex)> <no of blocks(in hex)>\n
+");
+    return(EXIT_FAILURE);
+  }
+
+  // -------------------------------------------------------------
+  // Convert HEX base address string into an integer pointer value
+  // and point loaded_ints there
+  // -------------------------------------------------------------
+  loaded_float = (float *)strtol(argv[1],  (char **)NULL, 16);
+
+  // -------------------------------------------------------------
+  // Convert no_of_blocks string into an integer value
+  // -------------------------------------------------------------
+  nblocks = (int)strtol(argv[2], (char **)NULL, 16);
+
+  // -------------------------------------------------------------
+  // Confirm values to the user
+  // -------------------------------------------------------------
+  printf("%x (%d) blocks of data at %x\n", nblocks, nblocks,
+         (unsigned int)loaded_ints);
+
+  // -------------------------------------------------------------
+  // Print back the data
+  // -------------------------------------------------------------
+  for(int i = 0; i < nblocks; i++) {
+    printf("%f ",loaded_floats[i]);
+  }
+  printf("\n");
+
+  return(EXIT_SUCCESS);
+}
+\end{verbatim}
+}
+
+We can use this to load our floating point NFT ({\tt foo.tree}) that 
+we created before, but first another word about memory.
+
+\subsection{Manual Data Relocation}
+Usually it will be the case, that a program loads an NTF at the start
+to a memory location, then processes it and then dumps it at the end.
+In this case the address in the node tag file is fine both for reading 
+and dumping. However we are now at an advanced stage, where one program
+produced the NTF but another program wants to load it.
+
+ In the program that made the NFT, the data was in a standard
+statically defined array that started (in my case) at address
+105d. Now however, we want to load it into a different program.  After
+converting the dump program to deal with floats, a quick look at the
+map file tells me that memory is still free from above 247D -- this is
+a consequence of the fact that the {\tt int} on the DSP is the same
+size as the {\tt float}. It is desirable to load the data to a high address,
+say 05e000. This can be achieved by editing the NTF and replacing 105d
+everywhere with 05e000. In my case the it is simply a question of a global
+edit. This is one of the advantages of the NTF being in ASCII format.
+
+\subsection{Example of loading an NTF}
+So, edit the previous program to deal with floats as I have done above.
+Edit your file {\tt tree.foo} replacing the base addresses everywhere with
+05e0000. Load the NTF using the command
+\begin{verbatim} 
+(qcdhost/homeqs0/bj/QCDSP/intro/IO/load: qcsh[q_1])% qload foo.tree
+\end{verbatim}
+and run the program, it should probably be called {\tt load.out}:
+\begin{verbatim}
+(qcdhost/homeqs0/bj/QCDSP/intro/IO/load: qcsh[q_1])% qrun load.out 05e000 5
+\end{verbatim}
+The computer should reply:
+\begin{verbatim}
+5 (5) blocks of data at 5e000
+1.000000 2.000000 3.000000 4.000000 5.000000 
+\end{verbatim}
+on all the processors.
+
+\subsection{Setting up qload options}
+You should now be able to use {\tt qload} to load parallel data. However
+just like the case of {\tt qread} there are some options that you can
+set. These allow you to specify the filename to {\tt qload} or simply 
+just the address and value to {\tt qload} (for poking single data). Then 
+you can use {\tt qload} with no arguments at all. The commands to set 
+the options are
+\begin{description}
+\item{ {\tt qset\_load\_select} : \ } Specifies whether {\tt qload} should
+read from a file or from the screen. The command can have up to 1 argument
+whose value is either {\tt file} or {\tt screen} (alternatively {\tt f} or
+{\tt s} respectively). If no arguments are given, the current value of
+the option is shown. I generally found that this option reset itself to 
+file every time {\tt qload} is invoked with an explicit filename.
+\item{ {\tt qset\_load\_screen} : \ } Specifies an address and a data 
+item. This option sets things up so that a subsequent call to {\tt qload} 
+will load the specified data to the specified address. The command can 
+have either  two arguments or none. Invoking the command with no arguments
+causes it to print the current values for the address and the data value.
+When the command is invoked with two arguments, the meaning of the arguments
+are
+\begin{description} 
+\item{\tt address \ } specifies the address to load to.
+\item{\tt data value \ } specifies the value of the data to be loaded.
+\end{description}
+Notes:
+\begin{itemize}
+\item 
+The following are equivalent: {\tt qload <address> <value>} and {\tt qset\_load\_select s ; qset\_load\_screen <address> <value> ; qload}.
+\item
+If one selects to load from the screen, and sets the address and value and
+then invokes {\tt qload <filename>}, then {\tt qload} will switch to 
+reading from the file instead. If one has set a filename to load from 
+using {\tt qset\_load\_filename} and has switched {\tt qload} to read from 
+file using {\tt qset\_load\_filename file}, if one now executes {\tt qload <address> <value>} then {\tt qload} will switch to screen mode and the last option
+will be valid.
+\end{itemize}
+\item{\tt qset\_load\_filename : } This command sets the name of the file
+that qload will use to load data from. It can have either one or no arguments.
+If the command is invoked with no arguments it will echo the current value
+of the filename. If invoked with one argument the argument, the argument
+should be the name of the file to load from.
+Note: The following are equivalent: {\tt qload <file>} and {\tt qset\_load\_select file ; qset\_load\_filename <file> ; qload }.
+\end{description}
+
+\section{Digression for Lattice Folk}
+There are two specialised commands to load and unload lattice gauge fields to
+and from the QCDSP. These are, as mentioned previously {\tt qload\_lattice}
+and {\tt qunload\_lattice}. Before describing these I should say a few 
+words about the lattice file format.
+
+\subsection{Gauge Connection Format}
+Currently NERSC provides an archive area called the {\tt Gauge Connection}.
+They use a particular format for lattices there. This format consists
+of a header section and a data section. The header section consists of
+a whole lot of fields. This is useful for keeping track of where the 
+lattices came from. The header file also keeps information about the
+average plaquette to assist in validation.
+
+The command {\tt qload\_lattice} simply takes a configuration in the NERSC
+archive and loads it into memory at a user supplied starting address.
+For example, prior to running a certain piece of code. I have obtained
+(actually output from another program) a lattice called {\tt lattice.ieee.full }. The {\tt .ieee} part of the naming convention indicates that the floating point format of the lattice is IEEE 32Bit big--endian. The {\tt .full} part indicates that all the link matrices are stored in full (as opposed to compressed 2 row
+format).
+
+I would like to load this lattice prior to computation. It has a volume
+of $8^4$ sites, which is to be distributed over 64 processors. My processor
+grid is a $4 \times 2 \times 2 \times 4$ lattice (the order of the dimensions
+in this case is $X \times Y \times Z \times T$. This implies that the local 
+lattice size per processor is $2 \times 4 \times 4 \times 2 = 64$ sites. On
+each site there are 4 link matrices each of these being a full SU(3) matrix
+consisting of 9 complex numbers which are represented as 18 real numbers.
+Hence the size of the local data is $64 \times 4 \times 18 = 4608$ numbers
+and since each number is word sized this means that the data requires 
+4608 words of storage which in hexadecimal is 1200. Thus the highest I can
+load this data in memory is to address 060000 - 001200 = 5ee00. To be 
+a little conservative I choose to load it to 5ed00.
+
+The instruction I give to the QCDSP is:
+\begin{verbatim}
+(qcdhost/homeqs0/bj/QCDSP/sfw/hello_world: qcsh[q_1])% qload_lattice 5ed00 lattice.ieee.full
+\end{verbatim}
+Apart from the usual qdaemon messges, the response of the computer was 
+as follows:
+{\scriptsize
+\begin{verbatim}
+DoLoadLattice:  a copy of the header from lattice.ieee.full
+        BEGIN_HEADER
+        CHECKSUM =  1649a43
+        LINK_TRACE = +0.0020214
+        PLAQUETTE = +0.5132502
+        DATATYPE = 4D_SU3_GAUGE_3x3
+        HDR_VERSION = 1.0
+        STORAGE_FORMAT = 1.0
+        DIMENSION_1 = 8
+        DIMENSION_2 = 8
+        DIMENSION_3 = 8
+        DIMENSION_4 = 8
+        BOUNDARY_1 = PERIODIC
+        BOUNDARY_2 = PERIODIC
+        BOUNDARY_3 = PERIODIC
+        BOUNDARY_4 = ANTIPERIODIC
+        ENSEMBLE_ID = BALINT_LAT_1
+        ENSEMBLE_LABEL = Balint's first test lattice 8x8x8x8 pure gauge beta=6.0
+        SEQUENCE_NUMBER = 100
+        CREATOR = Columbia
+        CREATOR_HARDWARE = QCDSP 
+        CREATION_DATE = Fri Apr 28 15:50:26 2000
+        ARCHIVE_DATE = Fri Apr 28 15:50:26 2000
+        FLOATING_POINT = IEEE32BIG
+        END_HEADER
+
+DoLoadLattice:  keywords used to load lattice
+        CHECKSUM = 1649a43
+        LINK_TRACE = 0.0020214
+        PLAQUETTE = 0.5132502
+        DATATYPE = 4D_SU3_GAUGE_3x3
+        DIMENSION_1 = 8
+        DIMENSION_2 = 8
+        DIMENSION_3 = 8
+        DIMENSION_4 = 8
+        FLOATING_POINT = IEEE32BIG
+
+DoLoadLattice:
+        Loading 4608 words per node to address 0x5ed00
+        Total transfer of 294912 words to 64 nodes of QCDSP
+        Starting to read 294912 words from host disk
+        Finished loading 1/4 of lattice to QCDSP
+        Finished loading 2/4 of lattice to QCDSP
+        Finished loading 3/4 of lattice to QCDSP
+        Finished loading 4/4 of lattice to QCDSP
+        Converting from IEEE32BIG to TIDSP32 on QCDSP
+DoLoadLattice:
+        Loading plaq.qin to calculate plaq and trace on QCDSP
+
+Output from plaq.qin running on QCDSP
+        Machine size (X,Y,Z,T) (4,2,2,4)
+        Lattice size per node (2,4,4,2)
+        Total lattice size (8,8,8,8)
+        Lattice address 0x5ed00
+
+        plaq            0.5132502
+        link trace      0.0020214
+
+MkerExecAck:  starting to check program exit status
+AnalyzeQCDSP::SCUCheck:  SCUDebug mode 0 doesn't allow analysis
+MkerExecAck:  SCUCheck could not be run
+
+DoLoadLattice:
+        Plaquette from header and QCDSP (0.5132502) agree to 0.000001
+        Link trace from header and QCDSP (0.0020214) agree to 0.000001
+        Checksum from header and QCDSP agree (0x1649a43)
+\end{verbatim}}
+The messages are quite self explanatory. First qload lattice echoed back
+the contents of the header file. Then it loaded the lattice, partitioned
+it amongst the processors. Thereafter it converted from IEEE 32Bit big
+endian format to the DSPs internal format denoted TIDSP32. A separate
+program was then run to calculate the plaquette and the average link trace
+to validate the data. Finally QCDSP responded indicating that the
+lattice has been loaded, that the plaquette and link trace have been
+found to be correct to 4dp and that the checksum test has been passed.
+
+At this point one can start one's computation. To be able to use the
+lattice in the Columbia Physics System, one has to set the members of a global
+instance of a {\tt GlobalJobParameter} class (it is required to have
+one of these called GJP declared globally).  One has to set the
+private {\tt start\_conf\_kind} member of the {\tt
+GlobalJobParameter} class to have value {\tt START\_CONF\_LOAD}, and
+one has to set the private {\tt start\_conf\_load\_addr} pointer to
+point in memory to first word of the loaded lattice.
+
+Currently this can only be done through the public {\tt Initialize} member 
+function of the {\tt GlobalJobParameter} class. This function takes as 
+an argument a reference to a {\tt DoArg} class. The {\tt DoArg} class
+has public member variables {\tt start\_conf\_kind} and {\tt start\_conf\_load\_addr}. The former of these has to be set to {\tt START\_CONF\_LOAD} 
+and the latter to the address of the first word of the loaded data.
+
+The address can be passed to the program as a command line argument, 
+making it available to each processor, or it could be read by node 0
+using the usual C style file I/O and then broadcast to the rest of the
+system. An example snippet of code to set up the lattice may look something
+like as follows:
+{\scriptsize
+\begin{verbatim}
+// ------------------------ 
+// Standard headers
+// ------------------------
+
+CPS_END_NAMESPACE
+#include <stdio.h>
+#include <stdlib.h>     // Exit
+CPS_START_NAMESPACE
+
+// ------------------------
+// QCDSP Non Physics Includes
+// ------------------------
+
+CPS_END_NAMESPACE
+#include <sysfunc.h>
+CPS_START_NAMESPACE
+
+// ------------------------
+// QCDSP Physics Includes
+// ------------------------
+
+CPS_END_NAMESPACE
+#include <util/include/lattice.h>   //  Lattice Classes
+#include <util/include/gjp.h>       //  Global Job Parameters  Class
+#include <util/include/verbose.h>   //  Verbose Output 
+#include <util/include/error.h>     //  Error Handler Class
+#include <alg/include/do_arg.h>     //  Some kind of argument handling class
+CPS_START_NAMESPACE
+
+// ------------------------
+// These are always defined Globally
+// -------------------------
+GlobalJobParameter GJP;
+Verbose            VRB;
+Error              ERR;
+
+// -----------------------------------
+// PE 0 is boss
+// -----------------------------------
+#define BOSS_ID  0
+
+main(int argc, char *argv[]) 
+{
+  // ----------------------------
+  // Check Arguments 
+  // Can call with either no arguments (ordered start) => argc = 1
+  // Or with  one argument, being hex address of gauge field 
+  // ----------------------------
+  if ( argc > 2  ) {
+    printf("Usage: qrun prog.out [hex address (no leading 0x)]\n");
+    exit(EXIT_FAILURE);
+  }
+
+  // ----------------------------
+  // Initialize the Global Job Params
+  // -----------------------------
+  DoArg do_arg;
+
+  int my_id = UniqueID();
+
+
+  // --------------------------------
+  // Global lattice      X  Y  Z  T 
+  // --------------------------------
+  int g_latt_size[4] = { 8, 8, 8, 8 };
+  // --------------------------------
+  //  Local lattice      X  Y  Z  T 
+  // ---------------------------------
+
+  int l_latt_size[4] = { 2, 4, 4, 2 };
+
+  printf("Local Lattice Size is: %d %d %d %d\n", 
+	 l_latt_size[0],l_latt_size[1],l_latt_size[2], l_latt_size[3]);
+  
+
+  // -----------------
+  // Use Whole Machine
+  // -----------------
+  do_arg.x_nodes = SizeX();
+  do_arg.y_nodes = SizeY();
+  do_arg.z_nodes = SizeZ();
+  do_arg.t_nodes = SizeT();
+
+  // ----------------------------
+  // We are in 4D by I set the 5th dimension anyway
+  // ----------------------------
+  do_arg.s_nodes = 1;
+
+  // -----------------
+  // Set the lattice volume -- Sites per node
+  // -----------------
+  do_arg.x_node_sites = l_latt_size[0];
+  do_arg.y_node_sites = l_latt_size[1];
+  do_arg.z_node_sites = l_latt_size[2];
+  do_arg.t_node_sites = l_latt_size[3];
+  do_arg.s_node_sites = 1;
+
+  // -----------------
+  // Set Boundary Conditions
+  // -----------------
+  do_arg.x_bc = BND_CND_PRD;  // Periodic
+  do_arg.y_bc = BND_CND_PRD;  // Periodic
+  do_arg.z_bc = BND_CND_PRD;  // Periodic
+  do_arg.t_bc = BND_CND_APRD; // Antiperiodic
+
+  // ----------------
+  // Set lattice start depending on no of arguments
+  // ----------------
+  if( argc  == 1 ) {         // No user supplied arguments
+     do_arg.start_conf_kind = START_CONF_ORD;
+  }
+  else {  // User supplied load address
+     
+     do_arg.start_conf_kind = START_CONF_LOAD;
+
+     // -------------------------------------
+     // Hex String to address convertion
+     // -------------------------------------
+     do_arg.start_conf_load_addr = (Matrix *)strtol(argv[1],(char **)NULL, 16);
+  }
+  do_arg.start_seed_kind = START_SEED_FIXED;
+  do_arg.verbose_level = VERBOSE_RESULT_LEVEL + 1;
+
+  // ---------------------------------------
+  // Quenched QCD -- 3 colours, beta = 6
+  // --------------------------------------- 
+  do_arg.colors = 3;
+  do_arg.beta = 6.0;
+
+  // ------------------------
+  // Initialise GJP Structure
+  // ------------------------
+
+  GJP.Initialize(do_arg);
+  
+  // -----------------------
+  // Set verbosity
+  // -----------------------
+
+  VRB.Level(VERBOSE_RESULT_LEVEL+1);
+
+  // ---------------------------
+  // Grab a Wilson Gauge Lattice. with possibly wilson fermions in future
+  // This gets initialised from GJP
+  // ---------------------------
+
+  GwilsonFwilson lat;
+
+  // --------------------------
+  // Calculate The Global Trace of the plaquette
+  // --------------------------
+
+  Float t;
+  Float normal; // Plaquette normalization factor
+
+  normal = g_latt_size[0]*g_latt_size[1]*g_latt_size[2]*g_latt_size[3];
+  normal *= 6 * 3; // No of planes * 3 to normalize unit gauge to 1
+  t=lat.SumReTrPlaq()/normal;
+
+  // Print Plaquette
+  if( my_id == BOSS_ID ) {
+    printf("Boss: Startup Gauge Field    --  Sum Tr Plaq = %f\n",(float)t);
+  }
+
+  // ---------------------------------------------
+  // Do your world beating calculation below
+  // ---------------------------------------------
+
+
+  // ---------------------------------------------
+  // Your world beating calculation ends
+  // You want to store gauge field perhaps
+  // --------------------------------------------- 
+  // --------------------------------------------- 
+  // Print Gauge Field -- for saving
+  // ---------------------------------------------
+  printf("Local Gauge field starts at %x\n",(int)lat.GaugeField());
+  exit(EXIT_SUCCESS);
+}
+\end{verbatim}
+}
+
+Running this program with no arguments produced the following output
+\begin{verbatim}
+ocal Lattice Size is: 2 4 4 2
+Boss: Startup Gauge Field    --  Sum Tr Plaq = 1.000000
+Local Gauge field starts at 137c8
+\end{verbatim}
+which is the correct output a unit gauge.
+I could recover the gauge field by using {\tt qunload\_lattice}
+as I have printed out the address of the start of the gauge field data.
+
+Now I load the gauge field as before (I have decided to omit the output
+from {\tt qload\_lattice} as I have already included it in full earlier.
+I then run the program giving the starting address (5ED00) as my 
+first argument. I get the following reply from the QCDSP:
+\begin{verbatim}
+Local Lattice Size is: 2 4 4 2
+Boss: Startup Gauge Field    --  Sum Tr Plaq = 0.513250
+Local Gauge field starts at 5ed00
+\end{verbatim}
+Indicating that I managed to initialize the lattice correctly.
+
+\subsection{Unloading Gauges}\label{s:GaugeUnload}
+Now we can try to unload the gauge and keep it. A few things need to be 
+borne in mind. It is a local convention, that gauge fields in use here
+at Columbia be kept in the DSP native representation ({\tt TIDSP32}) whereas
+fields that are to be shipped off to the gauge connection should really be
+in the IEEE big--endian format ({\tt IEEE32BIG}).
+
+Also, gauge fields can be kept in compressed format (2 of the 3 rows stored
+ only) for each SU(3) matrix or in full format.
+
+While the {\tt qload\_lattice} command can learn all this from the header 
+part of the gauge field configuration file, and the user program 
+has knows about the lattice through the {\tt GlobalJobParameter} structure,
+the {\tt qunload\_lattice} command, running on the front end, knows nothing
+about our lattice and has to be told via a parameter file.
+
+The parameter file essentially provides the header information part of the
+gauge configuration data file. It consists of an ordered list of entries, 
+which we shall describe below. Each entry lives on a single line of the file.
+Lines containing no text are ignored. Lines starting with a {\tt \#} character
+are treated as comments and ignored. The {\tt \#} character does not 
+need to be in the first column of the line. However it may not follow
+an entry. There are therefore no trailing comments. There should be 
+no trailing spaces following entries. {\bf The order of entries is important.}
+
+The entries of the file, in order are
+\begin{description}
+\item{\bf T Size \ } -- this is a single integer giving the global lattice size in the T (Euclidean Time direction)
+\item{\bf X Size \ } -- this is a single integer giving the global lattice size in the X direction
+\item{\bf Y Size \ } -- this is a single integer giving the global lattice size in the Y direction
+\item{\bf Z Size \ } -- this is a single integer giving the global lattice size in the Z direction
+\item{\bf Boundary condition for T \ } -- This entry specifies the boundary condition for the T direction. The boundary conditions can be either periodic or
+antiperiodic. This entry can take the values {\tt PERIODIC} or {\tt ANTIPERIODIC} respectively.
+\item{\bf Boundary condition for X \ } -- This entry specifies the boundary condition in the X direction.  The entry can take the values {\tt PERIODIC} or {\tt ANTIPERIODIC}.
+\item{\bf Boundary contidion for Y \ } -- This entry specifies the boundary condition in the Y direction.  The entry can take the values {\tt PERIODIC} or {\tt ANTIPERIODIC}.
+\item{\bf Boundary contidion for Z \ }  -- This entry specifies the boundary condition in the Z direction.  The entry can take the values {\tt PERIODIC} or {\tt ANTIPERIODIC}
+\item{\bf Lattice Base Address \ } -- The address in memory where the data
+for the lattice starts on each processor. Can be found using the {\tt GaugeField()} member function of the {\tt lattice} base class in the Physics system. The number should be entered in hexadecimal without any preceeding 0x.
+\item{\bf Lattice Output Filename \ } -- The filename where the lattice
+configuration is to be dumped. Be aware of the the file name suffix convention.
+\begin{description} 
+\item{ \tt .dsp.full \ } Gauge field is stored  in DSP internal floating point representation. All three rows of the link matrices are stored in the file.
+\item{ \tt .dsp  \ } Gauge field  is stored in DSP internal floating point representation. The link matrices are stored in compressed 2 row format. The third row is removed.
+\item{ \tt .ieee.full \ } Gauge field is stored in IEEE 32Bit Big Endian representation. All three rows of the link matrices are stored.
+\item{ \tt .ieee \ } Gauge fields are stored in IEEE 32Bit Big Endian format. The link matrices are stored in compressed 2 row format. The third row is removed.
+\end{description}
+\item{\bf Ensemble ID \ } -- This is some label uniquely identifying the simulation. It can be any string. On the Gauge Connection, this label is displayed
+when your ensemble is listed. By convention configurations from Columbia 
+have ensemble ID's of the form {\tt CU\_XXXX } where {\tt CU} identifies
+Columbia University (MILC have {\tt MILC} and Ohio State University use 
+{\tt OSU}) and {\tt XXXX} is a unique number identifying the ensemble from 
+which the gauge is from.
+\item{\bf Ensemble Label \ } -- This should be a more human readable label
+giving some details about the ensemble such as the parameters that
+were used to generate it. This entry takes a string value.
+\item{\bf Sequence Number \ } -- This is an integer value identifying 
+the configuration in a given ensemble (for example an HMC trajectory number,
+or a Heat bath sweep number).
+\item{\bf Creator String \ } -- A string describing the group responsible
+for the generation of the gauge configuration. Columbia uses {\tt Columbia}.
+\item{\bf Creator Hardware \ } -- The machine used to create the lattices.
+If the configurations were generated by QCDSP, this field should either be
+{\tt CU-QCDSP} for Columbia or {\tt RBRC-QCDSP} for the RIKEN--Brookhaven
+machine. 
+\item{\bf Datatype \ } -- An entry to describe how to save the configuration.
+This can take one of the following values
+\begin{description}
+\item{\tt 4D\_SU3\_GAUGE \ } Gauge field is to be saved in compressed 2 row
+format.
+\item{\tt 4D\_SU3\_GAUGE\_3x3 \ } Gauge field is to be saved in full 3 row format.
+\end{description}
+\item{\bf Floating point type \ } -- Specifies whether the gauge should be
+saved in DSP native format or in IEEE format.This can take values:
+\begin{description}
+\item{\tt TIDSP32 \ } Gauge configuration to be saved in Texas Instruments
+DSP 32bit format.
+\item{\tt IEEE32BIG \ } Gauge configuration is to be saved in 32 bit IEEE
+Big Endian format.
+\end{description}
+\item{\bf Creation Date \ } -- A character string specifying the date of 
+creation. It entry has the value {\tt now} it will be timestamped automatically
+when {\tt qunload\_gauge} is invoked.
+\end{description}
+
+For example to dump the gauge we have just loaded in the previous section
+I would need the following file: 
+\begin{verbatim}
+# size in T
+8
+
+# size in X
+8
+
+# size in Y
+8
+
+# size in Z
+8
+
+# boundary condition for T
+ANTIPERIODIC
+
+# boundary conditionf for X
+PERIODIC
+
+# boundary condition for Y
+PERIODIC
+
+# boundary condition for Z
+PERIODIC
+
+# lattice base address
+05ed00
+
+# lattice output file
+lattice.ieee.full
+
+# Ensemble ID
+BALINT_LAT_1
+
+# Ensemble label
+Balint's first test lattice 8x8x8x8 pure gauge beta=6.0
+
+# Sequence number 
+100
+
+# Creator string 
+Columbia
+
+# Creator Hardware 
+QCDSP 
+
+# Datatype 
+4D_SU3_GAUGE_3x3
+
+# Floating point type
+IEEE32BIG
+
+# Creation Date 
+now
+\end{verbatim}
+
+Before you can use {\tt qunload\_lattice} to unload a configuration
+you must tell it about the lattice. If you have created a file such as
+above you can tell {\tt qunload\_lattice} to use it as a desctiption file
+with the QC-Shell command:
+\begin{verbatim}
+qset_unload_lattice f <file>
+\end{verbatim}
+where {\tt <file>} is the name of your description file.
+
+Alternatively you can enter all the fields manually from the command 
+line by typing:
+\begin{verbatim}
+qset_unload_lattice m
+\end{verbatim}
+and enter answers to the various prompts.
+
+There is a default mode for {\tt qunload\_lattice} which you 
+can set with the command:
+\begin{verbatim}
+qset_unload_lattice d
+\end{verbatim}
+The default settings however refer to a lattice of $2^4$ sites with 
+periodic boundaries in each direction. Hence the default mode is probably
+not very useful.
+
+Once you have executed one of the {\tt qset\_unload\_lattice} commands
+and have got no error messages, you are ready to unload the lattice.
+It is a simple matter of typing 
+\begin{verbatim}
+qunload\_lattice
+\end{verbatim}
+
+For example, I now try to unload the unit gauge lattice I can produce
+by running my gauge reading program with no arguments.  I use the example 
+lattice description I have listed above except I've changed the output filename
+to {\tt unit\_gauge\_8888.ieee.full}.  The description is in a file I call {\tt
+qunload.in}.
+
+I first run the program without arguments to produce the unit gauge
+\begin{verbatim}
+(qcdhost/homeqs0/bj/QCDSP/sfw/hello_world: qcsh[q_1])% qrun simple_test.out 
+\end{verbatim}
+I get the response
+\begin{verbatim}
+Local Lattice Size is: 2 4 4 2
+Boss: Startup Gauge Field    --  Sum Tr Plaq = 1.000000
+Local Gauge field starts at 137c8
+\end{verbatim}
+
+I edit my description file {\tt qunload.in} to change the base address to 137C8.
+I execute the commands: {\scriptsize
+\begin{verbatim}
+(qcdhost/homeqs0/bj/QCDSP/sfw/hello_world: qcsh[q_1])% qset_unload_lattice f qunload.in
+(qcdhost/homeqs0/bj/QCDSP/sfw/hello_world: qcsh[q_1])% qunload_lattice
+\end{verbatim}}
+To which the QCDSP replies:
+{\scriptsize
+\begin{verbatim}
+DoUnloadLattice:
+        Unloading 4608 words per node from address 0x137c8
+        Total transfer of 294912 words from 64 nodes of QCDSP
+        Starting to write out 294912 words to host disk
+        Finished writing out 1/4 of lattice
+        Finished writing out 2/4 of lattice
+        Finished writing out 3/4 of lattice
+        Finished writing out 4/4 of lattice
+        Loading plaq.qin to calculate plaq and trace on QCDSP
+
+Output from plaq.qin running on QCDSP
+        Machine size (X,Y,Z,T) (4,2,2,4)
+        Lattice size per node (2,4,4,2)
+        Total lattice size (8,8,8,8)
+        Lattice address 0x137c8
+
+        plaq            1.0000000
+        link trace      1.0000000
+
+MkerExecAck:  starting to check program exit status
+AnalyzeQCDSP::SCUCheck:  SCUDebug mode 0 doesn't allow analysis
+MkerExecAck:  SCUCheck could not be run
+
+DoUnloadLattice:
+        copy of header written to lattice.ieee.full
+
+        BEGIN_HEADER
+        CHECKSUM =        0
+        LINK_TRACE = +1.0000000
+        PLAQUETTE = +1.0000000
+        DATATYPE = 4D_SU3_GAUGE_3x3
+        HDR_VERSION = 1.0
+        STORAGE_FORMAT = 1.0
+        DIMENSION_1 = 8
+        DIMENSION_2 = 8
+        DIMENSION_3 = 8
+        DIMENSION_4 = 8
+        BOUNDARY_1 = PERIODIC
+        BOUNDARY_2 = PERIODIC
+        BOUNDARY_3 = PERIODIC
+        BOUNDARY_4 = ANTIPERIODIC
+        ENSEMBLE_ID = BALINT_LAT_1
+        ENSEMBLE_LABEL = Balint's first test lattice 8x8x8x8 pure gauge beta=6.0
+        SEQUENCE_NUMBER = 100
+        CREATOR = Columbia
+        CREATOR_HARDWARE = QCDSP 
+        CREATION_DATE = Fri Apr 28 18:29:07 2000
+        ARCHIVE_DATE = Fri Apr 28 18:29:07 2000
+        FLOATING_POINT = IEEE32BIG
+        END_HEADER
+\end{verbatim}
+}
+
+\section{Serial I/O}
+We have spent some time dealing with parallel I/O. It should of course
+be obvious, that since saving and loading of parallel data is not done
+from the user program, that the user program must stop its computation
+when parallel IO needs to be performed. This leads to the model of running
+Monte Carlo simulations where observables are computed on the fly rather
+than the one where one just produces configurations, archives them 
+and measures observables later, although this latter model could be 
+uses if driven by a shell script say.
+
+Naturally after computing observables on the fly the user would wish to 
+store them in a file on the front end. Generally (except for propagators
+and things) observables tend to be small objects that can fit into the 
+memory of a single node. 
+
+The QCDSP provides the standard C file access mechanism for reading and 
+writing to files. {\tt The C++ iostream class is not implemented.}
+Hence one can use {\tt fprintf} and {\tt fscanf} to read from a file
+and {\tt printf} and {\tt scanf} to read from a terminal. (Bob are the 
+binary file functions {\tt fread} and {\tt fwrite} implemented?)
+
+There are however several things that the user has to be aware of:
+\begin{itemize}
+\item
+There is no concept of {\tt stdin}, {\tt stdout} and {\tt stderr} streams
+on the QCDSP (although there is on the front end). These are UNIX concepts.
+On the QCDSP one can either write to the screen or to a file.
+\item
+The {\tt printf} command will output on all the processors. The output
+of processor 0 is sent to the terminal. The output of other processors
+is buffered and can be retreived using the {\tt qprintf} command.
+\item
+{\bf Access to files on the front end is currently available from node 0 
+only. If other nodes wish to read or write files. They must arrange for
+node 0 to do it and transfer the results.}
+\item
+One can turn off I/O by running a program with the command {\tt qrun\_no\_io}.
+In this case I/O produced by {\tt printf} and {\tt fprintf} commands is lost.
+\end{itemize}
+
+\section{Summary}
+In this section we have discussed the main parallel and serial I/O 
+capabilities of the QCDSP. We now summarise some of the chief results
+of this chapter.
+
+\subsection{Memory Summary} 
+User code should reside between addresses 001000 and 05FFFF. The memory
+layout of a compiled and linked code is given by the appropriate map file.
+This file also includes the heap area so the highest used address in the 
+map file will be the highest address used by the program as there will
+be no runtime relocation of symbols, since the linker has already resolved
+everything.
+
+\subsection{Parallel I/O General Summary} 
+Parallel I/O has to be performed before execution of user programs
+or after the completion of user programs. Parallel input involves placing
+data directly into the QCDSP node memory above the user code but 
+below the operating system. Parallel output proceeds by reading directly
+the memory of the nodes after a program has stopped executing. 
+
+Parallel output can proceed via the {\tt qread} command for NTFs
+or via the {\tt qunload\_lattice} command for lattice gauge fields.
+
+Parallel input can proceed via the {\tt qload} command for NFTs
+or via the {\tt qload\_lattice} command for lattice gauge fields in the
+Gauge Connection archive format. 
+
+\subsection{Summary of {\tt qread}}
+The basic command is {\tt qread <address> <no of blocks>} which will
+cause qread to read {\tt <no of blocks>} data words to be read from
+each processors memory starting at address {\tt <address>}. Both {\tt
+<address>} and {\tt <no of blocks>} are hexadecimal numbers without
+any leading 0x.  The behaviour of {\tt qread} can be controlled by the following
+QC-Shell Commands
+\begin{description}
+\item{\tt qset\_read\_output\_filename : \ } Set name of file to dump to.
+If no arguments are supplied the command prints the currently set name
+of the dump file. If the command is run with one argument it must be
+the name of the dump file. Bear in mind that there is a file suffix
+convention (see figure \ref{f:NTFTypeSummary}.
+\item{\tt qset\_read\_output\_file\_access : \ } Set the access mode of the
+dump file. If called with no arguments the currently set mode is displayed.
+If called with one argument the argument must be a valid access more. 
+Valid access modes are {\tt w} for write mode and {\tt a} for append mode.
+\item{\tt qset\_read\_output\_select : \ }
+Select output to which the dump will be sent. Dump output can be sent to 
+the screen or to a file. If called with no arguments the command displays
+the current setting. If called with 1 argument, the argument has to be
+either {\tt f} or {\tt s} for dumping to a file or screen respectively.
+\item{\tt qset\_read\_output\_tagged : \ }
+Select the tagging mode for the dump if output is going to a file (Node Tagged File). Valid tagging modes are 
+\begin{description}
+\item{\tt no} Do not tag nodes.
+\item{\tt yes} Use default node tagging mode (tree)
+\item{\tt tree} Use tree node tagging mode
+\item{\tt p4d} Use physics (re-mappable) 4D coordinate tagging mode.
+\item{\tt m4d} Use machine (non--remappable) 4D coordinate tagging mode.
+\end{description}
+\end{description}
+
+\subsection{Summary of {\tt qload}}
+The {\tt qload} command can be used either to load NTFs or to poke
+individual words into memory. It can be invoked in three separate modes
+\begin{description}
+\item{\tt qload <address> <data> \ } -- loads {\tt <data> } to address
+{\tt <address>} on all processors. Both {\tt <data>} and {\tt <address>} 
+are hexadecimal values without any preceeding 0x in the notation.
+\item{\tt qload <file> \ } -- will cause the loading of the NTF {\tt <file>}.
+The memory addresses are hardwired into the NTF so manual relocation may 
+be necessary.
+\item{\tt qload \ } -- will cause {\tt qload} to execute according to the 
+behaviour set with previous commands. Commands affecting {\tt qload} are
+\begin{description}
+\item{\tt qset\_load\_select \ } Takes 0 or 1  arguments. Selects whether {\tt
+qload} operates in screen mode (poking a single data into an address)
+or file mode (reading an NFT). When called without an argument, the 
+command will print the current selection. The mode will be altered by 
+calling {\tt qload} with multiple arguments to load files or data directly.
+\item{\tt qset\_load\_screen \ } Can be called with 2 or no arguments.
+If called with two arguments, argument 1 must be a hexadecimal address
+and argument 2 must be a hexadecimal data value. A subsequent call to 
+{\tt qload} will load the data value to the address on all processors if
+screen mode has been selected with {\tt qset\_load\_select}, unless
+the behaviour of {\tt qload} is altered by some other command.
+\item{\tt qset\_load\_filename \ } Can be called with 1 or no arguments.
+If called with 1 argument, the argument must be a filename. A subsequent
+call to {\tt qload} will attempt to load the specified file if {\tt qload}
+has been put into file mode using {\tt qset\_load\_select}, unless the 
+behaviour of {\tt qload} has been altered by some other subsequent command.
+\end{description}
+\end{description}
+XS
+\subsection{Node Tag File (NTF) Summary}
+Node tag files (NTFs)are ASCII files containing data from all the nodes of the
+currently selected set of processors. A given NTF contains a magic number
+and a sequence of records, one for each processor. Each record contains
+some data to identify its processor, the starting address and the number
+of blocks of that processors data followed by the data itself. The record
+is terminated by a 0. Each entry in an NTF needs to be on a new line.
+All numbers are in hexadecimal. For a summary of Node Tag Files see
+figures \ref{f:NTFStructure}, \ref{f:NTFRecStructure} and \ref{f:NTFTypeSummary}.
+
+\subsection{Summary of {\tt qload\_lattice}}
+The command {\tt qload\_lattice} takes two arguments. Argument one
+is the address on each processor where the first word of lattice data
+is to reside. The second argument is the name of a lattice gauge configuration
+file in the Gauge Connection archive format. 
+
+Executing the command will cause {\tt qload\_lattice} to distribute the 
+lattice amongst the currently selected nodes. Any conversion from 
+IEEE floating point representation to DSP representation is done at this time.
+Various diagnostic information is also printed to the screen, including the
+value of the plaquette and the average of the traces of the gauge field 
+link matrices.
+
+\subsection{Summary of {\tt qunload\_lattice}}
+The command {\tt qunload\_lattice} takes no arguments. Details of the lattice
+have to be made known to it previously using the {\tt qset\_unload\_lattice} 
+command.
+
+The {\tt qset\_unload\_lattice} command can take 0, 1 or 2 arguments.
+If {\tt qset\_unload\_lattice} is called with no arguments it will display
+its current settings. If called with 1 argument the argument has to be 
+either {\tt d} in which case the default settings will be chosen or {\tt m}
+in which case the user will be prompted to enter details manually. If called
+with 2 arguments the first argument has to be an {\tt f} followed by the name
+of a file containing a description of the lattice to be dumped. This file
+must be in the format described in section \ref{s:GaugeUnload}.
+
+\subsection{Gauge Connection Format Summary}
+See {\tt http://qcd.nersc.gov}.
+
+\subsection{Serial I/O Summary}
+The C Standard I/O file interface is partially implemented. In particular
+{\tt printf}, {\tt scanf}, {\tt fprintf}, {\tt fscanf}, {\tt fopen}, {\tt
+fclose}, {\tt fread} and {\tt fwrite} are implemented (I am not sure of the
+last 2). Apart from {\tt printf} calling these functions only makes sense
+from node 0. The {\tt printf} output of processors are saved in a buffer
+and can later be recovered using {\tt qprintf} unless the program was run
+with {\tt qrun\_no\_io.} in which case all serial I/O is lost.
+
+\subsection{Miscellany}
+In this section we have used rather a lot of the QC-Shell (QOS) built
+in commands. It is possibly helpful to know that a brief summary of all 
+the QC-Shell commands can be listed using the QC-Shell command {\tt qhelp}.
+It is recommended that the output is piped through a pager such as {\tt less}
+or {\tt more}.
+
+CPS_END_NAMESPACE

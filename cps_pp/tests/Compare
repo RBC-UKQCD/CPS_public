@@ -1,0 +1,93 @@
+#include<config.h>
+CPS_START_NAMESPACE
+#!/usr/local/bin/tcsh
+
+#####################################################
+# Usage: Compare phys_vx.y.z
+#
+# It does a diff of all data files in the
+# test directories below with the data files in 
+# phys_vx.y.z/tests/*
+#####################################################
+
+set base_dir=`pwd`
+set log=$base_dir/compare.log
+
+/bin/rm  $log >& /dev/null
+touch $log
+
+echo "Compare dir is:" $1 >>& $log
+echo "Base dir is:" $base_dir >>& $log
+
+set list1=`echo f_stag_pbp f_wilson_pbp f_clover_pbp f_dwf_pbp f_dwfso_pbp`
+set list2=`echo f_hmd f_hmd_dwfso g_hb g_hmd s_spect w_spect threept f_wilson_eig xi_spect_gsum`
+set list3=`echo fix_gauge`
+
+echo " "
+
+# PsiBarPsi tests 
+#####################################################
+@ j = 1
+while ( $j <= $#list1 )
+  set local_dir=$list1[$j]
+  set dir=$base_dir/$local_dir
+  cd $dir >>& $log
+  echo " " >>& $log
+  echo " " >>& $log
+  echo "============================================================================================"  >>& $log
+  echo directory is $dir >>& $log
+  echo "============================================================================================"  >>& $log
+  echo directory is $dir
+  foreach x (*.dat)
+  echo "compare with" $x >>& $log
+  diff ../../../$1/tests/$local_dir/$x . >>& $log
+  end
+  @ j++
+end
+
+
+# General tests with out stdio output
+#####################################################
+@ j = 1
+while ( $j <= $#list2 )
+  set local_dir=$list2[$j]
+  set dir=$base_dir/$local_dir
+  cd $dir >>& $log
+  echo " " >>& $log
+  echo " " >>& $log
+  echo "============================================================================================"  >>& $log
+  echo directory is $dir  >>& $log
+  echo "============================================================================================"  >>& $log
+  echo directory is $dir
+  foreach x (*.dat)
+  echo "compare with" $x >>& $log
+  diff ../../../$1/tests/$local_dir/$x . >>& $log
+  end
+  @ j++
+end
+
+
+# General tests with stdio output
+#####################################################
+@ j = 1
+while ( $j <= $#list3 )
+  set local_dir=$list3[$j]
+  set dir=$base_dir/$local_dir
+  cd $dir >>& $log
+  echo " " >>& $log
+  echo " " >>& $log
+  echo "============================================================================================"  >>& $log
+  echo directory is $dir  >>& $log
+  echo "============================================================================================"  >>& $log
+  echo directory is $dir
+  foreach x (*.dat)
+  echo "compare with" $x >>& $log
+  diff ../../../$1/tests/$local_dir/$x . >>& $log
+  end
+  @ j++
+end
+
+cd $base_dir
+
+
+CPS_END_NAMESPACE

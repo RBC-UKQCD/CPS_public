@@ -1,0 +1,681 @@
+#include<config.h>
+CPS_START_NAMESPACE
+%------------------------------------------------------------------
+% $Id: document.tex,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+%------------------------------------------------------------------
+%Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
+%
+% For best results, this latex file should be compiled using pdflatex.
+% However it will also compile under normal latex, if you prefer.
+%
+%------------------------------------------------------------------
+\documentclass[12pt]{article}
+
+% importing other useful packages:
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{tabularx}
+% color for the pdf links:
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.5}
+% for conditional latex source:
+\usepackage{ifthen}
+% pdftex specifications, these are only included if we are using pdflatex:
+\providecommand{\pdfoutput}{0}
+\ifthenelse{\pdfoutput = 0}{
+% Not PDF:
+\usepackage{html}
+\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+}{
+% PDF: hyperref for pdf with full linkages:
+\usepackage[
+pagebackref,
+hyperindex,
+hyperfigures,
+colorlinks,
+linkcolor=darkblue,
+citecolor=darkblue,
+pagecolor=darkblue,
+urlcolor=blue,
+%bookmarksopen,
+pdfpagemode=None,
+%=UseOutlines,
+pdfhighlight={/I},
+pdftitle={The QCDIO API. $Revision: 1.1.1.1 $ - $Date: 2003-06-22 13:34:52 $.},
+pdfauthor={A.N. Jackson \& S. Booth},
+plainpages=false
+]{hyperref}
+}
+
+
+% Code style commands:
+\newcommand{\cls}[1]{{\bf #1}}            % Classes
+\newcommand{\struct}[1]{{\bf #1}}         % Structs
+\newcommand{\cde}[1]{{\tt #1}}            % Code fragments
+
+% document style modifications:
+\setlength{\parskip}{2.0mm}
+\setlength{\parindent}{0mm}
+\begin{document}
+
+\title{\bf Physics Environment}
+\vskip 1. truein
+\author{QCDSP Group}
+\maketitle
+
+%\begin{abstract}
+%
+%\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+%-----------------------------------------------------------
+\section{Introduction}
+\label{sec-introduction}
+
+
+
+
+%-----------------------------------------------------------
+\section{Global Variables}
+\label{sec-global}
+
+Objects with the following names are declared external in the corresponding
+header files. These objects are defined outside main.
+
+
+\medskip
+{\noindent}
+{\bf GJP} Global Job Parameter is a class that
+contains all globally needed parameters such as lattice size, verbose
+level etc.
+\hfill \break
+Header File: util/include/global\_job\_parameters.h
+\hfill \break
+Source Directory: util/global\_job\_parameter
+
+
+\medskip
+{\noindent}
+{\bf VRB} VeRBose is a class that controls all verbose output.
+\hfill \break
+Header File: util/include/verbose.h
+\hfill \break
+Source Directory: util/verbose
+
+
+\medskip
+{\noindent}
+{\bf ERR} Error is a class that controls all error output.
+It prints a message and exits with a given exit value.
+\hfill \break
+Header File: util/include/error.h
+\hfill \break
+Source Directory: util/error
+
+
+
+%-----------------------------------------------------------
+\section{Coding Style}
+\begin{itemize}
+
+\item There should be no explicit use of the {\tt float} or {\tt double}
+native types in the code.  The {\tt Float} typedef should be used instead,
+thus allowing compile-time precision control.
+
+\item One may use slightly more modern c++ techniques (template, standard template
+library), as long as this code is distinct from the Columbia code, and does not affect up the compilation on the qcdsp.
+
+\end{itemize}
+
+%-----------------------------------------------------------
+\section{Internal Data Formats}
+
+\subsection{Lattice: The Gauge Configuration}
+Each instance of the \href{../doxygen/html/class_Lattice.html}{Lattice} 
+class contains a pointer to the guage
+configuration, \cde{gauge\_field}, which is a pointer to an array of
+\href{../doxygen/html/class_Matrix.html}{Matrix} objects.  
+The value of this pointer can be accessed using the
+\href{../doxygen/html/class_Lattice.html#a11}{Lattice::GaugeField()} method.
+
+While the internal format of the guage configuration can be changed, the
+"canonical" format will be described here.  The array consists of
+4*GPJ.VolNodesSites() Matrix objects, i.e. there four SU(3) matricies
+(0, 1, 2, 3 for Ux, Uy, Uz, Ut) for each site on that processor node.
+This is the ``fastest-moving index''.  The next is the count in the
+x-direction, then the y-direction, then z and finally t.  This detail is
+hidden from the user via a simple method: 
+\href{../doxygen/html/class_Lattice.html#a13}{Lattice::GsiteOffset(int* x)}.
+Given an integer array indicating the \emph{local} position of a site (such
+that x[i] is the ith coordinate where i = {0,1,2,3} = {x,y,z,t}), this method
+returns a pointer to the first of the four matrix objects associated with that
+site.
+
+Each Matrix object is a single SU(3) matrix, build of 2$\times$3$\times$3 Floats 
+(i.e. two floats to one complex number, and three by three colors).  [It is
+not clear what the internal structure of the SU(3) matrix is, but presumably
+the rows and colums of this matrix must map onto the rows and colums of the
+matricies read from other codes if binary reproducibility is to be ensured.  -
+SHOULD CHECK THIS - ANJ ]. [UPDATE - ADDING A TRANSPOSE FLAG]
+
+\section{Introduction}
+The aim of this document is to put forward a plan for the way in which
+currently available lattice QCD codes can be adapted to run on the
+forthcoming QCD-OC hardware.  This will focus on the C++ QCD-SP code,
+and in particular on how this code may be made a portable as possible,
+so that a minimum of new code will be required for it to run on
+any future hardware platform.
+
+\subsection*{The Core Aim:}
+\begin{quote}
+To develop the codes required to produce good science using the QCD-OC
+machine.
+\end{quote}
+
+The quality of the science that can be determined using the code is
+predominately determined by the functionality supplied by it.  This is
+primary issue is outlined in \S\ref{codefunc} below.  Having defined
+the functionality we require, we can then consider the best route by
+which to produce such a code.  There is a large volume of trusted code
+already in existence, and so this secondary issue breaks down as
+follows.  We evaluate the available codes, estimating the pro's and
+con's of each (see \S\ref{oldcodes}), and then put forward plans for
+ways in which these code may be developed to meet our aims
+(\S\ref{plans}).
+
+\subsection*{Overall Constraints}
+\begin{itemize}
+\item The most important constraint is the project time-scale.  The
+hardware may be available in as little as 12 months, and the software
+development plan should fit \emph{within} this ETA.
+\end{itemize}
+
+%--------------------------------------------------------------------
+\section{Functionality Specification for the QCD-OC code}
+\label{codefunc}
+The follow specification is a breakdown of the \emph{ideal}
+functionality that the new code could provide.  A version of the code
+which contains all of the assorted bells \& whistles listed below is
+probably unattainable on the project time-scale.  However, all HIGH
+priority functionality should be included, and the code-developers
+will keep in mind the possible implementation of the lower-priority
+aims at a later date.
+
+%---------------------------
+\subsection{The Physical System}
+\begin{center}
+ \begin{tabular}{lc}
+ \hline
+ \bf{Description} & \bf{Priority}\\
+ \hline
+  Wilson gauge field & HIGH \\
+  Wilson-clover fermions & HIGH \\
+  Ginsburg-Wilson fermion action & Medium (long-term HIGH)\\
+ \hline
+ \end{tabular}
+\end{center}
+
+%---------------------------
+\subsection{Evolution Mechanisms}
+\begin{center}
+ \begin{tabular}{lc}
+ \hline
+ \bf{Description} & \bf{Priority}\\
+ \hline
+ Hybrid MC. & HIGH \\
+ Tweakability of algorithm parameters. & HIGH \\
+ Output options? & ? \\
+ \hline
+ \end{tabular}
+\end{center}
+
+%---------------------------
+\subsection{Measurement Capabilities}
+\begin{center}
+ \begin{tabular}{lc}
+ \hline
+ \bf{Description} & \bf{Priority}\\
+ \hline
+  $\bar{\psi}\psi$? & ?\\
+ \hline
+ \end{tabular}
+\end{center}
+
+%---------------------------
+\subsection{Constraints \& Overall Priorities}
+\begin{center}
+ \begin{tabular}{lc}
+ \hline
+ \bf{Description} & \bf{Priority}\\
+ \hline
+  Usable within $\sim$12 months. & HIGH \\
+  Capable of using 5x5x5x5 sublattices, i.e. the odd local lattice
+ size issue. &HIGH \\
+  Run-time machine partitioning in software & Medium \\
+ Portability and future proofing against future hardware. & Medium/low \\
+ \hline
+ \end{tabular}
+\end{center}
+
+%------------------------------------------------------------------
+\section{Available Codes}
+\label{oldcodes}
+
+\subsection{Colombia/QCD-SP}
+Written in pre-ANSI C++.  What do to about this? (what are Colombia
+going to do?)  See \S\ref{col:notcpp}. But review of this code in
+\S\ref{col:code}. 
+
+\subsection{SZIN}
+This is a macro-based application code, and as such its treatment is
+split into two parts.  Firstly, the definition of the language itself,
+and secondly the application code that has been built up using that language.
+
+\subsubsection{SZIN: The Language }
+[m4 macros? links?]
+
+\begin{itemize}
+\item In Brief:
+	\href{http://www.jlab.org/~edwards/szin_manual.html}
+	{http://www.jlab.org/{\textasciitilde}edwards/szin\_manual.html}
+\item Manual:
+	\href{http://www.jlab.org/~edwards/macros_v2.ps}
+	{http://www.jlab.org/{\textasciitilde}edwards/macros\_v2.ps}
+\end{itemize}
+
+\subsubsection{SZIN: The Application Code}
+
+\subsection{UKQCD}
+[What fortran codes are availible, and are there any ways in which
+this code may be of use to use despite the (probable???) lack of a
+compiler.] 
+
+%------------------------------------------------------------------
+\section{Overview of the Colombia/QCD-SP code}
+\label{col:code}
+The core concept behing this implementation of a lattice QCD library
+is the unification of the way in which different gauge and fermion
+actions are treated, via \cde{lattice} abstract class
+(\S\ref{col:latticeclass}).  The algorithms to be applied to the
+chosen system are also abstracted in order to unify the interface by
+which algorithms are `run' on the system (\S\ref{col:algclass}).
+These classes, along with simple mechanisms for specifing the simulation
+parameters, allow the user to construct LQCD applications using
+relatively little source code.  A simple source file can be
+constructed as follows:
+\begin{itemize}
+\item Specify the global parameters, such as the size of the
+processor array (\S\ref{col:globalparam}).
+\item Define the system by choosing the gauge and fermion types
+(\S\ref{col:latticeclass}).
+\item Choose an algorithm from the suite available
+(\S\ref{col:algclass}).
+\item Specify any parameters specific to the algorithm (\S\ref{col:algparam}).
+\item Run the algorithm for a given number of steps (\S\ref{col:algclass}).
+\end{itemize}
+
+The central aim of the following code breakdown is twofold:
+\begin{enumerate}
+  \item To clarify the library interface, so that any shortcomings in
+  the way in which the application interacts with the library are made
+  clear.
+  \item To indicate any gaps between the desired code functionality
+  and that supplied by this code, particularly where the gaps are due
+  to QCD-SP specific parts of the code.
+\end{enumerate}
+
+[???, What to say about sub-lattice size limitations???]
+[???, What to say about software partiioning issue???]
+
+%---------------------------
+\subsection{Global Parameters}
+\label{col:globalparam}
+These either specify some property of the simulation itself
+(\S\ref{col:gjp} \& \S\ref{col:commarg}), or control the textual output
+of the code (\S\ref{col:verboseclass} \& \S\ref{col:errorclass}).
+
+\subsubsection{The GlobalJobParameter class and the DoArg \& CommonArg structs}
+\label{col:gjp}
+To control the most general parameters of the simulation, a specific  instance
+of \cls{GlobalJobParameter} class (called \cde{GJP} and with global scope)
+\emph{must} be created. The parameters contained in the \cde{GJP} can
+be read via a set of methods, but these parameters should be set by
+using a single call and a \struct{DoArg} struct.
+
+The parameters held in an instance of \struct{DoArg} are listed in full
+in table \ref{tab:doargs}.  In brief, this allows the user to set:
+\begin{itemize}
+ \item The parameters of the regular domain decomposition, i.e. the
+ size of the processor grid and the size of the lattice on each
+ processor.
+ \item The boundary conditions (periodic or antiperiodic in each
+ direction).
+ \item The kind of initial configuration.
+ \item The initial value of the random number generator seed.
+ \item The number of colors.
+ \item Various parameters for controlling the different gauge/fermion actions,
+ such as the value of the gauge $\beta$.
+\end{itemize}
+The parameters held within a \struct{DoArg} structure are then used to
+initialise the global job parameters held in \cde{GJP}.
+
+\subsubsection{The CommonArg struct}
+\label{col:commarg}
+This structure is used to control the output of the code, and an
+instance of it is used to initialise each of the algorithms
+(\S\ref{col:algclass}).  It contains a unique simulation identifier
+and the name of the file to be used for simulation output.
+[???, The unique ID is not used in the test codes, it seems.  Does
+this have something to do with the task list and job manager stuff???]
+
+\subsubsection{Verbosity: The Verbose class}
+\label{col:verboseclass}
+As in the case of the \cls{GlobalJobParameter} class, a specific
+instance of the \cls{Verbose} class (called \cde{VRB}) is used to control
+the diagnostic textual output of the code.  This information includes
+subroutine call traces, memory allocation and deallocation and so on.
+It also allows the program to control the LED status.  The level of
+diagnostic output is initially set via the \cls{GlobalJobParameter}
+initialisation, but can be explicitly set using \cde{VRB.Level}.
+
+\subsubsection{Error Reporting: The Error class}
+\label{col:errorclass}
+Again, a specific global instance of the \cls{Error} class (called
+\cde{ERR}) is used to control the error reporting mechanism.  This is
+very similar to the \cls{Verbose} class, but for serious problems
+(such as attempts to use \cde{NULL} pointers, file I/O failures and so
+on) which require the code to cease execution.
+
+%---------------------------
+\subsection{The Lattice Class}
+\label{col:latticeclass}
+This class forms the core of the QCDSP code.  It holds the gauge-field
+configuration, and defines the interface for the gauge-field and
+fermion-field operations in such a way as to ensure that the interface
+remains the same no matter what specific action is used.  It also
+defines the interface to the random number generator. [???, anything
+else??? Converting???]
+Note that the fermion field is actually stored elsewhere (usually in
+the \cls{Alg} class, \S\ref{col:algclass}). A large number of classes
+are derived from this base class, for each fermion and gauge action.
+The actual class that is used for a simulation will be one of these
+derived classes, chosen by the dessired combination of actions.
+
+\subsubsection{Gauge Field Types}
+There are four possible gauge-field types (see table
+\ref{tab:gauges}), each of which implements the gauge-operation
+interface specified by the \cls{Lattice} class (see
+\S\ref{sss:gaugeops}).
+
+\begin{table}[!ht]
+\begin{center}
+ \begin{tabular}{lp{100mm}l}
+ \hline
+ \bf{Class} & \bf{Description} & \bf{Dependencies}\\
+ \hline
+ Gnone & Acts as if there is no gauge action (i.e. $\beta=0$) & ???\\
+ Gwilson & Uses the standard Wilson single plaquette action. & ???,The
+ Wilson Library?\\
+ GimprRect & Uses the standard Wilson plaquette operator plus
+the second order rectangle operator. ???& \\
+ GpowerPlaq & This action is the same as the standard Wilson action
+with the irrelevant power plaquette term added to it. The full action
+is: $\sum_p [ \beta * { -Tr[U_p]/3} + ( {1 - Tr[U_p]/3} / c )^k ]$
+with \cde{c = GJP.PowerPlaqCutoff()} and \cde{k =
+GJP.PowerPlaqExponent()}.  This action supresses plaquettes with ${1 -
+ReTr[U_p]/3} > c$ and threfore reduces lattice dislocations. & ???\\
+ GpowerRect & Uses the standard Wilson plaquette operator plus the
+second order rectangle operator plus a power plaquette term plus a
+power rectangle term.  The full action is: $( \sum_p [ c_0*\beta*
+{ -Tr[U_p]/3} + ( {1 - Tr[U_p]/3} / c )^k ] + \sum_r [ c_1*\beta*
+{ -Tr[U_r]/3} + ( {1 - Tr[U_r]/3} / c )^k ] )$ with \cde{c =
+GJP.PowerPlaqCutoff()}, \cde{k = GJP.PowerPlaqExponent()} \cde{c\_0 = 1
+- 8 * c\_1}, \cde{c\_1 = GJP.C1()}. This action supresses plaquettes
+with ${1 - ReTr[U_p]/3} > c$ and rectangles with ${1 - ReTr[U_r]/3} >
+c$ and therefore reduces lattice dislocations.& ???\\
+ \hline
+ \end{tabular}
+ \label{tab:gauges}
+ \caption{Gauge fields supported by the QCD-SP code.}
+\end{center}
+\end{table}
+
+\subsubsection{Gauge Operations Interface}
+\label{sss:gaugeops}
+[What functionality for acting upon the Lattices is supplied within Lattice.]
+\begin{itemize}
+\item 
+{\bf Gclass\-Type} {\bf Gclass} (void)
+\begin{list}\small\item\em It returns the type of gauge
+class.\item\end{list}
+
+\item 
+void {\bf Gaction\-Gradient} ({\bf Matrix} \&grad, int $\ast$x, int
+mu)
+\begin{list}\small\item\em Calculates the partial derivative of the gauge action w.r.t. the link U\_\-mu(x). Typical implementation has this func called with \cls{Matrix} \&grad = $\ast$mp0, so avoid using it. \item\end{list}
+
+\item 
+void {\bf Gforce\-Site} ({\bf Matrix} \&force, int $\ast$x, int mu)
+\begin{list}\small\item\em It calculates the gauge force at site x and
+direction mu.\item\end{list}
+
+\item 
+void {\bf Evolve\-Mom\-Gforce} ({\bf Matrix} $\ast$mom, {\bf Float} step\_\-size)
+\begin{list}\small\item\em It evolves the canonical momentum mom by step\_\-size using the pure gauge force. \item\end{list}
+
+\item 
+{\bf Float} {\bf Ghamilton\-Node} (void)
+\begin{list}\small\item\em Returns the value of the pure gauge Hamiltonian of the node
+sublattice.\item\end{list}
+
+\end{itemize}
+
+[Plus some action specific functions.]
+
+[Details of dependencies.vector\_util, Matrix, Float, cbuf (this last
+one turns into nothing on a workstation, I think).]
+
+\subsubsection{Fermion Action Types}
+
+\begin{table}[!ht]
+\begin{center}
+ \begin{tabular}{lp{100mm}l}
+ \hline
+ \bf{Class} & \bf{Description} & \bf{Dependencies}\\
+ \hline
+ Fnone & Its functions do nothing and return values as if there is no
+ fermion action or fermion fields. The number of spin components is
+ zero & ???\\
+ FstagTypes: & Staggered fermions: & \\
+ \hspace{5mm}Fstag & Defines the \cls{Lattice} functions for
+ staggered fermions. & ???\\
+ FwilsonTypes: & Wilson fermions:& \\
+ \hspace{5mm}Fclover & Wilson-clover fermions. & ???,The Wilson Library?\\
+ \hspace{5mm}Fdwf & Wilson-domain-wall fermions. & ???\\
+ \hspace{5mm}Fwilson & Wilson fermions. & ???\\
+ \hline
+ \end{tabular}
+ \label{tab:factions}
+ \caption{Fermion actions supported by the QCD-SP code.}
+\end{center}
+\end{table}
+
+\subsubsection{Fermion Operations Interface}
+[What functionality for acting upon the Lattices is supplied within Lattice.]
+[NB It contains an interface for a Ritz eigenvec/val solver... Which
+is implemented in eigen\_wilson.C.  This is relevant to the GW stuff]
+
+\begin{itemize}
+
+\item 
+{\bf Fclass\-Type} {\bf Fclass} (void)
+\begin{list}\small\item\em It returns the type of fermion
+class.\item\end{list}
+
+\item 
+int {\bf Fsite\-Offset\-Chkb} (const int $\ast$x) const
+\begin{list}\small\item\em 
+Sets the offsets for the fermion fields on a  checkerboard. The
+fermion field storage order is not the canonical one but it is
+particular to the fermion type. This function is not relevant to
+fermion types that do not use even/odd checkerboarding. x[i] is the
+ith coordinate where i = \{0,1,2,3\} = \{x,y,z,t\}. 
+\item\end{list}
+
+\item 
+int {\bf Fsite\-Offset} (const int $\ast$x) const
+\begin{list}\small\item\em 
+Sets the offsets for the fermion fields on a  checkerboard. The
+fermion field storage order is the canonical one. X[I] is the ith
+coordinate where i = \{0,1,2,3\} = \{x,y,z,t\}. 
+\item\end{list}
+
+\item 
+int {\bf Exact\-Flavors} (void)
+\begin{list}\small\item\em 
+Returns the number of exact flavors of the matrix that is inverted
+during a molecular dynamics evolution. 
+\item\end{list}
+
+\item 
+int {\bf Spin\-Components} (void)
+\begin{list}\small\item\em Returns the number of spin
+components.\item\end{list}
+
+\item 
+int {\bf Fsite\-Size} (void)
+\begin{list}\small\item\em 
+Returns the number of fermion field  components (including
+real/imaginary) on a site of the 4-D lattice.
+\item\end{list}
+
+\item 
+int {\bf Fchkb\-Evl} (void)
+\begin{list}\small\item\em 
+0 -$>$ If no checkerboard is used for the evolution or the CG that
+inverts the evolution matrix. 1 -$>$ If the fermion fields in the
+evolution or the CG that inverts the evolution matrix are defined on a
+single checkerboard (half the  lattice). 
+\item\end{list}
+
+\item 
+int {\bf Fmat\-Evl\-Inv} ({\bf Vector} $\ast$f\_\-out, {\bf Vector} $\ast$f\_\-in, {\bf Cg\-Arg} $\ast$cg\_\-arg, {\bf Float} $\ast$true\_\-res, {\bf Cnv\-Frm\-Type} cnv\_\-frm=CNV\_\-FRM\_\-YES)
+\begin{list}\small\item\em
+It calculates f\_\-out where A $\ast$ f\_\-out = f\_\-in and A is the
+preconditioned (if relevant) fermion matrix that appears in the HMC
+evolution (typically some preconditioned  form of [Dirac$^\wedge$dag
+Dirac]). The inversion is done with the conjugate gradient. cg\_\-arg
+is the structure that contains all the control parameters, f\_\-in is
+the fermion field source vector, f\_\-out should be set to be the
+initial guess and on return is the solution. f\_\-in and f\_\-out are
+defined on a checkerboard. If true\_\-res !=0 the value of the true
+residual is returned in true\_\-res. true\_\-res = $|$src -
+Mat\-Pc\-Dag\-Mat\-Pc $\ast$ sol$|$ / $|$src$|$ The function returns
+the total number of CG iterations.
+\item\end{list}
+
+\item 
+int {\bf Fmat\-Evl\-Inv} ({\bf Vector} $\ast$f\_\-out, {\bf Vector} $\ast$f\_\-in, {\bf Cg\-Arg} $\ast$cg\_\-arg, {\bf Cnv\-Frm\-Type} cnv\_\-frm=CNV\_\-FRM\_\-YES)
+\begin{list}\small\item\em Same as original but with
+true\_\-res=0;.\item\end{list}
+
+\item 
+int {\bf Fmat\-Inv} ({\bf Vector} $\ast$f\_\-out, {\bf Vector} $\ast$f\_\-in, {\bf Cg\-Arg} $\ast$cg\_\-arg, {\bf Float} $\ast$true\_\-res, {\bf Cnv\-Frm\-Type} cnv\_\-frm=CNV\_\-FRM\_\-YES, {\bf Preserve\-Type} prs\_\-f\_\-in=PRESERVE\_\-YES)
+\begin{list}\small\item\em 
+It calculates f\_\-out where A $\ast$ f\_\-out = f\_\-in and A is the
+fermion matrix (Dirac operator). The inversion is done with the
+conjugate gradient. cg\_\-arg is the  structure that contains all the
+control parameters, f\_\-in  is the fermion field source vector,
+f\_\-out should be set  to be the initial guess and on return is the
+solution. f\_\-in and f\_\-out are defined on the whole lattice. If
+true\_\-res !=0 the value of the true residual is returned in
+true\_\-res. true\_\-res = $|$src - Mat\-Pc\-Dag\-Mat\-Pc $\ast$
+sol$|$ / $|$src$|$ cnv\_\-frm is used to specify if f\_\-in should be
+converted  from canonical to fermion order and f\_\-out from fermion
+to canonical.  prs\_\-f\_\-in is used to specify if the source f\_\-in
+should be preserved or not. If not the memory usage is less by the
+size of one fermion vector or by the size  of one checkerboard fermion
+vector (half a fermion vector). For staggered fermions f\_\-in is
+preserved regardles of the value of prs\_\-f\_\-in.  The function
+returns the total number of CG iterations. 
+\item\end{list}
+
+\item 
+int {\bf Fmat\-Inv} ({\bf Vector} $\ast$f\_\-out, {\bf Vector} $\ast$f\_\-in, {\bf Cg\-Arg} $\ast$cg\_\-arg, {\bf Cnv\-Frm\-Type} cnv\_\-frm=CNV\_\-FRM\_\-YES, {\bf Preserve\-Type} prs\_\-f\_\-in=PRESERVE\_\-YES)
+\begin{list}\small\item\em Same as original but with
+true\_\-res=0;.\item\end{list}
+
+\item 
+int {\bf Feig\-Solv} ({\bf Vector} $\ast$$\ast$f\_\-eigenv, {\bf Float} $\ast$lambda, {\bf Float} chirality[$\,$], int valid\_\-eig[$\,$], {\bf Float} $\ast$$\ast$hsum, {\bf Eig\-Arg} $\ast$eig\_\-arg, {\bf Cnv\-Frm\-Type} cnv\_\-frm=CNV\_\-FRM\_\-YES)
+\begin{list}\small\item\em 
+It finds the eigenvectors and eigenvalues of A where A is the fermion
+matrix (Dirac operator). The solution uses Ritz
+minimization. eig\_\-arg is the  structure that contains all the
+control parameters, f\_\-eigenv are the fermion field source vectors
+which should be defined initially, lambda are the eigenvalues returned
+on solution. f\_\-eigenv is defined on the whole lattice. hsum are
+projected eigenvectors. The function returns the total number of Ritz
+iterations. 
+\item\end{list}
+
+\item 
+void {\bf Set\-Phi} ({\bf Vector} $\ast$phi, {\bf Vector} $\ast$frm1, {\bf Vector} $\ast$frm2, {\bf Float} mass)
+\begin{list}\small\item\em It sets the pseudofermion field phi from
+frm1, frm2.\item\end{list}
+
+\item 
+void {\bf Evolve\-Mom\-Fforce} ({\bf Matrix} $\ast$mom, {\bf Vector} $\ast$frm, {\bf Float} mass, {\bf Float} step\_\-size)
+\begin{list}\small\item\em 
+It evolves the canonical momentum mom by step\_\-size using the
+fermion force. 
+\item\end{list}
+
+\item 
+{\bf Float} {\bf Fhamilton\-Node} ({\bf Vector} $\ast$phi, {\bf Vector} $\ast$chi)
+\begin{list}\small\item\em 
+The fermion Hamiltonian of the node sublattice. chi must be the
+solution of Cg with source phi. 
+\item\end{list}
+
+\item 
+void {\bf Fconvert} ({\bf Vector} $\ast$f\_\-field, {\bf Str\-Ord\-Type} to, {\bf Str\-Ord\-Type} from)
+\begin{list}\small\item\em Convert fermion field f\_\-field from -$>$
+to.\item\end{list}
+
+\item 
+{\bf Float} {\bf Bhamilton\-Node} ({\bf Vector} $\ast$boson, {\bf Float} mass)
+\begin{list}\small\item\em The boson Hamiltonian of the node
+sublattice.\item\end{list}
+\end{itemize}
+
+[Plus action specific functions.]
+
+[Details of dependencies.]
+
+\subsubsection{Putting the fermion \& gauge fields together}
+[The system is chosen from a list of all possible F and G
+combinations: GtypeFtype]
+
+%---------------------------
+\subsection{Dirac Operators}
+
+%---------------------------
+\subsection{The Algorithms}
+\label{col:algclass}
+
+\subsubsection{Algorithm Parameters}
+\label{col:algparam}
+
+
+
+
+\end{document}
+
+
+
+CPS_END_NAMESPACE

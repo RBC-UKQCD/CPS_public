@@ -1,0 +1,358 @@
+#include<config.h>
+CPS_START_NAMESPACE
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+           "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="TtH 2.92">
+
+                                 
+<title> The QCDIO API </title>
+</head>
+<body>
+ 
+<h1 align="center">The QCDIO API </h1>
+
+<h3 align="center">A.N. Jackson &amp; S. Booth </h3>
+
+<h3 align="center"><font size="-1">
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Revision</i>: 1.4 </td></tr></table>
+</td></tr></table>
+
+  
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Date</i>: 2001/10/23 14:45:08 </td></tr></table>
+</td></tr></table>
+
+</font> </h3>
+
+<p>
+   
+<h1>Contents </h1><a href="#tth_sEc1"
+>1&nbsp; Introduction</a><br />
+<a href="#tth_sEc2"
+>2&nbsp; Standard Output</a><br />
+<a href="#tth_sEc3"
+>3&nbsp; Loading/Saving Gauge Configurations</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.1"
+>3.1&nbsp; The UKQCD gauge configuration file format</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.1.1"
+>3.1.1&nbsp; Regenerate the third row</a><br />
+ 
+
+
+<p>
+
+ <h2><a name="tth_sEc1">
+1</a>&nbsp;&nbsp;Introduction</h2>
+This document outlines our current proposal for the QCDIO API, as (to be)
+implemented in the Columbia code.  The code implementing this API can fe found
+at: 
+
+<ul>
+<li> <a href="../doxygen/html/qcdio_h.html">./phys/util/include/qcdio.h</a></li>
+
+<li>
+ <a href="../doxygen/html/qcdio_C.html">./phys/util/qcdio/qcdio.C</a></li>
+</ul>
+
+<p>
+
+ <h2><a name="tth_sEc2">
+2</a>&nbsp;&nbsp;Standard Output</h2>
+By default, when running of QCDSP, only the output from node 0 is returned to
+Q shell.  In order to reproduce this behaviour elsewhere (for regression testing
+purposes), the qcdio.h file overrides [f]printf to map it onto q[f]printf
+which are defined in qcdio.C.
+
+<p>
+
+ <h2><a name="tth_sEc3">
+3</a>&nbsp;&nbsp;Loading/Saving Gauge Configurations</h2>
+Again, for testing purposes, we need a simple API for loading and saving the
+gauge configurations.  The suggested form is:
+
+<ul>
+<li>qload_gauge( char* filename_prefix, Lattice lat )
+Load the configuration from a set of files specified by the UKQCD filename
+prefix into the Lattice object lat.</li>
+
+<li>qload_gauge( char* filename_prefix, Lattice lat)
+Save the current gauge configuration from the Lattice object lat to a set of 
+files using the specified UKQCD filename prefix.</li>
+</ul>
+
+<p>
+EPCC will write a very simple gauge configuration
+reader for the Columbia code. Because of the DOE SciDAC project, there is no point in putting too much work into modifying the infrastructure of the code. The plan would be to just read the configurations in UKQCD format.
+
+<p>
+Craig McNeile will write a conversion code to convert the following formats:
+
+<ul>
+<li> NERSC</li>
+
+<li> MILC</li>
+
+<li> SZIN</li>
+</ul>
+into ukqcd format (using <a href="http://www.ph.ed.ac.uk/ukqcd/public/misc.html">http://www.ph.ed.ac.uk/ukqcd/public/misc.html</a> as a starting point).
+
+<p>
+     <h3><a name="tth_sEc3.1">
+3.1</a>&nbsp;&nbsp;The UKQCD gauge configuration file format</h3>
+In general a "configuration" is  tar (UNIX tape archive) file with 
+name
+
+<pre>
+D&lt;Beta&#62;C&lt;Clover&#62;K&lt;Kappa&#62;U&lt;Trajectory&#62;.tar
+
+</pre>
+where 
+
+<ul>
+<li> Beta is the beta value without the decimal point.</li>
+
+<li> Clover is the clover value without the decimal point (probably rounded)</li>
+
+<li> Kappa  is the kappa_sea value without the '0.1' at the start</li>
+
+<li> Trajectory is a 6 digit number designating the HMC trajectory.</li>
+</ul>
+For example D52C202K3500U007000.tar
+contains the information for trajectory serial no 7000 with
+
+<pre>
+beta = 5.2
+clover ~ 2.02 (as to how to find the exact value see later)
+kappa\_sea = .1350
+
+</pre>
+This tar file contains the following files:
+
+<p>
+<tt>D&lt;Beta&#62;C&lt;Clover&#62;K&lt;Kappa&#62;U&lt;trajectory&#62;T&lt;timeslice&#62;</tt> - these are the gauge timeslices
+
+<p>
+<tt>D&lt;Beta&#62;C&lt;Clover&#62;K&lt;Kappa&#62;U&lt;trajectory&#62;PT&lt;timeslice&#62;</tt> - these are the conjugate momenta timeslices
+
+<p>
+<tt>D&lt;Beta&#62;C&lt;Clover&#62;K&lt;Kappa&#62;U&lt;Trajectory&#62;.par</tt> - The parameter file
+
+<p>
+<tt>D&lt;Beta&#62;C&lt;Clover&#62;K&lt;Kappa&#62;U&lt;Trajectory&#62;.rng</tt> - The random number state
+
+<p>
+The random number state and the conjugate momenta are probably not useful
+for analysis, their purpose in the parameter file was just to allow 
+consistent restarts from the configuration using the HMC code should 
+we have wished to do so.
+
+<p>
+The parameter file is useful as it contains all the simulation  parameters
+such as the precise values of beta, c_sw, and kappa_sea which may have
+been truncated to keep filenames a manageable length. It also contains 
+the lattice dimensions and validation information for the 
+configuration such as the plaquette.
+
+<p>
+The parameters plaquette_real, plaquette_image refer to the plaquette 
+over the whole configuration
+whereas the parameters tplaquette_real[index], tplaquette_imag[index]
+refer to the spatial plaquette on timeslice &lt;index&#62;
+
+<p>
+The gauge configurations are saved in timeslices in files with names
+
+<pre>
+D&lt;Beta&#62;C&lt;Clover&#62;K&lt;Kappa&#62;U&lt;Trajectory&#62;T&lt;Timeslice - always 2 digits&#62;
+
+</pre>
+The precision of the saved gauges is usually 4 bytes 
+(This is <tt>REAL, KIND=4</tt> in Fortran 90 and
+<tt>sizeof(float)</tt> in C for  most architectures.
+The ghmc code can save with 8 bytes precision also, but this
+is almost never used)
+
+<p>
+The byte ordering of the configurations is the cray t3e byte ordering.
+[I believe this is ``big-endian'' - ANJ].
+This is the same as the byte ordering for Sun workstations but 
+is the opposite of the byte ordering for the alpha systems.
+
+<p>
+WIthin a timeslice array indexing runs as follows (fastes index first)
+
+<p>
+complex components, rows (2 rows only), columns, direction, x, y, z
+
+<p>
+where 
+
+<table>
+<tr><td>complex components </td><td>= 0 - 1    </td><td>(Real Part = 0, Imaginary Part = 1)</td></tr>
+<tr><td>rows               </td><td>= 0 - 1  </td><td>(Two rows only) </td></tr>
+<tr><td>columns            </td><td>= 0 - 2  </td><td>(Three columns)</td></tr>
+<tr><td>direction(mu)      </td><td>= 0 - 3 </td><td></td></tr>
+<tr><td>x                  </td><td>= 0 - Latt_x-1 </td><td></td></tr>
+<tr><td>y                  </td><td>= 0 - Latt_y-1 </td><td></td></tr>
+<tr><td>z                  </td><td>= 0 - Latt_y-1 </td><td></td></tr></table>
+
+
+<p>
+Where Latt_x, Latt_y, Latt_z are sizes of the lattice in the various directions.
+In our production runs these are always 16.
+
+<p>
+The last row of the gauges has to be regenerated as it is not stored.
+
+<p>
+Thus to read in a gauge configuration one must 
+read
+
+<p>
+4 * 2 * 2 * 3 * 4 * Latt_x * Latt_y * Latt_z 
+
+<p>
+bytes into a buffer
+
+<p>
+(These are 
+	precision * No of complex components * 2 rows * 3 columns *
+       	   4 directions * Spatial dimensions  in order
+)
+
+<p>
+Byte swap the buffer (depending on architecture) if necessary
+
+<p>
+Pack the buffer away into your lattice data structure in memory usually by
+looping over all the components in the order described above 
+(complex fastest, z slowest)
+
+<p>
+      <h4><a name="tth_sEc3.1.1">
+3.1.1</a>&nbsp;&nbsp;Regenerate the third row</h4>
+Include is a set of very simple C++ routines that can be used
+to handle gauges on a workstation. Our Fortran code is also
+available but is horribly complicated as it has been designed for
+MPP use and involves a lot of preprocessing, conditional compilation,
+header files,  dealing with processor layout etc which are much 
+harder to glean information from. This code is available as gauge.tar.gz
+on the web page.
+
+<p>
+The most important of all these files is gauge.cpp which is the 
+code for all the methods of the SU3GaugeTimeslice and the program
+gaugetest.cpp which illustrates how the class can be used to read in 
+a gauge. The rest of the classes are just support ( a very primitive
+complex number class, and an su3 matrix class - also primitive ).
+One should be able to compile gaugetest.cpp using the Makefile supplied.
+It has been tested with Dec C++ on an Alpha running Digital Unix.
+
+<p>
+The SU3Matrix class illustrates the technique used to regenerate the 
+third row. The swap.cpp subroutines carry out the byte swapping.
+
+<p>
+To change the C++ compiler to any other, edit the Makefile and change
+the CC macro to the C++ compiler of your choice. Currently it is set to 
+cxx.
+
+<p>
+For suns the byte swap flag in gaugetest.cpp should be set to 0.
+
+<p>
+To compile the test program copy  the test file gauge.tar.gz
+to its final location.
+
+<p>
+Unzip it using gunzip:
+
+<pre>
+$ gunzip gauge.tar.gz
+
+</pre>
+Untar it
+
+<pre>
+$ tar xvf gauge.tar
+
+</pre>
+
+<p>
+It should create its own directory called gauge and untar there.
+To compile go into this directory and make:
+
+<pre>
+$ cd gauge; make
+
+</pre>
+The code can be run to read in a gauge configuration by typing
+
+<pre>
+$ ./gaugetest &lt;Xsize&#62; &lt;Ysize&#62; &lt;Zsize&#62; &lt;Tsize&#62; &lt;ByteSwap&#62; &lt;Prefix&#62;
+
+</pre>
+Xsize, Ysize, Zsize are the lattice spatial dimensions in the directions 
+of x, y, and z respectively.
+
+<p>
+Tsize is the number of timeslices
+
+<p>
+Byte swap is a flag indicating wether or not the gauge should have
+its byte order reversed.
+
+<p>
+Prefix is the path of the gauge timeslice files without the T&lt;timeslice&#62;
+
+<p>
+Eg to read a 16<sup>3</sup> x 32 configuration in the current directory 
+with filename stem of D52C202K3500U007000 on an Alpha where one has to 
+reverse the byte order of the floating point numbers ons could run
+
+<pre>
+$ ./gaugetest 16 16 16 32 1 ./D52C202K3500U007000
+
+</pre>
+If all goes well you should get output of the following nature:
+
+<pre>
+Reading timeslice ./D52C202K3500U007000T00
+Re Tr Plaq = 0.533327  Im Tr Plaq = 0.000494551
+Reading timeslice ./D52C202K3500U007000T01
+Re Tr Plaq = 0.528731  Im Tr Plaq = -0.000777869
+Reading timeslice ./D52C202K3500U007000T02
+Re Tr Plaq = 0.533354  Im Tr Plaq = 0.000177485
+Reading timeslice ./D52C202K3500U007000T03
+Re Tr Plaq = 0.530886  Im Tr Plaq = -0.000693423
+Reading timeslice ./D52C202K3500U007000T04
+.
+. (etc)
+.
+
+</pre>
+
+<p>
+If gaugetest dies with a segfault or gets the plaquette wrong it can be 
+because the gauge dimensions are wrong or that the byte swap flag is 
+set incorrectly or that something horrible happened on the way to the
+transport of the gauge or that my C++ is not as portable as I like to think
+
+<p>
+If you have problems even despite this assistance pleas contact me
+via email at B.Joo@ed.ac.uk
+
+<p>
+
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 2.92.<br />On  4 Jul 2002, 16:37.</small>
+</body></html>
+CPS_END_NAMESPACE

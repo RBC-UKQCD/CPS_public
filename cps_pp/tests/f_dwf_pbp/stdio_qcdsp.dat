@@ -1,0 +1,4 @@
+#include<config.h>
+CPS_START_NAMESPACE
+
+qcsh:  file loaded not an executableCPS_END_NAMESPACE

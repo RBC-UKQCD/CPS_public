@@ -1,0 +1,2189 @@
+#include<config.h>
+CPS_START_NAMESPACE
+Lattice::Lattice() :
+	Reseted random number generator with seed = 112319
+Lattice::Lattice() :
+	Disordered starting configuration
+Lattice::Lattice() :
+	Memory starting configuration addr = cfc70
+Lattice::Convert(StrOrdType) :
+	No conversion necessary from 0 to 0
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 51.000000
+AlgHmcPhi::run() :
+	No Metropolis step -> Accepted
+AlgHmcPhi::run() :
+	Hmc steps = 52, Delta_hamilton = -4.130554e-02, accept = 1, dev = 1.792829e-07, max_diff = 7.450581e-07
+AlgHmcPhi::run() :
+	CG iterations: average = 0.000000e+00, min = 0, max = 0
+AlgHmcPhi::run() :
+	True Residual / |source|: average = 0.000000e+00, min = 0.000000e+00, max = 0.000000e+00
+AlgHmcPhi::run() :
+	Configuration number = 1
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+Lattice::Lattice() :
+	Memory starting configuration addr = cfc70
+Lattice::Convert(StrOrdType) :
+	No conversion necessary from 0 to 0
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 51.000000
+AlgHmcPhi::run() :
+	Metropolis step -> Accepted
+AlgHmcPhi::run() :
+	Hmc steps = 52, Delta_hamilton = -1.646423e-02, accept = 1, dev = 1.692143e-07, max_diff = 1.013279e-06
+AlgHmcPhi::run() :
+	CG iterations: average = 0.000000e+00, min = 0, max = 0
+AlgHmcPhi::run() :
+	True Residual / |source|: average = 0.000000e+00, min = 0.000000e+00, max = 0.000000e+00
+AlgHmcPhi::run() :
+	Configuration number = 2
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+Lattice::Lattice() :
+	Memory starting configuration addr = cfc70
+Lattice::Convert(StrOrdType) :
+	No conversion necessary from 0 to 0
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 1.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 2.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 3.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 4.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 5.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 6.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 7.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 8.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 9.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 10.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 11.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 12.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 13.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 14.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 15.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 16.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 17.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 18.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 19.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 20.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 21.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 22.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 23.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 24.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 25.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 26.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 27.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 28.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 29.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 30.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 31.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 32.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 33.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 34.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 35.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 36.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 37.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 38.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 39.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 40.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 41.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 42.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 43.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 44.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 45.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 46.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 47.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 48.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 49.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.000000
+AlgHmcPhi::run() :
+	MD_time/step_size = 50.500000
+AlgHmcPhi::run() :
+	MD_time/step_size = 51.000000
+AlgHmcPhi::run() :
+	Metropolis step -> Accepted
+AlgHmcPhi::run() :
+	Hmc steps = 52, Delta_hamilton = -1.219177e-02, accept = 1, dev = 1.818899e-07, max_diff = -8.642673e-07
+AlgHmcPhi::run() :
+	CG iterations: average = 0.000000e+00, min = 0, max = 0
+AlgHmcPhi::run() :
+	True Residual / |source|: average = 0.000000e+00, min = 0.000000e+00, max = 0.000000e+00
+AlgHmcPhi::run() :
+	Configuration number = 3
+AlgHmcPhi::run() :
+	MD_time/step_size = 0.000000
+Lattice::Lattice() :
+	Memory starting configuration addr = cfc70
+Lattice::Convert(StrOrdType) :
+	No conversion necessary from 0 to 0
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 0
+	Just enetered
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =1.413304e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.847241e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.188463e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 6.191135e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.957505e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 9.258118e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 4.665208e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 2.380195e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 9.791285e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 4.947801e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.989505e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 8.093862e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 3.251285e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.282617e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 4.195129e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 1.051357e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 4.212207e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 1.857469e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 9.652809e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 5.519058e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 2.742187e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 8.296528e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 2.383477e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 5.192518e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 1.154337e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 3.323980e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 7.825827e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 2.142958e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 7.020099e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 1.677619e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 3.425569e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 8.392102e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 2.106231e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 4.816971e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 6.819449e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 1.504604e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 4.097473e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 1.064756e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 2.254963e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 4.229744e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 8.491595e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 1.651928e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 3.376122e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 6.131310e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 1.552009e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 8.917059e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 6.258849e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 2.924143e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[47]|^2 = 7.530219e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 3.039705e-07, iter = 48
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 12766156
+	Exiting
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 12799488
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =1.824442e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 1.824442e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.430981e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.614980e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 5.358573e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.558524e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.296207e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 6.373918e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 2.736903e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.453308e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 5.847868e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.886256e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 1.260164e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 3.976485e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 9.501960e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 2.362585e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 9.414479e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 4.963248e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 2.679807e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 9.614653e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 4.842128e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 1.847249e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 6.121573e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 1.159189e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 2.865966e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 6.572181e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 2.043449e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 5.340154e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 8.355266e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 1.475197e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 3.122979e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 6.956265e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 1.594591e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 4.685818e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 1.029178e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 2.417667e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 5.747190e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 1.185840e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 2.034279e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 4.306986e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 7.437178e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 1.625753e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 2.442838e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 6.175367e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 3.288932e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 1.795436e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 1.536232e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 3.732845e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[47]|^2 = 5.190439e-26
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 5.967544e-07, iter = 48
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 25565644
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 48 5.967544e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 25565644
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =4.324352e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 4.324352e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 7.548428e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 3.202606e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.260352e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 5.373347e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 2.935868e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.503791e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 6.016869e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 2.805079e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.299156e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 6.535648e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 2.343879e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 6.594304e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 1.660231e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 3.769207e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 1.178330e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 3.936947e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 1.407105e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 8.448810e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 5.695352e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 1.951972e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 5.104753e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 1.237959e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 3.628362e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 8.866280e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 2.203631e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 6.277644e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 1.625138e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 4.064699e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 1.242998e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 2.823975e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 4.035531e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 8.713003e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 2.331657e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 6.202012e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 1.386979e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 2.571769e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 4.309459e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 7.838817e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 1.822807e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 3.792804e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 7.055187e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 3.227154e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 2.338160e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 1.284543e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 4.742142e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 9.244992e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[47]|^2 = 1.227522e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 4.271542e-07, iter = 48
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 38315134
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 48 4.271542e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 38315134
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =2.642875e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 2.642875e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 4.903667e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 2.146874e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 7.014987e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 3.375203e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 2.694129e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.125003e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 4.273164e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.387798e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 4.316119e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.286398e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 4.551550e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.286872e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 3.697115e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 1.600762e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 9.048991e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 4.481699e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 2.133840e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 9.967718e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 3.568519e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 1.119107e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 4.261072e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 1.299882e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 3.737247e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 8.838342e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 2.636131e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 7.650225e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 1.490438e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 3.551688e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 7.083417e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 1.069592e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 2.041663e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 6.356042e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 1.682833e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 4.540653e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 8.565607e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 1.666046e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 3.199696e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 5.223098e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 9.983152e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 2.096344e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 3.656704e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 7.226969e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 2.621483e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 1.580323e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 1.208461e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 4.119321e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[47]|^2 = 7.610137e-26
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 4.437087e-07, iter = 48
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 51081290
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 48 4.437087e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 51081290
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.398092e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 3.398092e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 6.528638e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 2.777781e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.204710e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 5.742379e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 3.003191e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 1.442326e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 6.202529e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 2.914277e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.144854e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.997820e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 6.448717e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 2.651874e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 1.164498e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 4.286440e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 1.677237e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 8.942195e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 4.682859e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 2.297208e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 8.436803e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 3.026638e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 9.576174e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 2.611100e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 8.379541e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 1.771713e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 3.504441e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 6.062473e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 1.287829e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 2.329009e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 5.280827e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 1.020348e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 2.652598e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 5.415337e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 1.379323e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 2.863253e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 6.893142e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 1.341262e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 2.682365e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 4.662268e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 1.068316e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 2.979305e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 7.033887e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 3.090465e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 2.228523e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 1.195835e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 3.511088e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 4.737866e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[47]|^2 = 6.485511e-26
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 3.962035e-07, iter = 48
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 63930776
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 48 3.962035e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 63930776
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.668123e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 3.668123e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.020710e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.007968e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 4.848203e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.027344e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.011996e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 4.059394e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 1.693108e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 8.392841e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 4.685741e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.338457e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 9.741064e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 3.022962e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 8.379842e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 1.560203e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 5.072689e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 2.480452e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 1.767930e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 8.322583e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 3.193297e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 7.796190e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 2.534833e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 4.858030e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 8.227399e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 1.756897e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 3.364250e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 1.026229e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 2.806269e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 7.608635e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 2.151928e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 6.075725e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 1.458979e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 3.307769e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 7.765593e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 2.042720e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 5.047357e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 1.201473e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 2.443863e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 3.575141e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 4.637440e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 8.450168e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 1.955373e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 4.482650e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 1.302489e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 6.496235e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 4.334889e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 2.672421e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 3.225152e-07, iter = 47
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 76463608
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 47 3.225152e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 76463608
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.460191e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 3.460191e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.726104e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.119954e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 5.582210e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.823340e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.333748e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 5.840704e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 2.609009e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.236880e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 6.276034e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.675826e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 1.018665e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 2.993875e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 7.458718e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 2.018098e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 4.690450e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 1.097116e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 3.170124e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 1.070969e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 5.094660e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 2.879781e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 1.540779e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 5.984480e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 1.887867e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 4.817565e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 1.290652e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 3.714106e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 1.039975e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 2.199945e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 6.695408e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 1.687172e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 3.428514e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 6.120680e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 1.296928e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 3.688102e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 7.298021e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 1.699838e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 2.285445e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 4.417579e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 7.360920e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 1.589445e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 3.085871e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 9.975693e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 6.508151e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 4.485919e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 2.313049e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 4.232322e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[47]|^2 = 5.389713e-26
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.118461e-07, iter = 48
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 89229764
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 48 2.118461e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 89229764
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.293971e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 3.293971e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.466564e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.074303e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 5.648665e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.331175e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.445124e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 6.746489e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 3.077798e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.047262e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 4.037565e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.523119e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 4.146718e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 8.634428e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 2.473797e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 9.201393e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 4.794643e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 3.342960e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 1.837542e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 5.715926e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 1.550768e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 3.636237e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 8.318415e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 1.805570e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 4.592781e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 1.074891e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 1.962291e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 5.444974e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 1.940309e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 7.542905e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 2.909685e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 8.185771e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 1.408438e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 2.983624e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 6.625185e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 1.776848e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 3.751109e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 8.131290e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 1.315040e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 3.704844e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 7.209649e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 1.675322e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 3.890014e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 8.255668e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 1.751146e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 1.031261e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 6.931594e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 3.139170e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.580732e-07, iter = 47
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 101745930
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 47 2.580732e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 101745930
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.816634e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 3.816634e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 4.378701e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.145821e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 5.959386e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 2.429061e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.384751e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 7.640885e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 2.896758e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.402750e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 5.178875e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.950657e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 5.843563e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.578244e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 6.039026e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 3.012710e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 1.546795e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 6.681712e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 3.131538e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 1.435548e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 5.553117e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 2.168099e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 5.607231e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 1.665903e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 4.568855e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 8.707676e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 1.825903e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 4.540244e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 1.088621e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 2.019106e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 6.828800e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 1.453783e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 2.565635e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 5.543987e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 1.381783e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 3.975918e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 7.919829e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 1.613285e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 3.743223e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 7.185502e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 1.407891e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 2.805079e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 3.940696e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 8.512574e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 2.990320e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 1.752626e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 1.209895e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 4.565324e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[47]|^2 = 7.044668e-26
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.137792e-07, iter = 48
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 114528752
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 48 2.137792e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 114528752
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =4.151491e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 4.151491e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.052702e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 9.304656e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 3.343220e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.640891e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 9.426923e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 4.889895e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 2.075362e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 9.312935e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 4.825722e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 2.153308e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 8.399649e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 2.985052e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 8.721246e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 1.584945e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 3.340563e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 8.746360e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 3.278179e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 9.446168e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 3.282057e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 1.788761e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 7.781897e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 4.008006e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 1.452869e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 4.857101e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 1.284381e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 3.216384e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 9.027713e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 1.636187e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 4.077443e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 8.307852e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 1.679745e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 3.513859e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 7.424874e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 1.751811e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 4.193433e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 9.520430e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 2.413847e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 4.725550e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 9.859828e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 1.857306e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 4.483308e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 1.391321e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 9.406381e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 5.642513e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 2.909429e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 8.653362e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[47]|^2 = 1.374693e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.298141e-07, iter = 48
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 127378238
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 48 2.298141e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 127378238
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.956405e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 3.956405e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 3.128167e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 6.797962e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 2.857422e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.157555e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 7.190868e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 4.616348e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 2.250789e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 8.460847e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 3.529291e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 9.613703e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 2.203412e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 7.144341e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 3.062887e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 1.209556e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 5.927638e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 3.087613e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 1.688885e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 5.382724e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 1.399902e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 3.941082e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 1.182953e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 2.156679e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 6.368411e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 3.166207e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 9.613030e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 2.294056e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 5.579859e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 1.229322e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 2.461157e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 4.671978e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 1.171364e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 2.390344e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 3.612467e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 7.877477e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 2.330472e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 5.008097e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 1.459137e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 3.343663e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 7.567519e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 1.424493e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 3.152280e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 9.576875e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 6.099335e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 3.918092e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 1.812348e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 4.108550e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[47]|^2 = 8.778729e-26
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.735372e-07, iter = 48
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 140161060
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 48 1.735372e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 140161060
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =3.574087e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 3.574087e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 2.626264e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 5.133024e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 1.712543e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 8.173638e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 4.626451e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 2.460954e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 9.542098e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 3.846618e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 1.566702e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 6.969773e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 3.036503e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.029219e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 3.383959e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 9.010054e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 3.578671e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 1.609840e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 9.572807e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 4.851774e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 2.194382e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 7.979432e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 1.658362e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 4.211870e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 1.083729e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 2.389234e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 5.537625e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 1.668893e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 5.025021e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 1.049295e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 3.160284e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 7.050562e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 1.068693e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 2.521488e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 4.330084e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 8.755249e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 1.564181e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 3.356989e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 7.469346e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 1.352414e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 3.557206e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 5.851997e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 1.395162e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 2.277111e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 4.905202e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 1.478781e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 1.907119e-07, iter = 45
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 152160580
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 45 1.907119e-07
+DiracOp::DiracOp(L&,V*,V*,CgArg,CnvFrmType) : Clock (1.0 MHz) = 152160580
+	Just enetered
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 0 to 2
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> WILSON
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =4.304492e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 4.304492e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 4.281329e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 1.313234e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 6.186973e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 3.268472e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.847986e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 9.486873e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 3.634537e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 1.248311e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 5.164946e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 1.834827e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 4.086069e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 1.120867e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 5.819921e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 2.843796e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 1.291020e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 7.221251e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 3.179505e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 1.218590e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 4.185893e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 1.477748e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 4.350385e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 1.125536e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 3.613892e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 1.191011e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 2.663184e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 6.415585e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 1.242595e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 2.157314e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 6.565853e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 1.325310e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 2.434123e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 4.893771e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 1.178598e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 2.461921e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 6.171708e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 1.312958e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 3.484003e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 6.873145e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 1.199307e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 1.801862e-22
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 3.633432e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 1.061619e-23
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 8.553453e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 5.606598e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 1.839523e-24
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 3.490100e-25
+DiracOp::InvCg(V*,V*,F,F*) :
+	True |res| / |src| = 2.876093e-07, iter = 47
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Fclover::Fconvert(V*,StrOrdType,StrOrdType) :
+	Converting frm field str ord from 2 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: WILSON -> CANONICAL
+DiracOp::~DiracOp() : Clock (1.0 MHz) = 164676746
+	Exiting
+WspectQuark::CTOR :
+	CG iterations = 47 2.876093e-07
+CPS_END_NAMESPACE

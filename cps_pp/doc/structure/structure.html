@@ -1,0 +1,302 @@
+#include<config.h>
+CPS_START_NAMESPACE
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+           "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="TtH 2.92">
+
+                                 
+<title> CPS: Overall Code Structure. </title>
+</head>
+<body>
+ 
+<h1 align="center">CPS: Overall Code Structure. </h1>
+
+<h3 align="center">A.N. Jackson &amp; S. Booth </h3>
+
+<h3 align="center"><font size="-1">
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Revision</i>: 1.5 </td></tr></table>
+</td></tr></table>
+
+  
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Date</i>: 2002/06/06 13:28:25 </td></tr></table>
+</td></tr></table>
+
+</font> </h3>
+
+<p>
+   
+<h1>Contents </h1><a href="#tth_sEc1"
+>1&nbsp; File types and filename extensions</a><br />
+<a href="#tth_sEc2"
+>2&nbsp; ./phys/ - The Physics Code</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.1"
+>2.1&nbsp; ./phys/alg/ - Algorithms</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2"
+>2.2&nbsp; ./phys/doc/ - Documentation</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.3"
+>2.3&nbsp; ./phys/lib/ - Library Files</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.4"
+>2.4&nbsp; ./phys/mem/ - Memory Routines</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.5"
+>2.5&nbsp; ./phys/nga/ - Node Gate Array Routines</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.6"
+>2.6&nbsp; ./phys/task/ - Task &amp; Scripting Routines</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.7"
+>2.7&nbsp; ./phys/tests/ - The Regression Testing Programs</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.8"
+>2.8&nbsp; ./phys/util/ - The Physics Utilies Library</a><br />
+<a href="#tth_sEc3"
+>3&nbsp; The GNU build system</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.1"
+>3.1&nbsp; autoconf: resolving platform dependancies and build options</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2"
+>3.2&nbsp; gmake: the GNU make program</a><br />
+<a href="#tth_sEc4"
+>4&nbsp; Outline of the new code structure</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc4.1"
+>4.1&nbsp; A unified build system</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc4.2"
+>4.2&nbsp; Cross-platform portability</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc4.3"
+>4.3&nbsp; Cross-platform testing suite</a><br />
+ 
+
+
+<p>
+
+ <h2><a name="tth_sEc1">
+1</a>&nbsp;&nbsp;File types and filename extensions</h2>
+
+<table border="1">
+<tr><td><b>Type</b> </td><td colspan="4" align="center"><b>QCDSP</b> </td><td><b>Elsewhere</b> </td><td colspan="1" align="center"><b>GNU</b></td></tr>
+<tr><td></td><td>General </td><td>Tartan </td><td>T.I. </td><td>Sun </td><td></td><td></td></tr>
+<tr><td>C++ source </td><td>.C </td><td>- </td><td>- </td><td>.C </td><td>.C </td><td>.[cc<font face="symbol">|</font
+>cxx<font face="symbol">|</font
+>cpp<font face="symbol">|</font
+>c++<font face="symbol">|</font
+>C] </td></tr>
+<tr><td>C/C++ header </td><td>.h </td><td>- </td><td>- </td><td>.h </td><td>.h </td><td>.h</td></tr>
+<tr><td>Pre-processed file </td><td>.i </td><td>- </td><td>- </td><td>.i </td><td>.i </td><td>.i</td></tr>
+<tr><td>Assembler source </td><td>.asm </td><td>- </td><td>- </td><td>.asm </td><td>.asm </td><td>.[s<font face="symbol">|</font
+>S] </td></tr>
+<tr><td>Object </td><td>- </td><td>.tof </td><td>.obj </td><td>.o </td><td>.o </td><td>.o </td></tr>
+<tr><td>Archive/Library </td><td>- </td><td>.olb </td><td>.lib </td><td>.lib </td><td>.a </td><td>.a </td></tr>
+<tr><td>Binary </td><td>- </td><td>.outtof </td><td>.out </td><td>.out </td><td>.out </td><td>- </td></tr>
+<tr><td>Output Data </td><td>.dat </td><td>- </td><td>- </td><td>.dat </td><td>.dat </td><td>- </td></tr>
+<tr><td>GNU build input files </td><td>- </td><td>- </td><td>- </td><td>- </td><td>.in </td><td>.in </td></tr></table>
+
+
+<p>
+Note that QCDSP also uses linker control files (.lcf), object list files
+(.ctl), linker map files (.map) and processed assembler files (.lst) [???].  
+See the <a href="../qcdsp/toplevel.html#tth_chAp6">QCDSP manual</a>
+for more information on all the file types used on that platform.
+
+<p>
+
+ <h2><a name="tth_sEc2">
+2</a>&nbsp;&nbsp;./phys/ - The Physics Code</h2>
+This is the top level directory.  It contains global configuration files (e.g.
+config.h) and the makefiles.
+
+<p>
+     <h3><a name="tth_sEc2.1">
+2.1</a>&nbsp;&nbsp;./phys/alg/ - Algorithms</h3>
+<a name="phys:alg">
+</a>
+Physical simulation algorithms.
+
+<p>
+     <h3><a name="tth_sEc2.2">
+2.2</a>&nbsp;&nbsp;./phys/doc/ - Documentation</h3>
+<a name="phys:doc">
+</a>
+Documentation for the code, starting at
+<a href="../index.html">./phys/doc/index.html</a>.
+
+<p>
+     <h3><a name="tth_sEc2.3">
+2.3</a>&nbsp;&nbsp;./phys/lib/ - Library Files</h3>
+<a name="phys:lib">
+</a>
+All the library archive files from all the other code directories are placed
+here to be linked against.
+
+<p>
+     <h3><a name="tth_sEc2.4">
+2.4</a>&nbsp;&nbsp;./phys/mem/ - Memory Routines</h3>
+<a name="phys:mem">
+</a>
+Mainly p2v.C, which copies assembler routines into CRAM for the QCDSP machine.
+
+<p>
+     <h3><a name="tth_sEc2.5">
+2.5</a>&nbsp;&nbsp;./phys/nga/ - Node Gate Array Routines</h3>
+<a name="phys:nga">
+</a>
+The hardware interface routines.  The global sums and the circular buffer
+routines are defined in here.  This directory also contains the MPI
+implementation of the SCU layer.
+
+<p>
+     <h3><a name="tth_sEc2.6">
+2.6</a>&nbsp;&nbsp;./phys/task/ - Task &amp; Scripting Routines</h3>
+<a name="phys:task">
+</a>
+Mainly for QCDSP, these routines parse and execute scripts describing
+sequences of QCD computations.
+
+<p>
+     <h3><a name="tth_sEc2.7">
+2.7</a>&nbsp;&nbsp;./phys/tests/ - The Regression Testing Programs</h3>
+<a name="phys:tests">
+</a>
+A set of programs for regression testing of the code suite.
+
+<p>
+     <h3><a name="tth_sEc2.8">
+2.8</a>&nbsp;&nbsp;./phys/util/ - The Physics Utilies Library</h3>
+<a name="phys:util">
+</a>
+This contains the core code, defining the data structures and the essential 
+mathematical algorithms. e.g. the CG solver is defined in here, in context,
+but called from ./phys/alg/.
+
+<p>
+
+ <h2><a name="tth_sEc3">
+3</a>&nbsp;&nbsp;The GNU build system</h2>
+When not running on QCDSP, the CPS is built using standard GNU tools to make
+the platform dependencies as simple to deal with as possible.  The tools are
+autoconf (<a href="http://www.gnu.org/manual/autoconf/">http://www.gnu.org/manual/autoconf/</a>) and GNU make (gmake, <a href="http://www.gnu.org/manual/make/">http://www.gnu.org/manual/make/</a>). 
+
+<p>
+     <h3><a name="tth_sEc3.1">
+3.1</a>&nbsp;&nbsp;autoconf: resolving platform dependancies and build options</h3>
+The core of this standard automatic configuration system is the developer's
+configure script `configure.in' (in the root ./phys/ directory of the CPS).  
+This defines which files are system/build dependent, and defines macro 
+substitutions to produce versions of those files suitable for a particular
+build.  The configure.in script cannot be run directly, so we need to
+translate this file into a shell script that will run on as wide a range of
+platforms as possible.  This is what autoconf does; it takes configure.in and
+produces a shell script called `configure' which should run on any flavour of 
+UNIX.  The user invokes the `./configure' command to
+configure the build.
+
+<p>
+The build dependant files are:
+
+<p>
+
+<table>
+<tr><td><b>Input</b> </td><td><b>Output</b> </td><td><b>Description</b></td></tr>
+<tr><td>Makefile.gnu.in </td><td>Makefile.gnu </td><td>The makefile for building the CPS library.
+ </td></tr>
+<tr><td>Makefile.gnutests.in </td><td>Makefile.gnutests </td><td>The makefile for building the test
+ suite. </td></tr>
+<tr><td>config.h.in </td><td>config.h </td><td>The global code-configuration header file. </td></tr>
+<tr><td>tests/regression.pl.in </td><td>tests/regression.pl </td><td>A perl script to generate
+ shell scripts for running the test suite. </td></tr></table>
+
+
+<p>
+So, for example, config.h is produced from config.h.in, by performing
+macrosubstitution of all the @MACRO_NAME@ macros in that file.  The full list
+of macros is:
+
+<p>
+
+<table>
+<tr><td><b>Macro</b> </td><td><b>Description</b> </td><td><b>Default</b></td></tr>
+<tr><td>@CC@ </td><td>The C compiler </td><td>``gcc'' </td></tr>
+<tr><td>@CFLAGS@ </td><td>Flags for the C compiler </td><td>``-O'' </td></tr>
+<tr><td>@NOT_TESTING_QCDSP@ </td><td>Is this not QCDSP </td><td>``yes'' </td></tr>
+<tr><td>@PARALLELDEF@ </td><td>Define the PARALLEL macro </td><td>``-DPARALLEL=0'' </td></tr>
+<tr><td>@MPILINK@ </td><td>To link with MPI use e.g. -lmpi </td><td>``'' </td></tr>
+<tr><td>@PARALLELLINK@ </td><td>Link with parallel or serial libraries </td><td>``SERIALLIB'' </td></tr>
+<tr><td>@TESTING_PARALLEL@ </td><td>Should the tests be run as parallel </td><td>``no'' </td></tr>
+<tr><td>@GSUMPRECISION@ </td><td>Floating-point precision to use for global sums </td><td>``double''
+</td></tr>
+<tr><td>@LOCALPRECISION@ </td><td>Floating-point precision to use elsewhere </td><td>``double'' </td></tr>
+<tr><td>@topwd_srcdir@ </td><td>Absolute location of the top-level source directory </td><td>- </td></tr></table>
+
+
+<p>
+The user can use the configure script to change the behaviour away from the
+default.  Currently, the build options are:
+
+<ul>
+<li> <b>-enable-parallel-mpi</b> which turns the build into a parallel build using
+the MPI implementation of the SCU.</li>
+
+<li> <b>-enable-double-prec=``no''</b> which forces the build to use floats
+instead of doubles for all calculations except the global summations.</li>
+</ul>
+There are other standard ./configure options (use ``./configure -help'' to
+see them) but these are not really used in the CPS.
+
+<p>
+Note that mny of the macros can be overriden using shell environment
+variables.  For example, if you want to use the Sun C++ compiler with
+debugging information switched on, i.e. CC -g , you should use (in bash):
+
+<p>
+
+<pre>
+export CC=CC
+export CFLAGS=-g
+./configure
+
+</pre>
+
+<p>
+You should be warned, however, that the configure script stores a record of
+the build options in a file called config.status or config.cache.  You may have
+to remove this file to force the build behaviour to change.
+
+<p>
+There are a number of other special files that autoconf creates to store
+information and to ensure that the ./configure system will run anywhere.  They
+are config.cache, config.guess, config.log, config.status, config.sub,
+install-sh, missing, mkinstalldirs, uname.  See the autoconf manual for
+detailed information on what these files do.
+
+<p>
+     <h3><a name="tth_sEc3.2">
+3.2</a>&nbsp;&nbsp;gmake: the GNU make program</h3>
+The GNU version of make is used simply because it has a little more
+functionality that standard make programs.  In particular, the makefiles can
+be (and are) recursive.
+
+<p>
+ <h2><a name="tth_sEc4">
+4</a>&nbsp;&nbsp;Outline of the new code structure</h2>
+
+<p>
+     <h3><a name="tth_sEc4.1">
+4.1</a>&nbsp;&nbsp;A unified build system</h3>
+
+<p>
+     <h3><a name="tth_sEc4.2">
+4.2</a>&nbsp;&nbsp;Cross-platform portability</h3>
+
+<p>
+     <h3><a name="tth_sEc4.3">
+4.3</a>&nbsp;&nbsp;Cross-platform testing suite</h3>
+
+<p>
+
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 2.92.<br />On  4 Jul 2002, 16:38.</small>
+</body></html>
+CPS_END_NAMESPACE

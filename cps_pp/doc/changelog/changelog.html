@@ -1,0 +1,567 @@
+#include<config.h>
+CPS_START_NAMESPACE
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+           "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="TtH 2.92">
+
+                                 
+<title> Notes on changes to the Columbia code. </title>
+</head>
+<body>
+ 
+<h1 align="center">Notes on changes to the Columbia code. </h1>
+
+<h3 align="center">A.N. Jackson &amp; S. Booth </h3>
+
+<h3 align="center"><font size="-1">
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Revision</i>: 1.9 </td></tr></table>
+</td></tr></table>
+
+  
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Date</i>: 2002/06/06 13:28:25 </td></tr></table>
+</td></tr></table>
+
+</font> </h3>
+
+<p>
+   
+<div align=right><a href="mailto:A.N.Jackson@ed.ac.uk">A.N.Jackson@ed.ac.uk</a>.
+</div>
+
+<p>
+
+<h1>Contents </h1><a href="#tth_sEc1"
+>1&nbsp; Version 4.0.0</a><br />
+<a href="#tth_sEc2"
+>2&nbsp; Version 4.0.5</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.1"
+>2.1&nbsp; ANSIfication</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.1.1"
+>2.1.1&nbsp; Variable Scoping</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2"
+>2.2&nbsp; The MPI version of the SCU</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.3"
+>2.3&nbsp; Other Minor Issues</a><br />
+<a href="#tth_sEc3"
+>3&nbsp; Version 4.1.0 (alpha release)</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.1"
+>3.1&nbsp; Implementing flexible floating-point precision</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.1.1"
+>3.1.1&nbsp; Global Summations</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2"
+>3.2&nbsp; Addition of an autoconf configuration system</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.3"
+>3.3&nbsp; Other Minor Changes</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.4"
+>3.4&nbsp; Testing</a><br />
+<a href="#tth_sEc4"
+>4&nbsp; Version 4.1.0 (beta release)</a><br />
+<a href="#tth_sEc5"
+>5&nbsp; Version 4.1.0 (beta release)</a><br />
+<a href="#tth_sEc6"
+>6&nbsp; Version 4.1.0 (beta release)</a><br />
+<a href="#tth_sEc7"
+>7&nbsp; Version 4.1.0 (beta release)</a><br />
+<a href="#tth_sEc8"
+>8&nbsp; Pre-4.1.6: Adding a gauge-configuration saving routine</a><br />
+ 
+
+<p>
+
+ <h2><a name="tth_sEc1">
+1</a>&nbsp;&nbsp;Version 4.0.0</h2>
+The original version of the code from Columbia.  Internally, this corresponds
+to revision 1.1.1.1 in the UKQCD QCDOC repository, dated 2001/06/15.  
+This was given the revision tag <tt>phys_4_0_0_open</tt>. 
+
+<p>
+
+ <h2><a name="tth_sEc2">
+2</a>&nbsp;&nbsp;Version 4.0.5</h2>
+This version (largely notional as there was no CVS tag) referred to the basic
+ANSIfication of the code and the addition of the draft MPI SCU layer.
+
+<p>
+     <h3><a name="tth_sEc2.1">
+2.1</a>&nbsp;&nbsp;ANSIfication</h3>
+<a name="405ANSI">
+</a>
+A large number of small changes have been made throughout the code, to
+turn it into more standard C++.  The code will now compile with any recent gcc
+(only tested under 2.8.1 &amp; 2.95.2, but 2.95.3+ should present few serious
+issues).  The 4.0.0 code only compiled under <tt>gcc 2.8.1</tt>.  The compiler errors
+fell into the following categories:
+
+<ul>
+<li> Attempts at using inline variables outside their scope.</li>
+
+<li> Inline declaration of variable without types.</li>
+
+<li> ``assignment to <tt>char*</tt> or <tt>void*</tt> from <tt>const char*</tt>
+ discards qualifiers.''  This does not occur on all compilers as the default
+ type for inline character strings is compiler dependent.  However, this behaviour 
+ can usually be controlled via command-line arguments to the compiler.</li>
+
+<li> No type declaration for <tt>main</tt>.</li>
+
+<li> Cannot pass <tt>Float</tt> through <tt>(...)</tt>.  Only native types can be
+ passed through ellipsis, see section of floating-point below.</li>
+
+<li> Could not find <tt>sysfunc.h</tt>, <tt>flotar.h</tt>,
+ etcetera. i.e. could not find QCDSP-specific header files.</li>
+
+<li> Implicit declarations of functions and variables, mainly due
+ to the missing header files.</li>
+</ul>
+
+<p>
+      <h4><a name="tth_sEc2.1.1">
+2.1.1</a>&nbsp;&nbsp;Variable Scoping</h4>
+The most common problem was the use of variables beyond their ANSI scope.  For
+example, consider a code fragment of the form:
+
+<pre>
+for(int i = 0; i &lt; 10; i++ ) {
+  [do something]
+}
+for( i = 0; i &lt; 10; i++ ) {
+  [do something else]
+}
+
+</pre>
+This is illegal under ANSI C++, as the integer i does not exist beyond the
+scope of the for-loop in which it was created.  This was fixed by moving the
+declaration into the required scope:
+
+<pre>
+int i;
+for(i = 0; i &lt; 10; i++ ) {
+  [do something]
+}
+for( i = 0; i &lt; 10; i++ ) {
+  [do something else]
+}
+
+</pre>
+This yields the correct scoping on both old and ANSI compilers.
+
+<p>
+     <h3><a name="tth_sEc2.2">
+2.2</a>&nbsp;&nbsp;The MPI version of the SCU</h3>
+The first MPI implementation of the SCU layer was added to
+the <tt>./nga</tt> directory.  More information on this aid to portability can be found
+in <a href="../mpi-scu/commspec.html">../mpi-scu/commspec.html</a>.
+
+<p>
+     <h3><a name="tth_sEc2.3">
+2.3</a>&nbsp;&nbsp;Other Minor Issues</h3>
+Apart from the ANSIisms and MPI, some other minor changes were also made.  For
+this version, the <tt>double64.h</tt> header files have been moved.  Identical
+copies of this file were found in multiple directories (under
+<tt>./nga/glb_*</tt>).  These have been removed and replaced with a single
+<tt>double64.h</tt> header file in <tt>./nga/include</tt>.
+
+<p>
+
+ <h2><a name="tth_sEc3">
+3</a>&nbsp;&nbsp;Version 4.1.0 (alpha release)</h2>
+The first major release from EPCC was the 4.1.0 (alpha) version, dated
+2001/09/06 cvs revision tag: <tt>phys_4_1_0_alpha_open</tt>.  This version
+had been successfully compiled and tested on a number of platforms (see
+section on testing below).  As well as the 4.0.5 modifications, this version
+implements flexible (float/double) floating-point precision, and adds an
+autoconf based configuration system.
+
+<p>
+     <h3><a name="tth_sEc3.1">
+3.1</a>&nbsp;&nbsp;Implementing flexible floating-point precision</h3>
+As indicated above (&#167;<a href="#405ANSI">2.1</a>), it is not always possible to use the <tt>rfloat</tt>
+floating-point implementation on all platforms.  To this end, <b>all</b>
+references to rfloat have been replaced with a typedef called <tt>Float</tt>.
+Also, <b>all</b> references to <tt>float</tt>s have been replaced with an
+``internal float'' typedef called <tt>IFloat</tt>.  These typedefs are in 
+<tt>./util/include/data_types.h</tt>.  
+
+<p>
+Setting <tt>Float</tt> to <tt>rfloat</tt> and <tt>IFloat</tt> to <tt>float</tt> recovers
+the original functionality.  
+
+<p>
+Using <tt>Float</tt> = <tt>IFloat</tt> = <tt>float</tt> runs in exactly the same
+precision as the original, but the serial code runs approximately 20 times
+faster.
+
+<p>
+Using <tt>Float</tt> = <tt>IFloat</tt> = <tt>double</tt> makes the code to run in
+double precision.
+
+<p>
+This behaviour is controlled from <tt>./config.h</tt> using two compiler macros,
+e.g.
+
+<pre>
+/* Precision of the local calculations: rfloat, float, double. */
+#define LOCALCALC_TYPE double
+/* Precision of other internal calcs: float, double. */
+#define INTERNAL_LOCALCALC_TYPE double
+
+</pre>
+
+<p>
+      <h4><a name="tth_sEc3.1.1">
+3.1.1</a>&nbsp;&nbsp;Global Summations</h4>
+Some global operations (essentially global sums) can be set to use 
+double-precision separately to the rest of the code.  This rests on the use of
+the <tt>double64.h</tt> header file in <tt>./nga/include</tt>, which defines a
+64-bit floating-point type (<tt>Double64</tt>) for use with the global-sum calls.
+On QCDSP, the original behaviour (involving a specialised floating-point class) is
+retained.  Elsewhere, the behaviour is typedef'd such that:
+
+<pre>
+typedef GLOBALSUM_TYPE Double64;
+
+</pre>
+Where the compiler macro <tt>GLOBALSUM_TYPE</tt> is defined in <tt>./config.h</tt>.  
+The default is <tt>double</tt>.
+
+<p>
+     <h3><a name="tth_sEc3.2">
+3.2</a>&nbsp;&nbsp;Addition of an autoconf configuration system</h3>
+There are two parallel make-structures in the codebase.  The QCDSP one has been
+left unchanged, but the GNU one has been modified.  The autoconf system
+revolves around a configure script, <tt>configure.in</tt>, which defines the
+platform dependencies and from which the <tt>./configure</tt> script is created.
+This latter script takes the following files:
+
+<pre>
+./config.h.in
+./Makefile.gnu.in
+./Makefile.gnutests.in
+./tests/regression.pl.in
+
+</pre>
+and creates the files
+
+<pre>
+./config.h
+./Makefile.gnu
+./Makefile.gnutests
+./tests/regression.pl
+
+</pre>
+from them via macro substitution.  As well as controlling platform dependence,
+the configure script allows you to set the code precision and decide whether
+to compile as a serial or parallel (MPI) program.  Run <tt>./configure
+-help</tt> for more information.
+
+<p>
+Note that some of the global code options set in config.h are extremely
+important, and so any other header files which did not directly or indirectly
+include config.h had to be changed to do so.
+
+<p>
+On QCDSP, this distribution should still compile straight out of the
+box.  On other platforms, the process is slightly more involved.  See
+<a href="../porting/porting.html">../porting/porting.html</a> for more information.
+
+<p>
+     <h3><a name="tth_sEc3.3">
+3.3</a>&nbsp;&nbsp;Other Minor Changes</h3>
+The seeding of the serial RNG has also been <tt>#define</tt>d in <tt>config.h</tt>,
+globally instead of locally.  Also, a standard level of verbosity has been
+<tt>#define</tt>d in <tt>config.h</tt> for the test programs, instead of having a
+separate verbose-level in each code.  Note also that a new verbosity setting
+has been added to the <tt>Verbose</tt> class so that the RNG seed(s) used by the
+code can be output without also having to output vast amounts of program-flow
+information.
+
+<p>
+     <h3><a name="tth_sEc3.4">
+3.4</a>&nbsp;&nbsp;Testing</h3>
+Following all of these changes, the code has been tested using a
+slightly modified implementation of the original Qrun testing script.
+A perl script (tests/regression.pl) is used to generate a batch script
+(tests/regression.sh).  Running this script will place the output of
+each code (both from stdio and from and .dat files) into the
+tests/regressions directory.  This output can be checked against that
+provided in the following subdirectories.
+
+<p>
+
+<pre>
+ phys/tests/regressions/v4_0_0/parallel
+ phys/tests/regressions/v4_0_0/serial
+
+</pre>
+
+<p>
+These contain the output from the original version of the code that EPCC
+received, prior to any of our changes but using a standardised level of
+verbosity.
+
+<p>
+
+<pre>
+ phys/tests/regressions/v4_1_0/parallel
+ phys/tests/regressions/v4_1_0/serial
+
+</pre>
+
+<p>
+These contain the output from the current version of the code.  The
+two sets of files differ only trivially, in that the Clock timings are
+different, the CRAM addresses have changed, and that the conditions
+for the outputting of the RNG printing string have been altered.
+
+<p>
+Note that all of this output is from QCDSP.  The MPI version has yet to be
+rigorously tested.
+
+<p>
+
+ <h2><a name="tth_sEc4">
+4</a>&nbsp;&nbsp;Version 4.1.0 (beta release)</h2>
+Date: 23rd January 2001; CVS revision tag <tt>phys_4_1_0_beta_open</tt>.
+
+<p>
+Since the above version, a few very minor changes have been made to the code,
+along with much modification of the documentation.  Also, the names of the
+library archive files (under the GNU make-structure) have been changed to
+<tt>*.a</tt> instead of <tt>*.lib</tt> to ensure portability.  The suggested set of
+CVS <tt>$ Tag: $</tt> tags have been added to the files added by EPCC.
+
+<p>
+
+ <h2><a name="tth_sEc5">
+5</a>&nbsp;&nbsp;Version 4.1.0 (beta release)</h2>
+Date: 23rd January 2001; CVS revision tag <tt>phys_4_1_0_beta_open</tt>.
+
+ <h2><a name="tth_sEc6">
+6</a>&nbsp;&nbsp;Version 4.1.0 (beta release)</h2>
+Date: 23rd January 2001; CVS revision tag <tt>phys_4_1_0_beta_open</tt>.
+
+ <h2><a name="tth_sEc7">
+7</a>&nbsp;&nbsp;Version 4.1.0 (beta release)</h2>
+Date: 23rd January 2001; CVS revision tag <tt>phys_4_1_0_beta_open</tt>.
+
+<p>
+4.1  4.0.0 Columbia
+The original version of the code recieved by EPCC from Columbia.
+
+<p>
+UKQCD CVS Repository Tag: phys_4_0_0_open
+
+<p>
+4.2  4.1.0 UKQCD
+ANSIfication, initial MPI SCU, type flexibility (float/double), basic qcdio support includuing the qload guage configuration loader.
+
+<p>
+UKQCD CVS Repository Tag: phys_4_1_0_alpha_open
+
+<p>
+UKQCD CVS Repository Tag: phys_4_1_0_beta_open
+
+<p>
+UKQCD CVS Repository Tag: Root-of-Columbia4_1_1_test
+
+<p>
+4.3  4.1.0 Columbia
+Integration of new physics components
+
+<p>
+UKQCD CVS Repository Tag: Columbia4_1_1_test-branch
+
+<p>
+4.4  4.1.1 Assimilation [UKQCD+Columbia]
+UKQCD+Columbia 4.1.0 code merge
+
+<p>
+UKQCD CVS Repository Tag: Merged-from-Columbia4_1_1_test
+
+<p>
+4.5  4.1.2 Tested, Accepted
+
+<p>
+UKQCD CVS Repository Tag: ???
+
+<p>
+4.6  4.1.5 Assimilation [+Brookhaven]
+Code modifications from Brookhaven.
+
+<p>
+4.7  4.1.6 Additions
+
+<p>
+
+ <h2><a name="tth_sEc8">
+8</a>&nbsp;&nbsp;Pre-4.1.6: Adding a gauge-configuration saving routine</h2>
+Date: 8th May 2002
+
+<p>
+There are many possible ways of implementing a routine to save the gauge
+configuration out of the code when running in parallel.  We have to choose
+one that will scale acceptable given the 10,000 CPUs and 4Gbit/s (?) frontend
+bandwidth of QCDOC.  My thoughts were:
+
+<ul>
+<li> Each node opens its own file and dumps the local data, after which 
+the I/O node opens all the files and remixes the data in the right 
+order to a new set of T-ordered files.
+[High I/O usage, tying up one node for some time]</li>
+
+<li> Each node passes a copy of its own data all the way around the cube,
+x-dirn, y-dirn and then z-dirn.  The I/O node opens a separate file for
+each x-stream (i.e. #files = local-z * local-y), and appends the data
+from each file as is passes through.  The I/O node can then trivially
+concatenate these files to form the overall output file.
+[Quite high I/O usage, and quite a lot of communication too]</li>
+
+<li> One node requests the data it requires to form the output file in 
+the correct order from each relevant node in turn.  This can be done 
+with no buffering at all, but will require many transations with each 
+node. Also, there is no call for arbitrary point-to-point comms, so 
+this will have to be written using the nearest-neighbour primitives.
+[High communications usage]</li>
+
+<li> Similar to the above idea, except that simultaneous comms are used 
+to collapse the data from the x-direction (or perhaps the x and y
+directions) on to the nodes that hold the x=0 plane (or the x=y=0
+line).  This requires potentially large buffers, but allows much comms
+overlapping.  After the collapse, the data can be collated as in method
+3 above.  
+[High memory usage]</li>
+
+<li> Collate the data onto one node in a large buffer, rearrange the data
+on that node and then write out the file.
+[Very large memory usage and ties up one PE for some time]</li>
+</ul>
+
+<p>
+For the time being I will implement the simplest one, where each processor
+offloads its data to a different file.  These files can be patched together
+either offline or inline.
+
+<p>
+Okay, current version writes out a file for each node, with appropriate
+filenames, using the given precision, transpose and byteswap.  Needs testing,
+but difficult to test properly until the reassembly code is written.
+
+<p>
+The output file is the right size at least!  
+
+<p>
+N.B. Updated the ukqcd CVS repository access instructions.
+
+<p>
+I've made the code split the data into files accross the T axis.  This should
+allow the serial version to work perfectly, producing identical output as
+input.  However, the test I just did failed and the files differed.  On closer
+inspection (`od file | head'), is seems the differences were very slight - the
+odd byte here and there.  Therefore, is seems reasonable to assume that the
+fact that the code was running in double precision means that some information
+got munged in the transformation to and from double precision.  I am
+recompiling the whole thing to use single precision, which should allow
+precise testing using this input data.  1/2 bit errors per 32-bit word.
+
+<p>
+Darn it.  Got pretty much exactly the same results.  I now suspect the
+expansion and compression from 2x3 to full 3x3 and back to 2x3 again, or
+possibly the transposing.  The latter should not do any such thing, and the
+former should save out the cols/rows that got loaded in, I think.  I'll check
+the transpose action occurs at the right spot to get the original data back
+out.
+
+<p>
+Quick check, switch off the transpose and try again...  Damn, the same.
+Trying when outputting the other part of the matrix. Rom from 1 to COLORS
+instead of 0 to COLORS-1...  Hmmm.  That didn't work. 
+
+<p>
+Most likely, it is the set of transformations used to reconstruct the matrix
+from the 3x2 form.  I'll try not bothering, and this should read out the data
+in the same order as it is read in.  Excellent!  That worked.  The
+norm-orthog-norm-orthog sequence introduces a few minor errors in the numbers.
+
+<p>
+Checking the code in, so people can at least access the saver routine in
+serial.
+
+<p>
+Now to run in in parallel...  Some compilation issues, forgot to export
+CC=mpCC, reconfigure etc. Now trying a complete clean and build on lomond
+front-end.  That worked.  Ran in parallel and produced umpteen files with
+different chunks of the matrix in them.  Now all I have to do is remix the
+data correctly.
+
+<p>
+30/05/2002
+
+<p>
+Change of plan.  Moving over to a more sensible system where each x,y,z=0
+processor opens each TXX output file, and the data is pumped down from the
+TXX x,y,z cube to the I/O node.  The method is borrowed from ideas/code from
+SPB.  Every node loops over all the data, the I/O nodes load the data,
+all relvent nodes participate in the pumping of data to the destination nodes,
+and then the destination nodes unpack the data.  Much the same code is used to
+perform the reverse pack-pump-save routine.
+
+<p>
+This is in place in essence, but the pumping routine appears to be wrong and
+prism is showing me that there are messages left unheeded and recieved sent
+without a matching message too.
+
+<p>
+31/05/2002
+
+<p>
+Finally working okay, creating a reversible process where data is loaded in a
+saved out again while being identical (note that the reconstruction of the
+missing row is commented out to ensure bitwise-identical results).  Now
+stripping out the paranoid (per pump) sync commands and retesting.  Seems to
+be okay, and is a darn sight faster, tens of minutes down to minutes on the
+lomond front-end (not too surprising really). Yup.  Looks fine.
+
+<p>
+Now I'll check this in and let Craig know its there, but in a beta state as
+the actual data on each node has not been fully tested yet.  Also, I should
+add some more comments, at least to the head of each subroutine.
+
+<p>
+4/06/2002
+
+<p>
+Created a 'maketestdata.c' program and added it to the cvs repository in
+tests/qcdio/.  This creates a set of dummy data files filled with simple
+incremental data.  I'm currently running this through the code to check the
+data on each node has been loaded correctly.
+
+<p>
+5/06/2002
+
+<p>
+The test program for qcdio now creates its own test data, loads it in, checks
+it has been loaded correctly and then saves it out.  The only gap is that it
+does not check that the resulting files are bit-identical to the input files,
+but the test.bindiff.sh script will do that.  This routine is now considered
+complete and ready for use by others.
+
+<p>
+However, the routine to write out the g/c .par file is not complete, and the
+code in qcdio.C is under-commented.  These issues will remain outstanding for
+some time as I have to work on other projects.
+
+<p>
+
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 2.92.<br />On  4 Jul 2002, 16:36.</small>
+</body></html>
+CPS_END_NAMESPACE

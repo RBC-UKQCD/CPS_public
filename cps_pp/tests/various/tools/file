@@ -1,0 +1,4 @@
+#include<config.h>
+CPS_START_NAMESPACE
+grep $1| sed 's/^'$1' //g' 
+CPS_END_NAMESPACE

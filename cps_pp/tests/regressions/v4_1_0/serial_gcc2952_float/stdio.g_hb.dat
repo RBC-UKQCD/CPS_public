@@ -1,0 +1,206 @@
+#include<config.h>
+CPS_START_NAMESPACE
+Lattice::Lattice() :Reset random number generator with seed = 112319
+Lattice::Lattice() :
+	Ordered starting configuration
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+Lattice::GsoCheck() :
+	Plaquette, checksum test successful
+CPS_END_NAMESPACE

@@ -1,0 +1,629 @@
+#include<config.h>
+CPS_START_NAMESPACE
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+           "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="TtH 2.92">
+
+                                 
+<title> CPS: Overall Code Structure. </title>
+</head>
+<body>
+ 
+<h1 align="center">CPS: Overall Code Structure. </h1>
+
+<h3 align="center">A.N. Jackson &amp; B&#225;lint Jo&#243; </h3>
+
+<h3 align="center"><font size="-1">
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Revision</i>: 1.3 </td></tr></table>
+</td></tr></table>
+
+  
+<br clear="all" /><table border="1" width="100%"><tr><td>
+<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
+<i>Date</i>: 2002/07/23 09:36:26 </td></tr></table>
+</td></tr></table>
+
+</font> </h3>
+
+<p>
+   
+<h1>Contents </h1><a href="#tth_sEc1"
+>1&nbsp; Overall aims</a><br />
+<a href="#tth_sEc2"
+>2&nbsp; The Directory Structure</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.1"
+>2.1&nbsp; The top-level of the tree</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.1.1"
+>2.1.1&nbsp; Files</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.1.2"
+>2.1.2&nbsp; Directories</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2"
+>2.2&nbsp; The Source Tree: <em>cps/src/...</em></a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2.1"
+>2.2.1&nbsp; The top-level of the source tree</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2.2"
+>2.2.2&nbsp; The deeper directory structure</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.2.3"
+>2.2.3&nbsp; Separating code for different platforms</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.3"
+>2.3&nbsp; The Include Files: <em>cps/include/...</em></a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.4"
+>2.4&nbsp; The Library Files: <em>cps/lib/...</em></a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.5"
+>2.5&nbsp; The Documentation: <em>cps/docs/...</em></a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.6"
+>2.6&nbsp; The Test Suite: <em>cps/test/...</em></a><br />
+<a href="#tth_sEc3"
+>3&nbsp; The Build System</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.1"
+>3.1&nbsp; Makefile Rules</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc3.2"
+>3.2&nbsp; External Libraries</a><br />
+<a href="#tth_sEc4"
+>4&nbsp; The Test Suite</a><br />
+ 
+
+
+<p>
+
+ <h2><a name="tth_sEc1">
+1</a>&nbsp;&nbsp;Overall aims</h2>
+The CPS code structure and build system aims to:
+
+<ul>
+<li> Use standard GNU filenames, extensions, directory structures, and
+ compile using standard UNIX/GNU tools.</li>
+
+<li> Reflect the structure of the object-oriented code in the structure of
+ the source directory tree.</li>
+
+<li> Allow sources, libraries and binaries for different platforms to coexist.</li>
+
+<li> Build all libraries relevant to a given platform, so that the specific
+ implementation can be chosen at link time.</li>
+
+<li> Maintain Compatibility with the current QCDSP hardware and development environment.</li>
+</ul>
+
+<p>
+
+ <h2><a name="tth_sEc2">
+2</a>&nbsp;&nbsp;The Directory Structure</h2>
+<a name="sec:dirs">
+</a>
+
+<p>
+
+     <h3><a name="tth_sEc2.1">
+2.1</a>&nbsp;&nbsp;The top-level of the tree</h3>
+All files are held in a directory called <em>cps/</em>, for the Columbia Physics System.
+The directory structure at this uppermost level reflects standard GNU practice
+for organising software distributions.
+
+<p>
+      <h4><a name="tth_sEc2.1.1">
+2.1.1</a>&nbsp;&nbsp;Files</h4>
+
+<ul>
+<li> <em>cps/Makefile</em></li>
+
+<li> <em>cps/configure</em></li>
+
+<li> <em>cps/README</em></li>
+
+<li> <em>cps/INSTALL</em></li>
+
+<li> <em>cps/...etc...</em></li>
+</ul>
+The autoconf-based configure script, the overall makefile and other top-level 
+files are examined further in section <a href="#sec:build">3</a> below.
+
+<p>
+      <h4><a name="tth_sEc2.1.2">
+2.1.2</a>&nbsp;&nbsp;Directories</h4>
+
+<ul>
+<li> <em>cps/src/</em> - Directory containing the source tree.</li>
+
+<li> <em>cps/include/</em> - Directory containing the source header files.</li>
+
+<li> <em>cps/lib/</em> - Directory holding the binary library files for a given platform.</li>
+
+<li> <em>cps/docs/</em> - The documentation directory.</li>
+
+<li> <em>cps/test/</em> - The test suite (see section <a href="#sec:tests">4</a>).</li>
+</ul>
+
+<p>
+We consider each directory in turn.
+
+<p>
+
+     <h3><a name="tth_sEc2.2">
+2.2</a>&nbsp;&nbsp;The Source Tree: <em>cps/src/...</em></h3>
+There are three design criteria for the organisation of the source tree:
+
+<ul>
+<li> The top-level of the source tree should reflect logically separable
+classes of code.</li>
+
+<li> The deeper directory structure should accurately reflect the
+object-oriented structure of the code.</li>
+
+<li> The final leaves of the directory-tree should effectively separate code
+for different platforms, so that the source files for a particular platform can be
+easily identified.</li>
+</ul>
+
+<p>
+      <h4><a name="tth_sEc2.2.1">
+2.2.1</a>&nbsp;&nbsp;The top-level of the source tree</h4>
+The source directory in this version of the code corresponds to a combination of the 
+source files from <em>phys/[util,alg,nga,task,mem]</em>.  The original layout
+was driven by the target platform, whereas the new layout moves the
+platform-dependencies further down the tree. However on Consultation with 
+Bob, we decided to keep the original <em>util, alg, nga, task, mem</em>
+layout to separate cleanly the functions in these directories. The 
+functions outlined by Bob are:
+
+<dl compact="compact">
+	<dd><em>util</em> - These are physics related utilities, to do with
+lattices, Dirac Operators, Vectors, linear algebra and the like.</dd>
+
+	<dd><em>alg</em> - The classes herein correspond to algorithms to 
+perform measurements, such as quark propagators, [<font face="symbol">`</font
+>(<font face="symbol">y</font
+>)]<font face="symbol">y</font
+> etc.</dd>
+
+	<dd><em>task</em> - The original intention here was to have combinations
+of <em>alg</em> classes to perform more complicated tasks, such as a Hybrid Monte Calro, with inline measurements and so forth, including running scripts. However, the original development ``ran out of energy'' and so this directory is 
+somewhat disorganised.</dd>
+
+	<dd><em>nga</em> - This directory contains routines to perform various 
+kinds of communications (NGA stands for Node Gate Array - the communications hardware of the QCDSP). It is envisaged that we rename this to something like <em>comms</em>.</dd>
+
+	<dd><em>mem</em> - This directory contained code to deal with loading 
+data in and out of internal memory of the DSP chips on QCDSP. It is highly
+likely that future machines, may need similar routines, for example the 
+QCDOC will have some EDRAM that may need to be accessed through specialised
+routines.</dd>
+</dl>
+
+<p>
+Bearing in mind our consultation by video conference on Aug 20, 2002,
+the suggested code structure at this level is as follows:
+
+<ul>
+<li> <em>cps/src/alg/</em> - Directory containing the Alg class.</li>
+
+<li> <em>cps/src/comms/</em> - The comms routines.</li>
+
+<li> <em>cps/src/comms/gsum/</em> - The global sum routines.</li>
+
+<li> <em>cps/src/io/</em> - I/O routines.</li>
+
+<li> <em>cps/src/io/qcdio</em> - The currend QCDIO library</li>
+
+<li> <em>cps/src/mem</em> - Routines for managing internal memories</li>
+
+<li> <em>cps/src/task/</em> - Directory containing the tasks.</li>
+
+<li> <em>cps/src/util/DiracOp/</em> - Directory containing the DiracOp class.</li>
+
+<li> <em>cps/src/util/Error/</em> - Directory containing the Error class.</li>
+
+<li> <em>cps/src/util/GlobalJobParameter/</em> - Directory containing the GlobalJobParameter class.</li>
+
+<li> <em>cps/src/util/lapack/</em> - The lapack linear algebra routines.</li>
+
+<li> <em>cps/src/util/Lattice/</em> - Directory containing the Lattice class.</li>
+
+<li> <em>cps/src/util/Mom/</em> - Directory containing the Mom class.</li>
+
+<li> <em>cps/src/util/pmalloc/</em> - The pmalloc routines.</li>
+
+<li> <em>cps/src/util/Random/</em> - Directory containing the Random class.</li>
+
+<li> <em>cps/src/util/RComplex/</em> - Directory containing the RComplex class.</li>
+
+<li> <em>cps/src/util/RFloat/</em> - Directory containing the RFloat class.</li>
+
+<li> <em>cps/src/util/smalloc/</em> - The smalloc routines.</li>
+
+<li> <em>cps/src/util/Vector/</em> - Directory containing the Vector class.</li>
+
+<li> <em>cps/src/util/Verbose/</em> - Directory containing the Verbose class.</li>
+</ul>
+
+<p>
+Here we have added an <em>io</em> directory which is expected to contain
+functions for loading and saving configurations, propagators and the like.
+
+<p>
+In ``leaf'' directories, upper-case names indicate a corresponding class exists
+(i.e. the class DiracOp is defined in DiracOp.C in
+<em>cps/src/DiracOp</em>).  Lowercase directory names indicate that this
+directory contains utility functions that are not wrapped in C++
+classes.
+
+<p>
+It has been agreed in the videoconference that leaf directories 
+and library names should follow the names of the classes (ie libDiracOp.a,
+on UNIX and DiracOp.olb on QCDSP). After some testing it appears that
+the Compiler/Linker/Archiver toolchains can deal with this naming 
+convention on QCDSP (Tartan), Solaris (cc/CC), AIX (xlc) and Linux
+(gcc). Hence this naming scheme will be adopted in the new code structure.
+
+<p>
+There exist currently some functions that are not wrapped in C++ classes,
+in the short term it is acceptable to put these in a <em>cps/src/notCPP</em>
+directory, but in the long term such a directory ought to be eliminated. 
+Insofar as the pure C / Assembler functions are related to a C++ class, 
+they should reside in the same directory as that class.
+separate <em>cps/src/misc/</em> directory?
+
+<p>
+
+<center><table align="left" border="1"><tr><td width="0" align="center">
+<br /><table align="left" border="0"><tr><td width="395">
+ <b>Query.0:</b> Should pmalloc and smalloc be combined into one ``memory'' directory,
+including all from <em>phys/mem/</em>.</td></tr></table><!--hbox-->
+ </td></tr></table><!--hbox-->
+<br clear="all" /> </center> 
+      <h4><a name="tth_sEc2.2.2">
+2.2.2</a>&nbsp;&nbsp;The deeper directory structure</h4>
+This should reflect the OO structure.  So, if we look at the Doxygen
+documentation <br />
+(see <a href="http://www.epcc.ed.ac.uk/~ukqcd/cps/">http://www.epcc.ed.ac.uk/&#126;ukqcd/cps/</a> ) <br />
+for a given class, e.g. the Dirac Operators:<br />
+<a href="http://www.epcc.ed.ac.uk/~ukqcd/cps/doxygen/html/class_DiracOp.html">http://www.epcc.ed.ac.uk/&#126;ukqcd/cps/doxygen/html/class_DiracOp.html</a>
+
+<p>
+This suggests the following structure:
+
+<ul>
+<li> <em>cps/src/DiracOp/</em></li>
+
+<li> <em>cps/src/DiracOp/DiracOpStagTypes/</em></li>
+
+<li> <em>cps/src/DiracOp/DiracOpStagTypes/DiracOpStag/</em></li>
+
+<li> <em>cps/src/DiracOp/DiracOpWilsonTypes/</em></li>
+
+<li> <em>cps/src/DiracOp/DiracOpWilsonTypes/DiracOpClover/</em></li>
+
+<li> <em>cps/src/DiracOp/DiracOpWilsonTypes/DiracOpDwf/</em></li>
+
+<li> <em>cps/src/DiracOp/DiracOpWilsonTypes/DiracOpWilson/</em></li>
+</ul>
+
+<p>
+      <h4><a name="tth_sEc2.2.3">
+2.2.3</a>&nbsp;&nbsp;Separating code for different platforms</h4>
+<a name="sssec:sepcode">
+</a>
+File common to all platforms are held in the object's directory.  e.g. The
+pure-C++ file that defines the abstract base class <tt>DiracOp</tt> is held in
+<em>cps/src/DiracOp/DiracOp.C</em>.  Any platform dependent files are stored in
+further subdirectories:
+
+<ul>
+<li> <em>cps/src/DiracOp/</em> - Source common to all platforms.</li>
+
+<li> <em>cps/src/DiracOp/noarch/</em> - Portable versions of usually
+ platform-dependent code.</li>
+
+<li> <em>cps/src/DiracOp/qcdsp/</em> - QCDSP-only files.</li>
+
+<li> <em>cps/src/DiracOp/qcdoc/</em> - QCDOC-only files.</li>
+
+<li> <em>cps/src/DiracOp/alpha/</em> - Alpha-chipset-only files.</li>
+
+<li> <em>cps/src/DiracOp/x86linux/</em> - (x86 chip-series, Linux OS)-only files.</li>
+</ul>
+
+<p>
+In some cases, for a given platform, multiple implementations of the same
+functionality are present.  For example, there are a large number of
+QCDSP-specific global sum routines and Dirac operation routines that fulfill
+the same function.   Each of these will be held in a separate directory within
+the <em>.../qcdsp/</em> directory and each will be compiled into a separate
+library using the name of the directory as the library name.  e.g.
+
+<p>
+<em>phys/util/dirac_op/d_op_wilson_opt_lcl_nos/</em>
+
+<p>
+becomes
+
+<p>
+<em>cps/src/DiracOp/DiracOpWilsonTypes/DiracOpWilson/qcdsp/d_op_wilson_opt_lcl_nos/</em>
+
+<p>
+and (on QCDSP only) will result in a library file called 
+
+<p>
+<em>cps/lib/libd_op_wilson_opt_lcl_nos.a</em>, 
+
+<p>
+sitting alongside the more general 
+
+<p>
+<em>cps/lib/libDiracOp.a</em>.
+
+<p>
+There is a large amount of code replication in the global sum and Dirac
+operator directories. It is not expected that such a large number of 
+classes / libraries will exist in general. The current strategy is 
+to put all the sources and libraries into a machine specific <br />
+<em>cps/src/DiracOp/DiracOpWilsonTypes/DiracOpWilson/qcdsp</em> directory and build them 
+all as is done currently. A second pass may then try and eliminate the
+replication of codes.
+
+<p>
+
+     <h3><a name="tth_sEc2.3">
+2.3</a>&nbsp;&nbsp;The Include Files: <em>cps/include/...</em></h3>
+
+<p>
+The current code structure has separated include files to reside 
+relatively close to the source files:
+
+<p>
+
+<ul>
+<li> <em>phys/util/include</em> - Include files for the sources in <em>util</em></li>
+
+<li> <em>phys/alg/include</em> - Include files for the sources in <em>alg</em></li>
+
+<li> <em>phys/mem/include</em> - Include files for the sources in <em>mem</em></li>
+
+<li> <em>phys/nga/include</em> - Include files for the sources in <em>nga</em></li>
+</ul>
+
+<p>
+It is intended to reorganise these, into one single include directory.
+To prevent undue flattaning of the current structure and mixing of names
+we envisage keeping the current distinctions within this include directory
+as in:
+
+<p>
+
+<ul>
+<li> <em>cps/include/util</em> - Include files for the sources in <em>util</em></li>
+
+<li> <em>cps/include/alg</em> - Include files for the sources in <em>alg</em></li>
+
+<li> <em>cps/include/mem</em> - Include files for the sources in <em>mem</em></li>
+
+<li> <em>cps/include/comms</em> - Include files for the sources in <em>comms</em>
+- the new name for the <em>nga</em> directory.</li>
+</ul>
+
+<p>
+This has the advantage of maintaining current distinctions. A user can then 
+set his ``include path'' to <em>cps/include</em>, and include files with 
+directives such as #include  &lt; util/lattice.h &gt;  and so forth. Alternatively,
+several include paths can be set (for the GNU compiler:<em> -Icps/include/util -Icps/include/alg/mem -Icps/include/comms</em>) in which case one can include
+headers in sources with directives such as #include &lt; lattice.h &gt; .
+
+<p>
+
+<center><table align="left" border="1"><tr><td width="0" align="center">
+<br /><table align="left" border="0"><tr><td width="395">
+ <b>Query.0:</b> Which of the above two are preferred?</td></tr></table><!--hbox-->
+ </td></tr></table><!--hbox-->
+<br clear="all" /> </center> 
+     <h3><a name="tth_sEc2.4">
+2.4</a>&nbsp;&nbsp;The Library Files: <em>cps/lib/...</em></h3>
+All the library files, one for each of the main directories in <em>cps/src/</em>
+plus ones for platform-dependent variants of a given library (as described at
+the end of section <a href="#sssec:sepcode">2.2.3</a>).
+
+<p>
+
+     <h3><a name="tth_sEc2.5">
+2.5</a>&nbsp;&nbsp;The Documentation: <em>cps/docs/...</em></h3>
+This is essentially the same as in the original EPCC-Columbia distribution,
+with HTML as the primary format, and including the Doxygen-ized version of the
+code.
+
+<p>
+
+     <h3><a name="tth_sEc2.6">
+2.6</a>&nbsp;&nbsp;The Test Suite: <em>cps/test/...</em></h3>
+At first, this will be a copy of the original CPS test suite, or at
+least the parts of that suite that work on all platforms.  
+
+<p>
+Eventually a more general test suite must be defined and implemented, taking
+advantage of the new hypercubic RNG implemented at Columbia.
+
+<p>
+
+ <h2><a name="tth_sEc3">
+3</a>&nbsp;&nbsp;The Build System</h2>
+<a name="sec:build">
+</a>
+The build strategy is simple.  We use a <tt>configure;make;make install</tt>
+scheme, where the install can be made to separate binaries for different
+platforms.  For any given target platform, we make every library that is relevant 
+to that platform.  The only compilation option that cannot be separated out
+into a separate library is the decision whether to use float or double
+precision floating-point arithmetic.  Broadly:
+
+<p>
+
+<pre>
+%./configure --target=[TARGET]  \
+             --prefix=/cps/[TARGET]/  \
+             --enable-double-precision=[yes|no]
+%make
+%make install
+
+</pre>
+
+<p>
+The parallel/serial and other platform-specific options are chosen at the link
+stage, the tests do this and thus require a separate configure+make system.
+
+<p>
+<tt>make install</tt> will make and populate a directory called (generically)
+instdir, by creating the following structure
+
+<ul>
+<li> <em>instdir/</em>
+ 
+<ul>
+<li> <em>arch/</em>
+  
+<ul>
+<li> <em>include/</em> copy of include directory.</li>
+
+<li> <em>lib/</em> all libs for target.</li>
+
+<li> <em>doc/</em> documents.
+   
+<ul>
+<li> <em>doxygen/</em> doxygened docs, for source used in build.</li>
+</ul></li>
+
+<li> <em>bin/</em> executables created by build.</li>
+
+<li> <em>src/</em> a copy of the sources used in this build.</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<p>
+instdir would be specified as usual by the -prefix option to configure.  Note
+that arch/ may be superfluous, as may bin/ the bin is suggested by the facts
+that there would always be some stock executables that would be built (e.g. the
+test ones)
+
+<p>
+
+     <h3><a name="tth_sEc3.1">
+3.1</a>&nbsp;&nbsp;Makefile Rules</h3>
+It is envisaged that there would be some file called Makefile.rules say, that
+encapsulates the rules for building the particular application. This would
+live in the top-level source directory.  The rules could contain:
+
+<ul>
+<li> Invocations for the compiler, archiver, assembler etc.</li>
+
+<li> Various compiler and assembler flags (include paths, preprocessing options such as -DHAVE_CONFIG).</li>
+
+<li> Definitions of suffixes and rules for building object files, e.g. from C++ and from assembler files.</li>
+</ul>
+
+<p>
+Makefile rules could be either pre-written for specific systems, e.g.
+Makefile.rules.alpha Makefile.rules.sparc or could have their values filled in
+by autoconf, or perhaps be generated through some combination. (e.g.: Autoconf
+fills in path information and optimisation flags, whereas the rest are pre
+written) (Makefile.rules.alpha.in...)
+
+<p>
+In subdirectories, one would use recursive files, just like the current QCDSP
+build system (using the more portable GNU make). The leaf makefiles
+could all include the top-level rules file. The leaf makefiles would presumably
+work on some wildcard mechanism (i.e. compile all .C and .S files in the current
+directory).  Library names would be specified by base names of current
+directory.
+
+<p>
+Working out how to traverse the right set of directories for a particular
+architecture, is a problem to be solved by us. Our goals in this direction 
+are that the build system be as simple as possible, for future maintenance.
+
+<p>
+As a final statement, we need to describe why building the executables is
+harder than to build the library. We don't know what mode of operation is
+expected as there are so many options:
+
+<ul>
+<li> Should we run with no safety (nos)?</li>
+
+<li> Should we run with dirac_opt_stag or dirac_opt_stag_rdm?</li>
+
+<li> Should we run a parallel build with a simulated SCU?</li>
+
+<li> Should we run with QMP?</li>
+
+<li> ...</li>
+</ul>
+One way around this would be to have independent makefiles for the executables
+(for the most common targets) that could include the rules from the first
+level configuration - this punts the issue of what options we need to pass to
+autoconf, and may fit well into the current testing framework. The list of
+builds is relatively easy (already exists on QCDSP - and doesn't really exist
+in a crystallised form for other targets). One possibility is to have a
+test/qcdsp test/alpha etc etc directories where we could have the different
+architectural tests (e.g. tests that exercise hardware like SCUs and so worth)
+another possibility is to have a single directory of test cases with makefiles
+for all architectures in them (the top-level rules would be used for building,
+but the library lists would need to be hardwired depending on the test in
+question.)  I lean towards the first option myself. We should discuss with
+Chris Miller how this fits into his testing environment. Similar setup could
+be used to build stock applications (hmc, etc etc)
+
+<p>
+An alternative scheme for building the executables has been suggested by
+Craig McNeile, which would involve having some generic GUI interface,
+through which users can choose the particular library versions they desire.
+This has the advantage, that the choice of libraries for a particular
+architecture can be ``institutionalised''. Whether such a GUI is to be 
+a C++ program, Tcl/Tk script, Jave applet or a web form is yet open to debate.
+
+<p>
+<b>It is not in the remit of this particular reorganisation to decide on, 
+or implement this strategy. Our current brief is to make sure that the libraries can be built and installed</b>.
+
+<p>
+
+     <h3><a name="tth_sEc3.2">
+3.2</a>&nbsp;&nbsp;External Libraries</h3>
+Somehow we need to tell the compiler about where these live (e.g.
+-with-mpi=/usr/mpich, or -with-mpi-include=/usr/mpich/include - so that the
+right include files can be found - for the libraries only the include files
+matter. However for the executables obviously the libraries are needed too.
+
+<p>
+What would be classed as an external library?
+
+<ul>
+<li> <em>MPI</em> (for sure)</li>
+
+<li> <em>GM</em> (on clusters say)</li>
+
+<li> <em>QMP</em>  (default no - could be based on MPI or SCU or implemented directly...)</li>
+
+<li> <em>SCU</em>  (default no - too ingrained in the code)</li>
+</ul>
+
+<p>
+
+ <h2><a name="tth_sEc4">
+4</a>&nbsp;&nbsp;The Test Suite</h2>
+<a name="sec:tests">
+</a>
+This will require a complex configure script to allow the user to choose
+between the different possible libraries available for a given platform.
+However, for a general platform, the core option is whether to run in serial
+or in parallel.
+
+<p>
+
+<br /><br /><hr /><small>File translated from
+T<sub><font size="-1">E</font></sub>X
+by <a href="http://hutchinson.belmont.ma.us/tth/">
+T<sub><font size="-1">T</font></sub>H</a>,
+version 2.92.<br />On 26 Aug 2002, 11:42.</small>
+</body></html>
+CPS_END_NAMESPACE

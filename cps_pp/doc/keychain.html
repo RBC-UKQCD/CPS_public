@@ -1,0 +1,531 @@
+#include<config.h>
+CPS_START_NAMESPACE
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><title>SSH and keychain</title>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="author" content="Stewart V. Wright (svwright@amtp.liv.ac.uk)">
+<meta name="description" content="SSH and keychain">
+<meta name="keywords" content="Stewart V. Wright Stewart Wright Security SSH OpenSSH keychain UKQCD">
+<!-- base href="http://www.liv.ac.uk/~svwright/" -->
+<link rel="stylesheet" type="text/css" href="keychain_files/personal.css"></head>
+
+<body>
+
+<!-- Page -->
+<table class="page" cellpadding="4" cellspacing="0" border="0">
+
+ <!-- Banner -->
+ <tbody><tr>
+
+  <!-- Logo -->
+  <td nowrap="nowrap" class="banner-logo" align="center"><span class="logo">~ S V W ~</span></td>
+  <!-- /Logo -->
+
+  <!-- Page Title -->
+  <td width="100%" align="right" class="banner-subtitle"><span class="banner-subtitle">SSH and keychain</span></td>
+  <!-- /Page Title -->
+
+ </tr>
+ <!-- /Banner -->
+
+ <!-- Main Body -->
+ <tr>
+
+  <!-- Menu -->
+  <td class="menu-panel" valign="top">
+   <table class="menu" cellpadding="2" cellspacing="0">
+    <!-- Home -->
+    <tbody><tr><td nowrap="nowrap" class="menu-item"><a href="http://www.liv.ac.uk/%7Esvwright/" class="menu-item" onmouseover="window.status='Home'; return true;" title="Home">Home</a></td></tr>
+    <!-- About Me -->
+    <tr><td nowrap="nowrap" class="menu-item"><a href="http://www.liv.ac.uk/%7Esvwright/personal.html" class="menu-item" onmouseover="window.status='About ME'; return true;" title="About ME">About Me</a></td></tr>
+    <!-- Photos -->
+    <tr><td nowrap="nowrap" class="menu-item"><a href="http://www.liv.ac.uk/%7Esvwright/photos/" class="menu-item" onmouseover="window.status='My online photo gallery'; return true;" title="My online photo gallery">Photos</a></td></tr>
+    <!-- Physics -->
+    <tr><td nowrap="nowrap" class="menu-item"><a href="http://www.liv.ac.uk/%7Esvwright/physics/" class="menu-item" onmouseover="window.status='Physics Related Links'; return true;" title="Physics Related Links">Physics</a></td></tr>
+    <!-- Mutt -->
+    <tr><td nowrap="nowrap" class="menu-item"><a href="http://www.liv.ac.uk/%7Esvwright/mutt/" class="menu-item" onmouseover="window.status='Links for the mailing program Mutt'; return true;" title="Links for the mailing program Mutt">Mutt</a></td></tr>
+    <!-- CVS -->
+    <tr><td nowrap="nowrap" class="menu-item"><a href="http://www.liv.ac.uk/%7Esvwright/cvs/" class="menu-item" onmouseover="window.status='CVS'; return true;" title="CVS">CVS</a></td></tr>
+    <!-- Security -->
+    <tr><td nowrap="nowrap" class="menu-item"><a href="http://www.liv.ac.uk/%7Esvwright/security/" class="menu-item" onmouseover="window.status='Security'; return true;" title="Security">Security</a></td></tr>
+    <tr><td nowrap="nowrap" class="menu-item"><a href="http://www.gnupg.org/" class="menu-sub-item" onmouseover="window.status='GnuPG - GNU Privacy Guard'; return true;" title="GnuPG - GNU Privacy Guard">   GnuPG</a></td></tr>
+    <tr><td nowrap="nowrap" class="menu-chosen-item"><span class="menu-chosen-sub-item">   SSH</span></td></tr>
+    <tr><td nowrap="nowrap" class="menu-item"><a href="http://www.liv.ac.uk/%7Esvwright/security/gpg-key.html" class="menu-sub-item" onmouseover="window.status='OpenPGP Keys'; return true;" title="OpenPGP Keys">   OpenPGP<br>    Keys</a></td></tr>
+    <!-- Humour -->
+    <tr><td nowrap="nowrap" class="menu-item"><a href="http://www.liv.ac.uk/%7Esvwright/humour/" class="menu-item" onmouseover="window.status='Collected Humour'; return true;" title="Collected Humour">Humour</a></td></tr>
+    <!-- ? -->
+<!--
+    <TR><TD NOWRAP CLASS="menu-item"><A HREF="?" CLASS="menu-item" onMouseOver="window.status='?'; return true;" TITLE="?">?</A></TD></TR>
+-->
+   </tbody></table>
+  </td>
+  <!-- /Menu -->
+
+  <!-- Content -->
+  <td class="content-panel" valign="top">
+
+<p>One of the hardest things that I have found to do is getting ssh to
+work as a transparent replacement for rsh and rcp.  Notionally this is
+a simple job, but in practice...</p>
+
+<p>Here are my steps for getting ssh to work.</p>
+
+<ul>
+  <li><a href="http://www.liv.ac.uk/%7Esvwright/security/keychain.html#SecImplementations">Implementations</a></li>
+  <li><a href="http://www.liv.ac.uk/%7Esvwright/security/keychain.html#SecGenKey">Generating a Key</a></li>
+  <li><a href="http://www.liv.ac.uk/%7Esvwright/security/keychain.html#SecUsingKeys">Using Keys</a></li>
+  <li><a href="http://www.liv.ac.uk/%7Esvwright/security/keychain.html#SecKeyAgent">The Key Agent or keychain</a></li>
+  <li><a href="http://www.liv.ac.uk/%7Esvwright/security/keychain.html#SecIssues">Issues</a></li>
+</ul>
+
+
+   <!-- Section (Implementations) -->
+   <table cellpadding="3" width="100%">
+
+    <!-- Section Banner -->
+    <tbody><tr><td class="section-banner"><a name="SecImplementations"></a><span class="section-title">Implementations</span></td></tr>
+    <!-- /Section Banner -->
+
+    <!-- Section Content -->
+    <tr>
+     <td class="section-text">
+
+<p>The first difficulty people run into is related to the two
+implementations of the SSH or OpenSSH standard.</p> 
+
+<p>Firstly there is OpenSSH (<a href="http://www.openssh.com/">http://www.openssh.com</a>) a free
+implementation.  This is the version I will be discussing in this
+page.</p>
+
+<p>Then there is the SSH Communications Security Corp (<a href="http://www.ssh.com/">http://www.ssh.com</a>) implementation that
+some people have installed.  This is free for non-commercial use, but
+frankly is not as nice as the OpenSSH version.</p>
+
+<p>To discover what version you are using type <tt>ssh -V</tt> at the
+command line.  If you see<br>
+   <tt>OpenSSH_3.4p1, SSH protocols 1.5/2.0, OpenSSL
+0x0090600f</tt><br>
+you are using the OpenSSH implementation (version 3.4p1 -- which is
+important, as I will discuss below).  If you see<br>
+   <tt>ssh: SSH Secure Shell 2.4.0 (non-commercial
+version) on sparc-sun-solaris2.7</tt><br>
+you are using the SSH Communications Security Corp (AKA commercial)
+release.  If your output doesn't match this exactly, don't panic, you
+hopefully can work out which implementation you are using.
+
+</p><p>Try to use the OpenSSH version.  Nearly 60% (at the time of
+writing, and growing) of internet hosts using Secure Shell, used this
+derivative (see the <a href="http://www.openssh.org/usage/index.html">usage statistics</a>
+listed on the OpenSSH web page).  If you are using the most common
+variant, then you have a better chance of being consistent when you
+access new machine.</p>
+
+     </td>
+    </tr>
+    <!-- /Section Content -->
+
+   </tbody></table>
+   <!-- /Section -->
+
+   <br>
+
+
+   <!-- Section (Important Warnings) -->
+   <table cellpadding="3" width="100%">
+
+    <!-- Section Banner -->
+    <tbody><tr><td class="section-banner"><a name="SecWarnings"></a><span class="section-title">Important Warnings</span></td></tr>
+    <!-- /Section Banner -->
+
+    <!-- Section Content -->
+    <tr>
+     <td class="section-text">
+
+<p><strong>ONLY</strong> use version 3.4p1 or higher of OpenSSH.  If a
+host you are on uses an older version, point your sysop to <a href="http://www.openssh.org/security.html">http://www.openssh.org/security.html</a>
+and also the warnings about the vulnerability in zlib 1.1.3 (<a href="http://www.zlib.org/advisory-2002-03-11.txt">http://www.zlib.org/advisory-2002-03-11.txt</a>).</p>
+
+<p><strong>ALWAYS</strong> try to use SSH protocol 2!  Note that
+protocol 1 lacks a strong mechanism for ensuring the integrity of the
+connection.  (So there!)  If you follow the instructions I give below,
+you will be using protocol 2. This comment is directed at those who
+want to mess about with what is happening.</p>
+
+<p>If your sysop does not <strong>publish</strong> the hostkey of
+their machine hassle them so you can be sure you are connecting to the
+right place!</p>
+
+     </td>
+    </tr>
+    <!-- /Section Content -->
+
+   </tbody></table>
+   <!-- /Section -->
+
+   <br>
+
+   <!-- Section (Generating a Key) -->
+   <table cellpadding="3" width="100%">
+
+    <!-- Section Banner -->
+    <tbody><tr><td class="section-banner"><a name="SecGenKey"></a><span class="section-title">Generating a Key</span></td></tr>
+    <!-- /Section Banner -->
+
+    <!-- Section Content -->
+    <tr>
+     <td class="section-text">
+
+
+<a name="KeyGen"></a><h4>For the Impatient: (Actually) Generating a
+key</h4>
+
+<p>It is fairly easy to do:</p>
+  <div align="center">
+  <table border="1" cellpadding="3">
+    <tbody><tr>
+      <td>ssh-keygen -t dsa</td>
+    </tr>
+  </tbody></table>
+  </div>
+
+<p><span class="sub-title">Filename:</span> I usually give the key file a different
+name than the default.</p>
+
+<p>This makes knowing WHERE the key to be used easier.  For example I
+have generated a key for use from the Liverpool machines and one for
+use from Adelaide.  Not surprisingly they are called:</p>
+  <div align="center">
+  <table border="0" cellpadding="1">
+    <tbody><tr><td>Liverpool_id_ds</td></tr>
+    <tr><td>Adelaide_id_dsa</td></tr>
+  </tbody></table>
+  </div>
+
+<p><span class="sub-title">Passphrase:</span> You will be asked for a
+passphrase. As Alan said in his FAQ:</p>
+<blockquote>
+  <em>"The pass-phrase is just that... pick a phrase that is memorable
+to you. Put in a miss-spelling and/or replace a letter by a digit to
+enhance security."</em>
+</blockquote>
+<p>Remember that this passphrase is all that is stopping someone
+logging into your account. DO NOT chose it to be the same as your
+regular password!</p>
+
+<p><span class="sub-title">Remember</span> that these files should be
+stored in your <tt>~/.ssh</tt> directory.  If I talk about a file from
+now I will be assuming that you are starting in the the
+<tt>~/.ssh</tt> directories, NOT your home (~) directory.</p>
+
+<p>So now you have generated your SSH keys (keys plural -- because there are
+both public and private keys, but that comes later...) what do we do
+with them?  Read on...</p>
+
+<h4>General Comments</h4>
+
+<p>There is some confusion on when you need to generate a key.  If you
+are just going to be logging into a machine occasionally you <strong>do
+not</strong> need to generate a key.</p>
+
+<p>If you have already generated a key (following the suggestions in
+Alan's <a href="http://www.liv.ac.uk/maths/THEORPHYS/FAQ/answers/ssh.html">FAQ</a>)
+delete those keys, on every machine where you copied them, NOW!</p>
+
+<p>Keys in Secure Shell allow you an easy way of identifying yourself,
+so you don't need to type your password in every time you log into a
+machine.  Think about this for a moment and you will hopefully see the
+danger.  If you don't manage your keys properly, anyone who has access
+to them can log into your accounts.  This is why I strongly suggest
+you delete the keys that you might have previously generated.</p>
+
+     </td>
+    </tr>
+    <!-- /Section Content -->
+
+   </tbody></table>
+   <!-- /Section -->
+
+   <br>
+
+
+   <!-- Section (Using Keys) -->
+   <table cellpadding="3" width="100%">
+
+    <!-- Section Banner -->
+    <tbody><tr><td class="section-banner"><a name="SecUsingKeys"></a><span class="section-title">Using Keys</span></td></tr>
+    <!-- /Section Banner -->
+
+    <!-- Section Content -->
+    <tr>
+     <td class="section-text">
+
+<p>What is the point of generating a key if you don't actually use
+it?</p>
+
+<h4>For the Impatient: Authorising a key</h4>
+
+<p>Before a key can be used to access a account, you need to let SSH
+on that account know which keys it will accept.</p><p>
+
+  </p><div align="center">
+  <table border="1" cellpadding="3" width="80%">
+    <tbody><tr>
+      <td><ol>
+	<li>Copy your PUBLIC key into the account you wish to
+	     access:<br>
+	     On the remote machine (accessed via SSH)<br>
+	     <tt>mkdir .ssh</tt><br>
+	     On the local machine<br>
+	     <tt>scp .ssh/Liverpool_id_dsa.pub user@remote.host:.ssh</tt>
+	     </li>
+	<li>Authorise your public key:<br>
+	     On the remote machine (accessed via SSH) in the
+	     <tt>.ssh</tt> directory:<br>
+	     <tt>cat Liverpool_id_dsa.pub &gt;&gt; authorized_keys</tt><br>
+	     Note the spelling of authorized and the double &gt;.
+	     This will append the public key to your authorized_keys
+	     file, rather than overwriting it.
+	     </li>
+        <li>Make sure the permissions on the <tt>authorized_keys</tt>
+	     file are restrictive:<br>
+	     <tt>chmod og-rwx authorized_keys</tt>
+	     </li>
+	<li>You can delete the public key file
+	     (<tt>Liverpool_id_dsa.pub</tt>) if you want.</li>
+	<li>Smile.  That wasn't too painful was it?
+	     </li>
+      </ol></td>
+    </tr>
+  </tbody></table>
+  </div>
+
+<p>With these simple steps you have set up your remote account so that
+(hopefully) you can use your key for access.  Now we need to get the
+local host to send the keys when you log in.</p>
+
+<h4>General Comments</h4>
+
+<p>When you generated your key (<a href="http://www.liv.ac.uk/%7Esvwright/security/keychain.html#KeyGen">above</a>)
+two keys were created.  Firstly there is your private key (it is the
+one NOT ending in <tt>.pub</tt>).  This is the key that allows you to
+identify yourself and log into other machines.  Keep this key safe.
+Make sure that the permissions are such that no-one else can see the
+file (<tt>chmod og-rwx &lt;file&gt;</tt>).  If someone else has this
+key, and your passphrase, they have full access to your
+accounts...</p>
+
+<p>The other key created is the public key (it's the one finishing in
+<tt>.pub</tt>).  This is the file that you copy to the machines that
+you want to log in to using SSH and your key.  Remember that you don't
+<strong>need</strong> to use keys to log into a machine using SSH, so
+only copy this to machines that you want to access regularly.  I also
+recommend not using the same key to access machines on different
+networks.  Whilst it is <strong>very</strong> difficult (think time
+frames of the order of 10^6 years on a 1GHz Pentium) to get extract
+the private key from the information in the public key, it is not
+impossible.  If someone obtained your public key on system A,
+notionally they could use it to access system B.  I use the same key
+coming FROM all the Liverpool University machines, but different keys
+to come FROM Adelaide.  It might be unnecessarily paranoid, but that
+is what I do.</p>
+     
+     </td>
+    </tr>
+    <!-- /Section Content -->
+
+   </tbody></table>
+   <!-- /Section -->
+
+   <br>
+
+   <!-- Section (The Key Agent) -->
+   <table cellpadding="3" width="100%">
+
+    <!-- Section Banner -->
+    <tbody><tr><td class="section-banner"><a name="SecKeyAgent"></a><span class="section-title">The Key Agent / keychain</span></td></tr>
+    <!-- /Section Banner -->
+
+    <!-- Section Content -->
+    <tr>
+     <td class="section-text">
+
+<h4>For the impatient: Using keychain</h4>
+
+<p>Add the following to the top of your <tt>.bash_profile</tt>:
+(including the "${HOSTNAME}")</p>
+  <div align="center">
+  <table border="1" cellpadding="3">
+    <tbody><tr>
+      <td>keychain --clear ~/.ssh/Liverpool_id_dsa<br>
+          . ~/.keychain/${HOSTNAME}-sh</td>
+    </tr>
+  </tbody></table>
+  </div>
+
+<p>The NEXT time you log into a machine that has bash as it's shell,
+you will be asked for your password.  However, see <a href="http://www.liv.ac.uk/%7Esvwright/security/keychain.html#SecIssues">Issues</a> below for a
+variant of this.</p>
+
+<p><span class="sub-title">Keychain:</span> Keychain is available for
+download <a href="http://www.gentoo.org/projects/keychain.html#doc_chap3">here</a>.
+The version that I used for writing this is 2.0.2.</p>
+
+<p>In practice this means you start the ssh-agent as the first program
+when you log in, and then subsequently any time you run ssh (or scp or
+sftp) the authentication of your login will be handled by the agent,
+meaning if feels like you are using rsh (or rcp), BUT it is still
+encrypted.  This is quite nice.</p>
+     </td>
+    </tr>
+    <!-- /Section Content -->
+
+   </tbody></table>
+   <!-- /Section -->
+
+   <br>
+
+   <!-- Section (Issues) -->
+   <table cellpadding="3" width="100%">
+
+    <!-- Section Banner -->
+    <tbody><tr><td class="section-banner"><a name="SecIssues"></a><span class="section-title">Issues</span></td></tr>
+    <!-- /Section Banner -->
+
+    <!-- Section Content -->
+    <tr>
+     <td class="section-text">
+
+<p>1. Use <tt>ssh -A</tt> (for the OpenSSH software) as all password
+requests will be sent back to your original ssh-agent for
+verification, so you can do iasc7 -&gt; t3e -&gt; trumpton -&gt; dylan
+without worrying about passwords.  (See below for my current way of
+automating this)</p>
+
+<p>2. The line in your bash profile will be run on EVERY machine that
+has bash -- i.e. a new keychain and a new password request EVERY time
+you log into a machine on the Liverpool network.  So...I have</p>
+   <div align="center">
+   <table border="1" cellpadding="3" width="80%">
+       <tbody><tr>
+       <td><pre>if [ -z "`set|grep -E '(SSH|SSH2)_CLIENT'`" ]; then
+  keychain --clear ~/.ssh/Liverpool_id_dsa
+  . ~/.keychain/${HOSTNAME}-sh
+fi</pre>
+       </td></tr>
+   </tbody></table>
+   </div>
+<p>in my <tt>~/.bash_profile</tt> instead.  Thus keychain will only be
+run if there is no SSH_CLIENT environment variable set.  SSH sets this
+when you log in _via_ ssh, so keychain will be run when you log into a
+machine either from the console, or from telnet, but not when you log
+in via ssh.  This fixes the problems of circular logins that I
+mentioned previously.</p>
+
+     </td>
+    </tr>
+    <!-- /Section Content -->
+
+   </tbody></table>
+   <!-- /Section -->
+
+   <br>
+
+   <!-- Section (My 'ssh -A' Trick) -->
+   <table cellpadding="3" width="100%">
+
+    <!-- Section Banner -->
+    <tbody><tr><td class="section-banner"><a name="SecMyTrick"></a><span class="section-title">My 'ssh -A' Trick</span></td></tr> 
+    <!-- /Section Banner -->
+
+    <!-- Section Content -->
+    <tr>
+     <td class="section-text">
+
+<p>The following is from my .bashrc.  I set up <tt>$SSH</tt> to point
+to either <tt>ssh</tt> or <tt>ssh -A</tt> (depending on the version of
+ssh that is running).  Then I set up the machines I connect to, and
+finally the aliases to connect to them.  I separate the hosts and the
+aliases so it makes scp easier to use, i.e. I can type</p>
+   <div align="center">
+   <table border="0" cellpadding="1">
+       <tbody><tr>
+         <td>scp ${trumpton}:file .</td>
+         <td>rather than</td>
+       </tr>
+       <tr><td>scp johndoe@trum<span class="snip">[snip]...</span>:file .</td></tr>
+   </tbody></table>
+   </div>
+<p>(bash allows TAB completion of "${tru" so I don't have to even get
+the spelling correct!!!)</p>
+
+<p>Here are the lines............</p>
+
+   <div align="center">
+   <table border="1" cellpadding="1">
+       <tbody><tr><td><pre># Connect to remote hosts.
+if [ -n "`ssh -V 2&gt;&amp;1|grep 'OpenSSH'`" ]; then 
+  SSH="ssh -A"
+else
+  SSH="ssh"
+fi
+
+# These are the hosts I will be connecting to.
+export sune='johndoe@su<span class="snip">[snip]...</span>'
+export iasc7='johndoe@ia<span class="snip">[snip]...</span>'
+export dylan='johndoe@dy<span class="snip">[snip]...</span>'
+export trumpton='johndoe@trum<span class="snip">[snip]...</span>'
+
+# These are the aliases making the connection easier.
+alias sune='${SSH} ${sune}'
+alias iasc7='${SSH} ${iasc7}'
+alias dylan='${SSH} ${dylan}'
+alias trumpton='${SSH} ${trumpton}'
+       </pre></td></tr>
+   </tbody></table>
+   </div>
+
+     </td>
+    </tr>
+    <!-- /Section Content -->
+
+   </tbody></table>
+   <!-- /Section -->
+
+   <br>
+
+  </td>
+  <!-- /Content -->
+
+ </tr>
+ <!-- /Main Body -->
+
+ <!-- Footer -->
+ <tr>
+  <td colspan="2">
+
+   <!-- Valid HTML -->
+   <a href="http://validator.w3.org/check/referer"><img border="0" align="right" src="keychain_files/valid-html401.png" alt="Valid HTML 4.01!" height="31" width="88"></a>
+   <!-- /Valid HTML -->
+   <!-- Valid CSS -->
+    <a href="http://jigsaw.w3.org/css-validator/check/referer"><img border="0" align="right" src="keychain_files/vcss.png" alt="Valid CSS!" height="31" width="88"></a>
+   <!-- /Valid CSS -->
+
+<!--   <A HREF="http://www.mutt.org/"><IMG -->
+<!--   SRC="../images/mutt_button.gif" ALIGN="right" WIDTH=88 -->
+<!--   HEIGHT=31 BORDER=0 ALT="mutt home"></A> -->
+
+   <!-- Footnote -->
+   <address><a href="http://www.liv.ac.uk/%7Esvwright/">Stewart V. Wright &lt;svwright@amtp.liv.ac.uk&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Mon Oct  7 16:02:50 2002
+<!-- hhmts end -->
+   <!-- /Footnote -->
+  </td>
+ </tr>
+ <!-- /Footer -->
+
+</tbody></table>
+<!-- /Page -->
+
+</body></html>CPS_END_NAMESPACE

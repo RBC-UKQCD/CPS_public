@@ -1,0 +1,156 @@
+#include<config.h>
+CPS_START_NAMESPACE
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: mcneile $
+//  $Date: 2003-06-22 13:34:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/parser/link.lcf,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Id: link.lcf,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.2  2001/06/19 18:12:31  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:16:04  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
+//  $RCSfile: link.lcf,v $
+//  $Revision: 1.1.1.1 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/parser/link.lcf,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
+
+/*
+//
+// C and C++ Linker Control File
+// for the TI TMS320C30 Application Board
+// Startup Configuration
+//
+// Modified by RDM 9/8/96 for qcdsp.  Assume here that the
+// boot kernels have already been used to initialize the hardware,
+// including the NGA.
+//
+*/
+
+link  
+
+/*
+// Display Banner
+*/
+
+banner "";
+banner "Tartan Linker, SPARC/C3x, v5.1.0";
+banner "Copyright (c) 1986-1995 by Tartan, Inc., All Rights Reserved";
+banner "";
+banner "    QCDSP link file for C++ (/usr/local/tartan/v2.1/etc/qcdsp_v4/link.lcf";
+banner "    Suitable for programs called from boot kernels";
+banner "    Version 4:  Last modified 4/8/97 by PMV";
+banner "";
+banner "    Memory size:       0x80000 = 0.5 Mwords";
+banner "    Stack size:        0x10000";
+banner "    Heap size:         0x10000";
+banner "";
+
+/*
+// Options
+*/
+
+resolve sections;			// optimize linking
+options romcopy;			// init RAM variables from ROM
+
+/*
+// Configuration Constants
+*/
+
+define __STACK_SIZE	= 0x10000;	// 1K stack
+define __SYSMEM_SIZE	= 0x10000;	// 1K heap
+
+// These constants define bus control register values loaded at startup
+define tc_PBCR_startup	= 0xF00;	// primary bus control value
+// define tc_EBCR_startup	= 0x0;		// expansion bus control value
+
+// These constants define ST, IE registers during initialization
+define tc_ST_startup	= 0x2800;	// status register
+define tc_IE_init	= 0x7FFF;	// interrupt mask
+
+/*
+// System Configuration
+*/
+
+define TDB_BREAKPOINT	= 0x66000000;	// breakpoint for Tartan debugger
+
+control "*.ctl";			// list of obj/lib files to link
+					// *.ctl file built by Tartan shell
+
+list "*.map";				// default extension for link maps
+
+space .stack, __STACK_SIZE;             // declare memory for program stack
+space .sysmem, __SYSMEM_SIZE;           // declare memory for program heap
+
+/*
+// Explicit Modules
+*/
+
+use module = qcdsp_tcroot;		// general startup code
+use module = tcrpc;			// needed for Tartan debugger
+use section = .cinit nowarn;		// link in .cinit tables
+
+use kind = debug;			// include debug information
+use kind = dstring;			// include debug strings
+use kind = linenumber;			// include debug line mapping
+
+/*
+// Define Memory Layout
+*/
+
+memory (
+        limit = 0x80000;		//
+        avoid = 0x0, 0x1000;		// 0x1000 - 0x7FFFF
+);
+ 
+/*
+// Define Program Layout
+*/
+
+allocate ".bss" kind = data image (
+		origin = 0x1000 kind=data
+	);
+
+allocate ".data" kind = constant image (
+		kind=constant
+	);
+
+allocate ".text" kind = code image   (
+		kind = code 
+	);
+
+/*
+// Debug Directives
+//
+// These commands are for debugger symbol information, and do
+// not affect the size or location of the program
+*/
+
+allocate debug_directives image kind = debug
+        (origin = 0 kind = debug);
+
+allocate debug_strings image kind = dstring
+        (origin = 0 kind = dstring);
+
+allocate debug_source_location image kind = linenumber
+        (origin = 0 kind = linenumber);
+
+end link;
+CPS_END_NAMESPACE

@@ -1,0 +1,85 @@
+dnl--------------------------------------------------------------------
+dnl  CVS keywords
+dnl
+dnl  $Author: mcneile $
+dnl  $Date: 2003-06-22 13:34:45 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+dnl  $Id: configure.in,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+dnl  $Name: not supported by cvs2svn $
+dnl  $Locker:  $
+dnl  $RCSfile: configure.in,v $
+dnl  $Revision: 1.1.1.1 $
+dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
+dnl  $State: Exp $
+dnl
+dnl--------------------------------------------------------------------
+AC_INIT(./src/)
+
+AC_PROG_CC(gcc)
+
+
+dnl Get host information:
+AC_CANONICAL_SYSTEM
+
+dnl If using this script, then we are not making the QCDSP version.
+NOT_TESTING_QCDSP="yes"
+AC_SUBST(NOT_TESTING_QCDSP)
+
+
+dnl Parallel (MPI) v. serial switch.
+AC_ARG_ENABLE(parallel-mpi, 
+[  --enable-parallel-mpi   Compile as a parallel code, using MPI. (default=no)] ,  , [enable_parallel_mpi="no"])
+AC_MSG_CHECKING("if parallel-mpi is enabled")
+AC_MSG_RESULT($enable_parallel_mpi)
+if test "$enable_parallel_mpi" = "yes"; then
+  if test -z "$CC"; then
+    CC="mpCC"
+  fi
+  PARALLELDEF="-DPARALLEL=1"
+  MPILINK="-lmpi"
+  PARALLELLINK="MPILIB"
+  TESTING_PARALLEL="yes";
+else
+  if test -z "$CC"; then
+    CC="gcc"
+  fi
+  PARALLELDEF="-DPARALLEL=0"
+  MPILINK=""
+  PARALLELLINK="SERIALLIB"
+  TESTING_PARALLEL="no";
+fi
+AC_SUBST(PARALLELDEF)
+AC_SUBST(MPILINK)
+AC_SUBST(PARALLELLINK)
+AC_SUBST(TESTING_PARALLEL)
+
+dnl Basic float/double precision switch:
+AC_ARG_ENABLE(double-prec, 
+[  --enable-double-prec    Force the code to use double precision throughout (default=yes)] ,  , [enable_double_precision="yes"])
+AC_MSG_CHECKING("if double-prec is enabled")
+AC_MSG_RESULT($enable_double_precision)
+if test "$enable_double_precision" = "yes"; then
+  GSUMPRECISION="double"
+  LOCALPRECISION="double"
+else
+  GSUMPRECISION="double"
+  LOCALPRECISION="float"
+fi
+AC_SUBST(GSUMPRECISION)
+AC_SUBST(LOCALPRECISION)
+
+
+dnl Set default value for CFLAGS if none is defined or it's empty
+if test -z "$CFLAGS"; then
+  CFLAGS="-O"
+fi
+
+topwd_srcdir=`pwd`
+AC_SUBST(topwd_srcdir)
+
+AC_PROG_INSTALL
+
+AC_OUTPUT(Makefile_cps\
+	  config.h \
+          tests/regression.pl )
+

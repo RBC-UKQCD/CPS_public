@@ -1,0 +1,127 @@
+#include<config.h>
+CPS_START_NAMESPACE
+
+#####################################################
+# Usage: source Qrun phys_vx.y.z
+#
+# It runs all the tests in the lists below and
+# does a diff with the data files in 
+# phys_vx.y.z/tests/*
+#####################################################
+
+set base_dir=`pwd`
+set qrun_log=$base_dir/qrun.log
+set cmp_log=$base_dir/compare.log
+
+/bin/rm  $qrun_log >& /dev/null
+/bin/rm  $cmp_log >& /dev/null
+/bin/rm  $base_dir/*/*.dat >& /dev/null
+/bin/rm  $base_dir/*/phys.* >& /dev/null
+touch $qrun_log
+touch $cmp_log
+
+date >>& $qrun_log
+echo "Compare dir is:" $1 >>& $cmp_log
+echo "Base dir is:" $base_dir >>& $qrun_log
+
+set list1=`echo f_stag_pbp f_wilson_pbp f_clover_pbp f_dwf_pbp f_dwfso_pbp`
+set list2=`echo f_hmd f_hmd_dwfso g_hb g_hmd s_spect w_spect threept f_wilson_eig xi_spect_gsum`
+set list3=`echo fix_gauge`
+
+qset_nodes all >>& $qrun_log
+
+echo " "
+
+# PsiBarPsi tests 
+#####################################################
+@ j = 1
+while ( $j <= $#list1 )
+  set local_dir=$list1[$j]
+  set dir=$base_dir/$local_dir
+  cd $dir >>& $qrun_log
+  echo " " >>& $qrun_log
+  echo " " >>& $qrun_log
+  echo "============================================================================================"  >>& $qrun_log
+  echo directory is $dir >>& $qrun_log
+  echo "============================================================================================"  >>& $qrun_log
+  echo " " >>& $cmp_log
+  echo " " >>& $cmp_log
+  echo "============================================================================================"  >>& $cmp_log
+  echo directory is $dir >>& $cmp_log
+  echo "============================================================================================"  >>& $cmp_log
+  echo directory is $dir
+  set exec_file=$dir/main.gnu.out
+  echo "exec file:" $exec_file >>& $qrun_log
+  $exec_file >! stdio_sun.dat
+  /bin/mv pbp.dat pbp_sun.dat >>& $qrun_log
+  foreach x (*.dat)
+  echo "compare with" $x >>& $cmp_log
+  diff ../../../$1/tests/$local_dir/$x . >>& $cmp_log
+  end
+  @ j++
+end
+
+
+# General tests with out stdio output
+#####################################################
+@ j = 1
+while ( $j <= $#list2 )
+  set local_dir=$list2[$j]
+  set dir=$base_dir/$local_dir
+  cd $dir >>& $qrun_log
+  echo " " >>& $qrun_log
+  echo " " >>& $qrun_log
+  echo "============================================================================================"  >>& $qrun_log
+  echo directory is $dir  >>& $qrun_log
+  echo "============================================================================================"  >>& $qrun_log
+  echo " " >>& $cmp_log
+  echo " " >>& $cmp_log
+  echo "============================================================================================"  >>& $cmp_log
+  echo directory is $dir >>& $cmp_log
+  echo "============================================================================================"  >>& $cmp_log
+  echo directory is $dir
+  set exec_file=$dir/main.gnu.out
+  qrun $exec_file >>& $qrun_log
+  foreach x (*.dat)
+  echo "compare with" $x >>& $cmp_log
+  diff ../../../$1/tests/$local_dir/$x . >>& $cmp_log
+  end
+  @ j++
+end
+
+
+# General tests with stdio output
+#####################################################
+@ j = 1
+while ( $j <= $#list3 )
+  set local_dir=$list3[$j]
+  set dir=$base_dir/$local_dir
+  cd $dir >>& $qrun_log
+  echo " " >>& $qrun_log
+  echo " " >>& $qrun_log
+  echo "============================================================================================"  >>& $qrun_log
+  echo directory is $dir  >>& $qrun_log
+  echo "============================================================================================"  >>& $qrun_log
+  echo " " >>& $cmp_log
+  echo " " >>& $cmp_log
+  echo "============================================================================================"  >>& $cmp_log
+  echo directory is $dir >>& $cmp_log
+  echo "============================================================================================"  >>& $cmp_log
+  echo directory is $dir
+  set exec_file=$dir/main.gnu.out
+  echo "exec file:" $exec_file >>& $qrun_log
+  qrun $exec_file >! stdio_qcdsp.dat
+  foreach x (*.dat)
+  echo "compare with" $x >>& $cmp_log
+  diff ../../../$1/tests/$local_dir/$x . >>& $cmp_log
+  end
+  @ j++
+end
+
+date >>& $qrun_log
+
+cd $base_dir
+
+
+
+CPS_END_NAMESPACE

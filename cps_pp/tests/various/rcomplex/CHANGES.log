@@ -1,0 +1,18 @@
+#include<config.h>
+CPS_START_NAMESPACE
+
+
+====================================================================
+/tmp_mnt/home/cmm80/phys/phys_v4.1.1.test/tests/various/rcomplex/main.C
+====================================================================
+73,74c73,74
+< IFloat buffer[BUF_SIZE];
+< IFloat *buffer_p = buffer;
+---
+> float buffer[BUF_SIZE];
+> float *buffer_p = buffer;
+82c82
+<   IFloat f = 1.123;
+---
+>   float f = 1.123;
+CPS_END_NAMESPACE

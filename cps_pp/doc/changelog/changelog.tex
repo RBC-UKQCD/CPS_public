@@ -1,0 +1,470 @@
+#include<config.h>
+CPS_START_NAMESPACE
+%------------------------------------------------------------------
+% $Id: changelog.tex,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+%------------------------------------------------------------------
+%Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
+%
+% For best results, this latex file should be compiled using pdflatex.
+% However it will also compile under normal latex, if you prefer.
+%
+%------------------------------------------------------------------
+\documentclass[12pt]{article}
+
+% importing other useful packages:
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{tabularx}
+% color for the pdf links:
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.5}
+% for conditional latex source:
+\usepackage{ifthen}
+% pdftex specifications, these are only included if we are using pdflatex:
+\providecommand{\pdfoutput}{0}
+\ifthenelse{\pdfoutput = 0}{
+% Not PDF:
+\usepackage{html}
+\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+}{
+% PDF: hyperref for pdf with full linkages:
+\usepackage[
+pagebackref,
+hyperindex,
+hyperfigures,
+colorlinks,
+linkcolor=darkblue,
+citecolor=darkblue,
+pagecolor=darkblue,
+urlcolor=blue,
+%bookmarksopen,
+pdfpagemode=None,
+%=UseOutlines,
+pdfhighlight={/I},
+pdftitle={Notes on changes to the Columbia code. $Revision: 1.1.1.1 $ - $Date: 2003-06-22 13:34:52 $.},
+pdfauthor={A.N. Jackson \& S. Booth},
+plainpages=false
+]{hyperref}
+}
+
+
+% Code style commands:
+\newcommand{\cls}[1]{{\bf #1}}            % Classes
+\newcommand{\struct}[1]{{\bf #1}}         % Structs
+\newcommand{\cde}[1]{{\tt #1}}            % Code fragments
+
+% document style modifications:
+\setlength{\parskip}{2.0mm}
+\setlength{\parindent}{0mm}
+
+% title information:
+\title{Notes on changes to the Columbia code.}
+\author{A.N. Jackson \& S. Booth}
+\date{\mbox{\small $$Revision: 1.1.1.1 $$  $$Date: 2003-06-22 13:34:52 $$}}
+
+%------------------------------------------------------------------
+\begin{document}
+
+\maketitle
+
+\begin{flushright}
+\href{mailto:A.N.Jackson@ed.ac.uk}{A.N.Jackson@ed.ac.uk}.
+\end{flushright}
+
+\tableofcontents
+
+\newpage
+
+%-------------------------------------------------------------------
+\section{Version 4.0.0}
+The original version of the code from Columbia.  Internally, this corresponds
+to revision 1.1.1.1 in the UKQCD QCDOC repository, dated 2001/06/15.  
+This was given the revision tag \cde{phys\_4\_0\_0\_open}. 
+
+%-------------------------------------------------------------------
+\section{Version 4.0.5}
+This version (largely notional as there was no CVS tag) referred to the basic
+ANSIfication of the code and the addition of the draft MPI SCU layer.
+
+\subsection{ANSIfication}
+\label{405ANSI}
+A large number of small changes have been made throughout the code, to
+turn it into more standard C++.  The code will now compile with any recent gcc
+(only tested under 2.8.1 \& 2.95.2, but 2.95.3+ should present few serious
+issues).  The 4.0.0 code only compiled under \cde{gcc 2.8.1}.  The compiler errors
+fell into the following categories:
+\begin{itemize}
+ \item Attempts at using inline variables outside their scope.
+ \item Inline declaration of variable without types.  
+ \item ``assignment to \cde{char*} or \cde{void*} from \cde{const char*}
+ discards qualifiers.''  This does not occur on all compilers as the default
+ type for inline character strings is compiler dependent.  However, this behaviour 
+ can usually be controlled via command-line arguments to the compiler.
+ \item No type declaration for \cde{main}.
+ \item Cannot pass \cde{Float} through \cde{(...)}.  Only native types can be
+ passed through ellipsis, see section of floating-point below.
+ \item Could not find \cde{sysfunc.h}, \cde{flotar.h},
+ etcetera. i.e. could not find QCDSP-specific header files.
+ \item Implicit declarations of functions and variables, mainly due
+ to the missing header files.
+\end{itemize}
+
+\subsubsection{Variable Scoping}
+The most common problem was the use of variables beyond their ANSI scope.  For
+example, consider a code fragment of the form:
+\begin{verbatim}
+for(int i = 0; i < 10; i++ ) {
+  [do something]
+}
+for( i = 0; i < 10; i++ ) {
+  [do something else]
+}
+\end{verbatim}
+This is illegal under ANSI C++, as the integer i does not exist beyond the
+scope of the for-loop in which it was created.  This was fixed by moving the
+declaration into the required scope:
+\begin{verbatim}
+int i;
+for(i = 0; i < 10; i++ ) {
+  [do something]
+}
+for( i = 0; i < 10; i++ ) {
+  [do something else]
+}
+\end{verbatim}
+This yields the correct scoping on both old and ANSI compilers.
+
+\subsection{The MPI version of the SCU}
+The first MPI implementation of the SCU layer was added to
+the \cde{./nga} directory.  More information on this aid to portability can be found
+in \href{../mpi-scu/commspec.html}{../mpi-scu/commspec.html}.
+
+\subsection{Other Minor Issues}
+Apart from the ANSIisms and MPI, some other minor changes were also made.  For
+this version, the \cde{double64.h} header files have been moved.  Identical
+copies of this file were found in multiple directories (under
+\cde{./nga/glb\_*}).  These have been removed and replaced with a single
+\cde{double64.h} header file in \cde{./nga/include}.
+
+
+%-------------------------------------------------------------------
+\section{Version 4.1.0 (alpha release)}
+The first major release from EPCC was the 4.1.0 (alpha) version, dated
+2001/09/06 cvs revision tag: \cde{phys\_4\_1\_0\_alpha\_open}.  This version
+had been successfully compiled and tested on a number of platforms (see
+section on testing below).  As well as the 4.0.5 modifications, this version
+implements flexible (float/double) floating-point precision, and adds an
+autoconf based configuration system.
+
+\subsection{Implementing flexible floating-point precision}
+As indicated above (\S\ref{405ANSI}), it is not always possible to use the \cde{rfloat}
+floating-point implementation on all platforms.  To this end, {\bf{all}}
+references to rfloat have been replaced with a typedef called \cde{Float}.
+Also, {\bf{all}} references to \cde{float}s have been replaced with an
+``internal float'' typedef called \cde{IFloat}.  These typedefs are in 
+\cde{./util/include/data\_types.h}.  
+
+Setting \cde{Float} to \cde{rfloat} and \cde{IFloat} to \cde{float} recovers
+the original functionality.  
+
+Using \cde{Float} = \cde{IFloat} = \cde{float} runs in exactly the same
+precision as the original, but the serial code runs approximately 20 times
+faster.
+
+Using \cde{Float} = \cde{IFloat} = \cde{double} makes the code to run in
+double precision.
+
+This behaviour is controlled from \cde{./config.h} using two compiler macros,
+e.g.
+\begin{verbatim}
+/* Precision of the local calculations: rfloat, float, double. */
+#define LOCALCALC_TYPE double
+/* Precision of other internal calcs: float, double. */
+#define INTERNAL_LOCALCALC_TYPE double
+\end{verbatim}
+
+\subsubsection{Global Summations}
+Some global operations (essentially global sums) can be set to use 
+double-precision separately to the rest of the code.  This rests on the use of
+the \cde{double64.h} header file in \cde{./nga/include}, which defines a
+64-bit floating-point type (\cde{Double64}) for use with the global-sum calls.
+On QCDSP, the original behaviour (involving a specialised floating-point class) is
+retained.  Elsewhere, the behaviour is typedef'd such that:
+\begin{verbatim}
+typedef GLOBALSUM_TYPE Double64;
+\end{verbatim}
+Where the compiler macro \cde{GLOBALSUM\_TYPE} is defined in \cde{./config.h}.  
+The default is \cde{double}.
+
+\subsection{Addition of an autoconf configuration system}
+There are two parallel make-structures in the codebase.  The QCDSP one has been
+left unchanged, but the GNU one has been modified.  The autoconf system
+revolves around a configure script, \cde{configure.in}, which defines the
+platform dependencies and from which the \cde{./configure} script is created.
+This latter script takes the following files:
+\begin{verbatim}
+./config.h.in
+./Makefile.gnu.in
+./Makefile.gnutests.in
+./tests/regression.pl.in
+\end{verbatim}
+and creates the files
+\begin{verbatim}
+./config.h
+./Makefile.gnu
+./Makefile.gnutests
+./tests/regression.pl
+\end{verbatim}
+from them via macro substitution.  As well as controlling platform dependence,
+the configure script allows you to set the code precision and decide whether
+to compile as a serial or parallel (MPI) program.  Run \cde{./configure
+--help} for more information.
+
+Note that some of the global code options set in config.h are extremely
+important, and so any other header files which did not directly or indirectly
+include config.h had to be changed to do so.
+
+On QCDSP, this distribution should still compile straight out of the
+box.  On other platforms, the process is slightly more involved.  See
+\href{../porting/porting.html}{../porting/porting.html} for more information.
+
+\subsection{Other Minor Changes}
+The seeding of the serial RNG has also been \cde{\#define}d in \cde{config.h},
+globally instead of locally.  Also, a standard level of verbosity has been
+\cde{\#define}d in \cde{config.h} for the test programs, instead of having a
+separate verbose-level in each code.  Note also that a new verbosity setting
+has been added to the \cde{Verbose} class so that the RNG seed(s) used by the
+code can be output without also having to output vast amounts of program-flow
+information.
+
+\subsection{Testing}
+Following all of these changes, the code has been tested using a
+slightly modified implementation of the original Qrun testing script.
+A perl script (tests/regression.pl) is used to generate a batch script
+(tests/regression.sh).  Running this script will place the output of
+each code (both from stdio and from and .dat files) into the
+tests/regressions directory.  This output can be checked against that
+provided in the following subdirectories.
+
+\begin{verbatim}
+ phys/tests/regressions/v4_0_0/parallel
+ phys/tests/regressions/v4_0_0/serial
+\end{verbatim}
+
+These contain the output from the original version of the code that EPCC
+received, prior to any of our changes but using a standardised level of
+verbosity.
+
+\begin{verbatim}
+ phys/tests/regressions/v4_1_0/parallel
+ phys/tests/regressions/v4_1_0/serial
+\end{verbatim}
+
+These contain the output from the current version of the code.  The
+two sets of files differ only trivially, in that the Clock timings are
+different, the CRAM addresses have changed, and that the conditions
+for the outputting of the RNG printing string have been altered.
+
+Note that all of this output is from QCDSP.  The MPI version has yet to be
+rigorously tested.
+
+%-------------------------------------------------------------------
+\section{Version 4.1.0 (beta release)}
+Date: 23rd January 2001; CVS revision tag \cde{phys\_4\_1\_0\_beta\_open}.
+
+Since the above version, a few very minor changes have been made to the code,
+along with much modification of the documentation.  Also, the names of the
+library archive files (under the GNU make-structure) have been changed to
+\cde{*.a} instead of \cde{*.lib} to ensure portability.  The suggested set of
+CVS \cde{\$ Tag: \$} tags have been added to the files added by EPCC.
+
+%-------------------------------------------------------------------
+\section{Version 4.1.0 (beta release)}
+Date: 23rd January 2001; CVS revision tag \cde{phys\_4\_1\_0\_beta\_open}.
+%-------------------------------------------------------------------
+\section{Version 4.1.0 (beta release)}
+Date: 23rd January 2001; CVS revision tag \cde{phys\_4\_1\_0\_beta\_open}.
+%-------------------------------------------------------------------
+\section{Version 4.1.0 (beta release)}
+Date: 23rd January 2001; CVS revision tag \cde{phys\_4\_1\_0\_beta\_open}.
+
+4.1  4.0.0 Columbia
+The original version of the code recieved by EPCC from Columbia.
+
+UKQCD CVS Repository Tag: phys\_4\_0\_0\_open
+
+4.2  4.1.0 UKQCD
+ANSIfication, initial MPI SCU, type flexibility (float/double), basic qcdio support includuing the qload guage configuration loader.
+
+UKQCD CVS Repository Tag: phys\_4\_1\_0\_alpha\_open
+
+UKQCD CVS Repository Tag: phys\_4\_1\_0\_beta\_open
+
+UKQCD CVS Repository Tag: Root-of-Columbia4\_1\_1\_test
+
+4.3  4.1.0 Columbia
+Integration of new physics components
+
+UKQCD CVS Repository Tag: Columbia4\_1\_1\_test-branch
+
+4.4  4.1.1 Assimilation [UKQCD+Columbia]
+UKQCD+Columbia 4.1.0 code merge
+
+UKQCD CVS Repository Tag: Merged-from-Columbia4\_1\_1\_test
+
+4.5  4.1.2 Tested, Accepted
+
+UKQCD CVS Repository Tag: ???
+
+4.6  4.1.5 Assimilation [+Brookhaven]
+Code modifications from Brookhaven.
+
+4.7  4.1.6 Additions
+
+%-------------------------------------------------------------------
+\section{Pre-4.1.6: Adding a gauge-configuration saving routine}
+Date: 8th May 2002
+
+There are many possible ways of implementing a routine to save the gauge
+configuration out of the code when running in parallel.  We have to choose
+one that will scale acceptable given the 10,000 CPUs and 4Gbit/s (?) frontend
+bandwidth of QCDOC.  My thoughts were:
+\begin{itemize}
+
+\item Each node opens its own file and dumps the local data, after which 
+the I/O node opens all the files and remixes the data in the right 
+order to a new set of T-ordered files.
+[High I/O usage, tying up one node for some time]
+    
+\item Each node passes a copy of its own data all the way around the cube,
+x-dirn, y-dirn and then z-dirn.  The I/O node opens a separate file for
+each x-stream (i.e. \#files = local-z * local-y), and appends the data
+from each file as is passes through.  The I/O node can then trivially
+concatenate these files to form the overall output file.
+[Quite high I/O usage, and quite a lot of communication too]
+
+\item One node requests the data it requires to form the output file in 
+the correct order from each relevant node in turn.  This can be done 
+with no buffering at all, but will require many transations with each 
+node. Also, there is no call for arbitrary point-to-point comms, so 
+this will have to be written using the nearest-neighbour primitives.
+[High communications usage]
+
+\item Similar to the above idea, except that simultaneous comms are used 
+to collapse the data from the x-direction (or perhaps the x and y
+directions) on to the nodes that hold the x=0 plane (or the x=y=0
+line).  This requires potentially large buffers, but allows much comms
+overlapping.  After the collapse, the data can be collated as in method
+3 above.  
+[High memory usage]
+
+\item Collate the data onto one node in a large buffer, rearrange the data
+on that node and then write out the file.
+[Very large memory usage and ties up one PE for some time]
+
+\end{itemize}
+
+For the time being I will implement the simplest one, where each processor
+offloads its data to a different file.  These files can be patched together
+either offline or inline.
+
+Okay, current version writes out a file for each node, with appropriate
+filenames, using the given precision, transpose and byteswap.  Needs testing,
+but difficult to test properly until the reassembly code is written.
+
+The output file is the right size at least!  
+
+N.B. Updated the ukqcd CVS repository access instructions.
+
+I've made the code split the data into files accross the T axis.  This should
+allow the serial version to work perfectly, producing identical output as
+input.  However, the test I just did failed and the files differed.  On closer
+inspection (`od file | head'), is seems the differences were very slight - the
+odd byte here and there.  Therefore, is seems reasonable to assume that the
+fact that the code was running in double precision means that some information
+got munged in the transformation to and from double precision.  I am
+recompiling the whole thing to use single precision, which should allow
+precise testing using this input data.  1/2 bit errors per 32-bit word.
+
+Darn it.  Got pretty much exactly the same results.  I now suspect the
+expansion and compression from 2x3 to full 3x3 and back to 2x3 again, or
+possibly the transposing.  The latter should not do any such thing, and the
+former should save out the cols/rows that got loaded in, I think.  I'll check
+the transpose action occurs at the right spot to get the original data back
+out.
+
+Quick check, switch off the transpose and try again...  Damn, the same.
+Trying when outputting the other part of the matrix. Rom from 1 to COLORS
+instead of 0 to COLORS-1...  Hmmm.  That didn't work. 
+
+Most likely, it is the set of transformations used to reconstruct the matrix
+from the 3x2 form.  I'll try not bothering, and this should read out the data
+in the same order as it is read in.  Excellent!  That worked.  The
+norm-orthog-norm-orthog sequence introduces a few minor errors in the numbers.
+
+Checking the code in, so people can at least access the saver routine in
+serial.
+
+Now to run in in parallel...  Some compilation issues, forgot to export
+CC=mpCC, reconfigure etc. Now trying a complete clean and build on lomond
+front-end.  That worked.  Ran in parallel and produced umpteen files with
+different chunks of the matrix in them.  Now all I have to do is remix the
+data correctly.
+
+30/05/2002
+
+Change of plan.  Moving over to a more sensible system where each x,y,z=0
+processor opens each TXX output file, and the data is pumped down from the
+TXX x,y,z cube to the I/O node.  The method is borrowed from ideas/code from
+SPB.  Every node loops over all the data, the I/O nodes load the data,
+all relvent nodes participate in the pumping of data to the destination nodes,
+and then the destination nodes unpack the data.  Much the same code is used to
+perform the reverse pack-pump-save routine.
+
+This is in place in essence, but the pumping routine appears to be wrong and
+prism is showing me that there are messages left unheeded and recieved sent
+without a matching message too.
+
+31/05/2002
+
+Finally working okay, creating a reversible process where data is loaded in a
+saved out again while being identical (note that the reconstruction of the
+missing row is commented out to ensure bitwise-identical results).  Now
+stripping out the paranoid (per pump) sync commands and retesting.  Seems to
+be okay, and is a darn sight faster, tens of minutes down to minutes on the
+lomond front-end (not too surprising really). Yup.  Looks fine.
+
+Now I'll check this in and let Craig know its there, but in a beta state as
+the actual data on each node has not been fully tested yet.  Also, I should
+add some more comments, at least to the head of each subroutine.
+
+4/06/2002
+
+Created a 'maketestdata.c' program and added it to the cvs repository in
+tests/qcdio/.  This creates a set of dummy data files filled with simple
+incremental data.  I'm currently running this through the code to check the
+data on each node has been loaded correctly.
+
+5/06/2002
+
+The test program for qcdio now creates its own test data, loads it in, checks
+it has been loaded correctly and then saves it out.  The only gap is that it
+does not check that the resulting files are bit-identical to the input files,
+but the test.bindiff.sh script will do that.  This routine is now considered
+complete and ready for use by others.
+
+However, the routine to write out the g/c .par file is not complete, and the
+code in qcdio.C is under-commented.  These issues will remain outstanding for
+some time as I have to work on other projects.
+
+
+
+\end{document}
+
+%-------------------------------------------------------------------
+\section{Pre-4.1.6: Adding a serial implementation of the SCU}
+Date: ???
+
+CPS_END_NAMESPACE

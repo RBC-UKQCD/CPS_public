@@ -1,0 +1,113 @@
+#include<config.h>
+CPS_START_NAMESPACE
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: mcneile $
+//  $Date: 2003-06-22 13:34:45 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/meson_prop_s.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Id: meson_prop_s.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.2  2001/06/19 18:11:30  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:16:00  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
+//  $RCSfile: meson_prop_s.C,v $
+//  $Revision: 1.1.1.1 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/meson_prop_s.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
+// meson_prop_s.C
+
+CPS_END_NAMESPACE
+#include<math.h>
+#include<alg/meson_prop_s.h>
+#include<alg/quark_prop_s.h>
+CPS_START_NAMESPACE
+
+char MesonPropS::cname[] = "MesonPropS";
+
+//--------------------------------------------------------------------
+// private functions 
+//--------------------------------------------------------------------
+
+Complex MesonPropS::traceG1DagG2(Float *G1[], Float *G2[], int offset)
+{
+  Complex res;
+  for(int color = 0; color < 3; ++color) {
+    Complex *a = (Complex *) (G1[color]+offset);
+    Complex *b = (Complex *) (G2[color]+offset);
+    for (int i = 0; i < 3; ++i) {
+      res += conj(a[i]) * b[i];
+    }
+  }
+  return res;
+}
+
+//--------------------------------------------------------------------
+// when dir = T, the following are normal hadron operator. 
+// phase factors unclear when dir != T
+//--------------------------------------------------------------------
+
+int MesonPropS::signSC(int x[])         // SC
+{ return ((x[(dir+1)%4]+x[(dir+2)%4]+x[(dir+3)%4]) & 1) == 0 ? 1 : -1; }
+
+int MesonPropS::signVT(int x[])         // VT
+{
+  int res = (x[(dir+1)%4] & 1) == 0 ? 1 : -1;
+  res += (x[(dir+2)%4] & 1) == 0 ? 1 : -1;
+  res += (x[(dir+3)%4] & 1) == 0 ? 1 : -1;
+  return res;
+}
+
+int MesonPropS::signPV(int x[])         // PV
+{
+  int i = (dir+1)%4;
+  int j = (dir+2)%4;
+  int k = (dir+3)%4;
+
+  int res = ((x[i]+x[j]) & 1) == 0 ? 1 : -1;
+  res += ((x[j]+x[k]) & 1) == 0 ? 1 : -1;
+  res += ((x[i]+x[k]) & 1) == 0 ? 1 : -1;
+  return res;
+}
+
+//--------------------------------------------------------------------
+// protected function
+//--------------------------------------------------------------------
+void MesonPropS::localVal(Complex *currt_p, int *s)
+{
+  int offset = X_OFFSET(s); 
+
+  Complex trace = traceG1DagG2(qp0, qp1, offset);
+
+  *currt_p++ += trace;
+  *currt_p++ += trace * signVT(s);
+  *currt_p++ += trace * signPV(s);
+  *currt_p   += trace * signSC(s);
+
+  return; 
+}
+
+MesonPropS::MesonPropS(Lattice &lattice, StagMesonArg& arg)
+: HadronPropS(lattice, 4, arg.dir, QuarkPropSMng::srcSlice(arg.qid0), 1),
+  qp0(QuarkPropSMng::prop(arg.qid0)),
+  qp1(QuarkPropSMng::prop(arg.qid1)) {}
+ 
+MesonPropS::~MesonPropS(){}
+
+CPS_END_NAMESPACE
