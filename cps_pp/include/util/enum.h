@@ -3,18 +3,24 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: enum.h,v 1.3 2003-08-29 20:24:47 mike Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
-//  $Id: enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Author: mike $
+//  $Date: 2003-08-29 20:24:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.3 2003-08-29 20:24:47 mike Exp $
+//  $Id: enum.h,v 1.3 2003-08-29 20:24:47 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2003/07/24 16:53:53  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.2  2001/06/19 18:13:17  anj
 //  Serious ANSIfication.  Plus, degenerate double64.h files removed.
 //  Next version will contain the new nga/include/double64.h.  Also,
@@ -31,7 +37,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: enum.h,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v $
 //  $State: Exp $
 //
@@ -283,7 +289,9 @@ enum RitzMatType {
     MATPCDAG_MATPC,  /*!< The preconditioned \f$M^\dagger M\f$
 		          on a single parity */
     MATDAG_MAT,      /*!< \f$M^\dagger M\f$ on the full lattice */
-    NEG_MATDAG_MAT   /*!< \f$-M^\dagger M\f$ on the full lattice*/
+    NEG_MATDAG_MAT,   /*!< \f$-M^\dagger M\f$ on the full lattice*/
+    MATDAG_MAT_NORM,  /*!< \f$cM^\dagger M\f$ on the full lattice (normalised)*/
+    NEG_MATDAG_MAT_NORM  /*!< \f$-cM^\dagger M\f$ on the full lattice (normalised)*/
 };
 		  
 
