@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.1 2005-02-11 23:53:40 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.2 2005-02-12 00:54:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -39,6 +39,15 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 #define PROFILE
+
+static int offset (int *size, int *pos, int mu = -1){
+  if (mu>3) printf("FdwfBase::offset: Error!\n");
+  if (mu>-1) pos[mu] = (pos[mu]+1)%size[mu];
+  int result = 
+  pos[0] + size[0] *( pos[1] + size[1] *( pos[2] + size[2] *( pos[3])));
+  if (mu>-1) pos[mu] = (pos[mu]-1+size[mu])%size[mu];
+  return result;
+}
 
 // CJ: change start
 //------------------------------------------------------------------
@@ -121,16 +130,18 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   char *str_site_v1 = "site_v1" ;
   char *str_site_v2 = "site_v2" ;
 
-//  Float *site_v1[4],*size_v2[4];
-//  for(int i =0;i<4;i++) {
+  Float *v1_buf[4],*v2_buf[4];
+  for(int i =0;i<4;i++) {
+    v1_buf[i]=(Float *)smalloc(cname,fname,"v1_buf",surf[i]*FsiteSize()*sizeof(Float)) ;
+    v2_buf[i]=(Float *)smalloc(cname,fname,"v2_buf",surf[i]*FsiteSize()*sizeof(Float)) ;
+  }
+
     Float *site_v1=(Float *)qalloc(QFAST|QNONCACHE,FsiteSize()*sizeof(Float)) ;
     if (site_v1 == 0) ERR.Pointer(cname, fname, str_site_v1) ;
     VRB.Smalloc(cname, fname, str_site_v1, site_v1, FsiteSize()*sizeof(Float)) ;
     Float *site_v2=(Float *)qalloc(QFAST|QNONCACHE,FsiteSize()*sizeof(Float)) ;
-//    site_v2[i]=(Float *)smalloc(surf[i]*FsiteSize()*sizeof(Float)) ;
     if (site_v2 == 0) ERR.Pointer(cname, fname, str_site_v2) ;
     VRB.Smalloc(cname, fname, str_site_v2, site_v2, FsiteSize()*sizeof(Float)) ;
-//  }
 
 
   Matrix tmp_mat1, tmp_mat2 ;
@@ -168,12 +179,14 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 //------------------------------------------------------------------
   sys_cacheflush(0);
 
+  int pos[4];
   for (mu=0; mu<4; mu++){
-    for (t=0; t<lt; t++){
-    for (z=0; z<lz; z++){
-    for (y=0; y<ly; y++){
-    for (x=0; x<lx; x++){
-      int gauge_offset = x+lx*(y+ly*(z+lz*t)) ;
+    for (pos[3]=0; pos[3]<size[3]; pos[3]++){
+    for (pos[2]=0; pos[2]<size[2]; pos[2]++){
+    for (pos[1]=0; pos[1]<size[1]; pos[1]++){
+    for (pos[0]=0; pos[0]<size[0]; pos[0]++){
+//      int gauge_offset = x+lx*(y+ly*(z+lz*t)) ;
+      int gauge_offset = offset(size,pos);
       int vec_offset = f_site_size_4d*gauge_offset ;
       gauge_offset = mu+4*gauge_offset ;
 
@@ -184,10 +197,8 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
       Float coeff = -2.0 * step_size ;
 
-      switch (mu) {
-        case 0 :
-          vec_plus_mu_offset *= (x+1)%lx+lx*(y+ly*(z+lz*t)) ;
-          if ((GJP.Xnodes()>1)&&((x+1) == lx) ) {
+          vec_plus_mu_offset *= offset(size,pos,mu);
+          if ((GJP.Nodes(mu)>1)&&((pos[mu]+1) == size[mu]) ) {
 #if 1
           addr[0] = (IFloat *)v1+vec_plus_mu_offset;
           addr[1] = (IFloat *)v2+vec_plus_mu_offset;
@@ -209,106 +220,13 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
             v1_plus_mu = site_v1 ;
             v2_plus_mu = site_v2 ;
             vec_plus_mu_stride = 0 ;
-            if (GJP.XnodeBc()==BND_CND_APRD) coeff = -coeff ;
+//            if (GJP.XnodeBc()==BND_CND_APRD) coeff = -coeff ;
+            if (GJP.NodeBc(mu)==BND_CND_APRD) coeff = -coeff ;
           } else {
             v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
             v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
             vec_plus_mu_stride = f_size_4d - f_site_size_4d ;
           }
-          break ;
-        case 1 :
-          vec_plus_mu_offset *= x+lx*((y+1)%ly+ly*(z+lz*t)) ;
-          if ((GJP.Ynodes()>1)&&((y+1) == ly) ) {
-#if 1
-          addr[0] = (IFloat *)v1+vec_plus_mu_offset;
-          addr[1] = (IFloat *)v2+vec_plus_mu_offset;
-          Send[mu].Addr(addr,2);
-	  Recv[mu].StartTrans();
-	  Send[mu].StartTrans();
-	  Recv[mu].TransComplete();
-	  Send[mu].TransComplete();
-#else
-            for (s=0; s<ls; s++) {
-              getPlusData( (IFloat *)site_v1+s*f_site_size_4d,
-                (IFloat *)v1+vec_plus_mu_offset+s*f_size_4d,
-                f_site_size_4d, mu) ;
-              getPlusData( (IFloat *)site_v2+s*f_site_size_4d,
-                (IFloat *)v2+vec_plus_mu_offset+s*f_size_4d,
-                f_site_size_4d, mu) ;
-            } // end for s
-#endif
-            v1_plus_mu = site_v1 ;
-            v2_plus_mu = site_v2 ;
-            vec_plus_mu_stride = 0 ;
-            if (GJP.YnodeBc()==BND_CND_APRD) coeff = -coeff ;
-          } else {
-            v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-            v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-            vec_plus_mu_stride = f_size_4d - f_site_size_4d ;
-          }
-          break ;
-        case 2 :
-          vec_plus_mu_offset *= x+lx*(y+ly*((z+1)%lz+lz*t)) ;
-          if ((GJP.Znodes()>1)&&((z+1) == lz) ) {
-#if 1
-          addr[0] = (IFloat *)v1+vec_plus_mu_offset;
-          addr[1] = (IFloat *)v2+vec_plus_mu_offset;
-          Send[mu].Addr(addr,2);
-	  Recv[mu].StartTrans();
-	  Send[mu].StartTrans();
-	  Recv[mu].TransComplete();
-	  Send[mu].TransComplete();
-#else
-            for (s=0; s<ls; s++) {
-              getPlusData( (IFloat *)site_v1+s*f_site_size_4d,
-                (IFloat *)v1+vec_plus_mu_offset+s*f_size_4d,
-                f_site_size_4d, mu) ;
-              getPlusData( (IFloat *)site_v2+s*f_site_size_4d,
-                (IFloat *)v2+vec_plus_mu_offset+s*f_size_4d,
-                f_site_size_4d, mu) ;
-            } // end for s
-#endif
-            v1_plus_mu = site_v1 ;
-            v2_plus_mu = site_v2 ;
-            vec_plus_mu_stride = 0 ;
-            if (GJP.ZnodeBc()==BND_CND_APRD) coeff = -coeff ;
-          } else {
-            v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-            v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-            vec_plus_mu_stride = f_size_4d - f_site_size_4d ;
-          }
-          break ;
-        case 3 :
-          vec_plus_mu_offset *= x+lx*(y+ly*(z+lz*((t+1)%lt))) ;
-          if ((GJP.Tnodes()>1)&&((t+1) == lt) ) {
-#if 1
-          addr[0] = (IFloat *)v1+vec_plus_mu_offset;
-          addr[1] = (IFloat *)v2+vec_plus_mu_offset;
-          Send[mu].Addr(addr,2);
-	  Recv[mu].StartTrans();
-	  Send[mu].StartTrans();
-	  Recv[mu].TransComplete();
-	  Send[mu].TransComplete();
-#else
-            for (s=0; s<ls; s++) {
-              getPlusData( (IFloat *)site_v1+s*f_site_size_4d,
-                (IFloat *)v1+vec_plus_mu_offset+s*f_size_4d,
-                f_site_size_4d, mu) ;
-              getPlusData( (IFloat *)site_v2+s*f_site_size_4d,
-                (IFloat *)v2+vec_plus_mu_offset+s*f_size_4d,
-                f_site_size_4d, mu) ;
-            } // end for s
-#endif
-            v1_plus_mu = site_v1 ;
-            v2_plus_mu = site_v2 ;
-            vec_plus_mu_stride = 0 ;
-            if (GJP.TnodeBc()==BND_CND_APRD) coeff = -coeff ;
-          } else {
-            v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-            v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-            vec_plus_mu_stride = f_size_4d - f_site_size_4d ;
-          }
-      } // end switch mu 
 
 //     Float time2 = -dclock();
       sproj_tr[mu]( (IFloat *)&tmp_mat1,
@@ -356,6 +274,11 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
  
   VRB.Sfree(cname, fname, str_site_v1, site_v1) ;
   qfree(site_v1) ;
+
+  for(int i =0;i<4;i++) {
+    sfree(cname,fname,"v1_buf",v1_buf[i]);
+    sfree(cname,fname,"v2_buf",v2_buf[i]);
+  }
  
   VRB.Sfree(cname, fname, str_v2, v2) ;
   ffree(v2) ;
