@@ -1,4 +1,4 @@
-# $Id: Makefile_common.in,v 1.16 2004-08-30 04:45:23 chulwoo Exp $
+# $Id: Makefile_common.in,v 1.17 2004-08-30 06:06:17 chulwoo Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -42,10 +42,6 @@ DFLAGS += @DFLAGS@
 
 LIBLIST =\
   $(BUILDDIR)/cps.a \
-  $(BUILDDIR)/qcdoc_cbuf.a \
-  $(BUILDDIR)/qcdoc_scu.a \
-  $(BUILDDIR)/qcdoc_glb_cpp.a \
-#  $(BUILDDIR)/qcdoc_glb_passthru.a \
 
 #
 #  targets
