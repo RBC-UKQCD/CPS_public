@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.13 2004-09-07 05:20:21 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.14 2004-11-17 18:26:37 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -106,6 +106,10 @@ OBJS := $(notdir $(OBJS_SRC))
 %.o:%.C
 	${CXX} -c $< -o $(BUILDDIR2)/$@ ${libcps_CXXFLAGS}
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+
+%.xlo:%.C
+	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@
+#	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.S
 	$(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR2)/$*.i

@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2004-11-08 06:39:52 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.24 2004-11-08 06:39:52 chulwoo Exp $
-dnl  $Id: configure.in,v 1.24 2004-11-08 06:39:52 chulwoo Exp $
+dnl  $Date: 2004-11-17 18:26:38 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.25 2004-11-17 18:26:38 chulwoo Exp $
+dnl  $Id: configure.in,v 1.25 2004-11-17 18:26:38 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.24 $
+dnl  $Revision: 1.25 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -258,6 +258,7 @@ dnl AC_CHECK_HEADERS([strings.h])
 
 
 AC_OUTPUT(config.h \
+	  XLC.cfg \
 	  Makefile \
 	  Makefile.rules \
 	  Makefile.users \

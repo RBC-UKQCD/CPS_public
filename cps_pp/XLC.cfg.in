@@ -1,0 +1,161 @@
+* Configuration file generated on "Thu Apr  1 17:20:24 EST 2004"
+* with "/opt/ibmcmp/vac/6.0/bin/vac_configure -gcc64 /usr -o chulwoo.cfg"
+*
+* COMPONENT_NAME: (CC) VisualAge C++ for Linux
+*
+* FUNCTIONS: C/C++ Configuration file
+*
+* ORIGINS: 27
+*
+* IBM(R) VisualAge(R) C++ Version 6.0 for Linux(TM)
+* 5765-F56
+* Licensed Materials - Property of IBM
+* (C) Copyright IBM Corp. 1991, 2003. All Rights Reserved
+*
+* US Government Users Restricted Rights - Use, duplication or
+* disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+*
+* ANSI C compiler, UNIX headers
+xlc: use = DEFLT
+        options = -qansialias,-qtls
+
+* ANSI C compiler
+xlc_r: use = DEFLT
+        options = -qansialias,-qthreaded,-D_REENTRANT,-D__VACPP_MULTI__,-qtls
+        gcc_static_libs = -lgcc,-lpthread,-lm,-lc,-lgcc
+        gcc_static_libs_64 = -lgcc,-lpthread,-lm,-lc,-lgcc
+        gcc_shared_libs = -lgcc_s,-lpthread,-lgcc,-lm,-lc,-lgcc_s,-lgcc
+        gcc_shared_libs_64 = -lgcc_s_64,-lpthread,-lgcc,-lm,-lc,-lgcc_s_64,-lgcc
+
+* C compiler, extended mode
+cc: use = DEFLT
+        options = -qlanglvl=extended,-qnoro,-qnoroconst,-qtls
+
+* C compiler, extended mode - thread safe
+cc_r: use = DEFLT
+        options = -qlanglvl=extended,-qnoro,-qnoroconst,-qthreaded,-D_REENTRANT,-D__VACPP_MULTI__,-qtls
+        gcc_static_libs = -lgcc,-lpthread,-lm,-lc,-lgcc
+        gcc_static_libs_64 = -lgcc,-lpthread,-lm,-lc,-lgcc
+        gcc_shared_libs = -lgcc_s,-lpthread,-lgcc,-lm,-lc,-lgcc_s,-lgcc
+        gcc_shared_libs_64 = -lgcc_s_64,-lpthread,-lgcc,-lm,-lc,-lgcc_s_64,-lgcc
+
+* Strict ISO/C89 compiler, ISO/C89 headers
+c89: use = DEFLT
+        options = -D_ANSI_C_SOURCE,-D__STRICT_ANSI__,-qansialias,-qnolonglong,-qstrict_induction,-qtls
+
+* Strict ISO/C89 compiler, ISO/C89 headers
+c89_r: use = DEFLT
+        options = -D_ANSI_C_SOURCE,-D__STRICT_ANSI__,-qansialias,-qnolonglong,-qstrict_induction,-qthreaded,-D_REENTRANT,-D__VACPP_MULTI__,-qtls
+        gcc_static_libs = -lgcc,-lpthread,-lm,-lc,-lgcc
+        gcc_static_libs_64 = -lgcc,-lpthread,-lm,-lc,-lgcc
+        gcc_shared_libs = -lgcc_s,-lpthread,-lgcc,-lm,-lc,-lgcc_s,-lgcc
+        gcc_shared_libs_64 = -lgcc_s_64,-lpthread,-lgcc,-lm,-lc,-lgcc_s_64,-lgcc
+
+* Strict ISO C99 compiler, ISO C99 headers
+c99: use = DEFLT
+        options = -D_ANSI_C_SOURCE,-D_ISOC99_SOURCE,-D__STRICT_ANSI__,-qlanglvl=stdc99,-qansialias,-qstrict_induction,-qtls
+
+* Strict ISO C99 compiler, ISO C99 headers
+c99_r: use = DEFLT
+        options = -D_ANSI_C_SOURCE,-D_ISOC99_SOURCE,-D__STRICT_ANSI__,-qlanglvl=stdc99,-qansialias,-qstrict_induction,-qthreaded,-D_REENTRANT,-D__VACPP_MULTI__,-qtls
+        gcc_static_libs = -lgcc,-lpthread,-lm,-lc,-lgcc
+        gcc_static_libs_64 = -lgcc,-lpthread,-lm,-lc,-lgcc
+        gcc_shared_libs = -lgcc_s,-lpthread,-lgcc,-lm,-lc,-lgcc_s,-lgcc
+        gcc_shared_libs_64 = -lgcc_s_64,-lpthread,-lgcc,-lm,-lc,-lgcc_s_64,-lgcc
+
+* C++ compiler
+xlC: use = DEFLT
+        options = -qansialias,-qtls
+        libraries = -lxlopt,-lxl,-libmc++
+        libraries_64 = -lxlopt,-lxl,-libmc++
+        gcc_libdirs= -L$gcc_path/lib,-L$gcc_path/lib/gcc-lib/powerpc-unknown-linux-gnu/3.2,-L$gcc_path/lib/gcc-lib
+        gcc_libdirs_64= -L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/64,-L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3,-L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../../../lib64,-L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../..,-L/lib/../lib64,-L/usr/lib/../lib64
+        gcc_cpp_libs = -lstdc++,-lm
+        gcc_cpp_libs_64 = -lstdc++,-lm
+        gcc_static_libs = -lgcc,-lgcc_eh,-lm,-lc,-lgcc,-lgcc_eh
+        gcc_static_libs_64 = -lgcc,-lgcc_eh,-lm,-lc,-lgcc,-lgcc_eh
+        gcc_shared_libs = -lgcc_s,-lgcc,-lm,-lc,-lgcc_s,-lgcc
+        gcc_shared_libs_64 = -lgcc_s_64,-lgcc,-lm,-lc,-lgcc_s_64,-lgcc
+
+* xlC C++ compiler aliased as xlC_r
+xlC_r: use = DEFLT
+        options = -qansialias,-qthreaded,-D_REENTRANT,-D__VACPP_MULTI__,-qtls
+        libraries = -lxlopt,-lxl,-libmc++
+        libraries_64 = -lxlopt,-lxl,-libmc++
+        gcc_libdirs= -L$gcc_path/lib,-L$gcc_path/lib/gcc-lib/powerpc-unknown-linux-gnu/3.2,-L$gcc_path/lib/gcc-lib
+        gcc_libdirs_64= -L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/64,-L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3,-L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../../../lib64,-L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../..,-L/lib/../lib64,-L/usr/lib/../lib64
+        gcc_cpp_libs = -lstdc++,-lm
+        gcc_cpp_libs_64 = -lstdc++,-lm
+        gcc_static_libs = -lgcc,-lgcc_eh,-lpthread,-lm,-lc,-lgcc,-lgcc_eh
+        gcc_static_libs_64 = -lgcc,-lgcc_eh,-lpthread,-lm,-lc,-lgcc,-lgcc_eh
+        gcc_shared_libs = -lgcc_s,-lgcc,-lpthread,-lm,-lc,-lgcc_s,-lgcc
+        gcc_shared_libs_64 = -lgcc_s_64,-lgcc,-lpthread,-lm,-lc,-lgcc_s_64,-lgcc
+
+* common definitions
+DEFLT: cppcomp = /opt/ibmcmp/vacpp/6.0/exe/xlCentry
+        ccomp = /opt/ibmcmp/vac/6.0/exe/xlcentry
+        code = /opt/ibmcmp/vac/6.0/exe/xlCcode
+        xlC = /opt/ibmcmp/vacpp/6.0/bin/xlC
+        ipa = /opt/ibmcmp/vac/6.0/exe/ipa
+        dis = /opt/ibmcmp/vac/6.0/exe/dis
+        cppfilt = /usr/bin/c++filt
+        bolt = /opt/ibmcmp/vac/6.0/exe/bolt
+        as = /usr/bin/as
+        as_64 = /usr/bin/as
+        ld = /usr/bin/ld
+        ld_64 = /usr/bin/ld
+        options = -D_CALL_SYSV,-D__null=0,-D__NO_MATH_INLINES,-qtls
+        ldopt = "o:e:u:R:H:Y:Z:L:T:A:k:j:"
+        dynlib = -dynamic-linker,/lib/ld.so.1
+        dynlib_64 = -dynamic-linker,/lib64/ld64.so.1
+        crt = /usr/lib/crt1.o
+        gcrt = /usr/lib/gcrt1.o
+        mcrt = /usr/lib/gcrt1.o
+        crt_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../../../lib64/crt1.o
+        gcrt_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../../../lib64/gcrt1.o
+        mcrt_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../../../lib64/gcrt1.o
+        crtp = /usr/lib/crti.o
+        crte = /usr/lib/crtn.o
+        crtp_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../../../lib64/crti.o
+        crte_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../../../lib64/crtn.o
+        crtbegin = $gcc_path/lib/gcc-lib/powerpc-unknown-linux-gnu/3.2/crtbegin.o
+        crtbegin_s = $gcc_path/lib/gcc-lib/powerpc-unknown-linux-gnu/3.2/crtbeginS.o
+        crtbegin_t = $gcc_path/lib/gcc-lib/powerpc-unknown-linux-gnu/3.2/crtbeginT.o
+        crtend = $gcc_path/lib/gcc-lib/powerpc-unknown-linux-gnu/3.2/crtend.o
+        crtend_s = $gcc_path/lib/gcc-lib/powerpc-unknown-linux-gnu/3.2/crtendS.o
+        crtsavres = $gcc_path/lib/gcc-lib/powerpc-unknown-linux-gnu/3.2/crtsavres.o
+        crtbegin_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/64/crtbegin.o
+        crtbegin_s_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/64/crtbeginS.o
+        crtbegin_t_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/64/crtbeginT.o
+        crtend_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/64/crtend.o
+        crtend_s_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/64/crtendS.o
+        crtsavres_64 = /usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/64/crtsavres.o
+        libdirs = -L/opt/ibmcmp/vacpp/6.0/lib,-L/opt/ibmcmp/lib,-R/opt/ibmcmp/lib
+        libdirs_64= -L/opt/ibmcmp/xlsmp/1.3/lib64,-L/opt/ibmcmp/vac/6.0/lib64,-L/opt/ibmcmp/vacpp/6.0/lib64,-R/opt/ibmcmp/xlsmp/1.3/../../lib64,-R/opt/ibmcmp/vacpp/6.0/../../lib64
+        smplibraries = -lxlsmp
+        smplibraries_64 = -lxlsmp
+        libraries = -lxlopt,-lxl
+        libraries_64 = -lxlopt,-lxl
+        bigdata = -T/opt/ibmcmp/vac/6.0/exe/elf32ppclinux.x
+        bigdata_shr = -T/opt/ibmcmp/vac/6.0/exe/elf32ppclinux_shr.x
+        gcc_path = /usr/local/gcc-3.2.0
+        gcc_path_64 = /usr
+        gcc_libdirs = -L$gcc_path/lib,-L$gcc_path/gcc-lib
+        gcc_libdirs_64 = -L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/64,-L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3,-L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../../../lib64,-L/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/../../..,-L/lib/../lib64,-L/usr/lib/../lib64
+        gcc_static_libs = -lgcc,-lm,-lc,-lgcc
+        gcc_static_libs_64 = -lgcc,-lm,-lc,-lgcc
+        gcc_shared_libs = -lgcc_s,-lgcc,-lm,-lc,-lgcc_s,-lgcc
+        gcc_shared_libs_64 = -lgcc_s_64,-lgcc,-lm,-lc,-lgcc_s_64,-lgcc
+        modes_configure = 64
+*        xlc_cpp_stdinc = /opt/ibmcmp/xlsmp/1.3/include:/opt/ibmcmp/vacpp/6.0/include
+        xlc_cpp_stdinc = /qcdoc/local/gcc-3.2.2/lib/gcc-lib/powerpc-gnu-elf/3.2.2/include:/qcdoc/local/gcc-3.2.2/powerpc-gnu-elf/sys-include:@QOS@/quser/include:@QOS@/quser_qker/include:@QOS@/qhost_qker_quser/include:@QOS@/qhost_qker/:@abs_builddir@:@abs_top_srcdir@/include
+        defaultmsg = /opt/ibmcmp/vacpp/6.0/msg/en_US
+        vacpp_path = /opt/ibmcmp/vacpp/6.0
+        gcc_cpp_stdinc_64 = /usr/include/c++/3.2.3:/usr/include/c++/3.2.3/ppc64-redhat-linux:/usr/include/c++/3.2.3/backward:/usr/local/include:/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/include:/usr/include
+        crt2_64 = NULL
+        vac_path = /opt/ibmcmp/vac/6.0
+        xlc_cpp_complexgccinc_64 = /opt/ibmcmp/xlsmp/1.3/include:/opt/ibmcmp/vacpp/6.0/include:/usr/include/c++/3.2.3:/usr/include/c++/3.2.3/ppc64-redhat-linux:/usr/include/c++/3.2.3/backward:/usr/local/include:/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/include:/usr/include
+        xlc_c_complexgccinc_64 = /opt/ibmcmp/xlsmp/1.3/include:/opt/ibmcmp/vac/6.0/include:/usr/local/include:/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/include:/usr/include
+*        xlc_c_stdinc = /opt/ibmcmp/xlsmp/1.3/include:/opt/ibmcmp/vac/6.0/include
+        xlc_c_stdinc = /qcdoc/local/gcc-3.2.2/lib/gcc-lib/powerpc-gnu-elf/3.2.2/include:/qcdoc/local/gcc-3.2.2/powerpc-gnu-elf/sys-include:@QOS@/quser/include:@QOS@/quser_qker/include:@QOS@/qhost_qker_quser/include:@QOS@/qhost_qker/:@abs_builddir@:@abs_top_srcdir@/include
+        gcc_c_stdinc_64 = /usr/local/include:/usr/lib/gcc-lib/ppc64-redhat-linux/3.2.3/include:/usr/include

@@ -4195,7 +4195,7 @@ fi
 
 
 
-                                                                      ac_config_files="$ac_config_files config.h Makefile Makefile.rules Makefile.users tests/Makefile_common hdw_tests/Makefile_common tests/regression.pl"
+                                                                                ac_config_files="$ac_config_files config.h XLC.cfg Makefile Makefile.rules Makefile.users tests/Makefile_common hdw_tests/Makefile_common tests/regression.pl"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -4721,6 +4721,7 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "config.h" ) CONFIG_FILES="$CONFIG_FILES config.h" ;;
+  "XLC.cfg" ) CONFIG_FILES="$CONFIG_FILES XLC.cfg" ;;
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "Makefile.rules" ) CONFIG_FILES="$CONFIG_FILES Makefile.rules" ;;
   "Makefile.users" ) CONFIG_FILES="$CONFIG_FILES Makefile.users" ;;
