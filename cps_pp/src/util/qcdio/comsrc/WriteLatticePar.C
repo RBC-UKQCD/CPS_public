@@ -17,8 +17,7 @@ using namespace std;
 
 // code from cdawson/kostas
 
-void WriteLatticeParallel::writeHeader(ostream & fout, Float link_trace, Float plaq, const QioArg & wt_arg)
-{
+void WriteLatticeParallel::defaultHeader() {
     // default archive time is current time
     time_t ptm;
     time(&ptm);
@@ -31,12 +30,30 @@ void WriteLatticeParallel::writeHeader(ostream & fout, Float link_trace, Float p
     hd_ensemble_label = "unspecified";
     hd_sequence_number = 0;
     hd_creator = "unspecified";
-    hd_creator_hardware = "unspecified";
-    hd_creation_date = "unspecified";
 
-    cout << "header init'd" << endl;
+#if TARGET == QCDOC
+    hd_creator_hardware = "QCDOC";
+#else
+#if TARGET == QCDSP
+    hd_creator_hardware = "QCDSP";
+#else
+    hd_creator_hardware = "NOARCH";
+#endif
+#endif
+
+    hd_creation_date = hd_archive_date;
+}
+
+void WriteLatticeParallel::setHeader(const char * EnsembleId, const char * EnsembleLabel, const int SequenceNumber, const char * Creator) {
+  hd_ensemble_id = EnsembleId;
+  hd_ensemble_label= EnsembleLabel;
+  hd_sequence_number = SequenceNumber;
+  hd_creator = Creator;
+}
 
 
+void WriteLatticeParallel::writeHeader(ostream & fout, Float link_trace, Float plaq, const QioArg & wt_arg)
+{
   if(isRoot()) {
     fout.seekp(0,ios::beg);
     fout << "BEGIN_HEADER\n";
@@ -92,6 +109,7 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 
   // init
   int error = 0;
+  unload_good = false;
 
   const char * filename = wt_arg.FileName;
   recon_row_3 = wt_arg.ReconRow3;
