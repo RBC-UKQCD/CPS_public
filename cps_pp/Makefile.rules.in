@@ -104,7 +104,7 @@ OBJS := $(notdir $(OBJS_SRC))
 	${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.S
-	$(CC) -E $(libcps_CXXFLAGS) $< > $*.i
+	$(CC) -E $(libcps_CXXFLAGS) $< > $$*.i
 	$(AS) $(ASFLAGS) -o $@ $$*.i
 	${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
