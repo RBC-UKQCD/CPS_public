@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.7 2004-07-09 04:15:19 chulwoo Exp $
+  $Id: random.C,v 1.8 2004-07-15 22:42:58 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 04:15:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.7 2004-07-09 04:15:19 chulwoo Exp $
-//  $Id: random.C,v 1.7 2004-07-09 04:15:19 chulwoo Exp $
+//  $Date: 2004-07-15 22:42:58 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.8 2004-07-15 22:42:58 chulwoo Exp $
+//  $Id: random.C,v 1.8 2004-07-15 22:42:58 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -146,6 +146,7 @@ LatRanGen::LatRanGen()
 
 LatRanGen::~LatRanGen() {
 	delete[] ugran;
+	delete[] ugran_4d;
 }
 
 /*! Seeds the RNGs according to the method defined in GJP */  
@@ -161,9 +162,9 @@ void LatRanGen::Initialize()
       ERR.General(cname, fname,
 		  "Must have a multiple of 2^4 lattice sites per node.");
   
-  if (GJP.SnodeSites()<2)
-  n_rgen = GJP.VolNodeSites()/16;
-  else
+  n_rgen = n_rgen_4d = GJP.VolNodeSites()/16;
+
+  if (GJP.SnodeSites()>=2)
   n_rgen = GJP.VolNodeSites()*GJP.SnodeSites() / 32;
 //  VRB.Flow(cname,fname,"n_rgen=%d\n",n_rgen);
 
@@ -173,6 +174,8 @@ void LatRanGen::Initialize()
 
   ugran = new UGrandomGenerator[n_rgen];
   if(!ugran) ERR.Pointer(cname, fname, "ugran"); 
+  ugran_4d = new UGrandomGenerator[n_rgen_4d];
+  if(!ugran) ERR.Pointer(cname, fname, "ugran_4d"); 
 
   // Lower bounds of global lattice coordinates on this node
   int x_o[5];
@@ -214,6 +217,7 @@ void LatRanGen::Initialize()
   // Sort out what the seed should be depending on the GJP.StartSeedKind()
 
   int start_seed, base_seed;
+  int start_seed_4d, base_seed_4d;
 
   if(GJP.StartSeedKind()==START_SEED_INPUT_UNIFORM||
      GJP.StartSeedKind()==START_SEED_INPUT_NODE||
@@ -250,7 +254,8 @@ void LatRanGen::Initialize()
   // Seed the hypercube RNGs
 
   int x[5];
-  int index = 0;
+  int index, index_4d;
+  index = index_4d = 0;
   
 for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
   for(x[3] = x_o[3]; x[3] <= x_f[3]; x[3]+=2) {
@@ -262,16 +267,21 @@ for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
 		  
 		  if(GJP.StartSeedKind()==START_SEED||
 		     GJP.StartSeedKind()==START_SEED_INPUT||
-		     GJP.StartSeedKind()==START_SEED_FIXED)
+		     GJP.StartSeedKind()==START_SEED_FIXED){
 		      start_seed = base_seed
 			  + 23 * (x[0]/2 + vx[0]*
 				 (x[1]/2 + vx[1]*
 				 (x[2]/2 + vx[2]*
 				 (x[3]/2 + vx[3]*(x[4]/2) ))));
+		      start_seed_4d = base_seed
+			  + 23 * (x[0]/2 + vx[0]*
+				 (x[1]/2 + vx[1]*
+				 (x[2]/2 + vx[2]*(x[3]/2) )));
+		  }
 //		  fprintf(stderr,"%d %d %d %d %d",x[0],x[1],x[2],x[3],x[4]);
 //		  fprintf(stderr,"index=%d start_seed= %d\n",index,start_seed);
 		  ugran[index++].Reset(start_seed);
-		  
+		  if(x[4]==x_o[4]) ugran_4d[index_4d++].Reset(start_seed_4d);
 	      }
 	  }
       }
@@ -285,9 +295,17 @@ for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
   \return A uniform random number for this  hypercube.
 */
 //----------------------------------------------------------------------
-IFloat LatRanGen::Urand()
+IFloat LatRanGen::Urand(FermionFieldDimension frm_dim)
 {
+  char *fname = "Urand(FermionFieldDimension)";
+  if (frm_dim == FIVE_D)
   return ugran[rgen_pos].Urand();
+  else{
+    if(rgen_pos >GJP.VolNodeSites()/16)
+      ERR.General(cname,fname,"rgen_pos(%d)>GJP.VolNodeSites()/16",rgen_pos);
+    return ugran_4d[rgen_pos].Urand();
+  }
+//  return ugran[rgen_pos].Urand();
 }
 
 //---------------------------------------------------------
@@ -296,10 +314,17 @@ IFloat LatRanGen::Urand()
   \return A gaussian random number for this hypercube.
 */
 //----------------------------------------------------------------------
-IFloat LatRanGen::Grand()
+IFloat LatRanGen::Grand(FermionFieldDimension frm_dim)
 {
+  char *fname = "Grand(FermionFieldDimension)";
 //  printf("LatRanGen::Grand():%d\n",rgen_pos);
+  if (frm_dim == FIVE_D)
   return ugran[rgen_pos].Grand();
+  else{
+    if(rgen_pos >GJP.VolNodeSites()/16)
+      ERR.General(cname,fname,"rgen_pos(%d)>GJP.VolNodeSites()/16",rgen_pos);
+    return ugran_4d[rgen_pos].Grand();
+  }
 }
 
 
@@ -313,6 +338,7 @@ IFloat LatRanGen::Grand()
 void LatRanGen::SetInterval(IFloat high, IFloat low)
 {
   for(int i=0; i<n_rgen; i++) ugran[i].SetInterval(high, low);
+  for(int i=0; i<n_rgen_4d; i++) ugran_4d[i].SetInterval(high, low);
   
 }
 
@@ -325,6 +351,7 @@ void LatRanGen::SetInterval(IFloat high, IFloat low)
 void LatRanGen::SetSigma(IFloat sigma)
 {
   for(int i=0; i<n_rgen; i++) ugran[i].SetSigma(sigma);
+  for(int i=0; i<n_rgen_4d; i++) ugran_4d[i].SetSigma(sigma);
 }
 
 //---------------------------------------------------------
@@ -390,8 +417,8 @@ void LatRanGen ::AssignGenerator(int i)
   int s;
   if (GJP.SnodeSites()<2) s = 0;
   else  s = (i/can[4]) % hx[4];
-
   rgen_pos = x + hx[0] * (y + hx[1] * (z + hx[2] * (t + hx[3] * s)));
+//  fprintf(stders,"i=%d x = %d %d %d %d %d rgen_pos=%d ",i,x,y,z,t,s,rgen_pos);
 }
 
 
