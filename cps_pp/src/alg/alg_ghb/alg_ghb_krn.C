@@ -4,61 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Routines used by the AlgGheatBath class methods:
 
-  $Id: alg_ghb_krn.C,v 1.3 2004-01-13 20:38:58 chulwoo Exp $
+  $Id: alg_ghb_krn.C,v 1.1 2004-02-09 14:14:22 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:38:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb_krn.C,v 1.3 2004-01-13 20:38:58 chulwoo Exp $
-//  $Id: alg_ghb_krn.C,v 1.3 2004-01-13 20:38:58 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-02-09 14:14:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/alg_ghb_krn.C,v 1.1 2004-02-09 14:14:22 zs Exp $
+//  $Id: alg_ghb_krn.C,v 1.1 2004-02-09 14:14:22 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.2.10.1  2003/11/06 00:10:38  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.1.1  2003/11/04 05:04:56  chulwoo
-//
-//  starting again
-//
-//
-//  Revision 1.2  2003/07/24 16:53:53  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.1.1.1  2003/06/22 13:34:45  mcneile
-//  This is the cleaned up version of the Columbia Physics System.
-//  The directory structure has been changed.
-//  The include paths have been updated.
-//
-//
-//  Revision 1.1  2002/12/10 17:51:41  zs
-//  These two files are altered because of the new hypercubic RNG and moved
-//  because the assembler versions do not support the new hypercubic RNG and
-//  have therefore been removed.
-//
-//  Revision 1.2  2001/06/19 18:11:26  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:15:59  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: alg_ghb_krn.C,v $
-//  $Revision: 1.3 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb_krn.C,v $
+//  $Revision: 1.1 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/alg_ghb_krn.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -73,17 +32,9 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdlib.h>	// exit()
-#include <stdio.h>
 #include <math.h>
-#include<alg/alg_ghb.h>
-#include<alg/common_arg.h>
-#include<alg/ghb_arg.h>
-#include<util/lattice.h>
 #include<util/gjp.h>
 #include<util/random.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
 #include<util/verbose.h>
 #include<util/error.h>
 CPS_START_NAMESPACE
