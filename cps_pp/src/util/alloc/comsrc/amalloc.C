@@ -3,7 +3,7 @@
   \file
   \brief Functions for dynamical array allocation.
 
-  $Id: amalloc.C,v 1.5 2004-09-17 18:10:53 chulwoo Exp $
+  $Id: amalloc.C,v 1.6 2004-09-23 18:19:58 zs Exp $
 */
 #include <util/smalloc.h>
 #include <stdarg.h>
@@ -25,7 +25,7 @@ CPS_START_NAMESPACE
 */
 //  ------------------------------------------------------------
 
-void subarray(size_t size, int n_dim, int n_ptr,
+static void subarray(size_t size, int n_dim, int n_ptr,
 	      void ***prev, void **start, int *dimension, int index){
 
     int i, dim = dimension[index];
@@ -41,8 +41,17 @@ void subarray(size_t size, int n_dim, int n_ptr,
 
     }else{		// Last recursion; set up pointers to data   
 
-//	for(i=0; i<n_ptr; i++) (char*)prev[i] = (char*)start+i*dim*size;
-	for(i=0; i<n_ptr; i++) prev[i] = start+i*dim*size;
+	// The data should lie on a 'size'-byte boundary, so, if necessary,
+	// we move 'start' to the next 'size'-byte boundary.
+	// We allocated additional space for this using 'align_pad' in amalloc.
+
+	if(0!=(long)start%(long)size)
+	    start = (void**)(((long)start/(long)size+1)*(long)size);
+
+  	for(i=0; i<n_ptr; i++){ 
+  	    char **previ = (char**)&prev[i]; 
+  	    *previ = (char*)start+i*dim*size; 
+  	} 
 	
     }
 
@@ -93,7 +102,12 @@ void *amalloc(size_t size, int n_dim, ...){
 
     // Allocate the memory for the data and the pointers. 
 
-    void **start = (void**)smalloc((size_t)(n_data*size)+n_ptr*sizeof(void*));
+    // smalloc will align the pointers correctly. We should
+    // align the data on a boundary which is a multiple of 'size' so let's
+    // pad the array so there is space to realign the data if necessary.
+    const int align_pad = 1;
+    
+    void **start = (void**)smalloc((size_t)((n_data+align_pad)*size)+n_ptr*sizeof(void*));
     if(!start) return 0;//ERR.Pointer("", "amalloc", "start");
 
     // Set up the pointers.
