@@ -5,18 +5,18 @@ CPS_START_NAMESPACE
 
   Used by derivatives of the FwilsonTypes class.
   
-  $Id: sproj_tr.C,v 1.1 2004-11-09 03:38:43 chulwoo Exp $
+  $Id: sproj_tr.C,v 1.2 2004-11-17 23:23:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-11-09 03:38:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/qcdoc/sproj_tr.C,v 1.1 2004-11-09 03:38:43 chulwoo Exp $
-//  $Id: sproj_tr.C,v 1.1 2004-11-09 03:38:43 chulwoo Exp $
+//  $Date: 2004-11-17 23:23:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/qcdoc/sproj_tr.C,v 1.2 2004-11-17 23:23:09 chulwoo Exp $
+//  $Id: sproj_tr.C,v 1.2 2004-11-17 23:23:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/qcdoc/sproj_tr.C,v $
 //  $State: Exp $
 //
@@ -42,13 +42,19 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 #ifndef _GCC_
-#define   __builtin_prefetch(A)
+#ifdef _XLC_
+#include <builtins.h>
+#define	  __builtin_prefetch(A) __dcbt(A)
+#else
+#define	  __builtin_prefetch(A)
+#endif
 #endif
  
 
 enum{MATRIX_SIZE = 18};
 
 
+extern "C" {
 //------------------------------------------------------------------
 // sproj with (1 + gamma_0)
 //------------------------------------------------------------------
@@ -546,6 +552,7 @@ void sprojTrTm(IFloat *f, IFloat *v, IFloat *w, int num_blk,
     w += 24 + w_stride ;
   }
   return ;
+}
 }
 
 CPS_END_NAMESPACE
