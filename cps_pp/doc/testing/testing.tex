@@ -1,7 +1,7 @@
 
 
 %------------------------------------------------------------------
-% $Id: testing.tex,v 1.5 2003-08-14 13:54:39 mcneile Exp $
+% $Id: testing.tex,v 1.6 2004-02-01 16:39:49 mcneile Exp $
 %------------------------------------------------------------------
 %Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
 %
@@ -27,7 +27,7 @@
 \ifthenelse{\pdfoutput = 0}{
 % Not PDF:
 \usepackage{html}
-\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+\newcommand{\hreff}[2]{\htmladdnormallink{#2}{#1}}
 }{
 % PDF: hyperref for pdf with full linkages:
 \usepackage[
@@ -43,7 +43,7 @@ urlcolor=blue,
 pdfpagemode=None,
 %=UseOutlines,
 pdfhighlight={/I},
-pdftitle={Frameworks For Testing. $Revision: 1.5 $ - $Date: 2003-08-14 13:54:39 $.},
+pdftitle={Frameworks For Testing. $Revision: 1.6 $ - $Date: 2004-02-01 16:39:49 $.},
 pdfauthor={A.N. Jackson, C. McNeile \& S. Booth},
 plainpages=false
 ]{hyperref}
@@ -69,7 +69,7 @@ plainpages=false
 % title information:
 \title{Testing the Columbia code.}
 \author{A.N. Jackson, C. McNeile,  \& S. Booth}
-\date{\mbox{\small $$Revision: 1.5 $$  $$Date: 2003-08-14 13:54:39 $$}}
+\date{\mbox{\small $$Revision: 1.6 $$  $$Date: 2004-02-01 16:39:49 $$}}
 
 %------------------------------------------------------------------
 \begin{document}
