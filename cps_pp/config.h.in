@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.7 2004-01-13 20:38:56 chulwoo Exp $
+  $Id: config.h.in,v 1.8 2004-02-06 12:16:21 zs Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -13,14 +13,14 @@
  *--------------------------------------------------------------------
  *  CVS keywords
  *
- *  $Author: chulwoo $
- *  $Date: 2004-01-13 20:38:56 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.7 2004-01-13 20:38:56 chulwoo Exp $
- *  $Id: config.h.in,v 1.7 2004-01-13 20:38:56 chulwoo Exp $
+ *  $Author: zs $
+ *  $Date: 2004-02-06 12:16:21 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.8 2004-02-06 12:16:21 zs Exp $
+ *  $Id: config.h.in,v 1.8 2004-02-06 12:16:21 zs Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.7 $
+ *  $Revision: 1.8 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -32,7 +32,7 @@
 #define NOARCH 0
 #define QCDOC  1
 #define QCDSP  2
-#define MPI    3
+#define cpsMPI    3
 
 #define TARGET @ARCH@
 #@ENABLE_PARALLEL@
@@ -78,10 +78,6 @@
 /*! Data size for the MPI comms layer: */
 #define COMMS_DATASIZE (sizeof(@LOCALPRECISION@))
 
-/*! Debugging flag: */
-#ifndef VERBOSE
-#define VERBOSE 1
-#endif
 
 #if (TARGET == QCDOC) || (TARGET == QCDSP)
 #define CPS_END_NAMESPACE
@@ -95,7 +91,7 @@
 
 /* Override printf to only print on one proc (Not nec. on QCDSP, only
  *    expected to work via the MPI layer. */
-#if TARGET == MPI
+#if TARGET == cpsMPI
 #include<util/qcdio_qprintf.h>
 #endif
 

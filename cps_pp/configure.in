@@ -1,14 +1,14 @@
 dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
-dnl  $Author: mcneile $
-dnl  $Date: 2004-02-01 14:45:38 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.6 2004-02-01 14:45:38 mcneile Exp $
-dnl  $Id: configure.in,v 1.6 2004-02-01 14:45:38 mcneile Exp $
+dnl  $Author: zs $
+dnl  $Date: 2004-02-06 12:16:21 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.7 2004-02-06 12:16:21 zs Exp $
+dnl  $Id: configure.in,v 1.7 2004-02-06 12:16:21 zs Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.6 $
+dnl  $Revision: 1.7 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -85,15 +85,17 @@ if test "$enable_target" = "qcdoc"; then
    TESTING_PARALLEL="yes";
 
 elif test "$enable_target" = "mpi"; then
+   CXX=""
    AC_CHECK_PROGS(CXX, mpic++ mpiCC mpCC, g++)
    if test "$CXX" = "g++"; then
+     AC_MSG_NOTICE([Path is $PATH])
      AC_MSG_WARN([Using g++])
      AC_SEARCH_LIBS(MPI_Init, mpi mpich, ,echo "CPS needs the MPI library for a parallel build - bailing out."; exit 1)
+     LDFLAGS="-lmpi"
    fi
    DFLAGS=""
-   LDFLAGS="-lmpi"
    TESTING_PARALLEL="yes";
-   ARCH=MPI
+   ARCH=cpsMPI
    ARCHDIR="MPI_DIR"
 
 else

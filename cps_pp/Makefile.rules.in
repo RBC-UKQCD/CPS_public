@@ -47,11 +47,19 @@ DIRLIST := $(shell ls -p $(SRCDIR)/$(DIR) )
 DIRLIST := $(filter %/ ,$(DIRLIST))
 DIRLIST := $(DIRLIST:/=)
 
+ARCH = @ARCH@
 ARCHDIR := $(@ARCHDIR@)
 
 FILTERDIR := $(filter-out $(ARCHDIR) , $(NORECURSE_DIR))
 RECURSEDIRS := $(filter-out $(FILTERDIR) , $(DIRLIST))
 
+ifeq "$(ARCH)" "cpsMPI"
+  ifeq "$(findstring $(NOARCH_DIR), $(DIRLIST))" "$(NOARCH_DIR)"
+    ifneq "$(findstring $(MPI_DIR), $(DIRLIST))" "$(MPI_DIR)"
+      RECURSEDIRS += $(NOARCH_DIR)
+    endif
+  endif
+endif 
 
 libcps_CXXFLAGS = $(INCLUDE_FLAGS) $(CXXFLAGS) $(DFLAGS)
 .PHONY: $(RECURSEDIRS) cps all recurse
@@ -108,10 +116,21 @@ OBJS := $(notdir $(OBJS_SRC))
 	$(AS) $(ASFLAGS) -o $(BUILDDIR)/$(DIRB)/$@ $(BUILDDIR)/$(DIRB)/$*.i
 	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
+ifeq "${ARCH}" "cpsMPI"
+
+depend: recurse
+	cd $(SRCDIR)/$(DIR) ; \
+	$(CXX) -M $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
+	| sed -e 's/:.*\.[cC]/\:/g' > $(BUILDDIR)/$(DIRB)/Makefile_depend
+
+else
+
 
 depend: recurse
 	echo > $(BUILDDIR)/$(DIRB)/Makefile_depend
 	cd $(SRCDIR)/$(DIR) ;makedepend -f$(BUILDDIR)/$(DIRB)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
+
+endif
 
 clean: recurse
 	cd $(BUILDDIR)/$(DIRB) ; rm -f *.o *.i *.bak
