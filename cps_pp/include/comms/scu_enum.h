@@ -1,13 +1,11 @@
-#include <config.h>
+#include<config.h>
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 /*!\file
   \brief  The MPI communication direction and flag enumerations:
 
-  $Id: scu_enum.h,v 1.5 2003-08-28 15:08:07 zs Exp $
+  $Id: scu_enum.h,v 1.6 2003-10-21 15:34:42 zs Exp $
 */
-
-
 /*---------------------------------------------------------------
   This is very closely based on the original scu_enum.h from QCDSP.
   The only difference is the order of the direction enum `SCUDir'.
@@ -23,22 +21,26 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2003-08-28 15:08:07 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.5 2003-08-28 15:08:07 zs Exp $
-  $Id: scu_enum.h,v 1.5 2003-08-28 15:08:07 zs Exp $
+  $Date: 2003-10-21 15:34:42 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.6 2003-10-21 15:34:42 zs Exp $
+  $Id: scu_enum.h,v 1.6 2003-10-21 15:34:42 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_enum.h,v $
-  $Revision: 1.5 $
+  $Revision: 1.6 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
-#ifdef SCU_ENUM_H
+CPS_END_NAMESPACE
+CPS_START_NAMESPACE
 
 /* Allow the MPI stuff to be switched out, thus avoiding compiler
    errors (for the time being). */
 #ifdef INCLUDE_MPI_SCU
+
+#ifndef INCLUDED_SCU_ENUM_H
+#define INCLUDED_SCU_ENUM_H
 
 
 /*--------------------------------------------------------------------
@@ -51,8 +53,6 @@ CPS_START_NAMESPACE
 //  for efficiency.
 //--------------------------------------------------------------------
 */
-
-
 
 //--------------------------------------------------------------------
 //  Map physics directions to wires
@@ -71,8 +71,8 @@ enum SCUDir {
   SCU_YP,                      /*!< +y */  
   SCU_YM,                      /*!< -y */  
   SCU_ZP,                      /*!< +z */  
-  SCU_ZM,                      /*!< -z */ 
-  SCU_NoDir = -1              /*!< Null direction */
+  SCU_ZM,                      /*!< -z */
+  SCU_NoDir = -1             /*!< Null direction */
 };
 
 
@@ -97,6 +97,10 @@ enum SCUXR {
     SCU_NoXR = -1    /*!< Dummy flag for serial code */
 };
 
+#endif
+
 #endif /* INCLUDE_MPI_SCU */
 
-#endif
+
+
+CPS_END_NAMESPACE

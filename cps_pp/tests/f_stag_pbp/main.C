@@ -2,13 +2,24 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-08-14 13:17:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_stag_pbp/main.C,v 1.2 2003-08-14 13:17:22 mcneile Exp $
-//  $Id: main.C,v 1.2 2003-08-14 13:17:22 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-10-21 15:34:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_stag_pbp/main.C,v 1.3 2003-10-21 15:34:42 zs Exp $
+//  $Id: main.C,v 1.3 2003-10-21 15:34:42 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.4.2  2003/09/11 16:09:34  zs
+//  Slight changes to get things looking more like the root code.
+//  This compiles and runs with SCore/MPI on the Liverpool cluster.
+//
+//  Revision 1.2.4.1  2003/08/19 17:11:26  zs
+//  Alterations to the build structure to make it work with MPI (don't know how
+//  portably).
+//
+//  Revision 1.2  2003/08/14 13:17:22  mcneile
+//  I have added namespacesupport to the code.
+//
 //  Revision 1.1.1.1  2003/06/22 13:34:49  mcneile
 //  This is the cleaned up version of the Columbia Physics System.
 //  The directory structure has been changed.
@@ -70,14 +81,13 @@
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: main.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_stag_pbp/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 #include <stdio.h>
-#include <stdlib.h>	// exit()
 #include<config.h>
 #include<util/lattice.h>
 #include<util/gjp.h>
@@ -89,17 +99,15 @@
 #include<alg/pbp_arg.h>
 
 
-CPS_START_NAMESPACE
 
+CPS_START_NAMESPACE
 GlobalJobParameter GJP;
 LatRanGen LRG;
 Verbose VRB;
 Error ERR;
-
 CPS_END_NAMESPACE
 
-
-USING_NAMESPACE_CPS ;
+USING_CPS_NAMESPACE
 
 int main(int argc,char *argv[])
 {
@@ -118,8 +126,8 @@ int main(int argc,char *argv[])
 #ifdef PARALLEL
   do_arg.x_nodes = 2;
   do_arg.y_nodes = 2;
-  do_arg.z_nodes = 2;
-  do_arg.t_nodes = 2;
+  do_arg.z_nodes = 1;
+  do_arg.t_nodes = 1;
   do_arg.s_nodes = 1;
 #else
   do_arg.x_nodes = 1;

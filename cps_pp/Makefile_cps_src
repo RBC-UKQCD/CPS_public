@@ -151,7 +151,39 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
    ./src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.o\
    ./src/util/dirac_op/d_op_wilson_types/eigen_wilson.o
 
-                
+# default = QCDSP source
+
+cps_comms_obj =\
+   ./src/comms/qcdsp_comms/cbuf/cbuf.o \
+   ./src/comms/qcdsp_comms/scu/get_data.o \
+   ./src/comms/qcdsp_comms/glb_cpp/glb_min_max.o \
+   ./src/comms/qcdsp_comms/glb_cpp/glb_sum.o \
+   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_dir.o \
+   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_five.o \
+   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_matrix_dir.o\
+   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_multi_dir.o \
+   ./src/comms/qcdsp_comms/glb_cpp/slice_sum.o
+
+ifeq "$(TARGET_QCDSP)" "0"
+
+cps_comms_obj =\
+   ./src/comms/mpi_comms/mpi_scu/scu_dir_arg.o \
+   ./src/comms/mpi_comms/mpi_scu/sysfunc.o \
+   ./src/comms/qcdsp_comms/scu/get_data.o \
+   ./src/comms/qcdsp_comms/glb_cpp/glb_min_max.o \
+   ./src/comms/qcdsp_comms/glb_cpp/glb_sum.o \
+   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_dir.o \
+   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_five.o \
+   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_matrix_dir.o\
+   ./src/comms/qcdsp_comms/glb_cpp/glb_sum_multi_dir.o \
+   ./src/comms/qcdsp_comms/glb_cpp/slice_sum.o \
+    ./src/comms/vanilla_comms/cbuf_sim/cbuf.o \
+   ./src/comms/vanilla_comms/cbuf_sim/cram.o 
+
+endif
+
+ifeq "$(PARALLEL)" "0"
+
 cps_comms_obj =\
     ./src/comms/vanilla_comms/cbuf_sim/cbuf.o \
    ./src/comms/vanilla_comms/cbuf_sim/cram.o \
@@ -163,6 +195,8 @@ cps_comms_obj =\
    ./src/comms/vanilla_comms/glb_sim/glb_sum_matrix_dir.o\
    ./src/comms/vanilla_comms/glb_sim/glb_sum_multi_dir.o \
    ./src/comms/vanilla_comms/glb_sim/slice_sum.o
+
+endif
 
 cps_obj = $(cps_comsrc_obj)  $(cps_comms_obj)
 

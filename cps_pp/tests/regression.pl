@@ -11,16 +11,25 @@
 # Configurations: These are platform/config-dependant:
 #
 
+#
 # General defs of versions and trusted versions:
-$version = "4_1_0";
-$trusted_version = "4_0_0";
+#
+
+# directory with good test data in it
+$test_dir = "v5_0_0" ;
+@test_names = ( "f_hmd" , "f_hmd_dwfso", "g_hb" , "g_hmd" , "s_spect" ,  "w_spect" , "f_wilson_eig" ,  "xi_spect_gsum" , "f_stag_pbp" ) ; 
+
+##@test_names = ( "f_stag_pbp" , "f_wilson_pbp" , "f_clover_pbp" , "f_dwf_pbp" , "f_dwfso_pbp" ); 
+#------
+
+$error_tol = 0.001; 
 
 
 if( 'yes' eq 'yes' ) {
 # This makes it run autoconf version:
   $machine = 'i686-pc-linux-gnu';
-  $parallel = 'no';
-  $compiler = 'gcc';
+  $parallel = 'yes';
+  $compiler = '@CC@';
   $executable = "regression_cps.x";
 } else {
 # This is right for the parallel QCDSP version:
@@ -37,25 +46,8 @@ if( 'yes' eq 'yes' ) {
 
 #The name of the shell script this will create:
 $shellscript = "regression.sh";
-#$output_dir = "Qregressions";
 $output_dir = "regressions";
 
-# There are three sets of tests...
-#---------------------------------
-## $test_str[0] = "PsiBarPsi tests:";
-## $test_dirs[0] = "f_stag_pbp f_wilson_pbp f_clover_pbp f_dwf_pbp f_dwfso_pbp";
-
-#---------------------------------
-$test_str[1] = "General tests without stdio output:";
-##$test_dirs[1] = "f_hmd f_hmd_dwfso g_hb g_hmd s_spect w_spect f_wilson_eig xi_spect_gsum";
-#[DIES] threept
-
-$test_dirs[0] = "s_spect w_spect";
-
-#---------------------------------
-#$test_str[2] = "General tests with stdio output:";
-#$test_dirs[2] = "";
-#[DIES] fix_gauge
 
 # Variations:
 #---------------------------------
@@ -70,20 +62,17 @@ if( $machine eq "qcdsp" && $compiler eq "tcpp" ) {
 # Open the file which will contain the shell script which will run the tests:
 open SHOUT,">$shellscript" or die "Could not open $shellscript!\n";
 
-# Loop over all series of tests:
-for( $tsi = 0; $tsi < scalar(@test_dirs); $tsi++ ) {
-
-# Print out the title of this series of tests:
-    print "$test_str[$tsi]\n";
-
 # Loop over each test in the series:
-    @test_names = split " ", $test_dirs[$tsi];
-    for( $tni = 0; $tni < scalar(@test_names); $tni++ ) {
-	print SHOUT '#------------------------------------'."\n";
+
+# clean up any old output
+    print SHOUT 'rm '.$output_dir.'/*.dat '."\n";
+
+foreach $tni (@test_names){
+    print SHOUT '#------------------------------------'."\n";
 
 # Construct the names of the files to store the results:
-	$res_file = "../".$output_dir."/stdio.".$test_names[$tni].".dat";
-	$dat_file = "../".$output_dir."/data.".$test_names[$tni].".dat";
+	$res_file = "../".$output_dir."/stdio.".$tni.".dat";
+	$dat_file = "../".$output_dir."/data.".$tni.".dat";
 
 # Construct the name of the file which holds the original results:
 
@@ -94,34 +83,48 @@ for( $tsi = 0; $tsi < scalar(@test_dirs); $tsi++ ) {
 	}
 
 # State which test is about to run, run it, and store the results:
-	print SHOUT "echo In ".$test_names[$tni]."\n";
-	print SHOUT "cd ".$test_names[$tni]."\n";
+	print SHOUT "cd ".$tni."\n";
 # Remove any files associated with previous runs (i.e. *.dat)
-	print SHOUT 'rm *.dat'."\n";
-# Run the program:
-	$exec_cmd = $exec_prefix.$executable;
-	print SHOUT "echo Running $exec_cmd...\n";
-	print SHOUT "$exec_cmd > $res_file\n";
-# Grab all of the *.dat output files and sling them into a single file:
-	print SHOUT "more *.dat > $dat_file\n";
-
-# Inform the user about the directory being looked at:
-	print "[$tni]: '$exec_cmd'.\n";
-
-# Diff the output and report if the output differs from that expected:
-	print SHOUT "echo Checking the output...\n";
-
-# Drop back to the test directory:
+	print SHOUT 'rm -f '.$exec_cmd.' *.dat'."\n";
+#       compile the code (do not echo the commands)
+	print SHOUT 'make -s -f Makefile_regression'."\n";
+#       check that the executable has been created
+	print SHOUT 'if test ! -f '.$exec_cmd.' ; then'."\n";
+	print SHOUT 'echo '.$tni." COMPILATION FAILURE\n";
 	print SHOUT "cd ..\n";
 
-# Loop over to the next test:
-	}
+	print SHOUT "else\n";
 
-# Loop over to the next test series:
+
+# Run the program:
+	$exec_cmd = $exec_prefix.$executable;
+##	print SHOUT "echo Running $exec_cmd...\n";
+	print SHOUT "$exec_cmd > $res_file\n";
+# Grab all of the *.dat output files and sling them into a single file:
+	print SHOUT "perl ../combine_files.pl *.dat > $dat_file\n";
+
+# Inform the user about the directory being looked at:
+##	print "[$tni]: '$exec_cmd'.\n";
+
+# Diff the output and report if the output differs from that expected:
+# Drop back to the test directory:
+	print SHOUT "cd ..\n";
+	print SHOUT "cd regressions ; perl check_data.pl $tni  $error_tol  $test_dir\n" ;
+	print SHOUT "cd ..\n" ;
+
+	print SHOUT "fi\n";
+
+# Loop over to the next test:
 }
 
-# Tell the user how to use the script:
-print "To run the test programs, use 'source $shellscript'\n";
+print SHOUT "echo ------------------------------\n";
+print SHOUT "echo DISCLAIMER\n";
+print SHOUT "echo Please also test this code on \n";
+print SHOUT "echo a physical system before using in \n";
+print SHOUT "echo production runs \n";
+print SHOUT "echo ------------------------------\n";
+
+
 
 # close the script file
 close SHOUT;

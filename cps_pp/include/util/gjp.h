@@ -3,18 +3,27 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.3 2003-08-12 16:22:51 zs Exp $
+  $Id: gjp.h,v 1.4 2003-10-21 15:34:42 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-08-12 16:22:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.3 2003-08-12 16:22:51 zs Exp $
-//  $Id: gjp.h,v 1.3 2003-08-12 16:22:51 zs Exp $
+//  $Date: 2003-10-21 15:34:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.4 2003-10-21 15:34:42 zs Exp $
+//  $Id: gjp.h,v 1.4 2003-10-21 15:34:42 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3.4.2  2003/10/21 15:26:55  zs
+//  Need <sysfunc.h> not <comms/sysfunc.h> for the QCD{SP,OC} build.
+//
+//  Revision 1.3.4.1  2003/09/24 12:49:57  mcneile
+//  I have updated the include path.
+//
+//  Revision 1.3  2003/08/12 16:22:51  zs
+//  Added Asqtad action parameters.
+//
 //  Revision 1.3  2001/07/03 17:01:02  anj
 //
 //  Multiple minor alterations to change some #include's from referring to
@@ -39,7 +48,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //

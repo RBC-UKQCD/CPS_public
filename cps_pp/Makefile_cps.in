@@ -1,24 +1,29 @@
-# $Id: Makefile_cps.in,v 1.9 2003-08-08 10:10:46 mcneile Exp $
+# $Id: Makefile_cps.in,v 1.10 2003-10-21 15:34:42 zs Exp $
 #
 #  Template makefile for the Columbia Physics System
-#  Need to add autoconf stuff
 #
 #  Create the library for CPS using: make cps
 #
 MAKEFILE = Makefile_cps
 
+# TARGET_QCDSP = 1 for QCDSP build, 0 otherwise
+TARGET_QCDSP = @TARGET_QCDSP@
 
-CC = @CC@
-CXX = @CC@
+# PARALLEL = 1 for parallel compilation, 0 for serial compilation 
+PARALLEL = @PARALLEL@
 
 top_srcdir = @topwd_srcdir@
-INCLUDE_FLAGS = -I$(top_srcdir)  -I$(top_srcdir)/include
 
+INCLUDE_FLAGS := -I$(top_srcdir)  -I$(top_srcdir)/include
+ifeq "$(PARALLEL)" "1" 
+ifeq "$(TARGET_QCDSP)" "0"
+INCLUDE_FLAGS := $(INCLUDE_FLAGS) -I$(top_srcdir)/include/comms
+endif
+endif
 
-
-
-libcps_CXXFLAGS = -DPARALLEL=0 -DTARGET_QCDSP=0  $(INCLUDE_FLAGS) 
-
+CXX = @CXX@
+CXXFLAGS = @CXXFLAGS@ -DTARGET_QCDSP=@TARGET_QCDSP@  $(INCLUDE_FLAGS) 
+LIBS = @LIBS@
 
 #
 #   source from specific build options
@@ -26,23 +31,26 @@ libcps_CXXFLAGS = -DPARALLEL=0 -DTARGET_QCDSP=0  $(INCLUDE_FLAGS)
 include Makefile_cps_src
 
 .SUFFIXES:
-
 .SUFFIXES:      .o .C
 
 #  go into the subdirectory and compile
 %.o:%.C
-	cd ${<D} ; g++ -c  ${<F} $(libcps_CXXFLAGS)
-
-
+	cd ${<D} ; $(CXX) $(CXXFLAGS) -c  ${<F} 
 
 
 #
 # make the library for the CPS code
 #
 cps: $(cps_obj)
-	ar rcs cps.a ${cps_obj}
+	ar rcs cps.a $^ 
 
-.PHONY : cps clean docs depend
+
+f_stag_pbp: cps
+	$(CXX) $(CXXFLAGS) -c $(top_srcdir)/tests/$@/main.C -o $(top_srcdir)/tests/$@/main.o 
+	$(CXX) $(top_srcdir)/tests/$@/main.o cps.a $(LIBS) -o $(top_srcdir)/tests/$@/a.out
+
+
+.PHONY : cps clean docs webdocs depend
 
 # change the makefile ==> recompile
 $(cps_obj): $(MAKEFILE) 
@@ -50,9 +58,7 @@ $(cps_obj): $(MAKEFILE)
 cps_SOURCES=  $(cps_obj:.o=.C)
 
 
-have_doxygen = @have_doxygen@
-
-ifneq "$(have_doxygen)" "yes"
+ifneq "@have_doxygen@" "yes"
 
 docs webdocs:
 	@echo doxygen must be installed to make the documentation.
@@ -93,12 +99,15 @@ test:
 	cd $(TEST_DIR) ; sh regression.sh
 
 
-
 ##
 ## create dependencies
-##
-depend:	
-	makedepend -f Makefile_depend  $(libcps_CXXFLAGS)  $(cps_SOURCES)
+## 
+# depend:	
+# 	makedepend -f Makefile_depend  $(CXXFLAGS)  $(cps_SOURCES)
+
+depend: 
+	$(CXX) -M $(CXXFLAGS) $(cps_SOURCES) |\
+	sed -e 's/^.*\.o://g' -e 's/\.C/\.o:/g'  > Makefile_depend
 
 include Makefile_depend
 

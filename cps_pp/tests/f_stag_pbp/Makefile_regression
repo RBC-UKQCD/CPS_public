@@ -20,7 +20,8 @@ include ../Makefile_common
 all:regression
 
 regression:
-	$(COMPILER) -o regression_cps.x $(CFLAGS) $(INCLIST) main.C  $(LIBLIST) $(LDFLAGS)  
+	$(COMPILER) -c $(CFLAGS) $(INCLIST) -o main.o main.C
+	$(COMPILER) -o regression_cps.x main.o $(LIBLIST) $(LDFLAGS)  
 
 
 

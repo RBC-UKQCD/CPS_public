@@ -1,9 +1,9 @@
 /*!\file
   \brief   Global options for compiling the Colombia code:
 
-  Generated automatically from config.h.in by configure procedure.
+  @configure_input@
 
-  $Id: config.h.in,v 1.3 2003-08-14 13:15:08 mcneile Exp $
+  $Id: config.h.in,v 1.4 2003-10-21 15:34:42 zs Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -13,14 +13,14 @@
  *--------------------------------------------------------------------
  *  CVS keywords
  *
- *  $Author: mcneile $
- *  $Date: 2003-08-14 13:15:08 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.3 2003-08-14 13:15:08 mcneile Exp $
- *  $Id: config.h.in,v 1.3 2003-08-14 13:15:08 mcneile Exp $
+ *  $Author: zs $
+ *  $Date: 2003-10-21 15:34:42 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.4 2003-10-21 15:34:42 zs Exp $
+ *  $Id: config.h.in,v 1.4 2003-10-21 15:34:42 zs Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.3 $
+ *  $Revision: 1.4 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -29,18 +29,19 @@
 #ifndef INCLUDED_CONFIG_H_
 #define INCLUDED_CONFIG_H_                  //!< Prevent multiple inclusion 
 
-/* Define this flag if you are using QCDSP (default): */
+/* Default is 1 => compilation for QCDSP */
 #ifndef TARGET_QCDSP
 #define TARGET_QCDSP 1
 #endif
 
-
 #if TARGET_QCDSP == 0   /* General non-QCDSP version: */
 
-/* For parallel compilation? default is serial (PARALLEL undefined) */
-#if PARALLEL == 0
+/* PARALLEL = 1 for parallel compilation, 0 for serial compilation */
+#define PARALLEL @PARALLEL@
+#if PARALLEL == 0 
 #undef PARALLEL
-#endif
+#endif 
+
 
 /*! Explicit casting away of the const-ness  */
 #define CAST_AWAY_CONST(x) ( const_cast<char*>(x) )
@@ -71,7 +72,7 @@
 
 #define CPS_END_NAMESPACE } 
 #define CPS_START_NAMESPACE  namespace cps {
-#define USING_NAMESPACE_CPS using namespace cps 
+#define USING_CPS_NAMESPACE  using namespace cps;
 
 /* Override printf to only print on one proc (Not nec. on QCDSP, only
  *    expected to work via the MPI layer. */
@@ -80,25 +81,23 @@
 /* ------------------------------------------------------------------*/
 #else /* For compiling on QCDSP: */
 
+#define TARGET_QCDSP 1
 #define CPS_END_NAMESPACE 
 #define CPS_START_NAMESPACE  
-#define USING_NAMESPACE_CPS using namespace cps 
-
-#ifndef _TARTAN  /* Not using TARTAN, so under the Sun CC compiler: */
+#define USING_NAMESPACE_CPS 
 
 #define CAST_AWAY_CONST(x) ( x )
 #define LOCALCALC_TYPE rfloat
 #define INTERNAL_LOCALCALC_TYPE float
 #define COMMS_DATASIZE 4
+
+#ifndef _TARTAN  /* Not using TARTAN, so under the Sun CC compiler: */
+
 #include<util/qcdio_qprintf.h>
 
 #else  /* ELSE using TARTAN */
 
-#define CAST_AWAY_CONST(x) ( x )
 #define PARALLEL 1
-#define LOCALCALC_TYPE rfloat
-#define INTERNAL_LOCALCALC_TYPE float
-#define COMMS_DATASIZE 4
 
 #endif /* END of TARTAN */
 
@@ -110,7 +109,9 @@
 
 #define SERIAL_SEED 112319
 
-/*! Default value for the verbosity level (see the Verbose class for details).*/
+//! Default value for the verbosity level
+/*! see the Verbose class for details. */
+
 #define DEFAULT_VERBOSE_LEVEL -12100502
 
 #endif /* INCLUDED_CONFIG_H_ */

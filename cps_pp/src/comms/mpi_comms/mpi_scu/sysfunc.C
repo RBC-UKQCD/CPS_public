@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions for the MPI implementation of the QCDSP/QCDOC communications layer.
   
-  $Id: sysfunc.C,v 1.3 2003-10-21 13:42:47 zs Exp $
+  $Id: sysfunc.C,v 1.4 2003-10-21 15:34:42 zs Exp $
 */
 /*----------------------------------------------------------------------
 /* The Sysfunc Comms Interface: sysfunc.C
@@ -16,13 +16,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2003-10-21 13:42:47 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v 1.3 2003-10-21 13:42:47 zs Exp $
-  $Id: sysfunc.C,v 1.3 2003-10-21 13:42:47 zs Exp $
+  $Date: 2003-10-21 15:34:42 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v 1.4 2003-10-21 15:34:42 zs Exp $
+  $Id: sysfunc.C,v 1.4 2003-10-21 15:34:42 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.C,v $
-  $Revision: 1.3 $
+  $Revision: 1.4 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -372,12 +372,12 @@ void SCUCommsInit( void ) {
     commsMPI_RNGseed = 1;
     strcpy(commsMPI_seedFileName,"rng.dat");
 
-    // Parses the communications parameters:
-    MPIParseCommsParam();
-
     /* Initialise MPI, using dummy argc and argv arguments */
     MPI_Init(&dummy_argc, &dummy_argv);
     commsMPI_init = TRUE;
+
+    // Parses the communications parameters:
+    MPIParseCommsParam();
 
     /* Look up processor number */
     MPI_Comm_rank( MPI_COMM_WORLD, &commsMPI_peRank );
