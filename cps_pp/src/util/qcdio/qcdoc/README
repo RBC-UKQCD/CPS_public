@@ -1,0 +1,36 @@
+Usage:
+
+//should have 
+//QMP_init_msg_passing(&argc, &argv, QMP_SMP_ONE_ADDRESS);
+//somewhere before...
+
+//and  QMP_finalize_msg_passing();  somewhere at the end
+
+
+to load lattice:
+ReadLatticeParallel  rd;
+rd.setConcurIONumber( int );  //optional, split nodes into groups doing io
+rd.read(file);
+
+to check plaq and link trace:
+GwilsonFnone  lat;
+lat.GaugeField(rd.GaugeField());
+rd.CheckPlaqLinktrace(lat);
+
+
+to unload:
+WriteLatticeParallel  wt;
+wt.setConcurIONumber( int );  // optional
+wt.write(lat,filename);
+   -or-
+wt.write(lat,filename,enum FP_FORMAT floating_format, recon_row_3);
+            // enum FP_FORMAT, see  fpconv.h (TIDSP32, IEEE64BIG, etc.)
+            // if(recon_row_3 == 1), will output 2 rows for each matrix, else, 3 rows
+
+
+to run the test,
+qrun QCDOC.x   -r   conf.file  <x/y/z sites>  <t sites>   
+   -or-
+qrun QCDOC.x   -w   conf.file  <x/y/z sites>  <t sites>   [floating_format_name]
+
+
