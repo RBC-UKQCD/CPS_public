@@ -15,8 +15,8 @@
 #include <util/verbose.h>
 #include <util/error.h>
 
-#include <util/parctrl.h>
-#include <util/fpconv.h>
+#include "qioarg.h"
+#include "fpconv.h"
 
 
 CPS_START_NAMESPACE
@@ -26,7 +26,7 @@ using namespace std;
 // WriteLatticeParallel class
 // A modification to "WriteLattice" class to enable parallel writing
 
-class WriteLatticeParallel
+class WriteLatticeParallel : private QioControl
 {
 
  public:
@@ -41,19 +41,30 @@ class WriteLatticeParallel
 
 
  public:
-    WriteLatticeParallel();
+    WriteLatticeParallel(Lattice & lat, const char * filename,
+			 const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 0)
+      : QioControl(), unload_good(false)    {
+      initHeader();
+      QioArg  wt_arg(filename, dataFormat, recon_row_3);
+      write(lat, wt_arg);
+    }
+
+    WriteLatticeParallel(Lattice & lat, const QioArg & wt_arg)
+      : QioControl(), unload_good(false)    {
+      initHeader();
+      write(lat, wt_arg);
+    }
+
     ~WriteLatticeParallel() {}
-    void write(Lattice & lat, char * file, enum FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 0);
-    inline void setConcurIONumber(int set_concur) { pc.setConcurIONumber(set_concur); }
 
- protected:
-    char *filename; // output filename
-    ParallelControl  pc;
-    int data_start;
-    int error;
+    void initHeader(); 
 
+    void write(Lattice & lat, const QioArg & wt_arg);
+
+    inline bool good() { return unload_good; }
+ private:
     FPConv fpconv;
-
+    bool unload_good;
 };
 
 

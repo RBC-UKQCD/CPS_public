@@ -166,6 +166,7 @@ class Lattice
     // end change from phys_v4.0.0 --> phys_v4.1.0
 
 // public:
+    static int ForceFlops;
     friend class LinkBuffer;
 
     int LinkBufferIsEnabled() {return ((int) link_buffer);}
@@ -1544,7 +1545,6 @@ class Fasqtad : public virtual FstagTypes
     char *cname;    // Class name.
 
  public:
-    static int ForceFlops;
 
     Fasqtad();
     virtual ~Fasqtad();

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.9 2004-06-02 09:36:38 zs Exp $
+  $Id: gjp.h,v 1.10 2004-07-28 06:13:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-06-02 09:36:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.9 2004-06-02 09:36:38 zs Exp $
-//  $Id: gjp.h,v 1.9 2004-06-02 09:36:38 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-07-28 06:13:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.10 2004-07-28 06:13:52 chulwoo Exp $
+//  $Id: gjp.h,v 1.10 2004-07-28 06:13:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //
@@ -92,6 +92,9 @@ extern int gjp_scu_wire_map[];
   values are then accessible via the methods of this object.  
 */
 
+//! Maximum filname for START_CONF_FILE.
+const int MAX_FILENAME_LEN = 100;
+
 
 class GlobalJobParameter
 {
@@ -149,6 +152,8 @@ class GlobalJobParameter
                        // the starting conf. to be used if 
                        // start_conf = START_CONF_MEM
 		       // Otherwise it is 0.
+  char start_conf_filename[MAX_FILENAME_LEN];
+			//Filename for START_CONF_FILENAME
 
   StartSeedType start_seed_kind;  // The kind of initial 
                                   // random generator seed
@@ -510,6 +515,13 @@ public:
     \return The address of the starting configuration
     if the gauge field starting type is \c START_CONF_MEM, 0 otherwise.
   */
+
+  const char * StartConfFilename() const
+      {return start_conf_filename;}
+  //!< Gets the type of initial  gauge configuration.
+  /*!<
+    \return The type of initial gauge configuration.
+  */    
 
   StartSeedType StartSeedKind() const
       {return start_seed_kind;}

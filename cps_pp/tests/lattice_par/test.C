@@ -4,38 +4,46 @@
 #include <alg/alg_ghb.h>
 #include <alg/do_arg.h>
 #include <alg/ghb_arg.h>
-#include <sysfunc.h>
-#include <qmp.h>
+//#include <sysfunc.h>
 #include <util/ReadLatticePar.h>
 #include <util/WriteLatticePar.h>
 #include <util/fpconv.h>
 
+CPS_START_NAMESPACE
+GlobalJobParameter GJP;
+LatRanGen LRG;
+Verbose VRB;
+Error ERR;
+CPS_END_NAMESPACE
+
 USING_NAMESPACE_CPS
+
 
 
 int read_lattice(int argc, char ** argv) {
   cout << "ReadLatticeParallel class test!" << endl;
 
-  // load lattice
-  ReadLatticeParallel  rd;
-  rd.setConcurIONumber(4); // num of processors to do concurrent IO, any number, default is 8
-  rd.read(argv[2]);
+  GwilsonFnone lat;  // create a lattice at the GJP-specified address
+
+  // load lattice, and use the above created lattice to check plaq and link trace
+  ReadLatticeParallel  rd(lat,argv[2]);
+
+  //// to have more control, use
+  //
+  // QioArg  rd_arg(char * filename, Float check_precision /* optional */ );
+  // 
+  //   (modify rd_arg members....)   // including setting ConcurIONumber // see  qioarg.h
+  //
+  // ReadLatticeParallel rd(lat, rd_arg);
+  //
+
+
+  if(!rd.good()) {
+    cout << "Loading failed" << endl;
+    exit(-13);
+  }
 
   cout << "Load complete" << endl << endl;
-
-  // check its link trace and plaq trace
-
-  // now re-set GJP from gauge file (to extract gauge field addr, etc)
-  GJP.Initialize(rd.do_arg);
-
-  GwilsonFnone latNodeLoad;
-  latNodeLoad.GaugeField(rd.GaugeField());
-
-  cout << endl << "Checking lattice data" << endl;
-
-  rd.CheckPlaqLinktrace(latNodeLoad, 0.1);
-
-  cout << "Verification done" << endl << endl;
 
   return 0;
 }
@@ -56,19 +64,27 @@ int write_lattice(int argc, char ** argv) {
 
   for(int i=0;i<ITERATIONS;++i)  ghb.run();
 
-  // unload lattice
-  WriteLatticeParallel  wt;
+  ////////////////////////////////////////////////////////////////////
+  // start unloading lattice
+  WriteLatticeParallel wt(lat, argv[2]); 
 
-  wt.setConcurIONumber(4);
-  if(argc < 6) {
-    wt.write(lat,argv[2]); // default: output format = host format, output 3 rows
-  }
-  else { // specified output floating format
-    FPConv fp;
-    fp.setFileFormat(argv[5]);
-    if(fp.fileFormat == FP_UNKNOWN)  fp.fileFormat = FP_AUTOMATIC;
+  // more options, e.g.
+  // WriteLatticeParallel wt(lat, argv[2], FP_IEEE32BIG, 1);  for NERSC format, see util/fpconv.h
 
-    wt.write(lat,argv[2],fp.fileFormat,1);  // output format = user set, output 2 rows (recon_row_3 == 1)
+
+  //// to have even more control, use
+  //
+  // QioArg  wt_arg(char * filename, FP_FORMAT fileFpFormat /* optional */, int recon_row_3 /* optional */ );
+  // 
+  //   (modify wt_arg members....)  // including setting ConcurIONumber // see  qioarg.h
+  //
+  // WriteLatticeParallel wt(lat, wt_arg);
+  //
+
+
+  if(!wt.good()) {
+    cout << "Unloading failed" << endl;
+    exit(-13);
   }
 
   cout << "Unload complete" <<endl << endl;
@@ -78,23 +94,30 @@ int write_lattice(int argc, char ** argv) {
 
 
 int main(int argc, char ** argv) {
-  if(argc<5) {
-    cout << "Usage:" << endl<<"      qrun QCDOC.x  -[r|w]  <conf.dat>  <x/y/z sites>  <t sites> "<< endl;
+  if(argc<9) {
+    cout << "Usage:" << endl<<"      qrun QCDOC.x  -[r|w]  <conf.dat>  <x/y/z sites>  <t sites>  <Xbc> <Ybc> <Zbc> <Tbc>"<< endl;
+    cout << "(use letter \'P\' or \'A\' for arguments of gauge BC's)" << endl;
+    cout << "Eg,   qrun QCDOC.x -r  conf8x8x8x16.file   8  16  P P P P"<< endl;
+    cout << "      qrun QCDOC.x -w  conf4x4x4x32.file   4  32  P P A A"<< endl;
     exit(1);
   }
 
-  QMP_init_msg_passing(&argc, &argv, QMP_SMP_ONE_ADDRESS);
-
-  cout << "QMP init'd" << endl;
+  // no longer need QMP....
 
   // init  GJP
   DoArg do_arg;
-  ParallelControl pc;
 
-  do_arg.x_nodes = pc.Xnodes();
-  do_arg.y_nodes = pc.Ynodes();
-  do_arg.z_nodes = pc.Znodes();
-  do_arg.t_nodes = pc.Tnodes();
+#if TARGET == QCDOC 
+  do_arg.x_nodes = SizeX();
+  do_arg.y_nodes = SizeY();
+  do_arg.z_nodes = SizeZ();
+  do_arg.t_nodes = SizeT();
+#else
+  do_arg.x_nodes = 1;
+  do_arg.y_nodes = 1;
+  do_arg.z_nodes = 1;
+  do_arg.t_nodes = 1;
+#endif
   do_arg.s_nodes = 1;
 
   int nx = atoi(argv[3]);
@@ -111,34 +134,49 @@ int main(int argc, char ** argv) {
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
   do_arg.z_bc = BND_CND_PRD;
-  //  do_arg.t_bc = BND_CND_PRD;
   do_arg.t_bc = BND_CND_APRD;
-  do_arg.start_conf_kind = START_CONF_DISORD;
-//  do_arg.start_conf_kind = START_CONF_ORD;
-//  do_arg.start_conf_kind = START_CONF_LOAD;
-//  do_arg.start_conf_load_addr = (Matrix *)0x5f700;
+
   do_arg.start_seed_kind = START_SEED_FIXED;
-  //  do_arg.colors = 3;
   do_arg.beta = 5.3;
   do_arg.dwf_height = 0.9;
-  //  do_arg.verbose_level = 1;  //-100502;
-//  do_arg.verbose_level = 100;
-//  do_arg.verbose_level = 0;
-
-  GJP.Initialize(do_arg);
-
-  cout << "Initialized ok" << endl;
-
 
   // start testing
   if(!strcmp(argv[1],"-w")) {
+    do_arg.start_conf_kind = START_CONF_DISORD;
+    GJP.Initialize(do_arg);
+
+    cout << "Initialized ok" << endl;
+
     write_lattice(argc,argv);
   }
   else {
+    do_arg.start_conf_load_addr = new Matrix[do_arg.x_node_sites * do_arg.y_node_sites *
+					     do_arg.z_node_sites * do_arg.t_node_sites * 4];
+#if 1
+    do_arg.start_conf_kind = START_CONF_LOAD;
+    GJP.Initialize(do_arg);
+
+    cout << "Initialized ok" << endl;
+
     read_lattice(argc,argv);
+#else
+//   An equivalent way to load the lattice. ReadLatticePar is called
+//   inside Lattice::Lattice()
+
+    do_arg.start_conf_kind = START_CONF_FILE;
+    do_arg.start_conf_filename  = argv[2];
+    GJP.Initialize(do_arg);
+    cout << "Initialized ok" << endl;
+    GwilsonFnone lat;
+    cout << "lattice loaded ok" << endl;
+    const char *write_file_name = "test_out.lat";
+//  Should dupilcate the NERSC format lattice except header
+    WriteLatticeParallel(lat,write_file_name,FP_IEEE32BIG,1);
+#endif
+
+    delete[] do_arg.start_conf_load_addr;
   }
 
-  QMP_finalize_msg_passing();
 
   exit(0);
 }

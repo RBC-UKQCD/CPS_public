@@ -20,7 +20,7 @@
 #include <util/error.h>
 #include <alg/do_arg.h>
 
-#include <util/parctrl.h>
+#include <util/qioarg.h>
 #include <util/fpconv.h>
 
 CPS_START_NAMESPACE
@@ -34,7 +34,6 @@ typedef map<string,string> GCFHMapParT;
 class GCFheaderPar
 {
 private:
-
 
   GCFHMapParT headerMap;
   bool  prevFound;
@@ -53,47 +52,34 @@ public:
 };
 
 
-class  ReadLatticeParallel {
- protected:
-  Matrix *lpoint; // pointer to the lattice
-  bool allocated; // check if holding memory
+class  ReadLatticeParallel : private QioControl {
+ private:
   GCFheaderPar hd ;
-  Float _plaq_inheader;
-  Float _linktrace_inheader;
-  int recon_row_3;
-
-  int error;
-  int data_start;  // start pos of data in file
-  ParallelControl  pc;
-  
   FPConv  fpconv;
+  bool load_good;
 
  public:
-  
-  DoArg   do_arg; // do_arg for this lattice
-  inline Matrix * GaugeField()  { return lpoint; }
-  inline void setConcurIONumber(int num) {  pc.setConcurIONumber(num); }
+  ReadLatticeParallel(Lattice & lat, const char * filename, const Float chkprec = 0.01)
+    : QioControl(), load_good(false)    {        
+    QioArg rd_arg(filename,chkprec);
+    read(lat,rd_arg);
+  }
 
- public:
-  ReadLatticeParallel():
-    allocated(false), error(0)
-    { 
-      recon_row_3 = 0;
-    }
+  ReadLatticeParallel(Lattice & lat, const QioArg & rd_arg) 
+    : QioControl(), load_good(false)    {
+    read(lat,rd_arg);
+  }
   
-  //  ReadLatticeParallel(const char* file);
-  
-  ~ReadLatticeParallel() { if ( allocated) delete[] lpoint; }
-  
-  void read( const char* file );
-  unsigned calc_csum(char *fpoint);
-  Float plaqInHeader() { return _plaq_inheader; }
-  Float linktraceInHeader() { return _linktrace_inheader; }
-  void CheckLinktrace(Matrix * mat, Float chkprec);
-  void CheckPlaqLinktrace(Lattice &lattice, Float chkprec) ;
-  //    void ReconRow3Single(float* dat);
-  //    void ReconRow3(Matrix *lpoint,float *fpoint,int size_matrices);
+  virtual ~ReadLatticeParallel() { }
 
+  void read( Lattice & lat, const QioArg & rd_arg);
+
+  inline bool good() { return load_good; }
+
+ private:
+  bool CheckSum(char *fpoint, int size_ints);
+  bool CheckPlaqLinktrace(Lattice & lat, const QioArg & rd_arg,
+			  const Float plaq_inheader, const Float linktrace_inheader);
 };
 
 CPS_END_NAMESPACE

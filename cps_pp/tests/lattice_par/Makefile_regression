@@ -12,7 +12,7 @@
 #  include the platform specific part of the makefile
 #
 include ../Makefile_common
-LDFLAGS := $(LDFLAGS) -lqcd_api
+#LDFLAGS := $(LDFLAGS) -lqcd_api
 
 
 

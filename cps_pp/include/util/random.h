@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.8 2004-07-15 22:19:00 chulwoo Exp $
+  $Id: random.h,v 1.9 2004-07-28 06:13:52 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-15 22:19:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.8 2004-07-15 22:19:00 chulwoo Exp $
-//  $Id: random.h,v 1.8 2004-07-15 22:19:00 chulwoo Exp $
+//  $Date: 2004-07-28 06:13:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.9 2004-07-28 06:13:52 chulwoo Exp $
+//  $Id: random.h,v 1.9 2004-07-28 06:13:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -279,7 +279,7 @@ class LatRanGen
 	
 };
 
-/*! An instance of the LatRanGen class, named VRB, should be
+/*! An instance of the LatRanGen class, named LRG, should be
   created at the highest scope (outside main). This external declaration
   allows control of and access to the random number generation.
 */
