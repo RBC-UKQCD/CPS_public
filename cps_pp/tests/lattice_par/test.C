@@ -1,3 +1,5 @@
+#include <config.h>
+#include <stdlib.h>
 #include <util/gjp.h>
 #include <alg/common_arg.h>
 #include <alg/alg_base.h>
@@ -8,6 +10,7 @@
 #include <util/ReadLatticePar.h>
 #include <util/WriteLatticePar.h>
 #include <util/fpconv.h>
+#include <comms/sysfunc.h>
 
 CPS_START_NAMESPACE
 GlobalJobParameter GJP;
@@ -57,7 +60,7 @@ int write_lattice(int argc, char ** argv) {
   int ITERATIONS = 10;
   
   CommonArg common_arg_ghb;
-  common_arg_ghb.results = (void*)"/host/lishu/qcdio/ghb.dat";
+  common_arg_ghb.results = (void*)"ghb.dat";
   GhbArg ghb_arg;
   ghb_arg.num_iter=3;
   AlgGheatBath ghb(lat,&common_arg_ghb,&ghb_arg);
@@ -66,10 +69,10 @@ int write_lattice(int argc, char ** argv) {
 
   ////////////////////////////////////////////////////////////////////
   // start unloading lattice
-  WriteLatticeParallel wt(lat, argv[2]); 
+  //WriteLatticeParallel wt(lat, argv[2]); 
 
   // more options, e.g.
-  // WriteLatticeParallel wt(lat, argv[2], FP_IEEE32BIG, 1);  for NERSC format, see util/fpconv.h
+   WriteLatticeParallel wt(lat, argv[2], FP_IEEE32BIG, 1);//  for NERSC format, see util/fpconv.h
 
 
   //// to have even more control, use
@@ -107,18 +110,11 @@ int main(int argc, char ** argv) {
   // init  GJP
   DoArg do_arg;
 
-#if TARGET == QCDOC 
   do_arg.x_nodes = SizeX();
   do_arg.y_nodes = SizeY();
   do_arg.z_nodes = SizeZ();
   do_arg.t_nodes = SizeT();
-#else
-  do_arg.x_nodes = 1;
-  do_arg.y_nodes = 1;
-  do_arg.z_nodes = 1;
-  do_arg.t_nodes = 1;
-#endif
-  do_arg.s_nodes = 1;
+  do_arg.s_nodes = SizeS();
 
   int nx = atoi(argv[3]);
   int ny = atoi(argv[3]);

@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.8 2004-08-18 11:58:09 zs Exp $
+  $Id: main.C,v 1.9 2004-09-07 06:05:25 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -14,6 +14,7 @@
 #include <alg/alg_hmd.h>
 #include <alg/do_arg.h>
 #include <util/random.h>
+#include <comms/sysfunc.h>
 
 const int nx = 4;
 const int ny = 4;
@@ -33,16 +34,11 @@ USING_NAMESPACE_CPS
 // some function prototypes
 void setup_do_arg(DoArg& do_arg) ; 
 void setup_hmd_arg(HmdArg& hmd_arg) ;
-#if TARGET == QCDOC
-extern "C" void _mcleanup(void);
-#endif
 
 
 int main(int argc,char *argv[])
 {
-#if TARGET == QCDOC
-  DefaultSetup(); 
-#endif
+  Start();
 
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
@@ -93,14 +89,7 @@ int main(int argc,char *argv[])
   char *total_sites_st = "total sites = ";
   VRB.Flow(cname,fname,"%s%f\n",total_sites_st,IFloat(total_sites));
   FILE *plaq;
-#if 0
-  char filename[200];
-  const char *plaq_filename = CWDPREFIX("plaquette");
-  sprintf(filename, "%s%d%d%d%d%d%d.test2",
-	plaq_filename,CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
-#else
   const char *filename = "plaquette.dat";
-#endif
   plaq = Fopen(filename,"w");
   
   //----------------------------------------------------------------
@@ -168,10 +157,7 @@ int main(int argc,char *argv[])
 
   Fclose(plaq); 
   }
-#if TARGET == QCDOC
-  _mcleanup();
-#endif
-
+  End();
   return(0);
 }
 
@@ -180,7 +166,6 @@ void setup_do_arg(DoArg& do_arg)
 {
 
 
-#if TARGET == QCDOC
   do_arg.x_node_sites = nx/SizeX();
   do_arg.y_node_sites = ny/SizeY();
   do_arg.z_node_sites = nz/SizeZ();
@@ -189,16 +174,6 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.y_nodes = SizeY();
   do_arg.z_nodes = SizeZ();
   do_arg.t_nodes = SizeT();
-#else
-  do_arg.x_node_sites = nx ;
-  do_arg.y_node_sites = ny ;
-  do_arg.z_node_sites = nz ;
-  do_arg.t_node_sites = nt ;
-  do_arg.x_nodes = 1;
-  do_arg.y_nodes = 1;
-  do_arg.z_nodes = 1;
-  do_arg.t_nodes = 1;
-#endif
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
   do_arg.z_bc = BND_CND_PRD;

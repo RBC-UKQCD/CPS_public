@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-04 09:14:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.13 2004-09-04 09:14:13 chulwoo Exp $
-//  $Id: main.C,v 1.13 2004-09-04 09:14:13 chulwoo Exp $
+//  $Date: 2004-09-07 06:08:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.14 2004-09-07 06:08:12 chulwoo Exp $
+//  $Id: main.C,v 1.14 2004-09-07 06:08:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -36,6 +36,12 @@ static int nx,ny,nz,nt,ns;
 int main(int argc,char *argv[])
 {
   FILE *fp;
+
+#if TARGET==cpsMPI
+    using MPISCU::fprintf;
+    using MPISCU::printf;
+#endif
+
   Start();
   if (argc<6) {printf("usage: %s nx ny nz nt ns\n",argv[0]);exit(-2);}
   sscanf(argv[1],"%d",&nx);
@@ -78,8 +84,6 @@ int main(int argc,char *argv[])
 
 #if TARGET==cpsMPI
     MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);    
-    using MPISCU::fprintf;
-    using MPISCU::printf;
 #endif
   
   GJP.Initialize(do_arg);
@@ -91,7 +95,8 @@ int main(int argc,char *argv[])
 
   VRB.Level(0);
 //  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
-//  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+  VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
 //  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_CLOCK_LEVEL);
   VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
@@ -156,9 +161,10 @@ int main(int argc,char *argv[])
       }
     }
   }
+#endif
 
 
-
+#if 1
   //----------------------------------------------------------------
   // Run HMD R Staggered
   //----------------------------------------------------------------
