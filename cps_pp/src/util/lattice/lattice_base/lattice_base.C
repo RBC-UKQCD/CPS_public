@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.18 2004-08-18 11:58:05 zs Exp $
+  $Id: lattice_base.C,v 1.19 2004-08-30 04:36:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.18 2004-08-18 11:58:05 zs Exp $
-//  $Id: lattice_base.C,v 1.18 2004-08-18 11:58:05 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-30 04:36:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.19 2004-08-30 04:36:36 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.19 2004-08-30 04:36:36 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -161,7 +161,12 @@ Lattice::Lattice()
 
     if(start_conf_kind != START_CONF_LOAD &&
        start_conf_kind!=START_CONF_FILE){
+#if TARGET == QCDOC
+       gauge_field = (Matrix *) qalloc(GJP.StartConfAllocFlag(),array_size);
+    VRB.Flow(cname,fname,"gauge_field=%p\n",gauge_field);
+#else
       gauge_field = (Matrix *) pmalloc(array_size);
+#endif
       if( gauge_field == 0) ERR.Pointer(cname,fname, "gauge_field");
       VRB.Pmalloc(cname, fname, "gauge_field", gauge_field, array_size);
     }
@@ -1470,19 +1475,33 @@ Float Lattice::SumReTrCubeNode(void)
 	  for(int mu = 0; mu < 4; mu++)
 	    {
 	      dir[0] = mu ;
-	      dir[5] = OPP_DIR(mu) ;    // is this right?
-	      for(int nu = mu+1; nu < 4; nu++) 
+	      dir[3] = OPP_DIR(mu) ;    
+	      for(int nu = 0; nu < 4; nu++) 
+                if(nu!=mu)
 		{
 		   dir[1] = nu ;
 		   dir[4] = OPP_DIR(nu) ;
-		   for(int rho = nu+1; rho < 4; rho++)
+		   for(int rho = mu+1; rho < 4; rho++)
+		     if(rho!=mu && rho!=nu)
 		     {
 		       dir[2] = rho ;
-		       dir[3] = OPP_DIR(rho) ;       // is this right?
+		       dir[5] = OPP_DIR(rho) ;     
 		       sum += ReTrLoop(x,dir,6);
 		     }
+#if 1
+		   dir[1] = OPP_DIR(nu) ;
+		   dir[4] = nu ;
+		   for(int rho = mu+1; rho < 4; rho++)
+		     if(rho!=mu && rho!=nu)
+		     {
+		       dir[2] = rho ;
+		       dir[5] = OPP_DIR(rho) ;     
+		       sum += 0.33333333333333333333333*ReTrLoop(x,dir,6);
+		     }
+#endif
 		}
 	    }
+//  ClearAllBufferedLink();
   return sum;
 }
 
@@ -2403,6 +2422,7 @@ void Lattice::GsoCheck(void){
     snd_buf = plaq;
     for(s=1; s < s_nodes; s++){
       getMinusData(&rcv_buf, &snd_buf, 1, 4);
+//	printf("plaq=%e rcv_buf=$%e\n",plaq,rcv_buf);
       if(rcv_buf != plaq) {
 	failed_flag = 1.0;
 #ifdef _TARTAN
