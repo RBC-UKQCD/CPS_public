@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.1 2004-10-14 22:13:50 chulwoo Exp $
+  $Id: main.C,v 1.2 2004-10-14 22:14:18 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -71,7 +71,7 @@ int main(int argc,char *argv[])
   const int no_warmup_sweep = 0 ; 
   const int no_measure_sweep = 1 ; 
   int sweep_counter = 0 ;
-  const int total_measure = 10 ;
+  const int total_measure = 5000 ;
   
   //----------------------------------------------------------------
   // Initialize argument structures
