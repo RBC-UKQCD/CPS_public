@@ -3,7 +3,7 @@
 /*!\file
   \brief Helper routines for the fermionic force term
 
-  $Id: force_product_sum.C,v 1.3 2004-08-18 11:58:02 zs Exp $
+  $Id: force_product_sum.C,v 1.4 2004-08-19 22:20:49 mclark Exp $
 */
 //--------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ extern "C" void Force_cross2dag(const Vector *chi, const Vector *phi, Matrix *re
 // Note that STAG order stores hermitian conjugate of links.
 
 void Fasqtad::force_product_sum(const Matrix *v,  int dir,
-				IFloat coeff, Matrix *f, Matrix *mtmp){
+				IFloat coeff, Matrix *f){
 
   Matrix m, md;
   int n;
@@ -46,8 +46,8 @@ void Fasqtad::force_product_sum(const Matrix *v,  int dir,
 // f += u(vw)^dagger
 
 void Fasqtad::force_product_sum(const Matrix *u, const Matrix *v,
-				const Matrix *w, IFloat coeff, Matrix *f,
-				Matrix *m1, Matrix *m2){
+				const Matrix *w, IFloat coeff, 
+				Matrix *f, Matrix *tmp){
 
   Matrix m, md;
   int n;
@@ -74,7 +74,7 @@ void Fasqtad::force_product_sum(const Matrix *u, const Matrix *v,
 // f += coeff v w^dagger
 
 void Fasqtad::force_product_sum(const Matrix *v, const Matrix *w,
-				IFloat coeff, Matrix *f, Matrix *mtmp){
+				IFloat coeff, Matrix *f){
 
   Matrix m, md;
   int n;
@@ -100,7 +100,7 @@ void Fasqtad::force_product_sum(const Matrix *v, const Matrix *w,
 // f += coeff (v w)^dagger
 
 void Fasqtad::force_product_d_sum(const Matrix *v, const Matrix *w,
-				    IFloat coeff, Matrix *f, Matrix *mtmp){
+				    IFloat coeff, Matrix *f){
 
   Matrix m, md;
   int n;

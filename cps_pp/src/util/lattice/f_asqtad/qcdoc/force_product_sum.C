@@ -4,7 +4,7 @@
 /*!\file
   \brief Helper routines for the fermionic force term
 
-  $Id: force_product_sum.C,v 1.2 2004-08-18 11:58:03 zs Exp $
+  $Id: force_product_sum.C,v 1.3 2004-08-19 22:20:49 mclark Exp $
 */
 //--------------------------------------------------------------------
 
@@ -25,12 +25,16 @@ extern "C" {
 // f += coeff * U_dir(x) * v(x)^dagger
 // Note that STAG order stores hermitian conjugate of links.
 void Fasqtad::force_product_sum(const Matrix *v,  int dir,
-				IFloat coeff, Matrix *f, Matrix *m){
+				IFloat coeff, Matrix *f){
+  unsigned long v2=(unsigned long)v;
+  if( qalloc_is_fast((Matrix *)v) &&
+      qalloc_is_fast((Matrix *)f) &&
+      qalloc_is_fast((Matrix *)(GaugeField()+dir)))
+    v2 = v2 - 0xb0000000 + 0x9c000000;
 
   int vol = node_sites[0]*node_sites[1]*node_sites[2]*node_sites[3];
   ForceFlops += vol * 234;
-  gdagtimesmdag(&vol, (GaugeField()+dir), v, m); 
-  vaxpy3_m(f, &coeff, m, f, 3*vol); // 36*vol flops
+  fgdagm1dagpm2(f, &coeff, (GaugeField()+dir), (const Matrix*)v2, f, &vol); 
   
 }
 
@@ -38,36 +42,51 @@ void Fasqtad::force_product_sum(const Matrix *v,  int dir,
 // f += u(vw)^dagger
 void Fasqtad::force_product_sum(const Matrix *u, const Matrix *v,
 				const Matrix *w, IFloat coeff, Matrix *f, 
-				Matrix *m1, Matrix *m2){
+				Matrix *mtmp){
+
+  unsigned long u2=(unsigned long)u;
+  if( qalloc_is_fast((Vector *)u) &&
+      qalloc_is_fast((Vector *)mtmp) &&
+      qalloc_is_fast((Matrix *)f) )
+    u2 = u2 - 0xb0000000 + 0x9c000000;
 
   int vol = node_sites[0]*node_sites[1]*node_sites[2]*node_sites[3];
   ForceFlops += vol * 432;
-  m1timesm2(&vol, v, w, m1);
-  m1timesm2dag(&vol, u, m1, m2);
-  vaxpy3_m(f, &coeff, m2, f, 3*vol); // 36*vol flops
+  m1m2(mtmp, v, w, &vol);
+  fm1m2dagpm3(f, &coeff, (const Matrix*)u2, mtmp, f, &vol);
 
 }
 
 
 // f += coeff v w^dagger
 void Fasqtad::force_product_sum(const Matrix *v, const Matrix *w,
-				IFloat coeff, Matrix *f, Matrix *m){
+				IFloat coeff, Matrix *f){
+
+  unsigned long v2=(unsigned long)v;
+  if( qalloc_is_fast((Vector *)v) &&
+      qalloc_is_fast((Vector *)w) &&
+      qalloc_is_fast((Matrix *)f) )
+    v2 = v2 - 0xb0000000 + 0x9c000000;
 
   int vol = node_sites[0]*node_sites[1]*node_sites[2]*node_sites[3];
   ForceFlops += vol * 234;
-  m1timesm2dag(&vol, v, w, m);  
-  vaxpy3_m(f, &coeff, m, f, 3*vol); //36*vol flops
+  fm1m2dagpm3(f, &coeff, (const Matrix*)v, w, f, &vol);  
 
 }
 
 // f += coeff (v w)^dagger
 void Fasqtad::force_product_d_sum(const Matrix *v, const Matrix *w,
-				  IFloat coeff, Matrix *f, Matrix *m){
+				  IFloat coeff, Matrix *f){
+
+  unsigned long v2=(unsigned long)v;
+  if( qalloc_is_fast((Vector *)v) &&
+      qalloc_is_fast((Vector *)w) &&
+      qalloc_is_fast((Matrix *)f) )
+    v2 = v2 - 0xb0000000 + 0x9c000000;
 
   int vol = node_sites[0]*node_sites[1]*node_sites[2]*node_sites[3];
   ForceFlops += vol * 234;
-  m1dagtimesm2dag(&vol, w, v, m);
-  vaxpy3_m(f, &coeff, m, f, 3*vol); // 36*vol flops
+  fm1dagm2dagpm3(f, &coeff, w, (const Matrix*)v2, f, &vol);
 
 }
 
