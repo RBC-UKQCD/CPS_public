@@ -3,7 +3,7 @@
 
   @configure_input@
 
-  $Id: config.h.in,v 1.5 2003-10-27 16:45:38 zs Exp $
+  $Id: config.h.in,v 1.6 2003-10-31 16:26:42 zs Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -14,13 +14,13 @@
  *  CVS keywords
  *
  *  $Author: zs $
- *  $Date: 2003-10-27 16:45:38 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.5 2003-10-27 16:45:38 zs Exp $
- *  $Id: config.h.in,v 1.5 2003-10-27 16:45:38 zs Exp $
+ *  $Date: 2003-10-31 16:26:42 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.6 2003-10-31 16:26:42 zs Exp $
+ *  $Id: config.h.in,v 1.6 2003-10-31 16:26:42 zs Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.5 $
+ *  $Revision: 1.6 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -29,12 +29,7 @@
 #ifndef INCLUDED_CONFIG_H_
 #define INCLUDED_CONFIG_H_                  //!< Prevent multiple inclusion 
 
-/* Default is 1 => compilation for QCDSP */
 #ifndef TARGET_QCDSP
-#define TARGET_QCDSP 1
-#endif
-
-#if TARGET_QCDSP == 0   /* General non-QCDSP version: */
 
 /* PARALLEL = 1 for parallel compilation, 0 for serial compilation */
 #define PARALLEL @PARALLEL@
