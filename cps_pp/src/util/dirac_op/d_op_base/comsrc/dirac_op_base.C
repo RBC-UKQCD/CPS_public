@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class methods.
   
-  $Id: dirac_op_base.C,v 1.9 2005-02-18 20:18:11 mclark Exp $
+  $Id: dirac_op_base.C,v 1.10 2005-03-07 00:24:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2005-02-18 20:18:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.9 2005-02-18 20:18:11 mclark Exp $
-//  $Id: dirac_op_base.C,v 1.9 2005-02-18 20:18:11 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:24:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.10 2005-03-07 00:24:46 chulwoo Exp $
+//  $Id: dirac_op_base.C,v 1.10 2005-03-07 00:24:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v $
 //  $State: Exp $
 //
@@ -38,7 +38,8 @@ CPS_START_NAMESPACE
 // Initialize static variables
 //------------------------------------------------------------------
 int DiracOp::scope_lock = 0;
-int DiracOp::CGflops = 0;
+unsigned long long DiracOp::CGflops = 0;
+unsigned int DiracOp::CGcount = 0;
 
 //------------------------------------------------------------------
 // static variables
@@ -49,14 +50,6 @@ static int bc[4] = {0,0,0,0};	// boundary condition on this node
 
 static void BondCond(Lattice& lat, Matrix *u_base)
 {
-#if 0
-	printf("g_dir_offset(%p) = %d %d %d %d\n",
-	Lattice::g_dir_offset,
-	Lattice::g_dir_offset[0],
-	Lattice::g_dir_offset[1],
-	Lattice::g_dir_offset[2],
-	Lattice::g_dir_offset[3]);
-#endif
       int x[4];
   for(int u = 0; u < 4; ++u) {
     if(bc[u]) {

@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-10-14 22:10:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.13 2004-10-14 22:10:00 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.13 2004-10-14 22:10:00 chulwoo Exp $
+//  $Date: 2005-03-07 00:24:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.14 2005-03-07 00:24:47 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.14 2005-03-07 00:24:47 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -57,11 +57,9 @@ void report_flops(int flops, struct timeval *start,struct timeval *end);
 //#undef REPRODUCE_TEST
 #endif
 
-#ifdef  REPRODUCE_TEST
 CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
 CPS_START_NAMESPACE
-#endif
 
 extern "C" { 
   void invcg_r_norm(IFloat *resa, IFloat *scale, IFloat *mult, IFloat *add, 
@@ -207,30 +205,39 @@ int DiracOp::InvCg(Vector *out,
   stp_cnd = src_norm_sq * dirac_arg->stop_rsd * dirac_arg->stop_rsd;
   VRB.Flow(cname,fname, "stp_cnd =%e\n", IFloat(stp_cnd));
 
-#ifdef REPRODUCE_TEST 
+
+  Vector *sol_store;
+  Float *d_store;
+  int test_num = 0;
+
+  int test_freq = GJP.CGreprodFreq();
+
+  if (test_freq && (CGcount % test_freq == 0))  {
   
+    test_num = 1;
 // Allocate space for storing solution
 //------------------------------------------------------------------
-  Vector *sol_store = (Vector *) smalloc(f_size_cb * sizeof(Float));
-  if(sol_store == 0) ERR.Pointer(cname,fname, "sol_store");
-  VRB.Smalloc(cname,fname, "sol_store", sol_store, f_size_cb * sizeof(Float));
-
+    sol_store = (Vector *) smalloc(f_size_cb * sizeof(Float));
+    if(sol_store == 0) ERR.Pointer(cname,fname, "sol_store");
+    VRB.Smalloc(cname,fname, "sol_store", sol_store, f_size_cb * sizeof(Float));
+  
 // Allocate space for storing d
 //------------------------------------------------------------------
-  Float *d_store = (Float *) smalloc( dirac_arg->max_num_iter-1 * sizeof(Float));
+    d_store = (Float *) smalloc( (dirac_arg->max_num_iter-1) * sizeof(Float));
+  
+    if(d_store == 0) ERR.Pointer(cname,fname, "d_store");
+    VRB.Smalloc(cname,fname, "d_store", d_store, (dirac_arg->max_num_iter-1) * sizeof(Float));
+  
+    for ( int n = 0; n < dirac_arg->max_num_iter-1; n++ )  d_store[n] = 0;
+  
+    sol_store->CopyVec(sol, f_size_cb);
+  
+  }
 
-  if(d_store == 0) ERR.Pointer(cname,fname, "d_store");
-  VRB.Smalloc(cname,fname, "d_store", d_store, dirac_arg->max_num_iter-1 * sizeof(Float));
-
-  for ( int n = 0; n < dirac_arg->max_num_iter-1; n++ )  d_store[n] = 0;
-
-  sol_store->CopyVec(sol, f_size_cb);
-
-  for ( int test = 0; test < 2; test++ ) {
+  for ( int test = 0; test < test_num+1; test++ ) {
     if (test == 1) sol-> CopyVec(sol_store, f_size_cb);
-    
-#endif
-
+      
+  
 //------------------------------------------------------------------
 // Initial step:
 // res = src - MatPcDagMatPc * sol
@@ -241,170 +248,171 @@ int DiracOp::InvCg(Vector *out,
 //   return
 // }
 //------------------------------------------------------------------
-  // Mmp = MatPcDagMatPc * sol
-  MatPcDagMatPc(mmp, sol);
-
-  // res = src
-  dir->CopyVec(src, f_size_cb);
-
-  // res -= mmp
-  dir->VecMinusEquVec(mmp, f_size_cb);
-
-  // dir = res
-  //dir->CopyVec(res, f_size_cb);  
-
-  IFloat *Fsol = (IFloat*)sol;
-  IFloat *Fdir = (IFloat*)dir;
-  IFloat *Fmmp = (IFloat*)mmp;
-  IFloat *Xptr;
-
-  // Interleave solution and residual
-  Xptr = X;
-  for (j=0; j<f_size_cb/GRAN;j++) {
-    for (i=0; i<GRAN; i++) *Xptr++ = *(Fsol+j*GRAN+i);
-    for (i=0; i<GRAN; i++) *Xptr++ = *(Fdir+j*GRAN+i);
-  }
-
-  // res_norm_sq_cur = res * res
-  res_norm_sq_cur = dir->NormSqNode(f_size_cb);
-
-  DiracOpGlbSum(&res_norm_sq_cur);
-
-  // if( |res|^2 <= stp_cnd ) we are done
-  VRB.Flow(cname,fname,
-  	   "|res[0]|^2 = %e\n", IFloat(res_norm_sq_cur));
-  itr = 0;
-  max_itr = dirac_arg->max_num_iter-1;
-  if(res_norm_sq_cur <= stp_cnd) max_itr = 0;
-
-
-#ifdef PROFILE
-  struct timeval start;
-  struct timeval end;
-  struct timeval linalg_tmp;
-  struct timeval linalg_start;
-  struct timeval linalg_end;
-
-  CGflops    = 0;
-  int nflops = 0;
-  int nflops_tmp;
-  gettimeofday(&start,NULL);
-
-#endif
-
+    // Mmp = MatPcDagMatPc * sol
+    MatPcDagMatPc(mmp, sol);
+  
+    // res = src
+    dir->CopyVec(src, f_size_cb);
+  
+    // res -= mmp
+    dir->VecMinusEquVec(mmp, f_size_cb);
+  
+    // dir = res
+    //dir->CopyVec(res, f_size_cb);  
+  
+    IFloat *Fsol = (IFloat*)sol;
+    IFloat *Fdir = (IFloat*)dir;
+    IFloat *Fmmp = (IFloat*)mmp;
+    IFloat *Xptr;
+  
+    // Interleave solution and residual
+    Xptr = X;
+    for (j=0; j<f_size_cb/GRAN;j++) {
+      for (i=0; i<GRAN; i++) *Xptr++ = *(Fsol+j*GRAN+i);
+      for (i=0; i<GRAN; i++) *Xptr++ = *(Fdir+j*GRAN+i);
+    }
+  
+    // res_norm_sq_cur = res * res
+    res_norm_sq_cur = dir->NormSqNode(f_size_cb);
+  
+    DiracOpGlbSum(&res_norm_sq_cur);
+  
+    // if( |res|^2 <= stp_cnd ) we are done
+    VRB.Flow(cname,fname,
+    	   "|res[0]|^2 = %e\n", IFloat(res_norm_sq_cur));
+    itr = 0;
+    max_itr = dirac_arg->max_num_iter-1;
+    if(res_norm_sq_cur <= stp_cnd) max_itr = 0;
+  
+  
+  #ifdef PROFILE
+    struct timeval start;
+    struct timeval end;
+    struct timeval linalg_tmp;
+    struct timeval linalg_start;
+    struct timeval linalg_end;
+  
+    CGflops    = 0;
+    int nflops = 0;
+    int nflops_tmp;
+    gettimeofday(&start,NULL);
+  
+  #endif
+  
 //------------------------------------------------------------------
 // Loop over CG iterations
 //------------------------------------------------------------------
 //  Gint::SynchMachine();
-
-  for(i=0; i < max_itr; i++){
-    timeval start,end;
-    itr++;
-    res_norm_sq_prv = res_norm_sq_cur;
-
-    // mmp = MatPcDagMatPc * dir
-    // d = <dir, MatPcDagMatPc*dir>
-    MatPcDagMatPc(mmp, dir, &d);
-
-#ifdef REPRODUCE_TEST 
-
-    /* Check reproducibility */
-    if ( test == 0) d_store[ i ] = d;
-    else if ( d != d_store[ i ] )
-      InterruptExit(-1, "NODE FAILS TO REPRODUCE");
-    /* End of Check */
-
-#endif
-#ifdef PROFILE
+  
+    for(i=0; i < max_itr; i++){
+      timeval start,end;
+      itr++;
+      res_norm_sq_prv = res_norm_sq_cur;
+  
+      // mmp = MatPcDagMatPc * dir
+      // d = <dir, MatPcDagMatPc*dir>
+      MatPcDagMatPc(mmp, dir, &d);
+  
+    if (test_num) {
+  
+      /* Check reproducibility */
+      if ( test == 0) d_store[ i ] = d;
+      else if ( d != d_store[ i ] ){
+        fprintf(stderr, "NODE FAILS TO REPRODUCE");
+        InterruptExit(-1, "NODE FAILS TO REPRODUCE");
+      }
+      /* End of Check */
+  
+    }
+  #ifdef PROFILE
 //    gettimeofday(&linalg_tmp,NULL);
 //    nflops_tmp = 0;
-#endif
+  #endif
+    
+      DiracOpGlbSum(&d);
   
-    DiracOpGlbSum(&d);
-
-    // If d = 0 we are done
-    if(d == 0.0) break;
-    //??? or should we give a warning or error? Yes we should, really.
-
-    a = -res_norm_sq_prv / d;
-
-    // res = - a * (MatPcDagMatPc * dir) + res;
-    // res_norm_sq_cur = res * res
-
-    invcg_r_norm(X+GRAN, &a, Fmmp, X+GRAN, f_size_cb/GRAN, &res_norm_sq_cur);
-    DiracOpGlbSum(&res_norm_sq_cur);
-#ifdef PROFILE
+      // If d = 0 we are done
+      if(d == 0.0) break;
+      //??? or should we give a warning or error? Yes we should, really.
+  
+      a = -res_norm_sq_prv / d;
+  
+      // res = - a * (MatPcDagMatPc * dir) + res;
+      // res_norm_sq_cur = res * res
+  
+      invcg_r_norm(X+GRAN, &a, Fmmp, X+GRAN, f_size_cb/GRAN, &res_norm_sq_cur);
+      DiracOpGlbSum(&res_norm_sq_cur);
+  #ifdef PROFILE
 //    nflops_tmp +=f_size_cb*4;
-#endif
-    CGflops+=f_size_cb*4;
-
-    a = -a;
-    b = res_norm_sq_cur / res_norm_sq_prv;
-
-    // sol = a * dir + sol;
-    //sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
-    // dir = b * dir + res;
-    invcg_xp_update(X, Fdir, &a, &b, Fdir, X, f_size_cb/GRAN);
-
-
-#ifdef PROFILE
+  #endif
+      CGflops+=f_size_cb*4;
+  
+      a = -a;
+      b = res_norm_sq_cur / res_norm_sq_prv;
+  
+      // sol = a * dir + sol;
+      //sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
+      // dir = b * dir + res;
+      invcg_xp_update(X, Fdir, &a, &b, Fdir, X, f_size_cb/GRAN);
+  
+  
+  #ifdef PROFILE
 //    linalg_start = linalg_tmp;
 //    gettimeofday(&linalg_end,NULL);
 //    nflops =nflops_tmp+f_size_cb*4;
-#endif
-    CGflops+=f_size_cb*4;
-
-    // if( |res|^2 <= stp_cnd ) we are done
-    VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", itr, IFloat(res_norm_sq_cur));
-    if(res_norm_sq_cur <= stp_cnd) break;
-
-  }
-
-#ifdef PROFILE
-  gettimeofday(&end,NULL);
-  print_flops(cname,fname,CGflops,&start,&end); 
-#endif
-
-  // It has not reached stp_cnd: Issue a warning
-  if(itr == dirac_arg->max_num_iter - 1){
-    VRB.Warn(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
-	     itr+1, IFloat(res_norm_sq_cur) );
-  }
-
+  #endif
+      CGflops+=f_size_cb*4;
+  
+      // if( |res|^2 <= stp_cnd ) we are done
+      VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", itr, IFloat(res_norm_sq_cur));
+      if(res_norm_sq_cur <= stp_cnd) break;
+  
+    }
+  
+  #ifdef PROFILE
+    gettimeofday(&end,NULL);
+    print_flops(cname,fname,CGflops,&start,&end); 
+  #endif
+  
+    // It has not reached stp_cnd: Issue a warning
+    if(itr == dirac_arg->max_num_iter - 1){
+      VRB.Warn(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
+  	     itr+1, IFloat(res_norm_sq_cur) );
+    }
+  
 //------------------------------------------------------------------
 // Done. Finish up and return
 //------------------------------------------------------------------
-  // Calculate and set true residual: 
-  // true_res = |src - MatPcDagMatPc * sol| / |src|
-  Xptr = X-GRAN;
-  for (j=0; j<f_size_cb; j++) {
-    if (j%GRAN==0) Xptr += GRAN;
-    *(Fsol++) = *(Xptr++);
+    // Calculate and set true residual: 
+    // true_res = |src - MatPcDagMatPc * sol| / |src|
+    Xptr = X-GRAN;
+    for (j=0; j<f_size_cb; j++) {
+      if (j%GRAN==0) Xptr += GRAN;
+      *(Fsol++) = *(Xptr++);
+    }
+  
+    MatPcDagMatPc(mmp, sol);
+    dir->CopyVec(src, f_size_cb);
+    dir->VecMinusEquVec(mmp, f_size_cb);
+    res_norm_sq_cur = dir->NormSqNode(f_size_cb);
+    DiracOpGlbSum(&res_norm_sq_cur);
+    Float tmp = res_norm_sq_cur / src_norm_sq;
+    tmp = sqrt(tmp);
+    if(true_res != 0){
+      *true_res = tmp;
+    }
+    VRB.Result(cname,fname, "True |res| / |src| = %e, iter = %d\n", 
+  	     IFloat(tmp), itr+1);
   }
 
-  MatPcDagMatPc(mmp, sol);
-  dir->CopyVec(src, f_size_cb);
-  dir->VecMinusEquVec(mmp, f_size_cb);
-  res_norm_sq_cur = dir->NormSqNode(f_size_cb);
-  DiracOpGlbSum(&res_norm_sq_cur);
-  Float tmp = res_norm_sq_cur / src_norm_sq;
-  tmp = sqrt(tmp);
-  if(true_res != 0){
-    *true_res = tmp;
-  }
-  VRB.Result(cname,fname, "True |res| / |src| = %e, iter = %d\n", 
-	     IFloat(tmp), itr+1);
-
-#ifdef REPRODUCE_TEST 
-  }
+  if (test_num) {
   VRB.Sfree(cname, fname,"d_store", d_store);
   sfree(d_store);
   VRB.Sfree(cname, fname,"sol_store", sol_store);
   sfree(sol_store);
+  }
 
-#endif
-
-  // Free memory
+// Free memory
   VRB.Sfree(cname,fname, "mmp", mmp);
   qfree(mmp);
   VRB.Sfree(cname,fname, "dir", dir);
@@ -421,7 +429,8 @@ int DiracOp::InvCg(Vector *out,
   VRB.LedFlash(cname,fname,2);
   VRB.LedOn(cname,fname);
 
-  // Return number of iterations
+// Return number of iterations
+  CGcount++;
   return itr+1;
 
 }

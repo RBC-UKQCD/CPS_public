@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.4 2004-08-18 11:57:48 zs Exp $
+  $Id: inv_cg.C,v 1.5 2005-03-07 00:24:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.4 2004-08-18 11:57:48 zs Exp $
-//  $Id: inv_cg.C,v 1.4 2004-08-18 11:57:48 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:24:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.5 2005-03-07 00:24:46 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.5 2005-03-07 00:24:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -208,11 +208,11 @@ int DiracOp::InvCg(Vector *out,
 
 // Allocate space for storing d
 //------------------------------------------------------------------
-  Float *d_store = (Float *) smalloc( dirac_arg->max_num_iter-1 * sizeof(Float));
+  Float *d_store = (Float *) smalloc( (dirac_arg->max_num_iter-1) * sizeof(Float));
 
   if(d_store == 0)
     ERR.Pointer(cname,fname, "d_store");
-  VRB.Smalloc(cname,fname, "d_store", d_store, dirac_arg->max_num_iter-1 * sizeof(Float));
+  VRB.Smalloc(cname,fname, "d_store", d_store, (dirac_arg->max_num_iter-1) * sizeof(Float));
 
   for ( int n = 0; n < dirac_arg->max_num_iter-1; n++ )  d_store[n] = 0;
 

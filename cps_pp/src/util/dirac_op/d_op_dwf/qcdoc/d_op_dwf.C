@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.6 2004-08-18 11:57:50 zs Exp $
+  $Id: d_op_dwf.C,v 1.7 2005-03-07 00:24:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.6 2004-08-18 11:57:50 zs Exp $
-//  $Id: d_op_dwf.C,v 1.6 2004-08-18 11:57:50 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:24:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.7 2005-03-07 00:24:48 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.7 2005-03-07 00:24:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -111,19 +111,6 @@ DiracOpDwf::DiracOpDwf(Lattice & latt,
   dwf_arg->dwf_kappa = 
     1.0 / ( 2 * (4 + GJP.DwfA5Inv() - GJP.DwfHeight()) );
 //  printf("new_gauge_field=%p size = %x \n",new_gauge_field,sizeof(Matrix)*GJP.VolNodeSites()*4);
-#undef NEW_FIELD
-#ifdef NEW_FIELD
-  Float time = -dclock();
-  new_gauge_field  = (Matrix *)fmalloc(sizeof(Matrix)*GJP.VolNodeSites()*4);
-  Matrix *edram = new_gauge_field;
-  Matrix *ddr = gauge_field;
-//  for(int i = 0;i<GJP.VolNodeSites()*4;i++) *edram++ = *ddr++;
-  memcpy(edram,ddr,sizeof(Matrix)*GJP.VolNodeSites()*4);
-  old_gauge_field = gauge_field;
-  gauge_field  = new_gauge_field;
-  time += dclock();
-  print_flops(cname,fname,0,time);
-#endif
 
 }
 
@@ -137,11 +124,6 @@ DiracOpDwf::DiracOpDwf(Lattice & latt,
 DiracOpDwf::~DiracOpDwf() {
   char *fname = "~DiracOpDwf()";
   VRB.Func(cname,fname);
-
-#ifdef NEW_FIELD
-  ffree(new_gauge_field);
-  gauge_field = old_gauge_field;
-#endif
 
   //----------------------------------------------------------------
   // Do the necessary conversions

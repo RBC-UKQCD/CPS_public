@@ -1,10 +1,12 @@
+#define PROFILE
+
 #include <stdio.h>
 #include <config.h>
 CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOp class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.9 2005-02-18 20:18:11 mclark Exp $
+   $Id: minvcg.C,v 1.10 2005-03-07 00:24:47 chulwoo Exp $
  */
 
 CPS_END_NAMESPACE
@@ -16,6 +18,11 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 #include <math.h>
+
+#ifdef PROFILE
+#include <util/time.h>
+#endif
+
 CPS_START_NAMESPACE
 
 /*!
@@ -92,6 +99,7 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
     
   int convP;
   int *convsP = (int*)smalloc(Nmass*sizeof(int));
+  int *converged = (int*)smalloc(Nmass*sizeof(int));
   
   Float a=0, as, b, bp, b_tmp;
   Float *bs = (Float*)smalloc(Nmass * sizeof(Float));
@@ -113,18 +121,26 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
     return 0;
   }
   
-  r-> CopyVec(chi,f_size);
-  for (s=0; s<Nmass; s++) p[s] -> CopyVec(chi,f_size);
-  cp = chi_norm;
+  if (type == SINGLE || type == MULTI) {
+    r-> CopyVec(chi,f_size);
+    cp = chi_norm;
+  } else if (type == GENERAL) {
+    MatPcDagMatPc(r,psi[isz]);
+    r -> FTimesV1MinusV2(1.0,chi,r,f_size);
+    cp = r -> NormSqGlbSum(f_size);
+  }
+
+  for (s=0; s<Nmass; s++) p[s] -> CopyVec(r,f_size);
 
   for (s=0; s<Nmass; s++) {
     rsdcg_sq[s] = RsdCG[s]*RsdCG[s];
     rsd_sq[s] = cp*rsdcg_sq[s];
+    converged[s] = 0;
   }
 
   /*  d = <p, A.p>  */
   if (mass[isz] > 0) {
-    MatPcDagMatPc(Ap,p[isz],dot);
+    MatPcDagMatPc(Ap,p[isz]);
     Ap -> FTimesV1PlusV2(mass[isz],p[isz],Ap, f_size);
     d = p[isz] -> ReDotProductGlbSum(Ap, f_size);
   } else {
@@ -173,6 +189,13 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
   // a[k+1] = |r[k]**2/ |r[k-1]|**2
   a = c/cp;
   
+#ifdef PROFILE
+  struct timeval start;
+  struct timeval end;
+  CGflops = 0;
+  gettimeofday(&start,NULL);
+#endif
+
   // for k=1 until MaxCG do
   // if |psi[k+1] - psi[k]| <= RsdCG |psi[k+1]| then return
   for (k=1; k<=dirac_arg->max_num_iter && !convP; k++) {
@@ -187,13 +210,13 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
       if (convsP[s]) continue;
       if (s==isz) {
 	p[s] -> FTimesV1PlusV2(a,p[s],r,f_size);
+	CGflops += f_size*2;
       } else {
 	as = a * (z[iz][s] * bs[s]) / (z[1-iz][s] * b);
 	p[s] -> VecTimesEquFloat(as,f_size);	
 	p[s] -> FTimesV1PlusV2(z[iz][s],r,p[s],f_size);	
+	CGflops += f_size*3;
       }
-      IFloat *Ap_tmp = (IFloat *)p[s];
-      VRB.Flow(cname,fname,"isz = %d as = %e p[%d] =%e\n",isz, as, s,*Ap_tmp);
     }
     
     // cp = |r[k]**2
@@ -204,12 +227,11 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
       MatPcDagMatPc(Ap,p[isz],dot);
       Ap -> FTimesV1PlusV2(mass[isz],p[isz],Ap, f_size);
       d = p[isz] -> ReDotProductGlbSum(Ap, f_size);
+      CGflops += f_size*4;
     } else {
       MatPcDagMatPc(Ap,p[isz],&d);
       DiracOpGlbSum(&d);
     }
-    IFloat *Ap_tmp = (IFloat *)Ap;
-    VRB.Flow(cname,fname,"Ap =%e  |b[%d]^2 =%e\n",*Ap_tmp,k,d);
 
     bp = b;
     b = -cp/d;
@@ -229,7 +251,8 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
     r -> FTimesV1PlusV2(b,Ap,r,f_size);
     // c = |r[k]|**2
     c = r-> NormSqGlbSum(f_size);
-    
+    CGflops += f_size*4;    
+
     // p[k+1] = r[k+1] + a[k+1] p[k]
     //   Compute the shifted as
     //   ps[k+1] = zs[k+1] r[k+1] + a[k+1] ps[k]
@@ -239,26 +262,25 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
       for (s=0; s<Nmass; s++) {
 	if (convsP[s]) continue;
 	psi[0]->FTimesV1PlusV2(-bs[s]*alpha[s],p[s],psi[0],f_size);
+	CGflops += f_size*2;
       }
     else
       for (s=0; s<Nmass; s++) {
 	if (convsP[s]) continue;
 	psi[s]->FTimesV1PlusV2(-bs[s],p[s],psi[s],f_size);
+	CGflops += f_size*2;
       }
     
     // if |psi[k+1] -psi[k]| <= rsdCG |psi[k+1]| then return
     // or if |r[k+1]| <= RsdCG |chi| then return
     for (s=0; s<Nmass; s++) {
       if (convsP[s]) continue;
-      // convergance methods
-      
       //check norm of shifted residuals
       css = c * z[iz][s] * z[iz][s];
       convsP[s] = (css < rsd_sq[s]) ? 1 : 0;
-
       if (convsP[s]){
-	RsdCG[s] = sqrt(css);
-	VRB.Result(cname,fname,"%d shift converged, iter = %d, res = %e\n",s,k,css);
+	RsdCG[s] = css;
+	converged[s] = k;
       }
     }    
     
@@ -267,6 +289,25 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
     if (convP) for (s=0; s<Nmass; s++) if (!convsP[s]) convP = 0;
   }
   
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  print_flops(cname,fname,CGflops,&start,&end); 
+#endif
+
+  if (k >= dirac_arg->max_num_iter)   // It has not reached stp_cnd: Issue a warning
+    VRB.Warn(cname,fname,"CG reached max iterations = %d. |res|^2 = %e\n",k, css);
+
+  for (s=Nmass-1; s>=0; s--) {
+    if (convsP[s]) {
+      VRB.Result(cname,fname,"%d shift converged, iter = %d, res^2 = %e\n",s,converged[s],RsdCG[s]);
+      RsdCG[s] = sqrt(RsdCG[s]);
+    } else {
+      RsdCG[s] = c*z[iz][s]*z[iz][s];
+      VRB.Result(cname,fname,"%d shift did not converge, iter = %d, res^2 = %e\n",s,k,RsdCG[s]);
+      RsdCG[s] = sqrt(RsdCG[s]);
+    }
+  }
+
   // free arrays and vectors
   for (s=0; s<Nmass; s++)
       sfree(*(p+s), cname, fname, "p[s]");
@@ -278,12 +319,11 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
   sfree(*(z+1));
   sfree(*z);
   sfree(z);
+  sfree(converged);
   sfree(convsP);
   sfree(rsdcg_sq);
   sfree(rsd_sq);
   
-  if (k >= dirac_arg->max_num_iter)   // It has not reached stp_cnd: Issue a warning
-    VRB.Warn(cname,fname,"CG reached max iterations = %d. |res|^2 = %e\n",k, css);
   return k;
 }
 

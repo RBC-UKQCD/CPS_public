@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_4.C,v 1.3 2004-08-18 11:57:50 zs Exp $
-//  $Id: dwf_dslash_4.C,v 1.3 2004-08-18 11:57:50 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:24:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_4.C,v 1.4 2005-03-07 00:24:49 chulwoo Exp $
+//  $Id: dwf_dslash_4.C,v 1.4 2005-03-07 00:24:49 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_4.C,v $
 //  $State: Exp $
 //
@@ -43,7 +43,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #endif
 
-#define MAX_LS 32
+#define MAX_LS 64
 
 void dwf_dslash_4(Vector *out, 
 		  Matrix *gauge_field, 
@@ -83,9 +83,11 @@ void dwf_dslash_4(Vector *out,
 
   // I'm a bad programmer
   if ( size_cb[0] != size_cb[1] ) { 
+    printf("dwf_dslash_4:size_cb[0](%d) != size_cb[1]\n(%d)\n",size_cb[0],size_cb[1]);
     exit(-1);
   }
   if ( ls > MAX_LS ) { 
+    printf("dwf_dslash_4:ls(%d) is larger than MAX_LS(%d)\n",ls,MAX_LS);
     exit(-1);
   }
 
