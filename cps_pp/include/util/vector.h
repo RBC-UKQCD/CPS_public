@@ -5,26 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.7 2004-08-05 18:53:19 mclark Exp $
+  $Id: vector.h,v 1.8 2004-08-08 05:05:29 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-08-05 18:53:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.7 2004-08-05 18:53:19 mclark Exp $
-//  $Id: vector.h,v 1.7 2004-08-05 18:53:19 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-08 05:05:29 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.8 2004-08-08 05:05:29 chulwoo Exp $
+//  $Id: vector.h,v 1.8 2004-08-08 05:05:29 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.6  2004/07/08 22:49:58  chulwoo
-//  *** empty log message ***
-//
-//  Revision 1.5  2004/07/01 17:43:41  chulwoo
-//  merging with qos-2-3-pre1-CJ
-//
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //

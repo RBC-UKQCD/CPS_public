@@ -8,5 +8,6 @@ Float dclock(void);
 Float print_flops(int nflops, Float time);
 Float print_flops(char *cname, char *fname,int nflops, Float time);
 Float print_flops(int nflops, struct timeval *start, struct timeval *end);
+Float print_flops(char *cname, char *fname, int nflops, struct timeval *start, struct timeval *end);
 CPS_END_NAMESPACE
 #endif

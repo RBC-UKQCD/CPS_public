@@ -2,23 +2,24 @@
 #ifdef PARALLEL
 #include<comms/sysfunc.h>
 #endif
+#include<util/pt_int.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.10 2004-08-05 20:37:20 mclark Exp $
+  $Id: pt.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-08-05 20:37:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.10 2004-08-05 20:37:20 mclark Exp $
-//  $Id: pt.h,v 1.10 2004-08-05 20:37:20 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-08 05:05:29 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
+//  $Id: pt.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -139,16 +140,6 @@ class ParTransAsqtad : public ParTransStagTypes
 
     Vector *frm_tmp;     // Temporary fermion field
 
-    IFloat *rcv_buf[2*6];
-    IFloat *tmp_buf[2*6];
-    IFloat *gauge_field_addr;
-
-    void pt_init(const void *);
-    void pt_init_g();
-    void pt_delete();
-    void pt_delete_g();
-
-
     CnvFrmType converted;
 
     int Offset(int dir, int hop);
@@ -159,7 +150,6 @@ class ParTransAsqtad : public ParTransStagTypes
     /*!
       \param latt The lattice containing the gauge field on which this
       operation is defined.
-      \pre The gauge field should be in staggered order (::STAG).
     */
     ParTransAsqtad(Lattice& latt);            // Lattice object.
 
@@ -172,8 +162,8 @@ class ParTransAsqtad : public ParTransStagTypes
       \pre The gauge field should be in staggered order (::STAG).
       \pre The Vector fields should be in CANONICAL order.
      */
-    void run(int n, Vector **vout, Vector **vin, const int *dir );
-
+    void run(int n, Vector **vout, Vector **vin, const int *dir )
+    { pt_1vec(n,(IFloat **)vout, (IFloat **)vin, dir);}
     //! Parallel transports fields of staggered fermionic vectors.
     /*!
       \param n The number of fields.
@@ -183,7 +173,8 @@ class ParTransAsqtad : public ParTransStagTypes
       \pre The gauge field should be in staggered order (::STAG).
       \pre The Matrix fields should be in CANONICAL order.      
      */
-    void run(int n, Matrix **mout, Matrix **min, const int *dir );
+    void run(int n, Matrix **mout, Matrix **min, const int *dir )
+    { pt_mat(n,(IFloat **)mout, (IFloat **)min, dir);}
 
     //! Not implemented
     void run(Vector *vout, Vector *vin, int dir );
@@ -204,6 +195,56 @@ class ParTransAsqtad : public ParTransStagTypes
     ~ParTransAsqtad();
 
 };
+
+//------------------------------------------------------------------
+
+//! A class describing parallel transports for all sorts of staggered fermions.
+/*!
+  These are operations of the form
+  \f$ u(x) = U_\mu(x) v(x+\mu) \f$
+  where \e u and \e v are fermionic vectors or 3x3 matrices.
+
+  This class just reimplements ParTrans; the derived class should be used.
+*/
+//------------------------------------------------------------------
+class ParTransWilsonTypes : public ParTrans
+{
+ private:
+  char *cname;    // Class name.
+
+ public:
+  ParTransWilsonTypes(Lattice& latt);            // Lattice object.
+
+  virtual ~ParTransWilsonTypes();
+
+};
+
+//------------------------------------------------------------------
+
+//! A class describing parallel transports for all sorts of staggered fermions.
+/*!
+  These are operations of the form
+  \f$ u(x) = U_\mu(x) v(x+\mu) \f$
+  where \e u and \e v are fermionic vectors or 3x3 matrices.
+
+  This class just reimplements ParTrans; the derived class should be used.
+*/
+//------------------------------------------------------------------
+class ParTransGauge : public ParTrans
+{
+ private:
+  char *cname;    // Class name.
+
+ public:
+  ParTransGauge(Lattice& latt);            // Lattice object.
+
+  virtual ~ParTransGauge();
+
+  void run(int n, Matrix **mout, Matrix **min, const int *dir )
+    { pt_mat(n,(IFloat **)mout, (IFloat **)min, dir);}
+
+};
+
 
 #endif
 

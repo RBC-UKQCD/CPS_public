@@ -145,6 +145,8 @@ class Lattice
     // the declarations for GetLink and GetLinkOld
     // used to be protected and listed above (before void MltFloatImpl)
 
+	int smeared;
+
  public:
 
     const Matrix * GetLink(const int *x, int mu) const;
@@ -1305,6 +1307,32 @@ class GimprOLSym : public virtual Lattice
   Most of the methods do nothing.
   \ingroup factions
 */
+
+//-------------------------------------------------------------------
+// A class for 'improved' (using smeared links) lattice
+//------------------------------------------------------------------
+
+class Fsmear : public virtual Lattice
+{
+private:
+    char *cname;    // Class name.
+
+protected:
+    int n_fields;  // number of smeared fields
+    Matrix **fields;
+
+public:
+
+    Fsmear(int n_smear);
+
+    ~Fsmear();
+
+    Matrix *Fields(int n);
+
+    virtual void Smear() = 0 ; //pure virtual function
+
+};
+
 //------------------------------------------------------------------
 class Fnone : public virtual Lattice
 {
@@ -1550,7 +1578,7 @@ class ParTransAsqtad; //forward declaration
 */
 //------------------------------------------------------------------
 
-class Fasqtad : public virtual FstagTypes
+class Fasqtad : public virtual FstagTypes, public virtual Fsmear
 {
  private:
     char *cname;    // Class name.
@@ -1605,6 +1633,8 @@ class Fasqtad : public virtual FstagTypes
 			      Vector **sol_d);
 
     // Various utility routines for the momentum force computation.
+
+	void Smear();
     
   private:
 
@@ -2372,8 +2402,8 @@ class GnoneFdwf
 /*! \ingroup latactions */
 //------------------------------------------------------------------
 class GwilsonFnone 
-    : public virtual Lattice, 
-    public Gwilson, 
+//    : Public virtual Lattice, 
+    : public Gwilson, 
     public Fnone
 {
  private:

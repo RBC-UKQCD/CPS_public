@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.10 2004-08-05 18:53:19 mclark Exp $
+  $Id: random.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-08-05 18:53:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.10 2004-08-05 18:53:19 mclark Exp $
-//  $Id: random.h,v 1.10 2004-08-05 18:53:19 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-08 05:05:29 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
+//  $Id: random.h,v 1.11 2004-08-08 05:05:29 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -36,35 +36,35 @@ CPS_START_NAMESPACE
   This uses the Fibonacci RNG routine (ran3) from Numerical Recipes in C
 */
 //---------------------------------------------------------------
+const long long MBIG  = 1000000000;
+const IFloat FAC = 1.0E-09;			// 1.0/MBIG
 class RandomGenerator {
   private:
 
     static const int state_size = 55;
-    int ma[state_size];	// The value 55(range ma[0...54])
+    long long ma[state_size];	// The value 55(range ma[0...54])
     				// is special and should not be
 				// modified.
     int inext;
     int inextp;
-    static const int MBIG  = 1000000000;
-    IFloat FAC;			// 1.0/MBIG
     
   public:
 
     RandomGenerator() {
-      FAC = 1e-9;
+//      FAC = 1e-9;
     }
 
     //! Gets a random number 
     virtual IFloat Rand();
 
     //! Seeds the RNG.
-    void Reset(int seed);
+    void Reset(long long seed);
 
     //! Stores the RNG state.
-    void StoreSeeds(unsigned *to) const;
+    void StoreSeeds(unsigned long long *to) const;
 
     //! Loads the RNG state.
-    void RestoreSeeds(const unsigned *from);
+    void RestoreSeeds(const unsigned long long *from);
 
     //! Size of the RNG state.
     int StateSize() const;
@@ -264,19 +264,19 @@ class LatRanGen
 
 
     //! Assign the  state to a selected RNG.
-    void SetState(const unsigned*);
+    void SetState(const unsigned long long *);
 
     //! Assign the  state of all RNGs.      
-    void SetStates(unsigned**);
+    void SetStates(unsigned long long **);
 
     //! Get the total number of states
     int NStates() const;
     
     //! Retrieve the state of a single RNG
-    void GetState(unsigned*) const;
+    void GetState(unsigned long long *) const;
 
     //! Retrieve the state of all RNGs
-    void GetStates(unsigned**) const;
+    void GetStates(unsigned long long **) const;
     
 	
 };
