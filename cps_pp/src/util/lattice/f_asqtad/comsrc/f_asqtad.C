@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.16 2004-10-13 18:38:59 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.17 2004-11-07 23:43:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -379,7 +379,8 @@ void Fasqtad::Smear(){
   IFloat c7 = GJP.staple7_coeff();
   IFloat c6 = GJP.Lepage_coeff();
 
-  int i, j, N = 4;
+  int i, j; 
+  const int N = 4;
   int vol = GJP.VolNodeSites();
   ParTransAsqtad pt(*this);
   Matrix *result[NUM_DIR];
@@ -556,7 +557,6 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
      result[j+POS_DIR] = fields[2] + vol*j;
      VRB.Flow(cname,fname,"result[%d]=%p\n",j,result[j]);
   }
-  N = 4;  
   for(j = 0;j<vol;j++) Unit[j] = c2;
   for(int mu = 0;mu<NUM_DIR;mu += N){
     if (mu == 4) for(j = 0;j<vol;j++) Unit[j] = -c2;
