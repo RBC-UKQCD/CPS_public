@@ -4,14 +4,9 @@
 
   AlgSmear, AlgApeSmear, AlgKineticSmear and AlgHypSmear classes.
   
-  $Id: alg_smear.h,v 1.4 2004-09-02 16:53:01 zs Exp $
+  $Id: alg_smear.h,v 1.5 2005-01-13 06:06:48 chulwoo Exp $
 */
 //------------------------------------------------------------------
-/*
-  alg_smear.h
-  
-  chris dawson
-*/
 #ifndef _ALG_SMEAR_CD_
 #define _ALG_SMEAR_CD_
 
@@ -26,7 +21,7 @@ CPS_START_NAMESPACE
 
   Also allows for restricting smearing to hyperplanes orthogonal to a
   specified direction. On the base class level this will
-  only excludes the links in that direction from being
+  only exclude the links in that direction from being
   smeared; it is the responsibility of the derived classes
   to exclude links from being smeared with paths that move in
   that direction.
@@ -211,6 +206,8 @@ class AlgKineticSmear:public AlgSmear
 
   Allows for restricting smearing to hyperplanes orthogonal to a
   specified direction.
+
+  Note: the current implementation is aggressively inefficient
 
   \ingroup alg  
 */
