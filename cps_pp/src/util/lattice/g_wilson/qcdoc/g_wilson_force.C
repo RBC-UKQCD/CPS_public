@@ -108,5 +108,6 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
   }
   for(int i = 0;i<4;i++) 
   ffree(result[i]);
+  VRB.FuncEnd(cname,fname);
 }
 CPS_END_NAMESPACE

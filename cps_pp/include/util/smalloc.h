@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of dynamic memory management routines.	
 
-  $Id: smalloc.h,v 1.10 2004-10-27 14:30:25 zs Exp $
+  $Id: smalloc.h,v 1.11 2004-12-16 00:10:56 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-10-27 14:30:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.10 2004-10-27 14:30:25 zs Exp $
-//  $Id: smalloc.h,v 1.10 2004-10-27 14:30:25 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-12-16 00:10:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.11 2004-12-16 00:10:56 chulwoo Exp $
+//  $Id: smalloc.h,v 1.11 2004-12-16 00:10:56 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: smalloc.h,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v $
 //  $State: Exp $
 //
@@ -44,7 +44,8 @@ CPS_START_NAMESPACE
   \post Program exits with the appropriate Error code if allocation fails.  
 */
 void* smalloc(size_t request,
-	      const char *vname="", const char *fname="smalloc", const char *cname="");
+	      const char *vname, const char *fname="smalloc", const char *cname="");
+void* smalloc(size_t request);
 
 //! Allocate memory
 /*!
@@ -103,7 +104,8 @@ void sclear();
   \post  Exits with the appropriate Error code if allocation fails.  
 */
 void* fmalloc(size_t request,
-	      const char *vname="", const char *fname="fmalloc", const char *cname="");
+	      const char *vname, const char *fname="fmalloc", const char *cname="");
+void* fmalloc(size_t request);
 
 //! Free allocate memory
 /*!

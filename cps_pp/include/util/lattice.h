@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.32 2004-12-11 20:57:40 chulwoo Exp $
+  $Id: lattice.h,v 1.33 2004-12-16 00:10:55 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2004-12-11 20:57:40 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.32 2004-12-11 20:57:40 chulwoo Exp $
-  $Id: lattice.h,v 1.32 2004-12-11 20:57:40 chulwoo Exp $
+  $Date: 2004-12-16 00:10:55 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.33 2004-12-16 00:10:55 chulwoo Exp $
+  $Id: lattice.h,v 1.33 2004-12-16 00:10:55 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.32 $
+  $Revision: 1.33 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -24,6 +24,7 @@
 #ifndef INCLUDED_LATTICE_H
 #define INCLUDED_LATTICE_H           //!< Prevent multiple inclusion
 
+#include <util/gjp.h>
 #include <util/enum.h>
 #include <util/random.h>
 #include <util/vector.h>

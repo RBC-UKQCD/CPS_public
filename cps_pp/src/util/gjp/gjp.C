@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.21 2004-12-15 07:32:12 chulwoo Exp $
+  $Id: gjp.C,v 1.22 2004-12-16 00:10:57 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-15 07:32:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.21 2004-12-15 07:32:12 chulwoo Exp $
-//  $Id: gjp.C,v 1.21 2004-12-15 07:32:12 chulwoo Exp $
+//  $Date: 2004-12-16 00:10:57 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.22 2004-12-16 00:10:57 chulwoo Exp $
+//  $Id: gjp.C,v 1.22 2004-12-16 00:10:57 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -395,13 +395,15 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
 #endif
 
 //  if (doarg_int.xi_bare != 1.0) {
-  if (fabs(doarg_int.xi_bare - 1.0)< SMALL ) {
+  if (fabs(doarg_int.xi_bare - 1.0)> SMALL ) {
     doarg_int.clover_coeff_xi = rda.clover_coeff_xi;
     doarg_int.beta /= doarg_int.xi_bare;    
     doarg_int.xi_gfix *= doarg_int.xi_bare;
   } else {
     doarg_int.clover_coeff_xi = doarg_int.clover_coeff;
   }
+  printf("clover_coeff_xi - clover_coeff= %e\n",
+  doarg_int.clover_coeff_xi - doarg_int.clover_coeff);
 
 #if 0
   // Set the power plaquette cutoff.

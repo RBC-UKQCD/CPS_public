@@ -4,18 +4,19 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-21 20:16:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.12 2004-09-21 20:16:54 chulwoo Exp $
-//  $Id: main.C,v 1.12 2004-09-21 20:16:54 chulwoo Exp $
+//  $Date: 2004-12-16 00:10:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.13 2004-12-16 00:10:59 chulwoo Exp $
+//  $Id: main.C,v 1.13 2004-12-16 00:10:59 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
+#include<util/gjp.h>
 #include<util/lattice.h>
 #include<alg/alg_hmd.h>
 #include<alg/alg_plaq.h>

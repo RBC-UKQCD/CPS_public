@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: fmalloc.C,v 1.5 2004-10-27 14:24:31 zs Exp $
+  $Id: fmalloc.C,v 1.6 2004-12-16 00:10:56 chulwoo Exp $
 */
 
 #include <stdlib.h>
@@ -17,6 +17,10 @@ void* fmalloc(size_t request,
 
     return smalloc(request, vname, fname, cname);
     
+}
+
+void* fmalloc(size_t request){
+    return smalloc(request);
 }
 
 void ffree(void* p, const char *vname, const char *fname, const char *cname){

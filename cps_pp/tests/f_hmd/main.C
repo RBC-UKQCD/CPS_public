@@ -4,13 +4,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-15 07:32:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.21 2004-12-15 07:32:17 chulwoo Exp $
-//  $Id: main.C,v 1.21 2004-12-15 07:32:17 chulwoo Exp $
+//  $Date: 2004-12-16 00:10:58 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.22 2004-12-16 00:10:58 chulwoo Exp $
+//  $Id: main.C,v 1.22 2004-12-16 00:10:58 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -29,6 +29,8 @@ USING_NAMESPACE_CPS
 static int nx,ny,nz,nt,ns;
 const int SAVE_RNG = 0;
 const int LOAD_RNG = 0;
+const int LOAD_DOARG = 0;
+const int SAVE_DOARG = 0;
 
 int main(int argc,char *argv[])
 {
@@ -41,45 +43,52 @@ int main(int argc,char *argv[])
 #endif
 
   Start();
-  if (argc<6) {printf("usage: %s nx ny nz nt ns\n",argv[0]);exit(-2);}
-  sscanf(argv[1],"%d",&nx);
-  sscanf(argv[2],"%d",&ny);
-  sscanf(argv[3],"%d",&nz);
-  sscanf(argv[4],"%d",&nt);
-  sscanf(argv[5],"%d",&ns);
-  printf("sizes = %d %d %d %d %d\n",nx,ny,nz,nt,ns);
+
 
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
   //----------------------------------------------------------------
   DoArg do_arg;
 
-  do_arg.x_node_sites = nx/SizeX();
-  do_arg.y_node_sites = ny/SizeY();
-  do_arg.z_node_sites = nz/SizeZ();
-  do_arg.t_node_sites = nt/SizeT();
-  do_arg.s_node_sites = ns/SizeS();
-  do_arg.x_nodes = SizeX();
-  do_arg.y_nodes = SizeY();
-  do_arg.z_nodes = SizeZ();
-  do_arg.t_nodes = SizeT();
-  do_arg.s_nodes = SizeS();
-
-  do_arg.x_bc = BND_CND_PRD;
-  do_arg.y_bc = BND_CND_PRD;
-  do_arg.z_bc = BND_CND_PRD;
-  do_arg.t_bc = BND_CND_APRD;
+  if (LOAD_DOARG){
+    do_arg.Decode("do_arg.in", (char *)&do_arg);
+  } else {
+    if (argc<6) {printf("usage: %s nx ny nz nt ns\n",argv[0]);exit(-2);}
+    sscanf(argv[1],"%d",&nx);
+    sscanf(argv[2],"%d",&ny);
+    sscanf(argv[3],"%d",&nz);
+    sscanf(argv[4],"%d",&nt);
+    sscanf(argv[5],"%d",&ns);
+    printf("sizes = %d %d %d %d %d\n",nx,ny,nz,nt,ns);
+    do_arg.x_node_sites = nx/SizeX();
+    do_arg.y_node_sites = ny/SizeY();
+    do_arg.z_node_sites = nz/SizeZ();
+    do_arg.t_node_sites = nt/SizeT();
+    do_arg.s_node_sites = ns/SizeS();
+    do_arg.x_nodes = SizeX();
+    do_arg.y_nodes = SizeY();
+    do_arg.z_nodes = SizeZ();
+    do_arg.t_nodes = SizeT();
+    do_arg.s_nodes = SizeS();
+  
+    do_arg.x_bc = BND_CND_PRD;
+    do_arg.y_bc = BND_CND_PRD;
+    do_arg.z_bc = BND_CND_PRD;
+    do_arg.t_bc = BND_CND_APRD;
 #if TARGET ==QCDOC
-//  do_arg.start_conf_alloc_flag = QFAST;
-  do_arg.start_conf_alloc_flag = QCOMMS;
+  //  do_arg.start_conf_alloc_flag = QFAST;
+    do_arg.start_conf_alloc_flag = QCOMMS;
 #endif
-  do_arg.start_conf_kind = START_CONF_DISORD;
-  do_arg.start_seed_kind = START_SEED_FIXED;
+    do_arg.start_conf_kind = START_CONF_DISORD;
+    do_arg.start_seed_kind = START_SEED_FIXED;
+  
+    do_arg.beta = 5.5;
+    do_arg.dwf_height = 0.9;
+    do_arg.clover_coeff = 2.0171;
+  }
 
-  do_arg.beta = 5.5;
-  do_arg.dwf_height = 0.9;
-  do_arg.clover_coeff = 2.0171;
-  do_arg.Encode("do_arg.vml", (char *)&do_arg);
+  if(SAVE_DOARG)
+  do_arg.Encode("do_arg.out", (char *)&do_arg);
 
 #if TARGET==cpsMPI
     MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);    
@@ -92,10 +101,10 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
 
   VRB.Level(0);
-//  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
-//  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
-//  VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
-//  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+  VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_CLOCK_LEVEL);
   VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 

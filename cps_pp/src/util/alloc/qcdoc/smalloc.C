@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc.C,v 1.9 2004-10-27 14:24:31 zs Exp $
+  $Id: smalloc.C,v 1.10 2004-12-16 00:10:57 chulwoo Exp $
 */
 
 #include <util/error.h>
@@ -17,6 +17,11 @@ void* smalloc(size_t request,
     void *p = qalloc(QCOMMS,request);
     if (!p) ERR.Pointer(cname, fname, vname);
     VRB.Smalloc(cname, fname, vname, p, request);
+    return p;
+}
+
+void* smalloc(size_t request){
+    void *p = qalloc(QCOMMS,request);
     return p;
 }
 

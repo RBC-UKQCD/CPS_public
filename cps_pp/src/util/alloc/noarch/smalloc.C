@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc.C,v 1.4 2004-10-27 14:24:31 zs Exp $
+  $Id: smalloc.C,v 1.5 2004-12-16 00:10:56 chulwoo Exp $
 */
 
 #include <util/error.h>
@@ -12,10 +12,15 @@
 CPS_START_NAMESPACE
 
 void* smalloc(size_t request,
-	      const char *vname="", const char *fname="smalloc", const char *cname=""){
+	      const char *vname, const char *fname, const char *cname){
     void *p = malloc(request);
     if(!p) ERR.Pointer(cname, fname, vname);
     VRB.Smalloc(cname, fname, vname, p, request);
+    return p;
+}
+
+void* smalloc(size_t request){
+    void *p = malloc(request);
     return p;
 }
 

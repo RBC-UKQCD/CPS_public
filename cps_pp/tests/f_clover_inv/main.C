@@ -92,7 +92,7 @@ int main(int argc,char *argv[]){
     do_arg.beta = 5.5;
     do_arg.dwf_height = 0.9;
     do_arg.clover_coeff = 2.0171;
- //   do_arg.verbose_level = -1205;
+//   do_arg.verbose_level = -1205;
 
     do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
     do_arg.asqtad_naik = -1.0/24.0;
@@ -104,6 +104,7 @@ int main(int argc,char *argv[]){
 	VRB.Level(0);
 	VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
 	VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+	VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
 	VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
     
     CgArg cg_arg;

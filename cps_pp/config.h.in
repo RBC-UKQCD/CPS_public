@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.19 2004-12-15 07:32:05 chulwoo Exp $
+  $Id: config.h.in,v 1.20 2004-12-16 00:10:55 chulwoo Exp $
 */
 /* Global options for compiling the Columbia code:  
  * @configure_input@
@@ -12,13 +12,13 @@
  *  CVS keywords
  *
  *  $Author: chulwoo $
- *  $Date: 2004-12-15 07:32:05 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.19 2004-12-15 07:32:05 chulwoo Exp $
- *  $Id: config.h.in,v 1.19 2004-12-15 07:32:05 chulwoo Exp $
+ *  $Date: 2004-12-16 00:10:55 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.20 2004-12-16 00:10:55 chulwoo Exp $
+ *  $Id: config.h.in,v 1.20 2004-12-16 00:10:55 chulwoo Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.19 $
+ *  $Revision: 1.20 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -48,6 +48,7 @@
 #endif
 
 #if TARGET == QCDOC
+#include<qalloc.h>
 #include<qcdocos.h>
 #endif
 
