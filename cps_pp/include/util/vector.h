@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.10 2004-08-18 11:57:37 zs Exp $
+  $Id: vector.h,v 1.11 2004-08-19 22:22:01 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.10 2004-08-18 11:57:37 zs Exp $
-//  $Id: vector.h,v 1.10 2004-08-18 11:57:37 zs Exp $
+//  $Author: mclark $
+//  $Date: 2004-08-19 22:22:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.11 2004-08-19 22:22:01 mclark Exp $
+//  $Id: vector.h,v 1.11 2004-08-19 22:22:01 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -87,7 +87,7 @@ void compDotProduct(IFloat *c_r, IFloat *c_i,
 void cTimesV1PlusV2(IFloat *a, IFloat b_re, IFloat b_im, const IFloat *c,
                     const IFloat *d, int size);      
 
-    //! Not implemented
+    //! Not implemented on qcdsp
 void cTimesV1MinusV2(IFloat *a, IFloat b_re, IFloat b_im, const IFloat *c,
 	             const IFloat *d, int size);      // A = b*C-D
 
@@ -593,10 +593,21 @@ extern "C" {
     vaxpy3_norm((Vector *)res, scale, (Vector *)mult,(Vector *)add,ncvec,norm);
   }
 
-  void m1timesm2(int *length, const Matrix *m1, const Matrix *m2, Matrix *res);
-  void m1timesm2dag(int *length, const Matrix *m1, const Matrix *m2, Matrix *res);
-  void m1dagtimesm2dag(int *length, const Matrix *m1, const Matrix *m2, Matrix *res);
-  void gdagtimesmdag(int *length, const Matrix *g, const Matrix *m, Matrix *res);
+  // SU(3) * SU(3) streaming operations
+  void m1m2(Matrix *res, const Matrix *m1, const Matrix *m2, int *length);
+  void m1m2dag(Matrix *res, const Matrix *m1, const Matrix *m2, int *length);
+  void m1dagm2dag(Matrix *res, const Matrix *m1, const Matrix *m2, int *length);
+  void gdagmdag(Matrix *res, const Matrix *g, const Matrix *m, int *length);
+
+  // f*SU(3)*SU(3) + SU(3) streaming operations
+  void fm1m2pm3(Matrix *res, Float *scale, const Matrix *m1, 
+		const Matrix *m2, Matrix *m3, int *length);
+  void fm1m2dagpm3(Matrix *res, Float *scale, const Matrix *m1, 
+		   const Matrix *m2, Matrix *m3, int *length);
+  void fm1dagm2dagpm3(Matrix *res, Float *scale, const Matrix *m1, 
+		      const Matrix *m2, Matrix *m3, int *length);
+  void fgdagm1dagpm2(Matrix *res, Float *scale, const Matrix *g, 
+		     const Matrix *m1, Matrix *m2, int *length);
 
 }
 

@@ -1642,7 +1642,7 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
 
     // Various utility routines for the momentum force computation.
 
-	void Smear();
+    void Smear();
     
   private:
 
@@ -1650,16 +1650,16 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
     
     ChkbType parity(const int*);
 
-    void force_product_sum(const Matrix*,  int, IFloat, Matrix*, Matrix*);
+    void force_product_sum(const Matrix*,  int, IFloat, Matrix*);
     
     void force_product_sum(const Matrix*, const Matrix*, const Matrix*, 
-			   IFloat, Matrix*, Matrix*, Matrix*);
+			   IFloat, Matrix*, Matrix*);
 
     void force_product_sum(const Matrix*, const Matrix*, IFloat, 
-			   Matrix*, Matrix*);
+			   Matrix*);
 
     void force_product_d_sum(const Matrix*, const Matrix*, IFloat, 
-			     Matrix*, Matrix*);
+			     Matrix*);
 
     void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
 
