@@ -1,4 +1,4 @@
-///  $Id: main.C,v 1.8 2004-09-02 16:52:46 zs Exp $
+///  $Id: main.C,v 1.9 2004-09-03 12:33:06 zs Exp $
 ///  Demonstrate the random gauge transformation code.
 ///
 
@@ -14,7 +14,7 @@
  The gauge transformation code was orginally written
  by Chris Dawson (using existing code from the BNL group).
 
-$Id: main.C,v 1.8 2004-09-02 16:52:46 zs Exp $
+$Id: main.C,v 1.9 2004-09-03 12:33:06 zs Exp $
 */
 
 #include <config.h>
@@ -73,15 +73,6 @@ static const int nt = 4 ;
 int main(int argc,char *argv[])
 {
 
-
-  //  CommandLine::is(argc,argv);
-  
-  //  ReadLattice rl(CommandLine::arg());
-  ReadLattice rl("u_TEST_4223.101") ; 
-
-
-  
-  setup_do_arg(rl.do_arg) ; 
 
 #if TARGET==cpsMPI
   MPISCU::set_pe_grid(rl.do_arg.x_nodes, rl.do_arg.y_nodes, rl.do_arg.z_nodes, rl.do_arg.t_nodes);
