@@ -843,6 +843,7 @@ void asqtad_destroy_dirac_buf()
     for(k=0;k<3;k++)
     sfree(chi_off_node[k][i]);
 #endif
+    sfree(tmpfrm);
   }
 }
 //-------------------------------------------------------------------
@@ -2377,7 +2378,7 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
 #endif //SIMUL_AGG
 
 #ifndef SIMUL_U
-#if 1
+#if 0
   fp = fopen("uc_nl.h","w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat uc_nl%d[] LOCATE(\"edramnormal\") = {\n",j); 
@@ -2508,12 +2509,14 @@ extern "C"
 void asqtad_destroy_dirac_buf_g(void)
 {
   int i;
-#ifndef SIMUL_U
   for ( i = 0; i < 2; i++){
-  sfree(uc_l[i]);
-  sfree(uc_nl[i]);
-  }
+#ifndef SIMUL_U
+    sfree(uc_l[i]);
+    sfree(uc_nl[i]);
 #endif
+    sfree(uc_l_agg[i]);
+    sfree(uc_nl_agg[i]);
+  }
 }
 //---------------------------------------------------------------------
 //  Find nearest neighbor coordinate for coordinates given.  Nearest

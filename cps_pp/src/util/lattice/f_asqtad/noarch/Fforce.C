@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.5 2004-01-14 20:05:03 chulwoo Exp $
+  $Id: Fforce.C,v 1.6 2004-01-23 19:52:52 cwj Exp $
 */
 //--------------------------------------------------------------------
 
@@ -92,6 +92,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
     Vector *Psigma7[n_sign][n_sign][n_sign][n_sign][N];
     
     size = GJP.VolNodeSites()*sizeof(Vector);
+    
 
     for(int w=0; w<N; w++){
 	for(int i=0; i<n_sign; i++){
@@ -629,10 +630,29 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	}
     }
     
-	
-	sfree(tmp);
+    for(int w=0; w<N; w++){
+      for(int i=0; i<n_sign; i++){
+	pfree(Pnu[i][w]);
+	for(int j=0; j<n_sign; j++){
+	  pfree(P3[i][j][w]);
+	  pfree(Prhonu[i][j][w]);
+	  for(int k=0; k<n_sign; k++){
+	    pfree(P5[i][j][k][w]);
+	    for(int l=0; l<n_sign; l++){
+	      pfree(P7[i][j][k][l][w]);
+	      pfree(Psigma7[i][j][k][l][w]);
+	    }
+	  }
+	}
+      }
+    }
+    
+    for (int i=0; i<4; i++) free(force[i]);
+
+    sfree(tmp);
 //   Fconvert(tmp,STAG,CANONICAL);
 
+    return;
 }
 
 
@@ -655,10 +675,10 @@ int staggered_phase(const int *n, int mu){
     case 2:
 	return (n[0]+n[1]+n[3])%2?-1:1;
     }
-
+    
 //     for(p=0, d=0; d<mu; d++) p += n[d];
 //     return p%2?-1:1;
-    
+    return 0;
 }
 
 #undef FILE_PRINT
