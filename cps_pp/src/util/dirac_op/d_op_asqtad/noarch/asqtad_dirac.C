@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.15 2005-01-13 07:46:14 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.16 2005-03-09 18:11:54 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -1417,9 +1417,9 @@ int non_local_count_3[3][2];
  
   IFloat c1 = GJP.KS_coeff();
   IFloat c2 = GJP.Naik_coeff();
-  IFloat c3 = GJP.staple3_coeff();
+  IFloat c3 = -GJP.staple3_coeff();
   IFloat c5 = GJP.staple5_coeff();
-  IFloat c7 = GJP.staple7_coeff();
+  IFloat c7 = -GJP.staple7_coeff();
   IFloat c6 = GJP.Lepage_coeff(); 
 
   //-------------------------------------------------------------------

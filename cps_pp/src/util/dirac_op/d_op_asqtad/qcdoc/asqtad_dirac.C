@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:22:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.18 2005-03-07 00:22:22 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.18 2005-03-07 00:22:22 chulwoo Exp $
+//  $Date: 2005-03-09 18:11:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.19 2005-03-09 18:11:55 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.19 2005-03-09 18:11:55 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -185,9 +185,9 @@ void AsqD::init(AsqDArg *arg)
   for(int i = 0;i<4;i++) coor[i] = arg->coor[i];
   c1 = arg->c1;
   c2 = arg->c2;
-  c3 = arg->c3;
+  c3 = -arg->c3;
   c5 = arg->c5;
-  c7 = arg->c7;
+  c7 = -arg->c7;
   c6 = arg->c6;
   fat = (matrix *)arg->Fat;
   naik = (matrix *)arg->Naik;
@@ -783,11 +783,10 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
   Float c6 = GJP.Lepage_coeff();
 #else
 #endif
-  printf("fat=%p naik=%p naik_m=%p\n",fat,naik,naik_m);
   if (fat_p) fat = (matrix *)fat_p;
   if (naik_p) naik = (matrix *)naik_p;
   if (naikm_p) naik_m = (matrix *)naikm_p;
-  printf("fat=%p naik=%p naik_m=%p\n",fat,naik,naik_m);
+//  printf("fat=%p naik=%p naik_m=%p\n",fat,naik,naik_m);
   frm_tmp = frm_p;
  
 
