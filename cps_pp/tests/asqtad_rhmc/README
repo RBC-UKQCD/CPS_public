@@ -1,0 +1,166 @@
+Description: This is a description of how to use the RHMC algorithm in
+the CPS in the context of performing exact asqtad fermions.
+
+Author: Mike Clark (mike@ph.ed.ac.uk)
+
+The main.C program contained in this directory gives an example of how
+to perform 2+1 flavour simulations using asqtad fermions.  There are
+two important classes instantiated in this program, AlgRemez and
+AlgHmcRHMC, which are specific to performing exact Nf!=fermion
+multiplet (e.g. Nf != 4 for staggered types) simulations.
+
+For a description of how the RHMC works, see hep-lat/0309084.
+
+AlgRemez
+========
+
+AlgRemez is a class which contains the Remez algorithm, this algorithm
+is responsible for calculating the rational approximation used in the
+RHMC algorithm.  Thus it is from this class that the parameters for
+AlgHmcRHMC are generated.  The class has a simple interface and is
+very straightforward to use.
+
+It is important to note that AlgRemez is not built by default when
+building the CPS.  To enable it's build you must have the GNU MP
+(multi-precision) library installed (this can be downloaded from
+http://www.swox.com/gmp).  Once you have done this, you should then
+configure the Makefile to include the gmp specific parts of the CPS
+for building (at the time of writing, and for the forseeable future
+this is only AlgRemez).  This is done by
+
+./configure --enable-gmp=GMP_INCLUDE_PATH (+ any other relevant options)
+
+where GMP_LIB_PATH is the path of the installed gmp include files.
+You can then compile as usual, and everything should just work.
+Without doing the above, the example file in this directory will not
+compile due to the missing gmp library.
+
+The constructor for the class requires 3 parameters, the lower and
+upper bounds of the approximations validity and the precision at which
+the algorithm performs it's arithmetic.  For staggered type fermions,
+a conservative bound that applies to the spectral interval is
+(4*m^2)<lambda<(64+4*m^2), m is the fermion mass of the simulation.
+The precision of the working arithmetic in the algorithm is set by an
+integer which states the number of decimal digits accuracy which is
+required to achieve convergance in the algorithm.  The required
+precision is determined by the condition number of the problem
+(i.e. lambda_high/lambda_low), for most problems 50 digit precision
+seems to suffice, however, for some of the lightest fermion masses
+with large approximation degree, 100 digit precision may be required.
+This is purposely not hard coded into the class.
+
+So for a m=0.01, an instance of AlgRemez would be instantiated by
+
+AlgRemez remez(4.0*m*m, 64.0+4.0*m*m, 50);
+
+Once an instance has been created, an approximation can then be
+generted over the required interval.  To do this, one calls the
+generateApprox method remez.generateApprox(degree, num, den); where
+degree is the degree of the required approximation, and num and den
+determine the function, x^(num/den) being approximated, e.g. for a
+square root approximation the call would be
+
+remez.generateApprox(5, 1, 2);
+
+which would calculate a degree 5 rational approximation to the square
+root over the spectral range defined in the constructor.  Note that
+arguments num and den are unsigned quantities, to obtain the optimal
+rational approximation for x^(-1/2), the rational function is simply
+inverted.
+
+The maximum error of the approximation is returned by the
+generateApprox method, this can be used to test if the approximation
+is of sufficient quality or not.
+
+Once a suitable approximation has been produced, it has to be
+converted into partial fraction form, so that it is suitable for use
+RHMC algorithm.  To do this, there exists the methods getPFE and
+getIPFE, where the former returns the partial fraction fraction
+expansion of the approximating function and the latter, the partial
+fraction expansion of the inverse of the approximation e.g.
+
+remez.getPFE(&res[0], &poles[0], &norm);
+
+would perform the partial fraction expansion on the previously
+obtained approximation, and copy it into the array pointed to be res
+(residues) and poles.  The constant additive term is copied to norm.
+
+
+AlgHmcRHMC
+==========
+
+To perform simulations using the AlgHmcRHMC, there are many paramters
+which must be set and passed to the constructor.  The arguments
+specific to performing RHMC are conatined inside the HmdArg struct.
+As well as the usual parameters relevant to AlgHmcPhi, the following
+parameters must also be set:
+
+(int *) FRatDeg 
+(Float *) FRatNorm
+(Float **) FRatRes
+(Float **) FRatPoles
+
+These parameters are related to the rational approximation used when
+performing the MD integration of the gauge field.  The "F" stands for
+force, since these parameters are used to estimate the fermion force
+contribution to the momentum.  e.g. to set these parameters for 2
+flavours of staggered fermions using AlgRemez:
+
+lower = 4.0 * pow(hmd_arg.frm_mass[0],2);
+upper = 64.0 + lower;
+hmd_arg.FRatDeg[0] = 6;
+AlgRemez remez(lower,upper,50);
+remez.generateApprox(hmd_arg.FRatDeg[0],1,2);
+remez.getIPFE(hmd_arg.FRatRes[0],hmd_arg.FRatPole[0],&hmd_arg.FRatNorm[0]);
+
+It is the inverse function which require for the force since it is the
+inverse which appears in the action.
+
+It is a simlar story for the following parameters
+
+(int *) SRatDeg 
+(Float *) SRatNorm
+(Float **) SRatRes
+(Float **) SRatPoles
+(Float *) SIRatNorm
+(Float **) SIRatRes
+(Float **) SIRatPoles
+
+Here the rational functions SRat and SIRat are just the inverse of
+each other.  There is only one parameter SRatDeg since both
+approximations are of the smae degree.  The function SRat is required
+to evaluate the action, and is hence used for the Metropolis
+acceptance test.  SIRat is used to perform the heatbath.  The
+approximation required here is the square root of the approximation
+generated for the force, e.g.
+
+remez.generateApprox(hmd_arg.SRatDeg[0],1,4);
+
+Confusingly getIPFE is required for the function SRat and getPFE for
+SIRat (because the action S contains the inverse of the rational
+function, and vice versa, so it sort of make sense!).
+
+remez.getIPFE(hmd_arg.SRatRes[0],hmd_arg.SRatPole[0],&hmd_arg.SRatNorm[0]);
+remez.getPFE(hmd_arg.SIRatRes[0],hmd_arg.SIRatPole[0],&hmd_arg.SIRatNorm[0]);
+
+The approximations used in the action (and heatbath) should be
+"exact", and so the maximum error of the approximation should not be
+the greatest error in the simulation.  This means the approximation
+should be at least as good as the residuals of the inverter or
+floating point precision.  For the force approximations, any errors
+introduced by an inaccurate approximations are corrected by the
+Metropolis acceptance test, and so the deciding factor here should be
+what the lowest degree approximation is possible that has a minimal
+effect on the acceptance rate.  Typically an accuracy of 1 part in
+1000 is good enough, though this has not been tested on large volumes
+and small masses.
+
+The only other term of relevance is the sw (Sexton-Weingarten) term.
+With this term you can set the number of pure gauge fore contributions
+to the momentum per fermionic contribution.
+
+(int) sw
+
+All of the above should become clear by simply looking at the example
+code provided.
+
