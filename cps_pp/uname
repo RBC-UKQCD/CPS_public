@@ -1,8 +1,0 @@
-#!/bin/sh
-# uname(1) simulator, inspired by Pavel Roskin.
-
-[ $# -ne 1 ] && exec sh $0 -s
-[ $1 = -m ] && echo ia64 && exit 0
-[ $1 = -r ] && echo B.11.20 && exit 0
-[ $1 = -s ] && echo HP-UX && exit 0
-[ $1 = -v ] && echo A && exit 0
