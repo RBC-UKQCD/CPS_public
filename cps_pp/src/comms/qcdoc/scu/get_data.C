@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.8 2004-08-18 11:57:43 zs Exp $
+  $Id: get_data.C,v 1.9 2004-11-30 22:48:55 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.8 2004-08-18 11:57:43 zs Exp $
-//  $Id: get_data.C,v 1.8 2004-08-18 11:57:43 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-11-30 22:48:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.9 2004-11-30 22:48:55 chulwoo Exp $
+//  $Id: get_data.C,v 1.9 2004-11-30 22:48:55 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -50,6 +50,7 @@ CPS_START_NAMESPACE
 */
 //------------------------------------------------------------------
 const int MAX_LENGTH = 1024;
+const int MAX_COPY = 128;
 static IFloat *rcv_noncache=NULL;
 static IFloat *send_noncache=NULL;
 void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
@@ -249,7 +250,83 @@ void getMinus3Data(IFloat* rcv_buf, IFloat* send_buf, int len, int dir)
     qfree(tmp_buf);
 }
 
+static SCUDirArg scu_send;
+static SCUDirArg scu_recv;
+void getData(IFloat* rcv_buf, int rblklen, int rnumblk,int rstr,
+        IFloat* send_buf, int sblklen, int snumblk,int sstr,
+        int mu, int sign){
+	char *fname = "getData()";
+	int total_length;
+	if (rblklen !=sblklen)
+	ERR.General("",fname,
+"send and receive block size different: not implemented yet\n");
+	if ((total_length = rblklen*rnumblk) !=sblklen*snumblk)
+	ERR.General("",fname, "send and receive total size different\n");
+	if(gjp_local_axis[mu] == 0) {
+		IFloat *saddr = send_buf;
+		IFloat *raddr = rcv_buf;
+		int r_i=0, r_j=0;
+		for(int i = 0;i< snumblk;i++){
+			for(int j = 0;j< sblklen;j++){
+				*raddr++= *saddr++;
+				r_j++;
+				if (r_j>=rblklen){ r_i++;r_j=0; raddr += rstr;}
+			}
+			saddr +=sstr;
+		}
+		return;
+	}
+	int s_dir = 2*mu+(1+sign)/2; printf("%s:signe = %d send = %d\n",fname,sign,s_dir);
+	int r_dir = 2*mu+(1-sign)/2;
+	int r_copy = 0;
 
+	if (!qalloc_is_communicable(send_buf) ){
+		if (total_length > MAX_LENGTH)
+		ERR.General("",fname, "too big from non-communicable memory\n");
+		if (total_length > MAX_COPY ){
+			IFloat *saddr = send_buf;
+			IFloat *raddr = send_noncache;
+			int r_i=0, r_j=0;
+			for(int i = 0;i< snumblk;i++){
+				for(int j = 0;j< sblklen;j++){
+					*raddr++= *saddr++;
+				}
+				saddr +=sstr;
+			}
+    		scu_send.Init(send_noncache, gjp_scu_dir[s_dir], SCU_SEND, 
+			total_length*sizeof(IFloat));
+		} else 
+    	scu_send.Init(send_buf, gjp_scu_dir[s_dir], SCU_SEND,
+		sblklen*sizeof(IFloat),sblklen,sstr);
+	} 
+
+	if ( !qalloc_is_communicable(rcv_buf) ){
+		if (total_length > MAX_LENGTH)
+		ERR.General("",fname, "too big from non-communicable memory\n");
+		if (total_length > MAX_COPY ){
+			r_copy = 1;
+    		scu_recv.Init(rcv_noncache, gjp_scu_dir[r_dir], SCU_SEND, 
+				total_length*sizeof(IFloat));
+		} else 
+    		scu_recv.Init(rcv_buf, gjp_scu_dir[r_dir], SCU_SEND, 
+			rblklen*sizeof(IFloat),rblklen,rstr);
+	} 
+	scu_send.StartTrans();
+	scu_recv.StartTrans();
+	scu_send.TransComplete();
+	scu_recv.TransComplete();
+	if (r_copy){
+			IFloat *saddr = rcv_noncache;
+			IFloat *raddr = rcv_buf;
+			int r_i=0, r_j=0;
+			for(int i = 0;i< rnumblk;i++){
+				for(int j = 0;j< rblklen;j++){
+					*raddr++= *saddr++;
+				}
+				raddr +=rstr;
+			}
+	}
+}
 
 
 
