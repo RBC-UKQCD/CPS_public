@@ -5,13 +5,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-04 07:22:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v 1.9 2004-09-04 07:22:29 chulwoo Exp $
-//  $Id: QPropW.C,v 1.9 2004-09-04 07:22:29 chulwoo Exp $
+//  $Date: 2004-09-17 18:10:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v 1.10 2004-09-17 18:10:04 chulwoo Exp $
+//  $Id: QPropW.C,v 1.10 2004-09-17 18:10:04 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: QPropW.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v $
 //  $State: Exp $
 //
@@ -535,7 +535,7 @@ int x, int y, int z, int t)
   // zero the vector
   int fv_size = GJP.VolNodeSites() * GJP.Colors() * 8;
   for (int i = 0; i < fv_size; i++)
-    *((rfloat *)fv_ + i) = 0;
+    *((IFloat *)fv_ + i) = 0;
 
   // set point source
   int procCoorX = x / GJP.XnodeSites();
@@ -563,7 +563,7 @@ int x, int y, int z, int t)
       coor_y == procCoorY &&
       coor_z == procCoorZ &&
       coor_t == procCoorT)
-    *((rfloat *)fv_ + 2 * (color + GJP.Colors() * (spin + 4 * (
+    *((IFloat *)fv_ + 2 * (color + GJP.Colors() * (spin + 4 * (
     localX + GJP.XnodeSites() * (
     localY + GJP.YnodeSites() * (
     localZ + GJP.ZnodeSites() * localT)))))) = 1.0;
@@ -578,7 +578,7 @@ void FermionVectorTp::setVolSource()
 
   int fv_size = GJP.VolNodeSites() * GJP.Colors() * 8;
   for (int i = 0; i < fv_size; i++) {
-     *((rfloat *)fv_ + i)= 0.0;
+     *((IFloat *)fv_ + i)= 0.0;
   }
 }
 
@@ -599,9 +599,9 @@ void FermionVectorTp::setVolSource(int color, int spin)
 
   int fv_size = GJP.VolNodeSites() * GJP.Colors() * 8;
   for (int i = 0; i < fv_size; i++) {
-     *((rfloat *)fv_ + i)= 0.0;
+     *((IFloat *)fv_ + i)= 0.0;
      if(i%SPINOR_SIZE != 2*( color + COLORS*spin ) )continue;
-     *((rfloat *)fv_ + i) = 1.0;
+     *((IFloat *)fv_ + i) = 1.0;
   }
 }
 
@@ -629,13 +629,13 @@ void FermionVectorTp::setWallSource(int color, int spin, int source_time)
   int wall_size = GJP.VolNodeSites()/GJP.TnodeSites()*SPINOR_SIZE;
   int fv_size = GJP.VolNodeSites() * GJP.Colors() * 8;
   for (int i = 0; i < fv_size; i++) {
-     *((rfloat *)fv_ + i)= 0.0;
+     *((IFloat *)fv_ + i)= 0.0;
 #ifdef PARALLEL
      if(my_node != ts_node)continue; 
 #endif
      if(i< wall_size*node_ts || i>=wall_size*(node_ts+1) )continue;
      if(i%SPINOR_SIZE != 2*( color + COLORS*spin ) )continue;
-     *((rfloat *)fv_ + i) = 1.0;
+     *((IFloat *)fv_ + i) = 1.0;
   }
 }
 
@@ -662,15 +662,15 @@ void FermionVectorTp::setWallSource(int color, int spin, int source_time, Float*
   int fv_size = GJP.VolNodeSites() * GJP.Colors() * 8;
   int i, ii;
   for (i=0,ii=0; i < fv_size; i+=2) {
-     *((rfloat *)fv_ + i)= 0.0;
-     *((rfloat *)fv_ + i+1)= 0.0;
+     *((IFloat *)fv_ + i)= 0.0;
+     *((IFloat *)fv_ + i+1)= 0.0;
 #ifdef PARALLEL
      if(my_node != ts_node)continue;
 #endif
      if(i< wall_size*node_ts || i>=wall_size*(node_ts+1) )continue;
      if(i%SPINOR_SIZE != 2*( color + COLORS*spin ) )continue;
-     *((rfloat *)fv_ + i) = src[ii];
-     *((rfloat *)fv_ + i+1) = src[ii+1];
+     *((IFloat *)fv_ + i) = src[ii];
+     *((IFloat *)fv_ + i+1) = src[ii+1];
      ii+=2;
   }
 }
@@ -682,7 +682,7 @@ void FermionVectorTp::print() const
   VRB.Func(cname, fname);
   for (int i = 0; i <  GJP.VolNodeSites() * GJP.Colors() * 8; i++)
     VRB.Result(cname, fname,
-   "fv_[%d] = %g\n", i, IFloat(*((rfloat *)fv_ + i)) );
+   "fv_[%d] = %g\n", i, IFloat(*((IFloat *)fv_ + i)) );
 }
 
 

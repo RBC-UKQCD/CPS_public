@@ -4,7 +4,7 @@
 
   AlgSmear, AlgApeSmear, AlgKineticSmear and AlgHypSmear classes.
   
-  $Id: alg_smear.C,v 1.4 2004-09-02 16:53:03 zs Exp $
+  $Id: alg_smear.C,v 1.5 2004-09-17 18:10:04 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 #include <config.h>
@@ -204,7 +204,7 @@ void AlgSmear::three_staple( Lattice& latt,  Matrix& link ,
       latt.PathOrdProdPlus(acumulate_mp, pos, dir, 3); 
     }
   // 18 is the matrix size
-  moveMem((float *) &link, (float*)&acumulate_mp, 18*sizeof(float));
+  moveMem((Float *) &link, (Float*)&acumulate_mp, 18*sizeof(Float));
 }
 
 
@@ -247,7 +247,7 @@ void AlgKineticSmear::five_staple ( Lattice& latt,  Matrix& link ,
     }// all directions 
 
   // 18 is the matrix size
-  moveMem((float *) &link, (float*)&acumulate_mp, 18*sizeof(float));
+  moveMem((Float *) &link, (Float*)&acumulate_mp, 18*sizeof(Float));
 }
 
 
@@ -306,7 +306,7 @@ void AlgKineticSmear::seven_staple( Lattice& latt,  Matrix& link ,
         }// all directions 
     } // all directions
   // 18 is the matrix size
-  moveMem((float *) &link, (float*)&acumulate_mp, 18*sizeof(float));
+  moveMem((Float *) &link, (Float*)&acumulate_mp, 18*sizeof(Float));
 }
 
 
@@ -333,7 +333,7 @@ void AlgKineticSmear::lepage_staple( Lattice& latt,  Matrix& link ,
       latt.PathOrdProdPlus(acumulate_mp, pos, dir, 5); 
     }
   // 18 is the matrix size
-  moveMem((float *) &link, (float*)&acumulate_mp, 18*sizeof(float));
+  moveMem((Float *) &link, (Float*)&acumulate_mp, 18*sizeof(Float));
 }
 
 
@@ -359,7 +359,7 @@ void AlgKineticSmear::run()
     if(common_arg->filename != 0){
 	FILE* f = Fopen(common_arg->filename, "a");
 	if(!f) ERR.FileA(cname, "run", common_arg->filename);
-	for (int i=0;i<5;++i) Fprintf(f,"coef %2i : %e \n",i,(float)_coef[i]);
+	for (int i=0;i<5;++i) Fprintf(f,"coef %2i : %e \n",i,(Float)_coef[i]);
 	Fclose(f);
     }
 

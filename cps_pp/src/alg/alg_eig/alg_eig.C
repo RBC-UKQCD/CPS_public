@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.10 2004-09-06 05:36:35 chulwoo Exp $
+  $Id: alg_eig.C,v 1.11 2004-09-17 18:10:04 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-06 05:36:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.10 2004-09-06 05:36:35 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.10 2004-09-06 05:36:35 chulwoo Exp $
+//  $Date: 2004-09-17 18:10:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.11 2004-09-17 18:10:04 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.11 2004-09-17 18:10:04 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -64,11 +64,14 @@ AlgEig::AlgEig(Lattice& latt,
   case MAT_HERM:
   case MATDAG_MAT:
   case NEG_MATDAG_MAT:
+  case MATDAG_MAT_NORM:
+  case NEG_MATDAG_MAT_NORM:
     Ncb = 2;
     break;
-
+    
   case MATPC_HERM:
   case MATPCDAG_MATPC:
+  case NEG_MATPCDAG_MATPC:
     Ncb = 1;
     break;
 
@@ -87,18 +90,24 @@ AlgEig::AlgEig(Lattice& latt,
 
   // Allocate memory for the eigenvectors and eigenvalues
   //----------------------------------------------------------------
-  eigenv = (Vector **) smalloc(cname,fname,"eigenv",N_eig * sizeof(Vector *));
+  eigenv = (Vector **) smalloc (cname,fname, "eigenv", N_eig * sizeof(Vector *));
   
   for(int n = 0; n < N_eig; ++n)
   {
-    eigenv[n] = (Vector *) smalloc(cname,fname,"eigenv[n]",f_size * sizeof(Float));
+    eigenv[n] = (Vector *) smalloc(cname,fname, "eigenv[n]", f_size * sizeof(Float));
   }
 
-  lambda = (Float *) smalloc(cname,fname,"lambda",N_eig * sizeof(Float));
+  lambda = (Float *) smalloc(cname,fname, "lambda", N_eig * sizeof(Float));
 
-  chirality = (Float *) smalloc(cname,fname,"chirality",N_eig * sizeof(Float));
+  chirality = (Float *) smalloc(N_eig * sizeof(Float));
+  if(chirality == 0)
+    ERR.Pointer(cname,fname, "chirality");
+  VRB.Smalloc(cname,fname, "chirality", chirality, N_eig * sizeof(Float));
 
-  valid_eig = (int *) smalloc(cname,fname,"valid_eig",N_eig * sizeof(int));
+  valid_eig = (int *) smalloc(N_eig * sizeof(int));
+  if(valid_eig == 0)
+    ERR.Pointer(cname,fname, "valid_eig");
+  VRB.Smalloc(cname,fname, "valid_eig", valid_eig, N_eig * sizeof(int));
 
   // Print out input parameters
   //----------------------------------------------------------------
@@ -161,7 +170,7 @@ void AlgEig::run()
     using MPISCU::fprintf;
 #endif
 
-  int iter;
+  int iter=0;
   EigArg *eig_arg;
   char *fname = "run()";
   VRB.Func(cname,fname);
@@ -201,11 +210,17 @@ void AlgEig::run()
       ERR.General(cname,fname,"Invalid direction\n");
     }
 
-    hsum = (Float **) smalloc(cname,fname,"hsum",N_eig * sizeof(Float*)); // surely Float* ?
+    hsum = (Float **) smalloc(N_eig * sizeof(Float*)); // surely Float* ?
+    if(hsum == 0)
+      ERR.Pointer(cname,fname, "hsum");
+    VRB.Smalloc(cname,fname, "hsum", hsum, N_eig * sizeof(Float*));
   
     for(int n = 0; n < N_eig; ++n)
     {
-      hsum[n] = (Float *) smalloc(cname,fname,"hsum[n]",hsum_len * sizeof(Float));
+      hsum[n] = (Float *) smalloc(hsum_len * sizeof(Float));
+      if(hsum[n] == 0)
+	ERR.Pointer(cname,fname, "hsum[n]");
+      VRB.Smalloc(cname,fname, "hsum[n]", hsum[n], hsum_len*sizeof(Float));
     }
   }
   else
@@ -232,9 +247,12 @@ void AlgEig::run()
 
     // Solve for eigenvectors and eigenvalues.
     // Use eigenv as initial guess. Lambda is not used initially.
-    iter = lat.FeigSolv(eigenv, lambda, chirality, valid_eig, 
+    if(Ncb==2)
+      iter = lat.FeigSolv(eigenv, lambda, chirality, valid_eig, 
 			hsum, eig_arg, CNV_FRM_YES);
-
+    else if(Ncb==1)
+      iter = lat.FeigSolv(eigenv, lambda, chirality, valid_eig, 
+      			hsum, eig_arg, CNV_FRM_NO);
     // Print out number of iterations and eigs
     //----------------------------------------------------------------
     if(common_arg->results != 0)

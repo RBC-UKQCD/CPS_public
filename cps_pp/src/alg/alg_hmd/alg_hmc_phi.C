@@ -1,22 +1,25 @@
 #include<config.h>
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
 
-  $Id: alg_hmc_phi.C,v 1.15 2004-09-07 05:22:00 chulwoo Exp $
+  $Id: alg_hmc_phi.C,v 1.16 2004-09-17 18:10:04 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-07 05:22:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.15 2004-09-07 05:22:00 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.15 2004-09-07 05:22:00 chulwoo Exp $
+//  $Date: 2004-09-17 18:10:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.16 2004-09-17 18:10:04 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.16 2004-09-17 18:10:04 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
