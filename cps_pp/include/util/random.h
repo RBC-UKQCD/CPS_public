@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.18 2004-09-17 18:08:13 chulwoo Exp $
+  $Id: random.h,v 1.19 2004-11-22 20:32:38 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-17 18:08:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.18 2004-09-17 18:08:13 chulwoo Exp $
-//  $Id: random.h,v 1.18 2004-09-17 18:08:13 chulwoo Exp $
+//  $Date: 2004-11-22 20:32:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.19 2004-11-22 20:32:38 chulwoo Exp $
+//  $Id: random.h,v 1.19 2004-11-22 20:32:38 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -133,7 +133,7 @@ class UniformRandomGenerator: public virtual RandomGenerator
   \note The user must ensure that the lower bound is not greater than the
   upper bound.
 */
-    void SetInterval(IFloat high_limit, IFloat low_limit){
+    static void SetInterval(IFloat high_limit, IFloat low_limit){
 	A = low_limit;
 	B = high_limit;
     }
@@ -178,7 +178,7 @@ class GaussianRandomGenerator : public virtual RandomGenerator
 /*!
   \param s2 the variance of the gaussian distribution.
 */
-    void SetSigma(IFloat s2) {
+    static void SetSigma(IFloat s2) {
 	sigma2 = s2;
     }
 
@@ -332,8 +332,8 @@ class LatRanGen
         FermionFieldDimension frm_dim = FIVE_D ) const;
     
     //! Save the RNGs to a file (due to multi-type class members, not only supports read/write on same platform)
-    bool Read(const char* filename);
-    bool Write(const char* filename);
+    bool Read(const char* filename, const int ParIO = 1);
+    bool Write(const char* filename, const int ParIO = 1);
 	
 };
 

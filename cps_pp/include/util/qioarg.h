@@ -6,7 +6,7 @@
 #include <map>
 
 #include <util/lattice.h>
-
+#include <util/gjp.h>
 #include <util/fpconv.h>
 #include <util/intconv.h>
 
@@ -16,6 +16,9 @@ using namespace std;
 
 
 class QioArg {
+ public:
+  QioArg() { /* should init before use */ }   // required for dec. of a indep. object
+
  private:
   // added s axis for future expansion
   //  int Xnodes,     Ynodes,     Znodes,     Tnodes,     Snodes;
@@ -55,6 +58,11 @@ class QioArg {
   inline int Nodes(int dir) const { return nodes[dir]; }
   inline int NodeSites(int dir) const { return node_sites[dir]; }
   inline int Coor(int dir) const { return coor[dir]; }
+
+  inline void cutHalf() {  // used in loading/unloading LatRng data
+    for(int d=0;d<5;d++)  node_sites[d] /= 2;
+    if(node_sites[4]==0)  node_sites[4] = 1;
+  }
 
  public:
   Matrix * StartConfLoadAddr;
@@ -134,45 +142,19 @@ class QioControl {
 
 
 
-
-// GCFheaderPar class
-// header parser for parallel IO
-// removed "exit()"'s, others same as class GCFheader
-typedef map<string,string> GCFHMapParT;
-
-class GCFheaderPar
-{
-private:
-
-  GCFHMapParT headerMap;
-  bool  prevFound;
-
-public:
-  
-  inline bool found() { return prevFound; }
-
-  bool    add( string key_eq_value );
-
-  int     asInt   ( string key );
-  Float   asFloat ( string key );
-  string  asString( string key );
-
-  void Show();
-};
-
-
 // a memory allocator that prevents memory leak
 class TempBufAlloc { 
  private:
   char * buf;
  public:
-  TempBufAlloc(const size_t size_chars) {  buf = new char[size_chars]; }
-  virtual ~TempBufAlloc() {  delete[] buf; }
-  operator char*() { return buf; }
-  operator int*() {  return (int*)buf; }
+  TempBufAlloc(const size_t size_chars) {  buf = (char*)fmalloc(size_chars); } // fast memory
+  virtual ~TempBufAlloc() {  ffree(buf); }
+
+  inline operator char*() { return buf; }
+  inline char * CharPtr() { return buf; }
+  //  operator int*() {  return (int*)buf; }
+  inline int *IntPtr() { return (int*)buf; }
 };
-
-
 
 
 CPS_END_NAMESPACE

@@ -15,8 +15,10 @@
 #include <util/verbose.h>
 #include <util/error.h>
 
-#include "qioarg.h"
-#include "fpconv.h"
+#include <util/qioarg.h>
+#include <util/fpconv.h>
+#include <util/iostyle.h>
+#include <util/latheader.h>
 
 
 CPS_START_NAMESPACE
@@ -28,52 +30,45 @@ using namespace std;
 
 class WriteLatticeParallel : private QioControl
 {
+  // IoStyle provides a function  IoStyle::store() 
+  // which determines Parallel or Serial storing
 
  private:
     FPConv fpconv;
     bool unload_good;
-    int data_start;
     int csum_pos;
     bool recon_row_3;
     char *cname;
 
  public:
-    // header strings
-    string hd_ensemble_id ;
-    string hd_ensemble_label ;
-    int hd_sequence_number ;
-    string hd_creator ;
-    string hd_creator_hardware ;
-    string hd_creation_date ;
-    string hd_archive_date ;
+    LatticeHeader hd;
 
  public:
     // ctor for 2-step unloading
     WriteLatticeParallel()  
-      : QioControl(), unload_good(false), cname("WriteLatticeParallel") {
-      defaultHeader();
+      : QioControl(), unload_good(false), cname("WriteLatticeParallel"), UseParIO(1) {
     }
 
     // ctor containing unloading behavior
     WriteLatticeParallel(Lattice & lat, const char * filename,
 			 const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 1)
-      : QioControl(), unload_good(false), cname("WriteLatticeParallel")   {
-      defaultHeader();
+      : QioControl(), unload_good(false), cname("WriteLatticeParallel"), UseParIO(1)  {
       QioArg  wt_arg(filename, dataFormat, recon_row_3);
       write(lat, wt_arg);
     }
 
     // ctor containing unloading behavior
     WriteLatticeParallel(Lattice & lat, const QioArg & wt_arg)
-      : QioControl(), unload_good(false), cname("WriteLatticeParallel")   {
-      defaultHeader();
+      : QioControl(), unload_good(false), cname("WriteLatticeParallel"), UseParIO(1)   {
       write(lat, wt_arg);
     }
 
     ~WriteLatticeParallel() {}
 
     void setHeader(const char * EnsembleId, const char * EnsembleLabel,
-		   const int SequenceNumber, const char * Creator);
+		   const int SequenceNumber) {
+      hd.setHeader(EnsembleId, EnsembleLabel, SequenceNumber);
+    }
 
     void write(Lattice & lat, const char * filename,
 	       const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 1) {
@@ -84,9 +79,49 @@ class WriteLatticeParallel : private QioControl
 
     inline bool good() { return unload_good; }
 
-    void defaultHeader();
-    void writeHeader(ostream & fout, Float link_trace, Float plaq, const QioArg & wt_arg); 
+ private:
+    bool UseParIO;
+ public:
+    inline void setParallel() { UseParIO = 1; }
+    inline void setSerial() { 
+#if TARGET == QCDOC
+      UseParIO = 0; 
+#else
+      cout << "On non-QCDOC platform, setSerial() has no effect!" << endl;
+#endif
+    }
+    inline int parIO() const { return UseParIO; }
 
+};
+
+
+class WriteLatticeSerial : public WriteLatticeParallel {
+ private:
+  char * cname;
+
+ public:
+    // ctor for 2-step unloading
+    WriteLatticeSerial()
+      : WriteLatticeParallel(), cname("WriteLatticeParallel") {
+      setSerial();
+    }
+
+    // ctor containing unloading behavior
+    WriteLatticeSerial(Lattice & lat, const char * filename,
+		       const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 1)
+      : WriteLatticeParallel(), cname("WriteLatticeParallel") {
+      setSerial();
+      write(lat, filename, dataFormat, recon_row_3);
+    }
+
+    // ctor containing unloading behavior
+    WriteLatticeSerial(Lattice & lat, const QioArg & wt_arg)
+      : WriteLatticeParallel(), cname("WriteLatticeParallel"){
+      setSerial();
+      write(lat, wt_arg);
+    }
+
+    ~WriteLatticeSerial() {}
 };
 
 

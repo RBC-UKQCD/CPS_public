@@ -2,6 +2,7 @@
 #define __INT_CONV__
 
 #include <config.h>
+#include <util/fpconv.h> // need base class DataConversion
 
 CPS_START_NAMESPACE
 using namespace std;
@@ -19,11 +20,16 @@ enum INT_FORMAT {
 };
 
 
-class IntConv {
- protected:
-  void byterevn(type32 w[], int n);
+class DataConversion;  // forward declaration 
+class QioArg;
 
-  void copy32(type32 tgt[], type32 src[], int n);
+
+class IntConv : public DataConversion
+{
+ protected:
+  void byterevn(type32 w[], int n) const;
+
+  void copy32(type32 tgt[], type32 src[], int n) const;
   enum INT_FORMAT  testHostFormat();
 
  public:
@@ -33,19 +39,31 @@ class IntConv {
 
   IntConv();
   virtual ~IntConv();
-  char * file2host(char * hbuf, const char *fdat, const int fdat_len);
-  char * host2file(char * fbuf, const char *hdat, const int hdat_len);
+  char * file2host(char * hbuf, const char *fdat, const int fdat_len) const;
+  char * host2file(char * fbuf, const char *hdat, const int hdat_len) const;
   unsigned int checksum(char * data, const int data_len, 
-			const enum INT_FORMAT dataFormat = INT_AUTOMATIC); // default use fileFormat
-  unsigned int posDepCsum(char * data, const int data_len, 
-			  const enum INT_FORMAT dataFormat = INT_AUTOMATIC);
+			const enum INT_FORMAT dataFormat) const; // default use fileFormat
+  unsigned int posDepCsum(char * data, const int data_len, const int dimension,
+			  const QioArg & qio_arg, const int siteid, const int global_id,
+			  const enum INT_FORMAT dataFormat) const;
 
   // functions to describe int format
-  int size(const enum INT_FORMAT datatype);
-  inline int fileIntSize() { return size(fileFormat); }
-  inline int hostIntSize() { return size(hostFormat); }
-  bool big_endian(const enum INT_FORMAT datatype);
-  const char * name(const enum INT_FORMAT format);
+  int size(const enum INT_FORMAT datatype) const;
+  inline int fileIntSize() const { return size(fileFormat); }
+  inline int hostIntSize() const { return size(hostFormat); }
+  bool big_endian(const enum INT_FORMAT datatype) const;
+  static const char * name(const enum INT_FORMAT format);
+
+  int fileDataSize() const { return fileIntSize(); }
+  int hostDataSize() const { return hostIntSize(); }
+  unsigned int checksum(char * data, const int data_len) const {
+    return checksum(data, data_len, INT_AUTOMATIC);
+  }
+  unsigned int posDepCsum(char * data, const int data_len, const int dimension,
+			  const QioArg & qio_arg, 
+			  const int siteid, const int global_id) const {
+    return posDepCsum(data, data_len, dimension, qio_arg, siteid, global_id, INT_AUTOMATIC);
+  }
 };
 
 CPS_END_NAMESPACE

@@ -3,7 +3,9 @@
 
 #include <config.h>
 #include <util/qioarg.h>
+#include <util/iostyle.h>
 #include <util/intconv.h>
+#include <util/latheader.h>
 
 CPS_START_NAMESPACE
 using namespace std;
@@ -19,14 +21,24 @@ class LatRngIO : public QioControl {
  protected:
   bool io_good;
   IntConv intconv;
-  int local_n[5];
-  int global_n[5];
-  int coor[5];
-  void calcDim(const QioArg & io_arg);
 
-  // used for position-dependent checksum to verify layout of data
-  int uniqueSiteID5d(int local_id_5d);
-  int uniqueSiteID4d(int local_id_4d); 
+  LatRngHeader hd;
+
+ private:
+    bool UseParIO;
+ public:
+    inline void setParallel() { UseParIO = 1; }
+
+    inline void setSerial() { 
+#if TARGET == QCDOC
+      UseParIO = 0; 
+#else
+      cout << "On non-QCDOC platform, setSerial() has no effect!" << endl;
+#endif
+    }
+
+    inline int parIO() const { return UseParIO; }
+
 };
 
 
@@ -38,10 +50,14 @@ class LatRngRead : public LatRngIO {
   void read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 	    const QioArg & rd_arg);
 
- private:
-  GCFheaderPar hd;
 };
 
+class LatRngReadSerial : public LatRngRead {
+ public:
+  LatRngReadSerial() : LatRngRead() {
+    setSerial();
+  }
+};
 
 class LatRngWrite : public LatRngIO {
  public:
@@ -51,6 +67,13 @@ class LatRngWrite : public LatRngIO {
   void write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 	     const QioArg & wt_arg);
 
+};
+
+class LatRngWriteSerial : public LatRngWrite {
+ public:
+  LatRngWriteSerial() : LatRngWrite() {
+    setSerial();
+  }
 };
 
 
