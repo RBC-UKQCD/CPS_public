@@ -40,7 +40,7 @@ LIBNAME = cps
 endif
 LIBNAME ?= cps
 
-DFLAGS = @DFLAGS@
+DFLAGS += @DFLAGS@
 
 
 DIRLIST := $(shell ls -p $(SRCDIR)/$(DIR) )

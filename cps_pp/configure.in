@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: zs $
-dnl  $Date: 2004-02-06 12:16:21 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.7 2004-02-06 12:16:21 zs Exp $
-dnl  $Id: configure.in,v 1.7 2004-02-06 12:16:21 zs Exp $
+dnl  $Date: 2004-02-06 12:56:39 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.8 2004-02-06 12:56:39 zs Exp $
+dnl  $Id: configure.in,v 1.8 2004-02-06 12:56:39 zs Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.7 $
+dnl  $Revision: 1.8 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -35,7 +35,7 @@ dnl check if Intel compiler is available if running on 686
        AC_CHECK_PROGS(CC, icc, gcc)
        AC_CHECK_PROGS(CXX, icc, g++)
    else
-     AC_CHECK_PROGS(CXX, g++)
+     AC_PROG_CXX
    fi
    AC_CHECK_PROGS(LD, ld)
    AC_CHECK_PROGS(AR, ar)
@@ -91,7 +91,6 @@ elif test "$enable_target" = "mpi"; then
      AC_MSG_NOTICE([Path is $PATH])
      AC_MSG_WARN([Using g++])
      AC_SEARCH_LIBS(MPI_Init, mpi mpich, ,echo "CPS needs the MPI library for a parallel build - bailing out."; exit 1)
-     LDFLAGS="-lmpi"
    fi
    DFLAGS=""
    TESTING_PARALLEL="yes";
