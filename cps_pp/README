@@ -21,6 +21,11 @@ and is an alternative to the common 'install' procedure.
 
 The source and build directories can be identical. 
 
+************ CHANGES in v4_8_11
+(De)serialization of input structures to files are available vil VML.
+Currently, CgArg, DoArg, WspectArg are processed via VML. Refer to 
+tests/f_hmd/main.C for usage example.
+************ CHANGES in v4_8_11 (end)
 
 	1. Configuring.
 
@@ -102,13 +107,19 @@ See the autoconf(1) documentatoin for more details.
 
 Has anyone tried this recently?
 
-
 	2. Compiling
 
 Note that GNU make is needed. Having configured the system, the
 library is built by simply running GNU make: 
 
+************ CHANGES in v4_8_11
+$ gmake headers
 $ gmake
+
+'gmake headers' is needed to generate headers for input structures via VML.
+If you have multiple targets with different precision for (I)Floats, you need to
+run 'gmake headers' each time you switch targets. Otherwise, 'gmake headers' is needed only once.
+************ CHANGES in v4_8_11 (end)
 
 This produces  directory tree called objs containing all the object
 files and the library cps.a in your build directory (But see also

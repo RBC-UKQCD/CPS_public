@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Prototypes of gauge configuration IO functions.
 
-  $Id: qcdio.h,v 1.6 2004-09-04 07:20:31 chulwoo Exp $
+  $Id: qcdio.h,v 1.7 2004-12-16 18:37:35 chulwoo Exp $
 */
 /*2  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
    $Author: chulwoo $
-   $Date: 2004-09-04 07:20:31 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.6 2004-09-04 07:20:31 chulwoo Exp $
-   $Id: qcdio.h,v 1.6 2004-09-04 07:20:31 chulwoo Exp $
+   $Date: 2004-12-16 18:37:35 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.7 2004-12-16 18:37:35 chulwoo Exp $
+   $Id: qcdio.h,v 1.7 2004-12-16 18:37:35 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.h,v $
-   $Revision: 1.6 $
+   $Revision: 1.7 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v $
    $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -37,7 +37,7 @@ CPS_START_NAMESPACE
 
 #ifndef GAUGE_CONF_PREC
 /*! The default precision at which gauge configurations are stored in files. */
-#define GAUGE_CONF_PREC (sizeof(float))
+#define GAUGE_CONF_PREC (sizeof(Float))
 #endif
 
 #ifndef SWAP_BYTE_ORDER

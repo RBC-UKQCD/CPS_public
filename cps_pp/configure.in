@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2004-12-15 07:32:05 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.28 2004-12-15 07:32:05 chulwoo Exp $
-dnl  $Id: configure.in,v 1.28 2004-12-15 07:32:05 chulwoo Exp $
+dnl  $Date: 2004-12-16 18:37:15 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.29 2004-12-16 18:37:15 chulwoo Exp $
+dnl  $Id: configure.in,v 1.29 2004-12-16 18:37:15 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.28 $
+dnl  $Revision: 1.29 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -64,7 +64,6 @@ AC_CHECK_LIB(m, sin, ,echo "CPS needs the math library - bailing out"; exit 1)
 dnl Set the relevant include files
 topwd_srcdir=`pwd`
 AC_SUBST(topwd_srcdir)
-dnl INCLUDE_FLAGS="-I\${BUILDDIR} -I\${BUILDDIR}/include -I\${SRCDIR}/include -I\${SRCDIR}/misc/vml_encode/rpcgenvml/"
 
 dnl This is the _default_ default
 namespace_default="yes" 
