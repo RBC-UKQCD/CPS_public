@@ -40,20 +40,18 @@ $test_dir = "v5_0_0" ;
 
 #The name of the shell script this will create:
 $shellscript = "regression.sh";
-#$output_dir = "Qregressions";
 $output_dir = "regressions";
 
 # There are three sets of tests...
 #---------------------------------
-## $test_str[0] = "PsiBarPsi tests:";
-## $test_dirs[0] = "f_stag_pbp f_wilson_pbp f_clover_pbp f_dwf_pbp f_dwfso_pbp";
+$test_str[0] = "PsiBarPsi tests:";
+$test_dirs[0] = "f_stag_pbp f_wilson_pbp f_clover_pbp f_dwf_pbp f_dwfso_pbp";
 
 #---------------------------------
 $test_str[1] = "General tests without stdio output:";
-##$test_dirs[1] = "f_hmd f_hmd_dwfso g_hb g_hmd s_spect w_spect f_wilson_eig xi_spect_gsum";
+$test_dirs[1] = "f_hmd f_hmd_dwfso g_hb g_hmd s_spect w_spect f_wilson_eig xi_spect_gsum";
 #[DIES] threept
 
-$test_dirs[0] = "s_spect w_spect";
 
 #---------------------------------
 #$test_str[2] = "General tests with stdio output:";
