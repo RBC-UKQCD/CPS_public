@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.12 2004-09-04 07:33:14 chulwoo Exp $
+  $Id: main.C,v 1.13 2004-09-19 01:48:28 chulwoo Exp $
 */
 
 #include<config.h>
@@ -13,6 +13,7 @@
 #include<util/error.h>
 #include<util/time.h>
 #include<comms/scu.h>
+#include<comms/sysfunc.h>
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
 #if TARGET == QCDOC
@@ -21,12 +22,6 @@ extern "C" void _mcleanup(void);
 #endif
 
 
-CPS_START_NAMESPACE
-GlobalJobParameter GJP;
-LatRanGen LRG;
-Verbose VRB;
-Error ERR;
-CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 
