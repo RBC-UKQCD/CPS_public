@@ -524,6 +524,8 @@ void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 		return ;
 	}
 
+//	printf("f_size is: %d\n", f_size);
+
 	// Allocate memory for a temporary
 	//----------------------------------------------------------
 	Vector *tmp_f_field = (Vector *) smalloc(f_size * sizeof(Float));

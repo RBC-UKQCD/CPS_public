@@ -1,20 +1,3 @@
-#include<config.h>
-CPS_START_NAMESPACE
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/SpinMatrix.C,v 1.6 2004-08-18 11:57:40 zs Exp $
-//  $Id: SpinMatrix.C,v 1.6 2004-08-18 11:57:40 zs Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: SpinMatrix.C,v $
-//  $Revision: 1.6 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/SpinMatrix.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // SpinMatrix.C
@@ -26,9 +9,7 @@ CPS_START_NAMESPACE
 //
 //------------------------------------------------------------------
 
-CPS_END_NAMESPACE
 #include <alg/spin_matrix.h>
-CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
 //------------------------------------------------------------------
@@ -40,7 +21,7 @@ SpinMatrix::SpinMatrix()
 {}
 
 //------------------------------------------------------------------
-SpinMatrix::SpinMatrix(IFloat c) 
+SpinMatrix::SpinMatrix(Float c) 
 { *this = c; }
 
 
@@ -55,7 +36,7 @@ SpinMatrix::SpinMatrix(const SpinMatrix& m)
 
 
 //------------------------------------------------------------------
-SpinMatrix& SpinMatrix::operator = (IFloat c)
+SpinMatrix& SpinMatrix::operator = (Float c)
 {
   this -> ZeroSpinMatrix();
   u[0] = u[10] = u[20] = u[30] = c;
@@ -75,12 +56,12 @@ SpinMatrix& SpinMatrix::operator = (const Complex& c)
 //------------------------------------------------------------------
 void SpinMatrix::UnitSpinMatrix(void)
 {
-  IFloat *p = (IFloat *)u;
+  Float *p = (Float *)u;
 
   for(int i = 0; i < 32; ++i) {
     *p++ = 0.0;
   }
-  p = (IFloat *)u;
+  p = (Float *)u;
   *p = 1.0;
   *(p+10) = 1.0;
   *(p+20) = 1.0;
@@ -90,7 +71,7 @@ void SpinMatrix::UnitSpinMatrix(void)
 //------------------------------------------------------------------
 void SpinMatrix::ZeroSpinMatrix(void)
 {
-  IFloat *p = (IFloat *)u;
+  Float *p = (Float *)u;
 
   for(int i = 0; i < 32; ++i) {
     *p++ = 0.0;
@@ -116,5 +97,3 @@ Complex SpinMatrix::Tr() const
 		((Complex*)u)[10] + ((Complex*)u)[15];
 }
 
-
-CPS_END_NAMESPACE

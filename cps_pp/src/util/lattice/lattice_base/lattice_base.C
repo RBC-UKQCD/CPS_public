@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
+  $Id: lattice_base.C,v 1.25 2005-01-13 06:28:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-21 19:45:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.24 2004-12-21 19:45:15 chulwoo Exp $
+//  $Date: 2005-01-13 06:28:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.25 2005-01-13 06:28:26 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.25 2005-01-13 06:28:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.24 $
+//  $Revision: 1.25 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -232,7 +232,7 @@ Lattice::Lattice()
   }
   else if(start_conf_kind == START_CONF_FILE){
 #if TARGET == QCDOC || TARGET == NOARCH
-    gauge_field = GJP.StartConfLoadAddr();
+//    gauge_field = GJP.StartConfLoadAddr();
     VRB.Flow(cname,fname, "Load starting configuration addr = %x\n",
 	     gauge_field);
     ReadLatticeParallel rd_lat(*this,GJP.StartConfFilename());
