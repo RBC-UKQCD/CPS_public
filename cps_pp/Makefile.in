@@ -30,3 +30,8 @@ install:
 	cp Makefile Makefile.rules Makefile.vars Makefile.compile ${SRCDIR}
 	cp tests/Makefile_common* ${SRCDIR}/tests
 
+# create the documentation
+docs:
+	cd ${SRCDIR}/doc ; sh mkdocs.sh 
+
+
