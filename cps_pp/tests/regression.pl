@@ -1,5 +1,3 @@
-#include<config.h>
-CPS_START_NAMESPACE
 #!/usr/local/bin/perl
 # Note that this shebang line may not work everywhere, as some 
 # Unixies put perl elsewhere, e.g. /usr/bin/perl.
@@ -124,5 +122,3 @@ print "To run the test programs, use 'source $shellscript'\n";
 close SHOUT;
 
 exit;
-
-CPS_END_NAMESPACE
