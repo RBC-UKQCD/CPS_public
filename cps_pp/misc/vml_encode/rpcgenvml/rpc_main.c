@@ -32,7 +32,7 @@
  * From @(#)rpc_main.c 1.30 89/03/30 (C) 1987 SMI;
  */
 const char main_rcsid[] =
-  "$Id: rpc_main.c,v 1.3 2004-12-15 07:32:08 chulwoo Exp $";
+  "$Id: rpc_main.c,v 1.4 2004-12-21 19:02:38 chulwoo Exp $";
 
 /*
  * rpc_main.c, Top level of the RPC protocol compiler.
@@ -170,12 +170,16 @@ int indefinitewait;		/* If started by port monitors, hang till it wants */
 int exitnow;			/* If started by port monitors, exit after the call */
 int timerflag;			/* TRUE if !indefinite && !exitnow */
 int newstyle;			/* newstyle of passing arguments (by value) */
+#if 0
 #ifdef __GNU_LIBRARY__
 int Cflag = 1;			/* ANSI C syntax */
 #else
 int Cflag = 0;			/* ANSI C/C++ syntax */
 #endif
-int CCflag = 0;			/* C++ files */
+#else
+int Cflag = 0;			/* C++ files */
+#endif
+int CCflag = 1;			/* C++ files */
 static int allfiles;		/* generate all files */
 
 int tirpcflag = 0;		/* generating code for tirpc, by default */

@@ -5,12 +5,11 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpBase class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.9 2004-12-01 06:38:16 chulwoo Exp $
+   $Id: minvcg.C,v 1.10 2004-12-21 19:02:39 chulwoo Exp $
  */
 
 CPS_END_NAMESPACE
 #include <util/dirac_op.h>
-#include <util/lattice.h>
 #include <util/smalloc.h>
 #include <qalloc.h>
 #include <util/vector.h>
@@ -19,17 +18,15 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 #include <math.h>
-#include <util/time.h>
-#include <util/enum.h>
-CPS_START_NAMESPACE
 
 #define PROFILE
 
 #ifdef PROFILE
-#include <time.h>
-#include <sys/time.h>
-void report_flops(int flops, struct timeval *start,struct timeval *end);
+#include <util/time.h>
 #endif
+
+CPS_START_NAMESPACE
+
 
 extern "C" { 
   void vaxpy(Float *scale,Vector *mult,Vector *add, int ncvec);
@@ -70,47 +67,39 @@ int DiracOp::MInvCG(Vector *psi_slow, Vector *chi, Float chi_norm, Float *mass,
 //------------------------------------------------------------------
 
   int iz, k, s;
-  int f_size;
-  if(lat.Fclass() == F_CLASS_CLOVER) {
-    f_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
-  } else {
-    f_size = GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
-  }
+  int n_vec;
+  if(lat.Fclass() == F_CLASS_CLOVER)
+      n_vec = GJP.VolNodeSites() / 2;
+  else
+      n_vec = GJP.VolNodeSites() / (lat.FchkbEvl()+1);
+  const int f_size = n_vec * lat.FsiteSize();
   
-  Vector *r = (Vector *)fmalloc(f_size * sizeof(Float));
-  if(r == 0) ERR.Pointer(cname,fname, "r");
-  VRB.Smalloc(cname,fname,"r", r, f_size * sizeof(Float));
-  
-  Vector *Ap = (Vector *)fmalloc(f_size * sizeof(Float));
-  if(Ap == 0) ERR.Pointer(cname,fname, "Ap");
-  VRB.Smalloc(cname,fname,"Ap", Ap, f_size * sizeof(Float));
-  
-  Vector **p = (Vector **)fmalloc(Nmass * sizeof(Vector*));
-  if(p == 0) ERR.Pointer(cname,fname, "p");
-  VRB.Smalloc(cname,fname, "p", p, Nmass * sizeof(Vector*));
+  Vector *r = (Vector *)fmalloc(f_size * sizeof(Float),
+				cname,fname, "r");
+   
+  Vector *Ap = (Vector *)fmalloc(f_size * sizeof(Float),
+				 cname,fname, "Ap");
+    
+  Vector **p = (Vector **)fmalloc(Nmass * sizeof(Vector*),
+				  cname,fname, "p");
 
-  Vector **psi = (Vector **) fmalloc(Nmass * sizeof(Vector*));
-  if(psi == 0) ERR.Pointer(cname,fname, "psi");
-  VRB.Smalloc(cname,fname, "psi", psi, Nmass * sizeof(Vector*));
-
+  Vector **psi = (Vector **) fmalloc(Nmass * sizeof(Vector*),
+				     cname,fname, "psi");
+  
   if (type == SINGLE) {
-    *psi = (Vector*)fmalloc(f_size * sizeof(Float));
-    if(*psi == 0) ERR.Pointer(cname,fname, "psi[0]");
-    VRB.Smalloc(cname,fname,"psi[0]", psi[0], f_size * sizeof(Float));
-    psi[0] -> CopyVec(psi_slow,f_size);
+      *psi = (Vector*)fmalloc(f_size * sizeof(Float),
+			      cname,fname, "psi[0]");
+      psi[0] -> CopyVec(psi_slow,f_size);
   }
 
   for (s=0; s<Nmass; s++) {
-    *(p+s) = (Vector*)fmalloc(f_size * sizeof(Float));
-    if(*(p+s) == 0) ERR.Pointer(cname,fname, "p[s]");
-    VRB.Smalloc(cname,fname,"p[s]", p[s], f_size * sizeof(Float));
-
-    if (type == MULTI) {
-      *(psi+s) = (Vector*)fmalloc(f_size * sizeof(Float));
-      if(*(psi+s) == 0) ERR.Pointer(cname,fname, "psi[s]");
-      VRB.Smalloc(cname,fname,"psi[s]", psi[s], f_size * sizeof(Float));
-      psi[s] -> CopyVec(psi_slow +f_size*s,f_size);
-    }
+      *(p+s) = (Vector*)fmalloc(f_size * sizeof(Float),
+				cname,fname, "p[s]");
+      if (type == MULTI) {
+	  *(psi+s) = (Vector*)fmalloc(f_size * sizeof(Float),
+				      cname,fname, "psi[s]");
+	  psi[s] -> CopyVec(psi_slow +n_vec*s, f_size);
+      }
 
   }
   
@@ -339,7 +328,7 @@ int DiracOp::MInvCG(Vector *psi_slow, Vector *chi, Float chi_norm, Float *mass,
   for (s=0; s<Nmass; s++) {
     if (type == MULTI || s==0) {
       // Copy solution vectors from fast memory to DDR
-      (psi_slow +f_size*s) -> CopyVec(psi[s],f_size);
+      (psi_slow +n_vec*s) -> CopyVec(psi[s],f_size);
       VRB.Sfree(cname,fname,"psi[s]",*(psi+s));
       qfree(*(psi+s));
     }

@@ -2,14 +2,13 @@
 #include <config.h>
 CPS_START_NAMESPACE
  /*! \file
-   \brief  Definition of DiracOpBase class multishift CG solver method.
+   \brief  Definition of DiracOp class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.7 2004-12-01 06:38:15 chulwoo Exp $
+   $Id: minvcg.C,v 1.8 2004-12-21 19:02:39 chulwoo Exp $
  */
 
 CPS_END_NAMESPACE
 #include <util/dirac_op.h>
-#include <util/lattice.h>
 #include <util/smalloc.h>
 #include <util/vector.h>
 #include <util/gjp.h>
@@ -33,9 +32,9 @@ CPS_START_NAMESPACE
   \param isz The smallest shift
   \param RsdCG The target residuals for each shift
   \param type The type of multimass inverter.
-      If type is ::MULTI, then regular multishift inversion is performed with
+   -  If type is ::MULTI, then regular multishift inversion is performed with
       each solution stored separately.
-      If type is ::SINGLE, then each solution is multiplied by an
+   -  If type is ::SINGLE, then each solution is multiplied by an
       amount in parameter \a alpha and summed to a single solution vector.
   \param alpha The contribution of each shifted solution to the total
   solution vector if \a type is SINGLE.
@@ -74,29 +73,28 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
 //------------------------------------------------------------------
 
   int iz, k, s;
-  int f_size;
-  if(lat.Fclass() == F_CLASS_CLOVER) {
-    f_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
-  } else {
-    f_size = GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
-  }
+  int n_vec;
+
+  if(lat.Fclass() == F_CLASS_CLOVER)
+      n_vec = GJP.VolNodeSites() / 2;
+  else
+      n_vec = GJP.VolNodeSites() / (lat.FchkbEvl()+1);
+  const int f_size = n_vec * lat.FsiteSize();
   
-  Vector *r = (Vector *)smalloc(f_size * sizeof(Float));
-  if(r == 0) ERR.Pointer(cname,fname, "r");
-  VRB.Smalloc(cname,fname,"r", r, sizeof(Float));
   
-  Vector *Ap = (Vector *)smalloc(f_size * sizeof(Float));
-  if(Ap == 0) ERR.Pointer(cname,fname, "Ap");
-  VRB.Smalloc(cname,fname,"Ap", Ap, sizeof(Float));
   
-  Vector **p = (Vector **)smalloc(Nmass * sizeof(Vector*));
-  if(p == 0) ERR.Pointer(cname,fname, "p");
-  VRB.Smalloc(cname,fname, "p", p, f_size * sizeof(Vector*));
-  for (s=0; s<Nmass; s++) {
-    *(p+s) = (Vector*)smalloc(f_size * sizeof(Float));
-    if(*(p+s) == 0) ERR.Pointer(cname,fname, "p[i]");
-    VRB.Smalloc(cname,fname,"p[s]", p[s], sizeof(Float));
-  }
+  Vector *r = (Vector *)smalloc(f_size * sizeof(Float),
+				cname,fname,"r");
+  
+  Vector *Ap = (Vector *)smalloc(f_size * sizeof(Float),
+				 cname,fname, "Ap");
+  
+  Vector **p = (Vector **)smalloc(Nmass * sizeof(Vector*),
+				  cname,fname, "p");
+  for (s=0; s<Nmass; s++) 
+      *(p+s) = (Vector*)smalloc(f_size * sizeof(Float),
+				cname,fname, "p[i]");
+  
   
   int convP;
   int *convsP = (int*)smalloc(Nmass*sizeof(int));
@@ -116,7 +114,7 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
   // If source norm = 0, solution must be 0
   if (chi_norm == 0.0) {
     if (type == SINGLE) psi->VecTimesEquFloat(0.0,f_size);
-    else for (k=0; k<Nmass; k++) (psi + f_size*k)->VecTimesEquFloat(0.0,f_size);
+    else for (k=0; k<Nmass; k++) (psi + n_vec*k)->VecTimesEquFloat(0.0,f_size);
     return 0;
   }
   
@@ -168,7 +166,7 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
       psi -> FTimesV1PlusV2(-b_tmp,chi,psi,f_size);
     }
   } else {
-    for (s=0; s<Nmass; s++) (psi + f_size*s)-> FTimesV1PlusV2(-bs[s],chi,psi+f_size*s,f_size);  
+    for (s=0; s<Nmass; s++) (psi + n_vec*s)-> FTimesV1PlusV2(-bs[s],chi,psi+n_vec*s,f_size);  
   }
 
   // Check the convergance of the first solution
@@ -249,7 +247,7 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
     else
       for (s=0; s<Nmass; s++) {
 	if (convsP[s]) continue;
-	(psi + f_size*s)->FTimesV1PlusV2(-bs[s],p[s],psi+f_size*s,f_size);
+	(psi + n_vec*s)->FTimesV1PlusV2(-bs[s],p[s],psi+n_vec*s,f_size);
       }
     
     // if |psi[k+1] -psi[k]| <= rsdCG |psi[k+1]| then return
@@ -274,17 +272,12 @@ int DiracOp::MInvCG(Vector *psi, Vector *chi, Float chi_norm, Float *mass,
   }
   
   // free arrays and vectors
-  for (s=0; s<Nmass; s++) {
-    VRB.Sfree(cname,fname,"p[s]",*(p+s));
-    sfree(*(p+s));
-  }
-  
-  VRB.Sfree(cname,fname,"p",p);
-  sfree(p);
-  VRB.Sfree(cname,fname,"Ap",Ap);
-  sfree(Ap);
-  VRB.Sfree(cname,fname,"r",r);
-  sfree(r);
+  for (s=0; s<Nmass; s++)
+      sfree(*(p+s), cname, fname, "p[s]");
+    
+  sfree(p, cname, fname, "p");
+  sfree(Ap, cname, fname, "Ap");
+  sfree(r, cname, fname, "r");
   sfree(bs);
   sfree(*(z+1));
   sfree(*z);

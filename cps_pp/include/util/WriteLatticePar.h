@@ -28,14 +28,13 @@ using namespace std;
 // WriteLatticeParallel class
 // A modification to "WriteLattice" class to enable parallel writing
 
-class WriteLatticeParallel : private QioControl
+class WriteLatticeParallel : public QioControl
 {
   // IoStyle provides a function  IoStyle::store() 
   // which determines Parallel or Serial storing
 
  private:
-    FPConv fpconv;
-    bool unload_good;
+  //    FPConv fpconv;
     int csum_pos;
     bool recon_row_3;
     char *cname;
@@ -46,20 +45,20 @@ class WriteLatticeParallel : private QioControl
  public:
     // ctor for 2-step unloading
     WriteLatticeParallel()  
-      : QioControl(), unload_good(false), cname("WriteLatticeParallel"), UseParIO(1) {
+      : QioControl(), cname("WriteLatticeParallel"), UseParIO(1) {
     }
 
     // ctor containing unloading behavior
     WriteLatticeParallel(Lattice & lat, const char * filename,
 			 const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 1)
-      : QioControl(), unload_good(false), cname("WriteLatticeParallel"), UseParIO(1)  {
+      : QioControl(), cname("WriteLatticeParallel"), UseParIO(1)  {
       QioArg  wt_arg(filename, dataFormat, recon_row_3);
       write(lat, wt_arg);
     }
 
     // ctor containing unloading behavior
     WriteLatticeParallel(Lattice & lat, const QioArg & wt_arg)
-      : QioControl(), unload_good(false), cname("WriteLatticeParallel"), UseParIO(1)   {
+      : QioControl(), cname("WriteLatticeParallel"), UseParIO(1)   {
       write(lat, wt_arg);
     }
 
@@ -77,8 +76,6 @@ class WriteLatticeParallel : private QioControl
     }
     void write(Lattice & lat, const QioArg & wt_arg);
 
-    inline bool good() { return unload_good; }
-
  private:
     bool UseParIO;
  public:
@@ -87,7 +84,8 @@ class WriteLatticeParallel : private QioControl
 #if TARGET == QCDOC
       UseParIO = 0; 
 #else
-      cout << "On non-QCDOC platform, setSerial() has no effect!" << endl;
+      const char * fname = "setSerial()";
+      VRB.Flow(cname,fname,"On non-QCDOC platform, setSerial() has no effect!\n");
 #endif
     }
     inline int parIO() const { return UseParIO; }

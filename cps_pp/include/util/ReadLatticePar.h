@@ -28,20 +28,17 @@ CPS_START_NAMESPACE
 using namespace std;
 
 
-class  ReadLatticeParallel : private QioControl{
+class  ReadLatticeParallel : public QioControl{
   // which determines parallel reading or serial reading
 
  private:
   char *cname;
-  //  GCFheaderPar hd ;
   LatticeHeader hd;
-  FPConv  fpconv;
-  bool load_good;
 
 public:
   // ctor for 2-step loading
   ReadLatticeParallel()
-    : QioControl(), cname("ReadLatticeParallel") , load_good(false), UseParIO(1)
+    : QioControl(), cname("ReadLatticeParallel"), UseParIO(1)
     {  }
 
   // ctor invoking loading behavior
@@ -49,7 +46,7 @@ public:
     : 
     QioControl(),
     cname("ReadLatticeParallel") , 
-    load_good(false), UseParIO(1)
+    UseParIO(1)
     {        
     QioArg rd_arg(filename,chkprec);
     read(lat,rd_arg);
@@ -57,7 +54,7 @@ public:
 
   // ctor invoking loading behavior
   ReadLatticeParallel(Lattice & lat, const QioArg & rd_arg) 
-    : QioControl(), cname("ReadLatticeParallel"), load_good(false), UseParIO(1)
+    : QioControl(), cname("ReadLatticeParallel"), UseParIO(1)
   {
     read(lat,rd_arg);
   }
@@ -71,10 +68,7 @@ public:
 
   void read(Lattice & lat, const QioArg & rd_arg);
 
-  inline bool good() { return load_good; }
-
  private:
-  //  bool CheckSum(char *fpoint, int size_Floats, const int Scoor);
   bool CheckPlaqLinktrace(Lattice & lat, const QioArg & rd_arg,
 			  const Float plaq_inheader, const Float linktrace_inheader);
 
@@ -86,7 +80,8 @@ public:
 #if TARGET == QCDOC
       UseParIO = 0; 
 #else
-      cout << "On non-QCDOC platform, setSerial() has no effect!" << endl;
+      const char * fname = "setSerial()";
+      VRB.Flow(cname,fname,"On non-QCDOC platform, setSerial() has no effect!\n");
 #endif
     }
     inline int parIO() const { return UseParIO; }

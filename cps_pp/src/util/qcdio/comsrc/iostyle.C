@@ -36,6 +36,7 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
 		     const int dimension /* 4 or 5 */,
 		     unsigned int * ptrcsum, unsigned int * ptrpdcsum,
 		     Float * rand_sum, Float * rand_2_sum)  { 
+  const char * fname = "load()";
 
   int error = 0;
   QioArg & rd_arg = qio_arg;
@@ -64,17 +65,15 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
   // all open file and check error
   ifstream input(rd_arg.FileName);
   if ( !input.good() )
-  {
-      cout << "Could not open file:\n   "
-      << rd_arg.FileName
-      << "\nfor input.\nUSER: maybe you should kill the process!!\n";
+    {
       error = 1;
     }
 
   // executed by all, sync and share error status information
-  if(synchronize(error) != 0)   return 0;
+  if(synchronize(error) != 0)   
+    ERR.FileR(cname, fname, rd_arg.FileName);
 
-  // TempBufAlloc is a Mem Allocator that prevents mem leak on "return"s
+  // TempBufAlloc is a Mem Allocator that prevents mem leak on function exits
   TempBufAlloc fbuf(chars_per_site);  // buffer only stores one site
   
   // these two only needed when loading LatRng
@@ -90,7 +89,7 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
   int siteid = 0;
   char * pd = data;
 
-  cout << "Parallel loading starting..." << endl << endl;
+  VRB.Flow(cname, fname, "Parallel loading starting\n");
   setConcurIONumber(rd_arg.ConcurIONumber);
   //
   getIOTimeSlot();
@@ -152,9 +151,9 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
     cout << "Parallel loading: " << (int)((sr-sbegin+1) * 100.0 /(send-sbegin)) << "% done." << endl;
   }
 
-  if ( !input.good() ) { cout << "Input stream error!" << endl; error = 1; }
+  if ( !input.good() )    error = 1;
 
-  cout << "This Group Done!" << endl << endl;
+  VRB.Flow(cname,fname, "This Group Done!\n");
 
   finishIOTimeSlot();
   //
@@ -162,7 +161,8 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
   input.close();
 
 
-  if(synchronize(error) != 0)  return 0;
+  if(synchronize(error) != 0)  
+    ERR.General(cname, fname, "Loading failed\n");
 
 
   if(ptrcsum) *ptrcsum = csum;
@@ -179,8 +179,8 @@ int ParallelIO::store(ostream & output,
 		      const int dimension /* 4 or 5 */,
 		      unsigned int * ptrcsum, unsigned int * ptrpdcsum,
 		      Float * rand_sum, Float * rand_2_sum)  { 
-
-
+  const char * fname = "store()";
+  
   int error = 0;
 
   //  const int data_per_site = wt_arg.ReconRow3 ? 4*12 : 4*18;
@@ -206,7 +206,7 @@ int ParallelIO::store(ostream & output,
   int sblk = tblk * nt;
 
 
-  // TempBufAlloc is a mem allocator that prevents mem leak on "return"
+  // TempBufAlloc is a mem allocator that prevents mem leak on function exits
   TempBufAlloc fbuf(chars_per_site);
 
   // these two only need when doing LatRng unloading
@@ -219,7 +219,7 @@ int ParallelIO::store(ostream & output,
   const char * pd = data;
   int siteid=0;
 
-  cout << "Parallel unloading starting..." << endl << endl;
+  VRB.Flow(cname, fname, "Parallel unloading starting\n");
   setConcurIONumber(wt_arg.ConcurIONumber);
   getIOTimeSlot();
 
@@ -289,10 +289,10 @@ int ParallelIO::store(ostream & output,
 	   << "% done." << endl;
     }
       
-    if ( !output.good() ) { cout << "Output stream error!" << endl; error = 1; }
+    if ( !output.good() )   error = 1;
   }
 
-  cout << "This Group done!" << endl << endl;
+  VRB.Flow(cname, fname, "This Group done!\n");
 
   finishIOTimeSlot();
   //
@@ -319,6 +319,7 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
 		   const int dimension /* 4 or 5 */,
 		   unsigned int * ptrcsum, unsigned int * ptrpdcsum,
 		   Float * rand_sum, Float * rand_2_sum) {
+  const char * fname = "load()";
 
   // only node 0 is responsible for writing
   int error = 0;
@@ -339,24 +340,24 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
     input.open(rd_arg.FileName);
     if ( !input.good() )
       {
-	cout << "Could not open file:\n   "
-	     << rd_arg.FileName
-	     << "\nfor input.\nUSER: maybe you should kill the process!!\n";
 	error = 1;
       }
   }
 
   // executed by all, sync and share error status information
-  if(synchronize(error) != 0)   return 0;
+  if(synchronize(error) != 0)   
+    ERR.FileR(cname, fname, rd_arg.FileName);
 
-  // TempBufAlloc is a Mem Allocator that prevents mem leak on "return"s
+  // TempBufAlloc is a Mem Allocator that prevents mem leak on function exits
   TempBufAlloc fbuf(chars_per_site);
   TempBufAlloc rng(data_per_site * dconv.hostDataSize());
 
   if(isNode0()) {
     input.seekg(hd.dataStart(),ios_base::beg);
+    if(!input.good()) error = 1;
   }
-  if(synchronize(error) != 0)   return 0;
+  if(synchronize(error) != 0)   
+    ERR.General(cname, fname, "Loading failed\n");
   
   int global_id = 0;
   unsigned int csum = 0;
@@ -365,7 +366,7 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
   Float Rand2Sum = 0;
   UGrandomGenerator * ugran = (UGrandomGenerator*)data;
 
-  cout << "Serial loading <thru node 0> starting..." << endl << endl;
+  VRB.Flow(cname, fname, "Serial loading <thru node 0> starting\n");
   for(int sc=0; dimension==4 || sc<ns; sc++) {
     for(int tc=0;tc<nt;tc++) {
       for(int zc=0;zc<nz;zc++) {
@@ -410,7 +411,8 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
 	    } // endif(isNode0())
 	  
 	    // execute by all
-	    if(synchronize(error) != 0)   return 0;
+	    if(synchronize(error) != 0)  
+	      ERR.General(cname, fname, "Loading failed\n");
 
 	    xShiftNode(data, site_mem * rd_arg.XnodeSites());
 	  }
@@ -433,7 +435,8 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
     cout << "Serial loading: " << (int)((sc+1) * 100.0 / ns) << "% finished." << endl;
   }
   
-  if(synchronize(error)!=0) return 0;
+  if(synchronize(error)!=0) 
+    ERR.General(cname, fname, "Loading failed\n");
 
   if(isNode0()) 
     input.close();
@@ -442,7 +445,7 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
   if(dimension==4) 
     sSpread(data, site_mem * rd_arg.VolNodeSites());
   
-  cout << "Loading done!" << endl << endl;
+  VRB.Flow(cname, fname, "Loading done!\n");
 
   if(ptrcsum) *ptrcsum = csum;
   if(ptrpdcsum) *ptrpdcsum = pdcsum;
@@ -458,6 +461,7 @@ int SerialIO::store(ostream & output,
 		    const int dimension /* 4 or 5 */,
 		    unsigned int * ptrcsum, unsigned int * ptrpdcsum,
 		    Float * rand_sum, Float * rand_2_sum)  { 
+  const char * fname = "store()";
   
   int error = 0;
 
@@ -484,7 +488,7 @@ int SerialIO::store(ostream & output,
 
   output.seekp(hd.dataStart(), ios_base::beg);
 
-  cout << "Serial unloading <thru node 0> starting..." << endl << endl;
+  VRB.Flow(cname, fname, "Serial unloading <thru node 0> starting\n");
   for(int sc=0; dimension==4 || sc<ns; sc++) {
     for(int tc=0;tc<nt;tc++) {
       for(int zc=0;zc<nz;zc++) {
@@ -531,7 +535,8 @@ int SerialIO::store(ostream & output,
 	    }
 
 	    // run by all nodes
-	    if(synchronize(error) != 0) return 0;
+	    if(synchronize(error) != 0) 
+	      ERR.General(cname, fname, "Unloading failed\n");
 	    
 	    xShiftNode(data, site_mem * wt_arg.XnodeSites());
 	  }
@@ -554,7 +559,7 @@ int SerialIO::store(ostream & output,
     cout << "Serial unloading: " << (int)((sc+1)*100.0/ns) << "% done." <<endl;
   }
 
-  cout << "Unloading done!" << endl << endl;
+  VRB.Flow(cname, fname, "Unloading done!\n");
 
   if(ptrcsum) *ptrcsum = csum;
   if(ptrpdcsum) *ptrpdcsum = pdcsum;

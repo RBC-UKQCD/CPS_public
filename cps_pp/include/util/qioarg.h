@@ -2,6 +2,7 @@
 #define __QIO_ARG__
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <map>
 
@@ -89,21 +90,21 @@ class QioArg {
 
  public:
   QioArg(const char * file) {  
-    init(file, 8, 0.01, FP_AUTOMATIC, INT_AUTOMATIC, 1); 
+    init(file, 0, 0.01, FP_AUTOMATIC, INT_AUTOMATIC, 1); 
   }
   QioArg(const char * file, const Float chkprec) {  
     // used in ReadLatticePar
-    init(file, 8, chkprec, FP_AUTOMATIC, INT_AUTOMATIC, 1);
+    init(file, 0, chkprec, FP_AUTOMATIC, INT_AUTOMATIC, 1);
   }
 
   QioArg(const char * file, const FP_FORMAT dataformat, const int recon_row_3){
     // used in WriteLatticePar
-    init(file, 8, 0.01, dataformat, INT_AUTOMATIC, recon_row_3);
+    init(file, 0, 0.01, dataformat, INT_AUTOMATIC, recon_row_3);
   }
   
   QioArg(const char * file, const INT_FORMAT dataintformat) {
     // used in LatRngIO
-    init(file, 8, 0.01, FP_AUTOMATIC, dataintformat, 1);
+    init(file, 0, 0.01, FP_AUTOMATIC, dataintformat, 1);
   }
 
 };
@@ -112,11 +113,14 @@ class QioArg {
 
 class QioControl {
  private:
+  char * cname;
   int unique_id;  // = my_data_pos_in_file = (((s*dim_t+t)*dim_z+z)*dim_y+y)*dim_x+x
   int number_nodes;
   int num_concur_io; // number of nodes to excecute concurrent io
-  int IOCommander(int caller,int block=1) const; // caller 0 <get IO>;   
+  int IOCommander(int caller) const; // caller 0 <get IO>;   
                                                  // caller 1 <finish IO>
+  void buildNodesList(int * active_num, int * active_node_list, int this_active) const;
+
  public:
   QioControl();
   virtual ~QioControl();
@@ -127,17 +131,42 @@ class QioControl {
   int globalSumInt(const int data)  const;
   unsigned int globalSumUint(const unsigned int data) const;
   Float globalSumFloat(const Float data) const;
+  int round(const Float fdata) const;
+  int globalMinInt(const int data) const;
 
-  int getIOTimeSlot(int block=1) const;
-  int finishIOTimeSlot(int block=1) const;
+  int getIOTimeSlot() const;
+  int finishIOTimeSlot() const;
 
-  inline void setConcurIONumber(int set_concur)   { 
-    num_concur_io = (set_concur <= 0? NumNodes() : set_concur);
-  }
+  inline void setConcurIONumber(int set_concur) { num_concur_io = set_concur; }
 
   inline bool isRoot() { return (uniqueID() == 0); }
   inline int uniqueID() const { return unique_id; }
   inline int NumNodes()  const { return number_nodes; }
+
+  int syncError(int this_error) const;
+
+ private:
+  int do_log;
+  int logging;
+  fstream logs;
+  long log_point;
+  time_t log_start;
+  char log_dir[200];
+
+ public:
+  void setLogDir(const char * LogDir);
+  void startLogging(const char * action=0);
+  void finishLogging(const char * ending_word=0);
+  void log(const char * short_note=0);
+
+ protected:
+  FPConv fpconv;
+  bool io_good;
+ public:
+  inline bool good() const { return io_good; }
+
+ public:
+  void SimQCDSP(int sim) { fpconv.SimQCDSP(sim); }
 };
 
 

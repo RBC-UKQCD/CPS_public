@@ -24,7 +24,10 @@ int read_lattice(int argc, char ** argv) {
 
   
   // load lattice, and use the above created lattice to check plaq and link trace
-  ReadLatticeParallel  rd(lat,argv[2]);
+  ReadLatticeParallel  rd;
+  rd.setLogDir("logs");
+  //  rd.SimQCDSP(1);
+  rd.read(lat,argv[2]);
 
   //// to have more control, use
   //
@@ -48,7 +51,10 @@ int read_lattice(int argc, char ** argv) {
   cout << "-----------------------------------------------------" << endl;
   cout << "================== SERIAL   IO ======================" << endl << endl;
 
-  ReadLatticeSerial rd2(lat,argv[2]);
+  ReadLatticeSerial rd2;
+  rd2.setLogDir("logs");
+  //  rd2.SimQCDSP(1);
+  rd2.read(lat,argv[2]);
 
   if(!rd2.good()) {
     cout << "Serial Loading failed" << endl;
@@ -97,6 +103,7 @@ int write_lattice(int argc, char ** argv) {
   // TWO-STEP writing, to set some labels in header
   WriteLatticeParallel wt;
   wt.setHeader("EnsTest","Testing Ensemble by Sam Oct,2004",1001);
+  wt.setLogDir("logs");
   wt.write(lat,argv[2]);
 
   if(!wt.good()) {
@@ -110,6 +117,7 @@ int write_lattice(int argc, char ** argv) {
 
   WriteLatticeSerial wt2;
   wt2.setHeader("EnsSerial", "Serial unloading test Nov, 2004", 1002);
+  wt2.setLogDir("logs");
 
   char filename2[256];
   strcpy(filename2,argv[2]);

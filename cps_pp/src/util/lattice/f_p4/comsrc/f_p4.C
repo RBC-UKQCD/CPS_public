@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.3 2004-12-11 20:58:03 chulwoo Exp $
+  $Id: f_p4.C,v 1.4 2004-12-21 19:02:41 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -156,7 +156,8 @@ int Fp4::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift,
 
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
-      p4.Dslash(f_out_d + e_vsize*s,f_out + e_vsize*s,CHKB_EVEN,DAG_NO);
+	p4.Dslash(f_out_d + GJP.VolNodeSites()/2*s,
+		  f_out + GJP.VolNodeSites()/2*s, CHKB_EVEN, DAG_NO);
   cg_arg->true_rsd = RsdCG[isz];
 
   sfree(RsdCG);
@@ -209,16 +210,14 @@ int Fp4::FmatInv(Vector *f_out, Vector *f_in,
 		   CnvFrmType cnv_frm,
 		   PreserveType prs_f_in)
 {
-  int iter;
+
   char *fname = "FmatInv(CgArg*,V*,V*,F*,CnvFrmType)";
   VRB.Func(cname,fname);
 
   DiracOpP4 stag(*this, f_out, f_in, cg_arg, cnv_frm);
   
-  iter = stag.MatInv(true_res, prs_f_in);
+  return stag.MatInv(true_res, prs_f_in);
   
-  // Return the number of iterations
-  return iter;
 }
 
 

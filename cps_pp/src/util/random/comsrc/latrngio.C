@@ -23,7 +23,7 @@ using namespace std;
 // Lat Random Generator Read  functions 
 
 LatRngRead::LatRngRead() 
-  : LatRngIO()
+  : LatRngIO(), cname("LatRngRead")
 { }
 
 LatRngRead::~LatRngRead() 
@@ -31,7 +31,12 @@ LatRngRead::~LatRngRead()
 
 void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 		      const QioArg & rd_arg) { 
-  cout << endl << "Loading RNGs..." << endl << endl;
+  const char * fname = "read()";
+  VRB.Func(cname,fname);
+
+  char loginfo[100];
+  sprintf(loginfo,"Load %s",rd_arg.FileName);
+  startLogging(loginfo);
 
   io_good = false;
   int error = 0;
@@ -40,9 +45,7 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
     // all open file and check error
     ifstream input(rd_arg.FileName);
     if ( !input.good() ) {
-      cout << "Could not open file:\n   "
-	   << rd_arg.FileName
-	   << "\nfor input.\n";
+      //      VRB.Flow(cname,fname,"Could not open file: [%s] for input.\n",rd_arg.FileName);
       error = 1;
     }
 
@@ -53,19 +56,21 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   }
   // first sync point
   // executed by all, sync and share error status information
-  if(synchronize(error) != 0)   return;
+  if(synchronize(error) != 0)   
+    ERR.FileR(cname, fname, rd_arg.FileName);
+  log();
 
   broadcastInt(&hd.data_start);
 
 
   if(isRoot()) {
     if(hd.datatype != "LATTICE_RNG_5D_4D"){  // need both 5d & 4d
-      cout << "Invalid RNG type: " << hd.datatype << endl;
+      VRB.Flow(cname,fname,"Invalid RNG type: %s\n",hd.datatype.c_str());
       error = 1;
     }
   }
-  if(synchronize(error) != 0)  return;
-
+  if(synchronize(error) != 0) 
+    ERR.General(cname,fname,"Invalid RNG type\n");
 
   // check dimensions, etc
   int nx = rd_arg.Xnodes() * rd_arg.XnodeSites();
@@ -75,14 +80,19 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   int ns = rd_arg.Snodes() * rd_arg.SnodeSites();
 
   if(isRoot()) {
-    cout << "Lattice Dimensions in File: " << hd.dimension[0] <<"x" << hd.dimension[1] <<"x" << hd.dimension[2] <<"x" << hd.dimension[3] <<"x" << hd.dimension[4]<< endl;
-    if(hd.dimension[0] != nx || hd.dimension[1] != ny || hd.dimension[2] != nz || hd.dimension[3] != nt || hd.dimension[4]!=ns) {
-      cout << "Dimensions in file DISAGREE with GlobalJobParameter!"<<endl;
+    //    cout << "Lattice Dimensions in File: " << hd.dimension[0] <<"x" << hd.dimension[1] <<"x" << hd.dimension[2] <<"x" << hd.dimension[3] <<"x" << hd.dimension[4]<< endl;
+    if(hd.dimension[0] != nx || hd.dimension[1] != ny || hd.dimension[2] != nz || hd.dimension[3] != nt 
+       || hd.dimension[4]!=ns) {
+      VRB.Flow(cname,fname,"Dimensions in file DISAGREE with GlobalJobParameter!\n");
+      VRB.Flow(cname,fname,"In File: %d x %d x %d x %d x %d\n",
+	       hd.dimension[0],hd.dimension[1], hd.dimension[2], hd.dimension[3], hd.dimension[4]);
+      VRB.Flow(cname,fname,"In GJP:  %d x %d x %d x %d x %d\n",nx, ny, nz, nt, ns);
       error = 1;
     }
   }
 
-  if(synchronize(error) != 0)  return;
+  if(synchronize(error) != 0) 
+    ERR.General(cname, fname, "Wrong parameters specified\n");
 
   // check floating point format
   if(isRoot()) {
@@ -90,8 +100,7 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   }
   broadcastInt((int*)&intconv.fileFormat);
   if(intconv.fileFormat == INT_UNKNOWN) {
-    cout << "Data file Integer format UNKNOWN" << endl;
-    return;
+    ERR.General(cname,fname,"Data file Integer format UNKNOWN\n");
   }
 
   if(isRoot())  hd.show();
@@ -107,63 +116,70 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   unsigned int csum[2] = {0}, pos_dep_csum[2] = {0};
   Float RandSum[2]={0.0}, Rand2Sum[2]={0.0};
 
+  log();
+
+
 #if TARGET != QCDOC  // when on LINUX, only parallel (direct IO) mode is used
   setParallel();
 #endif
 
   if(parIO()) {
-    cout << endl << "================= Loading 5-D RNGs =================" << endl << endl;
+    VRB.Flow(cname,fname, "Start Loading 5-D RNGs\n");
 
     ParallelIO pario(rng_arg);
     if(! pario.load((char*)ugran, size_rng_ints, sizeof(UGrandomGenerator),
 		    hd, intconv, 5,
-		    &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0])) return;
+		    &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0]))
+      ERR.General(cname, fname, "Loading failed\n");
 
     hd.data_start += size_rng_chars * rng_arg.VolSites() * 
                      rng_arg.Snodes() * rng_arg.SnodeSites();
  
-    cout << endl << "================= Loading 4-D RNGs =================" << endl << endl;
+    VRB.Flow(cname,fname, "Start Loading 4-D RNGs\n");
     if(! pario.load((char*)ugran_4d, size_rng_ints, sizeof(UGrandomGenerator),
 		    hd, intconv, 4,
-		    &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1])) return;
+		    &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1]))
+      ERR.General(cname, fname, "Loading failed\n");
   }
 #if TARGET == QCDOC
   else {
-    cout << endl << "================= Loading 5-D RNGs =================" << endl << endl;
+    VRB.Flow(cname,fname, "Start Loading 5-D RNGs\n");
 
     SerialIO serio(rng_arg);
     if(! serio.load((char*)ugran, size_rng_ints, sizeof(UGrandomGenerator),
 		    hd, intconv, 5,
-		    &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0])) return;
+		    &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0]))
+      ERR.General(cname, fname, "Loading failed\n");
 
     hd.data_start += size_rng_chars * rng_arg.VolSites() * 
                      rng_arg.Snodes() * rng_arg.SnodeSites();
     
-    cout << endl << "================= Loading 4-D RNGs =================" << endl << endl;
+    VRB.Flow(cname,fname, "Start Loading 4-D RNGs\n");
 
     if(! serio.load((char*)ugran_4d, size_rng_ints, sizeof(UGrandomGenerator),
 		    hd, intconv, 4,
-		    &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1])) return;
+		    &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1]))
+      ERR.General(cname, fname, "Loading failed\n");
   }
 #endif
 
-  cout << endl << "================= Verification =================" << endl << endl;
+  log();
 
-  // Step 2.1: verify  checksum
+  // Step 2.1: verify checksum
   csum[0] += csum[1];
   csum[0] = globalSumUint(csum[0]);
 
   if(isRoot()) {
     if( hd.checksum != csum[0] ) {
-      cout << "CheckSUM error !! Header:" << hex << hd.checksum << dec 
-	   << " Host calc:" <<hex << csum[0] << dec << endl;
+      VRB.Flow(cname,fname, "CheckSUM error!! Header:%x  Host calc:%x\n",hd.checksum,csum[0]);
       error = 1;
     }
     else
-      cout << "CheckSUM is ok\n";
+      VRB.Flow(cname,fname,"CheckSUM is ok\n");
   }
 
-  if(synchronize(error) != 0) return;
+  if(synchronize(error) != 0) 
+      ERR.General(cname,fname, "CheckSUM error\n");
 
   // Step 2.2: verify position-dep. Checksum
   pos_dep_csum[0] += pos_dep_csum[1];
@@ -171,16 +187,16 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   if(isRoot()) {
     // pos_dep_csum could be absent
     if( hd.pos_dep_csum > 0 && hd.pos_dep_csum != pos_dep_csum[0] ) { 
-      cout << "Position Dependent CheckSUM error!!" 
-	   << " Header:" <<hex << hd.pos_dep_csum << dec
-	   << " Host_calc:" <<hex << pos_dep_csum[0] << dec << endl;
+      VRB.Flow(cname,fname, "Position Dependent CheckSUM error!! Header:%x  Host_calc:%x\n",
+	       hd.pos_dep_csum, pos_dep_csum[0]);
       error = 1;
     }
     else
-      cout << "Position Dependent CheckSUM is ok\n";
+      VRB.Flow(cname,fname, "Position Dependent CheckSUM is ok\n");
   }
 
-  if(synchronize(error) != 0) return;
+  if(synchronize(error) != 0) 
+    ERR.General(cname, fname, "Position-Dependent Checksum error\n");
 
 
   // STEP 3: Verify Rand Average and Variance
@@ -192,15 +208,18 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   Float RandVar = globalSumFloat(Rand2Sum[0]) / (total_rngs_5d + total_rngs_4d)
                   - RandAvg * RandAvg;
   if(isRoot()) {
-  cout << "Average::  calc: " << RandAvg << "  header: " << hd.average 
-       << "  rel.dev.: " << fabs((RandAvg-hd.average)/RandAvg) <<  endl;
-  cout << "Variance:: calc: " << RandVar << "  header: " << hd.variance 
-       << "  rel.dev.: " << fabs((RandVar-hd.variance)/RandVar) << endl;
+  VRB.Flow(cname,fname, "Average::  calc: %lf  header: %lf  rel.dev.: %lf\n",
+	   RandAvg, hd.average, fabs((RandAvg-hd.average)/RandAvg));
+  VRB.Flow(cname,fname, "Variance:: calc: %lf  header: %lf  rel.dev.: %lf\n",
+	   RandVar, hd.variance,fabs((RandVar-hd.variance)/RandVar));
   }
 
-  cout << endl << "================= Loading Complete =================" << endl << endl;
-
   io_good = true;
+
+  log();
+  finishLogging();
+
+  VRB.FuncEnd(cname,fname);
 
 }
 
@@ -210,7 +229,7 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 // LatRngWrite functions
 
 LatRngWrite::LatRngWrite() 
-  : LatRngIO()
+  : LatRngIO(), cname("LatRngWrite")
 { }
 
 LatRngWrite::~LatRngWrite()
@@ -220,14 +239,19 @@ LatRngWrite::~LatRngWrite()
 
 void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 			const QioArg & wt_arg) {
-  cout << "LatRngWrite::write() start..." << endl;
+  const char * fname = "write()";
+  VRB.Func(cname,fname);
+
+  char loginfo[100];
+  sprintf(loginfo, "Unload %s", wt_arg.FileName);
+  startLogging(loginfo);
 
   io_good = false;
   int error = 0;
 
   // some cross-platform issued to be discussed
   intconv.setFileFormat(wt_arg.FileIntFormat);
-  cout << "Set File INT format : " << intconv.name(intconv.fileFormat) << endl;
+  //  VRB.Flow(cname,fname, "Set File INT format : %s\n", intconv.name(intconv.fileFormat));
 
   // size information
   int nx = wt_arg.Xnodes() * wt_arg.XnodeSites();
@@ -236,45 +260,42 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   int nt = wt_arg.Tnodes() * wt_arg.TnodeSites();
   int ns = wt_arg.Snodes() * wt_arg.SnodeSites();
 
-  cout << "Lattice size = " << nx <<"x"<<ny<<"x"<<nz<<"x"<<nt<<"x"<<ns<<endl;
+  //  cout << "Lattice size = " << nx <<"x"<<ny<<"x"<<nz<<"x"<<nt<<"x"<<ns<<endl;
 
   // num of integers per RNG (NOTE: not all data in RNG are saved)
   int size_rng_ints = ugran[0].RNGints();
-  cout << "size_rng_ints = " << size_rng_ints << endl;
+  //  cout << "size_rng_ints = " << size_rng_ints << endl;
   int size_rng_chars = size_rng_ints * intconv.fileIntSize();
 
 #if TARGET != QCDOC
   setParallel();
 #endif
 
+  log();
+
   // start writing file
   ofstream output;
 
   if(parIO()) {
     output.open(wt_arg.FileName);
-    if(!output.good())
-      {
-	cout << "Could not open file:\n   "
-	     << wt_arg.FileName
-	     << "\nfor output.\n";
-	error = 1;
-      }
+    if(!output.good())  {
+      //      VRB.Flow(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
+      error = 1;
+    }
   }
 #if TARGET == QCDOC
   else {
     if(isRoot()) {
       output.open(wt_arg.FileName);
-      if(!output.good())
-	{
-	  cout << "Could not open file:\n   "
-	       << wt_arg.FileName
-	       << "\nfor output.\n";
-	  error = 1;
-	}
+      if(!output.good()) {
+	//	VRB.Flow(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
+	error = 1;
+      }
     }    
   }  
 #endif
-  if(synchronize(error) > 0)  return;
+  if(synchronize(error) > 0)  
+    ERR.General(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
 
   // write header
   if(isRoot()) {
@@ -282,6 +303,7 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
     hd.write(output);
   }
   broadcastInt(&hd.data_start); // from 0 to all
+  log();
 
   unsigned int csum[2]={0}, pos_dep_csum[2] = {0};
   Float RandSum[2]={0.0}, Rand2Sum[2] = {0.0};
@@ -290,42 +312,47 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   rng_arg.cutHalf();
 
   if(parIO()) {
-    cout << endl << "================= Unloading 5-D RNGs =================" << endl << endl;
+    VRB.Flow(cname,fname,"Start Unloading 5-D RNGs\n");
 
     ParallelIO pario(rng_arg);
     if(! pario.store(output, (char*)ugran, size_rng_ints,
 		     sizeof(UGrandomGenerator), hd, intconv, 5,
-		     &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0])) return;
+		     &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0]))
+      ERR.General(cname, fname, "Unloading failed\n");
 
     hd.data_start += size_rng_chars * rng_arg.VolSites() * 
                      rng_arg.Snodes() * rng_arg.SnodeSites();
  
-    cout << endl << "================= Unloading 4-D RNGs =================" << endl << endl;
+    VRB.Flow(cname,fname,"Start Unloading 4-D RNGs\n");
 
     if(! pario.store(output, (char*)ugran_4d, size_rng_ints, 
 		     sizeof(UGrandomGenerator), hd, intconv, 4,
-		     &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1])) return;
+		     &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1]))
+      ERR.General(cname, fname, "Unloading Failed\n");
   }
 #if TARGET == QCDOC
   else {
-    cout << endl << "================= Unloading 5-D RNGs =================" << endl << endl;
+    VRB.Flow(cname,fname,"Start Unloading 5-D RNGs\n");
 
     SerialIO serio(rng_arg);
     if(! serio.store(output, (char*)ugran, size_rng_ints, 
 		     sizeof(UGrandomGenerator), hd, intconv, 5,
-		     &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0])) return;
+		     &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0]))
+      ERR.General(cname, fname, "Unloading Failed\n");
 
     hd.data_start += size_rng_chars * rng_arg.VolSites() * 
                      rng_arg.Snodes() * rng_arg.SnodeSites();
 
-    cout << endl << "================= Unloading 4-D RNGs =================" << endl << endl;
-    
+    VRB.Flow(cname,fname,"Start Unloading 4-D RNGs\n");
+
     if(! serio.store(output, (char*)ugran_4d, size_rng_ints, 
 		     sizeof(UGrandomGenerator), hd, intconv, 4,
-		     &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1])) return;
+		     &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1]))
+      ERR.General(cname, fname, "Unloading Failed\n");
   }
 #endif
 
+  log();
 
   // fill in verification information
   csum[0] += csum[1];
@@ -343,19 +370,23 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
   if(isRoot()) {
     hd.fillInCheckInfo(output, csum[0], pos_dep_csum[0], RandAvg, RandVar);
-    if ( !output.good() ) { cout << "Output stream error!" << endl; error = 1; }
+    if ( !output.good() )  error = 1; 
   }
 
-  if(synchronize(error) != 0)  return;
+  if(synchronize(error) != 0)
+    ERR.General(cname, fname, "Writing checksum and other info failed\n");
+  log();
 
   if(parIO()) 
     output.close();
   else
-    if(isRoot()) output.close();
+    if(isRoot())  output.close();
   
-  cout << endl << "================= Unloading Complete =================" << endl << endl;
-
   io_good = true;
+
+  finishLogging();
+
+  VRB.FuncEnd(cname,fname);
 }
 
 

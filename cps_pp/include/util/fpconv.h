@@ -2,7 +2,7 @@
   \file
   \brief
   
-  $Id: fpconv.h,v 1.7 2004-11-22 20:32:34 chulwoo Exp $
+  $Id: fpconv.h,v 1.8 2004-12-21 19:02:38 chulwoo Exp $
  */
 
 #ifndef __FP_CONV__
@@ -60,6 +60,8 @@ class DataConversion {
 
 class FPConv : public DataConversion
 {
+ private:
+  char * cname;
  protected:
   void ti2ieee (type32 *,int) const;
   void ieee2ti (type32 *,int) const;
@@ -101,6 +103,11 @@ class FPConv : public DataConversion
   unsigned int posDepCsum(char * data, const int data_len, const int dimension,
 			  const QioArg & qio_arg, 
 			  const int site_id, const int global_id) const { return 0; }
+
+ private:
+  bool sim_qcdsp;
+ public:
+  void SimQCDSP(int sim) { sim_qcdsp = sim?true:false; }
 };
 
 CPS_END_NAMESPACE

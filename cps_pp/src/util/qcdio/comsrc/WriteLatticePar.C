@@ -6,7 +6,12 @@ using namespace std;
 
 void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 {
-  cout << endl << "Unloading lattice..." << endl << endl;
+  const char * fname = "write()";
+  VRB.Func(cname,fname);
+
+  char loginfo[100];
+  sprintf(loginfo,"Unload %s",wt_arg.FileName);
+  startLogging(loginfo);
 
 #ifdef PROFILE
   struct timeval start,end;
@@ -15,21 +20,20 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 
   // init
   int error = 0;
-  unload_good = false;
+  io_good = false;
 
   //  const char * filename = wt_arg.FileName;
   recon_row_3 = wt_arg.ReconRow3;
   FP_FORMAT dataFormat = wt_arg.FileFpFormat;
   fpconv.setFileFormat(dataFormat);
   if(fpconv.fileFormat == FP_UNKNOWN) {
-    cout << "Output Floating Point format UNKNOWN"<< endl;
-    return;
+    ERR.General(cname,fname,"Output Floating Point format UNKNOWN\n");
   }
 
   // calc Plaq and LinkTrace
   const int size_matrices(wt_arg.VolNodeSites()*4);
   Matrix * lpoint = lat.GaugeField();
-  cout << "Writing Gauge Field at Lattice::GaugeField() = " << hex << lpoint << dec << endl;
+  VRB.Flow(cname,fname, "Writing Gauge Field at Lattice::GaugeField() = %p\n", lpoint);
 
   Float plaq = lat.SumReTrPlaq()/(18*wt_arg.VolSites()) ;
   Float ltrace(0.0);
@@ -42,6 +46,7 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   else
     globalSumFloat(0.0);  // everyone has to participate in global ops
 
+  log();
   
   // write lattice data, in Parallel or Serial manner
   // determined by the template parameter "IoStyle" of this class
@@ -60,9 +65,8 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
     // all open file, start writing
     output.open(wt_arg.FileName);
     if(!output.good())    {
-      cout << "Could not open file:\n   "
-	   << wt_arg.FileName
-	   << "\nfor output.\nUSER: maybe you should kill the process\n\n";
+      //      VRB.Flow(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);
+      //      VRB.Flow(cname,fname,"USER: maybe you should kill the process\n");
       error = 1;
     }
   }
@@ -71,28 +75,31 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
     if(isRoot()) {
       output.open(wt_arg.FileName);
       if(!output.good())    {
-	cout << "Could not open file:\n   "
-	     << wt_arg.FileName
-	     << "\nfor output.\nUSER: maybe you should kill the process\n\n";
+	//	VRB.Flow(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);
+	//	VRB.Flow(cname,fname,"USER: maybe you should kill the process\n");
 	error = 1;
       }
     }
   }
-  if(synchronize(error) > 0)  return;
+  if(synchronize(error) > 0)  
+    ERR.FileW(cname,fname,wt_arg.FileName);
 
   // write header
   if(isRoot()){
     hd.init(wt_arg, fpconv.fileFormat, ltrace, plaq);
     hd.write(output);
   }
-  if(synchronize(error) > 0) return;
+  if(synchronize(error) > 0) 
+    ERR.General(cname,fname,"Writing header failed\n");
+  log();
 
   broadcastInt(&hd.data_start);
 
   if(parIO()) {
     ParallelIO pario(wt_arg);
     if(!pario.store(output, (char*)lpoint, data_per_site, sizeof(Matrix)*4,
-		    hd, fpconv, 4, &csum)) return;
+		    hd, fpconv, 4, &csum)) 
+      ERR.General(cname, fname, "Unload failed\n");
     if(wt_arg.Scoor() == 0) 
       csum = globalSumUint(csum);
     else 
@@ -102,9 +109,12 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   else {
     SerialIO serio(wt_arg);
     if(!serio.store(output, (char*)lpoint, data_per_site, sizeof(Matrix)*4,
-		    hd, fpconv, 4, &csum)) return;
+		    hd, fpconv, 4, &csum)) 
+      ERR.General(cname, fname, "Unload failed\n");
   }
 #endif
+
+  log();
 
   // after unloading, fill in checksum
   if(isRoot()) 
@@ -117,16 +127,20 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
     if(isRoot())
       output.close();
   }
-  if(synchronize(error) != 0)  return;
+  if(synchronize(error) != 0)  
+    ERR.General(cname, fname, "Writing checksum failed\n");
   
-  cout << "Unloading Finished!" << endl << endl;
-
 #ifdef PROFILE
   gettimeofday(&end,NULL);
   print_flops(cname,"write",0,&start,&end);
 #endif
 
-  unload_good = true;
+  io_good = true;
+
+  log();
+  finishLogging();
+
+  VRB.FuncEnd(cname,fname);
 }
 
 

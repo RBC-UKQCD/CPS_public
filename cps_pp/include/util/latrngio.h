@@ -12,14 +12,13 @@ using namespace std;
 
 
 class LatRngIO : public QioControl {
+ private:
+  char * cname;
  public:
-  LatRngIO () : QioControl(), io_good(false) { }
+  LatRngIO () : QioControl(), cname("LatRngIO") { }
   virtual ~LatRngIO() { }
 
-  bool good() { return io_good; }
-
  protected:
-  bool io_good;
   IntConv intconv;
 
   LatRngHeader hd;
@@ -33,7 +32,8 @@ class LatRngIO : public QioControl {
 #if TARGET == QCDOC
       UseParIO = 0; 
 #else
-      cout << "On non-QCDOC platform, setSerial() has no effect!" << endl;
+      const char * fname = "setSerial()";
+      VRB.Flow(cname,fname, "On non-QCDOC platform, setSerial() has no effect!\n");
 #endif
     }
 
@@ -43,6 +43,8 @@ class LatRngIO : public QioControl {
 
 
 class LatRngRead : public LatRngIO {
+ private:
+  char * cname;
  public:
   LatRngRead();
   virtual ~LatRngRead();
@@ -52,14 +54,9 @@ class LatRngRead : public LatRngIO {
 
 };
 
-class LatRngReadSerial : public LatRngRead {
- public:
-  LatRngReadSerial() : LatRngRead() {
-    setSerial();
-  }
-};
-
 class LatRngWrite : public LatRngIO {
+ private:
+  char * cname;
  public:
   LatRngWrite();
   virtual ~LatRngWrite();
@@ -69,12 +66,6 @@ class LatRngWrite : public LatRngIO {
 
 };
 
-class LatRngWriteSerial : public LatRngWrite {
- public:
-  LatRngWriteSerial() : LatRngWrite() {
-    setSerial();
-  }
-};
 
 
 CPS_END_NAMESPACE

@@ -24,7 +24,7 @@ const int FP_FORMAT_ENTRIES = sizeof(FP_FORMAT_NAME)/sizeof(FP_FORMAT_NAME[0]);
 
 
 FPConv::FPConv() 
-  : fileFormat(FP_UNKNOWN) { 
+  : fileFormat(FP_UNKNOWN), cname("FPConv"), sim_qcdsp(0) { 
   testHostFormat();
 
 }
@@ -38,6 +38,7 @@ const char * FPConv::name(const enum FP_FORMAT format) {
 }
 
 char * FPConv::file2host(char * hbuf, const char * fdat, const int fdat_len)const {
+  const char * fname = "file2host()";
   // trivial case
   if(hostFormat == fileFormat) {
     memcpy(hbuf,fdat,fdat_len*size(hostFormat));
@@ -60,8 +61,8 @@ char * FPConv::file2host(char * hbuf, const char * fdat, const int fdat_len)cons
       copy32((type32*)hbuf, (type32*)fdat, fdat_len);
     }
     else {
-      cout << "read IEEE64 on QCDSP : not implemented!" << endl;
-      return 0;
+      ERR.NotImplemented(cname,fname,"Read IEEE64 on QCDSP not implemented!\n");
+      //      return 0;
     }
   }
   else if(size(hostFormat) == 4) {     // host  ieee32
@@ -89,6 +90,7 @@ char * FPConv::file2host(char * hbuf, const char * fdat, const int fdat_len)cons
 }
 
 char * FPConv::host2file(char *fbuf, const char * hdat, const int hdat_len) const{
+  const char * fname = "host2file";
   // trivial case
   if(hostFormat == fileFormat) {
     memcpy(fbuf,hdat,hdat_len*size(fileFormat));
@@ -103,8 +105,8 @@ char * FPConv::host2file(char *fbuf, const char * hdat, const int hdat_len) cons
       ti2ieee((type32*)fbuf, hdat_len);
     }
     else {
-      cout << "write IEEE64 on QCDSP : not implemented!" << endl;
-      return 0;
+      ERR.NotImplemented(cname,fname, "Write IEEE64 on QCDSP : not implemented!\n");
+      //      return 0;
     }
   }
   else if(size(hostFormat) == 4) {     // host  ieee32
@@ -220,16 +222,17 @@ void FPConv::copy32(type32 tgt[], type32 src[], int n) const{
 }
 
 enum FP_FORMAT  FPConv::testHostFormat() { // test the type of CPS::Float
+  const char * fname = "testHostFormat()";
   // 1. endian
   char end_check[4] = {1,0,0,0};
   unsigned long *lp = (unsigned long *)end_check;
   int host_big;
 
   if ( *lp == 0x1 ) { 
-    cout << "Host is little-endian\n";
+    //    cout << "Host is little-endian\n";
     host_big = 0;
   } else {
-    cout << "Host is big-endian\n";
+    //    cout << "Host is big-endian\n";
     host_big = 1;
   }
 
@@ -265,22 +268,24 @@ enum FP_FORMAT  FPConv::testHostFormat() { // test the type of CPS::Float
     }
 
   } // end of 32 bits
-  cout << "Host FP Format : " << name(hostFormat) << endl;
+  //  VRB.Flow(cname,fname, "Host FP Format : %s\n", name(hostFormat) );
 
   return hostFormat;
 }
 
 enum FP_FORMAT  FPConv::setFileFormat(const enum FP_FORMAT dataFormat) {
+  const char * fname = "setFileFormat";
   fileFormat = dataFormat;
   if(dataFormat == FP_AUTOMATIC) 
     fileFormat = hostFormat;
   if(fileFormat == FP_UNKNOWN) {
-    cout << "Floating point format setting error!" << endl;
+    VRB.Flow(cname,fname,"Floating point format cannot be FP_UNKNOWN!\n");
   }
   return fileFormat;
 }
 
 enum FP_FORMAT  FPConv::setFileFormat(const char * desc) {
+  const char * fname = "setFileFormat()";
   fileFormat = FP_UNKNOWN;
   for(int i=1;i<FP_FORMAT_ENTRIES;i++) {
     if(!strcmp(FP_FORMAT_NAME[i],desc)) {
@@ -289,7 +294,7 @@ enum FP_FORMAT  FPConv::setFileFormat(const char * desc) {
     }
   }
   if(fileFormat == FP_UNKNOWN) {
-    cout << "Floating point format \"" << desc << "\" not recognized!" << endl;
+    VRB.Flow(cname,fname, "Floating point format \"%s\" not recognized!\n",desc);
   }
   else if(fileFormat == FP_AUTOMATIC)  {
     fileFormat = hostFormat;
@@ -300,20 +305,27 @@ enum FP_FORMAT  FPConv::setFileFormat(const char * desc) {
 
 unsigned int FPConv::checksum(char * data, const int data_len,
 			       const enum FP_FORMAT dataFormat) const{
+  const char * fname = "checksum()";
   // checksum always done on 32-bits
 
   enum FP_FORMAT chkFormat = dataFormat;
   if(dataFormat == FP_AUTOMATIC)  chkFormat = fileFormat;
 
   if(chkFormat == FP_UNKNOWN) {
-    cout << "checksum data format not recognized!" << endl;
+    VRB.Flow(cname,fname, "checksum data format UNKNOWN!\n");
     return 0;
   }
 
   int csumcnt = data_len;
   if(size(chkFormat) == 8)  csumcnt *= 2; // always sum as 32 bits data
 
-  if(big_endian(hostFormat) != big_endian(chkFormat))
+  int need_byterevn = 0;
+  if(sim_qcdsp && !big_endian(chkFormat)) 
+    need_byterevn = 1;
+  if(!sim_qcdsp && big_endian(hostFormat) != big_endian(chkFormat))
+    need_byterevn = 1;
+
+  if(need_byterevn)
     byterevn((type32*)data, csumcnt);
 
   unsigned int *buf = (unsigned int*)data;
@@ -323,7 +335,7 @@ unsigned int FPConv::checksum(char * data, const int data_len,
     buf++;
   }
 
-  if(big_endian(hostFormat) != big_endian(chkFormat))
+  if(need_byterevn)
     byterevn((type32*)data, csumcnt);
 
   return s;
@@ -480,7 +492,8 @@ void FPConv::ti2ieee(type32 *ti, int Num) const{
 
 
 void FPConv::ieee2ti(type32 *ti, int Num) const{
-  cout << "FPConv::ieee2ti()  not implemented" << endl;
+  const char * fname = "ieee2ti()";
+  ERR.NotImplemented(cname,fname);
   exit(13);
 }
 

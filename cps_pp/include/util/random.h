@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.19 2004-11-22 20:32:38 chulwoo Exp $
+  $Id: random.h,v 1.20 2004-12-21 19:02:38 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-11-22 20:32:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.19 2004-11-22 20:32:38 chulwoo Exp $
-//  $Id: random.h,v 1.19 2004-11-22 20:32:38 chulwoo Exp $
+//  $Date: 2004-12-21 19:02:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.20 2004-12-21 19:02:38 chulwoo Exp $
+//  $Id: random.h,v 1.20 2004-12-21 19:02:38 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -31,6 +31,7 @@ CPS_END_NAMESPACE
 #include <util/enum.h>
 #include <util/error.h>
 #include <util/smalloc.h>
+#include <util/verbose.h>
 CPS_START_NAMESPACE
 //---------------------------------------------------------------
 //! A random number generator generating uniform random numbers in (0,1)
@@ -332,8 +333,36 @@ class LatRanGen
         FermionFieldDimension frm_dim = FIVE_D ) const;
     
     //! Save the RNGs to a file (due to multi-type class members, not only supports read/write on same platform)
-    bool Read(const char* filename, const int ParIO = 1);
-    bool Write(const char* filename, const int ParIO = 1);
+    bool Read(const char* filename);
+    bool Write(const char* filename);
+
+ private:
+    bool UseParIO;
+    bool io_good;
+ public:
+    inline void setParallel() { UseParIO = 1; }
+    
+    inline void setSerial() { 
+#if TARGET == QCDOC
+      UseParIO = 0; 
+#else
+      const char * fname = "setSerial";
+      VRB.Flow(cname,fname,"On non-QCDOC platform, setSerial() has no effect!");
+#endif
+    }
+
+    inline int parIO() const { return UseParIO; }
+
+    inline bool good() const { return io_good; }
+
+ private:
+    int do_log;
+    char log_dir[200];
+ public:
+    void setLogDir(const char * LogDir) {
+      do_log = 1;
+      strcpy(log_dir,LogDir);
+    }
 	
 };
 

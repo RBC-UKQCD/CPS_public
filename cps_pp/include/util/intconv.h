@@ -26,6 +26,8 @@ class QioArg;
 
 class IntConv : public DataConversion
 {
+ private:
+  char * cname;
  protected:
   void byterevn(type32 w[], int n) const;
 

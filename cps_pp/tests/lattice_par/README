@@ -45,3 +45,9 @@ qrun QCDOC.x  -w  conf4x4x4x16.file 4  16     P  P  A  A
      use class:     Read/WriteLatticeParallel  default   use parallel
 		    Read/WriteLatticeSerial    default   use serial
 
+
+9. Use Logging:
+	Enable logging for Read/WriteLatticeParallel:  Read/WriteLatticeParallel::setLogDir("/whateverlogdir/");
+	Enable logging for Read/Write LRG:             LRG.setLogDir("/whateverlogdir/");
+   The "whateverlogdir" should be existent before the program starts.
+

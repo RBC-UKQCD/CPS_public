@@ -1,3 +1,10 @@
+//------------------------------------------------------------------
+/*!\file
+  \brief  Definitions of the bigfloat wrapper class.
+
+  $Id: bigfloat.h,v 1.3 2004-12-21 19:02:36 chulwoo Exp $
+*/
+//------------------------------------------------------------------
 #include<config.h>
 #include <gmp.h>
 CPS_START_NAMESPACE
@@ -11,7 +18,16 @@ CPS_START_NAMESPACE
 // algorithm
 //
 //------------------------------------------------------------------
-
+//! Arbitrary precision arithmetic.
+/*!
+  This is used by the AlgRemez class
+  It is a wrapper around the GNU
+  Multiprecision Library (GMP).GMP library.
+  and therefore can only be used if the CPS is built with GMP.
+  This is achieved at CPS configure time by using the option
+  --enable-gmp=GMP_PATH with the configure script, where GMP_PATH is the 
+  directory where GMP has been installed. 	
+*/
 class bigfloat {
 
 private:
@@ -25,7 +41,8 @@ public:
   bigfloat(const unsigned long u) { mpf_init_set_ui(x, u); }
   bigfloat(const long i) { mpf_init_set_si(x, i); }
   bigfloat(const int i) {mpf_init_set_si(x,(long)i);}
-  bigfloat(const Float d) { mpf_init_set_d(x, (double)d); }
+  bigfloat(const float d) { mpf_init_set_d(x, (double)d); }
+  bigfloat(const double d) { mpf_init_set_d(x, d); }  
   bigfloat(const char *str) { mpf_init_set_str(x, str, 10); }
   ~bigfloat(void) { mpf_clear(x); }
   operator const Float (void) const { return (Float)mpf_get_d(x); }
@@ -58,8 +75,13 @@ public:
     return *this;
   }
   
-  bigfloat& operator=(const Float y) {
+  bigfloat& operator=(const float y) {
     mpf_set_d(x, (double)y); 
+    return *this;
+  }
+
+  bigfloat& operator=(const double y) {
+    mpf_set_d(x, y); 
     return *this;
   }
 

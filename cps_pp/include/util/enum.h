@@ -11,11 +11,6 @@
 #include <util/vml/vml.h>
 #include <util/enum.h>
 #include <util/defines.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 CPS_START_NAMESPACE
 
 typedef double Float;
@@ -496,6 +491,10 @@ enum FieldTensorId {
 typedef enum FieldTensorId FieldTensorId;
 
 /* the xdr functions */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if defined(__STDC__) || defined(__cplusplus)
 extern  bool_t vml_Float (VML *, char *instance, Float*);

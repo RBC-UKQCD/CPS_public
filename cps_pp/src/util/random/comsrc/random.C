@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.19 2004-12-01 06:38:26 chulwoo Exp $
+  $Id: random.C,v 1.20 2004-12-21 19:02:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-01 06:38:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.19 2004-12-01 06:38:26 chulwoo Exp $
-//  $Id: random.C,v 1.19 2004-12-01 06:38:26 chulwoo Exp $
+//  $Date: 2004-12-21 19:02:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.20 2004-12-21 19:02:43 chulwoo Exp $
+//  $Id: random.C,v 1.20 2004-12-21 19:02:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -141,6 +141,8 @@ LatRanGen::LatRanGen()
 {
     cname = "LatRanGen";
     is_initialized = 0;
+    UseParIO = 1;
+    io_good = 1;
 }
 
 LatRanGen::~LatRanGen() {
@@ -516,23 +518,27 @@ void LatRanGen::GetStates(unsigned int **s,
 }
 
 
-bool LatRanGen::Read(const char * filename, const int ParIO) {
+bool LatRanGen::Read(const char * filename) {
+  io_good = false;
   QioArg rd_arg(filename);
   LatRngRead  rd;
-  if(ParIO) rd.setParallel();
-  else      rd.setSerial();
+  if(parIO()) rd.setParallel();
+  else        rd.setSerial();
+  if(do_log) rd.setLogDir(log_dir);
   rd.read(ugran,ugran_4d,rd_arg);
-  return rd.good();
+  return (io_good = rd.good());
 }
 
 
-bool LatRanGen::Write(const char * filename, const int ParIO) {
+bool LatRanGen::Write(const char * filename) {
+  io_good = false;
   QioArg wt_arg(filename);
   LatRngWrite  wt;
-  if(ParIO) wt.setParallel();
-  else      wt.setSerial();
+  if(parIO()) wt.setParallel();
+  else        wt.setSerial();
+  if(do_log) wt.setLogDir(log_dir);
   wt.write(ugran,ugran_4d,wt_arg);
-  return wt.good();
+  return (io_good=wt.good());
 }
 
 CPS_END_NAMESPACE

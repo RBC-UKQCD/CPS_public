@@ -3,9 +3,9 @@
 #include<math.h>
 CPS_START_NAMESPACE
 /*!\file
-  \brief  Implementation of Fasqtad class.
+  \brief  Implementation of some Fasqtad class methods.
 
-  $Id: f_asqtad.C,v 1.18 2004-12-01 06:38:18 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.19 2004-12-21 19:02:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -144,7 +144,6 @@ int Fasqtad::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift,
 
   Float dot = f_in -> NormSqGlbSum(e_vsize);
 
-//  Float RsdCG[Nshift];
   Float *RsdCG = (Float *)smalloc(sizeof(Float)*Nshift);
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
@@ -155,7 +154,8 @@ int Fasqtad::FmatEvlMInv(Vector *f_out, Vector *f_in, Float *shift,
 
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
-      asqtad.Dslash(f_out_d + e_vsize*s,f_out + e_vsize*s,CHKB_EVEN,DAG_NO);
+	asqtad.Dslash(f_out_d + GJP.VolNodeSites()/2*s,
+		      f_out + GJP.VolNodeSites()/2*s, CHKB_EVEN, DAG_NO);
   cg_arg->true_rsd = RsdCG[isz];
 
   sfree(RsdCG);
@@ -208,16 +208,14 @@ int Fasqtad::FmatInv(Vector *f_out, Vector *f_in,
 		   CnvFrmType cnv_frm,
 		   PreserveType prs_f_in)
 {
-  int iter;
+
   char *fname = "FmatInv(CgArg*,V*,V*,F*,CnvFrmType)";
   VRB.Func(cname,fname);
 
   DiracOpAsqtad stag(*this, f_out, f_in, cg_arg, cnv_frm);
   
-  iter = stag.MatInv(true_res, prs_f_in);
+  return stag.MatInv(true_res, prs_f_in);
   
-  // Return the number of iterations
-  return iter;
 }
 
 
@@ -411,10 +409,10 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
     P3[i] = (Matrix *)fmalloc(cname,fname,"P3[i]",sizeof(Matrix)*vol);
   for(j = 0;j<POS_DIR;j++){
      result[j] = fields[0] + vol*j;
-//    result[j+POS_DIR] = fields[1] + vol*j;
+
      VRB.Flow(cname,fname,"result[%d]=%p\n",j,result[j]);
   }
-//     result[j] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+
 
   for(j = 0;j<vol;j++) Unit[j] = c1;
   for(j = 0;j<POS_DIR;j++)

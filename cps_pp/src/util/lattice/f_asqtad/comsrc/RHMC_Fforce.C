@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce.C,v 1.5 2004-12-01 06:38:18 chulwoo Exp $
+  $Id: RHMC_Fforce.C,v 1.6 2004-12-21 19:02:39 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -57,42 +57,38 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
     const int N = 4;  
     enum{plus, minus, n_sign};
 
-    int vol = GJP.VolNodeSites();
-    size_t size = vol*FsiteSize()/2*sizeof(Float);
-    int m_size = sizeof(Matrix);
-    int v_size = sizeof(Vector);
+    const int vol = GJP.VolNodeSites();
     
-    for (int i=0; i<degree; i++) 
-      (sol+i*size) -> VecTimesEquFloat(alpha[i],size);
+    for (int i=0; i<degree; i++)
+	(sol+i*vol/2)->VecTimesEquFloat(alpha[i], vol/2*FsiteSize());
 
-    Vector **X = (Vector**)smalloc(degree*sizeof(Vector*));
-    for (int p=0; p<degree; p++) X[p] = (Vector*)smalloc(vol*sizeof(Vector));
+    Vector **X = (Vector**)amalloc(smalloc, sizeof(Vector), 2, degree, vol);
 
     // X_odd = D X_even    
     for (int p=0; p<degree; p++) {
-      moveMem(X[p], sol+size*p, size);
-      moveMem(X[p]+vol/2, sol_d+size*p, size);
-      Fconvert(X[p], CANONICAL, STAG);
+	moveMem(X[p],       sol+vol/2*p,   vol/2*FsiteSize()*sizeof(Float));
+	moveMem(X[p]+vol/2, sol_d+vol/2*p, vol/2*FsiteSize()*sizeof(Float));
+	Fconvert(X[p], CANONICAL, STAG);
     }
     Convert(STAG);  // Puts staggered phases into gauge field.
 
     // These are work Matrices used in force_product_sum routines
-    Matrix *mtmp = (Matrix*)fmalloc(vol*m_size);
+    Matrix *mtmp = (Matrix*)fmalloc(vol*sizeof(Matrix));
 
     // Matrix fields for which we must allocate memory
-    Matrix ***Pnu = (Matrix***)amalloc(fmalloc, m_size, 3, n_sign, N, vol);
-    Matrix ****P3 = (Matrix****)amalloc(fmalloc, m_size, 4, n_sign, n_sign, N, vol);
-    Matrix ****Prhonu = (Matrix****)amalloc(fmalloc, m_size, 4, n_sign, n_sign, N, vol);
-    Matrix *****P5 = (Matrix*****)amalloc(fmalloc, m_size, 5, n_sign, n_sign, n_sign, N, vol);
-    Matrix ******P7 = (Matrix******)amalloc(fmalloc, m_size, 6, n_sign, n_sign, n_sign, n_sign, N, vol);
-    Matrix ******Psigma7 = (Matrix******)amalloc(fmalloc, m_size, 6, n_sign, n_sign, n_sign, n_sign, N, vol);
-    Matrix **L = (Matrix**)amalloc(fmalloc, m_size, 2, N, vol);
-    Matrix ***Lnu = (Matrix***)amalloc(fmalloc, m_size, 3, n_sign, N, vol);
-    Matrix ****Lrhonu = (Matrix****)amalloc(fmalloc, m_size, 4, n_sign, n_sign, N, vol);
-    Matrix ****Lmusigmarhonu = (Matrix****)amalloc(fmalloc, m_size, 4, n_sign, n_sign, N, vol);
+    Matrix ***Pnu = (Matrix***)amalloc(fmalloc, sizeof(Matrix), 3, n_sign, N, vol);
+    Matrix ****P3 = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
+    Matrix ****Prhonu = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
+    Matrix *****P5 = (Matrix*****)amalloc(fmalloc, sizeof(Matrix), 5, n_sign, n_sign, n_sign, N, vol);
+    Matrix ******P7 = (Matrix******)amalloc(fmalloc, sizeof(Matrix), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
+    Matrix ******Psigma7 = (Matrix******)amalloc(fmalloc, sizeof(Matrix), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
+    Matrix **L = (Matrix**)amalloc(fmalloc, sizeof(Matrix), 2, N, vol);
+    Matrix ***Lnu = (Matrix***)amalloc(fmalloc, sizeof(Matrix), 3, n_sign, N, vol);
+    Matrix ****Lrhonu = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
+    Matrix ****Lmusigmarhonu = (Matrix****)amalloc(fmalloc, sizeof(Matrix), 4, n_sign, n_sign, N, vol);
 
     // Array in which to accumulate the force term      
-    Matrix **force = (Matrix**)amalloc(fmalloc, m_size, 2, 4, vol);
+    Matrix **force = (Matrix**)amalloc(fmalloc, sizeof(Matrix), 2, 4, vol);
 
     // These fields can be overlapped with previously allocated memory
     
@@ -115,7 +111,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 
 
     for(int i=0; i<4; i++)
-      for(int s=0; s<vol; s++) force[i][s].ZeroMatrix();
+	for(int s=0; s<vol; s++) force[i][s].ZeroMatrix();
 
     ParTransAsqtad parallel_transport(*this);
 
@@ -765,7 +761,6 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
     ffree(Lrhonu);
     ffree(Lmusigmarhonu);
     ffree(force);
-    for (int p=0; p<degree; p++) sfree(X[p]);
     sfree(X);
     ffree(mtmp);
    

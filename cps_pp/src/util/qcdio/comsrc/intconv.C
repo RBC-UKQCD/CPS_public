@@ -18,7 +18,7 @@ const int INT_FORMAT_ENTRIES = sizeof(INT_FORMAT_NAME)/sizeof(INT_FORMAT_NAME[0]
 
 
 IntConv::IntConv() 
-  : fileFormat(INT_UNKNOWN) { 
+  : fileFormat(INT_UNKNOWN), cname("IntConv") { 
   testHostFormat();
 
 }
@@ -99,16 +99,17 @@ void IntConv::copy32(type32 tgt[], type32 src[], int n) const {
 }
 
 enum INT_FORMAT  IntConv::testHostFormat() { // test the type of CPS::Float
+  const char * fname = "testHostFormat()";
   // 1. endian
   char end_check[4] = {1,0,0,0};
   unsigned long *lp = (unsigned long *)end_check;
   int host_big;
 
   if ( *lp == 0x1 ) { 
-    cout << "Host is little-endian\n";
+    //    cout << "Host is little-endian\n";
     host_big = 0;
   } else {
-    cout << "Host is big-endian\n";
+    //    cout << "Host is big-endian\n";
     host_big = 1;
   }
 
@@ -118,24 +119,27 @@ enum INT_FORMAT  IntConv::testHostFormat() { // test the type of CPS::Float
     else          hostFormat = INT_32LITTLE;
   }
   else {
-    cout << "IntConv::testHostFormat() : non-32 bit int not supported" << endl;
-    exit(13);
+    ERR.NotImplemented(cname,fname,"IntConv::testHostFormat() : non-32 bit int not supported\n");
+    //    exit(13);
   }
 
   return hostFormat;
 }
 
 enum INT_FORMAT  IntConv::setFileFormat(const enum INT_FORMAT dataFormat) {
+  const char * fname = "setFileFormat()";
+
   fileFormat = dataFormat;
   if(dataFormat == INT_AUTOMATIC) 
     fileFormat = hostFormat;
   if(fileFormat == INT_UNKNOWN) {
-    cout << "Floating point format setting error!" << endl;
+    VRB.Flow(cname,fname,"Floating point format cannot be INT_UNKNOWN!\n");
   }
   return fileFormat;
 }
 
 enum INT_FORMAT  IntConv::setFileFormat(const char * desc) {
+  const char * fname = "setFileFormat()";
   fileFormat = INT_UNKNOWN;
   for(int i=1;i<INT_FORMAT_ENTRIES;i++) {
     if(!strcmp(INT_FORMAT_NAME[i],desc)) {
@@ -144,7 +148,7 @@ enum INT_FORMAT  IntConv::setFileFormat(const char * desc) {
     }
   }
   if(fileFormat == INT_UNKNOWN) {
-    cout << "Floating point format \"" << desc << "\" not recognized!" << endl;
+    VRB.Flow(cname,fname,"Floating point format \"%s\" not recognized!\n",desc);
   }
   else if(fileFormat == INT_AUTOMATIC)  {
     fileFormat = hostFormat;
@@ -155,13 +159,14 @@ enum INT_FORMAT  IntConv::setFileFormat(const char * desc) {
 
 unsigned int IntConv::checksum(char * data, const int data_len,
 			       const enum INT_FORMAT dataFormat) const{
+  const char * fname = "checksum()";
   // checksum always done on 32-bits
 
   enum INT_FORMAT chkFormat = dataFormat;
   if(dataFormat == INT_AUTOMATIC)  chkFormat = fileFormat;
 
   if(chkFormat == INT_UNKNOWN) {
-    cout << "checksum data format not recognized!" << endl;
+    VRB.Flow(cname,fname,"checksum data format not recognized!\n");
     return 0;
   }
 
@@ -187,13 +192,14 @@ unsigned int IntConv::posDepCsum(char * data, const int data_len,
 				 const int dimension, const QioArg & qio_arg, 
 				 const int siteid, const int global_id,
 				 const enum INT_FORMAT dataFormat) const {
+  const char * fname = "posDepCsum()";
   // checksum always done on 32-bits
 
   enum INT_FORMAT chkFormat = dataFormat;
   if(dataFormat == INT_AUTOMATIC)  chkFormat = fileFormat;
 
   if(chkFormat == INT_UNKNOWN) {
-    cout << "checksum data format not recognized!" << endl;
+    VRB.Flow(cname,fname,"checksum data format not recognized!\n");
     return 0;
   }
 

@@ -26,3 +26,12 @@ qrun QCDOC.x  -w  conf4x4x4x16x32.file 4  16  32
 
 
 6. NOTE: on non-QCDOC machine, only parallel mode (direct-io mode) is applicable
+
+7. Use Logging:
+	Enable logging for Read/WriteLatticeParallel:  Read/WriteLatticeParallel::setLogDir("/whateverlogdir/");
+	Enable logging for Read/Write LRG:             LRG.setLogDir("/whateverlogdir/");
+   The "whateverlogdir" should be existent before the program starts.
+
+
+
+

@@ -37,8 +37,10 @@ class IoStyle : protected QioControl {
 
 
 class ParallelIO : public IoStyle {
+ private:
+  char * cname;
  public:
-  ParallelIO(const QioArg & qarg) : IoStyle(qarg) { }
+  ParallelIO(const QioArg & qarg) : IoStyle(qarg), cname("ParallelIO") { }
 
   virtual int load(char * data, const int data_per_site, const int site_mem,
 		   const LatHeaderBase & hd, const DataConversion & dconv,
@@ -59,8 +61,10 @@ class ParallelIO : public IoStyle {
 #if TARGET == QCDOC  // Serial IO mode only applicable to QCDOC
 
 class SerialIO : public IoStyle {
+ private:
+  char * cname;
  public:
-  SerialIO(const QioArg & qarg) : IoStyle(qarg) { }
+  SerialIO(const QioArg & qarg) : IoStyle(qarg), cname("SerialIO") { }
 
   virtual int load(char * data, const int data_per_site, const int site_mem,
 		   const LatHeaderBase & hd, const DataConversion & dconv,

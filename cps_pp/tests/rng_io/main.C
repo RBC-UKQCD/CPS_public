@@ -74,10 +74,12 @@ int main(int argc, char ** argv) {
   }
   
   cout << "Shuffling done!"<< endl;
-  
+
+  LRG.setLogDir("logs");
 
   if(!strcmp(argv[1],"-r")) { // read
     cout << endl << "***********************  PARALLEL MODE  **************************" << endl;
+    LRG.setParallel();
     if(LRG.Read(argv[2])) {
       cout << "Parallel Reading from file [" << argv[2] << "] success!" << endl;
     }
@@ -86,7 +88,8 @@ int main(int argc, char ** argv) {
     }
 
     cout << endl << "***********************  SERIAL MODE  **************************" << endl;
-    if(LRG.Read(argv[2], 0)) {
+    LRG.setSerial();
+    if(LRG.Read(argv[2])) {
       cout << "Serial Reading from file [" << argv[2] << "] success!" << endl;
     }
     else {
@@ -95,6 +98,7 @@ int main(int argc, char ** argv) {
   }
   else if(!strcmp(argv[1],"-w")) {  // write
     cout << endl << "***********************  PARALLEL MODE  **************************" << endl;
+    LRG.setParallel();
     if(LRG.Write(argv[2])) {
       cout << "Parallel Writing to file [" << argv[2] << "] success!" << endl;
     }
@@ -107,7 +111,8 @@ int main(int argc, char ** argv) {
     strcat(fname,".serial");
 
     cout << endl << "***********************  SERIAL MODE  **************************" << endl;
-    if(LRG.Write(fname,0)) {
+    LRG.setSerial();
+    if(LRG.Write(fname)) {
       cout << "Serial Writing to file [" << fname << "] success!" << endl;
     }
     else {

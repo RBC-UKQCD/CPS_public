@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of ParTransAsqtad class methods.
   
-  $Id: pt_asqtad.C,v 1.3 2004-08-18 11:58:06 zs Exp $
+  $Id: pt_asqtad.C,v 1.4 2004-12-21 19:02:41 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/noarch/pt_asqtad.C,v 1.3 2004-08-18 11:58:06 zs Exp $
-//  $Id: pt_asqtad.C,v 1.3 2004-08-18 11:58:06 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-12-21 19:02:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/noarch/pt_asqtad.C,v 1.4 2004-12-21 19:02:41 chulwoo Exp $
+//  $Id: pt_asqtad.C,v 1.4 2004-12-21 19:02:41 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_asqtad.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/noarch/pt_asqtad.C,v $
 //  $State: Exp $
 //
@@ -36,7 +36,7 @@ ParTransAsqtad::ParTransAsqtad(Lattice &latt): ParTransStagTypes(latt) {
     cname = "ParTransAsqtad";
     char *fname = "ParTransAsqtad(Lattice&)";
     VRB.Func(cname,fname);
-    printf("latt=%p\n",&latt);
+
     converted = CNV_FRM_NO;
     if(lat.StrOrd()==CANONICAL){
 	lat.Convert(STAG);
@@ -67,7 +67,6 @@ void pt_mat(int N, IFloat **fout, IFloat **fin, const int *dir){
     int s[4], spm[4];
     Matrix ud;
     Matrix *vin[N],*vout[N];
-    printf("Lat=%p\n",Lat);
 
     for(int d=0; d<N; d++){
 	vin[d] = (Matrix *)fin[d];
@@ -109,7 +108,7 @@ void pt_1vec(int N, IFloat **fout, IFloat **fin, const int *dir){
     IFloat *u, *v;
     int s[4], spm[4];
     Vector *vin[N],*vout[N];
-    printf("Lat=%p\n",Lat);
+
 
     for(int d=0; d<N; d++){
         vin[d] = (Vector *)fin[d];
@@ -149,7 +148,7 @@ void pt_1vec(int N, IFloat **fout, IFloat **fin, const int *dir){
 
 void pt_init(Lattice &latt) {
   Lat = &latt;
-  printf("Lat=%p\n",Lat);
+
 }
 
 void pt_delete(){

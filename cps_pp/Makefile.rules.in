@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.15 2004-11-21 21:39:59 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.16 2004-12-21 19:02:35 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -100,6 +100,12 @@ SOBJ=$(SSRC:.S=.o)
 OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
 OBJS := $(notdir $(OBJS_SRC))
 
+XLCOBJ=$(CSRC:.c=.xlo)
+XLCCOBJ=$(CCSRC:.C=.xlo)
+XLCOBJS_SRC = $(XLCCOBJ) $(XLCOBJ)
+XLCOBJS := $(notdir $(XLCOBJS_SRC))
+
+
 %.o:%.c
 	${CC} -c $< -o $(BUILDDIR2)/$@ ${libcps_CXXFLAGS}
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
@@ -108,12 +114,17 @@ OBJS := $(notdir $(OBJS_SRC))
 	${CXX} -c $< -o $(BUILDDIR2)/$@ ${libcps_CXXFLAGS}
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
+%.xlo:%.c
+	cd $(BUILDDIR2)/ ; xlC -F$(BUILDDIR)/XLC.cfg -S $< ${XLCFLAGS}
+	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@ ${XLCFLAGS}
+	cd $(BUILDDIR2) ; objcopy -R .eh_frame $@
+	cd $(BUILDDIR2) ; ar  rcs ${BUILDDIR}/$(LIBNAME).xla $@
+
 %.xlo:%.C
 	cd $(BUILDDIR2)/ ; xlC -F$(BUILDDIR)/XLC.cfg -S $< ${XLCFLAGS}
 	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@ ${XLCFLAGS}
 	cd $(BUILDDIR2) ; objcopy -R .eh_frame $@
 	cd $(BUILDDIR2) ; ar  rcs ${BUILDDIR}/$(LIBNAME).xla $@
-#	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.S
 	$(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR2)/$*.i
@@ -144,6 +155,8 @@ cleanlib:
 	rm -f $(BUILDDIR)/*.a
 
 cps: recurse $(OBJS) 
+
+cps_xlc: recurse $(XLCOBJS) 
 
 buildlib: recurse $(OBJS)
 ifneq ($(OBJS),)

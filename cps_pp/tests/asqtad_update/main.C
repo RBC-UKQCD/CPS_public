@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.12 2004-10-27 15:35:12 zs Exp $
+  $Id: main.C,v 1.13 2004-12-21 19:02:43 chulwoo Exp $
 */
 
 #include<config.h>
@@ -70,12 +70,9 @@ int main(int argc,char *argv[]){
     if(!mom) ERR.Pointer("","","mom");
 
     const int degree = 2; 
-    Vector *X[degree];
-    for(int d=0; d<degree; d++){
-	X[d] = (Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-	if(!X[d]) ERR.Pointer("","","X");
-    }
 
+    Vector *X = (Vector*)smalloc(degree*GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+    
     Matrix *gf = lat.GaugeField();
 
     int s[4];
@@ -90,7 +87,8 @@ int main(int argc,char *argv[]){
 		    IFloat crd = 1.0*s[0]+0.1*s[1]+0.01*s[2]+0.001*s[3];
 
 		    for(int d=0; d<degree; d++)
-			for(int v=0; v<6; v++) *((IFloat*)&X[d] [oe]+v) = crd;
+			for(int v=0; v<6; v++)
+			    *((IFloat*)(X+d*GJP.VolNodeSites()+oe)+v) = crd;
 
 		    for(int d=0; d<4; d++){
 			Complex icrd(0, crd+0.0001*d);
@@ -103,15 +101,15 @@ int main(int argc,char *argv[]){
 
     Float dummy;
     Float dt = 2;
-    VRB.Level(5);
+
 
     Float alpha[degree];
     for(int d=0;  d<degree; d++) alpha[d] = 1.0;
 
-//     for(int d=0; d<degree; d++)
-//  	lat.EvolveMomFforce(mom, X[d], dummy, dt);
+     for(int d=0; d<degree; d++)
+  	lat.EvolveMomFforce(mom, X+d*GJP.VolNodeSites(), dummy, dt);
 
-    lat.RHMC_EvolveMomFforce(mom, X, degree, alpha, dummy, dt, X);
+//    lat.RHMC_EvolveMomFforce(mom, X, degree, alpha, dummy, dt, X);
 		
 
     FILE *fp;
