@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of dynamic memory management routines.	
 
-  $Id: pmalloc.h,v 1.5 2004-09-02 16:57:04 zs Exp $
+  $Id: pmalloc.h,v 1.6 2004-10-27 14:30:25 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-09-02 16:57:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pmalloc.h,v 1.5 2004-09-02 16:57:04 zs Exp $
-// $Id: pmalloc.h,v 1.5 2004-09-02 16:57:04 zs Exp $
+//  $Date: 2004-10-27 14:30:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pmalloc.h,v 1.6 2004-10-27 14:30:25 zs Exp $
+// $Id: pmalloc.h,v 1.6 2004-10-27 14:30:25 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pmalloc.h,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pmalloc.h,v $
 //  $State: Exp $
 //
@@ -30,10 +30,11 @@ CPS_START_NAMESPACE
 
 //! Allocate memory
 /*!
+  Exits with the appropriate Error code if allocation fails.
   \param request The amount of memory (in bytes) to allocate
   \return A pointer to the allocated memory
 */
-void* pmalloc(int request);
+void* pmalloc(size_t request);
 
 //! Free allocate memory
 /*!

@@ -33,36 +33,19 @@ class  ReadLatticeParallel : private QioControl {
   FPConv  fpconv;
   bool load_good;
 
-public:
-  // ctor for 2-step loading
-  ReadLatticeParallel()
-    : QioControl(),cname("ReadLatticeParallel") , load_good(false)
-    {  }
-
-  // ctor invoking loading behavior
+ public:
   ReadLatticeParallel(Lattice & lat, const char * filename, const Float chkprec = 0.01)
-    : 
-    QioControl(), 
-    cname("ReadLatticeParallel") , 
-    load_good(false)
-    {        
+    : QioControl(),cname("ReadLatticeParallel"), load_good(false)    {        
     QioArg rd_arg(filename,chkprec);
     read(lat,rd_arg);
   }
 
-  // ctor invoking loading behavior
   ReadLatticeParallel(Lattice & lat, const QioArg & rd_arg) 
-    : QioControl(), cname("ReadLatticeParallel"), load_good(false)
-  {
+    : QioControl(), cname("ReadLatticeParallel"), load_good(false)   {
     read(lat,rd_arg);
   }
   
   virtual ~ReadLatticeParallel() {}
-
-  void read(Lattice & lat, const char * filename, const Float chkprec = 0.01){
-    QioArg rd_arg(filename,chkprec);
-    read(lat,rd_arg);
-  }
 
   void read( Lattice & lat, const QioArg & rd_arg);
 

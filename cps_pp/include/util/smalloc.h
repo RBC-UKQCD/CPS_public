@@ -1,27 +1,31 @@
 #include<config.h>
+#include <stdlib.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of dynamic memory management routines.	
 
-  $Id: smalloc.h,v 1.9 2004-10-13 18:22:48 chulwoo Exp $
+  $Id: smalloc.h,v 1.10 2004-10-27 14:30:25 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-10-13 18:22:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.9 2004-10-13 18:22:48 chulwoo Exp $
-//  $Id: smalloc.h,v 1.9 2004-10-13 18:22:48 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-10-27 14:30:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.10 2004-10-27 14:30:25 zs Exp $
+//  $Id: smalloc.h,v 1.10 2004-10-27 14:30:25 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: smalloc.h,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 #ifndef _smalloc_h
 #define _smalloc_h                //!< Prevent multiple inclusion
+
+
+
 
 /*! \addtogroup mem_alloc Memory allocation
   @{
@@ -30,37 +34,112 @@ CPS_START_NAMESPACE
 
 //! Allocate memory
 /*!
+  With verbose reporting of allocation details, if the appropriate Verbose
+  level is enabled.
+  \param request The amount of memory (in bytes) to allocate
+  \param vname The name of the variable pointing to the allocated memory.
+  \param fname The name of the calling function or method
+  \param cname The name of the calling class
+  \return A pointer to the allocated memory
+  \post Program exits with the appropriate Error code if allocation fails.  
+*/
+void* smalloc(size_t request,
+	      const char *vname="", const char *fname="smalloc", const char *cname="");
+
+//! Allocate memory
+/*!
+  With verbose reporting of allocation details, if the appropriate Verbose
+  level is enabled.
+  \param cname The name of the calling class
+  \param fname The name of the calling function or method
+  \param vname The name of the variable pointing to the allocated memory.
   \param request The amount of memory (in bytes) to allocate
   \return A pointer to the allocated memory
+  \post  Exits with the appropriate Error code if allocation fails.
 */
-void* smalloc(int request);
-void* smalloc(char *cname, char *fname, char *vname, int request);
+
+void* smalloc(const char *cname, const char *fname, const char *vname, size_t request);
 
 //! Free allocate memory
 /*!
+  With verbose reporting of allocation details, if the appropriate Verbose
+  level is enabled.
+  \param p Pointer to the memory to be freed.
+  \param vname The name of the variable pointing to the allocated memory.
+  \param fname The name of the calling function or method
+  \param cname The name of the calling class
+  \post  Exits with the appropriate Error code if allocation fails.  
+*/
+void sfree(void* p,
+	   const char *vname="", const char *fname="sfree", const char *cname="");
+
+
+//! Free memory
+/*!
+  With verbose reporting of details, if the appropriate Verbose
+  level is enabled.
+  \param cname The name of the calling class
+  \param fname The name of the calling function or method
+  \param vname The name of the variable pointing to the allocated memory.
   \param p Pointer to the memory to be freed.
 */
-void sfree(void* p);
-void sfree(char *cname, char *fname, char *vname, void *p);
+void sfree(const char *cname, const char *fname, const char *vname, void *p);
 
 //! Doesn't appear to do anything.
-void sclear(void);
+void sclear();
 
 
 //! Allocate memory
 /*!
-  Allocates fast memory (EDRAM) on the QCDOC.
+  Allocates in fast memory (EDRAM) on the QCDOC.
+  If this fails, then allocation of transient DDR memory is attempted.
+  With verbose reporting of allocation details, if the appropriate Verbose
+  level is enabled.
   \param request The amount of memory (in bytes) to allocate
+  \param vname The name of the variable pointing to the allocated memory.
+  \param fname The name of the calling function or method
+  \param cname The name of the calling class
   \return A pointer to the allocated memory
+  \post  Exits with the appropriate Error code if allocation fails.  
 */
-void* fmalloc(int request);
-void* fmalloc(char *cname, char *fname, char *vname, int request);
+void* fmalloc(size_t request,
+	      const char *vname="", const char *fname="fmalloc", const char *cname="");
 
 //! Free allocate memory
 /*!
+  With verbose reporting of allocation details, if the appropriate Verbose
+  level is enabled.  
+  \param p Pointer to the memory to be freed.
+  \param vname The name of the variable pointing to the allocated memory.
+  \param fname The name of the calling function or method
+  \param cname The name of the calling class
+*/
+void ffree(void* p,
+	   const char *vname="", const char *fname="ffree", const char *cname="");
+
+//! Allocate memory
+/*!
+  With verbose reporting of allocation details, if the appropriate Verbose
+  level is enabled.
+  \param cname The name of the calling class
+  \param fname The name of the calling function or method
+  \param vname The name of the variable pointing to the allocated memory.
+  \param request The amount of memory (in bytes) to allocate
+  \return A pointer to the allocated memory
+  \post  Exits with the appropriate Error code if allocation fails.
+*/
+void* fmalloc(const char *cname, const char *fname, const char *vname, size_t request);
+
+//! Free memory
+/*!
+  With verbose reporting of details, if the appropriate Verbose
+  level is enabled.
+  \param cname The name of the calling class
+  \param fname The name of the calling function or method
+  \param vname The name of the variable pointing to the allocated memory.
   \param p Pointer to the memory to be freed.
 */
-void ffree(void* p);
+void sfree(const char *cname, const char *fname, const char *vname, void *p);
 
 /*! @} */
 
