@@ -1,18 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  $Id: fix_gauge.C,v 1.4 2004-07-09 04:15:19 chulwoo Exp $
+  $Id: fix_gauge.C,v 1.5 2004-08-18 11:58:04 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-09 04:15:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.4 2004-07-09 04:15:19 chulwoo Exp $
-//  $Id: fix_gauge.C,v 1.4 2004-07-09 04:15:19 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.5 2004-08-18 11:58:04 zs Exp $
+//  $Id: fix_gauge.C,v 1.5 2004-08-18 11:58:04 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v $
 //  $State: Exp $
 //

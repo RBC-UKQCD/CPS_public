@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmd constructor and destructor.
 
-  $Id: alg_hmd.C,v 1.7 2004-07-01 17:43:41 chulwoo Exp $
+  $Id: alg_hmd.C,v 1.8 2004-08-18 11:57:39 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v 1.7 2004-07-01 17:43:41 chulwoo Exp $
-//  $Id: alg_hmd.C,v 1.7 2004-07-01 17:43:41 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v 1.8 2004-08-18 11:57:39 zs Exp $
+//  $Id: alg_hmd.C,v 1.8 2004-08-18 11:57:39 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v $
 //  $State: Exp $
 //--------------------------------------------------------------------

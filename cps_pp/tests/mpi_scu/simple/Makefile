@@ -2,7 +2,7 @@
 CPS_START_NAMESPACE
 # Makefile for the MPI implementation of the UKQCD@QCDOC code.
 #
-# CVS v. $Id: Makefile,v 1.1.1.1 2003-06-22 13:34:49 mcneile Exp $
+# CVS v. $Id: Makefile,v 1.2 2004-08-18 11:58:10 zs Exp $
 # A.N. Jackson: andrewj@epcc.ed.ac.uk 
 #
 

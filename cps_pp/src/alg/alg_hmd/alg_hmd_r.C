@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.11 2004-08-17 03:33:09 chulwoo Exp $
+  $Id: alg_hmd_r.C,v 1.12 2004-08-18 11:57:39 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.11 2004-08-17 03:33:09 chulwoo Exp $
-//  $Id: alg_hmd_r.C,v 1.11 2004-08-17 03:33:09 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.12 2004-08-18 11:57:39 zs Exp $
+//  $Id: alg_hmd_r.C,v 1.12 2004-08-18 11:57:39 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //

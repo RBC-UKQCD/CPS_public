@@ -2,7 +2,7 @@
 CPS_START_NAMESPACE
 /*!\file
 
-  $Id: w_ext_mesons.C,v 1.7 2004-08-17 03:33:11 chulwoo Exp $
+  $Id: w_ext_mesons.C,v 1.8 2004-08-18 11:57:40 zs Exp $
 */
 /* class WspectExtendedMesons
  * Thomas and Xiaodong. March 2000.

@@ -2,14 +2,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v 1.7 2004-08-17 03:33:17 chulwoo Exp $
-//  $Id: main.C,v 1.7 2004-08-17 03:33:17 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v 1.8 2004-08-18 11:58:09 zs Exp $
+//  $Id: main.C,v 1.8 2004-08-18 11:58:09 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v $
 //  $State: Exp $
 //
@@ -42,15 +42,15 @@ int main(int argc,char *argv[]) {
 
     DoArg do_arg;
 
-    do_arg.x_node_sites = 4;
+    do_arg.x_node_sites = 3;
     do_arg.y_node_sites = 4;
     do_arg.z_node_sites = 4;
     do_arg.t_node_sites = 4;
 #ifdef PARALLEL
     do_arg.x_nodes = 1;
     do_arg.y_nodes = 1;
-    do_arg.z_nodes = 1;
-    do_arg.t_nodes = 1;
+    do_arg.z_nodes = 2;
+    do_arg.t_nodes = 2;
 #else
     do_arg.x_nodes = 1;
     do_arg.y_nodes = 1;
@@ -69,6 +69,7 @@ int main(int argc,char *argv[]) {
     MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes,
 			do_arg.z_nodes, do_arg.t_nodes);
     MPI_Init(&argc, &argv);
+    using MPISCU::printf;
 #endif
     
     GJP.Initialize(do_arg);
@@ -86,7 +87,7 @@ int main(int argc,char *argv[]) {
     GwilsonFnone lat;
     AlgPlaq plaquette(lat, &common, &none);
     plaquette.run();
-   printf(" plaquette = %f\n", lat.SumReTrPlaqNode()/(GJP.VolNodeSites()*3.0*6.0));
+    printf(" plaquette = %f\n", lat.SumReTrPlaqNode()/(GJP.VolNodeSites()*3.0*6.0));
     return 0;
 
 }

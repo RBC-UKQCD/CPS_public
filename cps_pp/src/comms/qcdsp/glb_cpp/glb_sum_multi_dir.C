@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of glb_sum_multi_dir routine.
 
-  $Id: glb_sum_multi_dir.C,v 1.3 2004-06-04 21:14:02 chulwoo Exp $
+  $Id: glb_sum_multi_dir.C,v 1.4 2004-08-18 11:57:44 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp/glb_sum_multi_dir.C,v 1.3 2004-06-04 21:14:02 chulwoo Exp $
-//  $Id: glb_sum_multi_dir.C,v 1.3 2004-06-04 21:14:02 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:44 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp/glb_sum_multi_dir.C,v 1.4 2004-08-18 11:57:44 zs Exp $
+//  $Id: glb_sum_multi_dir.C,v 1.4 2004-08-18 11:57:44 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp/glb_sum_multi_dir.C,v $
 //  $State: Exp $
 //

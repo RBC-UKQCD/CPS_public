@@ -5,18 +5,18 @@ CPS_START_NAMESPACE
 
   Used by derivatives of the FwilsonTypes class.
   
-  $Id: sproj_tr.C,v 1.3 2004-06-04 21:14:13 chulwoo Exp $
+  $Id: sproj_tr.C,v 1.4 2004-08-18 11:58:04 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/noarch/sproj_tr.C,v 1.3 2004-06-04 21:14:13 chulwoo Exp $
-//  $Id: sproj_tr.C,v 1.3 2004-06-04 21:14:13 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/noarch/sproj_tr.C,v 1.4 2004-08-18 11:58:04 zs Exp $
+//  $Id: sproj_tr.C,v 1.4 2004-08-18 11:58:04 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/noarch/sproj_tr.C,v $
 //  $State: Exp $
 //

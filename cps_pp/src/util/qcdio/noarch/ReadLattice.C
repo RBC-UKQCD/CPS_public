@@ -1,6 +1,6 @@
 /*!\file
   
-  $Id: ReadLattice.C,v 1.1 2004-07-09 05:23:40 chulwoo Exp $
+  $Id: ReadLattice.C,v 1.2 2004-08-18 11:58:07 zs Exp $
 */
 
 // Read the format of Gauge Connection Format

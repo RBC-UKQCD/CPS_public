@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FwilsonTypes class.
 
-  $Id: f_wilson_t.C,v 1.5 2004-07-28 05:36:47 chulwoo Exp $
+  $Id: f_wilson_t.C,v 1.6 2004-08-18 11:58:04 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-28 05:36:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.5 2004-07-28 05:36:47 chulwoo Exp $
-//  $Id: f_wilson_t.C,v 1.5 2004-07-28 05:36:47 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.6 2004-08-18 11:58:04 zs Exp $
+//  $Id: f_wilson_t.C,v 1.6 2004-08-18 11:58:04 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_wilson_t.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v $
 //  $State: Exp $
 //

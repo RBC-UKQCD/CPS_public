@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of a dummy (empty) argument structure.
 
-  $Id: no_arg.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: no_arg.h,v 1.3 2004-08-18 11:57:36 zs Exp $
 */
 //---------------------------------------------------------------------------
 /*  no_arg.h */

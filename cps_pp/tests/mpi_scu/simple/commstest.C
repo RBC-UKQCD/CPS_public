@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
   A series of tests of the functionality supplied by the MPI
   implementations of the QCDSP comms.
 
-  $Id: commstest.C,v 1.2 2004-08-17 03:33:18 chulwoo Exp $
+  $Id: commstest.C,v 1.3 2004-08-18 11:58:11 zs Exp $
 
   A.N.Jackson: ajackson@epcc.ed.ac.uk                       */
 /*----------------------------------------------------------*/

@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.12 2004-06-17 16:19:34 zs Exp $
+  $Id: config.h.in,v 1.13 2004-08-18 11:57:33 zs Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -14,13 +14,13 @@
  *  CVS keywords
  *
  *  $Author: zs $
- *  $Date: 2004-06-17 16:19:34 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.12 2004-06-17 16:19:34 zs Exp $
- *  $Id: config.h.in,v 1.12 2004-06-17 16:19:34 zs Exp $
+ *  $Date: 2004-08-18 11:57:33 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.13 2004-08-18 11:57:33 zs Exp $
+ *  $Id: config.h.in,v 1.13 2004-08-18 11:57:33 zs Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.12 $
+ *  $Revision: 1.13 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */

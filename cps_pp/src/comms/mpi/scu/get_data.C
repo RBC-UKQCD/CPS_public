@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.2 2004-06-04 21:14:01 chulwoo Exp $
+  $Id: get_data.C,v 1.3 2004-08-18 11:57:41 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/get_data.C,v 1.2 2004-06-04 21:14:01 chulwoo Exp $
-//  $Id: get_data.C,v 1.2 2004-06-04 21:14:01 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/get_data.C,v 1.3 2004-08-18 11:57:41 zs Exp $
+//  $Id: get_data.C,v 1.3 2004-08-18 11:57:41 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/get_data.C,v $
 //  $State: Exp $
 //

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.h,v 1.8 2004-05-10 15:26:54 zs Exp $
+  $Id: enum.h,v 1.9 2004-08-18 11:57:37 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-05-10 15:26:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.8 2004-05-10 15:26:54 zs Exp $
-//  $Id: enum.h,v 1.8 2004-05-10 15:26:54 zs Exp $
+//  $Date: 2004-08-18 11:57:37 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.9 2004-08-18 11:57:37 zs Exp $
+//  $Id: enum.h,v 1.9 2004-08-18 11:57:37 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: enum.h,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v $
 //  $State: Exp $
 //

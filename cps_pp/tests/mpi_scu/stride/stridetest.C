@@ -9,7 +9,7 @@ CPS_START_NAMESPACE
   George T. Fleming <gfleming@mps.ohio-state.edu>
   [recieved Wed, 11 Apr 2001 16:03:40 -0400]
 
-  $Id: stridetest.C,v 1.3 2004-08-17 03:33:18 chulwoo Exp $
+  $Id: stridetest.C,v 1.4 2004-08-18 11:58:11 zs Exp $
 
   A.N.Jackson: ajackson@epcc.ed.ac.uk                       */
 /*----------------------------------------------------------*/

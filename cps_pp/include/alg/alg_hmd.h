@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.9 2004-08-05 18:53:18 mclark Exp $
+  $Id: alg_hmd.h,v 1.10 2004-08-18 11:57:35 zs Exp $
 */
 //------------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 /*!\file
   Staggered Dirac operator for QCDOC
 
-  $Id: dirac.C,v 1.10 2004-08-17 03:33:13 chulwoo Exp $
+  $Id: dirac.C,v 1.11 2004-08-18 11:57:51 zs Exp $
 */
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian

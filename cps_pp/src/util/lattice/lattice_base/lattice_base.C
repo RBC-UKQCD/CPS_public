@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.17 2004-08-17 03:33:14 chulwoo Exp $
+  $Id: lattice_base.C,v 1.18 2004-08-18 11:58:05 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.17 2004-08-17 03:33:14 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.17 2004-08-17 03:33:14 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.18 2004-08-18 11:58:05 zs Exp $
+//  $Id: lattice_base.C,v 1.18 2004-08-18 11:58:05 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -158,7 +158,7 @@ Lattice::Lattice()
     // Allocate memory for the gauge field.
     //--------------------------------------------------------------
     array_size = GsiteSize() * GJP.VolNodeSites() * sizeof(Float);  
-    printf("array_size=%x\n",array_size);
+
     if(start_conf_kind != START_CONF_LOAD &&
        start_conf_kind!=START_CONF_FILE){
       gauge_field = (Matrix *) pmalloc(array_size);

@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the CommonArg structure.
 
-  $Id: common_arg.h,v 1.4 2004-06-07 19:41:08 mclark Exp $
+  $Id: common_arg.h,v 1.5 2004-08-18 11:57:36 zs Exp $
 */
 //--------------------------------------------------------------------------
 #ifndef INCLUDED_COMMON_ARG_H

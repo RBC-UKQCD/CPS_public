@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v 1.4 2004-06-04 21:14:17 chulwoo Exp $
-//  $Id: getseeds.C,v 1.4 2004-06-04 21:14:17 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v 1.5 2004-08-18 11:58:11 zs Exp $
+//  $Id: getseeds.C,v 1.5 2004-08-18 11:58:11 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: getseeds.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v $
 //  $State: Exp $
 //

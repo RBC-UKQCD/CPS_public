@@ -9,13 +9,13 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.5 2004-08-17 03:33:15 chulwoo Exp $
-//  $Id: link_buffer.C,v 1.5 2004-08-17 03:33:15 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.6 2004-08-18 11:58:05 zs Exp $
+//  $Id: link_buffer.C,v 1.6 2004-08-18 11:58:05 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v $
 //  $State: Exp $
 //

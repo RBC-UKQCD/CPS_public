@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgPlaq class methods.
   
-  $Id: alg_plaq.C,v 1.8 2004-08-17 03:33:10 chulwoo Exp $
+  $Id: alg_plaq.C,v 1.9 2004-08-18 11:57:39 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:10 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.8 2004-08-17 03:33:10 chulwoo Exp $
-//  $Id: alg_plaq.C,v 1.8 2004-08-17 03:33:10 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.9 2004-08-18 11:57:39 zs Exp $
+//  $Id: alg_plaq.C,v 1.9 2004-08-18 11:57:39 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_plaq.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v $
 //  $State: Exp $
 //

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file 
   \brief   Definition of Error class methods.
 
-  $Id: error.C,v 1.7 2004-08-17 03:33:13 chulwoo Exp $
+  $Id: error.C,v 1.8 2004-08-18 11:58:02 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.7 2004-08-17 03:33:13 chulwoo Exp $
-//  $Id: error.C,v 1.7 2004-08-17 03:33:13 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.8 2004-08-18 11:58:02 zs Exp $
+//  $Id: error.C,v 1.8 2004-08-18 11:58:02 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: error.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v $
 //  $State: Exp $
 //

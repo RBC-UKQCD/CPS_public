@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions for the MPI implementation of the QCDSP/QCDOC communications layer.
   
-  $Id: sysfunc.C,v 1.4 2004-08-17 03:33:11 chulwoo Exp $
+  $Id: sysfunc.C,v 1.5 2004-08-18 11:57:41 zs Exp $
 */
 /*----------------------------------------------------------------------
 /* The Sysfunc Comms Interface: sysfunc.C
@@ -15,14 +15,14 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: chulwoo $
-  $Date: 2004-08-17 03:33:11 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v 1.4 2004-08-17 03:33:11 chulwoo Exp $
-  $Id: sysfunc.C,v 1.4 2004-08-17 03:33:11 chulwoo Exp $
+  $Author: zs $
+  $Date: 2004-08-18 11:57:41 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v 1.5 2004-08-18 11:57:41 zs Exp $
+  $Id: sysfunc.C,v 1.5 2004-08-18 11:57:41 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.C,v $
-  $Revision: 1.4 $
+  $Revision: 1.5 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -35,7 +35,7 @@ CPS_END_NAMESPACE
 #include <math.h>
 CPS_START_NAMESPACE
 
-
+#define MPISCU_DEBUG
 
 // File-scoped data used by MPISCU functions.
 
@@ -95,7 +95,7 @@ namespace MPISCU{
 // Grid geometry
 
 //! Number of grid dimensions.
-    static const int NDIM = 4;
+    static const int NDIM = 5;
 
     static int peGrid[NDIM]; // initialise to invalid value.
 //!< Number of processors in each direction.
@@ -121,11 +121,13 @@ int CoorT() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::
 int CoorX() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::pePos[SCU_X]; }
 int CoorY() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::pePos[SCU_Y]; }
 int CoorZ() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::pePos[SCU_Z]; }
+int CoorS() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::pePos[SCU_S]; }
 
 int SizeT() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::peGrid[SCU_T]; }
 int SizeX() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::peGrid[SCU_X]; }
 int SizeY() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::peGrid[SCU_Y]; }
 int SizeZ() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::peGrid[SCU_Z]; }
+int SizeS() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::peGrid[SCU_S]; }
 
 int NumNodes() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::peNum; }
 
@@ -375,7 +377,7 @@ namespace MPISCU{
   \param z The grid dimension in the Z direction.
   \param t The grid dimension in the T direction.
 */
-    void set_pe_grid(int x, int y, int z, int t){
+    void set_pe_grid(int x, int y, int z, int t, int s){
 
 	if(grid_is_set) return; // issue a warning?
     
@@ -383,7 +385,8 @@ namespace MPISCU{
 	peGrid[1] = x;
 	peGrid[2] = y;
 	peGrid[3] = z;
-
+	peGrid[4] = s;
+	
 	grid_is_set = true;
 
     }
@@ -403,7 +406,7 @@ namespace MPISCU{
 //----------------------------------------------------------------
     void CommsInit(  ) {
     
-	int  grid_periodicity[NDIM] = {1,1,1,1};  /* Array used to specify periodic BCs */
+	int  grid_periodicity[NDIM] = {1,1,1,1,1};  /* Array used to specify periodic BCs */
 	int  pe_reorder = 0;      /* Flag to disallow PE reordering for the cart-comm */
 
 	// If we have already been initialized, don't try to do it twice:
@@ -464,7 +467,7 @@ namespace MPISCU{
 
 	/* Look up number of processors */
 	MPI_Comm_size( Cart_Comm, &peNum );
-    
+#define MPISCU_DEBUG    
 #ifdef MPISCU_DEBUG
 	/* Initialise the log-file, which may actually be stdout or stderr */
 
@@ -521,7 +524,7 @@ namespace MPISCU{
 
 	/* Log that the initialization has completed and give this PEs rank */
 #ifdef MPISCU_DEBUG
-	Fprintf_all(logFile,"MPISCU::CommsInit:  Initialization complete [PE=%i of %i, ROOT_PE=%i].\n",peRank, peNum, root_pe );
+	fprintf_all(logFile,"MPISCU::CommsInit:  Initialization complete [PE=%i of %i, ROOT_PE=%i].\n",peRank, peNum, root_pe );
 #endif
 
 
@@ -529,23 +532,24 @@ namespace MPISCU{
 	ReqMan = new MPIRequestManager();
 
 	/* Initialise the table of NNs, indexed by SCUDir */
-	int dir_index, nnMinus;
+	int dir_index, dummy;
 	for( int idim = 0; idim < NDIM; idim++ ) {
-	    for( int idir = -1; idir < +3; idir+=2 ) {
-		if( idim == 0 && idir == +1 ) dir_index = SCU_TP;
-		if( idim == 0 && idir == -1 ) dir_index = SCU_TM;
+	    for( int idir = -1; idir <=1 ; idir+=2 ) {
+  		if( idim == 0 && idir == +1 ) dir_index = SCU_TP;
+  		if( idim == 0 && idir == -1 ) dir_index = SCU_TM;
 		if( idim == 1 && idir == +1 ) dir_index = SCU_XP;
 		if( idim == 1 && idir == -1 ) dir_index = SCU_XM;
 		if( idim == 2 && idir == +1 ) dir_index = SCU_YP;
 		if( idim == 2 && idir == -1 ) dir_index = SCU_YM;
 		if( idim == 3 && idir == +1 ) dir_index = SCU_ZP;
 		if( idim == 3 && idir == -1 ) dir_index = SCU_ZM;
-		MPI_Cart_shift( Cart_Comm,      /* Using the cartesian communicator */
-				idim,                /* Do this dimension */
-				idir,                /* Look up first neighbour (on +ve side) */
-				&nnMinus,/* Store identity of neighbour PEs (-ve direction)*/
-				&(nnList[dir_index])     
-				/* Store identity of neighbour PEs (+ve direction) */
+		if( idim == 4 && idir == +1 ) dir_index = SCU_SP;
+		if( idim == 4 && idir == -1 ) dir_index = SCU_SM;
+		MPI_Cart_shift( Cart_Comm,  // Using the cartesian communicator
+				idim,       // Do this dimension 
+				idir,       // Look up nearest neighbour 
+				&dummy,     // Rank of this PE
+				&(nnList[dir_index]) // Rank of neighbour PE 
 		    );
 	    }
 	}
@@ -576,7 +580,7 @@ namespace MPISCU{
 	if( !Is_Initialised ) CommsInit(); 
 
 #ifdef MPISCU_DEBUG
-	Fprintf(logFile,"SCUGlobalSum: Performing a global summation.\n");
+	MPISCU::fprintf(logFile,"SCUGlobalSum: Performing a global summation.\n");
 #endif
 
 	/* Check args make sense */
@@ -615,7 +619,7 @@ namespace MPISCU{
     void RaiseError( char* errstr ) {
 
 	/* Report the error: */
-	::Fprintf(stderr, "Error: %s\n", errstr);  
+	::fprintf(stderr, "Error: %s\n", errstr);  
 
 	/* Finish with MPI if it has been initialised: */
 	if( Is_Initialised ) MPI_Finalize();
@@ -927,7 +931,7 @@ namespace MPISCU{
 	if( !Is_Initialised ) CommsInit();
 
 #ifdef MPISCU_DEBUG
-	Fprintf(logFile,"MPISCU::ReadSeedFile: Opening seed file %s.\n", seedFileName);
+	fprintf_all(logFile,"MPISCU::ReadSeedFile: Opening seed file %s.\n", seedFileName);
 #endif
 
 	// Create the seeds buffer:
@@ -962,7 +966,7 @@ namespace MPISCU{
 } //namespace MPISCU
 
 
-//}// End of extern "C".
+
 
 
 

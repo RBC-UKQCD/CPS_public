@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the SCUDirArg class.
 
-  $Id: scu_dir_arg.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
+  $Id: scu_dir_arg.C,v 1.4 2004-08-18 11:57:41 zs Exp $
 */
 /*----------------------------------------------------------*/
 /* The SCUDirArg Class: scu_dir_arg.C
@@ -17,14 +17,14 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: chulwoo $
-  $Date: 2004-06-04 21:14:01 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/scu_dir_arg.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
-  $Id: scu_dir_arg.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
+  $Author: zs $
+  $Date: 2004-08-18 11:57:41 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/scu_dir_arg.C,v 1.4 2004-08-18 11:57:41 zs Exp $
+  $Id: scu_dir_arg.C,v 1.4 2004-08-18 11:57:41 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_dir_arg.C,v $
-  $Revision: 1.3 $
+  $Revision: 1.4 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/scu_dir_arg.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/

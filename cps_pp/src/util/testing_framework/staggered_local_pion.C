@@ -7,8 +7,8 @@
 //
 //
 //  Starting point
-//  $Date: 2004-08-17 03:33:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/testing_framework/staggered_local_pion.C,v 1.3 2004-08-17 03:33:16 chulwoo Exp $
+//  $Date: 2004-08-18 11:58:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/testing_framework/staggered_local_pion.C,v 1.4 2004-08-18 11:58:08 zs Exp $
 //
 //--------------------------------------------------------------------
 /*

@@ -3,18 +3,24 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of complex floating point data type.
 
-  $Id: rcomplex.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: rcomplex.h,v 1.3 2004-08-18 11:57:37 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rcomplex.h,v 1.2 2003-07-24 16:53:53 zs Exp $
-//  $Id: rcomplex.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Date: 2004-08-18 11:57:37 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rcomplex.h,v 1.3 2004-08-18 11:57:37 zs Exp $
+//  $Id: rcomplex.h,v 1.3 2004-08-18 11:57:37 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2003/07/24 16:53:53  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.5  2001/08/16 10:50:30  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -39,7 +45,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: rcomplex.h,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rcomplex.h,v $
 //  $State: Exp $
 //

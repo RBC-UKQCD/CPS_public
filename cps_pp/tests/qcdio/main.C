@@ -10,14 +10,14 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: chulwoo $
-  $Date: 2004-08-17 03:33:18 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.5 2004-08-17 03:33:18 chulwoo Exp $
-  $Id: main.C,v 1.5 2004-08-17 03:33:18 chulwoo Exp $
+  $Author: zs $
+  $Date: 2004-08-18 11:58:11 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.6 2004-08-18 11:58:11 zs Exp $
+  $Id: main.C,v 1.6 2004-08-18 11:58:11 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: main.C,v $
-  $Revision: 1.5 $
+  $Revision: 1.6 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/

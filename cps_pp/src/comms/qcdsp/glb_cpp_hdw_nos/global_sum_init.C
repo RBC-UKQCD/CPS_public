@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw_nos/global_sum_init.C,v 1.3 2004-06-04 21:14:04 chulwoo Exp $
-//  $Id: global_sum_init.C,v 1.3 2004-06-04 21:14:04 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw_nos/global_sum_init.C,v 1.4 2004-08-18 11:57:46 zs Exp $
+//  $Id: global_sum_init.C,v 1.4 2004-08-18 11:57:46 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: global_sum_init.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw_nos/global_sum_init.C,v $
 //  $State: Exp $
 //

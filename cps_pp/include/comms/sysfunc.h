@@ -5,13 +5,13 @@
 #include <sysfunc.h>
 #else
 
-CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 /*!\file
   \brief  Declarations for the MPI implementation of the QCDSP/QCDOC communications  layer.
   
-  $Id: sysfunc.h,v 1.8 2004-06-04 21:13:58 chulwoo Exp $
+  $Id: sysfunc.h,v 1.9 2004-08-18 11:57:36 zs Exp $
 */
+
 /*----------------------------------------------------------------------
   The Sysfunc Comms Interface: sysfunc.h
 
@@ -22,30 +22,25 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: chulwoo $
-  $Date: 2004-06-04 21:13:58 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v 1.8 2004-06-04 21:13:58 chulwoo Exp $
-  $Id: sysfunc.h,v 1.8 2004-06-04 21:13:58 chulwoo Exp $
+  $Author: zs $
+  $Date: 2004-08-18 11:57:36 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v 1.9 2004-08-18 11:57:36 zs Exp $
+  $Id: sysfunc.h,v 1.9 2004-08-18 11:57:36 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.h,v $
-  $Revision: 1.8 $
+  $Revision: 1.9 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
-CPS_END_NAMESPACE
-CPS_START_NAMESPACE
-
 #ifndef INCLUDED_SYSFUNC_H
 #define INCLUDED_SYSFUNC_H
 
-CPS_END_NAMESPACE
 #include <comms/scu_dir_arg.h>
 #include <comms/mpi_requests.h>
+
 CPS_START_NAMESPACE
-
-
 
 
 
@@ -65,11 +60,13 @@ int CoorT();  //!< Gets the grid coordinate of this node in the T direction.
 int CoorX();  //!< Gets the grid coordinate of this node in the X direction.
 int CoorY();  //!< Gets the grid coordinate of this node in the Y direction.
 int CoorZ();  //!< Gets the grid coordinate of this node in the Z direction.
+int CoorS();  //!< Gets the grid coordinate of this node in the S direction.
 
 int SizeT(); //!< Gets the size of the grid  in the T direction.
 int SizeX(); //!< Gets the size of the grid  in the X direction.
 int SizeY(); //!< Gets the size of the grid  in the Y direction.
 int SizeZ(); //!< Gets the size of the grid  in the Z direction.
+int SizeS(); //!< Gets the size of the grid  in the S direction.
 
 //! Returns the total number of nodes in the processor grid.
 int NumNodes();
@@ -125,7 +122,7 @@ namespace MPISCU {
 
 
 //! Communicates the processor grid dimensions to the MPI-SCU layer.
-    void set_pe_grid(int x, int y, int z, int t);
+    void set_pe_grid(int x, int y, int z, int t, int s=1);
 
 //! Initialises the MPI communications layer.
     void CommsInit();
@@ -165,12 +162,12 @@ namespace MPISCU {
     unsigned int ReadSeedFile(  );
 
 
-} //namespace MPSICU
-
-#endif
-
+} //namespace MPISCU
 
 CPS_END_NAMESPACE
+
+#endif //INCLUDED_SYSFUNC_H
+
 #endif // TARGET
 
 

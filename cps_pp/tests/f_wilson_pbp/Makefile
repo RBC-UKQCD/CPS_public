@@ -4,6 +4,9 @@ CPS_START_NAMESPACE
 ##  CVS keywords
 ##
 ##  $Log: not supported by cvs2svn $
+##  Revision 1.3  2004/06/07 20:55:35  mclark
+##  Merged rhmc_update branch into main trunk.
+##
 ##  Revision 1.1.1.1  2003/06/22 13:34:49  mcneile
 ##  This is the cleaned up version of the Columbia Physics System.
 ##  The directory structure has been changed.

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpStagTypes class eigensolver methods.
    
-  $Id: eigen_stag.C,v 1.7 2004-07-09 04:15:18 chulwoo Exp $
+  $Id: eigen_stag.C,v 1.8 2004-08-18 11:57:51 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-09 04:15:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.7 2004-07-09 04:15:18 chulwoo Exp $
-//  $Id: eigen_stag.C,v 1.7 2004-07-09 04:15:18 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.8 2004-08-18 11:57:51 zs Exp $
+//  $Id: eigen_stag.C,v 1.8 2004-08-18 11:57:51 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: eigen_stag.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v $
 //  $State: Exp $
 //

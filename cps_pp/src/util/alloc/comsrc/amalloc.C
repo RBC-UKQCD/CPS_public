@@ -2,7 +2,7 @@
 /*!
   \file Functions for dynamical array allocation.
 
-  $Id: amalloc.C,v 1.2 2004-05-10 15:26:54 zs Exp $
+  $Id: amalloc.C,v 1.3 2004-08-18 11:57:47 zs Exp $
 */
 #include <util/smalloc.h>
 #include <stdarg.h>

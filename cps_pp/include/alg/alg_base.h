@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the Alg class.
 
-  $Id: alg_base.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: alg_base.h,v 1.3 2004-08-18 11:57:35 zs Exp $
 */
 //------------------------------------------------------------------
 //

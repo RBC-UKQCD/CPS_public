@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of dynamic memory management routines.	
 
-  $Id: pmalloc.h,v 1.3 2004-07-01 17:43:40 chulwoo Exp $
+  $Id: pmalloc.h,v 1.4 2004-08-18 11:57:37 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pmalloc.h,v 1.3 2004-07-01 17:43:40 chulwoo Exp $
-// $Id: pmalloc.h,v 1.3 2004-07-01 17:43:40 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:37 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pmalloc.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+// $Id: pmalloc.h,v 1.4 2004-08-18 11:57:37 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pmalloc.h,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pmalloc.h,v $
 //  $State: Exp $
 //

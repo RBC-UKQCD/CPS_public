@@ -5,18 +5,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
 
-  $Id: wilson_dslash.C,v 1.5 2004-06-04 21:14:07 chulwoo Exp $
+  $Id: wilson_dslash.C,v 1.6 2004-08-18 11:57:51 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.5 2004-06-04 21:14:07 chulwoo Exp $
-//  $Id: wilson_dslash.C,v 1.5 2004-06-04 21:14:07 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.6 2004-08-18 11:57:51 zs Exp $
+//  $Id: wilson_dslash.C,v 1.6 2004-08-18 11:57:51 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v $
 //  $State: Exp $
 //

@@ -1,4 +1,4 @@
-//$Id: detail.dox,v 1.4 2004-06-04 21:13:57 chulwoo Exp $
+//$Id: detail.dox,v 1.5 2004-08-18 11:57:35 zs Exp $
 /*!
 
 \page detailpage The CPS in more detail
@@ -287,7 +287,8 @@ comms section of the Reference Manual.
 \subsection griddecomp Grid decomposition
 
 The lattice is divided up using domain decomposition over a processor grid.
-This grid connot be of more than four dimensions.
+This grid cannot be of more than five dimensions, and naturally it can only 
+be five-dimensional if the lattice is too.
 The CPS seems to make a distinction between the  logical grid \e i.e. the nodes
 that you are actually using and the physical grid \e i.e. the nodes that there
 actually are.
@@ -299,20 +300,22 @@ structure
  - DoArg::y_nodes 
  - DoArg::z_nodes
  - DoArg::t_nodes
+ - DoArg::s_nodes
 .
 and must divide exactly the values returned by the system calls 
 - SizeX()
 - SizeY()
 - SizeZ()
 - SizeT()
+- SizeS()
 .
 which give the size of the physical grid. This is so that a job running 
 on a number of nodes can in fact decompose several identical lattices 
 over those nodes.
 
-A five dimensional lattice for domain wall fermions can be 
-parallelised along the fifth dimension if one of the other dimensions is 
-entirely local.
+On the QCDSP, a five dimensional lattice for domain wall fermions can be 
+parallelised along the fifth dimension only if one of the other dimensions is 
+entirely local: There is no such restriction on QCDOC or MPI platforms.
 
 The MPI-SCU layer has an additional interface,
 described in the section \ref mpiscuin, for specifying the dimensions
@@ -334,10 +337,12 @@ parameters of the grid:
 -  SizeX()  Gets the size of the grid in the X direction. 
 -  SizeY()  Gets the size of the grid in the Y direction. 
 -  SizeZ()  Gets the size of the grid in the Z direction. 
+-  SizeS()  Gets the size of the grid in the S direction. 
 -  CoorT()  Gets the grid coordinate of this node in the T direction.
 -  CoorX()  Gets the grid coordinate of this node in the X direction.
 -  CoorY()  Gets the grid coordinate of this node in the Y direction.
 -  CoorZ()  Gets the grid coordinate of this node in the Z direction.
+-  CoorS()  Gets the grid coordinate of this node in the S direction.
 
 \subsection comms Communication
 
@@ -408,10 +413,10 @@ communications layer is used, SCUCommsFinalize() performs a clean exit from it.
 \section rng Random numbers
 
 An aim of the CPS is to allow reproducible code regardless of the computer
-platform or of the decomposition of the lattice over hte node grid.
+platform or of the decomposition of the lattice over the node grid.
 Since many CPS applications use random numbers, the RNG has to be independent
 of these things too. This is achieved by assigning a seperate dedicated random 
-number stream to each minimal 2<sup>4</sup> hypercube of lattice sites.
+number stream to each minimal 2<sup>5</sup> hypercube of lattice sites.
 By restricting the local lattice dimensions to be even in all directions 
 we can ensure that whatever the decomposition, each lattice site will have the 
 same random number stream. 
@@ -482,6 +487,14 @@ of the local lattice:
        foo[site] = LRG.Urand();
    }
 \endverbatim
+
+Special measures are in place for Domain Wall fermions, where we
+typically want a 4-dimensional field which is uniform along the fifth
+dimension. Since the processor grid may be parallelised along the 5th
+dimension, 4-dimensional hypercubic RNGs are provided to give
+identical random number streams on all nodes along the fifth
+dimension. Using these, a random 4-dimensional field can be set up
+which extends over the fifth dimension.
 
 The state of the RNGs across the lattice can be saved with the
 void LatRanGen::GetStates(unsigned **s) const

@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of rfloat operator methods.
 
-  $Id: rfloat_rnd_op.C,v 1.3 2004-06-04 21:14:15 chulwoo Exp $
+  $Id: rfloat_rnd_op.C,v 1.4 2004-08-18 11:58:08 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/rfloat/noarch/rfloat_rnd_op.C,v 1.3 2004-06-04 21:14:15 chulwoo Exp $
-//  $Id: rfloat_rnd_op.C,v 1.3 2004-06-04 21:14:15 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/rfloat/noarch/rfloat_rnd_op.C,v 1.4 2004-08-18 11:58:08 zs Exp $
+//  $Id: rfloat_rnd_op.C,v 1.4 2004-08-18 11:58:08 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/rfloat/noarch/rfloat_rnd_op.C,v $
 //  $State: Exp $
 //

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgGheatBath class methods.
   
-  $Id: alg_ghb.C,v 1.10 2004-08-17 03:33:08 chulwoo Exp $
+  $Id: alg_ghb.C,v 1.11 2004-08-18 11:57:38 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.10 2004-08-17 03:33:08 chulwoo Exp $
-//  $Id: alg_ghb.C,v 1.10 2004-08-17 03:33:08 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.11 2004-08-18 11:57:38 zs Exp $
+//  $Id: alg_ghb.C,v 1.11 2004-08-18 11:57:38 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
 //  $State: Exp $
 //

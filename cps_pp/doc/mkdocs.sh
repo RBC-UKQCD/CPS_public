@@ -1,4 +1,4 @@
-# $Id: mkdocs.sh,v 1.3 2004-08-09 07:47:22 chulwoo Exp $
+# $Id: mkdocs.sh,v 1.4 2004-08-18 11:57:34 zs Exp $
 # Runs doxygen to produce the reference manual and the user guide and 
 # installdox to get the cross-references right.
 

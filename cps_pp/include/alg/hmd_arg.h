@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the HmdArg structure.
 
-  $Id: hmd_arg.h,v 1.7 2004-08-05 18:53:18 mclark Exp $
+  $Id: hmd_arg.h,v 1.8 2004-08-18 11:57:36 zs Exp $
 */
 //------------------------------------------------------------------
 

@@ -1,44 +1,31 @@
 #include <config.h>
-CPS_START_NAMESPACE
+
 /*----------------------------------------------------------*/
 /*!\file
   \brief  The MPI communication direction and flag enumerations:
 
-  $Id: scu_enum.h,v 1.9 2004-06-04 21:13:58 chulwoo Exp $
+  $Id: scu_enum.h,v 1.10 2004-08-18 11:57:36 zs Exp $
 */
 /*---------------------------------------------------------------
-  This is very closely based on the original scu_enum.h from QCDSP.
-  The only difference is the order of the direction enum `SCUDir'.
-  This order reflects the way in which the MPI implementation
-  identifies the `opposite direction', i.e. if were looking in
-  direction dir:
-    opposite_dir = (dir+NDIM)%(2*NDIM)
-  where NDIM is the number of dimensions.  If this causes 
-  problems, it can always be changed at a later stage.
-
-  A.N.Jackson: ajackson@epcc.ed.ac.uk                       
-  -----------------------------------------------------------
   CVS keywords
  
-  $Author: chulwoo $
-  $Date: 2004-06-04 21:13:58 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.9 2004-06-04 21:13:58 chulwoo Exp $
-  $Id: scu_enum.h,v 1.9 2004-06-04 21:13:58 chulwoo Exp $
+  $Author: zs $
+  $Date: 2004-08-18 11:57:36 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.10 2004-08-18 11:57:36 zs Exp $
+  $Id: scu_enum.h,v 1.10 2004-08-18 11:57:36 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_enum.h,v $
-  $Revision: 1.9 $
+  $Revision: 1.10 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
-CPS_END_NAMESPACE
-CPS_START_NAMESPACE
 
 #ifndef INCLUDED_SCU_ENUM_H
 #define INCLUDED_SCU_ENUM_H
 
-
+CPS_START_NAMESPACE
 
 /*--------------------------------------------------------------------
 //  The following enum's define the symbolic names for the physics
@@ -69,6 +56,8 @@ enum SCUDir {
   SCU_YM,                      /*!< -y */  
   SCU_ZP,                      /*!< +z */  
   SCU_ZM,                      /*!< -z */ 
+  SCU_SP,                      /*!< +s */  
+  SCU_SM,                      /*!< -s */ 
   SCU_NoDir=-1          /*!< Null direction */  
 };
 
@@ -83,6 +72,7 @@ enum SCUAxis {
     SCU_X,          /*!< x axis */
     SCU_Y,          /*!< y axis */
     SCU_Z,          /*!< z axis */
+    SCU_S,          /*!< s axis */    
     SCU_NoAxis = -1 /*!< Dummy axis for serial code */
 };
 
@@ -97,11 +87,11 @@ enum SCUXR {
 };
 
 
-
+CPS_END_NAMESPACE
 
 #endif
 
-CPS_END_NAMESPACE
+
 
 
 

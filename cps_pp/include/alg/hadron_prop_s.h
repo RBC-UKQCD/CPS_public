@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-09 05:55:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v 1.5 2004-07-09 05:55:01 chulwoo Exp $
-//  $Id: hadron_prop_s.h,v 1.5 2004-07-09 05:55:01 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v 1.6 2004-08-18 11:57:36 zs Exp $
+//  $Id: hadron_prop_s.h,v 1.6 2004-08-18 11:57:36 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.h,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v $
 //  $State: Exp $
 //

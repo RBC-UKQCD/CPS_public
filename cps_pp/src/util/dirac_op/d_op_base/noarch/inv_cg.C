@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.3 2004-06-04 21:14:05 chulwoo Exp $
+  $Id: inv_cg.C,v 1.4 2004-08-18 11:57:48 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.3 2004-06-04 21:14:05 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.3 2004-06-04 21:14:05 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.4 2004-08-18 11:57:48 zs Exp $
+//  $Id: inv_cg.C,v 1.4 2004-08-18 11:57:48 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //

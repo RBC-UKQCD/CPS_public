@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
-  $Id: verbose.C,v 1.6 2004-08-17 03:33:17 chulwoo Exp $
+  $Id: verbose.C,v 1.7 2004-08-18 11:58:09 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.6 2004-08-17 03:33:17 chulwoo Exp $
-//  $Id: verbose.C,v 1.6 2004-08-17 03:33:17 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.7 2004-08-18 11:58:09 zs Exp $
+//  $Id: verbose.C,v 1.7 2004-08-18 11:58:09 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //

@@ -4,20 +4,20 @@
 /*!\file
   \brief Redefinitions of stdio functions for MPI. 
 
-  $Id: qcdio_qprintf.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
+  $Id: qcdio_qprintf.C,v 1.5 2004-08-18 11:58:07 zs Exp $
 */
 
 /*  -----------------------------------------------------------
    CVS keywords
  
-   $Author: chulwoo $ 
-   $Date: 2004-08-17 03:33:15 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/mpi/qcdio_qprintf.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
-   $Id: qcdio_qprintf.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
+   $Author: zs $ 
+   $Date: 2004-08-18 11:58:07 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/mpi/qcdio_qprintf.C,v 1.5 2004-08-18 11:58:07 zs Exp $
+   $Id: qcdio_qprintf.C,v 1.5 2004-08-18 11:58:07 zs Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio_qprintf.C,v $
-   $Revision: 1.4 $
+   $Revision: 1.5 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/mpi/qcdio_qprintf.C,v $
    $State: Exp $  
  ----------------------------------------------------------------------*/
@@ -30,110 +30,129 @@
 
 namespace cps{
 
-namespace MPISCU{
-  /*!
-    Works just like printf.
-    \param format The format string
-    \param ... Optional arguments to the format string 
-   */
-  int printf( const char *format, ... ) {
-        va_list ap;
-        int nbytes;
+    namespace MPISCU{
 	
-	if( UniqueID() == 1 ) {
-  	    va_start(ap, format);
-  	    nbytes = vprintf( format, ap );
-	    va_end(ap);
-	} else {
-	    nbytes = 0;
-	}
+	/*!
+	  Works  like printf.
+	  \param format The format string
+	  \param ... Optional arguments to the format string 
+	*/
+	int printf( const char *format, ... ) {
+	
+	    if( UniqueID()!=1) return 0;
 
-        return nbytes;
-  }
-
-  /*!
-    Works just like fprintf.
-    \param stream The file handle to which to print
-    \param format The format string
-    \param ... Optional arguments to the format string 
-   */
-  int fprintf( FILE *stream, const char *format, ... ) {
-        va_list ap;
-        int nbytes;
-
-	if( UniqueID() == 1 ) {
+	    va_list ap;
+	    int nbytes;
 	    va_start(ap, format);
-	    nbytes = vfprintf( stream, format, ap );
+	    nbytes = ::vprintf( format, ap );
 	    va_end(ap);
-	} else {
-	    nbytes = 0;
+
+	    return nbytes;
 	}
 
-        return nbytes;
-  }
+	/*!
+	  Works  like fprintf.
+	  \param stream The file handle to which to print
+	  \param format The format string
+	  \param ... Optional arguments to the format string 
+	*/
+	int fprintf( FILE *stream, const char *format, ... ) {
+
+	    if( UniqueID() != 1 ) return 0;
+
+    	    va_list ap;
+	    int nbytes;
+	    va_start(ap, format);
+	    nbytes = ::vfprintf( stream, format, ap );
+	    va_end(ap);
+	    
+	    return nbytes;
+	}
   
-  /*!
-    Works just like printf.
-    \param format The format string
-    \param ... Optional arguments to the format string 
-   */
-  int printf_all( const char *format, ... ) {
-        va_list ap;
-        int nbytes;
+	/*!
+	  Works just  like printf.
+	  \param format The format string
+	  \param ... Optional arguments to the format string 
+	*/
+	int printf_all( const char *format, ... ) {
+	    va_list ap;
+	    int nbytes;
 	
-	va_start(ap, format);
-	nbytes = vprintf( format, ap );
-	va_end(ap);
+	    va_start(ap, format);
+	    nbytes = ::vprintf( format, ap );
+	    va_end(ap);
 
-        return nbytes;
-  }
+	    return nbytes;
+	}
  
-  /*!
-    Works just like printf, but prefixes the message with the node ID number
-    and the cartesian coordinates of the node in the node grid.
-    \param format The format string
-    \param ... Optional arguments to the format string 
-   */
-  int printf_allid( const char *format, ... ) {
-        va_list ap;
-        int nbytes;
-	char* newformat = new char[strlen(format)+100];
+	/*!
+	  Works  like printf, but prefixes the message with the node ID number
+	  and the cartesian coordinates of the node in the node grid.
+	  \param format The format string
+	  \param ... Optional arguments to the format string 
+	*/
+	int printf_allid( const char *format, ... ) {
+	    va_list ap;
+	    int nbytes;
+	    char* newformat = new char[strlen(format)+100];
 	
-	sprintf(newformat,"%i [%i,%i,%i,%i] %s",
-			UniqueID(),
-			GJP.XnodeCoor(),
-			GJP.YnodeCoor(),
-			GJP.ZnodeCoor(),
-			GJP.TnodeCoor(),
-			format );
+	    sprintf(newformat,"%i [%i,%i,%i,%i] %s",
+		    UniqueID(),
+		    GJP.XnodeCoor(),
+		    GJP.YnodeCoor(),
+		    GJP.ZnodeCoor(),
+		    GJP.TnodeCoor(),
+		    format );
 	
-	va_start(ap, newformat);
-	nbytes = vprintf( newformat, ap );
-	va_end(ap);
+	    va_start(ap, newformat);
+	    nbytes = ::vprintf( newformat, ap );
+	    va_end(ap);
 
-        return nbytes;
-  }
+	    return nbytes;
+	}
 
 
-  /*!
-    Works just like fprintf.
-    \param stream The file handle to which to print    
-    \param format The format string
-    \param ... Optional arguments to the format string 
-   */
+    
 
-  int fprintf_all( FILE *stream, const char *format, ... ) {
-        va_list ap;
-        int nbytes;
+	/*!
+	  Works just like fprintf.
+	  \param stream The file handle to which to print    
+	  \param format The format string
+	  \param ... Optional arguments to the format string 
+	*/
 
-	va_start(ap, format);
-	nbytes = vfprintf( stream, format, ap );
-	va_end(ap);
+	int fprintf_all( FILE *stream, const char *format, ... ) {
+	    va_list ap;
+	    int nbytes;
 
-        return nbytes;
-  }
+	    va_start(ap, format);
+	    nbytes = ::vfprintf( stream, format, ap );
+	    va_end(ap);
 
-} //namespace MPISCU
+	    return nbytes;
+	}
+
+	/*!
+	  Works like vprintf.
+	  \param format The format string
+	  \param arg The variable argument list.
+	*/
+	int vprintf(const char* format, va_list arg){
+	    if( UniqueID() != 1 ) return 0;
+	    return ::vprintf(format, arg);
+	}
+
+	/*!
+	  Works like vprintf.
+	  \param format The format string
+	  \param arg The variable argument list.
+	*/
+	int vfprintf(FILE *f, const char* format, va_list arg){
+	    if( UniqueID() != 1 ) return 0;
+	    return ::vfprintf(f, format, arg);
+	}
+	
+    } //namespace MPISCU
  
 }//CPS_END_NAMESPACE 
 

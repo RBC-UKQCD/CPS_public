@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.13 2004-08-17 03:33:14 chulwoo Exp $
+  $Id: gjp.C,v 1.14 2004-08-18 11:58:02 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.13 2004-08-17 03:33:14 chulwoo Exp $
-//  $Id: gjp.C,v 1.13 2004-08-17 03:33:14 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.14 2004-08-18 11:58:02 zs Exp $
+//  $Id: gjp.C,v 1.14 2004-08-18 11:58:02 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -53,13 +53,13 @@ CPS_END_NAMESPACE
 #include <mem/p2v.h>
 CPS_START_NAMESPACE
 
-CPS_END_NAMESPACE
+// CPS_END_NAMESPACE
 // #ifdef PARALLEL
 // #include <comms/sysfunc.h>
 // #else
 // #include <time.h>
 // #endif
-CPS_START_NAMESPACE
+// CPS_START_NAMESPACE
 
 #ifdef PARALLEL
 int gjp_local_axis[6] = {0, 0, 0, 0, 1, 1}; 
@@ -132,25 +132,23 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   z_node_sites = rda.z_node_sites;
   t_node_sites = rda.t_node_sites;
   s_node_sites = rda.s_node_sites;   
-
-  // CJ: It should complain if any of node_sites are not divisible by 2
-  // Why diidn't it?
   if(s_node_sites == 0) s_node_sites=1;
+  
   if (x_node_sites<=0 ||x_node_sites%2!=0)
       ERR.General(cname,fname,
-	"x_node_sites(%d) is not divisible by 2\n",x_node_sites);
+	"Bad value %d for x_node_sites; must be divisible by 2\n", x_node_sites);
   if (y_node_sites<=0 ||y_node_sites%2!=0)
       ERR.General(cname,fname,
-	"y_node_sites(%d) is not divisible by 2\n",y_node_sites);
+	"Bad value %d for y_node_sites; must be divisible by 2\n", y_node_sites);
   if (z_node_sites<=0 ||z_node_sites%2!=0)
       ERR.General(cname,fname,
-	"z_node_sites(%d) is not divisible by 2\n",z_node_sites);
+	"Bad value %d for z_node_sites; must be divisible by 2\n", z_node_sites);
   if (t_node_sites<=0 ||t_node_sites%2!=0)
       ERR.General(cname,fname,
-	"t_node_sites(%d) is not divisible by 2\n",t_node_sites);
-  if (s_node_sites<=0 &&s_node_sites%2!=0)
+	"Bad value %d for t_node_sites; must be divisible by 2\n", t_node_sites);
+  if (s_node_sites<=0 || (s_node_sites>1 && s_node_sites%2!=0))
       ERR.General(cname,fname,
-	"s_node_sites(%d) is not divisible by 2\n",s_node_sites);
+	"Bad value %d for s_node_sites; must be 1 or divisible by 2\n", t_node_sites);
 
   // Set the number of nodes
   //----------------------------------------------------------------
@@ -160,7 +158,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   t_nodes = rda.t_nodes;
   s_nodes = rda.s_nodes;
 
-  // Check that at least one number_of_nodes is equal to 1
+  // On the QCDSP, check that at least one number_of_nodes is equal to 1
   //----------------------------------------------------------------
 #if TARGET == QCDSP
   if( x_nodes != 1 &&
@@ -218,6 +216,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   if( z_nodes != 1) size_z = SizeZ(); 
   if( t_nodes != 1) size_t = SizeT(); 
   if( s_nodes != 1) size_s = SizeS(); 
+#endif
 #if TARGET==QCDSP
   if( s_nodes != 1) {
     if (s_axis == SCU_X) size_s = SizeX();
@@ -225,7 +224,6 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
     if (s_axis == SCU_Z) size_s = SizeZ();
     if (s_axis == SCU_T) size_s = SizeT();
   } 
-#endif
 #endif
 
   if( x_nodes == 0 || size_x%x_nodes != 0) 
@@ -273,7 +271,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   z_node_coor = 0;
   t_node_coor = 0;
   s_node_coor = 0;
-#if TARGET == QCDSP || TARGET == cpsMPI
+#if TARGET == QCDSP
   if(x_nodes != 1) x_node_coor = CoorX() % x_nodes;
   if(y_nodes != 1) y_node_coor = CoorY() % y_nodes;
   if(z_nodes != 1) z_node_coor = CoorZ() % z_nodes;
@@ -284,8 +282,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
     if (s_axis == SCU_Z) s_node_coor = CoorZ() % s_nodes;
     if (s_axis == SCU_T) s_node_coor = CoorT() % s_nodes;
   }
-#endif
-#if TARGET == QCDOC
+#else
   if(x_nodes != 1) x_node_coor = CoorX() % x_nodes;
   if(y_nodes != 1) y_node_coor = CoorY() % y_nodes;
   if(z_nodes != 1) z_node_coor = CoorZ() % z_nodes;
@@ -297,15 +294,13 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   // and gjp_scu_wire_map[10].
   //----------------------------------------------------------------
 #ifdef PARALLEL
-  for(int la=0; la<6; la++){
-    gjp_local_axis[la] = 0;
-  }
-  if(x_nodes == 1) {gjp_local_axis[0] = 1; gjp_local_axis[5] = 1;}
-  if(y_nodes == 1) {gjp_local_axis[1] = 1; gjp_local_axis[5] = 1;}
-  if(z_nodes == 1) {gjp_local_axis[2] = 1; gjp_local_axis[5] = 1;}
-  if(t_nodes == 1) {gjp_local_axis[3] = 1; gjp_local_axis[5] = 1;}
-  if(s_nodes == 1) {gjp_local_axis[4] = 1;}
 
+  for(int la=0; la<6; la++) gjp_local_axis[la] = 0;
+  if(x_nodes == 1) gjp_local_axis[0] = gjp_local_axis[5] = 1;
+  if(y_nodes == 1) gjp_local_axis[1] = gjp_local_axis[5] = 1;
+  if(z_nodes == 1) gjp_local_axis[2] = gjp_local_axis[5] = 1;
+  if(t_nodes == 1) gjp_local_axis[3] = gjp_local_axis[5] = 1;
+  if(s_nodes == 1) gjp_local_axis[4] = 1;
 
   gjp_scu_dir[0] = SCU_XP;
   gjp_scu_dir[1] = SCU_XM;
@@ -325,7 +320,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   gjp_scu_wire_map[6] = SCURemap( SCU_TP );
   gjp_scu_wire_map[7] = SCURemap( SCU_TM );
 
-#if TARGET == QCDSP
+#if TARGET==QCDSP 
   if(s_nodes != 1) {
     if (s_axis == SCU_X) {
       gjp_scu_dir[8] = SCU_XP;
@@ -357,11 +352,10 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
       gjp_scu_dir[9] = SCU_SM;
       gjp_scu_wire_map[8] = SCURemap( SCU_SP );
       gjp_scu_wire_map[9] = SCURemap( SCU_SM );
-#endif
+#endif // QCDSP
 
 
-
-#endif
+#endif //PARALLEL
   
   // Set the boundary conditions for the whole lattice
   //----------------------------------------------------------------

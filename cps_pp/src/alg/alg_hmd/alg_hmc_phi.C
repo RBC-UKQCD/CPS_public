@@ -7,14 +7,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.12 2004-08-17 03:33:09 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.12 2004-08-17 03:33:09 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.13 2004-08-18 11:57:39 zs Exp $
+//  $Id: alg_hmc_phi.C,v 1.13 2004-08-18 11:57:39 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //

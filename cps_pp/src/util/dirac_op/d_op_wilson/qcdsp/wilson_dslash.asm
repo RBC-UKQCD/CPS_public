@@ -1,13 +1,13 @@
 **--------------------------------------------------------------------
 **  CVS keywords
 **
-**  $Author: chulwoo $
-**  $Date: 2004-06-04 21:14:08 $
-**  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qcdsp/wilson_dslash.asm,v 1.3 2004-06-04 21:14:08 chulwoo Exp $
-**  $Id: wilson_dslash.asm,v 1.3 2004-06-04 21:14:08 chulwoo Exp $
+**  $Author: zs $
+**  $Date: 2004-08-18 11:57:57 $
+**  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qcdsp/wilson_dslash.asm,v 1.4 2004-08-18 11:57:57 zs Exp $
+**  $Id: wilson_dslash.asm,v 1.4 2004-08-18 11:57:57 zs Exp $
 **  $Name: not supported by cvs2svn $
 **  $Locker:  $
-**  $Revision: 1.3 $
+**  $Revision: 1.4 $
 **  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qcdsp/wilson_dslash.asm,v $
 **  $State: Exp $
 **

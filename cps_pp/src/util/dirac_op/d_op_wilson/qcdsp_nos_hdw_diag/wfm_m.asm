@@ -1,13 +1,13 @@
 **--------------------------------------------------------------------
 **  CVS keywords
 **
-**  $Author: chulwoo $
-**  $Date: 2004-06-04 21:14:11 $
-**  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_m.asm,v 1.3 2004-06-04 21:14:11 chulwoo Exp $
-**  $Id: wfm_m.asm,v 1.3 2004-06-04 21:14:11 chulwoo Exp $
+**  $Author: zs $
+**  $Date: 2004-08-18 11:58:00 $
+**  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_m.asm,v 1.4 2004-08-18 11:58:00 zs Exp $
+**  $Id: wfm_m.asm,v 1.4 2004-08-18 11:58:00 zs Exp $
 **  $Name: not supported by cvs2svn $
 **  $Locker:  $
-**  $Revision: 1.3 $
+**  $Revision: 1.4 $
 **  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_m.asm,v $
 **  $State: Exp $
 **

@@ -5,18 +5,18 @@ CPS_START_NAMESPACE
 
   class methods.
 
-  $Id: lattice_sn.C,v 1.1 2004-08-10 21:36:20 chulwoo Exp $
+  $Id: lattice_sn.C,v 1.2 2004-08-18 11:58:06 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-10 21:36:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_types/lattice_sn.C,v 1.1 2004-08-10 21:36:20 chulwoo Exp $
-//  $Id: lattice_sn.C,v 1.1 2004-08-10 21:36:20 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_types/lattice_sn.C,v 1.2 2004-08-18 11:58:06 zs Exp $
+//  $Id: lattice_sn.C,v 1.2 2004-08-18 11:58:06 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_types/lattice_sn.C,v $
 //  $State: Exp $
 //

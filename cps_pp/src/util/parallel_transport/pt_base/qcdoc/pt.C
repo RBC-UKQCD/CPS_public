@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
+  $Id: pt.C,v 1.5 2004-08-18 11:58:07 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
-//  $Id: pt.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.5 2004-08-18 11:58:07 zs Exp $
+//  $Id: pt.C,v 1.5 2004-08-18 11:58:07 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //

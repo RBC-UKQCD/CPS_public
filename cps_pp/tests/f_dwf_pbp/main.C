@@ -4,14 +4,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_dwf_pbp/main.C,v 1.5 2004-08-17 03:33:17 chulwoo Exp $
-//  $Id: main.C,v 1.5 2004-08-17 03:33:17 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_dwf_pbp/main.C,v 1.6 2004-08-18 11:58:10 zs Exp $
+//  $Id: main.C,v 1.6 2004-08-18 11:58:10 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_dwf_pbp/main.C,v $
 //  $State: Exp $
 //
@@ -55,18 +55,23 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   DoArg do_arg;
 
-#ifdef PARALLEL
+#if TARGET==cpsMPI
+  MPISCU::set_pe_grid(1,1,1,2,2);
+    using MPISCU::fprintf;
+    using MPISCU::printf;
+#endif
 
+#ifdef PARALLEL
   do_arg.x_node_sites = 4/SizeX();
   do_arg.y_node_sites = 4/SizeY();
   do_arg.z_node_sites = 4/SizeZ();
   do_arg.t_node_sites = 4/SizeT();
-  do_arg.s_node_sites = 4;
+  do_arg.s_node_sites = 4/SizeS();
   do_arg.x_nodes = SizeX();
   do_arg.y_nodes = SizeY();
   do_arg.z_nodes = SizeZ();
   do_arg.t_nodes = SizeT();
-  do_arg.s_nodes = 1;
+  do_arg.s_nodes = SizeS();
 #else
   do_arg.x_node_sites = 4;
   do_arg.y_node_sites = 4;
@@ -90,16 +95,12 @@ int main(int argc,char *argv[])
   do_arg.beta = 5.8;
   do_arg.dwf_height = 0.9;
 
-#if TARGET==cpsMPI
-    MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);    
-    using MPISCU::fprintf;
-    using MPISCU::printf;
-#endif
 
   VRB.Level(0);
-  VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
-  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
-
+//    VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
+//    VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+  VRB.Level(VERBOSE_FUNC_LEVEL);
+  VRB.DeactivateLevel(VERBOSE_SMALLOC_LEVEL);  
   GJP.Initialize(do_arg);
 
 
@@ -139,11 +140,11 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   // Initialize run parameters
   //----------------------------------------------------------------
-  int num_therm_no_met = 1;
-  int num_therm_met = 1;
+  int num_therm_no_met = 0;
+  int num_therm_met = 0;
   int num_hits = 1;
   int num_meas = 1;
-  int num_sweeps = 1;
+  int num_sweeps = 0;
   int min_ls = 3;
   int num_ls = 2;
   int ls_step = 1;

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.6 2004-06-04 21:14:12 chulwoo Exp $
+  $Id: convert_func.C,v 1.7 2004-08-18 11:58:02 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.6 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: convert_func.C,v 1.6 2004-06-04 21:14:12 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.7 2004-08-18 11:58:02 zs Exp $
+//  $Id: convert_func.C,v 1.7 2004-08-18 11:58:02 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //

@@ -2,18 +2,18 @@
 /*!\file
   \brief  Implementation of Fsmear class.
 
-  $Id: f_smear.C,v 1.2 2004-08-09 07:47:24 chulwoo Exp $
+  $Id: f_smear.C,v 1.3 2004-08-18 11:58:03 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-09 07:47:24 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_smear/f_smear.C,v 1.2 2004-08-09 07:47:24 chulwoo Exp $
-//  $Id: f_smear.C,v 1.2 2004-08-09 07:47:24 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:03 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_smear/f_smear.C,v 1.3 2004-08-18 11:58:03 zs Exp $
+//  $Id: f_smear.C,v 1.3 2004-08-18 11:58:03 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_smear/f_smear.C,v $
 //  $State: Exp $
 //

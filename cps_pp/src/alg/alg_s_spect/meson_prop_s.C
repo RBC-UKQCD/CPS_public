@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/meson_prop_s.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
-//  $Id: meson_prop_s.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/meson_prop_s.C,v 1.6 2004-08-18 11:57:39 zs Exp $
+//  $Id: meson_prop_s.C,v 1.6 2004-08-18 11:57:39 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: meson_prop_s.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/meson_prop_s.C,v $
 //  $State: Exp $
 //

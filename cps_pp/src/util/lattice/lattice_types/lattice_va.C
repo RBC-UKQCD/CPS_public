@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of the GpowerRectFasqtad class.
 
-  $Id: lattice_va.C,v 1.4 2004-08-09 07:47:24 chulwoo Exp $
+  $Id: lattice_va.C,v 1.5 2004-08-18 11:58:06 zs Exp $
 */
 //--------------------------------------------------------------------
 

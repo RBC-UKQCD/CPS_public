@@ -2,14 +2,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/xi_spect_gsum/main.C,v 1.7 2004-08-17 03:33:19 chulwoo Exp $
-//  $Id: main.C,v 1.7 2004-08-17 03:33:19 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/xi_spect_gsum/main.C,v 1.8 2004-08-18 11:58:13 zs Exp $
+//  $Id: main.C,v 1.8 2004-08-18 11:58:13 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/xi_spect_gsum/main.C,v $
 //  $State: Exp $
 //

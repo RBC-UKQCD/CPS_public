@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Prototypes of gauge configuration IO functions.
 
-  $Id: qcdio.h,v 1.3 2004-08-17 03:33:08 chulwoo Exp $
+  $Id: qcdio.h,v 1.4 2004-08-18 11:57:37 zs Exp $
 */
 /*2  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
-   $Author: chulwoo $
-   $Date: 2004-08-17 03:33:08 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.3 2004-08-17 03:33:08 chulwoo Exp $
-   $Id: qcdio.h,v 1.3 2004-08-17 03:33:08 chulwoo Exp $
+   $Author: zs $
+   $Date: 2004-08-18 11:57:37 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+   $Id: qcdio.h,v 1.4 2004-08-18 11:57:37 zs Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.h,v $
-   $Revision: 1.3 $
+   $Revision: 1.4 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v $
    $State: Exp $  */
 /*----------------------------------------------------------*/

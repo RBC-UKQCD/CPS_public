@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-17 03:33:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v 1.8 2004-08-17 03:33:11 chulwoo Exp $
-//  $Id: w_baryon.C,v 1.8 2004-08-17 03:33:11 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v 1.9 2004-08-18 11:57:40 zs Exp $
+//  $Id: w_baryon.C,v 1.9 2004-08-18 11:57:40 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_baryon.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v $
 //  $State: Exp $
 //

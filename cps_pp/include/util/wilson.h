@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief Declarations of routine used internally in the DiracOpWilson class.
 
-  $Id: wilson.h,v 1.5 2004-07-08 22:49:58 chulwoo Exp $
+  $Id: wilson.h,v 1.6 2004-08-18 11:57:38 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-08 22:49:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.5 2004-07-08 22:49:58 chulwoo Exp $
-//  $Id: wilson.h,v 1.5 2004-07-08 22:49:58 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:57:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.6 2004-08-18 11:57:38 zs Exp $
+//  $Id: wilson.h,v 1.6 2004-08-18 11:57:38 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: wilson.h,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v $
 //  $State: Exp $
 //

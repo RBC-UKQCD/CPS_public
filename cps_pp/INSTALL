@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------
 INSTALL: The Columbia Code
 ----------------------------------------------------------------------
-$Id: INSTALL,v 1.5 2004-02-03 13:13:29 mcneile Exp $
+$Id: INSTALL,v 1.6 2004-08-18 11:57:33 zs Exp $
 
 The new system only creates one library: cps.a
 The system probably requires gnu make, so 

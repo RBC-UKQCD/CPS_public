@@ -1,13 +1,13 @@
 **--------------------------------------------------------------------
 **  CVS keywords
 **
-**  $Author: chulwoo $
-**  $Date: 2004-06-04 21:14:15 $
-**  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdsp/su3_char_asm.asm,v 1.3 2004-06-04 21:14:15 chulwoo Exp $
-**  $Id: su3_char_asm.asm,v 1.3 2004-06-04 21:14:15 chulwoo Exp $
+**  $Author: zs $
+**  $Date: 2004-08-18 11:58:09 $
+**  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdsp/su3_char_asm.asm,v 1.4 2004-08-18 11:58:09 zs Exp $
+**  $Id: su3_char_asm.asm,v 1.4 2004-08-18 11:58:09 zs Exp $
 **  $Name: not supported by cvs2svn $
 **  $Locker:  $
-**  $Revision: 1.3 $
+**  $Revision: 1.4 $
 **  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdsp/su3_char_asm.asm,v $
 **  $State: Exp $
 **

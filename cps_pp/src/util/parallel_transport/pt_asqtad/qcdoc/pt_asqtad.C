@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief    Definition of ParTransAsqtad class methods for QCDOC.
 
-  $Id: pt_asqtad.C,v 1.8 2004-08-11 05:33:34 chulwoo Exp $
+  $Id: pt_asqtad.C,v 1.9 2004-08-18 11:58:06 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-11 05:33:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v 1.8 2004-08-11 05:33:34 chulwoo Exp $
-//  $Id: pt_asqtad.C,v 1.8 2004-08-11 05:33:34 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-08-18 11:58:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v 1.9 2004-08-18 11:58:06 zs Exp $
+//  $Id: pt_asqtad.C,v 1.9 2004-08-18 11:58:06 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_asqtad.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v $
 //  $State: Exp $
 //
