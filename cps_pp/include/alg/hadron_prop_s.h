@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v 1.3 2004-06-04 21:13:57 chulwoo Exp $
-//  $Id: hadron_prop_s.h,v 1.3 2004-06-04 21:13:57 chulwoo Exp $
+//  $Date: 2004-07-08 22:49:57 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v 1.4 2004-07-08 22:49:57 chulwoo Exp $
+//  $Id: hadron_prop_s.h,v 1.4 2004-07-08 22:49:57 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.h,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v $
 //  $State: Exp $
 //
@@ -33,7 +33,7 @@ CPS_START_NAMESPACE
 //		   |	HadronPropS  |
 //     		    ----------------
 //		   ^	  ^	   ^
-//		  //       \\	    \\
+//		  ||       \\	    \\
 //	-----------  -------------  ------------
 //	|MesonPropS| |NucleonPropS| |NLocalPropS|
 //	-----------  -------------  ------------

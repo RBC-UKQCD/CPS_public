@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief Declarations of routine used internally in the DiracOpWilson class.
 
-  $Id: wilson.h,v 1.4 2004-07-01 17:43:41 chulwoo Exp $
+  $Id: wilson.h,v 1.5 2004-07-08 22:49:58 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.4 2004-07-01 17:43:41 chulwoo Exp $
-//  $Id: wilson.h,v 1.4 2004-07-01 17:43:41 chulwoo Exp $
+//  $Date: 2004-07-08 22:49:58 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.5 2004-07-08 22:49:58 chulwoo Exp $
+//  $Id: wilson.h,v 1.5 2004-07-08 22:49:58 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: wilson.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v $
 //  $State: Exp $
 //
@@ -59,10 +59,11 @@ extern int wfm_wire_map[];
 extern int wfm_max_scu_poll;
 //!< Some crazy optimisation thing.
 /*!
-/* The maximun number of times a wire is polled
+ The maximum number of times a wire is polled
    before wfm_scu_wait exits with an error. Implemented only in
    d_op_wilson_opt_nos_hdw_diag and d_op_dwf_nos_hdw_diag.
 */
+
 
 extern int wfm_scu_diag[];
 //!< Some crazy optimisation thing.

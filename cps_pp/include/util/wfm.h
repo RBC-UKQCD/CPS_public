@@ -196,7 +196,8 @@ class wfm : public WilsonArg {
 	     Float  *mp_sq_p,    /* pointer to Sum |M psi|^2    */
 	     Float  Kappa        /* Wilson's kappa parameter    */
 	    );
-  ~wfm() {printf("wfm %x has been destroyed\n",this);};
+  ~wfm() {};
+//  ~wfm() {printf("wfm %p has been destroyed\n",this);};
   void dslash(Float *chi, 
 	      Float *u, 
 	      Float *psi, 

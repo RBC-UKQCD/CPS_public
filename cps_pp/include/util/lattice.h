@@ -1,4 +1,5 @@
 #include<config.h>
+#include<stdio.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
