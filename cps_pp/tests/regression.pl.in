@@ -31,6 +31,9 @@ if( '@NOT_TESTING_QCDSP@' eq 'yes' ) {
 }
 
 
+# directory with good test data in it
+$test_dir = "v5_0_0" ;
+
 #
 # Configurations: These should be relevant always:
 #
@@ -94,13 +97,13 @@ for( $tsi = 0; $tsi < scalar(@test_dirs); $tsi++ ) {
 	}
 
 # State which test is about to run, run it, and store the results:
-	print SHOUT "echo In ".$test_names[$tni]."\n";
+	print SHOUT "echo Starting test ".$test_names[$tni]."\n";
 	print SHOUT "cd ".$test_names[$tni]."\n";
 # Remove any files associated with previous runs (i.e. *.dat)
 	print SHOUT 'rm *.dat'."\n";
 # Run the program:
 	$exec_cmd = $exec_prefix.$executable;
-	print SHOUT "echo Running $exec_cmd...\n";
+##	print SHOUT "echo Running $exec_cmd...\n";
 	print SHOUT "$exec_cmd > $res_file\n";
 # Grab all of the *.dat output files and sling them into a single file:
 	print SHOUT "more *.dat > $dat_file\n";
@@ -109,10 +112,10 @@ for( $tsi = 0; $tsi < scalar(@test_dirs); $tsi++ ) {
 	print "[$tni]: '$exec_cmd'.\n";
 
 # Diff the output and report if the output differs from that expected:
-	print SHOUT "echo Checking the output...\n";
-
 # Drop back to the test directory:
 	print SHOUT "cd ..\n";
+	print SHOUT "cd regressions ; perl check_data.pl $test_names[$tni]  0.001  $test_dir\n" ;
+	print SHOUT "cd ..\n" ;
 
 # Loop over to the next test:
 	}
