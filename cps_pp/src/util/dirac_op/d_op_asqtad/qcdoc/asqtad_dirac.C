@@ -8,6 +8,7 @@
 //
 //-------------------------------------------------------------------
 #include <config.h>
+#include <stdio.h>
 CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <comms/scu.h>
@@ -16,7 +17,6 @@ CPS_END_NAMESPACE
 #include <util/dirac_op.h>
 #include <util/vector.h>
 #include <util/pt.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -34,7 +34,6 @@ CPS_START_NAMESPACE
 
 
 #undef gauge_inv_check
-#define CHI_MOD2 //getting rid of indices for dirac_sum
 #define IND_AGG //aggregate index for uc and chi
 
 #define fat_link
@@ -57,30 +56,6 @@ temporary arraies and skip the generation of arraies.
 /****************************************************************
 CPP is a switch for using C++ routine for dirac_cmv.
 *****************************************************************/
-
-#if 0
-typedef struct gauge_agg{
-  int src;
-  int dest;
-  IFloat mat[18];
-} gauge_agg ;
-#endif
-
-#ifdef SIMUL_TBUF
-#include "Toffset.h"
-#endif
-#ifdef SIMUL_AGG
-#include "uc_l_agg.h"
-#include "uc_nl_agg.h"
-#endif
-#ifdef SIMUL_U
-#include "uc_l.h"
-#include "uc_nl.h"
-#endif
-#ifdef SIMUL
-#include "chi_l.h"
-#include "chi_nl.h"
-#endif
 
 void dirac_sum_acc_cpp(int s, long chi, long tmpfrm, long b);
 void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long a, long tmpfrm);
@@ -191,22 +166,16 @@ static IFloat ** chi_nl[2];
 //------------------------------------------------------------------
 
 SCUDirArgIR * SCUarg[2*NUM_DIR];
-SCUDirArgIR SCUargIR[2*NUM_DIR];
 SCUDirArgMulti * SCUmulti;
-SCUDirArgMulti SCUmultiIR;
 
 SCUDirArgIR * SCUarg_1[2*NUM_DIR];
-SCUDirArgIR SCUarg_1IR[2*NUM_DIR];
 SCUDirArgMulti * SCUmulti_1;
-SCUDirArgMulti SCUmulti_1IR;
 
 SCUDMAInst *SCUDMAarg_p[NUM_DIR*4];
 SCUDMAInst SCUDMAarg[NUM_DIR*4];
 
 SCUDirArgIR * SCUarg_2[2*NUM_DIR];
-SCUDirArgIR SCUarg_2IR[2*NUM_DIR];
 SCUDirArgMulti * SCUmulti_2;
-SCUDirArgMulti SCUmulti_2IR;
 
 //------------------------------------------------------------------
 //  The offset into the even or odd checkboard chi's and chi3's used for a send
@@ -253,6 +222,12 @@ static int LexVector( int * c );
 //-------------------------------------------------------------------
 
 static int LexSurface( int * cc, int surface );
+
+static int NotParallel( int mu, int nu){
+	int dif = mu-nu;
+	if (dif==0 ||dif==-4||dif==4)return 0;
+	else return 1;
+}
 
 static IFloat * gauge_field_addr;
 
@@ -323,6 +298,7 @@ void asqtad_dirac_init(const void * gauge_u )
   size[1] = GJP.XnodeSites();
   size[2] = GJP.YnodeSites();
   size[3] = GJP.ZnodeSites();
+printf("size= %d %d %d %d\n",size[0],size[1],size[2],size[3]);
   split =  (  (size[0]>2 &&size[1]>2 && size[2]>2 && size[3] >2 ) ? 0 : 1 ); 
 //  split =1;
 
@@ -362,13 +338,9 @@ void asqtad_dirac_init(const void * gauge_u )
  for ( j= 0; j < 3; j++ ){
     chi_off_node[j][0] = &(chi_off_node_total[ j*non_local_chi* VECT_LEN/2 ] ); 
     chi_off_node_p[j][0] = (IFloat *)(sizeof (IFloat)*j*non_local_chi* VECT_LEN/2 );
-//    printf("chi_off_node[%d][%d]=%p ",j,0,chi_off_node[j][0]);
-//    printf("chi_off_node_p[%d][%d]=%p\n",j,0,chi_off_node_p[j][0]);
   for ( i = 1; i < NUM_DIR; i++ ){
     chi_off_node[j][i] = chi_off_node[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
     chi_off_node_p[j][i] = chi_off_node_p[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
-//    printf("chi_off_node[%d][%d]=%p ",j,i,chi_off_node[j][i]);
-//    printf("chi_off_node_p[%d][%d]=%p\n",j,i,chi_off_node_p[j][i]);
   }
  }
   //-----------------------------------------------------------------
@@ -380,14 +352,7 @@ void asqtad_dirac_init(const void * gauge_u )
   //  The size of chi_l and chi_nl has been doubled for additional U*Chi and UUU*chi
   //-----------------------------------------------------------------
 
-#ifdef SIMUL
-  chi_l[0] = chi_l0;
-  chi_l[1] = chi_l1;
-  chi_nl[0] = chi_nl0;
-  chi_nl[1] = chi_nl1;
-#endif
   for ( i = 0; i < 2; i++ ){
-#ifndef SIMUL
     chi_l[i] = ( IFloat ** ) smalloc((2*(local_chi+local_chi_3)/2)*sizeof(IFloat *));
    if(chi_l[i] == NULL)
 	ERR.Pointer(cname,fname, "chi_l[i]");
@@ -396,7 +361,6 @@ void asqtad_dirac_init(const void * gauge_u )
 
       if(chi_nl[i] == NULL)
 	ERR.Pointer(cname,fname, "chi_nl[i]");
-#endif
   }
   
 
@@ -417,7 +381,6 @@ void asqtad_dirac_init(const void * gauge_u )
   }
 
 
-#ifndef SIMUL
   //-----------------------------------------------------------------
   //  Loop over all directions
   //-----------------------------------------------------------------
@@ -446,19 +409,11 @@ void asqtad_dirac_init(const void * gauge_u )
 	      //----------------------------------------------------------
 	      //pointer to source field (offset in the receive buffer)
 
-#ifndef SIMUL
 	      *( chi_nl[ odd ]  +  2 * non_local_count[ odd ] )
 	     		= chi_off_node_p[0][n] + VECT_LEN * ( LexSurface( coord_nn, n%4 ) / 2 );
 	      // pointer to temporary field where U*chi is stored
-#ifdef CHI_MOD2
 	      *( chi_nl[ odd ] + 2*non_local_count[ odd ] +1 ) =
 				( IFloat * ) ( VECT_LEN2 * (LexVector( coord ) / 2 * 2*NUM_DIR+n )  * sizeof(IFloat));
-#else
-	      *( chi_nl[ odd ] + 2 * non_local_count[ odd ] + 1) =
-				( IFloat *) ( VECT_LEN * (2*NUM_DIR * int(sg/2) + n ) * sizeof(IFloat));
-#endif
-#endif
-//printf("(%d %d %d %d) dir=%d chi_nl[%d][%d]=%d %d\n",x[0],x[1],x[2],x[3],n,odd,2*non_local_count[odd],chi_nl[odd][2*non_local_count[odd]],chi_nl[odd][2*non_local_count[odd]+1]);
 	      non_local_count[odd]++;
 	    }
 	}
@@ -487,20 +442,12 @@ void asqtad_dirac_init(const void * gauge_u )
 	    m = (2* NUM_DIR + 1) * (sg/2);
 
 	    if ( !CoordNN( n ) ) {		//  off-node
-#ifndef SIMUL
 	      //pointer to source field
 	      *( chi_l[ odd ]  +  2 * local_count[ odd ] )
 		= ( IFloat * ) ( VECT_LEN * ( LexVector( coord_nn ) / 2 ) * sizeof(IFloat));
-#ifdef CHI_MOD2
 	      // pointer to temporary field where U*chi is stored
 	      *( chi_l[ odd ]  +  2 * local_count[ odd ] + 1) =
 					( IFloat * ) ( VECT_LEN2 * (LexVector( coord ) / 2 *2*NUM_DIR+n) * sizeof(IFloat));
-#else
-	      // pointer to temporary field where U*chi is stored
-	      *( chi_l[ odd ]  +  2 * local_count[ odd ] + 1) =
-					( IFloat *) ( VECT_LEN * (2*NUM_DIR * int(sg/2) + n) * sizeof(IFloat));
-#endif
-#endif
 	      local_count[odd]++;
 	    }  //else-on_node case
 	}
@@ -535,19 +482,12 @@ void asqtad_dirac_init(const void * gauge_u )
   if ( CoordkNN( n, 3 ) ) {		//  chi3_off-node
 	
  
-#ifndef SIMUL
-#endif //SIMUL
 
     for (j=0; j<3; j++){
        if((coord_knn[n%4]==j&&n<4)||(coord_knn[n%4]==(size[n%4]-1-j)&& n>3)) {
 	 *( chi_nl[ odd ] + 2 * non_local_count_3[j][odd]+(j+1)*non_local_chi )
             =chi_off_node_p[j][n]+ VECT_LEN * ( LexSurface( coord_knn,n%4)/2 ); 
-#ifdef CHI_MOD2
         *( chi_nl[odd] + 2 * non_local_count_3[j][odd] + (j+1)*non_local_chi+1 ) = ( IFloat * ) ( VECT_LEN2 * (LexVector( coord ) / 2*2*NUM_DIR+n+8 )  * sizeof(IFloat));
-#else
-        *( chi_nl[odd] +2*non_local_count_3[j][odd] + (j+1)*non_local_chi + 1) 
-	     = (IFloat *)(VECT_LEN*(2*NUM_DIR*int(sg/2)+n+8)*sizeof(IFloat));
-#endif
 	non_local_count_3[j][odd]++;
        }
     }
@@ -580,20 +520,13 @@ void asqtad_dirac_init(const void * gauge_u )
 	    m = (2* NUM_DIR + 1) * (sg/2);
 
   if ( !CoordkNN( n, 3 ) ) {		//  chi3_off-node
-#ifndef SIMUL
 	      //pointer to source field
 	      *( chi_l[ odd ]  +  2 * local_count_3[ odd ] + local_chi )
 		= ( IFloat * ) ( VECT_LEN * ( LexVector( coord_knn ) / 2 )
 		                 * sizeof(IFloat));
 	      // pointer to temporary field where U*chi is stored
-#ifdef CHI_MOD2
 	      *( chi_l[ odd ]  +  2 * local_count_3[ odd ] + local_chi + 1) =
 	  	( IFloat * ) ( VECT_LEN2 * (LexVector( coord ) / 2 *2*NUM_DIR+n+8) * sizeof(IFloat));
-#else
-	      *( chi_l[ odd ]  +  2 * local_count_3[ odd ] + local_chi + 1) =
-		( IFloat * ) ( VECT_LEN * (2*NUM_DIR * int(sg/2) + n+8) * sizeof(IFloat));
-#endif
-#endif
 	      local_count_3[odd]++;
 	    }  //else-on_node case
 
@@ -603,10 +536,8 @@ void asqtad_dirac_init(const void * gauge_u )
       }
     }// for x[3] loop
   }//for n loop
-#endif /* SIMUL */
   FILE *fp;
 
-#ifndef SIMUL
 #if 0
   fp=fopen("/host/chulwoo/chi_l.h","w");
   for(j=0;j<2;j++){
@@ -631,13 +562,6 @@ void asqtad_dirac_init(const void * gauge_u )
 
   fclose(fp);
 #endif
-
-#endif /* SIMUL */
-
-
-
-
-
 
   //-------------------------------------------------------------------
   //  Set up SCU buffer parameters.  T direction is special, since
@@ -668,31 +592,12 @@ void asqtad_dirac_init(const void * gauge_u )
   for ( k = 0; k < 3; k++ ) {
   for ( i = 0; i < 2; i++ ) {
     Tbuffer[k][i] = (IFloat *) smalloc ( size[1] * size[2] * size[3] * VECT_LEN * sizeof( IFloat ) / 2);
-#ifndef SIMUL_TBUF
     ToffsetP[k][i] = ( int * ) smalloc (  size[1] * size[2] * size[3] *  sizeof( int ) / 2 );
     ToffsetM[k][i] = ( int * ) smalloc (  size[1] * size[2] * size[3] *  sizeof( int ) / 2 );
     countP[k][i] = 0;
     countM[k][i] = 0;
-#else
-    countP[k][i] = size[1]*size[2]*size[3]/2;
-    countM[k][i] = size[1]*size[2]*size[3]/2;
-#endif
   }
  }
-#ifdef SIMUL_TBUF
-  ToffsetP[0][0]= ToffsetP00;
-  ToffsetP[0][1]= ToffsetP01;
-  ToffsetP[1][0]= ToffsetP10;
-  ToffsetP[1][1]= ToffsetP11;
-  ToffsetP[2][0]= ToffsetP20;
-  ToffsetP[2][1]= ToffsetP21;
-  ToffsetM[0][0]= ToffsetM00;
-  ToffsetM[0][1]= ToffsetM01;
-  ToffsetM[1][0]= ToffsetM10;
-  ToffsetM[1][1]= ToffsetM11;
-  ToffsetM[2][0]= ToffsetM20;
-  ToffsetM[2][1]= ToffsetM21;
-#else
   for ( sg = 0; sg < vol; sg++ ) {
 
     odd = SetCoord( sg );
@@ -711,6 +616,7 @@ void asqtad_dirac_init(const void * gauge_u )
   } //end of sg loop
   
   int vol3 = (size[1] * size[2] * size[3])/2;
+
 #if 0
   fp= fopen("/host/chulwoo/Toffset.h","w");
   for ( k = 0; k < 3; k++ ) 
@@ -728,7 +634,7 @@ void asqtad_dirac_init(const void * gauge_u )
   }
   fclose(fp);
 #endif
-#endif
+
 
   //-------------------------------------------------------------------
   //  Index i says data has been received from TP, XP, YP, ZP, TM, XM,
@@ -738,27 +644,27 @@ void asqtad_dirac_init(const void * gauge_u )
   for ( i = 0; i < NUM_DIR; i++ ) {
     j = i % (NUM_DIR/2);
 
-      SCUarg[i + NUM_DIR] = &(SCUargIR[i+NUM_DIR]);
+      SCUarg[i + NUM_DIR] = new SCUDirArgIR;
       SCUarg[i + NUM_DIR] ->Init(chi_off_node[2][i], scudir[i], SCU_REC,
 		    VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0, IR_7);
       SCUarg[i + NUM_DIR] ->Assert();
 
-    SCUDMAarg_p[(i+NUM_DIR)*2]  = &(SCUDMAarg[(i+NUM_DIR)*2]);
+    SCUDMAarg_p[(i+NUM_DIR)*2]  = new SCUDMAInst;
     SCUDMAarg_p[(i+NUM_DIR)*2] ->Init(chi_off_node[0][i],
       VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0);
-    SCUDMAarg_p[(i+NUM_DIR)*2+1]  = &(SCUDMAarg[(i+NUM_DIR)*2+1]);
+    SCUDMAarg_p[(i+NUM_DIR)*2+1]  = new SCUDMAInst;
     SCUDMAarg_p[(i+NUM_DIR)*2+1] ->Init(chi_off_node[1][i],
       VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0);
 
     if( split ){
-      SCUarg_1[i + NUM_DIR] = &(SCUarg_1IR[i+NUM_DIR]);
+      SCUarg_1[i + NUM_DIR] = new SCUDirArgIR;
       SCUarg_1[i + NUM_DIR] ->Init(scudir[i],SCU_REC, &SCUDMAarg_p[(i+NUM_DIR)*2],1, IR_5);
       SCUarg_1[i + NUM_DIR] ->Assert();
-      SCUarg_2[i + NUM_DIR] = &(SCUarg_2IR[i+NUM_DIR]);
+      SCUarg_2[i + NUM_DIR] = new SCUDirArgIR;
       SCUarg_2[i + NUM_DIR] ->Init(scudir[i],SCU_REC, &SCUDMAarg_p[(i+NUM_DIR)*2+1],1, IR_6);
       SCUarg_2[i + NUM_DIR] ->Assert();
     } else {
-      SCUarg_1[i + NUM_DIR] = &(SCUarg_1IR[i+NUM_DIR]);
+      SCUarg_1[i + NUM_DIR] = new SCUDirArgIR;
       SCUarg_1[i + NUM_DIR] ->Init(scudir[i],SCU_REC, &SCUDMAarg_p[(i+NUM_DIR)*2],2, IR_5);
       SCUarg_1[i + NUM_DIR] ->Assert();
     }
@@ -771,7 +677,7 @@ void asqtad_dirac_init(const void * gauge_u )
 
     //send arguments
     if ((i == 0) || ( i == 4)){
-      SCUarg[i] = &(SCUargIR[i]);
+      SCUarg[i] = new SCUDirArgIR;
       if (size[j] >4)
         SCUarg[i] ->Init (Tbuffer[2][(4 - i)/4], scudir[i], SCU_SEND,
 		       blklen[j], numblk[j], stride[j], IR_7 );
@@ -783,10 +689,10 @@ void asqtad_dirac_init(const void * gauge_u )
 		       blklen[j], numblk[j], stride[j], IR_7 );
       SCUarg[i] ->Assert();
 
-      SCUDMAarg_p[i*2] = &(SCUDMAarg[i*2]);
+      SCUDMAarg_p[i*2] = new SCUDMAInst;
       SCUDMAarg_p[i*2] ->Init(Tbuffer[0][(4 - i)/4], 
 		       blklen[j], numblk[j], stride[j]);
-      SCUDMAarg_p[i*2+1] = &(SCUDMAarg[i*2+1]);
+      SCUDMAarg_p[i*2+1] = new SCUDMAInst;
 
       if(size[j]>2)
         SCUDMAarg_p[i*2+1] ->Init(Tbuffer[1][(4 - i)/4], 
@@ -796,21 +702,21 @@ void asqtad_dirac_init(const void * gauge_u )
 		       blklen[j], numblk[j], stride[j]);
 
     if( split ){
-      SCUarg_1[i] = &(SCUarg_1IR[i]);
+      SCUarg_1[i] = new SCUDirArgIR;
       SCUarg_1[i] ->Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2],1,IR_5);
       SCUarg_1[i] ->Assert();
-      SCUarg_2[i] = &(SCUarg_2IR[i]);
+      SCUarg_2[i] = new SCUDirArgIR;
       SCUarg_2[i] ->Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2+1],1,IR_6);
       SCUarg_2[i] ->Assert();
     } else {
-      SCUarg_1[i] = &(SCUarg_1IR[i]);
+      SCUarg_1[i] = new SCUDirArgIR;
       SCUarg_1[i] ->Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2],2,IR_5);
       SCUarg_1[i] ->Assert();
     }
 
     }
     else{
-      SCUarg[i] = &(SCUargIR[i]);
+      SCUarg[i] = new SCUDirArgIR;
       if(size[j] >2)
         SCUarg[i] ->Init(( void * ) 0, scudir[i], SCU_SEND,
 		       blklen[j], numblk[j], stride[j], IR_7 );
@@ -819,21 +725,21 @@ void asqtad_dirac_init(const void * gauge_u )
            VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j]),1,0, IR_7 );
       SCUarg[i] ->Assert();
 
-      SCUDMAarg_p[i*2] = &(SCUDMAarg[i*2]);
+      SCUDMAarg_p[i*2] = new SCUDMAInst;
       SCUDMAarg_p[i*2] ->Init((void *)0, 
 		       blklen[j], numblk[j], stride[j]);
-      SCUDMAarg_p[i*2+1] = &(SCUDMAarg[i*2+1]);
+      SCUDMAarg_p[i*2+1] = new SCUDMAInst;
       SCUDMAarg_p[i*2+1] ->Init((void *)0, 
 		       blklen[j], numblk[j], stride[j]);
       if( split ){
-        SCUarg_1[i] = &(SCUarg_1IR[i]);
+        SCUarg_1[i] = new SCUDirArgIR;
         SCUarg_1[i] -> Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2],1,IR_5);
         SCUarg_1[i] ->Assert();
-        SCUarg_2[i] = &(SCUarg_2IR[i]);
+        SCUarg_2[i] = new SCUDirArgIR;
         SCUarg_2[i] -> Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2+1],1,IR_6);
         SCUarg_2[i] ->Assert();
       } else {
-        SCUarg_1[i] = &(SCUarg_1IR[i]);
+        SCUarg_1[i] = new SCUDirArgIR;
         SCUarg_1[i] -> Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2],2,IR_5);
         SCUarg_1[i] ->Assert();
       }
@@ -841,12 +747,12 @@ void asqtad_dirac_init(const void * gauge_u )
   }// end of NUM_DIR loop
 
 
-  SCUmulti = &SCUmultiIR;
+  SCUmulti = new SCUDirArgMulti;
   SCUmulti->Init(SCUarg, 2*NUM_DIR);
-  SCUmulti_1 = &SCUmulti_1IR;
+  SCUmulti_1 = new SCUDirArgMulti;
   SCUmulti_1->Init(SCUarg_1, 2*NUM_DIR);
   if( split ){
-    SCUmulti_2 = &SCUmulti_2IR;
+    SCUmulti_2 = new SCUDirArgMulti;
     SCUmulti_2->Init(SCUarg_2, 2*NUM_DIR);
   }
 
@@ -874,34 +780,32 @@ void asqtad_destroy_dirac_buf()
 
   sfree (tmpfrm);
   sfree(chi_off_node_total);
-#if 0
-   delete SCUmulti;
-   delete SCUmulti_1;
-#endif
+  delete SCUmulti;
+  delete SCUmulti_1;
+  if(split)
+  delete SCUmulti_2;
 
   for ( i = 0; i < 2; i++ ) {
-#ifndef SIMUL
     sfree(chi_nl[i]);
     sfree(chi_l[i]);
-#endif
     for ( k = 0; k < 3; k++ ) {
       sfree(Tbuffer[k][i]);
-#ifndef SIMUL_TBUF
       sfree(ToffsetP[k][i]);
       sfree(ToffsetM[k][i]);
-#endif
     }
   }
     
   for ( i = 0; i < NUM_DIR; i++ ) {
-#if 0
-    delete SCUarg[i];
-    delete SCUarg[i+8];
-    delete SCUarg_1[i];
-    delete SCUarg_1[i+8];
+    delete SCUarg[2*i];
+    delete SCUarg[2*i+1];
+    delete SCUarg_1[2*i];
+    delete SCUarg_1[2*i+1];
+    if(split){
+      delete SCUarg_2[2*i];
+      delete SCUarg_2[2*i+1];
+    }
     for(k=0;k<4;k++)
       delete SCUDMAarg_p[i*4+k];
-#endif
   }
 }
 //-------------------------------------------------------------------
@@ -1582,6 +1486,7 @@ int non_local_count_3[3][2];
   int x[NUM_DIR/2];
   char *cname = "DiracOpAsqtad";
   char *fname = "asqtad_dirac_init_g()";
+  VRB.Func(cname,fname);
 
   //--------------------------------------------------------------------
   // c1 -> one link; c2 -> 3-link; c3 -> 3-link staple; c5 -> 5-link staple;
@@ -1684,8 +1589,8 @@ int non_local_count_3[3][2];
        ERR.Pointer(cname,fname, "uc_l_agg[i]");
  
     uc_nl[i] = (IFloat*)smalloc( MATRIX_SIZE * ((non_local_chi +non_local_chi_3)/2) * sizeof(IFloat) );
-    for(int j=0;j<MATRIX_SIZE*(non_local_chi+non_local_chi_3)/2;j++)
-	uc_nl[i][j]=0.;
+//    for(int j=0;j<MATRIX_SIZE*(non_local_chi+non_local_chi_3)/2;j++)
+//	uc_nl[i][j]=0.;
     uc_nl_agg[i]  = (gauge_agg*)smalloc(((non_local_chi+non_local_chi_3)/2)*sizeof(gauge_agg));
 
     if(uc_nl[i] == 0){
@@ -1696,25 +1601,88 @@ int non_local_count_3[3][2];
      }
   }
 
+printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
 FILE *fp;
+char * char_tmp = (char *)smalloc(4);
+printf("asqtad_init_g::char_tmp=%p\n",char_tmp);
+sfree(char_tmp);
+char_tmp = (char *)smalloc(4);
+printf("asqtad_init_g::char_tmp=%p\n",char_tmp);
+sfree(char_tmp);
+{
   ParTransAsqtad pt(*lat_pt);
+  Float *gauge_p = (Float *)gauge_field_addr;
+  printf("lat_pt->GaugeField(%p)=\n",gauge_p);
+  for(int ii= 0;ii<6;ii++) printf("%e ",*gauge_p++);
+  printf("\n");
+  gauge_p = (Float *)lat_pt->GaugeField();
+  printf("lat_pt->GaugeField(%p)=\n",gauge_p);
+  for(int ii= 0;ii<6;ii++) printf("%e ",*gauge_p++);
+  printf("\n");
+printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
   Matrix *result[NUM_DIR];
-  Matrix *tmpmat1 = new Matrix[vol];
-  Matrix *tmpmat2 = new Matrix[vol];
-  for(int j = 0;j<vol;j++) tmpmat1[j].UnitMatrix();
-  for(int j = 0;j<vol;j++) tmpmat2[j].UnitMatrix();
-
+  Matrix *Unit = new Matrix[vol];
+  printf("Unit=%p\n",Unit);fflush(stdout);
+  Matrix *P3 = new Matrix[vol];
+  printf("P3=%p\n",P3);fflush(stdout);
+  Matrix *P3mu = new Matrix[vol];
+  printf("P3mu=%p\n",P3mu);fflush(stdout);
+  Matrix *P5 = new Matrix[vol];
+  printf("P5=%p\n",P5);fflush(stdout);
+  Matrix *P5mu = new Matrix[vol];
+  printf("P5mu=%p\n",P5mu);fflush(stdout);
+  Matrix *P7 = new Matrix[vol];
+  printf("P7=%p\n",P7);fflush(stdout);
+  Matrix *P7mu = new Matrix[vol];
+  printf("P7mu=%p\n",P7mu);fflush(stdout);
+  Matrix *P6 = P5;
+  Matrix *P6mu = P5mu;
+  Matrix *Pmumu = P7;
+  Matrix *Pmumumu = P7mu;
+  for(int j = 0;j<vol;j++) Unit[j].UnitMatrix();
   for(int j = 0;j<NUM_DIR;j++){
      result[j] = new Matrix[vol];
+  printf("result[%d]=%p\n",j,result[j]);fflush(stdout);
      for(int k = 0;k<vol;k++) result[j][k].ZeroMatrix();
   }
   int dirs[] = {6,0,2,4,7,1,3,5}; //mapping between ParTrans and DiracOpAsqtad
   Matrix *min[NUM_DIR],*mout[NUM_DIR];
-  for(int j = 0;j<NUM_DIR;j++){
-    min[j] = tmpmat1;
-    mout[j] = result[j];
+  for(int mu = 0;mu<NUM_DIR;mu++){
+//printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
+    pt.run(1,&(result[mu]),&Unit,&dirs[mu]);
+//printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
+    for(int nu = 0;nu<NUM_DIR;nu++)
+    if(NotParallel(mu,nu)){
+      pt.run(1,&P3,&Unit,&dirs[nu]);
+      pt.run(1,&P3mu,&P3,&dirs[mu]);
+      for(int rho = 0;rho<NUM_DIR;rho++)
+      if(NotParallel(mu,rho) && NotParallel(nu,rho)){
+        pt.run(1,&P5,&P3,&dirs[rho]);
+        pt.run(1,&P5mu,&P5,&dirs[mu]);
+        for(int sigma = 0;sigma<NUM_DIR;sigma++)
+        if(NotParallel(mu,sigma) && NotParallel(nu,sigma)&&NotParallel(rho,sigma)){
+          pt.run(1,&P7,&P5,&dirs[sigma]);
+          pt.run(1,&P7mu,&P7,&dirs[mu]);
+          int sig_n = (sigma+4)%8;
+          pt.run(1,&P7,&P7mu,&dirs[sig_n]);
+          fTimesV1PlusV2((IFloat*)P5mu,c7/c5,(IFloat*)P7,(IFloat*)P5mu,vol*18);
+        }
+        int rho_n = (rho+4)%8;
+        pt.run(1,&P5,&P5mu,&dirs[rho_n]);
+        fTimesV1PlusV2((IFloat*)P3mu,c5/c3,(IFloat*)P5,(IFloat*)P3mu,vol*18);
+      }
+      pt.run(1,&P6,&P3,&dirs[nu]);
+      pt.run(1,&P6mu,&P6,&dirs[mu]);
+      int nu_n = (nu+4)%8;
+      pt.run(1,&P6,&P6mu,&dirs[nu_n]);
+      fTimesV1PlusV2((IFloat*)P3mu,c6/c3,(IFloat*)P6,(IFloat*)P3mu,vol*18);
+
+      pt.run(1,&P3,&P3mu,&dirs[nu_n]);
+      fTimesV1PlusV2((IFloat*)result[mu],c3/c1,(IFloat*)P3,(IFloat*)result[mu],vol*18);
+    }
   }
-  pt.run(8,mout,min,dirs);
+//printf("size= %d %d %d %d\n",size[0],size[1],size[2],size[3]);
+//  printf("asqtad_init_g() done\n"); exit(4);
 
   for ( i = 0; i < 2; i++){
     local_count[i] = 0;
@@ -1728,6 +1696,7 @@ FILE *fp;
   //-----------------------------------------------------------------
 
   Matrix *tmp,*tmp2;
+
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     for (x[3] = 0; x[3] < size[3]; x[3]++)
     for (x[2] = 0; x[2] < size[2]; x[2]++)
@@ -1738,599 +1707,130 @@ FILE *fp;
 	    sg = coord[1] + size[1] * ( coord[2] + size[2] * ( coord[3] +  size[3] * coord[0] ));
       if ( CoordNN( n ) ) {		// chi(x+mu) off-node
         tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * non_local_count[odd]);
+//printf("x= %d %d %d %d\n",coord[0],coord[1],coord[2],coord[3]);
+//printf("size= %d %d %d %d\n",size[0],size[1],size[2],size[3]);
+//printf("tmp=%p result[%d][%d]=%p\n",tmp,n,LexGauge(coord),&(result[n][LexGauge(coord)]));fflush(stdout);
         *tmp = result[n][LexGauge(coord)]; 
 	*tmp *= (Float)c1;
         non_local_count[odd]++;
       }
       else {
         tmp = (Matrix *)(uc_l[odd] + MATRIX_SIZE * local_count[odd]);
+//printf("x= %d %d %d %d\n",coord[0],coord[1],coord[2],coord[3]);
+//printf("size= %d %d %d %d\n",size[0],size[1],size[2],size[3]);
+//printf("tmp=%p result[%d][%d]=%p\n",tmp,n,LexGauge(coord),&(result[n][LexGauge(coord)]));fflush(stdout);
         *tmp = result[n][LexGauge(coord)]; 
 	*tmp *= (Float)c1;
         local_count[odd]++;
       }
     }
   }
-#if 0
-
-#ifndef SIMUL_U
-
-
-
-  for ( i = 0; i < 2; i++){
-    local_count[i] = 0;
-    non_local_count[i] = 0;
-    local_count_3[i]=0;
-   for (j=0; j<3; j++) non_local_count_3[j][i] = 0;
-  }
-
-
-  //-----------------------------------------------------------
-  //  Copy links in POSTIVE directions.  These are all on-node
-  //  Take Hermitian conjugate while doing this
-  //-----------------------------------------------------------
-//	fp=fopen("/host/chulwoo/uc_l_1link.out","w");
-
   for ( n = 0; n < NUM_DIR/2; n++ ) {
-
-  //-----------------------------------------------------------------
-  //  Loop over all sites.  First rearrange gauge field for this
-  //  site and then set up pointers to vector field
-  //-----------------------------------------------------------------
-
-    for (x[3] = 0; x[3] < size[3]; x[3]++){
-      for (x[2] = 0; x[2] < size[2]; x[2]++){
-			for (x[1] = 0; x[1] < size[1]; x[1]++){
-	  			for (x[0] = 0; x[0] < size[0]; x[0]++){
-
+    for (x[3] = 0; x[3] < size[3]; x[3]++)
+    for (x[2] = 0; x[2] < size[2]; x[2]++)
+    for (x[1] = 0; x[1] < size[1]; x[1]++)
+    for (x[0] = 0; x[0] < size[0]; x[0]++){
    	 for (i = 0; i < 4 ; i++) coord[i] = x[i];
 	    odd = ( coord[0] + coord[1] + coord[2] + coord[3] ) % 2;
 	    sg = coord[1] + size[1] * ( coord[2] + size[2] * ( coord[3] +  size[3] * coord[0] ));
-
-    //---------------------------------------------------------------
-     //U_mu(x) ~
-     //---------------------------------------------------------------
-       nn = ( n - 1 + 4 ) % 4;		//  nn is physics system order
-       v = u + SITE_LEN *(LexGauge( coord ))+ MATRIX_SIZE * nn;
-	    //v = u + SITE_LEN * sg + MATRIX_SIZE * nn;
-       //storage the uc fields in the same order of chi's
-      if ( CoordNN( n ) ) {		// chi(x+mu) off-node
-//		fprintf(fp,"non_local%d %d %d %d %d = %d\n",x[0],x[1],x[2],x[3],n,non_local_count[odd]);
-        w = uc_nl[odd] + MATRIX_SIZE * non_local_count[odd];
-        for ( r = 0; r < 3; r++ ) {
-          for ( c = 0; c < 3; c++ ) {
-            i = 6*r + 2*c;
-            j = 6*c + 2*r;
-            w[i] = v[j];
-        	w[i+1] = -v[j+1];
-		 	}
-        }
-	      non_local_count[odd]++;
-	  }
-	else {
-//		fprintf(fp,"local %d %d %d %d %d = %d v = %d\n",x[0],x[1],x[2],x[3],n,local_count[odd], 4*(LexGauge( coord ))+nn);
-	    w = uc_l[odd] + MATRIX_SIZE * local_count[odd];
-          for ( r = 0; r < 3; r++ ) {
-			for ( c = 0; c < 3; c++ ) {
-	      	  i = 6*r + 2*c;
-		      j = 6*c + 2*r;
-	   	      w[i] = v[j];
-	      	  w[i+1] = -v[j+1];
-         	}
-          }
-       local_count[odd]++;
-      } // end of else
-
- for (i = 0; i < 4 ; i++) coord[i] = x[i];
- CoordNN( n );
- coord[n]=coord_nn[n];  // x+mu
- CoordNN( n );
- coord[n]=coord_nn[n]; // x+2m
-
- //U_mu(x+mu) ~
- nn =  ( n - 1 + 4 ) % 4;          
- v = u + SITE_LEN * (LexGauge( coord )) + MATRIX_SIZE * nn;
- DaggerM( w_t2, v);  
-
-  off_node= CoordNN( n+4 ); // x+2mu -> x+mu
-  TransfP( off_node,  nflush_g, w_t2, mtmp,  n);
-
- //U_mu(x+mu) ~
-  coord[n]=coord_nn[n];
-  nn =  ( n - 1 + 4 ) % 4;          
- v = u + SITE_LEN * (LexGauge( coord )) + MATRIX_SIZE * nn;
- DaggerM( w_t1, v); 
-
-  mDotMEqual( w_t3, w_t1, w_t2  ) ; //on x+mu node
-
-  off_node= CoordNN( n+4 ); // x+mu -> x
-  coord[n]=coord_nn[n];
-  TransfP( off_node,  nflush_g, w_t3, mtmp,  n);
-
-     //---------------------------------------------------------------
-    //U_mu(x) ~U_mu(x+mu) ~U_mu(x+2mu) ~   (1 transformation  max)
-     //---------------------------------------------------------------
-
-
-   for (i = 0; i < 4 ; i++) coord[i] = x[i];
-   if ( CoordkNN (n, 3)) {         // 3rd nn off-node
-  
-   for (j=0; j<3; j++){
-
-    if ((coord_knn[n%4]==j)) {
-	w3 = uc_nl[odd]+MATRIX_SIZE*(non_local_count_3[j][odd]+(j+1)* non_local_chi/2);
-	non_local_count_3[j][odd]++;
-       }
-   }
-
-     }
-   else {                      // 3rd nn on-node
-    w3 = uc_l[odd] + MATRIX_SIZE * (local_chi/2 + local_count_3[odd]);
-    local_count_3[odd]++;
-   }
-
-
-  
-
-#ifdef naik
-   mDotMEqual(w3 ,  w ,  w_t3  ) ;  
-
-  for ( i = 0; i < 18; i++ ) {
-    w3[i] = c2 * w3[i]; 
-
-  }
-#endif
-   // mDotMEqual(w3 ,  w_t3 ,  w  ) ;  //wrong one
-
-
-
-
-#ifdef fat_link
- int nu;
- IFloat  stp3_0[18],  stp3_2[18],  stp3_4[18], stp3_5[18];
- IFloat stp5_0[18], stp5_1[18], stp5_2[18], stp5_3[18] , stp5_4[18], stp5_5[18];
- IFloat UnitMatrix[18], stp5_f[18], stp3_f[18] ; 
- IFloat stp7_0[18], stp7_f[18], stp7_2[18];
- IFloat stp6_f[18];
-
-   for ( i = 0; i < 18; i++ ) {
-               stp3_5[i] = 0.;
-	       stp5_f[i] = 0.;
-	       stp6_f[i] = 0.;
-	       stp3_f[i] = 0.;
-	       stp7_f[i] = 0.;
-	       UnitMatrix[i] = 0.;
-           }
-
-
-
-    UnitMatrix[0]=1.;
-    UnitMatrix[8]=1.;
-    UnitMatrix[16]=1.;
-
-for (nu=0; nu < 8 ; nu++){
- if  (nu%4 != n){
-    for (i = 0; i < 4 ; i++) coord[i] = x[i]; 
-if (nu<4){
-      Staple3_PP (UnitMatrix,stp3_4, coord, n,nu, v,u,nflush_g,1 );
-      Staple5_PP (UnitMatrix,stp5_2, coord, n,nu, nu, v,u,nflush_g );
-}
-else{ 
-     Staple3_PN (UnitMatrix,stp3_4, coord, n,nu%4, v,u,nflush_g,1 );
-     Staple5_PN (UnitMatrix,stp5_2, coord, n,nu,nu%4, v,u,nflush_g );
-}
-
-         for ( i = 0; i < 18; i++ ) {
-               stp3_5[i] += stp3_4[i];
-               stp6_f[i] += stp5_2[i];
-           }
- }}
-
-
-#ifdef staple5
-
-
-
-for (int ro=0; ro < 4 ; ro++){  //positive ro direction
-if  (ro%4 != n)
-   {  
- for (nu=0; nu < 8 ; nu++){ // 8 direction
-if  ( ( (nu%4)!= n )&&( (nu%4)!=(ro%4)) )
-   {  
-     for (i = 0; i < 4 ; i++) coord[i] = x[i]; 
-
-  Staple5_PP (UnitMatrix ,stp5_2 , coord, n, nu, ro, v, u, nflush_g  );
-
-       for ( i = 0; i < 18; i++ ) {
-	 stp5_f[i] += stp5_2[i];}
-}
-}}}	
-
- for (int ro=0; ro < 4 ; ro++){ //negative ro direction
-if  (ro != n)
-   {  
- for (nu=0; nu < 8 ; nu++){ //8 direction
-if  ( ( (nu%4)!= n )&&( (nu%4)!=(ro%4)) )
-   {  
-     for (i = 0; i < 4 ; i++) coord[i] = x[i]; 
-
-     Staple5_PN(UnitMatrix ,stp5_2 , coord, n, nu, ro, v, u, nflush_g  );
-
-       for ( i = 0; i < 18; i++ ) {
-	 stp5_f[i] += stp5_2[i];}
-   }
- }
-   }
- }
-
-
-#endif //staple5
-
-#ifdef staple7
-
-for (int de=0; de < 4 ;de++){  //positive de direction
-  if  (de%4 != n ){
-
-for (int ro=0; ro < 8 ; ro++){  //all ro direction
-if  (ro%4 != n && ro%4 != de%4)
-   {  
- for (nu=0; nu < 8 ; nu++){ // 8 direction
-if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
-   {  
-     for (i = 0; i < 4 ; i++) coord[i] = x[i]; 
-
-     Staple7_PP (UnitMatrix ,stp7_2 , coord, n, nu, ro,de, v, u, nflush_g  );
- 
-       for ( i = 0; i < 18; i++ ) {
-	 stp7_f[i] += stp7_2[i];}
-}
- }}} }}
-
-
-for (int de=0; de < 4 ;de++){  //negative de direction
-  if  (de%4 != n){
-
-for (int ro=0; ro < 8 ; ro++){  //all ro direction
-if  (ro%4 != n && ro%4 != de%4)
-   {  
- for (nu=0; nu < 8 ; nu++){ // 8 direction
-if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
-   {  
-     for (i = 0; i < 4 ; i++) coord[i] = x[i]; 
-
-     Staple7_PN (UnitMatrix ,stp7_2 , coord, n, nu, ro,de, v, u, nflush_g  );
- 
-       for ( i = 0; i < 18; i++ ) {
-	 stp7_f[i] += stp7_2[i];}
-}
- }}} }}
-
-
-#endif //staple7
-
-
-
-
-
-
-
-
-
- //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- // add the fat link term to one link
- //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
-    for ( i = 0; i < 18; i++ ) {
-
-      w[i]*= c1;
-      w[i] = w[i] + c3 * stp3_5[i]+ c5 * stp5_f[i] + c6
-*stp6_f[i] + c7 * stp7_f[i] ;
-           }
-
-#endif //fat_link
-
-
-        }//end of for x[0] loop
-       }
+      if ( CoordNN( n+4 ) ) {		// chi(x+mu) off-node
+        tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * non_local_count[odd]);
+//printf("tmp=%p result[%d][%d]=%p\n",tmp,n+4,LexGauge(coord),&(result[n+4][LexGauge(coord)]));fflush(stdout);
+        *tmp = result[n+4][LexGauge(coord)]; 
+	*tmp *= (Float)-c1;
+        non_local_count[odd]++;
       }
-    } //end of for x[3] loop
-  }//end of the n-loop (sum_postive mu _
-
- 
-
-   //-----------------------------------------------------------------
-    //  Copy links in NEGATIVE directions.  Some are off-node
-    //  Add an overall minus sign
-    //-----------------------------------------------------------------
-    for ( n = 0; n < NUM_DIR/2; n++ ) {
- 
-  for (x[3] = 0; x[3] < size[3]; x[3]++){
-	for (x[2] = 0; x[2] < size[2]; x[2]++){
-	  for (x[1] = 0; x[1] < size[1]; x[1]++){
-	    for (x[0] = 0; x[0] < size[0]; x[0]++){
-
-	      for (i = 0; i < 4 ; i++) coord[i] = x[i];
-	      odd = ( coord[0] + coord[1] + coord[2] + coord[3] ) % 2;
-
-	      nn = ( n - 1 + 4 ) % 4;		//  nn is physics system order
-      	//---------------------------------------------------------------
-	      //U_mu (x-mu)
-	      //---------------------------------------------------------------
-        off_node = CoordNN( n + 4 );
-
-	      v = u + SITE_LEN * LexGauge( coord_nn ) + MATRIX_SIZE * nn;
-
-        if ( off_node ) {		//  off-node
-//		fprintf(fp,"non_local%d %d %d %d %d = %d\n",x[0],x[1],x[2],x[3],n+4,non_local_count[odd]);
-//	 	fprintf(fp,"coord_nn = %d %d %d %d\n",coord_nn[0],coord_nn[1],coord_nn[2],coord_nn[3]);
-	  w = uc_nl[odd] + MATRIX_SIZE * non_local_count[odd];
-           non_local_count[odd]++;
-				TransfM( off_node,  nflush_g, v, mtmp,  n);
-//				fprintf(fp,"v[0]=%e\t mtmp[0]=%e\n",v[0],mtmp[0]);
-				v = mtmp;
-	      }
-	else{
-//		fprintf(fp,"local %d %d %d %d %d = %d v = %d\n",x[0],x[1],x[2],x[3],n+4,local_count[odd], 4*(LexGauge( coord ))+nn);
-		  w = uc_l[odd] + MATRIX_SIZE * local_count[odd];
-		  local_count[odd]++;
-	      }  //end of "else"
-
-	//U_mu (x-mu) -> x  
-	
- for ( i = 0; i < 18; i++ ) {
-         	w[i] = -v[i];
-//			fprintf(fp,"v[i]=%e\n",v[i]);
-           }
-
- for (i = 0; i < 4 ; i++) coord[i] = x[i];
- CoordNN( n + 4);
- coord[n]=coord_nn[n];  // x-mu
- CoordNN( n + 4);
- coord[n]=coord_nn[n];  // x-2mu
- off_node=CoordNN( n + 4); //coord_nn= x-3mu
-
- //U_mu (x-3mu) to x2mu
-     v = u + SITE_LEN * LexGauge( coord_nn ) + MATRIX_SIZE * nn;
-     for ( i = 0; i < 18; i++ ) {
-         	w_t2[i] = v[i];
-           }
-
-     TransfM( off_node,  nflush_g, w_t2, mtmp,  n);
- //U_mu (x-2mu)
-     v = u + SITE_LEN * LexGauge( coord ) + MATRIX_SIZE * nn;
-     for ( i = 0; i < 18; i++ ) {
-         	w_t1[i] = v[i];
-           }
-  // /U_mu (x-2mu)*U_mu (x-3mu) on x-2mu to x
-    mDotMEqual(w_t3, w_t1, w_t2  ) ; //on x-2mu
-    off_node= CoordkNN( n,2 ); // x-2mu -> x //U_mu (x-mu) transfered to x too 
-    TransfM( off_node,  nflush_g, w_t3, mtmp,  n);
-
-   //---------------------------------------------------------------
-   //U_mu(x-mu)*U_mu(x-2mu)*U_mu(x-3mu)
-   //---------------------------------------------------------------
-   for (i = 0; i < 4 ; i++) coord[i] = x[i];
-   if ( CoordkNN (n + 4, 3)) {      // 3rd nn off-node
-
-   for (j=0; j<3; j++){
-
-    if ((coord_knn[n%4]==(size[n%4]-1-j))) {
-	w3 = uc_nl[odd]+MATRIX_SIZE*(non_local_count_3[j][odd]+(j+1)* non_local_chi/2);
-	non_local_count_3[j][odd]++;
-       }
-   }
-   
-   }
-   else {                     // 3rd nn om-node
-    w3 = uc_l[odd] + MATRIX_SIZE * (local_count_3[odd] + local_chi/2);
-    local_count_3[odd]++;
-   }
-
-   // mDotMEqual( mtmp,  w_t1,  w_t2) ;
-   mDotMEqual( w3 ,  w ,  w_t3 ) ;
-
-  for ( i = 0; i < 18; i++ ) {
-    w3[i] = c2 * w3[i]; 
-
+      else {
+        tmp = (Matrix *)(uc_l[odd] + MATRIX_SIZE * local_count[odd]);
+//printf("tmp=%p result[%d][%d]=%p\n",tmp,n+4,LexGauge(coord),&(result[n+4][LexGauge(coord)]));fflush(stdout);
+        *tmp = result[n+4][LexGauge(coord)]; 
+	*tmp *= (Float)-c1;
+        local_count[odd]++;
+      }
+    }
+  }
+  for(int mu = 0;mu<NUM_DIR;mu++){
+    pt.run(1,&(result[mu]),&Unit,&dirs[mu]);
+    pt.run(1,&Pmumu,&result[mu],&dirs[mu]);
+    pt.run(1,&(result[mu]),&Pmumu,&dirs[mu]);
   }
 
+  for ( n = 0; n < NUM_DIR/2; n++ ) {
+    for (x[3] = 0; x[3] < size[3]; x[3]++)
+    for (x[2] = 0; x[2] < size[2]; x[2]++)
+    for (x[1] = 0; x[1] < size[1]; x[1]++)
+    for (x[0] = 0; x[0] < size[0]; x[0]++){
+   	 for (i = 0; i < 4 ; i++) coord[i] = x[i];
+	    odd = ( coord[0] + coord[1] + coord[2] + coord[3] ) % 2;
+      if ( CoordkNN( n,3 ) ){ 	// chi(x+mu) off-node
+        for(int j=0;j<3;j++)
+          if(coord_knn[n%4]==j){
+            tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * (non_local_count_3[j][odd]+(j+1)*non_local_chi/2));
+            *tmp = result[n][LexGauge(coord)]; 
+	    int index = non_local_count_3[j][odd]+(j+1)*non_local_chi/2;
+//        printf("x = %d %d %d %d n= %d uc_nl[%d][%d]=%e ",coord[0],coord[1],coord[2],coord[3],n,odd,index,*((Float *)tmp));
+            *tmp *= (Float)c2;
+//	printf("tmp[0] =%e(%p)\n",*((Float *)tmp),tmp);
+            non_local_count_3[j][odd]++;
+          }
+      } else {
+        tmp = (Matrix *)(uc_l[odd] + MATRIX_SIZE * (local_chi/2+local_count_3[odd]));
+        *tmp = result[n][LexGauge(coord)]; 
+	    int index = local_count_3[odd]+local_chi/2;
+//        printf("x = %d %d %d %d n= %d uc_l[%d][%d]=%e ",coord[0],coord[1],coord[2],coord[3],n,odd,index,*((Float *)tmp));
+	*tmp *= (Float)c2;
+//	printf("tmp[0] =%e(%p)\n",*((Float *)tmp),tmp);
+        local_count_3[odd]++;
+      }
+    }
+  }
+  for ( n = 0; n < NUM_DIR/2; n++ ) {
+    for (x[3] = 0; x[3] < size[3]; x[3]++)
+    for (x[2] = 0; x[2] < size[2]; x[2]++)
+    for (x[1] = 0; x[1] < size[1]; x[1]++)
+    for (x[0] = 0; x[0] < size[0]; x[0]++){
+   	 for (i = 0; i < 4 ; i++) coord[i] = x[i];
+	    odd = ( coord[0] + coord[1] + coord[2] + coord[3] ) % 2;
+      if ( CoordkNN( n+4,3 ) ){ 	// chi(x+mu) off-node
+        for(int j=0;j<3;j++)
+          if(coord_knn[n%4]==(size[n%4]-1-j)){
+            tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * (non_local_count_3[j][odd]+(j+1)*non_local_chi/2));
+	    int index = non_local_count_3[j][odd]+(j+1)*non_local_chi/2;
+            *tmp = result[n+4][LexGauge(coord)]; 
+//        printf("x = %d %d %d %d n= %d uc_nl[%d][%d]=%e ",coord[0],coord[1],coord[2],coord[3],n+4,odd,index,*((Float *)tmp));
+            *tmp *= (Float)-c2;
+//	printf("tmp[0] =%e(%p)\n",*((Float *)tmp),tmp);
+            non_local_count_3[j][odd]++;
+          }
+      } else {
+        tmp = (Matrix *)(uc_l[odd] + MATRIX_SIZE * (local_chi/2+local_count_3[odd]));
+        *tmp = result[n+4][LexGauge(coord)]; 
+	    int index = local_count_3[odd]+local_chi/2;
+//        printf("x = %d %d %d %d n= %d uc_l[%d][%d]=%e ",coord[0],coord[1],coord[2],coord[3],n+4,odd,index,*((Float *)tmp));
+	*tmp *= (Float)-c2;
+//	printf("tmp[0] =%e(%p)\n",*((Float *)tmp),tmp);
+        local_count_3[odd]++;
+      }
+    }
+  }
 
-#ifdef fat_link
- int nu;
- IFloat  stp3_0[18],stp3_1[18],  stp3_2[18], stp3_3[18], stp3_4[18], stp3_5[18];
-IFloat stp5_0[18], stp5_1[18], stp5_2[18], stp5_3[18] , stp5_4[18], stp5_5[18];
-IFloat UnitMatrix[18], stp5_f[18], stp3_f[18], stp7_2[18],stp7_f[18],stp6_f[18] ; 
-
-
-
-
-   for ( i = 0; i < 18; i++ ) {
-               stp3_5[i] = 0;
-	       stp5_f[i] = 0;
-	       stp3_f[i] = 0;
-	       stp6_f[i] = 0;
-	       stp7_f[i] = 0;
-	       UnitMatrix[i] = 0; 
-   
-           }
-
-    UnitMatrix[0]=1;
-    UnitMatrix[8]=1;
-    UnitMatrix[16]=1;
-
-
-for (nu=0; nu < 8 ; nu++){
- if  (nu%4 != n){
-    for (i = 0; i < 4 ; i++) coord[i] = x[i]; 
-if (nu<4){
-      Staple3_NP (UnitMatrix,stp3_4, coord, n,nu, v,u,nflush_g,1 );
-      Staple5_NP (UnitMatrix,stp5_2, coord, n,nu, nu, v,u,nflush_g);
+  delete[] Unit;
+  delete[] P3;
+  delete[] P3mu;
+  delete[] P5;
+  delete[] P5mu;
+  delete[] P7;
+  delete[] P7mu;
+  for(int j = 0;j<NUM_DIR;j++)
+  delete[] result[j];
 }
-else {
-     Staple3_NN (UnitMatrix,stp3_4, coord, n,nu%4, v,u,nflush_g,1 );
-     Staple5_NN (UnitMatrix,stp5_2, coord, n,nu,nu%4, v,u,nflush_g);
-}
-
-         for ( i = 0; i < 18; i++ ) {
-               stp3_5[i] += stp3_4[i];
-               stp6_f[i] += stp5_2[i];
-           }
- }}
-
-#ifdef staple5
-
- for (int ro=0; ro < 4 ; ro++){  //positive ro direction
-if  (ro%4 != n)
-   {  
- for (nu=0; nu < 8 ; nu++){ // 8 direction
-if  (nu%4 != n && nu%4 != ro%4)
-   {  
-     for (i = 0; i < 4 ; i++) coord[i] = x[i]; 
- Staple5_NP (UnitMatrix ,stp5_2 , coord, n, nu, ro, v, u, nflush_g  );
-
- //summation
-       for ( i = 0; i < 18; i++ ) {
-          stp5_f[i] += stp5_2[i]; }
-  
-
-   }
- }
-   
-   }}	
-		
-
-
- for (int ro=0; ro < 4 ; ro++){ //nrgative ro direction
-if  (ro != n)
-   {  
- for (nu=0; nu < 8 ; nu++){ //8 direction
-if  (nu%4 != n && nu%4 != ro%4)
-   {  
-     for (i = 0; i < 4 ; i++) coord[i] = x[i]; 
-
- Staple5_NN(UnitMatrix ,stp5_2 , coord, n, nu, ro, v, u, nflush_g  );
-
-       for ( i = 0; i < 18; i++ ) {
-	 stp5_f[i] += stp5_2[i];}
-
-
-   }
- }
-   }
- }
-
-#endif // staple5
-
-
-
-#ifdef staple7
-
-for (int de=0; de < 4 ;de++){  //positive de direction
-  if  (de%4 != n){
-
-for (int ro=0; ro < 8 ; ro++){  //all ro direction
-if  (ro%4 != n && ro%4 != de%4)
-   {  
-      for (nu=0; nu < 8 ; nu++){ // 8 direction
-	//for (nu=0; nu < 4 ; nu++){ // positive direction
-if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
-   {  
-     for (i = 0; i < 4 ; i++) coord[i] = x[i]; 
-
-        Staple7_NP (UnitMatrix ,stp7_2 , coord, n, nu, ro,de, v, u, nflush_g  );
- 
-       for ( i = 0; i < 18; i++ ) {
-	 stp7_f[i] += stp7_2[i];}
-}
- }}} }}
-
-
- 
-
-for (int de=0; de < 4 ;de++){  //negative de direction
-  if  (de%4 != n){
-
-for (int ro=0; ro < 8 ; ro++){  //all ro direction
-if  (ro%4 != n && ro%4 != de%4)
-   {
-     //for (nu=0; nu < 4 ; nu++){ // positive direction  
- for (nu=0; nu < 8 ; nu++){ // 8 direction
-if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
-   {  
-     for (i = 0; i < 4 ; i++) coord[i] = x[i]; 
-
-     Staple7_NN (UnitMatrix ,stp7_2 , coord, n, nu, ro,de, v, u, nflush_g  );
- 
-       for ( i = 0; i < 18; i++ ) {
-	 stp7_f[i] += stp7_2[i];}
-}
- }}} }}
-
-
-#endif //staple7
-
-
-
-
- //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- // add the fat link term to one link
- //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
-    for ( i = 0; i < 18; i++ ) {
-
-      w[i]*= c1;
-      //w[i] = w[i] + c3 * stp3_5[i]+ c5 * stp5_f[i] + c7 * stp7_f[i] ;
-      w[i] = w[i] - c3 * stp3_5[i]- c5 * stp5_f[i] - c6*stp6_f[i] - c7 * stp7_f[i] ; //test
-      /*
-      w[i]+=stp3_5[i];
-#ifdef staple5
-        w[i]+=stp5_f[i];
-#endif 
-#ifdef staple7
-	 w[i]+=stp7_f[i];
-	 #endif*/
-           }
-
-
-
-
-
-
-
-
-
-
-
- 
-
- 
-
-
-
-
-
-#endif //fat_link
-
-
-
-
-
-
-
-
-     }}} }//end of all the x-for loop
-   }//end of the for-n-loop //all negative direction
-//	fclose(fp);
-
-#endif // SIMUL 
-#endif
-
+char_tmp = (char *)smalloc(4);
+printf("asqtad_init_g::char_tmp=%p\n",char_tmp);
+sfree(char_tmp);
 
   int fd;
   char buf[200];
-#ifndef SIMUL_U
 #if 1
-//  printf("local_chi=%d\n",local_chi);
-//  printf("local_chi_3=%d\n",local_chi_3);
   fp=fopen("/host/chulwoo/uc_l.h","w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
@@ -2343,7 +1843,6 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
     fprintf(fp,"\n};\n"); 
   }
   fclose(fp);
-#endif
 #endif
 
 #ifndef SIMUL_AGG
@@ -2369,8 +1868,6 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
       temp[src*NUM_DIR*2+num_ind[src]].dest= (int)chi_l[j][2*i+1];
       for(k=0;k<MATRIX_SIZE;k++){
         temp[src*NUM_DIR*2+num_ind[src]].mat[k] = uc_l[j][i*MATRIX_SIZE+k];
-//	if(fabs(uc_l[j][i*18+k]) <1e-10)
-//		printf("src=%d uc_l[%d][%d]=%e\n",src,j,i*18+k,uc_l[j][i*18+k]);
       }
       num_ind[src]++;
     }
@@ -2400,33 +1897,6 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
       fprintf(fp,"{%d,%d,{\n",agg_p->src,agg_p->dest);
       for(k=0;k<18;k++){
         fprintf(fp,"%0.8e",agg_p->mat[k]);
-	if(k!=17){
-        fprintf(fp,", ");
-	}
-        if( k%6 == 5){
-          fprintf(fp,"\n");
-        }
-      }
-      fprintf(fp,"}},\n");
-    }
-    fprintf(fp,"\n};\n"); 
-  }
-  fclose(fp);
-#endif
-
-#else
-
-#if 0
-  fp=fopen("/host/chulwoo/uc_l_agg.h","w");
-  for(j=0;j<2;j++){
-    fprintf(fp,"struct gauge_agg uc_l_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
-    for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
-      fprintf(fp,"{%d,%d,{\n",*(chi_l[j]+2*i),*(chi_l[j]+2*i+1));
-      uc_l_agg[j][i].src = (int)chi_l[j][2*i];
-      uc_l_agg[j][i].dest = (int)chi_l[j][2*i+1];
-      for(k=0;k<18;k++){
-        fprintf(fp,"%0.8e",*(uc_l[j]+i*18+k));
-        uc_l_agg[j][i].mat[k] = uc_l[j][i*18+k];
 	if(k!=17){
         fprintf(fp,", ");
 	}
@@ -2479,7 +1949,6 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
       }
       temp[src*2+num_ind[src]].src = (int)chi_nl[j][2*i];
       temp[src*2+num_ind[src]].dest= (int)chi_nl[j][2*i+1];
-//      printf("src=%d dest=%d\n",(int)chi_nl[j][2*i],(int)chi_nl[j][2*i+1]);
       for(k=0;k<18;k++)
         temp[src*2+num_ind[src]].mat[k] = uc_nl[j][i*18+k];
       num_ind[src]++;
@@ -2525,36 +1994,11 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
   }
   fclose(fp);
 #endif
-#else
-#if 0
-  fp = fopen("/host/chulwoo/uc_nl_agg.h","w");
-  for(j=0;j<2;j++){
-    fprintf(fp,"struct gauge_agg uc_nl_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
-    for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
-      fprintf(fp,"{%d,%d,{\n",*(chi_nl[j]+2*i),*(chi_nl[j]+2*i+1));
-      uc_nl_agg[j][i].src = (int)chi_nl[j][2*i];
-      uc_nl_agg[j][i].dest = (int)chi_nl[j][2*i+1];
-      for(k=0;k<18;k++){
-        fprintf(fp,"%0.8e",*(uc_nl[j]+i*18+k));
-        uc_nl_agg[j][i].mat[k] = uc_nl[j][i*18+k];
-	if(k!=17){
-        fprintf(fp,", ");
-	}
-        if( k%6 == 5){
-          fprintf(fp,"\n");
-        }
-      }
-      fprintf(fp,"}},\n");
-    }
-    fprintf(fp,"\n};\n"); 
-    fprintf(fp,buf,strlen(buf));
-  }
-  fclose(fp);
-#endif
+
 #endif
 
 #endif // SIMUL_AGG
-exit(5);
+
 }
 
 extern "C"
@@ -2562,14 +2006,10 @@ void asqtad_destroy_dirac_buf_g(void)
 {
   int i;
   for ( i = 0; i < 2; i++){
-#ifndef SIMUL_U
   sfree(uc_l[i]);
   sfree(uc_nl[i]);
-#endif
-#ifndef SIMUL_AGG
   sfree(uc_l_agg[i]);
   sfree(uc_nl_agg[i]);
-#endif
   }
 }
 //---------------------------------------------------------------------
@@ -2727,17 +2167,9 @@ void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   //  Transfer chi's on faces.  
   //-----------------------------------------------------------------
 
-#if 0
-  printf("dirac:before");
-  for(i=0;i<vol*3;i++){
-//    if(a[i]*a[i]>1e-10)
-      printf("i=%d %e\n",i,a[i]);
-  }
-#endif
 
-#ifdef PPC440QCDOC
 //  transient_cache_flush();
-#endif
+
   copy_buffer(countM[0][a_odd], (long)a, (long)Tbuffer[0][0], (long)ToffsetM[0][a_odd]);
   copy_buffer(countP[0][a_odd], (long)a, (long)Tbuffer[0][1], (long)ToffsetP[0][a_odd]);
   if(size[0]>2) {
@@ -2796,8 +2228,6 @@ void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
 
 
 #ifdef IND_AGG
-//  dirac_cmv_agg_4( (local_chi + local_chi_3)/2, (long)0, (long)uc_l_agg[odd],
-//	       (long)a, (long)tmpfrm);
   dirac_cmv_jcw_agg( (local_chi + local_chi_3)/2, (long)0, (long)uc_l_agg[odd],
 	       (long)a, (long)tmpfrm);
 #else
@@ -2850,11 +2280,7 @@ if(split) {
   //-----------------------------------------------------------------
 
 #ifdef IND_AGG
-#ifdef CPP
-  dirac_cmv_jcw_agg_cpp( non_local_chi_3/2, (long)0, (long)&(uc_nl_agg[odd][0]), (long)c, (long)tmpfrm);
-#else
   dirac_cmv_jcw_agg( non_local_chi_3/2, (long)0, (long)&(uc_nl_agg[odd][0]), (long)c, (long)tmpfrm);
-#endif //#ifdef CPP
 #else
 #ifdef CPP
   dirac_cmv_cpp( non_local_chi, (long)(chi_nl[odd]+2*non_local_chi), (long)(uc_nl[odd]+non_local_chi*MATRIX_SIZE), (long)c, (long)tmpfrm);
@@ -2873,17 +2299,9 @@ if(split) {
   //----------------------------------------------------------------
 
 #ifdef IND_AGG
-#ifdef CPP
-  dirac_cmv_jcw_agg_cpp( non_local_chi/2, (long)0, (long)&(uc_nl_agg[odd][non_local_chi_3/2]), (long)c, (long)tmpfrm);
-#else
   dirac_cmv_jcw_agg( non_local_chi/2, (long)0, (long)&(uc_nl_agg[odd][non_local_chi_3/2]) , (long)c, (long)tmpfrm);
-#endif //#ifdef CPP
-#else
-#ifdef CPP
-  dirac_cmv_cpp( non_local_chi, (long)0, (long)(uc_nl[odd]), (long)c, (long)tmpfrm);
 #else
   dirac_cmv( non_local_chi, (long)0, (long)(uc_nl[odd]), (long)c, (long)tmpfrm);
-#endif //#ifdef CPP
 #endif
 
   //printf ("the computations involving chi3 non-local spinors done \n");
@@ -2894,16 +2312,7 @@ if(split) {
   //-----------------------------------------------------------------
 
   if ( add_flag == 0){
-#ifdef CHI_MOD2
-#ifdef CPP
-    dirac_sum2_64_cpp( vol/2, (long)0, (long)tmpfrm, (long)b);
-#else
     dirac_sum2_64( vol/2, (long)0, (long)tmpfrm, (long)b);
-#endif
-#else
-    dirac_sum( vol/2, (long)0, (long)tmpfrm, (long)b);
-#endif
-
   }
   else{
 
@@ -2911,13 +2320,6 @@ if(split) {
 
   }
 
-#if 0
-  printf("dirac:after");
-  for(i=0;i<vol*3;i++){
-//    if(b[i]*b[i]>1e-10)
-      printf("i=%d %e\n",i,b[i]);
-  }
-#endif
   restore_reg((long)intreg, (long)dreg);
 
 
