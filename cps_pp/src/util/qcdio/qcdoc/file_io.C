@@ -46,8 +46,6 @@ int Fprintf( FILE *stream, const char *format,...){
 
 int Vfprintf( FileIoType type, FILE *stream, const char *format, va_list ap){
   if ( stream == &FAKE )  return 1;
-  int nb = vfprintf(stream, format, ap);
-  va_end(args);
-  return nb;
+  return vfprintf(stream, format, ap);
 }
 CPS_END_NAMESPACE
