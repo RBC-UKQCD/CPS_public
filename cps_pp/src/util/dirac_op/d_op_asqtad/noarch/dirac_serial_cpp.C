@@ -1,13 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
-#include <util/gjp.h>
-#include <comms/scu.h>
-#include <comms/glb.h>
-#include <util/lattice.h>
-#include <util/dirac_op.h>
-#include <util/vector.h>
+/*!----------------------------------------------------------------------
+  $Id: dirac_serial_cpp.C,v 1.3 2004-02-17 19:06:15 zs Exp $
+
+----------------------------------------------------------------------*/
+
+#include <util/data_types.h>
+
 CPS_START_NAMESPACE
 struct gauge_agg{
   int src;
@@ -28,7 +25,8 @@ void dirac_cmv_nl_mod_cpp( int sites, long chi, long u, long a,
   for (s = 0; s< sites; s++)
     {
       fp1 = (IFloat *)(tmpfrm + (int)*(ch + s ));
-      fp0 = (IFloat *)((int)a +  s*48 );
+      fp0 = (IFloat *)(a +  s*6*sizeof(IFloat) );      
+      
       uu = (IFloat *)u + MATRIX_SIZE * s;
       for (c=0; c<3; c++){
 	//Re part
@@ -197,13 +195,13 @@ void dirac_sum2_64_cpp(int s, long chi, long tmpfrm, long b)
 {
   int i,j;
   IFloat *fp0, *fp1;
-  int *ch;
-  ch = (int *)chi;
 
 
   for (i = 0; i < s; i++){
-    fp0 = (IFloat *)((int)b + 48*i);
-    fp1 = (IFloat *)(tmpfrm + i*64*16);
+//     fp0 = (IFloat *)((int)b + 48*i);
+//     fp1 = (IFloat *)(tmpfrm + i*64*16);
+    fp0 = (IFloat *)((int)b + 6*sizeof(IFloat)*i);
+    fp1 = (IFloat *)(tmpfrm + i*8*sizeof(IFloat)*16);
     *fp0 = *fp1;
     *(fp0+1) = *(fp1+1);
     *(fp0+2) = *(fp1+2);
@@ -212,7 +210,8 @@ void dirac_sum2_64_cpp(int s, long chi, long tmpfrm, long b)
     *(fp0+5) = *(fp1+5);
 
     for (j = 1; j < 16; j++){
-      fp1 = (IFloat *)(tmpfrm + 64*(i*16+j) );
+//       fp1 = (IFloat *)(tmpfrm + 64*(i*16+j) );
+      fp1 = (IFloat *)(tmpfrm + 8*sizeof(IFloat)*(i*16+j) );	
       *fp0 += *fp1;
       *(fp0+1) += *(fp1+1);
       *(fp0+2) += *(fp1+2);
@@ -227,13 +226,13 @@ void dirac_sum2_acc_cpp(int s, long chi, long tmpfrm, long b)
 {
   int i,j;
   IFloat *fp0, *fp1;
-  int *ch;
-  ch = (int *)chi;
 
 
   for (i = 0; i < s; i++){
-    fp0 = (IFloat *)((int)b + 48*i);
-    fp1 = (IFloat *)(tmpfrm + i*48*16);
+    fp0 = (IFloat *)((int)b + 6*sizeof(IFloat)*i);
+    fp1 = (IFloat *)(tmpfrm + i*6*sizeof(IFloat)*16);
+
+    
     *fp0 = *fp1;
     *(fp0+1) += *(fp1+1);
     *(fp0+2) += *(fp1+2);
@@ -242,7 +241,7 @@ void dirac_sum2_acc_cpp(int s, long chi, long tmpfrm, long b)
     *(fp0+5) += *(fp1+5);
 
     for (j = 1; j < 16; j++){
-      fp1 = (IFloat *)(tmpfrm + 48*(i*16+j) );
+      fp1 = (IFloat *)(tmpfrm + 6*sizeof(IFloat)*(i*16+j) );	
       *fp0 += *fp1;
       *(fp0+1) += *(fp1+1);
       *(fp0+2) += *(fp1+2);
@@ -257,13 +256,11 @@ void dirac_sum2_cpp(int s, long chi, long tmpfrm, long b)
 {
   int i,j;
   IFloat *fp0, *fp1;
-  int *ch;
-  ch = (int *)chi;
-
+ 
 
   for (i = 0; i < s; i++){
-    fp0 = (IFloat *)((int)b + 48*i);
-    fp1 = (IFloat *)(tmpfrm + i*48*16);
+    fp0 = (IFloat *)(b + 6*sizeof(IFloat)*i);
+    fp1 = (IFloat *)(tmpfrm + i*6*sizeof(IFloat)*16);
     *fp0 = *fp1;
     *(fp0+1) = *(fp1+1);
     *(fp0+2) = *(fp1+2);
@@ -272,7 +269,7 @@ void dirac_sum2_cpp(int s, long chi, long tmpfrm, long b)
     *(fp0+5) = *(fp1+5);
 
     for (j = 1; j < 16; j++){
-      fp1 = (IFloat *)(tmpfrm + 48*(i*16+j) );
+      fp1 = (IFloat *)(tmpfrm + 6*sizeof(IFloat)*(i*16+j) );	
       *fp0 += *fp1;
       *(fp0+1) += *(fp1+1);
       *(fp0+2) += *(fp1+2);

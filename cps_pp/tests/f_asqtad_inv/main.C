@@ -1,3 +1,10 @@
+/*!----------------------------------------------------------------------
+  $Id: main.C,v 1.5 2004-02-17 19:06:15 zs Exp $
+  Test Asqtad dirac operator code.	
+----------------------------------------------------------------------*/
+
+
+
 #include<config.h>
 #include <stdio.h>
 #include<util/lattice.h>
@@ -7,10 +14,7 @@
 #include<util/error.h>
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
-#include<alg/common_arg.h>
-#include<alg/cg_arg.h>
-#include<alg/hmd_arg.h>
-#include<alg/ghb_arg.h>
+#include <math.h>
 
 #include "Gauge_edram_random.h"
 #include "Source_edram.h"
@@ -159,20 +163,21 @@ int main(int argc,char *argv[]){
 		for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
 
 		    int n = lat.FsiteOffset(s);
-			IFloat *temp_p = (IFloat *)(gf+4*n+3);
+
+		    IFloat *temp_p = (IFloat *)(gf+4*n+3);
 
 		    IFloat crd = 1.0*s[0]+0.1*s[1]+0.01*s[2]+0.001*s[3];
 #if TARGET==QCDOC
-		  if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0 &&n==0) crd=1.0; else crd = 0.0;
+		    if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0 &&n==0) crd=1.0; else crd = 0.0;
 #else
-	if(n==0) crd = 1.0; else crd = 0.0;
+		    if(n==0) crd = 1.0; else crd = 0.0;
 #endif
 					
 		    for(int v=0; v<6; v+=2){ 
 			if (v==0)
-			*((IFloat*)&X_in[n]+v) = crd;
+			    *((IFloat*)&X_in[n]+v) = crd;
 			else
-			*((IFloat*)&X_in[n]+v) = 0;
+			    *((IFloat*)&X_in[n]+v) = 0;
 			*((IFloat*)&X_in[n]+v+1) = 0.0;
 		    }
 		}
@@ -181,76 +186,95 @@ int main(int argc,char *argv[]){
     Vector *out;
     DiracOpAsqtad dirac(lat,X_out,X_in,&cg_arg,CNV_FRM_NO);
 
-	for(int k = 0; k< 2; k++){
-		fprintf(fp, "k=%d\n",k);
-		printf("k=%d ",k);
-		if (k ==0)
-			out = result;
-		else
-			out = X_out;
-		bzero((char *)out, GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-		lat.Fconvert(out,STAG,CANONICAL);
-		lat.Fconvert(X_in,STAG,CANONICAL);
-   		int iter = dirac.MatInv(out,X_in);
-		printf("iter=%d\n",iter);
-		if (k == 0){
-		int offset = GJP.VolNodeSites()*lat.FsiteSize()/ (2*6);
-			bzero((char *)X_out2, GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-			dirac.Dslash(X_out2,out+offset,CHKB_ODD,DAG_NO);
-			dirac.Dslash(X_out2+offset,out,CHKB_EVEN,DAG_NO);
-			lat.Fconvert(X_out2,CANONICAL,STAG);
-		}
-		lat.Fconvert(out,CANONICAL,STAG);
-		lat.Fconvert(X_in,CANONICAL,STAG);
-		X_out2->FTimesV1PlusV2(2*cg_arg.mass,out,X_out2,GJP.VolNodeSites
-()*lat.FsiteSize());
-    
-    
-    Float dummy;
-    Float dt = 2;
+    for(int k = 0; k< 2; k++){
+	
+	fprintf(fp, "k=%d\n",k);
+	printf("k=%d ",k);
+	if (k ==0)
+	    out = result;
+	else
+	    out = X_out;
+	bzero((char *)out, GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+	lat.Fconvert(out,STAG,CANONICAL);
+	lat.Fconvert(X_in,STAG,CANONICAL);
+	int iter = dirac.MatInv(out,X_in);
+	printf("iter=%d\n",iter);
+	if (k == 0){
+	    int offset = GJP.VolNodeSites()*lat.FsiteSize()/ (2*6);
+	    bzero((char *)X_out2, GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+	    dirac.Dslash(X_out2,out+offset,CHKB_ODD,DAG_NO);
+	    dirac.Dslash(X_out2+offset,out,CHKB_EVEN,DAG_NO);
+	    lat.Fconvert(X_out2,CANONICAL,STAG);
+	}
+	lat.Fconvert(out,CANONICAL,STAG);
+	lat.Fconvert(X_in,CANONICAL,STAG);
+	X_out2->FTimesV1PlusV2(2*cg_arg.mass,out,X_out2,GJP.VolNodeSites
+			       ()*lat.FsiteSize());
 
-if (k==0)    fprintf(fp," x y z t\n");
-    
-    for(s[3]=0; s[3]<GJP.NodeSites(3); s[3]++) 
-	for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
-	    for(s[1]=0; s[1]<GJP.NodeSites(1); s[1]++)
-		for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
+	double maxdiff = 0.0;
 
-		    int n = lat.FsiteOffset(s);
+	if (k==0)    fprintf(fp," x y z t\n");
+
+	for(s[3]=0; s[3]<GJP.NodeSites(3); s[3]++) 
+	    for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
+		for(s[1]=0; s[1]<GJP.NodeSites(1); s[1]++)
+		    for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
+
+			int n = lat.FsiteOffset(s);
 			unsigned long  *pt = (unsigned long *)&X_out[n];
 			unsigned long  *pt2 = (unsigned long *)&result[n];
 			for(int i=0; i<3; i++){
 #if TARGET == QCDOC
-		    if ( k==0 )
-				fprintf(fp," %d %d %d %d %d ", CoorX()*GJP.NodeSites(0)+s[0], CoorY()*GJP.NodeSites(1)+s[1], CoorZ()*GJP.NodeSites(2)+s[2], CoorT()*GJP.NodeSites(3)+s[3], i);
+			    if ( k==0 )
+				fprintf(fp," %d %d %d %d %d ",
+					CoorX()*GJP.NodeSites(0)+s[0],
+					CoorY()*GJP.NodeSites(1)+s[1],
+					CoorZ()*GJP.NodeSites(2)+s[2],
+					CoorT()*GJP.NodeSites(3)+s[3], i);
 #else
-		    if ( k==0 )
+			    if ( k==0 )
 				fprintf(fp," %d %d %d %d %d ", s[0], s[1], s[2], s[3], i);
 #endif
-		    if ( k==0 )
+			    if ( k==0 ){
 				fprintf(fp," (%0.7e %0.7e) (%0.7e %0.7e) (%0.2e %0.2e)\n",
-				*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
-				*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1),
+					*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
+					*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1),
 #if 0
-				*((IFloat*)&X_out2[n]+i*2), *((IFloat*)&X_out2[n]+i*2+1));
+					*((IFloat*)&X_out2[n]+i*2), *((IFloat*)&X_out2[n]+i*2+1));
 #else
-				*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1));
+					*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1));
 #endif
-				for (int j = 0; j<4;j++)
+#
+			        double thisdiff = fabs( (double)(*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2)) );
+				if(thisdiff>maxdiff) maxdiff = thisdiff;
+				thisdiff = fabs( (double)(*((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i*2+1)) );
+				if(thisdiff>maxdiff) maxdiff = thisdiff;
+			    }
+
+			    int longsincomplex = 2*sizeof(IFloat)/sizeof(long);
+			    for (int j = 0; j<longsincomplex;j++)
 				if( k !=0 )
-				if(*(pt2+j) != *(pt +j)){
-					fprintf(fp, "ERROR! X_out[%d][%d](0x%x) != psi[%d][%d](0x%x)\n",n,i*4+j,*(pt+j),n,i*4+j,*(pt2+j));
-					printf("ERROR! X_out[%d][%d](0x%x) != psi[%d][%d](0x%x)\n",n,i*4+j,*(pt+j),n,i*4+j,*(pt2+j));
-				}
-				pt2 +=4;
-		    if ( k==0 )
-			    fprintf(fp2,"0x%0.8x, 0x%0.8x, 0x%0.8x, 0x%0.8x,\n", *(pt2),*(pt2+1),*(pt2+2),*(pt2+3));
-				pt +=4;
+				    if(*(pt2+j) != *(pt +j)){
+					fprintf(fp, "ERROR! X_out[%d][%d](0x%x) != psi[%d][%d](0x%x)\n",n,i*longsincomplex+j,*(pt+j),n,i*longsincomplex+j,*(pt2+j));
+					printf("ERROR! X_out[%d][%d](0x%x) != psi[%d][%d](0x%x)\n",n,i*longsincomplex+j,*(pt+j),n,i*longsincomplex+j,*(pt2+j));
+				    }
+			    pt2 +=longsincomplex;
+
+			    if ( k==0 ){
+				for(int b=0; b<longsincomplex; b++)
+				    fprintf(fp2, "0x%0.8x ", *(pt2+b));
+				fprintf(fp2, "\n");
+			    }
+			    pt +=longsincomplex;
 			}
-		}
-}
+		    }
+	
+	if(k==0) printf("Max diff between X_in and M*X_out = %0.2e\n", maxdiff);
+    }
+
+
     fclose(fp);
-		fprintf(fp2,"};\n");
+    fprintf(fp2,"};\n");
     fclose(fp2);
     
     return 0; 
