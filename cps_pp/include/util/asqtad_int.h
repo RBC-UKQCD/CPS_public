@@ -1,5 +1,6 @@
 #ifndef ASQTAD_INT_H
 #define ASQTAD_INT_H
+#include <qalloc.h>
 #include <util/asq_data_types.h>
 #include <util/gauge_agg.h>
 
