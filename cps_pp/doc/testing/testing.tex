@@ -1,7 +1,7 @@
 
 
 %------------------------------------------------------------------
-% $Id: testing.tex,v 1.3 2003-08-08 12:17:20 mcneile Exp $
+% $Id: testing.tex,v 1.4 2003-08-08 13:29:39 mcneile Exp $
 %------------------------------------------------------------------
 %Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
 %
@@ -43,8 +43,8 @@ urlcolor=blue,
 pdfpagemode=None,
 %=UseOutlines,
 pdfhighlight={/I},
-pdftitle={Frameworks For Testing. $Revision: 1.3 $ - $Date: 2003-08-08 12:17:20 $.},
-pdfauthor={A.N. Jackson \& S. Booth},
+pdftitle={Frameworks For Testing. $Revision: 1.4 $ - $Date: 2003-08-08 13:29:39 $.},
+pdfauthor={A.N. Jackson, C. McNeile \& S. Booth},
 plainpages=false
 ]{hyperref}
 }
@@ -68,8 +68,8 @@ plainpages=false
 
 % title information:
 \title{Testing the Columbia code.}
-\author{A.N. Jackson \& S. Booth}
-\date{\mbox{\small $$Revision: 1.3 $$  $$Date: 2003-08-08 12:17:20 $$}}
+\author{A.N. Jackson, C. McNeile,  \& S. Booth}
+\date{\mbox{\small $$Revision: 1.4 $$  $$Date: 2003-08-08 13:29:39 $$}}
 
 %------------------------------------------------------------------
 \begin{document}
@@ -80,7 +80,69 @@ plainpages=false
 \newpage
 
 %-------------------------------------------------------------------
-\section{Proposed Testing Framework}
+\section{Testing Framework for the cps++ code.}
+
+We are ``growing'' a testing framework for the cps++ code.
+The original testing framework was written by Chris Miller
+at Columbia.
+
+
+This testing framework is meant to be used for the 
+cps++ code on its own with out any additional libraries.
+We expect that UKQCD users will interact more with 
+QCD-lite supercharged version of cps++, but it is useful to 
+have a framework for the cps code on its own.
+
+\subsection{Running the tests}
+
+The tests are run using the makefile target.
+\begin{verbatim}
+make -f Makefile_cps test
+\end{verbatim}
+%%
+This should produce output like
+\begin{verbatim}
+Starting test w_spect
+make[1]: Entering directory `/raidz/mcneile/qcdoc/cps++/tests/w_spect'
+g++ -o regression_cps.x -DPARALLEL=0 -DTARGET_QCDSP=0  -O2
+-I../../../cps++ -I../.../cps++/include  main.C
+``../../../cps++''/cps.a  -lm
+make[1]: Leaving directory `/raidz/mcneile/qcdoc/cps++/tests/w_spect'
+w_spect    PASS
+\end{verbatim}
+
+A perl script loops over the test cases, compiles the code,
+and then runs it. The output is compared against
+previous output and a PASS/FAIL tag is generated.
+
+\subsection{Philosophy behind the testing framework}
+
+Lattice QCD codes produce a lot of output. It is important that the 
+output is automatically tested against older output, otherwise
+a user could miss a problem.
+
+Because of rounding errors, the output can not be tested against older
+output by using a crude tool such as diff. We have taken the
+philosophy that only an important subset of the data needs to be
+tested. For example, a regression test may only need to check that the
+pion correlator at a single timeslice is correct. If the pion
+correlator at timeslice 2 is correct, then it is likely that all the
+meson correlators are correct.
+
+In this testing framework, we use perl scripts to
+extract a subset of the correlators. The important
+perl script that does the comparison is called
+regressions/check\_data.pl. This compares the output from
+the program to previous output stored in a special format.
+
+\subsection{Adding a new test to the testing framework}
+
+%-------------------------------------------------------------------
+\section{What is required from a  Testing Framework}
+
+Here are some thoughts on what is required for a testing
+framework. Most of the information in this section will
+be moved elsewhere at some stage.
 
 \subsection{Parallelism Issues}
 Some of the test cases should be done on big lattices, as there are subtle communication bugs that will only show with more than 32 nodes.  Therefore, the code should ensure the same results can be calculated over a range of machine partition sizes.
