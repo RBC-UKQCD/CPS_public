@@ -1,0 +1,10 @@
+	Hmc steps = 10, Delta_hamilton = -2.342337e+00, accept = 1, dev = 1.306776e-16, max_diff = -7.771561e-16
+	Hmc steps = 10, Delta_hamilton = -3.995003e-01, accept = 1, dev = 1.445377e-16, max_diff = -1.110223e-15
+	Hmc steps = 10, Delta_hamilton = -9.165299e-02, accept = 1, dev = 1.512171e-16, max_diff = 8.881784e-16
+	Hmc steps = 10, Delta_hamilton = -7.489834e-02, accept = 1, dev = 1.525753e-16, max_diff = 9.010804e-16
+	Hmc steps = 10, Delta_hamilton = 4.210427e-02, accept = 1, dev = 1.556505e-16, max_diff = -1.137979e-15
+	Hmc steps = 10, Delta_hamilton = -2.324138e-01, accept = 1, dev = 1.565584e-16, max_diff = 1.110223e-15
+	Hmc steps = 10, Delta_hamilton = -3.700712e-02, accept = 1, dev = 1.547415e-16, max_diff = 1.137979e-15
+	Hmc steps = 10, Delta_hamilton = 1.775444e-01, accept = 1, dev = 1.532674e-16, max_diff = 1.110223e-15
+	Hmc steps = 10, Delta_hamilton = 1.333056e-02, accept = 1, dev = 1.572942e-16, max_diff = 7.771561e-16
+	Hmc steps = 10, Delta_hamilton = -8.273069e-02, accept = 1, dev = 1.549569e-16, max_diff = 1.054712e-15
