@@ -7,7 +7,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations for the MPI implementation of the QCDSP/QCDOC communications  layer.
   
-  $Id: sysfunc_noarch.h,v 1.2 2004-08-30 06:05:22 chulwoo Exp $
+  $Id: sysfunc_noarch.h,v 1.3 2004-09-03 08:43:06 zs Exp $
 */
 /*----------------------------------------------------------------------
   The Sysfunc Comms Interface: sysfunc.h
@@ -18,14 +18,14 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: chulwoo $
-  $Date: 2004-08-30 06:05:22 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v 1.2 2004-08-30 06:05:22 chulwoo Exp $
-  $Id: sysfunc_noarch.h,v 1.2 2004-08-30 06:05:22 chulwoo Exp $
+  $Author: zs $
+  $Date: 2004-09-03 08:43:06 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v 1.3 2004-09-03 08:43:06 zs Exp $
+  $Id: sysfunc_noarch.h,v 1.3 2004-09-03 08:43:06 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc_noarch.h,v $
-  $Revision: 1.2 $
+  $Revision: 1.3 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -35,11 +35,6 @@ CPS_START_NAMESPACE
 
 #ifndef NOARCH_SYSFUNC_H
 #define NOARCH_SYSFUNC_H
-
-CPS_END_NAMESPACE
-#include <comms/scu_dir_arg.h>
-#include <comms/mpi_requests.h>
-CPS_START_NAMESPACE
 
 
 
