@@ -2,21 +2,23 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2004-09-07 05:20:21 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.21 2004-09-07 05:20:21 chulwoo Exp $
-dnl  $Id: configure.in,v 1.21 2004-09-07 05:20:21 chulwoo Exp $
+dnl  $Date: 2004-09-17 18:06:08 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.22 2004-09-17 18:06:08 chulwoo Exp $
+dnl  $Id: configure.in,v 1.22 2004-09-17 18:06:08 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.21 $
+dnl  $Revision: 1.22 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
 dnl--------------------------------------------------------------------
 AC_INIT(./src/)
+AC_CONFIG_HEADERS([conf.h])
+AC_CHECK_HEADERS([malloc.h])
 
 dnl Get host and target information:
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 
 dnl Set correct compiler information
 if test "$cross_compiling" = "yes"; then
@@ -32,12 +34,14 @@ else
 dnl check if Intel compiler is available if running on 686
    if test "$host" = "i686-pc-linux-gnu" && \
    test "$build" = "i686-pc-linux-gnu"; then
+	   CC=""
        AC_CHECK_PROGS(CC, icc, gcc)
        AC_CHECK_PROGS(CXX, icc, g++)
    elif test "$host" = "powerpc-ibm-aix5.2.0.0" ||\
    test "$host" = "powerpc64-unknown-linux-gnu" ;then
-       AC_CHECK_PROGS(CC, xlc, gcc)
-       AC_CHECK_PROGS(CXX, xlc, g++)
+	   CC=""
+       AC_CHECK_PROGS(CC, xlC, gcc)
+       AC_CHECK_PROGS(CXX, xlC, g++)
    else
      AC_PROG_CXX
    fi
@@ -248,8 +252,8 @@ AC_SUBST(VERSION_STR)
 AC_PROG_INSTALL
 
 AC_CHECK_PROG(have_doxygen, doxygen, "yes")
-AC_CONFIG_HEADERS([conf.h])
-AC_CHECK_HEADERS([string.h])
+dnl AC_CONFIG_HEADERS([conf.h])
+dnl AC_CHECK_HEADERS([string.h])
 dnl AC_CHECK_HEADERS([strings.h])
 
 
