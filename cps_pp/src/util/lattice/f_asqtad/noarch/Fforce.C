@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.4 2004-01-14 07:43:00 chulwoo Exp $
+  $Id: Fforce.C,v 1.5 2004-01-14 20:05:03 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -67,8 +67,6 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
     char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
     VRB.Func(cname,fname);
     int pos[] = {0,0,0,0};
-    IFloat *link_p = (IFloat *)GetLink(pos,0);
-    printf("GetLink({0,0,0,0},0)(%p)=%e\n",link_p,*link_p );
     int f_size = GJP.VolNodeSites()*FsiteSize()*sizeof(Float)/2;
 
     Vector *tmp = (Vector *)smalloc(2*f_size);
@@ -633,7 +631,6 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
     
 	
 	sfree(tmp);
-  printf("EvolveMomFforce() done\n");
 //   Fconvert(tmp,STAG,CANONICAL);
 
 }
@@ -672,7 +669,6 @@ void Fasqtad::parallel_transport(Vector **vin, const int *dir,
     Matrix u, ud;
     int n, s[4], spm[4];
     int pos[] = {0,0,0,0};
-    IFloat *link_p = (IFloat *)GetLink(pos,0);
 	FILE *fp;
 	called++;
 	char filename[200];

@@ -1632,7 +1632,6 @@ int non_local_count_3[3][2];
     uc_nl_agg[i]  = (gauge_agg*)smalloc(((non_local_chi+non_local_chi_3)/2)*sizeof(gauge_agg));
 
     if(uc_nl[i] == 0){
-       printf("i=%d\n",i);
        ERR.Pointer(cname,fname, "uc_nl[i]");
      }
   }
@@ -2247,9 +2246,7 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
   char buf[200];
   FILE *fp;
 #ifndef SIMUL_U
-#if 1
-  printf("local_chi=%d\n",local_chi);
-  printf("local_chi_3=%d\n",local_chi_3);
+#if 0
   fp=fopen("uc_l.h","w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
@@ -2276,12 +2273,12 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
     for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
       src = (int)chi_l[j][2*i];
       if (src%(VECT_LEN*sizeof(IFloat))!=0){
-        printf("src = %d\n",src);
+        ERR.General(cname,fname,"src = %d\n",src);
         exit(1);
       }
       src = src/(VECT_LEN*sizeof(IFloat));
       if(src > vol/2) {
-        printf("src[%d](%d) > vol/2\n",i,src);
+        ERR.General(cname,fname,"src[%d](%d) > vol/2\n",i,src);
         exit(1);
       }
       temp[src*NUM_DIR*2+num_ind[src]].src = (int)chi_l[j][2*i];
@@ -2405,12 +2402,12 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
     for(i=0;i< ((non_local_chi+ non_local_chi_3)/2);i++){
       src = (int)chi_nl[j][2*i];
       if (src%(VECT_LEN*sizeof(IFloat))!=0){
-        printf("src = %d\n",src);
+        ERR.General(cname,fname,"src = %d\n",src);
         exit(1);
       }
       src = src/(VECT_LEN*sizeof(IFloat));
       if(src > non_local_chi*3/2) {
-        printf("src(%d) > non_local_chi*3\n",src);
+        ERR.General(cname,fname,"src(%d) > non_local_chi*3\n",src);
         exit(1);
       }
       temp[src*max+num_ind[src]].src = (int)chi_nl[j][2*i];
@@ -2419,7 +2416,7 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
         temp[src*max+num_ind[src]].mat[k] = uc_nl[j][i*18+k];
       num_ind[src]++;
       if(num_ind[src]>max){
-        printf("num_ind[%d](%d) > %d \n",src, num_ind[src],max);
+        ERR.General(cname,fname,"num_ind[%d](%d) > %d \n",src, num_ind[src],max);
         exit(1);
       }
     }

@@ -6,18 +6,21 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.3 2004-01-14 07:43:00 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.4 2004-01-14 20:05:03 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-01-14 07:43:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v 1.3 2004-01-14 07:43:00 chulwoo Exp $
-//  $Id: f_asqtad.C,v 1.3 2004-01-14 07:43:00 chulwoo Exp $
+//  $Date: 2004-01-14 20:05:03 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v 1.4 2004-01-14 20:05:03 chulwoo Exp $
+//  $Id: f_asqtad.C,v 1.4 2004-01-14 20:05:03 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3  2004/01/14 07:43:00  chulwoo
+//  *** empty log message ***
+//
 //  Revision 1.1.4.5  2003/12/24 00:22:45  cwj
 //  ../../dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C
 //
@@ -85,7 +88,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: f_asqtad.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v $
 //  $State: Exp $
 //
@@ -404,10 +407,6 @@ int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in,
   char *fname = "FmatEvlInv(CgArg*,V*,V*,F*,CnvFrmType)";
   VRB.Func(cname,fname);
 
-  printf("f_out^2=%e\n", f_out->NormSqNode(GJP.VolNodeSites() *
-FsiteSize() / 2 ) );
-  printf("f_in^2=%e\n", f_in->NormSqNode(GJP.VolNodeSites() *
-FsiteSize() / 2 ) );
   DiracOpAsqtad stag(*this, f_out, f_in, cg_arg, cnv_frm);
   iter = stag.InvCg(true_res);
 
@@ -589,9 +588,6 @@ void Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o,
   CgArg cg_arg;
   cg_arg.mass = mass;
 //  static int called=0;
-  char *tmp = (char *)smalloc(4);
-  printf("SetPhi::tmp=%p\n",tmp);
-  sfree(tmp);
 
   DiracOpAsqtad stag(*this, phi, frm_o, &cg_arg, CNV_FRM_NO);
   stag.Dslash(phi, frm_o, CHKB_ODD, DAG_NO);
@@ -619,9 +615,6 @@ void Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o,
   // End modification
 //  called++;
 //  if(called ==10) exit(56);
-  tmp = (char *)smalloc(4);
-  printf("SetPhi::tmp=%p\n",tmp);
-  sfree(tmp);
 }
 
 

@@ -2,12 +2,15 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v 1.2 2004-01-13 20:39:34 chulwoo Exp $
-//  $Id: d_op_asqtad.C,v 1.2 2004-01-13 20:39:34 chulwoo Exp $
+//  $Date: 2004-01-14 20:05:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v 1.3 2004-01-14 20:05:02 chulwoo Exp $
+//  $Id: d_op_asqtad.C,v 1.3 2004-01-14 20:05:02 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2004/01/13 20:39:34  chulwoo
+//  Merging with multibuild
+//
 //  Revision 1.1.2.1  2003/11/06 20:55:16  cwj
 //  *** empty log message ***
 //
@@ -44,7 +47,7 @@
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: d_op_asqtad.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v $
 //  $State: Exp $
 //
@@ -167,7 +170,6 @@ DiracOpAsqtad::~DiracOpAsqtad() {
     //------------------------------------------------------------------
     mass_rs = dirac_arg->mass * GJP.XiBare()/GJP.XiV();
     mass_sq = 4 * mass_rs * mass_rs;
-    printf("mass_sq = %e\n",mass_sq);
     // End modification
 
   }

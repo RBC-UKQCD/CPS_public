@@ -298,7 +298,6 @@ void asqtad_dirac_init(const void * gauge_u )
   size[1] = GJP.XnodeSites();
   size[2] = GJP.YnodeSites();
   size[3] = GJP.ZnodeSites();
-printf("size= %d %d %d %d\n",size[0],size[1],size[2],size[3]);
   split =  (  (size[0]>2 &&size[1]>2 && size[2]>2 && size[3] >2 ) ? 0 : 1 ); 
 //  split =1;
 
@@ -1601,40 +1600,18 @@ int non_local_count_3[3][2];
      }
   }
 
-printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
 FILE *fp;
-char * char_tmp = (char *)smalloc(4);
-printf("asqtad_init_g::char_tmp=%p\n",char_tmp);
-sfree(char_tmp);
-char_tmp = (char *)smalloc(4);
-printf("asqtad_init_g::char_tmp=%p\n",char_tmp);
-sfree(char_tmp);
 {
   ParTransAsqtad pt(*lat_pt);
   Float *gauge_p = (Float *)gauge_field_addr;
-  printf("lat_pt->GaugeField(%p)=\n",gauge_p);
-  for(int ii= 0;ii<6;ii++) printf("%e ",*gauge_p++);
-  printf("\n");
-  gauge_p = (Float *)lat_pt->GaugeField();
-  printf("lat_pt->GaugeField(%p)=\n",gauge_p);
-  for(int ii= 0;ii<6;ii++) printf("%e ",*gauge_p++);
-  printf("\n");
-printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
   Matrix *result[NUM_DIR];
   Matrix *Unit = new Matrix[vol];
-  printf("Unit=%p\n",Unit);fflush(stdout);
   Matrix *P3 = new Matrix[vol];
-  printf("P3=%p\n",P3);fflush(stdout);
   Matrix *P3mu = new Matrix[vol];
-  printf("P3mu=%p\n",P3mu);fflush(stdout);
   Matrix *P5 = new Matrix[vol];
-  printf("P5=%p\n",P5);fflush(stdout);
   Matrix *P5mu = new Matrix[vol];
-  printf("P5mu=%p\n",P5mu);fflush(stdout);
   Matrix *P7 = new Matrix[vol];
-  printf("P7=%p\n",P7);fflush(stdout);
   Matrix *P7mu = new Matrix[vol];
-  printf("P7mu=%p\n",P7mu);fflush(stdout);
   Matrix *P6 = P5;
   Matrix *P6mu = P5mu;
   Matrix *Pmumu = P7;
@@ -1642,15 +1619,12 @@ printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
   for(j = 0;j<vol;j++) Unit[j].UnitMatrix();
   for(j = 0;j<NUM_DIR;j++){
      result[j] = new Matrix[vol];
-  printf("result[%d]=%p\n",j,result[j]);fflush(stdout);
      for(int k = 0;k<vol;k++) result[j][k].ZeroMatrix();
   }
   int dirs[] = {6,0,2,4,7,1,3,5}; //mapping between ParTrans and DiracOpAsqtad
   Matrix *min[NUM_DIR],*mout[NUM_DIR];
   for(int mu = 0;mu<NUM_DIR;mu++){
-//printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
     pt.run(1,&(result[mu]),&Unit,&dirs[mu]);
-//printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
     for(int nu = 0;nu<NUM_DIR;nu++)
     if(NotParallel(mu,nu)){
       pt.run(1,&P3,&Unit,&dirs[nu]);
@@ -1681,8 +1655,6 @@ printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
       fTimesV1PlusV2((IFloat*)result[mu],c3/c1,(IFloat*)P3,(IFloat*)result[mu],vol*18);
     }
   }
-//printf("size= %d %d %d %d\n",size[0],size[1],size[2],size[3]);
-//  printf("asqtad_init_g() done\n"); exit(4);
 
   for ( i = 0; i < 2; i++){
     local_count[i] = 0;
@@ -1707,18 +1679,12 @@ printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
 	    sg = coord[1] + size[1] * ( coord[2] + size[2] * ( coord[3] +  size[3] * coord[0] ));
       if ( CoordNN( n ) ) {		// chi(x+mu) off-node
         tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * non_local_count[odd]);
-//printf("x= %d %d %d %d\n",coord[0],coord[1],coord[2],coord[3]);
-//printf("size= %d %d %d %d\n",size[0],size[1],size[2],size[3]);
-//printf("tmp=%p result[%d][%d]=%p\n",tmp,n,LexGauge(coord),&(result[n][LexGauge(coord)]));fflush(stdout);
         *tmp = result[n][LexGauge(coord)]; 
 	*tmp *= (Float)c1;
         non_local_count[odd]++;
       }
       else {
         tmp = (Matrix *)(uc_l[odd] + MATRIX_SIZE * local_count[odd]);
-//printf("x= %d %d %d %d\n",coord[0],coord[1],coord[2],coord[3]);
-//printf("size= %d %d %d %d\n",size[0],size[1],size[2],size[3]);
-//printf("tmp=%p result[%d][%d]=%p\n",tmp,n,LexGauge(coord),&(result[n][LexGauge(coord)]));fflush(stdout);
         *tmp = result[n][LexGauge(coord)]; 
 	*tmp *= (Float)c1;
         local_count[odd]++;
@@ -1824,13 +1790,10 @@ printf("size(%p)= %d %d %d %d\n",size,size[0],size[1],size[2],size[3]);
   for(int j = 0;j<NUM_DIR;j++)
   delete[] result[j];
 }
-char_tmp = (char *)smalloc(4);
-printf("asqtad_init_g::char_tmp=%p\n",char_tmp);
-sfree(char_tmp);
 
   int fd;
   char buf[200];
-#if 1
+#if 0
   fp=fopen("/host/chulwoo/uc_l.h","w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
@@ -1856,12 +1819,12 @@ sfree(char_tmp);
     for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
       src = (int)chi_l[j][2*i];
       if (src%(VECT_LEN*sizeof(IFloat))!=0){
-        printf("src = %d\n",src);
+        ERR.General(cname,fname,"src = %d\n",src);
         exit(1);
       }
       src = src/(VECT_LEN*sizeof(IFloat));
       if(src > vol/2) {
-        printf("src[%d](%d) > vol/2\n",i,src);
+        ERR.General(cname,fname,"src[%d](%d) > vol/2\n",i,src);
         exit(1);
       }
       temp[src*NUM_DIR*2+num_ind[src]].src = (int)chi_l[j][2*i];
@@ -1916,7 +1879,7 @@ sfree(char_tmp);
 #endif //SIMUL_AGG
 
 
-#if 1
+#if 0
   fp = fopen("/host/chulwoo/uc_nl.h","w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat uc_nl%d[] LOCATE(\"edramnormal\") = {\n",j); 
@@ -1939,12 +1902,12 @@ sfree(char_tmp);
     for(i=0;i< ((non_local_chi+ non_local_chi_3)/2);i++){
       src = (int)chi_nl[j][2*i];
       if (src%(VECT_LEN*sizeof(IFloat))!=0){
-        printf("src = %d\n",src);
+        ERR.General(cname,fname,"src = %d\n",src);
         exit(1);
       }
       src = src/(VECT_LEN*sizeof(IFloat));
       if(src > non_local_chi*3/2) {
-        printf("src(%d) > non_local_chi*3\n",src);
+        ERR.General(cname,fname,"src(%d) > non_local_chi*3\n",src);
         exit(1);
       }
       temp[src*2+num_ind[src]].src = (int)chi_nl[j][2*i];
@@ -1953,7 +1916,7 @@ sfree(char_tmp);
         temp[src*2+num_ind[src]].mat[k] = uc_nl[j][i*18+k];
       num_ind[src]++;
       if(num_ind[src]>2){
-        printf("num_ind[%d](%d) > 2 \n",src, num_ind[src]);
+        ERR.General(cname,fname,"num_ind[%d](%d) > 2 \n",src, num_ind[src]);
         exit(1);
       }
     }

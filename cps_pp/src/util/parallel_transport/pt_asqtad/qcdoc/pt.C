@@ -319,7 +319,7 @@ void ParTransAsqtad::pt_init_g(void){
 		SCUarg_mat[i*2+1]->Init((void *)0,snd_dir[i],SCU_SEND,blklen[i]*3,numblk[i],stride[i]*3,IR_9);
 	}
 //	fclose(fp);
-	printf("pt_init_g() done\n"); fflush(stdout);
+//	printf("pt_init_g() done\n"); fflush(stdout);
 }
 
 #if 0
