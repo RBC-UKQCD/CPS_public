@@ -1,4 +1,4 @@
-//$Id: intro.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+//$Id: intro.dox,v 1.2 2003-08-12 16:24:38 zs Exp $
 /*!
 
 \page intropage Introduction 
@@ -47,9 +47,11 @@ Broadly, a CPS application is written by specifying the gauge and fermion
 actions with the appropriate Lattice class derivative, specifying the 
 general parameters of the lattice simulation, choosing an algorithm and 
 specifying its parameters, and finally running the algorithm.
+These essential elements are provided in the CPS library.
 
 In the rest of the guide we look at the essential 
-components of the CPS in more detail, how to build and run programs and 
-some considerations when it comes to writing CPS code.
+components of the CPS in more detail, how to build the CPS library
+some considerations when it comes to writing appplications which use
+the library and writing additions to the library. 
  
 */

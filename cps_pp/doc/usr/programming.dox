@@ -1,4 +1,4 @@
-//$Id: programming.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+//$Id: programming.dox,v 1.2 2003-08-12 16:24:38 zs Exp $
 /*!
 
 \page progpage CPS programming
@@ -27,7 +27,8 @@ because they were not supported in the QCDSP programming environment.
 \subsection cppnotthere C++ ideosyncrasies
 
 While the code
-is ANSI compliant the following C++ features appear to be absent:
+is ANSI compliant the following C++ features appear to be absent from
+the QCDSP code:
 
 - Templates
 - The \c bool datatype
@@ -50,6 +51,12 @@ the \c string class.
 - The Standard Template Library, so no STL containers, iterators, generic 
 algorithms, \e etc.
 - Namespaces
+
+If you want to include language features that the QCDSP complier does
+not support you should provide some way of compiling them out. In this
+way the portability of the CPS should be preserved. This, of course,
+does not prevent the development of seperate applications that use the
+CPS library.
 
 \section port Platforms and portability
 
@@ -165,11 +172,71 @@ here: http://www.epcc.ed.ac.uk/~ukqcd/cps/structure/structure.html
 \endlatexonly
 for a description of the old directory structure 
 
-\subsection Configuring the CPS
+\subsection config Configuring the CPS
 
-Configuring the CPS using \e autoconf (http://www.gnu.org/autoconf/).
+The effort to reconstruct the CPS in a reasonably platform independent
+manner prompts us to use the
+\e autoconf (http://www.gnu.org/autoconf/) program to configure the code.
+Autoconf produces a shell script called \a configure from the macros
+in the file \a configure.in. When \a configure  is run
+it writes the makefile \a Makefile_cps from the template \a
+Makefile_cps.in and the header file \a config.h from the template \a
+config.h.in. 
 
-\subsection Compiling a program
+The autoconf program does not run on the QCDSP platform, and therefore
+the \a config.h and \a Makefile_cps are designed to be easily editable
+to be suitable for building the CPS code on the QCDSP platform.
+
+On a non-QCDSP platform, the basic build is achieved by simply typing
+
+\verbatim
+$ ./configure
+\endverbatim
+
+This sets up \a Makefile_cps and \a config.h for a serial build.
+
+With the option 
+\verbatim
+$ ./configure --enable-parallel-mpi
+\endverbatim
+\a Makefile_cps and \a config.h should be set up for a parallel build
+with MPI.
+
+For a QCDSP build, \a Makefile_cps should be edited so that the variablea \a
+TARGET_QCDSP and \a PARALLEL are set to 1.
+\verbatim
+TARGET_QCDSP = 1
+PARALLEL = 1
+\endverbatim
+
+The QCDSP build can be a parallel build or a serial build. For the
+former, define the variable \a _TARTAN in \a config.h
+\verbatim
+#define _TARTAN
+\endverbatim
+For the latter, make sure it is not defined.
+
+\subsection compiling Compiling a program
+
+Having got the files \a Makefile_cps and \a config.h prepared as
+described in section \ref config, the make targets are the same
+regardless of platform.
+\verbatim
+$ make -f Makefile_cps depend
+$ make -f Makefile_cps cps
+\endverbatim
+builds the library \a cps.a.
+
+Other targets are
+\verbatim
+$ make -f Makefile_cps docs
+\endverbatim
+which makes this documentation package, and
+\verbatim
+$ make -f Makefile_cps clean
+\endverbatim
+which removes lots of files which can be remade.
+
 
 \section testing Testing  a  CPS program 
 
