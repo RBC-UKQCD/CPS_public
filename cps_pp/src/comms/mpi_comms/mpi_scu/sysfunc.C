@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions for the MPI implementation of the QCDSP/QCDOC communications layer.
   
-  $Id: sysfunc.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: sysfunc.C,v 1.3 2003-10-21 13:42:47 zs Exp $
 */
 /*----------------------------------------------------------------------
 /* The Sysfunc Comms Interface: sysfunc.C
@@ -16,13 +16,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2003-07-24 16:53:54 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-  $Id: sysfunc.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Date: 2003-10-21 13:42:47 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v 1.3 2003-10-21 13:42:47 zs Exp $
+  $Id: sysfunc.C,v 1.3 2003-10-21 13:42:47 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.C,v $
-  $Revision: 1.2 $
+  $Revision: 1.3 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -498,7 +498,7 @@ void SCUGlobalSum(Type_tag t,   /*!< In: Type of data being summed */
 		  void *ivec,   /*!< In: Vector of input values */
 		  void *ovec    /*!< Out: Vector of output values */
 		  ) {
-    MPI_Datatype mpitype; /*!< This will hold the MPI_Datatype for type (t + size) */
+    MPI_Datatype mpitype; /* This will hold the MPI_Datatype for type (t + size) */
 
     if( !commsMPI_init ) SCUCommsInit(); 
 
@@ -518,12 +518,12 @@ void SCUGlobalSum(Type_tag t,   /*!< In: Type of data being summed */
     mpitype = SCUMPITypeConv( t, tsize );
 
     /* Invoke the relevent MPI call, so that all processors get the global sum */
-    MPI_Allreduce(ivec,         /*!< Array containing data to be summed */
-	          ovec,         /*!< Array to receive the summations */
-		  n,            /*!< Number of items in the array */
-		  mpitype,      /*!< MPI datatype corresponding to Type_tag */
-		  MPI_SUM,      /*!< Do a global sum operation */
-		  commsMPI_comm  /*!< Use the cartesian communicator */
+    MPI_Allreduce(ivec,         /* Array containing data to be summed */
+	          ovec,         /* Array to receive the summations */
+		  n,            /* Number of items in the array */
+		  mpitype,      /* MPI datatype corresponding to Type_tag */
+		  MPI_SUM,      /* Do a global sum operation */
+		  commsMPI_comm  /* Use the cartesian communicator */
 		  );
 
 }
