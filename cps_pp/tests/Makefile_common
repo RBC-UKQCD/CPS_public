@@ -1,0 +1,37 @@
+#
+#   This is the makefile for all the commands
+#   that are common for all testing applications.
+#
+#
+#
+
+
+# This should point at the top level directory for the 
+# cps code.
+TOP=../../..
+
+COMPILER = g++
+LDFLAGS = -lm
+
+
+
+#
+# include list for the Columbia code
+#
+TOPINC=$(TOP)/cps++
+INCLIST = -I$(TOPINC) -I$(TOPINC)/include 
+
+CFLAGS= -DPARALLEL=0 -DTARGET_QCDSP=0  -O2
+
+#
+# Libraries for the Columbia code
+#
+# (These are for the scalar version of the code)
+#
+#
+
+
+LINLIB = "$(TOP)/cps++"
+LIBLIST =\
+  $(LINLIB)/cps.a \
+
