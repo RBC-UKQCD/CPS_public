@@ -39,6 +39,7 @@
 /****************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 
 #include <util/wfm.h>
@@ -124,7 +125,8 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
     printf("wfm::spinor_tmp allocate\n");
     exit(-1);
   }
-  printf("spinor_tmp is %x\n",spinor_tmp);
+  bzero(spinor_tmp,spinor_words*sizeof(Float)*2);
+//  printf("spinor_tmp is %x\n",spinor_tmp);
     
 
 /*--------------------------------------------------------------------------*/
@@ -140,7 +142,7 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
     printf("wfm::two_spinor allocate\n");
     exit(-1);
   }
-  printf("two_spinor is %x\n",two_spinor);
+//  printf("two_spinor is %x\n",two_spinor);
 
   for ( int pm = 0;pm<2;pm++ ) {
     for ( mu = 0 ; mu < 4 ; mu ++) {
@@ -163,14 +165,14 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
 /* Build the pointer table                                              */
 /*----------------------------------------------------------------------*/
   pointers_init();
-  printf("wfm::Pointers initialised\n");
+//  printf("wfm::Pointers initialised\n");
   
 /*----------------------------------------------------------------------*/
 /* Initialise the comms                                                 */
 /*----------------------------------------------------------------------*/
 
   comm_init();
-  printf("wfm::comms initialised\n");
+//  printf("wfm::comms initialised\n");
 
 }
 void wfm::end (void)

@@ -138,10 +138,10 @@ DiracOpClover::GetLink(const int *site, int dir) const
     for (int i = 0; i < 4; ++i) {
       while (site[i] != on_node_site[i]) {
 	if (site[i] < 0) {
-	  getMinusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv), i);
+	  getMinusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv)/sizeof(IFloat), i);
 	  on_node_site[i] -= nsites[i];
 	} else {
-	  getPlusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv), i);
+	  getPlusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv)/sizeof(IFloat), i);
 	  on_node_site[i] += nsites[i];
 	}
 	send = recv;      

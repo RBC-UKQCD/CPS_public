@@ -118,7 +118,7 @@ void wfm::comm_init(void)
   LoadDirArgIRs[0] = 1;
   LoadDirArgIRs[1] = 1;
 
-  printf("Initialising SCU for Dslash IR %d %d\n",IR,IR+1);
+//  printf("Initialising SCU for Dslash IR %d %d\n",IR,IR+1);
  
   block=(HALF_SPINOR_SIZE*sizeof(Float));
   stridenormal=((PAD_HALF_SPINOR_SIZE-HALF_SPINOR_SIZE )*sizeof(Float));
@@ -244,7 +244,7 @@ void wfm::comm_init(void)
       }
       
     }
-    printf("Initialised SCU regs\n");
+//    printf("Initialised SCU regs\n");
 
     DA_multi[cb].Init(DA_p[cb],num_op);
 
@@ -268,8 +268,8 @@ void wfm::comm_end(void)
 void wfm::comm_start(int cb)
 {
   //  sys_cacheflush(0);
-//  DA_multi[cb].StartTrans(LoadDirArgIRs[cb]);
-  DA_multi[cb].StartTrans();
+  DA_multi[cb].StartTrans(LoadDirArgIRs[cb]);
+//  DA_multi[cb].StartTrans();
   LoadDirArgIRs[cb] = 0;
   return;
 }

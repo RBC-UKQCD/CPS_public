@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.9 2004-07-01 17:43:42 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.9 2004-07-01 17:43:42 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.10 2004-07-09 04:15:17 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.10 2004-07-09 04:15:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -218,7 +218,7 @@ static int LexVector( int * c );
 //  calculate the offset into the receive buffers (chi_off_node);
 //-------------------------------------------------------------------
 
-extern "C" void vaxpy3(Matrix *a,Float *b,Matrix *c,Matrix *d,int nvec);
+//extern "C" void vaxpy3(Matrix *a,Float *b,Matrix *c,Matrix *d,int nvec);
 
 static int LexSurface( int * cc, int surface );
 
@@ -715,7 +715,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
       j = i % (NUM_DIR/2);
         SCUarg[odd][i + NUM_DIR].Init(chi_off_node[2][i], scudir[i], SCU_REC,
   		    VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0, scu_irs[odd][2]);
-        SCUarg[odd][i + NUM_DIR].Assert();
+//        SCUarg[odd][i + NUM_DIR].Assert();
       SCUDMAarg_p[odd][(i+NUM_DIR)*2]  = new SCUDMAInst;
   //      printf("SCUDMAarg_p[%d]=%p\n",(i+NUM_DIR)*2,SCUDMAarg_p[(i+NUM_DIR)*2]);
       SCUDMAarg_p[odd][(i+NUM_DIR)*2] ->Init(chi_off_node[0][i],
@@ -725,12 +725,12 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
         VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0);
       if( split ){
         SCUarg_1[odd][i + NUM_DIR].Init(scudir[i],SCU_REC, &SCUDMAarg_p[odd][(i+NUM_DIR)*2],1, scu_irs[odd][0]);
-        SCUarg_1[odd][i + NUM_DIR].Assert();
+//        SCUarg_1[odd][i + NUM_DIR].Assert();
         SCUarg_2[odd][i + NUM_DIR].Init(scudir[i],SCU_REC, &SCUDMAarg_p[odd][(i+NUM_DIR)*2+1],1, scu_irs[odd][1]);
-        SCUarg_2[odd][i + NUM_DIR].Assert();
+//        SCUarg_2[odd][i + NUM_DIR].Assert();
       } else {
         SCUarg_1[odd][i + NUM_DIR].Init(scudir[i],SCU_REC, &SCUDMAarg_p[odd][(i+NUM_DIR)*2],2, scu_irs[odd][0]);
-        SCUarg_1[odd][i + NUM_DIR].Assert();
+//        SCUarg_1[odd][i + NUM_DIR].Assert();
       }
   
       //send arguments
@@ -744,7 +744,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
         else
           SCUarg[odd][i].Init (chi_off_node[0][4-i], scudir[i], SCU_SEND,
   		       blklen[j], numblk[j], stride[j], scu_irs[odd][2] );
-        SCUarg[odd][i].Assert();
+//        SCUarg[odd][i].Assert();
   
         SCUDMAarg_p[odd][i*2] = new SCUDMAInst;
         SCUDMAarg_p[odd][i*2] ->Init(Tbuffer[0][(4 - i)/4], 
@@ -760,12 +760,12 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
   
         if( split ){
           SCUarg_1[odd][i].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],1,scu_irs[odd][0]);
-          SCUarg_1[odd][i].Assert();
+//          SCUarg_1[odd][i].Assert();
           SCUarg_2[odd][i].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2+1],1,scu_irs[odd][1]);
-          SCUarg_2[odd][i].Assert();
+//          SCUarg_2[odd][i].Assert();
         } else {
           SCUarg_1[odd][i].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],2,scu_irs[odd][0]);
-          SCUarg_1[odd][i].Assert();
+//          SCUarg_1[odd][i].Assert();
         }
       }
       else{
@@ -779,7 +779,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
           SCUarg[odd][i].Init(chi_off_node[0][(i+4)%NUM_DIR], scudir[i], SCU_SEND,
              VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j]),1,0, scu_irs[odd][2] );
 
-        SCUarg[odd][i].Assert();
+//        SCUarg[odd][i].Assert();
   
         SCUDMAarg_p[odd][i*2] = new SCUDMAInst;
         SCUDMAarg_p[odd][i*2] ->Init(chi_off_node_total, 
@@ -789,12 +789,12 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
   		       blklen[j], numblk[j], stride[j]);
         if( split ){
           SCUarg_1[odd][i].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],1,scu_irs[odd][0]);
-          SCUarg_1[odd][i].Assert();
+//          SCUarg_1[odd][i].Assert();
           SCUarg_2[odd][i]. Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2+1],1,scu_irs[odd][1]);
-          SCUarg_2[odd][i].Assert();
+//          SCUarg_2[odd][i].Assert();
         } else {
           SCUarg_1[odd][i].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],2,scu_irs[odd][0]);
-          SCUarg_1[odd][i].Assert();
+//          SCUarg_1[odd][i].Assert();
         }
       }
     }// end of NUM_DIR loop
@@ -1160,7 +1160,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
 //          fTimesV1PlusV2((IFloat*)P5mu,c7/c5,(IFloat*)P7,(IFloat*)P5mu,vol*18);
 		  Float c75 = c7/c5;
           for(i  = 0;i<N;i++)
-            vaxpy3(P5mu[i],&c75,P7[i],P5mu[i],vol*3);
+            vaxpy3_m(P5mu[i],&c75,P7[i],P5mu[i],vol*3);
 	  nflops +=vol*18*2*N;
         }
         for(i  = 0;i<N;i++){
@@ -1176,7 +1176,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
 //        fTimesV1PlusV2((IFloat*)P3mu,c5/c3,(IFloat*)P5,(IFloat*)P3mu,vol*18);
 		Float c53 = c5/c3;
         for(i  = 0;i<N;i++)
-          vaxpy3(P3mu[i],&c53,P5[i],P3mu[i],vol*3);
+          vaxpy3_m(P3mu[i],&c53,P5[i],P3mu[i],vol*3);
 		nflops +=vol*18*2*N;
       }
       for(i  = 0;i<N;i++){
@@ -1207,7 +1207,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
 //      pt.run(1,&P6,&P6mu,&dirs[nu_n]);
 	  Float c63 = c6/c3;
       for(i  = 0;i<N;i++)
-        vaxpy3(P3mu[i],&c63,P6[i],P3mu[i],vol*3);
+        vaxpy3_m(P3mu[i],&c63,P6[i],P3mu[i],vol*3);
 	  nflops +=vol*18*2*N;
 //      fTimesV1PlusV2((IFloat*)P3mu,c6/c3,(IFloat*)P6,(IFloat*)P3mu,vol*18);
       for(i  = 0;i<N;i++){
@@ -1223,7 +1223,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
 	  Float c31 = c3/c1;
 	  for(i  = 0;i<N;i++){
 	    mu_p =Rotate(mu,i);
-        vaxpy3(result[mu_p],&c31,P3[i],result[mu_p],vol*3);
+        vaxpy3_m(result[mu_p],&c31,P3[i],result[mu_p],vol*3);
       }
 	  nflops +=vol*18*2*N;
 //      fTimesV1PlusV2((IFloat*)result[mu],c3/c1,(IFloat*)P3,(IFloat*)result[mu],vol*18);

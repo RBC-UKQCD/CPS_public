@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-02 22:11:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v 1.2 2004-07-02 22:11:02 chulwoo Exp $
-//  $Id: d_op_clover.C,v 1.2 2004-07-02 22:11:02 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v 1.3 2004-07-09 04:15:17 chulwoo Exp $
+//  $Id: d_op_clover.C,v 1.3 2004-07-09 04:15:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_clover.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v $
 //  $State: Exp $
 //
@@ -41,10 +41,12 @@ CPS_END_NAMESPACE
 #include<mem/p2v.h>
 CPS_START_NAMESPACE
 
+#if 0
 extern "C" {
   void vaxpy3(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec);
   void vaxpy3_norm(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec, Float * norm_p);
 }
+#endif
 
 static Vector *clover_tmp;
 
@@ -454,9 +456,6 @@ int DiracOpClover::MatEvlInv(Vector *out, Vector *in, Float *true_res)
 {
   char *fname = "MatEvlInv(V*,V*,F*)";
   VRB.Func(cname,fname);
-  { IFloat *tmp = (IFloat *)in;
-  printf("in[0]=%e\n",*tmp);
-  }
   // out_even = Aee^inv Aee^inv in_even                      done!
   //--------------------------------------------------------------------
   {

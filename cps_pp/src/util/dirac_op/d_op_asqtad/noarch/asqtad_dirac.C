@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.7 2004-04-27 03:51:17 cwj Exp $
+//  $Id: asqtad_dirac.C,v 1.8 2004-07-09 04:15:16 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -789,39 +789,11 @@ static int SetCoord( int sg )
 void TransfP(int off_node, int nflush_g,IFloat * v,IFloat * mtmp
 
 , int n ){
-//  		SCUDirArgIR X( 0, scudir[n+4], SCU_SEND, 18 * sizeof(IFloat));
-// 		SCUDirArgIR R( 0, scudir[n], SCU_REC, 18 * sizeof(IFloat));
- 	     
-		
- 
-//	     if ( off_node ) {
-                //initialize transfer
-//	      X.Addr(v);
-//              R.Addr(mtmp);
-//              X.StartTrans();
-//              R.StartTrans();
-//              X.TransComplete();
-//              R.TransComplete();
 	getPlusData(mtmp,v,18,(n+1)%4);
- //             v = mtmp;
-	      
-	      
-  //				}
- 
  }
 
 void TransfM(int off_node, int nflush_g,IFloat * v,IFloat * mtmp, int n ){
- 	      if ( off_node ) {
-//  		SCUDirArgIR X( v, scudir[n], SCU_SEND, 18 * sizeof(IFloat));
-// 		SCUDirArgIR R( mtmp, scudir[n+4], SCU_REC, 18 * sizeof(IFloat));
-                //make sure link is in main memory
- 
-//              X.StartTrans();
-//              R.StartTrans();
-//              X.TransComplete();
-//              R.TransComplete();
 	getMinusData(mtmp,v,18,(n+1)%4);
-  			}
  }
 void DaggerM (IFloat * w_t1,IFloat * v){
    	int i, j, c, r;

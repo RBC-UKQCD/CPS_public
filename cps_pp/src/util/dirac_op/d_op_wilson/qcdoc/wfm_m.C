@@ -29,7 +29,7 @@ void wfm::m(Float *chi,
 /*--------------------------------------------------------------------------*/
 /* 1_OO - kappa^2 * Dslash_0E * Dslash_E0                                   */
 /*--------------------------------------------------------------------------*/
-  vaxpy(&mkappasq,chi,psi,len);
+  xaxpy(&mkappasq,chi,psi,len);
   DiracOp::CGflops += vol*24*2;
 }
 
@@ -62,7 +62,13 @@ void wfm::mdag(Float *chi,
 /*--------------------------------------------------------------------------*/
 /* [1_OO - kappa * DslashDag_0E * DslashDag_E0] ]                           */
 /*--------------------------------------------------------------------------*/
-  vaxpy(&mkappasq,chi,psi,len);
+  xaxpy(&mkappasq,chi,psi,len);
+#if 0
+ for(int i=0;i<len*6;i++){
+   printf("chi[%d]=%e psi[%d]=%e\n",i,chi[i],i,psi[i]);
+   chi[i] = psi[i] -kappa*kappa*chi[i];
+ }
+#endif
   DiracOp::CGflops += vol*24*2;
 }
 
@@ -96,10 +102,10 @@ void wfm::mdagm(Float *chi,
 /* 1_OO - kappa^2 * Dslash_0E * Dslash_E0                                   */
 /*--------------------------------------------------------------------------*/
   if(mp_sq_p != 0) {
-    vaxpy_norm(&mkappasq,tmp2,psi,len,mp_sq_p);
+    xaxpy_norm(&mkappasq,tmp2,psi,len,mp_sq_p);
     DiracOp::CGflops += vol*24*4;
   } else {
-    vaxpy(&mkappasq,tmp2,psi,len);
+    xaxpy(&mkappasq,tmp2,psi,len);
     DiracOp::CGflops += vol*24*2;
   }
 
@@ -117,7 +123,7 @@ void wfm::mdagm(Float *chi,
 /* [1_OO - kappa * DslashDag_0E * DslashDag_E0] *                           */
 /*                                 [1_OO - kappa^2 * Dslash_0E * Dslash_E0] */
 /*--------------------------------------------------------------------------*/
-  vaxpy(&mkappasq,chi,tmp2,len);
+  xaxpy(&mkappasq,chi,tmp2,len);
   DiracOp::CGflops += vol*24*2;
 }
 

@@ -1,7 +1,7 @@
 /*!\file
   Wilson Dirac operator code for QCDOC
 
-  $Id: d_op_wilson.C,v 1.7 2004-07-01 17:43:44 chulwoo Exp $
+  $Id: d_op_wilson.C,v 1.8 2004-07-09 04:15:18 chulwoo Exp $
 */
 //------------------------------------------------------------------
 //
@@ -25,6 +25,7 @@
 //
 //------------------------------------------------------------------
 
+#include <math.h>
 #include <util/dirac_op.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
@@ -174,6 +175,7 @@ void DiracOpWilson::MatPc(Vector *out, Vector *in)
 //------------------------------------------------------------------
 void DiracOpWilson::MatPcDag(Vector *out, Vector *in) 
 {
+//    printf("kappa=%e\n",kappa);
     wfm_mdag((Float *)out,
 	     (Float *)gauge_field,
 	     (Float *)in,
@@ -216,10 +218,30 @@ int DiracOpWilson::MatInv(Vector *out,
   VRB.Smalloc(cname,fname, "temp", temp, temp_size * sizeof(Float));
 
   if(prs_in == PRESERVE_YES){
-    temp2 = (Vector *) smalloc(temp_size * sizeof(Float));
+    temp2 = (Vector *) smalloc(2*temp_size * sizeof(Float));
     if (temp2 == 0) ERR.Pointer(cname, fname, "temp2");
     VRB.Smalloc(cname,fname, "temp2", temp2, temp_size * sizeof(Float));
   }
+  // save source
+  if(prs_in == PRESERVE_YES){
+    moveMem((Float *)temp2, (Float *)in, 2*temp_size*sizeof(Float));
+  }
+
+#if 0
+{
+  printf("in(before)=\n");
+  IFloat *temp_p = (IFloat *)in;
+  for(int ii = 0; ii< GJP.VolNodeSites();ii++){
+    for(int jj = 0; jj< lat.FsiteSize();jj++){
+      if (fabs(*temp_p)>1e-7){
+        printf("i=%d j=%d\n",ii,jj);
+        printf("%e\n",*(temp_p));
+      }
+      temp_p++;
+    }
+  }
+}
+#endif
 
   // points to the even part of fermion source 
   Vector *even_in = (Vector *) ( (Float *) in + temp_size );
@@ -232,19 +254,38 @@ int DiracOpWilson::MatInv(Vector *out,
   fTimesV1PlusV2((Float *)temp, (Float) kappa, (Float *)temp,
     (Float *)in, temp_size);
 
-  // save source
-  if(prs_in == PRESERVE_YES){
-    moveMem((Float *)temp2, (Float *)in, temp_size);
+#if 0
+{
+  printf("temp(before)=\n");
+  IFloat *temp_p = (IFloat *)temp;
+  for(int ii = 0; ii< GJP.VolNodeSites();ii++){
+    for(int jj = 0; jj< lat.FsiteSize();jj++){
+      if (fabs(*temp_p)>1e-7){
+        printf("i=%d j=%d\n",ii,jj);
+        printf("%e\n",*(temp_p));
+      }
+      temp_p++;
+    }
   }
+}
+#endif
 
   MatPcDag(in, temp);
 
-  int iter = InvCg(out,in,true_res);
-
-  // restore source
-  if(prs_in == PRESERVE_YES){
-    moveMem((Float *)in, (Float *)temp2, temp_size);
+#if 0
+{
+  IFloat *temp_p = (IFloat *)in;
+  for(int ii = 0; ii< GJP.VolNodeSites()/2;ii++){
+    printf("i=%d\n",ii);
+    for(int jj = 0; jj< lat.FsiteSize();jj++)
+      printf("%e ",*(temp_p++));
+    printf("\n");
   }
+  exit(44);
+}
+#endif
+
+  int iter = InvCg(out,in,true_res);
 
   Dslash(temp, out, CHKB_ODD, DAG_NO);
 
@@ -253,6 +294,44 @@ int DiracOpWilson::MatInv(Vector *out,
 
   VRB.Sfree(cname, fname, "temp", temp);
   sfree(temp);
+
+
+  // restore source
+  if(prs_in == PRESERVE_YES){
+    moveMem((Float *)in, (Float *)temp2, 2*temp_size*sizeof(Float));
+  }
+
+#if 0
+{
+  printf("in(after)=\n");
+  IFloat *temp_p = (IFloat *)in;
+  for(int ii = 0; ii< GJP.VolNodeSites();ii++){
+    for(int jj = 0; jj< lat.FsiteSize();jj++){
+      if (fabs(*temp_p)>1e-7){
+        printf("i=%d j=%d\n",ii,jj);
+        printf("%e\n",*(temp_p));
+      }
+      temp_p++;
+    }
+  }
+}
+#endif
+
+#if 0
+{
+  printf("temp2(after)=\n");
+  IFloat *temp_p = (IFloat *)temp2;
+  for(int ii = 0; ii< GJP.VolNodeSites();ii++){
+    for(int jj = 0; jj< lat.FsiteSize();jj++){
+      if (fabs(*temp_p)>1e-7){
+        printf("i=%d j=%d\n",ii,jj);
+        printf("%e\n",*(temp_p));
+      }
+      temp_p++;
+    }
+  }
+}
+#endif
 
   if(prs_in == PRESERVE_YES){
     VRB.Sfree(cname, fname, "temp2", temp2);

@@ -25,13 +25,15 @@ void rec_su3    (void *psi,void *gauge,void *chiin,void *len);
 void rec_su3_dag(void *psi,void *gauge,void *chiin,void *len);
 
 
-void vaxpy_norm (Float *scalep,
+#if 0
+void xaxpy_norm (Float *scalep,
 		 Float *InOutScale, 
 		 Float *Add, 
 		 int len,
 		 Float *res);
 
-void vaxpy (Float *scalep,Float *InOutScale, Float *Add, int len);
+void xaxpy (Float *scalep,Float *InOutScale, Float *Add, int len);
+#endif
   /*Used to scatter a recv buf onto the appropriate face*/
 void face_scatter(Float *TwoSpinor,
 		  Float *RcvBuf, 

@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.5 2004-06-04 21:14:02 chulwoo Exp $
+  $Id: get_data.C,v 1.6 2004-07-09 04:16:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.5 2004-06-04 21:14:02 chulwoo Exp $
-//  $Id: get_data.C,v 1.5 2004-06-04 21:14:02 chulwoo Exp $
+//  $Date: 2004-07-09 04:16:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.6 2004-07-09 04:16:33 chulwoo Exp $
+//  $Id: get_data.C,v 1.6 2004-07-09 04:16:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -56,6 +56,7 @@ void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
 {
   if(rcv_noncache==NULL) rcv_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
   if(send_noncache==NULL) send_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
+//  printf("rcv_buf=%p send_buf=%p len=%d \n",rcv_buf,send_buf,len);
 	
   int i = 0;
   if(gjp_local_axis[mu] == 0) {
@@ -100,6 +101,7 @@ void getMinusData(IFloat* rcv_buf, IFloat* send_buf, int len, int mu)
   int i;
   if(rcv_noncache==NULL) rcv_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
   if(send_noncache==NULL) send_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
+//  printf("rcv_buf=%p send_buf=%p len=%d \n",rcv_buf,send_buf,len);
   if(gjp_local_axis[mu] == 0) {
     if ( len > MAX_LENGTH){
         ERR.General("","getMinusData","len>MAX_LENGTH(%d)\n",MAX_LENGTH);

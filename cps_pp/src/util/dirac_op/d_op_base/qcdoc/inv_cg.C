@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-02 14:13:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.6 2004-07-02 14:13:42 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.6 2004-07-02 14:13:42 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.7 2004-07-09 04:15:17 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.7 2004-07-09 04:15:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -42,7 +42,7 @@ CPS_END_NAMESPACE
 #include <qcdocos/gint.h>
 CPS_START_NAMESPACE
 
-#define PROFILE
+#undef PROFILE
 
 // PAB generic Dop flops reporting
 //int DiracOp::CGflops;
@@ -65,10 +65,12 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #endif
 
+#if 0
 extern "C" { 
   void vaxpy3(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec);
   void vaxpy3_norm(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec,Float *norm);
 }
+#endif
 //------------------------------------------------------------------
 /*!
   Solves \f$ M^\dagger M out = in \f$ for \a out using the Conjugate
@@ -164,7 +166,6 @@ int DiracOp::InvCg(Vector *out,
     else dir = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
   if(dir == 0){
     dir = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
-    printf("dir=%p\n",dir);
   }
   if(dir == 0)
     ERR.Pointer(cname,fname, "dir");
@@ -178,7 +179,6 @@ int DiracOp::InvCg(Vector *out,
   if(mmp == 0){
     mmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
   }
-    printf("mmp=%p\n",mmp);
   if(mmp == 0)
     ERR.Pointer(cname,fname, "mmp");
   VRB.Smalloc(cname,fname, "mmp", mmp, f_size_cb * sizeof(Float));
@@ -314,8 +314,8 @@ int DiracOp::InvCg(Vector *out,
 
 #ifdef PROFILE
 //    nflops_tmp +=f_size_cb*2;
-    CGflops+=f_size_cb*2;
 #endif
+    CGflops+=f_size_cb*2;
 
     //PAB. Should be able to use "vaxpy_norm here"
     // res = - a * (MatPcDagMatPc * dir) + res;
@@ -327,8 +327,8 @@ int DiracOp::InvCg(Vector *out,
     DiracOpGlbSum(&res_norm_sq_cur);
 #ifdef PROFILE
 //    nflops_tmp +=f_size_cb*4;
-    CGflops+=f_size_cb*4;
 #endif
+    CGflops+=f_size_cb*4;
 
 
     // if( |res|^2 <= stp_cnd ) we are done
@@ -343,16 +343,14 @@ int DiracOp::InvCg(Vector *out,
 //    linalg_start = linalg_tmp;
 //    gettimeofday(&linalg_end,NULL);
 //    nflops =nflops_tmp+f_size_cb*2;
-    CGflops+=f_size_cb*2;
 #endif
-    //    printf("Iter = %d, %d flops\n",itr,CGflops);
+    CGflops+=f_size_cb*2;
   }
 
 #ifdef PROFILE
     gettimeofday(&end,NULL);
 
     report_flops(CGflops,&start,&end); 
-//    report_flops(nflops,&linalg_start,&linalg_end); 
 #endif
 
   // It has not reached stp_cnd: Issue a warning

@@ -42,14 +42,14 @@ void wfm_scope_assert(int i)
 
 void wfm_init_internal(int num,WilsonArg *wilson_p)
 {
-  printf("wfm_init_internal(%d,%p)\n",num,wilson_p);
+//  printf("wfm_init_internal(%d,%p)\n",num,wilson_p);
   wfm_scope_check(num);
   WilsonLock[num] = 1;
   StaticWilsonPAB[num].init(wilson_p);
 }
 void wfm_end_internal(int num)
 {
-  printf("wfm_init_internal(%d)\n",num);
+//  printf("wfm_end_internal(%d)\n",num);
   wfm_scope_assert(num);
   StaticWilsonPAB[num].end();
   WilsonLock[num] = 0;
@@ -59,7 +59,7 @@ extern "C" {
 
   void wfm_init(WilsonArg *wilson_p)
   {
-    printf("wfm_init(%p)\n",wilson_p);
+//    printf("wfm_init(%p)\n",wilson_p);
     wilson_p->instruction_reg_num = 10;
     wfm_init_internal(0,wilson_p);
   }
@@ -75,7 +75,7 @@ extern "C" {
 
   void wfm_end(struct WilsonArg *wp)
   {
-    printf("wfm_end_internal(%p)\n",wp);
+//    printf("wfm_end(%p)\n",wp);
     wfm_end_internal(0);
   }
   void wfm_vec_end(struct WilsonArg *wp)

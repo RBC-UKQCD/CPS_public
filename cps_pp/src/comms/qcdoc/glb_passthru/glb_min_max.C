@@ -34,12 +34,12 @@ const SCUDir dir[] = { SCU_XP, SCU_XM, SCU_YP, SCU_YM,
 
 
 
-static Float *transmit_buf = NULL;
-static Float *receive_buf = NULL;
+//static Float *transmit_buf = NULL;
+//static Float *receive_buf = NULL;
 static Gsum64 gminmax;
 static SCUAxis gsum_axis[]={SCU_X,SCU_Y,SCU_Z,SCU_T};
 static int initted=0;
-static int counter = 0;
+//static int counter = 0;
 
 
 //----------------------------------------------------------------------

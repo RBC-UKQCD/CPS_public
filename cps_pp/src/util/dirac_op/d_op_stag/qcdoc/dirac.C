@@ -1,7 +1,7 @@
 /*!\file
   Staggered Dirac operator for QCDOC
 
-  $Id: dirac.C,v 1.8 2004-07-01 17:43:44 chulwoo Exp $
+  $Id: dirac.C,v 1.9 2004-07-09 04:15:18 chulwoo Exp $
 */
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian
@@ -65,7 +65,7 @@ static int coord_nn[4];
 static int vol;
 static int non_local_chi;
 static int local_chi;
-static int buffer_flush[8];
+//static int buffer_flush[8];
 static int nflush;
 
 //---------------------------------------------------------------------
@@ -94,8 +94,8 @@ static IFloat Tbuffer[2][MAX_TBUF_LEN] PEC_ALIGN LOCATE("Edramnoncache");
 //-------------------------------------------------------------------
 // end of stack based arrays which should be heap based 
 //-------------------------------------------------------------------
-static int intreg[18];
-static IFloat dreg[18];
+//static int intreg[18];
+//static IFloat dreg[18];
 static int * ToffsetP[2];
 static int * ToffsetM[2];
 static int countP[2];
@@ -985,8 +985,9 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   SCUarg[7]->Addr( a + Xoffset[7]);
   
   sys_cacheflush(0);
+//  for(int i = 0;i<2*NUM_DIR;i++) SCUarg[i]->Assert();
   SCUmulti->StartTrans();
-  printf("SCUmulti started\n");
+//  printf("SCUmulti started\n");
 //  save_reg((long)intreg, (long)dreg);
   //-----------------------------------------------------------------
   //do first local computations
@@ -1005,9 +1006,9 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   //-----------------------------------------------------------------
   // check to see if transfers are done
   //-----------------------------------------------------------------
-  printf("SCUmulti ended\n");
+//  for(int i = 0;i<2*NUM_DIR;i++) SCUarg[i]->Assert();
   SCUmulti->TransComplete();
-  printf("SCUmulti ended\n");
+//  printf("SCUmulti ended\n");
 
   //-----------------------------------------------------------------
   //do the computations involving non-local spinors

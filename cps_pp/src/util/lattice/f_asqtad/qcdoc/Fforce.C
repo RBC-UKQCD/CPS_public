@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.5 2004-07-02 14:13:42 chulwoo Exp $
+  $Id: Fforce.C,v 1.6 2004-07-09 04:15:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -46,7 +46,9 @@ static void v_free(void *ptr){
 }
 
 
+#if 0
 extern "C" void vaxpy3(Vector *a, Float *b, Vector *c,Vector *d, int nvec);
+#endif
 const int VAXPY_UNROLL =6;
 
 

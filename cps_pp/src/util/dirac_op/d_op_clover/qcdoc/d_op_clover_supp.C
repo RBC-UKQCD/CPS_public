@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-02 22:11:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover_supp.C,v 1.2 2004-07-02 22:11:02 chulwoo Exp $
-//  $Id: d_op_clover_supp.C,v 1.2 2004-07-02 22:11:02 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover_supp.C,v 1.3 2004-07-09 04:15:17 chulwoo Exp $
+//  $Id: d_op_clover_supp.C,v 1.3 2004-07-09 04:15:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_clover_supp.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover_supp.C,v $
 //  $State: Exp $
 //
@@ -146,10 +146,10 @@ DiracOpClover::GetLink(const int *site, int dir) const
     for (int i = 0; i < 4; ++i) {
       while (site[i] != on_node_site[i]) {
 	if (site[i] < 0) {
-	  getMinusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv), i);
+	  getMinusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv)/sizeof(IFloat), i);
 	  on_node_site[i] -= nsites[i];
 	} else {
-	  getPlusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv), i);
+	  getPlusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv)/sizeof(IFloat), i);
 	  on_node_site[i] += nsites[i];
 	}
 	send = recv;      
@@ -195,9 +195,10 @@ DiracOpClover::GetLink(const int *site, int dir) const
 void 
 DiracOpClover::SiteFuv(Matrix &Fuv, const int *site, int mu, int nu) const
 {
-  //  char *fname = "SiteFuv()";
-  //  VRB.Func(cname,fname);
+//    char *fname = "SiteFuv()";
+//    VRB.Func(cname,fname);
 
+//  lat.PrintPointers();
   // neighbour[] is the local coordinates of a neighbour site
   //------------------------------------------------------------------------
   int neighbor[4] = {site[0], site[1], site[2], site[3]};
@@ -246,6 +247,7 @@ DiracOpClover::SiteFuv(Matrix &Fuv, const int *site, int mu, int nu) const
   *mp2 = GetLink(neighbor, mu);
   ++(neighbor[mu]);                             // neighbor = x-nu
   mp1->DotMEqual(GetLink(neighbor, nu), *mp2);
+//  lat.PrintPointers();
   
   // Fuv += [ U_mu(x-mu)^dag U_nu(x-mu-nu)^dag U_mu(x-mu-nu) U_nu(x-nu) ] ^T
   //------------------------------------------------------------------------
@@ -272,6 +274,7 @@ DiracOpClover::SiteFuv(Matrix &Fuv, const int *site, int mu, int nu) const
   *mp0 -= Fuv;
   Fuv.Trans(*mp0);  
   Fuv *= -0.125;
+//  lat.PrintPointers();
 }
 
 //--------------------------------------------------------------------------
@@ -502,12 +505,14 @@ DiracOpClover::CloverMatChkb(ChkbType chkb, int inv) const
 {
   char *fname = "CloverMatChkb()";
   VRB.Func(cname,fname);
+//  lat.PrintPointers();
 
   // get the pointer to the clover matrices.
   //------------------------------------------------------------------------
   IFloat *cl_mat_p = (IFloat *)(chkb == CHKB_EVEN ? 
 			      lat.Aux0Ptr() : lat.Aux1Ptr());
   
+  VRB.Flow(cname,fname,"cl_mat_p=%p\n",cl_mat_p);
   // loop in the order consistent with the Wilson checkerboarded storage
   // Note: the sites[0,1,2,3] is in order of [x,y,z,t] 
   //------------------------------------------------------------------------
@@ -539,6 +544,7 @@ DiracOpClover::CloverMatChkb(ChkbType chkb, int inv) const
       Ap += HALF_CLOVER_MAT_SIZE;         
     } 
   }
+//  lat.PrintPointers();
 }
 
 

@@ -1,18 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  $Id: fix_gauge.C,v 1.3 2004-06-04 21:14:13 chulwoo Exp $
+  $Id: fix_gauge.C,v 1.4 2004-07-09 04:15:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.3 2004-06-04 21:14:13 chulwoo Exp $
-//  $Id: fix_gauge.C,v 1.3 2004-06-04 21:14:13 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.4 2004-07-09 04:15:19 chulwoo Exp $
+//  $Id: fix_gauge.C,v 1.4 2004-07-09 04:15:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -339,7 +339,7 @@ IFloat HyperPlane::HyperPlane_Sum(IFloat sum_1)
 	for(int j=0; j<XXX::Num_Nodes_in_Dir(ind2dir[i])-1; j++)
 	  {
 	    tmp = sum_1;
-	    getPlusData(&sum_1, &tmp, sizeof(tmp)/sizeof(IFloat), ind2dir[i]);
+	    getPlusData(&sum_1, &tmp, 1 , ind2dir[i]);
 	    sum += sum_1;
 	  }
       }
@@ -354,7 +354,7 @@ IFloat HyperPlane::HyperPlane_Sum(IFloat sum_1)
       {
 	for(int j=0; j<XXX::Num_Nodes_in_Dir(ind2dir[i])-1; j++)
 	  {
-	    getPlusData(&tmp, &sum_1, sizeof(tmp)/sizeof(IFloat), ind2dir[i]);
+	    getPlusData(&tmp, &sum_1, 1, ind2dir[i]);
 	    sum = (sum>tmp) ? sum : tmp;
 	  }
       }

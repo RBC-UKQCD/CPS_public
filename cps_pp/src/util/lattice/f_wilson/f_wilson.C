@@ -169,8 +169,8 @@ int Fwilson::FmatEvlInv(Vector *f_out, Vector *f_in,
   timersub(&t_stop,&t_start,&t_start);
   double flops= (double)WfmFlops;
   double secs = t_start.tv_sec + 1.E-6 *t_start.tv_usec;
-  printf("Wilson solve: %d iteratations %d flops %f Mflops per node\n",
-	 iter,WfmFlops,flops/(secs*1000000) );
+//  printf("Wilson solve: %d iteratations %d flops %f Mflops per node\n",
+//	 iter,WfmFlops,flops/(secs*1000000) );
 
   
   // Return the number of iterations

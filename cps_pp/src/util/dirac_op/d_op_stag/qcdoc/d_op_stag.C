@@ -1,4 +1,5 @@
 #include<config.h>
+#include<qalloc.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -82,6 +83,8 @@ DiracOpStag::DiracOpStag(Lattice & latt,
   //----------------------------------------------------------------
   // Allocate memory for the temporary fermion vector frm_tmp.
   //----------------------------------------------------------------
+  frm_tmp = (Vector *) qalloc(QFAST,f_size_cb * sizeof(Float));
+  if(frm_tmp == 0)
   frm_tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
   if(frm_tmp == 0)
     ERR.Pointer(cname,fname, "frm_tmp");
@@ -155,11 +158,20 @@ void DiracOpStag::DiracArg(CgArg *arg){
 void DiracOpStag::MatPcDagMatPc(Vector *out, 
 			       Vector *in, 
 			       Float *dot_prd){
+//  static long nflops = (570)*GJP.VolNodeSites();
   stag_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
   stag_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
 
-  if( dot_prd !=0 ) vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);
-  else vaxmy(&mass_sq,in,out,f_size_cb/6);
+  if( dot_prd !=0 ){
+	vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);
+	CGflops +=f_size_cb*4;
+//	nflops +=f_size_cb*4;
+  }
+  else{
+	vaxmy(&mass_sq,in,out,f_size_cb/6);
+	CGflops +=f_size_cb*2;
+//	nflops +=f_size_cb*2;
+  }
 
 }
 

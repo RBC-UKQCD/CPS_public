@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.10 2004-07-02 14:13:42 chulwoo Exp $
+  $Id: lattice_base.C,v 1.11 2004-07-09 04:15:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-02 14:13:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.10 2004-07-02 14:13:42 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.10 2004-07-02 14:13:42 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.11 2004-07-09 04:15:19 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.11 2004-07-09 04:15:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -420,11 +420,11 @@ int Lattice::GsiteSize(void)
 const Matrix *
 Lattice::GetLink(const int *site, int dir) const
 {
-//char *fname = "GetLink()";
+char *fname = "GetLink()";
 //VRB.Func(cname,fname);
 
-//VRB.Debug(cname, fname, "link %3i %3i %3i %3i ; %i\n",
-//  site[0], site[1], site[2], site[3], dir) ;
+VRB.Flow(cname, fname, "link %3i %3i %3i %3i ; %i\n",
+  site[0], site[1], site[2], site[3], dir) ;
 
   // offset out-of-range coordinates site[] into on_node_site[]
   // in order to locate the link
@@ -462,10 +462,10 @@ Lattice::GetLink(const int *site, int dir) const
     for (int i = 0; i < 4; ++i) {
       while (site[i] != on_node_site[i]) {
         if (site[i] < 0) {
-          getMinusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv), i);
+          getMinusData((IFloat *)&recv, (IFloat *)&send, MATRIX_SIZE, i);
           on_node_site[i] -= node_sites[i];
         } else {
-          getPlusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv), i);
+          getPlusData((IFloat *)&recv, (IFloat *)&send, MATRIX_SIZE, i);
           on_node_site[i] += node_sites[i];
         }
         send = recv;
@@ -2080,7 +2080,7 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
   int checker, i, k, s, x[4];
 
 
-  printf("num_chkbds=%d vec_size=%d s_node_sites=%d \n",num_chkbds,vec_size,s_node_sites);fflush(stdout);
+//  printf("num_chkbds=%d vec_size=%d s_node_sites=%d \n",num_chkbds,vec_size,s_node_sites);fflush(stdout);
   if(num_chkbds == 2) {
     for(checker = 0; checker < 2; checker++)
     for(s = 0; s < s_node_sites; s++) {

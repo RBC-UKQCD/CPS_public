@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 21:26:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_m.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
-//  $Id: dwf_m.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_m.C,v 1.4 2004-07-09 04:15:18 chulwoo Exp $
+//  $Id: dwf_m.C,v 1.4 2004-07-09 04:15:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_m.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_m.C,v $
 //  $State: Exp $
 //
@@ -30,7 +30,7 @@ CPS_END_NAMESPACE
 #include<util/verbose.h>
 #include<util/error.h>
 #include<util/dirac_op.h>
-#include "dwf_internal.h"
+//#include "dwf_internal.h"
 CPS_START_NAMESPACE
 
 
@@ -62,7 +62,7 @@ void  dwf_m(Vector *out,
 // out = in - dwf_kappa_sq * out
 //------------------------------------------------------------------
   //  out->FTimesV1PlusV2(minus_kappa_sq, out, in, f_size); 
-  vaxpy3((Float *)out,&minus_kappa_sq,(Float *)out,(Float *)in,f_size/6);
+  vaxpy3(out,&minus_kappa_sq,out,in,f_size/6);
   DiracOp::CGflops+=2*f_size;
 
 }

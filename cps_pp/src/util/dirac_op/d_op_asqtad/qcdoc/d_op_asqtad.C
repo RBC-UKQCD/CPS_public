@@ -168,7 +168,7 @@ DiracOpAsqtad::~DiracOpAsqtad() {
 void DiracOpAsqtad::MatPcDagMatPc(Vector *out, 
 			       Vector *in, 
 			       Float *dot_prd){
- long nflops = (1146)*GJP.VolNodeSites();
+ static long nflops = (1146)*GJP.VolNodeSites();
 
 #undef PROFILE
 #ifdef PROFILE

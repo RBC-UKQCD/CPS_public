@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpStagTypes class eigensolver methods.
    
-  $Id: eigen_stag.C,v 1.6 2004-06-04 21:14:07 chulwoo Exp $
+  $Id: eigen_stag.C,v 1.7 2004-07-09 04:15:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.6 2004-06-04 21:14:07 chulwoo Exp $
-//  $Id: eigen_stag.C,v 1.6 2004-06-04 21:14:07 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.7 2004-07-09 04:15:18 chulwoo Exp $
+//  $Id: eigen_stag.C,v 1.7 2004-07-09 04:15:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: eigen_stag.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v $
 //  $State: Exp $
 //
@@ -84,7 +84,7 @@ int DiracOpStagTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[], E
 
   // Local vars which are for extension purposes
   Float lambda_t;
-  Float dummy;
+//  Float dummy;
   Float del_lamb;
   int n;
   int j;
@@ -139,7 +139,7 @@ int DiracOpStagTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[], E
     ERR.Pointer(cname,fname, "lambda_old");
   VRB.Smalloc(cname,fname, "lambda_old", lambda_old, N_eig * sizeof(Float));
 
-  Complex *off_diag;
+  Complex *off_diag = NULL;
   if (N_eig > 1)
   {
     off_diag = (Complex *) smalloc(N_eig*(N_eig-1)/2 * sizeof(Complex));

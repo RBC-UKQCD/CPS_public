@@ -1,7 +1,7 @@
 /*!\file
   Wilson Dirac operator code for QCDOC
 
-  $Id: wilson_init.C,v 1.5 2004-07-01 17:43:45 chulwoo Exp $
+  $Id: wilson_init.C,v 1.6 2004-07-09 04:15:18 chulwoo Exp $
 */
 
 #include <util/wilson.h>
@@ -20,6 +20,7 @@ static WilsonArg wil;
 
 void wilson_end(Wilson *wilson_p)
 {
+  VRB.Func("","wilson_end()");
   wilson_compat_end(wilson_p);
   wfm_end(&wil); 
 }

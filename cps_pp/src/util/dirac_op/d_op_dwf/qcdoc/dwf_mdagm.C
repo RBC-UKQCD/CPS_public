@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 21:26:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_mdagm.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
-//  $Id: dwf_mdagm.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_mdagm.C,v 1.4 2004-07-09 04:15:18 chulwoo Exp $
+//  $Id: dwf_mdagm.C,v 1.4 2004-07-09 04:15:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_mdagm.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_mdagm.C,v $
 //  $State: Exp $
 //
@@ -31,7 +31,7 @@ CPS_END_NAMESPACE
 #include<util/verbose.h>
 #include<util/error.h>
 #include<util/dirac_op.h>
-#include "dwf_internal.h"
+//#include "dwf_internal.h"
 CPS_START_NAMESPACE
 
 
@@ -69,18 +69,12 @@ void dwf_mdagm(Vector *out,
 //------------------------------------------------------------------
   if(dot_prd != 0){
 
-    vaxpy3_norm((Float *)frm_tmp1,
-		&minus_kappa_sq,
-	       (Float *)frm_tmp1,
-	       (Float *)in,f_size/6,dot_prd);
+    vaxpy3_norm(frm_tmp1, &minus_kappa_sq, frm_tmp1, in,f_size/6,dot_prd);
     DiracOp::CGflops+=4*f_size;
 
   } else { 
 
-    vaxpy3((Float *)frm_tmp1,
-	   &minus_kappa_sq,
-	  (Float *)frm_tmp1,
-	  (Float *)in,f_size/6);
+    vaxpy3(frm_tmp1, &minus_kappa_sq, frm_tmp1, in,f_size/6);
     DiracOp::CGflops+=2*f_size;
 
   }

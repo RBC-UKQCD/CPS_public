@@ -1,22 +1,23 @@
 #include <config.h>
 #include <stdlib.h>
+#include <math.h>
 #include <stdio.h>
 CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpWilson class methods.
 
-  $Id: d_op_wilson.C,v 1.4 2004-06-04 21:14:07 chulwoo Exp $
+  $Id: d_op_wilson.C,v 1.5 2004-07-09 04:15:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v 1.4 2004-06-04 21:14:07 chulwoo Exp $
-//  $Id: d_op_wilson.C,v 1.4 2004-06-04 21:14:07 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v 1.5 2004-07-09 04:15:18 chulwoo Exp $
+//  $Id: d_op_wilson.C,v 1.5 2004-07-09 04:15:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v $
 //  $State: Exp $
 //
@@ -222,7 +223,7 @@ int DiracOpWilson::MatInv(Vector *out,
 			  PreserveType prs_in) {
   char *fname = "MatInv(V*,V*,F*)";
   VRB.Func(cname,fname);
-  Vector *temp2;
+  Vector *temp2 = NULL;
 
   int temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
 
@@ -244,6 +245,22 @@ int DiracOpWilson::MatInv(Vector *out,
     VRB.Smalloc(cname,fname, "temp2", temp2, temp_size * sizeof(Float));
   }
 
+#if 0
+{
+  printf("in(before)=\n");
+  IFloat *temp_p = (IFloat *)in;
+  for(int ii = 0; ii< GJP.VolNodeSites();ii++){
+    for(int jj = 0; jj< lat.FsiteSize();jj++){
+      if (fabs(*temp_p)>1e-7){
+        printf("i=%d j=%d\n",ii,jj);
+        printf("%e\n",*(temp_p));
+      }
+      temp_p++;
+    }
+  }
+}
+#endif
+
   // points to the even part of fermion source 
   Vector *even_in = (Vector *) ( (IFloat *) in + temp_size );
 
@@ -254,6 +271,22 @@ int DiracOpWilson::MatInv(Vector *out,
 
   fTimesV1PlusV2((IFloat *)temp, (IFloat) kappa, (IFloat *)temp,
     (IFloat *)in, temp_size);
+
+#if 0
+{
+  printf("temp(before)=\n");
+  IFloat *temp_p = (IFloat *)temp;
+  for(int ii = 0; ii< GJP.VolNodeSites();ii++){
+    for(int jj = 0; jj< lat.FsiteSize();jj++){
+      if (fabs(*temp_p)>1e-7){
+        printf("i=%d j=%d\n",ii,jj);
+        printf("%e\n",*(temp_p));
+      }
+      temp_p++;
+    }
+  }
+}
+#endif
 
   // save source
   if(prs_in == PRESERVE_YES){

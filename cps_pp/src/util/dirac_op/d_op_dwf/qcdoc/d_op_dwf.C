@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.4 2004-07-09 04:15:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 21:26:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
+//  $Date: 2004-07-09 04:15:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.4 2004-07-09 04:15:17 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.4 2004-07-09 04:15:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -275,14 +275,12 @@ void DiracOpDwf::MatPcDag(Vector *out, Vector *in) {
   // Implement routine
   //----------------------------------------------------------------
   IFloat *tmp = (IFloat *)in;
-  printf("in[0]=%e\n",*tmp);
   dwf_mdag(out, 
 	   gauge_field, 
 	   in, 
 	   mass,
 	   (Dwf *) dwf_lib_arg);
   tmp = (IFloat *)out;
-  printf("out[0]=%e\n",*tmp);
 }
 
 
