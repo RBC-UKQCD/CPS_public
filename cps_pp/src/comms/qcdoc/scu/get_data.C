@@ -6,86 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.3 2004-03-15 15:09:02 cwj Exp $
+  $Id: get_data.C,v 1.4 2004-04-27 03:51:17 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: cwj $
-//  $Date: 2004-03-15 15:09:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.3 2004-03-15 15:09:02 cwj Exp $
-//  $Id: get_data.C,v 1.3 2004-03-15 15:09:02 cwj Exp $
+//  $Date: 2004-04-27 03:51:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.4 2004-04-27 03:51:17 cwj Exp $
+//  $Id: get_data.C,v 1.4 2004-04-27 03:51:17 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.2.2.2  2004/03/15 08:15:57  cwj
-//  Update for QOS v2.1
-//
-//  Revision 1.2.2.1  2004/03/15 00:51:58  cwj
-//  Updated communication calls for QOS v2.1
-//
-//  Revision 1.2  2004/01/13 20:39:07  chulwoo
-//  Merging with multibuild
-//
-//  Revision 1.1.2.1.2.2  2003/11/28 21:44:27  cwj
-//   Copy data into non-cachable memory to solve memory coherency problem
-//
-//  Revision 1.1.2.1.2.1  2003/11/06 20:22:20  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.1.1  2003/11/04 05:05:03  chulwoo
-//
-//  starting again
-//
-//
-//  Revision 1.1  2003/10/08 18:38:39  chulwoo
-//  start from vanilla_comms
-//  start from QCDSP comms
-//  start from QCDSP comms
-//
-//  Revision 1.1.1.1  2003/09/18 22:30:45  chulwoo
-//  Mike's files for single node QCDOC + Parallel transport
-//  I added some hacks for PARALLEL without MPI_SCU
-//  PARALLEL=2 set PARALLEL without MPI_SCU
-//
-//
-//  Revision 1.2  2003/07/24 16:53:54  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.1.1.1  2003/06/22 13:34:47  mcneile
-//  This is the cleaned up version of the Columbia Physics System.
-//  The directory structure has been changed.
-//  The include paths have been updated.
-//
-//
-//  Revision 1.4  2001/08/16 10:50:03  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:12:16  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:03  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v $
 //  $State: Exp $
 //

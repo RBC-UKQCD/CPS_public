@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definition of glb_sum routine.
 
-  $Id: glb_sum.C,v 1.3 2004-03-15 02:56:10 cwj Exp $ 
+  $Id: glb_sum.C,v 1.4 2004-04-27 03:51:17 cwj Exp $ 
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: cwj $
-//  $Date: 2004-03-15 02:56:10 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_passthru/glb_sum.C,v 1.3 2004-03-15 02:56:10 cwj Exp $
-//  $Id: glb_sum.C,v 1.3 2004-03-15 02:56:10 cwj Exp $
+//  $Date: 2004-04-27 03:51:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_passthru/glb_sum.C,v 1.4 2004-04-27 03:51:17 cwj Exp $
+//  $Id: glb_sum.C,v 1.4 2004-04-27 03:51:17 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: glb_sum.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_passthru/glb_sum.C,v $
 //  $State: Exp $
 //
@@ -56,10 +56,10 @@ static int counter = 0;
 //---------------------------------------------------------------------- 
 void glb_sum(Float * float_p)
 {
-  if (!initted){ gsum.Init(gsum_axis,4); initted=1;};
+   if (!initted){ gsum.Init(gsum_axis,4); initted=1;};
 //  printf("glb_sum %d before = %e ",counter,(double)*float_p);
   *float_p = (Float) gsum.Sum((double)*float_p);
 //  printf("after = %e\n",(double)*float_p);
-  counter ++;
+//  counter ++;
 }
 CPS_END_NAMESPACE

@@ -1,17 +1,19 @@
 #include <config.h>
 #include <util/gjp.h>
 #include <util/pt.h>
+#include <util/time.h>
 #include <sysfunc.h>
 #include <comms/scu.h>
 #include <stdio.h>
+#include <qalloc.h>
 CPS_START_NAMESPACE
 void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long in, long out);
-void dirac_cmm_jcw_agg_cpp( int sites, long chi, long u,long in, long out);
-extern "C" void dirac_cmv_jcw_agg( int sites, long chi, long u,long in, long out);
+extern "C" void cmm_agg_cpp( int sites, long chi, long u,long in, long out);
+extern "C" void pt_asqtad_agg( int sites, long chi, long u,long in, long out);
 extern "C" void copy_buffer(int n, long src, long dest, long ptable);
 static const int NDIM=4;
 static int size[NDIM];
-enum {GAUGE_LEN=18,VECT_LEN=6, VECT_LEN2=8};
+enum {GAUGE_LEN=18,VECT_LEN=6, VECT_LEN2=6};
 int vol = 1;
 
 gauge_agg *uc_l[2*SCUMachDim];
@@ -28,7 +30,7 @@ int *offset;
 
 static SCUDirArgIR *SCUarg[4*SCUMachDim];
 static SCUDirArgIR *SCUarg_mat[4*SCUMachDim];
-static SCUDirArgIR *SCUarg_txyz[4*SCUMachDim];
+//static SCUDirArgIR *SCUarg_txyz[4*SCUMachDim];
 
 static void Copy (IFloat *dest, IFloat *src){
 	for(int i=0;i<18;i++)
@@ -100,8 +102,16 @@ void ParTransAsqtad::pt_init(const void *gauge_u)
 	}
 	for(i=0; i<2*NDIM;i++){
     local_count[i]=non_local_count[i]=0;
-		uc_l[i] = (gauge_agg *)smalloc(sizeof(gauge_agg)*local_chi[i]);
-		uc_nl[i] = (gauge_agg *)smalloc(sizeof(gauge_agg)*non_local_chi[i]);
+		uc_l[i] = (gauge_agg *)qalloc(QFAST,sizeof(gauge_agg)*local_chi[i]);
+		uc_nl[i] = (gauge_agg *)qalloc(QFAST,sizeof(gauge_agg)*non_local_chi[i]);
+		if(uc_l[i]==NULL) 
+		uc_l[i] = (gauge_agg *)qalloc(QCOMMS,sizeof(gauge_agg)*local_chi[i]);
+//        printf("uc_l[%d]=%p\n",i,uc_l[i]);
+		if(uc_nl[i]==NULL) 
+		uc_nl[i] = (gauge_agg *)qalloc(QCOMMS,sizeof(gauge_agg)*non_local_chi[i]);
+//        printf("uc_nl[%d]=%p\n",i,uc_l[i]);
+		if(uc_l[i]==NULL)ERR.Pointer(cname,fname,"uc_l[i]");
+		if(uc_nl[i]==NULL)ERR.Pointer(cname,fname,"uc_nl[i]");
 #if 0
 		for(int j = 0;j<2;j++){
   		uc_l_txyz[j][i] = (gauge_agg *)smalloc(sizeof(gauge_agg)*local_chi[i]/2);
@@ -109,9 +119,16 @@ void ParTransAsqtad::pt_init(const void *gauge_u)
       local_count_txyz[j][i]=non_local_count_txyz[j][i]=0;
 		}
 #endif
-		rcv_buf[i] = (IFloat *)smalloc(non_local_chi[i]*vlen*3);
-		tmp_buf[i] = (IFloat *)smalloc(vol*vlen2*3);
+		rcv_buf[i] = (IFloat *)qalloc(QFAST,non_local_chi[i]*vlen*3);
+		tmp_buf[i] = (IFloat *)qalloc(QFAST,vol*vlen2*3);
+		if(rcv_buf[i]==NULL)
+		rcv_buf[i] = (IFloat *)qalloc(QCOMMS,non_local_chi[i]*vlen*3);
+		if(tmp_buf[i]==NULL)
+		tmp_buf[i] = (IFloat *)qalloc(QCOMMS,vol*vlen2*3);
+		if(rcv_buf[i]==NULL)ERR.Pointer(cname,fname,"rcv_buf[i]");
+		if(tmp_buf[i]==NULL)ERR.Pointer(cname,fname,"tmp_buf[i]");
   }
+
 #if 0
 	Toffset[0][0] = (int *)smalloc(sizeof(int)*size[0]*size[1]*size[2]/2);
 	Toffset[1][0] = (int *)smalloc(sizeof(int)*size[0]*size[1]*size[2]/2);
@@ -202,7 +219,6 @@ void ParTransAsqtad::pt_init(const void *gauge_u)
 		}
 	}
 #endif
-
 }
 
 void ParTransAsqtad::pt_delete(){
@@ -216,16 +232,16 @@ void ParTransAsqtad::pt_delete(){
 	sfree (stride);
 	sfree (offset);
 	for(int i = 0; i < 2*NDIM; i++){
-		sfree(uc_l[i]);
-		sfree(uc_nl[i]);
+		qfree(uc_l[i]);
+		qfree(uc_nl[i]);
 #if 0
 		for(int j = 0; j < 2; j++){
 			sfree(uc_l_txyz[j][i]);
 			sfree(uc_nl_txyz[j][i]);
 		}
 #endif
-		sfree(rcv_buf[i]);
-		sfree(tmp_buf[i]);
+		qfree(rcv_buf[i]);
+		qfree(tmp_buf[i]);
 	}
 #if 0
 	for(int i = 0; i < 2; i++)
@@ -295,48 +311,32 @@ void ParTransAsqtad::pt_init_g(void){
 		}
 	}
 	for(i=0;i<2*NDIM;i++) {
+//		printf("rcv_buf[%d]=%p\n",i,rcv_buf[i]);
 		SCUarg[i*2] = new SCUDirArgIR;
 		SCUarg[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,non_local_chi[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
 		SCUarg[i*2+1] = new SCUDirArgIR;
-		SCUarg[i*2+1]->Init((void *)0,snd_dir[i],SCU_SEND,blklen[i],numblk[i],stride[i],IR_9);
+//
+//  inputs a dummy but valid address to pass syscall test and changed later, CJ
+//
+		SCUarg[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,blklen[i],numblk[i],stride[i],IR_9);
 		SCUarg_mat[i*2] = new SCUDirArgIR;
 		SCUarg_mat[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,non_local_chi[i]*VECT_LEN*sizeof(IFloat)*3,1,0,IR_9);
 		SCUarg_mat[i*2+1] = new SCUDirArgIR;
-		SCUarg_mat[i*2+1]->Init((void *)0,snd_dir[i],SCU_SEND,blklen[i]*3,numblk[i],stride[i]*3,IR_9);
+		SCUarg_mat[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,blklen[i]*3,numblk[i],stride[i]*3,IR_9);
 	}
+//	printf("pt_init_g()\n");
 }
 
-#if 0
-void ParTransAsqtad::run(int n, Vector **vout, Vector **vin, const SCUDir *scudir){
-	int dir[n];
-	for(int i=0;i<n;i++){
-#if  0
-		switch(scudir[i]){
-			case SCU_XP: dir[i]=0;break;
-			case SCU_XM: dir[i]=1;break;
-			case SCU_YP: dir[i]=2;break;
-			case SCU_YM: dir[i]=3;break;
-			case SCU_ZP: dir[i]=4;break;
-			case SCU_ZM: dir[i]=5;break;
-			case SCU_TP: dir[i]=6;break;
-			case SCU_TM: dir[i]=7;break;
-			default: printf("wrong scudir"); exit(3);
-		}
-#else
-		dir[i] = (int)scudir[i];
-#endif
-		printf("dir[%d]=%d\n",i,dir[i]);
-	}
-	run(n,vout,vin,dir);
-}
-#endif
 
 void ParTransAsqtad::run(int n, Matrix **mout, Matrix **min, const int *dir){
 	int wire[n];
 	int i,j;
 	SCUDirArgIR *SCUarg_p[2*n];
 	SCUDirArgMulti SCUmulti;
+	static int call_num = 0;
 
+	call_num++;
+//	printf("run(i,M**,M**,i):call_num=%d\n",call_num);
 	char *fname="run(i,M**,M**,i)";
 //	VRB.Func(cname,fname);
 	
@@ -344,33 +344,41 @@ void ParTransAsqtad::run(int n, Matrix **mout, Matrix **min, const int *dir){
 	for(i=0;i<n;i++) wire[i] = dir[i]; 
 	for(i=0;i<n;i++) {
 		Matrix * addr = (min[i]+offset[wire[i]]);
+//		printf("addr=%p\n",addr);
 		SCUarg_p[2*i] = SCUarg_mat[2*wire[i]];
 		SCUarg_p[2*i+1] = SCUarg_mat[2*wire[i]+1];
 		SCUarg_p[2*i+1]->Addr((void *)addr);
 	}
 	SCUmulti.Init(SCUarg_p,n*2);
 	SCUmulti.SlowStartTrans();
-	
-	for(i=0;i<n;i++) dirac_cmm_jcw_agg_cpp(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)min[i],(long)tmp_buf[i]);
+			
+//	Float dtime  = - dclock();
+	for(i=0;i<n;i++)
+	 cmm_agg_cpp(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)min[i],(long)mout[i]);
 	SCUmulti.TransComplete();
-	
-	for(i=0;i<n;i++) dirac_cmm_jcw_agg_cpp(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)tmp_buf[i]);
+	for(i=0;i<n;i++) cmm_agg_cpp(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)mout[i]);
+//	dtime +=dclock();
+//	print_flops(198*vol*n,dtime);
+#if 0
 	for(i=0;i<n;i++){
 		for(j=0;j<vol;j++){
 			IFloat * temp = (IFloat *)(mout[i]+j);
 			for(int k = 0;k<VECT_LEN*3;k += 3){
-			temp[k+0] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+0);
-			temp[k+1] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+1);
-			temp[k+2] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+2);
-      }
+				temp[k+0] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+0);
+				temp[k+1] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+1);
+				temp[k+2] = *(tmp_buf[i]+(j*VECT_LEN2*3)+k+2);
+ 			}
 		}
 	}
+#endif
 }
 
 void ParTransAsqtad::run(int n, Vector **vout, Vector **vin, const int *dir){
-	int wire[n];
 	int i,j;
 	SCUDirArgIR *SCUarg_p[2*n];
+//	for(i=0;i<n;i++) printf("dir[%d]=%d\n",i,dir[i]);
+//	Float dtime  = - dclock();
+	int wire[n];
 	SCUDirArgMulti SCUmulti;
 
 	char *fname="run(i,V**,V**,i)";
@@ -386,10 +394,13 @@ void ParTransAsqtad::run(int n, Vector **vout, Vector **vin, const int *dir){
 	SCUmulti.Init(SCUarg_p,n*2);
 	SCUmulti.SlowStartTrans();
 	
-	for(i=0;i<n;i++) dirac_cmv_jcw_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)tmp_buf[i]);
+	for(i=0;i<n;i++) pt_asqtad_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
 	SCUmulti.TransComplete();
 	
-	for(i=0;i<n;i++) dirac_cmv_jcw_agg(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)tmp_buf[i]);
+	for(i=0;i<n;i++) pt_asqtad_agg(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
+//	dtime +=dclock();
+//	print_flops(66*n*vol,dtime);
+#if 0
 	for(i=0;i<n;i++){
 		for(j=0;j<vol;j++){
 			IFloat * temp = (IFloat *)(vout[i]+j);
@@ -401,6 +412,7 @@ void ParTransAsqtad::run(int n, Vector **vout, Vector **vin, const int *dir){
 			temp[5] = *(tmp_buf[i]+(j*VECT_LEN2)+5);
 		}
 	}
+#endif
 }
 
 CPS_END_NAMESPACE

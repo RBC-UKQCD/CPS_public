@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: pt.h,v 1.4 2004-02-06 12:20:43 zs Exp $
+  $Id: pt.h,v 1.5 2004-04-27 03:51:16 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-06 12:20:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.4 2004-02-06 12:20:43 zs Exp $
-//  $Id: pt.h,v 1.4 2004-02-06 12:20:43 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.5 2004-04-27 03:51:16 cwj Exp $
+//  $Id: pt.h,v 1.5 2004-04-27 03:51:16 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -46,9 +46,6 @@ class ParTrans
  private:
   char *cname;                     // Class name.
 
-  static int scope_lock;           // lock that forbids more than
-                                   // one DiracOp object to be on
-                                   // scope at any time.
 
  protected:
   Lattice& lat;                    //!< The lattice..
@@ -56,6 +53,9 @@ class ParTrans
 
 
  public:
+  static int scope_lock;           // lock that forbids more than
+                                   // one ParTrans object to be on
+                                   // scope at any time.
   ParTrans(Lattice& latt);           // Lattice object.
 
   virtual ~ParTrans();

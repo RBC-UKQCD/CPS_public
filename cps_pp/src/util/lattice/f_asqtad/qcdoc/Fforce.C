@@ -1,10 +1,11 @@
 #include<config.h>
 #include<stdio.h>
+#include<qalloc.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.1 2004-01-28 06:06:22 cwj Exp $
+  $Id: Fforce.C,v 1.2 2004-04-27 03:51:20 cwj Exp $
 */
 //--------------------------------------------------------------------
 
@@ -45,7 +46,23 @@ void Fasqtad::force_product_sum(const Vector *v, const Vector *w,
 
     Matrix m0;
     int n, s[4];
+    static int called=0;
     
+
+    IFloat *tmp, *tmp2;
+#if 0
+    tmp = (IFloat *)f;
+    for(int ii = 0; ii<18;ii++){
+        printf("%e ",tmp[ii]);
+        if(ii%6==5) printf("\n");
+    }
+
+    int ii;
+    tmp = (IFloat *)v; tmp2=(IFloat *)w;
+    printf("called=%d\n",called);
+    for(int ii = 0; ii<6;ii++)
+        printf("%e %e\n",tmp[ii],tmp2[ii]);
+#endif
     for(n=0, s[3]=0; s[3]<GJP.TnodeSites(); s[3]++)
 	for(s[2]=0; s[2]<GJP.ZnodeSites(); s[2]++)
 	    for(s[1]=0; s[1]<GJP.YnodeSites(); s[1]++)
@@ -56,6 +73,14 @@ void Fasqtad::force_product_sum(const Vector *v, const Vector *w,
 		    f[n] += m0;
 		}
 
+#if 0
+    tmp = (IFloat *)f;
+    for(int ii = 0; ii<18;ii++){
+        printf("%e ",tmp[ii]);
+        if(ii%6==5) printf("\n");
+    }
+    called++;
+#endif
 }
 
 
@@ -74,21 +99,23 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
     Vector *tmp = (Vector *)smalloc(2*f_size);
     Vector *tmp_o = &(tmp[GJP.VolNodeSites()/2]);
     moveMem(tmp,frm,f_size);
-#if 1
+#if 0
+    // Does not work for RHMC
     moveMem(tmp_o,f_tmp,f_size);
 #else
+    // Works for all algorithms
     {
-    CgArg cg_arg;
-    cg_arg.mass=0.0;
-    DiracOpAsqtad asqtad(*this,tmp_o,frm,&cg_arg,CNV_FRM_NO);
+      CgArg cg_arg;
+      cg_arg.mass=0.0;
+      DiracOpAsqtad asqtad(*this,tmp_o,frm,&cg_arg,CNV_FRM_NO);
       asqtad.Dslash(tmp_o,frm,CHKB_EVEN,DAG_NO);
     }
 #endif
-    Convert(STAG);
 
+    Fconvert(tmp,CANONICAL,STAG);
+    Convert(STAG);
     
     const int N = 4;  // N can be 1, 2 or 4.
-	Fconvert(tmp,CANONICAL,STAG);
 
     enum{plus, minus, n_sign};
     int size;
@@ -106,24 +133,30 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 
     for(int w=0; w<N; w++){
 	for(int i=0; i<n_sign; i++){
-	    Pnu[i][w] = (Vector*)pmalloc(size);
-	    if(!Pnu[i]) ERR.Pointer(cname, fname, "Pnu");
+	    Pnu[i][w] = (Vector*)qalloc(QFAST,size);
+	    if(!Pnu[i][w]) Pnu[i][w] = (Vector*)qalloc(QCOMMS,size);
+	    if(!Pnu[i][w]) ERR.Pointer(cname, fname, "Pnu");
 	    for(int j=0; j<n_sign; j++){
-		P3[i][j][w] = (Vector*)pmalloc(size);
+		P3[i][j][w] = (Vector*)qalloc(QFAST,size);
+	    	if(!P3[i][j][w]) P3[i][j][w] = (Vector*)qalloc(QCOMMS,size);
 		if(!P3[i][j][w]) ERR.Pointer(cname, fname, "P3");
 
-		Prhonu[i][j][w] = (Vector*)pmalloc(size);
+		Prhonu[i][j][w]= (Vector*)qalloc(QFAST,size);
+		if(!Prhonu[i][j][w]) Prhonu[i][j][w]= (Vector*)qalloc(QCOMMS,size);
 		if(!Prhonu[i][j][w]) ERR.Pointer(cname, fname, "Prhonu");
 
 		for(int k=0; k<n_sign; k++){
-		    P5[i][j][k][w] = (Vector*)pmalloc(size);
+		    P5[i][j][k][w] = (Vector*)qalloc(QFAST,size);
+		    if(!P5[i][j][k][w])P5[i][j][k][w]= (Vector*)qalloc(QCOMMS,size);
 		    if(!P5[i][j][k][w]) ERR.Pointer(cname, fname, "P5");
 
   		    for(int l=0; l<n_sign; l++){
-	 		P7[i][j][k][l][w] = (Vector*)pmalloc(size);
+	 		P7[i][j][k][l][w]= (Vector*)qalloc(QFAST,size);
+			if(!P7[i][j][k][l][w])P7[i][j][k][l][w]= (Vector*)qalloc(QCOMMS,size);
 			if(!P7[i][j][k][l][w]) ERR.Pointer(cname, fname, "P7");
 
-			Psigma7[i][j][k][l][w] = (Vector*)pmalloc(size);
+			Psigma7[i][j][k][l][w]= (Vector*)qalloc(QFAST,size);
+			if(!Psigma7[i][j][k][l][w]) Psigma7[i][j][k][l][w]= (Vector*)qalloc(QCOMMS,size);
 			if(!Psigma7[i][j][k][l][w]) ERR.Pointer(cname, fname, "P7sigma");
 		    }
 		}
@@ -166,6 +199,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
     Matrix *force[4];
     for(int i=0; i<4; i++){
 	force[i] = (Matrix*)pmalloc(GJP.VolNodeSites()*sizeof(Matrix));         
+        bzero(force[i],GJP.VolNodeSites()*sizeof(Matrix));
         VRB.Pmalloc(cname, fname,"force[i]", force[i], GJP.VolNodeSites()*sizeof(Matrix));
 	if(!force[i]) ERR.Pointer(cname, fname, "force[i]");
     }
@@ -196,8 +230,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		vout[n_sign*i] = Pnu[minus][i];
 		vout[n_sign*i+1] = Pnu[plus][i];
 	    }
-	    parallel_transport(pt,vin, dir, n_sign*N, vout);
-
+//		printf("Pnu\n");
+		pt.run(n_sign*N, vout, vin, dir);
 	    // P3 = U_mu Pnu
 	    // ms is the nu sign index, ms is the mu sign index,
 	    // w is the direction index
@@ -211,7 +245,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		    vout[n_sign*i] = P3[plus][ns][i];
 		    vout[n_sign*i+1] = P3[minus][ns][i];
 		}
-		parallel_transport(pt,vin, dir, n_sign*N, vout);
+//		printf("P3\n");
+		pt.run(n_sign*N, vout, vin, dir);
 	    }
 	    
 	    for(w=0; w<N; w++)
@@ -250,7 +285,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 			vout[n_sign*i] = Prhonu[ns][minus][i];
 			vout[n_sign*i+1] = Prhonu[ns][plus][i];
 		    }
-		    parallel_transport(pt,vin, dir, n_sign*N, vout);
+//			printf("Prhonu\n");
+			pt.run(n_sign*N, vout, vin, dir);
 		}
 
 		// P5 = U_mu Prhonu
@@ -265,7 +301,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 			vout[n_sign*i] = P5[plus][ns][rs][i];
 			vout[n_sign*i+1] = P5[minus][ns][rs][i];
 		    }
-		    parallel_transport(pt,vin, dir, n_sign*N, vout);
+//			printf("P5\n");
+			pt.run(n_sign*N, vout, vin, dir);
 		}
 
 		// F_mu += P5 Prhonu^dagger
@@ -289,7 +326,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 			vout[n_sign*i] = Psigmarhonu[ns][rs][minus][i];
 			vout[n_sign*i+1] = Psigmarhonu[ns][rs][plus][i];
 		    }
-		    parallel_transport(pt,vin, dir, n_sign*N, vout);
+//			printf("Psigmarhonu\n");
+			pt.run(n_sign*N, vout, vin, dir);
 		}
 
 		// P7 = U_mu P_sigmarhonu
@@ -303,7 +341,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 			vout[n_sign*i] = P7[plus][ns][rs][ss][i];
 			vout[n_sign*i+1] = P7[minus][ns][rs][ss][i];
 		    }
-		    parallel_transport(pt,vin, dir, n_sign*N, vout);
+//			printf("P7\n");
+			pt.run(n_sign*N, vout, vin, dir);
 		}
 
 		// F_mu -= P7 Psigmarhonu^\dagger
@@ -346,7 +385,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 			vout[n_sign*i] = Psigma7[ms][ns][rs][plus][i];
 			vout[n_sign*i+1] = Psigma7[ms][ns][rs][minus][i];
 		    }
-		    parallel_transport(pt,vin, dir, n_sign*N, vout);
+//			printf("Psigma7\n");
+			pt.run(n_sign*N, vout, vin, dir);
 		}
 
 		// F_sigma += Fsigma7 Frhonu^\dagger
@@ -403,7 +443,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 			vout[n_sign*i] = Prho5[ms][ns][plus][i];
 			vout[n_sign*i+1] = Prho5[ms][ns][minus][i];
 		    }
-		    parallel_transport(pt,vin, dir, n_sign*N, vout);
+//			printf("Prho5\n");
+			pt.run(n_sign*N, vout, vin, dir);
 		}
 
 		// F_rho -= Prho5 Pnu^\dagger
@@ -444,7 +485,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		vout[n_sign*i] = Pnunu[minus][i];
 		vout[n_sign*i+1] = Pnunu[plus][i];
 	    }
-	    parallel_transport(pt,vin, dir, n_sign*N, vout);
+//		printf("Pnunu\n");
+		pt.run(n_sign*N, vout, vin, dir);
 
 	    // P5 = U_mu Pnunu
 
@@ -459,7 +501,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		    vout[n_sign*i] = P5[plus][ns][0][i];
 		    vout[n_sign*i+1] = P5[minus][ns][0][i];
 		}
-		parallel_transport(pt,vin, dir, n_sign*N, vout);
+//		printf("P5\n");
+		pt.run(n_sign*N, vout, vin, dir);
 	    }
 
 	    // F_mu += P5 Pnunu^\dagger
@@ -501,7 +544,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		    vout[n_sign*i] =   Pnu5[ms][plus][i];
 		    vout[n_sign*i+1] = Pnu5[ms][minus][i];
 		}
-		parallel_transport(pt,vin, dir, n_sign*N, vout);
+//		printf("Pnu5\n");
+		pt.run(n_sign*N, vout, vin, dir);
 	    }
 
 	    // F_nu -= Pnu5 Pnu^\dagger
@@ -551,7 +595,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		    vin[i] = P3[ms][plus][i]; 
 		    vout[i] = Pnu3[ms][plus][i];
 		}
-		parallel_transport(pt,vin, dir, N, vout);
+//		printf("Pnu3\n");
+		pt.run(N, vout, vin, dir);
 	    }
 
 	    // F_nu += Pnu3 X^\dagger
@@ -610,7 +655,8 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 		vin[i] = Pnunu[minus][i]; 
 		vout[i] = Pnununu[i];
 	    }
-	    parallel_transport(pt,vin, dir, N, vout);
+//		printf("Pnununu\n");
+		pt.run(N, vout, vin, dir);
 	    
 	    // F_nu += Pnununu X^\dagger
 		
@@ -634,7 +680,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    mf = force[mu][s];
 	    mfd.Dagger((IFloat*)&mf);
 	    mf.TrLessAntiHermMatrix(mfd);
-	    mf *= 0.5;				// for MILC compatibility
+//	    mf *= 0.5;				// for MILC compatibility
 	    fTimesV1PlusV2((IFloat*)(ip+mu), dt, (IFloat*)&mf,
 			   (IFloat*)(ip+mu)+BANK4_BASE, MATRIX_SIZE);
 	}
@@ -642,21 +688,22 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
     
     for(int w=0; w<N; w++){
 	for(int i=0; i<n_sign; i++){
-	    pfree(Pnu[i][w]);
+	    qfree(Pnu[i][w]);
 	    for(int j=0; j<n_sign; j++){
-		pfree(P3[i][j][w]);
-		pfree(Prhonu[i][j][w]);
+		qfree(P3[i][j][w]);
+		qfree(Prhonu[i][j][w]);
 		for(int k=0; k<n_sign; k++){
-		    pfree(P5[i][j][k][w]);
+		    qfree(P5[i][j][k][w]);
   		    for(int l=0; l<n_sign; l++){
-	 		pfree(P7[i][j][k][l][w]);
-			pfree(Psigma7[i][j][k][l][w]);
+	 		qfree(P7[i][j][k][l][w]);
+			qfree(Psigma7[i][j][k][l][w]);
 		    }
 		}
 	    }
 	}
     }
 	
+   Convert(CANONICAL);
    for(int i=0;i<4;i++) pfree(force[i]);
  	sfree(tmp);
 //	Fconvert(frm,STAG,CANONICAL);

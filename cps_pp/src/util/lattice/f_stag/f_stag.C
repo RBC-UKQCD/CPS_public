@@ -1,22 +1,23 @@
 #include<config.h>
 #include<stdio.h>
+#include<stdlib.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.6 2004-02-16 13:21:42 zs Exp $
+  $Id: f_stag.C,v 1.7 2004-04-27 03:51:21 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-16 13:21:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v 1.6 2004-02-16 13:21:42 zs Exp $
-//  $Id: f_stag.C,v 1.6 2004-02-16 13:21:42 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v 1.7 2004-04-27 03:51:21 cwj Exp $
+//  $Id: f_stag.C,v 1.7 2004-04-27 03:51:21 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_stag.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v $
 //  $State: Exp $
 //
@@ -252,8 +253,7 @@ int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 
   //Fake the constructor
   DiracOpStag stag(*this, f_out[0], f_in, cg_arg, cnv_frm);
-
-  return stag.MInvCG(f_out,f_in,sqrt(dot),shift,Nshift,isz,RsdCG,EigVec,Neig);  
+  return stag.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,EigVec,Neig);  
 }
 
 
@@ -449,6 +449,15 @@ void Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
   char *fname = "EvolveMomFforce(M*,V*,F,F)";
   VRB.Func(cname,fname);
 
+  { 
+    // Added this dslash to give compatibility with RHMC
+    CgArg cg_arg;
+    cg_arg.mass = 0.0;
+    Vector *v1=(Vector*)0, *v2=(Vector*)0;
+    DiracOpStag stag(*this, v2, v1, &cg_arg, CNV_FRM_NO);
+    stag.Dslash(f_tmp, frm, CHKB_EVEN, DAG_NO);
+  }
+
   setCbufCntrlReg(4, CBUF_MODE4);
   int x[4];
   
@@ -469,18 +478,7 @@ void Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
       }
     }
   }
-}
 
-void Fstag::prepForce(Vector *frm) {
-  char *fname = "prepForce(V*)";
-  VRB.Func(cname,fname);
-
-  // Fake out the constructor
-  CgArg cg_arg;
-  cg_arg.mass = 0.0;
-  Vector *v1=(Vector*)0, *v2=(Vector*)0;
-  DiracOpStag stag(*this, v2, v1, &cg_arg, CNV_FRM_NO);
-  stag.Dslash(f_tmp, frm, CHKB_EVEN, DAG_NO);
 }
 
 

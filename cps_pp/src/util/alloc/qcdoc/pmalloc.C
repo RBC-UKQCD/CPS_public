@@ -11,8 +11,6 @@ CPS_END_NAMESPACE
 #include <qalloc.h>
 CPS_START_NAMESPACE
 
-//static unsigned long extra_heap[0*1048576] LOCATE(".ddr_t_heap");
-
 //! Allocate memory
 /*!
   \param request The amount of memory (in bytes) to allocate

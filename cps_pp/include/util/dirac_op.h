@@ -3,18 +3,27 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.5 2004-01-13 20:38:56 chulwoo Exp $
+  $Id: dirac_op.h,v 1.6 2004-04-27 03:51:16 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:38:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.5 2004-01-13 20:38:56 chulwoo Exp $
-//  $Id: dirac_op.h,v 1.5 2004-01-13 20:38:56 chulwoo Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.6 2004-04-27 03:51:16 cwj Exp $
+//  $Id: dirac_op.h,v 1.6 2004-04-27 03:51:16 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.5.2.2  2004/04/22 21:31:57  cwj
+//  *** empty log message ***
+//
+//  Revision 1.5.2.1  2004/04/01 05:52:34  cwj
+//  *** empty log message ***
+//
+//  Revision 1.5  2004/01/13 20:38:56  chulwoo
+//  Merging with multibuild
+//
 //  Revision 1.4.2.1  2003/11/05 16:13:21  mike
 //  Initial attempt at producing working branch
 //
@@ -70,7 +79,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: dirac_op.h,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v $
 //  $State: Exp $
 //
@@ -100,9 +109,6 @@ class DiracOp
  private:
   char *cname;                     // Class name.
 
-  static int scope_lock;           // lock that forbids more than
-                                   // one DiracOp object to be on
-                                   // scope at any time.
 
  protected:
   Lattice& lat;                    //!< The lattice..
@@ -122,6 +128,9 @@ class DiracOp
 
 
  public:
+  static int scope_lock;           // lock that forbids more than
+                                   // one DiracOp object to be on
+                                   // scope at any time.
   DiracOp(Lattice& latt,           // Lattice object.
 	  Vector *f_field_out,     // Output fermion field ptr.
 	  Vector *f_field_in,      // Input fermion field ptr.
@@ -1137,6 +1146,128 @@ class DiracOpDwf : public DiracOpWilsonTypes
 	     CnvFrmType cnv_frm_flg);  // Fermion conversion flag
 
   virtual ~DiracOpDwf();
+
+  void DiracArg(CgArg *arg);
+     // It sets the dirac_arg pointer to arg and initializes
+     // kappa
+
+  void MatPcDagMatPc(Vector *out, Vector *in, Float *dot_prd=0);
+     // MatPcDagMatPc is the fermion matrix that appears in the HMC 
+     // evolution. It is a Hermitian matrix.
+     // The in, out fields are defined on the checkerboard lattice.
+     // If dot_prd is not 0 then the dot product (on node)
+     // <out, in> = <MatPcDagMatPc*in, in> is returned in dot_prd.
+
+  void Dslash(Vector *out, 
+		      Vector *in,
+		      ChkbType cb, 
+		      DagType dag);
+     // Dslash is the derivative part of the fermion matrix. 
+     // The in, out fields are defined on the checkerboard lattice
+     // cb = 0/1 <--> even/odd checkerboard of in field.
+     // dag = 0/1 <--> Dslash/Dslash^dagger is calculated.
+
+  //! Multiplication by the odd-even preconditioned fermion matrix.
+  void MatPc(Vector *out, Vector *in);
+     // MatPc is the fermion matrix.  
+     // The in, out fields are defined on the checkerboard lattice.
+
+  //! Multiplication by the  hermitian conjugate odd-even preconditioned fermion matrix.
+  void MatPcDag(Vector *out, Vector *in);
+     // MatPcDag is the dagger of the fermion matrix. 
+     // The in, out fields are defined on the checkerboard lattice.
+
+  int MatInv(Vector *out, 
+	     Vector *in, 
+	     Float *true_res,
+	     PreserveType prs_in = PRESERVE_YES);
+     // The inverse of the unconditioned Dirac Operator 
+     // using Conjugate gradient.  source is *in, initial
+     // guess and solution is *out.
+     // If true_res !=0 the value of the true residual is returned
+     // in true_res.
+     // *true_res = |src - MatPcDagMatPc * sol| / |src|
+     // prs_in is used to specify if the source
+     // in should be preserved or not. If not the memory usage
+     // is less by half the size of a fermion vector.
+     // The function returns the total number of CG iterations.
+
+  int MatInv(Vector *out, 
+	     Vector *in,
+	     PreserveType prs_in = PRESERVE_YES);
+     // Same as original but true_res=0.
+
+  int MatInv(Float *true_res,
+	     PreserveType prs_in = PRESERVE_YES);
+     // Same as original but in = f_in and out = f_out.
+
+  int MatInv(PreserveType prs_in = PRESERVE_YES);
+     // Same as original but in = f_in, out = f_out, true_res=0.
+ 
+  void MatHerm(Vector *out, Vector *in);
+     // MatHerm is the hermitian version of Mat.
+     // MatHerm works on the full lattice.
+     // The in, out fields are defined on the ful.
+
+  void Mat(Vector *out, Vector *in);
+     // Mat is the unpreconditioned fermion matrix.  
+     // Mat works on the full lattice
+     // The in, out fields are defined on the full lattice.
+
+  void MatDag(Vector *out, Vector *in);
+     // MatDag is the dagger of the unpreconditioned fermion matrix. 
+     // MatDag works on the full lattice
+     // The in, out fields are defined on the full lattice.
+
+  void CalcHmdForceVecs(Vector *chi) ;
+  //!< Computes vectors used in the HMD pseudofermionic force term.
+    // GRF
+    // chi is the solution to MatPcInv.  The user passes two full size
+    // CANONICAL fermion vectors with conversion enabled to the
+    // constructor.  Using chi, the function fills these vectors;
+    // the result may be used to compute the HMD fermion force.
+
+  void Reflex(Vector *out, Vector *in);
+  //!< Not implemented
+    // Reflexion in s operator, needed for the hermitian version 
+    // of the dirac operator in the Ritz solver.
+};
+
+//------------------------------------------------------------------
+//! A class describing the Dirac operator for domain-wall Wilson fermions.
+/*!
+  See the description of the DiracOpWilsonTypes class for the definition
+  of the Wilson fermion matrix.
+*/
+//------------------------------------------------------------------
+class DiracOpImprDwf : public DiracOpWilsonTypes
+{
+ private:
+  char *cname;    // Class name.
+
+  void *dwf_lib_arg;     // pointer to an argument structure related
+                         // to the dwf library.
+
+  Float mass;            // Dwf mass (couples left-right components)
+
+  Matrix *lat_back; // back up copy
+
+
+  protected:
+  void DiracOpGlbSum(Float *float_p);					
+     // The global sum used by InvCg. If s_nodes = 1
+     // it is the usual global sum. If s_nodes > 1 it
+     // is the 5-dimensional globals sum glb_sum_five.
+
+
+ public:
+  DiracOpImprDwf(Lattice& latt,            // Lattice object.
+	     Vector *f_field_out,      // Output fermion field ptr.
+	     Vector *f_field_in,       // Input fermion field ptr.
+	     CgArg *arg,               // Argument structure
+	     CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+
+  virtual ~DiracOpImprDwf();
 
   void DiracArg(CgArg *arg);
      // It sets the dirac_arg pointer to arg and initializes

@@ -1,72 +1,23 @@
 #include<config.h>
+#include<qalloc.h>
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
   \brief  Definition of glb_sum_matrix_dir routine.
 
-  $Id: glb_sum_matrix_dir.C,v 1.2 2004-01-13 20:39:06 chulwoo Exp $
+  $Id: glb_sum_matrix_dir.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/glb_sum_matrix_dir.C,v 1.2 2004-01-13 20:39:06 chulwoo Exp $
-//  $Id: glb_sum_matrix_dir.C,v 1.2 2004-01-13 20:39:06 chulwoo Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/glb_sum_matrix_dir.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
+//  $Id: glb_sum_matrix_dir.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.1.2.1.2.1  2003/11/06 20:22:20  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.1.1  2003/11/04 05:05:03  chulwoo
-//
-//  starting again
-//
-//
-//  Revision 1.2  2003/10/10 21:30:28  chulwoo
-//
-//  added sizeof's to compensate different convention
-//
-//  Revision 1.1  2003/10/08 18:38:29  chulwoo
-//  start from vanilla_comms
-//  start from QCDSP comms
-//
-//  Revision 1.1.1.1  2003/09/18 22:30:43  chulwoo
-//  Mike's files for single node QCDOC + Parallel transport
-//  I added some hacks for PARALLEL without MPI_SCU
-//  PARALLEL=2 set PARALLEL without MPI_SCU
-//
-//
-//  Revision 1.2  2003/07/24 16:53:54  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.1.1.1  2003/06/22 13:34:47  mcneile
-//  This is the cleaned up version of the Columbia Physics System.
-//  The directory structure has been changed.
-//  The include paths have been updated.
-//
-//
-//  Revision 1.2  2001/06/19 18:11:51  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:01  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: glb_sum_matrix_dir.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/glb_sum_matrix_dir.C,v $
 //  $State: Exp $
 //
@@ -87,9 +38,9 @@ CPS_START_NAMESPACE
 
 
 
-static Matrix transmit_buf;
-static Matrix receive_buf;
-static Matrix gsum_buf;
+static Matrix *transmit_buf = NULL;
+static Matrix *receive_buf = NULL;
+static Matrix *gsum_buf = NULL;
 
 //----------------------------------------------------------------------
 /*!
@@ -120,24 +71,32 @@ void glb_sum_matrix_dir(Matrix * matrix_p, int dir)
 		 GJP.TnodeCoor(), 
 		 GJP.SnodeCoor()}; 
 
+  if (transmit_buf == NULL) 
+      transmit_buf = (Matrix *)qalloc(QFAST|QNONCACHE,sizeof(Matrix));
+  if (receive_buf == NULL) 
+      receive_buf = (Matrix *)qalloc(QFAST|QNONCACHE,sizeof(Matrix));
+  if (gsum_buf == NULL) 
+      gsum_buf = (Matrix *)qalloc(QFAST|QNONCACHE,sizeof(Matrix));
+
   // Sum along dir
   //--------------------------------------------------------------
-  gsum_buf = *matrix_p;
+  *gsum_buf = *matrix_p;
 
-  transmit_buf = gsum_buf;
+  *transmit_buf = *gsum_buf;
   int blocksize=sizeof(Matrix);
   int itmp;
   for (itmp = 1; itmp < NP[dir]; itmp++) {
-    SCUDirArg send(&transmit_buf, gjp_scu_dir[2*dir], SCU_SEND, blocksize);
-    SCUDirArg rcv(&receive_buf, gjp_scu_dir[2*dir+1], SCU_REC, blocksize);
+    SCUDirArg send(transmit_buf, gjp_scu_dir[2*dir], SCU_SEND, blocksize);
+    SCUDirArg rcv(receive_buf, gjp_scu_dir[2*dir+1], SCU_REC, blocksize);
 
-    SCUTrans(&send);
-    SCUTrans(&rcv);
+    send.StartTrans();
+    rcv.StartTrans();
 
-    SCUTransComplete();
+    send.TransComplete();
+    rcv.TransComplete();
 
-    gsum_buf += receive_buf;
-    transmit_buf = receive_buf;
+    *gsum_buf += *receive_buf;
+    *transmit_buf = *receive_buf;
   }
 
 
@@ -145,26 +104,26 @@ void glb_sum_matrix_dir(Matrix * matrix_p, int dir)
   //--------------------------------------------------------------
 
   if(COOR[dir] != 0) {
-    gsum_buf.ZeroMatrix();
+    gsum_buf->ZeroMatrix();
   }
     
-  transmit_buf = gsum_buf;
+  *transmit_buf = *gsum_buf;
   
   for (itmp = 1; itmp < NP[dir]; itmp++) {
-    SCUDirArg send(&transmit_buf, gjp_scu_dir[2*dir], SCU_SEND, blocksize);
-    SCUDirArg rcv(&receive_buf, gjp_scu_dir[2*dir+1], SCU_REC, blocksize);
+    SCUDirArg send(transmit_buf, gjp_scu_dir[2*dir], SCU_SEND, blocksize);
+    SCUDirArg rcv(receive_buf, gjp_scu_dir[2*dir+1], SCU_REC, blocksize);
     
-    SCUTrans(&send);
-    SCUTrans(&rcv);
+    send.StartTrans();
+    rcv.StartTrans();
+    send.TransComplete();
+    rcv.TransComplete();
     
-    SCUTransComplete();
-    
-    gsum_buf += receive_buf;
-    transmit_buf = receive_buf;
+    *gsum_buf += *receive_buf;
+    *transmit_buf = *receive_buf;
   }
 
 
-  *matrix_p = gsum_buf;
+  *matrix_p = *gsum_buf;
 }
 
 

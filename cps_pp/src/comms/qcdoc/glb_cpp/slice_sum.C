@@ -1,21 +1,31 @@
 #include<config.h>
+#include<qalloc.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 /*!\file
   \brief Definition of slice_sum routine
 
-  $Id: slice_sum.C,v 1.2 2004-01-13 20:39:06 chulwoo Exp $
+  $Id: slice_sum.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/slice_sum.C,v 1.2 2004-01-13 20:39:06 chulwoo Exp $
-//  $Id: slice_sum.C,v 1.2 2004-01-13 20:39:06 chulwoo Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/slice_sum.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
+//  $Id: slice_sum.C,v 1.3 2004-04-27 03:51:17 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.2.2  2004/03/24 21:41:10  cwj
+//  *** empty log message ***
+//
+//  Revision 1.2.2.1  2004/03/15 00:51:58  cwj
+//  Updated communication calls for QOS v2.1
+//
+//  Revision 1.2  2004/01/13 20:39:06  chulwoo
+//  Merging with multibuild
+//
 //  Revision 1.1.2.1.2.1  2003/11/06 20:22:20  cwj
 //  *** empty log message ***
 //
@@ -87,7 +97,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: slice_sum.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/slice_sum.C,v $
 //  $State: Exp $
 //
@@ -142,7 +152,7 @@ void slice_sum(Float * float_p, int blcklength, int dir)
   if (blcklength > MAX)
     ERR.General(cname, fname, "blcklength (%d) too big > MAX (%d) \n",blcklength, MAX);
 		    
-  IFloat *transmit_buf = (IFloat *)smalloc(blcklength*sizeof(IFloat));
+  IFloat *transmit_buf = (IFloat *)qalloc(QFAST|QNONCACHE,blcklength*sizeof(IFloat));
 
   // added by manke
   if(transmit_buf == 0)
@@ -150,7 +160,7 @@ void slice_sum(Float * float_p, int blcklength, int dir)
   VRB.Smalloc(cname,fname, "transmit_buf", transmit_buf, blcklength*sizeof(IFloat));
   // end added
 
-  IFloat *receive_buf  = (IFloat *)smalloc(blcklength*sizeof(IFloat));
+  IFloat *receive_buf  = (IFloat *)qalloc(QFAST|QNONCACHE,blcklength*sizeof(IFloat));
 
   // added by manke
   if(receive_buf == 0)
@@ -167,7 +177,7 @@ void slice_sum(Float * float_p, int blcklength, int dir)
 	// loop index where 0 <= count < blcklength 
   int itmp;		  
 	// loop index with 1<= itmp < NP[i] 
-  int i;
+  int i,j;
 
   for(i = 0; i < 4; ++i) {
 
@@ -176,10 +186,12 @@ void slice_sum(Float * float_p, int blcklength, int dir)
       //--------------------------------------------------------------
       // address of buffer of to be sent (data on this node) 
       //--------------------------------------------------------------
-      transmit_buf_p = (IFloat *)float_p; 
+//      transmit_buf_p = (IFloat *)float_p; 
+      transmit_buf_p = transmit_buf;
+      for(j = 0;j<blcklength;j++) transmit_buf_p[j] = float_p[j];
 
       SCUDirArg send(transmit_buf_p, pos_dir[i], SCU_SEND, blcklength*sizeof(IFloat));
-      SCUDirArg recv(receive_buf_p, neg_dir[i], SCU_REC, blcklength*sizeof(IFloat));
+      SCUDirArg rcv(receive_buf_p, neg_dir[i], SCU_REC, blcklength*sizeof(IFloat));
 
       //--------------------------------------------------------------
       // tranmit & receive NP[i] - 1 times in snd_dir[i] direction
@@ -189,9 +201,10 @@ void slice_sum(Float * float_p, int blcklength, int dir)
 	 //-----------------------------------------------------------
          // do SCU transfers
 	 //-----------------------------------------------------------
-         SCUTrans(&send);
-         SCUTrans(&recv);
-	 SCUTransComplete();
+    send.StartTrans();
+    rcv.StartTrans();
+    send.TransComplete();
+    rcv.TransComplete();
 
 	 //-----------------------------------------------------------
          // accumulate received data	
@@ -204,7 +217,7 @@ void slice_sum(Float * float_p, int blcklength, int dir)
 	 // the free buffer will be used to receive      
 	 //-----------------------------------------------------------
 	 send.Addr(transmit_buf_p = receive_buf_p);
-	 recv.Addr(receive_buf_p = free_buffer_p);
+	 rcv.Addr(receive_buf_p = free_buffer_p);
 
 	 //-----------------------------------------------------------
 	 // transmit_buf WILL be free buffer NEXT round of transmit
@@ -212,8 +225,8 @@ void slice_sum(Float * float_p, int blcklength, int dir)
 	 free_buffer_p = transmit_buf_p;
       }
   }
-  sfree(transmit_buf);
-  sfree(receive_buf);
+  qfree(transmit_buf);
+  qfree(receive_buf);
 }
 
 

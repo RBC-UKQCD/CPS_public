@@ -3,18 +3,21 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.3 2004-01-13 20:38:57 chulwoo Exp $
+  $Id: random.h,v 1.4 2004-04-27 03:51:17 cwj Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:38:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.3 2004-01-13 20:38:57 chulwoo Exp $
-//  $Id: random.h,v 1.3 2004-01-13 20:38:57 chulwoo Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.4 2004-04-27 03:51:17 cwj Exp $
+//  $Id: random.h,v 1.4 2004-04-27 03:51:17 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3  2004/01/13 20:38:57  chulwoo
+//  Merging with multibuild
+//
 //  Revision 1.2.10.1  2003/11/25 22:53:17  cwj
 //  *** empty log message ***
 //
@@ -61,7 +64,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: random.h,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -265,7 +268,7 @@ class LatRanGen
     static UGrandomGenerator *ugran;
   public:
     LatRanGen();
-    ~LatRanGen() {}
+    ~LatRanGen() {delete[] ugran;}
     void Initialize();  // Identical to the Constructor
 
     //! Get a uniform random number.

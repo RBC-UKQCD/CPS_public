@@ -1,4 +1,4 @@
-NORECURSE_DIR = qcdoc qcdsp noarch mpi CVS 
+NORECURSE_DIR = f_impr_dwf qcdoc qcdsp noarch mpi CVS 
 QCDOC_DIR = qcdoc
 QCDOC_SERIAL_DIR = qcdoc
 QCDSP_DIR = qcdsp

@@ -1,22 +1,21 @@
 #include<config.h>
-#include<stdio.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.4 2004-02-16 13:21:43 zs Exp $
+  $Id: f_wilson.C,v 1.5 2004-04-27 03:51:21 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-16 13:21:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v 1.4 2004-02-16 13:21:43 zs Exp $
-//  $Id: f_wilson.C,v 1.4 2004-02-16 13:21:43 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v 1.5 2004-04-27 03:51:21 cwj Exp $
+//  $Id: f_wilson.C,v 1.5 2004-04-27 03:51:21 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_wilson.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v $
 //  $State: Exp $
 //
@@ -41,6 +40,23 @@ CPS_END_NAMESPACE
 #include <comms/glb.h>
 CPS_START_NAMESPACE
 
+#define BENCHMARK
+#ifdef BENCHMARK
+#include <stdio.h>
+#include <sys/time.h>
+unsigned long WfmFlops;
+#ifndef timersub
+#define timersub(a, b, result)                                                \
+  do {                                                                        \
+    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
+    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
+    if ((result)->tv_usec < 0) {                                              \
+      --(result)->tv_sec;                                                     \
+      (result)->tv_usec += 1000000;                                           \
+    }                                                                         \
+  } while (0)
+#endif
+#endif
 
 //------------------------------------------------------------------
 // Initialize static variables.
@@ -71,10 +87,14 @@ Fwilson::Fwilson()
   // Do initializations before the wilson library can be used
   // Initialization involve memory allocation.
   //----------------------------------------------------------------
+
+  //  static Wilson wilson_struct;
+  //  f_dirac_op_init_ptr = &wilson_struct;
+  //  wilson_init((Wilson *) f_dirac_op_init_ptr);
+
   static Wilson wilson_struct;
   f_dirac_op_init_ptr = &wilson_struct;
-  printf("f_dirac_op_init_ptr=%p\n",f_dirac_op_init_ptr);
-  wilson_init((Wilson *) f_dirac_op_init_ptr);
+  wilson_init((Wilson*) f_dirac_op_init_ptr);
 }
 
 
@@ -146,9 +166,21 @@ int Fwilson::FmatEvlInv(Vector *f_out, Vector *f_in,
   VRB.Func(cname,fname);
 
   DiracOpWilson wilson(*this, f_out, f_in, cg_arg, cnv_frm);
+
+  WfmFlops = 0;
+  struct timeval t_start, t_stop;
+  gettimeofday(&t_start,NULL);
   
   iter = wilson.InvCg(true_res);
 
+  gettimeofday(&t_stop,NULL);
+  timersub(&t_stop,&t_start,&t_start);
+  double flops= (double)WfmFlops;
+  double secs = t_start.tv_sec + 1.E-6 *t_start.tv_usec;
+  printf("Wilson solve: %d iteratations %d flops %f Mflops per node\n",
+	 iter,WfmFlops,flops/(secs*1000000) );
+
+  
   // Return the number of iterations
   return iter;
 }
@@ -544,12 +576,5 @@ Float Fwilson::BhamiltonNode(Vector *boson, Float mass){
 
   return ret_val;
 }
-
-
-
-
-
-
-
 
 CPS_END_NAMESPACE

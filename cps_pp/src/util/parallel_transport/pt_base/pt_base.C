@@ -1,20 +1,30 @@
 #include <config.h>
+#include <stdio.h>
 CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of ParallelTransport class methods.
   
-  $Id: pt_base.C,v 1.2 2004-01-13 20:39:53 chulwoo Exp $
+  $Id: pt_base.C,v 1.3 2004-04-27 03:51:21 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v 1.2 2004-01-13 20:39:53 chulwoo Exp $
-//  $Id: pt_base.C,v 1.2 2004-01-13 20:39:53 chulwoo Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v 1.3 2004-04-27 03:51:21 cwj Exp $
+//  $Id: pt_base.C,v 1.3 2004-04-27 03:51:21 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.2.2  2004/04/26 02:14:12  cwj
+//  *** empty log message ***
+//
+//  Revision 1.2.2.1  2004/04/01 05:20:25  cwj
+//  *** empty log message ***
+//
+//  Revision 1.2  2004/01/13 20:39:53  chulwoo
+//  Merging with multibuild
+//
 //  Revision 1.1.2.1  2003/11/06 21:04:06  cwj
 //  *** empty log message ***
 //
@@ -72,7 +82,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: pt_base.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v $
 //  $State: Exp $
 //
@@ -83,6 +93,7 @@ CPS_END_NAMESPACE
 #include <util/pt.h>
 #include <util/lattice.h>
 #include <util/verbose.h>
+#include <util/dirac_op.h>
 #include <util/error.h>
 #include <util/gjp.h>
 #include <comms/glb.h>
@@ -188,8 +199,9 @@ ParTrans::ParTrans(Lattice & latt) :           // Lattice object
 
 
   //----------------------------------------------------------------
-  // turn on the boundary condition
+  // turn on the boundary condition, if not inside a dirac operator
   //----------------------------------------------------------------
+  if(DiracOp::scope_lock ==0)
   BondCond(latt, gauge_field);
 
   //???
@@ -219,6 +231,7 @@ ParTrans::~ParTrans() {
   //----------------------------------------------------------------
   // turn off the boundary condition
   //----------------------------------------------------------------
+  if(DiracOp::scope_lock ==0)
   BondCond(lat, gauge_field);
 
   VRB.Clock(cname,fname,"Exiting\n");

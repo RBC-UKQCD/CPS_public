@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.5 2003-10-30 18:04:00 zs Exp $
+  $Id: alg_hmd.h,v 1.6 2004-04-27 03:51:16 cwj Exp $
 */
 //------------------------------------------------------------------
 
@@ -182,7 +182,7 @@ class AlgHmcPhi : public AlgHmd
 
   virtual ~AlgHmcPhi();
 
-  void run(void);
+  Float run(void);
 };
 
 //------------------------------------------------------------------
@@ -225,15 +225,8 @@ class AlgHmcRHMC : public AlgHmd
     Matrix* gauge_field_init;
         // Initial gauge field needed if the evolved one is rejected
 
-    Vector** frm1;
-    Vector** frm2;
-        // 2 general purpose fermion/boson field arrays (checkerboarded).
-    Vector*** frm3;
-
-
-    Vector** cg_sol_cur; 
-    Vector** cg_sol_prev;
-        // Temporary pointers to the current and previous CG solution.
+    Vector*** frmn;
+        // Solution vectors
 
     Float *h_f_init;    
         // Initial fermion Hamiltonian (one for each mass)
@@ -253,17 +246,24 @@ class AlgHmcRHMC : public AlgHmd
     Float *delta_h_b;   
         // Final-Init boson Hamiltonian (one for each mass)
 
+    // The force approximations
     int *FRatDeg;
     Float *FRatNorm;
-    Float **FRatConst;
+    Float **FRatRes;
     Float **FRatPole;
 
-    int *HBRatDeg;
-    Float *HBRatNorm;
-    Float **HBRatConst;
-    Float **HBRatPole;
+    // The action approximations
+    int *SRatDeg;
+    Float *SRatNorm;
+    Float **SRatRes;
+    Float **SRatPole;
+    Float *SIRatNorm;
+    Float **SIRatRes;
+    Float **SIRatPole;
 
     int isz; // smallest polar shift of rational approximation
+
+    int sw; // sexton-weingarten factor
 
  public:
 
@@ -271,7 +271,7 @@ class AlgHmcRHMC : public AlgHmd
 
   virtual ~AlgHmcRHMC();
 
-  void run(void);
+  Float run(void);
 };
 
 //------------------------------------------------------------------
@@ -345,7 +345,7 @@ class AlgHmdR : public AlgHmd
   virtual ~AlgHmdR();
 
   //! Performs a single HMD trajectory.
-  void run(void);
+  Float run(void);
 };
 
 

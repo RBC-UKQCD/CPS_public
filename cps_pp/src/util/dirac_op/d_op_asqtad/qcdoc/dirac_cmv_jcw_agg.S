@@ -23,55 +23,57 @@ dirac_cmv_jcw_agg:
 	stw	%r30,	496(%r1)
 	stw	%r31,	504(%r1)
 	li   16,	0
+	stfd	14,	112(%r1)
 	li   17,	32
+	stfd	15,	120(%r1)
 	li   18,	64
+	stfd	16,	128(%r1)
 	li   19,	96
+	stfd	17,	136(%r1)
 	li   20,	128
 	li   21,	160
+	stfd	18,	144(%r1)
 	li   22,	192
 	li   23,	224
+	stfd	19,	152(%r1)
 	li   24,	256
 	li   25,	288
-	li   26,	320
-	stfd	14,	112(%r1)
-	stfd	15,	120(%r1)
-	stfd	16,	128(%r1)
-	stfd	17,	136(%r1)
-	stfd	18,	144(%r1)
-	stfd	19,	152(%r1)
 	stfd	20,	160(%r1)
+	li   26,	320
+	li   27,	16
 	stfd	21,	168(%r1)
+	li   28,	48
 	stfd	22,	176(%r1)
 	stfd	23,	184(%r1)
+	lwz	%r12, 0(%r5)
 	stfd	24,	192(%r1)
+	lwz	%r14, 4(%r5)
 	stfd	25,	200(%r1)
+	lwz	%r11, 152(%r5)
 	stfd	26,	208(%r1)
 	stfd	27,	216(%r1)
+	lwz	%r13, 156(%r5)
 	stfd	28,	224(%r1)
 	stfd	29,	232(%r1)
 	stfd	30,	240(%r1)
 	stfd	31,	248(%r1)
-	lwz	%r12, 0(%r5)
-	lwz	%r14, 4(%r5)
-	lwz	%r11, 152(%r5)
-	lwz	%r13, 156(%r5)
 	addi	%r3,	%r3,	1
 	srawi.	3,	3,	1
 	bf gt,	lab0
 	lfd	   12,	8(%r5)
 	lfd	   13,	16(%r5)
+	lfd	   14,	24(%r5)
+	lfd	   15,	32(%r5)
 	lfd	   18,	56(%r5)
 	lfd	   19,	64(%r5)
-	lfd	   24,	104(%r5)
-	lfd	   25,	112(%r5)
 	lwz	%r30, 304(%r5)
 	lwz	%r9, 308(%r5)
 	lwz	%r31, 456(%r5)
 	lwz	%r10, 460(%r5)
-	lfd	   14,	24(%r5)
-	lfd	   15,	32(%r5)
 	lfd	   20,	72(%r5)
 	lfd	   21,	80(%r5)
+	lfd	   24,	104(%r5)
+	lfd	   25,	112(%r5)
 	lfd	   26,	120(%r5)
 	lfd	   27,	128(%r5)
 	add	%r12, %r12, %r6
@@ -180,6 +182,8 @@ lab1:
 	stfd	   10,	32(%r14)
 	lfd	   15,	184(%r5)
 	stfd	   11,	40(%r14)
+	stfd	   30,	48(%r14)
+	stfd	   30,	56(%r14)
 	fmul	 6, 12,  0
 	dcbt	 %r21,	 %r29
 	fmul	 7, 12,  1
@@ -217,11 +221,11 @@ lab1:
 	fmadd	 8, 20,  2,  8
 	lfd	   16,	192(%r5)
 	fmadd	 9, 20,  3,  9
-	dcbt	 %r16,	 %r31
+	dcbt	 %r27,	 %r31
 	fmadd	10, 26,  2, 10
 	lfd	   17,	200(%r5)
 	fmadd	11, 26,  3, 11
-	dcbt	 %r17,	 %r31
+
 	fnmsub	 6, 15,  3,  6
 	lfd	   22,	240(%r5)
 	fmadd	 7, 15,  2,  7
@@ -268,7 +272,7 @@ lab1:
 	lfd	   2,	16 ( % r12)
 
 	stfd	   8,	16(%r13)
-
+	addi %r29, %r29, 304
 	lfd	   3,	24 ( % r12)
 
 	stfd	   9,	24(%r13)
@@ -278,9 +282,11 @@ lab1:
 	stfd	   10,	32(%r13)
 
 	lfd	   15,	336(%r5)
-	addi %r29, %r29, 304
+
 	stfd	   11,	40(%r13)
 	addi %r5, %r5, 304
+	stfd	   30,	48(%r13)
+	stfd	   30,	56(%r13)
 	bf gt,	lab2
 	b  lab1
 lab2:
@@ -378,6 +384,8 @@ lab2:
 	stfd	   10,	32(%r14)
 	lfd	   15,	184(%r5)
 	stfd	   11,	40(%r14)
+	stfd	   30,	48(%r14)
+	stfd	   30,	56(%r14)
 	fmul	 6, 12,  0
 
 	fmul	 7, 12,  1
@@ -466,7 +474,7 @@ lab2:
 
 
 
-
+	addi %r29, %r29, 304
 
 
 	stfd	   6,	0(%r13)
@@ -476,10 +484,12 @@ lab2:
 	stfd	   8,	16(%r13)
 
 	stfd	   9,	24(%r13)
-	addi %r29, %r29, 304
+
 	stfd	   10,	32(%r13)
 	addi %r5, %r5, 304
 	stfd	   11,	40(%r13)
+	stfd	   30,	48(%r13)
+	stfd	   30,	56(%r13)
 lab0:
 	lwz	%r14,	368(%r1)
 	lwz	%r15,	376(%r1)

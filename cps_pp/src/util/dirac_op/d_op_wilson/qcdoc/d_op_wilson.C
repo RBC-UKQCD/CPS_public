@@ -1,26 +1,33 @@
-#include <config.h>
-#include <stdio.h>
-CPS_START_NAMESPACE
 //------------------------------------------------------------------
 //
 // d_op_wilson.C
 //
-// DiracOpWilson is derived from the DiracOp base class. 
+// DiracOpWilsonQCDOCa is derived from the DiracOp base class. 
 // DiracOpWilson is the front end for a library that contains
 // all Dirac operators associated with Wilson fermions.
 //
+// PAB. Call the BAGEL wfm_* routines for QCDOC. 
+//
+// The Wilson struct is different on qcdoc, and I hide it
+// in a Wilson arg and wfm class. This is wrapped in "C" linkage wrappers
+// with a static instance of wfm used. The scope lock in the CPS dirac
+// operators leaves this static instance safe to use. Two static instances
+// will be used for the DWF case.
+//
+// Since (annoyingly) the wilson_init(struct Wilson *) is exposed all the way up to the
+// f_wilson class, I create a "C" linkage wilson_init(struct Wilson *) wrapper in here that calls my
+// wfm_init(struct WilsonArg). May wish to think about what to do for DWF here.
+//
 //------------------------------------------------------------------
 
-CPS_END_NAMESPACE
-#include<util/dirac_op.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<util/wilson.h>
-#include<mem/p2v.h>
-#include<comms/glb.h>
-CPS_START_NAMESPACE
+#include <util/dirac_op.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <util/wilson.h>
+#include <util/wfm.h>
+#include <comms/glb.h>
 
 
 //------------------------------------------------------------------
@@ -61,12 +68,6 @@ DiracOpWilson::DiracOpWilson(Lattice & latt,
   // constructor.
   //----------------------------------------------------------------
   wilson_lib_arg = lat.FdiracOpInitPtr();
-
-
-  //----------------------------------------------------------------
-  // Copy optimized code into its execution place (CRAM)
-  //----------------------------------------------------------------
-  p2vWilsonLib();
 
 }
 
@@ -111,15 +112,13 @@ DiracOpWilson::~DiracOpWilson() {
 //------------------------------------------------------------------
 void DiracOpWilson::MatPcDagMatPc(Vector *out, 
 					 Vector *in, 
-					 Float *dot_prd){
-
-  printf("DiracOpWilson::MatPcDagMatPc()\n");
-  wilson_mdagm((Float *)out, 
-	       (Float *)gauge_field, 
-	       (Float *)in, 
-	       (Float *)dot_prd,
-	       Float(kappa),
-	       (Wilson *)wilson_lib_arg);
+					 Float *dot_prd)
+{
+  wfm_mdagm((Float *)out,
+	    (Float *)gauge_field,
+	    (Float *)in,
+	    (Float *)dot_prd,
+	    (Float)kappa);
 }
 
 
@@ -132,18 +131,17 @@ void DiracOpWilson::MatPcDagMatPc(Vector *out,
 // cb = 0/1 <--> even/odd checkerboard of in field.
 // dag = 0/1 <--> Dslash/Dslash^dagger is calculated.
 //------------------------------------------------------------------
-#include <iostream.h>
 void DiracOpWilson::Dslash(Vector *out, 
 			   Vector *in, 
 			   ChkbType cb, 
-			   DagType dag) {
+			   DagType dag) 
+{
 
-  wilson_dslash((Float *)out, 
-		(Float *)gauge_field, 
-		(Float *)in, 
-		int(cb),
-		int(dag),
-		(Wilson *)wilson_lib_arg);
+    wfm_dslash((Float *)out,
+	       (Float *)gauge_field,
+	       (Float *)in,
+	       int(cb),
+	       int(dag));
 
 }
 
@@ -153,12 +151,12 @@ void DiracOpWilson::Dslash(Vector *out,
 // MatPc connects only odd-->odd sites.
 // The in, out fields are defined on the odd checkerboard.
 //------------------------------------------------------------------
-void DiracOpWilson::MatPc(Vector *out, Vector *in) {  
-  wilson_m((Float *)out, 
-	   (Float *)gauge_field, 
-	   (Float *)in, 
-	   Float(kappa),
-	   (Wilson *)wilson_lib_arg);
+void DiracOpWilson::MatPc(Vector *out, Vector *in) 
+{  
+    wfm_m((Float *)out,
+	  (Float *)gauge_field,
+	  (Float *)in,
+	  (Float)kappa);
 }
 
 //------------------------------------------------------------------
@@ -167,12 +165,12 @@ void DiracOpWilson::MatPc(Vector *out, Vector *in) {
 // MatPcDag connects only odd-->odd sites.
 // The in, out fields are defined on the odd checkerboard.
 //------------------------------------------------------------------
-void DiracOpWilson::MatPcDag(Vector *out, Vector *in) {
-  wilson_mdag((Float *)out, 
-	      (Float *)gauge_field, 
-	      (Float *)in, 
-	      Float(kappa),
-	      (Wilson *)wilson_lib_arg);
+void DiracOpWilson::MatPcDag(Vector *out, Vector *in) 
+{
+    wfm_mdag((Float *)out,
+	     (Float *)gauge_field,
+	     (Float *)in,
+             (Float)kappa);
 }
 
 //------------------------------------------------------------------
@@ -222,7 +220,6 @@ int DiracOpWilson::MatInv(Vector *out,
   // points to the even part of fermion solution
   Vector *even_out = (Vector *) ( (Float *) out + temp_size );
 
-  Float * in_f = (Float *)even_in;
   Dslash(temp, even_in, CHKB_EVEN, DAG_NO);
 
   fTimesV1PlusV2((Float *)temp, (Float) kappa, (Float *)temp,
@@ -230,11 +227,23 @@ int DiracOpWilson::MatInv(Vector *out,
 
   // save source
   if(prs_in == PRESERVE_YES){
-    moveMem((Float *)temp2, (Float *)in, temp_size*sizeof(Float));
+    moveMem((Float *)temp2, (Float *)in, temp_size);
   }
 
   MatPcDag(in, temp);
-  in_f = (Float *)in;
+
+#if 0
+{
+  IFloat *temp_p = (IFloat *)in;
+  for(int ii = 0; ii< GJP.VolNodeSites()/2;ii++){
+    printf("i=%d\n",ii);
+    for(int jj = 0; jj< lat.FsiteSize();jj++)
+      printf("%e ",*(temp_p++));
+    printf("\n");
+  }
+  exit(44);
+}
+#endif
 
   int iter = InvCg(out,in,true_res);
 
@@ -265,7 +274,9 @@ int DiracOpWilson::MatInv(Vector *out,
 // but true_res=0.
 //------------------------------------------------------------------
 int DiracOpWilson::MatInv(Vector *out, Vector *in, PreserveType prs_in)
-{ return MatInv(out, in, 0, prs_in); }
+{
+  return MatInv(out, in, 0, prs_in); 
+}
 
 
 //------------------------------------------------------------------
@@ -273,7 +284,9 @@ int DiracOpWilson::MatInv(Vector *out, Vector *in, PreserveType prs_in)
 // but in = f_in and out = f_out.
 //------------------------------------------------------------------
 int DiracOpWilson::MatInv(Float *true_res, PreserveType prs_in)
-{ return MatInv(f_out, f_in, true_res, prs_in); }
+{
+  return MatInv(f_out, f_in, true_res, prs_in); 
+}
 
 
 //------------------------------------------------------------------
@@ -281,7 +294,9 @@ int DiracOpWilson::MatInv(Float *true_res, PreserveType prs_in)
 // but in = f_in, out = f_out, true_res=0.
 //------------------------------------------------------------------
 int DiracOpWilson::MatInv(PreserveType prs_in)
-{ return MatInv(f_out, f_in, 0, prs_in); }
+{
+  return MatInv(f_out, f_in, 0, prs_in); 
+}
 
 
 //------------------------------------------------------------------
@@ -290,7 +305,8 @@ int DiracOpWilson::MatInv(PreserveType prs_in)
 // Mat works on the full lattice.
 // The in, out fields are defined on the full lattice.
 //------------------------------------------------------------------
-void DiracOpWilson::Mat(Vector *out, Vector *in) {  
+void DiracOpWilson::Mat(Vector *out, Vector *in) 
+{  
   char *fname = "Mat(V*,V*)";
   VRB.Func(cname,fname);
 
@@ -318,7 +334,8 @@ void DiracOpWilson::Mat(Vector *out, Vector *in) {
 // MatDag works on the full lattice.
 // The in, out fields are defined on the full lattice.
 //------------------------------------------------------------------
-void DiracOpWilson::MatDag(Vector *out, Vector *in) {
+void DiracOpWilson::MatDag(Vector *out, Vector *in) 
+{
   char *fname = "MatDag(V*,V*)";
   VRB.Func(cname,fname);
 
@@ -346,7 +363,8 @@ void DiracOpWilson::MatDag(Vector *out, Vector *in) {
 // MatHerm works on the full lattice.
 // The in, out fields are defined on the full lattice.
 //------------------------------------------------------------------
-void DiracOpWilson::MatHerm(Vector *out, Vector *in) {
+void DiracOpWilson::MatHerm(Vector *out, Vector *in) 
+{
   char *fname = "MatHerm(V*,V*)";
   VRB.Func(cname,fname);
 
@@ -410,4 +428,3 @@ void DiracOpWilson::CalcHmdForceVecs(Vector *chi)
 
   return ;
 }
-CPS_END_NAMESPACE

@@ -3,18 +3,27 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStag class methods.
 
-  $Id: d_op_stag.C,v 1.4 2004-01-13 20:39:36 chulwoo Exp $
+  $Id: d_op_stag.C,v 1.5 2004-04-27 03:51:18 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.4 2004-01-13 20:39:36 chulwoo Exp $
-//  $Id: d_op_stag.C,v 1.4 2004-01-13 20:39:36 chulwoo Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.5 2004-04-27 03:51:18 cwj Exp $
+//  $Id: d_op_stag.C,v 1.5 2004-04-27 03:51:18 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.4.2.2  2004/03/29 19:28:20  mike
+//  Fixed stupid bug of my own doing.
+//
+//  Revision 1.4.2.1  2004/03/19 21:51:36  mike
+//  Added NEG_MATPCDAG_MATPC type.
+//
+//  Revision 1.4  2004/01/13 20:39:36  chulwoo
+//  Merging with multibuild
+//
 //  Revision 1.3.2.1.2.1  2003/11/06 20:22:21  cwj
 //  *** empty log message ***
 //
@@ -63,7 +72,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: d_op_stag.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v $
 //  $State: Exp $
 //
@@ -398,19 +407,6 @@ void DiracOpStag::RitzMat(Vector *out, Vector *in) {
   VRB.Func(cname,fname);
   Float *dot=0;
 
-  /*
-    Vector *tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
-    if(tmp == 0)
-    ERR.Pointer(cname,fname, "tmp");
-    VRB.Smalloc(cname,fname, "tmp", tmp, f_size_cb * sizeof(Float));
-    
-    Dslash(tmp, in, CHKB_EVEN, DAG_NO);
-    Dslash(out, tmp, CHKB_ODD, DAG_YES);
-    
-    out->VecTimesEquFloat(0.25, f_size_cb);
-    
-    sfree(tmp);
-  */
   Float mass = dirac_arg->mass;
   Float c = 1.0/(64.0 + 4.0*mass*mass);
 
@@ -422,6 +418,11 @@ void DiracOpStag::RitzMat(Vector *out, Vector *in) {
 
     case MATPCDAG_MATPC:
       MatPcDagMatPc(out, in, dot);
+      break;
+      
+    case NEG_MATPCDAG_MATPC:
+      MatPcDagMatPc(out, in, dot);
+      out->VecNegative(out, RitzLatSize());
       break;
       
     case NEG_MATDAG_MAT:

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.5 2004-02-16 13:21:43 zs Exp $
+  $Id: lattice_base.C,v 1.6 2004-04-27 03:51:21 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-16 13:21:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.5 2004-02-16 13:21:43 zs Exp $
-//  $Id: lattice_base.C,v 1.5 2004-02-16 13:21:43 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.6 2004-04-27 03:51:21 cwj Exp $
+//  $Id: lattice_base.C,v 1.6 2004-04-27 03:51:21 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -298,6 +298,10 @@ Lattice::~Lattice()
   // No data manipulations if the scaling factor is 1.0
   // [built into lat.MltFloat].
   MltFloat(1.0 / GJP.XiBare(), GJP.XiDir());
+
+  // freeing up allocated arraies - CJ
+  pfree(gauge_field);
+  pfree(g_upd_cnt);
 }
 
 
@@ -1875,12 +1879,13 @@ void Lattice::Reunitarize(Float &dev, Float &max_diff)
 // 0 reject, 1 accept. If delta_h < 0 it accepts unconditionally.
 /*!
   \param delta_h The energy difference.
+  \param accept The acceptance probability
   \return True (1) if accepted, false (0) otherwise.
 
   If \a delta_h is greater than or equal to 20 the routine always rejects.
  */
 //------------------------------------------------------------------
-int Lattice::MetropolisAccept(Float delta_h) 
+int Lattice::MetropolisAccept(Float delta_h, Float *accept) 
 {
   char *fname = "MetropolisAccept(F)";
   VRB.Func(cname,fname);
@@ -1902,6 +1907,7 @@ int Lattice::MetropolisAccept(Float delta_h)
   if (node_id == 0) {
     if(delta_h <= 0.0) {
       flag = 1.0;
+      *accept = 1.0;
     } else if(delta_h < 20.0) {
       LRG.AssignGenerator(0, 0, 0, 0);
       LRG.SetInterval(1, 0);
@@ -1913,6 +1919,7 @@ int Lattice::MetropolisAccept(Float delta_h)
 #else
       exp_mdh = exp(-delta_h);
 #endif
+      *accept = (Float)exp_mdh;
       rand_num = LRG.Urand();
       if( rand_num <= exp_mdh ) flag = 1.0;
     }
@@ -1936,6 +1943,25 @@ int Lattice::MetropolisAccept(Float delta_h)
   }
 
 }
+
+
+//------------------------------------------------------------------
+// int MetropolisAccept(Float delta_h, Float *accept):
+// 0 reject, 1 accept. If delta_h < 0 it accepts unconditionally.
+/*!
+  \param delta_h The energy difference.
+  \return True (1) if accepted, false (0) otherwise.
+
+  If \a delta_h is greater than or equal to 20 the routine always rejects.
+  (Included for backwards compatability)
+ */
+//------------------------------------------------------------------
+int Lattice::MetropolisAccept(Float delta_h)
+{
+  Float accept;
+  return MetropolisAccept(delta_h, &accept);
+}
+
 
 
 //------------------------------------------------------------------

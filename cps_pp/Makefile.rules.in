@@ -3,9 +3,11 @@ BUILDDIR = @abs_builddir@
 QOS = @QOS@
 
 PWD := $(shell pwd)
-DIR := $(subst $(BUILDDIR)/objs,src,$(PWD))
-
-VPATH := ${SRCDIR}/$(DIR) 
+DIR := $(subst $(BUILDDIR),,$(PWD))
+DIR := $(subst $(SRCDIR),,$(DIR))/
+DIRB:= $(subst /src,/objs/,$(DIR))
+DIR:= $(subst /objs/,/src/,$(DIRB))
+VPATH:=${SRCDIR}/$(DIR) ${BUILDDIR}/$(DIRB)
 
 CC = @CC@
 CXX = @CXX@
@@ -66,10 +68,12 @@ all: cps
 recurse: $(RECURSEDIRS)
 
 $(RECURSEDIRS):
-	@echo PWD = $(PWD)
-	mkdir -p $@
-	touch -a $@/Makefile_depend
-	cp -p $(SRCDIR)/$(DIR)/$@/Makefile $@
+	@echo PWD = $(BUILDDIR)/$(DIRB)
+	@echo DIR = $(DIR)
+	@echo DIRB = $(DIRB)
+	mkdir -p $(BUILDDIR)/$(DIRB)/$@
+	touch -a $(BUILDDIR)/$(DIRB)/$@/Makefile_depend
+	cp -p $(SRCDIR)/$(DIR)/$@/Makefile $(BUILDDIR)/$(DIRB)/$@
 ifeq	($(LIB_NAME_SET),yes)
 	$(MAKE) -C $@ LIBNAME=$(LIBNAME) $(MAKECMDGOALS)
 else
@@ -96,17 +100,17 @@ OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
 OBJS := $(notdir $(OBJS_SRC))
 
 %.o:%.c
-	${CC} -c $< -o $@ ${libcps_CXXFLAGS}
-	${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+	${CC} -c $< -o $(BUILDDIR)/$(DIRB)/$@ ${libcps_CXXFLAGS}
+	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.C
-	${CXX} -c $< -o $@ ${libcps_CXXFLAGS}
-	${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+	${CXX} -c $< -o $(BUILDDIR)/$(DIRB)/$@ ${libcps_CXXFLAGS}
+	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.S
-	$(CC) -E $(libcps_CXXFLAGS) $< > $$*.i
-	$(AS) $(ASFLAGS) -o $@ $$*.i
-	${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+	$(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR)/$(DIRB)/$*.i
+	$(AS) $(ASFLAGS) -o $(BUILDDIR)/$(DIRB)/$@ $(BUILDDIR)/$(DIRB)/$*.i
+	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 ifeq "${ARCH}" "cpsMPI"
 
@@ -125,7 +129,7 @@ depend: recurse
 endif
 
 clean: recurse
-	rm -f *.o *.i *.bak
+	cd $(BUILDDIR)/$(DIRB) ; rm -f *.o *.i *.bak
 
 cleanlib:
 	rm -f $(BUILDDIR)/*.a
@@ -133,8 +137,8 @@ cleanlib:
 cps: recurse $(OBJS) 
 
 
-Makefile_depend: depend
+$(BUILDDIR)/$(DIRB)/Makefile_depend: depend
 
 ifneq ($(MAKECMDGOALS), clean)
-include Makefile_depend
+include $(BUILDDIR)/$(DIRB)/Makefile_depend
 endif

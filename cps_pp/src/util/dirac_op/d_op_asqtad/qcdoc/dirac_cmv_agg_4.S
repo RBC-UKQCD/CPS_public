@@ -100,8 +100,8 @@ dirac_cmv_agg_4:
 	addi %r29, %r29, 352
 	subic.	 3,	3,	1
 	bf gt,	lab2
-	b  lab1
-lab1:
+	b  dirac_cmv_agg_4_lab1
+dirac_cmv_agg_4_lab1:
 	fmul	 6, 12,  0
 	dcbt	 %r16,	 %r29
 	fmul	 7, 12,  1
@@ -471,7 +471,7 @@ lab1:
 	stfd	   30,	56(%r13)
 	addi %r5, %r5, 304
 	bf gt,	lab2
-	b  lab1
+	b  dirac_cmv_agg_4_lab1
 lab2:
 	fmul	 6, 12,  0
 

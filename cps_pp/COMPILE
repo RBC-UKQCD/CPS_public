@@ -3,6 +3,9 @@ GNU package-type make is tried. Namely, you should:
 mkdir <builddir>
 cd <builddir>
 
+WARNING: Do NOT place builddir under srcdir or the other way around. It
+breaks the makefile
+
 <srcdir>/configure for NOARCH (single node C++ codes)
 
 or
@@ -11,6 +14,7 @@ or
 --enable-target=qcdoc QOS=(QOS directory)  for QCDOC on qcdochost0
 
 Variable QOS should be set to point where QOS is installed.
+
 
 If you don't want to figure out what the build and host should be, you
 can use 'conf' script which generates command for configure:
@@ -45,9 +49,7 @@ SEPARATE_LIB flag determines if each directories under which the flag is
 defined will have separate
 libraries. The names for the libraries will be the name of the
 directories with '_' replacing '/'. Some common directory names wil be
-switched offseparate libraries. The names for the libraries will be
-the name of the directories with '_' replacing '/'. Some common
-directory names wil be switched off. 
+ommited for brevity. 
 
 LIB_NAME_SET  will do similar except it will have only one separate
 libraries with the name set by the directory LIB_NAME is defined.

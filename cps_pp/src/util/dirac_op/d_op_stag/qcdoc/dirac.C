@@ -19,7 +19,7 @@
 #include <time.h>
 #include <math.h>
 #include <comms/sysfunc.h>
-#include <qcdoc_align.h>
+#include <qalloc.h>
 
 #undef CPP
 
@@ -85,7 +85,7 @@ static IFloat * uc_nl[2];
 //------------------------------------------------------------------
 static IFloat *tmpfrm;
 const int MAX_TBUF_LEN = 1024;
-#if 0
+#if 1
 static IFloat *Tbuffer[2];
 #else
 static IFloat Tbuffer[2][MAX_TBUF_LEN] PEC_ALIGN LOCATE("Edramnoncache");
@@ -104,7 +104,7 @@ static int countM[2];
 //  pointers to storage area for color vectors from tp, xp, yp, zp, tm,
 //  xm, ym, zm (p = plus, m = minus).  Indexed as 0-7
 //---------------------------------------------------------------------
-#if 0
+#if 1
 static IFloat * chi_off_node[8];
 #else
 static IFloat  chi_off_node[8][MAX_TBUF_LEN] PEC_ALIGN LOCATE("Edramnoncache");
@@ -275,8 +275,8 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   //-----------------------------------------------------------------
   
   for ( i = 0; i < NUM_DIR; i++ ){
-#if 0
-    chi_off_node[i] = ( IFloat * ) smalloc(
+#if 1
+    chi_off_node[i] = ( IFloat * ) qalloc(QFAST,
       VECT_LEN * vol * sizeof( IFloat ) / ( 2 * size[ i % 4 ] ) );    
     if(chi_off_node[i] == 0)
       ERR.Pointer(cname,fname, "chi_off_node[i]");
@@ -472,8 +472,8 @@ extern "C" void stag_dirac_init(const void * gauge_u )
 
 
   for ( i = 0; i < 2; i++ ) {
-#if 0
-    Tbuffer[i] = (IFloat *) smalloc ( size[1] * size[2] * size[3] *
+#if 1
+    Tbuffer[i] = (IFloat *) qalloc (QFAST|QNONCACHE, size[1] * size[2] * size[3] *
 			    VECT_LEN * sizeof( IFloat ) / 2);
 #else
     if( size[1]*size[2]*size[3]*VECT_LEN/2 >MAX_TBUF_LEN ){
@@ -981,6 +981,7 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   SCUarg[3]->Addr( a + Xoffset[3]);
   SCUarg[7]->Addr( a + Xoffset[7]);
   
+  sys_cacheflush(0);
   SCUmulti->StartTrans();
   save_reg((long)intreg, (long)dreg);
   //-----------------------------------------------------------------
@@ -1008,7 +1009,7 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   //do the computations involving non-local spinors
   //-----------------------------------------------------------------
 
-#if 0
+#if 1
   dirac_cmv( non_local_chi/2, (long)chi_nl[odd], (long)uc_nl[odd], 
 		(long)c, (long)tmpfrm);
 #else

@@ -80,20 +80,13 @@ void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u, long a,
   const int SITE_LEN = 72;
   const int MATRIX_SIZE = 18;
   int *ch;
-
+  printf("dirac_cmv_jcw_agg_cpp:\n");
   for (s = 0; s< sites; s++)
     {
       fp1 = (IFloat *)(tmpfrm + agg[s].dest );
       fp0 = (IFloat *)((int)a + agg[s].src);
-      printf("src=%p(%d) dest=%p(%d) ",fp0,agg[s].src,fp1,agg[s].dest);
-      fflush(stdout);
       uu = &(agg[s].mat[0]);
-#if 0
-      for(i=0;i<18;i++){
-      printf("%d %0.4e,",i,uu[i]);
-      if(i % 6 == 5 ) printf("\n");
-      }
-#endif
+
       for (c=0; c<3; c++){
 	//Re part
 	*(fp1+2*c) = *fp0 * *(uu+6*c) - *(fp0+1) * *(uu+6*c+1) + 
@@ -103,9 +96,30 @@ void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u, long a,
 	*(fp1+2*c+1) = *fp0 * *(uu+6*c+1) + *(fp0+1) * *(uu+6*c) + 
 	  *(fp0+2) * *(uu+6*c+3) + *(fp0+3)* *(uu+6*c+2) + 
 	  *(fp0+4) * *(uu+6*c+5) + *(fp0+5) * *(uu+6*c+4);
-      printf("%e %e ",*(fp1+2*c),*(fp1+2*c+1));
       }
+
+   if(fp0[0]*fp0[0]>1e-5){
+      printf("src=%p(%d) dest=%p(%d) ",fp0,agg[s].src,fp1,agg[s].dest);
+      fflush(stdout);
+#if 1
+      printf("src=");
+      for(i=0;i<6;i++){
+      printf("%d %0.4e,",i,fp0[i]);
+      if(i % 6 == 5 ) printf("\n");
+      }
+#endif
+#if 1
+      printf("uu=");
+      for(i=0;i<18;i++){
+      printf("%d %0.4e,",i,uu[i]);
+      if(i % 6 == 5 ) printf("\n");
+      }
+#endif
+      printf("dest=");
+      for (c=0; c<3; c++)
+      printf("%e %e ",*(fp1+2*c),*(fp1+2*c+1));
       printf("\n");
+  }
     }
 }
 

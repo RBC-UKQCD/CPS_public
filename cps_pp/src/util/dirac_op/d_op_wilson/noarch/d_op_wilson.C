@@ -1,20 +1,31 @@
 #include <config.h>
+#include <stdlib.h>
+#include <stdio.h>
 CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpWilson class methods.
 
-  $Id: d_op_wilson.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: d_op_wilson.C,v 1.3 2004-04-27 03:51:19 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: d_op_wilson.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v 1.3 2004-04-27 03:51:19 cwj Exp $
+//  $Id: d_op_wilson.C,v 1.3 2004-04-27 03:51:19 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.16.1  2004/04/24 04:38:07  cwj
+//  *** empty log message ***
+//
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.7  2002/03/11 22:27:07  anj
 //  This should now be the correct, fully merged code from our two versions. Anj
 //
@@ -46,7 +57,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: d_op_wilson.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v $
 //  $State: Exp $
 //
@@ -292,6 +303,19 @@ int DiracOpWilson::MatInv(Vector *out,
   }
 
   MatPcDag(in, temp);
+
+#if 0
+{
+  IFloat *temp_p = (IFloat *)in;
+  for(int ii = 0; ii< GJP.VolNodeSites()/2;ii++){
+    printf("i=%d\n",ii);
+    for(int jj = 0; jj< lat.FsiteSize();jj++)
+      printf("%e ",*(temp_p++));
+    printf("\n");
+  }
+  exit(44);
+}
+#endif
 
   int iter = InvCg(out,in,true_res);
 

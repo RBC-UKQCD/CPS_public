@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.13 2004-02-16 13:21:43 zs Exp $
+  $Id: lattice.h,v 1.14 2004-04-27 03:51:16 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-16 13:21:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.13 2004-02-16 13:21:43 zs Exp $
-//  $Id: lattice.h,v 1.13 2004-02-16 13:21:43 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.14 2004-04-27 03:51:16 cwj Exp $
+//  $Id: lattice.h,v 1.14 2004-04-27 03:51:16 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -415,6 +415,10 @@ class Lattice
         // where U(i), V(i) is the gauge field before and after 
         // reunitarization. The index i runs over all components of
         // the gauge field.
+
+    int MetropolisAccept(Float delta_h, Float *accept);
+    //!< Metropolis algorithm decision.
+        // 0 reject, 1 accept. If delta_h < 0 it accepts unconditionally.
 
     int MetropolisAccept(Float delta_h);
     //!< Metropolis algorithm decision.
@@ -847,8 +851,6 @@ class Lattice
       \post \a mom is assigned the value of the momentum after the molecular
       dynamics evolution.
     */
-
-    virtual void prepForce(Vector *out) = 0;
 
     virtual Float FhamiltonNode(Vector *phi, Vector *chi) = 0;
     //!< Computes the pseudofermionic action on the local sublattice.
@@ -1353,23 +1355,8 @@ class Fnone : public virtual Lattice
 
     Float BhamiltonNode(Vector *boson, Float mass);
         // The boson Hamiltonian of the node sublattice.
-
-    int FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
-		 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
-      {
-	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
-	VRB.Func(cname, fname);
-	ERR.General(cname,fname,"MatMInv not yet implemented for Wilson fermions");
-	return 0;
-      }
-    
-    
-    void prepForce(Vector* out) 
-      {
-	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
-	VRB.Func(cname, fname);
-	ERR.General(cname,fname,"MatMInv not yet implemented for Wilson fermions");
-      }
+    int FmatEvlMInv(Vector **out, Vector *in, Float *shift,
+        int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm);
 
 };
 
@@ -1877,16 +1864,16 @@ class Fclover : public virtual FwilsonTypes
   \ingroup factions
 */
 //------------------------------------------------------------------
-class Fdwf : public virtual FwilsonTypes
+class FdwfBase : public virtual FwilsonTypes
 {
  private:
     char *cname;    // Class name.
     
  public:
 
-    Fdwf();
+    FdwfBase(void);
 
-    virtual ~Fdwf();
+    virtual ~FdwfBase(void);
 
     FclassType Fclass() const;
         // It returns the type of fermion class
@@ -1930,6 +1917,9 @@ class Fdwf : public virtual FwilsonTypes
         // in true_res.
         // *true_res = |src - MatPcDagMatPc * sol| / |src|
 	// The function returns the total number of CG iterations.
+    int FmatEvlInv(Vector *f_out, Vector *f_in, 
+		   CgArg *cg_arg, 
+		   CnvFrmType cnv_frm = CNV_FRM_YES);
 
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
@@ -1953,6 +1943,10 @@ class Fdwf : public virtual FwilsonTypes
         // f_in should be preserved or not. If not the memory usage
         // is less by half the size of a fermion vector.
 	// The function returns the total number of CG iterations.
+    int FmatInv(Vector *f_out, Vector *f_in, 
+		CgArg *cg_arg, 
+		CnvFrmType cnv_frm = CNV_FRM_YES,
+		PreserveType prs_f_in = PRESERVE_YES);
 	
     void Ffour2five(Vector *five, Vector *four, int s_u, int s_l);
     //!< Transforms a 4-dimensional fermion field into a 5-dimensional field.
@@ -2020,6 +2014,42 @@ class Fdwf : public virtual FwilsonTypes
        // of the dirac operator in the Ritz solver.
 };
 
+class Fdwf : public FdwfBase {
+ private:
+    char *cname;    // Class name.
+    
+ public:
+
+    Fdwf(void);
+    ~Fdwf(void);
+};
+
+class FimprDwf : public FdwfBase {
+ private:
+    char *cname;    // Class name.
+    
+ public:
+
+    FimprDwf(void);
+    ~FimprDwf(void);
+
+    int FmatEvlInv(Vector *f_out, Vector *f_in,
+                     CgArg *cg_arg,
+                     Float *true_res,
+                     CnvFrmType cnv_frm);
+   void SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+                  Float mass);
+   void EvolveMomFforce(Matrix *mom, Vector *chi,
+                           Float mass, Float step_size);
+   Float BhamiltonNode(Vector *boson, Float mass);
+   int FmatInv(Vector *f_out, Vector *f_in,
+                  CgArg *cg_arg,
+                  Float *true_res,
+                  CnvFrmType cnv_frm,
+                  PreserveType prs_f_in);
+	void ForceProductSum(const Vector *v, const Vector *w,
+        IFloat coeff, Matrix *f);
+};
 
 //------------------------------------------------------------------
 //
@@ -2255,6 +2285,24 @@ class GwilsonFdwf
  public:
     GwilsonFdwf();
     virtual ~GwilsonFdwf();
+};
+
+//------------------------------------------------------------------
+//! Wilson gauge action with domain wall fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GwilsonFimprDwf 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gwilson, 
+    public FimprDwf
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GwilsonFimprDwf(void);
+    virtual ~GwilsonFimprDwf(void);
 };
 
 
@@ -2624,6 +2672,24 @@ class GimprOLSymFdwf
  public:
     GimprOLSymFdwf();
     virtual ~GimprOLSymFdwf();
+};
+
+//------------------------------------------------------------------
+//! One Loop Symanzik improved gauge action with domain wall fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GimprOLSymFimprDwf
+    : public virtual Lattice,
+    public virtual FwilsonTypes,
+    public GimprOLSym,
+    public FimprDwf
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GimprOLSymFimprDwf(void);
+    virtual ~GimprOLSymFimprDwf(void);
 };
 
 //------------------------------------------------------------------

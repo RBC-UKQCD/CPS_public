@@ -5,18 +5,24 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
 
-  $Id: wilson_dslash.C,v 1.3 2004-01-13 20:39:38 chulwoo Exp $
+  $Id: wilson_dslash.C,v 1.4 2004-04-27 03:51:19 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.3 2004-01-13 20:39:38 chulwoo Exp $
-//  $Id: wilson_dslash.C,v 1.3 2004-01-13 20:39:38 chulwoo Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.4 2004-04-27 03:51:19 cwj Exp $
+//  $Id: wilson_dslash.C,v 1.4 2004-04-27 03:51:19 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3.2.1  2004/04/24 04:38:07  cwj
+//  *** empty log message ***
+//
+//  Revision 1.3  2004/01/13 20:39:38  chulwoo
+//  Merging with multibuild
+//
 //  Revision 1.2.10.1  2003/12/11 20:22:53  cwj
 //  *** empty log message ***
 //
@@ -57,7 +63,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: wilson_dslash.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v $
 //  $State: Exp $
 //
@@ -232,6 +238,7 @@ void wilson_dslash(IFloat *chi_p_f,
 	     getPlusData((IFloat *)fbuf, (IFloat *) psi, SPINOR_SIZE, 0);
 	     psi = fbuf;
 	   }
+#if 0
  	     for(int l = 0; l<2;l++)
  	     for(int m = 0; m<3;m++)
  	     for(int n = 0; n<3;n++)
@@ -239,6 +246,7 @@ void wilson_dslash(IFloat *chi_p_f,
 		printf("PSI_xp(%d %d %d %d) (%d %d %d) = %e\n",
 		x,y,z,t,l,m,n,PSI(l,m,n));
  	     }
+#endif
 	   for(c=0;c<3;c++){
 	     TMP(0,c,0) = PSI(0,c,0) - sdag * ( -PSI(1,c,3) ); 
 	     TMP(1,c,0) = PSI(1,c,0) - sdag * (  PSI(0,c,3) ); 
@@ -279,6 +287,7 @@ void wilson_dslash(IFloat *chi_p_f,
 	   if(y == ly-1){
 	     getPlusData((IFloat *)fbuf, (IFloat *) psi, SPINOR_SIZE, 1);
 	     psi = fbuf;
+#if 0
  	     for(int l = 0; l<2;l++)
  	     for(int m = 0; m<3;m++)
  	     for(int n = 0; n<3;n++)
@@ -286,6 +295,7 @@ void wilson_dslash(IFloat *chi_p_f,
 		printf("PSI_yp(%d %d %d %d) (%d %d %d) = %e\n",
 		x,y,z,t,l,m,n,PSI(l,m,n));
  	     }
+#endif
 	   }
 	   for(c=0;c<3;c++){
 	     TMP(0,c,0) = PSI(0,c,0) - sdag * ( -PSI(0,c,3) ); 
@@ -327,6 +337,7 @@ void wilson_dslash(IFloat *chi_p_f,
 	   if(z == lz-1){
 	     getPlusData((IFloat *)fbuf, (IFloat *) psi, SPINOR_SIZE, 2);
 	     psi = fbuf;
+#if 0
  	     for(int l = 0; l<2;l++)
  	     for(int m = 0; m<3;m++)
  	     for(int n = 0; n<3;n++)
@@ -334,6 +345,7 @@ void wilson_dslash(IFloat *chi_p_f,
 		printf("PSI_zp(%d %d %d %d) (%d %d %d) = %e\n",
 		x,y,z,t,l,m,n,PSI(l,m,n));
  	     }
+#endif
 	   }
 	   for(c=0;c<3;c++){
 	     TMP(0,c,0) = PSI(0,c,0) - sdag * ( -PSI(1,c,2) ); 
@@ -375,6 +387,7 @@ void wilson_dslash(IFloat *chi_p_f,
 	   if(t == lt-1){
 	     getPlusData((IFloat *)fbuf, (IFloat *) psi, SPINOR_SIZE, 3);
 	     psi = fbuf;
+#if 0
  	     for(int l = 0; l<2;l++)
  	     for(int m = 0; m<3;m++)
  	     for(int n = 0; n<3;n++)
@@ -382,6 +395,7 @@ void wilson_dslash(IFloat *chi_p_f,
 		printf("PSI_tp(%d %d %d %d) (%d %d %d) = %e\n",
 		x,y,z,t,l,m,n,PSI(l,m,n));
  	     }
+#endif
 	   }
 	   for(c=0;c<3;c++){
 	     TMP(0,c,0) = PSI(0,c,0) - sdag * (  PSI(0,c,2) ); 

@@ -5,18 +5,28 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.5 2004-01-14 20:05:01 chulwoo Exp $
+  $Id: alg_hmd_r.C,v 1.6 2004-04-27 03:51:17 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-14 20:05:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.5 2004-01-14 20:05:01 chulwoo Exp $
-//  $Id: alg_hmd_r.C,v 1.5 2004-01-14 20:05:01 chulwoo Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.6 2004-04-27 03:51:17 cwj Exp $
+//  $Id: alg_hmd_r.C,v 1.6 2004-04-27 03:51:17 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.5.2.2  2004/02/26 21:39:07  mike
+//  Altered run function to now return the acceptance probabilty (as opposed to
+//  void).
+//
+//  Revision 1.5.2.1  2004/02/10 21:28:54  cwj
+//  *** empty log message ***
+//
+//  Revision 1.5  2004/01/14 20:05:01  chulwoo
+//  *** empty log message ***
+//
 //  Revision 1.4  2004/01/13 22:22:10  chulwoo
 //  *** empty log message ***
 //
@@ -78,7 +88,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //
@@ -277,7 +287,7 @@ AlgHmdR::~AlgHmdR() {
   structure.
 */
 //------------------------------------------------------------------
-void AlgHmdR::run(void)
+Float AlgHmdR::run(void)
 {
   int i;
   int step;                            // Trajectory step
@@ -450,6 +460,7 @@ void AlgHmdR::run(void)
       }
 	printf("\n");
       }
+//  exit(1);
 #endif
 
     // Evolve momenta by one step using the fermion force
@@ -476,12 +487,7 @@ void AlgHmdR::run(void)
       cg_calls++;
       frm_time_step = 
 	hmd_arg->frm_flavors[i] * flavor_coeff * dt ;
-      lat.EvolveMomFforce(mom, frm1, 
-			  hmd_arg->frm_mass[i], 
-			  frm_time_step);
-  Float mom_sum = lat.MomHamiltonNode(mom);
-  glb_sum(&mom_sum);
-  VRB.Flow(cname,fname,"mom_sum = %0.14e\n",mom_sum);
+
 #if 0
   phi_p = (Float *)mom;
       for(int ii = 0; ii<GJP.VolNodeSites();ii++){
@@ -494,6 +500,28 @@ void AlgHmdR::run(void)
 	printf("\n");
       }
 #endif
+
+      lat.EvolveMomFforce(mom, frm1, 
+			  hmd_arg->frm_mass[i], 
+			  frm_time_step);
+  Float mom_sum = lat.MomHamiltonNode(mom);
+  glb_sum(&mom_sum);
+  VRB.Flow(cname,fname,"mom_sum = %0.14e\n",mom_sum);
+
+#if 0
+  phi_p = (Float *)mom;
+      for(int ii = 0; ii<GJP.VolNodeSites();ii++){
+	printf("%0.4d ",ii);
+      for(int j = 0; j<72;j++){
+	if ( j%6==0) printf("\n");
+	printf("%0.8e ",*phi_p);
+	phi_p++;
+      }
+	printf("\n");
+      }
+	exit(1);
+#endif
+
     }
 
     //--------------------------------------------------------------
@@ -596,6 +624,8 @@ void AlgHmdR::run(void)
   //----------------------------------------------------------------
   lat.MdTime(0.0);
   VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
+
+  return (Float)1.0;
 
 }
 

@@ -1,8 +1,8 @@
 	.section	".text"
 	.align 2
-	.globl dirac_cmv_jcw_agg
-	.type	dirac_cmv_jcw_agg,@function
-dirac_cmv_jcw_agg:
+	.globl pt_asqtad_agg
+	.type	pt_asqtad_agg,@function
+pt_asqtad_agg:
 	la   %r1,	-864(%r1)
 	stw	%r14,	368(%r1)
 	stw	%r15,	376(%r1)

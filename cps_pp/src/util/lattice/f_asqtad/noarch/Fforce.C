@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.6 2004-01-23 19:52:52 cwj Exp $
+  $Id: Fforce.C,v 1.7 2004-04-27 03:51:20 cwj Exp $
 */
 //--------------------------------------------------------------------
 
@@ -43,7 +43,22 @@ void Fasqtad::force_product_sum(const Vector *v, const Vector *w,
 
     Matrix m0;
     int n, s[4];
+    static int called=0;
     
+    IFloat *tmp, *tmp2;
+#if 0
+    tmp = (IFloat *)f;
+    for(int ii = 0; ii<18;ii++){
+        printf("%e ",tmp[ii]);
+        if(ii%6==5) printf("\n");
+    }
+
+    int ii;
+    tmp = (IFloat *)v; tmp2=(IFloat *)w;
+    printf("called=%d\n",called);
+    for(int ii = 0; ii<6;ii++)
+        printf("%e %e\n",tmp[ii],tmp2[ii]);
+#endif
     for(n=0, s[3]=0; s[3]<GJP.TnodeSites(); s[3]++)
 	for(s[2]=0; s[2]<GJP.ZnodeSites(); s[2]++)
 	    for(s[1]=0; s[1]<GJP.YnodeSites(); s[1]++)
@@ -53,7 +68,14 @@ void Fasqtad::force_product_sum(const Vector *v, const Vector *w,
 		    m0 *= coeff;
 		    f[n] += m0;
 		}
-
+#if 0
+    tmp = (IFloat *)f;
+    for(int ii = 0; ii<18;ii++){
+        printf("%e ",tmp[ii]);
+        if(ii%6==5) printf("\n");
+    }
+    called++;
+#endif
 }
 
 
@@ -69,16 +91,50 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
     int pos[] = {0,0,0,0};
     int f_size = GJP.VolNodeSites()*FsiteSize()*sizeof(Float)/2;
 
+#if 0
+  IFloat *tmp_f = (IFloat *)frm;
+  printf("frm = ");
+  for(int i = 0;i<6;i++){
+    printf("%e ",*(tmp_f++));
+    if(i%6==5) printf("\n");
+  }
+  tmp_f = (IFloat *)f_tmp;
+  printf("f_tmp = ");
+  for(int i = 0;i<6;i++){
+    printf("%e ",*(tmp_f++));
+    if(i%6==5) printf("\n");
+  }
+  tmp_f = (IFloat *)mom;
+  printf("mom = ");
+  for(int i = 0;i<144;i++){
+    printf("%e ",*(tmp_f++));
+    if(i%6==5) printf("\n");
+  }
+#endif
+
     Vector *tmp = (Vector *)smalloc(2*f_size);
     Vector *tmp_o = &(tmp[GJP.VolNodeSites()/2]);
     moveMem(tmp,frm,f_size);
+
+#if 0
+    // Does not work for RHMC
     moveMem(tmp_o,f_tmp,f_size);
-    
+#else
+    // Works for all algorithms
+    {
+      CgArg cg_arg;
+      cg_arg.mass=0.0;
+      DiracOpAsqtad asqtad(*this,tmp_o,frm,&cg_arg,CNV_FRM_NO);
+      asqtad.Dslash(tmp_o,frm,CHKB_EVEN,DAG_NO);
+    }
+#endif    
+
+
     Fconvert(tmp,CANONICAL,STAG);
     Convert(STAG);
 
     
-    const int N = 4;  // N can be 1, 2 or 4.
+    const int N = 1;  // N can be 1, 2 or 4.
 
     enum{plus, minus, n_sign};
     int size;
@@ -624,7 +680,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    mf = force[mu][s];
 	    mfd.Dagger((IFloat*)&mf);
 	    mf.TrLessAntiHermMatrix(mfd);
-	    mf *= 0.5;				// for MILC compatibility
+//	    mf *= 0.5;				// for MILC compatibility
 	    fTimesV1PlusV2((IFloat*)(ip+mu), dt, (IFloat*)&mf,
 			   (IFloat*)(ip+mu)+BANK4_BASE, MATRIX_SIZE);
 	}
@@ -650,7 +706,17 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
     for (int i=0; i<4; i++) free(force[i]);
 
     sfree(tmp);
+    Convert(CANONICAL);
 //   Fconvert(tmp,STAG,CANONICAL);
+#if 0
+  tmp_f = (IFloat *)mom;
+  printf("mom = ");
+  for(int i = 0;i<18*4*GJP.VolNodeSites();i++){
+    printf("%e ",*(tmp_f++));
+    if(i%6==5) printf("\n");
+  }
+  exit(1);
+#endif
 
     return;
 }
@@ -698,7 +764,21 @@ void Fasqtad::parallel_transport(Vector **vin, const int *dir,
 	fprintf(fp,"called=%d\n",called);
 	fprintf(stdout,"called=%d\n",called);
 #endif
-//	Convert(STAG);
+
+  int bc[4] = {0,0,0,0};
+  int nx[4];
+  nx[0] = GJP.XnodeSites();
+  nx[1] = GJP.YnodeSites();
+  nx[2] = GJP.ZnodeSites();
+  nx[3] = GJP.TnodeSites();
+  if(GJP.Xbc() == BND_CND_APRD)
+  	bc[0] = GJP.XnodeCoor() == (GJP.Xnodes()-1) ? 1 : 0;
+  if(GJP.Ybc() == BND_CND_APRD)
+  	bc[1] = GJP.YnodeCoor() == (GJP.Ynodes()-1) ? 1 : 0;
+  if(GJP.Zbc() == BND_CND_APRD)
+  	bc[2] = GJP.ZnodeCoor() == (GJP.Znodes()-1) ? 1 : 0;
+  if(GJP.Tbc() == BND_CND_APRD)
+  	bc[3] = GJP.TnodeCoor() == (GJP.Tnodes()-1) ? 1 : 0;
 
     for(int d=0; d<N; d++){
 
@@ -709,11 +789,10 @@ void Fasqtad::parallel_transport(Vector **vin, const int *dir,
 #endif
 	if(mu%2) backwards = true;
         mu /= 2;
-	
-	for(n=0, spm[3]=s[3]=0; s[3]<GJP.TnodeSites(); spm[3]++, s[3]++)
-	    for(spm[2]=s[2]=0; s[2]<GJP.ZnodeSites(); spm[2]++, s[2]++)
-		for(spm[1]=s[1]=0; s[1]<GJP.YnodeSites(); spm[1]++, s[1]++)
-		    for(spm[0]=s[0]=0; s[0]<GJP.XnodeSites(); spm[0]++, s[0]++, n++) {
+	for(n=0, spm[3]=s[3]=0; s[3]<nx[3]; spm[3]++, s[3]++)
+	    for(spm[2]=s[2]=0; s[2]<nx[2]; spm[2]++, s[2]++)
+		for(spm[1]=s[1]=0; s[1]<nx[1]; spm[1]++, s[1]++)
+		    for(spm[0]=s[0]=0; s[0]<nx[0]; spm[0]++, s[0]++, n++) {
 			if(backwards){
 			    --s[mu];
 			    spm[mu] = (spm[mu]-1+GJP.NodeSites(mu))%GJP.NodeSites(mu);
@@ -721,7 +800,7 @@ void Fasqtad::parallel_transport(Vector **vin, const int *dir,
 			Matrix u = *(const_cast<Matrix*>(GetLink(s, mu)));
 
 //			if(staggered_phase(s, mu)==-1) u *= -1.0;
-			
+			if(bc[mu]&& ((s[mu] + 1) % nx[mu] == 0) ) u *= -1.0;
 			if(backwards){
 			    ud.Dagger(u);
 			    u = ud;	

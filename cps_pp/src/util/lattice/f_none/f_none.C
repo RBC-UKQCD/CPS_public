@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fnone class.
 
-  $Id: f_none.C,v 1.3 2004-02-16 13:21:42 zs Exp $
+  $Id: f_none.C,v 1.4 2004-04-27 03:51:20 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-16 13:21:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v 1.3 2004-02-16 13:21:42 zs Exp $
-//  $Id: f_none.C,v 1.3 2004-02-16 13:21:42 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v 1.4 2004-04-27 03:51:20 cwj Exp $
+//  $Id: f_none.C,v 1.4 2004-04-27 03:51:20 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_none.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v $
 //  $State: Exp $
 //
@@ -144,6 +144,22 @@ int Fnone::FmatEvlInv(Vector *f_out, Vector *f_in,
 // 		      CnvFrmType cnv_frm)
 // { return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
 
+
+//------------------------------------------------------------------
+// int FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
+//                 int Nshift, int isz, CgArg *cg_arg, 
+//                 CnvFrmType cnv_frm);
+// It does nothing and returns 0.
+//------------------------------------------------------------------
+int Fnone::FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
+		       int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
+{
+  char *fname = "FmatEvlMInv(V**,V*,F*,int,int,CgArg*,CnvFrmType)";
+  VRB.Func(cname,fname);
+
+  // Return the number of iterations
+  return 0;
+}
 
 //------------------------------------------------------------------
 // int FmatInv(Vector *f_out, Vector *f_in, 

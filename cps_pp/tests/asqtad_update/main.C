@@ -2,14 +2,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-09 14:30:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_update/main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
-//  $Id: main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_update/main.C,v 1.4 2004-04-27 03:51:23 cwj Exp $
+//  $Id: main.C,v 1.4 2004-04-27 03:51:23 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_update/main.C,v $
 //  $State: Exp $
 //
@@ -66,7 +66,7 @@ int main(int argc,char *argv[]){
     do_arg.x_bc = BND_CND_PRD;
     do_arg.y_bc = BND_CND_PRD;
     do_arg.z_bc = BND_CND_PRD;
-    do_arg.t_bc = BND_CND_PRD;
+    do_arg.t_bc = BND_CND_APRD;
     do_arg.start_conf_kind = START_CONF_ORD;
     do_arg.start_seed_kind = START_SEED_FIXED;
     do_arg.colors = 3;

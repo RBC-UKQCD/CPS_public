@@ -1,14 +1,14 @@
 dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
-dnl  $Author: zs $
-dnl  $Date: 2004-02-10 14:29:53 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.9 2004-02-10 14:29:53 zs Exp $
-dnl  $Id: configure.in,v 1.9 2004-02-10 14:29:53 zs Exp $
+dnl  $Author: cwj $
+dnl  $Date: 2004-04-27 03:51:16 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.10 2004-04-27 03:51:16 cwj Exp $
+dnl  $Id: configure.in,v 1.10 2004-04-27 03:51:16 cwj Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.9 $
+dnl  $Revision: 1.10 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -54,7 +54,9 @@ dnl Check for maths library
 AC_CHECK_LIB(m, sin, ,echo "CPS needs the math library - bailing out"; exit 1)
 
 dnl Set the relevant include files
-dnl   INCLUDE_FLAGS=
+topwd_srcdir=`pwd`
+AC_SUBST(topwd_srcdir)
+dnl INCLUDE_FLAGS="-I\${BUILDDIR} -I\${SRCDIR}/include"
 
 dnl What target are we compiling for?
 AC_ARG_ENABLE(target, 
@@ -71,7 +73,7 @@ if test "$enable_target" = "qcdoc"; then
    AS="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${AS}"
    AR="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${AR}"
    LD="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${LD}"
-   INCLUDE_FLAGS="-I\${QOS}/quser/include -I\${QOS}/quser_qker/include -I\${QOS}/qhost_qker ${INCLUDE_FLAGS}"
+   INCLUDE_FLAGS="-I\${QOS}/quser/include -I\${QOS}/quser_qker/include -I\${QOS}/qhost_qker -I\${QOS}/qhost_qker_quser/include ${INCLUDE_FLAGS}"
    CFLAGS="-Wa,-m405 -fno-exceptions -fno-hosted"
    CXXFLAGS="-Wa,-m405 -fno-exceptions -fno-hosted"
    ASFLAGS="-m405"
@@ -125,7 +127,20 @@ if test "$enable_debug" = "yes"; then
    CXXFLAGS="${CXXFLAGS} -g -O0"
 fi
 
-DFLAGS=""
+
+dnl Are we compiling with gnu multiprecision library?
+AC_ARG_ENABLE(gmp, 
+[  --enable-gmp   Compile with GNU Multiprecision lib. (default=no)] ,  , [enable_gmp="no"])
+AC_MSG_CHECKING("if including gmp")
+AC_MSG_RESULT($enable_gmp)
+if test "$enable_gmp" = "no"; then
+   DFLAGS=""
+else
+   LDFLAGS="${LDFLAGS} -L${enable_gmp}/lib -lgmp"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_gmp}/include"
+   DFLAGS="${DFLAGS} -DGMP"
+fi
+
 if test "$TESTING_PARALLEL" = "yes"; then
    ENABLE_PARALLEL="define PARALLEL"
 else
@@ -148,6 +163,7 @@ AC_SUBST(LDFLAGS)
 AC_SUBST(TESTING_PARALLEL)
 AC_SUBST(ENABLE_PARALLEL)
 AC_SUBST(QOS)
+AC_SUBST(DO_GMP)
 
 
 dnl temporary hack until qos is more mature
@@ -182,10 +198,7 @@ AC_CHECK_PROG(have_doxygen, doxygen, "yes")
 
 AC_OUTPUT(config.h \
 	  Makefile \
-	  Makefile.vars \
 	  Makefile.rules \
-	  Makefile.compile \
           tests/Makefile_common \
-          tests/Makefile_common2 \
           tests/regression.pl )
 

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the HmdArg structure.
 
-  $Id: hmd_arg.h,v 1.4 2003-08-29 20:15:44 mike Exp $
+  $Id: hmd_arg.h,v 1.5 2004-04-27 03:51:16 cwj Exp $
 */
 //------------------------------------------------------------------
 
@@ -73,11 +73,11 @@ struct HmdArg {
 				    of dynamical fermions/bosons */
                                    
 
-    Float stop_rsd[MAX_HMD_MASSES];   /*!< The target residual for the solver
-					stopping condition for each mass 
-				    of dynamical fermions/bosons */
+  Float stop_rsd[MAX_HMD_MASSES];   /*!< The target residual for the solver
+				      stopping condition for each mass 
+				      of dynamical fermions/bosons */
 
-    int steps_per_traj;		    /*!<
+  int steps_per_traj;		    /*!<
 				      For the R algorithm, this is
 				      the number of steps per trajectory. For
 				      the HMC/phi algorithm this is
@@ -96,16 +96,28 @@ struct HmdArg {
 				      the trajectory before the metropolis
 				      step. */
   
-  /*!< The parameters for the rational approximation*/
-  int FRatDeg[MAX_HMD_MASSES], HBRatDeg[MAX_HMD_MASSES];
-  Float FRatNorm[MAX_HMD_MASSES], HBRatNorm[MAX_HMD_MASSES];
-  Float FRatConst[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+  /*!< The parameters for the force rational approximations*/
+  int FRatDeg[MAX_HMD_MASSES];
+  Float FRatNorm[MAX_HMD_MASSES];
+  Float FRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
   Float FRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
-  Float HBRatConst[MAX_HMD_MASSES][MAX_RAT_DEGREE];
-  Float HBRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
 
-  int isz; /*!< The smallest polar shift in the rational approximation 
-	    (used by MInvCG)*/
+  /*!< The parameters for the action rational approximations*/
+  int SRatDeg[MAX_HMD_MASSES];
+  Float SRatNorm[MAX_HMD_MASSES];
+  Float SRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+  Float SRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+
+  /*!< The parameters for the inverse action rational approximations*/
+  Float SIRatNorm[MAX_HMD_MASSES];
+  Float SIRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+  Float SIRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+
+  /*!< The location of the smallest polar shift in the rational approximations*/
+  int isz;
+
+  /*!< The Sexton-Weigngarten factor*/
+  int sw;
 
 };
 

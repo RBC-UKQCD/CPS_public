@@ -4,18 +4,24 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStag class methods.
 
-  $Id: pt_asqtad.C,v 1.3 2004-01-13 23:25:24 chulwoo Exp $
+  $Id: pt_asqtad.C,v 1.4 2004-04-27 03:51:21 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 23:25:24 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v 1.3 2004-01-13 23:25:24 chulwoo Exp $
-//  $Id: pt_asqtad.C,v 1.3 2004-01-13 23:25:24 chulwoo Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v 1.4 2004-04-27 03:51:21 cwj Exp $
+//  $Id: pt_asqtad.C,v 1.4 2004-04-27 03:51:21 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3.2.1  2004/04/26 02:14:12  cwj
+//  *** empty log message ***
+//
+//  Revision 1.3  2004/01/13 23:25:24  chulwoo
+//  *** empty log message ***
+//
 //  Revision 1.1.2.3  2003/12/27 21:05:31  cwj
 //
 //  (somewhat) cleaned up for QCDOC + qos-1-8-5
@@ -77,7 +83,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: pt_asqtad.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/qcdoc/pt_asqtad.C,v $
 //  $State: Exp $
 //
@@ -153,7 +159,6 @@ ParTransAsqtad::ParTransAsqtad(Lattice & latt) :
 	      frm_tmp, f_size_cb * sizeof(Float));
 #endif
 
-//  printf("ParTransAsqtad() done\n"); fflush(stdout); exit(42);
 }
 
 

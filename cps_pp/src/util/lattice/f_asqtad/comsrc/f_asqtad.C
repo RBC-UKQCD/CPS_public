@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.5 2004-02-16 13:21:42 zs Exp $
+  $Id: f_asqtad.C,v 1.6 2004-04-27 03:51:20 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-16 13:21:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v 1.5 2004-02-16 13:21:42 zs Exp $
-//  $Id: f_asqtad.C,v 1.5 2004-02-16 13:21:42 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v 1.6 2004-04-27 03:51:20 cwj Exp $
+//  $Id: f_asqtad.C,v 1.6 2004-04-27 03:51:20 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_asqtad.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v $
 //  $State: Exp $
 //
@@ -158,9 +158,8 @@ int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
-  DiracOpAsqtad stag(*this, f_out[0], f_in, cg_arg, cnv_frm);
-
-  return stag.MInvCG(f_out,f_in,sqrt(dot),shift,Nshift,isz,RsdCG,EigVec,Neig);  
+  DiracOpAsqtad asqtad(*this, f_out[0], f_in, cg_arg, cnv_frm);
+  return asqtad.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,EigVec,Neig);  
 }
 
 
@@ -322,8 +321,6 @@ void Fasqtad::prepForce(Vector *frm) {
   stag.Dslash(f_tmp, frm, CHKB_EVEN, DAG_NO);
 
 }
-
-
 
 //------------------------------------------------------------------
 // Float BhamiltonNode(Vector *boson, Float mass):

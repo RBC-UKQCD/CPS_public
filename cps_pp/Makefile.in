@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.10 2004-02-10 14:50:47 zs Exp $
+# $Id: Makefile.in,v 1.11 2004-04-27 03:51:16 cwj Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -27,10 +27,13 @@ recurse:
 cleanlib: clean
 	rm -f *.a
 
-install:
-	cp Makefile Makefile.rules Makefile.vars Makefile.compile ${SRCDIR}
+copy_makefile:
+	cp Makefile Makefile.rules ${SRCDIR}
 	cp tests/Makefile_common* ${SRCDIR}/tests
 
+copy_include:
+	rm -rf $(BUILDDIR)/include
+	cp -r $(SRCDIR)/include $(BUILDDIR)
 
 #  Create the documentation
 
@@ -73,3 +76,4 @@ test: cps
 
 realclean: 
 	rm -rf $(BUILDDIR)/objs $(BUILDDIR)/*.a
+

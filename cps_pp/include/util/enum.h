@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.h,v 1.6 2004-02-16 13:21:43 zs Exp $
+  $Id: enum.h,v 1.7 2004-04-27 03:51:16 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-16 13:21:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.6 2004-02-16 13:21:43 zs Exp $
-//  $Id: enum.h,v 1.6 2004-02-16 13:21:43 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.7 2004-04-27 03:51:16 cwj Exp $
+//  $Id: enum.h,v 1.7 2004-04-27 03:51:16 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: enum.h,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v $
 //  $State: Exp $
 //
@@ -267,12 +267,30 @@ enum RitzMatType {
     MATPC_HERM,      /*!< The preconditioned hermitian matrix on a single parity. */
     MATPCDAG_MATPC,  /*!< The preconditioned \f$M^\dagger M\f$
 		          on a single parity */
+    NEG_MATPCDAG_MATPC,  /*!< The preconditioned \f$-M^\dagger M\f$
+		          on a single parity */
     MATDAG_MAT,      /*!< \f$M^\dagger M\f$ on the full lattice */
     NEG_MATDAG_MAT,   /*!< \f$-M^\dagger M\f$ on the full lattice*/
     MATDAG_MAT_NORM,  /*!< \f$cM^\dagger M\f$ on the full lattice (normalised)*/
     NEG_MATDAG_MAT_NORM  /*!< \f$-cM^\dagger M\f$ on the full lattice (normalised)*/
 };
+
+//------------------------------------------------------------------
+//! The types of rational approximation for RHMC
+//------------------------------------------------------------------
+enum RatApproxType {
+  CONSTANT,  /*!< CONSTANT - approximation is held constant*/
+  DYNAMIC    /*!< DYNAMIC - approximation recalculated at the end of the trajectory*/
+};
 		  
+//------------------------------------------------------------------
+//! The types multishift solve to perform
+//------------------------------------------------------------------
+enum MultiShiftSolveType {
+  SINGLE,  /*!< SINGLE - solutions are summed to a common vector*/
+  MULTI    /*!< MULTI - solutions are summed to separate vectors*/
+};
+
 
 #endif
 

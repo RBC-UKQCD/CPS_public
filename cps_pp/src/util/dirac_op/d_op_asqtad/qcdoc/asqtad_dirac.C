@@ -1,4 +1,4 @@
-//-------------------------------------------------------------------
+
 //    12/02 HueyWen Lin, Chulwoo Jung
 //
 //   Asqtad Dirac operator for QCDOC. Communications and computations
@@ -11,6 +11,7 @@
 #include <stdio.h>
 CPS_END_NAMESPACE
 #include <util/gjp.h>
+#include <util/time.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
 #include <util/lattice.h>
@@ -23,16 +24,17 @@ CPS_END_NAMESPACE
 #include <time.h>
 #include <math.h>
 #include <qcdocos.h>
-#include <emalloc.h>
+#include <qalloc.h>
+#include <ppc_lib.h>
 CPS_START_NAMESPACE
 
-const char *uc_l_filename = CWDPREFIX("uc_l");
-const char *uc_nl_filename = CWDPREFIX("uc_nl");
-const char *Toffset_filename = CWDPREFIX("Toffset");
-const char *uc_l_agg_filename = CWDPREFIX("uc_l_agg");
-const char *uc_nl_agg_filename = CWDPREFIX("uc_nl_agg");
-const char *chi_l_filename = CWDPREFIX("chi_l");
-const char *chi_nl_filename = CWDPREFIX("chi_nl");
+const char *uc_l_filename = CWDPREFIX("uc_l.h");
+const char *uc_nl_filename = CWDPREFIX("uc_nl.h");
+const char *Toffset_filename = CWDPREFIX("Toffset.h");
+const char *uc_l_agg_filename = CWDPREFIX("uc_l_agg.h");
+const char *uc_nl_agg_filename = CWDPREFIX("uc_nl_agg.h");
+const char *chi_l_filename = CWDPREFIX("chi_l.h");
+const char *chi_nl_filename = CWDPREFIX("chi_nl.h");
 #define IND_AGG //aggregate index for uc and chi
 
 /*****************************************************************
@@ -42,6 +44,7 @@ for dirac operator. If SIMUL is defined, it will include (pre-calcuated)
 temporary arraies and skip the generation of arraies.
 ******************************************************************/
 
+#define USE_NEW
 #undef CPP
 /****************************************************************
 CPP is a switch for using C++ routine for dirac_cmv.
@@ -76,17 +79,17 @@ static SCUDir scudir[] =
 
 static int size[4];
 static int split; 
+static int isplit; 
 static int coord[4];
 static int coord_nn[4];
 static int coord_knn[4];
 static int vol;
-static int non_local_chi_3;
+static int non_local_chi_3[4];
 static int non_local_chi;
 static int local_chi;
 static int local_chi_3;
-static int buffer_order[3][4]; // never used ??
-static int buffer_flush[3][8]; // never used ?? asign space in dirac_init but never be used after that.
 static int nflush;
+static int odd_num= 0;
 
 //---------------------------------------------------------------------
 //  uc_l[0] points to a cluster of matrices per even site for local 
@@ -107,11 +110,8 @@ static IFloat * uc_nl[2];
 // malloc are available (should be changed according to volume)
 //------------------------------------------------------------------
 
-//static IFloat tmpfrm[16384] PEC_ALIGN LOCATE("edramtransient"); //double the original size
 static IFloat *tmpfrm;
-//static IFloat tmpfrm[1024] PEC_ALIGN LOCATE("edramtransient");
 
-//static IFloat Tbuffer[3][2][192] PEC_ALIGN LOCATE("edramtransient");
 static IFloat *Tbuffer[3][2];
 
 //-------------------------------------------------------------------
@@ -128,7 +128,6 @@ static int countM[3][2];
 //  xm, ym, zm (p = plus, m = minus).  Indexed as 0-7
 //---------------------------------------------------------------------
 static IFloat * chi_off_node_total;
-//static IFloat chi_off_node_total[10000] LOCATE("edramtransient");
 static IFloat * chi_off_node[3][8];
 static IFloat * chi_off_node_p[3][8];
 //------------------------------------------------------------------
@@ -155,17 +154,17 @@ static IFloat ** chi_nl[2];
 //  SCUarg[3] is set up for different Xoffset and Toffset.
 //------------------------------------------------------------------
 
-SCUDirArgIR * SCUarg[2*NUM_DIR];
-SCUDirArgMulti * SCUmulti;
+SCUDirArgIR SCUarg[2][2*NUM_DIR];
+SCUDirArgMulti SCUmulti[2];
 
-SCUDirArgIR * SCUarg_1[2*NUM_DIR];
-SCUDirArgMulti * SCUmulti_1;
+SCUDirArgIR SCUarg_1[2][2*NUM_DIR];
+SCUDirArgMulti SCUmulti_1[2];
 
-SCUDMAInst *SCUDMAarg_p[NUM_DIR*4];
-SCUDMAInst SCUDMAarg[NUM_DIR*4];
+SCUDMAInst *SCUDMAarg_p[2][NUM_DIR*4];
+SCUDMAInst SCUDMAarg[2][NUM_DIR*4];
 
-SCUDirArgIR * SCUarg_2[2*NUM_DIR];
-SCUDirArgMulti * SCUmulti_2;
+SCUDirArgIR SCUarg_2[2][2*NUM_DIR];
+SCUDirArgMulti SCUmulti_2[2];
 
 //------------------------------------------------------------------
 //  The offset into the even or odd checkboard chi's and chi3's used for a send
@@ -248,8 +247,17 @@ void asqtad_dirac_init(const void * gauge_u )
   int x[NUM_DIR/2];
   char buf[200];
   int fd;
+  int scu_irs[2][3];
   char *cname = "DiracOpAsqtad";
   char *fname = "asqtad_dirac_init(const void *gauge)";
+
+  scu_irs[0][0]=IR_5;
+  scu_irs[0][1]=IR_6;
+  scu_irs[0][2]=IR_7;
+  scu_irs[1][0]=IR_8;
+  scu_irs[1][1]=IR_9;
+  scu_irs[1][2]=IR_10;
+
 
   //-------------------------------------------------------------------
   //  sg is a lexical index for (t,z,y,x) where x runs fastest. This is
@@ -288,30 +296,42 @@ void asqtad_dirac_init(const void * gauge_u )
   size[1] = GJP.XnodeSites();
   size[2] = GJP.YnodeSites();
   size[3] = GJP.ZnodeSites();
-  split =  (  (size[0]>2 &&size[1]>2 && size[2]>2 && size[3] >2 ) ? 0 : 1 ); 
-//  split =1;
 
   vol = size[0] * size[1] * size[2] * size[3];
+  split =  (  vol>64 ? 0 : 1 ); 
+//  split =0;
 
   non_local_chi = 2*(size[0]*size[1]*size[2] + size[1]*size[2]*size[3]+
     size[2]*size[3]*size[0] + size[3]*size[0]*size[1]);
 
-  non_local_chi_3 = 0;
+  non_local_chi_3[0] = 0;
+  non_local_chi_3[1] = 0;
   for(i=0;i<4;i++){
-    if(size[i]<4)
-      non_local_chi_3 += 4*vol/size[i];
-    else
-      non_local_chi_3 += 6*vol/size[i];
+    if(size[i]>2)
+      non_local_chi_3[1] += 2*vol/size[i];
   }
+  non_local_chi_3[2]  = non_local_chi_3[1]+non_local_chi;
+  non_local_chi_3[3]  = non_local_chi_3[2]+non_local_chi;
 
 
   local_chi = NUM_DIR*vol - non_local_chi;
-  local_chi_3 = NUM_DIR*vol - non_local_chi_3;
+  local_chi_3 = NUM_DIR*vol - (non_local_chi_3[3]);
+  isplit = (non_local_chi_3[1]+non_local_chi)/2;
+
+//  printf("local_chi=%d local_chi_3=%d\n",local_chi,local_chi_3);
+//  printf("non_local_chi=%d non_local_chi_3[1]=%d\n",non_local_chi,non_local_chi_3[1]);
+//  printf("non_local_chi_3[2]=%d non_local_chi_3[3]=%d\n",non_local_chi_3[2],non_local_chi_3[3]);
   //-------------------------------------------------------------
   // flush_cache_spinor() function will flush 192 bytes * nflush 
   //-------------------------------------------------------------
   nflush = vol/8;
-  tmpfrm = (IFloat *) smalloc ( NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
+
+  tmpfrm = (IFloat *) qalloc (QFAST|QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
+
+  if(tmpfrm == NULL){ 
+    tmpfrm = (IFloat *) qalloc (QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
+    printf("tmpfrm is allocated at (%p),length 0x%x \n",tmpfrm,NUM_DIR*vol*VECT_LEN2*sizeof(IFloat));
+  }
   if(tmpfrm == 0) 
     ERR.Pointer(cname,fname, "tmpfrm");
 
@@ -320,15 +340,24 @@ void asqtad_dirac_init(const void * gauge_u )
   //  Allocate 8 receive buffers for off-node vectors
   //-----------------------------------------------------------------
   
-    chi_off_node_total = ( IFloat * ) smalloc( 3*non_local_chi*
+  if(vol>1024) chi_off_node_total=NULL;
+    else
+    chi_off_node_total = ( IFloat * ) qalloc(QFAST|QCOMMS, 3*non_local_chi*
       VECT_LEN * sizeof( IFloat ) / 2 );
+  if(chi_off_node_total == NULL){ 
+    chi_off_node_total = ( IFloat * ) qalloc(QCOMMS, 3*non_local_chi*
+      VECT_LEN * sizeof( IFloat ) / 2 );
+    printf("chi_off_node_total is allocated at DDR (%p)\n",chi_off_node_total);
+  }
     if(chi_off_node_total == 0)
       ERR.Pointer(cname,fname, "chi_off_node_total");
  for ( j= 0; j < 3; j++ ){
-    chi_off_node[j][0] = &(chi_off_node_total[ j*non_local_chi* VECT_LEN/2 ] ); 
-    chi_off_node_p[j][0] = (IFloat *)(sizeof (IFloat)*j*non_local_chi* VECT_LEN/2 );
+    chi_off_node[j][0] = &(chi_off_node_total[ non_local_chi*j* VECT_LEN/2 ] ); 
+//    fprintf(stderr,"chi_off_node[%d][0] =%d\n",j,(chi_off_node[j][0]-chi_off_node_total)/VECT_LEN);
+    chi_off_node_p[j][0] = (IFloat *)(sizeof (IFloat)*non_local_chi*j* VECT_LEN/2 );
   for ( i = 1; i < NUM_DIR; i++ ){
     chi_off_node[j][i] = chi_off_node[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
+//    fprintf(stderr,"chi_off_node[%d][%d] =%d\n",j,i,(chi_off_node[j][i]-chi_off_node_total)/VECT_LEN);
     chi_off_node_p[j][i] = chi_off_node_p[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
   }
  }
@@ -346,7 +375,7 @@ void asqtad_dirac_init(const void * gauge_u )
    if(chi_l[i] == NULL)
 	ERR.Pointer(cname,fname, "chi_l[i]");
 
-    chi_nl[i] = (IFloat ** ) smalloc((2* (non_local_chi + non_local_chi_3)/2)*sizeof(IFloat *));
+    chi_nl[i] = (IFloat ** ) smalloc((2* (non_local_chi + non_local_chi_3[3])/2)*sizeof(IFloat *));
 
       if(chi_nl[i] == NULL)
 	ERR.Pointer(cname,fname, "chi_nl[i]");
@@ -360,6 +389,22 @@ void asqtad_dirac_init(const void * gauge_u )
     for( n = 0; n < 3; n++ )  non_local_count_3[n][i] = 0;
 
   }
+
+  for ( k = 0; k < 3; k++ ) {
+  for ( i = 0; i < 2; i++ ) {
+    Tbuffer[k][i] = (IFloat *) qalloc (QFAST|QNONCACHE, size[1] * size[2] * size[3] * VECT_LEN * sizeof( IFloat ) / 2);
+   if(Tbuffer[k][i] == NULL)
+	ERR.Pointer(cname,fname, "Tbuffer[i][j]");
+    ToffsetP[k][i] = ( int * ) qalloc (0,  size[1] * size[2] * size[3] *  sizeof( int ) / 2 );
+   if(ToffsetP[k][i] == NULL)
+	ERR.Pointer(cname,fname, "TOffsetP[i][j]");
+    ToffsetM[k][i] = ( int * ) qalloc (0,  size[1] * size[2] * size[3] *  sizeof( int ) / 2 );
+   if(ToffsetM[k][i] == NULL)
+	ERR.Pointer(cname,fname, "TOffsetM[i][j]");
+    countP[k][i] = 0;
+    countM[k][i] = 0;
+  }
+ }
 
   //-----------------------------------------------------------------
   // Assembly written for double precision only, check sizeof(IFloat)
@@ -413,6 +458,7 @@ void asqtad_dirac_init(const void * gauge_u )
   //-----------------------------------------------------------------
   //  Loop over all directions
   //-----------------------------------------------------------------
+//  printf("chi_l=0x%x\nchi_l[0]=%x\n",chi_l,chi_l[0]);
   for ( n = 0; n < NUM_DIR; n++ ) {
 
     //-----------------------------------------------------------------
@@ -474,9 +520,11 @@ void asqtad_dirac_init(const void * gauge_u )
 
     for (j=0; j<3; j++){
        if((coord_knn[n%4]==j&&n<4)||(coord_knn[n%4]==(size[n%4]-1-j)&& n>3)) {
-	 *( chi_nl[ odd ] + 2 * non_local_count_3[j][odd]+(j+1)*non_local_chi )
+	 *( chi_nl[ odd ] + 2 * non_local_count_3[j][odd]+non_local_chi+non_local_chi_3[j] )
             =chi_off_node_p[j][n]+ VECT_LEN * ( LexSurface( coord_knn,n%4)/2 ); 
-        *( chi_nl[odd] + 2 * non_local_count_3[j][odd] + (j+1)*non_local_chi+1 ) = ( IFloat * ) ( VECT_LEN2 * (LexVector( coord ) / 2*2*NUM_DIR+n+8 )  * sizeof(IFloat));
+        *( chi_nl[odd] + 2 * non_local_count_3[j][odd] + non_local_chi+non_local_chi_3[j]+1 )
+ = ( IFloat * ) ( VECT_LEN2 * (LexVector( coord ) / 2*2*NUM_DIR+n+8 )  * sizeof(IFloat));
+//	printf("%d %d %d %d %d chi_nl[%d][%d]=%d j=%d\n",x[0],x[1],x[2],x[3],n,odd,non_local_count_3[j][odd]+(j+1)*non_local_chi/2,LexSurface(coord_knn,n%4)/2,j);
 	non_local_count_3[j][odd]++;
        }
     }
@@ -543,13 +591,22 @@ void asqtad_dirac_init(const void * gauge_u )
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat * chi_nl%d[] LOCATE(\"edramtransient\") = {\n",j);
     fprintf(fp," (IFloat *) %d",*(chi_nl[j]));
-    for(i=1;i< 2*((non_local_chi+ non_local_chi_3)/2);i++){
+    for(i=1;i< 2*((non_local_chi+ non_local_chi_3[3])/2);i++){
       fprintf(fp,",\n (IFloat *) %d",*(chi_nl[j]+i));
     }
     fprintf(fp,"\n};\n");
   }
 
   fclose(fp);
+#endif
+
+#if 0
+  for(i=0;i<2;i++){
+	printf("local_count[%d]=%d non_local_count[%d]=%d\n",i,local_count[i],i,non_local_count[i]);
+	printf("local_count_3[%d]=%d non_local_count_3[0][%d]=%d\n",i,local_count_3[i],i,non_local_count_3[0][i]);
+  	for(j=1;j<3;j++)
+	printf("non_local_count_3[%d][%d]=%d\n",j,i,non_local_count_3[j][i]);
+  }
 #endif
 
   //-------------------------------------------------------------------
@@ -577,16 +634,6 @@ void asqtad_dirac_init(const void * gauge_u )
   //  We have plus (P) transfers for both the even and odd
   //  checkerboards.  Same for minus (M) transfers.
   //-------------------------------------------------------------------
-
-  for ( k = 0; k < 3; k++ ) {
-  for ( i = 0; i < 2; i++ ) {
-    Tbuffer[k][i] = (IFloat *) smalloc ( size[1] * size[2] * size[3] * VECT_LEN * sizeof( IFloat ) / 2);
-    ToffsetP[k][i] = ( int * ) smalloc (  size[1] * size[2] * size[3] *  sizeof( int ) / 2 );
-    ToffsetM[k][i] = ( int * ) smalloc (  size[1] * size[2] * size[3] *  sizeof( int ) / 2 );
-    countP[k][i] = 0;
-    countM[k][i] = 0;
-  }
- }
   for ( sg = 0; sg < vol; sg++ ) {
 
     odd = SetCoord( sg );
@@ -610,11 +657,13 @@ void asqtad_dirac_init(const void * gauge_u )
   fp= fopen(Toffset_filename,"w");
   for ( k = 0; k < 3; k++ ) 
   for ( i = 0; i < 2; i++ ) {
+    fprintf(fp,"countP[%d][%d]=%d\n",k,i,countP[k][i]);
     fprintf(fp,"int ToffsetP%d%d[] LOCATE(\"edramnormal\") = {\n",k,i);
     for( j = 0;j<vol3;j++){
       fprintf(fp, "%d,\n",ToffsetP[k][i][j]);
     }
     fprintf(fp,"};\n");
+    fprintf(fp,"countM[%d][%d]=%d\n",k,i,countM[k][i]);
     fprintf(fp,"int ToffsetM%d%d[] LOCATE(\"edramnormal\") = {\n",k,i);
     for( j = 0;j<vol3;j++){
       fprintf(fp, "%d,\n",ToffsetM[k][i][j]);
@@ -630,126 +679,126 @@ void asqtad_dirac_init(const void * gauge_u )
   //  YM, ZM
   //-------------------------------------------------------------------
 
-  for ( i = 0; i < NUM_DIR; i++ ) {
-    j = i % (NUM_DIR/2);
+#if 0
+	for(int kk = 0;kk<3;kk++){
+	printf("Tbuffer[%d][0]=%p\n",kk,Tbuffer[kk][0]);
+	printf("Tbuffer[%d][1]=%p\n",kk,Tbuffer[kk][1]);
+	}
+#endif
 
-      SCUarg[i + NUM_DIR] = new SCUDirArgIR;
-      SCUarg[i + NUM_DIR] ->Init(chi_off_node[2][i], scudir[i], SCU_REC,
-		    VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0, IR_7);
-      SCUarg[i + NUM_DIR] ->Assert();
-
-    SCUDMAarg_p[(i+NUM_DIR)*2]  = new SCUDMAInst;
-    SCUDMAarg_p[(i+NUM_DIR)*2] ->Init(chi_off_node[0][i],
-      VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0);
-    SCUDMAarg_p[(i+NUM_DIR)*2+1]  = new SCUDMAInst;
-    SCUDMAarg_p[(i+NUM_DIR)*2+1] ->Init(chi_off_node[1][i],
-      VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0);
-
-    if( split ){
-      SCUarg_1[i + NUM_DIR] = new SCUDirArgIR;
-      SCUarg_1[i + NUM_DIR] ->Init(scudir[i],SCU_REC, &SCUDMAarg_p[(i+NUM_DIR)*2],1, IR_5);
-      SCUarg_1[i + NUM_DIR] ->Assert();
-      SCUarg_2[i + NUM_DIR] = new SCUDirArgIR;
-      SCUarg_2[i + NUM_DIR] ->Init(scudir[i],SCU_REC, &SCUDMAarg_p[(i+NUM_DIR)*2+1],1, IR_6);
-      SCUarg_2[i + NUM_DIR] ->Assert();
-    } else {
-      SCUarg_1[i + NUM_DIR] = new SCUDirArgIR;
-      SCUarg_1[i + NUM_DIR] ->Init(scudir[i],SCU_REC, &SCUDMAarg_p[(i+NUM_DIR)*2],2, IR_5);
-      SCUarg_1[i + NUM_DIR] ->Assert();
-    }
-
-      // change the size of buffer_flush or add 2 more??
-      // never used ??  // 12288 or 384?
-      buffer_flush[0][i] = VECT_LEN * sizeof(IFloat) * vol/ (12288 * size[j]);
-      buffer_flush[1][i] = VECT_LEN * sizeof(IFloat) * vol/ (12288 * size[j]);
-      buffer_flush[2][i] = VECT_LEN * sizeof(IFloat) * vol/ (12288 * size[j]);
-
-    //send arguments
-    if ((i == 0) || ( i == 4)){
-      SCUarg[i] = new SCUDirArgIR;
-      if (size[j] >4)
-        SCUarg[i] ->Init (Tbuffer[2][(4 - i)/4], scudir[i], SCU_SEND,
-		       blklen[j], numblk[j], stride[j], IR_7 );
-      else if (size[j] >2) 
-        SCUarg[i] ->Init (Tbuffer[1][i/4], scudir[i], SCU_SEND,
-		       blklen[j], numblk[j], stride[j], IR_7 );
-      else
-        SCUarg[i] ->Init (chi_off_node[0][4-i], scudir[i], SCU_SEND,
-		       blklen[j], numblk[j], stride[j], IR_7 );
-      SCUarg[i] ->Assert();
-
-      SCUDMAarg_p[i*2] = new SCUDMAInst;
-      SCUDMAarg_p[i*2] ->Init(Tbuffer[0][(4 - i)/4], 
-		       blklen[j], numblk[j], stride[j]);
-      SCUDMAarg_p[i*2+1] = new SCUDMAInst;
-
-      if(size[j]>2)
-        SCUDMAarg_p[i*2+1] ->Init(Tbuffer[1][(4 - i)/4], 
-		       blklen[j], numblk[j], stride[j]);
-      else
-        SCUDMAarg_p[i*2+1] ->Init(Tbuffer[0][i/4], 
-		       blklen[j], numblk[j], stride[j]);
-
-    if( split ){
-      SCUarg_1[i] = new SCUDirArgIR;
-      SCUarg_1[i] ->Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2],1,IR_5);
-      SCUarg_1[i] ->Assert();
-      SCUarg_2[i] = new SCUDirArgIR;
-      SCUarg_2[i] ->Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2+1],1,IR_6);
-      SCUarg_2[i] ->Assert();
-    } else {
-      SCUarg_1[i] = new SCUDirArgIR;
-      SCUarg_1[i] ->Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2],2,IR_5);
-      SCUarg_1[i] ->Assert();
-    }
-
-    }
-    else{
-      SCUarg[i] = new SCUDirArgIR;
-      if(size[j] >2)
-        SCUarg[i] ->Init(( void * ) 0, scudir[i], SCU_SEND,
-		       blklen[j], numblk[j], stride[j], IR_7 );
-      else
-        SCUarg[i] ->Init(chi_off_node[0][(i+4)%NUM_DIR], scudir[i], SCU_SEND,
-           VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j]),1,0, IR_7 );
-      SCUarg[i] ->Assert();
-
-      SCUDMAarg_p[i*2] = new SCUDMAInst;
-      SCUDMAarg_p[i*2] ->Init((void *)0, 
-		       blklen[j], numblk[j], stride[j]);
-      SCUDMAarg_p[i*2+1] = new SCUDMAInst;
-      SCUDMAarg_p[i*2+1] ->Init((void *)0, 
-		       blklen[j], numblk[j], stride[j]);
+  for( odd=0;odd<2;odd++){
+    for ( i = 0; i < NUM_DIR; i++ ) {
+      j = i % (NUM_DIR/2);
+  
+        SCUarg[odd][i + NUM_DIR].Init(chi_off_node[2][i], scudir[i], SCU_REC,
+  		    VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0, scu_irs[odd][2]);
+        SCUarg[odd][i + NUM_DIR].Assert();
+  
+      SCUDMAarg_p[odd][(i+NUM_DIR)*2]  = new SCUDMAInst;
+  //      printf("SCUDMAarg_p[%d]=%p\n",(i+NUM_DIR)*2,SCUDMAarg_p[(i+NUM_DIR)*2]);
+      SCUDMAarg_p[odd][(i+NUM_DIR)*2] ->Init(chi_off_node[0][i],
+        VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0);
+      SCUDMAarg_p[odd][(i+NUM_DIR)*2+1]  = new SCUDMAInst;
+      SCUDMAarg_p[odd][(i+NUM_DIR)*2+1] ->Init(chi_off_node[1][i],
+        VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0);
+  
       if( split ){
-        SCUarg_1[i] = new SCUDirArgIR;
-        SCUarg_1[i] -> Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2],1,IR_5);
-        SCUarg_1[i] ->Assert();
-        SCUarg_2[i] = new SCUDirArgIR;
-        SCUarg_2[i] -> Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2+1],1,IR_6);
-        SCUarg_2[i] ->Assert();
+        SCUarg_1[odd][i + NUM_DIR].Init(scudir[i],SCU_REC, &SCUDMAarg_p[odd][(i+NUM_DIR)*2],1, scu_irs[odd][0]);
+        SCUarg_1[odd][i + NUM_DIR].Assert();
+        SCUarg_2[odd][i + NUM_DIR].Init(scudir[i],SCU_REC, &SCUDMAarg_p[odd][(i+NUM_DIR)*2+1],1, scu_irs[odd][1]);
+        SCUarg_2[odd][i + NUM_DIR].Assert();
       } else {
-        SCUarg_1[i] = new SCUDirArgIR;
-        SCUarg_1[i] -> Init(scudir[i],SCU_SEND,&SCUDMAarg_p[i*2],2,IR_5);
-        SCUarg_1[i] ->Assert();
+        SCUarg_1[odd][i + NUM_DIR].Init(scudir[i],SCU_REC, &SCUDMAarg_p[odd][(i+NUM_DIR)*2],2, scu_irs[odd][0]);
+        SCUarg_1[odd][i + NUM_DIR].Assert();
       }
+  
+      //send arguments
+      if ((i == 0) || ( i == 4)){
+        if (size[j] >4)
+          SCUarg[odd][i].Init (Tbuffer[2][(4 - i)/4], scudir[i], SCU_SEND,
+  		       blklen[j], numblk[j], stride[j], scu_irs[odd][2] );
+        else if (size[j] >2) 
+          SCUarg[odd][i].Init (Tbuffer[1][i/4], scudir[i], SCU_SEND,
+  		       blklen[j], numblk[j], stride[j], scu_irs[odd][2] );
+        else
+          SCUarg[odd][i].Init (chi_off_node[0][4-i], scudir[i], SCU_SEND,
+  		       blklen[j], numblk[j], stride[j], scu_irs[odd][2] );
+        SCUarg[odd][i].Assert();
+  
+        SCUDMAarg_p[odd][i*2] = new SCUDMAInst;
+        SCUDMAarg_p[odd][i*2] ->Init(Tbuffer[0][(4 - i)/4], 
+  		       blklen[j], numblk[j], stride[j]);
+
+        SCUDMAarg_p[odd][i*2+1] = new SCUDMAInst;
+        if(size[j]>2)
+          SCUDMAarg_p[odd][i*2+1] ->Init(Tbuffer[1][(4 - i)/4], 
+  		       blklen[j], numblk[j], stride[j]);
+        else
+          SCUDMAarg_p[odd][i*2+1] ->Init(Tbuffer[0][i/4], 
+  		       blklen[j], numblk[j], stride[j]);
+  
+        if( split ){
+          SCUarg_1[odd][i].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],1,scu_irs[odd][0]);
+          SCUarg_1[odd][i].Assert();
+          SCUarg_2[odd][i].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2+1],1,scu_irs[odd][1]);
+          SCUarg_2[odd][i].Assert();
+        } else {
+          SCUarg_1[odd][i].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],2,scu_irs[odd][0]);
+          SCUarg_1[odd][i].Assert();
+        }
+      }
+      else{
+        if(size[j] >2)
+  //
+  // put in chi_off_node_total to pass communicable test. CJ
+  //
+          SCUarg[odd][i].Init(chi_off_node_total, scudir[i], SCU_SEND,
+  		       blklen[j], numblk[j], stride[j], scu_irs[odd][2] );
+        else
+          SCUarg[odd][i].Init(chi_off_node[0][(i+4)%NUM_DIR], scudir[i], SCU_SEND,
+             VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j]),1,0, scu_irs[odd][2] );
+
+        SCUarg[odd][i].Assert();
+  
+        SCUDMAarg_p[odd][i*2] = new SCUDMAInst;
+        SCUDMAarg_p[odd][i*2] ->Init(chi_off_node_total, 
+  		       blklen[j], numblk[j], stride[j]);
+        SCUDMAarg_p[odd][i*2+1] = new SCUDMAInst;
+        SCUDMAarg_p[odd][i*2+1] ->Init(chi_off_node_total, 
+  		       blklen[j], numblk[j], stride[j]);
+        if( split ){
+          SCUarg_1[odd][i].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],1,scu_irs[odd][0]);
+          SCUarg_1[odd][i].Assert();
+          SCUarg_2[odd][i]. Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2+1],1,scu_irs[odd][1]);
+          SCUarg_2[odd][i].Assert();
+        } else {
+          SCUarg_1[odd][i].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],2,scu_irs[odd][0]);
+          SCUarg_1[odd][i].Assert();
+        }
+      }
+    }// end of NUM_DIR loop
+  
+    SCUDirArgIR *SCUarg_p[2*NUM_DIR];
+  
+//    SCUmulti[odd] = new SCUDirArgMulti;
+    for(i = 0;i<2*NUM_DIR;i++) SCUarg_p[i] = &(SCUarg[odd][i]);
+    SCUmulti[odd].Init(SCUarg_p, 2*NUM_DIR);
+//    SCUmulti_1[odd] = new SCUDirArgMulti;
+    for(i = 0;i<2*NUM_DIR;i++) SCUarg_p[i] = &(SCUarg_1[odd][i]);
+    SCUmulti_1[odd].Init(SCUarg_p, 2*NUM_DIR);
+    if( split ){
+//      SCUmulti_2[odd] = new SCUDirArgMulti;
+      for(i = 0;i<2*NUM_DIR;i++) SCUarg_p[i] = &(SCUarg_2[odd][i]);
+      SCUmulti_2[odd].Init(SCUarg_p, 2*NUM_DIR);
     }
-  }// end of NUM_DIR loop
-
-
-  SCUmulti = new SCUDirArgMulti;
-  SCUmulti->Init(SCUarg, 2*NUM_DIR);
-  SCUmulti_1 = new SCUDirArgMulti;
-  SCUmulti_1->Init(SCUarg_1, 2*NUM_DIR);
-  if( split ){
-    SCUmulti_2 = new SCUDirArgMulti;
-    SCUmulti_2->Init(SCUarg_2, 2*NUM_DIR);
-  }
+  } // end of odd loop
 
   //-------------------------------------------------------------------
   //  Need send offsets for various transfers.  The index for
   //  sends is TM, XM, YM, ZM, TP, XP, YP, ZP, since the
   //  transfers are indexed by the node data is received from.
   //-------------------------------------------------------------------
+// printf("Xoffset=%p\n",Xoffset);
 for ( k = 0; k < 3; k++ ) {
   Xoffset[k][0] = 0;
   Xoffset[k][1] = VECT_LEN * size[0] * (size[1] - 1-k) / 2;
@@ -760,6 +809,7 @@ for ( k = 0; k < 3; k++ ) {
   Xoffset[k][6] = VECT_LEN * size[0] * size[1]*k /2;
   Xoffset[k][7] = VECT_LEN * size[0] * size[1] * size[2]*k /2;
 } // end of k loop
+printf("done\n");fflush(stdout);
 }
 
 extern "C"
@@ -767,34 +817,29 @@ void asqtad_destroy_dirac_buf()
 {
   int i,k;
 
-  sfree (tmpfrm);
-  sfree(chi_off_node_total);
-  delete SCUmulti;
-  delete SCUmulti_1;
-  if(split)
-  delete SCUmulti_2;
+  qfree (tmpfrm);
+  qfree(chi_off_node_total);
 
   for ( i = 0; i < 2; i++ ) {
     sfree(chi_nl[i]);
     sfree(chi_l[i]);
     for ( k = 0; k < 3; k++ ) {
-      sfree(Tbuffer[k][i]);
-      sfree(ToffsetP[k][i]);
-      sfree(ToffsetM[k][i]);
+      qfree(Tbuffer[k][i]);
+      qfree(ToffsetP[k][i]);
+      qfree(ToffsetM[k][i]);
     }
   }
     
-  for ( i = 0; i < NUM_DIR; i++ ) {
-    delete SCUarg[2*i];
-    delete SCUarg[2*i+1];
-    delete SCUarg_1[2*i];
-    delete SCUarg_1[2*i+1];
-    if(split){
-      delete SCUarg_2[2*i];
-      delete SCUarg_2[2*i+1];
+
+  for (int odd = 0; odd<2;odd++){
+//    delete SCUmulti[odd];
+//    delete SCUmulti_1[odd];
+ //   if(split)
+//    delete SCUmulti_2[odd];
+    for ( i = 0; i < NUM_DIR; i++ ) {
+      for(k=0;k<4;k++)
+        delete SCUDMAarg_p[odd][i*4+k];
     }
-    for(k=0;k<4;k++)
-      delete SCUDMAarg_p[i*4+k];
   }
 }
 //-------------------------------------------------------------------
@@ -804,10 +849,10 @@ void asqtad_destroy_dirac_buf()
 
 static int SetCoord( int sg )
 {
-  coord[1] =   sg % size[1];
-  coord[2] = ((int)( sg / size[1] )) % size[2];
-  coord[3] = ((int)( sg / ( size[1] * size[2] ) )) % size[3];
-  coord[0] = ((int)( sg / ( size[1] * size[2] * size[3] ) )) % size[0];
+  coord[0] =   sg % size[0];
+  coord[1] = ((int)( sg / size[0] )) % size[1];
+  coord[2] = ((int)( sg / ( size[0] * size[1] ) )) % size[2];
+  coord[3] = ((int)( sg / ( size[0] * size[1] * size[2] ) ));
 
   return ( coord[0] + coord[1] + coord[2] + coord[3] ) % 2;
 }
@@ -925,19 +970,25 @@ int non_local_count_3[3][2];
      if(uc_l[i] == 0){
        ERR.Pointer(cname,fname, "uc_l[i]"); exit(3);
 	}
-    for(j=0;j<MATRIX_SIZE*(local_chi+local_chi_3)/2;j++)
-	uc_l[i][j]=0.;
-    uc_l_agg[i]  = (gauge_agg *)smalloc(((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
+    for(j=0;j<MATRIX_SIZE*(local_chi+local_chi_3)/2;j++) uc_l[i][j]=0.;
+    uc_l_agg[i]  = (gauge_agg *)qalloc(QFAST,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
+   if(uc_l_agg[i] == 0){
+      uc_l_agg[i]  = (gauge_agg *)qalloc(QCOMMS,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
+      printf("uc_l_agg[%d] is allocated at DDR (%p)\n",i,uc_l_agg[i]);
+    }
 
      if(uc_l[i] == 0)
        ERR.Pointer(cname,fname, "uc_l[i]");
      if(uc_l_agg[i] == 0)
        ERR.Pointer(cname,fname, "uc_l_agg[i]");
  
-    uc_nl[i] = (IFloat*)smalloc( MATRIX_SIZE * ((non_local_chi +non_local_chi_3)/2) * sizeof(IFloat) );
-//    for(int j=0;j<MATRIX_SIZE*(non_local_chi+non_local_chi_3)/2;j++)
-//	uc_nl[i][j]=0.;
-    uc_nl_agg[i]  = (gauge_agg*)smalloc(((non_local_chi+non_local_chi_3)/2)*sizeof(gauge_agg));
+    uc_nl[i] = (IFloat*)smalloc( MATRIX_SIZE * ((non_local_chi +non_local_chi_3[3])/2) * sizeof(IFloat) );
+
+    uc_nl_agg[i]  = (gauge_agg*)qalloc(QFAST,((non_local_chi+non_local_chi_3[3])/2)*sizeof(gauge_agg));
+    if(uc_nl_agg[i] == 0){
+      uc_nl_agg[i]  = (gauge_agg*)qalloc(QCOMMS,((non_local_chi+non_local_chi_3[3])/2)*sizeof(gauge_agg));
+      printf("uc_nl_agg[%d] is allocated at DDR (%p)\n",i,uc_nl_agg[i]);
+    }
 
     if(uc_nl[i] == 0){
        ERR.Pointer(cname,fname, "uc_nl[i]");
@@ -952,6 +1003,7 @@ FILE *fp;
   ParTransAsqtad pt(*lat_pt);
   Float *gauge_p = (Float *)gauge_field_addr;
   Matrix *result[NUM_DIR];
+#ifdef USE_NEW
   Matrix *Unit = new Matrix[vol];
   Matrix *P3 = new Matrix[vol];
   Matrix *P3mu = new Matrix[vol];
@@ -959,15 +1011,28 @@ FILE *fp;
   Matrix *P5mu = new Matrix[vol];
   Matrix *P7 = new Matrix[vol];
   Matrix *P7mu = new Matrix[vol];
+  for(j = 0;j<NUM_DIR;j++)
+     result[j] = new Matrix[vol];
+#else
+  Matrix *Unit = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
+  Matrix *P3 = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
+  Matrix *P3mu = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
+  Matrix *P5 = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
+  Matrix *P5mu = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
+  Matrix *P7 = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
+  Matrix *P7mu = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
+  for(j = 0;j<NUM_DIR;j++)
+     result[j] = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
+#endif
   Matrix *P6 = P5;
   Matrix *P6mu = P5mu;
   Matrix *Pmumu = P7;
   Matrix *Pmumumu = P7mu;
   for(j = 0;j<vol;j++) Unit[j].UnitMatrix();
-  for(j = 0;j<NUM_DIR;j++){
      result[j] = new Matrix[vol];
+  for(j = 0;j<NUM_DIR;j++)
      for(int k = 0;k<vol;k++) result[j][k].ZeroMatrix();
-  }
+  IFloat *temp;
   int dirs[] = {6,0,2,4,7,1,3,5}; //mapping between ParTrans and DiracOpAsqtad
   Matrix *min[NUM_DIR],*mout[NUM_DIR];
   for(int mu = 0;mu<NUM_DIR;mu++){
@@ -1078,7 +1143,7 @@ FILE *fp;
       if ( CoordkNN( n,3 ) ){ 	// chi(x+mu) off-node
         for(int j=0;j<3;j++)
           if(coord_knn[n%4]==j){
-            tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * (non_local_count_3[j][odd]+(j+1)*non_local_chi/2));
+            tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * (non_local_count_3[j][odd]+(non_local_chi_3[j]+non_local_chi)/2));
             *tmp = result[n][LexGauge(coord)]; 
 	    int index = non_local_count_3[j][odd]+(j+1)*non_local_chi/2;
 //        printf("x = %d %d %d %d n= %d uc_nl[%d][%d]=%e ",coord[0],coord[1],coord[2],coord[3],n,odd,index,*((Float *)tmp));
@@ -1107,7 +1172,7 @@ FILE *fp;
       if ( CoordkNN( n+4,3 ) ){ 	// chi(x+mu) off-node
         for(int j=0;j<3;j++)
           if(coord_knn[n%4]==(size[n%4]-1-j)){
-            tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * (non_local_count_3[j][odd]+(j+1)*non_local_chi/2));
+            tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * (non_local_count_3[j][odd]+(non_local_chi_3[j]+non_local_chi)/2));
 	    int index = non_local_count_3[j][odd]+(j+1)*non_local_chi/2;
             *tmp = result[n+4][LexGauge(coord)]; 
 //        printf("x = %d %d %d %d n= %d uc_nl[%d][%d]=%e ",coord[0],coord[1],coord[2],coord[3],n+4,odd,index,*((Float *)tmp));
@@ -1127,6 +1192,7 @@ FILE *fp;
     }
   }
 
+#ifdef USE_NEW
   delete[] Unit;
   delete[] P3;
   delete[] P3mu;
@@ -1136,6 +1202,17 @@ FILE *fp;
   delete[] P7mu;
   for(int j = 0;j<NUM_DIR;j++)
   delete[] result[j];
+#else
+  qfree( Unit);
+  qfree( P3);
+  qfree( P3mu);
+  qfree( P5);
+  qfree( P5mu);
+  qfree( P7);
+  qfree( P7mu);
+  for(int j = 0;j<NUM_DIR;j++)
+  qfree( result[j]);
+#endif
 }
 
   int fd;
@@ -1145,7 +1222,7 @@ FILE *fp;
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
     for(i=0;i< MATRIX_SIZE * ((local_chi+ local_chi_3)/2);i++){
-      fprintf(fp,"%0.8e, ",*(uc_l[j]+i));
+      fprintf(fp,"%0.4e, ",*(uc_l[j]+i));
       if( i%6 == 5){
         fprintf(fp,"\n");
       }
@@ -1155,18 +1232,21 @@ FILE *fp;
   fclose(fp);
 #endif
 
-  gauge_agg temp[12*vol];
+  gauge_agg *temp = new gauge_agg[12*vol];
   int num_ind[vol*6];
   int src;
+//  printf("chi_l=0x%x\nchi_l[0][0]=%d\n",chi_l,chi_l[0][0]);
   for(j=0;j<2;j++){
     for(i=0;i<vol;i++) num_ind[i]=0;
     for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
       src = (int)chi_l[j][2*i];
+//      printf("chi_l[%d][%d]=%d %d\n",j,i*2,chi_l[j][2*i],src);
       if (src%(VECT_LEN*sizeof(IFloat))!=0){
         ERR.General(cname,fname,"src = %d\n",src);
         exit(1);
       }
       src = src/(VECT_LEN*sizeof(IFloat));
+//      printf("src[%d]=%d\n",i,src);
       if(src > vol/2) {
         ERR.General(cname,fname,"src[%d](%d) > vol/2\n",i,src);
         exit(1);
@@ -1179,7 +1259,7 @@ FILE *fp;
       num_ind[src]++;
     }
     int index = 0;
-    int div = 2;
+    int div = 4;
     for( n = 0; n*div<NUM_DIR*2;n++)
     for(i=0;i<vol/2;i++){
       for(m=0;m<div;m++){
@@ -1191,11 +1271,12 @@ FILE *fp;
            index++;
         }
       }
+      if (n==0) odd_num +=num_ind[i]%div;
     }
   }
 
+  gauge_agg *agg_p;
 #if 0
-  struct gauge_agg *agg_p;
   fp=fopen(uc_l_agg_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"struct gauge_agg uc_l_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
@@ -1224,8 +1305,8 @@ FILE *fp;
   fp = fopen(uc_nl_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat uc_nl%d[] LOCATE(\"edramnormal\") = {\n",j); 
-    for(i=0;i< MATRIX_SIZE * ((non_local_chi+non_local_chi_3 )/2);i++){
-      fprintf(fp,"%0.8e, ",*(uc_nl[j]+i));
+    for(i=0;i< MATRIX_SIZE * ((non_local_chi+non_local_chi_3[3] )/2);i++){
+      fprintf(fp,"%0.4e, ",*(uc_nl[j]+i));
       if( i%6 == 5){
         fprintf(fp,"\n");
       }
@@ -1237,7 +1318,7 @@ FILE *fp;
 
   for(j=0;j<2;j++){
     for(i=0;i<non_local_chi*3/2;i++) num_ind[i]=0;
-    for(i=0;i< ((non_local_chi+ non_local_chi_3)/2);i++){
+    for(i=0;i< ((non_local_chi+ non_local_chi_3[3])/2);i++){
       src = (int)chi_nl[j][2*i];
       if (src%(VECT_LEN*sizeof(IFloat))!=0){
         ERR.General(cname,fname,"src = %d\n",src);
@@ -1271,12 +1352,13 @@ FILE *fp;
       }
     }
   }
+  delete[] temp;
 
 #if 0
   fp = fopen(uc_nl_agg_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"struct gauge_agg uc_nl_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
-    for(i=0;i< ((non_local_chi+ non_local_chi_3)/2);i++){
+    for(i=0;i< ((non_local_chi+ non_local_chi_3[3])/2);i++){
       agg_p = &(uc_nl_agg[j][i]);
       fprintf(fp,"{%d,%d,{\n",agg_p->src,agg_p->dest);
       for(k=0;k<18;k++){
@@ -1289,7 +1371,6 @@ FILE *fp;
         }
       }
       fprintf(fp,"}},\n");
-      fprintf(fp,buf,strlen(buf));
     }
     fprintf(fp,"\n};\n"); 
   }
@@ -1307,8 +1388,8 @@ void asqtad_destroy_dirac_buf_g(void)
   for ( i = 0; i < 2; i++){
   sfree(uc_l[i]);
   sfree(uc_nl[i]);
-  sfree(uc_l_agg[i]);
-  sfree(uc_nl_agg[i]);
+  qfree(uc_l_agg[i]);
+  qfree(uc_nl_agg[i]);
   }
 }
 //---------------------------------------------------------------------
@@ -1361,13 +1442,15 @@ static int CoordkNN( int nn, int k )
 
      if (nn<4 ) coord_knn[m]+=k;
      else coord_knn[m]-=k;
+#if 0
      while (coord_knn[m] < 0) {
         coord_knn[m] += size[m] ;
          }
        coord_knn[m] %= size[m] ;
+#endif
  
-  if (nn<4 ){ if (coord_knn[m] != (coord[m]+k)) off_node = 1;}
-       else {if (coord_knn[m] != (coord[m]-k)) off_node = 1;}
+  if (nn<4 ){ if (coord_knn[m] >(size[m]-1)) {coord_knn[m] -=size[m];off_node = 1;}}
+       else {if (coord_knn[m] <0 ) {coord_knn[m]  +=size[m];off_node = 1;}}
   return off_node;
 }
 
@@ -1436,10 +1519,11 @@ static int LexSurface( int * cc, int surface )
 
 extern "C" void dirac_comm_assert()
 {
-  int i;
+  int i,odd;
+  for(odd=0;odd<2;odd++)
   for(i=0;i<2*NUM_DIR;i++){
-    if(!(SCUarg[i]->Valid()) ) SCUarg[i]->Assert();
-    if(!(SCUarg_1[i]->Valid()) ) SCUarg_1[i]->Assert();
+     SCUarg[odd][i].Assert();
+     SCUarg_1[odd][i].Assert();
   }
 }
 
@@ -1448,90 +1532,139 @@ extern "C" void dirac_comm_assert()
 //  add_flag = 1 :       b += D a
 //
 //  a_odd    = 1 :	 b even;  a odd
-//  a_odd    = 0 :	 b odd ;  b even
+//  a_odd    = 0 :	 b odd ;  a even
 //
 //   D a = \sum_u( U^dag_u(x) a(x+u) - U(x-u) a(x-u) )
 //-------------------------------------------------------------------
 
 
+static int called=0;
+static unsigned long address[]={0x0,0x0};
 extern "C"
 void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
 {
-  int i,j,k,c = (int) chi_off_node_total;
+  int i,j,k;
   int odd = 1 - a_odd;
-  char *cname = "DiracOpAsqtad";
-  char *fname = "asqtad_dirac(F*,F*,i,i)";
-  VRB.Func(cname,fname);
+  long c = (long) chi_off_node_total;
+  long uc_l = (long)uc_l_agg[odd];
+  long uc_nl = (long)uc_nl_agg[odd];
+  long uc_nl2 = (long)&(uc_nl_agg[odd][isplit]);
+  long cache_p0=uc_l;
+  long cache_p1=cache_p0+32;
+  long cache_p2=cache_p1+32;
+  long cache_p3=cache_p2+32;
+  long cache_p4=cache_p3+32;
+  long cache_p5=cache_p4+32;
+  long cache_p6=cache_p5+32;
+  long cache_p7=cache_p6+32;
+  int num_flops;
+  Float dtime;
+  struct timeval start,end;
+  
+
+#undef PROFILE
+#ifdef PROFILE
+  num_flops = 0;
+  gettimeofday(&start,NULL);
+#endif
+  if( (unsigned long)a != address[odd]){
+//    printf("a[%d] = %p -> %p\n",odd,address[odd],a);
+    address[odd] = (unsigned long)a;
+  
+    for(i=1;i<4;i++)
+    if(size[i] >2 ){
+      SCUarg[odd][i].Addr( a + Xoffset[2][i]);
+      SCUarg[odd][i+4].Addr( a + Xoffset[2][i+4]);
+    }
+  
+    void *addr[2];
+    if(split) {
+      for(i=1;i<4;i++){
+        addr[0] = (void *)(a+Xoffset[0][i]);
+        addr[1] = (void *)(a+Xoffset[1][i]);
+        SCUarg_1[odd][i].Addr( addr,1);
+        SCUarg_2[odd][i].Addr( addr+1,1);
+        addr[0] = (void *)(a+Xoffset[0][i+4]);
+        addr[1] = (void *)(a+Xoffset[1][i+4]);
+        SCUarg_1[odd][i+4].Addr( addr,1);
+        SCUarg_2[odd][i+4].Addr( addr+1,1);
+      }
+    } else {
+      for(i=1;i<4;i++){
+        addr[0] = (void *)(a+Xoffset[0][i]);
+        addr[1] = (void *)(a+Xoffset[1][i]);
+        SCUarg_1[odd][i].Addr( addr,2);
+        addr[0] = (void *)(a+Xoffset[0][i+4]);
+        addr[1] = (void *)(a+Xoffset[1][i+4]);
+        SCUarg_1[odd][i+4].Addr( addr,2);
+      }
+    }
+  } // if address[odd] != a
+
+
   //-----------------------------------------------------------------
   //  Transfer chi's on faces.  
   //-----------------------------------------------------------------
-
-
-//  transient_cache_flush();
 
   copy_buffer(countM[0][a_odd], (long)a, (long)Tbuffer[0][0], (long)ToffsetM[0][a_odd]);
   copy_buffer(countP[0][a_odd], (long)a, (long)Tbuffer[0][1], (long)ToffsetP[0][a_odd]);
   if(size[0]>2) {
   copy_buffer(countM[1][a_odd], (long)a, (long)Tbuffer[1][0], (long)ToffsetM[1][a_odd]);
   copy_buffer(countP[1][a_odd], (long)a, (long)Tbuffer[1][1], (long)ToffsetP[1][a_odd]);
+  }
   if(size[0]>4) {
   copy_buffer(countM[2][a_odd], (long)a, (long)Tbuffer[2][0], (long)ToffsetM[2][a_odd]);
   copy_buffer(countP[2][a_odd], (long)a, (long)Tbuffer[2][1], (long)ToffsetP[2][a_odd]);
   }
-  }
+#if 0
+	if(called<2)
+    for (int i = 0; i<(vol*VECT_LEN/2);i++)
+	if (fabs(a[i]) >1e-10)
+		fprintf(stderr,"a[%d]=%e\n",i,a[i]);
+
+	if(called<2)
+    for (int i = 0; i<1;i++)
+    for (int j = 0; j<2;j++)
+	for (int k = 0; k<(size[1]*size[2]*size[3]*VECT_LEN)/2;k++){
+	if (fabs(*(Tbuffer[i][j]+k)) >1e-10)
+		fprintf(stderr,"Tbuffer[%d][%d][%d]=%e\n",i,j,k,*(Tbuffer[i][j]+k));
+    }
+#endif
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  print_flops(0,&start,&end);
+#endif
+
+  sys_cacheflush(0);
 
   //make sure spinor field is in main memory before starting transfers
 
-  for(i=1;i<4;i++)
-  if(size[i] >2 ){
-    SCUarg[i]->Addr( a + Xoffset[2][i]);
-    SCUarg[i+4]->Addr( a + Xoffset[2][i+4]);
-  }
+  SCUmulti_1[odd].StartTrans();
 
-  save_reg((long)intreg, (long)dreg);
- //*************
-
-  void *addr[2];
-  if(split) {
-    for(i=1;i<4;i++){
-      addr[0] = (void *)(a+Xoffset[0][i]);
-      addr[1] = (void *)(a+Xoffset[1][i]);
-      SCUarg_1[i]->Addr( addr,1);
-      SCUarg_2[i]->Addr( addr+1,1);
-      addr[0] = (void *)(a+Xoffset[0][i+4]);
-      addr[1] = (void *)(a+Xoffset[1][i+4]);
-      SCUarg_1[i+4]->Addr( addr,1);
-      SCUarg_2[i+4]->Addr( addr+1,1);
-    }
-  } else {
-    for(i=1;i<4;i++){
-      addr[0] = (void *)(a+Xoffset[0][i]);
-      addr[1] = (void *)(a+Xoffset[1][i]);
-      SCUarg_1[i]->Addr( addr,2);
-      addr[0] = (void *)(a+Xoffset[0][i+4]);
-      addr[1] = (void *)(a+Xoffset[1][i+4]);
-      SCUarg_1[i+4]->Addr( addr,2);
-    }
-  }
-
-
-  SCUmulti_1->StartTrans();
-
-  save_reg((long)intreg, (long)dreg);
+#undef PROFILE
+#ifdef PROFILE
+  num_flops = 33*(local_chi + local_chi_3);
+  gettimeofday(&start,NULL);
+#endif
 
   //-----------------------------------------------------------------
   //do first local computations
   //-----------------------------------------------------------------
-  IFloat *fp0,*fp1, *uu;
-  int *ch;
-
-
-#ifdef IND_AGG
+  dcbt(cache_p0);cache_p0=uc_nl;
+  dcbt(cache_p1);cache_p1=cache_p0+32;
+  dcbt(cache_p2);cache_p2=cache_p1+32;
+  dcbt(cache_p3);cache_p3=cache_p2+32;
+  dcbt(cache_p4);cache_p4=cache_p3+32;
+  dcbt(cache_p5);cache_p5=cache_p4+32;
+  dcbt(cache_p6);cache_p6=cache_p5+32;
+#ifdef CPP
+  dirac_cmv_jcw_agg_cpp( (local_chi + local_chi_3)/2, (long)0, uc_l, (long)a, (long)tmpfrm);
+#else
+  if (odd_num)
   dirac_cmv_jcw_agg( (local_chi + local_chi_3)/2, (long)0, (long)uc_l_agg[odd],
 	       (long)a, (long)tmpfrm);
-#else
-  dirac_cmv( (local_chi + local_chi_3)/2, (long)chi_l[odd], (long)uc_l[odd],
-	       (long)a, (long)tmpfrm);
+  else
+  dirac_cmv_agg_4( (local_chi + local_chi_3)/2, (long)0, uc_l, (long)a, (long)tmpfrm);
 #endif
 
 
@@ -1539,57 +1672,85 @@ void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   // check to see if transfers are done and start another transfer
   //-----------------------------------------------------------------
 
-  SCUmulti_1->TransComplete();
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  print_flops(num_flops,&start,&end);
+#endif
+
+  SCUmulti_1[odd].TransComplete();
 
 if(split) {
 
-  SCUmulti_2->StartTrans();
-  int isplit = (non_local_chi_3-non_local_chi)/2;
+  SCUmulti_2[odd].StartTrans();
 
-#ifdef IND_AGG
-  dirac_cmv_jcw_agg( isplit, (long)0, (long)&(uc_nl_agg[odd][0]), (long)c, (long)tmpfrm);
-#else
-  dirac_cmv( non_local_chi, (long)(chi_nl[odd]+2*non_local_chi), (long)(uc_nl[odd]+non_local_chi*MATRIX_SIZE) , (long)c, (long)tmpfrm);
+#undef PROFILE
+#ifdef PROFILE
+  num_flops = 66*isplit;
+  gettimeofday(&start,NULL);
 #endif
 
-  SCUmulti_2->TransComplete();
-  SCUmulti->StartTrans();
+  dcbt(cache_p0);cache_p0=uc_nl2;
+  dcbt(cache_p1);cache_p1=cache_p0+32;
+  dcbt(cache_p2);cache_p2=cache_p1+32;
+  dcbt(cache_p3);cache_p3=cache_p2+32;
+  dcbt(cache_p4);cache_p4=cache_p3+32;
+  dcbt(cache_p5);cache_p5=cache_p4+32;
+  dcbt(cache_p6);cache_p6=cache_p5+32;
+#ifdef CPP
+  dirac_cmv_jcw_agg_cpp( isplit, (long)0, (long)&(uc_nl_agg[odd][0]), (long)c, (long)tmpfrm);
+#else
+  dirac_cmv_jcw_agg( isplit, (long)0, uc_nl, c, (long)tmpfrm);
+#endif
 
-#ifdef IND_AGG
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  print_flops(num_flops,&start,&end);
+#endif
+
+  SCUmulti_2[odd].TransComplete();
+
+  SCUmulti[odd].StartTrans();
+
+#ifdef PROFILE
+  num_flops = 33*(non_local_chi);
+  gettimeofday(&start,NULL);
+#endif
+
 #ifdef CPP
   dirac_cmv_jcw_agg_cpp( non_local_chi/2, (long)0, (long)&(uc_nl_agg[odd][isplit]), (long)c, (long)tmpfrm);
 #else
-  dirac_cmv_jcw_agg( non_local_chi/2, (long)0, (long)&(uc_nl_agg[odd][isplit]), (long)c, (long)tmpfrm);
+  dirac_cmv_jcw_agg( non_local_chi/2, (long)0, uc_nl2, (long)c, (long)tmpfrm);
 #endif //#ifdef CPP
-#else
-#ifdef CPP
-  dirac_cmv_cpp( non_local_chi, (long)(chi_nl[odd]+2*non_local_chi), (long)(uc_nl[odd]+non_local_chi*MATRIX_SIZE), (long)c, (long)tmpfrm);
-#else
-  dirac_cmv( non_local_chi, (long)(chi_nl[odd]+2*non_local_chi), (long)(uc_nl[odd]+non_local_chi*MATRIX_SIZE) , (long)c, (long)tmpfrm);
-#endif //#ifdef CPP
-#endif
 
 
 } else {
 
-  SCUmulti->StartTrans();
+  SCUmulti[odd].StartTrans();
 
   //-----------------------------------------------------------------
   //do the computations involving "chi" non-local spinors
   //-----------------------------------------------------------------
 
-#ifdef IND_AGG
-  dirac_cmv_jcw_agg( non_local_chi_3/2, (long)0, (long)&(uc_nl_agg[odd][0]), (long)c, (long)tmpfrm);
-#else
-#ifdef CPP
-  dirac_cmv_cpp( non_local_chi, (long)(chi_nl[odd]+2*non_local_chi), (long)(uc_nl[odd]+non_local_chi*MATRIX_SIZE), (long)c, (long)tmpfrm);
-#else
-  dirac_cmv( non_local_chi, (long)(chi_nl[odd]+2*non_local_chi), (long)(uc_nl[odd]+non_local_chi*MATRIX_SIZE) , (long)c, (long)tmpfrm);
-#endif //#ifdef CPP
+
+#ifdef PROFILE
+  num_flops = 33*(non_local_chi + non_local_chi_3[2]);
+  gettimeofday(&start,NULL);
 #endif
+
+#ifdef CPP
+  dirac_cmv_jcw_agg_cpp( (non_local_chi+non_local_chi_3[2])/2, (long)0, (long)&(uc_nl_agg[odd][0]), (long)c, (long)tmpfrm);
+#else
+  dirac_cmv_jcw_agg( (non_local_chi+non_local_chi_3[2])/2, (long)0, (long)&(uc_nl_agg[odd][0]), (long)c, (long)tmpfrm);
+#endif
+
 }
 
-  SCUmulti->TransComplete();
+
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  print_flops(num_flops,&start,&end);
+#endif
+  SCUmulti[odd].TransComplete();
 
  
 
@@ -1597,11 +1758,34 @@ if(split) {
   //do the computations involving chi3 non-local spinors
   //----------------------------------------------------------------
 
-#ifdef IND_AGG
-  dirac_cmv_jcw_agg( non_local_chi/2, (long)0, (long)&(uc_nl_agg[odd][non_local_chi_3/2]) , (long)c, (long)tmpfrm);
-#else
-  dirac_cmv( non_local_chi, (long)0, (long)(uc_nl[odd]), (long)c, (long)tmpfrm);
+
+#undef PROFILE
+#ifdef PROFILE
+//  num_flops = 1146*vol/2;
+  num_flops = 33*non_local_chi;
+  dtime = -dclock();
 #endif
+
+#ifdef CPP
+  dirac_cmv_jcw_agg_cpp( non_local_chi/2, (long)0, (long)&(uc_nl_agg[odd][(non_local_chi+non_local_chi_3[2])/2]) , (long)c, (long)tmpfrm);
+#else
+  dirac_cmv_jcw_agg( non_local_chi/2, (long)0, (long)&(uc_nl_agg[odd][(non_local_chi+non_local_chi_3[2])/2]) , (long)c, (long)tmpfrm);
+#endif
+
+#ifdef PROFILE
+  dtime +=dclock();
+  printf("dirac_cmv_jcw_agg::%ld flops/%e seconds = %e MFlops\n",num_flops,dtime,(Float)num_flops/(dtime*1e6));
+#endif
+
+#if 0
+	if(called<2)
+    for (int i = 0; i<3*non_local_chi* VECT_LEN / 2;i++ ){
+	if (fabs(chi_off_node_total[i]) >1e-10)
+		fprintf(stderr,"chi_off_node_total[%d]=%e\n",i,chi_off_node_total[i]);
+    }
+	called++;
+#endif
+
 
   //printf ("the computations involving chi3 non-local spinors done \n");
   // check to see if transfers are done
@@ -1610,17 +1794,22 @@ if(split) {
   //              ^^^ change must be made in  dirac_sum**
   //-----------------------------------------------------------------
 
+
+#undef PROFILE
+#ifdef PROFILE
+  num_flops = 45*vol;
+  dtime = -dclock();
+#endif
   if ( add_flag == 0){
     dirac_sum2_64( vol/2, (long)0, (long)tmpfrm, (long)b);
   }
   else{
-
     dirac_sum_acc_cpp( vol/2, (long)0, (long)tmpfrm, (long)b);
-
   }
-
-  restore_reg((long)intreg, (long)dreg);
-
+#ifdef PROFILE
+  dtime +=dclock();
+  printf("dirac_cmv_jcw_agg::%ld flops/%e seconds = %e MFlops\n",num_flops,dtime,(Float)num_flops/(dtime*1e6));
+#endif
 
 }
 

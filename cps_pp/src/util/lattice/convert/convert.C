@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of methods converting between different data layouts.
 
-  $Id: convert.C,v 1.5 2004-02-16 13:21:42 zs Exp $
+  $Id: convert.C,v 1.6 2004-04-27 03:51:20 cwj Exp $
   
   \todo Why not make these (and other) methods of FWilsonTypes and FstagTypes
   to avoid reimplementing them for each fermion class?
@@ -11,14 +11,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-02-16 13:21:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v 1.5 2004-02-16 13:21:42 zs Exp $
-//  $Id: convert.C,v 1.5 2004-02-16 13:21:42 zs Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v 1.6 2004-04-27 03:51:20 cwj Exp $
+//  $Id: convert.C,v 1.6 2004-04-27 03:51:20 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v $
 //  $State: Exp $
 //
@@ -501,7 +501,7 @@ void FstagTypes::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
   \param from The current order; either CANONICAL or WILSON.
 */
 //------------------------------------------------------------------
-void Fdwf::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
+void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
 {
 	Float *field_ptr;
 	Float *tmp_field_ptr;

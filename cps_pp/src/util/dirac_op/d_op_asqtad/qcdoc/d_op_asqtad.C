@@ -1,56 +1,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mike $
-//  $Date: 2004-02-04 02:49:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v 1.4 2004-02-04 02:49:04 mike Exp $
-//  $Id: d_op_asqtad.C,v 1.4 2004-02-04 02:49:04 mike Exp $
+//  $Author: cwj $
+//  $Date: 2004-04-27 03:51:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v 1.5 2004-04-27 03:51:17 cwj Exp $
+//  $Id: d_op_asqtad.C,v 1.5 2004-04-27 03:51:17 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.3  2004/01/14 20:05:02  chulwoo
-//  *** empty log message ***
-//
-//  Revision 1.2  2004/01/13 20:39:34  chulwoo
-//  Merging with multibuild
-//
-//  Revision 1.1.2.1  2003/11/06 20:55:16  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.1.1  2003/11/04 05:05:12  chulwoo
-//
-//  starting again
-//
-//
-//  Revision 1.1  2003/09/19 07:16:12  chulwoo
-//
-//  adding dirac operator for asqtad
-//
-//  Revision 1.4  2001/08/16 10:50:20  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:12:46  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:06  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: d_op_asqtad.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v $
 //  $State: Exp $
 //
@@ -73,12 +31,25 @@
 #include <util/smalloc.h>
 #include <util/verbose.h>
 #include <util/error.h>
+#include <util/time.h>
 #include <util/asqtad.h>
 #include <comms/cbuf.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
+#if TARGET == QCDOC
+#include <qalloc.h>
+#include <ppc_lib.h>
+#endif
+CPS_START_NAMESPACE
+
+extern "C"{
+void vaxmy(Vector *res, Float *scale,Vector *mult,Vector *sub,int ncvec);
+void vaxmy_norm(Vector *res, Float *scale,Vector *mult,Vector *sub, int ncvec, Float *norm);
+}
 
 extern "C" void dirac_comm_assert(void);
+extern SCUDirArgIR *SCUarg;
+extern SCUDirArgIR *SCUarg_1;
 
 //------------------------------------------------------------------
 // Constructor
@@ -124,7 +95,11 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   //----------------------------------------------------------------
   // Allocate memory for the temporary fermion vector frm_tmp.
   //----------------------------------------------------------------
-  frm_tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
+  frm_tmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
+  if(frm_tmp == 0){
+    frm_tmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
+    printf("frm_tmp is allocated int DDR (%p)\n",frm_tmp);
+  }
   if(frm_tmp == 0)
     ERR.Pointer(cname,fname, "frm_tmp");
   VRB.Smalloc(cname,fname, "frm_tmp", 
@@ -157,7 +132,11 @@ DiracOpAsqtad::~DiracOpAsqtad() {
   // Free memory
   //----------------------------------------------------------------
   VRB.Sfree(cname,fname, "frm_tmp", frm_tmp);
+#if TARGET == QCDOC
+  qfree(frm_tmp);
+#else
   sfree(frm_tmp);
+#endif
 }
 
 
@@ -191,14 +170,33 @@ DiracOpAsqtad::~DiracOpAsqtad() {
 void DiracOpAsqtad::MatPcDagMatPc(Vector *out, 
 			       Vector *in, 
 			       Float *dot_prd){
-
+  static long nflops = (1158)*GJP.VolNodeSites();
+  struct timeval start,end;
+//  printf("mass_sq=%e\n",mass_sq);
+#undef PROFILE
+#ifdef PROFILE
+  gettimeofday(&start,NULL);
+#endif
   asqtad_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
   asqtad_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
-  out->FTimesV1MinusV2(mass_sq, in, out, f_size_cb);
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  printf("DiracOpAsqtad::MatPcDagMatPc:: ");
+  print_flops(nflops,&start,&end);
+#endif
 
+//  out->FTimesV1MinusV2(mass_sq, in, out, f_size_cb);
+//  if( dot_prd !=0 ){
+//    *dot_prd = dotProduct((IFloat *) in, (IFloat *) out, f_size_cb);
+//  }
+   vaxmy(out,&mass_sq,in,out,f_size_cb/6);
   if( dot_prd !=0 ){
+//	printf("dot_prd=%e\n",*dot_prd);
     *dot_prd = dotProduct((IFloat *) in, (IFloat *) out, f_size_cb);
+//	printf("dot_prd=%e\n",*dot_prd);
   }
+
+
 }
 
 
@@ -387,6 +385,7 @@ int DiracOpAsqtad::MatInv(Vector *out,
 			PreserveType prs_in) {
   char *fname = "MatInv(V*,V*,F*)";
   VRB.Func(cname,fname);
+  timeval start,end;
 
   IFloat *k_e = (IFloat *)in;
   IFloat *k_o = k_e+f_size_cb;
@@ -403,7 +402,16 @@ int DiracOpAsqtad::MatInv(Vector *out,
   fTimesV1MinusV2((IFloat *)tmp, 2.*mass_rs, k_e,
   	(IFloat *)tmp, f_size_cb);
 
+#define PROFILE
+#ifdef PROFILE
+  gettimeofday(&start,NULL);
+#endif
   int iter = InvCg(out, tmp, true_res);
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  printf("DiracOpAsqtad::InvCg:: ");
+  print_flops(1187*iter*GJP.VolNodeSites(),&start,&end);
+#endif
 
   // calculate odd solution
   IFloat *x_e = (IFloat *)out;
@@ -464,6 +472,11 @@ void DiracOpAsqtad::RitzMat(Vector *out, Vector *in) {
 
     case MATPCDAG_MATPC:
       MatPcDagMatPc(out, in, dot);
+      break;
+      
+    case NEG_MATPCDAG_MATPC:
+      MatPcDagMatPc(out, in, dot);
+      out->VecNegative(out, RitzLatSize());
       break;
       
     case NEG_MATDAG_MAT:

@@ -69,8 +69,8 @@ dirac_sum2_64:
 	bf gt,	lab0
 	subic.	 3,	3,	1
 	bf gt,	lab2
-	b  lab1
-lab1:
+	b  dirac_sum_64_lab1
+dirac_sum_64_lab1:
 	fadd	   0,	6,	12
 	lfd	   18,	128(%r5)
 	fadd	   1,	7,	13
@@ -267,7 +267,7 @@ lab1:
 	stfd	   5,	40(%r6)
 	addi %r6, %r6, 48
 	bf gt,	lab2
-	b  lab1
+	b  dirac_sum_64_lab1
 lab2:
 	fadd	   0,	6,	12
 	lfd	   18,	128(%r5)

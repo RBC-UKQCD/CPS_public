@@ -271,7 +271,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_unique_file="./src/"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX LD AR AS CC CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT NOT_TESTING_QCDSP CFLAGS ac_ct_CC topwd_srcdir ARCH ARCHDIR ASFLAGS DFLAGS INCLUDE_FLAGS TESTING_PARALLEL ENABLE_PARALLEL QOS CWD GSUMPRECISION LOCALPRECISION INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA have_doxygen LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX LD AR AS CC CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT NOT_TESTING_QCDSP CFLAGS ac_ct_CC topwd_srcdir ARCH ARCHDIR ASFLAGS DFLAGS INCLUDE_FLAGS TESTING_PARALLEL ENABLE_PARALLEL QOS DO_GMP CWD GSUMPRECISION LOCALPRECISION INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA have_doxygen LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -814,6 +814,7 @@ Optional Features:
   --enable-target   What target are we compiling for? (default=noarch)
   --enable-optimise   Compile with maximum optimisation. (default=yes)
   --enable-debug   Compile with debug information. (default=no)
+  --enable-gmp   Compile with GNU Multiprecision lib. (default=no)
   --enable-double-prec    Force the code to use double precision throughout (default=yes)
 
 Some influential environment variables:
@@ -3002,7 +3003,7 @@ if test "$enable_target" = "qcdoc"; then
    AS="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${AS}"
    AR="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${AR}"
    LD="env GCC_EXEC_PREFIX=\${QOS}/quser/gcc-lib-user/// ${LD}"
-   INCLUDE_FLAGS="-I\${QOS}/quser/include -I\${QOS}/quser_qker/include -I\${QOS}/qhost_qker ${INCLUDE_FLAGS}"
+   INCLUDE_FLAGS="-I\${QOS}/quser/include -I\${QOS}/quser_qker/include -I\${QOS}/qhost_qker -I\${QOS}/qhost_qker_quser/include ${INCLUDE_FLAGS}"
    CFLAGS="-Wa,-m405 -fno-exceptions -fno-hosted"
    CXXFLAGS="-Wa,-m405 -fno-exceptions -fno-hosted"
    ASFLAGS="-m405"
@@ -3217,12 +3218,32 @@ if test "$enable_debug" = "yes"; then
    CXXFLAGS="${CXXFLAGS} -g -O0"
 fi
 
-DFLAGS=""
+
+# Check whether --enable-gmp or --disable-gmp was given.
+if test "${enable_gmp+set}" = set; then
+  enableval="$enable_gmp"
+
+else
+  enable_gmp="no"
+fi;
+echo "$as_me:$LINENO: checking \"if including gmp\"" >&5
+echo $ECHO_N "checking \"if including gmp\"... $ECHO_C" >&6
+echo "$as_me:$LINENO: result: $enable_gmp" >&5
+echo "${ECHO_T}$enable_gmp" >&6
+if test "$enable_gmp" = "no"; then
+   DFLAGS=""
+else
+   LDFLAGS="${LDFLAGS} -L${enable_gmp}/lib -lgmp"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_gmp}/include"
+   DFLAGS="${DFLAGS} -DGMP"
+fi
+
 if test "$TESTING_PARALLEL" = "yes"; then
    ENABLE_PARALLEL="define PARALLEL"
 else
    ENABLE_PARALLEL="undef PARALLEL"
 fi
+
 
 
 
@@ -3386,7 +3407,7 @@ fi
 
 
 
-                                                                                ac_config_files="$ac_config_files config.h Makefile Makefile.vars Makefile.rules Makefile.compile tests/Makefile_common tests/Makefile_common2 tests/regression.pl"
+                                                  ac_config_files="$ac_config_files config.h Makefile Makefile.rules tests/Makefile_common tests/regression.pl"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -3939,11 +3960,8 @@ do
   # Handling of arguments.
   "config.h" ) CONFIG_FILES="$CONFIG_FILES config.h" ;;
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-  "Makefile.vars" ) CONFIG_FILES="$CONFIG_FILES Makefile.vars" ;;
   "Makefile.rules" ) CONFIG_FILES="$CONFIG_FILES Makefile.rules" ;;
-  "Makefile.compile" ) CONFIG_FILES="$CONFIG_FILES Makefile.compile" ;;
   "tests/Makefile_common" ) CONFIG_FILES="$CONFIG_FILES tests/Makefile_common" ;;
-  "tests/Makefile_common2" ) CONFIG_FILES="$CONFIG_FILES tests/Makefile_common2" ;;
   "tests/regression.pl" ) CONFIG_FILES="$CONFIG_FILES tests/regression.pl" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -4063,6 +4081,7 @@ s,@INCLUDE_FLAGS@,$INCLUDE_FLAGS,;t t
 s,@TESTING_PARALLEL@,$TESTING_PARALLEL,;t t
 s,@ENABLE_PARALLEL@,$ENABLE_PARALLEL,;t t
 s,@QOS@,$QOS,;t t
+s,@DO_GMP@,$DO_GMP,;t t
 s,@CWD@,$CWD,;t t
 s,@GSUMPRECISION@,$GSUMPRECISION,;t t
 s,@LOCALPRECISION@,$LOCALPRECISION,;t t
