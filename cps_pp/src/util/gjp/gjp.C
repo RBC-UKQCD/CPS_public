@@ -3,18 +3,24 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.3 2003-08-12 16:22:51 zs Exp $
+  $Id: gjp.C,v 1.4 2003-10-23 13:38:59 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-08-12 16:22:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.3 2003-08-12 16:22:51 zs Exp $
-//  $Id: gjp.C,v 1.3 2003-08-12 16:22:51 zs Exp $
+//  $Date: 2003-10-23 13:38:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.4 2003-10-23 13:38:59 zs Exp $
+//  $Id: gjp.C,v 1.4 2003-10-23 13:38:59 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3.6.1  2003/08/29 15:56:31  zs
+//  First draft of the asqtad fermion force stuff - it compiles at least!
+//
+//  Revision 1.3  2003/08/12 16:22:51  zs
+//  Added Asqtad action parameters.
+//
 //  Revision 1.7  2001/08/01 12:11:29  anj
 //  Minor alteration to allow the serial RNG seed to be set from config.h,
 //  via a #define. Anj.
@@ -58,7 +64,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -526,6 +532,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
 
   // Set the asqtad improved  staggered fermion action parameters.
 
+  asqtad_KS = rda.asqtad_KS;	  
   asqtad_naik = rda.asqtad_naik;	  
   asqtad_3staple = rda.asqtad_3staple; 
   asqtad_5staple = rda.asqtad_5staple; 

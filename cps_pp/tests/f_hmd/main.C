@@ -2,13 +2,22 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-07-29 09:57:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.2 2003-07-29 09:57:15 mcneile Exp $
-//  $Id: main.C,v 1.2 2003-07-29 09:57:15 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-10-23 13:38:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.3 2003-10-23 13:38:59 zs Exp $
+//  $Id: main.C,v 1.3 2003-10-23 13:38:59 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.6.2  2003/09/22 04:18:44  zs
+//  Back to how it was originally.
+//
+//  Revision 1.2.6.1  2003/09/04 14:32:35  zs
+//  Temporary changes for asqtad debugging.
+//
+//  Revision 1.2  2003/07/29 09:57:15  mcneile
+//  I have added namespace support to the codes.
+//
 //  Revision 1.1.1.1  2003/06/22 13:34:49  mcneile
 //  This is the cleaned up version of the Columbia Physics System.
 //  The directory structure has been changed.
@@ -85,7 +94,7 @@
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: main.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -158,6 +167,14 @@ int main(int argc,char *argv[])
   do_arg.clover_coeff = 2.0171;
   do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
 
+  // asqtad stuff
+  do_arg.asqtad_KS = 1.0;
+  do_arg.asqtad_naik = 0.0;
+  do_arg.asqtad_lepage = 0.0;
+  do_arg.asqtad_3staple = 0.0;
+  do_arg.asqtad_5staple = 0.0;
+  do_arg.asqtad_7staple = 0.0;
+  
   GJP.Initialize(do_arg);
 
 
@@ -186,6 +203,7 @@ int main(int argc,char *argv[])
   hmd_arg.steps_per_traj = 25;
   hmd_arg.metropolis = METROPOLIS_NO;
   hmd_arg.reunitarize = REUNITARIZE_YES;
+
 
   //----------------------------------------------------------------
   // Run HMC Phi Wilson
@@ -222,7 +240,7 @@ int main(int argc,char *argv[])
       }
     }
   }
-  
+
 
 
   //----------------------------------------------------------------
@@ -345,6 +363,7 @@ int main(int argc,char *argv[])
     }
   }
 
+  
   return(1);  
 }
 

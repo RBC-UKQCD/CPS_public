@@ -1,4 +1,4 @@
-# $Id: Makefile_cps.in,v 1.10 2003-10-21 15:34:42 zs Exp $
+# $Id: Makefile_cps.in,v 1.11 2003-10-23 13:38:58 zs Exp $
 #
 #  Template makefile for the Columbia Physics System
 #
@@ -41,13 +41,10 @@ include Makefile_cps_src
 #
 # make the library for the CPS code
 #
-cps: $(cps_obj)
-	ar rcs cps.a $^ 
+cps: cps.a
 
-
-f_stag_pbp: cps
-	$(CXX) $(CXXFLAGS) -c $(top_srcdir)/tests/$@/main.C -o $(top_srcdir)/tests/$@/main.o 
-	$(CXX) $(top_srcdir)/tests/$@/main.o cps.a $(LIBS) -o $(top_srcdir)/tests/$@/a.out
+cps.a: $(cps_obj)
+	ar rcs cps.a ${cps_obj}
 
 
 .PHONY : cps clean docs webdocs depend
@@ -94,7 +91,7 @@ clean:
 ##
 TEST_DIR = tests
 
-test:
+test: cps
 	cd $(TEST_DIR) ; perl regression.pl
 	cd $(TEST_DIR) ; sh regression.sh
 

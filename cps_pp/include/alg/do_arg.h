@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the DoArg structure.
   
-  $Id: do_arg.h,v 1.4 2003-10-21 15:34:42 zs Exp $
+  $Id: do_arg.h,v 1.5 2003-10-23 13:38:58 zs Exp $
 */
 //--------------------------------------------------------------------
 /* CIM Sun Jul  6 23:30:27 GMT 1997 */
@@ -147,6 +147,8 @@ struct DoArg {
 
     // Parameters for the asqtad improved staggered action.
 
+    //! Coefficient of the Kogut-Susskind term in the Asqtad improved staggered fermion action.
+    Float asqtad_KS;	
     //! Coefficient of the Naik term in the Asqtad improved staggered fermion action.
     Float asqtad_naik;	
     //! Coefficient of the 3-staple term in the Asqtad improved staggered fermion action.

@@ -4,49 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.3 2003-08-29 20:58:09 mike Exp $
+  $Id: f_stag.C,v 1.4 2003-10-23 13:38:59 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mike $
-//  $Date: 2003-08-29 20:58:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v 1.3 2003-08-29 20:58:09 mike Exp $
-//  $Id: f_stag.C,v 1.3 2003-08-29 20:58:09 mike Exp $
+//  $Author: zs $
+//  $Date: 2003-10-23 13:38:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v 1.4 2003-10-23 13:38:59 zs Exp $
+//  $Id: f_stag.C,v 1.4 2003-10-23 13:38:59 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.2  2003/07/24 16:53:54  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.4  2001/08/16 10:50:35  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:13:23  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:09  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: f_stag.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v $
 //  $State: Exp $
 //
@@ -64,7 +34,6 @@ CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/verbose.h>
 #include <util/dirac_op.h>
-#include <util/stag.h>
 #include <util/vector.h>
 #include <util/gjp.h>
 #include <comms/nga_reg.h>
@@ -73,7 +42,7 @@ CPS_END_NAMESPACE
 #include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
-enum{VECT_LEN=6, MATRIX_SIZE=18, SITE_LEN=72};
+
 
 
 //------------------------------------------------------------------
@@ -109,25 +78,21 @@ static Matrix *mp1 = &mt1;
 // static Matrix *mp2 = &mt2;
 // static Matrix *mp3 = &mt3;
 static Vector vt0;
-static Vector vt1;
+//static Vector vt1;
 static Vector vt2;
 static Vector vt3;
 static Vector *vp0 = &vt0;
-static Vector *vp1 = &vt1;
+//static Vector *vp1 = &vt1;
 static Vector *vp2 = &vt2;
 static Vector *vp3 = &vt3;
 
 #endif 
 
-static Matrix m_tmp1, m_tmp2;
-static int bc[4] = {0,0,0,0};	// boundary on this node
+//static Matrix m_tmp1, m_tmp2;
 
 
 
-const unsigned CBUF_MODE1 = 0xcb911548;
-const unsigned CBUF_MODE2 = 0xcca52112;
-const unsigned CBUF_MODE3 = 0xc98c6106;
-const unsigned CBUF_MODE4 = 0xcca52112;
+
 
 
 
@@ -140,84 +105,26 @@ Fstag::Fstag()
   char *fname = "Fstag()";
   VRB.Func(cname,fname);
 
-  //----------------------------------------------------------------
-  // Check if anisotropy is present and exit since Fstag has
-  // not been tested for anisotropic lattices.
-  //----------------------------------------------------------------
-
-  // Modified for anisotropic lattices
-  //  if(GJP.XiBare() != 1 ||
-  //     GJP.XiV()    != 1 ||
-  //     GJP.XiVXi()  != 1   ){
-  //    ERR.General(cname,fname,
-  //    "XiBare=%g, XiV=%g, XiVXi=%g : Fstag has not been tested with anisotropy\n",
-  //		GJP.XiBare(), GJP.XiV(), GJP.XiVXi());
-  //  }
-  // End modification
-
-  e_vsize = VECT_LEN/2;
-  for(int i = 0; i < 4; ++i) {
-      e_vsize *= node_sites[i];
-  }
-
-  f_tmp = (Vector *)smalloc(e_vsize*sizeof(Float));
-
-  xv[0] = node_sites[3]/2;
-  xv[1] = (node_sites[3]*node_sites[0])/2;
-  xv[2] = (node_sites[3]*node_sites[0]*node_sites[1])/2;
-
-
-  //----------------------------------------------------------------
-  // Initialize boundary condition on this node
-  //----------------------------------------------------------------
-  if(GJP.Xbc() == BND_CND_APRD) bc[0] = GJP.XnodeCoor()
-  	== (GJP.Xnodes()-1) ? 1 : 0 ;
-
-  if(GJP.Ybc() == BND_CND_APRD) bc[1] = GJP.YnodeCoor()
-  	== (GJP.Ynodes()-1) ? 1 : 0;
-
-  if(GJP.Zbc() == BND_CND_APRD) bc[2] = GJP.ZnodeCoor()
-  	== (GJP.Znodes()-1) ? 1 : 0;
-
-  if(GJP.Tbc() == BND_CND_APRD) bc[3] = GJP.TnodeCoor()
-  	== (GJP.Tnodes()-1) ? 1 : 0;
-
-  dirac_init(GaugeField());
-
-  // setup CBUF
-    setCbufCntrlReg(1, CBUF_MODE1);
-    setCbufCntrlReg(2, CBUF_MODE2);
-    setCbufCntrlReg(3, CBUF_MODE3);
-    setCbufCntrlReg(4, CBUF_MODE4);
 }
 
 
 //------------------------------------------------------------------
 // Destructor
 //------------------------------------------------------------------
-Fstag::~Fstag()
-{
+Fstag::~Fstag(){
   char *fname = "~Fstag()";
   VRB.Func(cname,fname);
-
-  destroy_dirac_buf();
-  sfree(f_tmp);
 }
 
 
 //------------------------------------------------------------------
-// FclassType Fclass(void):
+// FclassType Fclass():
 // It returns the type of fermion class.
 //------------------------------------------------------------------
-FclassType Fstag::Fclass(void){
+FclassType Fstag::Fclass(){
   return F_CLASS_STAG;
 }
 
-
-//-------------------------------------------------------
-// used by getUDagX()
-//-------------------------------------------------------
-static Vector v_tmp1;
 
 
 
@@ -231,6 +138,7 @@ static Vector v_tmp1;
 void Fstag::
 getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const
 {
+    Vector v_tmp1;
     Matrix *uoff = GaugeField()+GsiteOffset(x)+mu;
 
     setCbufCntrlReg(3, CBUF_MODE3);
@@ -286,50 +194,11 @@ getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const
 }
 
 
-//------------------------------------------------------------------
-// int ExactFlavors() : 
-// Returns the number of exact flavors of the matrix that
-// is inverted during a molecular dynamics evolution.
-//------------------------------------------------------------------
-int Fstag::ExactFlavors(void)
-{
-  return 4;
-}
 
 
-//------------------------------------------------------------------
-// int SpinComponents() : 
-// Returns the number of spin components.
-//------------------------------------------------------------------
-int Fstag::SpinComponents(void)
-{
-  return 1;
-}
 
 
-//------------------------------------------------------------------
-// int FsiteSize() : 
-// Returns the number of fermion field components 
-// (including real/imaginary) on a site of the 4-D lattice.
-//------------------------------------------------------------------
-int Fstag::FsiteSize(void)
-{
-  return 2 * Colors() * SpinComponents();  
-  // re/im * colors * spin_components
-}
 
-
-//------------------------------------------------------------------
-// int FchkbEvl() :
-// returns 1 => The fermion fields in the evolution
-//      or the CG that inverts the evolution matrix
-//      are defined on a single checkerboard (half the 
-//      lattice).
-//------------------------------------------------------------------
-int Fstag::FchkbEvl(void)
-{
-  return 1;
-}
 
 
 //------------------------------------------------------------------
@@ -651,17 +520,6 @@ void Fstag::prepForce(Vector *frm) {
 }
 
 
-//------------------------------------------------------------------
-// Float FhamiltonNode(Vector *phi, Vector *chi):
-// The fermion Hamiltonian of the node sublattice.
-// chi must be the solution of Cg with source phi.	       
-//------------------------------------------------------------------
-Float Fstag::FhamiltonNode(Vector *phi, Vector *chi){
-  char *fname = "FhamiltonNode(V*,V*)";
-  VRB.Func(cname,fname);
-
-  return dotProduct((IFloat *)phi, (IFloat *)chi, e_vsize);
-}
 
 
 //------------------------------------------------------------------
@@ -682,18 +540,6 @@ Float Fstag::BhamiltonNode(Vector *boson, Float mass){
 }
 
 
-//------------------------------------------------------------------
-// int FsiteOffset(const int *x):
-// Sets the offsets for the fermion fields on a 
-// checkerboard. The fermion field storage order
-// is the canonical one. X[I] is the
-// ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-//------------------------------------------------------------------
-int Fstag::FsiteOffset(const int *x) const {
-// ???
-  ERR.NotImplemented(cname, "FsiteOffset");
-  return 0; 
-}
 
 //------------------------------------------------------------------
 // Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, CnvFrmType cnv_frm,

@@ -37,12 +37,30 @@ CFLAGS= -DTARGET_QCDSP=$(TARGET_QCDSP)  -O2
 #
 # Libraries for the Columbia code
 #
-# (These are for the scalar version of the code)
-#
-#
-
 
 LINLIB = "$(TOP)/cps++"
 LIBLIST =\
   $(LINLIB)/cps.a \
 
+#
+#  targets
+#
+
+me = $(notdir $(PWD))
+
+all:regression_cps.x 
+
+regression_cps.x:  cps main.o
+	$(COMPILER) -o regression_cps.x main.o $(LIBLIST) $(LDFLAGS)
+
+main.o: main.C
+	$(COMPILER) -o main.o $(CFLAGS) -c $(INCLIST) main.C 
+
+cps: 
+	cd $(TOPINC); $(MAKE)
+#	$(MAKE) -C $(TOPINC)
+
+clean:
+	rm -f *.dat *.o  regression_cps.x 
+	rm -f ../regressions/*$(me).dat
+	rm -f ../regressions/*$(me).checklog

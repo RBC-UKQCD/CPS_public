@@ -76,6 +76,11 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
    ./src/util/lattice/lattice_types/lattice_wn.o\
    ./src/util/lattice/lattice_types/lattice_ws.o\
    ./src/util/lattice/lattice_types/lattice_ww.o\
+   ./src/util/lattice/lattice_types/lattice_wa.o\
+   ./src/util/lattice/lattice_types/lattice_na.o\
+   ./src/util/lattice/lattice_types/lattice_pa.o\
+   ./src/util/lattice/lattice_types/lattice_ra.o\
+   ./src/util/lattice/lattice_types/lattice_va.o\
    ./src/util/lattice/lattice_base/lattice_base.o\
    ./src/util/lattice/lattice_base/link_buffer.o\
    ./src/util/lattice/g_wilson/g_wilson.o\
@@ -95,6 +100,8 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
    ./src/util/lattice/f_wilson/f_wilson.o\
    ./src/util/lattice/f_stag_types/f_stag_t.o\
    ./src/util/lattice/f_stag/f_stag.o\
+   ./src/util/lattice/f_stagAsqtad/f_stagAsqtad.o\
+   ./src/util/lattice/f_stagAsqtad/Fforce.o\
    ./src/util/lattice/f_none/f_none.o\
    ./src/util/lattice/fix_gauge/fix_gauge.o\
    ./src/util/lattice/f_dwf/f_dwf.o\

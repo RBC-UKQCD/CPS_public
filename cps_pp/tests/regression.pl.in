@@ -1,3 +1,5 @@
+# @configure_input@
+# $Id: regression.pl.in,v 1.12 2003-10-23 13:38:59 zs Exp $ 
 # Note that this shebang line may not work everywhere, as some 
 # Unixies put perl elsewhere, e.g. /usr/bin/perl.
 #
@@ -65,7 +67,7 @@ open SHOUT,">$shellscript" or die "Could not open $shellscript!\n";
 # Loop over each test in the series:
 
 # clean up any old output
-    print SHOUT 'rm '.$output_dir.'/*.dat '."\n";
+    print SHOUT 'rm -f '.$output_dir.'/*.dat '."\n";
 
 foreach $tni (@test_names){
     print SHOUT '#------------------------------------'."\n";
@@ -85,11 +87,11 @@ foreach $tni (@test_names){
 # State which test is about to run, run it, and store the results:
 	print SHOUT "cd ".$tni."\n";
 # Remove any files associated with previous runs (i.e. *.dat)
-	print SHOUT 'rm -f '.$exec_cmd.' *.dat'."\n";
+	print SHOUT 'make -s -f Makefile_regression clean'."\n";
 #       compile the code (do not echo the commands)
 	print SHOUT 'make -s -f Makefile_regression'."\n";
 #       check that the executable has been created
-	print SHOUT 'if test ! -f '.$exec_cmd.' ; then'."\n";
+	print SHOUT 'if test ! -f '.$executable.' ; then'."\n";
 	print SHOUT 'echo '.$tni." COMPILATION FAILURE\n";
 	print SHOUT "cd ..\n";
 
@@ -110,8 +112,10 @@ foreach $tni (@test_names){
 # Drop back to the test directory:
 	print SHOUT "cd ..\n";
 	print SHOUT "cd regressions ; perl check_data.pl $tni  $error_tol  $test_dir\n" ;
-	print SHOUT "cd ..\n" ;
-
+	print SHOUT "cd ../".$tni."\n" ;
+# Clean up
+	print SHOUT "make -s -f Makefile_regression clean\n";
+	print SHOUT "cd ..\n";
 	print SHOUT "fi\n";
 
 # Loop over to the next test:

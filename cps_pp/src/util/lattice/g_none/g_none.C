@@ -3,18 +3,27 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Gnone class.
 
-  $Id: g_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: g_none.C,v 1.3 2003-10-23 13:38:59 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: g_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2003-10-23 13:38:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v 1.3 2003-10-23 13:38:59 zs Exp $
+//  $Id: g_none.C,v 1.3 2003-10-23 13:38:59 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.6.1  2003/09/23 21:39:20  zs
+//  Gnone needs an AllStaple method
+//
+//  Revision 1.2  2003/07/24 16:53:54  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.2  2001/06/19 18:13:27  anj
 //  Serious ANSIfication.  Plus, degenerate double64.h files removed.
 //  Next version will contain the new nga/include/double64.h.  Also,
@@ -31,7 +40,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: g_none.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v $
 //  $State: Exp $
 //
@@ -134,6 +143,11 @@ Float Gnone::GhamiltonNode(void){
 void Gnone::GactionGradient(Matrix &grad, int *x, int mu)
 {
   ERR.NotImplemented(cname, "GactionGradient(M&,i*,i)") ;
+}
+
+void Gnone::AllStaple(Matrix &grad, const int *x, int mu)
+{
+  ERR.NotImplemented(cname, "AllStaple(M&,i*,i)") ;
 }
 
 CPS_END_NAMESPACE

@@ -3,52 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.4 2003-10-21 15:34:42 zs Exp $
+  $Id: gjp.h,v 1.5 2003-10-23 13:38:59 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-10-21 15:34:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.4 2003-10-21 15:34:42 zs Exp $
-//  $Id: gjp.h,v 1.4 2003-10-21 15:34:42 zs Exp $
+//  $Date: 2003-10-23 13:38:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.5 2003-10-23 13:38:59 zs Exp $
+//  $Id: gjp.h,v 1.5 2003-10-23 13:38:59 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.3.4.2  2003/10/21 15:26:55  zs
-//  Need <sysfunc.h> not <comms/sysfunc.h> for the QCD{SP,OC} build.
-//
-//  Revision 1.3.4.1  2003/09/24 12:49:57  mcneile
-//  I have updated the include path.
-//
-//  Revision 1.3  2003/08/12 16:22:51  zs
-//  Added Asqtad action parameters.
-//
-//  Revision 1.3  2001/07/03 17:01:02  anj
-//
-//  Multiple minor alterations to change some #include's from referring to
-//  files relative to the top-level source directory to referring to files
-//  relative to the source-file positions.  This alteration makes the code
-//  backwards compatable with the make structure of QCDSP, although this
-//  may have to be changed to a more usual form in the future. Anj.
-//
-//  Revision 1.2  2001/06/19 18:13:17  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:09  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //
@@ -266,6 +233,7 @@ class GlobalJobParameter
 
   // Asqtad improved staggered action parameters
   
+  Float asqtad_KS;
   Float asqtad_naik;
   Float asqtad_3staple;
   Float asqtad_5staple;
@@ -726,6 +694,12 @@ public:
   */
 
   // Asqtad improved staggered action parameters
+
+  //! Gets the coefficient of the Kogut-Susskind term in the Asqtad improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float KS_coeff(){ return asqtad_KS; }
 
   //! Gets the coefficient of the Naik term in the Asqtad improved staggered fermion action.
   /*!

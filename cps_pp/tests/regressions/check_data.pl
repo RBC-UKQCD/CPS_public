@@ -68,7 +68,7 @@ sub check_data
 
     my @all_lines = <LOG> ; 
 
-    my $pass_fail = "PASS" ; 
+    my $pass_fail = "FAIL" ; 
 
     my $pt = 0 ; 
     foreach $line (@all_lines) 
@@ -107,6 +107,7 @@ sub check_data
 		    else
 		    {
 			print  OUT "PASS\n" ;
+			$pass_fail = "PASS" ;
 		    }
 
 		} # end of loop over test data for this particle
