@@ -7,6 +7,20 @@ AC_ARG_ENABLE(target,
 AC_MSG_CHECKING("what target we are compiling for")
 AC_MSG_RESULT($enable_target)
 
+dnl Shall we use the cps namespace?
+AC_ARG_ENABLE(namespace,
+[  --enable-namespace   Build the library inside a 'cps' namespace.
+(default=no for QCDOC, yes otherwise)] ,  , [enable_namespace="no"])
+AC_MSG_CHECKING("whether we are using the namespace")
+AC_MSG_RESULT($enable_namespace)
+
+if test "$enable_namespace" = "yes";
+then
+	ENABLE_NAMESPACE='--enable-namespace=yes'
+else
+	ENABLE_NAMESPACE=''
+fi
+
 case "$enable_target" in
 	qcdoc)
 	BUILD=$build
@@ -22,6 +36,7 @@ esac
 AC_SUBST(BUILD)
 AC_SUBST(HOST)
 AC_SUBST(ENABLE_TARGET)
+AC_SUBST(ENABLE_NAMESPACE)
 AC_SUBST(QOS)
 
 AC_OUTPUT(config_wrapper)

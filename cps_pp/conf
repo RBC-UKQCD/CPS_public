@@ -271,7 +271,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_unique_file="./src/"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os BUILD HOST ENABLE_TARGET QOS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os BUILD HOST ENABLE_TARGET ENABLE_NAMESPACE QOS LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -788,6 +788,8 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-target   What target are we compiling for? (default=noarch)
+  --enable-namespace   Build the library inside a 'cps' namespace.
+(default=no for QCDOC, yes otherwise)
 
 _ACEOF
 fi
@@ -1312,6 +1314,25 @@ echo $ECHO_N "checking \"what target we are compiling for\"... $ECHO_C" >&6
 echo "$as_me:$LINENO: result: $enable_target" >&5
 echo "${ECHO_T}$enable_target" >&6
 
+# Check whether --enable-namespace or --disable-namespace was given.
+if test "${enable_namespace+set}" = set; then
+  enableval="$enable_namespace"
+
+else
+  enable_namespace="no"
+fi;
+echo "$as_me:$LINENO: checking \"whether we are using the namespace\"" >&5
+echo $ECHO_N "checking \"whether we are using the namespace\"... $ECHO_C" >&6
+echo "$as_me:$LINENO: result: $enable_namespace" >&5
+echo "${ECHO_T}$enable_namespace" >&6
+
+if test "$enable_namespace" = "yes";
+then
+	ENABLE_NAMESPACE='--enable-namespace=yes'
+else
+	ENABLE_NAMESPACE=''
+fi
+
 case "$enable_target" in
 	qcdoc)
 	BUILD=$build
@@ -1324,6 +1345,7 @@ case "$enable_target" in
 	ENABLE_TARGET=''
 	;;
 esac
+
 
 
 
@@ -1978,6 +2000,7 @@ s,@target_os@,$target_os,;t t
 s,@BUILD@,$BUILD,;t t
 s,@HOST@,$HOST,;t t
 s,@ENABLE_TARGET@,$ENABLE_TARGET,;t t
+s,@ENABLE_NAMESPACE@,$ENABLE_NAMESPACE,;t t
 s,@QOS@,$QOS,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t

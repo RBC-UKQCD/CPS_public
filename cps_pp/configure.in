@@ -1,14 +1,14 @@
 dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
-dnl  $Author: zs $
-dnl  $Date: 2004-06-17 16:20:36 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.13 2004-06-17 16:20:36 zs Exp $
-dnl  $Id: configure.in,v 1.13 2004-06-17 16:20:36 zs Exp $
+dnl  $Author: chulwoo $
+dnl  $Date: 2004-08-08 00:08:47 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.14 2004-08-08 00:08:47 chulwoo Exp $
+dnl  $Id: configure.in,v 1.14 2004-08-08 00:08:47 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.13 $
+dnl  $Revision: 1.14 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -34,6 +34,9 @@ dnl check if Intel compiler is available if running on 686
    test "$build" = "i686-pc-linux-gnu"; then
        AC_CHECK_PROGS(CC, icc, gcc)
        AC_CHECK_PROGS(CXX, icc, g++)
+   elif test "$host" = "powerpc-ibm-aix5.2.0.0" ;then
+       AC_CHECK_PROGS(CC, xlc, gcc)
+       AC_CHECK_PROGS(CXX, xlc, g++)
    else
      AC_PROG_CXX
    fi

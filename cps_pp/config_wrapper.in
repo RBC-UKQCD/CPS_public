@@ -1,1 +1,1 @@
-@abs_top_srcdir@/configure --build=@BUILD@ --host=@HOST@ QOS=@QOS@ @ENABLE_TARGET@
+@abs_top_srcdir@/configure --build=@BUILD@ --host=@HOST@ QOS=@QOS@ @ENABLE_TARGET@ @ENABLE_NAMESPACE@
