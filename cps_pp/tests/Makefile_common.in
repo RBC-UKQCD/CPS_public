@@ -25,7 +25,12 @@ PARALLEL = @PARALLEL@
 # include list for the Columbia code
 #
 TOPINC=$(TOP)/cps++
-INCLIST = -I$(TOPINC) -I$(TOPINC)/include 
+INCLIST := -I$(TOPINC) -I$(TOPINC)/include 
+ifeq "$(PARALLEL)" "1" 
+ifeq "$(TARGET_QCDSP)" "0"
+INCLIST := $(INCLIST) -I$(TOPINC)/include/comms
+endif
+endif
 
 CFLAGS= -DTARGET_QCDSP=$(TARGET_QCDSP)  -O2
 
