@@ -12,6 +12,14 @@ void pt_init(Lattice &Lat){
   pt_arg.size[1] = GJP.YnodeSites();
   pt_arg.size[2] = GJP.ZnodeSites();
   pt_arg.size[3] = GJP.TnodeSites();
+  //-------------------------------------------------
+  //Added by Michael C.
+  for(int i = 0; i < 4;i++)
+    if(GJP.Nodes(i) == 1)
+      pt_arg.local[i] = 1;
+    else
+      pt_arg.local[i] = 0;
+  //-------------------------------------------------
   int temp = 0;
   for(int i = 0;i<4;i++){
     temp += GJP.NodeSites(i)*GJP.NodeCoor(i);
@@ -85,4 +93,34 @@ void pt_shift_link(IFloat **u, const int *dir, int n_dir){
 void pt_shift_field(IFloat **v, const int *dir, int n_dir,
                     int hop, IFloat **u){
   StaticPT.shift_field(v,dir,n_dir,hop,u);
+}
+
+void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb)
+{
+  StaticPT.mat_cb(n,mout,min,dir,cb);
+}
+
+void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb, Float * new_gauge_field)
+{
+  StaticPT.mat_cb(n,mout,min,dir,cb,new_gauge_field);
+}
+
+void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb)
+{
+  StaticPT.vec_cb(n,vout,vin,dir,cb);
+}
+
+void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb, Float * new_gauge_field)
+{
+  StaticPT.vec_cb(n,vout,vin,dir,cb,new_gauge_field);
+}
+
+void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, int pad)
+{
+  StaticPT.vec_cb(n,vout,vin,dir,cb,pad);
+}
+
+void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, int pad, Float * new_gauge_field)
+{
+  StaticPT.vec_cb(n,vout,vin,dir,cb,pad,new_gauge_field);
 }

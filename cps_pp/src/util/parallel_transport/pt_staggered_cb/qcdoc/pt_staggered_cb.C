@@ -13,69 +13,51 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <util/lattice.h>
-#include <util/gjp.h>
-#include <util/vector.h>
-#include <util/smalloc.h>
-#include <util/verbose.h>
 #include <util/pt.h>
-#include <util/error.h>
-#include <util/stag.h>
-#include <comms/cbuf.h>
-#include <comms/glb.h>
-#include <math.h>
+#include <util/gjp.h>
 CPS_START_NAMESPACE
 
 
 
 //------------------------------------------------------------------
 
+/*!
+  \param latt The lattice object containing the gauge field on which the
+  parallel tranport operates.
+  \post The gauge field storage order is converted to STAG order if it is not
+  already.
+*/
+
+//All the necessary initializations are performed in ParTransStagTypes
+//Conversion of storage order is also done by ParTransStagtypes
+static StrOrdType old_str_ord;
 ParTransStaggered_cb::ParTransStaggered_cb(Lattice & latt) :
 			 ParTransStagTypes(latt)
 {
   cname = "ParTransStaggered_cb";
   char *fname = "ParTransStaggered_cb(L&,V*,V*,CgArg*,CnvFrmType)";
   VRB.Func(cname,fname);
-
-  //----------------------------------------------------------------
-  // Do the necessary conversions
-  //----------------------------------------------------------------
-//    lat.Convert(STAG);
-
-  //----------------------------------------------------------------
-  // Set the node checkerboard size of the fermion field
-  //----------------------------------------------------------------
-  f_size_cb = GJP.VolNodeSites() * lat.FsiteSize() / 2;
-
-//  pt_init(lat.StrOrd(),lat.GaugeField());
-//  pt_init_g();
-
-#if 0
-  //----------------------------------------------------------------
-  // Allocate memory for the temporary fermion vector frm_tmp.
-  //----------------------------------------------------------------
-  frm_tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
-  if(frm_tmp == 0)
-    ERR.Pointer(cname,fname, "frm_tmp");
-  VRB.Smalloc(cname,fname, "frm_tmp", 
-	      frm_tmp, f_size_cb * sizeof(Float));
-#endif
-  //printf("%s:%s end\n",cname,fname);
+  old_str_ord = lat.StrOrd();
+  if (lat.StrOrd() != STAG_BLOCK){
+    lat.Convert(STAG_BLOCK);
+  }
 }
 
+/*!
+  \post The gauge field storage order is converted back to CANONICAL order
+  if that was how it was when this object was created.
+ */
 
 //------------------------------------------------------------------
+//All necessary memory de-allocation is performed by the
+//destructor for ParTransStagTypes
+
 ParTransStaggered_cb::~ParTransStaggered_cb() {
   char *fname = "~ParTransStaggered_cb()";
   VRB.Func(cname,fname);
-
-//    lat.Convert(CANONICAL);
-
-  //----------------------------------------------------------------
-  // Free memory
-  //----------------------------------------------------------------
-//  pt_delete_g();
-//  pt_delete();
+  if ( old_str_ord !=STAG_BLOCK){
+    lat.Convert(old_str_ord);
+  }
 }
 
 CPS_END_NAMESPACE

@@ -40,9 +40,9 @@ void PT::asqtad_fat(AsqDArg *asq_arg, matrix *fatlink){
 #if 0
   IFloat c1 = GJP.KS_coeff();
   IFloat c2 = GJP.Naik_coeff();
-  IFloat c3 = GJP.staple3_coeff();
+  IFloat c3 = -GJP.staple3_coeff();
   IFloat c5 = GJP.staple5_coeff();
-  IFloat c7 = GJP.staple7_coeff();
+  IFloat c7 = -GJP.staple7_coeff();
   IFloat c6 = GJP.Lepage_coeff();
 #endif
 

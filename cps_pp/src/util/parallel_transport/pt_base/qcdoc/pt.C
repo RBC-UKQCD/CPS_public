@@ -1,26 +1,28 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.19 2005-03-07 22:37:27 chulwoo Exp $
+  $Id: pt.C,v 1.20 2005-03-09 18:28:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 22:37:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.19 2005-03-07 22:37:27 chulwoo Exp $
-//  $Id: pt.C,v 1.19 2005-03-07 22:37:27 chulwoo Exp $
+//  $Date: 2005-03-09 18:28:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.20 2005-03-09 18:28:40 chulwoo Exp $
+//  $Id: pt.C,v 1.20 2005-03-09 18:28:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 #include <config.h>
 #include <util/pt_int.h>
+#include <util/vector.h>
 #include <qalloc.h>
+#include <util/time.h>
 #if 0
 #include <util/gjp.h>
 #include <util/pt.h>
@@ -31,6 +33,7 @@
 #endif
 
 #undef CPP
+//#define CPP
 //CPS_START_NAMESPACE
 //void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long in, long out);
 
@@ -40,6 +43,12 @@ extern "C"{
   void cmm_agg_cpp( int sites, long chi, long u,long in, long out);
   void cmv_agg_cpp( int sites, long u,long in, long out);
   void pt_asqtad_agg( int sites, long chi, long u,long in, long out);
+
+  void pt_cmv(int count, ind_agg *ind, double *gauge, double *src, double *dest);
+  void pt_cmv_pad(int count, ind_agg *ind, double *gauge, double *src, double *dest);
+  void pt_cmv_dag(int count, ind_agg *ind, double *gauge, double *src, double *dest);
+  void pt_cmv_dag_pad(int count, ind_agg *ind, double *gauge, double *src, double *dest);
+
   void copy_buffer(int n, long src, long dest, long ptable);
   // Assembler copying routines
   void copy_matrix(IFloat *res, IFloat *src, int *length, 
@@ -62,10 +71,15 @@ extern "C"{
 
   //---------------------------------------------------------------------------
   //matrix multiply for checkerboarded fields
-  void cmm_agg_cpp_cb(int sites, long u, long in, long out, IFloat *gauge_field, int pad=0);
+  void pt_cmm_cpp(int sites, long u, long in, long out, long gauge_field);
+  void pt_cmm_dag_cpp(int sites, long u, long in, long out, long gauge_field);
 
   //matrix vector multiply for checkerboarded fields
-  void cmv_agg_cpp_cb(int sites, long u, long in, long out, IFloat * gauge_field, int pad=0);
+  void pt_cmv_cpp(int sites, long u, long in, long out, long gauge_field);
+  void pt_cmv_dag_cpp(int sites, long u, long in, long out, long gauge_field);
+  void pt_cmv_pad_cpp(int sites, long u, long in, long out, long gauge_field);
+  void pt_cmv_dag_pad_cpp(int sites, long u, long in, long out, long gauge_field);
+
   //---------------------------------------------------------------------------
 
   void m1m2_lookup(matrix *result, matrix *m1, matrix *m2, int length,
@@ -262,6 +276,12 @@ int PT::lex_g_xyzt(int *x, int mu){
   return (temp*NDIM + mu);
 }
 
+//Returns index associated with gauge link in txyz ordering
+int PT::lex_g_txyz(int *x, int mu){
+  int temp = mu*vol+x[3] + size[3]*(x[0]+size[0]*(x[1]+size[1]*x[2]));
+  return temp;
+}
+
 //Returns index associated with gauge link in the mu direction and 
 //coordinate x for checkerboarded storage
 int PT:: lex_g_xyzt_cb_o(int *x, int mu){
@@ -311,7 +331,6 @@ void PT::set_hop_pointer() {
 #endif
 
   //Initialize local and non-local hop counters.
-      printf("start\n");
   for (hop=0; hop<MAX_HOP; hop++) {
     for (i=0; i<2*NDIM; i++) {
       hp_non_local_count[hop][i] = 0;
@@ -443,6 +462,13 @@ void PT::init(PTArg *pt_arg)
   size[1] = pt_arg->size[1];
   size[2] = pt_arg->size[2];
   size[3] = pt_arg->size[3];
+  local[0] = pt_arg->local[0];
+  local[1] = pt_arg->local[1];
+  local[2] = pt_arg->local[2];
+  local[3] = pt_arg->local[3];
+  non_local_dirs = 2*(4-local[0]-local[1]-local[2]-local[3]);
+  //printf("Local directions = %d %d %d %d\n", local[0],local[1],local[2],local[3]);
+
   gauge_field_addr = pt_arg->gauge_field_addr;
   g_str_ord = pt_arg->g_str_ord;
   g_conj = pt_arg->g_conj;
@@ -454,6 +480,7 @@ void PT::init(PTArg *pt_arg)
   switch(g_str_ord){
     case PT_XYZT:
       LexGauge = lex_g_xyzt;
+      LexGauge2 = lex_g_txyz;
       break;
     case PT_XYZT_CB_O:
       LexGauge = lex_g_xyzt_cb_o;
@@ -600,8 +627,12 @@ void PT::init(PTArg *pt_arg)
   //Calculate the number of local and non-local parallel transports
   for(i = 0; i < NDIM; i++)
     {
-      non_local_chi_cb[2*i+1] = non_local_chi_cb[2*i] = vol/(2*size[i]);
+      if(!local[i])
+	non_local_chi_cb[2*i+1] = non_local_chi_cb[2*i] = vol/(2*size[i]);
+      else
+	non_local_chi_cb[2*i+1] = non_local_chi_cb[2*i] = 0;
       local_chi_cb[2*i+1] = local_chi_cb[2*i] = vol/2 - non_local_chi_cb[2*i];
+      //printf("non_local_chi_cb[2*%d] = %d; local_chi_cb[2*%d] = %d\n",i,non_local_chi_cb[2*i],i,local_chi_cb[2*i]);
     }
 
   //---------------------------------------------------------------------------
@@ -638,6 +669,9 @@ void PT::init(PTArg *pt_arg)
     {
       uc_l_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_l_cb[parity][i]",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
       uc_nl_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
+
+      uc_l_pad_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_l_cb[parity][i]",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
+      uc_nl_pad_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
     }
 
     //-------------------------------------------------------------------------
@@ -725,7 +759,7 @@ void PT::init(PTArg *pt_arg)
 	    else {
 	      nei[i] = x[i]+1;
 	      if(local_count[2*i+1]<0) fprintf(stderr,"%s:local_count[%d]=%d]n",
-			fname,2*i+local_count[2*i+1]);
+					       fname,2*i+local_count[2*i+1]);
 	      (uc_l[2*i+1]+local_count[2*i+1])->src = LexVector(x)*vlen;
 	      (uc_l[2*i+1]+local_count[2*i+1])->dest = LexVector(nei)*vlen2;
 	      local_count[i*2+1]++;
@@ -759,7 +793,7 @@ void PT::init(PTArg *pt_arg)
 	    //An even index for uc_nl, uc_l, uc_nl_cb, uc_l_cb corresponds
 	    //to parallel transport in the negative direction
 
-	    if(x[i] == 0)
+	      if((x[i] == 0) && !local[i])
 	      {
 	      nei[i] = size[i]-1;
 
@@ -776,11 +810,14 @@ void PT::init(PTArg *pt_arg)
 	      //              transport the field
 	      //dagger - determines if the gauge link needs to be conjugated
 
-	      (uc_nl_cb[parity][2*i]+non_local_count_cb[parity][2*i])->src = non_local_count_cb[parity][2*i];
-	      (uc_nl_cb[parity][2*i]+non_local_count_cb[parity][2*i])->dest = LexVector_cb(nei);
-	      (uc_nl_cb[parity][2*i]+non_local_count_cb[parity][2*i])->dest2 = LexVector_cb(nei)*8+2*i;
-	      (uc_nl_cb[parity][2*i]+non_local_count_cb[parity][2*i])->gauge_index = LexGauge(nei,i)*GAUGE_LEN;
-	      (uc_nl_cb[parity][2*i]+non_local_count_cb[parity][2*i])->dagger = (int) conjugated;
+	      (uc_nl_cb[parity][2*i]+non_local_count_cb[parity][2*i])->src = non_local_count_cb[parity][2*i]*6*sizeof(IFloat);
+	      (uc_nl_cb[parity][2*i]+non_local_count_cb[parity][2*i])->dest = LexVector_cb(nei)*6*sizeof(IFloat);
+	      (uc_nl_cb[parity][2*i]+non_local_count_cb[parity][2*i])->gauge = LexGauge2(nei,i)*GAUGE_LEN*sizeof(IFloat);
+
+	      (uc_nl_pad_cb[parity][2*i]+non_local_count_cb[parity][2*i])->src = non_local_count_cb[parity][2*i]*6*sizeof(IFloat);
+	      (uc_nl_pad_cb[parity][2*i]+non_local_count_cb[parity][2*i])->dest = (LexVector_cb(nei)*8+2*i)*8*sizeof(IFloat);
+	      (uc_nl_pad_cb[parity][2*i]+non_local_count_cb[parity][2*i])->gauge = LexGauge2(nei,i)*GAUGE_LEN*sizeof(IFloat);
+
 
 	      non_local_count_cb[parity][i*2]++;
 	      if(non_local_count_cb[parity][i*2]>non_local_chi_cb[i*2])
@@ -790,16 +827,19 @@ void PT::init(PTArg *pt_arg)
 	    } 
 	    else 
 	      {
-	      nei[i] = x[i]-1;
+	      nei[i] = (x[i]+size[i]-1)%size[i];
 
-	      (uc_l_cb[parity][2*i]+local_count_cb[parity][2*i])->src = LexVector_cb(x);
-	      (uc_l_cb[parity][2*i]+local_count_cb[parity][2*i])->dest = LexVector_cb(nei);
-	      (uc_l_cb[parity][2*i]+local_count_cb[parity][2*i])->dest2 = LexVector_cb(nei)*8+2*i;
-	      (uc_l_cb[parity][2*i]+local_count_cb[parity][2*i])->gauge_index = LexGauge(nei,i)*GAUGE_LEN;
-	      (uc_l_cb[parity][2*i]+local_count_cb[parity][2*i])->dagger = (int) conjugated;
+	      (uc_l_cb[parity][2*i]+local_count_cb[parity][2*i])->src = LexVector_cb(x)*6*sizeof(IFloat);
+	      (uc_l_cb[parity][2*i]+local_count_cb[parity][2*i])->dest = LexVector_cb(nei)*6*sizeof(IFloat);
+	      (uc_l_cb[parity][2*i]+local_count_cb[parity][2*i])->gauge = LexGauge2(nei,i)*GAUGE_LEN*sizeof(IFloat);
+
+	      (uc_l_pad_cb[parity][2*i]+local_count_cb[parity][2*i])->src = LexVector_cb(x)*6*sizeof(IFloat);
+	      (uc_l_pad_cb[parity][2*i]+local_count_cb[parity][2*i])->dest = (LexVector_cb(nei)*8+2*i)*8*sizeof(IFloat);
+	      (uc_l_pad_cb[parity][2*i]+local_count_cb[parity][2*i])->gauge = LexGauge2(nei,i)*GAUGE_LEN*sizeof(IFloat);
+
 	      local_count_cb[parity][i*2]++;
 	      if(local_count_cb[parity][i*2]>local_chi_cb[i*2])
-		fprintf(stderr,"%s:local_count_cb[%d][%d](%d)>local_chi_cb[%d](%d)\n",parity,2*i,local_count_cb[parity][2*i],2*i,local_chi[2*i]);
+		fprintf(stderr,"%s:local_count_cb[%d][%d](%d)>local_chi_cb[%d](%d)\n",fname,parity,2*i,local_count_cb[parity][2*i],2*i,local_chi[2*i]);
 	      }
 
 	    // negative direction
@@ -807,7 +847,7 @@ void PT::init(PTArg *pt_arg)
 	    //An odd index for uc_l, uc_nl, uc_l_cb,uc_nl_cb corresponds to
 	    //transport in the positive direction
 
-	    if(x[i] == (size[i] -1))
+	      if((x[i] == (size[i] -1)) && !local[i])
 	      {
 	      nei[i] = 0;
 
@@ -821,35 +861,38 @@ void PT::init(PTArg *pt_arg)
 	      //will contain the information necessary
 	      //for the pre-multiplication of the SU(3) link matrix
 	      
-	      (uc_nl_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->src = non_local_count_cb[parity][2*i+1];
-	      (uc_nl_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->dest = LexVector_cb(nei);
-	      (uc_nl_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->dest2 = LexVector_cb(nei)*8+2*i+1;
-	      (uc_nl_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->gauge_index = LexGauge(x,i)*GAUGE_LEN;
-	      (uc_nl_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->dagger = 1-(int)conjugated;
+	      (uc_nl_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->src = non_local_count_cb[parity][2*i+1]*6*sizeof(IFloat);
+	      (uc_nl_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->dest = LexVector_cb(nei)*6*sizeof(IFloat);
+	      (uc_nl_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->gauge = LexGauge2(x,i)*GAUGE_LEN*sizeof(IFloat);
 
-	      (uc_nl_cb_pre[parity][i]+non_local_count_cb[parity][2*i+1])->src = LexVector_cb(x);
-	      (uc_nl_cb_pre[parity][i]+non_local_count_cb[parity][2*i+1])->dest = non_local_count_cb[parity][2*i+1];
-	      (uc_nl_cb_pre[parity][i]+non_local_count_cb[parity][2*i+1])->dest2 = LexVector_cb(nei)*8+2*i+1;
-	      (uc_nl_cb_pre[parity][i]+non_local_count_cb[parity][2*i+1])->gauge_index = LexGauge(x,i)*GAUGE_LEN;
-	      (uc_nl_cb_pre[parity][i]+non_local_count_cb[parity][2*i+1])->dagger = 1-(int)conjugated;
+	      
+	      (uc_nl_pad_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->src = non_local_count_cb[parity][2*i+1]*6*sizeof(IFloat);
+	      (uc_nl_pad_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->dest = (LexVector_cb(nei)*8+2*i+1)*8*sizeof(IFloat);
+	      (uc_nl_pad_cb[parity][2*i+1]+non_local_count_cb[parity][2*i+1])->gauge = LexGauge2(x,i)*GAUGE_LEN*sizeof(IFloat);
+
+	      (uc_nl_cb_pre[parity][i]+non_local_count_cb[parity][2*i+1])->src = LexVector_cb(x)*6*sizeof(IFloat);
+	      (uc_nl_cb_pre[parity][i]+non_local_count_cb[parity][2*i+1])->dest = non_local_count_cb[parity][2*i+1]*6*sizeof(IFloat);
+	      (uc_nl_cb_pre[parity][i]+non_local_count_cb[parity][2*i+1])->gauge = LexGauge2(x,i)*GAUGE_LEN*sizeof(IFloat);
 
 	      non_local_count_cb[parity][i*2+1]++;
 	      if(non_local_count_cb[parity][i*2+1]>non_local_chi_cb[i*2+1])
-		fprintf(stderr,"%s:non_local_count_cb[%d][%d](%d)>non_local_chi_cb[%d](%d)\n",parity,2*i+1,non_local_count_cb[parity][2*i+1],2*i+1,non_local_chi[2*i+1]);
+		fprintf(stderr,"%s:non_local_count_cb[%d][%d](%d)>non_local_chi_cb[%d](%d)\n",fname,parity,2*i+1,non_local_count_cb[parity][2*i+1],2*i+1,non_local_chi[2*i+1]);
 	      } 
 	    else 
 	      {
-	      nei[i] = x[i]+1;
+	      nei[i] = (x[i]+1)%size[i];
 
-	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->src = LexVector_cb(x);
-	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->dest = LexVector_cb(nei);
-	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->dest2 = LexVector_cb(nei)*8+2*i+1;
-	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->gauge_index = LexGauge(x,i)*GAUGE_LEN;
-	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->dagger = 1-(int)conjugated;
+	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->src = LexVector_cb(x)*6*sizeof(IFloat);
+	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->dest = LexVector_cb(nei)*6*sizeof(IFloat);
+	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->gauge = LexGauge2(x,i)*GAUGE_LEN*sizeof(IFloat);
+
+	      (uc_l_pad_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->src = LexVector_cb(x)*6*sizeof(IFloat);
+	      (uc_l_pad_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->dest = (LexVector_cb(nei)*8+2*i+1)*8*sizeof(IFloat);
+	      (uc_l_pad_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->gauge = LexGauge2(x,i)*GAUGE_LEN*sizeof(IFloat);
 
 	      local_count_cb[parity][i*2+1]++;
 	      if(local_count_cb[parity][i*2+1]>local_chi_cb[i*2+1])
-		fprintf(stderr,"%s:local_count_cb[%d][%d](%d)>local_chi_cb[%d](%d)\n",parity,2*i+1,local_count_cb[parity][2*i+1],2*i+1,local_chi[2*i+1]);
+		fprintf(stderr,"%s:local_count_cb[%d][%d](%d)>local_chi_cb[%d](%d)\n",fname,parity,2*i+1,local_count_cb[parity][2*i+1],2*i+1,local_chi[2*i+1]);
 	    }
 	    nei[i] = x[i];
 	  }
@@ -949,6 +992,8 @@ void PT::delete_buf(){
       {
 	Free(uc_l_cb[parity][i]);
 	Free(uc_nl_cb[parity][i]);
+	Free(uc_l_pad_cb[parity][i]);
+	Free(uc_nl_pad_cb[parity][i]);
       }
 
     //-------------------------------------------------------------------
@@ -993,6 +1038,7 @@ void PT::delete_buf(){
 void PT::delete_g_buf(){
   char *fname = "pt_delete_g()";
 //  VRB.Func("",fname);
+  Free(gauge_txyz);
   for(int hop = 0; hop < MAX_HOP; hop++)
     for(int i = 0; i < 4*NDIM; i++)
       {
@@ -1024,6 +1070,42 @@ void PT::init_g(void){
   }
   //Location of gauge field
   IFloat *u = gauge_field_addr;
+
+  //For staggered parallel transport, we need to re-order the gauge fields
+  //to match the ordering of the vector field
+
+  #if 0
+  int gauge_mem = vol*NDIM*GAUGE_LEN*sizeof(IFloat);
+  if(vol<4096)
+    {
+      gauge_txyz = (IFloat *)qalloc(QFAST|QCOMMS,gauge_mem);
+      if(!gauge_txyz)
+	{
+	  printf("Qalloc unsuccessful for gauge_txyz.  Allocating to smalloc instead.\n");
+	  gauge_txyz = (IFloat *)Alloc(gauge_mem);
+	  printf("Alloc successful gauge_txyz = %p\n",gauge_txyz);
+	}
+      else
+	{
+	  //printf("Qalloc successful gauge_txyz = %p\n",gauge_txyz);
+	}
+    }
+  else
+    {
+      printf("Memory required for gauge_txyz (in bytes) = %d\n", gauge_mem);
+      printf("Local volume = %d, too large for Qalloc of gauge_txyz\n",vol);
+      gauge_txyz = (IFloat *)Alloc(gauge_mem);
+      printf("Alloc successful gauge_txyz = %p\n",gauge_txyz); 
+    }
+  //Copy the gauge field in STAGGERED ordering into gauge_txyz
+  for(x[0]=0;x[0]<size[0];x[0]++)
+    for(x[1]=0;x[1]<size[1];x[1]++)
+      for(x[2]=0;x[2]<size[2];x[2]++)
+	for(x[3]=0;x[3]<size[3];x[3]++)
+	  for(int mu = 0; mu < NDIM; mu++)
+	    moveMem(gauge_txyz+LexGauge2(x,mu)*GAUGE_LEN,u+LexGauge(x,mu)*GAUGE_LEN,GAUGE_LEN*sizeof(IFloat));
+  #endif
+
 
   //Send and receive directions
   SCUDir rcv_dir[]={SCU_XP, SCU_XM, SCU_YP, SCU_YM, SCU_ZP, SCU_ZM,SCU_TP,SCU_TM};
@@ -1087,7 +1169,6 @@ void PT::init_g(void){
 	    nei[i] = x[i];
 	  } // x[]
   } // i
-
 #if 0
   for(i=0;i<2*NDIM;i++) {
     SCUarg[i*2] = new SCUDirArgIR;
@@ -1139,32 +1220,35 @@ void PT::init_g(void){
       //Initialize SCUArg to receive fermion fields
       SCUarg_cb[i*2] = new SCUDirArgIR;
       SCUarg_cb[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,
-			       non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
+			     non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
+
       //Initialize SCUArg to send fermion field
       SCUarg_cb[i*2+1] = new SCUDirArgIR;
-
+      
       if(i%2)
 	SCUarg_cb[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,
-					non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
+			       non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
       else 
-	  SCUarg_cb[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,blklen_cb[i],
-				 numblk_cb[i],stride_cb[i],IR_9);
+	SCUarg_cb[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,blklen_cb[i],
+				   numblk_cb[i],stride_cb[i],IR_9);
     
       //Receive for Matrices
       SCUarg_mat_cb[i*2] = new SCUDirArgIR;
-      SCUarg_mat_cb[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,
+	SCUarg_mat_cb[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,
 				   3*non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
+
       //send for matrices
       SCUarg_mat_cb[i*2+1] = new SCUDirArgIR;
       if(i%2)
 	SCUarg_mat_cb[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,
-					3*non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
+				   3*non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
       else
 	SCUarg_mat_cb[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,
-				     3*blklen_cb[i],numblk_cb[i],
-				     3*stride_cb[i],IR_9);
+				   3*blklen_cb[i],numblk_cb[i],3*stride_cb[i],IR_9);
       //-----------------------------------------------------------------------
   }
+  
+
 #endif
   qfree(rcv_mat);
 }
@@ -1186,24 +1270,38 @@ void PT::init_g(void){
 
 #undef PROFILE
 void PT::mat_cb(int n, IFloat **mout, IFloat **min, const int *dir, int
+parity, IFloat * new_gauge_field)
+{
+  mat_cb_norm(n,mout,min,dir,parity,new_gauge_field);
+}
+
+#undef PROFILE
+void PT::mat_cb(int n, IFloat **mout, IFloat **min, const int *dir, int
 parity)
+{
+  mat_cb_norm(n,mout,min,dir,parity,gauge_field_addr);
+}
+
+#undef PROFILE
+void PT::mat_cb_norm(int n, IFloat **mout, IFloat **min, const int *dir, int
+parity, IFloat * gauge)
 {
   //List of the different directions
   int wire[n];
   int i;
+
   //SCUDirArgs for sending and receiving in the n directions
   SCUDirArgIR *SCUarg_p[2*n];
   SCUDirArgMulti SCUmulti;
   static int call_num = 0;
-//  int parity = (int) cb;
   int vlen = VECT_LEN;
-  int vlen2 = VECT_LEN2;
+  int vlen2 = VECT_LEN;
 
   call_num++;
   
   //Name our function
   char *fname="pt_mat_cb()";
-//  VRB.Func("",fname);
+  //  VRB.Func("",fname);
   
   //Set the transfer directions
   //If wire[i] is even, then we have communication in the negative direction
@@ -1223,16 +1321,22 @@ parity)
   //we have to copy the appropriate fields to a send buffer
   for(i=0;i<n;i++)
     {
-      if(wire[i]%2)
-	  cmm_agg_cpp_cb(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)min[i],(long)snd_buf_cb[wire[i]/2],gauge_field_addr);
-      else if(wire[i] == 6)
-	{
-	  for(int j = 0; j < non_local_chi_cb[6];j++)
-	    for(int d = 0; d < GAUGE_LEN; d++)
-	      *(snd_buf_t_cb + j*GAUGE_LEN + d) = *(min[i] + 3 * *(Toffset[parity]+j)*vlen+d);
-	}
+      if(!local[wire[i]/2])
+      {
+	if(wire[i]%2)
+	  {
+	    if(conjugated)
+	      pt_cmm_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)min[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);
+	    else
+	      pt_cmm_dag_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)min[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);
+	  }
+	else if((wire[i] == 6))
+	  {
+	    for(int j = 0; j < non_local_chi_cb[6];j++)
+	      moveMem(snd_buf_t_cb + j*GAUGE_LEN,min[i] + 3 * *(Toffset[parity]+j)*vlen,GAUGE_LEN*sizeof(IFloat));
+	  }
+      }
     }
-
 
   for(i=0;i<n;i++)
     {
@@ -1242,7 +1346,7 @@ parity)
       SCUarg_p[2*i] = SCUarg_mat_cb[2*wire[i]];
       //This points to the appropriate SCUDirArg for sending
       SCUarg_p[2*i+1] = SCUarg_mat_cb[2*wire[i]+1];
-
+      
       //Set the send address
       if(wire[i]%2)
 	SCUarg_p[2*i+1]->Addr((void *)snd_buf_cb[wire[i]/2]);
@@ -1263,34 +1367,44 @@ parity)
   //Do local calculations
   for(i=0;i<n;i++)
     {
-      cmm_agg_cpp_cb(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)min[i],(long)mout[i],gauge_field_addr);
+      if((wire[i]%2 && conjugated) || ((wire[i]%2 == 0) && (conjugated == 0)))
+	pt_cmm_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)min[i],(long)mout[i],(long)gauge);
+      else
+	pt_cmm_dag_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)min[i],(long)mout[i],(long)gauge);
     }
 
   //If wire[i] is even, then we have transport in the negative direction
   //In this case, the vector field is multiplied by the SU(3) link matrix
   //after all communication is complete
+  IFloat *fp0,*fp1;
   for(i=0;i<n;i++)
     {
-      if(!(wire[i]%2))
-	{
-	  cmm_agg_cpp_cb(non_local_chi_cb[wire[i]],(long)uc_nl_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)mout[i],gauge_field_addr);
-	}
-      //Otherwise we have parallel transport in the positive direction.
-      //In this case, the received data has already been pre-multiplied
-      //All we need to do is to put the transported field in the correct place
-      else
-	{
-	  IFloat *fp0,*fp1;
-	  int destination, source;
-	  //Place the data in the receive buffer into the result vector
-	  for(int s=0;s<non_local_chi_cb[wire[i]];s++)
+      if(!local[wire[i]/2])
+      	{
+	  if(!(wire[i]%2))
 	    {
-	      source = uc_nl_cb[parity][wire[i]][s].src*vlen;
-	      fp0 = (IFloat *)(rcv_buf[wire[i]])+3*source;
-	      destination = uc_nl_cb[parity][wire[i]][s].dest*vlen2;
-	      fp1 = (IFloat *)(mout[i])+3*destination;
-	      for(int d = 0;d<GAUGE_LEN;d++)
-		*(fp1+d) = *(fp0+d);
+	      if(conjugated)
+		pt_cmm_dag_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)mout[i],(long)gauge);
+	      else
+		pt_cmm_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)mout[i],(long)gauge);
+	    }
+	  //Otherwise we have parallel transport in the positive direction.
+	  //In this case, the received data has already been pre-multiplied
+	  //All we need to do is to put the transported field in the correct place
+	  else
+	    {
+	      //int destination, source;
+	      //Place the data in the receive buffer into the result vector
+	      for(int s=0;s<non_local_chi_cb[wire[i]];s++)
+		{
+		  //source = uc_nl_cb[parity][wire[i]][s].src;
+		  fp0 = (IFloat *)((long)rcv_buf[wire[i]]+3*uc_nl_cb[parity][wire[i]][s].src);
+		  //destination = uc_nl_cb[parity][wire[i]][s].dest;
+		  fp1 = (IFloat *)(mout[i]+3*uc_nl_cb[parity][wire[i]][s].dest);
+		  //for(int d = 0;d<GAUGE_LEN;d++)
+		  //*(fp1+d) = *(fp0+d);
+		  moveMem(fp1,fp0,GAUGE_LEN*sizeof(IFloat));
+		}
 	    }
 	}
     }
@@ -1317,7 +1431,7 @@ parity)
 void PT::vec_cb(int n, IFloat **vout, IFloat **vin, const int *dir, int
  parity)
 {
-  PT::vec_cb_norm(n,vout,vin,dir,parity,gauge_field_addr);
+  vec_cb_norm(n,vout,vin,dir,parity,gauge_field_addr);
 }
 
 //Normal parallel transport, but with user-specified gauge fields
@@ -1333,7 +1447,7 @@ parity, IFloat * new_gauge_field)
 void PT::vec_cb(int n, IFloat *vout, IFloat **vin, const int *dir, int
 parity, int pad)
 {
-  vec_cb_pad(n,vout,vin,dir,parity,pad,gauge_field_addr);
+  vec_cb_pad(n,vout,vin,dir,parity,gauge_field_addr);
 }
 
 //Padded parallel transport, but with user-specified gauge fields
@@ -1341,37 +1455,29 @@ parity, int pad)
 void PT::vec_cb(int n, IFloat *vout, IFloat **vin, const int *dir, int
 parity, int pad, IFloat * new_gauge_field)
 {
-  vec_cb_pad(n,vout,vin,dir,parity,pad,new_gauge_field);
+  vec_cb_pad(n,vout,vin,dir,parity,new_gauge_field);
 }
 
 #undef PROFILE
+//#define PROFILE
 void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
   //List of the different directions
   int wire[n];
-  int i;
+  int i,j,d,s,k;
   //SCUDirArgs for sending and receiving in the n directions
-  SCUDirArgIR *SCUarg_p[2*n];
+  SCUDirArgIR *SCUarg_p[2*non_local_dirs];
+  //SCUDirArgIR *SCUarg_p[2*n];
   SCUDirArgMulti SCUmulti;
   static int call_num = 0;
   int vlen = VECT_LEN;
   int vlen2 = VECT_LEN;
-
-  #if 0
-  for(int s = 0; s < GJP.VolNodeSites(); s++)
-      for(int t = 0; t < 4; t++)
-  	{
-  	  printf("site = %d, direction = %d\n",s,t);
-  	  for(int u = 0; u < 9; u++)
-  	    printf("%e %e\n",*(gauge+4*GAUGE_LEN*s + GAUGE_LEN*t + 2*u),*(gauge+4*GAUGE_LEN*s + GAUGE_LEN*t + 2*u+1));
-  	}
-  #endif
 
   call_num++;
   
   //Name our function
   char *fname="pt_1vec_cb_norm()";
-//  VRB.Func("",fname);
+  //  VRB.Func("",fname);
   
   //Set the transfer directions
   //If wire[i] is even, then we have communication in the negative direction
@@ -1389,22 +1495,78 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
   //
   //If we have transfer in the negative T direction (wire[i] = 6) then
   //we have to copy the appropriate fields into the send buffer
+  if(conjugated)
+    for(i=0;i<n;i++)
+      {
+	if(!local[wire[i]/2])
+	  {
+	    if(wire[i]%2)
+	      {
+		//printf("dir = %d, pre-mulitply\n", wire[i]);
+                #ifdef CPP
+		pt_cmv_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);
+                #else
+		pt_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
+                #endif
+	      }
+	    else if((wire[i] == 6))
+	      {
+		for(j = 0; j < non_local_chi_cb[6];j++)
+		  for(k = 0; k < VECT_LEN;k++)
+		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)*vlen + k);
+		  //moveMem(snd_buf_t_cb + j*VECT_LEN,vin[i] + *(Toffset[parity]+j)*vlen,VECT_LEN*sizeof(IFloat));
+	      }
+	  }
+      }
+  else
+    for(i=0;i<n;i++)
+      {
+	if(!local[wire[i]/2])
+	  {
+	    if(wire[i]%2)
+	      {
+                #ifdef CPP
+		pt_cmv_dag_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);	    
+                #else
+		pt_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);	 
+                #endif
+	      }
+	    else if(wire[i] == 6)
+	      {
+		for(j = 0; j < non_local_chi_cb[6];j++)
+		  for(k = 0; k < VECT_LEN;k++)
+		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)*vlen + k);
+		  moveMem(snd_buf_t_cb + j*VECT_LEN,vin[i] + *(Toffset[parity]+j)*vlen,VECT_LEN*sizeof(IFloat));
+	      }
+	  }
+      }
+
+  #if 1
+  int comms = 0;
   for(i=0;i<n;i++)
     {
-      if(wire[i]%2)
+      if(!local[wire[i]/2])
 	{
-	  //printf("dir = %d, pre-mulitply\n", wire[i]);
-	  cmv_agg_cpp_cb(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],gauge);
-	}
-      else if(wire[i] == 6)
-	{
-	  for(int j = 0; j < non_local_chi_cb[6];j++)
-	    for(int d = 0; d < VECT_LEN; d++)
-	      *(snd_buf_t_cb + j*VECT_LEN + d) = *(vin[i] + *(Toffset[parity]+j)*vlen+d);
+	  //Calculate the starting address for the data to be sent
+	  IFloat *addr = vin[i] + VECT_LEN * offset_cb[wire[i]];
+	  //This points to the appropriate SCUDirArg for receiving
+	  SCUarg_p[2*comms] = SCUarg_cb[2*wire[i]];
+	  //This points to the appropriate SCUDirArg for sending
+	  SCUarg_p[2*comms+1] = SCUarg_cb[2*wire[i]+1];
+	  
+	  //Set the send address
+	  if(wire[i]%2)
+	    SCUarg_p[2*comms+1]->Addr((void *)snd_buf_cb[wire[i]/2]);
+	  else if(wire[i] == 6)
+	    SCUarg_p[2*comms+1]->Addr((void *)snd_buf_t_cb);
+	  else
+	    SCUarg_p[2*comms+1]->Addr((void *)addr);
+	  comms++;
 	}
     }
+  #endif
 
-
+  #if 0
   for(i=0;i<n;i++)
     {
       //Calculate the starting address for the data to be sent
@@ -1422,68 +1584,91 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
       else
 	SCUarg_p[2*i+1]->Addr((void *)addr);
     }
+  #endif
 
-  SCUmulti.Init(SCUarg_p,2*n);
+  SCUmulti.Init(SCUarg_p,2*non_local_dirs);
+  //SCUmulti.Init(SCUarg_p,2*n);
 
   //Begin transmission
   SCUmulti.SlowStartTrans();
   //End transmission
-  SCUmulti.TransComplete();
-
-  //for(int i = 0; i < 4; i++)
-  //  for(int j = 0; j < VECT_LEN*non_local_chi_cb[2*i+1]; j++)
-  //    {
-  //	printf("snd_buf_cb[%d][%d] = %e\n",i,j,*(snd_buf_cb[i]+j));
-  //	printf("rcv_buf[%d][%d] = %e\n",(2*i+1),j,*(rcv_buf[2*i+1]+j));
-  //   }
+//  SCUmulti.TransComplete();
 
   //Do local calculations
-  for(i=0;i<n;i++)
+  if(conjugated)
     {
-	cmv_agg_cpp_cb(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],gauge);
+      for(i=0;i<n;i++)
+	{
+          #ifdef CPP
+	  if(wire[i]%2)
+	    pt_cmv_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],(long)gauge);
+	  else
+	    pt_cmv_dag_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],(long)gauge);	
+          #else
+	  if(wire[i]%2)
+	    pt_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+	  else
+	    pt_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+           #endif
+	}
     }
+  else
+    {
+    for(i=0;i<n;i++)
+      {
+        #ifdef CPP
+	if(!(wire[i]%2))
+	  pt_cmv_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],(long)gauge);
+	else
+	  pt_cmv_dag_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],(long)gauge);	
+        #else
+	if(!(wire[i]%2))
+	  pt_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+	else
+	  pt_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+        #endif
+      }
+    }
+  
+  //End transmission
+  SCUmulti.TransComplete();
 
   //If wire[i] is even, then we have transport in the negative direction.
   //In this case, the vector field is multiplied by the SU(3) link matrix
   //after all communication is complete
+  IFloat *fp0, *fp1;
   for(i=0;i<n;i++)
     {
-      if(!(wire[i]%2))
-	{
-
-	  #if 0
-	  int destination, source;
-	  printf("wire[%d] = %d\n",i,wire[i]);
-	  for(int s = 0; s< non_local_chi_cb[wire[i]];s++)
+      if(!local[wire[i]/2])
+      	{
+	  if(!(wire[i]%2))
 	    {
-	      source = ((int)(s*VECT_LEN*sizeof(IFloat)/blklen_cb[wire[i]]))*(stride_cb[wire[i]]+blklen_cb[wire[i]])/(sizeof(IFloat))+(s%(blklen_cb[wire[i]]/(VECT_LEN*sizeof(IFloat))))*VECT_LEN;
-	      destination = s*VECT_LEN;
-	      	      for(int d = 0;d<VECT_LEN;d++)
-	      {
-	        printf("*(vin[%d]+%d+%d) = %e\n",i,source,d,*((IFloat *)vin[i] + source+d));
-	        printf("*(rcv_buf[%d]+%d+%d) = %e\n",wire[i],destination,d,*((IFloat *)rcv_buf[wire[i]]+destination+d));
-	       }
-	   }
-	  #endif
-	    cmv_agg_cpp_cb(non_local_chi_cb[wire[i]],(long)uc_nl_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout[i],gauge);
-	}
-      //Otherwise we have parallel transport in the positive direction.
-      //In this case, the received data has already been pre-multiplied
-      //All we need to do is to put the transported field in the correct place
-      else
-	{
-	  IFloat *fp0,*fp1;
-	  int destination, source;
-	  //Place the data in the receive buffer into the result vector
-	  for(int s=0;s<non_local_chi_cb[wire[i]];s++)
+            #ifdef CPP
+	    if(conjugated)
+	      pt_cmv_dag_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout[i],(long)gauge);
+	    else
+	      pt_cmv_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout[i],(long)gauge);
+            #else
+	    if(conjugated)
+	      pt_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
+	    else
+	      pt_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
+            #endif
+	    }
+	  //Otherwise we have parallel transport in the positive direction.
+	  //In this case, the received data has already been pre-multiplied
+	  //All we need to do is to put the transported field in the correct place
+	  else
 	    {
-	      source = uc_nl_cb[parity][wire[i]][s].src*vlen;
-	      destination = uc_nl_cb[parity][wire[i]][s].dest*vlen2;
-	      fp0 = (IFloat *)(rcv_buf[wire[i]])+source;
-	      fp1 = (IFloat *)(vout[i])+destination;
-	      for(int d = 0;d<VECT_LEN;d++)
-		*(fp1+d) = *(fp0+d);
-
+	      //Place the data in the receive buffer into the result vector
+	      for(s=0;s<non_local_chi_cb[wire[i]];s++)
+		{
+		  fp0 = (IFloat *)((long)rcv_buf[wire[i]]+uc_nl_cb[parity][wire[i]][s].src);
+		  fp1 = (IFloat *)((long)vout[i]+uc_nl_cb[parity][wire[i]][s].dest);
+		  for(d = 0;d<VECT_LEN;d++)
+		    *(fp1+d) = *(fp0+d);
+		  //moveMem(fp1,fp0,VECT_LEN*sizeof(IFloat));
+		}
 	    }
 	}
     }
@@ -1494,37 +1679,28 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 //  ParTrans::PTflops +=33*n*vol;
 }
 
+#define PROFILE
 #undef PROFILE
-void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int
-parity,int pad, IFloat * gauge)
+#define PROFILE2
+#undef PROFILE2
+void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
   //List of the different directions
   int wire[n];
-  int i;
+  int i,k;
   //SCUDirArgs for sending and receiving in the n directions
-  SCUDirArgIR *SCUarg_p[2*n];
+  SCUDirArgIR *SCUarg_p[2*non_local_dirs];
+  //SCUDirArgIR *SCUarg_p[2*n];
   SCUDirArgMulti SCUmulti;
   static int call_num = 0;
   int vlen = VECT_LEN;
-  int vlen2 = VECT_LEN;
-  if(pad)
-    vlen2 = 8;
-
-  #if 0
-  for(int s = 0; s < GJP.VolNodeSites(); s++)
-      for(int t = 0; t < 4; t++)
-  	{
-  	  printf("site = %d, direction = %d\n",s,t);
-  	  for(int u = 0; u < 9; u++)
-  	    printf("%e %e\n",*(gauge+4*GAUGE_LEN*s + GAUGE_LEN*t + 2*u),*(gauge+4*GAUGE_LEN*s + GAUGE_LEN*t + 2*u+1));
-  	}
-  #endif
+  int vlen2 = 8;
 
   call_num++;
   
   //Name our function
   char *fname="pt_1vec_cb_pad()";
-//  VRB.Func("",fname);
+  //VRB.Func("",fname);
   
   //Set the transfer directions
   //If wire[i] is even, then we have communication in the negative direction
@@ -1536,6 +1712,10 @@ parity,int pad, IFloat * gauge)
   Float dtime  = - dclock();
 #endif
 
+#ifdef PROFILE2
+  Float dtime2;
+#endif
+
   //If wire[i] is odd, then we have parallel transport in the
   //positive direction.  In this case, the matrix multiplication is
   //done before the field is transferred over to the adjacent node
@@ -1544,17 +1724,67 @@ parity,int pad, IFloat * gauge)
   //we have to copy the appropriate fields into the send buffer
   for(i=0;i<n;i++)
     {
-      if(wire[i]%2)
-	{
-	  cmv_agg_cpp_cb(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],gauge,0);
-	}
-      else if(wire[i] == 6)
-	{
-	  for(int j = 0; j < non_local_chi_cb[6];j++)
-	    for(int d = 0; d < VECT_LEN; d++)
-	      *(snd_buf_t_cb + j*VECT_LEN + d) = *(vin[i] + *(Toffset[parity]+j)*vlen+d);
+      if(!local[wire[i]/2])
+      	{
+	  if(wire[i]%2)
+	    {
+	      //printf("dir = %d, pre-mulitply \n", wire[i]);
+	      #ifdef CPP
+	      if(conjugated)
+		pt_cmv_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);
+	      else
+		pt_cmv_dag_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);
+	      #else
+	      if(conjugated)
+		{
+		  #ifdef PROFILE2
+		  dtime2  = - dclock();
+                  #endif
+		pt_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
+                #ifdef PROFILE2
+		dtime2 +=dclock();
+		print_flops("Assembly Pre-multiply",fname,66*non_local_chi_cb[wire[i]],dtime2);
+                #endif
+		}
+	      else
+		pt_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
+             #endif
+	    }
+	  else if(wire[i] == 6)
+	    {
+	      for(int j = 0; j < non_local_chi_cb[6];j++)
+		  for(k = 0; k < VECT_LEN;k++)
+		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)*vlen + k);
+	      //moveMem(snd_buf_t_cb + j*VECT_LEN,vin[i] + *(Toffset[parity]+j)*vlen,VECT_LEN*sizeof(IFloat));
+	    }
 	}
     }
+
+  #if 1
+  int comms = 0;
+  for(i=0;i<n;i++)
+    {
+      if(!local[wire[i]/2])
+	{
+	  //Calculate the starting address for the data to be sent
+	  IFloat *addr = vin[i] + VECT_LEN * offset_cb[wire[i]];
+	  //This points to the appropriate SCUDirArg for receiving
+	  SCUarg_p[2*comms] = SCUarg_cb[2*wire[i]];
+	  //This points to the appropriate SCUDirArg for sending
+	  SCUarg_p[2*comms+1] = SCUarg_cb[2*wire[i]+1];
+	  
+	  //Set the send address
+	  if(wire[i]%2)
+	    SCUarg_p[2*comms+1]->Addr((void *)snd_buf_cb[wire[i]/2]);
+	  else if(wire[i] == 6)
+	    SCUarg_p[2*comms+1]->Addr((void *)snd_buf_t_cb);
+	  else
+	    SCUarg_p[2*comms+1]->Addr((void *)addr);
+	  comms++;
+	}
+    }
+  #endif
+  #if 0
   for(i=0;i<n;i++)
     {
       //Calculate the starting address for the data to be sent
@@ -1572,71 +1802,77 @@ parity,int pad, IFloat * gauge)
       else
 	SCUarg_p[2*i+1]->Addr((void *)addr);
     }
+  #endif
 
-  SCUmulti.Init(SCUarg_p,2*n);
-
+  SCUmulti.Init(SCUarg_p,2*non_local_dirs);
+  //SCUmulti.Init(SCUarg_p,2*n);
   //Begin transmission
   SCUmulti.SlowStartTrans();
   //End transmission
   SCUmulti.TransComplete();
 
 
-  //  for(int i = 0; i < 4; i++)
-  //  for(int j = 0; j < VECT_LEN*non_local_chi_cb[2*i+1]; j++)
-  //    {
-  //	printf("snd_buf_cb[%d][%d] = %e\n",i,j,*(snd_buf_cb[i]+j));
-  //	printf("rcv_buf[%d][%d] = %e\n",(2*i+1),j,*(rcv_buf[2*i+1]+j));
-  //   }
-
   //Do local calculations
   for(i=0;i<n;i++)
     {
-      //printf("local, dir = %d\n",i);
-      cmv_agg_cpp_cb(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long) vin[i],(long)vout,gauge,pad);
+      #ifdef CPP
+      if((wire[i]%2 && conjugated) || ((wire[i]%2 == 0) && (conjugated == 0)))
+	pt_cmv_pad_cpp(local_chi_cb[wire[i]],(long)uc_l_pad_cb[parity][wire[i]],(long)vin[i],(long)vout,(long)gauge);
+      else
+	pt_cmv_dag_pad_cpp(local_chi_cb[wire[i]],(long)uc_l_pad_cb[parity][wire[i]],(long)vin[i],(long)vout,(long)gauge);	
+      #else
+      if((wire[i]%2 && conjugated) || ((wire[i]%2 == 0) && (conjugated == 0)))
+	{
+	  	  #ifdef PROFILE2
+		  dtime2  = - dclock();
+                  #endif
+	pt_cmv_pad(local_chi_cb[wire[i]]/2,uc_l_pad_cb[parity][wire[i]],gauge,vin[i],vout);
+               #ifdef PROFILE2
+		dtime2 +=dclock();
+		print_flops("Assembly Local multiply",fname,66*local_chi_cb[wire[i]],dtime2);
+                #endif
+	}
+      else
+	pt_cmv_dag_pad(local_chi_cb[wire[i]]/2,uc_l_pad_cb[parity][wire[i]],gauge,vin[i],vout);
+      #endif
     }
 
   //If wire[i] is even, then we have transport in the negative direction.
   //In this case, the vector field is multiplied by the SU(3) link matrix
   //after all communication is complete
+  IFloat *fp0,*fp1;
   for(i=0;i<n;i++)
     {
-      if(!(wire[i]%2))
+      if(!local[wire[i]/2])
 	{
-
-	  #if 0
-	  int destination, source;
-	  printf("wire[%d] = %d\n",i,wire[i]);
-	  for(int s = 0; s< non_local_chi_cb[wire[i]];s++)
+	  if(!(wire[i]%2))
 	    {
-	      source = ((int)(s*VECT_LEN*sizeof(IFloat)/blklen_cb[wire[i]]))*(stride_cb[wire[i]]+blklen_cb[wire[i]])/(sizeof(IFloat))+(s%(blklen_cb[wire[i]]/(VECT_LEN*sizeof(IFloat))))*VECT_LEN;
-	      destination = s*VECT_LEN;
-	      	      for(int d = 0;d<VECT_LEN;d++)
-	      {
-	        printf("*(vin[%d]+%d+%d) = %e\n",i,source,d,*((IFloat *)vin[i] + source+d));
-	        printf("*(rcv_buf[%d]+%d+%d) = %e\n",wire[i],destination,d,*((IFloat *)rcv_buf[wire[i]]+destination+d));
-	       }
-	   }
-	  #endif
-	  //printf("post-multiply, dir = %d\n",i);
-	    cmv_agg_cpp_cb(non_local_chi_cb[wire[i]],(long)uc_nl_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout,gauge,pad);
-	}
-      //Otherwise we have parallel transport in the positive direction.
-      //In this case, the received data has already been pre-multiplied
-      //All we need to do is to put the transported field in the correct place
-      else
-	{
-	  IFloat *fp0,*fp1;
-	  int destination, source;
-	  //Place the data in the receive buffer into the result vector
-	  for(int s=0;s<non_local_chi_cb[wire[i]];s++)
+              #ifdef CPP
+	      if(conjugated)
+		pt_cmv_dag_pad_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_pad_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout,(long)gauge);
+	      else
+		pt_cmv_pad_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_pad_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout,(long)gauge);
+              #else
+	      if(conjugated)
+		pt_cmv_dag_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout);
+	      else
+		pt_cmv_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout);
+	      #endif
+	    }
+	  //Otherwise we have parallel transport in the positive direction.
+	  //In this case, the received data has already been pre-multiplied
+	  //All we need to do is to put the transported field in the correct place
+	  else
 	    {
-	      source = uc_nl_cb[parity][wire[i]][s].src*vlen;
-	      fp0 = (IFloat *)(rcv_buf[wire[i]])+source;
-		  destination = uc_nl_cb[parity][wire[i]][s].dest2*vlen2;
-		  fp1 = vout+destination;
-	      for(int d = 0;d<VECT_LEN;d++)
-		*(fp1+d) = *(fp0+d);
-
+	      //Place the data in the receive buffer into the result vector
+	      for(int s=0;s<non_local_chi_cb[wire[i]];s++)
+		{
+		  fp0 = (IFloat *)((long)rcv_buf[wire[i]]+uc_nl_pad_cb[parity][wire[i]][s].src);
+		  fp1 = (IFloat *)((long)vout +  uc_nl_pad_cb[parity][wire[i]][s].dest);
+		  for(int d = 0;d<VECT_LEN;d++)
+		    *(fp1+d) = *(fp0+d);
+		  //moveMem(fp1,fp0,VECT_LEN*sizeof(IFloat));
+		}
 	    }
 	}
     }
@@ -1646,7 +1882,6 @@ parity,int pad, IFloat * gauge)
 #endif
 //  ParTrans::PTflops +=33*n*vol;
 }
-
 
 //-----------------------------------------------------------------------------
 

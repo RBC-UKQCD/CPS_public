@@ -1,19 +1,19 @@
 /*! \file
   \brief  Functions used by the ParTransAsqtad class.
   
-  $Id: pt.C,v 1.7 2005-01-13 07:46:20 chulwoo Exp $
+  $Id: pt.C,v 1.8 2005-03-09 18:28:39 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-01-13 07:46:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.7 2005-01-13 07:46:20 chulwoo Exp $
-//  $Id: pt.C,v 1.7 2005-01-13 07:46:20 chulwoo Exp $
+//  $Date: 2005-03-09 18:28:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.8 2005-03-09 18:28:39 chulwoo Exp $
+//  $Id: pt.C,v 1.8 2005-03-09 18:28:39 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v $
 //  $State: Exp $
 //
@@ -28,6 +28,8 @@ enum {MATRIX_SIZE = 18,NUM_DIR=8};
 static int vol;
 static Lattice  *Lat;
 static int node_sites[5];
+//--------------------------------------------------------------------
+
 void pt_mat(int N, IFloat **fout, IFloat **fin, const int *dir){
 
     IFloat *u, *v;
@@ -108,7 +110,7 @@ void pt_1vec(int N, IFloat **fout, IFloat **fin, const int *dir){
 		    }
 			
     }
-    ParTrans::PTflops += 198*N*vol;
+    ParTrans::PTflops += 66*N*vol;
 }
 
 /*! 
@@ -302,5 +304,198 @@ void pt_delete_g(){
 void pt_init_g(){
 }
 
+//----------------------------------------------------------------------------
+
+//Parallel transport of a matrix defined on one half of the checkerboarded
+//lattice
+//
+//Parameters
+//
+//n - The number of direction in which to perform the parallel transport
+//mout - Result of the parallel transport, on sites with opposite parity of min
+//min - Initial field, defined on sites with only one parity
+//dir - a list of the n directions in which the field will be transported
+//cb - Checkerboard parity of the vector min
+
+void pt_mat_cb(int n, IFloat **mout, IFloat **min, const int *dir, ChkbType cb)
+{
+  pt_mat_norm(n,mout,min,dir,cb,(IFloat *)Lat->GaugeField());
+}
+
+void pt_mat_cb(int n, IFloat **mout, IFloat **min, const int *dir, ChkbType cb, IFloat * new_gauge_field)
+{
+  pt_mat_norm(n,mout,min,dir,cb,new_gauge_field);
+}
+
+void pt_mat_norm(int n, IFloat **mout, IFloat **min, const int *dir, ChkbType cb, IFloat * gauge)
+{
+  int s[4], spm[4];
+  Matrix * vin[NUM_DIR];
+  Matrix * vout[NUM_DIR];
+  Matrix * udag;
+  IFloat * u, *v;
+  int parity = (int) cb;
+  
+  for(int i = 0; i < n; i++)
+    {
+        vin[i] = (Matrix *)min[i];
+        vout[i] = (Matrix *)mout[i];
+	int mu = dir[i]/2;
+
+	for(spm[3]=s[3]=0; s[3]<GJP.TnodeSites(); spm[3]++, s[3]++)
+	    for(spm[2]=s[2]=0; s[2]<GJP.ZnodeSites(); spm[2]++, s[2]++)
+		for(spm[1]=s[1]=0; s[1]<GJP.YnodeSites(); spm[1]++, s[1]++)
+		    for(spm[0]=s[0]=0; s[0]<GJP.XnodeSites(); spm[0]++, s[0]++)
+		      {
+			if(parity == (s[0]+s[1]+s[2]+s[3])%2)
+			  {
+			    if(dir[i]%2==0){
+			      spm[mu] = (s[mu]-1+GJP.NodeSites(mu))%GJP.NodeSites(mu);
+			      u = gauge+(Lat->GsiteOffset(spm)+mu)*MATRIX_SIZE;
+			      udag->Dagger(u);
+			      v = (IFloat*)&vin[i][Lat->FsiteOffsetChkb(s)];
+			      //STAG stores hermitian conjugate links
+			      mDotMEqual((IFloat*)&vout[i][Lat->FsiteOffsetChkb(spm)],
+					 (IFloat *)udag, v);			    
+			    }
+			    else{
+			      spm[mu] = (s[mu]+1)%GJP.NodeSites(mu);
+			      u = gauge+(Lat->GsiteOffset(s)+mu)*MATRIX_SIZE;
+			      v = (IFloat*)&vin[i][Lat->FsiteOffsetChkb(s)];
+			      // STAG stores hermitian conjugate links
+			      mDotMEqual((IFloat*)&vout[i][Lat->FsiteOffsetChkb(spm)],
+					    u, v);
+			    }			    
+			  }
+			spm[mu] = s[mu];  
+		      }
+    }
+}
+
+//Parallel transport of a vector defined on single parity sites
+//
+//Parameters
+//
+//n - number of directions in which to parallel transport
+//vout - Transported vector
+//vin - Initial vector
+//dir - list of directions in which to transport the vectors
+//cb - Parity of the sites where the vectors are defined
+//gauge - Pointer to block of gauge fields in STAG order
+
+//Normal parallel transport with normal gauge fields
+#undef PROFILE
+void pt_1vec_cb(int n, IFloat **vout, IFloat **vin, const int *dir, ChkbType cb)
+{
+  pt_1vec_cb_norm(n,vout,vin,dir,cb,(IFloat *)Lat->GaugeField());
+}
+
+//Normal parallel transport, but with user-specified gauge fields
+#undef PROFILE
+void pt_1vec_cb(int n, IFloat **vout, IFloat **vin, const int *dir, ChkbType cb, IFloat * new_gauge_field)
+{
+  pt_1vec_cb_norm(n,vout,vin,dir,cb,new_gauge_field);
+}
+
+//Padded parallel transport with normal gauge fields
+#undef PROFILE
+void pt_1vec_cb(int n, IFloat *vout, IFloat **vin, const int *dir, ChkbType cb, int pad)
+{
+  pt_1vec_cb_pad(n,vout,vin,dir,cb,pad,(IFloat *)Lat->GaugeField());
+}
+
+//Padded parallel transport, but with user-specified gauge fields
+#undef PROFILE
+void pt_1vec_cb(int n, IFloat *vout, IFloat **vin, const int *dir, ChkbType cb, int pad, IFloat * new_gauge_field)
+{
+  pt_1vec_cb_pad(n,vout,vin,dir,cb,pad,new_gauge_field);
+}
+
+void pt_1vec_cb_norm(int n, IFloat **fout, IFloat **fin, const int *dir,ChkbType cb, IFloat * gauge)
+{
+  int s[4], spm[4];
+  Vector * vin[NUM_DIR];
+  Vector * vout[NUM_DIR];
+  IFloat * u, *v;
+  int parity = (int) cb;
+  
+  for(int i = 0; i < n; i++)
+    {
+        vin[i] = (Vector *)fin[i];
+        vout[i] = (Vector *)fout[i];
+	int mu = dir[i]/2;
+
+	for(spm[3]=s[3]=0; s[3]<GJP.TnodeSites(); spm[3]++, s[3]++)
+	    for(spm[2]=s[2]=0; s[2]<GJP.ZnodeSites(); spm[2]++, s[2]++)
+		for(spm[1]=s[1]=0; s[1]<GJP.YnodeSites(); spm[1]++, s[1]++)
+		    for(spm[0]=s[0]=0; s[0]<GJP.XnodeSites(); spm[0]++, s[0]++)
+		      {
+			if(parity == (s[0]+s[1]+s[2]+s[3])%2)
+			  {
+			    if(dir[i]%2==0){
+			      spm[mu] = (s[mu]-1+GJP.NodeSites(mu))%GJP.NodeSites(mu);
+			      u = (IFloat*)(gauge+(Lat->GsiteOffset(spm)+mu)*MATRIX_SIZE);
+			      v = (IFloat*)&vin[i][Lat->FsiteOffsetChkb(s)];
+			      //STAG stores hermitian conjugate links
+			      uDagDotXEqual((IFloat*)&vout[i][Lat->FsiteOffsetChkb(spm)],
+					 u, v);			    
+			    }
+			    else{
+			      spm[mu] = (s[mu]+1)%GJP.NodeSites(mu);
+			      u = (IFloat*)(gauge+(Lat->GsiteOffset(s)+mu)*MATRIX_SIZE);
+			      v = (IFloat*)&vin[i][Lat->FsiteOffsetChkb(s)];
+			      // STAG stores hermitian conjugate links
+			      uDotXEqual((IFloat*)&vout[i][Lat->FsiteOffsetChkb(spm)],
+					    u, v);
+			    }			    
+			  }
+			spm[mu] = s[mu];  
+		      }
+    }
+}
+
+void pt_1vec_cb_pad(int n, IFloat *fout, IFloat **fin, const int *dir,ChkbType cb,int pad, IFloat * gauge)
+{
+  int s[4], spm[4];
+  Vector * vin[NUM_DIR];
+  IFloat * vout = fout;
+  IFloat * u, *v;
+  int parity = (int) cb;
+  
+  for(int i = 0; i < n; i++)
+    {
+        vin[i] = (Vector *)fin[i];
+	int mu = dir[i]/2;
+
+	for(spm[3]=s[3]=0; s[3]<GJP.TnodeSites(); spm[3]++, s[3]++)
+	    for(spm[2]=s[2]=0; s[2]<GJP.ZnodeSites(); spm[2]++, s[2]++)
+		for(spm[1]=s[1]=0; s[1]<GJP.YnodeSites(); spm[1]++, s[1]++)
+		    for(spm[0]=s[0]=0; s[0]<GJP.XnodeSites(); spm[0]++, s[0]++)
+		      {
+			if(parity == (s[0]+s[1]+s[2]+s[3])%2)
+			  {
+			    if(dir[i]%2==0){
+			      spm[mu] = (s[mu]-1+GJP.NodeSites(mu))%GJP.NodeSites(mu);
+			      u = (IFloat*)(gauge+(Lat->GsiteOffset(spm)+mu)*MATRIX_SIZE);
+			      v = (IFloat*)&vin[i][Lat->FsiteOffsetChkb(s)];
+			      //STAG stores hermitian conjugate links
+			      uDagDotXEqual((IFloat*)&vout[8*(Lat->FsiteOffsetChkb(spm)*8+i)],
+					 u, v);			    
+			    }
+			    else{
+			      spm[mu] = (s[mu]+1)%GJP.NodeSites(mu);
+			      u = (IFloat*)(gauge+(Lat->GsiteOffset(s)+mu)*MATRIX_SIZE);
+			      v = (IFloat*)&vin[i][Lat->FsiteOffsetChkb(s)];
+			      // STAG stores hermitian conjugate links
+			      uDotXEqual((IFloat*)&vout[8*(Lat->FsiteOffsetChkb(spm)*8+i)],
+					    u, v);
+			    }			    
+			  }
+			spm[mu] = s[mu];  
+		      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 CPS_END_NAMESPACE
 	
