@@ -31,7 +31,34 @@ install:
 	cp tests/Makefile_common* ${SRCDIR}/tests
 
 # create the documentation
+# docs:
+#	cd ${SRCDIR}/doc ; sh mkdocs.sh 
+#
+
+
+have_doxygen = @have_doxygen@
+
+ifneq "$(have_doxygen)" "yes"
+
+docs webdocs:
+	@echo doxygen must be installed to make the documentation.
+else
+
 docs:
 	cd ${SRCDIR}/doc ; sh mkdocs.sh 
+#
+#  documentation for the web pages
+#  (this deletes the source code so that it is not posted on the web)
 
+subdirs = $(dir $(shell ls doc/*/Makefile))
+webdocs:
+	@echo Creating documentation for the web page
+	@echo This will delete all source code
+	$(MAKE) -f $(MAKEFILE) docs
+	@rm -rf src include tests
+	@for a in $(subdirs); do $(MAKE) -C $$a all clean; done
+	chmod o= `ls`
+	@find doc -path "*CVS" -prune -o -type d -print | xargs chmod 775
+	@find doc -name "*.html" -o -name "*.*ps" -o -name "*.gif" -o -name "*.png" -o -name "*.jp*g" -o -name "*.pdf" -o -name "*.tar.gz" |xargs chmod 644
 
+endif

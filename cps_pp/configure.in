@@ -1,14 +1,14 @@
 dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
-dnl  $Author: chulwoo $
-dnl  $Date: 2004-01-14 07:42:59 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.5 2004-01-14 07:42:59 chulwoo Exp $
-dnl  $Id: configure.in,v 1.5 2004-01-14 07:42:59 chulwoo Exp $
+dnl  $Author: mcneile $
+dnl  $Date: 2004-02-01 14:45:38 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.6 2004-02-01 14:45:38 mcneile Exp $
+dnl  $Id: configure.in,v 1.6 2004-02-01 14:45:38 mcneile Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.5 $
+dnl  $Revision: 1.6 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -181,8 +181,7 @@ AC_PROG_INSTALL
 AC_CHECK_PROG(have_doxygen, doxygen, "yes")
 
 
-AC_OUTPUT(Makefile_cps\
-	  config.h \
+AC_OUTPUT(config.h \
 	  Makefile \
 	  Makefile.vars \
 	  Makefile.rules \
