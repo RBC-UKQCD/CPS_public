@@ -21,7 +21,7 @@ UseSystemGroups=yes
 # Set UseSeperateACLFileForEachDir to yes in order to use a
 # seperate 'access' file for each directory.
 # This increased the performance if you have really big repository.
-UseSeperateACLFileForEachDir=yes
+#UseSeperateACLFileForEachDir=yes
 # moving to 1.2.1 fixed the typo in the keyword, Darn...
 UseSeparateACLFileForEachDir=yes
 
