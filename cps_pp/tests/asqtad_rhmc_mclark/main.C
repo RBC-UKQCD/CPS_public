@@ -24,12 +24,6 @@
 #include <alg/alg_remez.h>
 #include <util/random.h>
 
-CPS_START_NAMESPACE
-  GlobalJobParameter GJP;
-  Verbose VRB;
-  Error ERR;
-  LatRanGen LRG;
-CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 

@@ -1,6 +1,6 @@
-# $Id: regression.pl.in,v 1.18 2004-08-18 11:58:09 zs Exp $
-# @configure_input@
-# $Id: regression.pl.in,v 1.18 2004-08-18 11:58:09 zs Exp $ 
+# $Id: regression.pl.in,v 1.19 2004-09-21 20:16:50 chulwoo Exp $
+# tests/regression.pl.  Generated from regression.pl.in by configure.
+# $Id: regression.pl.in,v 1.19 2004-09-21 20:16:50 chulwoo Exp $ 
 #--------------------------------------------------------------------
 # 
 # This perl script writes a shell script "regression.sh"
@@ -8,49 +8,54 @@
 # required because of the limitations of QCDSP).
 #
 
-#
-# Configurations: These are platform/config-dependant:
-#
-
-#
-# General defs of versions and trusted versions:
-#
-
 # directory with good test data in it
-$test_dir = "v5_0_0" ;
-$error_tol = 0.001; 
+$control_dir = "regressions/xmldiff/v6_0_0" ; 
 
-@test_names = ( "f_hmd" ,  "s_spect" ,  "w_spect" ,  "t_asqtad_pion" , "t_gauge_rot" ) ; 
-
-
-
-
-#  Create the test comparison for each test
 #
-#  this could be done with some fancy OO perl
-#  techniques. Let us do something simple at first.
+#  Different subroutines to convert the CPS output
+#  files into XML format
 #
 
-foreach $test (@test_names)
-{
-    $which_test{ $test }  = 1 ; 
-}
+$combine_file = sub { 
+    system("perl ../combine_files_xml.pl *.dat > $candidate_file"); 
+};
 
-    $which_test{ "t_asqtad_pion" }  = 2 ; 
-    $which_test{ "t_gauge_rot" }  = 2 ; 
+$scalar_run = sub { 
+    system("$executable  > $output_file") ; 
+};
+
+
+$do_nothing = sub {  };
+
+
+# assume that the xmldiff utility is in your PATH
+$xmldiff = "xmldiff" ; 
+$status = system("which $xmldiff > /dev/null") ;
+die("ERROR: can NOT find $xmldiff in your path") unless $status == 0 ;
+
+
+# load in information on which tests to run
+require $control_dir."/test_names.pl" ;
+
+
+# machine parameters
+require 'machine_depend.pl' ; 
+
 #------ 
 
-if( '@NOT_TESTING_QCDSP@' eq 'yes' ) {
 # This makes it run autoconf version:
   $machine = '@target@';
   $parallel = '@TESTING_PARALLEL@';
   $executable = "@ARCH@.x";
-} else {
-# This is right for the parallel QCDSP version:
-  $machine = "qcdsp";
-  $parallel = "yes";
-  $executable = "qcdsp.out";
-}
+  $mach = "@ARCH@"  ; 
+
+
+
+
+$executable = $machine_names{$mach}{"exec"} ; 
+
+print "Name of program = " . $executable  .  "\n"  ; 
+
 
 
 #
@@ -58,165 +63,113 @@ if( '@NOT_TESTING_QCDSP@' eq 'yes' ) {
 #
 
 #The name of the shell script this will create:
-$shellscript = "regression.sh";
 $output_dir = "regressions";
 
 
-# Variations:
-#---------------------------------
-if( $machine eq "qcdsp" || $machine eq "qcdoc" ) {
-    $exec_prefix = "qrun ./";
-} else {
-    $exec_prefix = "./";
-}
 
-#--------------------------------------------------------------------
+#
+#  initialize (eg. set up qdeamon for QCDOC)
+#
 
-# Open the file which will contain the shell script which will run the tests:
-open SHOUT,">$shellscript" or die "Could not open $shellscript!\n";
+$setup_machine = $machine_names{$mach}{"setup"} ; 
+&$setup_machine() ; 
 
-# clean up any old output
-print SHOUT 'rm -f '.$output_dir.'/*.dat '."\n";
 
 ##
-##  first compile 
+##  first compile the applications
 ##
 
-print SHOUT "echo COMPILATION STATUS\n";
-foreach $tni (@test_names){
-    print SHOUT '#------------------------------------'."\n";
+print "COMPILATION STATUS\n";
+foreach $test ( keys %test_names ) 
+{
+    chdir $test ;
 
-# Construct the name of the file which holds the original results:
 
-# If we are on qcdsp, reset the machine before beginning the next run:
-	if( $machine eq "qcdsp"  ) {
-	    print SHOUT "echo Rebooting the board...\n";
-	    print SHOUT "qreset_boot > qreset.log\n";
-	}
+    system("gmake -s -f Makefile_regression clean > log_clean 2>&1") ;
+#     on qcdoc the bourne shell and the recursive make get confused 
+     system("bash -c \"gmake -d -s -f Makefile_regression ".$executable." \" > log_compile 2>&1") ; 
 
-# State which test is about to run, run it, and store the results:
-	print SHOUT "cd ".$tni."\n";
-# Remove any files associated with previous runs (i.e. *.dat)
-	print SHOUT 'make -s -f Makefile_regression clean'."\n";
-#       compile the code (do not echo the commands)
-	print SHOUT 'make -s -f Makefile_regression'."\n";
-#       check that the executable has been created
-	print SHOUT 'if test ! -f '.$executable.' ; then'."\n";
-	print SHOUT 'echo '.$tni." FAILURE\n";
-##	print SHOUT "cd ..\n";
+    print $test ."  " ; 
+    if( -f $executable )
+    {
+	print "SUCCESS\n" ; 
+    }
+    else
+    {
+	print "FAILURE\n" ; 
+    }
 
-	print SHOUT "else\n";
-	print SHOUT 'echo '.$tni." SUCCESS\n";
-	print SHOUT "fi\n";
-	print SHOUT "cd ..\n";
+  chdir ".." ; 
 
 # Loop over to the next test:
 }
 
 
-
+##exit ; 
 #
 #  now run the code
 #
 
-print SHOUT "echo TEST_CASE_STATUS\n";
-foreach $tni (@test_names){
-    print SHOUT '#------------------------------------'."\n";
-
-# Construct the names of the files to store the results:
-	$res_file = "../".$output_dir."/stdio.".$tni.".dat";
-	$dat_file = "../".$output_dir."/data.".$tni.".dat";
-
-# Construct the name of the file which holds the original results:
-
-# If we are on qcdsp, reset the machine before beginning the next run:
-	if( $machine eq "qcdsp"  ) {
-	    print SHOUT "echo Rebooting the board...\n";
-	    print SHOUT "qreset_boot > qreset.log\n";
-	}
-
-# State which test is about to run, run it, and store the results:
-	print SHOUT "cd ".$tni."\n";
-# Remove any files associated with previous runs (i.e. *.dat)
-#       check that the executable has been created
-	print SHOUT 'if test ! -f '.$executable.' ; then'."\n";
-	print SHOUT "cd ..\n";
-
-	print SHOUT "else\n";
-
-
-# Run the program:
-    $exec_cmd = $exec_prefix.$executable;
-    print SHOUT "$exec_cmd > $res_file\n";
-
-# test the resulting output
-    $test_type = $which_test{$tni} ;
-    if( $test_type eq "1" ) 
-    {		
-	&backwards_test() ;
-    }
-    else
+print  "TEST_CASE_STATUS\n";
+foreach $test ( keys %test_names ) {
+    $do_test = $test_names{$test}{"check_data"} ; 
+    if( $do_test == "YES" ) 
     {
-	check_file_output($tni,$res_file);
+
+#        Construct the names of the files to store the results:
+	$output_file = "stdio.".$test.".log";
+        $candidate_dir = $machine_names{$mach}{"output"} ; 
+	$candidate_file = $candidate_dir."candidate_".$test.".xml";
+	$xmldiff_log_file = "xmldiff_".$test.".log";
+
+	$control_file   = "../".$control_dir."/control_".$test.".xml";
+	$metric_file    =  "../".$control_dir."/metric_".$test.".xml";
+
+	chdir $test ;
+	if( -f $executable )
+	{
+	    print $test."  " ;
+	    $run_exec = $machine_names{$mach}{"run"} ; 
+            &$run_exec() ; 
+
+# Grab all of the *.dat output files and sling them into a single file:
+	    $xml_the_files = $test_names{$test}{"get_xml"} ; 
+	    &$xml_the_files() ; 
+
+# Diff the output and report if the output differs from that expected:
+
+	    $cmp = system("$xmldiff $control_file $candidate_file $metric_file $xmldiff_log_file "); 
+	    if( $cmp == 0 ) 
+	    {
+		print "PASS\n"  ;
+	    } else
+	    {
+		print "FAIL\n"  ;
+	    }
+
+	    system("gmake -s -f Makefile_regression clean");
+	    chdir ".." ; 
+
+	} ## end if executable exists
+
     }
-
-
-# Clean up
-	print SHOUT "make -s -f Makefile_regression clean\n";
-	print SHOUT "cd ..\n";
-	print SHOUT "fi\n";
 
 # Loop over to the next test:
 }
 
-print SHOUT "echo ------------------------------\n";
-print SHOUT "echo DISCLAIMER\n";
-print SHOUT "echo Please also test this code on \n";
-print SHOUT "echo a physical system before using in \n";
-print SHOUT "echo production runs \n";
-print SHOUT "echo ------------------------------\n";
+print " ------------------------------\n";
+print " DISCLAIMER\n";
+print " Please also test this code on \n";
+print " a physical system before using in \n";
+print " production runs \n";
+print " ------------------------------\n";
 
 
 
-# close the script file
-close SHOUT;
-
-exit;
+$shutdown_machine = $machine_names{$mach}{"final"} ; 
+&$shutdown_machine() ; 
 
 
-#
-#  collection of testing functions
-#
+exit 0;
+# the end 
 
-
-#
-# compare against old tests data
-#
-sub backwards_test
-{
-# Grab all of the *.dat output files and sling them into a single file:
-    print SHOUT "perl ../combine_files.pl *.dat > $dat_file\n";
-    print SHOUT "cd ..\n";
-# Diff the output and report if the output differs from that expected:
-# Drop back to the test directory:
-
-
-    print SHOUT "cd regressions ; perl check_data.pl $tni  $error_tol  $test_dir\n" ;
-    print SHOUT "cd ../".$tni."\n" ;
-
-
-}
-
-
-#
-#  
-#
-#
-
-sub check_file_output
-{
-    my ($name ,$log) = @_ ;
-
-    print SHOUT "ans=`grep test_result ".$log." | awk \'{print \$3  }\'`\n";
-    print SHOUT "echo ".$name." \$ans \n" ; 
-}

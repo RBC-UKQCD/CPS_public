@@ -3,7 +3,7 @@
 ///
 
 /*!----------------------------------------------------------------------
-  $Id: main.C,v 1.8 2004-09-17 17:56:21 chulwoo Exp $
+  $Id: main.C,v 1.9 2004-09-21 20:16:55 chulwoo Exp $
   Test Asqtad dirac operator code.	
 
    This is a simple regression test of the Asqtad inverter.
@@ -27,16 +27,10 @@
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
 #include <util/qcdio.h>
+#include <comms/sysfunc.h>
 #include<util/testing_framework.h>
+#include<util/dump_xml.h>
 
-
-
-CPS_START_NAMESPACE
-GlobalJobParameter GJP;
-LatRanGen LRG;
-Verbose VRB;
-Error ERR;
-CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 
@@ -44,7 +38,7 @@ USING_NAMESPACE_CPS
 
 int main(int argc,char *argv[])
 {
-    
+    Start(); 
     const int nx=4;
     const int ny=4;
     const int nz=4;
@@ -55,7 +49,6 @@ int main(int argc,char *argv[])
     //----------------------------------------------------------------
     DoArg do_arg;
 
-#if TARGET == QCDOC
     do_arg.x_node_sites = nx/SizeX();
     do_arg.y_node_sites = ny/SizeY();
     do_arg.z_node_sites = nz/SizeZ();
@@ -64,16 +57,7 @@ int main(int argc,char *argv[])
     do_arg.x_nodes = SizeX();
     do_arg.y_nodes = SizeY();
     do_arg.z_nodes = SizeZ();
-#else
-    do_arg.x_node_sites = nx;
-    do_arg.y_node_sites = ny;
-    do_arg.z_node_sites = nz;
-    do_arg.t_node_sites = nt;
-    do_arg.s_node_sites = 0;
-    do_arg.x_nodes = 1;
-    do_arg.y_nodes = 1;
-    do_arg.z_nodes = 1;
-#endif 
+    do_arg.t_nodes = SizeT();
     do_arg.x_bc = BND_CND_PRD;
     do_arg.y_bc = BND_CND_PRD;
     do_arg.z_bc = BND_CND_PRD;
@@ -150,8 +134,13 @@ int main(int argc,char *argv[])
     compare_array_relative(pion_corr, pion_corr_good,tol,
 			   time_size) ;
 
+  // write out as XML
+  dump_xml output("candidate_t_asqtad_pion.xml", "hadroncorr") ;
+
+  output.write(pion_corr,time_size,"pion") ; 
+  output.close(); 
 
     sfree(pion_corr); 
-    
+    End();
     return 0; 
 }

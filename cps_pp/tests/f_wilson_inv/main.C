@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.10 2004-08-18 11:58:10 zs Exp $
+  $Id: main.C,v 1.11 2004-09-21 20:16:53 chulwoo Exp $
 */
 
 #include<config.h>
@@ -22,12 +22,6 @@ void _mcleanup(void);
 #endif
 
 
-CPS_START_NAMESPACE
-GlobalJobParameter GJP;
-LatRanGen LRG;
-Verbose VRB;
-Error ERR;
-CPS_END_NAMESPACE
 
 
 USING_NAMESPACE_CPS

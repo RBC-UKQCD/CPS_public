@@ -23,12 +23,6 @@ void _mcleanup(void);
 #endif
 
 
-CPS_START_NAMESPACE
-GlobalJobParameter GJP;
-LatRanGen LRG;
-Verbose VRB;
-Error ERR;
-CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 

@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.13 2004-09-19 01:48:28 chulwoo Exp $
+  $Id: main.C,v 1.14 2004-09-21 20:16:51 chulwoo Exp $
 */
 
 #include<config.h>
@@ -16,6 +16,9 @@
 #include<comms/sysfunc.h>
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
+#ifdef HAVE_STRINGS_H
+#include<strings.h>
+#endif
 #if TARGET == QCDOC
 #include <qalloc.h>
 extern "C" void _mcleanup(void);

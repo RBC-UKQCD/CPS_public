@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-17 17:56:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.9 2004-09-17 17:56:21 chulwoo Exp $
-//  $Id: main.C,v 1.9 2004-09-17 17:56:21 chulwoo Exp $
+//  $Date: 2004-09-21 20:16:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.10 2004-09-21 20:16:55 chulwoo Exp $
+//  $Id: main.C,v 1.10 2004-09-21 20:16:55 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v $
 //  $State: Exp $
 //
@@ -24,13 +24,7 @@
 #include<alg/aots_s.h>
 
 
-CPS_START_NAMESPACE
 
-GlobalJobParameter GJP;
-LatRanGen LRG;
-Verbose VRB;
-Error ERR;
-CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 

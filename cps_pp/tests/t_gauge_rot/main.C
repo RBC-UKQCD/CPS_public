@@ -1,4 +1,4 @@
-///  $Id: main.C,v 1.10 2004-09-03 13:23:33 zs Exp $
+///  $Id: main.C,v 1.11 2004-09-21 20:16:55 chulwoo Exp $
 ///  Demonstrate the random gauge transformation code.
 ///
 
@@ -14,7 +14,7 @@
  The gauge transformation code was orginally written
  by Chris Dawson (using existing code from the BNL group).
 
-$Id: main.C,v 1.10 2004-09-03 13:23:33 zs Exp $
+$Id: main.C,v 1.11 2004-09-21 20:16:55 chulwoo Exp $
 */
 
 #include <config.h>
@@ -29,14 +29,7 @@ $Id: main.C,v 1.10 2004-09-03 13:23:33 zs Exp $
 #include <util/ReadLattice.h>
 #include <alg/alg_rnd_gauge.h>
 #include<util/testing_framework.h>
-
-
-CPS_START_NAMESPACE
-GlobalJobParameter GJP;
-LatRanGen          LRG;
-Verbose            VRB;
-Error              ERR;
-CPS_END_NAMESPACE
+#include<util/dump_xml.h>
 
 USING_NAMESPACE_CPS
 
@@ -117,6 +110,13 @@ int main(int argc,char *argv[])
   plaq.run();
   Float new_trace = link_trace(lattice);
 
+  // write out as XML
+  dump_xml output("candidate_t_gauge_rot.xml", "gauge") ;
+
+  output.write(new_trace,"link_trace"); 
+
+  output.close(); 
+
   //------------------------------ 
   // testing framework - compare the test against the old value
   const Float tol = 0.0001 ; 
@@ -135,33 +135,15 @@ int main(int argc,char *argv[])
 void setup_do_arg(DoArg& do_arg)
 {
 
-#ifdef PARALLEL
-#if 1
   do_arg.x_node_sites = nx/SizeX();
   do_arg.y_node_sites = ny/SizeY();
   do_arg.z_node_sites = nz/SizeZ();
   do_arg.t_node_sites = nt/SizeT();
-#else
-  do_arg.x_node_sites = 2;
-  do_arg.y_node_sites = 2;
-  do_arg.z_node_sites = 2;
-  do_arg.t_node_sites = 2;
-#endif
   do_arg.s_node_sites = 0;
   do_arg.x_nodes = SizeX();
   do_arg.y_nodes = SizeY();
   do_arg.z_nodes = SizeZ();
   do_arg.t_nodes = SizeT();
-#else
-  do_arg.x_node_sites = nx ;
-  do_arg.y_node_sites = ny ;
-  do_arg.z_node_sites = nz ;
-  do_arg.t_node_sites = nt ;
-  do_arg.x_nodes = 1;
-  do_arg.y_nodes = 1;
-  do_arg.z_nodes = 1;
-  do_arg.t_nodes = 1;
-#endif
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
   do_arg.z_bc = BND_CND_PRD;

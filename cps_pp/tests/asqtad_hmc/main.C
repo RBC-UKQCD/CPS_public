@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.10 2004-09-17 17:56:21 chulwoo Exp $
+  $Id: main.C,v 1.11 2004-09-21 20:16:50 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -21,12 +21,6 @@ const int ny = 4;
 const int nz = 4;
 const int nt = 4;
 
-CPS_START_NAMESPACE
-  GlobalJobParameter GJP;
-  Verbose VRB;
-  Error ERR;
-  LatRanGen LRG;
-CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 

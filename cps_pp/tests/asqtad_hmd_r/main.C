@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-17 17:56:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v 1.9 2004-09-17 17:56:21 chulwoo Exp $
-//  $Id: main.C,v 1.9 2004-09-17 17:56:21 chulwoo Exp $
+//  $Date: 2004-09-21 20:16:50 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v 1.10 2004-09-21 20:16:50 chulwoo Exp $
+//  $Id: main.C,v 1.10 2004-09-21 20:16:50 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v $
 //  $State: Exp $
 //
@@ -33,13 +33,7 @@ const int ny = 4;
 const int nz = 4;
 const int nt = 4;
 
-CPS_START_NAMESPACE
 
-  GlobalJobParameter GJP;
-  Verbose VRB;
-  Error ERR;
-  LatRanGen LRG;
-CPS_END_NAMESPACE
 USING_NAMESPACE_CPS
 
 

@@ -34,13 +34,7 @@ const int ny = 2;
 const int nz = 2;
 const int nt = 2;
 
-CPS_START_NAMESPACE
 
-  GlobalJobParameter GJP;
-  Verbose VRB;
-  Error ERR;
-  LatRanGen LRG;
-CPS_END_NAMESPACE
 USING_NAMESPACE_CPS
 
 const char *plaq_filename = CWDPREFIX("plaquette");

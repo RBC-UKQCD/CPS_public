@@ -1,16 +1,15 @@
 #include<config.h>
-CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-17 17:56:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v 1.7 2004-09-17 17:56:21 chulwoo Exp $
-//  $Id: main.C,v 1.7 2004-09-17 17:56:21 chulwoo Exp $
+//  $Date: 2004-09-21 20:16:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v 1.8 2004-09-21 20:16:54 chulwoo Exp $
+//  $Id: main.C,v 1.8 2004-09-21 20:16:54 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v $
 //  $State: Exp $
 //
@@ -24,7 +23,6 @@ CPS_START_NAMESPACE
  */
 
 
-CPS_END_NAMESPACE
 #include<config.h>
 #include<util/lattice.h>
 #include<util/gjp.h>
@@ -36,12 +34,9 @@ CPS_END_NAMESPACE
 #include<alg/common_arg.h>
 #include<util/random.h>
 #include <math.h>
-CPS_START_NAMESPACE
 
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
 
 #ifndef M_PI            // for TARTAN compiler
@@ -53,6 +48,7 @@ CPS_START_NAMESPACE
 #define Z_LINK 2
 #define T_LINK 3
 
+CPS_START_NAMESPACE
 Complex I = Complex(0,1);
 
 class XXX
@@ -223,16 +219,11 @@ Matrix urnd(Float rng=2*M_PI)
   return D;
 }
 
-Verbose VRB;
-Error ERR;
-GlobalJobParameter GJP;
-LatRanGen LRG;
 
 Matrix *L, *M;
 Matrix **G, **Gp;
 
 CPS_END_NAMESPACE
-
 
 USING_NAMESPACE_CPS
 
@@ -437,7 +428,6 @@ int main()
 
 }
 
-CPS_START_NAMESPACE
 
 /****************
     VRB.Debug("Transforming the lattice to the Coulomb gauge\n");
@@ -562,4 +552,3 @@ Float ran345(long *idum)
 
 
 
-CPS_END_NAMESPACE

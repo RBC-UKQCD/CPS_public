@@ -373,3 +373,36 @@ Cg iters = 4 true residual = 2.990928e-01
 Cg iters = 4 true residual = 3.108419e-01
 Cg iters = 4 true residual = 3.092258e-01
 CPS_END_NAMESPACE
+do_arg.dwf_height= 1.800000e+00
+prop stop_rsd= 1.000000e-06
+gauge fix type= 3
+gauge fix stop_cond= 1.000000e-03
+t_src= 2
+t_sink= 6
+t_Op= 3
+5.210990e-03 5.424466e-02 8.345344e-01 -4.331418e-01 1.405965e-03 9.016015e-03
+MASS= 5.000000e-01
+Cg iters = 4 true residual = 2.893726e-01
+Cg iters = 4 true residual = 3.103847e-01
+Cg iters = 4 true residual = 3.064117e-01
+Cg iters = 4 true residual = 2.949058e-01
+Cg iters = 4 true residual = 3.182647e-01
+Cg iters = 4 true residual = 3.118258e-01
+Cg iters = 4 true residual = 2.830772e-01
+Cg iters = 4 true residual = 3.044663e-01
+Cg iters = 4 true residual = 3.030332e-01
+Cg iters = 4 true residual = 3.026667e-01
+Cg iters = 4 true residual = 3.101171e-01
+Cg iters = 4 true residual = 3.104082e-01
+Cg iters = 4 true residual = 2.887965e-01
+Cg iters = 4 true residual = 3.067686e-01
+Cg iters = 4 true residual = 3.048578e-01
+Cg iters = 4 true residual = 3.006855e-01
+Cg iters = 4 true residual = 3.158506e-01
+Cg iters = 4 true residual = 3.108619e-01
+Cg iters = 4 true residual = 2.846418e-01
+Cg iters = 4 true residual = 3.054559e-01
+Cg iters = 4 true residual = 3.020340e-01
+Cg iters = 4 true residual = 2.990928e-01
+Cg iters = 4 true residual = 3.108419e-01
+Cg iters = 4 true residual = 3.092258e-01

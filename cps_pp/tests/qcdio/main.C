@@ -1,5 +1,4 @@
 #include<config.h>
-CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 /*!  A simple text program for the qcdio library.
 
@@ -10,20 +9,19 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: zs $
-  $Date: 2004-08-18 11:58:11 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.6 2004-08-18 11:58:11 zs Exp $
-  $Id: main.C,v 1.6 2004-08-18 11:58:11 zs Exp $
+  $Author: chulwoo $
+  $Date: 2004-09-21 20:16:54 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.7 2004-09-21 20:16:54 chulwoo Exp $
+  $Id: main.C,v 1.7 2004-09-21 20:16:54 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: main.C,v $
-  $Revision: 1.6 $
+  $Revision: 1.7 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
 
-CPS_END_NAMESPACE
 #include <util/qcdio.h>
 #include <stdlib.h>
 #include<util/lattice.h>
@@ -33,18 +31,11 @@ CPS_END_NAMESPACE
 #include<alg/do_arg.h>
 #include<alg/common_arg.h>
 #include<util/qcdio.h>
-CPS_START_NAMESPACE
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include<comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
 
-GlobalJobParameter GJP;
-LatRanGen LRG;
-Verbose VRB;
-Error ERR;
-
+CPS_START_NAMESPACE
 void qcdio_create_dummy_data( void ) {
   char* fprefix = "D52C202K3500U007000";
   char* fpar = "D52C202K3500U007000.par", fname[200], number[200];
@@ -146,9 +137,11 @@ output_prefix              D52C202K3500
     Fclose(bfp);
   }
 }
+CPS_END_NAMESPACE
 
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
+USING_NAMESPACE_CPS
 
 int main( int argc, char** argv ) {
   DoArg do_arg;
@@ -278,4 +271,3 @@ int main( int argc, char** argv ) {
   return(0);
 }
 
-CPS_END_NAMESPACE

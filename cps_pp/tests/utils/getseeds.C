@@ -1,21 +1,19 @@
 #include<config.h>
-CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v 1.5 2004-08-18 11:58:11 zs Exp $
-//  $Id: getseeds.C,v 1.5 2004-08-18 11:58:11 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-21 20:16:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v 1.6 2004-09-21 20:16:56 chulwoo Exp $
+//  $Id: getseeds.C,v 1.6 2004-09-21 20:16:56 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: getseeds.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-CPS_END_NAMESPACE
 #include<util/lattice.h>
 #include<util/gjp.h>
 #include<util/verbose.h>
@@ -25,18 +23,12 @@ CPS_END_NAMESPACE
 #include<alg/do_arg.h>
 #include<alg/common_arg.h>
 #include<alg/pbp_arg.h>
-CPS_START_NAMESPACE
 
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
 
-GlobalJobParameter GJP;
-LatRanGen LRG;
-Verbose VRB;
-Error ERR;
+USING_NAMESPACE_CPS
 
 int main(int argc,char *argv[]){
 
@@ -104,4 +96,3 @@ int main(int argc,char *argv[]){
 
 
 
-CPS_END_NAMESPACE
