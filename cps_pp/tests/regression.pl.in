@@ -1,7 +1,12 @@
-# $Id: regression.pl.in,v 1.14 2004-04-30 12:18:00 zs Exp $
+# $Id: regression.pl.in,v 1.15 2004-05-11 15:06:01 mcneile Exp $
 # @configure_input@
-# $Id: regression.pl.in,v 1.14 2004-04-30 12:18:00 zs Exp $ 
+# $Id: regression.pl.in,v 1.15 2004-05-11 15:06:01 mcneile Exp $ 
 #--------------------------------------------------------------------
+# 
+# This perl script writes a shell script "regression.sh"
+# that actually runs the tests. (This dual mode is
+# required because of the limitations of QCDSP).
+#
 
 #
 # Configurations: These are platform/config-dependant:
@@ -13,32 +18,36 @@
 
 # directory with good test data in it
 $test_dir = "v5_0_0" ;
-@test_names = qw( f_hmd 
-		  f_hmd_dwfso 
-		  g_hb  
-		  g_hmd  
-		  s_spect   
-		  w_spect  
-		  f_wilson_eig   
-		  xi_spect_gsum  
-		  f_stag_pbp ) ; 
-
-#------
-
 $error_tol = 0.001; 
 
+@test_names = ( "f_hmd" , "f_hmd_dwfso", "g_hb" , "g_hmd" , "s_spect" ,  "w_spect" , "f_wilson_eig" ,  "xi_spect_gsum" , "f_stag_pbp" , "t_asqtad_pion" ) ; 
+
+
+
+
+#  Create the test comparison for each test
+#
+#  this could be done with some fancy OO perl
+#  techniques. Let us do something simple at first.
+#
+
+foreach $test (@test_names)
+{
+    $which_test{ $test }  = 1 ; 
+}
+
+    $which_test{ "t_asqtad_pion" }  = 2 ; 
+#------ 
 
 if( '@NOT_TESTING_QCDSP@' eq 'yes' ) {
 # This makes it run autoconf version:
   $machine = '@target@';
   $parallel = '@TESTING_PARALLEL@';
-  $compiler = '@CC@';
-  $executable = "@ARCH@.x";
+  $executable = "regression_cps.x";
 } else {
 # This is right for the parallel QCDSP version:
   $machine = "qcdsp";
   $parallel = "yes";
-  $compiler = "tcpp";
   $executable = "qcdsp.out";
 }
 
@@ -54,7 +63,7 @@ $output_dir = "regressions";
 
 # Variations:
 #---------------------------------
-if( $machine eq "qcdsp" && $compiler eq "tcpp" ) {
+if( $machine eq "qcdsp" || $machine eq "qcdoc" ) {
     $exec_prefix = "qrun ./";
 } else {
     $exec_prefix = "./";
@@ -65,22 +74,21 @@ if( $machine eq "qcdsp" && $compiler eq "tcpp" ) {
 # Open the file which will contain the shell script which will run the tests:
 open SHOUT,">$shellscript" or die "Could not open $shellscript!\n";
 
-# Loop over each test in the series:
-
 # clean up any old output
-    print SHOUT 'rm -f '.$output_dir.'/*.dat '."\n";
+print SHOUT 'rm -f '.$output_dir.'/*.dat '."\n";
 
+##
+##  first compile 
+##
+
+print SHOUT "echo COMPILATION STATUS\n";
 foreach $tni (@test_names){
     print SHOUT '#------------------------------------'."\n";
-
-# Construct the names of the files to store the results:
-	$res_file = "../".$output_dir."/stdio.".$tni.".dat";
-	$dat_file = "../".$output_dir."/data.".$tni.".dat";
 
 # Construct the name of the file which holds the original results:
 
 # If we are on qcdsp, reset the machine before beginning the next run:
-	if( $machine eq "qcdsp" && $compiler eq "tcpp" ) {
+	if( $machine eq "qcdsp"  ) {
 	    print SHOUT "echo Rebooting the board...\n";
 	    print SHOUT "qreset_boot > qreset.log\n";
 	}
@@ -93,27 +101,65 @@ foreach $tni (@test_names){
 	print SHOUT 'make -s -f Makefile_regression'."\n";
 #       check that the executable has been created
 	print SHOUT 'if test ! -f '.$executable.' ; then'."\n";
-	print SHOUT 'echo '.$tni." COMPILATION FAILURE\n";
+	print SHOUT 'echo '.$tni." FAILURE\n";
+##	print SHOUT "cd ..\n";
+
+	print SHOUT "else\n";
+	print SHOUT 'echo '.$tni." SUCCESS\n";
+	print SHOUT "fi\n";
+	print SHOUT "cd ..\n";
+
+# Loop over to the next test:
+}
+
+
+
+#
+#  now run the code
+#
+
+print SHOUT "echo TEST_CASE_STATUS\n";
+foreach $tni (@test_names){
+    print SHOUT '#------------------------------------'."\n";
+
+# Construct the names of the files to store the results:
+	$res_file = "../".$output_dir."/stdio.".$tni.".dat";
+	$dat_file = "../".$output_dir."/data.".$tni.".dat";
+
+# Construct the name of the file which holds the original results:
+
+# If we are on qcdsp, reset the machine before beginning the next run:
+	if( $machine eq "qcdsp"  ) {
+	    print SHOUT "echo Rebooting the board...\n";
+	    print SHOUT "qreset_boot > qreset.log\n";
+	}
+
+# State which test is about to run, run it, and store the results:
+	print SHOUT "cd ".$tni."\n";
+# Remove any files associated with previous runs (i.e. *.dat)
+#       check that the executable has been created
+	print SHOUT 'if test ! -f '.$executable.' ; then'."\n";
 	print SHOUT "cd ..\n";
 
 	print SHOUT "else\n";
 
 
 # Run the program:
-	$exec_cmd = $exec_prefix.$executable;
-##	print SHOUT "echo Running $exec_cmd...\n";
-	print SHOUT "$exec_cmd > $res_file\n";
-# Grab all of the *.dat output files and sling them into a single file:
-	print SHOUT "perl ../combine_files.pl *.dat > $dat_file\n";
+    $exec_cmd = $exec_prefix.$executable;
+    print SHOUT "$exec_cmd > $res_file\n";
 
-# Inform the user about the directory being looked at:
-##	print "[$tni]: '$exec_cmd'.\n";
+# test the resulting output
+    $test_type = $which_test{$tni} ;
+    if( $test_type eq "1" ) 
+    {		
+	&backwards_test() ;
+    }
+    else
+    {
+	check_file_output($tni,$res_file);
+    }
 
-# Diff the output and report if the output differs from that expected:
-# Drop back to the test directory:
-	print SHOUT "cd ..\n";
-	print SHOUT "cd regressions ; perl check_data.pl $tni  $error_tol  $test_dir\n" ;
-	print SHOUT "cd ../".$tni."\n" ;
+
 # Clean up
 	print SHOUT "make -s -f Makefile_regression clean\n";
 	print SHOUT "cd ..\n";
@@ -135,3 +181,41 @@ print SHOUT "echo ------------------------------\n";
 close SHOUT;
 
 exit;
+
+
+#
+#  collection of testing functions
+#
+
+
+#
+# compare against old tests data
+#
+sub backwards_test
+{
+# Grab all of the *.dat output files and sling them into a single file:
+    print SHOUT "perl ../combine_files.pl *.dat > $dat_file\n";
+    print SHOUT "cd ..\n";
+# Diff the output and report if the output differs from that expected:
+# Drop back to the test directory:
+
+
+    print SHOUT "cd regressions ; perl check_data.pl $tni  $error_tol  $test_dir\n" ;
+    print SHOUT "cd ../".$tni."\n" ;
+
+
+}
+
+
+#
+#  
+#
+#
+
+sub check_file_output
+{
+    my ($name ,$log) = @_ ;
+
+    print SHOUT "ans=`grep test_result ".$log." | awk \'{print \$3  }\'`\n";
+    print SHOUT "echo ".$name." \$ans \n" ; 
+}
