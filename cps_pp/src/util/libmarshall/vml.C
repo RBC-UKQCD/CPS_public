@@ -2,12 +2,16 @@
  * vml.c, Generic VML routines implementation.
  */
 
+#include <config.h>
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
 
+#if 0
 #include <rpc/types.h>
 #include <rpc/rpc.h>
+#endif
+#include <util/vml/types.h>
 #include <util/vml/vml.h>
 #include <util/vml/vml_encoder.h>
 
@@ -235,8 +239,9 @@ vml_enum (VML *vmls, char *name, enum_t *ep)
 bool_t
 vml_opaque (VML *vmls, char *name, caddr_t cp, u_int cnt)
 {
+  char *tmp = (char *)cp;
   int icnt = cnt;
-  VmlEncode->Bytes(vmls,name,(char *)cp,icnt);
+  VmlEncode->Bytes(vmls,name,tmp,icnt);
   cnt = icnt;
   return TRUE;
 }

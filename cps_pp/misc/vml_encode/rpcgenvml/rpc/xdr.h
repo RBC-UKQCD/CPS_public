@@ -36,7 +36,9 @@
 #ifndef _RPC_XDR_H
 #define _RPC_XDR_H 1
 
+#if 0
 #include <features.h>
+#endif
 #include <sys/types.h>
 #include <rpc/types.h>
 

@@ -1,4 +1,4 @@
-
+#include <config.h>
 #include <util/latheader.h>
 #include <util/qioarg.h>
 #include <string.h>

@@ -32,7 +32,7 @@
  * From: @(#)rpc_cout.c 1.13 89/02/22 (C) 1987 SMI
  */
 char cout_rcsid[] =
-"$Id: rpc_cout.c,v 1.2 2004-12-11 20:57:45 chulwoo Exp $";
+"$Id: rpc_cout.c,v 1.3 2004-12-15 07:32:08 chulwoo Exp $";
 
 /*
  * rpc_cout.c, XDR routine outputter for the RPC protocol compiler
@@ -315,7 +315,7 @@ print_prog_header (const proc_list * plist)
 static void
 print_trailer (void)
 {
-  f_print (fout, "\treturn TRUE;\n");
+  f_print (fout, "\treturn VML_TRUE;\n");
   f_print (fout, "}\n");
 }
 
@@ -381,7 +381,7 @@ print_ifclose (int indent)
 {
   f_print (fout, "))\n");
   tabify (fout, indent);
-  f_print (fout, "\t return FALSE;\n");
+  f_print (fout, "\t return VML_FALSE;\n");
 }
 
 static void
@@ -481,7 +481,7 @@ emit_enum (definition * def)
 
   if ( VMLoutput ) {
     f_print(fout,"\tif (!vml_enum (vmls,name,(enum_t *)objp))\n");
-    f_print(fout,"\t\treturn FALSE;\n");
+    f_print(fout,"\t\treturn VML_FALSE;\n");
   } else { 
     print_ifopen (1, "enum","name");
     print_ifarg ("(enum_t *) objp");
@@ -584,7 +584,7 @@ emit_union (const definition * def)
   else
     {
       f_print (fout, "\tdefault:\n");
-      f_print (fout, "\t\treturn FALSE;\n");
+      f_print (fout, "\t\treturn VML_FALSE;\n");
     }
 
   f_print (fout, "\t}\n");
@@ -613,7 +613,7 @@ inline_struct (definition *def, int flag)
       f_print (fout, "\n\tif (xdrs->x_op == XDR_ENCODE) {\n");
     else
       f_print (fout,
-	       "\t\treturn TRUE;\n\t} else if (xdrs->x_op == XDR_DECODE) {\n");
+	       "\t\treturn VML_TRUE;\n\t} else if (xdrs->x_op == XDR_DECODE) {\n");
     
     i = 0;
     size = 0;
@@ -842,7 +842,7 @@ emit_struct (definition * def)
 	flag = GET;
     }
 
-  f_print (fout, "\t return TRUE;\n\t}\n\n");
+  f_print (fout, "\t return VML_TRUE;\n\t}\n\n");
 
   /* now take care of XDR_FREE case */
 
@@ -860,7 +860,7 @@ emit_typedef (const definition * def)
 
   if ( VMLoutput ) { 
     f_print(fout,"\tif (!vml_%s (vmls,name,objp))\n",type);
-    f_print(fout,"\t\treturn FALSE;\n");
+    f_print(fout,"\t\treturn VML_FALSE;\n");
   } else { 
     print_ifstat (1, prefix, type, rel, amax, "objp", def->def_name);    
   }

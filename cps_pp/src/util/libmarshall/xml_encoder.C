@@ -1,6 +1,8 @@
 #include <util/vml/vml_encoder.h>
 #include <stdlib.h>
+#ifdef HAVE_STRINGS_H
 #include <strings.h>
+#endif
 #include <string.h>
   /*
    * Interface to represent the basic types in XDR routines

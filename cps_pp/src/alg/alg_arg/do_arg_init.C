@@ -4,10 +4,19 @@
  */
 
 #include "alg/do_arg.h"
+#if TARGET == QCDOC
+#include <qalloc.h>
+#endif
 CPS_START_NAMESPACE
 
 
 DoArg::DoArg () {
+  x_sites = 0;
+  y_sites = 0;
+  z_sites = 0;
+  t_sites = 0;
+  s_sites = 0;
+ 
   s_node_sites=1;
   s_nodes=1;
   xi_bare=1.0;
@@ -19,7 +28,12 @@ DoArg::DoArg () {
   c_1=0.0;
   u0=1.0;
   xi_gfix=1.0;
-
+  for(int i = 0; i<50;i++ ) start_conf_filename[i] = ' ';
+#if TARGET == QCDOC
+  start_conf_alloc_flag = QCOMMS; 
+#else
+  start_conf_alloc_flag = 0; 
+#endif
   dwf_a5_inv=1.0;
   asqtad_naik=0.0;
   asqtad_3staple=0.0;

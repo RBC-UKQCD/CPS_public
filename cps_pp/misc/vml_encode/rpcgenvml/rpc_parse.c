@@ -32,7 +32,7 @@
  * From: @(#)rpc_parse.c 1.8 89/02/22 (C) 1987 SMI
  */
 const char parse_rcsid[] =
-  "$Id: rpc_parse.c,v 1.2 2004-12-11 20:57:47 chulwoo Exp $";
+  "$Id: rpc_parse.c,v 1.3 2004-12-15 07:32:08 chulwoo Exp $";
 
 /*
  * rpc_parse.c, Parser for the RPC protocol compiler
@@ -156,7 +156,7 @@ def_program (definition * defp)
   proc_list *plist;
   proc_list **ptailp;
   int num_args;
-  bool_t isvoid = FALSE;	/* whether first argument is void */
+  bool_t isvoid = VML_FALSE;	/* whether first argument is void */
   defp->def_kind = DEF_PROGRAM;
   scan (TOK_IDENT, &tok);
   defp->def_name = tok.str;
@@ -186,14 +186,14 @@ def_program (definition * defp)
 	  scan (TOK_LPAREN, &tok);
 	  /* get args - first one */
 	  num_args = 1;
-	  isvoid = FALSE;
+	  isvoid = VML_FALSE;
 	  /* type of DEF_PROGRAM in the first
 	   * get_prog_declaration and DEF_STURCT in the next
 	   * allows void as argument if it is the only argument
 	   */
 	  get_prog_declaration (&dec, DEF_PROGRAM, num_args);
 	  if (streq (dec.type, "void"))
-	    isvoid = TRUE;
+	    isvoid = VML_TRUE;
 	  decls = ALLOC (decl_list);
 	  plist->args.decls = decls;
 	  decls->decl = dec;
@@ -208,7 +208,7 @@ def_program (definition * defp)
 	      decls->decl = dec;
 	      *tailp = decls;
 	      if (streq (dec.type, "void"))
-		isvoid = TRUE;
+		isvoid = VML_TRUE;
 	      tailp = &decls->next;
 	    }
 	  /* multiple arguments are only allowed in newstyle */

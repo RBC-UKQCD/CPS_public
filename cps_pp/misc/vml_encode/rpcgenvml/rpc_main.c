@@ -32,7 +32,7 @@
  * From @(#)rpc_main.c 1.30 89/03/30 (C) 1987 SMI;
  */
 const char main_rcsid[] =
-  "$Id: rpc_main.c,v 1.2 2004-12-11 20:57:46 chulwoo Exp $";
+  "$Id: rpc_main.c,v 1.3 2004-12-15 07:32:08 chulwoo Exp $";
 
 /*
  * rpc_main.c, Top level of the RPC protocol compiler.
@@ -580,11 +580,14 @@ h_output (const char *infile, const char *define, int extend,
   fprintf (fout, "#ifndef _%s\n#define _%s\n\n", guard,
 	   guard);
 
+#if 0
   fprintf (fout, "#include <rpc/rpc.h>\n\n");
+#endif
   if ( VMLoutput ) 
     {
-      fprintf (fout, "#include <util/vml/vml.h>\n");
       fprintf (fout, "#include <config.h>\n");
+      fprintf (fout, "#include <util/vml/types.h>\n");
+      fprintf (fout, "#include <util/vml/vml.h>\n");
       fprintf (fout, "#include <util/enum.h>\n");
       fprintf (fout, "#include <util/defines.h>\n");
     }

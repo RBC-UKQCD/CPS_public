@@ -1,7 +1,12 @@
+#include <config.h>
 #include <util/vml/vml_encoder.h>
 #include <stdlib.h>
+#ifdef HAVE_STRINGS_H
 #include <strings.h>
+#endif
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif
   /*
    * Interface to represent the basic types in XDR routines
    */

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of class rfloat.
 
-  $Id: rfloat.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+  $Id: rfloat.h,v 1.5 2004-12-15 07:32:07 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rfloat.h,v 1.4 2004-08-18 11:57:37 zs Exp $
-//  $Id: rfloat.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-12-15 07:32:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rfloat.h,v 1.5 2004-12-15 07:32:07 chulwoo Exp $
+//  $Id: rfloat.h,v 1.5 2004-12-15 07:32:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: rfloat.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rfloat.h,v $
 //  $State: Exp $
 //
@@ -28,7 +28,8 @@ CPS_START_NAMESPACE
 
 class rfloat;
 CPS_END_NAMESPACE
-#include <util/data_types.h>        
+#include <util/enum.h>
+//#include <util/data_types.h>        
 CPS_START_NAMESPACE
 
 //! A floating point type.

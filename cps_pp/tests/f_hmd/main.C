@@ -1,22 +1,22 @@
 #include<config.h>
+#include <stdlib.h>
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-11-08 06:43:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.20 2004-11-08 06:43:54 chulwoo Exp $
-//  $Id: main.C,v 1.20 2004-11-08 06:43:54 chulwoo Exp $
+//  $Date: 2004-12-15 07:32:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.21 2004-12-15 07:32:17 chulwoo Exp $
+//  $Id: main.C,v 1.21 2004-12-15 07:32:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 #include <util/qcdio.h>
-#include <stdlib.h>
 #include<util/lattice.h>
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
@@ -33,6 +33,7 @@ const int LOAD_RNG = 0;
 int main(int argc,char *argv[])
 {
   FILE *fp;
+  Float temp;
 
 #if TARGET==cpsMPI
     using MPISCU::fprintf;
@@ -78,6 +79,7 @@ int main(int argc,char *argv[])
   do_arg.beta = 5.5;
   do_arg.dwf_height = 0.9;
   do_arg.clover_coeff = 2.0171;
+  do_arg.Encode("do_arg.vml", (char *)&do_arg);
 
 #if TARGET==cpsMPI
     MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);    

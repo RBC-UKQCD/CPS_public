@@ -6,10 +6,9 @@
 #ifndef _DO_ARG_H_RPCGEN
 #define _DO_ARG_H_RPCGEN
 
-#include <rpc/rpc.h>
-
-#include <util/vml/vml.h>
 #include <config.h>
+#include <util/vml/types.h>
+#include <util/vml/vml.h>
 #include <util/enum.h>
 #include <util/defines.h>
 
@@ -50,7 +49,7 @@ public:
 	StartConfType start_conf_kind;
 	u_long start_conf_load_addr;
 	StartSeedType start_seed_kind;
-	char *start_conf_filename;
+	char start_conf_filename[50];
 	int start_conf_alloc_flag;
 	int start_seed_value;
 	Float beta;

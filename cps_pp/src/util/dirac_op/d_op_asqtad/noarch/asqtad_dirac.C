@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.13 2004-09-21 18:11:15 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.14 2004-12-15 07:32:12 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -18,7 +18,7 @@
 #include <util/vector.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+//#include <unistd.h>
 #include <fcntl.h>
 #include <time.h>
 #include <math.h>

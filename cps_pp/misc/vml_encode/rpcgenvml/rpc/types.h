@@ -41,13 +41,13 @@ typedef int enum_t;
 
 #define        __dontcare__    -1
 
-#ifndef FALSE
-#      define  FALSE   (0)
+#ifndef VML_FALSE
 #endif
+#      define  VML_FALSE   (0)
 
-#ifndef TRUE
-#      define  TRUE    (1)
+#ifndef VML_TRUE
 #endif
+#      define  VML_TRUE    (1)
 
 #ifndef NULL
 #      define  NULL 0
@@ -63,9 +63,11 @@ typedef int enum_t;
 #include <sys/time.h>
 #include <sys/param.h>
 
+#if 0
 #ifndef INADDR_ANY
 #include <netinet/in.h>
 #endif 
+#endif
 
 #ifndef INADDR_LOOPBACK
 #define       INADDR_LOOPBACK         (u_long)0x7F000001

@@ -1,22 +1,25 @@
 #include<config.h>
 #include<util/qcdio.h>
+#if TARGET == QCDOC
+#include<qalloc.h>
+#endif
 CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.22 2004-12-07 06:11:59 chulwoo Exp $
+  $Id: lattice_base.C,v 1.23 2004-12-15 07:32:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-07 06:11:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.22 2004-12-07 06:11:59 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.22 2004-12-07 06:11:59 chulwoo Exp $
+//  $Date: 2004-12-15 07:32:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.23 2004-12-15 07:32:12 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.23 2004-12-15 07:32:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //

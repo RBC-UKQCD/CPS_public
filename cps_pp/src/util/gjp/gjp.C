@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.20 2004-12-11 20:58:03 chulwoo Exp $
+  $Id: gjp.C,v 1.21 2004-12-15 07:32:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-11 20:58:03 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.20 2004-12-11 20:58:03 chulwoo Exp $
-//  $Id: gjp.C,v 1.20 2004-12-11 20:58:03 chulwoo Exp $
+//  $Date: 2004-12-15 07:32:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.21 2004-12-15 07:32:12 chulwoo Exp $
+//  $Id: gjp.C,v 1.21 2004-12-15 07:32:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -150,7 +150,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   // if(s_node_sites == 0) s_node_sites=1;
 #endif
   
-  for(i = 0; i<5 ; i++)
+  for(i = 0; i<4 ; i++)
   if (node_sites[i]<0 ||node_sites[i]%2!=0)
       ERR.General(cname,fname,
 	"Bad value %d for %s_node_sites; must be divisible by 2\n", node_sites[i], dim_name[i]);
@@ -180,13 +180,13 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
       size[3] = SizeT(); 
       size[4] = SizeS(); 
     }
-  if(x_node_sites*y_node_sites*t_node_sites*s_node_sites==0)
+  if( node_sites[0]* node_sites[1]* node_sites[2]* node_sites[3]* node_sites[4] == 0 )
     {
-      x_node_sites = rda.x_sites/SizeX();
-      y_node_sites = rda.y_sites/SizeY();
-      z_node_sites = rda.z_sites/SizeZ();
-      t_node_sites = rda.t_sites/SizeT();
-      s_node_sites = rda.s_sites/SizeS();   
+      node_sites[0] = rda.x_sites/SizeX();
+      node_sites[1] = rda.y_sites/SizeY();
+      node_sites[2] = rda.z_sites/SizeZ();
+      node_sites[3] = rda.t_sites/SizeT();
+      node_sites[4] = rda.s_sites/SizeS();   
     }
 #endif
   
@@ -231,7 +231,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
     if(nodes[i] != 1) node_coor[i] = coor[i] % nodes[i];
   }
   VRB.Result(cname,fname, "node_sites= %d %d %d %d %d\n",
-node_sites,[0], node_sites,[1], node_sites,[2], node_sites,[3], node_sites,[4]);
+node_sites[0], node_sites[1], node_sites[2], node_sites[3], node_sites[4]);
   VRB.Result(cname,fname, "nodes= %d %d %d %d %d\n",
 nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
 #if 0
@@ -251,11 +251,10 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   //----------------------------------------------------------------
 
   for(int la=0; la<6; la++) gjp_local_axis[la] = 0;
-  if(x_nodes == 1) gjp_local_axis[0] = gjp_local_axis[5] = 1;
-  if(y_nodes == 1) gjp_local_axis[1] = gjp_local_axis[5] = 1;
-  if(z_nodes == 1) gjp_local_axis[2] = gjp_local_axis[5] = 1;
-  if(t_nodes == 1) gjp_local_axis[3] = gjp_local_axis[5] = 1;
-  if(s_nodes == 1) gjp_local_axis[4] = 1;
+  for(int la=0; la<4; la++){
+  if(nodes[la] == 1) gjp_local_axis[la] = gjp_local_axis[5] = 1;
+  }
+  if(nodes[4] == 1) gjp_local_axis[4] = 1;
 
   gjp_scu_dir[0] = SCU_XP;
   gjp_scu_dir[1] = SCU_XM;
@@ -274,11 +273,11 @@ x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
   gjp_scu_wire_map[3] = SCURemap( SCU_YM );
   gjp_scu_wire_map[4] = SCURemap( SCU_ZP );
   gjp_scu_wire_map[5] = SCURemap( SCU_ZM );
-  if(t_nodes > 1){
+  if(nodes[3] > 1){
   gjp_scu_wire_map[6] = SCURemap( SCU_TP );
   gjp_scu_wire_map[7] = SCURemap( SCU_TM );
   }
-  if(s_nodes > 1){
+  if(nodes[4] > 1){
   gjp_scu_wire_map[8] = SCURemap( SCU_SP );
   gjp_scu_wire_map[9] = SCURemap( SCU_SM );
   }

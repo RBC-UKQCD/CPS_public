@@ -6,10 +6,9 @@
 #ifndef _ENUM_H_RPCGEN
 #define _ENUM_H_RPCGEN
 
-#include <rpc/rpc.h>
-
-#include <util/vml/vml.h>
 #include <config.h>
+#include <util/vml/types.h>
+#include <util/vml/vml.h>
 #include <util/enum.h>
 #include <util/defines.h>
 

@@ -31,7 +31,7 @@ int measurefreq;
   unsigned long start_conf_load_addr;
 
   StartSeedType start_seed_kind;  /*!< The kind of initial random number generator seed*/
-  char *start_conf_filename;
+  char start_conf_filename[50];
   int start_conf_alloc_flag;
 
   int start_seed_value;   /*!< The value of the random number generator seed.*/

@@ -5,8 +5,13 @@
 #ifndef _RPC_VML_H
 #define _RPC_VML_H 1
 
+#include <config.h>
 #include <sys/types.h>
+#if TARGET == QCDOC
+#include <util/vml/types.h>
+#else
 #include <rpc/types.h>
+#endif
 
 #include <config.h>
 
