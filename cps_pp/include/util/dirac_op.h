@@ -3,18 +3,21 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.3 2003-08-29 20:28:55 mike Exp $
+  $Id: dirac_op.h,v 1.4 2003-08-29 21:02:56 mike Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: mike $
-//  $Date: 2003-08-29 20:28:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.3 2003-08-29 20:28:55 mike Exp $
-//  $Id: dirac_op.h,v 1.3 2003-08-29 20:28:55 mike Exp $
+//  $Date: 2003-08-29 21:02:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.4 2003-08-29 21:02:56 mike Exp $
+//  $Id: dirac_op.h,v 1.4 2003-08-29 21:02:56 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3  2003/08/29 20:28:55  mike
+//  Added MInvCG, the multishift CG invertor, used by AlgHmcRHMC.
+//
 //  Revision 1.2  2003/07/24 16:53:53  zs
 //  Addition of documentation via doxygen:
 //  doxygen-parsable comment blocks added to many source files;
@@ -51,7 +54,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: dirac_op.h,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v $
 //  $State: Exp $
 //
@@ -307,9 +310,6 @@ class DiracOp
   virtual int MatInv(PreserveType prs_in = PRESERVE_YES) = 0;
      // Same as original but in = f_in, out = f_out, true_res=0.
 
-  virtual int MatMInv(Vector **out, Vector *in, Float *shift, 
-		      int Nshift, int isz) = 0;
-  
 
 //! Computes eigenvectors and eigenvalues.
 /*!
@@ -504,9 +504,6 @@ class DiracOpStag : public DiracOpStagTypes
   int MatInv(PreserveType prs_in = PRESERVE_YES);
      // Same as original but in = f_in, out = f_out, true_res=0.
 
-  int MatMInv(Vector **out, Vector *in, Float *shift, 
-	      int Nshift, int isz);
-  
   void RitzEigMat(Vector *out, Vector *in);
      // RitzEigMat is the fermion matrix used in RitzEig
      // RitzEigMat works on the full lattice or half lattice
@@ -605,14 +602,6 @@ class DiracOpWilsonTypes : public DiracOp
 		     Vector *f_field_in,       // Input fermion field ptr.
 		     CgArg *arg,               // Argument structure
 		     CnvFrmType cnv_frm_flg);  // Fermion conversion flag
-
-  int MatMInv(Vector **out, Vector *in, Float *shift, 
-		      int Nshift, int isz) {
-    char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
-    VRB.Func(cname, fname);
-    ERR.General(cname,fname,"MatMInv not yet implemented for Wilson fermions");
-    return 0;
-  }
 
   virtual ~DiracOpWilsonTypes();
 
