@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-30 05:25:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.12 2004-08-30 05:25:32 chulwoo Exp $
-//  $Id: main.C,v 1.12 2004-08-30 05:25:32 chulwoo Exp $
+//  $Date: 2004-09-04 09:14:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.13 2004-09-04 09:14:13 chulwoo Exp $
+//  $Id: main.C,v 1.13 2004-09-04 09:14:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -66,8 +66,8 @@ int main(int argc,char *argv[])
   do_arg.z_bc = BND_CND_PRD;
   do_arg.t_bc = BND_CND_APRD;
 #if TARGET ==QCDOC
-//  do_arg.start_conf_alloc_flag = QFAST;
-  do_arg.start_conf_alloc_flag = QCOMMS;
+  do_arg.start_conf_alloc_flag = QFAST;
+//  do_arg.start_conf_alloc_flag = QCOMMS;
 #endif
   do_arg.start_conf_kind = START_CONF_DISORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
@@ -90,9 +90,9 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
 
   VRB.Level(0);
-  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
 //  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
-  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_CLOCK_LEVEL);
   VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
