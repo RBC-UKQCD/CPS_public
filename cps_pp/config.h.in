@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.14 2004-08-30 04:28:41 chulwoo Exp $
+  $Id: config.h.in,v 1.15 2004-09-03 13:49:37 zs Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -13,14 +13,14 @@
  *--------------------------------------------------------------------
  *  CVS keywords
  *
- *  $Author: chulwoo $
- *  $Date: 2004-08-30 04:28:41 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.14 2004-08-30 04:28:41 chulwoo Exp $
- *  $Id: config.h.in,v 1.14 2004-08-30 04:28:41 chulwoo Exp $
+ *  $Author: zs $
+ *  $Date: 2004-09-03 13:49:37 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.15 2004-09-03 13:49:37 zs Exp $
+ *  $Id: config.h.in,v 1.15 2004-09-03 13:49:37 zs Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.14 $
+ *  $Revision: 1.15 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -109,14 +109,6 @@
 
 #endif /* END of TARGET_ */
 
-/* ------------------------------------------------------------------*/
-/* Other overall definitions:   */
-/* ------------------------------------------------------------------*/
-
-#define SERIAL_SEED 112319
-
-/*! Default value for the verbosity level (see the Verbose class for details).*/
-#define DEFAULT_VERBOSE_LEVEL -12100502
 
 #endif /* INCLUDED_CONFIG_H_ */
 
