@@ -219,7 +219,7 @@ int DiracOpWilson::MatInv(Vector *out,
     moveMem((Float *)temp2, (Float *)in, 2*temp_size*sizeof(Float));
   }
 
-#if 1
+#if 0
 {
   printf("in(before)=\n");
   IFloat *temp_p = (IFloat *)in;
@@ -235,7 +235,7 @@ int DiracOpWilson::MatInv(Vector *out,
 }
 #endif
 
-#if 1
+#if 0
 {
   printf("temp2(before)=\n");
   IFloat *temp_p = (IFloat *)temp2;
@@ -280,7 +280,7 @@ int DiracOpWilson::MatInv(Vector *out,
     moveMem((Float *)in, (Float *)temp2, 2*temp_size*sizeof(Float));
   }
 
-#if 1
+#if 0
 {
   printf("in(after)=\n");
   IFloat *temp_p = (IFloat *)in;
@@ -296,7 +296,7 @@ int DiracOpWilson::MatInv(Vector *out,
 }
 #endif
 
-#if 1
+#if 0
 {
   printf("temp2(after)=\n");
   IFloat *temp_p = (IFloat *)temp2;

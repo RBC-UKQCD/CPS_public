@@ -527,7 +527,7 @@ extern "C" void stag_dirac_init(const void * gauge_u )
 		       blklen[j], numblk[j], stride[j], IR_5 );
     }
     else{ 
-      SCUarg[i] = new SCUDirArgIR(( void * ) 0, scudir[i], SCU_SEND, 
+      SCUarg[i] = new SCUDirArgIR(Tbuffer[0], scudir[i], SCU_SEND, 
 		       blklen[j], numblk[j], stride[j], IR_5 );
     }
   }
@@ -659,7 +659,8 @@ extern "C" void stag_dirac_init_g()
   SCUDirArg X;
   SCUDirArg R;
 #endif
-  IFloat mtmp[18];
+  IFloat *mtmp;
+  mtmp = (IFloat *)qalloc(QFAST,18*sizeof(IFloat));
 
   VRB.Func(cname,fname);
 //  print("dirac_init_g start\n");
@@ -755,11 +756,12 @@ extern "C" void stag_dirac_init_g()
 
     //-----------------------------------------------------------------
     //  Copy links in negative directions.  Some are off-node
-    //  Add an overall minus sign
+    //  Add an overall minus sign, setting dummy address to be changed
+    //  via Addr() later.
     //-----------------------------------------------------------------
     for ( n = 0; n < NUM_DIR/2; n++ ) {
-  SCUDirArgIR X( 0, scudir[n], SCU_SEND, 18 * sizeof(IFloat));
-  SCUDirArgIR R( 0, scudir[n+4], SCU_REC, 18 * sizeof(IFloat));
+  SCUDirArgIR X( uc_l[0], scudir[n], SCU_SEND, 18 * sizeof(IFloat));
+  SCUDirArgIR R( uc_l[0], scudir[n+4], SCU_REC, 18 * sizeof(IFloat));
 
       for (x[3] = 0; x[3] < size[3]; x[3]++){
 	for (x[2] = 0; x[2] < size[2]; x[2]++){
@@ -824,6 +826,7 @@ extern "C" void stag_dirac_init_g()
 	}
       }
     }
+    qfree(mtmp);
 
 #if 0
   char buf[200];
@@ -1021,12 +1024,6 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   //-----------------------------------------------------------------
   //do the sum of 8 temporary vectors at each lattice site
   //-----------------------------------------------------------------
-
-#if 0
-  for(int i = 0;i<48;i++){
-    printf("%d %e\n",i,tmpfrm[i]);
-  }
-#endif
 
   if ( add_flag == 0){
     dirac_sum( vol/2, (long)chi[odd], (long)tmpfrm, (long)b);

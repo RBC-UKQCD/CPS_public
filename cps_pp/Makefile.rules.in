@@ -136,6 +136,10 @@ cleanlib:
 
 cps: recurse $(OBJS) 
 
+buildlib: recurse $(OBJS)
+ifneq ($(OBJS),)
+	cd $(BUILDDIR)/$(DIRB) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $(OBJS)
+endif
 
 $(BUILDDIR)/$(DIRB)/Makefile_depend: depend
 

@@ -1,4 +1,4 @@
-# $Id: Makefile_common.in,v 1.9 2004-02-10 14:29:53 zs Exp $
+# $Id: Makefile_common.in,v 1.10 2004-04-27 18:18:10 cwj Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -11,7 +11,7 @@ QOS = @QOS@
 COMPILER = @CXX@
 LDFLAGS = @LDFLAGS@
 
-BIN = regression_cps.x
+BIN = @ARCH@.x
 
 
 

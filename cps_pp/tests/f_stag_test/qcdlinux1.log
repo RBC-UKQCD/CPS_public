@@ -1,0 +1,663 @@
+total sites = 4 4 4 4
+Lattice::Lattice() :
+	Disordered starting configuration
+(none)::CanonToAnything(CAP,StrOrdType) :
+	Converting gauge field order: CANONICAL -> STAG
+k=0 FstagTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
+	Converting frm field str ord from 0 to 1
+FstagTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
+	Converting frm field str ord from 0 to 1
+DiracOp::InvCg(V*,V*,F,F*) :
+	stp_cnd =5.766088e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[0]|^2 = 5.766088e+03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[1]|^2 = 1.245649e+03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[2]|^2 = 5.448035e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[3]|^2 = 2.582550e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[4]|^2 = 1.722467e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[5]|^2 = 1.277961e+02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[6]|^2 = 9.477281e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[7]|^2 = 7.828805e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[8]|^2 = 6.174505e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[9]|^2 = 5.343187e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[10]|^2 = 4.497727e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[11]|^2 = 3.995215e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[12]|^2 = 3.734963e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[13]|^2 = 2.871986e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[14]|^2 = 2.322403e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[15]|^2 = 2.092211e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[16]|^2 = 1.980931e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[17]|^2 = 1.896492e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[18]|^2 = 1.812749e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[19]|^2 = 1.573322e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[20]|^2 = 1.315239e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[21]|^2 = 1.164159e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[22]|^2 = 1.023391e+01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[23]|^2 = 8.673551e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[24]|^2 = 7.885441e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[25]|^2 = 6.061360e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[26]|^2 = 5.545723e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[27]|^2 = 5.541071e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[28]|^2 = 4.584406e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[29]|^2 = 4.238675e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[30]|^2 = 3.854437e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[31]|^2 = 3.672350e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[32]|^2 = 3.266008e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[33]|^2 = 2.709827e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[34]|^2 = 2.392229e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[35]|^2 = 1.773476e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[36]|^2 = 1.373001e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[37]|^2 = 1.099899e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[38]|^2 = 1.116124e+00
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[39]|^2 = 9.618636e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[40]|^2 = 8.560620e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[41]|^2 = 7.148167e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[42]|^2 = 6.813164e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[43]|^2 = 5.934045e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[44]|^2 = 4.779297e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[45]|^2 = 3.741431e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[46]|^2 = 2.898341e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[47]|^2 = 2.271359e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[48]|^2 = 2.131705e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[49]|^2 = 1.898758e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[50]|^2 = 1.602026e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[51]|^2 = 1.333583e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[52]|^2 = 1.113168e-01
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[53]|^2 = 9.261706e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[54]|^2 = 7.429036e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[55]|^2 = 7.123469e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[56]|^2 = 6.142726e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[57]|^2 = 6.126209e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[58]|^2 = 4.799765e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[59]|^2 = 3.864472e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[60]|^2 = 3.229072e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[61]|^2 = 2.691759e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[62]|^2 = 2.328944e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[63]|^2 = 1.997870e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[64]|^2 = 1.646542e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[65]|^2 = 1.567501e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[66]|^2 = 1.237926e-02
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[67]|^2 = 9.106110e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[68]|^2 = 8.239581e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[69]|^2 = 6.642463e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[70]|^2 = 5.786998e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[71]|^2 = 4.364641e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[72]|^2 = 4.013594e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[73]|^2 = 3.393353e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[74]|^2 = 3.039574e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[75]|^2 = 2.528975e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[76]|^2 = 2.122743e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[77]|^2 = 1.947362e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[78]|^2 = 1.483165e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[79]|^2 = 1.236257e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[80]|^2 = 1.095516e-03
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[81]|^2 = 9.445599e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[82]|^2 = 8.338763e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[83]|^2 = 7.913901e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[84]|^2 = 6.122119e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[85]|^2 = 5.187718e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[86]|^2 = 4.361854e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[87]|^2 = 3.877950e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[88]|^2 = 3.815878e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[89]|^2 = 3.314486e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[90]|^2 = 2.875953e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[91]|^2 = 2.152705e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[92]|^2 = 1.860380e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[93]|^2 = 1.551645e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[94]|^2 = 1.251084e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[95]|^2 = 1.133374e-04
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[96]|^2 = 9.835701e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[97]|^2 = 8.306496e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[98]|^2 = 7.965654e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[99]|^2 = 7.266076e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[100]|^2 = 5.711255e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[101]|^2 = 4.675816e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[102]|^2 = 4.195431e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[103]|^2 = 3.483628e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[104]|^2 = 3.083432e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[105]|^2 = 2.617386e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[106]|^2 = 1.875199e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[107]|^2 = 1.757046e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[108]|^2 = 1.615965e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[109]|^2 = 1.302842e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[110]|^2 = 1.052748e-05
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[111]|^2 = 9.056759e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[112]|^2 = 6.956590e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[113]|^2 = 6.300231e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[114]|^2 = 5.602029e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[115]|^2 = 5.446376e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[116]|^2 = 4.213422e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[117]|^2 = 3.051779e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[118]|^2 = 2.810582e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[119]|^2 = 2.123332e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[120]|^2 = 1.945665e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[121]|^2 = 1.775824e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[122]|^2 = 1.680716e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[123]|^2 = 1.231207e-06
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[124]|^2 = 9.772281e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[125]|^2 = 8.197584e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[126]|^2 = 6.781406e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[127]|^2 = 5.314674e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[128]|^2 = 4.753733e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[129]|^2 = 4.074298e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[130]|^2 = 3.765026e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[131]|^2 = 2.863927e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[132]|^2 = 2.465538e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[133]|^2 = 1.897949e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[134]|^2 = 1.522266e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[135]|^2 = 1.602995e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[136]|^2 = 1.472116e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[137]|^2 = 1.352287e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[138]|^2 = 1.238231e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[139]|^2 = 1.046939e-07
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[140]|^2 = 8.222246e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[141]|^2 = 6.127147e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[142]|^2 = 4.686996e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[143]|^2 = 3.589082e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[144]|^2 = 3.104066e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[145]|^2 = 2.492398e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[146]|^2 = 2.804095e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[147]|^2 = 2.212700e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[148]|^2 = 1.807435e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[149]|^2 = 1.516289e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[150]|^2 = 1.260018e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[151]|^2 = 1.259921e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[152]|^2 = 1.050451e-08
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[153]|^2 = 8.016935e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[154]|^2 = 6.547837e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[155]|^2 = 5.474838e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[156]|^2 = 5.710610e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[157]|^2 = 4.325325e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[158]|^2 = 3.740772e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[159]|^2 = 3.184732e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[160]|^2 = 2.944812e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[161]|^2 = 2.435909e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[162]|^2 = 2.132279e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[163]|^2 = 1.704566e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[164]|^2 = 1.372034e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[165]|^2 = 1.149429e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[166]|^2 = 1.026789e-09
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[167]|^2 = 8.859492e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[168]|^2 = 6.624985e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[169]|^2 = 5.464584e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[170]|^2 = 5.033567e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[171]|^2 = 3.995462e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[172]|^2 = 3.660652e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[173]|^2 = 2.707540e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[174]|^2 = 2.205128e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[175]|^2 = 1.785093e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[176]|^2 = 1.497818e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[177]|^2 = 1.495772e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[178]|^2 = 1.093501e-10
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[179]|^2 = 9.719122e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[180]|^2 = 8.147152e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[181]|^2 = 9.800565e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[182]|^2 = 6.603207e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[183]|^2 = 5.816592e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[184]|^2 = 4.643148e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[185]|^2 = 4.922192e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[186]|^2 = 3.357390e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[187]|^2 = 2.565473e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[188]|^2 = 2.172511e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[189]|^2 = 2.300227e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[190]|^2 = 2.421707e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[191]|^2 = 1.747034e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[192]|^2 = 1.525447e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[193]|^2 = 1.268884e-11
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[194]|^2 = 8.037789e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[195]|^2 = 6.189743e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[196]|^2 = 5.078621e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[197]|^2 = 4.496625e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[198]|^2 = 4.120284e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[199]|^2 = 2.646152e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[200]|^2 = 2.366470e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[201]|^2 = 2.268142e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[202]|^2 = 2.026954e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[203]|^2 = 1.858875e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[204]|^2 = 1.577108e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[205]|^2 = 1.199051e-12
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[206]|^2 = 9.090743e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[207]|^2 = 8.031942e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[208]|^2 = 6.827952e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[209]|^2 = 5.987563e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[210]|^2 = 4.059153e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[211]|^2 = 3.360909e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[212]|^2 = 3.413860e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[213]|^2 = 3.717683e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[214]|^2 = 2.918882e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[215]|^2 = 2.411184e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[216]|^2 = 2.482017e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[217]|^2 = 1.575849e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[218]|^2 = 1.636190e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[219]|^2 = 1.591023e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[220]|^2 = 1.228842e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[221]|^2 = 1.114787e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[222]|^2 = 1.034216e-13
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[223]|^2 = 7.453533e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[224]|^2 = 6.392095e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[225]|^2 = 5.467368e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[226]|^2 = 6.503898e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[227]|^2 = 4.812467e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[228]|^2 = 3.273510e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[229]|^2 = 2.585014e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[230]|^2 = 2.708814e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[231]|^2 = 2.654866e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[232]|^2 = 1.910305e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[233]|^2 = 2.495342e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[234]|^2 = 1.686908e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[235]|^2 = 1.300438e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[236]|^2 = 1.030322e-14
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[237]|^2 = 9.826171e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[238]|^2 = 7.075193e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[239]|^2 = 5.008600e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[240]|^2 = 5.428923e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[241]|^2 = 3.949337e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[242]|^2 = 3.000048e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[243]|^2 = 2.877652e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[244]|^2 = 2.632932e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[245]|^2 = 1.486241e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[246]|^2 = 1.158447e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[247]|^2 = 7.997675e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[248]|^2 = 7.807560e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[249]|^2 = 1.011484e-15
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[250]|^2 = 6.819126e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[251]|^2 = 6.508968e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[252]|^2 = 5.210899e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[253]|^2 = 3.400553e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[254]|^2 = 2.666921e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[255]|^2 = 2.905765e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[256]|^2 = 2.488113e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[257]|^2 = 1.923860e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[258]|^2 = 2.160655e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[259]|^2 = 1.628149e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[260]|^2 = 1.237044e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[261]|^2 = 9.967251e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[262]|^2 = 1.211778e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[263]|^2 = 1.192367e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[264]|^2 = 1.042790e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[265]|^2 = 1.012747e-16
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[266]|^2 = 5.777209e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[267]|^2 = 4.409489e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[268]|^2 = 4.588398e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[269]|^2 = 4.674169e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[270]|^2 = 3.226477e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[271]|^2 = 3.460948e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[272]|^2 = 2.267777e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[273]|^2 = 1.642197e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[274]|^2 = 1.310813e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[275]|^2 = 1.635014e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[276]|^2 = 1.109243e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[277]|^2 = 8.364938e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[278]|^2 = 1.325248e-17
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[279]|^2 = 9.318202e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[280]|^2 = 6.195005e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[281]|^2 = 6.994286e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[282]|^2 = 4.608440e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[283]|^2 = 4.044615e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[284]|^2 = 3.626087e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[285]|^2 = 1.852515e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[286]|^2 = 1.631559e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[287]|^2 = 1.765622e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[288]|^2 = 1.160276e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[289]|^2 = 1.041022e-18
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[290]|^2 = 9.354603e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[291]|^2 = 5.934492e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[292]|^2 = 5.286123e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[293]|^2 = 4.801790e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[294]|^2 = 3.688416e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[295]|^2 = 3.474621e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[296]|^2 = 3.823297e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[297]|^2 = 2.256400e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[298]|^2 = 2.190450e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[299]|^2 = 2.134383e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[300]|^2 = 2.066324e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[301]|^2 = 2.511841e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[302]|^2 = 1.528367e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[303]|^2 = 1.460472e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[304]|^2 = 1.228737e-19
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[305]|^2 = 7.042830e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[306]|^2 = 5.964117e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[307]|^2 = 4.932478e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[308]|^2 = 3.693286e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[309]|^2 = 4.047142e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[310]|^2 = 2.175608e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[311]|^2 = 1.702722e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[312]|^2 = 1.991349e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[313]|^2 = 1.404953e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[314]|^2 = 1.091735e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[315]|^2 = 1.566770e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[316]|^2 = 1.209598e-20
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[317]|^2 = 7.910900e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[318]|^2 = 9.741924e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[319]|^2 = 5.852831e-21
+DiracOp::InvCg(V*,V*,F,F*) :
+	|res[320]|^2 = 4.123367e-21
+9.417370e+07 flops /6.417707e-02 seconds = 1.467404e+03 MFlops
+iter=321
+FstagTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
+	Converting frm field str ord from 1 to 0
+FstagTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
+	Converting frm field str ord from 1 to 0
+FstagTypes::Fconvert(V*,StrOrdType,StrOrdType, int) :
+	Converting frm field str ord from 1 to 0
+Lattice::Convert(StrOrdType) :
+	Converting gauge field order: STAG -> CANONICAL

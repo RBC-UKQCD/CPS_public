@@ -98,13 +98,6 @@ int main(int argc,char *argv[]){
     do_arg.clover_coeff = 2.0171;
     do_arg.verbose_level = -1205;
 
-    do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
-    do_arg.asqtad_naik = -1.0/24.0;
-    do_arg.asqtad_3staple = (-1.0/8.0)*0.5;
-    do_arg.asqtad_5staple = ( 1.0/8.0)*0.25*0.5;
-    do_arg.asqtad_7staple = (-1.0/8.0)*0.125*(1.0/6.0);
-    do_arg.asqtad_lepage = -1.0/16;
-    
     CgArg cg_arg;
 
     cg_arg.mass = 0.1;
@@ -177,7 +170,6 @@ int main(int argc,char *argv[]){
     DiracOpStag dirac(lat,X_out,X_in,&cg_arg,CNV_FRM_NO);
 
 	for(int k = 0; k< 1; k++){
-		fprintf(fp, "k=%d\n",k);
 		printf("k=%d ",k);
 		if (k ==0)
 			out = result;
@@ -217,7 +209,6 @@ int main(int argc,char *argv[]){
     Float dummy;
     Float dt = 2;
 
-if (k==0)    fprintf(fp," x y z t\n");
     
     for(s[3]=0; s[3]<GJP.NodeSites(3); s[3]++) 
 	for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
@@ -225,8 +216,6 @@ if (k==0)    fprintf(fp," x y z t\n");
 		for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
 
 		    int n = lat.FsiteOffset(s);
-			unsigned long  *pt = (unsigned long *)&X_out[n];
-			unsigned long  *pt2 = (unsigned long *)&result[n];
 			for(int i=0; i<3; i++){
 #if TARGET == QCDOC
 		    if ( k==0 )
@@ -239,11 +228,12 @@ if (k==0)    fprintf(fp," x y z t\n");
 				fprintf(fp," (%0.7e %0.7e) (%0.7e %0.7e)",
 				*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
 				*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1));
+#if 1
+				fprintf(fp,"\n");
+#else
 				fprintf(fp," (%0.2e %0.2e)\n",
 				*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1));
-				for (int j = 0; j<4;j++)
-				pt2 +=4;
-				pt +=4;
+#endif
 			}
 		}
 }
