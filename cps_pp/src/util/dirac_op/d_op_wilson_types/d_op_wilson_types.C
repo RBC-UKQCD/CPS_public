@@ -3,11 +3,6 @@ CPS_START_NAMESPACE
 /*! \file
   \brief Definition of DiracOpWilsonTypes class constructor and destructor.
   
-<<<<<<< d_op_wilson_types.C
-  $Id: d_op_wilson_types.C,v 1.5 2004-06-07 20:27:11 mclark Exp $
-=======
-  $Id: d_op_wilson_types.C,v 1.5 2004-06-07 20:27:11 mclark Exp $
->>>>>>> 1.3.6.1
 */
 //--------------------------------------------------------------------
 //  CVS keywords

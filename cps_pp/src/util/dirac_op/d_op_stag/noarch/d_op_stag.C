@@ -4,11 +4,6 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStag class methods.
 
-<<<<<<< d_op_stag.C
-  $Id: d_op_stag.C,v 1.7 2004-06-07 20:27:09 mclark Exp $
-=======
-  $Id: d_op_stag.C,v 1.7 2004-06-07 20:27:09 mclark Exp $
->>>>>>> 1.5.6.1
 */
 //--------------------------------------------------------------------
 //  CVS keywords

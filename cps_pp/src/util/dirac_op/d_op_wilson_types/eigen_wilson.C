@@ -3,11 +3,6 @@ CPS_START_NAMESPACE
  /*! \file
   \brief  Definition of DiracOpWilsonTypes class eigensolver methods.
 
-<<<<<<< eigen_wilson.C
-  $Id: eigen_wilson.C,v 1.5 2004-06-07 20:27:11 mclark Exp $
-=======
-  $Id: eigen_wilson.C,v 1.5 2004-06-07 20:27:11 mclark Exp $
->>>>>>> 1.3.6.1
 */
 //--------------------------------------------------------------------
 //  CVS keywords
