@@ -1,5 +1,5 @@
 %------------------------------------------------------------------
-% $Id: porting.tex,v 1.3 2003-07-30 16:32:01 zs Exp $
+% $Id: porting.tex,v 1.4 2004-02-01 16:40:59 mcneile Exp $
 %------------------------------------------------------------------
 %Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
 %
@@ -25,7 +25,7 @@
 \ifthenelse{\pdfoutput = 0}{
 % Not PDF:
 \usepackage{html}
-\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+\newcommand{\hreff}[2]{\htmladdnormallink{#2}{#1}}
 }{
 % PDF: hyperref for pdf with full linkages:
 \usepackage[
@@ -41,7 +41,7 @@ urlcolor=blue,
 pdfpagemode=None,
 %=UseOutlines,
 pdfhighlight={/I},
-pdftitle={Installing CPS. $Revision: 1.3 $ - $Date: 2003-07-30 16:32:01 $.},
+pdftitle={Installing CPS. $Revision: 1.4 $ - $Date: 2004-02-01 16:40:59 $.},
 pdfauthor={A.N. Jackson \& S. Booth},
 plainpages=false
 ]{hyperref}
@@ -67,7 +67,7 @@ plainpages=false
 % title information:
 \title{Installing the Columbia Physics System}
 \author{A.N. Jackson \& S. Booth}
-\date{\mbox{\small $$Revision: 1.3 $$  $$Date: 2003-07-30 16:32:01 $$}}
+\date{\mbox{\small $$Revision: 1.4 $$  $$Date: 2004-02-01 16:40:59 $$}}
 
 %------------------------------------------------------------------
 \begin{document}
@@ -147,7 +147,7 @@ This file contains the following flags:
  \item{\tt INTERNAL\_LOCALCALC\_TYPE} Precision/type for IFloat.  Should be the
                              same as LOCALCALC\_TYPE anywhere but on
                              QCDSP, where float should be used (IFloats used
-			     to be floats in the original code).
+                             to be floats in the original code).
  \item{\tt COMMS\_DATASIZE} Default size of the individual items of data to be
                     transmitted via the MPISCU.  Should be consistent
                     with the size of Float and IFloat.
