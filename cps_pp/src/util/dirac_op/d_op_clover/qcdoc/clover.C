@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/clover.C,v 1.4 2004-08-18 11:57:49 zs Exp $
-//  $Id: clover.C,v 1.4 2004-08-18 11:57:49 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-10-28 15:25:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/clover.C,v 1.5 2004-10-28 15:25:49 chulwoo Exp $
+//  $Id: clover.C,v 1.5 2004-10-28 15:25:49 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: clover.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/clover.C,v $
 //  $State: Exp $
 //
@@ -84,7 +84,7 @@ void clover_init(Clover *clover_p)
   int f_size = SPINOR_SIZE * GJP.VolNodeSites() * sizeof(IFloat);  
   clover_p->frm_buf0 = (IFloat *)smalloc(f_size);
   clover_p->frm_buf1 = clover_p->frm_buf0 + f_size / (2 * sizeof(IFloat));
-  bzero(clover_p->frm_buf0,f_size);
+  bzero((char *)clover_p->frm_buf0,f_size);
 
   if (clover_p->frm_buf0 == 0 || clover_p->frm_buf1 == 0)
     ERR.Pointer(cname,fname, "frm_buf");
