@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.13 2004-09-02 16:59:37 zs Exp $
+  $Id: f_wilson.C,v 1.14 2004-09-17 19:26:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -204,14 +204,17 @@ int Fwilson::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
   Float dot = f_in -> NormSqGlbSum(f_size);
 
-  Float RsdCG[Nshift];
+//  Float RsdCG[Nshift];
+  Float *RsdCG = new Float[Nshift];
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
   DiracOpWilson wilson(*this, f_out[0], f_in, cg_arg, cnv_frm);
   cg_arg->true_rsd = RsdCG[isz];
 
-  return wilson.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+  int return_value = wilson.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+  delete[] RsdCG;
+  return return_value;
 }
 
 //------------------------------------------------------------------

@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.13 2004-09-02 17:09:19 zs Exp $
+  $Id: f_stag.C,v 1.14 2004-09-17 19:26:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -233,7 +233,8 @@ int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   VRB.Func(cname,fname);
 
   Float dot = f_in -> NormSqGlbSum(e_vsize);
-  Float RsdCG[Nshift];
+//  Float RsdCG[Nshift];
+  Float *RsdCG = new Float[Nshift];
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
 
   //Fake the constructor
@@ -245,6 +246,7 @@ int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
       stag.Dslash(f_out_d[s],f_out[s],CHKB_EVEN,DAG_NO);
   cg_arg->true_rsd = RsdCG[isz];
 
+  delete[] RsdCG;
   return iter;
 
 }

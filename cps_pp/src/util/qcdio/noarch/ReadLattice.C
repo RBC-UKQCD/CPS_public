@@ -1,6 +1,6 @@
 /*!\file
   
-  $Id: ReadLattice.C,v 1.2 2004-08-18 11:58:07 zs Exp $
+  $Id: ReadLattice.C,v 1.3 2004-09-17 19:26:27 chulwoo Exp $
 */
 
 // Read the format of Gauge Connection Format
@@ -8,6 +8,9 @@
 
 #include <config.h>
 #include <math.h>
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif
 #include <util/ReadLattice.h>
 #include <util/Flconv.h>
 CPS_START_NAMESPACE

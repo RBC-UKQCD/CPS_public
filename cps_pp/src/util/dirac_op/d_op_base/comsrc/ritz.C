@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class Ritz eigensolver methods.
 
-  $Id: ritz.C,v 1.4 2004-08-18 11:57:48 zs Exp $
+  $Id: ritz.C,v 1.5 2004-09-17 19:26:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.4 2004-08-18 11:57:48 zs Exp $
-//  $Id: ritz.C,v 1.4 2004-08-18 11:57:48 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-17 19:26:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.5 2004-09-17 19:26:26 chulwoo Exp $
+//  $Id: ritz.C,v 1.5 2004-09-17 19:26:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v $
 //  $State: Exp $
 //
@@ -191,25 +191,12 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
     
 // Set the node checkerboard size of the fermion field
 //------------------------------------------------------------------
-  Vector *psi = (Vector *) smalloc(f_size * sizeof(Float));
-  if(psi == 0)
-    ERR.Pointer(cname,fname, "psi");
-  VRB.Smalloc(cname,fname, "psi", psi, f_size * sizeof(Float));
+  Vector *psi = (Vector *) smalloc(cname,fname, "psi", f_size * sizeof(Float));
 
-  Vector *p = (Vector *) smalloc(f_size * sizeof(Float));
-  if(p == 0)
-    ERR.Pointer(cname,fname, "p");
-  VRB.Smalloc(cname,fname, "p", p, f_size * sizeof(Float));
+  Vector *p = (Vector *) smalloc(cname,fname, "p", f_size * sizeof(Float));
 
-  Vector *Apsi = (Vector *) smalloc(f_size * sizeof(Float));
-  if(Apsi == 0)
-    ERR.Pointer(cname,fname, "Apsi");
-  VRB.Smalloc(cname,fname, "Apsi", Apsi, f_size * sizeof(Float));
-
-  Vector *Ap = (Vector *) smalloc(f_size * sizeof(Float));
-  if(Ap == 0)
-    ERR.Pointer(cname,fname, "Ap");
-  VRB.Smalloc(cname,fname, "Ap", Ap, f_size * sizeof(Float));
+  Vector *Apsi = (Vector *) smalloc(cname,fname, "Apsi", f_size * sizeof(Float));
+  Vector *Ap = (Vector *) smalloc(cname,fname, "Ap", f_size * sizeof(Float));
 
   acc = 2.0e-6;
   acc *= acc;
@@ -270,14 +257,10 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
     /*  Copy psi back into psi_all(N_eig-1)  */
     psi_all[nn]->CopyVec(psi, f_size);
 
-    VRB.Sfree(cname,fname, "Ap", Ap);
-    sfree(Ap);
-    VRB.Sfree(cname,fname, "Apsi", Apsi);
-    sfree(Apsi);
-    VRB.Sfree(cname,fname, "p", p);
-    sfree(p);
-    VRB.Sfree(cname,fname, "psi", psi);
-    sfree(psi);
+    sfree(cname,fname, "Ap", Ap);
+    sfree(cname,fname, "Apsi", Apsi);
+    sfree(cname,fname, "p", p);
+    sfree(cname,fname, "psi", psi);
 
     n_count = 0;
     return n_count;
