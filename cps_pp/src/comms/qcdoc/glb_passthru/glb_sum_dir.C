@@ -3,19 +3,10 @@ CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
   \brief  Definition of glb_sum_dir routine.
-
-  $Id: glb_sum_dir.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_passthru/glb_sum_dir.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
-//  $Id: glb_sum_dir.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_passthru/glb_sum_dir.C,v $
 //  $State: Exp $
 //

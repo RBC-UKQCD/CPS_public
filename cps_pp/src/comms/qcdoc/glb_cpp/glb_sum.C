@@ -5,20 +5,10 @@ CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
   \brief Definition of glb_sum routine.
-
-  $Id: glb_sum.C,v 1.4 2004-06-04 21:14:01 chulwoo Exp $ 
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/glb_sum.C,v 1.4 2004-06-04 21:14:01 chulwoo Exp $
-//  $Id: glb_sum.C,v 1.4 2004-06-04 21:14:01 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: glb_sum.C,v $
-//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_cpp/glb_sum.C,v $
 //  $State: Exp $
 //
@@ -65,8 +55,7 @@ void glb_sum(Float * float_p)
       receive_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
   if (gsum_buf == NULL) 
       gsum_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
-
-  if (output) printf("glb_sum %d before = %e ", counter, (double)*float_p);
+  if (output) printf("glb_sum cpp %d before = %e ", counter, (double)*float_p);
   *gsum_buf = (Double64)*float_p;
 
   for(int i = 0; i < 4; ++i) {
@@ -77,7 +66,6 @@ void glb_sum(Float * float_p)
 	SCUDirArg send(transmit_buf, gjp_scu_dir[2*i], SCU_SEND, sizeof(Double64) );
 	SCUDirArg rcv(receive_buf, gjp_scu_dir[2*i+1], SCU_REC, sizeof(Double64) );
 
-//	printf("sent=%e received %e\n",transmit_buf,receive_buf);
 	send.StartTrans();
 	rcv.StartTrans();
 	send.TransComplete();
@@ -88,7 +76,7 @@ void glb_sum(Float * float_p)
       }
   }
   *float_p = (Float)*gsum_buf;
-if (output)   printf("after = %e\n", (double)*float_p);
+  if (output)   printf("after = %e\n", (double)*float_p);
   counter++;
 }
 CPS_END_NAMESPACE

@@ -4,18 +4,15 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definition of slice_sum routine
 
-  $Id: slice_sum.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_passthru/slice_sum.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
-//  $Id: slice_sum.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $Revision: 1.3 $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.2.18.1  2004/06/07 17:12:17  mclark
+//  Optimised RHMC force term for asqtad fermions. Fully implemented RHMC for all fermion
+//  types bar clover.  Fixed lots of minor bugs.
+//
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_passthru/slice_sum.C,v $
 //  $State: Exp $
 //
