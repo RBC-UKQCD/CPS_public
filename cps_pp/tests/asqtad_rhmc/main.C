@@ -24,19 +24,24 @@
 #include <alg/alg_remez.h>
 #include <util/random.h>
 
+const int nx = 4;
+const int ny = 4;
+const int nz = 4;
+const int nt = 4;
 
 USING_NAMESPACE_CPS
 
 // some function prototypes
 void setup_do_arg(DoArg& do_arg) ; 
+void setup_asqtad_arg(DoArg& do_arg, Float plaq) ; 
 void setup_hmd_arg(HmdArg& hmd_arg) ;
 void setup_eig_arg(EigArg& eig_arg) ;
 
 int main(int argc,char *argv[])
 {
-#ifdef PARALLEL
-  DefaultSetup(); 
-#endif
+
+  Start();
+
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
   //----------------------------------------------------------------
@@ -48,6 +53,8 @@ int main(int argc,char *argv[])
   // Set verbose level
   //----------------------------------------------------------------
   VRB.Level(0);
+//  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
 
   char *cname = "asqtad_rhmc";
@@ -64,7 +71,6 @@ int main(int argc,char *argv[])
   setup_eig_arg(eig_arg);
 
   // parameters for the simulation
-  const int no_warmup_sweep = 10; 
   const int no_measure_sweep = 1 ; 
   int sweep_counter = 0 ;
   const int total_measure = 10;
@@ -84,24 +90,12 @@ int main(int argc,char *argv[])
   
   char *total_sites_st = "total sites = ";
   VRB.Flow(cname,fname,"%s%f\n",total_sites_st,IFloat(total_sites));
-#if 0
-  char plaqfile[200];
-  char accfile[200];
-  char infofile[200];
-  sprintf(plaqfile, "%s%d%d%d%d%d%d.test2",
-	"plaquette",CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
-  sprintf(accfile, "%s%d%d%d%d%d%d.test2",
-	"acceptance",CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
-  sprintf(infofile, "%s%d%d%d%d%d%d.test2",
-	"info",CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
-#else
+
   const char *plaqfile = "plaquette.dat";
   const char *accfile = "acceptance.dat";
-  const char *infofile = "info.dat";
-#endif
+
   FILE *plaq = Fopen(plaqfile,"w");
   FILE *acc = Fopen(accfile,"w");
-  FILE *info = Fopen(infofile,"w");
 
   //----------------------------------------------------------------
   // Run Rational Hybrid Monte Carlo
@@ -112,23 +106,10 @@ int main(int argc,char *argv[])
 
     {
 
-      //-----------------------------------------------------------------
-      // warming up 
-      //-----------------------------------------------------------------
-      {
-	hmd_arg.metropolis = METROPOLIS_NO;
-	AlgHmcRHMC rhmc(lat,&common_arg,&hmd_arg);	
-        for (int n = 0 ; n < no_warmup_sweep ; n++) {
-       	  rhmc.run();
-	  sweep_counter++; 
-        }
-      }
-
-      hmd_arg.metropolis = METROPOLIS_YES;
       for (int i = 0; i < total_measure ; i += no_measure_sweep ) {
 
-	//if (i%20==0) hmd_arg.approx_type = DYNAMIC;
-	//else hmd_arg.approx_type = CONSTANT;
+	if (i>100) hmd_arg.metropolis = METROPOLIS_YES;
+	else hmd_arg.metropolis = METROPOLIS_NO;
 
         VRB.Flow(cname,fname,"iteration # = %d\n", i);
 
@@ -139,7 +120,6 @@ int main(int argc,char *argv[])
 	VRB.Flow(cname,fname,"AlgHmcRHMC starts....\n");
 	{
  	  AlgHmcRHMC rhmc(lat,&common_arg,&hmd_arg,&eig_arg);
- 	  //AlgHmdR rhmc(lat,&common_arg,&hmd_arg);
           for (int n = 0 ; n < no_measure_sweep; n++)
 	    {
 	      VRB.Flow(cname,fname,"HMD sweep n= %d/%d\n",n,no_measure_sweep) ;
@@ -168,15 +148,13 @@ int main(int argc,char *argv[])
 
       } // end of loop over i
 
-      // Naive mean quantities
-      Fprintf(info,"Mean acceptance = %e\n", acceptance/Float(total_measure));
-      Fprintf(info,"Mean plaquette = %e\n", plaquette/Float(no_measure_sweep));
     }
   }
 
   Fclose(plaq); 
   Fclose(acc);
-  Fclose(info);
+
+  End();
   
   return(0);
 }
@@ -185,29 +163,15 @@ int main(int argc,char *argv[])
 void setup_do_arg(DoArg& do_arg)
 {
   
-#ifdef PARALLEL
   do_arg.x_node_sites = 4;
   do_arg.y_node_sites = 4;
   do_arg.z_node_sites = 4;
   do_arg.t_node_sites = 4;
-  do_arg.s_node_sites = 0;
   do_arg.x_nodes = SizeX();
   do_arg.y_nodes = SizeY();
   do_arg.z_nodes = SizeZ();
   do_arg.t_nodes = SizeT();
   do_arg.s_nodes = 1;
-#else
-  do_arg.x_node_sites = 4;
-  do_arg.y_node_sites = 4;
-  do_arg.z_node_sites = 4;
-  do_arg.t_node_sites = 4;
-  do_arg.s_node_sites = 0;
-  do_arg.x_nodes = 1;
-  do_arg.y_nodes = 1;
-  do_arg.z_nodes = 1;
-  do_arg.t_nodes = 1;
-  do_arg.s_nodes = 1;
-#endif
 
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
@@ -223,9 +187,13 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.xi_bare = 1;
   do_arg.xi_v = 1;
   do_arg.xi_v_xi = 1;
-  
-  do_arg.u0 = 1.0;
-  // With u0 = 1 => No tadpole improvement
+
+  setup_asqtad_arg(do_arg, 1.0);
+
+}
+
+void setup_asqtad_arg(DoArg& do_arg, Float plaq) {
+  do_arg.u0 = pow(3.0*plaq,-0.25);
   do_arg.asqtad_KS      = (1.0/8.0)+(3.0/8.0)+(1.0/8.0);
   do_arg.asqtad_naik    = (-1.0/24.0)*pow(do_arg.u0,-2);
   do_arg.asqtad_lepage  = (-1.0/16.0)*pow(do_arg.u0,-4);
@@ -237,15 +205,10 @@ void setup_do_arg(DoArg& do_arg)
 void setup_hmd_arg(HmdArg& hmd_arg)
 {
   Float tau = 1.0;
-  hmd_arg.n_frm_masses = 2;
+  hmd_arg.n_frm_masses = 1;
   hmd_arg.frm_mass[0] = 0.25;
-  hmd_arg.frm_mass[1] = 0.25;
-  hmd_arg.frm_flavors[0] = 1; // For the R algorithm
-  hmd_arg.frm_flavors[1] = 1; // For the R algorithm
   hmd_arg.frm_power_num[0] = 1;
   hmd_arg.frm_power_den[0] = 2;
-  hmd_arg.frm_power_num[1] = 1;
-  hmd_arg.frm_power_den[1] = 2;
   hmd_arg.n_bsn_masses = 0;
   hmd_arg.steps_per_traj = 10;
   hmd_arg.step_size = tau/hmd_arg.steps_per_traj;
@@ -255,12 +218,8 @@ void setup_hmd_arg(HmdArg& hmd_arg)
   hmd_arg.sw = 2; // Sexton-Weingarten term (gauge contribution per fermion)
 
   // Set the required degree of approximation
-  hmd_arg.FRatDeg[0] = 3;
-  hmd_arg.SRatDeg[0] = 6;
-  hmd_arg.FRatDeg[1] = 3;
-  hmd_arg.SRatDeg[1] = 6;
-  //hmd_arg.FRatDegNew[0] = hmd_arg.FRatDeg[0];
-  //hmd_arg.SRatDegNew[0] = hmd_arg.SRatDeg[0];
+  hmd_arg.FRatDeg[0] = 4;
+  hmd_arg.SRatDeg[0] = 7;
 
   hmd_arg.precision = 30;
   hmd_arg.approx_type = CONSTANT;
@@ -268,55 +227,22 @@ void setup_hmd_arg(HmdArg& hmd_arg)
 
   // Construct approximations
   for (int i=0; i<hmd_arg.n_frm_masses; i++) {
-    int copy =0;
     hmd_arg.lambda_low[i] = 4*pow(hmd_arg.frm_mass[i],2);
     hmd_arg.lambda_high[i] = 64.0 + hmd_arg.lambda_low[i];
-    //hmd_arg.lambda_low[i] = 0.001;
-    //hmd_arg.lambda_high[i] = 10;
     hmd_arg.lambda_min[i] = hmd_arg.lambda_low[i];
     hmd_arg.lambda_max[i] = hmd_arg.lambda_high[i];
 
-    for (int j=0; j<i; j++) {
-      // no need to recalculate approximation if same mass
-      if (hmd_arg.frm_mass[j] == hmd_arg.frm_mass[i]) {
-	hmd_arg.FRatDeg[i] = hmd_arg.FRatDeg[j];
-	hmd_arg.FRatNorm[i] = hmd_arg.FRatNorm[j];
-	for (int k=0; k<hmd_arg.FRatDeg[i]; k++) {
-	  hmd_arg.FRatRes[i][k] = hmd_arg.FRatRes[j][k];
-	  hmd_arg.FRatPole[i][k] = hmd_arg.FRatPole[j][k];
-	}
-	hmd_arg.SRatDeg[i] = hmd_arg.SRatDeg[j];
-	hmd_arg.SRatNorm[i] = hmd_arg.SRatNorm[j];
-	hmd_arg.SIRatNorm[i] = hmd_arg.SIRatNorm[j];
-	for (int k=0; k<hmd_arg.SRatDeg[i]; k++) {
-	  hmd_arg.SRatRes[i][k] = hmd_arg.SRatRes[j][k];
-	  hmd_arg.SRatPole[i][k] = hmd_arg.SRatPole[j][k];
-	  hmd_arg.SIRatRes[i][k] = hmd_arg.SIRatRes[j][k];
-	  hmd_arg.SIRatPole[i][k] = hmd_arg.SIRatPole[j][k];
-	}
-	copy = 1;
-      }
-    }
-
-    if (!copy) {
-      AlgRemez remez(hmd_arg.lambda_low[i],hmd_arg.lambda_high[i],hmd_arg.precision);
-      hmd_arg.FRatError[i] = remez.generateApprox(hmd_arg.FRatDeg[i],hmd_arg.frm_power_num[i],
-						  hmd_arg.frm_power_den[i]);
-      remez.getIPFE(hmd_arg.FRatRes[i],hmd_arg.FRatPole[i],&hmd_arg.FRatNorm[i]);
-      hmd_arg.SRatError[i] = remez.generateApprox(hmd_arg.SRatDeg[i],hmd_arg.frm_power_num[i],
-						  2*hmd_arg.frm_power_den[i]);
-      remez.getIPFE(hmd_arg.SRatRes[i],hmd_arg.SRatPole[i],&hmd_arg.SRatNorm[i]);
-      remez.getPFE(hmd_arg.SIRatRes[i],hmd_arg.SIRatPole[i],&hmd_arg.SIRatNorm[i]);
-    }      
-    
     // set any other common variables
     hmd_arg.max_num_iter[i] = 5000;
-    hmd_arg.stop_rsd[i] = 1.0E-6;
+    hmd_arg.stop_rsd[i] = 1.0e-6;
     hmd_arg.stop_rsd_md[i] = 1e-6;
-    hmd_arg.stop_rsd_mc[i] = 1e-10;
+    hmd_arg.stop_rsd_mc[i] = 1e-8;
+    hmd_arg.valid_approx[i] = 0;
+    hmd_arg.field_type[i] = FERMION;
   }
-  
+
 }
+
 void setup_eig_arg(EigArg& eig_arg)
 {
   eig_arg.N_eig = 1;

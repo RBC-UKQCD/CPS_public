@@ -3,9 +3,48 @@ the CPS in the context of performing exact asqtad fermions.
 
 Author: Mike Clark (mike@ph.ed.ac.uk)
 
+===============================================
+UPDATE
+
+As of revision v4_8_11_dwf_rhmc, there is no need for the user to 
+call the AlgRemez class directly.  This functionality has been built
+into the AlgHmcRHMC class directly, the user has now much less 
+parameters to set.  Above and beyond the the standard parameters, the 
+user must specify the following for each fermion field
+
+lamda_low[i] - the bottom of the approximation spectrum
+lamda_high[i] - the top of the approximation spectrum
+
+FRatDeg[i] - the degree of the approximation to use for the MD
+SRatDeg[i] - the degree of the approximation to use for the MC
+(maybe I should rename these to MDRatDeg and MCRatDeg?)
+
+field_type[i] (=FERMION or BOSON) - always set to FERMION unless
+simulating PauliVillars field
+
+valid_approx[i] - whether a valid approximation has been generated or
+not (set = 0 unless you know what this it)
+
+hmd_arg.stop_rsd_md[i] - the residual used for the MD
+hmd_arg.stop_rsd_mc[i] - the residual used for the MC
+
+The user must also set this parameter which is a single parameter
+applied to all fields.
+precision - the precision which the Remez algorithm uses 
+(typically 30-50 unless it barfs).
+
+These are the only parameters required.  For compilation, use the
+instructions below explaining how to configure GMP usage.  Ignore the
+stuff about AlgRemez, this is all done automatically.  I shall at some
+point update this document to remove the legacy crap below.
+
+Mike Clark - 24th Ferbruary 2005.
+
+===============================================
+
 The main.C program contained in this directory gives an example of how
-to perform 2+1 flavour simulations using asqtad fermions.  There are
-two important classes instantiated in this program, AlgRemez and
+to perform exact 2+1 flavour simulations using asqtad fermions.  There
+are two important classes instantiated in this program, AlgRemez and
 AlgHmcRHMC, which are specific to performing exact Nf!=fermion
 multiplet (e.g. Nf != 4 for staggered types) simulations.
 
@@ -74,8 +113,8 @@ is of sufficient quality or not.
 
 Once a suitable approximation has been produced, it has to be
 converted into partial fraction form, so that it is suitable for use
-RHMC algorithm.  To do this, there exists the methods getPFE and
-getIPFE, where the former returns the partial fraction fraction
+with the RHMC algorithm.  To do this, there exists the methods getPFE
+and getIPFE, where the former returns the partial fraction fraction
 expansion of the approximating function and the latter, the partial
 fraction expansion of the inverse of the approximation e.g.
 
@@ -84,7 +123,6 @@ remez.getPFE(&res[0], &poles[0], &norm);
 would perform the partial fraction expansion on the previously
 obtained approximation, and copy it into the array pointed to be res
 (residues) and poles.  The constant additive term is copied to norm.
-
 
 AlgHmcRHMC
 ==========
@@ -128,7 +166,7 @@ It is a simlar story for the following parameters
 
 Here the rational functions SRat and SIRat are just the inverse of
 each other.  There is only one parameter SRatDeg since both
-approximations are of the smae degree.  The function SRat is required
+approximations are of the same degree.  The function SRat is required
 to evaluate the action, and is hence used for the Metropolis
 acceptance test.  SIRat is used to perform the heatbath.  The
 approximation required here is the square root of the approximation
@@ -151,12 +189,16 @@ Floating point precision.  For the force approximations, any errors
 introduced by an inaccurate approximations are corrected by the
 Metropolis acceptance test, and so the deciding factor here should be
 what the lowest degree approximation is possible that has a minimal
-effect on the acceptance rate.  Typically an accuracy of 1 part in
-1000 is good enough, though this has not been tested on large volumes
-and small masses.
+effect on the acceptance rate.  RHMC uses two different residual
+parameters which are part of the HmdArg struct.  stop_rsd_md[i] is the
+residual used for the molecular dynamics, and stop_rsd_mc[i] is used
+for the acceptance test.  As a general rule of thumb, the error in the
+approximation should be of similar or less order than the appropriate
+residual error, for the approximation error to not be the rate
+determining step.
 
 The only other term of relevance is the sw (Sexton-Weingarten) term.
-With this term you can set the number of pure gauge fore contributions
+With this term you can set the number of pure gauge force contributions
 to the momentum per fermionic contribution.
 
 (int) sw
