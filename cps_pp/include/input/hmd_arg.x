@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the HmdArg structure.
 
-  $Id: hmd_arg.x,v 1.2 2004-12-11 20:57:34 chulwoo Exp $
+  $Id: hmd_arg.x,v 1.3 2005-03-07 00:03:23 chulwoo Exp $
 */
 /*------------------------------------------------------------------*/
 
@@ -25,7 +25,7 @@ enum MetropolisType { METROPOLIS_NO    = 0,
 
 
 
-#define MAX_HMD_MASSES  4       /*!< The maximum number of dynamical masses.*/
+#define MAX_HMD_MASSES  8       /*!< The maximum number of dynamical masses.*/
 
 #define MAX_RAT_DEGREE  20          /* The maximum degree of the rational
 				       approximation. */

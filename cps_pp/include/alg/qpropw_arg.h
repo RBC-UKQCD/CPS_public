@@ -13,6 +13,7 @@
 #include <alg/cg_arg.h>
 #include <util/vector.h>
 
+CPS_START_NAMESPACE
 
 enum SourceType {POINT      = 0 ,  
 		 VOLUME     = 1 , 
@@ -103,5 +104,6 @@ public:
     } ;
   
 };
+CPS_END_NAMESPACE
 
 #endif /* !INCLUDED_QPropW_ARG_H */

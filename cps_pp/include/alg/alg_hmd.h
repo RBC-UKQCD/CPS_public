@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.13 2005-02-18 19:44:28 mclark Exp $
+  $Id: alg_hmd.h,v 1.14 2005-03-07 00:03:20 chulwoo Exp $
 */
 //------------------------------------------------------------------
 
@@ -439,7 +439,7 @@ class AlgHmcRHMC : public AlgHmd
     //!< The sum of the rational approximation degrees used for the force
 
     Float *all_res;
-    //!< ?
+    //!< An array holding the residues - used for asqtad force
 
     EigArg *eig_arg;
     //!< ?
@@ -458,6 +458,9 @@ class AlgHmcRHMC : public AlgHmd
 
   //! Performs a single RHMC trajectory
   Float run(void);
+
+  //! Automatic generation of the rational approximation.
+  void generateApprox(HmdArg*);
 
   //! Dynamical generation of the rational approximation.
   void dynamicalApprox();
@@ -535,6 +538,98 @@ class AlgHmdR : public AlgHmd
   Float run(void);
 };
 
+//------------------------------------------------------------------
+//! A class implementing the R2 algorithm.
+/*!
+  This evolves a gauge field by a single iteration of the standard HMD
+  algorithm, \e i.e. a molecular dynamics trajectory with intermediate
+  gauge field updates to take care of the arbitrary numbers of
+  dynamical flavours. The initial guess in the solver is a random
+  gaussian vector.
+  
+  The R2 algorithm is specifically for simulating 2+1 flavours of
+  dynamical staggered fermions of different masses.  It uses the
+  generalised multimass solver to minimise the number of cg iterations
+  performed.  The algorithm can only be used when the mass matrix is a
+  scalar multiple of the identity.
+
+  \ingroup alg
+*/
+//------------------------------------------------------------------
+class AlgHmdR2 : public AlgHmd
+{
+ private:
+    char *cname;
+
+ protected:
+    int n_frm_masses;     
+    //!< The number of dynamical fermion masses.
+    /*!<
+      This is not necessarily the number of dynamical flavours.
+     */
+
+    Float *flavor_time_step;
+    //!< A tricky thing to describe succinctly.
+    /*!<
+      This is an array of the time steps used for the intermediate gauge
+      field updates for each dynamical mass.
+      Actually it is the differences between them. At least most of it is.
+    */
+
+    Float *force_coeff;
+    //!< The coefficient of each force passed to RHMC_EvolveFforce
+    /*!<
+      Array of coefficients = flavours * flavour_coeff
+    */
+
+    int f_sites;       
+    int f_vec_count;       
+    int f_count;       
+    int f_size;       
+    //!< The size of the pseudofermion (and similar) fields.
+    /*!< The size is given in terms of the total number of floating point
+      numbers in the field on the local lattice, taking into account whether
+      or not the field is defined on just a single parity.
+    */
+
+    CgArg *frm_cg_arg;
+    //!< Pointer to an array of structures containing solver parameters.
+    /*!<
+      These are the parameters corresponding to each of the dynamical fermion
+      masses.      
+     */
+
+    Vector** phi;
+    //!< Pseudofermion fields
+    /*!< One for each mass */
+
+    Vector** frmn;
+    //!< Array of vectors
+    /*!< These will hold the solutions from the solves. */
+
+    Vector** frmn_d;
+    //!< Array of vectors
+    /*!< These will hold the solutions from the solves multiplied by
+      the D-slash operator. */ 
+
+    Float *shift;
+    //!< The renormalised shift
+
+    int light;
+    //!< The index of the lightest mass
+
+    int heavy;
+    //!< The index of the heaviest mass
+
+ public:
+
+  AlgHmdR2(Lattice& latt, CommonArg *c_arg, HmdArg *arg);
+
+  virtual ~AlgHmdR2();
+
+  //! Performs a single HMD trajectory.
+  Float run(void);
+};
 
 #endif
 

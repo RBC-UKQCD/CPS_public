@@ -37,6 +37,7 @@ public:
 	int updates;
 	int measurements;
 	int measurefreq;
+	int cg_reprod_freq;
 	BndCndType x_bc;
 	BndCndType y_bc;
 	BndCndType z_bc;

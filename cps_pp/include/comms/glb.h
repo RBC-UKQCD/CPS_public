@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations of collective communications routines
 
-  $Id: glb.h,v 1.4 2004-08-18 11:57:36 zs Exp $
+  $Id: glb.h,v 1.5 2005-03-07 00:03:22 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v 1.4 2004-08-18 11:57:36 zs Exp $
-//  $Id: glb.h,v 1.4 2004-08-18 11:57:36 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-07 00:03:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v 1.5 2005-03-07 00:03:22 chulwoo Exp $
+//  $Id: glb.h,v 1.5 2005-03-07 00:03:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v $
 //  $State: Exp $
 //
@@ -40,6 +40,7 @@ CPS_START_NAMESPACE
 //! Sums a floating point number over all nodes in a 4-dimensinal grid.
 //--------------------------------------------------------------
 extern void glb_sum(Float * float_p);
+extern void glb_sum_gimp(Float * float_p);
 
 //--------------------------------------------------------------
 //! Sums a floating point number over all nodes in a 5-dimensinal grid.
@@ -75,6 +76,12 @@ extern void
 slice_sum(Float * float_p, int blcklength, int dir);
 
 /*! @} */
+
+
+extern unsigned int local_checksum(Float * float_p, int len);
+#if 0
+extern unsigned int global_checksum(Float * float_p, int len);
+#endif
 
 #endif
 

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.17 2004-12-22 08:39:17 chulwoo Exp $
+  $Id: gjp.h,v 1.18 2005-03-07 00:03:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-22 08:39:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.17 2004-12-22 08:39:17 chulwoo Exp $
-//  $Id: gjp.h,v 1.17 2004-12-22 08:39:17 chulwoo Exp $
+//  $Date: 2005-03-07 00:03:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.18 2005-03-07 00:03:11 chulwoo Exp $
+//  $Id: gjp.h,v 1.18 2005-03-07 00:03:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -517,6 +517,10 @@ public:
   /*!<
     \return The type of local boundary condition along the T axis.
   */
+
+  int CGreprodFreq() const
+      {return doarg_int.cg_reprod_freq;}
+  //!< Gets the frequency for CG reproducibility test
 
   StartConfType StartConfKind() const
       {return doarg_int.start_conf_kind;}

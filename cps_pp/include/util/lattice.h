@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.35 2005-02-18 19:50:19 mclark Exp $
+  $Id: lattice.h,v 1.36 2005-03-07 00:03:11 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
-  $Author: mclark $
-  $Date: 2005-02-18 19:50:19 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.35 2005-02-18 19:50:19 mclark Exp $
-  $Id: lattice.h,v 1.35 2005-02-18 19:50:19 mclark Exp $
+  $Author: chulwoo $
+  $Date: 2005-03-07 00:03:11 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.36 2005-03-07 00:03:11 chulwoo Exp $
+  $Id: lattice.h,v 1.36 2005-03-07 00:03:11 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.35 $
+  $Revision: 1.36 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -792,6 +792,7 @@ class Lattice
 	    return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
 			       MULTI,alpha, f_out_d);
 	}
+
     //!< The multishift matrix inversion used in the RHMC molecular dynamics algorithms.
     /*!<
       Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out}\f$
@@ -840,6 +841,43 @@ class Lattice
       \param shift The shifts of the fermion matrix.
       \param Nshift The number of shifts
       \param isz The smallest shift (required by MInvCG)
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+      to a new storage order appropriate for the type of fermion action.
+      If this is ::CNV_FRM_NO, then just the gauge field is converted.
+      If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+      are also converted: This assumes they are initially in the same order as
+      the gauge field. Fields that are converted are restored to their original
+      order upon exit of this method. \e N.B. If the fields are already in the
+      suitable order, then specifying ::CNV_FRM_YES here has no effect.
+      \param f_out_d Not implemented or ignored with Wilsonesque fermions.
+      With staggered fermions, if this is initially non-zero
+      and ::MULTI is also specified,
+      then <em> D f<sub>out</sub></em>, the solution vectors acted on with the
+      Dirac D-slash operator, is written here. 
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vectors.
+    */
+
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm,
+		    MultiShiftSolveType type, Vector **f_out_d)
+	{
+	    Float *alpha=0;
+	    return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
+			       MULTI,alpha,f_out_d);
+	}
+    //!< The multishift matrix inversion used in the RHMC molecular dynamics algorithms.
+    /*!<
+      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out}\f$
+      for a given number of shifts,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The solution vectors.
+      \param f_in The source vector
+      \param shift The shifts of the fermion matrix.
+      \param Nshift The number of shifts
+      \param isz The smallest shift (required by MInvCG)
       \param cg_arg The solver parameters for each shift
       \param cnv_frm Whether the lattice fields need to be converted to
       to a new storage order appropriate for the type of fermion action.
@@ -853,6 +891,9 @@ class Lattice
       \post \a f_out contains the solution vectors.
     */
 
+
+    virtual Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+			    Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm) = 0;
 
     //! Chronological initial guess for the solver.
     /*!
@@ -879,8 +920,6 @@ class Lattice
       
       \return The residue of this guess.
      */
-    virtual Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
-			    Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm) = 0;
 
     virtual int FmatInv(Vector *f_out, Vector *f_in, 
 			CgArg *cg_arg, 

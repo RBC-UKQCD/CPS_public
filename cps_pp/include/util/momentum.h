@@ -7,6 +7,8 @@
 //---------------------------------------------------------------------------
 #include <math.h>
 
+CPS_START_NAMESPACE
+
 class ThreeMom
 {
   int p[3] ; // holds the momentum
@@ -42,4 +44,5 @@ class ThreeMom
     p[2]=-p[2] ;
   }
 } ;
+CPS_END_NAMESPACE
 #endif // !INCLUDED_MOMENTUM_H  

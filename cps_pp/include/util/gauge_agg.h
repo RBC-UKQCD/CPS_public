@@ -1,7 +1,6 @@
 #ifndef GAUGE_AGG_H
 #define GAUGE_AGG_H
-#include <util/data_types.h>
-CPS_START_NAMESPACE
+#include <util/asq_data_types.h>
 struct gauge_agg{
   int src;
   int dest;
@@ -29,5 +28,5 @@ struct hop_pointer {
   int src;
   int dest;
 };
-CPS_END_NAMESPACE
+//CPS_END_NAMESPACE
 #endif

@@ -4,19 +4,19 @@
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.2 2004-12-11 20:57:33 chulwoo Exp $
+  $Id: enum.x,v 1.3 2005-03-07 00:03:23 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2004-12-11 20:57:33 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.2 2004-12-11 20:57:33 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.2 2004-12-11 20:57:33 chulwoo Exp $*/
+/*  $Date: 2005-03-07 00:03:23 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.3 2005-03-07 00:03:23 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.3 2005-03-07 00:03:23 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.2 $*/
+/*  $Revision: 1.3 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -331,8 +331,23 @@ enum RatApproxType {
 /*------------------------------------------------------------------*/
 enum MultiShiftSolveType {
   SINGLE,  /*!< SINGLE - solutions are summed to a common vector*/
-  MULTI    /*!< MULTI - solutions are summed to separate vectors*/
+  MULTI,    /*!< MULTI - solutions are summed to separate vectors*/
+  GENERAL /*!< GENERAL - non-zero initial guess (R2 aglorithm) */
 };
+
+enum MassRenormaliseDir {
+  RENORM_BACKWARDS = 0,
+  RENORM_FORWARDS = 1
+};
+
+/*------------------------------------------------------------------*/
+/*! The field type (valid for dwf rhmc)*/
+/*------------------------------------------------------------------*/
+enum FieldType {
+  FERMION,  /*< FERMION - field is of fermion type*/
+  BOSON /*< BOSON - field is of boson type*/
+};
+
 enum WbaryonFold {BARYON_FOLD, BARYON_RAW, BARYON_PAST};
 enum SourceKind { POINT_W = 0, 
 		  WALL_W, 

@@ -54,8 +54,8 @@ class AlgWspect : public Alg
   static int   d_counter;
   static int   d_count_step;
 
-  CgArg *cg_arg;                 // the conjugate gradient parameters
   WspectArg *  d_arg_p;          // the spectrum arg for each quark mass
+  CgArg *      cg_arg_p;         // added by mflin to really pass CgArg to the class
   int          d_num_args;       // num of non-degenerate quark masses
   
  public:

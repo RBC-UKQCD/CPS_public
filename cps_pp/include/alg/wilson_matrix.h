@@ -20,8 +20,9 @@
 #include <util/vector.h>
 #include <util/wilson.h>
 
-#include "spin_matrix.h"
+#include <alg/spin_matrix.h>
 
+CPS_START_NAMESPACE
 /* 
    The following structures used to define the quark propagator
    were taken from version 4 of the MILC Code: 
@@ -415,6 +416,8 @@ extern Rcomplex Tr(const Matrix& a, const Matrix& b);
 
 //! trace of two SpinMatrices
 extern Rcomplex Tr(const SpinMatrix& a, const SpinMatrix& b);
+
+CPS_END_NAMESPACE
 
 #endif
 

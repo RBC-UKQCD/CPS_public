@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.15 2005-02-18 19:50:19 mclark Exp $
+  $Id: dirac_op.h,v 1.16 2005-03-07 00:03:10 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -58,7 +58,8 @@ class DiracOp
   //!< lock that prevents more than one DiracOp object to be on scope at any time.
 
   // PAB... uniform performance counting
-  static int CGflops; //!< Flops counter.
+  static unsigned long long CGflops; //!< Flops counter.
+  static unsigned int CGcount;
 
   DiracOp(Lattice& latt,           // Lattice object.
 	  Vector *f_field_out,     // Output fermion field ptr.

@@ -1,10 +1,6 @@
 #ifndef ASQTAD_INT_H
 #define ASQTAD_INT_H
-#include <config.h>
-#if 0
-#include <qalloc.h>
-#endif
-#include <util/data_types.h>
+#include <util/asq_data_types.h>
 #include <util/gauge_agg.h>
 
 class matrix{
@@ -253,8 +249,11 @@ SCUDirArgMulti SCUmulti_2[2];
   public:
   AsqD() {};
   ~AsqD() {};
+  int Size(int dir){return size[dir];}
+  int Vol() {return vol;}
   void init(AsqDArg  *arg);
-  void init_g(Float *frm_p);
+  void init_g(Float *frm_p,Float *fat_p=NULL, Float *naik_p=NULL, 
+    Float *naikm_p=NULL);
   void destroy_buf();
   void destroy_buf_g();
   void comm_assert();

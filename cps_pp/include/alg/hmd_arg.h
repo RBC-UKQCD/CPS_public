@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the HmdArg structure.
 
-  $Id: hmd_arg.h,v 1.10 2005-02-18 19:44:28 mclark Exp $
+  $Id: hmd_arg.h,v 1.11 2005-03-07 00:03:21 chulwoo Exp $
 */
 //------------------------------------------------------------------
 
@@ -104,6 +104,12 @@ struct HmdArg {
 					the trajectory before the metropolis
 					step. */
   
+    //! Type of fields which are being simulated (FERMION OR BOSON)
+    FieldType field_type[MAX_HMD_MASSES];
+
+    //! Has a valid approximation been constructed?
+    int valid_approx[MAX_HMD_MASSES];
+
     //! Parameters for the RHMC force rational approximations.
     int FRatDeg[MAX_HMD_MASSES];
     //! Parameters for the RHMC rational approximations.    
@@ -147,7 +153,6 @@ struct HmdArg {
     //! The new degrees to use for dynamic RHMC.
     int SRatDegNew[MAX_HMD_MASSES];
     
-
     Float lambda_low[MAX_HMD_MASSES];
     Float lambda_high[MAX_HMD_MASSES];
     Float lambda_min[MAX_HMD_MASSES];

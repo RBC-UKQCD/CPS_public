@@ -12,7 +12,7 @@
 
 #include <string.h>
 #include <util/data_types.h>
-
+CPS_START_NAMESPACE
 class SpinMatrix;
 
 
@@ -48,5 +48,6 @@ class SpinMatrix
 };
 
 
+CPS_END_NAMESPACE
 #endif
 

@@ -171,14 +171,21 @@ typedef enum RatApproxType RatApproxType;
 enum MultiShiftSolveType {
 	SINGLE = 0,
 	MULTI = 1,
+	GENERAL = 2,
 };
 typedef enum MultiShiftSolveType MultiShiftSolveType;
 
 enum MassRenormaliseDir {
-  RENORM_BACKWARDS = 0,
-  RENORM_FORWARDS = 1,
+	RENORM_BACKWARDS = 0,
+	RENORM_FORWARDS = 1,
 };
 typedef enum MassRenormaliseDir MassRenormaliseDir;
+
+enum FieldType {
+	FERMION = 0,
+	BOSON = 1,
+};
+typedef enum FieldType FieldType;
 
 enum WbaryonFold {
 	BARYON_FOLD = 0,
@@ -523,6 +530,8 @@ extern  bool_t vml_SigmaprojType (VML *, char *instance, SigmaprojType*);
 extern  bool_t vml_RitzMatType (VML *, char *instance, RitzMatType*);
 extern  bool_t vml_RatApproxType (VML *, char *instance, RatApproxType*);
 extern  bool_t vml_MultiShiftSolveType (VML *, char *instance, MultiShiftSolveType*);
+extern  bool_t vml_MassRenormaliseDir (VML *, char *instance, MassRenormaliseDir*);
+extern  bool_t vml_FieldType (VML *, char *instance, FieldType*);
 extern  bool_t vml_WbaryonFold (VML *, char *instance, WbaryonFold*);
 extern  bool_t vml_SourceKind (VML *, char *instance, SourceKind*);
 extern  bool_t vml_MomentumKind (VML *, char *instance, MomentumKind*);
@@ -558,6 +567,8 @@ extern  bool_t vml_SigmaprojType (VML *, char *instance, SigmaprojType*);
 extern  bool_t vml_RitzMatType (VML *, char *instance, RitzMatType*);
 extern  bool_t vml_RatApproxType (VML *, char *instance, RatApproxType*);
 extern  bool_t vml_MultiShiftSolveType (VML *, char *instance, MultiShiftSolveType*);
+extern  bool_t vml_MassRenormaliseDir (VML *, char *instance, MassRenormaliseDir*);
+extern  bool_t vml_FieldType (VML *, char *instance, FieldType*);
 extern  bool_t vml_WbaryonFold (VML *, char *instance, WbaryonFold*);
 extern  bool_t vml_SourceKind (VML *, char *instance, SourceKind*);
 extern  bool_t vml_MomentumKind (VML *, char *instance, MomentumKind*);

@@ -23,6 +23,8 @@
 #include <util/momentum.h>
 #include "wilson_matrix.h"
 
+CPS_START_NAMESPACE
+
 class FermionVectorTp {
 
 private:
@@ -94,6 +96,7 @@ public:
 			     int d, int x, int y, int z, int t) ;
 };
 
+CPS_END_NAMESPACE
 
 #endif
 

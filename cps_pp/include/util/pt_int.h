@@ -8,7 +8,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.7 2005-02-18 19:50:20 mclark Exp $
+  $Id: pt_int.h,v 1.8 2005-03-07 00:03:11 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 //#include <util/lattice.h>
@@ -104,7 +104,6 @@ class PT  {
   private:
   char *cname;
   static int size[4];
-  static  int vol;
   int local[4];
   int g_str_ord;
   int g_conj;
@@ -231,7 +230,8 @@ int conjugated;
   public:
     PT() {};
     ~PT() {};
-	void init (PTArg *pt_arg);
+    static  int vol;
+    void init (PTArg *pt_arg);
 	void init_g();
 	void delete_buf();
 	void delete_g_buf();

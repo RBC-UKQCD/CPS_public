@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.12 2004-09-21 18:07:15 chulwoo Exp $
+  $Id: vector.h,v 1.13 2005-03-07 00:03:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-21 18:07:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.12 2004-09-21 18:07:15 chulwoo Exp $
-//  $Id: vector.h,v 1.12 2004-09-21 18:07:15 chulwoo Exp $
+//  $Date: 2005-03-07 00:03:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.13 2005-03-07 00:03:12 chulwoo Exp $
+//  $Id: vector.h,v 1.13 2005-03-07 00:03:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -46,6 +46,7 @@ extern "C"
 {
     //! vector copy; b = a
 void moveMem(void *b, const void *a, int len); 
+void moveFloat(Float *b, const Float *a, int len); 
 
     //! 3x3 complex matrix multiplication; c = ab 
 void mDotMEqual(IFloat* c, const IFloat* a, const IFloat* b);
@@ -158,7 +159,11 @@ class Matrix
     //! Overloaded assignment
     /*! \a m should not alias this matrix */
     Matrix& operator=(const Matrix& m)
+#if 1
+    { for(int i=0;i<COLORS*COLORS*2;i++) u[i] = m.u[i];
+#else
     { moveMem(u, m.u, COLORS*COLORS*2*sizeof(Float)); 
+#endif
       return *this; }
 
     // MANIPULATORS
@@ -376,7 +381,11 @@ class Vector
     //! Overloaded assignment
     /*! \a x should not alias this matrix */
     Vector& operator=(const Vector& x)
+#if 1
+    { for(int i=0;i<COLORS*2;i++) v[i] = x.v[i];
+#else
     { moveMem(v, x.v, COLORS*2*sizeof(Float)); 
+#endif
       return *this; }
 
     // MANIPULATORS
@@ -442,7 +451,11 @@ class Vector
       \a b should not alias this vector.
     */
     void CopyVec(const Vector *b, int len)
+#if 1
+    { moveFloat((Float *)&v, (const Float *)b, len); }
+#else
     { moveMem(&v, b, len*sizeof(Float)); }
+#endif
 
     //! Square norm.
     /*!

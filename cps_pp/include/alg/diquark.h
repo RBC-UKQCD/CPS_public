@@ -4,6 +4,8 @@
 #include <comms/glb.h>
 #include "wilson_matrix.h"
 
+CPS_START_NAMESPACE
+
 enum ProjectType {PPAR    = 0, 
 		  NPAR    = 1, 
 		  PPAR_5Z = 2, 
@@ -34,5 +36,6 @@ class Diquark {
   
 } ;
 
+CPS_END_NAMESPACE
 #endif
 

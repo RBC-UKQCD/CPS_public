@@ -35,6 +35,7 @@
 #define PROP_MID 1
 #define PROP  0
 
+CPS_START_NAMESPACE
 
 //! The QPropW class.
 
@@ -405,5 +406,6 @@ public:
   void SetSource(FermionVectorTp& src, int spin, int color);
   SourceType SrcType(){return PROT_D_SEQ;}
 } ;
+CPS_END_NAMESPACE
 
 #endif

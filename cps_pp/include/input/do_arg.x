@@ -19,9 +19,10 @@ class DoArg {
   int t_nodes;      /*!< Number of nodes along the T direction*/
   int s_nodes;      /*!< Number of nodes along the S (5th) direction*/
                     /*!<  Relevant to domain wall fermions only. */
- int updates;
-int measurements;
-int measurefreq;
+  int updates;
+  int measurements;
+  int measurefreq;
+  int cg_reprod_freq; /* run reproducibility test in every nth time, never if 0 */
   BndCndType x_bc;  /*!< Boundary condition in the x direction.*/
   BndCndType y_bc;  /*!< Boundary condition in the y direction.*/
   BndCndType z_bc;  /*!< Boundary condition in the z direction.*/
