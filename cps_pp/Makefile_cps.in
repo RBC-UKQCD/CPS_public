@@ -56,6 +56,15 @@ docs:
 else
 docs:
 	@$(SHELL) doc/mkdocs.sh 
+
+#
+#  documentation for the web pages
+#  (this deletes the source code so that it is not posted on the web)
+webdocs:
+	@echo Creating documentation for the web page
+	@echo This will delete all the source code
+        @rm -i -r src
+        @rm -r src tests include
 endif
 
 clean:
