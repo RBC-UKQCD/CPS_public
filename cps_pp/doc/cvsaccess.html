@@ -34,25 +34,58 @@
  </div>
      
 <h2><a name="Accessing_the_UKQCD_QCDOC_Code"></a>
- Accessing the UKQCD QCDOC Code Repository</h2>
-     To access the CVS repository, you need an account on pughpugh.ph.ed.ac.uk
-  (contact <a href="cmaynard@ph.ed.ac.uk">Chris Maynard</a>
-     for this). &nbsp; (Your account needs to be in the qcdoc group.)To check out the current version of the Columbia code,
+ Accessing the CPS Code Repository</h2>
+     To access the CVS repository, you need an account at Columbia.
+To check out the current version of the Columbia code,
   you need to (in bash):<br>
        
-<pre wrap="">export CVS_RSH=ssh<br><span class="moz-txt-citetags"></span>export CVSROOT=:ext:<font color="#ff0000"><b>YOURUSERNAME</b></font>@pughpugh.ph.ed.ac.uk:/Disk/ukqcd/QCDOC/CVS <br><span class="moz-txt-citetags"></span>cvs co -P cps++</pre>
-    This will then prompt you for your pughpugh password, and then check the 
+<pre wrap=""><span class="moz-txt-citetags"></span>export CVSROOT=:pserver:<font color="#ff0000"><b>YOURUSERNAME</b></font>@localhost:/home/cvs/cps <br><span class="moz-txt-citetags"></span>
+cvs -d :pserver:<font color="#ff0000"><b>YOURUSERNAME</b></font>@localhost:2401/home/cvs/cps login
+<br>
+cvs co -P cps++
+</pre>
+    This will then prompt you for your password at Columbia,
+and then check the 
 entire  codebase out into a directory called `cps++'.<br>
 The -P flag is required so that empty directories are not
 checked out. This will cause the build system to fail.
 
+<p>
+The access to CVS is slighty not standard. For example,
+you can not use the standard ssh methods for remote access. As we
+use a
+<a href="http://cvsacl.sourceforge.net/">patched version of CVS</a>
+ with secure branches,
+to allow some code to be hidden from other collaborations.
+Access is via the pserver method. For protection this is
+routed through <a href="http://www.stunnel.org/">stunnel</a>.
+<p>
+For this to work the machine localhost should be running
+a stunnel process. This needs to be done by someone
+with root privileges. The following machines are running stunnel.
+
+<ul>
+<li>  qcdanly4    (Columbia)
+<li>  qcdlinux1   (Columbia)
+<li>  quark       (Brookhaven)
+<li>  iasc7       (Liverpool)
+</ul>  
+
+At Liverpool I can log into iasc7 using
+<pre> ssh iasc7 </pre>
+from florence. Hence I can remotely check code
+out of the CVS from florence by replacing localhost
+with iasc7 on florence.
+
+
+
 <h2><a name="Submission_of_Changes"></a>
- Submission of Changes</h2>
+
+Submission of Changes</h2>
    Anyone who has checked out the code in the manner described above has
 the  ability to commit their own changes to the repository. &nbsp;For the
 time  being, we request that all changes are cleared/submitted by ourselves
-(via  <a href="mailto:mcneile@amtp.liv.ac.uk">Craig McNeile</a>
-   ) so that we can retain overall control of the repository.
+so that we can retain overall control of the repository.
 Eventually there will (probably) be a committee of people to "approve"
 submissions, comprising of people 
 from UKQCD, Columbia and BNL. The CVS log messages are
@@ -61,22 +94,7 @@ automatically send to the
 of the emails. These will stop once your email has been added to a list
 of approved people who can post to the list.)
 
-<h2><a name="Using_ssh"></a>
- Using ssh</h2>
-<p>
- Using the mechanism descibed above, the secure login process means that
-you have to type in your password every time you perform a cvs operation,
-and sometime twice when checking in changes. &nbsp;This can be avoided by
-setting up your own ssh-agent to remember your passphrase locally and perform
-the identity check automatically. 
-</p>
-<p>
-Getting you ssh-agent set up is rather fiddly so...
-Here is a local copy of <a href="keychain.html">SSH and keychain</a> by Stewart
-V. Wright (taken from <a
-href="http://www.liv.ac.uk/~svwright/security/keychain.html">here</a>).  You
-can also try looking at these tutorials [<a href="http://www.deadman.org/ssh-tut.html">1</a>
- ,<a href="http://mah.everybody.org/docs/ssh">2</a> ].
+
 </p>
         <hr width="100%" size="2" align="Left" noshade="">    
         <div align="Right"><a href="mailto:mcneile@amtp.liv.ac.uk"><small>Craig
