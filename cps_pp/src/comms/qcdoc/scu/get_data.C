@@ -1,23 +1,32 @@
 #include<config.h>
 #include<stdio.h>
-#include<qcdoc_align.h>
+#include<qalloc.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.2 2004-01-13 20:39:07 chulwoo Exp $
+  $Id: get_data.C,v 1.3 2004-03-15 15:09:02 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.2 2004-01-13 20:39:07 chulwoo Exp $
-//  $Id: get_data.C,v 1.2 2004-01-13 20:39:07 chulwoo Exp $
+//  $Author: cwj $
+//  $Date: 2004-03-15 15:09:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.3 2004-03-15 15:09:02 cwj Exp $
+//  $Id: get_data.C,v 1.3 2004-03-15 15:09:02 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.2.2  2004/03/15 08:15:57  cwj
+//  Update for QOS v2.1
+//
+//  Revision 1.2.2.1  2004/03/15 00:51:58  cwj
+//  Updated communication calls for QOS v2.1
+//
+//  Revision 1.2  2004/01/13 20:39:07  chulwoo
+//  Merging with multibuild
+//
 //  Revision 1.1.2.1.2.2  2003/11/28 21:44:27  cwj
 //   Copy data into non-cachable memory to solve memory coherency problem
 //
@@ -76,7 +85,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -108,10 +117,12 @@ CPS_START_NAMESPACE
 */
 //------------------------------------------------------------------
 const int MAX_LENGTH = 1024;
-static IFloat rcv_noncache[MAX_LENGTH] PEC_ALIGN LOCATE("Edramnoncache");
-static IFloat send_noncache[MAX_LENGTH] PEC_ALIGN LOCATE("Edramnoncache");
+static IFloat *rcv_noncache=NULL;
+static IFloat *send_noncache=NULL;
 void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
 {
+  if(rcv_noncache==NULL) rcv_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
+  if(send_noncache==NULL) send_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
 	
   int i = 0;
   if(gjp_local_axis[mu] == 0) {
@@ -154,6 +165,8 @@ void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
 void getMinusData(IFloat* rcv_buf, IFloat* send_buf, int len, int mu)
 {
   int i;
+  if(rcv_noncache==NULL) rcv_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
+  if(send_noncache==NULL) send_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
   if(gjp_local_axis[mu] == 0) {
     if ( len > MAX_LENGTH){
         ERR.General("","getMinusData","len>MAX_LENGTH(%d)\n",MAX_LENGTH);
@@ -208,21 +221,28 @@ const SCUDir neg_dir[] = { SCU_XM, SCU_YM, SCU_ZM, SCU_TM };
 //-------------------------------------------------------------------
 void getMinus2Data(IFloat* rcv_buf, IFloat* send_buf, int len, int mu, int nu)
 {
-    IFloat *tmp_buf = (IFloat *)smalloc(len*sizeof(IFloat));
+    int i;
+    IFloat *tmp_buf = (IFloat *)qalloc(QFAST|QNONCACHE,len*sizeof(IFloat));
+  if(rcv_noncache==NULL) rcv_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
+  if(send_noncache==NULL) send_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
 
+    for(i=0;i<len;i++) send_noncache[i] = send_buf[i];
     SCUDirArg send1(send_buf, pos_dir[mu], SCU_SEND, len*sizeof(IFloat));
     SCUDirArg recv1(tmp_buf, neg_dir[mu], SCU_REC, len*sizeof(IFloat));
     send1.StartTrans();
     recv1.StartTrans();
-    SCUTransComplete();
+    send1.TransComplete();
+    recv1.TransComplete();
 
     SCUDirArg send2(tmp_buf, pos_dir[nu], SCU_SEND, len*sizeof(IFloat));
     SCUDirArg recv2(rcv_buf, neg_dir[nu], SCU_REC, len*sizeof(IFloat));
     send2.StartTrans();
     recv2.StartTrans();
-    SCUTransComplete();
+    send2.TransComplete();
+    recv2.TransComplete();
+    for(i=0;i<len;i++) rcv_buf[i] = rcv_noncache[i];
 
-    sfree(tmp_buf);
+    qfree(tmp_buf);
 }
 
 //-------------------------------------------------------------------
@@ -250,40 +270,48 @@ void getMinus2Data(IFloat* rcv_buf, IFloat* send_buf, int len, int mu, int nu)
 //-------------------------------------------------------------------
 void getMinus3Data(IFloat* rcv_buf, IFloat* send_buf, int len, int dir)
 {
-    IFloat *tmp_buf = (IFloat *)smalloc(len*sizeof(IFloat));
+    IFloat *tmp_buf = (IFloat *)qalloc(QFAST|QNONCACHE,len*sizeof(IFloat));
+  if(rcv_noncache==NULL) rcv_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
+  if(send_noncache==NULL) send_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
 
     int i = (dir+1)%4;
     int j = (dir+2)%4;
     int k = (dir+3)%4;
+    int l;
 
     //--------------------------------------------------------------
     // send_buf --> rcv_buf(as a temporary buffer) 
     //--------------------------------------------------------------
-    SCUDirArg send1(send_buf, pos_dir[i], SCU_SEND, len*sizeof(IFloat) );
-    SCUDirArg recv1(rcv_buf, neg_dir[i], SCU_REC, len*sizeof(IFloat) );
-    SCUTrans(&send1);
-    SCUTrans(&recv1);
-    SCUTransComplete();
+    for(l=0;l<len;l++) send_noncache[l] = send_buf[l];
+    SCUDirArg send1(send_noncache, pos_dir[i], SCU_SEND, len*sizeof(IFloat) );
+    SCUDirArg recv1(rcv_noncache, neg_dir[i], SCU_REC, len*sizeof(IFloat) );
+    send1.StartTrans();
+    recv1.StartTrans();
+    send1.TransComplete();
+    recv1.TransComplete();
 
     //--------------------------------------------------------------
     // rcv_buf --> tmp_buf 
     //--------------------------------------------------------------
-    SCUDirArg send2(rcv_buf, pos_dir[j], SCU_SEND, len*sizeof(IFloat) );
+    SCUDirArg send2(rcv_noncache, pos_dir[j], SCU_SEND, len*sizeof(IFloat) );
     SCUDirArg recv2(tmp_buf, neg_dir[j], SCU_REC, len*sizeof(IFloat));
-    SCUTrans(&send2);
-    SCUTrans(&recv2);
-    SCUTransComplete();
+    send2.StartTrans();
+    recv2.StartTrans();
+    send2.TransComplete();
+    recv2.TransComplete();
 
     //--------------------------------------------------------------
     // tmp_buf --> rcv_buf 
     //--------------------------------------------------------------
     SCUDirArg send3(tmp_buf, pos_dir[k], SCU_SEND, len*sizeof(IFloat));
-    SCUDirArg recv3(rcv_buf, neg_dir[k], SCU_REC, len*sizeof(IFloat));
-    SCUTrans(&send3);
-    SCUTrans(&recv3);
-    SCUTransComplete();
+    SCUDirArg recv3(rcv_noncache, neg_dir[k], SCU_REC, len*sizeof(IFloat));
+    send3.StartTrans();
+    recv3.StartTrans();
+    send3.TransComplete();
+    recv3.TransComplete();
+    for(l=0;l<len;l++) rcv_buf[l] = rcv_noncache[l];
 
-    sfree(tmp_buf);
+    qfree(tmp_buf);
 }
 
 
