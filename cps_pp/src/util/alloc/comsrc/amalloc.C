@@ -3,7 +3,7 @@
   \file
   \brief Functions for dynamical array allocation.
 
-  $Id: amalloc.C,v 1.8 2004-10-29 13:08:29 zs Exp $
+  $Id: amalloc.C,v 1.9 2004-11-07 23:54:36 chulwoo Exp $
 */
 #include <util/smalloc.h>
 #include <stdarg.h>
@@ -80,8 +80,8 @@ static void subarray(size_t size, int n_dim, int n_ptr,
   \return A pointer to the allocated memory
 */
 
-void *amalloc(void*  (*allocator)(size_t, const char *vname="",
-			  const char *fname="smalloc", const char *cname=""),
+void *amalloc(void*  (*allocator)(size_t, const char *vname,
+			  const char *fname, const char *cname),
 	      size_t size, int n_dim, ...){
 
 /*
@@ -120,7 +120,7 @@ void *amalloc(void*  (*allocator)(size_t, const char *vname="",
     if(n_ptr*sizeof(void*)%alignment==0) align = 0;
     else align = alignment;
 
-    void **start = (void**)allocator(n_data*size+align+n_ptr*sizeof(void*));
+    void **start = (void**)allocator(n_data*size+align+n_ptr*sizeof(void*),"","amalloc","");
 
 
     // Set up the pointers.
