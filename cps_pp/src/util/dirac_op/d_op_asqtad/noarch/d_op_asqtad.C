@@ -1,13 +1,16 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-14 20:05:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/noarch/d_op_asqtad.C,v 1.3 2004-01-14 20:05:02 chulwoo Exp $
-//  $Id: d_op_asqtad.C,v 1.3 2004-01-14 20:05:02 chulwoo Exp $
+//  $Author: mike $
+//  $Date: 2004-02-04 02:49:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/noarch/d_op_asqtad.C,v 1.4 2004-02-04 02:49:04 mike Exp $
+//  $Id: d_op_asqtad.C,v 1.4 2004-02-04 02:49:04 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3  2004/01/14 20:05:02  chulwoo
+//  *** empty log message ***
+//
 //  Revision 1.2  2004/01/13 20:39:34  chulwoo
 //  Merging with multibuild
 //
@@ -52,7 +55,7 @@
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: d_op_asqtad.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/noarch/d_op_asqtad.C,v $
 //  $State: Exp $
 //
@@ -139,7 +142,6 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   // Initialize parameters
   //----------------------------------------------------------------
   DiracArg(dirac_arg);
-
 }
 
 
@@ -455,18 +457,41 @@ int DiracOpAsqtad::MatInv(PreserveType prs_in)
 void DiracOpAsqtad::RitzMat(Vector *out, Vector *in) {
   char *fname = "RitzMat(V*,V*)";
   VRB.Func(cname,fname);
+  Float *dot=0;
 
-  Vector *tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
-  if(tmp == 0)
-    ERR.Pointer(cname,fname, "tmp");
-  VRB.Smalloc(cname,fname, "tmp", tmp, f_size_cb * sizeof(Float));
+  Float mass = dirac_arg->mass;
+  Float c = 1.0/(64.0 + 4.0*mass*mass);
 
-  Dslash(tmp, in, CHKB_EVEN, DAG_NO);
-  Dslash(out, tmp, CHKB_ODD, DAG_YES);
+  switch(dirac_arg->RitzMatOper)
+    {
+    case MATDAG_MAT:
+      MatPcDagMatPc(out, in, dot);
+      break;
 
-  out->VecTimesEquFloat(0.25, f_size_cb);
+    case MATPCDAG_MATPC:
+      MatPcDagMatPc(out, in, dot);
+      break;
+      
+    case NEG_MATDAG_MAT:
+      MatPcDagMatPc(out, in, dot);
+      out->VecNegative(out, RitzLatSize());
+      break;
+      
+    case MATDAG_MAT_NORM:
+      MatPcDagMatPc(out, in, dot);
+      out->VecTimesEquFloat(c,RitzLatSize());
+      break;
 
-  sfree(tmp);
+    case NEG_MATDAG_MAT_NORM:
+      MatPcDagMatPc(out, in, dot);
+      out->VecTimesEquFloat(-c,RitzLatSize());
+      break;
+
+    default:
+      ERR.General(cname,fname,"RitzMatOper %d not implemented",
+		  dirac_arg->RitzMatOper);
+    }
+  
 }
 
 //------------------------------------------------------------------
