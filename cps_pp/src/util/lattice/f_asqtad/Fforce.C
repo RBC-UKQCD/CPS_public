@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.2 2004-05-10 15:26:54 zs Exp $
+  $Id: Fforce.C,v 1.3 2004-06-02 11:03:19 zs Exp $
 */
 //--------------------------------------------------------------------
 
@@ -33,7 +33,6 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
     Vector *X = (Vector *)smalloc(2*size);
     Vector *X_e = X;                             // even sites
-
     Vector *X_o = X+GJP.VolNodeSites()/2;  // odd sites
 
     // The argument frm should have the CG solution.

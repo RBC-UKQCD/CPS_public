@@ -43,7 +43,7 @@ int main(int argc,char *argv[]){
     do_arg.x_bc = BND_CND_PRD;
     do_arg.y_bc = BND_CND_PRD;
     do_arg.z_bc = BND_CND_PRD;
-    do_arg.t_bc = BND_CND_APRD;
+    do_arg.t_bc = BND_CND_PRD;
     do_arg.start_conf_kind = START_CONF_ORD;
     do_arg.start_seed_kind = START_SEED_FIXED;
     do_arg.beta = 5.5;
@@ -123,7 +123,7 @@ int main(int argc,char *argv[]){
 		
 
     FILE *fp;
-    if( (fp = fopen("update.dat.all", "w")) == NULL ) 
+    if( (fp = fopen("update.dat", "w")) == NULL ) 
 	ERR.FileA(" ","main", "update.dat");
     
 
@@ -139,7 +139,7 @@ int main(int argc,char *argv[]){
  			    s[0], s[1], s[2], s[3], n/4);
 
 		    for(int d=0; d<4; d++){
-			printf("\n         %d\n\n", d);
+			fprintf(fp, "\n         %d\n\n", d);
 			for(int i=0; i<3; i++){
 			    for(int j=0; j<3; j++)
 				fprintf(fp, " (%+7e %+7e)",

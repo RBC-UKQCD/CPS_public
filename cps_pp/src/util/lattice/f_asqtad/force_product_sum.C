@@ -3,7 +3,7 @@
 /*!\file
   \brief Helper routines for the fermionic force term
 
-  $Id: force_product_sum.C,v 1.2 2004-05-10 15:26:55 zs Exp $
+  $Id: force_product_sum.C,v 1.3 2004-06-02 11:03:19 zs Exp $
 */
 //--------------------------------------------------------------------
 
@@ -31,11 +31,7 @@ void Fasqtad::force_product_sum(const Matrix *v,  int dir,
 		    int  n = FsiteOffset(s); 
 		    m.DotMEqual(v[n], *(GaugeField()+GsiteOffset(s)+dir));
 		    md.Dagger(m);
-#ifdef MILC_COMPATIBILITY
 		    if(parity(s)==CHKB_ODD) md *= -coeff;
-#else
-		    if(parity(s)==CHKB_EVEN) md *= -coeff; 
-#endif
 		    else md *= coeff;
 		    f[n] += md;
 		}
@@ -58,11 +54,7 @@ void Fasqtad::force_product_sum(const Matrix *u, const Matrix *v,
 		    int n = FsiteOffset(s);
 		    m.DotMEqual(v[n], w[n]);
 		    md.Dagger(m);
-#ifdef MILC_COMPATIBILITY
 		    if(parity(s)==CHKB_ODD) md *= -coeff;
-#else
-		    if(parity(s)==CHKB_EVEN) md *= -coeff;
-#endif
 		    else md *= coeff;
 		    f[n].DotMPlus(u[n], md);
 		}    
@@ -85,11 +77,7 @@ void Fasqtad::force_product_sum(const Matrix *v, const Matrix *w,
 		    int n = FsiteOffset(s);
 		    md.Dagger(w[n]);
 		    m.DotMEqual(v[n], md);
-#ifdef MILC_COMPATIBILITY
 		    if(parity(s)==CHKB_ODD) m *= -coeff;
-#else
-		    if(parity(s)==CHKB_EVEN) m *= -coeff;
-#endif
 		    else m *= coeff;
 		    f[n] += m;
 		}
@@ -111,11 +99,7 @@ void Fasqtad::force_product_d_sum(const Matrix *v, const Matrix *w,
 		    n = FsiteOffset(s);
 		    m.DotMEqual(v[n], w[n]);
 		    md.Dagger(m);
-#ifdef MILC_COMPATIBILITY
 		    if(parity(s)==CHKB_ODD) md *= -coeff;
-#else
-		    if(parity(s)==CHKB_EVEN) md *= -coeff;
-#endif
 		    else md *= coeff;
 		    f[n] += md;
 		}
@@ -146,11 +130,7 @@ void Fasqtad::force_product_sum(const Vector *v, const Vector *w,
 // Note the extra factor of 2 from Matrix::Cross2; this is corrected by
 // the factor of 1/2 in Matrix::TrLessAntiHermMatrix used in
 // Fasqtad::update_momenta.
-#ifdef MILC_COMPATIBILITY
 		    if(parity(s)==CHKB_ODD) m *= -coeff;    
-#else
-		    if(parity(s)==CHKB_EVEN) m *= -coeff;    
-#endif
 		    else m *= coeff;
 		    f[n] += m;
 		}

@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.3 2004-06-02 09:36:41 zs Exp $
+  $Id: main.C,v 1.4 2004-06-02 11:03:19 zs Exp $
 */
 
 /* Quick Wilson Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -59,11 +59,10 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   // Set verbose level
   //----------------------------------------------------------------
-  VRB.DeactivateAll();
-  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
-  VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
-  
-  char *cname = "asqtad_hmc";
+
+  VRB.Level(0);
+  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
+  char *cname = "asqtad_hmd_r";
   char *fname = "main";
   VRB.Func(cname,fname);
 
@@ -206,6 +205,12 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.start_conf_kind = START_CONF_DISORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
   do_arg.beta = 5.6;
+<<<<<<< main.C
+  do_arg.xi_bare = 1;
+  do_arg.xi_v = 1;
+  do_arg.xi_v_xi = 1;
+=======
+>>>>>>> 1.3
   do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
   do_arg.asqtad_naik = -1.0/24.0;
   do_arg.asqtad_lepage = -1.0/16;
@@ -231,11 +236,17 @@ void setup_hmd_arg(HmdArg& hmd_arg)
   hmd_arg.frm_mass[0] = 0.1;
   hmd_arg.frm_flavors[0] = 2;
   hmd_arg.n_bsn_masses = 0;
+<<<<<<< main.C
+  hmd_arg.max_num_iter[0] = 100;
+  hmd_arg.stop_rsd[0] = 1.0E-6;
+  hmd_arg.step_size = 0.001;
+=======
   hmd_arg.max_num_iter[0] = 500;
   hmd_arg.stop_rsd[0] = 1.0E-6;
   hmd_arg.step_size = 0.02;
+>>>>>>> 1.3
   hmd_arg.steps_per_traj = 50;
-  hmd_arg.metropolis = METROPOLIS_NO;
+  hmd_arg.metropolis = METROPOLIS_YES;
   hmd_arg.reunitarize = REUNITARIZE_YES;
 
 }

@@ -3,7 +3,7 @@
 ///
 
 /*!----------------------------------------------------------------------
-  $Id: main.C,v 1.4 2004-06-02 09:36:42 zs Exp $
+  $Id: main.C,v 1.5 2004-06-02 11:03:19 zs Exp $
   Test Asqtad dirac operator code.	
 
    This is a simple regression test of the Asqtad inverter.
@@ -130,12 +130,10 @@ int main(int argc,char *argv[])
     int time_size=GJP.Tnodes()*GJP.TnodeSites();
 
     if( time_size != good_size )
-    {
-	printf("Error:: time_size = %d != good_size = %d\n",
-	       time_size,good_size) ; 
-	exit(0) ; 
-    }
+	ERR.General("", "main", "time_size = %d != good_size = %d\n",
+		    time_size,good_size);
 
+    
     Float* pion_corr = (Float*)smalloc(time_size*sizeof(IFloat));
 
     GwilsonFasqtad lat;

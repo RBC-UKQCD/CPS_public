@@ -7,7 +7,7 @@
   Separated from the rest of qcdio.h to avoid troublesome
   header file interdependancies.
 
-  $Id: qcdio_qprintf.h,v 1.3 2004-06-02 09:36:38 zs Exp $  
+  $Id: qcdio_qprintf.h,v 1.4 2004-06-02 11:03:19 zs Exp $  
 */
 /*  A.N.Jackson: ajackson@epcc.ed.ac.uk                       */
 /*----------------------------------------------------------*/
@@ -21,7 +21,7 @@
 
 #if TARGET == cpsMPI
 
-namespace cps{
+CPS_BEGIN_NAMESPACE
 
 namespace MPISCU{
   //! Reimplementation of printf that prints from only a single node
@@ -39,8 +39,10 @@ namespace MPISCU{
   //! Reimplementation of fprintf that prints on all nodes
   int fprintf_all( FILE *stream, const char *format, ... );
 }
+
+
+CPS_END_NAMESPACE
+
+#endif
 #endif
 
-} //CPS_END_NAMESPACE
-
-#endif
