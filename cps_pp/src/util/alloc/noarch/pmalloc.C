@@ -2,20 +2,18 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: pmalloc.C,v 1.3 2004-09-02 16:58:08 zs Exp $
+  $Id: pmalloc.C,v 1.4 2004-10-27 14:24:31 zs Exp $
 */
 
 #include <util/verbose.h>
 #include <util/error.h>
 #include <stdlib.h>
+#include <util/smalloc.h>
 
 CPS_START_NAMESPACE
 
-void* pmalloc(int request){
-    void *p = malloc(request);
-    if(!p) ERR.Pointer("","pmalloc","");
-    VRB.Pmalloc("","pmalloc","", p, request);
-    return p;
+void* pmalloc(size_t request){
+    return smalloc(request, "", "pmalloc");
 }
 
 void pfree(void* p){

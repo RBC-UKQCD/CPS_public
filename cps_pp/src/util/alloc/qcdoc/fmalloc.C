@@ -2,24 +2,28 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: fmalloc.C,v 1.6 2004-10-14 22:09:59 chulwoo Exp $
+  $Id: fmalloc.C,v 1.7 2004-10-27 14:24:31 zs Exp $
 */
 
 #include <util/error.h>
 #include <util/verbose.h>
 #include <qcdoc_align.h>
 #include <qalloc.h>
+#include <util/smalloc.h>
 
 CPS_START_NAMESPACE
 
-void* fmalloc(int request){
+void* fmalloc(size_t request,
+	      const char *vname, const char *fname, const char *cname){
     void *p = qalloc(QFAST,request);
-    if (!p) p = qalloc(QCOMMS,request);
+    if (!p) return smalloc(request, cname, fname, vname);
     return p;
 }
 
-void ffree(void* p){
-  qfree(p);
+void ffree(void* p,
+	   const char *vname, const char *fname, const char *cname){
+    VRB.Sfree(cname, fname, vname, p);
+    qfree(p);
 }
 
 

@@ -3,12 +3,13 @@
   \file
   \brief Functions for dynamical array allocation.
 
-  $Id: amalloc.C,v 1.6 2004-09-23 18:19:58 zs Exp $
+  $Id: amalloc.C,v 1.7 2004-10-27 14:24:30 zs Exp $
 */
 #include <util/smalloc.h>
 #include <stdarg.h>
 #include <stddef.h>
-#include <util/error.h>
+#include <util/verbose.h>
+
 
 CPS_START_NAMESPACE
 
@@ -24,6 +25,9 @@ CPS_START_NAMESPACE
   \param index  Recursion depth - the array index of this subarray
 */
 //  ------------------------------------------------------------
+
+
+static const size_t alignment = 128;
 
 static void subarray(size_t size, int n_dim, int n_ptr,
 	      void ***prev, void **start, int *dimension, int index){
@@ -41,12 +45,12 @@ static void subarray(size_t size, int n_dim, int n_ptr,
 
     }else{		// Last recursion; set up pointers to data   
 
-	// The data should lie on a 'size'-byte boundary, so, if necessary,
-	// we move 'start' to the next 'size'-byte boundary.
+	// The data should lie on a 'align'-byte boundary, so, if necessary,
+	// we move 'start' to the next 'align'-byte boundary.
 	// We allocated additional space for this using 'align_pad' in amalloc.
-
-	if(0!=(long)start%(long)size)
-	    start = (void**)(((long)start/(long)size+1)*(long)size);
+	
+	if(0!=(long)start%alignment)
+	    start = (void**)(((long)start/alignment+1)*alignment);
 
   	for(i=0; i<n_ptr; i++){ 
   	    char **previ = (char**)&prev[i]; 
@@ -68,13 +72,17 @@ static void subarray(size_t size, int n_dim, int n_ptr,
 
   The data is stored in the usual C order.
 
+  \param allocator Pointer to the function allocating the memory <em>viz.</em>
+  ::smalloc or ::fmalloc.
   \param size The size (in bytes) of the elements of the array.
   \param n_dim The dimensionality of the array.
   \param ... The dimensions of the array.
   \return A pointer to the allocated memory
 */
 
-void *amalloc(size_t size, int n_dim, ...){
+void *amalloc(void*  (*allocator)(size_t, const char *vname="",
+			  const char *fname="smalloc", const char *cname=""),
+	      size_t size, int n_dim, ...){
 
 /*
   The first bit of data in the array are pointers which point to the data
@@ -84,7 +92,6 @@ void *amalloc(size_t size, int n_dim, ...){
 */
 
     int *dimension = (int*)smalloc(n_dim*sizeof(int));
-    if(!dimension) ERR.Pointer("", "amalloc", "dimension");
 
     // Count the pointers and data elements in the array. 
 
@@ -102,23 +109,36 @@ void *amalloc(size_t size, int n_dim, ...){
 
     // Allocate the memory for the data and the pointers. 
 
-    // smalloc will align the pointers correctly. We should
-    // align the data on a boundary which is a multiple of 'size' so let's
+    // The allocator will align the pointers correctly. We should
+    // align the data on a boundary which is a multiple of 128 bytes so let's
     // pad the array so there is space to realign the data if necessary.
-    const int align_pad = 1;
-    
-    void **start = (void**)smalloc((size_t)((n_data+align_pad)*size)+n_ptr*sizeof(void*));
-    if(!start) return 0;//ERR.Pointer("", "amalloc", "start");
+
+  
+    // if the size of all the pointers happens to be a multiple of the
+    //alignment length  then no padding is necessary here, right?
+    size_t align;   
+    if(n_ptr*sizeof(void*)%align==0) align = 0;
+    else align = alignment;
+
+    void **start = (void**)allocator(n_data*size+align+n_ptr*sizeof(void*));
+
 
     // Set up the pointers.
 		   
     void **p;
     subarray(size, n_dim-1, 1, &p, start, dimension, 0);
 
+    VRB.Smalloc("","amalloc","", start,
+		n_data*size+align+n_ptr*sizeof(void*));
+    
     sfree(dimension);
     return (void*)start;
 
 }
+
+
+
+
 
 
 CPS_END_NAMESPACE

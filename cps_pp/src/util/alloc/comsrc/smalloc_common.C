@@ -2,43 +2,27 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc_common.C,v 1.4 2004-10-14 22:09:59 chulwoo Exp $
+  $Id: smalloc_common.C,v 1.5 2004-10-27 14:24:31 zs Exp $
 */
 
 #include <util/smalloc.h>
-#include <util/error.h>
-#include <util/verbose.h>
 
 CPS_START_NAMESPACE
 
-void* smalloc(char *cname, char *fname, char *vname, int request){
-  if (request < 1)
-    ERR.General(cname,fname,"requested size of %s is %d\n",vname,request);
-  void *p = smalloc(request);
-  if (p == 0)
-    ERR.Pointer(cname,fname,vname);
-  VRB.Smalloc(cname,fname,vname,p,request);
-  return p;
-}
-void sfree(char *cname, char *fname, char *vname, void *p){
-  VRB.Sfree(cname,fname,vname,p);
-  if (p == 0)
-    ERR.Pointer(cname,fname,vname);
-  sfree(p);
+void* smalloc(const char *cname, const char *fname, const char *vname, size_t request){
+    return smalloc(request, vname, fname, cname);
 }
 
-void* fmalloc(char *cname, char *fname, char *vname, int request){
-  void *p = fmalloc(request);
-  if (p == 0)
-    ERR.Pointer(cname,fname,vname);
-  VRB.Smalloc(cname,fname,vname,p,request);
-  return p;
+void sfree(const char *cname, const char *fname, const char *vname, void *p){
+    return sfree(cname, fname, vname, p);
 }
-void ffree(char *cname, char *fname, char *vname, void *p){
-  VRB.Sfree(cname,fname,vname,p);
-  if (p == 0)
-    ERR.Pointer(cname,fname,vname);
-  ffree(p);
+
+void* fmalloc(const char *cname, const char *fname, const char *vname, size_t request){
+  return fmalloc(cname, fname, vname, request);
+}
+
+void ffree(const char *cname, const char *fname, const char *vname, void *p){
+    return ffree(cname, fname, vname, p);
 }
 
 CPS_END_NAMESPACE
