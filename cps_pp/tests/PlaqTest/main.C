@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v 1.8 2004-08-18 11:58:09 zs Exp $
-//  $Id: main.C,v 1.8 2004-08-18 11:58:09 zs Exp $
+//  $Date: 2004-08-18 12:17:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v 1.9 2004-08-18 12:17:36 zs Exp $
+//  $Id: main.C,v 1.9 2004-08-18 12:17:36 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v $
 //  $State: Exp $
 //
@@ -42,7 +42,7 @@ int main(int argc,char *argv[]) {
 
     DoArg do_arg;
 
-    do_arg.x_node_sites = 3;
+    do_arg.x_node_sites = 4;
     do_arg.y_node_sites = 4;
     do_arg.z_node_sites = 4;
     do_arg.t_node_sites = 4;
