@@ -26,6 +26,10 @@ USING_NAMESPACE_CPS
 const char *f_asqtad_test_filename = CWDPREFIX("f_asqtad_test");
 const char *psi_filename = CWDPREFIX("psi");
 
+const int nx=4;
+const int ny=4;
+const int nz=4;
+const int nt=4;
 
 
 int main(int argc,char *argv[]){
@@ -43,18 +47,23 @@ int main(int argc,char *argv[]){
     //----------------------------------------------------------------
     DoArg do_arg;
 
-    do_arg.x_node_sites = 4;
-    do_arg.y_node_sites = 4;
-    do_arg.z_node_sites = 4;
-    do_arg.t_node_sites = 4;
-    do_arg.s_node_sites = 0;
 #if TARGET == QCDOC
+    do_arg.x_node_sites = nx/SizeX();
+    do_arg.y_node_sites = ny/SizeY();
+    do_arg.z_node_sites = nz/SizeZ();
+    do_arg.t_node_sites = nt/SizeT();
+    do_arg.s_node_sites = 0;
     do_arg.x_nodes = SizeX();
     do_arg.y_nodes = SizeY();
     do_arg.z_nodes = SizeZ();
     do_arg.t_nodes = SizeT();
     do_arg.s_nodes = 1;
 #else
+    do_arg.x_node_sites = nx;
+    do_arg.y_node_sites = ny;
+    do_arg.z_node_sites = nz;
+    do_arg.t_node_sites = nt;
+    do_arg.s_node_sites = 0;
     do_arg.x_nodes = 1;
     do_arg.y_nodes = 1;
     do_arg.z_nodes = 1;
@@ -65,9 +74,16 @@ int main(int argc,char *argv[]){
     do_arg.y_bc = BND_CND_PRD;
     do_arg.z_bc = BND_CND_PRD;
     do_arg.t_bc = BND_CND_PRD;
-//    do_arg.start_conf_kind = START_CONF_ORD;
+#if 1
+#if 1
+    do_arg.start_conf_kind = START_CONF_ORD;
+#else
+    do_arg.start_conf_kind = START_CONF_DISORD;
+#endif
+#else
     do_arg.start_conf_kind = START_CONF_LOAD;
     do_arg.start_conf_load_addr = (Matrix *)Gauge_edram;
+#endif
     do_arg.start_seed_kind = START_SEED_FIXED;
     do_arg.colors = 3;
     do_arg.beta = 5.5;
@@ -120,7 +136,14 @@ int main(int argc,char *argv[]){
 
     int s[4];
 #if 0
+#if 0
     Vector *X_in = (Vector *) Source_edram;
+#else
+    Vector *X_in =
+	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+    if(!X_in) ERR.Pointer("","","X_in");
+	lat.RandGaussVector(X_in,1.0);
+#endif
 #else
     Vector *X_in =
 	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
@@ -139,7 +162,11 @@ int main(int argc,char *argv[]){
 			IFloat *temp_p = (IFloat *)(gf+4*n+3);
 
 		    IFloat crd = 1.0*s[0]+0.1*s[1]+0.01*s[2]+0.001*s[3];
+#if TARGET==QCDOC
 		  if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0 &&n==0) crd=1.0; else crd = 0.0;
+#else
+	if(n==0) crd = 1.0; else crd = 0.0;
+#endif
 					
 		    for(int v=0; v<6; v+=2){ 
 			if (v==0)
@@ -175,6 +202,8 @@ int main(int argc,char *argv[]){
 		}
 		lat.Fconvert(out,CANONICAL,STAG);
 		lat.Fconvert(X_in,CANONICAL,STAG);
+		X_out2->FTimesV1PlusV2(2*cg_arg.mass,out,X_out2,GJP.VolNodeSites
+()*lat.FsiteSize());
     
     
     Float dummy;
@@ -190,14 +219,23 @@ if (k==0)    fprintf(fp," x y z t\n");
 		    int n = lat.FsiteOffset(s);
 			unsigned long  *pt = (unsigned long *)&X_out[n];
 			unsigned long  *pt2 = (unsigned long *)&result[n];
-		    if ( k==0 )
-				fprintf(fp," %d %d %d %d\n", s[0], s[1], s[2], s[3]);
 			for(int i=0; i<3; i++){
+#if TARGET == QCDOC
 		    if ( k==0 )
-				fprintf(fp," (%0.7e %0.7e) (%0.7e %0.7e) (%0.7e %0.7e)\n",
+				fprintf(fp," %d %d %d %d %d ", CoorX()*GJP.NodeSites(0)+s[0], CoorY()*GJP.NodeSites(1)+s[1], CoorZ()*GJP.NodeSites(2)+s[2], CoorT()*GJP.NodeSites(3)+s[3], i);
+#else
+		    if ( k==0 )
+				fprintf(fp," %d %d %d %d %d ", s[0], s[1], s[2], s[3], i);
+#endif
+		    if ( k==0 )
+				fprintf(fp," (%0.7e %0.7e) (%0.7e %0.7e) (%0.2e %0.2e)\n",
 				*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
 				*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1),
+#if 0
 				*((IFloat*)&X_out2[n]+i*2), *((IFloat*)&X_out2[n]+i*2+1));
+#else
+				*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1));
+#endif
 				for (int j = 0; j<4;j++)
 				if( k !=0 )
 				if(*(pt2+j) != *(pt +j)){
