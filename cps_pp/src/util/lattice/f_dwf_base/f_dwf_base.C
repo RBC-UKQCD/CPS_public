@@ -3,6 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
+  $Id: f_dwf_base.C,v 1.16 2004-11-09 18:34:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -221,7 +222,8 @@ int FdwfBase::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   //Fake the constructor
   DiracOpDwf dwf(*this, f_out[0], f_in, cg_arg, cnv_frm);
   cg_arg->true_rsd = RsdCG[isz];
-  int return_value =  dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+//  return dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+  int return_value= dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
   delete[] RsdCG;
   return return_value;
 }
@@ -475,7 +477,7 @@ void FdwfBase::Ffive2four(Vector *four, Vector *five, int s_u, int s_l)
 }
 
 //------------------------------------------------------------------
-// int FeigSolv(Vector **f_eigenv, Float lambda[], int valid_eig[],
+// int FeigSolv(Vector **f_eigenv, Float *lambda, int *valid_eig,
 //              EigArg *eig_arg, 
 //              CnvFrmType cnv_frm = CNV_FRM_YES):
 // It solve  A * f_eigenv = lambda * f_eigenv where
@@ -487,8 +489,8 @@ void FdwfBase::Ffive2four(Vector *four, Vector *five, int s_u, int s_l)
 // f_eigenv is defined on the whole lattice.
 // The function returns the total number of Ritz iterations.
 //------------------------------------------------------------------
-int FdwfBase::FeigSolv(Vector **f_eigenv, Float lambda[],
-		      Float chirality[], int valid_eig[],
+int FdwfBase::FeigSolv(Vector **f_eigenv, Float *lambda,
+		      Float *chirality, int *valid_eig,
 		      Float **hsum,
 		      EigArg *eig_arg, 
 		      CnvFrmType cnv_frm)
@@ -526,14 +528,8 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float lambda[],
 
   // calculate chirality
   int f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents();
-  Vector *four = (Vector *) smalloc (f_size * sizeof(Float));
-  if (four == 0)
-    ERR.Pointer (cname, fname, "four");
-  VRB.Smalloc (cname,fname, "four", four, f_size * sizeof(Float));
-  Vector *fourg5 = (Vector *) smalloc (f_size * sizeof(Float));
-  if (fourg5 == 0)
-    ERR.Pointer (cname, fname, "fourg5");
-  VRB.Smalloc (cname,fname, "fourg5", fourg5, f_size * sizeof(Float));
+  Vector *four = (Vector *) smalloc (cname,fname, "four", f_size * sizeof(Float));
+  Vector *fourg5 = (Vector *) smalloc (cname,fname, "fourg5", f_size * sizeof(Float));
   Float help;
 
   for (i=0; i<N_eig; i++) {
@@ -557,11 +553,7 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float lambda[],
       for(int i=0; i < N_eig; ++i)
 	Fconvert(f_eigenv[i], CANONICAL, StrOrd());
 
-    Float *f_in = (Float *) 
-      smalloc (GJP.VolNodeSites()*GJP.SnodeSites()*sizeof(Float));
-    if (f_in == 0)
-      ERR.Pointer(cname, fname, "f_in");
-    VRB.Smalloc(cname, fname, "f_in", f_in, 
+    Float *f_in = (Float *) smalloc (cname, fname, "f_in", 
 		GJP.VolNodeSites()*GJP.SnodeSites()*sizeof(Float));
     
     for(i=0; i < N_eig; ++i) {
@@ -579,10 +571,10 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float lambda[],
       f_eigenv[i]->SliceArraySumFive (hsum[i], f_in, eig_arg->hsum_dir);
     }
 
-    VRB.Sfree(cname, fname, "f_in", f_in);
-    sfree(f_in);
+    sfree(cname, fname, "f_in", f_in);
   }
-
+  sfree(cname,fname, "four",four);
+  sfree(cname,fname, "fourg5",fourg5);
   // Return the number of iterations
   return iter;
 }
@@ -622,6 +614,7 @@ void FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 
 #define PROFILE
 
+// CJ: change start
 //------------------------------------------------------------------
 // EvolveMomFforce(Matrix *mom, Vector *chi, Float mass, 
 //                 Float step_size):
@@ -871,6 +864,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
  
   return ;
 }
+// CJ: change end
 
 void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				    Float *alpha, Float mass, Float dt,
@@ -925,15 +919,9 @@ Float FdwfBase::BhamiltonNode(Vector *boson, Float mass){
 
   int f_size = GJP.VolNodeSites() * FsiteSize() / 2 ;
 
-  Vector *bsn_tmp = (Vector *)
-    smalloc(f_size*sizeof(Float));
-
   char *str_tmp = "bsn_tmp" ;
-
-  if (bsn_tmp == 0)
-    ERR.Pointer(cname,fname,str_tmp) ;
-
-  VRB.Smalloc(cname,fname,str_tmp,bsn_tmp,f_size*sizeof(Float));
+  Vector *bsn_tmp = (Vector *)
+    smalloc(cname,fname,str_tmp,f_size*sizeof(Float));
 
   DiracOpDwf dwf(*this, boson, bsn_tmp, &cg_arg, CNV_FRM_NO) ;
 
@@ -941,9 +929,7 @@ Float FdwfBase::BhamiltonNode(Vector *boson, Float mass){
 
   Float ret_val = bsn_tmp->NormSqNode(f_size) ;
 
-  VRB.Sfree(cname,fname,str_tmp,bsn_tmp);
-
-  sfree(bsn_tmp) ;
+  sfree(cname,fname,str_tmp,bsn_tmp);
 
   // Sum accross s nodes in case Snodes() != 1
   glb_sum_dir(&ret_val, 4) ;
