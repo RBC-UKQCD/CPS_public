@@ -3,18 +3,21 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.4 2003-08-29 20:43:59 mike Exp $
+  $Id: lattice.h,v 1.5 2003-09-03 21:41:22 mike Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: mike $
-//  $Date: 2003-08-29 20:43:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.4 2003-08-29 20:43:59 mike Exp $
-//  $Id: lattice.h,v 1.4 2003-08-29 20:43:59 mike Exp $
+//  $Date: 2003-09-03 21:41:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.5 2003-09-03 21:41:22 mike Exp $
+//  $Id: lattice.h,v 1.5 2003-09-03 21:41:22 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.4  2003/08/29 20:43:59  mike
+//  Small bug fixes to RHMC related material.
+//
 //  Revision 1.3  2003/08/29 20:27:38  mike
 //  Added new function prepForce for use by RHMC to avoid storing Dslash psi for all
 //  evaluated poles simultaneusly.
@@ -72,7 +75,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -1411,6 +1414,24 @@ class Fnone : public virtual Lattice
 
     Float BhamiltonNode(Vector *boson, Float mass);
         // The boson Hamiltonian of the node sublattice.
+
+    int FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
+		 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
+      {
+	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
+	VRB.Func(cname, fname);
+	ERR.General(cname,fname,"MatMInv not yet implemented for Wilson fermions");
+	return 0;
+      }
+    
+    
+    void prepForce(Vector* out) 
+      {
+	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
+	VRB.Func(cname, fname);
+	ERR.General(cname,fname,"MatMInv not yet implemented for Wilson fermions");
+      }
+
 };
 
 
@@ -1835,6 +1856,11 @@ class FwilsonTypes : public virtual Lattice
 
     FwilsonTypes(void);
 
+    virtual ~FwilsonTypes(void);
+
+    //! Multiplication of a lattice spin-colour vector by gamma_5.
+    void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
+
     int FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
 		 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
       {
@@ -1845,10 +1871,12 @@ class FwilsonTypes : public virtual Lattice
       }
     
     
-    virtual ~FwilsonTypes(void);
-
-    //! Multiplication of a lattice spin-colour vector by gamma_5.
-    void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
+    void prepForce(Vector* out) 
+      {
+	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
+	VRB.Func(cname, fname);
+	ERR.General(cname,fname,"MatMInv not yet implemented for Wilson fermions");
+      }
 };
 
 
