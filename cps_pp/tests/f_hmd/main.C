@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-30 04:46:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.11 2004-08-30 04:46:19 chulwoo Exp $
-//  $Id: main.C,v 1.11 2004-08-30 04:46:19 chulwoo Exp $
+//  $Date: 2004-08-30 05:25:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.12 2004-08-30 05:25:32 chulwoo Exp $
+//  $Id: main.C,v 1.12 2004-08-30 05:25:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -113,13 +113,13 @@ int main(int argc,char *argv[])
   hmd_arg.n_bsn_masses = 0;
   hmd_arg.max_num_iter[0] = 500;
   hmd_arg.stop_rsd[0] = 1.0E-6;
-  hmd_arg.step_size = 0.01;
-  hmd_arg.steps_per_traj = 50;
+  hmd_arg.step_size = 0.02;
+  hmd_arg.steps_per_traj = 25;
   hmd_arg.metropolis = METROPOLIS_NO;
   hmd_arg.reunitarize = REUNITARIZE_YES;
 
 
-#if 0
+#if 1
   //----------------------------------------------------------------
   // Run HMC Phi Wilson
   //----------------------------------------------------------------
@@ -238,7 +238,7 @@ int main(int argc,char *argv[])
   }
 #endif
 
-#if 0
+#if 1
   //----------------------------------------------------------------
   // Run HMC Phi Clover
   //----------------------------------------------------------------
