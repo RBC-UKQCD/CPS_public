@@ -3,18 +3,24 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: lattice.h,v 1.3 2003-08-29 20:27:38 mike Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.2 2003-07-24 16:53:53 zs Exp $
-//  $Id: lattice.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Author: mike $
+//  $Date: 2003-08-29 20:27:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.3 2003-08-29 20:27:38 mike Exp $
+//  $Id: lattice.h,v 1.3 2003-08-29 20:27:38 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2003/07/24 16:53:53  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.9  2002/12/04 17:16:27  zs
 //  Merged the new 2^4 RNG into the code.
 //  This new RNG is implemented in the LatRanGen class.
@@ -62,7 +68,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -804,6 +810,9 @@ class Lattice
       \return The number of solver iterations.
       \post \a f_out contains the solution vector.
     */
+    
+    virtual int FmatMInv(Vector **f_out, Vector *f_in, Float *shift, 
+			 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm) = 0;
 
     virtual int FeigSolv(Vector **f_eigenv, Float lambda[], 
 			 Float chirality[], int valid_eig[],
@@ -859,6 +868,8 @@ class Lattice
       \post \a mom is assigned the value of the momentum after the molecular
       dynamics evolution.
     */
+
+    virtual void prepForce(Vector *out) = 0;
 
     virtual Float FhamiltonNode(Vector *phi, Vector *chi) = 0;
     //!< Computes the pseudofermionic action on the local sublattice.
@@ -1503,6 +1514,10 @@ class Fstag : public virtual FstagTypes
 		PreserveType prs_f_in = PRESERVE_YES);
         // Same as original but with true_res=0;
 
+    int FmatMInv(Vector **f_out, Vector *f_in, Float *shift,
+		 int Nshift, int isz, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm);
+
     int FeigSolv(Vector **f_eigenv, Float lambda[], 
 		 Float chirality[], int valid_eig[],
 		 Float **hsum,
@@ -1530,9 +1545,11 @@ class Fstag : public virtual FstagTypes
         // the pseudofermion field.
 
     void EvolveMomFforce(Matrix *mom, Vector *frm, 
-				 Float mass, Float step_size);
+			 Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
+
+    void prepForce(Vector* out);
 
     Float FhamiltonNode(Vector *phi, Vector *chi);
         // The fermion Hamiltonian of the node sublattice.
@@ -1770,6 +1787,16 @@ class FwilsonTypes : public virtual Lattice
 
     FwilsonTypes(void);
 
+    int FmatMInv(Vector **out, Vector *in, Float *shift, 
+		 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
+      {
+	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
+	VRB.Func(cname, fname);
+	ERR.General(cname,fname,"MatMInv not yet implemented for Wilson fermions");
+	return 0;
+      }
+    
+    
     virtual ~FwilsonTypes(void);
 
     //! Multiplication of a lattice spin-colour vector by gamma_5.
