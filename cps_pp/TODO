@@ -1,0 +1,23 @@
+# started by CJ. 12/01/04
+# It is meant to be the list of things to be done.
+# Please feel free to add
+
+To-do list:
+# Please move entries to Done: with the date and the branch/tag number
+# when finished. The entry numbers are meant to be permanant.
+
+1. RHMC force term should be checked after merging Mike Clark(MC)'s
+improvement.
+Started branch/tag: v4_8_9 date: 12/01/04
+# Finished branch/tag: ??    date: ???
+
+2. Parameter serialization via VML
+Started branch/tag: vml date: ??
+# Finished branch/tag: ??    date: ???
+
+3. DWF force term improvement: Merging Pauli-vilars to the normal force
+term
+Started branch/tag: v4_8_10 date: 12/01/04
+# Finished branch/tag: ??    date: ???
+
+Done:
