@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.17 2004-12-01 06:38:19 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.18 2005-02-11 23:53:39 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -614,6 +614,7 @@ void FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 
 #define PROFILE
 
+#if 0
 // CJ: change start
 //------------------------------------------------------------------
 // EvolveMomFforce(Matrix *mom, Vector *chi, Float mass, 
@@ -865,6 +866,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   return ;
 }
 // CJ: change end
+#endif
 
 void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector *sol, int degree,
 				    Float *alpha, Float mass, Float dt,

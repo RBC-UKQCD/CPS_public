@@ -1,7 +1,7 @@
 NORECURSE_DIR = qcdoc qcdsp noarch mpi CVS 
-QCDOC_DIR = qcdsp
+QCDOC_DIR = qcdoc
 QCDOC_SERIAL_DIR = qcdoc
-QCDSP_DIR = qcdsp
+QCDSP_DIR = noarch
 MPI_DIR = mpi
 NOARCH_DIR = noarch
 include ../../../../Makefile.rules
