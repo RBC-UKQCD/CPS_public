@@ -4,72 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.2 2004-07-01 21:22:36 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 21:22:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.2 2004-07-01 21:22:36 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.2 2004-07-01 21:22:36 chulwoo Exp $
+//  $Date: 2004-07-01 21:26:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.3 2004-07-01 21:26:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.1.4.2  2004/06/16 00:17:56  chulwoo
-//  *** empty log message ***
-//
-//  Revision 1.1.4.1  2004/06/09 04:31:54  chulwoo
-//  *** empty log message ***
-//
-//  Revision 1.1.2.1  2004/05/20 14:36:31  pab
-//  Files for three optimised dirac operators.
-//  Added some patches to the ReadLattice too.
-//
-//  Revision 1.2  2003/07/24 16:53:54  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.8  2002/03/11 22:27:04  anj
-//  This should now be the correct, fully merged code from our two versions. Anj
-//
-//  Revision 1.5.2.1  2002/03/08 16:36:38  anj
-//  Checking in the Columbia code branch on tag Columbia4_1_1_test-branch, to be
-//  merged with the UKQCD head branch shortly.  Anj
-//
-//  Revision 1.5  2001/08/16 12:54:29  anj
-//  Some fixes follosin the float-> IFloat change, mostly of the (variable
-//  anme) IFloat_p -> float_p type.  A few fixes to ensure the test
-//  programs use the same level of verbosity throughout, and an update of
-//  the regression.pl script to make it more useful. Anj
-//
-//  Revision 1.4  2001/08/16 10:50:17  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:12:38  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:05  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v $
 //  $State: Exp $
 //
