@@ -22,35 +22,32 @@ FILE *Fopen( FileIoType type, const char *filename, const char *mode){
 }
 
 int Fclose( FileIoType type, FILE *stream){
-//  if ( type == ZERO_ONLY && UniqueID() ) return 1;
   if ( stream == &FAKE )  return 1;
   return fclose(stream);
 }
 
 int Fprintf( FileIoType type, FILE *stream, const char *format,...){
-//  if ( type == ZERO_ONLY && UniqueID() ) return 1;
   if ( stream == &FAKE )  return 1;
-#if 0
-  {
-     ERR.General("","Fprintf()","Trying to write to a fake file pointer, (did you open without ADD_ID option?)\n");
-  }
-#endif
   va_list args;
   va_start(args,format);
-  return vfprintf(stream,format,args);
+  int nb = vfprintf(stream, format, args);
+  va_end(args);
+  return nb;
 }
 
 int Fprintf( FILE *stream, const char *format,...){
-//  if ( UniqueID() ) return 1;
   if ( stream == &FAKE )  return 1;
   va_list args;
   va_start(args,format);
-  return vfprintf(stream,format,args);
+  int nb = vfprintf(stream, format, args);
+  va_end(args);
+  return nb;
 }
 
 int Vfprintf( FileIoType type, FILE *stream, const char *format, va_list ap){
-//  if ( type == ZERO_ONLY && UniqueID() ) return 1;
   if ( stream == &FAKE )  return 1;
-  return vfprintf(stream, format, ap);
+  int nb = vfprintf(stream, format, ap);
+  va_end(args);
+  return nb;
 }
 CPS_END_NAMESPACE
