@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.11 2004-09-04 07:23:13 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.12 2004-09-17 18:11:21 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -1516,7 +1516,7 @@ int non_local_count_3[3][2];
        ERR.Pointer(cname,fname, "uc_l[i]");
  
 #ifndef SIMUL_U
-    uc_nl[i] = (IFloat*)malloc( MATRIX_SIZE * ((non_local_chi +non_local_chi_3)/2) * sizeof(IFloat) );
+    uc_nl[i] = (IFloat*)smalloc( MATRIX_SIZE * ((non_local_chi +non_local_chi_3)/2) * sizeof(IFloat) );
     for(int j=0;j<MATRIX_SIZE*(non_local_chi+non_local_chi_3)/2;j++)
 	uc_nl[i][j]=0.;
 #endif
