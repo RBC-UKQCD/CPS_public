@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>	// exit()
 #include <config.h>
+#include <math.h>
 
 #include <util/lattice.h>
 #include <util/gjp.h>
@@ -23,11 +24,10 @@
 #include <alg/alg_remez.h>
 #include <util/random.h>
 
-
-// ANSI stuff
-#include <string>
-#include <iostream>
-#include <math.h>
+const int X = 8;
+const int Y = 8;
+const int Z = 8;
+const int T = 8;
 
 CPS_START_NAMESPACE
   GlobalJobParameter GJP;
@@ -58,7 +58,9 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   // Set verbose level
   //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
+  VRB.Level(0);
+  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
+
   char *cname = "asqtad_rhmc";
   char *fname = "main";
   VRB.Func(cname,fname);
@@ -193,11 +195,6 @@ int main(int argc,char *argv[])
 void setup_do_arg(DoArg& do_arg)
 {
   
-  int X = 8;
-  int Y = 8;
-  int Z = 8;
-  int T = 8;
-
 #ifdef PARALLEL
   do_arg.x_node_sites = X/SizeX();
   do_arg.y_node_sites = Y/SizeY();
@@ -229,10 +226,8 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.start_conf_kind = START_CONF_ORD;
   do_arg.start_seed_kind = START_SEED_INPUT;
   do_arg.start_seed_value = 1213;
-  do_arg.colors = 3;
   do_arg.beta = 4.8;
   do_arg.dwf_height = 1.8;
-  do_arg.verbose_level = -1205;
   do_arg.xi_bare = 1;
   do_arg.xi_v = 1;
   do_arg.xi_v_xi = 1;

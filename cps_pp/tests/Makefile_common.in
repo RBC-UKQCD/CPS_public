@@ -1,4 +1,4 @@
-# $Id: Makefile_common.in,v 1.13 2004-06-04 22:46:23 chulwoo Exp $
+# $Id: Makefile_common.in,v 1.14 2004-06-07 21:27:16 mclark Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -29,8 +29,6 @@ CFLAGS= @CFLAGS@
 CXXFLAGS= @CXXFLAGS@
 ASFLAGS= @ASFLAGS@
 DFLAGS += @DFLAGS@
-
-CFLAGS = ${CXXFLAGS} ${DFLAGS}
 
 #
 # Libraries for the Columbia code
@@ -71,9 +69,9 @@ $(BIN):  $(OBJS) $(LIBLIST)
 	$(CXX) $(OBJS) $(LIBLIST) $(LDFLAGS) -o $(BIN)
 
 .c.o:
-	$(CC) -o $@ $(CFLAGS) -c $(INCLIST) $<
+	$(CC) -o $@ $(CFLAGS) $(DFLAGS) -c $(INCLIST) $<
 .C.o:
-	$(CXX) -o $@ $(CXXFLAGS) -c $(INCLIST) $<
+	$(CXX) -o $@ $(CXXFLAGS) $(DFLAGS) -c $(INCLIST) $<
 .S.o:
 	$(AS) -o $@ $(ASFLAGS) -c $(INCLIST) $<
 

@@ -1691,26 +1691,6 @@ class FwilsonTypes : public virtual Lattice
     //! Multiplication of a lattice spin-colour vector by gamma_5.
     void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
 
-<<<<<<< lattice.h
-    int FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
-		 int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm)
-      {
-	char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
-	VRB.Func(cname, fname);
-	ERR.NotImplemented(cname,fname);
-	return 0;
-      }
-    
-    
-    void prepForce(Vector* out) 
-      {
-	char *fname = "prepForce(Vector *)";
-	VRB.Func(cname, fname);
-	ERR.NotImplemented(cname,fname);
-      }
-
-=======
->>>>>>> 1.15.2.2
     void Fconvert(Vector*, StrOrdType, StrOrdType);
 
     Float FhamiltonNode( Vector*,  Vector*) ;
