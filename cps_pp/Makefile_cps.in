@@ -1,4 +1,4 @@
-# $Id: Makefile_cps.in,v 1.7 2003-08-07 15:37:45 zs Exp $
+# $Id: Makefile_cps.in,v 1.8 2003-08-07 16:08:33 mcneile Exp $
 #
 #  Template makefile for the Columbia Physics System
 #  Need to add autoconf stuff
@@ -81,6 +81,18 @@ endif
 clean:
 	rm -f $(cps_obj) cps.a
 	@$(SHELL) doc/cleandocs.sh
+
+
+##
+##  run the test suite
+##
+TEST_DIR = tests
+
+test:
+	cd $(TEST_DIR) ; perl regression.pl
+	cd $(TEST_DIR) ; source regression.sh
+
+
 
 ##
 ## create dependencies
