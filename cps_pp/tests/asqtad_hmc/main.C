@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.16 2005-03-07 22:34:13 chulwoo Exp $
+  $Id: main.C,v 1.17 2005-03-09 19:19:35 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -194,9 +194,9 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
   do_arg.asqtad_naik = -1.0/24.0;
   do_arg.asqtad_lepage = -1.0/16;
-  do_arg.asqtad_3staple = (-1.0/8.0)*0.5;
+  do_arg.asqtad_3staple = (1.0/8.0)*0.5;
   do_arg.asqtad_5staple = ( 1.0/8.0)*0.25*0.5;
-  do_arg.asqtad_7staple = (-1.0/8.0)*0.125*(1.0/6.0);
+  do_arg.asqtad_7staple = (1.0/8.0)*0.125*(1.0/6.0);
 }
 
 

@@ -197,9 +197,9 @@ void setup_asqtad_arg(DoArg& do_arg, Float plaq) {
   do_arg.asqtad_KS      = (1.0/8.0)+(3.0/8.0)+(1.0/8.0);
   do_arg.asqtad_naik    = (-1.0/24.0)*pow(do_arg.u0,-2);
   do_arg.asqtad_lepage  = (-1.0/16.0)*pow(do_arg.u0,-4);
-  do_arg.asqtad_3staple = (-1.0/8.0)*(1.0/2.0)*pow(do_arg.u0,-2);
+  do_arg.asqtad_3staple = (1.0/8.0)*(1.0/2.0)*pow(do_arg.u0,-2);
   do_arg.asqtad_5staple = ( 1.0/8.0)*(1.0/8.0)*pow(do_arg.u0,-4);
-  do_arg.asqtad_7staple = (-1.0/8.0)*(1.0/48.0)*pow(do_arg.u0,-6);
+  do_arg.asqtad_7staple = (1.0/8.0)*(1.0/48.0)*pow(do_arg.u0,-6);
 }
 
 void setup_hmd_arg(HmdArg& hmd_arg)
