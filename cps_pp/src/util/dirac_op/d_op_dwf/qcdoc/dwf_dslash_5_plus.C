@@ -1,0 +1,285 @@
+#include<config.h>
+CPS_START_NAMESPACE
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: chulwoo $
+//  $Date: 2004-07-01 21:22:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v 1.2 2004-07-01 21:22:36 chulwoo Exp $
+//  $Id: dwf_dslash_5_plus.C,v 1.2 2004-07-01 21:22:36 chulwoo Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $Log: not supported by cvs2svn $
+//  Revision 1.1.4.1  2004/06/09 04:31:54  chulwoo
+//  *** empty log message ***
+//
+//  Revision 1.1.2.1  2004/05/20 14:36:32  pab
+//  Files for three optimised dirac operators.
+//  Added some patches to the ReadLattice too.
+//
+//  Revision 1.1.1.1  2003/06/22 13:34:46  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
+//  Revision 1.4  2001/08/16 10:50:17  anj
+//  The float->Float changes in the previous version were unworkable on QCDSP.
+//  To allow type-flexibility, all references to "float" have been
+//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
+//  (where Float=rfloat), and on all other machines allows the use of
+//  double or float in all cases (i.e. for both Float and IFloat).  The I
+//  stands for Internal, as in "for internal use only". Anj
+//
+//  Revision 1.2  2001/06/19 18:12:39  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:16:05  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
+//  $RCSfile: dwf_dslash_5_plus.C,v $
+//  $Revision: 1.2 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_5_plus.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
+//------------------------------------------------------------------
+//
+// dwf_dslash_5_plus.C
+//
+// dwf_dslash_5_plus is the derivative part of the 5th direction
+// part of the fermion matrix. This routine accumulates the result
+// on the out field 
+// The in, out fields are defined on the checkerboard lattice.
+// The action of this operator is the same for even/odd
+// checkerboard fields because there is no gauge field along
+// the 5th direction.
+// dag = 0/1 <--> Dslash/Dslash^dagger is calculated.
+//
+//
+// Storage order for DWF fermions
+//------------------------------------------------------------------
+//  
+//  |     |
+//  | |r| |
+//  | |i| |
+//  |     |
+//  | |r| | = |spin comp|
+//  | |i| |
+//  |     |
+//  | |r| |
+//  | |i| |
+//  |     |
+//  
+//  
+//  |             |
+//  | |spin comp| |
+//  |             |
+//  |             |
+//  | |spin comp| | 
+//  |             | = |spinor|
+//  |             |
+//  | |spin comp| |
+//  |             |
+//  |             |
+//  | |spin comp| |
+//  |             |
+//  
+//  
+//  |            |
+//  |  |spinor|  |
+//  |  |spinor|  |
+//  |  |spinor|  |
+//  |  |spinor|  |
+//  |  |spinor|  |
+//  |     .      | = |s-block|   The spinors are arranged in Wilson
+//  |     .      |               order with odd - even 4d-checkerboard
+//  |     .      |               storage.
+//  |evn/odd vol |
+//  |     .      |
+//  |  |spinor|  |
+//  |            |
+//  
+//  
+//  |                |
+//  | |s-block even| |  For even chckerboard
+//  | |s-block odd|  |
+//  | |s-block even| |
+//  | |s-block odd|  |
+//  |       .        |
+//  |       .        |
+//  |       .        |
+//  |                |
+//
+//
+//  |                |
+//  | |s-block odd|  |  For odd chckerboard
+//  | |s-block even| |
+//  | |s-block odd|  |
+//  | |s-block even| |
+//  |       .        |
+//  |       .        |
+//  |       .        |
+//  |                |
+//
+//------------------------------------------------------------------
+
+
+CPS_END_NAMESPACE
+#include<util/dwf.h>
+#include<util/gjp.h>
+#include<util/vector.h>
+#include<util/verbose.h>
+#include<util/error.h>
+#include<util/smalloc.h>
+#include<comms/scu.h>
+#include<util/dirac_op.h>
+CPS_START_NAMESPACE
+
+#include <time.h>
+#include <sys/time.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+
+extern "C" { 
+  void FtV1pV2Skip(double*,double,const double*,const double*,int);
+  void FtV1pV2Skip_asm(double* out,
+		       const double *scale,
+		       const double* V1,
+		       const double* V2,
+		       int ntwo_spin);
+}
+
+void dwf_dslash_5_plus(Vector *out, 
+		       Vector *in, 
+		       Float mass,
+		       int dag, 
+		       Dwf *dwf_lib_arg)
+{
+  int x;
+  int s;
+
+// Initializations
+//------------------------------------------------------------------
+  int local_ls = GJP.SnodeSites(); 
+  int s_nodes = GJP.Snodes();
+  int s_node_coor = GJP.SnodeCoor();
+  int vol_4d_cb = dwf_lib_arg->vol_4d / 2;
+  int ls_stride = 24 * vol_4d_cb;
+  IFloat *f_in;
+  IFloat *f_out;
+  IFloat *f_temp;
+  IFloat *comm_buf = dwf_lib_arg->comm_buf;
+  IFloat two_over_a5 = 2.0 * GJP.DwfA5Inv();
+  IFloat neg_mass_two_over_a5 = -2.0 * mass * GJP.DwfA5Inv();
+
+// [1 + gamma_5] term (if dag=1 [1 - gamma_5] term)
+//
+// out[s] = [1 + gamma_5] in[s-1]
+//------------------------------------------------------------------
+  f_in  = (IFloat *) in;
+  f_out = (IFloat *) out;
+  if(dag == 1){
+    f_in  =  f_in + 12;
+    f_out = f_out + 12;
+  }
+  f_out = f_out + ls_stride; 
+
+  struct timeval start, stop;
+  //  gettimeofday(&start,NULL);
+
+  //  FtV1pV2Skip(f_out,two_over_a5,f_in,f_out,(local_ls-1)*vol_4d_cb);
+  FtV1pV2Skip_asm(f_out,&two_over_a5,f_in,f_out,(local_ls-1)*vol_4d_cb);
+
+// [1 + gamma_5] for lower boundary term (if dag=1 [1 - gamma_5] term)
+// If there's only one node along fifth direction, no communication
+// is necessary; Otherwise data from adjacent node in minus direction
+// will be needed.
+// If the lower boundary is the s=0 term
+// out[0] = - m_f * [1 + gamma_5] in[ls-1]
+// else, out[s] = [1 + gamma_5] in[s-1]
+//
+//------------------------------------------------------------------
+
+  f_in  = (IFloat *) in;  
+  f_in = f_in + (local_ls-1)*ls_stride; 
+  f_out = (IFloat *) out;
+  
+  if(dag == 1){
+    f_in  =  f_in + 12;
+    f_out = f_out + 12;
+  }
+ 
+// this version is not working when s_nodes != 1
+    if(s_node_coor == 0) { 
+      FtV1pV2Skip_asm(f_out, &neg_mass_two_over_a5, f_in, f_out, vol_4d_cb);
+    }
+    else {
+      FtV1pV2Skip_asm(f_out, &two_over_a5, f_in, f_out, vol_4d_cb);
+    }
+
+
+
+// [1 - gamma_5] term (if dag=1 [1 + gamma_5] term)
+// 
+// out[s] = [1 - gamma_5] in[s+1]
+//------------------------------------------------------------------
+  f_in  = (IFloat *) in;
+  f_out = (IFloat *) out;
+  if(dag == 0){
+    f_in  =  f_in + 12;
+    f_out = f_out + 12;
+  }
+  f_in = f_in + ls_stride;
+
+  FtV1pV2Skip_asm(f_out,&two_over_a5,f_in,f_out,(local_ls-1)*vol_4d_cb);
+
+// [1 - gamma_5] for upper boundary term (if dag=1 [1 + gamma_5] term)
+// If there's only one node along fifth direction, no communication
+// is necessary; Otherwise data from adjacent node in minus direction
+// will be needed.
+// If the upper boundary is the s=ls term
+// out[ls-1] = - m_f * [1 - gamma_5] in[0]
+// else out[s] = [1 - gamma_5] in[s+1]
+//
+//------------------------------------------------------------------
+
+  f_in  = (IFloat *) in;
+  f_out = (IFloat *) out;
+
+  if(dag == 0){
+    f_in  =  f_in + 12;
+    f_out = f_out + 12;
+  }
+
+  f_out = f_out + (local_ls-1)*ls_stride;
+
+  if(s_node_coor == s_nodes - 1) { 
+    FtV1pV2Skip_asm(f_out, &neg_mass_two_over_a5, f_in, f_out, vol_4d_cb);
+  } else {
+    FtV1pV2Skip_asm(f_out, &two_over_a5, f_in, f_out, vol_4d_cb);
+  }
+  DiracOp::CGflops+=local_ls*vol_4d_cb*24*2;
+
+  //  gettimeofday(&stop,NULL);
+
+  //  double flops = local_ls*vol_4d_cb*24*2;
+  //  double micros = stop.tv_usec - start.tv_usec;
+  //  micros +=  (stop.tv_sec - start.tv_sec)*1.E6;
+
+  //  printf("Dslash_5: %f mflops\n",flops/micros );
+}
+
+
+
+CPS_END_NAMESPACE
