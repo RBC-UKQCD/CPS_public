@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: alg_s_spect.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: alg_s_spect.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -52,7 +52,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_s_spect.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v $
 //  $State: Exp $
 //
@@ -73,26 +73,23 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
 #include <stdio.h>
-#include<config.h>
-#include<alg/quark_prop_s.h>
-#include<alg/meson_prop_s.h>
-#include<alg/mom_meson_p_s.h>
-#include<alg/nucl_prop_s.h>
-#include<alg/nlocal_prop_s.h>
-#include<alg/aots_s.h>
-#include<alg/alg_s_spect.h>
-#include<alg/common_arg.h>
-#include<alg/s_spect_arg.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<util/error.h>
-CPS_START_NAMESPACE
-//#include "../../util/include/mom.h"
-CPS_END_NAMESPACE
-#include<alg/myenum.h>
+#include <alg/quark_prop_s.h>
+#include <alg/meson_prop_s.h>
+#include <alg/mom_meson_p_s.h>
+#include <alg/nucl_prop_s.h>
+#include <alg/nlocal_prop_s.h>
+#include <alg/aots_s.h>
+#include <alg/alg_s_spect.h>
+#include <alg/common_arg.h>
+#include <alg/s_spect_arg.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/verbose.h>
+#include <util/error.h>
+//#include <util/mom.h>
+#include <alg/myenum.h>
 CPS_START_NAMESPACE
 #ifdef PARALLEL
 CPS_END_NAMESPACE
@@ -674,4 +671,5 @@ void AlgStagNonLocal::run()
     alg_stag_non_local_arg->nlocal_buf = 0;
   }
 }
+
 CPS_END_NAMESPACE

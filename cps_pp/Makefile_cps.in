@@ -19,7 +19,7 @@ libcps_CXXFLAGS = -DPARALLEL=0 -DTARGET_QCDSP=0  $(INCLUDE_FLAGS)
 
 
 #
-#   source from specifiv build options
+#   source from specific build options
 #
 include Makefile_cps_src
 
@@ -40,7 +40,7 @@ include Makefile_cps_src
 cps: $(cps_obj)
 	ar rcs cps.a ${cps_obj}
 
-.PHONY : cps
+.PHONY : cps clean docs depend
 
 # change the makefile ==> recompile
 $(cps_obj): $(MAKEFILE) 
@@ -48,10 +48,18 @@ $(cps_obj): $(MAKEFILE)
 cps_SOURCES=  $(cps_obj:.o=.C)
 
 
+have_doxygen = @have_doxygen@
+
+ifneq "$(have_doxygen)" "yes"
+docs:
+	@echo doxygen must be installed to make the documentation.
+else
+docs:
+	@$(SHELL) doc/mkdocs.sh 
+endif
 
 clean:
 	rm $(cps_obj) cps.a
-
 
 ##
 ## create dependencies

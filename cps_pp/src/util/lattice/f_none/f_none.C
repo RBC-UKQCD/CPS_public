@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of Fnone class.
+
+  $Id: f_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: f_none.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: f_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,7 +31,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: f_none.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v $
 //  $State: Exp $
 //
@@ -38,15 +43,15 @@ CPS_START_NAMESPACE
 // Fnone is derived from Lattice. Its functions do nothing
 // and return values as if there is no fermion action or
 // fermion fields. The number of spin components is zero
-// The site size of the fermion array FsiteSize() is 
+// The site size of the fermion array FsiteSize() is
 // set to 1 so that memory allocation would proceed normally.
 //
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/dirac_op.h>
-#include<util/verbose.h>
+#include <util/lattice.h>
+#include <util/dirac_op.h>
+#include <util/verbose.h>
 CPS_START_NAMESPACE
 
 
@@ -105,11 +110,9 @@ int Fnone::SpinComponents(void)
 
 
 //------------------------------------------------------------------
-// int FsiteSize() : 
-// Returns the number of fermion field components 
-// (including real/imaginary) on a site of the 4-D lattice.
-// This is 0 but in order for memory allocation to
-// proceed normally it returns 1 instead.
+/*!
+  \return 1, in order for memory allocation to proceed normally.
+*/
 //------------------------------------------------------------------
 int Fnone::FsiteSize(void)
 {
@@ -209,7 +212,7 @@ int Fnone::FeigSolv(Vector **f_eigenv, Float lambda[],
 
 //------------------------------------------------------------------
 // SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass):
-// It sets the pseudofermion field phi from frm1, frm2.
+//! Does nothing.
 //------------------------------------------------------------------
 void Fnone::SetPhi(Vector *phi, Vector *frm1, Vector *frm2, 
 		   Float mass){
@@ -301,5 +304,6 @@ int Fnone::FsiteOffset(const int *x) const {
   ERR.NotImplemented(cname, "FsiteOffset");
   return 0; 
 }
+
 
 CPS_END_NAMESPACE

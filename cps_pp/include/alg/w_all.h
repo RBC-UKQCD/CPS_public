@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/w_all.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: w_all.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/w_all.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: w_all.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_all.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/w_all.h,v $
 //  $State: Exp $
 //
@@ -58,23 +58,23 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdio.h>                                // FILE *
-#include<util/data_types.h>
-#include<alg/w_spect_arg.h>
+#include <util/data_types.h>        // Float, Complex
+#include <alg/w_spect_arg.h>        // SourceKind
 CPS_START_NAMESPACE
 // added by Xiaodong & Thomas
 CPS_END_NAMESPACE
-#include<alg/w_ginfo.h>
-#include<alg/w_ext_mesons.h>
-#include<alg/w_hyper_rect.h>
-#include<alg/w_ferm_vec.h>
-#include<alg/w_quark.h>
-#include<alg/w_mesons.h>
-#include<alg/w_baryon.h>
-#include<alg/w_fuzzing.h>
-#include<alg/w_field.h>
-#include<alg/w_ext_mesons.h>
-#include<alg/w_ext_mesonBE.h>
-#include<alg/w_axialcurr.h>
+#include <alg/w_ginfo.h>
+#include <alg/w_ext_mesons.h>
+#include <alg/w_hyper_rect.h>
+#include <alg/w_ferm_vec.h>
+#include <alg/w_quark.h>
+#include <alg/w_mesons.h>
+#include <alg/w_baryon.h>
+#include <alg/w_fuzzing.h>
+#include <alg/w_field.h>
+#include <alg/w_ext_mesons.h>
+#include <alg/w_ext_mesonBE.h>
+#include <alg/w_axialcurr.h>
 CPS_START_NAMESPACE
 
 
@@ -177,5 +177,6 @@ class WspectExtendedMesons;
 // MomProject      -- sum over space with right momentum.
 //
 //---------------------------------------------------------------------------
+
 
 CPS_END_NAMESPACE

@@ -1,14 +1,14 @@
 dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
-dnl  $Author: mcneile $
-dnl  $Date: 2003-06-22 13:34:45 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-dnl  $Id: configure.in,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+dnl  $Author: zs $
+dnl  $Date: 2003-07-24 16:53:53 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.2 2003-07-24 16:53:53 zs Exp $
+dnl  $Id: configure.in,v 1.2 2003-07-24 16:53:53 zs Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.1.1.1 $
+dnl  $Revision: 1.2 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -78,6 +78,9 @@ topwd_srcdir=`pwd`
 AC_SUBST(topwd_srcdir)
 
 AC_PROG_INSTALL
+
+AC_CHECK_PROG(have_doxygen, doxygen, "yes")
+
 
 AC_OUTPUT(Makefile_cps\
 	  config.h \

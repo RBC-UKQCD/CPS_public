@@ -9,7 +9,7 @@ CPS_START_NAMESPACE
 #define INCLUDED_INST_ARG_H
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
+#include <util/data_types.h>
 CPS_START_NAMESPACE
 
 
@@ -45,4 +45,5 @@ struct InstArg {
 };
 
 #endif /* !INCLUDED_INST_ARG_H */
+
 CPS_END_NAMESPACE

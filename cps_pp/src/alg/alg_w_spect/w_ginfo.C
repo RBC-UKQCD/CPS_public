@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_ginfo.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: w_ginfo.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_ginfo.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: w_ginfo.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -41,19 +41,19 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: w_ginfo.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_ginfo.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<alg/w_all.h>
+#include <alg/w_all.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdlib.h>                          
-#include<util/gjp.h>
+#include <util/gjp.h>
 CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
@@ -212,5 +212,6 @@ WspectGinfo::printSpinor(FILE *fp, const IFloat *flt_p) const
     }
   }
 }
+
 
 CPS_END_NAMESPACE

@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Utility routines for SU(3) matrices.
+
+  $Id: su3_util.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: su3_util.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: su3_util.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,21 +39,15 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: su3_util.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//  su3_util.C
-//
-//  Utilities for SU(3) matrices
-//
-//------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <math.h>
-#include<util/vector.h>
+#include <util/vector.h>
 CPS_START_NAMESPACE
 
 
@@ -62,6 +61,14 @@ static IFloat inv3 = 1./3.;
 //  Matrix
 //---------------------------------------------------------------//
 
+/*!
+  \param a A linear array representation of a 3x3 complex matrix, such that 
+  real part of the (i,j) element is at array position [6i+2j] 
+  and the imaginary part of the (i,j) element is at array position [6i+2j+1].
+  \post This matrix is the hermitian conjugate of \a m.
+
+  \a a must not be an alias of this matrix.
+ */
 void Matrix::Dagger(const IFloat* a)
 {
     u[0]  = a[0];   u[1]  = -a[1];
@@ -75,12 +82,12 @@ void Matrix::Dagger(const IFloat* a)
     u[16] = a[16];  u[17] = -a[17];
 }
 
-   
-//  1/2(A - A~dag) - 1/6 Tr(A - A~dag)
-//
-//  M = 1/2(A - A~dag)
-//  M - 1/3 TrM
-//
+/*!
+  \param dag A matrix \a A.
+  \post This matrix is set to\n
+  <em>1/2(M-A) - 1/6 Trace M-A)</em>
+  \n where \a M is the original value of this matrix.
+*/
 void Matrix::TrLessAntiHermMatrix(const Matrix& dag)
 {
     // get 1/2(A - dag(A)) =  1/2A - dag(1/2A)
@@ -95,7 +102,11 @@ void Matrix::TrLessAntiHermMatrix(const Matrix& dag)
     *(p+17) -= c;
 }
 
-
+/*!
+  \param v1 A complex 3-vector \a u
+  \param v2 A complex 3-vector \a v
+  \post This matrix is assigned the values M(i,j) = u(i)v(j)*
+*/
 void Matrix::Cross2(const Vector& v1, const Vector& v2)
 {
     const IFloat *p1 = (const IFloat *)v1.v;
@@ -116,7 +127,12 @@ void Matrix::Cross2(const Vector& v1, const Vector& v2)
     }
 }
 
-
+/*!
+  \param a an array of 8 real numbers.
+  \post This matrix is assigned the value\n
+  <em>i L<sub>i</sub> * a[i]</em>
+  \n where <em>L<sub>i</sub></em> is the \a i 'th Gell-Mann matrix.
+*/
 void Matrix::AntiHermMatrix(const IFloat *a)
 {
     IFloat s3 = 0.57735 * *(a+7);       // 1/sqrt(3) = 0.57735;
@@ -145,6 +161,11 @@ void Matrix::AntiHermMatrix(const IFloat *a)
 }
 
 
+/*!
+  \param q An array of length at least 2.
+  \post The real and imaginarey parts of the determinant of this matrix
+  are written to the 0 and 1 elements of \a q.
+*/
 void Matrix::Det(IFloat* q) const
 {
     const IFloat *p = (const IFloat *)u;
@@ -186,7 +207,9 @@ IFloat Matrix::ReTr() const
     return *p + *(p+8) + *(p+16);
 }
 
-
+/*!
+  This method is specifically for an anti-hermitian matrix only.
+*/
 IFloat Matrix::NegHalfTrSquare() const
 {
     IFloat *p = (IFloat *)u;
@@ -202,7 +225,9 @@ IFloat Matrix::NegHalfTrSquare() const
 //---------------------------------------------------------------//
 //  Vector
 //---------------------------------------------------------------//
-
+/*!
+  \post The L2 norm of this vector is 1
+*/
 void Vector::Normalize()
 {
     IFloat norm = dotProduct((IFloat *)v, (IFloat *)v, 6);
@@ -218,6 +243,11 @@ void Vector::Normalize()
 //	v2' = v2 - v1 * (v1, v2)
 // 	then	(v1, v2') = 0
 // 
+/*!
+  \param p1 A vector
+  \post This vector is orthogonalised against the vector \a p1 so
+  that its inner product with p1 vanishes.
+*/
 void Vector::Orthogonalize(const Vector& p1)
 {
     IFloat re = 0.0;
@@ -241,6 +271,7 @@ void Vector::Orthogonalize(const Vector& p1)
 	}
     }
 }
+
 
 
 

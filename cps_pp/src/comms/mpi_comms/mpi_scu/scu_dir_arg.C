@@ -1,7 +1,13 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
-/*! The SCUDirArg Class: scu_dir_arg.C
+/*!\file
+  \brief  Definition of the SCUDirArg class.
+
+  $Id: scu_dir_arg.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
+/*----------------------------------------------------------*/
+/* The SCUDirArg Class: scu_dir_arg.C
 
   The MPI implementation of the comms-layer data structures. These
   objects will define and commit a new MPI_Datatype based on the user
@@ -11,21 +17,18 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: mcneile $
-  $Date: 2003-06-22 13:34:47 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/scu_dir_arg.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-  $Id: scu_dir_arg.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+  $Author: zs $
+  $Date: 2003-07-24 16:53:54 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/scu_dir_arg.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: scu_dir_arg.C,v 1.2 2003-07-24 16:53:54 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_dir_arg.C,v $
-  $Revision: 1.1.1.1 $
+  $Revision: 1.2 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/scu_dir_arg.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
-CPS_END_NAMESPACE
-#include<config.h>
-CPS_START_NAMESPACE
 
 /* Allow the MPI stuff to be switched out, thus avoiding compiler
    errors (for the time being). */
@@ -40,10 +43,35 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 //----------------------------------
+/*!
+  The default constructor initialises an instance of this class as follows
+  - base address of data to be sent = NULL
+  - direction to send data = ::SCU_NoDir (the null direction)
+  - send or receive flag = ::SCU_NoXR (neither)
+  - length of each block = -1
+  - number of blocks = -1
+  - stride = -1
+  - MPI datatype = MPI_DATATYPE_NULL
+  - size of each basic data element = #COMMS_DATASIZE
+  .
+  \post A data structure with these characteristics is created.  
+*/
+//----------------------------------
 SCUDirArg::SCUDirArg() {
     // Initialise with default (null) values;
     SCUDirArgInitValues();
 }
+
+/*!
+  \param addr The base address of the data to be sent/received.
+  \param dir The direction in which to communicate.
+  \param sendxr The flag indicating whether to send or receive this data.
+  \param blklen  The length in floating point or integer numbers of each block of data.
+  \param numblk The number of blocks (default = 1).
+  \param stride The stride (the interval from the start of one block to the next) in floating point or integer numbers (default = 1).
+
+  \post A data structure with the desired characteristics is created.
+ */
 
 SCUDirArg::SCUDirArg(void* addr, SCUDir dir, SCUXR sendxr, int blklen, 
 		     int numblk, int stride) {
@@ -76,6 +104,17 @@ void SCUDirArg::SCUDirArgInitValues(void) {
 
 
 //----------------------------------
+/*!
+  \param addr The base address of the data to be sent/received.
+  \param dir The direction in which to communicate.
+  \param sendxr The flag indicating whether to send or receive this data.
+  \param blklen  The length of each block of data in floating point or integer numbers .
+  \param numblk The number of blocks.
+  \param stride The stride (the interval from the start of one block to the next) in floating point or integer numbers 
+
+  \post A data structure with the desired characteristics is created.
+ */
+//----------------------------------
 void SCUDirArg::Init(void* addr, SCUDir dir, SCUXR sendxr, int blklen, 
 		     int numblk, int stride ) {
     // Copy arguments into the instance variables, and check them.
@@ -93,9 +132,18 @@ void SCUDirArg::Init(void* addr, SCUDir dir, SCUXR sendxr, int blklen,
 }
 
 //----------------------------------
+/*!
+  \return The base address of the data to be communicated.
+*/
+//----------------------------------
 void* SCUDirArg::Addr() {
     return addr_;
 }
+
+/*!
+  \param addr The new base address of the data to be communicated.
+  \return The previous base address
+*/
 
 void* SCUDirArg::Addr(void* addr) {
     void* oldaddr;
@@ -107,10 +155,18 @@ void* SCUDirArg::Addr(void* addr) {
 }
 
 //----------------------------------
+/*!
+  \return The block-length in floating point or integer numbers .
+*/
+//----------------------------------
 int SCUDirArg::Blklen() {
     return blklen_;
 }
 
+/*!
+  \param The new block length in floating point or integer numbers .
+  \return The previous block-length.
+ */
 int SCUDirArg::Blklen( int blklen ) {
     int oldblen;
 
@@ -121,10 +177,18 @@ int SCUDirArg::Blklen( int blklen ) {
 }
 
 //----------------------------------
+/*!
+  \return The number of blocks.
+*/
+//----------------------------------
 int SCUDirArg::Numblk() {
     return numblk_;
 }
 
+/*!
+  \param The new number of blocks.
+  \return The previous number of blocks.
+*/
 int SCUDirArg::Numblk( int numblk ) {
     int oldnblk;
 
@@ -135,10 +199,18 @@ int SCUDirArg::Numblk( int numblk ) {
 }
 
 //----------------------------------
+/*!
+  \return The stride in floating point or integer numbers.
+*/
+//----------------------------------
 int SCUDirArg::Stride() {
     return stride_;
 }
 
+/*!
+  \param The new stride in floating point or integer numbers.
+  \return The previous stride.
+*/
 int SCUDirArg::Stride( int stride ) {
     int oldstride;
 
@@ -148,6 +220,15 @@ int SCUDirArg::Stride( int stride ) {
     return oldstride;
 }
 
+//----------------------------------
+/*!
+  \param addr The base address of the data to be sent/received.
+  \param dir The direction in which to communicate.
+  \param sendxr The flag indicating whether to send or receive this data.
+  \param blklen The length of each block of data in floating point or integer numbers.
+  \param numblk The number of blocks (default = 1).
+  \param stride The stride (the interval from the start of one block to the next) (default = 1) in floating point or integer numbers.
+*/
 //----------------------------------
 void SCUDirArg::Reload(void* addr, int blklen, int numblk = 1, int stride = 1) {
 
@@ -160,20 +241,38 @@ void SCUDirArg::Reload(void* addr, int blklen, int numblk = 1, int stride = 1) {
 }
 
 //----------------------------------
+/*!
+  \return The datatype.
+*/
+//----------------------------------
 MPI_Datatype SCUDirArg::Datatype() {
     return mpi_dt_;
 }
 
+//----------------------------------
+/*!
+  \return The direction flag.
+*/
 //----------------------------------
 SCUDir SCUDirArg::CommDir() {
     return dir_;
 }
 
 //----------------------------------
+/*!
+  \return The flag indicating whether this data is sent or received.
+*/
+//----------------------------------
 SCUXR SCUDirArg::CommType() {
     return sendrx_;
 }
 
+//----------------------------------
+/*!
+  If there is an mpi datatype defined for this class,
+  it is redefined to use the new data size.
+  \param mpi_datasize The new data size in bytes.
+*/
 //----------------------------------
 void SCUDirArg::SetDataSize( int mpi_datasize ) {
     //! Change the size (in bytes) of the fundamental data element:

@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/mem/p2v/p2v.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: p2v.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/mem/p2v/p2v.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: p2v.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -37,7 +37,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: p2v.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/mem/p2v/p2v.C,v $
 //  $State: Exp $
 //
@@ -45,11 +45,10 @@ CPS_START_NAMESPACE
 // p2v.C
 
 CPS_END_NAMESPACE
-#include<config.h>
-#include<mem/p2v.h>
+#include <mem/p2v.h>
 #include <string.h>		//memmove()
-#include<util/verbose.h>
-#include<util/error.h>
+#include <util/verbose.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------//
@@ -191,6 +190,7 @@ void p2vCloverLib()
 
 #endif
 } 
+
 
 
 CPS_END_NAMESPACE

@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief  Routine used internally in the DiracOpWilson class.
+
+  $Id: wilson_dslash.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: wilson_dslash.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: wilson_dslash.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -41,7 +46,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: wilson_dslash.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v $
 //  $State: Exp $
 //
@@ -71,33 +76,45 @@ CPS_START_NAMESPACE
 /***************************************************************************/
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
-#include<util/vector.h>
-#include<util/wilson.h>
-#include<util/error.h>
-#include<comms/scu.h>
+#include <util/data_types.h>
+#include <util/vector.h>
+#include <util/wilson.h>
+#include <util/error.h>
+#include <comms/scu.h>
 CPS_START_NAMESPACE
 
 
+//! Access to the elements of the \e SU(3) matrix
+/*!
+  Gets the element of the \e SU(3) matrix \e u with row \e row,
+  column \e col and complex component \e d
+*/
 #define U(r,row,col,d)  *(u+(r+2*(row+3*(col+3*d))))
+//! Access to the elements of a spinor vector.
+/*!
+  Gets the element of the spinor \e psi with spin \e s,
+  colour \e c and complex component \e r
+*/
 #define PSI(r,c,s)      *(psi +(r+2*(c+3*s)))
+
+//! As above, but the vector is called chi
 #define CHI(r,c,s)      *(chi +(r+2*(c+3*s)))
-#define TMP(r,c,s)      *(tmp +(r+2*(c+3*s)))
-#define TMP1(r,c,s)     *(tmp1+(r+2*(c+3*s)))
-#define TMP2(r,c,s)     *(tmp2+(r+2*(c+3*s)))
-#define TMP3(r,c,s)     *(tmp3+(r+2*(c+3*s)))
-#define TMP4(r,c,s)     *(tmp4+(r+2*(c+3*s)))
-#define TMP5(r,c,s)     *(tmp5+(r+2*(c+3*s)))
-#define TMP6(r,c,s)     *(tmp6+(r+2*(c+3*s)))
-#define TMP7(r,c,s)     *(tmp7+(r+2*(c+3*s)))
-#define TMP8(r,c,s)     *(tmp8+(r+2*(c+3*s)))
-#define FBUF(r,c,s)     *(fbuf+(r+2*(c+3*s)))
+#define TMP(r,c,s)      *(tmp +(r+2*(c+3*s))) 
+#define TMP1(r,c,s)     *(tmp1+(r+2*(c+3*s))) 
+#define TMP2(r,c,s)     *(tmp2+(r+2*(c+3*s))) 
+#define TMP3(r,c,s)     *(tmp3+(r+2*(c+3*s))) 
+#define TMP4(r,c,s)     *(tmp4+(r+2*(c+3*s))) 
+#define TMP5(r,c,s)     *(tmp5+(r+2*(c+3*s))) 
+#define TMP6(r,c,s)     *(tmp6+(r+2*(c+3*s))) 
+#define TMP7(r,c,s)     *(tmp7+(r+2*(c+3*s))) 
+#define TMP8(r,c,s)     *(tmp8+(r+2*(c+3*s))) 
+#define FBUF(r,c,s)     *(fbuf+(r+2*(c+3*s))) 
 
 
 
-/*--------------------------------------------------------------------------*/
-/* wilson_dslash:                                                           */
-/*--------------------------------------------------------------------------*/
+
+
+
 void wilson_dslash(IFloat *chi_p_f, 
 		   IFloat *u_p_f, 
 		   IFloat *psi_p_f, 
@@ -562,4 +579,5 @@ void wilson_dslash(IFloat *chi_p_f,
 
 
 }
+
 CPS_END_NAMESPACE

@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief  Definition of DiracOpDwf class methods.
+
+  $Id: d_op_dwf.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: d_op_dwf.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: d_op_dwf.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -47,7 +52,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -63,20 +68,34 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/dirac_op.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<util/wilson.h>
-#include<util/dwf.h>
-#include<mem/p2v.h>
-#include<comms/glb.h>
+#include <util/dirac_op.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <util/wilson.h>
+#include <util/dwf.h>
+#include <mem/p2v.h>
+#include <comms/glb.h>
 CPS_START_NAMESPACE
 
 
+
 //------------------------------------------------------------------
-// Constructor
+/*!
+  Only one instance of this class is allowed to be in existence at
+  any time.
+  \param latt The lattice on which this Dirac operator is defined
+  \param f_field_out A (pointer to) a spin-colour field (optionally). 
+  \param f_field_in A (pointer to) a spin-colour field (optionally).
+  \param arg Parameters for the solver.
+  \param cnv_frm_flag Whether the lattice fields should be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_field_out and \a f_field_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field.
+ */
 //------------------------------------------------------------------
 DiracOpDwf::DiracOpDwf(Lattice & latt,
 			     Vector *f_field_out,
@@ -134,7 +153,10 @@ DiracOpDwf::DiracOpDwf(Lattice & latt,
 
 
 //------------------------------------------------------------------
-// Destructor
+/*!
+  If the storage order of any fields was changed by the constructor
+  then they are changed to the canonical order by the destructor.
+*/
 //------------------------------------------------------------------
 DiracOpDwf::~DiracOpDwf() {
   char *fname = "~DiracOpDwf()";
@@ -233,9 +255,11 @@ void DiracOpDwf::Dslash(Vector *out,
 }
 
 //------------------------------------------------------------------
-// MatPc(Vector *out, Vector *in) :
-// MatPc is the fermion matrix.  
-// The in, out fields are defined on the checkerboard lattice.
+/*!
+  The preconditioned matrix connects sites of odd parity.
+  \param out The resulting vector.
+  \param in The vector to be multiplied.
+*/
 //------------------------------------------------------------------
 void DiracOpDwf::MatPc(Vector *out, Vector *in) {  
 
@@ -261,9 +285,11 @@ void DiracOpDwf::MatPc(Vector *out, Vector *in) {
 }
 
 //------------------------------------------------------------------
-// MatPcDag(Vector *out, Vector *in) :
-// MatPcDag is the dagger of the fermion matrix. 
-// The in, out fields are defined on the checkerboard lattice.
+/*!
+  The preconditioned matrix connects sites of odd parity.
+  \param out The resulting vector.
+  \param in The vector to be multiplied.
+*/
 //------------------------------------------------------------------
 void DiracOpDwf::MatPcDag(Vector *out, Vector *in) {
 
@@ -541,11 +567,22 @@ void DiracOpDwf::MatHerm(Vector *out, Vector *in) {
 
 
 //------------------------------------------------------------------
-// GRF
-// chi is the solution to MatPcInv.  The user passes two full size
-// CANONICAL fermion vectors with conversion enabled to the
-// constructor.  Using chi, the function fills these vectors;
-// the result may be used to compute the HMD fermion force.
+/*!
+  \pre This method is to be used when the instance of this object has been
+  created with \a f_field_out and \a f_field_in pointers to spin-colour
+  vectors defined over the whole lattice. 
+
+  \param chi A spin-colour vector defined on odd parity lattice sites.
+
+  \post The vector \a f_field_out is \f$ (1+D)\chi \f$
+
+  and the vector \a f_field_in is \f$ (D^\dagger-\kappa^2 M)\chi \f$
+
+  where \e M is the odd-even preconditioned fermion matrix connecting odd to
+  odd parity sites and \e D is the hopping term connecting odd to
+  even parity sites. Recall that \a chi is defined on odd sites only.
+  The new vectors are in odd-even order.
+*/
 //------------------------------------------------------------------
 
 void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
@@ -620,5 +657,6 @@ void DiracOpDwf::DiracOpGlbSum(Float *float_p) {
     glb_sum_five(float_p);
   }
 }
+
 
 CPS_END_NAMESPACE

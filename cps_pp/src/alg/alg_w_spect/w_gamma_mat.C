@@ -6,8 +6,8 @@ CPS_START_NAMESPACE
  */
 
 CPS_END_NAMESPACE
-#include<alg/w_gamma_mat.h>
-#include<util/data_types.h>
+#include <alg/w_gamma_mat.h>
+#include <util/data_types.h>
 CPS_START_NAMESPACE
 
 // follow definition of gamma[i] in Ping's thesis
@@ -135,6 +135,7 @@ IFloat WGamma[16][4][4][2]={1.0,0.0,  0.0,0.0,  0.0,0.0,  0.0,0.0,
 //?? write the same one for WspectMesons too???
 //result_p point to the correlator data entry(Complex number)
 //sign is the sign of contribution to correlator of this trace term
+
 
 
 

@@ -6,14 +6,14 @@ CPS_START_NAMESPACE
 //
 
 CPS_END_NAMESPACE
-#include <stdio.h>  // for printf
+#include <stdio.h>  // for printf  ( really?  where? )
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<math.h>
-#include<util/mom.h>
-#include<alg/mom_meson_p_s.h>
-#include<alg/quark_prop_s.h>
+#include <math.h>
+#include <util/mom.h>  
+#include <alg/mom_meson_p_s.h>
+#include <alg/quark_prop_s.h>
 CPS_START_NAMESPACE
 
 
@@ -94,6 +94,7 @@ MomMesonPropS::MomMesonPropS(Lattice &lattice, StagMomMesonArg& arg)
   qp1(QuarkPropSMng::prop(arg.qid1)){}
  
 MomMesonPropS::~MomMesonPropS(){}
+
 
 
 

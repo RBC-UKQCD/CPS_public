@@ -1,28 +1,20 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Magic numbers.
+
+  $Id: enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: enum.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.3  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.2  2001/06/19 18:13:17  anj
 //  Serious ANSIfication.  Plus, degenerate double64.h files removed.
 //  Next version will contain the new nga/include/double64.h.  Also,
@@ -39,26 +31,18 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: enum.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// enum.h
-//
-// Header file for enum types.
-//
-//------------------------------------------------------------------
-
 
 #ifndef INCLUDED_ENUM_H
-#define INCLUDED_ENUM_H
+#define INCLUDED_ENUM_H    //!< Prevent multiple inclusion
 
 
 //------------------------------------------------------------------
-// The possible kinds of directions
+//! The directions in the lattice
 //------------------------------------------------------------------
 enum DirType {DIR_X,
 	      DIR_Y,
@@ -67,70 +51,95 @@ enum DirType {DIR_X,
 	      DIR_S};
 
 //------------------------------------------------------------------
-// The possible kinds of fermion classes
+//! The types of fermion action
 //------------------------------------------------------------------
-enum FclassType {F_CLASS_NONE,   
-		 F_CLASS_STAG,
-		 F_CLASS_WILSON,
-		 F_CLASS_CLOVER,
-		 F_CLASS_DWF};
+enum FclassType {
+    F_CLASS_NONE,   
+    F_CLASS_STAG,
+    F_CLASS_WILSON,
+    F_CLASS_CLOVER,
+    F_CLASS_DWF
+};
 
 
 //------------------------------------------------------------------
-// The possible kinds of gauge classes
+//! The types of gauge action.
 //------------------------------------------------------------------
-enum GclassType {G_CLASS_NONE,   
-                 G_CLASS_WILSON,
-                 G_CLASS_POWER_PLAQ,
-                 G_CLASS_IMPR_RECT,
-                 G_CLASS_POWER_RECT,
-                 G_CLASS_IMPR_OLSYM};
+enum GclassType {
+    G_CLASS_NONE,   
+    G_CLASS_WILSON,
+    G_CLASS_POWER_PLAQ,
+    G_CLASS_IMPR_RECT,
+    G_CLASS_POWER_RECT,
+    G_CLASS_IMPR_OLSYM
+};
 
 
 //------------------------------------------------------------------
-// The possible kinds of lattice storage orders.
+//! The lattice storage orders.
 //------------------------------------------------------------------
-enum StrOrdType {CANONICAL = 0, // Canonical storage order is
-		                // expected by Lattice functions
-		STAG      = 1,  // Staggered ferm. storage order is
-                                // expected by DiracOpStag functions
-	        WILSON    = 2,  // Wilson storage order is
-                                // expected by DiracOpWilson 
-                                // DiracOpClover and DiracOpDwf 
-                                // functions
-             G_WILSON_HB  = 3}; // Storage order for the 
-                                // wilson gauge action heat bath.
-                                // This order is expected by
-                                // all QncWilsonHb functions.
+enum StrOrdType {
+    CANONICAL = 0, /*!< Canonical storage order: %Lattice sites are ordered
+		     so that the site with cartesian coordinates
+		     (x, y, z, t) on a local lattice of dimensions Nx, Ny, 
+		     Nz, Nt has the index
+		     
+		     n = x + Nx y + Nx Ny z + Nx Ny Nz t
+
+		     The gauge link direction index is
+		     0, 1, 2 or 3  for direction X, Y, Z and T respectively.
+
+		     This order is expected by most Lattice functions. */
+    STAG      = 1,  /*!< Staggered fermion storage order is the same as WILSON
+		      except that the staggered phases are included in the
+		      gauge field.
+		      This is expected by DiracOpStag functions */
+    WILSON    = 2,  /*!<
+		      %Lattice sites are ordered by parity.
+		      The parity of a site with cartesian coordinates
+		      (x, y, z, t) is (-1)^{x+y+z+t}. Odd parity sites are
+		      numbered before even parity sites.
+		      On a local lattice of dimensions Nx, Ny, Nz, Nt each site
+		      has the index
+
+		      n = [x-x%2 + Nx y + Nx Ny z + Nx Ny Nz t
+		      + Nx Ny Nz Nt ((x+y+z+t+1)%2)]/2
+
+		      This order is expected by DiracOpWilson,
+		      DiracOpClover and DiracOpDwf functions. */
+    G_WILSON_HB  = 3 /*!< Storage order for the Wilson gauge action heat bath:
+		       Canonical site ordering but the link direction indices
+		       are 0, 1, 2 or 3  for direction T, X, Y and Z
+		       respectively.
+		       This order is expected by all QncWilsonHb functions.*/
+};
 
 
 //------------------------------------------------------------------
-// The possible storage order conversion flags.
+//! The  storage order conversion flags.
 //------------------------------------------------------------------
-enum CnvFrmType {CNV_FRM_NO   = 0,   // Do not convert fermion field
-                 CNV_FRM_YES  = 1};  // Convert fermion field 
-                                     // assuming that it is defined 
-                                     // on the whole lattice i.e.
-                                     // one spinor per site AND NOT
-                                     // just on the sites of a 
-                                     // single checkerboard.
+enum CnvFrmType {
+    CNV_FRM_NO   = 0,   /*!< Do not convert fermion field */
+    CNV_FRM_YES  = 1  /*!< Convert fermion field assuming that it is defined
+			on the whole lattice \e i.e. one spinor per site and
+			not just on the sites of a single checkerboard
+			parity.*/
+};
 
 //------------------------------------------------------------------
-//  Divide FsiteSize by SnodeSites in RandGaussVector
+//!  The dimensionality of the fermion field.
 //------------------------------------------------------------------
 enum FermionFieldDimension { FOUR_D, FIVE_D };
 
+//------------------------------------------------------------------
+//! The kinds of preservation 
+//------------------------------------------------------------------
+enum PreserveType {PRESERVE_NO  = 0,  /*!< Do not preserve. */
+		   PRESERVE_YES = 1 /*!< Preserve. */
+};
 
 //------------------------------------------------------------------
-// The possible kinds of preservation
-//------------------------------------------------------------------
-enum PreserveType {PRESERVE_NO  = 0,  // Do not preserve.
-		   PRESERVE_YES = 1}; // Preserve.
-
-
-//------------------------------------------------------------------
-// The possible kinds of starting configurations.
-//
+//! The kinds of starting configurations.
 //
 // START_CONF_ORD  Ordered start. After the configuration is set
 // the GJP.StartConfKind() is set to START_CONF_MEM.
@@ -141,7 +150,7 @@ enum PreserveType {PRESERVE_NO  = 0,  // Do not preserve.
 // START_CONF_FILE Read from file. After the configuration is set
 // the GJP.StartConfKind() is set to START_CONF_MEM.
 //
-// START_CONF_LOAD Mamory is not allocated for the gauge filed.
+// START_CONF_LOAD Memory is not allocated for the gauge field.
 // Instead the gauge_field pointer is set to GJP.StartConfLoadAddr().
 // After the configuration is set the GJP.StartConfKind() is set 
 // to START_CONF_MEM.
@@ -157,130 +166,128 @@ enum PreserveType {PRESERVE_NO  = 0,  // Do not preserve.
 // util/lattice/lattice_base/lattice_base.C
 //
 //------------------------------------------------------------------
-enum StartConfType {START_CONF_ORD     = 0,
-		    START_CONF_DISORD  = 1,
-		    START_CONF_FILE    = 2,
-		    START_CONF_LOAD    = 3,
-		    START_CONF_MEM     = 4};
+
+enum StartConfType {
+    START_CONF_ORD     = 0, /*!< Ordered start */
+    START_CONF_DISORD  = 1, /*!< Disordered start */
+    START_CONF_FILE    = 2, /*!< Read from file */
+    START_CONF_LOAD    = 3, /*!< The gauge_field pointer is
+			      set to the address specified in
+			      the DoArg structure but no memory
+			      is allocated for it.*/
+    START_CONF_MEM     = 4  /*!< The gauge_field pointer is
+			      set to the address specified in
+			      the DoArg structure and memory
+			      is allocated for it. */
+};
 
 
 //------------------------------------------------------------------
-// The possible kinds of starting seeds.
-//
-//
-// START_SEED_FIXED It does not change between reboots but it is
-// different on each node depending on the node coordinates. 
-// It is derived from the qos function SeedST(). On node 0,0 it has
-// the SeedST() value.
-//
-// START_SEED_FIXED_UNIFORM It does not change between reboots,
-// is the same on all nodes and is equal to the qos SeedST() value.
-//
-// START_SEED It changes between reboots and it is 
-// different on each node depending on the GJP node coordinates. 
-// It is derived from the qos function SeedS(). On node 0,0 it has
-// the SeedS() value.
-//
-// START_SEED_UNIFORM It changes between reboots, it is the 
-// same on all nodes and is equal to the qos SeedS() value.
-//
-// START_SEED_INPUT It is different on each node depending on the 
-// GJP node coordinates. It is derived from the DoArg 
-// start_seed_value which is set by GJP.Initialize().
-//
-// START_SEED_INPUT_UNIFORM It is the same on each node. It is 
-// derived from the DoArg start_seed_value which is set by 
-// GJP.Initialize().
-//
-// START_SEED_INPUT_NODE It is different on each node depending 
-// on the physical node coordinates (the ones given by the qos). 
-// It is derived from the DoArg start_seed_value which is set by 
-// GJP.Initialize(). If this option is used each processor has
-// a different seed and therefore the machine can not be divided
-// into partitions. This option is usefull only when each node is
-// to be used as an individual computer with local communication.
-//
-// For implementation details see util/gjp/gjp.C
-//
+//! The possible kinds of initial RNG seeds.
 //------------------------------------------------------------------
-enum StartSeedType {START_SEED_FIXED          = 0,   
-		    START_SEED_FIXED_UNIFORM  = 1,
-		    START_SEED                = 2,
-		    START_SEED_UNIFORM        = 3,
-		    START_SEED_INPUT          = 4,
-		    START_SEED_INPUT_UNIFORM  = 5,
-		    START_SEED_INPUT_NODE     = 6};
+enum StartSeedType {
+    START_SEED_FIXED          = 0,
+/*!< Seed has a fixed value but it is different on each node */
+    START_SEED_FIXED_UNIFORM  = 1,
+/*!< Seed has a fixed value and is the same on all nodes */
+    START_SEED                = 2,
+/*!< Seed has a time-dependent value and it is different on each node */
+    START_SEED_UNIFORM        = 3,
+/*!< Seed has a time-dependent value and is the same on all nodes */     
+    START_SEED_INPUT          = 4,
+/*!< Seed value comes from the DoArg structure and is different on all nodes*/
+    START_SEED_INPUT_UNIFORM  = 5,
+/*!< Seed value comes from the DoArg structure and is the same on all nodes*/ 
+    START_SEED_INPUT_NODE     = 6
+/*!< Seed structure comes from the DoArg structure and is different on all
+  nodes. This should be used when in a farming mode. */     
+};
+
+//------------------------------------------------------------------
+// The possible types of checker  boards (chequer boards?)
+//------------------------------------------------------------------
+enum ChkbType {
+    CHKB_EVEN =0,   // Even checkerboard
+    CHKB_ODD  =1};  // Odd checkerboard
 
 
 //------------------------------------------------------------------
-// The possible types of checker boards
+//! Hermitian conjugate flag
 //------------------------------------------------------------------
-enum ChkbType {CHKB_EVEN =0,   // Even checkerboard
-               CHKB_ODD  =1};  // Odd checkerboard
+enum DagType {
+    DAG_NO  = 0,   /*!< No hermitian conjugate */
+    DAG_YES = 1    /*!< Hermitian conjugate */
+};
 
 
 //------------------------------------------------------------------
-// The possible types of dagger
+//! The kinds of boundary conditions.
 //------------------------------------------------------------------
-enum DagType {DAG_NO  = 0,   // Do not take the dagger
-              DAG_YES = 1};  // Take the dagger
+enum BndCndType {
+    BND_CND_PRD,    /*!< Periodic */
+    BND_CND_APRD    /*!< Antiperiodic */
+};
 
 
 //------------------------------------------------------------------
-// The possible kinds of boundary conditions.
+//! The possible kinds of gauge fixing
 //------------------------------------------------------------------
-enum BndCndType {BND_CND_PRD, BND_CND_APRD};
-
-
-//------------------------------------------------------------------
-// The possible kinds of gauges for FixGauge(..) routine
-//------------------------------------------------------------------
-enum FixGaugeType{ FIX_GAUGE_NONE = -2,
-                   FIX_GAUGE_LANDAU = -1, 
-		   FIX_GAUGE_COULOMB_X = 0, 
-	           FIX_GAUGE_COULOMB_Y = 1, 
-	           FIX_GAUGE_COULOMB_Z = 2, 
-	           FIX_GAUGE_COULOMB_T = 3};
-
+enum FixGaugeType{ 
+    FIX_GAUGE_NONE = -2,   /*!< No gauge fixing */
+    FIX_GAUGE_LANDAU = -1,  /*!< Fixing to Landau gauge */
+    FIX_GAUGE_COULOMB_X = 0,  /*!< Fixing to Coulomb gauge */
+    FIX_GAUGE_COULOMB_Y = 1,  /*!< Fixing to Coulomb gauge */
+    FIX_GAUGE_COULOMB_Z = 2,  /*!< Fixing to Coulomb gauge */
+    FIX_GAUGE_COULOMB_T = 3 /*!< Fixing to Coulomb gauge */
+};		   
 
 //------------------------------------------------------------------
-// The possible kinds of spin projections
+//! The possible kinds of spin projections
 //------------------------------------------------------------------
-enum SprojType {SPROJ_XM = 0,     // sproj with (1 - gamma_0)
-		SPROJ_YM = 1,     // sproj with (1 - gamma_1)
-		SPROJ_ZM = 2,     // sproj with (1 - gamma_2)
-		SPROJ_TM = 3,     // sproj with (1 - gamma_3)
-		SPROJ_XP = 4,     // sproj with (1 + gamma_0)
-		SPROJ_YP = 5,     // sproj with (1 + gamma_1)
-		SPROJ_ZP = 6,     // sproj with (1 + gamma_2)
-		SPROJ_TP = 7 };   // sproj with (1 + gamma_3) 
+enum SprojType {
+    SPROJ_XM = 0,     /*!< (1 - gamma_0) projection */
+    SPROJ_YM = 1,     /*!< (1 - gamma_1) projection */
+    SPROJ_ZM = 2,     /*!< (1 - gamma_2) projection */
+    SPROJ_TM = 3,     /*!< (1 - gamma_3) projection */
+    SPROJ_XP = 4,     /*!< (1 + gamma_0) projection */
+    SPROJ_YP = 5,     /*!< (1 + gamma_1) projection */
+    SPROJ_ZP = 6,     /*!<(1 + gamma_2) projection */
+    SPROJ_TP = 7   /*!< (1 + gamma_3)  projection */
+};
 
 //------------------------------------------------------------------
-// The possible kinds of Sigma projections
+//! The possible kinds of Sigma projections
 //------------------------------------------------------------------
-enum SigmaprojType {SIGMAPROJ_XY = 0,     // Sigmaproj with Sigma_{0,1}
-		SIGMAPROJ_XZ = 1,     // Sigmaproj with Sigma_{0,2}
-		SIGMAPROJ_XT = 2,     // Sigmaproj with Sigma_{0,3}
-		SIGMAPROJ_YZ = 3,     // Sigmaproj with Sigma_{1,2}
-		SIGMAPROJ_YT = 4,     // Sigmaproj with Sigma_{1,3}
-		SIGMAPROJ_YX = 5,     // Sigmaproj with Sigma_{1,0}    
-		SIGMAPROJ_ZT = 6,     // Sigmaproj with Sigma_{2,3}
-		SIGMAPROJ_ZX = 7,     // Sigmaproj with Sigma_{2,0}
-		SIGMAPROJ_ZY = 8,     // Sigmaproj with Sigma_{2,1}  
-		SIGMAPROJ_TX = 9,     // Sigmaproj with Sigma_{3,0}
-		SIGMAPROJ_TY =10,     // Sigmaproj with Sigma_{3,1}
-		SIGMAPROJ_TZ =11 };   // Sigmaproj with Sigma_{3,2} 
+enum SigmaprojType {
+    SIGMAPROJ_XY = 0,     /*!< Sigma_{0,1} projection */
+    SIGMAPROJ_XZ = 1,     /*!< Sigma_{0,2} projection */
+    SIGMAPROJ_XT = 2,     /*!< Sigma_{0,3} projection */
+    SIGMAPROJ_YZ = 3,     /*!< Sigma_{1,2} projection */
+    SIGMAPROJ_YT = 4,     /*!< Sigma_{1,3} projection */
+    SIGMAPROJ_YX = 5,     /*!< Sigma_{1,0}     projection */
+    SIGMAPROJ_ZT = 6,     /*!< Sigma_{2,3} projection */
+    SIGMAPROJ_ZX = 7,     /*!< Sigma_{2,0} projection */
+    SIGMAPROJ_ZY = 8,     /*!< Sigma_{2,1}   projection */
+    SIGMAPROJ_TX = 9,     /*!< Sigma_{3,0} projection */
+    SIGMAPROJ_TY =10,     /*!< Sigma_{3,1} projection */
+    SIGMAPROJ_TZ =11     /*!< Sigma_{3,2}  projection */
+};
 
 //------------------------------------------------------------------
-// The type of operators used in RitzEigMat and RitzMat
+//! Operators, in terms of the fermion matrix \e M, of which the eigenvalues/vectors can be found.
 //------------------------------------------------------------------
-enum RitzMatType {NONE,            // No eigenvalues requested
-		  MAT_HERM,        // Use hermitian (full) matrix in RitzEig
-		  MATPC_HERM,      // Use hermitian preconditioned mat in RitzEig
-		  MATPCDAG_MATPC,  // Use preconditioned MatDag*Mat in Ritz
-		  MATDAG_MAT,      // Use MatDag*Mat in Ritz
-		  NEG_MATDAG_MAT}; // Use neg of MatDag*Mat in Ritz
+enum RitzMatType {
+    NONE,            /*!< No eigenvalues requested */
+    MAT_HERM,        /*!< The hermitian matrix on the full lattice */
+    MATPC_HERM,      /*!< The preconditioned hermitian matrix on a single parity. */
+    MATPCDAG_MATPC,  /*!< The preconditioned \f$M^\dagger M\f$
+		          on a single parity */
+    MATDAG_MAT,      /*!< \f$M^\dagger M\f$ on the full lattice */
+    NEG_MATDAG_MAT   /*!< \f$-M^\dagger M\f$ on the full lattice*/
+};
+		  
 
 #endif
+
 
 CPS_END_NAMESPACE

@@ -7,8 +7,8 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<alg/w_fuzzing.h>
-#include<alg/w_field.h>
+#include <alg/w_fuzzing.h>
+#include <alg/w_field.h>
 CPS_START_NAMESPACE
 
 class WspectQuark : public WspectGinfo {
@@ -172,4 +172,5 @@ private:
  *       DEV2     Z  Z  Y  Y
  *       DEV3     T  T  T  Z
  */
+
 CPS_END_NAMESPACE

@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief  Definition of DiracOp class Ritz eigensolver methods.
+
+  $Id: ritz.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/ritz.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: ritz.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/ritz.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: ritz.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: ritz.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/ritz.C,v $
 //  $State: Exp $
 //
@@ -121,19 +126,31 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<util/dirac_op.h>
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/gjp.h>
-#include<comms/glb.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <util/dirac_op.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <comms/glb.h>
+#include <util/verbose.h>
+#include <util/error.h>
 #include <math.h>
 CPS_START_NAMESPACE
 
-
-void GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size)
+//! Vector orthogonalisation
+/*!
+  Implementation of the Gram-Schmidt method to orthogonalise vectors.
+  \param psi An array of vectors to be orthogonalised.
+  \param Npsi The number of vectors to be orthogonalised.
+  \param vec An array of vectors against which each vector in \a psi is to
+  be orthogonalised.
+  \pre The vectors in the array \a vec should have unit norm.
+  \param Nvec The number of vectors in the array \a vec.
+  \param f_size The length, in floating point numbers, of the vectors.
+  \post Each vector in the array \a psi is orthogonal to all of the vectors
+  in the array \a vec.
+*/
+void GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size) 
 {
   Complex xp;
 
@@ -149,6 +166,12 @@ void GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size)
   }
 }
 
+/*!
+  The eigensolver implemented here finds the \e n th lowest eigenvalue
+  \e lambda_n of a of a hermitian matrix \a A by using a Conjugate Gradient
+  based method to minimize the Ritz functional in the subspace orthogonal
+  to the \e (n-1) lower eigenvectors of \e A.
+*/
 
 int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda, 
 		  Float RsdR_a, Float RsdR_r, Float Rsdlam, 
@@ -527,4 +550,5 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   ERR.General(cname,fname, "too many CG/Ritz iterations: %d\n",n_count);
   return n_count;
 }
+
 CPS_END_NAMESPACE

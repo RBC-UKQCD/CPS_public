@@ -1,15 +1,27 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
+/*!\file
+  \brief  Definitions of communications routines
+
+  $Id: get_data.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
+//--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/scu/get_data.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: get_data.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/scu/get_data.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: get_data.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1  2003/06/22 13:34:47  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.4  2001/08/16 10:50:03  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -34,7 +46,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -44,13 +56,30 @@ CPS_END_NAMESPACE
 #include<comms/nga_reg.h>
 #include<util/smalloc.h>
 #include<util/gjp.h>
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
 // mu = {0,1,2,3,4} corresponds to {x,y,z,t,s}
 //------------------------------------------------------------------
 
+//------------------------------------------------------------------
+/*!
+  Gets a contiguous block of floating point data from the neighbouring node
+  in a positive direction.
+
+  This function also handles the case where there is no such node,
+  \e i.e. the lattice is local in that direction.
+
+  \param rcv_buf A buffer into which the data is copied.
+  \param send_buf A buffer from which the data is to be copied.
+  \param len The amount of data; the number of floating point numbers.
+  \param mu The direction of the transfer, one of {0, 1, 2, 3, 4} corresponding
+  to {x, y, z, t, s} respectively.
+
+  \ingroup comms
+*/
+//------------------------------------------------------------------
 void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
 {
   if(gjp_local_axis[mu] == 0) {
@@ -67,6 +96,22 @@ void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
   }
 }
 
+
+/*!
+  Gets a contiguous block of floating point data from the neighbouring
+  node in a negative direction.
+
+  This function also handles the case where there is no such node,
+  \e i.e. the lattice is local in that direction.
+
+  \param rcv_buf A buffer into which the data is copied.
+  \param send_buf A buffer from which the data is to be copied.
+  \param len The amount of data; the number of floating point numbers.
+  \param mu The direction of the transfer, one of {0, 1, 2, 3, 4} corresponding
+  to {x, y, z, t, s} respectively.
+
+  \ingroup comms
+*/
 
 void getMinusData(IFloat* rcv_buf, IFloat* send_buf, int len, int mu)
 {
@@ -97,6 +142,25 @@ const SCUDir neg_dir[] = { SCU_XM, SCU_YM, SCU_ZM, SCU_TM };
 //  get data from any ONE site on the 1-D side of 
 //  the spatial cube: 2 times SCU transfer
 //-------------------------------------------------------------------
+/*!
+  Gets a contiguous block of floating point data from the second-nearest
+  neighbouring node in a negative direction, \e i.e.  the node in the
+  (-mu, -nu) position relative to this one.
+
+  This function also handles the case where there is no such node
+  in either of these directions,
+  \e i.e. the lattice is local in that direction.
+
+  \param rcv_buf A buffer into which the data is copied.
+  \param send_buf A buffer from which the data is to be copied.
+  \param len The amount of data; the number of floating point numbers.
+  \param mu The direction of the transfer, one of {0, 1, 2, 3} corresponding
+  to {x, y, z, t} respectively.
+  \param nu The other direction of the transfer.
+
+  \ingroup comms
+*/
+//-------------------------------------------------------------------
 void getMinus2Data(IFloat* rcv_buf, IFloat* send_buf, int len, int mu, int nu)
 {
     IFloat *tmp_buf = (IFloat *)smalloc(len*sizeof(IFloat));
@@ -119,6 +183,25 @@ void getMinus2Data(IFloat* rcv_buf, IFloat* send_buf, int len, int mu, int nu)
 //-------------------------------------------------------------------
 //  get data from (-1, -1, -1): with dir being the normal direction
 //  orthogonal to this hyperplane
+//-------------------------------------------------------------------
+/*!
+  Gets a contiguous block of floating point data from the 
+  node in a relative position to this one of (-mu, -nu, -rho)
+  where mu, nu and rho are any of the directions {x, y, z, t}.
+  
+  This function also handles the case where there is no such node
+  in any of these directions,
+  \e i.e. the lattice is local in that direction.
+
+  \param rcv_buf A buffer into which the data is copied.
+  \param send_buf A buffer from which the data is to be copied.
+  \param len The amount of data; the number of floating point numbers.
+  \param dir The direction perpendicular to all of the directions in transfer
+  is to take place, one of {0, 1, 2, 3} corresponding to {x, y, z, t}
+  respectively. 
+
+  \ingroup comms
+*/
 //-------------------------------------------------------------------
 void getMinus3Data(IFloat* rcv_buf, IFloat* send_buf, int len, int dir)
 {

@@ -10,8 +10,8 @@ CPS_START_NAMESPACE
 #define INCLUDED_WSPECT_FIELD_H
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
-#include<alg/w_ginfo.h>
+#include <util/data_types.h>        // Float, Complex
+#include <alg/w_ginfo.h>
 CPS_START_NAMESPACE
 
 class Lattice; 
@@ -55,4 +55,5 @@ class WspectField : public WspectGinfo{
 };
 
 #endif 
+
 CPS_END_NAMESPACE

@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of GimprRect class.
+
+  $Id: g_impr_rect.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: g_impr_rect.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: g_impr_rect.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,32 +39,23 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: g_impr_rect.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//
-// g_impr_rect.C
-//
-// GimprRect is derived from Lattice and is relevant to the 
-// action which contains the standard Wilson plaquette operator
-// plus the second order rectangle operator.
-//
-//-----------------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <stdlib.h>
 #include <math.h>
-#include<util/lattice.h>
-#include<util/verbose.h>
-#include<util/vector.h>
-#include<util/gjp.h>
-#include<util/gw_hb.h>
-#include<comms/nga_reg.h>
-#include<comms/glb.h>
-#include<comms/cbuf.h>
+#include <util/lattice.h>
+#include <util/verbose.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <util/gw_hb.h>
+#include <comms/nga_reg.h>
+#include <comms/glb.h>
+#include <comms/cbuf.h>
 CPS_START_NAMESPACE
 #ifdef _TARTAN
 CPS_END_NAMESPACE
@@ -68,8 +64,6 @@ CPS_START_NAMESPACE
 #endif
 
 
-//------------------------------------------------------------------------------
-//
 //------------------------------------------------------------------------------
 enum { MATRIX_SIZE = 18 };
 
@@ -286,6 +280,32 @@ void GimprRect::GactionGradient(Matrix &grad, int *x, int mu)
 //------------------------------------------------------------------------
 // GimprRect::AllStaple() gets all the staples relavent to the heat bath
 //    in this case it's (1-8*c_1)*plaq_staple + c_1*rect_staple 
+/*!
+  The sum of the staples around the link \f$ U_\mu(x) \f$ is:
+\f[
+(1-8c_1)\sum_{\nu \neq \mu}[
+              U_\nu(x+\mu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+ +  U^\dagger_\nu(x+\mu-\nu) U^\dagger_\mu(x-\nu) U_\nu(x-\nu)] \f]\f[
+ +  c_1\sum_{\nu \neq \mu}\left[\right.     
+ U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu)
+ U^\dagger_\mu(x+\nu)  U^\dagger_\nu(x) \f]\f[
+ + U_\mu(x+\mu)    U^\dagger_\nu(x+2\mu-\nu) U^\dagger_\mu(x+\mu-\nu) 
+ U^\dagger_\mu(x-\nu)  U_\nu(x-\nu) \f]\f[
+ + U_\nu(x+\mu)    U^\dagger_\mu(x+\nu)  U^\dagger_\mu(x-\mu+\nu)
+ U^\dagger_\nu(x-\mu) U_\mu(x-\mu)  \f]\f[
+ + U^\dagger_\nu(x+\mu-\nu) U^\dagger_\mu(x-\nu)  U^\dagger_\mu(x-\mu-\nu)
+ U_\nu(x-\mu-\nu) U_\mu(x-\mu) \f]\f[
+ + U_\nu(x+\mu)    U_\nu(x+\mu+\nu)   U^\dagger_\mu(x+2\nu)
+ U^\dagger_\nu(x+\nu)  U^\dagger_\nu(x) \f]\f[
+ + U^\dagger_\nu(x+\mu-\nu) U^\dagger_\nu(x+\mu-2\nu) U^\dagger_\mu(x-2\nu)
+ U_\nu(x-2\nu)  U_\nu(x-\nu)       
+ \left.\right]
+ \f]
+
+  \param x The coordinates of the lattice site 
+  \param mu The link direction 
+  \param stap The computed staple sum.
+ */
 //------------------------------------------------------------------------
 void GimprRect::
 AllStaple(Matrix &stap, const int *x, int mu){
@@ -299,5 +319,6 @@ AllStaple(Matrix &stap, const int *x, int mu){
   vecTimesEquFloat((IFloat*)&stap, GJP.C1(), MATRIX_SIZE);
   vecAddEquVec((IFloat*)&stap, (IFloat*)&mat, MATRIX_SIZE); 
 }
+
 
 CPS_END_NAMESPACE

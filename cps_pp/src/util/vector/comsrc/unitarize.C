@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of Matrix class method Matrix::Unitarize
+
+  $Id: unitarize.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/unitarize.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: unitarize.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/unitarize.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: unitarize.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,33 +31,33 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: unitarize.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/unitarize.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//  unitarize.C
-//
-//  Forces a matrix to be unitary.
-//
-//  Sui 10/98
-// 
-//------------------------------------------------------------------
+
 CPS_END_NAMESPACE
-#include<util/vector.h>
+#include <util/vector.h>
 #include <math.h>	// sqrt()
 CPS_START_NAMESPACE
 
-void normalize(Float *p);
-void orthogonalize(Float *p2, const Float *p1);
+//! Utility routine used by Matrix::Unitarize
+/*!\todo Since these routines are only used by a Matrix class method they 
+  could be made private methods of the Matrix class.
+*/
+ void normalize(Float *p);
+//! Utility routine used by Matrix::Unitarize
+void orthogonalize(Float *p2, const Float *p1); 
+//! Utility routine used by Matrix::Unitarize
 void crossProductConj(Float *v3, const Float *v1, const Float *v2);
-
-
 
 //------------------------------------------------------------------
 // The unitarize routine
 //------------------------------------------------------------------
+/*!
+  \post This matrix is a member of the SU(3) group.
+*/
 void Matrix::Unitarize()
 {
     Float *p1 = &u[0];	// row 1
@@ -139,6 +144,7 @@ void crossProductConj(Float *v3, const Float *v1, const Float *v2)
   v3[4] = v1[0]*v2[2] - v1[1]*v2[3] -v1[2]*v2[0] + v1[3]*v2[1];
   v3[5] = -v1[0]*v2[3] - v1[1]*v2[2] + v1[2]*v2[1] + v1[3]*v2[0];
 }
+
 
 
 CPS_END_NAMESPACE

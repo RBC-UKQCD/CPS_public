@@ -1,12 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
+//-------------------------------------------------------------------
+/*!\file
+  \brief  Declarations of communications routines
+
+  $Id: scu.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: scu.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: scu.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +40,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: scu.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu.h,v $
 //  $State: Exp $
 //
@@ -52,7 +58,7 @@ CPS_START_NAMESPACE
 #define INCLUDED_SCU_H
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
+#include <util/data_types.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
@@ -63,10 +69,16 @@ CPS_START_NAMESPACE
 #define IDLE 'i'
 extern void bsm(IFloat *, int , int , int , int , int  );
 
+/*! \defgroup sendrecv Fairly high level send/receive routines
+  \ingroup comms
+  @{ */ 
+
 //------------------------------------------------------------------
 // getPlusData:
 // mu = {0,1,2,3,4} corresponds to {x,y,z,t,s}
 //------------------------------------------------------------------
+//! Sends data in negative direction/receives data from positive direction.
+
 extern void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu);
  
 
@@ -74,6 +86,7 @@ extern void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu);
 // getMinusData:
 // mu = {0,1,2,3,4} corresponds to {x,y,z,t,s}
 //------------------------------------------------------------------
+//! Sends data in positive direction/receives data from negative direction.
 extern void getMinusData(IFloat* rcv_buf, IFloat* send_buf, int len, int mu);
 
 
@@ -81,6 +94,7 @@ extern void getMinusData(IFloat* rcv_buf, IFloat* send_buf, int len, int mu);
 // getMinus2Data: get data from node "-mu, -nu"
 // mu = {0,1,2,3} corresponds to {x,y,z,t}
 //------------------------------------------------------------------
+//! Sends data in positive direction/receives data from negative direction.
 extern void 
 getMinus2Data(IFloat* rcv_buf, IFloat* send_buf, int len, int mu, int nu);
 
@@ -89,10 +103,14 @@ getMinus2Data(IFloat* rcv_buf, IFloat* send_buf, int len, int mu, int nu);
 // getMinus3Data: get data from node "-mu, -nu, -rho" ( != dir )
 // mu = {0,1,2,3} corresponds to {x,y,z,t}
 //------------------------------------------------------------------
+//! Sends data in positive direction/receives data from negative direction.
 extern void 
 getMinus3Data(IFloat* rcv_buf, IFloat* send_buf, int len, int dir);
 
+/*! @} */
+
 #endif
+
 
 
 

@@ -13,7 +13,7 @@ CPS_START_NAMESPACE
  */
 
 CPS_END_NAMESPACE
-#include<alg/w_all.h>
+#include <alg/w_all.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
@@ -27,28 +27,28 @@ CPS_START_NAMESPACE
 #endif
  
 CPS_END_NAMESPACE
-#include<util/error.h>
-#include<util/verbose.h>
+#include <util/error.h>                // ERR
+#include <util/verbose.h>              // VRB
 CPS_START_NAMESPACE
  
 
 CPS_END_NAMESPACE
-#include<util/vector.h>
+#include <util/vector.h>               // dotProduct
 CPS_START_NAMESPACE
  
 CPS_END_NAMESPACE
-#include<comms/glb.h>
-#include<alg/common_arg.h>
+#include <comms/glb.h>                   // glb_sum
+#include <alg/common_arg.h>
 CPS_START_NAMESPACE
  
 CPS_END_NAMESPACE
-#include<alg/alg_w_spect.h>
+#include <alg/alg_w_spect.h>          // AlgWspect::GetCounter()
 CPS_START_NAMESPACE
  
 CPS_END_NAMESPACE
-#include<comms/glb.h>
-#include<comms/scu.h>
-#include<comms/cbuf.h>
+#include <comms/glb.h>               // glb_sum(...)
+#include <comms/scu.h>              //getMinusData, getPlusData
+#include <comms/cbuf.h>              
 CPS_START_NAMESPACE
 
 #ifdef _TARTAN
@@ -794,6 +794,7 @@ void WspectFuzzing::displaySU3(Matrix *m){
 }
 */
 #endif //ifdef DEBUG_FUZZING
+
 
 
 

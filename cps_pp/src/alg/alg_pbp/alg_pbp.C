@@ -1,28 +1,20 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief Methods of the AlgPbp class.
+  
+  $Id: alg_pbp.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: alg_pbp.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: alg_pbp.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.5  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.4  2001/08/16 10:49:39  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -47,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_pbp.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v $
 //  $State: Exp $
 //
@@ -75,20 +67,24 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
 #include <stdio.h>
-#include<alg/alg_pbp.h>
-#include<alg/common_arg.h>
-#include<alg/pbp_arg.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <alg/alg_pbp.h>
+#include <alg/common_arg.h>
+#include <alg/pbp_arg.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/verbose.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
-// Constructor 
+/*!
+  \param latt The lattice on which to compute the condensate.
+  \param c_arg The common argument structure for all algorithms.
+  \param arg The algorithm parameters.
+ */
 //------------------------------------------------------------------
 AlgPbp::AlgPbp(Lattice& latt, 
 	       CommonArg *c_arg,
@@ -147,7 +143,11 @@ AlgPbp::~AlgPbp() {
 
 
 //------------------------------------------------------------------
-//
+//! Performs the computation.
+/*!
+  \post The results are written to the file specified in the common_arg
+  structure.
+*/
 //------------------------------------------------------------------
 void AlgPbp::run()
 {
@@ -163,6 +163,8 @@ void AlgPbp::run()
   CgArg *cg_arg = &cg_arg_struct;
   char *fname = "run()";
   VRB.Func(cname,fname);
+
+/////  printf("HERE HERE... \n");
 
 
   // Set the Lattice pointer pbp_arg and cg_arg
@@ -546,7 +548,26 @@ void AlgPbp::run()
 
 
 //------------------------------------------------------------------
-//
+//! Run the algorithm using point sources and domain wall fermions.
+/*!
+  The algorithm runs roughly as follows:
+
+-#  Create a vector R zero everywhere except at the site specified where
+  only the spin \a s and colour \a c component is 1.
+-#  Solve M psi = R for psi where M is the fermion matrix. The initial guess
+  for psi is a vector with every complex component equal to 1.
+-#  Compute the normalised real part of the dot product <R,psi>.
+-#  Compute the normalised real part of the dot product <R, gamma_5 psi>.
+-# Repeat from step 1 for all other possible values of \a s and \a c.
+-# Sum the dot products over all spin and colour values.
+
+\param x the x coordinate of the point source.
+\param y the y coordinate of the point source.
+\param z the z coordinate of the point source.
+\param t the t coordinate of the point source.
+\post The results are written to the file specified in the common_arg
+structure,
+ */
 //------------------------------------------------------------------
 void AlgPbp::runPointSource(int x, int y, int z, int t)
 {
@@ -747,7 +768,6 @@ void AlgPbp::runPointSource(int x, int y, int z, int t)
 	      // Calculate pbg5p = Tr[ PsiBar * Gamma5 * Psi]
 	      lat.Gamma5(sol_4d, sol_4d, GJP.VolNodeSites());
 	      pbg5p = sol_4d->ReDotProductGlbSum(src_4d, f_size/ls) / pbp_norm;
-	      
 	      pbg5ptmp += pbg5p;
 	      
 	    }
@@ -824,6 +844,7 @@ void AlgPbp::runPointSource(int x, int y, int z, int t)
   }
   
 }
+
 
 
 

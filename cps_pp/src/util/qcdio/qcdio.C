@@ -1,24 +1,25 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
-/*! The QCD I/O Interface:
+/*!\file
+  \brief  The QCD I/O Interface:
 
-  $Id: qcdio.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-
-  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
+  $Id: qcdio.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
+/*  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
-   $Author: mcneile $
-   $Date: 2003-06-22 13:34:46 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-   $Id: qcdio.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+   $Author: zs $ 
+   $Date: 2003-07-24 16:53:54 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+   $Id: qcdio.C,v 1.2 2003-07-24 16:53:54 zs Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.C,v $
-   $Revision: 1.1.1.1 $
+   $Revision: 1.2 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v $
-   $State: Exp $  */
+   $State: Exp $  */ 
 /*----------------------------------------------------------*/
 
 CPS_END_NAMESPACE
@@ -26,17 +27,16 @@ CPS_END_NAMESPACE
 #include <stdlib.h>
 #include <stdarg.h>
 #include <math.h>
-#include<config.h>
-#include<util/qcdio.h>
+#include <util/qcdio.h>
 CPS_START_NAMESPACE
 #ifdef PARALLEL
 CPS_END_NAMESPACE
-#include<comms/sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 #endif
 CPS_END_NAMESPACE
-#include<util/gjp.h>
-#include<util/error.h>
+#include <util/gjp.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 /* Could use a flag HAVE_VPRINTF to check this is possible. */
@@ -57,7 +57,11 @@ CPS_START_NAMESPACE
   	Basic standard I/O:
     ------------------------------------------------------ */
   
-  //! Reimplementation of printf that prints on only the zeroth node
+  /*!
+    Works just like printf.
+    \param format The format string
+    \param ... Optional arguments to the format string 
+   */
   int qprintf( const char *format, ... ) {
         va_list ap;
         int nbytes;
@@ -73,7 +77,12 @@ CPS_START_NAMESPACE
         return nbytes;
   }
 
-  //! Reimplementation of fprintf that prints on only the zeroth node
+  /*!
+    Works just like fprintf.
+    \param stream The file handle to which to print
+    \param format The format string
+    \param ... Optional arguments to the format string 
+   */
   int qfprintf( FILE *stream, const char *format, ... ) {
         va_list ap;
         int nbytes;
@@ -89,7 +98,11 @@ CPS_START_NAMESPACE
         return nbytes;
   }
   
-  //! Reimplementation of printf that prints on all nodes
+  /*!
+    Works just like printf.
+    \param format The format string
+    \param ... Optional arguments to the format string 
+   */
   int qprintf_all( const char *format, ... ) {
         va_list ap;
         int nbytes;
@@ -101,7 +114,12 @@ CPS_START_NAMESPACE
         return nbytes;
   }
  
-  //! Reimplementation of printf that prints on all nodes with node ID prefix
+  /*!
+    Works just like printf, but prefixes the message with the node ID number
+    and the cartesian coordinates of the node in the node grid.
+    \param format The format string
+    \param ... Optional arguments to the format string 
+   */
   int qprintf_allid( const char *format, ... ) {
         va_list ap;
         int nbytes;
@@ -123,7 +141,13 @@ CPS_START_NAMESPACE
   }
 
 
-  //! Reimplenemtation of fprintf that prints on all nodes
+  /*!
+    Works just like fprintf.
+    \param stream The file handle to which to print    
+    \param format The format string
+    \param ... Optional arguments to the format string 
+   */
+
   int qfprintf_all( FILE *stream, const char *format, ... ) {
         va_list ap;
         int nbytes;
@@ -144,11 +168,11 @@ CPS_START_NAMESPACE
   	Gauge configuration I/O:
     ------------------------------------------------------ */
   
-  /*! Routine for performing the bytes-swapping of the raw
-      data files.  The decision of whether to swap is based on the
-      SWAP_BYTE_ORDER macro (1 = do the swap, 0 = don't swap);
-
-      This subroutine taken fram swap.cpp by Balint Joo.
+  //! Routine for performing the bytes-swapping of double precision raw data files.
+  /*!
+    This is a utility routine used by functions qload_unpackstrip and
+    qsave_packstrip.\n
+    This subroutine taken fram swap.cpp by Balint Joo.
   */
   void block_swap_double( double *buffer, int length ) {
        int i;
@@ -173,6 +197,13 @@ CPS_START_NAMESPACE
        }
        return;
   }
+
+//! Routine for performing the bytes-swapping of single precision raw data files.
+/*!
+  This is a utility routine used by functions qload_unpackstrip and
+  qsave_packstrip.
+*/
+
   void block_swap( int *buffer, int length ) {
     int i;
     union swapper {
@@ -196,9 +227,11 @@ CPS_START_NAMESPACE
 
   
   // -------------------------------------------------------------------------------
-
-  /*! Normalises the specified row of an SU3 complex matrix:
-  This subroutine was taken from su3_matrix.cpp by Balint Joo.
+  //! Normalises the specified row of an SU3 complex matrix:
+  /*!
+    This is a utility routine used by function qload_unpackstrip in
+    the SU(3) reunitarisation.\n
+    This subroutine was taken from su3_matrix.cpp by Balint Joo.
   */
   void qcdio_norm_row(Complex* data_, int row) {
      double sum;
@@ -226,9 +259,11 @@ CPS_START_NAMESPACE
   }
   
   // -------------------------------------------------------------------------------
-
-  /*! Orthogonailises two rows within an SU3 matrix:
-  This subroutine taken from su3_matrix.cpp by Balint Joo.
+  //! Orthogonalises two rows within an SU3 matrix:
+  /*!
+    This is a utility routine used by function qload_unpackstrip in
+    the SU(3) reunitarisation.\n
+    This subroutine taken from su3_matrix.cpp by Balint Joo.
   */
   void qcdio_orthog_rows( Complex* data_, int row1, int row2) {
      Complex dotprod1;
@@ -258,12 +293,14 @@ CPS_START_NAMESPACE
   }  
   
   // -------------------------------------------------------------------------------
-    
-  /*! Computes the cross-product of the 1st and 2nd rows in an SU3 matrix in
-   order to determine the values for the third row.
-   This subroutine taken from su3_matrix.cpp by Balint Joo:
-   Computes 
-              ( row1 x row2 )*
+  //! Computes the cross-product of the 1st and 2nd rows in an SU3 matrix
+  /*!
+    Computes
+              ( row1 x row2 )* 
+
+    \nThis is a utility routine used by function qload_unpackstrip in
+    the SU(3) reunitarisation.\n
+    This subroutine taken from su3_matrix.cpp by Balint Joo:
               Nicked from GHMC.
   */
   void qcdio_cross_rows( Complex* data_, int row1, int row2, int row3) {
@@ -288,12 +325,16 @@ CPS_START_NAMESPACE
   }
   
   // -------------------------------------------------------------------------------
-  
+  /*!
+    \param newval Set to 1 if the gauge field is to be normalized, or any
+    other value if it is not.
+  */
   void qcdio_set_normalize( int newval ) {
     qcdio_normalize_the_data = newval;
   }
   
   // -------------------------------------------------------------------------------
+  //! A utility routine used by qloadsave_gauge.
 
   void qload_unpackstrip( unsigned char* mtxfilebuff, 
                           int filebufsize,
@@ -367,7 +408,8 @@ CPS_START_NAMESPACE
     return;
   }
   
-  // -------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  //! A utility routine used by qloadsave_gauge.
 
   void qsave_packstrip( unsigned char* mtxfilebuff, 
                         int filebufsize,
@@ -424,6 +466,8 @@ CPS_START_NAMESPACE
   }
 
   // --------------------------------------------------------------------------
+  //! A utility routine used by qloadsave_gauge.
+
   // if inout = 0, pump down to t,0,0,0 (for saving).
   // if inout = 1, pump up from t,0,0,0 (for loading).
   void qloadsave_pump_data( int* pos, unsigned char* buf, int byte_size, int inout) {
@@ -551,6 +595,7 @@ CPS_START_NAMESPACE
   }
 
   // --------------------------------------------------------------------------
+  //! A utility routine used by qloadsave_gauge.
 
   void qload_parameters( char* fprefix, Lattice& lat ) {
     int fprelen;
@@ -616,6 +661,7 @@ CPS_START_NAMESPACE
   }
 
   // --------------------------------------------------------------------------
+  //! A utility routine used by qloadsave_gauge.
 
   void qsave_parameters( char* fprefix, Lattice& lat ) {
     // Grab parameters from CPS and put into our own variables.
@@ -635,7 +681,8 @@ CPS_START_NAMESPACE
   }
 
   // --------------------------------------------------------------------------
-  
+  //! A utility routine used by qload_gauge and qsave_gauge..
+
   // mode = 0 does a load
   // mode != 0 does a save
   void qloadsave_gauge( int mode, char* fprefix, Lattice& lat, 
@@ -837,10 +884,17 @@ CPS_START_NAMESPACE
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
-  /*! Routine for loading a gauge configuration:
-  Loads the guage configuration from a set us UKQCD format
-  files (identified by the filename prefix fprefix) into the 
-  Lattice object lat */
+  /*! 
+    Loads the gauge configuration from a set of UKQCD format
+    files.
+    \param fprefix The prefix of the gauge configuration filenames
+    \param lat The Lattice object into which to load the gauge configuration
+    \param prec The precision at which the gauge configuration is stored in
+    the file, either \c sizeof(float) or \c sizeof(double)
+    \param swap 1 if the data need to be byte-swapped when they are read in,
+    0 otherwise,
+    \param transp 1 if the gauge field matrices need to be transposed when they are read in,
+  */
   void qload_gauge( char* fprefix, Lattice& lat, 
              int prec,
 	     int swap,
@@ -849,9 +903,18 @@ CPS_START_NAMESPACE
     return;
   }  
 
-  /*! Routine for saving the current gauge configuration:
-  Saves the gauge configuration held in the Lattice object lat 
-  into a set of UKQCD format files under the prefix fprefix. */
+  /*! 
+    Saves the gauge configuration into a set of UKQCD format
+    files.
+    Lattice object lat
+    \param fprefix The prefix of the gauge configuration filenames
+    \param lat The Lattice object from which to write the gauge configuration
+    \param prec The precision at which the gauge configuration is stored in
+    the file, either \c sizeof(float) or \c sizeof(double)
+    \param swap 1 if the data need to be byte-swapped when they are written out,
+    0 otherwise,
+    \param transp 1 if the gauge field matrices need to be transposed when they are written out,
+  */
   void qsave_gauge( char* fprefix, Lattice& lat, 
              int prec, 
 	     int swap, 
@@ -862,5 +925,6 @@ CPS_START_NAMESPACE
 
 
 // --------------------------------------------------------------------------
+
 
 CPS_END_NAMESPACE

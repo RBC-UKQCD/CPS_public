@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief  Routine used internally in the DiracOpWilson class.
+
+  $Id: wilson_end.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_end.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: wilson_end.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_end.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: wilson_end.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,35 +31,19 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: wilson_end.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_end.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-/****************************************************************************/
-/* 10/16/97                                                                 */
-/*                                                                          */
-/* wilson_end:                                                              */
-/*                                                                          */
-/* This routine frees any memory that was allocated by wilson_init          */
-/*                                                                          */
-/* WARNING:                                                                 */
-/*                                                                          */
-/* This set of routines will work only if the node sublattices have         */
-/* even number of sites in each direction.                                  */
-/*                                                                          */
-/****************************************************************************/
 
-/*--------------------------------------------------------------------------*/
-/* Include header files                                                     */
-/*--------------------------------------------------------------------------*/
 CPS_END_NAMESPACE
-#include<util/wilson.h>
-#include<util/smalloc.h>
-#include<util/verbose.h>
+#include <util/wilson.h>
+#include <util/smalloc.h>
+#include <util/verbose.h>
 CPS_START_NAMESPACE
 
-
+  
 void wilson_end( Wilson *wilson_p)
 {
   char *cname = " ";
@@ -71,4 +60,5 @@ void wilson_end( Wilson *wilson_p)
   sfree(wilson_p->ptr);
 
 }
+
 CPS_END_NAMESPACE

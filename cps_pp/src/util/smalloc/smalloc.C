@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Dynamic memory management routines.	
+
+  $Id: smalloc.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/smalloc/smalloc.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: smalloc.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/smalloc/smalloc.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: smalloc.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,18 +31,22 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: smalloc.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/smalloc/smalloc.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 CPS_END_NAMESPACE
-#include<util/smalloc.h>
-#include<util/verbose.h>
+#include <util/smalloc.h>
+#include <util/verbose.h>
 #include <stdlib.h>
 CPS_START_NAMESPACE
 
-
+//! Allocate memory
+/*!
+  \param request The amount of memory (in bytes) to allocate
+  \return A pointer to the allocated memory
+*/
 void* smalloc(int request){
   void* ptr;
   
@@ -46,6 +55,10 @@ void* smalloc(int request){
   return ptr;
 }
 
+//! Free allocate memory
+/*!
+  \param p Pointer to the memory to be freed.
+*/
 void sfree(void* p){
   VRB.Sfree("","sfree(v*)","",p);
   free((char*) p);
@@ -54,6 +67,7 @@ void sfree(void* p){
 
 
 void sclear(void){};
+
 
 
 

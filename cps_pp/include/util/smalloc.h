@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Declaration of dynamic memory management routines.	
+
+  $Id: smalloc.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: smalloc.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: smalloc.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,13 +31,13 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: smalloc.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 #ifndef _smalloc_h
-#define _smalloc_h
+#define _smalloc_h                //!< Prevent multiple inclusion
 
 
 void* smalloc(int request);
@@ -43,4 +48,5 @@ void sclear(void);
 
 
 #endif /* !_smalloc_h */
+
 CPS_END_NAMESPACE

@@ -1,8 +1,12 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
-/*! The MPI comms direction and flag enums:
+/*!\file
+  \brief  The MPI communication direction and flag enumerations:
 
+  $Id: scu_enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
+/*---------------------------------------------------------------
   This is very closely based on the original scu_enum.h from QCDSP.
   The only difference is the order of the direction enum `SCUDir'.
   This order reflects the way in which the MPI implementation
@@ -16,20 +20,19 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: mcneile $
-  $Date: 2003-06-22 13:34:52 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-  $Id: scu_enum.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+  $Author: zs $
+  $Date: 2003-07-24 16:53:53 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: scu_enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_enum.h,v $
-  $Revision: 1.1.1.1 $
+  $Revision: 1.2 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
 CPS_END_NAMESPACE
-#include<config.h>
 CPS_START_NAMESPACE
 
 /* Allow the MPI stuff to be switched out, thus avoiding compiler
@@ -54,34 +57,50 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  Map physics directions to wires
 //--------------------------------------------------------------------
-/*! Like QCDSP, MPI implementation uses +t,-t,+x,-x,+y,-y,+z,-z.  Must go + then -, but the order of t, x, y and z is arbitrary. */
+//! Definition of the physical directions
+/*!
+  The order must alternate positive and negative directions,
+  but the order of t, x, y and z is arbitrary.
+*/
+//--------------------------------------------------------------------
 enum SCUDir { 
-  SCU_TP, 
-  SCU_TM, 
-  SCU_XP, 
-  SCU_XM, 
-  SCU_YP, 
-  SCU_YM, 
-  SCU_ZP, 
-  SCU_ZM,
-  SCU_NoDir = -1 
+  SCU_TP,                      /*!< +t */
+  SCU_TM,                      /*!< -t */
+  SCU_XP,                      /*!< +x */  
+  SCU_XM,                      /*!< -x */ 
+  SCU_YP,                      /*!< +y */  
+  SCU_YM,                      /*!< -y */  
+  SCU_ZP,                      /*!< +z */  
+  SCU_ZM,                      /*!< -z */ 
+  SCU_NoDir = -1              /*!< Null direction */
 };
 
 
 //--------------------------------------------------------------------
-//!  Label axes
+//! Definition of the physical axes
 //--------------------------------------------------------------------
-enum SCUAxis { SCU_T, SCU_X, SCU_Y, SCU_Z, SCU_NoAxis = -1 };
+enum SCUAxis {
+    SCU_T,          /*!< t axis */
+    SCU_X,          /*!< x axis */
+    SCU_Y,          /*!< y axis */
+    SCU_Z,          /*!< z axis */
+    SCU_NoAxis = -1 /*!< Dummy axis for serial code */
+};
 
 
 //--------------------------------------------------------------------
-//!  Define send and receive for SCU calls
+//!  Flags denoting 'send' and 'receive' in communications routines
 //--------------------------------------------------------------------
-enum SCUXR { SCU_REC, SCU_SEND = 8, SCU_NoXR = -1 };
+enum SCUXR {
+    SCU_REC,         /*!< Receive */
+    SCU_SEND = 8,    /*!< Send */
+    SCU_NoXR = -1    /*!< Dummy flag for serial code */
+};
 
 #endif
 
 #endif /* INCLUDE_MPI_SCU */
+
 
 
 CPS_END_NAMESPACE

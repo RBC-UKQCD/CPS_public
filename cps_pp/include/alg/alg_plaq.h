@@ -1,14 +1,11 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
-//
-// alg_plaq.h
-//
-// Header file for the AlgPlaq class.
-//
-// AlgPlaq is derived from Alg and it measures the average
-// value of the plaquette. 
-//
+/*!\file
+  \brief  Definitions of the AlgPlaq class.
+
+  $Id: alg_plaq.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //------------------------------------------------------------------
 
 
@@ -16,15 +13,26 @@ CPS_START_NAMESPACE
 #define INCLUDED_ALG_PLAQ_H
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/pmalloc.h>
-#include<alg/alg_base.h>
-#include<alg/common_arg.h>
-#include<alg/no_arg.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/pmalloc.h>
+#include <alg/alg_base.h>
+#include <alg/common_arg.h>
+#include <alg/no_arg.h>
 CPS_START_NAMESPACE
 
 
+//------------------------------------------------------------------
+//! A class implementing calculation of the average plaquette.
+/*!
+  This class computes the real trace of the plaquette averaged over
+  the total number of plaquettes and the number of colours (which is three).
+  Also computed is the variance of this mean, and one third of the real trace
+  of the plaquette at the origin in the X-Y plane.
+
+  \ingroup alg
+*/
+//------------------------------------------------------------------
 class AlgPlaq : public Alg
 {
  private:
@@ -47,6 +55,7 @@ class AlgPlaq : public Alg
 
 
 #endif
+
 
 
 

@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief Declarations of routines used internally in the DiracOpClover class.
+
+  $Id: clover.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/clover.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: clover.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/clover.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: clover.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: clover.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/clover.h,v $
 //  $State: Exp $
 //
@@ -52,43 +57,40 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<util/wilson.h>
+#include <util/wilson.h>
 CPS_START_NAMESPACE
 
 //--------------------------------------------------------------------------
 // Type definitions
 //--------------------------------------------------------------------------
+//! A container of data relevant to the clover matrix multiplication.
+/*!
+  This contains parameters describing the  local lattice geometry and
+  pointers to workspace arrays needed by the Wilson-clover matrix
+  multiplication routines.
+ */
+
 struct Clover {
-  IFloat clover_coef;         // The clover coefficient 
-  IFloat *frm_buf0;           // buffers of the size of checkerboarded 
-  IFloat *frm_buf1;           //    fermionic fields for DiracOpClover.
-  int nsites[4];             // number of local sites.  
-  Wilson *wilson_p;          // Pointer to the wilson structure
+  IFloat clover_coef;         //!< The clover coefficient 
+  IFloat *frm_buf0;           //!< Workspace array 
+  IFloat *frm_buf1;           //!< Workspace array 
+  int nsites[4];             //!< The dimensions of the local lattice.
+  Wilson *wilson_p;          //!< Wilson hopping term data
 };
 
 
 //--------------------------------------------------------------------------
-// initialization routine:
-//   performs all initializations needed before clover library
-// funcs are called. It sets the addressing related arrays and reserves
-// memory for the needed temporary buffers. It only needs to be called only
-// once at the begining of the program (or after a clover_end call)
-// before any number of calls to clover functions are made.
-// clover_p is a  pointer to Clover struct.
+//! Initialisation of parameters and memory used in the clover matrix multiplication.
 //--------------------------------------------------------------------------
 void clover_init(Clover *clover_p);
 
 //--------------------------------------------------------------------------
-// This routine frees any memory reserved by clover_init.
-// clover_p is a  pointer to Clover struct.
+//! Frees memory reserved by clover_init    
 //--------------------------------------------------------------------------
 void clover_end(Clover *clover_p);
 
 //--------------------------------------------------------------------------
-// calculate Y = A X   where  Y, X:   spinors (checkboarded)
-//                               A:   compressed Clover matrices (chbd'ed)
-//                               n:   number of local sites (chbd'ed)
-// assume:  Y != X
+
 //--------------------------------------------------------------------------
 inline void clover_mat_mlt(IFloat *Y, const IFloat *A, const IFloat *X, int n);
 
@@ -99,9 +101,21 @@ inline void clover_mat_mlt(IFloat *Y, const IFloat *A, const IFloat *X, int n);
 //--------------------------------------------------------------------------
 // inline function definition:  NO attention for user to pay here!
 //--------------------------------------------------------------------------
+
 extern "C" void clover_mat_mlt_asm(IFloat*, const IFloat*, const IFloat*, int n);
 extern "C" void clover_mat_mlt_C(IFloat*, const IFloat*, const IFloat*, int n);
 
+//--------------------------------------------------------------------------
+//! Multiplication by the clover term.
+/*!
+  A spinor vector on a single parity is multiplied by the clover matrix.
+
+  \param out The resulting vector
+  \param mat The (lower triangular part of the) clover matrix 
+  \param in The vector to be multiplied
+  \param n ?
+*/
+//--------------------------------------------------------------------------
 void clover_mat_mlt(IFloat *Y, const IFloat *A, const IFloat *X, int n) 
 {
 #ifdef _TARTAN
@@ -116,4 +130,5 @@ void clover_mat_mlt(IFloat *Y, const IFloat *A, const IFloat *X, int n)
 
 
 #endif  // #ifndef INCLUDED_CLOVER_H
+
 CPS_END_NAMESPACE

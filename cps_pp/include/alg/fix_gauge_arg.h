@@ -6,8 +6,8 @@ CPS_START_NAMESPACE
 #define INCLUDED_FIX_GAUGE_ARG_H
 
 CPS_END_NAMESPACE
-#include<util/enum.h>
-#include<util/vector.h>
+#include <util/enum.h>
+#include <util/vector.h>
 CPS_START_NAMESPACE
 
 struct FixGaugeArg {
@@ -26,4 +26,5 @@ struct FixGaugeArg {
 
 
 #endif
+
 CPS_END_NAMESPACE

@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of FwilsonTypes class.
+
+  $Id: f_wilson_t.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: f_wilson_t.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: f_wilson_t.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: f_wilson_t.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v $
 //  $State: Exp $
 //
@@ -51,12 +56,12 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/enum.h>
-#include<util/verbose.h>
-#include<util/gjp.h>
-#include<util/error.h>
-#include<util/sproj_tr.h>
+#include <util/lattice.h>
+#include <util/enum.h>
+#include <util/verbose.h>
+#include <util/gjp.h>
+#include <util/error.h>
+#include <util/sproj_tr.h>
 CPS_START_NAMESPACE
 
 extern void gamma_5(IFloat *v_out, IFloat *v_in, int num_sites) ;
@@ -114,17 +119,20 @@ FwilsonTypes::~FwilsonTypes()
 
 
 //------------------------------------------------------------------
-// Gamma5(Vector *v_out, Vector *v_in, int num_sites):
-//
-// v_out = Gamma5 * v_in. Gamme5 is in the chiral basis
-//
-//          [ 1  0  0  0]
-// Gamma5 = [ 0  1  0  0]
-//          [ 0  0 -1  0]
-//          [ 0  0  0 -1]
-//
-// num_sites is the number of sites. It is assumed
-// that each site has 24 components.
+    /*!
+      The vectors should have 4x3 complex components per site.
+      gamma_5 is in the chiral basis:
+    
+               [ 1  0  0  0]
+     gamma_5 = [ 0  1  0  0]
+               [ 0  0 -1  0]
+               [ 0  0  0 -1]
+          
+      \param v_out The product vector.
+      \param v_in The vector to be multiplied,
+      \param num_sites The number of lattice sites at which to do the
+      multiplication.
+    */
 //------------------------------------------------------------------
 void FwilsonTypes::Gamma5(Vector *v_out, Vector *v_in, int num_sites)
 {
@@ -138,6 +146,7 @@ void FwilsonTypes::Gamma5(Vector *v_out, Vector *v_in, int num_sites)
  
   gamma_5((IFloat *)v_out, (IFloat *)v_in, num_sites) ;
 }
+
 
 
 CPS_END_NAMESPACE

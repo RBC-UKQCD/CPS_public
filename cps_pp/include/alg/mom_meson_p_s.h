@@ -6,10 +6,10 @@ CPS_START_NAMESPACE
 #define INCLUDED_MOM_MESON_PROP_S_H
 
 CPS_END_NAMESPACE
-#include<alg/hadron_prop_s.h>
-#include<util/rcomplex.h>
-#include<alg/s_spect_arg.h>
-#include<util/mom.h>
+#include <alg/hadron_prop_s.h>
+#include <util/rcomplex.h>
+#include <alg/s_spect_arg.h>
+#include <util/mom.h>
 CPS_START_NAMESPACE
 
 //-------------------------------------------------------------------
@@ -56,4 +56,5 @@ public:
 };
 
 #endif
+
 CPS_END_NAMESPACE

@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of GimprOLSym class methods.
+
+  $Id: g_impr_OLSym.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: g_impr_OLSym.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: g_impr_OLSym.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -37,7 +42,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: g_impr_OLSym.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v $
 //  $State: Exp $
 //
@@ -54,14 +59,14 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <stdlib.h> // exit()
 #include <math.h>
-#include<util/lattice.h>
-#include<util/verbose.h>
-#include<util/vector.h>
-#include<util/gjp.h>
-#include<util/gw_hb.h>
-#include<comms/nga_reg.h>
-#include<comms/glb.h>
-#include<comms/cbuf.h>
+#include <util/lattice.h>
+#include <util/verbose.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <util/gw_hb.h>
+#include <comms/nga_reg.h>
+#include <comms/glb.h>
+#include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
 //-----------------------------------------------------------------------------
@@ -256,7 +261,39 @@ void GimprOLSym::GactionGradient(Matrix &grad, int *x, int mu)
 //------------------------------------------------------------------------
 // GimprOLSym::AllStaple() gets all the staples relavent to the heat bath
 //    in this case it's 
-//   plaq_staple+rect_coeff*rect_staple+cube_coeff*chair_staple 
+//   plaq_staple+rect_coeff*rect_staple+cube_coeff*chair_staple
+/*!
+    The staple sum around the link U_\mu(x) is
+  \f[
+\sum_{\pm \nu, |\nu|\neq \mu} \left\{\right.
+  U_\nu(x+\mu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]\f[
+  -\frac{ 1 + 0.4805 \alpha_s}{20 u_0^2} \left[\right.
+ U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu)
+ U^\dagger_\mu(x+\nu)  U^\dagger_\nu(x) \f]\f[
+
+ + U_\nu(x+\mu)    U^\dagger_\mu(x+\nu)  U^\dagger_\mu(x-\mu+\nu)
+ U^\dagger_\nu(x-\mu) U_\mu(x-\mu)  \f]\f[
+ 
+ + U_\nu(x+\mu)    U_\nu(x+\mu+\nu)   U^\dagger_\mu(x+2\nu)
+ U^\dagger_\nu(x+\nu)  U^\dagger_\nu(x)
+ \left.\right]\f]\f[
+
+ -\frac{ 0.03325 \alpha_s}{u_0^2}
+ \sum_{\pm \rho, |\rho|\neq \nu, |\rho|\neq \mu}
+
+ U_\nu(x+\mu) U_\rho(x+\mu+\nu) U_{-\mu}(x+\mu+\nu+\rho) U_{-\nu}(x+\nu+\rho) U_{-\rho}(x+\rho)
+ 
+ \left.\right\}
+ \f]
+ where \f$u_0\f$ is the tadpole coefficient
+ and \f$\alpha_s = -4\log(u_0)/3.06839\f$.
+ 
+  \param stap The computed staple sum.
+  \param x The coordinates of the lattice site 
+  \param mu The link direction 
+  
+ */
 //------------------------------------------------------------------------
 void GimprOLSym::AllStaple(Matrix &stap, const int *x, int mu){
   char * fname = "AllStaple()"; 
@@ -282,5 +319,6 @@ void GimprOLSym::AllStaple(Matrix &stap, const int *x, int mu){
   // add the result to stap
   vecAddEquVec((IFloat*)&stap, (IFloat*)&mat, MATRIX_SIZE); 
 }
+
 
 CPS_END_NAMESPACE

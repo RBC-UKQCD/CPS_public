@@ -1,34 +1,34 @@
 #include<config.h>
 CPS_START_NAMESPACE
-/*  cg_arg.h */
+/*!\file
+  \brief  Definition of the CgArg structure..
 
-/*  The structure type CgArg holds the parameters specific to
-    the subroutine cg(). */
+  $Id: cg_arg.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
+//---------------------------------------------------------------------------
 
 #ifndef INCLUDED_CG_ARG_H
-#define INCLUDED_CG_ARG_H
+#define INCLUDED_CG_ARG_H		//!< Prevent multiple inclusion.
 
 CPS_END_NAMESPACE
-#include<util/enum.h>
-#include<util/vector.h>
+#include <util/enum.h>
+#include <util/vector.h>
 CPS_START_NAMESPACE
 
+//! A structure to hold the solver parameters.
 struct CgArg {
-  /* ??? */
 
-  Float mass;			/*  The mass to use in the conjugate
-				gradient solution. */
+    Float mass;			/*!<  The mass parameter. */
 
-  int max_num_iter;		/*  The maximum number of conjugate
-				gradient iterations to do. */
+  int max_num_iter;		/*!<  The maximum number of solver
+				 iterations to do. */
 
+    Float stop_rsd;		/*!<  The target residual. */
 
-  Float stop_rsd;		/*  The residual for the stopping 
-                                condition. */
-
-  enum RitzMatType RitzMatOper; // Which operator to determine eigenvalues of
-                                // if any
+    enum RitzMatType RitzMatOper; /*!< Which operator to determine eigenvalues
+				    of, if any. */
 };
 
 #endif /* !INCLUDED_CG_ARG_H */
+
 CPS_END_NAMESPACE

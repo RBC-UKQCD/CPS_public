@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_hyper_rect.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: w_hyper_rect.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_hyper_rect.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: w_hyper_rect.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,15 +26,15 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: w_hyper_rect.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_hyper_rect.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<alg/w_all.h>
-#include<util/error.h>
+#include <alg/w_all.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 
@@ -69,6 +69,7 @@ WspectHyperRectangle::WspectHyperRectangle(int dir, int glb_coord)
   d_glb_min[d_dir] = d_glb_max[d_dir] = glb_coord;
   d_lcl_min[d_dir] = d_lcl_max[d_dir] = glb_coord - lcl2glb_offset[d_dir];
 }
+
 
 
 

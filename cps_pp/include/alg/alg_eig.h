@@ -1,31 +1,28 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
-//
-// alg_eig.h
-//
-// Header file for the AlgEig class.
-//
-// AlgEig is derived from Alg and is relevant to the 
-// Ritz eigenvector solver. The type of fermion is
-// determined by the argument to the constructor.
-//
+/*!\file
+  \brief Definitions of the AlgEig class.
+
+  $Id: alg_eig.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //------------------------------------------------------------------
 
 
 #ifndef INCLUDED_ALG_EIG_H
-#define INCLUDED_ALG_EIG_H
+#define INCLUDED_ALG_EIG_H           //!< Prevent multiple inclusion.
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/pmalloc.h>
-#include<alg/alg_base.h>
-#include<alg/common_arg.h>
-#include<alg/eig_arg.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/pmalloc.h>
+#include <alg/alg_base.h>
+#include <alg/common_arg.h>
+#include <alg/eig_arg.h>
 CPS_START_NAMESPACE
 
-
+//! A class implementing a Ritz eigenvalue solver for the fermion matrix.
+/*! \ingroup alg */
 class AlgEig : public Alg
 {
  private:
@@ -58,6 +55,7 @@ class AlgEig : public Alg
 };
 
 #endif
+
 
 
 

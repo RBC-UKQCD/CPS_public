@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: hadron_prop_s.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: hadron_prop_s.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -58,7 +58,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: hadron_prop_s.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v $
 //  $State: Exp $
 //
@@ -67,11 +67,10 @@ CPS_START_NAMESPACE
 //debug
 CPS_END_NAMESPACE
 #include <stdio.h>
-#include<config.h>
-#include<alg/hadron_prop_s.h>
-#include<util/rcomplex.h>
-#include<comms/glb.h>
-#include<alg/myenum.h>
+#include <alg/hadron_prop_s.h>
+#include <util/rcomplex.h>
+#include <comms/glb.h>
+#include <alg/myenum.h>
 CPS_START_NAMESPACE
 
 #ifdef PARALLEL
@@ -519,5 +518,6 @@ void HadronPropS::collect_prop(HadronType type, Float *sum_buf,
 }
 
 #endif
+
 
 CPS_END_NAMESPACE

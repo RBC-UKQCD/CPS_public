@@ -1,28 +1,20 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Lattice class methods.
+  
+  $Id: lattice_base.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: lattice_base.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: lattice_base.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.9  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.8  2001/09/06 11:51:47  anj
 //  Minor modifications to the test suite, e.g. standardizing the
 //  verbosity and such.  Collected the output from the original and the
@@ -63,7 +55,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -77,18 +69,17 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<config.h>
-#include<util/lattice.h>
-#include<util/vector.h>
-#include<util/gjp.h>
-#include<util/pmalloc.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<util/random.h>
-#include<comms/nga_reg.h>
-#include<comms/glb.h>
-#include<comms/scu.h>
-#include<comms/cbuf.h>
+#include <util/lattice.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <util/pmalloc.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <util/random.h>
+#include <comms/nga_reg.h>
+#include <comms/glb.h>
+#include <comms/scu.h>
+#include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
 #ifdef _TARTAN
@@ -108,7 +99,7 @@ CPS_START_NAMESPACE
 #endif
 
 //------------------------------------------------------------------
-// Define the opposite dir macro for the  Pathorder routines
+//! A macro  defining the opposite direction.
 //------------------------------------------------------------------
 #define OPP_DIR(dir)  (((dir)+4)&7)
  
@@ -117,6 +108,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 //------------------------------------------------------------------
+//! The number of floating point numbers in a 3x3 complex matrix.
 enum { MATRIX_SIZE = 18 };
 //------------------------------------------------------------------
 
@@ -173,6 +165,10 @@ static Matrix *mp4 = &mt4;
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
+/*!
+  If needed, allocates memory for the gauge field.
+  Initialises the random number generator and the gauge configuration.
+ */
 Lattice::Lattice()
 {
   cname = "Lattice";
@@ -318,6 +314,10 @@ Lattice::Lattice()
 
 //------------------------------------------------------------------
 // Destructor
+/*!
+  Note that the destructor does not free any memory allocated by the
+  constructor for the gauge field. This is a feature, not a bug.
+*/
 //------------------------------------------------------------------
 Lattice::~Lattice()
 {
@@ -351,9 +351,14 @@ Matrix *Lattice::GaugeField(void) const
 
 
 //------------------------------------------------------------------
+/*! Copies the array pointed to by u into the gauge configuration.
+   \param u The array to be copied from.
+   \post The gauge configuration ia a copy of the array \a u
+*/
+
 // void GaugeField(Matrix *u) const:
-// Copies the array pointed to by u to the array pointed to 
-// by gauge_field.
+// Copies the array pointed to by gauge_field to the
+// array pointed to by u.
 //------------------------------------------------------------------
 void Lattice::GaugeField(Matrix *u)
 {
@@ -370,6 +375,11 @@ void Lattice::GaugeField(Matrix *u)
 
 
 //------------------------------------------------------------------
+/*!
+  \param u An array
+  \post The array \a u contains a copy of the gauge configuration.
+ */
+
 // void CopyGaugeField(Matrix* u) const:
 // Copies the array pointed to by gauge_field to the
 // array pointed to by u.
@@ -407,9 +417,11 @@ int Lattice::Colors(void)
 
 
 //------------------------------------------------------------------
-// int GsiteSize() : 
-// Returns the number of gauge field components 
-// (including real/imaginary) on a site of the 4-D lattice.
+/*!
+  \return The number of components (real numbers) of the gauge field
+  at each lattice site, \a i.e. taking into account the number of complex,
+  colour, and lattice direction components.
+ */
 //------------------------------------------------------------------
 int Lattice::GsiteSize(void)
 {
@@ -421,15 +433,17 @@ int Lattice::GsiteSize(void)
 // const Matrix *
 // Lattice::GetLink(const int *site, int dir) const
 //--------------------------------------------------------------------------
-// Purpose:
-//   get a link at specified coordinates and direction, whether on node
-//   or off node.
-// Arguments:
-//   site:    lattice coordinates[x,y,z,t]
-//            which could be out-of-range, i.e., is located off-node.
-//   dir:     0,1,2,3 for Ux, Uy, Uz, Ut
-//   return:  a pointer to the link. If off-node, it points to
-//            a block of static memory. Be careful to use it!
+/*!
+  Get a link at specified coordinates and direction, whether on node
+  or off node. The coordinates are defined relative to the local lattice
+  origin.
+  
+  \param site The lattice coordinates[x,y,z,t]
+  which could be out of range, \a i.e.located off-node.
+  \param dir The direction 0, 1, 2 or 3 for U_x, U_y, U_z and U_t respectively.
+  \return a pointer to the link. If off-node, it points to a block of
+  static memory. Be careful to use it!
+*/
 // GRF Notes:
 //  - modified from PC's DiracOpClover::GetLink()
 //  - now properly handles the case where link is two or more nodes in
@@ -502,6 +516,7 @@ Lattice::GetLink(const int *site, int dir) const
 
 
 // get U_mu(x+v)
+
 const Matrix* Lattice::
 GetLinkOld(Matrix *g_offset, const int *x, int v, int mu) const
 {
@@ -522,14 +537,17 @@ const unsigned CBUF_MODE4 = 0xcca52112;
 
 
 //------------------------------------------------------------------
-// Staple(Matrix& stap, int *x, int mu):
-// It calculates the staple field at x, mu.
-// The staple field is:
-//
-//	V_u(x) = \sum_v(!=u) {
-//		U_v(x+u) U_u(x+v)~ U_v(x)~
-//	     +  U_v(x+u-v)~ U_u(x-v)~ U_v(x-v)  }
-//
+/*!
+  The staple sum around the link \f$ U_mu(x) \f$ is
+\f[
+   \sum_{\nu \neq \mu}[
+              U_\nu(x+\mu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+           +  U^\dagger_\nu(x+\mu-\nu) U^\dagger_\mu(x-\nu) U_\nu(x-\nu)]     
+\f]
+  \param stap The computed staple sum.
+  \param x The coordinates of the lattice site 
+  \param mu The link direction 
+*/
 //------------------------------------------------------------------
 void Lattice::Staple(Matrix& stap, int *x, int mu)
 {
@@ -654,17 +672,28 @@ void Lattice::Staple(Matrix& stap, int *x, int mu)
 //------------------------------------------------------------------
 // RectStaple(Matrix& stap, int *x, int mu):
 // It calculates the rectangle staple field at x, mu.
-// The rectangle staple field is:
-//
-// \sum_{v != u} {
-//     U_u(x+u)    U_v(x+2u)    U_u(x+u+v)~ U_u(x+v)~  U_v(x)~
-//   + U_u(x+u)    U_v(x+2u-v)~ U_u(x+u-v)~ U_u(x-v)~  U_v(x-v)
-//   + U_v(x+u-v)~ U_v(x+u-2v)~ U_u(x-2v)~  U_v(x-2v)  U_v(x-v)
-//   + U_v(x+u-v)~ U_u(x-v)~    U_u(x-u-v)~ U_v(x-u-v) U_u(x-u)
-//   + U_v(x+u)    U_u(x+v)~    U_u(x-u+v)~ U_v(x-u)~  U_u(x-u)
-//   + U_v(x+u)    U_v(x+u+v)   U_u(x+2v)~  U_v(x+v)~  U_v(x)~
-// }
-//
+/*! The 5-link rectangle staple sum around the link \f$ U_\mu(x) \f$ is:
+\f[
+ \sum_{\nu \neq \mu}\left[\right.     
+ U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu)
+ U^\dagger_\mu(x+\nu)  U^\dagger_\nu(x) \f]\f[
+ + U_\mu(x+\mu)    U^\dagger_\nu(x+2\mu-\nu) U^\dagger_\mu(x+\mu-\nu) 
+ U^\dagger_\mu(x-\nu)  U_\nu(x-\nu) \f]\f[
+ + U_\nu(x+\mu)    U^\dagger_\mu(x+\nu)  U^\dagger_\mu(x-\mu+\nu)
+ U^\dagger_\nu(x-\mu) U_\mu(x-\mu)  \f]\f[
+ + U^\dagger_\nu(x+\mu-\nu) U^\dagger_\mu(x-\nu)  U^\dagger_\mu(x-\mu-\nu)
+ U_\nu(x-\mu-\nu) U_\mu(x-\mu) \f]\f[
+ + U_\nu(x+\mu)    U_\nu(x+\mu+\nu)   U^\dagger_\mu(x+2\nu)
+ U^\dagger_\nu(x+\nu)  U^\dagger_\nu(x) \f]\f[
+ + U^\dagger_\nu(x+\mu-\nu) U^\dagger_\nu(x+\mu-2\nu) U^\dagger_\mu(x-2\nu)
+ U_\nu(x-2\nu)  U_\nu(x-\nu)       
+\left.\right]
+\f]
+
+  \param x The coordinates of the lattice site 
+  \param mu The link direction
+  \param rect The computed staple sum.
+*/
 //------------------------------------------------------------------
 void Lattice::RectStaple(Matrix& rect, int *x, int mu)
 {
@@ -702,7 +731,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE) ;
 
     //----------------------------------------------------------
-    // mp3 = U_u(x+v)~
+    // mp3 = U_mu(x+v)~
     //----------------------------------------------------------
     ++(link_site[nu]) ;
     mp3->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE+BANK_SIZE) ;
@@ -1036,6 +1065,17 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
 //    calculates the plaquette U_u(x) U_v(x+u) U_u(x+v)~ U_v(x)~
 // Added by Ping to help code debugging, may be more useful later on.
 //------------------------------------------------------------------
+/*!
+  The plaquette is
+\f[
+  U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+
+  \param plaq The computed plaquette.
+  \param x the coordinates of the lattice site at the start of the plaquette
+  \param mu The first plaquette direction.
+  \param nu The second plaquette direction; should be different from \a mu.
+*/
 void Lattice::Plaq(Matrix &plaq, int *x, int mu, int nu) const 
 {
   // set cbuf
@@ -1077,20 +1117,18 @@ void Lattice::Plaq(Matrix &plaq, int *x, int mu, int nu) const
 }  
  
 
-
-
-
-
-
 //------------------------------------------------------------------
-// ReTrPlaq(int *x, int mu, int nu):
-// It calculates the real part of the trace of the plaquette 
-// field at site x, mu, nu with mu < nu.
-// The plaquette field is:
-//
-//   U_u(x) U_v(x+u) U_u(x+v)~ U_v(x)~
-//
-//------------------------------------------------------------------
+/*!
+  The plaquette is
+\f[
+  U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+
+  \param x the coordinates of the lattice site at the start of the plaquette
+  \param mu The first plaquette direction
+  \param nu The second plaquette direction; should be different from \a mu.
+  \return  The real part of the trace of the plaquette.
+*/
 Float Lattice::ReTrPlaq(int *x, int mu, int nu) const
 {
 //  char *fname = "ReTrPlaq(i*,i,i) const";
@@ -1141,9 +1179,17 @@ Float Lattice::ReTrPlaq(int *x, int mu, int nu) const
 
 
 //------------------------------------------------------------------
-// SumReTrPlaqNode():
-// It calculates the sum of the real part of the trace of the 
-// plaquette field at each site of the node sublattice.
+/*!
+  At a site \a x and in the \f$ \mu-\nu \f$plane , the plaquette is
+
+\f[
+  U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all local lattice sites and all six \f$ \mu-\nu \f$ planes.
+
+  \return The summed real trace of the plaquette.
+*/
 //------------------------------------------------------------------
 Float Lattice::SumReTrPlaqNode(void) const
 {
@@ -1173,9 +1219,16 @@ Float Lattice::SumReTrPlaqNode(void) const
 
 
 //------------------------------------------------------------------
-// SumReTrPlaq():
-// It calculates the sum of the real part of the trace of the 
-// plaquette field at each site of the whole lattice
+/*!
+  At a site \a x and in the \f$ \mu-\nu \f$ plane, the plaquette is
+\f[  
+  U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all lattice sites and all six \f$ \mu-\nu \f$planes.
+
+  \return The globally summed real trace of the plaquette.
+*/
 //------------------------------------------------------------------
 Float Lattice::SumReTrPlaq(void) const
 {
@@ -1189,13 +1242,19 @@ Float Lattice::SumReTrPlaq(void) const
 
 
 //-----------------------------------------------------------------------------
-// ReTrRect(int *x, int mu, int nu):
-//   It calculates the real part of the trace of the rectangle
-//   field at site x, in the (mu, nu) plane with the long axis
-//   of the rectangle in the mu direction.
-//   The rectangle field is:
-//
-//   U_u(x) U_u(x+u) U_v(x+2u) U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
+/*!
+  The rectangle at site \a x in the \f$ \mu-\nu \f$ plane with the long axis
+  of the rectangle in the \f$ \mu \f$ direction is:
+\f[
+  U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+
+  \param x the coordinates of the lattice site at the start of the rectangle
+  \param mu The first rectangle direction.
+  \param nu The second rectangle direction; should be different from \a mu.
+  \return The computed rectangle
+*/
+
 //
 //-----------------------------------------------------------------------------
 Float Lattice::ReTrRect(int *x, int mu, int nu) const
@@ -1294,9 +1353,19 @@ Float Lattice::ReTrRect(int *x, int mu, int nu) const
 
 
 //-----------------------------------------------------------------------------
-// SumReTrRectNode()
-//   It calculates the sum of the real part of the trace of the
-//   rectangle field at each site of the node sublattice.
+/*!
+  The rectangle at site \a x in the \f$ \mu-\nu \f$ plane with the long axis
+  of the rectangle in the \a \mu direction is:
+\f[
+U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu)
+U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+The sum is over all local lattice sites and all sixteen \f$ \mu-\nu \f$
+combinations.
+
+  \return The summed real trace of the rectangle.
+*/
 //-----------------------------------------------------------------------------
 Float Lattice::SumReTrRectNode(void) const
 {
@@ -1321,9 +1390,18 @@ Float Lattice::SumReTrRectNode(void) const
 
 
 //-----------------------------------------------------------------------------
-// SumReTrRect()
-//   It calculates the sum of the real part of the trace of the
-//   rectangle field at each site of the whole lattice
+/*!
+  The rectangle at site \a x in the \f$\mu-\nu \f$ plane with the long axis
+  of the rectangle in the \f$ \mu \f$ direction is:
+\f[
+    U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu)
+    U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all lattice sites and all sixteen \f$ \mu-\nu \f$ combinations.
+
+  \return The globally summed real trace of the rectangle.
+*/
 //-----------------------------------------------------------------------------
 Float Lattice::SumReTrRect(void) const
 {
@@ -1336,15 +1414,22 @@ Float Lattice::SumReTrRect(void) const
 }
 
 //-------------------------------------------------------------------
-// ReTrLoop(int *x, int *dir,int length):
-//   It calculates the real part of the trace of the loop at site x
-//   specified by the list of directions in dir
-//   length is the length of the loop 
-//
-// Warning!!:
-//   The user is responcible for handing in directions that close a loop!
+/*!
+  Given the starting site x, the directions of each step on the path
+  and the number of steps. calculate the path ordered product of 
+  all the links along the path and take the real part of the trace.
+  Each direction is one of 0, 1, 2, 3, 4, 5, 6 or 7} corresponding to
+  the directions X, Y, Z, T, -X, -Y, -Z and -T respectively.
+
+  \param x The coordinates of the starting point of the path
+  \param dir The list of directions.
+  \param length The number of links in the path.
+  \return The real part of the trace of the product along the path.
+  
+  \a N.B. The user is responsible for defining directions that close the loop.
+*/
 //--------------------------------------------------------------------
-Float Lattice::ReTrLoop(const int *x, const int *dir,  int length) 
+Float Lattice::ReTrLoop(const int *x, const int *dir,  int length)
 {
   char *fname = "ReTrLoop(i*,i,i)";
   VRB.Func(cname, fname) ;
@@ -1365,11 +1450,21 @@ Float Lattice::ReTrLoop(const int *x, const int *dir,  int length)
 
 
 //-----------------------------------------------------------------------------
-// SumReTrCubeNode()
-//   It calculates the sum of the real part of the trace of the
-//   Cube field at each site of the node sublattice.
-//
-//   The Cube loop is: mu nu rho -mu -nu -rho
+/*!
+  The cube loop is
+\f[
+      U_\mu(x) U_\nu(x+\mu) U_\rho(x+\mu+\nu) U^\dagger_\mu(x+\mu+\nu+\rho)
+       U^\dagger_\nu(x+\nu+\rho) U^\dagger_\rho(x+\rho)
+\f]
+
+The sum runs over all positive values of \f$ \mu\f$, \f$ \nu>\mu \f$ and
+\f$ \rho>\nu \f$
+     The real part of the trace of this loop is summed over all local
+     lattice sites \a x. 
+
+     \return The locally summed real trace of the cube.
+     \todo Check this code.
+*/
 //-----------------------------------------------------------------------------
 Float Lattice::SumReTrCubeNode(void) 
 {
@@ -1387,7 +1482,7 @@ Float Lattice::SumReTrCubeNode(void)
 	  for(int mu = 0; mu < 4; mu++)
 	    {
 	      dir[0] = mu ;
-	      dir[5] = OPP_DIR(mu) ;
+	      dir[5] = OPP_DIR(mu) ;    // is this right?
 	      for(int nu = mu+1; nu < 4; nu++) 
 		{
 		   dir[1] = nu ;
@@ -1395,7 +1490,7 @@ Float Lattice::SumReTrCubeNode(void)
 		   for(int rho = nu+1; rho < 4; rho++)
 		     {
 		       dir[2] = rho ;
-		       dir[3] = OPP_DIR(rho) ;
+		       dir[3] = OPP_DIR(rho) ;       // is this right?
 		       sum += ReTrLoop(x,dir,6);
 		     }
 		}
@@ -1405,9 +1500,20 @@ Float Lattice::SumReTrCubeNode(void)
 
 
 //-----------------------------------------------------------------------------
-// SumReTrCube()
-//   It calculates the sum of the real part of the trace of the
-//   Cube field at each site of the whole lattice
+/*!
+  The cube loop is
+
+\f[
+U_\mu(x) U_\nu(x+\mu) U_\rho(x+\mu+\nu) U^\dagger_\mu(x+\mu+\nu+\rho)
+U^\dagger_\nu(x+\nu+\rho) U^\dagger_\rho(x+\rho)
+\f]     
+     The sum runs over all positive values of
+     \f$ \mu, \nu>\mu \f$ and \f$ \rho>\nu \f$
+     The real part of the trace of this loop is summed over all 
+     lattice sites \a x. 
+
+  \return The globally summed real trace of the cube.
+*/
 //-----------------------------------------------------------------------------
 Float Lattice::SumReTrCube(void)
 {
@@ -1423,17 +1529,31 @@ Float Lattice::SumReTrCube(void)
 //------------------------------------------------------------------
 // Added by Ping for anisotropic lattices
 //------------------------------------------------------------------
-enum {NUM_SPACE_PLAQ = 3, NUM_TIME_PLAQ = 3,
-      NUM_COLORS = 3, 
-      NUM_DIM = 4
+enum {NUM_SPACE_PLAQ = 3, //!< Number of planes in a 3-dimensional lattice slice.
+      NUM_TIME_PLAQ = 3, //!< Number of planes in a 3-dimensional lattice slice.
+      NUM_COLORS = 3,    //!< Number of colours (again).
+      NUM_DIM = 4        //!< Number of lattice dimensions.
 };
 
 //------------------------------------------------------------------
 // Float AveReTrPlaqNodeNoXi(void) const
 //------------------------------------------------------------------
 // Normalization:  1 for ordered links
-// Average over plaq's perpendicular to the special anisotropic dir.
 // Added by Ping for anisotropic lattices
+/*!
+  At a site \a x and in the \f$ \mu-\nu plane\f$, the plaquette is
+
+\f[
+  U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all local lattice sites and all three \f$x \mu-\nu \f$ planes
+  where neither \f$ \mu \f$nor \f$ \nu \f$ is the anisotropic direction.
+
+  \return The real trace of the plaquette averaged over local sites,
+  planes and colours.
+*/
+
 //------------------------------------------------------------------
 Float Lattice::AveReTrPlaqNodeNoXi() const
 {
@@ -1465,8 +1585,20 @@ Float Lattice::AveReTrPlaqNodeNoXi() const
 // Float AveReTrPlaqNodeXi(void) const
 //------------------------------------------------------------------
 // Normalization:  1 for ordered links
-// Average over plaq's parallel to the special anisotropic dir.
 // Added by Ping for anisotropic lattices
+/*!
+  At a site \a x and in the \f$ \mu-\nu \f$ plane, the plaquette is
+
+\f[
+  U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all local lattice sites and all three \f$ \mu-\nu \f$ planes
+  where one of \f$ \mu \f$ or \f$\nu \f$ is the anisotropic direction. The bare
+  anisotropy is taken into account here.
+
+  \return The real trace of the plaquette averaged over local sites, planes and colours.
+*/
 //------------------------------------------------------------------
 Float Lattice::AveReTrPlaqNodeXi() const
 {
@@ -1499,8 +1631,18 @@ Float Lattice::AveReTrPlaqNodeXi() const
 // Float AveReTrPlaqNoXi(void) const
 //------------------------------------------------------------------
 // Normalization:  1 for ordered links
-// Average over plaq's perpendicular to the special anisotropic dir.
 // Added by Ping for anisotropic lattices
+/*!
+  At a site \a x and in the \f$ \mu-\nu \f$ plane, the plaquette is
+\f[
+  U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all lattice sites and all three \f$ \mu-\nu \f$ planes
+  where neither \f$ \mu \f$ nor \f$ \nu \f$ is the anisotropic direction.
+
+  \return The real trace of the plaquette averaged over sites, planes and colours.
+*/
 //------------------------------------------------------------------
 Float Lattice::AveReTrPlaqNoXi() const
 {
@@ -1516,8 +1658,19 @@ Float Lattice::AveReTrPlaqNoXi() const
 // Float AveReTrPlaqXi(void) const
 //------------------------------------------------------------------
 // Normalization:  1 for ordered links
-// Average over plaq's perpendicular to the special anisotropic dir.
 // Added by Ping for anisotropic lattices
+/*!
+  At a site \a x and in the \f$ \mu-\nu \f$ plane, the plaquette is
+\f[
+  U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all local lattice sites and all three \a \mu-\nu planes
+  where one of \f$ \mu \f$ or \f$ \nu \f$ is the anisotropic direction. The bare
+  anisotropy is taken into account here.
+
+  \return The real trace of the plaquette averaged over local sites, planes and colours.
+*/
 //------------------------------------------------------------------
 Float Lattice::AveReTrPlaqXi() const
 {
@@ -1532,11 +1685,6 @@ Float Lattice::AveReTrPlaqXi() const
 
 //------------------------------------------------------------------
 // Lattice::MltFloat(Float factor, int dir = 3)
-//------------------------------------------------------------------
-// Purpose:
-//   U_dir(x) => factor * U_dir(x)
-// Arguments:
-//   dir:    {0,1,2,3} = {x,y,z,t}.
 // Added by Ping for anisotropic lattices
 //------------------------------------------------------------------
 // Canonical order:    U[t][z][y][x][x,y,z,t]
@@ -1545,6 +1693,13 @@ Float Lattice::AveReTrPlaqXi() const
 // Staggered order:    U[t][z][y][x][x,y,z,t]
 //     same as canonical order up to some phase factor
 // G_WILSON_HB:        U[t][z][y][x][t,x,y,z]
+  /*!
+    \param factor The real scale factor.
+    \param dir The direction index of the links to be scaled; 
+    \a dir = 0, 1, 2 or 3 for direction X, Y, Z and T respectively (all kinds
+    of storage order are handled correctly).
+    \post The  gauge field  links in direction \a dir are scaled.
+  */
 //------------------------------------------------------------------
 void Lattice::MltFloatImpl(Float factor, int dir)
 {
@@ -1566,6 +1721,18 @@ void Lattice::MltFloatImpl(Float factor, int dir)
 // EvolveGfield(Matrix *mom, Float step_size):
 // It evolves the gauge field by step_size using
 // the canonical momentum mom
+/*!
+  Updates each gauge link U according to the canonical equation of motion
+
+  <em>
+  U(t+dt) = exp(i dt H) U(t)
+  </em>
+  
+  A ninth order Horner expansion is used to compute the exponential.
+  \param mom The multiple \a iH of the conjugate momentum field \a H.
+  \param step_size The molecular dynamics time-step \a dt size used in the
+  numerical integration of the equations of motion.  
+*/  
 //------------------------------------------------------------------
 void Lattice::EvolveGfield(Matrix *mom, Float step_size){
   char *fname = "EvolveGfield(M*,F)";
@@ -1616,7 +1783,16 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
 
 //------------------------------------------------------------------
 // Float MomHamiltonNode(Matrix *momentum):
-// The conjugate momentum Hamiltonian of the node sublattice.
+/*!
+  The local kinetic energy is 
+  \f[
+  \sum_{x, \mu} \frac{1}{2} Tr H_\mu(x)^2
+  \f]
+  where the \a H is the conjugate momentum field and the
+  sum is over all directions \f$ \mu \f$ and all local lattice sites \a x.
+  \param momentum  The antihermitian momentum field \a iH.
+  \return the local kinetic energy.
+ */
 //------------------------------------------------------------------
 Float Lattice::MomHamiltonNode(Matrix *momentum){
   char *fname = "MomHamiltonNode(M*)";
@@ -1625,7 +1801,8 @@ Float Lattice::MomHamiltonNode(Matrix *momentum){
   Float ham = 0.0;
   
   int n_links = 4 * GJP.XnodeSites() * GJP.YnodeSites()
-    * GJP.ZnodeSites() * GJP.TnodeSites();
+      * GJP.ZnodeSites() * GJP.TnodeSites();
+  // In other words,  4 * GJP.VolNodeSites(); 
   
   for(int i = 0; i < n_links; ++i) {
     ham += momentum[i].NegHalfTrSquare();
@@ -1641,6 +1818,9 @@ Float Lattice::MomHamiltonNode(Matrix *momentum){
 //------------------------------------------------------------------
 // Modefied by Ping on January 1999 for anisotropic lattices.
 //------------------------------------------------------------------
+/*!
+  \post The gauge field is reunitarised.
+ */
 void Lattice::Reunitarize(void)
 {
   char *fname = "Reunitarize()";
@@ -1664,13 +1844,25 @@ void Lattice::Reunitarize(void)
 
 //------------------------------------------------------------------
 // void Lattice::Reunitarize(Float &dev, Float &max_diff):
-// Re-unitarize the gauge field configuration
-// and return:
-// dev = sqrt( Sum_i [ (U(i) - V(i))^2 ] / (Vol*4*18) ),
-// max_diff = Max_i[ |U(i) - V(i)| ]
-// where U(i), V(i) is the gauge field before and after 
-// reunitarization. The index i runs over all components of
-// the gauge field.
+/*! 
+ \param dev  
+ \param max_diff  
+ \post The gauge field is reunitarised.
+ \post The (averaged) L-2 norm of the resulting change in the gauge field,
+\f[
+            \surd\{ \sum_i [ (U(i) - V(i))^2 ] / (Vol\times 4\times 18) \}
+\f] 
+ where U and V are the gauge field before and after 
+ reunitarization,  the index \e i runs over all components
+ (link direction, local lattice site and colour indices) of the gauge field.
+ and \e Vol is the local lattice volume,
+ is assigned to \a dev.
+\post The L-infinity norm of the resulting change in the gauge field,
+\f[
+             \max_i( |U(i) - V(i)| )
+\f]
+ is assigned to \a max_diff.
+*/
 //------------------------------------------------------------------
 // Modefied by Ping on January 1999 for anisotropic lattices.
 //------------------------------------------------------------------
@@ -1720,8 +1912,14 @@ void Lattice::Reunitarize(Float &dev, Float &max_diff)
 //------------------------------------------------------------------
 // int MetropolisAccept(Float delta_h):
 // 0 reject, 1 accept. If delta_h < 0 it accepts unconditionally.
+/*!
+  \param delta_h The energy difference.
+  \return True (1) if accepted, false (0) otherwise.
+
+  If \a delta_h is greater than or equal to 20 the routine always rejects.
+ */
 //------------------------------------------------------------------
-int Lattice::MetropolisAccept(Float delta_h)
+int Lattice::MetropolisAccept(Float delta_h) 
 {
   char *fname = "MetropolisAccept(F)";
   VRB.Func(cname,fname);
@@ -1781,9 +1979,17 @@ int Lattice::MetropolisAccept(Float delta_h)
 
 //------------------------------------------------------------------
 // void RandGaussAntiHermMatrix(Matrix *mat, Float sigma):
-// It produces an anti-Hermitian matrix for each site of 
-// the lattice with random entries weighted according to 
-// exp(- Tr(mat^2) / (2 * sigma2)
+/*!
+  Creates a field of antihermitian 3x3 complex matrices with each complex
+  element drawn at random from a gaussian distribution with zero mean.
+  Hence the matrices are distributed according to
+
+  <em>
+  exp[- Tr(mat^2)/(2 sigma2)]
+  </em>
+  \param mat The field.
+  \param sigma2 The variance of the gaussian distribution.
+*/
 //------------------------------------------------------------------
 void Lattice::RandGaussAntiHermMatrix(Matrix *mat, Float sigma2)
 {
@@ -1814,11 +2020,17 @@ void Lattice::RandGaussAntiHermMatrix(Matrix *mat, Float sigma2)
 
 
 //--------------------------------------------------------------------------
-// void Lattice::RandGaussVector(Vector * frm, Float sigma,
-//                                 FermionFieldDimension frm_dim = FIVE_D)
-// Puts a Complex Three-Vector at each point of the lattice
-// with random numbers weighted according to
-// exp(-x^2 / (2 * sigma2)).
+/*!
+  The field is defined on all lattice sites.
+  \param frm  A vector.
+  \param sigma2  The variance of the gaussian distribution from which the
+  vector elements will be drawn.
+  \param frm_dim This should be set to ::FOUR_D if the lattice is  
+  4-dimensional. The default is ::FIVE_D, \e i.e. a 5-dimensional lattice for
+  domain-wall fermions.
+  \post The real and imaginary parts of each element of this vector are drawn
+  at random from a gaussian distribution with mean 0 and variance \a sigma2. 
+ */  
 //--------------------------------------------------------------------------
 void Lattice::RandGaussVector(Vector *frm, Float sigma2,
                           FermionFieldDimension frm_dim)
@@ -1826,11 +2038,15 @@ void Lattice::RandGaussVector(Vector *frm, Float sigma2,
   RandGaussVector(frm, sigma2, 2, frm_dim);
 }
 //--------------------------------------------------------------------------
-// void Lattice::RandGaussVector(Vector * frm, Float sigma,
-//                                 FermionFieldDimension frm_dim = FIVE_D)
-// Puts a Complex Three-Vector at each point of the lattice
-// with random numbers weighted according to
-// exp(-x^2 / (2 * sigma2)).
+/*!
+  The field is defined on all sites of a 5-dimensional lattice for
+  domain-wall fermions.
+  \param frm  A vector.
+  \param sigma2  The variance of the gaussian distribution from which the
+  vector elements will be drawn.
+  \post The real and imaginary parts of each element of this vector are drawn
+  at random from a gaussian distribution with mean 0 and variance \a sigma2. 
+ */  
 //--------------------------------------------------------------------------
 void Lattice::RandGaussVector(Vector *frm, Float sigma2)
 {
@@ -1838,11 +2054,19 @@ void Lattice::RandGaussVector(Vector *frm, Float sigma2)
 }
 
 //--------------------------------------------------------------------------
-// void Lattice::RandGaussVector(Vector * frm, int number_of_checkerboards,
-//              Float sigma, FermionFieldDimension frm_dim /* = FIVE_D */)
-// Puts a Complex Three-Vector at each point of the lattice
-// with random numbers weighted according to
-// exp(-x^2 / (2 * sigma2)).
+/*!
+  \param frm  A vector.
+  \param sigma2  The variance of the gaussian distribution from which the
+  vector elements will be drawn.
+  \param num_chkbds This should be set to 2 if the field is defined on all
+  lattice sites in canonical order or 1 if the field is defined on lattice
+  sites of a single parity.
+  \param frm_dim This should be set to ::FOUR_D if the lattice is  
+  4-dimensional. The default is ::FIVE_D, \e i.e. a 5-dimensional lattice for
+  domain-wall fermions.
+  \post The real and imaginary parts of each element of this vector are drawn
+  at random from a gaussian distribution with mean 0 and variance \a sigma2. 
+ */  
 //--------------------------------------------------------------------------
 void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
                         FermionFieldDimension frm_dim /* = FIVE_D */)
@@ -1886,11 +2110,14 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
       }
     }
   }
+
 }
 
 
 //------------------------------------------------------------------
-// Sets the gauge field to the identity
+/*
+  \post Each gauge field link is set to the identity matrix.
+*/
 //------------------------------------------------------------------
 void Lattice::SetGfieldOrd(void){
   char *fname = "SetGfieldOrd()";
@@ -1909,7 +2136,9 @@ void Lattice::SetGfieldOrd(void){
 
 
 //------------------------------------------------------------------
-// Sets the gauge field to disordered (random) values
+/*
+  \post Each gauge field link is set to a random SU(3) matrix.
+*/
 //------------------------------------------------------------------
 void Lattice::SetGfieldDisOrd(void){
   char *fname = "SetGfieldDisOrd()";
@@ -1934,34 +2163,63 @@ void Lattice::SetGfieldDisOrd(void){
 //------------------------------------------------------------------
 // Counter related functions (g_upd_cnt, md_time)
 //------------------------------------------------------------------
+
+/*!
+  \return The number of gauge field updates that have been performed.
+*/
 int Lattice::GupdCnt(void)
 {
   return *g_upd_cnt ;
 }
 
+/*!
+  Sets the the initial value of the counter of the number of gauge field
+  updates that have been performed.
+  \param set_val The inital value for the counter.
+  \return The inital value for the counter.
+*/
 int Lattice::GupdCnt(int set_val)
 {
   *g_upd_cnt = set_val ;
   return *g_upd_cnt ;
 }
 
+/*!
+  \param inc_val The number by which to inrease the gauge field update counter.
+  \return The new value of the gauge field update counter.
+*/
 int Lattice::GupdCntInc(int inc_val)
 {
   *g_upd_cnt += inc_val ;
   return *g_upd_cnt ;
 }
 
+//! The molecular dynamics time counter.
+/*!
+  \return The number of timesteps completed so far in a molecular dynamics
+  trajectory.
+*/
 Float Lattice::MdTime(void)
 {
   return md_time ;
 }
 
+//! Sets the value of the molecular dynamics time counter.
+/*!
+  Sets the number of timesteps completed so far in a molecular dynamics
+  trajectory.
+*/
 Float Lattice::MdTime(Float set_val)
 {
   md_time = set_val ;
   return md_time ;
 }
 
+//! Increments the value of the molecular dynamics time counter.
+/*!
+  Increments the number of timesteps completed so far in a molecular dynamics
+  trajectory.
+*/
 Float Lattice::MdTimeInc(Float inc_val)
 {
   md_time += inc_val ;
@@ -1970,8 +2228,7 @@ Float Lattice::MdTimeInc(Float inc_val)
 
 
 //------------------------------------------------------------------
-// Returns fix_gauge_ptr (pointer to an array of pointers 
-// that point to the various gauge fixed hyperplanes.
+//! Returns an array of pointers to the gauge fixed hyperplanes.
 //------------------------------------------------------------------
 Matrix **Lattice::FixGaugePtr(void){
   return fix_gauge_ptr;
@@ -2061,13 +2318,16 @@ void *Lattice::Aux1Ptr(void){
   return aux1_ptr;
 }
 
+
 //------------------------------------------------------------------
-// void GsoCheck(void):
-// If GJP.Snodes() == 1 it just returns.
-// If GJP.Snodes() != 1 it checks that the "spread-out"
-// gauge field is identical along all s-slices by comparing 
-// the checksum and plaquette value. This situation arises for
-// DWF with the s direction spread out across many processors.
+/*!
+  Checks that the gauge field is
+  identical (using a checksum and the average plaquette)
+  on each slice of the lattice perpendicular to the 5th direction
+  and local in the 5th direction.
+  Obviously this is always the case when the entire 5th direction is local.
+  If any of the node slices fail to match the program exits with an error.
+*/
 //------------------------------------------------------------------
 void Lattice::GsoCheck(void){
   char *fname = "GsoCheck()";
@@ -2172,14 +2432,15 @@ void Lattice::GsoCheck(void){
 
 
 //------------------------------------------------------------------
-// void SoCheck(Float num):
-// If GJP.Snodes() == 1 it just returns.
-// If GJP.Snodes() != 1 it checks that the value of num
-// is identical along all s-slices. This situation arises for
-// DWF with the s direction spread out across many processors.
-// If the num along all s-slices is not identical it exits
-// with an error.
-//------------------------------------------------------------------
+/*!
+  Checks that a floating point number is
+  identical (using a checksum and the average plaquette)
+  on each slice of the lattice perpendicular to the 5th direction
+  and local in the 5th direction. 
+  Obviously this is always the case when the entire 5th direction is local.
+  If any of the node slices fail to match the program exits with an error.
+  \param num The number to check.
+*///------------------------------------------------------------------
 void Lattice::SoCheck(Float num){
   char *fname = "SoCheck()";
   VRB.Func(cname,fname);
@@ -2234,6 +2495,7 @@ void Lattice::SoCheck(Float num){
   VRB.Flow(cname,fname,"SoCheck test successful\n");
 
 }
+
 
 
 

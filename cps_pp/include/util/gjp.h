@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definitions of global job parameters.
+
+  $Id: gjp.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: gjp.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: gjp.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //
@@ -60,13 +65,12 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 #ifndef INCLUDED_GLOBAL_JOB_PARAMETER_H
-#define INCLUDED_GLOBAL_JOB_PARAMETER_H
+#define INCLUDED_GLOBAL_JOB_PARAMETER_H     //!< Prevent multiple inclusion
 
 
 CPS_END_NAMESPACE
-#include<config.h>
-#include<util/lattice.h>
-#include<util/vector.h>
+#include <util/lattice.h>
+#include <util/vector.h>
 CPS_START_NAMESPACE
 #ifdef PARALLEL
 CPS_END_NAMESPACE
@@ -105,6 +109,13 @@ extern int gjp_scu_wire_map[];
      // used. 
 
 #endif
+
+//! A container class for global parameters.
+/*! An object of this class, called GJP, should be created at the highest
+  scope (outside main). The header file declares GJP as external. All global
+  values are then accessible via the methods of this object.  
+*/
+
 
 class GlobalJobParameter
 {
@@ -182,7 +193,7 @@ class GlobalJobParameter
                     // c_1 = -0.05 is the tree level value.
                     // c_1 = -0.331 is the Iwasaki action.
 
-  Float u_0;	    // The tadpole
+  Float u_0;	    // The juvenile amphibian
 
   Float dwf_height; // The height of the domain wall
 
@@ -243,17 +254,25 @@ class GlobalJobParameter
      // rectangle term in the pure gauge action
      // implemented by the GpowerRect class.
 
- 
+
 public:
   GlobalJobParameter();
 
   ~GlobalJobParameter();
 
-  //----------------------------------------------------------------
-  // Functions that return the value of a variable
-  //----------------------------------------------------------------
-  
+  //! \todo These should be const methods, no?
+  /*!\defgroup gjp_get_methods Methods that return the value of a global variable
+    @{ */
+
   int NodeSites(int dir){ return (&x_node_sites)[dir]; }
+  //!< Gets the dimension of the local lattice in a given direction.
+  /*!<
+    \param dir The direction in which to obtain the local lattice
+    size; 0, 1, 2, 3 or 4 corresponding to X, Y, Z, T or S (the latter
+    is only relevant for Domain Wall Fermions).
+    \return The size of the local lattice in direction \a dir.
+  */
+  
     //making use of the storage order of the elements in the class, ie
     //the fact that x_node_sites, y_node_sites, z_node_sites, t_node_sites, 
     //s_node_sites, are in the order, x, y, z, t, s, with nothing in between. 
@@ -266,59 +285,87 @@ public:
     //of the original code. 
 
   int XnodeSites(void)
-  {return x_node_sites;}
-     // Returns the value of x_node_sites = 
-     // sites of a single node along the x direction
+      {return x_node_sites;}
+  //!< Gets the dimension of the local lattice in the X direction.
+  /*!<
+    \return The size of the local lattice in the X direction.
+  */
 
   int YnodeSites(void)
-  {return y_node_sites;}
-     // Returns the value of y_node_sites = 
-     // sites of a single node along the y direction
+      {return y_node_sites;}
+  //!< Gets the dimension of the local lattice in the Y direction.  
+  /*!<
+    \return The size of the local lattice in the Y direction.
+  */
 
   int ZnodeSites(void)
-  {return z_node_sites;}
-     // Returns the value of z_node_sites = 
-     // sites of a single node along the z direction
+      {return z_node_sites;}
+  //!< Gets the dimension of the local lattice in the Z direction.
+  /*!<
+    \return The size of the local lattice in the Z direction.
+  */
 
   int TnodeSites(void)
-  {return t_node_sites;}
-     // Returns the value of t_node_sites = 
-     // sites of a single node along the t direction
+      {return t_node_sites;}
+  //!< Gets the dimension of the local lattice in the T direction.
+  /*!<
+    \return The size of the local lattice in the T direction.
+  */
 
   int SnodeSites(void)
-  {return s_node_sites;}
-     // Returns the value of s_node_sites = 
-     // sites of a single node along the s direction
-     // (5th dir.) relevant to DWF only
+      {return s_node_sites;}
+  //!< Gets the dimension of the local lattice in the 5th direction.
+  /*!<
+    This is only relevant for Domain Wall Fermions.
+    \return The size of the local lattice in the 5th direction.
+  */
 
   int Nodes(int dir){ return (&x_nodes)[dir];}
+  //!<Gets the dimension of the processor grid in a given direction.
+  /*!<
+    \param dir The direction in which to obtain the node grid
+    size; 0, 1, 2, 3 or 4 corresponding to X, Y, Z, T or S (the latter
+    is only relevant for Domain Wall Fermions).
+    \return The size of the grid in direction \a dir.
+  */
+
      // refer to the comments of NodeSites(int dir) above
 
   int Xnodes(void)
-  {return x_nodes;}
-     // Returns the value of x_nodes = 
-     // number of nodes along the x direction
+      {return x_nodes;}
+  //!< Gets the dimension of the node grid in the X direction.  
+  /*!<
+    \return The size of the grid in the X direction.
+  */
 
   int Ynodes(void)
-  {return y_nodes;}
-     // Returns the value of y_nodes = 
-     // number of nodes along the y direction
+      {return y_nodes;}
+  //!< Gets the dimension of the node grid in the Y direction.  
+  /*!<
+    \return The size of the grid in the Y direction.
+  */
 
   int Znodes(void)
-  {return z_nodes;}
-     // Returns the value of z_nodes = 
-     // number of nodes along the z direction
+      {return z_nodes;}
+  //!< Gets the dimension of the node grid in the Z direction.  
+  /*!<
+    \return The size of the grid in the Z direction.
+  */
 
   int Tnodes(void)
-  {return t_nodes;}
-     // Returns the value of t_nodes = 
-     // number of nodes along the t direction
+      {return t_nodes;}
+  //!< Gets the dimension of the node grid in the T direction.  
+  /*!<
+    \return The size of the grid in the T direction.
+  */
 
   int Snodes(void)
-  {return s_nodes;}
-     // Returns the value of s_nodes = 
-     // number of nodes along the s direction
-     // (5th dir.) relevant to DWF only
+      {return s_nodes;}
+  //!< Gets the dimension of the node grid in the 5th direction.  
+  /*!<
+    This is only relevant for Domain Wall Fermions.
+    \return The size of the grid in the 5th direction.
+  */
 
 #ifdef PARALLEL
   SCUAxis Saxis(void)
@@ -329,134 +376,225 @@ public:
 #endif
 
   int VolNodeSites(void)
-  {return vol_node_sites;}
-     // Returns the value of the total number of sites (4-D volume)
-     // of a single node.
+      {return vol_node_sites;}
+  //!< Gets the local lattice volume.
+  /*!<
+    In a domain wall fermion context, where the lattice is 5-dimensional,
+    this is the volume of the 4-dimensional slice perpendicular to the 5th
+    direction.
+    \return The number of lattice sites on the node.
+   */
 
   int VolSites(void)
-  {return vol_sites;}
-     // Returns the value of the total number of sites (4-D volume)
-     // of the whole lattice.
+      {return vol_sites;}
+  //!< Gets the global lattice volume.
+  /*!<
+    In a domain wall fermion context, where the lattice is 5-dimensional,
+    this is the volume of the 4-dimensional slice perpendicular to the 5th
+    direction.
+    \return The number of lattice sites in the entire lattice..
+   */
 
   int NodeCoor(int dir) {return (&x_node_coor)[dir];}
-     // refer to the comments of NodeSites(int dir) above
+  //!< Gets the grid coordinate of this node in a given direction.
+  /*!<
+    \param dir The direction in which to obtain the node grid
+    coordinate; 0, 1, 2, 3 or 4 corresponding to X, Y, Z, T or S (the latter
+    is only relevant for Domain Wall Fermions).
+    \return The grid coordinate of this node in direction \a dir.
+  */    
+  // refer to the comments of NodeSites(int dir) above
 
   int XnodeCoor(void)
-  {return x_node_coor;}
-     // Returns the value of x_node_coor = 
-     // "coordinate" of the node along the x direction
+      {return x_node_coor;}
+  //!< Gets this nodes X direction grid coordinate.
+  /*!<
+    \return The grid coordinate of this node in the X direction.
+  */
 
   int YnodeCoor(void)
-  {return y_node_coor;}
-     // Returns the value of y_node_coor = 
-     // "coordinate" of the node along the y direction
+      {return y_node_coor;}
+  //!< Gets this nodes Y direction grid coordinate.
+  /*!<
+    \return The grid coordinate of this node in the Y direction.
+  */
 
   int ZnodeCoor(void)
-  {return z_node_coor;}
-     // Returns the value of z_node_coor = 
-     // "coordinate" of the node along the z direction
+      {return z_node_coor;}
+  //!< Gets this nodes Z direction grid coordinate.
+  /*!<
+    \return The grid coordinate of this node in the Z direction.
+  */
 
   int TnodeCoor(void)
-  {return t_node_coor;}
-     // Returns the value of t_node_coor = 
-     // "coordinate" of the node along the t direction
+      {return t_node_coor;}
+  //!< Gets this nodes T direction grid coordinate.
+  /*!<
+    \return The grid coordinate of this node in the T direction.
+  */
 
   int SnodeCoor(void)
-  {return s_node_coor;}
-     // Returns the value of s_node_coor = 
-     // "coordinate" of the node along the s direction
-     // (5th dir.) relevant to DWF only
+      {return s_node_coor;}
+  //!< Gets this nodes 5th direction grid coordinate.
+  /*!<
+    This is only relevant for Domain Wall Fermions.    
+    \return The grid coordinate of this node in the 5th direction.
+  */
 
   BndCndType Bc(int dir){ return (&x_bc)[dir];}
-     // refer to the comments of NodeSites(int dir) above
-
+  //!< Gets the global lattice boundary condition in a given direction.
+  /*!< 
+    \param dir The direction in which to obtain the boundary 
+    condition; 0, 1, 2 or 3 corresponding to X, Y, Z or T.
+    \return The type of boundary condition in direction \a dir.
+  */
+  // refer to the comments of NodeSites(int dir) above
+  
   BndCndType Xbc(void)
-  {return x_bc;}
-     // Returns the type of boundary conditions along x
-     // for the whole lattice
+      {return x_bc;}
+  //!< Gets the global lattice boundary condition in the X direction.
+  /*!<
+    \return The type of global boundary condition along the X axis.
+  */
 
   BndCndType Ybc(void)
-  {return y_bc;}
-     // Returns the type of boundary conditions along y
-     // for the whole lattice
+      {return y_bc;}
+  //!< Gets the global lattice boundary condition in the Y direction.
+  /*!<
+    \return The type of global boundary condition along the Y axis.
+  */
 
+  
   BndCndType Zbc(void)
-  {return z_bc;}
-     // Returns the type of boundary conditions along z
-     // for the whole lattice
+      {return z_bc;}
+  //!< Gets the global lattice boundary condition in the Z direction.
+  /*!<
+    \return The type of global boundary condition along the Z axis.
+  */
 
   BndCndType Tbc(void)
-  {return t_bc;}
-     // Returns the kind of boundary conditions along t
-     // for the whole lattice
+      {return t_bc;}
+  //!< Gets the global lattice boundary condition in the T direction.
+  /*!<
+    \return The type of global boundary condition along the T axis.
+  */
 
   BndCndType NodeBc(int dir) { return (&x_node_bc)[dir];}
-     // refer to the comments of NodeSites(int dir) above
+  //!< Gets the local lattice boundary condition in a given direction.
+  /*!< 
+    \param dir The direction in which to obtain the local boundary 
+    condition; 0, 1, 2 or 3 corresponding to X, Y, Z or T.
+    \return The type of boundary condition on this node in direction \a dir.
+  */
+  // refer to the comments of NodeSites(int dir) above
 
   BndCndType XnodeBc(void)
-  {return x_node_bc;}
-     // Returns the kind of boundary conditions along x
-     // for the sub-lattice on this node
+      {return x_node_bc;}
+  //!< Gets the local lattice boundary condition in the X direction.
+  /*!<
+    \return The type of local boundary condition along the X axis.
+  */
     
   BndCndType YnodeBc(void)
-  {return y_node_bc;}
-     // Returns the kind of boundary conditions along y
-     // for the sub-lattice on this node
+      {return y_node_bc;}
+  //!< Gets the local lattice boundary condition in the Y direction.
+  /*!<
+    \return The type of local boundary condition along the Y axis.
+  */
     
   BndCndType ZnodeBc(void)
-  {return z_node_bc;}
-     // Returns the kind of boundary conditions along z
-     // for the sub-lattice on this node
+      {return z_node_bc;}
+  //!< Gets the local lattice boundary condition in the Z direction.
+  /*!<
+    \return The type of local boundary condition along the Z axis.
+  */
     
   BndCndType TnodeBc(void)
-  {return t_node_bc;}
-     // Returns the kind of boundary conditions along t
-     // for the sub-lattice on this node
+      {return t_node_bc;}
+  //!< Gets the local lattice boundary condition in the T direction.
+  /*!<
+    \return The type of local boundary condition along the T axis.
+  */
 
   StartConfType StartConfKind(void)
-  {return start_conf_kind;} 
-     // Returns the kind of the initial configuration.
+      {return start_conf_kind;}
+  //!< Gets the type of initial  gauge configuration.
+  /*!<
+    \return The type of initial gauge configuration.
+  */    
 
   Matrix *StartConfLoadAddr(void)
-  {return start_conf_load_addr;}
-     // Returns the load address of the starting configuration.
+      {return start_conf_load_addr;}
+  //!< Gets the initial configuration.
+  /*!<
+    \return The address of the starting configuration
+    if the gauge field starting type is \c START_CONF_MEM, 0 otherwise.
+  */
 
   StartSeedType StartSeedKind(void)
-  {return start_seed_kind;} 
-     // Returns the kind of the initial seed.
+      {return start_seed_kind;}
+  //!< Gets the type of the initial RNG seed.
+  /*!<
+    \return The type of the initial RNG seed.
+  */
 
   int StartSeedValue(void)
-  {return start_seed_value;}
-     // Returns the value of the starting seed;
+      {return start_seed_value;}
+  //!< Gets the value of the starting seed.
+  /*!<
+    \return The value of the starting seed.
+   */
+  
 
   int Colors(void)
-  {return colors;}
-     // Returns the number of colors.
+      {return colors;}
+  //!< Gets the number of colours.
+  /*!<
+    \return The number of colours.
+  */
 
   Float Beta(void)
-  {return beta;}
-     // Returns the pure gauge action "beta".
-
-  Float C1(void)
-  {return c_1;}
-    // Returns the coefficient related to the rectangle
-    // term in the pure gauge action.
-    //   c_1 = 0 is the Wilson gauge action.
-    //   c_1 = -0.05 is the tree level value.
-    //   c_1 = -0.331 is the Iwasaki action.
+      {return beta;}
+  //!< Gets the "beta" parameter in the pure gauge action.
   
+  /*!
+    \return The coefficient of the plaquette term in the pure gauge action. .
+  */
+  Float C1(void)
+      {return c_1;}
+  //!< Gets c_1, the coefficient of the rectangle term in the pure gauge action.
+  /*!<
+- c_1 = 0 is the Wilson gauge action.
+- c_1 = -0.05 is the tree level value.
+- c_1 = -0.331 is the Iwasaki action.
+    
+    \return The coefficient of the rectangle term in the pure gauge action.
+   */  
+
   Float u0(void)
-    {return u_0;}
-  // Returns the tadpole
+      {return u_0;}
+  //!< Gets the tadpole coefficient (the mean link).
+  /*
+    \return The tadpole coefficient.
+  */
 
 
   Float DwfHeight(void)
-  {return dwf_height;}
-     // Returns the height of the domain wall.
+      {return dwf_height;}
+  //!< Gets the height of the domain wall.
+  /*!<
+    Obviously, only relevant for Domain Wall Fermions.
+    \return The height of the domain wall.
+  */
 
   Float DwfA5Inv(void)
-  {return dwf_a5_inv;}
-     // Returns the inverse of the dwf 5th dir. lattice spacing 
+      {return dwf_a5_inv;}
+  //!< Gets the inverse of the 5th direction lattice spacing.
+  /*!<
+    Obviously, only relevant for Domain Wall Fermions.
+    \return The inverse of the 5th direction lattice spacing.
+  */
+  
 
   //------------------------------------------------------------------
   // Added in by Ping for anisotropic lattices and clover improvement
@@ -466,26 +604,60 @@ public:
   // xi as a prefix  indicates relevancy to anisotropic lattices.
   // xi as a postfix indicates relevancy to the special anisotropic direction.
 
-  Float XiBare()             {return xi_bare;} 
-  // Returns bare anisotropy, 1 for isotropic lattice
+  Float XiBare()             {return xi_bare;}
+  //!< Gets the bare lattice anisotropy.
+  /*!<
+    The anisotropy is 1 for an isotropic lattice.
+    \return The bare anisotropy,
+   */
 
-  int   XiDir()              {return xi_dir;} 
-  // Returns the anisotropic direction, time dir by default.
+  int   XiDir()              {return xi_dir;}
+  //!< Gets the anisotropic direction.
+  /*!<
+    This will be one of 0, 1, 2 or 3 corresponding to the X, Y, Z and
+    T directions. The default is 3.
+    \return The anisotropic direction.
+  */
  
   Float XiV()                {return xi_v;}
-  // Returns bare velocity of light, 1 for isotropic lattice
+  //!< Gets the  bare speed of light.
+  /*!<
+    This is 1 for an isotropic lattice.
+    \return The bare velocity of light.
+  */
  
   Float XiVXi()              {return xi_v_xi;}
-  // Returns bare velocity of light, 1 for isotropic lattice
- 
+  //!<  Gets the bare speed of light in the anisotropic direction.
+  /*
+    This is 1 for an isotropic lattice.
+    \return the bare speed of light  in the anisotropic direction.
+  */
+  
   Float CloverCoeff()        {return clover_coeff;}
-  // Returns the clover coefficient, 1 for tree level improvement
+  //!< Gets the clover coefficient.
+  /*!<
+    The coefficient of the clover term in the Sheikoleslami-Wohlert improved
+    fermion action.
+    This 1 for tree level improvement.
+    \return The clover coefficient.
+  */
  
   Float CloverCoeffXi()      {return clover_coeff_xi;}
-  // Returns the clover coefficient, 1 for tree level improvement
+  //!< Gets the anisotropic clover coefficient.
+  /*!<
+    The coefficient of the clover term with links in the anisotropic
+    direction Sheikoleslami-Wohlert improved anisotropic fermion action.
+    \return The anisotropic clover coefficient.
+  */
 
-  Float XiGfix()             {return xi_gfix;}  
-  // Returns the coefficient for Landau gauge, 1 for isotropic lattoce
+  Float XiGfix()             {return xi_gfix;}
+  //!< Gets the Landau gauge coefficient
+  /*!<
+    The coefficient for fixing to the Landau gauge on anisotropic
+    lattices.  
+    This is 1 for an isotropic lattice.
+    \return The Landau gauge coefficient,
+  */
 
   //------------------------------------------------------------------
   // Added in by Ping for global sum
@@ -501,76 +673,98 @@ public:
   // Returns max num of tries of global sum, 2 by default.
 
   Float PowerPlaqCutoff(void)
-  {return power_plaq_cutoff;}
-     // Returns the cutoff parameter for the power
-     // plaquete term in the pure gauge action
-     // implemented by the GpowerPlaq class.
+      {return power_plaq_cutoff;}
+  //!< Gets the cut-off parameter of the power plaquette term in the pure gauge action.
+  /*!< 
+    \return The cut-off parameter.
+  */
 
   int PowerPlaqExponent(void)
-  {return power_plaq_exponent;}
-     // Returns the exponent of the power
-     // plaquete term in the pure gauge action
-     // implemented by the GpowerPlaq class.
+      {return power_plaq_exponent;}
+  //!< Gets the exponent of the power plaquette term in the pure gauge action.
+  /*!<
+    \return The exponent.
+  */
 
   int VerboseLevel(void)
-  {return verbose_level;}
-     // Returns the verbose level.
+      {return verbose_level;}
+  //!< Gets the verbosity level.
+  /*!<
+    See the Verbose class for details.
+    \return The verbosity level.
+  */
 
   Float PowerRectCutoff(void)
-  {return power_rect_cutoff;}
-     // Returns the cutoff parameter for the power
-     // rectangle term in the pure gauge action
-     // implemented by the GpowerRect class.
+      {return power_rect_cutoff;}
+  //!< Gets the cut-off parameter of the power rectangle term in the pure gauge action.
+  /*!<
+    \return The cutoff parameter.
+   */
 
   int PowerRectExponent(void)
-  {return power_rect_exponent;}
-     // Returns the exponent of the power
-     // rectangle term in the pure gauge action
-     // implemented by the GpowerRect class.
+      {return power_rect_exponent;}
+  //!< Gets the exponent of the power rectangle term in the pure gauge action.
+  /*!<
+    \return The exponent.
+  */
 
+  
+  /*!\defgroup gjp_set_methods Methods that set the value of a global variable
+    @{ */
 
-  //----------------------------------------------------------------
-  // Functions that set the value of a variable
-  //----------------------------------------------------------------
+  //!  Initializes all global variables
   void Initialize(const DoArg& do_arg);
-     // Initializes all varables using the DoArg structure.
 
   void SnodeSites(int sites)
-  {s_node_sites = sites;}
-     // Sets the value of s_node_sites = 
-     // sites of a single node along the s direction
-     // (5th dir.) relevant to Domain Wall Fermions.
+      {s_node_sites = sites;}
+  //!< Sets the value of the dimension of the local lattice in the 5th direction.
+  /*!<
+    This is only relevant for Domain Wall Fermions.
+    \param sites The dimension of the local lattice in the 5th direction.
+  */
 
+  //! Sets the global lattice boundary condition in the X direction.
   void Xbc(BndCndType bc);
-     // Sets the type of boundary conditions along x
-     // for the whole lattice
 
+  //! Sets the global lattice boundary condition in the Y direction.
   void Ybc(BndCndType bc);
-     // Sets the type of boundary conditions along y
-     // for the whole lattice
 
+  //! Sets the global lattice boundary condition in the Z direction.
   void Zbc(BndCndType bc);
-     // Sets the type of boundary conditions along z
-     // for the whole lattice
 
+  //! Sets the global lattice boundary condition in the T direction.
   void Tbc(BndCndType bc);
-     // Sets the kind of boundary conditions along t
-     // for the whole lattice
 
   void StartConfKind(StartConfType sc)
-  {start_conf_kind = sc;}
-     // Sets the kind of the initial configuration.
+      {start_conf_kind = sc;}
+  //!< Sets the type of initial  gauge configuration.
+  /*!<
+    \param sc The type of initial gauge configuration.
+  */
 
   void StartSeedKind(StartSeedType ss)
-  {start_seed_kind = ss;}
-     // Sets the kind of the initial seed.
+      {start_seed_kind = ss;}
+  //!< Sets the type of the initial RNG seed.
+  /*!<
+    \param sc The type of the initial RNG seed.
+  */
 
   void DwfHeight(Float height)
-  {dwf_height = height;}
-     // Sets the height of the domain wall.
+      {dwf_height = height;}
+  //!< Sets the height of the domain wall.
+  /*!<
+    Obviously, only relevant for Domain Wall Fermions.
+    \param height The height of the domain wall.
+  */
 
   void DwfA5Inv(Float a5_inv)
-  {dwf_a5_inv = a5_inv;}
+      {dwf_a5_inv = a5_inv;}
+  //!< Sets the inverse of the 5th direction lattice spacing.
+  /*!<
+    Obviously, only relevant for Domain Wall Fermions.
+    \param a5_inv The inverse of the 5th direction lattice spacing.
+  */
+
      // Sets the inverse of the dwf 5th dir. lattice spacing.
 
 
@@ -587,11 +781,15 @@ public:
   void GsumMaxTry(int i)           {gsum_max_try = i;}
   // Sets max num of tries of global sum, 2 by default.
 
+  /*! @} */
+
 };
 
-//------------------------------------------------------------------
-// External declarations.
-//------------------------------------------------------------------
+
+/*! An instance of the GlobalJobParameter class, named GJP, should be
+  created at the highest scope (outside main). This external declaration
+  allows access to all global variables.
+*/
 extern GlobalJobParameter GJP;
 
 
@@ -599,4 +797,5 @@ extern GlobalJobParameter GJP;
 
 
 #endif
+
 CPS_END_NAMESPACE

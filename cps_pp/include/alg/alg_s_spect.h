@@ -17,13 +17,13 @@ CPS_START_NAMESPACE
 #define INCLUDED_ALG_S_SPECT_H
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/pmalloc.h>
-#include<alg/alg_base.h>
-#include<alg/quark_prop_s.h>
-#include<alg/common_arg.h>
-#include<alg/s_spect_arg.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/pmalloc.h>
+#include <alg/alg_base.h>
+#include <alg/quark_prop_s.h>
+#include <alg/common_arg.h>
+#include <alg/s_spect_arg.h>
 CPS_START_NAMESPACE
 
 // Forward declaration
@@ -196,6 +196,7 @@ class AlgStagNonLocal : public Alg
 
 
 #endif
+
 
 
 

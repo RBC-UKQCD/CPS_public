@@ -1,12 +1,20 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of methods converting between different data layouts.
+
+  $Id: convert.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  
+  \todo Why not make these (and other) methods of FWilsonTypes and FstagTypes
+  to avoid reimplementing them for each fermion class?
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: convert.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: convert.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -50,7 +58,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: convert.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v $
 //  $State: Exp $
 //
@@ -65,19 +73,20 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<util/gjp.h>
-#include<comms/nga_reg.h>
-#include<comms/cbuf.h>
+#include <util/lattice.h>
+#include <util/vector.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <util/gjp.h>
+#include <comms/nga_reg.h>
+#include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
-typedef struct ConvertArgStruct {
+//! A data container in the layout conversion routines.
+typedef struct ConvertArgStruct { 
 	unsigned	lx ;
 	unsigned	ly ;
-unsigned	lz ;
+	unsigned	lz ;
 	unsigned	lt ;
 	unsigned	nc ;
 	unsigned	ns ;
@@ -112,6 +121,12 @@ extern void FstagToCanon(CAP cap, int number_of_checkerboards = 2) ;
 // new_str_ord then it converts the gauge field
 // configuration and the two fermion fields f_field_1, 
 // f_field_2 to new_str_ord.
+/*!
+  \param new_str_ord The new order in which the fields will be laid out.
+  \param f_field_1 A fermion  field.
+  \param f_field_2 A fermion  field.
+  \post The fermion fields and the gauge field are laid out in the new order.
+*/
 //-------------------------------------------------------------------------
 void Lattice::Convert(StrOrdType new_str_ord, 
 		     Vector *f_field_1,
@@ -155,10 +170,10 @@ void Lattice::Convert(StrOrdType new_str_ord,
 
 //------------------------------------------------------------------
 // Convert(StrOrdType new_str_ord):
-// If str_ord is not the same as 
-// new_str_ord then it converts the gauge field
-// configuration to new_str_ord.
-//------------------------------------------------------------------
+/*!
+  \param new_str_ord The new order in which the field will be laid out.
+  \post The gauge field is arranged in the new order.
+*/
 void Lattice::Convert(StrOrdType new_str_ord)
 {
 	char *fname = "Convert(StrOrdType)";
@@ -401,8 +416,7 @@ char *converting_str = "Converting frm field str ord from %d to %d\n";
 
 
 //------------------------------------------------------------------
-// Fnone::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
-// Convert None fermion field f_field from -> to
+//! Does nothing!
 //------------------------------------------------------------------
 void Fnone::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
 {
@@ -410,13 +424,15 @@ void Fnone::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 }
 
 //-------------------------------------------------------------------------
-// Fwilson::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
-//
-// Converts the given fermion field between CANONICAL <-> WILSON.  No 
-// other conversions are currently supported in this derived class.
+//! Converts the field layout between the canonical and the odd-even order..
+/*!
+  \param f_field The fermionic field to be converted.
+  \param to The new order; either CANONICAL or WILSON.
+  \param from The current order; either CANONICAL or WILSON.
+*/
 //-------------------------------------------------------------------------
 
-void Fwilson::Fconvert(Vector *f_field,StrOrdType to,StrOrdType from) 
+void Fwilson::Fconvert(Vector *f_field,StrOrdType to,StrOrdType from)
 {
 	CAS	cas ;
 
@@ -464,8 +480,12 @@ void Fwilson::Fconvert(Vector *f_field,StrOrdType to,StrOrdType from)
 
 
 //------------------------------------------------------------------
-// Fstag::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
-// Convert Staggered fermion field f_field from -> to
+//! Converts the field layout between the canonical and the odd-even order..
+/*!
+  \param f_field The fermionic field to be converted.
+  \param to The new order; either CANONICAL or STAG.
+  \param from The current order; either CANONICAL or STAG.
+*/
 //------------------------------------------------------------------
 void Fstag::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
 {
@@ -516,8 +536,12 @@ void Fstag::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 
 
 //------------------------------------------------------------------
-// Fstag::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
-// Convert Staggered fermion field f_field from -> to
+//! Converts the field layout between the canonical and the odd-even order..
+/*!
+  \param f_field The fermionic field to be converted.
+  \param to The new order; either CANONICAL or STAG.
+  \param from The current order; either CANONICAL or STAG.
+*/
 //------------------------------------------------------------------
 void FstagAsqtad::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
 {
@@ -568,10 +592,12 @@ void FstagAsqtad::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 
 
 //------------------------------------------------------------------
-// Fclover::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
-// Convert Clover fermion field f_field from -> to
-// Since the Clover and Wilson storage orders are the same this 
-// routine calls the Wilson conversion routine.
+//! Converts the field layout between the canonical and the odd-even order..
+/*!
+  \param f_field The fermionic field to be converted.
+  \param to The new order; either CANONICAL or WILSON.
+  \param from The current order; either CANONICAL or WILSON.
+*/
 //------------------------------------------------------------------
 void Fclover::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
 {
@@ -623,8 +649,12 @@ void Fclover::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 
 
 //------------------------------------------------------------------
-// Fdwf::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
-// Convert dwf fermion field f_field from -> to
+//! Converts the field layout between the canonical and the odd-even order..
+/*!
+  \param f_field The fermionic field to be converted.
+  \param to The new order; either CANONICAL or WILSON.
+  \param from The current order; either CANONICAL or WILSON.
+*/
 //------------------------------------------------------------------
 void Fdwf::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from) 
 {
@@ -761,5 +791,6 @@ void Fdwf::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 	return ;
 
 }
+
 
 CPS_END_NAMESPACE

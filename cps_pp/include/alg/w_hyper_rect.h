@@ -47,4 +47,5 @@ private:
 };
 
 #endif // ! _INCLUDED_W_HYPER_RECT
+
 CPS_END_NAMESPACE

@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: alg_wline.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: alg_wline.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +34,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_wline.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v $
 //  $State: Exp $
 //
@@ -51,17 +51,17 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
 #include <stdio.h>
-#include<alg/alg_wline.h>
-#include<alg/common_arg.h>
-#include<alg/no_arg.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<comms/scu.h>
-#include<comms/glb.h>
+#include <alg/alg_wline.h>
+#include <alg/common_arg.h>
+#include <alg/no_arg.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <comms/scu.h>
+#include <comms/glb.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
@@ -211,4 +211,5 @@ void AlgWline::run()
     VRB.Debug(cname, fname, "End Direction = %i\n", mu) ;
   } // end for mu
 }
+
 CPS_END_NAMESPACE

@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of rfloat operator methods.
+
+  $Id: rfloat_rnd_op.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/rfloat/noarch/rfloat_rnd_op.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: rfloat_rnd_op.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/rfloat/noarch/rfloat_rnd_op.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: rfloat_rnd_op.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: rfloat_rnd_op.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/rfloat/noarch/rfloat_rnd_op.C,v $
 //  $State: Exp $
 //
@@ -56,7 +61,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/rfloat.h>
+#include <util/rfloat.h>
 CPS_START_NAMESPACE
 
 
@@ -74,5 +79,6 @@ rfloat& rfloat::operator/=(IFloat a)
 
 rfloat operator-(const rfloat& a)
 {return -a.x;}
+
 
 CPS_END_NAMESPACE

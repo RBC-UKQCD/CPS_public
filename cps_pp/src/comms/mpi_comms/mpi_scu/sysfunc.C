@@ -1,7 +1,13 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
-/*! The Sysfunc Comms Interface: sysfunc.C
+/*!\file
+  \brief  Definitions for the MPI implementation of the QCDSP/QCDOC communications layer.
+  
+  $Id: sysfunc.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
+/*----------------------------------------------------------------------
+/* The Sysfunc Comms Interface: sysfunc.C
 
   The MPI implementation of the QCDSP SCU comms-layer.
 
@@ -9,20 +15,19 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: mcneile $
-  $Date: 2003-06-22 13:34:47 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-  $Id: sysfunc.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+  $Author: zs $
+  $Date: 2003-07-24 16:53:54 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: sysfunc.C,v 1.2 2003-07-24 16:53:54 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.C,v $
-  $Revision: 1.1.1.1 $
+  $Revision: 1.2 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
 CPS_END_NAMESPACE
-#include<config.h>
 #include<comms/sysfunc.h>
 CPS_START_NAMESPACE
 
@@ -35,7 +40,7 @@ CPS_START_NAMESPACE
 
 //extern "C" {
 
-/*! Size of buffers for reading in/dealing with strings */
+/*! Size of buffers for storing strings */
 #define STRING_MAX_LEN  10000              
 
 /*! Boolean false is zero */
@@ -52,19 +57,25 @@ CPS_START_NAMESPACE
 /* Static global storage for communication handles etc:     */
 /*----------------------------------------------------------*/
 
-extern int commsMPI_init = FALSE; /*!< Definition  of the necessarily 
-				     global+extern'd comms-layer
-				     initialization flag.*/
-extern int commsMPI_Datasize = COMMS_DATASIZE; /*!< Definition of the default size 
-						 (in bytes) for the basic elements
-						 to be communicated 
-						 (ints and IFloats).*/
-static int          commsMPI_peRank;        /*!< Rank/identify of this process */
+extern int commsMPI_init = FALSE; 
+/*!<
+  The initial value of the global comms-layer
+  initialization flag is FALSE, indicating that the communications system has
+  not been set up.
+*/
+
+extern int commsMPI_Datasize = COMMS_DATASIZE;
+/*!<
+  Definition of the default size (in bytes) for the basic elements (ints and
+  IFloats) to be communicated .
+*/ 
+
+static int          commsMPI_peRank;        /*!< Rank/identify of this  process */
 static int          commsMPI_peNum;         /*!< Total number of processors */
-static int          commsMPI_peGrid[NDIM];  /*!< Run-time defined: no. of 
+static int          commsMPI_peGrid[NDIM];  /*!< Run-time defined: no. of  
 					     processors in each direction.*/
-static int          commsMPI_pePos[NDIM];   /*!< Position of this process in the grid */
-static int          commsMPI_root;          /*!< Specify the root processor by rank */
+static int          commsMPI_pePos[NDIM];   /*!< Position of this process in the grid */ 
+static int          commsMPI_root;          /*!< Specify the root processor by rank */ 
 static MPI_Comm     commsMPI_comm;          /*!< MPI communicator for the NDIM 
 					     cartesian PE topology. */
 static char         commsMPI_logFileName[STRING_MAX_LEN]; /*!< String containing the 
@@ -98,18 +109,73 @@ int SizeZ() { if( !commsMPI_init ) SCUCommsInit(); return commsMPI_peGrid[SCU_Z]
 
 int NumNodes() { if( !commsMPI_init ) SCUCommsInit(); return commsMPI_peNum; }
 
+//----------------------------------------------------------------
+/*!
+  The seed is (in general) different for each node and is (in general)
+  changed every time the machine is reset.
+
+  The behaviour of the MPI version may differ from that of the like-named 
+  QCDSP/QCDOC system function.
+*/
+//----------------------------------------------------------------
 unsigned int Seed(){ return SCUReadSeedFile(); }
+//----------------------------------------------------------------
+/*!
+  The seed  is the same for each node (spatially fixed, hence the S), but
+  changes every time the machine is reset.
+
+  The behaviour of the MPI version may differ from that of the like-named
+  QCDSP/QCDOC system function.
+*/
+//----------------------------------------------------------------
 unsigned int SeedS(){ if( !commsMPI_init ) SCUCommsInit(); return commsMPI_RNGseed; }
+//----------------------------------------------------------------
+/*!
+  SeedT is different for each node, but is fixed in time (the T), so it is
+  unchanged by a reset.
+
+  The behaviour of the MPI version may differ from that of the like-named 
+  QCDSP/QCDOC system function.
+*/
+//----------------------------------------------------------------
 unsigned int SeedT(){ return Seed(); }
+//----------------------------------------------------------------
+/*!
+  SeedST is the same for each node (spatially fixed, hence the S), and the
+  same after every reset (fixed time, hence T).
+
+  The behaviour of the MPI version may differ from that of the like-named 
+  QCDSP/QCDOC system function.
+*/
+//----------------------------------------------------------------
 unsigned int SeedST(){ return SeedS(); }
 
+//----------------------------------------------------------------
+/*!
+  This function blocks further code execution until all
+  nodes in the machine have begun executing the code in the sync()
+  routine.
+  \return 0
+*/
+//----------------------------------------------------------------
 unsigned int sync() {
     if( !commsMPI_init ) SCUCommsInit(); 
     MPI_Barrier( commsMPI_comm );
     return 0;
 }
 
-/*! In this implementation, this just returns the integer value
+//----------------------------------------------------------------
+/*!
+  On QCDSP this function returns the explicit wire
+  number (0 - 7) of the physics direction given by \a dir. In the MPI
+  version this returns the internal direction from the cartesian
+  communicator which corresponds to the given physics direction.
+  \param dir The physics (lattice) direction.
+  \return The number used by the comms layer to represents that direction.
+
+  Possibly.
+*/
+/* In this implementation, this just returns the integer value
   associated with the direction from the SCUDir enum */
 int SCURemap( SCUDir dir ) {
     return (int)dir;
@@ -119,10 +185,23 @@ int SCURemap( SCUDir dir ) {
 /*! SCUTrans (multiple, overloaded):
   N.B. For each direction, send and recieve requests must be in the
   same order!  */
+/*!
+  Performs the communication specified in \a arg.
+  \param arg The object fully specifying what data to send to (or receive from)
+  where.
+*/
+//----------------------------------------------------------------
 void SCUTrans( SCUDirArg * arg ) {
     SCUTrans( &arg, 1 );
 }
 
+//----------------------------------------------------------------
+/*!
+  Performs the multiple communications specified in \a arg.
+  \param arg A pointer to an array of objects, each fully specifying what
+  data to send to (or receive from) where.
+*/
+//----------------------------------------------------------------
 void SCUTrans( SCUDirArg ** arg, int n ) {
     int i;
 
@@ -135,6 +214,19 @@ void SCUTrans( SCUDirArg ** arg, int n ) {
     }
 }
 
+//----------------------------------------------------------------
+/*!
+  This function does a number of transfers in the same direction of data
+  with the same block length, stride and number
+  of blocks but with different addresses. These addresses are specified as
+  offsets to the base address.
+  \param arg The object containing the information about the structure of the
+  data, its base address, \e etc.
+  \param offset The array of offsets from the base address, defining addresses
+  to/from where data will be sent/received.
+  \param n The number of data transfers.
+*/
+//----------------------------------------------------------------
 void SCUTrans( SCUDirArg * arg, unsigned int * offset, int n ) {
     int i;
 
@@ -147,7 +239,26 @@ void SCUTrans( SCUDirArg * arg, unsigned int * offset, int n ) {
     }
 }
 
+//----------------------------------------------------------------
+/*!
+  The block length, stride and number of blocks involved in the data
+  transfer are given to to the underlying communications layer,
+  but no transfers are done.
+  \param arg The object containing the information about the structure of the
+  data.
+*/
+//----------------------------------------------------------------
 void SCUSetDMA( SCUDirArg * arg ) { SCUSetDMA( &arg, 1 ); }
+
+//----------------------------------------------------------------
+/*!
+  The block length, stride and number of blocks involved in a number of data
+  transfer are given to to the underlying communications layer,
+  but no transfers are done.
+  \param arg A pointer ot an array of objects containing the information about
+  the structure of the data.
+  \param n The number of sets of data to be transferred.
+//----------------------------------------------------------------*/
 void SCUSetDMA( SCUDirArg ** arg, int n ) {
     int i;
 
@@ -164,7 +275,30 @@ void SCUSetDMA( SCUDirArg ** arg, int n ) {
     return;
 }
 
+//----------------------------------------------------------------
+/*!
+  Performs the communication specified by its arguments.
+
+  \pre The transfer must have been set up using ::SCUTransAddr
+
+  \param arg The object specifiying the base address of the data, the
+  direction of the transfer and whether to send of receive the data. 
+*/
+//----------------------------------------------------------------
 void SCUTransAddr( SCUDirArg * arg ) { SCUTransAddr( &arg, 1 ); }
+
+//----------------------------------------------------------------
+/*!
+  Performs the communications specified by its arguments.
+
+  \pre The transfers must have been set up using ::SCUTransAddr
+
+  \param arg A pointer to an array of objects specifiying, for each transfer,
+  the base address of the data, the direction of the transfer and whether to
+  send of receive the data.
+  \param n The number of sets of data to be transferred.
+*/  
+//----------------------------------------------------------------
 void SCUTransAddr( SCUDirArg ** arg, int n ) {
     int i;
 
@@ -178,6 +312,12 @@ void SCUTransAddr( SCUDirArg ** arg, int n ) {
 }
 
 
+//----------------------------------------------------------------
+/*!
+  This function returns only when all pending communications operations
+  have completed.
+*/
+//----------------------------------------------------------------
 void SCUTransComplete( void ) {
     int numreq;
     MPI_Status *stat;
@@ -205,14 +345,24 @@ void SCUTransComplete( void ) {
 
 }
 
+//----------------------------------------------------------------
+/*!
+  This function finds the parameters relevant for the parallel
+  decomposition of the lattice, sets up the communications layer
+  and defines the grid topology.
 
-//! Controls the initialisation of the communications:
+  It also  defines a root node (which is useful for IO)
+  and opens logfiles (if required).
+
+  \ingroup mpicomms
+*/
+//----------------------------------------------------------------
 void SCUCommsInit( void ) {
     int   idirn, dummy_argc, root_check, *root_array, ir;
-    int   grid_periodicity[NDIM];  /*!< Array used to specify periodic BCs */
-    int   pe_reorder = FALSE;      /*!< Flag to (dis)allow PE reordering for the cart-comm */
-    char  **dummy_argv, *PEnum;    /*!< Dummy argv and PE number string */
-    int   ordPEnum;                /*!< No. of orders of magnitude (base10) of number of PEs */
+    int   grid_periodicity[NDIM];  /* Array used to specify periodic BCs */
+    int   pe_reorder = FALSE;      /* Flag to (dis)allow PE reordering for the cart-comm */
+    char  **dummy_argv, *PEnum;    /* Dummy argv and PE number string */
+    int   ordPEnum;                /* No. of orders of magnitude (base10) of number of PEs */
 
     //! If we have already been initialized, don't try to do it twice:
     if( commsMPI_init ) return;
@@ -260,12 +410,12 @@ void SCUCommsInit( void ) {
 
     /* Define the (cartesian, periodic) topology of the MPI communicator */
     for( idirn = 0; idirn < NDIM; idirn++ ) grid_periodicity[idirn] = TRUE;
-    MPI_Cart_create( MPI_COMM_WORLD,   /*!< Original communicator */
-		     NDIM,             /*!< No. dimensions */
-		     commsMPI_peGrid,   /*!< No. PEs in each direction */
-		     grid_periodicity, /*!< Periodicity of PE grid in each direction */
-		     pe_reorder,       /*!< True/false flag to allow PE re-ordering */
-		     &commsMPI_comm     /*!< The new, cartesian, communicator */
+    MPI_Cart_create( MPI_COMM_WORLD,   /* Original communicator */
+		     NDIM,             /* No. dimensions */
+		     commsMPI_peGrid,   /* No. PEs in each direction */
+		     grid_periodicity, /* Periodicity of PE grid in each direction */
+		     pe_reorder,       /* True/false flag to allow PE re-ordering */
+		     &commsMPI_comm     /* The new, cartesian, communicator */
 		     );
 
     /* Look up processor number again, in case the new communicator has
@@ -283,13 +433,13 @@ void SCUCommsInit( void ) {
     root_array = (int*)malloc(commsMPI_peNum*sizeof(int));
     if( root_array == NULL ) 
       SCURaiseError("malloc failed for root_array in SCUCommsInit!");
-    MPI_Allgather( &root_check, /*!< Pointer to number to be gathered */
-		   1,           /*!< i.e. gathering a single item */
-		   MPI_INT,     /*!< which is a standard C integer */
-		   root_array,  /*!< Pointer to the array which will recieve the data */
-		   1,           /*!< One thing from each PE */
-		   MPI_INT,     /*!< and that thing is an int. */
-		   commsMPI_comm /*!< Using the cartesian communicator */
+    MPI_Allgather( &root_check, /* Pointer to number to be gathered */
+		   1,           /* i.e. gathering a single item */
+		   MPI_INT,     /* which is a standard C integer */
+		   root_array,  /* Pointer to the array which will recieve the data */
+		   1,           /* One thing from each PE */
+		   MPI_INT,     /* and that thing is an int. */
+		   commsMPI_comm /* Using the cartesian communicator */
 		   );
     /* Every PE goes through the list and identifies the root PE */
     for( ir = 0; ir < commsMPI_peNum; ir++ ) {
@@ -332,14 +482,16 @@ void SCUCommsInit( void ) {
 }
 
 
-//! Controls the comms finalization; clean exit via MPI_Finalize:
+/*!   \ingroup mpicomms */
+
 void SCUCommsFinalize( void ) {
     if( commsMPI_init ) MPI_Finalize();
 }
 
 
-/*! The global summation */
-/* --------------------- */
+/* The global summation */
+/*! \ingroup mpicomms collectivecomms */
+
 void SCUGlobalSum(Type_tag t,   /*!< In: Type of data being summed */
 		  size_t tsize, /*!< In: Size of the data type */
 		  int n,        /*!< In: Number of values to sum */
@@ -378,6 +530,14 @@ void SCUGlobalSum(Type_tag t,   /*!< In: Type of data being summed */
 
 /* SCU-layer error handler:
    Should map onto the ERR class for the QCDSP code. */
+/*!
+  Prints an error message to \c stdout and causes the program to exit
+  immediately with the value \a EXIT_FAILURE.
+  \param errstr The messsage.
+
+  \ingroup mpicomms  
+*/
+
 void SCURaiseError( char* errstr ) {
     /* Report the error: */
     printf("error: %s\n", errstr);
@@ -387,7 +547,16 @@ void SCURaiseError( char* errstr ) {
 
     exit(EXIT_FAILURE);
 }
-//! Extra error wrapper to deal with string literals. */
+
+
+// Extra error wrapper to deal with string literals. */
+/*!
+  Prints an error message to \c stdout and causes the program to exit
+  immediately with the value \a EXIT_FAILURE.
+  \param errstr The messsage.
+
+  \ingroup mpicomms
+*/
 void SCURaiseError( const char* errstring ) { 
     SCURaiseError( const_cast<char*>(errstring) ); 
 }
@@ -398,9 +567,12 @@ void SCURaiseError( const char* errstring ) {
 /*              If this were a class, these would be private.              */
 /*-------------------------------------------------------------------------*/
 
-/*! Actual lowest level MPI comms subroutine, on which all other
- comms-calls are based.  
+//----------------------------------------------------------------
+/*!
+  The lowest level MPI comms subroutine, on which all other comms calls
+  are based.  
 */
+//----------------------------------------------------------------
 void SCUTrans_mpi( void* addr, MPI_Datatype mpi_dt, SCUDir dir, SCUXR sendrx ) {
     int j, nnPE;
     MPI_Request request;
@@ -434,17 +606,17 @@ void SCUTrans_mpi( void* addr, MPI_Datatype mpi_dt, SCUDir dir, SCUXR sendrx ) {
     return;
 }
 
-//! MPIParseCommsParam():
-//! Parse the comms parameters:
-/*! It looks up the run-time user parameters specified via COMMS_ENVVAR.
-  i.e. Lots of messy string handling etcetera.
+//----------------------------------------------------------------
+/*!
+  Looks up and parses the run-time user parameters specified via COMMS_ENVVAR.
+  i.e. Lots of messy string handling et cetera.
  
-  ??? Currently, they all open the file and look up the required 
-  information.  It would perhaps be quicker to get 1 PE to look 
+  \todo Currently, all PEs open the file and look up the required 
+  information.  It would perhaps be quicker to get one PE to look 
   in the file and then distribute the information.
   In fact, if only one node is capable of I/O, this would be 
   neccessary, so it should be done.
-                                                                     */
+*/                                                                     
 /* ----------------------------------------------------------------- */
 void MPIParseCommsParam(void) {
     enum { NULL_READ, GRID_READ, LOGF_READ, SEED_READ, SEEDFILE_READ};
@@ -554,7 +726,12 @@ void MPIParseCommsParam(void) {
 
 }
 
-//! String tokenizer, coded here to ensure portability:
+//----------------------------------------------------------------
+/*!
+  String tokenizer, coded here to ensure portability:
+*/
+//----------------------------------------------------------------
+
 char *MPICommsStringTokenizer(char* str, const char* delim, char** tok_pos ) {
     char *tokenstr, *substr;
     int i, tokenstate, toki, isgap, idel, tok_find;
@@ -607,10 +784,14 @@ char *MPICommsStringTokenizer(char* str, const char* delim, char** tok_pos ) {
     return(NULL);
 }
 
-/*! On-the-fly type+size -> MPI_Datatype conversion.  There are
- probably somewhat quicker ways of doing this via look-up tables, but
- for now, the look-up has been left explicit.*/
 //----------------------------------------------------------------
+/*!
+  On-the-fly type+size -> MPI_Datatype conversion.  There are
+ probably somewhat quicker ways of doing this via look-up tables, but
+ for now, the look-up has been left explicit.
+*/
+//----------------------------------------------------------------
+
 MPI_Datatype SCUMPITypeConv( Type_tag t, size_t tsize ) {
     int i, mpisize;
     MPI_Datatype int_types[NUM_INT_TYPES] = { MPI_CHAR, MPI_SHORT, MPI_INT, MPI_LONG };
@@ -657,7 +838,12 @@ MPI_Datatype SCUMPITypeConv( Type_tag t, size_t tsize ) {
 
 }
 
-//! Read N seeds from the seedfile into an array */
+//----------------------------------------------------------------
+/*!
+  Reads a seed for every PE from a file specified during intialisation.
+*/
+//----------------------------------------------------------------
+
 unsigned int SCUReadSeedFile( void ) {
     FILE *seedfp = NULL;
     int i, io_state, n = commsMPI_peNum;

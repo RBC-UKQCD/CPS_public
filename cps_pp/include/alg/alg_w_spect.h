@@ -22,7 +22,7 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<alg/alg_base.h>
+#include <alg/alg_base.h>               // class Alg
 CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
@@ -88,5 +88,6 @@ class AlgWspectExtMeson : public AlgWspect
 
 
 #endif
+
 
 CPS_END_NAMESPACE

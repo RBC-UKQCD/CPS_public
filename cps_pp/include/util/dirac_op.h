@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
+
+  $Id: dirac_op.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: dirac_op.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: dirac_op.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -40,37 +45,30 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: dirac_op.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// dirac_op.h
-//
-// Header file for the DiracOp base class. Each type of frmion has 
-// a derived class. DiracOp is the front end for all Dirac operators 
-// associated with a specific kind of  fermions.
-//
-//------------------------------------------------------------------
 
 
 #ifndef INCLUDED_DIRAC_OP_H
 #define INCLUDED_DIRAC_OP_H
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/vector.h>
-#include<alg/cg_arg.h>
-#include<alg/eig_arg.h>
+#include <util/lattice.h>
+#include <util/vector.h>
+#include <alg/cg_arg.h>
+#include <alg/eig_arg.h>
 CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
-//
-// DiracOp base class.
-//
+//! A class representing operations on the Dirac operator.
+/*!
+  This is an abstract base class, so the details specific to the various
+  types of fermion action are defined in the derived classes.
+ */
 //------------------------------------------------------------------
 class DiracOp
 {
@@ -82,13 +80,14 @@ class DiracOp
                                    // scope at any time.
 
  protected:
-  Lattice& lat;                    // Lattice object.
-  Vector *f_out;                   // Output fermion field pointer.
-  Vector *f_in;                    // Input fermion field pointer.
-  CgArg *dirac_arg;                // Argument structure
-  CnvFrmType cnv_frm;              // Fermion conversion flag
-  Matrix *gauge_field;             // pointer to the gauge field
+  Lattice& lat;                    //!< The lattice..
+  Vector *f_out;                   //!< Pointer aliasing vector \a f_field_out.
+  Vector *f_in;                    //!< Pointer aliasing vector \a f_field_out.
+  CgArg *dirac_arg;                //!< Solver parameters.
+  CnvFrmType cnv_frm;              //!< Field storage order conversion flag.
+  Matrix *gauge_field;             //!< Pointer to the gauge field.
   
+  //! Global sum of a floating point number.
   virtual void DiracOpGlbSum(Float *float_p);					
      // The global sum used by InvCg. At the base class
      // level it is just the usual global sum. It is overloaded
@@ -106,7 +105,7 @@ class DiracOp
 
   virtual ~DiracOp();
 
-
+  //! The matrix inversion used in the molecular dynamics algorithms.
   int InvCg(Vector *out,
 	    Vector *in,
 	    Float src_norm_sq,
@@ -120,31 +119,39 @@ class DiracOp
      // in true_res.
      // *true_res = |src - MatPcDagMatPc * sol| / |src|
 
+  //! The matrix inversion used in the molecular dynamics algorithms.  
   int InvCg(Vector *out, Vector *in, Float src_norm_sq);
       // Same as original but with true_res=0
 
+  //! The matrix inversion used in the molecular dynamics algorithms.
   int InvCg(Vector *out, Vector *in, Float *true_res);
      // Same as original but with src_norm_sq=0.0
 
+  //! The matrix inversion used in the molecular dynamics algorithms.
   int InvCg(Vector *out, Vector *in);
-     // Same as original but with src_norm_sq=0.0, true_res=0
-
+  // Same as original but with s
+  
+  //! The matrix inversion used in the molecular dynamics algorithms.
   int InvCg(Float src_norm_sq, Float *true_res);
      // Same as original but with 
      // in=f_in, out=f_out
 
+  //! The matrix inversion used in the molecular dynamics algorithms.
   int InvCg(Float src_norm_sq);
      // Same as original but with 
      // in=f_in, out=f_out, true_res=0
 
+  //! The matrix inversion used in the molecular dynamics algorithms.
   int InvCg(Float *true_res);
      // Same as original but with 
      // in=f_in, out=f_out, src_norm_sq=0.0
 
+  //! The matrix inversion used in the molecular dynamics algorithms.
   int InvCg(void);
      // Same as original but with 
      // in=f_in, out=f_out, src_norm_sq=0.0, true_res=0
 
+  //! Ritz eigensolver.
   int Ritz(Vector **psi_all, int N_eig, Float &lambda,
 	   Float RsdR_a, Float RsdR_r, Float Rsdlam, Float Cutl_zero,
 	   int n_renorm, int Kalk_Sim, int N_min, int N_max, Float Cv_fact,
@@ -153,6 +160,7 @@ class DiracOp
      // The matrix that is used is RitzMat.
      // RitzMat must be hermitian and positive def.
 
+  //! Jacobi diagonalisation of a matrix.
   int Jacobi(Vector **psi, int N_eig, Float lambda[], 
 	     Complex off_diag[], 
 	     Float Toler, int N_max);
@@ -160,58 +168,139 @@ class DiracOp
 
 // Pure virtual functions
 //------------------------------------------------------------------
+
+//! Resets the parameters used in the solver (and elsewhere).
+/*!
+  The quark mass is set from the set parameters used in the solver
+  and made available to all methods in this class.
+  \param arg The new set of solver parameters.
+ */
   virtual void DiracArg(CgArg *arg) = 0;
      // It sets the dirac_arg pointer to arg and initializes
      // the relevant parameters (kappa, m^2, ...).
 
+  //! Multiplication by the square of the odd-even preconditioned fermion matrix.
+  /*!
+    A vector, defined on a lattice sites of a single parity, is multiplied by
+    \f$ M^\dagger M \f$ where \e M is a single parity of the odd-even
+    preconditioned fermion matrix.
+    \param out The result
+    \param in The vector to be multiplied.
+    \param dot_prod Whether or not to compute the real part of the
+    local dot product (\e i.e. with no global sum)
+    of the vectors \a out and \a in. If \a dot_prod is initially
+    non-zero then this is computed and the result placed here.
+  */
   virtual void MatPcDagMatPc(Vector *out, Vector *in, Float *dot_prd=0) = 0;
-     // MatPcDagMatPc is the fermion matrix that appears in the HMC 
-     // evolution. It is a Hermitian matrix where M is
-     // the preconditioned (if relevant) Dirac Operator matrix.        
-     // MatPcDagMatPc connects only even-->even or odd-->odd sites.
-     // The in, out fields are defined on a checkerboard.
-     // If dot_prd is not 0 then the dot product (on node)
-     // <out, in> = <MatPcDagMatPc*in, in> is returned in dot_prd.
  
+  //! The derivative part of the fermion matrix.
+  /*!
+    A vector defined on lattice sites of a single parity is multiplied by
+    the derivative part of the fermion matrix.
+    \param out The resulting vector.
+    \param in The vector to be multiplied.
+    \param cb The parity on which the vector \a in is defined.
+    \param dag Whether to multiply by the hermitian conjugate matrix:
+    Should be set to 1 to multiply by the hermitian conjugate, 0 otherwise.
+   */
   virtual void Dslash(Vector *out, 
 		      Vector *in,
 		      ChkbType cb, 
 		      DagType dag)=0;
-     // Dslash is the derivative part of the fermion matrix. 
-     // Dslash conects only odd-->even or even-->odd sites.
-     // The in, out fields are defined on a checkerboard.
-     // cb refers to the checkerboard of the in field.
 
+  //! Fermion matrix inversion.
+  /*!
+    Solves <em> A x = b </em> for \e x, where \a A is the
+    fermion matrix. The vectors are defined on the whole lattice,
+    not just on sites of a single parity.
+    \param out The initial guess of the solution vector \e x.
+    \param in The source vector \e b.
+    \param true_res Whether or not to report the true residual. The true
+    residual will be written here if this is non-zero.
+    \param prs_in Whether or not the source vector is allowed to be
+    overwritten, thereby saving memory. For staggered fermions it is
+    preserved regardless of the value of \a prs_in. 
+    \return The number of solver iterations.
+    \post \a out contains the solution vector \e x.
+    \post \a true_res contains the true residual, if this was non-zero to start with.
+    The residual is  <em>  |b - A x| / |b| </em>
+  */
   virtual int MatInv(Vector *out, 
 		     Vector *in, 
 		     Float *true_res, 
 		     PreserveType prs_in = PRESERVE_YES) = 0;
-     // The inverse of the unconditioned (if relevant) Dirac Operator 
-     // using Conjugate gradient. source is *in, initial
-     // guess and solution is *out.
-     // If true_res !=0 the value of the true residual is returned
-     // in true_res.
-     // *true_res = |src - MatPcDagMatPc * sol| / |src|
-     // prs_in is used to specify if the source
-     // in should be preserved or not. If not the memory usage
-     // is less by the size of one fermion vector or by the size
-     // of one checkerboard fermion vector (half a fermion vector).
-     // For staggered fermions in is preserved regardles of
-     // the value of prs_in. 
-     // The function returns the total number of CG iterations.
 
+  //! Fermion matrix inversion.
+  /*!
+    Solves <em> A x = b </em> for \e x, where \e A is the
+    fermion matrix. The vectors are defined on the whole lattice,
+    not just on sites of a single parity.
+    \param out The initial guess of the solution vector \e x.
+    \param in The source vector \e b.
+    \param prs_in Whether or not the source vector is allowed to be
+    overwritten, thereby saving memory. For staggered fermions it is
+    preserved regardless of the value of \a prs_in. 
+    \return The number of solver iterations.
+    \post \a out contains the solution vector \e x.
+  */
   virtual int MatInv(Vector *out, Vector *in, 
 		     PreserveType prs_in = PRESERVE_YES) = 0;
      // Same as original but true_res=0.
 
+  //! Fermion matrix inversion.
+  /*!
+    Solves <em> A x = x </em> for \a f_out,
+    where \a A is the fermion matrix.
+    The vectors \a f_field_in and \a f_field_out, defined in the constructor,
+    are used for \e b and \e x respectively
+
+    \pre \a f_field_in and \a f_field_out, defined in the
+    constructor, must point to spin-colour vectors defined on the
+    whole lattice, not just on sites of a single parity.
+    \pre \a f_field_out contains the initial guess for \e x.
+    
+    \param true_res Whether or not to report the true residual. The true
+    residual will be written here if this is non-zero.
+    \param prs_in Whether or not the source vector is allowed to be
+    overwritten, thereby saving memory. For staggered fermions it is
+    preserved regardless of the value of \a prs_in. 
+    \return The number of solver iterations.
+    \post \a f_field_out contains the solution vector \e x.
+    \post \a true_res contains the true residual, if this was non-zero to start with.
+    The residual is  <em>  |b - A x| / |b| </em>
+  */
   virtual int MatInv(Float *true_res, 
 		     PreserveType prs_in = PRESERVE_YES) = 0;
      // Same as original but in = f_in and out = f_out.
 
+  //! Fermion matrix inversion.
+  /*!
+    Solves <em> A x = b </em> for \a x,
+    where \a A is the fermion matrix.
+    The vectors \a f_field_in and \a f_field_out, defined in the constructor,
+    are used for \e b and \e x respectively
+    
+    \pre \a f_field_in and \a f_field_out, defined in the
+    constructor, must point to spin-colour vectors defined on the
+    whole lattice, not just on sites of a single parity.
+    \pre \a f_field_out contains the initial guess for \e x.
+
+    \param prs_in Whether or not the source vector is allowed to be
+    overwritten, thereby saving memory. For staggered fermions it is
+    preserved regardless of the value of \a prs_in. 
+    \return The number of solver iterations.
+    \post \a f_field_out contains the solution vector \e x.
+  */
   virtual int MatInv(PreserveType prs_in = PRESERVE_YES) = 0;
      // Same as original but in = f_in, out = f_out, true_res=0.
 
-  virtual int RitzEig(Vector **eigenv, Float lambda[], int valid_eig[], 
+//! Computes eigenvectors and eigenvalues.
+/*!
+  Uses a Conjugate Gradient based Ritz functional minimisation method
+  to compute the \e n lowest eigenvectors and eigenvalues of some fermion
+  matrix operator.
+ */
+   virtual int RitzEig(Vector **eigenv, Float lambda[], int valid_eig[], 
 		      EigArg *eig_arg) = 0;
      // The eigenvector solver using Ritz minimization and Jacobi reconstruction
      // (using the Kalkreuter-Simma algorithm) of the eigenvectors of RitzEigMat.
@@ -221,20 +310,38 @@ class DiracOp
      // Can also use non KS algorithm to return eigenvalues only of 
      // RitzEigMat = RitzMat.
 
+   //! Multiplication by a fermion matrix operator.
+   /*!
+     Multiplies a vector by the hermitian matrix defined for the
+     eigenvalue calculations. Exactly what this is and whether the operation
+     acts on vectors defined on the full lattice or just one parity depends
+     on the fermion action used.
+     \param out The resulting vector.
+     \param in The vector to be multiplied.
+   */
   virtual void RitzEigMat(Vector *out, Vector *in) = 0;
-     // RitzEigMat is the fermion matrix used in RitzEig
-     // RitzEigMat works on the full lattice or half lattice
-     // The in, out fields are defined on the full or half lattice.
 
+   //! Multiplication by a fermion matrix operator.
+   /*!
+     Multiplies a vector by something like
+     the hermitian matrix defined (in the structure
+     \a arg used in the constructor) for the
+     eigenvalue calculations. Exactly what this is and whether the operation
+     acts on vectors defined on the full lattice or just one parity depends
+     on the fermion action used.
+     \param out The resulting vector.
+     \param in The vector to be multiplied.
+   */
   virtual void RitzMat(Vector *out, Vector *in) = 0;
-     // RitzMat is the fermion matrix used in Ritz
-     // RitzMat works on the full lattice or half lattice
-     // The in, out fields are defined on the full or half lattice.
 
+//! The size of a fermion field.
+/*!
+  \return The size on each node, in terms of floating point numbers,
+  of the fermion field on which the matrix defined (in the structure
+  \a arg used in the constructor) for the eigenvalue calculations operates.
+*/
   virtual int RitzLatSize() = 0;
-     // RitzLatSize returns the number of checkerboards of a fermion.
-     // It uses the RitzMatType flag to determine the operator
-     // to use and relevant checkerboard sizes.
+
 };
 
 
@@ -242,10 +349,21 @@ class DiracOp
 //
 // DiracOpStagTypes class.
 //
-// Is derived from DiracOp and is relevant to
-// all DiracOp classes with Staggered type fermions.
-// These classes are derived from DiracOpStagTypes
-//
+//! A class describing the Dirac operator for all sorts of staggered fermions.
+/*!
+  This is an abstract base class from which the staggered fermion Dirac
+  operator classes are derived.
+
+  The staggered fermion is
+  \f[
+  M_{xy} =
+  m_0 - \sum_mu e^{\sum_{i=0}^{\mu-1}x_i} 
+  [ U^\dagger_\mu(x) \delta_{x\,y+\mu} - U_\mu(x-\mu) \delta_{x\,y-\mu} ]
+  \f]
+
+  \e N.B  The phases are implemented in the gauge field when it is
+  converted to staggered (::STAG) storage order.
+*/
 //------------------------------------------------------------------
 class DiracOpStagTypes : public DiracOp
 {
@@ -261,7 +379,6 @@ class DiracOpStagTypes : public DiracOp
 
   virtual ~DiracOpStagTypes();
 
-
   virtual int RitzEig(Vector **eigenv, Float lambda[], int valid_eig[], 
 	              EigArg *eig_arg);
      // The eigenvector solver using Ritz minimization and Jacobi reconstruction
@@ -273,9 +390,7 @@ class DiracOpStagTypes : public DiracOp
      // RitzEigMat = RitzMat.
 
   virtual int RitzLatSize();
-     // RitzLatSize returns the size of a fermion on a node
-     // It uses the RitzMatType flag to determine the operator
-     // to use and relevant checkerboard sizes.
+
 };
 
 
@@ -283,7 +398,8 @@ class DiracOpStagTypes : public DiracOp
 //
 // DiracOpStag is derived from DiracOpStagTypes and is the front
 // end for all Dirac operators associated with Staggered fermions.
-//
+
+//! A class describing the Dirac operator for staggered fermions.
 //------------------------------------------------------------------
 class DiracOpStag : public DiracOpStagTypes
 {
@@ -329,6 +445,7 @@ class DiracOpStag : public DiracOpStagTypes
      // The in, out fields are defined on a checkerboard.
      // cb refers to the checkerboard of the in field.
 
+  //! The derivative part of the fermion matrix.
   void Dslash(Vector *out, 
 	      Vector *in,
 	      ChkbType cb, 
@@ -385,25 +502,82 @@ class DiracOpStag : public DiracOpStagTypes
 //------------------------------------------------------------------
 //
 // DiracOpWilsonTypes class.
-//
-// Is derived from DiracOp and is relevant to
-// all DiracOp classes with Wilson type fermions 
-// (e.g DiracOpWilson, DiracOpClover, DiracOpDwf, ...). 
-//  These classes are derived from DiracOpWilsonTypes
-//
+
+//! A class describing the Dirac operator for all sorts of Wilson fermions.
+/*! This is an abstract base class from which the Wilson Dirac operator
+  classes are derived.
+
+  The general Wilson type of fermion matrix is \f$ M = A - \kappa D \f$
+  where the Wilson hopping matrix \e D is
+  \f[
+  D_{xy} = \sum_{\mu}(1-\gamma_{\mu})U_\mu(x)\delta_{y\,x+\mu}
+  +(1+\gamma_{\mu})U_\mu^{\dagger}(x-\mu)\delta_{y\,x-\mu}
+  \f]w
+
+  Note that \e D connects sites of opposite parity.
+  
+  For Wilson fermions \e A is just a unit matrix.
+
+  For clover improved fermions   \e A is the clover matrix
+  \f[
+  A(x) = 1 - \frac{1}{2} \kappa c_\mathrm{sw}   \sum_{\mu<\nu}
+  [\gamma_\mu, \gamma_\nu] F_{\mu\nu}(x) 
+  \f]
+  where 
+  the field strength tensor \f$ F_{\mu\nu} \f$ is the matrix
+  \f[
+  F_{\mu\nu}(x) = \frac{1}{4}\frac{1}{2}
+                (P_{\mu\nu}(x) - P^\dagger_{\mu\nu}(x))
+  \f]
+  in which
+\f[
+	P_{\mu\nu}(x)  =
+    U_\mu(x) U_\nu(x+mu) U_\mu(x+\nu)^\dagger U_\nu(x)^\dagger +  
+    U_\nu(x) U_\mu(x-\mu+\nu)^\dagger U_\nu(x-\mu)^\dagger U_\mu(x-\mu) +
+ \f]\f[    
+    U_\mu(x-\mu)^\dagger U_\nu(x-\mu-\nu)^\dagger U_\mu(x-\mu-\nu) U_\nu(x-\nu) + 
+    U_\nu(x-\nu)^\dagger U_\mu(x-\nu) U_\nu(x+\mu-\nu) U_\mu(x)^\dagger
+\f]
+  
+  The odd-even preconditioned fermion matrix is
+  \f$ A - \kappa^2 D A^{-1} D \f$  on odd parity lattice sites
+  and \e A on even parity sites.
+
+  Note that for Wilson fermions the even sites are completely decoupled.  
+  
+The following representation of the Euclidean gamma matrices is probably used:
+\f[
+\gamma_t = \pmatrix{
+0&0&1&0 \cr 0&0&0&1 \cr1&0&0&0 \cr 0&1&0&0 \cr 
+}
+
+\gamma_x = \pmatrix{
+0&0&0&i \cr 0&0&i&0 \cr 0&-i&0&0 \cr -i&0&0&0 \cr
+}
+\f]
+\f[
+\gamma_y = \pmatrix{
+0&0&0&-1 \cr 0&0&1&0 \cr 0&1&0&0 \cr -1&0&0&0 \cr
+}
+
+\gamma_z = \pmatrix{
+0&0&i&0 \cr 0&0&0&-i \cr -i&0&0&0 \cr 0&i&0&0 \cr
+}
+\f]
+
+
+  
+*/
 //------------------------------------------------------------------
 class DiracOpWilsonTypes : public DiracOp
 {
  private:
   char *cname;    // Class name.
 
- protected:
+  protected:
+
+  //! Multiply a vector by  gamma_5.
   void MultGamma(Vector *out, const Vector *in, int gamma_num, int nodevol);
-     // Multiply vector on left by 
-     // gamma_1^n1 * gamma_2^n2 * gamma_3^n3 * gamma_4^n4
-     // Where  (n1,n2,n3,n4) = bit wise decomposition of gamma_num
-     // Vector has nodevol number of sites to run over
-     // out = gamma_1^n1*gamma_2^n2*gamma_3^n3*gamma_4^n4 * in
 
  public:
   DiracOpWilsonTypes(Lattice& latt,            // Lattice object.
@@ -414,25 +588,35 @@ class DiracOpWilsonTypes : public DiracOp
 
   virtual ~DiracOpWilsonTypes();
 
+  
   virtual void MatHerm(Vector *out, Vector *in) = 0;
-     // MatHerm is the hermitian version of Mat.
-     // MatHerm works on the full lattice.
-     // The in, out fields are defined on the ful.
+  //!< Multiplication by the hermitian fermion matrix.
+/*!<
+  The fermion matrix is left multiplied by gamma_5 to make it hermitian.
+  The vectors are defined on the whole lattice.
+  \param out The resulting vector.
+  \param in The vector to be multiplied.
+*/
+
 
   virtual void Mat(Vector *out, Vector *in) = 0;
-     // Mat is the unpreconditioned fermion matrix.  
-     // Mat works on the full lattice
-     // The in, out fields are defined on the full lattice.
+  //!< Multiplication by the full fermion matrix.
+/*!<
+  The vectors are defined on the whole lattice.
+  \param out The resulting vector.
+  \param in The vector to be multiplied.
+*/
 
   virtual void MatDag(Vector *out, Vector *in) = 0;
-     // MatDag is the dagger of the unpreconditioned fermion matrix. 
-     // MatDag works on the full lattice
-     // The in, out fields are defined on the full lattice.
+  //!< Multiplication by the hermitian conjugate of the full fermion matrix.  
+/*!<
+  The vectors are defined on the whole lattice.
+  \param out The resulting vector.
+  \param in The vector to be multiplied.
+*/
 
+  //! Multiplication by the square of the fermion matrix.
   virtual void MatDagMat(Vector *out, Vector *in);
-     // MatDagMat is the MatDag*Mat.
-     // MatDagMat works on the full lattice.
-     // The in, out fields are defined on the full.
 
   virtual int RitzEig(Vector **eigenv, Float lambda[], int valid_eig[], 
 		      EigArg *eig_arg);
@@ -462,11 +646,12 @@ class DiracOpWilsonTypes : public DiracOp
 
 
 
-//------------------------------------------------------------------
-//
-// DiracOpWilson is derived from DiracOp and is the frot end for 
-// all Dirac operators associated with Wilson fermions.
-//
+//-----------------------------------------------------------------
+//! A class describing the Dirac operator for Wilson fermions.
+/*!
+  See the description of the DiracOpWilsonTypes class for the definition
+  of the clover fermion matrix.
+*/
 //------------------------------------------------------------------
 class DiracOpWilson : public DiracOpWilsonTypes
 {
@@ -510,15 +695,11 @@ class DiracOpWilson : public DiracOpWilsonTypes
      // The in, out fields are defined on a checkerboard.
      // cb refers to the checkerboard of the in field.
 
+  //! Multiplication by the odd-even preconditioned fermion matrix.
   void MatPc(Vector *out, Vector *in);
-     // MatPc is the preconditioned fermion matrix.  
-     // MatPc connects only odd-->odd sites.
-     // The in, out fields are defined on the odd checkerboard.
 
+  //! Multiplication by the hermitian conjugate of the odd-even preconditioned fermion matrix.
   void MatPcDag(Vector *out, Vector *in);
-     // MatPcDag is the dagger of the preconditioned fermion matrix. 
-     // MatPcDag connects only odd-->odd sites.
-     // The in, out fields are defined on the odd checkerboard.
 
   int MatInv(Vector *out, 
 	     Vector *in, 
@@ -548,21 +729,14 @@ class DiracOpWilson : public DiracOpWilsonTypes
      // Same as original but in = f_in, out = f_out, true_res=0.
 
   void MatHerm(Vector *out, Vector *in);
-     // MatHerm is the hermitian version of Mat.
-     // MatHerm works on the full lattice.
-     // The in, out fields are defined on the ful.
 
   void Mat(Vector *out, Vector *in);
-     // Mat is the unpreconditioned fermion matrix.  
-     // Mat works on the full lattice
-     // The in, out fields are defined on the full lattice.
 
   void MatDag(Vector *out, Vector *in);
-     // MatDag is the dagger of the unpreconditioned fermion matrix. 
-     // MatDag works on the full lattice
-     // The in, out fields are defined on the full lattice.
 
   void CalcHmdForceVecs(Vector *chi) ;
+  //!< Computes vectors used in the HMD pseudofermionic force term.
+  
     // GRF
     // chi is the solution to MatPcInv.  The user passes two full size
     // CANONICAL fermion vectors with conversion enabled to the
@@ -572,18 +746,18 @@ class DiracOpWilson : public DiracOpWilsonTypes
 
 
 //------------------------------------------------------------------
-//
-// DiracOpClover is derived from DiracOp and is the frot end for 
-// all Dirac operators associated with Clover fermions.
-//
-//------------------------------------------------------------------
-
-//------------------------------------------------------------------
 // Forward struct declaration for class DiracOpClover
 //------------------------------------------------------------------
 struct Clover;
 class Fclover;
 
+//------------------------------------------------------------------
+//! A class describing the Dirac operator for clover-improved Wilson fermions.
+/*!
+  See the description of the DiracOpWilsonTypes class for the definition
+  of the clover fermion matrix.
+*/
+//------------------------------------------------------------------
 class DiracOpClover : public DiracOpWilsonTypes
 {
  private:
@@ -616,33 +790,36 @@ class DiracOpClover : public DiracOpWilsonTypes
   // Auxiliary member functions
   //----------------------------------------------------------------------
   const Matrix& GetLink(const int *site, int dir) const;
-  // returns a reference to a link in Wilson order.
+  //!< Gets a reference to a link.
   // The site[] is [x,y,z,t] and could be off-node.
   // If off-node, the link is stored in a static buffer and will be
   // overwritten by the next off-node link, so BE CAREFUL.
 
   void SiteFuv(Matrix &Fuv, const int *site, int mu, int nu) const;
+  //!< Computes the gauge field strength tensor for a specified site and orientation.
   // calculate Fuv, on return Fuv follows the matrix convention
   // of IFloat[row][col][2], instead of IFloat[col][row][2] used in
   // Wilson order.
 
   void SiteCloverMat(const int *site, IFloat *mat_72_IFloats) const;
+  //!< Computes the clover matrix at a lattice site.
   // calculate the local 12x12 clover matrix, and stored it as
   // two blocks of 6x6 compressed (that is, only the lower diagonal
   // part is stored) hermitian matrices.
 
   void CloverMatChkb(ChkbType chkb, int inverse = 0) const;
-  // calculate the clover matrices for all even, or all odd sites, and
-  // invert them if specified.
+  //!< Computes the clover matrix or its inverse at all sites with a given parity.  
 
+  //! Multiplication by the odd-even preconditioned fermion matrix or its hermitian conjugate.
   void MatPcDagOrNot(Vector *out, const Vector *in, int dag) const;
-  // out = MatPcDag in   OR  out = MatPc in
 
   // FOR THE PURPOSE OF DEBUGGING ONLY
   //----------------------------------------------------------------------
+//! For  debugging  purposes only, apparently
   void MatDagOrNotDbg(Vector *out, const Vector *in, int dag, int direct) const;
   // out = MatDag in    OR  out = Mat in
 
+//! For  debugging  purposes only, apparently
   void MatDagMatDbg(Vector *out, Vector *in, Float *dot_prd=0, int direct=0);
   // out = MatDagMat in
   // If direct = 0,   use MatPc to implement
@@ -668,14 +845,24 @@ class DiracOpClover : public DiracOpWilsonTypes
 		      DagType dag);
      // Not implemented
 
+  //! Multiplication by the odd-even preconditioned fermion matrix.
+/*!
+  The vectors are defined on odd parity lattice sites and the multiplication
+  is by the odd parity part of the matrix.
+  \param out The resulting vector.
+  \param in The vector to be multiplied.
+*/
   void MatPc(Vector *out, Vector *in) {
     MatPcDagOrNot(out, in, 0);
   }
-     // MatPc(Vector *out, Vector *in) :
-     // MatPc is the preconditioned fermion matrix.  
-     // MatPc connects only odd-->odd sites.
-     // The in, out fields are defined on the odd checkerboard.
 
+  //! Multiplication by the  hermitian conjugate odd-even preconditioned fermion matrix.
+/*!
+  The vectors are defined on odd parity lattice sites and the multiplication
+  is by the odd parity part of the matrix.
+  \param out The resulting vector.
+  \param in The vector to be multiplied.
+*/
   void MatPcDag(Vector *out, Vector *in) {
     MatPcDagOrNot(out, in, 1);
   }
@@ -722,6 +909,7 @@ class DiracOpClover : public DiracOpWilsonTypes
      // Same as original but in = f_in, out = f_out, true_res=0.
 
   int MatEvlInv(Vector *out, Vector *in, Float *true_res);
+  //!< The matrix inversion used in the molecular dynamics evolution.
      // It calculates out where A * out = in and
      // A is the preconditioned fermion matrix that appears
      // in the HMC evolution (even/odd  preconditioning 
@@ -740,12 +928,15 @@ class DiracOpClover : public DiracOpWilsonTypes
      // The function returns the total number of CG iterations.
 
   int MatEvlInv(Vector *out, Vector *in);
+  //!< The matrix inversion used in the molecular dynamics evolution.
      // Same as original but true_res=0.
 
   int MatEvlInv(Float *true_res);
+    //!< The matrix inversion used in the molecular dynamics evolution.
      // Same as original but in = f_in and out = f_out.
 
   int MatEvlInv(void);
+  //!< The matrix inversion used in the molecular dynamics evolution.  
      // Same as original but in = in, f_out = f_out, true_res=0.
 
   void MatHerm(Vector *out, Vector *in);
@@ -754,16 +945,20 @@ class DiracOpClover : public DiracOpWilsonTypes
      // The in, out fields are defined on the ful.
 
   void Mat(Vector *out, Vector *in);
+  //!< Not implemented.
      // Mat is the unpreconditioned fermion matrix.  
      // Mat works on the full lattice
      // The in, out fields are defined on the full lattice.
 
   void MatDag(Vector *out, Vector *in);
+  //!< Not implemented.  
      // MatDag is the dagger of the unpreconditioned fermion matrix. 
      // MatDag works on the full lattice
      // The in, out fields are defined on the full lattice.
 
   void CalcHmdForceVecs(Vector *chi) ;
+  //!< Computes vectors used in the HMD pseudofermionic force term.
+  
     // Lingling changed the prvious defintion of the fermion fields by
     // some constant factors. chi is the solution to MatPcInv on the  
     // odd sites.  The user passes two full size  
@@ -775,10 +970,11 @@ class DiracOpClover : public DiracOpWilsonTypes
 
 
 //------------------------------------------------------------------
-//
-// DiracOpDwf is derived from DiracOp and is the frot end for 
-// all Dirac operators associated with Dwf fermions.
-//
+//! A class describing the Dirac operator for domain-wall Wilson fermions.
+/*!
+  See the description of the DiracOpWilsonTypes class for the definition
+  of the Wilson fermion matrix.
+*/
 //------------------------------------------------------------------
 class DiracOpDwf : public DiracOpWilsonTypes
 {
@@ -791,7 +987,7 @@ class DiracOpDwf : public DiracOpWilsonTypes
   Float mass;            // Dwf mass (couples left-right components)
 
 
- protected:
+  protected:
   void DiracOpGlbSum(Float *float_p);					
      // The global sum used by InvCg. If s_nodes = 1
      // it is the usual global sum. If s_nodes > 1 it
@@ -827,10 +1023,12 @@ class DiracOpDwf : public DiracOpWilsonTypes
      // cb = 0/1 <--> even/odd checkerboard of in field.
      // dag = 0/1 <--> Dslash/Dslash^dagger is calculated.
 
+  //! Multiplication by the odd-even preconditioned fermion matrix.
   void MatPc(Vector *out, Vector *in);
      // MatPc is the fermion matrix.  
      // The in, out fields are defined on the checkerboard lattice.
 
+  //! Multiplication by the  hermitian conjugate odd-even preconditioned fermion matrix.
   void MatPcDag(Vector *out, Vector *in);
      // MatPcDag is the dagger of the fermion matrix. 
      // The in, out fields are defined on the checkerboard lattice.
@@ -878,6 +1076,7 @@ class DiracOpDwf : public DiracOpWilsonTypes
      // The in, out fields are defined on the full lattice.
 
   void CalcHmdForceVecs(Vector *chi) ;
+  //!< Computes vectors used in the HMD pseudofermionic force term.
     // GRF
     // chi is the solution to MatPcInv.  The user passes two full size
     // CANONICAL fermion vectors with conversion enabled to the
@@ -885,11 +1084,13 @@ class DiracOpDwf : public DiracOpWilsonTypes
     // the result may be used to compute the HMD fermion force.
 
   void Reflex(Vector *out, Vector *in);
+  //!< Not implemented
     // Reflexion in s operator, needed for the hermitian version 
     // of the dirac operator in the Ritz solver.
 };
 
 #endif
+
 
 
 

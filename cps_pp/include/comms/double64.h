@@ -1,12 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
+//-------------------------------------------------------------------
+/*!\file
+  \brief  Definition of Double64 class/type.
+
+  $Id: double64.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/double64.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: double64.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/double64.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: double64.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -48,7 +54,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: double64.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/double64.h,v $
 //  $State: Exp $
 //
@@ -72,10 +78,14 @@ CPS_START_NAMESPACE
 
 //Get the global options:
 CPS_END_NAMESPACE
-#include<config.h>
 CPS_START_NAMESPACE
 
-//If we are not on QCDSP, use double for the global sums:
+//! A type used (solely?) to accumulate global sums in double precision.
+/*!
+  On platforms other than QCDSP, this should default to \c double.
+  On QCDSP this is a custom class implementing 64-bit arithmetic.
+*/
+
 #ifdef GLOBALSUM_TYPE
 
 typedef GLOBALSUM_TYPE Double64;
@@ -448,4 +458,5 @@ inline unsigned long truncu(const Double64& x)
 #endif /* End of Double64 precision choice */
 
 #endif /* _INCLUDED_DOUBLE64_H_ */
+
 CPS_END_NAMESPACE

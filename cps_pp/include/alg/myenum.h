@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/myenum.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: myenum.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/myenum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: myenum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -33,7 +33,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: myenum.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/myenum.h,v $
 //  $State: Exp $
 //
@@ -45,4 +45,5 @@ enum { VECT_LEN = 6, MATRIX_SIZE = 18 };
 enum HadronType { SMESON, SMOMMESON, SNUCLEON, SNONLOCAL};
 
 #endif
+
 CPS_END_NAMESPACE

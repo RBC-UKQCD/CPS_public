@@ -1,28 +1,20 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief Definitions of the AlgGheatBath class methods.
+  
+  $Id: alg_ghb.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: alg_ghb.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: alg_ghb.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.3  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.2  2001/06/19 18:11:25  anj
 //  Serious ANSIfication.  Plus, degenerate double64.h files removed.
 //  Next version will contain the new nga/include/double64.h.  Also,
@@ -39,36 +31,27 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
 //  $State: Exp $
 //
-//--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// alg_ghb.C
-//
-// AlgGheatBath is derived from Alg and is relevant to the 
-// gauge heat bath algorithm. The type of gauge action is
-// determined by the argument to the constructor.
-//
-//------------------------------------------------------------------
+
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#include<alg/alg_ghb.h>
-#include<alg/common_arg.h>
-#include<alg/ghb_arg.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/random.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<mem/p2v.h>
+#include <alg/alg_ghb.h>
+#include <alg/common_arg.h>
+#include <alg/ghb_arg.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/random.h>
+#include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <mem/p2v.h>
 CPS_START_NAMESPACE
 
 //Uncomment next line to switch on timing
@@ -85,7 +68,11 @@ static int dram_grand_seed[6] = {
   
 
 //------------------------------------------------------------------
-// Constructor 
+/*!
+  \param latt The lattice on which to perform the heatbath
+  \param c_arg The common argument structure for all algorithms.
+  \param arg The parameters specific to this algorithm.
+ */
 //------------------------------------------------------------------
 AlgGheatBath::AlgGheatBath(Lattice& latt, 
 	     CommonArg *c_arg,
@@ -115,7 +102,6 @@ AlgGheatBath::AlgGheatBath(Lattice& latt,
     dram_grand_seed[3] = (int) (LRG.Urand()*1000000);
 */
   }
-
 }
 
 
@@ -130,7 +116,6 @@ AlgGheatBath::~AlgGheatBath() {
 void m_conjugate( Float* );
 void cmhb_kernel( Float*, Float* );
 void metropolis_kernel( Float*, Float* );
-
 
 void AlgGheatBath::relocate(){
 #ifdef _TARTAN
@@ -180,6 +165,8 @@ void AlgGheatBath::preserve_seed(){
 // AlgGheatBath::run()
 //  only useful for the naive wilson gauge action. 
 //  checkerboard over nodes is not done.
+
+//! Run the heatbath algorithm for the Wilson (plaquette) gauge action.
 //------------------------------------------------------------------
 void AlgGheatBath::run()
 {
@@ -268,6 +255,12 @@ void AlgGheatBath::run()
 // AlgGheatBath::NoCheckerBoardRun()
 //  only useful for the naive wilson gauge action. 
 //  checkerboard over nodes is not done.
+//! Run the heatbath algorithm for the Wilson (plaquette) gauge action.
+/*!
+  This is identical to AlgGheatBath::run apart from a call to
+  Lattice::ClearAllBufferedLink at the end.
+*/
+  
 //------------------------------------------------------------------
 void AlgGheatBath::NoCheckerBoardRun()
 {
@@ -350,6 +343,7 @@ void AlgGheatBath::NoCheckerBoardRun()
 // perpendicular to the updated link has node_sites of 2. 
 // This is necessary for the correctness of the heatbath algorithm, when
 // the rectangle action is involved.
+//! Run the heatbath algorithm 
 //------------------------------------------------------------------
 void AlgGheatBath::NodeCheckerBoardRun()
 {
@@ -539,10 +533,10 @@ AlgGheatBath::UpdateLink(Matrix * pmLink, const Matrix & mStaple){
 
           // Call the heat bath
           {
-	      //metropolis_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
-	    cmhb_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
-          } 
-
+	    //metropolis_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
+            cmhb_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
+          }
+          
           // Copy the link back into the lattice, and
           // arrange the internal storage order back to
           // the "canonical" order.
@@ -567,6 +561,7 @@ AlgGheatBath::UpdateLink(Matrix * pmLink, const Matrix & mStaple){
           *((Float*)pmLink + 17 ) = *(pfLinkCMHBorder + 17);
 
 }
+
 
 
 

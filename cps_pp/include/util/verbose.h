@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of Verbose class.
+
+  $Id: verbose.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/verbose.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: verbose.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/verbose.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: verbose.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -31,7 +36,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: verbose.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/verbose.h,v $
 //  $State: Exp $
 //
@@ -47,49 +52,58 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 #ifndef INCLUDED_VERBOSE_H
-#define INCLUDED_VERBOSE_H
+#define INCLUDED_VERBOSE_H       //!< Prevent multiple inclusion.
 
-// String length for vsprintf
-//------------------------------------------------------------------
 #define MAX_VRB_STR_LEN 500 
-// The maximum string length to be used with vsprintf.
-// This is needed by all verbose functions with ... argument.                              
+//!< The maximum length of message strings
 
-// Verbose base
-//------------------------------------------------------------------
 #define VERBOSE_BASE 100
-// When level is negative VRB_BASE is used
-// as a base in order to extract the various function levels from 
-// the single value of level. If a funcyion level is present
-// the coresponding function level active flag is set.
-// For example, if VERBOSE_BASE = 10 then
-// if level = -142 then it returns 1 if level_value is
-// equal to 1 or to 4 or to 2.
+//!< Allows certain categories of message to be selected.
+/*!< See the description of the Verbose class for more details. */ 
 
 
-// Verbose function levels.
 //------------------------------------------------------------------
+//! Definition of the types of message, related to various aspects of code activity.
+/*! See the description of the Verbose class for more details. */
+
 enum VerboseLevelType {
-  VERBOSE_WARN_LEVEL = 1,        // Controls Warn
-  VERBOSE_RESULT_LEVEL = 2,      // Controls Result
-  VERBOSE_PMALLOC_LEVEL = 3,     // Controls Pmalloc, Pfree, Pclear
-  VERBOSE_SMALLOC_LEVEL = 3,     // Controls Smalloc, Sfree, Sclear
-  VERBOSE_FUNC_LEVEL = 4,        // Controls Func, FuncEnd
-  VERBOSE_FLOW_LEVEL = 5,        // Controls Flow
-  VERBOSE_INPUT_LEVEL = 6,       // Controls Input
-  VERBOSE_DEBUG_LEVEL = 7,       // Controls Debug
-  VERBOSE_FUNC_CLOCK_LEVEL = 8,  // Clock output in Func, FuncEnd 
-  VERBOSE_FLOW_CLOCK_LEVEL = 9,  // Clock output in Flow
-  VERBOSE_CLOCK_LEVEL = 10,      // Controls Clock
-  VERBOSE_LED_LEVEL = 11,        // Controls LedOn, LedOff
-  VERBOSE_RNGSEED_LEVEL = 12     // Controls RNG seed output
+  VERBOSE_WARN_LEVEL = 1,        //!< Warning messages.
+  VERBOSE_RESULT_LEVEL = 2,      //!< Messages printing results
+  VERBOSE_PMALLOC_LEVEL = 3,     //!< Dynamic memory management messages
+  VERBOSE_SMALLOC_LEVEL = 3,     //!< Dynamic memory management messages
+  VERBOSE_FUNC_LEVEL = 4,        //!< Function entry and exit messages
+  VERBOSE_FLOW_LEVEL = 5,        //!< Function progress messages
+  VERBOSE_INPUT_LEVEL = 6,       //!< Function argument messages
+  VERBOSE_DEBUG_LEVEL = 7,       //!< Debugging messages
+  VERBOSE_FUNC_CLOCK_LEVEL = 8,  //!< Clock output on function entry and exit 
+  VERBOSE_FLOW_CLOCK_LEVEL = 9,  //!< Clock output during progress through function. 
+  VERBOSE_CLOCK_LEVEL = 10,      //!< Clock output
+  VERBOSE_LED_LEVEL = 11,        //!< LED
+  VERBOSE_RNGSEED_LEVEL = 12     //!< RNG seeding information.
 };
 
-//------------------------------------------------------------------
-//
-// Verbose is the base class
-//
-//------------------------------------------------------------------
+//! Class to control printing of informational messages.
+/*!
+  Various different types of message, relating to different types of code
+  activity, are defined by the #VerboseLevelType. This class manages an
+  overall verbosity level, which, depending on its numerical value, permits the
+  printing of some of these types of informational messages.
+  
+  A message category is enabled if the verbosity level is larger than the
+  number assigned to the category in the #VerboseLevelType enumeration type.
+  The larger this verbosity level is, the more messages can be printed.
+
+  If the verbosity level is negative, certain categories of message can be
+  specifically enabled in a peculiar way determined by the value of
+  #VERBOSE_BASE: Essentially, if #VERBOSE_BASE is defined to be 10, then
+  the categories of message corresponding to the verbosity levels digits
+  are enabled. Defining #VERBOSE_BASE to any other value appears to be less
+  than useful, IMHO.
+
+  \todo Most of these methods should be const with const arguments.
+  \todo Why not use vprintf rather than vsprintf followed by printf?
+*/
+
 class Verbose
 {
   private:
@@ -146,168 +160,100 @@ class Verbose
 
     virtual ~Verbose();
 
-
     int Level(void);
-       // Returns the value of level.
-
+    //!< Gets the value of the verbosity level.
 
     void Level(int);
-       // Sets the value of level and activates the appropriate 
-       // function level active flags.
-
+    //!< Sets the value of the verbosity level
 
     int Active(VerboseLevelType level_value);
-       // It returns 1 if level_value < level.
-       // If level is negative it rerturns 1 if
-       // level_value matches an entry in level as expanded
-       // in base VERBOSE_BASE (for example if VRB_BASE = 10 then
-       // if level = -142 then it returns 1 if level_value is
-       // equal to 1 or to 4 or to 2).
-       // Otherwise it returns 0.
-
+    //!< Decides whether a message category should be enabled.
 
     void Func(char *class_name, char *func_name);
-       // Use when enetring a function for flow control purposes.
-       // It prints out   
-       // class_name::func_name : Entered
-       // If func_clock_active = 1 it also prints Clock = value
-       // on the same line.
-
+    //!< For printing a message upon function entry.
 
     void FuncEnd(char *class_name, char *func_name);
-       // Use when exiting a function for flow control purposes.
-       // It prints out   
-       // class_name::func_name : Exiting
-       // If func_clock_active = 1 it also prints Clock = value
-       // on the same line.
-
+    //!< For printing a message upon function exit.    
 
     void Pmalloc(char *class_name, char *func_name,
-			  char *ptr_name,    // pointer name
-			  void *ptr,         // pointer address
-			  int size);         // allocation size
-       // Use when initializing a pointer with pmalloc. It prints out   
-       // func_name : pmalloc initialized pointer 
-       //    "ptr_name" to ptr with size size
-
+		 char *ptr_name, void *ptr, int size);         
+    //!< For printing a message upon memory allocation.
 
     void Pfree(char *class_name, char *func_name,
-			char *ptr_name,    // pointer name
-			void *ptr);        // pointer address
-       // Use before freeing a pointer with pfree. It prints out   
-       // func_name : pfree wil free pointer "ptr_name" = ptr 
-
-
+	       char *ptr_name, void *ptr);      
+    //!< For printing a message when freeing allocated memory.
+    
     void Pclear(char *class_name, char *func_name);
-       // Use after calling pclear(). It prints out   
-       // func_name : pclear() called
-
+    //!< For printing a message after calling pclear(). 
 
     void Smalloc(char *class_name, char *func_name, 
-                          char *ptr_name,    // pointer name
-			  void *ptr,         // pointer address
-			  int size);         // allocation size
-       // Use after initializing a pointer with smalloc. It prints out   
-       // func_name : smalloc initialized pointer 
-       //     "ptr_name" to ptr with size size
-
+		 char *ptr_name, void *ptr, int size);
+    //!< For printing a message upon memory allocation.
 
     void Sfree(char *class_name, char *func_name,
-			char *ptr_name,    // pointer name
-			void *ptr);        // pointer address
-       // Use before freeing a pointer with sfree. It prints out   
-       // func_name : sfree wil free pointer "ptr_name" = ptr 
-
-
+	       char *ptr_name, void *ptr);
+    //!< For printing a message when freeing allocated memory.
+    
     void Sclear(char *class_name, char *func_name);
-       // Use after calling sclear(). It prints out   
-       // func_name : sclear() called
+    //!< For printing a message after calling pclear(). 
 
+    void Flow(char *class_name, char *func_name,
+	      const char *format, ...);                
+    //!< For printing a message during function execution.
 
-   void Flow(char *class_name, char *func_name,
-	     const char *format,  // format
-	     ...);                // argument list   
-        // Use to print info in order follow the flow 
-        // inside a function. Usage is as in printf.
-
-
-   void Input(char *class_name, char *func_name,
-	      const char *format,  // format
-	      ...);                // argument list   
-        // Use inside a function to print any relevant input 
-        // values. Usage is as in printf.
-        
+    void Input(char *class_name, char *func_name,
+	       const char *format, ...);
+   //!< For printing function arguments.
 
    void Result(char *class_name, char *func_name,
-			 const char *format,  // format
-			 ...);                // argument list   
-        // Use to print any results. Usage is as in printf.
-        
+	       const char *format, ...);
+   //!< For printing results.
+    
 
    void Warn(char *class_name, char *func_name,
-			 const char *format,  // format
-			 ...);                // argument list   
-        // Use to print any Warnings. Usage is as 
-	// in printf. It appends to the output WARNING.
-
+	     const char *format, ...);                
+   //!< For printing warnings.
 
    void Debug(char *class_name, char *func_name,
-	                 const char *format,  // format
-	                 ...);                // argument list   
-        // Use to print debugging info. Usage is as 
-	// in printf.
+	      const char *format, ...);
+   //!< For printing debugging messages.
 
-   void Debug(const char *format,  // format
-	                 ...);     // argument list   
-        // Use to print debugging info. Usage is as 
-	// in printf.
-
+   void Debug(const char *format, ...);     
+   //!< For printing debugging messages.
 
    void LedOn(char *class_name, char *func_name);
-        // Use to turn on the LED and print 
-	// class_name::func_name : LED on
-
+   //!< For printing LED messages.
 
    void LedOff(char *class_name, char *func_name);
-        // Use to turn off the LED and print 
-	// class_name::func_name : LED off
-
+   //!< For printing LED messages.   
 
    void LedFlash(char *class_name, char *func_name, int number);
-       // Use to flash the LED and print 
-       // class_name::func_name : LED flashing
-       // "number" number of times.
-       // It leaves the LED on.
-
+   //!< For printing LED messages.      
 
    void Clock(char *class_name, char *func_name,
-	                 const char *format,  // format
-	                 ...);                // argument list   
-	// Use to print the clock value. It prints
-        // class_name::func_name : Clock = value
-	// The rest is as in printf.
-
+	      const char *format, ...);
+   //!< For printing a message with the clock value.
 
    void Clock(char *class_name, char *func_name);
-	// Use to print the clock value. It prints
-        // class_name::func_name : Clock = value
-
+   //!< For printing the clock value.
 
    void RNGSeed(char *class_name, char *func_name,
-	     const char *format,  // format
-	     ...);                // argument list   
-        // Use to print the RNG seeds.
-        // Usage is as in printf.
+		const char *format, ...);
+   //!< For printing RNG seeding information.
 
 };
 
 //------------------------------------------------------------------
-// External declarations.
+/*! An instance of the Verbose class, named VRB, should be
+  created at the highest scope (outside main). This external declaration
+  allows control of and access to the message printing mechanisms.
+*/
 //------------------------------------------------------------------
 extern Verbose VRB;
 
 
 #endif
+
 
 
 CPS_END_NAMESPACE

@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: w_mesons.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: w_mesons.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -63,20 +63,19 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: w_mesons.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<alg/w_all.h>
-#include<alg/w_gamma_mat.h>
+#include <alg/w_all.h>
+#include <alg/w_gamma_mat.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdlib.h>
-#include<config.h>
 CPS_START_NAMESPACE
 
 #ifdef PARALLEL
@@ -86,21 +85,21 @@ CPS_START_NAMESPACE
 #endif
 
 CPS_END_NAMESPACE
-#include<util/error.h>
-#include<util/verbose.h>
+#include <util/error.h>                // ERR
+#include <util/verbose.h>              // VRB
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/vector.h>
+#include <util/vector.h>               // dotProduct
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<comms/glb.h>
-#include<alg/common_arg.h>
+#include <comms/glb.h>                   // glb_sum
+#include <alg/common_arg.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<alg/alg_w_spect.h>
+#include <alg/alg_w_spect.h>          // AlgWspect::GetCounter()
 CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
@@ -1204,4 +1203,5 @@ static void testCosSin()
 	 (IFloat)(COS(g)), (IFloat)g, (IFloat)(SIN(g)));
 }
 #endif   // #ifdef TEST_COS_SIN
+
 CPS_END_NAMESPACE

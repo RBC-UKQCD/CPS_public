@@ -1,12 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  LinkBuffer class methods and some Lattice class methods involving
+  the link buffer.
+
+  $Id $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: link_buffer.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: link_buffer.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,26 +40,30 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: link_buffer.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 CPS_END_NAMESPACE
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<comms/nga_reg.h>
-#include<comms/scu.h>
-#include<comms/cbuf.h>
-#include<util/gjp.h>
-#include<util/lattice.h>
-#include<util/link_buffer.h>
-#include<util/list.h>
+#include <util/vector.h>
+#include <util/verbose.h>
+#include <comms/nga_reg.h>
+#include <comms/scu.h>
+#include <comms/cbuf.h>
+#include <util/gjp.h>
+#include <util/lattice.h>
+#include <util/link_buffer.h>
+#include <util/list.h>
 #include <stdio.h>
 CPS_START_NAMESPACE
 
 enum {MATRIX_SIZE = 18};
 
+//! The basic object in the link buffer.
+/*!
+  This is manipulated in the internal workings of the Linkbuffer class.
+*/
 struct LinkEntry{
   list_head hash_entry;
   //to put this LinkEntry in the hash table
@@ -96,6 +106,7 @@ Matrix *result_mp = &mat3;
 Matrix *acumulate_mp =&mat4;
 #endif
 
+//! Prints the addresses of the items in a linked list 
 void print_list(list_head * lp){ 
   list_head * lh_p = lp->next;
   printf("\n\nlist at %x:\n", (lp));
@@ -109,6 +120,7 @@ void print_list(list_head * lp){
 static int cnt;
 static int hit_cnt;
 
+//! The number of items in a linked list
 int list_len(list_head * l){
   list_head * l_iter = l->next; 
    int i=0;
@@ -171,6 +183,10 @@ LinkBuffer::LinkBuffer(Lattice &_lat, int _buf_sz):lat(_lat), buf_sz(_buf_sz){
   }
 }
 
+/*!
+  Prints to \c stdout the number of times a lenk has been fetched from the
+  buffer and the the number of times that link was on this node.
+*/
 LinkBuffer::~LinkBuffer(){ 
   //char * fname = "~LinkBuffer()";
   //VRB.Func(cname, fname);
@@ -219,8 +235,13 @@ int LinkBuffer::GetNodeId(const int *x){
 }
 
 //----------------------------------------------------------------------
-// Matrix * LinkBuffer::GetBufferedLink()
-// Given the coordinates of a link and its direction, 
+/*!
+  Looks for the link \a U_mu(x) in the buffer. If it is not there it is
+  brought in.
+  \param x The lattice coordinates of the link.
+  \param mu The direction index of the link.
+  \return The link \a U_mu(x).
+*/
 //----------------------------------------------------------------------
 Matrix * LinkBuffer::GetBufferedLink(const int *x, int mu){
   char * fname = "GetBufferedLink()";
@@ -249,7 +270,7 @@ Matrix * LinkBuffer::GetBufferedLink(const int *x, int mu){
       //list_add(list_p, flush_list.prev );
 
       //move the link from its current position in the hash list to the 
-      //head of it, so it's easier to locate it next tiem.
+      //head of it, so it's easier to locate it next item.
       //-------------------------------------------------------------
       list_del(list_iter);
       list_add(list_iter, hash_list); 
@@ -296,10 +317,12 @@ Matrix * LinkBuffer::GetBufferedLink(const int *x, int mu){
 }
 
 //----------------------------------------------------------------------
-// void LinkBuffer::ClearBufferedLink()
-// given the coordinates of a link and its direction, remove
-// all the bufferd links that has the same local coordinates and 
-// direction. 
+/*!
+  Remove from the buffer all the links with local lattice site \a x
+  and direction \a mu.
+  \param x The lattice coordinates.
+  \param mu The direction index.
+*/
 //----------------------------------------------------------------------
 
 void LinkBuffer::ClearBufferedLink(const int *x, int mu){
@@ -344,6 +367,11 @@ void Lattice::ClearAllBufferedLink(){
     link_buffer->ClearAll();
 }
 
+/*!
+  This function does not create a buffer if there already is one.
+  \param buf_sz The size of the link buffer.
+  \return True if there is a link buffer, false otherwise.
+*/
 int Lattice::EnableLinkBuffer(int buf_sz){
   //char * fname = "EnableLinkBuffer()";
   //VRB.Func(cname, fname);
@@ -359,6 +387,13 @@ void Lattice::DisableLinkBuffer(){
   }
 }
 
+/*!
+  Looks for the link \a U_mu(x) in the buffer. If it is not there it is
+  brought in.
+  \param x The lattice coordinates of the link.
+  \param mu The direction index of the link.
+  \return The link \a U_mu(x).
+*/
 const Matrix * Lattice::
 GetBufferedLink(const int *x , int mu){
   if(IsOnNode(x)) return gauge_field+GsiteOffset((int*)x) + mu;    
@@ -366,12 +401,22 @@ GetBufferedLink(const int *x , int mu){
   return GetLink(x,mu);
 }
 
+/*!
+  Remove from the buffer all the links with local lattice site \a x
+  and direction \a mu.
+  \param x The lattice coordinates.
+  \param mu The direction index.
+*/
 void  Lattice::
 ClearBufferedLink(const int *x, int mu){
   if(LinkBufferIsEnabled())
     link_buffer->ClearBufferedLink(x, mu); 
 }
 
+/*!
+  \param x The lattice site coordinates
+  \return 1 if x is on this node, 0 otherwise.
+ */
 int Lattice::
 IsOnNode(const int * x){
   for(int i=0;i<4;i++)
@@ -382,11 +427,19 @@ IsOnNode(const int * x){
 
 //------------------------------------------------------------------
 //Lattice::BufferedStaple()
-// it calculates the plaq staple using the PatheOrdProd routine
-// \sum{v!=+/-u}{
-//    U_v(x+u) U_{-u}(x+u+v) U_{-v}(x+v)
-// }
-// u is one of {0,1,2,3}
+/*!
+  The staple sum around the link \f$ U_\mu(x) \f$is
+  
+\f[
+  \sum_{v \neq \mu} [                                  
+              U_\nu(x+\mu) U_\mu(x+\nu) U^\dagger_\nu(x)                  
+           +  U^\dagger_\nu(x+\mu-\nu) U^\dagger_u(x-\nu) U_\nu(x-\nu) ]
+\f]
+
+  \param x The coordinates of the lattice site 
+  \param u The link direction
+  \param stap The computed staple sum.
+*/
 //------------------------------------------------------------------
 void Lattice::
 BufferedStaple(Matrix& stap, const int *x, int u){
@@ -425,11 +478,29 @@ BufferedStaple(Matrix& stap, const int *x, int u){
 
 //------------------------------------------------------------------
 //Lattice::BufferedRectStaple()
-// it calculates the flat 6-1 link staple using the PathOrdProdPlus routine
-// \sum_{ v!= +/-u }{
-//    U_v(x+u) U_v(x+u+v) U_{-u}(x+u+v+v) U_{-v}(x+v+v) U_{-v}(x+v)
-// +  U_v(x+u) U_{-u}(x+v+u) U_{-u}(x+v)  U_{-v}(x+v-u) U_u(x-u)
-// +  U_u(x+u) U_v(x+u+u) U_{-u}(x+u+u+v) U_{-u}(x+u+v) U_{-v}(x+v) 
+/*! The 5-link rectangle staple sum around the link U_\mu(x) is:
+
+\f[
+ \sum_{\nu \neq \mu} \left[\right.                                     
+ U_\mu(x+\mu)  U_\nu(x+2\mu)  U^\dagger_\mu(x+\mu+\nu)
+ U^\dagger_\mu(x+\nu)  U^\dagger_\nu(x)       \f]\f[
+ + U_\mu(x+\mu)  U^\dagger_\nu(x+2\mu-\nu) U^\dagger_\mu(x+\mu-\nu)
+ U^\dagger_\mu(x-\nu)  U_\nu(x-\nu)  \f]\f[
+ + U_\nu(x+\mu)  U^\dagger_\mu(x+\nu)  U^\dagger_\mu(x-\mu+\nu)
+ U^\dagger_\nu(x-\mu) U_\mu(x-\mu)      \f]\f[
+ + U^\dagger_\nu(x+\mu-\nu) U^\dagger_\mu(x-\nu)  U^\dagger_\mu(x-\mu-\nu)
+ U_\nu(x-\mu-\nu) U_\mu(x-\mu)  \f]\f[
+ + U_\nu(x+\mu)  U_\nu(x+\mu+\nu)  U^\dagger_\mu(x+2\nu)
+ U^\dagger_\nu(x+\nu)  U^\dagger_\nu(x) \f]\f[
+ + U^\dagger_\nu(x+\mu-\nu) U^\dagger_\nu(x+\mu-2\nu) U^\dagger_\mu(x-2\nu)
+ U_\nu(x-2\nu)  U_\nu(x-\nu)
+ \left.\right]
+\f]
+
+  \param x The coordinates of the lattice site 
+  \param u The link direction
+  \param stap The computed staple sum.
+*/
 //------------------------------------------------------------------
 void Lattice::
 BufferedRectStaple(Matrix& stap, const int *x, int u){
@@ -492,13 +563,24 @@ BufferedRectStaple(Matrix& stap, const int *x, int u){
 
 
 //------------------------------------------------------------------
-//Lattice::BufferedChairStaple()
-//it calculates the chair shaped 6-1 link staple at x, mu
-// \sum_{v != +/-u, w !=+/-v, w != +/-u}{
-//    U_w(x+u) U_v(x+u+w) U_{-w}(x+u+v+w) U_{-u}(x+u+v) U_{-v}(x+v)
-//  + U_w(x+u) U_v(x+u+w) U_{-u}(x+u+v+w) U_{-v}(x+v+w) U_{-w}(x+w)
-//  + U_w(x+u) U_{-u}(x+u+w) U_v(x+w) U_{-w}(x+w+v) U_{-v}(x+v)
-// }
+/*! The chair shaped 5-link staple sum around the link U_\mu(x) is:
+  
+\f[
+ \sum_{\pm \nu, |\nu|\neq \mu} \sum_{\pm \rho, |\rho|\neq \nu, |\rho|\neq \mu}(
+\left[\right.
+ U_\rho(x+\mu) U_\nu(x+\mu+\rho) U_{-\rho}(x+\mu+\nu+\rho)
+ U_{-\mu}(x+\mu+\nu) U_{-\nu}(x+\nu)   \f]\f[
+ + U_\rho(x+\mu) U_\nu(x+\mu+\rho) U_{-\mu}(x+\mu+\nu+\rho)
+ U_{-\nu}(x+\nu+\rho) U_{-\rho}(x+\rho)    \f]\f[
+ + U_\rho(x+\mu) U_{-\mu}(x+\mu+\rho) U_\nu(x+\rho)
+ U_{-\rho}(x+\rho+\nu) U_{-\nu}(x+\nu)        
+ \left.\right]
+\f]
+
+  \param x The coordinates of the lattice site 
+  \param u The link direction
+  \param stap The computed staple sum.
+*/
 //------------------------------------------------------------------
 void Lattice::
 BufferedChairStaple(Matrix& stap, const int *x, int u){
@@ -566,15 +648,22 @@ BufferedChairStaple(Matrix& stap, const int *x, int u){
   moveMem((IFloat *) &stap, (IFloat*)acumulate_mp, MATRIX_SIZE*sizeof(IFloat));
 }
 //------------------------------------------------------------------------
-// Lattice::BufferedCubeStaple()
-//   it calculates the cube shaped 6-1 link staple at x, mu
-//   \sum_{w != +/-u, w !=+/-v, w != +/-u}{
-//     U_v(x+u) U_w(x+u+v) U_{-u}(x+u+v+w) U_{-v}(x+v+w) U_{-w}(x+w)
-//    }
-//------------------------------------------------------------------------
+/*!
+  The staple sum around the link U_\mu(x) is
+\f[
+\sum_{\pm \nu, |\nu|\neq \mu} \sum_{\pm \rho, |\rho|\neq \nu, |\rho|\neq \mu}
 
-void Lattice::
-BufferedCubeStaple(Matrix &stap, const int *x, int u){
+     U_\nu(x+\mu) U_\rho(x+\mu+\nu) U_{-\mu}(x+\mu+\nu+\rho) U_{-\nu}(x+\nu+\rho) U_{-\rho}(x+\rho)
+    
+\f]
+
+  \param x The coordinates of the lattice site 
+  \param u The link direction
+  \param stap The computed staple sum.
+*/     
+//------------------------------------------------------------------------
+void Lattice:: 
+BufferedCubeStaple(Matrix &stap, const int *x, int u){ 
   int link_site[4];
 
   const unsigned CBUF_MODE4 = 0xcca52112;
@@ -614,13 +703,19 @@ BufferedCubeStaple(Matrix &stap, const int *x, int u){
 
 
 //-------------------------------------------------------------------
-// Lattice::PathOrdProdPlus(Matrix & m, const int * x, int mu)
-// given the starting site x, the directions of each step on the path
-// and the number of steps. calculate the path ordered product of
-// all the links along the path and add it to the given matrix m.
-// where each direction could be {0,1,2,3,4,5,6,7} coresponding to
-// the directions {n_x, n_y, n_z, n_t, -n_x, -n_y, -n_z, -n_t}
-// the result is returned in mat.
+/*!
+  Given the starting site x, the directions of each step on the path
+  and the number of steps. calculate the path ordered product of
+  all the links along the path and add it to the given matrix m.
+  Each direction is one of 0, 1, 2, 3, 4, 5, 6 or 7} corresponding to
+  the directions X, Y, Z, T, -X, -Y, -Z and -T respectively.
+
+  \param m The initial matrix.
+  \param x The coordinates of the starting point of the path
+  \param dirs The list of directions.
+  \param n The number of links in the path.
+  \post \a The product along the path is added to \a m.
+*/
 // 
 // in this implementation, each link is retrieved from other sites,
 // and assembled on the local node.
@@ -703,18 +798,23 @@ PathOrdProdPlus(Matrix & mat, const int * x, const int* dirs, int n){
 }
 
 //-------------------------------------------------------------------
-// Lattice::PathOrdProd(Matrix & m, const int * x, int mu)
-// given the starting site x, the directions of each step on the path
-// and the number of steps. calculate the path ordered product of
-// where each direction could be {0,1,2,3,4,5,6,7} coresponding to
-// the directions {n_x, n_y, n_z, n_t, -n_x, -n_y, -n_z, -n_t}
-// the result is returned in mat, and it's on the node where the last site
-// of the path resides.
-//
-// the idea is whenever the path hits a boundary the current partial result is 
-// passed to the next processer on the path, which will calculate the part of 
-// the product that's on this node and pass on, so the result ends up on the 
-// last processor where the path stops.
+/*!
+  Given the starting site x, the directions of each step on the path
+  and the number of steps. calculate the path ordered product of
+  all the links along the path and add it to the given matrix m.
+  Each direction is one of 0, 1, 2, 3, 4, 5, 6 or 7} corresponding to
+  the directions X, Y, Z, T, -X, -Y, -Z and -T respectively.
+
+  The idea is whenever the path hits a boundary the current partial result is 
+  passed to the next processer on the path, which will calculate the part of 
+  the product that is on this node and pass on, so the result ends up on the 
+  last processor where the path stops.
+  
+  \param m The product along the path.
+  \param x The coordinates of the starting point of the path
+  \param dirs The list of directions.
+  \param n The number of links in the path.
+*/
 //-------------------------------------------------------------------
 
 void Lattice::
@@ -835,5 +935,6 @@ PathOrdProd(Matrix & mat, const int * x, const int* dirs, int n){
   }
   moveMem((IFloat*)&mat, (IFloat*)r1_mp, MATRIX_SIZE* sizeof(IFloat));
 }
+
 
 CPS_END_NAMESPACE

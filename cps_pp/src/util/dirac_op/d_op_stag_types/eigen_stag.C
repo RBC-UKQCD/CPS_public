@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+ /*! \file
+   \brief  Definition of DiracOpStagTypes class eigensolver methods.
+   
+  $Id: eigen_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: eigen_stag.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: eigen_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: eigen_stag.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v $
 //  $State: Exp $
 //
@@ -69,14 +74,14 @@ CPS_START_NAMESPACE
 /*  ProjApsiP	flag for projecting A.psi	(Read) */
 
 CPS_END_NAMESPACE
-#include<util/dirac_op.h>
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/gjp.h>
-#include<comms/glb.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <util/dirac_op.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <comms/glb.h>
+#include <util/verbose.h>
+#include <util/error.h>
 #include <math.h>
 CPS_START_NAMESPACE
 
@@ -303,4 +308,5 @@ int DiracOpStagTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[], E
       
   return NCG_tot;
 }
+
 CPS_END_NAMESPACE

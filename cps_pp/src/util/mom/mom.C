@@ -1,5 +1,10 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief Definitiion of Mom class methods.
+
+  $Id: mom.C,v 1.2 2003-07-24 16:53:54 zs Exp $ 
+*/
 // mom.C
 //
 // Mom calculates the phase factor for each
@@ -10,14 +15,14 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
 #include <stdio.h>
-#include<util/mom.h>
+#include <util/mom.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/gjp.h>
-#include<util/smalloc.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <util/gjp.h>
+#include <util/smalloc.h>
+#include <util/verbose.h> 
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 Mom MOM;
@@ -46,7 +51,11 @@ Mom::~Mom() {
 
 
 //------------------------------------------------------------------
-// Initialisation
+//Initialisation
+/*!
+  \param arg The set of run-time parameters for the momentum computation.
+  \todo Why is this stuff not in the constructor?
+*/
 //------------------------------------------------------------------
 void Mom::Init(MomArg *arg)
 {
@@ -104,10 +113,15 @@ void Mom::Init(MomArg *arg)
 
 
 //------------------------------------------------------------------
-// run()
-//
+/*!
+				
+This method actually computes all the phases and stores them internally.
+\post A table of momenta and their corresponding numbers by which they
+can be identified is written to a
+file called \c mom_table.log.
+*/
 //------------------------------------------------------------------
-void Mom::run()
+void Mom::run() 
 {
   char *fname = "run()";
   VRB.Func(cname,fname);
@@ -215,6 +229,14 @@ void Mom::run()
 //------------------------------------------------------------------
 // fact(int imom, int *s)
 // returns the complex phase factor for momentum "imom" at site "s"
+/*!
+  \param imom The number referring to the required momentum (a table of
+  momenta and their corresponding numbers is written to a file called
+  \c mom_table.log by ::run.
+  \param s The coordinates of the lattice site at which the phase is
+  required.
+  \return The complex phase.
+*/	  
 //------------------------------------------------------------------
 Complex Mom::fact(int imom, int *s) 
 {
@@ -227,4 +249,5 @@ Complex Mom::fact(int imom, int *s)
 
 
 }
+
 CPS_END_NAMESPACE

@@ -17,12 +17,12 @@ CPS_START_NAMESPACE
 #define INCLUDED_ALG_FIX_GAUGE_H
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/pmalloc.h>
-#include<alg/alg_base.h>
-#include<alg/common_arg.h>
-#include<alg/fix_gauge_arg.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/pmalloc.h>
+#include <alg/alg_base.h>
+#include <alg/common_arg.h>
+#include <alg/fix_gauge_arg.h>
 CPS_START_NAMESPACE
 
 
@@ -51,6 +51,7 @@ class AlgFixGauge : public Alg
 
 
 #endif
+
 
 
 

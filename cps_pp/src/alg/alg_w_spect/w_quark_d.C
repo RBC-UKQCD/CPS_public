@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 */
 
 CPS_END_NAMESPACE
-#include<alg/w_all.h>
+#include <alg/w_all.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
@@ -14,14 +14,14 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/gjp.h>
-#include<util/error.h>
-#include<util/verbose.h>
-#include<util/vector.h>
-#include<util/lattice.h>
-#include<comms/scu.h>
-#include<comms/nga_reg.h>
-#include<comms/cbuf.h>
+#include <util/gjp.h>              // GJP
+#include <util/error.h>            // ERR
+#include <util/verbose.h>          // VRB
+#include <util/vector.h>
+#include <util/lattice.h>          // Lattice::GetLink()
+#include <comms/scu.h>               //getMinusData, getPlusData
+#include <comms/nga_reg.h>
+#include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
 //for debugging
@@ -462,5 +462,6 @@ const Vector *WspectQuark::getPropData(int isFullProp,const IFloat *prop_data_p,
     return recv ;
   }
 }
+
 
 CPS_END_NAMESPACE

@@ -1,14 +1,11 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
-//
-// alg_hmd.h
-//
-// Header file for the AlgHmd class and its derived classes
-// AlgHmdR and AlgHmcPhi. 
-// The type of glue or fermion is given as
-// an argument of type Lattice& to the constructor.
-//
+/*!\file
+  \brief  Definitions of the AlgHmd class and derived classes.
+
+  $Id: alg_hmd.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //------------------------------------------------------------------
 
 
@@ -16,39 +13,47 @@ CPS_START_NAMESPACE
 #define INCLUDED_ALG_HMD_H
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/pmalloc.h>
-#include<alg/alg_base.h>
-#include<alg/common_arg.h>
-#include<alg/hmd_arg.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/pmalloc.h>
+#include <alg/alg_base.h>
+#include <alg/common_arg.h>
+#include <alg/hmd_arg.h>
 CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
-//
-// AlgHmd is derived from Alg and is relevant to the Hybrid  
-// Molecular Dynamics algorithms.
-//
+//! A virtual base class for implementing Molecular Dynamics algorithms.
+/*!
+  \ingroup alg
+  \todo The derived classes should inherit more.
+*/
 //------------------------------------------------------------------
 class AlgHmd : public Alg
 {
  private:
     char *cname;
-
+   
  protected:
 
     HmdArg *hmd_arg;
-        // The argument structure for the hmc phi algorithm
+        //!< A structure containing the algorithm parameters
   
     int g_size;       
-        // Node size of the gauge field
+    //!< The size of the gauge field.
+    /*!<
+      The size of the gauge field on the local lattice in terms of the
+      total number of floating point numbers.
+    */
 
     int Ncb;
-        // Number of checkerboards on which the fermion field is defined
+    //!< The number of parities on which the pseudofermion field is defined.
 
     Matrix* mom;
-        // Conjugate momentum (traceless antihermitian) 
+    //!< The (traceless antihermitian) conjugate momentum field.
+    /*!<
+      This is \e i times the actual conjugate momentum.
+     */	
 
  public:
 
@@ -60,10 +65,30 @@ class AlgHmd : public Alg
 
 
 //------------------------------------------------------------------
-//
-// AlgHmcPhi is derived from AlgHmd and is relevant to the Hybrid  
-// Molecular Dynamics HMC Phi algorithm.
-//
+//! A class implementing the Hybrid Monte Carlo algorithm.
+/*!
+  This evolves a gauge field by a single iteration of
+  the standard HMC algorithm (phi algorithm), \e i.e. a molecular dynamics
+  trajectory followed by a metropolis accept/reject step.
+
+  This implementation uses the leapfrog integration scheme and a
+  two-step chronological method to choose the starting guess for the solver.  
+
+  The algorithm is configurable to include dynamical fermions
+  of several masses, each mass having its own set of pseudofermion fields
+  and solver parameters. The number of degenerate flavours at each mass
+  depends on the type of fermion action used. Similarly
+  one can have in addition pseudobosonic 
+  \f$ \chi^\dagger M^\dagger M \chi \f$ terms in the hamiltonian contributing
+  to the total force on the momentum field. 
+
+  One also has the option of forcing acceptance at the metropolis step.
+
+  A bunch of statistics relating to the performance of the solver, the
+  conservation of the hamiltonian and the metropolis acceptance are collected.
+  
+  \ingroup alg
+*/
 //------------------------------------------------------------------
 class AlgHmcPhi : public AlgHmd
 {
@@ -74,56 +99,82 @@ class AlgHmcPhi : public AlgHmd
  protected:
 
     int n_frm_masses;     
-        // The number of dynamical fermion masses.
+    //!< The number of dynamical fermion masses.
+    /*!
+      This is not necessarily the number of dynamical flavours.
+     */
 
     int n_bsn_masses;     
-        // The number of dynamical boson masses.
+    //!< The number of dynamical boson masses.
 
     int f_size;       
-        // Node checkerboard size of the fermion field
+    //!< The size of the pseudofermion (and similar) fields.
+    /*!< The size is given in terms of the total number of floating point
+      numbers in the field on the local lattice, taking into account whether
+      or not the field is defined on just a single parity.
+    */
 
     CgArg **frm_cg_arg;
-        // pointer to an array of CG argument structures
-	// relevant to fermions.
+    //!< Pointer to an array of structures containing solver parameters.
+    /*!<
+      These are the parameters corresponding to each of the dynamical fermion
+      masses.      
+     */
 
     CgArg **bsn_cg_arg;
-        // pointer to an array of CG argument structures
-	// relevant to bosons.
+    //!< Pointer to an array of structures containing solver parameters.
+    /*!<
+      These are the parameters corresponding to each of the dynamical boson
+      masses.      
+     */
 
     Vector** phi;
-        // Pseudo fermion field phi (checkerboarded).
+    //!< Pseudofermion fields
+    /*!< One for each mass */
 
     Vector** bsn;
-        // Boson field bsn (checkerboarded).
-
+    //!< Boson (pseudoboson?) fields 
+    /*!< One for each mass */
+    
     Matrix* gauge_field_init;
-        // Initial gauge field needed if the evolved one is rejected
+    //!< The initial gauge field configuration
 
     Vector** frm1;
+    //!< Array of general purpose fields
     Vector** frm2;
-        // 2 general purpose fermion/boson field arrays (checkerboarded).
+    //!< Another array of general purpose fields    
 
-    Vector** cg_sol_cur; 
+    Vector** cg_sol_cur;
+    //!< Pointer to the most recent solution produced by the solver.
+    /*!< One for each mass */    
     Vector** cg_sol_prev;
-        // Temporary pointers to the current and previous CG solution.
+    //!< Pointer to the most recent solution produced by the solver.
+    /*!< One for each mass */    
+
 
     Float *h_f_init;    
-        // Initial fermion Hamiltonian (one for each mass)
+    //!< The initial value of the pseudofermion action.
+    /*!< The value at the start of the trajectory. One for each mass */
 
     Float *h_f_final;   
-        // Final fermion Hamiltonian (one for each mass)
+    //!< The final value of the pseudofermion action.
+    /*!< The value at the end of the trajectory. One for each mass */
 
     Float *delta_h_f;   
-        // Final-Init fermion Hamiltonian (one for each mass)
+    //!< The change in the value of the pseudofermion action.
+    /*!< The final value - the initial value. One for each mass */
 
     Float *h_b_init;    
-        // Initial boson Hamiltonian (one for each mass)
+    //!< The initial value of the boson action.
+    /*!< The value at the start of the trajectory. One for each mass */
 
     Float *h_b_final;   
-        // Final boson Hamiltonian (one for each mass)
+    //!< The final value of the boson action.
+    /*!< The value at the end of the trajectory. One for each mass */
 
     Float *delta_h_b;   
-        // Final-Init boson Hamiltonian (one for each mass)
+    //!< The change in the value of the boson action.
+    /*!< The final value - the initial value. One for each mass */
 
  public:
 
@@ -136,11 +187,23 @@ class AlgHmcPhi : public AlgHmd
 
 
 //------------------------------------------------------------------
-//
-// AlgHmdR is derived from AlgHmd and is relevant to the Hybrid  
-// Molecular Dynamics R algorithm. Boson fields are simulated as
-// fermion fields with negative flavor number.
-//
+//! A class implementing the Hybrid Molecular Dynamics (R) algorithm.
+/*!
+  This evolves a gauge field by a single iteration of
+  the standard HMD algorithm, \e i.e. a molecular dynamics trajectory
+  with intermediate gauge field updates to take care of the arbitrary numbers
+  of dynamical flavours. The initial guess in the solver is a random gaussian
+  vector.
+  
+  The algorithm is configurable to include dynamical fermions
+  of several masses, each with a different number of flavours.
+  For each mass there is a set of solver parameters. 
+
+  A bunch of statistics relating to the performance of the solver, the
+  conservation of the hamiltonian and the metropolis acceptance are collected.
+  
+  \ingroup alg
+*/
 //------------------------------------------------------------------
 class AlgHmdR : public AlgHmd
 {
@@ -149,27 +212,43 @@ class AlgHmdR : public AlgHmd
 
  protected:
     int n_frm_masses;     
-        // The number of dynamical fermion masses.
+    //!< The number of dynamical fermion masses.
+    /*!<
+      This is not necessarily the number of dynamical flavours.
+     */
 
     Float *flavor_time_step;
-        // Pointer to an array of size n_frm_masses + 1.
-        // Each entry contains the time_step for each 
-        // intermediate (one for each flavor plus the 
-        // midpoint one) evolution of the gauge field.
+    //!< A tricky thing to describe succinctly.
+    /*!<
+      This is an array of the time steps used for the intermediate gauge
+      field updates for each dynamical mass.
+      Actually it is the differences between them. At least most of it is.
+    */
 
     int f_size;       
-        // Node checkerboard size of the fermion field
+    //!< The size of the pseudofermion (and similar) fields.
+    /*!< The size is given in terms of the total number of floating point
+      numbers in the field on the local lattice, taking into account whether
+      or not the field is defined on just a single parity.
+    */
 
     CgArg **frm_cg_arg;
-        // pointer to an array of CG argument structures
-	// relevant to fermions.
+    //!< Pointer to an array of structures containing solver parameters.
+    /*!<
+      These are the parameters corresponding to each of the dynamical fermion
+      masses.      
+     */
 
     Vector** phi;
-        // Pseudo fermion field phi (checkerboarded).
+    //!< Pseudofermion fields
+    /*!< One for each mass */
 
     Vector* frm1;
+    //!< Array of general purpose fields
+
     Vector* frm2;
-        // 2 general purpose fermion fields (checkerboarded).
+    //!< Another array of general purpose fields
+    
 
  public:
 
@@ -177,11 +256,13 @@ class AlgHmdR : public AlgHmd
 
   virtual ~AlgHmdR();
 
+  //! Performs a single HMD trajectory.
   void run(void);
 };
 
 
 #endif
+
 
 
 

@@ -1,28 +1,20 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of Fdwf class.
+
+  $Id: f_dwf.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_dwf/f_dwf.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: f_dwf.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_dwf/f_dwf.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: f_dwf.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.5  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.4  2001/08/16 10:50:33  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -47,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: f_dwf.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_dwf/f_dwf.C,v $
 //  $State: Exp $
 //
@@ -64,16 +56,16 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <stdio.h>
 #include <math.h>
-#include<util/lattice.h>
-#include<util/dirac_op.h>
-#include<util/dwf.h>
-#include<util/gjp.h>
-#include<util/verbose.h>
-#include<util/vector.h>
-#include<util/random.h>
-#include<util/error.h>
-#include<comms/scu.h>
-#include<comms/glb.h>
+#include <util/lattice.h>
+#include <util/dirac_op.h>
+#include <util/dwf.h>
+#include <util/gjp.h>
+#include <util/verbose.h>
+#include <util/vector.h>
+#include <util/random.h>
+#include <util/error.h>
+#include <comms/scu.h> // GRF
+#include <comms/glb.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
@@ -280,16 +272,19 @@ int Fdwf::FmatInv(Vector *f_out, Vector *f_in,
 
 
 //------------------------------------------------------------------
-// Ffour2five(Vector *five, Vector *four, int s_u, int s_l):
-// It transforms a 4-dimensional fermion field
-// to a 5-dimensional field. The 5d field is zero
-// except for the upper two components (right chirality)
-// at s = s_u which are equal to the ones of the 4d field
-// and the lower two components (left chirality) 
-// at s_l, which are equal to the ones of the 4d field
-// For spread-out DWF s_u, s_l refer to the global
-// s coordinate i.e. their range is from 
-// 0 to [GJP.Snodes() * GJP.SnodeSites() - 1]
+/*!
+  \param five The 5-dimensional field.
+  \param four The 4-dimensional field.
+  \param s_u The global 5th direction (s) coordinate where the
+   upper two components (right chirality) of the 5-dim. field
+   take the values of those of the 4-dim. field.
+  \param s_l The global 5th direction (s) coordinate where the
+   lower two components (left chirality) of the 5-dim. field
+   take the values of those of the 4-dim. field.
+   \post The 5-dim field is zero everywhere except where the global
+   5th direction coordinate (s) is \a s_l or \a s_u, where it takes the values
+   explained above.
+*/
 //------------------------------------------------------------------
 void Fdwf::Ffour2five(Vector *five, Vector *four, int s_u, int s_l)
 {
@@ -360,18 +355,21 @@ void Fdwf::Ffour2five(Vector *five, Vector *four, int s_u, int s_l)
 
 
 //------------------------------------------------------------------
-// Ffive2four(Vector *four, Vector *five, int s_u, int s_l):
-// It transforms a 5-dimensional fermion field
-// to a 4-dimensional field. The 4d field has
-// the upper two components (right chirality) equal to the
-// ones of the 5d field at s = s_u and the lower two 
-// components (left chirality) equal to the
-// ones of the 5d field at s = s_l, where s is the 
-// coordinate in the 5th direction.
-// For spread-out DWF s_u, s_l refer to the global
-// s coordinate i.e. their range is from 
-// 0 to [GJP.Snodes() * GJP.SnodeSites() - 1]
-// The same 4D field is generarted in all s node slices.
+/*!
+  \param four The 4-dimensional field.
+  \param five The 5-dimensional field.
+  \param s_u The global 5th direction (s) coordinate where 
+   the values of the upper two components (right chirality) of the 5-dim. field
+   are taken by those of the 4-dim. field.
+  \param s_l The global 5th direction coordinate (s) where the values of 
+   the lower two components (left chirality) of the 5-dim. field
+   are taken by  those of the 4-dim. field.
+   \post The 5-dim field is zero everywhere except where the global
+   5th direction coordinate is \a s_l or \a s_u, where it takes the values
+   explained above.
+   \post An identical 4-dim. field is reproduced on all nodes in the s
+   direction.
+*/
 //------------------------------------------------------------------
 void Fdwf::Ffive2four(Vector *four, Vector *five, int s_u, int s_l)
 {
@@ -935,6 +933,7 @@ int Fdwf::FsiteOffset(const int *x) const {
   return 0; 
 }
 
+
 //--------------------------------------------------------------------
 // void Freflex (Vector *out, Vector *in)
 // does the reflexion in s needed for the hermitian D_dwf operator.
@@ -1039,5 +1038,6 @@ void Fdwf::Freflex(Vector *out, Vector *in)
 
   VRB.FuncEnd (cname,fname);
 }
+
 
 CPS_END_NAMESPACE

@@ -1,15 +1,27 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
+/*!\file
+  \brief Routines used by the AlgGheatBath class methods:
+
+  $Id: alg_ghb_sup.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
+//--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb_sup.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: alg_ghb_sup.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb_sup.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: alg_ghb_sup.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1  2003/06/22 13:34:45  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.1  2002/12/10 17:51:41  zs
 //  These two files are altered because of the new hypercubic RNG and moved
 //  because the assembler versions do not support the new hypercubic RNG and
@@ -31,7 +43,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_ghb_sup.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb_sup.C,v $
 //  $State: Exp $
 //

@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: alg_w_spect.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: alg_w_spect.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -33,7 +33,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_w_spect.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v $
 //  $State: Exp $
 //
@@ -50,24 +50,24 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<alg/alg_w_spect.h>
+#include <alg/alg_w_spect.h>         // class AlgWspect
 CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<alg/common_arg.h>
-#include<alg/w_spect_arg.h>
-#include<util/lattice.h>
+#include <alg/common_arg.h>          // class CommonArg
+#include <alg/w_spect_arg.h>         // class WspectArg
+#include <util/lattice.h>            // class Lattice
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/verbose.h>
-#include<util/error.h>
+#include <util/verbose.h>            // VRB
+#include <util/error.h>              // ERR
 CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<alg/w_all.h>
+#include <alg/w_all.h>                                 // class Wspect*
 CPS_START_NAMESPACE
 
 #define DEBUG_ALG_W_SPECT
@@ -76,11 +76,15 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------------------
 // For the purpose of debugging or timing during code upgrade
 //---------------------------------------------------------------------------
+CPS_END_NAMESPACE
 //#include <stdlib.h>      // exit
+CPS_START_NAMESPACE
 //#define TIMING_ALG_W_SPECT
 
 #ifdef  TIMING_ALG_W_SPECT
+CPS_END_NAMESPACE
   #include <time.h>                 // clock()
+CPS_START_NAMESPACE
 #endif
 
 
@@ -375,4 +379,5 @@ void AlgWspect::run()
 #endif 
 
 }
+
 CPS_END_NAMESPACE

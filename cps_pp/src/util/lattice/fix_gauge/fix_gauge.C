@@ -1,12 +1,15 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  $Id: fix_gauge.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: fix_gauge.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: fix_gauge.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +37,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: fix_gauge.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -48,14 +51,14 @@ CPS_START_NAMESPACE
  */
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/verbose.h>
-#include<util/gjp.h>
-#include<util/error.h>
-#include<util/smalloc.h>
-#include<util/rcomplex.h>
-#include<comms/scu.h>
-#include<comms/glb.h>
+#include <util/lattice.h>
+#include <util/verbose.h>
+#include <util/gjp.h>
+#include <util/error.h>
+#include <util/smalloc.h>
+#include <util/rcomplex.h>
+#include <comms/scu.h>
+#include <comms/glb.h>
 CPS_START_NAMESPACE
 
 #ifdef _TARTAN
@@ -68,6 +71,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #endif
 
+//! The number of colours, again.
 #define COLORS 3  // implemented only for this number of colors
 
 //------------------------------------------------------------------------//
@@ -77,6 +81,7 @@ CPS_START_NAMESPACE
 
 typedef unsigned uword;  // DSP word is 32 bits
 
+//! A container class for global parameters used in the gauge fixing routines.
 class XXX
 {
 public:
@@ -905,7 +910,21 @@ void FixHPlane::unitarize(int recurse)
     G_loc().Unitarize();
 }
 
+//-------------------------------------------------------------------------
+/*!
+  \pre Lattice::FixGaugeAllocate should be called prior to this. That is how
+  the requested type of gauge fixing is communicated to this method.
 
+  \param Smallfloat The stopping criterion, determining the accuracy of the
+  gauge fixing.
+  \param MaxIterNum The maximum number of iterations the gauge fixing
+  algorithm is allowed before it gives up.
+  \return The total number of iterations used. The algorithm failed to converge
+  within the allowed number of iterations, then the -1 times the number of
+  iterations reached is returned (this might not be MaxIterNum, oddly enough).
+
+  \post The required parts of the gauge field are fixed to the desired gauge.
+ */
 //-------------------------------------------------------------------------//
 //                                                                         //
 //  Function FixGauge calculates gauge transformation matrices that        //
@@ -932,7 +951,6 @@ void FixHPlane::unitarize(int recurse)
 //  int MaxIterNum - issues a warning if reached.                          //
 //                                                                         //
 //-------------------------------------------------------------------------//
-
 int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
 {
   char *fname = "FixGauge(F,i)";
@@ -1085,29 +1103,23 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
 
 
 //-------------------------------------------------------------------------//
-//                                                                         //
-// Allocates memory for *gauge_fix_ptr[], sets unused fields in it to NULL //
-// allocates memory for the hyperplanes to be fixed and initializes        //
-// matrices to unity                                                       //
-//                                                                         //
-//  Parameters:                                                            //
-//                                                                         //
-//    FixGaugeType GaugeKind - gauge type. Numerically equal to the number //
-//                of the direction (ordered in the "canonical" way X=0,    //
-//                Y=1, Z=2, T=3) orthogonal to the three dimensions used   //
-//                in the Coulomb gauge fixing condition in (2). For the    //
-//                Landau gauge a negative number is used.                  //
-//                                                                         //
-//    int NHplanes - number of the hyperplanes to fix on the whole         //
-//                machine (not only current node). Not used in the         //
-//                Landau gauge. If set to zero in Coulomb gauge then       //
-//                treated as a request to use all hyperplanes on all       //
-//                nodes.                                                   //
-//                                                                         //
-//    int *Hplanes - list of NHplanes positions of the hyperplanes to fix  //
-//                along the direction orthogonal to them. Not used in the  //
-//                Landau gauge and when NHplanes is set to zero.           //
-//                                                                         //
+/*!
+  If Landau gauge fixing is requested, memory is allocated for a gauge fixing
+  matrix at each lattice site. If Coulomb gauge fixing is requested, memory is
+  allocated for a gauge fixing matrix at each lattice site on the hyperplanes
+  requested, if that hyperplane intersects the local lattice on this node.
+  The matrices are initialised to unity.
+
+  \param GaugeKind The  type of gauge fixing.
+  \param NHplanes The total number of the hyperplanes on which to fix the 
+  gauge. If set to zero when Coulomb gauge is requested, then treated as
+  a request to fix all hyperplanes in the global lattice.
+  This is ignored for Landau gauge fixing.
+  \param Hplanes A list of the positions of the hyperplanes on which to fix
+  the gauge.along the direction orthogonal to them. This list should be in
+  increasing order.  This is ignored for Landau gauge fixing and when \a
+  NHplanes is zero.
+*/
 //-------------------------------------------------------------------------//
 
 void Lattice::FixGaugeAllocate(FixGaugeType GaugeKind,
@@ -1309,4 +1321,5 @@ void Lattice::FixGaugeFree()
     fix_gauge_kind = FIX_GAUGE_NONE;
   }
 }
+
 CPS_END_NAMESPACE

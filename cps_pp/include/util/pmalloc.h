@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Declaration of dynamic memory management routines.	
+
+  $Id: pmalloc.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pmalloc.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: pmalloc.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pmalloc.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+// $Id: pmalloc.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,13 +31,13 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: pmalloc.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pmalloc.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 #ifndef _pmalloc_h
-#define _pmalloc_h
+#define _pmalloc_h             //!< Prevent multiple inclusion
 
 
 void* pmalloc(int request);
@@ -43,4 +48,5 @@ void pclear(void);
 
 
 #endif /* !_pmalloc_h */
+
 CPS_END_NAMESPACE

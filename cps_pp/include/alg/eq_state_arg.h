@@ -18,4 +18,5 @@ struct EqStateArg {
 };
 
 #endif /* !INCLUDED_EQ_STATE_ARG_H */
+
 CPS_END_NAMESPACE

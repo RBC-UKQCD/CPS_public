@@ -3,11 +3,13 @@ CPS_START_NAMESPACE
 #ifndef INCLUDED_W_AXIALCURR
 #define INCLUDED_W_AXIALCURR
 
-// #include "../../util/include/data_types.h"        // Float, Complex
-// #include "../../alg/include/w_spect_arg.h"        // SourceKind
-// #include "w_ginfo.h"
-// #include "w_hyper_rect.h"
-// #include "w_gamma_mat.h"
+CPS_END_NAMESPACE
+// #include <util/data_types.h>        // Float, Complex
+// #include <alg/w_spect_arg.h>        // SourceKind
+// #include <alg/w_ginfo.h>
+// #include <alg/w_hyper_rect.h>
+// #include <alg/w_gamma_mat.h>
+CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
 // Forward Declarations  -- classes defined in other translation units
@@ -121,4 +123,5 @@ private:
 
 //-------------------------end of declaration of class WspectAxialCurrent
 #endif // ! _INCLUDED_W_AXIALCURR
+
 CPS_END_NAMESPACE

@@ -17,10 +17,10 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <math.h>    // for exponential function
-#include<alg/pot_arg.h>
-#include<alg/alg_base.h>
-#include<alg/common_arg.h>
-#include<util/lattice.h>
+#include <alg/pot_arg.h>
+#include <alg/alg_base.h>
+#include <alg/common_arg.h>
+#include <util/lattice.h> // for PathOrderedProduct
 CPS_START_NAMESPACE
 
 
@@ -59,6 +59,7 @@ class AlgPot : public Alg
 
 
 #endif
+
 
 
 

@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief  Definition of DiracOpStag class methods.
+
+  $Id: d_op_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: d_op_stag.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: d_op_stag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -41,7 +46,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: d_op_stag.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v $
 //  $State: Exp $
 //
@@ -57,16 +62,16 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/dirac_op.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/vector.h>
-#include<util/smalloc.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<util/stag.h>
-#include<comms/cbuf.h>
-#include<comms/glb.h>
+#include <util/dirac_op.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/vector.h>
+#include <util/smalloc.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <util/stag.h>
+#include <comms/cbuf.h>
+#include <comms/glb.h>
 CPS_START_NAMESPACE
 
 
@@ -78,7 +83,20 @@ const unsigned CBUF_MODE4 = 0xcca52112;
 
 
 //------------------------------------------------------------------
-// Constructor
+/*!
+  Only one instance of this class is allowed to be in existence at
+  any time.
+  \param latt The lattice on which this Dirac operator is defined
+  \param f_field_out A (pointer to) a spin-colour field (optionally). 
+  \param f_field_in A (pointer to) a spin-colour field (optionally).
+  \param arg Parameters for the solver.
+  \param cnv_frm_flag Whether the lattice fields should be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_field_out and \a f_field_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field.
+ */
 //------------------------------------------------------------------
 DiracOpStag::DiracOpStag(Lattice & latt,
 			 Vector *f_field_out,
@@ -134,7 +152,10 @@ DiracOpStag::DiracOpStag(Lattice & latt,
 
 
 //------------------------------------------------------------------
-// Destructor
+/*!
+  If the storage order of any fields was changed by the constructor
+  then they are changed to the canonical order by the destructor.
+*/
 //------------------------------------------------------------------
 DiracOpStag::~DiracOpStag() {
   char *fname = "~DiracOpStag()";
@@ -230,7 +251,24 @@ void DiracOpStag::Dslash(Vector *out,
 // cb refers to the checkerboard of the in field.
 // dir_flag is flag which takes value 0 when all direction contribute to D,
 // 1 - when only the special anisotropic direction contributes to D,
-// 2 - when all  except the special anisotropic direction. 
+// 2 - when all  except the special anisotropic direction.
+  /*!
+    A vector defined on lattice sites of single parity is multiplied by
+    all or some of the derivative part of the fermion matrix; on an
+    anisotropic lattice
+    \param out The resulting vector.
+    \param in The vector to be multiplied.
+    \param cb The parity on which the vector \a in is defined.
+    \param dag Whether to multiply by the hermitian conjugate matrix:
+    Should be set to 1 to multiply by the hermitian conjugate, 0 otherwise.
+    \param dir_flag Which parts of the derivative matrix to use:
+    When 0, the derivative matrix is the sum over derivatives in all
+    directions.
+    When 1, the derivative matrix is the  derivative in the anisotropic
+    direction.
+    When 2, the derivative matrix is the sum over derivatives in all
+    directions but the anisotropic direction.
+  */
 //-------------------------------------------------------------------
 void DiracOpStag::Dslash(Vector *out, 
 			 Vector *in, 
@@ -364,4 +402,5 @@ void DiracOpStag::RitzMat(Vector *out, Vector *in) {
 void DiracOpStag::RitzEigMat(Vector *out, Vector *in) {
   ERR.NotImplemented(cname,"RitzEigMat");
 }
+
 CPS_END_NAMESPACE

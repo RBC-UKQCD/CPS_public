@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Declaration and definition of Error class.
+
+  $Id: error.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: error.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: error.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,41 +31,30 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: error.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// error.h
-//
-// Header file for the Error base class. There are no derived 
-// classes. The functions in this class print a message and exit 
-// with a specific value. An object of this class called
-// ERR should be created at the highest scope (outside main). 
-// The header file declares ERR as external.
-//
-//------------------------------------------------------------------
 
 #ifndef INCLUDED_ERROR_H
-#define INCLUDED_ERROR_H
+#define INCLUDED_ERROR_H  //!< Prevent multiple inclusions
 
 
-#define MAX_ERR_STR_LEN 500  
-// The maximum string length to be used with vsprintf.
-// This is needed by all error functions with ... argument.                              
+#define MAX_ERR_STR_LEN 500
+//!< The maximum length of error message strings
 
-
-
-//------------------------------------------------------------------
-//
-// Error is the base class
-//
-//------------------------------------------------------------------
+//! A class to handle the printing of error messages.
+/*! Upon encountering an error from which the code cannot recover,
+  one of these methods can be called to print a diagnostic message and exit
+  with a predefined value.
+  \todo Is it worth making things const correct in a fatal class?
+*/
+  
 class Error
 {
   private:
+    
     char *cname;    // Class name.
     char e_string[MAX_ERR_STR_LEN];  
        // Needed by all error functions with ... argument.                              
@@ -91,57 +85,51 @@ class Error
 
     virtual ~Error();
 
-    void Error::Pointer(char *class_name, char *func_name,
-			char *ptr_name);   // pointer name
-       // Error message for: Pointer not initialized.
+    void Pointer(char *class_name, char *func_name,
+			char *ptr_name);  
+    //!< Error message for an uninitialized pointer.
 
+    void FileR(char *class_name, char *func_name,
+		      char *file_name);
+    //!< Error message for failure to open a file to read.
 
-     void Error::FileR(char *class_name, char *func_name, 
-		       char *file_name);  // file name
-       // Error message for: Can not open file to read.
+    void FileW(char *class_name, char *func_name,
+		      char *file_name);  
+    //!< Error message for failure to open a file to write.
 
+    void FileA(char *class_name, char *func_name,
+		      char *file_name); 
+    //!< Error message for failure to open a file to append.
 
-     void Error::FileW(char *class_name, char *func_name, 
-		       char *file_name);  // file name
-       // Error message for: Can not open file to write.
+    void NotImplemented(char *class_name, char *func_name);
+    //!< Error message when something is not implemented.
 
+    void NotImplemented(char *class_name, char *func_name,
+			       const char *format, ...);
+    //!< Error message when something is not implemented.
 
-     void Error::FileA(char *class_name, char *func_name, 
-		       char *file_name);  // file name
-       // Error message for: Can not open file to append.
+    void Hardware(char *class_name, char *func_name,
+			 const char *format, ...);
+    //!< Error message for hardware failure.
 
-
-     void Error::NotImplemented(char *class_name, char *func_name); 
-       // Error message for: Not implemented.
-
-
-     void Error::NotImplemented(char *class_name, char *func_name, 
-                         const char *format,  // format of message
-                         ...);                // arg. list of message  
-       // Error message for: NotImplemented (write your own message).
-
-
-     void Error::Hardware(char *class_name, char *func_name, 
-			  const char *format,  // format of message
-			  ...);                // arg. list of message  
-       // Error message for: Hardware error (write your own message).
-        
-
-     void Error::General(char *class_name, char *func_name, 
-                         const char *format,  // format of message
-                         ...);                // arg. list of message  
-       // Error message for: General error (write your own message).
+    void General(char *class_name, char *func_name,
+			const char *format, ...);
+    //!< Error message for miscellaneous failure.    
         
 };
 
 
 //------------------------------------------------------------------
-// External declarations.
+/*! An instance of the Error class, named ERR, should be
+  created at the highest scope (outside main). This external declaration
+  allows  access to the error message printing mechanisms.
+*/
 //------------------------------------------------------------------
 extern Error ERR;
 
 
 #endif
+
 
 
 CPS_END_NAMESPACE

@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: w_axialcurr.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: w_axialcurr.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -41,13 +41,13 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: w_axialcurr.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 CPS_END_NAMESPACE
-#include<alg/w_all.h>
+#include <alg/w_all.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
@@ -55,19 +55,19 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/gjp.h>
-#include<util/error.h>
-#include<util/verbose.h>
-#include<util/sproj_tr.h>
-#include<util/lattice.h>
-#include<util/data_types.h>
+#include <util/gjp.h>              // GJP
+#include <util/error.h>            // ERR
+#include <util/verbose.h>          // VRB
+#include <util/sproj_tr.h>         // sproj_tr
+#include <util/lattice.h>  
+#include <util/data_types.h>  
 CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<comms/glb.h>
-#include<comms/scu.h>
-#include<alg/alg_w_spect.h>
+#include <comms/glb.h>               // glb_sum(...)
+#include <comms/scu.h>               // getPlusData(...)
+#include <alg/alg_w_spect.h>       // AlgWspect::GetCounter()
 CPS_START_NAMESPACE
 
 
@@ -576,6 +576,7 @@ void WspectAxialCurrent::dumpData(char *filename) const {
   }
 
 }
+
 
 
 CPS_END_NAMESPACE

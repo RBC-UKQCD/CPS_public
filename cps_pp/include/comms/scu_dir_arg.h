@@ -1,7 +1,13 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
-/*! The SCUDirArg Class: scu_dir_arg.h
+/*!\file
+  \brief  Declaration of the SCUDirArg class.
+  
+  $Id: scu_dir_arg.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
+/*----------------------------------------------------------*/
+/* The SCUDirArg Class: scu_dir_arg.h
 
   Declarations for the MPI implementation of the comms-layer data
   structures.
@@ -10,20 +16,19 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: mcneile $
-  $Date: 2003-06-22 13:34:52 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_dir_arg.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-  $Id: scu_dir_arg.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+  $Author: zs $
+  $Date: 2003-07-24 16:53:53 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_dir_arg.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: scu_dir_arg.h,v 1.2 2003-07-24 16:53:53 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_dir_arg.h,v $
-  $Revision: 1.1.1.1 $
+  $Revision: 1.2 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_dir_arg.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
 CPS_END_NAMESPACE
-#include<config.h>
 CPS_START_NAMESPACE
 
 /* Allow the MPI stuff to be switched out, thus avoiding compiler
@@ -35,27 +40,47 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <mpi.h>
-#include<config.h>
-#include<comms/comms/scu_enum.h>
+#include <comms/scu_enum.h>
 CPS_START_NAMESPACE
 
-/*! enum to handle boolean logic in a neated manner: */
+//*! Labels for Boolean logic values. 
 enum { FALSE, TRUE };
 
-/*! Typedefs used to implement portable types               */
-typedef enum {
-  TYPE_IFloat,                    /*!< identifies IFloat type */
-  TYPE_int                       /*!< identifies integer type */
-} Type_tag;
-#define NUM_INT_TYPES   4                  /*!< The total number of MPI int types */
-#define NUM_FLOAT_TYPES 3                  /*!< The total number of MPI IFloat types */
 
-/*! Default size of the basic communications element (in bytes) */
+
+//! Flags to identify  portable data types               
+typedef enum {
+  TYPE_IFloat,                   /*!< Identifies ::IFloat type */
+  TYPE_int                       /*!< Identifies integer type */
+} Type_tag;
+
+#define NUM_INT_TYPES   4        //!< The total number of MPI integer types 
+#define NUM_FLOAT_TYPES 3        //!< The total number of MPI IFloat types 
+
+//! Default size of the basic communications element (in bytes) 
 #ifndef COMMS_DATASIZE
 #define COMMS_DATASIZE 4
 #endif
 
+
 /*----------------------------------------------------------*/
+//! A class describing the data to be communicated,
+/*!
+   The SCUDirArg class is part of the MPI communications layer. It
+   describes the data to be communicated. It is assumed to be of a regularly
+   strided form, so it is described in terms of its base address, the number
+   of blocks its block length and the stride between each block. The latter
+   two are in units of the actual numbers (not bytes).
+
+   Also described here is whether this data should be sent or received and
+   the direction in which the data is to communicated.
+
+   At present this code is hardwired to assume that the data is always
+   of type IFloat.
+
+   \ingroup comms    
+*/
+//----------------------------------------------------------------------
 class SCUDirArg 
 {
   private:
@@ -87,56 +112,58 @@ class SCUDirArg
        Public interface:
     ----------------------------------*/
 
-    //! Default constructor:
+    //! Default constructor
     SCUDirArg();
-    //! Parameterized constructor:
+    //! Parameterized constructor
     SCUDirArg( void* addr, SCUDir dir, SCUXR sendxr, 
 	       int blklen, int numblk = 1, int stride = 1);
     //! Destructor:
     ~SCUDirArg();
 
-    //! Initialise, sets up a previously `empty' SCUDirArg:
+    //! Initialise (or re-initialise) the datatype.
     void Init( void* addr, SCUDir dir, SCUXR sendxr, 
 	       int blklen, int numblk = 1, int stride = 1);
 
-    //! Get the base-address:
+    //! Get the base-address.
     void * Addr();
-    //! Set the base-address, returns the previous base-address:
+    //! Set the base-address.
     void * Addr(void* addr);
 
-    //! Get the block-length:
+    //! Get the block-length.
     int Blklen();
-    //! Set the block-length, returns the previous block-length:
+    //! Set the block-length.
     int Blklen( int blklen );
 
-    //! Get the number of blocks:
+    //! Get the number of blocks.
     int Numblk();
-    //! Set the number of blocks, returns the previous value:
+    //! Set the number of blocks.
     int Numblk( int numblk );
 
-    //! Get the stride:
+    //! Get the stride.
     int Stride();
-    //! Set the stride, returns the previous stride value:
+    //! Set the stride.
     int Stride( int stride );
 
-    //! Set the address, blocklength, #blocks and stride:
+    //! Reset the data structure parameters parameters.
     void Reload( void* addr, int blklen, int numblk, int stride );
 
-    //! Get the MPI Datatype created by this SCUDirArg:
+    //! Get the MPI Datatype created by this SCUDirArg.
     MPI_Datatype Datatype( void );
 
-    //! Get the direction:
+    //! Get the direction.
     SCUDir CommDir( void );
 
-    //! Get the send/recieve flag of this SCUDirArg:
+    //! Get the send/receive flag of this SCUDirArg.
     SCUXR CommType( void );
 
-    //! Allows the size of the basic data-element (IFloat or int) to be set (in bytes):
+    //! Change the size of the fundamental data element.
     void SetDataSize( int mpi_datasize );
 
 };
 
+
 #endif
 
 #endif /* INCLUDE_MPI_SCU */
+
 CPS_END_NAMESPACE

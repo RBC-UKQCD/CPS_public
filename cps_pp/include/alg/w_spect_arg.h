@@ -11,7 +11,7 @@ CPS_START_NAMESPACE
 #define INCLUDED_W_SPECT_ARG_H
 
 CPS_END_NAMESPACE
-#include<alg/cg_arg.h>
+#include <alg/cg_arg.h>
 CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
@@ -537,4 +537,5 @@ struct WspectArg {
 };
 
 #endif /* !INCLUDED_W_SPECT_ARG_H */
+
 CPS_END_NAMESPACE

@@ -1,28 +1,21 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of Vector and Matrix classes.
+
+  Definitions of functions that perform operations on complex vectors.
+  $Id: vector.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: vector.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: vector.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.8  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.7  2002/03/11 22:27:13  anj
 //  This should now be the correct, fully merged code from our two versions. Anj
 //
@@ -54,62 +47,59 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: vector.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// vector.C
-//
-// The vector class functions.
-//
-// For now this is specific to three colors. The constructor
-// will exit if the number of colors is not equal to three.
-//
-// This file contains the definitions of the Vector and Matrix 
-// class functions.
-//
-// Float is defined in vector.h.
-//
-//------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/vector.h>
-#include<util/random.h>
-#include<util/gjp.h>
-#include<comms/glb.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <comms/glb.h>
 CPS_START_NAMESPACE
 
 
-//------------------------------------------------------------------
-//------------------------------------------------------------------
-// The Matrix class.
-// For now Matrix is a class of general 3x3 complex matrices.
-// If the number of colors is not 3 the constructor will exit.
-//------------------------------------------------------------------
 //------------------------------------------------------------------
 
 Matrix::Matrix()
 {}
 
 //------------------------------------------------------------------
+/*!
+  The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the real
+  number \a c; All other elements are zero.  
+  \param c The diagonal matrix element
+*/
 Matrix::Matrix(IFloat c) 
 { *this = c; }
 
 
 //------------------------------------------------------------------
+/*!
+  The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the complex
+  number \a c; All other elements are zero.  
+  \param c The diagonal matrix element
+*/
 Matrix::Matrix(const Complex& c) 
 { *this = c; }
 
 
 //------------------------------------------------------------------
+/*!
+  The matrix is initialised as a copy of the matrix \a m.
+  \param m The initialising matrix.
+*/
 Matrix::Matrix(const Matrix& m) 
 { *this = m; }
 
 
 //------------------------------------------------------------------
+/*!
+  The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the real
+  number \a c; All other elements are zero.  
+  \param c The diagonal matrix element
+*/
 Matrix& Matrix::operator = (IFloat c)
 {
   this -> ZeroMatrix();
@@ -118,6 +108,11 @@ Matrix& Matrix::operator = (IFloat c)
 }
 
 //------------------------------------------------------------------
+/*!
+  The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the complex
+  number \a c; All other elements are zero.  
+  \param c The diagonal matrix element
+*/
 Matrix& Matrix::operator = (const Complex& c)
 {
   this -> ZeroMatrix();
@@ -129,6 +124,14 @@ Matrix& Matrix::operator = (const Complex& c)
 // 0, 1, 2
 // 3, 4, 5
 // 6, 7, 8
+/*!
+  \param m A linear array representation of a 3x3 complex matrix, such that 
+  real part of the (i,j) element is at array position [6i+2j] 
+  and the imaginary part of the (i,j) element is at array position [6i+2j+1].
+  \post This matrix is the transpose of \a m.
+
+  \a m must not be an alias of this matrix/
+*/  
 void Matrix::Trans(const IFloat *m) 
 {
   Complex *dst = (Complex *)u;
@@ -139,6 +142,9 @@ void Matrix::Trans(const IFloat *m)
 }
 
 //------------------------------------------------------------------
+/*!
+  \post This matrix is a 3x3 unit matrix.
+*/
 void Matrix::UnitMatrix(void)
 {
   IFloat *p = (IFloat *)u;
@@ -154,6 +160,9 @@ void Matrix::UnitMatrix(void)
 }
 
 //------------------------------------------------------------------
+/*!
+  \post This matrix is a 3x3 zero matrix.
+*/
 void Matrix::ZeroMatrix(void)
 {
   IFloat *p = (IFloat *)u;
@@ -164,10 +173,10 @@ void Matrix::ZeroMatrix(void)
 }
 
 
-//------------------------------------------------------------------
-/*
- *  calculate |U~dag U - I|^2
- */
+/*!
+  \return <em>|U^dagger U - I|^2</em>, where the norm used is the L2 norm
+  of the matrix elements.
+*/
 IFloat Matrix::ErrorSU3() const
 {
   Matrix tmp1, tmp2;
@@ -183,11 +192,21 @@ IFloat Matrix::ErrorSU3() const
 
 
 //------------------------------------------------------------------
+    /*!
+      \param i The row index,
+      \param j The column index,
+      \return  The (i,j) matrix element
+    */
 Complex& Matrix::operator()(int i, int j)
 { return ((Complex*)u)[i*COLORS+j]; }
 
 
 //------------------------------------------------------------------
+    /*!
+      \param i The row index,
+      \param j The column index,
+      \return  The (i,j) matrix element
+    */
 const Complex& Matrix::operator()(int i, int j) const
 { return ((Complex*)u)[i*COLORS+j]; }
 
@@ -219,21 +238,18 @@ Complex Matrix::Char10() const
 
 
 //------------------------------------------------------------------
-//------------------------------------------------------------------
 // The Vector class.
-// For now Vector is a class of general 3 component column
-// vectors. If the number of colors is not 3 the constructor
-// will exit.
-// Vector is not automatically normalized when constructed.
 //------------------------------------------------------------------
-//------------------------------------------------------------------
+
 Vector::Vector()
 {}
 
 
 //------------------------------------------------------------------
-// Returns the dot product (v*, v) summed over the whole lattice.
-// len is the number of real numbers in the array.
+/*!
+  \param len The number of real numbers in the vectors.
+  \return The square norm of this vector summed over all nodes.
+*/
 //------------------------------------------------------------------
 Float Vector::NormSqGlbSum(int len)
 {
@@ -244,9 +260,11 @@ Float Vector::NormSqGlbSum(int len)
 
 
 //------------------------------------------------------------------
-// Returns the real part of the dot product (v, b) 
-// summed over all nodes.
-// len is the number of real numbers in the array.
+/*!
+  \param b Another vector
+  \param len The number of real numbers in the vectors.
+  \return The real part of the dot product (v,b) summed over all nodes.
+*/
 //------------------------------------------------------------------
 Float Vector::ReDotProductGlbSum(const Vector *b, int len)
 {
@@ -256,9 +274,11 @@ Float Vector::ReDotProductGlbSum(const Vector *b, int len)
 }
 
 //------------------------------------------------------------------
-// Returns the complex part of the dot product (v, b) 
-// summed over all nodes.
-// len is the number of real numbers in the array.
+/*!
+  \param b Another vector
+  \param len The number of real numbers in the vectors.
+  \return The dot product of this vector with b, summed over all nodes.
+ */
 //------------------------------------------------------------------
 Complex Vector::CompDotProductGlbSum(const Vector *b, int len)
 {
@@ -270,8 +290,21 @@ Complex Vector::CompDotProductGlbSum(const Vector *b, int len)
 }
 
 
+
+
+
 //------------------------------------------------------------------
-// Slice sum norm square a vector perp. to direction dir
+/*!
+  For this array of vectors, with one on each lattice site, and
+  some direction \a dir, sum the square norms of the vectors over the entire
+  lattice on sites which
+  have the same coordinate in direction \a dir. In other words, divide the
+  global lattice into 3-dim slices perpendicular to direction \a dir and
+  sum the square norms of the vectors in each slice.
+  \param f_out The array holding the global sum for each slice.
+  \param size The size of this vector on each lattice site.	
+  \param dir The direction perpendicular to the slices.
+*/
 void Vector::NormSqArraySliceSum(Float *f_out, const int size, const int dir)
 {
   char *cname = "Vector";
@@ -292,8 +325,16 @@ void Vector::NormSqArraySliceSum(Float *f_out, const int size, const int dir)
 }
 
 //------------------------------------------------------------------
-// Slice sum a lattice of Floats to form an array of length L[dir]
-// lattice size of virtual grid in direction dir
+/*!
+  For an array of floating point numbers, one on each lattice site, and
+  some direction \a dir, sum all the numbers over the entire lattice which
+  have the same coordinate in direction \a dir. In other words, divide the
+  global lattice into 3-dim slices perpendicular to direction \a dir and
+  sum the array in each slice.
+  \param sum The array holding the global sum for each slice.
+  \param f_in The array to be sliced and summed
+  \param dir The direction perpendicular to the slices.
+*/
 void Vector::SliceArraySum(Float *sum, const Float *f_in, const int dir)
 {
   char *cname = "Vector";
@@ -335,8 +376,17 @@ void Vector::SliceArraySum(Float *sum, const Float *f_in, const int dir)
 
 
 //------------------------------------------------------------------
-// 5D Slice sum a lattice of Floats to form an array of length L[dir]
-// lattice size of virtual grid in direction dir
+/*!
+  For an array of floating point numbers, one on each 5-dim lattice site, and
+  some direction \a dir, sum all the numbers over the entire lattice which
+  have the same coordinate in direction \a dir. In other words, divide the
+  global lattice into 4-dim slices perpendicular to direction \a dir and
+  sum the array in each slice.
+  \param sum The array holding the global sum for each slice.
+  \param f_in The array to be sliced and summed
+  \param dir The direction perpendicular to the slices.
+*/
+//--------------------------------------------------------------------------
 void Vector::SliceArraySumFive(Float *sum, const Float *f_in, const int dir)
 {
   char *cname = "Vector";
@@ -380,9 +430,16 @@ void Vector::SliceArraySumFive(Float *sum, const Float *f_in, const int dir)
 }
 
 
-//
-//  y  -=  U x
-//
+/*! The 3x3 complex matrix is assumed to be stored in a linear form
+  where the real part of the (i,j) element is at vector position [6i+2j]
+  and the imaginary part of the (i,j) element is at vector position [6i+2j+1].
+  \param y The vector \a y
+  \param u The matrix \a M
+  \param x The complex 3-vector
+  \post \a y is the vector <em>y-Mx</em>
+
+  The vector \a y must not alias vector \a x or \a u
+*/
 void uDotXMinus(IFloat* y, const IFloat* u, const IFloat* x)
 {
     *y    -= *u      * *x     - *(u+1)  * *(x+1) + *(u+2)  * *(x+2)
@@ -399,9 +456,16 @@ void uDotXMinus(IFloat* y, const IFloat* u, const IFloat* x)
 	     + *(u+15) * *(x+2) + *(u+16) * *(x+5) + *(u+17) * *(x+4);
 }
 
-//
-//  y  +=  U~dag x
- //
+/*! The 3x3 complex matrix is assumed to be stored in a linear form
+  where the real part of the (i,j) element is at vector position [6i+2j]
+  and the imaginary part of the (i,j) element is at vector position [6i+2j+1].
+  \param y The vector \a y
+  \param u The matrix \a M
+  \param x The complex 3-vector \a x
+  \post \a y is the vector <em>y + M^dagger x</em>
+
+  The vector \a y must not alias vector \a x or \a u
+*/
 void uDagDotXPlus(IFloat* y, const IFloat* u, const IFloat* x)
 {
     *y    += *u      * *x     + *(u+1)  * *(x+1) + *(u+6)  * *(x+2)
@@ -418,9 +482,15 @@ void uDagDotXPlus(IFloat* y, const IFloat* u, const IFloat* x)
 	     - *(u+11) * *(x+2) + *(u+16) * *(x+5) - *(u+17) * *(x+4);
 }
 
-//
-//  y   =  U~dag x
-//
+/*! The 3x3 complex matrix is assumed to be stored in a linear form
+  where the real part of the (i,j) element is at vector position [6i+2j]
+  and the imaginary part of the (i,j) element is at vector position [6i+2j+1].
+  \param y The vector <em>M^dagger x</em>
+  \param u The matrix \a M
+  \param x The complex 3-vector \a x
+
+  The vector \a y must not alias vector \a x or \a u
+*/
 void uDagDotXEqual(IFloat* y, const IFloat* u, const IFloat* x)
 {
     *y     =  *u      * *x     + *(u+1)  * *(x+1) + *(u+6)  * *(x+2)
@@ -436,6 +506,7 @@ void uDagDotXEqual(IFloat* y, const IFloat* u, const IFloat* x)
     *(y+5) =  *(u+4)  * *(x+1) - *(u+5)  * *x     + *(u+10) * *(x+3)
 	    - *(u+11) * *(x+2) + *(u+16) * *(x+5) - *(u+17) * *(x+4);
 }
+
 
 
 CPS_END_NAMESPACE

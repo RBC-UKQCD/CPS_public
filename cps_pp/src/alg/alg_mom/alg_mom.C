@@ -10,18 +10,18 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
 #include <stdio.h>
-#include<alg/alg_mom.h>
+#include <alg/alg_mom.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<alg/common_arg.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<comms/glb.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <alg/common_arg.h>
+#include <util/smalloc.h>
+#include <util/vector.h>           // Tr() and ReTr()
+#include <util/verbose.h> 
+#include <util/error.h>
+#include <comms/glb.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
@@ -286,4 +286,5 @@ Complex AlgMom::fact(int imom, int *s)
 
 
 }
+
 CPS_END_NAMESPACE

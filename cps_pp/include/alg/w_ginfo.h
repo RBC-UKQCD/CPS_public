@@ -5,8 +5,8 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
-#include<alg/w_spect_arg.h>
+#include <util/data_types.h>        // Float, Complex
+#include <alg/w_spect_arg.h>        // SourceKind
 CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
@@ -104,4 +104,5 @@ protected:
 
 
 #endif // ! _INCLUDED_W_GINFO
+
 CPS_END_NAMESPACE

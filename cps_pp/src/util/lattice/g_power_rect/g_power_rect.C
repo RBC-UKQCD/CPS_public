@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of GpowerRect class.
+
+  $Id: g_power_rect.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_rect/g_power_rect.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: g_power_rect.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_rect/g_power_rect.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: g_power_rect.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: g_power_rect.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_rect/g_power_rect.C,v $
 //  $State: Exp $
 //
@@ -62,15 +67,15 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/verbose.h>
-#include<util/vector.h>
-#include<util/gjp.h>
-#include<util/gw_hb.h>
-#include<comms/nga_reg.h>
-#include<comms/glb.h>
-#include<comms/scu.h>
-#include<comms/cbuf.h>
+#include <util/lattice.h>
+#include <util/verbose.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <util/gw_hb.h>
+#include <comms/nga_reg.h>
+#include <comms/glb.h>
+#include <comms/scu.h>
+#include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
 
@@ -297,15 +302,20 @@ void GpowerRect::GactionGradient(Matrix &grad, int *x, int mu)
 
 
 //------------------------------------------------------------------
-// Float PowerPlaq(int *x, int mu, int nu) const:
-// It calculates the power plaquette 
-// field at site x, mu, nu with mu < nu.
-// The power plaquette field is:
-//
-// pp(x,u,v) = { (1 - ReTr[U_p(x,u,v)]/3) / c }^k
-//
-// with c = GJP.PowerPlaqCutoff() and
-//      k = GJP.PowerPlaqExponent()
+/*!
+  The power plaquette at site \a x in the \f$ \mu-\nu \f$ plane with
+  \f$ \mu < \nu \f$ is
+  \f[
+  \{(1 - Re Tr[U_p(x,\mu,\nu)]/3) / c \}^k
+  \f]
+  where the \f$ U_p \f$ is the plaquette and \a c and \a k are the coefficients
+  appearing in the action.
+
+  \param x the coordinates of the lattice site at the start of the plaquette
+  \param mu The first plaquette direction.
+  \param nu The second plaquette direction; should be different from \a mu.
+  \return  The real part of the trace of the power plaquette.
+*/
 //------------------------------------------------------------------
 Float GpowerRect::PowerPlaq(int *x, int mu, int nu) const
 {
@@ -323,9 +333,18 @@ Float GpowerRect::PowerPlaq(int *x, int mu, int nu) const
 
 
 //------------------------------------------------------------------
-// Float SumPowerPlaqNode(void) const:
-// It calculates the sum of the power plaquette  
-// field at each site of the node sublattice.
+/*!
+  The power plaquette at site \a x in the \f$ \mu-\nu \f$ plane with
+  \f$ \mu < \nu \f$ is
+  \f[
+  \{(1 - Re Tr[U_p(x,\mu,\nu)]/3) / c \}^k
+  \f]
+  where the \f$ U_p \f$ is the plaquette and \a c and \a k are the coefficients
+  appearing in the action.
+
+  \return  The real part of the trace of the power plaquette summed over all
+  local lattice sites and all six planes.
+*/
 //------------------------------------------------------------------
 Float GpowerRect::SumPowerPlaqNode(void) const
 {
@@ -355,9 +374,18 @@ Float GpowerRect::SumPowerPlaqNode(void) const
 
 
 //------------------------------------------------------------------
-// Float SumPowerPlaq(void) const:
-// It calculates the sum of the power plaquette 
-// field at each site of the whole lattice
+/*!
+  The power plaquette at site \a x in the \f$ \mu-\nu \f$ plane with
+  \f$ \mu < \nu \f$ is
+  \f[
+  \{(1 - Re Tr[U_p(x,\mu,\nu)]/3) / c \}^k
+  \f]
+  where the \f$ U_p \f$ is the plaquette and \a c and \a k are the coefficients
+  appearing in the action.
+
+  \return  The real part of the trace of the power plaquette summed over all
+  lattice sites and all six planes.
+*/
 //------------------------------------------------------------------
 Float GpowerRect::SumPowerPlaq(void) const
 {
@@ -371,22 +399,27 @@ Float GpowerRect::SumPowerPlaq(void) const
 
 
 //------------------------------------------------------------------
-// void PowerStaple(Matrix& pstap, int *x, int mu):
-// It calculates the staple field at x, mu.
-// The staple field is:
-//
-// V_u(x) = \sum_v(!=u) {
-//      ps(x,u,v)   * [ U_v(x+u) U_u(x+v)~ U_v(x)~     ]
-//    + ps(x-v,u,v) * [ U_v(x+u-v)~ U_u(x-v)~ U_v(x-v) ] }
-//
-// where
-//
-// ps(x,u,v) = 
-//      beta*c_0 + {k/c} * { (1 - ReTr[U_p(x,u,v)]/3) / c }^(k-1)
-//
-// with c = GJP.PowerPlaqCutoff() and
-//      k = GJP.PowerPlaqExponent()
-//    c_0 = ( 1.0 - 8.0 * GJP.C1() )
+/*!
+  The staple sum around the link \f$ U_\mu(x) \f$ is
+\f[
+  \sum_{v \neq u} [
+      ps(x,\mu,\nu)     U_\nu(x+\mu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)     
+    + ps(x-\nu,\mu,\nu)   U^\dagger_\nu(x+\mu-\nu) U^\dagger_\mu(x-\nu) U_\nu(x-\nu) ]          
+\f]
+  where
+\f[
+ ps(x,\mu,\nu) = 
+ \beta (1-8c_1) + k/c \{(1 - ReTr[U_p(x,\mu,\nu)]/3) / c \}^{k-1}
+ \f]
+
+ where the real parameters \f$\beta,\f$ \a c and \a k are those in the
+ definition of the power plaquette action and \f$ U_p \f$ is the standard
+ plaquette.
+
+  \param x The coordinates of the lattice site 
+  \param mu The link direction 
+  \param pstap The computed staple sum.
+*/
 //------------------------------------------------------------------
 void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
 {
@@ -570,7 +603,35 @@ void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
 
 
 //------------------------------------------------------------------
-// It calculates the rectangle staple field at x, mu.
+/*!
+  The staple sum around the link \f$ U_\mu(x) \f$ is
+
+  \f[
+ \sum_{\nu \neq \mu} \left[\right.                                     
+R(x,\mu,\nu)  U_\mu(x+\mu)  U_\nu(x+2\mu)  
+ U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu)  U^\dagger_\nu(x)   \f]\f[
+ + R(x-\nu,\mu,\nu) U_\mu(x+\mu)  U^\dagger_\nu(x+2\mu-\nu) 
+ U^\dagger_\mu(x+\mu-\nu) U^\dagger_\mu(x-\nu)  U_\nu(x-\nu)  \f]\f[
+ + R(x-\mu,\mu,\nu) U_\nu(x+\mu)  U^\dagger_\mu(x+\nu) U^\dagger_\mu(x-\mu+\nu)
+ U^\dagger_\nu(x-\mu) U_\mu(x-\mu)      \f]\f[
+ + R(x-\mu-\nu,\mu,\nu) U^\dagger_\nu(x+\mu-\nu) U^\dagger_\mu(x-\nu)  
+ U^\dagger_\mu(x-\mu-\nu) U_\nu(x-\mu-\nu) U_\mu(x-\mu)  \f]\f[
+ + R(x+\mu, \nu,\mu) U_\nu(x+\mu)  U_\nu(x+\mu+\nu)  U^\dagger_\mu(x+2\nu)
+ U^\dagger_\nu(x+\nu)  U^\dagger_\nu(x) \f]\f[
+ + R(x+\mu-2\nu, \nu,\mu) U^\dagger_\nu(x+\mu-\nu) U^\dagger_\nu(x+\mu-2\nu)
+  U^\dagger_\mu(x-2\nu) U_\nu(x-2\nu)  U_\nu(x-\nu)
+ \left.\right]
+ \f]
+ where
+ \f[
+ R(x,\mu, \nu) = c_1+k/c \{(1 - ReTr[U_r(x,\mu,\nu)]/3) / c \}^{k-1}
+ \f]
+ where \f$U_r\f$ is the 6-link rectangle loop defined in the action.
+ 
+  \param x The coordinates of the lattice site 
+  \param mu The link direction 
+  \param rect The computed staple sum.
+*/
 //------------------------------------------------------------------
 void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
 {
@@ -1162,14 +1223,20 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
 
 
 //------------------------------------------------------------------
-// It calculates the power rectangle 
-// field at site x, mu, nu with mu < nu.
-// The power plaquette rectangle is:
-//
-// pp(x,u,v) = { (1 - ReTr[U_r(x,u,v)]/3) / c }^k
-//
-// with c = GJP.PowerRectCutoff() and
-//      k = GJP.PowerRectExponent()
+/*!
+  The power rectangle at site \a x in the \f$ \mu-\nu \f$ plane with
+  \f$ \mu < \nu \f$ is
+  \f[
+  \{(1 - Re Tr[U_r(x,\mu,\nu)]/3) / c \}^k
+  \f]
+  where the \f$ U_r \f$ is the rectangle and \a c and \a k are the coefficients
+  appearing in the action.
+
+  \param x the coordinates of the lattice site at the start of the plaquette
+  \param mu The first loop direction.
+  \param nu The second loop direction; should be different from \a mu.
+  \return  The real part of the trace of the power rectangle.
+*/
 //------------------------------------------------------------------
 Float GpowerRect::PowerRect(int *x, int mu, int nu) const
 {
@@ -1189,8 +1256,18 @@ Float GpowerRect::PowerRect(int *x, int mu, int nu) const
 
 
 //------------------------------------------------------------------
-// It calculates the sum of the power rectangle  
-// field at each site of the node sublattice.
+/*!
+  The power rectangle at site \a x in the \f$ \mu-\nu \f$ plane with
+  \f$ \mu < \nu \f$ is
+  \f[
+  \{(1 - Re Tr[U_r(x,\mu,\nu)]/3) / c \}^k
+  \f]
+  where the \f$ U_r \f$ is the rectangle and \a c and \a k are the coefficients
+  appearing in the action.
+
+  \return  The real part of the trace of the power plaquette summed over all
+  local lattice sites and all six planes.
+*/
 //------------------------------------------------------------------
 Float GpowerRect::SumPowerRectNode(void) const
 {
@@ -1214,8 +1291,18 @@ Float GpowerRect::SumPowerRectNode(void) const
 }
 
 //------------------------------------------------------------------
-// It calculates the sum of the power rectangle 
-// field at each site of the whole lattice
+/*!
+  The power rectangle at site \a x in the \f$ \mu-\nu \f$ plane with
+  \f$ \mu < \nu \f$ is
+  \f[
+  \{(1 - Re Tr[U_r(x,\mu,\nu)]/3) / c \}^k
+  \f]
+  where the \f$ U_r \f$ is the rectangle and \a c and \a k are the coefficients
+  appearing in the action.
+
+  \return  The real part of the trace of the power rectangle summed over all
+  lattice sites and all six planes.
+*/
 //------------------------------------------------------------------
 Float GpowerRect::SumPowerRect(void) const
 {
@@ -1231,4 +1318,5 @@ void GpowerRect::AllStaple(Matrix & stap, const int *x, int mu)
 {
   ERR.NotImplemented(cname, "AllStaple(M&,i*,i)") ;
 }
+
 CPS_END_NAMESPACE

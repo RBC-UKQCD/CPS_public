@@ -1,12 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definitions of functions computing 
+  the characters of some SU(3) representations.
+
+  $Id: su3_char.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_char.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: su3_char.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_char.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: su3_char.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,14 +40,14 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: su3_char.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_char.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
+#include <util/data_types.h>
 CPS_START_NAMESPACE
 
 static IFloat f1o3 = 1.0 / 3.0 ;
@@ -125,4 +131,5 @@ IFloat imChar10(IFloat *p)
 {
   return 0.0 ;
 }
+
 CPS_END_NAMESPACE

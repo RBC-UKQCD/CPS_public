@@ -1,7 +1,13 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
-/*! The Sysfunc Comms Interface: sysfunc.h
+/*!\file
+  \brief  Declarations for the MPI implementation of the QCDSP/QCDOC communications  layer.
+  
+  $Id: sysfunc.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
+/*----------------------------------------------------------------------
+  The Sysfunc Comms Interface: sysfunc.h
 
   Declarations for the MPI implementation of the QCDSP SCU
   comms-layer.
@@ -10,20 +16,19 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: mcneile $
-  $Date: 2003-06-22 13:34:52 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-  $Id: sysfunc.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+  $Author: zs $
+  $Date: 2003-07-24 16:53:53 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: sysfunc.h,v 1.2 2003-07-24 16:53:53 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.h,v $
-  $Revision: 1.1.1.1 $
+  $Revision: 1.2 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
 CPS_END_NAMESPACE
-#include<config.h>
 CPS_START_NAMESPACE
 
 /* Allow the MPI stuff to be switched out, thus avoiding compiler
@@ -38,23 +43,26 @@ CPS_END_NAMESPACE
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include<config.h>
-#include<comms/comms/scu_dir_arg.h>
-#include<comms/mpi_requests.h>
+#include <comms/scu_dir_arg.h>
+#include <comms/mpi_requests.h>
 CPS_START_NAMESPACE
 
+//! Number of dimensions.
 #ifndef NDIM                     /* If NDIM has not been specified: */
-#define NDIM 4                   /*!< Number of dimensions */ 
+#define NDIM 4                   
 #endif
 
 /* Macros for the required environment variable names: */
-/*! Name of the environment variable holding (or pointing to) 
-  the simulation option definitions */
+
+//! Name of the environment variable with the parallel execution parameters.
+/*! This environment variable might define the parameters directly or
+  name a file which does.
+*/
 #ifndef COMMS_ENVVAR
 #define COMMS_ENVVAR "COMMS_DEF" 
 #endif
 
-/*! Default name for the comms definition file. */
+//! Default name for the file containing the parallel execution parameters.
 #ifndef COMMS_DEFFILE
 #define COMMS_DEFFILE "commsMPI.def"
 #endif
@@ -62,128 +70,118 @@ CPS_START_NAMESPACE
 /*! Max size of temporary strings */
 #define STRING_MAX_LEN  10000 
 
-/*! Note that this interface cannot be extern C'd because it uses
+/* Note that this interface cannot be extern C'd because it uses
   overloaded subroutines */
 //extern "C" {
 
-//! Declaration for the global comms-layer initialization flag.
+//! The global comms-layer initialization flag.
 extern int commsMPI_init;
 
 //--------------------------------------------------------------------
-/*! Public interface subroutines for the comms: */
+/* Public interface subroutines for the comms: */
 //--------------------------------------------------------------------
-//! An ID which is unique for each node.
+/*! \defgroup comms  Communications objects and functions 
+  @{ */
+ 
+//! Gets an ID which is unique for each node.
 int UniqueID();
 
-/*!  Functions to return physics four dimensional coordinates of the
+/*  Functions to return physics four dimensional coordinates of the
   node.  The physics coordinate axes are labeled T, X, Y, Z*/
-int CoorT();
-int CoorX();
-int CoorY();
-int CoorZ();
 
-int SizeT();
-int SizeX();
-int SizeY();
-int SizeZ();
+int CoorT();  //!< Gets the grid coordinate of this node in the T direction.
+int CoorX();  //!< Gets the grid coordinate of this node in the X direction.
+int CoorY();  //!< Gets the grid coordinate of this node in the Y direction.
+int CoorZ();  //!< Gets the grid coordinate of this node in the Z direction.
 
-/*! Returns the total number of nodes in the PE grid */
+int SizeT(); //!< Gets the size of the grid  in the T direction.
+int SizeX(); //!< Gets the size of the grid  in the X direction.
+int SizeY(); //!< Gets the size of the grid  in the Y direction.
+int SizeZ(); //!< Gets the size of the grid  in the Z direction.
+
+//! Returns the total number of nodes in the processor grid.
 int NumNodes();
 
-/*! Random number seeds that on QCDSP were loaded at boot time by the
+/* Random number seeds that on QCDSP were loaded at boot time by the
   QOS.  N.B. Note that the MPI implementation of these functions are
   not currently compliant with the function comments */
-unsigned int Seed();   /*<! Seed is different for each node and is
-			 changed every time the machine is reset.*/
-unsigned int SeedS();  /*<! SeedS is the same for each node
-			 (spatially fixed, hence the S), but changes
-			 in time*/
-unsigned int SeedT();  /*<! SeedT is different for each node, but is
-			 fixed in time (the T), so it is unchanged by
-			 a reset.*/
-unsigned int SeedST(); /*<! SeedST is the same for each node
-			 (spatially fixed, hence the S), and the same
-			 after every reset (fixed time, hence T).*/
+unsigned int Seed();   //!< Gets a RNG seed.
+unsigned int SeedS();  //!< Gets a RNG seed.
+unsigned int SeedT();  //!< Gets a RNG seed.
+unsigned int SeedST(); //!< Gets a RNG seed.
 
-/*! sync() is a function which blocks further code execution until all
-  nodes in the machine have begun executing the code in the sync()
-  routine.  Originally returned the idle-time, but now returns 0. */
+//! A barrier function.
 unsigned int sync();
 
-/*! SCURemap: On QCDSP, this function returned the explicit wire
-  number (0 - 7) of the physics direction given by dir. In the MPI
-  version, this returns the internal direction from the cartesian
-  communicator which corresponds to the given physics direction. */
+//! Gets the direction used internally by the comms layer.
 int SCURemap( SCUDir dir );
 
-//! The following are the primary functions for generic SCU transfers:
+/* The following are the primary functions for generic SCU transfers: */
 
+//! Generic single communication.
 void SCUTrans( SCUDirArg * arg );
-/*!< This performs a single transfer, specified by arg. */
 
+//! Generic multiple communication.
 void SCUTrans( SCUDirArg ** arg, int n );
-/*!< This function performs n transfers, as specified by the array of
-  ACUDirArg objects in arg */
 
+//! Does a number of similar communications.
 void SCUTrans( SCUDirArg * arg, unsigned int * offset, int n );
-/*!<  This function does multiple transfers (n of them) for a specified
-  direction.  All transfers have the same block, stride and number
-  of blocks, but different addresses.  The address field of the
-  arg object is the base address.  Each transfer is started at
-  a specified offest relative to the base. */
 
-/*! SCUSetDMA: Used to set up the block, stride and number of blocks,
-  but no transfers are done. The transfer is instead inisialised using
-  SCUTransAddr. */
+//! Initialise a data transfer.
 void SCUSetDMA( SCUDirArg * arg );
+
+//! Initialise multiple data transfers.
 void SCUSetDMA( SCUDirArg ** arg, int n );
 
-/*! SCUTransAddr: This function also perform SCU transfers, but the
-  existing block, stride and number of blocks, as defined by a call to
-  SCUSetDMA.  Therefore, this command _must_ be preceded by a call to
-  SCUSetDMA. The base-addresses of the data are taken from the
-  SCUTransAddr arguments. */
+//! Performs a previously set-up data transfer.
 void SCUTransAddr( SCUDirArg * arg );
+
+//! Performs multiple previously set-up data transfers.
 void SCUTransAddr( SCUDirArg ** arg, int n );
 
-/*!  SCUComplete() only returns when all transfers on this PE are completed. */
+//! A communications barrier function,
 void SCUTransComplete(void);
+
 
 /*-------------------------------------------------------------------------*/
 /*             Useful extra subroutines, part of the MPI version:          */
 /*-------------------------------------------------------------------------*/
-//! Controls the comms initialisation, parses comm-params and calls MPI_Init:
+  
+//! Initialises the MPI communications layer.
 void SCUCommsInit( void );
 
-//! Controls the comms finalization; clean exit via MPI_Finalize:
+//! Performs a clean exit from the MPI communications layer.
 void SCUCommsFinalize( void );
 
-//! Perform a global sum directly using MPI */
+//! Computes a global sum directly using MPI 
 void SCUGlobalSum(Type_tag t, size_t tsize, int n, void *ivec, void *ovec );
 
-//! Wrapper for the comms-error reporting mechanism. */
+//! Reports an error.
 void SCURaiseError( char* errstr );
-//! Extra error wrapper to deal with string literals. */
+
+//! Reports an error.
 void SCURaiseError( const char* errstring );
 
+/*! @} */
 
 /*-------------------------------------------------------------------------*/
 /*              Implementation-specific internal subroutines:              */
 /*              If this were a class, these would be private.              */
 /*-------------------------------------------------------------------------*/
-//! Basic MPI transfer call, on which all others are based:
+
+//! An implementation-specific internal subroutine
 void SCUTrans_mpi( void* addr, MPI_Datatype mpi_dt, SCUDir dir, SCUXR sendrx );
 
-//! Parses the comms parameters:
+//! An implementation-specific internal subroutine
 void MPIParseCommsParam(void);
 
-//! String tokenizer, coded here to ensure portability:
+//! An implementation-specific internal subroutine
 char *MPICommsStringTokenizer(char* str, const char* tokens, char** tok_pos );
 
-//! This performs on-the-fly type+size to MPI_Datatype conversion.
+//! An implementation-specific internal subroutine
 MPI_Datatype SCUMPITypeConv( Type_tag t, size_t tsize );
 
-//! Reads a seed for every PE from a file specified during intialisation:
+//! An implementation-specific internal subroutine
 unsigned int SCUReadSeedFile( void );
 
 
@@ -191,4 +189,5 @@ unsigned int SCUReadSeedFile( void );
 #endif
 
 #endif /* INCLUDE_MPI_SCU */
+
 CPS_END_NAMESPACE

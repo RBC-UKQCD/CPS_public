@@ -1,30 +1,33 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definitions of the AlgGheatBath class.
+  
+  $Id: alg_ghb.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //------------------------------------------------------------------
-//
-// alg_ghb.h
-//
-// Header file for the AlgGheatBath class.
-//
-// AlgGheatBath is derived from Alg and is relevant to the 
-// gauge heat bath algorithm. The type of gauge action is
-// determined by the argument to the constructor.
-//
-//------------------------------------------------------------------
-
 
 #ifndef INCLUDED_ALG_GHB_H
 #define INCLUDED_ALG_GHB_H
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/pmalloc.h>
-#include<alg/alg_base.h>
-#include<alg/common_arg.h>
-#include<alg/ghb_arg.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/pmalloc.h>
+#include <alg/alg_base.h>
+#include <alg/common_arg.h>
+#include <alg/ghb_arg.h>
 CPS_START_NAMESPACE
 
+//-----------------------------------------------------------------------------
+//! Class implementing the gauge field global heatbath algorithm.
+/*!
+  The algorithm used is the Cabbibo-Marinari SU(N) heatbath update with
+  the Kennedy-Pendleton method for updating SU(2) subgroups
+
+  \ingroup alg 
+ */
+//------------------------------------------------------------------
 class AlgGheatBath : public Alg
 {
  private:
@@ -48,6 +51,7 @@ class AlgGheatBath : public Alg
 };
 
 #endif
+
 
 
 

@@ -1,12 +1,19 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Declaration/definition of Vector and Matrix classes.
+
+  Also declarations of functions that perform operations on complex vectors.
+
+  $Id: vector.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: vector.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: vector.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -20,7 +27,7 @@ CPS_START_NAMESPACE
 //  AlgHmd                  GlobalJobParameter
 //  AlgNoise                Lattice
 //  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
+//  AlgThreept              RandmGenerator
 //                          Vector
 //
 //  Revision 1.4  2001/08/16 10:50:31  anj
@@ -47,34 +54,19 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// vector.h
-//
-// Header file for the vector class.
-//
-// For now this is specific to three colors. The constructor
-// will exit if the number of colors is not equal to three.
-//
-// This file contains the declarations of the Vector and Matrix 
-// classes as well as the declarations of some genaral c-style
-// functions that perform operations on vectors of general
-// length.
-//
-//------------------------------------------------------------------
 
 
 #ifndef INCLUDED_VECTOR_H
-#define INCLUDED_VECTOR_H
+#define INCLUDED_VECTOR_H               //!< Prevent multiple inclusion
 
 CPS_END_NAMESPACE
 #include <string.h>
-#include<util/data_types.h>
+#include <util/data_types.h>
 CPS_START_NAMESPACE
 
 
@@ -89,43 +81,55 @@ class Matrix;
 //------------------------------------------------------------------
 extern "C" 
 {
-void moveMem(void *b, const void *a, int len); // b=a, REQUIRE:len >= 4
+    //! vector copy; b = a
+void moveMem(void *b, const void *a, int len); 
 
-void mDotMEqual(IFloat* c, const IFloat* a, const IFloat* b); // C = A*B
-                                         // Assumption: c!=a and c!=b 
+    //! 3x3 complex matrix multiplication; c = ab 
+void mDotMEqual(IFloat* c, const IFloat* a, const IFloat* b);
 
-void mDotMPlus(IFloat* c, const IFloat* a, const IFloat* b); // C += A*B
-                                         // Assumption: c!=a and c!=b 
+    //! 3x3 complex matrix multiplication and sum; c += ab
+void mDotMPlus(IFloat* c, const IFloat* a, const IFloat* b); 
 
-void uDotXEqual(IFloat* y, const IFloat* m, const IFloat* x); // y = M*x
+    //! 3x3 complex matrix times vector; y = Mx
+void uDotXEqual(IFloat* y, const IFloat* m, const IFloat* x); 
 
-IFloat dotProduct(const IFloat *a, const IFloat *b, int);  // len >= 3
+    //! vector scalar product; a.b
+IFloat dotProduct(const IFloat *a, const IFloat *b, int);
 
-void vecAddEquVec(IFloat *a, const IFloat *b, int); 	// A += B
+    //! vector addition; a += b
+void vecAddEquVec(IFloat *a, const IFloat *b, int); 	
 
-void vecMinusEquVec(IFloat *a, const IFloat *b, int); 	// A -= B
+    //! vector subtraction; a -= b
+void vecMinusEquVec(IFloat *a, const IFloat *b, int);  
 
-void vecNegative(IFloat *a, const IFloat *b, int); 	// A = -B
+    //! vector negation; a = -b
+void vecNegative(IFloat *a, const IFloat *b, int); 	
 
-void vecTimesEquFloat(IFloat *a, IFloat b, int); // A *= b
+    //! real scalar times vector multiplication; a *= b
+void vecTimesEquFloat(IFloat *a, IFloat b, int); // 
 
+    //! vector linear combination; a = bc+d
 void fTimesV1PlusV2(IFloat *a, IFloat b, const IFloat *c,
-			const IFloat *d, int size); 	// A = b*C+D
+			const IFloat *d, int size); 	
 
+    //! vector linear combination; a = bc-d
 void fTimesV1MinusV2(IFloat *a, IFloat b, const IFloat *c,
-			const IFloat *d, int size); 	// A = b*C-D
+			const IFloat *d, int size);    
 
+    //! complex vector scalar product; a.b
 void compDotProduct(IFloat *c_r, IFloat *c_i, 
-        	    const IFloat *a, const IFloat *b, int);  // len >= 3
+        	    const IFloat *a, const IFloat *b, int);
 
+    //! complex vector linear combination; a = bc+d
 void cTimesV1PlusV2(IFloat *a, IFloat b_re, IFloat b_im, const IFloat *c,
-                    const IFloat *d, int size);      // A = b*C+D
+                    const IFloat *d, int size);      
 
+    //! Not implemented
 void cTimesV1MinusV2(IFloat *a, IFloat b_re, IFloat b_im, const IFloat *c,
 	             const IFloat *d, int size);      // A = b*C-D
 
-void oneMinusfTimesMatrix(IFloat *a, IFloat b, const IFloat *c,
-			int n);     // A = 1-b*C, A and C are Matrix
+    //! matrix linear combination; a = 1-bc
+void oneMinusfTimesMatrix(IFloat *a, IFloat b, const IFloat *c, int n);     
 
 }
 
@@ -136,10 +140,13 @@ void oneMinusfTimesMatrix(IFloat *a, IFloat b, const IFloat *c,
 // no optimized assembly.
 //------------------------------------------------------------------
 
+//! Multiplication of complex vector by matrix and subtraction; y -= Mx
 void uDotXMinus(IFloat* y, const IFloat* u, const IFloat* x);
 
+//! Multiplication of complex vector by hermitian conjugate matrix and summation; y += M^dagger x
 void uDagDotXEqual(IFloat* y, const IFloat* u, const IFloat* x);
 
+//! Multiplication of complex vector by hermitian conjugate matrix; y = M^dagger x
 void uDagDotXPlus(IFloat* y, const IFloat* u, const IFloat* x);
 
 //------------------------------------------------------------------
@@ -156,16 +163,12 @@ extern IFloat imChar10(IFloat *p) ;
 
 
 //------------------------------------------------------------------
-// For now the number of colors for the Matrix and Vector classes
-// is fixed. If the number of colors is not 3 the appropriate 
-// constructors will exit.
+//! The rank of the matrices represented by the Matrix class
 //------------------------------------------------------------------
-enum{COLORS=3};
+enum{COLORS=3}; 
 
 //------------------------------------------------------------------
-// The Matrix class.
-// For now Matrix is a class of general 3x3 complex matrices.
-// If the number of colors is not 3 the constructor will exit.
+//! A class of general 3x3 complex matrices.
 //------------------------------------------------------------------
 class Matrix
 {
@@ -175,105 +178,189 @@ class Matrix
 
   public:
     // CREATORS
+    //! General constructor; no initialisation.
     Matrix();
+    //! Initialisation to real multiple of the unit matrix.
     Matrix(IFloat c);
+
+    //! Initialisation to complex multiple of the unit matrix.
     Matrix(const Complex& c);
+    //! Copy constructor
     Matrix(const Matrix& m);
 
+    //! Assignment to real multiple of the unit matrix.
     Matrix& operator=(IFloat c);
+    //! Assignment to complex multiple of the unit matrix.
     Matrix& operator=(const Complex& c);
-
+    //! Overloaded assignment
+    /*! \a m should not alias this matrix */
     Matrix& operator=(const Matrix& m)
     { moveMem(u, m.u, COLORS*COLORS*2*sizeof(Float)); 
       return *this; }
 
     // MANIPULATORS
+    //! Adds a matrix \a m to this matrix.
+    /*!
+      \param m The matrix to be added.
+      \return The matrix sum.
+    */
     Matrix& operator+=(const Matrix& m)
     { vecAddEquVec((IFloat *)u, (IFloat *)m.u, COLORS*COLORS*2);
       return *this; }
 
+    //! Adds a real scalar multiple of the unit matrix to this one.
+    /*!
+      \param c The real scalar multiple
+      \return The matrix sum
+    */
     Matrix& operator+=(IFloat c)
      { u[0] += c;  u[8] += c;  u[16] += c;  return *this; }
 
+    //! Subtracts a matrix \a m to this matrix.
+    /*!
+      \param m The matrix to be subtracted.
+      \return The matrix difference.
+    */
     Matrix& operator-=(const Matrix& m)
     { vecMinusEquVec((IFloat *)u, (IFloat *)m.u, COLORS*COLORS*2);
       return *this; }
 
+    //! Subtracts a real scalar multiple of the unit matrix from this one.
+    /*!
+      \param c The real scalar multiple
+      \return The matrix difference
+    */
     Matrix& operator-=(IFloat c)
       { u[0] -= c;  u[8] -= c;  u[16] -= c;  return *this; }
 
-    Matrix& operator*=(IFloat c)
+    //! Multiplies this matrix by a real scalar.
+    /*!
+      \param c The real scalar
+      \return The multiplied matrix
+    */
+     Matrix& operator*=(IFloat c)
     { vecTimesEquFloat((IFloat *)u, c, COLORS*COLORS*2); return *this; }
 
+     //! Assignment to matrix product; \a ab
+     /*!
+         \param a the matrix \a a
+	 \param b the matrix \a b
+	 \post This matrix is the matrix product \a ab
+      */
     void DotMEqual(const Matrix& a, const Matrix& b)
     { mDotMEqual((IFloat *)u, (IFloat *) a.u, (IFloat *) b.u);}
-       //u = a.u * b.u
 
+     //! Assignment to matrix product; \a ab
+     /*!
+         \param a the matrix \a a
+	 \param b the matrix \a b
+	 \post The matrix product \a ab  is added to  this matrix.
+      */
     void DotMPlus(const Matrix& a, const Matrix& b)
     { mDotMPlus((IFloat *)u, (IFloat *)a.u, (IFloat *)b.u);}
        //u += a.u * b.u
 
+    //! Assignment to Matrix transpose.
     void Trans(const IFloat* m);
-       // *this = transpose of m.                 Assume: this != m
 
+    //! Assignment to matrix transpose.
+    /*!
+      \param m A matrix.
+      \post This matrix is the transpose of \a m.
+      
+      \a m must not be an alias of this matrix/
+    */
     void Trans(const Matrix& m)
         { Trans((const IFloat *)(m.u)); }
 
+    //! Hermitian conjugate.
     void Dagger(const IFloat* m);
-    	// put dag(m) and save it to this object
 
+    //! Assignment to hermitian conjugate.
+    /*!
+      \param m A matrix.
+      \post This matrix is the hermitian conjugate of \a m.
+
+      \a a must not be an alias of this matrix
+    */
     void Dagger(const Matrix& m)
     	{ Dagger((const IFloat *)&m); }
-   
+
+    //! Not what you might think.
     void TrLessAntiHermMatrix(const Matrix& this_dag);
-    	// translate this to traceless anti-hermitian matrix
-	// passing this_dag as an argument in oder to make it
-	// more efficient.
 
+    //! Assignment to tensor product of vectors.
     void Cross2(const Vector& v1, const Vector& v2);
-    	// *this = 2 * (V1 x V2^*)
 
+    //! Assignment to an traceless antihermitian matrix.
     void AntiHermMatrix(const IFloat *a);
     	// a points to an array of 8 real numbers
 	    // *this = i \lamda^i * a^i
 	    // \lambda^i are 8 Gellmann matrices
 
+    //! Force this matrix to be an SU(3) matrix.
     void Unitarize(void);
-    	// force this matrix to be a unitary SU(3) matrix
 
+    //! Assignment to a unit matrix.
     void UnitMatrix(void);
 
+    //! Assignment to a zero matrix.
     void ZeroMatrix(void);
 
+    //! Assignment to a negated matrix.
+    /*!
+      \param m A matrix.
+      \post This matrix has the value \a -m.
+    */
     void NegMatrix(const Matrix& m)
     	{ vecNegative((IFloat *)u, (IFloat *)&m, COLORS*COLORS*2); }
 
+    //! Assignment to the matrix linear combination 1-xm
+    /*!
+      \param x A real scalar factor
+      \param m A matrix
+      \post This matrix has the value 1-xm.
+    */
     void OneMinusfTimesM(IFloat x, const Matrix& m)
     	{ oneMinusfTimesMatrix((IFloat *)u, x, (IFloat *)&m,
 	  COLORS*COLORS*2); }
 
 
     // ACCESSORS
+    //! Write access.
     Complex& operator()(int i, int j);
-
+    //! Read access.
     const Complex& operator()(int i, int j) const;
 
-    Complex& operator[](int i) { return ((Complex*)u)[i]; }
+    //! Write access.
+    /*!
+      \param i A number between 0 and 8
+      \return The ([i - i mod 3]/3, i mod 3) matrix element
 
+      Should this method not be private?
+    */
+    Complex& operator[](int i) { return ((Complex*)u)[i]; }
+    //! Read access.
+    /*!
+      \param i A number between 0 and 8
+      \return The ([i - i mod 3]/3, i mod 3) matrix element
+    */
     const Complex& operator[](int i) const { return ((Complex*)u)[i]; }
 
+    //! The determinant.
     void Det(IFloat* c) const;
-    	// get determinant and store it to c
 
-    IFloat ReTr() const;		// real part of the trace
+    //! Returns the real part of the trace.
+    IFloat ReTr() const;		
 
+    //! Returns the trace.
     Complex Tr() const;
 
+    //! -1/2 times the trace of the square.
     IFloat NegHalfTrSquare() const;
-    	// -0.5 tr(*this)^2, this matrix must be anti-hermitian
 
+    //! The deviation of this matrix from unitarity
     IFloat ErrorSU3() const;
-    	// return |U~dag U - I|^2
 
     // SU(3) Characters
 
@@ -290,11 +377,20 @@ class Matrix
 
 
 //------------------------------------------------------------------
-// The Vector class.
-// For now Vector is a class of general 3 component column
-// vectors. If the number of colors is not 3 the constructor
-// will exit.
-// Vector is not automatically normalized when constructed.
+//! A class implementing a general 3 component complex vector.
+/*!
+  This is a schizophrenic class. It is really designed to be a class
+  of complex 3-vectors, and many methods carry out operations on just
+  such an object; \e e.g. the overloaded binary operators, the
+  matrix-vector multiplications and the normalisation and orthogonalisation
+  methods. However, some methods, those with take an argument \c int \a len,
+  are really wrappers for functions operating on 1-dimensional floating
+  point arrays of any length. They are meant to be used with an array of
+  Vectors: the first Vector in the array operates not only on its own data
+  but on that of all the other objects in the array by assuming that it is
+  at the beginning of a contiguous floating point array. For the sake of
+  sanity the argument \a len should be a multiple of 6.
+*/
 //------------------------------------------------------------------
 class Vector
 {
@@ -306,31 +402,54 @@ class Vector
     // CREATORS
     Vector();
 
+    //! Overloaded assignment
+    /*! \a x should not alias this matrix */
     Vector& operator=(const Vector& x)
     { moveMem(v, x.v, COLORS*2*sizeof(Float)); 
       return *this; }
 
     // MANIPULATORS
+    //! Multiplies this vector by a real scalar.
+    /*!
+      \param p The real scalar
+      \return The multiplied vector
+    */
     Vector& operator*=(IFloat p)
     { vecTimesEquFloat((IFloat *)v, p, COLORS*2); return *this; }
 
+    //! Adds a vector \a m to this vector.
+    /*!
+      \param m The vector to be added.
+      \return The vector sum.
+    */
     Vector& operator+=(const Vector& x)
     { vecAddEquVec((IFloat *)v, (IFloat *)x.v, COLORS*2);
       return *this; }
 
+    //! Subtracts a vector \a m to this vector.
+    /*!
+      \param m The vector to be subtracted.
+      \return The vector difference.
+    */
     Vector& operator-=(const Vector& x)
     { vecMinusEquVec((IFloat *)v, (IFloat *)x.v, COLORS*2);
       return *this; }
 
+    //! Assignment to matrix-vector product.
+    /*!
+      \param m A matrix.
+      \param x a vector
+      \post This vector is takes the value Mx
+    */
     void DotXEqual(const Matrix& m, const Vector& x)
     { uDotXEqual((IFloat *)v, (IFloat *) m.u, (IFloat *) x.v); }
        // v = m.u * x.v, m should be in CRAM, x MUST be in DRAM */
 
+    //! Normalisation
     void Normalize(void);
-       // Normalize v to 1.
 
+    //! Orthogonalisation
     void Orthogonalize(const Vector& p1);
-
 
 
     //--------------------------------------------------------------
@@ -343,102 +462,152 @@ class Vector
     // a general array of IFloating numbers.
     //--------------------------------------------------------------
 
+    //! Assignment to another vector
+    /*!
+      \param b Another vector
+      \param len The number of real numbers in the vectors.
+      \post This vector  = \a b
+
+      \a b should not alias this vector.
+    */
     void CopyVec(const Vector *b, int len)
     { moveMem(&v, b, len*sizeof(Float)); }
-       // len is the number of real numbers in the array.
-       // Copy b to v
 
+    //! Square norm.
+    /*!
+      \param len The number of real numbers in the vectors.
+      \return The square norm of this vector.
+    */
     Float NormSqNode(int len)
     {return Float( dotProduct((IFloat *)&v, (IFloat *)&v, len) ); }
-       // len is the number of real numbers in the array.
-       // Returns the dot product (v*, v) on the node.
 
+    //! Square norm with global sum.
     Float NormSqGlbSum(int len);
-       // len is the number of real numbers in the array.
-       // Returns the dot product (v*, v) summed over all nodes.
 
+    //! The real part of the dot product
+    /*!
+      \param b Another vector
+      \param len The number of real numbers in the vectors.
+      \return The real part of the dot product (v,b).
+    */
     Float ReDotProductNode(const Vector *b, int len)
     {return Float( dotProduct((IFloat *)&v, (IFloat *)b, len) ); }
-       // len is the number of real numbers in the array.
-       // Returns the real part of the dot product (v, b)
 
+    //! The real part of the dot product with global sum.
     Float ReDotProductGlbSum(const Vector *b, int len);
-       // len is the number of real numbers in the array.
-       // Returns the real part of the dot product (v, b) 
-       // summed over all nodes.
 
-    void Vector::NormSqArraySliceSum(Float *f_out, const int size, const int dir);
-       // Slice sum norm square the vector  v  of element size "size" perp. 
-       // to direction dir
+    void NormSqArraySliceSum(Float *f_out, const int size, const int dir);
+    //!< Sum the square norms of vectors in 3-dim slices.
 
-    void Vector::SliceArraySum(Float *sum, const Float *f_in, const int dir);
-       // Slice sum a lattice of Floats f_in to form an array of length L[dir]
-       // lattice size of virtual grid in direction dir
+    void SliceArraySum(Float *sum, const Float *f_in, const int dir);
+    //!< Sum an array of Floats on a 4-dim lattice in 3-dim slices.
 
-    void Vector::SliceArraySumFive(Float *sum, const Float *f_in, const int dir);
-       // 5D Slice sum a lattice of Floats f_in to form an array of length L[dir]
-       // lattice size of virtual grid in direction dir
+    void SliceArraySumFive(Float *sum, const Float *f_in, const int dir);
+    //!< Sum an array of Floats on a 5-dim lattice in 4-dim slices.
 
+    //! Assignment to a negated vector.
+    /*!
+      \param b A vector.
+      \param len The number of real numbers in the vectors.
+      \post This vector has the value \a -b.
+    */
     void VecNegative(const Vector *b, int len)
-    {vecNegative((IFloat *)&v, (IFloat *)b, len);}
-       // len is the number of real numbers in the array.
-       //  v = -v 
+	{vecNegative((IFloat *)&v, (IFloat *)b, len);}
 
+    //! Multiplication by a real scalar
+    /*!
+      \param fb The real scalar
+      \param len The number of real numbers in the vectors.
+      \post This vector is multiplied by \a fb
+    */
     void VecTimesEquFloat(const Float &fb, int len)
     {vecTimesEquFloat((IFloat *)&v, IFloat(fb), len);}
-       // len is the number of real numbers in the array.
-       //  v = v * fb 
 
+    //! Addition of another vector
+    /*!
+      \param b Another vector
+      \param len The number of real numbers in the vectors.
+      \post \a b is added to this vector.
+    */
     void VecAddEquVec(const Vector *b, int len)
     { vecAddEquVec((IFloat *)&v, (IFloat *)b, len);}
-       // len is the number of real numbers in the array.
-       // v = v + b
 
+    //! Subtraction of another vector
+    /*!
+      \param b Another vector
+      \param len The number of real numbers in the vectors.
+      \post \a b is subtracted from this vector.
+    */
     void VecMinusEquVec(const Vector *b, int len)
     { vecMinusEquVec((IFloat *)&v, (IFloat *)b, len);}
-       // v = v - b
 
+    //! Assignment of the linear combination  fb * c + d
+    /*!
+      \param fb A real scalar
+      \param c A vector
+      \param d A vector      
+      \param len The number of real numbers in the vectors.
+      \post \a  This vector takes the value fb * c + d
+    */
     void FTimesV1PlusV2(const Float &fb, const Vector *c,
 			const Vector *d, int len)
     { fTimesV1PlusV2((IFloat *)&v, IFloat(fb), (IFloat *)c, 
                         (IFloat *)d, len); }
-       // len is the number of real numbers in the array.
-       // v = fb * c + d
 
+
+    //! Assignment of the linear combination  fb * c - d
+    /*!
+      \param fb A real scalar
+      \param c A vector
+      \param d A vector      
+      \param len The number of real numbers in the vectors.
+      \post  This vector takes the value fb * c - d
+    */
     void FTimesV1MinusV2(const Float &fb, const Vector *c,
 			 const Vector *d, int len)
     { fTimesV1MinusV2((IFloat *)&v, IFloat(fb), (IFloat *)c, 
                         (IFloat *)d, len); }
-       // len is the number of real numbers in the array.
-       // v = fb * c - d
-
+    //! The dot product with another vector
+    /*!
+      \param b Another vector
+      \param len The number of real numbers in the vectors.
+      \return The dot product of this vector with b.
+    */
     Complex CompDotProductNode(const Vector *b, int len)
     {
        IFloat c_r, c_i;
        compDotProduct(&c_r, &c_i, (IFloat *)&v, (IFloat *)b, len);
        return Complex(c_r,c_i);
      }
-       // len is the number of complex numbers in the array.
-       // Returns the complex part of the dot product (v*, b)
 
-    Complex CompDotProductGlbSum(const Vector *b, int len);
-       // len is the number of real numbers in the array.
-       // Returns the complex part of the dot product (v*, b) 
-       // summed over all nodes.
-
+    //! The dot product with another vector, with global sum
+     Complex CompDotProductGlbSum(const Vector *b, int len);
+  
+    //! Assignment of the linear combination  fb * c + d
+    /*!
+      \param fb A complex scalar
+      \param c A vector
+      \param d A vector      
+      \param len The number of real numbers in the vectors.
+      \post  This vector takes the value fb * c + d
+    */
     void CTimesV1PlusV2(const Complex &fb, const Vector *c,
                          const Vector *d, int len)
     { cTimesV1PlusV2((IFloat *)&v, real(fb), imag(fb), (IFloat *)c, 
 	              (IFloat *)d, len); }
-       // len is the number of real numbers in the array.
-       // v = fb * c + d
  
+    //! Assignment of the linear combination  fb * c - d
+    /*!
+      \param fb A complex scalar
+      \param c A vector
+      \param d A vector      
+      \param len The number of real numbers in the vectors.
+      \post \a  This vector takes the value fb * c - d
+    */
     void CTimesV1MinusV2(const Complex &fb, const Vector *c,
                            const Vector *d, int len)
     { cTimesV1MinusV2((IFloat *)&v, real(fb), imag(fb), (IFloat *)c, 
 	                (IFloat *)d, len); }
-       // len is the number of real numbers in the array.
-       // v = fb * c - d
 
 };
 
@@ -446,5 +615,6 @@ class Vector
 
 
 #endif
+
 
 CPS_END_NAMESPACE

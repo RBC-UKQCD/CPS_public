@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of Gnone class.
+
+  $Id: g_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: g_none.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: g_none.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,7 +31,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: g_none.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v $
 //  $State: Exp $
 //
@@ -41,8 +46,8 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/verbose.h>
+#include <util/lattice.h>
+#include <util/verbose.h>
 CPS_START_NAMESPACE
 
 
@@ -82,8 +87,13 @@ GclassType Gnone::Gclass(void){
 
 
 //------------------------------------------------------------------
-// GforceSite(Matrix& force, int *x, int mu):
-// It calculates the gauge force at site x and direction mu.
+/*!
+  In this case, of course, the force is zero.
+  \param force The computed force from the gauge action.
+  \param x the lattice site coordinates.
+  \param mu The direction mu.
+  \todo Should this not be be a virtual Lattice method?
+*/
 //------------------------------------------------------------------
 void Gnone::GforceSite(Matrix& force, int *x, int mu)
 {
@@ -116,13 +126,14 @@ Float Gnone::GhamiltonNode(void){
 }
 
 
-//------------------------------------------------------------------------------
-// void GactionGradient(Matrix &grad, int *x, int mu)
+//-------------------------------------------------------------------------//
+//void GactionGradient(Matrix &grad, int *x, int mu)
 //   Calculates the partial derivative of the gauge action
 //   w.r.t. the link U_mu(x).
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void Gnone::GactionGradient(Matrix &grad, int *x, int mu)
 {
   ERR.NotImplemented(cname, "GactionGradient(M&,i*,i)") ;
 }
+
 CPS_END_NAMESPACE

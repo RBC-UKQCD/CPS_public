@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/SpinMatrix.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: SpinMatrix.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/SpinMatrix.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: SpinMatrix.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +34,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: SpinMatrix.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/SpinMatrix.C,v $
 //  $State: Exp $
 //
@@ -51,7 +51,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<alg/spin_matrix.h>
+#include <alg/spin_matrix.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
@@ -139,5 +139,6 @@ Complex SpinMatrix::Tr() const
 { return ((Complex*)u)[0] + ((Complex*)u)[5] + 
 		((Complex*)u)[10] + ((Complex*)u)[15];
 }
+
 
 CPS_END_NAMESPACE

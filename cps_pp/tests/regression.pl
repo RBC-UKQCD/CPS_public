@@ -17,9 +17,9 @@ $trusted_version = "4_0_0";
 
 if( 'yes' eq 'yes' ) {
 # This makes it run autoconf version:
-  $machine = 'sparc-sun-solaris2.8';
-  $parallel = 'yes';
-  $compiler = 'mpCC';
+  $machine = 'i686-pc-linux-gnu';
+  $parallel = 'no';
+  $compiler = 'gcc';
   $executable = "main.gnu.out";
 } else {
 # This is right for the parallel QCDSP version:

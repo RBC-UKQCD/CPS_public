@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of class rfloat.
+
+  $Id: rfloat.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+ */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rfloat.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: rfloat.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rfloat.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: rfloat.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -52,7 +57,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: rfloat.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rfloat.h,v $
 //  $State: Exp $
 //
@@ -61,28 +66,37 @@ CPS_START_NAMESPACE
 //
 
 #ifndef INCLUDED_RFLOAT_H
-#define INCLUDED_RFLOAT_H
+#define INCLUDED_RFLOAT_H           //!< Prevent multiple inclusion
 
 class rfloat;
 CPS_END_NAMESPACE
-#include<util/data_types.h>
+#include <util/data_types.h>        
 CPS_START_NAMESPACE
+
+//! A floating point type.
+/*!
+  This appears to be a fancy class wrapper for the IFloat type.
+  Why, I do not know.
+*/
 
 class rfloat {
     IFloat x;
 public:
-    rfloat(IFloat a = 0);
-    rfloat(const rfloat& a);
+    rfloat(IFloat a = 0);       /*!< Initialised to 0.0 by default */ 
+    rfloat(const rfloat& a);    
     ~rfloat();
 
     rfloat& operator=(IFloat a)
     	{ x = a; return *this; }
 
+    //! Conversion from  rfloat to IFloat.
     operator IFloat() const { return x; }
-    // conversion. Even though the user-defined conversion is a bad
-    	// practice in many situation, it's OK here, because the
-	// behavior of rfloat is exactly the same as IFloat except
-	// the overloaded operators.
+    /*!<
+      Even though the user-defined conversion is a bad
+      practice in many situation, it's OK here, because the
+      behaviour of rfloat is exactly the same as IFloat except for
+      the overloaded operators.
+    */
 
     // Overloaded = operator to allow printf to print rfloats as IFloats:
     //IFloat operator=( const rfloat& a ) { return a.x; }
@@ -90,51 +104,65 @@ public:
     //---------------------------------------------------------
     //  overloaded operators
     //---------------------------------------------------------
-    	// binary plus
+    //! overloaded binary plus
     friend rfloat operator+(const rfloat&, const rfloat&);
+    //! overloaded binary plus
     friend rfloat operator+(double, const rfloat&);
+    //! overloaded binary plus
     friend rfloat operator+(const rfloat&, double);
 
-    	// binary minus
+    //! overloaded binary minus
     friend rfloat operator-(const rfloat&, const rfloat&);
+    //! overloaded binary minus
     friend rfloat operator-(double, const rfloat&);
+    //! overloaded binary minus
     friend rfloat operator-(const rfloat&, double);
 
-    	// binary multiply
+    //! overloaded binary multiply
     friend rfloat operator*(const rfloat&, const rfloat&);
+    //! overloaded binary multiply
     friend rfloat operator*(double, const rfloat&);
+    //! overloaded binary multiply    
     friend rfloat operator*(const rfloat&, double);
 
-    	// binary division
+    //! overloaded binary division
     friend rfloat operator/(const rfloat&, const rfloat&);
+    //! overloaded binary division
     friend rfloat operator/(double, const rfloat&);
+    //! overloaded binary division
     friend rfloat operator/(const rfloat&, double);
 
 
-    	// prefix unary minus
+    	//! overloaded prefix unary minus
     friend rfloat operator-(const rfloat&);
 
-
+    //! overloaded sum
     rfloat& operator+=(IFloat a);
+    //! overloaded sum
     rfloat& operator+=(const rfloat& a)
-    	{ *this += a.x;  return *this; }
+   	{ *this += a.x;  return *this; }
 
+    //! overloaded subtraction
     rfloat& operator-=(IFloat a);
+    //! overloaded subtraction
     rfloat& operator-=(const rfloat& a)
     	{ *this -= a.x;  return *this; }
 
+    //! overloaded multiplication
     rfloat& operator*=(IFloat a);
+    //! overloaded multiplication
     rfloat& operator*=(const rfloat& a)
     	{ *this *= a.x;  return *this; }
-
+    //! overloaded division
     rfloat& operator/=(IFloat a);
+    //! overloaded division
     rfloat& operator/=(const rfloat& a)
     	{ *this /= a.x;  return *this; }
 };
 
 
 //-----------------------------------------------------------------
-// Free freind functions
+// Free friend functions
 //-----------------------------------------------------------------
 rfloat operator-(const rfloat& a);
 
@@ -159,4 +187,5 @@ rfloat operator/(const rfloat& a, double b);
 
 
 #endif
+
 CPS_END_NAMESPACE

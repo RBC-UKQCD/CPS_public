@@ -1,7 +1,7 @@
 #include<config.h>
 CPS_START_NAMESPACE
 CPS_END_NAMESPACE
-#include<alg/w_all.h>
+#include <alg/w_all.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
@@ -9,18 +9,18 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/gjp.h>
-#include<util/error.h>
-#include<util/verbose.h>
+#include <util/gjp.h>              // GJP
+#include <util/error.h>            // ERR
+#include <util/verbose.h>          // VRB
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
+#include <util/lattice.h>          // Lattice::FixGaugePtr()
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<comms/glb.h>
-#include<comms/scu.h>
+#include <comms/glb.h>               // glb_sum(...)
+#include <comms/scu.h>              //getMinusData, getPlusData
 CPS_START_NAMESPACE
 //Warning: do not use math64.h, seems to use some rsgisters that
 //is in conflict with optimized code.
@@ -427,6 +427,7 @@ FermionVector::setSource(int C, int D, IFloat rs_fac, const IFloat *src_mat,
     }
   }
 }
+
 
 
 

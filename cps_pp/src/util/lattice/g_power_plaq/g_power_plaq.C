@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of GpowerPlaq class.
+
+  $Id: g_power_plaq.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_plaq/g_power_plaq.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: g_power_plaq.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_plaq/g_power_plaq.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: g_power_plaq.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: g_power_plaq.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_plaq/g_power_plaq.C,v $
 //  $State: Exp $
 //
@@ -58,19 +63,20 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/verbose.h>
-#include<util/vector.h>
-#include<util/gjp.h>
-#include<util/gw_hb.h>
-#include<comms/nga_reg.h>
-#include<comms/glb.h>
-#include<comms/scu.h>
-#include<comms/cbuf.h>
+#include <util/lattice.h>
+#include <util/verbose.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <util/gw_hb.h>
+#include <comms/nga_reg.h>
+#include <comms/glb.h>
+#include <comms/scu.h>
+#include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
+//! The number of floating point numbers in an SU(3) matrix.
 enum { MATRIX_SIZE = 18 };
 //------------------------------------------------------------------
 
@@ -139,8 +145,13 @@ const unsigned CBUF_MODE4 = 0xcca52112;
 
 
 //------------------------------------------------------------------
-// GforceSite(Matrix& force, int *x, int mu):
-// It calculates the gauge force at site x and direction mu.
+/*!
+  \param force The computed force from the gauge action.
+  \param x the lattice site coordinates.
+  \param mu The direction mu.
+  \todo Could this not be be a virtual Lattice method, if only so that I could
+  avoid rewriting this?
+*/
 //------------------------------------------------------------------
 void GpowerPlaq::GforceSite(Matrix& force, int *x, int mu)
 {
@@ -236,15 +247,19 @@ Float GpowerPlaq::GhamiltonNode(void){
 
 
 //------------------------------------------------------------------
-// Float PowerPlaq(int *x, int mu, int nu) const:
-// It calculates the power plaquette 
-// field at site x, mu, nu with mu < nu.
-// The power plaquette field is:
-//
-// pp(x,u,v) = { (1 - ReTr[U_p(x,u,v)]/3) / c }^k
-//
-// with c = GJP.PowerPlaqCutoff() and
-//      k = GJP.PowerPlaqExponent()
+/*!
+  The power plaquette is
+  \f[
+  ( (1 - 1/3 Re Tr [U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)])/c )^k
+\f]
+  where the real parameters \a c and \a k are those in the definition of
+  the power plaquette action.
+
+  \param x the coordinates of the lattice site at the start of the plaquette
+  \param mu The first plaquette direction.
+  \param nu The second plaquette direction; should be different from \a mu.
+  \return The computed power plaquette term.  
+*/
 //------------------------------------------------------------------
 Float GpowerPlaq::PowerPlaq(int *x, int mu, int nu) const
 {
@@ -262,9 +277,22 @@ Float GpowerPlaq::PowerPlaq(int *x, int mu, int nu) const
 
 
 //------------------------------------------------------------------
-// Float SumPowerPlaqNode(void) const:
-// It calculates the sum of the power plaquette  
-// field at each site of the node sublattice.
+/*!
+  At each site \a x and different directions \a mu and \a nu,
+  the power plaquette is
+
+\f[
+    ( (1 - 1/3 Re Tr [U_\mu(x) U_\nu(x+\nu)
+                      U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)])/c )^k
+\f]
+
+  where the real parameters \a c and \a k are those in the definition of
+  the power plaquette action. This computes the
+  sum of the power plaquette over all local lattice sites \a x and all six
+  \f$ \mu-\nu \f$ planes. 
+ 
+  \return The locally summed power plaquette term.
+*/
 //------------------------------------------------------------------
 Float GpowerPlaq::SumPowerPlaqNode(void) const
 {
@@ -294,9 +322,20 @@ Float GpowerPlaq::SumPowerPlaqNode(void) const
 
 
 //------------------------------------------------------------------
-// Float SumPowerPlaq(void) const:
-// It calculates the sum of the power plaquette 
-// field at each site of the whole lattice
+/*!
+  At each site \a x and different directions \a mu and \a nu,
+  the power plaquette is
+  \f[
+  \{ (1 - 1/3 Re Tr [U_\mu(x) U_\nu(x+\nu)
+                    U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)])/c  \}^k
+  \f]
+  where the real parameters \a c and \a k are those in the definition of
+  the power plaquette action. This computes the
+  sum of the power plaquette over all lattice sites \a x and all six
+  \f$ \mu-\nu \f$ planes. 
+ 
+  \return The globally summed power plaquette term.
+*/
 //------------------------------------------------------------------
 Float GpowerPlaq::SumPowerPlaq(void) const
 {
@@ -310,21 +349,25 @@ Float GpowerPlaq::SumPowerPlaq(void) const
 
 
 //------------------------------------------------------------------
-// void PowerStaple(Matrix& pstap, int *x, int mu):
-// It calculates the staple field at x, mu.
-// The staple field is:
-//
-// V_u(x) = \sum_v(!=u) {
-//      ps(x,u,v)   * [ U_v(x+u) U_u(x+v)~ U_v(x)~     ]
-//    + ps(x-v,u,v) * [ U_v(x+u-v)~ U_u(x-v)~ U_v(x-v) ] }
-//
-// where
-//
-// ps(x,u,v) = 
-//      beta + {k/c} * { (1 - ReTr[U_p(x,u,v)]/3) / c }^(k-1)
-//
-// with c = GJP.PowerPlaqCutoff() and
-//      k = GJP.PowerPlaqExponent()
+/*!
+  The staple is:
+\f[
+  \sum_{\nu \neq \mu} \{                                                 
+  ps(x,\mu,v)
+    [ U_\nu(x+\mu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x) ]
+  + ps(x-\nu,\mu,v)
+    [ U^\dagger_\nu(x+\mu-\nu) U^\dagger_\mu(x-\nu) U_\nu(x-\nu) ] \}
+\f]
+  where
+\f[
+ ps(x,\mu,\nu) = 
+ \beta + k/c ((1 - ReTr[U_p(x,\mu,\nu)]/3) / c )^{k-1}
+ \f]
+
+ where the real parameters \f$\beta\f$, \a c and \a k are those in the
+ definition of the power plaquette action and \f$ U_p \f$ is the standard
+ plaquette.
+*/
 //------------------------------------------------------------------
 void GpowerPlaq::PowerStaple(Matrix& pstap, int *x, int mu)
 {
@@ -521,4 +564,5 @@ void GpowerPlaq::AllStaple(Matrix & stap, const int *x, int mu)
 {
   ERR.NotImplemented(cname, "AllStaple(M&,i*,i)") ;
 }
+
 CPS_END_NAMESPACE

@@ -1,15 +1,27 @@
 #include<config.h>
 CPS_START_NAMESPACE
+//-------------------------------------------------------------------
+/*!\file
+  \brief  Definition of glb_sum_five routine.
+
+  $Id: glb_sum_five.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/glb_sum_five.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: glb_sum_five.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/glb_sum_five.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: glb_sum_five.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1  2003/06/22 13:34:47  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.6  2001/08/16 12:54:01  anj
 //  Some fixes follosin the float-> IFloat change, mostly of the (variable
 //  anme) IFloat_p -> float_p type.  A few fixes to ensure the test
@@ -48,7 +60,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: glb_sum_five.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/glb_sum_five.C,v $
 //  $State: Exp $
 //
@@ -67,7 +79,7 @@ CPS_END_NAMESPACE
 #include<comms/scu.h>
 #include<util/gjp.h>
 #include<comms/double64.h>
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 
 
@@ -75,6 +87,18 @@ static Double64 transmit_buf;
 static Double64 receive_buf;
 static Double64 gsum_buf;
 
+//----------------------------------------------------------------------
+/*!
+  This routine need only be used by domain-wall fermion code where
+  the 5th dimension is parallelised.
+  
+  \param float_p The number to be summed.
+  \post The number pointed to by \a float_p is summed over all nodes
+  and that sum is written back to \a float_p, which is identical on all nodes.
+
+  \ingroup comms
+*/
+//---------------------------------------------------------------------- 
 
 void glb_sum_five(Float * float_p)
 {

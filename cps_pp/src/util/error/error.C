@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file 
+  \brief   Definition of Error class methods.
+
+  $Id: error.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: error.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: error.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,32 +31,22 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: error.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// error.C
-//
-// Error is the base class. There are no derived classes.
-// The functions in this class print a message and exit 
-// with a specific value. 
-//
-//------------------------------------------------------------------
-//
-//------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>  //exit
-#include<util/error.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
 // Error messages
+// Why are these here?
 //------------------------------------------------------------------
 char *pointer_str = "Error in %s::%s :\n\tpointer %s is not initialized.\n";
 char *file_r_str = "Error in %s::%s :\n\tcan not open file %s to read.\n";
@@ -69,19 +64,23 @@ char *error_class_name = "Error";
 
 //------------------------------------------------------------------
 // Constructor
+/*!
+   The exit codes are initialised here.
+*/
 //------------------------------------------------------------------
 Error::Error() {
-cname = "Error";
 
-pointer_exit_value = -1;
-file_r_exit_value = -2;
-file_w_exit_value = -3;
-file_a_exit_value = -4;
-not_implemented_exit_value = -5; 
-hardware_exit_value = -6;
-general_exit_value = -7;
+    cname = "Error";
+    pointer_exit_value = -1;
+    file_r_exit_value = -2;
+    file_w_exit_value = -3;
+    file_a_exit_value = -4;
+    not_implemented_exit_value = -5;
+    hardware_exit_value = -6;
+    general_exit_value = -7;
 
 }
+
 
 
 //------------------------------------------------------------------
@@ -91,29 +90,50 @@ Error::~Error() {}
 
 
 //------------------------------------------------------------------
-// Pointer: Pointer not initialized.
+/*!
+  Prints the message
+  \n<tt>Error in <class name>::<function name> : </tt>\n
+  <tt>pointer <pointer name> is not initialized.</tt>\n
+  to \c stdout and to the file \c phys.error.
+  Exits with -1.
+
+  \param class_name The name of a class whose method is being entered.
+  \param func_name The name of a function or method.
+  \param ptr_name The variable name of the pointer.
+*/
 //------------------------------------------------------------------
-void Error::Pointer(char *class_name, char *func_name,
-		    char *ptr_name)    // pointer name
+void Error::Pointer(char *class_name, char *func_name, 
+		    char *ptr_name)
 {
   FILE *fp;
   char *error_func_name = "Pointer";
 
-  printf(pointer_str, class_name, func_name, ptr_name);
+  printf(pointer_str, class_name, func_name, ptr_name); 
 
-  if( (fp = fopen(error_file_name, "w")) == NULL ) {
-    printf(file_w_str, error_class_name, error_func_name, error_file_name);
-    exit(file_w_exit_value);
-  }
-  fprintf(fp, pointer_str, class_name, func_name, ptr_name);
-  fclose(fp);
+  if( (fp = fopen(error_file_name, "w")) == NULL ) { 
+    printf(file_w_str, error_class_name, error_func_name, error_file_name); 
+    exit(file_w_exit_value); 
+  } 
+  fprintf(fp, pointer_str, class_name, func_name, ptr_name); 
+  fclose(fp); 
   
-  exit(pointer_exit_value);
+  exit(pointer_exit_value); 
+  
 }
 
 
 //------------------------------------------------------------------
-// FileR: Can not open file to read.
+/*!
+  Prints the message
+  \n<tt>Error in <class name>::<function name> : </tt>\n
+  <tt>can not open file <file name> to read.</tt>\n
+  to \c stdout and to the file \c phys.error.
+  Exits with -2.
+
+  \param class_name The name of a class.
+  \param func_name The name of a function or method.
+  \param file_name The name of the file.
+*/
 //------------------------------------------------------------------
 void Error::FileR(char *class_name, char *func_name,
 		  char *file_name)   // file name
@@ -135,7 +155,17 @@ void Error::FileR(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// FileW: Can not open file to write.
+/*!
+  Prints the message
+  \n<tt>Error in <class name>::<function name> : </tt>\n
+  <tt>can not open file <file name> to write.</tt>\n
+  to \c stdout and to the file \c phys.error.
+  Exits with -3.
+
+  \param class_name The name of a class.
+  \param func_name The name of a function or method.
+  \param file_name The name of the file.
+*/
 //------------------------------------------------------------------
 void Error::FileW(char *class_name, char *func_name,
 		  char *file_name)   // file name
@@ -157,7 +187,17 @@ void Error::FileW(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// FileA: Can not open file to append.
+/*!
+  Prints the message
+  \n<tt>Error in <class name>::<function name> :</tt>\n
+  <tt>can not open file <file name> to append.</tt>\n
+  to \c stdout and to the file \c phys.error.
+  Exits with -4.
+
+  \param class_name The name of a class.
+  \param func_name The name of a function or method.
+  \param file_name The name of the file.
+*/
 //------------------------------------------------------------------
 void Error::FileA(char *class_name, char *func_name, 
 		  char *file_name)   // file name
@@ -179,7 +219,16 @@ void Error::FileA(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// NotImplemented: Not implemented.
+/*!
+  Prints the message
+  \n<tt>Error in <class name>::<function name> :</tt>\n
+  <tt>not implemented.</tt>\n
+  to \c stdout and to the file \c phys.error.
+  Exits with -5.
+
+  \param class_name The name of a class.
+  \param func_name The name of a function or method.
+*/
 //------------------------------------------------------------------
 void Error::NotImplemented(char *class_name, char *func_name) 
 {
@@ -200,7 +249,21 @@ void Error::NotImplemented(char *class_name, char *func_name)
 
 
 //------------------------------------------------------------------
-// NotImplemented: NotImplemented error (write your own message).
+/*!
+  Prints the message
+  \n<tt>Error in <class name>::<function name> :</tt>\n
+  <tt>not implemented.</tt>\n
+  <tt><message></tt>\n
+  to \c stdout and to the file \c phys.error.
+  Exits with -5.
+
+  \param class_name The name of a class.
+  \param func_name The name of a function or method.
+  \param format A format string for the message (<em>&aacute; la</em> \c printf)
+  \param ... Optional arguments to the format string.
+
+  \todo Why not use vprintf rather than vsprintf followed by printf?      
+*/
 //------------------------------------------------------------------
 void Error::NotImplemented(char *class_name, char *func_name,
 			   const char *format,  // format of message
@@ -229,7 +292,18 @@ void Error::NotImplemented(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// Hardware: Hardware error (write your own message).
+/*!
+  Prints the message
+  \n<tt>Hardware error in <class name>::<function name> :</tt>\n
+  <tt><message></tt>\n
+  to \c stdout and to the file \c phys.error.
+  Exits with -6.
+
+  \param class_name The name of a class.
+  \param func_name The name of a function or method.
+  \param format A format string for the message (<em>&aacute; la</em> \c printf)
+  \param ... Optional arguments to the format string.
+*/
 //------------------------------------------------------------------
 void Error::Hardware(char *class_name, char *func_name,
 		    const char *format,  // format of message
@@ -258,7 +332,18 @@ void Error::Hardware(char *class_name, char *func_name,
         
 
 //------------------------------------------------------------------
-// General: General error (write your own message).
+/*!
+  Prints the message
+  \n<tt>Error in <class name>::<function name> :</tt>\n
+  <tt><message></tt>\n
+  to \c stdout and to the file \c phys.error.
+  Exits with -7.
+
+  \param class_name The name of a class.
+  \param func_name The name of a function or method.
+  \param format A format string for the message (<em>&aacute; la</em> \c printf)
+  \param ... Optional arguments to the format string.
+*/
 //------------------------------------------------------------------
 void Error::General(char *class_name, char *func_name,
 		    const char *format,  // format of message
@@ -284,6 +369,7 @@ void Error::General(char *class_name, char *func_name,
   exit(general_exit_value);
 }
         
+
 
 
 CPS_END_NAMESPACE

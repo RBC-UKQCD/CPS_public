@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of Verbose class methods.
+
+  $Id: verbose.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: verbose.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: verbose.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -47,26 +52,18 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// verbose.C
-//
-// Verbose is the base class
-//
-//------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
-#include<config.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <util/verbose.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 // GRF: Some compilers don't have this defined in their header files,
@@ -79,6 +76,9 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
+/*!
+  The constructor sets the verbosity level to zero (no messages) by default.
+*/
 Verbose::Verbose() {
 cname = "Verbose";
 
@@ -107,8 +107,9 @@ Verbose::~Verbose() {}
 
 
 //------------------------------------------------------------------
-// Level(): 
-// Returns the value of level.
+/*!
+  \return The value of the verbosity level.
+*/
 //------------------------------------------------------------------
 int Verbose::Level()
 {
@@ -117,9 +118,10 @@ int Verbose::Level()
 
 
 //------------------------------------------------------------------
-// Level(int): 
-// Sets the value of level and activates the appropriate 
-// function level active flags.
+/*!
+  Depending on the level chosen, the categories of message are enabled.
+  \param value The value to which the verbosity level is set.
+ */
 //------------------------------------------------------------------
 void Verbose::Level(int value)
 {
@@ -144,14 +146,14 @@ void Verbose::Level(int value)
 
 
 //------------------------------------------------------------------
-// int Active(VerboseLevelType level_value) :
-// It returns 1 if level_value < level.
-// If level is negative it rerturns 1 if
-// level_value matches an entry in level as expanded
-// in base VRB_BASE (for example if VRB_BASE = 10 then
-// if level = -142 then it returns 1 if level_value is
-// equal to 1 or to 4 or to 2).
-// Otherwise it returns 0.
+/*!
+  Based on the verbosity level, decides whether a particular category
+  is enabled.
+
+  Why is this method public?
+  \param level_value The message category.
+  \return 1 if this message category should be enabled, 0 otherwise.
+*/
 //------------------------------------------------------------------
 int Verbose::Active(VerboseLevelType level_value)
 {
@@ -175,10 +177,17 @@ int Verbose::Active(VerboseLevelType level_value)
 
 
 //------------------------------------------------------------------
-// Func: 
-// Use when enetring a function for flow control purposes.
-// If func_clock_active = 1 it also prints Clock = value
-// on the same line.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : Entered</tt>\n
+  is printed to \c stdout.  
+  If the clock output on function entry and exit message category is enabled,
+  the message
+  \n<tt><class name>::<function name> : Entered  Clock (<clock frequency> MHz) = <clock></tt>\n
+  is printed to \c stdout.
+  \param class_name The name of the class whose method is being entered.
+  \param func_name The name of the function/method being entered.
+*/
 //------------------------------------------------------------------
 void Verbose::Func(char *class_name, char *func_name)
 {
@@ -200,10 +209,17 @@ void Verbose::Func(char *class_name, char *func_name)
 
 
 //------------------------------------------------------------------
-// FuncEnd: 
-// Use when exiting a function for flow control purposes.
-// If func_clock_active = 1 it also prints Clock = value
-// on the same line.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : Exiting</tt>\n
+  is printed to \c stdout.  
+  If the clock output on function entry and exit message category is enabled,
+  the message
+  \n<tt><class name>::<function name> : Exiting  Clock (<clock frequency> MHz) = <clock></tt>\n
+  is printed to \c stdout.
+  \param class_name The name of the class whose method is being entered.
+  \param func_name The name of the function/method being entered.
+*/
 //------------------------------------------------------------------
 void Verbose::FuncEnd(char *class_name, char *func_name)
 {
@@ -225,8 +241,17 @@ void Verbose::FuncEnd(char *class_name, char *func_name)
 
 
 //------------------------------------------------------------------
-// Pmalloc: 
-// Use when initializing a pointer with pmalloc.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : pmalloc initialized pointer</tt>\n
+  <tt>        <pointer name> to <pointer address> with size <size></tt>\n  
+  is printed to \c stdout.  
+  \param class_name The name of a class
+  \param func_name The name of a function or method.
+  \param ptr_name The variable name of the pointer
+  \param ptr The pointer itself.
+  \param size The amount of memory (in bytes) allocated.
+*/
 //------------------------------------------------------------------
 void Verbose::Pmalloc(char *class_name, char *func_name,
 		      char *ptr_name,    // pointer name
@@ -241,8 +266,16 @@ void Verbose::Pmalloc(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// Pfree: 
-// Use before freeing a pointer with pfree.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : pfree will free pointer</tt>\n
+  <tt>        <pointer name> = <pointer address></tt>\n  
+  is printed to \c stdout.  
+  \param class_name The name of a class.
+  \param func_name The name of a function or method.
+  \param ptr_name The variable name of the pointer.
+  \param ptr The pointer itself.
+ */
 //------------------------------------------------------------------
 void Verbose::Pfree(char *class_name, char *func_name,
 		    char *ptr_name,    // pointer name
@@ -256,8 +289,13 @@ void Verbose::Pfree(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// Pclear: 
-// Use after calling pclear().
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : pclear called</tt>\n
+  is printed to \c stdout.  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+ */
 //------------------------------------------------------------------
 void Verbose::Pclear(char *class_name, char *func_name) 
 {
@@ -268,8 +306,17 @@ void Verbose::Pclear(char *class_name, char *func_name)
 
 
 //------------------------------------------------------------------
-// Smalloc: 
-// Use when initializing a pointer with smalloc.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : smalloc initialized pointer</tt>\n
+  <tt>        <pointer name> to <pointer address> with size <size></tt>\n  
+  is printed to \c stdout.  
+  \param class_name The name of a class
+  \param func_name The name of a function or method.
+  \param ptr_name The variable name of the pointer
+  \param ptr The pointer itself.
+  \param size The amount of memory (in bytes) allocated.
+*/
 //------------------------------------------------------------------
 void Verbose::Smalloc(char *class_name, char *func_name,
 		      char *ptr_name,    // pointer name
@@ -284,8 +331,16 @@ void Verbose::Smalloc(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// Sfree: 
-// Use before freeing a pointer with sfree.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : sfree will free pointer</tt>\n
+  <tt>        <pointer name> = <pointer address></tt>\n  
+  is printed to \c stdout.  
+  \param class_name The name of a class.
+  \param func_name The name of a function or method.
+  \param ptr_name The variable name of the pointer.
+  \param ptr The pointer itself.
+ */
 //------------------------------------------------------------------
 void Verbose::Sfree(char *class_name, char *func_name,
 		    char *ptr_name,    // pointer name
@@ -299,8 +354,13 @@ void Verbose::Sfree(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// Sclear: 
-// Use after calling sclear().
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : sclear called</tt>\n
+  is printed to \c stdout.  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+ */
 //------------------------------------------------------------------
 void Verbose::Sclear(char *class_name, char *func_name) 
 {
@@ -311,10 +371,22 @@ void Verbose::Sclear(char *class_name, char *func_name)
 
 
 //------------------------------------------------------------------
-// Flow:
-// Use to print info in order follow the flow 
-// inside a function. Usage is as in printf.
-// If flow_clock_active = 1 it also prints Clock = value
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> :</tt>\n
+  <tt><message></tt>\n  
+  is printed to \c stdout.
+  If the clock output on function entry and exit message category is enabled,
+  the message
+  \n<tt><class name>::<function name> : Clock (<clock frequency> MHz) = <clock></tt>\n
+  <tt><message></tt>\n
+  is printed to \c stdout.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+  \param format A format string for the message (<em>&aacute; la</em> \c printf)
+  \param ... Optional arguments to the format string.
+ */
 //------------------------------------------------------------------
 void Verbose::Flow(char *class_name, char *func_name,
 		   const char *format,  // format
@@ -342,9 +414,17 @@ void Verbose::Flow(char *class_name, char *func_name,
         
 
 //------------------------------------------------------------------
-// Input:
-// Use inside a function to print any relevant input 
-// values. Usage is as in printf.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> :</tt>\n
+  <tt><message></tt>\n
+  is printed to \c stdout.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+  \param format A format string for the message (<em>&aacute; la</em> \c printf)
+  \param ... Optional arguments to the format string.
+ */
 //------------------------------------------------------------------
 void Verbose::Input(char *class_name, char *func_name, 
 		    const char *format,  // format
@@ -361,8 +441,17 @@ void Verbose::Input(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// Result:
-// Use to print any results. Usage is as in printf.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> :</tt>\n
+  <tt><message></tt>\n
+  is printed to \c stdout.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+  \param format A format string for the message (<em>&aacute; la</em> \c printf)
+  \param ... Optional arguments to the format string.
+ */
 //------------------------------------------------------------------
 void Verbose::Result(char *class_name, char *func_name,
 		      const char *format,  // format
@@ -379,9 +468,17 @@ void Verbose::Result(char *class_name, char *func_name,
 
         
 //------------------------------------------------------------------
-// Warn:
-// Use to print any warnings. Usage is as 
-// in printf. It appends to the output WARNING.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt>WARNING <class name>::<function name> :</tt>\n
+  <tt><message></tt>\n
+  is printed to \c stdout and the file \c phys.warn.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+  \param format A format string for the message (<em>&aacute; la</em> \c printf)
+  \param ... Optional arguments to the format string.
+ */
 //------------------------------------------------------------------
 void Verbose::Warn(char *class_name, char *func_name,
 		      const char *format,  // format
@@ -407,7 +504,17 @@ void Verbose::Warn(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// Use to print debugging info. Usage is as in printf.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> :</tt>\n
+  <tt><message></tt>\n
+  is printed to \c stdout.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+  \param format A format string for the message (<em>&aacute; la</em> \c printf)
+  \param ... Optional arguments to the format string.
+*/
 //------------------------------------------------------------------
 void Verbose::Debug(char *class_name, char *func_name,
 		    const char *format,  // format
@@ -424,7 +531,14 @@ void Verbose::Debug(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// Use to print debugging info. Usage is as in printf.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><message></tt>\n
+  is printed to \c stdout.
+  
+  \param format A format string for the message (<em>&aacute; la</em> \c printf) 
+  \param ... Optional arguments to the format string.
+*/
 //------------------------------------------------------------------
 void Verbose::Debug(const char *format,  // format
 		               ...)      // argument list   
@@ -440,8 +554,14 @@ void Verbose::Debug(const char *format,  // format
 
 
 //------------------------------------------------------------------
-// Use to turn on the LED and print 
-// class_name::func_name : LED on
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : LED on</tt>\n
+  is printed to \c stdout. The LED is turned on.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+*/
 //------------------------------------------------------------------
 void Verbose::LedOn(char *class_name, char *func_name)
 {
@@ -455,8 +575,14 @@ void Verbose::LedOn(char *class_name, char *func_name)
 
 
 //------------------------------------------------------------------
-// Use to turn off the LED and print 
-// class_name::func_name : LED off
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : LED off</tt>\n
+  is printed to \c stdout. The LED is turned off.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+*/
 //------------------------------------------------------------------
 void Verbose::LedOff(char *class_name, char *func_name)
 {
@@ -470,10 +596,17 @@ void Verbose::LedOff(char *class_name, char *func_name)
 
 
 //------------------------------------------------------------------
-// Use to flash the LED and print 
-// class_name::func_name : LED flashing
-// "number" number of times.
-// It leaves the LED on.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : LED flashing</tt>\n
+  is printed to \c stdout. The LED is flashed some number of times and left
+  turned on.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+  \param number The number of time to flash.
+*/
+
 //------------------------------------------------------------------
 void Verbose::LedFlash(char *class_name, char *func_name, int number)
 {
@@ -499,9 +632,17 @@ void Verbose::LedFlash(char *class_name, char *func_name, int number)
 
 
 //------------------------------------------------------------------
-// Use to print the clock value. It prints
-// class_name::func_name : Clock = value
-// The rest is as in printf.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : Clock (<clock frequency> MHz) = <clock></tt>\n
+  <tt><message></tt>\n
+  is printed to \c stdout.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+  \param format A format string for the message (<em>&aacute; la</em> \c printf)
+  \param ... Optional arguments to the format string.
+ */
 //------------------------------------------------------------------
 void Verbose::Clock(char *class_name, char *func_name,
 		    const char *format,  // format
@@ -524,8 +665,14 @@ void Verbose::Clock(char *class_name, char *func_name,
 
 
 //------------------------------------------------------------------
-// Use to print the clock value. It prints
-// class_name::func_name : Clock = value
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> : Clock (<clock frequency> MHz) = <clock></tt>\n
+  is printed to \c stdout.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+ */
 //------------------------------------------------------------------
 void Verbose::Clock(char *class_name, char *func_name)
 {
@@ -543,9 +690,17 @@ void Verbose::Clock(char *class_name, char *func_name)
 
 
 //------------------------------------------------------------------
-// RNGSeed:
-// Use to print the RNG seeding information.
-// Usage is as in printf.
+/*!
+  If the verbosity level enables this message category, the message
+  \n<tt><class name>::<function name> :</tt>\n
+  <tt><message></tt>\n
+  is printed to \c stdout.
+  
+  \param class_name The name of a class
+  \param func_name The name of a function or method
+  \param format A format string for the message (<em>&aacute; la</em> \c printf)
+  \param ... Optional arguments to the format string.
+ */
 //------------------------------------------------------------------
 void Verbose::RNGSeed(char *class_name, char *func_name,
 		   const char *format,  // format
@@ -561,6 +716,7 @@ void Verbose::RNGSeed(char *class_name, char *func_name,
   }
 }
         
+
 
 
 

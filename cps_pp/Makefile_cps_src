@@ -1,5 +1,5 @@
 #
-#   source from specifiv build options
+#   source from specific build options
 #
 
 cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\

@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: QPropW.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: QPropW.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -73,7 +73,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: QPropW.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v $
 //  $State: Exp $
 //
@@ -91,22 +91,21 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <stdlib.h>     // exit()
 #include <stdio.h>
-#include<config.h>
-#include<alg/qpropw.h>
-#include<alg/common_arg.h>
+#include <alg/qpropw.h>
+#include <alg/common_arg.h>
 CPS_START_NAMESPACE
 #ifdef PARALLEL
 CPS_END_NAMESPACE
-#include<comms/glb.h>
+#include <comms/glb.h>
 #include <sysfunc.h>
 CPS_START_NAMESPACE
 #endif
 
 
 CPS_END_NAMESPACE
-#include<util/dirac_op.h>
-#include<util/dwf.h>
-#include<util/random.h>
+#include <util/dirac_op.h>
+#include <util/dwf.h>
+#include <util/random.h>
 CPS_START_NAMESPACE
 
 QPropW::QPropW(void)
@@ -1153,6 +1152,7 @@ void FermionVectorTp::GaugeFixSink(Lattice &lat, int dir)
     }
   }
 }
+
 
 
 

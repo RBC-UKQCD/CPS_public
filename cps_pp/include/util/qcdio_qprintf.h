@@ -1,11 +1,15 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
-/*! The QCD I/O Interface:
+/*!\file
+  \brief Basic IO function declarations,
 
-  $Id: qcdio_qprintf.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+  Separated from the rest of qcdio.h to avoid troublesome
+  header file interdependancies.
 
-  A.N.Jackson: ajackson@epcc.ed.ac.uk                       */
+  $Id: qcdio_qprintf.h,v 1.2 2003-07-24 16:53:53 zs Exp $  
+*/
+/*  A.N.Jackson: ajackson@epcc.ed.ac.uk                       */
 /*----------------------------------------------------------*/
 
 #ifndef INCLUDED_QCDIO_QPRINTF_H_
@@ -13,20 +17,13 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdio.h>
-#include<config.h>
-#include<util/data_types.h>
+#include <util/data_types.h>
 CPS_START_NAMESPACE
 
 
 #ifdef PARALLEL
-#define printf qprintf
-#define fprintf qfprintf
-
-  /* ------------------------------------------------------
-  	Basic standard I/O:
-    Separated from the rest of qcdio.h to avoid troublesome
-    header file interdependancies.
-    ------------------------------------------------------ */
+#define printf qprintf           //!<Parallel reimplementation of printf
+#define fprintf qfprintf         //!<Parallel reimplementation of fprintf
 
   //! Reimplementation of printf that prints on only the zeroth node
   int qprintf( const char *format, ... );
@@ -46,4 +43,5 @@ CPS_START_NAMESPACE
 #endif
 
 #endif
+
 CPS_END_NAMESPACE

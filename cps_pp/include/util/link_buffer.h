@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of the LinkBuffer class.
+
+  $Id $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/link_buffer.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: link_buffer.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/link_buffer.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: link_buffer.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,16 +31,16 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: link_buffer.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/link_buffer.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 #ifndef LINK_BUFFER_H
-#define LINK_BUFFER_H
+#define LINK_BUFFER_H                    //!< Prevent multiple inclusion.
 
 CPS_END_NAMESPACE
-#include<util/list.h>
+#include <util/list.h>
 CPS_START_NAMESPACE
 
 class Matrix;
@@ -44,7 +49,7 @@ struct LinkEntry;
 
 //-----------------------------------------------------------------
 //
-// LinkBuffer is a class that buffers the offnode links. 
+//! LinkBuffer is a class that buffers the off-node links. 
 // 
 //-----------------------------------------------------------------
 
@@ -59,9 +64,9 @@ class LinkBuffer{
     //the size of the buffer, used for debuging 
 
   list_head * hash_tab; 
-  //the hash table is indexed by the local coordiates and 
+  //the hash table is indexed by the local coordinates and 
   //the direction of the link. in this way, it would be easy to remove
-  //all links with the same local coordinates and orientaion. 
+  //all links with the same local coordinates and orientation. 
   //this is important because when a local link is changed, the same
   //links on other nodes are most likely also changed, if we have the 
   //buffered version of thoses links we should remove them from the buffer. 
@@ -88,14 +93,22 @@ class LinkBuffer{
   // int check_lists();
 
  public: 
+
+//! Allocate the link buffer.  
+/*!
+  Allocates a buffer for \a size links on lattice \a lat
+  \param lat The lattice on which the links live.
+  \param size The size of this buffer (how many links it can contain).
+*/
   LinkBuffer(Lattice & lat, int size); 
+	
   ~LinkBuffer();
 
   //----------------------------------------------------------------
   // GetBufferedLink looks into the buffer to search for the a given 
   // link if it's not there, it gets the link from the neighbours 
   //----------------------------------------------------------------
-
+  //! Gets a link from the buffer.
   Matrix * GetBufferedLink(const int *x, int mu);
   
   //----------------------------------------------------------------
@@ -106,11 +119,15 @@ class LinkBuffer{
   // local coordiates (in its local coordinates) get removed from 
   // the buffer  
   //----------------------------------------------------------------
+  //! Removes links from the buffer.
   void ClearBufferedLink(const int *x, int mu);
+
+  //! Removes all links from the buffer.
   void ClearAll();
 
 };
 
 #endif
+
 
 CPS_END_NAMESPACE

@@ -1,28 +1,20 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of GlobalJobParameter class methods.
+
+  $Id: gjp.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: gjp.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: gjp.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.8  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.7  2001/08/01 12:11:29  anj
 //  Minor alteration to allow the serial RNG seed to be set from config.h,
 //  via a #define. Anj.
@@ -66,7 +58,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -96,14 +88,13 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <stdlib.h>
 #include <stdio.h>
-#include<config.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<alg/do_arg.h>
-#include<mem/p2v.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/vector.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <alg/do_arg.h>
+#include <mem/p2v.h>
 CPS_START_NAMESPACE
 
 #ifdef PARALLEL
@@ -169,11 +160,13 @@ GlobalJobParameter::~GlobalJobParameter() {
   VRB.Func(cname,fname);
 }
 
+//------------------------------------------------------------------
+/*!
+  Initializes all global variables using the DoArg structure, and performs
+  checks to make sure the values are suitable.
+  \param rda Structure containing the initial values of the global variables
+*/
 
-//------------------------------------------------------------------
-// Initializes all varables using the DoArg structure.
-// Also perform any other general initializations.
-//------------------------------------------------------------------
 void GlobalJobParameter::Initialize(const DoArg& rda) {
   char *fname = "Initialize()";
   VRB.Func(cname,fname);
@@ -530,7 +523,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   //----------------------------------------------------------------
   verbose_level = rda.verbose_level;
 
- 
+
   //================================================================
   // Other initializations
   //================================================================
@@ -544,9 +537,12 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
 
 
 //------------------------------------------------------------------
-// Sets the type of boundary conditions along x for the whole 
-// lattice and updates the x_node_bc.
-//------------------------------------------------------------------
+/*!
+  Sets the type of global lattice boundary condition in the X direction
+  and also adjusts the local X direction boundary conditions to match.
+  \param bc The type of boundary condition.
+*/
+
 void GlobalJobParameter::Xbc(BndCndType bc){
 
   // Set the x boundary condition for the whole lattice
@@ -562,9 +558,12 @@ void GlobalJobParameter::Xbc(BndCndType bc){
 
 
 //------------------------------------------------------------------
-// Sets the type of boundary conditions along y for the whole 
-// lattice and updates the y_node_bc.
-//------------------------------------------------------------------
+/*!
+  Sets the type of global lattice boundary condition in the Y direction
+  and also adjusts the local Y direction boundary conditions to match.
+  \param bc The type of boundary condition.
+*/
+
 void GlobalJobParameter::Ybc(BndCndType bc){
 
   // Set the y boundary condition for the whole lattice
@@ -580,9 +579,12 @@ void GlobalJobParameter::Ybc(BndCndType bc){
 
 
 //------------------------------------------------------------------
-// Sets the type of boundary conditions along z for the whole 
-// lattice and updates the z_node_bc.
-//------------------------------------------------------------------
+/*!
+  Sets the type of global lattice boundary condition in the Z direction
+  and also adjusts the local Z direction boundary conditions to match.
+  \param bc The type of boundary condition.
+*/
+
 void GlobalJobParameter::Zbc(BndCndType bc){
 
   // Set the z boundary condition for the whole lattice
@@ -598,9 +600,12 @@ void GlobalJobParameter::Zbc(BndCndType bc){
 
 
 //------------------------------------------------------------------
-// Sets the type of boundary conditions along t for the whole 
-// lattice and updates the t_node_bc.
-//------------------------------------------------------------------
+/*!
+  Sets the type of global lattice boundary condition in the T direction
+  and also adjusts the local T direction boundary conditions to match.
+  \param bc The type of boundary condition.
+*/
+
 void GlobalJobParameter::Tbc(BndCndType bc){
 
   // Set the t boundary condition for the whole lattice
@@ -613,6 +618,7 @@ void GlobalJobParameter::Tbc(BndCndType bc){
   if(t_bc == BND_CND_APRD) 
     t_node_bc = ( t_node_coor == (t_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
 }
+
 
 
 

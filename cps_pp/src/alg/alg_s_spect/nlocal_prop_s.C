@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/nlocal_prop_s.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: nlocal_prop_s.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/nlocal_prop_s.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: nlocal_prop_s.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -45,31 +45,30 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: nlocal_prop_s.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/nlocal_prop_s.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 // nlocal_prop_s.C
 CPS_END_NAMESPACE
-#include<config.h>
-#include<alg/nlocal_prop_s.h>
-#include<alg/quark_prop_s.h>
-#include<util/gjp.h>
-#include<util/smalloc.h>
+#include <alg/nlocal_prop_s.h>
+#include <alg/quark_prop_s.h>
+#include <util/gjp.h>
+#include <util/smalloc.h>
 CPS_START_NAMESPACE
 		// smalloc()
 CPS_END_NAMESPACE
-#include<comms/scu.h>
+#include <comms/scu.h>	
 CPS_START_NAMESPACE
 		// getMinusData(), getMinus2Data(), getMinus3Data()
 CPS_END_NAMESPACE
-#include<alg/myenum.h>
+#include <alg/myenum.h>
 CPS_START_NAMESPACE
 
 #ifdef PARALLEL
 CPS_END_NAMESPACE
-#include<comms/sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 #endif
 
@@ -400,5 +399,6 @@ NLocalPropS::~NLocalPropS()
     }
   }
 }
+
 
 CPS_END_NAMESPACE

@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief  Routine used internally in the DiracOpWilson class.
+
+  $Id: wilson_mdag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_mdag.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: wilson_mdag.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_mdag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: wilson_mdag.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,45 +39,36 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: wilson_mdag.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_mdag.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-/***************************************************************************/
-/*                                                                         */
-/* wilson_mdag: It calculates chi = M^dag * psi, where M is the            */
-/* Wilson fermion matrix. M is a function of the gauge fields u.           */
-/* Kappa is the usual Wilson parameter and lx,ly,lz,lt is the lattice      */
-/* size.                                                                   */
-/*                                                                         */
-/* This routine is to be used with scalar machines.                        */
-/*                                                                         */
-/* WARNING:                                                                 */
-/*                                                                          */
-/* This set of routines will work only if the node sublattices have         */
-/* even number of sites in each direction.                                  */
-/*                                                                          */
-/***************************************************************************/
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
-#include<util/wilson.h>
+#include <util/data_types.h>
+#include <util/wilson.h>
 CPS_START_NAMESPACE
 
 
+//! Access to the elements of the \e SU(3) matrix
+/*!
+  Gets the element of the \e SU(3) matrix \e u with row \e row,
+  column \e col and complex component \e d
+*/
 #define U(r,row,col,d,n,cb) *(u+(r+2*(row+3*(col+3*(d+4*(n+vol[0]*(cb)))))))
+//! Access to the elements of a spinor vector.
+/*!
+  Gets the element of the spinor \e psi with spin \e s,
+  colour \e c and complex component \e r
+*/
 #define PSI(r,c,s,n)     *(psi+(r+2*(c+3*(s+4*(n)))))
+//! As above, but the vector is called chi
 #define CHI(r,c,s,n)     *(chi+(r+2*(c+3*(s+4*(n)))))
 #define TMP1(r,c,s,n)     *(tmp1+(r+2*(c+3*(s+4*(n)))))
 
-/*--------------------------------------------------------------------------*/
-/* Function declarations                                                    */
-/*--------------------------------------------------------------------------*/
 
-/*--------------------------------------------------------------------------*/
-/* wilson_mdag:                                                             */
-/*--------------------------------------------------------------------------*/
+
 void wilson_mdag(IFloat *chi_f, 
 		 IFloat *u_f, 
 		 IFloat *psi_f, 
@@ -118,6 +114,7 @@ void wilson_mdag(IFloat *chi_f,
 
 
 }
+
 
 
 

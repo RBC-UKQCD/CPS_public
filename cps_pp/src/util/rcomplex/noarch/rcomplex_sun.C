@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of Rcomplex methods,
+
+  $Id: rcomplex_sun.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/rcomplex/noarch/rcomplex_sun.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: rcomplex_sun.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/rcomplex/noarch/rcomplex_sun.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: rcomplex_sun.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,13 +39,13 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: rcomplex_sun.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/rcomplex/noarch/rcomplex_sun.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 CPS_END_NAMESPACE
-#include<util/rcomplex.h>
+#include <util/rcomplex.h>
 CPS_START_NAMESPACE
 
 IFloat Rcomplex::norm() const
@@ -102,5 +107,6 @@ Rcomplex conj(const Rcomplex& c)
 
 Rcomplex operator - (const Rcomplex& c)
 {  return Rcomplex(-c.re, -c.im); }
+
 
 CPS_END_NAMESPACE

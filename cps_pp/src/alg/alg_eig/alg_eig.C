@@ -1,28 +1,21 @@
 #include<config.h>
 CPS_START_NAMESPACE
+//------------------------------------------------------------------
+/*!\file
+  \brief Methods of the AlgEig class.
+  
+  $Id: alg_eig.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: alg_eig.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: alg_eig.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.5  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.4  2001/08/16 10:49:38  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -47,39 +40,35 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// alg_eig.C
-//
-// AlgEig is derived from Alg and is relevant to the 
-// Ritz eigenvector finder. The type of fermion is
-// determined by the argument to the constructor.
-//
-//------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
 #include <stdio.h>
 #include <math.h>
-#include<alg/alg_eig.h>
-#include<alg/common_arg.h>
-#include<alg/eig_arg.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <alg/alg_eig.h>
+#include <alg/common_arg.h>
+#include <alg/eig_arg.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/verbose.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
 // Constructor 
+/*!
+  \param latt The lattice on which to compute the condensate.
+  \param c_arg The common argument structure for all algorithms.
+  \param arg The algorithm parameters.
+ */
 //------------------------------------------------------------------
 AlgEig::AlgEig(Lattice& latt, 
 	       CommonArg *c_arg,
@@ -114,6 +103,7 @@ AlgEig::AlgEig(Lattice& latt,
     ERR.General(cname,fname,"RitzMatOper %d not implemented",
 		alg_eig_arg->RitzMatOper);
   }
+
 
   // Set the node size of the full (non-checkerboarded) fermion field
   // NOTE: at this point we must know on what lattice size the operator 
@@ -201,7 +191,11 @@ AlgEig::~AlgEig() {
 
 
 //------------------------------------------------------------------
-//
+//! Performs the computation.
+/*!
+  \post The results are written to the file specified in the common_arg
+  structure.
+*/
 //------------------------------------------------------------------
 void AlgEig::run()
 {
@@ -245,7 +239,7 @@ void AlgEig::run()
       ERR.General(cname,fname,"Invalid direction\n");
     }
 
-    hsum = (Float **) smalloc(N_eig * sizeof(Float));
+    hsum = (Float **) smalloc(N_eig * sizeof(Float)); // surely Float* ?
     if(hsum == 0)
       ERR.Pointer(cname,fname, "hsum");
     VRB.Smalloc(cname,fname, "hsum", hsum, N_eig * sizeof(Float));
@@ -314,4 +308,5 @@ void AlgEig::run()
   }
 
 }
+
 CPS_END_NAMESPACE

@@ -5,10 +5,10 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
-#include<alg/w_spect_arg.h>
-#include<alg/w_ginfo.h>
-#include<alg/w_momenta.h>
+#include <util/data_types.h>        // Float, Complex
+#include <alg/w_spect_arg.h>        // SourceKind
+#include <alg/w_ginfo.h>
+#include <alg/w_momenta.h>
 CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
@@ -110,6 +110,7 @@ public:
 };
 
 #endif // ! _INCLUDED_W_MESONS
+
 
 
 

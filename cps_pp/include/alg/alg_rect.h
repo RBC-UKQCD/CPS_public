@@ -15,12 +15,12 @@ CPS_START_NAMESPACE
 #define INCLUDED_ALG_RECT_H
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/pmalloc.h>
-#include<alg/alg_base.h>
-#include<alg/common_arg.h>
-#include<alg/no_arg.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/pmalloc.h>
+#include <alg/alg_base.h>
+#include <alg/common_arg.h>
+#include <alg/no_arg.h>
 CPS_START_NAMESPACE
 
 class AlgRect : public Alg
@@ -43,4 +43,5 @@ class AlgRect : public Alg
 };
 
 #endif
+
 CPS_END_NAMESPACE

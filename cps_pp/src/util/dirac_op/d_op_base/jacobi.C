@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief  Definition of DiracOp class Ritz eigensolver methods.
+
+  $Id: jacobi.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/jacobi.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: jacobi.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/jacobi.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: jacobi.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: jacobi.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/jacobi.C,v $
 //  $State: Exp $
 //
@@ -54,13 +59,13 @@ CPS_START_NAMESPACE
 /*  N_Count	Number of Jacobi iters		(Write) */
 
 CPS_END_NAMESPACE
-#include<util/dirac_op.h>
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/gjp.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <util/dirac_op.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <util/verbose.h>
+#include <util/error.h>
 #include <math.h>
 CPS_START_NAMESPACE
 
@@ -284,4 +289,5 @@ int DiracOp::Jacobi(Vector **psi, int N_eig, Float *lambda, Complex *off_diag,
   ERR.General(cname,fname, "too many Jacobi iterations");
   return n_count;
 }
+
 CPS_END_NAMESPACE

@@ -1,15 +1,27 @@
 #include<config.h>
 CPS_START_NAMESPACE
+//-------------------------------------------------------------------
+/*!\file
+  \brief  Definition of glb_sum_multi_dir routine.
+
+  $Id: glb_sum_multi_dir.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/glb_sum_multi_dir.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: glb_sum_multi_dir.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/glb_sum_multi_dir.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: glb_sum_multi_dir.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1  2003/06/22 13:34:47  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.6  2001/08/16 12:54:02  anj
 //  Some fixes follosin the float-> IFloat change, mostly of the (variable
 //  anme) IFloat_p -> float_p type.  A few fixes to ensure the test
@@ -48,7 +60,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: glb_sum_multi_dir.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/glb_sum_multi_dir.C,v $
 //  $State: Exp $
 //
@@ -64,7 +76,7 @@ CPS_END_NAMESPACE
 #include<comms/scu.h>
 #include<util/gjp.h>
 #include<comms/double64.h>
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 
 #define MAX_NUM_WORDS 40  //set to larger than size of double precision 3x3 matrix
@@ -73,6 +85,21 @@ static Double64 receive_buf[MAX_NUM_WORDS];
 static Double64 gsum_buf[MAX_NUM_WORDS];
 
 
+//----------------------------------------------------------------------
+/*!
+  \param float_p The number to be summed.
+  \param dir The direction in which to sum; one of {0, 1, 2, 3, 4},
+  corresponding to {x, y, z, t, s}.
+  \param len The number of floating point numbers in the vector.
+  \post The vector pointed to by \a float_p is summed over all nodes along the
+  \a dir direction, \e i.e. over each strip of nodes where the grid
+  coordinates in all other directions are constant.
+  That sum vector is written back to \a float_p, which is identical on all
+  nodes in this strip.
+
+  \ingroup comms
+*/
+//---------------------------------------------------------------------- 
 void glb_sum_multi_dir(Float * float_p, int dir, int len)
 {
   int NP[5] = {GJP.Xnodes(), 

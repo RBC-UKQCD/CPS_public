@@ -70,4 +70,5 @@ private:
 };
 
 #endif // ! _INCLUDED_W_MOMENTA
+
 CPS_END_NAMESPACE

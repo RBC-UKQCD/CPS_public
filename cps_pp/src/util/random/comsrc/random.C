@@ -1,28 +1,20 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief   Methods for the Random Number Generator classes.
+
+  $Id: random.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: random.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: random.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.5  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.4  2001/08/16 10:50:38  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -47,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: random.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -58,10 +50,10 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/random.h>
-#include<util/gjp.h>
-#include<util/error.h>
-#include<comms/glb.h>
+#include <util/random.h>
+#include <util/gjp.h>
+#include <util/error.h>
+#include <comms/glb.h>
 CPS_START_NAMESPACE
 
 
@@ -81,7 +73,11 @@ const int MZ    = 0;
 
 
 
-
+/*!
+  This method must be called before the RNG is used (so why is it not called
+  by the constructor?)
+  \param idum The seed.	
+ */
 void RandomGenerator::Reset(int idum)
 {
     int i, k, ii;
@@ -133,7 +129,11 @@ void RandomGenerator::Reset(int idum)
 
 
 //---------------------------------------------------------------
-    	// to[] anf from[] are buffers of size 55+4
+/*!
+  \param to Pointer to a buffer of size at least 57*sizeof(int).
+  \post \a to is left pointing to an address 57*sizeof(int) after its
+  initial value.
+*/
 
 void RandomGenerator::StoreSeeds(unsigned *to)
 {
@@ -144,6 +144,11 @@ void RandomGenerator::StoreSeeds(unsigned *to)
     }
 }
 
+/*!
+  \param from Pointer to a buffer of size at least 57*sizeof(int).
+  \post \a from is left pointing to an address 57*sizeof(int) after its
+  initial value.
+*/
 
 void RandomGenerator::RestoreSeeds(unsigned *from)
 {
@@ -251,6 +256,10 @@ void LatRanGen::Initialize()
 }
 
 //---------------------------------------------------------
+/*!
+  \return A uniform random number from the previously assigned hypercube RNG.
+*/
+//----------------------------------------------------------------------
 IFloat LatRanGen
 ::Urand(void)
 {
@@ -258,6 +267,10 @@ IFloat LatRanGen
 }
 
 //---------------------------------------------------------
+/*!
+  \return A gaussian random number from the previously assigned hypercube RNG.
+*/
+//----------------------------------------------------------------------
 IFloat LatRanGen
 ::Grand(void)
 {
@@ -266,6 +279,12 @@ IFloat LatRanGen
 
 
 //---------------------------------------------------------
+/*!
+  The parameters are set for the RNGs on all hypercubes.
+  \param high the upper bound of the distribution range
+  \param lower the lower bound of the distribution range
+*/
+//----------------------------------------------------------------------
 void LatRanGen
 ::SetInterval(IFloat high, IFloat low)
 {
@@ -275,6 +294,11 @@ void LatRanGen
 }
 
 //---------------------------------------------------------
+/*!
+  The parameters are set for the RNGs on all hypercubes. The mean is zero.
+  \param sigma the variance of the gaussian distribution.
+*/
+//----------------------------------------------------------------------
 void LatRanGen
 ::SetSigma(IFloat sigma)
 {
@@ -284,6 +308,17 @@ void LatRanGen
 }
 
 //---------------------------------------------------------
+/*!
+  For a given lattice site, this identifies and assigns the corresponding
+  hypercube RNG.
+  \param x The x coordinate of the lattice site.
+  \param y The y coordinate of the lattice site.
+  \param z The z coordinate of the lattice site.
+  \param t The t coordinate of the lattice site.
+  \post  Subsequent calls to \e e.g. Urand will return results from this
+  particular hypercubic RNG.  
+ */
+//----------------------------------------------------------------------
 void LatRanGen
 ::AssignGenerator(int x, int y, int z, int t)
 {
@@ -300,6 +335,15 @@ void LatRanGen
   rgen_pos = x + hx[0] * (y + hx[1] * (z + hx[2] * t));
 }
 
+//----------------------------------------------------------------------
+/*!
+  For a given lattice site, this identifies and
+  assigns the corresponding hypercube RNG.
+  \param x Array holding the lattice site coordinates.
+  \post  Subsequent calls to \e e.g. Urand will return results from this
+  particular hypercubic RNG.
+*/
+//----------------------------------------------------------------------
 void LatRanGen
 ::AssignGenerator(int * x)
 {
@@ -313,6 +357,14 @@ void LatRanGen
 }
 
 //---------------------------------------------------------
+/*!
+  For a given lattice site, this identifies and
+  assigns the corresponding hypercube RNG.
+  \param i The canonical index of the lattice site.
+  \post  Subsequent calls to \e e.g. Urand will return results from this
+  particular hypercubic RNG.
+*/
+//----------------------------------------------------------------------
 void LatRanGen
 ::AssignGenerator(int i)
 {
@@ -326,6 +378,9 @@ void LatRanGen
 
 
 //--------------------------------------------------------------
+/*!
+  \return A uniform random number; one per node, the same on each node.
+*/
 // Lrand will return the same random number on every node by
 // performing a global sum over all 2^4 hypercubes, and taking the
 // average value
@@ -344,5 +399,6 @@ IFloat LatRanGen
   IFloat result = (IFloat) cntr;
   return result;
 }
+
 
 CPS_END_NAMESPACE

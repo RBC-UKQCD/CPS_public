@@ -12,12 +12,12 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
-#include<alg/w_spect_arg.h>
-#include<alg/w_ginfo.h>
-#include<alg/w_hyper_rect.h>
-#include<alg/w_gamma_mat.h>
-#include<alg/w_fuzzing.h>
+#include <util/data_types.h>        // Float, Complex
+#include <alg/w_spect_arg.h>        // SourceKind
+#include <alg/w_ginfo.h>
+#include <alg/w_hyper_rect.h>
+#include <alg/w_gamma_mat.h>
+#include <alg/w_fuzzing.h>
 CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
@@ -172,6 +172,7 @@ class WspectExtendedMesons : public WspectGinfo {
 
 
 #endif // ! _INCLUDED_W_EXT_MESONS
+
 
 
 

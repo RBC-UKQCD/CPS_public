@@ -1,15 +1,27 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
+/*!\file
+  \brief Definition of slice_sum routine
+
+  $Id: slice_sum.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+ */
+//--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/slice_sum.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: slice_sum.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/slice_sum.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: slice_sum.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1  2003/06/22 13:34:47  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.8  2002/03/11 22:26:36  anj
 //  This should now be the correct, fully merged code from our two versions. Anj
 //
@@ -47,7 +59,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: slice_sum.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/slice_sum.C,v $
 //  $State: Exp $
 //
@@ -63,7 +75,7 @@ CPS_END_NAMESPACE
 #include<comms/glb.h>
 #include<util/smalloc.h>
 #include<util/gjp.h>
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 
 const SCUDir pos_dir[] = { SCU_XP, SCU_YP, SCU_ZP, SCU_TP };
@@ -76,6 +88,21 @@ const SCUDir neg_dir[] = { SCU_XM, SCU_YM, SCU_ZM, SCU_TM };
 //* float_p[i] = sum_over_nodes_of_this_slice(float_p[i])
 //-------------------------------------------------------------------
 
+//-------------------------------------------------------------------
+/*!
+  The vector pointed to by \a float_p is summed over each 3-dimensional
+  hyperplane of nodes which is perpendiculat to the \a dir direction
+
+  \param float_p The number to be summed.
+  \param blcklength The number of floating point numbers in the vector.
+  \param dir The normal direction defining the hyperplane; one of {0, 1, 2, 3} 
+  corresponding to {x, y, z, t}.
+  \post The vector sum is written back to \a float_p, which is identical on
+  all nodes in this hyperplane.
+
+  \ingroup comms
+*/
+//-------------------------------------------------------------------
 void slice_sum(Float * float_p, int blcklength, int dir)
 {
   char *cname = "slice_sum";
@@ -92,7 +119,7 @@ void slice_sum(Float * float_p, int blcklength, int dir)
   // added by manke
   if(transmit_buf == 0)
     ERR.Pointer(cname,fname, "transmit_buf");
-  VRB.Smalloc(cname,fname, "transmit_buf", transmit_buf, blcklength*sizeof(float));
+  VRB.Smalloc(cname,fname, "transmit_buf", transmit_buf, blcklength*sizeof(IFloat));
   // end added
 
   IFloat *receive_buf  = (IFloat *)smalloc(blcklength*sizeof(IFloat));
@@ -100,7 +127,7 @@ void slice_sum(Float * float_p, int blcklength, int dir)
   // added by manke
   if(receive_buf == 0)
     ERR.Pointer(cname,fname, "receive_buf");
-  VRB.Smalloc(cname,fname, "receive_buf", receive_buf, blcklength*sizeof(float));
+  VRB.Smalloc(cname,fname, "receive_buf", receive_buf, blcklength*sizeof(IFloat));
   // end added
 
   IFloat *transmit_buf_p = transmit_buf;

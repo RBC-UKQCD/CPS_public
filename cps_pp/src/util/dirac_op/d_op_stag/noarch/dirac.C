@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief  Routines used internally in the DiracOpStag class.
+
+  $Id: dirac.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/dirac.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: dirac.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/dirac.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: dirac.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: dirac.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/dirac.C,v $
 //  $State: Exp $
 //
@@ -42,20 +47,20 @@ CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 //  dirac.C
 //
-//  A pure C++ code.
+//  A pure C++ code. Apart from the 'extern "C"' bit.
 //-------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/gjp.h>
-#include<comms/scu.h>
-#include<comms/glb.h>
-#include<util/lattice.h>
-#include<util/dirac_op.h>
-#include<util/vector.h>
+#include <util/gjp.h>
+#include <comms/scu.h>
+#include <comms/glb.h>
+#include <util/lattice.h>
+#include <util/dirac_op.h>
+#include <util/vector.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/stag.h>
+#include <util/stag.h>
 CPS_START_NAMESPACE
 
 enum{VECT_LEN=6, MATRIX_SIZE=18, SITE_LEN=72};
@@ -230,5 +235,6 @@ void destroy_dirac_buf()
 {
 // do nothing
 }
+
 
 CPS_END_NAMESPACE

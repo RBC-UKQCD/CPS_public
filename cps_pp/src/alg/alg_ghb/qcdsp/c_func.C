@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/qcdsp/c_func.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: c_func.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/qcdsp/c_func.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: c_func.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -39,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: c_func.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/qcdsp/c_func.C,v $
 //  $State: Exp $
 //
@@ -54,12 +54,12 @@ CPS_START_NAMESPACE
 //  production code all comments to those functions are
 //  commented out, and only bad_sqrt() is required.
 //------------------------------------------------------------
-CPS_END_NAMESPACE
 #include	<stdlib.h>
 #include	<stdio.h>
-#include<util/data_types.h>
-#include<util/verbose.h>
-#include<util/error.h>
+CPS_END_NAMESPACE
+#include <util/data_types.h>
+#include <util/verbose.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 #if( _TARTAN )
@@ -78,5 +78,6 @@ extern "C" {
   void  xprint( unsigned x ) { printf("# %08x\n", x); }
 }
 #endif
+
 
 CPS_END_NAMESPACE

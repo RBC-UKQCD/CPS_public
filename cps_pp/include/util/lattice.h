@@ -1,18 +1,20 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definitions of the Lattice classes.
+  
+  $Id: lattice.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: lattice.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: lattice.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.10  2003/02/10 11:15:24  mcneile
-//  I have added a place holder for the asqtad code.
-//
 //  Revision 1.9  2002/12/04 17:16:27  zs
 //  Merged the new 2^4 RNG into the code.
 //  This new RNG is implemented in the LatRanGen class.
@@ -60,7 +62,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -75,31 +77,39 @@ CPS_START_NAMESPACE
 
 
 #ifndef INCLUDED_LATTICE_H
-#define INCLUDED_LATTICE_H
+#define INCLUDED_LATTICE_H           //!< Prevent multiple inclusion
 
 CPS_END_NAMESPACE
-#include<util/enum.h>
-#include<util/random.h>
-#include<util/vector.h>
-#include<util/smalloc.h>
-#include<util/pmalloc.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<util/data_types.h>
+#include <util/enum.h>
+#include <util/random.h>
+#include <util/vector.h>
+#include <util/smalloc.h>
+#include <util/pmalloc.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <util/data_types.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<alg/cg_arg.h>
-#include<alg/ghb_arg.h>
-#include<alg/eig_arg.h>
+#include <alg/cg_arg.h>
+#include <alg/ghb_arg.h>
+#include <alg/eig_arg.h>
 CPS_START_NAMESPACE
 
 class LinkBuffer;
 
 //------------------------------------------------------------------
 //
-// Lattice is the base abstract class.
-//
+//! The fundamental abstract base class.
+/*! This is the basic class of the CPS from which many are derived.
+  The derived classes define the lattice action, and many of the methods
+  implementing operations with the action are defined or declared here.
+  This class holds the gauge configuration and implements operations
+  on the gauge configuration.
+  all sorts of other things are actually  defined here too, for instance,
+  many of the methods used in the HMD algorithms, operations on spinor
+  fields, \e etc.  
+*/
 //------------------------------------------------------------------
 class Lattice
 {
@@ -147,20 +157,27 @@ class Lattice
       // if the gauge is not fixed.
 
  protected:
-    
+
     static int node_sites[5];
-    	// node_sites[0] = GJP.XnodeSite();
-    	// node_sites[1] = GJP.YnodeSite();
-    	// node_sites[2] = GJP.ZnodeSite();
-    	// node_sites[3] = GJP.TnodeSite();
-    	// node_sites[4] = GJP.SnodeSite();
+    //!< The local lattice dimensions.
+    /*!<
+      A reimplementation of GlobalJobParameter::XnodeSite(), \e etc:
+-   	 node_sites[0] = GJP.XnodeSite();
+-    	 node_sites[1] = GJP.YnodeSite();
+-    	 node_sites[2] = GJP.ZnodeSite();
+-    	 node_sites[3] = GJP.TnodeSite();
+-    	 node_sites[4] = GJP.SnodeSite();
+    */
 
     static int g_dir_offset[4];
-    	// g_dir_offset[0] = 4;
-    	// g_dir_offset[1] = g_dir_offset[0]*GJP.XnodeSites();
-    	// g_dir_offset[2] = g_dir_offset[1]*GJP.YnodeSites();
-    	// g_dir_offset[3] = g_dir_offset[2]*GJP.ZnodeSites();
-
+    //!< Offsets to help find the array index of gauge links.
+    /*!<
+      Specifically, \a g_dir_offset[i] is the the internal array index of the
+      first of the four gauge field links at the lattice site where the \a i th
+      coordinate is 1 and all the rest are 0. The canonical order is assumed,
+      so \a i = 0, 1, 2 and 3 corresponds to the X , Y, Z and T direections
+      respectively.
+    */
 
     void *f_dirac_op_init_ptr;
       // A pointer that is used by the fermion classes to
@@ -169,19 +186,19 @@ class Lattice
       // operator.
 
     void *aux0_ptr;
-      // General purpose auxiliary pointer 0;
+      //!< A  pointer!
 
     void *aux1_ptr;
-      // General purpose auxiliary pointer 1;
+      //!< Another pointer!
 
 
     // Added in by Ping for anisotropic lattices
     //------------------------------------------------------------------
     void MltFloatImpl(Float factor, int dir);
-    // U_dir(x) *= factor  where dir = [0,1,2,3] as [x,y,z,t]
+    //!< Multiplies all gauge links in direction \a dir by a real factor.
 
     LinkBuffer * link_buffer ;
-    //For better performance when getting an offsite link.
+    //!< The array of off-node links, accessed by methods in link_buffer.C
 
     // change from phys_v4.0.0
     // the declarations for GetLink and GetLinkOld
@@ -190,7 +207,7 @@ class Lattice
  public:
 
     const Matrix * GetLink(const int *x, int mu) const;
-      // GRF:  returns a reference to the link U_\mu(x), where x is
+      //!< Gets the gauge link U_mu(x).
       // defined relative to the local site (0,0,0,0).
       // If the link is on-node, it returns a reference to
       // to the link.  If the link is off-node, it retrieves the link
@@ -201,38 +218,39 @@ class Lattice
 
     const Matrix * GetLinkOld(Matrix *g_offset, const int *x,
              int dir, int mu) const;
-      // get U_mu(x+dir)
+    //!< Gets the gauge link U_mu(x+dir)
       // GRF: renamed to avoid conflict with the more general
       // purpose function
 
     // end change from phys_v4.0.0 --> phys_v4.1.0
 
- public:
+// public:
     friend class LinkBuffer;
 
     int LinkBufferIsEnabled(){return ((int) link_buffer);}
+    //!< Returns true if there is a buffer for the links, false otherwise.
 
     int EnableLinkBuffer(int buf_sz);
-      //create the LinkBuffer Object only when requested.
+      //!< Creates a link buffer.
 
     void DisableLinkBuffer();   
-      //delete the LinkBuffer Object when it's not in use. 
+      //!< delete the LinkBuffer Object when it's not in use. 
 
     const Matrix * GetBufferedLink(const int *x, int mu);
-      //get link through the buffer.
+      //!< Gets a link from the buffer.
 
     void ClearBufferedLink(const int * x, int mu);
-      //delete the changed links in the buffer
+     //!< Removes links from the buffer.
 
     void ClearAllBufferedLink();
-      //delete all the buffered links from the buffer
+      //!< Deletes all the links from the buffer.
       //this must be called when lat.Unitarize() is used
 
     int IsOnNode(const int * x);
-      //check if the site x is on node.
-      //return 1 if on node, 0 if offnode.
+      //!< Checks if a lattice site local to this node.
 
     void PathOrdProdPlus(Matrix & mat, const int *x, const int * dirs, int n);
+    //!< Computes the product of links along a path and adds it to a matrix.
       //given the starting point x, the directions of each step on the path
       //and the number of steps. calculate the path ordered product of 
       //all the links along the path and add the result to mat 
@@ -241,6 +259,7 @@ class Lattice
       //the result is returned in mat.
 
     void PathOrdProd(Matrix & mat, const int *x, const int * dirs, int n);
+    //!< Computes the product of links along a path.
       //also calculates the path ordered product, but the result returned 
       //is that product of the path that end on the local node
 
@@ -254,51 +273,47 @@ class Lattice
     virtual ~Lattice(void);
 
     Matrix *GaugeField(void) const;
-    	// Returns the pointer to the gauge field configuration.
+    	//!< Returns the pointer to the gauge field configuration.
 
     void GaugeField(Matrix *u);
-        // Copies the array pointed to by u to the array
-        // pointed to by gauge_field.
+        //!< Copies an array into the gauge configuration.
 
     int GsiteOffset(int *x) const
         { return x[0]*g_dir_offset[0]+x[1]*g_dir_offset[1]
-	        +x[2]*g_dir_offset[2]+x[3]*g_dir_offset[3];  }
-        // Sets the offsets for the canonical storage order
-        // of the gauge field. x[i] is the ith coordinate
-        // where i = {0,1,2,3} = {x,y,z,t}.
+	+x[2]*g_dir_offset[2]+x[3]*g_dir_offset[3];  }
+
+	//!< Gets the array index of a gauge link.
+	/*!<
+	Specifically, the internal array index of the first of the four gauge
+	field links at lattice site x for the canonical storage order.
+	\param x The lattice site coordinates.
+	\return The array index.
+*/
+
 
     void CopyGaugeField(Matrix* u);
-        // Copies the array pointed to by gauge_field to the
-        // array pointed to by u.
+        //!< Copies the  gauge configuration into an array/
 
     StrOrdType StrOrd(void);
-        // Returns the storage order.
+        //!< Returns the storage order.
 
     int Colors(void);
-        // Returns the number of colors.	  
+        //!< Returns the number of colors.	  
 
     int GsiteSize(void);
-        // Returns the number of gauge field 
-        // components (including real/imaginary) on a
-        // site of the 4-D lattice.
-
+        //!< Gets the number of gauge field  components per lattice site.
 
     void Staple(Matrix& stap, int *x, int mu);
-        // It calculates the staple field at x, mu.
-        // The staple field is:
-        //
-        //      V_u(x) = \sum_v(!=u) {
-        //		U_v(x+u) U_u(x+v)~ U_v(x)~
-        //	     +  U_v(x+u-v)~ U_u(x-v)~ U_v(x-v)  }
-        //
+        //!< Calculates the gauge field square staple sum around a link
         // GRF: consider changing the function name
         // to Lattice::PlaqStaple() for consistency.
 
     void BufferedStaple(Matrix & stap, const int *x, int mu);
+        //!< Calculates the gauge field square staple sum  around a link
         //Buffered version of staple
 
     void RectStaple(Matrix& stap, int *x, int mu) ;
-        // It calculates the rectangle field at x, mu.
+        //!< Calculates the rectangle staple sum around a link.
         // The rectangle field is:
         //
         // \sum_{v != u} {
@@ -311,15 +326,18 @@ class Lattice
         // }
         //
     void BufferedRectStaple(Matrix& stap, const int *x, int mu);
+        //!< Calculates the rectangle staple sum around a link.
         //buffered version of RectStaple 
 
+	//! Appears not to be implemented.
     void RectStaple1(Matrix& stap, int *x, int mu);
         // it calculates the flat 6-1 link staple using the PathOrdProdPlus routine
-	// \sum_{ v!= +/-u }{
+	// \sum_{+/-v; v!= u }{
 	//    U_v(x+u) U_v(x+u+v) U_{-u}(x+u+v+v) U_{-v}(x+v+v) U_{-v}(x+v)
 	// +  U_v(x+u) U_{-u}(x+v+u) U_{-u}(x+v)  U_{-v}(x+v-u) U_u(x-u)
 	// +  U_u(x+u) U_v(x+u+u) U_{-u}(x+u+u+v) U_{-u}(x+u+v) U_{-v}(x+v)
 
+    //! Appears not to be implemented.
     void ChairStaple(Matrix& stap, int *x, int mu);
          //it calculates the chair shaped 6-1 link staple at x, mu
          // \sum_{w != +/-u, w !=+/-v, w != +/-u}{
@@ -329,8 +347,9 @@ class Lattice
          // }
 
     void BufferedChairStaple(Matrix &stap, const int *x, int mu);
-        //buffered version of ChairStaple
+        //!< Calculates the chair shaped staple sum around a link.
     
+    //! Appears not to be implemented.
     void CubeStaple(Matrix &stap, const int *x, int mu);
         //it calculates the cube shaped 6-1 link staple at x, mu
         // \sum_{w != +/-u, w !=+/-v, w != +/-u}{
@@ -338,9 +357,11 @@ class Lattice
         // }
             
     void BufferedCubeStaple(Matrix &stap, const int *x, int mu);  
+        //!< Calculates the 5-link cube shaped staple sum around a link
         //buffered version of CubeStaple
 
     virtual void AllStaple(Matrix &stap, const int *x, int mu)=0;
+    //!< Computes all of the staple sums around a link.
         //pure virtual function must be implemented for the gauge actions 
         //derived from it.
         //given a link calculate all of its staples, depending on the 
@@ -348,26 +369,26 @@ class Lattice
         //this is used in heatbath.
 
     void Plaq(Matrix &plaq, int *x, int mu, int nu) const;
+    //!< Computes a plaquette.
         // Added by Ping for the purpose of debugging now, may be more useful
         // later on. It calculates  the plaquette 
         //   U_u(x) U_v(x+u) U_u(x+v)~ U_v(x)~
 
     Float ReTrPlaq(int *x, int mu, int nu) const;
-        // It calculates the real part of the trace of the plaquette 
+        //!< Calculates the real part of the trace of a plaquette.
         // field at site x, mu, nu with mu < nu.
         // The plaquette field is:
         //
         //   U_u(x) U_v(x+u) U_u(x+v)~ U_v(x)~
 
     Float SumReTrPlaqNode(void) const;
-       // It calculates the sum of the real part of the trace of the 
-       // plaquette field at each site of the node sublattice.
+       //!< Calculates the local sum of the real part of the trace of the plaquette 
 
     Float SumReTrPlaq(void) const;
-       // It calculates the sum of the real part of the trace of the 
-       // plaquette field at each site of the whole lattice
+       //!< Calculates the global sum of the real part of the trace of the plaquette 
 
     Float ReTrRect(int *x, int mu, int nu) const;
+        //!< Calculates the real part of the trace of a 6-link rectangle.
        // It calculates the real part of the trace of the rectangle
        // field at site x, in the (mu, nu) plane with the long axis
        // of the rectangle in the mu direction.
@@ -377,69 +398,61 @@ class Lattice
        //
 
     Float SumReTrRectNode(void) const;
+        //!< Calculates the local sum of the real part of the trace of the 6-link rectangle.
        // It calculates the sum of the real part of the trace of the
        // rectangle field at each site of the node sublattice.
 
     Float SumReTrRect(void) const;
+        //!< Calculates the global sum of the real part of the trace of the 6-link rectangle.
        // It calculates the sum of the real part of the trace of the
        // rectangle field at each site of the whole lattice.
     
     Float ReTrLoop(const int *x, const int *dir,  int length) ;
-    //-------------------------------------------------------------------
-    // ReTrLoop(int *x, int *dir,int length):
-    //   It calculates the real part of the trace of the loop at site x
-    //   specified by the list of directions in dir
-    //   length is the length of the loop 
-    //
-    // Warning!!:
-    //   The user is responcible for handing in directions that close a loop!
-    //--------------------------------------------------------------------
-    
+    //!< Computes the real trace of the product of links along a path.
+
     Float SumReTrCubeNode(void) ;
-    //----------------------------------------------------------------------
-    // SumReTrLoopCube()
-    //   It calculates the sum of the real part of the trace of the
-    //   Cube field at each site of the node sublattice.
-    //
-    //   The Cube loop is: mu nu rho -mu -nu -rho
-    //-----------------------------------------------------------------------
+    //!< Calculates the local sum of the real part of the trace of the cube
 
     Float SumReTrCube(void) ;
-    //-----------------------------------------------------------------------
-    // SumReTrCube()
-    //   It calculates the sum of the real part of the trace of the
-    //   Cube field at each site of the whole lattice
-    //-----------------------------------------------------------------------
+    //!< Calculates the global sum of the real part of the trace of the cube
 
   // Added in by Ping for anisotropic lattices
   //------------------------------------------------------------------
   Float AveReTrPlaqNodeNoXi(void) const;
+  //!< Calculates the local average of the real part of the trace of the plaquettes perpendicular to the special anisotropic direction.
   // Normalization:  1 for ordered links
-  // Average over plaq's perpendicular to the special anisotropic dir.
 
   Float AveReTrPlaqNodeXi(void) const;
+  //!< Calculates the local average of the real part of the trace of the plaquettes parallel to the special anisotropic direction.
   // Normalization:  1 for ordered links
-  // Average over plaq's parallel to the special anisotropic dir.
 
   Float AveReTrPlaqNoXi(void) const;
+  //!< Calculates the global average of the real part of the trace of the plaquettes perpendicular to the special anisotropic direction.  
   // Normalization:  1 for ordered links
   // Average over plaq's perpendicular to the special anisotropic dir.
 
   Float AveReTrPlaqXi(void) const;
+  //!< Calculates the global average of the real part of the trace of the plaquettes parallel to the special anisotropic direction.
   // Normalization:  1 for ordered links
   // Average over plaq's parallel to the special anisotropic dir.
 
   void MltFloat(Float factor, int dir)      {
     if (factor != 1.0)    MltFloatImpl(factor, dir);
   }    
-  // U_dir(x) *= factor  where dir = [0,1,2,3] as [x,y,z,t]
-  // Handle all kinds of storage order correctly.
-
+  //!< Multiplies all gauge links with direction \a dir by a real factor.
+  /*!<
+    \param factor The real scale factor.
+    \param dir The direction index of the links to be scaled; 
+    \a dir = 0, 1, 2 or 3 for direction X, Y, Z and T respectively (all kinds
+    of storage order are handled correctly).
+    \post The  gauge field  links in direction \a dir are scaled.
+  */
+ 
     void Reunitarize(void);
-    	// Re-unitarize the gauge field configuration.
+    //!< Re-unitarize the gauge field configuration.
 
     void Reunitarize(Float &dev, Float &max_diff);
-    	// Re-unitarize the gauge field configuration
+    	//!< Test the gauge field for unitarity violation and reunitarize it.
 	// and return:
 	// dev = sqrt( Sum_i [ (U(i) - V(i))^2 ] / (Vol*4*18) ),
         // max_diff = Max_i[ |U(i) - V(i)| ]
@@ -448,41 +461,40 @@ class Lattice
         // the gauge field.
 
     int MetropolisAccept(Float delta_h);
-        // 0 reject, 1 accept. If delta_h < 0 it accepts
-        // unconditionally.
+    //!< Metropolis algorithm decision.
+        // 0 reject, 1 accept. If delta_h < 0 it accepts unconditionally.
 
     void EvolveGfield(Matrix *mom, Float step_size);
-        // It evolves the gauge field by step_size using
-        // the canonical momentum mom
+        //!< Molecular dynamics evolution of the gauge field.
 
     Float MomHamiltonNode(Matrix *momentum);
-        // The conjugate momentum Hamiltonian of the node sublattice.
+    //!< The kinetic energy term of the canonical Hamiltonian on the local lattice.
 
     void Convert(StrOrdType new_str_ord,
-			Vector *f_field_1,
-			Vector *f_field_2);
-        // If str_ord is not the same as 
-        // new_str_ord then it converts the gauge field
-        // configuration and the two fermion fields f_field_1, 
-        // f_field_2 to new_str_ord.
+		 Vector *f_field_1,
+		 Vector *f_field_2);
+    //!< Converts the gauge field and two fermion fields to a new data layout.
+    
 
     void Convert(StrOrdType new_str_ord);
-        // If str_ord is not the same as 
-        // new_str_ord then it converts the gauge field
-        // configuration to new_str_ord.
+    //!< Converts the gauge field to a new data layout.    
 
+    //! A random gaussian anti-Hermitian matrix field.
     void RandGaussAntiHermMatrix(Matrix *mat, Float sigma2);
         // It produces an anti-Hermitian matrix for each
         // site of the lattice with random
         // entries weighted according to 
 	// exp(- Tr(mat^2)) / (2 * sigma2)
 
+    //! Creates a random gaussian spin-colour field.
     void RandGaussVector(Vector *vect, Float sigma);
 
+    //! Creates a random gaussian spin-colour field.
     void RandGaussVector(Vector *vect, Float sigma,
                         FermionFieldDimension frm_field_dim);
         // This version assumes the fermion field spans the whole lattice
 
+    //! Creates a random gaussian spin-colour field.
     void RandGaussVector(Vector *vect, Float sigma, int num_chckbds,
                               FermionFieldDimension frm_field_dim = FIVE_D);
         // It produces 3-vectors in canonical storage order
@@ -494,19 +506,19 @@ class Lattice
         // If keep_snodes == 1, then we divide the site size by SnodeSites()
 
     void SetGfieldOrd(void);
-    	// Sets the gauge field to the identity
+    //!< Creates a unit gauge field.
 
     void SetGfieldDisOrd(void);
-    	// Sets the gauge field to disordered (random) values
+    //!< Creates a random (disordered) gauge field.
 
     int GupdCnt(void);
-      // Returns the value of *g_upd_cnt.
+    //!< Reads the gauge field updates counter.
 
     int GupdCnt(int set_val);
-      // Sets the value of *g_upd_cnt to set_val and returns that value.
+    //!< Sets the gauge field updates counter.
 
     int GupdCntInc(int inc_val = 1);
-      // Increments the *g_upd_cnt by inc_val and returns new value.
+    //!< Increments the gauge field updates counter.
 
     Float MdTime(void);
       // Returns the value of md_time.
@@ -525,25 +537,11 @@ class Lattice
       // operator.
 
     void FixGaugeAllocate(FixGaugeType GaugeType,int NHplanes=0,int *Hplanes=0);
-        // Allocates memory for the gauge fixing matrices
-        //
-	// FixGaugeType GaugeKind - gauge type. Numerically equal to the number
-	// of the direction (ordered in the "canonical" way X=0,
-        // Y=1, Z=2, T=3) orthogonal to the three dimensions used
-        // in the Coulomb gauge fixing condition in (2). For the
-        // Landau gauge a negative number is used.
-        //
-        // int NHplanes - number of the hyperplanes to fix on the whole
-        // machine (not only current node). Not used in the
-        // Landau gauge. If set to zero in Coulomb gauge then
-        // treated as a request to use all hyperplanes on all nodes.
-        //
-        // int *Hplanes - list of NHplanes positions of the hyperplanes to fix
-        // along the direction orthogonal to them. Not used in the
-        // Landau gauge and when NHplanes is set to zero.
+        //!< Allocates memory for the gauge fixing matrices.
 
     int FixGauge(Float StopCond, int MaxIterNum);
-        // Fixes the gauge and returns number of iterations for this node.
+    //!< Fixes the gauge.
+
         // FixGaugeAllocate must be called first.
         //
         // Float StopCond is the stopping condition;
@@ -551,22 +549,23 @@ class Lattice
         // int MaxIterNum - issues a warning if reached
 
     void FixGaugeFree(void);
-        // Free memory for the gauge fixing matrices
+        //!< Free memory used by the gauge fixing matrices.
 
     Matrix **FixGaugePtr(void);
-      // Returns fix_gauge_ptr (pointer to an array of pointers 
-      // that point to the various gauge fixed hyperplanes.
+      //!< Returns (a pointer to the first element of) an array of pointers to gauge-fixed hyperplanes.
 
     FixGaugeType FixGaugeKind(void);
-      // Returns fix_gauge_kind (the kind of gauge fixing).
+      //!< Returns the kind of gauge fixing.
 
     void *Aux0Ptr(void);
-      // Returns the general purpose auxiliary pointer 0;
+     //!< Returns a general purpose auxiliary pointer.
 
     void *Aux1Ptr(void);
-      // Returns the general purpose auxiliary pointer 1;
+      //!< Returns a general purpose auxiliary pointer.
 
     void GsoCheck(void);
+    //!< Checks that the gauge field is identical on 5th dimension local lattice slices.
+
       // If GJP.Snodes() == 1 it just returns.
       // If GJP.Snodes() != 1 it checks that the "spread-out"
       // gauge field is identical along all s-slices by comparing 
@@ -576,13 +575,7 @@ class Lattice
       // exits with an error.
 
     void SoCheck(Float num);
-      // If GJP.Snodes() == 1 it just returns.
-      // If GJP.Snodes() != 1 it checks that the value of num
-      // is identical along all s-slices. This situation arises for
-      // DWF with the s direction spread out across many processors.
-      // If the num along all s-slices is not identical it exits
-      // with an error.
-
+    //!< Checks that a number is identical on 5th dimension local lattice slices.
 
 // Gauge action related virtual functions.
 //------------------------------------------------------------------
@@ -590,22 +583,28 @@ class Lattice
 
 // Fermion action related virtual functions.
 //------------------------------------------------------------------
-    virtual void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
-      // v_out = gamma_5 v_in
 
+    //! Not implemented here.
+    virtual void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
+    
+    //! Not implemented here.
     virtual void Ffour2five(Vector *five, Vector *four, 
 			    int s_r, int s_l);
-        // This is "truly" implemented only in the Fdwf derived class
+    // This is "truly" implemented only in the Fdwf derived class
 
+    //! Not implemented here.
     virtual void Ffive2four(Vector *four, Vector *five, 
 			    int s_r, int s_l);
         // This is "truly" implemented only in the Fdwf derived class
 
-    virtual void Freflex (Vector *out, Vector *in) {}
+    //! Not implemented here.
+    virtual void Freflex (Vector *out, Vector *in) {};
        // This is "truly" implemented only in the Fdwf derived class
 
+    //! Not implemented here.
     virtual void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int dir_flag);
+
     // dir_flag is flag which takes value 0 when all direction contribute to D
     // 1 - when only the special anisotropic direction contributes to D,
     // 2 - when all  except the special anisotropic direction.
@@ -614,148 +613,278 @@ class Lattice
 // Gauge action related pure virtual functions
 //------------------------------------------------------------------
     virtual GclassType Gclass(void) = 0;
-        // It returns the type of gauge class
+        //!< Returns the type of gauge action
 
     virtual void GactionGradient(Matrix &grad, int *x, int mu) = 0;
-        // Calculates the partial derivative of the gauge action
-        // w.r.t. the link U_mu(x).
+    //!< Calculates the partial derivative of the gauge action w.r.t. the link U_mu(x).
+    /*!<
+      \param grad The computed gradient.
+      \param x The coordinates of the lattice site.
+      \param mu The direction of the link.
+     */
 
     virtual void EvolveMomGforce(Matrix *mom, Float step_size) = 0;
-        // It evolves the canonical momentum mom by step_size
-        // using the pure gauge force.
+    //!< Molecular dynamics evolution of the conjugate momentum
+    /*!<
+      The momentum is evolved for a single molecular dynamics timestep
+      using the force from the pure gauge action.
+      \param mom The momentum matrices on all links.
+      \param step_size The molecular dynamics timestep used in the numerical
+      integration.
+      \post \a mom is assigned the value of the momentum after the molecular
+      dynamics evolution.
+    */
 
     virtual Float GhamiltonNode(void) = 0;
-        // The pure gauge Hamiltonian of the node sublattice
-
+    //!< Computes the pure gauge action on the local sublattice.
+    /*!<
+      \return The value of the pure gauge action on this node.
+    */
 
 
 // Fermion action related pure virtual functions 
 //------------------------------------------------------------------
     virtual FclassType Fclass(void) = 0;
-        // It returns the type of fermion class
+        //!< Returns the type of fermion action.
 
     virtual int FsiteOffsetChkb(const int *x) const = 0;
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is not the canonical one but it is particular
-        // to the fermion type. This function is not
-        // relevant to fermion types that do not
-        // use even/odd checkerboarding. x[i] is the 
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+    //!< Gets the lattice site index for the odd-even (checkerboard) order.
+    /*!<
+      When the fermion field is stored in the odd-even (checkerboard) order,
+      defined by ::StrOrdType = WILSON, this method converts a sites
+      cartesian coordinates into its lattice site index.
+      \param x The cartesian lattice site coordinates.
+      \return The lattice site index.
+    */
 
     virtual int FsiteOffset(const int *x) const = 0;
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is the canonical one. X[I] is the
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+    //!< Gets the lattice site index for the canonical order.
+    /*!<
+      When the fermion field is stored in canonical order,
+      defined by StrOrdType = CANONICAL, this method converts a sites
+      cartesian coordinates into its lattice site index.
+      \param x The cartesian lattice site coordinates.
+      \return The lattice site index.
+    */
 
     virtual int ExactFlavors(void) = 0;
-        // Returns the number of exact flavors of the matrix that
-        // is inverted during a molecular dynamics evolution.
+    //!<  The number of dynamical flavors.
+    /*!<
+      \return The number of flavours defined  when this action is used in
+      molecular dynamics dynamical fermion algorithms.
+    */
 
     virtual int SpinComponents(void) = 0;
-        // Returns the number of spin components.
+        //!< Returns the number of spin components.
 
     virtual int FsiteSize(void) = 0;
-        // Returns the number of fermion field 
-        // components (including real/imaginary) on a
-        // site of the 4-D lattice.
-
+    //!< Gets the size of a fermion field per 4-dim. lattice site.
+    /*!<
+      \return The total number of all fermionic field components, \e i.e.
+      the number of floating point numbers, at each site of the 4-dim. lattice.
+    */
+    
     virtual int FchkbEvl(void) = 0;
-        // 0 -> If no checkerboard is used for the evolution
-        //      or the CG that inverts the evolution matrix.
-	// 1 -> If the fermion fields in the evolution
-        //      or the CG that inverts the evolution matrix
-	//      are defined on a single checkerboard (half the 
-	//      lattice).
+    //!< Determines whether one or both parities are used in the molecular dynamics evolution.
+    /*!<
+      Are the fields used in the molecular dynamics algorithms defined on
+      the whole lattice or just on sites on one parity?
+      \return 0 if both parities are used, 1 if only one parity is used.
+    */
 
     virtual int FmatEvlInv(Vector *f_out, Vector *f_in, 
 			   CgArg *cg_arg, 
                            Float *true_res,
 			   CnvFrmType cnv_frm = CNV_FRM_YES) = 0;
-        // It calculates f_out where A * f_out = f_in and
-        // A is the preconditioned (if relevant) fermion matrix that
-        // appears in the HMC evolution (typically some preconditioned 
-        // form of [Dirac^dag Dirac]). The inversion is done
-	// with the conjugate gradient. cg_arg is the structure
-        // that contains all the control parameters, f_in is the
-        // fermion field source vector, f_out should be set to be
-        // the initial guess and on return is the solution.
-	// f_in and f_out are defined on a checkerboard.
-        // If true_res !=0 the value of the true residual is returned
-        // in true_res.
-        // *true_res = |src - MatPcDagMatPc * sol| / |src|
-	// The function returns the total number of CG iterations.
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ M^\dagger M f_{out} = f_{in} \f$
+      for \f$ f_{out} \f$, where \a M is the 
+      (possibly odd-even preconditioned) fermionic matrix.
 
-    virtual int FmatEvlInv(Vector *f_out, Vector *f_in, 
-			   CgArg *cg_arg, 
-			   CnvFrmType cnv_frm = CNV_FRM_YES) = 0;
-        // Same as original but with true_res=0;
+      \param f_out The initial guess of solution vector.
+      \param f_in The source vector
+      \param cg_arg The solver parameters
+      \param true_res Whether or not to report the true residual. This will
+      point to the true residual  if it initially points to a non-zero value.
+      \param cnv_frm Whether the lattice fields need to be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field. Fields that are converted are restored to their original
+  order upon exit of this method. \e N.B. If the fields are already in the
+  suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+      \post true_res The true residual, if this was non-zero to start with.
+      The residual is \f$ |f_{in} - M^\dagger M f_{out}| / |f_{in}| \f$.
+    */
+    virtual int FmatEvlInv(Vector *f_out, Vector *f_in,  
+			   CgArg *cg_arg,  
+			   CnvFrmType cnv_frm = CNV_FRM_YES) = 0; 
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ M^\dagger M f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The initial guess of solution vector.
+      \param f_in The source vector
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field. Fields that are converted are restored to their original
+  order upon exit of this method. \e N.B. If the fields are already in the
+  suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
 
     virtual int FmatInv(Vector *f_out, Vector *f_in, 
 			CgArg *cg_arg, 
                         Float *true_res,
 			CnvFrmType cnv_frm = CNV_FRM_YES,
 			PreserveType prs_f_in = PRESERVE_YES) = 0;
-        // It calculates f_out where A * f_out = f_in and
-        // A is the fermion matrix (Dirac operator). The inversion
-	// is done with the conjugate gradient. cg_arg is the 
-        // structure that contains all the control parameters, f_in 
-        // is the fermion field source vector, f_out should be set 
-        // to be the initial guess and on return is the solution.
-	// f_in and f_out are defined on the whole lattice.
-        // If true_res !=0 the value of the true residual is returned
-        // in true_res.
-        // *true_res = |src - MatPcDagMatPc * sol| / |src|
-        // cnv_frm is used to specify if f_in should be converted 
-        // from canonical to fermion order and f_out from fermion 
-        // to canonical. 
-        // prs_f_in is used to specify if the source
-        // f_in should be preserved or not. If not the memory usage
-        // is less by the size of one fermion vector or by the size 
-        // of one checkerboard fermion vector (half a fermion vector).
-        // For staggered fermions f_in is preserved regardles of
-        // the value of prs_f_in. 
-	// The function returns the total number of CG iterations.
+    //!< Fermion matrix inversion.
+    /*!<
+      Solves <em> A f_out = f_in </em> for \a f_out, where \a A is the
+      fermion matrix. The vectors must be defined on the whole lattice,
+      not just on sites of a single parity.
+
+      \param f_out The initial guess of solution vector.
+      \param f_in The source vector
+      \param cg_arg The solver parameters
+      \param true_res Whether or not to report the true residual. The true
+      residual will be  written here if this is non-zero.
+      \param cnv_frm Whether the lattice fields need to be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field. Fields that are converted are restored to their original
+  order upon exit of this method. \e N.B. If the fields are already in the
+  suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \param prs_f_in Whether or not the source vector is allowed to be
+      overwritten, thereby saving memory. For staggered fermions \a f_in is
+      preserved regardless of the value of \a prs_f_in. 
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+      \post \a true_res contains  the true residual, if it was non-zero
+      to start with.
+      The residual is  <em>  |f_in - A f_out| / |f_in| </em>
+    */
 
     virtual int FmatInv(Vector *f_out, Vector *f_in, 
 			CgArg *cg_arg, 
 			CnvFrmType cnv_frm = CNV_FRM_YES,
 			PreserveType prs_f_in = PRESERVE_YES) = 0;
-        // Same as original but with true_res=0;
+    //!< Fermion matrix inversion.
+    /*!<
+      Solves <em> A f_out = f_in </em> for \a f_out, where \a A is the
+      fermion matrix. The vectors must be defined on the whole lattice,
+      not just on sites of a single parity.
+
+      \param f_out The initial guess of solution vector.
+      \param f_in The source vector
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field. Fields that are converted are restored to their original
+  order upon exit of this method. \e N.B. If the fields are already in the
+  suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \param prs_f_in Whether or not the source vector is allowed to be
+      overwritten, thereby saving memory. For staggered fermions f_in is
+      preserved regardless of the value of prs_f_in. 
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
 
     virtual int FeigSolv(Vector **f_eigenv, Float lambda[], 
 			 Float chirality[], int valid_eig[],
 			 Float **hsum,
 			 EigArg *eig_arg, 
 			 CnvFrmType cnv_frm = CNV_FRM_YES) = 0;
-        // It finds the eigenvectors and eigenvalues of A where
-        // A is the fermion matrix (Dirac operator). The solution
-	// uses Ritz minimization. eig_arg is the 
-        // structure that contains all the control parameters, f_eigenv
-        // are the fermion field source vectors which should be
-        // defined initially, lambda are the eigenvalues returned 
-        // on solution. f_eigenv is defined on the whole lattice.
-        // hsum are projected eigenvectors.
-	// The function returns the total number of Ritz iterations.
+    //!< It the eigenvectors and eigenvalues of the fermion matrix.
+    /*!<
+      \param f_eigenv The computed eigenvalues
+      \param lambda The corresponding eigenvalues
+      \param chirality eigenvector(i)^dagger gamma_5 eigenvector(i)
+      \param valid_eig
+      \param hsum
+      \param eig_arg 
+      \param cnv_frm Whether the lattice fields need to be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field. Fields that are converted are restored to their original
+  order upon exit of this method. \e N.B. If the fields are already in the
+  suitable order, then specifying ::CNV_FRM_YES here has not effect.
+      \return The number of eigensolver iterations.
+      \post f_eigenv contains the eigenvectors.
+      \post lambda contains the eigenvalues.
+     */
 
     virtual void SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 			Float mass) = 0;
-	// It sets the pseudofermion field phi from frm1, frm2.
+    //!< Initialises the pseudofermion field.
+    /*!<
+      The heatbath initialisation of the pseudofermion field
+      is done by setting \f$ \phi = M^\dagger \eta \f$ where \f$ \eta \f$
+      is a zero mean, unit variance random gaussian field.
+      The pseudofermion field may be computed on a single parity only.	     
+    
+      \pre The random field must already be initialised.
+      \param phi The pseudofermion field.
+      \param frm1 A random field, possibly on a single parity.
+      \param frm2 Another random field, or possibly workspace.
+      \param mass The mass parameter of the fermion matrix.       
+    */
 
     virtual void EvolveMomFforce(Matrix *mom, Vector *frm, 
 				 Float mass, Float step_size) = 0;
-        // It evolves the canonical momentum mom by step_size
-        // using the fermion force. 
+    //!< Molecular dynamics evolution of the conjugate momentum
+    /*!<
+      The momentum is evolved for a single molecular dynamics timestep
+      using the force from the fermion action.
+      \param mom The momentum matrices on all links of the local lattice.
+      \param step_size The molecular dynamics timestep used in the numerical
+      integration.
+      \post \a mom is assigned the value of the momentum after the molecular
+      dynamics evolution.
+    */
 
     virtual Float FhamiltonNode(Vector *phi, Vector *chi) = 0;
-        // The fermion Hamiltonian of the node sublattice.
-        // chi must be the solution of Cg with source phi.	       
+    //!< Computes the pseudofermionic action on the local sublattice.
+    /*!<
+      \pre The equation <em> A chi = phi </em>  needs to have been solved for
+      chi, where \e A is the inverse of the fermionic matrix in the molecular
+      dynamics hamiltonian.
+      of the matrix in the molecular dynamics hamiltonian. 
+      \param phi The pseudofermion field
+      \param chi The solution of <em> A chi = phi </em> 
+      where \e A is the inverse of the fermionic matrix in the molecular
+      dynamics hamiltonian.
+      \return The value of the  pseudofermionic action on this node.
+    */
 
     virtual void Fconvert(Vector *f_field, 
 		   	  StrOrdType to,
 			  StrOrdType from) = 0;
-        // Convert fermion field f_field from -> to
+    //!< Converts the field layout.
+    /*!
+      Exactly which data layouts are supported depends on the type of
+      fermion action.
+      \param f_field The field to be converted.
+      \param to The new order.
+      \param from The current order.
+    */
 
 
 // Bosonic action related pure virtual functions.
@@ -766,12 +895,15 @@ class Lattice
 
 };
 
+/*! \defgroup gactions Gauge Actions
+  \ingroup latactions */
 
 //------------------------------------------------------------------
-//
-// Gnone is derived from Lattice. Its functions act
-// as if there is no gauge action i.e. beta = 0.
-//
+//! A class implementing a lattice with a zero gauge action.
+/*!
+  Whatever that means. Most of the methods do nothing.
+  \ingroup gactions
+*/
 //------------------------------------------------------------------
 class Gnone : public virtual Lattice
 {
@@ -794,7 +926,7 @@ class Gnone : public virtual Lattice
         // func called with Matrix &grad = *mp0, so avoid using it.
 
     void GforceSite(Matrix& force, int *x, int mu);
-        // It calculates the gauge force at site x and direction mu.
+    //!< Calculates the gauge force at site x and direction mu.
 
     void EvolveMomGforce(Matrix *mom, Float step_size);
         // It evolves the canonical momentum mom by step_size
@@ -804,15 +936,14 @@ class Gnone : public virtual Lattice
        // The pure gauge Hamiltonian of the node sublattice.
 
     void AllStaple(Matrix &stap, const int *x, int mu);
+    //!< Not implemented.
 
 };
 
 
 //------------------------------------------------------------------
-//
-// Gwilson is derived from Lattice and is relevant to the 
-// standard Wilson single plaquette action.
-//
+//! A class implementing a lattice with the standard Wilson plaquette gauge action.
+/*! \ingroup gactions */
 //------------------------------------------------------------------
 class Gwilson : public virtual Lattice
 {
@@ -835,7 +966,7 @@ class Gwilson : public virtual Lattice
         // func called with Matrix &grad = *mp0, so avoid using it.
 
     void GforceSite(Matrix& force, int *x, int mu);
-        // It calculates the gauge force at site x and direction mu.
+    //!< Calculates the gauge force at site x and direction mu.
 
     void EvolveMomGforce(Matrix *mom, Float step_size);
         // It evolves the canonical momentum mom by step_size
@@ -845,24 +976,27 @@ class Gwilson : public virtual Lattice
        // The pure gauge Hamiltonian of the node sublattice.
 
     void AllStaple(Matrix &stap, const int *x, int mu);
-
+    //!< Calculates the gauge field square staple sum  around a link
+    
 };
 
 
 //------------------------------------------------------------------
-//
-// GpowerPlaq is derived from Lattice and is relevant to the 
-// power plaquette action. This action is the same as
-// the standard Wilson action with the irrelevant power plaquette
-// term added to it. The full action is:
-//
-// Sum_p [ beta * { -Tr[U_p]/3} + ( {1 - Tr[U_p]/3} / c )^k ]
-//
-// with c = GJP.PowerPlaqCutoff() and k = GJP.PowerPlaqExponent()
-//
-// This action supresses plaquettes with {1 - ReTr[U_p]/3} > c 
-// and threfore reduces lattice dislocations.
-//
+//! A class implementing a lattice with the power-plaquette gauge action.
+/*!
+  This action is the standard Wilson action with an irrelevant power plaquette
+ term added to it. The action is:
+\f[
+ \sum_p  -\frac{1}{3}\beta \mathrm{ReTr}[U_p] + \left(\frac{1}{c}(1-\frac{1}{3}\mathrm{ReTr}[U_p]) \right)^k 
+\f]
+ where \f$ U_p \f$ is the plaquette and the sum is over all plaquettes.
+ \f$ \beta \f$, \a c and \a k are real parameters.
+ (see GlobalJobParameter::PowerPlaqCutoff,
+      GlobalJobParameter::PowerPlaqExponent and
+      GlobalJobParameter::Beta)
+
+   \ingroup gactions
+*/
 //------------------------------------------------------------------
 class GpowerPlaq : public virtual Lattice
 {
@@ -885,7 +1019,7 @@ class GpowerPlaq : public virtual Lattice
         // func called with Matrix &grad = *mp0, so avoid using it.
 
     void GforceSite(Matrix& force, int *x, int mu);
-        // It calculates the gauge force at site x and direction mu.
+    //!< Calculates the gauge force at site x and direction mu.
 
     void EvolveMomGforce(Matrix *mom, Float step_size);
         // It evolves the canonical momentum mom by step_size
@@ -895,48 +1029,34 @@ class GpowerPlaq : public virtual Lattice
        // The pure gauge Hamiltonian of the node sublattice.
 
     void PowerStaple(Matrix& pstap, int *x, int mu);
-        // It calculates the staple field at x, mu.
-        // The staple field is:
-        //
-        // V_u(x) = \sum_v(!=u) {
-        //      ps(x,u,v)   * [ U_v(x+u) U_u(x+v)~ U_v(x)~     ]
-        //    + ps(x-v,u,v) * [ U_v(x+u-v)~ U_u(x-v)~ U_v(x-v) ] }
-        //
-        // where
-        //
-        // ps(x,u,v) = 
-        // beta + {k/c} * { (1 - ReTr[U_p(x,u,v)]/3) / c }^(k-1)
-        //
-        // with c = GJP.PowerPlaqCutoff() and
-        //      k = GJP.PowerPlaqExponent()
+    //!< Computes the power-plaquette staple sum around a link.
 
     Float PowerPlaq(int *x, int mu, int nu) const;
-        // It calculates the power plaquette 
-        // field at site x, mu, nu with mu < nu.
-        // The power plaquette field is:
-        //
-        // pp(x,u,v) = { (1 - ReTr[U_p(x,u,v)]/3) / c }^k
-        //
-        // with c = GJP.PowerPlaqCutoff() and
-        //      k = GJP.PowerPlaqExponent()
+        //!< Calculates the power plaquette term.
 
     Float SumPowerPlaqNode(void) const;
-       // It calculates the sum of the power plaquette  
-       // field at each site of the node sublattice.
+        //!< Calculates the local sum of the power plaquette term.
 
     Float SumPowerPlaq(void) const;
-       // It calculates the sum of the power plaquette 
-       // field at each site of the whole lattice
+        //!< Calculates the global sum of the power plaquette term.    
 
     void AllStaple(Matrix &stap, const int *x, int mu);
 };
 
 //------------------------------------------------------------------
-//
-// GimprRect is derived from Lattice and is relevant to the
-// action which contains the standard Wilson plaquette operator
-// plus the second order rectangle operator.
-//
+//! A class implementing a lattice with the plaquette + rectangle gauge action.
+/*!
+  The action is
+  \f[
+  -\frac{1}{3}\beta \sum_x \sum_\mu \sum_{\nu\neq\mu}[
+  (1-8 c_1) U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x) 
+  +c_1 U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu)
+U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+]
+\f]
+
+  \ingroup gactions
+*/
 //------------------------------------------------------------------
 class GimprRect : public virtual Lattice
 {
@@ -963,7 +1083,7 @@ class GimprRect : public virtual Lattice
         // func called with Matrix &grad = *mp0, so avoid using it.
 
     void GforceSite(Matrix& force, int *x, int mu);
-        // It calculates the gauge force at site x and direction mu.
+    //!< Calculates the gauge force at site x and direction mu.
         // Typical implementation has this func called with
         // Matrix &force = *mp0.  GactionGradient typically uses
         // mp1 thru mp4, so be careful.
@@ -975,28 +1095,36 @@ class GimprRect : public virtual Lattice
     Float GhamiltonNode(void);
        // The pure gauge Hamiltonian of the node sublattice.
 
+    //! Computes sum of the plaquette and rectangle staples around a link.
     void AllStaple(Matrix &stap, const int *x, int mu);
 
 };
 
 
 //------------------------------------------------------------------
-//
-// GpowerRect is derived from Lattice and is relevant to the
-// action which contains the standard Wilson plaquette operator
-// plus the second order rectangle operator plus a power
-// plaquette term plus a power rectangle term.
-//
-// The full action is:
-// 
-// (  Sum_p [ c_0*beta*{ -Tr[U_p]/3} + ( {1 - Tr[U_p]/3} / c )^k ]
-//  + Sum_r [ c_1*beta*{ -Tr[U_r]/3} + ( {1 - Tr[U_r]/3} / c )^k ] )
-// with c = GJP.PowerPlaqCutoff(), k = GJP.PowerPlaqExponent()
-// c_0 = 1 - 8 * c_1, c_1 = GJP.C1()
-// This action supresses plaquettes with {1 - ReTr[U_p]/3} > c
-// and rectangles with {1 - ReTr[U_r]/3} > c
-// and threfore reduces lattice dislocations.
-//
+//! A class implementing a lattice with the power-rectangle gauge action.
+/*!
+The action is:
+ \f[
+-\beta \sum_x \sum_p
+[ (1-8c_1)\frac{1}{3}\mathrm{ReTr}[U_p] + \{ \frac{1}{c}(1-\frac{1}{3}\mathrm{ReTr}[U_p]) \}^k ]
++ \sum_r [c_1\frac{1}{3}\mathrm{ReTr}[U_r] + \{ \frac{1}{c}(1-\frac{1}{3}\mathrm{ReTr}[U_r]) \}^k ]
+\f]
+    where the sum is over all plaquettes
+\f[
+  U_p(x, \mu, \nu) = U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+    and all rectangles
+\f[
+  W_r(x, \mu, \nu) = U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+
+ This action supresses plaquettes with \f$ 1 - \mathrm{ReTr}[U_p]/3 > c \f$
+ and rectangles with \f$ 1 - \mathrm{ReTr}[W_r]/3 > c \f$
+ and therefore reduces lattice dislocations.
+
+   \ingroup gactions
+ */
 //------------------------------------------------------------------
 class GpowerRect : public virtual Lattice
 {
@@ -1010,7 +1138,7 @@ class GpowerRect : public virtual Lattice
 
  public:
 
-    GpowerRect(void);
+ GpowerRect(void);
 
     virtual ~GpowerRect(void);
 
@@ -1023,7 +1151,7 @@ class GpowerRect : public virtual Lattice
         // func called with Matrix &grad = *mp0, so avoid using it.
 
     void GforceSite(Matrix& force, int *x, int mu);
-        // It calculates the gauge force at site x and direction mu.
+    //!< Calculates the gauge force at site x and direction mu.
         // Typical implementation has this func called with
         // Matrix &force = *mp0.  GactionGradient typically uses
         // mp1 thru mp4, so be careful.
@@ -1036,67 +1164,54 @@ class GpowerRect : public virtual Lattice
        // The pure gauge Hamiltonian of the node sublattice.
 
     void PowerStaple(Matrix& pstap, int *x, int mu);
-        // It calculates the staple field at x, mu.
-        // The staple field is:
-        //
-        // V_u(x) = \sum_v(!=u) {
-        //      ps(x,u,v)   * [ U_v(x+u) U_u(x+v)~ U_v(x)~     ]
-        //    + ps(x-v,u,v) * [ U_v(x+u-v)~ U_u(x-v)~ U_v(x-v) ] }
-        //
-        // where
-        //
-        // ps(x,u,v) = 
-        // beta + {k/c} * { (1 - ReTr[U_p(x,u,v)]/3) / c }^(k-1)
-        //
-        // with c = GJP.PowerPlaqCutoff() and
-        //      k = GJP.PowerPlaqExponent()
+        //!< Calculates the sum of the plaquette staples around a link.
 
     Float PowerPlaq(int *x, int mu, int nu) const;
-        // It calculates the power plaquette 
-        // field at site x, mu, nu with mu < nu.
-        // The power plaquette field is:
-        //
-        // pp(x,u,v) = { (1 - ReTr[U_p(x,u,v)]/3) / c }^k
-        //
-        // with c = GJP.PowerPlaqCutoff() and
-        //      k = GJP.PowerPlaqExponent()
+        //!< Calculates the real part of the trace of the power plaquette.
 
     Float SumPowerPlaqNode(void) const;
-       // It calculates the sum of the power plaquette  
-       // field at each site of the node sublattice.
+        //!< Calculates the local sum of the real part of the trace of the power plaquette.
 
     Float SumPowerPlaq(void) const;
-       // It calculates the sum of the power plaquette 
-       // field at each site of the whole lattice
+        //!< Calculates the global sum of the real part of the trace of the power plaquette.
 
     void PowerRectStaple(Matrix& pstap, int *x, int mu);
-        // It calculates the rectangle staple field at x, mu.
+        // ! Calculates the rectangle staple sum around a link.
 
     Float PowerRect(int *x, int mu, int nu) const;
-        // It calculates the power rectangle 
-        // field at site x, mu, nu with mu < nu.
-        // The power plaquette rectangle is:
-        //
-        // pp(x,u,v) = { (1 - ReTr[U_r(x,u,v)]/3) / c }^k
-        //
-        // with c = GJP.PowerPlaqCutoff() and
-        //      k = GJP.PowerPlaqExponent()
+        //!< Calculates the the real part of the trace of the power rectangle.
 
     Float SumPowerRectNode(void) const;
-       // It calculates the sum of the power rectangle  
-       // field at each site of the node sublattice.
+        //!< Calculates the local sum of the real part of the trace of the power rectangle.
 
     Float SumPowerRect(void) const;
-       // It calculates the sum of the power rectangle 
-       // field at each site of the whole lattice
+        //!< Calculates the global sum of the real part of the trace of the power rectangle.
+
     void AllStaple(Matrix &stap, const int *x, int mu);
+    //!< Not implemented.
 };
 
 //------------------------------------------------------------------
-//
-// GimprOLSym is derived from Lattice. It implements the
-// One Loop Symanzik improved gauge action.
-//
+//! A class implementing a lattice with the 1-loop Symanzik improved gauge action.
+/*!
+  This is a sum of the plaquette, rectangle and cube loops:
+  \f[
+  \sum_x\sum_\mu\sum_{\nu>\mu} \left[\right.
+U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+  \f]\f[
+  -\frac{ 1 + 0.4805 \alpha_s}{20 u_0^2} 
+  U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+  \f]\f[
+    -\frac{ 0.03325 \alpha_s}{u_0^2} 
+     \sum_{\rho>\nu} U_\mu(x) U_\nu(x+\mu) U_\rho(x+\mu+\nu) U^\dagger_\mu(x+\mu+\nu+\rho)
+     U^\dagger_\nu(x+\nu+\rho) U^\dagger_\rho(x+\rho)
+     \left.\right]
+       \f]
+       where \f$u_0\f$ is the tadpole coefficient
+       and \f$\alpha_s = -4\log(u_0)/3.06839\f$.       
+
+  \ingroup gactions
+*/
 //------------------------------------------------------------------
 class GimprOLSym : public virtual Lattice
 {
@@ -1123,7 +1238,7 @@ class GimprOLSym : public virtual Lattice
         // func called with Matrix &grad = *mp0, so avoid using it.
 
     void GforceSite(Matrix& force, int *x, int mu);
-        // It calculates the gauge force at site x and direction mu.
+        //!< Calculates the gauge force at site x and direction mu.
         // Typical implementation has this func called with
         // Matrix &force = *mp0.  GactionGradient typically uses
         // mp1 thru mp4, so be careful.
@@ -1136,18 +1251,23 @@ class GimprOLSym : public virtual Lattice
        // The pure gauge Hamiltonian of the node sublattice.
 
     void AllStaple(Matrix &stap, const int *x, int mu);
+    //!< Computes the sum of all the staples around a link.
 
 };
 
+/*! \defgroup factions Fermion actions
+  \ingroup latactions */
 //------------------------------------------------------------------
-//
-//
 // Fnone is derived from Lattice. Its functions do nothing
 // and return values as if there is no fermion action or
 // fermion fields. The number of spin components is zero
 // The site size of the fermion array FsiteSize() is 
 // set to 1 so that memory allocation would proceed normally.
-//
+//! A class implementing a lattice with a zero fermion action.
+/*!
+  Most of the methods do nothing.
+  \ingroup factions
+*/
 //------------------------------------------------------------------
 class Fnone : public virtual Lattice
 {
@@ -1186,9 +1306,7 @@ class Fnone : public virtual Lattice
         // Returns the number of spin components.
 
     int FsiteSize(void);
-        // Returns the number of fermion field 
-        // components (including real/imaginary) on a
-        // site of the 4-D lattice.
+    //!< Gets the size per lattice site of the fermion field.
 
     int FchkbEvl(void);
 	// returns 1 => The fermion fields in the evolution
@@ -1196,7 +1314,7 @@ class Fnone : public virtual Lattice
 	//      are defined on a single checkerboard (half the 
 	//      lattice).
 
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
+   int FmatEvlInv(Vector *f_out, Vector *f_in, 
 		   CgArg *cg_arg, 
 		   Float *true_res,
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
@@ -1219,8 +1337,8 @@ class Fnone : public virtual Lattice
 		CgArg *cg_arg, 
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
-        // Same as original but with true_res=0;
-
+    // Same as original but with true_res=0;
+	
     int FeigSolv(Vector **f_eigenv, Float *lambda,
 		 Float chirality[], int valid_eig[],
 		 Float **hsum,
@@ -1228,12 +1346,13 @@ class Fnone : public virtual Lattice
 		 CnvFrmType cnv_frm = CNV_FRM_YES);
         // It does nothing and returns 0.
 
-    void SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+    virtual void SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 			Float mass);
 	// It sets the pseudofermion field phi from frm1, frm2.
 
     void FforceSite(Matrix& force, Vector *frm, 
                             int *x, int mu);
+    //!< Calculates the pseudofermion force at site x and direction mu.
         // It calculates the fermion force per site x
         // and direction mu. frm is the fermion field that 
         // resulted from the application of the inverter on 
@@ -1259,11 +1378,7 @@ class Fnone : public virtual Lattice
 
 
 //------------------------------------------------------------------
-//
-// FstagTypes is derived from Lattice and is relevant to
-// all fermion classes with Staggered type fermions 
-// These classes are derived from FstagTypes
-//
+//! A class containing methods relevant to all staggered fermion actions.
 //------------------------------------------------------------------
 class FstagTypes : public virtual Lattice
 {
@@ -1281,10 +1396,10 @@ class FstagTypes : public virtual Lattice
 
 
 //------------------------------------------------------------------
-//
-// Fstag is derived from FstagTypes and is relevant to
-// staggered fermions.
-//
+//! A class implementing staggered fermions.
+/*!
+  \ingroup factions
+*/
 //------------------------------------------------------------------
 class Fstag : public virtual FstagTypes
 {
@@ -1408,6 +1523,7 @@ class Fstag : public virtual FstagTypes
 
     void FforceSite(Matrix& force, Vector *frm, 
                             int *x, int mu);
+    //!< Calculates the pseudofermion force at site x and direction mu.
         // It calculates the fermion force per site x
         // and direction mu. frm is the fermion field that 
         // resulted from the application of the inverter on 
@@ -1435,14 +1551,11 @@ class Fstag : public virtual FstagTypes
 
 };
 
-
-
-
-
 //------------------------------------------------------------------
-//
-// Fstag is derived from FstagTypes and is relevant to
-// staggered fermions.
+//! A class implementing improved staggered fermions (the asqtad action).
+/*!
+  \ingroup factions
+*/
 //
 //------------------------------------------------------------------
 class FstagAsqtad : public virtual FstagTypes
@@ -1456,7 +1569,7 @@ class FstagAsqtad : public virtual FstagTypes
     Vector *f_tmp;
 
     void getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const;
-    
+
  public:
 
     FstagAsqtad(void);
@@ -1559,8 +1672,8 @@ class FstagAsqtad : public virtual FstagTypes
 			Float mass);
 	// It sets the pseudofermion field phi from frm1, frm2.
 
-    void FforceSite(Matrix& force, Vector *frm, 
-                            int *x, int mu);
+    void FforceSite(Matrix& force, Vector *frm, int *x, int mu);
+    //!< Calculates the pseudofermion force at site x and direction mu.
         // It calculates the fermion force per site x
         // and direction mu. frm is the fermion field that 
         // resulted from the application of the inverter on 
@@ -1589,13 +1702,9 @@ class FstagAsqtad : public virtual FstagTypes
 };
 
 
+
 //------------------------------------------------------------------
-//
-// FwilsonTypes is derived from Lattice and is relevant to
-// all fermion classes with Wilson type fermions 
-// (e.g Fwilson, Fclover, Fdwf, ...). These classes are derived
-// from FwilsonTypes
-//
+//! A class containing methods relevant to all Wilson type fermion actions.
 //------------------------------------------------------------------
 class FwilsonTypes : public virtual Lattice
 {
@@ -1609,9 +1718,16 @@ class FwilsonTypes : public virtual Lattice
 			int num_blk, 
 			int v_stride,
 			int w_stride) ;
-    // Array with entries that point to 8 non-member functions.
+    //!< Array of pointers to external functions.
+    /*!<
+      These functions compute 
+      \f$ f_{ij} = Tr_{spins}[ (1 \pm \gamma_\mu) v_i w^\dagger_j ] \f$
+      for spin-colour vectors \a v and \a w where \a i and \a j are
+      colour indices.
+    */
+    // Array with entries that point to 12 non-member functions.
     // These functions are called as follows:
-    // sproj_tr[SprojType mu]();
+    // Sigmaproj_tr[SigmaprojType mu_nu]();
     // For the various SprojTypes see enum.h
     // These functions return a color matrix in f constructed from
     // the spinors v, w using: 
@@ -1629,6 +1745,13 @@ class FwilsonTypes : public virtual Lattice
 			int num_blk, 
 			int v_stride,
 			int w_stride) ;
+    //!< Array of pointers to external functions.
+    /*!<
+      These functions compute 
+    \f$ f_{ij} = \frac{1}{2} Tr_{spins}[ \sigma_{\mu\nu} v_i w^\dagger_j ] \f$
+      for spin-colour vectors \a v and \a w where \a i and \a j
+      are colour indices.
+    */
     // Array with entries that point to 12 non-member functions.
     // These functions are called as follows:
     // Sigmaproj_tr[SigmaprojType mu_nu]();
@@ -1649,25 +1772,16 @@ class FwilsonTypes : public virtual Lattice
 
     virtual ~FwilsonTypes(void);
 
+    //! Multiplication of a lattice spin-colour vector by gamma_5.
     void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
-    // v_out = Gamma5 * v_in. Gamme5 is in the chiral basis
-    //
-    //          [ 1  0  0  0]
-    // Gamma5 = [ 0  1  0  0]
-    //          [ 0  0 -1  0]
-    //          [ 0  0  0 -1]
-    //
-    // num_sites is the number of sites. It is assumed
-    // that each site has 24 components.
-
 };
 
 
 //------------------------------------------------------------------
-//
-// Fwilson is derived from FwilsonTypes and is relevant to
-// wilson fermions.
-//
+//! A class implementing Wilson fermions.
+/*!
+  \ingroup factions
+*/
 //------------------------------------------------------------------
 class Fwilson : public virtual FwilsonTypes
 {
@@ -1805,10 +1919,10 @@ class Fwilson : public virtual FwilsonTypes
 
 
 //------------------------------------------------------------------
-//
-// Fclover is derived from FwilsonTypes and is relevant to
-// clover Wilson fermions.
-//
+//! A class implementing clover improved Wilson fermions.
+/*!
+  \ingroup factions
+*/
 //------------------------------------------------------------------
 class Fclover : public virtual FwilsonTypes
 {
@@ -1964,10 +2078,10 @@ class Fclover : public virtual FwilsonTypes
 
 
 //------------------------------------------------------------------
-//
-// Fdwf is derived from FwilsonTypes and is relevant to
-// domain wall fermions.
-//
+//! A class implementing  domain wall fermions.
+/*!
+  \ingroup factions
+*/
 //------------------------------------------------------------------
 class Fdwf : public virtual FwilsonTypes
 {
@@ -2065,20 +2179,20 @@ class Fdwf : public virtual FwilsonTypes
         // Same as original but with true_res=0;
 	
     void Ffour2five(Vector *five, Vector *four, int s_u, int s_l);
-        // It transforms a 4-dimensional fermion field
-        // to a 5-dimensional field. The 5d field is zero
-        // except for the upper two components (right chirality)
-        // at s = s_u which are equal to the ones of the 4d field
-        // and the lower two components (left chirality) 
-        // at s_l, which are equal to the ones of the 4d field
-        // where s is the coordinate in the 5th direction.
-        // For spread-out DWF s_u, s_l refer to the global
-        // s coordinate i.e. their range is from 
-        // 0 to [GJP.Snodes() * GJP.SnodeSites() - 1]
+    //!< Transforms a 4-dimensional fermion field into a 5-dimensional field.
+    /* The 5d field is zero */
+    // The 5d field is zero
+    // except for the upper two components (right chirality)
+    // at s = s_u which are equal to the ones of the 4d field
+    // and the lower two components (left chirality) 
+    // at s_l, which are equal to the ones of the 4d field
+    // For spread-out DWF s_u, s_l refer to the global
+    // s coordinate i.e. their range is from 
+    // 0 to [GJP.Snodes() * GJP.SnodeSites() - 1]
 
     void Ffive2four(Vector *four, Vector *five, int s_u, int s_l);
-        // It transforms a 5-dimensional fermion field
-        // to a 4-dimensional field. The 4d field has
+    //!< Transforms a 5-dimensional fermion field into a 4-dimensional field.
+    //The 4d field has
         // the upper two components (right chirality) equal to the
         // ones of the 5d field at s = s_u and the lower two 
         // components (left chirality) equal to the
@@ -2125,6 +2239,7 @@ class Fdwf : public virtual FwilsonTypes
         // The boson Hamiltonian of the node sublattice
 
     void Freflex (Vector *out, Vector *in);
+    //!< Does something really cool.
        // Reflexion in s operator, needed for the hermitian version 
        // of the dirac operator in the Ritz solver.
 };
@@ -2140,13 +2255,14 @@ class Fdwf : public virtual FwilsonTypes
 // gauge class and from one fermion class. All combinations are 
 // present.
 //
+/*! \defgroup latactions  Lattice Actions */
 //------------------------------------------------------------------
 
-
 //------------------------------------------------------------------
-// Trivial gauge action -- no fermions
+//! Trivial gauge action with no fermions
+/*! \ingroup latactions */
 //------------------------------------------------------------------
-class GnoneFnone 
+class GnoneFnone  
     : public virtual Lattice, 
     public Gnone, 
     public Fnone
@@ -2161,7 +2277,8 @@ class GnoneFnone
 
 
 //------------------------------------------------------------------
-// Trivial gauge action -- staggered fermion action
+//! Trivial gauge action with staggered fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GnoneFstag 
     : public virtual Lattice, 
@@ -2179,7 +2296,8 @@ class GnoneFstag
 
 
 //------------------------------------------------------------------
-// Trivial gauge action -- wilson fermion action
+//! Trivial gauge action with wilson fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GnoneFwilson 
     : public virtual Lattice, 
@@ -2197,7 +2315,8 @@ class GnoneFwilson
 
 
 //------------------------------------------------------------------
-// Trivial gauge action -- clover Wilson fermion action
+//! Trivial gauge action with clover Wilson fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GnoneFclover 
     : public virtual Lattice, 
@@ -2215,7 +2334,8 @@ class GnoneFclover
 
 
 //------------------------------------------------------------------
-// Trivial gauge action -- domain wall fermion action
+//! Trivial gauge action with domain wall fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GnoneFdwf 
     : public virtual Lattice, 
@@ -2233,7 +2353,8 @@ class GnoneFdwf
 
 
 //------------------------------------------------------------------
-// Wilson gauge action -- no fermions
+//! Wilson gauge action with no fermions
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GwilsonFnone 
     : public virtual Lattice, 
@@ -2250,7 +2371,8 @@ class GwilsonFnone
 
 
 //------------------------------------------------------------------
-// Wilson gauge action -- staggered fermion action
+//! Wilson gauge action with staggered fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GwilsonFstag 
     : public virtual Lattice, 
@@ -2268,7 +2390,8 @@ class GwilsonFstag
 
 
 //------------------------------------------------------------------
-// Wilson gauge action -- wilson fermion action
+//! Wilson gauge action with wilson fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GwilsonFwilson 
     : public virtual Lattice, 
@@ -2286,7 +2409,8 @@ class GwilsonFwilson
 
 
 //------------------------------------------------------------------
-// Wilson gauge action -- clover Wilson fermion action
+//! Wilson gauge action with clover Wilson fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GwilsonFclover 
     : public virtual Lattice, 
@@ -2304,7 +2428,8 @@ class GwilsonFclover
 
 
 //------------------------------------------------------------------
-// Wilson gauge action -- domain wall fermion action
+//! Wilson gauge action with domain wall fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GwilsonFdwf 
     : public virtual Lattice, 
@@ -2322,7 +2447,8 @@ class GwilsonFdwf
 
 
 //------------------------------------------------------------------
-// PowerPlaq gauge action -- no fermions
+//! Power plaquette gauge action with no fermions
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GpowerPlaqFnone 
     : public virtual Lattice, 
@@ -2339,7 +2465,8 @@ class GpowerPlaqFnone
 
 
 //------------------------------------------------------------------
-// PowerPlaq gauge action -- staggered fermion action
+//! Power plaquette gauge action with staggered fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GpowerPlaqFstag 
     : public virtual Lattice, 
@@ -2357,7 +2484,8 @@ class GpowerPlaqFstag
 
 
 //------------------------------------------------------------------
-// PowerPlaq gauge action -- powerPlaq fermion action
+//! Power plaquette gauge action with Wilson fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GpowerPlaqFwilson 
     : public virtual Lattice, 
@@ -2374,7 +2502,8 @@ class GpowerPlaqFwilson
 
 
 //------------------------------------------------------------------
-// PowerPlaq gauge action -- clover PowerPlaq fermion action
+//! Power plaquette gauge action with clover PowerPlaq fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GpowerPlaqFclover 
     : public virtual Lattice, 
@@ -2391,7 +2520,8 @@ class GpowerPlaqFclover
 
 
 //------------------------------------------------------------------
-// PowerPlaq gauge action -- domain wall fermion action
+//! Power plaquette gauge action with domain wall fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GpowerPlaqFdwf 
     : public virtual Lattice, 
@@ -2408,7 +2538,8 @@ class GpowerPlaqFdwf
 
 
 //------------------------------------------------------------------
-// Improved rectangle gauge action -- no fermions
+//! Improved rectangle gauge action with no fermions
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprRectFnone
     : public virtual Lattice,
@@ -2425,7 +2556,8 @@ class GimprRectFnone
 
 
 //------------------------------------------------------------------
-// Improved rectangle gauge action -- staggered fermion action
+//! Improved rectangle gauge action with staggered fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprRectFstag
     : public virtual Lattice,
@@ -2443,7 +2575,8 @@ class GimprRectFstag
 
 
 //------------------------------------------------------------------
-// Improved rectangle gauge action -- wilson fermion action
+//! Improved rectangle gauge action with wilson fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprRectFwilson
     : public virtual Lattice,
@@ -2461,7 +2594,8 @@ class GimprRectFwilson
 
 
 //------------------------------------------------------------------
-// Improved rectangle gauge action -- clover Wilson fermion action
+//! Improved rectangle gauge action with clover Wilson fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprRectFclover
     : public virtual Lattice,
@@ -2479,7 +2613,8 @@ class GimprRectFclover
 
 
 //------------------------------------------------------------------
-// Improved rectangle gauge action -- domain wall fermion action
+//! Improved rectangle gauge action with domain wall fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprRectFdwf
     : public virtual Lattice,
@@ -2497,7 +2632,8 @@ class GimprRectFdwf
 
 
 //------------------------------------------------------------------
-// PowerRect gauge action -- no fermions
+//! Power rectangle gauge action with no fermions
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GpowerRectFnone 
     : public virtual Lattice, 
@@ -2514,7 +2650,8 @@ class GpowerRectFnone
 
 
 //------------------------------------------------------------------
-// PowerRect gauge action -- staggered fermion action
+//! Power rectangle gauge action with staggered fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GpowerRectFstag 
     : public virtual Lattice, 
@@ -2532,7 +2669,8 @@ class GpowerRectFstag
 
 
 //------------------------------------------------------------------
-// PowerRect gauge action -- powerRect fermion action
+//! Power rectangle gauge action with powerRect fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GpowerRectFwilson 
     : public virtual Lattice, 
@@ -2549,7 +2687,8 @@ class GpowerRectFwilson
 
 
 //------------------------------------------------------------------
-// PowerRect gauge action -- clover PowerRect fermion action
+//! Power rectangle gauge action with clover PowerRect fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GpowerRectFclover 
     : public virtual Lattice, 
@@ -2566,7 +2705,8 @@ class GpowerRectFclover
 
 
 //------------------------------------------------------------------
-// PowerRect gauge action -- domain wall fermion action
+//! Power rectangle gauge action with domain wall fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GpowerRectFdwf 
     : public virtual Lattice, 
@@ -2582,7 +2722,8 @@ class GpowerRectFdwf
 };
 
 //------------------------------------------------------------------
-// One Loop Symanzik improved gauge action -- no fermions
+//! One Loop Symanzik improved gauge action with no fermions
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprOLSymFnone
     : public virtual Lattice,
@@ -2599,7 +2740,8 @@ class GimprOLSymFnone
 
 
 //------------------------------------------------------------------
-// One Loop Symanzik improved gauge action -- staggered fermion action
+//! One Loop Symanzik improved gauge action with staggered fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprOLSymFstag
     : public virtual Lattice,
@@ -2616,29 +2758,9 @@ class GimprOLSymFstag
 };
 
 
-
-
-
 //------------------------------------------------------------------
-// One Loop Symanzik improved gauge action -- Asqtad staggered action
-//------------------------------------------------------------------
-class GimprOLSymFstagAsqtad
-    : public virtual Lattice,
-    public virtual FstagTypes,
-    public GimprOLSym,
-    public FstagAsqtad
-{
- private:
-    char *cname;    // Class name.
-
- public:
-    GimprOLSymFstagAsqtad(void);
-    virtual ~GimprOLSymFstagAsqtad(void);
-};
-
-
-//------------------------------------------------------------------
-// One Loop Symanzik improved gauge action -- wilson fermion action
+//! One Loop Symanzik improved gauge action with wilson fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprOLSymFwilson
     : public virtual Lattice,
@@ -2656,7 +2778,8 @@ class GimprOLSymFwilson
 
 
 //------------------------------------------------------------------
-// One Loop Symanzik improved gauge action -- clover Wilson fermion action
+//! One Loop Symanzik improved gauge action with clover Wilson fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprOLSymFclover
     : public virtual Lattice,
@@ -2674,7 +2797,8 @@ class GimprOLSymFclover
 
 
 //------------------------------------------------------------------
-// One Loop Symanzik improved gauge action -- domain wall fermion action
+//! One Loop Symanzik improved gauge action with domain wall fermion action
+/*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprOLSymFdwf
     : public virtual Lattice,
@@ -2693,4 +2817,5 @@ class GimprOLSymFdwf
 
 
 #endif
+
 CPS_END_NAMESPACE

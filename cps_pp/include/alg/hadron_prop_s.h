@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: hadron_prop_s.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: hadron_prop_s.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/hadron_prop_s.h,v $
 //  $State: Exp $
 //
@@ -21,9 +21,9 @@ CPS_START_NAMESPACE
 #define INCLUDED_HADRON_PROP_S_H
 
 CPS_END_NAMESPACE
-#include<util/vector.h>
-#include<util/gjp.h>
-#include<alg/myenum.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <alg/myenum.h>
 CPS_START_NAMESPACE
 
 //```````````````````````````````````````````````````````````````
@@ -150,4 +150,5 @@ public:
 };
 
 #endif
+
 CPS_END_NAMESPACE

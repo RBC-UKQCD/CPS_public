@@ -1,28 +1,21 @@
 #include<config.h>
 CPS_START_NAMESPACE
+//------------------------------------------------------------------
+/*!\file
+  \brief Definitions of the AlgNoise class methods.
+
+  $Id: alg_noise.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_noise/alg_noise.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: alg_noise.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_noise/alg_noise.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: alg_noise.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.5  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.4  2001/08/16 10:49:39  anj
 //  The float->Float changes in the previous version were unworkable on QCDSP.
 //  To allow type-flexibility, all references to "float" have been
@@ -47,42 +40,35 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_noise.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_noise/alg_noise.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// alg_noise.C
-//
-// AlgNoise is derived from Alg and is relevant to the
-// multiplication of the current configuration with group elements 
-// that take values that fluctuate according to some random 
-// distribution (specified in NoiseArg) away from the identity.
-// The magnitude of the fluctuations is specified in NoiseArg.
-// 
-//------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include<alg/alg_noise.h>
-#include<alg/common_arg.h>
-#include<alg/noise_arg.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/random.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <alg/alg_noise.h>
+#include <alg/common_arg.h>
+#include <alg/noise_arg.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/random.h>
+#include <util/verbose.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
-// Constructor 
+/*!
+  \param latt The lattice on which to compute the new gauge configuration.
+  \param c_arg The common argument structure for all algorithms.
+  \param arg  Arguments specific to this algorithm.
+ */
 //------------------------------------------------------------------
 AlgNoise::AlgNoise(Lattice& latt, 
  	         CommonArg *c_arg,
@@ -114,7 +100,11 @@ AlgNoise::~AlgNoise() {
 static Matrix Exponentiate_Matrix( Matrix, int );
 
 //------------------------------------------------------------------
-// run() runs the code
+//! Performs the computation.
+/*!
+  \post The results are written to the file specified in the common_arg
+  structure.
+*/
 //------------------------------------------------------------------
 void AlgNoise::run()
 {
@@ -208,4 +198,5 @@ static Matrix Exponentiate_Matrix( Matrix iA, int order )
   mg.Unitarize();
   return mg;
 }
+
 CPS_END_NAMESPACE

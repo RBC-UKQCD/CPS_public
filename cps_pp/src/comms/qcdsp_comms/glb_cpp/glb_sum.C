@@ -1,15 +1,27 @@
 #include<config.h>
 CPS_START_NAMESPACE
+//-------------------------------------------------------------------
+/*!\file
+  \brief Definition of glb_sum routine.
+
+  $Id: glb_sum.C,v 1.2 2003-07-24 16:53:54 zs Exp $ 
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/glb_sum.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: glb_sum.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/glb_sum.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: glb_sum.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.1.1.1  2003/06/22 13:34:47  mcneile
+//  This is the cleaned up version of the Columbia Physics System.
+//  The directory structure has been changed.
+//  The include paths have been updated.
+//
+//
 //  Revision 1.9  2003/02/24 12:10:35  anj
 //  Fixed a nasty hack with a slightly less nasty one in glb_sum.C, fixed getseeds
 //  so that it includes the global RNG object, and added new keychain and ssh
@@ -66,7 +78,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: glb_sum.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp_comms/glb_cpp/glb_sum.C,v $
 //  $State: Exp $
 //
@@ -78,12 +90,11 @@ CPS_START_NAMESPACE
 // {GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes()}
 //--------------------------------------------------------------
 CPS_END_NAMESPACE
-#include<config.h>
 #include<comms/glb.h>
 #include<comms/scu.h>
 #include<util/gjp.h>
 #include<comms/double64.h>
-#include <sysfunc.h>
+#include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 
 
@@ -93,7 +104,15 @@ static Double64 receive_buf;
 static Double64 gsum_buf;
 
 
+//----------------------------------------------------------------------
+/*!
+  \param float_p The number to be summed.
+  \post The number pointed to by \a float_p is summed over all nodes
+  and that sum is written back to \a float_p, which is identical on all nodes.
 
+  \ingroup comms
+*/
+//---------------------------------------------------------------------- 
 void glb_sum(Float * float_p)
 {
   int NP[4] = {GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes()};

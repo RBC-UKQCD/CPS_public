@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief  Routine used internally in the DiracOpWilson class.
+  
+  $Id: wilson_init.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: wilson_init.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: wilson_init.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: wilson_init.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v $
 //  $State: Exp $
 //
@@ -61,18 +66,15 @@ CPS_START_NAMESPACE
 /* Include header files                                                     */
 /*--------------------------------------------------------------------------*/
 CPS_END_NAMESPACE
-#include<util/data_types.h>
-#include<util/wilson.h>
-#include<util/gjp.h>
-#include<util/smalloc.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <util/data_types.h>
+#include <util/wilson.h>
+#include <util/gjp.h>
+#include <util/smalloc.h>
+#include <util/verbose.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 
-/*=========================================================================*/
-/* wilson_init:                                                            */
-/*=========================================================================*/
 
 void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 {
@@ -134,5 +136,6 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
   VRB.Debug("af0 = %x\n", wilson_p->af[0]);
   VRB.Debug("af1 = %x\n", wilson_p->af[1]);
 }
+
 
 CPS_END_NAMESPACE

@@ -11,24 +11,24 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<alg/alg_w_spect.h>
+#include <alg/alg_w_spect.h>         // class AlgWspect
 CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<alg/common_arg.h>
-#include<alg/w_spect_arg.h>
-#include<util/lattice.h>
+#include <alg/common_arg.h>          // class CommonArg
+#include <alg/w_spect_arg.h>         // class WspectArg
+#include <util/lattice.h>            // class Lattice
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/verbose.h>
-#include<util/error.h>
+#include <util/verbose.h>            // VRB
+#include <util/error.h>              // ERR
 CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include<alg/w_all.h>
+#include <alg/w_all.h>                                 // class Wspect*
 CPS_START_NAMESPACE
 
 #define DEBUG_ALG_W_SPECT_EXT_MESONS
@@ -42,7 +42,9 @@ CPS_START_NAMESPACE
 //#define TIMING_ALG_W_SPECT
 
 #ifdef  TIMING_ALG_W_SPECT
+CPS_END_NAMESPACE
   #include <time.h>                 // clock()
+CPS_START_NAMESPACE
 #endif
 
 
@@ -426,5 +428,6 @@ void AlgWspectExtMeson::run()
   
 
 }
+
 
 CPS_END_NAMESPACE

@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: w_baryon.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: w_baryon.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,32 +34,32 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: w_baryon.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<alg/w_all.h>
+#include <alg/w_all.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/error.h>
-#include<util/verbose.h>
+#include <util/error.h>
+#include <util/verbose.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/vector.h>
+#include <util/lattice.h>
+#include <util/vector.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<comms/glb.h>
+#include <comms/glb.h>                 // glb_sum
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
-#include<alg/alg_w_spect.h>
+#include <alg/alg_w_spect.h>         // AlgWspect::GetCounter()
 CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
@@ -72,7 +72,9 @@ CPS_START_NAMESPACE
 //  #define DEBUG_W_BARYON_PROJECT_IMAG
 //  #define DEBUG_W_BARYON_DIRAC
 //  #define DEBUG_W_BARYON_COLOR
-  #include "../../util/include/gjp.h"
+CPS_END_NAMESPACE
+  #include <util/gjp.h>
+CPS_START_NAMESPACE
 #endif
 
 //---------------------------------------------------------------------------
@@ -936,6 +938,7 @@ WspectBaryon::print(char *filename, WbaryonFold fold) const
   
   fclose(fp);
 }
+
 
 
 

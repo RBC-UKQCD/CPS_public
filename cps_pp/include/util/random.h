@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definition of RNG classes.
+
+  $Id: random.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+ */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
-//  $Id: random.h,v 1.1.1.1 2003-06-22 13:34:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: random.h,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -47,34 +52,27 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: random.h,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-// random.h
-// Header file for the implementation of a random number generator
-//
-//  Implemented in "random_asm.asm" and "random.C"
-//
-
-//////////////////////////////////////////////////////////////////
-//								//
-//		Fibonacci Random number generator		//
-//								//
-//////////////////////////////////////////////////////////////////
 
 
 #ifndef INCLUDED_RANDOM_H
-#define INCLUDED_RANDOM_H
+#define INCLUDED_RANDOM_H              //!< Prevent multiple inclusion
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
-#include<util/vector.h>
-#include<util/enum.h>
+#include <util/data_types.h>
+#include <util/vector.h>
+#include <util/enum.h>
 CPS_START_NAMESPACE
 //---------------------------------------------------------------
-// Generate uniform random number in (0,1)
+//! A random number generator generating uniform random numbers in (0,1)
+/*!
+  This uses the Fibonacci RNG routine (ran3) from Numerical Recipes in C
+  pp.283.
+*/
 //---------------------------------------------------------------
 class RandomGenerator {
   private:
@@ -85,15 +83,21 @@ class RandomGenerator {
     int inextp;
 
   public:
-    RandomGenerator();
-    virtual IFloat Rand(void);
-    void Reset(int seed = SERIAL_SEED);
-	// This function should be called before any random
-	// generator is used.
 
+    RandomGenerator();
+
+    //! Gets a random number 
+    virtual IFloat Rand(void);
+
+    //! Seeds the RNG.
+    void Reset(int seed = SERIAL_SEED);
+
+    //! Stores the RNG state.
     void StoreSeeds(unsigned *to);
+
+    //! Loads the RNG state.
     void RestoreSeeds(unsigned *from);
-    	// to[] anf from[] are buffers of size 55+2
+
 };
 
 
@@ -102,7 +106,13 @@ inline RandomGenerator::RandomGenerator() {}
 
 
 //---------------------------------------------------------------
-// Generate uniform random number in (a,b)
+//! A random number generator generating uniform random numbers.
+/*!
+  The range is defined in the constructor.
+  
+  This should be inherited by UGrandomGenerator class rather than used
+  directly.
+*/
 //---------------------------------------------------------------
 class UniformRandomGenerator
 : public virtual RandomGenerator
@@ -114,12 +124,23 @@ class UniformRandomGenerator
   public:
     UniformRandomGenerator(IFloat high_limit = 0.5,
 			IFloat low_limit = -0.5);
+
+//! Sets the interval over which the uniform distribution is defined.
+/*!
+  The default range is (-0.5, 0.5).
+  \param high_limit the upper bound of the distribution range
+  \param lower_limit the lower bound of the distribution range
+*/
     void SetInterval(IFloat high_limit, IFloat low_limit)
                 {   A = low_limit;  B = high_limit; }
     IFloat Rand(void);
 };
  
-
+/*!
+  The default range is (-0.5, 0.5).
+  \param high_limit the upper bound of the distribution range
+  \param lower_limit the lower bound of the distribution range
+*/
 inline UniformRandomGenerator
 ::UniformRandomGenerator(IFloat high_limit, IFloat low_limit)
   : RandomGenerator(), A(low_limit), B(high_limit) {}
@@ -128,8 +149,18 @@ inline UniformRandomGenerator
 
 //---------------------------------------------------------------
 // Gaussian Random Generator. Generate Exp(-x^2/(2*sigma2))
-// see "Numerical Recipes in C" pp.289
+// 
+//! A random number generator generating gaussian random numbers.
+/*!
+  The mean of the distribution is 0; the variance is defined in the
+  constructor. It is based on the Box-Muller algorithm (see "Numerical
+  Recipes in C" pp.289).
+
+  This should be inherited by UGrandomGenerator class rather than used
+  directly.
+*/ 
 //---------------------------------------------------------------
+
 class GaussianRandomGenerator
 : public virtual RandomGenerator
 {
@@ -140,19 +171,31 @@ class GaussianRandomGenerator
 
   public:
     GaussianRandomGenerator(IFloat s2 = 1.0); 	// s2 is the sigma^2
+    //! Sets the variance of the distribution.
+/*!
+  The default variance is 1.0.
+  \param s2 the variance of the gaussian distribution.
+*/
     void SetSigma(IFloat s2) {sigma2 = s2; }
     IFloat Rand(void);
 };
  
-
+/*!
+  The default variance is 1.0.
+  \param s2 the variance of the gaussian distribution.
+*/
 inline GaussianRandomGenerator
 ::GaussianRandomGenerator(IFloat s2 /* = 1.0 */)
   : RandomGenerator(), sigma2(s2), iset(0) {}
 
 
 //---------------------------------------------------------------
-//  This is a random number generator for a single 2^4 hypercube
-//  in the lattice.  LatRanGen possesses an array of these generators,
+//! The random number generator for a single 2^4 hypercube in the lattice.
+/*!
+  For each 2^4 hypercube there is a uniform RNG and a gaussian RNG.
+  They should be accessed through the LatRanGen class rather than directly.
+*/
+//  LatRanGen possesses an array of these generators,
 //  one for each 2^4 hypercube.
 //---------------------------------------------------------------
 class UGrandomGenerator
@@ -161,11 +204,30 @@ class UGrandomGenerator
 {
   public:
     UGrandomGenerator();
+
+    //! This should not be used.
     IFloat Rand(void); // This will return an error message - not valid option
+
+    //! Get a gaussian random number
     IFloat Grand(void) { return GaussianRandomGenerator::Rand(); }
+
+    //! Get a uniform random number.
     IFloat Urand(void) { return UniformRandomGenerator::Rand(); }
+
+//! Sets the interval over which the uniform distribution is defined.
+/*!
+  The default range is (-0.5, 0.5).
+  \param high the upper bound of the distribution range
+  \param lower the lower bound of the distribution range
+*/
     void SetInterval(IFloat high, IFloat low)
-                {UniformRandomGenerator::SetInterval(high, low); }
+	{UniformRandomGenerator::SetInterval(high, low); }
+
+//! Sets the variance of the distribution.
+/*!
+  The default variance is 1.0 (and the mean is zero).
+  \param s2 the variance of the gaussian distribution.
+*/
     void SetSigma(IFloat s2) { GaussianRandomGenerator::SetSigma(s2);  }
 };
 
@@ -174,8 +236,13 @@ inline UGrandomGenerator
   :  UniformRandomGenerator(), GaussianRandomGenerator() {}
 
 //---------------------------------------------------------------
-// Possesses a unique random number generator for each 2^4
-// hypercube in the lattice.
+//! The lattice random number generator.
+/*!
+  This class contains a uniform and a gaussian RNG for each 2^4 hypercube
+  on the lattice.
+  To ensure cross-platform reproducibility, these RNGs should be used, not the
+  ones defined in the classes from which this inherits.
+*/
 //---------------------------------------------------------------
 class LatRanGen
 {
@@ -191,18 +258,37 @@ class LatRanGen
     LatRanGen();
     ~LatRanGen() {}
     void Initialize();  // Identical to the Constructor
+
+    //! Get a uniform random number.
     IFloat Urand(void);
+
+    //! Get a gaussian random number
     IFloat Grand(void);
-    IFloat Lrand(void); // Returns same random number on all nodes
+
+    //! Get a uniform random number which is the same on all nodes.
+    IFloat Lrand(void); 
+
+    //! Sets the variance of the distribution.
     void SetSigma(IFloat sigma);
+
+    //! Sets the interval over which the uniform distribution is defined.
     void SetInterval(IFloat high, IFloat low);
+
+    //! Specifies which hypercube RNG to use.
     void AssignGenerator(int x, int y, int z, int t);
+    //! Specifies which hypercube RNG to use.
     void AssignGenerator(int * coor);
+    //! Specifies which hypercube RNG to use.
     void AssignGenerator(int i);
 };
 
+/*! An instance of the LatRanGen class, named VRB, should be
+  created at the highest scope (outside main). This external declaration
+  allows control of and access to the random number generation.
+*/
 extern LatRanGen LRG;
 
 #endif
+
 
 CPS_END_NAMESPACE

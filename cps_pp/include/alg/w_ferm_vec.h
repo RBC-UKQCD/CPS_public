@@ -100,4 +100,5 @@ public:
 };
 
 #endif // ! _INCLUDED_W_FERM_VEC
+
 CPS_END_NAMESPACE

@@ -3,10 +3,10 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: quark_prop_s.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: quark_prop_s.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -45,7 +45,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: quark_prop_s.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v $
 //  $State: Exp $
 //
@@ -53,13 +53,12 @@ CPS_START_NAMESPACE
 // quark_prop_s.C
 
 CPS_END_NAMESPACE
-#include<config.h>
-#include<alg/quark_prop_s.h>
-#include<util/smalloc.h>
-#include<util/gjp.h>
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <alg/quark_prop_s.h>
+#include <util/smalloc.h>
+#include <util/gjp.h>
+#include <util/vector.h>	// uDotXEqual()
+#include <util/verbose.h>
+#include <util/error.h>
 #include <string.h>			// memcpy()
 #include <stdlib.h>
 CPS_START_NAMESPACE
@@ -69,7 +68,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #endif
 CPS_END_NAMESPACE
-#include<alg/myenum.h>
+#include <alg/myenum.h>
 #include <stdio.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------
@@ -599,5 +598,6 @@ void QuarkPropSMng::release(int id)
     VRB.Flow(cname,fname,"QuarkPropS of id = %d is destroyed\n", id);
   }
 }
+
 
 CPS_END_NAMESPACE

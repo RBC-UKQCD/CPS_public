@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Functions used by the data layout conversion functions.
+
+  $Id: common.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/common.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: common.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/common.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: common.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,14 +39,14 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: common.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/common.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/data_types.h>
+#include <util/data_types.h>
 CPS_START_NAMESPACE
 
 #ifdef __cplusplus
@@ -55,7 +60,13 @@ void site2dram(IFloat *src, IFloat *dst, unsigned *link_tbl, unsigned site_size)
 #ifdef __cplusplus
 }
 #endif
-
+//! Negate a floating point array.
+/*!
+  \param link_size The length of the array.
+  \param link The array
+  \post All elements of \a link are negated.
+*/
+  
 void negate_link(unsigned link_size, IFloat *link)
 {
 	unsigned idx ;
@@ -63,6 +74,12 @@ void negate_link(unsigned link_size, IFloat *link)
 	for (idx=0; idx<link_size; idx++) *(link+idx) = - *(link+idx) ;
 }
 
+//! Copy an array.
+/*!
+  \param src The array to copy from.
+  \param dst The array to copy to.
+  \param site_size The length of the array.
+*/
 
 void site2cram(IFloat *src, IFloat *dst, unsigned site_size)
 {
@@ -72,6 +89,16 @@ void site2cram(IFloat *src, IFloat *dst, unsigned site_size)
 		*(dst+offset) = *(src+offset) ;
 }
 
+//! Copy and rearrange an array.
+/*!
+  The copy is of the form <em\n
+  dst[link_tbl[i]] = src[i]
+  \n</em>
+  \param src The array to copy from.
+  \param dst The array to copy to.
+  \param link_tbl The look-up table for the \a dst indices.
+  \param site_size The length of the \a src array.
+*/
 
 void site2dram(IFloat *src, IFloat *dst, unsigned *link_tbl, unsigned site_size)
 {
@@ -80,4 +107,5 @@ void site2dram(IFloat *src, IFloat *dst, unsigned *link_tbl, unsigned site_size)
 	for (offset=0; offset<site_size; offset++)
 		*(dst+*(link_tbl+offset)) = *(src+offset) ;
 }
+
 CPS_END_NAMESPACE

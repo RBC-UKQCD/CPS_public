@@ -5,8 +5,8 @@ CPS_START_NAMESPACE
 #ifndef INCLUDED_S_SPECT_ARG_H
 #define INCLUDED_S_SPECT_ARG_H
 CPS_END_NAMESPACE
-#include<util/vector.h>
-#include<alg/cg_arg.h>
+#include <util/vector.h>	// Float
+#include <alg/cg_arg.h>
 CPS_START_NAMESPACE
 
 enum { POINT = 0, WALLZ, WALL2Z };	// StagQuarkSrc type
@@ -61,4 +61,5 @@ struct StagNonLocalArg {
 };
 
 #endif
+
 CPS_END_NAMESPACE

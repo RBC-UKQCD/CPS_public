@@ -1,12 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Definitions of functions that perform operations on complex matrices
+  and vectors.
+
+  $Id: vector_util.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/vector_util.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: vector_util.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/vector_util.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: vector_util.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,44 +40,50 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: vector_util.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/vector_util.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 /*------------------------------------------------------------------*/
 /*
-   vector_util.c
-
-   This file contains the definitions of some genaral c-style
-   functions that perform operations on vectors of general
-   length. For these functions there exists optimized assembly 
+   For these functions there exists optimized assembly 
    code.
 */
 /*------------------------------------------------------------------*/
 
 CPS_END_NAMESPACE
 #include <string.h>		/* memcpy */
-#include<util/vector.h>
+#include <util/vector.h>
 CPS_START_NAMESPACE
 
 
+/*!
+  \param b The vector to be copied to
+  \param a The vector to be copied from.
+  \param len The number of bytes to be copied.
 
+   The arrays \a c and \a b must not alias each other.
+*/
 //---------------------------------------------------------------//
-void moveMem(void *b, const void *a, int len)
+void moveMem(void *b, const void *a, int len) 
 {
-    memcpy(b, a, len);
+    memcpy(b, a, len); 
 }
 //---------------------------------------------------------------//
 
 
 //---------------------------------------------------------------//
 
-//
-//  Assume that c!=a and c!=b
-//
-//    c = a*b
-//
+/*! The 3x3 complex matrices are assumed to be stored in a linear form
+  where the real part of the (i,j) element is at array position [6i+2j]
+  and the imaginary part of the (i,j) element is at array position [6i+2j+1].
+  \param c the product matrix \a ab
+  \param a the matrix \a a
+  \param b the matrix \a b
+
+  The array \a c must not alias arrays \a a or \a b
+*/
 void mDotMEqual(IFloat* c, const IFloat* a, const IFloat* b)
 {
     *c      = *a      * *b      - *(a+1)  * *(b+1)    +
@@ -139,11 +151,15 @@ void mDotMEqual(IFloat* c, const IFloat* a, const IFloat* b)
 }
 
 
-//
-//  Assume that c!=a and c!=b
-//
-//    c += a*b
-//
+/*! The 3x3 complex matrices are assumed to be stored in a linear form
+  where the real part of the (i,j) element is at array position [6i+2j]
+  and the imaginary part of the (i,j) element is at array position [6i+2j+1].
+  \param c the product matrix <em>c + ab</em>
+  \param a the matrix \a a
+  \param b the matrix \a b
+
+  The array \a c must not alias arrays \a a or \a b
+*/
 void mDotMPlus(IFloat* c, const IFloat* a, const IFloat* b)
 {
     *c     += *a      * *b      - *(a+1)  * *(b+1)    +
@@ -213,9 +229,15 @@ void mDotMPlus(IFloat* c, const IFloat* a, const IFloat* b)
 
 //---------------------------------------------------------------//
 
-//
-//  y   =  U x
-//
+/*! The 3x3 complex matrix is assumed to be stored in a linear form
+  where the real part of the (i,j) element is at array position [6i+2j]
+  and the imaginary part of the (i,j) element is at array position [6i+2j+1].
+  \param y The product vector \a Mx
+  \param u The matrix \a M
+  \param x The complex 3-vector
+
+  The array \a y must not alias array \a x or \a u
+*/
 void uDotXEqual(IFloat* y, const IFloat* u, const IFloat* x)
 {
     *y     =  *u      * *x     - *(u+1)  * *(x+1) + *(u+2)  * *(x+2)
@@ -234,7 +256,13 @@ void uDotXEqual(IFloat* y, const IFloat* u, const IFloat* x)
 
 
 //---------------------------------------------------------------//
-
+/*!
+  If the vectors are real, this function computes the scalar product.
+  \param a A vector
+  \param b Another vector
+  \param len The size of the vectors.
+  \return The scalar product of the vectors.
+ */
 IFloat dotProduct(const IFloat *a, const IFloat *b, int len)
 {
     IFloat sum = 0.0;
@@ -244,6 +272,12 @@ IFloat dotProduct(const IFloat *a, const IFloat *b, int len)
     return sum;
 }
 
+/*!
+  \param a The vector to be multiplied
+  \param b The real scalar
+  \param len The length of the vectors.
+  \post \a a is the multiplied vector.
+ */
 void vecTimesEquFloat(IFloat *a, IFloat b, int len)
 {
     for(int i = 0; i < len; ++i) {
@@ -251,6 +285,12 @@ void vecTimesEquFloat(IFloat *a, IFloat b, int len)
     }
 }
 
+/*!
+  \param a A vector to be added to.
+  \param b Another vector.
+  \param len The length of the vectors.
+  \post \a a is the sum vector.
+ */
 void vecAddEquVec(IFloat *a, const IFloat *b, int len)
 {
     for(int i = 0; i < len; ++i) {
@@ -258,6 +298,12 @@ void vecAddEquVec(IFloat *a, const IFloat *b, int len)
     }
 }
 
+/*!
+  \param a A vector to be subtracted from.
+  \param b Another vector.
+  \param len The length of the vectors.
+  \post \a a is the difference vector.
+ */
 void vecMinusEquVec(IFloat *a, const IFloat *b, int len)
 {
     for(int i = 0; i < len; ++i) {
@@ -265,6 +311,13 @@ void vecMinusEquVec(IFloat *a, const IFloat *b, int len)
     }
 }
 
+/*!
+  \param a The resulting vector
+  \param b A real scalar
+  \param c A vector
+  \param d A vector
+  \param len The length of the vectors.
+ */
 void fTimesV1PlusV2(IFloat *a, IFloat b, const IFloat *c,
 	const IFloat *d, int len)
 {
@@ -273,6 +326,13 @@ void fTimesV1PlusV2(IFloat *a, IFloat b, const IFloat *c,
     }
 }
 
+/*!
+  \param a The resulting vector
+  \param b A real scalar
+  \param c A vector
+  \param d A vector
+  \param len The length of the vectors.
+ */
 void fTimesV1MinusV2(IFloat *a, IFloat b, const IFloat *c,
 	const IFloat *d, int len)
 {
@@ -281,8 +341,15 @@ void fTimesV1MinusV2(IFloat *a, IFloat b, const IFloat *c,
     }
 }
 
-void oneMinusfTimesMatrix(IFloat *a, IFloat b, const IFloat *c,
-	int n)
+/*! The 3x3 complex matrix is assumed to be stored in a linear form
+  where the real part of the (i,j) element is at array position [6i+2j]
+  and the imaginary part of the (i,j) element is at array position [6i+2j+1].
+  \param a The resulting matrix
+  \param b A real scalar factor
+  \param c A matrix
+  \param n This must be 18 in order for this function to do anything meaningful
+*/
+void oneMinusfTimesMatrix(IFloat *a, IFloat b, const IFloat *c, int n)
 {
     IFloat *p = a;
     for(int i = 0; i < n; ++i) {
@@ -291,6 +358,11 @@ void oneMinusfTimesMatrix(IFloat *a, IFloat b, const IFloat *c,
     *a += 1.0;    *(a+8) += 1.0;    *(a+16) += 1.0;
 }
 
+/*!
+  \param a The resulting negated vector
+  \param b A vector
+  \param len The length of the vectors.
+ */
 void vecNegative(IFloat *a, const IFloat *b, int len)
 {
     for(int i = 0; i < len; ++i) {
@@ -298,6 +370,13 @@ void vecNegative(IFloat *a, const IFloat *b, int len)
     }
 }
 
+/*!
+  \param c_r The real part of the scalar product of the vectors.
+  \param c_i The imaginary part of the scalar product of the vectors.  
+  \param a A complex vector
+  \param b Another complex vector
+  \param len The length of the vectors
+ */
 void compDotProduct(IFloat *c_r, IFloat *c_i, 
 		    const IFloat *a, const IFloat *b, int len)
 {
@@ -309,6 +388,14 @@ void compDotProduct(IFloat *c_r, IFloat *c_i,
     }
 }
 
+/*!
+  \param re The real part of the scalar complex factor
+  \param im The imaginary part of the scalar complex factor 
+  \param a The resulting vector
+  \param c A vector
+  \param d Another vector
+  \param len The length of the vectors
+ */
 void cTimesV1PlusV2(IFloat *a, IFloat re, IFloat im, const IFloat *c,
 	const IFloat *d, int len)
 {
@@ -318,6 +405,7 @@ void cTimesV1PlusV2(IFloat *a, IFloat re, IFloat im, const IFloat *c,
       *a++ = re * *(c+1) + im * *c     + *d++;   // imag part
     }
 }
+
 
 
 

@@ -1,12 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
+//------------------------------------------------------------------
+/*!\file
+  \brief Definitions of the AlgPlaq class methods.
+  
+  $Id: alg_plaq.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: alg_plaq.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: alg_plaq.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -41,7 +47,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_plaq.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v $
 //  $State: Exp $
 //
@@ -58,23 +64,27 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
 #include <stdio.h>
-#include<alg/alg_plaq.h>
-#include<alg/common_arg.h>
-#include<alg/no_arg.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/smalloc.h>
-#include<util/vector.h>
-#include<util/verbose.h>
-#include<util/error.h>
-#include<comms/glb.h>
+#include <alg/alg_plaq.h>
+#include <alg/common_arg.h>
+#include <alg/no_arg.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <comms/glb.h>
 CPS_START_NAMESPACE
 
 #define max(A, B) ((A) > (B) ? (A) : (B))
 #define min(A, B) ((A) < (B) ? (A) : (B))
 
 //------------------------------------------------------------------
-// Constructor 
+/*!
+  \param latt The lattice on which to compute the plaquette.
+  \param c_arg The common argument structure for all algorithms.
+  \param arg A dummy argument structure.
+ */
 //------------------------------------------------------------------
 AlgPlaq::AlgPlaq(Lattice& latt, 
 	     CommonArg *c_arg,
@@ -111,7 +121,11 @@ AlgPlaq::~AlgPlaq() {
 
 
 //------------------------------------------------------------------
-//
+//! Performs the computation.
+/*!
+  \post The results are written to the file specified in the common_arg
+  structure.
+*/
 //------------------------------------------------------------------
 void AlgPlaq::run()
 {
@@ -201,6 +215,7 @@ void AlgPlaq::run()
   }
 
 }
+
 
 
 

@@ -1,12 +1,17 @@
-#include<config.h>
+#include <config.h>
 CPS_START_NAMESPACE
+/*! \file
+  \brief Definition of DiracOpWilsonTypes class constructor and destructor.
+  
+  $Id: d_op_wilson_types.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: d_op_wilson_types.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: d_op_wilson_types.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: d_op_wilson_types.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.C,v $
 //  $State: Exp $
 //
@@ -51,16 +56,29 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/dirac_op.h>
-#include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <util/dirac_op.h>
+#include <util/lattice.h>
+#include <util/gjp.h>
+#include <util/verbose.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
-// Constructor
+/*!
+  Only one instance of this class is allowed to be in existence at
+  any time.
+  \param latt The lattice on which this Dirac operator is defined
+  \param f_field_out A (pointer to) a spin-colour field (optionally). 
+  \param f_field_in A (pointer to) a spin-colour field (optionally).
+  \param arg Parameters for the solver.
+  \param cnv_frm_flag Whether the lattice fields should be converted to
+  to a new storage order appropriate for the type of fermion action.
+  If this is ::CNV_FRM_NO, then just the gauge field is converted.
+  If this is ::CNV_FRM_YES, then the fields \a f_field_out and \a f_field_in
+  are also converted: This assumes they are initially in the same order as
+  the gauge field.
+ */
 //------------------------------------------------------------------
 DiracOpWilsonTypes::DiracOpWilsonTypes(Lattice & latt,
 				       Vector *f_field_out,
@@ -80,7 +98,10 @@ DiracOpWilsonTypes::DiracOpWilsonTypes(Lattice & latt,
 
 
 //------------------------------------------------------------------
-// Destructor
+/*!
+  If the storage order of any fields was changed by the constructor
+  then they are changed to the canonical order by the destructor.
+*/
 //------------------------------------------------------------------
 DiracOpWilsonTypes::~DiracOpWilsonTypes() {
   char *fname = "~DiracOpWilsonTypes()";
@@ -89,12 +110,13 @@ DiracOpWilsonTypes::~DiracOpWilsonTypes() {
 
 
 //------------------------------------------------------------------
-// MultGamma(Vector *out, const Vector *in, int gamma_num, int nodevol):
-// Multiply vector on left by 
-// gamma_1^n1 * gamma_2^n2 * gamma_3^n3 * gamma_4^n4
-// Where  (n1,n2,n3,n4) = bit wise decomposition of gamma_num
-// Vector has nodevol number of sites to run over
-// v = gamma_1^n1*gamma_2^n2*gamma_3^n3*gamma_4^n4 * in
+/*!
+  A vector is left multiplied by  gamma_5
+  \param out The resulting vector
+  \param in The vector to be multiplied.
+  \param gamma_num This must be 15.
+  \param nodevol The size, in terms of floating point numbers, of the vectors.
+*/
 //------------------------------------------------------------------
 void DiracOpWilsonTypes::MultGamma(Vector *out,
 				   const Vector *in, 
@@ -225,11 +247,15 @@ void DiracOpWilsonTypes::RitzEigMat(Vector *out, Vector *in) {
 
 
 //------------------------------------------------------------------
-// MatDagMat(Vector *out, Vector *in) :
-// MatDagMat is MatDag*Mat. This is common to all WilsonTypes type dirac operators.
-// MatDagMat works on the full lattice.
-// The in, out fields are defined on the full lattice.
-//------------------------------------------------------------------
+/*!
+  Multiplies a vector by \f$ M^\dagger M \f$ where \e M is the fermion
+  matrix with no preconditioning, so the vectors are defined on the whole
+  lattice.
+
+  \param out The resulting vector.
+  \param in The vector to be multiplied.
+*/
+//-----------------------------------------------------------------
 void DiracOpWilsonTypes::MatDagMat(Vector *out, Vector *in) {
   char *fname = "MatDagMat(V*,V*)";
   VRB.Func(cname,fname);
@@ -246,5 +272,6 @@ void DiracOpWilsonTypes::MatDagMat(Vector *out, Vector *in) {
   VRB.Sfree(cname, fname, "temp", temp);
   sfree(temp);
 }
+
 
 CPS_END_NAMESPACE

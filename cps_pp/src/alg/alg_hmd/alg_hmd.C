@@ -1,28 +1,21 @@
 #include<config.h>
 CPS_START_NAMESPACE
+//------------------------------------------------------------------
+/*!\file
+  \brief Definitions of the AlgHmd constructor and destructor.
+  
+  $Id: alg_hmd.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
-//  $Id: alg_hmd.C,v 1.1.1.1 2003-06-22 13:34:45 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Id: alg_hmd.C,v 1.2 2003-07-24 16:53:53 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
-//  Revision 1.3  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
 //  Revision 1.2  2001/06/19 18:11:27  anj
 //  Serious ANSIfication.  Plus, degenerate double64.h files removed.
 //  Next version will contain the new nga/include/double64.h.  Also,
@@ -39,7 +32,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_hmd.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v $
 //  $State: Exp $
 //
@@ -55,21 +48,25 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <string.h>
-#include<alg/alg_hmd.h>
-#include<alg/common_arg.h>
-#include<alg/hmd_arg.h>
-#include<alg/cg_arg.h>
-#include<util/lattice.h>
-#include<util/vector.h>
-#include<util/gjp.h>
-#include<util/smalloc.h>
-#include<util/verbose.h>
-#include<util/error.h>
+#include <alg/alg_hmd.h>
+#include <alg/common_arg.h>
+#include <alg/hmd_arg.h>
+#include <alg/cg_arg.h>
+#include <util/lattice.h>
+#include <util/vector.h>
+#include <util/gjp.h>
+#include <util/smalloc.h>
+#include <util/verbose.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
-// Constructor
+/*!
+  \param latt The lattice on which run the HMD algorithm.
+  \param c_arg The common argument structure for all algorithms.
+  \param arg The algorithm parameters.
+ */
 //------------------------------------------------------------------
 AlgHmd::AlgHmd(Lattice& latt, 
 		     CommonArg *c_arg,
@@ -107,9 +104,9 @@ AlgHmd::AlgHmd(Lattice& latt,
   if(latt.FchkbEvl() == 1)
     Ncb = 1;                    // Half Checkerboard
   else if(latt.FchkbEvl() == 0)
-    Ncb = 2;                    // Full Checkerboard
-}
+      Ncb = 2;                    // Full Checkerboard
 
+}
 
 //------------------------------------------------------------------
 // Destructor
@@ -118,13 +115,17 @@ AlgHmd::~AlgHmd() {
   char *fname = "~AlgHmd()" ;
   VRB.Func(cname,fname);
 
-
   // Free memory for the conjugate momenta.
   //----------------------------------------------------------------
   VRB.Sfree(cname,fname, "mom",mom);
   sfree(mom);
 
 }
+
+
+
+    
+
 
 
 

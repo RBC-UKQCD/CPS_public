@@ -1,32 +1,34 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
-//
-// alg_noise.h
-//
-// Header file for the AlgNoise class.
-//
-// AlgNoise is derived from Alg and is relevant to the
-// multiplication of the current configuration with group elements 
-// that take values that fluctuate according to some random 
-// distribution (specified in NoiseArg) away from the identity.
-// The magnitude of the fluctuations is specified in NoiseArg.
-// 
+/*!\file
+  \brief  Definitions of the AlgNoise class.
+
+  $Id: alg_noise.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //------------------------------------------------------------------
 
 #ifndef INCLUDED_ALG_NOISE_H
-#define INCLUDED_ALG_NOISE_H
+#define INCLUDED_ALG_NOISE_H           //!< Prevent multiple inclusion.
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/pmalloc.h>
-#include<alg/alg_base.h>
-#include<alg/common_arg.h>
-#include<alg/noise_arg.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/pmalloc.h>
+#include <alg/alg_base.h>
+#include <alg/common_arg.h>
+#include <alg/noise_arg.h>
 CPS_START_NAMESPACE
 
 
+//! Class for noising up a gauge configuration.
+/*!
+  Each gauge field link is left multiplied by an SU(3) group element
+  taken at random from some distribution with unit mean. The type and width
+  of the distribution is specified by the user.
+
+  \ingroup alg
+ */
 class AlgNoise : public Alg
 {
  private:
@@ -44,6 +46,7 @@ class AlgNoise : public Alg
 };
 
 #endif
+
 
 
 

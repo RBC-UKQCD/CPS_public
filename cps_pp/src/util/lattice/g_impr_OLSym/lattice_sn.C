@@ -1,12 +1,19 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of GimprOLSymFnone
+
+  class methods.
+
+  $Id: lattice_sn.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/lattice_sn.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
-//  $Id: lattice_sn.C,v 1.1.1.1 2003-06-22 13:34:47 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/lattice_sn.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: lattice_sn.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -26,7 +33,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: lattice_sn.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/lattice_sn.C,v $
 //  $State: Exp $
 //
@@ -45,8 +52,8 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/verbose.h>
+#include <util/lattice.h>
+#include <util/verbose.h>
 CPS_START_NAMESPACE
 
 
@@ -69,6 +76,7 @@ GimprOLSymFnone::~GimprOLSymFnone()
 
   //???
 }
+
 
 
 CPS_END_NAMESPACE

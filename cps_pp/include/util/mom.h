@@ -1,5 +1,10 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief  Declaration of Mom class.
+
+  $Id: mom.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //------------------------------------------------------------------
 //
 // mom.h
@@ -17,23 +22,41 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <math.h>    // for cos and sin
-#include<util/data_types.h>
+#include <util/data_types.h>
 CPS_START_NAMESPACE
 
+//! Structure for arguments to the ::Mom class constructor.
+
 struct MomArg {
-  int no_of_momenta; // number of different momenta    
-  int max_p1;        // max. number of momentum units into 1-direction
-  int max_p2;        // max. number of momentum units into 2-direction
-  int max_p3;        // max. number of momentum units into 3-direction
-  int deg;           // control flag: average over degenerate momenta on/off
-  int dir;           // propagation direction
-  int src_begin[4];  // source 
-  int src_end[4];
+    int no_of_momenta; /*!< The number of different momenta.
+			 Why do we need to specify this? */
+    int max_p1;        /*!< The maximum momentum in lattice units in the 1st direction */   
+  int max_p2;          /*!< The maximum momentum in lattice units in the 1st direction */   
+  int max_p3;          /*!< The maximum momentum in lattice units in the 1st direction */   
+    int deg;           /*!< Whether to average over degenerate momenta. */
+    int dir;           /*!< The propagation direction.*/
+    int src_begin[4];  /*!< Source coordinates */ 
+  int src_end[4];      /*!< Source coordinates */
 
 };
 
 
+//! A class to compute momentum phases.
+/*!
+  The phases \e exp(ip.x) are computed where \e x is the lattice site
+  coordinates relative to some source point and \e p is a momentum.
+  The momentum is zero in a chosen direction of propagation.
+  The values of the other momentum components \f$p_\mu\f$
+  range from 0 to a chosen maximum in lattice units \e i.e. in units of
+  \f$ 2\pi/L_\mu \f$ where \e L is the size of the lattice in the \f$\mu\f$
+  direction. If desired, momenta of the same magnitude can be averaged
+  (this should only be done if the lattice sizes are equal).
 
+  Each different momentum used is assigned a number. These numbers and the
+  corresponding momenutm components are written to a file called
+  \c mom_table.log.
+    
+ */
 class Mom
 {
  private:
@@ -53,11 +76,17 @@ class Mom
 
  public:
     Mom();
+    /*!
+      \todo Why is the destructor virtual? Is this class used polymorphically?
+    */
     virtual ~Mom();
+    //! Initialisation of parameters.
     void Init(MomArg *arg);
+    //! Calculation of the phases
     void run(void);
         
     // returns the complex phase factor for momentum "imom" at site "s"
+    //! Get a particular phase
     Complex fact(int imom, int *s);
 };
 
@@ -68,6 +97,7 @@ extern Mom MOM;
 
 
 #endif
+
 
 
 

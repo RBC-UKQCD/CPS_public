@@ -1,5 +1,10 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief Definitions of the Alg class.
+
+  $Id: alg_base.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+*/
 //------------------------------------------------------------------
 //
 // alg_base.h
@@ -15,16 +20,15 @@ CPS_START_NAMESPACE
 #define INCLUDED_ALG_BASE_H
 
 CPS_END_NAMESPACE
-#include<util/lattice.h>
-#include<util/smalloc.h>
-#include<util/pmalloc.h>
-#include<alg/common_arg.h>
+#include <util/lattice.h>
+#include <util/smalloc.h>
+#include <util/pmalloc.h>
+#include <alg/common_arg.h>
 CPS_START_NAMESPACE
 
+/*! \defgroup alg Algorithms */
 //------------------------------------------------------------------
-//
-// Alg is the base abstract class for all algorithms
-//
+//! Alg is the base abstract class for all algorithms.
 //------------------------------------------------------------------
 class Alg
 {
@@ -36,19 +40,22 @@ class Alg
 
  protected:
     CommonArg *common_arg;
-        // The common argument structure for all algorithms
+        //!< The common argument structure for all algorithms
+
 
  public:
     Alg(Lattice& latt, CommonArg *c_arg);
+    //!< Basic initialisation.
 
     virtual ~Alg();
 
     Lattice& AlgLattice();
-        // Returns alg_lattice
+        //!< Returns the lattice,
 };
 
 
 #endif
+
 
 
 

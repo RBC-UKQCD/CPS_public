@@ -1,12 +1,17 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief   Methods for the Random Number Generator classes.
+
+  $Id: random_asm.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-06-22 13:34:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
-//  $Id: random_asm.C,v 1.1.1.1 2003-06-22 13:34:46 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2003-07-24 16:53:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Id: random_asm.C,v 1.2 2003-07-24 16:53:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
@@ -34,7 +39,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.1.1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -46,7 +51,7 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/random.h>
+#include <util/random.h>
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
@@ -63,7 +68,10 @@ const IFloat FAC   = 1.0e-9;			// 1.0/MBIG
 
 
 
-
+/*!
+  \pre ::Reset must have already been called.
+  \return A random number from a uniform distribution over (0,1)
+ */
 IFloat RandomGenerator::Rand(void)
 {
     //---------------------------------------------------------
@@ -80,7 +88,10 @@ IFloat RandomGenerator::Rand(void)
 
 
 
-
+/*!
+  \pre ::Reset must have already been called.
+  \return A random number from a gaussian distribution with zero mean.
+*/
 IFloat GaussianRandomGenerator::Rand()
 {
     if(iset == 0) {	// We don't have an extra deviate handy
@@ -105,11 +116,15 @@ IFloat GaussianRandomGenerator::Rand()
     }
 }
 
-
+/*!
+  \pre ::Reset must have already been called.
+  \return A random number from a uniform distribution.
+*/
 IFloat UniformRandomGenerator::Rand()
 {
     return A + ((B - A) * RandomGenerator::Rand());
 }
+
 
 
 CPS_END_NAMESPACE
