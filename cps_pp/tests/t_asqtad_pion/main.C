@@ -1,5 +1,9 @@
+///  \brief
+///  Test the asqtad inverter by computing the pion correlator.
+///
+
 /*!----------------------------------------------------------------------
-  $Id: main.C,v 1.2 2004-05-11 15:37:10 mcneile Exp $
+  $Id: main.C,v 1.3 2004-05-12 18:15:14 mcneile Exp $
   Test Asqtad dirac operator code.	
 
    This is a simple regression test of the Asqtad inverter.
