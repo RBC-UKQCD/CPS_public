@@ -21,7 +21,7 @@ UseSystemGroups=yes
 # Set UseSeperateACLFileForEachDir to yes in order to use a
 # seperate 'access' file for each directory.
 # This increased the performance if you have really big repository.
-#UseSeperateACLFileForEachDir=no
+UseSeperateACLFileForEachDir=yes
 
 # Set CVSServerRunAsUser to a system user, in order CVS server
 # to run as.
