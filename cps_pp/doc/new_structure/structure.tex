@@ -1,5 +1,5 @@
 %------------------------------------------------------------------
-% $Id: structure.tex,v 1.2 2003-07-30 16:31:57 zs Exp $
+% $Id: structure.tex,v 1.3 2004-02-01 16:46:49 mcneile Exp $
 %------------------------------------------------------------------
 % Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
 %
@@ -25,7 +25,7 @@
 \ifthenelse{\pdfoutput = 0}{
 % Not PDF:
 \usepackage{html}
-\newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+\newcommand{\hreff}[2]{\htmladdnormallink{#2}{#1}}
 }{
 % PDF: hyperref for pdf with full linkages:
 \usepackage[
@@ -41,7 +41,7 @@ urlcolor=blue,
 pdfpagemode=None,
 %=UseOutlines,
 pdfhighlight={/I},
-pdftitle={CPS: Overall Code Structure. $Revision: 1.2 $ - $Date: 2003-07-30 16:31:57 $.},
+pdftitle={CPS: Overall Code Structure. $Revision: 1.3 $ - $Date: 2004-02-01 16:46:49 $.},
 pdfauthor={A.N. Jackson \& B\'{a}lint Jo\'{o}},
 plainpages=false
 ]{hyperref}
@@ -67,7 +67,7 @@ plainpages=false
 % title information:
 \title{CPS: Overall Code Structure.}
 \author{A.N. Jackson \& B\'{a}lint Jo\'{o}}
-\date{\mbox{\small $$Revision: 1.2 $$  $$Date: 2003-07-30 16:31:57 $$}}
+\date{\mbox{\small $$Revision: 1.3 $$  $$Date: 2004-02-01 16:46:49 $$}}
 
 %------------------------------------------------------------------
 \begin{document}
