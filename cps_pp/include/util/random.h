@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.15 2004-08-30 04:31:06 chulwoo Exp $
+  $Id: random.h,v 1.16 2004-09-01 13:49:32 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-30 04:31:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.15 2004-08-30 04:31:06 chulwoo Exp $
-//  $Id: random.h,v 1.15 2004-08-30 04:31:06 chulwoo Exp $
+//  $Date: 2004-09-01 13:49:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.16 2004-09-01 13:49:32 chulwoo Exp $
+//  $Id: random.h,v 1.16 2004-09-01 13:49:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -26,6 +26,7 @@ CPS_START_NAMESPACE
 #define INCLUDED_RANDOM_H              //!< Prevent multiple inclusion
 
 CPS_END_NAMESPACE
+#include <string.h>
 #include <util/data_types.h>
 #include <util/enum.h>
 #include <util/smalloc.h>
@@ -69,6 +70,23 @@ class RandomGenerator {
 
     //! Size of the RNG state.
     int StateSize() const;
+
+    //! Number of Integers in RNG, that should be stored to record status
+    int RNGints() const { return state_size + 2; } // ma & inext & inextp
+
+    //! to store this object
+    void store(int *buf) {
+      memcpy(buf,ma,state_size * sizeof(int));
+      buf[state_size] = inext;
+      buf[state_size+1] = inextp;
+    }
+
+    //! to load from file
+    void load(int *buf) {
+      memcpy(ma,buf,state_size * sizeof(int));
+      inext = buf[state_size];
+      inextp = buf[state_size+1];
+    }
     
 };
 
@@ -288,6 +306,9 @@ class LatRanGen
     void GetStates(unsigned int **,
         FermionFieldDimension frm_dim = FIVE_D ) const;
     
+    //! Save the RNGs to a file (due to multi-type class members, not only supports read/write on same platform)
+    bool Read(const char* filename);
+    bool Write(const char* filename);
 	
 };
 
@@ -296,6 +317,7 @@ class LatRanGen
   allows control of and access to the random number generation.
 */
 extern LatRanGen LRG;
+
 
 #endif
 

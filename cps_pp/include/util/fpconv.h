@@ -45,14 +45,14 @@ class FPConv {
   enum FP_FORMAT  hostFormat, fileFormat; // open to public so I can broadcast
 
   FPConv();
-  ~FPConv();
+  virtual ~FPConv();
   char * file2host(char * hbuf, const char *fdat, const int fdat_len);
   char * host2file(char * fbuf, const char *hdat, const int hdat_len);
 
   enum FP_FORMAT  setFileFormat(const char * desc);
   enum FP_FORMAT  setFileFormat(const enum FP_FORMAT dataFormat);
-  unsigned long checksum(char * data, const int data_len, 
-			 const enum FP_FORMAT dataFormat = FP_AUTOMATIC); // default use fileFormat
+  unsigned int checksum(char * data, const int data_len, 
+			const enum FP_FORMAT dataFormat = FP_AUTOMATIC); // default use fileFormat
 
   int size(const enum FP_FORMAT datatype);
   bool big_endian(const enum FP_FORMAT datatype);

@@ -26,31 +26,6 @@
 CPS_START_NAMESPACE
 using namespace std;
 
-// GCFheaderPar class
-// header parser for parallel IO
-// removed "exit()"'s, others same as class GCFheader
-typedef map<string,string> GCFHMapParT;
-
-class GCFheaderPar
-{
-private:
-
-  GCFHMapParT headerMap;
-  bool  prevFound;
-
-public:
-  
-  inline bool found() { return prevFound; }
-
-  bool    add( string key_eq_value );
-
-  int     asInt   ( string key );
-  Float   asFloat ( string key );
-  string  asString( string key );
-
-  void Show();
-};
-
 
 class  ReadLatticeParallel : private QioControl {
  private:
@@ -77,7 +52,7 @@ class  ReadLatticeParallel : private QioControl {
   inline bool good() { return load_good; }
 
  private:
-  bool CheckSum(char *fpoint, int size_ints);
+  //  bool CheckSum(char *fpoint, int size_Floats, const int Scoor);
   bool CheckPlaqLinktrace(Lattice & lat, const QioArg & rd_arg,
 			  const Float plaq_inheader, const Float linktrace_inheader);
 };

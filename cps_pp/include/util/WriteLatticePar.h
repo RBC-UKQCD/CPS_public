@@ -44,20 +44,18 @@ class WriteLatticeParallel : private QioControl
     WriteLatticeParallel(Lattice & lat, const char * filename,
 			 const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 0)
       : QioControl(), unload_good(false)    {
-      initHeader();
       QioArg  wt_arg(filename, dataFormat, recon_row_3);
       write(lat, wt_arg);
     }
 
     WriteLatticeParallel(Lattice & lat, const QioArg & wt_arg)
       : QioControl(), unload_good(false)    {
-      initHeader();
       write(lat, wt_arg);
     }
 
     ~WriteLatticeParallel() {}
 
-    void initHeader(); 
+    void writeHeader(ostream & fout, Float link_trace, Float plaq, const QioArg & wt_arg); 
 
     void write(Lattice & lat, const QioArg & wt_arg);
 
@@ -65,6 +63,9 @@ class WriteLatticeParallel : private QioControl
  private:
     FPConv fpconv;
     bool unload_good;
+    int data_start;
+    int csum_pos;
+    bool recon_row_3;
 };
 
 
