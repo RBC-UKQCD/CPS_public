@@ -3,7 +3,7 @@
 
   @configure_input@
 
-  $Id: config.h.in,v 1.4 2003-10-21 15:34:42 zs Exp $
+  $Id: config.h.in,v 1.5 2003-10-27 16:45:38 zs Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -14,13 +14,13 @@
  *  CVS keywords
  *
  *  $Author: zs $
- *  $Date: 2003-10-21 15:34:42 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.4 2003-10-21 15:34:42 zs Exp $
- *  $Id: config.h.in,v 1.4 2003-10-21 15:34:42 zs Exp $
+ *  $Date: 2003-10-27 16:45:38 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.5 2003-10-27 16:45:38 zs Exp $
+ *  $Id: config.h.in,v 1.5 2003-10-27 16:45:38 zs Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.4 $
+ *  $Revision: 1.5 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -55,19 +55,12 @@
 /*! Precision of internal calculations: float, double. */
 #define INTERNAL_LOCALCALC_TYPE @LOCALPRECISION@
 
-/*! \def INCLUDE_MPI_SCU
-  If parallel (and not QCDSP), include the MPI layer in the make.
-*/
-#ifdef PARALLEL
-#define INCLUDE_MPI_SCU 1
-#endif
-
 /*! Data size for the MPI comms layer: */
 #define COMMS_DATASIZE (sizeof(@LOCALPRECISION@))
 
 /*! Debugging flag: */
 #ifndef VERBOSE
-#define VERBOSE 1
+#define VERBOSE 
 #endif
 
 #define CPS_END_NAMESPACE } 

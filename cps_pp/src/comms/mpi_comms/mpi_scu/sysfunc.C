@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions for the MPI implementation of the QCDSP/QCDOC communications layer.
   
-  $Id: sysfunc.C,v 1.4 2003-10-21 15:34:42 zs Exp $
+  $Id: sysfunc.C,v 1.5 2003-10-27 16:45:38 zs Exp $
 */
 /*----------------------------------------------------------------------
 /* The Sysfunc Comms Interface: sysfunc.C
@@ -16,13 +16,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2003-10-21 15:34:42 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v 1.4 2003-10-21 15:34:42 zs Exp $
-  $Id: sysfunc.C,v 1.4 2003-10-21 15:34:42 zs Exp $
+  $Date: 2003-10-27 16:45:38 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v 1.5 2003-10-27 16:45:38 zs Exp $
+  $Id: sysfunc.C,v 1.5 2003-10-27 16:45:38 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.C,v $
-  $Revision: 1.4 $
+  $Revision: 1.5 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/sysfunc.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -31,9 +31,6 @@ CPS_END_NAMESPACE
 #include<comms/sysfunc.h>
 CPS_START_NAMESPACE
 
-/* Allow the MPI stuff to be switched out, thus avoiding compiler
-   errors (for the time being). */
-#ifdef INCLUDE_MPI_SCU
 
 #ifndef INCLUDED_SYSFUNC_C
 #define INCLUDED_SYSFUNC_C
@@ -889,5 +886,5 @@ unsigned int SCUReadSeedFile( void ) {
 //}// End of extern "C".
 #endif
 
-#endif /* INCLUDE_MPI_SCU */
+
 CPS_END_NAMESPACE

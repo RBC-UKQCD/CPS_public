@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the SCUDirArg class.
 
-  $Id: scu_dir_arg.C,v 1.3 2003-08-12 14:32:22 zs Exp $
+  $Id: scu_dir_arg.C,v 1.4 2003-10-27 16:45:38 zs Exp $
 */
 /*----------------------------------------------------------*/
 /* The SCUDirArg Class: scu_dir_arg.C
@@ -18,21 +18,18 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2003-08-12 14:32:22 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/scu_dir_arg.C,v 1.3 2003-08-12 14:32:22 zs Exp $
-  $Id: scu_dir_arg.C,v 1.3 2003-08-12 14:32:22 zs Exp $
+  $Date: 2003-10-27 16:45:38 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/scu_dir_arg.C,v 1.4 2003-10-27 16:45:38 zs Exp $
+  $Id: scu_dir_arg.C,v 1.4 2003-10-27 16:45:38 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_dir_arg.C,v $
-  $Revision: 1.3 $
+  $Revision: 1.4 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi_comms/mpi_scu/scu_dir_arg.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
 
-/* Allow the MPI stuff to be switched out, thus avoiding compiler
-   errors (for the time being). */
-#ifdef INCLUDE_MPI_SCU
 
 #ifndef INCLUDED_SCU_DIR_ARG
 #define INCLUDED_SCU_DIR_ARG
@@ -319,5 +316,5 @@ void SCUDirArg::Create_Datatype() {
 
 #endif
 
-#endif /* INCLUDE_MPI_SCU */
+
 CPS_END_NAMESPACE

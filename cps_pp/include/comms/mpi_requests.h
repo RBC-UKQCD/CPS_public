@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration and definition of the MPIRequestManager class
 
-  $Id: mpi_requests.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: mpi_requests.h,v 1.3 2003-10-27 16:45:38 zs Exp $
 */
 /*----------------------------------------------------------*/
 /* The MPI comms request handle manager: mpi_requests.h
@@ -14,13 +14,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2003-07-24 16:53:53 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/mpi_requests.h,v 1.2 2003-07-24 16:53:53 zs Exp $
-  $Id: mpi_requests.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Date: 2003-10-27 16:45:38 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/mpi_requests.h,v 1.3 2003-10-27 16:45:38 zs Exp $
+  $Id: mpi_requests.h,v 1.3 2003-10-27 16:45:38 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: mpi_requests.h,v $
-  $Revision: 1.2 $
+  $Revision: 1.3 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/mpi_requests.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -28,9 +28,6 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
-/* Allow the MPI stuff to be switched out, thus avoiding compiler
-   errors (for the time being). */
-#ifdef INCLUDE_MPI_SCU
 
 #ifndef INCLUDED_MPI_REQ_MAN
 #define INCLUDED_MPI_REQ_MAN
@@ -129,8 +126,5 @@ class MPIRequestManager {
 };
 
 #endif
-
-#endif /* INCLUDE_MPI_SCU */
-
 
 CPS_END_NAMESPACE
