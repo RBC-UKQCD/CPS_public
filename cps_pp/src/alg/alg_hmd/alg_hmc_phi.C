@@ -4,19 +4,15 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
   
-  $Id: alg_hmc_phi.C,v 1.6 2004-06-04 21:13:59 chulwoo Exp $
+<<<<<<< alg_hmc_phi.C
+  $Id: alg_hmc_phi.C,v 1.7 2004-06-07 19:47:02 mclark Exp $
+=======
+  $Id: alg_hmc_phi.C,v 1.7 2004-06-07 19:47:02 mclark Exp $
+>>>>>>> 1.4.6.1
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.6 2004-06-04 21:13:59 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.6 2004-06-04 21:13:59 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -652,6 +648,8 @@ Float AlgHmcPhi::run(void)
   // Print out monitor info
   //---------------------------------------------------------------
   if(common_arg->results != 0){
+    printf("Results ptr is 0x%8.8x\n",common_arg->results);
+    if (common_arg->results == NULL) printf("FUCK\n");fflush(stdout);
     if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
@@ -690,7 +688,6 @@ Float AlgHmcPhi::run(void)
 
   VRB.Result(cname,fname,"Configuration number = %d\n", lat.GupdCnt());
   
-
   // Reset Molecular Dynamics time counter
   //----------------------------------------------------------------
   lat.MdTime(0.0);

@@ -5,19 +5,88 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.8 2004-06-04 21:13:59 chulwoo Exp $
+<<<<<<< alg_hmd_r.C
+  $Id: alg_hmd_r.C,v 1.9 2004-06-07 19:47:02 mclark Exp $
+=======
+  $Id: alg_hmd_r.C,v 1.9 2004-06-07 19:47:02 mclark Exp $
+>>>>>>> 1.6.6.1
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.8 2004-06-04 21:13:59 chulwoo Exp $
-//  $Id: alg_hmd_r.C,v 1.8 2004-06-04 21:13:59 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.8 $
+//  Revision 1.6  2004/04/27 03:51:17  cwj
+//  merging with merged-multibuild
+//
+//  Revision 1.5.2.2  2004/02/26 21:39:07  mike
+//  Altered run function to now return the acceptance probabilty (as opposed to
+//  void).
+//
+//  Revision 1.5.2.1  2004/02/10 21:28:54  cwj
+//  *** empty log message ***
+//
+//  Revision 1.5  2004/01/14 20:05:01  chulwoo
+//  *** empty log message ***
+//
+//  Revision 1.4  2004/01/13 22:22:10  chulwoo
+//  *** empty log message ***
+//
+//  Revision 1.2.10.3  2003/12/27 21:05:31  cwj
+//
+//  (somewhat) cleaned up for QCDOC + qos-1-8-5
+//
+//  Revision 1.2.10.2  2003/12/02 16:37:29  cwj
+//  alg_hmd_r.C
+//
+//  Revision 1.2.10.1  2003/11/06 00:12:34  cwj
+//  *** empty log message ***
+//
+//  Revision 1.1.1.1  2003/11/04 05:04:57  chulwoo
+//
+//  starting again
+//
+//
+//  Revision 1.2  2003/07/24 16:53:53  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
+//  Revision 1.5  2002/12/04 17:16:27  zs
+//  Merged the new 2^4 RNG into the code.
+//  This new RNG is implemented in the LatRanGen class.
+//  The following algorithm and utility classes are affected:
+//
+//  AlgEig                  Fdwf
+//  AlgGheatBath            Fstag
+//  AlgHmd                  GlobalJobParameter
+//  AlgNoise                Lattice
+//  AlgPbp                  Matrix
+//  AlgThreept              RandomGenerator
+//                          Vector
+//
+//  Revision 1.4  2001/08/16 10:49:39  anj
+//  The float->Float changes in the previous version were unworkable on QCDSP.
+//  To allow type-flexibility, all references to "float" have been
+//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
+//  (where Float=rfloat), and on all other machines allows the use of
+//  double or float in all cases (i.e. for both Float and IFloat).  The I
+//  stands for Internal, as in "for internal use only". Anj
+//
+//  Revision 1.2  2001/06/19 18:11:27  anj
+//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
+//  Next version will contain the new nga/include/double64.h.  Also,
+//  Makefile.gnutests has been modified to work properly, propagating the
+//  choice of C++ compiler and flags all the way down the directory tree.
+//  The mpi_scu code has been added under phys/nga, and partially
+//  plumbed in.
+//
+//  Everything has newer dates, due to the way in which this first alteration was handled.
+//
+//  Anj.
+//
+//  Revision 1.2  2001/05/25 06:15:59  cvs
+//  Added CVS keywords to phys_v4_0_0_preCVS
+//
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //

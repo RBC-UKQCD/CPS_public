@@ -1,5 +1,3 @@
-#define MINV 1
-
 #include<config.h>
 CPS_START_NAMESPACE 
 
@@ -23,6 +21,7 @@ CPS_END_NAMESPACE
 #include<util/verbose.h>
 #include<util/error.h>
 #include<comms/glb.h>
+#include<alg/alg_remez.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
@@ -33,14 +32,49 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
 		     HmdArg *arg) : 
 		     AlgHmd(latt, c_arg, arg) 
 {
-  int i,j;
   cname = "AlgHmcRHMC";
   char *fname = "AlgHmcRHMC(L&,CommonArg*,HmdArg*)";
   VRB.Func(cname,fname);
-  int n_masses;
 
-  isz = hmd_arg->isz;
-  sw = hmd_arg->sw;
+  // Calculate the fermion field size.
+  //----------------------------------------------------------------
+  f_size = GJP.VolNodeSites() * latt.FsiteSize() / (latt.FchkbEvl()+1);
+
+
+  // Approx type must be constant if this constructor is called
+  //----------------------------------------------------------------
+  hmd_arg->approx_type = CONSTANT;
+
+  init();
+}
+
+//------------------------------------------------------------------
+// Constructor for when dynamical approximations are used
+//------------------------------------------------------------------
+
+AlgHmcRHMC::AlgHmcRHMC(Lattice& latt, CommonArg *c_arg, HmdArg *arg, 
+		       EigArg *e_arg) : AlgHmd(latt, c_arg, arg)
+
+{
+  cname = "AlgHmcRHMC";
+  char *fname = "AlgHmcRHMC(L&,CommonArg*,HmdArg*)";
+  VRB.Func(cname,fname);
+
+  // Calculate the fermion field size.
+  //----------------------------------------------------------------
+  f_size = GJP.VolNodeSites() * latt.FsiteSize() / (latt.FchkbEvl()+1);
+
+  init();
+  eig_arg = e_arg;
+}
+
+void AlgHmcRHMC::init()
+{
+  int i,j;
+  cname = "AlgHmcRHMC";
+  char *fname = "init()";
+  VRB.Func(cname,fname);
+  int n_masses;
 
   // Initialize the number of dynamical fermion masses
   //----------------------------------------------------------------
@@ -59,10 +93,6 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
     "hmd_arg->n_bsn_masses = %d is larger than MAX_HMD_MASSES = %d\n",
     n_bsn_masses, MAX_HMD_MASSES);
   }
-
-  // Calculate the fermion field size.
-  //----------------------------------------------------------------
-  f_size = GJP.VolNodeSites() * latt.FsiteSize() / (latt.FchkbEvl()+1);
 
   // Allocate memory for the fermion CG arguments.
   //----------------------------------------------------------------
@@ -121,15 +151,27 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
   //----------------------------------------------------------------
   if(n_frm_masses != 0){
     phi = (Vector **) smalloc(n_frm_masses * sizeof(Vector*));
-    if(phi == 0)
-      ERR.Pointer(cname,fname, "phi");
     VRB.Smalloc(cname,fname, "phi",phi, n_frm_masses * sizeof(Vector*));
     for(i=0; i<n_frm_masses; i++){
-      phi[i] = (Vector *) smalloc(f_size * sizeof(Vector));
-      if(phi[i] == 0)
-	ERR.Pointer(cname,fname, "phi[i]");
-      VRB.Smalloc(cname,fname, "phi[i]", phi[i], f_size * sizeof(Vector));
+      phi[i] = (Vector *) smalloc(f_size * sizeof(Float));
+      VRB.Smalloc(cname,fname, "phi[i]", phi[i], f_size * sizeof(Float));
     }  
+  }
+
+  // Allocate memory for the frmn solution fermion fields.
+  //----------------------------------------------------------------
+  total_size = 0;
+  for (i=0; i<n_frm_masses; i++) total_size += hmd_arg->FRatDeg[i];
+
+  frmn = (Vector **) smalloc(total_size * sizeof(Vector*));
+  VRB.Smalloc(cname,fname, "frmn",frmn, n_frm_masses * sizeof(Vector*));
+  frmn_d = (Vector **)smalloc(total_size * sizeof(Vector*));
+  VRB.Smalloc(cname,fname, "frmn_d",frmn_d, total_size * sizeof(Vector*));
+  for (i=0; i<total_size; i++) {
+    frmn[i] = (Vector *) smalloc(f_size *sizeof(Float));
+    VRB.Smalloc(cname,fname, "frmn[i]", frmn[i], f_size *sizeof(Float));
+    frmn_d[i] = (Vector*)smalloc(f_size * sizeof(Float));
+    VRB.Smalloc(cname,fname, "frmn_d[i]", frmn_d[i], f_size * sizeof(Float));
   }
 
   // Allocate memory for the boson field bsn.
@@ -140,10 +182,10 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
       ERR.Pointer(cname,fname, "bsn");
     VRB.Smalloc(cname,fname, "bsn",bsn, n_bsn_masses * sizeof(Vector*));
     for(i=0; i<n_bsn_masses; i++){
-      bsn[i] = (Vector *) smalloc(f_size * sizeof(Vector));
+      bsn[i] = (Vector *) smalloc(f_size * sizeof(Float));
       if(bsn[i] == 0)
 	ERR.Pointer(cname,fname, "bsn[i]");
-      VRB.Smalloc(cname,fname, "bsn[i]", bsn[i], f_size * sizeof(Vector));
+      VRB.Smalloc(cname,fname, "bsn[i]", bsn[i], f_size * sizeof(Float));
     }  
   }
 
@@ -154,77 +196,20 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
     ERR.Pointer(cname,fname, "gauge_field_init"); 
   VRB.Smalloc(cname,fname,
 	      "gauge_field_init",gauge_field_init, 
-	      g_size * sizeof(Float));
+	      g_size * sizeof(Matrix));
 
-  // Allocate memory for the rational functions and copy over.
-  //----------------------------------------------------------
-
-  FRatDeg = (int*)smalloc(n_frm_masses * sizeof(int));
-  FRatNorm = (Float*)smalloc(n_frm_masses * sizeof(Float));
-  FRatPole = (Float**)smalloc(n_frm_masses * sizeof(Float*));
-  FRatRes = (Float**)smalloc(n_frm_masses * sizeof(Float*));
-  SRatDeg = (int*)smalloc(n_frm_masses * sizeof(int));
-  SRatNorm = (Float*)smalloc(n_frm_masses * sizeof(Float));
-  SRatPole = (Float**)smalloc(n_frm_masses * sizeof(Float*));
-  SRatRes = (Float**)smalloc(n_frm_masses * sizeof(Float*));
-  SIRatNorm = (Float*)smalloc(n_frm_masses * sizeof(Float));
-  SIRatPole = (Float**)smalloc(n_frm_masses * sizeof(Float*));
-  SIRatRes = (Float**)smalloc(n_frm_masses * sizeof(Float*));
-
-  for (i=0; i<n_frm_masses; i++) {
-    FRatDeg[i] = hmd_arg -> FRatDeg[i];
-    FRatNorm[i] = hmd_arg -> FRatNorm[i];
-    FRatRes[i] = (Float*)smalloc(FRatDeg[i] * sizeof(Float));
-    FRatPole[i] = (Float*)smalloc(FRatDeg[i] * sizeof(Float));
-    for (j=0; j<FRatDeg[i]; j++) {
-      FRatRes[i][j] = hmd_arg -> FRatRes[i][j];
-      FRatPole[i][j] = hmd_arg -> FRatPole[i][j];
-    }
-    SRatDeg[i] = hmd_arg -> SRatDeg[i];
-    SRatNorm[i] = hmd_arg -> SRatNorm[i];
-    SRatRes[i] = (Float*)smalloc(SRatDeg[i] * sizeof(Float));
-    SRatPole[i] = (Float*)smalloc(SRatDeg[i] * sizeof(Float));
-    SIRatNorm[i] = hmd_arg -> SIRatNorm[i];
-    SIRatRes[i] = (Float*)smalloc(SRatDeg[i] * sizeof(Float));
-    SIRatPole[i] = (Float*)smalloc(SRatDeg[i] * sizeof(Float));
-    for (j=0; j<SRatDeg[i]; j++) {
-      SRatRes[i][j] = hmd_arg -> SRatRes[i][j];
-      SRatPole[i][j] = hmd_arg -> SRatPole[i][j];
-      SIRatRes[i][j] = hmd_arg -> SIRatRes[i][j];
-      SIRatPole[i][j] = hmd_arg -> SIRatPole[i][j];
-    }
-  }
-
-  // Allocate memory for fermion/boson field arrays.
+  // Used for storing residue coefficients for staggered optimisation
   //----------------------------------------------------------------
-  n_masses = n_frm_masses;
-  if(n_bsn_masses > n_frm_masses)
-    n_masses = n_bsn_masses;
-
-  if(n_masses != 0){
-    frmn = (Vector ***) smalloc(n_masses * sizeof(Vector**));
-    if(frmn == 0) ERR.Pointer(cname,fname, "frmn");
-    VRB.Smalloc(cname,fname, "frmn",frmn, n_masses * sizeof(Vector**));
-
-    for(i=0; i<n_masses; i++){
-      // Ensure the solution vector has dimension of the largest approximation
-      int rat_size = (SRatDeg[i] > FRatDeg[i]) ? SRatDeg[i] : FRatDeg[i];
-      frmn[i] = (Vector**) smalloc(rat_size*sizeof(Vector*));
-      if(frmn[i] == 0) ERR.Pointer(cname,fname, "frmn[i]");
-      VRB.Smalloc(cname,fname, "frmn[i]", frmn[i], rat_size * sizeof(Vector*));
-
-      for (j=0; j<rat_size; j++) {
-	frmn[i][j] = (Vector*) smalloc(f_size*sizeof(Float));
-	if(frmn[i][j] == 0) ERR.Pointer(cname,fname, "frmn[i][j]");
-	VRB.Smalloc(cname,fname, "frmn[i][j]", frmn[i][j], f_size * sizeof(Float));
-      }
-
+  if (AlgLattice().Fclass() == F_CLASS_ASQTAD) {
+    all_res = (Float *)smalloc(total_size * sizeof(Float));
+    VRB.Smalloc(cname,fname, "all_res", all_res, total_size * sizeof(Float));
+    Float *res = all_res;
+    for (i=0; i<n_frm_masses; i++) {
+      for (j=0; j<hmd_arg->FRatDeg[i]; j++)
+	*(res++) = hmd_arg->FRatRes[i][j];
     }
-
   }
-
 }
-
 
 //------------------------------------------------------------------
 // Destructor
@@ -233,49 +218,13 @@ AlgHmcRHMC::~AlgHmcRHMC() {
   int i,j;
   char *fname = "~AlgHmcRHMC()" ;
   VRB.Func(cname,fname);
-  int n_masses;
 
-  // Free memory for fermion solution field
+  // Free memory for the residue coefficients
   //----------------------------------------------------------------
-  n_masses = n_frm_masses;
-  if(n_bsn_masses > n_frm_masses)
-    n_masses = n_bsn_masses;
-
-  if(n_masses != 0){
-    for(i=0; i<n_masses; i++){
-      int rat_size = (SRatDeg[i] > FRatDeg[i]) ? SRatDeg[i] : FRatDeg[i];
-      for (j=0; j<rat_size; j++) {
-	VRB.Sfree(cname,fname, "frmn[i][j]",frmn[i][j]);
-	sfree(frmn[i][j]);
-      }
-      VRB.Sfree(cname,fname, "frmn[i]",frmn[i]);
-      sfree(frmn[i]);
-    }
-    VRB.Sfree(cname,fname, "frmn",frmn);
-    sfree(frmn);
+  if (AlgLattice().Fclass() == F_CLASS_ASQTAD) {
+    VRB.Sfree(cname,fname, "all_res",all_res);
+    sfree(all_res);
   }
-  
-  // Free memory for the rational functions
-  //----------------------------------------------------------------
-  for (i=0; i<n_frm_masses; i++) {
-    sfree(SIRatPole[i]);
-    sfree(SIRatRes[i]);
-    sfree(SRatPole[i]);
-    sfree(SRatRes[i]);
-    sfree(FRatPole[i]);
-    sfree(FRatRes[i]);
-  }
-  sfree(SIRatPole);
-  sfree(SIRatRes);
-  sfree(SIRatNorm);
-  sfree(SRatPole);
-  sfree(SRatRes);
-  sfree(SRatNorm);
-  sfree(SRatDeg);
-  sfree(FRatPole);
-  sfree(FRatRes);
-  sfree(FRatNorm);
-  sfree(FRatDeg);
 
   // Free memory for the initial gauge field.
   //----------------------------------------------------------------
@@ -303,6 +252,19 @@ AlgHmcRHMC::~AlgHmcRHMC() {
     VRB.Sfree(cname,fname, "phi",phi);
     sfree(phi);
   }
+
+  // Free memory for the frmn (pseudo fermion) solution fields.
+  //----------------------------------------------------------------
+  for(i=0; i<total_size; i++){
+    VRB.Sfree(cname,fname, "frmn[i]",frmn[i]);
+    sfree(frmn[i]);
+    VRB.Sfree(cname,fname, "frmn_d[i]",frmn_d[i]);
+    sfree(frmn_d[i]);
+  }
+  VRB.Sfree(cname,fname, "frmn",frmn);
+  sfree(frmn);
+  VRB.Sfree(cname,fname, "frmn_d",frmn_d);
+  sfree(frmn_d);
 
   // Free memory for the boson CG arguments
   //----------------------------------------------------------------
@@ -353,6 +315,7 @@ Float AlgHmcRHMC::run(void)
   Float true_res_min=0;
   Float true_res_max=0;
   int cg_calls=0;
+  int shift;
   int i=0, j=0;
   char *fname = "run()";
   char *md_time_str = "MD_time/step_size = ";
@@ -360,7 +323,9 @@ Float AlgHmcRHMC::run(void)
   VRB.Func(cname,fname);
 
   Float trueMass=0;
+  Float zeroPole;
   Float acceptance;                            // The acceptance probability
+  Float efficiency;
  
   // Get the Lattice object
   //----------------------------------------------------------------
@@ -398,17 +363,15 @@ Float AlgHmcRHMC::run(void)
   //----------------------------------------------------------------
   lat.RandGaussAntiHermMatrix(mom, 1.0);
   
-  
   // Heat Bath for the boson field bsn
   //----------------------------------------------------------------
   for(i=0; i<n_bsn_masses; i++){
-    lat.RandGaussVector(frmn[i][0], 0.5, Ncb);
+    lat.RandGaussVector(frmn[0], 0.5, Ncb);
     lat.RandGaussVector(bsn[i], 0.5, Ncb);
-    lat.SetPhi(phi[i], frmn[i][0], bsn[i], hmd_arg->bsn_mass[i]);
+    lat.SetPhi(phi[i], frmn[0], bsn[i], hmd_arg->bsn_mass[i]);
     lat.RandGaussVector(bsn[i], 0.5, Ncb);
     lat.FmatEvlInv(bsn[i], phi[i], bsn_cg_arg[i], CNV_FRM_NO);
   }
-  
 
   // Heat Bath for the pseudo-fermions (phi)
   // Use the SI approximation since need the inverse of the action
@@ -416,22 +379,28 @@ Float AlgHmcRHMC::run(void)
 
   h_init = lat.GhamiltonNode() + lat.MomHamiltonNode(mom);
   for(i=0; i<n_frm_masses; i++){
-    lat.RandGaussVector(phi[i], 0.5, Ncb);
-    h_init += lat.FhamiltonNode(phi[i],phi[i]);
+    
+    lat.RandGaussVector(frmn[0], 0.5, Ncb);
+    h_init += lat.FhamiltonNode(frmn[0],frmn[0]);
 
-#ifdef MINV
-    for (j=0; j<SRatDeg[i]; j++) frmn[i][j] -> VecTimesEquFloat(0.0,f_size);
-    cg_iter = lat.FmatEvlMInv(frmn[i], phi[i], SIRatPole[i], SRatDeg[i],
-			      isz, frm_cg_arg[i], CNV_FRM_NO);
-#else
-    trueMass = frm_cg_arg[i] -> mass;
-    cg_iter = 0;
-    for (j=0; j<SRatDeg[i]; j++) {
-      frm_cg_arg[i] -> mass = sqrt(trueMass*trueMass + SIRatPole[i][j]/4.0);
-      cg_iter += lat.FmatEvlInv(frmn[i][j], phi[i], frm_cg_arg[i], &true_res, CNV_FRM_NO);
+    phi[i] -> CopyVec(frmn[0],f_size);
+    phi[i] -> VecTimesEquFloat(hmd_arg->SIRatNorm[i], f_size);
+
+    // Can only renormalise mass for staggered or asqtad cases
+    if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
+      trueMass = frm_cg_arg[i] -> mass;
+      frm_cg_arg[i] -> mass = sqrt(trueMass*trueMass + hmd_arg->SIRatPole[i][0]/4.0);
+      zeroPole = hmd_arg->SIRatPole[i][0];
+      for (j=0; j<hmd_arg->SRatDeg[i]; j++) hmd_arg->SIRatPole[i][j] -= zeroPole;
     }
-    frm_cg_arg[i] -> mass = trueMass;
-#endif
+
+    cg_iter = lat.FmatEvlMInv(phi+i, frmn[0], hmd_arg->SIRatPole[i], hmd_arg->SRatDeg[i],
+    			      hmd_arg->isz, frm_cg_arg[i], CNV_FRM_NO, SINGLE, hmd_arg->SIRatRes[i]);
+
+    if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
+      for (j=0; j<hmd_arg->SRatDeg[i]; j++) hmd_arg->SIRatPole[i][j] += zeroPole;
+      frm_cg_arg[i] -> mass = trueMass;
+    }
 
     cg_iter_av += cg_iter;
     if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
@@ -441,9 +410,6 @@ Float AlgHmcRHMC::run(void)
     if(true_res > true_res_max) true_res_max = true_res;
     cg_calls++;      
 
-    phi[i] -> VecTimesEquFloat(SIRatNorm[i], f_size);
-    for (j=0; j<SRatDeg[i]; j++)
-      phi[i] -> FTimesV1PlusV2(SIRatRes[i][j],frmn[i][j],phi[i],f_size);
   }
 
   // Calculate initial boson contribution to the Hamiltonian
@@ -457,11 +423,11 @@ Float AlgHmcRHMC::run(void)
 
   // Perform initial UQPQ integration
   //--------------------------------------------------------------
-  lat.EvolveGfield(mom, 0.25*dt/(Float)sw);
-  for (i=0; i<sw; i++) {
-    lat.EvolveMomGforce(mom, 0.5*dt/(Float)sw);
-    if (i < sw-1) lat.EvolveGfield(mom, 0.5*dt/(Float)sw);
-    else lat.EvolveGfield(mom, 0.25*dt/(Float)sw);
+  lat.EvolveGfield(mom, 0.25*dt/(Float)hmd_arg->sw);
+  for (i=0; i<hmd_arg->sw; i++) {
+    lat.EvolveMomGforce(mom, 0.5*dt/(Float)hmd_arg->sw);
+    if (i < hmd_arg->sw-1) lat.EvolveGfield(mom, 0.5*dt/(Float)hmd_arg->sw);
+    else lat.EvolveGfield(mom, 0.25*dt/(Float)hmd_arg->sw);
   }
 
   // First leap frog step has occurred. Increment MD Time clock in
@@ -479,20 +445,26 @@ Float AlgHmcRHMC::run(void)
     // Evolve momenta by one step using the fermion force
     //--------------------------------------------------------------
 
+    shift = 0;
     for(i=0; i<n_frm_masses; i++){
-#ifdef MINV
-      for (j=0; j<FRatDeg[i]; j++) frmn[i][j] -> VecTimesEquFloat(0.0, f_size);
-      cg_iter = lat.FmatEvlMInv(frmn[i], phi[i], FRatPole[i], FRatDeg[i],
-				isz, frm_cg_arg[i], CNV_FRM_NO);
-#else
-      cg_iter = 0;
-      trueMass = frm_cg_arg[i] -> mass;
-      for (j=0; j<FRatDeg[i]; j++) {
-	frm_cg_arg[i] -> mass = sqrt(trueMass*trueMass + FRatPole[i][j]/4.0);
-	cg_iter += lat.FmatEvlInv(frmn[i][j],phi[i],frm_cg_arg[i],&true_res,CNV_FRM_NO);
+      // Can only renormalise mass for staggered or asqtad cases
+      if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
+	trueMass = frm_cg_arg[i] -> mass;
+	frm_cg_arg[i] -> mass = sqrt(trueMass*trueMass + hmd_arg->FRatPole[i][0]/4.0);
+	zeroPole = hmd_arg->FRatPole[i][0];
+	for (j=0; j<hmd_arg->FRatDeg[i]; j++) hmd_arg->FRatPole[i][j] -= zeroPole;
       }
-      frm_cg_arg[i] -> mass = trueMass;
-#endif
+
+      for (j=0; j<hmd_arg->FRatDeg[i]; j++) frmn[j] -> VecTimesEquFloat(0.0,f_size);
+
+      cg_iter = lat.FmatEvlMInv(frmn+shift, phi[i], hmd_arg->FRatPole[i], hmd_arg->FRatDeg[i],
+				hmd_arg->isz, frm_cg_arg[i], CNV_FRM_NO, frmn_d+shift);
+      shift += hmd_arg->FRatDeg[i];
+
+      if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
+	for (j=0; j<hmd_arg->FRatDeg[i]; j++) hmd_arg->FRatPole[i][j] += zeroPole;
+	frm_cg_arg[i] -> mass = trueMass;
+      }
 
       cg_iter_av += cg_iter;
       if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
@@ -502,10 +474,17 @@ Float AlgHmcRHMC::run(void)
       if(true_res > true_res_max) true_res_max = true_res;
       cg_calls++;      
       
-      for (j=0; j<FRatDeg[i]; j++)
-	lat.EvolveMomFforce(mom,frmn[i][j],hmd_arg->frm_mass[i],dt*FRatRes[i][j]);
-
+      if (lat.Fclass() != F_CLASS_ASQTAD)
+	lat.RHMC_EvolveMomFforce(mom, frmn, hmd_arg->FRatDeg[i], hmd_arg->FRatRes[i], 
+				 hmd_arg->frm_mass[i], dt, frmn_d);
+      //for(j=0; j<hmd_arg->FRatDeg[i]; j++)
+      //	lat.EvolveMomFforce(mom, frmn[j], hmd_arg->frm_mass[i], hmd_arg->FRatRes[i][j]*dt);
     }
+
+    // Only for the case of asqtad fermions do we perform this optimisation
+    //--------------------------------------------------------------
+    if (lat.Fclass() == F_CLASS_ASQTAD)
+      lat.RHMC_EvolveMomFforce(mom, frmn, total_size, all_res, 0.0, dt, frmn_d);
 
     // Evolve momenta by one step using the boson force
     //--------------------------------------------------------------
@@ -522,11 +501,11 @@ Float AlgHmcRHMC::run(void)
       {
 	// Perform UQPQ integration (pure gauge and momenta)
 	//----------------------------------------------------------------
-	lat.EvolveGfield(mom, 0.5*dt/(Float)sw);
-	for (i=0; i<sw; i++) {
-	  lat.EvolveMomGforce(mom, dt/(Float)sw);
-	  if (i < sw-1) lat.EvolveGfield(mom, dt/(Float)sw);
-	  else lat.EvolveGfield(mom, 0.5*dt/(Float)sw);
+	lat.EvolveGfield(mom, 0.5*dt/(Float)hmd_arg->sw);
+	for (i=0; i<hmd_arg->sw; i++) {
+	  lat.EvolveMomGforce(mom, dt/(Float)hmd_arg->sw);
+	  if (i < hmd_arg->sw-1) lat.EvolveGfield(mom, dt/(Float)hmd_arg->sw);
+	  else lat.EvolveGfield(mom, 0.5*dt/(Float)hmd_arg->sw);
 	}
 
 	// Increment MD Time clock in Lattice by one half time step.
@@ -538,11 +517,11 @@ Float AlgHmcRHMC::run(void)
       {
 	// Perform final UQPQ integration
 	//----------------------------------------------------------------
-	lat.EvolveGfield(mom, 0.25*dt/(Float)sw);
-	for (i=0; i<sw; i++) {
-	  lat.EvolveMomGforce(mom, 0.5*dt/(Float)sw);
-	  if (i < sw-1) lat.EvolveGfield(mom, 0.5*dt/(Float)sw);
-	  else lat.EvolveGfield(mom, 0.25*dt/(Float)sw);
+	lat.EvolveGfield(mom, 0.25*dt/(Float)hmd_arg->sw);
+	for (i=0; i<hmd_arg->sw; i++) {
+	  lat.EvolveMomGforce(mom, 0.5*dt/(Float)hmd_arg->sw);
+	  if (i < hmd_arg->sw-1) lat.EvolveGfield(mom, 0.5*dt/(Float)hmd_arg->sw);
+	  else lat.EvolveGfield(mom, 0.25*dt/(Float)hmd_arg->sw);
 	}
 
       }
@@ -558,24 +537,38 @@ Float AlgHmcRHMC::run(void)
   }
   h_final = lat.GhamiltonNode();
 
+  // Measure bounds and generate new approximations
+  if (hmd_arg->approx_type == DYNAMIC) {
+#ifndef GMP
+    ERR.General(cname,fname,"Dynamical rational generation not possible without gmp\n");
+#else
+    dynamicalApprox();
+#endif
+  }
 
   // Calculate final fermion contribution to the Hamiltonian
   //---------------------------------------------------------------
+  shift = 0;
   for (i=0; i<n_frm_masses; i++) {
+    frmn[0] -> CopyVec(phi[i],f_size);
+    frmn[0] -> VecTimesEquFloat(hmd_arg->SRatNorm[i], f_size);
 
-#ifdef MINV
-    for (j=0; j<SRatDeg[i]; j++) frmn[i][j] -> VecTimesEquFloat(0.0, f_size);
-    cg_iter = lat.FmatEvlMInv(frmn[i], phi[i], SRatPole[i], SRatDeg[i],
-			      isz, frm_cg_arg[i], CNV_FRM_NO);        
-#else
-    cg_iter = 0;
-    trueMass = frm_cg_arg[i] -> mass;
-    for (j=0; j<SRatDeg[i]; j++) {
-      frm_cg_arg[i] -> mass = sqrt(trueMass*trueMass + SRatPole[i][j]/4.0);
-      cg_iter += lat.FmatEvlInv(frmn[i][j], phi[i], frm_cg_arg[i], &true_res, CNV_FRM_NO);
+    // Can only renormalise mass for staggered or asqtad cases
+    if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
+      trueMass = frm_cg_arg[i] -> mass;
+      frm_cg_arg[i] -> mass = sqrt(trueMass*trueMass + hmd_arg->SRatPole[i][0]/4.0);
+      zeroPole = hmd_arg->SRatPole[i][0];
+      for (j=0; j<hmd_arg->SRatDeg[i]; j++) hmd_arg->SRatPole[i][j] -= zeroPole;
     }
-    frm_cg_arg[i] -> mass = trueMass;
-#endif
+
+    cg_iter = lat.FmatEvlMInv(frmn+shift, phi[i], hmd_arg->SRatPole[i], hmd_arg->SRatDeg[i],
+    			      hmd_arg->isz, frm_cg_arg[i], CNV_FRM_NO, SINGLE, hmd_arg->SRatRes[i]);
+    shift += hmd_arg->FRatDeg[i];
+
+    if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
+      for (j=0; j<hmd_arg->SRatDeg[i]; j++) hmd_arg->SRatPole[i][j] += zeroPole;
+      frm_cg_arg[i] -> mass = trueMass;
+    }
 
     cg_iter_av += cg_iter;
     if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
@@ -585,15 +578,10 @@ Float AlgHmcRHMC::run(void)
     if(true_res > true_res_max) true_res_max = true_res;
     cg_calls++;      
 
-    phi[i] -> VecTimesEquFloat(SRatNorm[i],f_size);
-    for (j=0; j<SRatDeg[i]; j++)
-      phi[i] -> FTimesV1PlusV2(SRatRes[i][j],frmn[i][j],phi[i],f_size);
-    h_final += lat.FhamiltonNode(phi[i], phi[i]);
+    h_final += lat.FhamiltonNode(frmn[0], frmn[0]);
   }
   
-
   h_final = h_final + lat.MomHamiltonNode(mom);
-
 
   // Calculate final boson contribution to the Hamiltonian
   //---------------------------------------------------------------
@@ -615,12 +603,7 @@ Float AlgHmcRHMC::run(void)
     lat.SoCheck(delta_h);
   }
 
-  // Calculate average of monitor variables
-  //---------------------------------------------------------------
-  cg_iter_av = Float(cg_iter_av) / Float(cg_calls);
-  true_res_av = Float(true_res_av) / Float(cg_calls);
 
-  
   // Metropolis step
   //---------------------------------------------------------------
   if(hmd_arg->metropolis){
@@ -647,6 +630,15 @@ Float AlgHmcRHMC::run(void)
     lat.GupdCntInc(1);
     VRB.Result(cname,fname,"No Metropolis step -> Accepted\n");
   }    
+
+
+  // Calculate average of monitor variables
+  //---------------------------------------------------------------
+  
+  efficiency = Float(acceptance) / Float(cg_iter_av);
+  cg_iter_av = Float(cg_iter_av) / Float(cg_calls);
+  true_res_av = Float(true_res_av) / Float(cg_calls);
+
 
   // If GJP.Snodes() !=1  the gauge field is spread out
   // accross s-slices of processors. It must be identical
@@ -681,7 +673,7 @@ Float AlgHmcRHMC::run(void)
   }
 
   VRB.Result(cname,fname,
-  "Hmc steps = %d, Delta_hamilton = %e, accept = %d, dev = %e, max_diff = %e\n",
+	     "Hmc steps = %d, Delta_hamilton = %e, accept = %d, dev = %e, max_diff = %e\n",
 	     hmd_arg->steps_per_traj,
 	     IFloat(delta_h), 
 	     accept,
@@ -698,6 +690,10 @@ Float AlgHmcRHMC::run(void)
 	     IFloat(true_res_min),
 	     IFloat(true_res_max));
 
+  VRB.Result(cname,fname,
+	     "Efficiency (acceptance per cg iteration) = %e\n",
+	     efficiency);
+
   VRB.Result(cname,fname,"Configuration number = %d\n", lat.GupdCnt());
   
 
@@ -708,4 +704,144 @@ Float AlgHmcRHMC::run(void)
 
   return acceptance;
 }
+
+// Measure Eigenvalue bounds and regenerate approximation if necessary
+void AlgHmcRHMC::dynamicalApprox()
+{
+
+  char *fname = "dynamicalApprox()";
+  VRB.Func(cname,fname);
+
+  // Get the Lattice object
+  //----------------------------------------------------------------
+  Lattice& lat = AlgLattice();
+
+  // First measure highest and lowest eigenvalues
+  eig_arg->N_eig = 1;
+
+  Vector **psi = (Vector**) smalloc(sizeof(Vector*));
+  if(psi == 0) ERR.Pointer(cname,fname, "psi");
+  VRB.Smalloc(cname,fname, "psi",psi,sizeof(Vector*));
+  Float *lambda = (Float*) smalloc(2*sizeof(Float));
+  Float *chirality = (Float*) smalloc(sizeof(Float));
+  int *valid_eig = (int*) smalloc(sizeof(int));
+  Float **hsum = (Float**) smalloc(sizeof(Float*));
+  if (eig_arg->hsum_dir == 0)
+    *hsum = (Float*) smalloc(GJP.Xnodes()*GJP.XnodeSites() * sizeof(Float));
+  else if (eig_arg->hsum_dir == 1)
+    *hsum = (Float*) smalloc(GJP.Ynodes()*GJP.YnodeSites() * sizeof(Float));
+  else if (eig_arg->hsum_dir == 2)
+    *hsum = (Float*) smalloc(GJP.Ynodes()*GJP.YnodeSites() * sizeof(Float));
+  else if (eig_arg->hsum_dir == 3)
+    *hsum = (Float*) smalloc(GJP.Ynodes()*GJP.YnodeSites() * sizeof(Float));
+
+  psi[0] = (Vector *) smalloc(f_size * sizeof(Float));
+  if(psi[0] == 0) ERR.Pointer(cname,fname, "psi[0]");
+  
+  for (int i=0; i<n_frm_masses; i++) {
+    eig_arg->mass = hmd_arg->frm_mass[i];
+    
+    // Measure lowest e-value
+    eig_arg->RitzMatOper = MATPCDAG_MATPC;
+    lat.RandGaussVector(psi[0], 0.5, 1);
+    lat.FeigSolv(psi, lambda, chirality, valid_eig, hsum, eig_arg, CNV_FRM_NO);
+    
+    // Measure highest e-value
+    eig_arg->RitzMatOper = NEG_MATPCDAG_MATPC;
+    lat.RandGaussVector(psi[0], 0.5, 1);
+    lat.FeigSolv(psi, lambda+1, chirality, valid_eig, hsum, eig_arg, CNV_FRM_NO);
+    lambda[1] *= -1;
+
+    VRB.Flow(cname,fname, "Old Spectral Bounds are [%f,%f]\n",
+	     hmd_arg->lambda_low[i],hmd_arg->lambda_high[i]);
+    VRB.Flow(cname,fname, "New Spectral Bounds are [%f,%f]\n",lambda[0],lambda[1]);
+
+    // Need to reconstruct approximations if either the spectrum leaves the interval 
+    // or if it moves much inside the interval
+    
+    Float delta = eig_arg->Rsdlam + hmd_arg->spread;
+
+    // Reset the required degree of approximation
+    if (hmd_arg->FRatDegNew[i] != 0 && hmd_arg->SRatDegNew[i] != 0) {
+      hmd_arg->FRatDeg[i] = hmd_arg->FRatDegNew[i];
+      hmd_arg->SRatDeg[i] = hmd_arg->SRatDegNew[i];
+    }
+
+    if (lambda[0] < hmd_arg->lambda_low[i]  || // below interval
+	lambda[1] > hmd_arg->lambda_high[i] || // above interval
+	lambda[0] > hmd_arg->lambda_low[i]  * (1.0+delta) || // inside from below
+	lambda[1] < hmd_arg->lambda_high[i] * (1.0-delta) ||
+	hmd_arg->FRatDeg[i] != hmd_arg->FRatDegNew[i] ||
+	hmd_arg->SRatDeg[i] != hmd_arg->SRatDegNew[i] ) { // inside from above
+      VRB.Flow(cname,fname,"Reconstructing approximation\n");
+
+      // Free and Allocate memory for force approximation if necessary
+       if (hmd_arg->FRatDeg[i] != hmd_arg->FRatDegNew[i]) {
+
+	for(i=0; i<total_size; i++){
+	  VRB.Sfree(cname,fname, "frmn[i]",frmn[i]);
+	  sfree(frmn[i]);
+	  VRB.Sfree(cname,fname, "frmn_d[i]",frmn_d[i]);
+	  sfree(frmn_d[i]);
+	}
+	VRB.Sfree(cname,fname, "frmn",frmn);
+	sfree(frmn);
+	VRB.Sfree(cname,fname, "frmn_d",frmn_d);
+	sfree(frmn_d);
+
+	total_size = 0;
+	for (i=0; i<n_frm_masses; i++) total_size += hmd_arg->FRatDeg[i];
+	
+	frmn = (Vector **) smalloc(total_size * sizeof(Vector*));
+	VRB.Smalloc(cname,fname, "frmn",frmn, n_frm_masses * sizeof(Vector*));
+	frmn_d = (Vector **)smalloc(total_size * sizeof(Vector*));
+	VRB.Smalloc(cname,fname, "frmn_d",frmn_d, total_size * sizeof(Vector*));
+	for (i=0; i<total_size; i++) {
+	  frmn[i] = (Vector *) smalloc(f_size *sizeof(Float));
+	  VRB.Smalloc(cname,fname, "frmn[i]", frmn[i], f_size *sizeof(Float));
+	  frmn_d[i] = (Vector*)smalloc(f_size * sizeof(Float));
+	  VRB.Smalloc(cname,fname, "frmn_d[i]", frmn_d[i], f_size * sizeof(Float));
+	}
+	hmd_arg->FRatDeg[i] = hmd_arg->FRatDegNew[i];
+      }
+
+      if (hmd_arg->SRatDeg[i] != hmd_arg->SRatDegNew[i])
+	hmd_arg->SRatDeg[i] = hmd_arg->SRatDegNew[i];
+
+      // If bounded, remain within bounds
+      if (lambda[0]*(1-delta) > hmd_arg->lambda_min[i]) 
+	hmd_arg->lambda_low[i] = lambda[0]*(1-delta);
+      else
+	hmd_arg->lambda_low[i] = hmd_arg->lambda_min[i];
+    
+      if (lambda[1]*(1+delta) < hmd_arg->lambda_max[i]) 
+	hmd_arg->lambda_high[i] = lambda[1]*(1+delta);
+      else
+	hmd_arg->lambda_high[i] = hmd_arg->lambda_max[i];
+
+      AlgRemez remez(hmd_arg->lambda_low[i], hmd_arg->lambda_high[i], hmd_arg->precision);
+      
+      remez.generateApprox(hmd_arg->FRatDeg[i],hmd_arg->frm_power_num[i], hmd_arg->frm_power_den[i]);
+      remez.getIPFE(hmd_arg->FRatRes[i], hmd_arg->FRatPole[i], hmd_arg->FRatNorm+i);
+      remez.generateApprox(hmd_arg->SRatDeg[i],hmd_arg->frm_power_num[i],2*hmd_arg->frm_power_den[i]);
+      remez.getIPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i], hmd_arg->SRatNorm+i);
+      remez.getPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i], hmd_arg->SIRatNorm+i);
+      
+    } else {
+      VRB.Flow(cname,fname,"Reconstruction not necessary\n");
+    }
+    
+  }
+
+  sfree(hsum[0]);
+  sfree(psi[0]);
+  sfree(psi);
+  sfree(hsum);
+  sfree(lambda);
+  sfree(chirality);
+  sfree(valid_eig);
+
+}
+
+
 CPS_END_NAMESPACE
