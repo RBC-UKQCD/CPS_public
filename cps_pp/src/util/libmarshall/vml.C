@@ -11,6 +11,7 @@
 #include <rpc/types.h>
 #include <rpc/rpc.h>
 #endif
+#include <util/qcdio.h>
 #include <util/vml/types.h>
 #include <util/vml/vml.h>
 #include <util/vml/vml_encoder.h>
@@ -23,8 +24,10 @@ extern "C" {
 /*
  * constants specific to the vml "protocol"
  */
+#if 0
 #define VML_FALSE	((long) 0)
 #define VML_TRUE	((long) 1)
+#endif
 #define LASTUNSIGNED	((u_int) 0-1)
 
 /*
@@ -542,12 +545,14 @@ void vml_class_end   (VML *vmls, char *type, char *instance)
 
 }
 
+USING_NAMESPACE_CPS
+
 bool_t VML::Puts(char *string)
 {
   switch ( StreamType ) { 
   case VML_STDIO:
   case VML_DESCRIPTOR:
-    fprintf(x_fp,string);
+    Fprintf(x_fp,string);
     fflush(x_fp);
     return true;
     break;
@@ -613,7 +618,7 @@ bool_t VML::Create(char *file, enum vml_op op)
 {
   FILE *fp = NULL;
   if ( op == VML_ENCODE ) { 
-    fp  = fopen(file,"w");
+    fp  = Fopen(file,"w");
   } else if ( op == VML_DECODE ) { 
     fp  = fopen(file,"r");
   }
@@ -633,7 +638,7 @@ bool_t VML::Create(FILE *file, enum vml_op op)
 void VML::Destroy(void) 
 {
   if ( StreamType == VML_MEM ) return;
-  else if (x_fp) fclose(x_fp);
+  else if (x_fp) Fclose(x_fp);
 }
 bool_t vmlmem_create (VML *__vmls, char * __addr,
 				int __size, enum vml_op __xop)
