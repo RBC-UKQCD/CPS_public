@@ -1,0 +1,28 @@
+# Set `UseCVSACL' to yes to use CVSACL feature.
+UseCVSACL=yes
+
+# Default CVSACL Permission to use.
+#CVSACLDefaultPermissions=p
+
+# Default file location for CVS ACL file (access) is CVSROOT/access.
+# If you want to use a different location, define it below.
+#CVSACLFileLocation=/path/to/cvs/access
+
+# Set `UseSystemGroups' to yes to use system group definitions (/etc/group).
+UseSystemGroups=yes
+
+# Set `UseCVSGroups' to yes to use another group file.
+#UseCVSGroups=yes
+
+# Default file location for CVS groups file is CVSROOT/group.
+# If you want to use a different location, define it below.
+#CVSGroupsFileLocation=/path/to/cvs/group
+
+# Set UseSeperateACLFileForEachDir to yes in order to use a
+# seperate 'access' file for each directory.
+# This increased the performance if you have really big repository.
+#UseSeperateACLFileForEachDir=no
+
+# Set CVSServerRunAsUser to a system user, in order CVS server
+# to run as.
+#CVSServerRunAsUser=runascvsuser
