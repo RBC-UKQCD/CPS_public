@@ -10,6 +10,8 @@ ln -s Makefile_cps  makefile
 make depend
 make cps
 
+To run the test suite:
+make test
 
 Full instructions for comfiguration and compilation can be found in
 
