@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.30 2004-12-01 06:38:14 chulwoo Exp $
+  $Id: lattice.h,v 1.31 2004-12-07 05:23:18 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2004-12-01 06:38:14 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.30 2004-12-01 06:38:14 chulwoo Exp $
-  $Id: lattice.h,v 1.30 2004-12-01 06:38:14 chulwoo Exp $
+  $Date: 2004-12-07 05:23:18 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.31 2004-12-07 05:23:18 chulwoo Exp $
+  $Id: lattice.h,v 1.31 2004-12-07 05:23:18 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.30 $
+  $Revision: 1.31 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -1783,6 +1783,96 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
 };
 
 
+class ParTransP4; //forward declaration
+
+//------------------------------------------------------------------
+//! A class implementing improved staggered fermions (the P4 action).
+/*!
+  \ingroup factions
+*/
+//------------------------------------------------------------------
+
+class Fp4 : public virtual FstagTypes, public virtual Fsmear
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+
+    Fp4();
+    virtual ~Fp4();
+
+    FclassType Fclass() const;
+    
+    int FmatEvlInv(Vector *f_out, Vector *f_in, 
+		   CgArg *cg_arg, 
+		   Float *true_res,
+		   CnvFrmType cnv_frm = CNV_FRM_YES);
+
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
+		    Vector **f_out_d);
+
+    Float FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
+
+    int FmatInv(Vector *f_out, Vector *f_in, 
+		CgArg *cg_arg, 
+		Float *true_res,
+		CnvFrmType cnv_frm = CNV_FRM_YES,
+		PreserveType prs_f_in = PRESERVE_YES);
+
+    int FeigSolv(Vector **f_eigenv, Float *lambda, 
+		 Float *chirality, int *valid_eig,
+		 Float **hsum,
+		 EigArg *eig_arg,
+		 CnvFrmType cnv_frm = CNV_FRM_YES);
+
+    void SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+			Float mass);
+
+    void EvolveMomFforce(Matrix *mom, Vector *frm, 
+			 Float mass, Float step_size);
+
+    Float BhamiltonNode(Vector *boson, Float mass);
+
+    void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm, int dir_flag);
+
+
+    //! Momentum update in the RHMC algorithm.
+    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+			      Float *alpha, Float mass, Float dt,
+			      Vector **sol_d);
+
+    // Various utility routines for the momentum force computation.
+
+    void Smear();
+    
+  private:
+
+    void update_momenta(Matrix**, IFloat, Matrix*);
+    
+    ChkbType parity(const int*);
+
+    void force_product_sum(const Matrix*,  int, IFloat, Matrix*);
+    
+    void force_product_sum(const Matrix*, const Matrix*, const Matrix*, 
+			   IFloat, Matrix*, Matrix*);
+
+    void force_product_sum(const Matrix*, const Matrix*, IFloat, 
+			   Matrix*);
+
+    void force_product_d_sum(const Matrix*, const Matrix*, IFloat, 
+			     Matrix*);
+
+    void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
+
+
+    
+};
+
 
 //------------------------------------------------------------------
 //! A class containing methods relevant to all Wilson type fermion actions.
@@ -2435,6 +2525,24 @@ class GnoneFasqtad
 };
 
 //------------------------------------------------------------------
+//! Trivial gauge action with improved staggered fermion action (P4)
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GnoneFp4
+    : public virtual Lattice, 
+    public virtual FstagTypes, 
+    public Gnone, 
+    public Fp4
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GnoneFp4();
+    virtual ~GnoneFp4();
+};
+
+//------------------------------------------------------------------
 //! Trivial gauge action with staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
@@ -3068,7 +3176,7 @@ class GpowerRectFasqtad : public GpowerRect, public Fasqtad {
 
 
 //------------------------------------------------------------------
-//! One Loop Symanzik improved gauge action with Asqtad staggered fermion action
+//! One Loop Symanzik improved gauge action with P4 staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprOLSymFasqtad : public GimprOLSym, public Fasqtad{
@@ -3080,7 +3188,19 @@ class GimprOLSymFasqtad : public GimprOLSym, public Fasqtad{
     GimprOLSymFasqtad();
     ~GimprOLSymFasqtad();
 };
+//------------------------------------------------------------------
+//! One Loop Symanzik improved gauge action with Asqtad staggered fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GimprOLSymFp4 : public GimprOLSym, public Fp4{
+    
+  private:
+    char *cname;    // Class name.
 
+  public:
+    GimprOLSymFp4();
+    ~GimprOLSymFp4();
+};
 CPS_END_NAMESPACE
 #endif
 

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the DoArg structure.
   
-  $Id: do_arg.h,v 1.12 2004-08-30 04:29:59 chulwoo Exp $
+  $Id: do_arg.h,v 1.13 2004-12-07 05:23:16 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /* CIM Sun Jul  6 23:30:27 GMT 1997 */
@@ -151,6 +151,21 @@ struct DoArg {
     //! Coefficient of the Lepage term in the Asqtad improved staggered fermion action.
     Float asqtad_lepage; 
     
+ // Parameters for the p4 improved staggered action.
+
+    //! Coefficient of the Kogut-Susskind term in the P4 improved staggered fermion action.
+    Float p4_KS;	
+    //! Coefficient of the Naik term in the P4 improved staggered fermion action.
+    Float p4_knight;	
+    //! Coefficient of the 3-staple term in the P4 improved staggered fermion action.
+    Float p4_3staple;
+    //! Coefficient of the 5-staple term in the P4 improved staggered fermion action.
+    Float p4_5staple;
+    //! Coefficient of the 7-staple term in the P4 improved staggered fermion action.    
+    Float p4_7staple;
+    //! Coefficient of the Lepage term in the P4 improved staggered fermion action.
+    Float p4_lepage; 
+    
 
   //------------------------------------------------------------------
   // Added in by Ping for anisotropy, clover and global sum.
@@ -175,7 +190,9 @@ struct DoArg {
     gsum_fast_mode(0),      
     gsum_max_try(2),        
 	asqtad_naik(0.0), asqtad_3staple(0.0),asqtad_5staple(0.0),
-	asqtad_7staple(0.0),asqtad_lepage(0.0)
+       asqtad_7staple(0.0),asqtad_lepage(0.0),
+	p4_knight(0.0), p4_3staple(0.0),p4_5staple(0.0),
+	p4_7staple(0.0),p4_lepage(0.0)
 	{}
     
 //!< Default values of some parameters.
@@ -195,6 +212,7 @@ struct DoArg {
 - Default maximum number of global sum attempts:   2	       
 - Default 5th direction inverse lattice spacing: 1
 - Default Asqtad improved staggered fermion action parameters: 0.
+- Default P4 improved staggered fermion action parameters: 0.
 */
     
 };

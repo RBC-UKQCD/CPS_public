@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.h,v 1.10 2004-09-02 16:52:54 zs Exp $
+  $Id: enum.h,v 1.11 2004-12-07 05:23:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:52:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.10 2004-09-02 16:52:54 zs Exp $
-//  $Id: enum.h,v 1.10 2004-09-02 16:52:54 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-12-07 05:23:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.11 2004-12-07 05:23:17 chulwoo Exp $
+//  $Id: enum.h,v 1.11 2004-12-07 05:23:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: enum.h,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v $
 //  $State: Exp $
 //
@@ -43,7 +43,9 @@ enum FclassType {
     F_CLASS_WILSON,
     F_CLASS_CLOVER,
     F_CLASS_DWF,
-    F_CLASS_ASQTAD
+    F_CLASS_ASQTAD,
+    F_CLASS_P4
+
 };
 
 

@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.15 2004-11-17 18:27:08 chulwoo Exp $
+  $Id: pt.h,v 1.16 2004-12-07 05:23:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-11-17 18:27:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.15 2004-11-17 18:27:08 chulwoo Exp $
-//  $Id: pt.h,v 1.15 2004-11-17 18:27:08 chulwoo Exp $
+//  $Date: 2004-12-07 05:23:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.16 2004-12-07 05:23:18 chulwoo Exp $
+//  $Id: pt.h,v 1.16 2004-12-07 05:23:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -115,6 +115,28 @@ struct gauge_agg{
   IFloat mat[18];
 };
 
+//-----------------------------------------------------------------------
+//Checkerboarded parallel transport
+
+struct gauge_agg_cb{
+  //Index for initial position of field
+  int src;
+  //Index for "transported field"
+  int dest;
+  //Index for the padded field.  This assumes that the field will be
+  //transported in all 8 possible directions.  Instead of storing
+  //each direction in a single block, fields transported to each
+  //lattice site from different directions are stored together
+  //This allows for faster linear combination in the p4 action.
+  int dest2;
+  //Index for the gauge link
+  int gauge_index;
+  //Determines if the gauge link needs to be complex conjugated
+  int dagger;
+};
+
+//-----------------------------------------------------------------------
+
 struct hop_pointer {
   int src;
   int dest;
@@ -160,9 +182,9 @@ class ParTransAsqtad : public ParTransStagTypes
       \param vin Array of the fields to be transported.
       \param dir Array of directions in which the transports are performed.
       \pre The gauge field should be in staggered order (::STAG).
-      \pre The Vector fields should be in CANONICAL order.
+      \pre The Vector fields should be in ::CANONICAL order.
      */
-    void run(int n, Vector **vout, Vector **vin, const int *dir )
+    void run(int n, Vector **vout, Vector **vin, const int *dir)
     { pt_1vec(n,(IFloat **)vout, (IFloat **)vin, dir);}
     //! Parallel transports fields of staggered fermionic vectors.
     /*!
@@ -173,7 +195,7 @@ class ParTransAsqtad : public ParTransStagTypes
       \pre The gauge field should be in staggered order (::STAG).
       \pre The Matrix fields should be in CANONICAL order.      
      */
-    void run(int n, Matrix **mout, Matrix **min, const int *dir )
+    void run(int n, Matrix **mout, Matrix **min, const int *dir)
     { pt_mat(n,(IFloat **)mout, (IFloat **)min, dir);}
 
     //! Not implemented
@@ -200,6 +222,87 @@ class ParTransAsqtad : public ParTransStagTypes
     }
 
     ~ParTransAsqtad();
+
+};
+
+//------------------------------------------------------------------
+//! A class describing the Parallel Transport operator for staggered fermions.
+/*!
+  These are operations of the form
+  \f$ u(x) = U_\mu(x) v(x+\mu) \f$
+  where \e u is a field defined on sites of a given
+  parity and \e v is a field defined on sites of
+  the opposite parity.
+
+  The fermions fields must be in staggered  ::STAG order
+
+  The gauge field must be in staggered ::STAG order.
+*/
+//------------------------------------------------------------------
+class ParTransStaggered_cb : public ParTransStagTypes
+{
+  private:
+
+    char *cname;         // Class name.
+
+    int f_size_cb;       //The node checkerbrd. size of the ferm. field
+
+    Vector *frm_tmp;     // Temporary fermion field
+
+    CnvFrmType converted;
+
+    int Offset(int dir, int hop);
+    void setHopPointer();
+
+  public:
+
+    /*!
+      \param latt The lattice containing the gauge field on which this
+      operation is defined.
+    */
+    ParTransStaggered_cb(Lattice& latt);            // Lattice object.
+
+    //! Parallel transports Vector fields defined on single parity sites
+    /*!
+      \param n The number of fields.
+      \param vout Array of the transported fields.
+      \param vin Array of the fields to be transported.
+      \param dir Array of directions in which the transports are performed.
+      \param cb The parity on which the field vin is defined
+      \param pad Parameter that determines whether the transported fields should be padded for QCDOC optimization
+      \pre The gauge field should be in staggered order (::STAG).
+      \pre The Vector fields should be in ::STAG order.
+     */
+    void run(int n, Vector **vout, Vector **vin, const int *dir,ChkbType cb)
+      { pt_1vec_cb(n,(IFloat **)vout, (IFloat **)vin, dir, cb);}
+
+    void run(int n, Vector **vout, Vector **vin, const int *dir,ChkbType cb, IFloat * new_gauge_field)
+      { pt_1vec_cb(n,(IFloat **)vout, (IFloat **)vin, dir, cb, new_gauge_field);}
+
+    void run(int n, IFloat * vout, Vector **vin, const int *dir, ChkbType cb, int pad)
+      { pt_1vec_cb(n,vout, (IFloat **)vin, dir, cb, pad);}
+
+    void run(int n, IFloat * vout, Vector **vin, const int *dir, ChkbType cb, int pad, IFloat * new_gauge_field)
+      { pt_1vec_cb(n,vout, (IFloat **)vin, dir, cb, pad, new_gauge_field);}
+
+    //! Parallel transports Matrix fields defined on single parity sites
+    /*!
+      \param n The number of fields.
+      \param vout Array of the transported fields.
+      \param vin Array of the fields to be transported.
+      \param dir Array of directions in which the transports are performed.
+      \param cb The parity on which the field min is defined
+      \param pad Parameter that determines whether the transported fields should be padded for QCDOC optimization
+      \pre The gauge field should be in staggered order (::STAG).
+      \pre The Matrix fields should be in ::STAG order.      
+     */
+    void run(int n, Matrix **mout, Matrix **min, const int *dir,ChkbType cb)
+    { pt_mat_cb(n,(IFloat **)mout, (IFloat **)min, dir, cb);}
+
+    //! Not implemented
+    void run(Vector *vout, Vector *vin, int dir );
+
+    ~ParTransStaggered_cb();
 
 };
 

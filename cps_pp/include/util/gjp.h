@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.13 2004-09-02 16:53:07 zs Exp $
+  $Id: gjp.h,v 1.14 2004-12-07 05:23:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:53:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.13 2004-09-02 16:53:07 zs Exp $
-//  $Id: gjp.h,v 1.13 2004-09-02 16:53:07 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-12-07 05:23:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.14 2004-12-07 05:23:17 chulwoo Exp $
+//  $Id: gjp.h,v 1.14 2004-12-07 05:23:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -238,7 +238,12 @@ class GlobalJobParameter
   Float asqtad_5staple;
   Float asqtad_7staple;
   Float asqtad_lepage;
- 
+  Float p4_KS;
+  Float p4_knight;
+  Float p4_3staple;
+  Float p4_5staple;
+  Float p4_7staple;
+  Float p4_lepage;
 public:
   GlobalJobParameter();
 
@@ -730,9 +735,49 @@ public:
   Float Lepage_coeff() const { return asqtad_lepage; }
 
   
+
+  
+   // P4 improved staggered action parameters
+
+  //! Gets the coefficient of the Kogut-Susskind term in the P4 improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float p4_KS_coeff() const { return p4_KS; }
+
+  //! Gets the coefficient of the Naik term in the P4 improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float p4_knight_coeff() const { return p4_knight; }
+
+  //! Gets the coefficient of the 3-staple term in the P4 improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float p4_staple3_coeff() const { return p4_3staple; }
+
+  //! Gets the coefficient of the 5-staple term in the P4 improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float p4_staple5_coeff() const { return p4_5staple; }
+
+  //! Gets the coefficient of the 7-staple term in the P4 improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float p4_staple7_coeff() const { return p4_7staple; }
+  
+  //! Gets the coefficient of the Lepage term in the P4 improved staggered fermion action.
+  /*!
+    \return The coefficient.
+  */
+  Float p4_Lepage_coeff() const { return p4_lepage; }
+
+  
   /*! @} */
-  
-  
+
   /*!\defgroup gjp_set_methods Methods that set the value of a global variable
     @{ */
 
