@@ -39,6 +39,7 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
     ./src/alg/alg_mom/alg_mom.o\
     ./src/alg/alg_inst/alg_inst.o\
     ./src/alg/alg_hmd/alg_hmc_phi.o\
+    ./src/alg/alg_hmd/alg_hmc_rhmc.o\
     ./src/alg/alg_hmd/alg_hmd.o\
     ./src/alg/alg_hmd/alg_hmd_r.o\
     ./src/alg/alg_ghb/comsrc/alg_ghb.o\
@@ -122,6 +123,7 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
    ./src/util/dirac_op/d_op_base/inv_cg.o\
    ./src/util/dirac_op/d_op_base/jacobi.o\
    ./src/util/dirac_op/d_op_base/ritz.o\
+   ./src/util/dirac_op/d_op_base/minvcg.o\
    ./src/util/dirac_op/d_op_clover/noarch/clover.o\
    ./src/util/dirac_op/d_op_clover/noarch/d_op_clover.o\
    ./src/util/dirac_op/d_op_clover/noarch/d_op_clover_s.o\
