@@ -1,0 +1,27 @@
+AC_INIT(./src/)
+AC_CANONICAL_SYSTEM
+dnl What target are we compiling for?
+
+AC_ARG_ENABLE(target, 
+[  --enable-target   What target are we compiling for? (default=noarch)] ,  , [enable_target="noarch"])
+AC_MSG_CHECKING("what target we are compiling for")
+AC_MSG_RESULT($enable_target)
+
+case "$enable_target" in
+	qcdoc)
+	BUILD=$build
+	HOST=powerpc-gnu-elf
+	ENABLE_TARGET='--enable-target=qcdoc'
+	;;
+	*)
+	BUILD=$build
+	HOST=$host
+	ENABLE_TARGET=''
+	;;
+esac
+AC_SUBST(BUILD)
+AC_SUBST(HOST)
+AC_SUBST(ENABLE_TARGET)
+AC_SUBST(QOS)
+
+AC_OUTPUT(config_wrapper)
