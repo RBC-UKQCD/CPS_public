@@ -1,52 +1,40 @@
-//------------------------------------------------------------------
-//
-// site.h
-//
-// Header file for the  Site class 
-//
-// This class provides utilities to help you
-// move arround the Lattice
-//
-// February 2001
-//
-// Kostas Orginos
-//
-//------------------------------------------------------------------
-
 #ifndef INCLUDED_SITE_H
 #define INCLUDED_SITE_H
-
+#include <config.h>
 #include <util/gjp.h>
-#include <util/verbose.h>
-#include <util/error.h>
-
 CPS_START_NAMESPACE
+
+/*!
+  Class for looping over a single node. Also provides conversion between local
+  and global coordinates.
+  
+  It keeps track of the x,y,z, and t positions separately (as oppposed to just
+  the index). If you really need high performance, and whatever you're doing
+  at each site is very quick, then you can probably get much better
+  performance by hard-coding the loop.
+*/
 class Site 
 {
 private:
+  //! site index
+  int s        ; 
+  //! site vector x:0 y:1 z:2 t:3 
+  int x    [4] ;
+  //! dimensions of local volume
+  int size [4] ; 
 
-  int s        ; // site index
-  int x    [4] ; // site vector x:0 y:1 z:2 t:3 
-  int size [4] ; // dimensions of local volume
   int vol  [5] ;
-  int shift[4] ; // the shift need to convert to physical coordinates 
-
-  bool _looping; // looping over node ?
+  //! the shift need to convert to physical coordinates 
+  int shift[4] ; 
+  //! looping over node ?
+  bool _looping; 
 
 private:
   
   /*!
     compute x[0 -> 3] given s
   */
-  void computeVec()
-  {
-    int ss,i ;
-    x[0] = s%size[0] ;
-    for(i=1;i<4;i++){
-      ss = s/vol[i] ;
-      x[i] = ss%size[i] ;
-    }
-  }
+  void computeVec();
   
   /*!
     computes s given x[0->3] 
@@ -56,15 +44,11 @@ private:
     s = x[0] + size[0]*(x[1]+size[1]*(x[2]+size[2]*x[3])) ;
   }
   
-  
-  void setVolumes()
-  {
-      vol[0] = 1 ;
-      vol[1] = vol[0]*size[0] ;
-      vol[2] = vol[1]*size[1] ;
-      vol[3] = vol[2]*size[2] ;
-      vol[4] = vol[3]*size[3] ;
-    }
+  /*! 
+    computes size of the 1-,2-,3- etc.. volumes 
+  */
+  void setVolumes();
+
   
   /*!
     computes the shifts to take local co-ords into
@@ -109,41 +93,29 @@ public:
   */
   int* pos()  { return x; } 
 
-  int Coor    ( const int d )  const { return x[d]          ; }
-  int physCoor( const int d )  const { return x[d]+shift[d] ; }
+  int Coor    ( int d )  const { return x[d]          ; }
+  int physCoor( int d )  const { return x[d]+shift[d] ; }
 
   /*
     node information
   */
 
-  int Size    ( const int d )  const { return size[d]       ; }
-  int Vol     ( const int d )  const { return vol[d]        ; }
+  int Size    ( int d )  const { return size[d]       ; }
+  int Vol     ( int d )  const { return vol[d]        ; }
 
   int nodeBc(const int mu) const { return GJP.NodeBc(mu) ; }
 
   /*!
     Returns the index of the neighbor in the plus mu direction
    */
-  int plusIndex(const int mu) const 
-    {
-      const int Xmu (x[mu]+1) ;
-      int indx(s+vol[mu]);
-      if(Xmu==size[mu])
-	indx -= size[mu]*vol[mu] ;
-      return indx ;
-    }
+  int plusIndex( int mu ) const;
+
 
   /*!
     Returns the index of the neighbor in the minus mu direction
    */
-  int minusIndex(const int mu) const 
-    {
-      const int Xmu(x[mu]-1) ;
-      int indx(s-vol[mu]);
-      if(Xmu<0)
-	indx += size[mu]*vol[mu] ;
-      return indx ;
-    }
+  int minusIndex( int mu ) const;
+
   
   /*
     for looping over a node
@@ -162,9 +134,9 @@ public:
   }
   
   bool End()              const { return (s<vol[4])       ; }
-  bool End(const int mu ) const { return (x[mu]<size[mu]) ; }
+  bool End(int mu ) const { return (x[mu]<size[mu]) ; }
   
-  bool resetEnd(const int mu )
+  bool resetEnd( int mu )
   { 
     bool E(x[mu]<size[mu]) ;
     if(E) 
@@ -176,13 +148,13 @@ public:
 
   void nextSite();
 
-  void nextSite( const int mu )
+  void nextSite( int mu )
   { 
     x[mu]++ ;
     s+=vol[mu] ;
   }
 
-  void nextSiteExcept(const int mu);
+  void nextSiteExcept( int mu );
 
 
   /*! 
@@ -203,5 +175,10 @@ public:
 
 } ;
 
-#endif //!INCLUDED_SITE_H
 CPS_END_NAMESPACE
+#endif //!INCLUDED_SITE_H
+
+
+
+
+
