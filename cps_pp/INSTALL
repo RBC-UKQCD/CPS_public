@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------
 INSTALL: The Columbia Code
 ----------------------------------------------------------------------
-$Id: INSTALL,v 1.4 2004-01-25 18:39:49 mcneile Exp $
+$Id: INSTALL,v 1.5 2004-02-03 13:13:29 mcneile Exp $
 
 The new system only creates one library: cps.a
 The system probably requires gnu make, so 
@@ -22,6 +22,14 @@ cd ../cps++_build
 ../cps++/configure
 make
 
+Testing
+--------
+To use the testing framework you need to type
+make install
+
+This copies the makefiles for the testing framework from the 
+cps++_build directory to the cps++ directory. The testing framework
+is then in "tests".
 
 NOTES
 ----
