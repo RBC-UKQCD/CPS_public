@@ -3,18 +3,21 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpStagTypes class eigensolver methods.
    
-  $Id: eigen_stag.C,v 1.3 2003-08-29 21:44:26 mike Exp $
+  $Id: eigen_stag.C,v 1.4 2003-08-29 22:08:52 mike Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: mike $
-//  $Date: 2003-08-29 21:44:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.3 2003-08-29 21:44:26 mike Exp $
-//  $Id: eigen_stag.C,v 1.3 2003-08-29 21:44:26 mike Exp $
+//  $Date: 2003-08-29 22:08:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.4 2003-08-29 22:08:52 mike Exp $
+//  $Id: eigen_stag.C,v 1.4 2003-08-29 22:08:52 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3  2003/08/29 21:44:26  mike
+//  Fixed bug so that the eigenvalue array is now returned.
+//
 //  Revision 1.2  2003/07/24 16:53:54  zs
 //  Addition of documentation via doxygen:
 //  doxygen-parsable comment blocks added to many source files;
@@ -45,7 +48,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: eigen_stag.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v $
 //  $State: Exp $
 //
@@ -272,16 +275,17 @@ int DiracOpStagTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[], E
   VRB.Result(cname,fname,"Final Eigenvalues: NCG=%d\n", NCG_tot); 
   for(n = 0; n < N_eig; n++)
     VRB.Result(cname,fname,"lambda_D[%d] = %g\n",n,(IFloat)lambda[n]);
-//for(n = 0; n < N_eig; n++)
-//  VRB.Result(cname,fname,"valid_eig[%d] = %d\n",n,valid_eig[n]);
+  for(n = 0; n < N_eig; n++)
+    VRB.Result(cname,fname,"valid_eig[%d] = %d\n",n,valid_eig[n]);
 
-  VRB.Sfree(cname,fname, "off_diag", off_diag);
+  if (N_eig > 1) {
+    VRB.Sfree(cname,fname, "off_diag", off_diag);
     sfree(off_diag);
+  }
   VRB.Sfree(cname,fname, "lambda_old", lambda_old);
   sfree(lambda_old);
   VRB.Sfree(cname,fname, "lambda", lambda);
   sfree(lambda);
-
 
 #if 0
   // Construct eigenvectors of  (-1)^x D_slash */
