@@ -3,18 +3,24 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: dirac_op.h,v 1.3 2003-08-29 20:28:55 mike Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-07-24 16:53:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.2 2003-07-24 16:53:53 zs Exp $
-//  $Id: dirac_op.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+//  $Author: mike $
+//  $Date: 2003-08-29 20:28:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v 1.3 2003-08-29 20:28:55 mike Exp $
+//  $Id: dirac_op.h,v 1.3 2003-08-29 20:28:55 mike Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2  2003/07/24 16:53:53  zs
+//  Addition of documentation via doxygen:
+//  doxygen-parsable comment blocks added to many source files;
+//  New target in makefile and consequent alterations to configure.in;
+//  New directories and files under the doc directory.
+//
 //  Revision 1.5  2001/08/16 12:54:30  anj
 //  Some fixes follosin the float-> IFloat change, mostly of the (variable
 //  anme) IFloat_p -> float_p type.  A few fixes to ensure the test
@@ -45,7 +51,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: dirac_op.h,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dirac_op.h,v $
 //  $State: Exp $
 //
@@ -160,11 +166,18 @@ class DiracOp
      // The matrix that is used is RitzMat.
      // RitzMat must be hermitian and positive def.
 
+  //! Vector orthogonalisation
+  void GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size);
+
   //! Jacobi diagonalisation of a matrix.
   int Jacobi(Vector **psi, int N_eig, Float lambda[], 
 	     Complex off_diag[], 
 	     Float Toler, int N_max);
      // Jacobi diagonalizer of a single site matrix.
+
+  //! Multishift CG invertor used in RHMC.
+  int MInvCG(Vector **out, Vector *in, Float in_norm, Float *shift, 
+	     int Nshift, int isz, Float *RsdCG, Vector **EigVec, int NEig);
 
 // Pure virtual functions
 //------------------------------------------------------------------
@@ -293,6 +306,10 @@ class DiracOp
   */
   virtual int MatInv(PreserveType prs_in = PRESERVE_YES) = 0;
      // Same as original but in = f_in, out = f_out, true_res=0.
+
+  virtual int MatMInv(Vector **out, Vector *in, Float *shift, 
+		      int Nshift, int isz) = 0;
+  
 
 //! Computes eigenvectors and eigenvalues.
 /*!
@@ -487,6 +504,9 @@ class DiracOpStag : public DiracOpStagTypes
   int MatInv(PreserveType prs_in = PRESERVE_YES);
      // Same as original but in = f_in, out = f_out, true_res=0.
 
+  int MatMInv(Vector **out, Vector *in, Float *shift, 
+	      int Nshift, int isz);
+  
   void RitzEigMat(Vector *out, Vector *in);
      // RitzEigMat is the fermion matrix used in RitzEig
      // RitzEigMat works on the full lattice or half lattice
@@ -585,6 +605,14 @@ class DiracOpWilsonTypes : public DiracOp
 		     Vector *f_field_in,       // Input fermion field ptr.
 		     CgArg *arg,               // Argument structure
 		     CnvFrmType cnv_frm_flg);  // Fermion conversion flag
+
+  int MatMInv(Vector **out, Vector *in, Float *shift, 
+		      int Nshift, int isz) {
+    char *fname = "MatMInv(Vector **out, Vector *in, Float *shift,...";
+    VRB.Func(cname, fname);
+    ERR.General(cname,fname,"MatMInv not yet implemented for Wilson fermions");
+    return 0;
+  }
 
   virtual ~DiracOpWilsonTypes();
 
