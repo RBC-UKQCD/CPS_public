@@ -1,17 +1,10 @@
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
-// d_op_asqtad.C
+// d_op_P4.C
 //
-// DiracOpAsqtad is derived from the DiracOpStagTypes class. 
-// DiracOpAsqtad is the front end for a library that contains
-// all Dirac operators associated with Asqtad fermions.
+// DiracOpP4 is derived from the DiracOpStagTypes class. 
+// DiracOpP4 is the front end for a library that contains
+// all Dirac operators associated with P4 improved fermions
 //
 //------------------------------------------------------------------
 
@@ -25,29 +18,20 @@
 #include <util/error.h>
 #include <util/time.h>
 #include <util/asqtad.h>
+#include <util/p4.h>
 #include <comms/cbuf.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
-#if TARGET == QCDOC
-#include <qalloc.h>
-#include <ppc_lib.h>
-#endif
 CPS_START_NAMESPACE
 
-extern "C"{
-  void vaxmy(Float *scale,Vector *mult,Vector *sub,int ncvec);
-  void vaxmy_vxdot(Float *scale, Vector *mult, Vector *sub, int ncvec, Float *norm);
-}
-
-extern "C" void dirac_comm_assert(void);
-extern SCUDirArgIR *SCUarg;
-extern SCUDirArgIR *SCUarg_1;
+//extern "C" void dirac_comm_assert(void);
+//extern SCUDirArgIR *SCUarg;
+//extern SCUDirArgIR *SCUarg_1;
 
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
-static long flops;
-DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
+DiracOpP4::DiracOpP4(Lattice & latt,
 			 Vector *f_field_out,
 			 Vector *f_field_in,
 			 CgArg *arg,
@@ -58,11 +42,10 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
 					  arg,
 					  cnv_frm_flg)
 {
-  cname = "DiracOpAsqtad";
-  char *fname = "DiracOpAsqtad(L&,V*,V*,CgArg*,CnvFrmType)";
+  cname = "DiracOpP4";
+  char *fname = "DiracOpP4(L&,V*,V*,CgArg*,CnvFrmType)";
   VRB.Func(cname,fname);
 
-  flops = (1146)*GJP.VolNodeSites();
 
   //----------------------------------------------------------------
   // Do the necessary conversions
@@ -79,8 +62,9 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   // otherwise we need a static data member to check initializtions
   //----------------------------------------------------------------
 #if 0
-  asqtad_dirac_init(latt.GaugeField());
+  p4_dirac_init(latt.GaugeField());
 #endif
+  p4_dirac_init_g();
 
   //----------------------------------------------------------------
   // Set the node checkerboard size of the fermion field
@@ -91,17 +75,11 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   //----------------------------------------------------------------
   // Allocate memory for the temporary fermion vector frm_tmp.
   //----------------------------------------------------------------
-  frm_tmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
-
-  if(frm_tmp == 0){
-    frm_tmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
-    printf("frm_tmp is allocated int DDR (%p)\n",frm_tmp);
-  }
+  frm_tmp = (Vector *) smalloc(f_size_cb * sizeof(IFloat));
   if(frm_tmp == 0)
     ERR.Pointer(cname,fname, "frm_tmp");
   VRB.Smalloc(cname,fname, "frm_tmp", 
 	      frm_tmp, f_size_cb * sizeof(Float));
-  asqtad_dirac_init_g((IFloat *)frm_tmp);
 
 
   //----------------------------------------------------------------
@@ -115,8 +93,8 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
 //------------------------------------------------------------------
 // Destructor
 //------------------------------------------------------------------
-DiracOpAsqtad::~DiracOpAsqtad() {
-  char *fname = "~DiracOpAsqtad()";
+DiracOpP4::~DiracOpP4() {
+  char *fname = "~DiracOpP4()";
   VRB.Func(cname,fname);
 
   if(cnv_frm == CNV_FRM_YES)
@@ -125,19 +103,15 @@ DiracOpAsqtad::~DiracOpAsqtad() {
     lat.Convert(CANONICAL);
 
 #if 0
-  asqtad_destroy_dirac_buf();
+  p4_destroy_dirac_buf();
 #endif
-  asqtad_destroy_dirac_buf_g();
+  p4_destroy_dirac_buf_g();
 
   //----------------------------------------------------------------
   // Free memory
   //----------------------------------------------------------------
   VRB.Sfree(cname,fname, "frm_tmp", frm_tmp);
-#if TARGET == QCDOC
-  qfree(frm_tmp);
-#else
   sfree(frm_tmp);
-#endif
 }
 
 
@@ -146,7 +120,7 @@ DiracOpAsqtad::~DiracOpAsqtad() {
 // It sets the dirac_arg pointer to arg and initializes
 // mass_sq = 4 * mass^2.
 //------------------------------------------------------------------
-  void DiracOpAsqtad::DiracArg(CgArg *arg){
+  void DiracOpP4::DiracArg(CgArg *arg){
     dirac_arg = arg;
 
     // Added for anisotropic lattices
@@ -168,28 +142,22 @@ DiracOpAsqtad::~DiracOpAsqtad() {
 // If dot_prd is not 0 then the dot product (on node)
 // <out, in> = <MatPcDagMatPc*in, in> is returned in dot_prd.
 //------------------------------------------------------------------
-void DiracOpAsqtad::MatPcDagMatPc(Vector *out, 
+void DiracOpP4::MatPcDagMatPc(Vector *out, 
 			       Vector *in, 
 			       Float *dot_prd){
- long nflops = flops;
+ static long nflops = (4416)*GJP.VolNodeSites();
 
 #undef PROFILE
 #ifdef PROFILE
   struct timeval start,end;
   gettimeofday(&start,NULL);
 #endif
-  asqtad_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
-  asqtad_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
-  CGflops += nflops;
+  p4_dirac(frm_tmp, in, 0, 0);
+  p4_dirac(out, frm_tmp, 1, 0);
+  out->FTimesV1MinusV2(mass_sq,in,out,f_size_cb);
 
   if( dot_prd !=0 ){
-	vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);
-    CGflops +=f_size_cb*4;
-    nflops +=f_size_cb*4;
-  } else {
-    CGflops +=f_size_cb*2;
-    nflops +=f_size_cb*2;
-    vaxmy(&mass_sq,in,out,f_size_cb/6);
+    *dot_prd = dotProduct((IFloat *) in, (IFloat *) out, f_size_cb);
   }
 
 #ifdef PROFILE
@@ -207,18 +175,15 @@ void DiracOpAsqtad::MatPcDagMatPc(Vector *out,
 // The in, out fields are defined on a checkerboard.
 // cb refers to the checkerboard of the in field.
 //------------------------------------------------------------------
-void DiracOpAsqtad::Dslash(Vector *out, 
+void DiracOpP4::Dslash(Vector *out, 
 				  Vector *in, 
 				  ChkbType cb, 
 				  DagType dag) {
 
-  asqtad_dirac((IFloat *)out, 
-	(IFloat *)in, 
-	int(cb),
-	int(dag));
+  p4_dirac(out,in, int(cb),int(dag));
 }
 
-
+#if 0
 //------------------------------------------------------------------
 // Dslash(Vector *out, Vector *in, ChkbType cb, DagType dag, int dir_flag) :
 // Dslash is the derivative part of the fermion matrix. 
@@ -229,7 +194,7 @@ void DiracOpAsqtad::Dslash(Vector *out,
 // 1 - when only the special anisotropic direction contributes to D,
 // 2 - when all  except the special anisotropic direction. 
 //------------------------------------------------------------------
-void DiracOpAsqtad::Dslash(Vector *out, 
+void DiracOpP4::Dslash(Vector *out, 
 			 Vector *in, 
 			 ChkbType cb, 
 			 DagType dag,
@@ -362,7 +327,7 @@ void DiracOpAsqtad::Dslash(Vector *out,
   }
 }
 
-
+#endif
 
 //------------------------------------------------------------------
 // int MatInv(Vector *out, Vector *in, 
@@ -379,23 +344,19 @@ void DiracOpAsqtad::Dslash(Vector *out,
 // prs_in is not used. The source in is always preserved.
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
-int DiracOpAsqtad::MatInv(Vector *out, 
+int DiracOpP4::MatInv(Vector *out, 
 			Vector *in, 
 			Float *true_res,
 			PreserveType prs_in) {
   char *fname = "MatInv(V*,V*,F*)";
   VRB.Func(cname,fname);
   timeval start,end;
+  int vol = GJP.VolNodeSites();
 
-  IFloat *k_e = (IFloat *)in;
-  IFloat *k_o = k_e+f_size_cb;
+  Vector *k_e = in;
+  Vector *k_o = k_e + vol/2;
 
   Vector *tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
-#undef TEST_ASQD
-#ifdef TEST_ASQD
-  Vector *out2 = (Vector *) smalloc(f_size_cb * sizeof(Float));
-  memcpy( out2,out,f_size_cb * sizeof(Float));
-#endif
   if(tmp == 0)
     ERR.Pointer(cname,fname, "tmp");
   VRB.Smalloc(cname,fname, "tmp", 
@@ -403,8 +364,8 @@ int DiracOpAsqtad::MatInv(Vector *out,
 
   // tmp = (2m - D)k
 
-  asqtad_dirac((IFloat *)tmp, k_o, 1, 0);
-  fTimesV1MinusV2((IFloat *)tmp, 2.*mass_rs, k_e,
+  p4_dirac(tmp, k_o, 1, 0);
+  fTimesV1MinusV2((IFloat *)tmp, 2.*mass_rs, (IFloat *)k_e,
   	(IFloat *)tmp, f_size_cb);
 
 #define PROFILE
@@ -414,29 +375,17 @@ int DiracOpAsqtad::MatInv(Vector *out,
   int iter = InvCg(out, tmp, true_res);
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  printf("DiracOpAsqtad::InvCg:: ");
-  print_flops(1187*iter*GJP.VolNodeSites(),&start,&end);
-#endif
-
-#ifdef TEST_ASQD
-  InvArg inv_arg;
-  inv_arg.mass = dirac_arg->mass; 
-  inv_arg.stop_rsd = dirac_arg->stop_rsd;
-  inv_arg.niter = dirac_arg->max_num_iter;
-  inv_arg.evenodd = 0;
-  printf("asqd.InvCg\n");
-  int iter2 = asqd.InvCg(&inv_arg,(Float *)out2,(Float *)tmp,true_res);
-  printf("asqd.InvCg\n");
-  printf("iter = %d out=%0.15e out2=%0.15e\n",iter2,*((Float*)out),*((Float*)out2));
+  printf("DiracOpP4::InvCg:: ");
+  print_flops(DiracOp::CGflops,&start,&end);
 #endif
 
   // calculate odd solution
-  IFloat *x_e = (IFloat *)out;
-  IFloat *x_o = x_e+f_size_cb;
-  moveMem(x_o, k_o, f_size_cb*sizeof(Float));
-  asqtad_dirac((IFloat *)tmp, x_e, 0, 0);
-  vecMinusEquVec(x_o, (IFloat *)tmp, f_size_cb);
-  vecTimesEquFloat(x_o, 0.5/mass_rs, f_size_cb);
+  Vector *x_e = out;
+  Vector *x_o = x_e+vol/2;
+  moveMem((IFloat *)x_o, (IFloat *)k_o, f_size_cb*sizeof(Float));
+  p4_dirac(tmp, x_e, 0, 0);
+  vecMinusEquVec((IFloat *)x_o, (IFloat *)tmp, f_size_cb);
+  vecTimesEquFloat((IFloat *)x_o, 0.5/mass_rs, f_size_cb);
 
   sfree(tmp);
 
@@ -448,7 +397,7 @@ int DiracOpAsqtad::MatInv(Vector *out,
 // Overloaded function is same as original 
 // but true_res=0.
 //------------------------------------------------------------------
-int DiracOpAsqtad::MatInv(Vector *out, Vector *in, PreserveType prs_in)
+int DiracOpP4::MatInv(Vector *out, Vector *in, PreserveType prs_in)
 { return MatInv(out, in, 0, prs_in); }
 
 
@@ -456,7 +405,7 @@ int DiracOpAsqtad::MatInv(Vector *out, Vector *in, PreserveType prs_in)
 // Overloaded function is same as original 
 // but in = f_in and out = f_out.
 //------------------------------------------------------------------
-int DiracOpAsqtad::MatInv(Float *true_res, PreserveType prs_in)
+int DiracOpP4::MatInv(Float *true_res, PreserveType prs_in)
 { return MatInv(f_out, f_in, true_res, prs_in); }
 
 
@@ -464,7 +413,7 @@ int DiracOpAsqtad::MatInv(Float *true_res, PreserveType prs_in)
 // Overloaded function is same as original 
 // but in = f_in, out = f_out, true_res=0.
 //------------------------------------------------------------------
-int DiracOpAsqtad::MatInv(PreserveType prs_in)
+int DiracOpP4::MatInv(PreserveType prs_in)
 { return MatInv(f_out, f_in, 0, prs_in); }
 
 //------------------------------------------------------------------
@@ -473,7 +422,7 @@ int DiracOpAsqtad::MatInv(PreserveType prs_in)
 // RitzMat works on the full or half lattice.
 // The in, out fields are defined on the full or half lattice.
 //------------------------------------------------------------------
-void DiracOpAsqtad::RitzMat(Vector *out, Vector *in) {
+void DiracOpP4::RitzMat(Vector *out, Vector *in) {
   char *fname = "RitzMat(V*,V*)";
   VRB.Func(cname,fname);
   Float *dot=0;
@@ -524,7 +473,7 @@ void DiracOpAsqtad::RitzMat(Vector *out, Vector *in) {
 // RitzEigMat works on the full or half lattice.
 // The in, out fields are defined on the full or half lattice.
 //------------------------------------------------------------------
-void DiracOpAsqtad::RitzEigMat(Vector *out, Vector *in) {
+void DiracOpP4::RitzEigMat(Vector *out, Vector *in) {
   ERR.NotImplemented(cname,"RitzEigMat");
 }
 CPS_END_NAMESPACE

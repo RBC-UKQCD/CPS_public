@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of some Fasqtad class methods.
 
-  $Id: f_asqtad.C,v 1.22 2005-03-09 18:23:55 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.23 2005-04-05 06:44:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -371,8 +371,9 @@ void Fasqtad::Smear(){
   IFloat c6 = GJP.Lepage_coeff();
 
   int i, j; 
-  const int N = 4;
+  int N = 4;
   int vol = GJP.VolNodeSites();
+  if (vol>2000) N = 2;
   ParTransAsqtad pt(*this);
   Matrix *result[NUM_DIR];
   Matrix *Unit;

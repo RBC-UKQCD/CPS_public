@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 22:37:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.15 2005-03-07 22:37:27 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.15 2005-03-07 22:37:27 chulwoo Exp $
+//  $Date: 2005-04-05 06:44:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.16 2005-04-05 06:44:48 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.16 2005-04-05 06:44:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -304,8 +304,11 @@ int DiracOp::InvCg(Vector *out,
       /* Check reproducibility */
       if ( test == 0) d_store[ i ] = mmp_checksum;
       else if ( mmp_checksum != d_store[ i ] ){
-        fprintf(stderr, "NODE FAILS TO REPRODUCE");
+        fprintf(stderr, "NODE (%d %d %d %d %d)FAILS TO REPRODUCE\n",
+        GJP.XnodeCoor(),GJP.YnodeCoor(),GJP.ZnodeCoor(),GJP.TnodeCoor(),GJP.SnodeCoor());
         fprintf(stderr,"mmp =%p mmp_store = %p\n",mmp_checksum,d_store[i]);
+// Temporary hack to exit immediately
+        Float *null_p = NULL; *null_p = 0.;
         InterruptExit(-1, "NODE FAILS TO REPRODUCE");
       }
       /* End of Check */

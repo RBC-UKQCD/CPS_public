@@ -28,8 +28,11 @@ void QioArg::init(const char * file, const int concur_io_number, const Float chk
     coor[dir] = GJP.NodeCoor(dir);
   }
 
+// Make it all periodic as NERSC header specifies gauge boundary condition, 
+// 04/03/05 CJ
   for(int dir=0;dir<4;dir++) 
-    bc[dir] = GJP.Bc(dir);
+    bc[dir] = BND_CND_PRD;
+//    bc[dir] = GJP.Bc(dir);
 
   StartConfLoadAddr = GJP.StartConfLoadAddr();
 

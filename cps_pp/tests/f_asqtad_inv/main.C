@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.16 2005-01-13 07:46:25 chulwoo Exp $
+  $Id: main.C,v 1.17 2005-04-05 06:44:52 chulwoo Exp $
 */
 
 #include<config.h>
@@ -24,6 +24,7 @@
 extern "C" void _mcleanup(void);
 #endif
 
+#define CG
 
 
 USING_NAMESPACE_CPS
@@ -90,9 +91,9 @@ int main(int argc,char *argv[]){
 
     do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
     do_arg.asqtad_naik = -1.0/24.0;
-    do_arg.asqtad_3staple = (-1.0/8.0)*0.5;
+    do_arg.asqtad_3staple = (1.0/8.0)*0.5;
     do_arg.asqtad_5staple = ( 1.0/8.0)*0.25*0.5;
-    do_arg.asqtad_7staple = (-1.0/8.0)*0.125*(1.0/6.0);
+    do_arg.asqtad_7staple = (1.0/8.0)*0.125*(1.0/6.0);
     do_arg.asqtad_lepage = -1.0/16;
 
 #if 0
@@ -121,7 +122,9 @@ int main(int argc,char *argv[]){
     GJP.Initialize(do_arg);
 
     VRB.Level(0);
+    VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
     VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+    VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
     VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
     fp = Fopen(ADD_ID,"f_asqtad_test.out","w");
@@ -134,7 +137,7 @@ int main(int argc,char *argv[]){
     LatVector *X_in  = new LatVector(1);
 
     int s[4];
-#if 1
+#if 0
     lat.RandGaussVector(X_in->Vec(),1.0);
 #else
 
@@ -180,7 +183,7 @@ int main(int argc,char *argv[]){
 	lat.Fconvert(out->Vec(),STAG,CANONICAL);
 	lat.Fconvert(X_in->Vec(),STAG,CANONICAL);
 	int offset = GJP.VolNodeSites()/2;
-#if 1
+#ifdef CG
 	int vol = GJP.VolNodeSites();
 	dtime = -dclock();
 	int iter = dirac.MatInv(out->Vec(),X_in->Vec());

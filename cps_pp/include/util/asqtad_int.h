@@ -110,6 +110,9 @@ class AsqD : public AsqDArg{
     matrix *naik_m;
 
     static SCUDir scudir[8];
+    static int cg_called;
+    int node_odd;
+    int non_local_dirs;
     int split;
     int isplit;
     int coord[4];
@@ -117,10 +120,10 @@ class AsqD : public AsqDArg{
     int coord_knn[4];
     int vol;
     int f_size_cb;
-    int non_local_chi_3[4];
-    int non_local_chi;
-    int local_chi;
-    int local_chi_3;
+    int non_local_chi_3[2][4];
+    int non_local_chi[2];
+    int local_chi[2];
+    int local_chi_3[2];
     int nflush;
     int odd_num;
 enum{VECT_LEN=6, VECT_LEN2=8, MATRIX_SIZE=18, SITE_LEN=72, NUM_DIR=8,
@@ -160,8 +163,8 @@ N=4};
 //  xm, ym, zm (p = plus, m = minus).  Indexed as 0-7
 //---------------------------------------------------------------------
     Float * chi_off_node_total;
-    Float * chi_off_node[3][8];
-    Float * chi_off_node_p[3][8];
+    Float * chi_off_node[2][3][8];
+    Float * chi_off_node_p[2][3][8];
 //------------------------------------------------------------------
 //  pointer to array of pointers telling where color vectors are
 //  located for cluster arrangement of lattice (even and odd).
@@ -207,6 +210,10 @@ SCUDirArgMulti SCUmulti_2[2];
 
     unsigned long address[2];
 
+    int comp_l[2];
+    int comp_nl[2];
+    int comp_nl_2[2];
+
 //-------------------------------------------------------------------
 //  Given a lexical value for gauge fields, set the coordinates.
 //  Return 1 if odd, 0 if even
@@ -248,7 +255,7 @@ SCUDirArgMulti SCUmulti_2[2];
 
     int LexSurface( int * cc, int surface );
   public:
-  AsqD() {};
+  AsqD() {cname = "AsqD";};
   ~AsqD() {};
   int Size(int dir){return size[dir];}
   int Vol() {return vol;}
@@ -271,8 +278,10 @@ SCUDirArgMulti SCUmulti_2[2];
     exit(-1);
   }
 
+  int NodeOdd(){return node_odd;}
   int InvCg(InvArg *inv_arg, Float *out, Float *in, Float *true_res);
   void MdagM(Float *mass_sq, Float *out, Float *in, Float *dot_prd = 0);
+  void Dslash(Float *out, Float *in);
   void Sum( Float *sum);
 };
 

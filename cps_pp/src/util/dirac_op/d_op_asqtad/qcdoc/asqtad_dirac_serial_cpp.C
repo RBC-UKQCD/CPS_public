@@ -1,9 +1,10 @@
 /*!\file
     Asqtad Dirac operator code for QCDOC.
 
-    $Id: asqtad_dirac_serial_cpp.C,v 1.5 2004-08-18 11:57:48 zs Exp $
+    $Id: asqtad_dirac_serial_cpp.C,v 1.6 2005-04-05 06:44:46 chulwoo Exp $
 */
 
+#if 0
 #include <util/gjp.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
@@ -12,14 +13,17 @@
 #include <util/vector.h>
 #include <sysfunc.h>
 //#include <stdio.h>
-
-CPS_START_NAMESPACE
-
 struct gauge_agg{
   int src;
   int dest;
   IFloat mat[18];
 };
+#endif
+#include <stdio.h>
+#include <util/asqtad_int.h>
+
+//CPS_START_NAMESPACE
+
 
 extern void SCUTransCRC(SCUDirArg *X, SCUDirArg *R);
 
@@ -49,32 +53,6 @@ void dirac_cmv_nl_mod_cpp( int sites, long chi, long u, long a,
     }
 }
 
-void dirac_cmv_mod_cpp( int sites, long chi, long u, long a, 
-                long tmpfrm)
-{
-  IFloat *fp0, *fp1, *uu;
-  int s, c;
-  const int MATRIX_SIZE = 18;
-  int *ch;
-  ch = (int *)chi;
-  for (s = 0; s< sites; s++)
-    {
-      fp1 = (IFloat *)(tmpfrm + (int)*(ch + 2 * s + 1));
-      fp0 = (IFloat *)((int)a +  (int)*(ch + 2 * s ));
-      uu = (IFloat *)u + MATRIX_SIZE * s;
-      for (c=0; c<3; c++){
-	//Re part
-	*(fp1+2*c) += *fp0 * *(uu+6*c) - *(fp0+1) * *(uu+6*c+1) + 
-	  *(fp0+2) * *(uu+6*c+2) - *(fp0+3)* *(uu+6*c+3) + 
-	  *(fp0+4) * *(uu+6*c+4) - *(fp0+5) * *(uu+6*c+5);
-	//Im part 
-	*(fp1+2*c+1) += *fp0 * *(uu+6*c+1) + *(fp0+1) * *(uu+6*c) + 
-	  *(fp0+2) * *(uu+6*c+3) + *(fp0+3)* *(uu+6*c+2) + 
-	  *(fp0+4) * *(uu+6*c+5) + *(fp0+5) * *(uu+6*c+4);
-      }
-    }
-}
-
 void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u, long a, 
                 long tmpfrm)
 {
@@ -84,12 +62,22 @@ void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u, long a,
 //  const int SITE_LEN = 72;
 //  const int MATRIX_SIZE = 18;
   int *ch;
-  printf("dirac_cmv_jcw_agg_cpp:\n");
+  printf("dirac_cmv_jcw_agg_cpp: a=%p tmpfrm=%p\n",a,tmpfrm);
   for (s = 0; s< sites; s++)
     {
+     if (agg[s].dest ==0)
+     printf("s=%d dest=%d src=%d\n",s,agg[s].dest,agg[s].src); 
       fp1 = (IFloat *)(tmpfrm + agg[s].dest );
       fp0 = (IFloat *)((int)a + agg[s].src);
       uu = &(agg[s].mat[0]);
+#if 0
+      if (agg[s].dest<(16*8*sizeof(Float)) ){
+         printf("agg[%d]:src = %d(%p) dest=%d(%p)\n",s,agg[s].src,fp0,agg[s].dest,fp1);
+         for( int i = 0;i<6;i++) 
+           printf("%e \n", *(fp0+i));
+      }
+#endif
+//     printf("fp1=%p fp=%p uu=%p\n",fp1,fp0,uu);
    if( (unsigned long)fp1 >0xc0000000 ||
       (unsigned long)fp0 >0xc0000000 ||
       (unsigned long)uu >0xc0000000){
@@ -108,7 +96,7 @@ void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u, long a,
 		*(fp0+4) * *(uu+6*c+5) + *(fp0+5) * *(uu+6*c+4);
 	}
 #if 0
-	printf("dirac_cmv_jcw_agg_cpp:\n");
+//	printf("dirac_cmv_jcw_agg_cpp:\n");
 	if(fp0[0]*fp0[0]>1e-5){
 	    printf("src=%p(%d) dest=%p(%d) ",fp0,agg[s].src,fp1,agg[s].dest);
 	    fflush(stdout);
@@ -420,5 +408,5 @@ void dirac_SCU( SCUDirArg ** Xarg, SCUDirArg ** Rarg, IFloat * a,
 }
 #endif
 
-CPS_END_NAMESPACE
+//CPS_END_NAMESPACE
 

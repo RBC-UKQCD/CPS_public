@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-09 19:18:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_p4_inv/main.C,v 1.2 2005-03-09 19:18:36 chulwoo Exp $
-//  $Id: main.C,v 1.2 2005-03-09 19:18:36 chulwoo Exp $
+//  $Date: 2005-04-05 06:44:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_p4_inv/main.C,v 1.3 2005-04-05 06:44:52 chulwoo Exp $
+//  $Id: main.C,v 1.3 2005-04-05 06:44:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_p4_inv/main.C,v $
 //  $State: Exp $
 //
@@ -118,7 +118,7 @@ int main(int argc,char *argv[]){
     VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
     VRB.ActivateLevel(VERBOSE_INPUT_LEVEL);
     VRB.ActivateLevel(VERBOSE_DEBUG_LEVEL);
-    VRB.DeactivateAll();
+//    VRB.DeactivateAll();
 
     fp = Fopen(ADD_ID,"f_p4_inv.out","w");
 

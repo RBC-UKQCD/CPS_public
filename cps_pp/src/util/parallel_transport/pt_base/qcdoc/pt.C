@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.20 2005-03-09 18:28:40 chulwoo Exp $
+  $Id: pt.C,v 1.21 2005-04-05 06:44:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-09 18:28:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.20 2005-03-09 18:28:40 chulwoo Exp $
-//  $Id: pt.C,v 1.20 2005-03-09 18:28:40 chulwoo Exp $
+//  $Date: 2005-04-05 06:44:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.21 2005-04-05 06:44:49 chulwoo Exp $
+//  $Id: pt.C,v 1.21 2005-04-05 06:44:49 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -94,124 +94,6 @@ extern "C"{
   
 }
 
-#if 0
-//Number of dimensions
-static const int NDIM=4;
-//Maximum length of parallel transport.  3 links for the Naik term
-static const int MAX_HOP=3;
-//Local volume size in each of four directions
-static int size[NDIM];
-//SU(3) matrix has 18 floating point numbers
-//SU(3) vector has 6 floating point numbers
-enum {GAUGE_LEN=18,VECT_LEN=6, VECT_LEN2=6};
-int vol = 1;
-
-//gauge_agg holds source and destination indices, as well as the SU(3)
-//link matrix.  One for local parallel transport, another for non-local
-static gauge_agg *uc_l[2*SCUMachDim];
-static gauge_agg *uc_nl[2*SCUMachDim];
-
-//---------------------------------------------------------------------------
-//Holds source,destination indexes for the matrix multiplication.
-//Also holds index for gauge field, and whether gauge field needs to be
-//conjugated
-//First array index = 0 for even parity block, =1 for odd parity block
-//
-//uc_nl_cb_pre holds information for pre-multiplication of the fields
-//that are transported in the positive direction.
-
-static gauge_agg_cb *uc_l_cb[2][2*SCUMachDim];
-static gauge_agg_cb *uc_nl_cb[2][2*SCUMachDim];
-static gauge_agg_cb *uc_nl_cb_pre[2][SCUMachDim];
-
-//--------------------------------------------------------------------------
-
-static hop_pointer *hp_l[MAX_HOP][2*SCUMachDim];
-static hop_pointer *hp_nl[MAX_HOP][2*SCUMachDim];
-
-static unsigned long *src_l[MAX_HOP][2*SCUMachDim];
-static unsigned long *dest_l[MAX_HOP][2*SCUMachDim];
-static unsigned long *src_nl[MAX_HOP][2*SCUMachDim];
-static unsigned long *dest_nl[MAX_HOP][2*SCUMachDim];
-
-//Length of block of data for SCU communication
-static int blklen[2*SCUMachDim];
-
-//Number of blocks of data
-static int numblk[2*SCUMachDim];
-
-//Stride between blocks
-static int stride[2*SCUMachDim];
-
-//number of parallel transports that can be done locally
-static int local_chi[2*SCUMachDim];
-
-//Parallel transports that require non-local communication
-static int non_local_chi[2*SCUMachDim];
-
-//Initial offset for the data when using SCU communication
-static int offset[2*SCUMachDim];
-
-//--------------------------------------------------------------
-//Checkerboarded data
-static int blklen_cb[2*SCUMachDim];
-static int numblk_cb[2*SCUMachDim];
-static int stride_cb[2*SCUMachDim];
-static int local_chi_cb[2*SCUMachDim];
-static int non_local_chi_cb[2*SCUMachDim];
-static int offset_cb[2*SCUMachDim];
-
-//This determines whether the gauge links that are stored
-//are the normal, canonical gauge links U_mu(x)
-//or the conjugated versions, U_mu(x).dagger()
-//For the staggered storage, the links are conjugated.
-
-DagType conjugated;
-//--------------------------------------------------------------
-
-//Buffer for receiving data via SCU
-static IFloat *rcv_buf[2*6];
-static IFloat *rcv_buf2[2*6];
-
-//--------------------------------------------------------------
-//Send buffer transfers in the positive direction
-static IFloat *snd_buf_cb[6];
-
-//Buffer for transfer in the negative T direction.  This is needed because
-//the block-stride communication does not work for communication
-//in the T direction on a checkerboard lattice
-static IFloat *snd_buf_t_cb;
-
-//List of indexes for the vectors that are transferred when
-//communicating in the negative T direction
-static int *Toffset[2];
-//--------------------------------------------------------------
-
-//Pointer to the gauge field
-static IFloat *gauge_field_addr;
-
-//SCU communication parameters
-static SCUDirArgIR *SCUarg[MAX_HOP][4*SCUMachDim];
-static SCUDirArgIR *SCUarg_mat[MAX_HOP][4*SCUMachDim];
-static SCUDirArgIR *SCUarg2[MAX_HOP][4*SCUMachDim];
-
-//--------------------------------------------------------------
-//Checkerboarded SCU
-static SCUDirArgIR *SCUarg_cb[4*SCUMachDim];
-static SCUDirArgIR *SCUarg_mat_cb[4*SCUMachDim];
-//--------------------------------------------------------------
-
-//Function primitives
-static void (*Copy) (IFloat *dest, IFloat *src);
-static void (*DagCopy) (IFloat *dest, IFloat *src);
-static int (*LexVector)(int *x);
-static int (*LexGauge) (int *x,int mu);
-
-//-------------------------------------------------------------
-//Added for checkerboarded parallel transport
-static int (*LexVector_cb)(int *x);
-//------------------------------------------------------------
-#endif
 
 int PT::size[NDIM];
 int PT::vol;
@@ -369,7 +251,7 @@ void PT::set_hop_pointer() {
 	      //"transported" in the negative direction
 	      // positive direction
 
-	      if(x[i] < hop){
+	      if((x[i] < hop) && (!local[i])){
 		//This calculates the neighbor coordinate
 		nei[i] = size[i]-hop+x[i];  
 
@@ -389,7 +271,7 @@ void PT::set_hop_pointer() {
 		//be handled locally
 	      } else {
 		//Calculate the new coordinate
-		nei[i] = x[i]-hop;
+		nei[i] = (size[i]+x[i]-hop)%size[i];
 
 		//Calculate the index for the source and the destination
 		(h_l[2*i]+local_count[2*i])->src = LexVector(x)*vlen;
@@ -406,9 +288,9 @@ void PT::set_hop_pointer() {
 	      //Consider hopping in the negative direction, which is parallel 
 	      //transport in the positive direction
 	      // negative direction
-	      if(x[i] >= (size[i]-hop)){
+	      if( (x[i] >= (size[i]-hop)) && (!local[i])){
 		//Calculate the non-local coordinate for this hop
-		nei[i] = x[i]+hop-size[i];
+		nei[i] = (x[i]+hop)%size[i];
 		//Calculate source and destination indices
 		(h_nl[2*i+1]+non_local_count[2*i+1])->src = non_local_count[2*i+1]*vlen;
 		(h_nl[2*i+1]+non_local_count[2*i+1])->dest = LexVector(nei)*vlen2;
@@ -421,7 +303,7 @@ void PT::set_hop_pointer() {
 			      fname,2*i,non_local_count[2*i],2*i,non_local_check);
 	      } else {
 		//Calculate the local coordinate for this hop
-		nei[i] = x[i]+hop;
+		nei[i] = (x[i]+hop)%size[i];
 		//Calculate source and destination indices
 		(h_l[2*i+1]+local_count[2*i+1])->src = LexVector(x)*vlen;
 		(h_l[2*i+1]+local_count[2*i+1])->dest = LexVector(nei)*vlen2;
@@ -514,58 +396,6 @@ void PT::init(PTArg *pt_arg)
   if (g_conj) { Copy = &dag_cpy; DagCopy = &cpy; conjugated = PT_DAG_YES;}
   else        { Copy = &cpy; DagCopy = &dag_cpy; conjugated = PT_DAG_NO;}
 
-#if 0
-  //Size of local volume in all four directions
-  size[0] = GJP.XnodeSites();
-  size[1] = GJP.YnodeSites();
-  size[2] = GJP.ZnodeSites();
-  size[3] = GJP.TnodeSites();
-
-  //Location of the gauge field
-  gauge_field_addr = (IFloat *) lat.GaugeField();
-
-  //Retrive the storage order
-  StrOrdType str_ord = lat.StrOrd();
-
-  //Define the appropriate function to calculate the indices for the fermion
-  //fields and the guage links.
-
-  //Canonical ordering xyzt without checkerboarding
-  if (str_ord == PT_CANONICAL){
-    Copy = cpy; DagCopy = dag_cpy;
-    LexVector = lex_xyzt;
-    LexGauge = lex_g_xyzt;
-
-    //------------------------------------------------------------------------
-    LexVector_cb = lex_txyz_cb;
-    conjugated = DAG_NO;
-    //------------------------------------------------------------------------
-
-    //Wilson ordering is checkerboarded
-  } else if (str_ord == WILSON){
-    Copy = cpy; DagCopy = dag_cpy;
-    LexVector = lex_xyzt_cb_o;
-    LexGauge = lex_g_xyzt_cb_o;
-
-    //-----------------------------------------------------------------------
-    LexVector_cb = lex_txyz_cb;
-    conjugated = DAG_NO;
-    //-----------------------------------------------------------------------
-
-    //Staggered ordering
-  } else if (str_ord == STAG){
-    Copy = dag_cpy; DagCopy = cpy;
-    LexVector = lex_xyzt;
-    LexGauge = lex_g_xyzt;
-
-    //-----------------------------------------------------------------------
-    LexVector_cb = lex_txyz_cb;
-    conjugated = DAG_YES;
-    //----------------------------------------------------------------------
-
-  } else
-    fprintf(stderr,"storage ordering not implemented");
-#endif
 
   //For the fastest changing index, data must be sent in many short messages
   //For the slowest changing index, the boundaries of the hypersurface are 
@@ -586,9 +416,16 @@ void PT::init(PTArg *pt_arg)
 
   //Calculate the number of local and non-local parallel transports
   //are needed in each direction
-  for(i=0; i<NDIM;i++){
-    non_local_chi[2*i+1] = non_local_chi[2*i] = vol/size[i];
+  for(i=0; i<NDIM;i++) {
+    if (local[i])
+      non_local_chi[2*i+1] = non_local_chi[2*i] = 0;
+    else 
+      non_local_chi[2*i+1] = non_local_chi[2*i] = vol/size[i];
     local_chi[2*i+1] = local_chi[2*i] = vol - non_local_chi[2*i];
+//    printf("local_chi[%d]=%d non_local_chi[%d]=%d\n",
+//    i*2,local_chi[i*2],i*2,non_local_chi[i*2]);
+//    printf("local_chi[%d]=%d non_local_chi[%d]=%d\n",
+//    i*2+1,local_chi[i*2+1],i*2+1,non_local_chi[i*2+1]);
   }
 
   //---------------------------------------------------------------------------
@@ -667,15 +504,16 @@ void PT::init(PTArg *pt_arg)
     //Allocate memory for gauge_agg_cb
     for(int parity = 0; parity < 2; parity++)
     {
-      uc_l_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_l_cb[parity][i]",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
-      uc_nl_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
+      uc_l_cb[parity][i] = (gauge_agg_cb *)qalloc(0,sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
+      uc_nl_cb[parity][i] = (gauge_agg_cb *)qalloc(0,sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
 
-      uc_l_pad_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_l_cb[parity][i]",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
-      uc_nl_pad_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
+      uc_l_pad_cb[parity][i] = (gauge_agg_cb *)qalloc(0,sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
+      uc_nl_pad_cb[parity][i] = (gauge_agg_cb *)qalloc(0,sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
     }
 
     //-------------------------------------------------------------------------
 
+    if(non_local_chi[i]>0){
     // This buffer is actually overkill, but ensures will work if
     // shift_field is called with hop>1
     rcv_buf[i] = (IFloat *)qalloc(QCOMMS,3*MAX_HOP*non_local_chi[i]*vlen);
@@ -684,21 +522,31 @@ void PT::init(PTArg *pt_arg)
     //Used buffer used in vvpd
     rcv_buf2[i] = (IFloat *)qalloc(QCOMMS,MAX_HOP*non_local_chi[i]*vlen);
     if(rcv_buf2[i]==NULL)PointerErr("",fname,"rcv_buf2[i]");
+    } else{
+      rcv_buf[i] = rcv_buf2[i] = NULL;
+    }
   }
 
   //---------------------------------------------------------------------------
   //Allocate memory for send buffer
 
   for(i=0; i<NDIM;i++)
+    if(non_local_chi_cb[2*i+1])
     {
       snd_buf_cb[i] = (IFloat *)qalloc(QCOMMS,3*non_local_chi_cb[2*i+1]*vlen);
       if(snd_buf_cb[i]==NULL)PointerErr("",fname,"snd_buf_cb[i]");
-    }
-  snd_buf_t_cb = (IFloat *)qalloc(QCOMMS,3*non_local_chi_cb[6]*vlen);
-  if(snd_buf_t_cb==NULL) PointerErr("",fname,"snd_buf_t_cb");
+    } else
+      snd_buf_cb[i] = NULL;
+  if(non_local_chi_cb[6]){
+    snd_buf_t_cb = (IFloat *)qalloc(QCOMMS,3*non_local_chi_cb[6]*vlen);
+    if(snd_buf_t_cb==NULL) PointerErr("",fname,"snd_buf_t_cb");
+  } else
+    snd_buf_t_cb = NULL;
 
   for(i = 0; i < 2;i++)
+    if(non_local_chi_cb[6])
     Toffset[i] = (int *)Alloc(cname,fname,"Toffset[parity]",non_local_chi_cb[6]*sizeof(int));
+    else Toffset[i]=NULL;
 
   //Allocate memory for the gauge_agg_cb used for matrix pre-multiplication
 
@@ -723,7 +571,7 @@ void PT::init(PTArg *pt_arg)
 	    //An even index for uc_nl, uc_l, uc_nl_cb, uc_l_cb corresponds
 	    //to parallel transport in the negative direction
 	    
-	    if(x[i] == 0){
+	    if( (x[i] == 0) && (!local[i])){
 	      nei[i] = size[i]-1;
 	      (uc_nl[2*i]+non_local_count[2*i])->src = non_local_count[2*i]*vlen;
 	      (uc_nl[2*i]+non_local_count[2*i])->dest = LexVector(nei)*vlen2;
@@ -733,7 +581,7 @@ void PT::init(PTArg *pt_arg)
 			fname,2*i,non_local_count[2*i],2*i,non_local_chi[2*i]);
 	    } 
 	    else {
-	      nei[i] = x[i]-1;
+	      nei[i] = (x[i]-1+size[i])%size[i];
 	      if(local_count[2*i]<0) fprintf(stderr,"%s:local_count[%d]=%d]n",
 			fname,2*i,local_count[2*i]);
 	      (uc_l[2*i]+local_count[2*i])->src = LexVector(x)*vlen;
@@ -747,7 +595,7 @@ void PT::init(PTArg *pt_arg)
 	    //This is parallel transport in the positive direction
 	    //An odd index for uc_l, uc_nl, uc_l_cb,uc_nl_cb corresponds to
 	    //transport in the positive direction
-	    if(x[i] == (size[i] -1)){
+	    if((x[i] == (size[i] -1))  && (!local[i])){
 	      nei[i] = 0;
 	      (uc_nl[2*i+1]+non_local_count[2*i+1])->src = non_local_count[2*i+1]*vlen;
 	      (uc_nl[2*i+1]+non_local_count[2*i+1])->dest = LexVector(nei)*vlen2;
@@ -755,9 +603,8 @@ void PT::init(PTArg *pt_arg)
 	      if (non_local_count[i*2+1]>non_local_chi[i*2+1])
 		fprintf(stderr,"%s:non_local_count[%d](%d)>non_local_chi[%d](%d)\n",
 			fname,2*i+1,non_local_count[2*i+1],2*i+1,non_local_chi[2*i+1]);
-	    } 
-	    else {
-	      nei[i] = x[i]+1;
+	    } else {
+	      nei[i] = (x[i]+1)%size[i];
 	      if(local_count[2*i+1]<0) fprintf(stderr,"%s:local_count[%d]=%d]n",
 					       fname,2*i+local_count[2*i+1]);
 	      (uc_l[2*i+1]+local_count[2*i+1])->src = LexVector(x)*vlen;
@@ -782,12 +629,12 @@ void PT::init(PTArg *pt_arg)
 
 	    parity = (x[0]+x[1]+x[2]+x[3])%2;
 	    //Calculate offsets for transfers in the negative T direction
-	    if(x[3] == 0)
+	    if((x[3] == 0) && !local[3])
 	      *(Toffset[parity] +non_local_count_cb[parity][6]) = LexVector_cb(x);
 
 	    for(i=0;i<NDIM;i++){
 
-	    //printf("%d %d %d %d %d\n",x[0],x[1],x[2],x[3],i);
+//	    printf("%d %d %d %d %d\n",x[0],x[1],x[2],x[3],i);
 	    // positive direction
 	    //This is for transport of a vector in the negative direction
 	    //An even index for uc_nl, uc_l, uc_nl_cb, uc_l_cb corresponds
@@ -981,7 +828,6 @@ void PT::init(PTArg *pt_arg)
 //Free memory associated with the parallel transport of the fermions
 void PT::delete_buf(){
   char *fname = "pt_delete()";
-//  VRB.Func("",fname);
 	
   for(int i = 0; i < 2*NDIM; i++){
     Free(uc_l[i]);
@@ -1024,12 +870,12 @@ void PT::delete_buf(){
       int nl_size = (hop+1)*non_local_chi[i]+1;
       int l_size = vol - nl_size+1;
       Free(hp_l[hop][i]);
-      qfree(src_l[hop][i]);
-      qfree(dest_l[hop][i]);
+      Free(src_l[hop][i]);
+      Free(dest_l[hop][i]);
 
       Free(hp_nl[hop][i]);
-      qfree(src_nl[hop][i]);
-      qfree(dest_nl[hop][i]);
+      Free(src_nl[hop][i]);
+      Free(dest_nl[hop][i]);
     }
   }
 }
@@ -1038,9 +884,11 @@ void PT::delete_buf(){
 void PT::delete_g_buf(){
   char *fname = "pt_delete_g()";
 //  VRB.Func("",fname);
-  Free(gauge_txyz);
+//  printf("gauge_txyz=%p\n",gauge_txyz);
+//  Free(gauge_txyz);
   for(int hop = 0; hop < MAX_HOP; hop++)
     for(int i = 0; i < 4*NDIM; i++)
+      if(!local[i/4])
       {
 	delete SCUarg[hop][i];
 	delete SCUarg2[hop][i];
@@ -1050,6 +898,7 @@ void PT::delete_g_buf(){
   //----------------------------------------------------------------------
   //Checkerboarding
   for(int i = 0; i < 4*NDIM; i++)
+    if(!local[i/4])
     {
       delete SCUarg_cb[i];
       delete SCUarg_mat_cb[i];
@@ -1120,8 +969,12 @@ void PT::init_g(void){
 
   for(i=0;i<NDIM;i++){
     //Initialize SCUDirArg for sending and receiving the one-hop term
-    SCUDirArgIR snd(u,snd_dir[i*2+1],SCU_SEND,sizeof(matrix));
-    SCUDirArgIR rcv(rcv_mat,rcv_dir[i*2+1],SCU_REC,sizeof(matrix));
+    SCUDirArgIR snd;
+    SCUDirArgIR rcv;
+    if(!local[i]){
+      snd.Init(u,snd_dir[i*2+1],SCU_SEND,sizeof(matrix));
+      rcv.Init(rcv_mat,rcv_dir[i*2+1],SCU_REC,sizeof(matrix));
+    }
 
     for(x[3]=0,nei[3]=0;x[3]<size[3];x[3]++,nei[3]++)
       for(x[2]=0,nei[2]=0;x[2]<size[2];x[2]++,nei[2]++)
@@ -1130,63 +983,56 @@ void PT::init_g(void){
 	    // positive direction
 	    //this is a hop in the positive direction, meaning data must be sent
 	    //in the negative direction.
-	    if(x[i] == 0){
+	    if((x[i] == 0) && (!local[i]) ){
 	      //Calculate the appropriate coordinate on the adjacent node
 	      nei[i] = size[i]-1;  
 	      //Copy the appropriate matrix from u to uc_nl
 	      Copy((uc_nl[2*i]+non_local_count[2*i])->mat, u+LexGauge(nei,i)*GAUGE_LEN);
 	      non_local_count[i*2]++;
+	      if (non_local_count[i*2]>non_local_chi[i*2])
+		fprintf(stderr,"%s:non_local_count[%d](%d)>non_local_chi[%d](%d)\n",
+			fname,2*i,non_local_count[2*i],2*i,non_local_chi[2*i]);
 	    } else {
 	      //Calculate the appropriate neighbor coordinate on the local node
-	      nei[i] = x[i]-1;
+	      nei[i] = (x[i]-1+size[i])%size[i];
 	      //Copy from u to uc_l
 	      Copy((uc_l[2*i]+local_count[2*i])->mat, u+LexGauge(nei,i)*GAUGE_LEN);
 	      local_count[i*2]++;
+	      if (local_count[i*2+1]>local_chi[i*2+1])
+		fprintf(stderr,"%s:local_count[%d](%d)>local_chi[%d](%d)\n",
+			fname,2*i+1,local_count[2*i+1],2*i+1,local_chi[2*i+1]);
 	    }
 	    // negative direction
-	    if(x[i] == (size[i] -1)){
+	    if((x[i] == (size[i]-1) ) && (!local[i]) ){
 	      nei[i] = 0;
-#if 0
-	      getMinusData( rcv_mat, u+LexGauge(x,i)*GAUGE_LEN, GAUGE_LEN, i);
-#else
 	      //Send the appropriate matrix
 	      snd.Addr(u+LexGauge(x,i)*GAUGE_LEN);
 	      //Send the transmission, prepare to receive
 	      snd.StartTrans();rcv.StartTrans();
 	      //Complete the send and receive
 	      snd.TransComplete();rcv.TransComplete();
-#endif
 	      //Copy to uc_nl from the received matrix
 	      DagCopy((uc_nl[2*i+1]+non_local_count[2*i+1])->mat, rcv_mat);
 	      non_local_count[i*2+1]++;
+	      if (non_local_count[i*2]>non_local_chi[i*2])
+		fprintf(stderr,"%s:non_local_count[%d](%d)>non_local_chi[%d](%d)\n",
+			fname,2*i,non_local_count[2*i],2*i,non_local_chi[2*i]);
 	    } else {
 	      //Calculate the appropriate neighbor coordinate on the local volume
-	      nei[i] = x[i]+1;
+	      nei[i] = (x[i]+1)%size[i];
 	      //Copy from u to uc_l
 	      DagCopy((uc_l[2*i+1]+local_count[2*i+1])->mat, u+LexGauge(x,i)*GAUGE_LEN);
 	      local_count[i*2+1]++;
+	      if (local_count[i*2+1]>local_chi[i*2+1])
+		fprintf(stderr,"%s:local_count[%d](%d)>local_chi[%d](%d)\n",
+			fname,2*i+1,local_count[2*i+1],2*i+1,local_chi[2*i+1]);
 	    }
 	    nei[i] = x[i];
 	  } // x[]
   } // i
-#if 0
-  for(i=0;i<2*NDIM;i++) {
-    SCUarg[i*2] = new SCUDirArgIR;
-    SCUarg[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,non_local_chi[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
-    SCUarg[i*2+1] = new SCUDirArgIR;
-    //
-    //  inputs a dummy but valid address to pass syscall test and changed later, CJ
-    //
-    SCUarg[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,blklen[i],numblk[i],stride[i],IR_9);
-    SCUarg_mat[i*2] = new SCUDirArgIR;
-    SCUarg_mat[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,non_local_chi[i]*VECT_LEN*sizeof(IFloat)*3,1,0,IR_9);
-    SCUarg_mat[i*2+1] = new SCUDirArgIR;
-    SCUarg_mat[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,blklen[i]*3,numblk[i],stride[i]*3,IR_9);
-  }
-#else
   //Loop over all possible communication directions
-  for(i=0;i<2*NDIM;i++) {
-
+  for(i=0;i<2*NDIM;i++) 
+    if (!local[i/2]) {
       for (int hop=1; hop<=MAX_HOP; hop++) {
       //Initialize SCUArg to receive fermion fields
       SCUarg[hop-1][i*2] = new SCUDirArgIR;
@@ -1249,7 +1095,6 @@ void PT::init_g(void){
   }
   
 
-#endif
   qfree(rcv_mat);
 }
 
@@ -1338,25 +1183,28 @@ parity, IFloat * gauge)
       }
     }
 
+  int non_local_dir=0;
   for(i=0;i<n;i++)
+    if(!local[wire[i]/2])
     {
       //Calculate the starting address for the data to be sent
       IFloat *addr = min[i] + GAUGE_LEN * offset_cb[wire[i]];
       //This points to the appropriate SCUDirArg for receiving
-      SCUarg_p[2*i] = SCUarg_mat_cb[2*wire[i]];
+      SCUarg_p[2*non_local_dir] = SCUarg_mat_cb[2*wire[i]];
       //This points to the appropriate SCUDirArg for sending
-      SCUarg_p[2*i+1] = SCUarg_mat_cb[2*wire[i]+1];
+      SCUarg_p[2*i+non_local_dir] = SCUarg_mat_cb[2*wire[i]+1];
       
       //Set the send address
       if(wire[i]%2)
-	SCUarg_p[2*i+1]->Addr((void *)snd_buf_cb[wire[i]/2]);
+	SCUarg_p[2*non_local_dir+1]->Addr((void *)snd_buf_cb[wire[i]/2]);
       else if(wire[i] == 6)
-	SCUarg_p[2*i+1]->Addr((void *)snd_buf_t_cb);
+	SCUarg_p[2*non_local_dir+1]->Addr((void *)snd_buf_t_cb);
       else
-	SCUarg_p[2*i+1]->Addr((void *)addr);
+	SCUarg_p[2*non_local_dir+1]->Addr((void *)addr);
+      non_local_dir++;
     }
 
-  SCUmulti.Init(SCUarg_p,2*n);
+  SCUmulti.Init(SCUarg_p,2*non_local_dir);
 
   //Begin transmission
   SCUmulti.SlowStartTrans();
@@ -1458,8 +1306,8 @@ parity, int pad, IFloat * new_gauge_field)
   vec_cb_pad(n,vout,vin,dir,parity,new_gauge_field);
 }
 
-#undef PROFILE
-//#define PROFILE
+//#undef PROFILE
+#define PROFILE
 void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
   //List of the different directions
@@ -1477,7 +1325,6 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
   
   //Name our function
   char *fname="pt_1vec_cb_norm()";
-  //  VRB.Func("",fname);
   
   //Set the transfer directions
   //If wire[i] is even, then we have communication in the negative direction
@@ -1485,9 +1332,8 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
   for(i=0;i<n;i++)
     wire[i]=dir[i];
 
-#ifdef PROFILE
-  Float dtime  = - dclock();
-#endif
+  Float dtime;
+
 
   //If wire[i] is odd, then we have parallel transport in the
   //positive direction.  In this case, the matrix multiplication is
@@ -1503,11 +1349,18 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	    if(wire[i]%2)
 	      {
 		//printf("dir = %d, pre-mulitply\n", wire[i]);
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
                 #ifdef CPP
 		pt_cmv_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);
                 #else
 		pt_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
                 #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
+#endif
 	      }
 	    else if((wire[i] == 6))
 	      {
@@ -1525,11 +1378,18 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	  {
 	    if(wire[i]%2)
 	      {
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
                 #ifdef CPP
 		pt_cmv_dag_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);	    
                 #else
 		pt_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);	 
                 #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
+#endif
 	      }
 	    else if(wire[i] == 6)
 	      {
@@ -1586,7 +1446,7 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
     }
   #endif
 
-  SCUmulti.Init(SCUarg_p,2*non_local_dirs);
+  SCUmulti.Init(SCUarg_p,2*comms);
   //SCUmulti.Init(SCUarg_p,2*n);
 
   //Begin transmission
@@ -1599,6 +1459,9 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
     {
       for(i=0;i<n;i++)
 	{
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
           #ifdef CPP
 	  if(wire[i]%2)
 	    pt_cmv_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],(long)gauge);
@@ -1610,12 +1473,19 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	  else
 	    pt_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
            #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
+#endif
 	}
     }
   else
     {
     for(i=0;i<n;i++)
       {
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
         #ifdef CPP
 	if(!(wire[i]%2))
 	  pt_cmv_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],(long)gauge);
@@ -1627,6 +1497,10 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	else
 	  pt_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
         #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
+#endif
       }
     }
   
@@ -1643,6 +1517,9 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
       	{
 	  if(!(wire[i]%2))
 	    {
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
             #ifdef CPP
 	    if(conjugated)
 	      pt_cmv_dag_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout[i],(long)gauge);
@@ -1654,6 +1531,10 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	    else
 	      pt_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
             #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
+#endif
 	    }
 	  //Otherwise we have parallel transport in the positive direction.
 	  //In this case, the received data has already been pre-multiplied
@@ -1672,10 +1553,6 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	    }
 	}
     }
-#ifdef PROFILE
-  dtime +=dclock();
-  print_flops("",fname,33*vol*n,dtime);
-#endif
 //  ParTrans::PTflops +=33*n*vol;
 }
 
@@ -1683,6 +1560,8 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 #undef PROFILE
 #define PROFILE2
 #undef PROFILE2
+
+#define PROFILE
 void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
   //List of the different directions
@@ -1708,8 +1587,9 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   for(i=0;i<n;i++)
     wire[i]=dir[i];
 
-#ifdef PROFILE
-  Float dtime  = - dclock();
+  Float dtime;
+#ifdef PROFILE3
+  dtime  = - dclock();
 #endif
 
 #ifdef PROFILE2
@@ -1729,6 +1609,9 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	  if(wire[i]%2)
 	    {
 	      //printf("dir = %d, pre-mulitply \n", wire[i]);
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
 	      #ifdef CPP
 	      if(conjugated)
 		pt_cmv_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);
@@ -1749,6 +1632,10 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	      else
 		pt_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
              #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
+#endif
 	    }
 	  else if(wire[i] == 6)
 	    {
@@ -1804,7 +1691,7 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
     }
   #endif
 
-  SCUmulti.Init(SCUarg_p,2*non_local_dirs);
+  SCUmulti.Init(SCUarg_p,2*comms);
   //SCUmulti.Init(SCUarg_p,2*n);
   //Begin transmission
   SCUmulti.SlowStartTrans();
@@ -1815,6 +1702,9 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   //Do local calculations
   for(i=0;i<n;i++)
     {
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
       #ifdef CPP
       if((wire[i]%2 && conjugated) || ((wire[i]%2 == 0) && (conjugated == 0)))
 	pt_cmv_pad_cpp(local_chi_cb[wire[i]],(long)uc_l_pad_cb[parity][wire[i]],(long)vin[i],(long)vout,(long)gauge);
@@ -1835,6 +1725,10 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
       else
 	pt_cmv_dag_pad(local_chi_cb[wire[i]]/2,uc_l_pad_cb[parity][wire[i]],gauge,vin[i],vout);
       #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
+#endif
     }
 
   //If wire[i] is even, then we have transport in the negative direction.
@@ -1876,7 +1770,7 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	    }
 	}
     }
-#ifdef PROFILE
+#ifdef PROFILE3
   dtime +=dclock();
   print_flops("",fname,33*vol*n,dtime);
 #endif
@@ -1904,17 +1798,20 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
 #ifdef PROFILE
   Float dtime  = - dclock();
 #endif
-  for(i=0;i<n;i++) {
+  int non_local_dir=0;
+  for(i=0;i<n;i++)
+  if (!local[wire[i]/2]) {
     //Calculate the address for transfer in a particular direction
     Float * addr = ((Float *)min[i]+GAUGE_LEN*offset[wire[i]]);
     //This should point to the appropriate SCUDirArg for receiving
-    SCUarg_p[2*i] = SCUarg_mat[0][2*wire[i]];
+    SCUarg_p[2*non_local_dir] = SCUarg_mat[0][2*wire[i]];
     //This points to the appropriate SCUDirArg for sending
-    SCUarg_p[2*i+1] = SCUarg_mat[0][2*wire[i]+1];
+    SCUarg_p[2*non_local_dir+1] = SCUarg_mat[0][2*wire[i]+1];
     //Reset the send address
-    SCUarg_p[2*i+1]->Addr((void *)addr);
+    SCUarg_p[2*non_local_dir+1]->Addr((void *)addr);
+    non_local_dir++;
   }
-  SCUmulti.Init(SCUarg_p,n*2);
+  SCUmulti.Init(SCUarg_p,non_local_dir*2);
   //Start transmission
   SCUmulti.SlowStartTrans();
   //End transmission
@@ -1929,8 +1826,10 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
 #endif
   }
 
+  SCUmulti.TransComplete();
   //Do non-local computations
-  for(i=0;i<n;i++){ 
+  for(i=0;i<n;i++) 
+  if (!local[wire[i]/2]) {
 #ifdef CPP
     cmm_agg_cpp(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)mout[i]);
 #else
@@ -1973,16 +1872,18 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
   char *fname="pt_1vec";
 //  VRB.Func("",fname);
 	
+  int non_local_dir=0;
   for(i=0;i<n;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
-  for(i=0;i<n;i++) {
+  for(i=0;i<n;i++)
+  if (!local[wire[i]/2]){
     IFloat * addr = (vin[i]+VECT_LEN*offset[wire[i]]);
-    SCUarg_p[2*i] = SCUarg[0][2*wire[i]];
-    SCUarg_p[2*i+1] = SCUarg[0][2*wire[i]+1];
-    SCUarg_p[2*i+1]->Addr((void *)addr);
+    SCUarg_p[2*non_local_dir] = SCUarg[0][2*wire[i]];
+    SCUarg_p[2*non_local_dir+1] = SCUarg[0][2*wire[i]+1];
+    SCUarg_p[2*non_local_dir+1]->Addr((void *)addr);
+    non_local_dir++;
   }
-  SCUmulti.Init(SCUarg_p,n*2);
+  SCUmulti.Init(SCUarg_p,non_local_dir*2);
   SCUmulti.SlowStartTrans();
-  SCUmulti.TransComplete();
 	
 #ifndef CPP
   for(i=0;i<n;i++) pt_asqtad_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
@@ -1991,8 +1892,11 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
     cmv_agg_cpp(local_chi[wire[i]],(long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
 #endif
 	
+  SCUmulti.TransComplete();
 #ifndef CPP
-  for(i=0;i<n;i++) pt_asqtad_agg(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
+  for(i=0;i<n;i++) 
+    if(non_local_chi[wire[i]])
+      pt_asqtad_agg(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
 #else
   for(i=0;i<n;i++) 
     cmv_agg_cpp(non_local_chi[wire[i]],(long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
@@ -2022,32 +1926,43 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
   SCUDirArgIR *SCUarg_p2[2*n_dir];  
 
   // Only do communication in forward direction
-  for(i=0;i<n_dir;i++) {
+  int comms=0;
+  for(i=0;i<n_dir;i++)
+  if( !local[wire[i]/2]) {
     if ( size[wire[i]] <hop)
       fprintf(stderr, 
 		"%s:size(%d) in direction %d is smaller than the hop(%d)\n",
 		fname,size[wire[i]],wire[i],hop);
-    SCUarg_p[2*i] = SCUarg[hop-1][4*wire[i]];
-    SCUarg_p[2*i+1] = SCUarg[hop-1][4*wire[i]+1];
-    SCUarg_p2[2*i] = SCUarg2[hop-1][4*wire[i]];
-    SCUarg_p2[2*i+1] = SCUarg2[hop-1][4*wire[i]+1];
+    SCUarg_p[2*comms] = SCUarg[hop-1][4*wire[i]];
+    SCUarg_p[2*comms+1] = SCUarg[hop-1][4*wire[i]+1];
+    SCUarg_p2[2*comms] = SCUarg2[hop-1][4*wire[i]];
+    SCUarg_p2[2*comms+1] = SCUarg2[hop-1][4*wire[i]+1];
+    comms++;
   }
 
   for(v=0; v<n_vect; v++){
     SCUDirArgMulti SCUmulti;
 
     if (v%2==0) {
+      comms=0;
       for(i=0;i<n_dir;i++)
-	SCUarg_p[2*i+1]->Addr((void *)(vect[v]+VECT_LEN*set_offset(2*wire[i], hop)));
+        if( !local[wire[i]/2]){ 
+	  SCUarg_p[2*comms+1]->Addr((void *)(vect[v]+VECT_LEN*set_offset(2*wire[i], hop)));
+          comms++;
+        }
 
       // Start communication
-      SCUmulti.Init(SCUarg_p,2*n_dir);
+      SCUmulti.Init(SCUarg_p,2*comms);
     } else {
+      comms=0;
       for(i=0;i<n_dir;i++)
-	SCUarg_p2[2*i+1]->Addr((void *)(vect[v]+VECT_LEN*set_offset(2*wire[i], hop)));
+        if( !local[wire[i]/2]){ 
+	  SCUarg_p2[2*comms+1]->Addr((void *)(vect[v]+VECT_LEN*set_offset(2*wire[i], hop)));
+          comms++;
+      }
 
       // Start communication
-      SCUmulti.Init(SCUarg_p2,2*n_dir);
+      SCUmulti.Init(SCUarg_p2,2*comms);
     }
     SCUmulti.SlowStartTrans();
     // Finalise communication
@@ -2108,14 +2023,16 @@ void PT::shift_field(IFloat **v, const int *dir, int n_dir,
   for (i=0; i<n_dir;i++) wire[i] = dir[i];
   SCUDirArgMulti SCUmulti;
   SCUDirArgIR *SCUarg_p[2*n_dir];
-
-  for (i=0; i<n_dir; i++) {
+  
+  int comms=0;
+  for (i=0; i<n_dir; i++) 
+  if (!local[wire[i]/2]){
     SCUarg_p[2*i] = SCUarg_mat[hop-1][2*wire[i]];
     SCUarg_p[2*i+1] = SCUarg_mat[hop-1][2*wire[i]+1];
     SCUarg_p[2*i+1]->Addr((void *)(v[i]+GAUGE_LEN*set_offset(wire[i], hop)));
   }
 
-  SCUmulti.Init(SCUarg_p,2*n_dir);
+  SCUmulti.Init(SCUarg_p,2*comms);
   SCUmulti.SlowStartTrans();
   SCUmulti.TransComplete();
   

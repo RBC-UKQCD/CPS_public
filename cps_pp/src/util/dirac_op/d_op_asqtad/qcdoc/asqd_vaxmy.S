@@ -8,8 +8,8 @@
  */  
 .text
 .align 2
-.globl asqd_vaxmy
-asqd_vaxmy:
+.globl asq_vaxmy
+asq_vaxmy:
 
 	or    %r10 , %r4 , %r4
 	la   %r1,	-736(%r1)
@@ -56,7 +56,7 @@ asqd_vaxmy:
 	lfd   0,	0(%r14)
 	li   %r16,32
 	li   %r17,64
-	bf gt,  asqd_vaxmy_lab0
+	bf gt,  asq_vaxmy_lab0
 	lfd   1,	0(%r10)
 	lfd   7,	0(%r11)
 	lfd   2,	8(%r10)
@@ -66,9 +66,9 @@ asqd_vaxmy:
 	lfd   4,	24(%r10)
 	lfd   10,	24(%r11)
 	mtctr 	%r13
-	b       asqd_vaxmy_lab1
+	b       asq_vaxmy_lab1
 .align 4
-asqd_vaxmy_lab1:
+asq_vaxmy_lab1:
 	addi  %r15 , %r11 , 0
 	lfd   5,	32(%r10)
 	fmsub  13 , 0 , 1 , 7
@@ -101,8 +101,8 @@ asqd_vaxmy_lab1:
 	dcbt 	%r16,%r11
 	la   %r13,	-1(%r13)
 	dcbt 	%r17,%r11
-	bdnz    asqd_vaxmy_lab1
-asqd_vaxmy_lab0:
+	bdnz    asq_vaxmy_lab1
+asq_vaxmy_lab0:
 	lwz   %r14,	368(%r1)
 	lwz   %r15,	376(%r1)
 	lwz   %r16,	384(%r1)

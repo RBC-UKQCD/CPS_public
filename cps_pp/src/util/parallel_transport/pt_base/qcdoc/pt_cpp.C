@@ -165,6 +165,7 @@ void pt_cmv_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
   IFloat *fp0, *fp1, *uu, *tmp;
   int s,c,d;
   struct gauge_agg_cb *agg = (struct gauge_agg_cb*)u;
+  printf("index=%p src=%p dest=%p gauge=%p\n",u,a,tmpfrm,gauge_field);
 
   for(s=0;s<sites;s++)
     {
@@ -187,8 +188,8 @@ void pt_cmv_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
 	    *(fp0+4) * *(tmp+5) + *(fp0+5) * *(tmp+4);
 	}
 
-      #if 0
       printf("agg[s].dest = %d  agg[s].src = %d, agg[s].gauge = %d\n", agg[s].dest, agg[s].src, agg[s].gauge);
+      #if 0
       for(int d = 0; d < 6; d++)
       {
 	printf("*(uu+%d) = %e %e %e\n",d,*(uu+3*d),*(uu+3*d+1),*(uu+3*d+2));

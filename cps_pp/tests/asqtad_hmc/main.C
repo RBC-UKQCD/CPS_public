@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.17 2005-03-09 19:19:35 chulwoo Exp $
+  $Id: main.C,v 1.18 2005-04-05 06:44:52 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -16,9 +16,9 @@
 #include <util/random.h>
 #include <comms/sysfunc.h>
 
-const int nx = 8;
-const int ny = 8;
-const int nz = 8;
+const int nx = 16;
+const int ny = 16;
+const int nz = 16;
 const int nt = 8;
 
 const int SAVE_DOARG = 1;
@@ -210,8 +210,8 @@ void setup_hmd_arg(HmdArg& hmd_arg)
   hmd_arg.n_bsn_masses = 0;
   hmd_arg.max_num_iter[0] = 5000;
   hmd_arg.stop_rsd[0] = 1.0E-06;
-  hmd_arg.step_size = 0.001;
-  hmd_arg.steps_per_traj = 50;
+  hmd_arg.step_size = 0.002;
+  hmd_arg.steps_per_traj = 25;
 //  hmd_arg.step_size = 0.005;
 //  hmd_arg.steps_per_traj = 100;
   hmd_arg.metropolis = METROPOLIS_YES;

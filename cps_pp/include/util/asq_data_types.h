@@ -3,7 +3,7 @@
 
 #include <qcdocos/scu_dir_arg.h>
 #ifdef SCIDAC
-#ifdef SINGLE
+#ifdef ASQD_SINGLE
 typedef float Float;
 typedef float IFloat;
 #define FNAME(pre,suf) pre##_F_##suf

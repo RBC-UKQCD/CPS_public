@@ -61,7 +61,9 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
       error = 1;
     }
 
-
+// Turned off the boundary check, as it is inconsistent  with NERSC convention.
+// 04/03/05, CJ
+#if 0
     if(hd.boundary[0] != rd_arg.Xbc() || hd.boundary[1] != rd_arg.Ybc() || hd.boundary[2] != rd_arg.Zbc() || hd.boundary[3] != rd_arg.Tbc()) {
       VRB.Flow(cname,fname,"Boundary conditions in file DISAGREE with GlobalJobParameter!\n");
 
@@ -79,7 +81,9 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 
       error = 1;
     }
+ #endif
   }
+
   if(synchronize(error) != 0)  
     ERR.General(cname, fname, "Wrong Parameters Specified\n");
 
