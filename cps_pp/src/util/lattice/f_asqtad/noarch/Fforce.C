@@ -1,9 +1,9 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  \brief  Implementation of FstagAsqtad::EvolveMomFforce.
+  \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.2 2003-10-23 13:38:59 zs Exp $
+  $Id: Fforce.C,v 1.1 2003-10-30 06:11:22 cwj Exp $
 */
 //--------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ CPS_START_NAMESPACE
 
 // The parity of the lattice site n
 
-ChkbType FstagAsqtad::parity(const int *n){
+ChkbType Fasqtad::parity(const int *n){
 
     int d, p;
     
@@ -37,7 +37,7 @@ ChkbType FstagAsqtad::parity(const int *n){
 // the MILC convention and is here to test against the MILC code.
 // This should eventually be changed to EVEN for the CPS. 
 
-void FstagAsqtad::force_product_sum(const Vector *v, const Vector *w,
+void Fasqtad::force_product_sum(const Vector *v, const Vector *w,
 				    IFloat coeff, Matrix *f){
 
     Matrix m0;
@@ -60,7 +60,7 @@ void FstagAsqtad::force_product_sum(const Vector *v, const Vector *w,
 // N.B. No optimising provision is made if any of the asqtad coefficients
 // are zero.
 
-void FstagAsqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
+void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm,
 				  Float mass, Float dt){
 
     char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
@@ -649,7 +649,7 @@ int staggered_phase(const int *n, int mu){
     
 }
 
-void FstagAsqtad::parallel_transport(Vector **vin, const SCUDir *dir,
+void Fasqtad::parallel_transport(Vector **vin, const SCUDir *dir,
 				     int N, Vector **vout){
 
     Matrix u, ud;

@@ -1,9 +1,9 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  \brief  Implementation of FstagAsqtad class.
+  \brief  Implementation of Fasqtad class.
 
-  $Id: f_stagAsqtad.C,v 1.3 2003-10-29 17:22:50 zs Exp $
+  $Id: f_asqtad.C,v 1.1 2003-10-30 06:11:22 cwj Exp $
 */
 //--------------------------------------------------------------------
 
@@ -68,25 +68,25 @@ static Vector *vp3 = &vt3;
 
 
 
-FstagAsqtad::FstagAsqtad(){
-    cname = "FstagAsqtad";
-    char *fname = "FstagAsqtad()";
+Fasqtad::Fasqtad(){
+    cname = "Fasqtad";
+    char *fname = "Fasqtad()";
     VRB.Func(cname,fname);
 }
 
 
-FstagAsqtad::~FstagAsqtad(){
-    char *fname = "~FstagAsqtad()";
+Fasqtad::~Fasqtad(){
+    char *fname = "~Fasqtad()";
     VRB.Func(cname,fname);
 }
 
 
-FclassType FstagAsqtad::Fclass(){
+FclassType Fasqtad::Fclass(){
     return F_CLASS_ASQTAD;
 }
 
 
-int FstagAsqtad::FmatEvlInv(Vector *f_out, Vector *f_in, 
+int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in, 
 			    CgArg *cg_arg, 
 			    Float *true_res,
 			    CnvFrmType cnv_frm)
@@ -106,13 +106,13 @@ int FstagAsqtad::FmatEvlInv(Vector *f_out, Vector *f_in,
 }
 
 
-int FstagAsqtad::FmatEvlInv(Vector *f_out, Vector *f_in, 
+int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in, 
 			    CgArg *cg_arg, 
 			    CnvFrmType cnv_frm)
 { return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
 
 
-int FstagAsqtad::FmatInv(Vector *f_out, Vector *f_in, 
+int Fasqtad::FmatInv(Vector *f_out, Vector *f_in, 
 			 CgArg *cg_arg, 
 			 Float *true_res,
 			 CnvFrmType cnv_frm,
@@ -131,14 +131,14 @@ int FstagAsqtad::FmatInv(Vector *f_out, Vector *f_in,
 }
 
 
-int FstagAsqtad::FmatInv(Vector *f_out, Vector *f_in, 
+int Fasqtad::FmatInv(Vector *f_out, Vector *f_in, 
 			 CgArg *cg_arg, 
 			 CnvFrmType cnv_frm,
 			 PreserveType prs_f_in)
 { return FmatInv(f_out, f_in, cg_arg, 0, cnv_frm, prs_f_in); }
 
 
-int FstagAsqtad::FeigSolv(Vector **f_eigenv, Float lambda[], 
+int Fasqtad::FeigSolv(Vector **f_eigenv, Float lambda[], 
 			  Float chirality[], int valid_eig[],
 			  Float **hsum,
 			  EigArg *eig_arg, 
@@ -195,7 +195,7 @@ int FstagAsqtad::FeigSolv(Vector **f_eigenv, Float lambda[],
     return iter;
 }
 
-void FstagAsqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
+void Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
 			 Float mass){
     char *fname = "SetPhi(V*,V*,V*,F)";
     VRB.Func(cname,fname);
@@ -213,7 +213,7 @@ void FstagAsqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o,
 }
 
 
-void FstagAsqtad::FforceSite(Matrix& force, Vector *frm, int *x, int mu){
+void Fasqtad::FforceSite(Matrix& force, Vector *frm, int *x, int mu){
 
     char *fname = "FforceSite(M&,V*,i*,i)";
     ERR.NotImplemented(cname,fname);
@@ -225,7 +225,7 @@ void FstagAsqtad::FforceSite(Matrix& force, Vector *frm, int *x, int mu){
 
 
 
-Float FstagAsqtad::BhamiltonNode(Vector *boson, Float mass){
+Float Fasqtad::BhamiltonNode(Vector *boson, Float mass){
     char *fname = "BhamiltonNode(V*,F)";
     VRB.Func(cname,fname);
     CgArg cg_arg;
@@ -240,7 +240,7 @@ Float FstagAsqtad::BhamiltonNode(Vector *boson, Float mass){
 
 
 
-void FstagAsqtad::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+void Fasqtad::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 			  CnvFrmType cnv_frm, int dir_flag){
     int offset;
     char *fname = "Fdslash(V*,V*,CgArg*,CnvFrmType,int)";
@@ -255,14 +255,14 @@ void FstagAsqtad::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
 }
 
 
-void FstagAsqtad::prepForce(Vector *frm){
+void Fasqtad::prepForce(Vector *frm){
 
     char *fname = "preopForce";
     ERR.NotImplemented(cname,fname);
 	
 }
 
-int FstagAsqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 		       int Nshift, int isz, CgArg *cg_arg,
 		       CnvFrmType cnv_frm) {
 
