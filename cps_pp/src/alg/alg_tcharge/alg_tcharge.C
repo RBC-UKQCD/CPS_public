@@ -103,7 +103,7 @@ void CloverLeaf(Lattice& lattice, Matrix& pl,  int* pos, int mu, int nu)
     P0 -=  P3;
     P0 *= 0.25;
 
-    moveMem((float*) &pl,(float*) &P0, 18 * sizeof(float) );
+    moveMem((Float*) &pl,(Float*) &P0, 18 * sizeof(Float) );
 
 }
 
@@ -146,7 +146,7 @@ void CloverLeafRect(Lattice& lattice, Matrix& pl,  int* pos, int mu, int nu)
    P0 -=  P3;
    
 
-   moveMem((float*) &pl,(float*) &P0, 18 * sizeof(float) );
+   moveMem((Float*) &pl,(Float*) &P0, 18 * sizeof(Float) );
    
    // 2x1  size
    P0.ZeroMatrix();
