@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
 
-  $Id: alg_hmc_phi.C,v 1.16 2004-09-17 18:10:04 chulwoo Exp $
+  $Id: alg_hmc_phi.C,v 1.17 2004-10-28 15:14:57 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-17 18:10:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.16 2004-09-17 18:10:04 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.16 2004-09-17 18:10:04 chulwoo Exp $
+//  $Date: 2004-10-28 15:14:57 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.17 2004-10-28 15:14:57 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.17 2004-10-28 15:14:57 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -156,7 +156,7 @@ AlgHmcPhi::AlgHmcPhi(Lattice& latt,
     VRB.Smalloc(cname,fname, "phi",phi, n_frm_masses * sizeof(int));
     for(i=0; i<n_frm_masses; i++){
       phi[i] = (Vector *) smalloc(f_size * sizeof(Float));
-      bzero(phi[i],f_size*sizeof(Float));
+      bzero((char *)phi[i],f_size*sizeof(Float));
       if(phi[i] == 0)
 	ERR.Pointer(cname,fname, "phi[i]");
       VRB.Smalloc(cname,fname, "phi[i]", phi[i], f_size * sizeof(Float));
