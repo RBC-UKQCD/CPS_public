@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprOLSym class methods.
 
-  $Id: g_impr_OLSym.C,v 1.6 2004-09-02 16:57:16 zs Exp $
+  $Id: g_impr_OLSym.C,v 1.7 2004-09-03 20:53:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:57:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.6 2004-09-02 16:57:16 zs Exp $
-//  $Id: g_impr_OLSym.C,v 1.6 2004-09-02 16:57:16 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-03 20:53:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.7 2004-09-03 20:53:06 chulwoo Exp $
+//  $Id: g_impr_OLSym.C,v 1.7 2004-09-03 20:53:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v $
 //  $State: Exp $
 //
@@ -35,6 +35,7 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/gjp.h>
 #include <util/gw_hb.h>
+#include <util/error.h>
 #include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/cbuf.h>
@@ -84,7 +85,6 @@ GimprOLSym::GimprOLSym()
   // This action cannot be used with anisotropic lattices
   if(GJP.XiBare()!=1)
       ERR.NotImplemented(cname,fname,"Anisotropic version not implemented\n") ;
-
 
   // See hep-lat/9507010 page 5 eq. 5 through 9
   Float u0(GJP.u0()) ;
@@ -155,7 +155,7 @@ void GimprOLSym::GforceSite(Matrix& force, int *x, int mu)
   force.TrLessAntiHermMatrix(*mp1);
 }
 
-#if 1
+#if TARGET !=QCDOC
 //-----------------------------------------------------------------------------
 // EvolveMomGforce(Matrix *mom, Float step_size):
 // It evolves the canonical momentum mom by step_size

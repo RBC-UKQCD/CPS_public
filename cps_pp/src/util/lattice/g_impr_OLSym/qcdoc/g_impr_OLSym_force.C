@@ -8,6 +8,7 @@
 #include <util/smalloc.h>
 #include <util/pt.h>
 #include <util/time.h>
+#define PROFILE
 CPS_START_NAMESPACE
 
 //-----------------------------------------------------------------------------
