@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.7 2004-08-18 11:57:41 zs Exp $
+  $Id: w_quark.C,v 1.8 2004-12-07 06:11:58 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP
@@ -137,8 +137,10 @@ WspectQuark::WspectQuark(Lattice &lat,
 
   // added new to phys_v4.1.0
   // rescale factor for sources -- default=1.0
-  Float rs_fac = warg.rescale_factor;
-  if (!rs_fac) rs_fac = 1.0;
+  Float rs_fac = 1.0;
+ 
+  // now let me hold the throat of somebody who wrote line below!!!
+  // if (!rs_fac) rs_fac = 1.0;
   //Float rs_fac = 1.0E+5;
   printf("rescaled source with rs_fac = %e \n",rs_fac);
   // end added

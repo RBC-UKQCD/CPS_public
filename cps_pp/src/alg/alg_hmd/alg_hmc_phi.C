@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
 
-  $Id: alg_hmc_phi.C,v 1.18 2004-12-01 06:38:15 chulwoo Exp $
+  $Id: alg_hmc_phi.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-01 06:38:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.18 2004-12-01 06:38:15 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.18 2004-12-01 06:38:15 chulwoo Exp $
+//  $Date: 2004-12-07 06:11:58 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -434,12 +434,6 @@ Float AlgHmcPhi::run(void)
   for(i=0; i<n_frm_masses; i++){
     lat.RandGaussVector(frm1[i], 0.5, Ncb);
     lat.RandGaussVector(frm2[i], 0.5, Ncb);
-//    bzero(frm1[i],f_size*sizeof(Float)/2);
-//    bzero(frm2[i],f_size*sizeof(Float)/2);
-//    Float *tmp = (Float *)frm1[i];
-//    int jj_start = (f_size/2)+6*lat.FsiteSize();
-//    int jj_end = jj_start+1;
-//    for(int jj=jj_start;jj<jj_end;jj++) *(tmp+jj)=1.0;
     lat.SetPhi(phi[i], frm1[i], frm2[i], hmd_arg->frm_mass[i]);
   }
 

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.21 2004-09-17 19:14:41 chulwoo Exp $
+  $Id: lattice_base.C,v 1.22 2004-12-07 06:11:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-17 19:14:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.21 2004-09-17 19:14:41 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.21 2004-09-17 19:14:41 chulwoo Exp $
+//  $Date: 2004-12-07 06:11:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.22 2004-12-07 06:11:59 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.22 2004-12-07 06:11:59 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -276,7 +276,7 @@ Lattice::Lattice()
   //----------------------------------------------------------------
   if(GJP.Snodes() != 1) {
     VRB.Flow(cname,fname, "Checking gauge field across s-slices\n");
-    GsoCheck();
+     GsoCheck();
   }
 
   //----------------------------------------------------------------
@@ -2087,12 +2087,12 @@ void Lattice::RandGaussVector(Vector *frm, Float sigma2)
 void Lattice::RandGaussVector(Vector *frm, Float sigma2, int
 chkbds,FermionFieldDimension frm_field_dim  )
 {
-  if (Fclass()==F_CLASS_STAG || Fclass() ==F_CLASS_ASQTAD)
+  if (Fclass()==F_CLASS_STAG || Fclass() ==F_CLASS_ASQTAD|| Fclass() ==F_CLASS_P4)
 	RandGaussVector(frm, sigma2, chkbds, STAG, frm_field_dim);
   else
 	RandGaussVector(frm, sigma2, chkbds, CANONICAL, frm_field_dim);
 }
-
+ 
 //--------------------------------------------------------------------------
 /*!
   \param frm  A vector.

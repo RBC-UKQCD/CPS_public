@@ -14,11 +14,88 @@
 #include <util/vector.h>
 #include <stdio.h>
 typedef double IFloat;
+
 struct gauge_agg{
   int src;
   int dest;
   IFloat mat[18];
 };
+
+//---------------------------------------------------------------
+//Checkerboarding
+struct gauge_agg_cb{
+  int src;
+  int dest;
+  int dest2;
+  int gauge_index;
+  int dagger;
+};
+//---------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+//C++ implementation of matrix multiply for checkerboarded field
+//
+//Parameters
+//
+//sites - Total number of matrix multiplies
+//u - Pointer to structs that hold source, destination indexes for parallel 
+//    transport, also holds the index for the appropriate SU(3) gauge link
+//a - Matrix field that is to be transported
+//tmpfrm - Transported matrix field
+//gauge_field - pointer to the gauge_field
+
+extern "C"
+void cmm_agg_cpp_cb(int sites, long u, long a, long tmpfrm, IFloat *gauge_field, int pad)
+{
+  IFloat *fp0, *fp1, *uu;
+  int s,c;
+  struct gauge_agg_cb *agg = (struct gauge_agg_cb*)u;
+
+  for(s=0;s<sites;s++)
+    {
+      //Assignment of source,destination,gauge field index
+      if(pad)
+	fp1 = (IFloat *)(tmpfrm)+3*agg[s].dest2*8;
+      else
+	fp1 = (IFloat *)(tmpfrm) + 3*agg[s].dest*6;
+      fp0 = (IFloat *)((int)a) + 3*agg[s].src*6;
+      uu = gauge_field + agg[s].gauge_index;
+    
+      //c indexes the row of the matrix
+      //d indexes the column of the matrix
+      for(int d = 0; d<3; d++)
+	for(c=0; c<3; c++)
+	  {
+	    //If SU(3) matrix is conjugated
+	    if(agg[s].dagger)
+	      {
+		//Re part
+		*(fp1+6*c+2*d) = *(fp0+2*d) * *(uu+2*c) + *(fp0+2*d+1) * *(uu+2*c+1) +
+		  *(fp0+2*d+6) * *(uu+2*c+6) + *(fp0+2*d+7) * *(uu+2*c+7) +
+		  *(fp0+2*d+12) * *(uu+2*c+12) + *(fp0+2*d+13) * *(uu+2*c+13);
+		//Im part
+		*(fp1+6*c+2*d+1) = *(fp0+2*d+1) * *(uu+2*c) - *(fp0+2*d) * *(uu+2*c+1) +
+		  *(fp0+2*d+7) * *(uu+2*c+6) - *(fp0+2*d+6) * *(uu+2*c+7) +
+		  *(fp0+2*d+13) * *(uu+2*c+12) - *(fp0+2*d+12) * *(uu+2*c+13);
+	      }
+	    else
+	      {
+		//Re part
+		*(fp1+6*c+2*d) = *(fp0+2*d) * *(uu+6*c) - *(fp0+2*d+1) * *(uu+6*c+1) + 
+		  *(fp0+2*d+6) * *(uu+6*c+2) - *(fp0+2*d+7)* *(uu+6*c+3) + 
+		  *(fp0+2*d+12) * *(uu+6*c+4) - *(fp0+2*d+13) * *(uu+6*c+5);
+		//Im part 
+		*(fp1+6*c+1+2*d) = *(fp0+2*d) * *(uu+6*c+1) + *(fp0+1+2*d) * *(uu+6*c) + 
+		  *(fp0+2*d+6) * *(uu+6*c+3) + *(fp0+2*d+7)* *(uu+6*c+2) + 
+		  *(fp0+2*d+12) * *(uu+6*c+5) + *(fp0+2*d+13) * *(uu+6*c+4);
+	      }
+	  }
+    }
+}
+
+//----------------------------------------------------------------------------
+
 extern "C"
 void cmm_agg_cpp( int sites, long chi, long u, long a, 
                 long tmpfrm)
@@ -31,7 +108,8 @@ void cmm_agg_cpp( int sites, long chi, long u, long a,
   int *ch;
 
   for (s = 0; s< sites; s++)
-	{
+    {
+      //Assignment of source, destination indexes
       fp1 = (IFloat *)(tmpfrm + 3*agg[s].dest );
       fp0 = (IFloat *)((int)a + 3*agg[s].src);
       uu = &(agg[s].mat[0]);
@@ -41,7 +119,6 @@ void cmm_agg_cpp( int sites, long chi, long u, long a,
       if(i % 6 == 5 ) printf("\n");
       }
 #endif
-//      printf("src=%d dest=%d ",agg[s].src,agg[s].dest);
       for (int d=0; d<3; d++)
       for (c=0; c<3; c++){
 	//Re part
@@ -57,6 +134,78 @@ void cmm_agg_cpp( int sites, long chi, long u, long a,
  //     printf("\n");
     }
 }
+
+//-----------------------------------------------------------------------------
+//C++ implementation of matrix vector multiply for checkerboarded field
+//
+//Parameters
+//
+//sites - Total number of matrix multiplies
+//u - Pointer to structs that hold source, destination indexes for parallel 
+//    transport, also holds the index for the appropriate SU(3) gauge link
+//a - Vector field that is to be transported
+//tmpfrm - Transported vector field
+//gauge_field - pointer to the gauge field
+
+
+extern "C"
+void cmv_agg_cpp_cb(int sites, long u, long a, long tmpfrm, IFloat* gauge_field, int pad)
+{
+  IFloat *fp0, *fp1, *uu;
+  int s,c;
+  struct gauge_agg_cb *agg = (struct gauge_agg_cb*)u;
+
+  for(s=0;s<sites;s++)
+    {
+      //Assignment of source, destination, gauge field indexes
+      if(pad)
+	fp1 = (IFloat *)(tmpfrm) + agg[s].dest2*8;
+      else
+	fp1 = (IFloat *)(tmpfrm) + agg[s].dest*6;
+      fp0 = (IFloat *)((int)a) + agg[s].src*6;
+      uu = gauge_field + agg[s].gauge_index;
+
+      //d indexes the row of the gauge link matrix
+      for(int d = 0; d<3; d++)
+	//If gauge link needs to be conjugated
+	if(agg[s].dagger)
+	  {
+	    //Re part
+	    *(fp1+2*d) = *(fp0) * *(uu+2*d) + *(fp0+1) * *(uu+2*d+1) +
+	      *(fp0+2) * *(uu+2*d+6) + *(fp0+3) * *(uu+2*d+7) +
+	      *(fp0+4) * *(uu+2*d+12) + *(fp0+5) * *(uu+2*d+13);
+	    //Im Part
+	    *(fp1+2*d+1) = *(fp0+1) * *(uu+2*d) - *(fp0) * *(uu+2*d+1) +
+	      *(fp0+3) * *(uu+2*d+6) - *(fp0+2) * *(uu+2*d+7) +
+	      *(fp0+5) * *(uu+2*d+12) - *(fp0+4) * *(uu+2*d+13);
+	  }
+	else
+	  {
+	    //Re part
+	    *(fp1+2*d) = *(fp0) * *(uu+6*d) - *(fp0+1) * *(uu+6*d+1) + 
+	      *(fp0+2) * *(uu+6*d+2) - *(fp0+3)* *(uu+6*d+3) + 
+	      *(fp0+4) * *(uu+6*d+4) - *(fp0+5) * *(uu+6*d+5);
+	    //Im part 
+	    *(fp1+1+2*d) = *(fp0) * *(uu+6*d+1) + *(fp0+1) * *(uu+d*6) + 
+	      *(fp0+2) * *(uu+6*d+3) + *(fp0+3)* *(uu+6*d+2) + 
+	      *(fp0+4) * *(uu+6*d+5) + *(fp0+5) * *(uu+6*d+4);
+	  }
+
+      #if 0
+      printf("agg[s].dest = %d  agg[s].src = %d, agg[s].gauge_index = %d\n", agg[s].dest, agg[s].src, agg[s].gauge_index);
+      for(int d = 0; d < 6; d++)
+      {
+	printf("*(uu+%d) = %e %e %e\n",d,*(uu+3*d),*(uu+3*d+1),*(uu+3*d+2));
+      	printf("*(fp0+%d) = %e\n",d,*(fp0+d));
+      	printf("*(fp1+%d) = %e\n",d,*(fp1+d));
+      }
+      #endif
+
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 extern "C"
 void cmv_agg_cpp( int sites, long u, long a, 
                 long tmpfrm)
@@ -69,16 +218,18 @@ void cmv_agg_cpp( int sites, long u, long a,
   int *ch;
 
       uu = &(agg[0].mat[0]);
-      printf("in=%p out=%p ",a,tmpfrm);
-      printf("src=%p dest=%p uu=%p\n",agg[0].src,agg[0].dest,uu);fflush(stdout);
-      printf("uu[%d]= ",0);
-      for(i=0;i<18;i++){
-      printf("%0.4e ",uu[i]);
-      if(i % 6 == 5 ) printf("\n");
-      }
+      //printf("in=%p out=%p ",a,tmpfrm);
+      //printf("src=%p dest=%p uu=%p\n",agg[0].src,agg[0].dest,uu);
+      //fflush(stdout);
+      //printf("uu[%d]= ",0);
+      //for(i=0;i<18;i++){
+      //printf("%0.4e ",uu[i]);
+      //if(i % 6 == 5 ) printf("\n");
+      //}
   for (s = 0; s< sites; s++)
 	{
-      fp1 = (IFloat *)(tmpfrm + agg[s].dest );
+
+      fp1 = (IFloat *)(tmpfrm + agg[s].dest);
       fp0 = (IFloat *)((int)a + agg[s].src);
       uu = &(agg[s].mat[0]);
 //      printf("src=%d dest=%d uu=%p\n",agg[0].src,agg[0].dest,uu);fflush(stdout);
@@ -108,11 +259,12 @@ void cmv_agg_cpp( int sites, long u, long a,
 	  *(fp0+2) * *(uu+6*d+2) - *(fp0+3)* *(uu+6*d+3) + 
 	  *(fp0+4) * *(uu+6*d+4) - *(fp0+5) * *(uu+6*d+5);
 	//Im part 
-	*(fp1+1+2*d) = *(fp0) * *(uu+6*d+1) + *(fp0+1+2*d) * *(uu+d*6) + 
+	*(fp1+1+2*d) = *(fp0) * *(uu+6*d+1) + *(fp0+1) * *(uu+d*6) + 
 	  *(fp0+2) * *(uu+6*d+3) + *(fp0+3)* *(uu+6*d+2) + 
 	  *(fp0+4) * *(uu+6*d+5) + *(fp0+5) * *(uu+6*d+4);
 //      printf("%e %e ",*(fp1+2*c),*(fp1+2*c+1));
       }
  //     printf("\n");
     }
+
 }

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.18 2004-10-15 06:12:37 chulwoo Exp $
+  $Id: gjp.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-10-15 06:12:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.18 2004-10-15 06:12:37 chulwoo Exp $
-//  $Id: gjp.C,v 1.18 2004-10-15 06:12:37 chulwoo Exp $
+//  $Date: 2004-12-07 06:11:58 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
+//  $Id: gjp.C,v 1.19 2004-12-07 06:11:58 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -288,6 +288,10 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   if(s_nodes != 1) s_node_coor = CoorS() % s_nodes;
 #endif
 #endif
+  VRB.Result(cname,fname, "node_sites= %d %d %d %d %d\n",
+x_node_sites,y_node_sites,z_node_sites,t_node_sites,s_node_sites);
+  VRB.Result(cname,fname, "nodes= %d %d %d %d %d\n",
+x_nodes,y_nodes,z_nodes,t_nodes,s_nodes);
 
   // Set the static arrays gjp_local_axis[5], gjp_scu_dir[10],
   // and gjp_scu_wire_map[10].
@@ -497,6 +501,12 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   asqtad_7staple = rda.asqtad_7staple; 
   asqtad_lepage = rda.asqtad_lepage;  
  
+  p4_KS = rda.p4_KS;	  
+  p4_knight = rda.p4_knight;	  
+  p4_3staple = rda.p4_3staple; 
+  p4_5staple = rda.p4_5staple; 
+  p4_7staple = rda.p4_7staple; 
+  p4_lepage = rda.p4_lepage; 
   //================================================================
   // Other initializations
   //================================================================
