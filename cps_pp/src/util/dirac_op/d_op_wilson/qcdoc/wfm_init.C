@@ -58,7 +58,6 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
   int sly;                          /* y-direction size of node sublattice */
   int slz;                          /* z-direction size of node sublattice */
   int slt;                          /* t-direction size of node sublattice */
-  int i;
   int mu;
 
   IR = wilson_p->instruction_reg_num;
