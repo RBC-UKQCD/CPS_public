@@ -6,7 +6,7 @@
 #include <config.h>
 #include <math.h>
 #include <util/ReadLattice.h>
-#include "Flconv.h"
+#include <util/Flconv.h>
 CPS_START_NAMESPACE
 
 

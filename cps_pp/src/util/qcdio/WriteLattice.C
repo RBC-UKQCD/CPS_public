@@ -3,7 +3,7 @@
 
 #include <config.h>
 #include <util/WriteLattice.h>
-#include "Flconv.h"
+#include <util/Flconv.h>
 CPS_START_NAMESPACE
 
 // code from cdawson/kostas

@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  The QCD I/O Interface:
 
-  $Id: qcdio.C,v 1.4 2004-04-28 14:24:50 cwj Exp $
+  $Id: qcdio.C,v 1.5 2004-04-28 14:27:52 cwj Exp $
 */
 /*  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
    $Author: cwj $ 
-   $Date: 2004-04-28 14:24:50 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v 1.4 2004-04-28 14:24:50 cwj Exp $
-   $Id: qcdio.C,v 1.4 2004-04-28 14:24:50 cwj Exp $
+   $Date: 2004-04-28 14:27:52 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v 1.5 2004-04-28 14:27:52 cwj Exp $
+   $Id: qcdio.C,v 1.5 2004-04-28 14:27:52 cwj Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.C,v $
-   $Revision: 1.4 $
+   $Revision: 1.5 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/qcdio.C,v $
    $State: Exp $  */ 
 /*----------------------------------------------------------*/
@@ -28,13 +28,10 @@ CPS_END_NAMESPACE
 #include <stdarg.h>
 #include <math.h>
 #include <util/qcdio.h>
-CPS_START_NAMESPACE
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 #endif
-CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/error.h>
 CPS_START_NAMESPACE
