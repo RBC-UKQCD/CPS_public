@@ -694,11 +694,11 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
   VRB.Clock(cname, fname, "Before loop over links.\n") ;
 
-  for (mu=0; mu<4; mu++) {
-    for (t=0; t<lt; t++) {
-    for (z=0; z<lz; z++) {
-    for (y=0; y<ly; y++) {
-    for (x=0; x<lx; x++) {
+  for (mu=0; mu<4; mu++){
+    for (t=0; t<lt; t++){
+    for (z=0; z<lz; z++){
+    for (y=0; y<ly; y++){
+    for (x=0; x<lx; x++){
       int gauge_offset = x+lx*(y+ly*(z+lz*t)) ;
       int vec_offset = f_site_size_4d*gauge_offset ;
       gauge_offset = mu+4*gauge_offset ;
@@ -823,10 +823,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
       *(mom+gauge_offset) += tmp_mat2 ;
 
-    }
-    }
-    }
-    } // end for x,y,z,t
+    } } } } // end for x,y,z,t
   } // end for mu
  
 //------------------------------------------------------------------

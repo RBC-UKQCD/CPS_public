@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Routines used by the AlgGheatBath class methods:
 
-  $Id: alg_ghb_krn.C,v 1.4 2004-06-04 20:32:44 chulwoo Exp $
+  $Id: alg_ghb_krn.C,v 1.5 2004-07-28 05:38:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 20:32:44 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v 1.4 2004-06-04 20:32:44 chulwoo Exp $
-//  $Id: alg_ghb_krn.C,v 1.4 2004-06-04 20:32:44 chulwoo Exp $
+//  $Date: 2004-07-28 05:38:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v 1.5 2004-07-28 05:38:20 chulwoo Exp $
+//  $Id: alg_ghb_krn.C,v 1.5 2004-07-28 05:38:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb_krn.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v $
 //  $State: Exp $
 //
@@ -202,7 +202,7 @@ void  cmhb_kernel( Float *sigma, Float *u)
 {
     LRG.SetInterval(1, -1);
 
-#if 0    
+#if 1    
     // This tells which subblock is being updated: 
   int	subblock=0;
 

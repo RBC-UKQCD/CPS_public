@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FwilsonTypes class.
 
-  $Id: f_wilson_t.C,v 1.4 2004-06-04 21:14:13 chulwoo Exp $
+  $Id: f_wilson_t.C,v 1.5 2004-07-28 05:36:47 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.4 2004-06-04 21:14:13 chulwoo Exp $
-//  $Id: f_wilson_t.C,v 1.4 2004-06-04 21:14:13 chulwoo Exp $
+//  $Date: 2004-07-28 05:36:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.5 2004-07-28 05:36:47 chulwoo Exp $
+//  $Id: f_wilson_t.C,v 1.5 2004-07-28 05:36:47 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_wilson_t.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v $
 //  $State: Exp $
 //
@@ -154,7 +154,7 @@ Float FwilsonTypes::FhamiltonNode( Vector *phi,  Vector *chi) {
   if (chi == 0)
     ERR.Pointer(cname,fname,"chi") ;
 
-  return phi->ReDotProductNode(chi,(GJP.VolNodeSites()*FsiteSize())>>1) ;
+  return phi->ReDotProductNode(chi,((GJP.VolNodeSites()*FsiteSize())>>1)*(2-FchkbEvl())) ;
 }
 
 //------------------------------------------------------------------

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.12 2004-07-15 22:27:37 chulwoo Exp $
+  $Id: lattice_base.C,v 1.13 2004-07-28 05:36:47 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-15 22:27:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.12 2004-07-15 22:27:37 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.12 2004-07-15 22:27:37 chulwoo Exp $
+//  $Date: 2004-07-28 05:36:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.13 2004-07-28 05:36:47 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.13 2004-07-28 05:36:47 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -37,6 +37,7 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 #include <util/random.h>
+#include <util/ReadLatticePar.h>
 #include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
@@ -122,7 +123,7 @@ static Matrix *mp4 = &mt4;
 #endif 
 
 
-
+int Lattice::ForceFlops=0;
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
@@ -135,7 +136,6 @@ Lattice::Lattice()
   cname = "Lattice";
   char *fname = "Lattice()";
   int array_size;  // On-node size of the gauge field array.
-  RandomGenerator ran_gen; // Random generator
 
   VRB.Func(cname,fname);
 
@@ -147,7 +147,8 @@ Lattice::Lattice()
     // Allocate memory for the gauge field.
     //--------------------------------------------------------------
     array_size = GsiteSize() * GJP.VolNodeSites() * sizeof(Float);  
-    if(start_conf_kind != START_CONF_LOAD){
+    if(start_conf_kind != START_CONF_LOAD &&
+	start_conf_kind!=START_CONF_FILE){
       gauge_field = (Matrix *) pmalloc(array_size);
       if( gauge_field == 0)
 	ERR.Pointer(cname,fname, "gauge_field");
@@ -213,10 +214,20 @@ Lattice::Lattice()
     GJP.StartConfKind(START_CONF_MEM);
   }
   else if(start_conf_kind == START_CONF_FILE){
+#if TARGET == QCDOC || TARGET == NOARCH
+    gauge_field = GJP.StartConfLoadAddr();
+    VRB.Flow(cname,fname, "Load starting configuration addr = %x\n",
+	     gauge_field);
+    ReadLatticeParallel rd_lat(*this,GJP.StartConfFilename());
+    str_ord = CANONICAL;
+    is_initialized = 1;
+    GJP.StartConfKind(START_CONF_MEM);
+#else
     //???
     VRB.Flow(cname,fname, "File starting configuration\n");
     ERR.NotImplemented(cname,fname, 
     "Starting config. type  START_CONF_FILE not implemented\n");
+#endif
   }
   else if(start_conf_kind == START_CONF_LOAD){
     gauge_field = GJP.StartConfLoadAddr();

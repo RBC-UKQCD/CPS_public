@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgGheatBath class methods.
   
-  $Id: alg_ghb.C,v 1.6 2004-07-09 05:55:15 chulwoo Exp $
+  $Id: alg_ghb.C,v 1.7 2004-07-28 05:38:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 05:55:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.6 2004-07-09 05:55:15 chulwoo Exp $
-//  $Id: alg_ghb.C,v 1.6 2004-07-09 05:55:15 chulwoo Exp $
+//  $Date: 2004-07-28 05:38:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.7 2004-07-28 05:38:20 chulwoo Exp $
+//  $Id: alg_ghb.C,v 1.7 2004-07-28 05:38:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
 //  $State: Exp $
 //
@@ -41,7 +41,7 @@ CPS_START_NAMESPACE
 //Uncomment next line to switch on timing
 //#define GHB_TIMING
 
-#if TARGET == QCDSP
+#if 1
 static int dram_grand_seed[6] = {
   0xbeefcafe,
   0xdefaced, 
@@ -167,6 +167,8 @@ void AlgGheatBath::run()
   // relocate the heatbath kernal and set up rand seeds
   //--------------------------------------------------
   relocate();
+
+  LRG.SetInterval(1,0);
 
   // Run the gauge heat bath
   //----------------------------------------------------------------

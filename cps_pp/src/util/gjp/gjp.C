@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.9 2004-07-02 14:13:42 chulwoo Exp $
+  $Id: gjp.C,v 1.10 2004-07-28 05:36:47 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-02 14:13:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.9 2004-07-02 14:13:42 chulwoo Exp $
-//  $Id: gjp.C,v 1.9 2004-07-02 14:13:42 chulwoo Exp $
+//  $Date: 2004-07-28 05:36:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.10 2004-07-28 05:36:47 chulwoo Exp $
+//  $Id: gjp.C,v 1.10 2004-07-28 05:36:47 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -62,7 +62,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 #ifdef PARALLEL
-int gjp_local_axis[6] = {0, 0, 0, 0, 1}; 
+int gjp_local_axis[6] = {0, 0, 0, 0, 1, 1}; 
      // For gjp_local_axis[n], n = {0,1,2,3,4}
      // corresponds to {x,y,z,t,s}. It is 1 if *_nodes = 1
      // and it is 0 otherwise.
@@ -392,10 +392,20 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   // Set the initial configuration load address
   //----------------------------------------------------------------
   if(start_conf_kind == START_CONF_MEM || 
-     start_conf_kind == START_CONF_LOAD)
+     start_conf_kind == START_CONF_LOAD ||
+     start_conf_kind == START_CONF_FILE)
     start_conf_load_addr = rda.start_conf_load_addr;
   else
     start_conf_load_addr = 0;
+
+  if(start_conf_kind == START_CONF_FILE){
+    if(strlen(rda.start_conf_filename)<1){
+      ERR.General(cname,fname,
+      "start_conf_filename is not set correctly");
+    } else
+    strcpy(start_conf_filename,rda.start_conf_filename);
+  }
+    
 
   // Set the initial seed type.
   //----------------------------------------------------------------

@@ -18,7 +18,7 @@ CPS_START_NAMESPACE
 // f_asqtad.C
 //
 // Fasqtad is derived from FstagTypes and is relevant to
-// staggered fermions
+// Improved staggered (Asqtad) fermions
 //
 //------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ void  set_pt (Fasqtad *lat);
 #endif
 
 
-int Fasqtad::ForceFlops=0;
+//int Fasqtad::ForceFlops=0;
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
