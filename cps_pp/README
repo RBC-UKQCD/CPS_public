@@ -130,7 +130,9 @@ guide in doc/ref/html and doc/usr/html respectively
 This target runs the suite of regression tests. The file
 tests/Makefile_common provides a useful template of makefile to use to
 build executables with the CPS.
-You need perl installed on your system in order for this to work.
+This uses xmldiff, so you need that to be installed in your PATH, and the 
+appropriate Java libraries.
+You need also perl installed on your system in order for this to work.
 
     3.3.  clean
 
