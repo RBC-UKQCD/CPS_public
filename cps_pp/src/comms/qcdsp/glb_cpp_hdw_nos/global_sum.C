@@ -4,12 +4,12 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw_nos/global_sum.C,v 1.3 2004-06-04 21:14:04 chulwoo Exp $
-//  $Id: global_sum.C,v 1.3 2004-06-04 21:14:04 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw_nos/global_sum.C,v 1.4 2004-08-17 03:33:12 chulwoo Exp $
+//  $Id: global_sum.C,v 1.4 2004-08-17 03:33:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw_nos/global_sum.C,v $
 //  $State: Exp $
 //
@@ -40,7 +40,7 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------------
 #ifdef GLOBAL_SUM_VERBOSE_ON
 CPS_END_NAMESPACE
-#include <stdio.h>                                   // printf 
+#include <util/qcdio.h>                                   // printf 
 CPS_START_NAMESPACE
 #endif
 

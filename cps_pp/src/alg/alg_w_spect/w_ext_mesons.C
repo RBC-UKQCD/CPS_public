@@ -2,7 +2,7 @@
 CPS_START_NAMESPACE
 /*!\file
 
-  $Id: w_ext_mesons.C,v 1.6 2004-07-09 05:55:16 chulwoo Exp $
+  $Id: w_ext_mesons.C,v 1.7 2004-08-17 03:33:11 chulwoo Exp $
 */
 /* class WspectExtendedMesons
  * Thomas and Xiaodong. March 2000.
@@ -29,6 +29,7 @@ CPS_END_NAMESPACE
 #include <util/error.h>                // ERR
 #include <util/verbose.h>              // VRB
 #include <util/vector.h>               // dotProduct
+#include <util/qcdio.h> 
 
 #include <comms/glb.h>                   // glb_sum
 #include <alg/alg_w_spect.h>          // AlgWspect::GetCounter()
@@ -381,7 +382,7 @@ WspectExtendedMesons::DiracAlgebra(const Float* qp1, const Float* qp2, int lclW,
       int state = 0;
       int traceDiracDone=0;
       Complex trace;
-      int sign;
+      int sign=1;
       Float weight = 0.;
       while (state < NUM_WMESON_STATE){
 	weight = table(state, sour_gamma, sour_op, sink_gamma, sink_op);
@@ -701,7 +702,7 @@ WspectExtendedMesons::print() const {
       printf("Writing extended meson#%d data to file %s\n",meson,outputfilename);   
 #endif
       
-      if ( !(fp = fopen(outputfilename, "a")) )
+      if ( !(fp = Fopen(outputfilename, "a")) )
 	ERR.FileA(d_class_name,fname, outputfilename);
 
       for (int wall = 0; wall <= d_glb_walls/2; ++wall) {
@@ -713,10 +714,10 @@ WspectExtendedMesons::print() const {
 	tmp /= 2.0; //average of t and N-t
 	// only print out the imaginary parts
 	//mom=0
-	fprintf(fp, "%d %d %d %.10e\n", 
+	Fprintf(fp, "%d %d %d %.10e\n", 
 		AlgWspect::GetCounter(), wall, 0, tmp.real());
       }
-      fclose(fp);
+      Fclose(fp);
     }//if(measur_flag)
   }//for meson
 }

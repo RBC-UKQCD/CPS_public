@@ -382,16 +382,16 @@ void Fasqtad::Smear(){
   ParTransAsqtad pt(*this);
   Matrix *result[NUM_DIR];
   Matrix *Unit;
-  Matrix *P3[N];
-  Matrix *P3mu[N];
-  Matrix *P5[N];
-  Matrix *P5mu[N];
-  Matrix *P7[N];
-  Matrix *P7mu[N];
-  Matrix *P6[N];
-  Matrix *P6mu[N];
-  Matrix *Pmumu[N];
-  Matrix *Pmumumu[N];
+  Matrix *P3[NUM_DIR];
+  Matrix *P3mu[NUM_DIR];
+  Matrix *P5[NUM_DIR];
+  Matrix *P5mu[NUM_DIR];
+  Matrix *P7[NUM_DIR];
+  Matrix *P7mu[NUM_DIR];
+  Matrix *P6[NUM_DIR];
+  Matrix *P6mu[NUM_DIR];
+  Matrix *Pmumu[NUM_DIR];
+  Matrix *Pmumumu[NUM_DIR];
 VRB.Flow(cname,fname,"vol=%d\n",vol);
   Unit = (Matrix *)fmalloc(sizeof(Matrix)*vol);
   for(i = 0;i<N;i++)
@@ -420,7 +420,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
   int nflops = 0;
   ParTrans::PTflops=0;
   int dir[] = {6,0,2,4,7,1,3,5},dirs[N]; //mapping between ParTrans and DiracOpAsqtad
-  Matrix *min[N],*mout[N];
+  Matrix *min[NUM_DIR],*mout[NUM_DIR];
   if (NUM_DIR%N !=0) ERR.General(cname,fname,"NUM_DIR(%d)is not divisible by N(%d)\n",NUM_DIR,N);
   for(int mu = 0;mu<POS_DIR;mu += N){
 	int mu_p,nu_p,rho_p,sigma_p;

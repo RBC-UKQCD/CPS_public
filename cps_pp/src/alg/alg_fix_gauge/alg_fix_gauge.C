@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v 1.6 2004-07-01 17:43:41 chulwoo Exp $
-//  $Id: alg_fix_gauge.C,v 1.6 2004-07-01 17:43:41 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v 1.7 2004-08-17 03:33:08 chulwoo Exp $
+//  $Id: alg_fix_gauge.C,v 1.7 2004-08-17 03:33:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_fix_gauge.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -26,7 +26,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/alg_fix_gauge.h>
 #include <alg/common_arg.h>
 #include <alg/fix_gauge_arg.h>

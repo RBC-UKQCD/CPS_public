@@ -1,12 +1,13 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.5 2004-07-09 03:54:23 chulwoo Exp $
+  $Id: w_quark.C,v 1.6 2004-08-17 03:33:11 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP
 #include <util/error.h>            // ERR
 #include <util/verbose.h>          // VRB
 #include <util/lattice.h>          // Lattice::FixGaugePtr()
+#include <util/qcdio.h> 
 #include <comms/glb.h>               // glb_sum(...)
 #include <comms/scu.h>               // getMinusData, getPlusData
 #include <alg/w_all.h>
@@ -75,7 +76,7 @@ WspectQuark::WspectQuark(Lattice &lat,
   //-------------------------------------------------------------------------
   FILE *fp;
   if (outfile) {
-    if (!(fp = fopen(outfile, "a"))) {
+    if (!(fp = Fopen(outfile, "a"))) {
       ERR.FileA(d_class_name, ctor_str, outfile);
     }
   }
@@ -527,7 +528,7 @@ WspectQuark::WspectQuark(Lattice &lat,
       //---------------------------------------------------------------------
       VRB.Result(d_class_name,ctor_str,"CG iterations = %d %.10e\n",
 		 cg_iter, Float(true_res));
-      fprintf(fp, "%d %.10e\n", cg_iter, Float(true_res));
+      Fprintf(fp, "%d %.10e\n", cg_iter, Float(true_res));
 
       // ============== added from phys_v4.0.0 ======================
       if ( (warg.source_kind==POINT_W) && pbp_outfile ) {
@@ -561,18 +562,18 @@ WspectQuark::WspectQuark(Lattice &lat,
   
   // Close the file
   //-------------------------------------------------------------------------
-  fclose(fp);
+  Fclose(fp);
   
   // === added from phys_v4.0.0 =================================
   if ( (warg.source_kind==POINT_W) && pbp_outfile) {
-    if (!(fp = fopen(pbp_outfile, "a"))) {
+    if (!(fp = Fopen(pbp_outfile, "a"))) {
       ERR.FileA(d_class_name, ctor_str, pbp_outfile);
     }
-    fprintf(fp, "%e %e %e\n",
+    Fprintf(fp, "%e %e %e\n",
             IFloat(warg.cg.mass),
             IFloat(pbp/pbp_norm),
             IFloat(pbg5p/pbp_norm));
-    fclose(fp);
+    Fclose(fp);
   }
 
   if (lat.Fclass() == F_CLASS_DWF && a0_p_outfile != 0) {
@@ -607,14 +608,14 @@ WspectQuark::dumpData(char *filename) const {
 
   FILE *fp;
   
-  if (filename && (fp = fopen(filename, "a"))) {
+  if (filename && (fp = Fopen(filename, "a"))) {
     for (int i = 0; i < d_size; ++i)
-      fprintf(fp, "%g\n", d_data_p[i]);
+      Fprintf(fp, "%g\n", d_data_p[i]);
   } else {
     ERR.FileA(d_class_name, "dumpData", filename);
   }
 
-  fclose(fp);  
+  Fclose(fp);  
 }
 
 
@@ -664,19 +665,19 @@ WspectQuark::dumpSource(char *filename, FermionVector &source) const {
   //Float sum;
   //printf("dump source to file  %s \n",filename);
 
-  if (filename && (fp = fopen(filename, "a"))) {
+  if (filename && (fp = Fopen(filename, "a"))) {
     for (int i = 0; i < GJP.VolNodeSites()* COLORs*DIRACs*COMPLEXs; i++){
       //      sum=pp[i];
       //glb_sum((Float *)(&sum));
       if (pp[i] != 0.0) {
-	fprintf(fp,"i = %4i, source = %16.8e \n",i,pp[i]);
+	Fprintf(fp,"i = %4i, source = %16.8e \n",i,pp[i]);
       }
     }
   } else {
     ERR.FileA(d_class_name, "dumpSource", filename);
   }
 
-  fclose(fp);  
+  Fclose(fp);  
 }
 
 

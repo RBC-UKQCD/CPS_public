@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 //
 
 CPS_END_NAMESPACE
-#include <stdio.h>  // for printf  ( really?  where? )
+#include <util/qcdio.h>  // for printf  ( really?  where? )
 CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE

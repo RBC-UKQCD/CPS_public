@@ -4,19 +4,19 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/verbose/main.C,v 1.4 2004-06-04 21:14:18 chulwoo Exp $
-//  $Id: main.C,v 1.4 2004-06-04 21:14:18 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/verbose/main.C,v 1.5 2004-08-17 03:33:19 chulwoo Exp $
+//  $Id: main.C,v 1.5 2004-08-17 03:33:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/verbose/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include<util/gjp.h>
 #include<util/random.h>
 #include<util/verbose.h>

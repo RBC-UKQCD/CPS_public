@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.7 2004-08-11 05:33:35 chulwoo Exp $
+  $Id: random_asm.C,v 1.8 2004-08-17 03:33:16 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-11 05:33:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.7 2004-08-11 05:33:35 chulwoo Exp $
-//  $Id: random_asm.C,v 1.7 2004-08-11 05:33:35 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.8 2004-08-17 03:33:16 chulwoo Exp $
+//  $Id: random_asm.C,v 1.8 2004-08-17 03:33:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -26,7 +26,7 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <util/random.h>
 CPS_START_NAMESPACE
 
@@ -41,6 +41,7 @@ CPS_START_NAMESPACE
  */
 IFloat RandomGenerator::Rand(void)
 {
+    static int called = 0;
     //---------------------------------------------------------
     // Start generating random numbers here
     //---------------------------------------------------------
@@ -49,7 +50,9 @@ IFloat RandomGenerator::Rand(void)
     int mj = ma[inext] - ma[inextp] ;
     if ( mj < 0 ) mj += MBIG ;
     ma[inext] = mj ;
-    printf("mj = %d mj*FAC=%0.9e\n",mj,mj*FAC);
+    if (called %10000==0)
+//    printf("mj = %d mj*FAC=%0.9e\n",mj,mj*FAC);
+    called++;
     return mj*FAC ;
 }
 
@@ -92,6 +95,10 @@ IFloat GaussianRandomGenerator::Rand()
 IFloat UniformRandomGenerator::Rand()
 {
     return A + ((B - A) * RandomGenerator::Rand());
+}
+IFloat UniformRandomGenerator::Rand(Float high, Float low)
+{
+    return low + ((high - low) * RandomGenerator::Rand());
 }
 
 

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgPlaq class methods.
   
-  $Id: alg_plaq.C,v 1.7 2004-06-04 21:13:59 chulwoo Exp $
+  $Id: alg_plaq.C,v 1.8 2004-08-17 03:33:10 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.7 2004-06-04 21:13:59 chulwoo Exp $
-//  $Id: alg_plaq.C,v 1.7 2004-06-04 21:13:59 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.8 2004-08-17 03:33:10 chulwoo Exp $
+//  $Id: alg_plaq.C,v 1.8 2004-08-17 03:33:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_plaq.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v $
 //  $State: Exp $
 //
@@ -37,7 +37,7 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 #include <comms/glb.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 CPS_START_NAMESPACE
 
 
@@ -120,12 +120,12 @@ void AlgPlaq::run()
  
     if (common_arg->results != 0){
       FILE *fp;
-      if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+      if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
         ERR.FileA(cname,fname, (char *)common_arg->results);
       }
-      fprintf(fp, "%f \t %f \t %f \n", 
+      Fprintf(fp, "%f \t %f \t %f \n", 
               (IFloat)ave_space, (IFloat)ave_time, (IFloat)ave_both);  
-      fclose(fp);  
+      Fclose(fp);  
     }
     return;
   }
@@ -187,14 +187,14 @@ void AlgPlaq::run()
   if(common_arg->results != 0){
     FILE *fp;
 
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) 
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) 
 	ERR.FileA(cname,fname, (char *)common_arg->results);
     
-    fprintf(fp, "%e %e %e %e %e %e\n",
+    Fprintf(fp, "%e %e %e %e %e %e\n",
 	     p_sum, p_var,
 	     p_max, p_min,
 	     p_temporal, p_spatial);
-    fclose(fp);
+    Fclose(fp);
   }
 
 }

@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v 1.6 2004-06-04 21:14:16 chulwoo Exp $
-//  $Id: main.C,v 1.6 2004-06-04 21:14:16 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v 1.7 2004-08-17 03:33:17 chulwoo Exp $
+//  $Id: main.C,v 1.7 2004-08-17 03:33:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v $
 //  $State: Exp $
 //
@@ -111,7 +111,7 @@ int main(int argc,char *argv[])
 #else
   const char *filename = "plaquette.dat";
 #endif
-  plaq = fopen(filename,"w");
+  plaq = Fopen(filename,"w");
   
   //----------------------------------------------------------------
   // Run Wilson Monte Carlo
@@ -132,7 +132,7 @@ int main(int argc,char *argv[])
 	  Float sum_plaq0 = lat.SumReTrPlaq();
 	  Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
 	  VRB.Flow(cname,fname,"%d plaquette = %0.16e\n",n,(float)aver_plaq0); 
-	  fprintf(plaq,"%d %0.16e\n",n,(float)aver_plaq0);fflush(plaq);
+	  Fprintf(plaq,"%d %0.16e\n",n,(float)aver_plaq0);fflush(plaq);
 
        	  hmc_r.run();
 	  sweep_counter++; 
@@ -150,7 +150,7 @@ int main(int argc,char *argv[])
 	Float sum_plaq0 = lat.SumReTrPlaq();
 	Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
 	VRB.Flow(cname,fname,"%d plaquette = %e\n",i,(float)aver_plaq0); 
-	fprintf(plaq,"%d %0.16e\n",i,(float)aver_plaq0);
+	Fprintf(plaq,"%d %0.16e\n",i,(float)aver_plaq0);
 	fflush(plaq);
 
 
@@ -177,7 +177,7 @@ int main(int argc,char *argv[])
 
     } 
 
-  fclose(plaq); 
+  Fclose(plaq); 
   }
 
   return(0);

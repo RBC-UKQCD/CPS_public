@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.7 2004-07-01 17:43:42 chulwoo Exp $
-//  $Id: quark_prop_s.C,v 1.7 2004-07-01 17:43:42 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.8 2004-08-17 03:33:10 chulwoo Exp $
+//  $Id: quark_prop_s.C,v 1.8 2004-08-17 03:33:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: quark_prop_s.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v $
 //  $State: Exp $
 //
@@ -29,7 +29,7 @@ CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
 #endif
 #include <alg/myenum.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------
@@ -383,12 +383,12 @@ void QuarkPropS::getQuarkPropS(char *results)
       // Print out monitor info of the inversion
       //---------------------------------------------------------------
       if(results != 0){
-        if( NULL == (fp = fopen(results, "a")) ) {
+        if( NULL == (fp = Fopen(results, "a")) ) {
           ERR.FileA(cname,fname, results);
       	}
-    	fprintf(fp,"%e %d %e\n", IFloat(qarg.cg.mass), cg_iter, 
+    	Fprintf(fp,"%e %d %e\n", IFloat(qarg.cg.mass), cg_iter, 
 				 IFloat(true_res));
-    	fclose(fp);
+    	Fclose(fp);
       }
  
       //------------------------------------------------------

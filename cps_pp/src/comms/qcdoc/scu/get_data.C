@@ -1,24 +1,24 @@
 #include<config.h>
-#include<stdio.h>
+#include<util/qcdio.h>
 #include<qalloc.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.6 2004-07-09 04:16:33 chulwoo Exp $
+  $Id: get_data.C,v 1.7 2004-08-17 03:33:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 04:16:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.6 2004-07-09 04:16:33 chulwoo Exp $
-//  $Id: get_data.C,v 1.6 2004-07-09 04:16:33 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.7 2004-08-17 03:33:12 chulwoo Exp $
+//  $Id: get_data.C,v 1.7 2004-08-17 03:33:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v $
 //  $State: Exp $
 //

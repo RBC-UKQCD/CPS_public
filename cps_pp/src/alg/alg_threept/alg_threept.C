@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgThreePt class methods.
   
-  $Id: alg_threept.C,v 1.5 2004-06-04 21:14:00 chulwoo Exp $
+  $Id: alg_threept.C,v 1.6 2004-08-17 03:33:10 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/alg_threept.C,v 1.5 2004-06-04 21:14:00 chulwoo Exp $
-//  $Id: alg_threept.C,v 1.5 2004-06-04 21:14:00 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/alg_threept.C,v 1.6 2004-08-17 03:33:10 chulwoo Exp $
+//  $Id: alg_threept.C,v 1.6 2004-08-17 03:33:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_threept.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/alg_threept.C,v $
 //  $State: Exp $
 //
@@ -33,7 +33,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/alg_threept.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
@@ -134,11 +134,11 @@ void AlgThreePt::run()
   cg->mass=alg_ThreePt_arg->mass[0];
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
-    fprintf(fp, "MASS= %e\n",cg->mass);
-    fclose(fp);
+    Fprintf(fp, "MASS= %e\n",cg->mass);
+    Fclose(fp);
   }
 
   // Take 0.5*(propp+propm)->prop
@@ -198,11 +198,11 @@ void AlgThreePt::run()
     cg->mass=alg_ThreePt_arg->mass[m];
     if(common_arg->results != 0){
       FILE *fp;
-      if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+      if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
         ERR.FileA(cname,fname, (char *)common_arg->results);
       }
-      fprintf(fp, "MASS= %e\n",cg->mass);
-      fclose(fp);
+      Fprintf(fp, "MASS= %e\n",cg->mass);
+      Fclose(fp);
     }
 
     // Take 0.5*(propp+propm)->prop
@@ -365,18 +365,18 @@ void AlgThreePt::figure8(QPropWWallSrc& prop, QPropWWallSrc& prop2)
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
     for(t=0; t<time_size; t++){
-      fprintf(fp," F8TRTR_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp," F8TRTR_ %d = %e %e\t%e %e\n", t,
 	    vv[t].real(), vv[t].imag(),
     	    aa[t].real(), aa[t].imag());
-      fprintf(fp," F8TR_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp," F8TR_ %d = %e %e\t%e %e\n", t,
    	    vv2[t].real(), vv2[t].imag(),
             aa2[t].real(), aa2[t].imag());
     }
-    fclose(fp);
+    Fclose(fp);
   }
   sfree(vv2);
   sfree(aa2);
@@ -446,15 +446,15 @@ void AlgThreePt::figure8_mix(QPropWWallSrc& prop, QPropWWallSrc& prop2)
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
     for(t=0; t<time_size; t++){
-      fprintf(fp,"F8_MX_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp,"F8_MX_ %d = %e %e\t%e %e\n", t,
             vv[t].real(), vv[t].imag(),
             aa[t].real(), aa[t].imag());
     }
-    fclose(fp);
+    Fclose(fp);
   }
 
   sfree(vv);
@@ -599,21 +599,21 @@ void AlgThreePt::eye(QPropWWallSrc& prop, QPropWWallSrc& prop2,
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
     for(t=t_Op; t<=t_Op; t++){
-      fprintf(fp," I3TRTR_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp," I3TRTR_ %d = %e %e\t%e %e\n", t,
             vv[t].real(), vv[t].imag(),
             aa[t].real(), aa[t].imag());
-      fprintf(fp," I3TR_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp," I3TR_ %d = %e %e\t%e %e\n", t,
             vv2[t].real(), vv2[t].imag(),
             aa2[t].real(), aa2[t].imag());
-      fprintf(fp," VS3_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp," VS3_ %d = %e %e\t%e %e\n", t,
 	   scl[t].real(), scl[t].imag(),
 	   pbp[t].real(), pbp[t].imag());
     }
-    fclose(fp);
+    Fclose(fp);
   }
 
   sfree(pbp);
@@ -706,18 +706,18 @@ void AlgThreePt::k_to_vac(QPropWWallSrc& prop, QPropWWallSrc& prop2,
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
     for(t=t_Op; t<=t_Op; t++){
-      fprintf(fp," I2TRTR_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp," I2TRTR_ %d = %e %e\t%e %e\n", t,
 	   -va[t].real(), -va[t].imag(),
 	   -av[t].real(), -av[t].imag());
-      fprintf(fp," I2TR_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp," I2TR_ %d = %e %e\t%e %e\n", t,
 	   -va2[t].real(), -va2[t].imag(),
 	   -av2[t].real(), -av2[t].imag());
     }
-    fclose(fp);
+    Fclose(fp);
   }
 
   sfree(va2);
@@ -829,15 +829,15 @@ void AlgThreePt::eye_mix_c4(QPropWWallSrc& prop, QPropWWallSrc& prop2,
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
     for(t=t_Op; t<=t_Op; t++){
-      fprintf(fp,"I3TR_MX_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp,"I3TR_MX_ %d = %e %e\t%e %e\n", t,
             vv[t].real(), vv[t].imag(),
             aa[t].real(), aa[t].imag());
     }
-    fclose(fp);
+    Fclose(fp);
   }
   sfree(vv);
   sfree(aa);
@@ -917,15 +917,15 @@ void AlgThreePt::k_to_vac_mix_c3(QPropWWallSrc& prop, QPropWWallSrc& prop2,
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
     for(t=t_Op; t<=t_Op; t++){
-      fprintf(fp,"I2TR_MX_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp,"I2TR_MX_ %d = %e %e\t%e %e\n", t,
            -va[t].real(), -va[t].imag(),
            -av[t].real(), -av[t].imag());
     }
-    fclose(fp);
+    Fclose(fp);
   }
   sfree(va);
   sfree(av);
@@ -1032,15 +1032,15 @@ void AlgThreePt::eye_mix_c31(QPropWWallSrc& prop, QPropWWallSrc& prop2,
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
     for(t=t_Op; t<=t_Op; t++){
-      fprintf(fp,"I3TRTR_MX_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp,"I3TRTR_MX_ %d = %e %e\t%e %e\n", t,
             vv[t].real(), vv[t].imag(),
             aa[t].real(), aa[t].imag());
     }
-    fclose(fp);
+    Fclose(fp);
   }
   sfree(vv);
   sfree(aa);
@@ -1119,15 +1119,15 @@ void AlgThreePt::k_to_vac_mix_c21(QPropWWallSrc& prop, QPropWWallSrc& prop2,
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
     for(t=t_Op; t<=t_Op; t++){
-      fprintf(fp,"I2TRTR_MX_ %d = %e %e\t%e %e\n", t,
+      Fprintf(fp,"I2TRTR_MX_ %d = %e %e\t%e %e\n", t,
            -va[t].real(), -va[t].imag(),
            -av[t].real(), -av[t].imag());
     }
-    fclose(fp);
+    Fclose(fp);
   }
   sfree(va);
   sfree(av);
@@ -1201,17 +1201,17 @@ void AlgThreePt::spectrum(QPropWWallSrc& prop, QPropWWallSrc& prop2)
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
     for(t=0; t<time_size; t++){
-      fprintf(fp, " PSEUDO %d   %e %e %e %e\n", t,
+      Fprintf(fp, " PSEUDO %d   %e %e %e %e\n", t,
 	    trace[t].real(), trace[t].imag(),
 	    trace2[t].real(), trace2[t].imag());
-      fprintf(fp," RHO3232 %d  %e %e\n", t,
+      Fprintf(fp," RHO3232 %d  %e %e\n", t,
 	    trace3[t].real(), trace3[t].imag());
     }
-    fclose(fp);
+    Fclose(fp);
   }
   sfree(trace3);
   sfree(trace2);
@@ -1276,14 +1276,14 @@ void AlgThreePt::wall_spectrum(QPropWWallSrc& prop, QPropWWallSrc& prop2)
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
     for(t=0; t<time_size; t++){
-      fprintf(fp, "WALLPSEUDO %d  %e %e\n", t,
+      Fprintf(fp, "WALLPSEUDO %d  %e %e\n", t,
 	    trace[t].real(), trace[t].imag());
     }
-    fclose(fp);
+    Fclose(fp);
   }
   sfree(wprop2);
   sfree(wprop);

@@ -1,5 +1,5 @@
 #include<config.h>
-#include<stdio.h>
+#include<util/qcdio.h>
 #include<qcdoc_align.h>
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------

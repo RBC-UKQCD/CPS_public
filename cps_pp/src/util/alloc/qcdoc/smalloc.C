@@ -7,7 +7,7 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <util/verbose.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <qcdoc_align.h>
 #include <qalloc.h>
 CPS_START_NAMESPACE

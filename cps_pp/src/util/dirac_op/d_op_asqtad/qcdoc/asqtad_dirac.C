@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-09 07:47:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.12 2004-08-09 07:47:23 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.12 2004-08-09 07:47:23 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.13 2004-08-17 03:33:13 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.13 2004-08-17 03:33:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -370,11 +370,11 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
 
  for ( j= 0; j < 3; j++ ){
     chi_off_node[j][0] = &(chi_off_node_total[ non_local_chi*j* VECT_LEN/2 ] ); 
-//    fprintf(stderr,"chi_off_node[%d][0] =%d\n",j,(chi_off_node[j][0]-chi_off_node_total)/VECT_LEN);
+//    Fprintf(stderr,"chi_off_node[%d][0] =%d\n",j,(chi_off_node[j][0]-chi_off_node_total)/VECT_LEN);
     chi_off_node_p[j][0] = (IFloat *)(sizeof (IFloat)*non_local_chi*j* VECT_LEN/2 );
   for ( i = 1; i < NUM_DIR; i++ ){
     chi_off_node[j][i] = chi_off_node[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
-//    fprintf(stderr,"chi_off_node[%d][%d] =%d\n",j,i,(chi_off_node[j][i]-chi_off_node_total)/VECT_LEN);
+//    Fprintf(stderr,"chi_off_node[%d][%d] =%d\n",j,i,(chi_off_node[j][i]-chi_off_node_total)/VECT_LEN);
     chi_off_node_p[j][i] = chi_off_node_p[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
   }
  }
@@ -600,28 +600,28 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
 
 #if 0
   FILE *fp;
-  fp=fopen(chi_l_filename,"w");
+  fp=Fopen(chi_l_filename,"w");
   for(j=0;j<2;j++){
-    fprintf(fp,"IFloat * chi_l%d[] LOCATE(\"edramtransient\") = {\n",j);
-    fprintf(fp," (IFloat *) %d",*(chi_l[j]));
+    Fprintf(fp,"IFloat * chi_l%d[] LOCATE(\"edramtransient\") = {\n",j);
+    Fprintf(fp," (IFloat *) %d",*(chi_l[j]));
     for(i=1;i< 2*((local_chi+local_chi_3)/2);i++){
-      fprintf(fp,",\n (IFloat *) %d",*(chi_l[j]+i));
+      Fprintf(fp,",\n (IFloat *) %d",*(chi_l[j]+i));
     }
-    fprintf(fp,"\n};\n");
+    Fprintf(fp,"\n};\n");
   }
-  fclose(fp);
+  Fclose(fp);
 
-  fp=fopen(chi_nl_filename,"w");
+  fp=Fopen(chi_nl_filename,"w");
   for(j=0;j<2;j++){
-    fprintf(fp,"IFloat * chi_nl%d[] LOCATE(\"edramtransient\") = {\n",j);
-    fprintf(fp," (IFloat *) %d",*(chi_nl[j]));
+    Fprintf(fp,"IFloat * chi_nl%d[] LOCATE(\"edramtransient\") = {\n",j);
+    Fprintf(fp," (IFloat *) %d",*(chi_nl[j]));
     for(i=1;i< 2*((non_local_chi+ non_local_chi_3[3])/2);i++){
-      fprintf(fp,",\n (IFloat *) %d",*(chi_nl[j]+i));
+      Fprintf(fp,",\n (IFloat *) %d",*(chi_nl[j]+i));
     }
-    fprintf(fp,"\n};\n");
+    Fprintf(fp,"\n};\n");
   }
 
-  fclose(fp);
+  Fclose(fp);
 #endif
 
 #if 0
@@ -678,23 +678,23 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
 
 #if 0
   int vol3 = (size[1] * size[2] * size[3])/2;
-  fp= fopen(Toffset_filename,"w");
+  fp= Fopen(Toffset_filename,"w");
   for ( k = 0; k < 3; k++ ) 
   for ( i = 0; i < 2; i++ ) {
-    fprintf(fp,"countP[%d][%d]=%d\n",k,i,countP[k][i]);
-    fprintf(fp,"int ToffsetP%d%d[] LOCATE(\"edramnormal\") = {\n",k,i);
+    Fprintf(fp,"countP[%d][%d]=%d\n",k,i,countP[k][i]);
+    Fprintf(fp,"int ToffsetP%d%d[] LOCATE(\"edramnormal\") = {\n",k,i);
     for( j = 0;j<vol3;j++){
-      fprintf(fp, "%d,\n",ToffsetP[k][i][j]);
+      Fprintf(fp, "%d,\n",ToffsetP[k][i][j]);
     }
-    fprintf(fp,"};\n");
-    fprintf(fp,"countM[%d][%d]=%d\n",k,i,countM[k][i]);
-    fprintf(fp,"int ToffsetM%d%d[] LOCATE(\"edramnormal\") = {\n",k,i);
+    Fprintf(fp,"};\n");
+    Fprintf(fp,"countM[%d][%d]=%d\n",k,i,countM[k][i]);
+    Fprintf(fp,"int ToffsetM%d%d[] LOCATE(\"edramnormal\") = {\n",k,i);
     for( j = 0;j<vol3;j++){
-      fprintf(fp, "%d,\n",ToffsetM[k][i][j]);
+      Fprintf(fp, "%d,\n",ToffsetM[k][i][j]);
     }
-    fprintf(fp,"};\n");
+    Fprintf(fp,"};\n");
   }
-  fclose(fp);
+  Fclose(fp);
 #endif
 
 
@@ -1120,18 +1120,18 @@ Matrix * Naik = lat_pt->Fields(1);
 //  char buf[200];
 #if 0
   FILE *fp;
-  fp=fopen(uc_l_filename,"w");
+  fp=Fopen(uc_l_filename,"w");
   for(j=0;j<2;j++){
-    fprintf(fp,"IFloat uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
+    Fprintf(fp,"IFloat uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
     for(i=0;i< MATRIX_SIZE * ((local_chi+ local_chi_3)/2);i++){
-      fprintf(fp,"%0.4e, ",*(uc_l[j]+i));
+      Fprintf(fp,"%0.4e, ",*(uc_l[j]+i));
       if( i%6 == 5){
-        fprintf(fp,"\n");
+        Fprintf(fp,"\n");
       }
     }
-    fprintf(fp,"\n};\n"); 
+    Fprintf(fp,"\n};\n"); 
   }
-  fclose(fp);
+  Fclose(fp);
 #endif
 
 #if 1
@@ -1212,43 +1212,43 @@ Matrix * Naik = lat_pt->Fields(1);
 
 //  gauge_agg *agg_p;
 #if 0
-  fp=fopen(uc_l_agg_filename,"w");
+  fp=Fopen(uc_l_agg_filename,"w");
   for(j=0;j<2;j++){
-    fprintf(fp,"struct gauge_agg uc_l_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
+    Fprintf(fp,"struct gauge_agg uc_l_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
     for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
       agg_p = &(uc_l_agg[j][i]);
-      fprintf(fp,"{%d,%d,{\n",agg_p->src,agg_p->dest);
+      Fprintf(fp,"{%d,%d,{\n",agg_p->src,agg_p->dest);
       for(k=0;k<18;k++){
-        fprintf(fp,"%0.8e",agg_p->mat[k]);
+        Fprintf(fp,"%0.8e",agg_p->mat[k]);
 	if(k!=17){
-        fprintf(fp,", ");
+        Fprintf(fp,", ");
 	}
         if( k%6 == 5){
-          fprintf(fp,"\n");
+          Fprintf(fp,"\n");
         }
       }
-      fprintf(fp,"}},\n");
+      Fprintf(fp,"}},\n");
     }
-    fprintf(fp,"\n};\n"); 
+    Fprintf(fp,"\n};\n"); 
   }
-  fclose(fp);
+  Fclose(fp);
 #endif
 
 
 
 #if 0
-  fp = fopen(uc_nl_filename,"w");
+  fp = Fopen(uc_nl_filename,"w");
   for(j=0;j<2;j++){
-    fprintf(fp,"IFloat uc_nl%d[] LOCATE(\"edramnormal\") = {\n",j); 
+    Fprintf(fp,"IFloat uc_nl%d[] LOCATE(\"edramnormal\") = {\n",j); 
     for(i=0;i< MATRIX_SIZE * ((non_local_chi+non_local_chi_3[3] )/2);i++){
-      fprintf(fp,"%0.4e, ",*(uc_nl[j]+i));
+      Fprintf(fp,"%0.4e, ",*(uc_nl[j]+i));
       if( i%6 == 5){
-        fprintf(fp,"\n");
+        Fprintf(fp,"\n");
       }
     }
-    fprintf(fp,"\n};\n"); 
+    Fprintf(fp,"\n};\n"); 
   }
-  fclose(fp);
+  Fclose(fp);
 #endif
 
   for(j=0;j<2;j++){
@@ -1290,26 +1290,26 @@ Matrix * Naik = lat_pt->Fields(1);
   delete[] temp;
 
 #if 0
-  fp = fopen(uc_nl_agg_filename,"w");
+  fp = Fopen(uc_nl_agg_filename,"w");
   for(j=0;j<2;j++){
-    fprintf(fp,"struct gauge_agg uc_nl_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
+    Fprintf(fp,"struct gauge_agg uc_nl_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
     for(i=0;i< ((non_local_chi+ non_local_chi_3[3])/2);i++){
       agg_p = &(uc_nl_agg[j][i]);
-      fprintf(fp,"{%d,%d,{\n",agg_p->src,agg_p->dest);
+      Fprintf(fp,"{%d,%d,{\n",agg_p->src,agg_p->dest);
       for(k=0;k<18;k++){
-        fprintf(fp,"%0.8e",agg_p->mat[k]);
+        Fprintf(fp,"%0.8e",agg_p->mat[k]);
 	if(k!=17){
-        fprintf(fp,", ");
+        Fprintf(fp,", ");
 	}
         if( k%6 == 5){
-          fprintf(fp,"\n");
+          Fprintf(fp,"\n");
         }
       }
-      fprintf(fp,"}},\n");
+      Fprintf(fp,"}},\n");
     }
-    fprintf(fp,"\n};\n"); 
+    Fprintf(fp,"\n};\n"); 
   }
-  fclose(fp);
+  Fclose(fp);
 #endif
 
 #if 0
@@ -1329,11 +1329,11 @@ Matrix * Naik = lat_pt->Fields(1);
       ERR.Pointer(cname,fname, "chi_off_node_total");
  for ( j= 0; j < 3; j++ ){
     chi_off_node[j][0] = &(chi_off_node_total[ non_local_chi*j* VECT_LEN/2 ] ); 
-//    fprintf(stderr,"chi_off_node[%d][0] =%d\n",j,(chi_off_node[j][0]-chi_off_node_total)/VECT_LEN);
+//    Fprintf(stderr,"chi_off_node[%d][0] =%d\n",j,(chi_off_node[j][0]-chi_off_node_total)/VECT_LEN);
     chi_off_node_p[j][0] = (IFloat *)(sizeof (IFloat)*non_local_chi*j* VECT_LEN/2 );
   for ( i = 1; i < NUM_DIR; i++ ){
     chi_off_node[j][i] = chi_off_node[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
-//    fprintf(stderr,"chi_off_node[%d][%d] =%d\n",j,i,(chi_off_node[j][i]-chi_off_node_total)/VECT_LEN);
+//    Fprintf(stderr,"chi_off_node[%d][%d] =%d\n",j,i,(chi_off_node[j][i]-chi_off_node_total)/VECT_LEN);
     chi_off_node_p[j][i] = chi_off_node_p[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
   }
  }
@@ -1740,7 +1740,7 @@ if(split) {
 	if(called<2)
     for (int i = 0; i<3*non_local_chi* VECT_LEN / 2;i++ ){
 	if (fabs(chi_off_node_total[i]) >1e-10)
-		fprintf(stderr,"chi_off_node_total[%d]=%e\n",i,chi_off_node_total[i]);
+		Fprintf(stderr,"chi_off_node_total[%d]=%e\n",i,chi_off_node_total[i]);
     }
 	called++;
 #endif

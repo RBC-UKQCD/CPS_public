@@ -14,7 +14,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include<util/rcomplex.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>
 #include<config.h>
 CPS_START_NAMESPACE

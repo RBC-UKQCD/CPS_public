@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v 1.6 2004-06-04 21:14:00 chulwoo Exp $
-//  $Id: QPropW.C,v 1.6 2004-06-04 21:14:00 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v 1.7 2004-08-17 03:33:10 chulwoo Exp $
+//  $Id: QPropW.C,v 1.7 2004-08-17 03:33:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: QPropW.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_threept/QPropW.C,v $
 //  $State: Exp $
 //
@@ -26,7 +26,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/qpropw.h>
 #include <alg/common_arg.h>
 #ifdef PARALLEL
@@ -197,12 +197,12 @@ QPropWWallSrc::QPropWWallSrc(Lattice& lat, CgArg *arg, int source_time,
 
     	if(common_arg->results != 0){
       	  FILE *fp;
-      	  if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+      	  if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
        	     ERR.FileA(cname,fname, (char *)common_arg->results);
       	  }
-      	  fprintf(fp, "Cg iters = %d true residual = %e\n",
+      	  Fprintf(fp, "Cg iters = %d true residual = %e\n",
 			iter, true_res);
-      	  fclose(fp);
+      	  Fclose(fp);
     	}
 
 
@@ -430,12 +430,12 @@ QPropWRandWallSrc::QPropWRandWallSrc(Lattice &lat, CgArg *arg,
 
         if(common_arg->results != 0){
           FILE *fp;
-          if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+          if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
              ERR.FileA(cname,fname, (char *)common_arg->results);
           }
-          fprintf(fp, "Cg iters = %d true residual = %e\n",
+          Fprintf(fp, "Cg iters = %d true residual = %e\n",
                         iter, true_res);
-          fclose(fp);
+          Fclose(fp);
         }
 
    } // End spin-color loop

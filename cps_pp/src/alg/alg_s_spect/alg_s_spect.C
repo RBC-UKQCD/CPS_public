@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 03:54:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.6 2004-07-09 03:54:23 chulwoo Exp $
-//  $Id: alg_s_spect.C,v 1.6 2004-07-09 03:54:23 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.7 2004-08-17 03:33:10 chulwoo Exp $
+//  $Id: alg_s_spect.C,v 1.7 2004-08-17 03:33:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_s_spect.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v $
 //  $State: Exp $
 //
@@ -29,7 +29,7 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/quark_prop_s.h>
 #include <alg/meson_prop_s.h>
 #include <alg/mom_meson_p_s.h>
@@ -92,9 +92,9 @@ t,num_IFloats,num_slices);
 
   printf("data_p[0] = %e %e %e \n",data_p[0],data_p[1],data_p[2]);
 
-  FILE *fp1=fopen("total_correlator.dat", "a");
-  for (int ii=0; ii < num_IFloats; ii++) fprintf(fp1,"%e\n",(IFloat)data_p[ii]);
-  fclose(fp1);
+  FILE *fp1=Fopen("total_correlator.dat", "a");
+  for (int ii=0; ii < num_IFloats; ii++) Fprintf(fp1,"%e\n",(IFloat)data_p[ii]);
+  Fclose(fp1);
   */
   
   int i, k;
@@ -104,7 +104,7 @@ t,num_IFloats,num_slices);
   //-------------------------------------------------------------
   for (i = 0; i < unit; ++i) {
     Float tmp = data_p[2*i] / num_slices;
-    fprintf(fp, "%e\n", (IFloat)tmp);
+    Fprintf(fp, "%e\n", (IFloat)tmp);
   }
   
   //-------------------------------------------------------------
@@ -117,7 +117,7 @@ t,num_IFloats,num_slices);
     for (i = unit; i < half_length; ++i) {
       k = unit*(N_t - i/unit) + i%unit;
       Float tmp = (data_p[2*i] + data_p[2*k])*0.5/num_slices;
-      fprintf(fp, "%e\n", (IFloat)tmp);
+      Fprintf(fp, "%e\n", (IFloat)tmp);
     }
   }
   else if (bc == BND_CND_APRD)  {
@@ -130,7 +130,7 @@ t,num_IFloats,num_slices);
       else
   	tmp = (data_p[2*i] + data_p[2*k])*0.5/num_slices;
 
-      fprintf(fp, "%e\n", (IFloat)tmp);
+      Fprintf(fp, "%e\n", (IFloat)tmp);
     }
   }
 
@@ -144,7 +144,7 @@ t,num_IFloats,num_slices);
       else
   	tmp = (data_p[2*i] - data_p[2*k])*0.5/num_slices;
 
-      fprintf(fp, "%e\n", (IFloat)tmp);
+      Fprintf(fp, "%e\n", (IFloat)tmp);
     }
   }
 
@@ -153,7 +153,7 @@ t,num_IFloats,num_slices);
   //-------------------------------------------------------------
   for (i = half_length; i < half_length + unit; ++i) {
     Float tmp = data_p[2*i] / num_slices;
-    fprintf(fp, "%e\n", (IFloat)tmp);
+    Fprintf(fp, "%e\n", (IFloat)tmp);
   }
 }
   
@@ -321,13 +321,13 @@ void AlgStagMeson::run()
     char *data_file = common_arg->results ? 
 		      (char *)common_arg->results : CAST_AWAY_CONST("meson.def"); 
     FILE *fp;
-    if( NULL == (fp = fopen(data_file, "a")) ) {
+    if( NULL == (fp = Fopen(data_file, "a")) ) {
       ERR.FileA(cname,fname, data_file);
     }
 
     write_to_file(alg_stag_meson_arg->meson_buf, fp, 
    	          m1.propLenTotal(), aots.numSlices(), 1, SMESON, m1.bcd());
-    fclose(fp);
+    Fclose(fp);
 
     VRB.Sfree(cname,fname, "alg_stag_meson_arg->meson_buf", 
 			    alg_stag_meson_arg->meson_buf);
@@ -419,14 +419,14 @@ void AlgStagMomMeson::run()
     char *data_file = common_arg->results ?
                       (char *)common_arg->results : (char *) "mom_meson.def";
     FILE *fp;
-    if( NULL == (fp = fopen(data_file, "a")) ) {
+    if( NULL == (fp = Fopen(data_file, "a")) ) {
       ERR.FileA(cname,fname, data_file);
     }
 
     write_to_file(alg_stag_mom_meson_arg->meson_buf, fp,
                   m1.propLenTotal(), aots.numSlices(), 
 	alg_stag_mom_meson_arg->no_of_momenta,SMOMMESON, m1.bcd());
-    fclose(fp);
+    Fclose(fp);
 
     VRB.Sfree(cname,fname, "alg_stag_mom_meson_arg->meson_buf",
                             alg_stag_mom_meson_arg->meson_buf);
@@ -517,13 +517,13 @@ void AlgStagNucleon::run()
     char *data_file = common_arg->results ? 
 		      (char *)common_arg->results : CAST_AWAY_CONST("nucleon.def"); 
     FILE *fp;
-    if( NULL == (fp = fopen(data_file, "a")) ) {
+    if( NULL == (fp = Fopen(data_file, "a")) ) {
       ERR.FileA(cname,fname, data_file);
     }
    
     write_to_file(alg_stag_nucleon_arg->nucleon_buf, fp, 
 		  n1.propLenTotal(), aots.numSlices(), 1, SNUCLEON, n1.bcd());
-    fclose(fp);
+    Fclose(fp);
 
     VRB.Sfree(cname,fname, "alg_stag_nucleon_arg->nucleon_buf", 
 			    alg_stag_nucleon_arg->nucleon_buf);
@@ -617,13 +617,13 @@ void AlgStagNonLocal::run()
     char *data_file = common_arg->results ? 
 		      (char *)common_arg->results : CAST_AWAY_CONST("nonlocal.def"); 
     FILE *fp;
-    if( NULL == (fp = fopen(data_file, "a")) ) {
+    if( NULL == (fp = Fopen(data_file, "a")) ) {
       ERR.FileA(cname,fname, data_file);
     }
 
     write_to_file(alg_stag_non_local_arg->nlocal_buf, fp, 
 		nlc.propLenTotal(), aots.numSlices(), 1, SNONLOCAL, nlc.bcd());
-    fclose(fp);
+    Fclose(fp);
 
     VRB.Sfree(cname,fname, "alg_stag_non_local_arg->nlocal_buf", 
 			    alg_stag_non_local_arg->nlocal_buf);

@@ -4,12 +4,12 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_quark.C.sav,v 1.3 2004-06-04 21:14:00 chulwoo Exp $
-//  $Id: w_quark.C.sav,v 1.3 2004-06-04 21:14:00 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_quark.C.sav,v 1.4 2004-08-17 03:33:11 chulwoo Exp $
+//  $Id: w_quark.C.sav,v 1.4 2004-08-17 03:33:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_quark.C.sav,v $
 //  $State: Exp $
 //
@@ -121,7 +121,7 @@ WspectQuark::WspectQuark(Lattice &     lat,
   //-------------------------------------------------------------------------
   FILE *fp;
   if (outfile) {
-    if (!(fp = fopen(outfile, "a"))) {
+    if (!(fp = Fopen(outfile, "a"))) {
       ERR.FileA(d_class_name, ctor_str, outfile);
     }
   }
@@ -436,7 +436,7 @@ WspectQuark::WspectQuark(Lattice &     lat,
   fclose(fp);
 
   if ( (warg.source_kind==POINT_W) && pbp_outfile) {
-    if (!(fp = fopen(pbp_outfile, "a"))) {
+    if (!(fp = Fopen(pbp_outfile, "a"))) {
       ERR.FileA(d_class_name, ctor_str, pbp_outfile);
     }
     fprintf(fp, "%e %e %e\n", 
@@ -466,7 +466,7 @@ WspectQuark::dumpData(char *filename) const {
 
   FILE *fp;
   
-  if (filename && (fp = fopen(filename, "a"))) {
+  if (filename && (fp = Fopen(filename, "a"))) {
     for (int i = 0; i < d_size; ++i)
       fprintf(fp, "%g\n", d_data_p[i]);
   } else {
@@ -540,7 +540,7 @@ FermionVector::zeroOut() const
 void FermionVector::print(char *file) const
 {
   FILE *fp;
-  if (!file || !(fp = fopen(file, "a"))) 
+  if (!file || !(fp = Fopen(file, "a"))) 
     ERR.FileA(d_class_name,"print", file);
 
 

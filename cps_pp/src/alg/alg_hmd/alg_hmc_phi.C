@@ -8,13 +8,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-28 05:38:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.11 2004-07-28 05:38:20 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.11 2004-07-28 05:38:20 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.12 2004-08-17 03:33:09 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.12 2004-08-17 03:33:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -29,7 +29,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>
 #include <alg/alg_hmd.h>
 #include <util/lattice.h>
@@ -663,10 +663,10 @@ Float AlgHmcPhi::run(void)
   if(common_arg->results != 0){
     printf("Results ptr is %p\n",common_arg->results);
     if (common_arg->results == NULL) printf("FUCK\n");fflush(stdout);
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
-    fprintf(fp,"%d %e %d %e %e %e %d %d %e %e %e\n",
+    Fprintf(fp,"%d %e %d %e %e %e %d %d %e %e %e\n",
 	    hmd_arg->steps_per_traj+2,
 	    IFloat(delta_h), 
 	    accept, 
@@ -678,7 +678,7 @@ Float AlgHmcPhi::run(void)
 	    IFloat(true_res_av),
 	    IFloat(true_res_min),
 	    IFloat(true_res_max));
-    fclose(fp);
+    Fclose(fp);
   }
 
   VRB.Result(cname,fname,

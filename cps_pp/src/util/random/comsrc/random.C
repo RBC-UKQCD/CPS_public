@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.10 2004-08-11 05:33:35 chulwoo Exp $
+  $Id: random.C,v 1.11 2004-08-17 03:33:16 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-11 05:33:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.10 2004-08-11 05:33:35 chulwoo Exp $
-//  $Id: random.C,v 1.10 2004-08-11 05:33:35 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.11 2004-08-17 03:33:16 chulwoo Exp $
+//  $Id: random.C,v 1.11 2004-08-17 03:33:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -26,7 +26,7 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <util/random.h>
 #include <util/gjp.h>
 #include <util/error.h>
@@ -132,12 +132,14 @@ int RandomGenerator::StateSize() const {
 
 }
 
+#if 0
 //--------------------------------------------------------
 IFloat UGrandomGenerator::Rand()
 {
   ERR.NotImplemented("UGrandomGenerator", "Rand()");
   return 0.0;
 }
+#endif
 
 
 //---------------------------------------------------------
@@ -281,8 +283,8 @@ for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
 				 (x[1]/2 + vx[1]*
 				 (x[2]/2 + vx[2]*(x[3]/2) )));
 		  }
-//		  fprintf(stderr,"%d %d %d %d %d",x[0],x[1],x[2],x[3],x[4]);
-//		  fprintf(stderr,"index=%d start_seed= %d\n",index,start_seed);
+//		  Fprintf(stderr,"%d %d %d %d %d",x[0],x[1],x[2],x[3],x[4]);
+//		  Fprintf(stderr,"index=%d start_seed= %d\n",index,start_seed);
 		  ugran[index++].Reset(start_seed);
 		  if(x[4]==x_o[4]) ugran_4d[index_4d++].Reset(start_seed_4d);
 	      }
@@ -421,7 +423,7 @@ void LatRanGen ::AssignGenerator(int i)
   else  s = (i/can[4]) % hx[4];
   rgen_pos = x + hx[0] * (y + hx[1] * (z + hx[2] * (t + hx[3] * s)));
   rgen_pos_4d = x + hx[0] * (y + hx[1] * (z + hx[2] * t ));
-//  fprintf(stdout,"i=%d x = %d %d %d %d %d rgen_pos=%d ",i,x,y,z,t,s,rgen_pos);
+//  Fprintf(stdout,"i=%d x = %d %d %d %d %d rgen_pos=%d ",i,x,y,z,t,s,rgen_pos);
 }
 
 

@@ -1,5 +1,5 @@
 #include <config.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <math.h>
 #include <alg/alg_smear.h>
 #include <util/lattice.h>
@@ -322,13 +322,13 @@ void AlgApeSmear::smear_link(Matrix& link,
 
 void AlgKineticSmear::run()
 {
-  FILE* f = fopen("params.dat","w");
+  FILE* f = Fopen("params.dat","w");
   int i;
   for (i=0;i<5;++i)
     {
-      fprintf(f,"coef %2i : %e \n",i,(float)_coef[i]);
+      Fprintf(f,"coef %2i : %e \n",i,(float)_coef[i]);
     }
-  fclose(f);
+  Fclose(f);
   AlgSmear::run();
 }
 
@@ -537,9 +537,9 @@ void AlgHypSmear::run()
       ERR.General("AlgHypSmear()","run()","orthog not defined");
     }
 
-  FILE* f = fopen("params.dat","a");
-  fprintf(f,"AlgHypSmear hit: c1=%e  c2=%e  c3=%e \n",c1,c2,c3);
-  fclose(f);
+  FILE* f = Fopen("params.dat","a");
+  Fprintf(f,"AlgHypSmear hit: c1=%e  c2=%e  c3=%e \n",c1,c2,c3);
+  Fclose(f);
 
   AlgSmear::run();
 }  

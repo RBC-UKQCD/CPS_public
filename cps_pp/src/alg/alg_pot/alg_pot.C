@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot/alg_pot.C,v 1.6 2004-07-01 17:43:42 chulwoo Exp $
-//  $Id: alg_pot.C,v 1.6 2004-07-01 17:43:42 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot/alg_pot.C,v 1.7 2004-08-17 03:33:10 chulwoo Exp $
+//  $Id: alg_pot.C,v 1.7 2004-08-17 03:33:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_pot.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot/alg_pot.C,v $
 //  $State: Exp $
 //
@@ -30,7 +30,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/alg_pot.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
@@ -264,16 +264,16 @@ void AlgPot::run()
 
 	    char *filename="Wt_x_y_z"; // example name
 	    sprintf(filename,"Wt_%d_%d_%d",ext1,ext2,ext3);
-	    FILE *fp= fopen(filename, "a");
+	    FILE *fp= Fopen(filename, "a");
 	    Float pot_tmp_real = real(pot);
 	    Float pot_tmp_imag = imag(pot);
 	    glb_sum(&pot_tmp_real) ;
 	    glb_sum(&pot_tmp_imag) ;
 	    pot_tmp_real *= aniso_factor*norm_fac;
 	    pot_tmp_imag *= aniso_factor*norm_fac;
-	    fprintf(fp,"%d %d %d %e %e \n",
+	    Fprintf(fp,"%d %d %d %e %e \n",
 		    sweep, ext_prop, r2, pot_tmp_real,pot_tmp_imag);
-	    fclose(fp);
+	    Fclose(fp);
 
 	    // deallocate space for path
 	    delete [] path;
@@ -282,7 +282,7 @@ void AlgPot::run()
       } // end for ext1
       
       // dump the averaged potential for all r2 at this timeslice
-      FILE *fp= fopen("Wts", "a");
+      FILE *fp= Fopen("Wts", "a");
       
       for (r2=0; r2 < max_r2; r2++){
 	if (number[r2]!=0) {
@@ -303,13 +303,13 @@ void AlgPot::run()
 	  //printf("after global sum %d %d %d %e %e \n",
 	  //sweep, ext_prop, r2, pot_real,pot_imag);
 	  
-	  fprintf(fp,"%d %d %d %e %e \n",
+	  Fprintf(fp,"%d %d %d %e %e \n",
 		  sweep, ext_prop, r2, pot_real,pot_imag);
 
 	} // end if (number[r2] !=0)
       } // end for r2=0; r2 < max_r2
     
-      fclose(fp);
+      Fclose(fp);
 
     } // end for ext_prop=0; ext_prop < max_T
  
@@ -444,9 +444,9 @@ void AlgPot::run()
 	    // write W(z,t) to file
 	    char *fn="Wz99t99";
 	    sprintf(fn,"Wz%dt%d",ext_prop,ext);
-	    FILE *fp= fopen(fn, "a");
-	    fprintf(fp,"%d %e %e \n",sweep, pot_real,pot_imag);
-	    fclose(fp);
+	    FILE *fp= Fopen(fn, "a");
+	    Fprintf(fp,"%d %e %e \n",sweep, pot_real,pot_imag);
+	    Fclose(fp);
 	    */
 	  } else {
 
@@ -462,19 +462,19 @@ void AlgPot::run()
 	    // write W(z,x) to file
 	    char *fn = "Wz99x99";
 	    sprintf(fn,"Wz%dx%d",ext_prop,ext);
-	    FILE *fp= fopen(fn, "a");
-	    fprintf(fp,"%d %e %e \n",sweep, pot_real,pot_imag);
-	    fclose(fp);
+	    FILE *fp= Fopen(fn, "a");
+	    Fprintf(fp,"%d %e %e \n",sweep, pot_real,pot_imag);
+	    Fclose(fp);
 	    */
 	  }
 
 	  // printf("after global sum %d %d %d %e %e \n",
 	  //	 sweep, ext_prop, r2, pot_real,pot_imag);
 	  
-	  FILE *fp= fopen(filename, "a");
-	  fprintf(fp,"%d %d %d %e %e \n",
+	  FILE *fp= Fopen(filename, "a");
+	  Fprintf(fp,"%d %d %d %e %e \n",
 		  sweep, ext_prop, ext, pot_real,pot_imag);
-	  fclose(fp);
+	  Fclose(fp);
 
 	  // deallocate space for path
 	  delete [] path;

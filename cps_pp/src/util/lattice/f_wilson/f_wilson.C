@@ -32,7 +32,7 @@ CPS_END_NAMESPACE
 
 #define BENCHMARK
 #ifdef BENCHMARK
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <sys/time.h>
 unsigned long WfmFlops;
 #ifndef timersub

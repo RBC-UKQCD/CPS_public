@@ -3,19 +3,19 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/xi_spect_gsum/main.C,v 1.6 2004-06-04 21:14:18 chulwoo Exp $
-//  $Id: main.C,v 1.6 2004-06-04 21:14:18 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/xi_spect_gsum/main.C,v 1.7 2004-08-17 03:33:19 chulwoo Exp $
+//  $Id: main.C,v 1.7 2004-08-17 03:33:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/xi_spect_gsum/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <util/gjp.h>
 #include <util/random.h>
 #include <util/verbose.h>
@@ -208,11 +208,11 @@ int main(int argc,char *argv[])
   int total_sites = GJP.VolNodeSites() * GJP.Xnodes() *
     GJP.Ynodes() * GJP.Znodes() * GJP.Tnodes();
 
-  if( (fp = fopen("info.dat", "a")) == NULL ) {
+  if( (fp = Fopen("info.dat", "a")) == NULL ) {
     ERR.FileA(" ","main", "info.dat");
   }
-  fprintf(fp, "Total sites :    %d\n", total_sites); 
-  fclose(fp);
+  Fprintf(fp, "Total sites :    %d\n", total_sites); 
+  Fclose(fp);
 
   //----------------------------------------------------------------
   // Run AlgPlaq 
@@ -242,13 +242,13 @@ int main(int argc,char *argv[])
 	hmc.run();
 	cur_g_upd_cnt = lat.GupdCnt() - init_g_upd_cnt;
       }
-      if( (fp = fopen("info.dat", "a")) == NULL ) {
+      if( (fp = Fopen("info.dat", "a")) == NULL ) {
 	ERR.FileA(" ","main", "info.dat");
       }
-      fprintf(fp,"%d %d %f\n",
+      Fprintf(fp,"%d %d %f\n",
 	      therm, cur_g_upd_cnt, 
 	      float(cur_g_upd_cnt) / float(therm) );
-      fclose(fp);
+      Fclose(fp);
 
       init_g_upd_cnt = lat.GupdCnt();
    }
@@ -271,13 +271,13 @@ int main(int argc,char *argv[])
 	cur_g_upd_cnt = lat.GupdCnt() - init_g_upd_cnt;
       }
       
-      if( (fp = fopen("info.dat", "a")) == NULL ) {
+      if( (fp = Fopen("info.dat", "a")) == NULL ) {
 	ERR.FileA(" ","main", "info.dat");
       }
-      fprintf(fp,"%d %d %f\n",
+      Fprintf(fp,"%d %d %f\n",
 	      therm, cur_g_upd_cnt, 
 	      float(cur_g_upd_cnt) / float(therm) );
-      fclose(fp);
+      Fclose(fp);
 
       init_g_upd_cnt = lat.GupdCnt();
     }
@@ -305,13 +305,13 @@ int main(int argc,char *argv[])
 	
 	cur_g_upd_cnt = lat.GupdCnt() - init_g_upd_cnt;
 
-	if( (fp = fopen("info.dat", "a")) == NULL ) {
+	if( (fp = Fopen("info.dat", "a")) == NULL ) {
 	  ERR.FileA(" ","main", "info.dat");
 	}
-	fprintf(fp,"%d %d %f\n",
+	Fprintf(fp,"%d %d %f\n",
 		iter, cur_g_upd_cnt, 
 		float(cur_g_upd_cnt) / float(iter) );	
-	fclose(fp);
+	Fclose(fp);
       }
 
 

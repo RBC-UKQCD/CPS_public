@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.15 2004-06-04 21:13:56 chulwoo Exp $
+# $Id: Makefile.in,v 1.16 2004-08-17 03:33:07 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -9,7 +9,7 @@ QOS = @QOS@
 
 
 
-all: recurse
+all: recurse copy_testdir
 
 cps: recurse
 

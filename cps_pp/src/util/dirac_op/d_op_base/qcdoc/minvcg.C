@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpBase class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.6 2004-08-11 05:33:33 chulwoo Exp $
+   $Id: minvcg.C,v 1.7 2004-08-17 03:33:13 chulwoo Exp $
  */
 
 CPS_END_NAMESPACE
@@ -258,14 +258,25 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     // p[k+1] = r[k+1] + a[k+1] p[k]
     //   Compute the shifted as
     //   ps[k+1] = zs[k+1] r[k+1] + a[k+1] ps[k]
+    as = 0.;
     for (s=0; s<Nmass_loop; s++) {
+      if(s == isz)
+        p[s] -> FTimesV1PlusV2(a,p[s],r,f_size);
+      else{
+#if 0
       as = -a * (z[iz][s] * bs[s]) / (z[1-iz][s] * b);
       at[s] *= as;
       as = z[iz][s]/at[s];
       vaxpy(&as,r,p[s],f_size/6);
+#else
+      as = -a * (z[iz][s] * bs[s]) / (z[1-iz][s] * b);
+        p[s] -> VecTimesEquFloat(as,f_size);
+        p[s] -> FTimesV1PlusV2(z[iz][s],r,p[s],f_size);
+#endif
+      }
       CGflops += f_size*2;
     IFloat *Ap_tmp = (IFloat *)p[s];
-  VRB.Flow(cname,fname,"as = %e p[%d] =%e\n",as, s,*Ap_tmp);
+  VRB.Flow(cname,fname,"isz = %d as = %e p[%d] =%e\n",isz, as, s,*Ap_tmp);
     }
 
     // cp = |r[k]**2
@@ -328,7 +339,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
       convsP[s] = (css < rsd_sq[s]) ? 1 : 0;
       if (convsP[s]) {
 	convsP[s] = k;
-	RsdCG[s] = sqrt(css);
+//	RsdCG[s] = sqrt(css);
+	RsdCG[s] = css;
 	converged++;
       }
     }

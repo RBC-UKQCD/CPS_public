@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eq_state/alg_eq_state.C,v 1.5 2004-06-04 21:13:58 chulwoo Exp $
-//  $Id: alg_eq_state.C,v 1.5 2004-06-04 21:13:58 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eq_state/alg_eq_state.C,v 1.6 2004-08-17 03:33:08 chulwoo Exp $
+//  $Id: alg_eq_state.C,v 1.6 2004-08-17 03:33:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eq_state.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eq_state/alg_eq_state.C,v $
 //  $State: Exp $
 //
@@ -26,7 +26,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/alg_eq_state.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
@@ -103,11 +103,11 @@ void AlgEqState::run()
 
     if (common_arg->results != 0){
       FILE *fp;
-      if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+      if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
         ERR.FileA(cname,fname, (char *)common_arg->results);
       }
-      fprintf(fp, "%e\t%e\n", (IFloat)ave_space, (IFloat)ave_time);  
-      fclose(fp);  
+      Fprintf(fp, "%e\t%e\n", (IFloat)ave_space, (IFloat)ave_time);  
+      Fclose(fp);  
     }
     return;
   }
@@ -149,11 +149,11 @@ void AlgEqState::run()
   //----------------------------------------------------------------
   if(common_arg->results != 0){
     FILE *fp;
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
-    fprintf(fp, "%e\t%e\n", IFloat(plaq_perpen), IFloat(plaq_parall));
-    fclose(fp);
+    Fprintf(fp, "%e\t%e\n", IFloat(plaq_perpen), IFloat(plaq_parall));
+    Fclose(fp);
   }
 }
 

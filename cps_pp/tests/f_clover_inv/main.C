@@ -1,5 +1,5 @@
 #include<config.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include<util/lattice.h>
@@ -125,9 +125,9 @@ int main(int argc,char *argv[]){
 #if TARGET == QCDOC
     char filename [200];
     sprintf(filename,"%s%d%d%d%d%d%d_%d%d%d%d%d%d.out",f_wilson_test_filename,SizeX(),SizeY(),SizeZ(),SizeT(),SizeS(),SizeW(),CoorX(),CoorY(),CoorZ(),CoorT(),CoorS(),CoorW());
-   fp = fopen(filename,"w");
+   fp = Fopen(filename,"w");
 #else
-    fp = fopen("f_clover_test.out","w");
+    fp = Fopen("f_clover_test.out","w");
 #endif
 
     GwilsonFclover lat;
@@ -241,17 +241,17 @@ int main(int argc,char *argv[]){
 			for(int i=0; i<(lat.FsiteSize()/2); i++){
 #if TARGET == QCDOC
 		    if ( k==0 )
-				fprintf(fp," %d %d %d %d %d ", CoorX()*GJP.NodeSites(0)+s[0], CoorY()*GJP.NodeSites(1)+s[1], CoorZ()*GJP.NodeSites(2)+s[2], CoorT()*GJP.NodeSites(3)+s[3], i);
+				Fprintf(fp," %d %d %d %d %d ", CoorX()*GJP.NodeSites(0)+s[0], CoorY()*GJP.NodeSites(1)+s[1], CoorZ()*GJP.NodeSites(2)+s[2], CoorT()*GJP.NodeSites(3)+s[3], i);
 #else
 		    if ( k==0 )
-				fprintf(fp," %d %d %d %d %d ", s[0], s[1], s[2], s[3], i);
+				Fprintf(fp," %d %d %d %d %d ", s[0], s[1], s[2], s[3], i);
 #endif
 		    if ( k==0 )
-				fprintf(fp," (%0.7e %0.7e) (%0.7e %0.7e)",
+				Fprintf(fp," (%0.7e %0.7e) (%0.7e %0.7e)",
 				*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
 				*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1));
 #if 0
-				fprintf(fp," (%0.2e %0.2e)\n",
+				Fprintf(fp," (%0.2e %0.2e)\n",
 #if 0
 				*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), 
 				*((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1));
@@ -260,7 +260,7 @@ int main(int argc,char *argv[]){
 				*((IFloat*)&X_out2[n]+i*2+1));
 #endif
 #else
-				fprintf(fp,"\n");
+				Fprintf(fp,"\n");
 #endif
 				double diff =	*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2);
       			if (fabs(diff)>maxdiff) maxdiff = fabs(diff);
@@ -271,7 +271,7 @@ int main(int argc,char *argv[]){
    		printf("Max diff between X_in and M*X_out = %0.2e\n", maxdiff);
 	}
 }
-    fclose(fp);
+    Fclose(fp);
     
     sfree(X_in);
     sfree(result);

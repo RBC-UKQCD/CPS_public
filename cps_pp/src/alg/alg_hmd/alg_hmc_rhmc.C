@@ -11,7 +11,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<stdio.h>
+#include<util/qcdio.h>
 #include<math.h>
 #include<alg/alg_hmd.h>
 #include<util/lattice.h>
@@ -334,7 +334,7 @@ Float AlgHmcRHMC::run(void)
   VRB.Func(cname,fname);
 
   Float trueMass=0;
-  Float zeroPole;
+  Float zeroPole=0;
   Float acceptance;                            // The acceptance probability
   Float efficiency;
  
@@ -668,10 +668,10 @@ Float AlgHmcRHMC::run(void)
   // Print out monitor info
   //---------------------------------------------------------------
   if(common_arg->results != 0){
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
-    fprintf(fp,"%d %e %d %e %e %e %d %d %e %e %e\n",
+    Fprintf(fp,"%d %e %d %e %e %e %d %d %e %e %e\n",
 	    hmd_arg->steps_per_traj+2,
 	    IFloat(delta_h), 
 	    accept, 
@@ -683,7 +683,7 @@ Float AlgHmcRHMC::run(void)
 	    IFloat(true_res_av),
 	    IFloat(true_res_min),
 	    IFloat(true_res_max));
-    fclose(fp);
+    Fclose(fp);
   }
 
   VRB.Result(cname,fname,

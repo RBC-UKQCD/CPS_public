@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v 1.6 2004-06-04 21:14:00 chulwoo Exp $
-//  $Id: w_mesons.C,v 1.6 2004-06-04 21:14:00 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v 1.7 2004-08-17 03:33:11 chulwoo Exp $
+//  $Id: w_mesons.C,v 1.7 2004-08-17 03:33:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_mesons.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v $
 //  $State: Exp $
 //
@@ -26,6 +26,7 @@ CPS_END_NAMESPACE
 #include <util/error.h>                // ERR
 #include <util/verbose.h>              // VRB
 #include <util/vector.h>               // dotProduct
+#include <util/qcdio.h> 
 #include <comms/glb.h>                   // glb_sum
 #include <alg/alg_w_spect.h>          // AlgWspect::GetCounter()
 CPS_START_NAMESPACE
@@ -355,22 +356,22 @@ WspectMesons::DiracAlgebra(int lclW)
 #ifdef DEBUG_W_MESON
   {
     static int calls = 0; calls++;
-    FILE *fp = fopen("meson.dirac.dat", "a");    
-    fprintf(fp, "Call %d\n", calls);
+    FILE *fp = Fopen("meson.dirac.dat", "a");    
+    Fprintf(fp, "Call %d\n", calls);
     for (int i0 = 0; i0 < DIRACs; ++i0) {
       for (int i1 = 0; i1 < DIRACs; ++i1) {
 	for (int i2 = 0; i2 < DIRACs; ++i2) {
 	  for (int i3 = 0; i3 < DIRACs; ++i3) {
 	    for (int iMom = 0; iMom < d_num_mom; ++iMom) {
 	      const Complex & tmp = d_mom_proj[iMom][i0][i1][i2][i3];
-	      fprintf(fp, "mom %d %d %d %d %d [%g %g]\n", 
+	      Fprintf(fp, "mom %d %d %d %d %d [%g %g]\n", 
 		      iMom, i0, i1, i2, i3, tmp.real(), tmp.imag());
 	    }
 	  }
 	}
       }
     }
-    fclose(fp);
+    Fclose(fp);
   }
 #endif
  
@@ -850,7 +851,7 @@ WspectMesons::print(char **filename) const
   for (int meson = 0; meson < 16  ; ++meson) 
     {
       
-      if ( !meson_names[meson] || !(fp = fopen(meson_names[meson], "a")) ) {
+      if ( !meson_names[meson] || !(fp = Fopen(meson_names[meson], "a")) ) {
 	ERR.FileA(d_class_name,fname, meson_names[meson]);
       }
 
@@ -864,11 +865,11 @@ WspectMesons::print(char **filename) const
 			 ((d_whr.glbCoord() + d_glb_walls - wall)%d_glb_walls)];
 	  tmp /= 2.0;
 	  // only print out the imaginary parts
-	  fprintf(fp, "%d %d %d %.10e\n", 
+	  Fprintf(fp, "%d %d %d %.10e\n", 
 		  AlgWspect::GetCounter(), wall, mom, tmp.real());
 	}
       }
-      fclose(fp);
+      Fclose(fp);
 
     }
 
@@ -896,7 +897,7 @@ WspectMesons::print_mp(char *filename) const
   FILE *fp;
 
   if ( filename != 0 ) {
-    if ( !(fp = fopen(filename, "a")))
+    if ( !(fp = Fopen(filename, "a")))
       ERR.FileA(d_class_name,fname, filename);
   
     for (int wall = 0; wall <= d_glb_walls/2; ++wall) {
@@ -907,11 +908,11 @@ WspectMesons::print_mp(char *filename) const
         tmp += d_data_p[offset + MESONs *
                      ((d_whr.glbCoord() + d_glb_walls - wall)%d_glb_walls)];
         // only print out the imaginary part
-        fprintf(fp, "%d %d %d %e\n",
+        Fprintf(fp, "%d %d %d %e\n",
                 AlgWspect::GetCounter(), wall, mom, tmp.real());
       }
     }
-    fclose(fp);
+    Fclose(fp);
   }
 }
 
@@ -927,11 +928,11 @@ WspectMesons::dumpData(char *filename) const {
 
   FILE *fp;
   
-  if (filename && (fp = fopen(filename, "a"))) {
+  if (filename && (fp = Fopen(filename, "a"))) {
     for (int i = 0; i < d_size/COMPLEXs; ++i) {
-      fprintf(fp, "%.10e %.10e\n", d_data_p[i].real(), d_data_p[i].imag());
+      Fprintf(fp, "%.10e %.10e\n", d_data_p[i].real(), d_data_p[i].imag());
     }
-    fclose(fp);    
+    Fclose(fp);    
   } else {
     ERR.FileA(d_class_name, "dumpData", filename);
   }

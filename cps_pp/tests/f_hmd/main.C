@@ -3,19 +3,19 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-02 14:13:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.8 2004-07-02 14:13:43 chulwoo Exp $
-//  $Id: main.C,v 1.8 2004-07-02 14:13:43 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.9 2004-08-17 03:33:17 chulwoo Exp $
+//  $Id: main.C,v 1.9 2004-08-17 03:33:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>
 #include<util/lattice.h>
 #include<alg/alg_hmd.h>
@@ -105,6 +105,7 @@ DefaultSetup();
   VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
 
+
   //----------------------------------------------------------------
   // Initialize argument structures
   //----------------------------------------------------------------
@@ -126,7 +127,7 @@ DefaultSetup();
   hmd_arg.reunitarize = REUNITARIZE_YES;
 
 
-#if 0
+#if 1
   //----------------------------------------------------------------
   // Run HMC Phi Wilson
   //----------------------------------------------------------------
@@ -145,21 +146,21 @@ DefaultSetup();
       Float sum_plaq0 = lat.SumReTrPlaq();
       Float aver_plaq0 = 1.-sum_plaq0/(18.0*total_sites);
 
-      if( (fp = fopen("plaq.dat", "a")) == NULL ) {
+      if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	ERR.FileA(" ","main", "plaq.dat");
       }
-      fprintf(fp, "%e\n", float(aver_plaq0));
-      fclose(fp);
+      Fprintf(fp, "%e\n", float(aver_plaq0));
+      Fclose(fp);
 
       for (int i = 0; i < 1; ++i) {
 	hmc_phi.run();
 	sum_plaq0 = lat.SumReTrPlaq();
 	aver_plaq0 = 1.-sum_plaq0/(18.0*total_sites);
-	if( (fp = fopen("plaq.dat", "a")) == NULL ) {
+	if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	  ERR.FileA(" ","main", "plaq.dat");
 	}
-	fprintf(fp,"%e\n", float(aver_plaq0));
-	fclose(fp);
+	Fprintf(fp,"%e\n", float(aver_plaq0));
+	Fclose(fp);
       }
     }
   }
@@ -183,21 +184,21 @@ DefaultSetup();
       Float sum_plaq0 = lat.SumReTrPlaq();
       Float aver_plaq0 = 1.-sum_plaq0/(18.0*total_sites);
 
-      if( (fp = fopen("plaq.dat", "a")) == NULL ) {
+      if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	ERR.FileA(" ","main", "plaq.dat");
       }
-      fprintf(fp, "%e\n", float(aver_plaq0));
-      fclose(fp);
+      Fprintf(fp, "%e\n", float(aver_plaq0));
+      Fclose(fp);
 
       for (int i = 0; i < 1; ++i) {
 	hmd_r.run();
 	sum_plaq0 = lat.SumReTrPlaq();
 	aver_plaq0 = 1.-sum_plaq0/(18.0*total_sites);
-	if( (fp = fopen("plaq.dat", "a")) == NULL ) {
+	if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	  ERR.FileA(" ","main", "plaq.dat");
 	}
-	fprintf(fp,"%e\n", float(aver_plaq0));
-	fclose(fp);
+	Fprintf(fp,"%e\n", float(aver_plaq0));
+	Fclose(fp);
       }
     }
   }
@@ -225,21 +226,21 @@ DefaultSetup();
       Float sum_plaq0 = lat.SumReTrPlaq();
       Float aver_plaq0 = 1.-sum_plaq0/(18.0*total_sites);
 
-      if( (fp = fopen("plaq.dat", "a")) == NULL ) {
+      if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	ERR.FileA(" ","main", "plaq.dat");
       }
-      fprintf(fp, "%e\n", float(aver_plaq0));
-      fclose(fp);
+      Fprintf(fp, "%e\n", float(aver_plaq0));
+      Fclose(fp);
 
       for (int i = 0; i < 1; ++i) {
 	hmc_phi.run();
 	sum_plaq0 = lat.SumReTrPlaq();
 	aver_plaq0 = 1.-sum_plaq0/(18.0*total_sites);
-	if( (fp = fopen("plaq.dat", "a")) == NULL ) {
+	if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	  ERR.FileA(" ","main", "plaq.dat");
 	}
-	fprintf(fp,"%e\n", float(aver_plaq0));
-	fclose(fp);
+	Fprintf(fp,"%e\n", float(aver_plaq0));
+	Fclose(fp);
       }
     }
   }
@@ -268,21 +269,21 @@ DefaultSetup();
       Float sum_plaq0 = lat.SumReTrPlaq();
       Float aver_plaq0 = 1.-sum_plaq0/(18.0*total_sites);
 
-      if( (fp = fopen("plaq.dat", "a")) == NULL ) {
+      if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	ERR.FileA(" ","main", "plaq.dat");
       }
-      fprintf(fp, "%e\n", float(aver_plaq0));
-      fclose(fp);
+      Fprintf(fp, "%e\n", float(aver_plaq0));
+      Fclose(fp);
 
       for (int i = 0; i < 1; ++i) {
 	hmc_phi.run();
 	sum_plaq0 = lat.SumReTrPlaq();
 	aver_plaq0 = 1.-sum_plaq0/(18.0*total_sites);
-	if( (fp = fopen("plaq.dat", "a")) == NULL ) {
+	if( (fp = Fopen("plaq.dat", "a")) == NULL ) {
 	  ERR.FileA(" ","main", "plaq.dat");
 	}
-	fprintf(fp,"%e\n", float(aver_plaq0));
-	fclose(fp);
+	Fprintf(fp,"%e\n", float(aver_plaq0));
+	Fclose(fp);
       }
     }
   }

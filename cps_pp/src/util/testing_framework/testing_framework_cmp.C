@@ -3,11 +3,11 @@
 //
 //
 //
-//  $Id: testing_framework_cmp.C,v 1.3 2004-05-12 17:31:58 mcneile Exp $
+//  $Id: testing_framework_cmp.C,v 1.4 2004-08-17 03:33:16 chulwoo Exp $
 //--------------------------------------------------------------------
 
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>	// exit()
 #include <math.h>
 #include <config.h>

@@ -1,9 +1,9 @@
 /*
-  $Id: main.C,v 1.8 2004-07-02 14:13:43 chulwoo Exp $
+  $Id: main.C,v 1.9 2004-08-17 03:33:18 chulwoo Exp $
 */
 
 #include<config.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <math.h>
 #include<util/lattice.h>
 #include<util/gjp.h>
@@ -29,7 +29,6 @@ Verbose VRB;
 Error ERR;
 CPS_END_NAMESPACE
 
-extern unsigned long WfmFlops;
 
 USING_NAMESPACE_CPS
 
@@ -37,12 +36,9 @@ USING_NAMESPACE_CPS
 
 const char *f_wilson_test_filename = CWDPREFIX("f_wilson_test");
 const char *psi_filename = CWDPREFIX("psi");
-const char *input_filename = CWDPREFIX("f_wilson_inv.in");
 
 
 int main(int argc,char *argv[]){
-
-WfmFlops = 0;
 
 #if TARGET == QCDOC
     DefaultSetup();
@@ -123,12 +119,12 @@ WfmFlops = 0;
 
 //    VRB.Level(GJP.VerboseLevel());
 
-#if TARGET == QCDOC
+#if 0
     char filename [200];
     sprintf(filename,"%s%d%d%d%d%d%d_%d%d%d%d%d%d.out",f_wilson_test_filename,SizeX(),SizeY(),SizeZ(),SizeT(),SizeS(),SizeW(),CoorX(),CoorY(),CoorZ(),CoorT(),CoorS(),CoorW());
-   fp = fopen(filename,"w");
+   fp = Fopen(filename,"w");
 #else
-    fp = fopen("f_wilson_test.out","w");
+    fp = Fopen(ADD_ID,"f_wilson_test.out","w");
 #endif
 
     GwilsonFwilson lat;
@@ -205,8 +201,6 @@ WfmFlops = 0;
 		dtime = -dclock();
    		int iter = dirac.MatInv(out,X_in);
 		dtime +=dclock();
-		print_flops(WfmFlops,dtime);
-		printf("iter=%d\n",iter);
 #else
 		dirac.Dslash(out,X_in+offset,CHKB_EVEN,DAG_NO);
 		dirac.Dslash(out+offset,X_in,CHKB_ODD,DAG_NO);
@@ -235,17 +229,17 @@ WfmFlops = 0;
 			for(int i=0; i<(lat.FsiteSize()/2); i++){
 #if TARGET == QCDOC
 		    if ( k==0 )
-				fprintf(fp," %d %d %d %d %d ", CoorX()*GJP.NodeSites(0)+s[0], CoorY()*GJP.NodeSites(1)+s[1], CoorZ()*GJP.NodeSites(2)+s[2], CoorT()*GJP.NodeSites(3)+s[3], i);
+				Fprintf(ADD_ID, fp," %d %d %d %d %d ", CoorX()*GJP.NodeSites(0)+s[0], CoorY()*GJP.NodeSites(1)+s[1], CoorZ()*GJP.NodeSites(2)+s[2], CoorT()*GJP.NodeSites(3)+s[3], i);
 #else
 		    if ( k==0 )
-				fprintf(fp," %d %d %d %d %d ", s[0], s[1], s[2], s[3], i);
+				Fprintf(ADD_ID, fp," %d %d %d %d %d ", s[0], s[1], s[2], s[3], i);
 #endif
 		    if ( k==0 )
-				fprintf(fp," (%0.7e %0.7e) (%0.7e %0.7e)",
+				Fprintf(ADD_ID, fp," (%0.7e %0.7e) (%0.7e %0.7e)",
 				*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
 				*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1));
 #if 0
-				fprintf(fp," (%0.2e %0.2e)\n",
+				Fprintf(ADD_ID, fp," (%0.2e %0.2e)\n",
 #if 0
 		*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), 
 	*((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1));
@@ -254,7 +248,7 @@ WfmFlops = 0;
 	*((IFloat*)&X_out2[n]+i*2+1));
 #endif
 #else
-				fprintf(fp,"\n");
+				Fprintf(ADD_ID, fp,"\n");
 #endif
 	double diff =	*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2);
         if (fabs(diff)>maxdiff) maxdiff = fabs(diff);
@@ -264,7 +258,7 @@ WfmFlops = 0;
 		}
     printf("Max diff between X_in and M*X_out = %0.2e\n", maxdiff);
 }
-    fclose(fp);
+    Fclose(fp);
     
     sfree(X_in);
     sfree(result);

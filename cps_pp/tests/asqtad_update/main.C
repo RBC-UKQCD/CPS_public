@@ -3,7 +3,7 @@
 */
 
 #include<config.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include<util/lattice.h>
 #include<util/gjp.h>
 #include<util/verbose.h>
@@ -128,11 +128,11 @@ int main(int argc,char *argv[]){
 		
 
     FILE *fp;
-    if( (fp = fopen("update.dat", "w")) == NULL ) 
+    if( (fp = Fopen("update.dat", "w")) == NULL ) 
 	ERR.FileA(" ","main", "update.dat");
     
 
-    fprintf(fp, " x y z t\n");
+    Fprintf(fp, " x y z t\n");
     
     for(s[3]=0; s[3]<GJP.NodeSites(3); s[3]++) 
 	for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
@@ -140,17 +140,17 @@ int main(int argc,char *argv[]){
 		for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
 		    int n = lat.GsiteOffset(s);		    
 
- 		    fprintf(fp, "\nsite (%d %d %d %d) = %d",
+ 		    Fprintf(fp, "\nsite (%d %d %d %d) = %d",
  			    s[0], s[1], s[2], s[3], n/4);
 
 		    for(int d=0; d<4; d++){
-			fprintf(fp, "\n         %d\n\n", d);
+			Fprintf(fp, "\n         %d\n\n", d);
 			for(int i=0; i<3; i++){
 			    for(int j=0; j<3; j++)
-				fprintf(fp, " (%+7e %+7e)",
+				Fprintf(fp, " (%+7e %+7e)",
 					(*(mom+n+d))(i,j).real(),
 					(*(mom+n+d))(i,j).imag());
-			    fprintf(fp, "\n");
+			    Fprintf(fp, "\n");
 			}
 			
 		    }

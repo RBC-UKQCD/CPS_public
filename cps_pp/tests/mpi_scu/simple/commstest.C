@@ -6,13 +6,13 @@ CPS_START_NAMESPACE
   A series of tests of the functionality supplied by the MPI
   implementations of the QCDSP comms.
 
-  $Id: commstest.C,v 1.1.1.1 2003-06-22 13:34:49 mcneile Exp $
+  $Id: commstest.C,v 1.2 2004-08-17 03:33:18 chulwoo Exp $
 
   A.N.Jackson: ajackson@epcc.ed.ac.uk                       */
 /*----------------------------------------------------------*/
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>
 #include<comms/sysfunc.h>
 CPS_START_NAMESPACE

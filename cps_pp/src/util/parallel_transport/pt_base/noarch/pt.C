@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of ParTransAsqtad class methods.
   
-  $Id: pt.C,v 1.3 2004-08-10 17:26:02 chulwoo Exp $
+  $Id: pt.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-10 17:26:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.3 2004-08-10 17:26:02 chulwoo Exp $
-//  $Id: pt.C,v 1.3 2004-08-10 17:26:02 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
+//  $Id: pt.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v $
 //  $State: Exp $
 //
@@ -23,45 +23,8 @@
 #include <util/pt.h>
 
 CPS_START_NAMESPACE
-#if 0
-/*!
-  \param latt The lattice object containing the gauge field on which the
-  parallel tranport operates.
-  \post The gauge field storage order is converted to STAG order if it is not
-  already.
-*/
 
-ParTransAsqtad::ParTransAsqtad(Lattice &latt): ParTransStagTypes(latt) {
-
-    cname = "ParTransAsqtad";
-    char *fname = "ParTransAsqtad(Lattice&)";
-    VRB.Func(cname,fname);
-//    printf("latt=%p\n",&latt);
-    converted = CNV_FRM_NO;
-    if(lat.StrOrd()==CANONICAL){
-	lat.Convert(STAG);
-	converted = CNV_FRM_YES;
-    }
-
-}
-
-/*!
-  \post The gauge field storage order is converted back to CANONICAL order
-  if that was how it was when this object was created.
- */
-ParTransAsqtad::~ParTransAsqtad() {
-    
-    char *fname = "~ParTransAsqtad()";
-    VRB.Func(cname,fname);
-
-    // Leave the gauge field as we found it
-    if(converted==CNV_FRM_YES) lat.Convert(CANONICAL);  
-
-}
-#endif
-
-
-enum {MATRIX_SIZE = 18};
+enum {MATRIX_SIZE = 18,NUM_DIR=8};
 static int vol;
 static Lattice  *Lat;
 static int node_sites[5];
@@ -70,7 +33,7 @@ void pt_mat(int N, IFloat **fout, IFloat **fin, const int *dir){
     IFloat *u, *v;
     int s[4], spm[4];
     Matrix ud;
-    Matrix *vin[N],*vout[N];
+    Matrix *vin[NUM_DIR],*vout[NUM_DIR];
 //    printf("Lat=%p\n",Lat);
 
     for(int d=0; d<N; d++){
@@ -112,8 +75,7 @@ void pt_1vec(int N, IFloat **fout, IFloat **fin, const int *dir){
 
     IFloat *u, *v;
     int s[4], spm[4];
-    Vector *vin[N],*vout[N];
-//    printf("Lat=%p\n",Lat);
+    Vector *vin[NUM_DIR],*vout[NUM_DIR];
 
     for(int d=0; d<N; d++){
         vin[d] = (Vector *)fin[d];

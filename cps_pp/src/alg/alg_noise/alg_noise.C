@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgNoise class methods.
 
-  $Id: alg_noise.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
+  $Id: alg_noise.C,v 1.6 2004-08-17 03:33:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_noise/alg_noise.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
-//  $Id: alg_noise.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_noise/alg_noise.C,v 1.6 2004-08-17 03:33:09 chulwoo Exp $
+//  $Id: alg_noise.C,v 1.6 2004-08-17 03:33:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_noise.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_noise/alg_noise.C,v $
 //  $State: Exp $
 //
@@ -24,7 +24,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdlib.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <math.h>
 #include <alg/alg_noise.h>
 #include <alg/common_arg.h>

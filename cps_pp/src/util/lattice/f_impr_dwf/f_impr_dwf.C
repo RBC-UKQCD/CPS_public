@@ -1,5 +1,5 @@
 #include <config.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <math.h>
 #include <util/lattice.h>
 #include <util/dirac_op.h>

@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_ginfo.C,v 1.5 2004-06-04 21:14:00 chulwoo Exp $
-//  $Id: w_ginfo.C,v 1.5 2004-06-04 21:14:00 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_ginfo.C,v 1.6 2004-08-17 03:33:11 chulwoo Exp $
+//  $Id: w_ginfo.C,v 1.6 2004-08-17 03:33:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_ginfo.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_ginfo.C,v $
 //  $State: Exp $
 //
@@ -19,6 +19,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <alg/w_all.h>
 #include <util/gjp.h>
+#include <util/qcdio.h>
 CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
@@ -157,7 +158,7 @@ void
 WspectGinfo::printSite(FILE *fp, const int x[]) const
 {  
   if (fp) {
-    fprintf(fp, "Site [x,y,z,t] = [%d, %d, %d, %d]\n",
+    Fprintf(fp, "Site [x,y,z,t] = [%d, %d, %d, %d]\n",
             x[0],x[1],x[2],x[3]);
   } 
 }
@@ -171,7 +172,7 @@ WspectGinfo::printSpinor(FILE *fp, const IFloat *flt_p) const
 {  
   if (fp) {
     for (int d = 0; d < DIRACs; ++d) {
-      fprintf(fp, " [[%g, %g], [%g, %g], [%g, %g]]\n",
+      Fprintf(fp, " [[%g, %g], [%g, %g], [%g, %g]]\n",
 	      flt_p[0], flt_p[1], flt_p[2], flt_p[3], flt_p[4], flt_p[5]);
       flt_p += COLORs * COMPLEXs;
     }

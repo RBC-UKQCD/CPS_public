@@ -1,13 +1,14 @@
 /*
-  $Id: main.C,v 1.9 2004-06-04 21:14:16 chulwoo Exp $
+  $Id: main.C,v 1.10 2004-08-17 03:33:17 chulwoo Exp $
 */
 
 #include<config.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <math.h>
 #include<util/lattice.h>
 #include<util/gjp.h>
 #include<util/verbose.h>
+#include<util/lat_data.h>
 #include<util/dirac_op.h>
 #include<util/error.h>
 #include<util/time.h>
@@ -29,9 +30,9 @@ CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS
 
-static const char *f_asqtad_test_filename = CWDPREFIX("f_asqtad_test");
-static const char *psi_filename = CWDPREFIX("psi");
-static const char *input_filename = CWDPREFIX("f_asqtad_inv.in");
+static const char *f_asqtad_test_filename = "f_asqtad_test";
+static const char *psi_filename = "psi";
+static const char *input_filename = "f_asqtad_inv.in";
 
 
 int main(int argc,char *argv[]){
@@ -74,7 +75,7 @@ int main(int argc,char *argv[]){
     do_arg.y_node_sites = ny;
     do_arg.z_node_sites = nz;
     do_arg.t_node_sites = nt;
-    do_arg.x_nodes = 2;
+    do_arg.x_nodes = 1;
     do_arg.y_nodes = 1;
     do_arg.z_nodes = 1;
     do_arg.t_nodes = 1;
@@ -114,39 +115,22 @@ int main(int argc,char *argv[]){
     
     GJP.Initialize(do_arg);
 
-	VRB.Level(0);
+    VRB.Level(0);
     VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
-#if TARGET == QCDOC
-    char filename [200];
-    sprintf(filename,"%s%d%d%d%d%d%d_%d%d%d%d%d%d.out",f_asqtad_test_filename,SizeX(),SizeY(),SizeZ(),SizeT(),SizeS(),SizeW(),CoorX(),CoorY(),CoorZ(),CoorT(),CoorS(),CoorW());
-    fp = fopen(filename,"w");
-#else
-    fp = fopen("f_asqtad_test.out","w");
-#endif
+    fp = Fopen(ADD_ID,"f_asqtad_test.out","w");
 
     GwilsonFasqtad lat;
 
-    Vector *result = 
-	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-    Vector *X_out =
-	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-    Vector *X_out2 =
-	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-
-    if(!result) ERR.Pointer("","","result");
-    if(!X_out) ERR.Pointer("","","X_out");
-    if(!X_out2) ERR.Pointer("","","X_out2");
-    Vector *X_out_odd = &(X_out[GJP.VolNodeSites()/2]);
+    LatVector *result = new LatVector(1); // 1 = number of spinors per site
+    LatVector *X_out  = new LatVector(1);
+    LatVector *X_out2  = new LatVector(1);
+    LatVector *X_in  = new LatVector(1);
 
     int s[4];
-    Vector *X_in =
-	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-    if(!X_in) ERR.Pointer("","","X_in");
 #if 1
-    lat.RandGaussVector(X_in,1.0);
+    lat.RandGaussVector(X_in->Vec(),1.0);
 #else
-    Vector *X_in_odd = &(X_in[GJP.VolNodeSites()/2]);
 
     Matrix *gf = lat.GaugeField();
     IFloat *gf_p = (IFloat *)lat.GaugeField();
@@ -168,17 +152,17 @@ int main(int argc,char *argv[]){
 					
 		    for(int v=0; v<6; v+=2){ 
 			if (v==0)
-			    *((IFloat*)&X_in[n]+v) = crd;
+			    *(X_in->Field(n,0,v)) = crd;
 			else
-			    *((IFloat*)&X_in[n]+v) = 0;
-			*((IFloat*)&X_in[n]+v+1) = 0.0;
+			    *(X_in->Field(n,0,v)) = 0.;
+		        *(X_in->Field(n,0,v+1)) = 0.;
 		    }
 		}
 #endif
 
     double maxdiff =0.;
-    Vector *out;
-    DiracOpAsqtad dirac(lat,X_out,X_in,&cg_arg,CNV_FRM_NO);
+    LatVector *out;
+    DiracOpAsqtad dirac(lat,X_out->Vec(),X_in->Vec(),&cg_arg,CNV_FRM_NO);
 
     for(int k = 0; k< 1; k++){
 	printf("k=%d ",k);
@@ -186,78 +170,70 @@ int main(int argc,char *argv[]){
 	    out = result;
 	else
 	    out = X_out;
-	bzero((char *)out, GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-	lat.Fconvert(out,STAG,CANONICAL);
-	lat.Fconvert(X_in,STAG,CANONICAL);
-	int offset = GJP.VolNodeSites()*lat.FsiteSize()/ (2*6);
+	bzero((char *)out->Field(), out->Size()*sizeof(IFloat));
+	lat.Fconvert(out->Vec(),STAG,CANONICAL);
+	lat.Fconvert(X_in->Vec(),STAG,CANONICAL);
+	int offset = GJP.VolNodeSites()/2;
 #if 1
-#if TARGET==QCDOC
-	int vol = nx*ny*nz*nt/(SizeX()*SizeY()*SizeZ()*SizeT());
-#else
-	int vol = nx*ny*nz*nt;
-#endif
+	int vol = GJP.VolNodeSites();
 	dtime = -dclock();
-	int iter = dirac.MatInv(out,X_in);
+	int iter = dirac.MatInv(out->Vec(),X_in->Vec());
 	dtime +=dclock();
 	print_flops(1182*iter*vol,dtime);
 	printf("iter=%d\n",iter);
 #else
-	dirac.Dslash(out,X_in+offset,CHKB_ODD,DAG_NO);
-	dirac.Dslash(out+offset,X_in,CHKB_EVEN,DAG_NO);
+	dirac.Dslash(out->Vec(),X_in->Vec(offset),CHKB_ODD,DAG_NO);
+	dirac.Dslash(out->Vec(offset),X_in,CHKB_EVEN,DAG_NO);
 #endif
 
 	if (k == 0){
-	    bzero((char *)X_out2, GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-	    dirac.Dslash(X_out2,out+offset,CHKB_ODD,DAG_NO);
-	    dirac.Dslash(X_out2+offset,out,CHKB_EVEN,DAG_NO);
-	    lat.Fconvert(X_out2,CANONICAL,STAG);
+	    bzero((char *)X_out2->Vec(), X_out2->Size()*sizeof(IFloat));
+	    dirac.Dslash(X_out2->Vec(),out->Vec(offset),CHKB_ODD,DAG_NO);
+	    dirac.Dslash(X_out2->Vec(offset),out->Vec(),CHKB_EVEN,DAG_NO);
+	    lat.Fconvert(X_out2->Vec(),CANONICAL,STAG);
 	}
-	lat.Fconvert(out,CANONICAL,STAG);
-	lat.Fconvert(X_in,CANONICAL,STAG);
-	X_out2->FTimesV1PlusV2(2*cg_arg.mass,out,X_out2,GJP.VolNodeSites
-			       ()*lat.FsiteSize());
+	lat.Fconvert(out->Vec(),CANONICAL,STAG);
+	lat.Fconvert(X_in->Vec(),CANONICAL,STAG);
+	X_out2->FTimesV1PlusV2(2*cg_arg.mass,out,X_out2);
     
 	Float dummy;
 	Float dt = 2;
 
     
 	for(s[3]=0; s[3]<GJP.NodeSites(3); s[3]++) 
-	    for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
-		for(s[1]=0; s[1]<GJP.NodeSites(1); s[1]++)
-		    for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
-
-			int n = lat.FsiteOffset(s);
-			for(int i=0; i<3; i++){
-#if TARGET == QCDOC
-			    if ( k==0 )
-				fprintf(fp," %d %d %d %d %d ", CoorX()*GJP.NodeSites(0)+s[0], CoorY()*GJP.NodeSites(1)+s[1], CoorZ()*GJP.NodeSites(2)+s[2], CoorT()*GJP.NodeSites(3)+s[3], i);
-#else
-			    if ( k==0 )
-				fprintf(fp," %d %d %d %d %d ", s[0], s[1], s[2], s[3], i);
-#endif
-			    if ( k==0 )
-				fprintf(fp," (%0.7e %0.7e) (%0.7e %0.7e)",
-					*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
-					*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1));
+	for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
+	for(s[1]=0; s[1]<GJP.NodeSites(1); s[1]++)
+	for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
+	    int n = lat.FsiteOffset(s);
+	    for(int i=0; i<3; i++){
+		if ( k==0 ){
+		    for(int mu = 0;mu<4;mu++)
+		    Fprintf(fp," %d",GJP.NodeCoor(mu)*GJP.NodeSites(mu)+s[mu]);
+		    Fprintf(fp," %d",i);
+		    Fprintf(fp,"  (%0.7e %0.7e) (%0.7e %0.7e)",
+		    *(out->Field(n,0,i*2)), *(out->Field(n,0,i*2+1)),
+		    *(X_in->Field(n,0,i*2)), *(X_in->Field(n,0,i*2+1)) );
 #if 1
-			    fprintf(fp,"\n");
+		    Fprintf(fp,"\n");
 #else
-			    fprintf(fp," (%0.2e %0.2e)\n",
-				    *((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1));
+		    Fprintf(fp," (%0.2e %0.2e)\n",
+		    *(X_out2->Field(n,i*2)-*(X_in->Field(n,i*2)), 
+		    *(X_out2->Field(n,i*2+1))-*(X_in->Field(n,i* 2+1));
 #endif
-			    double diff =	*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2);
-			    if (fabs(diff)>maxdiff) maxdiff = fabs(diff);
-			    diff = *((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1);
-			    if (fabs(diff)>maxdiff) maxdiff = fabs(diff);
-			}
-		    }
+		    double diff = *(X_out2->Field(n,i*2))-*(X_in->Field(n,i*2));
+		    if (fabs(diff)>maxdiff) maxdiff = fabs(diff);
+		    diff = *(X_out2->Field(n,i*2+1))-*(X_in->Field(n,i*2+1));
+		    if (fabs(diff)>maxdiff) maxdiff = fabs(diff);
+		}
+	    }
+	}
     }
-    fclose(fp);
+    Fclose(fp);
     printf("Max diff between X_in and M*X_out = %0.2e\n", maxdiff);
     
-    sfree(X_in);
-    sfree(result);
-    sfree(X_out);
-    sfree(X_out2);
+    delete X_in;
+    delete result;
+    delete X_out;
+    delete X_out2;
     return 0; 
 }

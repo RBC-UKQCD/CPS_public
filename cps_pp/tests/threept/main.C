@@ -3,14 +3,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-06-17 16:21:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/threept/main.C,v 1.5 2004-06-17 16:21:13 zs Exp $
-//  $Id: main.C,v 1.5 2004-06-17 16:21:13 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-17 03:33:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/threept/main.C,v 1.6 2004-08-17 03:33:18 chulwoo Exp $
+//  $Id: main.C,v 1.6 2004-08-17 03:33:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/threept/main.C,v $
 //  $State: Exp $
 //
@@ -19,7 +19,7 @@
  *  test for alg
  */
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #ifdef PARALLEL
 #include <comms/sysfunc.h>
 #endif
@@ -143,18 +143,18 @@ int main(int argc,char *argv[])
 
     common_arg.results = CAST_AWAY_CONST("threept.dat");
     FILE *fp;
-    if( (fp = fopen((char *)(common_arg.results), "a")) == NULL ) {
+    if( (fp = Fopen((char *)(common_arg.results), "a")) == NULL ) {
       ERR.FileA("main", "main", (char *)(common_arg.results) );
     }
-    //    fprintf(fp, "seed= %d\n",do_arg.start_seed_value);
-    fprintf(fp, "do_arg.dwf_height= %e\n", do_arg.dwf_height);
-    fprintf(fp, "prop stop_rsd= %e\n",threept_arg.cg.stop_rsd);
-    fprintf(fp, "gauge fix type= %d\n",fix_arg.fix_gauge_kind);
-    fprintf(fp, "gauge fix stop_cond= %e\n",fix_arg.stop_cond);
-    fprintf(fp, "t_src= %d\n",threept_arg.t_src);
-    fprintf(fp, "t_sink= %d\n",threept_arg.t_sink);
-    fprintf(fp, "t_Op= %d\n",threept_arg.t_Op);
-    fclose(fp);
+    //    Fprintf(fp, "seed= %d\n",do_arg.start_seed_value);
+    Fprintf(fp, "do_arg.dwf_height= %e\n", do_arg.dwf_height);
+    Fprintf(fp, "prop stop_rsd= %e\n",threept_arg.cg.stop_rsd);
+    Fprintf(fp, "gauge fix type= %d\n",fix_arg.fix_gauge_kind);
+    Fprintf(fp, "gauge fix stop_cond= %e\n",fix_arg.stop_cond);
+    Fprintf(fp, "t_src= %d\n",threept_arg.t_src);
+    Fprintf(fp, "t_sink= %d\n",threept_arg.t_sink);
+    Fprintf(fp, "t_Op= %d\n",threept_arg.t_Op);
+    Fclose(fp);
 
     AlgPlaq plaq(lat,&common_arg,&plaq_arg);
     plaq.run();

@@ -4,7 +4,7 @@
 
 
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h> // exit()
 #include <util/Flconv.h>
 //

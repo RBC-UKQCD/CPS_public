@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.3 2004-08-11 05:33:34 chulwoo Exp $
+  $Id: pt.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-11 05:33:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.3 2004-08-11 05:33:34 chulwoo Exp $
-//  $Id: pt.C,v 1.3 2004-08-11 05:33:34 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
+//  $Id: pt.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -679,12 +679,12 @@ char *fname = "pt_shift_link()";
 VRB.Func("",fname);
   for (int i=0; i<n_dir; i++) {
     for (int s=0; s<local_chi[dir[i]]; s++) {
-      Copy((IFloat*)((int)u[i] + 3*hp_l[0][dir[i]][s].dest),
+      cpy((IFloat*)((int)u[i] + 3*hp_l[0][dir[i]][s].dest),
 	   (IFloat*)(uc_l[dir[i]][s].mat)); 
     }
 
     for (int s=0; s<non_local_chi[dir[i]]; s++) {
-      Copy((IFloat*)((int)u[i] + 3*hp_nl[0][dir[i]][s].dest),
+      cpy((IFloat*)((int)u[i] + 3*hp_nl[0][dir[i]][s].dest),
 	   (IFloat*)(uc_nl[dir[i]][s].mat));
     }
   }

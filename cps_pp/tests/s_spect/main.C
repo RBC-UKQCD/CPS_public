@@ -3,19 +3,19 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.6 2004-06-04 21:14:17 chulwoo Exp $
-//  $Id: main.C,v 1.6 2004-06-04 21:14:17 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.7 2004-08-17 03:33:18 chulwoo Exp $
+//  $Id: main.C,v 1.7 2004-08-17 03:33:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include<util/lattice.h>
 #include<alg/alg_hmd.h>
 #include<alg/alg_s_spect.h>
@@ -271,11 +271,11 @@ int main(int argc,char *argv[])
 	Float sum_plaq0 = lat.SumReTrPlaq();
 	Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
         FILE *action;
-        if( 0 == (action = fopen("action.dat", "a")) ) 
+        if( 0 == (action = Fopen("action.dat", "a")) ) 
 	    ERR.FileA("", "main", "action.dat");
 		
-	fprintf(action, "%e\n", (float)aver_plaq0);
-        fclose(action);
+	Fprintf(action, "%e\n", (float)aver_plaq0);
+        Fclose(action);
 
         //------------------------------------------------------------
 	// Run stag spectrocopy with point source

@@ -2,7 +2,7 @@
 CPS_START_NAMESPACE
 /*! \file
 
-  $Id: w_ext_mesonBE.C,v 1.7 2004-06-02 09:36:39 zs Exp $
+  $Id: w_ext_mesonBE.C,v 1.8 2004-08-17 03:33:11 chulwoo Exp $
 */  
 
 /*w_ext_mesonBE.C
@@ -16,6 +16,7 @@ CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
 #endif
 #include <util/error.h>                // ERR
+#include <util/qcdio.h>                // ERR
 #include <util/verbose.h>              // VRB
 #include <util/vector.h>               // dotProduct
 #include <comms/glb.h>                   // glb_sum
@@ -267,7 +268,7 @@ void WspectExtendedMesonsBE::print()const{
       printf("Writing extended meson#%d data to file %s\n",meson,outputfilename);   
 #endif
       
-      if ( !(fp = fopen(outputfilename, "a")) )
+      if ( !(fp = Fopen(outputfilename, "a")) )
 	ERR.FileA(d_class_name,fname, outputfilename);
 
       for (int wall = 0; wall <= d_glb_walls/2; ++wall) {
@@ -279,10 +280,10 @@ void WspectExtendedMesonsBE::print()const{
 	tmp /= 2.0; //average of t and N-t
 	// only print out the imaginary parts
 	//mom=0
-	fprintf(fp, "%d %d %d %.10e\n", 
+	Fprintf(fp, "%d %d %d %.10e\n", 
 		AlgWspect::GetCounter(), wall, 0, tmp.real());
       }
-      fclose(fp);
+      Fclose(fp);
     }//if(measur_flag)
   }//for meson
   

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.12 2004-08-11 05:33:47 chulwoo Exp $
+  $Id: random.h,v 1.13 2004-08-17 03:33:08 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-11 05:33:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.12 2004-08-11 05:33:47 chulwoo Exp $
-//  $Id: random.h,v 1.12 2004-08-11 05:33:47 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.13 2004-08-17 03:33:08 chulwoo Exp $
+//  $Id: random.h,v 1.13 2004-08-17 03:33:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -55,7 +55,8 @@ class RandomGenerator {
     }
 
     //! Gets a random number 
-    virtual IFloat Rand();
+//    virtual IFloat Rand();
+    IFloat Rand();
 
     //! Seeds the RNG.
     void Reset(int seed);
@@ -114,6 +115,7 @@ class UniformRandomGenerator: public virtual RandomGenerator
     }
 
     IFloat Rand();
+    IFloat Rand(Float high, Float low);
 };
  
  
@@ -179,13 +181,15 @@ public UniformRandomGenerator, public GaussianRandomGenerator
 	GaussianRandomGenerator() {};
 
     //! This should not be used.
-    IFloat Rand(); // This will return an error message - not valid option
+//    IFloat Rand(); // This will return an error message - not valid option
 
     //! Get a gaussian random number
     IFloat Grand() { return GaussianRandomGenerator::Rand(); }
 
     //! Get a uniform random number.
     IFloat Urand() { return UniformRandomGenerator::Rand(); }
+    IFloat Urand(Float high, Float low) 
+	{ return UniformRandomGenerator::Rand(high,low); }
 
 //! Sets the interval over which the uniform distribution is defined.
 /*!

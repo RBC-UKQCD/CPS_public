@@ -21,6 +21,7 @@ CPS_END_NAMESPACE
 #include <util/enum.h>
 #include <util/random.h>
 #include <util/vector.h>
+#include <util/lat_data.h>
 #include <util/smalloc.h>
 #include <util/pmalloc.h>
 #include <util/verbose.h>
@@ -926,6 +927,11 @@ class Lattice
       \param to The new order.
       \param from The current order.
     */
+    void Fconvert(LatVector *f_field, 
+		   	  StrOrdType to,
+			  StrOrdType from){
+      Fconvert(f_field->Vec(),to,from);
+    }
 
 
 // Bosonic action related pure virtual functions.

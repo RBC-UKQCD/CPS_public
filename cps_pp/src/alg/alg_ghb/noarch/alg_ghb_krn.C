@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Routines used by the AlgGheatBath class methods:
 
-  $Id: alg_ghb_krn.C,v 1.6 2004-08-09 07:47:22 chulwoo Exp $
+  $Id: alg_ghb_krn.C,v 1.7 2004-08-17 03:33:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-09 07:47:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v 1.6 2004-08-09 07:47:22 chulwoo Exp $
-//  $Id: alg_ghb_krn.C,v 1.6 2004-08-09 07:47:22 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v 1.7 2004-08-17 03:33:08 chulwoo Exp $
+//  $Id: alg_ghb_krn.C,v 1.7 2004-08-17 03:33:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb_krn.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v $
 //  $State: Exp $
 //
@@ -33,7 +33,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <math.h>
 #include<alg/alg_ghb.h>
 #include<alg/common_arg.h>
@@ -275,7 +275,7 @@ void  cmhb_kernel( Float *sigma, Float *u)
     r[2] = r[2]/k;
     r[3] = r[3]/k;
  
-    Float lambda = (2. * GJP.Beta() * k) / 3.;
+//    Float lambda = (2. * GJP.Beta() * k) / 3.;
     // The 3 is the three of SU(3). 
    
     //  Generate the zero-th component of the boltzman distributed

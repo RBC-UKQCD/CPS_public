@@ -10,7 +10,7 @@
 //
 //------------------------------------------------------------------
 #include<config.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/alg_hmd.h>
 #include <util/lattice.h>
 #include <util/vector.h>
@@ -250,7 +250,7 @@ AlgHmcQPQ::AlgHmcQPQ(Lattice& latt,
 // Destructor
 //------------------------------------------------------------------
 AlgHmcQPQ::~AlgHmcQPQ() {
-  int i, j;
+  int i=0, j;
   char *fname = "~AlgHmcQPQ()" ;
   VRB.Func(cname,fname);
   int n_masses;
@@ -389,7 +389,7 @@ Float AlgHmcQPQ::run(void)
   Float true_res_min;
   Float true_res_max;
   int cg_calls;
-  Vector *cg_sol_cur;
+  Vector *cg_sol_cur=NULL;
   int i,j;
   char *fname = "run()";
   char *md_time_str = "MD_time/step_size = ";
@@ -674,12 +674,13 @@ Float AlgHmcQPQ::run(void)
   // Print out monitor info
   //---------------------------------------------------------------
   if(common_arg->results != 0){
-    printf("Results ptr is 0x%8.8x\n",common_arg->results);
+//    printf("Results ptr is 0x%8.8x\n",common_arg->results);
+    printf("Results ptr is %p\n",common_arg->results);
     if (common_arg->results == NULL) printf("FUCK\n");fflush(stdout);
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
-    fprintf(fp,"%d %e %d %e %e %e %d %d %e %e %e\n",
+    Fprintf(fp,"%d %e %d %e %e %e %d %d %e %e %e\n",
 	    hmd_arg->steps_per_traj+2,
 	    IFloat(delta_h), 
 	    accept, 
@@ -691,7 +692,7 @@ Float AlgHmcQPQ::run(void)
 	    IFloat(true_res_av),
 	    IFloat(true_res_min),
 	    IFloat(true_res_max));
-    fclose(fp);
+    Fclose(fp);
   }
 
   VRB.Result(cname,fname,

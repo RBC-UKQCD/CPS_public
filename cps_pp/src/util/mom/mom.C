@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitiion of Mom class methods.
 
-  $Id: mom.C,v 1.2 2003-07-24 16:53:54 zs Exp $ 
+  $Id: mom.C,v 1.3 2004-08-17 03:33:15 chulwoo Exp $ 
 */
 // mom.C
 //
@@ -14,7 +14,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <util/mom.h>
 CPS_START_NAMESPACE
 
@@ -138,11 +138,11 @@ void Mom::run()
 
   /*
   FILE *fp;
-  if( (fp = fopen("mom_table.log", "a")) == NULL ) {
+  if( (fp = Fopen("mom_table.log", "a")) == NULL ) {
     ERR.FileA(cname, fname, "mom_table.log");
   }
-  fprintf(fp,"# phase factors for dir = %d deg-flag = %d \n",dir,deg);
-  fprintf(fp,"# index   n[%d]  n[%d]  n[%d] \n",i,j,k);
+  Fprintf(fp,"# phase factors for dir = %d deg-flag = %d \n",dir,deg);
+  Fprintf(fp,"# index   n[%d]  n[%d]  n[%d] \n",i,j,k);
   */
 
   int imom=0;
@@ -207,7 +207,7 @@ void Mom::run()
 	    } // s[j]
 	  } // s[k]
 	} // s[dir]
-	// fprintf(fp,"%d         %d      %d      %d \n",imom, p1,p2,p3);
+	// Fprintf(fp,"%d         %d      %d      %d \n",imom, p1,p2,p3);
 	imom++; // calculate next momentum
 
       } // p3
@@ -218,9 +218,9 @@ void Mom::run()
     ERR.General(cname, fname, "conflict between imom=%d and no_of_mom = %d",imom,no_of_mom);
   
   /*
-    fprintf(fp,"total number of momenta = %d \n",no_of_mom);
-    fprintf(fp,"=================================== \n");
-    fclose(fp);
+    Fprintf(fp,"total number of momenta = %d \n",no_of_mom);
+    Fprintf(fp,"=================================== \n");
+    Fclose(fp);
   */
   // finished determination of mom_fact[offset] ========
 }

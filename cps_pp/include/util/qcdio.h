@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Prototypes of gauge configuration IO functions.
 
-  $Id: qcdio.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: qcdio.h,v 1.3 2004-08-17 03:33:08 chulwoo Exp $
 */
 /*2  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
-   $Author: zs $
-   $Date: 2003-07-24 16:53:53 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.2 2003-07-24 16:53:53 zs Exp $
-   $Id: qcdio.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+   $Author: chulwoo $
+   $Date: 2004-08-17 03:33:08 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.3 2004-08-17 03:33:08 chulwoo Exp $
+   $Id: qcdio.h,v 1.3 2004-08-17 03:33:08 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.h,v $
-   $Revision: 1.2 $
+   $Revision: 1.3 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v $
    $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -27,6 +27,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdio.h>
+#include <stdarg.h>
 #include <util/data_types.h>
 #include <util/lattice.h>
 #include <util/qcdio_qprintf.h>
@@ -69,6 +70,19 @@ CPS_START_NAMESPACE
              int prec = GAUGE_CONF_PREC,
              int swap = SWAP_BYTE_ORDER,
 	     int transp = TRANSPOSE_THE_MATRICES );
+
+enum FileIoType{ ZERO_ONLY = 0, ADD_ID};
+  FILE *Fopen( FileIoType type, const char *filename, const char *mode);
+  int Fclose( FileIoType type, FILE *stream);
+  int Fprintf( FileIoType type, FILE *stream, const char *format,...);
+  int Vfprintf( FileIoType type, FILE *stream, const char *format, va_list ap);
+
+  inline   FILE *Fopen( const char *filename, const char *mode)
+    { return Fopen( ZERO_ONLY, filename, mode);}
+  inline int Fclose( FILE *stream){return Fclose(ZERO_ONLY,stream);}
+  int Fprintf( FILE *stream, const char *format,...);
+  inline int Vfprintf( FILE *stream, const char *format, va_list ap)
+    { return Vfprintf(ZERO_ONLY,stream, format, ap);}
 
 #endif
 

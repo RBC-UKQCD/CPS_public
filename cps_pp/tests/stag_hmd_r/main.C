@@ -2,7 +2,7 @@
 
 #include <util/random.h>
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>	// exit()
 #include <config.h>
 
@@ -102,7 +102,7 @@ int main(int argc,char *argv[])
 #else
   const char *filename = "plaquette.dat";
 #endif
-  plaq = fopen(filename,"w");
+  plaq = Fopen(filename,"w");
   
   //----------------------------------------------------------------
   // Run Wilson Monte Carlo
@@ -123,7 +123,7 @@ int main(int argc,char *argv[])
 	  Float sum_plaq0 = lat.SumReTrPlaq();
 	  Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
 	  VRB.Flow(cname,fname,"%d plaquette = %0.16e\n",n,(float)aver_plaq0); 
-	  fprintf(plaq,"%d %0.16e\n",n,(float)aver_plaq0);fflush(plaq);
+	  Fprintf(plaq,"%d %0.16e\n",n,(float)aver_plaq0);fflush(plaq);
 
        	  hmc_r.run();
 	  sweep_counter++; 
@@ -141,7 +141,7 @@ int main(int argc,char *argv[])
 	Float sum_plaq0 = lat.SumReTrPlaq();
 	Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
 	VRB.Flow(cname,fname,"%d plaquette = %e\n",i,(float)aver_plaq0); 
-	fprintf(plaq,"%d %0.16e\n",i,(float)aver_plaq0);
+	Fprintf(plaq,"%d %0.16e\n",i,(float)aver_plaq0);
 	fflush(plaq);
 
 
@@ -168,7 +168,7 @@ int main(int argc,char *argv[])
 
     } 
 
-  fclose(plaq); 
+  Fclose(plaq); 
   }
 
   return(0);

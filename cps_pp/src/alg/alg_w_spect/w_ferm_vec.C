@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_ferm_vec.C,v 1.5 2004-07-09 03:54:23 chulwoo Exp $
+  $Id: w_ferm_vec.C,v 1.6 2004-08-17 03:33:11 chulwoo Exp $
 */
 
 #include<config.h>
@@ -9,6 +9,7 @@
 #include <util/error.h>            // ERR
 #include <util/verbose.h>          // VRB
 #include <util/lattice.h>          // Lattice::FixGaugePtr()
+#include <util/qcdio.h>
 #include <comms/glb.h>               // glb_sum(...)
 #include <comms/scu.h>              //getMinusData, getPlusData
 
@@ -80,7 +81,7 @@ FermionVector::zeroOut() const
 void FermionVector::print(char *file) const
 {
   FILE *fp;
-  if (!file || !(fp = fopen(file, "a"))) 
+  if (!file || !(fp = Fopen(file, "a"))) 
     ERR.FileA(d_class_name,"print", file);
 
 
@@ -110,7 +111,7 @@ void FermionVector::print(char *file) const
     }
   }
 
-  fclose(fp);  
+  Fclose(fp);  
 }
 
 //---------------------------------
@@ -123,7 +124,7 @@ void FermionVector::printWaveFunc(char *file) const{
     using MPISCU::fprintf;
 #endif
     FILE *fp;
-  if (!file || !(fp = fopen(file, "a"))) 
+  if (!file || !(fp = Fopen(file, "a"))) 
     ERR.FileA(d_class_name,"print", file);
   
 
@@ -175,13 +176,13 @@ void FermionVector::printWaveFunc(char *file) const{
 #endif 
 	  time=glb[3];
 	  
-	  fprintf(fp,"%g %g %g\n", radius, time, sum);
+	  Fprintf(fp,"%g %g %g\n", radius, time, sum);
 	
       }
     }
   }
 
-  fclose(fp);  
+  Fclose(fp);  
 }
 
 //---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 /* Quick Asqtad RHMC code, which measures the plaquette on each trajectory. */
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>	// exit()
 #include <config.h>
 #include <math.h>
@@ -54,8 +54,8 @@ int main(int argc,char *argv[])
   // Set verbose level
   //----------------------------------------------------------------
   VRB.Level(0);
-  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
-  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
   VRB.ActivateLevel(VERBOSE_INPUT_LEVEL);
   VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
 
@@ -93,7 +93,7 @@ int main(int argc,char *argv[])
   
   char *total_sites_st = "total sites = ";
   VRB.Flow(cname,fname,"%s%f\n",total_sites_st,IFloat(total_sites));
-#if TARGET == QCDOC
+#if 0
   char plaqfile[200];
   char accfile[200];
   char infofile[200];
@@ -108,9 +108,9 @@ int main(int argc,char *argv[])
   const char *accfile = "acceptance.dat";
   const char *infofile = "info.dat";
 #endif
-  FILE *plaq = fopen(plaqfile,"w");
-  FILE *acc = fopen(accfile,"w");
-  FILE *info = fopen(infofile,"w");
+  FILE *plaq = Fopen(plaqfile,"w");
+  FILE *acc = Fopen(accfile,"w");
+  FILE *info = Fopen(infofile,"w");
 
   //----------------------------------------------------------------
   // Run Rational Hybrid Monte Carlo
@@ -156,7 +156,7 @@ int main(int argc,char *argv[])
 	      acceptance += accept;
 	      sweep_counter++;
 	      VRB.Flow(cname,fname,"%d Acceptance = %e\n",i, accept);
-	      fprintf(acc,"%d %e\n",i+n,accept);
+	      Fprintf(acc,"%d %e\n",i+n,accept);
 	    }
 
 	} // end of RHMC scope
@@ -169,7 +169,7 @@ int main(int argc,char *argv[])
 	Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
 	VRB.Flow(cname,fname,"%d plaquette = %e\n",i,(float)aver_plaq0); 
 	printf("%d plaquette = %e\n",i,(float)aver_plaq0); fflush(stdout);
-	//fprintf(plaq,"%d %0.16e\n",i,(float)aver_plaq0);
+	Fprintf(plaq,"%d %0.16e\n",i,(float)aver_plaq0);
 	plaquette += aver_plaq0;
 
 	// Dynamic setting of u0
@@ -179,22 +179,22 @@ int main(int argc,char *argv[])
       } // end of loop over i
 
       // Naive mean quantities
-      fprintf(info,"Mean acceptance = %e\n", acceptance/Float(total_measure));
-      fprintf(info,"Mean plaquette = %e\n", plaquette/Float(no_measure_sweep));
+      Fprintf(info,"Mean acceptance = %e\n", acceptance/Float(total_measure));
+      Fprintf(info,"Mean plaquette = %e\n", plaquette/Float(no_measure_sweep));
     }
   }
 
-  fclose(plaq); 
-  fclose(acc);
-  fclose(info);
+  Fclose(plaq); 
+  Fclose(acc);
+  Fclose(info);
   
   return(0);
 }
 
-int nx = 4;
-int ny = 4;
-int nz = 4;
-int nt = 4;
+int nx = 8;
+int ny = 8;
+int nz = 8;
+int nt = 8;
   
 void setup_do_arg(DoArg& do_arg)
 {

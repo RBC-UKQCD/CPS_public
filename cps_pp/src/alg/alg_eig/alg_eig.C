@@ -4,26 +4,26 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.7 2004-07-01 17:43:41 chulwoo Exp $
+  $Id: alg_eig.C,v 1.8 2004-08-17 03:33:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.7 2004-07-01 17:43:41 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.7 2004-07-01 17:43:41 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.8 2004-08-17 03:33:08 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.8 2004-08-17 03:33:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 //#include <math.h>
 #include <alg/alg_eig.h>
 #include <util/lattice.h>
@@ -261,15 +261,15 @@ void AlgEig::run()
     if(common_arg->results != 0)
     {
       FILE *fp;
-      if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+      if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	ERR.FileA(cname,fname, (char *)common_arg->results);
       }
 
-      fprintf(fp, "mass = %g\n", (IFloat)(eig_arg->mass));
-      fprintf(fp, "  iter = %d\n", iter);
+      Fprintf(fp, "mass = %g\n", (IFloat)(eig_arg->mass));
+      Fprintf(fp, "  iter = %d\n", iter);
       for(int n = 0; n < eig_arg->N_eig; ++n)
       {
-	fprintf(fp, "  lambda[%d] = %g  chirality = %g  valid = %d\n", 
+	Fprintf(fp, "  lambda[%d] = %g  chirality = %g  valid = %d\n", 
 		n, (IFloat)lambda[n], (IFloat)chirality[n], valid_eig[n]);
       }
       
@@ -277,10 +277,10 @@ void AlgEig::run()
       {
 	for(int n = 0; n < eig_arg->N_eig; ++n)
 	  for(int i = 0; i < hsum_len; ++i)
-	    fprintf(fp, "  hsum[%d][%d] = %g\n",n,i,(IFloat)hsum[n][i]);
+	    Fprintf(fp, "  hsum[%d][%d] = %g\n",n,i,(IFloat)hsum[n][i]);
       }
       
-      fclose(fp);
+      Fclose(fp);
     }
   }
 

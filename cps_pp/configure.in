@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2004-08-09 07:47:22 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.15 2004-08-09 07:47:22 chulwoo Exp $
-dnl  $Id: configure.in,v 1.15 2004-08-09 07:47:22 chulwoo Exp $
+dnl  $Date: 2004-08-17 03:33:07 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.16 2004-08-17 03:33:07 chulwoo Exp $
+dnl  $Id: configure.in,v 1.16 2004-08-17 03:33:07 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.15 $
+dnl  $Revision: 1.16 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -229,6 +229,7 @@ AC_CHECK_PROG(have_doxygen, doxygen, "yes")
 AC_OUTPUT(config.h \
 	  Makefile \
 	  Makefile.rules \
+	  Makefile.users \
           tests/Makefile_common \
           tests/regression.pl )
 

@@ -1,22 +1,22 @@
 #include<config.h>
-#include<stdio.h>
+#include<util/qcdio.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.16 2004-08-11 05:33:34 chulwoo Exp $
+  $Id: lattice_base.C,v 1.17 2004-08-17 03:33:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-11 05:33:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.16 2004-08-11 05:33:34 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.16 2004-08-11 05:33:34 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.17 2004-08-17 03:33:14 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.17 2004-08-17 03:33:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2142,10 +2142,8 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
     } else {
       for(i = 0; i < GJP.VolNodeSites()*s_node_sites; i+=2) {
         LRG.AssignGenerator(i);
-//	printf("i=%d\n",i);
         for(k = 0; k < vec_size; k++) {
           *(ptr) = LRG.Grand(frm_dim);
-//	  if(k==0) fprintf(stderr,"%e\n",*ptr);fflush(stderr);
           sum += *ptr;
           square += (*ptr)*(*ptr);
  	  ptr++;

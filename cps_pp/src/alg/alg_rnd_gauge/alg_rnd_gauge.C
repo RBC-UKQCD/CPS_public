@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <math.h>
 #include <alg/common_arg.h>
 #include <util/lattice.h>

@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v 1.5 2004-06-04 21:14:00 chulwoo Exp $
-//  $Id: w_axialcurr.C,v 1.5 2004-06-04 21:14:00 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v 1.6 2004-08-17 03:33:10 chulwoo Exp $
+//  $Id: w_axialcurr.C,v 1.6 2004-08-17 03:33:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_axialcurr.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v $
 //  $State: Exp $
 //
@@ -22,6 +22,7 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>          // VRB
 #include <util/sproj_tr.h>         // sproj_tr
 #include <util/lattice.h>  
+#include <util/qcdio.h>  
 #include <util/data_types.h>  
 CPS_START_NAMESPACE
 
@@ -503,9 +504,9 @@ void WspectAxialCurrent::print() const
   // Print out correlator data 
   //------------------------------------------------------------------
 
-  FILE *fp;
+  FILE *fp=NULL;
 
-  if ( !ap_filename || !(fp = fopen(ap_filename, "a")) )
+  if ( !ap_filename || !(fp = Fopen(ap_filename, "a")) )
     ERR.FileA(d_class_name,fname, ap_filename);
 
   for (int wall = 0; wall < glb_walls; ++wall) {
@@ -516,12 +517,12 @@ void WspectAxialCurrent::print() const
 
     local_result = d_local_p[(d_whr.glbCoord() + wall)%glb_walls];
      
-    fprintf(fp, "%d %d %e %e\n", 
+    Fprintf(fp, "%d %d %e %e\n", 
 	    AlgWspect::GetCounter(), wall, 
 	    local_result,
 	    conserved_result);
   }
-  fclose(fp);
+  Fclose(fp);
   
 }
 
@@ -535,11 +536,11 @@ void WspectAxialCurrent::dumpData(char *filename) const {
 #endif
   FILE *fp;
 
-  if (filename && (fp = fopen(filename, "a"))) {
+  if (filename && (fp = Fopen(filename, "a"))) {
     for (int i = 0; i < glb_walls; ++i) {
-      fprintf(fp, "%e %e\n", d_local_p[i], d_conserved_p[i]);
+      Fprintf(fp, "%e %e\n", d_local_p[i], d_conserved_p[i]);
     }
-    fclose(fp);    
+    Fclose(fp);    
   } else {
     ERR.FileA(d_class_name, "dumpData", filename);
   }

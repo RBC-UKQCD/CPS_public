@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.10 2004-07-01 17:43:42 chulwoo Exp $
+  $Id: alg_hmd_r.C,v 1.11 2004-08-17 03:33:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.10 2004-07-01 17:43:42 chulwoo Exp $
-//  $Id: alg_hmd_r.C,v 1.10 2004-07-01 17:43:42 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.11 2004-08-17 03:33:09 chulwoo Exp $
+//  $Id: alg_hmd_r.C,v 1.11 2004-08-17 03:33:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //
@@ -33,7 +33,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/alg_hmd.h>
 #include <comms/glb.h>
 #include <util/lattice.h>
@@ -513,10 +513,10 @@ Float AlgHmdR::run(void)
   // Print out monitor info
   //---------------------------------------------------------------
   if(common_arg->results != 0){
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
-    fprintf(fp,"%d %e %e %e %d %d %e %e %e\n",
+    Fprintf(fp,"%d %e %e %e %d %d %e %e %e\n",
 	    hmd_arg->steps_per_traj,
 	    IFloat(dev),
 	    IFloat(max_diff),
@@ -526,7 +526,7 @@ Float AlgHmdR::run(void)
 	    IFloat(true_res_av),
 	    IFloat(true_res_min),
 	    IFloat(true_res_max));
-    fclose(fp);
+    Fclose(fp);
   }
 
   VRB.Result(cname,fname,

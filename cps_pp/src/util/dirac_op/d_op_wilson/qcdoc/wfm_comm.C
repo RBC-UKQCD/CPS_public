@@ -256,6 +256,7 @@ void wfm::comm_init(void)
 
 void wfm::comm_end(void)
 {
+//  printf("wfm::comm_end()\n");
   LoadDirArgIRs[0] = 1;
   LoadDirArgIRs[1] = 1;
   delete [] SendOps[0];
@@ -268,9 +269,10 @@ void wfm::comm_end(void)
 
 void wfm::comm_start(int cb)
 {
+//  printf("wfm::comm_start(%d, %d)\n",cb,LoadDirArgIRs[cb]);
   //  sys_cacheflush(0);
-  DA_multi[cb].StartTrans(LoadDirArgIRs[cb]);
-//  DA_multi[cb].StartTrans();
+//  DA_multi[cb].StartTrans(LoadDirArgIRs[cb]);
+  DA_multi[cb].StartTrans();
   LoadDirArgIRs[cb] = 0;
   return;
 }

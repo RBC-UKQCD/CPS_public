@@ -11,20 +11,20 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: chulwoo $
-  $Date: 2004-06-04 21:14:17 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.4 2004-06-04 21:14:17 chulwoo Exp $
-  $Id: main.C,v 1.4 2004-06-04 21:14:17 chulwoo Exp $
+  $Date: 2004-08-17 03:33:18 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.5 2004-08-17 03:33:18 chulwoo Exp $
+  $Id: main.C,v 1.5 2004-08-17 03:33:18 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: main.C,v $
-  $Revision: 1.4 $
+  $Revision: 1.5 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>
 #include<util/lattice.h>
 #include<util/gjp.h>
@@ -55,12 +55,12 @@ void qcdio_create_dummy_data( void ) {
   FILE* bfp;
 
 // Make the .par parameter file:
-  pfp = fopen( fpar, "w" );
-  fprintf(pfp,"beta 0.51999998E+01\n");
-  fprintf(pfp,"latt[X] %i\n",latX);
-  fprintf(pfp,"latt[Y] %i\n",latY);
-  fprintf(pfp,"latt[Z] %i\n",latZ);
-  fprintf(pfp,"latt[T] %i\n",latT);
+  pfp = Fopen( fpar, "w" );
+  Fprintf(pfp,"beta 0.51999998E+01\n");
+  Fprintf(pfp,"latt[X] %i\n",latX);
+  Fprintf(pfp,"latt[Y] %i\n",latY);
+  Fprintf(pfp,"latt[Z] %i\n",latZ);
+  Fprintf(pfp,"latt[T] %i\n",latT);
 // The following items are members of a full .par file, but are not
 // currently used in the CPS:
 /*
@@ -117,7 +117,7 @@ checkpoint_path            /ework2/c1/NF2/BETA52/CLOVER202/V16X32/KAPPA3500/chec
 input_stem                 D52C202K3500U007000
 output_prefix              D52C202K3500
 */
-  fclose(pfp);
+  Fclose(pfp);
 
 // Now write out each timeslice file in turn, filling every file with simple
 // unique numbers for every position:
@@ -126,7 +126,7 @@ output_prefix              D52C202K3500
     // Open the file:
     sprintf(fname,"%sT%02i",fprefix,t);
     printf("Writing %s...\n",fname);
-    bfp = fopen( fname, "wb" );
+    bfp = Fopen( fname, "wb" );
     for( z = 0; z < latZ; z++ ) {
     for( y = 0; y < latY; y++ ) {
     for( x = 0; x < latX; x++ ) {
@@ -143,7 +143,7 @@ output_prefix              D52C202K3500
       }
     }}}}}}}
 
-    fclose(bfp);
+    Fclose(bfp);
   }
 }
 

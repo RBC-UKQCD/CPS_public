@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgPbp class.
   
-  $Id: alg_pbp.C,v 1.6 2004-07-09 05:55:16 chulwoo Exp $
+  $Id: alg_pbp.C,v 1.7 2004-08-17 03:33:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 05:55:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.6 2004-07-09 05:55:16 chulwoo Exp $
-//  $Id: alg_pbp.C,v 1.6 2004-07-09 05:55:16 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.7 2004-08-17 03:33:09 chulwoo Exp $
+//  $Id: alg_pbp.C,v 1.7 2004-08-17 03:33:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_pbp.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v $
 //  $State: Exp $
 //
@@ -41,7 +41,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/alg_pbp.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
@@ -262,14 +262,14 @@ void AlgPbp::run()
       // Open file for results
       if(common_arg->results != 0){
 	FILE *fp;
-	if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+	if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	  ERR.FileA(cname,fname, (char *)common_arg->results);
         }
         if (pbp_arg->snk_loop) {
           // Print out mass, s-slice, pbp ,pbg5p, number of iterations
           // and true residual
           for (int i = 0; i < ls_glb; i++) {
-	    fprintf(fp,"%e %d %e %e %d %e\n", 
+	    Fprintf(fp,"%e %d %e %e %d %e\n", 
 		    IFloat(cg_arg->mass), 
 		    i,
 		    IFloat(pbp_all[i]), 
@@ -280,14 +280,14 @@ void AlgPbp::run()
         } 
 	else {
           // Print out mass, pbp, pbg5p, number of iterations and true residual
-          fprintf(fp, "%e %e %e %d %e\n", 
+          Fprintf(fp, "%e %e %e %d %e\n", 
 		  IFloat(cg_arg->mass),
                   IFloat(pbp), 
                   IFloat(pbg5p), 
 		  iter, 
 		  IFloat(true_res));
         }
-	fclose(fp);
+	Fclose(fp);
       }
 
       // If there is another mass loop iteration ahead, we should
@@ -380,16 +380,16 @@ void AlgPbp::run()
       // Print out mass, pbp, pbg5p number of iterations and true residual
       if(common_arg->results != 0){
 	FILE *fp;
-	if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+	if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	  ERR.FileA(cname,fname, (char *)common_arg->results);
 	}
-	fprintf(fp, "%e %e %e %d %e\n", 
+	Fprintf(fp, "%e %e %e %d %e\n", 
 		IFloat(cg_arg->mass), 
 		IFloat(pbp), 
 		IFloat(pbg5p), 
 		iter, 
 		IFloat(true_res));
-	fclose(fp);
+	Fclose(fp);
       }
 
       // If there is another mass loop iteration ahead, we should
@@ -478,15 +478,15 @@ void AlgPbp::run()
       // Print out mass, pbp number of iterations and true residual
       if(common_arg->results != 0){
 	FILE *fp;
-	if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+	if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	  ERR.FileA(cname,fname, (char *)common_arg->results);
 	}
-	fprintf(fp, "%e %e %e %e %d %e\n", 
+	Fprintf(fp, "%e %e %e %e %d %e\n", 
 		IFloat(cg_arg->mass), 
 		IFloat(pbp), IFloat(pbd0p), IFloat(pbdip), 
 		iter, 
 		IFloat(true_res));
-	fclose(fp);
+	Fclose(fp);
       }
 
       // If there is another mass loop iteration ahead, we should
@@ -754,14 +754,14 @@ void AlgPbp::runPointSource(int x, int y, int z, int t)
       // Open file for results
       if(common_arg->results != 0){
 	FILE *fp;
-	if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+	if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	  ERR.FileA(cname,fname, (char *)common_arg->results);
 	}
 	if (pbp_arg->snk_loop) {
 	  // Print out mass, s-slice, pbp ,pbg5p, number of iterations
 	  // and true residual
 	  for ( i = 0; i < ls_glb; i++) {
-	    fprintf(fp,"%e %d %e %e %d %e\n", 
+	    Fprintf(fp,"%e %d %e %e %d %e\n", 
 		    IFloat(cg_arg->mass), 
 		    i,
 		    IFloat(pbp_tmp[i]/4/GJP.Colors()), 
@@ -772,14 +772,14 @@ void AlgPbp::runPointSource(int x, int y, int z, int t)
 	} 
 	else {
 	  // Print out mass, pbp, pbg5p, number of iterations and true residual
-	  fprintf(fp, "%e %e %e %d %e\n", 
+	  Fprintf(fp, "%e %e %e %d %e\n", 
 		  IFloat(cg_arg->mass),
 		  IFloat(pbptmp/4/GJP.Colors()), 
 		  IFloat(pbg5ptmp/4/GJP.Colors()), 
 		  iter, 
 		  IFloat(true_res));
 	}
-	fclose(fp);
+	Fclose(fp);
       }
       
       // If there is another mass loop iteration ahead, we should

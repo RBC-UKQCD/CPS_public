@@ -4,25 +4,25 @@
 /*!\file
   \brief Redefinitions of stdio functions for MPI. 
 
-  $Id: qcdio_qprintf.C,v 1.3 2004-06-04 21:14:14 chulwoo Exp $
+  $Id: qcdio_qprintf.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
 */
 
 /*  -----------------------------------------------------------
    CVS keywords
  
    $Author: chulwoo $ 
-   $Date: 2004-06-04 21:14:14 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/mpi/qcdio_qprintf.C,v 1.3 2004-06-04 21:14:14 chulwoo Exp $
-   $Id: qcdio_qprintf.C,v 1.3 2004-06-04 21:14:14 chulwoo Exp $
+   $Date: 2004-08-17 03:33:15 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/mpi/qcdio_qprintf.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
+   $Id: qcdio_qprintf.C,v 1.4 2004-08-17 03:33:15 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio_qprintf.C,v $
-   $Revision: 1.3 $
+   $Revision: 1.4 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/mpi/qcdio_qprintf.C,v $
    $State: Exp $  
  ----------------------------------------------------------------------*/
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <comms/sysfunc.h>

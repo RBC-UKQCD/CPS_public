@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 05:55:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.5 2004-07-09 05:55:16 chulwoo Exp $
-//  $Id: hadron_prop_s.C,v 1.5 2004-07-09 05:55:16 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.6 2004-08-17 03:33:10 chulwoo Exp $
+//  $Id: hadron_prop_s.C,v 1.6 2004-08-17 03:33:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v $
 //  $State: Exp $
 //
@@ -18,7 +18,7 @@ CPS_START_NAMESPACE
 // hadron_prop_s.C
 //debug
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/hadron_prop_s.h>
 #include <util/rcomplex.h>
 #include <comms/glb.h>
@@ -60,8 +60,8 @@ HadronPropS::HadronPropS( Lattice &lattice, int num,
 		        int direction, int srcslice, int incr )
 : lat(lattice),
   dir(direction),
-  n_props(num), 
   slice(srcslice),
+  n_props(num), 
   stride(incr)
 {
     char *fname = "HadronPropS(Lattice &, int, int)";

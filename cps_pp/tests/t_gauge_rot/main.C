@@ -1,4 +1,4 @@
-///  $Id: main.C,v 1.5 2004-06-02 09:36:42 zs Exp $
+///  $Id: main.C,v 1.6 2004-08-17 03:33:18 chulwoo Exp $
 ///  Demonstrate the random gauge transformation code.
 ///
 
@@ -14,11 +14,11 @@
  The gauge transformation code was orginally written
  by Chris Dawson (using existing code from the BNL group).
 
-$Id: main.C,v 1.5 2004-06-02 09:36:42 zs Exp $
+$Id: main.C,v 1.6 2004-08-17 03:33:18 chulwoo Exp $
 */
 
 #include <config.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <util/verbose.h>

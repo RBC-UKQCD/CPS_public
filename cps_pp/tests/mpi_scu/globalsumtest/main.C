@@ -1,7 +1,7 @@
 #include<config.h>
 CPS_START_NAMESPACE
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>	// exit()
 #include<config.h>
 #include<util/lattice.h>

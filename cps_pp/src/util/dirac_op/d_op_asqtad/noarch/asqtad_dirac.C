@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.8 2004-07-09 04:15:16 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.9 2004-08-17 03:33:12 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -510,29 +510,29 @@ void asqtad_dirac_init(const void * gauge_u )
 
 #ifndef SIMUL
 #if 0
-  fp=fopen("chi_l.h","w");
+  fp=Fopen("chi_l.h","w");
   for(j=0;j<2;j++){
-    fprintf(fp,"IFloat * chi_l%d[] LOCATE(\"edramtransient\") = {\n",j);
-    fprintf(fp," (IFloat *) %d",*(chi_l[j]));
+    Fprintf(fp,"IFloat * chi_l%d[] LOCATE(\"edramtransient\") = {\n",j);
+    Fprintf(fp," (IFloat *) %d",*(chi_l[j]));
     for(i=1;i< 2*((local_chi+local_chi_3)/2);i++){
-      fprintf(fp,",\n (IFloat *) %d",*(chi_l[j]+i));
+      Fprintf(fp,",\n (IFloat *) %d",*(chi_l[j]+i));
     }
-    fprintf(fp,"\n};\n");
+    Fprintf(fp,"\n};\n");
   }
-  fclose(fp);
+  Fclose(fp);
 
-  fp=fopen("chi_nl.h","w");
-    fprintf(fp,"testing\n");
+  fp=Fopen("chi_nl.h","w");
+    Fprintf(fp,"testing\n");
   for(j=0;j<2;j++){
-    fprintf(fp,"IFloat * chi_nl%d[] LOCATE(\"edramtransient\") = {\n",j);
-    fprintf(fp," (IFloat *) %d",*(chi_nl[j]));
+    Fprintf(fp,"IFloat * chi_nl%d[] LOCATE(\"edramtransient\") = {\n",j);
+    Fprintf(fp," (IFloat *) %d",*(chi_nl[j]));
     for(i=1;i< 2*((non_local_chi+ non_local_chi_3)/2);i++){
-      fprintf(fp,",\n (IFloat *) %d",*(chi_nl[j]+i));
+      Fprintf(fp,",\n (IFloat *) %d",*(chi_nl[j]+i));
     }
-    fprintf(fp,"\n};\n");
+    Fprintf(fp,"\n};\n");
   }
 
-  fclose(fp);
+  Fclose(fp);
 #endif
 
 #endif /* SIMUL */
@@ -2112,18 +2112,18 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
   FILE *fp;
 #ifndef SIMUL_U
 #if 0
-  fp=fopen("uc_l.h","w");
+  fp=Fopen("uc_l.h","w");
   for(j=0;j<2;j++){
-    fprintf(fp,"IFloat uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
+    Fprintf(fp,"IFloat uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
     for(i=0;i< MATRIX_SIZE * ((local_chi+ local_chi_3)/2);i++){
-      fprintf(fp,"%0.4e, ",*(uc_l[j]+i));
+      Fprintf(fp,"%0.4e, ",*(uc_l[j]+i));
       if( i%6 == 5){
-        fprintf(fp,"\n");
+        Fprintf(fp,"\n");
       }
     }
-    fprintf(fp,"\n};\n"); 
+    Fprintf(fp,"\n};\n"); 
   }
-  fclose(fp);
+  Fclose(fp);
 #endif
 #endif
 
@@ -2239,18 +2239,18 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
 
 #ifndef SIMUL_U
 #if 0
-  fp = fopen("uc_nl.h","w");
+  fp = Fopen("uc_nl.h","w");
   for(j=0;j<2;j++){
-    fprintf(fp,"IFloat uc_nl%d[] LOCATE(\"edramnormal\") = {\n",j); 
+    Fprintf(fp,"IFloat uc_nl%d[] LOCATE(\"edramnormal\") = {\n",j); 
     for(i=0;i< MATRIX_SIZE * ((non_local_chi+non_local_chi_3 )/2);i++){
-      fprintf(fp,"%0.4e, ",*(uc_nl[j]+i));
+      Fprintf(fp,"%0.4e, ",*(uc_nl[j]+i));
       if( i%6 == 5){
-        fprintf(fp,"\n");
+        Fprintf(fp,"\n");
       }
     }
-    fprintf(fp,"\n};\n"); 
+    Fprintf(fp,"\n};\n"); 
   }
-  fclose(fp);
+  Fclose(fp);
 #endif
 #endif
 

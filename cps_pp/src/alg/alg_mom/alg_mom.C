@@ -9,7 +9,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <alg/alg_mom.h>
 CPS_START_NAMESPACE
 

@@ -3,26 +3,26 @@ CPS_START_NAMESPACE
 /*!\file 
   \brief   Definition of Error class methods.
 
-  $Id: error.C,v 1.6 2004-06-04 21:14:12 chulwoo Exp $
+  $Id: error.C,v 1.7 2004-08-17 03:33:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.6 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: error.C,v 1.6 2004-06-04 21:14:12 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.7 2004-08-17 03:33:13 chulwoo Exp $
+//  $Id: error.C,v 1.7 2004-08-17 03:33:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: error.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdarg.h>
 #include <stdlib.h>  //exit
 #include <util/error.h>
@@ -95,12 +95,12 @@ void Error::Pointer(const char *class_name, const char *func_name,
 
   printf(error_string[pointer], class_name, func_name, ptr_name); 
 
-  if( (fp = fopen(error_file_name, "w")) == NULL ) { 
+  if( (fp = Fopen(error_file_name, "w")) == NULL ) { 
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name); 
     exit(exit_value[file_w]); 
   } 
-  fprintf(fp, error_string[pointer], class_name, func_name, ptr_name); 
-  fclose(fp); 
+  Fprintf(fp, error_string[pointer], class_name, func_name, ptr_name); 
+  Fclose(fp); 
   
   exit(exit_value[pointer]); 
   
@@ -128,12 +128,12 @@ void Error::FileR(const char *class_name, const char *func_name,
 
   printf(error_string[file_r], class_name, func_name, file_name);
 
-  if( (fp = fopen(error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     exit(exit_value[file_w]);
   }
-  fprintf(fp, error_string[file_r], class_name, func_name, file_name);
-  fclose(fp);
+  Fprintf(fp, error_string[file_r], class_name, func_name, file_name);
+  Fclose(fp);
 
   exit(exit_value[file_r]);
 }
@@ -160,12 +160,12 @@ void Error::FileW(const char *class_name, const char *func_name,
 
   printf(error_string[file_w],class_name, func_name, file_name);
 
-  if( (fp = fopen(error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     exit(exit_value[file_w]);
   }
-  fprintf(fp, error_string[file_w],class_name, func_name, file_name);
-  fclose(fp);
+  Fprintf(fp, error_string[file_w],class_name, func_name, file_name);
+  Fclose(fp);
 
   exit(exit_value[file_w]);
 }
@@ -192,12 +192,12 @@ void Error::FileA(const char *class_name, const char *func_name,
 
   printf(error_string[file_a], class_name, func_name, file_name);
 
-  if( (fp = fopen(error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     exit(exit_value[file_w]);
   }
-  fprintf(fp, error_string[file_a], class_name, func_name, file_name);
-  fclose(fp);
+  Fprintf(fp, error_string[file_a], class_name, func_name, file_name);
+  Fclose(fp);
 
   exit(exit_value[file_a]);
 }
@@ -222,12 +222,12 @@ void Error::NotImplemented(const char *class_name, const char *func_name)
 
   printf(error_string[not_implemented], class_name, func_name);
 
-  if( (fp = fopen(error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     exit(exit_value[file_w]);
   }
-  fprintf(fp, error_string[not_implemented], class_name, func_name);
-  fclose(fp);
+  Fprintf(fp, error_string[not_implemented], class_name, func_name);
+  Fclose(fp);
 
   exit(exit_value[not_implemented]);
 }
@@ -262,13 +262,13 @@ void Error::NotImplemented(const char *class_name, const char *func_name,
   printf(error_string[not_implemented], class_name, func_name);
   vprintf(format, args);
 
-  if( (fp = fopen(error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     exit(exit_value[file_w]);
   }
-  fprintf(fp, error_string[not_implemented], class_name, func_name);
-  vfprintf(fp, format, args);
-  fclose(fp);
+  Fprintf(fp, error_string[not_implemented], class_name, func_name);
+  Vfprintf(fp, format, args);
+  Fclose(fp);
 
   exit(exit_value[not_implemented]);
 }
@@ -301,13 +301,13 @@ void Error::Hardware(const char *class_name, const char *func_name,
   printf(error_string[hardware], class_name, func_name);
   vprintf(format, args);
 
-  if( (fp = fopen(error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     exit(exit_value[file_w]);
   }
-  fprintf(fp, error_string[hardware], class_name, func_name);
-  vfprintf(fp, format, args);
-  fclose(fp);
+  Fprintf(fp, error_string[hardware], class_name, func_name);
+  Vfprintf(fp, format, args);
+  Fclose(fp);
 
   exit(exit_value[hardware]);
 }
@@ -340,13 +340,13 @@ void Error::General(const char *class_name, const char *func_name,
   printf(error_string[general], class_name, func_name);
   vprintf(format, args);
 
-  if( (fp = fopen(error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     exit(exit_value[file_w]);
   }
-  fprintf(fp, error_string[general], class_name, func_name);
-  vfprintf(fp, format, args);
-  fclose(fp);
+  Fprintf(fp, error_string[general], class_name, func_name);
+  Vfprintf(fp, format, args);
+  Fclose(fp);
 
   exit(exit_value[general]);
 }

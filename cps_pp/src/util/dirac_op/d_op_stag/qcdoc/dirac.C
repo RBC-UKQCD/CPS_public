@@ -1,7 +1,7 @@
 /*!\file
   Staggered Dirac operator for QCDOC
 
-  $Id: dirac.C,v 1.9 2004-07-09 04:15:18 chulwoo Exp $
+  $Id: dirac.C,v 1.10 2004-08-17 03:33:13 chulwoo Exp $
 */
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian
@@ -12,6 +12,7 @@
 //-------------------------------------------------------------------
 
 #include <util/gjp.h>
+#include <util/qcdio.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
 #include <util/lattice.h>
@@ -209,7 +210,7 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   char *cname = "DiracOpStag";
   char *fname = "dirac_init(const void *gauge)";
   if (initted !=0) {
-    fprintf(stderr,"stag_dirac_init already initted\n");
+    Fprintf(stderr,"stag_dirac_init already initted\n");
     return;
   }
   VRB.Func(cname,fname);
@@ -414,33 +415,33 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   char filename[200];
   sprintf(filename,"%s_%d%d%d%d%d%d",
   chi_l_filename,CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
-  FILE *fp = fopen(filename,"w");
+  FILE *fp = Fopen(filename,"w");
   for(j=0;j<2;j++){
-    fprintf(fp,"IFloat * chi_l%d[] LOCATE(\"edramtransient\") = {\n",j); 
-    fprintf(fp," (IFloat *) %d",*(chi_l[j])); 
+    Fprintf(fp,"IFloat * chi_l%d[] LOCATE(\"edramtransient\") = {\n",j); 
+    Fprintf(fp," (IFloat *) %d",*(chi_l[j])); 
     for(i=1;i< 2*(local_chi/2);i++){
-      fprintf(fp,",\n (IFloat *) %d",*(chi_l[j]+i)); 
+      Fprintf(fp,",\n (IFloat *) %d",*(chi_l[j]+i)); 
     }
-    fprintf(fp,"\n};\n"); 
+    Fprintf(fp,"\n};\n"); 
   }
-  fclose(fp);
+  Fclose(fp);
 #endif
 
 #if 0
   char filename[200];
   sprintf(filename,"%s_%d%d%d%d%d%d",
   chi_nl_filename, CoorX(), CoorY(), CoorZ(), CoorT(), CoorS(), CoorW());
-  FILE *fp = fopen(filename,"w");
+  FILE *fp = Fopen(filename,"w");
   for(j=0;j<2;j++){
-    fprintf(fp,"IFloat * chi_nl%d[] LOCATE(\"edramtransient\") = {\n",j); 
-    fprintf(fp," (IFloat *) 0x%x",*(chi_nl[j])); 
+    Fprintf(fp,"IFloat * chi_nl%d[] LOCATE(\"edramtransient\") = {\n",j); 
+    Fprintf(fp," (IFloat *) 0x%x",*(chi_nl[j])); 
     for(i=1;i< 2*(non_local_chi/2);i++){
-      fprintf(fp,",\n (IFloat *) 0x%x",*(chi_nl[j]+i)); 
+      Fprintf(fp,",\n (IFloat *) 0x%x",*(chi_nl[j]+i)); 
     }
-    fprintf(fp,"\n};\n"); 
+    Fprintf(fp,"\n};\n"); 
   }
 
-  fclose(fp);
+  Fclose(fp);
 
 #endif 
 

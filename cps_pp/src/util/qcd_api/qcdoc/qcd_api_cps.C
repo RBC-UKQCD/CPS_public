@@ -14,7 +14,7 @@
 #include <util/enum.h>
 #include <alg/do_arg.h>
 #include <util/qcd_api.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <qalloc.h>
 CPS_START_NAMESPACE
 GlobalJobParameter GJP;
@@ -208,7 +208,7 @@ double * (*out_pt)( int, int, int, int, int, int)
 	}
 
 //	dtime = -dclock();
-//	FILE *fp = fopen("/host/chulwoo/qcdocos_qcd_api_cps.out","w");
+//	FILE *fp = Fopen("/host/chulwoo/qcdocos_qcd_api_cps.out","w");
 
 	for(x[3] = 0;x[3]<size[3] ; x[3]++)    // t
 	for(x[2] = 0;x[2]<size[2] ; x[2]++)	   // z	
@@ -219,21 +219,21 @@ double * (*out_pt)( int, int, int, int, int, int)
 
 			double_p = (double *) in_pt(x[0],x[1],x[2],x[3],a,0);
 			in_p[LexVector(x)*VECT_LEN+a*2] = *double_p;
-//			fprintf(fp,"in[%d][%d]=\t%e+",LexVector(x),a, *double_p);
+//			Fprintf(fp,"in[%d][%d]=\t%e+",LexVector(x),a, *double_p);
 			double_p = (double *) in_pt(x[0],x[1],x[2],x[3],a,1);
 			in_p[LexVector(x)*VECT_LEN+a*2+1] = (*double_p);
-//			fprintf(fp,"\ti%e\n",*double_p);
+//			Fprintf(fp,"\ti%e\n",*double_p);
 
 			double_p = (double *) out_pt(x[0],x[1],x[2],x[3],a,0);
 			out_p[LexVector(x)*VECT_LEN+a*2] = *double_p;
-//			fprintf(fp,"out[%d][%d]=\t%e+",LexVector(x),a, *double_p);
+//			Fprintf(fp,"out[%d][%d]=\t%e+",LexVector(x),a, *double_p);
 			double_p = (double *) out_pt(x[0],x[1],x[2],x[3],a,1);
 			out_p[LexVector(x)*VECT_LEN+a*2+1] = (*double_p);
-//			fprintf(fp,"\ti%e\n",*double_p);
+//			Fprintf(fp,"\ti%e\n",*double_p);
 
 		}
 	}
-//	fclose(fp);
+//	Fclose(fp);
 //	dtime +=dclock();
 //	printf("DiracOpAsqtad:: elapsed time = %e seconds\n",dtime);
 
@@ -264,7 +264,7 @@ double * (*out_pt)( int, int, int, int, int, int)
     *final_rsq = (double)true_res;
 
 //	dtime = -dclock();
-//	fp = fopen("/host/chulwoo/qcdocos_qcd_api_cps.out","a");
+//	fp = Fopen("/host/chulwoo/qcdocos_qcd_api_cps.out","a");
 	for(x[3] = 0;x[3]<size[3] ; x[3]++)
 	for(x[2] = 0;x[2]<size[2] ; x[2]++)
 	for(x[1] = 0;x[1]<size[1] ; x[1]++)
@@ -272,15 +272,15 @@ double * (*out_pt)( int, int, int, int, int, int)
 		for(a=0;a<3;a++){
 			double_p = (double *) out_pt(x[0],x[1],x[2],x[3],a,0);
 			*double_p = out_p[LexVector(x)*VECT_LEN+a*2];
-//			fprintf(fp,"out[%d][%d]=\t%e+",LexVector(x),a, *double_p);
+//			Fprintf(fp,"out[%d][%d]=\t%e+",LexVector(x),a, *double_p);
 			double_p = (double *) out_pt(x[0],x[1],x[2],x[3],a,1);
 			*double_p = out_p[LexVector(x)*VECT_LEN+a*2+1];
-//			fprintf(fp,"\ti%e\n",*double_p);
+//			Fprintf(fp,"\ti%e\n",*double_p);
 		}
 	}
 //	dtime +=dclock();
 //	printf("Convert:: elapsed time = %e seconds\n",dtime);
-//	fclose(fp);
+//	Fclose(fp);
 
 	return iternum;
 #else	

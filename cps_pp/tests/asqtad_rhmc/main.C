@@ -1,6 +1,6 @@
 /* Quick Asqtad RHMC code, which measures the plaquette on each trajectory. */
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>	// exit()
 #include <config.h>
 #include <math.h>
@@ -90,7 +90,7 @@ int main(int argc,char *argv[])
   
   char *total_sites_st = "total sites = ";
   VRB.Flow(cname,fname,"%s%f\n",total_sites_st,IFloat(total_sites));
-#if TARGET == QCDOC
+#if 0
   char plaqfile[200];
   char accfile[200];
   char infofile[200];
@@ -105,9 +105,9 @@ int main(int argc,char *argv[])
   const char *accfile = "acceptance.dat";
   const char *infofile = "info.dat";
 #endif
-  FILE *plaq = fopen(plaqfile,"w");
-  FILE *acc = fopen(accfile,"w");
-  FILE *info = fopen(infofile,"w");
+  FILE *plaq = Fopen(plaqfile,"w");
+  FILE *acc = Fopen(accfile,"w");
+  FILE *info = Fopen(infofile,"w");
 
   //----------------------------------------------------------------
   // Run Rational Hybrid Monte Carlo
@@ -153,7 +153,7 @@ int main(int argc,char *argv[])
 	      acceptance += accept;
 	      sweep_counter++;
 	      VRB.Flow(cname,fname,"%d Acceptance = %e\n",i, accept);
-	      fprintf(acc,"%d %e\n",i+n,accept);
+	      Fprintf(acc,"%d %e\n",i+n,accept);
 	    }
 
 	} // end of RHMC scope
@@ -165,7 +165,7 @@ int main(int argc,char *argv[])
 	Float sum_plaq0 = lat.SumReTrPlaq();
 	Float aver_plaq0 = sum_plaq0/(18.0*total_sites);
 	VRB.Flow(cname,fname,"%d plaquette = %e\n",i,(float)aver_plaq0); 
-	fprintf(plaq,"%d %0.16e\n",i,(float)aver_plaq0);
+	Fprintf(plaq,"%d %0.16e\n",i,(float)aver_plaq0);
 	plaquette += aver_plaq0;
 
 	// Dynamic setting of u0
@@ -175,14 +175,14 @@ int main(int argc,char *argv[])
       } // end of loop over i
 
       // Naive mean quantities
-      fprintf(info,"Mean acceptance = %e\n", acceptance/Float(total_measure));
-      fprintf(info,"Mean plaquette = %e\n", plaquette/Float(no_measure_sweep));
+      Fprintf(info,"Mean acceptance = %e\n", acceptance/Float(total_measure));
+      Fprintf(info,"Mean plaquette = %e\n", plaquette/Float(no_measure_sweep));
     }
   }
 
-  fclose(plaq); 
-  fclose(acc);
-  fclose(info);
+  Fclose(plaq); 
+  Fclose(acc);
+  Fclose(info);
   
   return(0);
 }

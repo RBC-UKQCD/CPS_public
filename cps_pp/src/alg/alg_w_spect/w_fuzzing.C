@@ -661,7 +661,7 @@ void WspectFuzzing::display(){
   //
   printf("=========Links on slice #%d========\n",slice);
 
-  File *fp=fopen("fuzzedlink.dat","a");
+  File *fp=Fopen("fuzzedlink.dat","a");
   
 
   //set site boundary
@@ -694,21 +694,21 @@ void WspectFuzzing::display(){
 	    int icol;
 	    Matrix *matrix=GetLink(site,dir);
 	    for (icol = 0; icol  < COLORs; icol++)
-	      fprintf(fp,"(%14.6e, %14.6e)", matrix[2*icol],matrix[2*icol+1]);
-	    fprintf(fp,"\n");
+	      Fprintf(fp,"(%14.6e, %14.6e)", matrix[2*icol],matrix[2*icol+1]);
+	    Fprintf(fp,"\n");
 	    for (icol = COLORs; icol  < 2*COLORs; icol++)
-	      fprintf(fp"(%14.6e, %14.6e)", matrix[2*icol],matrix[2*icol+1]);
-	    fprintf(fp,"\n");
+	      Fprintf(fp"(%14.6e, %14.6e)", matrix[2*icol],matrix[2*icol+1]);
+	    Fprintf(fp,"\n");
 	    for (icol = 2*COLORs; icol  < 3*COLORs; icol++)
-	      fprintf(fp,"(%14.6e, %14.6e)", matrix[2*icol],matrix[2*icol+1]);
-	    fprintf(fp,"\n");
+	      Fprintf(fp,"(%14.6e, %14.6e)", matrix[2*icol],matrix[2*icol+1]);
+	    Fprintf(fp,"\n");
 	  }//dir
 	}
       }
     }
   }
 
-  fclose(fp);
+  Fclose(fp);
 
 }
 

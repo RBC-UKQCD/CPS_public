@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-09 05:55:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v 1.7 2004-07-09 05:55:16 chulwoo Exp $
-//  $Id: w_baryon.C,v 1.7 2004-07-09 05:55:16 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v 1.8 2004-08-17 03:33:11 chulwoo Exp $
+//  $Id: w_baryon.C,v 1.8 2004-08-17 03:33:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_baryon.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_baryon.C,v $
 //  $State: Exp $
 //
@@ -18,23 +18,12 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <alg/w_all.h>
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
+#include <util/qcdio.h>
 #include <util/error.h>
 #include <util/verbose.h>
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/vector.h>
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <comms/glb.h>                 // glb_sum
-CPS_START_NAMESPACE
-
-CPS_END_NAMESPACE
 #include <alg/alg_w_spect.h>         // AlgWspect::GetCounter()
 CPS_START_NAMESPACE
 
@@ -71,8 +60,8 @@ WspectBaryon::WspectBaryon(const WspectQuark &q1,
   : d_quark1_p(q1.Data()),
     d_quark2_p(q2.Data()),
     d_quark3_p(q3.Data()),
-    d_whr(whr),
     d_flavors(con),
+    d_whr(whr),
     d_diracs(dmats)
 {
   Everything();
@@ -91,8 +80,8 @@ WspectBaryon::WspectBaryon(const IFloat *q1,
 			   WspectBaryon::TwoDiracMats dmats) 
   : d_quark1_p(q1),
     d_quark2_p(q2),
-    d_quark3_p(q3),
     d_flavors(con),
+    d_quark3_p(q3),
     d_whr(whr),
     d_diracs(dmats)
 {
@@ -188,7 +177,7 @@ WspectBaryon::Everything()
 #if TARGET==cpsMPI
     using MPISCU::fprintf;
 #endif
-    FILE *fp = fopen("baryon.dirac.dat", "a");
+    FILE *fp = Fopen("baryon.dirac.dat", "a");
     Complex answer;
     int lcl[LORENTZs];  
     for (lcl[0] = 0; lcl[0] < GJP.XnodeSites(); lcl[0]++) {
@@ -198,7 +187,7 @@ WspectBaryon::Everything()
 	    for (int Dx = 0; Dx < DIRACs; ++Dx) {
 	      for (int Dy = 0; Dy < DIRACs; ++Dy) {
 		answer = DiracAlgebra(Dx, Dy, lcl);
-		fprintf(fp, 
+		Fprintf(fp, 
 			"site[%d %d %d %d] spin[%d%d]: [%g %g]\n",
 			lcl[0], lcl[1], lcl[2], lcl[3], Dx, Dy,
 			answer.real(), answer.imag());
@@ -208,7 +197,7 @@ WspectBaryon::Everything()
 	}
       }
     }
-    fclose(fp);
+    Fclose(fp);
   }
 #endif  // #ifdef DEBUG_W_BARYON_DIRAC
 
@@ -217,7 +206,7 @@ WspectBaryon::Everything()
 #if TARGET==cpsMPI
     using MPISCU::fprintf;
 #endif
-    FILE *fp = fopen("baryon.color.dat", "a");
+    FILE *fp = Fopen("baryon.color.dat", "a");
     Complex answer;
     int lcl[LORENTZs];  
     for (lcl[0] = 0; lcl[0] < GJP.XnodeSites(); lcl[0]++) {
@@ -232,7 +221,7 @@ WspectBaryon::Everything()
 		      for (int D3y = 0; D3y < DIRACs; ++D3y) {
 			answer = ColorAlgebra(D1x, D2x, D3x,
 					      D1y, D2y, D3y, lcl);
-			fprintf(fp, 
+			Fprintf(fp, 
 				"site[%d %d %d %d] spin[%d%d][%d%d][%d%d]: [%g %g]\n",
 				lcl[0], lcl[1], lcl[2], lcl[3], 
 				D1x, D1y, D2x, D2y, D3x, D3y,
@@ -247,7 +236,7 @@ WspectBaryon::Everything()
 	}
       }
     }
-    fclose(fp);
+    Fclose(fp);
   }
 
 #endif   //  #ifdef DEBUG_W_BARYON_COLOR
@@ -727,6 +716,7 @@ void
 WspectBaryon::DiracAlgebra(int Dx, int Dy, int local_site_offset,
 			   Complex &answer) 
 {
+  char *fname = "DiracAlgebra(i,i,i,C&)";
   // answer += DiracAlgebraABC
   DiracAlgebraABC(Dx, Dy, local_site_offset, answer);    
 
@@ -861,8 +851,8 @@ WspectBaryon::print(char *filename, WbaryonFold fold) const
 
   // Open the output file
   //------------------------------------------------------------------
-  FILE *fp;
-  if (!filename || !(fp = fopen(filename, "a"))) 
+  FILE *fp=NULL;
+  if (!filename || !(fp = Fopen(filename, "a"))) 
     ERR.FileA(d_class_name,fname, filename);
 
 
@@ -883,25 +873,25 @@ WspectBaryon::print(char *filename, WbaryonFold fold) const
   int w;
   switch (fold) {
   case BARYON_PAST:
-    fprintf(fp, "%d 0 0 %e\n", AlgWspect::GetCounter(), 
+    Fprintf(fp, "%d 0 0 %e\n", AlgWspect::GetCounter(), 
 	    IFloat(d_unit_p[src_wall]));
     for (w = 1; w < glb_walls/2; ++w){
       if (bound_cnd == -1) {
 	f1 = (src_wall + w)/glb_walls             ? -1 : 1;
 	f2 = (src_wall + glb_walls - w)/glb_walls ? -1 : 1;
       }
-      fprintf(fp, "%d %d 0 %e\n", AlgWspect::GetCounter(), w,
+      Fprintf(fp, "%d %d 0 %e\n", AlgWspect::GetCounter(), w,
 	      IFloat((f1 * d_unit_p[(src_wall + w)%glb_walls] +
 		     f2 * bound_cnd * 
 		     d_unit_p[(src_wall + glb_walls - w)%glb_walls])/2) );
     }
-    fprintf(fp,"%d %d 0 %e\n", AlgWspect::GetCounter(), w,
+    Fprintf(fp,"%d %d 0 %e\n", AlgWspect::GetCounter(), w,
 	    IFloat(d_unit_p[(src_wall+w)%glb_walls]));
     break;
     
   case BARYON_RAW:
     for (w = 0; w < glb_walls; ++w) {
-      fprintf(fp, "%d %d 0 %e %e\n", AlgWspect::GetCounter(), w,
+      Fprintf(fp, "%d %d 0 %e %e\n", AlgWspect::GetCounter(), w,
       	      IFloat(d_up_p  [(src_wall + w)%glb_walls]),
 	      IFloat(d_down_p[(src_wall + w)%glb_walls]));
     }
@@ -914,7 +904,7 @@ WspectBaryon::print(char *filename, WbaryonFold fold) const
 	f1 = (src_wall + w)/glb_walls             ? -1 : 1;
 	f2 = (src_wall + glb_walls - w)/glb_walls ? -1 : 1;
       }
-      fprintf(fp, "%d %d 0 %e \n", AlgWspect::GetCounter(), w,
+      Fprintf(fp, "%d %d 0 %e \n", AlgWspect::GetCounter(), w,
 	      IFloat((f1 * d_up_p[(src_wall + w)%glb_walls] + 
 		     f2 * bound_cnd *
 		     d_down_p[(src_wall + glb_walls - w)%glb_walls])/2.0));
@@ -922,7 +912,7 @@ WspectBaryon::print(char *filename, WbaryonFold fold) const
     break;
   }
   
-  fclose(fp);
+  Fclose(fp);
 }
 
 

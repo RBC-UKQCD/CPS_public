@@ -116,7 +116,7 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
     DiracOpGlbSum(&d);
   }
   IFloat *Ap_tmp = (IFloat *)Ap;
-  VRB.Flow(cname,fname,"Ap=%e pAp =%e\n",*Ap_tmp,d);
+  VRB.Flow(cname,fname,"Ap= %e pAp =%e\n",*Ap_tmp,d);
 
   b = -cp/d;
 
@@ -136,7 +136,7 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
   r -> FTimesV1PlusV2(b,Ap,r,f_size);
   // c = |r[1]|^2
   c = r -> NormSqGlbSum(f_size);
-  VRB.Flow(cname,fname,"|r[1]|^2 =%e\n",c);
+  VRB.Flow(cname,fname,"|r[1]^2 =%e\n",c);
   
   // Psi[1] -= b[0] p[0] =- b[0] chi;
   if (type == SINGLE) {
@@ -176,7 +176,7 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
 	p[s] -> FTimesV1PlusV2(z[iz][s],r,p[s],f_size);	
       }
     IFloat *Ap_tmp = (IFloat *)p[s];
-  VRB.Flow(cname,fname,"as = %e p[%d] =%e\n",as, s,*Ap_tmp);
+  VRB.Flow(cname,fname,"isz = %d as = %e p[%d] =%e\n",isz, as, s,*Ap_tmp);
     }
     
     // cp = |r[k]**2

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions for the MPI implementation of the QCDSP/QCDOC communications layer.
   
-  $Id: sysfunc.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
+  $Id: sysfunc.C,v 1.4 2004-08-17 03:33:11 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
 /* The Sysfunc Comms Interface: sysfunc.C
@@ -16,20 +16,20 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: chulwoo $
-  $Date: 2004-06-04 21:14:01 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
-  $Id: sysfunc.C,v 1.3 2004-06-04 21:14:01 chulwoo Exp $
+  $Date: 2004-08-17 03:33:11 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v 1.4 2004-08-17 03:33:11 chulwoo Exp $
+  $Id: sysfunc.C,v 1.4 2004-08-17 03:33:11 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.C,v $
-  $Revision: 1.3 $
+  $Revision: 1.4 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
 CPS_END_NAMESPACE
 #include<comms/sysfunc.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -486,7 +486,7 @@ namespace MPISCU{
 	    strcat(logFileName,&PEnum[1]); /* Skip the leading 1 */
 	    free( PEnum );
 	    /* Open the logfile associated with this PE */
-	    logFile = fopen(logFileName,"w");
+	    logFile = Fopen(logFileName,"w");
 	}
 #endif
 
@@ -521,7 +521,7 @@ namespace MPISCU{
 
 	/* Log that the initialization has completed and give this PEs rank */
 #ifdef MPISCU_DEBUG
-	fprintf_all(logFile,"MPISCU::CommsInit:  Initialization complete [PE=%i of %i, ROOT_PE=%i].\n",peRank, peNum, root_pe );
+	Fprintf_all(logFile,"MPISCU::CommsInit:  Initialization complete [PE=%i of %i, ROOT_PE=%i].\n",peRank, peNum, root_pe );
 #endif
 
 
@@ -576,7 +576,7 @@ namespace MPISCU{
 	if( !Is_Initialised ) CommsInit(); 
 
 #ifdef MPISCU_DEBUG
-	fprintf(logFile,"SCUGlobalSum: Performing a global summation.\n");
+	Fprintf(logFile,"SCUGlobalSum: Performing a global summation.\n");
 #endif
 
 	/* Check args make sense */
@@ -615,7 +615,7 @@ namespace MPISCU{
     void RaiseError( char* errstr ) {
 
 	/* Report the error: */
-	::fprintf(stderr, "Error: %s\n", errstr);  
+	::Fprintf(stderr, "Error: %s\n", errstr);  
 
 	/* Finish with MPI if it has been initialised: */
 	if( Is_Initialised ) MPI_Finalize();
@@ -712,7 +712,7 @@ namespace MPISCU{
 	
 	if(read_from_file) {	
 
-	    FILE *fp = fopen(envvar,"r");
+	    FILE *fp = Fopen(envvar,"r");
 	    if( fp == NULL ) RaiseError("MPIParseCommsParam: Could not open comms parameter file!");
 	    /* Lookup the file size and define a suitably sized buffer */
 	    fseek(fp, 0, SEEK_END);
@@ -727,7 +727,7 @@ namespace MPISCU{
 	    strcpy(parameters,"");
 
 	    while( fscanf(fp,"%[^\n]\n",f_line) != EOF ) strcat(parameters,f_line);
-	    fclose(fp);
+	    Fclose(fp);
 
 	}else
 	    parameters = envvar;
@@ -927,14 +927,14 @@ namespace MPISCU{
 	if( !Is_Initialised ) CommsInit();
 
 #ifdef MPISCU_DEBUG
-	fprintf(logFile,"MPISCU::ReadSeedFile: Opening seed file %s.\n", seedFileName);
+	Fprintf(logFile,"MPISCU::ReadSeedFile: Opening seed file %s.\n", seedFileName);
 #endif
 
 	// Create the seeds buffer:
 	iseed = new unsigned int[n+1];
     
 	// Open the file:
-	seedfp = fopen(seedFileName, "r" );
+	seedfp = Fopen(seedFileName, "r" );
 	if( seedfp == NULL ) 
 	    RaiseError("SCUReadSeedFile: could not open seed file!\n");
     
@@ -942,7 +942,7 @@ namespace MPISCU{
 	i = 0; while( i < n && fscanf(seedfp,"%u",&(iseed[i])) != EOF ) i++;
     
 	// Close the file:
-	fclose(seedfp); seedfp = NULL;
+	Fclose(seedfp); seedfp = NULL;
     
 	// Die if the file ended before all seeds had been read in:
 	if( i < n )

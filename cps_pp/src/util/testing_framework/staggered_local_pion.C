@@ -7,15 +7,15 @@
 //
 //
 //  Starting point
-//  $Date: 2004-05-11 15:10:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/testing_framework/staggered_local_pion.C,v 1.2 2004-05-11 15:10:36 mcneile Exp $
+//  $Date: 2004-08-17 03:33:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/testing_framework/staggered_local_pion.C,v 1.3 2004-08-17 03:33:16 chulwoo Exp $
 //
 //--------------------------------------------------------------------
 /*
  *  test for alg
  */
 
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <stdlib.h>	// exit()
 #include <config.h>
 #include <util/lattice.h>

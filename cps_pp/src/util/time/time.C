@@ -1,6 +1,6 @@
 #include <config.h>
 #include <sys/time.h>
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <util/data_types.h>
 CPS_START_NAMESPACE
 Float dclock(void){

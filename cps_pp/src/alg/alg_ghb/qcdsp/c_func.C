@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/qcdsp/c_func.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
-//  $Id: c_func.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/qcdsp/c_func.C,v 1.6 2004-08-17 03:33:08 chulwoo Exp $
+//  $Id: c_func.C,v 1.6 2004-08-17 03:33:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: c_func.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/qcdsp/c_func.C,v $
 //  $State: Exp $
 //
@@ -26,7 +26,7 @@ CPS_START_NAMESPACE
 //  commented out, and only bad_sqrt() is required.
 //------------------------------------------------------------
 #include	<stdlib.h>
-#include	<stdio.h>
+#include	<util/qcdio.h>
 CPS_END_NAMESPACE
 #include <util/data_types.h>
 #include <util/verbose.h>

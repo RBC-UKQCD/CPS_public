@@ -3,26 +3,26 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgGheatBath class methods.
   
-  $Id: alg_ghb.C,v 1.9 2004-08-11 05:33:33 chulwoo Exp $
+  $Id: alg_ghb.C,v 1.10 2004-08-17 03:33:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-11 05:33:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.9 2004-08-11 05:33:33 chulwoo Exp $
-//  $Id: alg_ghb.C,v 1.9 2004-08-11 05:33:33 chulwoo Exp $
+//  $Date: 2004-08-17 03:33:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.10 2004-08-17 03:33:08 chulwoo Exp $
+//  $Id: alg_ghb.C,v 1.10 2004-08-17 03:33:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
 //  $State: Exp $
 //
 
 CPS_END_NAMESPACE
 #include <stdlib.h>	// exit()
-#include <stdio.h>
+#include <util/qcdio.h>
 #include <math.h>
 #include <time.h>
 #include <alg/alg_ghb.h>
@@ -41,7 +41,7 @@ CPS_START_NAMESPACE
 //Uncomment next line to switch on timing
 //#define GHB_TIMING
 
-#if 1
+#if TARGET == QCDSP
 static int dram_grand_seed[6] = {
   0xbeefcafe,
   0xdefaced, 
