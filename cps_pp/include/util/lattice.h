@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.28 2004-09-02 16:52:56 zs Exp $
+  $Id: lattice.h,v 1.29 2004-11-17 18:27:07 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
-  $Author: zs $
-  $Date: 2004-09-02 16:52:56 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.28 2004-09-02 16:52:56 zs Exp $
-  $Id: lattice.h,v 1.28 2004-09-02 16:52:56 zs Exp $
+  $Author: chulwoo $
+  $Date: 2004-11-17 18:27:07 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.29 2004-11-17 18:27:07 chulwoo Exp $
+  $Id: lattice.h,v 1.29 2004-11-17 18:27:07 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.28 $
+  $Revision: 1.29 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -1581,9 +1581,9 @@ class FstagTypes : public virtual Lattice
 
     enum
       {
-	VECT_LEN=6,          //!< Number of floats in  a Vector
-	MATRIX_SIZE=18,  //!< Number of floats in  a Matrix
-	SITE_LEN=72      //!< Number of floats in four Matrix's
+	VECT_LEN=6,          //!< Number of Floats in  a Vector
+	MATRIX_SIZE=18,  //!< Number of Floats in  a Matrix
+	SITE_LEN=72      //!< Number of Floats in four Matrix's
       };
     
     int bc[4];	        //!< Boundary conditions

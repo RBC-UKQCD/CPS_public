@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.14 2004-08-18 11:57:37 zs Exp $
+  $Id: pt.h,v 1.15 2004-11-17 18:27:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.14 2004-08-18 11:57:37 zs Exp $
-//  $Id: pt.h,v 1.14 2004-08-18 11:57:37 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-11-17 18:27:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.15 2004-11-17 18:27:08 chulwoo Exp $
+//  $Id: pt.h,v 1.15 2004-11-17 18:27:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -102,9 +102,9 @@ class ParTransStagTypes : public ParTrans
  protected:
   enum
     {
-      VECT_LEN=6,          //!< Number of floats in  a Vector
-      MATRIX_SIZE=18,  //!< Number of floats in  a Matrix
-      SITE_LEN=72      //!< Number of floats in four Matrix's
+      VECT_LEN=6,          //!< Number of Floats in  a Vector
+      MATRIX_SIZE=18,  //!< Number of Floats in  a Matrix
+      SITE_LEN=72      //!< Number of Floats in four Matrix's
     };
 
 };
