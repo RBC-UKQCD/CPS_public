@@ -1,0 +1,69 @@
+<HTML>
+<HEAD>
+
+<TITLE> How to mirror the cps++ code  </TITLE>
+</HEAD>
+<BODY bgcolor = "white">
+
+Currently the main CVS repository for the cps++
+code is at Edinburgh on the trumpton linux box.
+The Columbia group wanted a copy on their machines.
+Also we needed to be able to backup the CVS
+repository.
+<p>
+
+The 
+<a href="http://samba.anu.edu.au/rsync/">rsync</a>
+command can be used to back up a directory.
+<P>
+<pre>
+setenv RSYNC_RSH ssh
+mkdir CVS
+rsync -avz trumpton.ph.ed.ac.uk:/Disk/ukqcd/QCDOC/CVS/cps++  CVS
+rsync -avz trumpton.ph.ed.ac.uk:/Disk/ukqcd/QCDOC/CVS/CVSROOT  CVS
+</pre>
+
+<p>
+To check the code out of the mirrored CVS directory:
+<pre>
+ cvs -d/home/mcneile/mirror/CVS/ co cps++
+</pre>
+where /home/mcneile/mirror/CVS/ should be replaced by the
+full path length of your mirrored CVS directory.
+<p>
+<font color="red" >Please don't use this system to make changes to the mirrored CVS
+directory. </font> This system is purely for backup.  There are
+systems that allow multiple CVS repositories, but they are
+more complicated.
+
+
+<h1> Other options to mirror cps++ </h1>
+
+There are some more powerful ways of maintaining multiple
+CVS directories. The <a href="http://www.cvsup.org/">cvsup</a>
+utility creates a copy of CVS repository. Only one copy can be
+used to easily check in code.
+The <a href="http://www.elegosoft.com/dcvs/">DCVS</a>
+does allow bidirectional updating of multiple repositories.
+DCVS does not look easy to install.
+There is also a standard unix utility called
+<a href="http://www.magnicomp.com/rdist/">rdist</a> for
+copying files to many machines.
+
+<HR>
+<address><a href="http://www.liv.ac.uk/~mcneile/">Craig McNeile &lt;mcneile@amtp.liv.ac.uk&gt;</a></address>
+<HR>
+
+<!-- hhmts start -->
+Last modified: Sun Jul 27 15:22:04 2003
+<!-- hhmts end -->
+
+</BODY>
+</HTML>
+
+
+
+
+
+
+
