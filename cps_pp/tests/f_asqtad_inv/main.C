@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.11 2004-08-18 11:58:09 zs Exp $
+  $Id: main.C,v 1.12 2004-09-04 07:33:14 chulwoo Exp $
 */
 
 #include<config.h>
@@ -37,12 +37,9 @@ static const char *input_filename = "f_asqtad_inv.in";
 
 int main(int argc,char *argv[]){
 
-
-#if TARGET == QCDOC
-    DefaultSetup();
+    Start();
     printf("Sizes = %d %d %d %d %d %d\n",SizeX(),SizeY(),SizeZ(),SizeT(),SizeS(),SizeW());
     printf("Coors = %d %d %d %d %d %d\n",CoorX(),CoorY(),CoorZ(),CoorT(),CoorS(),CoorW());
-#endif
 
     FILE *fp;
     double dtime;
@@ -61,7 +58,6 @@ int main(int argc,char *argv[]){
     sscanf(argv[3],"%d",&nz);
     sscanf(argv[4],"%d",&nt);
 
-#if TARGET == QCDOC
     do_arg.x_node_sites = nx/SizeX();
     do_arg.y_node_sites = ny/SizeY();
     do_arg.z_node_sites = nz/SizeZ();
@@ -70,16 +66,6 @@ int main(int argc,char *argv[]){
     do_arg.y_nodes = SizeY();
     do_arg.z_nodes = SizeZ();
     do_arg.t_nodes = SizeT();
-#else
-    do_arg.x_node_sites = nx;
-    do_arg.y_node_sites = ny;
-    do_arg.z_node_sites = nz;
-    do_arg.t_node_sites = nt;
-    do_arg.x_nodes = 1;
-    do_arg.y_nodes = 1;
-    do_arg.z_nodes = 1;
-    do_arg.t_nodes = 1;
-#endif 
     do_arg.x_bc = BND_CND_PRD;
     do_arg.y_bc = BND_CND_PRD;
     do_arg.z_bc = BND_CND_PRD;
@@ -235,5 +221,6 @@ int main(int argc,char *argv[]){
     delete result;
     delete X_out;
     delete X_out2;
+    End();
     return 0; 
 }

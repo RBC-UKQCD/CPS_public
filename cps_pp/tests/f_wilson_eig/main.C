@@ -2,14 +2,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:10 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_eig/main.C,v 1.7 2004-08-18 11:58:10 zs Exp $
-//  $Id: main.C,v 1.7 2004-08-18 11:58:10 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-04 07:33:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_eig/main.C,v 1.8 2004-09-04 07:33:14 chulwoo Exp $
+//  $Id: main.C,v 1.8 2004-09-04 07:33:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_eig/main.C,v $
 //  $State: Exp $
 //
@@ -34,7 +34,8 @@ USING_NAMESPACE_CPS
 
 int main(int argc,char *argv[])
 {
-
+  
+  Start();
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
   //----------------------------------------------------------------
@@ -170,7 +171,7 @@ int main(int argc,char *argv[])
       eig.run();
     }
   }
-
+  End();
   return(0);
 }
 
