@@ -1,4 +1,3 @@
-#
 # Note that this shebang line may not work everywhere, as some 
 # Unixies put perl elsewhere, e.g. /usr/bin/perl.
 #

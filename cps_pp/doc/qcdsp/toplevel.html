@@ -1,5 +1,5 @@
-#include<config.h>
-CPS_START_NAMESPACE
+
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
            "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
@@ -390,7 +390,7 @@ TC_BOARD=qcdsp_v&lt;version&#62;
 </pre>
 where <tt>version</tt> is the value of the variable <tt>QOS_VERS</tt>. I believe
 that <tt>TC_DIR</tt> is a list of directories which contain subdirectories
-for <tt>#include</tt> files, run time libraries etc. I suspect that <tt>TC_BOARD</tt>
+for <tt>
 identifies, which QOS operating system version interfaces the hardware
 is compliant with (<em>but this is guesswork on my part. Bob, please enlighten us here</em>.) In any case these variables need to be set to sensible values
 for code to compile, link, resolve and run successfully on the QCDSP computer.
@@ -1298,9 +1298,9 @@ compiler. The programmer merely needs to include the header file in
 his source files using the directive
 
 <pre>
-CPS_END_NAMESPACE
-#include<>
-CPS_START_NAMESPACE
+
+
+
 
 </pre> 
 identically to the way he/she normally includes <b>stdio.h</b>, <b>stdlib.h</b>, 
@@ -1376,11 +1376,11 @@ these functions:
 <a name="tth_fIg3.5">
 </a> <font size="-4">
 <pre>
-CPS_END_NAMESPACE
-#include<>
-#include<>
-#include<>
-CPS_START_NAMESPACE
+
+
+
+
+
 
 int main(int argc, char *argv[])
 {
@@ -1947,11 +1947,11 @@ all its neighbours.
 <p>
 <font size="-3">
 <pre>
-CPS_END_NAMESPACE
-#include<>
-#include<>
-#include<>
-CPS_START_NAMESPACE
+
+
+
+
+
 
 // --------------------------------------------------------------------
 // This function, when given the direction to send in (send direction)
@@ -2766,10 +2766,10 @@ using similar the algorithms described above.
 // ------------------------------------------------------
 // Include Files
 // ------------------------------------------------------
-CPS_END_NAMESPACE
-#include<>
-#include<>
-CPS_START_NAMESPACE
+
+
+
+
 
 // ------------------------------------------------------
 // Macros for picking local min/max
@@ -2876,7 +2876,7 @@ Bob puts it in place). It can be found in <tt>/qcdsp/sfw/qos.5.3.3/example/glb</
 <p>
 The <tt>include</tt> directory contains the file <tt>glb.h</tt> which defines
 the global communication subroutines. This has to be included in any 
-user programs using the <tt>#include</tt> directive. The <tt>src</tt> 
+user programs using the <tt>
 subdirectory contains the source files for the library plus a makefile
 to build the libraries. The <tt>lib</tt> directory is where the compiled
 library gets placed after it is built in the <tt>src</tt> subdirectory. 
@@ -2941,12 +2941,12 @@ them accross the processor grid. The code is shown below:
 <font size="-1">
 
 <pre>
-CPS_END_NAMESPACE
-#include<>
-#include<>
-#include<>
-#include<>
-CPS_START_NAMESPACE
+
+
+
+
+
+
 
 int main(int argc, char *argv[])
 {
@@ -3083,12 +3083,12 @@ in a sensible place where it can stay forever). You can then do
 one of two things.
 
 <ul>
-<li>You can include it with the directive <tt>#include &#223;ensible_path/glb.h"</tt>
+<li>You can include it with the directive <tt>
 where for <tt>sensible_path</tt>, you should substitute the path
 of the sensible place where the header file lives.</li>
 
 <li>
-You can include it with the directive <tt>#include &lt;glb.h&#62;</tt>. In this
+You can include it with the directive <tt>
 case you have to make sure that the compiler will look in the sensible
 place where the <tt>glb.h</tt> file is by default. You can specify
 a list of directories for the compiler to search with the <tt>-i</tt>
@@ -3097,7 +3097,7 @@ compiler flag.</li>
 <li>
 If you feel really unhappy about either of the above options you can
 always copy the <tt>glb.h</tt> file into the directory that you are working
-in and just include it as <tt>#include "glb.h"</tt>. This way you need
+in and just include it as <tt>
 neither edit the makefile nor mess with compiler flags. Its the 
 chicken way out tho' and it may leave you open to having
 different versions of the header file in different projects. A real
@@ -3707,12 +3707,12 @@ Consider the following little program:
 <font size="-3">
 
 <pre>
-CPS_END_NAMESPACE
-#include<>
-#include<>
-#include<>
-#include<>
-CPS_START_NAMESPACE
+
+
+
+
+
+
 
 
 int main( int argc, char *argv[] ) 
@@ -3949,12 +3949,12 @@ To that this has worked consider the following program:
 <font size="-3">
 
 <pre>
-CPS_END_NAMESPACE
-#include<>
-#include<>
-#include<>
-#include<>
-CPS_START_NAMESPACE
+
+
+
+
+
+
 
 int main( int argc, char *argv[] )
 {
@@ -4094,12 +4094,12 @@ of ints:
 <font size="-3">
 
 <pre>
-CPS_END_NAMESPACE
-#include<>
-#include<>
-#include<>
-#include<>
-CPS_START_NAMESPACE
+
+
+
+
+
+
 
 int main( int argc, char *argv[] )
 {
@@ -4414,30 +4414,30 @@ like as follows:
 // Standard headers
 // ------------------------
 
-CPS_END_NAMESPACE
-#include<>
-#include<>
-CPS_START_NAMESPACE
+
+
+
+
 
 // ------------------------
 // QCDSP Non Physics Includes
 // ------------------------
 
-CPS_END_NAMESPACE
-#include<>
-CPS_START_NAMESPACE
+
+
+
 
 // ------------------------
 // QCDSP Physics Includes
 // ------------------------
 
-CPS_END_NAMESPACE
-#include<>
-#include<>
-#include<>
-#include<>
-#include<>
-CPS_START_NAMESPACE
+
+
+
+
+
+
+
 
 // ------------------------
 // These are always defined Globally
@@ -6139,7 +6139,7 @@ for it in the linker control file.
 Likewise we must declare the actual <tt>matVecMult</tt> function as <tt>extern "C"</tt> otherwise the C++ compiler will mangle it to something else and the linker
 will not find a module called <tt>matvecmult</tt>. Instead it will find something
 like <tt>_matVecMult__FPfN21</tt>, which can lead to linking errors. I do 
-this by defining a header file <b>matvecmult.h</b> and <tt>#include</tt>-ing 
+this by defining a header file <b>matvecmult.h</b> and <tt>
 it both into the <b>matvecmult.C</b> file where the subroutine is defined
 (remember it has to be in a separate file to be a separate module) 
 the and <tt>main.C</tt> file where the routine is called. The header file
@@ -6237,9 +6237,9 @@ secondly <b>matvec.h</b>
 #ifndef MATVEC_H
 #define MATVEC_H
 
-CPS_END_NAMESPACE
-#include<defines.h>
-CPS_START_NAMESPACE
+
+
+
 
 // ----------------------------------------
 // Quick and dirty Complex 3x3 matrix class
@@ -6300,9 +6300,9 @@ The corresponding C++ files are <b>matvecmult.C</b>:
 <font size="-3">
 
 <pre>
-CPS_END_NAMESPACE
-#include<matvecmult.h>
-CPS_START_NAMESPACE
+
+
+
 // Define some indexes into the Matrix
 // For Loop Unrolling
 
@@ -6376,14 +6376,14 @@ and finally the main program in <tt>main.C</tt>:
 <font size="-3">
 
 <pre>
-CPS_END_NAMESPACE
-#include<>
-#include<>
-#include<matvec.h>
-#include<defines.h>
-#include<>
-#include<matvecmult.h>
-CPS_START_NAMESPACE
+
+
+
+
+
+
+
+
 
 void printTime(unsigned long start, unsigned long end, char *string)
 {
@@ -6479,14 +6479,14 @@ We now show the whole main program:
 <font size="-3">
 
 <pre>
-CPS_END_NAMESPACE
-#include<>
-#include<>
-#include<defines.h>
-#include<matvec.h>
-#include<>
-#include<matvecmult.h>
-CPS_START_NAMESPACE
+
+
+
+
+
+
+
+
 
 // ------------------------------------------------
 // Entry points defined by the linker control file
@@ -6883,13 +6883,13 @@ last section. We list the complete <b>main.C</b> file below:
 <font size="-3">
 
 <pre>
-CPS_END_NAMESPACE
-#include<>
-#include<>
-#include<defines.h>
-#include<matvec.h>
-#include<>
-CPS_START_NAMESPACE
+
+
+
+
+
+
+
 
 // ------------------------------------------------
 // Entry points defined by the linker control file
@@ -7143,4 +7143,4 @@ by <a href="http://hutchinson.belmont.ma.us/tth/">
 T<sub><font size="-1">T</font></sub>H</a>,
 version 2.92.<br />On  4 Jul 2002, 16:38.</small>
 </body></html>
-CPS_END_NAMESPACE
+

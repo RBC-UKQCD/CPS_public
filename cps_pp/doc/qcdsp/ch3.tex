@@ -1,5 +1,3 @@
-#include<config.h>
-CPS_START_NAMESPACE
 \chapter{Basic Programming of the QCDSP}
 \section{Introduction}
 This chapter is intended as a guide to the basic
@@ -180,9 +178,7 @@ directory part of the default search path for the Tartan C++
 compiler. The programmer merely needs to include the header file in
 his source files using the directive
 \begin{verbatim}
-CPS_END_NAMESPACE
 #include <sysfunc.h>
-CPS_START_NAMESPACE
 \end{verbatim} 
 identically to the way he/she normally includes {\bf stdio.h}, {\bf stdlib.h}, 
 {\bf math.h} and other standard header files.
@@ -241,11 +237,9 @@ these functions:
 \begin{figure}[h]
 \tiny
 \begin{verbatim}
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdlib.h>
 #include <sysfunc,h>
-CPS_START_NAMESPACE
 
 int main(int argc, char *argv[])
 {
@@ -709,11 +703,9 @@ all its neighbours.
 
 {\scriptsize
 \begin{verbatim}
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdlib.h>
 #include <sysfunc.h>
-CPS_START_NAMESPACE
 
 // --------------------------------------------------------------------
 // This function, when given the direction to send in (send direction)
@@ -1039,4 +1031,3 @@ its parity.
 
 \subsection{Exercise 2: Do the transfer}
 Implement the neighbour discovery algorithm outlined above.
-CPS_END_NAMESPACE

@@ -1,5 +1,3 @@
-#include<config.h>
-CPS_START_NAMESPACE
 \chapter{Single Processor Optimisation I -- Using CRAM}
 \section{Introduction}
 The greatest performance gains on the QCDSP can be made through
@@ -414,9 +412,7 @@ secondly {\bf matvec.h}
 #ifndef MATVEC_H
 #define MATVEC_H
 
-CPS_END_NAMESPACE
-#include<defines.h>
-CPS_START_NAMESPACE
+#include "defines.h"
 
 // ----------------------------------------
 // Quick and dirty Complex 3x3 matrix class
@@ -472,9 +468,7 @@ extern "C" void matVecMult(float *, float *, float *);
 The corresponding C++ files are {\bf matvecmult.C}:
 {\scriptsize
 \begin{verbatim}
-CPS_END_NAMESPACE
-#include<matvecmult.h>
-CPS_START_NAMESPACE
+#include "matvecmult.h"
 // Define some indexes into the Matrix
 // For Loop Unrolling
 
@@ -546,14 +540,12 @@ void matVecMult(float *y, float *a, float *x)
 and finally the main program in {\tt main.C}:
 {\scriptsize
 \begin{verbatim}
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdlib.h>
-#include<matvec.h>
-#include<defines.h>
+#include "matvec.h"
+#include "defines.h"
 #include <time.h>
-#include<matvecmult.h>
-CPS_START_NAMESPACE
+#include "matvecmult.h"
 
 void printTime(unsigned long start, unsigned long end, char *string)
 {
@@ -639,14 +631,12 @@ shown the complete linker control file in section \ref{s:ModLCF}.
 We now show the whole main program:
 {\scriptsize
 \begin{verbatim}
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdlib.h>
-#include<defines.h>
-#include<matvec.h>
+#include "defines.h"
+#include "matvec.h"
 #include <time.h>
-#include<matvecmult.h>
-CPS_START_NAMESPACE
+#include "matvecmult.h"
 
 // ------------------------------------------------
 // Entry points defined by the linker control file
@@ -1020,13 +1010,11 @@ seem to work. It is called from {\bf main.C} in a similar manner to the
 last section. We list the complete {\bf main.C} file below:
 {\scriptsize
 \begin{verbatim}
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdlib.h>
-#include<defines.h>
-#include<matvec.h>
+#include "defines.h"
+#include "matvec.h"
 #include <time.h>
-CPS_START_NAMESPACE
 
 // ------------------------------------------------
 // Entry points defined by the linker control file
@@ -1217,4 +1205,3 @@ to treat them as COFF object files.
 
 
 
-CPS_END_NAMESPACE

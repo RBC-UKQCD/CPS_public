@@ -1,4 +1,4 @@
-//$Id: action.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+//$Id: action.dox,v 1.2 2003-07-30 16:32:23 zs Exp $
 /*!
 
 \page actionpage Lattice actions in the CPS
@@ -299,7 +299,7 @@ where the sums over Wilson loops are as defined in the \ref rectal.
 and Wilson loops with \f$ 1 - \mathrm{ReTr}[W_r]/3 > c \f$
  and therefore reduces lattice dislocations, apparently.
 
-It is implemented in the class GpowerRect
+It is implemented in the class GpowerRect.
 
 \subsection  symanzik One-loop Symanzik improved action
 
@@ -313,6 +313,8 @@ It is implemented in the class GpowerRect
 \f]
        where \f$u_0\f$ is the tadpole coefficient
        and \f$\alpha_s = -4\log(u_0)/3.06839\f$.       
+
+It is implemented in the class GimprOLSym.
 
 \section latticeclass Combined actions
 

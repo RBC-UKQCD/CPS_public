@@ -1,5 +1,5 @@
 %------------------------------------------------------------------
-% $Id: porting.tex,v 1.2 2003-07-27 15:13:06 mcneile Exp $
+% $Id: porting.tex,v 1.3 2003-07-30 16:32:01 zs Exp $
 %------------------------------------------------------------------
 %Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
 %
@@ -41,7 +41,7 @@ urlcolor=blue,
 pdfpagemode=None,
 %=UseOutlines,
 pdfhighlight={/I},
-pdftitle={Installing CPS. $Revision: 1.2 $ - $Date: 2003-07-27 15:13:06 $.},
+pdftitle={Installing CPS. $Revision: 1.3 $ - $Date: 2003-07-30 16:32:01 $.},
 pdfauthor={A.N. Jackson \& S. Booth},
 plainpages=false
 ]{hyperref}
@@ -66,8 +66,8 @@ plainpages=false
 
 % title information:
 \title{Installing the Columbia Physics System}
-\author{A.N. Jackson, S. Booth \& C. McNeile}
-\date{\mbox{\small $$Revision: 1.2 $$  $$Date: 2003-07-27 15:13:06 $$}}
+\author{A.N. Jackson \& S. Booth}
+\date{\mbox{\small $$Revision: 1.3 $$  $$Date: 2003-07-30 16:32:01 $$}}
 
 %------------------------------------------------------------------
 \begin{document}
@@ -75,7 +75,7 @@ plainpages=false
 \maketitle
 
 \begin{flushright}
-\href{mailto:mcneile@amtp.liv.ac.uk}{mcneile@amtp.liv.ac.uk}.
+\href{mailto:A.N.Jackson@ed.ac.uk}{A.N.Jackson@ed.ac.uk}.
 \end{flushright}
 
 \tableofcontents
@@ -89,12 +89,11 @@ plainpages=false
 \section{Compiling the code}
 
 \subsection{INSTALLATION ON QCDSP} 
+The original make structure has been retained, and the configuration
+files are set up to default to the target being QCDSP.  Therefore, the
+code should compile straight away by simply running make in the phys/
+directory.
 
-
-The installation on QCDSP has not been tried after 
-the new build structure was designed. Nothing 
-was done in the new build structure to prejudice
-compilation on QCDSP.
 
 \subsection{INSTALLATION ELSEWHERE}
 
@@ -102,14 +101,13 @@ compilation on QCDSP.
 run it in parallel you will require some implementation of MPI.} }
 
 The code configuration is done in config.h. The compilation
-configuration is done in Makefile\_cps. The
-regression-testing code is being put back into the 
-code base.
+configuration is done in Makefile.gnu and Makefile.gnutests.  The
+regression-testing configuration is done in tests/regression.pl.
 
 \subsubsection{The configure script}
 The code uses a fairly standard configure script for cross-platform
 configuration of the makefiles etcetera.  The script should be run from the
-cps++/ directory as ``./configure''.  There are a large number of general
+phys/ directory as ``./configure''.  There are a large number of general
 configuration flags (use ``./configure --help'' to see them all) but only a
 few of these influence the behaviour of the physics code itself:
 \begin{itemize}
@@ -119,13 +117,11 @@ few of these influence the behaviour of the physics code itself:
 
 If all goes well, you may build via the GNU make files using:
 \begin{itemize}
- \item{\tt gmake -f Makefile\_cps depend} --- Creates the dependencies
- \item{\tt gmake -f Makefile\_cps } --- compiles the cps.a library
- \item{\tt gmake -f Makefile\_cps clean} --- Cleans everything.
-%% \item{\tt gmake -f Makefile.gnu testprogs} --- Makes only the test suite. 
-%% \item{\tt gmake -f Makefile.gnu cleantests} --- Cleans only the test suite.
+ \item{\tt gmake -f Makefile.gnu [all]} --- Makes everything.
+ \item{\tt gmake -f Makefile.gnu clean} --- Cleans everything.
+ \item{\tt gmake -f Makefile.gnu testprogs} --- Makes only the test suite.
+ \item{\tt gmake -f Makefile.gnu cleantests} --- Cleans only the test suite.
 \end{itemize}
-This will create the library: cps.a.
 
 \subsubsection{Manual configuration}
 The current configure script handles ome things (e.g. the MPI include/linkage)
@@ -168,6 +164,19 @@ with the default code output on QCDSP.
 The elements you may have to change
 lie between the ***COMPILATION FLAGS*** markers.  
 
+In Makefile.gnu, this concerns the compiler name and flags (the
+{\tt -I(top\_dir)/nga/mpi\_scu} tells the code where the MPISCU include files
+are).
+
+In Makefile.gnutests, you must choose which set of library files to
+compile against (depending on whether the code is serial or
+MPI-parallel) and define the compilation and linking flags.
+
+\item{Testing Script {\tt tests/regression.pl}}\\
+At the start of tests/regression.pl three different examples of
+testing configuration are given.  The first set runs the parallel
+QCDSP version, the second set runs the serial QCDSP version and the
+third set runs the non-QCDSP version.  
 
 \end{itemize}
 
@@ -177,6 +186,29 @@ lie between the ***COMPILATION FLAGS*** markers.
 \section{Platforms}
 The code has been used on the following platforms.
 
+\subsection{Columbia: QCDSP}
+The serial and parallel versions compile straight out of the box using
+the "gmake -f Makefile.gnu" and "make" commands respectively.
+
+\subsection{EPCC: Cray T3E}
+For compilation the following set of commands seems to work:
+\begin{verbatim}
+bash$ export PATH=/opt/open/bin:$PATH
+bash$ autoconf
+bash$ ./configure --enable-parallel-mpi CC=CC CFLAGS="-O3 -h conform"
+bash$ make -f Makefile.gnu all
+\end{verbatim}
+
+I don't know why you have to run autoconf on the T3E.  It must be some
+localised abberation because it is not necessary on other platforms.
+
+\subsection{UKQCD: Ukqcd2; an Alpha}
+
+\subsection{EPCC: Bronzite; a Sun workstation}
+
+\subsection{EPCC: Lomond; a Sunfire 6800 SMP}
+
+\subsection{EPCC: Bobcat; a Beowulf cluster}
 
 
 \end{document}

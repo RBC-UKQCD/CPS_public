@@ -1,5 +1,3 @@
-#include<config.h>
-CPS_START_NAMESPACE
 \chapter{I/O on the QCDSP}
 \section{Introduction}
 In this chapter we discuss the facilities afforded by QCDSP to perform
@@ -498,12 +496,10 @@ some memory from a program. We now proceed to demonstrate how this is done.
 Consider the following little program:
 {\scriptsize
 \begin{verbatim}
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <sysfunc.h>
-CPS_START_NAMESPACE
 
 
 int main( int argc, char *argv[] ) 
@@ -696,12 +692,10 @@ to load the value 5 into the memories of all the processors at address
 To that this has worked consider the following program:
 {\scriptsize
 \begin{verbatim}
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <sysfunc.h>
-CPS_START_NAMESPACE
 
 int main( int argc, char *argv[] )
 {
@@ -823,12 +817,10 @@ Consider the little program above but now converted to dump floats instead
 of ints:
 {\scriptsize
 \begin{verbatim}
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <sysfunc.h>
-CPS_START_NAMESPACE
 
 int main( int argc, char *argv[] )
 {
@@ -1107,30 +1099,24 @@ like as follows:
 // Standard headers
 // ------------------------
 
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdlib.h>     // Exit
-CPS_START_NAMESPACE
 
 // ------------------------
 // QCDSP Non Physics Includes
 // ------------------------
 
-CPS_END_NAMESPACE
 #include <sysfunc.h>
-CPS_START_NAMESPACE
 
 // ------------------------
 // QCDSP Physics Includes
 // ------------------------
 
-CPS_END_NAMESPACE
 #include <util/include/lattice.h>   //  Lattice Classes
 #include <util/include/gjp.h>       //  Global Job Parameters  Class
 #include <util/include/verbose.h>   //  Verbose Output 
 #include <util/include/error.h>     //  Error Handler Class
 #include <alg/include/do_arg.h>     //  Some kind of argument handling class
-CPS_START_NAMESPACE
 
 // ------------------------
 // These are always defined Globally
@@ -1747,4 +1733,3 @@ the QC-Shell commands can be listed using the QC-Shell command {\tt qhelp}.
 It is recommended that the output is piped through a pager such as {\tt less}
 or {\tt more}.
 
-CPS_END_NAMESPACE

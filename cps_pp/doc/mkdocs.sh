@@ -1,15 +1,28 @@
+# $Id: mkdocs.sh,v 1.2 2003-07-30 16:31:11 zs Exp $
 # Runs doxygen to produce the reference manual and the user guide and 
 # installdox to get the cross-references right.
 
 # This script is really meant to be called from Makefile_cps and so the
 # CPS directory structure is assumed e.g. the ref and usr directories 
-# and the source are in all the right places. However, we can allow it to 
-# be called as  a stand-alone script from the doc directory.
+# and the source are in all the right places.
+# However it can still be useful to use
+# this as a stand-alone script. The bottom line is that this script expects 
+# to be called from its own directory or its parent directory.
 
-topdir=`echo $PWD | sed -e 's:/doc$::'`
-docdir=$topdir/doc
 
-# this does not always work :(
+if [ `basename $PWD` == 'doc' ]
+then
+    docdir=`pwd -P`
+    topdir=`echo $docdir | sed -e 's:/doc$::'`
+else
+    topdir=`pwd -P` 
+    docdir=$topdir/doc
+fi
+
+
+
+
+# this is not supported for doxygen pre 1.2.17 or thereabouts
 
 sed -e "s:^STRIP_FROM_PATH.*:STRIP_FROM_PATH $topdir/:" $docdir/ref/doxygen.cfg > /tmp/tempdox
 mv /tmp/tempdox $docdir/ref/doxygen.cfg
@@ -29,11 +42,11 @@ do
 	doxygen doxygen.cfg		
 done
 
-# doxygen doesn't always manage to strip paths so this is a failsafe hack
+# hack if this doxygen version cannot strip paths  
 
-for f in $docdir/ref/html/files.html `ls $docdir/ref/html/*8[Ch]*.html`
+for f in `ls $docdir/ref/html/*.html`
 do
-	sed -e s:$topdir/:: $f > /tmp/painful
+	sed -e s:$topdir/::g $f > /tmp/painful
 	mv /tmp/painful $f
 done
 
