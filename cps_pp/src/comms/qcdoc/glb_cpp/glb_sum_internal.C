@@ -25,6 +25,7 @@ CPS_END_NAMESPACE
 #include<util/gjp.h>
 #include<comms/double64.h>
 #include <comms/sysfunc.h>
+#include "glb_sum_internal.h"
 CPS_START_NAMESPACE
 
 
@@ -32,8 +33,14 @@ CPS_START_NAMESPACE
 static Double64 *transmit_buf = NULL;
 static Double64 *receive_buf = NULL;
 static Double64 *gsum_buf = NULL;
-const int MAX_BUF = 72;
+static SCUDirArgIR *Send[5];
+static SCUDirArgIR *Recv[5];
+static SCUDirArgMulti *multi[5];
+//const int MAX_BUF = 72;
 static int output = 0;
+static int initted = 0;
+static int NP[5];
+static int length[5];
 
 
 //----------------------------------------------------------------------
@@ -45,38 +52,84 @@ static int output = 0;
   \ingroup comms
 */
 //---------------------------------------------------------------------- 
-void glb_sum(Float * float_p)
+void glb_sum_internal (Float * float_p, int dir,int len)
 {
-  int NP[4] = {GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes()};
-  static int counter = 0;
-  if (transmit_buf == NULL) 
-      transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
-  if (receive_buf == NULL) 
-      receive_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
-  if (gsum_buf == NULL) 
-      gsum_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
-  if (output) printf("glb_sum cpp %d before = %e ", counter, (double)*float_p);
-  *gsum_buf = (Double64)*float_p;
+//  printf("float_p(%p)=%e dir=%d len=%d\n",float_p,*float_p,dir,len);
+  if (!initted) {
+    NP[0]=GJP.Xnodes();
+	int max = NP[0];
+    NP[1]=GJP.Ynodes();
+    NP[2]=GJP.Znodes();
+    NP[3]=GJP.Tnodes();
+    NP[4]=GJP.Snodes();
+    for (int i = 1;i<5;i++)
+      if (max <NP[i]) max = NP[i]; 
+//    printf("max=%d\n",max);
+    transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64)*MAX_BUF*2);
+    receive_buf = transmit_buf +MAX_BUF;
+    gsum_buf = (Double64 *)qalloc(0,sizeof(Double64)*MAX_BUF*max);
+//    printf("gsum_buf=%p\n",gsum_buf);
+    for(int i = 0;i<5;i++){
+	  length[i] = 1;
+      Send[i]= new SCUDirArgIR(transmit_buf,gjp_scu_dir[2*i+1],SCU_SEND,length[i]*sizeof(Double64));
+       Recv[i]= new SCUDirArgIR(receive_buf,gjp_scu_dir[2*i],SCU_REC,length[i]*sizeof(Double64));
+    }
+  }
+  static Double64 tmp_sum[MAX_BUF];
+//  if (output) printf"glb_sum cpp %d before = %e ", counter, (double)*float_p);
+  if (length[dir] !=len){
+		 length[dir] = len;
+		 delete Send[dir]; 
+         Send[dir]= new SCUDirArgIR(transmit_buf,gjp_scu_dir[2*dir+1],SCU_SEND,length[dir]*sizeof(Double64));
+		 delete Recv[dir]; 
+         Recv[dir]= new SCUDirArgIR(receive_buf,gjp_scu_dir[2*dir],SCU_REC,length[dir]*sizeof(Double64));
+  }
 
-  for(int i = 0; i < 4; ++i) {
+  int coor = GJP.NodeCoor(dir);
+//printf("ccoor(%d)=%d\n",dir,coor);
+  for(int i = 0;i<len;i++){
+  transmit_buf[i] = gsum_buf[coor*len+i] = (Double64)(float_p[i]);
+//  printf("float_p[%d]=%e\n",i,float_p[i]);
+  }
 
-      *transmit_buf = *gsum_buf;
+ //     *transmit_buf = *gsum_buf;
 
-      for (int itmp = 1; itmp < NP[i]; itmp++) {
-	SCUDirArg send(transmit_buf, gjp_scu_dir[2*i], SCU_SEND, sizeof(Double64) );
-	SCUDirArg rcv(receive_buf, gjp_scu_dir[2*i+1], SCU_REC, sizeof(Double64) );
+    for (int itmp = 1; itmp < NP[dir]; itmp++) {
+//      printf("dir=%d itmp=%d\n",dir,itmp);
+      coor = (coor+1)%NP[dir];
+      Send[dir]->StartTrans();
+      Recv[dir]->StartTrans();
+      Send[dir]->TransComplete();
+      Recv[dir]->TransComplete();
 
-	send.StartTrans();
-	rcv.StartTrans();
-	send.TransComplete();
-	rcv.TransComplete();
-
-        *gsum_buf += *receive_buf;
-        *transmit_buf = *receive_buf;
+      for(int i = 0;i<len;i++){
+        gsum_buf[coor*len+i] = receive_buf[i];
+        transmit_buf[i] = receive_buf[i];
       }
   }
-  *float_p = (Float)*gsum_buf;
+  for(int i = 0;i<len;i++){
+    tmp_sum[i] = gsum_buf[i];
+    for( int itmp=1;itmp<NP[dir];itmp++){
+      tmp_sum[i] += gsum_buf[itmp*len+i];
+    }
+    float_p[i] = (Float)tmp_sum[i];
+//  printf("float_p[%d]=%e\n",i,float_p[i]);
+  }
+#if 0
+  int coor = GJP.NodeCoor(dir);
+	if (coor ==0 ){
+		Send[dir]->StartTrans();Send[dir] ->TransComplete();
+	}else {
+		Recv[dir]->StartTrans(); Recv[dir]->TransComplete();
+		if (coor < NP[dir]-1 ){
+			Send[dir]->StartTrans(); Send[dir]->TransComplete();
+		}
+	}
+
+  for(int i = 0;i<len;i++)
+  float_p[i] = (Float )transmit_buf[i];
+#endif
   if (output)   printf("after = %e\n", (double)*float_p);
-  counter++;
+  initted = 1;
 }
 CPS_END_NAMESPACE

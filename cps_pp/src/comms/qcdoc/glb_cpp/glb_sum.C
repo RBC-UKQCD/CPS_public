@@ -25,6 +25,7 @@ CPS_END_NAMESPACE
 #include<util/gjp.h>
 #include<comms/double64.h>
 #include <comms/sysfunc.h>
+#include "glb_sum_internal.h"
 CPS_START_NAMESPACE
 
 
@@ -46,6 +47,11 @@ static int output = 0;
 */
 //---------------------------------------------------------------------- 
 void glb_sum(Float * float_p)
+#if 1
+{
+	glb_sum_internal2(float_p,4);
+}
+#else
 {
   int NP[4] = {GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes()};
   static int counter = 0;
@@ -79,4 +85,5 @@ void glb_sum(Float * float_p)
   if (output)   printf("after = %e\n", (double)*float_p);
   counter++;
 }
+#endif
 CPS_END_NAMESPACE

@@ -24,6 +24,7 @@ CPS_END_NAMESPACE
 #include<util/gjp.h>
 #include<comms/double64.h>
 #include <comms/sysfunc.h>
+#include "glb_sum_internal.h"
 CPS_START_NAMESPACE
 
 #define MAX_NUM_WORDS 40  //set to larger than size of double precision 3x3 matrix
@@ -46,7 +47,21 @@ static Double64 *gsum_buf = NULL;
   \ingroup comms
 */
 //---------------------------------------------------------------------- 
+
 void glb_sum_multi_dir(Float * float_p, int dir, int len)
+#if 1
+{
+	int len2 = len ;
+	Float *tmp = float_p;
+	while( len2 > MAX_BUF){
+		glb_sum_internal(tmp,dir,MAX_BUF);
+		len2 -=MAX_BUF;
+		tmp += MAX_BUF;
+	}
+	if (len2>0)
+		glb_sum_internal(tmp,dir,len2);
+}
+#else
 {
   int NP[5] = {GJP.Xnodes(), 
 	       GJP.Ynodes(), 
@@ -127,6 +142,7 @@ void glb_sum_multi_dir(Float * float_p, int dir, int len)
   }
  
 }
+#endif
 
 
 CPS_END_NAMESPACE

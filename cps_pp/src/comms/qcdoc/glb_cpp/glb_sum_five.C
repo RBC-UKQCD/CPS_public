@@ -27,6 +27,7 @@ CPS_END_NAMESPACE
 #include<util/gjp.h>
 #include<comms/double64.h>
 #include <comms/sysfunc.h>
+#include "glb_sum_internal.h"
 CPS_START_NAMESPACE
 
 
@@ -48,6 +49,11 @@ static Double64 *gsum_buf = NULL;
 //---------------------------------------------------------------------- 
 
 void glb_sum_five(Float * float_p)
+#if 1
+{
+	glb_sum_internal2(float_p,5);
+}
+#else
 {
   int NP[5] = {GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes(), GJP.Snodes()};
 
@@ -65,16 +71,15 @@ void glb_sum_five(Float * float_p)
   int i;
   for(i = 0; i < 5; ++i) {
 
-      transmit_buf = gsum_buf;
+      *transmit_buf = *gsum_buf;
 
       for (int itmp = 1; itmp < NP[i]; itmp++) {
 	SCUDirArg send(transmit_buf, gjp_scu_dir[2*i], SCU_SEND, sizeof(Double64));
 	SCUDirArg rcv(receive_buf, gjp_scu_dir[2*i+1], SCU_REC, sizeof(Double64));
 
-	SCUTrans(&send);
-	SCUTrans(&rcv);
+	send.StartTrans(); rcv.StartTrans();
+	send.TransComplete(); rcv.TransComplete();
 
-	SCUTransComplete();
 
         *gsum_buf += *receive_buf;
         *transmit_buf = *receive_buf;
@@ -88,21 +93,19 @@ void glb_sum_five(Float * float_p)
      GJP.ZnodeCoor() != 0 || 
      GJP.TnodeCoor() != 0 || 
      GJP.SnodeCoor() != 0 ) {
-    gsum_buf = 0;
+    *gsum_buf = 0.;
   }
 
   for(i = 0; i < 5; ++i) {
     
-      transmit_buf = gsum_buf;
+      *transmit_buf = *gsum_buf;
 
       for (int itmp = 1; itmp < NP[i]; itmp++) {
 	SCUDirArg send(transmit_buf, gjp_scu_dir[2*i], SCU_SEND, sizeof(Double64));
 	SCUDirArg rcv(receive_buf, gjp_scu_dir[2*i+1], SCU_REC, sizeof(Double64));
 
-	SCUTrans(&send);
-	SCUTrans(&rcv);
-
-	SCUTransComplete();
+	send.StartTrans(); rcv.StartTrans();
+	send.TransComplete(); rcv.TransComplete();
 
         *gsum_buf += *receive_buf;
         *transmit_buf = *receive_buf;
@@ -110,7 +113,8 @@ void glb_sum_five(Float * float_p)
   }
 
   *float_p = *gsum_buf;
+//  printf("glb_sum_five() %e\n",*float_p);
 }
-
+#endif
 
 CPS_END_NAMESPACE

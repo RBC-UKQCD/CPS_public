@@ -1,5 +1,6 @@
 #include<config.h>
 #include<qalloc.h>
+#include "glb_sum_internal.h"
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
@@ -48,6 +49,12 @@ static Matrix *gsum_buf = NULL;
 //---------------------------------------------------------------------- 
 
 void glb_sum_matrix_dir(Matrix * matrix_p, int dir)
+#if 1
+{
+	VRB.Func("","glb_sum_matrix_dir");
+	glb_sum_internal((Float *)matrix_p,dir,sizeof(Matrix)/sizeof(Float));
+}
+#else
 {
   int NP[5] = {GJP.Xnodes(), 
 	       GJP.Ynodes(), 
@@ -115,6 +122,7 @@ void glb_sum_matrix_dir(Matrix * matrix_p, int dir)
 
   *matrix_p = *gsum_buf;
 }
+#endif
 
 
 CPS_END_NAMESPACE

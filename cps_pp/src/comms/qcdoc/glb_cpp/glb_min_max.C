@@ -63,7 +63,7 @@ void glb_max(Float * float_p)
 
   for(int i = 0; i < 4; ++i) {
 
-      transmit_buf = gsum_buf;
+      *transmit_buf = *gsum_buf;
 
       for (int itmp = 1; itmp < NP[i]; itmp++) {
 	SCUDirArg send(transmit_buf, dir[2*i], SCU_SEND, sizeof(Float));
