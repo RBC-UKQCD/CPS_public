@@ -11,7 +11,7 @@
 # cps code.
 TOP=../../..
 
-COMPILER = mpic++
+COMPILER = c++
 LDFLAGS = -lm
 
 
@@ -19,7 +19,7 @@ LDFLAGS = -lm
 TARGET_QCDSP = 0
 
 # PARALLEL = 1 for parallel compilation, 0 for serial compilation 
-PARALLEL = 1
+PARALLEL = 0
 
 
 #
@@ -33,7 +33,7 @@ INCLIST := $(INCLIST) -I$(TOPINC)/include/comms
 endif
 endif
 
-CFLAGS= -DTARGET_QCDSP=$(TARGET_QCDSP)  -O2
+CFLAGS= -g -O2 
 
 #
 # Libraries for the Columbia code
