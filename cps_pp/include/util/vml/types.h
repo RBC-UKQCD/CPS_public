@@ -4,7 +4,7 @@
 #define VML_FALSE ((long) 0)
 typedef int bool_t;
 typedef int enum_t;
-#if TARGET == QCDOC
+#if 1
 typedef char int8_t;
 typedef short int16_t;
 typedef int int32_t;
