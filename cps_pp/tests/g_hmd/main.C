@@ -1,15 +1,16 @@
 #include<config.h>
+#include<stdlib.h>
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:10 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.7 2004-08-18 11:58:10 zs Exp $
-//  $Id: main.C,v 1.7 2004-08-18 11:58:10 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-08-30 04:46:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.8 2004-08-30 04:46:19 chulwoo Exp $
+//  $Id: main.C,v 1.8 2004-08-30 04:46:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -21,6 +22,7 @@
 #include<alg/alg_rect.h>
 #include<alg/do_arg.h>
 #include<alg/no_arg.h>
+#include<comms/sysfunc.h>
 
 
 CPS_START_NAMESPACE
@@ -42,27 +44,27 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
   //----------------------------------------------------------------
+  Start();
   DoArg do_arg;
 
-  do_arg.x_node_sites = 4;
-  do_arg.y_node_sites = 4;
-  do_arg.z_node_sites = 4;
-  do_arg.t_node_sites = 4;
+  int nx,ny,nz,nt;
+  if (argc<5) {printf("usage: %s nx ny nz nt\n",argv[0]);exit(-2);}
+  sscanf(argv[1],"%d",&nx);
+  sscanf(argv[2],"%d",&ny);
+  sscanf(argv[3],"%d",&nz);
+  sscanf(argv[4],"%d",&nt);
+  printf("sizes = %d %d %d %d\n",nx,ny,nz,nt);
+  do_arg.x_node_sites = nx/SizeX();
+  do_arg.y_node_sites = ny/SizeY();
+  do_arg.z_node_sites = nz/SizeZ();
+  do_arg.t_node_sites = nt/SizeT();
   do_arg.s_node_sites = 2;
 
-#ifdef PARALLEL
-  do_arg.x_nodes = 2;
-  do_arg.y_nodes = 2;
-  do_arg.z_nodes = 2;
-  do_arg.t_nodes = 2;
+  do_arg.x_nodes = SizeX();
+  do_arg.y_nodes = SizeY();
+  do_arg.z_nodes = SizeZ();
+  do_arg.t_nodes = SizeT();
   do_arg.s_nodes = 1;
-#else
-  do_arg.x_nodes = 1;
-  do_arg.y_nodes = 1;
-  do_arg.z_nodes = 1;
-  do_arg.t_nodes = 1;
-  do_arg.s_nodes = 1;
-#endif 
 
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
@@ -77,9 +79,11 @@ int main(int argc,char *argv[])
   do_arg.power_plaq_exponent = 2;
   do_arg.power_rect_cutoff = 0.9;
   do_arg.power_rect_exponent = 4;
+  do_arg.u0 = 0.9; // for GimprOLSym
 
   GJP.Initialize(do_arg);
-
+  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+//  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
 
   //----------------------------------------------------------------
   // Initialize argument structures
@@ -113,11 +117,12 @@ int main(int argc,char *argv[])
   hmd_arg.n_bsn_masses = 0;
   hmd_arg.max_num_iter[0] = 5;
   hmd_arg.stop_rsd[0] = 1.0E-12;
-  hmd_arg.step_size = 0.02;
-  hmd_arg.steps_per_traj = 20;
+  hmd_arg.step_size = 0.01;
+  hmd_arg.steps_per_traj = 1;
   hmd_arg.metropolis = METROPOLIS_YES;
   hmd_arg.reunitarize = REUNITARIZE_YES;
 
+#if 1
   //----------------------------------------------------------------
   // Run HMC Phi for Gwilson
   //----------------------------------------------------------------
@@ -183,7 +188,27 @@ int main(int argc,char *argv[])
       rect.run();
     }
   }
+#endif
 
+  //----------------------------------------------------------------
+  // Run HMC Phi for GimprOLSym
+  //----------------------------------------------------------------
+  {
+    GimprOLSymFnone lat;
+    AlgHmcPhi hmc(lat,&common_arg_hmc,&hmd_arg);
+    AlgPlaq plaq(lat,&common_arg_pr_plaq,&plaq_arg);
+    AlgRect rect(lat,&common_arg_pr_rect,&plaq_arg);
+    
+    plaq.run();
+    rect.run();
+    for (int i = 0; i < 3; ++i) {
+      hmc.run();
+      plaq.run();
+      rect.run();
+    }
+  }
+
+  End();
   return(0);
 }
 
