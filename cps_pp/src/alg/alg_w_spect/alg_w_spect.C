@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-12-11 20:58:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.7 2004-12-11 20:58:01 chulwoo Exp $
-//  $Id: alg_w_spect.C,v 1.7 2004-12-11 20:58:01 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2005-02-18 19:53:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.8 2005-02-18 19:53:31 mclark Exp $
+//  $Id: alg_w_spect.C,v 1.8 2005-02-18 19:53:31 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_w_spect.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v $
 //  $State: Exp $
 //
@@ -82,6 +82,8 @@ AlgWspect::AlgWspect(Lattice& latt,
     d_arg_p(w_arg),
     d_num_args(n_quark_masses)
 {
+  cg_arg = cg;
+
   // Obtain an instance of the support class WspectGinfo
   //------------------------------------------------------------------------
   WspectGinfo g_info;
@@ -155,7 +157,7 @@ void AlgWspect::run()
   int total_b = clock();
   int total_e;  
 #endif
-  CgArg cg;
+  //CgArg cg;
   char *fname = "run()";
   VRB.Func(d_class_name,fname);
 
@@ -207,7 +209,7 @@ void AlgWspect::run()
     // create local quark propagator
     // printf("create quark q1 \n");
      WspectQuark q1(lat, output->cg, output->pbp,
-                  output->mid_point, output->a0_p, d_arg_p[0], cg,hyperRect);
+                  output->mid_point, output->a0_p, d_arg_p[0], *cg_arg,hyperRect);
 		  
      // printf("finished quark q1 \n");
 #ifdef  TIMING_ALG_W_SPECT
