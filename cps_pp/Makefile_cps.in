@@ -65,6 +65,7 @@ webdocs:
 	@echo This will delete all the source code
         @rm -i -r src
         @rm -r src tests include
+        make -f $(MAKEFILE) docs
 endif
 
 clean:
