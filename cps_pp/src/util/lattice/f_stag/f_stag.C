@@ -242,9 +242,25 @@ int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
       stag.Dslash(f_out_d[s],f_out[s],CHKB_EVEN,DAG_NO);
+  cg_arg->true_rsd = RsdCG[isz];
 
   return iter;
 
+}
+
+//------------------------------------------------------------------
+// Lattice class api to the chronological inverter
+//------------------------------------------------------------------
+Float Fstag::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
+{
+
+  char *fname = "FminResExt(V*, V*, V**, V**, int, CgArg *, CnvFrmType)";
+  VRB.Func(cname,fname);
+  
+  DiracOpStag stag(*this, sol, source, cg_arg, cnv_frm);
+  return stag.MinResExt(sol,source,sol_old,vm,degree);
+  
 }
 
 //------------------------------------------------------------------

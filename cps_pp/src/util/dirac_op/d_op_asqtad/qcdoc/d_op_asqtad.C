@@ -185,7 +185,7 @@ void DiracOpAsqtad::MatPcDagMatPc(Vector *out,
   } else {
     CGflops +=f_size_cb*2;
     nflops +=f_size_cb*2;
-	vaxmy(&mass_sq,in,out,f_size_cb/6);
+    vaxmy(&mass_sq,in,out,f_size_cb/6);
   }
 
 #ifdef PROFILE

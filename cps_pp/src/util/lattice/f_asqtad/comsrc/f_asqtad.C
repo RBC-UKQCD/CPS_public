@@ -9,7 +9,7 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/f_asqtad.C,v $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -150,9 +150,25 @@ int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
       asqtad.Dslash(f_out_d[s],f_out[s],CHKB_EVEN,DAG_NO);
+  cg_arg->true_rsd = RsdCG[isz];
 
   return iter;
 
+}
+
+//------------------------------------------------------------------
+// Lattice class api to the chronological inverter
+//------------------------------------------------------------------
+Float Fasqtad::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
+{
+
+  char *fname = "FminResExt(V*, V*, V**, V**, int, CgArg *, CnvFrmType)";
+  VRB.Func(cname,fname);
+  
+  DiracOpAsqtad asqtad(*this, sol, source, cg_arg, cnv_frm);
+  return asqtad.MinResExt(sol,source,sol_old,vm,degree);
+  
 }
 
 //------------------------------------------------------------------

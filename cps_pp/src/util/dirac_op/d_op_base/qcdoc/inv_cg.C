@@ -10,14 +10,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-09 04:15:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.7 2004-07-09 04:15:17 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.7 2004-07-09 04:15:17 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-08-05 19:00:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.8 2004-08-05 19:00:56 mclark Exp $
+//  $Id: inv_cg.C,v 1.8 2004-08-05 19:00:56 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -42,7 +42,7 @@ CPS_END_NAMESPACE
 #include <qcdocos/gint.h>
 CPS_START_NAMESPACE
 
-#undef PROFILE
+#define PROFILE
 
 // PAB generic Dop flops reporting
 //int DiracOp::CGflops;
@@ -65,12 +65,16 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #endif
 
-#if 0
 extern "C" { 
-  void vaxpy3(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec);
-  void vaxpy3_norm(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec,Float *norm);
+  void invcg_r_norm(IFloat *resa, IFloat *scale, IFloat *mult, IFloat *add, 
+		      int ncvec, IFloat *norm);
+  void invcg_xp_update(IFloat *out1, IFloat *out2, IFloat *A, IFloat *B, 
+		       IFloat *mult, IFloat *add, int size);
 }
-#endif
+
+// The granularity used in the interleaving
+#define GRAN 12
+
 //------------------------------------------------------------------
 /*!
   Solves \f$ M^\dagger M out = in \f$ for \a out using the Conjugate
@@ -104,7 +108,7 @@ int DiracOp::InvCg(Vector *out,
   Float a;
   Float b;
   Float d;
-  int i;
+  int i, j;
   char *fname = "InvCg(V*,V*,F,F*)";
 
 // Flash the LED and then turn it off
@@ -147,17 +151,19 @@ int DiracOp::InvCg(Vector *out,
   } else {
     f_size_cb = GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
   }
-    
-// Allocate memory for the residual vector res.
+  
+  if (f_size_cb % GRAN != 0) 
+    ERR.General(cname,fname,"Field length %d is not a multiple of granularity %d\n", GRAN, f_size_cb);
+
+// Allocate memory for the solution/residual field.
 //------------------------------------------------------------------
-  Vector *res = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
-  if(res == 0){
-    res = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
-    printf("res=%p\n",res);
+  IFloat *X = (IFloat *) qalloc(QCOMMS|QFAST,2*f_size_cb * sizeof(Float));
+  if(X == 0){
+    X = (IFloat *) qalloc(QCOMMS,2*f_size_cb * sizeof(Float));
+    printf("X=%p\n",X);
   }
-  if(res == 0)
-    ERR.Pointer(cname,fname, "res");
-  VRB.Smalloc(cname,fname, "res", res, f_size_cb * sizeof(Float));
+  if(X == 0) ERR.Pointer(cname,fname, "X");
+  VRB.Smalloc(cname,fname, "X", X, 2*f_size_cb * sizeof(Float));
 
 // Allocate memory for the direction vector dir.
 //------------------------------------------------------------------
@@ -233,16 +239,28 @@ int DiracOp::InvCg(Vector *out,
   MatPcDagMatPc(mmp, sol);
 
   // res = src
-  res->CopyVec(src, f_size_cb);
+  dir->CopyVec(src, f_size_cb);
 
   // res -= mmp
-  res->VecMinusEquVec(mmp, f_size_cb);
+  dir->VecMinusEquVec(mmp, f_size_cb);
 
   // dir = res
-  dir->CopyVec(res, f_size_cb);  
+  //dir->CopyVec(res, f_size_cb);  
+
+  IFloat *Fsol = (IFloat*)sol;
+  IFloat *Fdir = (IFloat*)dir;
+  IFloat *Fmmp = (IFloat*)mmp;
+  IFloat *Xptr;
+
+  // Interleave solution and residual
+  Xptr = X;
+  for (j=0; j<f_size_cb/GRAN;j++) {
+    for (i=0; i<GRAN; i++) *Xptr++ = *(Fsol+j*GRAN+i);
+    for (i=0; i<GRAN; i++) *Xptr++ = *(Fdir+j*GRAN+i);
+  }
 
   // res_norm_sq_cur = res * res
-  res_norm_sq_cur = res->NormSqNode(f_size_cb);
+  res_norm_sq_cur = dir->NormSqNode(f_size_cb);
 
   DiracOpGlbSum(&res_norm_sq_cur);
 
@@ -261,10 +279,10 @@ int DiracOp::InvCg(Vector *out,
   struct timeval linalg_start;
   struct timeval linalg_end;
 
-    CGflops    = 0;
-    int nflops = 0;
-    int nflops_tmp;
-    gettimeofday(&start,NULL);
+  CGflops    = 0;
+  int nflops = 0;
+  int nflops_tmp;
+  gettimeofday(&start,NULL);
 
 #endif
 
@@ -299,58 +317,46 @@ int DiracOp::InvCg(Vector *out,
     DiracOpGlbSum(&d);
 
     // If d = 0 we are done
-    if(d == 0.0) {
-      break;
-      //??? or should we give a warning or error? Yes we should, really.
-    }
+    if(d == 0.0) break;
+    //??? or should we give a warning or error? Yes we should, really.
 
-    a = res_norm_sq_prv / d;
+    a = -res_norm_sq_prv / d;
 
-    // sol = a * dir + sol;
-    //sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
-
-    vaxpy3(sol,&a,dir,sol,f_size_cb/6);
-
-
-#ifdef PROFILE
-//    nflops_tmp +=f_size_cb*2;
-#endif
-    CGflops+=f_size_cb*2;
-
-    //PAB. Should be able to use "vaxpy_norm here"
     // res = - a * (MatPcDagMatPc * dir) + res;
     // res_norm_sq_cur = res * res
 
-   // a *= -1.0;
-  double ma = -a;
-    vaxpy3_norm(res,&ma,mmp,res,f_size_cb/6,&res_norm_sq_cur);
+    invcg_r_norm(X+GRAN, &a, Fmmp, X+GRAN, f_size_cb/GRAN, &res_norm_sq_cur);
     DiracOpGlbSum(&res_norm_sq_cur);
 #ifdef PROFILE
 //    nflops_tmp +=f_size_cb*4;
 #endif
     CGflops+=f_size_cb*4;
 
+    a = -a;
+    b = res_norm_sq_cur / res_norm_sq_prv;
+
+    // sol = a * dir + sol;
+    //sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
+    // dir = b * dir + res;
+    invcg_xp_update(X, Fdir, &a, &b, Fdir, X, f_size_cb/GRAN);
+
+
+#ifdef PROFILE
+//    linalg_start = linalg_tmp;
+//    gettimeofday(&linalg_end,NULL);
+//    nflops =nflops_tmp+f_size_cb*4;
+#endif
+    CGflops+=f_size_cb*4;
 
     // if( |res|^2 <= stp_cnd ) we are done
     VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", itr, IFloat(res_norm_sq_cur));
     if(res_norm_sq_cur <= stp_cnd) break;
 
-    b = res_norm_sq_cur / res_norm_sq_prv;
-
-    // dir = b * dir + res;
-    vaxpy3(dir,&b,dir,res,f_size_cb/6);
-#ifdef PROFILE
-//    linalg_start = linalg_tmp;
-//    gettimeofday(&linalg_end,NULL);
-//    nflops =nflops_tmp+f_size_cb*2;
-#endif
-    CGflops+=f_size_cb*2;
   }
 
 #ifdef PROFILE
-    gettimeofday(&end,NULL);
-
-    report_flops(CGflops,&start,&end); 
+  gettimeofday(&end,NULL);
+  report_flops(CGflops,&start,&end); 
 #endif
 
   // It has not reached stp_cnd: Issue a warning
@@ -364,18 +370,24 @@ int DiracOp::InvCg(Vector *out,
 //------------------------------------------------------------------
   // Calculate and set true residual: 
   // true_res = |src - MatPcDagMatPc * sol| / |src|
+  Xptr = X-GRAN;
+  for (j=0; j<f_size_cb; j++) {
+    if (j%GRAN==0) Xptr += GRAN;
+    *(Fsol++) = *(Xptr++);
+  }
+
   MatPcDagMatPc(mmp, sol);
-  res->CopyVec(src, f_size_cb);
-  res->VecMinusEquVec(mmp, f_size_cb);
-  res_norm_sq_cur = res->NormSqNode(f_size_cb);
+  dir->CopyVec(src, f_size_cb);
+  dir->VecMinusEquVec(mmp, f_size_cb);
+  res_norm_sq_cur = dir->NormSqNode(f_size_cb);
   DiracOpGlbSum(&res_norm_sq_cur);
   Float tmp = res_norm_sq_cur / src_norm_sq;
   tmp = sqrt(tmp);
   if(true_res != 0){
     *true_res = tmp;
   }
-  VRB.Result(cname,fname,
-	     "True |res| / |src| = %e, iter = %d\n", IFloat(tmp), itr+1);
+  VRB.Result(cname,fname, "True |res| / |src| = %e, iter = %d\n", 
+	     IFloat(tmp), itr+1);
 
 #ifdef REPRODUCE_TEST 
   }
@@ -392,8 +404,8 @@ int DiracOp::InvCg(Vector *out,
   VRB.Sfree(cname,fname, "dir", dir);
   qfree(dir);
   VRB.Debug("b ============\n");
-  VRB.Sfree(cname,fname, "res", res);
-  sfree(res);
+  VRB.Sfree(cname,fname, "X", X);
+  sfree(X);
 
   VRB.Debug("a ============\n");
 

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of ParTrans class methods.
   
-  $Id: pt_base.C,v 1.6 2004-07-01 17:43:51 chulwoo Exp $
+  $Id: pt_base.C,v 1.7 2004-08-05 19:00:56 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v 1.6 2004-07-01 17:43:51 chulwoo Exp $
-//  $Id: pt_base.C,v 1.6 2004-07-01 17:43:51 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-08-05 19:00:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v 1.7 2004-08-05 19:00:56 mclark Exp $
+//  $Id: pt_base.C,v 1.7 2004-08-05 19:00:56 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_base.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v $
 //  $State: Exp $
 //
@@ -38,24 +38,19 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 int ParTrans::scope_lock = 0;
 int ParTrans::PTflops = 0;
+int ParTrans:: bc[4] = {0,0,0,0};	// boundary condition on this node
+int ParTrans::node_sites[5] = {0,0,0,0,0};
 
-//------------------------------------------------------------------
-// static variables
-//------------------------------------------------------------------
-static int nx[4];
-static int bc[4] = {0,0,0,0};	// boundary condition on this node
-
-
-static void BondCond(Lattice& lat, Matrix *u_base)
+void ParTrans::BondCond(Lattice& lat, Matrix *u_base)
 {
   for(int u = 0; u < 4; ++u) {
     if(bc[u]) {
       int x[4];
-      for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
-        for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
-          for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
-            for(x[3] = 0; x[3] < nx[3]; ++x[3]) {
-	      if(x[u]==nx[u]-1) {
+      for(x[3] = 0; x[3] < node_sites[3]; ++x[3]) {
+	for(x[2] = 0; x[2] < node_sites[2]; ++x[2]) {
+	  for(x[1] = 0; x[1] < node_sites[1]; ++x[1]) {
+	    for(x[0] = 0; x[0] < node_sites[0]; ++x[0]) {
+	      if(x[u]==node_sites[u]-1) {
 	        Matrix *m = u_base+lat.GsiteOffset(x)+u;
 	        *m *= -1;
 	      }
@@ -119,11 +114,11 @@ ParTrans::ParTrans(Lattice & latt) :
   if(GJP.Tbc() == BND_CND_APRD)
   	bc[3] = GJP.TnodeCoor() == (GJP.Tnodes()-1) ? 1 : 0;
 
-  nx[0] = GJP.XnodeSites();
-  nx[1] = GJP.YnodeSites();
-  nx[2] = GJP.ZnodeSites();
-  nx[3] = GJP.TnodeSites();
-
+  node_sites[0] = GJP.XnodeSites();
+  node_sites[1] = GJP.YnodeSites();
+  node_sites[2] = GJP.ZnodeSites();
+  node_sites[3] = GJP.TnodeSites();
+  node_sites[4] = GJP.SnodeSites();
 
   //----------------------------------------------------------------
   // turn on the boundary condition, if not inside a dirac operator

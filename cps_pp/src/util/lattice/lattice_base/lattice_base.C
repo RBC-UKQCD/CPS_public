@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.13 2004-07-28 05:36:47 chulwoo Exp $
+  $Id: lattice_base.C,v 1.14 2004-08-05 19:00:28 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-28 05:36:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.13 2004-07-28 05:36:47 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.13 2004-07-28 05:36:47 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-08-05 19:00:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.14 2004-08-05 19:00:28 mclark Exp $
+//  $Id: lattice_base.C,v 1.14 2004-08-05 19:00:28 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -42,6 +42,7 @@ CPS_END_NAMESPACE
 #include <comms/glb.h>
 #include <comms/scu.h>
 #include <comms/cbuf.h>
+
 CPS_START_NAMESPACE
 
 #ifdef _TARTAN
@@ -148,14 +149,10 @@ Lattice::Lattice()
     //--------------------------------------------------------------
     array_size = GsiteSize() * GJP.VolNodeSites() * sizeof(Float);  
     if(start_conf_kind != START_CONF_LOAD &&
-	start_conf_kind!=START_CONF_FILE){
+       start_conf_kind!=START_CONF_FILE){
       gauge_field = (Matrix *) pmalloc(array_size);
-      if( gauge_field == 0)
-	ERR.Pointer(cname,fname, "gauge_field");
-      VRB.Pmalloc(cname, fname,
-		  "gauge_field",
-		  gauge_field,
-		  array_size);
+      if( gauge_field == 0) ERR.Pointer(cname,fname, "gauge_field");
+      VRB.Pmalloc(cname, fname, "gauge_field", gauge_field, array_size);
     }
 
     //--------------------------------------------------------------

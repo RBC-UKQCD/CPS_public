@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.3 2004-06-04 21:14:15 chulwoo Exp $
+  $Id: vector_util.C,v 1.4 2004-08-05 18:59:47 mclark Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdoc/vector_util.C,v 1.3 2004-06-04 21:14:15 chulwoo Exp $
-//  $Id: vector_util.C,v 1.3 2004-06-04 21:14:15 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-08-05 18:59:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdoc/vector_util.C,v 1.4 2004-08-05 18:59:47 mclark Exp $
+//  $Id: vector_util.C,v 1.4 2004-08-05 18:59:47 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdoc/vector_util.C,v $
 //  $State: Exp $
 //
@@ -381,7 +381,23 @@ void cTimesV1PlusV2(IFloat *a, IFloat re, IFloat im, const IFloat *c,
     }
 }
 
-
+/*!
+  \param re The real part of the scalar complex factor
+  \param im The imaginary part of the scalar complex factor 
+  \param a The resulting vector
+  \param c A vector
+  \param d Another vector
+  \param len The length of the vectors
+ */
+void cTimesV1MinusV2(IFloat *a, IFloat re, IFloat im, const IFloat *c,
+	const IFloat *d, int len)
+{
+    for(int i = 0; i < len; i += 2, c += 2) 
+    {
+      *a++ = re * *c     - im * *(c+1) - *d++;   // real part
+      *a++ = re * *(c+1) + im * *c     - *d++;   // imag part
+    }
+}
 
 
 CPS_END_NAMESPACE

@@ -74,7 +74,6 @@ void AlgHmcRHMC::init()
   cname = "AlgHmcRHMC";
   char *fname = "init()";
   VRB.Func(cname,fname);
-  int n_masses;
 
   // Initialize the number of dynamical fermion masses
   //----------------------------------------------------------------
@@ -98,15 +97,13 @@ void AlgHmcRHMC::init()
   //----------------------------------------------------------------
   if(n_frm_masses != 0){
     frm_cg_arg = (CgArg **) smalloc(n_frm_masses * sizeof(CgArg*));
-    if(frm_cg_arg == 0)
-      ERR.Pointer(cname,fname, "frm_cg_arg");
+    if(frm_cg_arg == 0) ERR.Pointer(cname,fname, "frm_cg_arg");
     VRB.Smalloc(cname,fname,
 		"frm_cg_arg",frm_cg_arg, n_frm_masses * sizeof(CgArg*));
     
     for(i=0; i<n_frm_masses; i++){
       frm_cg_arg[i] = (CgArg *) smalloc(sizeof(CgArg));
-      if(frm_cg_arg[i] == 0)
-	ERR.Pointer(cname,fname, "frm_cg_arg[i]");
+      if(frm_cg_arg[i] == 0) ERR.Pointer(cname,fname, "frm_cg_arg[i]");
       VRB.Smalloc(cname,fname,
 		  "frm_cg_arg[i]", frm_cg_arg[i], sizeof(CgArg));
     } 
@@ -117,22 +114,20 @@ void AlgHmcRHMC::init()
   for(i=0; i<n_frm_masses; i++){
     frm_cg_arg[i]->mass = hmd_arg->frm_mass[i];
     frm_cg_arg[i]->max_num_iter = hmd_arg->max_num_iter[i];
-    frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd[i];
+    frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_md[i];
   }
 
   // Allocate memory for the boson CG arguments.
   //----------------------------------------------------------------
   if(n_bsn_masses != 0){
     bsn_cg_arg = (CgArg **) smalloc(n_bsn_masses * sizeof(CgArg*));
-    if(bsn_cg_arg == 0)
-      ERR.Pointer(cname,fname, "bsn_cg_arg");
+    if(bsn_cg_arg == 0) ERR.Pointer(cname,fname, "bsn_cg_arg");
     VRB.Smalloc(cname,fname,
 		"bsn_cg_arg",bsn_cg_arg, n_bsn_masses * sizeof(CgArg*));
     
     for(i=0; i<n_bsn_masses; i++){
       bsn_cg_arg[i] = (CgArg *) smalloc(sizeof(CgArg));
-      if(bsn_cg_arg[i] == 0)
-	ERR.Pointer(cname,fname, "bsn_cg_arg[i]");
+      if(bsn_cg_arg[i] == 0) ERR.Pointer(cname,fname, "bsn_cg_arg[i]");
       VRB.Smalloc(cname,fname,
 		  "bsn_cg_arg[i]", bsn_cg_arg[i], sizeof(CgArg));
     } 
@@ -144,16 +139,19 @@ void AlgHmcRHMC::init()
   for(i=0; i<n_bsn_masses; i++){
     bsn_cg_arg[i]->mass = hmd_arg->bsn_mass[i];
     bsn_cg_arg[i]->max_num_iter = hmd_arg->max_num_iter[i];
-    bsn_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd[i];
+    bsn_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_mc[i];
   }
 
   // Allocate memory for the phi pseudo fermion field.
   //----------------------------------------------------------------
   if(n_frm_masses != 0){
     phi = (Vector **) smalloc(n_frm_masses * sizeof(Vector*));
+    if(phi == 0) ERR.Pointer(cname,fname, "phi");
     VRB.Smalloc(cname,fname, "phi",phi, n_frm_masses * sizeof(Vector*));
+
     for(i=0; i<n_frm_masses; i++){
       phi[i] = (Vector *) smalloc(f_size * sizeof(Float));
+      if(phi[i] == 0) ERR.Pointer(cname,fname, "phi[i]");
       VRB.Smalloc(cname,fname, "phi[i]", phi[i], f_size * sizeof(Float));
     }  
   }
@@ -164,13 +162,20 @@ void AlgHmcRHMC::init()
   for (i=0; i<n_frm_masses; i++) total_size += hmd_arg->FRatDeg[i];
 
   frmn = (Vector **) smalloc(total_size * sizeof(Vector*));
-  VRB.Smalloc(cname,fname, "frmn",frmn, n_frm_masses * sizeof(Vector*));
+  if(frmn == 0) ERR.Pointer(cname,fname, "frmn");
+  VRB.Smalloc(cname,fname, "frmn",frmn, total_size * sizeof(Vector*));
+
   frmn_d = (Vector **)smalloc(total_size * sizeof(Vector*));
+  if(frmn_d == 0) ERR.Pointer(cname,fname, "frmn_d");
   VRB.Smalloc(cname,fname, "frmn_d",frmn_d, total_size * sizeof(Vector*));
+
   for (i=0; i<total_size; i++) {
     frmn[i] = (Vector *) smalloc(f_size *sizeof(Float));
+    if(frmn[i] == 0) ERR.Pointer(cname,fname, "frmn[i]");
     VRB.Smalloc(cname,fname, "frmn[i]", frmn[i], f_size *sizeof(Float));
+
     frmn_d[i] = (Vector*)smalloc(f_size * sizeof(Float));
+    if(frmn_d[i] == 0) ERR.Pointer(cname,fname, "frmn_d[i]");
     VRB.Smalloc(cname,fname, "frmn_d[i]", frmn_d[i], f_size * sizeof(Float));
   }
 
@@ -178,13 +183,12 @@ void AlgHmcRHMC::init()
   //----------------------------------------------------------------
   if(n_bsn_masses != 0){
     bsn = (Vector **) smalloc(n_bsn_masses * sizeof(Vector*));
-    if(bsn == 0)
-      ERR.Pointer(cname,fname, "bsn");
+    if(bsn == 0) ERR.Pointer(cname,fname, "bsn");
     VRB.Smalloc(cname,fname, "bsn",bsn, n_bsn_masses * sizeof(Vector*));
+
     for(i=0; i<n_bsn_masses; i++){
       bsn[i] = (Vector *) smalloc(f_size * sizeof(Float));
-      if(bsn[i] == 0)
-	ERR.Pointer(cname,fname, "bsn[i]");
+      if(bsn[i] == 0) ERR.Pointer(cname,fname, "bsn[i]");
       VRB.Smalloc(cname,fname, "bsn[i]", bsn[i], f_size * sizeof(Float));
     }  
   }
@@ -192,16 +196,15 @@ void AlgHmcRHMC::init()
   // Allocate memory for the initial gauge field.
   //----------------------------------------------------------------
   gauge_field_init = (Matrix *) smalloc(g_size * sizeof(Matrix));
-  if(gauge_field_init == 0)
-    ERR.Pointer(cname,fname, "gauge_field_init"); 
-  VRB.Smalloc(cname,fname,
-	      "gauge_field_init",gauge_field_init, 
+  if(gauge_field_init == 0) ERR.Pointer(cname,fname, "gauge_field_init"); 
+  VRB.Smalloc(cname,fname, "gauge_field_init",gauge_field_init, 
 	      g_size * sizeof(Matrix));
 
   // Used for storing residue coefficients for staggered optimisation
   //----------------------------------------------------------------
   if (AlgLattice().Fclass() == F_CLASS_ASQTAD) {
     all_res = (Float *)smalloc(total_size * sizeof(Float));
+    if(all_res == 0) ERR.Pointer(cname,fname, "all_res"); 
     VRB.Smalloc(cname,fname, "all_res", all_res, total_size * sizeof(Float));
     Float *res = all_res;
     for (i=0; i<n_frm_masses; i++) {
@@ -215,7 +218,7 @@ void AlgHmcRHMC::init()
 // Destructor
 //------------------------------------------------------------------
 AlgHmcRHMC::~AlgHmcRHMC() {
-  int i,j;
+  int i;
   char *fname = "~AlgHmcRHMC()" ;
   VRB.Func(cname,fname);
 
@@ -310,7 +313,6 @@ Float AlgHmcRHMC::run(void)
   Float cg_iter_av=0;
   int cg_iter_min=0;
   int cg_iter_max=0;
-  Float true_res=0;
   Float true_res_av=0;
   Float true_res_min=0;
   Float true_res_max=0;
@@ -405,9 +407,9 @@ Float AlgHmcRHMC::run(void)
     cg_iter_av += cg_iter;
     if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
     if(cg_iter > cg_iter_max) cg_iter_max = cg_iter;
-    true_res_av += true_res;
-    if(true_res < true_res_min) true_res_min = true_res;
-    if(true_res > true_res_max) true_res_max = true_res;
+    true_res_av += frm_cg_arg[i]->true_rsd;
+    if(frm_cg_arg[i]->true_rsd < true_res_min) true_res_min = frm_cg_arg[i]->true_rsd;
+    if(frm_cg_arg[i]->true_rsd > true_res_max) true_res_max = frm_cg_arg[i]->true_rsd;
     cg_calls++;      
 
   }
@@ -420,6 +422,11 @@ Float AlgHmcRHMC::run(void)
   //----------------------------------------------------------------
   // Molecular Dynamics Trajectory
   //----------------------------------------------------------------
+
+  // Reset the residual error for the Molecular Dynamics
+  //--------------------------------------------------------------
+  for (i=0; i<n_bsn_masses; i++)
+    frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_md[i];
 
   // Perform initial UQPQ integration
   //--------------------------------------------------------------
@@ -435,7 +442,6 @@ Float AlgHmcRHMC::run(void)
   //----------------------------------------------------------------
   lat.MdTimeInc(0.5) ;
   VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
-
 
   // Run through the trajectory
   //----------------------------------------------------------------
@@ -454,35 +460,33 @@ Float AlgHmcRHMC::run(void)
 	zeroPole = hmd_arg->FRatPole[i][0];
 	for (j=0; j<hmd_arg->FRatDeg[i]; j++) hmd_arg->FRatPole[i][j] -= zeroPole;
       }
-
-      for (j=0; j<hmd_arg->FRatDeg[i]; j++) frmn[j] -> VecTimesEquFloat(0.0,f_size);
-
+      
+      for (j=0; j<hmd_arg->FRatDeg[i]; j++) frmn[j+shift] -> VecTimesEquFloat(0.0,f_size);
+      
       cg_iter = lat.FmatEvlMInv(frmn+shift, phi[i], hmd_arg->FRatPole[i], hmd_arg->FRatDeg[i],
 				hmd_arg->isz, frm_cg_arg[i], CNV_FRM_NO, frmn_d+shift);
-      shift += hmd_arg->FRatDeg[i];
-
+      
       if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
 	for (j=0; j<hmd_arg->FRatDeg[i]; j++) hmd_arg->FRatPole[i][j] += zeroPole;
 	frm_cg_arg[i] -> mass = trueMass;
       }
-
+      
       cg_iter_av += cg_iter;
       if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
       if(cg_iter > cg_iter_max) cg_iter_max = cg_iter;
-      true_res_av += true_res;
-      if(true_res < true_res_min) true_res_min = true_res;
-      if(true_res > true_res_max) true_res_max = true_res;
+      true_res_av += frm_cg_arg[i]->true_rsd;
+      if(frm_cg_arg[i]->true_rsd < true_res_min) true_res_min = frm_cg_arg[i]->true_rsd;
+      if(frm_cg_arg[i]->true_rsd > true_res_max) true_res_max = frm_cg_arg[i]->true_rsd;
       cg_calls++;      
       
       if (lat.Fclass() != F_CLASS_ASQTAD)
-	lat.RHMC_EvolveMomFforce(mom, frmn, hmd_arg->FRatDeg[i], hmd_arg->FRatRes[i], 
-				 hmd_arg->frm_mass[i], dt, frmn_d);
-      //for(j=0; j<hmd_arg->FRatDeg[i]; j++)
-      //	lat.EvolveMomFforce(mom, frmn[j], hmd_arg->frm_mass[i], hmd_arg->FRatRes[i][j]*dt);
+	lat.RHMC_EvolveMomFforce(mom, frmn+shift, hmd_arg->FRatDeg[i], hmd_arg->FRatRes[i], 
+				 hmd_arg->frm_mass[i], dt, frmn_d+shift);
+      shift += hmd_arg->FRatDeg[i];
     }
-
+    
     // Only for the case of asqtad fermions do we perform this optimisation
-    //--------------------------------------------------------------
+    //--------------------------------------------------------------      
     if (lat.Fclass() == F_CLASS_ASQTAD)
       lat.RHMC_EvolveMomFforce(mom, frmn, total_size, all_res, 0.0, dt, frmn_d);
 
@@ -550,8 +554,8 @@ Float AlgHmcRHMC::run(void)
   //---------------------------------------------------------------
   shift = 0;
   for (i=0; i<n_frm_masses; i++) {
-    frmn[0] -> CopyVec(phi[i],f_size);
-    frmn[0] -> VecTimesEquFloat(hmd_arg->SRatNorm[i], f_size);
+    frmn[shift] -> CopyVec(phi[i],f_size);
+    frmn[shift] -> VecTimesEquFloat(hmd_arg->SRatNorm[i], f_size);
 
     // Can only renormalise mass for staggered or asqtad cases
     if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
@@ -561,10 +565,10 @@ Float AlgHmcRHMC::run(void)
       for (j=0; j<hmd_arg->SRatDeg[i]; j++) hmd_arg->SRatPole[i][j] -= zeroPole;
     }
 
+    // Reset the residual error to the error in the approximation
+    frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_mc[i];
     cg_iter = lat.FmatEvlMInv(frmn+shift, phi[i], hmd_arg->SRatPole[i], hmd_arg->SRatDeg[i],
     			      hmd_arg->isz, frm_cg_arg[i], CNV_FRM_NO, SINGLE, hmd_arg->SRatRes[i]);
-    shift += hmd_arg->FRatDeg[i];
-
     if (lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_STAG) {
       for (j=0; j<hmd_arg->SRatDeg[i]; j++) hmd_arg->SRatPole[i][j] += zeroPole;
       frm_cg_arg[i] -> mass = trueMass;
@@ -573,21 +577,22 @@ Float AlgHmcRHMC::run(void)
     cg_iter_av += cg_iter;
     if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
     if(cg_iter > cg_iter_max) cg_iter_max = cg_iter;
-    true_res_av += true_res;
-    if(true_res < true_res_min) true_res_min = true_res;
-    if(true_res > true_res_max) true_res_max = true_res;
+    true_res_av += frm_cg_arg[i]->true_rsd;
+    if(frm_cg_arg[i]->true_rsd < true_res_min) true_res_min = frm_cg_arg[i]->true_rsd;
+    if(frm_cg_arg[i]->true_rsd > true_res_max) true_res_max = frm_cg_arg[i]->true_rsd;
     cg_calls++;      
 
-    h_final += lat.FhamiltonNode(frmn[0], frmn[0]);
+    h_final += lat.FhamiltonNode(frmn[shift], frmn[shift]);
+    shift += hmd_arg->FRatDeg[i];
+
   }
   
-  h_final = h_final + lat.MomHamiltonNode(mom);
+  h_final += lat.MomHamiltonNode(mom);
 
   // Calculate final boson contribution to the Hamiltonian
   //---------------------------------------------------------------
   for(i=0; i<n_bsn_masses; i++)
-    h_final = h_final + lat.BhamiltonNode(bsn[i], 
-				      hmd_arg->bsn_mass[i]);
+    h_final += lat.BhamiltonNode(bsn[i], hmd_arg->bsn_mass[i]);
 
   // Calculate Final-Initial Hamiltonian 
   //---------------------------------------------------------------
@@ -722,10 +727,23 @@ void AlgHmcRHMC::dynamicalApprox()
   Vector **psi = (Vector**) smalloc(sizeof(Vector*));
   if(psi == 0) ERR.Pointer(cname,fname, "psi");
   VRB.Smalloc(cname,fname, "psi",psi,sizeof(Vector*));
+
   Float *lambda = (Float*) smalloc(2*sizeof(Float));
+  if(lambda == 0) ERR.Pointer(cname,fname, "lambda");
+  VRB.Smalloc(cname,fname, "lambda",lambda,2*sizeof(Float));
+
   Float *chirality = (Float*) smalloc(sizeof(Float));
+  if(chirality == 0) ERR.Pointer(cname,fname, "chirality");
+  VRB.Smalloc(cname,fname, "chirality",chirality,sizeof(Float));
+
   int *valid_eig = (int*) smalloc(sizeof(int));
+  if(valid_eig == 0) ERR.Pointer(cname,fname, "valid_eig");
+  VRB.Smalloc(cname,fname, "valid_eig",valid_eig,sizeof(int));
+
   Float **hsum = (Float**) smalloc(sizeof(Float*));
+  if(hsum == 0) ERR.Pointer(cname,fname, "hsum");
+  VRB.Smalloc(cname,fname, "hsum",hsum,sizeof(Float*));
+
   if (eig_arg->hsum_dir == 0)
     *hsum = (Float*) smalloc(GJP.Xnodes()*GJP.XnodeSites() * sizeof(Float));
   else if (eig_arg->hsum_dir == 1)
@@ -734,9 +752,12 @@ void AlgHmcRHMC::dynamicalApprox()
     *hsum = (Float*) smalloc(GJP.Ynodes()*GJP.YnodeSites() * sizeof(Float));
   else if (eig_arg->hsum_dir == 3)
     *hsum = (Float*) smalloc(GJP.Ynodes()*GJP.YnodeSites() * sizeof(Float));
+  if(*hsum == 0) ERR.Pointer(cname,fname, "*hsum");
+  VRB.Smalloc(cname,fname, "*hsum",*hsum,sizeof(Float));
 
   psi[0] = (Vector *) smalloc(f_size * sizeof(Float));
   if(psi[0] == 0) ERR.Pointer(cname,fname, "psi[0]");
+  VRB.Smalloc(cname,fname, "psi[0]",psi[0],f_size * sizeof(Float));
   
   for (int i=0; i<n_frm_masses; i++) {
     eig_arg->mass = hmd_arg->frm_mass[i];
@@ -784,6 +805,7 @@ void AlgHmcRHMC::dynamicalApprox()
 	  VRB.Sfree(cname,fname, "frmn_d[i]",frmn_d[i]);
 	  sfree(frmn_d[i]);
 	}
+
 	VRB.Sfree(cname,fname, "frmn",frmn);
 	sfree(frmn);
 	VRB.Sfree(cname,fname, "frmn_d",frmn_d);
@@ -793,13 +815,19 @@ void AlgHmcRHMC::dynamicalApprox()
 	for (i=0; i<n_frm_masses; i++) total_size += hmd_arg->FRatDeg[i];
 	
 	frmn = (Vector **) smalloc(total_size * sizeof(Vector*));
-	VRB.Smalloc(cname,fname, "frmn",frmn, n_frm_masses * sizeof(Vector*));
+	if(frmn == 0) ERR.Pointer(cname,fname, "frmn");
+	VRB.Smalloc(cname,fname, "frmn",frmn, total_size * sizeof(Vector*));
 	frmn_d = (Vector **)smalloc(total_size * sizeof(Vector*));
+	if(frmn_d == 0) ERR.Pointer(cname,fname, "frmn_d");
 	VRB.Smalloc(cname,fname, "frmn_d",frmn_d, total_size * sizeof(Vector*));
+
 	for (i=0; i<total_size; i++) {
 	  frmn[i] = (Vector *) smalloc(f_size *sizeof(Float));
+	  if(frmn[i] == 0) ERR.Pointer(cname,fname, "frmn[i]");
 	  VRB.Smalloc(cname,fname, "frmn[i]", frmn[i], f_size *sizeof(Float));
+
 	  frmn_d[i] = (Vector*)smalloc(f_size * sizeof(Float));
+	  if(frmn_d[i] == 0) ERR.Pointer(cname,fname, "frmn_d[i]");
 	  VRB.Smalloc(cname,fname, "frmn_d[i]", frmn_d[i], f_size * sizeof(Float));
 	}
 	hmd_arg->FRatDeg[i] = hmd_arg->FRatDegNew[i];
@@ -833,12 +861,20 @@ void AlgHmcRHMC::dynamicalApprox()
     
   }
 
+
+  VRB.Sfree(cname,fname, "hsum[0]",hsum[0]);
   sfree(hsum[0]);
-  sfree(psi[0]);
-  sfree(psi);
+  VRB.Sfree(cname,fname, "hsum",hsum);
   sfree(hsum);
+  VRB.Sfree(cname,fname, "psi[0]",psi[0]);
+  sfree(psi[0]);
+  VRB.Sfree(cname,fname, "psi",psi);
+  sfree(psi);
+  VRB.Sfree(cname,fname, "lambda",lambda);
   sfree(lambda);
+  VRB.Sfree(cname,fname, "chirality",chirality);
   sfree(chirality);
+  VRB.Sfree(cname,fname, "valid_eig",valid_eig);
   sfree(valid_eig);
 
 }

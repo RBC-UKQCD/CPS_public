@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.10 2004-07-02 14:13:42 chulwoo Exp $
+  $Id: Fforce.C,v 1.11 2004-08-05 19:00:27 mclark Exp $
 */
 //--------------------------------------------------------------------
 
@@ -636,7 +636,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 	nflops +=ParTrans::PTflops + ForceFlops;
 	print_flops(nflops,dtime);
 #endif
-    update_momenta(force, dt, mom,1);
+    update_momenta(force, dt, mom);
 
 
     // Tidy up

@@ -1,14 +1,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-09 04:15:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.10 2004-07-09 04:15:17 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.10 2004-07-09 04:15:17 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-08-05 19:00:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.11 2004-08-05 19:00:55 mclark Exp $
+//  $Id: asqtad_dirac.C,v 1.11 2004-08-05 19:00:55 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -1412,28 +1412,28 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
   }
   if(tmpfrm == 0) 
     ERR.Pointer(cname,fname, "tmpfrm");
-  printf("tmpfrm=%p\n",tmpfrm);
+  //printf("tmpfrm=%p\n",tmpfrm);
 #endif
 
-	for(i=0;i<2;i++){
-		if(vol> 4096) uc_l_agg[i]=NULL;
-		else
- 			uc_l_agg[i]  = (gauge_agg *)qalloc(QFAST,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
-		if(uc_l_agg[i] == NULL){
-			uc_l_agg[i]  = (gauge_agg *)qalloc(QCOMMS,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
-			printf("uc_l_agg[%d] is allocated at DDR (%p)\n",i,uc_l_agg[i]);
-	    }
-		if(uc_l_agg[i] == 0)
-			ERR.Pointer(cname,fname, "uc_l_agg[i]");
-   		 uc_nl_agg[i]  = (gauge_agg*)qalloc(QFAST,((non_local_chi+non_local_chi_3[3])/2)*sizeof(gauge_agg));
-	    if(uc_nl_agg[i] == 0){
-   			uc_nl_agg[i]  = (gauge_agg*)qalloc(QCOMMS,((non_local_chi+non_local_chi_3[3])/2)*sizeof(gauge_agg));
-   			printf("uc_nl_agg[%d] is allocated at DDR (%p)\n",i,uc_nl_agg[i]);
-	    }
-   		if(uc_nl_agg[i] == 0){
-			ERR.Pointer(cname,fname, "uc_nl_agg[i]");
-     	}
-	}
+  for(i=0;i<2;i++){
+    if(vol> 4096) uc_l_agg[i]=NULL;
+    else
+      uc_l_agg[i]  = (gauge_agg *)qalloc(QFAST,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
+    if(uc_l_agg[i] == NULL){
+      uc_l_agg[i]  = (gauge_agg *)qalloc(QCOMMS,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
+      printf("uc_l_agg[%d] is allocated at DDR (%p)\n",i,uc_l_agg[i]);
+    }
+    if(uc_l_agg[i] == 0)
+      ERR.Pointer(cname,fname, "uc_l_agg[i]");
+    uc_nl_agg[i]  = (gauge_agg*)qalloc(QFAST,((non_local_chi+non_local_chi_3[3])/2)*sizeof(gauge_agg));
+    if(uc_nl_agg[i] == 0){
+      uc_nl_agg[i]  = (gauge_agg*)qalloc(QCOMMS,((non_local_chi+non_local_chi_3[3])/2)*sizeof(gauge_agg));
+      printf("uc_nl_agg[%d] is allocated at DDR (%p)\n",i,uc_nl_agg[i]);
+    }
+    if(uc_nl_agg[i] == 0){
+      ERR.Pointer(cname,fname, "uc_nl_agg[i]");
+    }
+  }
 
   gauge_agg *temp = new gauge_agg[12*vol];
   int num_ind[vol*6];
@@ -1632,7 +1632,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
   } // end of odd loop
 #endif
 
-
+  
 }
 
 extern "C"

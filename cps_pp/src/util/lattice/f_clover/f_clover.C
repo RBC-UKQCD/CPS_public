@@ -7,14 +7,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-28 05:36:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.9 2004-07-28 05:36:47 chulwoo Exp $
-//  $Id: f_clover.C,v 1.9 2004-07-28 05:36:47 chulwoo Exp $
+//  $Author: mclark $
+//  $Date: 2004-08-05 19:00:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.10 2004-08-05 19:00:27 mclark Exp $
+//  $Id: f_clover.C,v 1.10 2004-08-05 19:00:27 mclark Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_clover.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -182,6 +182,19 @@ int Fclover::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   VRB.Func(cname, fname);
   ERR.NotImplemented(cname,fname);
   return -1;
+}
+
+
+Float Fclover::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
+{
+
+  char *fname = "FminResExt(V*, V*, V**, V**, int, CgArg *, CnvFrmType)";
+  VRB.Func(cname,fname);
+  
+  DiracOpClover clover(*this, sol, source, cg_arg, cnv_frm);
+  return clover.MinResExt(sol,source,sol_old,vm,degree);
+  
 }
 
 //------------------------------------------------------------------

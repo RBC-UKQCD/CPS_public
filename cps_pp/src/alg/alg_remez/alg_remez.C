@@ -82,9 +82,9 @@ AlgRemez::~AlgRemez()
 }
 
 // Free memory and reallocate as necessary
-void AlgRemez::allocate(int degree)
+void AlgRemez::allocate(int num_degree, int den_degree)
 {
-  char *fname = "allocate(int)";
+  char *fname = "allocate(int,int)";
   VRB.Func(cname,fname);
 
   // Arrays have previously been allocated, deallocate first, then allocate
@@ -101,28 +101,26 @@ void AlgRemez::allocate(int degree)
     delete [] mm;
   }
 
-  int size = 2*degree + 1;
-
   // Note use of new and delete in memory allocation - cannot run on qcdsp
-  param = new bigfloat[size+1];
+  param = new bigfloat[num_degree+den_degree+1];
   if(param == 0) ERR.Pointer(cname,fname,"param");
-  VRB.Smalloc(cname,fname,"param",param,size+1 * sizeof(bigfloat));
+  VRB.Smalloc(cname,fname,"param",param,num_degree+den_degree+1 * sizeof(bigfloat));
 
-  roots = new bigfloat[size];
+  roots = new bigfloat[num_degree];
   if(roots == 0) ERR.Pointer(cname,fname,"roots");
-  VRB.Smalloc(cname,fname,"roots",roots,degree * sizeof(bigfloat));
+  VRB.Smalloc(cname,fname,"roots",roots,num_degree * sizeof(bigfloat));
 
-  poles = new bigfloat[size];
+  poles = new bigfloat[den_degree];
   if(poles == 0) ERR.Pointer(cname,fname,"poles");
-  VRB.Smalloc(cname,fname,"poles",poles,degree * sizeof(bigfloat));
+  VRB.Smalloc(cname,fname,"poles",poles,den_degree * sizeof(bigfloat));
 
-  xx = new bigfloat[size+2];
+  xx = new bigfloat[num_degree+den_degree+3];
   if(xx== 0) ERR.Pointer(cname,fname,"xx");
-  VRB.Smalloc(cname,fname,"xx",xx,size+2 * sizeof(bigfloat));
+  VRB.Smalloc(cname,fname,"xx",xx,num_degree+den_degree+2 * sizeof(bigfloat));
 
-  mm = new bigfloat[size+2];
+  mm = new bigfloat[num_degree+den_degree+2];
   if(mm == 0) ERR.Pointer(cname,fname,"mm");
-  VRB.Smalloc(cname,fname,"mm",mm,size+2 * sizeof(bigfloat));
+  VRB.Smalloc(cname,fname,"mm",mm,num_degree+den_degree+2 * sizeof(bigfloat));
 
   alloc = 1;
 }
@@ -141,23 +139,29 @@ void AlgRemez::setBounds(Float lower, Float upper)
 // Generate the rational approximation x^(pnum/pden)
 Float AlgRemez::generateApprox(int degree, unsigned long pnum, unsigned long pden)
 {
+  return generateApprox(degree, degree, pnum, pden);
+}
+
+// Generate the rational approximation x^(pnum/pden)
+Float AlgRemez::generateApprox(int num_degree, int den_degree, unsigned long pnum, unsigned long pden)
+{
   char *fname = "generateApprox(int, unsigned long, unsigned long)";
   VRB.Func(cname,fname);
 
   // Reallocate arrays, since degree has changed
-  if (degree != n) allocate(degree);
+  if (num_degree != n || den_degree != d) allocate(num_degree,den_degree);
 
-  step = new bigfloat[2*degree+2];
+  step = new bigfloat[num_degree+den_degree+2];
   if(step == 0) ERR.Pointer(cname,fname,"step");
-  VRB.Smalloc(cname,fname,"step",step,(2*degree+2) * sizeof(bigfloat));
+  VRB.Smalloc(cname,fname,"step",step,(num_degree+den_degree+2) * sizeof(bigfloat));
 
   power_num = pnum;
   power_den = pden;
   spread = 1.0e37;
   iter = 0;
 
-  d = degree;
-  n = degree;
+  n = num_degree;
+  d = den_degree;
   neq = n + d + 1;
 
   initialGuess();
@@ -168,7 +172,6 @@ Float AlgRemez::generateApprox(int degree, unsigned long pnum, unsigned long pde
     if (iter++%100==0) 
       VRB.Flow(cname,fname,"Iteration %d, spread %e delta %e\n", iter-1,(Float)spread,(Float)delta);
     equations();
-
     if (delta < tolerance)
       ERR.General(cname, fname,"Delta too small, try increasing precision\n");
 
@@ -195,6 +198,8 @@ int AlgRemez::getPFE(Float *Res, Float *Pole, Float *Norm) {
   char *fname = "getPFE(Float*, Float*, Float*)";
   VRB.Func(cname,fname);
 
+  if (n!=d) ERR.General(cname,fname,"Cannot handle case: Numerator degree neq Denominator degree\n");
+
   if (!alloc) ERR.General(cname,fname,"Approximation not yet generated\n");
 
   bigfloat *r = new bigfloat[n];
@@ -204,20 +209,16 @@ int AlgRemez::getPFE(Float *Res, Float *Pole, Float *Norm) {
   if(p == 0) ERR.Pointer(cname,fname,"p");
   VRB.Smalloc(cname,fname,"p",p,d * sizeof(bigfloat));
   
-  for (int i=0; i<n; i++) {
-    r[i] = roots[i];
-    p[i] = poles[i];
-  }
+  for (int i=0; i<n; i++) r[i] = roots[i];
+  for (int i=0; i<d; i++) p[i] = poles[i];
   
   // Perform a partial fraction expansion
   pfe(r, p, norm);
 
   // Convert to Float and return
   *Norm = (Float)norm;
-  for (int i=0; i<n; i++) {
-    Res[i] = (Float)r[i];
-    Pole[i] = (Float)p[i];
-  }
+  for (int i=0; i<n; i++) Res[i] = (Float)r[i];
+  for (int i=0; i<d; i++) Pole[i] = (Float)p[i];
 
   VRB.Sfree(cname,fname, "r",r);
   delete [] r;
@@ -624,12 +625,12 @@ int AlgRemez::root() {
   VRB.Func(cname,fname);
   long i,j;
   bigfloat x,dx=0.05;
-  bigfloat upper=1, lower=-10000;
+  bigfloat upper=1, lower=-100000;
   bigfloat tol = 1e-20;
 
   bigfloat *poly = new bigfloat[neq+1];
   if(poly == 0) ERR.Pointer(cname,fname,"poly");
-  VRB.Smalloc(cname,fname,"poly",poly,(2*n+2) * sizeof(bigfloat));
+  VRB.Smalloc(cname,fname,"poly",poly,(n+d+2) * sizeof(bigfloat));
 
   // First find the numerator roots
   for (i=0; i<=n; i++) poly[i] = param[i];
@@ -641,13 +642,14 @@ int AlgRemez::root() {
     }
     poly[0] = -poly[0]/roots[i];
     for (j=1; j<=i; j++) poly[j] = (poly[j-1] - poly[j])/roots[i];
+  
   }
-
-  // Now find the denominator roots
+  
+ // Now find the denominator roots
   poly[d] = 1l;
   for (i=0; i<d; i++) poly[i] = param[n+1+i];
   for (i=d-1; i>=0; i--) {
-    poles[i] = rtnewt(poly,i+1,lower,upper,tol);
+    poles[i]=rtnewt(poly,i+1,lower,upper,tol);
     if (poles[i] == 0.0) {
       VRB.Warn(cname,fname,"Failure to converge on root");
       return 0;
@@ -658,8 +660,8 @@ int AlgRemez::root() {
 
   norm = param[n];
   VRB.Result(cname,fname,"Normalisation constant is %e\n",(double)norm);
-  for (i=0; i<n; i++)
-    VRB.Result(cname,fname,"%ld root = %e pole = %e\n",i,(Float)roots[i],(Float)poles[i]);
+  for (i=0; i<n; i++) VRB.Result(cname,fname,"%ld root = %e\n",i,(Float)roots[i]);
+  for (i=0; i<d; i++) VRB.Result(cname,fname,"%ld pole = %e\n",i,(Float)poles[i]);
 
   VRB.Sfree(cname,fname, "poly",poly);
   delete [] poly;

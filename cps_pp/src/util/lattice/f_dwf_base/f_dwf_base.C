@@ -218,9 +218,24 @@ int FdwfBase::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 
   //Fake the constructor
   DiracOpDwf dwf(*this, f_out[0], f_in, cg_arg, cnv_frm);
+  cg_arg->true_rsd = RsdCG[isz];
   return dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
 }
 
+//------------------------------------------------------------------
+// Lattice class api to the chronological inverter
+//------------------------------------------------------------------
+Float FdwfBase::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
+{
+
+  char *fname = "FminResExt(V*, V*, V**, V**, int, CgArg *, CnvFrmType)";
+  VRB.Func(cname,fname);
+  
+  DiracOpDwf dwf(*this, sol, source, cg_arg, cnv_frm);
+  return dwf.MinResExt(sol,source,sol_old,vm,degree);
+  
+}
 
 //------------------------------------------------------------------
 // int FmatInv(Vector *f_out, Vector *f_in, 

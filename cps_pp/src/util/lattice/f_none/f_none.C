@@ -145,6 +145,21 @@ int Fnone::FmatEvlMInv(Vector **out, Vector *in, Float *shift,
 }
 
 //------------------------------------------------------------------
+// Lattice class api to the chronological inverter
+// It does nothing and returns 0.
+//------------------------------------------------------------------
+Float Fnone::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
+{
+
+  char *fname = "FminResExt(V*, V*, V**, V**, int, CgArg *, CnvFrmType)";
+  VRB.Func(cname,fname);
+  
+  return 0.0;
+}
+
+
+//------------------------------------------------------------------
 // int FmatInv(Vector *f_out, Vector *f_in, 
 //             CgArg *cg_arg, 
 //             Float *true_res,

@@ -19,8 +19,9 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 //! Multishift CG invertor used in RHMC.
-int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, int Nmass, 
-		    int isz, Float *RsdCG, MultiShiftSolveType type, Float *alpha)
+int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, 
+		    int Nmass, int isz, Float *RsdCG, MultiShiftSolveType type, 
+		    Float *alpha)
 {
   char *fname = "MInvCG(V*,V**,...)";
   VRB.Func(cname,fname);
@@ -231,6 +232,7 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, int 
       convsP[s] = (css < rsd_sq[s]) ? 1 : 0;
 
       if (convsP[s]){
+	RsdCG[s] = sqrt(css);
 	VRB.Result(cname,fname,"%d shift converged, iter = %d, res = %e\n",s,k,css);
       }
     }    
