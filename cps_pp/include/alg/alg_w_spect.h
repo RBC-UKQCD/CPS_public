@@ -22,15 +22,17 @@ CPS_START_NAMESPACE
 
 
 CPS_END_NAMESPACE
-#include <alg/alg_base.h>               // class Alg
+#include <alg/alg_base.h>  
+#include <alg/w_spect_arg.h>
+
 CPS_START_NAMESPACE
 
 //---------------------------------------------------------------------------
 // Forward Declarations
 //---------------------------------------------------------------------------
-class Lattice;                      // defined in util/include/lattice.h
-class CommonArg;                    // defined in alg/include/common_arg.h
-class WspectArg;                    // defined in alg/include/w_spect_arg.h
+class Lattice;                      
+class CommonArg;                    
+class WspectArg;                    
 
 
 //---------------------------------------------------------------------------
