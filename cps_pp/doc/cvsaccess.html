@@ -35,13 +35,13 @@
      
 <h2><a name="Accessing_the_UKQCD_QCDOC_Code"></a>
  Accessing the UKQCD QCDOC Code Repository</h2>
-     To access the CVS repository, you need an account on trumpton.ph.ed.ac.uk
+     To access the CVS repository, you need an account on pughpugh.ph.ed.ac.uk
   (contact <a href="cmaynard@ph.ed.ac.uk">Chris Maynard</a>
      for this). &nbsp; (Your account needs to be in the qcdoc group.)To check out the current version of the Columbia code,
   you need to (in bash):<br>
        
-<pre wrap="">export&nbsp;CVS_SERVER=/usr/bin/cvs <br>export CVS_RSH=ssh<br><span class="moz-txt-citetags"></span>export CVSROOT=:ext:<font color="#ff0000"><b>YOURUSERNAME</b></font>@trumpton.ph.ed.ac.uk:/Disk/ukqcd/QCDOC/CVS <br><span class="moz-txt-citetags"></span>cvs co cps++</pre>
-    This will then prompt you for your trumpton password, and then check the 
+<pre wrap="">export&nbsp;CVS_SERVER=/usr/bin/cvs <br>export CVS_RSH=ssh<br><span class="moz-txt-citetags"></span>export CVSROOT=:ext:<font color="#ff0000"><b>YOURUSERNAME</b></font>@pughpugh.ph.ed.ac.uk:/Disk/ukqcd/QCDOC/CVS <br><span class="moz-txt-citetags"></span>cvs co cps++</pre>
+    This will then prompt you for your pughpugh password, and then check the 
 entire  codebase out into a directory called `cps++'.<br>
        
 <h2><a name="Submission_of_Changes"></a>
@@ -53,7 +53,11 @@ time  being, we request that all changes are cleared/submitted by ourselves
    ) so that we can retain overall control of the repository.
 Eventually there will (probably) be a committee of people to "approve"
 submissions, comprising of people 
-from UKQCD, Columbia and BNL.
+from UKQCD, Columbia and BNL. The CVS log messages are
+automatically send to the
+<a href="http://forge.nesc.ac.uk/mailman/listinfo/qcd-measure-cps++-auto">qcd-measure-cps++-auto</a> email list. (There may be annoying requests for moderation
+of the emails. These will stop once your email has been added to a list
+of approved people who can post to the list.)
 
 <h2><a name="Using_ssh"></a>
  Using ssh</h2>
