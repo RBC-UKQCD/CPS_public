@@ -397,10 +397,10 @@ WspectFuzzing::GetLink(const int *site, int dir) const
     for (int i = 0; i < 4; ++i) {
       while (site[i] != on_node_site[i]) {
         if (site[i] < 0) {
-          getMinusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv), i);
+          getMinusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv)/sizeof(IFloat), i);
           on_node_site[i] -= lcl_sites[i];
         } else {
-          getPlusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv), i);
+          getPlusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv)/sizeof(IFloat), i);
           on_node_site[i] += lcl_sites[i];
         }
         send = recv;
@@ -456,7 +456,7 @@ Matrix WspectFuzzing::staple_s(Matrix *gf_p,int x[4],int mu){
   stap.ZeroMatrix();
 
   //temporary buffers
-  Matrix mp1,mp2,mp3,m_tmp1,m_tmp2;
+  Matrix mp2,mp3;
   //int offset_x = siteOffset(site)*3;
   //Matrix *g_offset = gf_p+offset_x;
 

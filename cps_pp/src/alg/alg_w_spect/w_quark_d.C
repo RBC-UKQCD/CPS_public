@@ -449,10 +449,10 @@ const Vector *WspectQuark::getPropData(int isFullProp,const IFloat *prop_data_p,
     for (int i = 0; i < 4; ++i) {
       while (site[i] != on_node_site[i]) {
         if (site[i] < 0) {
-          getMinusData((IFloat *)recv, (IFloat *)&send[0], buf_byte_size, i);
+          getMinusData((IFloat *)recv, (IFloat *)&send[0], buf_byte_size/sizeof(IFloat), i);
           on_node_site[i] -= node_sites[i];
         } else {
-          getPlusData((IFloat *)recv, (IFloat *)&send[0], buf_byte_size, i);
+          getPlusData((IFloat *)recv, (IFloat *)&send[0], buf_byte_size/sizeof(IFloat), i);
           on_node_site[i] += node_sites[i];
         }
         moveMem((IFloat *)send, (const IFloat *)recv,buf_byte_size);

@@ -8,13 +8,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-02 14:13:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.9 2004-07-02 14:13:42 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.9 2004-07-02 14:13:42 chulwoo Exp $
+//  $Date: 2004-07-09 03:54:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.10 2004-07-09 03:54:23 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.10 2004-07-09 03:54:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -201,7 +201,6 @@ AlgHmcPhi::AlgHmcPhi(Lattice& latt,
     if(frm2 == 0)
       ERR.Pointer(cname,fname, "frm2");
     VRB.Smalloc(cname,fname, "frm2",frm2, n_masses * sizeof(int));
-    printf("frm1:FsiteSize()=%d\n",latt.FsiteSize());
     for(i=0; i<n_masses; i++){
       frm1[i] = (Vector *) smalloc(f_size * sizeof(Float));
       if(frm1[i] == 0)
@@ -441,11 +440,9 @@ Float AlgHmcPhi::run(void)
     true_res     = 1.0; // Set to non-zero so that FmatEvlInv 
                         // will return the true residual.
     IFloat *tmp = (IFloat *)frm1[i];
-    printf("frm1[%d] = %e\n",i,*tmp);
     cg_iter = 
       lat.FmatEvlInv(frm1[i], phi[i], frm_cg_arg[i], &true_res, CNV_FRM_NO);
     tmp = (IFloat *)phi[i];
-    printf("phi[%d] = %e\n",i,*tmp);
 //    exit(32);
     cg_iter_av = cg_iter_av + cg_iter;
     if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
@@ -658,7 +655,7 @@ Float AlgHmcPhi::run(void)
   // Print out monitor info
   //---------------------------------------------------------------
   if(common_arg->results != 0){
-    printf("Results ptr is 0x%8.8x\n",common_arg->results);
+    printf("Results ptr is %p\n",common_arg->results);
     if (common_arg->results == NULL) printf("FUCK\n");fflush(stdout);
     if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);

@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.4 2004-06-02 09:36:40 zs Exp $
+  $Id: w_quark.C,v 1.5 2004-07-09 03:54:23 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP
@@ -1631,10 +1631,10 @@ WspectQuark::GetSource(const int *site, const WspectHyperRectangle &whr) const
     for (int i = 0; i < 4; ++i) {
       while (site[i] != on_node_site[i]) {
         if (site[i] < 0) {
-          getMinusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv), i);
+          getMinusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv)/sizeof(IFloat), i);
           on_node_site[i] -= node_sites[i];
         } else {
-          getPlusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv), i);
+          getPlusData((IFloat *)&recv, (IFloat *)&send, sizeof(recv)/sizeof(IFloat), i);
           on_node_site[i] += node_sites[i];
         }
         send = recv;
