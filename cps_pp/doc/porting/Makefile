@@ -1,5 +1,7 @@
-#include<config.h>
-CPS_START_NAMESPACE
+#  The source document looks like 
+#  the onbe written in latex.
+#
+#
 PDFLATEX=pdflatex
 LATEX = latex
 DVIPS = dvips
@@ -30,4 +32,4 @@ $(SRC).tar.gz: $(SRC).tex
 
 clean:
 	rm -rf "#"*"#" *~ core *.toc *.tar.gz *.lof *.log *.aux *.dvi *.ps
-CPS_END_NAMESPACE
+
