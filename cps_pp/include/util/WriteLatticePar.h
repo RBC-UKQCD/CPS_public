@@ -40,34 +40,53 @@ class WriteLatticeParallel : private QioControl
     string hd_archive_date ;
     char *cname;
 
-
  public:
+    // ctor for 2-step unloading
+    WriteLatticeParallel()  
+      : QioControl(), unload_good(false), cname("WriteLatticeParallel") {
+      defaultHeader();
+    }
+
+    // ctor containing unloading behavior
     WriteLatticeParallel(Lattice & lat, const char * filename,
-			 const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 0)
-      :   QioControl(), cname("WriteLatticeParallel"), unload_good(false) 
-  {
+			 const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 1)
+      : QioControl(), unload_good(false), cname("WriteLatticeParallel")   {
+      defaultHeader();
       QioArg  wt_arg(filename, dataFormat, recon_row_3);
       write(lat, wt_arg);
     }
 
+    // ctor containing unloading behavior
     WriteLatticeParallel(Lattice & lat, const QioArg & wt_arg)
-      : QioControl(), cname("WriteLatticeParallel"), unload_good(false) { 
+      : QioControl(), unload_good(false), cname("WriteLatticeParallel")   {
+      defaultHeader();
       write(lat, wt_arg);
     }
 
     ~WriteLatticeParallel() {}
 
-    void writeHeader(ostream & fout, Float link_trace, Float plaq, const QioArg & wt_arg); 
+    void setHeader(const char * EnsembleId, const char * EnsembleLabel,
+		   const int SequenceNumber, const char * Creator);
 
+    void write(Lattice & lat, const char * filename,
+	       const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 1) {
+      QioArg  wt_arg(filename, dataFormat, recon_row_3);
+      write(lat, wt_arg);
+    }
     void write(Lattice & lat, const QioArg & wt_arg);
 
     inline bool good() { return unload_good; }
+
  private:
     FPConv fpconv;
     bool unload_good;
     int data_start;
     int csum_pos;
     bool recon_row_3;
+
+    void defaultHeader();
+    void writeHeader(ostream & fout, Float link_trace, Float plaq, const QioArg & wt_arg); 
+
 };
 
 
