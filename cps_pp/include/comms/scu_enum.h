@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  The MPI communication direction and flag enumerations:
 
-  $Id: scu_enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Id: scu_enum.h,v 1.3 2003-08-08 16:04:47 zs Exp $
 */
 /*---------------------------------------------------------------
   This is very closely based on the original scu_enum.h from QCDSP.
@@ -21,13 +21,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2003-07-24 16:53:53 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
-  $Id: scu_enum.h,v 1.2 2003-07-24 16:53:53 zs Exp $
+  $Date: 2003-08-08 16:04:47 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.3 2003-08-08 16:04:47 zs Exp $
+  $Id: scu_enum.h,v 1.3 2003-08-08 16:04:47 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_enum.h,v $
-  $Revision: 1.2 $
+  $Revision: 1.3 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -71,8 +71,8 @@ enum SCUDir {
   SCU_YP,                      /*!< +y */  
   SCU_YM,                      /*!< -y */  
   SCU_ZP,                      /*!< +z */  
-  SCU_ZM,                      /*!< -z */ 
-  SCU_NoDir = -1              /*!< Null direction */
+  SCU_ZM,                      /*!< -z */
+  SCU_NoDir = -1             /*!< Null direction */
 };
 
 
