@@ -8,13 +8,6 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Log: not supported by cvs2svn $
-//  Revision 1.4.4.1  2004/07/15 22:00:40  chulwoo
-//  *** empty log message ***
-//
-//  Revision 1.4  2004/06/07 19:56:25  mclark
-//  Merging rhmc_update to trunk.
-//
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_passthru/glb_sum_multi_dir.C,v $
 //  $State: Exp $
 //

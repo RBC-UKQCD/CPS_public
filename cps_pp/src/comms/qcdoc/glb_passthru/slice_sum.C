@@ -8,11 +8,6 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Log: not supported by cvs2svn $
-//  Revision 1.2.18.1  2004/06/07 17:12:17  mclark
-//  Optimised RHMC force term for asqtad fermions. Fully implemented RHMC for all fermion
-//  types bar clover.  Fixed lots of minor bugs.
-//
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/glb_passthru/slice_sum.C,v $
 //  $State: Exp $
 //
