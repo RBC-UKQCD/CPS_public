@@ -1,9 +1,16 @@
+/*! \file
+
+$Id: cps_compat.C,v 1.5 2004-07-28 17:26:29 zs Exp $
+*/
+	
+  
 #include <util/wilson.h>
 #include <util/gjp.h>
 #include <util/smalloc.h>
 #include <util/verbose.h>
 #include <util/error.h>
 #include <util/wfm.h>
+CPS_START_NAMESPACE
 
 /*----------------------------------------------------------------------*/
 /* for backward dwf and clover compatibility in CPS                     */
@@ -53,3 +60,4 @@ void wilson_compat_end(Wilson *wilson_p)
   sfree(wilson_p->ptr);
 }
 
+CPS_END_NAMESPACE

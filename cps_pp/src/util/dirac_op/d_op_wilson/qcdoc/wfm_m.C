@@ -1,5 +1,6 @@
 #include <util/wfm.h>
 #include "wfm_internal.h"
+CPS_START_NAMESPACE
 
 /*--------------------------------------------------------------------------*/
 /* wilson_m:                                                                */
@@ -128,6 +129,6 @@ void wfm::mdagm(Float *chi,
 }
 
 
-
+CPS_END_NAMESPACE
 
 

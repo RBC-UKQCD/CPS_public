@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-07-02 22:11:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/clover.C,v 1.2 2004-07-02 22:11:02 chulwoo Exp $
-//  $Id: clover.C,v 1.2 2004-07-02 22:11:02 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-07-28 17:26:29 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/clover.C,v 1.3 2004-07-28 17:26:29 zs Exp $
+//  $Id: clover.C,v 1.3 2004-07-28 17:26:29 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: clover.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/clover.C,v $
 //  $State: Exp $
 //
@@ -136,10 +136,12 @@ void clover_end(Clover *clover_p)
 extern "C" { 
   void clover_mat_mlt_asm(IFloat *out,const IFloat *mat,const IFloat *in,int n);
 }
+CPS_END_NAMESPACE
 #include <stdio.h>
 #include <util/dirac_op.h>
 #include <time.h>
 #include <sys/time.h>
+CPS_START_NAMESPACE
 
 void clover_mat_mlt_C(IFloat *out, const IFloat *mat, const IFloat *in, int n) 
 {

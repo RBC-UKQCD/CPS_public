@@ -2,6 +2,7 @@
 #include "wfm_internal.h"
 #include <stdio.h>
 #include <stdlib.h>
+CPS_START_NAMESPACE
 
 #ifdef USE_COMMS_NONE
 void wfm::comm_init(void)
@@ -308,3 +309,5 @@ void wfm::comm_complete(int cb)
 #ifdef USE_COMMS_QMP
 #error QMP NOT SUPPORTED YET
 #endif
+
+CPS_END_NAMESPACE

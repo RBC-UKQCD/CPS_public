@@ -1,7 +1,7 @@
 #include <util/wfm.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+CPS_START_NAMESPACE
 /*=========================================================================*/
 /* C binding for wilson library:                                           */
 /*=========================================================================*/
@@ -205,3 +205,4 @@ void wfm_dslash_vec( int nvec,
 
 }
 
+CPS_END_NAMESPACE

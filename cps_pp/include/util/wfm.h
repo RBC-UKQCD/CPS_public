@@ -1,4 +1,9 @@
 /****************************************************************************/
+/*! \file
+ \brief Definitions for the Wilson fermion matrix code
+
+ $Id: wfm.h,v 1.5 2004-07-28 17:26:29 zs Exp $
+*/
 /* Jan/2003                                                                 */
 /* Peter Boyle.                                                             */
 /*                                                                          */
@@ -10,8 +15,10 @@
 #ifndef INCLUDED_WFM_PAB_H
 #define INCLUDED_WFM_PAB_H
 
+
 #include <util/wilson.h>
 #include <util/wfm_config.h>
+CPS_START_NAMESPACE
 
 struct WilsonArg {
    int local_latt[4];
@@ -299,4 +306,5 @@ class wfm : public WilsonArg {
 
 #endif
 
+CPS_END_NAMESPACE
 #endif

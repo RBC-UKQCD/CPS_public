@@ -9,6 +9,7 @@
 #include "wfm_internal.h"
 #include <sys/time.h>
 #include <stdio.h>
+CPS_START_NAMESPACE
  
 #ifndef timersub
 #define timersub(a, b, result)                                                \
@@ -104,7 +105,7 @@ void wfm::dslash(Float *chi,
   return;
 }
 
-
+CPS_END_NAMESPACE
 
 
 

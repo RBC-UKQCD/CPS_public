@@ -38,7 +38,7 @@
 #include <stdio.h>
 
 #include <util/wfm.h>
-
+CPS_START_NAMESPACE
 
 void wfm::pointers_end(void)
 {
@@ -245,3 +245,4 @@ int wfm::local_psite(int addr[4],int latt[4])
 
 
 
+CPS_END_NAMESPACE

@@ -43,6 +43,7 @@
 #include <stdio.h>
 
 #include <util/wfm.h>
+CPS_START_NAMESPACE
 
 void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
 {
@@ -191,3 +192,4 @@ void wfm::end (void)
   FREE(spinor_tmp);
 }
 
+CPS_END_NAMESPACE
