@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  The MPI communication direction and flag enumerations:
 
-  $Id: scu_enum.h,v 1.4 2003-08-27 08:30:24 zs Exp $
+  $Id: scu_enum.h,v 1.5 2003-08-28 15:08:07 zs Exp $
 */
 
 
@@ -23,17 +23,18 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2003-08-27 08:30:24 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.4 2003-08-27 08:30:24 zs Exp $
-  $Id: scu_enum.h,v 1.4 2003-08-27 08:30:24 zs Exp $
+  $Date: 2003-08-28 15:08:07 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v 1.5 2003-08-28 15:08:07 zs Exp $
+  $Id: scu_enum.h,v 1.5 2003-08-28 15:08:07 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_enum.h,v $
-  $Revision: 1.4 $
+  $Revision: 1.5 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_enum.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
+#ifdef SCU_ENUM_H
 
 /* Allow the MPI stuff to be switched out, thus avoiding compiler
    errors (for the time being). */
@@ -96,8 +97,6 @@ enum SCUXR {
     SCU_NoXR = -1    /*!< Dummy flag for serial code */
 };
 
-#endif
-
 #endif /* INCLUDE_MPI_SCU */
 
-
+#endif
