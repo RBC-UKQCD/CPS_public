@@ -30,6 +30,11 @@ CPS_END_NAMESPACE
 #include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
+const unsigned FstagTypes::CBUF_MODE1;
+const unsigned FstagTypes::CBUF_MODE2;
+const unsigned FstagTypes::CBUF_MODE3;
+const unsigned FstagTypes::CBUF_MODE4;
+
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
