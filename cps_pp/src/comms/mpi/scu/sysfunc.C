@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions for the MPI implementation of the QCDSP/QCDOC communications layer.
   
-  $Id: sysfunc.C,v 1.6 2004-08-18 12:19:43 zs Exp $
+  $Id: sysfunc.C,v 1.7 2004-09-03 12:35:09 zs Exp $
 */
 /*----------------------------------------------------------------------
 /* The Sysfunc Comms Interface: sysfunc.C
@@ -16,13 +16,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: zs $
-  $Date: 2004-08-18 12:19:43 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v 1.6 2004-08-18 12:19:43 zs Exp $
-  $Id: sysfunc.C,v 1.6 2004-08-18 12:19:43 zs Exp $
+  $Date: 2004-09-03 12:35:09 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v 1.7 2004-09-03 12:35:09 zs Exp $
+  $Id: sysfunc.C,v 1.7 2004-09-03 12:35:09 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.C,v $
-  $Revision: 1.6 $
+  $Revision: 1.7 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -132,48 +132,48 @@ int SizeS() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::
 int NumNodes() { if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::peNum; }
 
 //----------------------------------------------------------------
-/*!
-  The seed is (in general) different for each node and is (in general)
-  changed every time the machine is reset.
+/*
+  The seed can be different for each node and can
+  change every time the machine is reset.
 
-  The behaviour of the MPI version may differ from that of the like-named 
-  QCDSP/QCDOC system function.
+  \note The behaviour of the MPI and serial implementations
+  may differ from that of the QCDSP/QCDOC system function.
 */
 //----------------------------------------------------------------
 unsigned int Seed(){ return MPISCU::ReadSeedFile(); }
 //----------------------------------------------------------------
-/*!
-  The seed  is the same for each node (spatially fixed, hence the S), but
-  changes every time the machine is reset.
+/*
+  The seed is the same for each node (spatially fixed, hence the S), but
+  can change every time the machine is reset.
 
-  The behaviour of the MPI version may differ from that of the like-named
-  QCDSP/QCDOC system function.
+  \note The behaviour of the MPI and serial implementations may differ
+  from that of the QCDSP/QCDOC system function.
 */
 //----------------------------------------------------------------
 unsigned int SeedS(){ if( !MPISCU::Is_Initialised ) MPISCU::CommsInit(); return MPISCU::RNGseed; }
 //----------------------------------------------------------------
-/*!
-  SeedT is different for each node, but is fixed in time (the T), so it is
+/*
+  SeedT can be different for each node, but is fixed in time (the T), so it is
   unchanged by a reset.
 
-  The behaviour of the MPI version may differ from that of the like-named 
-  QCDSP/QCDOC system function.
+  \note The behaviour of the MPI and serial implementations may
+  differ from that of the QCDSP/QCDOC system function.
 */
 //----------------------------------------------------------------
 unsigned int SeedT(){ return Seed(); }
 //----------------------------------------------------------------
-/*!
+/*
   SeedST is the same for each node (spatially fixed, hence the S), and the
   same after every reset (fixed time, hence T).
 
-  The behaviour of the MPI version may differ from that of the like-named 
-  QCDSP/QCDOC system function.
+  \note The behaviour of the MPI and serial implementations may differ
+  from that of the QCDSP/QCDOC system function.
 */
 //----------------------------------------------------------------
 unsigned int SeedST(){ return SeedS(); }
 
 //----------------------------------------------------------------
-/*!
+/*
   This function blocks further code execution until all
   nodes in the machine have begun executing the code in the sync()
   routine.
@@ -187,7 +187,7 @@ unsigned int sync() {
 }
 
 //----------------------------------------------------------------
-/*!
+/*
   On QCDSP this function returns the explicit wire
   number (0 - 7) of the physics direction given by \a dir. In the MPI
   version this returns the internal direction from the cartesian
