@@ -32,7 +32,7 @@ INCLIST := $(INCLIST) -I$(TOPINC)/include/comms
 endif
 endif
 
-CFLAGS= -DTARGET_QCDSP=$(TARGET_QCDSP)  -O2
+CFLAGS= @CXXFLAGS@ 
 
 #
 # Libraries for the Columbia code
