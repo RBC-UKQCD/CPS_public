@@ -1,12 +1,10 @@
-#NORECURSE_DIR = autom4te.cache CVS doc tests include
-#QCDOC_DIR = 
-#QCDOC_SERIAL_DIR =
-#QCDSP_DIR =
-#MPI_DIR = mpi
-#NOARCH_DIR = noarch
-#include Makefile.rules
+# CPS makefile
+# $Id: Makefile.in,v 1.7 2004-02-09 14:30:07 zs Exp $
+# @configure_input@
+
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_builddir@
+TESTDIR = $(SRCDIR)/tests
 QOS = @QOS@
 
 all: recurse
@@ -30,10 +28,7 @@ install:
 	cp Makefile Makefile.rules Makefile.vars Makefile.compile ${SRCDIR}
 	cp tests/Makefile_common* ${SRCDIR}/tests
 
-# create the documentation
-# docs:
-#	cd ${SRCDIR}/doc ; sh mkdocs.sh 
-#
+#  Create the documentation
 
 
 have_doxygen = @have_doxygen@
@@ -46,8 +41,8 @@ else
 
 docs:
 	cd ${SRCDIR}/doc ; sh mkdocs.sh 
-#
-#  documentation for the web pages
+
+#  Documentation for the web pages
 #  (this deletes the source code so that it is not posted on the web)
 
 subdirs = $(dir $(shell ls doc/*/Makefile))
@@ -62,3 +57,9 @@ webdocs:
 	@find doc -name "*.html" -o -name "*.*ps" -o -name "*.gif" -o -name "*.png" -o -name "*.jp*g" -o -name "*.pdf" -o -name "*.tar.gz" |xargs chmod 644
 
 endif
+
+#  Run the regression test suite
+
+test: cps
+	cd $(TESTDIR) ; perl regression.pl
+	cd $(TESTDIR) ; sh regression.sh

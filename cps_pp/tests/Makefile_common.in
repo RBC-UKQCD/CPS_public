@@ -1,14 +1,9 @@
-#
+# $Id: Makefile_common.in,v 1.8 2004-02-09 14:30:07 zs Exp $
+# @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
-#
-#
-#
+#----------------------------------------------------------------------
 
-
-# This should point at the top level directory for the 
-# cps code.
-TOP=../../..
 
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_top_builddir@
@@ -16,7 +11,7 @@ QOS = @QOS@
 COMPILER = @CXX@
 LDFLAGS = @LDFLAGS@
 
-BIN = regression_cps
+BIN = regression_cps.x
 
 
 
@@ -49,10 +44,10 @@ LIBLIST =\
 
 me = $(notdir $(PWD))
 
-all:$(BIN).x
+all:$(BIN)
 
-$(BIN).x:  main.o
-	$(COMPILER) -o $(BIN).x main.o $(LIBLIST) $(LDFLAGS)
+$(BIN):  main.o
+	$(COMPILER) -o $(BIN) main.o $(LIBLIST) $(LDFLAGS)
 
 main.o: main.C
 	$(COMPILER) -o main.o $(CFLAGS) -c $(INCLIST) main.C
@@ -61,7 +56,7 @@ cps:
 	$(MAKE) -C $(BUILDDIR)
 
 clean:
-	rm -f *.dat *.o  $(BIN).x
+	rm -f *.dat *.o  $(BIN)
 	rm -f ../regressions/*$(me).dat
 	rm -f ../regressions/*$(me).checklog
 

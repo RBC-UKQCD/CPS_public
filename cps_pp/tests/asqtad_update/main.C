@@ -1,4 +1,19 @@
 #include<config.h>
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: zs $
+//  $Date: 2004-02-09 14:30:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_update/main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
+//  $Id: main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $RCSfile: main.C,v $
+//  $Revision: 1.3 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_update/main.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
 
 
 #include <stdio.h>
@@ -13,20 +28,17 @@
 #include<alg/hmd_arg.h>
 #include<alg/ghb_arg.h>
 
-namespace cps
-{
+CPS_START_NAMESPACE
 GlobalJobParameter GJP;
 LatRanGen LRG;
 Verbose VRB;
 Error ERR;
-}
+CPS_END_NAMESPACE
 
-using namespace cps ;
+USING_NAMESPACE_CPS
 
 
 int main(int argc,char *argv[]){
-
-    FILE *fp;
 
     //----------------------------------------------------------------
     // Initializes all Global Job Parameters
@@ -83,7 +95,7 @@ int main(int argc,char *argv[]){
     VRB.Level(GJP.VerboseLevel());
 
 
-    GnoneFstagAsqtad lat;
+    GnoneFasqtad lat;
 
     Matrix *mom =
 	(Matrix*)smalloc(GJP.VolNodeSites()*lat.GsiteSize()*sizeof(IFloat));
@@ -122,24 +134,30 @@ int main(int argc,char *argv[]){
     
     lat.EvolveMomFforce(mom, X, dummy, dt);
 
-    printf(" x y z t\n");
+
+    FILE *fp;
+    if( (fp = fopen("update.dat", "a")) == NULL ) 
+	ERR.FileA(" ","main", "info.dat");
+    
+
+    fprintf(fp, " x y z t\n");
     
     for(s[3]=0; s[3]<GJP.NodeSites(3); s[3]++) 
 	for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
 	    for(s[1]=0; s[1]<GJP.NodeSites(1); s[1]++)
 		for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
 
-		    printf("\n %d %d %d %d", s[0], s[1], s[2], s[3]);
+		    fprintf(fp, "\n %d %d %d %d", s[0], s[1], s[2], s[3]);
 		    int n = lat.FsiteOffset(s);
 
 		    for(int d=0; d<4; d++){
-			printf("\n         %d\n\n", d);
+			fprintf(fp, "\n         %d\n\n", d);
 			for(int i=0; i<3; i++){
 			    for(int j=0; j<3; j++)
-				printf(" (%+7e %+7e)",
+				fprintf(fp, " (%+7e %+7e)",
 				       (*(mom+4*n+d))(i,j).real(),
 				       (*(mom+4*n+d))(i,j).imag());
-			    printf("\n");
+			    fprintf(fp, "\n");
 			}
 		    }
 		}

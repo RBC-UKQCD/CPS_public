@@ -1,12 +1,6 @@
+# $Id: regression.pl,v 1.10 2004-02-09 14:30:07 zs Exp $
 # tests/regression.pl.  Generated from regression.pl.in by configure.
-# $Id: regression.pl,v 1.9 2004-01-13 20:39:57 chulwoo Exp $ 
-# Note that this shebang line may not work everywhere, as some 
-# Unixies put perl elsewhere, e.g. /usr/bin/perl.
-#
-# More portable to call this script via:
-#   perl regression.pl
-#
-#  The location of perl could be put in by the autoconf system
+# $Id: regression.pl,v 1.10 2004-02-09 14:30:07 zs Exp $ 
 #--------------------------------------------------------------------
 
 #
@@ -29,9 +23,9 @@ $error_tol = 0.001;
 
 if( 'yes' eq 'yes' ) {
 # This makes it run autoconf version:
-  $machine = 'powerpc-gnu-elf';
-  $parallel = 'yes';
-  $compiler = 'env GCC_EXEC_PREFIX=${QOS}/quser/gcc-lib-user/// powerpc-gnu-elf-gcc';
+  $machine = 'i686-pc-linux-gnu';
+  $parallel = 'no';
+  $compiler = 'gcc';
   $executable = "regression_cps.x";
 } else {
 # This is right for the parallel QCDSP version:

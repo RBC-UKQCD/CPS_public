@@ -2,129 +2,36 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mcneile $
-//  $Date: 2003-07-29 10:14:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/xi_spect_gsum/main.C,v 1.2 2003-07-29 10:14:52 mcneile Exp $
-//  $Id: main.C,v 1.2 2003-07-29 10:14:52 mcneile Exp $
+//  $Author: zs $
+//  $Date: 2004-02-09 14:30:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/xi_spect_gsum/main.C,v 1.3 2004-02-09 14:30:08 zs Exp $
+//  $Id: main.C,v 1.3 2004-02-09 14:30:08 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.1.1.1  2003/06/22 13:34:47  mcneile
-//  This is the cleaned up version of the Columbia Physics System.
-//  The directory structure has been changed.
-//  The include paths have been updated.
-//
-//
-//  Revision 1.10  2002/12/04 17:16:27  zs
-//  Merged the new 2^4 RNG into the code.
-//  This new RNG is implemented in the LatRanGen class.
-//  The following algorithm and utility classes are affected:
-//
-//  AlgEig                  Fdwf
-//  AlgGheatBath            Fstag
-//  AlgHmd                  GlobalJobParameter
-//  AlgNoise                Lattice
-//  AlgPbp                  Matrix
-//  AlgThreept              RandomGenerator
-//                          Vector
-//
-//  Revision 1.9  2001/09/06 11:51:45  anj
-//  Minor modifications to the test suite, e.g. standardizing the
-//  verbosity and such.  Collected the output from the original and the
-//  latest versions using the new test suite, and checked them. Anj
-//
-//  Revision 1.8  2001/08/17 20:03:48  anj
-//  Multiple (extra) changes to make the test suite smaller (16CPUs
-//  required, not 64) and faster.  Anj
-//
-//  Revision 1.7  2001/08/16 12:54:27  anj
-//  Some fixes follosin the float-> float change, mostly of the (variable
-//  anme) float_p -> float_p type.  A few fixes to ensure the test
-//  programs use the same level of verbosity throughout, and an update of
-//  the regression.pl script to make it more useful. Anj
-//
-//  Revision 1.6  2001/08/16 10:50:13  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "float".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and float).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.5  2001/07/03 17:01:00  anj
-//
-//  Multiple minor alterations to change some #include's from referring to
-//  files relative to the top-level source directory to referring to files
-//  relative to the source-file positions.  This alteration makes the code
-//  backwards compatable with the make structure of QCDSP, although this
-//  may have to be changed to a more usual form in the future. Anj.
-//
-//  Revision 1.4  2001/06/28 14:34:20  anj
-//
-//  The core ANSIfication should now be complete.  There are a few
-//  remaining issues, but this version should compile anywhere and be
-//  backward compatable with QCDSP (although this requires the top source
-//  directory (.../phys/ to be added to the include path).
-//
-//  The serial GCC version has also been tested, and all test programs
-//  appear to behave as they should (not to imply that they all work, but
-//  I believe those that should work are ok).  There are minor differences
-//  in the results due to rounding, (see example pbp_gccsun.dat files),
-//  but that is all.
-//
-//  Anj.
-//
-//  Revision 1.3  2001/06/21 15:40:16  anj
-//  Updated the _TARTAN ifdefs, using PARALLEL instead (where appropriate).Anj
-//
-//  Revision 1.2  2001/06/19 18:12:35  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:05  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: main.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/xi_spect_gsum/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
+
 #include <stdio.h>
-#include <stdlib.h>	// exit()
-#include<config.h>
 #include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/verbose.h>
-#include<util/error.h>
 #include<alg/alg_hmd.h>
 #include<alg/alg_pbp.h>
 #include<alg/alg_w_spect.h>
 #include<alg/alg_plaq.h>
 #include<alg/do_arg.h>
-#include<alg/common_arg.h>
-#include<alg/hmd_arg.h>
-#include<alg/pbp_arg.h>
-#include<alg/w_spect_arg.h>
 #include<alg/no_arg.h>
 
-namespace cps
-{
+CPS_START_NAMESPACE
 GlobalJobParameter GJP;
 LatRanGen LRG;
 Verbose VRB;
 Error ERR;
-}
+CPS_END_NAMESPACE
 
-using namespace cps ;
+USING_NAMESPACE_CPS
 
 
 int main(int argc,char *argv[])

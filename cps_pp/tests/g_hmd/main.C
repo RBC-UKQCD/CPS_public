@@ -3,46 +3,38 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-10-31 14:15:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.3 2003-10-31 14:15:33 zs Exp $
-//  $Id: main.C,v 1.3 2003-10-31 14:15:33 zs Exp $
+//  $Date: 2004-02-09 14:30:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.4 2004-02-09 14:30:07 zs Exp $
+//  $Id: main.C,v 1.4 2004-02-09 14:30:07 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-#include <stdio.h>
-#include <stdlib.h>	// exit()
-#include<config.h>
+
 #include<util/lattice.h>
-#include<util/gjp.h>
-#include<util/verbose.h>
-#include<util/error.h>
 #include<alg/alg_hmd.h>
 #include<alg/alg_plaq.h>
 #include<alg/alg_rect.h>
 #include<alg/do_arg.h>
 #include<alg/no_arg.h>
-#include<alg/hmd_arg.h>
-#include<alg/common_arg.h>
-#include<util/random.h>
 
-#ifdef PARALLEL
-#include <comms/sysfunc.h>
-#endif
 
-namespace cps
-{
+CPS_START_NAMESPACE
+
 GlobalJobParameter GJP;
 LatRanGen LRG;
 Verbose VRB;
 Error ERR;
-}
+CPS_END_NAMESPACE
 
-using namespace cps ;
+USING_NAMESPACE_CPS
+
+
+
 
 
 int main(int argc,char *argv[])

@@ -1,33 +1,34 @@
+#include<config.h>
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: zs $
+//  $Date: 2004-02-09 14:30:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
+//  $Id: main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $RCSfile: main.C,v $
+//  $Revision: 1.3 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
 /* Quick Wilson Monte Carlo code, which measures the plaquette on each trajectory. */
 
-#include <util/random.h>
 
-#include <stdio.h>
-#include <stdlib.h>	// exit()
-#include <config.h>
+
 
 #include <util/lattice.h>
 #include <util/gjp.h>
-#include <util/verbose.h>
-#include <util/error.h>
+
 #include <util/qcdio.h>
 #include <alg/alg_hmd.h>
 #include <alg/alg_s_spect.h>
 #include <alg/do_arg.h>
-#include <alg/common_arg.h>
-#include <alg/cg_arg.h>
-#include <alg/hmd_arg.h>
-#include <alg/s_spect_arg.h>
-#include <alg/fix_gauge_arg.h>
 #include <alg/alg_fix_gauge.h>
 #include <alg/aots_s.h>
-#include <util/vector.h>
-#include <util/random.h>
 
-
-// ANSI stuff
-#include <string>
-#include <iostream>
 
 const int nx = 16;
 const int ny = 16;
