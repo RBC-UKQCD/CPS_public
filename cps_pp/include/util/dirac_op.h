@@ -56,6 +56,10 @@ class DiracOp
   static int scope_lock;           // lock that forbids more than
                                    // one DiracOp object to be on
                                    // scope at any time.
+
+  // PAB... uniform performance counting
+  static int CGflops;
+
   DiracOp(Lattice& latt,           // Lattice object.
 	  Vector *f_field_out,     // Output fermion field ptr.
 	  Vector *f_field_in,      // Input fermion field ptr.
@@ -909,7 +913,7 @@ class DiracOpClover : public DiracOpWilsonTypes
   //!< Computes the clover matrix or its inverse at all sites with a given parity.  
 
   //! Multiplication by the odd-even preconditioned fermion matrix or its hermitian conjugate.
-  void MatPcDagOrNot(Vector *out, const Vector *in, int dag) const;
+  void MatPcDagOrNot(Vector *out, const Vector *in, int dag, Float *dot=NULL) const;
 
   // FOR THE PURPOSE OF DEBUGGING ONLY
   //----------------------------------------------------------------------

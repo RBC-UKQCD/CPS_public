@@ -161,7 +161,7 @@ Float FstagTypes::FhamiltonNode( Vector *phi,  Vector *chi) {
 //------------------------------------------------------------------
 int FstagTypes::FsiteOffset(const int *x) const{
 
-    return x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+node_sites[3]*x[3]));
+    return x[0]+node_sites[0]*(x[1]+node_sites[1]*(x[2]+node_sites[2]*x[3]));
 }
 
 

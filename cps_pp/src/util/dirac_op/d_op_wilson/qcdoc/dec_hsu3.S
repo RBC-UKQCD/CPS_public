@@ -78,8 +78,6 @@ dec_hsu3:
 	lfd   20,	160(%r9)
 	lfd   21,	168(%r9)
 	mtctr 	%r14
-	b       dec_hsu3_lab1
-.align 4
 dec_hsu3_lab1:
 	addi  %r15 , %r13 , 160
 	lfd   4,	32(%r9)
@@ -313,8 +311,6 @@ dec_hsu3_lab1:
 	lfd   5,	40(%r11)
 	lfd   7,	56(%r11)
 	mtctr 	%r20
-	b       dec_hsu3_lab2
-.align 4
 dec_hsu3_lab2:
 	fmul   28 , 18 , 0
 	stfd  30,	48(%r16)

@@ -110,6 +110,14 @@ void wfm::comm_init(void)
 /* with a single block-stride                                           */
 /* Optimise for this later                                              */
 /*----------------------------------------------------------------------*/
+  SendOps[0] = new SCUDirArgIR [8];
+  SendOps[1] = new SCUDirArgIR [8];
+  RecvOps[0] = new SCUDirArgIR [8];
+  RecvOps[1] = new SCUDirArgIR [8];
+  DA_multi   = new SCUDirArgMulti[2];
+  LoadDirArgIRs[0] = 1;
+  LoadDirArgIRs[1] = 1;
+
   printf("Initialising SCU for Dslash IR %d %d\n",IR,IR+1);
  
   block=(HALF_SPINOR_SIZE*sizeof(Float));
@@ -127,7 +135,6 @@ void wfm::comm_init(void)
       if( !local_comm[mu] ) { 
 
 
-	printf("Snd mu = %d %d+\n",mu,nbound[mu]);
 	SendOps[cb][mu].Init(send_bufs[Minus][mu],
 			     minus_dirs[mu],
 			     SCU_SEND,
@@ -136,7 +143,6 @@ void wfm::comm_init(void)
 			     stridenormal,
 			     IR+cb);
 
-	printf("Snd mu = %d %d-\n",mu,nbound[mu]);
 	SendOps[cb][mu+4].Init(send_bufs[Plus][mu],
 			       plus_dirs[mu],
 			       SCU_SEND,
@@ -159,7 +165,6 @@ void wfm::comm_init(void)
 	  stride*=PAD_HALF_SPINOR_SIZE*sizeof(Float);
 	  stride-=block;
 
-	  printf("Tplus %x %d %d\n",Base,block,stride);
 
 	  RecvOps[cb][mu].Init(Base,
 			       minus_dirs[mu],
@@ -170,7 +175,6 @@ void wfm::comm_init(void)
 			       IR+cb);
 
 	  Base = &two_spinor[face_table[cb][Minus][mu][0]*PAD_HALF_SPINOR_SIZE];
-	  printf("Tminus %x %d %d\n",Base,block,stride);
 	  
 	  RecvOps[cb][mu+4].Init(Base,
 			     plus_dirs[mu],
@@ -193,11 +197,6 @@ void wfm::comm_init(void)
 	  stride = (face_table[cb][Plus][mu][1] - face_table[cb][Plus][mu][0]) 
 	    * PAD_HALF_SPINOR_SIZE * sizeof(Float);
 	  stride -=block;
-	  printf("Face table %d %d\n",
-		 face_table[cb][Plus][mu][0],
-		 face_table[cb][Plus][mu][1]
-		 );
-	  printf("Xplus %x %d %d\n",Base,block,stride);
 	  RecvOps[cb][mu].Init(Base,
 			   plus_dirs[mu],
 			   SCU_REC,
@@ -207,7 +206,7 @@ void wfm::comm_init(void)
 			   IR+cb);
 
 	  Base = &two_spinor[face_table[cb][Minus][mu][0]*PAD_HALF_SPINOR_SIZE];
-	  printf("Xminus %x %d %d\n",Base,block,stride);
+
 	  RecvOps[cb][mu+4].Init(Base,
 				 minus_dirs[mu],
 				 SCU_REC,
@@ -218,7 +217,7 @@ void wfm::comm_init(void)
 
 	} else { 
 
-	  printf("mu = %d +\n",mu);
+
 	  RecvOps[cb][mu].Init(recv_bufs[Minus][mu],
 			       plus_dirs[mu],
 			       SCU_REC,
@@ -227,7 +226,7 @@ void wfm::comm_init(void)
 			       stridenormal,
 			       IR+cb);
 
-	  printf("mu = %d -\n",mu);
+
 	  RecvOps[cb][mu+4].Init(recv_bufs[Plus][mu],
 			     minus_dirs[mu],
 			     SCU_REC,
@@ -256,13 +255,22 @@ void wfm::comm_init(void)
 
 void wfm::comm_end(void)
 {
+  LoadDirArgIRs[0] = 1;
+  LoadDirArgIRs[1] = 1;
+  delete [] SendOps[0];
+  delete [] SendOps[1];
+  delete [] RecvOps[0];
+  delete [] RecvOps[1];
+  delete [] DA_multi;
   return;
 }
 
 void wfm::comm_start(int cb)
 {
   //  sys_cacheflush(0);
+//  DA_multi[cb].StartTrans(LoadDirArgIRs[cb]);
   DA_multi[cb].StartTrans();
+  LoadDirArgIRs[cb] = 0;
   return;
 }
 
@@ -271,7 +279,7 @@ int sys_cacheflush(int);
 }
 void wfm::comm_complete(int cb)
 {
-  DA_multi[cb].TransComplete();
+  DA_multi[cb].TransComplete(0);
   //  sys_cacheflush(0);
   /*
    * Optimisation possible....

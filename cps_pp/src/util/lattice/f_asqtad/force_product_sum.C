@@ -6,6 +6,7 @@
 */
 //--------------------------------------------------------------------
 
+#include <stdio.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
 
@@ -105,7 +106,7 @@ void Fasqtad::force_product_d_sum(const Matrix *v, const Matrix *w,
 
 }
 
-
+#if 0
 
 // The outer product of v and w, multiplied by the parity factor and
 // coeffient, and added to the force f.
@@ -135,3 +136,4 @@ void Fasqtad::force_product_sum(const Vector *v, const Vector *w,
 		}
 
 }
+#endif

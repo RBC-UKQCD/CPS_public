@@ -19,11 +19,9 @@ CPS_START_NAMESPACE
 //----------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include<stdio.h>
+#include<math.h>
 #include<util/dirac_op.h>
-CPS_START_NAMESPACE
-
-
-CPS_END_NAMESPACE
 #include<util/lattice.h>
 #include<util/vector.h>
 #include<util/enum.h>
@@ -193,11 +191,14 @@ void DiracOpClover::MatPcDagMatPc(Vector *out,
 // Local buffer:
 //    clover_lib_arg->frm_buf0
 //----------------------------------------------------------------------
-void DiracOpClover::MatPcDagOrNot(Vector *out, 
-				  const Vector *in, int dag) const 
+void DiracOpClover::MatPcDagOrNot(Vector *out, const Vector *in, 
+					int dag, Float *dot_prd) const 
 {
   char *fname = "MatPcDagOrNot";
   VRB.Func(cname,fname);
+
+  if(dot_prd)
+  	ERR.NotImplemented(cname,"MatPcDagOrNot(*V,*V,i,*F)");
 
   // use clover_lib_arg->frm_buf0 as local buffer
   //--------------------------------------------------------------------
@@ -208,8 +209,20 @@ void DiracOpClover::MatPcDagOrNot(Vector *out,
   //--------------------------------------------------------------------
   {
     Wilson* wilson_p = clover_lib_arg->wilson_p;
+#if 0
+    {IFloat *tmp = (IFloat *)in;
+    printf("in[0]=%e\n",*tmp);}
+#endif
     wilson_dslash((IFloat *)frm_buf0, (IFloat *)gauge_field, (IFloat *)in, 
 		  1, dag, wilson_p); 
+#if 0
+  {IFloat *tmp = (IFloat *)frm_buf0;
+    for(int i = 0;i<GJP.VolNodeSites()*lat.FsiteSize();i++,tmp++){
+    if (fabs(*tmp)>1e-5)
+    printf("frm_buf0[%d][%d]=%e\n",i/lat.FsiteSize(),i%lat.FsiteSize(),*(tmp) );
+    }
+  }
+#endif
     clover_mat_mlt((IFloat *)out, 
 		   (const IFloat *)(lat.Aux0Ptr()), 
 		   (const IFloat *)frm_buf0, 
@@ -382,6 +395,10 @@ int DiracOpClover::MatEvlInv(Vector *out, Vector *in, Float *true_res)
 {
   char *fname = "MatEvlInv(V*,V*,F*)";
   VRB.Func(cname,fname);
+  { IFloat *tmp = (IFloat *)in;
+  printf("in[0]=%e\n",*tmp);
+  }
+
 
   // out_even = Aee^inv Aee^inv in_even                      done!
   //--------------------------------------------------------------------

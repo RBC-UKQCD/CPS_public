@@ -1543,6 +1543,7 @@ class Fasqtad : public virtual FstagTypes
     char *cname;    // Class name.
 
  public:
+    static int ForceFlops;
 
     Fasqtad();
     virtual ~Fasqtad();
@@ -1598,7 +1599,7 @@ class Fasqtad : public virtual FstagTypes
 
     void shift_link(Matrix**, const int*, int);
 
-    void update_momenta(Matrix**, IFloat, Matrix*);
+    void update_momenta(Matrix**, IFloat, Matrix*, int parity = 0);
     
     ChkbType parity(const int*);
 

@@ -1,7 +1,7 @@
 /*!\file
   Staggered Dirac operator for QCDOC
 
-  $Id: dirac.C,v 1.7 2004-06-17 16:21:13 zs Exp $
+  $Id: dirac.C,v 1.8 2004-07-01 17:43:44 chulwoo Exp $
 */
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian
@@ -519,9 +519,10 @@ extern "C" void stag_dirac_init(const void * gauge_u )
     j = i % (NUM_DIR/2);
       SCUarg[i + 8] = new SCUDirArgIR;
       SCUarg[i + 8] ->Init(chi_off_node[i], scudir[i], SCU_REC, 
-		    VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 
-			       1, 0, IR_5);
-      buffer_flush[i] = VECT_LEN * sizeof(IFloat) * vol/ (384 * size[j]);
+		    blklen[j]*numblk[j], 1, 0, IR_5);
+//		    VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 
+//			       1, 0, IR_5);
+//      buffer_flush[i] = VECT_LEN * sizeof(IFloat) * vol/ (384 * size[j]);
 //send arguments
     if ((i == 0) || ( i == 4)){
       SCUarg[i] = new SCUDirArgIR(Tbuffer[(4 - i)/4], scudir[i], SCU_SEND, 
@@ -561,9 +562,7 @@ extern "C" void stag_destroy_dirac_buf()
   delete SCUmulti;
   
   for ( i = 0; i < 2; i++ ) {
-#if 0
-    sfree(Tbuffer[i]);
-#endif
+    qfree(Tbuffer[i]);
     sfree(ToffsetP[i]);
     sfree(ToffsetM[i]);
     sfree(chi_nl[i]);
@@ -574,7 +573,7 @@ extern "C" void stag_destroy_dirac_buf()
   for ( i = 0; i < NUM_DIR; i++ ) {
     delete SCUarg[i];
     delete SCUarg[i+8];
-//    sfree(chi_off_node[i]);
+    qfree(chi_off_node[i]);
   }  
 }
 //-------------------------------------------------------------------
@@ -976,7 +975,7 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   copy_buffer(countP[a_odd], (long)a, (long)Tbuffer[1], (long)ToffsetP[a_odd]);
 
   //make sure spinor field is in main memory before starting transfers
-  flush_cache_spinor(nflush, (long)a);
+//  flush_cache_spinor(nflush, (long)a);
 
   SCUarg[1]->Addr( a + Xoffset[1]);
   SCUarg[5]->Addr( a + Xoffset[5]);
@@ -987,7 +986,8 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   
   sys_cacheflush(0);
   SCUmulti->StartTrans();
-  save_reg((long)intreg, (long)dreg);
+  printf("SCUmulti started\n");
+//  save_reg((long)intreg, (long)dreg);
   //-----------------------------------------------------------------
   //do first local computations
   //-----------------------------------------------------------------
@@ -1005,7 +1005,9 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   //-----------------------------------------------------------------
   // check to see if transfers are done
   //-----------------------------------------------------------------
+  printf("SCUmulti ended\n");
   SCUmulti->TransComplete();
+  printf("SCUmulti ended\n");
 
   //-----------------------------------------------------------------
   //do the computations involving non-local spinors
@@ -1031,7 +1033,7 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
     dirac_sum_acc( vol/2, (long)chi[odd], (long)tmpfrm, (long)b);
   }
 
-  restore_reg((long)intreg, (long)dreg);
+//  restore_reg((long)intreg, (long)dreg);
 
 }
 

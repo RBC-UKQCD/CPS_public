@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.7 2004-05-12 17:23:57 zs Exp $
+  $Id: pt.h,v 1.8 2004-07-01 17:43:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-05-12 17:23:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.7 2004-05-12 17:23:57 zs Exp $
-//  $Id: pt.h,v 1.7 2004-05-12 17:23:57 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-07-01 17:43:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.8 2004-07-01 17:43:40 chulwoo Exp $
+//  $Id: pt.h,v 1.8 2004-07-01 17:43:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -62,6 +62,7 @@ class ParTrans
  public:
 
   static int scope_lock;           // lock that forbids more than
+  static int PTflops;
                                    // one ParTrans object to be on
                                    // scope at any time.
   ParTrans(Lattice& latt);         

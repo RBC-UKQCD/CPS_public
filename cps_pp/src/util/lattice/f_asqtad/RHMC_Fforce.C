@@ -4,7 +4,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce.C,v 1.3 2004-06-07 20:27:11 mclark Exp $
+  $Id: RHMC_Fforce.C,v 1.4 2004-07-01 17:43:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -18,7 +18,7 @@
 
 CPS_START_NAMESPACE
 
-
+  
 
 /*!
   The momentum is evolved for a single molecular dynamics timestep

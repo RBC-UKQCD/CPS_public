@@ -42,12 +42,14 @@ void wfm_scope_assert(int i)
 
 void wfm_init_internal(int num,WilsonArg *wilson_p)
 {
+  printf("wfm_init_internal(%d,%p)\n",num,wilson_p);
   wfm_scope_check(num);
   WilsonLock[num] = 1;
   StaticWilsonPAB[num].init(wilson_p);
 }
 void wfm_end_internal(int num)
 {
+  printf("wfm_init_internal(%d)\n",num);
   wfm_scope_assert(num);
   StaticWilsonPAB[num].end();
   WilsonLock[num] = 0;
@@ -57,6 +59,7 @@ extern "C" {
 
   void wfm_init(WilsonArg *wilson_p)
   {
+    printf("wfm_init(%p)\n",wilson_p);
     wilson_p->instruction_reg_num = 10;
     wfm_init_internal(0,wilson_p);
   }
@@ -70,8 +73,9 @@ extern "C" {
   }
 
 
-  void wfm_end(struct WilsonArg *)
+  void wfm_end(struct WilsonArg *wp)
   {
+    printf("wfm_end_internal(%p)\n",wp);
     wfm_end_internal(0);
   }
   void wfm_vec_end(struct WilsonArg *wp)
@@ -120,6 +124,28 @@ extern "C" {
 
 }
 
+
+void wfm_dslash_begin( Float *chi0, 
+		       Float *u, 
+		       Float *psi0, 
+		       int cb0, int dag)
+{
+  wfm_scope_assert(0);
+  StaticWilsonPAB[0].decom(psi0,u,cb0,dag);
+  StaticWilsonPAB[0].comm_start(cb0);
+}
+
+void wfm_dslash_end( Float *chi0, 
+		     Float *u, 
+		     Float *psi0, 
+		     int cb0, int dag)
+{
+  wfm_scope_assert(0);
+  StaticWilsonPAB[0].comm_complete(cb0);
+  StaticWilsonPAB[0].recon(chi0,u,cb0,dag);
+}
+
+
 void wfm_dslash_two( Float *chi0, Float *chi1, 
 		     Float *u, 
 		     Float *psi0, Float *psi1,
@@ -160,6 +186,7 @@ void wfm_dslash_vec( int nvec,
    * Apply dslash to a set of spinors in
    * an efficient way.
    */
+
   if ( nvec &0x1 ) { 
     start = 1;
     StaticWilsonPAB[0].dslash(chis[0],u,psis[0],cbs[0],dag);
@@ -167,11 +194,14 @@ void wfm_dslash_vec( int nvec,
     start = 0;
   }
   for(int i=start;i<nvec;i+=2){ 
+
     wfm_dslash_two(chis[i],chis[i+1],
-		      u,
-		      psis[i],psis[i+1],
-		      cbs[i] , cbs[i+1],
-		      dag );
+		   u,
+		   psis[i],psis[i+1],
+		   cbs[i] , cbs[i+1],
+		   dag );
+
   }
+
 }
 

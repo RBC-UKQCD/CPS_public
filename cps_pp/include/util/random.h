@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.6 2004-06-07 19:41:08 mclark Exp $
+  $Id: random.h,v 1.7 2004-07-01 17:43:40 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-06-07 19:41:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.6 2004-06-07 19:41:08 mclark Exp $
-//  $Id: random.h,v 1.6 2004-06-07 19:41:08 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-07-01 17:43:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.7 2004-07-01 17:43:40 chulwoo Exp $
+//  $Id: random.h,v 1.7 2004-07-01 17:43:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -220,8 +220,8 @@ class LatRanGen
     
     int n_rgen;  // Gives the number of generators (and hypercubes)
     int rgen_pos;// ID of the generator being used
-    int can[4];  // Needed for Canonical Assignment of Sites
-    int hx[4];   // int (GJP.(X,Y,Z,T)nodeSites / 2)
+    int can[5];  // Needed for Canonical Assignment of Sites
+    int hx[5];   // int (GJP.(X,Y,Z,T,S)nodeSites / 2)
     int is_initialized; // = 0 when LatRanGen is not initialized
                                 // = 1 when LatRanGen is initialized
     UGrandomGenerator *ugran;
@@ -249,7 +249,7 @@ class LatRanGen
     void SetInterval(IFloat high, IFloat low);
 
     //! Specifies which hypercube RNG to use.
-    void AssignGenerator(int x, int y, int z, int t);
+    void AssignGenerator(int x, int y, int z, int t,int s = 0);
     //! Specifies which hypercube RNG to use.
     void AssignGenerator(const int * coor);
     //! Specifies which hypercube RNG to use.

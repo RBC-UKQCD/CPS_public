@@ -76,6 +76,9 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   // Assume that only one DiracStagOp instance exists at any time,
   // otherwise we need a static data member to check initializtions
   //----------------------------------------------------------------
+#if 0
+  asqtad_dirac_init(latt.GaugeField());
+#endif
   asqtad_dirac_init_g();
 
   //----------------------------------------------------------------
@@ -118,6 +121,9 @@ DiracOpAsqtad::~DiracOpAsqtad() {
   else if(cnv_frm == CNV_FRM_NO)
     lat.Convert(CANONICAL);
 
+#if 0
+  asqtad_destroy_dirac_buf();
+#endif
   asqtad_destroy_dirac_buf_g();
 
   //----------------------------------------------------------------
@@ -162,21 +168,29 @@ DiracOpAsqtad::~DiracOpAsqtad() {
 void DiracOpAsqtad::MatPcDagMatPc(Vector *out, 
 			       Vector *in, 
 			       Float *dot_prd){
-  static long nflops = (1158)*GJP.VolNodeSites();
-  struct timeval start,end;
+ long nflops = (1146)*GJP.VolNodeSites();
+
 #undef PROFILE
 #ifdef PROFILE
+  struct timeval start,end;
   gettimeofday(&start,NULL);
 #endif
   asqtad_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
   asqtad_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
 
-  if( dot_prd !=0 ) vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);
-  else vaxmy(&mass_sq,in,out,f_size_cb/6);
+  if( dot_prd !=0 ){
+	vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);
+    CGflops +=f_size_cb*4;
+    nflops +=f_size_cb*4;
+  } else {
+    CGflops +=f_size_cb*2;
+    nflops +=f_size_cb*2;
+	vaxmy(&mass_sq,in,out,f_size_cb/6);
+  }
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  printf("DiracOpAsqtad::MatPcDagMatPc::");
+  printf("DiracOpAsqtad::MatPcDagMatPc:: ");
   print_flops(nflops,&start,&end);
 #endif
 }

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief Declarations of routine used internally in the DiracOpWilson class.
 
-  $Id: wilson.h,v 1.3 2004-04-27 03:51:17 cwj Exp $
+  $Id: wilson.h,v 1.4 2004-07-01 17:43:41 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.3 2004-04-27 03:51:17 cwj Exp $
-//  $Id: wilson.h,v 1.3 2004-04-27 03:51:17 cwj Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-07-01 17:43:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.4 2004-07-01 17:43:41 chulwoo Exp $
+//  $Id: wilson.h,v 1.4 2004-07-01 17:43:41 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: wilson.h,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v $
 //  $State: Exp $
 //
@@ -42,11 +42,10 @@ CPS_START_NAMESPACE
 #define ND                 4      //!< Number of space-time dimensions.
 #define SPINOR_SIZE        24     //!< Number of floating-point numbers in a Dirac spinor.
 #define HALF_SPINOR_SIZE   12     //!< Number of floating-point numbers in half a Dirac spinor.
+#define PAD_HALF_SPINOR_SIZE 16
 #define BLOCK   HALF_SPINOR_SIZE  //!< Number of floating-point numbers in a two-spinor.
 #define COLUMN_SPINOR_SIZE  6     //!< Number of floating-point numbers in a colour vector.
 #define GAUGE_SIZE         72     //!< Number of floating-point numbers in a colour matrix.
-#define PAD_HALF_SPINOR_SIZE 16   /* We pad to a divisor of the PEC reg size*/
-                                  /* to avoid compulsory reg misses         */
 
 /*--------------------------------------------------------------------------*/
 /* External                                                                 */
@@ -108,21 +107,24 @@ struct comm_params
   pointers to workspace arrays needed by the Wilson matrix multiplication
   routines.
  */
-typedef struct	{
-  int   *ptr;               //!< The dimensions of the local lattice.
-  int   yztmax;             /* # of points of the y-z-t lattice per node   */
-  int   offset;             /* communication addressing related            */
-  int   comm_offset[ND];    /* communication addressing related            */
-  int   comm_stride[ND];    /* communication addressing related            */
-  int   comm_blklen[ND];    /* communication addressing related            */
-  int   comm_numblk[ND];    /* communication addressing related            */
-  struct  comm_params comm[ND];  
-  int   vol[2];             //!< The local lattice volume
-  int   padded_subgrid_vol[ND];
-  IFloat *spinor_tmp;        //!< Workspace array 
-  IFloat *af[ND];     //!< Array of spinors
-  IFloat *ab[ND];     //!< Array of spinors  
+typedef struct
+	{
+    int   *ptr;               //!< The dimensions of the local lattice.
+   int   yztmax;             /* # of points of the y-z-t lattice per node   */
+   int   offset;             /* communication addressing related            */
+   int   comm_offset[ND];    /* communication addressing related            */
+   int   comm_stride[ND];    /* communication addressing related            */
+   int   comm_blklen[ND];    /* communication addressing related            */
+   int   comm_numblk[ND];    /* communication addressing related            */
+   struct  comm_params comm[ND];  
+    int   vol[2];             //!< The local lattice volume
+   int   padded_subgrid_vol[ND];
+    IFloat *spinor_tmp;        //!< Workspace array 
+    IFloat *af[ND];     //!< Array of spinors
+   IFloat *ab[ND];      //!< Array of spinors  
 } Wilson;
+
+
 
 /*--------------------------------------------------------------------------*/
 /* Function declarations                                                    */
@@ -238,17 +240,6 @@ void wilson_mdag(IFloat *chi,
 		 Wilson *wilson_p);
 
 }
-
-#ifdef PPC440QCDOC
-
-/*Comms routines*/
-void wfm_scatter_face(Wilson *wilson_p, int pm, int cb);
-void wfm_comm_init(Wilson *wp);
-void wfm_comm_forward_start(Wilson *wp);
-void wfm_comm_backward_start(Wilson *wp);
-void wfm_comm_forward_complete(Wilson *wp);
-void wfm_comm_backward_complete(Wilson *wp);
-#endif
 
 #endif
 

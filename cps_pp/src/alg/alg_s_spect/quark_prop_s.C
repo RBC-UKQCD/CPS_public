@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.6 2004-06-04 21:14:00 chulwoo Exp $
-//  $Id: quark_prop_s.C,v 1.6 2004-06-04 21:14:00 chulwoo Exp $
+//  $Date: 2004-07-01 17:43:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.7 2004-07-01 17:43:42 chulwoo Exp $
+//  $Id: quark_prop_s.C,v 1.7 2004-07-01 17:43:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: quark_prop_s.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v $
 //  $State: Exp $
 //
@@ -132,7 +132,7 @@ void QuarkPropS::setupQuarkPropS()
 //------------------------------------------------------------
 
 QuarkPropS::QuarkPropS(Lattice& lattice, StagQuarkArg& arg) 
-: qarg(arg), qid(arg.qid), lat(lattice)
+: qid(arg.qid), qarg(arg), lat(lattice)
 { VRB.Func(cname,"QuarkPropS(Lattice& , StagQuarkArg& )"); }
 
 //------------------------------------------------------------
@@ -236,7 +236,7 @@ void QuarkPropS::setWallSrc(Matrix **gm, StagQuarkSrc& qs, int color )
     //-----------------------------------------
     // check if the source is valid
     //-----------------------------------------
-    int wall;
+    int wall = 0;
     int count = 0; 
     for (i = 0; i < 4; ++i) {
       if ( qs.origin[i] == qs.end[i] ) {

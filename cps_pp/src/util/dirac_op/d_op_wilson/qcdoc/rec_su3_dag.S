@@ -76,8 +76,6 @@ rec_su3_dag:
 	lfd   18,	48(%r12)
 	lfd   19,	56(%r12)
 	mtctr 	%r27
-	b       rec_su3_dag_lab1
-.align 4
 rec_su3_dag_lab1:
 	addi  %r11 , %r10 , 0
 	dcbt 	%r28,%r12
@@ -101,8 +99,6 @@ rec_su3_dag_lab1:
 	lfd   18,	48(%r12)
 	lfd   19,	56(%r12)
 	mtctr 	%r23
-	b       rec_su3_dag_lab2
-.align 4
 rec_su3_dag_lab2:
 	addi  %r14 , %r12 , 128
 	stfd  30,	48(%r24)

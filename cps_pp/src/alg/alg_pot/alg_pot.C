@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot/alg_pot.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
-//  $Id: alg_pot.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
+//  $Date: 2004-07-01 17:43:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot/alg_pot.C,v 1.6 2004-07-01 17:43:42 chulwoo Exp $
+//  $Id: alg_pot.C,v 1.6 2004-07-01 17:43:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_pot.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot/alg_pot.C,v $
 //  $State: Exp $
 //
@@ -346,6 +346,7 @@ void AlgPot::run()
 	switch (choice) {
 	case 0 :  sep_dir = 0; max_ext = max_X; filename = "Wzx"; break; 
 	case 1 :  sep_dir = 3; max_ext = max_T; filename = "Wzt"; break;
+	default :  sep_dir = 3; max_ext = max_T; filename = "Wzt"; break;
 	}
 	//printf(" calculate quark separation in %d -> %s \n",sep_dir,filename);
 

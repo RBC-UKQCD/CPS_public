@@ -38,11 +38,21 @@ extern "C" {
  * approaches.
  *
  */
+  /*
+   * Initialise for Wilson/Clover
+   */
 void wfm_init(struct WilsonArg *); 
 void wfm_end (struct WilsonArg *);
-
+  /*
+   * Initialise for DWF
+   */
 void wfm_vec_init(WilsonArg *wilson_p);
 void wfm_vec_end(struct WilsonArg *);
+/*
+ * Used to fill out the CPS wilson structure
+ */
+void wilson_compat_init(Wilson *wilson_p);
+void wilson_compat_end(Wilson *wilson_p);
 
 void wfm_mdagm(Float  *chi,        /* chi = MdagM(u) psi          */
 	       Float  *u,          /* Gauge field                 */
@@ -76,6 +86,15 @@ void wfm_dslash_vec( int nvec,
 		     Float *psis[],
 		     int cbs[],
 		     int dag);
+
+void wfm_dslash_begin( Float *chi0, 
+		       Float *u, 
+		       Float *psi0, 
+		       int cb0, int dag);
+void wfm_dslash_end( Float *chi0, 
+		     Float *u, 
+		     Float *psi0, 
+		     int cb0, int dag);
 
 #ifdef __cplusplus
 }
@@ -254,16 +273,25 @@ class wfm : public WilsonArg {
 			      Float *psi0, Float *psi1,
 			      int cb0, int cb1, int dag);
 
+  friend void wfm_dslash_begin( Float *chi0, 
+				Float *u, 
+				Float *psi0, 
+				int cb0, int dag);
+  friend void wfm_dslash_end( Float *chi0, 
+			      Float *u, 
+			      Float *psi0, 
+			      int cb0, int dag);
   int IR;
 #ifdef USE_COMMS_SCU
 /* FIXME. Should really derive a class wfmScu from wfm base class
  * and then 
  * Need to arrange for the different instances to use different IR numbers
  */
-  SCUDirArgIR SendOps[2][8];
-  SCUDirArgIR RecvOps[2][8];
+  SCUDirArgIR *SendOps[2];
+  SCUDirArgIR *RecvOps[2];
   SCUDirArgIR *DA_p[2][16];
-  SCUDirArgMulti DA_multi[2];
+  SCUDirArgMulti *DA_multi;
+  int LoadDirArgIRs[2];
 #endif
 
 };

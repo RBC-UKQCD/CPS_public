@@ -1,6 +1,7 @@
 #include <config.h>
 #include <qalloc.h>
 #include <util/time.h>
+
 CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
@@ -9,6 +10,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
+//  $Author: chulwoo $
+//  $Date: 2004-07-01 17:43:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.5 2004-07-01 17:43:43 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.5 2004-07-01 17:43:43 chulwoo Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $RCSfile: inv_cg.C,v $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -29,9 +38,20 @@ CPS_END_NAMESPACE
 #include <comms/nga_reg.h>
 #include <comms/cbuf.h>
 #include <math.h>
+#include <stdio.h>
+#include <qcdocos/gint.h>
 CPS_START_NAMESPACE
 
-#undef PROFILE
+#define PROFILE
+
+// PAB generic Dop flops reporting
+//int DiracOp::CGflops;
+
+#ifdef PROFILE
+#include <time.h>
+#include <sys/time.h>
+void report_flops(int flops, struct timeval *start,struct timeval *end);
+#endif
 
 #ifdef  PARALLEL
 //Uncomment the following line to activate reproducibility test
@@ -45,10 +65,6 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #endif
 
-//------------------------------------------------------------------
-// Circular buffer zero wait state access setting
-//------------------------------------------------------------------
-const unsigned CBUF_MODE4 = 0xcb18c1ff;
 extern "C" { 
   void vaxpy3(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec);
   void vaxpy3_norm(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec,Float *norm);
@@ -86,7 +102,7 @@ int DiracOp::InvCg(Vector *out,
   Float a;
   Float b;
   Float d;
-  int i, ic, icb;
+  int i;
   char *fname = "InvCg(V*,V*,F,F*)";
 
 // Flash the LED and then turn it off
@@ -115,6 +131,7 @@ int DiracOp::InvCg(Vector *out,
 // Set the source vector pointer
 //------------------------------------------------------------------
   Vector *src = in;
+  IFloat *src_tmp = (IFloat *)src;
 
 // Set the solution vector pointer
 //------------------------------------------------------------------
@@ -142,7 +159,9 @@ int DiracOp::InvCg(Vector *out,
 
 // Allocate memory for the direction vector dir.
 //------------------------------------------------------------------
-  Vector *dir = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
+  Vector *dir;
+  if(GJP.VolNodeSites() >4096) dir=0;
+    else dir = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
   if(dir == 0){
     dir = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
     printf("dir=%p\n",dir);
@@ -153,11 +172,13 @@ int DiracOp::InvCg(Vector *out,
 
 // Allocate mem. for the result vector of matrix multiplication mmp.
 //------------------------------------------------------------------
-  Vector *mmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
+  Vector *mmp;
+  if(GJP.VolNodeSites() >4096) mmp=0;
+    else mmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
   if(mmp == 0){
     mmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
-    printf("mmp=%p\n",mmp);
   }
+    printf("mmp=%p\n",mmp);
   if(mmp == 0)
     ERR.Pointer(cname,fname, "mmp");
   VRB.Smalloc(cname,fname, "mmp", mmp, f_size_cb * sizeof(Float));
@@ -233,10 +254,25 @@ int DiracOp::InvCg(Vector *out,
   if(res_norm_sq_cur <= stp_cnd) max_itr = 0;
 
 
-  int nflops = 1187*GJP.VolNodeSites();
+#ifdef PROFILE
+  struct timeval start;
+  struct timeval end;
+  struct timeval linalg_tmp;
+  struct timeval linalg_start;
+  struct timeval linalg_end;
+
+    CGflops    = 0;
+    int nflops = 0;
+    int nflops_tmp;
+    gettimeofday(&start,NULL);
+
+#endif
+
 //------------------------------------------------------------------
 // Loop over CG iterations
 //------------------------------------------------------------------
+//  Gint::SynchMachine();
+
   for(i=0; i < max_itr; i++){
     timeval start,end;
     itr++;
@@ -245,9 +281,6 @@ int DiracOp::InvCg(Vector *out,
     // mmp = MatPcDagMatPc * dir
     // d = <dir, MatPcDagMatPc*dir>
     MatPcDagMatPc(mmp, dir, &d);
-#ifdef PROFILE
-    gettimeofday(&start,NULL);
-#endif
 
 #ifdef REPRODUCE_TEST 
 
@@ -257,6 +290,10 @@ int DiracOp::InvCg(Vector *out,
       InterruptExit(-1, "NODE FAILS TO REPRODUCE");
     /* End of Check */
 
+#endif
+#ifdef PROFILE
+//    gettimeofday(&linalg_tmp,NULL);
+//    nflops_tmp = 0;
 #endif
   
     DiracOpGlbSum(&d);
@@ -271,14 +308,27 @@ int DiracOp::InvCg(Vector *out,
 
     // sol = a * dir + sol;
     //sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
+
     vaxpy3(sol,&a,dir,sol,f_size_cb/6);
 
+
+#ifdef PROFILE
+//    nflops_tmp +=f_size_cb*2;
+    CGflops+=f_size_cb*2;
+#endif
+
+    //PAB. Should be able to use "vaxpy_norm here"
     // res = - a * (MatPcDagMatPc * dir) + res;
     // res_norm_sq_cur = res * res
 
     a *= -1.0;
     vaxpy3_norm(res,&a,mmp,res,f_size_cb/6,&res_norm_sq_cur);
     DiracOpGlbSum(&res_norm_sq_cur);
+#ifdef PROFILE
+//    nflops_tmp +=f_size_cb*4;
+    CGflops+=f_size_cb*4;
+#endif
+
 
     // if( |res|^2 <= stp_cnd ) we are done
     VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", itr, IFloat(res_norm_sq_cur));
@@ -289,11 +339,20 @@ int DiracOp::InvCg(Vector *out,
     // dir = b * dir + res;
     vaxpy3(dir,&b,dir,res,f_size_cb/6);
 #ifdef PROFILE
-    gettimeofday(&end,NULL);
-    print_flops(nflops,&start,&end); 
+//    linalg_start = linalg_tmp;
+//    gettimeofday(&linalg_end,NULL);
+//    nflops =nflops_tmp+f_size_cb*2;
+    CGflops+=f_size_cb*2;
 #endif
-
+    //    printf("Iter = %d, %d flops\n",itr,CGflops);
   }
+
+#ifdef PROFILE
+    gettimeofday(&end,NULL);
+
+    report_flops(CGflops,&start,&end); 
+//    report_flops(nflops,&linalg_start,&linalg_end); 
+#endif
 
   // It has not reached stp_cnd: Issue a warning
   if(itr == dirac_arg->max_num_iter - 1){
@@ -519,5 +578,24 @@ int DiracOp::InvCg(Float *true_res)
 int DiracOp::InvCg(void)
 { return InvCg(f_out, f_in, 0.0, 0); }
 
+#ifdef PROFILE
+#include <stdio.h>
+void report_flops(int flops, struct timeval *start,struct timeval *end)
+{
+
+  double t;
+  double mflops;
+
+  t = ( end->tv_usec - start->tv_usec )*1.E-6;
+  t+= ( end->tv_sec - start->tv_sec );
+
+  mflops = (flops * 1.E-6) / t;
+  printf("\t%ld:%ld -> %ld:%ld\n",
+	 start->tv_sec,start->tv_usec,
+	 end->tv_sec,end->tv_usec
+	 );
+  printf("\t%d flops %le seconds %lf Mflop/s\n",flops,t,mflops);
+}
+#endif
 
 CPS_END_NAMESPACE

@@ -4,7 +4,7 @@
 /*--------------------------------------------------------------------------*/
 /* wilson_m:                                                                */
 /*--------------------------------------------------------------------------*/
-extern unsigned long WfmFlops;
+
 void wfm::m(Float *chi, 
 	    Float *u, 
 	    Float *psi, 
@@ -30,7 +30,7 @@ void wfm::m(Float *chi,
 /* 1_OO - kappa^2 * Dslash_0E * Dslash_E0                                   */
 /*--------------------------------------------------------------------------*/
   vaxpy(&mkappasq,chi,psi,len);
-  WfmFlops += vol*24*2;
+  DiracOp::CGflops += vol*24*2;
 }
 
 
@@ -63,7 +63,7 @@ void wfm::mdag(Float *chi,
 /* [1_OO - kappa * DslashDag_0E * DslashDag_E0] ]                           */
 /*--------------------------------------------------------------------------*/
   vaxpy(&mkappasq,chi,psi,len);
-  WfmFlops += vol*24*2;
+  DiracOp::CGflops += vol*24*2;
 }
 
 void wfm::mdagm(Float *chi, 
@@ -97,10 +97,10 @@ void wfm::mdagm(Float *chi,
 /*--------------------------------------------------------------------------*/
   if(mp_sq_p != 0) {
     vaxpy_norm(&mkappasq,tmp2,psi,len,mp_sq_p);
-    WfmFlops += vol*24*4;
+    DiracOp::CGflops += vol*24*4;
   } else {
     vaxpy(&mkappasq,tmp2,psi,len);
-    WfmFlops += vol*24*2;
+    DiracOp::CGflops += vol*24*2;
   }
 
 /*--------------------------------------------------------------------------*/
@@ -118,7 +118,7 @@ void wfm::mdagm(Float *chi,
 /*                                 [1_OO - kappa^2 * Dslash_0E * Dslash_E0] */
 /*--------------------------------------------------------------------------*/
   vaxpy(&mkappasq,chi,tmp2,len);
-  WfmFlops += vol*24*2;
+  DiracOp::CGflops += vol*24*2;
 }
 
 

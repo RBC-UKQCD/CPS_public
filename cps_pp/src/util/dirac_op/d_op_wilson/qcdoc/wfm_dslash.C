@@ -5,6 +5,7 @@
  *  in a reasonably portable/retargettable library.
  */
 #include <util/wfm.h>
+
 #include "wfm_internal.h"
 #include <sys/time.h>
 #include <stdio.h>
@@ -27,7 +28,7 @@ static int calls = 0;
  * This routine does the decompose
  */
 unsigned wfm_tbl1,wfm_tbl2,wfm_tbl3,wfm_tbl4;
-extern unsigned long WfmFlops;
+
 
 void wfm::decom(Float *psi, 
 	       Float *u, 
@@ -48,8 +49,9 @@ void wfm::decom(Float *psi,
   }
   return;
 }
-
-
+extern "C" { 
+  void rec_su3t(void *psi,void *gauge,void *chiin,void *len,unsigned *tims);
+}
 void wfm::recon(Float *chi, 
 	       Float *u, 
 	       int cb,
@@ -62,11 +64,14 @@ void wfm::recon(Float *chi,
   } else { 
     gauge_notpar = (Float *)u ;
   }
+  unsigned tbls[2];
   if ( dag ) { 
     rec_su3_dag(chi,gauge_notpar,two_spinor,&vol);
   } else { 
-    rec_su3(chi,gauge_notpar,two_spinor,&vol);
+    rec_su3t(chi,gauge_notpar,two_spinor,&vol,tbls);
+    //    printf("REC: Time elapsed is %d cycles\n",tbls[1]-tbls[0]);
   }
+  DiracOp::CGflops += 1320*vol;
   return;
 }
 
@@ -77,10 +82,6 @@ void wfm::dslash(Float *chi,
 		 int cb,
 		 int dag)
 {
-
-  struct timeval t_start, t_stop;
-  //  gettimeofday(&t_start,NULL);
-
 
   /*
    * To a first approximation, we simply
@@ -99,21 +100,6 @@ void wfm::dslash(Float *chi,
   comm_complete(cb);
 
   recon(chi,u,cb,dag);
-
-  /*
-  if ( calls ++ < 20 ) {
-    gettimeofday(&t_stop,NULL);
-    timersub(&t_stop,&t_start,&t_start);
-    double flops= 1320 * vol ;
-    double secs = t_start.tv_sec + 1.E-6 *t_start.tv_usec;
-    printf("Wilson dslash: %f Mflops per node\n",flops/(secs*1000000) );
-    printf("Psi %8.8x\n",psi);
-    printf("Chi %8.8x\n",chi);
-    printf("U   %8.8x\n",u);
-    printf("2sp %8.8x\n",shift_table[0][0]);
-  }
-  */
-  WfmFlops += 1320*vol;
 
   return;
 }

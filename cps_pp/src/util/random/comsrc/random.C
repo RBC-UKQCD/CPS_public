@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.4 2004-06-04 21:14:14 chulwoo Exp $
+  $Id: random.C,v 1.5 2004-07-01 17:43:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.4 2004-06-04 21:14:14 chulwoo Exp $
-//  $Id: random.C,v 1.4 2004-06-04 21:14:14 chulwoo Exp $
+//  $Date: 2004-07-01 17:43:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.5 2004-07-01 17:43:51 chulwoo Exp $
+//  $Id: random.C,v 1.5 2004-07-01 17:43:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -26,6 +26,7 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include <stdio.h>
 #include <util/random.h>
 #include <util/gjp.h>
 #include <util/error.h>
@@ -160,7 +161,10 @@ void LatRanGen::Initialize()
       ERR.General(cname, fname,
 		  "Must have a multiple of 2^4 lattice sites per node.");
   
-  n_rgen = GJP.VolNodeSites() / 16;
+  if (GJP.SnodeSites()<2)
+  n_rgen = GJP.VolNodeSites()/16;
+  else
+  n_rgen = GJP.VolNodeSites()*GJP.SnodeSites() / 32;
 
   
 
@@ -170,33 +174,39 @@ void LatRanGen::Initialize()
   if(!ugran) ERR.Pointer(cname, fname, "ugran"); 
 
   // Lower bounds of global lattice coordinates on this node
-  int x_o[4];
+  int x_o[5];
   x_o[0] = GJP.XnodeCoor() * GJP.XnodeSites();
   x_o[1] = GJP.YnodeCoor() * GJP.YnodeSites();
   x_o[2] = GJP.ZnodeCoor() * GJP.ZnodeSites();
   x_o[3] = GJP.TnodeCoor() * GJP.TnodeSites();
+  x_o[4] = GJP.SnodeCoor() * GJP.SnodeSites();
 
   // Upper bounds of global lattice coordinates on this node
-  int x_f[4];
+  int x_f[5];
   x_f[0] = x_o[0] + GJP.XnodeSites() - 1;
   x_f[1] = x_o[1] + GJP.YnodeSites() - 1;
   x_f[2] = x_o[2] + GJP.ZnodeSites() - 1;
   x_f[3] = x_o[3] + GJP.TnodeSites() - 1;
+  x_f[4] = x_o[4] + GJP.SnodeSites() - 1;
 
   hx[0] = GJP.XnodeSites() / 2;
   hx[1] = GJP.YnodeSites() / 2;
   hx[2] = GJP.ZnodeSites() / 2;
   hx[3] = GJP.TnodeSites() / 2;
+  hx[4] = GJP.SnodeSites() / 2;
 
   can[0] = 2;
   can[1] = can[0] * GJP.XnodeSites();
   can[2] = can[1] * GJP.YnodeSites();
   can[3] = can[2] * GJP.ZnodeSites();
+  can[4] = can[3] * GJP.TnodeSites();
 
-  int vx[3];
+  int vx[5];
   vx[0] = hx[0] * GJP.Xnodes();
   vx[1] = hx[1] * GJP.Ynodes();
   vx[2] = hx[2] * GJP.Znodes();
+  vx[3] = hx[3] * GJP.Tnodes();
+  vx[4] = hx[4] * GJP.Snodes();
 
 
   // Sort out what the seed should be depending on the GJP.StartSeedKind()
@@ -226,19 +236,21 @@ void LatRanGen::Initialize()
     
 #ifdef PARALLEL
   if(GJP.StartSeedKind()==START_SEED_INPUT_NODE){
-      int node  = GJP.XnodeCoor()
-	  + GJP.YnodeCoor() * GJP.Xnodes()
-	  + GJP.ZnodeCoor() * GJP.Xnodes() * GJP.Ynodes()
-	  + GJP.TnodeCoor() * GJP.Xnodes() * GJP.Ynodes() * GJP.Znodes();
+      int node  = 
+	GJP.XnodeCoor() + GJP.Xnodes()* (
+	GJP.YnodeCoor() + GJP.Ynodes()* (
+	GJP.ZnodeCoor() + GJP.Znodes()* (
+	GJP.TnodeCoor() + GJP.Tnodes()*  GJP.SnodeCoor() )));
       base_seed = base_seed + 23 * node;
   }
 #endif
 
   // Seed the hypercube RNGs
 
-  int x[4];
+  int x[5];
   int index = 0;
   
+for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
   for(x[3] = x_o[3]; x[3] <= x_f[3]; x[3]+=2) {
       for(x[2] = x_o[2]; x[2] <= x_f[2]; x[2]+=2) {
 	  for(x[1] = x_o[1]; x[1] <= x_f[1]; x[1]+=2) {
@@ -251,17 +263,18 @@ void LatRanGen::Initialize()
 		     GJP.StartSeedKind()==START_SEED_FIXED)
 		      start_seed = base_seed
 			  + 23 * (x[0]/2 + vx[0]*
-				  (x[1]/2 + vx[1]*
-				   (x[2]/2 + vx[2]*(x[3]/2))) );
-		      
+				 (x[1]/2 + vx[1]*
+				 (x[2]/2 + vx[2]*
+				 (x[3]/2 + vx[3]*(x[4]/2) ))));
+//		  fprintf(stderr,"%d %d %d %d %d",x[0],x[1],x[2],x[3],x[4]);
+//		  fprintf(stderr,"index=%d start_seed= %d\n",index,start_seed);
 		  ugran[index++].Reset(start_seed);
 		  
 	      }
 	  }
       }
   }
-  
-
+}
 }
 
 //---------------------------------------------------------
@@ -323,19 +336,23 @@ void LatRanGen::SetSigma(IFloat sigma)
   particular hypercubic RNG.  
  */
 //----------------------------------------------------------------------
-void LatRanGen::AssignGenerator(int x, int y, int z, int t)
+void LatRanGen::AssignGenerator(int x, int y, int z, int t,int s)
 {
   x = x % GJP.XnodeSites();
   y = y % GJP.YnodeSites();
   z = z % GJP.ZnodeSites();
   t = t % GJP.TnodeSites();
 
+  if (GJP.SnodeSites()<2) s = 0;
+  else s = s % GJP.SnodeSites();
+
   x/=2;
   y/=2;
   z/=2;
   t/=2;
+  s/=2;
 
-  rgen_pos = x + hx[0] * (y + hx[1] * (z + hx[2] * t));
+  rgen_pos = x + hx[0] * (y + hx[1] * (z + hx[2] * (t +hx[3] * s)));
 }
 
 //----------------------------------------------------------------------
@@ -349,7 +366,7 @@ void LatRanGen::AssignGenerator(int x, int y, int z, int t)
 //----------------------------------------------------------------------
 void LatRanGen::AssignGenerator(const int * x)
 {
-    AssignGenerator(x[0], x[1], x[2], x[3]);
+    AssignGenerator(x[0], x[1], x[2], x[3], 0);
 }
 
 //---------------------------------------------------------
@@ -367,8 +384,11 @@ void LatRanGen ::AssignGenerator(int i)
   int y = (i/can[1]) % hx[1];
   int z = (i/can[2]) % hx[2];
   int t = (i/can[3]) % hx[3];
+  int s;
+  if (GJP.SnodeSites()<2) s = 0;
+  else  s = (i/can[4]) % hx[4];
 
-  rgen_pos = x + hx[0] * (y + hx[1] * (z + hx[2] * t));
+  rgen_pos = x + hx[0] * (y + hx[1] * (z + hx[2] * (t + hx[3] * s)));
 }
 
 

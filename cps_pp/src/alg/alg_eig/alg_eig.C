@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.6 2004-06-10 17:45:48 mclark Exp $
+  $Id: alg_eig.C,v 1.7 2004-07-01 17:43:41 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-06-10 17:45:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.6 2004-06-10 17:45:48 mclark Exp $
-//  $Id: alg_eig.C,v 1.6 2004-06-10 17:45:48 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-07-01 17:43:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.7 2004-07-01 17:43:41 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.7 2004-07-01 17:43:41 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -187,6 +187,7 @@ void AlgEig::run()
   eig_arg = alg_eig_arg;
   Float **hsum;
   int N_eig = eig_arg->N_eig;
+//  int f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
   int hsum_len = 0;
 
   if (eig_arg->print_hsum)

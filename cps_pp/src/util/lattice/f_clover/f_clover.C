@@ -7,6 +7,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
+//  $Author: chulwoo $
+//  $Date: 2004-07-01 17:43:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.6 2004-07-01 17:43:49 chulwoo Exp $
+//  $Id: f_clover.C,v 1.6 2004-07-01 17:43:49 chulwoo Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $RCSfile: f_clover.C,v $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -21,6 +29,9 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include <util/lattice.h>
 #include <util/dirac_op.h>
 #include <util/clover.h>
@@ -298,6 +309,7 @@ void Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
   if (frm1 == 0)
     ERR.Pointer(cname,fname,"frm1") ;
 
+  Fconvert(frm1,WILSON,CANONICAL);
   DiracOpClover clover(*this, frm1, frm2, &cg_arg, CNV_FRM_NO);
 
   const int half_sites = GJP.VolNodeSites()/2;  
@@ -308,7 +320,35 @@ void Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 
 // phi_odd = (Aoo - kappa*kappa*Doe Aee^inv Deo)^dagger frm1_odd
 
+#if 0
+  {IFloat *tmp = (IFloat *)frm1;
+    printf("Coor = %d %d %d %d\n",
+      GJP.XnodeCoor(),
+      GJP.YnodeCoor(),
+      GJP.ZnodeCoor(),
+      GJP.TnodeCoor());
+    for(int i = 0;i<GJP.VolNodeSites()*FsiteSize();i++,tmp++){
+    *tmp=0.;
+    if(GJP.XnodeCoor() == 0 &&
+      GJP.YnodeCoor() == 0 &&
+      GJP.ZnodeCoor() == 0 &&
+      GJP.TnodeCoor() == 0 &&
+	i==96) *tmp=1.;
+    if (fabs(*tmp)>1e-5)
+    printf("frm1[%d][%d]=%e\n",i/FsiteSize(),i%FsiteSize(),*(tmp) );
+    }
+  }
+#endif
   clover.MatPcDag(phi, frm1);  
+#if 0
+  {IFloat *tmp = (IFloat *)phi;
+    for(int i = 0;i<GJP.VolNodeSites()*FsiteSize();i++,tmp++)
+//    if (fabs(*tmp)>1e-5 && (i%FsiteSize()==0))
+    if (fabs(*tmp)>1e-5)
+    printf("phi[%d][%d]=%e\n",i/FsiteSize(),i%FsiteSize(),*(tmp) );
+    tmp++;
+  }
+#endif
 
 //--------------------------------------------------------------------
 // Calculate the clover matrices for the EVEN checkerboard
@@ -324,6 +364,8 @@ void Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
                    (const IFloat *)(A_even), 
                    (const IFloat *)frm1_even, 
                    half_sites);    
+  {IFloat *tmp = (IFloat *)phi_even;
+  printf("phi_even[0]=%e\n",*tmp);}
 
   return;
   

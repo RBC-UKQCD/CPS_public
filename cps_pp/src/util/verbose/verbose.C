@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
-  $Id: verbose.C,v 1.4 2004-06-04 21:14:15 chulwoo Exp $
+  $Id: verbose.C,v 1.5 2004-07-01 17:43:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.4 2004-06-04 21:14:15 chulwoo Exp $
-//  $Id: verbose.C,v 1.4 2004-06-04 21:14:15 chulwoo Exp $
+//  $Date: 2004-07-01 17:43:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.5 2004-07-01 17:43:51 chulwoo Exp $
+//  $Id: verbose.C,v 1.5 2004-07-01 17:43:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
@@ -171,10 +171,10 @@ void Verbose::Func(const char *class_name, const char *func_name) {
     printf("%s::%s : Entered :", class_name, func_name);
     if(active[VERBOSE_FUNC_CLOCK_LEVEL]){
 #ifdef _TARTAN
-	printf("  Clock (12.5 MHz) = %d\n", clock());
+	printf("  Clock (12.5 MHz) = %d\n", (int)clock());
 #else
 	int cps = CLOCKS_PER_SEC;
-	printf("  Clock (%2.1f MHz) = %d\n", cps/1.e+06, clock());
+	printf("  Clock (%2.1f MHz) = %d\n", cps/1.e+06, (int)clock());
 #endif
     }
     else {
@@ -203,10 +203,10 @@ void Verbose::FuncEnd(const char *class_name, const char *func_name){
     printf("%s::%s : Exiting :", class_name, func_name);
     if(active[VERBOSE_FUNC_CLOCK_LEVEL]){
 #ifdef _TARTAN
-	printf("  Clock (12.5 MHz) = %d\n", clock());
+	printf("  Clock (12.5 MHz) = %d\n", (int)clock());
 #else
 	int cps = CLOCKS_PER_SEC;
-	printf("  Clock (%2.1f MHz) = %d\n", cps/1.e+06, clock());
+	printf("  Clock (%2.1f MHz) = %d\n", cps/1.e+06, (int)clock());
 #endif
     }
     else {
@@ -234,7 +234,7 @@ void Verbose::Pmalloc(const char *class_name, const char *func_name,
 
     if(!active[VERBOSE_PMALLOC_LEVEL]) return;
     
-    printf("%s::%s : pmalloc initialized pointer\n\t%s to %p with size 0x%x\n",
+    printf("%s::%s : pmalloc initialized pointer\t%s to %p with size 0x%x\n",
 	   class_name, func_name, ptr_name, ptr, size);
 
 }
@@ -257,7 +257,7 @@ void Verbose::Pfree(const char *class_name, const char *func_name,
     
     if(!active[VERBOSE_PMALLOC_LEVEL] ) return;
 
-    printf("%s::%s : pfree will free pointer\n\t%s = %p\n", 
+    printf("%s::%s : pfree will free pointer\t%s = %p\n", 
 	   class_name, func_name, ptr_name, ptr);
     
     
@@ -299,7 +299,7 @@ void Verbose::Smalloc(const char *class_name, const char *func_name,
     
     if(!active[VERBOSE_SMALLOC_LEVEL]) return;
 
-    printf("%s::%s : smalloc initialized pointer\n\t%s to %p with size 0x%x\n",
+    printf("%s::%s : smalloc initialized pointer\t%s to %p with size 0x%x\n",
 	   class_name, func_name, ptr_name, ptr, size);
     
 }
@@ -322,7 +322,7 @@ void Verbose::Sfree(const char *class_name, const char *func_name,
     
     if(! active[VERBOSE_SMALLOC_LEVEL] ) return;
 
-    printf("%s::%s : sfree will free pointer\n\t%s = %p\n",
+    printf("%s::%s : sfree will free pointer\t%s = %p\n",
 	   class_name, func_name, ptr_name, ptr);
 
 }
@@ -372,10 +372,10 @@ void Verbose::Flow(const char *class_name, const char *func_name,
     printf("%s::%s :", class_name, func_name);
     if(active[VERBOSE_FLOW_CLOCK_LEVEL]){
 #ifdef _TARTAN
-	printf(" Clock (12.5 MHz) = %d\n\t", clock());
+	printf(" Clock (12.5 MHz) = %d\n\t", (int)clock());
 #else
 	int cps = CLOCKS_PER_SEC;
-	printf(" Clock (%2.1f MHz) = %d\n\t", cps/1.e+06, clock());
+	printf(" Clock (%2.1f MHz) = %d\n\t", cps/1.e+06, (int)clock());
 #endif
     }
     else {
@@ -625,10 +625,10 @@ void Verbose::Clock(const char *class_name, const char *func_name,
 
     printf("%s::%s :", class_name, func_name);
 #ifdef _TARTAN
-    printf(" Clock (12.5 MHz cycles) = %d\n\t", clock());
+    printf(" Clock (12.5 MHz cycles) = %d\n\t", (int)clock());
 #else
     int cps = CLOCKS_PER_SEC;
-    printf(" Clock (%2.1f MHz) = %d\n\t", cps/1.e+06, clock());
+    printf(" Clock (%2.1f MHz) = %d\n\t", cps/1.e+06, (int)clock());
 #endif
     va_list args;
     va_start(args, format);
@@ -656,7 +656,7 @@ void Verbose::Clock(const char *class_name, const char *func_name){
     printf(" Clock (12.5 MHz cycles) = %d\n", clock());
 #else
     int cps = CLOCKS_PER_SEC;
-    printf(" Clock (%2.1f MHz) = %d\n", cps/1.e+06, clock());
+    printf(" Clock (%2.1f MHz) = %d\n", cps/1.e+06, (int)clock());
 #endif
     
 

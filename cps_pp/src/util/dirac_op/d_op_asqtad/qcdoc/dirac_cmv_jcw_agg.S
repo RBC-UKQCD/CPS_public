@@ -89,8 +89,8 @@ dirac_cmv_jcw_agg:
 	addi %r29, %r29, 432
 	subic.	 3,	3,	1
 	bf gt,	lab2
-	b  lab1
-lab1:
+	b  dirac_cmv_jcw_agg_lab1
+dirac_cmv_jcw_agg_lab1:
 	fmul	 6, 12,  0
 	dcbt	 %r16,	 %r29
 	fmul	 7, 12,  1
@@ -288,7 +288,7 @@ lab1:
 	stfd	   30,	48(%r13)
 	stfd	   30,	56(%r13)
 	bf gt,	lab2
-	b  lab1
+	b  dirac_cmv_jcw_agg_lab1
 lab2:
 	fmul	 6, 12,  0
 

@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_inst/alg_inst.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
-//  $Id: alg_inst.C,v 1.5 2004-06-04 21:13:59 chulwoo Exp $
+//  $Date: 2004-07-01 17:43:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_inst/alg_inst.C,v 1.6 2004-07-01 17:43:42 chulwoo Exp $
+//  $Id: alg_inst.C,v 1.6 2004-07-01 17:43:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_inst.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_inst/alg_inst.C,v $
 //  $State: Exp $
 //
@@ -178,7 +178,8 @@ VRB.Debug("---\n\n  n1,n2 = %d,%d\n\n---\n", n1,n2 );
   arInstCenter[2] = (GJP.YnodeSites()*GJP.Ynodes() - 1)/2.;
   arInstCenter[3] = (GJP.ZnodeSites()*GJP.Znodes() - 1)/2.;
 
-  unsigned auX[4];
+//  unsigned auX[4];
+  int auX[4];
   for( auX[0]=0; auX[0]<GJP.TnodeSites(); auX[0]++ )
   for( auX[1]=0; auX[1]<GJP.XnodeSites(); auX[1]++ )
   for( auX[2]=0; auX[2]<GJP.YnodeSites(); auX[2]++ )

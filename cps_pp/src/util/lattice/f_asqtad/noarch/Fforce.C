@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.3 2004-06-02 11:03:19 zs Exp $
+  $Id: Fforce.C,v 1.9 2004-07-01 17:43:47 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -11,10 +11,37 @@
 #include <util/lattice.h>
 #include <util/pt.h>
 #include <util/gjp.h>
+#include <util/time.h>
 #include <util/amalloc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#if TARGET==QCDOC
+#include <qalloc.h>
+#endif
 
 CPS_START_NAMESPACE
 
+static void* v_alloc(char *s, size_t bytes){
+#if TARGET==QCDOC
+	void *ptr = qalloc(QFAST,bytes);
+	if(ptr ==NULL)
+	ptr = qalloc(QCOMMS,bytes);
+#else
+	void *ptr = smalloc(bytes);
+#endif
+	printf("%s:%p\n",s,ptr);
+	if(ptr ==NULL){
+		printf(" v_alloc of %s failed\n",s);exit(34);	
+	}
+	return ptr;
+}
+static void v_free(void *ptr){
+#if TARGET==QCDOC
+	qfree(ptr);
+#else
+	sfree(ptr);
+#endif
+}
 
 
 
@@ -27,11 +54,16 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
     VRB.Func(cname,fname);
 
+    ParTrans::PTflops=0;
+	ForceFlops=0;
+	Float dtime;
     size_t size;
+	int nflops=0;
 
     size = GJP.VolNodeSites()/2*FsiteSize()*sizeof(Float);
 
     Vector *X = (Vector *)smalloc(2*size);
+//    printf("X=%p\n",X);
     Vector *X_e = X;                             // even sites
     Vector *X_o = X+GJP.VolNodeSites()/2;  // odd sites
 
@@ -48,13 +80,29 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     Convert(STAG);  // Puts staggered phases into gauge field.
     
     
-    const int N = 1;  // N can be 1, 2 or 4.
+    const int N = 4;  // N can be 1, 2 or 4.
+    VRB.Flow(cname,fname,"N=%d\n",N);
 
-    enum{plus, minus, n_sign};
+    enum{plus=0, minus=1, n_sign=2};
+
+    // Array in which to accumulate the force term:
+    // this must be initialised to zero 
+#if 0
+    Matrix **force = (Matrix**)amalloc(sizeof(Matrix), 2, 4, GJP.VolNodeSites());
+    if(!force) ERR.Pointer(cname, fname, "force");
+#else
+    size = GJP.VolNodeSites()*sizeof(Matrix);
+    Matrix *force[4];
+    for(int i = 0;i<4;i++)
+        force[i] = (Matrix *)v_alloc("force[i]",size);
+#endif
+    for(int i=0; i<4; i++)
+	for(int s=0; s<GJP.VolNodeSites(); s++) force[i][s].ZeroMatrix();
 
 
     // Vector arrays for which we must allocate memory
 
+#if 0
     Vector ***Pnu = (Vector***)amalloc(sizeof(Vector), 3, n_sign, N, GJP.VolNodeSites());
     if(!Pnu) ERR.Pointer(cname, fname, "Pnu");
     
@@ -78,17 +126,49 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     Vector ****Pnu3 = P7[0][0];
     Vector *****Prho5 = Psigma7[0];
     Vector *****Psigmarhonu = Psigma7[0];
+#else
+    size = GJP.VolNodeSites()*sizeof(Vector);
+    Vector *Pnu[n_sign][N];
+    Vector *P3[n_sign][n_sign][N];
+    Vector *Prhonu[n_sign][n_sign][N];
+    Vector *P5[n_sign][n_sign][n_sign][N];
+    Vector *P7[n_sign][n_sign][n_sign][n_sign][N];
+    Vector *Psigma7[n_sign][n_sign][n_sign][n_sign][N];
+    Vector *Pnununu[N];
+    Vector *Pnunu[n_sign][N];
+    Vector *Pnu5[n_sign][n_sign][N];
+    Vector *Pnu3[n_sign][n_sign][N];
+    Vector *Prho5[n_sign][n_sign][n_sign][N];
+    Vector *Psigmarhonu[n_sign][n_sign][n_sign][N];
+    printf("Pnu=%p Psigmarhonu=%p\n",Pnu,Psigmarhonu);
+
+    for(int w = 0;w<N;w++){
+      for(int i = 0;i<n_sign;i++){
+        Pnu[i][w]= (Vector *)v_alloc("Pnu",size);
+        for(int j = 0;j<n_sign;j++){
+          P3[i][j][w]= (Vector *)v_alloc("P3",size);
+          Prhonu[i][j][w]= (Vector *)v_alloc("Prhonu",size);
+          for(int k = 0;k<n_sign;k++){
+            P5[i][j][k][w]= (Vector *)v_alloc("P5",size);
+            for(int l = 0;l<n_sign;l++){
+              P7[i][j][k][l][w]= (Vector *)v_alloc("P7",size);
+              Psigma7[i][j][k][l][w]= (Vector *)v_alloc("Psigma7",size);
+            }
+            Prho5[i][j][k][w] = Psigma7[0][i][j][k][w];
+            Psigmarhonu[i][j][k][w] = Psigma7[0][i][j][k][w];
+          }
+          Pnu5[i][j][w]=P7[0][0][i][j][w];
+          Pnu3[i][j][w]=P7[0][0][i][j][w];
+        }
+        Pnunu[i][w]=Psigma7[0][0][0][i][w];
+      }
+      Pnununu[w]=Prhonu[0][0][w];
+    }
+
+#endif
     
 
 
-    // Array in which to accumulate the force term:
-    // this must be initialised to zero 
-
-    Matrix **force = (Matrix**)amalloc(sizeof(Matrix), 2, 4, GJP.VolNodeSites());
-    if(!force) ERR.Pointer(cname, fname, "force");
-    for(int i=0; i<4; i++)
-	for(int s=0; s<GJP.VolNodeSites(); s++) force[i][s].ZeroMatrix();
-   
     // input/output arrays for the parallel transport routines
     Vector *vin[n_sign*N], *vout[n_sign*N];
     int dir[n_sign*N];
@@ -100,92 +180,94 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
                                                // nu directions we have done.
     ParTransAsqtad parallel_transport(*this);
 	    
-    for (int m=0; m<4; m+=N){                     	    // Loop over mu
-	for(w=0; w<N; w++) mu[w] = (m+w)%4; 
+	dtime = -dclock();
+	for (int m=0; m<4; m+=N){                     	    // Loop over mu
+		for(w=0; w<N; w++) mu[w] = (m+w)%4; 
 
-	for (int n=m+1; n<m+4; n++){                        // Loop over nu
-	    for(w=0; w<N; w++) nu[w] = (n+w)%4;
+		for (int n=m+1; n<m+4; n++){                        // Loop over nu
+			for(w=0; w<N; w++) nu[w] = (n+w)%4;
 
-	    // Pnu = U_nu X
+	   	 // Pnu = U_nu X
 
-	    for(int i=0; i<N; i++){
-		vin[i] = vin[i+N] = X;
-		dir[n_sign*i] = n_sign*nu[i]+plus;        // nu_i
-		dir[n_sign*i+1] = n_sign*nu[i]+minus;    // -nu_i
-		vout[n_sign*i] = Pnu[minus][i];
-		vout[n_sign*i+1] = Pnu[plus][i];
-	    }
-	    parallel_transport.run(n_sign*N, vout, vin, dir);
+			for(int i=0; i<N; i++){
+				vin[i] = vin[i+N] = X;
+				dir[n_sign*i] = n_sign*nu[i]+plus;        // nu_i
+				dir[n_sign*i+1] = n_sign*nu[i]+minus;    // -nu_i
+				vout[n_sign*i] = Pnu[minus][i];
+				vout[n_sign*i+1] = Pnu[plus][i];
+			}
+		    parallel_transport.run(n_sign*N, vout, vin, dir);
 
-	    // P3 = U_mu Pnu
-	    // ms is the nu sign index, ms is the mu sign index,
-	    // w is the direction index
-	    for(int i=0; i<N; i++){
-		dir[n_sign*i] = n_sign*mu[i]+plus;        // mu_i
-		dir[n_sign*i+1] = n_sign*mu[i]+minus;    // -mu_i
-	    }
-	    for(ns=0; ns<n_sign; ns++){               // ns is the sign of nu
-		for(int i=0; i<N; i++){
-		    vin[n_sign*i] = vin[n_sign*i+1] = Pnu[ns][i];
-		    vout[n_sign*i] = P3[plus][ns][i];
-		    vout[n_sign*i+1] = P3[minus][ns][i];
-		}
-		parallel_transport.run(n_sign*N, vout, vin, dir);
-	    }
+			// P3 = U_mu Pnu
+		    // ms is the nu sign index, ms is the mu sign index,
+	   		// w is the direction index
+		    for(int i=0; i<N; i++){
+				dir[n_sign*i] = n_sign*mu[i]+plus;        // mu_i
+				dir[n_sign*i+1] = n_sign*mu[i]+minus;    // -mu_i
+		    }
+		    for(ns=0; ns<n_sign; ns++){               // ns is the sign of nu
+				for(int i=0; i<N; i++){
+				    vin[n_sign*i] = vin[n_sign*i+1] = Pnu[ns][i];
+				    vout[n_sign*i] = P3[plus][ns][i];
+				    vout[n_sign*i+1] = P3[minus][ns][i];
+				}
+				parallel_transport.run(n_sign*N, vout, vin, dir);
+	   		}
 	    
-	    for(w=0; w<N; w++)
-		for(ns=0; ns<n_sign; ns++)
-		    force_product_sum(P3[plus][ns][w], Pnu[ns][w],
+		    for(w=0; w<N; w++)
+			for(ns=0; ns<n_sign; ns++){
+			    force_product_sum(P3[plus][ns][w], Pnu[ns][w],
 				       -GJP.staple3_coeff(),
 				       force[mu[w]]);
+			}
 
-	    for(int r=n+1; r<n+4; r++){                     // Loop over rho
-		bool nextr = false;
-		for(w=0; w<N; w++){
-		    rho[w] = (r+w)%4;		
-		    if(rho[w]==mu[w]){
-			nextr = true;
-			break;
-		    }
-		}
-		if(nextr) continue;
+		    for(int r=n+1; r<n+4; r++){                     // Loop over rho
+				bool nextr = false;
+				for(w=0; w<N; w++){
+				    rho[w] = (r+w)%4;		
+				    if(rho[w]==mu[w]){
+						nextr = true;
+					break;
+				    }
+				}
+				if(nextr) continue;
 
-		for(w=0; w<N; w++){                         // sigma
-		    for(int s=rho[w]+1; s<rho[w]+4; s++){
-			sigma[w] = s%4;
-			if(sigma[w]!=mu[w] && sigma[w]!=nu[w]) break;
-		    }
-		}
+				for(w=0; w<N; w++){                         // sigma
+			   		for(int s=rho[w]+1; s<rho[w]+4; s++){
+						sigma[w] = s%4;
+						if(sigma[w]!=mu[w] && sigma[w]!=nu[w]) break;
+				    }
+				}
 
 		// Prhonu = U_rho Pnu 
 
-		for(int i=0; i<N; i++){
-		    dir[n_sign*i] = n_sign*rho[i]+plus;        
-		    dir[n_sign*i+1] = n_sign*rho[i]+minus;    
-		}
-		for(ns=0; ns<n_sign; ns++){
-		    for(int i=0; i<N; i++){
-			vin[n_sign*i] = vin[n_sign*i+1] = Pnu[ns][i];
-			vout[n_sign*i] = Prhonu[ns][minus][i];
-			vout[n_sign*i+1] = Prhonu[ns][plus][i];
-		    }
-		    parallel_transport.run(n_sign*N, vout, vin, dir);
-		}
+				for(int i=0; i<N; i++){
+				    dir[n_sign*i] = n_sign*rho[i]+plus;        
+				    dir[n_sign*i+1] = n_sign*rho[i]+minus;    
+				}
+				for(ns=0; ns<n_sign; ns++){
+				    for(int i=0; i<N; i++){
+						vin[n_sign*i] = vin[n_sign*i+1] = Pnu[ns][i];
+							vout[n_sign*i] = Prhonu[ns][minus][i];
+						vout[n_sign*i+1] = Prhonu[ns][plus][i];
+				    }
+				    parallel_transport.run(n_sign*N, vout, vin, dir);
+				}
 
 		// P5 = U_mu Prhonu
 
-		for(int i=0; i<N; i++){
-		    dir[n_sign*i] = n_sign*mu[i]+plus;        
-		    dir[n_sign*i+1] = n_sign*mu[i]+minus;    
-		}
-		for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) {
-		    for(int i=0; i<N; i++){
-			vin[n_sign*i] = vin[n_sign*i+1] = Prhonu[ns][rs][i];
-			vout[n_sign*i] = P5[plus][ns][rs][i];
-			vout[n_sign*i+1] = P5[minus][ns][rs][i];
-		    }
-		    parallel_transport.run(n_sign*N, vout, vin, dir);
-		}
+			for(int i=0; i<N; i++){
+			    dir[n_sign*i] = n_sign*mu[i]+plus;        
+			    dir[n_sign*i+1] = n_sign*mu[i]+minus;    
+			}
+			for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) {
+			    for(int i=0; i<N; i++){
+					vin[n_sign*i] = vin[n_sign*i+1] = Prhonu[ns][rs][i];
+					vout[n_sign*i] = P5[plus][ns][rs][i];
+					vout[n_sign*i+1] = P5[minus][ns][rs][i];
+			    }
+			    parallel_transport.run(n_sign*N, vout, vin, dir);
+			}
 
 		// F_mu += P5 Prhonu^dagger
 		      
@@ -198,18 +280,18 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
 		// Psigmarhonu = U_sigma P_rhonu
 		
-		for(int i=0; i<N; i++){
-		    dir[n_sign*i] = (n_sign*sigma[i]);        
-		    dir[n_sign*i+1] = (n_sign*sigma[i]+1);    
-		}
-		for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++){
-		    for(int i=0; i<N; i++){
-			vin[n_sign*i] = vin[n_sign*i+1] = Prhonu[ns][rs][i];
-			vout[n_sign*i] = Psigmarhonu[ns][rs][minus][i];
-			vout[n_sign*i+1] = Psigmarhonu[ns][rs][plus][i];
-		    }
-		    parallel_transport.run(n_sign*N, vout, vin, dir);
-		}
+			for(int i=0; i<N; i++){
+			    dir[n_sign*i] = (n_sign*sigma[i]);        
+			    dir[n_sign*i+1] = (n_sign*sigma[i]+1);    
+			}
+			for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++){
+			    for(int i=0; i<N; i++){
+					vin[n_sign*i] = vin[n_sign*i+1] = Prhonu[ns][rs][i];
+					vout[n_sign*i] = Psigmarhonu[ns][rs][minus][i];
+					vout[n_sign*i+1] = Psigmarhonu[ns][rs][plus][i];
+			    }
+			    parallel_transport.run(n_sign*N, vout, vin, dir);
+			}
 
 		// P7 = U_mu P_sigmarhonu
 		for(int i=0; i<N; i++){
@@ -291,6 +373,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 		if(GJP.staple5_coeff()!=0.0)
 		    for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(ss=0; ss<n_sign; ss++) for(w=0; w<N; w++)
 			P5[ms][ns][rs][w]->FTimesV1PlusV2(GJP.staple7_coeff()/GJP.staple5_coeff(), Psigma7[ms][ns][rs][ss][w], P5[ms][ns][rs][w], GJP.VolNodeSites()*VECT_LEN);
+		nflops += 2*GJP.VolNodeSites()*VECT_LEN*N*n_sign*n_sign*n_sign*n_sign;
 
 		// F_rho -= P5 Prhonu^\dagger
 	        for(w=0; w<N; w++)
@@ -348,6 +431,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 		if(GJP.staple3_coeff()!=0.0)		
 		    for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(w=0; w<N; w++)
 			P3[ms][ns][w]->FTimesV1PlusV2(GJP.staple5_coeff()/GJP.staple3_coeff(), Prho5[ms][ns][rs][w], P3[ms][ns][w], GJP.VolNodeSites()*VECT_LEN);
+		nflops += 2*GJP.VolNodeSites()*VECT_LEN*N*n_sign*n_sign*n_sign;
 
 	    } // rho+sigma loop
 
@@ -444,6 +528,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 	    if(GJP.staple3_coeff()!=0.0)
 		for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(w=0; w<N; w++)
 		    P3[ms][ns][w]->FTimesV1PlusV2(GJP.Lepage_coeff()/GJP.staple3_coeff(), Pnu5[ms][ns][w], P3[ms][ns][w], GJP.VolNodeSites()*VECT_LEN);
+		nflops += 2*GJP.VolNodeSites()*VECT_LEN*N*n_sign*n_sign;
 
 	    // F_nu += P3 Pnu^\dagger
 
@@ -546,19 +631,42 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
     // Now that we have computed the force, we can update the momenta
 
-    update_momenta(force, dt, mom);
-    
+	dtime += dclock();
+	printf("%s:%s:",cname,fname);
+	nflops +=ParTrans::PTflops + ForceFlops;
+	print_flops(nflops,dtime);
+    update_momenta(force, dt, mom,1);
+
 
     // Tidy up
     
+#if 0
     sfree(Pnu);
     sfree(P3);
     sfree(Prhonu);
     sfree(P5);
     sfree(P7);
     sfree(Psigma7);
+#else
+    for(int w = 0;w<N;w++){
+      for(int i = 0;i<n_sign;i++){
+        v_free(Pnu[i][w]);
+        for(int j = 0;j<n_sign;j++){
+          v_free(P3[i][j][w]);
+          v_free(Prhonu[i][j][w]);
+          for(int k = 0;k<n_sign;k++){
+            v_free(P5[i][j][k][w]);
+            for(int l = 0;l<n_sign;l++){
+              v_free(P7[i][j][k][l][w]);
+              v_free(Psigma7[i][j][k][l][w]);
+            }
+          }
+        }
+      }
+    }
+#endif
 
-    sfree(force);    
+    for(int i = 0;i<4;i++) v_free(force[i]);    
     sfree(X);
 
     Convert(CANONICAL);

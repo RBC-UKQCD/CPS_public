@@ -1,7 +1,7 @@
 /*!\file
   Wilson Dirac operator code for QCDOC
 
-  $Id: wilson_init.C,v 1.4 2004-06-17 16:21:13 zs Exp $
+  $Id: wilson_init.C,v 1.5 2004-07-01 17:43:45 chulwoo Exp $
 */
 
 #include <util/wilson.h>
@@ -17,18 +17,18 @@ CPS_START_NAMESPACE
 /* Pointer to Wilson type structure is ignored here                     */
 /*----------------------------------------------------------------------*/
 static WilsonArg wil;
+
 void wilson_end(Wilson *wilson_p)
 {
+  wilson_compat_end(wilson_p);
   wfm_end(&wil); 
 }
 
 void wilson_init(Wilson *wilson_p)  
 {
-
   char *cname = "wfm";
-  char *fname = "wilson_init(Wilson)";
+  char *fname = "wilson_init(Wilson *)";
 
-  VRB.Func(cname,fname);
 
 /*----------------------------------------------------------------------*/
 /* Set sublattice direction sizes                                       */
@@ -55,12 +55,14 @@ void wilson_init(Wilson *wilson_p)
   if ( GJP.Tnodes() > 1 )  wil.local_comm[3] = 0; 
   else  wil.local_comm[3] = 1; 
 
+  //Temporary hack to force non-local comms
   wil.local_comm[0] = 0;
   wil.local_comm[1] = 0;
   wil.local_comm[2] = 0;
   wil.local_comm[3] = 0;
 
   wfm_init (&wil);
+  wilson_compat_init(wilson_p);
 
 }
 

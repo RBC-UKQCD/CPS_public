@@ -3,7 +3,7 @@
 /*!\file
   \brief  Routines used in the Asqtad RHMC fermion force calculation
 
-  $Id: Fforce_utils.C,v 1.3 2004-06-07 20:27:11 mclark Exp $
+  $Id: Fforce_utils.C,v 1.4 2004-07-01 17:43:46 chulwoo Exp $
 */
 //----------------------------------------------------------------------
 
@@ -183,9 +183,11 @@ void Fasqtad::shift_link(Matrix **u, const int *dir, int n_dir){
 
 // The update of the momentum with the force
 
-void Fasqtad::update_momenta(Matrix **force, IFloat dt, Matrix *mom){
+void Fasqtad::update_momenta(Matrix **force, IFloat dt, Matrix *mom, int
+mul_parity){
 
     Matrix mf, mfd;
+    double dt_tmp;
 
     int s[4];
     for(s[3]=0; s[3]<node_sites[3]; s[3]++)
@@ -202,11 +204,14 @@ void Fasqtad::update_momenta(Matrix **force, IFloat dt, Matrix *mom){
 #ifdef MILC_COMPATIBILITY
 			mf *= 0.5;	
 #endif
-			fTimesV1PlusV2((IFloat*)(ip+mu), dt, (IFloat*)&mf,
+			if(mul_parity && parity(s) == CHKB_ODD) dt_tmp =-dt;
+			else  dt_tmp = dt;
+			fTimesV1PlusV2((IFloat*)(ip+mu), dt_tmp, (IFloat*)&mf,
 				       (IFloat*)(ip+mu),
 				       MATRIX_SIZE);
 		    }
 		}
+	ForceFlops += GJP.VolNodeSites()*54;	
     
 }
 

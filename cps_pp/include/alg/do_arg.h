@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the DoArg structure.
   
-  $Id: do_arg.h,v 1.8 2004-06-02 09:36:38 zs Exp $
+  $Id: do_arg.h,v 1.9 2004-07-01 17:43:39 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /* CIM Sun Jul  6 23:30:27 GMT 1997 */
@@ -150,18 +150,18 @@ struct DoArg {
   DoArg()     :  
       s_node_sites(1),
 	s_nodes(1),
+    c_1(0.0),               
+    u0(1.0),                
+    dwf_a5_inv(1.0),
     xi_bare(1.0),           
     xi_dir(3),              
     xi_v(1.0),              
     xi_v_xi(1.0),           
     clover_coeff(0.0),      
     clover_coeff_xi(0.0),   
-    c_1(0.0),               
-    u0(1.0),                
     xi_gfix(1.0),           
     gsum_fast_mode(0),      
     gsum_max_try(2),        
-	dwf_a5_inv(1.0),
 	asqtad_naik(0.0), asqtad_3staple(0.0),asqtad_5staple(0.0),
 	asqtad_7staple(0.0),asqtad_lepage(0.0)
 	{}

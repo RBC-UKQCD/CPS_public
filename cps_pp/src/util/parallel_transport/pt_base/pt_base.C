@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of ParTrans class methods.
   
-  $Id: pt_base.C,v 1.5 2004-06-04 21:14:14 chulwoo Exp $
+  $Id: pt_base.C,v 1.6 2004-07-01 17:43:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v 1.5 2004-06-04 21:14:14 chulwoo Exp $
-//  $Id: pt_base.C,v 1.5 2004-06-04 21:14:14 chulwoo Exp $
+//  $Date: 2004-07-01 17:43:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v 1.6 2004-07-01 17:43:51 chulwoo Exp $
+//  $Id: pt_base.C,v 1.6 2004-07-01 17:43:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_base.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v $
 //  $State: Exp $
 //
@@ -37,6 +37,7 @@ CPS_START_NAMESPACE
 // Initialize static variables
 //------------------------------------------------------------------
 int ParTrans::scope_lock = 0;
+int ParTrans::PTflops = 0;
 
 //------------------------------------------------------------------
 // static variables

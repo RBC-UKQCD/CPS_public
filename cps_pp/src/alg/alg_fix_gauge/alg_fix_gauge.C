@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:13:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v 1.5 2004-06-04 21:13:58 chulwoo Exp $
-//  $Id: alg_fix_gauge.C,v 1.5 2004-06-04 21:13:58 chulwoo Exp $
+//  $Date: 2004-07-01 17:43:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v 1.6 2004-07-01 17:43:41 chulwoo Exp $
+//  $Id: alg_fix_gauge.C,v 1.6 2004-07-01 17:43:41 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_fix_gauge.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -108,7 +108,7 @@ void AlgFixGauge::run()
       lattice_dir_size = GJP.YnodeSites() * GJP.Ynodes();
     else if(fix == FIX_GAUGE_COULOMB_Z) 
       lattice_dir_size = GJP.ZnodeSites() * GJP.Znodes();
-    else if(fix == FIX_GAUGE_COULOMB_T) 
+    else 
       lattice_dir_size = GJP.TnodeSites() * GJP.Tnodes();
 
     if(start+step*(num-1) >= lattice_dir_size){

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
+  $Id: gjp.C,v 1.8 2004-07-01 17:43:45 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
-//  $Id: gjp.C,v 1.7 2004-06-04 21:14:12 chulwoo Exp $
+//  $Date: 2004-07-01 17:43:45 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.8 2004-07-01 17:43:45 chulwoo Exp $
+//  $Id: gjp.C,v 1.8 2004-07-01 17:43:45 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -133,6 +133,24 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   t_node_sites = rda.t_node_sites;
   s_node_sites = rda.s_node_sites;   
 
+  // CJ: It should complain if any of node_sites are not divisible by 2
+  // Why diidn't it?
+  if (x_node_sites<=0 ||x_node_sites%2!=0)
+      ERR.General(cname,fname,
+	"x_node_sites(%d) is not divisible by 2\n",x_node_sites);
+  if (y_node_sites<=0 ||y_node_sites%2!=0)
+      ERR.General(cname,fname,
+	"y_node_sites(%d) is not divisible by 2\n",y_node_sites);
+  if (z_node_sites<=0 ||z_node_sites%2!=0)
+      ERR.General(cname,fname,
+	"z_node_sites(%d) is not divisible by 2\n",z_node_sites);
+  if (t_node_sites<=0 ||t_node_sites%2!=0)
+      ERR.General(cname,fname,
+	"t_node_sites(%d) is not divisible by 2\n",t_node_sites);
+  if (s_node_sites>2 &&t_node_sites%2!=0)
+      ERR.General(cname,fname,
+	"s_node_sites(%d) is not divisible by 2\n",s_node_sites);
+
   // Set the number of nodes
   //----------------------------------------------------------------
   x_nodes = rda.x_nodes;
@@ -143,6 +161,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
 
   // Check that at least one number_of_nodes is equal to 1
   //----------------------------------------------------------------
+#if TARGET == QCDSP
   if( x_nodes != 1 &&
       y_nodes != 1 &&
       z_nodes != 1 &&
@@ -152,11 +171,12 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
 		  "The processor grid must be of dimension 1 in at least one direction, but your grid is (X, Y, Z, T, S) = (%d, %d, %d, %d, %d).\n",
 		  x_nodes, y_nodes, z_nodes, t_nodes, s_nodes);
   }
+#endif
   
 
   // Check and set s_axis
   //-----------------------------------------------------------------
-#ifdef PARALLEL
+#if TARGET == QCDSP
   if(s_nodes != 1) {
       s_axis = rda.s_axis;
       if(s_axis != SCU_X &&
@@ -168,16 +188,16 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
 		      s_axis);
 
       if(s_axis == SCU_X && x_nodes != 1)
-	  ERR. General(cname, fname, "You cannot chosen %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the X axis too (DoArg::x_nodes = %d).\n", s_axis, x_nodes);
+	  ERR. General(cname, fname, "You cannot choose %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the X axis too (DoArg::x_nodes = %d).\n", s_axis, s_axis, x_nodes);
       
       if(s_axis == SCU_Y && y_nodes != 1) 
-	  ERR. General(cname, fname, "You cannot chosen %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the Y axis too (DoArg::y_nodes = %d).\n", s_axis, y_nodes);
+	  ERR. General(cname, fname, "You cannot choose %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the Y axis too (DoArg::y_nodes = %d).\n", s_axis,s_axis,  y_nodes);
       
       if(s_axis == SCU_Z && z_nodes != 1) 
-	  ERR. General(cname, fname, "You cannot chosen %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the Z axis too (DoArg::z_nodes = %d).\n", s_axis, y_nodes);
+	  ERR. General(cname, fname, "You cannot choose %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the Z axis too (DoArg::z_nodes = %d).\n", s_axis, s_axis, t_nodes);
       
       if(s_axis == SCU_T && t_nodes != 1) 
-	  ERR. General(cname, fname, "You cannot chosen %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the T axis too (DoArg::t_nodes = %d).\n", s_axis, t_nodes);
+	  ERR. General(cname, fname, "You cannot chosen %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the T axis too (DoArg::t_nodes = %d).\n", s_axis, s_axis, t_nodes);
 
       
   }
@@ -249,7 +269,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   z_node_coor = 0;
   t_node_coor = 0;
   s_node_coor = 0;
-#ifdef PARALLEL
+#if TARGET == QCDSP || TARGET == cpsMPI
   if(x_nodes != 1) x_node_coor = CoorX() % x_nodes;
   if(y_nodes != 1) y_node_coor = CoorY() % y_nodes;
   if(z_nodes != 1) z_node_coor = CoorZ() % z_nodes;
@@ -260,6 +280,13 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
     if (s_axis == SCU_Z) s_node_coor = CoorZ() % s_nodes;
     if (s_axis == SCU_T) s_node_coor = CoorT() % s_nodes;
   }
+#endif
+#if TARGET == QCDOC
+  if(x_nodes != 1) x_node_coor = CoorX() % x_nodes;
+  if(y_nodes != 1) y_node_coor = CoorY() % y_nodes;
+  if(z_nodes != 1) z_node_coor = CoorZ() % z_nodes;
+  if(t_nodes != 1) t_node_coor = CoorT() % t_nodes;
+  if(s_nodes != 1) s_node_coor = CoorS() % s_nodes;
 #endif
 
   // Set the static arrays gjp_local_axis[5], gjp_scu_dir[10],

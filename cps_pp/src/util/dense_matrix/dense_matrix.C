@@ -3,7 +3,13 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Log: not supported by cvs2svn $
+//	$Author: chulwoo $
+//	$Date: 2004-07-01 17:43:42 $
+//	$Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dense_matrix/dense_matrix.C,v 1.4 2004-07-01 17:43:42 chulwoo Exp $
+//	$Id: dense_matrix.C,v 1.4 2004-07-01 17:43:42 chulwoo Exp $
+//	$Name: not supported by cvs2svn $
+//	$Locker:  $
+//	$Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dense_matrix/dense_matrix.C,v $
 //  $State: Exp $
 //

@@ -1,7 +1,7 @@
 /*!\file
     Asqtad Dirac operator code for QCDOC.
 
-    $Id: asqtad_dirac_serial_cpp.C,v 1.3 2004-06-17 16:21:13 zs Exp $
+    $Id: asqtad_dirac_serial_cpp.C,v 1.4 2004-07-01 17:43:43 chulwoo Exp $
 */
 
 #include <util/gjp.h>
@@ -28,7 +28,6 @@ void dirac_cmv_nl_mod_cpp( int sites, long chi, long u, long a,
 {
   IFloat *fp0, *fp1, *uu;
   int s, c;
-
   const int MATRIX_SIZE = 18;
   int *ch;
   ch = (int *)chi;
@@ -55,7 +54,6 @@ void dirac_cmv_mod_cpp( int sites, long chi, long u, long a,
 {
   IFloat *fp0, *fp1, *uu;
   int s, c;
-
   const int MATRIX_SIZE = 18;
   int *ch;
   ch = (int *)chi;
@@ -80,16 +78,24 @@ void dirac_cmv_mod_cpp( int sites, long chi, long u, long a,
 void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u, long a, 
                 long tmpfrm)
 {
-    IFloat *fp0, *fp1, *uu;
-    int s, c,i;
-    struct gauge_agg *agg = (struct gauge_agg*)u;
-
-
-    for (s = 0; s< sites; s++)
+  IFloat *fp0, *fp1, *uu;
+  int s, c,i;
+  struct gauge_agg *agg = (struct gauge_agg*)u;
+//  const int SITE_LEN = 72;
+//  const int MATRIX_SIZE = 18;
+  int *ch;
+  printf("dirac_cmv_jcw_agg_cpp:\n");
+  for (s = 0; s< sites; s++)
     {
-	fp1 = (IFloat *)(tmpfrm + agg[s].dest );
-	fp0 = (IFloat *)((int)a + agg[s].src);
-	uu = &(agg[s].mat[0]);
+      fp1 = (IFloat *)(tmpfrm + agg[s].dest );
+      fp0 = (IFloat *)((int)a + agg[s].src);
+      uu = &(agg[s].mat[0]);
+   if( (unsigned long)fp1 >0xc0000000 ||
+      (unsigned long)fp0 >0xc0000000 ||
+      (unsigned long)uu >0xc0000000){
+      printf("fp1=%p fp0=%p uu=%p out of bound!!\n",fp1,fp0,uu);
+      exit(4);
+   }
 
 	for (c=0; c<3; c++){
 	    //Re part
@@ -126,6 +132,30 @@ void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u, long a,
 	}
 #endif
 
+#if 0
+   if(fp0[0]*fp0[0]>1e-5){
+      printf("src=%p(%d) dest=%p(%d) uu=%p",fp0,agg[s].src,fp1,agg[s].dest,uu);
+      fflush(stdout);
+#if 1
+      printf("src=");
+      for(i=0;i<6;i++){
+      printf("%d %0.4e,",i,fp0[i]);
+      if(i % 6 == 5 ) printf("\n");
+      }
+#endif
+#if 1
+      printf("uu=");
+      for(i=0;i<18;i++){
+      printf("%d %0.4e,",i,uu[i]);
+      if(i % 6 == 5 ) printf("\n");
+      }
+#endif
+      printf("dest=");
+      for (c=0; c<3; c++)
+      printf("%e %e ",*(fp1+2*c),*(fp1+2*c+1));
+      printf("\n");
+  }
+#endif
     }
   
 }
@@ -136,7 +166,6 @@ void dirac_cmv_cpp( int sites, long chi, long u, long a,
 {
   IFloat *fp0, *fp1, *uu;
   int s, c;
-
   const int MATRIX_SIZE = 18;
   int *ch;
   ch = (int *)chi;
@@ -317,6 +346,8 @@ void dirac_cmm_jcw_agg_cpp( int sites, long chi, long u, long a,
   IFloat *fp0, *fp1, *uu;
   int s, c;
   struct gauge_agg *agg = (struct gauge_agg*)u;
+  const int MATRIX_SIZE = 18;
+  int *ch;
 
   for (s = 0; s< sites; s++)
 	{

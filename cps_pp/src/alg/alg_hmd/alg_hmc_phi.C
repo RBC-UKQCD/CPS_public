@@ -3,16 +3,18 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
-  
-<<<<<<< alg_hmc_phi.C
-  $Id: alg_hmc_phi.C,v 1.7 2004-06-07 19:47:02 mclark Exp $
-=======
-  $Id: alg_hmc_phi.C,v 1.7 2004-06-07 19:47:02 mclark Exp $
->>>>>>> 1.4.6.1
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
+//  $Author: chulwoo $
+//  $Date: 2004-07-01 17:43:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.8 2004-07-01 17:43:41 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.8 2004-07-01 17:43:41 chulwoo Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $RCSfile: alg_hmc_phi.C,v $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -28,6 +30,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <stdio.h>
+#include <stdlib.h>
 #include <alg/alg_hmd.h>
 #include <util/lattice.h>
 #include <util/vector.h>
@@ -148,10 +151,12 @@ AlgHmcPhi::AlgHmcPhi(Lattice& latt,
     VRB.Smalloc(cname,fname, "phi",phi, n_frm_masses * sizeof(int));
     for(i=0; i<n_frm_masses; i++){
       phi[i] = (Vector *) smalloc(f_size * sizeof(Float));
+      bzero(phi[i],f_size*sizeof(Float));
       if(phi[i] == 0)
 	ERR.Pointer(cname,fname, "phi[i]");
       VRB.Smalloc(cname,fname, "phi[i]", phi[i], f_size * sizeof(Float));
     }  
+    bzero(phi[i],f_size*sizeof(Float));
   }
 
 
@@ -197,6 +202,7 @@ AlgHmcPhi::AlgHmcPhi(Lattice& latt,
     if(frm2 == 0)
       ERR.Pointer(cname,fname, "frm2");
     VRB.Smalloc(cname,fname, "frm2",frm2, n_masses * sizeof(int));
+    printf("frm1:FsiteSize()=%d\n",latt.FsiteSize());
     for(i=0; i<n_masses; i++){
       frm1[i] = (Vector *) smalloc(f_size * sizeof(Float));
       if(frm1[i] == 0)
@@ -435,8 +441,13 @@ Float AlgHmcPhi::run(void)
     lat.RandGaussVector(frm1[i], 0.5, Ncb);
     true_res     = 1.0; // Set to non-zero so that FmatEvlInv 
                         // will return the true residual.
+    IFloat *tmp = (IFloat *)frm1[i];
+    printf("frm1[%d] = %e\n",i,*tmp);
     cg_iter = 
       lat.FmatEvlInv(frm1[i], phi[i], frm_cg_arg[i], &true_res, CNV_FRM_NO);
+    tmp = (IFloat *)phi[i];
+    printf("phi[%d] = %e\n",i,*tmp);
+//    exit(32);
     cg_iter_av = cg_iter_av + cg_iter;
     if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
     if(cg_iter > cg_iter_max) cg_iter_max = cg_iter;

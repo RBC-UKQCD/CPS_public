@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.8 2004-06-04 21:14:13 chulwoo Exp $
+  $Id: lattice_base.C,v 1.9 2004-07-01 17:43:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.8 2004-06-04 21:14:13 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.8 2004-06-04 21:14:13 chulwoo Exp $
+//  $Date: 2004-07-01 17:43:50 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.9 2004-07-01 17:43:50 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.9 2004-07-01 17:43:50 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2079,6 +2079,7 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
   int checker, i, k, s, x[4];
 
 
+  printf("num_chkbds=%d vec_size=%d\n",num_chkbds,vec_size);
   if(num_chkbds == 2) {
     for(checker = 0; checker < 2; checker++)
     for(s = 0; s < s_node_sites; s++) {
@@ -2087,7 +2088,7 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
         for(x[2] = 0; x[2] < GJP.ZnodeSites(); x[2]++)
         for(x[1] = 0; x[1] < GJP.YnodeSites(); x[1]++)
         for(x[0] = 0; x[0] < GJP.XnodeSites(); x[0]++) {
-          LRG.AssignGenerator(x);
+          LRG.AssignGenerator(x[0],x[1],x[2],x[3],s);
           for(k = 0; k < vec_size; k++) {
             *(ptr++) = LRG.Grand();
           }
@@ -2106,11 +2107,12 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
           *(ptr++) = LRG.Grand();
         }
       }
-    } else
-    for(i = 0; i < GJP.VolNodeSites(); i+=2) {
-      LRG.AssignGenerator(i);
-      for(k = 0; k < FsiteSize(); k++) {
-        *(ptr++) = LRG.Grand();
+    } else {
+      for(i = 0; i < GJP.VolNodeSites()*s_node_sites; i+=2) {
+        LRG.AssignGenerator(i);
+        for(k = 0; k < vec_size; k++) {
+          *(ptr++) = LRG.Grand();
+        }
       }
     }
   }

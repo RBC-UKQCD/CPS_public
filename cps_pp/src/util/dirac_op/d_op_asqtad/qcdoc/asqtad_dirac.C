@@ -1,8 +1,17 @@
-/*! \file
-  Asqtad Dirac operator for QCDOC.
-
-  $Id: asqtad_dirac.C,v 1.8 2004-06-17 16:21:12 zs Exp $
-*/
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: chulwoo $
+//  $Date: 2004-07-01 17:43:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.9 2004-07-01 17:43:42 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.9 2004-07-01 17:43:42 chulwoo Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $RCSfile: asqtad_dirac.C,v $
+//  $Revision: 1.9 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
+//  $State: Exp $
+//
 //    12/02 HueyWen Lin, Chulwoo Jung
 //
 //   Asqtad Dirac operator for QCDOC. Communications and computations
@@ -45,7 +54,7 @@ for dirac operator. If SIMUL is defined, it will include (pre-calcuated)
 temporary arraies and skip the generation of arraies.
 ******************************************************************/
 
-#define USE_NEW
+#undef USE_NEW
 #undef CPP
 /****************************************************************
 CPP is a switch for using C++ routine for dirac_cmv.
@@ -64,7 +73,7 @@ extern "C" void dirac_sum2_64( int sites, long chi, long tmpfrm,long b);
 extern "C" void flush_cache_spinor(int nflush, long flush_buffer);
 extern "C" void flush_cache(int nflush, long flush_buffer);
 
-enum{VECT_LEN=6, VECT_LEN2=8, MATRIX_SIZE=18, SITE_LEN=72, NUM_DIR=8};
+enum{VECT_LEN=6, VECT_LEN2=8, MATRIX_SIZE=18, SITE_LEN=72, NUM_DIR=8, N=4};
 //---------------------------------------------------------------------
 //  Arrays for send direction, receive direction, lattice size per
 //  node, coordinate (for site where cluster of 8 matrices
@@ -118,7 +127,6 @@ static IFloat *Tbuffer[3][2];
 //-------------------------------------------------------------------
 // end of stack based arrays which should be heap based
 //-------------------------------------------------------------------
-
 static int * ToffsetP[3][2];
 static int * ToffsetM[3][2];
 static int countP[3][2];
@@ -210,8 +218,17 @@ static int LexVector( int * c );
 //  calculate the offset into the receive buffers (chi_off_node);
 //-------------------------------------------------------------------
 
+extern "C" void vaxpy3(Matrix *a,Float *b,Matrix *c,Matrix *d,int nvec);
+
 static int LexSurface( int * cc, int surface );
 
+static int Rotate (int mu, int i){
+	int mu_p = (mu+i)%4;
+	if( mu >= 4)
+		mu_p += 4;
+//	printf("Rotate(%d, %d)=%d)\n",mu,i,mu_p);
+	return mu_p;
+}
 static int NotParallel( int mu, int nu){
 	int dif = mu-nu;
 	if (dif==0 ||dif==-4||dif==4)return 0;
@@ -243,9 +260,7 @@ void asqtad_dirac_init(const void * gauge_u )
   int non_local_count[2];
   int local_count_3[2];
   int non_local_count_3[3][2];
-
   int x[NUM_DIR/2];
-
   int scu_irs[2][3];
   char *cname = "DiracOpAsqtad";
   char *fname = "asqtad_dirac_init(const void *gauge)";
@@ -297,6 +312,7 @@ void asqtad_dirac_init(const void * gauge_u )
   size[3] = GJP.ZnodeSites();
 
   vol = size[0] * size[1] * size[2] * size[3];
+VRB.Flow(cname,fname,"vol=%d\n",vol);
   split =  (  vol>64 ? 0 : 1 ); 
 //  split =0;
 
@@ -325,20 +341,21 @@ void asqtad_dirac_init(const void * gauge_u )
   //-------------------------------------------------------------
   nflush = vol/8;
 
+#if 0
+  tmpfrm = NULL;
+  if (vol<=4096)
   tmpfrm = (IFloat *) qalloc (QFAST|QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
-
   if(tmpfrm == NULL){ 
     tmpfrm = (IFloat *) qalloc (QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
     printf("tmpfrm is allocated at (%p),length 0x%x \n",tmpfrm,NUM_DIR*vol*VECT_LEN2*sizeof(IFloat));
   }
   if(tmpfrm == 0) 
     ERR.Pointer(cname,fname, "tmpfrm");
-
+#endif
 
   //-----------------------------------------------------------------
   //  Allocate 8 receive buffers for off-node vectors
   //-----------------------------------------------------------------
-  
   if(vol>1024) chi_off_node_total=NULL;
     else
     chi_off_node_total = ( IFloat * ) qalloc(QFAST|QCOMMS, 3*non_local_chi*
@@ -350,6 +367,7 @@ void asqtad_dirac_init(const void * gauge_u )
   }
     if(chi_off_node_total == 0)
       ERR.Pointer(cname,fname, "chi_off_node_total");
+
  for ( j= 0; j < 3; j++ ){
     chi_off_node[j][0] = &(chi_off_node_total[ non_local_chi*j* VECT_LEN/2 ] ); 
 //    fprintf(stderr,"chi_off_node[%d][0] =%d\n",j,(chi_off_node[j][0]-chi_off_node_total)/VECT_LEN);
@@ -360,6 +378,7 @@ void asqtad_dirac_init(const void * gauge_u )
     chi_off_node_p[j][i] = chi_off_node_p[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
   }
  }
+
   //-----------------------------------------------------------------
   //  Space for storage of pointers to chi's.  2 pointers per site,
   //  but split into even and odd groups for the first part of the
@@ -391,7 +410,13 @@ void asqtad_dirac_init(const void * gauge_u )
 
   for ( k = 0; k < 3; k++ ) {
   for ( i = 0; i < 2; i++ ) {
+  if(vol>1024) Tbuffer[k][i]=NULL;
+    else
     Tbuffer[k][i] = (IFloat *) qalloc (QFAST|QNONCACHE, size[1] * size[2] * size[3] * VECT_LEN * sizeof( IFloat ) / 2);
+
+  if( Tbuffer[k][i] == NULL)
+    Tbuffer[k][i] = (IFloat *) qalloc (QCOMMS, size[1] * size[2] * size[3] * VECT_LEN * sizeof( IFloat ) / 2);
+
    if(Tbuffer[k][i] == NULL)
 	ERR.Pointer(cname,fname, "Tbuffer[i][j]");
     ToffsetP[k][i] = ( int * ) qalloc (0,  size[1] * size[2] * size[3] *  sizeof( int ) / 2 );
@@ -573,7 +598,6 @@ void asqtad_dirac_init(const void * gauge_u )
     }// for x[3] loop
   }//for n loop
 
-
 #if 0
   FILE *fp;
   fp=fopen(chi_l_filename,"w");
@@ -652,7 +676,6 @@ void asqtad_dirac_init(const void * gauge_u )
   } //end of sg loop
   
 
-
 #if 0
   int vol3 = (size[1] * size[2] * size[3])/2;
   fp= fopen(Toffset_filename,"w");
@@ -690,11 +713,9 @@ void asqtad_dirac_init(const void * gauge_u )
   for( odd=0;odd<2;odd++){
     for ( i = 0; i < NUM_DIR; i++ ) {
       j = i % (NUM_DIR/2);
-  
         SCUarg[odd][i + NUM_DIR].Init(chi_off_node[2][i], scudir[i], SCU_REC,
   		    VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0, scu_irs[odd][2]);
         SCUarg[odd][i + NUM_DIR].Assert();
-  
       SCUDMAarg_p[odd][(i+NUM_DIR)*2]  = new SCUDMAInst;
   //      printf("SCUDMAarg_p[%d]=%p\n",(i+NUM_DIR)*2,SCUDMAarg_p[(i+NUM_DIR)*2]);
       SCUDMAarg_p[odd][(i+NUM_DIR)*2] ->Init(chi_off_node[0][i],
@@ -702,7 +723,6 @@ void asqtad_dirac_init(const void * gauge_u )
       SCUDMAarg_p[odd][(i+NUM_DIR)*2+1]  = new SCUDMAInst;
       SCUDMAarg_p[odd][(i+NUM_DIR)*2+1] ->Init(chi_off_node[1][i],
         VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 1, 0);
-  
       if( split ){
         SCUarg_1[odd][i + NUM_DIR].Init(scudir[i],SCU_REC, &SCUDMAarg_p[odd][(i+NUM_DIR)*2],1, scu_irs[odd][0]);
         SCUarg_1[odd][i + NUM_DIR].Assert();
@@ -818,7 +838,9 @@ void asqtad_destroy_dirac_buf()
 {
   int i,k;
 
+#if 0
   qfree (tmpfrm);
+#endif
   qfree(chi_off_node_total);
 
   for ( i = 0; i < 2; i++ ) {
@@ -921,7 +943,6 @@ void asqtad_dirac_init_g()
   //-----------------------------------------------------------
 
 
-
   //-----------------------------------------------------------
   //  Once all the index arithmetic is finished, v points to
   //  the initial gauge field matrix.  w points to where it should
@@ -940,7 +961,6 @@ void asqtad_dirac_init_g()
   //  location where one link matrix can be stored.
   //-----------------------------------------------------------
 
-  VRB.Func(cname,fname);
 #if 0
   size[0] = GJP.TnodeSites();
   size[1] = GJP.XnodeSites();
@@ -969,102 +989,251 @@ void asqtad_dirac_init_g()
        ERR.Pointer(cname,fname, "uc_l[i]"); exit(3);
 	}
     for(j=0;j<MATRIX_SIZE*(local_chi+local_chi_3)/2;j++) uc_l[i][j]=0.;
-    uc_l_agg[i]  = (gauge_agg *)qalloc(QFAST,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
-   if(uc_l_agg[i] == 0){
+     if(uc_l[i] == 0)
+       ERR.Pointer(cname,fname, "uc_l[i]");
+    uc_nl[i] = (IFloat*)smalloc( MATRIX_SIZE * ((non_local_chi +non_local_chi_3[3])/2) * sizeof(IFloat) );
+    if(uc_nl[i] == 0){
+       ERR.Pointer(cname,fname, "uc_nl[i]");
+     }
+
+#if 0
+	if(vol> 4096) uc_l_agg[i]=NULL;
+	else
+ 		uc_l_agg[i]  = (gauge_agg *)qalloc(QFAST,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
+   if(uc_l_agg[i] == NULL){
       uc_l_agg[i]  = (gauge_agg *)qalloc(QCOMMS,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
       printf("uc_l_agg[%d] is allocated at DDR (%p)\n",i,uc_l_agg[i]);
     }
-
-     if(uc_l[i] == 0)
-       ERR.Pointer(cname,fname, "uc_l[i]");
      if(uc_l_agg[i] == 0)
        ERR.Pointer(cname,fname, "uc_l_agg[i]");
- 
-    uc_nl[i] = (IFloat*)smalloc( MATRIX_SIZE * ((non_local_chi +non_local_chi_3[3])/2) * sizeof(IFloat) );
-
     uc_nl_agg[i]  = (gauge_agg*)qalloc(QFAST,((non_local_chi+non_local_chi_3[3])/2)*sizeof(gauge_agg));
     if(uc_nl_agg[i] == 0){
       uc_nl_agg[i]  = (gauge_agg*)qalloc(QCOMMS,((non_local_chi+non_local_chi_3[3])/2)*sizeof(gauge_agg));
       printf("uc_nl_agg[%d] is allocated at DDR (%p)\n",i,uc_nl_agg[i]);
     }
-
-    if(uc_nl[i] == 0){
-       ERR.Pointer(cname,fname, "uc_nl[i]");
-     }
     if(uc_nl_agg[i] == 0){
        ERR.Pointer(cname,fname, "uc_nl_agg[i]");
      }
+#endif
+
   }
 
-
 {
+  int N = 4;
+//  if (vol>512) N=2;
+  if (vol>1024) N=1;
   ParTransAsqtad pt(*lat_pt);
 //  Float *gauge_p = (Float *)gauge_field_addr;
   Matrix *result[NUM_DIR];
 #ifdef USE_NEW
   Matrix *Unit = new Matrix[vol];
+  printf("Unit=%p\n",Unit);
   Matrix *P3 = new Matrix[vol];
+  printf("P3=%p\n",Unit);
   Matrix *P3mu = new Matrix[vol];
   Matrix *P5 = new Matrix[vol];
   Matrix *P5mu = new Matrix[vol];
   Matrix *P7 = new Matrix[vol];
   Matrix *P7mu = new Matrix[vol];
-  for(j = 0;j<NUM_DIR;j++)
+  for(j = 0;j<NUM_DIR;j++){
      result[j] = new Matrix[vol];
-#else
-  Matrix *Unit = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
-  Matrix *P3 = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
-  Matrix *P3mu = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
-  Matrix *P5 = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
-  Matrix *P5mu = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
-  Matrix *P7 = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
-  Matrix *P7mu = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
-  for(j = 0;j<NUM_DIR;j++)
-     result[j] = (Matrix *)qalloc(QFAST|QCOMMS,sizeof(Matrix)*vol);
-#endif
+     printf("result[%d]=%p\n",j,result[j]);
+  }
   Matrix *P6 = P5;
   Matrix *P6mu = P5mu;
   Matrix *Pmumu = P7;
-//  Matrix *Pmumumu = P7mu;
-  for(j = 0;j<vol;j++) Unit[j].UnitMatrix();
-     result[j] = new Matrix[vol];
+  Matrix *Pmumumu = P7mu;
+#else
+  Matrix *Unit;
+  Matrix *P3[N];
+  Matrix *P3mu[N];
+  Matrix *P5[N];
+  Matrix *P5mu[N];
+  Matrix *P7[N];
+  Matrix *P7mu[N];
+  Matrix *P6[N];
+  Matrix *P6mu[N];
+  Matrix *Pmumu[N];
+  Matrix *Pmumumu[N];
+VRB.Flow(cname,fname,"vol=%d\n",vol);
+  Unit = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    Pmumumu[i] = P7mu[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    Pmumu[i] = P7[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    P6mu[i] = P5mu[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    P6[i] = P5[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    P3mu[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  for(i = 0;i<N;i++)
+    P3[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
   for(j = 0;j<NUM_DIR;j++)
-     for(int k = 0;k<vol;k++) result[j][k].ZeroMatrix();
+     result[j] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+#endif
+  for(j = 0;j<vol;j++) Unit[j].UnitMatrix();
+  for(j = 0;j<NUM_DIR;j++)
+     for(int k = 0;k<vol;k++) (result[j]+k)->ZeroMatrix();
+  Float dtime = -dclock();
+  int nflops = 0;
+  ParTrans::PTflops=0;
 //  IFloat *temp;
-  int dirs[] = {6,0,2,4,7,1,3,5}; //mapping between ParTrans and DiracOpAsqtad
-//  Matrix *min[NUM_DIR],*mout[NUM_DIR];
-  for(int mu = 0;mu<NUM_DIR;mu++){
-    pt.run(1,&(result[mu]),&Unit,&dirs[mu]);
+  int dir[] = {6,0,2,4,7,1,3,5},dirs[N]; //mapping between ParTrans and DiracOpAsqtad
+  Matrix *min[N],*mout[N];
+//  int NUM = NUM_DIR/N;
+  if (NUM_DIR%N !=0) ERR.General(cname,fname,"NUM_DIR(%d)is not divisible vy N(%d)\n",NUM_DIR,N);
+  for(int mu = 0;mu<NUM_DIR;mu += N){
+	int mu_p,nu_p,rho_p,sigma_p;
+    for(i  = 0;i<N;i++){
+      mu_p = Rotate(mu,i);
+      min[i] = Unit;
+      mout[i] = result[mu_p];
+      dirs[i] = dir[mu_p];
+    }
+    pt.run(N,mout,min,dirs);
+//    pt.run(1,&(result[mu]),&Unit,&dirs[mu]);
     for(int nu = 0;nu<NUM_DIR;nu++)
     if(NotParallel(mu,nu)){
-      pt.run(1,&P3,&Unit,&dirs[nu]);
-      pt.run(1,&P3mu,&P3,&dirs[mu]);
+      for(i  = 0;i<N;i++){
+		nu_p = Rotate(nu,i);
+        min[i] = Unit;
+        mout[i] = P3[i];
+        dirs[i] = dir[nu_p];
+      }
+      pt.run(N,mout,min,dirs);
+      for(i  = 0;i<N;i++){
+		mu_p = Rotate(mu,i);
+        min[i] = P3[i];
+        mout[i] = P3mu[i];
+        dirs[i] = dir[mu_p];
+      }
+      pt.run(N,mout,min,dirs);
+//     pt.run(1,&P3,&Unit,&dirs[nu]);
+//     pt.run(1,&P3mu,&P3,&dirs[mu]);
       for(int rho = 0;rho<NUM_DIR;rho++)
       if(NotParallel(mu,rho) && NotParallel(nu,rho)){
-        pt.run(1,&P5,&P3,&dirs[rho]);
-        pt.run(1,&P5mu,&P5,&dirs[mu]);
+        for(i  = 0;i<N;i++){
+  	   	  rho_p = Rotate(rho,i);
+          min[i] = P3[i];
+          mout[i] = P5[i];
+          dirs[i] = dir[rho_p];
+        }
+        pt.run(N,mout,min,dirs);
+//        pt.run(1,&P5,&P3,&dirs[rho]);
+        for(i  = 0;i<N;i++){
+	  	mu_p = Rotate(mu,i);
+          min[i] = P5[i];
+          mout[i] = P5mu[i];
+          dirs[i] = dir[mu_p];
+        }
+        pt.run(N,mout,min,dirs);
+//     pt.run(1,&P5mu,&P5,&dirs[mu]);
         for(int sigma = 0;sigma<NUM_DIR;sigma++)
         if(NotParallel(mu,sigma) && NotParallel(nu,sigma)&&NotParallel(rho,sigma)){
-          pt.run(1,&P7,&P5,&dirs[sigma]);
-          pt.run(1,&P7mu,&P7,&dirs[mu]);
-          int sig_n = (sigma+4)%8;
-          pt.run(1,&P7,&P7mu,&dirs[sig_n]);
-          fTimesV1PlusV2((IFloat*)P5mu,c7/c5,(IFloat*)P7,(IFloat*)P5mu,vol*18);
+          for(i  = 0;i<N;i++){
+    		sigma_p = Rotate(sigma,i);
+            min[i] = P5[i];
+            mout[i] = P7[i];
+            dirs[i] = dir[sigma_p];
+          }
+          pt.run(N,mout,min,dirs);
+//        pt.run(1,&P7,&P5,&dirs[sigma]);
+          for(i  = 0;i<N;i++){
+    		mu_p = Rotate(mu,i);
+            min[i] = P7[i];
+            mout[i] = P7mu[i];
+            dirs[i] = dir[mu_p];
+          }
+          pt.run(N,mout,min,dirs);
+      //    pt.run(1,&P7mu,&P7,&dirs[mu]);
+          for(i  = 0;i<N;i++){
+    		sigma_p = Rotate(sigma,i);
+            int sig_n = (sigma_p+4)%8;
+            min[i] = P7mu[i];
+            mout[i] = P7[i];
+            dirs[i] = dir[sig_n];
+          }
+          pt.run(N,mout,min,dirs);
+//          int sig_n = (sigma+4)%8;
+//         pt.run(1,&P7,&P7mu,&dirs[sig_n]);
+//          fTimesV1PlusV2((IFloat*)P5mu,c7/c5,(IFloat*)P7,(IFloat*)P5mu,vol*18);
+		  Float c75 = c7/c5;
+          for(i  = 0;i<N;i++)
+            vaxpy3(P5mu[i],&c75,P7[i],P5mu[i],vol*3);
+	  nflops +=vol*18*2*N;
         }
-        int rho_n = (rho+4)%8;
-        pt.run(1,&P5,&P5mu,&dirs[rho_n]);
-        fTimesV1PlusV2((IFloat*)P3mu,c5/c3,(IFloat*)P5,(IFloat*)P3mu,vol*18);
+        for(i  = 0;i<N;i++){
+            rho_p = Rotate(rho,i);
+            int rho_n = (rho_p+4)%8;
+            min[i] = P5mu[i];
+            mout[i] = P5[i];
+            dirs[i] = dir[rho_n];
+        }
+        pt.run(N,mout,min,dirs);
+//        int rho_n = (rho+4)%8;
+//        pt.run(1,&P5,&P5mu,&dirs[rho_n]);
+//        fTimesV1PlusV2((IFloat*)P3mu,c5/c3,(IFloat*)P5,(IFloat*)P3mu,vol*18);
+		Float c53 = c5/c3;
+        for(i  = 0;i<N;i++)
+          vaxpy3(P3mu[i],&c53,P5[i],P3mu[i],vol*3);
+		nflops +=vol*18*2*N;
       }
-      pt.run(1,&P6,&P3,&dirs[nu]);
-      pt.run(1,&P6mu,&P6,&dirs[mu]);
-      int nu_n = (nu+4)%8;
-      pt.run(1,&P6,&P6mu,&dirs[nu_n]);
-      fTimesV1PlusV2((IFloat*)P3mu,c6/c3,(IFloat*)P6,(IFloat*)P3mu,vol*18);
+      for(i  = 0;i<N;i++){
+        nu_p = Rotate(nu,i);
+        min[i] = P3[i];
+        mout[i] = P6[i];
+        dirs[i] = dir[nu_p];
+      }
+      pt.run(N,mout,min,dirs);
+//      pt.run(1,&P6,&P3,&dirs[nu]);
+      for(i  = 0;i<N;i++){
+        mu_p = Rotate(mu,i);
+        min[i] = P6[i];
+        mout[i] = P6mu[i];
+        dirs[i] = dir[mu_p];
+      }
+      pt.run(N,mout,min,dirs);
+//      pt.run(1,&P6mu,&P6,&dirs[mu]);
+      for(i  = 0;i<N;i++){
+        nu_p = Rotate(nu,i);
+        int nu_n = (nu_p+4)%8;
+        min[i] = P6mu[i];
+        mout[i] = P6[i];
+        dirs[i] = dir[nu_n];
+      }
+      pt.run(N,mout,min,dirs);
+//      int nu_n = (nu+4)%8;
+//      pt.run(1,&P6,&P6mu,&dirs[nu_n]);
+	  Float c63 = c6/c3;
+      for(i  = 0;i<N;i++)
+        vaxpy3(P3mu[i],&c63,P6[i],P3mu[i],vol*3);
+	  nflops +=vol*18*2*N;
+//      fTimesV1PlusV2((IFloat*)P3mu,c6/c3,(IFloat*)P6,(IFloat*)P3mu,vol*18);
+      for(i  = 0;i<N;i++){
+        nu_p = Rotate(nu,i);
+        int nu_n = (nu_p+4)%8;
+        min[i] = P3mu[i];
+        mout[i] = P3[i];
+        dirs[i] = dir[nu_n];
+      }
+      pt.run(N,mout,min,dirs);
+  //  pt.run(1,&P3,&P3mu,&dirs[nu_n]);
 
-      pt.run(1,&P3,&P3mu,&dirs[nu_n]);
-      fTimesV1PlusV2((IFloat*)result[mu],c3/c1,(IFloat*)P3,(IFloat*)result[mu],vol*18);
+	  Float c31 = c3/c1;
+	  for(i  = 0;i<N;i++){
+	    mu_p =Rotate(mu,i);
+        vaxpy3(result[mu_p],&c31,P3[i],result[mu_p],vol*3);
+      }
+	  nflops +=vol*18*2*N;
+//      fTimesV1PlusV2((IFloat*)result[mu],c3/c1,(IFloat*)P3,(IFloat*)result[mu],vol*18);
     }
   }
+
+  dtime +=dclock();
+  nflops += ParTrans::PTflops;
+  printf("%s:%s:",cname,fname);
+  print_flops(nflops,dtime);
 
   for ( i = 0; i < 2; i++){
     local_count[i] = 0;
@@ -1077,7 +1246,7 @@ void asqtad_dirac_init_g()
   //  site and then set up pointers to vector field
   //-----------------------------------------------------------------
 
-  Matrix *tmp; 
+  Matrix *tmp;
 
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     for (x[3] = 0; x[3] < size[3]; x[3]++)
@@ -1126,9 +1295,9 @@ void asqtad_dirac_init_g()
     }
   }
   for(int mu = 0;mu<NUM_DIR;mu++){
-    pt.run(1,&(result[mu]),&Unit,&dirs[mu]);
-    pt.run(1,&Pmumu,&result[mu],&dirs[mu]);
-    pt.run(1,&(result[mu]),&Pmumu,&dirs[mu]);
+    pt.run(1,&(result[mu]),&Unit,&dir[mu]);
+    pt.run(1,Pmumu,&result[mu],&dir[mu]);
+    pt.run(1,&(result[mu]),Pmumu,&dir[mu]);
   }
 
   for ( n = 0; n < NUM_DIR/2; n++ ) {
@@ -1202,17 +1371,21 @@ void asqtad_dirac_init_g()
   delete[] result[j];
 #else
   qfree( Unit);
-  qfree( P3);
-  qfree( P3mu);
-  qfree( P5);
-  qfree( P5mu);
-  qfree( P7);
-  qfree( P7mu);
+  for(int j = 0;j<N;j++){
+  qfree( P3[j]);
+  qfree( P3mu[j]);
+  qfree( P5[j]);
+  qfree( P5mu[j]);
+  qfree( P7[j]);
+  qfree( P7mu[j]);
+  }
   for(int j = 0;j<NUM_DIR;j++)
   qfree( result[j]);
 #endif
 }
 
+//  int fd;
+//  char buf[200];
 #if 0
   FILE *fp;
   fp=fopen(uc_l_filename,"w");
@@ -1228,6 +1401,39 @@ void asqtad_dirac_init_g()
   }
   fclose(fp);
 #endif
+
+#if 1
+  tmpfrm = NULL;
+  if (vol<=4096)
+  tmpfrm = (IFloat *) qalloc (QFAST|QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
+  if(tmpfrm == NULL){ 
+    tmpfrm = (IFloat *) qalloc (QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
+    printf("tmpfrm is allocated at (%p),length 0x%x \n",tmpfrm,NUM_DIR*vol*VECT_LEN2*sizeof(IFloat));
+  }
+  if(tmpfrm == 0) 
+    ERR.Pointer(cname,fname, "tmpfrm");
+  printf("tmpfrm=%p\n",tmpfrm);
+#endif
+
+	for(i=0;i<2;i++){
+		if(vol> 4096) uc_l_agg[i]=NULL;
+		else
+ 			uc_l_agg[i]  = (gauge_agg *)qalloc(QFAST,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
+		if(uc_l_agg[i] == NULL){
+			uc_l_agg[i]  = (gauge_agg *)qalloc(QCOMMS,((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
+			printf("uc_l_agg[%d] is allocated at DDR (%p)\n",i,uc_l_agg[i]);
+	    }
+		if(uc_l_agg[i] == 0)
+			ERR.Pointer(cname,fname, "uc_l_agg[i]");
+   		 uc_nl_agg[i]  = (gauge_agg*)qalloc(QFAST,((non_local_chi+non_local_chi_3[3])/2)*sizeof(gauge_agg));
+	    if(uc_nl_agg[i] == 0){
+   			uc_nl_agg[i]  = (gauge_agg*)qalloc(QCOMMS,((non_local_chi+non_local_chi_3[3])/2)*sizeof(gauge_agg));
+   			printf("uc_nl_agg[%d] is allocated at DDR (%p)\n",i,uc_nl_agg[i]);
+	    }
+   		if(uc_nl_agg[i] == 0){
+			ERR.Pointer(cname,fname, "uc_nl_agg[i]");
+     	}
+	}
 
   gauge_agg *temp = new gauge_agg[12*vol];
   int num_ind[vol*6];
@@ -1272,9 +1478,8 @@ void asqtad_dirac_init_g()
     }
   }
 
-
+//  gauge_agg *agg_p;
 #if 0
-  gauge_agg *agg_p;
   fp=fopen(uc_l_agg_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"struct gauge_agg uc_l_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
@@ -1375,6 +1580,57 @@ void asqtad_dirac_init_g()
   fclose(fp);
 #endif
 
+#if 0
+  //-----------------------------------------------------------------
+  //  Allocate 8 receive buffers for off-node vectors
+  //-----------------------------------------------------------------
+  if(vol>1024) chi_off_node_total=NULL;
+    else
+    chi_off_node_total = ( IFloat * ) qalloc(QFAST|QCOMMS, 3*non_local_chi*
+      VECT_LEN * sizeof( IFloat ) / 2 );
+  if(chi_off_node_total == NULL){ 
+    chi_off_node_total = ( IFloat * ) qalloc(QCOMMS, 3*non_local_chi*
+      VECT_LEN * sizeof( IFloat ) / 2 );
+    printf("chi_off_node_total is allocated at DDR (%p)\n",chi_off_node_total);
+  }
+    if(chi_off_node_total == 0)
+      ERR.Pointer(cname,fname, "chi_off_node_total");
+ for ( j= 0; j < 3; j++ ){
+    chi_off_node[j][0] = &(chi_off_node_total[ non_local_chi*j* VECT_LEN/2 ] ); 
+//    fprintf(stderr,"chi_off_node[%d][0] =%d\n",j,(chi_off_node[j][0]-chi_off_node_total)/VECT_LEN);
+    chi_off_node_p[j][0] = (IFloat *)(sizeof (IFloat)*non_local_chi*j* VECT_LEN/2 );
+  for ( i = 1; i < NUM_DIR; i++ ){
+    chi_off_node[j][i] = chi_off_node[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
+//    fprintf(stderr,"chi_off_node[%d][%d] =%d\n",j,i,(chi_off_node[j][i]-chi_off_node_total)/VECT_LEN);
+    chi_off_node_p[j][i] = chi_off_node_p[j][i-1]+vol/(2*size[(i-1)%4])*VECT_LEN;
+  }
+ }
+
+  for( int odd=0;odd<2;odd++){
+    for ( i = 0; i < NUM_DIR; i++ ) {
+      j = i % (NUM_DIR/2);
+	  SCUarg[odd][i+NUM_DIR].Addr(chi_off_node[2][i]);
+      if( split ){
+          SCUarg_1[odd][i + NUM_DIR].Addr(chi_off_node[0][i]);
+          SCUarg_2[odd][i + NUM_DIR].Addr(chi_off_node[1][i]);
+      } else {
+		void *addr[2];
+		addr[0] = chi_off_node[0][i];
+		addr[1] = chi_off_node[1][i];
+        SCUarg_1[odd][i + NUM_DIR].Addr(addr,2);
+      }
+      //send arguments
+      if ((i == 0) || ( i == 4)){
+		if (size[j]<=2)
+          SCUarg[odd][i].Addr(chi_off_node[0][4-i]);
+      }
+      else{
+        if(size[j]<=2)
+          SCUarg[odd][i].Addr(chi_off_node[0][(i+4)%NUM_DIR]);
+      }
+    }// end of NUM_DIR loop
+  } // end of odd loop
+#endif
 
 
 }
@@ -1389,6 +1645,10 @@ void asqtad_destroy_dirac_buf_g(void)
   qfree(uc_l_agg[i]);
   qfree(uc_nl_agg[i]);
   }
+  qfree (tmpfrm);
+#if 0
+  qfree(chi_off_node_total);
+#endif
 }
 //---------------------------------------------------------------------
 //  Find nearest neighbor coordinate for coordinates given.  Nearest
@@ -1547,17 +1807,9 @@ void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   long uc_l = (long)uc_l_agg[odd];
   long uc_nl = (long)uc_nl_agg[odd];
   long uc_nl2 = (long)&(uc_nl_agg[odd][isplit]);
-  long cache_p0=uc_l;
-  long cache_p1=cache_p0+32;
-  long cache_p2=cache_p1+32;
-  long cache_p3=cache_p2+32;
-  long cache_p4=cache_p3+32;
-  long cache_p5=cache_p4+32;
-  long cache_p6=cache_p5+32;
-//  long cache_p7=cache_p6+32;
-
-
-
+//  int num_flops;
+// Float dtime;
+//  struct timeval start,end;
   
 
 #undef PROFILE
@@ -1654,13 +1906,6 @@ void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   //-----------------------------------------------------------------
   //do first local computations
   //-----------------------------------------------------------------
-  dcbt(cache_p0);cache_p0=uc_nl;
-  dcbt(cache_p1);cache_p1=cache_p0+32;
-  dcbt(cache_p2);cache_p2=cache_p1+32;
-  dcbt(cache_p3);cache_p3=cache_p2+32;
-  dcbt(cache_p4);cache_p4=cache_p3+32;
-  dcbt(cache_p5);cache_p5=cache_p4+32;
-  dcbt(cache_p6);cache_p6=cache_p5+32;
 #ifdef CPP
   dirac_cmv_jcw_agg_cpp( (local_chi + local_chi_3)/2, (long)0, uc_l, (long)a, (long)tmpfrm);
 #else
@@ -1693,13 +1938,6 @@ if(split) {
   gettimeofday(&start,NULL);
 #endif
 
-  dcbt(cache_p0);cache_p0=uc_nl2;
-  dcbt(cache_p1);cache_p1=cache_p0+32;
-  dcbt(cache_p2);cache_p2=cache_p1+32;
-  dcbt(cache_p3);cache_p3=cache_p2+32;
-  dcbt(cache_p4);cache_p4=cache_p3+32;
-  dcbt(cache_p5);cache_p5=cache_p4+32;
-  dcbt(cache_p6);cache_p6=cache_p5+32;
 #ifdef CPP
   dirac_cmv_jcw_agg_cpp( isplit, (long)0, (long)&(uc_nl_agg[odd][0]), (long)c, (long)tmpfrm);
 #else
@@ -1814,6 +2052,7 @@ if(split) {
   dtime +=dclock();
   printf("dirac_cmv_jcw_agg::%ld flops/%e seconds = %e MFlops\n",num_flops,dtime,(Float)num_flops/(dtime*1e6));
 #endif
+  DiracOp::CGflops +=573*vol;
 
 }
 

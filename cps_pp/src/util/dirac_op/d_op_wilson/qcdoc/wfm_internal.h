@@ -5,9 +5,16 @@
 /* Wilson assembler routines                                                */
 /*--------------------------------------------------------------------------*/
 
+
+/*
+ * Flops reporting.
+ */
+#include <util/dirac_op.h>
+
 /*
  * FP KERNELS
  */
+
 
 extern "C" {
 

@@ -8,8 +8,8 @@
  */  
 .text
 .align 2
-.globl rec_su3
-rec_su3:
+.globl rec_su3t
+rec_su3t:
 
 	or    %r9 , %r3 , %r3
 	la   %r1,	-1408(%r1)
@@ -76,8 +76,7 @@ rec_su3:
 	lfd   18,	48(%r12)
 	lfd   19,	56(%r12)
 	mtctr 	%r27
-	b       rec_su3_lab1
-.align 4
+	mftbl %r8 
 rec_su3_lab1:
 	addi  %r11 , %r10 , 0
 	dcbt 	%r28,%r12
@@ -101,8 +100,6 @@ rec_su3_lab1:
 	lfd   18,	48(%r12)
 	lfd   19,	56(%r12)
 	mtctr 	%r23
-	b       rec_su3_lab2
-.align 4
 rec_su3_lab2:
 	addi  %r14 , %r12 , 128
 	stfd  30,	48(%r24)
@@ -208,6 +205,7 @@ rec_su3_lab2:
 	fnmsub 30 , 21 , 19 , 30
 	lfd   9,	8(%r12)
 	fmadd  27 , 2 , 19 , 27
+/*	mftbl %r8  357,397 cycles (93,147 dropped) (355,355)*/
 	fmadd  31 , 21 , 18 , 31
 	lfd   10,	16(%r12)
 	fnmsub 24 , 3 , 17 , 24
@@ -222,6 +220,7 @@ rec_su3_lab2:
 	fmadd  31 , 22 , 15 , 31
 	lfd   3,	56(%r10)
 	fmadd  24 , 4 , 12 , 24
+/*	mftbl %r8 343,388 cycles (93,147 dropped)*/
 	fmadd  25 , 4 , 13 , 25
 	lfd   17,	40(%r12)
 	fmadd  26 , 4 , 14 , 26
@@ -235,7 +234,10 @@ rec_su3_lab2:
 	fnmsub 26 , 5 , 15 , 26
 	fmadd  27 , 5 , 14 , 27
 	bdnz    rec_su3_lab2
+	nop
 rec_su3_lab3:
+	nop
+   /*	mftbl %r31 */
 	addi  %r14 , %r12 , 128
 	stfd  30,	48(%r24)
 	fmul   28 , 6 , 8
@@ -360,6 +362,7 @@ rec_su3_lab3:
 	fmadd  27 , 3 , 18 , 27
 	lfd   16,	0(%r12)
 	fmadd  30 , 22 , 14 , 30
+	/*mftbl %r8 244,289 cycles (2,47 dropped)*/
 	fmadd  31 , 22 , 15 , 31
 	dcbt 	%r29,%r14
 	fmadd  24 , 4 , 12 , 24
@@ -371,21 +374,27 @@ rec_su3_lab3:
 	fnmsub 30 , 23 , 15 , 30
 	dcbt 	%r30,%r14
 	fmadd  31 , 23 , 14 , 31
+	/*mftbl %r8 236,279 cycles (2,47 dropped)*/
 	addi  %r12 , %r18 , 128
 	fnmsub 24 , 5 , 13 , 24
 	lfd   21,	8(%r16)
 	fmadd  25 , 5 , 12 , 25
 	fnmsub 26 , 5 , 15 , 26
 	lfd   13,	8(%r20)
+	/*mftbl %r8 231,277 cycles (2,47 dropped)*/
 	fmadd  27 , 5 , 14 , 27
 	stfd  30,	48(%r24)
+	/* mftbl %r8 230,275 cycles (2,47 dropped)*/
 	fadd   0 , 16 , 8
+	/*mftbl %r8 229 cycles*/
 	stfd  31,	56(%r24)
+	/* mftbl %r8  228 cycles*/
 	fadd   1 , 17 , 9
 	stfd  24,	64(%r24)
 	fadd   2 , 18 , 10
 	stfd  25,	72(%r24)
 	fadd   3 , 19 , 11
+	/* mftbl %r8 223 cycles*/
 	stfd  26,	80(%r24)
 	fsub   4 , 19 , 11
 	stfd  27,	88(%r24)
@@ -395,6 +404,7 @@ rec_su3_lab3:
 	fsub   7 , 8 , 16
 	lfd   14,	16(%r20)
 	fadd   0 , 0 , 20
+/*	mftbl %r8 218,219 cycles (6 dropped)*/
 	fadd   1 , 1 , 21
 	lfd   22,	16(%r16)
 	fsub   6 , 6 , 20
@@ -413,6 +423,7 @@ rec_su3_lab3:
 	fadd   3 , 3 , 23
 	fadd   2 , 2 , 14
 	lfd   17,	8(%r17)
+/*	mftbl %r8 204 cycles */
 	fadd   5 , 5 , 23
 	fsub   4 , 4 , 14
 	lfd   10,	16(%r21)
@@ -674,6 +685,9 @@ rec_su3_lab3:
 	or.  %r27 , %r27 , %r27
 	bt gt,  rec_su3_lab1
 rec_su3_lab0:
+	mftbl %r31
+	stw %r8,0(%r7)
+	stw %r31,4(%r7)
 	lwz   %r14,	368(%r1)
 	lwz   %r15,	376(%r1)
 	lwz   %r16,	384(%r1)
