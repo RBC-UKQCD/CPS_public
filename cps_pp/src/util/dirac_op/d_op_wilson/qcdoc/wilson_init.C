@@ -1,9 +1,17 @@
+/*!\file
+  Wilson Dirac operator code for QCDOC
+
+  $Id: wilson_init.C,v 1.4 2004-06-17 16:21:13 zs Exp $
+*/
+
 #include <util/wilson.h>
 #include <util/gjp.h>
 #include <util/smalloc.h>
 #include <util/verbose.h>
 #include <util/error.h>
 #include <util/wfm.h>
+
+CPS_START_NAMESPACE
 
 /*----------------------------------------------------------------------*/
 /* Pointer to Wilson type structure is ignored here                     */
@@ -66,3 +74,5 @@ void wilson_dslash(Float *chi,
 {
   wfm_dslash(chi,u,psi,cb,dag);
 }
+
+CPS_END_NAMESPACE

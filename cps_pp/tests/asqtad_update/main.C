@@ -1,6 +1,8 @@
+/*
+  $Id :$
+*/
+
 #include<config.h>
-
-
 #include <stdio.h>
 #include<util/lattice.h>
 #include<util/gjp.h>
@@ -116,10 +118,13 @@ int main(int argc,char *argv[]){
     Float dt = 2;
     VRB.Level(5);
 
+    Float alpha[degree];
+    for(int d=0;  d<degree; d++) alpha[d] = 1.0;
+
 //     for(int d=0; d<degree; d++)
 // 	lat.EvolveMomFforce(mom, X[d], dummy, dt);
 
-    lat.RHMC_EvolveMomFforce(mom, X, degree, dummy, dt);
+    lat.RHMC_EvolveMomFforce(mom, X, degree, alpha, dummy, dt, X);
 		
 
     FILE *fp;

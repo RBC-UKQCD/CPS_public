@@ -1,16 +1,16 @@
 #include<config.h>
-CPS_START_NAMESPACE
+
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/threept/main.C,v 1.4 2004-06-04 21:14:17 chulwoo Exp $
-//  $Id: main.C,v 1.4 2004-06-04 21:14:17 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-06-17 16:21:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/threept/main.C,v 1.5 2004-06-17 16:21:13 zs Exp $
+//  $Id: main.C,v 1.5 2004-06-17 16:21:13 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/threept/main.C,v $
 //  $State: Exp $
 //
@@ -19,14 +19,10 @@ CPS_START_NAMESPACE
  *  test for alg
  */
 
-CPS_END_NAMESPACE
-CPS_START_NAMESPACE
+#include <stdio.h>
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
-CPS_END_NAMESPACE
 #include<util/lattice.h>
 #include<util/gjp.h>
 #include<util/verbose.h>
@@ -36,18 +32,17 @@ CPS_END_NAMESPACE
 #include<alg/alg_plaq.h>
 #include<alg/alg_threept.h>
 #include<alg/do_arg.h>
-#include<alg/common_arg.h>
-#include<alg/ghb_arg.h>
-#include<alg/threept_arg.h>
-#include<alg/no_arg.h>
-#include<alg/fix_gauge_arg.h>
 #include<alg/alg_fix_gauge.h>
-CPS_START_NAMESPACE
 
+CPS_START_NAMESPACE
 GlobalJobParameter GJP;
 LatRanGen LRG;
 Verbose VRB;
 Error ERR;
+CPS_END_NAMESPACE
+
+USING_NAMESPACE_CPS
+
 int main(int argc,char *argv[])
 {
  
@@ -185,4 +180,4 @@ int main(int argc,char *argv[])
 
 
 
-CPS_END_NAMESPACE
+

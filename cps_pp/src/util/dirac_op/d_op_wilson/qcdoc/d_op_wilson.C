@@ -1,3 +1,8 @@
+/*!\file
+  Wilson Dirac operator code for QCDOC
+
+  $Id: d_op_wilson.C,v 1.6 2004-06-17 16:21:13 zs Exp $
+*/
 //------------------------------------------------------------------
 //
 // d_op_wilson.C
@@ -29,6 +34,8 @@
 #include <util/wilson.h>
 #include <util/wfm.h>
 #include <comms/glb.h>
+
+CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
@@ -480,3 +487,5 @@ void DiracOpWilson::CalcHmdForceVecs(Vector *chi)
 
   return ;
 }
+
+CPS_END_NAMESPACE

@@ -1,3 +1,8 @@
+/*!\file
+  Staggered Dirac operator for QCDOC
+
+  $Id: dirac.C,v 1.7 2004-06-17 16:21:13 zs Exp $
+*/
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian
 //   Staggered Dirac operator for QCDOC. Communications and computations
@@ -13,15 +18,12 @@
 #include <util/dirac_op.h>
 #include <util/vector.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <time.h>
-#include <math.h>
 #include <comms/sysfunc.h>
 #include <qalloc.h>
 
 #undef CPP
+
+CPS_START_NAMESPACE
 
 const char *chi_l_filename = CWDPREFIX("chi_l.h");
 const char *chi_nl_filename = CWDPREFIX("chi_nl.h");
@@ -63,7 +65,6 @@ static int coord_nn[4];
 static int vol;
 static int non_local_chi;
 static int local_chi;
-static int buffer_order[4];
 static int buffer_flush[8];
 static int nflush;
 
@@ -197,13 +198,13 @@ static int initted = 0;
 extern "C" void stag_dirac_init(const void * gauge_u )
 {
   gauge_field_addr = ( IFloat * ) gauge_u;
-  int r,c,i,j,m,n,nn;
+  int i,j,m,n;
   int blklen[NUM_DIR/2];
   int numblk[NUM_DIR/2];
   int stride[NUM_DIR/2];
   int local_count[2];
   int non_local_count[2];
-  int off_node;
+
   int x[NUM_DIR/2];
   char *cname = "DiracOpStag";
   char *fname = "dirac_init(const void *gauge)";
@@ -600,7 +601,7 @@ extern "C" void stag_dirac_init_g()
 {
 
   IFloat * u = gauge_field_addr;
-  int c,i,j,m,n,r;
+  int c,i,j,n,r;
   int off_node;
   int local_count[2];
   int nflush_g = 1;
@@ -965,7 +966,7 @@ static int LexSurface( int * cc, int surface )
 extern "C"
 void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
 {
-  int i,j,k,c =0;
+  int c =0;
   int odd = 1 - a_odd;
   //-----------------------------------------------------------------
   //  Transfer chi's on faces.  
@@ -990,8 +991,6 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   //-----------------------------------------------------------------
   //do first local computations
   //-----------------------------------------------------------------
-  IFloat *fp0,*fp1, *uu;
-  int *ch;
 
 
 #ifdef CPP
@@ -1035,4 +1034,6 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   restore_reg((long)intreg, (long)dreg);
 
 }
+
+CPS_END_NAMESPACE
 

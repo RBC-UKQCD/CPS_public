@@ -2,14 +2,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v 1.5 2004-06-04 21:14:16 chulwoo Exp $
-//  $Id: main.C,v 1.5 2004-06-04 21:14:16 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-06-17 16:21:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v 1.6 2004-06-17 16:21:13 zs Exp $
+//  $Id: main.C,v 1.6 2004-06-17 16:21:13 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/PlaqTest/main.C,v $
 //  $State: Exp $
 //
@@ -47,7 +47,7 @@ int main(int argc,char *argv[]) {
     do_arg.z_node_sites = 4;
     do_arg.t_node_sites = 4;
 #ifdef PARALLEL
-    do_arg.x_nodes = 2;
+    do_arg.x_nodes = 1;
     do_arg.y_nodes = 1;
     do_arg.z_nodes = 1;
     do_arg.t_nodes = 1;
@@ -86,7 +86,7 @@ int main(int argc,char *argv[]) {
     GwilsonFnone lat;
     AlgPlaq plaquette(lat, &common, &none);
     plaquette.run();
-
+   printf(" plaquette = %f\n", lat.SumReTrPlaqNode()/(GJP.VolNodeSites()*3.0*6.0));
     return 0;
 
 }

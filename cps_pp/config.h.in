@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.11 2004-06-04 21:13:56 chulwoo Exp $
+  $Id: config.h.in,v 1.12 2004-06-17 16:19:34 zs Exp $
 */
 /* Global options for compiling the Colombia code:  
  * @configure_input@
@@ -13,14 +13,14 @@
  *--------------------------------------------------------------------
  *  CVS keywords
  *
- *  $Author: chulwoo $
- *  $Date: 2004-06-04 21:13:56 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.11 2004-06-04 21:13:56 chulwoo Exp $
- *  $Id: config.h.in,v 1.11 2004-06-04 21:13:56 chulwoo Exp $
+ *  $Author: zs $
+ *  $Date: 2004-06-17 16:19:34 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.12 2004-06-17 16:19:34 zs Exp $
+ *  $Id: config.h.in,v 1.12 2004-06-17 16:19:34 zs Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.11 $
+ *  $Revision: 1.12 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -69,28 +69,20 @@
 #define INTERNAL_LOCALCALC_TYPE @LOCALPRECISION@
 
 
+#define CPS_END_NAMESPACE    @CPS_END_NAMESPACE@  
+#define CPS_START_NAMESPACE  @CPS_START_NAMESPACE@
+#define USING_NAMESPACE_CPS  @USING_NAMESPACE_CPS@
 
-
-#if TARGET == QCDOC
-#define CPS_END_NAMESPACE
-#define CPS_START_NAMESPACE
-#define USING_NAMESPACE_CPS 
-#else
-#define CPS_END_NAMESPACE } 
-#define CPS_START_NAMESPACE  namespace cps {
-#define USING_NAMESPACE_CPS using namespace cps;
-#endif
 
 #if TARGET == cpsMPI
 /*! Data size for the MPI comms layer: */
 #define COMMS_DATASIZE (sizeof(float))
 /* Override printf to only print from only one processor */
 #include<util/qcdio_qprintf.h>
-#undef CPS_START_NAMESPACE
-#define CPS_START_NAMESPACE  namespace cps{ using MPISCU::printf; 
 #else
 #define COMMS_DATASIZE (sizeof(@LOCALPRECISION@))
 #endif
+
 
 /* ------------------------------------------------------------------*/
 

@@ -1,6 +1,9 @@
+/*
+  $Id: main.C,v 1.7 2004-06-17 16:21:13 zs Exp $
+*/
+
 #include<config.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
 #include<util/lattice.h>
 #include<util/gjp.h>
@@ -11,10 +14,6 @@
 #include<comms/scu.h>
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
-#include<alg/common_arg.h>
-#include<alg/cg_arg.h>
-#include<alg/hmd_arg.h>
-#include<alg/ghb_arg.h>
 #if TARGET == QCDOC
 #include <qalloc.h>
 extern "C"{
@@ -30,9 +29,11 @@ Verbose VRB;
 Error ERR;
 CPS_END_NAMESPACE
 
+extern unsigned long WfmFlops;
+
 USING_NAMESPACE_CPS
 
-extern unsigned long WfmFlops;
+
 
 const char *f_wilson_test_filename = CWDPREFIX("f_wilson_test");
 const char *psi_filename = CWDPREFIX("psi");

@@ -1,14 +1,14 @@
 dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
-dnl  $Author: chulwoo $
-dnl  $Date: 2004-06-04 21:13:57 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.12 2004-06-04 21:13:57 chulwoo Exp $
-dnl  $Id: configure.in,v 1.12 2004-06-04 21:13:57 chulwoo Exp $
+dnl  $Author: zs $
+dnl  $Date: 2004-06-17 16:20:36 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.13 2004-06-17 16:20:36 zs Exp $
+dnl  $Id: configure.in,v 1.13 2004-06-17 16:20:36 zs Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.12 $
+dnl  $Revision: 1.13 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -58,6 +58,9 @@ topwd_srcdir=`pwd`
 AC_SUBST(topwd_srcdir)
 dnl INCLUDE_FLAGS="-I\${BUILDDIR} -I\${SRCDIR}/include"
 
+dnl This is the _default_ default
+namespace_default="yes" 
+
 dnl What target are we compiling for?
 AC_ARG_ENABLE(target, 
 [  --enable-target   What target are we compiling for? (default=noarch)] ,  , [enable_target="noarch"])
@@ -83,6 +86,7 @@ if test "$enable_target" = "qcdoc"; then
    ARCHDIR="QCDOC_DIR"
    DFLAGS=""
    TESTING_PARALLEL="yes";
+   namespace_default="no" 
 
 elif test "$enable_target" = "mpi"; then
    CXX=""
@@ -147,6 +151,25 @@ else
    ENABLE_PARALLEL="undef PARALLEL"
 fi
 	
+dnl Shall we use the cps namespace?
+AC_ARG_ENABLE(namespace, 
+[  --enable-namespace   Build the library inside a 'cps' namespace. (default=no for QCDOC, yes otherwise)] ,  , [enable_namespace=$namespace_default])
+AC_MSG_CHECKING([whether we are using the namespace])
+AC_MSG_RESULT($enable_namespace)
+	
+if test "$enable_namespace" = "yes"
+then
+    if test "$enable_target" = "mpi"
+    then
+        CPS_END_NAMESPACE="}" 
+        CPS_START_NAMESPACE="namespace cps { using MPISCU::printf;"
+        USING_NAMESPACE_CPS="using namespace cps;"
+    else
+        CPS_END_NAMESPACE="}" 
+        CPS_START_NAMESPACE="namespace cps {"
+        USING_NAMESPACE_CPS="using namespace cps;"
+    fi
+fi
 
 dnl Make visible all variables declared above
 AC_SUBST(AR)
@@ -164,6 +187,10 @@ AC_SUBST(TESTING_PARALLEL)
 AC_SUBST(ENABLE_PARALLEL)
 AC_SUBST(QOS)
 AC_SUBST(DO_GMP)
+AC_SUBST(CPS_END_NAMESPACE)
+AC_SUBST(CPS_START_NAMESPACE)
+AC_SUBST(USING_NAMESPACE_CPS)
+
 
 
 dnl temporary hack until qos is more mature

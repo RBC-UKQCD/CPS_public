@@ -1,4 +1,8 @@
+/*! \file
+  Asqtad Dirac operator for QCDOC.
 
+  $Id: asqtad_dirac.C,v 1.8 2004-06-17 16:21:12 zs Exp $
+*/
 //    12/02 HueyWen Lin, Chulwoo Jung
 //
 //   Asqtad Dirac operator for QCDOC. Communications and computations
@@ -8,8 +12,9 @@
 //
 //-------------------------------------------------------------------
 #include <config.h>
+#ifdef PROFILE
 #include <stdio.h>
-CPS_END_NAMESPACE
+#endif
 #include <util/gjp.h>
 #include <util/time.h>
 #include <comms/scu.h>
@@ -18,14 +23,10 @@ CPS_END_NAMESPACE
 #include <util/dirac_op.h>
 #include <util/vector.h>
 #include <util/pt.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <time.h>
-#include <math.h>
 #include <qcdocos.h>
 #include <qalloc.h>
 #include <ppc_lib.h>
+
 CPS_START_NAMESPACE
 
 const char *uc_l_filename = CWDPREFIX("uc_l.h");
@@ -117,8 +118,7 @@ static IFloat *Tbuffer[3][2];
 //-------------------------------------------------------------------
 // end of stack based arrays which should be heap based
 //-------------------------------------------------------------------
-static int intreg[18] ;
-static IFloat dreg[18] ;
+
 static int * ToffsetP[3][2];
 static int * ToffsetM[3][2];
 static int countP[3][2];
@@ -235,18 +235,17 @@ extern "C"
 void asqtad_dirac_init(const void * gauge_u )
 {
   gauge_field_addr = ( IFloat * ) gauge_u;
-  int r,c,i,j,m,n,nn;
+  int i,j,m,n; 
   int blklen[NUM_DIR/2];
   int numblk[NUM_DIR/2];
   int stride[NUM_DIR/2];
   int local_count[2];
   int non_local_count[2];
   int local_count_3[2];
- int non_local_count_3[3][2];
- int off_node;
+  int non_local_count_3[3][2];
+
   int x[NUM_DIR/2];
-  char buf[200];
-  int fd;
+
   int scu_irs[2][3];
   char *cname = "DiracOpAsqtad";
   char *fname = "asqtad_dirac_init(const void *gauge)";
@@ -573,9 +572,10 @@ void asqtad_dirac_init(const void * gauge_u )
       }
     }// for x[3] loop
   }//for n loop
-  FILE *fp;
+
 
 #if 0
+  FILE *fp;
   fp=fopen(chi_l_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat * chi_l%d[] LOCATE(\"edramtransient\") = {\n",j);
@@ -651,9 +651,10 @@ void asqtad_dirac_init(const void * gauge_u )
     }//end of j loop
   } //end of sg loop
   
-  int vol3 = (size[1] * size[2] * size[3])/2;
+
 
 #if 0
+  int vol3 = (size[1] * size[2] * size[3])/2;
   fp= fopen(Toffset_filename,"w");
   for ( k = 0; k < 3; k++ ) 
   for ( i = 0; i < 2; i++ ) {
@@ -866,14 +867,11 @@ extern "C"
 void asqtad_dirac_init_g()
 {
 
-  IFloat * u = gauge_field_addr;
-  int c,i,j,m,n,r;
-  int off_node;
+  int i,j,m,n;
   int local_count[2];
-  int nflush_g = 2;
   int non_local_count[2];
   int local_count_3[2];
-int non_local_count_3[3][2];
+  int non_local_count_3[3][2];
   int x[NUM_DIR/2];
   char *cname = "DiracOpAsqtad";
   char *fname = "asqtad_dirac_init_g()";
@@ -922,7 +920,7 @@ int non_local_count_3[3][2];
   //  given by n.
   //-----------------------------------------------------------
 
-  int nn;
+
 
   //-----------------------------------------------------------
   //  Once all the index arithmetic is finished, v points to
@@ -930,12 +928,12 @@ int non_local_count_3[3][2];
   //  be stored.  same for w3 (for UUU matrix).
   //-----------------------------------------------------------
 
-  IFloat * v;
-  IFloat * w, wp1[18];
-  IFloat * w3;
+//  IFloat * v;
+//  IFloat * w, wp1[18];
+//  IFloat * w3;
 
-  IFloat  w_t1[18], w_t2[18], w_t3[18];
-  IFloat mtmp[18] ;
+//  IFloat  w_t1[18], w_t2[18], w_t3[18];
+//  IFloat mtmp[18] ;
 
   //-----------------------------------------------------------
   //  SCU transfer structure to get links from off node and a
@@ -998,10 +996,10 @@ int non_local_count_3[3][2];
      }
   }
 
-FILE *fp;
+
 {
   ParTransAsqtad pt(*lat_pt);
-  Float *gauge_p = (Float *)gauge_field_addr;
+//  Float *gauge_p = (Float *)gauge_field_addr;
   Matrix *result[NUM_DIR];
 #ifdef USE_NEW
   Matrix *Unit = new Matrix[vol];
@@ -1027,14 +1025,14 @@ FILE *fp;
   Matrix *P6 = P5;
   Matrix *P6mu = P5mu;
   Matrix *Pmumu = P7;
-  Matrix *Pmumumu = P7mu;
+//  Matrix *Pmumumu = P7mu;
   for(j = 0;j<vol;j++) Unit[j].UnitMatrix();
      result[j] = new Matrix[vol];
   for(j = 0;j<NUM_DIR;j++)
      for(int k = 0;k<vol;k++) result[j][k].ZeroMatrix();
-  IFloat *temp;
+//  IFloat *temp;
   int dirs[] = {6,0,2,4,7,1,3,5}; //mapping between ParTrans and DiracOpAsqtad
-  Matrix *min[NUM_DIR],*mout[NUM_DIR];
+//  Matrix *min[NUM_DIR],*mout[NUM_DIR];
   for(int mu = 0;mu<NUM_DIR;mu++){
     pt.run(1,&(result[mu]),&Unit,&dirs[mu]);
     for(int nu = 0;nu<NUM_DIR;nu++)
@@ -1079,7 +1077,7 @@ FILE *fp;
   //  site and then set up pointers to vector field
   //-----------------------------------------------------------------
 
-  Matrix *tmp,*tmp2;
+  Matrix *tmp; 
 
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     for (x[3] = 0; x[3] < size[3]; x[3]++)
@@ -1145,7 +1143,7 @@ FILE *fp;
           if(coord_knn[n%4]==j){
             tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * (non_local_count_3[j][odd]+(non_local_chi_3[j]+non_local_chi)/2));
             *tmp = result[n][LexGauge(coord)]; 
-	    int index = non_local_count_3[j][odd]+(j+1)*non_local_chi/2;
+//	    int index = non_local_count_3[j][odd]+(j+1)*non_local_chi/2;
 //        printf("x = %d %d %d %d n= %d uc_nl[%d][%d]=%e ",coord[0],coord[1],coord[2],coord[3],n,odd,index,*((Float *)tmp));
             *tmp *= (Float)c2;
 //	printf("tmp[0] =%e(%p)\n",*((Float *)tmp),tmp);
@@ -1154,7 +1152,7 @@ FILE *fp;
       } else {
         tmp = (Matrix *)(uc_l[odd] + MATRIX_SIZE * (local_chi/2+local_count_3[odd]));
         *tmp = result[n][LexGauge(coord)]; 
-	    int index = local_count_3[odd]+local_chi/2;
+//	    int index = local_count_3[odd]+local_chi/2;
 //        printf("x = %d %d %d %d n= %d uc_l[%d][%d]=%e ",coord[0],coord[1],coord[2],coord[3],n,odd,index,*((Float *)tmp));
 	*tmp *= (Float)c2;
 //	printf("tmp[0] =%e(%p)\n",*((Float *)tmp),tmp);
@@ -1173,7 +1171,7 @@ FILE *fp;
         for(int j=0;j<3;j++)
           if(coord_knn[n%4]==(size[n%4]-1-j)){
             tmp = (Matrix *)(uc_nl[odd] + MATRIX_SIZE * (non_local_count_3[j][odd]+(non_local_chi_3[j]+non_local_chi)/2));
-	    int index = non_local_count_3[j][odd]+(j+1)*non_local_chi/2;
+//	    int index = non_local_count_3[j][odd]+(j+1)*non_local_chi/2;
             *tmp = result[n+4][LexGauge(coord)]; 
 //        printf("x = %d %d %d %d n= %d uc_nl[%d][%d]=%e ",coord[0],coord[1],coord[2],coord[3],n+4,odd,index,*((Float *)tmp));
             *tmp *= (Float)-c2;
@@ -1183,7 +1181,7 @@ FILE *fp;
       } else {
         tmp = (Matrix *)(uc_l[odd] + MATRIX_SIZE * (local_chi/2+local_count_3[odd]));
         *tmp = result[n+4][LexGauge(coord)]; 
-	    int index = local_count_3[odd]+local_chi/2;
+//	    int index = local_count_3[odd]+local_chi/2;
 //        printf("x = %d %d %d %d n= %d uc_l[%d][%d]=%e ",coord[0],coord[1],coord[2],coord[3],n+4,odd,index,*((Float *)tmp));
 	*tmp *= (Float)-c2;
 //	printf("tmp[0] =%e(%p)\n",*((Float *)tmp),tmp);
@@ -1215,9 +1213,8 @@ FILE *fp;
 #endif
 }
 
-  int fd;
-  char buf[200];
 #if 0
+  FILE *fp;
   fp=fopen(uc_l_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"IFloat uc_l%d[] LOCATE(\"edramnormal\") = {\n",j);
@@ -1275,8 +1272,9 @@ FILE *fp;
     }
   }
 
-  gauge_agg *agg_p;
+
 #if 0
+  gauge_agg *agg_p;
   fp=fopen(uc_l_agg_filename,"w");
   for(j=0;j<2;j++){
     fprintf(fp,"struct gauge_agg uc_l_agg%d[] LOCATE(\"edramtransient\") = {\n",j);
@@ -1538,12 +1536,12 @@ extern "C" void dirac_comm_assert()
 //-------------------------------------------------------------------
 
 
-static int called=0;
+
 static unsigned long address[]={0x0,0x0};
 extern "C"
 void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
 {
-  int i,j,k;
+  int i;
   int odd = 1 - a_odd;
   long c = (long) chi_off_node_total;
   long uc_l = (long)uc_l_agg[odd];
@@ -1556,14 +1554,18 @@ void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   long cache_p4=cache_p3+32;
   long cache_p5=cache_p4+32;
   long cache_p6=cache_p5+32;
-  long cache_p7=cache_p6+32;
-  int num_flops;
-  Float dtime;
-  struct timeval start,end;
+//  long cache_p7=cache_p6+32;
+
+
+
   
 
 #undef PROFILE
 #ifdef PROFILE
+  int num_flops;
+  Float dtime;  
+  struct timeval start,end;
+  
   num_flops = 0;
   gettimeofday(&start,NULL);
 #endif
@@ -1617,6 +1619,8 @@ void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   copy_buffer(countP[2][a_odd], (long)a, (long)Tbuffer[2][1], (long)ToffsetP[2][a_odd]);
   }
 #if 0
+  static int called=0;
+  
 	if(called<2)
     for (int i = 0; i<(vol*VECT_LEN/2);i++)
 	if (fabs(a[i]) >1e-10)

@@ -29,7 +29,6 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
-CPS_START_NAMESPACE
 
 #define BENCHMARK
 #ifdef BENCHMARK
@@ -48,6 +47,8 @@ unsigned long WfmFlops;
   } while (0)
 #endif
 #endif
+
+CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
 // Initialize static variables.

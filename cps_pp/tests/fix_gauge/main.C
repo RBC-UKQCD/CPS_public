@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v 1.4 2004-06-04 21:14:17 chulwoo Exp $
-//  $Id: main.C,v 1.4 2004-06-04 21:14:17 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-06-17 16:21:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v 1.5 2004-06-17 16:21:13 zs Exp $
+//  $Id: main.C,v 1.5 2004-06-17 16:21:13 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v $
 //  $State: Exp $
 //
@@ -23,7 +23,7 @@ CPS_START_NAMESPACE
  *-----------------------------------------------------------------
  */
 
-//#include <stdlib.h>	// exit()
+
 CPS_END_NAMESPACE
 #include<config.h>
 #include<util/lattice.h>
@@ -109,9 +109,9 @@ Float rnd(Float rng)
   return res;
 }
 
-void srnd(long seed)
+void srnd(long s)
 {
-  ::seed = seed;
+  seed = s;
 }
 
 void p(Matrix x)
@@ -230,6 +230,11 @@ LatRanGen LRG;
 
 Matrix *L, *M;
 Matrix **G, **Gp;
+
+CPS_END_NAMESPACE
+
+
+USING_NAMESPACE_CPS
 
 int main()
 {
@@ -431,6 +436,9 @@ int main()
   }
 
 }
+
+CPS_START_NAMESPACE
+
 /****************
     VRB.Debug("Transforming the lattice to the Coulomb gauge\n");
 
@@ -494,7 +502,7 @@ int main()
     return 0;
   }
 }
-************/
+q************/
 
 
 #define MBIG 1000000000L
@@ -551,6 +559,7 @@ Float ran345(long *idum)
 	temp = (Float )mj * FAC ;
 	return temp;
 }
+
 
 
 CPS_END_NAMESPACE
