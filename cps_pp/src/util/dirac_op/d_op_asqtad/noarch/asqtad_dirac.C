@@ -1,4 +1,6 @@
 //-------------------------------------------------------------------
+//  $Id: asqtad_dirac.C,v 1.6 2004-02-09 14:34:10 zs Exp $
+//
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
 //   Asqtad Dirac operator for QCDOC. Communications and computations
@@ -389,13 +391,15 @@ void asqtad_dirac_init(const void * gauge_u )
 
   }
 
+#if TARGET == QCDOC  
   //-----------------------------------------------------------------
   // Assembly written for double precision only, check sizeof(IFloat)
   //-----------------------------------------------------------------
-  if ( sizeof(IFloat) != sizeof(double)){
+  if ( sizeof(IFloat) != sizeof(double))
      ERR.General(cname, fname, 
 		 "Assembly functions implemented only for double precision!");
-  }
+#endif
+  
 
 
 
