@@ -5,18 +5,18 @@ CPS_START_NAMESPACE
 
   Used by derivatives of the FwilsonTypes class.
   
-  $Id: sproj_tr.C,v 1.4 2004-11-19 21:05:39 chulwoo Exp $
+  $Id: sproj_tr.C,v 1.5 2004-11-19 21:44:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-11-19 21:05:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/qcdoc/sproj_tr.C,v 1.4 2004-11-19 21:05:39 chulwoo Exp $
-//  $Id: sproj_tr.C,v 1.4 2004-11-19 21:05:39 chulwoo Exp $
+//  $Date: 2004-11-19 21:44:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/qcdoc/sproj_tr.C,v 1.5 2004-11-19 21:44:34 chulwoo Exp $
+//  $Id: sproj_tr.C,v 1.5 2004-11-19 21:44:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/qcdoc/sproj_tr.C,v $
 //  $State: Exp $
 //
@@ -158,48 +158,34 @@ void sprojTrXp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
 void sprojTrXm(IFloat *f, IFloat *v, IFloat *w, int num_blk,
                int v_stride, int w_stride)
 {
-  int row, col, blk ;
-
-  IFloat *tf, *tv, *tw ;
-
-  tf = f ;
-
-  for (row=0; row<MATRIX_SIZE; row++)
-    *tf++ = 0.0 ;
-
-  for (blk=0; blk<num_blk; blk++) {
-    tf = f ;
-    tv = v ;
-    tw = w ;
-    for (row=0; row<3; row++) {
-      for (col=0; col<3; col++) {
-        *tf++ +=   (*(tv   ) + *(tv+19)) * *(tw   )
-                 + (*(tv+ 1) - *(tv+18)) * *(tw+ 1)
-                 + (*(tv+ 6) + *(tv+13)) * *(tw+ 6)
-                 + (*(tv+ 7) - *(tv+12)) * *(tw+ 7)
-                 + (*(tv+12) - *(tv+ 7)) * *(tw+12)
-                 + (*(tv+13) + *(tv+ 6)) * *(tw+13)
-                 + (*(tv+18) - *(tv+ 1)) * *(tw+18)
-                 + (*(tv+19) + *(tv   )) * *(tw+19) ;
-
-        *tf++ +=   (*(tv+ 1) - *(tv+18)) * *(tw   )
-                 - (*(tv   ) + *(tv+19)) * *(tw+ 1)
-                 + (*(tv+ 7) - *(tv+12)) * *(tw+ 6)
-                 - (*(tv+ 6) + *(tv+13)) * *(tw+ 7)
-                 + (*(tv+13) + *(tv+ 6)) * *(tw+12)
-                 - (*(tv+12) - *(tv+ 7)) * *(tw+13)
-                 + (*(tv+19) + *(tv   )) * *(tw+18)
-                 - (*(tv+18) - *(tv+ 1)) * *(tw+19) ;
-
-        tw += 2 ;
-      }
-      tw = w ;
-      tv += 2 ;
-    }
-    v += 24 + v_stride ;
-    w += 24 + w_stride ;
-  }
-  return ;
+	SPROJ_START()
+	v1_0 = (*(tv   ) + *(tv+19));
+	v1_1 = (*(tv+ 1) - *(tv+18));
+	v1_2 = (*(tv+ 2) + *(tv+21));
+	v1_3 = (*(tv+ 3) - *(tv+20));
+	v1_4 = (*(tv+ 4) + *(tv+23));
+	v1_5 = (*(tv+ 5) - *(tv+22));
+	w1_0 = (*(tw   ) + *(tw+19));
+	w1_1 = (*(tw+ 1) - *(tw+18));
+	w1_2 = (*(tw+ 2) + *(tw+21));
+	w1_3 = (*(tw+ 3) - *(tw+20));
+	w1_4 = (*(tw+ 4) + *(tw+23));
+	w1_5 = (*(tw+ 5) - *(tw+22));
+	SPROJ_COMP()
+	v1_0 = (*(tv+ 6) + *(tv+13));
+	v1_1 = (*(tv+ 7) - *(tv+12));
+	v1_2 = (*(tv+ 8) + *(tv+15));
+	v1_3 = (*(tv+ 9) - *(tv+14));
+	v1_4 = (*(tv+10) + *(tv+17));
+	v1_5 = (*(tv+11) - *(tv+16));
+	w1_0 = (*(tw+ 6) + *(tw+13));
+	w1_1 = (*(tw+ 7) - *(tw+12));
+	w1_2 = (*(tw+ 8) + *(tw+15));
+	w1_3 = (*(tw+ 9) - *(tw+14));
+	w1_4 = (*(tw+10) + *(tw+17));
+	w1_5 = (*(tw+11) - *(tw+16));
+	SPROJ_COMP()
+	SPROJ_END()
 }
 
 
@@ -208,51 +194,36 @@ void sprojTrXm(IFloat *f, IFloat *v, IFloat *w, int num_blk,
 //------------------------------------------------------------------
 void sprojTrYp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
                int v_stride, int w_stride)
-{ 
-  int row, col, blk ;
-
-  IFloat *tf, *tv, *tw ;
-
-  tf = f ;
-
-  for (row=0; row<MATRIX_SIZE; row++)
-    *tf++ = 0.0 ;
-
-  for (blk=0; blk<num_blk; blk++) {
-    tf = f ;
-    tv = v ;
-    tw = w ;
-    for (row=0; row<3; row++) {
-      for (col=0; col<3; col++) {
-        *tf++ +=   (*(tv   ) - *(tv+18)) * *(tw   )
-                 + (*(tv+ 1) - *(tv+19)) * *(tw+ 1)
-                 + (*(tv+ 6) + *(tv+12)) * *(tw+ 6)
-                 + (*(tv+ 7) + *(tv+13)) * *(tw+ 7)
-                 + (*(tv+12) + *(tv+ 6)) * *(tw+12)
-                 + (*(tv+13) + *(tv+ 7)) * *(tw+13)
-                 + (*(tv+18) - *(tv   )) * *(tw+18)
-                 + (*(tv+19) - *(tv+ 1)) * *(tw+19) ;
-
-        *tf++ +=   (*(tv+ 1) - *(tv+19)) * *(tw   )
-                 - (*(tv   ) - *(tv+18)) * *(tw+ 1)
-                 + (*(tv+ 7) + *(tv+13)) * *(tw+ 6)
-                 - (*(tv+ 6) + *(tv+12)) * *(tw+ 7)
-                 + (*(tv+13) + *(tv+ 7)) * *(tw+12)
-                 - (*(tv+12) + *(tv+ 6)) * *(tw+13)
-                 + (*(tv+19) - *(tv+ 1)) * *(tw+18)
-                 - (*(tv+18) - *(tv   )) * *(tw+19) ;
-
-        tw += 2 ;
-      }
-      tw = w ;
-      tv += 2 ;
-    }
-    v += 24 + v_stride ;
-    w += 24 + w_stride ;
-  }
-  return ;
+{
+	SPROJ_START()
+	v1_0 = (*(tv   ) - *(tv+18));
+	v1_1 = (*(tv+ 1) - *(tv+19));
+	v1_2 = (*(tv+ 2) - *(tv+20));
+	v1_3 = (*(tv+ 3) - *(tv+21));
+	v1_4 = (*(tv+ 4) - *(tv+22));
+	v1_5 = (*(tv+ 5) - *(tv+23));
+	w1_0 = (*(tw   ) - *(tw+18));
+	w1_1 = (*(tw+ 1) - *(tw+19));
+	w1_2 = (*(tw+ 2) - *(tw+20));
+	w1_3 = (*(tw+ 3) - *(tw+21));
+	w1_4 = (*(tw+ 4) - *(tw+22));
+	w1_5 = (*(tw+ 5) - *(tw+23));
+	SPROJ_COMP()
+	v1_0 = (*(tv+ 6) + *(tv+12));
+	v1_1 = (*(tv+ 7) + *(tv+13));
+	v1_2 = (*(tv+ 8) + *(tv+14));
+	v1_3 = (*(tv+ 9) + *(tv+15));
+	v1_4 = (*(tv+10) + *(tv+16));
+	v1_5 = (*(tv+11) + *(tv+17));
+	w1_0 = (*(tw+ 6) + *(tw+12));
+	w1_1 = (*(tw+ 7) + *(tw+13));
+	w1_2 = (*(tw+ 8) + *(tw+14));
+	w1_3 = (*(tw+ 9) + *(tw+15));
+	w1_4 = (*(tw+10) + *(tw+16));
+	w1_5 = (*(tw+11) + *(tw+17));
+	SPROJ_COMP()
+	SPROJ_END()
 }
-
 
 //------------------------------------------------------------------
 // sproj with (1 - gamma_1)
@@ -260,48 +231,34 @@ void sprojTrYp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
 void sprojTrYm(IFloat *f, IFloat *v, IFloat *w, int num_blk,
                int v_stride, int w_stride)
 {
-  int row, col, blk ;
-
-  IFloat *tf, *tv, *tw ;
-
-  tf = f ;
-
-  for (row=0; row<MATRIX_SIZE; row++)
-    *tf++ = 0.0 ;
-
-  for (blk=0; blk<num_blk; blk++) {
-    tf = f ;
-    tv = v ;
-    tw = w ;
-    for (row=0; row<3; row++) {
-      for (col=0; col<3; col++) {
-        *tf++ +=   (*(tv   ) + *(tv+18)) * *(tw   )
-                 + (*(tv+ 1) + *(tv+19)) * *(tw+ 1)
-                 + (*(tv+ 6) - *(tv+12)) * *(tw+ 6)
-                 + (*(tv+ 7) - *(tv+13)) * *(tw+ 7)
-                 + (*(tv+12) - *(tv+ 6)) * *(tw+12)
-                 + (*(tv+13) - *(tv+ 7)) * *(tw+13)
-                 + (*(tv+18) + *(tv   )) * *(tw+18)
-                 + (*(tv+19) + *(tv+ 1)) * *(tw+19) ;
-
-        *tf++ +=   (*(tv+ 1) + *(tv+19)) * *(tw   )
-                 - (*(tv   ) + *(tv+18)) * *(tw+ 1)
-                 + (*(tv+ 7) - *(tv+13)) * *(tw+ 6)
-                 - (*(tv+ 6) - *(tv+12)) * *(tw+ 7)
-                 + (*(tv+13) - *(tv+ 7)) * *(tw+12)
-                 - (*(tv+12) - *(tv+ 6)) * *(tw+13)
-                 + (*(tv+19) + *(tv+ 1)) * *(tw+18)
-                 - (*(tv+18) + *(tv   )) * *(tw+19) ;
-
-        tw += 2 ;
-      }
-      tw = w ;
-      tv += 2 ;
-    }
-    v += 24 + v_stride ;
-    w += 24 + w_stride ;
-  }
-  return ;
+	SPROJ_START()
+	v1_0 = (*(tv   ) + *(tv+18));
+	v1_1 = (*(tv+ 1) + *(tv+19));
+	v1_2 = (*(tv+ 2) + *(tv+20));
+	v1_3 = (*(tv+ 3) + *(tv+21));
+	v1_4 = (*(tv+ 4) + *(tv+22));
+	v1_5 = (*(tv+ 5) + *(tv+23));
+	w1_0 = (*(tw   ) + *(tw+18));
+	w1_1 = (*(tw+ 1) + *(tw+19));
+	w1_2 = (*(tw+ 2) + *(tw+20));
+	w1_3 = (*(tw+ 3) + *(tw+21));
+	w1_4 = (*(tw+ 4) + *(tw+22));
+	w1_5 = (*(tw+ 5) + *(tw+23));
+	SPROJ_COMP()
+	v1_0 = (*(tv+ 6) - *(tv+12));
+	v1_1 = (*(tv+ 7) - *(tv+13));
+	v1_2 = (*(tv+ 8) - *(tv+14));
+	v1_3 = (*(tv+ 9) - *(tv+15));
+	v1_4 = (*(tv+10) - *(tv+16));
+	v1_5 = (*(tv+11) - *(tv+17));
+	w1_0 = (*(tw+ 6) - *(tw+12));
+	w1_1 = (*(tw+ 7) - *(tw+13));
+	w1_2 = (*(tw+ 8) - *(tw+14));
+	w1_3 = (*(tw+ 9) - *(tw+15));
+	w1_4 = (*(tw+10) - *(tw+16));
+	w1_5 = (*(tw+11) - *(tw+17));
+	SPROJ_COMP()
+	SPROJ_END()
 }
 
 
@@ -311,48 +268,34 @@ void sprojTrYm(IFloat *f, IFloat *v, IFloat *w, int num_blk,
 void sprojTrZp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
                int v_stride, int w_stride)
 {
-  int row, col, blk ;
-
-  IFloat *tf, *tv, *tw ;
-
-  tf = f ;
-
-  for (row=0; row<MATRIX_SIZE; row++) 
-    *tf++ = 0.0 ;
-
-  for (blk=0; blk<num_blk; blk++) {
-    tf = f ;
-    tv = v ;
-    tw = w ;
-    for (row=0; row<3; row++) {
-      for (col=0; col<3; col++) {
-        *tf++ +=   (*(tv   ) - *(tv+13)) * *(tw   )
-                 + (*(tv+ 1) + *(tv+12)) * *(tw+ 1)
-                 + (*(tv+ 6) + *(tv+19)) * *(tw+ 6)
-                 + (*(tv+ 7) - *(tv+18)) * *(tw+ 7)
-                 + (*(tv+12) + *(tv+ 1)) * *(tw+12)
-                 + (*(tv+13) - *(tv   )) * *(tw+13)
-                 + (*(tv+18) - *(tv+ 7)) * *(tw+18)
-                 + (*(tv+19) + *(tv+ 6)) * *(tw+19) ;
-
-        *tf++ +=   (*(tv+ 1) + *(tv+12)) * *(tw   )
-                 - (*(tv   ) - *(tv+13)) * *(tw+ 1)
-                 + (*(tv+ 7) - *(tv+18)) * *(tw+ 6)
-                 - (*(tv+ 6) + *(tv+19)) * *(tw+ 7)
-                 + (*(tv+13) - *(tv   )) * *(tw+12)
-                 - (*(tv+12) + *(tv+ 1)) * *(tw+13)
-                 + (*(tv+19) + *(tv+ 6)) * *(tw+18)
-                 - (*(tv+18) - *(tv+ 7)) * *(tw+19) ;
-
-        tw += 2 ;
-      }
-      tw = w ;
-      tv += 2 ;
-    }
-    v += 24 + v_stride ;
-    w += 24 + w_stride ;
-  }
-  return ;
+	SPROJ_START()
+	v1_0 = (*(tv   ) - *(tv+13));
+	v1_1 = (*(tv+ 1) + *(tv+12));
+	v1_2 = (*(tv+ 2) - *(tv+15));
+	v1_3 = (*(tv+ 3) + *(tv+14));
+	v1_4 = (*(tv+ 4) - *(tv+17));
+	v1_5 = (*(tv+ 5) + *(tv+16));
+	w1_0 = (*(tw   ) - *(tw+13));
+	w1_1 = (*(tw+ 1) + *(tw+12));
+	w1_2 = (*(tw+ 2) - *(tw+15));
+	w1_3 = (*(tw+ 3) + *(tw+14));
+	w1_4 = (*(tw+ 4) - *(tw+17));
+	w1_5 = (*(tw+ 5) + *(tw+16));
+	SPROJ_COMP()
+	v1_0 = (*(tv+ 6) + *(tv+19));
+	v1_1 = (*(tv+ 7) - *(tv+18));
+	v1_2 = (*(tv+ 8) + *(tv+21));
+	v1_3 = (*(tv+ 9) - *(tv+20));
+	v1_4 = (*(tv+10) + *(tv+23));
+	v1_5 = (*(tv+11) - *(tv+22));
+	w1_0 = (*(tw+ 6) + *(tw+19));
+	w1_1 = (*(tw+ 7) - *(tw+18));
+	w1_2 = (*(tw+ 8) + *(tw+21));
+	w1_3 = (*(tw+ 9) - *(tw+20));
+	w1_4 = (*(tw+10) + *(tw+23));
+	w1_5 = (*(tw+11) - *(tw+22));
+	SPROJ_COMP()
+	SPROJ_END()
 }
 
 
@@ -362,48 +305,34 @@ void sprojTrZp(IFloat *f, IFloat *v, IFloat *w, int num_blk,
 void sprojTrZm(IFloat *f, IFloat *v, IFloat *w, int num_blk,
                int v_stride, int w_stride)
 {
-  int row, col, blk ;
-
-  IFloat *tf, *tv, *tw ;
-
-  tf = f ;
-
-  for (row=0; row<MATRIX_SIZE; row++) 
-    *tf++ = 0.0 ;
-
-  for (blk=0; blk<num_blk; blk++) {
-    tf = f ;
-    tv = v ;
-    tw = w ;
-    for (row=0; row<3; row++) {
-      for (col=0; col<3; col++) {
-        *tf++ +=   (*(tv   ) + *(tv+13)) * *(tw   )
-                 + (*(tv+ 1) - *(tv+12)) * *(tw+ 1)
-                 + (*(tv+ 6) - *(tv+19)) * *(tw+ 6)
-                 + (*(tv+ 7) + *(tv+18)) * *(tw+ 7)
-                 + (*(tv+12) - *(tv+ 1)) * *(tw+12)
-                 + (*(tv+13) + *(tv   )) * *(tw+13)
-                 + (*(tv+18) + *(tv+ 7)) * *(tw+18)
-                 + (*(tv+19) - *(tv+ 6)) * *(tw+19) ;
-
-        *tf++ +=   (*(tv+ 1) - *(tv+12)) * *(tw   )
-                 - (*(tv   ) + *(tv+13)) * *(tw+ 1)
-                 + (*(tv+ 7) + *(tv+18)) * *(tw+ 6)
-                 - (*(tv+ 6) - *(tv+19)) * *(tw+ 7)
-                 + (*(tv+13) + *(tv   )) * *(tw+12)
-                 - (*(tv+12) - *(tv+ 1)) * *(tw+13)
-                 + (*(tv+19) - *(tv+ 6)) * *(tw+18)
-                 - (*(tv+18) + *(tv+ 7)) * *(tw+19) ;
-
-        tw += 2 ;
-      }
-      tw = w ;
-      tv += 2 ;
-    }
-    v += 24 + v_stride ;
-    w += 24 + w_stride ;
-  }
-  return ;
+	SPROJ_START()
+	v1_0 = (*(tv   ) + *(tv+13));
+	v1_1 = (*(tv+ 1) - *(tv+12));
+	v1_2 = (*(tv+ 2) + *(tv+15));
+	v1_3 = (*(tv+ 3) - *(tv+14));
+	v1_4 = (*(tv+ 4) + *(tv+17));
+	v1_5 = (*(tv+ 5) - *(tv+16));
+	w1_0 = (*(tw   ) + *(tw+13));
+	w1_1 = (*(tw+ 1) - *(tw+12));
+	w1_2 = (*(tw+ 2) + *(tw+15));
+	w1_3 = (*(tw+ 3) - *(tw+14));
+	w1_4 = (*(tw+ 4) + *(tw+17));
+	w1_5 = (*(tw+ 5) - *(tw+16));
+	SPROJ_COMP()
+	v1_0 = (*(tv+ 6) - *(tv+19));
+	v1_1 = (*(tv+ 7) + *(tv+18));
+	v1_2 = (*(tv+ 8) - *(tv+21));
+	v1_3 = (*(tv+ 9) + *(tv+20));
+	v1_4 = (*(tv+10) - *(tv+23));
+	v1_5 = (*(tv+11) + *(tv+22));
+	w1_0 = (*(tw+ 6) - *(tw+19));
+	w1_1 = (*(tw+ 7) + *(tw+18));
+	w1_2 = (*(tw+ 8) - *(tw+21));
+	w1_3 = (*(tw+ 9) + *(tw+20));
+	w1_4 = (*(tw+10) - *(tw+23));
+	w1_5 = (*(tw+11) + *(tw+22));
+	SPROJ_COMP()
+	SPROJ_END()
 }
 
 
