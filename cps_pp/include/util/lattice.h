@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the Lattice classes.
   
-  $Id: lattice.h,v 1.7 2003-10-29 17:22:50 zs Exp $
+  $Id: lattice.h,v 1.8 2003-10-30 06:19:44 cwj Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2003-10-29 17:22:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.7 2003-10-29 17:22:50 zs Exp $
-//  $Id: lattice.h,v 1.7 2003-10-29 17:22:50 zs Exp $
+//  $Author: cwj $
+//  $Date: 2003-10-30 06:19:44 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.8 2003-10-30 06:19:44 cwj Exp $
+//  $Id: lattice.h,v 1.8 2003-10-30 06:19:44 cwj Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice.h,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
 //  $State: Exp $
 //
@@ -1513,7 +1513,7 @@ class Fstag : public FstagTypes{
   \ingroup factions
 */
 //------------------------------------------------------------------
-class FstagAsqtad : public FstagTypes{
+class Fasqtad : public FstagTypes{
     
   private:
 
@@ -1524,8 +1524,8 @@ class FstagAsqtad : public FstagTypes{
     
   public:
 
-    FstagAsqtad();
-    virtual ~FstagAsqtad();
+    Fasqtad();
+    virtual ~Fasqtad();
 
     FclassType Fclass();
     int FmatEvlInv(Vector *f_out, Vector *f_in, 
@@ -2571,52 +2571,52 @@ class GimprOLSymFdwf : public GimprOLSym, public Fdwf {
 //! Trivial gauge action with Asqtad staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GnoneFstagAsqtad : public Gnone, public FstagAsqtad {
+class GnoneFasqtad : public Gnone, public Fasqtad {
   private:
     char *cname;    // Class name.
 
   public:
-    GnoneFstagAsqtad();
-    ~GnoneFstagAsqtad();
+    GnoneFasqtad();
+    ~GnoneFasqtad();
 };
 
 //------------------------------------------------------------------
 //! Wilson gauge action with Asqtad staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GwilsonFstagAsqtad : public Gwilson, public FstagAsqtad {
+class GwilsonFasqtad : public Gwilson, public Fasqtad {
   private:
     char *cname;    // Class name.
 
   public:
-    GwilsonFstagAsqtad();
-    ~GwilsonFstagAsqtad();
+    GwilsonFasqtad();
+    ~GwilsonFasqtad();
 };
 
 //------------------------------------------------------------------
 //! Power plaquette gauge action with Asqtad staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerPlaqFstagAsqtad : public GpowerPlaq, public FstagAsqtad {
+class GpowerPlaqFasqtad : public GpowerPlaq, public Fasqtad {
   private:
     char *cname;    // Class name.
 
   public:
-    GpowerPlaqFstagAsqtad();
-    ~GpowerPlaqFstagAsqtad();
+    GpowerPlaqFasqtad();
+    ~GpowerPlaqFasqtad();
 };
 
 //------------------------------------------------------------------
 //! Improved rectangle gauge action with Asqtad staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprRectFstagAsqtad : public GimprRect, public FstagAsqtad {
+class GimprRectFasqtad : public GimprRect, public Fasqtad {
   private:
     char *cname;    // Class name.
 
   public:
-    GimprRectFstagAsqtad();
-    ~GimprRectFstagAsqtad();
+    GimprRectFasqtad();
+    ~GimprRectFasqtad();
 };
 
 
@@ -2624,13 +2624,13 @@ class GimprRectFstagAsqtad : public GimprRect, public FstagAsqtad {
 //! Power rectangle gauge action with Asqtad staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GpowerRectFstagAsqtad : public GpowerRect, public FstagAsqtad {
+class GpowerRectFasqtad : public GpowerRect, public Fasqtad {
   private:
     char *cname;    // Class name.
 
   public:
-    GpowerRectFstagAsqtad();
-    ~GpowerRectFstagAsqtad();
+    GpowerRectFasqtad();
+    ~GpowerRectFasqtad();
 };
 
 
@@ -2638,14 +2638,14 @@ class GpowerRectFstagAsqtad : public GpowerRect, public FstagAsqtad {
 //! One Loop Symanzik improved gauge action with Asqtad staggered fermion action
 /*! \ingroup latactions */
 //------------------------------------------------------------------
-class GimprOLSymFstagAsqtad : public GimprOLSym, public FstagAsqtad{
+class GimprOLSymFasqtad : public GimprOLSym, public Fasqtad{
     
   private:
     char *cname;    // Class name.
 
   public:
-    GimprOLSymFstagAsqtad();
-    ~GimprOLSymFstagAsqtad();
+    GimprOLSymFasqtad();
+    ~GimprOLSymFasqtad();
 };
 
 

@@ -100,8 +100,8 @@ cps_comsrc_obj= ./src/alg/alg_w_spect/alg_w_spc_ex.o\
    ./src/util/lattice/f_wilson/f_wilson.o\
    ./src/util/lattice/f_stag_types/f_stag_t.o\
    ./src/util/lattice/f_stag/f_stag.o\
-   ./src/util/lattice/f_stagAsqtad/f_stagAsqtad.o\
-   ./src/util/lattice/f_stagAsqtad/Fforce.o\
+   ./src/util/lattice/f_asqtad/comsrc/f_asqtad.o\
+   ./src/util/lattice/f_asqtad/noarch/Fforce.o\
    ./src/util/lattice/f_none/f_none.o\
    ./src/util/lattice/fix_gauge/fix_gauge.o\
    ./src/util/lattice/f_dwf/f_dwf.o\
