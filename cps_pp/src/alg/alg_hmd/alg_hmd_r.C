@@ -5,18 +5,22 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.3 2004-01-13 20:38:59 chulwoo Exp $
+  $Id: alg_hmd_r.C,v 1.4 2004-01-13 22:22:10 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-01-13 20:38:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.3 2004-01-13 20:38:59 chulwoo Exp $
-//  $Id: alg_hmd_r.C,v 1.3 2004-01-13 20:38:59 chulwoo Exp $
+//  $Date: 2004-01-13 22:22:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.4 2004-01-13 22:22:10 chulwoo Exp $
+//  $Id: alg_hmd_r.C,v 1.4 2004-01-13 22:22:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.2.10.3  2003/12/27 21:05:31  cwj
+//
+//  (somewhat) cleaned up for QCDOC + qos-1-8-5
+//
 //  Revision 1.2.10.2  2003/12/02 16:37:29  cwj
 //  alg_hmd_r.C
 //
@@ -71,7 +75,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //
@@ -196,11 +200,11 @@ AlgHmdR::AlgHmdR(Lattice& latt,
 
   // Allocate memory for 2 general purpose fermion fields (frm1,frm2).
   //----------------------------------------------------------------
-  frm1 = (Vector *) smalloc(2*f_size * sizeof(Float));
+  frm1 = (Vector *) smalloc(f_size * sizeof(Float));
   if(frm1 == 0)
     ERR.Pointer(cname,fname, "frm1");
   VRB.Smalloc(cname,fname, "frm1", frm1, f_size * sizeof(Float));
-#if 0
+#if 1
   frm2 = (Vector *) smalloc(f_size * sizeof(Float));
   if(frm2 == 0)
     ERR.Pointer(cname,fname, "frm2");
@@ -225,7 +229,7 @@ AlgHmdR::~AlgHmdR() {
   //----------------------------------------------------------------
   VRB.Sfree(cname,fname, "frm1",frm1);
   sfree(frm1);
-#if 0
+#if 1
   VRB.Sfree(cname,fname, "frm2",frm2);
   sfree(frm2);
 #endif
@@ -335,7 +339,19 @@ void AlgHmdR::run(void)
   lat.RandGaussAntiHermMatrix(mom, 1.0);
   Float mom_sum = lat.MomHamiltonNode(mom);
   glb_sum(&mom_sum);
-  printf("mom_sum = %0.16e\n",mom_sum);
+  printf("mom_sum = %0.14e\n",mom_sum);
+  Float *phi_p = (Float *)mom;
+#if 0
+      for(int ii = 0; ii<GJP.VolNodeSites();ii++){
+	printf("%0.4d ",ii);
+      for(int j = 0; j<72;j++){
+	if ( j%6==0) printf("\n");
+	printf("%0.8e ",*phi_p);
+	phi_p++;
+      }
+	printf("\n");
+      }
+#endif
 
 
   // Evolve gauge field by dt/2
@@ -360,22 +376,43 @@ void AlgHmdR::run(void)
       lat.EvolveGfield(mom, flavor_time_step[i]);
       lat.MdTimeInc(flavor_time_step[i] / dt);
       VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
-      lat.RandGaussVector(frm1, 0.5, 2);
-      Float phi_sum = (frm1)->NormSqGlbSum(GJP.VolNodeSites()*6);
-      printf("frm1_sum = %0.16e\n",phi_sum);
+      lat.RandGaussVector(frm1, 0.5, Ncb);
+      Float phi_sum = (frm1)->NormSqGlbSum(GJP.VolNodeSites()*6/2);
+      printf("frm1_sum = %0.14e\n",phi_sum);
+      phi_p = (Float *)frm1;
 #if 0
+      for(int ii = 0; ii<GJP.VolNodeSites()/2;ii++){
+	printf("%0.4d ",ii);
+      for(int j = 0; j<6;j++){
+	printf("%0.8e ",*phi_p);
+	phi_p++;
+      }
+	printf("\n");
+      }
+#endif
+
       lat.RandGaussVector(frm2, 0.5, Ncb);
       phi_sum = (frm2)->NormSqGlbSum(GJP.VolNodeSites()/2*6);
-      printf("frm2_sum = %e\n",phi_sum);
+      printf("frm2_sum = %0.14e\n",phi_sum);
+#if 0
+      phi_p = (Float *)frm2;
+      for(int ii = 0; ii<GJP.VolNodeSites()/2;ii++){
+	printf("%0.4d ",ii);
+      for(int j = 0; j<6;j++){
+	printf("%0.8e ",*phi_p);
+	phi_p++;
+      }
+	printf("\n");
+      }
 #endif
-      lat.Fconvert(frm1,STAG,CANONICAL);
+//      lat.Fconvert(frm1,STAG,CANONICAL);
 	
       lat.SetPhi(phi[i], frm1, frm2, hmd_arg->frm_mass[i]);
       phi_sum = (phi[i])->NormSqGlbSum(GJP.VolNodeSites()/2*6);
-      Float *phi_p = (Float *)phi[i];
-      printf("phi_sum = %0.16e\n",phi_sum);
-#if 0
-      for(int i = 0; i<GJP.VolNodeSites()/2;i++){
+      phi_p = (Float *)phi[i];
+      printf("phi_sum = %0.14e\n",phi_sum);
+#if 1
+      for(int ii = 0; ii<GJP.VolNodeSites()/2;ii++){
 	printf("%0.4d ",i);
       for(int j = 0; j<6;j++){
 	printf("%0.8e ",*phi_p);
@@ -383,7 +420,6 @@ void AlgHmdR::run(void)
       }
 	printf("\n");
       }
-      exit(1);
 #endif
     }
 
@@ -399,20 +435,32 @@ void AlgHmdR::run(void)
     lat.EvolveMomGforce(mom, dt);
   Float mom_sum = lat.MomHamiltonNode(mom);
   glb_sum(&mom_sum);
-  printf("mom_sum = %0.16e\n",mom_sum);
+  printf("mom_sum = %0.14e\n",mom_sum);
+  phi_p = (Float *)mom;
+#if 0
+      for(int ii = 0; ii<GJP.VolNodeSites();ii++){
+	printf("%0.4d ",ii);
+      for(int j = 0; j<72;j++){
+	if ( j%6==0) printf("\n");
+	printf("%0.8e ",*phi_p);
+	phi_p++;
+      }
+	printf("\n");
+      }
+#endif
 
     // Evolve momenta by one step using the fermion force
     //--------------------------------------------------------------
     for(i=0; i<n_frm_masses; i++){
-	lat.RandGaussVector(frm1, 0.5, 2);
-      lat.Fconvert(frm1,STAG,CANONICAL);
-      Float phi_sum = (frm1)->NormSqGlbSum(GJP.VolNodeSites()*6);
-      printf("frm1_sum = %0.16e\n",phi_sum);
+	lat.RandGaussVector(frm1, 0.5, Ncb);
+//      lat.Fconvert(frm1,STAG,CANONICAL);
+      Float phi_sum = (frm1)->NormSqGlbSum(GJP.VolNodeSites()*6/2);
+      printf("frm1_sum = %0.14e\n",phi_sum);
 	cg_iter = 
 	lat.FmatEvlInv(frm1, phi[i], 
 		       frm_cg_arg[i], &true_res, CNV_FRM_NO);
       phi_sum = (phi[i])->NormSqGlbSum(GJP.VolNodeSites()*6/2);
-      printf("phi_sum = %0.16e\n",phi_sum);
+      printf("phi_sum = %0.14e\n",phi_sum);
       cg_iter_av = cg_iter_av + cg_iter;
       if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
       if(cg_iter > cg_iter_max) cg_iter_max = cg_iter;
@@ -430,7 +478,19 @@ void AlgHmdR::run(void)
 			  frm_time_step);
   Float mom_sum = lat.MomHamiltonNode(mom);
   glb_sum(&mom_sum);
-  printf("mom_sum = %0.16e\n",mom_sum);
+  printf("mom_sum = %0.14e\n",mom_sum);
+#if 0
+  phi_p = (Float *)mom;
+      for(int ii = 0; ii<GJP.VolNodeSites();ii++){
+	printf("%0.4d ",ii);
+      for(int j = 0; j<72;j++){
+	if ( j%6==0) printf("\n");
+	printf("%0.8e ",*phi_p);
+	phi_p++;
+      }
+	printf("\n");
+      }
+#endif
     }
 
     //--------------------------------------------------------------

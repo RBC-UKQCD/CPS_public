@@ -65,8 +65,8 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
 
   // Calculate the fermion field size.
   //----------------------------------------------------------------
-//  f_size = GJP.VolNodeSites() * latt.FsiteSize() / (latt.FchkbEvl()+1);
-  f_size = GJP.VolNodeSites() * latt.FsiteSize() ;
+  f_size = GJP.VolNodeSites() * latt.FsiteSize() / (latt.FchkbEvl()+1);
+//  f_size = GJP.VolNodeSites() * latt.FsiteSize() ;
 
   // Allocate memory for the fermion CG arguments.
   //----------------------------------------------------------------
@@ -513,6 +513,7 @@ void AlgHmcRHMC::run(void)
 #if 0
       Float * temp = (Float *)mom;
       fp = fopen(filename,"w");
+      printf("filename=%s\n",filename);
       for(int k = 0;k<g_size;k++){
 	fprintf(fp,"%e ",*temp++);
 	if (k%6==5) fprintf(fp,"\n");
