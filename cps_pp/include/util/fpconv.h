@@ -25,7 +25,7 @@ enum FP_FORMAT {
 
 const double             FPConv_PI       = 3.14159265358979323846264338327950288319716939937510;
 const unsigned long      FPConv_ieee32pi = 0x40490fdbL;
-const unsigned long long FPConv_ieee64pi = 0x400921fb54442d18L;
+const unsigned long long FPConv_ieee64pi = 0x400921fb54442d18LL;
 
 class FPConv {
  protected:

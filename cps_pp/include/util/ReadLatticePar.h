@@ -35,13 +35,19 @@ class  ReadLatticeParallel : private QioControl {
 
  public:
   ReadLatticeParallel(Lattice & lat, const char * filename, const Float chkprec = 0.01)
-    : QioControl(), load_good(false),cname("ReadLatticeParallel")    {        
+    : 
+    QioControl(), 
+    cname("ReadLatticeParallel") , 
+    load_good(false)
+    {        
     QioArg rd_arg(filename,chkprec);
     read(lat,rd_arg);
   }
 
   ReadLatticeParallel(Lattice & lat, const QioArg & rd_arg) 
-    : QioControl(), load_good(false),cname("ReadLatticeParallel")   {
+    : QioControl(), 
+    cname("ReadLatticeParallel"),
+    load_good(false) {
     read(lat,rd_arg);
   }
   

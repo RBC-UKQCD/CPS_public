@@ -44,13 +44,14 @@ class WriteLatticeParallel : private QioControl
  public:
     WriteLatticeParallel(Lattice & lat, const char * filename,
 			 const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 0)
-      : QioControl(), unload_good(false), cname("WriteLatticeParallel")   {
+      :   QioControl(), cname("WriteLatticeParallel"), unload_good(false) 
+  {
       QioArg  wt_arg(filename, dataFormat, recon_row_3);
       write(lat, wt_arg);
     }
 
     WriteLatticeParallel(Lattice & lat, const QioArg & wt_arg)
-      : QioControl(), unload_good(false), cname("WriteLatticeParallel")   {
+      : QioControl(), cname("WriteLatticeParallel"), unload_good(false) { 
       write(lat, wt_arg);
     }
 
