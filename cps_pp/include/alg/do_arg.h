@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the DoArg structure.
   
-  $Id: do_arg.h,v 1.6 2003-10-31 14:15:33 zs Exp $
+  $Id: do_arg.h,v 1.7 2004-04-30 12:17:59 zs Exp $
 */
 //--------------------------------------------------------------------
 /* CIM Sun Jul  6 23:30:27 GMT 1997 */
@@ -14,18 +14,6 @@ CPS_START_NAMESPACE
 #ifndef INCLUDED_DO_ARG_H
 #define INCLUDED_DO_ARG_H
 
-typedef struct {
-  int ntb;
-  int nxb;
-  int nyb;
-  int nzb;
-  int bct;	/* Boundary conditions in t,x,y,z directions.	*/
-  int bcx;
-  int bcy;
-  int bcz;	/* 0 -- periodic, 1 -- antiperiodic		*/
-  int base_odd;
-  IFloat *u_base_addr;
-} DO_ARG;
 
 
 CPS_END_NAMESPACE
@@ -56,8 +44,10 @@ struct DoArg {
                     /*!<  Relevant to domain wall fermions only. */
 #ifdef PARALLEL
   SCUAxis s_axis;   //!< The machine axis on which the 5th direction axis is mapped.
-    /*!< Relevant to domain wall fermions with the number
-      of nodes along the 5th direction greater than 1. */
+    /*!< Relevant only to domain wall fermions when the number
+      of nodes along the 5th direction is greater than 1.
+      It should take one of the values enumerated in ::SCUAxis.
+    */
 #endif
 
   BndCndType x_bc;  //!< Boundary condition in the x direction.
@@ -77,10 +67,7 @@ struct DoArg {
                           /*!< Used if ::start_seed_kind is ::START_SEED_INPUT
 			    or ::START_SEED_INPUT_UNIFORM. */  
 
-  int colors;       //!< The number of colors.
-    /*!< \todo Since the number of colours is hardwired to be 3 throughout
-      this code, this seems rather pointless.
-     */
+  int colors;       //!< Obsolete.
     
   Float beta;       //!< The pure gauge action "beta" parameter.
 
@@ -110,13 +97,10 @@ struct DoArg {
     //!< The exponent for the power rectangle term in the pure gauge action.
     
 
-  int verbose_level;           //!< Verbosity level.
-  /*!<
-    See the Verbose class for details.
-  */
- 
-
-  int exec_task_list; //!< Number of task list loops.
+    int verbose_level;           //!< Not used.
+    /*!<Retained for backward compatibility. */
+    
+  int exec_task_list; //!< Not used
 
 
   //------------------------------------------------------------------
@@ -167,7 +151,8 @@ struct DoArg {
   // Default CTOR  [inline OK, since it will only be called once in practice.]
 
   DoArg()     :  
-    s_node_sites(1),         
+      s_node_sites(1),
+	s_nodes(1),
     xi_bare(1.0),           
     xi_dir(3),              
     xi_v(1.0),              
@@ -187,6 +172,7 @@ struct DoArg {
 //!< Default values of some parameters.
 /*!<
 - Default local lattice dimension in the s (5th) direction: 1 (4-dim. lattice)
+- Default processor grid dimension in the s (5th) direction: 1
 - Default bare anisotropy: 1 (isotropic lattice)
 - Default anisotropic direction: time	       
 - Default bare speed of light: 1	       

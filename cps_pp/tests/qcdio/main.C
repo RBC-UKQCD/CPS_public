@@ -10,14 +10,14 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: mcneile $
-  $Date: 2003-06-22 13:34:49 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.1.1.1 2003-06-22 13:34:49 mcneile Exp $
-  $Id: main.C,v 1.1.1.1 2003-06-22 13:34:49 mcneile Exp $
+  $Author: zs $
+  $Date: 2004-04-30 12:18:01 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.2 2004-04-30 12:18:01 zs Exp $
+  $Id: main.C,v 1.2 2004-04-30 12:18:01 zs Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: main.C,v $
-  $Revision: 1.1.1.1 $
+  $Revision: 1.2 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -190,13 +190,11 @@ int main( int argc, char** argv ) {
   do_arg.t_bc = BND_CND_APRD;
   do_arg.start_conf_kind = START_CONF_DISORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
-  do_arg.colors = 3;
   do_arg.beta = 6.0;
   do_arg.dwf_height = 0.9;
-  do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
+
 
   GJP.Initialize(do_arg);
-  VRB.Level(GJP.VerboseLevel());
   
 //--
   

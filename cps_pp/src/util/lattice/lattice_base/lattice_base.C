@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.6 2004-04-27 03:51:21 cwj Exp $
+  $Id: lattice_base.C,v 1.7 2004-04-30 12:18:00 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.6 2004-04-27 03:51:21 cwj Exp $
-//  $Id: lattice_base.C,v 1.6 2004-04-27 03:51:21 cwj Exp $
+//  $Author: zs $
+//  $Date: 2004-04-30 12:18:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.7 2004-04-30 12:18:00 zs Exp $
+//  $Id: lattice_base.C,v 1.7 2004-04-30 12:18:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -299,9 +299,6 @@ Lattice::~Lattice()
   // [built into lat.MltFloat].
   MltFloat(1.0 / GJP.XiBare(), GJP.XiDir());
 
-  // freeing up allocated arraies - CJ
-  pfree(gauge_field);
-  pfree(g_upd_cnt);
 }
 
 

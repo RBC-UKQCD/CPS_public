@@ -52,10 +52,9 @@ main(int argc,char *argv[])
   do_arg.t_bc = BND_CND_PRD;
   do_arg.start_conf_kind = START_CONF_DISORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
-  do_arg.colors = 3;
+
   do_arg.beta = 6.0;
   do_arg.dwf_height = 0.9;
-  do_arg.verbose_level = -10050402; // = 100;
 
   GJP.Initialize(do_arg);
 
@@ -63,8 +62,13 @@ main(int argc,char *argv[])
   //----------------------------------------------------------------
   // Set verbose level
   //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
 
+  VRB.Level(VERBOSE_NONE_LEVEL);
+  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+  VRB.ActivateLevel(VERBOSE_CLOCK_LEVEL);
+  
   //----------------------------------------------------------------
   // Test global sum
   //----------------------------------------------------------------

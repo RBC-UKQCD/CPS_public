@@ -3,56 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
-  $Id: verbose.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: verbose.C,v 1.3 2004-04-30 12:18:00 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: verbose.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2004-04-30 12:18:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.3 2004-04-30 12:18:00 zs Exp $
+//  $Id: verbose.C,v 1.3 2004-04-30 12:18:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.5  2001/09/06 11:51:48  anj
-//  Minor modifications to the test suite, e.g. standardizing the
-//  verbosity and such.  Collected the output from the original and the
-//  latest versions using the new test suite, and checked them. Anj
-//
-//  Revision 1.4  2001/07/03 17:01:03  anj
-//
-//  Multiple minor alterations to change some #include's from referring to
-//  files relative to the top-level source directory to referring to files
-//  relative to the source-file positions.  This alteration makes the code
-//  backwards compatable with the make structure of QCDSP, although this
-//  may have to be changed to a more usual form in the future. Anj.
-//
-//  Revision 1.3  2001/06/29 12:04:17  anj
-//
-//  A few minor fixes and tests, but mostly a change in the I/O handling.
-//  Off QCDSP, the I/O functions printf and fprintf are overriden by my
-//  own qcdio.h library.  (This should eventually become part of the
-//  general i/o spec.)  All this does is stop all processors from sending
-//  out indentical output. Anj.
-//
-//  Revision 1.2  2001/06/19 18:13:41  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:11  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
@@ -77,26 +40,23 @@ CPS_START_NAMESPACE
 // Constructor
 //------------------------------------------------------------------
 /*!
-  The constructor sets the verbosity level to zero (no messages) by default.
+  The constructor sets the verbosity level to report results,
+  function progress messages, clock output messages and RNG seed
+  information by default.
 */
-Verbose::Verbose() {
-cname = "Verbose";
+
+Verbose::Verbose(){
+    
+    cname = "Verbose";
 
 // Default verbose level value.
-//------------------------------------------------------------------
-level = 0;
 
-// Default active levels.
-//------------------------------------------------------------------
-warn_active = 0;
-result_active = 0;
-pmalloc_active = 0;
-smalloc_active = 0;
-func_active = 0;
-flow_active = 0;
-input_active = 0;
-rngseed_active = 0;
-
+    for(int i=0; i<N_VERBOSE_LEVELS; i++) active[i] = 0;
+    ActivateLevel(VERBOSE_RESULT_LEVEL);
+    ActivateLevel(VERBOSE_FLOW_LEVEL);
+    ActivateLevel(VERBOSE_CLOCK_LEVEL);
+    ActivateLevel(VERBOSE_RNGSEED_LEVEL);
+   
 }
 
 
@@ -108,12 +68,20 @@ Verbose::~Verbose() {}
 
 //------------------------------------------------------------------
 /*!
-  \return The value of the verbosity level.
+  \return A value identifying the verbosity level.
 */
 //------------------------------------------------------------------
-int Verbose::Level()
+//It is done this way for backwards compatibility.
+int Verbose::Level() 
 {
-  return level;
+    int factor = 1,  level = 0;
+    
+    for(int i=0; i<N_VERBOSE_LEVELS; i++)
+	if(active[i]){
+	    level -= factor*i;
+	    factor *= 100;
+	}
+    return level;
 }
 
 
@@ -123,56 +91,63 @@ int Verbose::Level()
   \param value The value to which the verbosity level is set.
  */
 //------------------------------------------------------------------
-void Verbose::Level(int value)
-{
-  level = value;
-
-  warn_active = Active(VERBOSE_WARN_LEVEL);
-  result_active = Active(VERBOSE_RESULT_LEVEL); 
-  pmalloc_active = Active(VERBOSE_PMALLOC_LEVEL); 
-  smalloc_active = Active(VERBOSE_SMALLOC_LEVEL);
-  func_active = Active(VERBOSE_FUNC_LEVEL);
-  flow_active = Active(VERBOSE_FLOW_LEVEL);
-  input_active = Active(VERBOSE_INPUT_LEVEL);
-  debug_active = Active(VERBOSE_DEBUG_LEVEL);
-  func_clock_active = Active(VERBOSE_FUNC_CLOCK_LEVEL);
-  flow_clock_active = Active(VERBOSE_FLOW_CLOCK_LEVEL);
-  clock_active = Active(VERBOSE_CLOCK_LEVEL);
-  led_active = Active(VERBOSE_LED_LEVEL);
-  rngseed_active = Active(VERBOSE_RNGSEED_LEVEL);
-
+// This is for backwards compatibilty
+void Verbose::Level(int value){
+    
+    int i;
+    if(value<0)
+	for(i=0; i<N_VERBOSE_LEVELS; i++) active[i] = Active(i, value);
+    else{
+	if(value>=N_VERBOSE_LEVELS) value = N_VERBOSE_LEVELS-1;
+	for(i=0; i<=value; i++) active[i] = 1;
+	for(i=value; i<N_VERBOSE_LEVELS; i++) active[i] = 0;
+    }
+    
 }
 
 
+//------------------------------------------------------------------
+/*!
+  Depending on the level chosen, the categories of message are enabled.
+  \param value The value to which the verbosity level is set.
+ */
+//------------------------------------------------------------------
+void Verbose::Level(VerboseLevelType value){
+
+    int i;
+    for(i=0; i<=value; i++) active[i] = 1;
+    for(i=value+1; i<N_VERBOSE_LEVELS; i++) active[i] = 0;
+   
+}
 
 //------------------------------------------------------------------
 /*!
   Based on the verbosity level, decides whether a particular category
   is enabled.
 
-  Why is this method public?
   \param level_value The message category.
   \return 1 if this message category should be enabled, 0 otherwise.
 */
 //------------------------------------------------------------------
-int Verbose::Active(VerboseLevelType level_value)
-{
-  if( int(level_value) < level) return 1;
-  
-  if(level < 0) {
-    int x = -level;
-    int base = VERBOSE_BASE;
-    int i;
-    int y;
-    for(i=0; i<base; i++){
-      y = x % base;
-      if( int(level_value) == y) return 1;
-      x = (x - y) / base;
-      if(x <= 0) break;
-    }
-  }
 
-  return 0;
+int Verbose::Active(int test_level, int level){
+
+    if(test_level<level) return 1;
+  
+    if(level<0) {
+	int x = -level;
+	const int base = 100;
+	int i;
+	int y;
+	for(i=0; i<base; i++){
+	    y = x % base;
+	    if( int(test_level) == y) return 1;
+	    x = (x - y) / base;
+	    if(x <= 0) break;
+	}
+    }
+    return 0;
+    
 }
 
 
@@ -189,24 +164,24 @@ int Verbose::Active(VerboseLevelType level_value)
   \param func_name The name of the function/method being entered.
 */
 //------------------------------------------------------------------
-void Verbose::Func(char *class_name, char *func_name)
-{
-  if( func_active ){
+void Verbose::Func(const char *class_name, const char *func_name) {
+
+    if(!active[VERBOSE_FUNC_LEVEL]) return;
+
     printf("%s::%s : Entered :", class_name, func_name);
-    if(func_clock_active){
+    if(active[VERBOSE_FUNC_CLOCK_LEVEL]){
 #ifdef _TARTAN
-      printf("  Clock (12.5 MHz) = %d\n", clock());
+	printf("  Clock (12.5 MHz) = %d\n", clock());
 #else
-      int cps = CLOCKS_PER_SEC;
-      printf("  Clock (%2.1f MHz) = %d\n", cps/1.e+06, clock());
+	int cps = CLOCKS_PER_SEC;
+	printf("  Clock (%2.1f MHz) = %d\n", cps/1.e+06, clock());
 #endif
     }
     else {
-      printf("\n");
+	printf("\n");
     }
-  }
-}
-
+    
+} 
 
 //------------------------------------------------------------------
 /*!
@@ -221,22 +196,23 @@ void Verbose::Func(char *class_name, char *func_name)
   \param func_name The name of the function/method being entered.
 */
 //------------------------------------------------------------------
-void Verbose::FuncEnd(char *class_name, char *func_name)
-{
-  if( func_active ){
+void Verbose::FuncEnd(const char *class_name, const char *func_name){
+    
+    if(!active[VERBOSE_FUNC_LEVEL]) return;
+
     printf("%s::%s : Exiting :", class_name, func_name);
-    if(func_clock_active){
+    if(active[VERBOSE_FUNC_CLOCK_LEVEL]){
 #ifdef _TARTAN
-      printf("  Clock (12.5 MHz) = %d\n", clock());
+	printf("  Clock (12.5 MHz) = %d\n", clock());
 #else
-      int cps = CLOCKS_PER_SEC;
-      printf("  Clock (%2.1f MHz) = %d\n", cps/1.e+06, clock());
+	int cps = CLOCKS_PER_SEC;
+	printf("  Clock (%2.1f MHz) = %d\n", cps/1.e+06, clock());
 #endif
     }
     else {
-      printf("\n");
+	printf("\n");
     }
-  }
+    
 }
 
 
@@ -253,15 +229,14 @@ void Verbose::FuncEnd(char *class_name, char *func_name)
   \param size The amount of memory (in bytes) allocated.
 */
 //------------------------------------------------------------------
-void Verbose::Pmalloc(char *class_name, char *func_name,
-		      char *ptr_name,    // pointer name
-		      void *ptr,         // pointer address
-		      int size)          // allocation size
-{
-  if( pmalloc_active ){
-    printf("%s::%s : pmalloc initialized pointer\n\t%s to %x with size %x\n", 
-	   class_name, func_name, ptr_name, int(ptr), size);
-  }
+void Verbose::Pmalloc(const char *class_name, const char *func_name,
+		      const char *ptr_name, const void *ptr, int size) {
+
+    if(!active[VERBOSE_PMALLOC_LEVEL]) return;
+    
+    printf("%s::%s : pmalloc initialized pointer\n\t%s to %p with size 0x%x\n",
+	   class_name, func_name, ptr_name, ptr, size);
+
 }
 
 
@@ -277,14 +252,15 @@ void Verbose::Pmalloc(char *class_name, char *func_name,
   \param ptr The pointer itself.
  */
 //------------------------------------------------------------------
-void Verbose::Pfree(char *class_name, char *func_name,
-		    char *ptr_name,    // pointer name
-		    void *ptr)         // pointer address
-{
-  if( pmalloc_active ){
-    printf("%s::%s : pfree will free pointer\n\t%s = %x\n", 
-	   class_name, func_name, ptr_name, int(ptr));
-  }
+void Verbose::Pfree(const char *class_name, const char *func_name,
+		    const char *ptr_name, const void *ptr){
+    
+    if(!active[VERBOSE_PMALLOC_LEVEL] ) return;
+
+    printf("%s::%s : pfree will free pointer\n\t%s = %p\n", 
+	   class_name, func_name, ptr_name, ptr);
+    
+    
 }
 
 
@@ -297,11 +273,11 @@ void Verbose::Pfree(char *class_name, char *func_name,
   \param func_name The name of a function or method
  */
 //------------------------------------------------------------------
-void Verbose::Pclear(char *class_name, char *func_name) 
-{
-  if( pmalloc_active ){
+void Verbose::Pclear(const char *class_name, const char *func_name) {
+
+    if(!active[VERBOSE_PMALLOC_LEVEL]) return;
+
     printf("%s::%s : pclear called\n", class_name, func_name);
-  }
 }
 
 
@@ -318,15 +294,14 @@ void Verbose::Pclear(char *class_name, char *func_name)
   \param size The amount of memory (in bytes) allocated.
 */
 //------------------------------------------------------------------
-void Verbose::Smalloc(char *class_name, char *func_name,
-		      char *ptr_name,    // pointer name
-		      void *ptr,         // pointer address
-		      int size)          // allocation size
-{
-  if( smalloc_active ){
-    printf("%s::%s : smalloc initialized pointer\n\t%s to %x with size %x\n", 
-	   class_name, func_name, ptr_name, int(ptr), size);
-  }
+void Verbose::Smalloc(const char *class_name, const char *func_name,
+		      const char *ptr_name, const void *ptr, int size){
+    
+    if(!active[VERBOSE_SMALLOC_LEVEL]) return;
+
+    printf("%s::%s : smalloc initialized pointer\n\t%s to %p with size 0x%x\n",
+	   class_name, func_name, ptr_name, ptr, size);
+    
 }
 
 
@@ -342,14 +317,14 @@ void Verbose::Smalloc(char *class_name, char *func_name,
   \param ptr The pointer itself.
  */
 //------------------------------------------------------------------
-void Verbose::Sfree(char *class_name, char *func_name,
-		    char *ptr_name,    // pointer name
-		    void *ptr)         // pointer address
-{
-  if( smalloc_active ){
-    printf("%s::%s : sfree will free pointer\n\t%s = %x\n", 
-	   class_name, func_name, ptr_name, int(ptr));
-  }
+void Verbose::Sfree(const char *class_name, const char *func_name,
+		    const char *ptr_name, const void *ptr) {
+    
+    if(! active[VERBOSE_SMALLOC_LEVEL] ) return;
+
+    printf("%s::%s : sfree will free pointer\n\t%s = %p\n",
+	   class_name, func_name, ptr_name, ptr);
+
 }
 
 
@@ -362,11 +337,12 @@ void Verbose::Sfree(char *class_name, char *func_name,
   \param func_name The name of a function or method
  */
 //------------------------------------------------------------------
-void Verbose::Sclear(char *class_name, char *func_name) 
-{
-  if( smalloc_active ){
+void Verbose::Sclear(const char *class_name, const char *func_name) {
+    
+    if(! active[VERBOSE_SMALLOC_LEVEL] ) return;
+
     printf("%s::%s : sclear called\n", class_name, func_name);
-  }
+    
 }
 
 
@@ -388,28 +364,27 @@ void Verbose::Sclear(char *class_name, char *func_name)
   \param ... Optional arguments to the format string.
  */
 //------------------------------------------------------------------
-void Verbose::Flow(char *class_name, char *func_name,
-		   const char *format,  // format
-		   ...)                 // argument list   
-{
-  if( flow_active ){
+void Verbose::Flow(const char *class_name, const char *func_name,
+		   const char *format, ...){
+    
+    if(!active[VERBOSE_FLOW_LEVEL]) return;
+    
     printf("%s::%s :", class_name, func_name);
-    if(flow_clock_active){
+    if(active[VERBOSE_FLOW_CLOCK_LEVEL]){
 #ifdef _TARTAN
-      printf(" Clock (12.5 MHz) = %d\n\t", clock());
+	printf(" Clock (12.5 MHz) = %d\n\t", clock());
 #else
-      int cps = CLOCKS_PER_SEC;
-      printf(" Clock (%2.1f MHz) = %d\n\t", cps/1.e+06, clock());
+	int cps = CLOCKS_PER_SEC;
+	printf(" Clock (%2.1f MHz) = %d\n\t", cps/1.e+06, clock());
 #endif
     }
     else {
-      printf("\n\t");
+	printf("\n\t");
     }
     va_list args;
     va_start(args, format);
-    vsprintf(v_string, format, args);
-    printf("%s",v_string);
-  }
+    vprintf(format, args);
+    
 }
         
 
@@ -426,17 +401,16 @@ void Verbose::Flow(char *class_name, char *func_name,
   \param ... Optional arguments to the format string.
  */
 //------------------------------------------------------------------
-void Verbose::Input(char *class_name, char *func_name, 
-		    const char *format,  // format
-		    ...)                 // argument list   
-{
-  if( input_active ){
+void Verbose::Input(const char *class_name, const char *func_name, 
+		    const char *format, ...) {
+    
+    if( !active[VERBOSE_INPUT_LEVEL] ) return;
+    
     va_list args;
     va_start(args, format);
     printf("%s::%s :\n\t", class_name, func_name);
-    vsprintf(v_string, format, args);
-    printf("%s",v_string);
-  }
+    vprintf(format, args);
+    
 }
 
 
@@ -453,17 +427,16 @@ void Verbose::Input(char *class_name, char *func_name,
   \param ... Optional arguments to the format string.
  */
 //------------------------------------------------------------------
-void Verbose::Result(char *class_name, char *func_name,
-		      const char *format,  // format
-		      ...)                 // argument list   
-{
-  if( result_active ){
+void Verbose::Result(const char *class_name, const char *func_name,
+		     const char *format, ...) {
+    
+    if( !active[VERBOSE_RESULT_LEVEL] ) return;
+    
     va_list args;
     va_start(args, format);
     printf("%s::%s :\n\t", class_name, func_name);
-    vsprintf(v_string, format, args);
-    printf("%s",v_string);
-  }
+    vprintf(format, args);
+    
 }
 
         
@@ -480,26 +453,25 @@ void Verbose::Result(char *class_name, char *func_name,
   \param ... Optional arguments to the format string.
  */
 //------------------------------------------------------------------
-void Verbose::Warn(char *class_name, char *func_name,
-		      const char *format,  // format
-		      ...)                 // argument list   
-{
-  if( warn_active ){
+void Verbose::Warn(const char *class_name, const char *func_name,
+		   const char *format, ...) {
+    
+    if(!active[VERBOSE_WARN_LEVEL]) return;
+
     va_list args;
     va_start(args, format);
     printf("WARNING %s::%s :\n\t", class_name, func_name);
-    vsprintf(v_string, format, args);
-    printf("%s",v_string);
+    vprintf(format, args);
     
     FILE *fp;
     char *filename = "phys.warn";
     if( (fp = fopen(filename, "a")) == NULL ) {
-      ERR.FileA("Verbose","Warn", filename);
+	ERR.FileA("Verbose","Warn", filename);
     }
     fprintf(fp,"WARNING %s::%s :\n\t", class_name, func_name);
-    fprintf(fp,"%s",v_string);
+    vfprintf(fp, format, args);
     fclose(fp);
-  }
+    
 }
 
 
@@ -516,17 +488,16 @@ void Verbose::Warn(char *class_name, char *func_name,
   \param ... Optional arguments to the format string.
 */
 //------------------------------------------------------------------
-void Verbose::Debug(char *class_name, char *func_name,
-		    const char *format,  // format
-		    ...)                 // argument list   
-{
-  if( debug_active ){
+void Verbose::Debug(const char *class_name, const char *func_name,
+		    const char *format, ...) {
+    
+    if(!active[VERBOSE_DEBUG_LEVEL]) return;
+
     va_list args;
     va_start(args, format);
     printf("%s::%s :\n\t", class_name, func_name);
-    vsprintf(v_string, format, args);
-    printf("%s",v_string);
-  }
+    vprintf(format, args);
+    
 }
 
 
@@ -540,15 +511,14 @@ void Verbose::Debug(char *class_name, char *func_name,
   \param ... Optional arguments to the format string.
 */
 //------------------------------------------------------------------
-void Verbose::Debug(const char *format,  // format
-		               ...)      // argument list   
-{
-  if( debug_active ){
+void Verbose::Debug(const char *format, ...) {
+    
+    if(! active[VERBOSE_DEBUG_LEVEL]) return;
+    
     va_list args;
     va_start(args, format);
-    vsprintf(v_string, format, args);
-    printf("%s",v_string);
-  }
+    vprintf(format, args);
+    
 }
 
 
@@ -563,14 +533,15 @@ void Verbose::Debug(const char *format,  // format
   \param func_name The name of a function or method
 */
 //------------------------------------------------------------------
-void Verbose::LedOn(char *class_name, char *func_name)
-{
-  if( led_active ){
+void Verbose::LedOn(const char *class_name, const char *func_name) {
+    
+    if(!active[VERBOSE_LED_LEVEL]) return;
+    
     printf("%s::%s : LED on\n", class_name, func_name);
 #ifdef _TARTAN
     asm("   LDI     2h,     IOF");
 #endif
-  }
+    
 }
 
 
@@ -584,14 +555,15 @@ void Verbose::LedOn(char *class_name, char *func_name)
   \param func_name The name of a function or method
 */
 //------------------------------------------------------------------
-void Verbose::LedOff(char *class_name, char *func_name)
-{
-  if( led_active ){
+void Verbose::LedOff(const char *class_name, const char *func_name) {
+    
+    if(!active[VERBOSE_LED_LEVEL]) return;
+
     printf("%s::%s : LED off\n", class_name, func_name);
 #ifdef _TARTAN
     asm("   LDI     6h,     IOF");
 #endif
-  }
+    
 }
 
 
@@ -608,26 +580,28 @@ void Verbose::LedOff(char *class_name, char *func_name)
 */
 
 //------------------------------------------------------------------
-void Verbose::LedFlash(char *class_name, char *func_name, int number)
-{
-  if( led_active ){
+void Verbose::LedFlash(const char *class_name, const char *func_name,
+		       int number){
+    
+    if(!active[VERBOSE_LED_LEVEL]) return;
+
     printf("%s::%s : LED flashing\n", class_name, func_name);
 #ifdef _TARTAN
     int repeat = 1500000;
     int dum = 0;
     int i, j;
     for(j = 0; j < number; j++){
-      asm("   LDI     6h,     IOF");
-      for(i = 0; i < repeat; i++){
-	dum = dum + 1;
-      }
-      asm("   LDI     2h,     IOF");
-      for(i = 0; i < repeat; i++){
-	dum = dum + 1;
-      }
+	asm("   LDI     6h,     IOF");
+	for(i = 0; i < repeat; i++){
+	    dum = dum + 1;
+	}
+	asm("   LDI     2h,     IOF");
+	for(i = 0; i < repeat; i++){
+	    dum = dum + 1;
+	}
     }
 #endif
-  }
+    
 }
 
 
@@ -644,11 +618,11 @@ void Verbose::LedFlash(char *class_name, char *func_name, int number)
   \param ... Optional arguments to the format string.
  */
 //------------------------------------------------------------------
-void Verbose::Clock(char *class_name, char *func_name,
-		    const char *format,  // format
-		    ...)                 // argument list   
-{
-  if( clock_active ){
+void Verbose::Clock(const char *class_name, const char *func_name,
+		    const char *format, ...){
+    
+    if(!active[VERBOSE_CLOCK_LEVEL]) return;
+
     printf("%s::%s :", class_name, func_name);
 #ifdef _TARTAN
     printf(" Clock (12.5 MHz cycles) = %d\n\t", clock());
@@ -658,9 +632,8 @@ void Verbose::Clock(char *class_name, char *func_name,
 #endif
     va_list args;
     va_start(args, format);
-    vsprintf(v_string, format, args);
-    printf("%s",v_string);
-  }
+    vprintf(format, args);
+    
 }
 
 
@@ -674,9 +647,10 @@ void Verbose::Clock(char *class_name, char *func_name,
   \param func_name The name of a function or method
  */
 //------------------------------------------------------------------
-void Verbose::Clock(char *class_name, char *func_name)
-{
-  if( clock_active ){
+void Verbose::Clock(const char *class_name, const char *func_name){
+
+    if(!active[VERBOSE_CLOCK_LEVEL]) return;
+
     printf("%s::%s :", class_name, func_name);
 #ifdef _TARTAN
     printf(" Clock (12.5 MHz cycles) = %d\n", clock());
@@ -684,7 +658,8 @@ void Verbose::Clock(char *class_name, char *func_name)
     int cps = CLOCKS_PER_SEC;
     printf(" Clock (%2.1f MHz) = %d\n", cps/1.e+06, clock());
 #endif
-  }
+    
+
 }
 
 
@@ -702,23 +677,53 @@ void Verbose::Clock(char *class_name, char *func_name)
   \param ... Optional arguments to the format string.
  */
 //------------------------------------------------------------------
-void Verbose::RNGSeed(char *class_name, char *func_name,
-		   const char *format,  // format
-		   ...)                 // argument list   
-{
-  if( rngseed_active ){
+void Verbose::RNGSeed(const char *class_name, const char *func_name,
+		      const char *format, ...){
+    
+    if(!active[VERBOSE_RNGSEED_LEVEL]) return;
+
     printf("%s::%s :", class_name, func_name);
     va_list args;
     va_start(args, format);
-    vsprintf(v_string, format, args);
-    printf("%s",v_string);
+    vprintf(format, args);
+    
 
-  }
 }
         
+/*!
+  \param value The type of message to enable.
+ */
+void Verbose::ActivateLevel(VerboseLevelType value){
 
+    active[value] = 1;
 
+}
 
+/*!
+  \param value The type of message to enable.
+ */
+void Verbose::DeactivateLevel(VerboseLevelType value){
+
+    active[value] = 0;
+
+}
+
+void Verbose::DeactivateAll(){
+
+    for(int i=0; i<N_VERBOSE_LEVELS; i++) active[i] = 0;
+
+}
+
+/*!
+  \param t The level of the type of message.
+  \return 1 if messages of this type are currently enabled, zero otherwise.
+*/
+int Verbose::IsActivated(VerboseLevelType t) const{
+
+    return active[t];
+    
+}
+    
 
 
 

@@ -1,4 +1,4 @@
-//$Id: detail.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+//$Id: detail.dox,v 1.2 2004-04-30 12:17:59 zs Exp $
 /*!
 
 \page detailpage The CPS in more detail
@@ -128,8 +128,8 @@ where in addition, the \c mu index runs in the order T, X, Y, Z.
 The CPS uses odd-even preconditioning to speed up the fermion matrix 
 inversions.
 
-We define the parity of a lattice site as \e even the sum of its
-cartesian coordinates is even, \o odd otherwise.
+We define the parity of a lattice site as \e even if the sum of its
+cartesian coordinates is even, \e odd otherwise.
 
 This form of preconditioning involves reordering the lattice sites so that
 all the odd sites are numbered first, and then all the even sites (or the 
@@ -250,7 +250,8 @@ This behaviour upon exiting such a method leaves the possibility that the
 gauge field and the fermion fields have different layouts. The programmer 
 needs to remember if the fermion fields are not in canonical order, since
 the Lattice::StrOrd() method returns the layout of the gauge field alone; there
-is no equivalent method for fermion fields. Note that supplying the
+can be no equivalent method for fermion fields because they are arrays,
+not objects. Note that supplying the
 ::CNV_FRM_YES argument assumes that both the gauge and fermion fields have 
 the same type of layout.
 
@@ -288,7 +289,7 @@ comms section of the Reference Manual.
 The lattice is divided up using domain decomposition over a processor grid.
 This grid connot be of more than four dimensions.
 The CPS seems to make a distinction between the  logical grid \e i.e. the nodes
-that you are actually using and the physical grid \ i.e. the nodes that there
+that you are actually using and the physical grid \e i.e. the nodes that there
 actually are.
 
 The dimensions of the logical grid are assigned to elements of the DoArg 
@@ -305,7 +306,9 @@ and must divide exactly the values returned by the system calls
 - SizeZ()
 - SizeT()
 .
-which give the size of the physical grid.
+which give the size of the physical grid. This is so that a job running 
+on a number of nodes can in fact decompose several identical lattices 
+over those nodes.
 
 A five dimensional lattice for domain wall fermions can be 
 parallelised along the fifth dimension if one of the other dimensions is 
@@ -395,7 +398,7 @@ a  given single direction. This results in a seperate sum for each strip of
 nodes. Also one can sum over all nodes in each three-dimensional hyperplane 
 perpendicular to a given direction.
 
-Finally, the function sync() action as a global barrier to synchronise 
+Finally, the function sync() acts as a global barrier to synchronise 
 program execution on all nodes.
 
 Even more finally, if the MPI
@@ -419,32 +422,44 @@ instance is not actually initialised until the Lattice constructor is called;
 at this point we can be sure that all the global lattice parameters upon which
 the LatRanGen initialisation depends have been fixed.
 
-The RNG is seeded according to the value returned by 
-GlobalJobParameter::StartSeedKind()
-- If this is #START_SEED_UNIFORM, #START_SEED_FIXED_UNIFORM 
-or #START_SEED_INPUT_UNIFORM then the same seed is used for all hypercube RNGs.
-- If this is #START_SEED, #START_SEED_INPUT or #START_SEED_FIXED then a function
-depending on the global lattice coordinates of each hypercube is added to
-the seed, and therefore each hypercube gets a unique seed. 
-- Finally, #START_SEED_INPUT_NODE assigns a seed which depends on the position
-of the node in the grid. This is not reproducible.
+The RNG stream on each hypercube is seeded according to the strategy
+ defined by the return value of GlobalJobParameter::StartSeedKind()
 
-DoArg::start_seed_kind also determines the value of the seed itself:
-- It is a reproducible constant number if the 
-DoArg::start_seed_kind is #START_SEED_FIXED or #START_SEED_FIXED_UNIFORM.
-- If it is #START_SEED or #START_SEED_UNIFORM.then the seed is obtained from 
-a  system call and is in general a non-reproducible time-varying number.
-- Finally, with #START_SEED_INPUT, #START_SEED_INPUT_UNIFORM and 
-#START_SEED_INPUT_NODE the value of the seed is supplied by the user and is 
-returned by GlobalJobParameter::StartSeedValue().
+- #START_SEED_UNIFORM means that the same seed is used for all
+   hypercube RNGs and its value can be time-dependent (irreproducible).
+- #START_SEED_FIXED_UNIFORM means that the same seed is used for all
+   hypercube RNGs and its value is time-independent (reproducible).
+- #START_SEED_INPUT_UNIFORM means that the same seed is used for all
+   hypercube RNGs and its value is set by the user.
+- #START_SEED means that  the seeds are obtained by adding a function
+  depending on the global lattice coordinates of each hypercube to
+  a time-dependent (irreproducible) seed. 
+- #START_SEED_FIXED means that the seeds are obtained by adding a function
+  depending on the global lattice coordinates of each hypercube  to
+  a time-independent (reproducible) value.
+- #START_SEED_INPUT means that  the seeds are obtained by adding a function
+  depending on the global lattice coordinates of each hypercube to
+  a user defined value.
+- Finally, #START_SEED_INPUT_NODE means that  the seeds are obtained
+   by adding a function depending on the position
+  of the node in the grid to a user defined value. This is not reproducible.
+
+
+As with all the global parameters in the GlobalJobParameter class, the 
+type of seed is set using the DoArg structure; specifically the
+DoArg::start_seed_kind field.
 
 Usually the seeding strategy is chosen by assigning a value to 
 DoArg::start_seed_kind, which is then used to initialise GJP as described in
-section \ref runtimeinput. However, the GlobalJobParameter::StartSeedKind()
-method can in principle be used to change this strategy at any time, even 
-though the value of the seed, as returned by returned 
-by GlobalJobParameter::StartSeedValue(), can only be set \e via assignment to 
-DoArg::start_seed_value and GlobalJobParameter::Initialize().
+section \ref runtimeinput. The GlobalJobParameter::StartSeedKind
+method can in principle be used to change this strategy. Note however that an
+instance of LatRanGen can only be seeded (through the
+LatRenGen::Initialize method) once.
+
+When appropriate, the user-defined seed is assigned  to
+DoArg::start_seed_value. It can be read from
+GlobalJobParameter::StartSeedValue(). CPS uses the value 112319 as the
+default time-independent seed.
 
 To generate random numbers, first the correct RNG must be assigned depending
 on the lattice site using LatRanGen::AssignGenerator(). 
@@ -467,6 +482,15 @@ of the local lattice:
        foo[site] = LRG.Urand();
    }
 \endverbatim
+
+The state of the RNGs across the lattice can be saved with the
+void LatRanGen::GetStates(unsigned **s) const
+ method, with saves the state in a 2-dim array of unsigned int. This must be 
+suitably allocated by the caller to have dimensions given by the return values
+of LatRanGen::NStates() and  LatRanGen::StateSize(), <em>i.e.</em>
+\c states[LatRanGen::NStates()][LatRanGen::StateSize()], heuristically,
+
+The states can be restored with the LatRanGen::SetStates(unsigned **s) method.
 
 
 */

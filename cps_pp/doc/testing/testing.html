@@ -1,412 +1,301 @@
-
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-           "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-<meta name="GENERATOR" content="TtH 2.92">
-
-                                 
-<title> Testing the Columbia code. </title>
-</head>
-<body>
+<meta name="GENERATOR" content="TtH 3.40">
+ <style type="text/css"> div.p { margin-top: 7pt;}</style>
+ <style type="text/css"><!--
+ td div.comp { margin-top: -0.6ex; margin-bottom: -1ex;}
+ td div.comb { margin-top: -0.6ex; margin-bottom: -.6ex;}
+ td div.hrcomp { line-height: 0.9; margin-top: -0.8ex; margin-bottom: -1ex;}
+ td div.norm {line-height:normal;}
+ span.roman {font-family: serif; font-style: normal; font-weight: normal;} 
+ span.overacc2 {position: relative;  left: .8em; top: -1.2ex;}
+ span.overacc1 {position: relative;  left: .6em; top: -1.2ex;} --></style>
  
-<h1 align="center">Testing the Columbia code. </h1>
+                                 
+<title> Testing framework for the Columbia code.</title>
+ 
+<h1 align="center">Testing framework for the Columbia code. </h1>
 
-<h3 align="center">A.N. Jackson &amp; S. Booth </h3>
+<h3 align="center">A.N. Jackson, C. McNeile, , Z. Sroczynski,  &amp; S. Booth </h3>
 
 <h3 align="center"><font size="-1">
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
-<i>Revision</i>: 1.3 </td></tr></table>
+<br clear="all" /><table border="0" width="100%"><tr><td>
+<table align="center" cellspacing="0" cellpadding="0"><tr><td nowrap="nowrap" align="center">
+Revision: 1.6.2.2 </td></tr></table>
 </td></tr></table>
 
   
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
-<i>Date</i>: 2001/10/03 15:33:36 </td></tr></table>
+<br clear="all" /><table border="0" width="100%"><tr><td>
+<table align="center" cellspacing="0" cellpadding="0"><tr><td nowrap="nowrap" align="center">
+Date: 2004/04/04 16:03:12 </td></tr></table>
 </td></tr></table>
 
 </font> </h3>
 
-<p>
-   
-<h1>Contents </h1><a href="#tth_sEc1"
->1&nbsp; Proposed Testing Framework</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc1.1"
->1.1&nbsp; Parallelism Issues</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc1.2"
->1.2&nbsp; Input Parameters</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc1.3"
->1.3&nbsp; Output Format</a><br />
-<a href="#tth_sEc2"
->2&nbsp; Types of Test</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#tth_sEc2.1"
->2.1&nbsp; Gauge Invarience</a><br />
-<a href="#tth_sEc3"
->3&nbsp; Parallel Random Number Generation</a><br />
- 
-
-
-<p>
+<div class="p"><!----></div>
 
  <h2><a name="tth_sEc1">
-1</a>&nbsp;&nbsp;Proposed Testing Framework</h2>
+1</a>&nbsp;&nbsp;Motivation for Testing Framework</h2>
 
-<p>
+<div class="p"><!----></div>
+We are "growing" a testing framework for the cps++ code.
+The aim is to produce a basic regression testing framework to allow
+"refactoring" and physics checks on relevant parts of the operating
+system.
+The history of the testing framework is described in 
+section&nbsp;.
+
+<div class="p"><!----></div>
+This testing framework is meant to be used for the CPS code on its own
+without any additional libraries, such as 
+<a href="http://www.jlab.org/~edwards/qdp/">QDP++</a>.
+  In particular we
+assume that none of the output is in XML format, hence we can not use the
+<a href="https://forge.nesc.ac.uk/projects/xmldiff/">XMLDiff</a>
+tool developed by EPCC for UKQCD.  There will be an additional
+testing framework for the hybrid applications that use a mixture of
+CPS and QDP++ libraries.
+
+<div class="p"><!----></div>
      <h3><a name="tth_sEc1.1">
-1.1</a>&nbsp;&nbsp;Parallelism Issues</h3>
-Some of the test cases should be done on big lattices, as there are subtle communication bugs that will only show with more than 32 nodes.  Therefore, the code should ensure the same results can be calculated over a range of machine partition sizes.
+1.1</a>&nbsp;&nbsp;Running the tests</h3>
 
-<p>
-     <h3><a name="tth_sEc1.2">
-1.2</a>&nbsp;&nbsp;Input Parameters</h3>
-One of the issues is how to maintain the tests 
-as the input parameters to the code gets changed. One way to
-proceed would be to write a library of perl scripts to write 
-the input parameters to the codes. This would localise most of the 
-input parameters to the code in one place. (This approach is 
-recommended in Software Test Automation by Fewster and 
-Graham).
-
-<p>
-     <h3><a name="tth_sEc1.3">
-1.3</a>&nbsp;&nbsp;Output Format</h3>
-One of problems with testing is comparing the output against the "correct" output. The issue is how to extract the important output (pion correlators, and residues) from the unimportant output (dates).  It is suggested that we use XML to tag the important information. 
-For example, the output could look &#223;omething like":
+<div class="p"><!----></div>
+The tests are run using the makefile target.
 
 <pre>
-&lt;notimportant&#62;
-STATUS:solver:make_source:0:Using point source on spin 0 colour 0
- STATUS:solver:make_clover:0:Making clover for p = 1
- STATUS:solver:make_source:0:Using point source on spin 0 colour 0
- STATUS:solver:solver_g5_driver:0:real residue is  
-&lt;/notimportant&#62;
-&lt;residue&#62; 0.97820832E-09 &lt;/residue&#62;
-&lt;notimportant&#62;
-STATUS:solver:solver_data_save:0:Saving solver data...
- STATUS:solver:solver_mpp_save:0:Saving solver data...
-&lt;/notimportant&#62;
+make -f Makefile test
 
 </pre>
-The plan would be to use &#228;ttributes" to index
-things such as the residue as well.
+This produces output like
 
-<p>
-An XML parser such as expat (<a href="http://www.jclark.com/xml/expat.html">http://www.jclark.com/xml/expat.html</a>)
-could be used to do the comparison.  Another option might be to use xmldiff 
-(<a href="http://www.logilab.org/xmldiff/">http://www.logilab.org/xmldiff/</a>)
-We could of course try to use perl/grep/awk to extract the 
-information we need, but this is somewhat opposed to the motivation for using XML.
+<pre>
+COMPILATION STATUS
+f_hmd SUCCESS
+f_hmd_dwfso SUCCESS
+g_hb SUCCESS
+g_hmd SUCCESS
+s_spect SUCCESS
+w_spect SUCCESS
+f_wilson_eig SUCCESS
+xi_spect_gsum SUCCESS
+f_stag_pbp SUCCESS
+t_asqtad_pion SUCCESS
+TEST_CASE_STATUS
+f_hmd    PASS
+f_hmd_dwfso    FAIL
+g_hb    FAIL
+g_hmd    FAIL
+s_spect    PASS
+w_spect    PASS
+f_wilson_eig  NO_CORRECT_OUTPUT
+xi_spect_gsum  NO_CORRECT_OUTPUT
+f_stag_pbp  NO_CORRECT_OUTPUT
+t_asqtad_pion PASS
+------------------------------
+DISCLAIMER
+Please also test this code on
+a physical system before using in
+production runs
+------------------------------
 
-<p>
+</pre>
 
+<div class="p"><!----></div>
+A perl script loops over the test cases, compiles the code,
+and then runs it. The output is compared against
+previous output and a PASS/FAIL tag is generated.
+If there is no test data to compare against the
+NO_CORRECT_OUTPUT tag is printed.
+
+<div class="p"><!----></div>
+The latest version of the system first compiles all the 
+applications and then runs them. This allows the user to
+see which applications compile and which don't.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc1.2">
+1.2</a>&nbsp;&nbsp;Philosophy behind the testing framework</h3>
+
+<div class="p"><!----></div>
+Lattice QCD codes produce a lot of output. It is important that the 
+output is automatically tested against older output, otherwise
+a user could miss a problem.
+
+<div class="p"><!----></div>
+Because of rounding errors, the output can not be tested against older
+output by using a crude tool such as diff. We have taken the
+philosophy that only an important subset of the data needs to be
+tested. For example, a regression test may only need to check that the
+pion correlator at a single timeslice is correct. If the pion
+correlator at timeslice 2 is correct, then it is likely that all the
+meson correlators are correct. This will trigger a PASS/FAIL
+print out, but we would still keep a snapshot of all the output.
+
+<div class="p"><!----></div>
+In this testing framework, we use perl scripts to
+extract a subset of the correlators. The important
+perl script that does the comparison is called
+regressions/check_data.pl. This compares the output from
+the program to previous output stored in a special format.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc1.3">
+1.3</a>&nbsp;&nbsp;Adding a new test to the testing framework</h3>
+
+<div class="p"><!----></div>
+In the older testing framework all the files were 
+combined together to form a single file of the form.
+
+<div class="p"><!----></div>
+
+<pre>
+-------------------
+a0.dat
+--------------------
+1 0 0 -1.4003954066e+00
+1 1 0 -1.0403947310e+00
+--------------------
+a0_prime.dat
+--------------------
+1 0 0 2.2492961048e+00
+1 1 0 -6.7672838306e-01
+
+</pre>
+
+<div class="p"><!----></div>
+The script regressions/check_data.pl stores selected data
+from the file in the format
+
+<center>
+name:column:row_from_name:value
+</center>
+In the above example the testing data for the w_spect
+test is:
+
+<div class="p"><!----></div>
+
+<pre>
+a0.dat:2:3:-1.4003954061e+00
+pion.dat:3:3:1.5681429497e+00
+nucleon.dat:2:3:1.179528e+00
+
+</pre>
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc1.4">
+1.4</a>&nbsp;&nbsp;Structure of makefile target</h3>
+
+<div class="p"><!----></div>
+The test target in the Makefile looks like:
+
+<pre>
+TEST_DIR = tests
+
+test: cps
+        cd $(TEST_DIR) ; perl regression.pl
+        cd $(TEST_DIR) ; sh regression.sh
+
+</pre>
+
+<div class="p"><!----></div>
+The perl script regression.pl writes the script 
+regression.sh. The script regression.sh compiles the codes,
+runs them and checks the output. This two step solution
+was required for running on QCDSP.
+
+<div class="p"><!----></div>
+     <h3><a name="tth_sEc1.5">
+1.5</a>&nbsp;&nbsp;Testing framework code in CPS</h3>
+
+<div class="p"><!----></div>
+In the original design of CPS some of the physics
+measurement code was buried a number of layers 
+in a class hierarchy. To test code the output from 
+the routines needs to close to the main program.
+Hence some simple testing code has been placed 
+in
+
+<pre>
+src/util/testing_framework
+
+</pre>
+
+<div class="p"><!----></div>
+At the moment there is code to compute the local pion for staggered
+fermions and to compare two arrays. We would expect that this 
+would evolve into an API.
+
+<div class="p"><!----></div>
+The code is used in the test "t_asqtad_pion" like:
+
+<div class="p"><!----></div>
+
+<pre>
+  // known output
+  Float pion_corr_good[] = { 7.563369 , 6.546032 , 5.474610 ,
+  5.255596 } ;
+  int good_size = sizeof(pion_corr_good) / sizeof(Float) ;
+
+  // compute the time sliced pion correlator
+  int time_size=GJP.Tnodes()*GJP.TnodeSites();
+  GwilsonFasqtad lat;
+  Float* pion_corr = (Float*)smalloc(time_size*sizeof(IFloat));
+  staggered_local_pion(lat,cg_arg.mass,pion_corr,time_size) ;
+
+  Float tol = 0.00001 ;
+  compare_array_relative(pion_corr, pion_corr_good,tol,
+                           time_size) ;
+
+</pre>
+
+<div class="p"><!----></div>
+Links to the some of 
+<a href="../examples">the test codes </a>
+are now
+included in the documentation bundle.
+This is the place to include a short explanation of 
+what the test is meant to check.
+
+<div class="p"><!----></div>
  <h2><a name="tth_sEc2">
-2</a>&nbsp;&nbsp;Types of Test</h2>
+2</a>&nbsp;&nbsp;Things to do</h2> 
 
-<p>
-     <h3><a name="tth_sEc2.1">
-2.1</a>&nbsp;&nbsp;Gauge Invarience</h3>
-We need a gauge invariance test subroutine in the Columbia code.  We can use the standalone UKQCD code to  produce gauge rotated configurations. 
-
-<p>
-   <a href="http://www.ph.ed.ac.uk/ukqcd/collaboration/t3e_codes/transform_gauge/gaugetransform.html">http://www.ph.ed.ac.uk/ukqcd/collaboration/t3e_codes/transform_gauge/gaugetransform.html</a>
-
-<p>
-These configurations could be read into the Columbia code.
-
-<p>
-
- <h2><a name="tth_sEc3">
-3</a>&nbsp;&nbsp;Parallel Random Number Generation</h2>
-Concerning the need to reproducability of results over a system of a given
-size, no matter how that system is decomposed over a set of processors.
-To achieve this, we must consider distributed and decomposition independent 
-(Pseudo Random Number Generators) PRNGs.
-
-<p>
-Date: Tue, 11 Sep 2001 12:41:07 +0100 (BST)<br />
-From: "S.Booth" &lt;spb@epcc.ed.ac.uk&#62;<br />
-Reply-To: s.booth@epcc.ed.ac.uk<br />
-To: qcdoc-app@epcc.ed.ac.uk<br />
-Subject: Parallel random number generation
-
-<p>
-First of all some trivial notation
+<div class="p"><!----></div>
 
 <ul>
-<li><i>S</i> - the state of a generator</li>
-
-<li><i>X</i> - the output of a generator</li>
-
-<li><i>U</i> - update transform (maps one state to the next)</li>
-
-<li><i>F</i> - output function (maps state to output)</li>
-
-<li><i>P</i> - period of generator</li>
+<li> The idea of using the perl script regression.pl to write
+      the shell script regression.sh is a bit ugly.
+      As the name of the test also needs to be correlated with the 
+      type of comparison test, it might be better to use a single
+      python script. Each test has a number of things 
+      associated with it, hence some kind of object oriented 
+      solution would be useful. The OO features of perl are
+      a bit weird.<br /><br /></li>
 </ul>
-i.e.
 
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
- <i>S</i><sub><i>n</i>+1</sub> = <i>U</i>.<i>S</i><sub><i>n</i></sub></td></tr></table>
-</td><td width="1%">(1)</td></tr></table>
+<div class="p"><!----></div>
 
+<div class="p"><!----></div>
+ <h2><a name="tth_sEc3">
+3</a>&nbsp;&nbsp;History of the testing framework</h2> <a name="se:history">
+</a>
 
+<div class="p"><!----></div>
+The original testing framework was written by Chris Miller
+at Columbia. The testing framework was taken over and improved
+by Andy Jackson (EPCC). 
 
-<p>
+<div class="p"><!----></div>
+Zbyszek Sroczynski and Craig McNeile are currently maintaining
+the system.
 
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
- <i>X</i><sub><i>n</i></sub> = <i>F</i>.<i>S</i><sub><i>n</i></sub></td></tr></table>
-</td><td width="1%">(2)</td></tr></table>
-
-
-
-<p>
-
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
- <i>U</i><sup><i>P</i></sup>  <font face="symbol">º</font
-> <i>I</i></td></tr></table>
-</td><td width="1%">(3)</td></tr></table>
-
-
-
-<p>
-Assume we are generating random numbers in large batches (size N)
-corresponding to a lattice worth of random numbers. (The
-problem of accept/reject algorithms that consume different amounts of
-random numbers on different sites is not too hard but I'll neglect it
-here for clarity)
-
-<p>
-The easiest way of doing this in a decomposition independent way is to
-store an RNG state at each site and use <i>U</i><sup><i>N</i></sup> as the update transform.
-
-<p>
-
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
- <i>S</i><sub>0</sub> <i>S</i><sub>1</sub> <i>S</i><sub>2</sub> . . . <i>S</i><sub><i>N</i>+1</sub></td></tr></table>
-</td><td width="1%">(4)</td></tr></table>
-
-
-goes to
-
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
- <i>S</i><sub><i>N</i></sub> <i>S</i><sub><i>N</i>+1</sub> <i>S</i><sub><i>N</i>+2</sub> . . . <i>S</i><sub>2<i>N</i><font face="symbol">-</font
->1</sub></td></tr></table>
-</td><td width="1%">(5)</td></tr></table>
-
-
-
-<p>
-giving the same result as if a single generator had been run on a
-sequential machine.
-
-<p>
-Vectorisable random number generators often used this trick, e.g for a
-multiplicative  generator:
-
-<p>
-
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
- <i>X</i><sub><i>n</i>+1</sub> = <i>a</i> . <i>X</i><sub><i>n</i></sub> mod <i>M</i></td></tr></table>
-</td><td width="1%">(6)</td></tr></table>
-
-
-implies
-
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
- <i>X</i><sub><i>n</i>+64</sub> = <i>b</i> . <i>X</i><sub><i>n</i></sub> mod <i>M</i>;  <i>b</i> = <i>a</i><sup>64</sup> mod <i>M</i></td></tr></table>
-</td><td width="1%">(7)</td></tr></table>
-
-
-allowing the sequence to be vectorised with a vector length of 64
-storing 64 words of state instead of 1.
-(Linear congruential generators LCGs are very similar to this).
-Even for a large offset <i>V</i> <i>a</i><sup><i>V</i></sup> mod <i>M</i> can be calculated in log(<i>V</i>) time.
-
-<p>
-The same trick can also be used with other PRNG algorithms e.g. lagged
-fibonacci. The difference here being that <i>U</i><sup><i>N</i></sup> may be more expensive to
-compute that U.  A lagged fibonacci update might be of the form
-
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
- <i>X</i><sub><i>n</i></sub> = <i>X</i><sub><i>n</i><font face="symbol">-</font
-><i>p</i></sub> <font face="symbol">±</font
-><i>X</i><sub><i>n</i><font face="symbol">-</font
-><i>q</i></sub> mod <i>M</i></td></tr></table>
-</td><td width="1%">(8)</td></tr></table>
-
-
-<i>U</i><sup><i>N</i></sup> will need q multiplications and additions (mod M)
-
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
-<i>X</i><sub><i>n</i>+<i>N</i></sub> = </td><td nowrap="nowrap" align="center">
-<font size="-1"><i>q</i></font><!--sup
---><br /><font face="symbol" size="+3">å<br /></font>
-<font size="-1"><i>i</i>=1</font>&nbsp;<br /></td><td nowrap="nowrap" align="center">
-<i>a</i><sub><i>i</i></sub> .<i>X</i><sub><i>n</i><font face="symbol">-</font
-><i>i</i></sub> mod <i>M</i></td></tr></table>
-</td><td width="1%">(9)</td></tr></table>
-
-
-(Note this cost is independent of the size of <i>N</i> but the cost of
- calculating the constants {<i>a</i><sub>1</sub>, <i>a</i><sub>2</sub> ... <i>a</i><sub><i>q</i></sub>} is proportional to
- log(<i>N</i>), however you only need to do this once)
-
-<p>
-This additional cost is an artifact of how the original generator was
-designed. The lagged fibonacci generators are just a special case of a
-more general class of generator the Multiply recursive generator (MRG)
-
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
-<i>X</i><sub><i>n</i></sub> = </td><td nowrap="nowrap" align="center">
-<font size="-1"><i>q</i></font><!--sup
---><br /><font face="symbol" size="+3">å<br /></font>
-<font size="-1"><i>i</i>=1</font>&nbsp;<br /></td><td nowrap="nowrap" align="center">
-<i>a</i><sub><i>i</i></sub> .<i>X</i><sub><i>n</i><font face="symbol">-</font
-><i>i</i></sub> mod <i>M</i></td></tr></table>
-</td><td width="1%">(10)</td></tr></table>
-
-
-
-<p>
-It is just as easy (if not easier) to design just as good a
-generator where <i>U</i><sup><i>N</i></sup> is cheap to evaluate and U is the more expensive.
-There is no such thing as a "good" random number generator. Generators
-should really be anlysed in terms of their prospective use. However 
-RNG designers usually use some fairly arbitrary criteria based on
-short distance correlation in the sequance that are
-thought to be valid for the majority of applications.
-
-<p>
-As far as a QCD simulation is concerned the important thing is the
-statistical properties of <i>U</i><sub><i>x</i></sub> <i>U</i><sub><i>y</i></sub> <i>U</i><sub><i>z</i></sub> <i>U</i><sub><i>t</i></sub> and <i>U</i><sub><i>s</i></sub> the operators that encode
-the transformation the RNG state from one lattice site to the next and
-between algorithmic iterations.
-For a naive sequential implementation:
-
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" width="80%" align="right"><tr><td nowrap="nowrap" align="right">
-<table border="1"><td nowrap="nowrap" align="left">
- <i>U</i><sub><i>x</i></sub> </td></tr></table></td><td nowrap="nowrap" align="left">
-<table border="1"><td nowrap="nowrap" align="left">
-=</td></tr></table></td><td nowrap="nowrap" align="left">
-<table border="1"><td nowrap="nowrap" align="left">
-<i>U</i>  </td></tr></table></td></tr><tr><td nowrap="nowrap" align="right" colspan="0"><table border="1"><td nowrap="nowrap" align="left">
- <i>U</i><sub><i>y</i></sub> </td></tr></table></td><td nowrap="nowrap" align="left">
-<table border="1"><td nowrap="nowrap" align="left">
-=</td></tr></table></td><td nowrap="nowrap" align="left">
-<table border="1"><td nowrap="nowrap" align="left">
-<i>U</i><sup><i>Lx</i></sup>  </td></tr></table></td></tr><tr><td nowrap="nowrap" align="right" colspan="0"><table border="1"><td nowrap="nowrap" align="left">
- <i>U</i><sub><i>z</i></sub> </td></tr></table></td><td nowrap="nowrap" align="left">
-<table border="1"><td nowrap="nowrap" align="left">
-=</td></tr></table></td><td nowrap="nowrap" align="left">
-<table border="1"><td nowrap="nowrap" align="left">
-<i>U</i><sub><i>y</i></sub><sup><i>Lx</i></sup>  </td></tr></table></td></tr><tr><td nowrap="nowrap" align="right" colspan="0"><table border="1"><td nowrap="nowrap" align="left">
- <i>U</i><sub><i>t</i></sub> </td></tr></table></td><td nowrap="nowrap" align="left">
-<table border="1"><td nowrap="nowrap" align="left">
-=</td></tr></table></td><td nowrap="nowrap" align="left">
-<table border="1"><td nowrap="nowrap" align="left">
-<i>U</i><sub><i>z</i></sub><sup><i>Lz</i></sup>  </td></tr></table></td></tr><tr><td nowrap="nowrap" align="right" colspan="0"><table border="1"><td nowrap="nowrap" align="left">
- <i>U</i><sub><i>s</i></sub> </td></tr></table></td><td nowrap="nowrap" align="left">
-<table border="1"><td nowrap="nowrap" align="left">
-=</td></tr></table></td><td nowrap="nowrap" align="left">
-<table><tr><td nowrap="nowrap" align="right" colspan="0"><i>U</i><sub><i>t</i></sub><sup><i>Lt</i></sup>  </td></tr></table></td></tr></table>
-</td></tr></table>
-
-
-and we could investigate these properties with a varient of the
-spectral test.
-
-<p>
-In the parallel implementation we can take
-
-<br clear="all" /><table border="1" width="100%"><tr><td>
-<table border="1" align="center"><tr><td nowrap="nowrap" align="center">
- <i>U</i><sub><i>s</i></sub> = <i>U</i> </td></tr></table>
-</td><td width="1%">(11)</td></tr></table>
-
-
-and are free to choose <i>U</i><sub><i>x</i></sub> <i>U</i><sub><i>y</i></sub> <i>U</i><sub><i>z</i></sub> <i>U</i><sub><i>t</i></sub> for their statistical
-properties rather than as a side effect of the order we loop through
-the lattice.
-
-<p>
-The only problem with this approach is the increase in storage needed for the
-generator state (q times the size of the lattice). This is only the
-"working" storage, as the states at each site are all related by <i>U</i><sub><i>x</i>,<i>y</i>,<i>z</i>,<i>t</i></sub>
-it is only necessary to checkpoint a single state the others can be
-regenerated easily.
-
-<p>
-Its possible to trade off computation for storage in three ways.
-
-<ol type="1">
-<li> We can get away with a smaller q if we use a prime modulus M rather
-than a power of 2. a 32 bit power of 2 generator has maximum period 2<sup>3</sup>1.(2<sup><i>q</i></sup> <font face="symbol">-</font
-> 1) 
-if M is prime the maximum period is (<i>M</i><sup><i>q</i></sup> <font face="symbol">-</font
->1)
-Prime modulus at approx 31 bits won't be too expensive if we have
-64-bit integer types available</li>
-
-<li> Only store a single RNG state per processor. This is 
-an alternative approach to getting decomposition independence where we
-arrange for each lattice of random numbers generated to be the same as 
-if they had been produced by a single processor. Each processor only
-stores a single RNG state but applies a different transformation at
-the end of each X, Y, Z, loop across the lattice. These transforms are
-more expensive than the normal update transform ( roughly <i>q</i><sup>2</sup>
-additions and multiplies for lagged fibonacci above) This is fine for
-large local volumes but is probably a significant expense for our
-target local volumes.
-(On the T3E I did something like this but used a different
-decomposition for the random numbers as for the physics
-lattices. However that requires non local communications)</li>
-
-<li> The option of having one generator per sub-cube of the lattice as
-sugessted by bob would also work fine, this uses less storage than the
-one generator / site approach but requires greater book-keepin. The
-problem being that it constrains the possible lattice decompositions
-to sub-cube boundaries. We could make the size of sub-cube a run-time
-parameter so the same code can also run with 1 generator/site though
-this increases the book-keeping overhead even futher.</li>
-</ol>
-
-<p>
-For HMC the RNG is not a very significant part of the runtime
-so we have a lot of freedom about what to do. We could also design an
-interface that could support any of the above approaches making it
-easy to change later. 
-
-<p>
-At the moment I would suggest a 1 generator/site approach using a
-prime modulus Multiply recursive generator (MRG) and 5 words of state
-per site. (that's 5K bytes for a 4<sup>4</sup> lattice) this generator would have
-a period of (<i>P</i><sup>5</sup> <font face="symbol">-</font
-> 1) with  <i>p</i> = 2<sup>3</sup>1<font face="symbol">-</font
->1  i.e. approx 2<sup>1</sup>55
-
-<p>
-In many ways this is overkill but the RNG is such a small part of the
-runtime a gold plated solution seems like a good idea to me.
-
-<p>
+<div class="p"><!----></div>
 
 <br /><br /><hr /><small>File translated from
 T<sub><font size="-1">E</font></sub>X
 by <a href="http://hutchinson.belmont.ma.us/tth/">
 T<sub><font size="-1">T</font></sub>H</a>,
-version 2.92.<br />On  4 Jul 2002, 16:39.</small>
-</body></html>
-
+version 3.40.<br />On  4 Apr 2004, 17:18.</small>
+</html>

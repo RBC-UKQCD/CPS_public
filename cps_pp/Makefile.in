@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.12 2004-04-27 18:18:10 cwj Exp $
+# $Id: Makefile.in,v 1.13 2004-04-30 12:17:59 zs Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -49,6 +49,9 @@ else
 
 docs:
 	cd ${SRCDIR}/doc ; sh mkdocs.sh 
+	cd ${SRCDIR}/tests/t_asqtad_pion ; doxygen Doxyfile
+	cd ${SRCDIR}/tests/s_spect ; doxygen Doxyfile
+
 
 #  Documentation for the web pages
 #  (this deletes the source code so that it is not posted on the web)

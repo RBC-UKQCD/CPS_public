@@ -4,18 +4,24 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgPlaq class methods.
   
-  $Id: alg_plaq.C,v 1.3 2004-01-13 20:39:00 chulwoo Exp $
+  $Id: alg_plaq.C,v 1.4 2004-04-30 12:18:00 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.3 2004-01-13 20:39:00 chulwoo Exp $
-//  $Id: alg_plaq.C,v 1.3 2004-01-13 20:39:00 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-04-30 12:18:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.4 2004-04-30 12:18:00 zs Exp $
+//  $Id: alg_plaq.C,v 1.4 2004-04-30 12:18:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $Log: not supported by cvs2svn $
+//  Revision 1.3.4.2  2004/04/20 12:20:39  zs
+//  Restore original version.
+//
+//  Revision 1.3  2004/01/13 20:39:00  chulwoo
+//  Merging with multibuild
+//
 //  Revision 1.2.10.1  2003/11/06 00:15:15  cwj
 //  *** empty log message ***
 //
@@ -61,7 +67,7 @@ CPS_START_NAMESPACE
 //  Added CVS keywords to phys_v4_0_0_preCVS
 //
 //  $RCSfile: alg_plaq.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v $
 //  $State: Exp $
 //

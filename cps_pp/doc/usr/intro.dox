@@ -1,4 +1,4 @@
-//$Id: intro.dox,v 1.2 2003-08-12 16:24:38 zs Exp $
+//$Id: intro.dox,v 1.3 2004-04-30 12:17:59 zs Exp $
 /*!
 
 \page intropage Introduction 
@@ -22,7 +22,8 @@ will concentrate on higher level features.
 
 This guide is not, by any stretch of the imagination, complete. 
 I do not even claim that everything here is correct. In any event,
-all of the wording is subject to revision.
+all of the wording is subject to revision, and suggestions for
+improvements, corrections or additions will be gratefully received.
 
 \section basis CPS basis
 

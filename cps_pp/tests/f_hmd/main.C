@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-02-09 14:30:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.4 2004-02-09 14:30:07 zs Exp $
-//  $Id: main.C,v 1.4 2004-02-09 14:30:07 zs Exp $
+//  $Date: 2004-04-30 12:18:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.5 2004-04-30 12:18:01 zs Exp $
+//  $Id: main.C,v 1.5 2004-04-30 12:18:01 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -64,11 +64,11 @@ int main(int argc,char *argv[])
   do_arg.t_bc = BND_CND_PRD;
   do_arg.start_conf_kind = START_CONF_ORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
-  do_arg.colors = 3;
+
   do_arg.beta = 5.5;
   do_arg.dwf_height = 0.9;
   do_arg.clover_coeff = 2.0171;
-  do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
+
 
   // asqtad stuff
   do_arg.asqtad_KS = 1.0;
@@ -84,7 +84,11 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   // Set verbose level
   //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
+
+  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+  VRB.ActivateLevel(VERBOSE_CLOCK_LEVEL);
+  VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
 
   //----------------------------------------------------------------
@@ -115,7 +119,8 @@ int main(int argc,char *argv[])
     GwilsonFwilson lat;
 
     {
-      common_arg.results = CAST_AWAY_CONST("hmc.dat");
+	common_arg.set_filename("hmc.dat");
+	
       AlgHmcPhi hmc_phi(lat,&common_arg,&hmd_arg);
       
       int total_sites = GJP.VolNodeSites() * GJP.Xnodes() *
@@ -153,7 +158,7 @@ int main(int argc,char *argv[])
     GwilsonFstag lat;
     
     {
-      common_arg.results = CAST_AWAY_CONST("hmd.dat");
+      common_arg.set_filename("hmd.dat");
       AlgHmdR hmd_r(lat,&common_arg,&hmd_arg);
       
       int total_sites = GJP.VolNodeSites() * GJP.Xnodes() *
@@ -194,7 +199,7 @@ int main(int argc,char *argv[])
     hmd_arg.frm_mass[0] = 0.05;
 
     {
-      common_arg.results = CAST_AWAY_CONST("hmc.dat");
+      common_arg.set_filename("hmc.dat");
       AlgHmcPhi hmc_phi(lat,&common_arg,&hmd_arg);
       
       int total_sites = GJP.VolNodeSites() * GJP.Xnodes() *
@@ -237,7 +242,7 @@ int main(int argc,char *argv[])
     }
 
     {
-      common_arg.results = CAST_AWAY_CONST("hmc.dat");
+      common_arg.set_filename("hmc.dat");
       AlgHmcPhi hmc_phi(lat,&common_arg,&hmd_arg);
       
       int total_sites = GJP.VolNodeSites() * GJP.Xnodes() *

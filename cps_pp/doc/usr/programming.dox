@@ -1,4 +1,4 @@
-//$Id: programming.dox,v 1.2 2003-08-12 16:24:38 zs Exp $
+//$Id: programming.dox,v 1.3 2004-04-30 12:17:59 zs Exp $
 /*!
 
 \page progpage CPS programming
@@ -161,7 +161,7 @@ here: http://www.epcc.ed.ac.uk/~ukqcd/cps/new_structure/structure.html
 \endlatexonly
 and 
 http://www.ph.ed.ac.uk/ukqcd/community/qcdoc/build
-for the discussions on this.
+for the discussions on this. 
 
 See
 \htmlonly
@@ -179,21 +179,21 @@ manner prompts us to use the
 \e autoconf (http://www.gnu.org/autoconf/) program to configure the code.
 Autoconf produces a shell script called \a configure from the macros
 in the file \a configure.in. When \a configure  is run
-it writes the makefile \a Makefile_cps from the template \a
-Makefile_cps.in and the header file \a config.h from the template \a
-config.h.in. 
+it writes the makefile \a Makefile and \a Makefile.rules from the templates \a
+Makefile.in and \a Makefile.rules.in and the header file \a config.h from
+the template \a config.h.in. 
 
-The autoconf program does not run on the QCDSP platform, and therefore
-the \a config.h and \a Makefile_cps are designed to be easily editable
-to be suitable for building the CPS code on the QCDSP platform.
+The autoconf program does not run on the QCDOC platform, and therefore
+the \a config.h and \a Makefile are designed to be easily editable
+to be suitable for building the CPS code on the QCDOC platform.
 
-On a non-QCDSP platform, the basic build is achieved by simply typing
+For a non-QCDOC platform, the basic build is achieved by simply typing
 
 \verbatim
 $ ./configure
 \endverbatim
 
-This sets up \a Makefile_cps and \a config.h for a serial build.
+This sets up \a Makefile,  and \a config.h for a serial build.
 
 With the option 
 \verbatim

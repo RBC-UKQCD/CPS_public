@@ -1,6 +1,6 @@
-# $Id: regression.pl.in,v 1.13 2004-02-09 14:30:07 zs Exp $
+# $Id: regression.pl.in,v 1.14 2004-04-30 12:18:00 zs Exp $
 # @configure_input@
-# $Id: regression.pl.in,v 1.13 2004-02-09 14:30:07 zs Exp $ 
+# $Id: regression.pl.in,v 1.14 2004-04-30 12:18:00 zs Exp $ 
 #--------------------------------------------------------------------
 
 #
@@ -13,9 +13,16 @@
 
 # directory with good test data in it
 $test_dir = "v5_0_0" ;
-@test_names = ( "f_hmd" , "f_hmd_dwfso", "g_hb" , "g_hmd" , "s_spect" ,  "w_spect" , "f_wilson_eig" ,  "xi_spect_gsum" , "f_stag_pbp" ) ; 
+@test_names = qw( f_hmd 
+		  f_hmd_dwfso 
+		  g_hb  
+		  g_hmd  
+		  s_spect   
+		  w_spect  
+		  f_wilson_eig   
+		  xi_spect_gsum  
+		  f_stag_pbp ) ; 
 
-##@test_names = ( "f_stag_pbp" , "f_wilson_pbp" , "f_clover_pbp" , "f_dwf_pbp" , "f_dwfso_pbp" ); 
 #------
 
 $error_tol = 0.001; 
@@ -26,7 +33,7 @@ if( '@NOT_TESTING_QCDSP@' eq 'yes' ) {
   $machine = '@target@';
   $parallel = '@TESTING_PARALLEL@';
   $compiler = '@CC@';
-  $executable = "regression_cps.x";
+  $executable = "@ARCH@.x";
 } else {
 # This is right for the parallel QCDSP version:
   $machine = "qcdsp";

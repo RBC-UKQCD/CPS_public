@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-02-09 14:30:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
-//  $Id: main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
+//  $Date: 2004-04-30 12:18:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.4 2004-04-30 12:18:01 zs Exp $
+//  $Id: main.C,v 1.4 2004-04-30 12:18:01 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v $
 //  $State: Exp $
 //
@@ -74,17 +74,14 @@ int main(int argc,char *argv[])
   do_arg.t_bc = BND_CND_APRD;
   do_arg.start_conf_kind = START_CONF_ORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
-  do_arg.colors = 3;
   do_arg.beta = 5.375;
-  do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
 
   GJP.Initialize(do_arg);
 
-
-  //----------------------------------------------------------------
-  // Set verbose level
-  //----------------------------------------------------------------
+  // This doesn't do anything but should still give the default behaviour
   VRB.Level(GJP.VerboseLevel());
+  
+  
 
   //----------------------------------------------------------------
   // Initialize argument structures
@@ -290,22 +287,22 @@ int main(int argc,char *argv[])
         printf("Aots starts....\n");
         for(Aots it(0, 1, 2); it; ++it) {
           {
-	    common_arg.results = CAST_AWAY_CONST("quark1.dat");
+	    common_arg.set_filename("quark1.dat");
             AlgStagQuark sq(lat, &common_arg, &p_qarg1, it);
             sq.run();
           }
           {
-	    common_arg.results = CAST_AWAY_CONST("mes11.dat");
+	    common_arg.set_filename("mes11.dat");
             AlgStagMeson meson(lat, &common_arg, &marg1, it);
             meson.run();
           }
           {
-	    common_arg.results = CAST_AWAY_CONST("nuc111.dat");
+	    common_arg.set_filename("nuc111.dat");
             AlgStagNucleon nucleon(lat, &common_arg, &narg1, it);
             nucleon.run();
           }
           {
-	    common_arg.results = CAST_AWAY_CONST("quark1.dat");
+	    common_arg.set_filename("quark1.dat");
             AlgStagQuark sq(lat, &common_arg, &p_qarg1, it);
             sq.free();
           }
@@ -332,23 +329,23 @@ int main(int argc,char *argv[])
 
 	for(Aots it2(0, 1, 2); it2; ++it2) {
 	  {
-	    common_arg.results = CAST_AWAY_CONST("quark3.dat");
+	    common_arg.set_filename("quark3.dat");
 	    AlgStagQuark sq(lat, &common_arg, &wz_qarg1, it2);
 	    sq.run();
 	  }
 
 	  {
-	    common_arg.results = CAST_AWAY_CONST("mes33.dat");
+	    common_arg.set_filename("mes33.dat");
 	    AlgStagMeson meson(lat, &common_arg, &marg3, it2);
 	    meson.run();
 	  }
 	  {
-	    common_arg.results = CAST_AWAY_CONST("nuc333.dat");
+	    common_arg.set_filename("nuc333.dat");
 	    AlgStagNucleon nucleon(lat, &common_arg, &narg3, it2);
 	    nucleon.run();
 	  }
 	  {
-	    common_arg.results = CAST_AWAY_CONST("quark3.dat");
+	    common_arg.set_filename("quark3.dat");
 	    AlgStagQuark sq(lat, &common_arg, &wz_qarg1, it2);
 	    sq.free();
 	  }
@@ -364,27 +361,27 @@ int main(int argc,char *argv[])
 
 	for(Aots it3(0, 1 , 2); it3; ++it3) {
 	  {
-	    common_arg.results = CAST_AWAY_CONST("quark4.dat");
+	    common_arg.set_filename("quark4.dat");
 	    AlgStagQuark sq(lat, &common_arg, &wz_qarg2, it3);
 	    sq.run();
 	  }
 	  {
-	    common_arg.results = CAST_AWAY_CONST("mes44.dat");
+	    common_arg.set_filename("mes44.dat");
 	    AlgStagMeson meson(lat, &common_arg, &marg4, it3);
 	    meson.run();
 	  }
 	  {
-	    common_arg.results = CAST_AWAY_CONST("nuc444.dat");
+	    common_arg.set_filename("nuc444.dat");
 	    AlgStagNucleon nucleon(lat, &common_arg, &narg4, it3);
 	    nucleon.run();
 	  }
 	  {
-	    common_arg.results = CAST_AWAY_CONST("nonlocal444.dat");
+	    common_arg.set_filename("nonlocal444.dat");
 	    AlgStagNonLocal nonlocal(lat, &common_arg, &darg4, it3);
 	    nonlocal.run();
 	  }
 	  {
-	    common_arg.results = CAST_AWAY_CONST("quark4.dat");
+	    common_arg.set_filename("quark4.dat");
 	    AlgStagQuark sq(lat, &common_arg, &wz_qarg2, it3);
 	    sq.free();
 	  }

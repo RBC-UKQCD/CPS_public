@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-10-31 14:15:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/ghb/main.C,v 1.2 2003-10-31 14:15:34 zs Exp $
-//  $Id: main.C,v 1.2 2003-10-31 14:15:34 zs Exp $
+//  $Date: 2004-04-30 12:18:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/ghb/main.C,v 1.3 2004-04-30 12:18:02 zs Exp $
+//  $Id: main.C,v 1.3 2004-04-30 12:18:02 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/ghb/main.C,v $
 //  $State: Exp $
 //
@@ -75,18 +75,18 @@ main(int argc,char *argv[])
   do_arg.t_bc = BND_CND_APRD;
   do_arg.start_conf_kind = START_CONF_DISORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
-  do_arg.colors = 3;
+
   do_arg.beta = 4.8;
   do_arg.dwf_height = 0.9;
-//  do_arg.verbose_level = -10050402; // = -1020306;
-  do_arg.verbose_level = -10050402; // = 0;
 
   GJP.Initialize(do_arg);
 
   //----------------------------------------------------------------
   // Set verbose level
   //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
+  VRB.DeactivateLevel(VERBOSE_RNGSEED_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+  
 
   //----------------------------------------------------------------
   // Initialize argument structures

@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-02-09 14:30:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v 1.3 2004-02-09 14:30:08 zs Exp $
-//  $Id: main.C,v 1.3 2004-02-09 14:30:08 zs Exp $
+//  $Date: 2004-04-30 12:18:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v 1.4 2004-04-30 12:18:02 zs Exp $
+//  $Id: main.C,v 1.4 2004-04-30 12:18:02 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v $
 //  $State: Exp $
 //
@@ -76,18 +76,11 @@ int main(int argc,char *argv[])
   do_arg.start_conf_load_addr = (Matrix *) 0x12f13;
   do_arg.start_seed_kind = START_SEED_FIXED;
   do_arg.start_seed_value = 1111;
-  do_arg.colors = 3;
   do_arg.beta = 5.8;
   do_arg.dwf_height = 0.9;
-  do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
 
   GJP.Initialize(do_arg);
 
-
-  //----------------------------------------------------------------
-  // Set verbose level
-  //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
 
 
   //----------------------------------------------------------------
@@ -213,7 +206,7 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   {
     GwilsonFnone lat;
-    common_arg.results = CAST_AWAY_CONST("plaq.dat");
+    common_arg.set_filename("plaq.dat");
     AlgPlaq plaq(lat,&common_arg,&plaq_arg);
     
     plaq.run();
@@ -326,7 +319,7 @@ int main(int argc,char *argv[])
 	  //------------------------------------------------------------
 	  if(pbp_num_hits != 0)
 	    {
-	      common_arg.results = CAST_AWAY_CONST("pbp.dat");
+	      common_arg.set_filename("pbp.dat");
 	      pbp_arg.mass[0] = mass;
 	      pbp_arg.src_u_s = 0;
 	      pbp_arg.src_l_s = ls-1;

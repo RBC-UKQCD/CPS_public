@@ -1,12 +1,13 @@
-
-
 %------------------------------------------------------------------
-% $Id: testing.tex,v 1.6 2004-02-01 16:39:49 mcneile Exp $
+% $Id: testing.tex,v 1.7 2004-04-30 12:17:59 zs Exp $
 %------------------------------------------------------------------
 %Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
 %
 % For best results, this latex file should be compiled using pdflatex.
 % However it will also compile under normal latex, if you prefer.
+%
+% The conversion of this latex document to html is best done
+% using the  "tth" program.
 %
 %------------------------------------------------------------------
 \documentclass[12pt]{article}
@@ -43,8 +44,8 @@ urlcolor=blue,
 pdfpagemode=None,
 %=UseOutlines,
 pdfhighlight={/I},
-pdftitle={Frameworks For Testing. $Revision: 1.6 $ - $Date: 2004-02-01 16:39:49 $.},
-pdfauthor={A.N. Jackson, C. McNeile \& S. Booth},
+pdftitle={Frameworks For Testing. $Revision: 1.7 $ - $Date: 2004-04-30 12:17:59 $.},
+pdfauthor={A.N. Jackson, C. McNeile, Z. Sroczynski, \& S. Booth},
 plainpages=false
 ]{hyperref}
 }
@@ -67,9 +68,9 @@ plainpages=false
 
 
 % title information:
-\title{Testing the Columbia code.}
-\author{A.N. Jackson, C. McNeile,  \& S. Booth}
-\date{\mbox{\small $$Revision: 1.6 $$  $$Date: 2004-02-01 16:39:49 $$}}
+\title{Testing framework for the Columbia code.}
+\author{A.N. Jackson, C. McNeile, , Z. Sroczynski,  \& S. Booth}
+\date{\mbox{\small $$Revision: 1.7 $$  $$Date: 2004-04-30 12:17:59 $$}}
 
 %------------------------------------------------------------------
 \begin{document}
@@ -80,28 +81,47 @@ plainpages=false
 \newpage
 
 %-------------------------------------------------------------------
-\section{Testing Framework for the cps++ code.}
+\section{Motivation for Testing Framework}
 
 We are ``growing'' a testing framework for the cps++ code.
-The original testing framework was written by Chris Miller
-at Columbia.
+The aim is to produce a basic regression testing framework to allow
+``refactoring'' and physics checks on relevant parts of the operating
+system.
+The history of the testing framework is described in 
+section~\ref{se:history}.
 
 
-This testing framework is meant to be used for the 
-cps++ code on its own with out any additional libraries.
-We expect that UKQCD users will interact more with 
-QCD-lite supercharged version of cps++, but it is useful to 
-have a framework for the cps code on its own.
+This testing framework is meant to be used for the CPS code on its own
+without any additional libraries, such as 
+\href{http://www.jlab.org/~edwards/qdp/}{QDP++}.
+  In particular we
+assume that none of the output is in XML format, hence we can not use the
+\href{https://forge.nesc.ac.uk/projects/xmldiff/}{XMLDiff}
+tool developed by EPCC for UKQCD.  There will be an additional
+testing framework for the hybrid applications that use a mixture of
+CPS and QDP++ libraries.
 
 \subsection{Running the tests}
 
 The tests are run using the makefile target.
 \begin{verbatim}
-make -f Makefile_cps test
+make -f Makefile test
 \end{verbatim}
 %%
-This should produce output like
+This produces output like
 \begin{verbatim}
+COMPILATION STATUS
+f_hmd SUCCESS
+f_hmd_dwfso SUCCESS
+g_hb SUCCESS
+g_hmd SUCCESS
+s_spect SUCCESS
+w_spect SUCCESS
+f_wilson_eig SUCCESS
+xi_spect_gsum SUCCESS
+f_stag_pbp SUCCESS
+t_asqtad_pion SUCCESS
+TEST_CASE_STATUS
 f_hmd    PASS
 f_hmd_dwfso    FAIL
 g_hb    FAIL
@@ -111,13 +131,13 @@ w_spect    PASS
 f_wilson_eig  NO_CORRECT_OUTPUT
 xi_spect_gsum  NO_CORRECT_OUTPUT
 f_stag_pbp  NO_CORRECT_OUTPUT
+t_asqtad_pion PASS
 ------------------------------
 DISCLAIMER
 Please also test this code on
 a physical system before using in
 production runs
 ------------------------------
-
 \end{verbatim}
 
 A perl script loops over the test cases, compiles the code,
@@ -125,6 +145,11 @@ and then runs it. The output is compared against
 previous output and a PASS/FAIL tag is generated.
 If there is no test data to compare against the
 NO\_CORRECT\_OUTPUT tag is printed.
+
+The latest version of the system first compiles all the 
+applications and then runs them. This allows the user to
+see which applications compile and which don't.
+
 
 \subsection{Philosophy behind the testing framework}
 
@@ -146,6 +171,8 @@ extract a subset of the correlators. The important
 perl script that does the comparison is called
 regressions/check\_data.pl. This compares the output from
 the program to previous output stored in a special format.
+
+
 
 \subsection{Adding a new test to the testing framework}
 
@@ -184,12 +211,12 @@ nucleon.dat:2:3:1.179528e+00
 
 \subsection{Structure of makefile target}
 
-The test target in the Makefile\_cps looks like:
+The test target in the Makefile looks like:
 %%%%
 \begin{verbatim}
 TEST_DIR = tests
 
-test:
+test: cps
         cd $(TEST_DIR) ; perl regression.pl
         cd $(TEST_DIR) ; sh regression.sh
 \end{verbatim}
@@ -199,237 +226,75 @@ regression.sh. The script regression.sh compiles the codes,
 runs them and checks the output. This two step solution
 was required for running on QCDSP.
 
-%-------------------------------------------------------------------
-\section{What is required from a  Testing Framework}
+\subsection{Testing framework code in CPS}
 
-Here are some thoughts on what is required for a testing
-framework. Most of the information in this section will
-be moved elsewhere at some stage.
-
-\subsection{Parallelism Issues}
-Some of the test cases should be done on big lattices, as there are subtle communication bugs that will only show with more than 32 nodes.  Therefore, the code should ensure the same results can be calculated over a range of machine partition sizes.
-
-\subsection{Input Parameters}
-One of the issues is how to maintain the tests 
-as the input parameters to the code gets changed. One way to
-proceed would be to write a library of perl scripts to write 
-the input parameters to the codes. This would localise most of the 
-input parameters to the code in one place. (This approach is 
-recommended in Software Test Automation by Fewster and 
-Graham).
-
-
-\subsection{Output Format}
-One of problems with testing is comparing the output against the "correct" output. The issue is how to extract the important output (pion correlators, and residues) from the unimportant output (dates).  It is suggested that we use XML to tag the important information. 
-For example, the output could look "something like":
+In the original design of CPS some of the physics
+measurement code was buried a number of layers 
+in a class hierarchy. To test code the output from 
+the routines needs to close to the main program.
+Hence some simple testing code has been placed 
+in
 \begin{verbatim}
-<notimportant>
-STATUS:solver:make_source:0:Using point source on spin 0 colour 0
- STATUS:solver:make_clover:0:Making clover for p = 1
- STATUS:solver:make_source:0:Using point source on spin 0 colour 0
- STATUS:solver:solver_g5_driver:0:real residue is  
-</notimportant>
-<residue> 0.97820832E-09 </residue>
-<notimportant>
-STATUS:solver:solver_data_save:0:Saving solver data...
- STATUS:solver:solver_mpp_save:0:Saving solver data...
-</notimportant>
+src/util/testing_framework
 \end{verbatim}
-The plan would be to use "attributes" to index
-things such as the residue as well.
 
-An XML parser such as expat (\href{http://www.jclark.com/xml/expat.html}{http://www.jclark.com/xml/expat.html})
-could be used to do the comparison.  Another option might be to use xmldiff 
-(\href{http://www.logilab.org/xmldiff/}{http://www.logilab.org/xmldiff/})
-We could of course try to use perl/grep/awk to extract the 
-information we need, but this is somewhat opposed to the motivation for using XML.
+At the moment there is code to compute the local pion for staggered
+fermions and to compare two arrays. We would expect that this 
+would evolve into an API.
 
+The code is used in the test ``t\_asqtad\_pion'' like:
 
-%-------------------------------------------------------------------
-\section{Types of Test}
+\begin{verbatim}
+  // known output
+  Float pion_corr_good[] = { 7.563369 , 6.546032 , 5.474610 ,
+  5.255596 } ;
+  int good_size = sizeof(pion_corr_good) / sizeof(Float) ;
 
-\subsection{Gauge Invarience}
-We need a gauge invariance test subroutine in the Columbia code.  We can use the standalone UKQCD code to  produce gauge rotated configurations. 
+  // compute the time sliced pion correlator
+  int time_size=GJP.Tnodes()*GJP.TnodeSites();
+  GwilsonFasqtad lat;
+  Float* pion_corr = (Float*)smalloc(time_size*sizeof(IFloat));
+  staggered_local_pion(lat,cg_arg.mass,pion_corr,time_size) ;
 
-   \href{http://www.ph.ed.ac.uk/ukqcd/collaboration/t3e_codes/transform_gauge/gaugetransform.html}{http://www.ph.ed.ac.uk/ukqcd/collaboration/t3e\_codes/transform\_gauge/gaugetransform.html}
+  Float tol = 0.00001 ;
+  compare_array_relative(pion_corr, pion_corr_good,tol,
+                           time_size) ;
+\end{verbatim}
 
-These configurations could be read into the Columbia code.
+Links to the some of 
+\href{../examples}{the test codes }
+are now
+included in the documentation bundle.
+This is the place to include a short explanation of 
+what the test is meant to check.
 
+\section{Things to do} 
 
-%-------------------------------------------------------------------
-\section{Parallel Random Number Generation}
-Concerning the need to reproducability of results over a system of a given
-size, no matter how that system is decomposed over a set of processors.
-To achieve this, we must consider distributed and decomposition independent 
-(Pseudo Random Number Generators) PRNGs.
-
-Date: Tue, 11 Sep 2001 12:41:07 +0100 (BST)\\
-From: "S.Booth" <spb@epcc.ed.ac.uk>\\
-Reply-To: s.booth@epcc.ed.ac.uk\\
-To: qcdoc-app@epcc.ed.ac.uk\\
-Subject: Parallel random number generation
-
-First of all some trivial notation
 \begin{itemize}
- \item{$S$} - the state of a generator
- \item{$X$} - the output of a generator
- \item{$U$} - update transform (maps one state to the next)
- \item{$F$} - output function (maps state to output)
- \item{$P$} - period of generator
+
+
+\item The idea of using the perl script regression.pl to write
+      the shell script regression.sh is a bit ugly.
+      As the name of the test also needs to be correlated with the 
+      type of comparison test, it might be better to use a single
+      python script. Each test has a number of things 
+      associated with it, hence some kind of object oriented 
+      solution would be useful. The OO features of perl are
+      a bit weird.
+
 \end{itemize}
-i.e.
-\begin{equation}
- S_{n+1} = U.S_{n}
-\end{equation}
 
-\begin{equation}
- X_{n} = F.S_{n}
-\end{equation}
+%-------------------------------------------------------------------
 
-\begin{equation}
-  U^{P} \equiv I
-\end{equation}
+\section{History of the testing framework} \label{se:history}
 
+The original testing framework was written by Chris Miller
+at Columbia. The testing framework was taken over and improved
+by Andy Jackson (EPCC). 
 
-Assume we are generating random numbers in large batches (size N)
-corresponding to a lattice worth of random numbers. (The
-problem of accept/reject algorithms that consume different amounts of
-random numbers on different sites is not too hard but I'll neglect it
-here for clarity)
+Zbyszek Sroczynski and Craig McNeile are currently maintaining
+the system.
 
-The easiest way of doing this in a decomposition independent way is to
-store an RNG state at each site and use $U^N$ as the update transform.
-
-\begin{equation}
- S_0   S_1   S_2  . . .     S_{N+1}
-\end{equation}
-goes to
-\begin{equation}
- S_N   S_{N+1}   S_{N+2}  . . .     S_{2N-1}
-\end{equation}
-
-giving the same result as if a single generator had been run on a
-sequential machine.
-
-Vectorisable random number generators often used this trick, e.g for a
-multiplicative  generator:
-
-\begin{equation}
-  X_{n+1}     = a . X_n  \mbox{mod} M
-\end{equation}
-implies
-\begin{equation}
-  X_{n+64}     = b . X_n \mbox{mod} M;  \hspace{5mm}  b = a^{64} \mbox{mod} M
-\end{equation}
-allowing the sequence to be vectorised with a vector length of 64
-storing 64 words of state instead of 1.
-(Linear congruential generators LCGs are very similar to this).
-Even for a large offset $V a^V \mbox{mod} M$ can be calculated in $\log(V)$ time.
-
-
-The same trick can also be used with other PRNG algorithms e.g. lagged
-fibonacci. The difference here being that $U^N$ may be more expensive to
-compute that U.  A lagged fibonacci update might be of the form
-\begin{equation}
-    X_n   =  X_{n-p} \pm  X_{n-q} \mbox{mod} M
-\end{equation}
-$U^N$ will need q multiplications and additions (mod M)
-\begin{equation}
-X_{n+N}= \sum_{i=1}^{q}    a_i .X_{n-i}  \mbox{mod} M
-\end{equation}
-(Note this cost is independent of the size of $N$ but the cost of
- calculating the constants $\{a_1, a_2 ... a_q\}$ is proportional to
- $\log(N)$, however you only need to do this once)
-
-This additional cost is an artifact of how the original generator was
-designed. The lagged fibonacci generators are just a special case of a
-more general class of generator the Multiply recursive generator (MRG)
-\begin{equation}
-X_n  = \sum_{i=1}^q   a_i .X_{n-i} \mbox{mod} M
-\end{equation}
-
-It is just as easy (if not easier) to design just as good a
-generator where $U^N$ is cheap to evaluate and U is the more expensive.
-There is no such thing as a "good" random number generator. Generators
-should really be anlysed in terms of their prospective use. However 
-RNG designers usually use some fairly arbitrary criteria based on
-short distance correlation in the sequance that are
-thought to be valid for the majority of applications.
-
-As far as a QCD simulation is concerned the important thing is the
-statistical properties of $U_x$ $U_y$ $U_z$ $U_t$ and $U_s$ the operators that encode
-the transformation the RNG state from one lattice site to the next and
-between algorithmic iterations.
-For a naive sequential implementation:
-\begin{eqnarray}
-  U_x &=& U \nonumber \\
-  U_y &=& U^{Lx} \nonumber \\
-  U_z &=& U_y^{Lx} \nonumber \\
-  U_t &=& U_z^{Lz} \nonumber \\
-  U_s &=& U_t^{Lt} \nonumber 
-\end{eqnarray}
-and we could investigate these properties with a varient of the
-spectral test.
-
-In the parallel implementation we can take
-\begin{equation}
-  U_s = U  
-\end{equation}
-and are free to choose $U_x$ $U_y$ $U_z$ $U_t$ for their statistical
-properties rather than as a side effect of the order we loop through
-the lattice.
-
-The only problem with this approach is the increase in storage needed for the
-generator state (q times the size of the lattice). This is only the
-"working" storage, as the states at each site are all related by $U_{x,y,z,t}$
-it is only necessary to checkpoint a single state the others can be
-regenerated easily.
-
-
-Its possible to trade off computation for storage in three ways.
-\begin{enumerate}
-\item We can get away with a smaller q if we use a prime modulus M rather
-than a power of 2. a 32 bit power of 2 generator has maximum period $2^31.(2^q - 1)$ 
-if M is prime the maximum period is $(M^q -1)$
-Prime modulus at approx 31 bits won't be too expensive if we have
-64-bit integer types available
-
-
-\item Only store a single RNG state per processor. This is 
-an alternative approach to getting decomposition independence where we
-arrange for each lattice of random numbers generated to be the same as 
-if they had been produced by a single processor. Each processor only
-stores a single RNG state but applies a different transformation at
-the end of each X, Y, Z, loop across the lattice. These transforms are
-more expensive than the normal update transform ( roughly $q^2$
-additions and multiplies for lagged fibonacci above) This is fine for
-large local volumes but is probably a significant expense for our
-target local volumes.
-(On the T3E I did something like this but used a different
-decomposition for the random numbers as for the physics
-lattices. However that requires non local communications)
-
-\item The option of having one generator per sub-cube of the lattice as
-sugessted by bob would also work fine, this uses less storage than the
-one generator / site approach but requires greater book-keepin. The
-problem being that it constrains the possible lattice decompositions
-to sub-cube boundaries. We could make the size of sub-cube a run-time
-parameter so the same code can also run with 1 generator/site though
-this increases the book-keeping overhead even futher.
-\end{enumerate}
-
-For HMC the RNG is not a very significant part of the runtime
-so we have a lot of freedom about what to do. We could also design an
-interface that could support any of the above approaches making it
-easy to change later. 
-
-At the moment I would suggest a 1 generator/site approach using a
-prime modulus Multiply recursive generator (MRG) and 5 words of state
-per site. (that's 5K bytes for a $4^4$ lattice) this generator would have
-a period of $(P^5 - 1)$ with  $p = 2^31-1$  i.e. approx $2^155$
-
-In many ways this is overkill but the RNG is such a small part of the
-runtime a gold plated solution seems like a good idea to me.
 
 
 \end{document}

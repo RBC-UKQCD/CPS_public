@@ -3,47 +3,19 @@ CPS_START_NAMESPACE
 /*!\file 
   \brief   Definition of Error class methods.
 
-  $Id: error.C,v 1.4 2004-01-13 20:39:49 chulwoo Exp $
+  $Id: error.C,v 1.5 2004-04-30 12:18:00 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.4 2004-01-13 20:39:49 chulwoo Exp $
-//  $Id: error.C,v 1.4 2004-01-13 20:39:49 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-04-30 12:18:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.5 2004-04-30 12:18:00 zs Exp $
+//  $Id: error.C,v 1.5 2004-04-30 12:18:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.3.2.1  2003/11/05 16:32:16  mike
-//  Attempting to create new working branch!
-//
-//  Revision 1.3  2003/09/11 15:07:34  zs
-//  Corrected documentation.
-//
-//  Revision 1.2  2003/07/24 16:53:54  zs
-//  Addition of documentation via doxygen:
-//  doxygen-parsable comment blocks added to many source files;
-//  New target in makefile and consequent alterations to configure.in;
-//  New directories and files under the doc directory.
-//
-//  Revision 1.2  2001/06/19 18:13:15  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:08  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: error.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v $
 //  $State: Exp $
 //
@@ -56,40 +28,41 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 CPS_START_NAMESPACE
 
-//------------------------------------------------------------------
-// Error messages
-// Why are these here?
-//------------------------------------------------------------------
-char *pointer_str = "Error in %s::%s :\n\tpointer %s is not initialized.\n";
-char *file_r_str = "Error in %s::%s :\n\tcan not open file %s to read.\n";
-char *file_w_str = "Error in %s::%s :\n\tcan not open file %s to write.\n";
-char *file_a_str = "Error in %s::%s :\n\tcan not open file %s to append.\n";
-char *not_implemented_str = "Error in %s::%s :\n\tnot implemented.\n\t";
-char *hardware_str = "Hardware error in %s::%s :\n\t";
-char *general_str = "Error in %s::%s :\n\t";
-
-//------------------------------------------------------------------
-// Error names
-//------------------------------------------------------------------
-char *error_file_name = CWDPREFIX("phys.error");
-char *error_class_name = "Error";
 
 //------------------------------------------------------------------
 // Constructor
 /*!
-   The exit codes are initialised here.
+   The exit codes and standard messages are initialised here.
 */
 //------------------------------------------------------------------
 Error::Error() {
 
-    cname = "Error";
-    pointer_exit_value = -1;
-    file_r_exit_value = -2;
-    file_w_exit_value = -3;
-    file_a_exit_value = -4;
-    not_implemented_exit_value = -5;
-    hardware_exit_value = -6;
-    general_exit_value = -7;
+    error_class_name = "Error";
+    
+// Error message format strings
+
+    error_string[pointer] = "Error in %s::%s :\n\tpointer %s is not initialized.\n";
+    error_string[file_r] = "Error in %s::%s :\n\tcan not open file %s to read.\n";
+    error_string[file_w] = "Error in %s::%s :\n\tcan not open file %s to write.\n";
+    error_string[file_a] = "Error in %s::%s :\n\tcan not open file %s to append.\n";
+    error_string[not_implemented] = "Error in %s::%s :\n\tnot implemented.\n\t";
+    error_string[hardware] = "Hardware error in %s::%s :\n\t";
+    error_string[general] = "Error in %s::%s :\n\t";
+ 
+
+    // Error exit values
+    
+    exit_value[pointer] = -1;
+    exit_value[file_r] = -2;
+    exit_value[file_w] = -3;
+    exit_value[file_a] = -4;
+    exit_value[not_implemented] = -5;
+    exit_value[hardware] = -6;
+    exit_value[general] = -7;
+
+// File to which error messages are written
+    
+    error_file_name = "phys.error";
 
 }
 
@@ -114,22 +87,22 @@ Error::~Error() {}
   \param ptr_name The variable name of the pointer.
 */
 //------------------------------------------------------------------
-void Error::Pointer(char *class_name, char *func_name, 
-		    char *ptr_name)
+void Error::Pointer(const char *class_name, const char *func_name, 
+		    const char *ptr_name)
 {
   FILE *fp;
-  char *error_func_name = "Pointer";
+  error_func_name = "Pointer";
 
-  printf(pointer_str, class_name, func_name, ptr_name); 
+  printf(error_string[pointer], class_name, func_name, ptr_name); 
 
   if( (fp = fopen(error_file_name, "w")) == NULL ) { 
-    printf(file_w_str, error_class_name, error_func_name, error_file_name); 
-    exit(file_w_exit_value); 
+    printf(error_string[file_w], error_class_name, error_func_name, error_file_name); 
+    exit(exit_value[file_w]); 
   } 
-  fprintf(fp, pointer_str, class_name, func_name, ptr_name); 
+  fprintf(fp, error_string[pointer], class_name, func_name, ptr_name); 
   fclose(fp); 
   
-  exit(pointer_exit_value); 
+  exit(exit_value[pointer]); 
   
 }
 
@@ -147,22 +120,22 @@ void Error::Pointer(char *class_name, char *func_name,
   \param file_name The name of the file.
 */
 //------------------------------------------------------------------
-void Error::FileR(char *class_name, char *func_name,
-		  char *file_name)   // file name
+void Error::FileR(const char *class_name, const char *func_name,
+		  const char *file_name)   // file name
 {
   FILE *fp;
-  char *error_func_name = "FileR";
+  error_func_name = "FileR";
 
-  printf(file_r_str, class_name, func_name, file_name);
+  printf(error_string[file_r], class_name, func_name, file_name);
 
   if( (fp = fopen(error_file_name, "w")) == NULL ) {
-    printf(file_w_str, error_class_name, error_func_name, error_file_name);
-    exit(file_w_exit_value);
+    printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
+    exit(exit_value[file_w]);
   }
-  fprintf(fp, file_r_str, class_name, func_name, file_name);
+  fprintf(fp, error_string[file_r], class_name, func_name, file_name);
   fclose(fp);
 
-  exit(file_r_exit_value);
+  exit(exit_value[file_r]);
 }
 
 
@@ -179,22 +152,22 @@ void Error::FileR(char *class_name, char *func_name,
   \param file_name The name of the file.
 */
 //------------------------------------------------------------------
-void Error::FileW(char *class_name, char *func_name,
-		  char *file_name)   // file name
+void Error::FileW(const char *class_name, const char *func_name,
+		  const char *file_name)   // file name
 {
   FILE *fp;
-  char *error_func_name = "FileW";
+  error_func_name = "FileW";
 
-  printf(file_w_str,class_name, func_name, file_name);
+  printf(error_string[file_w],class_name, func_name, file_name);
 
   if( (fp = fopen(error_file_name, "w")) == NULL ) {
-    printf(file_w_str, error_class_name, error_func_name, error_file_name);
-    exit(file_w_exit_value);
+    printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
+    exit(exit_value[file_w]);
   }
-  fprintf(fp, file_w_str,class_name, func_name, file_name);
+  fprintf(fp, error_string[file_w],class_name, func_name, file_name);
   fclose(fp);
 
-  exit(file_w_exit_value);
+  exit(exit_value[file_w]);
 }
 
 
@@ -211,22 +184,22 @@ void Error::FileW(char *class_name, char *func_name,
   \param file_name The name of the file.
 */
 //------------------------------------------------------------------
-void Error::FileA(char *class_name, char *func_name, 
-		  char *file_name)   // file name
+void Error::FileA(const char *class_name, const char *func_name, 
+		  const char *file_name)   // file name
 {
   FILE *fp;
-  char *error_func_name = "FileA";
+  error_func_name = "FileA";
 
-  printf(file_a_str, class_name, func_name, file_name);
+  printf(error_string[file_a], class_name, func_name, file_name);
 
   if( (fp = fopen(error_file_name, "w")) == NULL ) {
-    printf(file_w_str, error_class_name, error_func_name, error_file_name);
-    exit(file_w_exit_value);
+    printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
+    exit(exit_value[file_w]);
   }
-  fprintf(fp, file_a_str, class_name, func_name, file_name);
+  fprintf(fp, error_string[file_a], class_name, func_name, file_name);
   fclose(fp);
 
-  exit(file_a_exit_value);
+  exit(exit_value[file_a]);
 }
 
 
@@ -242,21 +215,21 @@ void Error::FileA(char *class_name, char *func_name,
   \param func_name The name of a function or method.
 */
 //------------------------------------------------------------------
-void Error::NotImplemented(char *class_name, char *func_name) 
+void Error::NotImplemented(const char *class_name, const char *func_name) 
 {
   FILE *fp;
-  char *error_func_name = "NotImplemented";
+  error_func_name = "NotImplemented";
 
-  printf(not_implemented_str, class_name, func_name);
+  printf(error_string[not_implemented], class_name, func_name);
 
   if( (fp = fopen(error_file_name, "w")) == NULL ) {
-    printf(file_w_str, error_class_name, error_func_name, error_file_name);
-    exit(file_w_exit_value);
+    printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
+    exit(exit_value[file_w]);
   }
-  fprintf(fp, not_implemented_str, class_name, func_name);
+  fprintf(fp, error_string[not_implemented], class_name, func_name);
   fclose(fp);
 
-  exit(not_implemented_exit_value);
+  exit(exit_value[not_implemented]);
 }
 
 
@@ -277,28 +250,27 @@ void Error::NotImplemented(char *class_name, char *func_name)
   \todo Why not use vprintf rather than vsprintf followed by printf?      
 */
 //------------------------------------------------------------------
-void Error::NotImplemented(char *class_name, char *func_name,
+void Error::NotImplemented(const char *class_name, const char *func_name,
 			   const char *format,  // format of message
 			   ...)                 // argument list of message
 {
   FILE *fp;
-  char *error_func_name = "NotImplemented";
+  error_func_name = "NotImplemented";
   va_list args;
   va_start(args, format);
 
-  printf(not_implemented_str, class_name, func_name);
-  vsprintf(e_string, format, args);
-  printf("%s",e_string);
+  printf(error_string[not_implemented], class_name, func_name);
+  vprintf(format, args);
 
   if( (fp = fopen(error_file_name, "w")) == NULL ) {
-    printf(file_w_str, error_class_name, error_func_name, error_file_name);
-    exit(file_w_exit_value);
+    printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
+    exit(exit_value[file_w]);
   }
-  fprintf(fp, not_implemented_str, class_name, func_name);
-  fprintf(fp, "%s",e_string);
+  fprintf(fp, error_string[not_implemented], class_name, func_name);
+  vfprintf(fp, format, args);
   fclose(fp);
 
-  exit(not_implemented_exit_value);
+  exit(exit_value[not_implemented]);
 }
         
 
@@ -317,28 +289,27 @@ void Error::NotImplemented(char *class_name, char *func_name,
   \param ... Optional arguments to the format string.
 */
 //------------------------------------------------------------------
-void Error::Hardware(char *class_name, char *func_name,
+void Error::Hardware(const char *class_name, const char *func_name,
 		    const char *format,  // format of message
 		    ...)                 // argument list of message
 {
   FILE *fp;
-  char *error_func_name = "Hardware";
+  error_func_name = "Hardware";
   va_list args;
   va_start(args, format);
 
-  printf(hardware_str, class_name, func_name);
-  vsprintf(e_string, format, args);
-  printf("%s",e_string);
+  printf(error_string[hardware], class_name, func_name);
+  vprintf(format, args);
 
   if( (fp = fopen(error_file_name, "w")) == NULL ) {
-    printf(file_w_str, error_class_name, error_func_name, error_file_name);
-    exit(file_w_exit_value);
+    printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
+    exit(exit_value[file_w]);
   }
-  fprintf(fp, hardware_str, class_name, func_name);
-  fprintf(fp, "%s",e_string);
+  fprintf(fp, error_string[hardware], class_name, func_name);
+  vfprintf(fp, format, args);
   fclose(fp);
 
-  exit(hardware_exit_value);
+  exit(exit_value[hardware]);
 }
 
         
@@ -357,28 +328,27 @@ void Error::Hardware(char *class_name, char *func_name,
   \param ... Optional arguments to the format string.
 */
 //------------------------------------------------------------------
-void Error::General(char *class_name, char *func_name,
+void Error::General(const char *class_name, const char *func_name,
 		    const char *format,  // format of message
 		    ...)                 // argument list of message
 {
   FILE *fp;
-  char *error_func_name = "General";
+  error_func_name = "General";
   va_list args;
   va_start(args, format);
 
-  printf(general_str, class_name, func_name);
-  vsprintf(e_string, format, args);
-  printf("%s",e_string);
+  printf(error_string[general], class_name, func_name);
+  vprintf(format, args);
 
   if( (fp = fopen(error_file_name, "w")) == NULL ) {
-    printf(file_w_str, error_class_name, error_func_name, error_file_name);
-    exit(file_w_exit_value);
+    printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
+    exit(exit_value[file_w]);
   }
-  fprintf(fp, general_str, class_name, func_name);
-  fprintf(fp, "%s",e_string);
+  fprintf(fp, error_string[general], class_name, func_name);
+  vfprintf(fp, format, args);
   fclose(fp);
 
-  exit(general_exit_value);
+  exit(exit_value[general]);
 }
         
 

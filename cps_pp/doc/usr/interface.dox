@@ -1,4 +1,4 @@
-//$Id: interface.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+//$Id: interface.dox,v 1.2 2004-04-30 12:17:59 zs Exp $
 /*!
 
 \page interpage User Interface
@@ -105,10 +105,6 @@ Others define the parameters of the  action and  the boundary conditions.
  - DoArg::t_bc
  .
 These must be assigned a value.
-
-- DoArg::colors This should \e always be set to 3. It is not a real run-time 
-parameter since the the number of colours is hard-wired as 3 elsewhere in the  
-code.
 
 - Gauge action parameter (see \ref gaugeactions)
  - DoArg::beta
@@ -277,31 +273,56 @@ there should be a global instance of the Verbose class called ::VRB.
     Verbose VRB;
 \endverbatim
 
-The default behaviour is to disable all message categories. 
-To enable printing of a message category
-you set the verbosity level with the Verbose::Level(int) method.
-The argument it takes is an integer which should have the value of
+The default behaviour of the Verbose class is to enable  message 
+categories reporting results,
+  function progress, clock output and RNG seed information.
+One way  of
+ enabling printing of a message category is to 
+ set the verbosity level with the Verbose::Level(VerboseLevelType) method.
+The argument it takes should be
 one of the fields in the ::VerboseLevelType enumeration type. This enables 
 the printing of messages with that category and those above it in the 
 hierarchy.
 
-For example, if we want all messages up to memory allocation messages to be 
+For example, if we want messages of all categories up to and
+including memory
+allocation messages to be 
 enabled we can look at the definition of ::VerboseLevelType where we see that 
 ::VERBOSE_SMALLOC_LEVEL is the level that turns on memory allocation messages.
 Then call
 \verbatim
-    VRB.Level((int)VERBOSE_SMALLOC_LEVEL);
+    VRB.Level(VERBOSE_SMALLOC_LEVEL);
 \endverbatim
 This enables all messages of level 3 and below, i.e. memory allocation 
 messages, "results" messages and "warning" messages.
 
 The message level of VRB can be changed in this manner anywhere in the code
 which is useful for enabling more detailed errors in just a specific part of 
-the code.
+the code. 
 
 There is also a way to enable specific message types, rather than "all message
-types up to and including this one" by calling Verbose::Level with a negative
-argument of the form -<level a><level b><level c> where <level \e i>
+types up to and including this one" by calling Verbose::Activate_level
+with an argument of type VerboseLevelType corresponding to the desired
+message type. Similarly, a message category can be switched off by
+calling Verbose::DeactivateLevel. Finally, the
+Verbose::DeactivateAll method switches off all messages.
+
+To see if a type of message is enabled, use the 
+Verbose::IsEnabled(VerboseLevelType) method, which allows one to write, say
+\verbatim
+    if(VRB.IsEnabled(VERBOSE_DEBUG_LEVEL)){
+	
+	// Do lots of stuff that you only want to do for debugging purposes,
+	int i = debug_info_only();
+
+        // then write out the results
+	VRB.Debug("The answer is %d ", i);
+    }
+\endverbatim
+
+Alternatively, a method retained for backwards compatibility allows
+one can do this by calling Verbose::Level with a negative 
+argument of the form \a -level<sub>a</sub>level<sub>b</sub>level<sub>c</sub> where \a level<sub>i</sub> 
 are two-digit numbers (left-padded with zero if necessary) corresponding to 
 the desired message levels.
 
@@ -310,15 +331,11 @@ function argument messages and RNG seed messages. We have to look at the
 definition of ::VerboseLevelType where we see that the message levels we want
 are ::VERBOSE_FUNC_LEVEL, ::VERBOSE_INPUT_LEVEL and ::VERBOSE_RNGSEED_LEVEL.
 These have the numerical values of 4, 6 and 12 respectively. Therefore the 
-argument to VRB::Level should be -040612:
+argument to VRB::Level could be -040612:
 \verbatim
     VRB.Level(-40612);
 \endverbatim
 
-Not only is this an unfriendly interface but since this method relies 
-on knowing the numerical values for the message levels, code using this method
-should be considered unstable with respect to the definition of 
-VerboseLevelType.
 
 \subsection doh Error messages
 
@@ -332,15 +349,21 @@ As described in the \ref glob section,
 there should be a global instance of the Error class called ::ERR.
 
 The methods of the Error class print messages for the following types of 
-error before causing the program to exit.
+error before causing the program to exit:
 
-- A pointer being unexpectedly uninitialised.
-- Failure to open a file for reading
-- Failure to open a file for writing
-- Failure to open a file for appending
-- Calling a method which is only a stub and not fully implemented.
-- Hardware failure
-- Miscellaneous error (\e i.e. anything else)
+- A pointer being unexpectedly uninitialised (-1)
+- Failure to open a file for reading (-2)
+- Failure to open a file for writing (-3)
+- Failure to open a file for appending (-4)
+- Calling a method which is only a stub and not fully implemented (-5)
+- Hardware failure (-6)
+- Miscellaneous error \e i.e. anything else (-7)
+
+The numbers in parentheses are the exit codes.
+
+The error messages are written to \c stdout and to a file called \c
+phys.error.
+
 
 \subsection outputdata Output data
 
@@ -351,15 +374,16 @@ is dumped.
 The data is written to \c stdout if the ::VERBOSE_RESULT_LEVEL of the global 
 Verbose class is enabled (see the \ref message section), \e e.g
 \verbatim
-    VRB.Level((int)VERBOSE_RESULT_LEVEL);
+    VRB.Level(VERBOSE_RESULT_LEVEL);
 \endverbatim
 
-The data can be written to a file using ::results field of the CommonArg 
-structure which is an argument of the algorithm class constructor. For example,
+The data can be written to a file using the CommonArg 
+structure which is an argument of the base algorithm class constructor Alg,
+from which all aglorithm classes inherit. For example,
 to log the data in a file called \c run.log, we could write
 \verbatim
     CommonArg common\_arg;
-    common_arg.results = const_cast<char*>("run.log");
+    common_arg.set_filename("run.log");
 \endverbatim
 
 \section fileformat Filestore interface 

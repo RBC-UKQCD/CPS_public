@@ -1,19 +1,4 @@
 #include<config.h>
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: cwj $
-//  $Date: 2004-04-27 03:51:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_update/main.C,v 1.4 2004-04-27 03:51:23 cwj Exp $
-//  $Id: main.C,v 1.4 2004-04-27 03:51:23 cwj Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: main.C,v $
-//  $Revision: 1.4 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_update/main.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 
 
 #include <stdio.h>
@@ -28,17 +13,20 @@
 #include<alg/hmd_arg.h>
 #include<alg/ghb_arg.h>
 
-CPS_START_NAMESPACE
+namespace cps
+{
 GlobalJobParameter GJP;
 LatRanGen LRG;
 Verbose VRB;
 Error ERR;
-CPS_END_NAMESPACE
+}
 
-USING_NAMESPACE_CPS
+using namespace cps ;
 
 
 int main(int argc,char *argv[]){
+
+    FILE *fp;
 
     //----------------------------------------------------------------
     // Initializes all Global Job Parameters
@@ -69,11 +57,10 @@ int main(int argc,char *argv[]){
     do_arg.t_bc = BND_CND_APRD;
     do_arg.start_conf_kind = START_CONF_ORD;
     do_arg.start_seed_kind = START_SEED_FIXED;
-    do_arg.colors = 3;
     do_arg.beta = 5.5;
     do_arg.dwf_height = 0.9;
     do_arg.clover_coeff = 2.0171;
-    do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
+
 
     
     do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
@@ -91,9 +78,6 @@ int main(int argc,char *argv[]){
 //    do_arg.asqtad_7staple = 0.0;
     
     GJP.Initialize(do_arg);
-
-    VRB.Level(GJP.VerboseLevel());
-
 
     GnoneFasqtad lat;
 
@@ -134,30 +118,24 @@ int main(int argc,char *argv[]){
     
     lat.EvolveMomFforce(mom, X, dummy, dt);
 
-
-    FILE *fp;
-    if( (fp = fopen("update.dat", "a")) == NULL ) 
-	ERR.FileA(" ","main", "info.dat");
-    
-
-    fprintf(fp, " x y z t\n");
+    printf(" x y z t\n");
     
     for(s[3]=0; s[3]<GJP.NodeSites(3); s[3]++) 
 	for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
 	    for(s[1]=0; s[1]<GJP.NodeSites(1); s[1]++)
 		for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
 
-		    fprintf(fp, "\n %d %d %d %d", s[0], s[1], s[2], s[3]);
+		    printf("\n %d %d %d %d", s[0], s[1], s[2], s[3]);
 		    int n = lat.FsiteOffset(s);
 
 		    for(int d=0; d<4; d++){
-			fprintf(fp, "\n         %d\n\n", d);
+			printf("\n         %d\n\n", d);
 			for(int i=0; i<3; i++){
 			    for(int j=0; j<3; j++)
-				fprintf(fp, " (%+7e %+7e)",
+				printf(" (%+7e %+7e)",
 				       (*(mom+4*n+d))(i,j).real(),
 				       (*(mom+4*n+d))(i,j).imag());
-			    fprintf(fp, "\n");
+			    printf("\n");
 			}
 		    }
 		}

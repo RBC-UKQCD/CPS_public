@@ -1,3 +1,7 @@
+/*
+  $Id: main.C,v 1.7 2004-04-30 12:18:01 zs Exp $
+*/
+
 #include<config.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +15,6 @@
 #include<comms/scu.h>
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
-#include<alg/common_arg.h>
 #include<alg/cg_arg.h>
 #include<alg/hmd_arg.h>
 #include<alg/ghb_arg.h>
@@ -93,11 +96,9 @@ int main(int argc,char *argv[]){
     do_arg.start_conf_kind = START_CONF_DISORD;
 
     do_arg.start_seed_kind = START_SEED_FIXED;
-    do_arg.colors = 3;
     do_arg.beta = 5.5;
     do_arg.dwf_height = 0.9;
     do_arg.clover_coeff = 2.0171;
-    do_arg.verbose_level = -1205;
 
     do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
     do_arg.asqtad_naik = -1.0/24.0;
@@ -113,7 +114,7 @@ int main(int argc,char *argv[]){
     cg_arg.max_num_iter = 500;
     GJP.Initialize(do_arg);
 
-    VRB.Level(GJP.VerboseLevel());
+    VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
 #if TARGET == QCDOC
     char filename [200];

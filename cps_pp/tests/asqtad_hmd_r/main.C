@@ -3,18 +3,18 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-02-09 14:30:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
-//  $Id: main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
+//  $Date: 2004-04-30 12:18:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v 1.4 2004-04-30 12:18:00 zs Exp $
+//  $Id: main.C,v 1.4 2004-04-30 12:18:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/asqtad_hmd_r/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-/* Quick Wilson Monte Carlo code, which measures the plaquette on each trajectory. */
+/* Monte Carlo code which measures the plaquette on each trajectory. */
 
 
 
@@ -30,10 +30,14 @@
 #include <alg/aots_s.h>
 
 
-const int nx = 16;
-const int ny = 16;
-const int nz = 8;
-const int nt = 8;
+// const int nx = 16;
+// const int ny = 16;
+// const int nz = 8;
+// const int nt = 8;
+const int nx = 4;
+const int ny = 4;
+const int nz = 4;
+const int nt = 4;
 
 CPS_START_NAMESPACE
 
@@ -61,13 +65,16 @@ int main(int argc,char *argv[])
   setup_do_arg(do_arg); 
   GJP.Initialize(do_arg);
 
-  //----------------------------------------------------------------
-  // Set verbose level
-  //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
+  VRB.DeactivateAll();
+  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+  VRB.ActivateLevel(VERBOSE_CLOCK_LEVEL);
+  
+
   char *cname = "asqtad_hmd_r";
   char *fname = "main";
   VRB.Func(cname,fname);
+
+
 
   //----------------------------------------------------------------
   // Initialize argument structures
@@ -81,7 +88,8 @@ int main(int argc,char *argv[])
   const int no_warmup_sweep = 0 ; 
   const int no_measure_sweep = 1 ; 
   int sweep_counter = 0 ;
-  const int total_measure = 20000 ;
+//  const int total_measure = 20000 ;
+    const int total_measure = 1 ;
   
   //----------------------------------------------------------------
   // Initialize argument structures
@@ -134,7 +142,7 @@ int main(int argc,char *argv[])
         VRB.Flow(cname,fname,"iteration # = %d\n", i);
 
 	//----------------------------------------------------------------
-	// calculate action and write it to file
+	// calculate plaquette and write it to file
 	//----------------------------------------------------------------
 
 	Float sum_plaq0 = lat.SumReTrPlaq();
@@ -145,7 +153,7 @@ int main(int argc,char *argv[])
 
 
 	//------------------------------------------------------------
-	// Run wilson HMC
+	// Run HMC
 	//------------------------------------------------------------
 
 	VRB.Flow(cname,fname,"AlgHmcR starts....\n");
@@ -214,9 +222,8 @@ void setup_do_arg(DoArg& do_arg)
   do_arg.t_bc = BND_CND_PRD;
   do_arg.start_conf_kind = START_CONF_ORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
-  do_arg.colors = 3;
   do_arg.beta = 5.6;
-  do_arg.verbose_level = -1205;
+
   do_arg.xi_bare = 1;
   do_arg.xi_v = 1;
   do_arg.xi_v_xi = 1;
@@ -245,10 +252,13 @@ void setup_hmd_arg(HmdArg& hmd_arg)
   hmd_arg.frm_mass[0] = 0.1;
   hmd_arg.frm_flavors[0] = 2;
   hmd_arg.n_bsn_masses = 0;
-  hmd_arg.max_num_iter[0] = 5000;
-  hmd_arg.stop_rsd[0] = 1.0E-12;
+//  hmd_arg.max_num_iter[0] = 5000;
+    hmd_arg.max_num_iter[0] = 2;
+//  hmd_arg.stop_rsd[0] = 1.0E-12;
+    hmd_arg.stop_rsd[0] = 1.0E-7;
   hmd_arg.step_size = 0.01;
-  hmd_arg.steps_per_traj = 50;
+//  hmd_arg.steps_per_traj = 50;
+    hmd_arg.steps_per_traj = 1;
   hmd_arg.metropolis = METROPOLIS_NO;
   hmd_arg.reunitarize = REUNITARIZE_YES;
 

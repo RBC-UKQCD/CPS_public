@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-02-09 14:30:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.4 2004-02-09 14:30:07 zs Exp $
-//  $Id: main.C,v 1.4 2004-02-09 14:30:07 zs Exp $
+//  $Date: 2004-04-30 12:18:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.5 2004-04-30 12:18:01 zs Exp $
+//  $Id: main.C,v 1.5 2004-04-30 12:18:01 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -70,7 +70,6 @@ int main(int argc,char *argv[])
   do_arg.t_bc = BND_CND_APRD;
   do_arg.start_conf_kind = START_CONF_DISORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
-  do_arg.colors = 3;
   do_arg.beta = 4.8;
   do_arg.c_1 = -0.05;
   do_arg.dwf_height = 0.9;
@@ -78,38 +77,33 @@ int main(int argc,char *argv[])
   do_arg.power_plaq_exponent = 2;
   do_arg.power_rect_cutoff = 0.9;
   do_arg.power_rect_exponent = 4;
-  do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
 
   GJP.Initialize(do_arg);
 
-  //----------------------------------------------------------------
-  // Set verbose level
-  //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
 
   //----------------------------------------------------------------
   // Initialize argument structures
   //----------------------------------------------------------------
   CommonArg common_arg_hmc;
-  common_arg_hmc.results = CAST_AWAY_CONST("hmc.dat");
+  common_arg_hmc.set_filename("hmc.dat");
 
   CommonArg common_arg_plaq;
-  common_arg_plaq.results = CAST_AWAY_CONST("plaq.dat");
+  common_arg_plaq.set_filename("plaq.dat");
 
   CommonArg common_arg_p_plaq;
-  common_arg_p_plaq.results = CAST_AWAY_CONST("p_plaq.dat");
+  common_arg_p_plaq.set_filename("p_plaq.dat");
 
   CommonArg common_arg_rn_plaq;
-  common_arg_rn_plaq.results = CAST_AWAY_CONST("rn_plaq.dat");
+  common_arg_rn_plaq.set_filename("rn_plaq.dat");
 
   CommonArg common_arg_rn_rect;
-  common_arg_rn_rect.results = CAST_AWAY_CONST("rn_rect.dat");
+  common_arg_rn_rect.set_filename("rn_rect.dat");
 
   CommonArg common_arg_pr_plaq;
-  common_arg_pr_plaq.results = CAST_AWAY_CONST("pr_plaq.dat");
+  common_arg_pr_plaq.set_filename("pr_plaq.dat");
 
   CommonArg common_arg_pr_rect;
-  common_arg_pr_rect.results = CAST_AWAY_CONST("pr_rect.dat");
+  common_arg_pr_rect.set_filename("pr_rect.dat");
 
   NoArg plaq_arg;
 

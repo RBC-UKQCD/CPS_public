@@ -1,54 +1,16 @@
-#include<config.h>
+include<config.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:39:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac_init.C,v 1.2 2004-01-13 20:39:37 chulwoo Exp $
-//  $Id: dirac_init.C,v 1.2 2004-01-13 20:39:37 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-04-30 12:18:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac_init.C,v 1.3 2004-04-30 12:18:00 zs Exp $
+//  $Id: dirac_init.C,v 1.3 2004-04-30 12:18:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.1.1.1.10.1  2003/11/06 20:22:21  cwj
-//  *** empty log message ***
-//
-//  Revision 1.1.1.1  2003/11/04 05:05:05  chulwoo
-//
-//  starting again
-//
-//
-//  Revision 1.1.1.1  2003/06/22 13:34:46  mcneile
-//  This is the cleaned up version of the Columbia Physics System.
-//  The directory structure has been changed.
-//  The include paths have been updated.
-//
-//
-//  Revision 1.4  2001/08/16 10:50:20  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:12:44  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:05  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: dirac_init.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac_init.C,v $
 //  $State: Exp $
 //
@@ -86,7 +48,7 @@ CPS_START_NAMESPACE
 /***********************************************************/
 CPS_END_NAMESPACE
 #include<util/dirac_op.h>
-#include<alg/do_arg.h>
+//#include<alg/do_arg.h>
 #include<util/smalloc.h>
 #include<util/gjp.h>
 #include<comms/nga_reg.h>
@@ -168,7 +130,7 @@ static void comm_init(int );
 //------------------------------------------------------------------
 // global variables used by "dirac_serial.asm"
 //------------------------------------------------------------------
-DO_ARG do_arg;
+//DO_ARG do_arg;
 ADDRTAB e_tab;
 ADDRTAB o_tab;
 
@@ -228,14 +190,22 @@ void stag_dirac_init(const void * gauge_field_addr)
   //--------------------------------------------------------------
   // initialize the do_arg object
   //--------------------------------------------------------------
-  do_arg.nxb = GJP.XnodeSites();
-  do_arg.nyb = GJP.YnodeSites();
-  do_arg.nzb = GJP.ZnodeSites();
-  do_arg.ntb = GJP.TnodeSites();
-  do_arg.base_odd = 0;
-  do_arg.u_base_addr = (IFloat *)gauge_field_addr;
+//   do_arg.nxb = GJP.XnodeSites();
+//   do_arg.nyb = GJP.YnodeSites();
+//   do_arg.nzb = GJP.ZnodeSites();
+//   do_arg.ntb = GJP.TnodeSites();
+  nxb = GJP.XnodeSites();
+  nyb = GJP.YnodeSites();
+  nzb = GJP.ZnodeSites();
+  ntb = GJP.TnodeSites();
+  
+//   do_arg.base_odd = 0;
+  base_odd = 0;
+//  do_arg.u_base_addr = (IFloat *)gauge_field_addr;
+  int u_base_addr = (IFloat *)gauge_field_addr;
 
-  int n_sites2 = (do_arg.nxb*do_arg.nyb*do_arg.nzb*do_arg.ntb)/2;
+//  int n_sites2 = (do_arg.nxb*do_arg.nyb*do_arg.nzb*do_arg.ntb)/2;
+    int n_sites2 = (nxb*nyb*nzb*ntb)/2;
   n_even_sites = n_sites2;
   n_odd_sites = n_sites2;
 
@@ -244,11 +214,12 @@ void stag_dirac_init(const void * gauge_field_addr)
   //--------------------------------------------------------------
   // Dong's stuff
   //--------------------------------------------------------------
-  nxb = do_arg.nxb;
-  nyb = do_arg.nyb;
-  nzb = do_arg.nzb;
-  ntb = do_arg.ntb;
-  if (do_arg.base_odd)
+//   nxb = do_arg.nxb;
+//   nyb = do_arg.nyb;
+//   nzb = do_arg.nzb;
+//   ntb = do_arg.ntb;
+//  if (do_arg.base_odd)
+  if (base_odd)  
     {
     base_even = 0;
     base_odd = 1;
@@ -769,8 +740,12 @@ void comm_init(int base_odd_flag)
  * This following part is general, independent of the size of the
  * lattice
  */
-  nxb = do_arg.nxb;	nyb = do_arg.nyb;
-  nzb = do_arg.nzb;	ntb = do_arg.ntb;
+//   nxb = do_arg.nxb;	nyb = do_arg.nyb;
+//   nzb = do_arg.nzb;	ntb = do_arg.ntb;
+  nxb = GJP.XnodeSites();
+  nyb = GJP.YnodeSites();
+  nzb = GJP.ZnodeSites();
+  ntb = GJP.TnodeSites();
   if ( base_odd_flag ) 
     {	base_even = 0;	base_odd = 1;	}
   else

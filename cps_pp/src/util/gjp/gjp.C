@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.5 2003-10-31 14:15:33 zs Exp $
+  $Id: gjp.C,v 1.6 2004-04-30 12:18:00 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-10-31 14:15:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.5 2003-10-31 14:15:33 zs Exp $
-//  $Id: gjp.C,v 1.5 2003-10-31 14:15:33 zs Exp $
+//  $Date: 2004-04-30 12:18:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.6 2004-04-30 12:18:00 zs Exp $
+//  $Id: gjp.C,v 1.6 2004-04-30 12:18:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -48,21 +48,18 @@ CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <util/vector.h>
-#include <util/verbose.h>
 #include <util/error.h>
 #include <alg/do_arg.h>
 #include <mem/p2v.h>
 CPS_START_NAMESPACE
 
-#ifdef PARALLEL
 CPS_END_NAMESPACE
-#include <comms/sysfunc.h>
+// #ifdef PARALLEL
+// #include <comms/sysfunc.h>
+// #else
+// #include <time.h>
+// #endif
 CPS_START_NAMESPACE
-#else
-CPS_END_NAMESPACE
-#include <time.h>
-CPS_START_NAMESPACE
-#endif
 
 #ifdef PARALLEL
 int gjp_local_axis[6] = {0, 0, 0, 0, 1}; 
@@ -151,35 +148,38 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
       z_nodes != 1 &&
       t_nodes != 1 &&
       s_nodes != 1 ) {
-    ERR.General(cname,fname,
-    "At least one of x_nodes, y_nodes, ... must be = 1, instead = %d, %d, %d, %d, %d\n",
-    x_nodes, y_nodes, z_nodes, t_nodes, s_nodes);
+      ERR.General(cname,fname,
+		  "The processor grid must be of dimension 1 in at least one direction, but your grid is (X, Y, Z, T, S) = (%d, %d, %d, %d, %d).\n",
+		  x_nodes, y_nodes, z_nodes, t_nodes, s_nodes);
   }
+  
 
   // Check and set s_axis
   //-----------------------------------------------------------------
 #ifdef PARALLEL
   if(s_nodes != 1) {
-    s_axis = rda.s_axis;
-    if(s_axis != SCU_X &&
-       s_axis != SCU_Y &&
-       s_axis != SCU_Z &&
-       s_axis != SCU_T ){
-      ERR.General(cname, fname, "s_axis = %d but it should be one of SCU_*\n",
-		  s_axis);
-    }
-    if(s_axis == SCU_X && x_nodes != 1) {
-      ERR. General(cname, fname, "s_axis = SCU_X but x_nodes is not 1\n");
-    }
-    if(s_axis == SCU_Y && y_nodes != 1) {
-      ERR. General(cname, fname, "s_axis = SCU_Y but y_nodes is not 1\n");
-    }
-    if(s_axis == SCU_Z && z_nodes != 1) {
-      ERR. General(cname, fname, "s_axis = SCU_Z but z_nodes is not 1\n");
-    }
-    if(s_axis == SCU_T && t_nodes != 1) {
-      ERR. General(cname, fname, "s_axis = SCU_T but t_nodes is not 1\n");
-    }
+      s_axis = rda.s_axis;
+      if(s_axis != SCU_X &&
+	 s_axis != SCU_Y &&
+	 s_axis != SCU_Z &&
+	 s_axis != SCU_T )
+	  ERR.General(cname, fname,
+		      "Illegal direction %d for the parallel S axis. Set DoArg::s_axis to one of 0, 1, 2 or 3.\n",
+		      s_axis);
+
+      if(s_axis == SCU_X && x_nodes != 1)
+	  ERR. General(cname, fname, "You cannot chosen %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the X axis too (DoArg::x_nodes = %d).\n", s_axis, x_nodes);
+      
+      if(s_axis == SCU_Y && y_nodes != 1) 
+	  ERR. General(cname, fname, "You cannot chosen %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the Y axis too (DoArg::y_nodes = %d).\n", s_axis, y_nodes);
+      
+      if(s_axis == SCU_Z && z_nodes != 1) 
+	  ERR. General(cname, fname, "You cannot chosen %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the Z axis too (DoArg::z_nodes = %d).\n", s_axis, y_nodes);
+      
+      if(s_axis == SCU_T && t_nodes != 1) 
+	  ERR. General(cname, fname, "You cannot chosen %d as the direction for the parallel S axis (DoArg::s_axis = %d) AND parallelise along the T axis too (DoArg::t_nodes = %d).\n", s_axis, t_nodes);
+
+      
   }
 #endif
 
@@ -203,31 +203,32 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
     if (s_axis == SCU_T) size_s = SizeT();
   } 
 #endif
-  if( (size_x % x_nodes) !=0 || x_nodes == 0 ) {
-    ERR.General(cname,fname,
-    "Illegal machine partition, X_physical_nodes = %d, X_partition_nodes = %d\n",
-		size_x, x_nodes);
-  }
-  if( (size_y % y_nodes) !=0 || y_nodes == 0 ) {
-    ERR.General(cname,fname,
-    "Illegal machine partition, Y_physical_nodes = %d, Y_partition_nodes = %d\n",
-		size_y, y_nodes);
-  }
-  if( (size_z % z_nodes) !=0 || z_nodes == 0 ) {
-    ERR.General(cname,fname,
-    "Illegal machine partition, Z_physical_nodes = %d, Z_partition_nodes = %d\n",
-		size_z, z_nodes);
-  }
-  if( (size_t % t_nodes) !=0 || t_nodes == 0 ) {
-    ERR.General(cname,fname,
-    "Illegal machine partition, T_physical_nodes = %d, T_partition_nodes = %d\n",
-		size_t, t_nodes);
-  }
-  if( (size_s % s_nodes) !=0 || s_nodes == 0 ) {
-    ERR.General(cname,fname,
-    "Illegal machine partition, S_physical_nodes = %d, S_partition_nodes = %d\n",
-		size_s, s_nodes);
-  }
+
+  if( x_nodes == 0 || size_x%x_nodes != 0) 
+      ERR.General(cname,fname,	
+		  "Illegal machine partition in X direction; physical grid size = %d must be a multiple of DoArg::x_nodes = %d\n",
+		  size_x, x_nodes );
+  
+  if( y_nodes == 0 || size_y%y_nodes != 0) 
+      ERR.General(cname,fname,
+		  "Illegal machine partition in Y direction; physical grid size = %d must be a multiple of DoArg::y_nodes = %d\n",
+		  size_y, y_nodes);	
+  
+  if( z_nodes == 0 || size_z%z_nodes != 0) 
+       ERR.General(cname,fname,
+		  "Illegal machine partition in Z direction; physical grid size = %d must be a multiple of DoArg::z_nodes = %d\n",
+		   size_z, z_nodes);
+
+  if( t_nodes == 0 || size_t%t_nodes != 0) 
+      ERR.General(cname,fname,
+		  "Illegal machine partition in T direction; physical grid size = %d must be a multiple of DoArg::t_nodes = %d\n",
+		  size_t, t_nodes);
+  
+  if( s_nodes == 0 || size_s%s_nodes != 0) 
+      ERR.General(cname,fname,
+		  "Illegal machine partition in S direction; physical grid size = %d must be a multiple of DoArg::s_nodes = %d\n",
+		  size_s, s_nodes);
+  
 
   // Set the volume values
   //----------------------------------------------------------------
@@ -364,50 +365,12 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
 
   // Set the initial seed value
   //----------------------------------------------------------------
-  int seed_st = SERIAL_SEED;
-  int seed_s;
-#ifdef PARALLEL
-  seed_s = SeedS();
-#else
-  seed_s = int (time(NULL));
-#endif
 
-  // Calculate the lexicographical coordinate of the "physical" node
-  // as given by the qos.
-  int lex_qos;
-#ifdef PARALLEL
-  lex_qos  = CoorX();
-  lex_qos += CoorY() * SizeX();
-  lex_qos += CoorZ() * SizeX() * SizeY();
-  lex_qos += CoorT() * SizeX() * SizeY() * SizeZ();
-#else
-  lex_qos  = 0;
-#endif
-
-  // Set initial seed according to start_seed_kind
-  if(  (start_seed_kind == START_SEED_FIXED)
-     ||(start_seed_kind == START_SEED_FIXED_UNIFORM) ) {
-    start_seed_value = seed_st;
-  }
-  else if(  (start_seed_kind == START_SEED)
-         || (start_seed_kind == START_SEED_UNIFORM) ) {
-    start_seed_value = seed_s;
-  }
-  else if(  (start_seed_kind == START_SEED_INPUT)
-         || (start_seed_kind == START_SEED_INPUT_UNIFORM) ) {
-    start_seed_value = rda.start_seed_value;
-  }
-  else if(start_seed_kind == START_SEED_INPUT_NODE) {
-    start_seed_value = rda.start_seed_value + 23 * lex_qos;
-  }
-  else{
-    ERR.General(cname,fname,"Unknown StartSeedType %d\n",
-                int(start_seed_kind));
-  }
-
-  // Set number of colors.
-  //----------------------------------------------------------------
-  colors = rda.colors;
+  if(start_seed_kind == START_SEED_INPUT ||
+     start_seed_kind == START_SEED_INPUT_UNIFORM ||
+     start_seed_kind == START_SEED_INPUT_NODE) 
+      start_seed_value = rda.start_seed_value;
+  
 
   // Set beta.
   //----------------------------------------------------------------
@@ -475,10 +438,6 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   // Set the power rectangle exponent.
   //----------------------------------------------------------------
   power_rect_exponent = rda.power_rect_exponent;
-
-  // Set verbose level.
-  //----------------------------------------------------------------
-  verbose_level = rda.verbose_level;
 
 
   // Set the asqtad improved  staggered fermion action parameters.

@@ -3,50 +3,26 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: random.C,v 1.3 2004-04-30 12:18:00 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: random.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2004-04-30 12:18:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.3 2004-04-30 12:18:00 zs Exp $
+//  $Id: random.C,v 1.3 2004-04-30 12:18:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.4  2001/08/16 10:50:38  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:13:35  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:10  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: random.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//  random.C
+
 //---------------------------------------------------------------
-//  This is the routine from Numerical Recipes in C PP.283 ran3
+//  This is the routine ran3 from Numerical Recipes in C 
 //---------------------------------------------------------------
 
 CPS_END_NAMESPACE
@@ -54,43 +30,33 @@ CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/error.h>
 #include <comms/glb.h>
+#ifdef PARALLEL
+#include <comms/sysfunc.h>
+#else
+#include <time.h>
+#endif
 CPS_START_NAMESPACE
-
-
-// Static variables
-int LatRanGen::n_rgen;
-int LatRanGen::rgen_pos;
-int LatRanGen::can[4];
-int LatRanGen::hx[4];
-int LatRanGen::is_initialized = 0;
-UGrandomGenerator *LatRanGen::ugran;
-
-
-
-const int MBIG  = 1000000000;
-const int MSEED = 161803398;
-const int MZ    = 0;
 
 
 
 /*!
-  This method must be called before the RNG is used (so why is it not called
-  by the constructor?)
+  This method must be called before the RNG is used
   \param idum The seed.	
  */
 void RandomGenerator::Reset(int idum)
 {
     int i, k, ii;
     int mk, mj;
- 
 
+    const int MSEED = 161803398;
+    
     //-----------------------------------------------------
-    //  Initialize ma[55] using the seed idum and the large
+    //  Initialize ma[state_size] using the seed idum and the large
     //  number MSEED.
     //-----------------------------------------------------
     mj = MSEED - (idum<0 ? -idum : idum);
     mj %= MBIG;
-    if(mj < MZ) mj = -mj; // Added by Roy and Pavlos to protect
+    if(mj < 0) mj = -mj; // Added by Roy and Pavlos to protect
                           // for the case where idum > MSEED
     ma[54] = mj;
 
@@ -101,19 +67,19 @@ void RandomGenerator::Reset(int idum)
     //  random.
     //-----------------------------------------------------
     mk = 1;
-    for( i = 1; i < 55; i++) {
-        ii = (21*i)%55 - 1;
+    for( i = 1; i < state_size; i++) {
+        ii = (21*i)%state_size - 1;
         ma[ii] = mk ;
         mk = mj - mk ;
-        if ( mk < MZ ) mk += MBIG ;
+        if ( mk < 0 ) mk += MBIG ;
         mj = ma[ii] ;
     }
 
     // Randomize them by "warming up the generator"
     for( k = 0; k < 4; k++) {
-        for( i = 0; i < 55; i++) {
-	    ma[i] -= ma[(i+31)%55] ;
-	    if ( ma[i] < MZ ) ma[i] += MBIG ;
+        for( i = 0; i < state_size; i++) {
+	    ma[i] -= ma[(i+31)%state_size] ;
+	    if ( ma[i] < 0 ) ma[i] += MBIG ;
         }
     }
 
@@ -129,37 +95,38 @@ void RandomGenerator::Reset(int idum)
 
 
 //---------------------------------------------------------------
+
 /*!
   \param to Pointer to a buffer of size at least 57*sizeof(int).
-  \post \a to is left pointing to an address 57*sizeof(int) after its
-  initial value.
 */
 
-void RandomGenerator::StoreSeeds(unsigned *to)
+void RandomGenerator::StoreSeeds(unsigned *to) const
 {
     *to++ = (unsigned )inext;
     *to++ = (unsigned )inextp;
-    for(int i = 0; i < 55; ++i) {
-        *to++ = ma[i];
-    }
+    for(int i = 0; i < 55; ++i) *to++ = ma[i];
 }
 
 /*!
   \param from Pointer to a buffer of size at least 57*sizeof(int).
-  \post \a from is left pointing to an address 57*sizeof(int) after its
-  initial value.
 */
 
-void RandomGenerator::RestoreSeeds(unsigned *from)
+void RandomGenerator::RestoreSeeds(const unsigned *from)
 {
     inext = *from++;
     inextp = *from++;
 
-    for(int i = 0; i < 55; ++i) {
-        ma[i] = *from++;
-    }
+    for(int i = 0; i < 55; ++i) ma[i] = *from++;
 }
 
+/*!
+  \return The number of unsigned ints that comprise the RNG state vector.
+*/
+int RandomGenerator::StateSize() const {
+
+    return state_size+2;
+
+}
 
 //--------------------------------------------------------
 IFloat UGrandomGenerator::Rand()
@@ -172,107 +139,149 @@ IFloat UGrandomGenerator::Rand()
 //---------------------------------------------------------
 LatRanGen::LatRanGen()
 {
-  Initialize();
+    cname = "LatRanGen";
+    is_initialized = 0;
 }
 
+LatRanGen::~LatRanGen() {
+	delete[] ugran;
+}
+
+/*! Seeds the RNGs according to the method defined in GJP */  
 //---------------------------------------------------------
 void LatRanGen::Initialize()
 {
-  if(is_initialized == 1) {
-    return;
-  }
+  if(is_initialized == 1) return;
 
-  VRB.Func("LatRanGen", "Initialize()");
+  const char *fname = "Initialize";
+  VRB.Func(cname, fname);
 
+  if(0!=GJP.VolNodeSites()%16)
+      ERR.General(cname, fname,
+		  "Must have a multiple of 2^4 lattice sites per node.");
+  
   n_rgen = GJP.VolNodeSites() / 16;
-  if(n_rgen == 0) {
-    return;
-  }
+
+  
 
   is_initialized = 1;
 
-  ugran = 0;
   ugran = new UGrandomGenerator[n_rgen];
-  if(ugran == 0) {
-    ERR.Pointer("LatRanGen","Initialize()", "ugran");
-    VRB.Pmalloc("LatRanGen", "Initialize()",  "ugran", ugran,
-                                        sizeof(UGrandomGenerator)*n_rgen);
-  }
+  if(!ugran) ERR.Pointer(cname, fname, "ugran"); 
 
+  // Lower bounds of global lattice coordinates on this node
   int x_o[4];
   x_o[0] = GJP.XnodeCoor() * GJP.XnodeSites();
   x_o[1] = GJP.YnodeCoor() * GJP.YnodeSites();
   x_o[2] = GJP.ZnodeCoor() * GJP.ZnodeSites();
   x_o[3] = GJP.TnodeCoor() * GJP.TnodeSites();
 
+  // Upper bounds of global lattice coordinates on this node
   int x_f[4];
   x_f[0] = x_o[0] + GJP.XnodeSites() - 1;
   x_f[1] = x_o[1] + GJP.YnodeSites() - 1;
   x_f[2] = x_o[2] + GJP.ZnodeSites() - 1;
   x_f[3] = x_o[3] + GJP.TnodeSites() - 1;
 
-  hx[0] = (GJP.XnodeSites() / 2);
-  hx[1] = (GJP.YnodeSites() / 2);
-  hx[2] = (GJP.ZnodeSites() / 2);
-  hx[3] = (GJP.TnodeSites() / 2);
+  hx[0] = GJP.XnodeSites() / 2;
+  hx[1] = GJP.YnodeSites() / 2;
+  hx[2] = GJP.ZnodeSites() / 2;
+  hx[3] = GJP.TnodeSites() / 2;
 
   can[0] = 2;
   can[1] = can[0] * GJP.XnodeSites();
   can[2] = can[1] * GJP.YnodeSites();
   can[3] = can[2] * GJP.ZnodeSites();
 
-  int index = 0;
-  int x[4], vx[3];
+  int vx[3];
   vx[0] = hx[0] * GJP.Xnodes();
   vx[1] = hx[1] * GJP.Ynodes();
   vx[2] = hx[2] * GJP.Znodes();
 
-  int start_seed;
-  int base_seed = GJP.StartSeedValue();
-  for(x[3] = x_o[3]; x[3] <= x_f[3]; x[3]+=2) {
-    for(x[2] = x_o[2]; x[2] <= x_f[2]; x[2]+=2) {
-      for(x[1] = x_o[1]; x[1] <= x_f[1]; x[1]+=2) {
-        for(x[0] = x_o[0]; x[0] <= x_f[0]; x[0]+=2) {
-          if( (GJP.StartSeedKind() == START_SEED_FIXED_UNIFORM) ||
-              (GJP.StartSeedKind() == START_SEED_UNIFORM)       ||
-              (GJP.StartSeedKind() == START_SEED_INPUT_UNIFORM)) {
-            start_seed = base_seed;
-          }
-          else if((GJP.StartSeedKind() == START_SEED_FIXED) ||
-                  (GJP.StartSeedKind() == START_SEED)       ||
-                  (GJP.StartSeedKind() == START_SEED_INPUT) ) {
-            start_seed = base_seed + 23 * (int(x[0]/2) + vx[0]*(int(x[1]/2) +
-                 vx[1]*(int(x[2]/2) + vx[2]*(int(x[3]/2)))) );
-          }
-          else if(GJP.StartSeedKind() == START_SEED_INPUT_NODE) {
-            start_seed = base_seed;
-            // This option will not create platform independent results
-          }
-          ugran[index++].Reset(start_seed);
-        }
-      }
-    }
+
+  // Sort out what the seed should be depending on the GJP.StartSeedKind()
+
+  int start_seed, base_seed;
+
+  if(GJP.StartSeedKind()==START_SEED_INPUT_UNIFORM||
+     GJP.StartSeedKind()==START_SEED_INPUT_NODE||
+     GJP.StartSeedKind()==START_SEED_INPUT)
+      base_seed = GJP.StartSeedValue();
+
+  else if(GJP.StartSeedKind()==START_SEED_UNIFORM||
+	  GJP.StartSeedKind()==START_SEED)
+#ifdef PARALLEL
+      base_seed = SeedS();
+#else
+      base_seed = int (time(NULL));
+#endif
+
+  else if(GJP.StartSeedKind()==START_SEED_FIXED_UNIFORM||
+	  GJP.StartSeedKind()==START_SEED_FIXED)
+      base_seed = default_seed;
+
+  else
+      ERR.General(cname, fname,"Unknown StartSeedType %d\n",
+		  int(GJP.StartSeedKind()));
+    
+#ifdef PARALLEL
+  if(GJP.StartSeedKind()==START_SEED_INPUT_NODE){
+      int node  = GJP.XnodeCoor()
+	  + GJP.YnodeCoor() * GJP.Xnodes()
+	  + GJP.ZnodeCoor() * GJP.Xnodes() * GJP.Ynodes()
+	  + GJP.TnodeCoor() * GJP.Xnodes() * GJP.Ynodes() * GJP.Znodes();
+      base_seed = base_seed + 23 * node;
   }
+#endif
+
+  // Seed the hypercube RNGs
+
+  int x[4];
+  int index = 0;
+  
+  for(x[3] = x_o[3]; x[3] <= x_f[3]; x[3]+=2) {
+      for(x[2] = x_o[2]; x[2] <= x_f[2]; x[2]+=2) {
+	  for(x[1] = x_o[1]; x[1] <= x_f[1]; x[1]+=2) {
+	      for(x[0] = x_o[0]; x[0] <= x_f[0]; x[0]+=2) {
+
+		  start_seed = base_seed;
+		  
+		  if(GJP.StartSeedKind()==START_SEED||
+		     GJP.StartSeedKind()==START_SEED_INPUT||
+		     GJP.StartSeedKind()==START_SEED_FIXED)
+		      start_seed = base_seed
+			  + 23 * (x[0]/2 + vx[0]*
+				  (x[1]/2 + vx[1]*
+				   (x[2]/2 + vx[2]*(x[3]/2))) );
+		      
+		  ugran[index++].Reset(start_seed);
+		  
+	      }
+	  }
+      }
+  }
+  
+
 }
 
 //---------------------------------------------------------
 /*!
-  \return A uniform random number from the previously assigned hypercube RNG.
+  \pre A RNG must be assigned using ::AssignGenerator.
+  \return A uniform random number for this  hypercube.
 */
 //----------------------------------------------------------------------
-IFloat LatRanGen
-::Urand(void)
+IFloat LatRanGen::Urand()
 {
   return ugran[rgen_pos].Urand();
 }
 
 //---------------------------------------------------------
 /*!
-  \return A gaussian random number from the previously assigned hypercube RNG.
+  \pre A RNG must be assigned using ::AssignGenerator.
+  \return A gaussian random number for this hypercube.
 */
 //----------------------------------------------------------------------
-IFloat LatRanGen
-::Grand(void)
+IFloat LatRanGen::Grand()
 {
   return ugran[rgen_pos].Grand();
 }
@@ -285,12 +294,10 @@ IFloat LatRanGen
   \param lower the lower bound of the distribution range
 */
 //----------------------------------------------------------------------
-void LatRanGen
-::SetInterval(IFloat high, IFloat low)
+void LatRanGen::SetInterval(IFloat high, IFloat low)
 {
-  for(int i=0; i<n_rgen; i++) {
-    ugran[i].SetInterval(high, low);
-  }
+  for(int i=0; i<n_rgen; i++) ugran[i].SetInterval(high, low);
+  
 }
 
 //---------------------------------------------------------
@@ -299,12 +306,9 @@ void LatRanGen
   \param sigma the variance of the gaussian distribution.
 */
 //----------------------------------------------------------------------
-void LatRanGen
-::SetSigma(IFloat sigma)
+void LatRanGen::SetSigma(IFloat sigma)
 {
-  for(int i=0; i<n_rgen; i++) {
-    ugran[i].SetSigma(sigma);
-  }
+  for(int i=0; i<n_rgen; i++) ugran[i].SetSigma(sigma);
 }
 
 //---------------------------------------------------------
@@ -319,8 +323,7 @@ void LatRanGen
   particular hypercubic RNG.  
  */
 //----------------------------------------------------------------------
-void LatRanGen
-::AssignGenerator(int x, int y, int z, int t)
+void LatRanGen::AssignGenerator(int x, int y, int z, int t)
 {
   x = x % GJP.XnodeSites();
   y = y % GJP.YnodeSites();
@@ -339,21 +342,14 @@ void LatRanGen
 /*!
   For a given lattice site, this identifies and
   assigns the corresponding hypercube RNG.
-  \param x Array holding the lattice site coordinates.
+  \param x Array holding the lattice site coordinates in order X, Y, Z, T.
   \post  Subsequent calls to \e e.g. Urand will return results from this
   particular hypercubic RNG.
 */
 //----------------------------------------------------------------------
-void LatRanGen
-::AssignGenerator(int * x)
+void LatRanGen::AssignGenerator(const int * x)
 {
-  x[0] = x[0] % GJP.XnodeSites();
-  x[1] = x[1] % GJP.YnodeSites();
-  x[2] = x[2] % GJP.ZnodeSites();
-  x[3] = x[3] % GJP.TnodeSites();
-
-  rgen_pos = int(x[0]/2) + hx[0] * (int(x[1]/2) + hx[1] * (
-                int(x[2]/2) + hx[2] * int(x[3]/2)));
+    AssignGenerator(x[0], x[1], x[2], x[3]);
 }
 
 //---------------------------------------------------------
@@ -365,8 +361,7 @@ void LatRanGen
   particular hypercubic RNG.
 */
 //----------------------------------------------------------------------
-void LatRanGen
-::AssignGenerator(int i)
+void LatRanGen ::AssignGenerator(int i)
 {
   int x = (i/can[0]) % hx[0];
   int y = (i/can[1]) % hx[1];
@@ -385,20 +380,83 @@ void LatRanGen
 // performing a global sum over all 2^4 hypercubes, and taking the
 // average value
 //--------------------------------------------------------------
-IFloat LatRanGen
-::Lrand(void)
+IFloat LatRanGen::Lrand()
 {
   Float cntr = 0.0;
-  for(int i = 0; i < n_rgen; i++) {
-    cntr+= (Float) ugran[i].Urand();
-  }
+  for(int i = 0; i < n_rgen; i++) cntr += (Float) ugran[i].Urand();
+  
   Float divisor = (Float) (n_rgen*GJP.Xnodes()*GJP.Ynodes()*GJP.Znodes()
-                                        *GJP.Tnodes());
+			   *GJP.Tnodes());
   cntr/=divisor;
   glb_sum(&cntr);
-  IFloat result = (IFloat) cntr;
-  return result;
+  return  (IFloat) cntr;
+
 }
 
+
+/*!
+  \return The number of unsigned ints that comprise the RNG state vector.
+*/
+int LatRanGen::StateSize() const{
+
+    return ugran[0].StateSize();    
+    
+}
+
+/*!
+  \pre A RNG must be assigned using ::AssignGenerator.
+  \a state must point to an array of unsigned ints (at least) as long
+  as the value returned by ::StateSize.
+
+  \param state The state to be copied from the RNG.
+*/
+void LatRanGen::GetState(unsigned *state) const{
+
+    ugran[rgen_pos].StoreSeeds(state);        
+    
+}
+
+/*!
+  \pre A RNG must be assigned using ::AssignGenerator.
+  \pre \a s must be an array with length given by ::StateSize.
+  \param s The state to assigned to the RNG on an assigned site.
+*/
+void LatRanGen::SetState(const unsigned* s){
+
+    ugran[rgen_pos].RestoreSeeds(s);
+
+}
+
+/*!
+  \return The total number of RNG states on the local lattice.
+*/
+int LatRanGen::NStates() const{
+
+    return n_rgen;
+
+}
+
+/*!
+  \pre \a s must point to a 2-d array with lengths given by ::NStates and 
+  ::StateSize.
+  \param s The state to assigned to the RNGs on the entire local lattice.
+*/
+void LatRanGen::SetStates(unsigned **s){
+
+    for(int h=0; h<n_rgen; h++) ugran[h].RestoreSeeds(s[h]);
+
+}
+	
+/*!
+
+  \pre \a s must point to a 2-d array with lengths given by ::NStates and
+  ::StateSize.
+  \param s The state to be copied from the RNGs on the entire local lattice. 
+*/
+void LatRanGen::GetStates(unsigned **s) const{
+
+    for(int h=0; h<n_rgen; h++) ugran[h].StoreSeeds(s[h]);
+
+}
 
 CPS_END_NAMESPACE

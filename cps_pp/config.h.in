@@ -1,26 +1,21 @@
 /*!\file
   \brief   Global options for compiling the Colombia code:
 
-  Generated automatically from config.h.in by configure procedure.
-
-  $Id: config.h.in,v 1.8 2004-02-06 12:16:21 zs Exp $
+  @configure_input@
+  $Id: config.h.in,v 1.9 2004-04-30 12:17:59 zs Exp $
 */
-/* Global options for compiling the Colombia code:  
- * @configure_input@
- * 
- *    Currently, this fine copes with two different build environments,
- *       on QCDSP or not on QCDSP, as determined by a flag.
+/* 
  *--------------------------------------------------------------------
  *  CVS keywords
  *
  *  $Author: zs $
- *  $Date: 2004-02-06 12:16:21 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.8 2004-02-06 12:16:21 zs Exp $
- *  $Id: config.h.in,v 1.8 2004-02-06 12:16:21 zs Exp $
+ *  $Date: 2004-04-30 12:17:59 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.9 2004-04-30 12:17:59 zs Exp $
+ *  $Id: config.h.in,v 1.9 2004-04-30 12:17:59 zs Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.8 $
+ *  $Revision: 1.9 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -123,14 +118,4 @@
 
 #endif /* END of TARGET_ */
 
-/* ------------------------------------------------------------------*/
-/* Other overall definitions:   */
-/* ------------------------------------------------------------------*/
-
-#define SERIAL_SEED 112319
-
-/*! Default value for the verbosity level (see the Verbose class for details).*/
-#define DEFAULT_VERBOSE_LEVEL -12100502
-
 #endif /* INCLUDED_CONFIG_H_ */
-

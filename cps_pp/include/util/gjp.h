@@ -3,59 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.7 2004-01-13 20:38:56 chulwoo Exp $
+  $Id: gjp.h,v 1.8 2004-04-30 12:17:59 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-01-13 20:38:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.7 2004-01-13 20:38:56 chulwoo Exp $
-//  $Id: gjp.h,v 1.7 2004-01-13 20:38:56 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-04-30 12:17:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.8 2004-04-30 12:17:59 zs Exp $
+//  $Id: gjp.h,v 1.8 2004-04-30 12:17:59 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.6.2.1.2.1  2003/11/13 08:05:56  cwj
-//  *** empty log message ***
-//
-//  Revision 1.6.2.1  2003/11/05 16:13:21  mike
-//  Initial attempt at producing working branch
-//
-//  Revision 1.2  2003/10/21 17:53:07  chulwoo
-//  added asqtad_KS
-//  changes for stagerred and asqtad action
-//
-//  Revision 1.3.6.1  2003/08/29 15:56:31  zs
-//  First draft of the asqtad fermion force stuff - it compiles at least!
-//
-//  Revision 1.3  2003/08/12 16:22:51  zs
-//  Added Asqtad action parameters.
-//
-//  Revision 1.3  2001/07/03 17:01:02  anj
-//
-//  Multiple minor alterations to change some #include's from referring to
-//  files relative to the top-level source directory to referring to files
-//  relative to the source-file positions.  This alteration makes the code
-//  backwards compatable with the make structure of QCDSP, although this
-//  may have to be changed to a more usual form in the future. Anj.
-//
-//  Revision 1.2  2001/06/19 18:13:17  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:09  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //
@@ -199,8 +159,6 @@ class GlobalJobParameter
                           // is START_SEED_INPUT_UNIFORM
                           // Derived from do_arg.start_seed_value.
 
-  int colors;       // The number of colors.
-
   Float beta;       // The pure gauge action "beta"
 
   Float c_1 ;       // Related to the coefficient of the rectangle
@@ -225,11 +183,6 @@ class GlobalJobParameter
      // plaquete term in the pure gauge action
      // implemented by the GpowerPlaq class.
 
-  int verbose_level;  
-     // verbose_level = 0   : No output
-     // verbose_level = 1   : ...
-     // ???
-     // verbose_level = 100 : Full output
 
 
   //------------------------------------------------------------------
@@ -289,7 +242,7 @@ public:
   /*!\defgroup gjp_get_methods Methods that return the value of a global variable
     @{ */
 
-  int NodeSites(int dir){ return (&x_node_sites)[dir]; }
+  int NodeSites(int dir) const { return (&x_node_sites)[dir]; }
   //!< Gets the dimension of the local lattice in a given direction.
   /*!<
     \param dir The direction in which to obtain the local lattice
@@ -309,35 +262,35 @@ public:
     //parameter is a variable. This tweak requires the least modification
     //of the original code. 
 
-  int XnodeSites(void)
+  int XnodeSites() const
       {return x_node_sites;}
   //!< Gets the dimension of the local lattice in the X direction.
   /*!<
     \return The size of the local lattice in the X direction.
   */
 
-  int YnodeSites(void)
+  int YnodeSites() const
       {return y_node_sites;}
   //!< Gets the dimension of the local lattice in the Y direction.  
   /*!<
     \return The size of the local lattice in the Y direction.
   */
 
-  int ZnodeSites(void)
+  int ZnodeSites() const
       {return z_node_sites;}
   //!< Gets the dimension of the local lattice in the Z direction.
   /*!<
     \return The size of the local lattice in the Z direction.
   */
 
-  int TnodeSites(void)
+  int TnodeSites() const
       {return t_node_sites;}
   //!< Gets the dimension of the local lattice in the T direction.
   /*!<
     \return The size of the local lattice in the T direction.
   */
 
-  int SnodeSites(void)
+  int SnodeSites() const
       {return s_node_sites;}
   //!< Gets the dimension of the local lattice in the 5th direction.
   /*!<
@@ -345,7 +298,7 @@ public:
     \return The size of the local lattice in the 5th direction.
   */
 
-  int Nodes(int dir){ return (&x_nodes)[dir];}
+  int Nodes(int dir) const { return (&x_nodes)[dir];}
   //!<Gets the dimension of the processor grid in a given direction.
   /*!<
     \param dir The direction in which to obtain the node grid
@@ -356,35 +309,35 @@ public:
 
      // refer to the comments of NodeSites(int dir) above
 
-  int Xnodes(void)
+  int Xnodes() const
       {return x_nodes;}
   //!< Gets the dimension of the node grid in the X direction.  
   /*!<
     \return The size of the grid in the X direction.
   */
 
-  int Ynodes(void)
+  int Ynodes() const
       {return y_nodes;}
   //!< Gets the dimension of the node grid in the Y direction.  
   /*!<
     \return The size of the grid in the Y direction.
   */
 
-  int Znodes(void)
+  int Znodes() const
       {return z_nodes;}
   //!< Gets the dimension of the node grid in the Z direction.  
   /*!<
     \return The size of the grid in the Z direction.
   */
 
-  int Tnodes(void)
+  int Tnodes() const
       {return t_nodes;}
   //!< Gets the dimension of the node grid in the T direction.  
   /*!<
     \return The size of the grid in the T direction.
   */
 
-  int Snodes(void)
+  int Snodes() const
       {return s_nodes;}
   //!< Gets the dimension of the node grid in the 5th direction.  
   /*!<
@@ -393,14 +346,14 @@ public:
   */
 
 #ifdef PARALLEL
-  SCUAxis Saxis(void)
+  SCUAxis Saxis()
   {return s_axis;}
      // Returns the value of s_axis =
      // the machine axis on which the 5th direction axis is  
      // mapped. Relevant to DWF with s_nodes different than 1.
 #endif
 
-  int VolNodeSites(void)
+  int VolNodeSites() const
       {return vol_node_sites;}
   //!< Gets the local lattice volume.
   /*!<
@@ -410,7 +363,7 @@ public:
     \return The number of lattice sites on the node.
    */
 
-  int VolSites(void)
+  int VolSites() const
       {return vol_sites;}
   //!< Gets the global lattice volume.
   /*!<
@@ -430,35 +383,35 @@ public:
   */    
   // refer to the comments of NodeSites(int dir) above
 
-  int XnodeCoor(void)
+  int XnodeCoor() const
       {return x_node_coor;}
   //!< Gets this nodes X direction grid coordinate.
   /*!<
     \return The grid coordinate of this node in the X direction.
   */
 
-  int YnodeCoor(void)
+  int YnodeCoor() const
       {return y_node_coor;}
   //!< Gets this nodes Y direction grid coordinate.
   /*!<
     \return The grid coordinate of this node in the Y direction.
   */
 
-  int ZnodeCoor(void)
+  int ZnodeCoor() const
       {return z_node_coor;}
   //!< Gets this nodes Z direction grid coordinate.
   /*!<
     \return The grid coordinate of this node in the Z direction.
   */
 
-  int TnodeCoor(void)
+  int TnodeCoor() const
       {return t_node_coor;}
   //!< Gets this nodes T direction grid coordinate.
   /*!<
     \return The grid coordinate of this node in the T direction.
   */
 
-  int SnodeCoor(void)
+  int SnodeCoor()
       {return s_node_coor;}
   //!< Gets this nodes 5th direction grid coordinate.
   /*!<
@@ -466,7 +419,8 @@ public:
     \return The grid coordinate of this node in the 5th direction.
   */
 
-  BndCndType Bc(int dir){ return (&x_bc)[dir];}
+  BndCndType Bc(int dir) const
+      { return (&x_bc)[dir];}
   //!< Gets the global lattice boundary condition in a given direction.
   /*!< 
     \param dir The direction in which to obtain the boundary 
@@ -475,14 +429,14 @@ public:
   */
   // refer to the comments of NodeSites(int dir) above
   
-  BndCndType Xbc(void)
+  BndCndType Xbc() const
       {return x_bc;}
   //!< Gets the global lattice boundary condition in the X direction.
   /*!<
     \return The type of global boundary condition along the X axis.
   */
 
-  BndCndType Ybc(void)
+  BndCndType Ybc() const
       {return y_bc;}
   //!< Gets the global lattice boundary condition in the Y direction.
   /*!<
@@ -490,21 +444,22 @@ public:
   */
 
   
-  BndCndType Zbc(void)
+  BndCndType Zbc() const
       {return z_bc;}
   //!< Gets the global lattice boundary condition in the Z direction.
   /*!<
     \return The type of global boundary condition along the Z axis.
   */
 
-  BndCndType Tbc(void)
+  BndCndType Tbc() const
       {return t_bc;}
   //!< Gets the global lattice boundary condition in the T direction.
   /*!<
     \return The type of global boundary condition along the T axis.
   */
 
-  BndCndType NodeBc(int dir) { return (&x_node_bc)[dir];}
+  BndCndType NodeBc(int dir) const
+      { return (&x_node_bc)[dir];}
   //!< Gets the local lattice boundary condition in a given direction.
   /*!< 
     \param dir The direction in which to obtain the local boundary 
@@ -513,42 +468,42 @@ public:
   */
   // refer to the comments of NodeSites(int dir) above
 
-  BndCndType XnodeBc(void)
+  BndCndType XnodeBc() const
       {return x_node_bc;}
   //!< Gets the local lattice boundary condition in the X direction.
   /*!<
     \return The type of local boundary condition along the X axis.
   */
     
-  BndCndType YnodeBc(void)
+  BndCndType YnodeBc() const
       {return y_node_bc;}
   //!< Gets the local lattice boundary condition in the Y direction.
   /*!<
     \return The type of local boundary condition along the Y axis.
   */
     
-  BndCndType ZnodeBc(void)
+  BndCndType ZnodeBc() const
       {return z_node_bc;}
   //!< Gets the local lattice boundary condition in the Z direction.
   /*!<
     \return The type of local boundary condition along the Z axis.
   */
     
-  BndCndType TnodeBc(void)
+  BndCndType TnodeBc() const
       {return t_node_bc;}
   //!< Gets the local lattice boundary condition in the T direction.
   /*!<
     \return The type of local boundary condition along the T axis.
   */
 
-  StartConfType StartConfKind(void)
+  StartConfType StartConfKind() const
       {return start_conf_kind;}
   //!< Gets the type of initial  gauge configuration.
   /*!<
     \return The type of initial gauge configuration.
   */    
 
-  Matrix *StartConfLoadAddr(void)
+  Matrix *StartConfLoadAddr() const
       {return start_conf_load_addr;}
   //!< Gets the initial configuration.
   /*!<
@@ -556,36 +511,35 @@ public:
     if the gauge field starting type is \c START_CONF_MEM, 0 otherwise.
   */
 
-  StartSeedType StartSeedKind(void)
+  StartSeedType StartSeedKind() const
       {return start_seed_kind;}
   //!< Gets the type of the initial RNG seed.
   /*!<
     \return The type of the initial RNG seed.
   */
 
-  int StartSeedValue(void)
+  int StartSeedValue() const
       {return start_seed_value;}
   //!< Gets the value of the starting seed.
   /*!<
     \return The value of the starting seed.
    */
   
-
-  int Colors(void)
-      {return colors;}
+  int Colors() const {return 3;} 
   //!< Gets the number of colours.
   /*!<
     \return The number of colours.
   */
 
-  Float Beta(void)
+
+  Float Beta() const
       {return beta;}
   //!< Gets the "beta" parameter in the pure gauge action.
   
   /*!
     \return The coefficient of the plaquette term in the pure gauge action. .
   */
-  Float C1(void)
+  Float C1() const
       {return c_1;}
   //!< Gets c_1, the coefficient of the rectangle term in the pure gauge action.
   /*!<
@@ -596,7 +550,7 @@ public:
     \return The coefficient of the rectangle term in the pure gauge action.
    */  
 
-  Float u0(void)
+  Float u0() const
       {return u_0;}
   //!< Gets the tadpole coefficient (the mean link).
   /*
@@ -604,7 +558,7 @@ public:
   */
 
 
-  Float DwfHeight(void)
+  Float DwfHeight() const
       {return dwf_height;}
   //!< Gets the height of the domain wall.
   /*!<
@@ -612,7 +566,7 @@ public:
     \return The height of the domain wall.
   */
 
-  Float DwfA5Inv(void)
+  Float DwfA5Inv() const
       {return dwf_a5_inv;}
   //!< Gets the inverse of the 5th direction lattice spacing.
   /*!<
@@ -629,14 +583,14 @@ public:
   // xi as a prefix  indicates relevancy to anisotropic lattices.
   // xi as a postfix indicates relevancy to the special anisotropic direction.
 
-  Float XiBare()             {return xi_bare;}
+  Float XiBare() const            {return xi_bare;}
   //!< Gets the bare lattice anisotropy.
   /*!<
     The anisotropy is 1 for an isotropic lattice.
     \return The bare anisotropy,
    */
 
-  int   XiDir()              {return xi_dir;}
+  int   XiDir()       const       {return xi_dir;}
   //!< Gets the anisotropic direction.
   /*!<
     This will be one of 0, 1, 2 or 3 corresponding to the X, Y, Z and
@@ -644,21 +598,21 @@ public:
     \return The anisotropic direction.
   */
  
-  Float XiV()                {return xi_v;}
+  Float XiV() const               {return xi_v;}
   //!< Gets the  bare speed of light.
   /*!<
     This is 1 for an isotropic lattice.
     \return The bare velocity of light.
   */
  
-  Float XiVXi()              {return xi_v_xi;}
+  Float XiVXi()    const          {return xi_v_xi;}
   //!<  Gets the bare speed of light in the anisotropic direction.
   /*
     This is 1 for an isotropic lattice.
     \return the bare speed of light  in the anisotropic direction.
   */
   
-  Float CloverCoeff()        {return clover_coeff;}
+  Float CloverCoeff()   const     {return clover_coeff;}
   //!< Gets the clover coefficient.
   /*!<
     The coefficient of the clover term in the Sheikoleslami-Wohlert improved
@@ -667,7 +621,7 @@ public:
     \return The clover coefficient.
   */
  
-  Float CloverCoeffXi()      {return clover_coeff_xi;}
+  Float CloverCoeffXi() const     {return clover_coeff_xi;}
   //!< Gets the anisotropic clover coefficient.
   /*!<
     The coefficient of the clover term with links in the anisotropic
@@ -675,7 +629,7 @@ public:
     \return The anisotropic clover coefficient.
   */
 
-  Float XiGfix()             {return xi_gfix;}
+  Float XiGfix() const            {return xi_gfix;}
   //!< Gets the Landau gauge coefficient
   /*!<
     The coefficient for fixing to the Landau gauge on anisotropic
@@ -690,43 +644,45 @@ public:
   // The following two parameters are relevant to scu transfer frequency
   // and hardware global sum.
 
-  int GsumFastMode()         {return gsum_fast_mode;}
+  int GsumFastMode() const        {return gsum_fast_mode;}
   // Returns the selection of scu frequency. 
   // 0[by default] for 25MHz. 50MHz otherwise.
 
-  int GsumMaxTry()           {return gsum_max_try;}
+  int GsumMaxTry() const          {return gsum_max_try;}
   // Returns max num of tries of global sum, 2 by default.
 
-  Float PowerPlaqCutoff(void)
+  Float PowerPlaqCutoff() const
       {return power_plaq_cutoff;}
   //!< Gets the cut-off parameter of the power plaquette term in the pure gauge action.
   /*!< 
     \return The cut-off parameter.
   */
 
-  int PowerPlaqExponent(void)
-      {return power_plaq_exponent;}
+  int PowerPlaqExponent() const
+      {return power_plaq_exponent;} 
   //!< Gets the exponent of the power plaquette term in the pure gauge action.
   /*!<
     \return The exponent.
   */
 
-  int VerboseLevel(void)
-      {return verbose_level;}
+  int VerboseLevel() const {
+      return VRB.Level();
+  } 
   //!< Gets the verbosity level.
   /*!<
+    This is really here just for backwards compatibility.
     See the Verbose class for details.
     \return The verbosity level.
   */
 
-  Float PowerRectCutoff(void)
+  Float PowerRectCutoff() const
       {return power_rect_cutoff;}
   //!< Gets the cut-off parameter of the power rectangle term in the pure gauge action.
   /*!<
     \return The cutoff parameter.
    */
 
-  int PowerRectExponent(void)
+  int PowerRectExponent() const
       {return power_rect_exponent;}
   //!< Gets the exponent of the power rectangle term in the pure gauge action.
   /*!<
@@ -739,37 +695,37 @@ public:
   /*!
     \return The coefficient.
   */
-  Float KS_coeff(){ return asqtad_KS; }
+  Float KS_coeff() const { return asqtad_KS; }
 
   //! Gets the coefficient of the Naik term in the Asqtad improved staggered fermion action.
   /*!
     \return The coefficient.
   */
-  Float Naik_coeff(){ return asqtad_naik; }
+  Float Naik_coeff() const { return asqtad_naik; }
 
   //! Gets the coefficient of the 3-staple term in the Asqtad improved staggered fermion action.
   /*!
     \return The coefficient.
   */
-  Float staple3_coeff(){ return asqtad_3staple; }
+  Float staple3_coeff() const { return asqtad_3staple; }
 
   //! Gets the coefficient of the 5-staple term in the Asqtad improved staggered fermion action.
   /*!
     \return The coefficient.
   */
-  Float staple5_coeff(){ return asqtad_5staple; }
+  Float staple5_coeff() const { return asqtad_5staple; }
 
   //! Gets the coefficient of the 7-staple term in the Asqtad improved staggered fermion action.
   /*!
     \return The coefficient.
   */
-  Float staple7_coeff(){ return asqtad_7staple; }
+  Float staple7_coeff() const { return asqtad_7staple; }
   
   //! Gets the coefficient of the Lepage term in the Asqtad improved staggered fermion action.
   /*!
     \return The coefficient.
   */
-  Float Lepage_coeff(){ return asqtad_lepage; }
+  Float Lepage_coeff() const { return asqtad_lepage; }
 
   
   /*! @} */

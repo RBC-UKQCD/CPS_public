@@ -1,11 +1,11 @@
-//$Id: algo.dox,v 1.1 2003-07-24 17:22:19 zs Exp $
+//$Id: algo.dox,v 1.2 2004-04-30 12:17:59 zs Exp $
 /*!
 
 \page algopage Algorithms in the CPS
 
 \section algo The algorithms in general
 
-The basic building blocks of physics application code are known as 
+The basic building blocks of phmysics application code are known as 
 algorithms in the CPS.
 An algorithm has its own class in the CPS, all of which inherit from a base 
 class Alg.
@@ -61,7 +61,7 @@ considered seperately in the HMC algorithm.
 
 Both algorithms are initialised with the HmdArg structure. Most of the fields
 in this structure are used by both algorithms, but some are relevant to
-just one or the other. Irrelevant parameters are ignored. Some parmeters 
+just one or the other. Irrelevant parameters are ignored. Some parameters 
 have slightly different meanings depending on the algorithm.
 
 The \c run method of each algorithm performs a single trajectory.
@@ -74,7 +74,8 @@ the AlgHmcPhi class has the following attributes:
 - The standard leapfrog integration scheme is used
 - A two-step chronological scheme is used to find the starting vectors for the 
 solves in the molecular dynamics. In the \e n th molcular dynamics step 
-the initial guess for the solution \f$X_n\f$ is \f$ 2X_{n-1}-X_{n-2} \f$
+the initial guess for the solution 
+<it>X<sub>n</sub></it> is <it>2X<sub>n-1</sub>-X<sub>n-2</sub> </it>
 with a random gaussian vector used when a previous solution is unavailable.
 - The algorithm can accomodate any number of doubly/quadrupally degenerate 
 Wilson/staggered dynamical fermion flavours.

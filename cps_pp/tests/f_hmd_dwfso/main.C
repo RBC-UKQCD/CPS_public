@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-02-09 14:30:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd_dwfso/main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
-//  $Id: main.C,v 1.3 2004-02-09 14:30:07 zs Exp $
+//  $Date: 2004-04-30 12:18:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd_dwfso/main.C,v 1.4 2004-04-30 12:18:01 zs Exp $
+//  $Id: main.C,v 1.4 2004-04-30 12:18:01 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd_dwfso/main.C,v $
 //  $State: Exp $
 //
@@ -63,28 +63,21 @@ int main(int argc,char *argv[])
   do_arg.start_conf_kind = START_CONF_ORD;
   do_arg.start_seed_kind = START_SEED_INPUT;
   do_arg.start_seed_value = 1357;
-  do_arg.colors = 3;
   do_arg.beta = 5.8;
   do_arg.dwf_height = 1.65;
-  do_arg.verbose_level = DEFAULT_VERBOSE_LEVEL;
+
 
   GJP.Initialize(do_arg);
-
-
-  //----------------------------------------------------------------
-  // Set verbose level
-  //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
 
 
   //----------------------------------------------------------------
   // Initialize argument structures
   //----------------------------------------------------------------
   CommonArg common_arg_hmd;
-  common_arg_hmd.results = CAST_AWAY_CONST("hmc.dat");
+  common_arg_hmd.set_filename("hmc.dat");
 
   CommonArg common_arg_plaq;
-  common_arg_plaq.results = CAST_AWAY_CONST("plaq.dat");
+  common_arg_plaq.set_filename("plaq.dat");
 
   NoArg plaq_arg;
 

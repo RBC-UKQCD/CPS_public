@@ -4,25 +4,23 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-10-31 14:15:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v 1.2 2003-10-31 14:15:34 zs Exp $
-//  $Id: getseeds.C,v 1.2 2003-10-31 14:15:34 zs Exp $
+//  $Date: 2004-04-30 12:18:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v 1.3 2004-04-30 12:18:01 zs Exp $
+//  $Id: getseeds.C,v 1.3 2004-04-30 12:18:01 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: getseeds.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 CPS_END_NAMESPACE
-#include <stdio.h>
-#include <stdlib.h>	// exit()
-#include<config.h>
 #include<util/lattice.h>
 #include<util/gjp.h>
 #include<util/verbose.h>
 #include<util/error.h>
+#include<util/random.h>
 #include<alg/alg_pbp.h>
 #include<alg/do_arg.h>
 #include<alg/common_arg.h>
@@ -73,18 +71,15 @@ int main(int argc,char *argv[]){
   do_arg.t_bc = BND_CND_APRD;
   do_arg.start_conf_kind = START_CONF_DISORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
-  do_arg.colors = 3;
+
   do_arg.beta = 6.0;
   do_arg.dwf_height = 0.9;
-  do_arg.verbose_level = -100502;
 
   GJP.Initialize(do_arg);
 
 
-  //----------------------------------------------------------------
-  // Set verbose level
-  //----------------------------------------------------------------
-  VRB.Level(GJP.VerboseLevel());
+
+  VRB.Deactivate_level(VERBOSE_RNGSEED_LEVEL);
 
   //----------------------------------------------------------------
   // Get all of the seeds:

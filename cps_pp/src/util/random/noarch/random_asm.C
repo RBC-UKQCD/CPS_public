@@ -3,51 +3,26 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+  $Id: random_asm.C,v 1.3 2004-04-30 12:18:00 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2003-07-24 16:53:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.2 2003-07-24 16:53:54 zs Exp $
-//  $Id: random_asm.C,v 1.2 2003-07-24 16:53:54 zs Exp $
+//  $Date: 2004-04-30 12:18:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.3 2004-04-30 12:18:00 zs Exp $
+//  $Id: random_asm.C,v 1.3 2004-04-30 12:18:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Log: not supported by cvs2svn $
-//  Revision 1.4  2001/08/16 10:50:38  anj
-//  The float->Float changes in the previous version were unworkable on QCDSP.
-//  To allow type-flexibility, all references to "float" have been
-//  replaced with "IFloat".  This can be undone via a typedef for QCDSP
-//  (where Float=rfloat), and on all other machines allows the use of
-//  double or float in all cases (i.e. for both Float and IFloat).  The I
-//  stands for Internal, as in "for internal use only". Anj
-//
-//  Revision 1.2  2001/06/19 18:13:35  anj
-//  Serious ANSIfication.  Plus, degenerate double64.h files removed.
-//  Next version will contain the new nga/include/double64.h.  Also,
-//  Makefile.gnutests has been modified to work properly, propagating the
-//  choice of C++ compiler and flags all the way down the directory tree.
-//  The mpi_scu code has been added under phys/nga, and partially
-//  plumbed in.
-//
-//  Everything has newer dates, due to the way in which this first alteration was handled.
-//
-//  Anj.
-//
-//  Revision 1.2  2001/05/25 06:16:10  cvs
-//  Added CVS keywords to phys_v4_0_0_preCVS
-//
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//  random.C
+
 //---------------------------------------------------------------
-//  This is the routine from Numerical Recipes in C PP.283
-//	ran3
+//  This is the routine ran3 from Numerical Recipes in C 
 //---------------------------------------------------------------
 
 CPS_END_NAMESPACE
@@ -59,15 +34,6 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 
-
-// Constants
-const int   MBIG  = 1000000000;
-const int   MZ    = 0;
-const IFloat FAC   = 1.0e-9;			// 1.0/MBIG
-
-
-
-
 /*!
   \pre ::Reset must have already been called.
   \return A random number from a uniform distribution over (0,1)
@@ -77,10 +43,10 @@ IFloat RandomGenerator::Rand(void)
     //---------------------------------------------------------
     // Start generating random numbers here
     //---------------------------------------------------------
-    if ( ++inext == 55 ) inext = 0 ;
-    if ( ++inextp == 55 ) inextp = 0 ;
+    if ( ++inext == state_size ) inext = 0 ;
+    if ( ++inextp == state_size ) inextp = 0 ;
     int mj = ma[inext] - ma[inextp] ;
-    if ( mj < MZ ) mj += MBIG ;
+    if ( mj < 0 ) mj += MBIG ;
     ma[inext] = mj ;
     return mj*FAC ;
 }
