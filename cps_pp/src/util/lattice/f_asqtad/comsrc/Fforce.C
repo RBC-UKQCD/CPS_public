@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.2 2004-10-27 14:47:46 zs Exp $
+  $Id: Fforce.C,v 1.3 2004-10-29 13:31:34 zs Exp $
 */
 //--------------------------------------------------------------------
 
@@ -48,6 +48,7 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     // The FstagTypes protected pointer f_tmp should contain Dslash frm
 
     moveMem(X_e, frm, size);
+#define DEBUGGING
 #ifdef DEBUGGING
     Vector * f_tmp_save = f_tmp;      // FstagTypes destructor needs this.
     f_tmp = frm+GJP.VolNodeSites()/2; // Debugging only.
@@ -104,7 +105,11 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
 
     // input/output arrays for the parallel transport routines
-    Vector *vin[n_sign*N], *vout[n_sign*N];
+    Vector **vin = (Vector**)smalloc(cname, fname, "vin",
+				     n_sign*N*sizeof(Vector*));
+    Vector **vout = (Vector**)smalloc(cname, fname, "vout",
+				      n_sign*N*sizeof(Vector*));
+
     int dir[n_sign*N];
 	
     int mu[N], nu[N], rho[N], sigma[N];   // Sets of directions
