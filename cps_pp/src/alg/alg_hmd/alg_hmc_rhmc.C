@@ -1,5 +1,26 @@
 #include<config.h>
 CPS_START_NAMESPACE 
+//------------------------------------------------------------------
+/*!\file
+  \brief Definitions of the AlgHmcRHMC methods.
+
+  $Id: alg_hmc_rhmc.C,v 1.11 2004-09-02 17:00:17 zs Exp $
+*/
+//--------------------------------------------------------------------
+/*
+  $Author: zs $
+  $Date: 2004-09-02 17:00:17 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.11 2004-09-02 17:00:17 zs Exp $
+  $Id: alg_hmc_rhmc.C,v 1.11 2004-09-02 17:00:17 zs Exp $
+  $Name: not supported by cvs2svn $
+  $Locker:  $
+  $RCSfile: alg_hmc_rhmc.C,v $
+  $Revision: 1.11 $
+  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
+  $State: Exp $
+*/
+//--------------------------------------------------------------------
+
 
 //------------------------------------------------------------------
 //
@@ -25,8 +46,13 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
-// Constructor
+/*!
+  \param latt The lattice on which the HMC algorithm runs.
+  \param c_arg The common argument structure for all algorithms.
+  \param arg The algorithm parameters.
+ */
 //------------------------------------------------------------------
+
 AlgHmcRHMC::AlgHmcRHMC(Lattice& latt, 
 		     CommonArg *c_arg,
 		     HmdArg *arg) : 
@@ -58,7 +84,13 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt,
 }
 
 //------------------------------------------------------------------
-// Constructor for when dynamical approximations are used
+/*!
+
+  \param latt The lattice on which the HMC algorithm runs.
+  \param c_arg The common argument structure for all algorithms.
+  \param arg The algorithm parameters.
+  \param e_arg ?
+ */
 //------------------------------------------------------------------
 
 AlgHmcRHMC::AlgHmcRHMC(Lattice& latt, CommonArg *c_arg, HmdArg *arg, 
@@ -77,6 +109,9 @@ AlgHmcRHMC::AlgHmcRHMC(Lattice& latt, CommonArg *c_arg, HmdArg *arg,
   eig_arg = e_arg;
 }
 
+/*!
+  Why is this public?
+*/
 void AlgHmcRHMC::init()
 {
   int i,j;
@@ -306,7 +341,22 @@ AlgHmcRHMC::~AlgHmcRHMC() {
 //------------------------------------------------------------------
 //
 // run(): The Rational Hybrid Monte Carlo algorithm.
-//
+/*!
+  \return The probability used in the metropolis step.
+  \post The following results are written to the file specified in the
+  CommonArg structure:
+  -# Number of molecular dynamics steps + 1
+  -# Change in the hamiltonian
+  -# 1/0 if accepted/rejected
+  -# A measure of the change in the gauge field due to reunitarisation
+  -# Another measure of the change in the gauge field due to reunitarisation
+  -# Average number of solver iterations.
+  -# Minimum number of solver iterations.
+  -# Maximum number of solver iterations.
+  -# Average solver residue
+  -# Minimum solver residue
+  -# Maximum solver residue
+*/
 //------------------------------------------------------------------
 Float AlgHmcRHMC::run(void)
 {
@@ -719,7 +769,10 @@ Float AlgHmcRHMC::run(void)
   return acceptance;
 }
 
-// Measure Eigenvalue bounds and regenerate approximation if necessary
+/*!
+  Measures the eigenvalue bounds and regenerates the approximation
+  if necessary.
+*/
 void AlgHmcRHMC::dynamicalApprox()
 {
 

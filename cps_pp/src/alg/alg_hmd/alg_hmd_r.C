@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.12 2004-08-18 11:57:39 zs Exp $
+  $Id: alg_hmd_r.C,v 1.13 2004-09-02 17:00:15 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.12 2004-08-18 11:57:39 zs Exp $
-//  $Id: alg_hmd_r.C,v 1.12 2004-08-18 11:57:39 zs Exp $
+//  $Date: 2004-09-02 17:00:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.13 2004-09-02 17:00:15 zs Exp $
+//  $Id: alg_hmd_r.C,v 1.13 2004-09-02 17:00:15 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //
@@ -208,8 +208,18 @@ AlgHmdR::~AlgHmdR() {
 
 //------------------------------------------------------------------
 /*!
-  \post The results are written to the file specified in the common_arg
-  structure.
+  \post The following results are written to the file specified in
+  the CommonArg structure:
+  -# The number of molecular dynamics steps
+  -# A measure of the change in the gauge field due to reunitarisation
+  -# Another measure of the change in the gauge field due to reunitarisation
+  -# Average number of solver iterations.
+  -# Minimum number of solver iterations.
+  -# Maximum number of solver iterations.
+  -# Average solver residue
+  -# Minimum solver residue
+  -# Maximum solver residue
+  .
 */
 //------------------------------------------------------------------
 Float AlgHmdR::run(void)

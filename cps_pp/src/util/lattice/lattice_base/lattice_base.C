@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.19 2004-08-30 04:36:36 chulwoo Exp $
+  $Id: lattice_base.C,v 1.20 2004-09-02 16:56:26 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-30 04:36:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.19 2004-08-30 04:36:36 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.19 2004-08-30 04:36:36 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-09-02 16:56:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.20 2004-09-02 16:56:26 zs Exp $
+//  $Id: lattice_base.C,v 1.20 2004-09-02 16:56:26 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -1920,14 +1920,13 @@ void Lattice::Reunitarize(Float &dev, Float &max_diff)
 
 
 //------------------------------------------------------------------
-// int MetropolisAccept(Float delta_h):
-// 0 reject, 1 accept. If delta_h < 0 it accepts unconditionally.
 /*!
   \param delta_h The energy difference.
   \param accept The acceptance probability
   \return True (1) if accepted, false (0) otherwise.
 
   If \a delta_h is greater than or equal to 20 the routine always rejects.
+  \post The acceptance probability is written to \a accept.
  */
 //------------------------------------------------------------------
 int Lattice::MetropolisAccept(Float delta_h, Float *accept) 
@@ -2296,6 +2295,9 @@ Float Lattice::MdTimeInc(Float inc_val)
 
 //------------------------------------------------------------------
 //! Returns an array of pointers to the gauge fixed hyperplanes.
+/*!
+  The array are allocated with FixGaugeAllocate.
+*/
 //------------------------------------------------------------------
 Matrix **Lattice::FixGaugePtr(void){
   return fix_gauge_ptr;

@@ -1,28 +1,26 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
+/*!\file
+  \brief Implementation of AlgWline class methods.
+
+  $Id: alg_wline.C,v 1.8 2004-09-02 16:53:12 zs Exp $
+*/
+//--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v 1.7 2004-08-18 11:57:41 zs Exp $
-//  $Id: alg_wline.C,v 1.7 2004-08-18 11:57:41 zs Exp $
+//  $Date: 2004-09-02 16:53:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v 1.8 2004-09-02 16:53:12 zs Exp $
+//  $Id: alg_wline.C,v 1.8 2004-09-02 16:53:12 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_wline.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// alg_wline.C
-//
-// AlgWline is derived from Alg and it measures the average
-// value of the Wilson line for each direction.
-//
-//------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <util/qcdio.h>
@@ -38,7 +36,11 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
-// Constructor 
+/*!
+  \param latt The Lattice object containg the gauge field on which to compute the %Wilson lines.
+  \param c_arg Container for generic parameters. .
+  \param arg Empty parameter container.
+*/
 //------------------------------------------------------------------
 AlgWline::AlgWline(Lattice& latt, 
 	     CommonArg *c_arg,
@@ -46,7 +48,7 @@ AlgWline::AlgWline(Lattice& latt,
 	     Alg(latt, c_arg) 
 {
   cname = "AlgWline";
-  char *fname = "AlgWline(L&,CommonArg*,NoArg*)";
+  const char *fname = "AlgWline";
   VRB.Func(cname,fname);
 
   // Initialize the argument pointer
@@ -62,13 +64,18 @@ AlgWline::AlgWline(Lattice& latt,
 // Destructor
 //------------------------------------------------------------------
 AlgWline::~AlgWline() {
-  char *fname = "~AlgWline()";
+  const char *fname = "~AlgWline";
   VRB.Func(cname,fname);
 }
 
 
 //------------------------------------------------------------------
-//
+/*!
+  The characters of the result for the 3, 6, 8, and 10 representations
+  are calculated.
+  If an output file is specified in the CommonArg argument, then the real
+  and imaginary parts of these are written to it all on one line per direction.
+*/  
 //------------------------------------------------------------------
 void AlgWline::run()
 {
@@ -76,7 +83,7 @@ void AlgWline::run()
     using MPISCU::fprintf;
 #endif
 
-  char *fname = "run()";
+  const char *fname = "run";
   VRB.Func(cname,fname);
 
   // Set the Lattice pointer
@@ -109,7 +116,7 @@ void AlgWline::run()
 
   // Added for anisotropic lattices
   Float norm_factor = 1/GJP.XiBare();
-  // End modification
+
 
   for (int mu=0; mu<4; mu++) {
     VRB.Debug(cname, fname, "Begin Direction = %i\n", mu) ;
@@ -172,16 +179,16 @@ void AlgWline::run()
         wline[2].real(), wline[2].imag(),
         wline[3].real(), wline[3].imag() );
  
-    if(common_arg->results != 0){
+    if(common_arg->filename != 0){
       FILE *fp;
-      if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
-        ERR.FileA(cname,fname, (char *)common_arg->results);
-      }
-      Fprintf(fp, "%e %e %e %e %e %e %e %e\n",
-        wline[0].real(), wline[0].imag(),
-        wline[1].real(), wline[1].imag(),
-        wline[2].real(), wline[2].imag(),
-        wline[3].real(), wline[3].imag() );
+//       if( (fp = Fopen(common_arg->filename, "a")) == NULL ) {
+//         ERR.FileA(cname,fname, (char *)common_arg->filename);
+//       }
+//       Fprintf(fp, "%e %e %e %e %e %e %e %e\n",
+//         wline[0].real(), wline[0].imag(),
+//         wline[1].real(), wline[1].imag(),
+//         wline[2].real(), wline[2].imag(),
+//         wline[3].real(), wline[3].imag() );
       Fclose(fp);
     }
 

@@ -1,19 +1,19 @@
 /*! \file
-  \brief  Definition of ParTransAsqtad class methods.
+  \brief  Functions used by the ParTransAsqtad class.
   
-  $Id: pt.C,v 1.5 2004-08-18 11:58:06 zs Exp $
+  $Id: pt.C,v 1.6 2004-09-02 17:00:05 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.5 2004-08-18 11:58:06 zs Exp $
-//  $Id: pt.C,v 1.5 2004-08-18 11:58:06 zs Exp $
+//  $Date: 2004-09-02 17:00:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.6 2004-09-02 17:00:05 zs Exp $
+//  $Id: pt.C,v 1.6 2004-09-02 17:00:05 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v $
 //  $State: Exp $
 //
@@ -34,7 +34,7 @@ void pt_mat(int N, IFloat **fout, IFloat **fin, const int *dir){
     int s[4], spm[4];
     Matrix ud;
     Matrix *vin[NUM_DIR],*vout[NUM_DIR];
-//    printf("Lat=%p\n",Lat);
+
 
     for(int d=0; d<N; d++){
 	vin[d] = (Matrix *)fin[d];
@@ -116,7 +116,7 @@ void pt_1vec(int N, IFloat **fout, IFloat **fin, const int *dir){
   where the sum is over n_vect vectors and the hop is in a forward direction.
 */
 void pt_vvpd(Vector **vect, int n_vect,
-			  const int *dir, int n_dir, int hop, Matrix **sum){
+	     const int *dir, int n_dir, int hop, Matrix **sum){
   
   int s[4];
   Matrix m;
@@ -167,119 +167,120 @@ void pt_vvpd(Vector **vect, int n_vect,
 
 //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
 void pt_shift_field(Matrix **v, const int *dir, int n_dir,
-				 int hop, Matrix **u){
-
-  int s[4];
-  
-  for(int d=0; d<n_dir; d++){
-    int mu = dir[d];
-    bool backwards = mu%2 ? true : false;
-    mu /= 2;
+		    int hop, Matrix **u){
     
-    if(backwards){
-      for(s[3]=0; s[3]<node_sites[3]; s[3]++)
-	for(s[2]=0; s[2]<node_sites[2]; s[2]++)
-	  for(s[1]=0; s[1]<node_sites[1]; s[1]++)
-	    for(s[0]=0; s[0]<node_sites[0]; s[0]++){
-	      int n = Lat->FsiteOffset(s);
+
+    int s[4];
+  
+    for(int d=0; d<n_dir; d++){
+	int mu = dir[d];
+	bool backwards = mu%2 ? true : false;
+	mu /= 2;
+    
+	if(backwards){
+	    for(s[3]=0; s[3]<node_sites[3]; s[3]++)
+		for(s[2]=0; s[2]<node_sites[2]; s[2]++)
+		    for(s[1]=0; s[1]<node_sites[1]; s[1]++)
+			for(s[0]=0; s[0]<node_sites[0]; s[0]++){
+			    int n = Lat->FsiteOffset(s);
 	      
-	      if(s[mu]-hop<0){
+			    if(s[mu]-hop<0){
 		
-		int save_coord = s[mu];
-		s[mu] -= hop;
-		while(s[mu]<0) s[mu] += node_sites[mu];
-		int np = Lat->FsiteOffset(s);
-		s[mu] = save_coord;
-		getMinusData((IFloat*)&u[d][n], (IFloat*)&v[d][np], MATRIX_SIZE, mu);
+				int save_coord = s[mu];
+				s[mu] -= hop;
+				while(s[mu]<0) s[mu] += node_sites[mu];
+				int np = Lat->FsiteOffset(s);
+				s[mu] = save_coord;
+				getMinusData((IFloat*)&u[d][n], (IFloat*)&v[d][np], MATRIX_SIZE, mu);
 		
-	      }else{
+			    }else{
 		
-		s[mu] -= hop;
-		int np = Lat->FsiteOffset(s);
-		s[mu] += hop;
-		u[d][n] = v[d][np];
+				s[mu] -= hop;
+				int np = Lat->FsiteOffset(s);
+				s[mu] += hop;
+				u[d][n] = v[d][np];
 		
-	      }
-	    }
-    } else {
-      for(s[3]=0; s[3]<node_sites[3]; s[3]++)
-	for(s[2]=0; s[2]<node_sites[2]; s[2]++)
-	  for(s[1]=0; s[1]<node_sites[1]; s[1]++)
-	    for(s[0]=0; s[0]<node_sites[0]; s[0]++){
-	      int n = Lat->FsiteOffset(s);
+			    }
+			}
+	} else {
+	    for(s[3]=0; s[3]<node_sites[3]; s[3]++)
+		for(s[2]=0; s[2]<node_sites[2]; s[2]++)
+		    for(s[1]=0; s[1]<node_sites[1]; s[1]++)
+			for(s[0]=0; s[0]<node_sites[0]; s[0]++){
+			    int n = Lat->FsiteOffset(s);
 	    
-	      if(s[mu]+hop>node_sites[mu]-1){
+			    if(s[mu]+hop>node_sites[mu]-1){
 		
-		int save_coord = s[mu];
-		s[mu] = (s[mu]+hop)%node_sites[mu];
-		int np = Lat->FsiteOffset(s);
-		s[mu] = save_coord;
-		getPlusData((IFloat*)&u[d][n], (IFloat*)&v[d][np], MATRIX_SIZE, mu);
+				int save_coord = s[mu];
+				s[mu] = (s[mu]+hop)%node_sites[mu];
+				int np = Lat->FsiteOffset(s);
+				s[mu] = save_coord;
+				getPlusData((IFloat*)&u[d][n], (IFloat*)&v[d][np], MATRIX_SIZE, mu);
 		
-	      }else{
+			    }else{
 		
-		s[mu] += hop;
-		int np = Lat->FsiteOffset(s);
-		s[mu] -= hop;
-		u[d][n] = v[d][np];
+				s[mu] += hop;
+				int np = Lat->FsiteOffset(s);
+				s[mu] -= hop;
+				u[d][n] = v[d][np];
 		
-	      }
-	    }
+			    }
+			}
+	}
     }
-  }
   
 }
 
 //! u[-/+nu](x) = U_[-/+nu](x) 
 void pt_shift_link(Matrix **u, const int *dir, int n_dir){
 
-  int s[4];
-  Matrix m; 
+    int s[4];
+    Matrix m; 
   
-  for(int d=0; d<n_dir; d++){
-    int nu = dir[d];
-    bool backwards = nu%2 ? true : false;
-    nu /= 2;
+    for(int d=0; d<n_dir; d++){
+	int nu = dir[d];
+	bool backwards = nu%2 ? true : false;
+	nu /= 2;
     
-    if(backwards){
-      for(s[3]=0; s[3]<node_sites[3]; s[3]++)
-	for(s[2]=0; s[2]<node_sites[2]; s[2]++)
-	  for(s[1]=0; s[1]<node_sites[1]; s[1]++)
-	    for(s[0]=0; s[0]<node_sites[0]; s[0]++){	      
-	      if(s[nu]==0){
-		s[nu] = node_sites[nu]-1;
-		getMinusData((IFloat*)&m, 
-			     (IFloat*)(Lat->GaugeField()+ Lat->GsiteOffset(s)+ nu), MATRIX_SIZE, nu);
-		s[nu] = 0;
-	      }else{
-		s[nu]--;
-		m = *(Lat->GaugeField()+Lat->GsiteOffset(s)+nu);
-		s[nu]++;				
-	      }
-	      u[d][Lat->FsiteOffset(s)] = m;
-	    }
-    } else {
+	if(backwards){
+	    for(s[3]=0; s[3]<node_sites[3]; s[3]++)
+		for(s[2]=0; s[2]<node_sites[2]; s[2]++)
+		    for(s[1]=0; s[1]<node_sites[1]; s[1]++)
+			for(s[0]=0; s[0]<node_sites[0]; s[0]++){	      
+			    if(s[nu]==0){
+				s[nu] = node_sites[nu]-1;
+				getMinusData((IFloat*)&m, 
+					     (IFloat*)(Lat->GaugeField()+ Lat->GsiteOffset(s)+ nu), MATRIX_SIZE, nu);
+				s[nu] = 0;
+			    }else{
+				s[nu]--;
+				m = *(Lat->GaugeField()+Lat->GsiteOffset(s)+nu);
+				s[nu]++;				
+			    }
+			    u[d][Lat->FsiteOffset(s)] = m;
+			}
+	} else {
       
-      for(s[3]=0; s[3]<node_sites[3]; s[3]++)
-	for(s[2]=0; s[2]<node_sites[2]; s[2]++)
-	  for(s[1]=0; s[1]<node_sites[1]; s[1]++)
-	    for(s[0]=0; s[0]<node_sites[0]; s[0]++){
-	      m.Dagger(*(Lat->GaugeField()+Lat->GsiteOffset(s)+nu));
-	      u[d][Lat->FsiteOffset(s)] = m;
-	    }
+	    for(s[3]=0; s[3]<node_sites[3]; s[3]++)
+		for(s[2]=0; s[2]<node_sites[2]; s[2]++)
+		    for(s[1]=0; s[1]<node_sites[1]; s[1]++)
+			for(s[0]=0; s[0]<node_sites[0]; s[0]++){
+			    m.Dagger(*(Lat->GaugeField()+Lat->GsiteOffset(s)+nu));
+			    u[d][Lat->FsiteOffset(s)] = m;
+			}
       
+	}
+    
     }
-    
-  }
   
 }
 
-// Private methods used in the QCDOC implementation.
+
 
 void pt_init(Lattice &latt) {
   Lat = &latt;
   vol = GJP.VolNodeSites();
-//  printf("Lat=%p\n",Lat);
+
   node_sites[0] = GJP.XnodeSites();
   node_sites[1] = GJP.YnodeSites();
   node_sites[2] = GJP.ZnodeSites();

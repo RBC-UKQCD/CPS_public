@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.9 2004-08-18 11:58:07 zs Exp $
+  $Id: random_asm.C,v 1.10 2004-09-02 16:57:00 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.9 2004-08-18 11:58:07 zs Exp $
-//  $Id: random_asm.C,v 1.9 2004-08-18 11:58:07 zs Exp $
+//  $Date: 2004-09-02 16:57:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.10 2004-09-02 16:57:00 zs Exp $
+//  $Id: random_asm.C,v 1.10 2004-09-02 16:57:00 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -96,9 +96,19 @@ IFloat UniformRandomGenerator::Rand()
 {
     return A + ((B - A) * RandomGenerator::Rand());
 }
+
+/*!
+  Generates a uniform random number from a distribution determined by
+  the function parameters.
+  \param high The upper distribution bound 
+  \param low The lower distribution bound 
+  \return A random number from a uniform distribution.
+  \note The user must ensure that the lower bound is not greater than the
+  upper bound.
+*/
 IFloat UniformRandomGenerator::Rand(Float high, Float low)
 {
-    return low + ((high - low) * RandomGenerator::Rand());
+    return low + (high - low) * RandomGenerator::Rand();
 }
 
 

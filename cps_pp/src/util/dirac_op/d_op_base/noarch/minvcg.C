@@ -3,7 +3,8 @@
 CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpBase class multishift CG solver method.
-   
+
+   $Id: minvcg.C,v 1.6 2004-09-02 16:53:08 zs Exp $
  */
 
 CPS_END_NAMESPACE
@@ -18,10 +19,32 @@ CPS_END_NAMESPACE
 #include <math.h>
 CPS_START_NAMESPACE
 
-//! Multishift CG invertor used in RHMC.
+/*!
+  Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out}\f$
+  for a given number of shifts,
+  where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+  \param psi The solution vectors
+  \param chi The source vector
+  \param chi_norm The square norm of the source vector
+  \param shift The shifts
+  \param The mass parameters  for each shift
+  \param Nmass The number of shifts
+  \param isz The smallest shift
+  \param RsdCG The target residuals for each shift
+  \param type The type of multimass inverter.
+      If type is ::MULTI, then regular multishift inversion is performed with
+      each solution stored separately.
+      If type is ::SINGLE, then each solution is multiplied by an
+      amount in parameter \a alpha and summed to a single solution vector.
+  \param alpha The contribution of each shifted solution to the total
+  solution vector if \a type is SINGLE.
+
+  \return The number of iterations performed.
+ */
 int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass, 
-		    int Nmass, int isz, Float *RsdCG, MultiShiftSolveType type, 
-		    Float *alpha)
+		    int Nmass, int isz, Float *RsdCG,
+		    MultiShiftSolveType type, Float *alpha)
 {
   char *fname = "MInvCG(V*,V**,...)";
   VRB.Func(cname,fname);

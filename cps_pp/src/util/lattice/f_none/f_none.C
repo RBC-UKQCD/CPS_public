@@ -3,6 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fnone class.
 
+  $Id: f_none.C,v 1.9 2004-09-02 16:59:40 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -196,8 +197,8 @@ int Fnone::FmatInv(Vector *f_out, Vector *f_in,
 //              EigArg *eig_arg, 
 //              CnvFrmType cnv_frm = CNV_FRM_YES):
 //------------------------------------------------------------------
-int Fnone::FeigSolv(Vector **f_eigenv, Float lambda[], 
-		    Float chirality[], int valid_eig[],
+int Fnone::FeigSolv(Vector **f_eigenv, Float *lambda, 
+		    Float *chirality, int *valid_eig,
 		    Float **hsum,
 		    EigArg *eig_arg, 
 		    CnvFrmType cnv_frm)

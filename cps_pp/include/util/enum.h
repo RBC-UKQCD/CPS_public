@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.h,v 1.9 2004-08-18 11:57:37 zs Exp $
+  $Id: enum.h,v 1.10 2004-09-02 16:52:54 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.9 2004-08-18 11:57:37 zs Exp $
-//  $Id: enum.h,v 1.9 2004-08-18 11:57:37 zs Exp $
+//  $Date: 2004-09-02 16:52:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v 1.10 2004-09-02 16:52:54 zs Exp $
+//  $Id: enum.h,v 1.10 2004-09-02 16:52:54 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: enum.h,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/enum.h,v $
 //  $State: Exp $
 //
@@ -81,14 +81,14 @@ enum StrOrdType {
 		   */
     STAG      = 1,  /*!<
 		      This order is used by actions with staggered fermions.
-		      Gauge links are stored in the canonical order, but they 
-		      are multiplied by the staggered phases and the hermitian
-		      conjugate of each link  is stored.
+		      Gauge links are stored in the CANONICAL site order,
+		      but they are multiplied by the staggered phases and
+		      the hermitian conjugate of each link  is stored.
 		      
 		      Fermions are stored in an odd-even order, where lattice
 		      sites are ordered by parity.
 		      The parity of a site with cartesian coordinates
-		      (x, y, z, t) is (-1)<sup>(x+y+z+t)</sup>.
+		      (x, y, z, t) is even(odd) if x+y+z+t is even(odd)
 		      Even parity sites are numbered before odd parity sites.
 
 			On a local lattice of dimensions
@@ -108,22 +108,34 @@ enum StrOrdType {
 		      %Lattice sites for both gauge and fermion fields
 		      are ordered by parity.
 		      The parity of a site with cartesian coordinates
-		      (x, y, z, t) is (-1)<sup>(x+y+z+t)</sup>.
-		      Even parity sites are numbered before odd parity sites.
+		      (x, y, z, t) is even(odd) if x+y+z+t is even(odd)
+
+		      For gauge fields, 
+		      even parity sites are numbered before odd parity sites.
+      
 		      On a local lattice of dimensions
 	      (N<sub>x</sub>, N<sub>y</sub>, N<sub>z</sub>, N<sub>t</sub>)
 		      each site has the index
+		      n = [x-x%2 + N<sub>x</sub> y +
+		      N<sub>x</sub> N<sub>y</sub> z +
+		      N<sub>x</sub> N<sub>y</sub> N<sub>z</sub> t
+     + N<sub>x</sub> N<sub>y</sub> N<sub>z</sub> N<sub>t</sub> ((x+y+z+t)%2)]/2
 
+		      For fermion fields,
+		      odd parity sites are numbered before even parity sites.
+
+		      Each site has the index
 		      n = [x-x%2 + N<sub>x</sub> y +
 		      N<sub>x</sub> N<sub>y</sub> z +
 		      N<sub>x</sub> N<sub>y</sub> N<sub>z</sub> t
      + N<sub>x</sub> N<sub>y</sub> N<sub>z</sub> N<sub>t</sub> ((x+y+z+t+1)%2)]/2
-
-		     <em>i.e</em> the x coordinate runs fastest,
+     
+		     <em>i.e</em> in both cases, the x coordinate runs fastest,
 		     then y, then z and t slowest.
+     
 		    */
     G_WILSON_HB  = 3 /*!< Storage order for the %Wilson gauge action heat bath:
-		       Canonical site ordering but the link direction indices
+		        Site ordering is CANONICAL but the link direction indices  
 		       are 0, 1, 2 or 3  for direction T, X, Y and Z
 		       respectively.
 		       This order is expected by all QncWilsonHb functions.*/

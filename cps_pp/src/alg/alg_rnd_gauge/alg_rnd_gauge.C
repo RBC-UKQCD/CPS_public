@@ -1,6 +1,10 @@
-#include <util/qcdio.h>
+/*!\file
+  \brief Implementation of AlgRandomGauge and AlgRotateGauge methods.
+
+  $Id: alg_rnd_gauge.C,v 1.3 2004-09-02 16:52:48 zs Exp $
+*/
+
 #include <math.h>
-#include <alg/common_arg.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <util/smalloc.h>
@@ -9,32 +13,17 @@
 #include <util/error.h>
 #include <comms/scu.h>
 #include <alg/alg_rnd_gauge.h>
-#include <alg/no_arg.h>
+
 
 CPS_START_NAMESPACE
-
-#define X_LINK 0
-#define Y_LINK 1
-#define Z_LINK 2
-#define T_LINK 3
 
 //====================================
 // change them to produce a paramter
 //====================================
 
-#define NX (GJP.XnodeSites())
-#define NY (GJP.YnodeSites())
-#define NZ (GJP.ZnodeSites())
-#define NT (GJP.TnodeSites())
-#define XSHIFT (GJP.XnodeCoor()*GJP.XnodeSites())
-#define YSHIFT (GJP.YnodeCoor()*GJP.YnodeSites())
-#define ZSHIFT (GJP.ZnodeCoor()*GJP.ZnodeSites())
-#define TSHIFT (GJP.TnodeCoor()*GJP.TnodeSites())
 
-#define IND(x,y,z,t,l) ((((((t+NT)%NT)*NZ+((z+NZ)%NZ))*NY+   \
-			  ((y+NY)%NY))*NX+((x+NX)%NX))*4+l)
 
-inline int index( int x, int y, int z, int t )
+int AlgRandomGauge::index( int x, int y, int z, int t )
 {
   return (
 	  (
@@ -51,9 +40,15 @@ AlgRandomGauge::AlgRandomGauge( Lattice& latt , CommonArg *c_arg )
   :Alg(latt,c_arg),
    theta(1)
 {
-  cname       = "AlgRandomGauge";
-  char *fname = "AlgRandomGauge(Lattice&)";
-  VRB.Func(cname,fname);
+    cname       = "AlgRandomGauge";
+    const char *fname = "AlgRandomGauge";
+    VRB.Func(cname,fname);
+
+    NX = GJP.XnodeSites();
+    NY = GJP.YnodeSites();
+    NZ = GJP.ZnodeSites();
+    NT = GJP.TnodeSites();
+  
 }
 
 
@@ -105,27 +100,24 @@ void AlgRandomGauge::run()
   // The random gauge transformation matrix
   //-------------------------------------------------
   
-  const int nt(NT);
-  const int nx(NX);
-  const int ny(NY);
-  const int nz(NZ);
 
+  LRG.SetInterval(0,3); 
 
-  LRG.SetInterval(0,3);
-
-  for( int t(0); t<nt ; t++ )
+  for( int t(0); t<NT ; t++ )
     {
-      for( int z(0); z<nz ; z++ )
+      for( int z(0); z<NZ ; z++ )
 	{
-	  for( int y(0); y<ny ; y++ )
+	  for( int y(0); y<NY ; y++ )
 	    {
-	      for( int x(0); x<nx ; x++ ) 
+	      for( int x(0); x<NX ; x++ ) 
 		{
 		  //---------------------------------------------
 		  // Generate random gauge transformation
 		  //---------------------------------------------
 		  
 		  Matrix& gmat(lat.FixGaugePtr()[0][ index(x,y,z,t) ]);
+
+		  LRG.AssignGenerator(x, y, z, t);
 		  
 		  const IFloat dum( LRG.Urand()  ); // between 0 and 3
                   
@@ -149,14 +141,83 @@ void AlgRandomGauge::run()
     } //end loop over sites
 }
 
+void AlgRandomGauge::RandMatrix(  Float theta , Matrix& U , int sub )
+{
 
+    const int su2_index[][3]= { {0,1,2},
+				{0,2,1},
+				{1,2,0} };
+    
+  //=========================
+  // calculate random three dimensional unit vector
+  //=========================
+  
+  Float nx( LRG.Urand() );
+  Float ny( LRG.Urand() );
+  Float nz( LRG.Urand() );
+  
+  const Float norm(1.0/sqrt(nx*nx+ny*ny+nz*nz));
+  
+  nx*=norm;
+  ny*=norm;
+  nz*=norm;
+
+  //==========================
+  // set up the elements
+  //==========================
+
+  const Float Cos( cos(theta) );
+  const Float Sin( sin(theta) );
+  const Complex el00( Cos     , -nz*Sin );
+  const Complex el01( -ny*Sin , -nx*Sin );
+  const Complex el10(  ny*Sin , -nx*Sin );
+  const Complex el11( Cos     ,  nz*Sin );
+  
+  //=================
+  // Fill the Matrix
+  //=================
+
+  U.ZeroMatrix();
+  U(su2_index[sub][0],su2_index[sub][0]) = el00;
+  U(su2_index[sub][0],su2_index[sub][1]) = el01;
+  U(su2_index[sub][1],su2_index[sub][0]) = el10;
+  U(su2_index[sub][1],su2_index[sub][1]) = el11;
+  U(su2_index[sub][2],su2_index[sub][2]) = Complex(1,0);
+ 
+}
+
+
+//==================================
+// print out a matrix for debugging
+//==================================
+
+void AlgRandomGauge::printMatrix( const Matrix& x )
+{
+    for (int i=0;i<3;++i)
+	for (int j=0;j<3;++j)
+	    printf("%d %d : %e %e \n",i,j,real(x(i,j)),imag(x(i,j)));
+
+
+}
+
+
+
+
+int AlgRotateGauge::index(int x, int y, int z, int t, int l){
+    return 
+    (((((t+NT)%NT)*NZ+((z+NZ)%NZ))*NY+   
+       ((y+NY)%NY))*NX+((x+NX)%NX))*4+l;
+}
+	
 
 
 //------------------------------------------------------------------
 // Fixes the gauge of the gauge fields using preset gauge fixing
 // matrices
 //------------------------------------------------------------------
-
+/*!
+  \pre Gauge transformation matrices must be present inthe Lattice object.
+*/
 void AlgRotateGauge::run()
 {
   char *fname = "run()";
@@ -190,12 +251,16 @@ void AlgRotateGauge::run()
   // get node parameters
   //---------------------
 
-  int node_sites[4]={ NX , NY , NZ ,NT };
+    NX = GJP.XnodeSites();
+    NY = GJP.YnodeSites();
+    NZ = GJP.ZnodeSites();
+    NT = GJP.TnodeSites();
+
+    int node_sites[4]={ NX , NY , NZ ,NT };
 
   //------------------------------
   // holds the offset to "flatten"  
-  // an array indexed by x,y,z
-  // and t
+  // an array indexed by x,y,z and t
   //=============================
   // m_dir_offset[0]=1;
   // m_dir_offset[1]=NX;
@@ -286,9 +351,9 @@ void AlgRotateGauge::run()
 		      // gauge transform the link
 		      //============================
 
-		      mtmp.DotMEqual( gl, L[IND(x,y,z,t,nu)] );
+		      mtmp.DotMEqual( gl, L[index(x,y,z,t,nu)] );
 		      
-		      M[IND(x,y,z,t,nu)].DotMEqual( mtmp, gr );
+		      M[index(x,y,z,t,nu)].DotMEqual( mtmp, gr );
 
 		    } // end loop over directions
 		} // x
@@ -308,11 +373,11 @@ void AlgRotateGauge::run()
 // link. Knows about node boundaries etc..
 //=============================================================
 Matrix AlgRotateGauge::GetMat( 
-			   Matrix *m_offset, 
+			   const Matrix *m_offset, 
 			   const int *x, 
 			   int nu,
-			   int *node_sites, 
-			   int *m_dir_offset ) 
+			   const int *node_sites, 
+			   const int *m_dir_offset ) 
 {
   static Matrix m_tmp1;
 
@@ -349,68 +414,18 @@ Matrix AlgRotateGauge::GetMat(
 //----------------------------------------------------------------
 
 
-const int su2_index[][3]= { {0,1,2},
-                            {0,2,1},
-                            {1,2,0} };
+/*!
+  Fill one of three su(2) subgroups with
 
+  cos(theta) -i nz sin(theta)  , -(inx+ny)sin(theta)
+  (-inx+ny)sin(theta)          , cos(theta) + i nz sin (theta) ..,
 
-void RandMatrix(  Float theta , Matrix& U , int sub )
-{
-  //=========================
-  // calculate random
-  // three dimensional
-  // unit vector
-  //=========================
+  where n* are the components of a 3d unit vector, and theta
+  is a specified argument.
   
-  Float nx( LRG.Urand() );
-  Float ny( LRG.Urand() );
-  Float nz( LRG.Urand() );
-  
-  const Float norm(1.0/sqrt(nx*nx+ny*ny+nz*nz));
-  
-  nx*=norm;
-  ny*=norm;
-  nz*=norm;
+  other co-ord 1 on diagonal, zero otherwise.
+*/
 
-  //==========================
-  // set up the elements
-  //==========================
-
-  const Float Cos( cos(theta) );
-  const Float Sin( sin(theta) );
-  const Complex el00( Cos     , -nz*Sin );
-  const Complex el01( -ny*Sin , -nx*Sin );
-  const Complex el10(  ny*Sin , -nx*Sin );
-  const Complex el11( Cos     ,  nz*Sin );
-  
-  //=================
-  // Fill the Matrix
-  //=================
-
-  U.ZeroMatrix();
-  U(su2_index[sub][0],su2_index[sub][0]) = el00;
-  U(su2_index[sub][0],su2_index[sub][1]) = el01;
-  U(su2_index[sub][1],su2_index[sub][0]) = el10;
-  U(su2_index[sub][1],su2_index[sub][1]) = el11;
-  U(su2_index[sub][2],su2_index[sub][2]) = Complex(1,0);
- 
-}
-
-
-//==================================
-// print out a matrix for debugging
-//==================================
-
-void printMatrix( const Matrix& x )
-{
-  for (int i=0;i<3;++i)
-    {
-      for (int j=0;j<3;++j)
-	{
-	  printf("%d %d : %e %e \n",i,j,real(x(i,j)),imag(x(i,j)));
-	}
-    }
-}
 
 
 CPS_END_NAMESPACE

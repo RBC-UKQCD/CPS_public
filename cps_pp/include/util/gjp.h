@@ -3,22 +3,21 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.12 2004-08-30 04:30:51 chulwoo Exp $
+  $Id: gjp.h,v 1.13 2004-09-02 16:53:07 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-30 04:30:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.12 2004-08-30 04:30:51 chulwoo Exp $
-//  $Id: gjp.h,v 1.12 2004-08-30 04:30:51 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-09-02 16:53:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.13 2004-09-02 16:53:07 zs Exp $
+//  $Id: gjp.h,v 1.13 2004-09-02 16:53:07 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
-//
 //--------------------------------------------------------------------
 //
 // gjp.h
@@ -95,7 +94,7 @@ extern int gjp_scu_wire_map[];
 //! Maximum filname for START_CONF_FILE.
 const int MAX_FILENAME_LEN = 100;
 
-
+//! Global parameters.
 class GlobalJobParameter
 {
  private:
@@ -245,7 +244,6 @@ public:
 
   ~GlobalJobParameter();
 
-  //! \todo These should be const methods, no?
   /*!\defgroup gjp_get_methods Methods that return the value of a global variable
     @{ */
 

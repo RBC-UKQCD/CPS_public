@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.16 2004-09-01 13:49:32 chulwoo Exp $
+  $Id: random.h,v 1.17 2004-09-02 16:56:58 zs Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-09-01 13:49:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.16 2004-09-01 13:49:32 chulwoo Exp $
-//  $Id: random.h,v 1.16 2004-09-01 13:49:32 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-09-02 16:56:58 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.17 2004-09-02 16:56:58 zs Exp $
+//  $Id: random.h,v 1.17 2004-09-02 16:56:58 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -37,11 +37,12 @@ CPS_START_NAMESPACE
   This uses the Fibonacci RNG routine (ran3) from Numerical Recipes in C
 */
 //---------------------------------------------------------------
-const int MBIG  = 1000000000;
-const IFloat FAC = 1.0E-09;			// 1.0/MBIG
 class RandomGenerator {
   private:
 
+
+    static int MBIG;
+    static IFloat FAC;			// 1.0/MBIG
     static const int state_size = 55;
     int ma[state_size];	// The value 55(range ma[0...54])
     				// is special and should not be
@@ -51,12 +52,9 @@ class RandomGenerator {
     
   public:
 
-    RandomGenerator() {
-//      FAC = 1e-9;
-    }
+    RandomGenerator() {    }
 
     //! Gets a random number 
-//    virtual IFloat Rand();
     IFloat Rand();
 
     //! Seeds the RNG.
@@ -115,10 +113,12 @@ class UniformRandomGenerator: public virtual RandomGenerator
 /*!
   The default range is (-0.5, 0.5).
   \param high_limit the upper bound of the distribution range
-  \param lower_limit the lower bound of the distribution range
+  \param low_limit the lower bound of the distribution range
+  \note The user must ensure that the lower bound is not greater than the
+  upper bound.
 */
     UniformRandomGenerator(IFloat high_limit = 0.5, IFloat low_limit = -0.5):
-//	RandomGenerator(), A(low_limit), B(high_limit) {}
+//	RandomGenerator(), A(low_limit), B(high_limit) {} //what's wrong with this?
 	RandomGenerator() {}
 
 //! Sets the interval over which the uniform distribution is defined.
@@ -126,6 +126,9 @@ class UniformRandomGenerator: public virtual RandomGenerator
   The default range is (-0.5, 0.5).
   \param high_limit the upper bound of the distribution range
   \param lower_limit the lower bound of the distribution range
+  \post This sets the interval for all instances of this class.
+  \note The user must ensure that the lower bound is not greater than the
+  upper bound.
 */
     void SetInterval(IFloat high_limit, IFloat low_limit){
 	A = low_limit;
@@ -197,9 +200,6 @@ public UniformRandomGenerator, public GaussianRandomGenerator
     UGrandomGenerator():
 	UniformRandomGenerator(),
 	GaussianRandomGenerator() {};
-
-    //! This should not be used.
-//    IFloat Rand(); // This will return an error message - not valid option
 
     //! Get a gaussian random number
     IFloat Grand() { return GaussianRandomGenerator::Rand(); }

@@ -1,30 +1,24 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief Definition of WilsonMatrix class and related functions and structs.
+
+  $Id: wilson_matrix.h,v 1.5 2004-09-02 16:58:16 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/wilson_matrix.h,v 1.4 2004-08-18 11:57:36 zs Exp $
-//  $Id: wilson_matrix.h,v 1.4 2004-08-18 11:57:36 zs Exp $
+//  $Date: 2004-09-02 16:58:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/wilson_matrix.h,v 1.5 2004-09-02 16:58:16 zs Exp $
+//  $Id: wilson_matrix.h,v 1.5 2004-09-02 16:58:16 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/wilson_matrix.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// wilson_matrix.h
-//
-// Header file WilsonMatrix class for 
-// Wilson-like quarks.
-//
-// For now this is specific to three colors. The constructor
-// will exit if the number of colors is not equal to three.
-//
-//------------------------------------------------------------------
 
 
 #ifndef INCLUDED_WILSONMATRIX_H
@@ -86,7 +80,8 @@ class WilsonMatrix
 
 };
 
-// some proto-types for functions that operate on WilsonMatrices
+// Prototypes for functions that operate on WilsonMatrix objects
+
 extern WilsonMatrix operator*(const WilsonMatrix& lhs, const WilsonMatrix& rhs);
 	// times operator
 extern WilsonMatrix operator*(const Float& num, const WilsonMatrix& mat);

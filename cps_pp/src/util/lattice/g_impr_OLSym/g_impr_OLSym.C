@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprOLSym class methods.
 
-  $Id: g_impr_OLSym.C,v 1.5 2004-08-30 04:48:21 chulwoo Exp $
+  $Id: g_impr_OLSym.C,v 1.6 2004-09-02 16:57:16 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-08-30 04:48:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.5 2004-08-30 04:48:21 chulwoo Exp $
-//  $Id: g_impr_OLSym.C,v 1.5 2004-08-30 04:48:21 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-09-02 16:57:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.6 2004-09-02 16:57:16 zs Exp $
+//  $Id: g_impr_OLSym.C,v 1.6 2004-09-02 16:57:16 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v $
 //  $State: Exp $
 //
@@ -29,7 +29,6 @@ CPS_START_NAMESPACE
 //-----------------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include <stdlib.h> // exit()
 #include <math.h>
 #include <util/lattice.h>
 #include <util/verbose.h>
@@ -39,6 +38,7 @@ CPS_END_NAMESPACE
 #include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/cbuf.h>
+#include <util/error.h>
 CPS_START_NAMESPACE
 
 //-----------------------------------------------------------------------------
@@ -83,10 +83,8 @@ GimprOLSym::GimprOLSym()
 
   // This action cannot be used with anisotropic lattices
   if(GJP.XiBare()!=1)
-    {
-      VRB.Warn(cname,fname,"Anisotropic version not implemented\n") ;
-      exit(-1) ;
-    }
+      ERR.NotImplemented(cname,fname,"Anisotropic version not implemented\n") ;
+
 
   // See hep-lat/9507010 page 5 eq. 5 through 9
   Float u0(GJP.u0()) ;
@@ -236,7 +234,7 @@ void GimprOLSym::GactionGradient(Matrix &grad, int *x, int mu)
 //    in this case it's 
 //   plaq_staple+rect_coeff*rect_staple+cube_coeff*chair_staple
 /*!
-    The staple sum around the link U_\mu(x) is
+    The staple sum around the link \f$ U_\mu(x) \f$ is
   \f[
 \sum_{\pm \nu, |\nu|\neq \mu} \left\{\right.
   U_\nu(x+\mu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief Declarations of routines used internally in the DiracOpClover class.
 
-  $Id: clover.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+  $Id: clover.h,v 1.5 2004-09-02 16:59:27 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/clover.h,v 1.4 2004-08-18 11:57:37 zs Exp $
-//  $Id: clover.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+//  $Date: 2004-09-02 16:59:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/clover.h,v 1.5 2004-09-02 16:59:27 zs Exp $
+//  $Id: clover.h,v 1.5 2004-09-02 16:59:27 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: clover.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/clover.h,v $
 //  $State: Exp $
 //
@@ -86,9 +86,9 @@ extern "C" void clover_mat_mlt_C(IFloat*, const IFloat*, const IFloat*, int n);
 /*!
   A spinor vector on a single parity is multiplied by the clover matrix.
 
-  \param out The resulting vector
-  \param mat The (lower triangular part of the) clover matrix 
-  \param in The vector to be multiplied
+  \param Y The resulting vector
+  \param A The (lower triangular part of the) clover matrix 
+  \param X The vector to be multiplied
   \param n ?
 */
 //--------------------------------------------------------------------------

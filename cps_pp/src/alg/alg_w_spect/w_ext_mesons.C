@@ -2,7 +2,7 @@
 CPS_START_NAMESPACE
 /*!\file
 
-  $Id: w_ext_mesons.C,v 1.8 2004-08-18 11:57:40 zs Exp $
+  $Id: w_ext_mesons.C,v 1.9 2004-09-02 17:00:00 zs Exp $
 */
 /* class WspectExtendedMesons
  * Thomas and Xiaodong. March 2000.
@@ -504,7 +504,7 @@ const unsigned MYBANK_SIZE=0;
 void
 WspectExtendedMesons::ColorAlgebra(const Float* q1_p, const Float* q2_p, 
 				   int D1x, int D2x, int D1y, int D2y, 
-				   const int lcl[], Complex &result) const
+				   const int lcl[LORENTZs], Complex &result) const
 {
   /*
   // set cbuf registers

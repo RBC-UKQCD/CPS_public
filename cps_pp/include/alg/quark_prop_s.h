@@ -4,12 +4,12 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/quark_prop_s.h,v 1.4 2004-08-18 11:57:36 zs Exp $
-//  $Id: quark_prop_s.h,v 1.4 2004-08-18 11:57:36 zs Exp $
+//  $Date: 2004-09-02 17:00:03 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/quark_prop_s.h,v 1.5 2004-09-02 17:00:03 zs Exp $
+//  $Id: quark_prop_s.h,v 1.5 2004-09-02 17:00:03 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/quark_prop_s.h,v $
 //  $State: Exp $
 //
@@ -104,7 +104,7 @@ public:
    //---------------------------------------------
    // set POINT source for a COLOR
    //---------------------------------------------
-   void setPntSrc(const int site[], int color);		
+   void setPntSrc(const int *site, int color);		
 
    //-----------------------------------------------------------
    // set Z or 2Z sources for a Color on the Wall 

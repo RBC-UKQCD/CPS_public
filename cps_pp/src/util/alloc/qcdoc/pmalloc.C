@@ -1,37 +1,27 @@
 #include<config.h>
-#include<string.h>
-CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of dynamic memory management routines.	
 
-CPS_END_NAMESPACE
-#include <util/pmalloc.h>
+  $Id: pmalloc.C,v 1.6 2004-09-02 16:57:07 zs Exp $
+*/
+
 #include <util/error.h>
 #include <util/verbose.h>
-#include <stdlib.h>
 #include <qcdoc_align.h>
 #include <qalloc.h>
+
 CPS_START_NAMESPACE
 
-//! Allocate memory
-/*!
-  \param request The amount of memory (in bytes) to allocate
-  \return A pointer to the allocated memory
-*/
 void* pmalloc(int request){
-  void* ptr;
-  ptr = qalloc(QCOMMS,request);
-  VRB.Pmalloc("","pmalloc(i)","", ptr, request);
-  if(ptr==NULL)
-	ERR.Pointer("","pmalloc(i)","");
-  return ptr;
+    void* p = qalloc(QCOMMS,request);
+    VRB.Pmalloc("","pmalloc","", p, request);
+    if(!p) ERR.Pointer("","pmalloc","");
+    return p;
 }
 
-//! Free allocate memory
-/*!
-  \param p Pointer to the memory to be freed.
-*/
 void pfree(void* p){
-  VRB.Pfree("","pfree(v*)","",p);
-  qfree((char*) p);
+    VRB.Pfree("","pfree","",p);
+    qfree(p);
 }
 
 void pclear(void){};

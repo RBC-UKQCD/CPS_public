@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  The QCD I/O Interface.
 
-  $Id: qcdio.C,v 1.5 2004-08-18 11:58:07 zs Exp $
+  $Id: qcdio.C,v 1.6 2004-09-02 16:59:24 zs Exp $
 */
 /*  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
    $Author: zs $ 
-   $Date: 2004-08-18 11:58:07 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v 1.5 2004-08-18 11:58:07 zs Exp $
-   $Id: qcdio.C,v 1.5 2004-08-18 11:58:07 zs Exp $
+   $Date: 2004-09-02 16:59:24 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v 1.6 2004-09-02 16:59:24 zs Exp $
+   $Id: qcdio.C,v 1.6 2004-09-02 16:59:24 zs Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.C,v $
-   $Revision: 1.5 $
+   $Revision: 1.6 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v $
    $State: Exp $  */ 
 /*----------------------------------------------------------*/
@@ -176,10 +176,7 @@ static  int qcdio_normalize_the_data = 1;
   // -------------------------------------------------------------------------------
   //! Computes the cross-product of the 1st and 2nd rows in an SU3 matrix
   /*!
-    Computes
-              ( row1 x row2 )* 
-
-    \nThis is a utility routine used by function qload_unpackstrip in
+    This is a utility routine used by function qload_unpackstrip in
     the SU(3) reunitarisation.\n
     This subroutine taken from su3_matrix.cpp by Balint Joo:
               Nicked from GHMC.

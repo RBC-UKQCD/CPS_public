@@ -6,18 +6,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpWilson class methods.
 
-  $Id: d_op_wilson.C,v 1.6 2004-08-18 11:57:51 zs Exp $
+  $Id: d_op_wilson.C,v 1.7 2004-09-02 16:59:22 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v 1.6 2004-08-18 11:57:51 zs Exp $
-//  $Id: d_op_wilson.C,v 1.6 2004-08-18 11:57:51 zs Exp $
+//  $Date: 2004-09-02 16:59:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v 1.7 2004-09-02 16:59:22 zs Exp $
+//  $Id: d_op_wilson.C,v 1.7 2004-09-02 16:59:22 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v $
 //  $State: Exp $
 //
@@ -51,7 +51,7 @@ CPS_START_NAMESPACE
   \param f_field_out A (pointer to) a spin-colour field (optionally). 
   \param f_field_in A (pointer to) a spin-colour field (optionally).
   \param arg Parameters for the solver.
-  \param cnv_frm_flag Whether the lattice fields should be converted to
+  \param convert Whether the lattice fields should be converted to
   to a new storage order appropriate for the type of fermion action.
   If this is ::CNV_FRM_NO, then just the gauge field is converted.
   If this is ::CNV_FRM_YES, then the fields \a f_field_out and \a f_field_in
@@ -63,12 +63,12 @@ DiracOpWilson::DiracOpWilson(Lattice & latt,
 			     Vector *f_field_out,
 			     Vector *f_field_in,
 			     CgArg *arg,
-			     CnvFrmType cnv_frm_flg) :
+			     CnvFrmType convert) :
 			     DiracOpWilsonTypes(latt, 
 						f_field_out,
 						f_field_in, 
 						arg,
-						cnv_frm_flg)
+						convert)
 {
   cname = "DiracOpWilson";
   char *fname = "DiracOpWilson(L&,V*,V*,CgArg*,CnvFrmType)";

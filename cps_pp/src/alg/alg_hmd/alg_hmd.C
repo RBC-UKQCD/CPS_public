@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmd constructor and destructor.
 
-  $Id: alg_hmd.C,v 1.8 2004-08-18 11:57:39 zs Exp $
+  $Id: alg_hmd.C,v 1.9 2004-09-02 17:00:13 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v 1.8 2004-08-18 11:57:39 zs Exp $
-//  $Id: alg_hmd.C,v 1.8 2004-08-18 11:57:39 zs Exp $
+//  $Date: 2004-09-02 17:00:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v 1.9 2004-09-02 17:00:13 zs Exp $
+//  $Id: alg_hmd.C,v 1.9 2004-09-02 17:00:13 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd.C,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -46,6 +46,8 @@ CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
 /*!
+  Allocates memory for all the fields used and copies parameters
+  to internal locations.
   \param latt The lattice on which run the HMD algorithm.
   \param c_arg The common argument structure for all algorithms.
   \param arg The algorithm parameters.
@@ -87,9 +89,11 @@ AlgHmd::AlgHmd(Lattice& latt, CommonArg *c_arg, HmdArg *arg) :
 
 }
 
-//------------------------------------------------------------------
-// Destructor
-//------------------------------------------------------------------
+
+//----------------------------------------------------------------
+/*!  Frees allocated memory.*/
+//----------------------------------------------------------------
+
 AlgHmd::~AlgHmd() {
   char *fname = "~AlgHmd()" ;
   VRB.Func(cname,fname);

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStagTypes class constructor and destructor.
 
-  $Id: d_op_stag_types.C,v 1.5 2004-08-18 11:57:51 zs Exp $
+  $Id: d_op_stag_types.C,v 1.6 2004-09-02 16:59:01 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/d_op_stag_types.C,v 1.5 2004-08-18 11:57:51 zs Exp $
-//  $Id: d_op_stag_types.C,v 1.5 2004-08-18 11:57:51 zs Exp $
+//  $Date: 2004-09-02 16:59:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/d_op_stag_types.C,v 1.6 2004-09-02 16:59:01 zs Exp $
+//  $Id: d_op_stag_types.C,v 1.6 2004-09-02 16:59:01 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_stag_types.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/d_op_stag_types.C,v $
 //  $State: Exp $
 //
@@ -47,7 +47,7 @@ CPS_START_NAMESPACE
   \param f_field_out A (pointer to) a spin-colour field (optionally). 
   \param f_field_in A (pointer to) a spin-colour field (optionally).
   \param arg Parameters for the solver.
-  \param cnv_frm_flag Whether the lattice fields should be converted to
+  \param convert Whether the lattice fields should be converted to
   to a new storage order appropriate for the type of fermion action.
   If this is ::CNV_FRM_NO, then just the gauge field is converted.
   If this is ::CNV_FRM_YES, then the fields \a f_field_out and \a f_field_in
@@ -59,12 +59,12 @@ DiracOpStagTypes::DiracOpStagTypes(Lattice & latt,
 				   Vector *f_field_out,
 				   Vector *f_field_in,
 				   CgArg *arg,
-				   CnvFrmType cnv_frm_flg) :
+				   CnvFrmType convert) :
                                    DiracOp(latt, 
 				           f_field_out,
 				           f_field_in, 
 				           arg,
-				           cnv_frm_flg)
+				           convert)
 {
   cname = "DiracOpStagTypes";
   char *fname = "DiracOpStagTypes(L&,V*,V*,CgArg*,CnvFrmType)";

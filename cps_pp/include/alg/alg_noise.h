@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgNoise class.
 
-  $Id: alg_noise.h,v 1.3 2004-08-18 11:57:35 zs Exp $
+  $Id: alg_noise.h,v 1.4 2004-09-02 16:56:35 zs Exp $
 */
 //------------------------------------------------------------------
 
@@ -13,8 +13,6 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <util/lattice.h>
-#include <util/smalloc.h>
-#include <util/pmalloc.h>
 #include <alg/alg_base.h>
 #include <alg/common_arg.h>
 #include <alg/noise_arg.h>
@@ -37,11 +35,14 @@ class AlgNoise : public Alg
     NoiseArg *alg_noise_arg;
         // The argument structure for the noise algorithm
 
+    Matrix Exponentiate_Matrix( Matrix, int );
+    
  public:
     AlgNoise(Lattice & latt, CommonArg *c_arg, NoiseArg *arg);
 
     virtual ~AlgNoise();
 
+    //! Run the algorithm.
     void run(void);
 };
 

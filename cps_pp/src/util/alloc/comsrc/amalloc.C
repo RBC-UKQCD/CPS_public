@@ -1,8 +1,9 @@
 #include <config.h>
 /*!
-  \file Functions for dynamical array allocation.
+  \file
+  \brief Functions for dynamical array allocation.
 
-  $Id: amalloc.C,v 1.3 2004-08-18 11:57:47 zs Exp $
+  $Id: amalloc.C,v 1.4 2004-09-02 16:59:38 zs Exp $
 */
 #include <util/smalloc.h>
 #include <stdarg.h>

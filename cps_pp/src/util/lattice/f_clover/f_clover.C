@@ -3,18 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fclover class.
 
+  $Id: f_clover.C,v 1.13 2004-09-02 16:59:30 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:03 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.12 2004-08-18 11:58:03 zs Exp $
-//  $Id: f_clover.C,v 1.12 2004-08-18 11:58:03 zs Exp $
+//  $Date: 2004-09-02 16:59:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.13 2004-09-02 16:59:30 zs Exp $
+//  $Id: f_clover.C,v 1.13 2004-09-02 16:59:30 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_clover.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -248,12 +249,12 @@ int Fclover::FmatInv(Vector *f_out, Vector *f_in,
 
 
 //------------------------------------------------------------------
-// int FeigSolv(Vector **f_eigenv, Float *lambda, int valid_eig[],
+// int FeigSolv(Vector **f_eigenv, Float *lambda, int *valid_eig,
 //              EigArg *eig_arg, 
 //              CnvFrmType cnv_frm = CNV_FRM_YES):
 //------------------------------------------------------------------
-int Fclover::FeigSolv(Vector **f_eigenv, Float lambda[],
-		      Float chirality[], int valid_eig[],
+int Fclover::FeigSolv(Vector **f_eigenv, Float *lambda,
+		      Float *chirality, int *valid_eig,
 		      Float **hsum,
 		      EigArg *eig_arg, 
 		      CnvFrmType cnv_frm)

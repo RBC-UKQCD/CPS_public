@@ -1,4 +1,10 @@
 #include <config.h>
+/*!\file
+  \brief Declaration of functions used by the parallel transport classes.
+
+  $Id: pt_int.h,v 1.4 2004-09-02 16:59:06 zs Exp $
+  Why are (at least some of) these not class methods?
+*/
 #include <util/lattice.h>
 CPS_START_NAMESPACE
     void pt_init(Lattice &lat);

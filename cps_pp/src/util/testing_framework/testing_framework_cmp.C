@@ -1,22 +1,17 @@
 //--------------------------------------------------------------------
-//  Comparison testing utilities for the testing framework.
-//
-//
-//
-//  $Id: testing_framework_cmp.C,v 1.5 2004-08-18 11:58:08 zs Exp $
+/*!\file
+  \brief Comparison testing utilities for the testing framework.
+
+  $Id: testing_framework_cmp.C,v 1.6 2004-09-02 16:57:12 zs Exp $
+*/
 //--------------------------------------------------------------------
 
-
-#include <util/qcdio.h>
-#include <stdlib.h>	// exit()
-#include <math.h>
 #include <config.h>
-#include <util/lattice.h>
-#include <util/gjp.h>
+#include <util/data_types.h>
+#include <math.h>
+#include <stdio.h>
 #include <util/verbose.h>
 #include <util/error.h>
-#include <comms/glb.h>
-#include <alg/w_ginfo.h>
 
 CPS_START_NAMESPACE
 
@@ -37,12 +32,25 @@ static inline int almost_zero(Float x)
   return ans ; 
 }
 
+/*!
+  Computes the relative difference between each number in the first array
+  and the corresponding number in the second array. The differences are
+  printed to \c stdout. If all differences are less than a specified
+  tolerance, "test_result = PASS" is printed to \c stdout; otherwise
+  "test_result = FAIL" is printed.
+  
+  \param pion_corr_A An floating-point array
+  \param pion_corr_B Another floating-point array
+  \param tol The tolerance
+  \param time_size The length of the arrays
+*/
 
 void compare_array_relative(Float* pion_corr_A, 
 			    Float* pion_corr_B, 
 			    Float tol, 
 			    int time_size)
 {
+
   printf("Start_regression_test\n") ; 
 
   int pass_test = 1 ; 
@@ -79,6 +87,17 @@ void compare_array_relative(Float* pion_corr_A,
   printf("End_regression_test\n") ; 
 }
 
+/*!
+  Computes the relative difference between two numbers
+  The difference is printed to \c stdout.
+  If the difference is less than a specified
+  tolerance, "test_result = PASS" is printed to \c stdout; otherwise
+  "test_result = FAIL" is printed.
+  
+  \param pion_corr_A An floating-point array
+  \param pion_corr_B Another floating-point array
+  \param tol The tolerance
+*/
 
 void compare_float_relative(Float pion_corr_A, 
 			    Float pion_corr_B, 

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the HmdArg structure.
 
-  $Id: hmd_arg.h,v 1.8 2004-08-18 11:57:36 zs Exp $
+  $Id: hmd_arg.h,v 1.9 2004-09-02 17:00:36 zs Exp $
 */
 //------------------------------------------------------------------
 
@@ -40,52 +40,52 @@ enum MetropolisType { METROPOLIS_NO    = 0,
 struct HmdArg {
 
 
-  int n_frm_masses;                /*!< The number of dynamical fermion
-				      masses. This is not necessarily the
-				      number of flavours: At each mass the
-				      number of flavours is given by
-				      Lattice::ExactFlavors. */
+    int n_frm_masses;                /*!< The number of dynamical fermion
+				       masses. This is not necessarily the
+				       number of flavours: At each mass the
+				       number of flavours is given by
+				       Lattice::ExactFlavors. */
 				
-  Float frm_mass[MAX_HMD_MASSES];   /*!< The array of dynamical fermions
+    Float frm_mass[MAX_HMD_MASSES];   /*!< The array of dynamical fermions
 					masses . */
 
-  int frm_flavors[MAX_HMD_MASSES];  /*!<
-				      The flavour number of each dynamical
-				      mass:
-				      This is relevant to the R
-				      algorithm only. Bosonic fields
-				      are simulated by setting 
-				      a negative flavor number. */
+    int frm_flavors[MAX_HMD_MASSES];  /*!<
+					The flavour number of each dynamical
+					mass:
+					This is relevant to the R
+					algorithm only. Bosonic fields
+					are simulated by setting 
+					a negative flavor number. */
 
-  int n_bsn_masses;                 /*!< The number of dynamical boson 
-				    masses. This is not necessarily the
-				      number of flavours: At each mass the
-				      number of flavours is given by
-				      Lattice::ExactFlavors. This is relevant
-				      to the Phi algorithm only.*/
+    int n_bsn_masses;                 /*!< The number of dynamical boson 
+					masses. This is not necessarily the
+					number of flavours: At each mass the
+					number of flavours is given by
+					Lattice::ExactFlavors. This is relevant
+					to the Phi algorithm only.*/
 				
-  Float bsn_mass[MAX_HMD_MASSES];   /* The array of dynamical bosons masses.
-				       This is relevant to the Phi algorithm
-				       only.*/
+    Float bsn_mass[MAX_HMD_MASSES];   /* The array of dynamical bosons masses.
+					 This is relevant to the Phi algorithm
+					 only.*/
 
-  int max_num_iter[MAX_HMD_MASSES]; /*!< The maximum number of iterations
-				    of the solver for each mass 
-				    of dynamical fermions/bosons */
+    int max_num_iter[MAX_HMD_MASSES]; /*!< The maximum number of iterations
+					of the solver for each mass 
+					of dynamical fermions/bosons */
                                    
 
-  Float stop_rsd[MAX_HMD_MASSES];   /*!< The target residual for the solver
-				      stopping condition for each mass 
-				      of dynamical fermions/bosons */
+    Float stop_rsd[MAX_HMD_MASSES];   /*!< The target residual for the solver
+					stopping condition for each mass 
+					of dynamical fermions/bosons */
 
-  Float stop_rsd_md[MAX_HMD_MASSES];   /*!< The target residual for the solver
-				      stopping condition for each mass 
-				      of dynamical fermions/bosons */
+    Float stop_rsd_md[MAX_HMD_MASSES];  /*!< The target residual for the solver
+					   stopping condition for each mass 
+					   of dynamical fermions/bosons */
 
-  Float stop_rsd_mc[MAX_HMD_MASSES];   /*!< The target residual for the solver
-				      stopping condition for each mass 
-				      of dynamical fermions/bosons */
+    Float stop_rsd_mc[MAX_HMD_MASSES];  /*!< The target residual for the solver
+					   stopping condition for each mass 
+					   of dynamical fermions/bosons */
 
-  int steps_per_traj;		    /*!<
+    int steps_per_traj;		    /*!<
 				      For the R algorithm, this is
 				      the number of steps per trajectory. For
 				      the HMC/phi algorithm this is
@@ -93,68 +93,90 @@ struct HmdArg {
 				      steps per trajectory.
 				    */
   
-  Float step_size;		    /*!< The molecular dynamics step size. */
+    Float step_size;		    /*!< The molecular dynamics step size. */
   
-  MetropolisType metropolis;        /*!< Whether to do the metropolis
-				      accept/reject step.
-				      This is relevant to the Phi
-				      algorithm only. */ 
+    MetropolisType metropolis;        /*!< Whether to do the metropolis
+					accept/reject step.
+					This is relevant to the Phi
+					algorithm only. */ 
   
-  ReunitarizeType reunitarize;      /*!< Whether to reunitarize at the end of
-				      the trajectory before the metropolis
-				      step. */
+    ReunitarizeType reunitarize;      /*!< Whether to reunitarize at the end of
+					the trajectory before the metropolis
+					step. */
   
-  /*!< The parameters for the force rational approximations*/
-  int FRatDeg[MAX_HMD_MASSES];
-  Float FRatError[MAX_HMD_MASSES];
-  Float FRatNorm[MAX_HMD_MASSES];
-  Float FRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
-  Float FRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+    //! Parameters for the RHMC force rational approximations.
+    int FRatDeg[MAX_HMD_MASSES];
+    //! Parameters for the RHMC rational approximations.    
+    Float FRatError[MAX_HMD_MASSES];
+    //! Parameters for the RHMC rational approximations.        
+    Float FRatNorm[MAX_HMD_MASSES];
+    //! Parameters for the RHMC rational approximations.
+    Float FRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+    //! Parameters for the RHMC rational approximations..
+    Float FRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+    
 
-  /*!< The parameters for the action rational approximations*/
-  int SRatDeg[MAX_HMD_MASSES];
-  Float SRatError[MAX_HMD_MASSES];
-  Float SRatNorm[MAX_HMD_MASSES];
-  Float SRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
-  Float SRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+    //! Parameters for the RHMC action rational approximations. 
+    int SRatDeg[MAX_HMD_MASSES];
+    //! Parameters for the RHMC action rational approximations.     
+    Float SRatError[MAX_HMD_MASSES];
+    //! Parameters for the RHMC action rational approximations.     
+    Float SRatNorm[MAX_HMD_MASSES];
+    //! Parameters for the RHMC action rational approximations.         
+    Float SRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+    //! Parameters for the RHMC action rational approximations.             
+    Float SRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
 
-  /*!< The parameters for the inverse action rational approximations*/
-  Float SIRatNorm[MAX_HMD_MASSES];
-  Float SIRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
-  Float SIRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+    //! Parameters for the RHMC inverse action rational approximations.
+    Float SIRatNorm[MAX_HMD_MASSES];
+    //! Parameters for the RHMC inverse action rational approximations.
+    Float SIRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+    //! Parameters for the RHMC inverse action rational approximations.
+    Float SIRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
 
-  /*!< What approximation do the rational functions represent (RHMC only)*/
-  int frm_power_num[MAX_HMD_MASSES];
-  int frm_power_den[MAX_HMD_MASSES];
+    //! The approximation represented by the RHMC rational functions.
+    int frm_power_num[MAX_HMD_MASSES];
+    //! The approximation represented by the RHMC rational functions.
+    int frm_power_den[MAX_HMD_MASSES];
 
-  /*!< Is the approximation static or dynamic (RHMC only)*/
-  int approx_type;
+    //! Whether the RHMC approximation is static or dynamic.
+    int approx_type;
 
-  /*!< The new degrees to use (DYNAMIC RHMC only) */
-  int FRatDegNew[MAX_HMD_MASSES], SRatDegNew[MAX_HMD_MASSES];
+    //! The new degrees to use for dynamic RHMC.
+    int FRatDegNew[MAX_HMD_MASSES];
+    //! The new degrees to use for dynamic RHMC.
+    int SRatDegNew[MAX_HMD_MASSES];
+    
 
-  Float lambda_low[MAX_HMD_MASSES];
-  Float lambda_high[MAX_HMD_MASSES];
-  Float lambda_min[MAX_HMD_MASSES];
-  Float lambda_max[MAX_HMD_MASSES];
-  Float spread; // the allowed sprectral spread in the rational approximation
+    Float lambda_low[MAX_HMD_MASSES];
+    Float lambda_high[MAX_HMD_MASSES];
+    Float lambda_min[MAX_HMD_MASSES];
+    Float lambda_max[MAX_HMD_MASSES];
 
-  /*!< The precision used in the Remez algorithm of the approximation (RHMC only)*/
-  long precision;
+    //! the allowed sprectral spread in the rational approximation
+    Float spread;
 
-  /*!< The location of the smallest polar shift in the rational approximations (RHMC only)*/
-  int isz;
+    //! The precision used in the Remez algorithm of the RHMC approximation.
+    long precision;
 
-  /*!< The Sexton-Weigngarten factor (RHMC only)*/
-  int sw;
+    //! The location of the smallest polar shift in the RHMC rational approximations.
+    int isz;
 
-  /*!< The number of previous solutions used to form the intial guess (HMC only)*/
-  int chrono;
+    //! The Sexton-Weingarten factor
+    /*! RHMC only.*/
+    int sw;
+
+    //! Chonological inversion parameter
+    /*!
+      The number of previous solutions used to form the initial solver
+      guess (HMC only).
+    */
+    int chrono;
 
 };
 
 
-#endif /* !INCLUDED_HMD_ARG_H */
+#endif /* INCLUDED_HMD_ARG_H */
 
 
 

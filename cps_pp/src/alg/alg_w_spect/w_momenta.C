@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_momenta.C,v 1.6 2004-08-18 11:57:40 zs Exp $
-//  $Id: w_momenta.C,v 1.6 2004-08-18 11:57:40 zs Exp $
+//  $Date: 2004-09-02 17:00:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_momenta.C,v 1.7 2004-09-02 17:00:02 zs Exp $
+//  $Id: w_momenta.C,v 1.7 2004-09-02 17:00:02 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_momenta.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_momenta.C,v $
 //  $State: Exp $
 //
@@ -85,7 +85,7 @@ static IFloat SIN(int n, int m)   {                // sin(2 PI  n / m),
 // WspectMomenta::CTOR
 //---------------------------------------------------------------------------
 WspectMomenta::WspectMomenta(const WspectHyperRectangle & whr, 
-			     const int center2[],
+			     const int center2[LORENTZs],
 			     int num)
   : d_num_non_zero(num),
     d_data_p(0),
@@ -191,7 +191,7 @@ WspectMomenta::~WspectMomenta()
 // WspectMomenta::operator[](const int lcl_site[]) 
 //---------------------------------------------------------------------------
 const Complex *
-WspectMomenta::operator[](const int lcl_site[]) const 
+WspectMomenta::operator[](const int lcl_site[LORENTZs]) const 
 {
   const Complex * answer = d_data_p;
   if (d_data_p)

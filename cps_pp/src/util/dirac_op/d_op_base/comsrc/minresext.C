@@ -1,3 +1,9 @@
+/*!\file
+  \brief  Definition of the Dirac operator MinResExt method.
+
+  $Id: minresext.C,v 1.3 2004-09-02 16:56:44 zs Exp $
+*/
+
 #include <config.h>
 #include <util/dirac_op.h>
 #include <util/lattice.h>
@@ -10,10 +16,37 @@
 #include <math.h>
 CPS_START_NAMESPACE
 
+/*!
+  This computes the starting guess for the solver for use in the
+  HMD force calculations using a  minimal residual chronological method.
+  This computes the guess solution as a linear combination of a given number
+  of previous solutions. 
+
+  \param psi The chronological guess for the solution vector.
+  \param phi The source vector in the equation to be solved.
+  \param psi_old The previous solutions.
+  \param vm The previous solutions.multiplied by \f$  M^\dagger M \f$, computed
+  as a necessary by-product.
+  \param degree The number of previous solutions.
+  \return The residue of this guess.
+*/  
+
 Float DiracOp::MinResExt(Vector *psi, Vector *phi, Vector **psi_old, 
 			Vector **vm, int degree) 
 {
 
+/*
+   We want to find the best initial guess of the solution of
+   A x = b, and we have N previous solutions x_i.
+   The method goes something like this:
+
+   1. Orthonormalise the x_i
+   2. Form the matrix G_ij = x_i^dagger A x_j
+   3. Form the vector B_i = x_i^dagger b
+   4. solve A_ij a_j  = B_i
+   5. x = a_i x_i
+*/
+    
   char *fname = "MinResExt(V*, V*, V**, V**, int)";
   VRB.Func(cname,fname);
 

@@ -1,3 +1,8 @@
+/*!\file
+  \brief Pion correlation function for the testing framework.
+
+  $Id: staggered_local_pion.C,v 1.5 2004-09-02 16:58:01 zs Exp $
+*/
 //--------------------------------------------------------------------
 // Compute the local pion correlator for staggered fermions.
 // This is a light weight code for the testing framework.
@@ -7,17 +12,13 @@
 //
 //
 //  Starting point
-//  $Date: 2004-08-18 11:58:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/testing_framework/staggered_local_pion.C,v 1.4 2004-08-18 11:58:08 zs Exp $
+//  $Date: 2004-09-02 16:58:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/testing_framework/staggered_local_pion.C,v 1.5 2004-09-02 16:58:01 zs Exp $
 //
-//--------------------------------------------------------------------
-/*
- *  test for alg
- */
+//-------------------------------------------------------------------
 
-#include <util/qcdio.h>
-#include <stdlib.h>	// exit()
 #include <config.h>
+#include <util/qcdio.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <util/verbose.h>
@@ -30,7 +31,16 @@
 
 CPS_START_NAMESPACE
 
-
+/*!
+  The correlation function is computed using a point source at the origin.
+  \param lat The lattice object containing the gauge configuration.
+  It is assumed that there are no spin degrees of freedom, so this should
+  be a class derived from FstagTypes.
+  \param mass Valence quark mass parameter
+  \param pion_corr The timesliced pseudoscalar correlation funtion
+  \param The number of timeslices over which to compute the correlator.
+  \post The correlator is written to the array and also printed to \c stdout.
+*/
 void staggered_local_pion(Lattice &lat, Float mass, 
 			  IFloat* pion_corr, int time_size)
 {

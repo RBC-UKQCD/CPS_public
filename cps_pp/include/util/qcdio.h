@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Prototypes of gauge configuration IO functions.
 
-  $Id: qcdio.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+  $Id: qcdio.h,v 1.5 2004-09-02 16:57:11 zs Exp $
 */
 /*2  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
    $Author: zs $
-   $Date: 2004-08-18 11:57:37 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.4 2004-08-18 11:57:37 zs Exp $
-   $Id: qcdio.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+   $Date: 2004-09-02 16:57:11 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.5 2004-09-02 16:57:11 zs Exp $
+   $Id: qcdio.h,v 1.5 2004-09-02 16:57:11 zs Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.h,v $
-   $Revision: 1.4 $
+   $Revision: 1.5 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v $
    $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -71,20 +71,143 @@ CPS_START_NAMESPACE
              int swap = SWAP_BYTE_ORDER,
 	     int transp = TRANSPOSE_THE_MATRICES );
 
-enum FileIoType{ ZERO_ONLY = 0, ADD_ID};
-  FILE *Fopen( FileIoType type, const char *filename, const char *mode);
-  int Fclose( FileIoType type, FILE *stream);
-  int Fprintf( FileIoType type, FILE *stream, const char *format,...);
-  int Vfprintf( FileIoType type, FILE *stream, const char *format, va_list ap);
+// File IO
 
-  inline   FILE *Fopen( const char *filename, const char *mode)
+  /*!\defgroup std_file_io Functions for doing file IO on a parallel machine
+    @{ */
+
+//! Type of IO
+enum FileIoType{
+    ZERO_ONLY,          /*!< Write from a single node only. */
+    ADD_ID              /*!< Each node writes to a seperate file which
+			  has the node ID number appended to its name. */
+};
+
+//! Opens a file
+/*!
+  This works like \a fopen in the C standard library, except that on a
+  parallel machine we can decide whether just one node does the IO, or
+  whether each node performs IO to a seperate file which has the node
+  number appended to its name.
+  
+  \param type What sort of IO to do.
+  \param filename the main name of the file
+  \param mode the IO mode (as for \a fopen)
+  \return The handle of the closed file, or NULL on failure.
+  \pre In the mode where all nodes open a file, the length of the final
+  filename, \e i.e. \a filename with a '.' and the node number appended,
+  cannot exceed 200 characters.
+  \post The file is opened by all nodes or just one. In the latter case
+  a dummy  file handle is returned.
+*/
+FILE *Fopen( FileIoType type, const char *filename, const char *mode);
+
+//! Closes a file
+/*!
+  This works like \a fclose in the C standard library
+  
+  \param type Ignored.
+  \param stream The file handle to close.
+  \return Normally, \c EOF or zero on error, but if the file was opened by
+  a single node and this function is called by a different node (in which
+  case \a stream will be the dummy file handle), then 1 is returned.
+*/
+int Fclose( FileIoType type, FILE *stream);
+
+//! Prints to a file
+/*!
+  This works like \a fprint in the C standard library, except that on a
+  parallel machine we can decide whether just one node does the IO, or
+  whether each node performs IO to a seperate file which has the node
+  number appended to its name.
+  
+  \param type Ignored
+  \param stream The file handle
+  \param format Format string - as in the C standard library \a fprintf
+  \param ... Parameters, as in the C standard library \a fprintf
+  \return Normally, the number of bytes written, but if the file was opened in
+  ZERO_ONLY mode and this function is called by a different mode (in which
+  case \a stream will be the dummy file handle), then 1 is returned.
+*/
+int Fprintf( FileIoType type, FILE *stream, const char *format,...);
+
+//! Prints a variable-length argument list to a file
+/*!
+  This works like \a vfprint in the C standard library, except that on a
+  parallel machine we can decide whether just one node does the IO, or
+  whether each node performs IO to a seperate file which has the node
+  number appended to its name.
+  
+  \param type Ignored
+  \param stream The file handle
+  \param format Format string - as in the C standard library \a fprintf
+  \param ap Parameter liss, as in the C standard library \a fprintf
+  \return Normally, the number of bytes written, but if the file was opened in
+  ZERO_ONLY mode and this function is called by a different mode  (in which
+  case \a stream will be the dummy file handle), then 1 is returned.
+*/
+int Vfprintf( FileIoType type, FILE *stream, const char *format, va_list ap);
+
+//! Opens a file
+/*!
+  This works like \a fopen in the C standard library, except that on a
+  parallel machine just one node does the IO
+  
+  \param filename the main name of the file
+  \param mode the IO mode (as for \a fopen)
+  \post Only one node opens the file. A dummy handle is returned  on other
+  nodes.
+*/
+inline FILE *Fopen( const char *filename, const char *mode)
     { return Fopen( ZERO_ONLY, filename, mode);}
-  inline int Fclose( FILE *stream){return Fclose(ZERO_ONLY,stream);}
-  int Fprintf( FILE *stream, const char *format,...);
-  inline int Vfprintf( FILE *stream, const char *format, va_list ap)
+
+//! Closes a file
+/*!
+  This works like \a fclose in the C standard library
+  
+  \param stream The file handle to close.
+  \return Normally, \c EOF or zero on error, but if the file was opened by
+  a single node and this function is called by a different node (in which
+  case \a stream will be the dummy file handle), then 1 is returned.
+*/
+inline int Fclose( FILE *stream){return Fclose(ZERO_ONLY,stream);}
+
+//! Prints to a file
+/*!
+  This works like \a fprint in the C standard library, except that on a
+  parallel machine we can decide whether just one node does the IO, or
+  whether each node performs IO to a seperate file which has the node
+  number appended to its name.
+  
+  \param stream The file handle
+  \param format Format string - as in the C standard library \a fprintf
+  \param ... Parameters, as in the C standard library \a fprintf
+  \return Normally, the number of bytes written, but if the file was opened in
+  ZERO_ONLY mode and this function is called by a different mode (in which
+  case \a stream will be the dummy file handle), then 1 is returned.
+*/
+
+int Fprintf( FILE *stream, const char *format,...);
+
+//! Prints a variable-length argument list to a file
+/*!
+  This works like \a vfprint in the C standard library, except that on a
+  parallel machine we can decide whether just one node does the IO, or
+  whether each node performs IO to a seperate file which has the node
+  number appended to its name.
+  
+  \param stream The file handle
+  \param format Format string - as in the C standard library \a fprintf
+  \param ap Parameter liss, as in the C standard library \a fprintf
+  \return Normally, the number of bytes written, but if the file was opened in
+  ZERO_ONLY mode and this function is called by a different mode, then 1
+  is returned.
+*/
+inline int Vfprintf( FILE *stream, const char *format, va_list ap)
     { return Vfprintf(ZERO_ONLY,stream, format, ap);}
 
 #endif
 
+/*! @} */
 
 CPS_END_NAMESPACE

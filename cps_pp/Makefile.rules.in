@@ -1,13 +1,13 @@
-#$Id $
+# $Id: Makefile.rules.in,v 1.12 2004-09-02 16:52:52 zs Exp $
+# @configure_input@
+
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_builddir@
 QOS = @QOS@
 
-PWD := $(shell pwd)
-DIR := $(subst $(BUILDDIR)/objs,,$(PWD))
-DIR := $(subst $(SRCDIR)/src,,$(DIR))/
+BUILDDIR2 := $(shell pwd)
+DIR := $(subst $(BUILDDIR)/objs,,$(BUILDDIR2))
 SRCDIR2 := $(SRCDIR)/src/$(DIR)
-BUILDDIR2 := $(BUILDDIR)/objs/$(DIR)
 VPATH:=$(SRCDIR2) ${BUILDDIR2}
 
 CC = @CC@
@@ -26,7 +26,6 @@ SEPARATE_LIB = yes
 endif
 
 ifeq	($(SEPARATE_LIB),yes)
-#DIR2 := $(subst /src/,,$(DIR))
 DIR2 := $(subst util/,,$(DIR))
 DIR2 := $(subst dirac_op/,,$(DIR2))
 DIR2 := $(subst mem/,,$(DIR2))
@@ -43,11 +42,9 @@ LIBNAME ?= cps
 
 DFLAGS += @DFLAGS@
 
-DIRLIST0 := $(shell ls -p $(SRCDIR2)/*/Makefile )
-DIRLIST0 := $(subst $(SRCDIR2),,$(DIRLIST0))
-DIRLIST1 := $(filter %/Makefile ,$(DIRLIST0))
-DIRLIST := $(DIRLIST1:/Makefile=)
-DIRLIST := $(subst /,,$(DIRLIST))
+DIRLIST := $(shell ls  $(SRCDIR2)/*/Makefile )
+DIRLIST := $(filter %/Makefile ,$(DIRLIST))
+DIRLIST := $(patsubst $(SRCDIR2)/%/Makefile, %, $(DIRLIST))
 
 ARCH = @ARCH@
 ARCHDIR := $(@ARCHDIR@)
@@ -71,7 +68,7 @@ all: cps
 recurse: $(RECURSEDIRS)
 
 $(RECURSEDIRS):
-	@echo RECURSEDIRS = $(RECURSEDIRS)
+	$(if $(findstring s, $(MAKEFLAGS)),,@echo RECURSEDIRS = $(RECURSEDIRS))
 	mkdir -p $(BUILDDIR2)/$@
 	touch -a $(BUILDDIR2)/$@/Makefile_depend
 	cp -p $(SRCDIR2)/$@/Makefile $(BUILDDIR2)/$@
@@ -125,7 +122,8 @@ else
 
 depend: recurse
 	echo > Makefile_depend
-	cd $(SRCDIR2) ;makedepend -f$(PWD)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
+#	cd $(SRCDIR2) ;makedepend -f$(PWD)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
+	cd $(SRCDIR2) ;makedepend -f$(BUILDDIR2)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
 
 endif
 

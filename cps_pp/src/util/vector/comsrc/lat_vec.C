@@ -1,3 +1,11 @@
+//------------------------------------------------------------------
+/*!\file
+  \brief  Implementation of LatData class methods.
+
+  $Id: lat_vec.C,v 1.4 2004-09-02 16:58:11 zs Exp $
+*/
+//------------------------------------------------------------------
+
 #include <config.h>
 #include <util/lat_data.h>
 #include <util/vector.h>
@@ -8,11 +16,12 @@
 CPS_START_NAMESPACE
 
 LatData::LatData(const LatData &lat){
-	ERR.General("LatData","LatData(&LatData)","Copy constructor not allowed");
+    ERR.General("LatData","LatData(&LatData)","Copy constructor not allowed");
+
 }
 
 LatData &LatData::operator=(const LatData &lat){
-	ERR.General("LatData","LatData(&LatData)","Copy constructor not allowed");
+    ERR.General("LatData","LatData(&LatData)","Copy constructor not allowed");
 }
 
 void LatVector::Init(int flag, int n_vec, int vol)
@@ -48,7 +57,7 @@ LatMatrix::LatMatrix(int flag, int n_vec, int vol)
 	LatData::Init(flag, n_vec*mat_size,vol);
 }
 LatMatrix::~LatMatrix(){
-	printf("LatMatrix::~LatMatrix()\n");
+//	printf("LatMatrix::~LatMatrix()\n");
 }
 
 Matrix *LatMatrix::Mat(int pos, int vec_row){

@@ -1,31 +1,26 @@
 #include<config.h>
-CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of dynamic memory management routines.	
 
-CPS_END_NAMESPACE
-#include <util/smalloc.h>
+  $Id: smalloc.C,v 1.3 2004-09-02 16:58:10 zs Exp $
+*/
+
+#include <util/error.h>
 #include <util/verbose.h>
 #include <stdlib.h>
+
 CPS_START_NAMESPACE
 
-//! Allocate memory
-/*!
-  \param request The amount of memory (in bytes) to allocate
-  \return A pointer to the allocated memory
-*/
 void* smalloc(int request){
-  void* ptr;
-  ptr = malloc(request);
-  VRB.Smalloc("","smalloc(i)","", ptr, request);
-  return ptr;
+    void *p = malloc(request);
+    if(!p) ERR.Pointer("","smalloc","");
+    VRB.Smalloc("","smalloc","", p, request);
+    return p;
 }
 
-//! Free allocate memory
-/*!
-  \param p Pointer to the memory to be freed.
-*/
 void sfree(void* p){
-  VRB.Sfree("","sfree(v*)","",p);
-  free((char*) p);
+    VRB.Sfree("","sfree","",p);
+    free(p);
 }
 
 

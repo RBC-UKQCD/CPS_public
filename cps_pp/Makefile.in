@@ -1,13 +1,18 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.17 2004-08-18 11:42:08 zs Exp $
+# $Id: Makefile.in,v 1.18 2004-09-02 16:52:50 zs Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_builddir@
-TESTDIR = $(SRCDIR)/tests
+TESTDIR = tests
+DOCDIR = doc
 QOS = @QOS@
 
-
+ifneq "$(BUILDDIR)"  "$(SRCDIR)"
+builddir_isnt_srcdir="yes"
+else
+builddir_isnt_srcdir=
+endif
 
 all: recurse copy_testdir
 
@@ -30,27 +35,22 @@ cleanlib:
 	rm -f *.a
 
 copy_makefile:
-	-cp Makefile Makefile.rules ${SRCDIR}
-	-cp tests/Makefile_common* ${SRCDIR}/tests
+	-cp $(BUILDDIR)Makefile $(BUILDDIR)Makefile.rules ${SRCDIR}
+	-cp $(BUILDDIR)/$(TESTDIR))/Makefile_common* ${SRCDIR}/$(TESTDIR)
 
 copy_include:
-ifneq "$(BUILDDIR)"  "$(SRCDIR)"
-	rm -rf $(BUILDDIR)/include
-	cp -r $(SRCDIR)/include $(BUILDDIR)
-endif
+	$(if $(builddir_isnt_srcdir), 
+	rm -rf $(BUILDDIR)/include; cp -r $(SRCDIR)/include $(BUILDDIR))
 
-TESTDIRS :=$(shell ls -p $(SRCDIR)/tests/*/Makefile_regression)
-TESTDIRS :=$(dir $(TESTDIRS))
-TESTDIRS :=$(subst $(SRCDIR)/tests,,$(TESTDIRS))
-TESTDIRS :=$(subst /,,$(TESTDIRS))
+TESTSUBDIRS :=$(shell ls -p $(SRCDIR)/$(TESTDIR)/*/Makefile_regression)
+TESTSUBDIRS :=$(dir $(TESTSUBDIRS))
+TESTSUBDIRS :=$(patsubst $(SRCDIR)/$(TESTDIR)/%/, %, $(TESTSUBDIRS))
 
-copy_testdir: $(TESTDIRS)
-	@echo TESTDIRS = $(TESTDIRS)
+copy_testdir: $(TESTSUBDIRS)
+	$(if $(findstring s, $(MAKEFLAGS)),,@echo TESTSUBDIRS = $(TESTSUBDIRS))
 
-$(TESTDIRS):
-	mkdir -p tests/$@
-	-cp -p $(SRCDIR)/tests/$@/Makefile_regression  tests/$@
-
+$(TESTSUBDIRS):
+	$(if $(builddir_isnt_srcdir), mkdir -p $(TESTDIR)/$@; cp -p $(SRCDIR)/$(TESTDIR)/$@/Makefile_regression  $(TESTDIR)/$@)
 #  Create the documentation
 
 have_doxygen = @have_doxygen@
@@ -62,38 +62,37 @@ docs webdocs:
 else
 
 docs:
-	cd ${SRCDIR}/doc ; sh mkdocs.sh 
-	cd ${SRCDIR}/tests/t_asqtad_pion ; doxygen Doxyfile
-	cd ${SRCDIR}/tests/s_spect ; doxygen Doxyfile
-	cd ${SRCDIR}/tests/t_gauge_rot ; doxygen Doxyfile
-
+docs: 
+	$(if $(builddir_isnt_srcdir), cp -r $(SRCDIR)/$(DOCDIR) $(BUILDDIR))
+	bash $(BUILDDIR)/$(DOCDIR)/mkdocs.sh $(SRCDIR)
 
 #  Documentation for the web pages
 #  (this deletes the source code so that it is not posted on the web)
 
-subdirs = $(dir $(shell ls doc/*/Makefile))
+docsubdirs = $(dir $(shell ls doc/*/Makefile))
 webdocs:
 	@echo Creating documentation for the web page
-	@echo This will delete all source code
+	$(if $(builddir_isnt_srcdir),, @echo This will delete all source code!)
 	$(MAKE)  docs
-	@rm -rf src include tests
-	@for a in $(subdirs); do $(MAKE) -C $$a all clean; done
+	$(if $(builddir_isnt_srcdir),, @rm -rf src include tests)
+	@for a in $(docsubdirs); do $(MAKE) -C $$a all clean; done
 	chmod o= `ls`
-	@find doc -path "*CVS" -prune -o -type d -print | xargs chmod 775
-	@find doc -name "*.html" -o -name "*.*ps" -o -name "*.gif" -o -name "*.png" -o -name "*.jp*g" -o -name "*.pdf" -o -name "*.tar.gz" |xargs chmod 644
+	@find $(DOCDIR) -path "*CVS" -prune -o -type d -print | xargs chmod 775
+	@find $(DOCDIR) -name "*.html" -o -name "*.*ps" -o -name "*.gif" -o -name "*.png" -o -name "*.jp*g" -o -name "*.pdf" -o -name "*.tar.gz" |xargs chmod 644
 
 endif
 
 #  Run the regression test suite
 
 test: cps
-	-cp tests/Makefile_common tests/regression.pl ${TESTDIR}
-	cd $(TESTDIR) ; perl regression.pl
-	cd $(TESTDIR) ; sh regression.sh
+	-cp $(TESTDIR)/Makefile_common tests/regression.pl $(SRCDIR)/${TESTDIR}
+	cd $(SRCDIR)/$(TESTDIR); perl regression.pl
+	cd $(SRCDIR)/$(TESTDIR); sh regression.sh
 
 
 # Remove everything made by this makefile
 
 realclean: 
-	rm -rf $(BUILDDIR)/objs $(BUILDDIR)/*.a
+	rm -rf objs *.a
+
 

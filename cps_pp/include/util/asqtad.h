@@ -1,16 +1,21 @@
 #include<config.h>
 CPS_START_NAMESPACE
+/*!\file
+  \brief Utility routines for the asqtad fermions Dirac operator
+
+  $Id: asqtad.h,v 1.5 2004-09-02 16:59:57 zs Exp $
+*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/asqtad.h,v 1.4 2004-08-18 11:57:37 zs Exp $
-//  $Id: asqtad.h,v 1.4 2004-08-18 11:57:37 zs Exp $
+//  $Date: 2004-09-02 16:59:57 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/asqtad.h,v 1.5 2004-09-02 16:59:57 zs Exp $
+//  $Id: asqtad.h,v 1.5 2004-09-02 16:59:57 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/asqtad.h,v $
 //  $State: Exp $
 //

@@ -1,12 +1,23 @@
+//--------------------------------------------------------------------
+/*!\file
+  \brief Implementation of smearing class methods.
+
+  AlgSmear, AlgApeSmear, AlgKineticSmear and AlgHypSmear classes.
+  
+  $Id: alg_smear.C,v 1.4 2004-09-02 16:53:03 zs Exp $
+*/
+//--------------------------------------------------------------------
 #include <config.h>
-#include <util/qcdio.h>
 #include <math.h>
+#include <util/qcdio.h>
 #include <alg/alg_smear.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <util/error.h>
 #include <util/site.h>
 #include <util/link_buffer.h>
+#include <util/smalloc.h>
+
 CPS_START_NAMESPACE
 
 /*!
@@ -14,12 +25,14 @@ CPS_START_NAMESPACE
   has the invers of this matrix in the relevant row and column
 */
 
-const int su2_index[][3]= { {0,1,2},
+
+void AlgSmear::sub( Matrix& x, Matrix& y , int ind )
+{
+
+    const int su2_index[][3]= { {0,1,2},
                             {0,2,1},
                             {1,2,0} };
-
-void sub( Matrix& x, Matrix& y , int ind )
-{
+    
   y=x;
   const int zero_rc(su2_index[ind][2]);
   const int i1     (su2_index[ind][0]);
@@ -46,7 +59,7 @@ void sub( Matrix& x, Matrix& y , int ind )
   y(i2,i1) = Complex( p2,-p1);
 }
 
-int su3_proj( Matrix& x )
+int AlgSmear::su3_proj( Matrix& x )
 {
   const int max_iter(10000);
   Matrix tmp  ;
@@ -86,16 +99,23 @@ int su3_proj( Matrix& x )
   return i;
 } 
  
-
+/*!
+  \param latt The Lattice object containg the gauge field with which smearing
+  is done.
+  \param c_arg Container for generic parameters. .
+  \param su3_proj Whether or not to project the smeared link on to the SU(3)
+  manifold.
+*/
 AlgSmear::AlgSmear( Lattice&   lat,
                     CommonArg* ca ,
-                    int _bool_su3_proj ):
+                    int su3_proj ):
   Alg(lat,ca),
-  bool_su3_proj(_bool_su3_proj),
+  bool_su3_proj(su3_proj),
   orthog(-1)
 {
+    cname = "AlgSmear";
   lat_back = new Matrix[GJP.VolNodeSites()*4];
-  if ( lat_back == 0x0 ) { ERR.Pointer("AlgSmear","run","lat_back"); }
+  if ( lat_back == 0x0 ) { ERR.Pointer(cname, cname,"lat_back"); }
 }
 
 AlgSmear::~AlgSmear()
@@ -156,17 +176,24 @@ void AlgSmear::run()
 
 }
 
-
-void three_staple( Lattice& latt,  Matrix& link , int *pos, int u, int orth )
+/*!
+  \param latt The Lattice containing the gauge field.
+  \param link The accumulated three staple.
+  \param pos The coordinates of the link.
+  \param u  The direction of the link.
+  \param orth A direction in which no smearing is done. 
+*/
+void AlgSmear::three_staple( Lattice& latt,  Matrix& link , 
+			     int *pos, int u, int orth )
 {
   Matrix acumulate_mp; acumulate_mp.ZeroMatrix();
   int dir[3];
   //loop over all directions (+ve and -ve)
-  int v;
-  for ( v=0; v<8; v++ )
+
+  for ( int v=0; v<8; v++ )
     {      
       // except the ones the link is aligned with 
-      if((v&3)==u || (v&3) == orth ) { continue; }
+      if((v&3)==u || (v&3) == orth )  continue; 
       
       const int v1((v+4)&7); // direction opposite to v
       
@@ -182,7 +209,8 @@ void three_staple( Lattice& latt,  Matrix& link , int *pos, int u, int orth )
 
 
 
-void five_staple ( Lattice& latt,  Matrix& link , int *pos, int u , int orth )
+void AlgKineticSmear::five_staple ( Lattice& latt,  Matrix& link ,
+				    int *pos, int u , int orth )
 {
   Matrix acumulate_mp; acumulate_mp.ZeroMatrix();
 
@@ -223,7 +251,8 @@ void five_staple ( Lattice& latt,  Matrix& link , int *pos, int u , int orth )
 }
 
 
-void seven_staple( Lattice& latt,  Matrix& link , int *pos, int u , int orth )
+void AlgKineticSmear::seven_staple( Lattice& latt,  Matrix& link ,
+				    int *pos, int u , int orth )
 {
   Matrix acumulate_mp; acumulate_mp.ZeroMatrix();
   int v;
@@ -281,7 +310,8 @@ void seven_staple( Lattice& latt,  Matrix& link , int *pos, int u , int orth )
 }
 
 
-void lepage_staple( Lattice& latt,  Matrix& link , int *pos, int u , int orth )
+void AlgKineticSmear::lepage_staple( Lattice& latt,  Matrix& link ,
+				     int *pos, int u , int orth )
 {
   Matrix acumulate_mp; acumulate_mp.ZeroMatrix();
   int dir[5];
@@ -319,45 +349,51 @@ void AlgApeSmear::smear_link(Matrix& link,
   link+=stap;
 }
 
+/*!
+  If an output file is specified in the CommonArg argument, then
+  the smearing coefficients are written to the file.
 
+*/
 void AlgKineticSmear::run()
 {
-  FILE* f = Fopen("params.dat","w");
-  int i;
-  for (i=0;i<5;++i)
-    {
-      Fprintf(f,"coef %2i : %e \n",i,(float)_coef[i]);
+    if(common_arg->filename != 0){
+	FILE* f = Fopen(common_arg->filename, "a");
+	if(!f) ERR.FileA(cname, "run", common_arg->filename);
+	for (int i=0;i<5;++i) Fprintf(f,"coef %2i : %e \n",i,(float)_coef[i]);
+	Fclose(f);
     }
-  Fclose(f);
-  AlgSmear::run();
+
+    AlgSmear::run();
 }
 
-typedef void (*staple_func)(Lattice&,Matrix&,int*,int,int);
 
 void AlgKineticSmear::smear_link( Matrix& link,
                                   int*    pos,
                                   int      mu )
 {
+
+    typedef void (AlgKineticSmear::*staple_func)(Lattice&,Matrix&,int*,int,int);
+    
   Lattice& lattice(AlgLattice());
-  staple_func funcs[]={ three_staple,
-                        five_staple ,
-                        seven_staple,
-                        lepage_staple };
+  staple_func funcs[]={ &AlgKineticSmear::three_staple,
+                        &AlgKineticSmear::five_staple ,
+                        &AlgKineticSmear::seven_staple,
+                        &AlgKineticSmear::lepage_staple };
   link*=_coef[0];
   Matrix stap; 
-  int i;
-  for (i=1;i<5;++i)
+
+  for (int i=1;i<5;++i)
     {
-      if ( _coef[i] != 0 )
-        {
-          funcs[i-1](lattice,stap,pos,mu,get_orthog());
-          stap*=_coef[i];
-          link+=stap;
-        }
+	if ( _coef[i] != 0 ) continue;
+
+	(this->*funcs[i-1])(lattice,stap,pos,mu,get_orthog());
+	stap*=_coef[i];
+	link+=stap;
+
     }
 }
 
-inline const Matrix GetLink( Lattice& lat, const int* x, int mu )
+const Matrix AlgHypSmear::GetLink( Lattice& lat, const int* x, int mu )
 {
   int link_site[4];
   int i;
@@ -529,17 +565,25 @@ void AlgHypSmear::smear_link(Matrix& link,
   // don't su3 project here because we'll do it in run()
 }
 
+/*!
+  If an output file is specified in the CommonArg argument, then
+  the smearing coefficients are written to the file.
 
+  \pre The smearing coefficents should be set with set_c1, set_2 and set_c3.
+*/
 void AlgHypSmear::run()
 {
-  if ( get_orthog() >=0 && get_orthog() <4 )
-    {
-      ERR.General("AlgHypSmear()","run()","orthog not defined");
-    }
+  if ( get_orthog() >=0 || get_orthog() <4 )
+      ERR.General(cname, "run",
+		  "Bad value %d for orthogonal direction", get_orthog());
+   
 
-  FILE* f = Fopen("params.dat","a");
-  Fprintf(f,"AlgHypSmear hit: c1=%e  c2=%e  c3=%e \n",c1,c2,c3);
-  Fclose(f);
+  if(common_arg->filename != 0){
+      FILE* f = Fopen(common_arg->filename, "a");
+      if(!f) ERR.FileA(cname, "run", common_arg->filename);
+      Fprintf(f,"AlgHypSmear hit: c1=%e  c2=%e  c3=%e \n",c1,c2,c3);
+      Fclose(f);
+  }
 
   AlgSmear::run();
 }  

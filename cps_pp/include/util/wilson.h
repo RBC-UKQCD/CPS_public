@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief Declarations of routine used internally in the DiracOpWilson class.
 
-  $Id: wilson.h,v 1.6 2004-08-18 11:57:38 zs Exp $
+  $Id: wilson.h,v 1.7 2004-09-02 16:59:02 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.6 2004-08-18 11:57:38 zs Exp $
-//  $Id: wilson.h,v 1.6 2004-08-18 11:57:38 zs Exp $
+//  $Date: 2004-09-02 16:59:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.7 2004-09-02 16:59:02 zs Exp $
+//  $Id: wilson.h,v 1.7 2004-09-02 16:59:02 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: wilson.h,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v $
 //  $State: Exp $
 //
@@ -162,13 +162,22 @@ void wilson_end(Wilson *wilson_p);     /* pointer to Wilson struct. */
 extern "C"{
 
 //! Multiplication by the odd-even preconditioned Wilson matrix    
-
-void wilson_mdagm(IFloat  *chi,        /* chi = MdagM(u) psi          */
-		  IFloat  *u,          /* Gauge field                 */
-		  IFloat  *psi,        /* chi = MdagM(u) psi          */
-		  IFloat  *mp_sq_p,    /* pointer to Sum |M psi|^2    */
-		  IFloat  Kappa,       /* Wilson's kappa parameter    */
-		  Wilson *wilson_p);  /* pointer to a Wilson struct. */
+/*!
+  Performs the multiplication \f$ \chi = M^\dagger M \psi \f$.
+  
+  \param chi The result vector
+  \param u The gauge field
+  \param psi The vector to be multiplied
+  \param m_sq_p The value of \f$ |M \psi|^2 \f$
+  \param kappa The Wilson matrix mass parameter
+  \param wilson_p pointer to a Wilson struct.
+*/
+void wilson_mdagm(IFloat  *chi,    
+		  IFloat  *u,      
+		  IFloat  *psi,    
+		  IFloat  *mp_sq_p,
+		  IFloat  Kappa,   
+		  Wilson *wilson_p);
 
 //--------------------------------------------------------------------
 
@@ -179,9 +188,9 @@ void wilson_mdagm(IFloat  *chi,        /* chi = MdagM(u) psi          */
   
   \pre The gauge field and spinor vector should be in odd-even order.  
 
-  \param chi_p_f The resulting vector
-  \param u_p_f The gauge field
-  \param psi_p_f The vector bing multiplied
+  \param chi The resulting vector
+  \param u The gauge field
+  \param psi The vector bing multiplied
   \param cb Multiplies a vector on odd parity sites if this is 0, even
             parity sites if this is 1.
   \param dag Multiply by the hermitian conjugate hopping term if this is 1,
@@ -205,10 +214,10 @@ void wilson_dslash(IFloat *chi,
 
   \pre The gauge field and spinor vector should be in odd-even order.
   
-  \param chi_f The matrix-vector product
-  \param u_f The gauge field
-  \param psi_f The vector to be mutliplied
-  \param kappa_f The Wilson matrix hopping parameter
+  \param chi The matrix-vector product
+  \param u The gauge field
+  \param psi The vector to be mutliplied
+  \param kappa The Wilson matrix hopping parameter
   \param wilson_p The Wilson multiplication data structure.
  */
     
@@ -227,10 +236,10 @@ void wilson_m(IFloat *chi,
 
   \pre The gauge field and spinor vector should be in odd-even order.
   
-  \param chi_f The matrix-vector product
-  \param u_f The gauge field
-  \param psi_f The vector to be mutliplied
-  \param kappa_f The Wilson matrix hopping parameter
+  \param chi The matrix-vector product
+  \param u The gauge field
+  \param psi The vector to be mutliplied
+  \param kappa The Wilson matrix hopping parameter
   \param wilson_p The Wilson multiplication data structure.
  */
     

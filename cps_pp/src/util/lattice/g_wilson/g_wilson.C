@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Gwilson class.
 
-  $Id: g_wilson.C,v 1.6 2004-08-18 11:58:05 zs Exp $
+  $Id: g_wilson.C,v 1.7 2004-09-02 16:57:14 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v 1.6 2004-08-18 11:58:05 zs Exp $
-//  $Id: g_wilson.C,v 1.6 2004-08-18 11:58:05 zs Exp $
+//  $Date: 2004-09-02 16:57:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v 1.7 2004-09-02 16:57:14 zs Exp $
+//  $Id: g_wilson.C,v 1.7 2004-09-02 16:57:14 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v $
 //  $State: Exp $
 //
@@ -237,11 +237,11 @@ void Gwilson::GactionGradient(Matrix &grad, int *x, int mu)
 
 /*!
   The staple sum around the link \f$ U_\mu(x) \f$ is
-/f[
-  \sum_{\nu \neq \mu) [
+\f[
+  \sum_{\nu \neq \mu} [
            U_\nu(x+\mu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)                  
         +  U^\dagger_\nu(x+\mu-\nu) U^\dagger_\mu(x-\nu) U_\nu(x-\nu)  ]
-/f]
+\f]
   \param x The coordinates of the lattice site 
   \param mu The link direction
   \param stap The computed staple sum.

@@ -1,16 +1,22 @@
+/*!\file
+  \brief Implementation of AlgEqState class methods.
+
+  $Id: alg_eq_state.C,v 1.8 2004-09-02 17:00:12 zs Exp $
+*/
+
 #include<config.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eq_state/alg_eq_state.C,v 1.7 2004-08-18 11:57:38 zs Exp $
-//  $Id: alg_eq_state.C,v 1.7 2004-08-18 11:57:38 zs Exp $
+//  $Date: 2004-09-02 17:00:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eq_state/alg_eq_state.C,v 1.8 2004-09-02 17:00:12 zs Exp $
+//  $Id: alg_eq_state.C,v 1.8 2004-09-02 17:00:12 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eq_state.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eq_state/alg_eq_state.C,v $
 //  $State: Exp $
 //
@@ -40,6 +46,12 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 // Constructor 
 //------------------------------------------------------------------
+/*!
+  \param latt The lattice object containing the gauge filed on which to
+  compute the plaquette.
+  \param arg   Container for parameters specific to this algorithm.
+  \param c_arg Container for generic algorithm parameters.
+ */
 AlgEqState::AlgEqState(Lattice& latt, 
 	     CommonArg *c_arg,
 	     EqStateArg *arg) : 
@@ -74,7 +86,11 @@ AlgEqState::~AlgEqState() {
 
 
 //------------------------------------------------------------------
-//
+/*!
+  \post If a file is specified in CommonArg, the plaquette values in the
+  perpendicular and then parallel to the specified direction are appended
+  to this file.
+ */
 //------------------------------------------------------------------
 void AlgEqState::run()
 {
@@ -118,25 +134,24 @@ void AlgEqState::run()
   Float plaq_parall = 0.0;
   int x[4];
     
-  for(x[0] = 0; x[0] < GJP.XnodeSites(); ++x[0]) {
-    for(x[1] = 0; x[1] < GJP.YnodeSites(); ++x[1]) {
-      for(x[2] = 0; x[2] < GJP.ZnodeSites(); ++x[2]) {
-        for(x[3] = 0; x[3] < GJP.TnodeSites(); ++x[3]) {
+  for(x[0] = 0; x[0] < GJP.XnodeSites(); ++x[0]) 
+      for(x[1] = 0; x[1] < GJP.YnodeSites(); ++x[1]) 
+	  for(x[2] = 0; x[2] < GJP.ZnodeSites(); ++x[2]) 
+	      for(x[3] = 0; x[3] < GJP.TnodeSites(); ++x[3]) {
   
-          for (int mu = 0; mu < 3; ++mu) {
-            for(int nu = mu+1; nu < 4; ++nu) {
-	      Float re_tr_plaq = lat.ReTrPlaq(x,mu,nu);
-	      if (mu == alg_eq_state_arg->dir || nu == alg_eq_state_arg->dir) {
-		plaq_parall += re_tr_plaq;
-	      } else {
-		plaq_perpen += re_tr_plaq;
+		  for (int mu = 0; mu<3; ++mu) for(int nu = mu+1; nu<4; ++nu){
+		      Float re_tr_plaq = lat.ReTrPlaq(x,mu,nu);
+		      if (mu == alg_eq_state_arg->dir || nu == alg_eq_state_arg->dir) 
+			  plaq_parall += re_tr_plaq;
+		      else 
+			  plaq_perpen += re_tr_plaq;
+			  
+		  }
+	  
 	      }
-            }
-          }
-        }
-      }
-    }
-  }
+	  
+      
+  
 
   glb_sum(&plaq_perpen);
   glb_sum(&plaq_parall);

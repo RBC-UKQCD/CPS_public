@@ -1,14 +1,11 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
-//
-// alg_wline.h
-//
-// Header file for the AlgWline class.
-//
-// AlgWline is derived from Alg and it measures the average
-// value of the Wilson line for each direction. 
-//
+/*!\file
+  \brief Definition of AlgWline class.
+
+  $Id: alg_wline.h,v 1.3 2004-09-02 16:53:10 zs Exp $
+*/
 //------------------------------------------------------------------
 
 
@@ -17,13 +14,18 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <util/lattice.h>
-#include <util/smalloc.h>
-#include <util/pmalloc.h>
 #include <alg/alg_base.h>
 #include <alg/common_arg.h>
 #include <alg/no_arg.h>
 CPS_START_NAMESPACE
 
+//! Measures the %Wilson line in all directions.
+/*!
+  In each direction, the %Wilson line is calculated and averaged over the
+  lattice.
+  
+  \ingroup alg
+*/
 
 class AlgWline : public Alg
 {
@@ -38,6 +40,7 @@ class AlgWline : public Alg
 
     virtual ~AlgWline();
 
+    //! Measures the %Wilson line in all directions.
     void run(void);
 };
 

@@ -39,7 +39,7 @@ CPS_START_NAMESPACE
   \param f_field_out A (pointer to) a spin-colour field (optionally). 
   \param f_field_in A (pointer to) a spin-colour field (optionally).
   \param arg Parameters for the solver.
-  \param cnv_frm_flag Whether the lattice fields should be converted to
+  \param convert Whether the lattice fields should be converted to
   to a new storage order appropriate for the type of fermion action.
   If this is ::CNV_FRM_NO, then just the gauge field is converted.
   If this is ::CNV_FRM_YES, then the fields \a f_field_out and \a f_field_in
@@ -51,12 +51,12 @@ DiracOpWilsonTypes::DiracOpWilsonTypes(Lattice & latt,
 				       Vector *f_field_out,
 				       Vector *f_field_in,
 				       CgArg *arg,
-				       CnvFrmType cnv_frm_flg) :
+				       CnvFrmType convert) :
                                        DiracOp(latt, 
 					       f_field_out,
 					       f_field_in, 
 					       arg,
-					       cnv_frm_flg)
+					       convert)
 {
   cname = "DiracOpWilsonTypes";
   char *fname = "DiracOpWilsonTypes(L&,V*,V*,CgArg*,CnvFrmType)";

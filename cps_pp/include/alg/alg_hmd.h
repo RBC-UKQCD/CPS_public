@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.10 2004-08-18 11:57:35 zs Exp $
+  $Id: alg_hmd.h,v 1.11 2004-09-02 16:56:39 zs Exp $
 */
 //------------------------------------------------------------------
 
@@ -59,8 +59,10 @@ class AlgHmd : public Alg
 
   AlgHmd(Lattice& latt, CommonArg *c_arg, HmdArg *arg);
 
+
   virtual ~AlgHmd();
 
+  //! Performs a single trajectory of the HMD algorithm. 
   virtual Float run() = 0;
 
 };
@@ -184,6 +186,7 @@ class AlgHmcPhi : public AlgHmd
 
   virtual ~AlgHmcPhi();
 
+  //! Performs a single  HMC trajectory.  
   Float run(void);
 };
 
@@ -191,7 +194,7 @@ class AlgHmcPhi : public AlgHmd
 //! A class implementing the Hybrid Monte Carlo algorithm.
 /*!
   This evolves a gauge field by a single iteration of
-  the standard HMC algorithm, \e i.e. a molecular dynamics
+  the HMC algorithm, \e i.e. a molecular dynamics
   trajectory followed by a metropolis accept/reject step.
 
   This implementation uses a Uqpq leapfrog integration scheme and a minimum 
@@ -303,14 +306,31 @@ class AlgHmcQPQ : public AlgHmd
 
   virtual ~AlgHmcQPQ();
 
+  //! Performs a HMC trajectory.
   Float run(void);
 };
 
 //------------------------------------------------------------------
-//
-// AlgHmcRHMC is derived from AlgHmd and is relevant to the Rational Hybrid  
-// Monte Carlo algorithm.
-//
+//! A class implementing the Rational Hybrid Monte Carlo algorithm.
+/*!
+  The main method evolves a gauge field along a molecular dynamics
+  trajectory followed by a metropolis accept/reject step using the RHMC
+  algorithm.
+
+  The algorithm is configurable to include dynamical fermions
+  of several masses, each mass having its own set of pseudofermion fields
+  and solver parameters. The number of degenerate flavours at each mass
+  depends on the type of fermion action used.
+
+  As with AlgHmcPhi, one can also have bosons in the action.
+
+  The rational approximation can be generated dynamically, but the
+  correct constructor must be used and the code should be configured with
+  the --enable-gmp flag to use the GNU multiprecision library.
+
+  \note When used with Asqtad fermions, the local lattice size has
+  to be greater than 2 in all directions.
+*/
 //------------------------------------------------------------------
 class AlgHmcRHMC : public AlgHmd
 {
@@ -321,73 +341,108 @@ class AlgHmcRHMC : public AlgHmd
  protected:
 
     int n_frm_masses;     
-        // The number of dynamical fermion masses.
+        //!< The number of dynamical fermion masses.
 
     int n_bsn_masses;     
-        // The number of dynamical boson masses.
+        //!< The number of dynamical boson masses.
 
     int f_size;       
-        // Node checkerboard size of the fermion field
+    //!< The size of a fermion field.
+    /*!< The size is given in terms of the total number of floating point
+      numbers in the field on the local lattice, taking into account whether
+      or not the field is defined on just a single parity.
+    */
 
     CgArg **frm_cg_arg;
-        // pointer to an array of CG argument structures
-	// relevant to fermions.
+    //!< Pointer to an array of structures containing solver parameters.
+    /*!<
+      These are the parameters corresponding to each of the dynamical fermion
+      masses.      
+     */
+
 
     CgArg **bsn_cg_arg;
-        // pointer to an array of CG argument structures
-	// relevant to bosons.
+    //!< Pointer to an array of structures containing solver parameters.
+    /*!<
+      These are the parameters corresponding to each of the dynamical boson
+      masses.      
+     */
 
     Vector** phi;
-        // Pseudo fermion field phi (checkerboarded).
+    //!< Pseudofermion fields
+    /*!< One for each mass */
+
 
     Vector** bsn;
-        // Boson field bsn (checkerboarded).
+    //!< Boson (pseudoboson?) fields 
+    /*!< One for each mass */
+
 
     Matrix* gauge_field_init;
-        // Initial gauge field needed if the evolved one is rejected
+    //!< The initial gauge field configuration
 
     Vector** frmn;
-        // Solution vectors
+    //!< Array of vectors
+    /*!< These will hold the solutions from the solves. */
 
     Vector** frmn_d;
-        // Dslash * Solution vectors 
+    //!< Array of vectors
+    /*!< These will hold the solutions from the solves multiplied by
+      the D-slash operator. */ 
 
     Float *h_f_init;    
-        // Initial fermion Hamiltonian (one for each mass)
+    //!< The initial value of the pseudofermion action.
+    /*!< The value at the start of the trajectory. One for each mass */
 
     Float *h_f_final;   
-        // Final fermion Hamiltonian (one for each mass)
+    //!< The final value of the pseudofermion action.
+    /*!< The value at the end of the trajectory. One for each mass */
+
 
     Float *delta_h_f;   
-        // Final-Init fermion Hamiltonian (one for each mass)
+    //!< The change in the value of the pseudofermion action.
+    /*!< The final value - the initial value. One for each mass */
 
     Float *h_b_init;    
-        // Initial boson Hamiltonian (one for each mass)
+    //!< The initial value of the boson action.
+    /*!< The value at the start of the trajectory. One for each mass */
 
     Float *h_b_final;   
-        // Final boson Hamiltonian (one for each mass)
+    //!< The final value of the boson action.
+    /*!< The value at the end of the trajectory. One for each mass */
 
     Float *delta_h_b;   
-        // Final-Init boson Hamiltonian (one for each mass)
+    //!< The change in the value of the boson action.
+    /*!< The final value - the initial value. One for each mass */
 
     int total_size;
-        // The sum of the rational approximation degrees used for the force
+    //!< The sum of the rational approximation degrees used for the force
+
     Float *all_res;
+    //!< ?
 
     EigArg *eig_arg;
-
+    //!< ?
 
  public:
 
+  //!  Constructor for when the rational approximation is fixed.
   AlgHmcRHMC(Lattice& latt, CommonArg *c_arg, HmdArg *arg);
+
+  //!   Constructor for when the rational approximations are to be generated dynamically.
   AlgHmcRHMC(Lattice& latt, CommonArg *c_arg, HmdArg *arg, EigArg *e_arg);
+
+  //! Does the main work of the constructors.
   void init();
 
   virtual ~AlgHmcRHMC();
 
+  //! Performs a single RHMC trajectory
   Float run(void);
 
+  //! Dynamical generation of the rational approximation.
   void dynamicalApprox();
+
 };
 
 //------------------------------------------------------------------

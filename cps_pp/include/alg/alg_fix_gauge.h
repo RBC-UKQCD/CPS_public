@@ -1,15 +1,11 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
-//
-// alg_fix_gauge.h
-//
-// Header file for the AlgFixGauge class.
-//
-// AlgFixGauge is derived from Alg and is relevant to the 
-// gauge fixing algorithms. The type of glue and fermion is
-// determined by the argument to the constructor.
-//
+/*!\file
+  \brief  Definitions of the AlgFixGauge class.
+
+  $Id: alg_fix_gauge.h,v 1.3 2004-09-02 16:56:28 zs Exp $
+*/
 //------------------------------------------------------------------
 
 
@@ -18,14 +14,21 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <util/lattice.h>
-#include <util/smalloc.h>
-#include <util/pmalloc.h>
 #include <alg/alg_base.h>
 #include <alg/common_arg.h>
 #include <alg/fix_gauge_arg.h>
 CPS_START_NAMESPACE
 
+//! Performs gauge fixing.
+/*!
+  The gauge can be fixed to Landau gauge, in which case this is done
+  at every lattice site, or to Coulomb gauge, in which case the gauge is
+  fixed on hyperplanes normal to a specified direction.
+  You can specify the first hyperplane, the number of hyperplanes and the
+  distance between hyperplanes.
 
+    \ingroup alg
+ */
 class AlgFixGauge : public Alg
 {
  private:
@@ -40,11 +43,15 @@ class AlgFixGauge : public Alg
 
     virtual ~AlgFixGauge();
 
+    //  Constructs the gauge fixing matrices.
+    /*!\post The Lattice class allocates memory for the gauge fixing matrices
+      which can be accessed using Lattice::FixGaugePtr.
+     */
     void run(void);  
-       // Allocates memory and constructs the gauge fixing matrices
 
+    // Frees the memory allocated for the gauge fixing matrices.
     void free(void);
-       // Free the memory of the gauge fixing matrices.
+
 };
 
 

@@ -3,18 +3,20 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
+
+  $Id: alg_hmc_phi.C,v 1.14 2004-09-02 17:00:31 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.13 2004-08-18 11:57:39 zs Exp $
-//  $Id: alg_hmc_phi.C,v 1.13 2004-08-18 11:57:39 zs Exp $
+//  $Date: 2004-09-02 17:00:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.14 2004-09-02 17:00:31 zs Exp $
+//  $Id: alg_hmc_phi.C,v 1.14 2004-09-02 17:00:31 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -331,11 +333,22 @@ AlgHmcPhi::~AlgHmcPhi() {
 
 
 //------------------------------------------------------------------
-//! Run the HMC algorithm.
 /*!
-  This performs a single  HMC trajectory.
-  \post The results are written to the file specified in the common_arg
-  structure.
+  \return The probability used in the metropolis step.
+  \post The following results are written to the file specified in the
+  CommonArg structure:
+  -# Number of molecular dynamics steps + 1
+  -# Change in the hamiltonian
+  -# 1/0 if accepted/rejected
+  -# A measure of the change in the gauge field due to reunitarisation
+  -# Another measure of the change in the gauge field due to reunitarisation
+  -# Average number of solver iterations.
+  -# Minimum number of solver iterations.
+  -# Maximum number of solver iterations.
+  -# Average solver residue
+  -# Minimum solver residue
+  -# Maximum solver residue
+  .
 */
 //------------------------------------------------------------------
 Float AlgHmcPhi::run(void)

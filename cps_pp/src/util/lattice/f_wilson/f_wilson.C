@@ -3,6 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
+  $Id: f_wilson.C,v 1.13 2004-09-02 16:59:37 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -273,7 +274,7 @@ int Fwilson::FmatInv(Vector *f_out, Vector *f_in,
 
 
 //------------------------------------------------------------------
-// int FeigSolv(Vector **f_eigenv, Float lambda[], int valid_eig[],
+// int FeigSolv(Vector **f_eigenv, Float *lambda, int *valid_eig,
 //              EigArg *eig_arg, 
 //              CnvFrmType cnv_frm = CNV_FRM_YES):
 // It solve  A * f_eigenv = lambda * f_eigenv where
@@ -285,8 +286,8 @@ int Fwilson::FmatInv(Vector *f_out, Vector *f_in,
 // f_eigenv is defined on the whole lattice.
 // The function returns the total number of Ritz iterations.
 //------------------------------------------------------------------
-int Fwilson::FeigSolv(Vector **f_eigenv, Float lambda[],
-		      Float chirality[], int valid_eig[],
+int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
+		      Float *chirality, int *valid_eig,
 		      Float **hsum,
 		      EigArg *eig_arg, 
 		      CnvFrmType cnv_frm)

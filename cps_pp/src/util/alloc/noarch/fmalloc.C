@@ -1,34 +1,27 @@
 #include<config.h>
-CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of dynamic memory management routines.	
 
-CPS_END_NAMESPACE
-#include <util/smalloc.h>
-#include <util/verbose.h>
+  $Id: fmalloc.C,v 1.3 2004-09-02 16:58:06 zs Exp $
+*/
+
 #include <stdlib.h>
+#include <util/verbose.h>
+#include <util/error.h>
+
 CPS_START_NAMESPACE
 
-//! Allocate memory
-/*!
-  \param request The amount of memory (in bytes) to allocate
-  \return A pointer to the allocated memory
-*/
 void* fmalloc(int request){
-  void* ptr;
-  ptr = malloc(request);
-  return ptr;
+    void *p =  malloc(request);
+    if(!p) ERR.Pointer("","fmalloc","");
+    VRB.Smalloc("","fmalloc","", p, request);
+    return p;
 }
 
-//! Free allocate memory
-/*!
-  \param p Pointer to the memory to be freed.
-*/
 void ffree(void* p){
-  free((char*) p);
+    VRB.Sfree("","ffree","",p);
+    free(p);
 }
-
-
-
-
 
 
 CPS_END_NAMESPACE

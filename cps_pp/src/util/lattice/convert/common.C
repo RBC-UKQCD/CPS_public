@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion functions.
 
-  $Id: common.C,v 1.4 2004-08-18 11:58:02 zs Exp $
+  $Id: common.C,v 1.5 2004-09-02 16:59:26 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/common.C,v 1.4 2004-08-18 11:58:02 zs Exp $
-//  $Id: common.C,v 1.4 2004-08-18 11:58:02 zs Exp $
+//  $Date: 2004-09-02 16:59:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/common.C,v 1.5 2004-09-02 16:59:26 zs Exp $
+//  $Id: common.C,v 1.5 2004-09-02 16:59:26 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/common.C,v $
 //  $State: Exp $
 //
@@ -66,7 +66,7 @@ void site2cram(IFloat *src, IFloat *dst, unsigned site_size)
 
 //! Copy and rearrange an array.
 /*!
-  The copy is of the form <em\n
+  The copy is of the form <em>\n
   dst[link_tbl[i]] = src[i]
   \n</em>
   \param src The array to copy from.

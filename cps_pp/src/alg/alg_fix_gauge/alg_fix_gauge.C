@@ -1,35 +1,34 @@
 #include<config.h>
 CPS_START_NAMESPACE
-//--------------------------------------------------------------------
+//------------------------------------------------------------------
+/*!\file
+  \brief Implementation of AlgFixGauge class methods.
+
+  $Id: alg_fix_gauge.C,v 1.9 2004-09-02 16:56:30 zs Exp $
+*/
+//------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v 1.8 2004-08-18 11:57:38 zs Exp $
-//  $Id: alg_fix_gauge.C,v 1.8 2004-08-18 11:57:38 zs Exp $
+//  $Date: 2004-09-02 16:56:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v 1.9 2004-09-02 16:56:30 zs Exp $
+//  $Id: alg_fix_gauge.C,v 1.9 2004-09-02 16:56:30 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_fix_gauge.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//------------------------------------------------------------------
-//
-// AlgFixGauge is derived from Alg and is relevant to the 
-// gauge fixing algorithms. The type of glue and fermion is
-// determined by the argument to the constructor.
-//
-//------------------------------------------------------------------
 
 
 CPS_END_NAMESPACE
-#include <stdlib.h>	// exit()
-#include <util/qcdio.h>
+//#include <stdlib.h>	// exit()
+//#include <util/qcdio.h>
 #include <alg/alg_fix_gauge.h>
-#include <alg/common_arg.h>
-#include <alg/fix_gauge_arg.h>
+// #include <alg/common_arg.h>
+// #include <alg/fix_gauge_arg.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <util/smalloc.h>
@@ -41,7 +40,11 @@ CPS_START_NAMESPACE
 
 
 //------------------------------------------------------------------
-// Constructor 
+/*!
+  \param latt The lattice object containing the gauge field to be fixed.
+  \param c_arg Generic algorithm parameters
+  \param arg Gauge fixing parameters.
+*/
 //------------------------------------------------------------------
 AlgFixGauge::AlgFixGauge(Lattice& latt, 
 			 CommonArg *c_arg,
@@ -49,7 +52,7 @@ AlgFixGauge::AlgFixGauge(Lattice& latt,
 			 Alg(latt, c_arg) 
 {
   cname = "AlgFixGauge";
-  char *fname = "AlgFixGauge(L&,CommonArg*,FixGaugeArg*)";
+  const char *fname = "AlgFixGauge";
   VRB.Func(cname,fname);
 
   // Initialize the argument pointer
@@ -58,20 +61,18 @@ AlgFixGauge::AlgFixGauge(Lattice& latt,
     ERR.Pointer(cname,fname, "arg");
   alg_fix_gauge_arg = arg;
 
-
-  //???
 }
 
 
 //------------------------------------------------------------------
-// Destructor
+/*!
+  \note The destructor does not free the memory allocated.
+  Use AlgFixGauge::free for this or Lattice::FixGaugeFree
+*/
 //------------------------------------------------------------------
 AlgFixGauge::~AlgFixGauge() {
-  char *fname = "~AlgFixGauge()";
+  const char *fname = "~AlgFixGauge";
   VRB.Func(cname,fname);
-
-
-  //???
 }
 
 
@@ -80,7 +81,7 @@ AlgFixGauge::~AlgFixGauge() {
 //------------------------------------------------------------------
 void AlgFixGauge::run()
 {
-  char *fname = "run()";
+  const char *fname = "run";
   VRB.Func(cname,fname);
 
   // Set the Lattice pointer
@@ -102,29 +103,31 @@ void AlgFixGauge::run()
       (fix == FIX_GAUGE_COULOMB_Y) ||
       (fix == FIX_GAUGE_COULOMB_Z) ||
       (fix == FIX_GAUGE_COULOMB_T)  ){ 
-    if(fix == FIX_GAUGE_COULOMB_X) 
-      lattice_dir_size = GJP.XnodeSites() * GJP.Xnodes();
-    else if(fix == FIX_GAUGE_COULOMB_Y) 
-      lattice_dir_size = GJP.YnodeSites() * GJP.Ynodes();
-    else if(fix == FIX_GAUGE_COULOMB_Z) 
-      lattice_dir_size = GJP.ZnodeSites() * GJP.Znodes();
-    else 
-      lattice_dir_size = GJP.TnodeSites() * GJP.Tnodes();
 
-    if(start+step*(num-1) >= lattice_dir_size){
-      ERR.General(cname, fname, 
-		  "Wrong fix_gauge_arg, start = %d, step = %d, num = %d\n",
-		  start, step, num);
-    }
+      switch(fix){
+      case FIX_GAUGE_COULOMB_X:
+	  lattice_dir_size = GJP.XnodeSites() * GJP.Xnodes();
+	  break;
+      case FIX_GAUGE_COULOMB_Y:
+	  lattice_dir_size = GJP.YnodeSites() * GJP.Ynodes();
+	  break;
+      case FIX_GAUGE_COULOMB_Z:
+	  lattice_dir_size = GJP.ZnodeSites() * GJP.Znodes();
+	  break;
+      case FIX_GAUGE_COULOMB_T:
+	  lattice_dir_size = GJP.TnodeSites() * GJP.Tnodes();
+      }
+
+    if(start+step*(num-1) >= lattice_dir_size)
+	ERR.General(cname, fname,
+		    "The coordinate of the last hyperplane (%d+%d*%d) is greater than the global lattice size.", 
+		    start, step, num-1, lattice_dir_size);
 
     h_planes = (int *) smalloc(num * sizeof(int));
-    if(h_planes == 0)
-      ERR.Pointer(cname,fname, "h_planes");
+    if(h_planes == 0) ERR.Pointer(cname,fname, "h_planes");
     VRB.Smalloc(cname,fname, "h_planes", h_planes, num * sizeof(int));
     
-    for(int i=0; i<num; i++){
-      h_planes[i] = start + step * i;
-    }
+    for(int i=0; i<num; i++) h_planes[i] = start + step * i;
 
   }
 

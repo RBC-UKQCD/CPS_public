@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.13 2004-09-01 13:36:23 chulwoo Exp $
+  $Id: random.C,v 1.14 2004-09-02 16:57:02 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2004-09-01 13:36:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.13 2004-09-01 13:36:23 chulwoo Exp $
-//  $Id: random.C,v 1.13 2004-09-01 13:36:23 chulwoo Exp $
+//  $Author: zs $
+//  $Date: 2004-09-02 16:57:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.14 2004-09-02 16:57:02 zs Exp $
+//  $Id: random.C,v 1.14 2004-09-02 16:57:02 zs Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -39,10 +39,8 @@ CPS_END_NAMESPACE
 #endif
 CPS_START_NAMESPACE
 
-
-IFloat UniformRandomGenerator::A = -0.5;
-IFloat UniformRandomGenerator::B = 0.5;
-IFloat GaussianRandomGenerator::sigma2 = 1.0;
+int  RandomGenerator::MBIG  = 1000000000;
+IFloat  RandomGenerator::FAC = 1.0E-09;			// 1.0/MBIG
 
 /*!
   This method must be called before the RNG is used
@@ -133,14 +131,10 @@ int RandomGenerator::StateSize() const {
 
 }
 
-#if 0
-//--------------------------------------------------------
-IFloat UGrandomGenerator::Rand()
-{
-  ERR.NotImplemented("UGrandomGenerator", "Rand()");
-  return 0.0;
-}
-#endif
+IFloat UniformRandomGenerator::A = -0.5;
+IFloat UniformRandomGenerator::B = 0.5;
+IFloat GaussianRandomGenerator::sigma2 = 1.0;
+
 
 
 //---------------------------------------------------------
@@ -331,15 +325,11 @@ IFloat LatRanGen::Grand(FermionFieldDimension frm_dim)
 /*!
   The parameters are set for the RNGs on all hypercubes.
   \param high the upper bound of the distribution range
-  \param lower the lower bound of the distribution range
+  \param low the lower bound of the distribution range
 */
 //----------------------------------------------------------------------
 void LatRanGen::SetInterval(IFloat high, IFloat low)
 {
-#if 0
-  for(int i=0; i<n_rgen; i++) ugran[i].SetInterval(high, low);
-  for(int i=0; i<n_rgen_4d; i++) ugran_4d[i].SetInterval(high, low);
-#endif
   ugran[0].SetInterval(high,low);
 }
 
@@ -351,10 +341,6 @@ void LatRanGen::SetInterval(IFloat high, IFloat low)
 //----------------------------------------------------------------------
 void LatRanGen::SetSigma(IFloat sigma)
 {
-#if 0
-  for(int i=0; i<n_rgen; i++) ugran[i].SetSigma(sigma);
-  for(int i=0; i<n_rgen_4d; i++) ugran_4d[i].SetSigma(sigma);
-#endif
   ugran[0].SetSigma(sigma);
 }
 
@@ -366,6 +352,7 @@ void LatRanGen::SetSigma(IFloat sigma)
   \param y The y coordinate of the lattice site.
   \param z The z coordinate of the lattice site.
   \param t The t coordinate of the lattice site.
+  \param s The s coordinate of the lattice site.  
   \post  Subsequent calls to \e e.g. Urand will return results from this
   particular hypercubic RNG.  
  */
@@ -466,9 +453,11 @@ int LatRanGen::StateSize() const{
   as the value returned by ::StateSize.
 
   \param state The state to be copied from the RNG.
+  \param frm_dim If FIVE_D, the default, refers to the normal RNG. If FOUR_D
+  then the special RNG four gauge fields with domain-wall fermions is used.  
 */
 void LatRanGen::GetState(unsigned int *state,
-FermionFieldDimension frm_dim) const{
+			 FermionFieldDimension frm_dim) const{
     if (frm_dim == FIVE_D)
     ugran[rgen_pos].StoreSeeds(state);        
     else
@@ -504,9 +493,10 @@ int LatRanGen::NStates() const{
   \pre \a s must point to a 2-d array with lengths given by ::NStates and 
   ::StateSize.
   \param s The state to assigned to the RNGs on the entire local lattice.
+  \param frm_dim If FIVE_D, the default, refers to the normal RNG. If FOUR_D
+  then the special RNG four gauge fields with domain-wall fermions is used.  
 */
-void LatRanGen::SetStates(unsigned int **s,
-FermionFieldDimension frm_dim) {
+void LatRanGen::SetStates(unsigned int **s, FermionFieldDimension frm_dim) {
     if (frm_dim == FIVE_D)
     for(int h=0; h<n_rgen; h++) ugran[h].RestoreSeeds(s[h]);
     else
@@ -515,13 +505,14 @@ FermionFieldDimension frm_dim) {
 }
 	
 /*!
-
   \pre \a s must point to a 2-d array with lengths given by ::NStates and
   ::StateSize.
   \param s The state to be copied from the RNGs on the entire local lattice. 
+  \param frm_dim If FIVE_D, the default, refers to the normal RNG. If FOUR_D
+  then the special RNG four gauge fields with domain-wall fermions is used.  
 */
 void LatRanGen::GetStates(unsigned int **s,
-FermionFieldDimension frm_dim) const {
+			  FermionFieldDimension frm_dim) const {
 
     if (frm_dim == FIVE_D)
     for(int h=0; h<n_rgen; h++) ugran[h].StoreSeeds(s[h]);

@@ -1,4 +1,4 @@
-///  $Id: main.C,v 1.7 2004-08-18 11:58:11 zs Exp $
+///  $Id: main.C,v 1.8 2004-09-02 16:52:46 zs Exp $
 ///  Demonstrate the random gauge transformation code.
 ///
 
@@ -14,7 +14,7 @@
  The gauge transformation code was orginally written
  by Chris Dawson (using existing code from the BNL group).
 
-$Id: main.C,v 1.7 2004-08-18 11:58:11 zs Exp $
+$Id: main.C,v 1.8 2004-09-02 16:52:46 zs Exp $
 */
 
 #include <config.h>
@@ -26,11 +26,7 @@ $Id: main.C,v 1.7 2004-08-18 11:58:11 zs Exp $
 #include <util/random.h>
 #include <alg/alg_plaq.h>
 #include <alg/do_arg.h>
-//#include <alg/common_arg.h>
-//#include <alg/alg_smear.h>
-//#include <alg/alg_tcharge.h>
 #include <util/ReadLattice.h>
-//#include <util/command_line.h>
 #include <alg/alg_rnd_gauge.h>
 #include<util/testing_framework.h>
 
@@ -45,7 +41,7 @@ CPS_END_NAMESPACE
 USING_NAMESPACE_CPS
 
 
-Float link_trace(Lattice& lattice)
+static Float link_trace(Lattice& lattice)
 {
 #if TARGET==cpsMPI
   using MPISCU::printf;
@@ -66,12 +62,12 @@ Float link_trace(Lattice& lattice)
   return linktrace ; 
 }
 
-void setup_do_arg(DoArg& do_arg) ; 
+static void setup_do_arg(DoArg& do_arg) ; 
 
-const int nx = 4 ;
-const int ny = 4 ;
-const int nz = 4 ;
-const int nt = 4 ;
+static const int nx = 4 ;
+static const int ny = 4 ;
+static const int nz = 4 ;
+static const int nt = 4 ;
 
 
 int main(int argc,char *argv[])
@@ -113,7 +109,7 @@ int main(int argc,char *argv[])
   AlgPlaq plaq(lattice,&common_arg,&no_arg);
 
   plaq.run();
-  Float tmp = link_trace(lattice);
+  Float tmp = link_trace(lattice); 
 
   AlgRandomGauge rnd( lattice, &common_arg );
 
@@ -129,9 +125,9 @@ int main(int argc,char *argv[])
   Float new_trace = link_trace(lattice);
 
   //------------------------------ 
-  // testing framework, compare the test against the old value
-  Float tol = 0.0001 ; 
-  Float old_trace = 0.62115 ;
+  // testing framework - compare the test against the old value
+  const Float tol = 0.0001 ; 
+  const Float old_trace = 0.6241053;
   compare_float_relative(new_trace,old_trace,tol) ; 
   // ----- end of testing framework -------------
 

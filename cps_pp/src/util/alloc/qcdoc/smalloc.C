@@ -1,40 +1,27 @@
 #include<config.h>
-#include<string.h>
-CPS_START_NAMESPACE
+/*!\file
+  \brief  Implementation of dynamic memory management routines.	
 
-CPS_END_NAMESPACE
-#include <util/smalloc.h>
+  $Id: smalloc.C,v 1.7 2004-09-02 16:57:09 zs Exp $
+*/
+
 #include <util/error.h>
 #include <util/verbose.h>
-#include <stdlib.h>
-#include <util/qcdio.h>
 #include <qcdoc_align.h>
 #include <qalloc.h>
+
 CPS_START_NAMESPACE
 
-//! Allocate memory
-/*!
-  \param request The amount of memory (in bytes) to allocate
-  \return A pointer to the allocated memory
-*/
 void* smalloc(int request){
-  void* ptr;
-  ptr = qalloc(QCOMMS,request);
-  if (ptr == NULL){
-  ERR.Pointer("","smalloc(i)","");
-  exit(1);
-  }
-  VRB.Smalloc("","smalloc(i)","", ptr, request);
-  return ptr;
+    void *p = qalloc(QCOMMS,request);
+    if (!p) ERR.Pointer("","smalloc","");
+    VRB.Smalloc("","smalloc","", p, request);
+    return p;
 }
 
-//! Free allocate memory
-/*!
-  \param p Pointer to the memory to be freed.
-*/
 void sfree(void* p){
-  VRB.Sfree("","sfree(v*)","",p);
-  qfree((char*) p);
+    VRB.Sfree("","sfree","",p);
+    qfree(p);
 }
 
 void sclear(void){};

@@ -171,7 +171,7 @@ int FimprDwf::FmatInv(Vector *f_out, Vector *f_in,
 // It evolves the canonical momentum mom by step_size
 // using the fermion force.
 //------------------------------------------------------------------
-void FimprDwf::EvolveMomFforce(Matrix *mom, Vector *chi, 
+void FimprDwf::EvolveMomFforce(Matrix *mom, Vector *frm, 
 			   Float mass, Float step_size){
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
@@ -187,8 +187,8 @@ void FimprDwf::EvolveMomFforce(Matrix *mom, Vector *chi,
   if (mom == 0)
     ERR.Pointer(cname,fname,"mom") ;
  
-  if (chi == 0)
-    ERR.Pointer(cname,fname,"chi") ;
+  if (frm == 0)
+    ERR.Pointer(cname,fname,"frm") ;
  
   //----------------------------------------------------------------
   // allocate space for two CANONICAL fermion fields
@@ -236,7 +236,7 @@ void FimprDwf::EvolveMomFforce(Matrix *mom, Vector *chi,
     cg_arg.mass = mass ;
 
     DiracOpImprDwf dwf(*this, v1, v2, &cg_arg, CNV_FRM_YES) ;
-    dwf.CalcHmdForceVecs(chi) ;
+    dwf.CalcHmdForceVecs(frm) ;
   }
 
   int mu, x, y, z, t, s, lx, ly, lz, lt, ls ;
@@ -827,7 +827,8 @@ void FimprDwf::EvolveMomFforce(Matrix *mom, Vector *chi,
 }
 
 void FimprDwf::ForceProductSum(const Vector *v, const Vector *w,
-		IFloat coeff, Matrix *f){
+			       IFloat coeff, Matrix *f){
+    ERR.NotImplemented(cname, "ForceProductSum");
 }
 
 CPS_END_NAMESPACE
