@@ -1,5 +1,5 @@
 /*
-  $Id :$
+  $Id: main.C,v 1.12 2004-10-27 15:35:12 zs Exp $
 */
 
 #include<config.h>
@@ -9,6 +9,7 @@
 #include<util/verbose.h>
 #include<util/error.h>
 #include<alg/do_arg.h>
+#include <comms/sysfunc.h>
 
 
 USING_NAMESPACE_CPS
@@ -21,32 +22,29 @@ int main(int argc,char *argv[]){
     //----------------------------------------------------------------
     DoArg do_arg;
 
-    do_arg.x_node_sites = 2;
-    do_arg.y_node_sites = 2;
-    do_arg.z_node_sites = 2;
-    do_arg.t_node_sites = 2;
-#ifdef PARALLEL
-    do_arg.x_nodes = 2;
-    do_arg.y_nodes = 2;
-    do_arg.z_nodes = 2;
-    do_arg.t_nodes = 2;
-#else
-    do_arg.x_nodes = 1;
-    do_arg.y_nodes = 1;
-    do_arg.z_nodes = 1;
-    do_arg.t_nodes = 1;
-#endif 
+    do_arg.x_node_sites = 4;
+    do_arg.y_node_sites = 4;
+    do_arg.z_node_sites = 4;
+    do_arg.t_node_sites = 4;
+
+#if TARGET==cpsMPI
+    using MPISCU::printf;
+    using MPISCU::fprintf;
+    MPISCU::set_pe_grid(2,2,1,1);    
+#endif
+
+    do_arg.x_nodes = SizeX();
+    do_arg.y_nodes = SizeY();    
+    do_arg.z_nodes = SizeZ();
+    do_arg.t_nodes = SizeT();
+
     do_arg.x_bc = BND_CND_PRD;
     do_arg.y_bc = BND_CND_PRD;
     do_arg.z_bc = BND_CND_PRD;
     do_arg.t_bc = BND_CND_PRD;
+
     do_arg.start_conf_kind = START_CONF_ORD;
     do_arg.start_seed_kind = START_SEED_FIXED;
-    do_arg.beta = 5.5;
-    do_arg.dwf_height = 0.9;
-    do_arg.clover_coeff = 2.0171;
-
-
     
     do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
     do_arg.asqtad_naik = -1.0/24.0;
@@ -62,11 +60,6 @@ int main(int argc,char *argv[]){
 //     do_arg.asqtad_5staple = 0.0;
 //     do_arg.asqtad_7staple = 0.0;
     
-#if TARGET==cpsMPI
-    MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
-    using MPISCU::printf;
-    using MPISCU::fprintf;
-#endif
 
     GJP.Initialize(do_arg);
 
@@ -116,7 +109,7 @@ int main(int argc,char *argv[]){
     for(int d=0;  d<degree; d++) alpha[d] = 1.0;
 
 //     for(int d=0; d<degree; d++)
-// 	lat.EvolveMomFforce(mom, X[d], dummy, dt);
+//  	lat.EvolveMomFforce(mom, X[d], dummy, dt);
 
     lat.RHMC_EvolveMomFforce(mom, X, degree, alpha, dummy, dt, X);
 		
