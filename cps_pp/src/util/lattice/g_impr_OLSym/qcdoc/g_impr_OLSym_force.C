@@ -15,7 +15,6 @@ CPS_START_NAMESPACE
 // It evolves the canonical momentum mom by step_size
 // using the pure gauge force.
 //-----------------------------------------------------------------------------
-#define PROFILE
 void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
 {
   char *fname = "EvolveMomGforce(M*,F)";  //Name of our function
@@ -48,17 +47,13 @@ void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
   //Temporary matrices for use in calculation of the staples
   Matrix *tmp1[N];
   Matrix *tmp2[N];
-  Matrix *tmp3[N];
-  Matrix *tmp4[N];
 
   for(int i = 0;i<N;i++)
     {
       tmp1[i] = (Matrix *) fmalloc(vol*sizeof(Matrix));
       tmp2[i] = (Matrix *) fmalloc(vol*sizeof(Matrix));
-      tmp3[i] = (Matrix *) fmalloc(vol*sizeof(Matrix));
-      tmp4[i] = (Matrix *) fmalloc(vol*sizeof(Matrix));
-      //Set all bytes in tmp3
-      bzero(tmp3[i],vol*sizeof(Matrix));
+      //Set all bytes in tmp2
+      bzero(tmp2[i],vol*sizeof(Matrix));
     }
 
   //Holds the sum of staples associated with each lattice site
@@ -99,245 +94,11 @@ void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
     //
     //The new vector field will be indexed according to its new position.
     //
-    //The staples for the rectangle and chair terms can be seen as
-    //modifications of the standard plaquette.
-    //
-    //Consider the standard plaquette staple.  Instead of the normal three
-    //links that constitute a staple, remove a single link and replace
-    //it with some superposition of the original link and its possible
-    //staples.  These extra terms are equivalent to the rectangle and
-    //the chair terms.
-    //
-    //In order to minimize the number of matrix multiplications, this
-    //philosophy will be used to calculate the staple, instead
-    //of calculating the 6+18+72 different terms per link sequentially
+    //We want to calculate the gauge force for the one-loop
+    //improved gauge action
 
-      for(nu = 1;nu<4;nu++){
-	//First, consider replacing the link U_nu(x)_dagger
-
-	//Plaquette term
-	pt.run(N,tmp1,Units,dirs_m+nu);
-	for(int i = 0; i<N;i++)
-	  {
-	    vecTimesEquFloat((IFloat *)tmp1[i],tmp_plaq,vol*18);
-	    moveMem(result[i],tmp1[i],vol*sizeof(Matrix));
-	  }
-
-	//Rectangle term
-	pt.run(N,tmp1,Units,dirs_p);
-	pt.run(N,tmp2,tmp1,dirs_m+nu);
-	pt.run(N,tmp1,tmp2,dirs_m);
-	for(int i = 0; i<N;i++)
-	  vaxpy3_m(result[i],&tmp_rect,tmp1[i],result[i],vol*3);
-
-	//Chair terms
-	for(rho = 2;rho<4;rho++)
-	  {
-	    pt.run(N,tmp1,Units,dirs_p+rho);
-	    pt.run(N,tmp2,tmp1,dirs_m+nu);
-	    pt.run(N,tmp1,tmp2,dirs_m+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	    pt.run(N,tmp1,Units,dirs_m+rho);
-	    pt.run(N,tmp2,tmp1,dirs_m+nu);
-	    pt.run(N,tmp1,tmp2,dirs_p+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	  }
-
-	//Now calculate the rest of the plaquette for this linear combination
-	pt.run(N,tmp2,result,dirs_m);
-	pt.run(N,result,tmp2,dirs_p+nu);
-
-	//Add this result to the sum of the staples
-	for(int i = 0; i < N; i++)
-	  vecAddEquVec((IFloat *)tmp3[i],(IFloat *)result[i],vol*18);
-
-	//Next, consider replacing the link U_mu(x+nu)_dagger
-	pt.run(N,tmp4,Units,dirs_m+nu);
-	//Plaquette term already calculated
-
-	//Rectangle term
-	pt.run(N,tmp1,tmp4,dirs_m+nu);
-	pt.run(N,tmp2,tmp1,dirs_m);
-	pt.run(N,tmp1,tmp2,dirs_p+nu);
-	for(int i = 0; i<N;i++)
-	  {
-	    vecTimesEquFloat((IFloat *)tmp1[i],tmp_rect,vol*18);
-	    moveMem(result[i],tmp1[i],vol*sizeof(Matrix));
-	  }
-
-
-	//Chair terms
-	for(rho = 2;rho<4;rho++)
-	  {
-	    pt.run(N,tmp1,tmp4,dirs_p+rho);
-	    pt.run(N,tmp2,tmp1,dirs_m);
-	    pt.run(N,tmp1,tmp2,dirs_m+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	    pt.run(N,tmp1,tmp4,dirs_m+rho);
-	    pt.run(N,tmp2,tmp1,dirs_m);
-	    pt.run(N,tmp1,tmp2,dirs_p+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	  }
-
-	//Now calculate the rest of the plaquette for this linear combination
-	pt.run(N,tmp2,result,dirs_p+nu);
-
-	//Add this result to the sum of the staples
-	for(int i = 0; i < N; i++)
-	  vecAddEquVec((IFloat *)tmp3[i],(IFloat *)tmp2[i],vol*18);
-
-	//Next, consider replacing the link U_nu(x+mu)
-	pt.run(N,tmp2,Units,dirs_m+nu);
-	pt.run(N,tmp4,tmp2,dirs_m);
-	//Plaquette term already calculated
-
-	//Rectangle term
-	pt.run(N,tmp1,tmp4,dirs_m);
-	pt.run(N,tmp2,tmp1,dirs_p+nu);
-	pt.run(N,tmp1,tmp2,dirs_p);
-	for(int i = 0; i<N;i++)
-	  {
-	    vecTimesEquFloat((IFloat *)tmp1[i],tmp_rect,vol*18);
-	    moveMem(result[i],tmp1[i],vol*sizeof(Matrix));
-	  }
-
-	//Chair terms
-	for(rho = 2;rho<4;rho++)
-	  {
-	    pt.run(N,tmp1,tmp4,dirs_p+rho);
-	    pt.run(N,tmp2,tmp1,dirs_p+nu);
-	    pt.run(N,tmp1,tmp2,dirs_m+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	    pt.run(N,tmp1,tmp4,dirs_m+rho);
-	    pt.run(N,tmp2,tmp1,dirs_p+nu);
-	    pt.run(N,tmp1,tmp2,dirs_p+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	  }
-
-	//Add this result to the sum of the staples
-	for(int i = 0; i < N; i++)
-	  vecAddEquVec((IFloat *)tmp3[i],(IFloat *)result[i],vol*18);
-
-	//-------------------------------------------------------------------------
-	//Now, for the plaquette in the negative nu direction
-	//First, consider replacing the link U_nu(x-nu)
-
-	//Plaquette term
-	pt.run(N,tmp1,Units,dirs_p+nu);
-	for(int i = 0; i<N;i++)
-	  {
-	    vecTimesEquFloat((IFloat *)tmp1[i],tmp_plaq,vol*18);
-	    moveMem(result[i],tmp1[i],vol*sizeof(Matrix));
-	  }
-
-	//Rectangle term
-	pt.run(N,tmp1,Units,dirs_p);
-	pt.run(N,tmp2,tmp1,dirs_p+nu);
-	pt.run(N,tmp1,tmp2,dirs_m);
-	for(int i = 0; i<N;i++)
-	  vaxpy3_m(result[i],&tmp_rect,tmp1[i],result[i],vol*3);
-
-	//Chair terms
-	for(rho = 2;rho<4;rho++)
-	  {
-	    pt.run(N,tmp1,Units,dirs_p+rho);
-	    pt.run(N,tmp2,tmp1,dirs_p+nu);
-	    pt.run(N,tmp1,tmp2,dirs_m+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	    pt.run(N,tmp1,Units,dirs_m+rho);
-	    pt.run(N,tmp2,tmp1,dirs_p+nu);
-	    pt.run(N,tmp1,tmp2,dirs_p+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	  }
-
-	//Now calculate the rest of the plaquette for this linear combination
-	pt.run(N,tmp2,result,dirs_m);
-	pt.run(N,result,tmp2,dirs_m+nu);
-
-	//Add this result to the sum of the staples
-	for(int i = 0; i < N; i++)
-	  vecAddEquVec((IFloat *)tmp3[i],(IFloat *)result[i],vol*18);
-
-	//Next, consider replacing the link U_mu(x-nu)_dagger
-	pt.run(N,tmp4,Units,dirs_p+nu);
-	//Plaquette term already calculated
-
-	//Rectangle term
-	pt.run(N,tmp1,tmp4,dirs_p+nu);
-	pt.run(N,tmp2,tmp1,dirs_m);
-	pt.run(N,tmp1,tmp2,dirs_m+nu);
-	for(int i = 0; i<N;i++)
-	  {
-	    vecTimesEquFloat((IFloat *)tmp1[i],tmp_rect,vol*18);
-	    moveMem(result[i],tmp1[i],vol*sizeof(Matrix));
-	  }
-
-	//Chair terms
-	for(rho = 2;rho<4;rho++)
-	  {
-	    pt.run(N,tmp1,tmp4,dirs_p+rho);
-	    pt.run(N,tmp2,tmp1,dirs_m);
-	    pt.run(N,tmp1,tmp2,dirs_m+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	    pt.run(N,tmp1,tmp4,dirs_m+rho);
-	    pt.run(N,tmp2,tmp1,dirs_m);
-	    pt.run(N,tmp1,tmp2,dirs_p+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	  }
-
-	//Now calculate the rest of the plaquette for this linear combination
-	pt.run(N,tmp2,result,dirs_m+nu);
-
-	//Add this result to the sum of the staples
-	for(int i = 0; i < N; i++)
-	  vecAddEquVec((IFloat *)tmp3[i],(IFloat *)tmp2[i],vol*18);
-
-	//Next, consider replacing the link U_nu(x+mu-nu)_dagger
-	pt.run(N,tmp2,Units,dirs_p+nu);
-	pt.run(N,tmp4,tmp2,dirs_m);
-	//Plaquette term already calculated
-
-
-	//Rectangle term
-	pt.run(N,tmp1,tmp4,dirs_m);
-	pt.run(N,tmp2,tmp1,dirs_m+nu);
-	pt.run(N,tmp1,tmp2,dirs_p);
-	for(int i = 0; i<N;i++)
-	  {
-	    vecTimesEquFloat((IFloat *)tmp1[i],tmp_rect,vol*18);
-	    moveMem(result[i],tmp1[i],vol*sizeof(Matrix));
-	  }
-
-	//Chair terms
-	for(rho = 2;rho<4;rho++)
-	  {
-	    pt.run(N,tmp1,tmp4,dirs_p+rho);
-	    pt.run(N,tmp2,tmp1,dirs_m+nu);
-	    pt.run(N,tmp1,tmp2,dirs_m+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	    pt.run(N,tmp1,tmp4,dirs_m+rho);
-	    pt.run(N,tmp2,tmp1,dirs_m+nu);
-	    pt.run(N,tmp1,tmp2,dirs_p+rho);
-	    for(int i = 0; i<N;i++)
-	      vaxpy3_m(result[i],&tmp_cube,tmp1[i],result[i],vol*3);
-	  }
-
-	//Add this result to the sum of the staples
-	for(int i = 0; i < N; i++)
-	  vecAddEquVec((IFloat *)tmp3[i],(IFloat *)result[i],vol*18);
-
-#if 0
+    for(int nu = 1; nu<4; nu++)
+      {
 
 	//First calculate the staple in the positive nu direction
         pt.run(N,tmp1,Units,dirs_m+nu);
@@ -378,6 +139,28 @@ void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
 	for(int i = 0; i<N;i++)
 	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
 
+	//Calculate the cube terms
+	for(rho = 1; rho < 4; rho++)
+	  {
+	    if(rho!=nu)
+	      {
+		pt.run(N,tmp1,Units,dirs_m+rho);
+		pt.run(N,result,tmp1,dirs_m+nu);
+		pt.run(N,tmp1,result,dirs_m);
+		pt.run(N,result,tmp1,dirs_p+rho);
+		pt.run(N,tmp1,result,dirs_p+nu);
+		for(int i = 0; i<N;i++)
+		  vaxpy3_m(tmp2[i],&tmp_cube,tmp1[i],tmp2[i],vol*3);
+		pt.run(N,tmp1,Units,dirs_p+rho);
+		pt.run(N,result,tmp1,dirs_m+nu);
+		pt.run(N,tmp1,result,dirs_m);
+		pt.run(N,result,tmp1,dirs_m+rho);
+		pt.run(N,tmp1,result,dirs_p+nu);
+		for(int i = 0; i<N;i++)
+		  vaxpy3_m(tmp2[i],&tmp_cube,tmp1[i],tmp2[i],vol*3);
+	      }
+	  }
+
 	//Calculating the staple in the negative nu direction
 	pt.run(N,tmp1,Units,dirs_p+nu);
 	pt.run(N,result,tmp1,dirs_m);
@@ -416,13 +199,34 @@ void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
 
 	for(int i = 0; i<N;i++)
 	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
-#endif
+
+	//Calculate the cube terms
+	for(rho = 1; rho < 4; rho++)
+	  {
+	    if(rho!=nu)
+	      {
+		pt.run(N,tmp1,Units,dirs_m+rho);
+		pt.run(N,result,tmp1,dirs_p+nu);
+		pt.run(N,tmp1,result,dirs_m);
+		pt.run(N,result,tmp1,dirs_p+rho);
+		pt.run(N,tmp1,result,dirs_m+nu);
+		for(int i = 0; i<N;i++)
+		  vaxpy3_m(tmp2[i],&tmp_cube,tmp1[i],tmp2[i],vol*3);
+		pt.run(N,tmp1,Units,dirs_p+rho);
+		pt.run(N,result,tmp1,dirs_p+nu);
+		pt.run(N,tmp1,result,dirs_m);
+		pt.run(N,result,tmp1,dirs_m+rho);
+		pt.run(N,tmp1,result,dirs_m+nu);
+		for(int i = 0; i<N;i++)
+		  vaxpy3_m(tmp2[i],&tmp_cube,tmp1[i],tmp2[i],vol*3);
+	      }
+	  }
 
 	//Count the flops?
         ForceFlops +=vol*288*N;
       }
       //Multiply on the left by our original link matrix to get force term
-      pt.run(N,result,tmp3,dirs_p);
+      pt.run(N,result,tmp2,dirs_p);
   }
 
       Matrix mp1;
@@ -477,8 +281,6 @@ void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
   for(int i = 0;i<N;i++){
   ffree(tmp1[i]);
   ffree(tmp2[i]);
-  ffree(tmp3[i]);
-  ffree(tmp4[i]);
   }
   for(int i = 0;i<4;i++) 
   ffree(result[i]);
