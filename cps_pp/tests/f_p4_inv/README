@@ -1,0 +1,18 @@
+P4 inverter test:
+
+free_4^4.dat:  Free field inversion of 4^4 volume; point source at origin;
+	   do_arg.p4_KS = 3.0/4.0;  do_arg.p4_knight = 1.0/48.0;
+	   all other smeared coefficients set to 1e-15;
+	   mass = 1.0
+
+free_8^4.dat:  Same as above, except volume = 8^4
+
+smeared_4^4.dat:  4^4 volume;  disordered starting configuration
+		  Gaussian random source; mass = 1.0
+	          do_arg.p4_KS = 3.0/4.0;  do_arg.p4_knight = 1.0/48.0
+		  do_arg.p4_3staple = (-1.0/8.0)*0.5
+	          do_arg.p4_5staple = (1.0/8.0)*.25*.5
+		  do_arg.p4_7staple = (-1.0/8.0)*.125*(1.0/6.0)
+		  do_arg.p4_lepage = -1.0/16.0
+
+smeared_8^4.dat:  same as above, except volume = 8^4

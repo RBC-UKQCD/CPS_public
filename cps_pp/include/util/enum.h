@@ -52,6 +52,7 @@ enum StrOrdType {
 	STAG = 1,
 	WILSON = 2,
 	G_WILSON_HB = 3,
+	STAG_BLOCK = 4,
 };
 typedef enum StrOrdType StrOrdType;
 

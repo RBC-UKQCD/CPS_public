@@ -4,19 +4,19 @@
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.3 2005-03-07 00:03:23 chulwoo Exp $
+  $Id: enum.x,v 1.4 2005-03-09 19:17:27 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2005-03-07 00:03:23 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.3 2005-03-07 00:03:23 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.3 2005-03-07 00:03:23 chulwoo Exp $*/
+/*  $Date: 2005-03-09 19:17:27 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.4 2005-03-09 19:17:27 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.4 2005-03-09 19:17:27 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.3 $*/
+/*  $Revision: 1.4 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -135,11 +135,12 @@ enum StrOrdType {
 		     then y, then z and t slowest.
      
 		    */
-    G_WILSON_HB  = 3 /*!< Storage order for the %Wilson gauge action heat bath:
+    G_WILSON_HB  = 3, /*!< Storage order for the %Wilson gauge action heat bath:
 		        Site ordering is CANONICAL but the link direction indices  
 		       are 0, 1, 2 or 3  for direction T, X, Y and Z
 		       respectively.
 		       This order is expected by all QncWilsonHb functions.*/
+    STAG_BLOCK = 4
 };
 
 

@@ -8,7 +8,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.8 2005-03-07 00:03:11 chulwoo Exp $
+  $Id: pt_int.h,v 1.9 2005-03-09 19:17:29 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 //#include <util/lattice.h>
@@ -33,6 +33,8 @@ void pt_shift_link(Float **u, const int *dir, int n_dir);
 //---------------------------------------------------------------
 //Checkerboarding methods
 void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb);  //!<Parallel transport for checkerboarded Matrix fields
+void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb,new_gauge_field);  //!<Parallel transport for checkerboarded Matrix fields
+
 void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb); //!<Parallel transport for checkerboarded Vector fields
 void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb, Float * new_gauge_field); //!<Parallel transport for checkerboarded Vector fields
 void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, int pad); //!<Parallel transport for padded checkerboarded Vector fields
@@ -111,6 +113,8 @@ class PT  {
   int v_str_ord_cb;
   int evenodd;
   int prec;
+  int non_local_dirs;
+  IFloat * gauge_txyz;
 	enum {NDIM = 4,
 		  MAX_HOP = 3,
     	  GAUGE_LEN=18,
@@ -133,6 +137,11 @@ class PT  {
     gauge_agg_cb *uc_l_cb[2][2*NDIM];
     gauge_agg_cb *uc_nl_cb[2][2*NDIM];
     gauge_agg_cb *uc_nl_cb_pre[2][NDIM];
+
+    gauge_agg_cb *uc_l_pad_cb[2][2*NDIM];
+    gauge_agg_cb *uc_nl_pad_cb[2][2*NDIM];
+    gauge_agg_cb *uc_nl_pad_cb_pre[2][NDIM];
+
 //--------------------------------------------------------------------------
 
     hop_pointer *hp_l[MAX_HOP][2*NDIM];
@@ -216,6 +225,7 @@ int conjugated;
     int (*LexVector)(int *x);
     int (*LexVector_cb)(int *x);
     int (*LexGauge) (int *x,int mu);
+    int (*LexGauge2) (int *x, int mu);
     static void cpy (Float *dest, Float *src);
     static void dag_cpy (Float *dest, Float *src);
     static int lex_xyzt(int *x);
@@ -225,6 +235,7 @@ int conjugated;
     int LexSurface(int *x);
     static int lex_g_xyzt(int *x, int mu);
     static int lex_g_xyzt_cb_o(int *x, int mu);
+    static int lex_g_txyz(int *x, int mu);
     static int set_offset(int dir, int hop);
     void set_hop_pointer();
   public:
@@ -235,28 +246,36 @@ int conjugated;
 	void init_g();
 	void delete_buf();
 	void delete_g_buf();
-    void mat_cb(int n, Float **mout, Float **min, const int *dir, int parity);
-    void vec_cb(int n, Float *vout, Float **vin, const int *dir,
-int parity, int pad);
-	void vec_cb(int n, Float **vout, Float **vin, const int *dir,
-int parity, Float * new_gauge_field);
-	void vec_cb(int n, Float **vout, Float **vin, const int *dir,
-int parity);
-	void vec_cb_norm(int n, Float **vout, Float **vin, const int
-*dir,int parity, Float * gauge);
-	void vec_cb_pad(int n, Float *vout, Float **vin, const int
-*dir,int parity,int pad, Float * gauge);
+
+	void mat_cb_norm(int n, Float **mout, Float **min, const int *dir, 
+			 int parity, Float * gauge);
+	void mat_cb(int n, Float **mout, Float **min, const int *dir, 
+		    int parity, Float * new_gauge_field);
+	void mat_cb(int n, Float **mout, Float **min, const int *dir, 
+		    int parity);
+
 	void vec_cb(int n, Float *vout, Float **vin, const int *dir,
-int parity, int pad, Float * new_gauge_field);
+		    int parity, int pad);
+	void vec_cb(int n, Float **vout, Float **vin, const int *dir,
+		    int parity, Float * new_gauge_field);
+	void vec_cb(int n, Float **vout, Float **vin, const int *dir,
+		    int parity);
+	void vec_cb(int n, Float *vout, Float **vin, const int *dir,
+		    int parity, int pad, Float * new_gauge_field);
+	void vec_cb_norm(int n, Float **vout, Float **vin, const int
+			 *dir,int parity, Float * gauge);
+	void vec_cb_pad(int n, Float *vout, Float **vin, const int
+			*dir,int parity, Float * gauge);
+
 	void mat(int n, matrix **mout, matrix **min, const int *dir);
 	void vec(int n, Float **vout, Float **vin, const int *dir);
 	void vvpd(Float **vect, int n_vect, const int *dir,
-             int n_dir, int hop, Float **sum);
+		  int n_dir, int hop, Float **sum);
 	void shift_field(Float **v, const int *dir, int n_dir,
-                    int hop, Float **u);
+			 int hop, Float **u);
 	void shift_link(Float **u, const int *dir, int n_dir);
 	void asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float dt);
-    void PointerErr(char *cname, char *fname, char *vname){
+	void PointerErr(char *cname, char *fname, char *vname){
 	  printf("%s::%s: %s not allocated\n",cname,fname,vname);
   	  exit(-1);
     }

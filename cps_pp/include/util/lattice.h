@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.36 2005-03-07 00:03:11 chulwoo Exp $
+  $Id: lattice.h,v 1.37 2005-03-09 19:17:27 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2005-03-07 00:03:11 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.36 2005-03-07 00:03:11 chulwoo Exp $
-  $Id: lattice.h,v 1.36 2005-03-07 00:03:11 chulwoo Exp $
+  $Date: 2005-03-09 19:17:27 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.37 2005-03-09 19:17:27 chulwoo Exp $
+  $Id: lattice.h,v 1.37 2005-03-09 19:17:27 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.36 $
+  $Revision: 1.37 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -2695,6 +2695,7 @@ class GwilsonFstag
     virtual ~GwilsonFstag();
 };
 
+
 //------------------------------------------------------------------
 //! Wilson gauge action with staggered fermion action
 /*! \ingroup latactions */
@@ -2713,6 +2714,23 @@ class GwilsonFasqtad
     virtual ~GwilsonFasqtad();
 };
 
+//------------------------------------------------------------------
+//! Wilson gauge action with staggered fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GwilsonFp4 
+    : public virtual Lattice, 
+    public virtual FstagTypes, 
+    public Gwilson, 
+    public Fp4
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GwilsonFp4();
+    virtual ~GwilsonFp4();
+};
 
 //------------------------------------------------------------------
 //! Wilson gauge action with wilson fermion action

@@ -9,19 +9,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.18 2005-02-18 19:50:20 mclark Exp $
+  $Id: pt.h,v 1.19 2005-03-09 19:17:28 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2005-02-18 19:50:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.18 2005-02-18 19:50:20 mclark Exp $
-//  $Id: pt.h,v 1.18 2005-02-18 19:50:20 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-03-09 19:17:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.19 2005-03-09 19:17:28 chulwoo Exp $
+//  $Id: pt.h,v 1.19 2005-03-09 19:17:28 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -55,6 +55,9 @@ void pt_shift_link(Float **u, const int *dir, int n_dir);
 //---------------------------------------------------------------
 //Checkerboarding methods
 void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb);  //!<Parallel transport for checkerboarded Matrix fields
+void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb, Float * new_gauge_field);  //!<Parallel transport for checkerboarded Matrix fields
+void pt_mat_norm(int n, Float **mout, Float **min, const int *dir, ChkbType cb, Float *gauge);
+
 void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb); //!<Parallel transport for checkerboarded Vector fields
 void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb, Float * new_gauge_field); //!<Parallel transport for checkerboarded Vector fields
 void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, int pad); //!<Parallel transport for padded checkerboarded Vector fields
@@ -341,6 +344,10 @@ class ParTransStaggered_cb : public ParTransStagTypes
      */
     void run(int n, Matrix **mout, Matrix **min, const int *dir,ChkbType cb)
     { pt_mat_cb(n,(IFloat **)mout, (IFloat **)min, dir, cb);}
+
+    void run(int n, Matrix **mout, Matrix **min, const int *dir,ChkbType cb, IFloat * new_gauge_field)
+    { pt_mat_cb(n,(IFloat **)mout, (IFloat **)min, dir, cb,new_gauge_field);}
+
 
     //! Not implemented
     void run(Vector *vout, Vector *vin, int dir );

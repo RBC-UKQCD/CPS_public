@@ -7,22 +7,14 @@ struct gauge_agg{
   IFloat mat[18];
 };
 
-struct gauge_agg_cb{
+typedef struct gauge_agg_cb{
   //Index for initial position of field
   int src;
   //Index for "transported field"
   int dest;
-  //Index for the padded field.  This assumes that the field will be
-  //transported in all 8 possible directions.  Instead of storing
-  //each direction in a single block, fields transported to each
-  //lattice site from different directions are stored together
-  //This allows for faster linear combination in the p4 action.
-  int dest2;
   //Index for the gauge link
-  int gauge_index;
-  //Determines if the gauge link needs to be complex conjugated
-  int dagger;
-};
+  int gauge;
+} ind_agg;
 
 struct hop_pointer {
   int src;
