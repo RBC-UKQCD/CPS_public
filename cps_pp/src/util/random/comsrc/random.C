@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.5 2004-07-01 17:43:51 chulwoo Exp $
+  $Id: random.C,v 1.6 2004-07-02 14:13:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.5 2004-07-01 17:43:51 chulwoo Exp $
-//  $Id: random.C,v 1.5 2004-07-01 17:43:51 chulwoo Exp $
+//  $Date: 2004-07-02 14:13:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.6 2004-07-02 14:13:43 chulwoo Exp $
+//  $Id: random.C,v 1.6 2004-07-02 14:13:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -165,6 +165,7 @@ void LatRanGen::Initialize()
   n_rgen = GJP.VolNodeSites()/16;
   else
   n_rgen = GJP.VolNodeSites()*GJP.SnodeSites() / 32;
+  VRB.Flow(cname,fname,"n_rgen=%d",n_rgen);
 
   
 
@@ -188,6 +189,9 @@ void LatRanGen::Initialize()
   x_f[2] = x_o[2] + GJP.ZnodeSites() - 1;
   x_f[3] = x_o[3] + GJP.TnodeSites() - 1;
   x_f[4] = x_o[4] + GJP.SnodeSites() - 1;
+  for(int i = 0;i<5;i++)
+  VRB.Flow(cname,fname,"x_o[%d]=%d x_f[%d]=%d\n",i,x_o[i],i,x_f[i]);
+
 
   hx[0] = GJP.XnodeSites() / 2;
   hx[1] = GJP.YnodeSites() / 2;
@@ -296,6 +300,7 @@ IFloat LatRanGen::Urand()
 //----------------------------------------------------------------------
 IFloat LatRanGen::Grand()
 {
+//  printf("LatRanGen::Grand():%d\n",rgen_pos);
   return ugran[rgen_pos].Grand();
 }
 

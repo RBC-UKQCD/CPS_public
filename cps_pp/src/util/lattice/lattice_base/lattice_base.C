@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.9 2004-07-01 17:43:50 chulwoo Exp $
+  $Id: lattice_base.C,v 1.10 2004-07-02 14:13:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.9 2004-07-01 17:43:50 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.9 2004-07-01 17:43:50 chulwoo Exp $
+//  $Date: 2004-07-02 14:13:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.10 2004-07-02 14:13:42 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.10 2004-07-02 14:13:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -1168,6 +1168,7 @@ Float Lattice::SumReTrPlaqNode(void) const
 	  
 	  for (int mu = 0; mu < 3; ++mu) {
 	    for(int nu = mu+1; nu < 4; ++nu) {
+//		printf("%d %d %d %d %d %d\n",x[0],x[1],x[2],x[3],mu,nu);
 	      sum += ReTrPlaq(x,mu,nu);
 	    }
 	  }
@@ -2079,7 +2080,7 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
   int checker, i, k, s, x[4];
 
 
-  printf("num_chkbds=%d vec_size=%d\n",num_chkbds,vec_size);
+  printf("num_chkbds=%d vec_size=%d s_node_sites=%d \n",num_chkbds,vec_size,s_node_sites);fflush(stdout);
   if(num_chkbds == 2) {
     for(checker = 0; checker < 2; checker++)
     for(s = 0; s < s_node_sites; s++) {
@@ -2088,7 +2089,9 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
         for(x[2] = 0; x[2] < GJP.ZnodeSites(); x[2]++)
         for(x[1] = 0; x[1] < GJP.YnodeSites(); x[1]++)
         for(x[0] = 0; x[0] < GJP.XnodeSites(); x[0]++) {
+//	printf("%d %d %d %d %d \n",x[0],x[1],x[2],x[3],s);
           LRG.AssignGenerator(x[0],x[1],x[2],x[3],s);
+//	printf("%d %d %d %d %d \n",x[0],x[1],x[2],x[3],s);
           for(k = 0; k < vec_size; k++) {
             *(ptr++) = LRG.Grand();
           }
@@ -2110,6 +2113,7 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
     } else {
       for(i = 0; i < GJP.VolNodeSites()*s_node_sites; i+=2) {
         LRG.AssignGenerator(i);
+//	printf("i=%d\n",i);
         for(k = 0; k < vec_size; k++) {
           *(ptr++) = LRG.Grand();
         }
@@ -2159,6 +2163,7 @@ void Lattice::SetGfieldDisOrd(void){
     LRG.AssignGenerator(i);
     for(int k = 0; k < site_size; k++) {
       *(pmat++) = LRG.Urand();
+//      printf("i=%d *pmat=%e\n",i,*(pmat-1));
     }
   }
   Reunitarize();

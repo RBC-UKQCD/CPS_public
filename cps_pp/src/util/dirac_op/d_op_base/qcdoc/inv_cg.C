@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.5 2004-07-01 17:43:43 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.5 2004-07-01 17:43:43 chulwoo Exp $
+//  $Date: 2004-07-02 14:13:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.6 2004-07-02 14:13:42 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.6 2004-07-02 14:13:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -321,8 +321,9 @@ int DiracOp::InvCg(Vector *out,
     // res = - a * (MatPcDagMatPc * dir) + res;
     // res_norm_sq_cur = res * res
 
-    a *= -1.0;
-    vaxpy3_norm(res,&a,mmp,res,f_size_cb/6,&res_norm_sq_cur);
+   // a *= -1.0;
+  double ma = -a;
+    vaxpy3_norm(res,&ma,mmp,res,f_size_cb/6,&res_norm_sq_cur);
     DiracOpGlbSum(&res_norm_sq_cur);
 #ifdef PROFILE
 //    nflops_tmp +=f_size_cb*4;

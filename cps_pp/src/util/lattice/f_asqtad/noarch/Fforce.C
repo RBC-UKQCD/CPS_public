@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.9 2004-07-01 17:43:47 chulwoo Exp $
+  $Id: Fforce.C,v 1.10 2004-07-02 14:13:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ static void* v_alloc(char *s, size_t bytes){
 #else
 	void *ptr = smalloc(bytes);
 #endif
-	printf("%s:%p\n",s,ptr);
+//	printf("%s:%p\n",s,ptr);
 	if(ptr ==NULL){
 		printf(" v_alloc of %s failed\n",s);exit(34);	
 	}
@@ -49,6 +49,7 @@ static void v_free(void *ptr){
 // N.B. No optimising provision is made if any of the asqtad coefficients
 // are zero.
 
+#undef PROFILE
 void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
     char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
@@ -63,7 +64,6 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     size = GJP.VolNodeSites()/2*FsiteSize()*sizeof(Float);
 
     Vector *X = (Vector *)smalloc(2*size);
-//    printf("X=%p\n",X);
     Vector *X_e = X;                             // even sites
     Vector *X_o = X+GJP.VolNodeSites()/2;  // odd sites
 
@@ -140,7 +140,6 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     Vector *Pnu3[n_sign][n_sign][N];
     Vector *Prho5[n_sign][n_sign][n_sign][N];
     Vector *Psigmarhonu[n_sign][n_sign][n_sign][N];
-    printf("Pnu=%p Psigmarhonu=%p\n",Pnu,Psigmarhonu);
 
     for(int w = 0;w<N;w++){
       for(int i = 0;i<n_sign;i++){
@@ -631,10 +630,12 @@ void Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
     // Now that we have computed the force, we can update the momenta
 
+#ifdef PROFILE
 	dtime += dclock();
 	printf("%s:%s:",cname,fname);
 	nflops +=ParTrans::PTflops + ForceFlops;
 	print_flops(nflops,dtime);
+#endif
     update_momenta(force, dt, mom,1);
 
 

@@ -3,19 +3,20 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.7 2004-06-04 21:14:16 chulwoo Exp $
-//  $Id: main.C,v 1.7 2004-06-04 21:14:16 chulwoo Exp $
+//  $Date: 2004-07-02 14:13:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.8 2004-07-02 14:13:43 chulwoo Exp $
+//  $Id: main.C,v 1.8 2004-07-02 14:13:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
 #include <stdio.h>
+#include <stdlib.h>
 #include<util/lattice.h>
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
@@ -30,28 +31,43 @@ CPS_END_NAMESPACE
 
 USING_NAMESPACE_CPS 
 
-
+static int nx,ny,nz,nt,ns;
 int main(int argc,char *argv[])
 {
+#if TARGET==QCDOC
+DefaultSetup();
+#endif
   FILE *fp;
+  if (argc<6) {printf("usage: %s nx ny nz nt ns\n",argv[0]);exit(-2);}
+  sscanf(argv[1],"%d",&nx);
+  sscanf(argv[2],"%d",&ny);
+  sscanf(argv[3],"%d",&nz);
+  sscanf(argv[4],"%d",&nt);
+  sscanf(argv[5],"%d",&ns);
+  printf("sizes = %d %d %d %d %d\n",nx,ny,nz,nt,ns);
 
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
   //----------------------------------------------------------------
   DoArg do_arg;
 
-  do_arg.x_node_sites = 2;
-  do_arg.y_node_sites = 2;
-  do_arg.z_node_sites = 2;
-  do_arg.t_node_sites = 2;
-  do_arg.s_node_sites = 6;
 #ifdef PARALLEL
-  do_arg.x_nodes = 2;
-  do_arg.y_nodes = 1;
-  do_arg.z_nodes = 1;
-  do_arg.t_nodes = 1;
-  do_arg.s_nodes = 1;
+  do_arg.x_node_sites = nx/SizeX();
+  do_arg.y_node_sites = ny/SizeY();
+  do_arg.z_node_sites = nz/SizeZ();
+  do_arg.t_node_sites = nt/SizeT();
+  do_arg.s_node_sites = ns/SizeS();
+  do_arg.x_nodes = SizeX();
+  do_arg.y_nodes = SizeY();
+  do_arg.z_nodes = SizeZ();
+  do_arg.t_nodes = SizeT();
+  do_arg.s_nodes = SizeS();
 #else
+  do_arg.x_node_sites = nx;
+  do_arg.y_node_sites = ny;
+  do_arg.z_node_sites = nz;
+  do_arg.t_node_sites = nt;
+  do_arg.s_node_sites = ns;
   do_arg.x_nodes = 1;
   do_arg.y_nodes = 1;
   do_arg.z_nodes = 1;
@@ -61,7 +77,7 @@ int main(int argc,char *argv[])
   do_arg.x_bc = BND_CND_PRD;
   do_arg.y_bc = BND_CND_PRD;
   do_arg.z_bc = BND_CND_PRD;
-  do_arg.t_bc = BND_CND_PRD;
+  do_arg.t_bc = BND_CND_APRD;
   do_arg.start_conf_kind = START_CONF_ORD;
   do_arg.start_seed_kind = START_SEED_FIXED;
 
@@ -83,6 +99,7 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
 
   VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
+  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
   VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_CLOCK_LEVEL);
   VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
@@ -109,6 +126,7 @@ int main(int argc,char *argv[])
   hmd_arg.reunitarize = REUNITARIZE_YES;
 
 
+#if 0
   //----------------------------------------------------------------
   // Run HMC Phi Wilson
   //----------------------------------------------------------------
@@ -183,6 +201,7 @@ int main(int argc,char *argv[])
       }
     }
   }
+#endif
 
 
   //----------------------------------------------------------------

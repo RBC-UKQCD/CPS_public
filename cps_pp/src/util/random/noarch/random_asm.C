@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.4 2004-06-04 21:14:14 chulwoo Exp $
+  $Id: random_asm.C,v 1.5 2004-07-02 14:13:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-06-04 21:14:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.4 2004-06-04 21:14:14 chulwoo Exp $
-//  $Id: random_asm.C,v 1.4 2004-06-04 21:14:14 chulwoo Exp $
+//  $Date: 2004-07-02 14:13:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.5 2004-07-02 14:13:43 chulwoo Exp $
+//  $Id: random_asm.C,v 1.5 2004-07-02 14:13:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -26,6 +26,7 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include <stdio.h>
 #include <util/random.h>
 CPS_START_NAMESPACE
 
@@ -48,6 +49,7 @@ IFloat RandomGenerator::Rand(void)
     int mj = ma[inext] - ma[inextp] ;
     if ( mj < 0 ) mj += MBIG ;
     ma[inext] = mj ;
+//    printf("mj=%d\n",mj);
     return mj*FAC ;
 }
 
@@ -65,6 +67,7 @@ IFloat GaussianRandomGenerator::Rand()
         do {
 	    v1 = 2.0 * RandomGenerator::Rand() - 1.0;
 	    v2 = 2.0 * RandomGenerator::Rand() - 1.0;
+//	    printf("v1=%e v2=%e\n",v1,v2);
 	    rsq = v1*v1 + v2*v2;
 	} while(rsq >= 1.0 || rsq == 0);
 	    // pick 2 uniform numbers in the square extending from

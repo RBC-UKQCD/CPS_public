@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.7 2004-06-17 16:21:13 zs Exp $
+  $Id: main.C,v 1.8 2004-07-02 14:13:43 chulwoo Exp $
 */
 
 #include<config.h>
@@ -111,6 +111,8 @@ WfmFlops = 0;
 
 	VRB.Level(0);
 	VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
+	VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+	VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
     
     CgArg cg_arg;
 

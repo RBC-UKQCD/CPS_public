@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.8 2004-07-01 17:43:45 chulwoo Exp $
+  $Id: gjp.C,v 1.9 2004-07-02 14:13:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.8 2004-07-01 17:43:45 chulwoo Exp $
-//  $Id: gjp.C,v 1.8 2004-07-01 17:43:45 chulwoo Exp $
+//  $Date: 2004-07-02 14:13:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.9 2004-07-02 14:13:42 chulwoo Exp $
+//  $Id: gjp.C,v 1.9 2004-07-02 14:13:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -135,6 +135,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
 
   // CJ: It should complain if any of node_sites are not divisible by 2
   // Why diidn't it?
+  if(s_node_sites == 0) s_node_sites=1;
   if (x_node_sites<=0 ||x_node_sites%2!=0)
       ERR.General(cname,fname,
 	"x_node_sites(%d) is not divisible by 2\n",x_node_sites);
@@ -147,7 +148,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   if (t_node_sites<=0 ||t_node_sites%2!=0)
       ERR.General(cname,fname,
 	"t_node_sites(%d) is not divisible by 2\n",t_node_sites);
-  if (s_node_sites>2 &&t_node_sites%2!=0)
+  if (s_node_sites<=0 &&s_node_sites%2!=0)
       ERR.General(cname,fname,
 	"s_node_sites(%d) is not divisible by 2\n",s_node_sites);
 
@@ -216,12 +217,15 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   if( y_nodes != 1) size_y = SizeY(); 
   if( z_nodes != 1) size_z = SizeZ(); 
   if( t_nodes != 1) size_t = SizeT(); 
+  if( s_nodes != 1) size_s = SizeS(); 
+#if TARGET==QCDSP
   if( s_nodes != 1) {
     if (s_axis == SCU_X) size_s = SizeX();
     if (s_axis == SCU_Y) size_s = SizeY();
     if (s_axis == SCU_Z) size_s = SizeZ();
     if (s_axis == SCU_T) size_s = SizeT();
   } 
+#endif
 #endif
 
   if( x_nodes == 0 || size_x%x_nodes != 0) 
@@ -321,6 +325,7 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
   gjp_scu_wire_map[6] = SCURemap( SCU_TP );
   gjp_scu_wire_map[7] = SCURemap( SCU_TM );
 
+#if TARGET ==QCDOC
   if(s_nodes != 1) {
     if (s_axis == SCU_X) {
       gjp_scu_dir[8] = SCU_XP;
@@ -346,6 +351,12 @@ void GlobalJobParameter::Initialize(const DoArg& rda) {
       gjp_scu_wire_map[8] = SCURemap( SCU_TP );
       gjp_scu_wire_map[9] = SCURemap( SCU_TM );
     }
+#else
+      gjp_scu_dir[8] = SCU_SP;
+      gjp_scu_dir[9] = SCU_SM;
+      gjp_scu_wire_map[8] = SCURemap( SCU_SP );
+      gjp_scu_wire_map[9] = SCURemap( SCU_SM );
+#endif
   }
 
 

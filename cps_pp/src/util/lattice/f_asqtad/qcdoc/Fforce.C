@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.4 2004-07-01 17:43:48 chulwoo Exp $
+  $Id: Fforce.C,v 1.5 2004-07-02 14:13:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ static void* v_alloc(char *s, size_t bytes){
 #else
 	void *ptr = smalloc(bytes);
 #endif
-	printf("%s:%p\n",s,ptr);
+//	printf("%s:%p\n",s,ptr);
 
 	if(ptr ==NULL){
 		printf(" v_alloc of %s failed\n",s);exit(34);	

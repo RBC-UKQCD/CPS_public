@@ -8,13 +8,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-07-01 17:43:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.8 2004-07-01 17:43:41 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.8 2004-07-01 17:43:41 chulwoo Exp $
+//  $Date: 2004-07-02 14:13:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.9 2004-07-02 14:13:42 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.9 2004-07-02 14:13:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -156,7 +156,6 @@ AlgHmcPhi::AlgHmcPhi(Lattice& latt,
 	ERR.Pointer(cname,fname, "phi[i]");
       VRB.Smalloc(cname,fname, "phi[i]", phi[i], f_size * sizeof(Float));
     }  
-    bzero(phi[i],f_size*sizeof(Float));
   }
 
 
