@@ -8,7 +8,7 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <stdlib.h>
 #include <qcdoc_align.h>
-//#include <qalloc.h>
+#include <qalloc.h>
 CPS_START_NAMESPACE
 
 //static unsigned long extra_heap[0*1048576] LOCATE(".ddr_t_heap");
@@ -20,12 +20,10 @@ CPS_START_NAMESPACE
 */
 void* pmalloc(int request){
   void* ptr;
- // ptr = qalloc(QCOMMS,request);
-  ptr = malloc(request);
+  ptr = qalloc(QCOMMS,request);
   VRB.Pmalloc("","pmalloc(i)","", ptr, request);
   if(ptr==NULL)
 	ERR.Pointer("","pmalloc(i)","");
-  bzero((char *)ptr,request);
   return ptr;
 }
 
@@ -35,8 +33,7 @@ void* pmalloc(int request){
 */
 void pfree(void* p){
   VRB.Pfree("","pfree(v*)","",p);
-//  qfree((char*) p);
-  free((char*) p);
+  qfree((char*) p);
 }
 
 void pclear(void){};

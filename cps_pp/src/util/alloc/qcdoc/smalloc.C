@@ -9,11 +9,11 @@ CPS_END_NAMESPACE
 #include <stdlib.h>
 #include <stdio.h>
 #include <qcdoc_align.h>
-//#include <qalloc.h>
+#include <qalloc.h>
 CPS_START_NAMESPACE
 
 //static unsigned long extra_heap[1024*1024] LOCATE(".ddr_t_heap");
-static unsigned long extra_heap[1024*1024] LOCATE(".dheap");
+//static unsigned long extra_heap[1024*1024] LOCATE(".dheap");
 
 //! Allocate memory
 /*!
@@ -22,15 +22,12 @@ static unsigned long extra_heap[1024*1024] LOCATE(".dheap");
 */
 void* smalloc(int request){
   void* ptr;
-//  ptr = qalloc(QCOMMS,request);
-  ptr = malloc(request);
-//  printf("request =%d ptr=%p\n",request,ptr);
+  ptr = qalloc(QCOMMS,request);
   if (ptr == NULL){
   ERR.Pointer("","smalloc(i)","");
   exit(1);
   }
   VRB.Smalloc("","smalloc(i)","", ptr, request);
-  bzero((char *)ptr,request);
   return ptr;
 }
 
@@ -40,8 +37,7 @@ void* smalloc(int request){
 */
 void sfree(void* p){
   VRB.Sfree("","sfree(v*)","",p);
-//  qfree((char*) p);
-  free((char*) p);
+  qfree((char*) p);
 }
 
 void sclear(void){};
