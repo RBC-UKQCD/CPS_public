@@ -16,7 +16,7 @@ CPS_START_NAMESPACE
 
 #ifdef PARALLEL
 CPS_END_NAMESPACE
-#include <comms/sysfunc.h>
+#include <sysfunc.h>
 CPS_START_NAMESPACE
 #endif
 
