@@ -128,7 +128,7 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
     printf("wfm::spinor_tmp allocate\n");
     exit(-1);
   }
-  bzero(spinor_tmp,spinor_words*sizeof(Float)*2);
+  bzero((char *)spinor_tmp,spinor_words*sizeof(Float)*2);
 //  printf("spinor_tmp is %x\n",spinor_tmp);
     
 
