@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fasqtad class.
 
-  $Id: f_asqtad.C,v 1.15 2004-09-04 07:29:12 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.16 2004-10-13 18:38:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -381,7 +381,6 @@ void Fasqtad::Smear(){
 
   int i, j, N = 4;
   int vol = GJP.VolNodeSites();
-  if (vol>1024) N=1;
   ParTransAsqtad pt(*this);
   Matrix *result[NUM_DIR];
   Matrix *Unit;
@@ -396,19 +395,19 @@ void Fasqtad::Smear(){
   Matrix *Pmumu[NUM_DIR];
   Matrix *Pmumumu[NUM_DIR];
 VRB.Flow(cname,fname,"vol=%d\n",vol);
-  Unit = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+  Unit = (Matrix *)fmalloc(cname,fname,"Unit",sizeof(Matrix)*vol);
   for(i = 0;i<N;i++)
-    Pmumumu[i] = P7mu[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+    Pmumumu[i] = P7mu[i] = (Matrix *)fmalloc(cname,fname,"Pmumumu[i]",sizeof(Matrix)*vol);
   for(i = 0;i<N;i++)
-    Pmumu[i] = P7[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+    Pmumu[i] = P7[i] = (Matrix *)fmalloc(cname,fname,"Pmumu[i]",sizeof(Matrix)*vol);
   for(i = 0;i<N;i++)
-    P6mu[i] = P5mu[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+    P6mu[i] = P5mu[i] = (Matrix *)fmalloc(cname,fname,"P6mu[i]",sizeof(Matrix)*vol);
   for(i = 0;i<N;i++)
-    P6[i] = P5[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+    P6[i] = P5[i] = (Matrix *)fmalloc(cname,fname,"P6[i]",sizeof(Matrix)*vol);
   for(i = 0;i<N;i++)
-    P3mu[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+    P3mu[i] = (Matrix *)fmalloc(cname,fname,"P3mu[i]",sizeof(Matrix)*vol);
   for(i = 0;i<N;i++)
-    P3[i] = (Matrix *)fmalloc(sizeof(Matrix)*vol);
+    P3[i] = (Matrix *)fmalloc(cname,fname,"P3[i]",sizeof(Matrix)*vol);
   for(j = 0;j<POS_DIR;j++){
      result[j] = fields[0] + vol*j;
 //    result[j+POS_DIR] = fields[1] + vol*j;
@@ -437,7 +436,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
     for(int nu = 0;nu<NUM_DIR;nu++)
     if(NotParallel(mu,nu)){
       for(i  = 0;i<N;i++){
-		nu_p = Rotate(nu,i);
+	nu_p = Rotate(nu,i);
         min[i] = Unit;
         mout[i] = P3[i];
         dirs[i] = dir[nu_p];

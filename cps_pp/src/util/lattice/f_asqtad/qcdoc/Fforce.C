@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.8 2004-08-18 11:58:02 zs Exp $
+  $Id: Fforce.C,v 1.9 2004-10-13 18:39:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -22,6 +22,7 @@
 CPS_START_NAMESPACE
 
 static void* v_alloc(char *s, size_t bytes){
+#if 0
 #if TARGET==QCDOC
   void *ptr = qalloc(QFAST,bytes);
   if(ptr ==NULL){
@@ -29,6 +30,9 @@ static void* v_alloc(char *s, size_t bytes){
   }
 #else
   void *ptr = smalloc(bytes);
+#endif
+#else
+  void *ptr = fmalloc(bytes);
 #endif
   //	printf("%s:%p\n",s,ptr);
 
