@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of dynamic memory management routines.	
 
-  $Id: smalloc.h,v 1.6 2004-09-02 16:57:05 zs Exp $
+  $Id: smalloc.h,v 1.7 2004-09-06 05:01:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:57:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.6 2004-09-02 16:57:05 zs Exp $
-//  $Id: smalloc.h,v 1.6 2004-09-02 16:57:05 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-06 05:01:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.7 2004-09-06 05:01:40 chulwoo Exp $
+//  $Id: smalloc.h,v 1.7 2004-09-06 05:01:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: smalloc.h,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v $
 //  $State: Exp $
 //
@@ -34,6 +34,7 @@ CPS_START_NAMESPACE
   \return A pointer to the allocated memory
 */
 void* smalloc(int request);
+void* smalloc(char *cname, char *fname, char *vname, int request);
 
 //! Free allocate memory
 /*!
