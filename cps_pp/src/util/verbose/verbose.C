@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
-  $Id: verbose.C,v 1.7 2004-08-18 11:58:09 zs Exp $
+  $Id: verbose.C,v 1.8 2004-09-21 18:25:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.7 2004-08-18 11:58:09 zs Exp $
-//  $Id: verbose.C,v 1.7 2004-08-18 11:58:09 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-21 18:25:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.8 2004-09-21 18:25:18 chulwoo Exp $
+//  $Id: verbose.C,v 1.8 2004-09-21 18:25:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
@@ -45,6 +45,7 @@ CPS_START_NAMESPACE
   information by default.
 */
 
+Verbose VRB;
 Verbose::Verbose(){
     
     cname = "Verbose";

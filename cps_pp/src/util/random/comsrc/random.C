@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.16 2004-09-03 14:59:11 zs Exp $
+  $Id: random.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-03 14:59:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.16 2004-09-03 14:59:11 zs Exp $
-//  $Id: random.C,v 1.16 2004-09-03 14:59:11 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-21 18:25:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
+//  $Id: random.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -133,6 +133,7 @@ IFloat GaussianRandomGenerator::sigma2 = 1.0;
 
 
 
+LatRanGen LRG;
 //---------------------------------------------------------
 LatRanGen::LatRanGen()
 {

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.16 2004-08-30 04:34:34 chulwoo Exp $
+  $Id: gjp.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-30 04:34:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.16 2004-08-30 04:34:34 chulwoo Exp $
-//  $Id: gjp.C,v 1.16 2004-08-30 04:34:34 chulwoo Exp $
+//  $Date: 2004-09-21 18:25:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
+//  $Id: gjp.C,v 1.17 2004-09-21 18:25:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -95,6 +95,7 @@ int gjp_scu_wire_map[10] = {0, 1, 2, 3, 4, 5, 6, 7, 0, 0};
      // used. 
 #endif
 
+GlobalJobParameter GJP;
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
