@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.2 2005-02-12 00:54:40 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.3 2005-02-14 00:10:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -108,7 +108,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   }
 
   int mu, x, y, z, t, s, lx, ly, lz, lt, ls ;
-  int size[5],surf[4];
+  int size[5],surf[4],blklen[4],stride[4],numblk[4];
  
   size[0] = lx = GJP.XnodeSites() ;
   size[1] = ly = GJP.YnodeSites() ;
@@ -116,8 +116,18 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   size[3] = lt = GJP.TnodeSites() ;
   size[4] = ls = GJP.SnodeSites() ;
 
+  blklen[0] = sizeof(Float)*FsiteSize()/size[4];
+  numblk[0] = GJP.VolNodeSites()/size[0]*size[4];
+  stride[0] = blklen[0] * (size[0]-1);
+  for (int i =1;i<4;i++){
+    blklen[i] = blklen[i-1] * size[i-1];
+	numblk[i] = numblk[i-1] / size[i];
+    stride[i] = blklen[i] * (size[i]-1);
+  }
+//  printf("blklen numblk stride surf\n");
   for (int i =0;i<4;i++){
     surf[i] = GJP.VolNodeSites()/size[i];
+//	printf("%d %d %d %d\n",blklen[i],numblk[i],stride[i],surf[i]);
   }
 
   //----------------------------------------------------------------
@@ -155,11 +165,11 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   int st_bytes = sizeof(Float)*f_size_4d - f_bytes;
   for (mu=0; mu<4; mu++){
     if ( GJP.Nodes(mu) >1){
-      dma[0]->Init(site_v1,ls*f_bytes);
-      dma[1]->Init(site_v2,ls*f_bytes);
+      dma[0]->Init(v1_buf[mu],surf[mu]*ls*f_bytes);
+      dma[1]->Init(v2_buf[mu],surf[mu]*ls*f_bytes);
       Recv[mu].Init(gjp_scu_dir[2*mu],SCU_REC,dma,2);
-      dma[0]->Init(v1,f_bytes,ls,st_bytes);
-      dma[1]->Init(v2,f_bytes,ls,st_bytes);
+      dma[0]->Init(v1,blklen[mu],numblk[mu],stride[mu]);
+      dma[1]->Init(v2,blklen[mu],numblk[mu],stride[mu]);
       Send[mu].Init(gjp_scu_dir[2*mu+1],SCU_SEND,dma,2);
     }
   }
@@ -171,15 +181,35 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   Float time = -dclock();
   ForceFlops=0;
 #endif
+
+  sys_cacheflush(0);
+  for (mu=0; mu<4; mu++){
+    if ( GJP.Nodes(mu) >1){
+      Recv[mu].StartTrans();
+      Send[mu].StartTrans();
+    }
+  }
+  for (mu=0; mu<4; mu++){
+    if ( GJP.Nodes(mu) >1){
+      Recv[mu].TransComplete();
+      Send[mu].TransComplete();
+    }
+  }
  
 //------------------------------------------------------------------
 // start by summing first over direction (mu) and then over site
 // to allow SCU transfers to happen face-by-face in the outermost
 // loop.
 //------------------------------------------------------------------
-  sys_cacheflush(0);
 
   int pos[4];
+  Float *v1_buf_pos[4];
+  Float *v2_buf_pos[4];
+  for(int i = 0;i<4;i++){
+    v1_buf_pos[i] = v1_buf[i];
+    v2_buf_pos[i] = v2_buf[i];
+ //   printf("v1_buf v2_buf (%d)= %x %x\n",mu,v1_buf_pos[i],v2_buf_pos[i]);
+  }
   for (mu=0; mu<4; mu++){
     for (pos[3]=0; pos[3]<size[3]; pos[3]++){
     for (pos[2]=0; pos[2]<size[2]; pos[2]++){
@@ -199,15 +229,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
           vec_plus_mu_offset *= offset(size,pos,mu);
           if ((GJP.Nodes(mu)>1)&&((pos[mu]+1) == size[mu]) ) {
-#if 1
-          addr[0] = (IFloat *)v1+vec_plus_mu_offset;
-          addr[1] = (IFloat *)v2+vec_plus_mu_offset;
-          Send[mu].Addr(addr,2);
-	  Recv[mu].StartTrans();
-	  Send[mu].StartTrans();
-	  Recv[mu].TransComplete();
-	  Send[mu].TransComplete();
-#else
+#if 0
             for (s=0; s<ls; s++) {
               getPlusData( (IFloat *)site_v1+s*f_site_size_4d,
                 (IFloat *)v1+vec_plus_mu_offset+s*f_size_4d,
@@ -215,11 +237,18 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
               getPlusData( (IFloat *)site_v2+s*f_site_size_4d,
                 (IFloat *)v2+vec_plus_mu_offset+s*f_size_4d,
                 f_site_size_4d, mu) ;
+//			printf("site_v1 site_v2= %e %e\n",*(site_v1+s*f_site_size_4d),*(site_v2+s*f_site_size_4d));
             } // end for s
 #endif
-            v1_plus_mu = site_v1 ;
-            v2_plus_mu = site_v2 ;
-            vec_plus_mu_stride = 0 ;
+            v1_plus_mu = v1_buf_pos[mu] ;
+            v2_plus_mu = v2_buf_pos[mu] ;
+//			printf("v1_buf v2_buf= %x %x\n",v1_plus_mu,v2_plus_mu);
+//			printf("v1_buf v2_buf= %e %e\n",*v1_plus_mu,*v2_plus_mu);
+			fflush(stdout);
+ 			v1_buf_pos[mu] += f_site_size_4d;
+ 			v2_buf_pos[mu] += f_site_size_4d;
+            vec_plus_mu_stride = (surf[mu] -1)*f_site_size_4d ;
+//			printf("v1_buf v2_buf= %e %e\n",*(v1_plus_mu+surf[mu]*f_site_size_4d),*(v2_plus_mu+surf[mu]*f_site_size_4d));
 //            if (GJP.XnodeBc()==BND_CND_APRD) coeff = -coeff ;
             if (GJP.NodeBc(mu)==BND_CND_APRD) coeff = -coeff ;
           } else {
