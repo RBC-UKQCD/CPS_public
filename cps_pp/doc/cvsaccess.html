@@ -87,14 +87,7 @@ in bash, or
 $ setenv CVSROOT :pserver:<font color="#ee0000"><b>username</b></font>@<font color="#0000ee"><b>host</b></font>:/home/cvs/cps
 </pre>
 in tcsh (see the <a href="http://www.gnu.org/software/cvs/manual/">CVS manual</a> for details).
-<p>
-Note that in the <tt>cvs co</tt> command, the <tt>-P</tt> flag is required so that empty directories are not checked out. This will cause the build system to fail.
-Similarly, you should use the read-only flag <pre>cvs -r</pre> because some 
-files need to be writeable in order for the build to work. After checking out 
-the CPS module, you can make the source code read-only with a command like
-<pre wrap="">
-<span class="moz-txt-citetags">find cps++ -name "*.[Ch]" -o -name "*.in" |xargs chmod 440</span><br>
-</pre>
+</p>
 
 <h2><a name="Submission_of_Changes"></a>Submission of Changes</h2>
 
@@ -151,7 +144,7 @@ you are sure everything is running correctly.
 
 </p>
 <hr width="100%" size="2" align="Left" noshade="">
-<div align=right><font size=-1>[ $Revision: 1.8 $ - $Date: 2004-09-02 16:51:48 $ ] </font></div>
+<div align=right><font size=-1>[ $Revision: 1.9 $ - $Date: 2004-12-13 09:26:21 $ ] </font></div>
 
        
         </body>
