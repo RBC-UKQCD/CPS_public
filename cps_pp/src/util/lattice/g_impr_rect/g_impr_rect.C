@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprRect class.
 
-  $Id: g_impr_rect.C,v 1.6 2004-08-30 04:50:28 chulwoo Exp $
+  $Id: g_impr_rect.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-08-30 04:50:28 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.6 2004-08-30 04:50:28 chulwoo Exp $
-//  $Id: g_impr_rect.C,v 1.6 2004-08-30 04:50:28 chulwoo Exp $
+//  $Date: 2004-09-07 05:21:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
+//  $Id: g_impr_rect.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v $
 //  $State: Exp $
 //
@@ -107,7 +107,7 @@ GclassType GimprRect::Gclass(void){
   return G_CLASS_IMPR_RECT;
 }
 
-const unsigned CBUF_MODE4 = 0xcca52112;
+unsigned GimprRect::CBUF_MODE4 = 0xcca52112;
 
 
 //------------------------------------------------------------------------------
@@ -173,8 +173,7 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
   ForceFlops +=198+24;
 }
 
-#ifdef PARALLEL
-#else
+#if TARGET != QCDOC
 #define PROFILE
 //------------------------------------------------------------------------------
 // EvolveMomGforce(Matrix *mom, Float step_size):

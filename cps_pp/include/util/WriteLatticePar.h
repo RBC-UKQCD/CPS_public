@@ -38,18 +38,19 @@ class WriteLatticeParallel : private QioControl
     string hd_creator_hardware ;
     string hd_creation_date ;
     string hd_archive_date ;
+    char *cname;
 
 
  public:
     WriteLatticeParallel(Lattice & lat, const char * filename,
 			 const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 0)
-      : QioControl(), unload_good(false)    {
+      : QioControl(), unload_good(false), cname("WriteLatticeParallel")   {
       QioArg  wt_arg(filename, dataFormat, recon_row_3);
       write(lat, wt_arg);
     }
 
     WriteLatticeParallel(Lattice & lat, const QioArg & wt_arg)
-      : QioControl(), unload_good(false)    {
+      : QioControl(), unload_good(false), cname("WriteLatticeParallel")   {
       write(lat, wt_arg);
     }
 

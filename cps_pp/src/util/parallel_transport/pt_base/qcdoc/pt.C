@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.6 2004-08-19 22:17:02 mclark Exp $
+  $Id: pt.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-08-19 22:17:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.6 2004-08-19 22:17:02 mclark Exp $
-//  $Id: pt.C,v 1.6 2004-08-19 22:17:02 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-07 05:21:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
+//  $Id: pt.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -290,13 +290,11 @@ void pt_init(Lattice &lat)
       uc_nl[i] = (gauge_agg *)qalloc(QFAST,sizeof(gauge_agg)*(1+non_local_chi[i]));
     }
     if(uc_l[i]==NULL) {
-      uc_l[i] = (gauge_agg *)smalloc(sizeof(gauge_agg)*(1+local_chi[i]));
+      uc_l[i] = (gauge_agg *)smalloc(cname,fname,"uc_l[i]",sizeof(gauge_agg)*(1+local_chi[i]));
     }
     if(uc_nl[i]==NULL) {
-      uc_nl[i] = (gauge_agg *)smalloc(sizeof(gauge_agg)*(1+non_local_chi[i]));
+      uc_nl[i] = (gauge_agg *)smalloc(cname,fname,"uc_nl[i]",sizeof(gauge_agg)*(1+non_local_chi[i]));
     }
-    if(uc_l[i]==NULL)ERR.Pointer("",fname,"uc_l[i]");
-    if(uc_nl[i]==NULL)ERR.Pointer("",fname,"uc_nl[i]");
 
     // This buffer is actually overkill, but ensures will work if
     // shift_field is called with hop>1
@@ -373,13 +371,9 @@ void pt_init(Lattice &lat)
       int nl_size = (j+1)*non_local_chi[i];
       int l_size = vol - nl_size;
       
-      hp_l[j][i] = (hop_pointer*) smalloc(l_size*sizeof(hop_pointer));
-      VRB.Smalloc(cname,fname,"hp_l[j][i]",hp_l[j][i],l_size*sizeof(hop_pointer));
-      if (hp_l[j][i] == NULL) ERR.Pointer(cname,fname,"hp_l[j][i]");
+      hp_l[j][i] = (hop_pointer*) smalloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
 
-      hp_nl[j][i] = (hop_pointer*) smalloc(nl_size*sizeof(hop_pointer));
-      VRB.Smalloc(cname,fname,"hp_nl[j][i]",hp_nl[j][i],nl_size*sizeof(hop_pointer));
-      if (hp_nl[j][i] == NULL) ERR.Pointer(cname,fname,"hp_nl[j][i]");
+      hp_nl[j][i] = (hop_pointer*) smalloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
 
       src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
       dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));

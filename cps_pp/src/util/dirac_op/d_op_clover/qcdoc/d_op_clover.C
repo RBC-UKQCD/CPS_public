@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v 1.4 2004-08-18 11:57:49 zs Exp $
-//  $Id: d_op_clover.C,v 1.4 2004-08-18 11:57:49 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-07 05:21:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v 1.5 2004-09-07 05:21:48 chulwoo Exp $
+//  $Id: d_op_clover.C,v 1.5 2004-09-07 05:21:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_clover.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v $
 //  $State: Exp $
 //
@@ -180,8 +180,8 @@ void DiracOpClover::MatPcDagMatPc(Vector *out,
 				  Vector *in, 
 				  Float *dot_prd) 
 {
-  char *fname = "MatPcDagMatPc(V*,V*,F*)";
-  VRB.Func(cname,fname);
+//  char *fname = "MatPcDagMatPc(V*,V*,F*)";
+//  VRB.Func(cname,fname);
 
   // use clover_lib_arg->frm_buf1 as local buffer
   //--------------------------------------------------------------------
@@ -211,8 +211,8 @@ void DiracOpClover::MatPcDagMatPc(Vector *out,
 
 void DiracOpClover::MatPcDagOrNot(Vector *out, const Vector *in, int dag,Float *dot_prd) const 
 {
-  char *fname = "MatPcDagOrNot";
-  VRB.Func(cname,fname);
+//  char *fname = "MatPcDagOrNot";
+//  VRB.Func(cname,fname);
 
   // use clover_lib_arg->frm_buf0 as local buffer
   //--------------------------------------------------------------------
@@ -400,7 +400,7 @@ int DiracOpClover::MatInv(Vector *out, Vector *in, Float *true_res,
   clover_mat_mlt((IFloat *)out_even, A_even, 
 		 (const IFloat*)frm_buf1, half_sites);
 
-  VRB.FuncEnd(cname,fname);
+//  VRB.FuncEnd(cname,fname);
   return iter;
 }
 
@@ -528,7 +528,7 @@ void DiracOpClover::MatDag(Vector *out, Vector *in) {
 //------------------------------------------------------------------
 void DiracOpClover::MatHerm(Vector *out, Vector *in) {
   char *fname = "MatHerm(V*,V*)";
-  VRB.Func(cname,fname);
+//  VRB.Func(cname,fname);
 
   int temp_size = GJP.VolNodeSites() * lat.FsiteSize();
   Vector *temp = (Vector *) smalloc(temp_size * sizeof(Float));

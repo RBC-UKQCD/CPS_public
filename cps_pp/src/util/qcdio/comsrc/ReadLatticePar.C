@@ -13,13 +13,19 @@
 #include <util/gjp.h>
 #include <util/ReadLatticePar.h>
 #include <util/fpconv.h>
+#include <util/time.h>
 CPS_START_NAMESPACE
 
-
+#define PROFILE
 void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 {
   // most codes coped from ReadLattice::read( ), modification added to enable parallel IO
   cout << endl << "Loading lattice..." << endl << endl;
+
+#ifdef PROFILE
+  struct timeval start,end;
+  gettimeofday(&start,NULL);
+#endif
 
   load_good = false;
   int error = 0;
@@ -244,6 +250,11 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 
   if(lat.GaugeField() != lpoint) lat.GaugeField(lpoint);
   if(! CheckPlaqLinktrace(lat,rd_arg,plaq_inheader, linktrace_inheader))  return;
+
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  print_flops(cname,"read",0,&start,&end);
+#endif
 
   load_good = true;
 

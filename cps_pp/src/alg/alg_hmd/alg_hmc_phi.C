@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
 
-  $Id: alg_hmc_phi.C,v 1.14 2004-09-02 17:00:31 zs Exp $
+  $Id: alg_hmc_phi.C,v 1.15 2004-09-07 05:22:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 17:00:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.14 2004-09-02 17:00:31 zs Exp $
-//  $Id: alg_hmc_phi.C,v 1.14 2004-09-02 17:00:31 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2004-09-07 05:22:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.15 2004-09-07 05:22:00 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.15 2004-09-07 05:22:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -248,10 +248,10 @@ AlgHmcPhi::~AlgHmcPhi() {
   // Free memory for current and previous CG solution pointers.
   //----------------------------------------------------------------
   if(n_frm_masses != 0){
-    VRB.Sfree(cname,fname, "cg_sol_prev",cg_sol_prev);
-    sfree(cg_sol_prev);
-    VRB.Sfree(cname,fname, "cg_sol_cur",cg_sol_cur);
-    sfree(cg_sol_cur);
+    sfree(cname,fname, "cg_sol_prev",cg_sol_prev);
+//    sfree(cg_sol_prev);
+    sfree(cname,fname, "cg_sol_cur",cg_sol_cur);
+//    sfree(cg_sol_cur);
   }
 
 
@@ -273,6 +273,7 @@ AlgHmcPhi::~AlgHmcPhi() {
     sfree(frm1);
     VRB.Sfree(cname,fname, "frm2",frm2);
     sfree(frm2);
+    VRB.FuncEnd(cname,fname);
   }
 
 

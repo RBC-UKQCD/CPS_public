@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of dynamic memory management routines.	
 
-  $Id: smalloc.h,v 1.7 2004-09-06 05:01:40 chulwoo Exp $
+  $Id: smalloc.h,v 1.8 2004-09-07 05:20:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-06 05:01:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.7 2004-09-06 05:01:40 chulwoo Exp $
-//  $Id: smalloc.h,v 1.7 2004-09-06 05:01:40 chulwoo Exp $
+//  $Date: 2004-09-07 05:20:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.8 2004-09-07 05:20:52 chulwoo Exp $
+//  $Id: smalloc.h,v 1.8 2004-09-07 05:20:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: smalloc.h,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v $
 //  $State: Exp $
 //
@@ -41,6 +41,7 @@ void* smalloc(char *cname, char *fname, char *vname, int request);
   \param p Pointer to the memory to be freed.
 */
 void sfree(void* p);
+void sfree(char *cname, char *fname, char *vname, void *p);
 
 //! Doesn't appear to do anything.
 void sclear(void);

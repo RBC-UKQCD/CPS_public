@@ -6,10 +6,12 @@
 
 #include <config.h>
 #include <util/WriteLatticePar.h>
+#include <util/time.h>
 #include <iomanip>
 #include <fstream>
 #include <iostream>
 
+#define PROFILE
 CPS_START_NAMESPACE
 using namespace std;
 
@@ -82,6 +84,11 @@ void WriteLatticeParallel::writeHeader(ostream & fout, Float link_trace, Float p
 void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 {
   cout << endl << "Unloading lattice..." << endl << endl;
+
+#ifdef PROFILE
+  struct timeval start,end;
+  gettimeofday(&start,NULL);
+#endif
 
   // init
   int error = 0;
@@ -208,6 +215,11 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   output.close();
 
   if(synchronize(error) != 0)  return;
+
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  print_flops(cname,"write",0,&start,&end);
+#endif
 
   unload_good = true;
 }

@@ -1,13 +1,15 @@
-# $Id: Makefile.rules.in,v 1.12 2004-09-02 16:52:52 zs Exp $
+# $Id: Makefile.rules.in,v 1.13 2004-09-07 05:20:21 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_builddir@
 QOS = @QOS@
 
-BUILDDIR2 := $(shell pwd)
-DIR := $(subst $(BUILDDIR)/objs,,$(BUILDDIR2))
+PWD := $(shell pwd)
+DIR := $(subst $(BUILDDIR)/objs,,$(PWD))
+DIR := $(subst $(SRCDIR)/src,,$(DIR))/
 SRCDIR2 := $(SRCDIR)/src/$(DIR)
+BUILDDIR2 := $(BUILDDIR)/objs/$(DIR)
 VPATH:=$(SRCDIR2) ${BUILDDIR2}
 
 CC = @CC@

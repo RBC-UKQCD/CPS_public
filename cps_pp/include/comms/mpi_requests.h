@@ -1,10 +1,11 @@
 #include<config.h>
+#include<stdlib.h>
 CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 /*!\file
   \brief  Declaration and definition of the MPIRequestManager class
 
-  $Id: mpi_requests.h,v 1.5 2004-08-18 11:57:36 zs Exp $
+  $Id: mpi_requests.h,v 1.6 2004-09-07 05:20:52 chulwoo Exp $
 */
 /*----------------------------------------------------------*/
 /* The MPI comms request handle manager: mpi_requests.h
@@ -13,14 +14,14 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: zs $
-  $Date: 2004-08-18 11:57:36 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/mpi_requests.h,v 1.5 2004-08-18 11:57:36 zs Exp $
-  $Id: mpi_requests.h,v 1.5 2004-08-18 11:57:36 zs Exp $
+  $Author: chulwoo $
+  $Date: 2004-09-07 05:20:52 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/mpi_requests.h,v 1.6 2004-09-07 05:20:52 chulwoo Exp $
+  $Id: mpi_requests.h,v 1.6 2004-09-07 05:20:52 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: mpi_requests.h,v $
-  $Revision: 1.5 $
+  $Revision: 1.6 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/mpi_requests.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
