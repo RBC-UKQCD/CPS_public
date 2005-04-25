@@ -23,6 +23,7 @@ CPS_END_NAMESPACE
 #include<comms/glb.h>
 #include<comms/scu.h>
 #include<util/gjp.h>
+#include<util/checksum.h>
 #include<comms/double64.h>
 #include <comms/sysfunc.h>
 CPS_START_NAMESPACE
@@ -56,7 +57,7 @@ void glb_sum_internal2(Float * float_p,int ndir)
   static int coor[5] ={0,0,0,0,0};
   static SCUDirArgIR *Send[5];
   static SCUDirArgIR *Recv[5];
-
+  
   if (!initted){
       NP[0] = GJP.Xnodes();
       int max=NP[0];
@@ -82,7 +83,14 @@ void glb_sum_internal2(Float * float_p,int ndir)
 //  gsum_buf[0] = (Double64)*float_p;
 
   Double64 tmp_sum = (Double64)*float_p;
-  
+
+  // Save checksum of local floating points
+  //---------------------------------------------------
+  unsigned long *csum_p = (unsigned long *)&tmp_sum;
+  unsigned long csum = csum_p[0]^csum_p[1];
+  CSM.AccumulateCsum(CSUM_GLB_LOC,csum);
+
+
   for(int i = 0; i < ndir; ++i) 
   if (NP[i] >1) {
       int coor = GJP.NodeCoor(i);
@@ -104,6 +112,11 @@ void glb_sum_internal2(Float * float_p,int ndir)
   }
   *float_p = (Float)tmp_sum;
 
+  // accumulate final global sum checksum
+  //------------------------------------
+  csum = csum_p[0] ^ csum_p[1];
+  CSM.AccumulateCsum(CSUM_GLB_SUM,csum);
+  
 }
 
 static int initted_u=0;
@@ -165,7 +178,6 @@ void glb_sum_internal2(unsigned int *uint_p, int ndir, int sum_flag) {
       }
 	}
   *uint_p = tmp_sum;
-
 }
 
 

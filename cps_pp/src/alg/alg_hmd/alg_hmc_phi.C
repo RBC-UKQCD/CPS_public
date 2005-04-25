@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
 
-  $Id: alg_hmc_phi.C,v 1.20 2005-02-18 19:55:59 mclark Exp $
+  $Id: alg_hmc_phi.C,v 1.21 2005-04-25 07:16:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2005-02-18 19:55:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.20 2005-02-18 19:55:59 mclark Exp $
-//  $Id: alg_hmc_phi.C,v 1.20 2005-02-18 19:55:59 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-04-25 07:16:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.21 2005-04-25 07:16:36 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.21 2005-04-25 07:16:36 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -34,6 +34,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include <util/checksum.h>
 #include <util/qcdio.h>
 #include <stdlib.h>
 #include <alg/alg_hmd.h>
@@ -380,6 +381,8 @@ Float AlgHmcPhi::run(void)
   char *md_time_str = "MD_time/step_size = ";
   FILE *fp;
   VRB.Func(cname,fname);
+  unsigned long step_cnt = 0;
+  CSM.SaveComment(step_cnt);
   Float acceptance;
 
   // Get the Lattice object
@@ -496,7 +499,7 @@ Float AlgHmcPhi::run(void)
   // Run through the trajectory
   //----------------------------------------------------------------
   for(step=0; step < hmd_arg->steps_per_traj; step++){
-
+    CSM.SaveComment(++step_cnt);
 
     // Evolve gauge field by one step
     //--------------------------------------------------------------
@@ -550,7 +553,7 @@ Float AlgHmcPhi::run(void)
 
   }
 
-
+  CSM.SaveComment(++step_cnt);
   // Evolve gauge field by one last step
   //----------------------------------------------------------------
   lat.EvolveGfield(mom, dt);

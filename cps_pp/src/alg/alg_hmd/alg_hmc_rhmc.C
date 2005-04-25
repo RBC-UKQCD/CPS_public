@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.15 2005-03-07 00:46:13 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.16 2005-04-25 07:16:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2005-03-07 00:46:13 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.15 2005-03-07 00:46:13 chulwoo Exp $
-  $Id: alg_hmc_rhmc.C,v 1.15 2005-03-07 00:46:13 chulwoo Exp $
+  $Date: 2005-04-25 07:16:36 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.16 2005-04-25 07:16:36 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.16 2005-04-25 07:16:36 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.15 $
+  $Revision: 1.16 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -32,6 +32,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include<util/checksum.h>
 #include<util/qcdio.h>
 #include<math.h>
 #include<alg/alg_hmd.h>
@@ -418,6 +419,8 @@ Float AlgHmcRHMC::run(void)
   char *md_time_str = "MD_time/step_size = ";
   FILE *fp;
   VRB.Func(cname,fname);
+  unsigned long step_cnt = 0;
+  CSM.SaveComment(step_cnt);
 
   Float dev = 0.0;
   Float max_diff = 0.0;
@@ -590,6 +593,7 @@ Float AlgHmcRHMC::run(void)
       //----------------------------------------------------------------
 
       for(step=0; step < hmd_arg->steps_per_traj; step++){
+	CSM.SaveComment(++step_cnt);
 
 	// Evolve momenta by one step using the fermion force
 	//--------------------------------------------------------------
@@ -674,6 +678,7 @@ Float AlgHmcRHMC::run(void)
 	  }
       }
 
+      CSM.SaveComment(++step_cnt);
       // Reunitarize
       //----------------------------------------------------------------
       if(hmd_arg->reunitarize == REUNITARIZE_YES){

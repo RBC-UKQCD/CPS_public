@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.18 2005-03-07 00:03:11 chulwoo Exp $
+  $Id: gjp.h,v 1.19 2005-04-25 07:14:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:03:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.18 2005-03-07 00:03:11 chulwoo Exp $
-//  $Id: gjp.h,v 1.18 2005-03-07 00:03:11 chulwoo Exp $
+//  $Date: 2005-04-25 07:14:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.19 2005-04-25 07:14:46 chulwoo Exp $
+//  $Id: gjp.h,v 1.19 2005-04-25 07:14:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -103,157 +103,11 @@ class GlobalJobParameter
   BndCndType bc[5];       // sites of a single node along {X,Y,Z,T,S} direction
   BndCndType node_bc[5];  // sites of a single node along {X,Y,Z,T,S} direction
   int node_coor[5];  // sites of a single node along {X,Y,Z,T,S} direction
-#if 0
-  // Be very careful when changing the order of the variables or
-  // adding new variables in this class! Please refer to the comments 
-  // of "int NodeSites(int dir)" for a more detailed explanation. 
-
-  int x_node_sites;  // sites of a single node along the x direction
-  int y_node_sites;  // sites of a single node along the y direction
-  int z_node_sites;  // sites of a single node along the z direction
-  int t_node_sites;  // sites of a single node along the t direction
-  int s_node_sites;  // sites of a single node along the s direction
-                     // (5th dir.), relevant to DWF only
-
-  int x_nodes;      // Number of nodes along the x direction
-  int y_nodes;      // Number of nodes along the y direction
-  int z_nodes;      // Number of nodes along the z direction
-  int t_nodes;      // Number of nodes along the t direction
-  int s_nodes;      // Number of nodes along the s direction
-                    // (5th dir.), relevant to DWF only
-
-#ifdef PARALLEL
-  SCUAxis s_axis;   // The machine axis on which the 5th direction
-                    // axis is mapped. Relevant to DWF with s_nodes
-                    // different than 1.
-#endif
-#endif
 
   int vol_node_sites;  // The number of sites (4-D) of a single node.
   int vol_sites;       // The number of sites (4-D) of the whole lattice
       
-#if 0
-  int x_node_coor;  // "coordinate" of the node along the x direction
-  int y_node_coor;  // "coordinate" of the node along the y direction
-  int z_node_coor;  // "coordinate" of the node along the z direction
-  int t_node_coor;  // "coordinate" of the node along the t direction
-  int s_node_coor;  // "coordinate" of the node along the s direction
-                    // (5th dir.), relevant to DWF only
 
-  BndCndType x_bc;  // Boundary conditions of the whole lattice along x
-  BndCndType y_bc;  // Boundary conditions of the whole lattice along y
-  BndCndType z_bc;  // Boundary conditions of the whole lattice along z
-  BndCndType t_bc;  // Boundary conditions of the whole lattice along t
-  
-  BndCndType x_node_bc;  // Boundary conditions on this node along x
-  BndCndType y_node_bc;  // Boundary conditions on this node along y
-  BndCndType z_node_bc;  // Boundary conditions on this node along z
-  BndCndType t_node_bc;  // Boundary conditions on this node along t
-  
-  StartConfType start_conf_kind; // The kind of initial 
-                                 // configuration
-
-  Matrix *start_conf_load_addr;     // The address of
-                       // the starting conf. to be used if 
-                       // start_conf = START_CONF_MEM
-		       // Otherwise it is 0.
-#endif
-
-#if 0
-  char start_conf_filename[MAX_FILENAME_LEN];
-			//Filename for START_CONF_FILENAME
-
-  int start_conf_alloc_flag;
-
-  StartSeedType start_seed_kind;  // The kind of initial 
-                                  // random generator seed
-
-  int start_seed_value;   // The value of the starting seed
-                          // if start_seed_kind
-                          // is START_SEED_INPUT or 
-                          // is START_SEED_INPUT_UNIFORM
-                          // Derived from do_arg.start_seed_value.
-
-  Float beta;       // The pure gauge action "beta"
-
-  Float c_1 ;       // Related to the coefficient of the rectangle
-                    // term in the pure gauge action.
-                    // c_1 = 0 is the Wilson gauge action.
-                    // c_1 = -0.05 is the tree level value.
-                    // c_1 = -0.331 is the Iwasaki action.
-
-  Float u_0;	    // The juvenile amphibian
-
-  Float dwf_height; // The height of the domain wall
-
-  Float dwf_a5_inv; // The inverse of the dwf 5th dir. lattice spacing 
-
-  Float power_plaq_cutoff;
-     // The cutoff parameter for the power
-     // plaquete term in the pure gauge action
-     // implemented by the GpowerPlaq class.
-
-  int power_plaq_exponent; 
-     // The exponent for the power
-     // plaquete term in the pure gauge action
-     // implemented by the GpowerPlaq class.
-
-
-
-  //------------------------------------------------------------------
-  // Added by Ping
-  //------------------------------------------------------------------
-  // The following parameters are relevant to anisotropic lattices and
-  // clover improvement.
-  // xi as a prefix  indicates relevancy to anisotropic lattices.
-  // xi as a postfix indicates relevancy to the special anisotropic direction.
-  
-  Float xi_bare;            // bare anisotropy
-  int   xi_dir;             // the special anisotropic direction 
-                            // [0,1,2,3] for [x,y,z,t]
-  Float xi_v;               // bare velocity of light
-  Float xi_v_xi;            // bare velocity of light in the special direction
-  Float clover_coeff;       // The clover fermion coefficient, 1 at tree level
-  Float clover_coeff_xi;    // clover term coefficient for plaquettes with
-                            // links along the special anisotropic direction.
-  
-  // Added for Landau gauge fixing for anisotropic lattices
-  Float xi_gfix;            // coefficient for Laudau gauge fixing
-
-  //------------------------------------------------------------------
-  // Added by Ping
-  //------------------------------------------------------------------
-  // The following two parameters are relevant to scu transfer frequency
-  // and hardware global sum.
-  int  gsum_fast_mode;      // 0[by default] for 25MHz. 50MHz otherwise.
-  int  gsum_max_try;        // max num of tries of global sum, 2 by default
-
-  Float power_rect_cutoff;
-     // The cutoff parameter for the power
-     // rectangle term in the pure gauge action
-     // implemented by the GpowerRect class.
-
-  int power_rect_exponent; 
-     // The exponent for the power
-     // rectangle term in the pure gauge action
-     // implemented by the GpowerRect class.
-
-
-  // Asqtad improved staggered action parameters
-  
-  Float asqtad_KS;
-  Float asqtad_naik;
-  Float asqtad_3staple;
-  Float asqtad_5staple;
-  Float asqtad_7staple;
-  Float asqtad_lepage;
-  Float p4_KS;
-  Float p4_knight;
-  Float p4_3staple;
-  Float p4_5staple;
-  Float p4_7staple;
-  Float p4_lepage;
-#endif
 public:
   GlobalJobParameter();
 
@@ -365,15 +219,6 @@ public:
     \return The size of the grid in the 5th direction.
   */
 
-#if 0
-#ifdef PARALLEL
-  SCUAxis Saxis()
-  {return s_axis;}
-     // Returns the value of s_axis =
-     // the machine axis on which the 5th direction axis is  
-     // mapped. Relevant to DWF with s_nodes different than 1.
-#endif
-#endif
 
   int VolNodeSites() const
       {return vol_node_sites;}
@@ -672,20 +517,6 @@ public:
     \return The Landau gauge coefficient,
   */
 
-#if 0
-  //------------------------------------------------------------------
-  // Added in by Ping for global sum
-  //------------------------------------------------------------------
-  // The following two parameters are relevant to scu transfer frequency
-  // and hardware global sum.
-
-  int GsumFastMode() const        {return gsum_fast_mode;}
-  // Returns the selection of scu frequency. 
-  // 0[by default] for 25MHz. 50MHz otherwise.
-
-  int GsumMaxTry() const          {return gsum_max_try;}
-  // Returns max num of tries of global sum, 2 by default.
-#endif
 
   Float PowerPlaqCutoff() const
       {return doarg_int.power_plaq_cutoff;}
@@ -862,21 +693,6 @@ public:
 
      // Sets the inverse of the dwf 5th dir. lattice spacing.
 
-
-#if 0
-  //------------------------------------------------------------------
-  // Added in by Ping for global sum
-  //------------------------------------------------------------------
-  // The following two parameters are relevant to scu transfer frequency
-  // and hardware global sum.
-
-  void GsumFastMode(int i)         {gsum_fast_mode = i;}
-  // Sets the selection of scu frequency. 
-  // 0[by default] for 25MHz. 50MHz otherwise.
-
-  void GsumMaxTry(int i)           {gsum_max_try = i;}
-  // Sets max num of tries of global sum, 2 by default.
-#endif
 
   /*! @} */
 

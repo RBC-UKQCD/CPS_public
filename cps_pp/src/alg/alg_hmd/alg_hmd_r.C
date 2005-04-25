@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.15 2005-03-07 22:37:25 chulwoo Exp $
+  $Id: alg_hmd_r.C,v 1.16 2005-04-25 07:16:37 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 22:37:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.15 2005-03-07 22:37:25 chulwoo Exp $
-//  $Id: alg_hmd_r.C,v 1.15 2005-03-07 22:37:25 chulwoo Exp $
+//  $Date: 2005-04-25 07:16:37 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.16 2005-04-25 07:16:37 chulwoo Exp $
+//  $Id: alg_hmd_r.C,v 1.16 2005-04-25 07:16:37 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //
@@ -33,6 +33,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include <util/checksum.h>
 #include <util/qcdio.h>
 #include <alg/alg_hmd.h>
 #include <comms/glb.h>
@@ -244,6 +245,8 @@ Float AlgHmdR::run(void)
   char *md_time_str = "MD_time/step_size = ";
   FILE *fp;
   VRB.Func(cname,fname);
+  unsigned long step_cnt = 0;
+  CSM.SaveComment(step_cnt);
 
   // Get the Lattice object
   //----------------------------------------------------------------
@@ -316,6 +319,7 @@ Float AlgHmdR::run(void)
   //----------------------------------------------------------------
   step = hmd_arg->steps_per_traj;
   while(step) {
+    CSM.SaveComment(++step_cnt);
 
     // Set the field phi for each mass.
     // First evolve gauge field by flavor_time_step.
@@ -452,6 +456,7 @@ Float AlgHmdR::run(void)
     VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
   }
 
+  CSM.SaveComment(++step_cnt);
 
   //--------------------------------------------------------------
   // move Links forward half step, finish leap-
