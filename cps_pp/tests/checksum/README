@@ -1,0 +1,1 @@
+CSUM_EVL_MMP is the checksums of the intermediate CG vectors. It generates one 32bit checksum at each iteration, which means it involves a large volume of data.Use it carefully since it will probably cause too much IO traffic. 
