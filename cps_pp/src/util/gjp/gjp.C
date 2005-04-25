@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.26 2005-03-07 00:33:40 chulwoo Exp $
+  $Id: gjp.C,v 1.27 2005-04-25 08:01:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:33:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.26 2005-03-07 00:33:40 chulwoo Exp $
-//  $Id: gjp.C,v 1.26 2005-03-07 00:33:40 chulwoo Exp $
+//  $Date: 2005-04-25 08:01:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.27 2005-04-25 08:01:06 chulwoo Exp $
+//  $Id: gjp.C,v 1.27 2005-04-25 08:01:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.26 $
+//  $Revision: 1.27 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -155,10 +155,6 @@ void GlobalJobParameter::Initialize() {
   // same size partitions.
   //----------------------------------------------------------------
   int size[5];
-#if 0
-  for(i = 0; i<5 ; i++)
-  size[i] = 1;
-#endif
   size[0] = SizeX(); 
   size[1] = SizeY(); 
   size[2] = SizeZ(); 
@@ -278,28 +274,8 @@ nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
 //      conf_kind != START_CONF_FILE)
    doarg_int.start_conf_load_addr = 0;
 
-#if 0
-  if(start_conf_kind == START_CONF_FILE){
-    if(strlen(rda.start_conf_filename)<1){
-      ERR.General(cname,fname,
-      "start_conf_filename is not set correctly");
-    } else
-    strcpy(start_conf_filename,rda.start_conf_filename);
-  }
-#endif
-
     VRB.Flow(cname,fname,"start_conf_alloc_flag=%d\n",doarg_int.start_conf_alloc_flag);
     
-
-#if 0
-  xi_bare = rda.xi_bare;
-  xi_dir  = rda.xi_dir;
-  xi_v    = rda.xi_v;
-  xi_v_xi = rda.xi_v_xi;
-  xi_gfix = rda.xi_gfix;  // for Landau gauge
-  clover_coeff_xi = clover_coeff = rda.clover_coeff;
-#endif
-
   // Set parameters for anisotropic lattices and clover improvement.
   // MUST BE AFTER THE SETTING OF BETA [which is re-adjusted for
   // anisotropic implementations]. 
@@ -315,7 +291,6 @@ nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
   //================================================================
   // Other initializations
   //================================================================
-    
 
 }
 
@@ -341,88 +316,6 @@ void GlobalJobParameter::Bc(int dir, BndCndType cond){
     node_bc[dir] = ( node_coor[dir] == (nodes[dir]-1) ) ? BND_CND_APRD : BND_CND_PRD;
 }
 
-#if 0
-void GlobalJobParameter::Xbc(BndCndType bc){ Bc(0,bc);}
-void GlobalJobParameter::Ybc(BndCndType bc){ Bc(1,bc);}
-void GlobalJobParameter::Zbc(BndCndType bc){ Bc(2,bc);}
-void GlobalJobParameter::Tbc(BndCndType bc){ Bc(3,bc);}
-
-void GlobalJobParameter::Xbc(BndCndType bc){
-
-  // Set the x boundary condition for the whole lattice
-  //----------------------------------------------------------------
-  x_bc = bc;
-
-  // Set the x boundary condition for the sub-lattice on this node
-  //----------------------------------------------------------------
-  x_node_bc = BND_CND_PRD;
-  if(x_bc == BND_CND_APRD) 
-    x_node_bc = ( x_node_coor == (x_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
-}
-
-
-//------------------------------------------------------------------
-/*!
-  Sets the type of global lattice boundary condition in the Y direction
-  and also adjusts the local Y direction boundary conditions to match.
-  \param bc The type of boundary condition.
-*/
-
-void GlobalJobParameter::Ybc(BndCndType bc){
-
-  // Set the y boundary condition for the whole lattice
-  //----------------------------------------------------------------
-  y_bc = bc;
-
-  // Set the y boundary condition for the sub-lattice on this node
-  //----------------------------------------------------------------
-  y_node_bc = BND_CND_PRD;
-  if(y_bc == BND_CND_APRD) 
-    y_node_bc = ( y_node_coor == (y_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
-}
-
-
-//------------------------------------------------------------------
-/*!
-  Sets the type of global lattice boundary condition in the Z direction
-  and also adjusts the local Z direction boundary conditions to match.
-  \param bc The type of boundary condition.
-*/
-
-void GlobalJobParameter::Zbc(BndCndType bc){
-
-  // Set the z boundary condition for the whole lattice
-  //----------------------------------------------------------------
-  z_bc = bc;
-
-  // Set the z boundary condition for the sub-lattice on this node
-  //----------------------------------------------------------------
-  z_node_bc = BND_CND_PRD;
-  if(z_bc == BND_CND_APRD) 
-    z_node_bc = ( z_node_coor == (z_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
-}
-
-
-//------------------------------------------------------------------
-/*!
-  Sets the type of global lattice boundary condition in the T direction
-  and also adjusts the local T direction boundary conditions to match.
-  \param bc The type of boundary condition.
-*/
-
-void GlobalJobParameter::Tbc(BndCndType bc){
-
-  // Set the t boundary condition for the whole lattice
-  //----------------------------------------------------------------
-  t_bc = bc;
-
-  // Set the t boundary condition for the sub-lattice on this node
-  //----------------------------------------------------------------
-  t_node_bc = BND_CND_PRD;
-  if(t_bc == BND_CND_APRD) 
-    t_node_bc = ( t_node_coor == (t_nodes-1) ) ? BND_CND_APRD : BND_CND_PRD;
-}
-#endif
 
 
 CPS_END_NAMESPACE

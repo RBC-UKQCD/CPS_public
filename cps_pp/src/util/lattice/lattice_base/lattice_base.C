@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.28 2005-03-07 22:37:27 chulwoo Exp $
+  $Id: lattice_base.C,v 1.29 2005-04-25 08:05:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 22:37:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.28 2005-03-07 22:37:27 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.28 2005-03-07 22:37:27 chulwoo Exp $
+//  $Date: 2005-04-25 08:05:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.29 2005-04-25 08:05:36 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.29 2005-04-25 08:05:36 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.28 $
+//  $Revision: 1.29 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -41,6 +41,7 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <util/random.h>
 #include <util/ReadLatticePar.h>
+#include <util/checksum.h>
 #include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
@@ -1780,6 +1781,15 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
   VRB.Result(cname,fname,"gauge checksum(before) = %p\n",
     global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
 
+  // checksuming local gauge matrices before update
+  //-------------------------------------------------
+  unsigned long loc_sum = local_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE);
+
+  // checksuming local momentum matrices
+  //----------------------------------------------
+  loc_sum = local_checksum((Float *)mom,n_links*MATRIX_SIZE);
+  CSM.SaveCsum(CSUM_EVL_MOM,loc_sum);
+
   for(int i = 0; i < n_links; ++i) {
 
     // *mp1 = *(mom+i)
@@ -1814,6 +1824,13 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
     mDotMEqual((IFloat *)(curU_p+i),(const IFloat *)mp3,
 	       (const IFloat *)mp2);
   }
+
+
+  // checksuming local gauge matrices after update
+  //------------------------------------------------
+  loc_sum = local_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE);
+  CSM.SaveCsum(CSUM_EVL_LAT,loc_sum);
+
   VRB.Result(cname,fname,"gauge checksum(after) = %p\n",
     global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
   smeared = 0;
@@ -1836,13 +1853,10 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
 Float Lattice::MomHamiltonNode(Matrix *momentum){
   char *fname = "MomHamiltonNode(M*)";
   VRB.Func(cname,fname);
-
   Float ham = 0.0;
-  
   int n_links = 4 * GJP.XnodeSites() * GJP.YnodeSites()
       * GJP.ZnodeSites() * GJP.TnodeSites();
   // In other words,  4 * GJP.VolNodeSites(); 
-  
   for(int i = 0; i < n_links; ++i) {
     ham += momentum[i].NegHalfTrSquare();
   }
