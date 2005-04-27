@@ -39,13 +39,13 @@ unsigned int local_checksum(Float * float_p, int len) {
 }
 
 unsigned int global_checksum(Float * float_p, int len) {
-  ERR.NotImplemented("","global_checksum(Float *, int)");
-  return 0;
+ return local_checksum(float_p,len);
+ // ERR.NotImplemented("","global_checksum(Float *, int)");
 }
 
 unsigned int test_checksum(Float * float_p, int len) {
-  ERR.NotImplemented("","test_checksum(Float *, int)");
-  return 0;
+ return local_checksum(float_p,len);
+ //ERR.NotImplemented("","test_checksum(Float *, int)");
 }
 
 CPS_END_NAMESPACE
