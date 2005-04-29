@@ -86,9 +86,8 @@ void glb_sum_internal2(Float * float_p,int ndir)
 
   // Save checksum of local floating points
   //---------------------------------------------------
-  unsigned long *csum_p = (unsigned long *)&tmp_sum;
-  unsigned long csum = csum_p[0]^csum_p[1];
-  CSM.AccumulateCsum(CSUM_GLB_LOC,csum);
+  unsigned long sum_sum = local_checksum(float_p,1);
+  CSM.AccumulateCsum(CSUM_GLB_LOC,sum_sum);
 
 
   for(int i = 0; i < ndir; ++i) 
@@ -114,8 +113,8 @@ void glb_sum_internal2(Float * float_p,int ndir)
 
   // accumulate final global sum checksum
   //------------------------------------
-  csum = csum_p[0] ^ csum_p[1];
-  CSM.AccumulateCsum(CSUM_GLB_SUM,csum);
+  sum_sum = local_checksum(float_p,1);
+  CSM.AccumulateCsum(CSUM_GLB_SUM,sum_sum);
   
 }
 

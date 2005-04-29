@@ -57,6 +57,8 @@ void slice_sum(Float * float_p, int blcklength, int dir)
   char *fname = "slice_sum(*float_p, int, int)";
 
   int NP[4] = { GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes() };
+  for(int i = 0;i<4;i++)
+  printf("NP[%d]=%d\n",i,NP[i]);
   const int MAX=1023;
 
   if (blcklength > MAX)
@@ -89,15 +91,12 @@ void slice_sum(Float * float_p, int blcklength, int dir)
 	// loop index with 1<= itmp < NP[i] 
   int i,j;
 
-  for(i = 0; i < 4; ++i) {
-
-      if(i == dir) continue;
+  for(i = 0; i < 4; ++i) 
+      if( (i != dir) && (NP[i]>1)){
 
       //--------------------------------------------------------------
       // address of buffer of to be sent (data on this node) 
       //--------------------------------------------------------------
-//      transmit_buf_p = (IFloat *)float_p; 
-      transmit_buf_p = transmit_buf;
       for(j = 0;j<blcklength;j++) transmit_buf_p[j] = float_p[j];
 
       SCUDirArg send(transmit_buf_p, pos_dir[i], SCU_SEND, blcklength*sizeof(IFloat));
@@ -119,15 +118,19 @@ void slice_sum(Float * float_p, int blcklength, int dir)
 	 //-----------------------------------------------------------
          // accumulate received data	
 	 //-----------------------------------------------------------
+         printf("float_p[%d]=%e\n",blcklength-1,float_p[blcklength-1]);
    	 for (count = 0; count < blcklength; ++count) 
            float_p[count] += receive_buf_p[count];
+         printf("float_p[%d](after)=%e\n",blcklength-1,float_p[blcklength-1]);
 
 	 //-----------------------------------------------------------
          // the received data will be sent out     
 	 // the free buffer will be used to receive      
 	 //-----------------------------------------------------------
-	 send.Addr(transmit_buf_p = receive_buf_p);
-	 rcv.Addr(receive_buf_p = free_buffer_p);
+         transmit_buf_p = receive_buf_p;
+         receive_buf_p = free_buffer_p;
+	 send.Addr(transmit_buf_p );
+	 rcv.Addr(receive_buf_p );
 
 	 //-----------------------------------------------------------
 	 // transmit_buf WILL be free buffer NEXT round of transmit
