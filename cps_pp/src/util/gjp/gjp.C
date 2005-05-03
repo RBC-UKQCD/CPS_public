@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.27 2005-04-25 08:01:06 chulwoo Exp $
+  $Id: gjp.C,v 1.28 2005-05-03 20:27:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-04-25 08:01:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.27 2005-04-25 08:01:06 chulwoo Exp $
-//  $Id: gjp.C,v 1.27 2005-04-25 08:01:06 chulwoo Exp $
+//  $Date: 2005-05-03 20:27:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.28 2005-05-03 20:27:23 chulwoo Exp $
+//  $Id: gjp.C,v 1.28 2005-05-03 20:27:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.27 $
+//  $Revision: 1.28 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -291,6 +291,11 @@ nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
   //================================================================
   // Other initializations
   //================================================================
+
+  VRB.DeactivateAll();
+//  printf("verbose_level =%d\n",doarg_int.verbose_level);
+  VRB.Level(doarg_int.verbose_level);
+  printf("verbose_level =%d\n",VRB.Level());
 
 }
 
