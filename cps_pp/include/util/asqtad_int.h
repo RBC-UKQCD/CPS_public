@@ -267,7 +267,10 @@ SCUDirArgMulti SCUmulti_2[2];
   void comm_assert();
   void dirac(Float* b, Float* a, int a_odd, int add_flag);
   void *Alloc(int request){
-    return qalloc(QCOMMS,request);
+    void *ptr = qalloc(QCOMMS,request);
+    if (!ptr) ptr = qalloc(0,request);
+    if (!ptr){ printf("AsqD::Alloc failed\n"); exit(-4);}
+    return ptr;
   }
   void Free(void *p){
     qfree(p);
