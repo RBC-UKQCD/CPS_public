@@ -38,8 +38,8 @@ extern "C" void asqtad_dirac_init(Fasqtad *lat){
   arg.c6 = GJP.Lepage_coeff();
   arg.Fat = (IFloat *)lat_pt->Fields(0);
   arg.Naik = (IFloat *)lat_pt->Fields(1);
-//  arg.NaikM = (IFloat *)lat_pt->Fields(2);
-  arg.NaikM = NULL;
+  arg.NaikM = (IFloat *)lat_pt->Fields(2);
+//  arg.NaikM = NULL;
   asqd.init(&arg);
 }
 

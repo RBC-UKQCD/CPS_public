@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-04-05 06:44:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.20 2005-04-05 06:44:45 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.20 2005-04-05 06:44:45 chulwoo Exp $
+//  $Date: 2005-05-03 19:00:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.21 2005-05-03 19:00:54 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.21 2005-05-03 19:00:54 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -330,7 +330,7 @@ void AsqD::init(AsqDArg *arg)
   }
     if(chi_off_node_total == 0)
       PointerErr(cname,fname, "chi_off_node_total");
-  printf("chi_off_node_total=%p\n",chi_off_node_total);
+//  printf("chi_off_node_total=%p\n",chi_off_node_total);
 
  for (int k= 0; k < 2; k++ )
  for ( j= 0; j < 3; j++ ){
@@ -400,6 +400,7 @@ void AsqD::init(AsqDArg *arg)
     countM[k][i] = 0;
   }
  }
+// printf("Tbuffer done\n");
 
 
   //-----------------------------------------------------------------
@@ -631,8 +632,8 @@ void AsqD::init(AsqDArg *arg)
   for(int j = 0;j<3;j++){
 //   printf("countM[%d][%d] = %d ",j,i,countM[j][i]);
 //   printf("countP[%d][%d] = %d\n",j,i,countP[j][i]);
-    if (NP[0]>1 && (countM[j][i] != area[(i+j)%2][0])) exit(-4);
-    if (NP[0]>1 && (countP[j][i] != area[(i+1+j)%2][0])) exit(-4);
+    if (NP[0]>1 && (countM[j][i] != area[(i+j)%2][0])&&(size[0]>j*2)) {printf("countM\n"); exit(-4);}
+    if (NP[0]>1 && (countP[j][i] != area[(i+1+j)%2][0])&&(size[0]>j*2)){printf("countP\n"); exit(-4);}
     int pad_len = 4-(countM[j][i]%4);
     if (pad_len==4) pad_len=0;
     int *last = ToffsetM[j][i]+ countM[j][i]-1;
@@ -760,13 +761,15 @@ void AsqD::init(AsqDArg *arg)
   
     SCUDirArgIR *SCUarg_p[2*NUM_DIR];
   
-    for(i = 0;i<2*comms;i++) SCUarg_p[i] = &(SCUarg[odd][i]);
-    SCUmulti[odd].Init(SCUarg_p, 2*comms);
-    for(i = 0;i<2*comms;i++) SCUarg_p[i] = &(SCUarg_1[odd][i]);
-    SCUmulti_1[odd].Init(SCUarg_p, 2*comms);
-    if( split ){
-      for(i = 0;i<2*comms;i++) SCUarg_p[i] = &(SCUarg_2[odd][i]);
-      SCUmulti_2[odd].Init(SCUarg_p, 2*comms);
+    if(comms){
+      for(i = 0;i<2*comms;i++) SCUarg_p[i] = &(SCUarg[odd][i]);
+      SCUmulti[odd].Init(SCUarg_p, 2*comms);
+      for(i = 0;i<2*comms;i++) SCUarg_p[i] = &(SCUarg_1[odd][i]);
+      SCUmulti_1[odd].Init(SCUarg_p, 2*comms);
+      if( split ){
+        for(i = 0;i<2*comms;i++) SCUarg_p[i] = &(SCUarg_2[odd][i]);
+        SCUmulti_2[odd].Init(SCUarg_p, 2*comms);
+      }
     }
   } // end of odd loop
 
@@ -1084,14 +1087,16 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
       Naik += vol;
     }
   }
-  for(int i = 0;i<2;i++){
+  for(int i = 0;i<2;i++)
+  if (local_count_3[i] != local_chi_3[i]){
     printf("local_count_3[%d]=%d\n",i,local_count_3[i]);
-    if (local_count_3[i] != local_chi_3[i]) exit(-4);
+     exit(-4);
   }
   for(int j = 0;j<3;j++)
-  for(int i = 0;i<2;i++){
+  for(int i = 0;i<2;i++)
+  if (non_local_count_3[j][i] != (non_local_chi_3[i][j+1]-non_local_chi_3[i][j]) ){
     printf("non_local_count_3[%d][%d]=%d\n",i,j,non_local_count_3[j][i]);
-    if (non_local_count_3[j][i] != (non_local_chi_3[i][j+1]-non_local_chi_3[i][j]) ) exit(-4);
+     exit(-4);
   }
   qfree (rcv_mat);
 
@@ -1134,7 +1139,11 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
     }
   }
 
-  gauge_agg *temp = new gauge_agg[NUM_DIR*vol];
+  int temp_len = NUM_DIR*vol;
+  if ( (PAD(non_local_chi[0])*6)>temp_len) temp_len = PAD(non_local_chi[0])*6;
+
+  gauge_agg *temp = (gauge_agg *)Alloc(temp_len*sizeof(gauge_agg));
+//  printf("temp=%p\n",temp);
   int num_ind[NUM_DIR*vol];
   int src;
   for(j=0;j<2;j++){
@@ -1153,6 +1162,11 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
       int dest = (int)chi_l[j][2*i+1]/(16*VECT_LEN2*sizeof(Float));
       if(dest > vol/2) {
         printf("%s::%s: dest_l[%d](%d) > vol/2\n",cname,fname,i,dest);
+        exit(1);
+      }
+      if ((src*NUM_DIR*2+num_ind[src])>temp_len){
+        printf("%s::%s: index[%d](%d) > NUM_DIR*vol\n",cname,fname,i,
+        src*NUM_DIR*2+num_ind[src]);
         exit(1);
       }
       temp[src*NUM_DIR*2+num_ind[src]].src = (int)chi_l[j][2*i];
@@ -1203,6 +1217,11 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
         printf("%s::%s: dest_nl[%d](%d) > vol/2\n",cname,fname,i,dest);
         exit(1);
       }
+      if ((src*2+num_ind[src])>temp_len){
+        printf("%s::%s: index_nl[%d](%d) > NUM_DIR*vol\n",cname,fname,i,
+        src*2+num_ind[src]);
+        exit(1);
+      }
       temp[src*2+num_ind[src]].src = (int)chi_nl[j][2*i];
       temp[src*2+num_ind[src]].dest= (int)chi_nl[j][2*i+1];
       for(k=0;k<18;k++)
@@ -1247,12 +1266,14 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
       comp_nl_2[i]++;
     }
   }
-  delete[] temp;
+//  delete[] temp;
+  Free(temp);
 
   for ( i = 0; i < 2; i++){
   Free(uc_l[i]);
   Free(uc_nl[i]);
   }
+//  printf("init_g() done\n");
   
 }
 
