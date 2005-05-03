@@ -20,6 +20,7 @@ DoArg::DoArg () {
   s_node_sites=1;
   s_nodes=1;
   cg_reprod_freq = 0;
+  verbose_level=-1202; //RESULT
   xi_bare=1.0;
   xi_dir=3;
   xi_v=1.0;
