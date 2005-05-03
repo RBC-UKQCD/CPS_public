@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <util/gjp.h>
 #include <util/site.h>
+#include <util/qcdio.h>
 #include <alg/alg_tcharge.h>
 #include <comms/glb.h>
 CPS_START_NAMESPACE
@@ -274,21 +275,19 @@ void AlgTcharge::run()
   // Print out results
   //----------------------------------------------------------------
 
-  if(common_arg->results != 0)
+  if(common_arg->filename != 0)
     {
       char *fname = "alg_tcharge()";
-      char *cname = "alg_tcharge()";
       FILE *fp;
-      if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
-        ERR.FileA(cname,fname, (char *)common_arg->results);
+      if( (fp = Fopen(common_arg->filename, "a")) == NULL ) {
+        ERR.FileA(cname,fname,common_arg->filename);
       }
-      fprintf(fp,"AlgTcharge   :\n Clov      : %e\n", tcharge_node);
-      fprintf(fp," Rect      : %e\n", tchargeRect_node );
-      fprintf(fp," Cross     : %e\n", tchargeCross_node);
-      fprintf(fp," Tot(a^2) Q: %e \n",charge    );
-      fprintf(fp," Tot(a^2) F: %e \n",charge_2 );
-
-      fclose(fp);
+      Fprintf(fp,"AlgTcharge   :\n Clov      : %e\n", tcharge_node);
+      Fprintf(fp," Rect      : %e\n", tchargeRect_node );
+      Fprintf(fp," Cross     : %e\n", tchargeCross_node);
+      Fprintf(fp," Tot(a^2) Q: %e \n",charge    );
+      Fprintf(fp," Tot(a^2) F: %e \n",charge_2 );
+      Fclose(fp);
     }
 
 }
