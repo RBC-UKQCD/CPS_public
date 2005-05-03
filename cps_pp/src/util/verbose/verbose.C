@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
-  $Id: verbose.C,v 1.8 2004-09-21 18:25:18 chulwoo Exp $
+  $Id: verbose.C,v 1.9 2005-05-03 20:29:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-21 18:25:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.8 2004-09-21 18:25:18 chulwoo Exp $
-//  $Id: verbose.C,v 1.8 2004-09-21 18:25:18 chulwoo Exp $
+//  $Date: 2005-05-03 20:29:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.9 2005-05-03 20:29:14 chulwoo Exp $
+//  $Id: verbose.C,v 1.9 2005-05-03 20:29:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
@@ -142,7 +142,10 @@ int Verbose::Active(int test_level, int level){
 	int y;
 	for(i=0; i<base; i++){
 	    y = x % base;
-	    if( int(test_level) == y) return 1;
+	    if( int(test_level) == y){
+//             printf("Verbose::Acitve(%d,%d)=1\n",test_level,level);
+             return 1;
+             }
 	    x = (x - y) / base;
 	    if(x <= 0) break;
 	}
@@ -169,7 +172,6 @@ void Verbose::Func(const char *class_name, const char *func_name) {
 
     if(!active[VERBOSE_FUNC_LEVEL]) return;
 
-    printf("%s::%s : Entered :", class_name, func_name);
     if(active[VERBOSE_FUNC_CLOCK_LEVEL]){
 #ifdef _TARTAN
 	printf("  Clock (12.5 MHz) = %d\n", (int)clock());
