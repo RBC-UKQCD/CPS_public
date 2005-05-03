@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-04-05 06:44:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.16 2005-04-05 06:44:48 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.16 2005-04-05 06:44:48 chulwoo Exp $
+//  $Date: 2005-05-03 20:25:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.17 2005-05-03 20:25:32 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.17 2005-05-03 20:25:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -35,6 +35,7 @@ CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/verbose.h>
 #include <util/error.h>
+#include <util/checksum.h>
 #include <comms/glb.h>
 #include <math.h>
 #include <stdio.h>
@@ -142,6 +143,14 @@ int DiracOp::InvCg(Vector *out,
   }
   VRB.Result(cname,fname, "Input checksum = %p\n",
       global_checksum((Float *)in,f_size_cb));
+
+  // checksuming the local source vector
+  //----------------------------------------------------
+  unsigned long loc_sum = local_checksum((Float *)in,f_size_cb);
+  CSM.SaveCsum(CSUM_EVL_SRC,loc_sum);
+  CSM.Clear(CSUM_GLB_LOC);
+  CSM.Clear(CSUM_GLB_SUM);
+
   if (f_size_cb % GRAN != 0) 
     ERR.General(cname,fname,"Field length %d is not a multiple of granularity %d\n", GRAN, f_size_cb);
 
@@ -289,7 +298,8 @@ int DiracOp::InvCg(Vector *out,
 // Loop over CG iterations
 //------------------------------------------------------------------
 //  Gint::SynchMachine();
-  
+
+    unsigned long x_loc_sum = 0x0;
     for(i=0; i < max_itr; i++){
       timeval start,end;
       itr++;
@@ -298,7 +308,18 @@ int DiracOp::InvCg(Vector *out,
       // mmp = MatPcDagMatPc * dir
       // d = <dir, MatPcDagMatPc*dir>
       MatPcDagMatPc(mmp, dir, &d);
-  
+      //--------------------------------------------------------------
+      // checksuming the intermediate vectors and put into the memory
+      // --mflin Apr.05
+      //--------------------------------------------------------------
+      loc_sum = local_checksum((Float *)mmp,f_size_cb);
+
+      // checksum of the checksums of intermediate vectors
+      //-----------------------------------------------------------
+      x_loc_sum = x_loc_sum ^ loc_sum;
+      CSM.SaveCsum(CSUM_EVL_MMP,loc_sum);
+
+
     if (test_num) {
       unsigned int mmp_checksum = local_checksum((Float *)mmp,f_size_cb);
       /* Check reproducibility */
@@ -395,7 +416,16 @@ int DiracOp::InvCg(Vector *out,
   	     IFloat(tmp), itr+1);
     VRB.Result(cname,fname, "Output checksum = %p\n",
       global_checksum((Float *)out,f_size_cb));
+
+    // checksuming the local solution vector
+    //----------------------------------------------
+    loc_sum = local_checksum((Float *)out,f_size_cb);
+    CSM.SaveCsum(CSUM_EVL_SOL,loc_sum);
+    CSM.SaveCsum(CSUM_MMP_SUM,x_loc_sum);
+    
   }
+  CSM.SaveCsumSum(CSUM_GLB_LOC);
+  CSM.SaveCsumSum(CSUM_GLB_SUM);
 
   if (test_num) {
   VRB.Sfree(cname, fname,"d_store", d_store);

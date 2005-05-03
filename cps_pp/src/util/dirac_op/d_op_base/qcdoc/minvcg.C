@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpBase class multishift CG solver method.
 
-  $Id: minvcg.C,v 1.12 2005-03-07 00:24:47 chulwoo Exp $
+  $Id: minvcg.C,v 1.13 2005-05-03 20:25:32 chulwoo Exp $
 */
 
 CPS_END_NAMESPACE
@@ -18,6 +18,7 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 #include <math.h>
+#include <util/checksum.h>
 
 #define PROFILE
 
@@ -74,6 +75,11 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     f_size = lat.FsiteSize()*GJP.VolNodeSites() / 2;
   else
     f_size = lat.FsiteSize()*GJP.VolNodeSites() / (lat.FchkbEvl()+1);
+
+  unsigned long loc_csum = local_checksum((Float *)chi,f_size);
+  CSM.SaveCsum(CSUM_EVL_SRC,loc_csum);
+  CSM.Clear(CSUM_GLB_LOC);
+  CSM.Clear(CSUM_GLB_SUM);
 
   Vector *r = (Vector *)fmalloc(f_size * sizeof(Float),
 				cname,fname, "r");
@@ -176,6 +182,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   } else {
     MatPcDagMatPc(Ap,p[isz],&d);
   }
+  unsigned long x_loc_csum = local_checksum((Float *)Ap,f_size);
+
   DiracOpGlbSum(&d);
   Ap_tmp = (IFloat *)Ap;
   VRB.Flow(cname,fname,"Ap= %e pAp =%e\n",*Ap_tmp,d);
@@ -224,6 +232,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   gettimeofday(&start,NULL);
 #endif
 
+  
   // for k=1 until MaxCG do
   // if |psi[k+1] - psi[k]| <= RsdCG |psi[k+1]| then return
   for (k=1; k<=dirac_arg->max_num_iter && !convP; k++) {
@@ -253,6 +262,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     } else {
       MatPcDagMatPc(Ap,p[isz],&d);
     }
+    x_loc_csum = x_loc_csum ^ local_checksum((Float *)Ap,f_size);
     DiracOpGlbSum(&d);
     
     bp = b;
@@ -330,17 +340,24 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     }
   }
 
+  loc_csum = 0x0;
   // free arrays and vectors
   for (s=0; s<Nmass; s++) {
+
     if (type == MULTI || s==0) {
       // Copy solution vectors from fast memory to DDR
       psi_slow[s] -> CopyVec(psi[s],f_size);
       VRB.Sfree(cname,fname,"psi[s]",psi[s]);
       ffree(psi[s]);
+      loc_csum = loc_csum ^ local_checksum((Float *)psi_slow[s],f_size);
     }
     VRB.Sfree(cname,fname,"p[s]",p[s]);
     ffree(p[s]);
   }
+  CSM.SaveCsum(CSUM_EVL_SOL,loc_csum);
+  CSM.SaveCsum(CSUM_MMP_SUM,x_loc_csum);
+  CSM.SaveCsumSum(CSUM_GLB_LOC);
+  CSM.SaveCsumSum(CSUM_GLB_SUM);
   
   VRB.Sfree(cname,fname,"p",p);
   sfree(p);
