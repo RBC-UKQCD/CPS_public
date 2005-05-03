@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2005-03-07 00:46:11 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.32 2005-03-07 00:46:11 chulwoo Exp $
-dnl  $Id: configure.in,v 1.32 2005-03-07 00:46:11 chulwoo Exp $
+dnl  $Date: 2005-05-03 20:13:15 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.33 2005-05-03 20:13:15 chulwoo Exp $
+dnl  $Id: configure.in,v 1.33 2005-05-03 20:13:15 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.32 $
+dnl  $Revision: 1.33 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -90,7 +90,7 @@ if test "$enable_target" = "qcdoc"; then
    CFLAGS="-D_GCC_"
    CXXFLAGS="-D_GCC_"
    ASFLAGS=""
-   LDFLAGS="-pg"
+   LDFLAGS=""
 
    ARCH="QCDOC"
    ARCHDIR="QCDOC_DIR"

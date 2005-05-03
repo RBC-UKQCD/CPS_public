@@ -3813,7 +3813,7 @@ if test "$enable_target" = "qcdoc"; then
    CFLAGS="-D_GCC_"
    CXXFLAGS="-D_GCC_"
    ASFLAGS=""
-   LDFLAGS="-pg"
+   LDFLAGS=""
 
    ARCH="QCDOC"
    ARCHDIR="QCDOC_DIR"
