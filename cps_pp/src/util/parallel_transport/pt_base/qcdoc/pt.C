@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.21 2005-04-05 06:44:49 chulwoo Exp $
+  $Id: pt.C,v 1.22 2005-05-03 20:28:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-04-05 06:44:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.21 2005-04-05 06:44:49 chulwoo Exp $
-//  $Id: pt.C,v 1.21 2005-04-05 06:44:49 chulwoo Exp $
+//  $Date: 2005-05-03 20:28:50 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.22 2005-05-03 20:28:50 chulwoo Exp $
+//  $Id: pt.C,v 1.22 2005-05-03 20:28:50 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -40,6 +40,7 @@
 //External function definitions
 extern "C"{
   void cmm_agg(gauge_agg *chi, matrix *phi,matrix *result, int counter);
+  void pt_cmm_agg(gauge_agg *chi, matrix *phi,matrix *result, int counter);
   void cmm_agg_cpp( int sites, long chi, long u,long in, long out);
   void cmv_agg_cpp( int sites, long u,long in, long out);
   void pt_asqtad_agg( int sites, long chi, long u,long in, long out);
@@ -273,9 +274,11 @@ void PT::set_hop_pointer() {
 		//Calculate the new coordinate
 		nei[i] = (size[i]+x[i]-hop)%size[i];
 
+		if ( size[i] >2){
 		//Calculate the index for the source and the destination
 		(h_l[2*i]+local_count[2*i])->src = LexVector(x)*vlen;
 		(h_l[2*i]+local_count[2*i])->dest = LexVector(nei)*vlen2;
+                }
 		
 		//Increment the local count
 		local_count[i*2]++;
@@ -305,8 +308,10 @@ void PT::set_hop_pointer() {
 		//Calculate the local coordinate for this hop
 		nei[i] = (x[i]+hop)%size[i];
 		//Calculate source and destination indices
+		if ( size[i] >2){
 		(h_l[2*i+1]+local_count[2*i+1])->src = LexVector(x)*vlen;
 		(h_l[2*i+1]+local_count[2*i+1])->dest = LexVector(nei)*vlen2;
+		}
 		//Increment local count, check that bounds not exceeded
 		local_count[i*2+1]++;
 		if (local_count[i*2]>local_check)
@@ -328,7 +333,7 @@ void PT::init(PTArg *pt_arg)
 {
   char *cname = "";
   char *fname = "pt_init()";
-//  VRB.Func("",fname);
+//printf("%s\n",fname);
   int i, j, x[NDIM],nei[NDIM];
   int local_count[2*NDIM];
   int non_local_count[2*NDIM];
@@ -422,10 +427,8 @@ void PT::init(PTArg *pt_arg)
     else 
       non_local_chi[2*i+1] = non_local_chi[2*i] = vol/size[i];
     local_chi[2*i+1] = local_chi[2*i] = vol - non_local_chi[2*i];
-//    printf("local_chi[%d]=%d non_local_chi[%d]=%d\n",
-//    i*2,local_chi[i*2],i*2,non_local_chi[i*2]);
-//    printf("local_chi[%d]=%d non_local_chi[%d]=%d\n",
-//    i*2+1,local_chi[i*2+1],i*2+1,non_local_chi[i*2+1]);
+//printf("local_chi[%d]=%d non_local_chi[%d]=%d\n", i*2,local_chi[i*2],i*2,non_local_chi[i*2]);
+//printf("local_chi[%d]=%d non_local_chi[%d]=%d\n", i*2+1,local_chi[i*2+1],i*2+1,non_local_chi[i*2+1]);
   }
 
   //---------------------------------------------------------------------------
@@ -469,7 +472,7 @@ void PT::init(PTArg *pt_arg)
       else
 	non_local_chi_cb[2*i+1] = non_local_chi_cb[2*i] = 0;
       local_chi_cb[2*i+1] = local_chi_cb[2*i] = vol/2 - non_local_chi_cb[2*i];
-      //printf("non_local_chi_cb[2*%d] = %d; local_chi_cb[2*%d] = %d\n",i,non_local_chi_cb[2*i],i,local_chi_cb[2*i]);
+  //    printf("non_local_chi_cb[2*%d] = %d; local_chi_cb[2*%d] = %d\n",i,non_local_chi_cb[2*i],i,local_chi_cb[2*i]);
     }
 
   //---------------------------------------------------------------------------
@@ -565,7 +568,7 @@ void PT::init(PTArg *pt_arg)
 	for(x[0]=0,nei[0]=0;x[0]<size[0];x[0]++,nei[0]++){
 	  for(i=0;i<NDIM;i++){
 	    
-	    //printf("%d %d %d %d %d\n",x[0],x[1],x[2],x[3],i);
+//	    printf("%d %d %d %d %d\n",x[0],x[1],x[2],x[3],i);
 	    // positive direction
 	    //This is for transport of a vector in the negative direction
 	    //An even index for uc_nl, uc_l, uc_nl_cb, uc_l_cb corresponds
@@ -634,7 +637,7 @@ void PT::init(PTArg *pt_arg)
 
 	    for(i=0;i<NDIM;i++){
 
-//	    printf("%d %d %d %d %d\n",x[0],x[1],x[2],x[3],i);
+//	    printf("Toffset:%d %d %d %d %d\n",x[0],x[1],x[2],x[3],i);
 	    // positive direction
 	    //This is for transport of a vector in the negative direction
 	    //An even index for uc_nl, uc_l, uc_nl_cb, uc_l_cb corresponds
@@ -793,9 +796,15 @@ void PT::init(PTArg *pt_arg)
       int nl_size = (j+1)*non_local_chi[i] + 1;
       int l_size = vol - nl_size + 1;
 
+    if (l_size>0){
       hp_l[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
       src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
       dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
+    } else {
+      hp_l[j][i] = NULL;
+      src_l[j][i] = NULL;
+      dest_l[j][i] = NULL;
+    }
       
       hp_nl[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
       dest_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
@@ -808,9 +817,9 @@ void PT::init(PTArg *pt_arg)
   //Calculate the indices for the source and destination
   for (j=0; j<MAX_HOP; j++) {
     for(i=0; i<2*NDIM; i++){
-      int nl_size = (j+1)*non_local_chi[i]+1;
-      int l_size = vol - nl_size+2;
-      if (l_size>2)
+      int nl_size = (j+1)*non_local_chi[i];
+      int l_size = vol - nl_size;
+      if (l_size>0)
       for (int s=0; s<l_size; s++) {
 	src_l[j][i][s] = hp_l[j][i][s].src/(VECT_LEN*sizeof(IFloat));
 	dest_l[j][i][s] = hp_l[j][i][s].dest/(VECT_LEN2*sizeof(IFloat));
@@ -821,7 +830,7 @@ void PT::init(PTArg *pt_arg)
       }
     }
   }
-
+//printf("pt_init() done\n");
 	
 }
 
@@ -867,11 +876,13 @@ void PT::delete_buf(){
 
   for (int hop=0; hop<MAX_HOP; hop++) {
     for(int i = 0; i < 2*NDIM; i++){
-      int nl_size = (hop+1)*non_local_chi[i]+1;
-      int l_size = vol - nl_size+1;
-      Free(hp_l[hop][i]);
-      Free(src_l[hop][i]);
-      Free(dest_l[hop][i]);
+      int nl_size = (hop+1)*non_local_chi[i];
+      int l_size = vol - nl_size;
+      if (l_size>0){
+        Free(hp_l[hop][i]);
+        Free(src_l[hop][i]);
+        Free(dest_l[hop][i]);
+      }
 
       Free(hp_nl[hop][i]);
       Free(src_nl[hop][i]);
@@ -913,6 +924,7 @@ void PT::init_g(void){
   int i;
 
   char *fname = "init_g()";
+//printf("%s\n",fname);
 
   for(i=0; i<2*NDIM;i++){
     local_count[i]=non_local_count[i]=0;
@@ -930,21 +942,21 @@ void PT::init_g(void){
       gauge_txyz = (IFloat *)qalloc(QFAST|QCOMMS,gauge_mem);
       if(!gauge_txyz)
 	{
-	  printf("Qalloc unsuccessful for gauge_txyz.  Allocating to smalloc instead.\n");
+	  //printf("Qalloc unsuccessful for gauge_txyz.  Allocating to smalloc instead.\n");
 	  gauge_txyz = (IFloat *)Alloc(gauge_mem);
-	  printf("Alloc successful gauge_txyz = %p\n",gauge_txyz);
+	  //printf("Alloc successful gauge_txyz = %p\n",gauge_txyz);
 	}
       else
 	{
-	  //printf("Qalloc successful gauge_txyz = %p\n",gauge_txyz);
+	  ////printf("Qalloc successful gauge_txyz = %p\n",gauge_txyz);
 	}
     }
   else
     {
-      printf("Memory required for gauge_txyz (in bytes) = %d\n", gauge_mem);
-      printf("Local volume = %d, too large for Qalloc of gauge_txyz\n",vol);
+      //printf("Memory required for gauge_txyz (in bytes) = %d\n", gauge_mem);
+      //printf("Local volume = %d, too large for Qalloc of gauge_txyz\n",vol);
       gauge_txyz = (IFloat *)Alloc(gauge_mem);
-      printf("Alloc successful gauge_txyz = %p\n",gauge_txyz); 
+      //printf("Alloc successful gauge_txyz = %p\n",gauge_txyz); 
     }
   //Copy the gauge field in STAGGERED ordering into gauge_txyz
   for(x[0]=0;x[0]<size[0];x[0]++)
@@ -980,6 +992,7 @@ void PT::init_g(void){
       for(x[2]=0,nei[2]=0;x[2]<size[2];x[2]++,nei[2]++)
 	for(x[1]=0,nei[1]=0;x[1]<size[1];x[1]++,nei[1]++)
 	  for(x[0]=0,nei[0]=0;x[0]<size[0];x[0]++,nei[0]++){
+//printf("%d %d %d %d %d\n",i,x[0],x[1],x[2],x[3]);
 	    // positive direction
 	    //this is a hop in the positive direction, meaning data must be sent
 	    //in the negative direction.
@@ -1034,6 +1047,7 @@ void PT::init_g(void){
   for(i=0;i<2*NDIM;i++) 
     if (!local[i/2]) {
       for (int hop=1; hop<=MAX_HOP; hop++) {
+//printf("%d %d\n",i,hop);
       //Initialize SCUArg to receive fermion fields
       SCUarg[hop-1][i*2] = new SCUDirArgIR;
       SCUarg[hop-1][i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,
@@ -1065,11 +1079,13 @@ void PT::init_g(void){
       //-----------------------------------------------------------------------
       //Initialize SCUArg to receive fermion fields
       SCUarg_cb[i*2] = new SCUDirArgIR;
+//printf("SCUarg_cb\n");
       SCUarg_cb[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,
 			     non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
 
       //Initialize SCUArg to send fermion field
       SCUarg_cb[i*2+1] = new SCUDirArgIR;
+//printf("SCUarg_cb\n");
       
       if(i%2)
 	SCUarg_cb[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,
@@ -1080,11 +1096,13 @@ void PT::init_g(void){
     
       //Receive for Matrices
       SCUarg_mat_cb[i*2] = new SCUDirArgIR;
+//printf("SCUarg_mat_cb\n");
 	SCUarg_mat_cb[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,
 				   3*non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
 
       //send for matrices
       SCUarg_mat_cb[i*2+1] = new SCUDirArgIR;
+//printf("SCUarg_mat_cb\n");
       if(i%2)
 	SCUarg_mat_cb[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,
 				   3*non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
@@ -1096,6 +1114,7 @@ void PT::init_g(void){
   
 
   qfree(rcv_mat);
+//printf("%s done\n",fname);
 }
 
 
@@ -1822,7 +1841,8 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
 #ifdef CPP
     cmm_agg_cpp(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)min[i],(long)mout[i]);
 #else
-    cmm_agg(uc_l[wire[i]],min[i],mout[i],local_chi[wire[i]]/2);
+    //cmm_agg(uc_l[wire[i]],min[i],mout[i],local_chi[wire[i]]/2);
+    pt_cmm_agg(uc_l[wire[i]],min[i],mout[i],local_chi[wire[i]]/2);
 #endif
   }
 
@@ -1833,7 +1853,8 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
 #ifdef CPP
     cmm_agg_cpp(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)mout[i]);
 #else
-    cmm_agg(uc_nl[wire[i]],(matrix *)rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
+    //cmm_agg(uc_nl[wire[i]],(matrix *)rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
+    pt_cmm_agg(uc_nl[wire[i]],(matrix *)rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
 #endif
     //#undef CPP
   }
@@ -2027,20 +2048,22 @@ void PT::shift_field(IFloat **v, const int *dir, int n_dir,
   int comms=0;
   for (i=0; i<n_dir; i++) 
   if (!local[wire[i]/2]){
-    SCUarg_p[2*i] = SCUarg_mat[hop-1][2*wire[i]];
-    SCUarg_p[2*i+1] = SCUarg_mat[hop-1][2*wire[i]+1];
-    SCUarg_p[2*i+1]->Addr((void *)(v[i]+GAUGE_LEN*set_offset(wire[i], hop)));
+    SCUarg_p[2*comms] = SCUarg_mat[hop-1][2*wire[i]];
+    SCUarg_p[2*comms+1] = SCUarg_mat[hop-1][2*wire[i]+1];
+    SCUarg_p[2*comms+1]->Addr((void *)(v[i]+GAUGE_LEN*set_offset(wire[i], hop)));
+    comms++;
   }
 
   SCUmulti.Init(SCUarg_p,2*comms);
   SCUmulti.SlowStartTrans();
-  SCUmulti.TransComplete();
+//  SCUmulti.TransComplete();
   
   for (i=0; i<n_dir; i++) {
     length = vol-hop*non_local_chi[wire[i]];
     copy_matrix(u[i],v[i],&length,dest_l[hop-1][wire[i]],
 		src_l[hop-1][wire[i]]);
   }
+  SCUmulti.TransComplete();
 
   for (i=0; i<n_dir; i++) {
     length = hop*non_local_chi[wire[i]];
