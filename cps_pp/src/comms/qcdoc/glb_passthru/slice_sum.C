@@ -107,10 +107,10 @@ void slice_sum(Float * float_p, int blcklength, int dir)
 	 //-----------------------------------------------------------
          // accumulate received data	
 	 //-----------------------------------------------------------
-         printf("float_p[%d]=%e\n",blcklength-1,float_p[blcklength-1]);
+ //        printf("float_p[%d]=%e\n",blcklength-1,float_p[blcklength-1]);
    	 for (count = 0; count < blcklength; ++count) 
            float_p[count] += receive_buf_p[count];
-         printf("float_p[%d](after)=%e\n",blcklength-1,float_p[blcklength-1]);
+//         printf("float_p[%d](after)=%e\n",blcklength-1,float_p[blcklength-1]);
 
 	 //-----------------------------------------------------------
          // the received data will be sent out     
