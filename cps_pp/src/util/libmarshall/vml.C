@@ -614,12 +614,22 @@ bool_t VML::Create(int fd,enum vml_op op)
 bool_t VML::Create(char *file, enum vml_op op)
 {
   FILE *fp = NULL;
-  if ( op == VML_ENCODE ) { 
-    fp  = Fopen(file,"w");
-  } else if ( op == VML_DECODE ) { 
-    fp  = fopen(file,"r");
-  }
-
+  if ( op == VML_ENCODE ) 
+    { 
+      fp  = Fopen(file,"w");
+      if ( fp == NULL )
+        {
+          ERR.FileW("VML","Create",file);
+        }
+    }
+  else if ( op == VML_DECODE ) 
+    { 
+      fp  = fopen(file,"r");
+      if ( fp == NULL )
+        {
+          ERR.FileR("VML","Create",file);
+        }
+    }
   return Create(fp,op);
 
 }
