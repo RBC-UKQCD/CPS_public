@@ -39,14 +39,14 @@ public:
 public:
 
 
-  AlgTcharge(Lattice & latt, 
+  AlgTcharge(Lattice&    latt, 
              CommonArg *c_arg ):
-    Alg(latt,c_arg)
+    Alg(latt,c_arg),
+    cname("AlgTcharge")
   {;}
   
   virtual ~AlgTcharge() {;}
   
-  /*! run the algorithm */
   void run();
 
 };

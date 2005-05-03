@@ -4,14 +4,18 @@
 
   AlgSmear, AlgApeSmear, AlgKineticSmear and AlgHypSmear classes.
   
-  $Id: alg_smear.h,v 1.5 2005-01-13 06:06:48 chulwoo Exp $
+  $Id: alg_smear.h,v 1.6 2005-05-03 18:57:37 chulwoo Exp $
 */
 //------------------------------------------------------------------
 #ifndef _ALG_SMEAR_CD_
 #define _ALG_SMEAR_CD_
-
 #include <config.h>
 #include <alg/alg_base.h>
+#include <alg/ape_smear_arg.h>
+#include <alg/kinetic_smear_arg.h>
+#include <alg/hyp_smear_arg.h>
+
+
 CPS_START_NAMESPACE
 
 //! Base class for smearing a lattice.
@@ -31,58 +35,73 @@ CPS_START_NAMESPACE
 
 class AlgSmear:public Alg
 {
-  private:
-  
-    int bool_su3_proj;
-    int orthog       ;
-    Matrix* lat_back ;
-    char *cname;
+private:
+  char *cname;
 
-    void sub( Matrix& x, Matrix& y , int ind );
-
-  public:
-  
-    AlgSmear( Lattice&   lat,
-	      CommonArg* ca ,
-	      int su3_proj );
-  
-    virtual ~AlgSmear();
-
-    //! Perform the smearing
-    void run();
-  
-    //! Restrict the smearing to some hyperplanes.
-    /*!
-      Smear only on hyperplanes orthogonal to this direction.
-      \param i The direction.
-    */
-    void set_orthog( int i ) { orthog=i; }
-
-    //! Get the direction orthogonal to which smearing is done.
-    /*!
-      \return The direction normal to the smeared hyperplanes.
-    */
-    int  get_orthog() const  { return orthog; }
-
-  protected:
-
-    //! Smear a  link.
-    /*!
-      \param link The link to smear.
-      \param pos The coordinates of the link.
-      \param mu The direction of the link.
-    */
-    virtual void smear_link( Matrix& link, 
-			     int*    pos,
-			     int      mu )=0;
-
-    //! Calculates the three-link staple around a link.
-    void three_staple(Lattice& latt, Matrix& link, int *pos, int u, int orth);
-
-    //! Projects a matrix on to the SU(3)manifold.
-    int su3_proj( Matrix& x );
+  int bool_su3_proj;
+  Float tolerance  ;
+  int orthog       ;
+  Matrix* lat_back ;
     
+public:
+  
+  AlgSmear( Lattice&   lat,
+            CommonArg* ca ,
+            int su3_proj );
+  
+  virtual ~AlgSmear();
+  
+  //! Perform the smearing
+  void run();
+  
+  //! Restrict the smearing to some hyperplanes.
+  /*!
+    Smear only on hyperplanes orthogonal to this direction.
+    \param i The direction.
+  */
+  void set_orthog( int i ) { orthog=i; }
+  
+  //! Get the direction orthogonal to which smearing is done.
+  /*!
+    \return The direction normal to the smeared hyperplanes.
+  */
+  int  get_orthog() const  { return orthog; }
+
+  //! set tolerance for the SU(3) projection 
+  void set_tol( Float x ) { tolerance = x; }
+  
+  //! get tolerance for the SU(3) projection
+  Float get_tol() const { return tolerance; }
+
+protected:
+  
+  //! Smear a  link.
+  /*!
+    \param link The link to smear.
+    \param pos The coordinates of the link.
+    \param mu The direction of the link.
+  */
+  virtual void smear_link( Matrix& link, 
+                           int*    pos,
+                           int      mu )=0;
+  
+  
 };
+
+//! Calculates the three-link staple around a link.
+void three_staple(Lattice& latt, Matrix& link, int *pos, int u, int orth);
+
+//! Calculates the five-link staple around a link.
+void five_staple  (Lattice& latt, Matrix& link, int *pos, int u, int orth);
+
+//! Calculates the seven-link staple around a link.
+void seven_staple (Lattice& latt, Matrix& link, int *pos, int u, int orth);
+
+//! Calculates the lepage staple around a link.
+void lepage_staple(Lattice& latt, Matrix& link, int *pos, int u, int orth);
+  
+//! Projects a matrix on to the SU(3) manifold.
+int su3_proj( Matrix& x , Float tolerance );
 
 
 //! Performs APE smearing 
@@ -94,7 +113,6 @@ class AlgSmear:public Alg
 
   \ingroup alg  
 */
-
 class AlgApeSmear:public AlgSmear
 {
 private:
@@ -111,21 +129,22 @@ public:
     \param ca Container for generic parameters. .
   */
   
-  AlgApeSmear(Lattice&   lat,
-              CommonArg* ca  ):
-    AlgSmear(lat,ca,1)
-      {
-	  cname = "AlgApeSmear";
-      }
+  AlgApeSmear(Lattice&     lat,
+              CommonArg*   ca ,
+              ApeSmearArg* asa );
   
   ~AlgApeSmear()
   {;}
+  
+  /*!
+    If an output file is specified in the CommonArg argument, then
+    the smearing coefficients are written to the file.
+  */
+  void run();
 
-  //! Set the smearing coefficient
-  /*! \param c The smearing coefficient. */
   void set_coef( Float x ) { c = x ; }
 
-  protected:
+protected:
   
   void smear_link( Matrix& mat,
                    int*    pos,
@@ -145,19 +164,17 @@ public:
 
   \ingroup alg
 */
+
+
 class AlgKineticSmear:public AlgSmear
 {
 
-  private:
+private:
   
-    Float _coef[5];
-    char *cname;
-
-    void five_staple(Lattice& latt, Matrix& link, int *pos, int u, int orth);
-    void seven_staple(Lattice& latt, Matrix& link, int *pos, int u, int orth);
-    void lepage_staple(Lattice& latt,  Matrix& link, int *pos, int u, int orth);
-
-  public:
+  char *cname;
+  Float _coef[5];
+    
+public:
   
   /*!
     \param lat The Lattice object containing the gauge field with which
@@ -166,12 +183,8 @@ class AlgKineticSmear:public AlgSmear
     \post The  smearing coefficients are all set to zero.
   */
   AlgKineticSmear(Lattice&   lat,
-                  CommonArg* ca  ):
-    AlgSmear(lat,ca,0)
-  {
-    for (int i=0;i<5;++i)  _coef[i]=0.0;
-    cname = "AlgKineticSmear";
-  }
+                  CommonArg* ca ,
+                  KineticSmearArg* ksa );
   
   ~AlgKineticSmear()
   {;}
@@ -179,24 +192,20 @@ class AlgKineticSmear:public AlgSmear
   //! Do the smearing  
   void run();
 
-  //!  Sets the single link coefficient/
   void single_link( Float coef ) { _coef[0] = coef; }
-  //!  Sets the three-link staple coefficient.
   void three_link ( Float coef ) { _coef[1] = coef; }
-  //!  Sets the five-link staple coefficient.
   void five_link  ( Float coef ) { _coef[2] = coef; }
-  //!  Sets the seven-link staple coefficient.
   void seven_link ( Float coef ) { _coef[3] = coef; }
-  //!  Sets the Lepage-term staple coefficient.
   void lepage     ( Float coef ) { _coef[4] = coef; }
 
-  protected:
+protected:
   
   void smear_link( Matrix& link,
                    int*    pos,
                    int      mu );
-
+  
 };
+
 
 
 //! Performs HYP smearing
@@ -211,34 +220,34 @@ class AlgKineticSmear:public AlgSmear
 
   \ingroup alg  
 */
+
 class AlgHypSmear:public AlgSmear
 {
 private:
-  
-  Float c1, c2, c3;
-  char *cname;
 
+  char *cname;  
+  Float c1, c2, c3;
+  
   const Matrix GetLink( Lattice& lat, const int* x, int mu );
   void get_vtilde( Matrix& , int*, int, int );
   void get_vbar  ( Matrix& , int*, int, int, int );
-
+  
 public:
   /*!
     \param lat The Lattice object containing the gauge field with which
     the smearing is done. 
     \param ca Container for generic parameters. .
   */
-  AlgHypSmear(Lattice&   lat, CommonArg* ca  ): AlgSmear(lat,ca,1)
-      {
-	  cname = "AlgHypSmear";
-      }
-
+  AlgHypSmear(Lattice&     lat, 
+              CommonArg*    ca,
+              HypSmearArg* hsa );
+  
   ~AlgHypSmear()
   {;}
-
+  
   //! Do the smearing
   void run();
-
+  
   //!  Sets a smearing coefficient
   void set_c1( Float x ) { c1=x; }
   //!  Sets a smearing coefficient
@@ -246,12 +255,12 @@ public:
   //!  Sets a smearing coefficient  
   void set_c3( Float x ) { c3=x; }
   
-  protected:
+protected:
   
   void smear_link( Matrix& link,
                    int*    pos,
                    int      mu );
-
+  
 };
 
 
