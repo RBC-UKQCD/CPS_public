@@ -51,6 +51,7 @@ static Double64 *gsum_buf = NULL;
 void glb_sum_multi_dir(Float * float_p, int dir, int len)
 #if 1
 {
+   printf("glb_sum_multi_dir(%p, %d, %d)\n",float_p,dir,len);
 	int len2 = len ;
 	Float *tmp = float_p;
 	while( len2 > MAX_BUF){
@@ -60,6 +61,7 @@ void glb_sum_multi_dir(Float * float_p, int dir, int len)
 	}
 	if (len2>0)
 		glb_sum_internal(tmp,dir,len2);
+        printf("done\n");
 }
 #else
 {

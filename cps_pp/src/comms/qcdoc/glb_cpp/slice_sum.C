@@ -12,12 +12,6 @@ CPS_START_NAMESPACE
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//====================================================================
-//*  SUI 3/27/97
-//*  slice_sum.C
-//*  last modified 11/7/97
-//====================================================================
-
 
 CPS_END_NAMESPACE
 #include<comms/glb.h>
@@ -57,13 +51,8 @@ void slice_sum(Float * float_p, int blcklength, int dir)
   char *fname = "slice_sum(*float_p, int, int)";
 
   int NP[4] = { GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes() };
-  for(int i = 0;i<4;i++)
-  printf("NP[%d]=%d\n",i,NP[i]);
   const int MAX=1023;
 
-  if (blcklength > MAX)
-    ERR.General(cname, fname, "blcklength (%d) too big > MAX (%d) \n",blcklength, MAX);
-		    
   IFloat *transmit_buf = (IFloat *)qalloc(QFAST|QNONCACHE,blcklength*sizeof(IFloat));
 
   // added by manke
@@ -118,10 +107,10 @@ void slice_sum(Float * float_p, int blcklength, int dir)
 	 //-----------------------------------------------------------
          // accumulate received data	
 	 //-----------------------------------------------------------
-         printf("float_p[%d]=%e\n",blcklength-1,float_p[blcklength-1]);
+ //        printf("float_p[%d]=%e\n",blcklength-1,float_p[blcklength-1]);
    	 for (count = 0; count < blcklength; ++count) 
            float_p[count] += receive_buf_p[count];
-         printf("float_p[%d](after)=%e\n",blcklength-1,float_p[blcklength-1]);
+//         printf("float_p[%d](after)=%e\n",blcklength-1,float_p[blcklength-1]);
 
 	 //-----------------------------------------------------------
          // the received data will be sent out     

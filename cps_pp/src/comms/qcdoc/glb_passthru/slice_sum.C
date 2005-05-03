@@ -1,9 +1,9 @@
 #include<config.h>
+#include<qalloc.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 /*!\file
   \brief Definition of slice_sum routine
-
  */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -12,23 +12,16 @@ CPS_START_NAMESPACE
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-//====================================================================
-//*  SUI 3/27/97
-//*  slice_sum.C
-//*  last modified 11/7/97
-//====================================================================
-
 
 CPS_END_NAMESPACE
 #include<comms/glb.h>
 #include<util/smalloc.h>
 #include<util/gjp.h>
 #include <comms/sysfunc.h>
-#include <qcdocos/gsum64.h>
 CPS_START_NAMESPACE
 
-static SCUAxis gsum_axis[]= {SCU_X,SCU_Y,SCU_Z,SCU_T};
-static Gsum64 gsum;
+const SCUDir pos_dir[] = { SCU_XP, SCU_YP, SCU_ZP, SCU_TP };
+const SCUDir neg_dir[] = { SCU_XM, SCU_YM, SCU_ZM, SCU_TM };
 
 
 //-------------------------------------------------------------------
@@ -57,21 +50,85 @@ void slice_sum(Float * float_p, int blcklength, int dir)
   char *cname = "slice_sum";
   char *fname = "slice_sum(*float_p, int, int)";
 
+  int NP[4] = { GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes() };
   const int MAX=1023;
-  SCUAxis axes[3];
-  int i,j =0 ;
-  for(i=0;i<4;i++)
-    if(i!=dir){
-      axes[j]=gsum_axis[i]; j++;
-    } 
-  gsum.Init(axes,3);
 
-  if (blcklength > MAX)
-    ERR.General(cname, fname, "blcklength (%d) too big > MAX (%d) \n",blcklength, MAX);
-  for(i=0;i<blcklength;i++){
-    *(float_p+i) = (Float) gsum.Sum( (double) *(float_p+i));
+  IFloat *transmit_buf = (IFloat *)qalloc(QFAST|QNONCACHE,blcklength*sizeof(IFloat));
+
+  // added by manke
+  if(transmit_buf == 0)
+    ERR.Pointer(cname,fname, "transmit_buf");
+  VRB.Smalloc(cname,fname, "transmit_buf", transmit_buf, blcklength*sizeof(IFloat));
+  // end added
+
+  IFloat *receive_buf  = (IFloat *)qalloc(QFAST|QNONCACHE,blcklength*sizeof(IFloat));
+
+  // added by manke
+  if(receive_buf == 0)
+    ERR.Pointer(cname,fname, "receive_buf");
+  VRB.Smalloc(cname,fname, "receive_buf", receive_buf, blcklength*sizeof(IFloat));
+  // end added
+
+  IFloat *transmit_buf_p = transmit_buf;
+  IFloat *receive_buf_p = receive_buf;
+  
+  IFloat *free_buffer_p = transmit_buf_p; 
+	// buffer to be used as next receive 
+  int count;		  
+	// loop index where 0 <= count < blcklength 
+  int itmp;		  
+	// loop index with 1<= itmp < NP[i] 
+  int i,j;
+
+  for(i = 0; i < 4; ++i) 
+      if( (i != dir) && (NP[i]>1)){
+
+      //--------------------------------------------------------------
+      // address of buffer of to be sent (data on this node) 
+      //--------------------------------------------------------------
+      for(j = 0;j<blcklength;j++) transmit_buf_p[j] = float_p[j];
+
+      SCUDirArg send(transmit_buf_p, pos_dir[i], SCU_SEND, blcklength*sizeof(IFloat));
+      SCUDirArg rcv(receive_buf_p, neg_dir[i], SCU_REC, blcklength*sizeof(IFloat));
+
+      //--------------------------------------------------------------
+      // tranmit & receive NP[i] - 1 times in snd_dir[i] direction
+      //--------------------------------------------------------------
+      for ( itmp = 1; itmp < NP[i]; itmp++) {
+
+	 //-----------------------------------------------------------
+         // do SCU transfers
+	 //-----------------------------------------------------------
+    send.StartTrans();
+    rcv.StartTrans();
+    send.TransComplete();
+    rcv.TransComplete();
+
+	 //-----------------------------------------------------------
+         // accumulate received data	
+	 //-----------------------------------------------------------
+         printf("float_p[%d]=%e\n",blcklength-1,float_p[blcklength-1]);
+   	 for (count = 0; count < blcklength; ++count) 
+           float_p[count] += receive_buf_p[count];
+         printf("float_p[%d](after)=%e\n",blcklength-1,float_p[blcklength-1]);
+
+	 //-----------------------------------------------------------
+         // the received data will be sent out     
+	 // the free buffer will be used to receive      
+	 //-----------------------------------------------------------
+         transmit_buf_p = receive_buf_p;
+         receive_buf_p = free_buffer_p;
+	 send.Addr(transmit_buf_p );
+	 rcv.Addr(receive_buf_p );
+
+	 //-----------------------------------------------------------
+	 // transmit_buf WILL be free buffer NEXT round of transmit
+	 //-----------------------------------------------------------
+	 free_buffer_p = transmit_buf_p;
+      }
   }
-		    
+  qfree(transmit_buf);
+  qfree(receive_buf);
 }
 
 
