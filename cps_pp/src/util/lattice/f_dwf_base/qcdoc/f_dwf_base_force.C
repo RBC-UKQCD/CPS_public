@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.5 2005-03-07 00:33:41 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.6 2005-05-06 20:17:54 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -83,14 +83,17 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   int f_size_4d = f_site_size_4d * GJP.VolNodeSites() ;
  
   char *str_v1 = "v1" ;
-  Vector *v1 = (Vector *)fmalloc(f_size*sizeof(Float)) ;
-  if (v1 == 0) ERR.Pointer(cname, fname, str_v1) ;
-  VRB.Smalloc(cname, fname, str_v1, v1, f_size*sizeof(Float)) ;
+  Vector *v1 = (Vector *)fmalloc(cname,fname,str_v1,f_size*sizeof(Float));
+//  if (v1 == 0) ERR.Pointer(cname, fname, str_v1) ;
+//  VRB.Smalloc(cname, fname, str_v1, v1, f_size*sizeof(Float)) ;
 
   char *str_v2 = "v2" ;
-  Vector *v2 = (Vector *)fmalloc(f_size*sizeof(Float)) ;
-  if (v2 == 0) ERR.Pointer(cname, fname, str_v2) ;
-  VRB.Smalloc(cname, fname, str_v2, v2, f_size*sizeof(Float)) ;
+  Vector *v2 = (Vector *)fmalloc(cname,fname,str_v2,f_size*sizeof(Float)) ;
+//  if (v2 == 0) ERR.Pointer(cname, fname, str_v2) ;
+//  VRB.Smalloc(cname, fname, str_v2, v2, f_size*sizeof(Float)) ;
+
+//  LatMatrix MomDiff(QFAST,4);
+//  Matrix *mom_diff = MomDiff.Mat();
 
   //----------------------------------------------------------------
   // Calculate v1, v2. Both v1, v2 must be in CANONICAL order after
@@ -194,6 +197,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       int vec_offset = f_site_size_4d*gauge_offset ;
       gauge_offset = mu+4*gauge_offset ;
 
+//      printf("%d %d %d %d %d\n",mu,pos[0],pos[1],pos[2],pos[3]);
       Float *v1_plus_mu ;
       Float *v2_plus_mu ;
       int vec_plus_mu_stride ;
@@ -226,7 +230,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       *tmp_mat1 += *tmp_mat2 ;
 
       // If GJP.Snodes > 1 sum up contributions from all s nodes
-      if(GJP.Snodes() != 1) {
+      if(GJP.Snodes() > 1) {
 	  glb_sum_multi_dir((Float *)tmp_mat1, 4, sizeof(Matrix)/sizeof(IFloat) ) ;
       }
 
@@ -277,6 +281,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
       Float coeff = -2.0 * step_size ;
 
+//      printf("%d %d %d %d %d\n",mu,pos[0],pos[1],pos[2],pos[3]);
           vec_plus_mu_offset *= offset(size,pos,mu);
       if ((GJP.Nodes(mu)>1)&&((pos[mu]+1) == size[mu]) ) {
             v1_plus_mu = v1_buf_pos[mu] ;
@@ -302,7 +307,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       *tmp_mat1 += *tmp_mat2 ;
 
       // If GJP.Snodes > 1 sum up contributions from all s nodes
-      if(GJP.Snodes() != 1) {
+      if(GJP.Snodes() >1 ) {
 	  glb_sum_multi_dir((Float *)tmp_mat1, 4, sizeof(Matrix)/sizeof(IFloat) ) ;
       }
 
