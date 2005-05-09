@@ -1,0 +1,34 @@
+<class><name>WspectOutput</name><instance>w_spect_output</instance><data>
+<item><name>fold</name><value><WbaryonFold>BARYON_FOLD </WbaryonFold></value></item>
+<item><name>cg</name><value><string>filename </string></value></item>
+<item><name>cg2</name><value><string>filename </string></value></item>
+<item><name>pbp</name><value><string>filename </string></value></item>
+<item><name>mid_point</name><value><string>filename </string></value></item>
+<item><name>a0_p</name><value><string>filename </string></value></item>
+<item><name>a1</name><value><string>filename </string></value></item>
+<item><name>b1</name><value><string>filename </string></value></item>
+<item><name>pion</name><value><string>filename </string></value></item>
+<item><name>pion_prime</name><value><string>filename </string></value></item>
+<item><name>rho</name><value><string>filename </string></value></item>
+<item><name>rho_prime</name><value><string>filename </string></value></item>
+<item><name>a0</name><value><string>filename </string></value></item>
+<item><name>a0_prime</name><value><string>filename </string></value></item>
+<item><name>a1_x</name><value><string>filename </string></value></item>
+<item><name>a1_y</name><value><string>filename </string></value></item>
+<item><name>a1_z</name><value><string>filename </string></value></item>
+<item><name>b1_x</name><value><string>filename </string></value></item>
+<item><name>b1_y</name><value><string>filename </string></value></item>
+<item><name>b1_z</name><value><string>filename </string></value></item>
+<item><name>rho_x</name><value><string>filename </string></value></item>
+<item><name>rho_y</name><value><string>filename </string></value></item>
+<item><name>rho_z</name><value><string>filename </string></value></item>
+<item><name>rho_x_prime</name><value><string>filename </string></value></item>
+<item><name>rho_y_prime</name><value><string>filename </string></value></item>
+<item><name>rho_z_prime</name><value><string>filename </string></value></item>
+<item><name>nucleon</name><value><string>filename </string></value></item>
+<item><name>nucleon_prime</name><value><string>filename </string></value></item>
+<item><name>delta_x</name><value><string>filename </string></value></item>
+<item><name>delta_y</name><value><string>filename </string></value></item>
+<item><name>delta_z</name><value><string>filename </string></value></item>
+<item><name>delta_t</name><value><string>filename </string></value></item>
+</data></class>

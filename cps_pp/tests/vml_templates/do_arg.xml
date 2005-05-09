@@ -1,0 +1,64 @@
+<class><name>DoArg</name><instance>do_arg</instance><data>
+<item><name>x_sites</name><value><int>0</int></value></item>
+<item><name>y_sites</name><value><int>0</int></value></item>
+<item><name>z_sites</name><value><int>0</int></value></item>
+<item><name>t_sites</name><value><int>0</int></value></item>
+<item><name>s_sites</name><value><int>0</int></value></item>
+<item><name>x_node_sites</name><value><int>0</int></value></item>
+<item><name>y_node_sites</name><value><int>0</int></value></item>
+<item><name>z_node_sites</name><value><int>0</int></value></item>
+<item><name>t_node_sites</name><value><int>0</int></value></item>
+<item><name>s_node_sites</name><value><int>1</int></value></item>
+<item><name>x_nodes</name><value><int>0</int></value></item>
+<item><name>y_nodes</name><value><int>0</int></value></item>
+<item><name>z_nodes</name><value><int>0</int></value></item>
+<item><name>t_nodes</name><value><int>0</int></value></item>
+<item><name>s_nodes</name><value><int>1</int></value></item>
+<item><name>updates</name><value><int>0</int></value></item>
+<item><name>measurements</name><value><int>0</int></value></item>
+<item><name>measurefreq</name><value><int>0</int></value></item>
+<item><name>cg_reprod_freq</name><value><int>0</int></value></item>
+<item><name>x_bc</name><value><BndCndType>BND_CND_PRD </BndCndType></value></item>
+<item><name>y_bc</name><value><BndCndType>BND_CND_PRD </BndCndType></value></item>
+<item><name>z_bc</name><value><BndCndType>BND_CND_PRD </BndCndType></value></item>
+<item><name>t_bc</name><value><BndCndType>BND_CND_PRD </BndCndType></value></item>
+<item><name>start_conf_kind</name><value><StartConfType>START_CONF_ORD </StartConfType></value></item>
+<item><name>start_conf_load_addr</name><value><ui4>0</ui4></value></item>
+<item><name>start_seed_kind</name><value><StartSeedType>START_SEED_FIXED </StartSeedType></value></item>
+<item><name>start_seed_filename</name><value><string> </string></value></item>
+<item><name>start_conf_filename</name><value><string> </string></value></item>
+<item><name>start_conf_alloc_flag</name><value><int>2</int></value></item>
+<item><name>wfm_alloc_flag</name><value><int>6</int></value></item>
+<item><name>wfm_send_alloc_flag</name><value><int>6</int></value></item>
+<item><name>start_seed_value</name><value><int>0</int></value></item>
+<item><name>beta</name><value><double>0.000000e+00</double></value></item>
+<item><name>c_1</name><value><double>0.000000e+00</double></value></item>
+<item><name>u0</name><value><double>1.000000e+00</double></value></item>
+<item><name>dwf_height</name><value><double>0.000000e+00</double></value></item>
+<item><name>dwf_a5_inv</name><value><double>1.000000e+00</double></value></item>
+<item><name>power_plaq_cutoff</name><value><double>0.000000e+00</double></value></item>
+<item><name>power_plaq_exponent</name><value><int>0</int></value></item>
+<item><name>power_rect_cutoff</name><value><double>0.000000e+00</double></value></item>
+<item><name>power_rect_exponent</name><value><int>0</int></value></item>
+<item><name>verbose_level</name><value><int>-1202</int></value></item>
+<item><name>exec_task_list</name><value><int>0</int></value></item>
+<item><name>xi_bare</name><value><double>1.000000e+00</double></value></item>
+<item><name>xi_dir</name><value><int>3</int></value></item>
+<item><name>xi_v</name><value><double>1.000000e+00</double></value></item>
+<item><name>xi_v_xi</name><value><double>1.000000e+00</double></value></item>
+<item><name>clover_coeff</name><value><double>0.000000e+00</double></value></item>
+<item><name>clover_coeff_xi</name><value><double>0.000000e+00</double></value></item>
+<item><name>xi_gfix</name><value><double>1.000000e+00</double></value></item>
+<item><name>asqtad_KS</name><value><double>0.000000e+00</double></value></item>
+<item><name>asqtad_naik</name><value><double>0.000000e+00</double></value></item>
+<item><name>asqtad_3staple</name><value><double>0.000000e+00</double></value></item>
+<item><name>asqtad_5staple</name><value><double>0.000000e+00</double></value></item>
+<item><name>asqtad_7staple</name><value><double>0.000000e+00</double></value></item>
+<item><name>asqtad_lepage</name><value><double>0.000000e+00</double></value></item>
+<item><name>p4_KS</name><value><double>0.000000e+00</double></value></item>
+<item><name>p4_knight</name><value><double>0.000000e+00</double></value></item>
+<item><name>p4_3staple</name><value><double>0.000000e+00</double></value></item>
+<item><name>p4_5staple</name><value><double>0.000000e+00</double></value></item>
+<item><name>p4_7staple</name><value><double>0.000000e+00</double></value></item>
+<item><name>p4_lepage</name><value><double>0.000000e+00</double></value></item>
+</data></class>

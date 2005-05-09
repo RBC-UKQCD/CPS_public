@@ -1,0 +1,14 @@
+class EvoArg evo_arg = {
+int traj_start = 0
+int gauge_unload_period = 0
+int gauge_configurations = 0
+int io_concurrency = 0
+string ensemble_id = "id"
+string ensemble_label = "label"
+string creator = "creator"
+string gauge_file_stem = "ckpoint_lat"
+string rng_file_stem = "ckpoint_rng"
+string plaquette_stem = "plaq"
+string evo_stem = "hmd"
+string work_directory = ""
+}
