@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.23 2005-03-07 00:33:44 chulwoo Exp $
+  $Id: random.C,v 1.24 2005-05-09 15:18:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:33:44 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.23 2005-03-07 00:33:44 chulwoo Exp $
-//  $Id: random.C,v 1.23 2005-03-07 00:33:44 chulwoo Exp $
+//  $Date: 2005-05-09 15:18:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.24 2005-05-09 15:18:51 chulwoo Exp $
+//  $Id: random.C,v 1.24 2005-05-09 15:18:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -221,6 +221,13 @@ void LatRanGen::Initialize()
   int start_seed_4d, base_seed_4d;
 
   switch(GJP.StartSeedKind()){
+  case START_SEED_FILE:
+	if ( !LatRanGen::Read(GJP.StartSeedFilename()) ) {
+	      ERR.General(cname, fname,
+		  "Reading file %s",GJP.StartSeedFilename());
+	} 
+	return;
+	break;
   case START_SEED_INPUT_UNIFORM:
   case START_SEED_INPUT_NODE:
   case START_SEED_INPUT:

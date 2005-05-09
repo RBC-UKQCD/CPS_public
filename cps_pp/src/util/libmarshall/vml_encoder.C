@@ -1,15 +1,24 @@
+#ifndef NO_CPS
 #include <config.h>
 #include <util/vml/vml_encoder.h>
+CPS_START_NAMESPACE
+USING_NAMESPACE_CPS
+#else
+#include <rpc/types.h>
+#include <rpc/rpc.h>
+#include <vml.h>
+#include <vml_encoder.h>
+#endif
 #include <stdlib.h>
+#include <stdio.h>
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif
-  /*
+  /* Peter Boyle 2004
    * Interface to represent the basic types in XDR routines
    */
+#define DEB(A) fprintf(stderr,A);
 bool_t TextEncoder::Void(void)
 {
   return true;
@@ -21,21 +30,58 @@ bool_t TextEncoder::Void(void)
   sprintf(format,fmt,name);\
   if ( vmls->x_op == VML_ENCODE ) { \
     sprintf(line,format,val);\
-    vmls->Puts(line);\
+    if(!vmls->Puts(line)) return false;\
     return true;\
   } else if ( vmls->x_op == VML_DECODE ) { \
-    vmls->Gets((char *)line,256);\
+    if (!vmls->Gets((char *)line,256)) { DEB("Gets"); return false;}\
     if ( sscanf(line,format,&val) == 1 ) { \
       return true;\
     } else { \
-      return false; \
+      DEB("scanf"); DEB(line); return false; \
     } \
   }  \
   return true;
 
-bool_t TextEncoder::Enum ( VML *vmls, char *name, unsigned long &val ) 
+#define SimpleEncodeDouble(val,name,fmt1,fmt2) \
+  char format[256]; \
+  char line[256]; \
+  if ( vmls->x_op == VML_ENCODE ) { \
+    sprintf(format,fmt1,name);\
+    sprintf(line,format,val);\
+    if(!vmls->Puts(line)) return false;\
+    return true;\
+  } else if ( vmls->x_op == VML_DECODE ) { \
+    sprintf(format,fmt2,name);\
+    if (!vmls->Gets((char *)line,256)) { DEB("Gets"); return false;}\
+    if ( sscanf(line,format,&val) == 1 ) { \
+      return true;\
+    } else { \
+      DEB("scanf"); DEB(line); return false; \
+    } \
+  }  \
+  return true;
+
+bool_t TextEncoder::Enum ( VML *vmls,char *ename, char *name, char *&value)
 {
-  SimpleEncode (val,name,"Enum %s = %%ld\n");
+  char format[256]; 
+  char line[256]; 
+  sprintf(format,"%s %s = %%s\n",ename,name);
+  if ( vmls->x_op == VML_ENCODE ) { 
+    sprintf(line,format,value);
+    if(!vmls->Puts(line)) return false;
+    return true;
+  } else if ( vmls->x_op == VML_DECODE ) { 
+    if (!vmls->Gets((char *)line,256)) return false;
+    value = (char *) malloc(strlen(line));
+
+    if ( sscanf(line,format,value) == 1 ) { 
+      return true;
+    } else { 
+      value = NULL; DEB("enum"); DEB(line);
+      return false; 
+    } 
+  }  
+  return true;
 }
 bool_t TextEncoder::Short ( VML *vmls, char *name, short &val ) 
 {
@@ -116,7 +162,7 @@ bool_t TextEncoder::Bool ( VML *vmls, char *name, bool_t &val )
 }
 bool_t TextEncoder::Double(VML *vmls, char *name, double &d)
 {
-  SimpleEncode (d,name,"double %s = %%le\n");
+  SimpleEncodeDouble (d,name,"double %s = %%24.16le\n","double %s = %%le\n");
 }
 bool_t TextEncoder::Float (VML *vmls, char *name, float  &f)
 {
@@ -129,18 +175,20 @@ bool_t TextEncoder::Array     ( VML *vmls, char *type, char *name,
   char tmp[256];
   char line[256];
   if ( vmls->x_op == VML_ENCODE ) { 
+
     sprintf(line,"%s %s[%d] = { \n",type,name,nvals);
-    vmls->Puts(line);
+    if(!vmls->Puts(line)) return false;
     for(int i=0;i<nvals;i++) { 
       sprintf(tmp,"%s[%d]",name,i);
       do_one(vmls,tmp,(void *)((unsigned long)vals+i*sizeofone));
     }
-    vmls->Puts("}\n");
+    if(!vmls->Puts("}\n")) return false;
     return true;
   } else if ( vmls->x_op == VML_DECODE ) { 
-    vmls->Gets((char *)line,256);
+    if (!vmls->Gets((char *)line,256)) return false;
     sprintf(tmp,"%s %s[%%d] = { \n",type,name);
     sscanf(line,tmp,&nvals);
+
     if ( DoAlloc ) { 
       if ( nvals )
 	vals = (char *)malloc(sizeofone*nvals);
@@ -149,12 +197,12 @@ bool_t TextEncoder::Array     ( VML *vmls, char *type, char *name,
     }
     
     for(int i=0;i<nvals;i++) { 
-      if ( vals == NULL ) return false;
+      if ( vals == NULL ) { DEB("NULL array\n"); return false;};
       sprintf(tmp,"%s[%d]",name,i);
       do_one(vmls,tmp,(void *)((unsigned long)vals+i*sizeofone));
     }
     /*Skip the closing bracket...*/
-    vmls->Gets((char *)line,256);
+    if (!vmls->Gets((char *)line,256)) { DEB("Array close\n"); return false;}
     return true;
 
   }  
@@ -172,16 +220,32 @@ bool_t TextEncoder::String (VML *vmls, char *name, char *&str )
 {
   int sizeofone = 1;
   int length = 0;
+  char line[1024];
+  char fmt[128];
+
   if ( vmls->x_op == VML_ENCODE ) { 
-    length = strlen(str)+1;
+
+   char * temp_str = str;
+    if ( temp_str == NULL ) temp_str = "";
+    sprintf(line,"string %s = \"%s\"\n",name,temp_str);
+    if(!vmls->Puts(line)) return false;
+
+  } else { 
+
+    if (!vmls->Gets((char *)line,1024)) {DEB("Gets failed");return false;}
+    str = (char *) malloc(strlen(line));
+    sprintf(fmt,"string %s = \"%%s\"\n",name);
+    sscanf(line,fmt,str);
+    if ( str[strlen(str)-1] == '\"' ) { 
+      str[strlen(str)-1] = '\0';
+    }
   }
-  return Array(vmls,"string",name,str,length,sizeofone,(vmlproc_t)vml_char);
+  return true;
 }
 
 bool_t TextEncoder::Reference ( VML *vmls, char *type, char *name, 
-				char *&ref, vmlproc_t do_ref  )
+				char *&ref, vmlproc_t do_ref,int sizeofone  )
 {
-  int sizeofone = 0;
   int length   = 1;
   return Array(vmls,"reference",name,ref,length,sizeofone,do_ref);
 }
@@ -191,10 +255,10 @@ bool_t TextEncoder::StructBegin( VML *vmls, char *type, char *instance )
   char line[256];
   if ( vmls->x_op == VML_ENCODE ) { 
     sprintf(line,"struct %s %s = {\n",type,instance);
-    vmls->Puts(line);
+    if(!vmls->Puts(line)) return false;
     return true;
   } else if ( vmls->x_op == VML_DECODE ) { 
-    vmls->Gets((char *)line,256);
+    if (!vmls->Gets((char *)line,256)) return false;
     return true;
   }  
   return true;
@@ -203,10 +267,10 @@ bool_t TextEncoder::StructEnd  ( VML *vmls, char *type, char *instance )
 {
   char line[256];
   if ( vmls->x_op == VML_ENCODE ) { 
-    vmls->Puts("}\n");
+    if (!vmls->Puts("}\n"))return false;
     return true;
   } else if ( vmls->x_op == VML_DECODE ) { 
-    vmls->Gets((char *)line,256);
+    if (!vmls->Gets((char *)line,256)) return false;
     return true;
   }  
   return true;
@@ -217,10 +281,10 @@ bool_t TextEncoder::ClassBegin( VML *vmls, char *type, char *instance )
   char line[256];
   if ( vmls->x_op == VML_ENCODE ) { 
     sprintf(line,"class %s %s = {\n",type,instance);
-    vmls->Puts(line);
+    if(!vmls->Puts(line)) return false;
     return true;
   } else if ( vmls->x_op == VML_DECODE ) { 
-    vmls->Gets((char *)line,256);
+    if (!vmls->Gets((char *)line,256)) return false;
     return true;
   }  
   return true;
@@ -229,12 +293,15 @@ bool_t TextEncoder::ClassEnd  ( VML *vmls, char *type, char *instance )
 {
   char line[256];
   if ( vmls->x_op == VML_ENCODE ) { 
-    vmls->Puts("}\n");
+    if (!vmls->Puts("}\n"))return false;
     return true;
   } else if ( vmls->x_op == VML_DECODE ) { 
-    vmls->Gets((char *)line,256);
+    if (!vmls->Gets((char *)line,256)) return false;
     return true;
   }  
   return true;
 }
 
+#ifndef NO_CPS
+CPS_END_NAMESPACE
+#endif

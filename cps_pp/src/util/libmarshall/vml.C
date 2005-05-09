@@ -1,18 +1,26 @@
 /*
+ * Peter Boyle, 2004
  * vml.c, Generic VML routines implementation.
  */
 
-#include <config.h>
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
+#define DEB(A) fprintf(stderr,A)
 
+#ifndef NO_CPS
 #include <util/qcdio.h>
 #include <util/vml/types.h>
 #include <util/vml/vml.h>
 #include <util/vml/vml_encoder.h>
-
+CPS_START_NAMESPACE
 USING_NAMESPACE_CPS
+#else
+#include <rpc/types.h>
+#include <rpc/rpc.h>
+#include <vml.h>
+#include <vml_encoder.h>
+#endif
 
 static GenericEncoder *VmlEncode = new TextEncoder;
 
@@ -22,10 +30,6 @@ extern "C" {
 /*
  * constants specific to the vml "protocol"
  */
-#if 0
-#define VML_FALSE	((long) 0)
-#define VML_TRUE	((long) 1)
-#endif
 #define LASTUNSIGNED	((u_int) 0-1)
 
 /*
@@ -180,55 +184,43 @@ vml_bool (VML *vmls, char *name, bool_t *bp)
 {
   return VmlEncode->Bool(vmls,name,*bp);
 }
-
+char *vml_enum_string ( enum_t *val, struct vml_enum_map *map )
+{
+  for ( int i=0;map[i].name!=NULL; i++ ) {
+    if ( map[i].val == *val ) {
+      return map[i].name;
+    }
+  }
+  fprintf(stderr,"logic bomb in vml_enum_string\n"); exit(-1);
+  return NULL;
+}
+enum_t *vml_enum_val  ( char *string, struct vml_enum_map * map)
+{
+  for ( int i=0;map[i].name!=NULL; i++ ) {
+    if ( !strcmp(string,map[i].name) ) {
+      return &map[i].val;
+    }
+  }
+  fprintf(stderr,"logic bomb in vml_enum_val\n"); exit(-1);
+}
 /*
  * VML enumerations
  */
 bool_t
-vml_enum (VML *vmls, char *name, enum_t *ep)
+vml_enum (VML *vmls, char *name, enum_t *ep,struct vml_enum_map *list)
 {
-  enum sizecheck
-    {
-      SIZEVAL
-    };				/* used to find the size of an enum */
-
-  /*
-   * enums are treated as ints
-   */
-  if (sizeof (enum sizecheck) == 4)
-    {
-#if INT_MAX < LONG_MAX
-      long l;
-
-      switch (vmls->x_op)
-	{
-	case VML_ENCODE:
-	  l = *ep;
-	  return VML_PUTLONG (vmls, name, &l);
-
-	case VML_DECODE:
-	  if (!VML_GETLONG (vmls, name, &l))
-	    {
-	      return FALSE;
-	    }
-	  *ep = l;
-	case VML_FREE:
-	  return VML_TRUE;
-
-	}
-      return FALSE;
-#else
-      return vml_long (vmls, name, (long *) ep);
-#endif
-    }
-  else if (sizeof (enum sizecheck) == sizeof (short))
-    {
-      return vml_short (vmls, name, (short *) ep);
-    }
-  else
-    {
-      return VML_FALSE;
-    }
+  char val_buf[256];
+  char * val_str = val_buf;
+  /*Fix me... error codes?*/
+  if ( vmls->x_op == VML_ENCODE ) { 
+    val_str = vml_enum_string(ep,list);
+  }
+  
+  VmlEncode->Enum(vmls,list[0].enum_name,name,val_str);
+  if ( vmls->x_op == VML_DECODE ) { 
+    *ep = *(vml_enum_val(val_str,list));
+  }
+  return VML_TRUE;
 }
 
 /*
@@ -240,8 +232,8 @@ vml_enum (VML *vmls, char *name, enum_t *ep)
 bool_t
 vml_opaque (VML *vmls, char *name, caddr_t cp, u_int cnt)
 {
-  char *tmp = (char *)cp;
   int icnt = cnt;
+  char *tmp = (char *)cp;
   VmlEncode->Bytes(vmls,name,tmp,icnt);
   cnt = icnt;
   return VML_TRUE;
@@ -300,15 +292,18 @@ vml_union (
      vmlproc_t dfault)		/* default vml routine */
 {
   enum_t dscm;
+  long tmp;
 
+  if ( dscmp ) tmp = *dscmp;
   /*
    * we deal with the discriminator;  it's an enum
    */
-  if (!vml_enum (vmls, name, dscmp))
+  if (!vml_long (vmls, name, &tmp))
     {
       return VML_FALSE;
     }
-  dscm = *dscmp;
+  dscm = tmp;
+  *dscmp = tmp;
 
   /*
    * search choices for a value that matches the discriminator.
@@ -495,7 +490,7 @@ vml_reference (
 {
   char *tmp = (char *)*pp;
   char *type = "Reference";
-  bool_t ret = VmlEncode->Reference(vmls,type,name,tmp,proc);
+  bool_t ret = VmlEncode->Reference(vmls,type,name,tmp,proc,size);
   *pp = tmp;
   return ret;
 }
@@ -543,13 +538,12 @@ void vml_class_end   (VML *vmls, char *type, char *instance)
 
 }
 
-
 bool_t VML::Puts(char *string)
 {
   switch ( StreamType ) { 
   case VML_STDIO:
   case VML_DESCRIPTOR:
-    Fprintf(x_fp,string);
+    fprintf(x_fp,string);
     fflush(x_fp);
     return true;
     break;
@@ -573,6 +567,7 @@ char *VML::Gets(char *string,int n)
   case VML_STDIO:
   case VML_DESCRIPTOR:
     ret = fgets(string, n, x_fp);
+    if ( ret == NULL ) DEB("bad fgets\n");
     return ret;
     break;
   case VML_MEM:
@@ -593,6 +588,7 @@ char *VML::Gets(char *string,int n)
     else return NULL;
     break;
   }
+  DEB("Bad StreamType in Gets\n");
   return NULL;
 }
 bool_t VML::Create(char *buf,int length, enum vml_op op)
@@ -609,27 +605,18 @@ bool_t VML::Create(int fd,enum vml_op op)
   FILE *fp = NULL;
   if ( op == VML_ENCODE ) fp = fdopen(fd,"w");
   if ( op == VML_DECODE ) fp = fdopen(fd,"r");
+  if ( fp == NULL ) return VML_FALSE;
   return Create(fp,op);
 }
 bool_t VML::Create(char *file, enum vml_op op)
 {
   FILE *fp = NULL;
-  if ( op == VML_ENCODE ) 
-    { 
-      fp  = Fopen(file,"w");
-      if ( fp == NULL )
-        {
-          ERR.FileW("VML","Create",file);
-        }
-    }
-  else if ( op == VML_DECODE ) 
-    { 
-      fp  = fopen(file,"r");
-      if ( fp == NULL )
-        {
-          ERR.FileR("VML","Create",file);
-        }
-    }
+  if ( op == VML_ENCODE ) { 
+    fp  = fopen(file,"w");
+  } else if ( op == VML_DECODE ) { 
+    fp  = fopen(file,"r");
+  }
+  if ( fp == NULL ) return VML_FALSE;
   return Create(fp,op);
 
 }
@@ -645,7 +632,7 @@ bool_t VML::Create(FILE *file, enum vml_op op)
 void VML::Destroy(void) 
 {
   if ( StreamType == VML_MEM ) return;
-  else if (x_fp) Fclose(x_fp);
+  else if (x_fp) fclose(x_fp);
 }
 bool_t vmlmem_create (VML *__vmls, char * __addr,
 				int __size, enum vml_op __xop)
@@ -684,3 +671,6 @@ void vml_destroy (VML *__vmls)
 {
   __vmls->Destroy();
 }
+#ifndef NO_CPS
+CPS_END_NAMESPACE
+#endif

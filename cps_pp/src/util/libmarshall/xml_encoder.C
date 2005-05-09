@@ -1,9 +1,19 @@
+#ifndef NO_CPS
 #include <util/vml/vml_encoder.h>
+#else
+#include <vml_encoder.h>
+#endif
+
 #include <stdlib.h>
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
 #include <string.h>
+
+#ifndef NO_CPS
+CPS_START_NAMESPACE
+USING_NAMESPACE_CPS
+#endif
   /*
    * Interface to represent the basic types in XDR routines
    */
@@ -40,9 +50,35 @@ bool_t XmlEncoder::UnsignedShort (VML *vmls, char *name, unsigned short &val)
 {
   DoIt (u,ui2);
 }
-bool_t XmlEncoder::Enum ( VML *vmls, char *name, unsigned long &val ) 
+bool_t XmlEncoder::Enum ( VML *vmls, char *ename, char *name, char *&value ) 
 {
-  DoIt (lu,ui8);
+
+  char format[512]; 
+  char line[512]; 
+
+  sprintf(format,"<item><name>%s</name><value><%s>%%s </%s></value></item>\n",name,ename,ename);
+
+  if ( vmls->x_op == VML_ENCODE ) {
+
+    sprintf(line,format, value); 
+    vmls->Puts(line);
+    return true;
+  } else if ( vmls->x_op == VML_DECODE ) { 
+
+    if ( !value ) value = (char *)malloc(256);
+
+    vmls->Gets((char *)line,256);
+    fprintf(stderr,"Line %s\n",line);
+    fprintf(stderr,"Format %s\n",format);
+
+    if ( sscanf(line,format,value) == 1 ) { 
+      return true;
+    } else { 
+      fprintf(stderr,"Enum XML Bummer...\n");
+      return false; 
+    } 
+  }  
+  return true;
 }
 bool_t XmlEncoder::Int ( VML *vmls, char *name, int &val ) 
 {
@@ -168,18 +204,38 @@ bool_t XmlEncoder::Bytes( VML *vmls, char *name, char *&vals,
   return Array(vmls,"bytes",name,vals,length,sizeofone,(vmlproc_t)vml_u_char);
 }
 
-bool_t XmlEncoder::String (VML *vmls, char *name, char *&val )
+bool_t XmlEncoder::String (VML *vmls, char *name, char *&value )
 {
-  if ( val ) { 
-    DoIt(s,string);
-  }
-  else return false;
+
+  char format[512]; 
+  char line[512]; 
+
+  sprintf(format,"<item><name>%s</name><value><string>%%s </string></value></item>\n",name);
+
+  if ( vmls->x_op == VML_ENCODE ) {
+
+    if( !value ) value = "";
+    sprintf(line,format, value); 
+    vmls->Puts(line);
+    return true;
+  } else if ( vmls->x_op == VML_DECODE ) { 
+
+    if ( !value ) value = (char *)malloc(256);
+
+    vmls->Gets((char *)line,256);
+
+    if ( sscanf(line,format,value) == 1 ) { 
+      return true;
+    } else { 
+      return false; 
+    } 
+  }  
+  return true;
 }
 
 bool_t XmlEncoder::Reference ( VML *vmls, char *type, char *name, 
-				char *&ref, vmlproc_t do_ref  )
+			       char *&ref, vmlproc_t do_ref ,int sizeofone )
 {
-  int sizeofone = 0;
   int length   = 1;
   return Array(vmls,"reference",name,ref,length,sizeofone,do_ref);
 }
@@ -235,4 +291,6 @@ bool_t XmlEncoder::ClassEnd  ( VML *vmls, char *type, char *instance )
   }  
   return true;
 }
-
+#ifndef NO_CPS
+CPS_END_NAMESPACE
+#endif
