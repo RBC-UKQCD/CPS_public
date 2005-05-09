@@ -1,4 +1,4 @@
-/*
+/* Hacked by Peter Boyle for VML 2004 *//*
  * rpc_pktout.c, UDP packet class outputter for the RPC protocol compiler
  * PAB 2002.
  * This auto-derives classes from the base class RPCPkt which I have written.

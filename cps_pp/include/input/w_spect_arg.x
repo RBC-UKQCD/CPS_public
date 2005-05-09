@@ -40,42 +40,42 @@ class  WspectOutput
 {
   WbaryonFold      fold;    
   
-  char *           cg;                  /* datafile for cg iter & res*/
-  char *           cg2;                 /* need and extra one for second quark propagator?*/
-  char *           pbp;                 /* datafile for pbp and pbg5p*/
-  char *           mid_point;           /* datafile for mid-point sink*/
-  char *           a0_p;             /* datafile for <A_0 P>*/
+  string           cg<>;                  /* datafile for cg iter & res*/
+  string           cg2<>;                 /* need and extra one for second quark propagator?*/
+  string           pbp<>;                 /* datafile for pbp and pbg5p*/
+  string           mid_point<>;           /* datafile for mid-point sink*/
+  string           a0_p<>;             /* datafile for <A_0 P>*/
 
   /* the following is as in phys_v3.11.4.xiaodong, i.e. average over polarisation*/
-  char *           a1;
-  char *           b1;
-  char *           pion;
-  char *           pion_prime;
-  char *           rho;
-  char *           rho_prime;
+  string           a1<>;
+  string           b1<>;
+  string           pion<>;
+  string           pion_prime<>;
+  string           rho<>;
+  string           rho_prime<>;
 
 /* The a0 and a1's must be continguous because of part of the code*/
-  char *           a0;                  /* datafile for meson a0*/
-  char *           a0_prime;
-  char *           a1_x;                /* x, y, z are to be understood*/
-  char *           a1_y;                /* as the three directions other*/
-  char *           a1_z;                /* than the propagation direction.*/
-  char *           b1_x;
-  char *           b1_y;
-  char *           b1_z;
-  char *           rho_x;
-  char *           rho_y;
-  char *           rho_z;
-  char *           rho_x_prime;
-  char *           rho_y_prime;
-  char *           rho_z_prime;
-  char *           nucleon;
-  char *           nucleon_prime;
-  char *           delta_x;
-  char *           delta_y;
-  char *           delta_z;
-  char *           delta_t;
-// char *filetail;/*eg. P, W, B4, JN30E2.50,... */
+  string           a0<>;                  /* datafile for meson a0*/
+  string           a0_prime<>;
+  string           a1_x<>;                /* x, y, z are to be understood*/
+  string           a1_y<>;                /* as the three directions other*/
+  string           a1_z<>;                /* than the propagation direction.*/
+  string           b1_x<>;
+  string           b1_y<>;
+  string           b1_z<>;
+  string           rho_x<>;
+  string           rho_y<>;
+  string           rho_z<>;
+  string           rho_x_prime<>;
+  string           rho_y_prime<>;
+  string           rho_z_prime<>;
+  string           nucleon<>;
+  string           nucleon_prime<>;
+  string           delta_x<>;
+  string           delta_y<>;
+  string           delta_z<>;
+  string           delta_t<>;
+// stringfiletail;/*eg. P, W, B4, JN30E2.50,... */
 
   memfun WspectOutput() ;
 //{ pbp=0; mid_point=0; a0_p=0;} //that jsut sounds wrong, so I won't propagate - petrov.
@@ -104,7 +104,7 @@ class WspectArg {
   SourceKind source_kind;       
 
   /*tail of output file names */
-/* char *filetail;eg. P, W, B4, JN30E2.50,... */
+/* stringfiletail;eg. P, W, B4, JN30E2.50,... */
 
   /*--------------------------*/
   /*Paremeter of sources*/

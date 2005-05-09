@@ -1,3 +1,5 @@
+/*Hacked by peter boyle for VML 2004 */
+
 /****** rpc_clntout.c ******/
 
 void write_stubs(void);

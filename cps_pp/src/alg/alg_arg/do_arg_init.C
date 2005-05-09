@@ -30,10 +30,14 @@ DoArg::DoArg () {
   c_1=0.0;
   u0=1.0;
   xi_gfix=1.0;
-  for(int i = 0; i<50;i++ ) start_conf_filename[i] = ' ';
+  start_conf_filename = "";
 #if TARGET == QCDOC
   start_conf_alloc_flag = QCOMMS; 
+  wfm_send_alloc_flag = QFAST|QCOMMS;
+  wfm_alloc_flag = QFAST|QCOMMS;
 #else
+  wfm_send_alloc_flag = 0;
+  wfm_alloc_flag = 0;
   start_conf_alloc_flag = 0; 
 #endif
   dwf_a5_inv=1.0;

@@ -1,21 +1,26 @@
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_top_builddir@
-
+VPATH:=${SRCDIR}/include/input
 RPCGEN=${SRCDIR}/misc/vml_encode/rpcgenvml/rpcgenvml
+RHFLAGS=-h -C -x -u util/vml/ -v alg/
+RCFLAGS=-c -C -x -u util/vml/ -v alg/
 
-all:
+all: enum.x cg_arg.x do_arg.x w_spect_arg.x hmd_arg.x
 	$(MAKE) -C ${SRCDIR}/misc/vml_encode/ clean all
-	cp ${BUILDDIR}/config.h .
-	cp ${BUILDDIR}/precision.h .
-	${RPCGEN} -h -C -x enum.x >${SRCDIR}/include/util/enum.h
-	${RPCGEN} -h -C -x enum.x >${SRCDIR}/include/alg/enum.h
-	${RPCGEN}  -C -x -c enum.x >${SRCDIR}/src/alg/alg_arg/enum.C
-	${RPCGEN} -h -C -x cg_arg.x >${SRCDIR}/include/alg/cg_arg.h
-	${RPCGEN} -c -C -x cg_arg.x >${SRCDIR}/src/alg/alg_arg/cg_arg.C
-	${RPCGEN} -h -C -x do_arg.x >${SRCDIR}/include/alg/do_arg.h
-	${RPCGEN}  -C -x -c  do_arg.x >${SRCDIR}/src/alg/alg_arg/do_arg.C
-	${RPCGEN} -h -C -x w_spect_arg.x >${SRCDIR}/include/alg/w_spect_arg.h
-	${RPCGEN}  -C -x -c  w_spect_arg.x >${SRCDIR}/src/alg/alg_arg/w_spect_arg.C
+	- cp ${BUILDDIR}/config.h .
+	- cp ${BUILDDIR}/precision.h .
+	- cp ${SRCDIR}/include/input/*.x .
+	${RPCGEN} $(RHFLAGS) enum.x >${SRCDIR}/include/util/enum.h
+	${RPCGEN} $(RHFLAGS) enum.x >${SRCDIR}/include/alg/enum.h
+	${RPCGEN}  $(RCFLAGS) enum.x >${SRCDIR}/src/alg/alg_arg/enum.C
+	${RPCGEN} $(RHFLAGS) cg_arg.x >${SRCDIR}/include/alg/cg_arg.h
+	${RPCGEN} $(RCFLAGS) cg_arg.x >${SRCDIR}/src/alg/alg_arg/cg_arg.C
+	${RPCGEN} $(RHFLAGS) do_arg.x >${SRCDIR}/include/alg/do_arg.h
+	${RPCGEN} $(RCFLAGS) do_arg.x >${SRCDIR}/src/alg/alg_arg/do_arg.C
+	${RPCGEN} $(RHFLAGS) w_spect_arg.x >${SRCDIR}/include/alg/w_spect_arg.h
+	${RPCGEN}  $(RCFLAGS)  w_spect_arg.x >${SRCDIR}/src/alg/alg_arg/w_spect_arg.C
+	${RPCGEN} $(RHFLAGS) hmd_arg.x >${SRCDIR}/include/alg/hmd_arg.h
+	${RPCGEN}  $(RCFLAGS)  hmd_arg.x >${SRCDIR}/src/alg/alg_arg/hmd_arg.C
 
 clean: 
 

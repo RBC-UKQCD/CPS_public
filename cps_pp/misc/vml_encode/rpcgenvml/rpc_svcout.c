@@ -1,4 +1,4 @@
-/*
+/* Hacked by Peter Boyle for VML 2004 *//*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
  * unrestricted use provided that this legend is included on all tape
  * media and as a part of the software program in whole or part.  Users
@@ -32,7 +32,7 @@
  * From: @(#)rpc_svcout.c 1.29 89/03/30 (C) 1987 SMI
  */
 char svcout_rcsid[] =
-  "$Id: rpc_svcout.c,v 1.2 2004-12-11 20:57:50 chulwoo Exp $";
+  "$Id: rpc_svcout.c,v 1.3 2005-05-09 07:16:05 chulwoo Exp $";
 
 /*
  * rpc_svcout.c, Server-skeleton outputter for the RPC protocol compiler

@@ -1,9 +1,9 @@
 #ifndef _PAB_VML_ENCODER_H_
 #define _PAB_VML_ENCODER_H_
-
+/* Peter Boyle 2004 Virtual markup language*/
 #include <util/vml/vml.h>
 #include <stdio.h>
-
+CPS_START_NAMESPACE
 /*
  * Try to abstract out references, inheritance, arrays, structs etc..
  */
@@ -34,7 +34,7 @@ class GenericEncoder
   virtual bool_t Char ( VML *vmls, char *name, char &val ) =0;
   virtual bool_t UnsignedChar ( VML *vmls, char *name, unsigned char &val ) =0;
   virtual bool_t Bool ( VML *vmls, char *name, bool_t &val ) =0;
-  virtual bool_t Enum ( VML *vmls, char *name, unsigned long &val ) =0;
+  virtual bool_t Enum ( VML *vmls, char *ename, char *name, char *&value ) =0;
   virtual bool_t Double(VML *vmls, char *name, double &d)=0;
   virtual bool_t Float (VML *vmls, char *name, float  &f)=0;
 
@@ -47,7 +47,7 @@ class GenericEncoder
   virtual bool_t String (VML *vmls, char *name, char *&str )=0;
 
   virtual bool_t Reference ( VML *vmls, char *type, char *name, 
-			     char *&ref, vmlproc_t do_ref  )=0;
+			     char *&ref, vmlproc_t do_ref, int sizeofone  )=0;
 #define NOSUP printf("Not implemented"); exit(-1);
   virtual bool_t Inherits  ( VML *vmls, char *type, char *name, 
 			     char *&ref, vmlproc_t do_ref  ){NOSUP};
@@ -81,7 +81,7 @@ class TextEncoder : public GenericEncoder
   virtual bool_t UnsignedInt64 ( VML *vmls, char *name, uint64_t &val ) ;
   virtual bool_t Char ( VML *vmls, char *name, char &val ) ;
   virtual bool_t UnsignedChar ( VML *vmls, char *name, unsigned char &val ) ;
-  virtual bool_t Enum ( VML *vmls, char *name, unsigned long &val );
+  virtual bool_t Enum ( VML *vmls, char *ename, char *name, char *&value);
   virtual bool_t Bool ( VML *vmls, char *name, bool_t &val ) ;
   virtual bool_t Double(VML *vmls, char *name, double &d);
   virtual bool_t Float (VML *vmls, char *name, float  &f);
@@ -98,7 +98,7 @@ class TextEncoder : public GenericEncoder
   virtual bool_t String (VML *vmls, char *name, char *&str );
 
   virtual bool_t Reference ( VML *vmls, char *type, char *name, 
-		     char *&ref, vmlproc_t do_ref  );
+			     char *&ref, vmlproc_t do_ref , int sizeofone );
 #define NOSUP printf("Not implemented"); exit(-1);
   virtual bool_t Inherits  ( VML *vmls, char *type, char *name, 
 		     char *&ref, vmlproc_t do_ref  ){NOSUP};
@@ -133,7 +133,7 @@ class XmlEncoder : public GenericEncoder
   virtual bool_t Char ( VML *vmls, char *name, char &val ) ;
   virtual bool_t UnsignedChar ( VML *vmls, char *name, unsigned char &val ) ;
   virtual bool_t Bool ( VML *vmls, char *name, bool_t &val ) ;
-  virtual bool_t Enum ( VML *vmls, char *name, unsigned long &val );
+  virtual bool_t Enum ( VML *vmls, char *ename, char *name, char *&value);
   virtual bool_t Double(VML *vmls, char *name, double &d);
   virtual bool_t Float (VML *vmls, char *name, float  &f);
 
@@ -147,7 +147,7 @@ class XmlEncoder : public GenericEncoder
   virtual bool_t String (VML *vmls, char *name, char *&str );
 
   virtual bool_t Reference ( VML *vmls, char *type, char *name, 
-		     char *&ref, vmlproc_t do_ref  );
+			     char *&ref, vmlproc_t do_ref , int sizeofone );
 #define NOSUP printf("Not implemented"); exit(-1);
   virtual bool_t Inherits  ( VML *vmls, char *type, char *name, 
 		     char *&ref, vmlproc_t do_ref  ){NOSUP};
@@ -194,7 +194,7 @@ class XdrEncoder : public GenericEncoder
   virtual bool_t String (VML *vmls, char *name, char *&str );
 
   virtual bool_t Reference ( VML *vmls, char *type, char *name, 
-		     char *&ref, vmlproc_t do_ref  );
+			     char *&ref, vmlproc_t do_ref , int sizeofone );
 
   virtual bool_t Inherits  ( VML *vmls, char *type, char *name, 
 		     char *&ref, vmlproc_t do_ref  ){NOSUP};
@@ -205,5 +205,5 @@ class XdrEncoder : public GenericEncoder
   virtual bool_t ClassEnd   ( VML *vmls, char *name, char *instance ){NOSUP};
 
 };
-
+CPS_END_NAMESPACE
 #endif

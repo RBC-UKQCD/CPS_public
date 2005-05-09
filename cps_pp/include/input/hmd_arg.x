@@ -1,21 +1,3 @@
-#include<config.h>
-CPS_START_NAMESPACE
-/*------------------------------------------------------------------*/
-/*!\file
-  \brief  Definitions of the HmdArg structure.
-
-  $Id: hmd_arg.x,v 1.3 2005-03-07 00:03:23 chulwoo Exp $
-*/
-/*------------------------------------------------------------------*/
-
-
-#ifndef INCLUDED_HMD_ARG_H
-#define INCLUDED_HMD_ARG_H
-
-CPS_END_NAMESPACE
-#include <util/vector.h>
-CPS_START_NAMESPACE
-
 
 enum ReunitarizeType { REUNITARIZE_NO    = 0,
 		       REUNITARIZE_YES   = 1 };
@@ -23,12 +5,12 @@ enum ReunitarizeType { REUNITARIZE_NO    = 0,
 enum MetropolisType { METROPOLIS_NO    = 0,
 		      METROPOLIS_YES   = 1 };
 
+enum RhmcPolesAction { 	RHMC_POLES_CALC = 0,
+ 			RHMC_POLES_READ = 1,
+			RHMC_POLES_CALC_WRITE = 2 };
 
-
-#define MAX_HMD_MASSES  8       /*!< The maximum number of dynamical masses.*/
-
-#define MAX_RAT_DEGREE  20          /* The maximum degree of the rational
-				       approximation. */
+enum HmdLimits { MAX_HMD_MASSES=8 ,   /* The maximum number of dynamical masses.*/
+                 MAX_RAT_DEGREE=20 }; /* The maximum degree of the rational approximation.*/
 
 /*! A structure holding the parameters relevant to the HMD algorithms.*/
 /*!
@@ -36,48 +18,28 @@ enum MetropolisType { METROPOLIS_NO    = 0,
   safely ignore  parameters irrelevant to it.
  \ingroup algargs 
 */
+typedef Float FRatVec[MAX_RAT_DEGREE];
+typedef int IMassVec[MAX_HMD_MASSES];
+typedef Float FMassVec[MAX_HMD_MASSES];
+typedef FRatVec FRatMassVec[MAX_HMD_MASSES];
 
-struct HmdArg {
+class HmdArg {
 
 
     int n_frm_masses;                /*!< The number of dynamical fermion
-				      masses. This is not necessarily the
-				      number of flavours: At each mass the
-				      number of flavours is given by
-				      Lattice::ExactFlavors. */
+				       masses. This is not necessarily the
+				       number of flavours: At each mass the
+				       number of flavours is given by
+				       Lattice::ExactFlavors. */
 				
-    Float frm_mass[MAX_HMD_MASSES];   /*!< The array of dynamical fermions
-					masses . */
+    int n_bsn_masses;                 /*!< The number of dynamical boson 
+					masses. This is not necessarily the
+					number of flavours: At each mass the
+					number of flavours is given by
+					Lattice::ExactFlavors. This is relevant
+					to the Phi algorithm only.*/
 
-    int frm_flavors[MAX_HMD_MASSES];  /*!<
-					The flavour number of each dynamical
-					mass:
-					This is relevant to the R
-					algorithm only. Bosonic fields
-                                    are simulated by setting 
-                                    a negative flavor number. */
-
-  int n_bsn_masses;                 /*!< The number of dynamical boson 
-				    masses. This is not necessarily the
-				      number of flavours: At each mass the
-				      number of flavours is given by
-				      Lattice::ExactFlavors. This is relevant
-				      to the Phi algorithm only.*/
-				
-  Float bsn_mass[MAX_HMD_MASSES];   /* The array of dynamical bosons masses.
-				       This is relevant to the Phi algorithm
-				       only.*/
-
-  int max_num_iter[MAX_HMD_MASSES]; /*!< The maximum number of iterations
-				    of the solver for each mass 
-				    of dynamical fermions/bosons */
-                                   
-
-  Float stop_rsd[MAX_HMD_MASSES];   /*!< The target residual for the solver
-				      stopping condition for each mass 
-				      of dynamical fermions/bosons */
-
-  int steps_per_traj;		    /*!<
+    int steps_per_traj;		    /*!<
 				      For the R algorithm, this is
 				      the number of steps per trajectory. For
 				      the HMC/phi algorithm this is
@@ -85,45 +47,199 @@ struct HmdArg {
 				      steps per trajectory.
 				    */
   
-  Float step_size;		    /*!< The molecular dynamics step size. */
+    Float step_size;		    /*!< The molecular dynamics step size. */
   
-  MetropolisType metropolis;        /*!< Whether to do the metropolis
-				      accept/reject step.
-				      This is relevant to the Phi
-				      algorithm only. */ 
+    MetropolisType metropolis;        /*!< Whether to do the metropolis
+					accept/reject step.
+					This is relevant to the Phi
+					algorithm only. */ 
   
-  ReunitarizeType reunitarize;      /*!< Whether to reunitarize at the end of
-				      the trajectory before the metropolis
-				      step. */
+    ReunitarizeType reunitarize;      /*!< Whether to reunitarize at the end of
+					the trajectory before the metropolis
+					step. */
+
+    //! Whether the RHMC approximation is static or dynamic.
+    RatApproxType approx_type;
+
+    //! the allowed sprectral spread in the rational approximation
+    Float spread;
+
+    //! The precision used in the Remez algorithm of the RHMC approximation.
+    long precision;
+
+    //! The location of the smallest polar shift in the RHMC rational approximations.
+    int isz;
+
+    //! The Sexton-Weingarten factor
+    /*! RHMC only.*/
+    int sw;
+
+    //! Chonological inversion parameter
+    /*!
+      The number of previous solutions used to form the initial solver
+      guess (HMC only).
+    */
+    int chrono;
+
+    //! Reproduce test? 1 = TRUE, 0 = FALSE
+    int reproduce;
+
+    //! How many attempts do we try to reproduce?
+    int reproduce_attempt_limit;
+
+    FMassVec frm_mass;   /*!< The array of dynamical fermions
+					masses . */
+
+    IMassVec frm_flavors;  /*!<
+					The flavour number of each dynamical
+					mass:
+					This is relevant to the R
+					algorithm only. Bosonic fields
+					are simulated by setting 
+					a negative flavor number. */
+
+				
+    FMassVec bsn_mass;   /* The array of dynamical bosons masses.
+					 This is relevant to the Phi algorithm
+					 only.*/
+
+    IMassVec max_num_iter; /*!< The maximum number of iterations
+					of the solver for each mass 
+					of dynamical fermions/bosons */
+                                   
+
+    FMassVec stop_rsd;   /*!< The target residual for the solver
+					stopping condition for each mass 
+					of dynamical fermions/bosons */
+
+    FMassVec stop_rsd_md;  /*!< The target residual for the solver
+					   stopping condition for each mass 
+					   of dynamical fermions/bosons */
+
+    FMassVec stop_rsd_mc;  /*!< The target residual for the solver
+					   stopping condition for each mass 
+					   of dynamical fermions/bosons */
+
   
-  /*!< The parameters for the force rational approximations*/
-  int FRatDeg[MAX_HMD_MASSES];
-  Float FRatNorm[MAX_HMD_MASSES];
-  Float FRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
-  Float FRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+    //! Type of fields which are being simulated (FERMION OR BOSON)
+    FieldType field_type[MAX_HMD_MASSES];
 
-  /*!< The parameters for the action rational approximations*/
-  int SRatDeg[MAX_HMD_MASSES];
-  Float SRatNorm[MAX_HMD_MASSES];
-  Float SRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
-  Float SRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+    //! Has a valid approximation been constructed?
+    IMassVec valid_approx;
 
-  /*!< The parameters for the inverse action rational approximations*/
-  Float SIRatNorm[MAX_HMD_MASSES];
-  Float SIRatRes[MAX_HMD_MASSES][MAX_RAT_DEGREE];
-  Float SIRatPole[MAX_HMD_MASSES][MAX_RAT_DEGREE];
+    FMassVec lambda_low;
+    FMassVec lambda_high;
+    FMassVec lambda_min;
+    FMassVec lambda_max;
 
-  /*!< The location of the smallest polar shift in the rational approximations*/
-  int isz;
+    /*Placeholder for splitting into two types*/
+    RhmcPolesAction rhmc_poles_action;
+    string rhmc_poles_file<>;
 
-  /*!< The Sexton-Weigngarten factor*/
-  int sw;
+    //! The approximation represented by the RHMC rational functions.
+    IMassVec frm_power_num;
+    //! The approximation represented by the RHMC rational functions.
+    IMassVec frm_power_den;
+
+    //! Parameters for the RHMC force rational approximations.
+    IMassVec FRatDeg;
+
+    //! The new degrees to use for dynamic RHMC.
+    IMassVec FRatDegNew;
+
+    //! The new degrees to use for dynamic RHMC.
+    IMassVec SRatDegNew;
+
+    //! Parameters for the RHMC rational approximations.    
+    FMassVec FRatError;
+    //! Parameters for the RHMC rational approximations.        
+    FMassVec FRatNorm;
+    //! Parameters for the RHMC rational approximations.
+    FRatMassVec FRatRes;
+    //! Parameters for the RHMC rational approximations..
+    FRatMassVec FRatPole;
+
+    //! Parameters for the RHMC action rational approximations. 
+    IMassVec SRatDeg;
+    //! Parameters for the RHMC action rational approximations.     
+    FMassVec SRatError;
+    //! Parameters for the RHMC action rational approximations.     
+    FMassVec SRatNorm;
+    //! Parameters for the RHMC action rational approximations.         
+    FRatMassVec SRatRes;
+    //! Parameters for the RHMC action rational approximations.             
+    FRatMassVec SRatPole;
+
+    //! Parameters for the RHMC inverse action rational approximations.
+    FMassVec SIRatNorm;
+    //! Parameters for the RHMC inverse action rational approximations.
+    FRatMassVec SIRatRes;
+    //! Parameters for the RHMC inverse action rational approximations.
+    FRatMassVec SIRatPole;
+
+    
 
 };
+/*
+ * PAB. While not an alg, it is convenient to place controls for evolution in
+ * the VML portion of the HMD algorithm.
+ */
+class EvoArg {
+  int traj_start;
+  int gauge_unload_period;
+  int gauge_configurations;
+  int io_concurrency;
+  string ensemble_id<>;
+  string ensemble_label<>;
+  string creator<>;
+  string gauge_file_stem<>;
+  string rng_file_stem<>;
+  string plaquette_stem<>;
+  string evo_stem<>;
+  string work_directory<>;
+};
 
+class RhmcPolesState {
 
-#endif /* !INCLUDED_HMD_ARG_H */
+    //! The approximation represented by the RHMC rational functions.
+    IMassVec frm_power_num;
+    //! The approximation represented by the RHMC rational functions.
+    IMassVec frm_power_den;
 
+    //! Parameters for the RHMC force rational approximations.
+    IMassVec FRatDeg;
 
+    //! The new degrees to use for dynamic RHMC.
+    IMassVec FRatDegNew;
 
-CPS_END_NAMESPACE
+    //! The new degrees to use for dynamic RHMC.
+    IMassVec SRatDegNew;
+
+    //! Parameters for the RHMC rational approximations.    
+    FMassVec FRatError;
+    //! Parameters for the RHMC rational approximations.        
+    FMassVec FRatNorm;
+    //! Parameters for the RHMC rational approximations.
+    FRatMassVec FRatRes;
+    //! Parameters for the RHMC rational approximations..
+    FRatMassVec FRatPole;
+
+    //! Parameters for the RHMC action rational approximations. 
+    IMassVec SRatDeg;
+    //! Parameters for the RHMC action rational approximations.     
+    FMassVec SRatError;
+    //! Parameters for the RHMC action rational approximations.     
+    FMassVec SRatNorm;
+    //! Parameters for the RHMC action rational approximations.         
+    FRatMassVec SRatRes;
+    //! Parameters for the RHMC action rational approximations.             
+    FRatMassVec SRatPole;
+
+    //! Parameters for the RHMC inverse action rational approximations.
+    FMassVec SIRatNorm;
+    //! Parameters for the RHMC inverse action rational approximations.
+    FRatMassVec SIRatRes;
+    //! Parameters for the RHMC inverse action rational approximations.
+    FRatMassVec SIRatPole;
+
+};    

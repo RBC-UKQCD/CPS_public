@@ -1,4 +1,4 @@
-/* @(#)rpc_prot.c	2.3 88/08/07 4.0 RPCSRC */
+/* Hacked by Peter Boyle for VML 2004 *//* @(#)rpc_prot.c	2.3 88/08/07 4.0 RPCSRC */
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
  * unrestricted use provided that this legend is included on all tape

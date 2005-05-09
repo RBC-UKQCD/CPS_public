@@ -1,4 +1,4 @@
-/*
+/* Peter Boyle 2004.
  * vml.h, Serialisation routines to connect Sunrpc/XDR to VML
  */
 
@@ -6,12 +6,21 @@
 #define _VML_H 1
 
 #include <config.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <util/vml/vml_config.h>
 #include <util/vml/types.h>
 
-struct VML;
+CPS_START_NAMESPACE
+#ifdef AIX
+typedef unsigned long long u_quad_t;
+typedef long long quad_t;
+#endif
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef __cplusplus 
+extern "C" { 
+#endif
 /*
  *
  * Each data type provides a single procedure which takes two arguments:
@@ -23,6 +32,15 @@ struct VML;
  *              <type> *argresp;
  *
  */
+
+/*PAB Mar 2005... add mapping of enum's to the text string..*/
+struct vml_enum_map { 
+  char *enum_name;
+  char *name;
+  enum_t val;
+};
+char *vml_enum_string ( enum_t *val, struct vml_enum_map * );
+enum_t *vml_enum_val  ( char *string, struct vml_enum_map * );
 
 /*
  * Vml operations.  VML_ENCODE causes the type to be encoded into the
@@ -75,9 +93,6 @@ struct VML
     bool_t Create(FILE *file, vml_op op);
     void Destroy(void);
   };
-#ifdef __cplusplus 
-extern "C" { 
-#endif
 
 /*
  * A vmlproc_t exists for each data type which is to be encoded or decoded.
@@ -135,7 +150,7 @@ extern bool_t vml_uint32_t (VML *__vmls, char *name, uint32_t *__up);
 extern bool_t vml_int64_t (VML *__vmls, char *name, int64_t *__ip);
 extern bool_t vml_uint64_t (VML *__vmls, char *name, uint64_t *__up);
 extern bool_t vml_bool (VML *__vmls, char *name, bool_t *__bp);
-extern bool_t vml_enum (VML *__vmls, char *name, enum_t *__ep);
+extern bool_t vml_enum (VML *__vmls, char *name, enum_t *__ep,struct vml_enum_map *list);
 extern bool_t vml_array (VML * _vmls, char *name, caddr_t *__addrp, u_int *__sizep,
 			      u_int __maxsize, u_int __elsize,
 			      vmlproc_t __elproc);
@@ -207,8 +222,8 @@ extern void vml_struct_end   (VML *vmls, char *type, char *instance);
 extern void vml_class_begin (VML *vmls, char *type, char *instance);
 extern void vml_class_end   (VML *vmls, char *type, char *instance);
 
-#ifdef __cplusplus
+#ifdef __cplusplus 
 }
 #endif
-
+CPS_END_NAMESPACE
 #endif /* rpc/vml.h */

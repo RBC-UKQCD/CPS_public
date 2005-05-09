@@ -32,8 +32,11 @@ class DoArg {
   unsigned long start_conf_load_addr;
 
   StartSeedType start_seed_kind;  /*!< The kind of initial random number generator seed*/
-  char start_conf_filename[50];
+  string start_seed_filename<>;
+  string start_conf_filename<>;
   int start_conf_alloc_flag;
+  int wfm_alloc_flag;
+  int wfm_send_alloc_flag;
 
   int start_seed_value;   /*!< The value of the random number generator seed.*/
                           /*!< Used if ::start_seed_kind is ::START_SEED_INPUT

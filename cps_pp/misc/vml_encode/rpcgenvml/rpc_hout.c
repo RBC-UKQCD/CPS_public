@@ -1,4 +1,4 @@
-/*
+/* Hacked by Peter Boyle for VML 2004 *//*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
  * unrestricted use provided that this legend is included on all tape
  * media and as a part of the software program in whole or part.  Users
@@ -32,7 +32,7 @@
  * From: @(#)rpc_hout.c 1.12 89/02/22 (C) 1987 SMI
  */
 char hout_rcsid[] =
-  "$Id: rpc_hout.c,v 1.2 2004-12-11 20:57:46 chulwoo Exp $";
+  "$Id: rpc_hout.c,v 1.3 2005-05-09 07:16:03 chulwoo Exp $";
 
 /*
  * rpc_hout.c, Header file outputter for the RPC protocol compiler
@@ -247,12 +247,12 @@ pclassdef (definition *def)
 {
   decl_list *l;
   const char *name = def->def_name;
+  f_print (fout, "class VML;\n");
+  f_print (fout, "class %s {\npublic:\n", name);
 
-    f_print (fout, "class %s {\npublic:\n", name);
-    f_print (fout, "\t %s(char *filename);\n",name);
-    f_print (fout, "\t void Encode(char *filename,char *instance);\n");
-    f_print (fout, "\t void Decode(char *filename,char *instance);\n");
-    f_print (fout, "\t void Vml(VML *vmls,char *instance);\n");
+    f_print (fout, "\t bool Encode(char *filename,char *instance);\n");
+    f_print (fout, "\t bool Decode(char *filename,char *instance);\n");
+    f_print (fout, "\t bool Vml(VML *vmls,char *instance);\n");
 
   for (l = def->def.st.decls; l != NULL; l = l->next)
     {
@@ -511,6 +511,9 @@ penumdef (definition *def)
     }
   f_print (fout, "};\n");
   f_print (fout, "typedef enum %s %s;\n", name, name);
+
+  f_print (fout, "extern struct vml_enum_map %s_map[];\n", name);
+
 }
 
 static void

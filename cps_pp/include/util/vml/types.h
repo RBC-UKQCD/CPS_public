@@ -3,7 +3,10 @@
 #include <conf.h>
 #define VML_TRUE ((long) 1)
 #define VML_FALSE ((long) 0)
-
+#ifndef TRUE 
+#define TRUE VML_TRUE
+#define FALSE VML_FALSE
+#endif
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
 #endif

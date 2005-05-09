@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.19 2005-04-25 07:14:46 chulwoo Exp $
+  $Id: gjp.h,v 1.20 2005-05-09 07:15:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-04-25 07:14:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.19 2005-04-25 07:14:46 chulwoo Exp $
-//  $Id: gjp.h,v 1.19 2005-04-25 07:14:46 chulwoo Exp $
+//  $Date: 2005-05-09 07:15:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.20 2005-05-09 07:15:14 chulwoo Exp $
+//  $Id: gjp.h,v 1.20 2005-05-09 07:15:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -387,8 +387,16 @@ public:
   const char * StartConfFilename() const
       {return doarg_int.start_conf_filename;}
 
+  const char * StartSeedFilename() const
+      {return doarg_int.start_seed_filename;}
+
   const int StartConfAllocFlag() 
       {return doarg_int.start_conf_alloc_flag;}
+
+  const int WfmSendAllocFlag() 
+      {return doarg_int.wfm_send_alloc_flag;}
+  const int WfmAllocFlag() 
+      {return doarg_int.wfm_alloc_flag;}
 
   StartSeedType StartSeedKind() const
       {return doarg_int.start_seed_kind;}

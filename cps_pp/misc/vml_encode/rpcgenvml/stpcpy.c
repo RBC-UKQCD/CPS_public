@@ -1,3 +1,4 @@
+/* Hacked by Peter Boyle for VML 2004 */
 char *
 stpcpy (dest, src)
      char *dest;

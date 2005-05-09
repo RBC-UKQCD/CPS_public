@@ -1,3 +1,4 @@
+/*Hacked by peter boyle for VML 2004 */
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
  * unrestricted use provided that this legend is included on all tape
@@ -35,7 +36,10 @@
  */
 
 #include <stdlib.h>
-
+#ifndef TRUE
+#define TRUE (1)
+#define FALSE (0)
+#endif
 #define alloc(size)		malloc((unsigned)(size))
 #define ALLOC(object)   (object *) malloc(sizeof(object))
 

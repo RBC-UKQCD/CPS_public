@@ -1,4 +1,4 @@
-/*
+/* Hacked by Peter Boyle for VML 2004 *//*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
  * unrestricted use provided that this legend is included on all tape
  * media and as a part of the software program in whole or part.  Users
@@ -32,7 +32,7 @@
  * From: @(#)rpc_cout.c 1.13 89/02/22 (C) 1987 SMI
  */
 char cout_rcsid[] =
-"$Id: rpc_cout.c,v 1.3 2004-12-15 07:32:08 chulwoo Exp $";
+"$Id: rpc_cout.c,v 1.4 2005-05-09 07:16:02 chulwoo Exp $";
 
 /*
  * rpc_cout.c, XDR routine outputter for the RPC protocol compiler
@@ -163,32 +163,28 @@ emit (definition * def)
 	return;
     };
 
-  if ( def->def_kind== DEF_CLASS ) { 
+  if ( (def->def_kind== DEF_CLASS) && (VMLoutput == 1) ) { 
     char *name = def->def_name;
-    f_print (fout, "\t %s::%s (char *file) {\n",
-	     def->def_name,def->def_name);
-    f_print (fout, "\t   Decode(file,\"instance\");\n\t };\n");
-
-    f_print (fout, "\t void %s::Encode(char *filename,char *instance){\n",
+    f_print (fout, "\t bool %s::Encode(char *filename,char *instance){\n",
 	     def->def_name);
     f_print (fout, "\t\t VML vmls;\n");
-    f_print (fout, "\t\t vmls.Create(filename,VML_ENCODE);\n");
-    f_print (fout, "\t\t Vml(&vmls,instance);\n",name);
-    f_print (fout, "\t\t vmls.Destroy();\n");
+    f_print (fout, "\t\t if ( !vmls.Create(filename,VML_ENCODE)) return false;\n");
+    f_print (fout, "\t\t if ( !Vml(&vmls,instance) ) return false;\n",name);
+    f_print (fout, "\t\t vmls.Destroy(); return true;\n");
     f_print (fout, "\t }\n");
     f_print (fout, "\n");
-    f_print (fout, "\t void %s::Decode(char *filename,char *instance){\n",
+    f_print (fout, "\t bool %s::Decode(char *filename,char *instance){\n",
 	     def->def_name);
     f_print (fout, "\t\t VML vmls;\n");
-    f_print (fout, "\t\t vmls.Create(filename,VML_DECODE);\n");
-    f_print (fout, "\t\t Vml(&vmls,instance);\n",name);
-    f_print (fout, "\t\t vmls.Destroy();\n");
+    f_print (fout, "\t\t if ( !vmls.Create(filename,VML_DECODE)) return false;\n");
+    f_print (fout, "\t\t if ( !Vml(&vmls,instance)) return false;\n");
+    f_print (fout, "\t\t vmls.Destroy(); return true;\n");
     f_print (fout, "\t }\n");
 
-    f_print (fout, "\t void %s::Vml(VML *vmls,char *instance){\n",
+    f_print (fout, "\t bool %s::Vml(VML *vmls,char *instance){\n",
 	     def->def_name);
-    f_print (fout, "\t\t vml_%s(vmls,instance,this);\n",name);
-    f_print (fout, "\t }\n");
+    f_print (fout, "\t\t if(!vml_%s(vmls,instance,this)) return false;\n",name);
+    f_print (fout, "\t return true;\n\t}\n");
     f_print (fout, "\n");
 
   }
@@ -200,6 +196,7 @@ emit (definition * def)
       break;
     case DEF_ENUM:
       emit_enum (def);
+      return;/*PAB... emit enum prints its own trailer now*/
       break;
     case DEF_STRUCT:
       print_vml(def,VML_STRUCT_ENTER);
@@ -315,7 +312,7 @@ print_prog_header (const proc_list * plist)
 static void
 print_trailer (void)
 {
-  f_print (fout, "\treturn VML_TRUE;\n");
+  f_print (fout, "\treturn TRUE;\n");
   f_print (fout, "}\n");
 }
 
@@ -381,7 +378,7 @@ print_ifclose (int indent)
 {
   f_print (fout, "))\n");
   tabify (fout, indent);
-  f_print (fout, "\t return VML_FALSE;\n");
+  f_print (fout, "\t return FALSE;\n");
 }
 
 static void
@@ -402,15 +399,19 @@ print_ifstat (int indent, const char *prefix, const char *type, relation rel,
       if (streq (type, "string"))
 	{
 	  alt = "string";
+	  print_ifopen (indent, alt,name);
+	  print_ifarg (objname);
 	}
       else if (streq (type, "opaque"))
 	{
 	  alt = "opaque";
+	  print_ifopen (indent, alt,name);
+	  print_ifarg ("(caddr_t) ");
+	  f_print (fout, "%s", objname);
 	}
       if (alt)
 	{
-	  print_ifopen (indent, alt,name);
-	  print_ifarg (objname);
+	  /*PAB Do nothing, moved to above to typecast for C++ compliance*/
 	}
       else
 	{
@@ -477,15 +478,36 @@ print_ifstat (int indent, const char *prefix, const char *type, relation rel,
 static void
 emit_enum (definition * def)
 {
-  (void) def;
+  char *name = def->def_name;
+  enumval_list *l;
 
   if ( VMLoutput ) {
-    f_print(fout,"\tif (!vml_enum (vmls,name,(enum_t *)objp))\n");
-    f_print(fout,"\t\treturn VML_FALSE;\n");
+    f_print(fout,"\tif (!vml_enum (vmls,name,(enum_t *)objp,%s_map))\n",def->def_name);
+    f_print(fout,"\t\treturn FALSE;\n");
+
+    
   } else { 
     print_ifopen (1, "enum","name");
     print_ifarg ("(enum_t *) objp");
     print_ifclose (1);
+  }
+  
+  f_print(fout,"\treturn TRUE;\n");
+  f_print(fout,"}\n");
+
+  if ( VMLoutput ) {
+
+    f_print (fout, "struct vml_enum_map %s_map[] = {\n", name, name);
+    for (l = def->def.en.vals; l != NULL; l = l->next) {
+      f_print( fout,"\t{\"%s\",\"%s\",%s}",
+	       def->def_name,
+	       l->name,l->name);
+      if ( l->next != NULL ) {
+	f_print( fout,",");
+      }
+      f_print( fout,"\n");
+    }
+    f_print (fout, "};\n");
   }
 }
 
@@ -584,7 +606,7 @@ emit_union (const definition * def)
   else
     {
       f_print (fout, "\tdefault:\n");
-      f_print (fout, "\t\treturn VML_FALSE;\n");
+      f_print (fout, "\t\treturn FALSE;\n");
     }
 
   f_print (fout, "\t}\n");
@@ -613,7 +635,7 @@ inline_struct (definition *def, int flag)
       f_print (fout, "\n\tif (xdrs->x_op == XDR_ENCODE) {\n");
     else
       f_print (fout,
-	       "\t\treturn VML_TRUE;\n\t} else if (xdrs->x_op == XDR_DECODE) {\n");
+	       "\t\treturn TRUE;\n\t} else if (xdrs->x_op == XDR_DECODE) {\n");
     
     i = 0;
     size = 0;
@@ -842,7 +864,7 @@ emit_struct (definition * def)
 	flag = GET;
     }
 
-  f_print (fout, "\t return VML_TRUE;\n\t}\n\n");
+  f_print (fout, "\t return TRUE;\n\t}\n\n");
 
   /* now take care of XDR_FREE case */
 
@@ -859,8 +881,31 @@ emit_typedef (const definition * def)
   relation rel = def->def.ty.rel;
 
   if ( VMLoutput ) { 
-    f_print(fout,"\tif (!vml_%s (vmls,name,objp))\n",type);
-    f_print(fout,"\t\treturn VML_FALSE;\n");
+    switch(rel) { 
+    case REL_ARRAY:
+    default:
+      fprintf(stderr,"unsupported typedef for VML\n");
+      exit(-1);
+      break;
+    case REL_POINTER:
+      fprintf(stderr,"POINTER type %s, prefix %s\n",type,prefix);
+
+      f_print(fout,"\tif (!vml_pointer (vmls,name,&objp,sizeof(%s),vml_%s ))\n",
+	      type,type);
+      f_print(fout,"\t\treturn FALSE;\n");
+      break;
+    case REL_VECTOR:
+      fprintf(stderr,"VECTOR type %s, prefix %s\n",type,prefix);
+      f_print(fout,"\tif (!vml_vector (vmls,name,(char *)objp,%s,sizeof(%s),(vmlproc_t)vml_%s))\n",
+	      def->def.ty.array_max,type,type);
+      f_print(fout,"\t\treturn FALSE;\n");
+      break;
+    case REL_ALIAS:
+      fprintf(stderr,"SIMPLE type %s, prefix %s\n",type,prefix);
+      f_print(fout,"\tif (!vml_%s (vmls,name,objp))\n",type);
+      f_print(fout,"\t\treturn FALSE;\n");
+      break;
+    }
   } else { 
     print_ifstat (1, prefix, type, rel, amax, "objp", def->def_name);    
   }

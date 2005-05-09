@@ -1,4 +1,4 @@
-/*
+/* Hacked by Peter Boyle for VML 2004 *//*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
  * unrestricted use provided that this legend is included on all tape
  * media and as a part of the software program in whole or part.  Users
@@ -32,7 +32,7 @@
  * From: @(#)rpc_parse.c 1.8 89/02/22 (C) 1987 SMI
  */
 const char parse_rcsid[] =
-  "$Id: rpc_parse.c,v 1.3 2004-12-15 07:32:08 chulwoo Exp $";
+  "$Id: rpc_parse.c,v 1.4 2005-05-09 07:16:03 chulwoo Exp $";
 
 /*
  * rpc_parse.c, Parser for the RPC protocol compiler
@@ -156,7 +156,7 @@ def_program (definition * defp)
   proc_list *plist;
   proc_list **ptailp;
   int num_args;
-  bool_t isvoid = VML_FALSE;	/* whether first argument is void */
+  bool_t isvoid = FALSE;	/* whether first argument is void */
   defp->def_kind = DEF_PROGRAM;
   scan (TOK_IDENT, &tok);
   defp->def_name = tok.str;
@@ -186,14 +186,14 @@ def_program (definition * defp)
 	  scan (TOK_LPAREN, &tok);
 	  /* get args - first one */
 	  num_args = 1;
-	  isvoid = VML_FALSE;
+	  isvoid = FALSE;
 	  /* type of DEF_PROGRAM in the first
 	   * get_prog_declaration and DEF_STURCT in the next
 	   * allows void as argument if it is the only argument
 	   */
 	  get_prog_declaration (&dec, DEF_PROGRAM, num_args);
 	  if (streq (dec.type, "void"))
-	    isvoid = VML_TRUE;
+	    isvoid = TRUE;
 	  decls = ALLOC (decl_list);
 	  plist->args.decls = decls;
 	  decls->decl = dec;
@@ -208,7 +208,7 @@ def_program (definition * defp)
 	      decls->decl = dec;
 	      *tailp = decls;
 	      if (streq (dec.type, "void"))
-		isvoid = VML_TRUE;
+		isvoid = TRUE;
 	      tailp = &decls->next;
 	    }
 	  /* multiple arguments are only allowed in newstyle */
@@ -453,6 +453,11 @@ def_typedef (definition * defp)
   defp->def.ty.old_type = dec.type;
   defp->def.ty.rel = dec.rel;
   defp->def.ty.array_max = dec.array_max;
+  if ( dec.array_max && strlen(dec.array_max) ) {
+    fprintf(stderr,"Typedef %s is %s[%s]\n",defp->def_name,defp->def.ty.old_type,dec.array_max);
+  } else { 
+    fprintf(stderr,"Typedef %s is %s\n",defp->def_name,defp->def.ty.old_type);
+  }
 }
 
 static void
@@ -461,6 +466,8 @@ get_declaration (declaration * dec, defkind dkind)
   token tok;
 
   get_type (&dec->prefix, &dec->type, dkind);
+
+  dec->array_max = "";
 
   dec->rel = REL_ALIAS;
   if (streq (dec->type, "void"))
@@ -474,8 +481,6 @@ get_declaration (declaration * dec, defkind dkind)
     dec->name = dec->prefix;
     dec->type = "";
     dec->prefix = "";
-    fprintf(stderr,"/*type =%s*/\n",dec->type);
-    fprintf(stderr,"/*name =%s*/\n",dec->name);
     return;
   }
 

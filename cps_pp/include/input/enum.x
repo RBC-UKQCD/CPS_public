@@ -4,19 +4,19 @@
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.4 2005-03-09 19:17:27 chulwoo Exp $
+  $Id: enum.x,v 1.5 2005-05-09 07:14:55 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2005-03-09 19:17:27 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.4 2005-03-09 19:17:27 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.4 2005-03-09 19:17:27 chulwoo Exp $*/
+/*  $Date: 2005-05-09 07:14:55 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.5 2005-05-09 07:14:55 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.5 2005-05-09 07:14:55 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.4 $*/
+/*  $Revision: 1.5 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -227,7 +227,8 @@ enum StartSeedType {
 /*!< Seed value comes from the DoArg structure and is different on all nodes*/
     START_SEED_INPUT_UNIFORM  = 5,
 /*!< Seed value comes from the DoArg structure and is the same on all nodes*/ 
-    START_SEED_INPUT_NODE     = 6
+    START_SEED_INPUT_NODE     = 6, 
+    START_SEED_FILE           = 7
 /*!< Seed structure comes from the DoArg structure and is different on all
   nodes. This should be used when in a farming mode. */     
 };
