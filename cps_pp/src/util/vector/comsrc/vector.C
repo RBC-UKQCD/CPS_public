@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definition of Vector and Matrix classes.
 
   Definitions of functions that perform operations on complex vectors.
-  $Id: vector.C,v 1.4 2004-08-18 11:58:08 zs Exp $
+  $Id: vector.C,v 1.5 2005-05-09 15:19:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.4 2004-08-18 11:58:08 zs Exp $
-//  $Id: vector.C,v 1.4 2004-08-18 11:58:08 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-05-09 15:19:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.5 2005-05-09 15:19:46 chulwoo Exp $
+//  $Id: vector.C,v 1.5 2005-05-09 15:19:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v $
 //  $State: Exp $
 //
@@ -222,7 +222,7 @@ Vector::Vector()
 Float Vector::NormSqGlbSum(int len)
 {
   IFloat sum = dotProduct((IFloat *)&v, (IFloat *)&v, len);
-  glb_sum((Float *)&sum);
+  glb_sum_five((Float *)&sum);
   return Float(sum);
 }
 
