@@ -30,7 +30,8 @@ DoArg::DoArg () {
   c_1=0.0;
   u0=1.0;
   xi_gfix=1.0;
-  start_conf_filename = "";
+  start_seed_filename = "start_seed";
+  start_conf_filename = "start_conf";
 #if TARGET == QCDOC
   start_conf_alloc_flag = QCOMMS; 
   wfm_send_alloc_flag = QFAST|QCOMMS;
@@ -41,6 +42,8 @@ DoArg::DoArg () {
   start_conf_alloc_flag = 0; 
 #endif
   dwf_a5_inv=1.0;
+  power_plaq_cutoff = 0.;
+  power_rect_cutoff = 0.;
   asqtad_naik=0.0;
   asqtad_3staple=0.0;
   asqtad_5staple=0.0;
