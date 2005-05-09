@@ -48,7 +48,7 @@ static int output = 0;
 //---------------------------------------------------------------------- 
 void glb_sum(Float * float_p)
 {
-#if 1
+#if 0
   glb_sum_five(float_p);
 #else
   glb_sum_internal2(float_p,4);
