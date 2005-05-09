@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations of collective communications routines
 
-  $Id: glb.h,v 1.6 2005-03-07 22:37:25 chulwoo Exp $
+  $Id: glb.h,v 1.7 2005-05-09 15:22:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 22:37:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v 1.6 2005-03-07 22:37:25 chulwoo Exp $
-//  $Id: glb.h,v 1.6 2005-03-07 22:37:25 chulwoo Exp $
+//  $Date: 2005-05-09 15:22:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v 1.7 2005-05-09 15:22:11 chulwoo Exp $
+//  $Id: glb.h,v 1.7 2005-05-09 15:22:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v $
 //  $State: Exp $
 //
@@ -55,7 +55,8 @@ extern void glb_sum_five(Float * float_p);
 //--------------------------------------------------------------
 extern void glb_sum_dir(Float * float_p, int dir);
 //! Sums a vector of floating point numbers over all nodes along a single direction.
-extern void glb_sum_multi_dir(Float * float_p, int dir, int len);
+extern void glb_sum_multi_dir(const Float * float_p, const int dir, const int len);
+extern void glb_sum_multi_dir(LatData &dat, const int dir);
 //! Sums a Matrix over all nodes along a single direction.
 extern void glb_sum_matrix_dir(Matrix * float_p, int dir);
 

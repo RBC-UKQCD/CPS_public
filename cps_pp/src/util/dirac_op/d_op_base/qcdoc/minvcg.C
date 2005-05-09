@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpBase class multishift CG solver method.
 
-  $Id: minvcg.C,v 1.13 2005-05-03 20:25:32 chulwoo Exp $
+  $Id: minvcg.C,v 1.14 2005-05-09 15:13:40 chulwoo Exp $
 */
 
 CPS_END_NAMESPACE
@@ -119,13 +119,19 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   if(bs == 0) ERR.Pointer(cname,fname, "bs");
   VRB.Smalloc(cname,fname,"bs", bs, Nmass * sizeof(Float));
 
+#if 1
+  Float *z[2];
+#else
   Float **z = (Float**)smalloc(2 * sizeof(Float*));
   if(z == 0) ERR.Pointer(cname,fname, "z");
   VRB.Smalloc(cname,fname,"z", z, 2 * sizeof(Float*));
+#endif
 
   for (s=0; s<2; s++) {
-    *(z+s) = (Float*)smalloc(Nmass * sizeof(Float));
-    if (*(z+s) == 0) ERR.Pointer(cname,fname, "z[s]");
+    z[s] = (Float*)smalloc(Nmass * sizeof(Float));
+    if (z[s] == 0) ERR.Pointer(cname,fname, "z[s]");
+//    *(z+s) = (Float*)smalloc(Nmass * sizeof(Float));
+//    if (*(z+s) == 0) ERR.Pointer(cname,fname, "z[s]");
     VRB.Smalloc(cname,fname,"z[s]", z[s], Nmass * sizeof(Float));
   }
 
@@ -167,6 +173,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   for (s=0; s<Nmass; s++) {
     rsdcg_sq[s] = RsdCG[s]*RsdCG[s];
     rsd_sq[s] = cp*rsdcg_sq[s];
+    VRB.Flow(cname,fname,"rsq_sd[%d]= %0.16e\n",s,rsd_sq[s]);
     converged[s] = 0;
   }
 
@@ -190,8 +197,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
  
   b = -cp/d;
   
-  z[0][isz] = 1.0;
-  z[1][isz] = 1.0;
+  *(z[0]+isz) = 1.0;
+  *(z[1]+isz) = 1.0;
   bs[isz] = -b;
   iz = 1;
   
@@ -206,7 +213,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   // c = |r[1]|^2
   vaxpy_norm(&b,Ap,r,f_size/6,&c);
   DiracOpGlbSum(&c);
-  VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", 0, IFloat(c));
+  VRB.Flow(cname,fname, "|res[%d]|^2 = %0.16e\n", 0, IFloat(c));
 
   // Psi[1] -= b[0] p[0] =- b[0] chi;
   if (type == SINGLE) {
@@ -285,7 +292,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     vaxpy_norm(&b_tmp,Ap,r,f_size/6,&c);
     CGflops += f_size*4;
     DiracOpGlbSum(&c);
-    VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", k, IFloat(c));
+    VRB.Flow(cname,fname, "|res[%d]|^2 = %0.16e\n", k, IFloat(c));
 
     // Psi[k+1] -= b[k] p[k]
     if (type == SINGLE)
@@ -374,7 +381,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   VRB.Sfree(cname,fname,"z[0]",z[0]);
   sfree(*z);
   VRB.Sfree(cname,fname,"z",z);
-  sfree(z);
+//  sfree(z);
   sfree(converged);
   VRB.Sfree(cname,fname,"convsP",convsP);
   sfree(convsP);

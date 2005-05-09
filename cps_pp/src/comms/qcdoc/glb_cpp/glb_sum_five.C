@@ -56,13 +56,19 @@ void glb_sum_five(Float * float_p)
 #else
 {
   int NP[5] = {GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes(), GJP.Snodes()};
+  int coor[5];
+  for(int i = 0;i<5;i++) coor[i]=GJP.NodeCoor(i);
 
+//  fprintf(stdout,"NP = %d %d %d %d %d\n",NP[0],NP[1],NP[2],NP[3],NP[4]);
+//  fprintf(stdout,"Coor = %d %d %d %d %d\n",coor[0],coor[1],coor[2],coor[3],coor[4]);
   if (transmit_buf == NULL) 
       transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
   if (receive_buf == NULL) 
       receive_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
   if (gsum_buf == NULL) 
       gsum_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
+
+//  printf("*float_p=%e\n",*float_p);
 
   // Sum over the "virtual" 5-dimensional mesh
   //------------------------------------------------------------
@@ -81,6 +87,7 @@ void glb_sum_five(Float * float_p)
 	send.TransComplete(); rcv.TransComplete();
 
 
+//	printf(" %d %d received=%e\n",i,itmp,*receive_buf);
         *gsum_buf += *receive_buf;
         *transmit_buf = *receive_buf;
       }

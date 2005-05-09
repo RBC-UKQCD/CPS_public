@@ -24,6 +24,7 @@ CPS_END_NAMESPACE
 #include<util/gjp.h>
 #include<comms/double64.h>
 #include <comms/sysfunc.h>
+#include <util/lat_data.h>
 #include "glb_sum_internal.h"
 CPS_START_NAMESPACE
 
@@ -48,12 +49,16 @@ static Double64 *gsum_buf = NULL;
 */
 //---------------------------------------------------------------------- 
 
-void glb_sum_multi_dir(Float * float_p, int dir, int len)
+void glb_sum_multi_dir(LatData &lat, const int dir){
+    glb_sum_multi_dir(lat.Field(),dir,(const int)lat.Size());
+}
+
+void glb_sum_multi_dir(const Float * float_p, const int dir, const int len)
 #if 1
 {
-   printf("glb_sum_multi_dir(%p, %d, %d)\n",float_p,dir,len);
+//   printf("glb_sum_multi_dir(%p, %d, %d)\n",float_p,dir,len);
 	int len2 = len ;
-	Float *tmp = float_p;
+	Float *tmp = (Float *)float_p;
 	while( len2 > MAX_BUF){
 		glb_sum_internal(tmp,dir,MAX_BUF);
 		len2 -=MAX_BUF;
@@ -61,7 +66,7 @@ void glb_sum_multi_dir(Float * float_p, int dir, int len)
 	}
 	if (len2>0)
 		glb_sum_internal(tmp,dir,len2);
-        printf("done\n");
+  //      printf("done\n");
 }
 #else
 {
@@ -77,6 +82,21 @@ void glb_sum_multi_dir(Float * float_p, int dir, int len)
 		 GJP.TnodeCoor(), 
 		 GJP.SnodeCoor()}; 
 
+//  fprintf(stderr,"glb_sum_multi_dir(%p, %d, %d)\n",float_p,dir,len);
+//  fprintf(stdout,"NP = %d %d %d %d %d\n",NP[0],NP[1],NP[2],NP[3],NP[4]);
+//  fprintf(stderr,"glb_sum_multi_dir():COOR = %d %d %d %d %d\n",COOR[0],COOR[1],COOR[2],COOR[3],COOR[4]);
+
+  if (len >MAX_NUM_WORDS){
+    printf("len(%d) >MAX_NUM_WORDS\n",len);
+    exit(-54);
+  }
+  if (dir >4){
+    printf("dir(%d) >4\n",dir);
+    exit(-54);
+  }
+
+  if (NP[dir]<2) return;
+
   if (transmit_buf == NULL) 
       transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,MAX_NUM_WORDS*sizeof(Double64));
   if (receive_buf == NULL) 
@@ -85,7 +105,7 @@ void glb_sum_multi_dir(Float * float_p, int dir, int len)
       gsum_buf = (Double64 *)qalloc(QFAST|QNONCACHE,MAX_NUM_WORDS*sizeof(Double64));
   int j;
   
-  int blocksize=2*len*sizeof(Float);
+  int blocksize=len*sizeof(Float);
 
   // Sum along dir
   //--------------------------------------------------------------
@@ -100,10 +120,11 @@ void glb_sum_multi_dir(Float * float_p, int dir, int len)
     SCUDirArg send(transmit_buf, gjp_scu_dir[2*dir], SCU_SEND, blocksize);
     SCUDirArg rcv(receive_buf, gjp_scu_dir[2*dir+1], SCU_REC, blocksize);
 
-    send.StartTrans();
     rcv.StartTrans();
-    send.TransComplete();
+    send.StartTrans();
+//    fprintf(stderr,"StartTrans()\n");
     rcv.TransComplete();
+    send.TransComplete();
     for(j=0;j<len;j++){
       *(gsum_buf+j) += *(receive_buf+j);
       *(transmit_buf+j) = *(receive_buf+j);

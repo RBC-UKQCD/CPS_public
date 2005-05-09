@@ -1,7 +1,7 @@
 /*!\file
   \brief Implementation of functions for timing and performance measurement.
 
-  $Id: time.C,v 1.5 2004-09-02 16:58:13 zs Exp $
+  $Id: time.C,v 1.6 2005-05-09 15:19:05 chulwoo Exp $
 */
 
 #include <config.h>
@@ -29,7 +29,7 @@ Float dclock(void){
   \return The FLOPS rate.
 */
 
-Float print_flops(int nflops, struct timeval *start, struct timeval *end){
+Float print_flops(unsigned long long nflops, struct timeval *start, struct timeval *end){
 	int sec = end->tv_sec - start->tv_sec; 
 	int usec = end->tv_usec - start->tv_usec; 
 	Float time = sec + 1.e-6*usec;
@@ -48,7 +48,7 @@ Float print_flops(int nflops, struct timeval *start, struct timeval *end){
   \param end The final result of calling \a gettimeofday  
   \return The FLOPS rate.
 */
-Float print_flops(char *cname, char *fname, int nflops, struct timeval *start, struct timeval *end){
+Float print_flops(char *cname, char *fname, unsigned long long nflops, struct timeval *start, struct timeval *end){
 	printf("%s:%s: ",cname,fname);
 	return print_flops(nflops,start,end);
 }
@@ -61,7 +61,7 @@ Float print_flops(char *cname, char *fname, int nflops, struct timeval *start, s
   \return The FLOPS rate.
 */
 
-Float print_flops(int nflops, Float time){
+Float print_flops(unsigned long long nflops, Float time){
 	printf("%e flops /%e seconds = %e MFlops\n",(Float)nflops,time,(Float)nflops/(time*1.e6));
 	return nflops/time;
 }
@@ -77,7 +77,7 @@ Float print_flops(int nflops, Float time){
   \return The FLOPS rate.
 */
 
-Float print_flops(char *cname, char *fname, int nflops, Float time){
+Float print_flops(char *cname, char *fname, unsigned long long nflops, Float time){
 	printf("%s::%s: ",cname,fname);
 	return print_flops(nflops,time);
 }

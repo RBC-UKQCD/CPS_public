@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.4 2005-02-11 23:53:39 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.5 2005-05-09 15:25:10 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -102,6 +102,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   //----------------------------------------------------------------  
 
   VRB.Clock(cname, fname, "Before calc force vecs.\n") ;
+  VRB.Flow(cname, fname, "Before calc force vecs.\n") ;
 
   {
     CgArg cg_arg ;
@@ -110,6 +111,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
     DiracOpDwf dwf(*this, v1, v2, &cg_arg, CNV_FRM_YES) ;
     dwf.CalcHmdForceVecs(chi) ;
   }
+  VRB.Flow(cname, fname, "After calc force vecs.\n") ;
 #ifdef PROFILE
   Float time = -dclock();
   ForceFlops=0;
@@ -248,9 +250,9 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       tmp_mat1 += tmp_mat2 ;
 
       // If GJP.Snodes > 1 sum up contributions from all s nodes
-      if(GJP.Snodes() != 1) {
+//      if(GJP.Snodes() > 1) {
 	  glb_sum_multi_dir((Float *)&tmp_mat1, 4, sizeof(Matrix)/sizeof(IFloat) ) ;
-      }
+//      }
 
       tmp_mat2.DotMEqual(*(gauge+gauge_offset), tmp_mat1) ;
 

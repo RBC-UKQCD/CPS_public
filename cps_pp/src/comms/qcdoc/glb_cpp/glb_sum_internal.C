@@ -93,7 +93,7 @@ void glb_sum_internal (Float * float_p, int dir,int len)
   }
 
   int coor = GJP.NodeCoor(dir);
-printf("coor(%d)=%d\n",dir,coor);
+  //printf("coor(%d)=%d\n",dir,coor);
   for(int i = 0;i<len;i++){
   transmit_buf[i] = gsum_buf[coor*len+i] = (Double64)(float_p[i]);
  // printf("float_p[%d]=%e\n",i,float_p[i]);
@@ -101,19 +101,29 @@ printf("coor(%d)=%d\n",dir,coor);
 
  //     *transmit_buf = *gsum_buf;
 
-    if (NP[dir]>1)
+  if (NP[dir]>1){
+  //       SCUDirArg Send2(transmit_buf,gjp_scu_dir[2*dir+1],SCU_SEND,length[dir]*sizeof(Double64));
+  //       SCUDirArg Recv2(receive_buf,gjp_scu_dir[2*dir],SCU_REC,length[dir]*sizeof(Double64));
     for (int itmp = 1; itmp < NP[dir]; itmp++) {
 //      printf("dir=%d itmp=%d\n",dir,itmp);
       coor = (coor+1)%NP[dir];
+#if 0
+      Send2.StartTrans();
+      Recv2.StartTrans();
+      Send2.TransComplete();
+      Recv2.TransComplete();
+#else
       Send[dir]->StartTrans();
       Recv[dir]->StartTrans();
       Send[dir]->TransComplete();
       Recv[dir]->TransComplete();
+#endif
 
       for(int i = 0;i<len;i++){
         gsum_buf[coor*len+i] = receive_buf[i];
         transmit_buf[i] = receive_buf[i];
       }
+    }
   }
   for(int i = 0;i<len;i++){
     tmp_sum[i] = gsum_buf[i];

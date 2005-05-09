@@ -46,8 +46,12 @@ static int counter = 0;
 //---------------------------------------------------------------------- 
 void glb_sum(Float * float_p)
 {
+#if 1
+  glb_sum_five(float_p);
+#else
   if (!initted){ gsum.Init(gsum_axis,4); initted=1;};
   *float_p = (Float) gsum.Sum((double)*float_p);
+#endif
   counter ++;
 }
 CPS_END_NAMESPACE

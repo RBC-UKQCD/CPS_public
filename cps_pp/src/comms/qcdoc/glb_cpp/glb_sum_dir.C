@@ -61,6 +61,7 @@ void glb_sum_dir(Float * float_p, int dir)
 		 GJP.TnodeCoor(), 
 		 GJP.SnodeCoor()}; 
 
+
   if (transmit_buf == NULL) 
       transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
   if (receive_buf == NULL) 
@@ -111,6 +112,7 @@ void glb_sum_dir(Float * float_p, int dir)
 
 
   *float_p = *gsum_buf;
+//  fprintf(stdout,"glb_sum_dir():NP[%d]=%d COOR[%d]=%d sum=%0.16e \n",dir,NP[dir],dir,COOR[dir],float_p);
 }
 
 

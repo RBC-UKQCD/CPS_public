@@ -46,7 +46,7 @@ extern SCUDirArgIR *SCUarg_1;
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
-static long flops;
+static unsigned long long flops;
 DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
 			 Vector *f_field_out,
 			 Vector *f_field_in,
@@ -171,7 +171,7 @@ DiracOpAsqtad::~DiracOpAsqtad() {
 void DiracOpAsqtad::MatPcDagMatPc(Vector *out, 
 			       Vector *in, 
 			       Float *dot_prd){
- long nflops = flops;
+ unsigned long long nflops = flops;
 
 #undef PROFILE
 #ifdef PROFILE
@@ -180,15 +180,15 @@ void DiracOpAsqtad::MatPcDagMatPc(Vector *out,
 #endif
   asqtad_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
   asqtad_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
-  CGflops += nflops;
+  CGflops += (unsigned long long)nflops;
 
   if( dot_prd !=0 ){
 	vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);
-    CGflops +=f_size_cb*4;
-    nflops +=f_size_cb*4;
+    CGflops +=(unsigned long long)f_size_cb*4;
+    nflops +=(unsigned long long)f_size_cb*4;
   } else {
-    CGflops +=f_size_cb*2;
-    nflops +=f_size_cb*2;
+    CGflops +=(unsigned long long)f_size_cb*2;
+    nflops +=(unsigned long long)f_size_cb*2;
     vaxmy(&mass_sq,in,out,f_size_cb/6);
   }
 

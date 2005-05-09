@@ -1,3 +1,4 @@
+
 /***********************************************************
  * PAB: simplified main programme for DWF RHMC algorithm
  *      using VML for parameter loading
@@ -44,13 +45,14 @@
 #include<util/ReadLatticePar.h>
 #include<util/qioarg.h>
 
-#include <qcdocos/scu_checksum.h>
+//#include <qcdocos/scu_checksum.h>
 //--------------------------------------------------------------
 
 USING_NAMESPACE_CPS
 using namespace std;
 
 HmdArg hmd_arg;
+HmdArg hmd_arg_pass;
 
 void checkpoint(GimprRectFdwf &lat, DoArg &do_arg, HmdArg &hmd_arg,EvoArg &evo_arg, int traj);
 
@@ -69,7 +71,12 @@ int main(int argc, char *argv[])
   DoArg do_arg;
   NoArg no_arg;
 
-  bzero((char *)&hmd_arg,sizeof(hmd_arg));  
+  if ( argc!=5 ) { 
+    printf("Args: doarg-file hmdarg-file evoarg-file initial-directory\n");
+    exit(-1);
+  }
+
+  chdir (argv[4]);
 
   if ( !do_arg.Decode(argv[1],"do_arg") ) { printf("Bum do_arg\n"); exit(-1);}
 
@@ -96,11 +103,11 @@ int main(int argc, char *argv[])
 
   chdir(evo_arg.work_directory);
 
-  ScuChecksum::Initialise();
+ // ScuChecksum::Initialise();
 
-  do_arg.verbose_level=VERBOSE_RESULT_LEVEL;
+//  do_arg.verbose_level=VERBOSE_RESULT_LEVEL;
   GJP.Initialize(do_arg);
-  VRB.Level(VERBOSE_RESULT_LEVEL);
+//  VRB.Level(VERBOSE_RESULT_LEVEL);
   LRG.Initialize();
 
   /************************************************
@@ -116,6 +123,7 @@ int main(int argc, char *argv[])
     checkpoint(lat, do_arg, hmd_arg, evo_arg, traj);
   }
 
+  hmd_arg_pass = hmd_arg;
   for(int conf=0; conf< evo_arg.gauge_configurations; conf ++ ) {
 
     GimprRectFdwf lat;
@@ -138,13 +146,13 @@ int main(int argc, char *argv[])
 	plaq.run();
 
 	printf("Running rhmc\n");
-	AlgHmcRHMC rhmc(lat,&common_arg_hmdr,&hmd_arg);
+	AlgHmcRHMC rhmc(lat,&common_arg_hmdr,&hmd_arg_pass);
 	rhmc.run();
 
-        if ( ! ScuChecksum::CsumSwap() ) { 
-	  fprintf(stderr, "Checksum mismatch\n");
-	  exit(-1);
-	}
+//        if ( ! ScuChecksum::CsumSwap() ) { 
+//	  fprintf(stderr, "Checksum mismatch\n");
+//	  exit(-1);
+//	}
 
       }
     }/*End of inter-cfg sweep*/

@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-03 19:00:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.21 2005-05-03 19:00:54 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.21 2005-05-03 19:00:54 chulwoo Exp $
+//  $Date: 2005-05-09 15:14:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.22 2005-05-09 15:14:31 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.22 2005-05-09 15:14:31 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -1538,7 +1538,7 @@ void AsqD::dirac(Float* b, Float* a, int a_odd, int add_flag)
 
   //make sure spinor field is in main memory before starting transfers
 
-  SCUmulti_1[odd].SlowStartTrans();
+  SCUmulti_1[odd].StartTrans();
 
 #undef PROFILE
 #ifdef PROFILE
@@ -1566,7 +1566,7 @@ void AsqD::dirac(Float* b, Float* a, int a_odd, int add_flag)
 
 if(split) {
 
-  SCUmulti_2[odd].SlowStartTrans();
+  SCUmulti_2[odd].StartTrans();
 
 
 #undef PROFILE
@@ -1583,7 +1583,7 @@ if(split) {
 #endif
   SCUmulti_2[odd].TransComplete();
 
-  SCUmulti[odd].SlowStartTrans();
+  SCUmulti[odd].StartTrans();
 
 #ifdef PROFILE
   num_flops = 33*(non_local_chi);

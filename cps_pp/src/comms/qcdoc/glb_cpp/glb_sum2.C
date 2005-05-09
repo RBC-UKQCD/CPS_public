@@ -87,13 +87,13 @@ void glb_sum_internal2(Float * float_p,int ndir)
   // Save checksum of local floating points
   //---------------------------------------------------
   unsigned long sum_sum = local_checksum(float_p,1);
-  CSM.AccumulateCsum(CSUM_GLB_LOC,sum_sum);
+ CSM.AccumulateCsum(CSUM_GLB_LOC,sum_sum);
 
 
   for(int i = 0; i < ndir; ++i) 
   if (NP[i] >1) {
       int coor = GJP.NodeCoor(i);
-//printf("coor[%d]=%d\n",i,coor);
+//fprintf(stderr,"coor[%d]=%d\n",i,coor);
       *transmit_buf = gsum_buf[coor]= tmp_sum;
 
       for (int itmp = 1; itmp < NP[i]; itmp++) {

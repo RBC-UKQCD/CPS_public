@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.28 2005-05-03 20:27:23 chulwoo Exp $
+  $Id: gjp.C,v 1.29 2005-05-09 15:17:29 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-03 20:27:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.28 2005-05-03 20:27:23 chulwoo Exp $
-//  $Id: gjp.C,v 1.28 2005-05-03 20:27:23 chulwoo Exp $
+//  $Date: 2005-05-09 15:17:29 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.29 2005-05-09 15:17:29 chulwoo Exp $
+//  $Id: gjp.C,v 1.29 2005-05-09 15:17:29 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.28 $
+//  $Revision: 1.29 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -214,11 +214,14 @@ void GlobalJobParameter::Initialize() {
 	
   for(i = 0; i<5 ; i++){
     if(nodes[i] != 1) node_coor[i] = coor[i] % nodes[i];
+    else node_coor[i]=0;
   }
   VRB.Result(cname,fname, "node_sites= %d %d %d %d %d\n",
 node_sites[0], node_sites[1], node_sites[2], node_sites[3], node_sites[4]);
   VRB.Result(cname,fname, "nodes= %d %d %d %d %d\n",
 nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
+  VRB.Result(cname,fname, "coor= %d %d %d %d %d\n",
+node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
 
   // Set the static arrays gjp_local_axis[5], gjp_scu_dir[10],
   // and gjp_scu_wire_map[10].
@@ -274,7 +277,7 @@ nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
 //      conf_kind != START_CONF_FILE)
    doarg_int.start_conf_load_addr = 0;
 
-    VRB.Flow(cname,fname,"start_conf_alloc_flag=%d\n",doarg_int.start_conf_alloc_flag);
+    VRB.Result(cname,fname,"start_conf_alloc_flag=%d\n",doarg_int.start_conf_alloc_flag);
     
   // Set parameters for anisotropic lattices and clover improvement.
   // MUST BE AFTER THE SETTING OF BETA [which is re-adjusted for

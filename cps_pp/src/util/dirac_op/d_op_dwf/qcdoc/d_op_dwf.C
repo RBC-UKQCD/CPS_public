@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.7 2005-03-07 00:24:48 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.8 2005-05-09 15:17:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:24:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.7 2005-03-07 00:24:48 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.7 2005-03-07 00:24:48 chulwoo Exp $
+//  $Date: 2005-05-09 15:17:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.8 2005-05-09 15:17:42 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.8 2005-05-09 15:17:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -607,7 +607,9 @@ void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
 
   psi = f_in ;
 
+//  fprintf(stderr,"psi=%p chi=%p rho=%p sigma=%p\n",psi,chi,rho,sigma);
   MatPc(psi,chi) ;
+//  fprintf(stderr,"MatPc\n");
 
   {
     Float kappa = ((Dwf *)dwf_lib_arg)->dwf_kappa ;
@@ -617,10 +619,12 @@ void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
   rho = (Vector *)((Float *)f_out + f_size_cb) ;
 
   Dslash(rho, chi, CHKB_ODD, DAG_NO) ;
+//  fprintf(stderr,"Dslash\n");
 
   sigma = (Vector *)((Float *)f_in + f_size_cb) ;
 
   Dslash(sigma, psi, CHKB_ODD, DAG_YES) ;
+//  fprintf(stderr,"Dslash\n");
 
   return ;
 }
@@ -632,12 +636,12 @@ void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
 // is the 5-dimensional globals sum glb_sum_five.
 //------------------------------------------------------------------
 void DiracOpDwf::DiracOpGlbSum(Float *float_p) {
-  if(GJP.Snodes() == 1) {
-    glb_sum(float_p);
-  }
-  else {
+//  if(GJP.Snodes() == 1) {
+//    glb_sum(float_p);
+//  }
+//  else {
     glb_sum_five(float_p);
-  }
+//  }
 }
 
 

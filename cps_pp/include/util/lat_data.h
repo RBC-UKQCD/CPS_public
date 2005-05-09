@@ -32,8 +32,11 @@ class LatData{
     }
     LatData &operator=(const LatData &lat);
     ~LatData();
-//    const IFloat *Field(int pos=0, int n=0);
-    int Size(){return size*vol;}
+    const IFloat *Field(int pos=0, int n=0)
+      { return (data+pos*size+n);}
+    const int Size(){return size*vol;}
+
+    friend void glb_sum_multi_dir(LatData &dat, int dir);
 
 };
 
@@ -60,7 +63,7 @@ class LatMatrix: public virtual LatData{
   private:
     int mat_size;
   public: 
-    LatMatrix(int flag, int n_vec = 1, int vol = 0);
+    LatMatrix(int flag, int n_vec , int vol );
     LatMatrix(int n_vec = 1, int vol = 0){
       LatMatrix(DEFAULT_FLAG,n_vec,vol);
     }
