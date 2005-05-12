@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgPbp class.
   
-  $Id: alg_pbp.C,v 1.10 2005-03-09 19:10:01 chulwoo Exp $
+  $Id: alg_pbp.C,v 1.11 2005-05-12 20:13:31 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-09 19:10:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.10 2005-03-09 19:10:01 chulwoo Exp $
-//  $Id: alg_pbp.C,v 1.10 2005-03-09 19:10:01 chulwoo Exp $
+//  $Date: 2005-05-12 20:13:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.11 2005-05-12 20:13:31 chulwoo Exp $
+//  $Id: alg_pbp.C,v 1.11 2005-05-12 20:13:31 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_pbp.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v $
 //  $State: Exp $
 //
@@ -54,7 +54,7 @@ CPS_START_NAMESPACE
 #define POINT
 #undef POINT
 #define Z2
-//#undef Z2
+#undef Z2
 //------------------------------------------------------------------
 /*!
   \param latt The lattice on which to compute the condensate.
@@ -272,7 +272,7 @@ void AlgPbp::run()
           // Print out mass, s-slice, pbp ,pbg5p, number of iterations
           // and true residual
           for (int i = 0; i < ls_glb; i++) {
-	    Fprintf(fp,"%e %d %e %e %d %e\n", 
+	    Fprintf(fp,"%0.16e %d %0.16e %0.16e %d %0.16e\n", 
 		    IFloat(cg_arg->mass), 
 		    i,
 		    IFloat(pbp_all[i]), 
@@ -283,7 +283,7 @@ void AlgPbp::run()
         } 
 	else {
           // Print out mass, pbp, pbg5p, number of iterations and true residual
-          Fprintf(fp, "%e %e %e %d %e\n", 
+          Fprintf(fp, "%0.16e %0.16e %0.16e %d %0.16e\n", 
 		  IFloat(cg_arg->mass),
                   IFloat(pbp), 
                   IFloat(pbg5p), 
@@ -386,7 +386,7 @@ void AlgPbp::run()
 	if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	  ERR.FileA(cname,fname, (char *)common_arg->results);
 	}
-	Fprintf(fp, "%e %e %e %d %e\n", 
+	Fprintf(fp, "%0.16e %0.16e %0.16e %d %0.16e\n", 
 		IFloat(cg_arg->mass), 
 		IFloat(pbp), 
 		IFloat(pbg5p), 
@@ -441,7 +441,7 @@ void AlgPbp::run()
     for(int zz = 0; zz < GJP.VolNodeSites(); zz++)
       for(int yy = 0; yy < 6; yy++)
 	if(*(((IFloat *)&src[zz])+yy) > 1e-15)
-	  printf("zz = %d, yy = %d, *(src+zz) = %e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
+	  printf("zz = %d, yy = %d, *(src+zz) = %0.16e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
     #else
     lat.RandGaussVector(src, 0.5);
     #endif
@@ -463,7 +463,7 @@ void AlgPbp::run()
     //printf("Site %d =\n",check_site);
     //tmp1 = (IFloat *)(src + check_site);
     //for(int yy = 0; yy < 6; yy++)
-    //  printf("%e  ",*(tmp1+yy));
+    //  printf("%0.16e  ",*(tmp1+yy));
     //printf("\n");
     #endif
 
@@ -525,7 +525,7 @@ void AlgPbp::run()
 	if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	  ERR.FileA(cname,fname, (char *)common_arg->results);
 	}
-	Fprintf(fp, "%e %e %e %e %d %e\n", 
+	Fprintf(fp, "%0.16e %0.16e %0.16e %0.16e %d %0.16e\n", 
 		IFloat(cg_arg->mass), 
 		IFloat(pbp), IFloat(pbd0p), IFloat(pbdip), 
 		iter, 
@@ -577,7 +577,7 @@ void AlgPbp::run()
     for(int zz = 0; zz < GJP.VolNodeSites(); zz++)
       for(int yy = 0; yy < 6; yy++)
 	if(*(((IFloat *)&src[zz])+yy) > 1e-15)
-	  printf("zz = %d, yy = %d, *(src+zz) = %e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
+	  printf("zz = %d, yy = %d, *(src+zz) = %0.16e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
     #else
     lat.RandGaussVector(src, 0.5);
     #endif
@@ -599,7 +599,7 @@ void AlgPbp::run()
     //printf("Site %d =\n",check_site);
     //tmp1 = (IFloat *)(src + check_site);
     //for(int yy = 0; yy < 6; yy++)
-    //  printf("%e  ",*(tmp1+yy));
+    //  printf("%0.16e  ",*(tmp1+yy));
     //printf("\n");
     #endif
 
@@ -661,7 +661,7 @@ void AlgPbp::run()
 	if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	  ERR.FileA(cname,fname, (char *)common_arg->results);
 	}
-	Fprintf(fp, "%e %e %e %e %d %e\n", 
+	Fprintf(fp, "%0.16e %0.16e %0.16e %0.16e %d %0.16e\n", 
 		IFloat(cg_arg->mass), 
 		IFloat(pbp), IFloat(pbd0p), IFloat(pbdip), 
 		iter, 
@@ -712,7 +712,7 @@ void AlgPbp::run()
     //for(int zz = 0; zz < GJP.VolNodeSites(); zz++)
     //  for(int yy = 0; yy < 6; yy++)
     //	if(*(((IFloat *)&src[zz])+yy) > 1e-15)
-    //	  printf("zz = %d, yy = %d, *(src+zz) = %e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
+    //	  printf("zz = %d, yy = %d, *(src+zz) = %0.16e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
     #else
     lat.RandGaussVector(src, 0.5);
     #endif
@@ -734,7 +734,7 @@ void AlgPbp::run()
     //printf("Site %d =\n",check_site);
     //tmp1 = (IFloat *)(src + check_site);
     //for(int yy = 0; yy < 6; yy++)
-    //  printf("%e  ",*(tmp1+yy));
+    //  printf("%0.16e  ",*(tmp1+yy));
     //printf("\n");
     #endif
 
@@ -796,7 +796,7 @@ void AlgPbp::run()
 	if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	  ERR.FileA(cname,fname, (char *)common_arg->results);
 	}
-	Fprintf(fp, "%e %e %e %e %d %e\n", 
+	Fprintf(fp, "%0.16e %0.16e %0.16e %0.16e %d %0.16e\n", 
 		IFloat(cg_arg->mass), 
 		IFloat(pbp), IFloat(pbd0p), IFloat(pbdip), 
 		iter, 
@@ -1077,7 +1077,7 @@ void AlgPbp::runPointSource(int x, int y, int z, int t)
 	  // Print out mass, s-slice, pbp ,pbg5p, number of iterations
 	  // and true residual
 	  for ( i = 0; i < ls_glb; i++) {
-	    Fprintf(fp,"%e %d %e %e %d %e\n", 
+	    Fprintf(fp,"%0.16e %d %0.16e %0.16e %d %0.16e\n", 
 		    IFloat(cg_arg->mass), 
 		    i,
 		    IFloat(pbp_tmp[i]/4/GJP.Colors()), 
@@ -1088,7 +1088,7 @@ void AlgPbp::runPointSource(int x, int y, int z, int t)
 	} 
 	else {
 	  // Print out mass, pbp, pbg5p, number of iterations and true residual
-	  Fprintf(fp, "%e %e %e %d %e\n", 
+	  Fprintf(fp, "%0.16e %0.16e %0.16e %d %0.16e\n", 
 		  IFloat(cg_arg->mass),
 		  IFloat(pbptmp/4/GJP.Colors()), 
 		  IFloat(pbg5ptmp/4/GJP.Colors()), 

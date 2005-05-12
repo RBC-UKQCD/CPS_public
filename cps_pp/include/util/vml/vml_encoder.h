@@ -3,7 +3,6 @@
 /* Peter Boyle 2004 Virtual markup language*/
 #include <util/vml/vml.h>
 #include <stdio.h>
-CPS_START_NAMESPACE
 /*
  * Try to abstract out references, inheritance, arrays, structs etc..
  */
@@ -205,5 +204,4 @@ class XdrEncoder : public GenericEncoder
   virtual bool_t ClassEnd   ( VML *vmls, char *name, char *instance ){NOSUP};
 
 };
-CPS_END_NAMESPACE
 #endif

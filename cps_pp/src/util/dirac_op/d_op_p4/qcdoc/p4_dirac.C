@@ -16,6 +16,9 @@
 #include <ppc_lib.h>
 #endif
 
+#define CPP
+#undef CPP
+
 CPS_START_NAMESPACE
 
 //--------------------------------------------------------------------------
@@ -59,6 +62,20 @@ CPS_START_NAMESPACE
 // and summed before all parallel transports are done.
 //--------------------------------------------------------------------------
 
+//-------------------------------------------------------------------------
+//Assembly routines for recombination
+//-------------------------------------------------------------------------
+
+//Recombination when all sites are recombined with the same sign
+extern "C" void p4_recom(int sites, Float *src, Float **res);
+
+//Recombination when sites are recombined with alternating sign
+extern "C" void p4_recom_n(int sites, Float *src, Float **res);
+
+//Final recombination routine
+extern "C" void p4_dsum(int sites, Float * src, Float *f_out, double * one, double * negone);
+//-------------------------------------------------------------------------
+
 enum{VECT_LEN=6, VECT_LEN2=8, MATRIX_SIZE=18, SITE_LEN=72, NUM_DIR=8, N=4};
 
 static int size[4];
@@ -92,7 +109,8 @@ static ParTransStaggered_cb * pt;
 
 static int LexVector(int * x);
 static int LexGauge(int * x, int dir);
-static int LexGauge2(int *x, int dir);
+static int LexGauge_block(int *x, int dir);
+static int LexGauge_block_cb(int *x, int dir);
 static void cpy(IFloat *dest, IFloat *src,int len);
 static void dagcpy(IFloat *dest, IFloat *src);
 
@@ -184,7 +202,7 @@ void p4_dirac_init_g()
 	for(coord[0] = 0; coord[0] < size[0]; coord[0]++)
 	  for(int i = 0; i < N; i++)
 	    {
-	      fp0 = smeared_gauge + LexGauge2(coord, i)*MATRIX_SIZE;
+	      fp0 = smeared_gauge + LexGauge_block_cb(coord, i)*MATRIX_SIZE;
 	      fp1 = (IFloat *)(Fat + i*vol + LexVector(coord));
 	      dagcpy(fp0,fp1);
 	    }
@@ -229,12 +247,6 @@ void p4_destroy_dirac_buf_g()
   delete pt;
 }
 
-static void cpy(IFloat *dest, IFloat *src, int len)
-{
-  for(int i = 0; i < len; i++)
-    *(dest + i) = *(src + i);
-}
-
 static void dagcpy(IFloat * dest, IFloat *src)
 {
   for(int i = 0; i < 3; i++)
@@ -257,10 +269,17 @@ static int LexGauge(int * x, int dir)
   return N*LexVector(x) + dir;
 }
 
-//Return index for gauge links ordered like txyz
-static int LexGauge2(int *x, int dir)
+//Return index for gauge links block-ordered with sites ordered
+//like txyz
+static int LexGauge_block(int *x, int dir)
 {
   return dir*vol+x[3]+size[3]*(x[0]+size[0]*(x[1]+size[1]*x[2]));
+}
+
+static int LexGauge_block_cb(int *x, int dir)
+{
+  int result = (x[3]+size[3]*(x[0]+size[0]*(x[1]+size[1]*x[2])))/2;
+  return dir*vol+result + ((x[0]+x[1]+x[2]+x[3])%2)*vol/2;
 }
 
 //-----------------------------------------------------------------------
@@ -282,6 +301,8 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   int dir[8] = {0,1,2,3,4,5,6,7};
 
   IFloat * fp0,*fp1,*fp2,*fp3,*fp4,*fp5,*fp6,*fp7,*fp8,*fp9,*fp10;
+  Vector * tmp_frm_p[8];
+  Float * res_p[4];
   int k,n,mu,nu = 0;
 
   //Copy the input fields into fermion
@@ -309,10 +330,12 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   //Terms of the form P_nu_nu_mu(x) or P_nu_nu_-mu(x) can be combined
   //locally after the first transport in the mu direction before transporting
   //twice in the nu direction
+
+  #ifdef CPP
   for(nu = 0; nu < NUM_DIR; nu+=2)
     {
       bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
-      bzero((char *)tmp_frm[nu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
+      //bzero((char *)tmp_frm[nu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
       for(n = 0; n < vol/2; n++)
 	{
 	  fp2 = knight_onetwo + n*NUM_DIR*VECT_LEN2;
@@ -334,17 +357,33 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
 	    }
 
 	  //moveMem(fp1,fp0,VECT_LEN*sizeof(IFloat));
-	  for(k = 0; k < VECT_LEN; k++)
-	    *(fp1+k) = *(fp0+k);
+	  //for(k = 0; k < VECT_LEN; k++)
+	  //  *(fp1+k) = *(fp0+k);
 
-	  #ifdef PROFILE
-	  nflops += 4*(vol/2)*6*6;
-	  #endif
 	}
+	  tmp_frm_p[nu] = tmp_frm[nu];
+	  tmp_frm_p[nu+1] = tmp_frm[nu];
     }
+  #else
+  for(nu = 0; nu < 4; nu++)
+    {
+      bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
+      res_p[nu] = (Float *)tmp_frm[nu];
+    }
+  p4_recom_n(vol/2, (Float *)knight_onetwo, res_p);
+  for(nu = 0; nu < 4; nu++)
+    {
+      tmp_frm_p[2*nu] = tmp_frm[nu];
+      tmp_frm_p[2*nu+1] = tmp_frm[nu];
+    }
+  #endif
+
+  #ifdef PROFILE
+  nflops += 4*(vol/2)*6*6;
+  #endif
 
   //Transport the resulting combinations in the nu direction
-  pt->run(8,tmp_frm2,tmp_frm,dir,(ChkbType) (1-cb));
+  pt->run(8,tmp_frm2,tmp_frm_p,dir,(ChkbType) (1-cb));
   pt->run(8,knight_onetwo,tmp_frm2,dir,(ChkbType) cb, 1);
 
   //Do linear combination for the initial two-link terms
@@ -352,10 +391,12 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   //Terms of the form P_mu_nu_nu(x) or P_mu_-nu_-nu(x) can be combined
   //locally after the first transport in the nu direction before transporting
   //mu direction
+
+  #ifdef CPP
   for(mu = 0; mu < NUM_DIR; mu+=2)
     {
       bzero((char *)tmp_frm[mu],(vol/2)*VECT_LEN*sizeof(IFloat));
-      bzero((char *)tmp_frm[mu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
+      //bzero((char *)tmp_frm[mu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
       for(n = 0; n < vol/2; n++)
 	{
 	  fp2 = knight_twoone + n*NUM_DIR*VECT_LEN2;
@@ -371,17 +412,33 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
 	      }
 
 	  //moveMem(fp1,fp0,VECT_LEN*sizeof(IFloat));
-	  for(k = 0; k < VECT_LEN; k++)
-	    *(fp1+k) = *(fp0+k);
+	  //for(k = 0; k < VECT_LEN; k++)
+	  //  *(fp1+k) = *(fp0+k);
 
-	  #ifdef PROFILE
-	  nflops += 4*(vol/2)*6*6;
-	  #endif
       }
+	  tmp_frm_p[mu] = tmp_frm[mu];
+	  tmp_frm_p[mu+1] = tmp_frm[mu];
     }
+  #else
+  for(nu = 0; nu < 4; nu++)
+    {
+      bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
+      res_p[nu] = (Float *)tmp_frm[nu];
+    }
+  p4_recom(vol/2, (Float *)knight_twoone, res_p);
+  for(nu = 0; nu < 4; nu++)
+    {
+      tmp_frm_p[2*nu] = tmp_frm[nu];
+      tmp_frm_p[2*nu+1] = tmp_frm[nu];
+    }
+  #endif
+
+  #ifdef PROFILE
+  nflops += 4*(vol/2)*6*6;
+  #endif
 
   //Transport these by one link
-  pt->run(8,knight_twoone,tmp_frm,dir,(ChkbType) cb, 1);
+  pt->run(8,knight_twoone,tmp_frm_p,dir,(ChkbType) cb, 1);
 
   //Calculate the smeared one link term
   pt->run(8,smeared_onelink,fermion,dir,(ChkbType) cb,1,smeared_gauge);
@@ -390,6 +447,8 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   //and the smeared one link term and place them in fout
 
   bzero((char*)f_out,(vol/2)*VECT_LEN*sizeof(IFloat));
+
+  #ifdef CPP
    for(n = 0; n < vol/2; n++)
     {
       fp3 = knight_onetwo + n*NUM_DIR*VECT_LEN2;
@@ -416,10 +475,21 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
 	      *(fp4) -= *(fp10 + k);
 	    }
 	}
-      #ifdef PROFILE
-      nflops += (vol/2)*6*8*3;
-      #endif
     }
+   #else
+   double cknight = (double) c_knight;
+   double negcknight = -cknight;
+   double one = 1.0;
+   double negone = -1.0;
+   p4_dsum(vol/2, (Float *)knight_onetwo, (Float *) f_out, &cknight, &cknight);
+   p4_dsum(vol/2, (Float *)knight_twoone, (Float *) f_out, &cknight, &negcknight);
+   p4_dsum(vol/2, (Float *)smeared_onelink, (Float *) f_out, &one, &negone);
+   #endif
+
+
+  #ifdef PROFILE
+  nflops += (vol/2)*6*4*6;
+  #endif
   
    #ifdef PROFILE
    dtime += dclock();
@@ -432,7 +502,7 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
    //72*vol + 72*vol + 72*vol = 216*vol
    //Total flop count = 2064*vol
 
-   DiracOp::CGflops += 7*264*vol+360*vol;
+   DiracOp::CGflops += 7*264*vol+216*vol;
 }
 
 CPS_END_NAMESPACE

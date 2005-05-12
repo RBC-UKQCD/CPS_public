@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgPlaq class methods.
   
-  $Id: alg_plaq.C,v 1.9 2004-08-18 11:57:39 zs Exp $
+  $Id: alg_plaq.C,v 1.10 2005-05-12 20:14:10 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.9 2004-08-18 11:57:39 zs Exp $
-//  $Id: alg_plaq.C,v 1.9 2004-08-18 11:57:39 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-05-12 20:14:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.10 2005-05-12 20:14:10 chulwoo Exp $
+//  $Id: alg_plaq.C,v 1.10 2005-05-12 20:14:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_plaq.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v $
 //  $State: Exp $
 //
@@ -190,7 +190,7 @@ void AlgPlaq::run()
     if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) 
 	ERR.FileA(cname,fname, (char *)common_arg->results);
     
-    Fprintf(fp, "%e %e %e %e %e %e\n",
+    Fprintf(fp, "%0.16e %0.16e %0.16e %0.16e %0.16e %0.16e\n",
 	     p_sum, p_var,
 	     p_max, p_min,
 	     p_temporal, p_spatial);

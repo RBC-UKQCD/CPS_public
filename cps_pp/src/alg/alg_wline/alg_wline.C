@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Implementation of AlgWline class methods.
 
-  $Id: alg_wline.C,v 1.9 2004-10-15 05:09:36 chulwoo Exp $
+  $Id: alg_wline.C,v 1.10 2005-05-12 20:14:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-10-15 05:09:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v 1.9 2004-10-15 05:09:36 chulwoo Exp $
-//  $Id: alg_wline.C,v 1.9 2004-10-15 05:09:36 chulwoo Exp $
+//  $Date: 2005-05-12 20:14:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v 1.10 2005-05-12 20:14:30 chulwoo Exp $
+//  $Id: alg_wline.C,v 1.10 2005-05-12 20:14:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_wline.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v $
 //  $State: Exp $
 //
@@ -173,7 +173,7 @@ void AlgWline::run()
     // Print out results
     //----------------------------------------------------------------
 
-    VRB.Debug(cname, fname, "%e %e %e %e %e %e %e %e\n",
+    VRB.Debug(cname, fname, "%0.16e %0.16e %0.16e %0.16e %0.16e %0.16e %0.16e %0.16e\n",
         wline[0].real(), wline[0].imag(),
         wline[1].real(), wline[1].imag(),
         wline[2].real(), wline[2].imag(),
@@ -184,7 +184,7 @@ void AlgWline::run()
        if( (fp = Fopen(common_arg->filename, "a")) == NULL ) {
          ERR.FileA(cname,fname, (char *)common_arg->filename);
        }
-       Fprintf(fp, "%e %e %e %e %e %e %e %e\n",
+       Fprintf(fp, "%0.16e %0.16e %0.16e %0.16e %0.16e %0.16e %0.16e %0.16e\n",
          wline[0].real(), wline[0].imag(),
          wline[1].real(), wline[1].imag(),
          wline[2].real(), wline[2].imag(),

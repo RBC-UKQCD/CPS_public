@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.37 2005-03-09 19:17:27 chulwoo Exp $
+  $Id: lattice.h,v 1.38 2005-05-12 20:11:55 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2005-03-09 19:17:27 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.37 2005-03-09 19:17:27 chulwoo Exp $
-  $Id: lattice.h,v 1.37 2005-03-09 19:17:27 chulwoo Exp $
+  $Date: 2005-05-12 20:11:55 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.38 2005-05-12 20:11:55 chulwoo Exp $
+  $Id: lattice.h,v 1.38 2005-05-12 20:11:55 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.37 $
+  $Revision: 1.38 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -1273,6 +1273,65 @@ class GimprRect : public virtual Lattice
         // It returns the type of gauge class
 
     void GactionGradient(Matrix &grad, int *x, int mu) ;
+        // Calculates the partial derivative of the gauge action
+        // w.r.t. the link U_mu(x).  Typical implementation has this
+        // func called with Matrix &grad = *mp0, so avoid using it.
+
+    void GforceSite(Matrix& force, int *x, int mu);
+    //!< Calculates the gauge force at site x and direction mu.
+        // Typical implementation has this func called with
+        // Matrix &force = *mp0.  GactionGradient typically uses
+        // mp1 thru mp4, so be careful.
+
+    void EvolveMomGforce(Matrix *mom, Float step_size);
+        // It evolves the canonical momentum mom by step_size
+        // using the pure gauge force.
+
+    Float GhamiltonNode();
+       // The pure gauge Hamiltonian of the node sublattice.
+
+    //! Computes sum of the plaquette and rectangle staples around a link.
+    void AllStaple(Matrix &stap, const int *x, int mu);
+
+};
+
+//------------------------------------------------------------------
+//! A class implementing a tadpole-improved plaquette + rectangle gauge action.
+/*!
+  The action is
+  \f[
+  -\frac{1}{3}\beta \sum_x \sum_\mu \sum_{\nu\neq\mu}[
+  (1-8 c_1) U_\mu(x) U_\nu(x+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x) 
+  + \frac{c_1}{u_0^2} U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu)
+U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+]
+\f]
+
+  \ingroup gactions
+*/
+//------------------------------------------------------------------
+class GtadpoleRect : public virtual Lattice
+{
+
+ private:
+    char *cname;    // Class name.
+
+    Float plaq_coeff; // - GJP.Beta() * ( 1.0 - 8.0 * GJP.C1() ) / 3.0
+
+    Float rect_coeff; // - GJP.Beta() * ( GJP.C1()/(GJP.u0()*GJP.u0()) ) / 3.0
+
+    static unsigned CBUF_MODE4;
+
+ public:
+
+    GtadpoleRect();
+
+    virtual ~GtadpoleRect();
+
+    GclassType Gclass();
+        // It returns the type of gauge class
+
+   void GactionGradient(Matrix &grad, int *x, int mu) ;
         // Calculates the partial derivative of the gauge action
         // w.r.t. the link U_mu(x).  Typical implementation has this
         // func called with Matrix &grad = *mp0, so avoid using it.
@@ -2991,6 +3050,18 @@ class GimprRectFdwf
     virtual ~GimprRectFdwf();
 };
 
+//------------------------------------------------------------------
+//! Improved rectangle gauge action with P4 staggered fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GimprRectFp4 : public GimprRect, public Fp4 {
+ private:
+  char *cname;    // Class name.
+ 
+ public:
+  GimprRectFp4();     
+  ~GimprRectFp4();
+};
 
 //------------------------------------------------------------------
 //! Power rectangle gauge action with no fermions
@@ -3260,6 +3331,34 @@ class GimprOLSymFp4 : public GimprOLSym, public Fp4{
   public:
     GimprOLSymFp4();
     ~GimprOLSymFp4();
+};
+
+//------------------------------------------------------------------
+//! Tadpole-improved rectangle gauge action with p4 staggered fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GtadpoleRectFp4 : public GtadpoleRect, public Fp4{
+    
+  private:
+    char *cname;    // Class name.
+
+  public:
+    GtadpoleRectFp4();
+    ~GtadpoleRectFp4();
+};
+
+//------------------------------------------------------------------
+//! Tadpole-improved rectangle gauge action with asqtad staggered fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GtadpoleRectFasqtad : public GtadpoleRect, public Fasqtad{
+    
+  private:
+    char *cname;    // Class name.
+
+  public:
+    GtadpoleRectFasqtad();
+    ~GtadpoleRectFasqtad();
 };
 CPS_END_NAMESPACE
 #endif

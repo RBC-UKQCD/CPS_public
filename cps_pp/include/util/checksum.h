@@ -1,4 +1,5 @@
 #include <config.h>
+#include <stdio.h>
 
 CPS_START_NAMESPACE
 
@@ -29,9 +30,7 @@ CPS_START_NAMESPACE
 
 #ifndef INCLUDED_CHECKSUM_H
 #define INCLUDED_CHECKSUM_H
-CPS_END_NAMESPACE
 
-CPS_START_NAMESPACE
 enum CsumType{
   CSUM_EVL_LAT,
   CSUM_EVL_MOM,
@@ -110,5 +109,5 @@ class CheckSum{
 extern CheckSum CSM;
 
 #endif
-
 CPS_END_NAMESPACE
+

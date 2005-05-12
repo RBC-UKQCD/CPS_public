@@ -9,7 +9,6 @@
 #include <util/vml/vml_config.h>
 #include <util/vml/types.h>
 
-CPS_START_NAMESPACE
 #ifdef AIX
 typedef unsigned long long u_quad_t;
 typedef long long quad_t;
@@ -225,5 +224,4 @@ extern void vml_class_end   (VML *vmls, char *type, char *instance);
 #ifdef __cplusplus 
 }
 #endif
-CPS_END_NAMESPACE
 #endif /* rpc/vml.h */
