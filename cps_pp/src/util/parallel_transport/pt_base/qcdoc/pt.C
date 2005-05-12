@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.22 2005-05-03 20:28:50 chulwoo Exp $
+  $Id: pt.C,v 1.23 2005-05-12 20:47:35 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-03 20:28:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.22 2005-05-03 20:28:50 chulwoo Exp $
-//  $Id: pt.C,v 1.22 2005-05-03 20:28:50 chulwoo Exp $
+//  $Date: 2005-05-12 20:47:35 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.23 2005-05-12 20:47:35 chulwoo Exp $
+//  $Id: pt.C,v 1.23 2005-05-12 20:47:35 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -159,11 +159,21 @@ int PT::lex_g_xyzt(int *x, int mu){
   return (temp*NDIM + mu);
 }
 
-//Returns index associated with gauge link in txyz ordering
+//---------------------------------------------------------------------------
+//Returns block ordering for the gauge fields, where all directions
+//are stored in one block and sites ordered txyz
 int PT::lex_g_txyz(int *x, int mu){
   int temp = mu*vol+x[3] + size[3]*(x[0]+size[0]*(x[1]+size[1]*x[2]));
   return temp;
 }
+
+//Returns block ordering for the gauge fields, where all directions
+//are stored in one block with sites checkerboarded txyz
+int PT::lex_g_txyz_cb(int *x, int mu){
+  int result = (x[3]+size[3]*(x[0]+size[0]*(x[1]+size[1]*x[2])))/2;
+  return mu*vol + result + ((x[0]+x[1]+x[2]+x[3])%2)*vol/2;
+}
+//---------------------------------------------------------------------------
 
 //Returns index associated with gauge link in the mu direction and 
 //coordinate x for checkerboarded storage
@@ -367,7 +377,7 @@ void PT::init(PTArg *pt_arg)
   switch(g_str_ord){
     case PT_XYZT:
       LexGauge = lex_g_xyzt;
-      LexGauge2 = lex_g_txyz;
+      LexGauge2 = lex_g_txyz_cb;
       break;
     case PT_XYZT_CB_O:
       LexGauge = lex_g_xyzt_cb_o;
@@ -1325,8 +1335,8 @@ parity, int pad, IFloat * new_gauge_field)
   vec_cb_pad(n,vout,vin,dir,parity,new_gauge_field);
 }
 
-//#undef PROFILE
 #define PROFILE
+#undef PROFILE
 void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
   //List of the different directions
@@ -1580,7 +1590,6 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 #define PROFILE2
 #undef PROFILE2
 
-#define PROFILE
 void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
   //List of the different directions

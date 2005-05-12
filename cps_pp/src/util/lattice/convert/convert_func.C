@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.9 2005-03-09 18:13:49 chulwoo Exp $
+  $Id: convert_func.C,v 1.10 2005-05-12 20:44:38 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-09 18:13:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.9 2005-03-09 18:13:49 chulwoo Exp $
-//  $Id: convert_func.C,v 1.9 2005-03-09 18:13:49 chulwoo Exp $
+//  $Date: 2005-05-12 20:44:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.10 2005-05-12 20:44:38 chulwoo Exp $
+//  $Id: convert_func.C,v 1.10 2005-05-12 20:44:38 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -261,7 +261,7 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 			      for(x[0]=0;x[0]<cap->lx;x[0]++)
 				for(x[3]=0;x[3]<cap->lt;x[3]++)
 				  {
-				    new_index = cap->vol*mu+x[3]+cap->lt*(x[0]+cap->lx*(x[1]+cap->ly*x[2]));
+ 				    new_index = cap->vol*mu+(x[3]+cap->lt*(x[0]+cap->lx*(x[1]+cap->ly*x[2])))/2 + ((x[3]+x[2]+x[1]+x[0])%2)*cap->vol/2;
 				    current = 4*(x[0]+cap->lx*(x[1]+cap->ly*(x[2]+cap->lz*x[3])))+mu;
 				    moveMem(tmp_gauge+new_index,cap->start_ptr+18*current,sizeof(Matrix));
 				  }

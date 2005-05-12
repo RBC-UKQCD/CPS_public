@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.6 2005-03-09 18:12:50 chulwoo Exp $
+  $Id: f_p4.C,v 1.7 2005-05-12 20:45:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -516,6 +516,8 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
           vaxpy3_m(P3mu[i],&c53,P5[i],P3mu[i],vol*3);
 		nflops +=vol*18*2*N;
       }
+      //Lepage term
+      if(fabs(c6) > 1e-11){
       for(i  = 0;i<N;i++){
         nu_p = Rotate(nu,i);
         min[i] = P3[i];
@@ -542,6 +544,7 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
       for(i  = 0;i<N;i++)
         vaxpy3_m(P3mu[i],&c63,P6[i],P3mu[i],vol*3);
 	  nflops +=vol*18*2*N;
+      }//end Lepage term
       for(i  = 0;i<N;i++){
         nu_p = Rotate(nu,i);
         int nu_n = (nu_p+4)%8;

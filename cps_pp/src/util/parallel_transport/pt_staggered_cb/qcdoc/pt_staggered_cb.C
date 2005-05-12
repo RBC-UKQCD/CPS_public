@@ -30,14 +30,14 @@ CPS_START_NAMESPACE
 
 //All the necessary initializations are performed in ParTransStagTypes
 //Conversion of storage order is also done by ParTransStagtypes
-static StrOrdType old_str_ord;
+static StrOrdType old_str_ord2;
 ParTransStaggered_cb::ParTransStaggered_cb(Lattice & latt) :
 			 ParTransStagTypes(latt)
 {
   cname = "ParTransStaggered_cb";
   char *fname = "ParTransStaggered_cb(L&,V*,V*,CgArg*,CnvFrmType)";
   VRB.Func(cname,fname);
-  old_str_ord = lat.StrOrd();
+  old_str_ord2 = lat.StrOrd();
   if (lat.StrOrd() != STAG_BLOCK){
     lat.Convert(STAG_BLOCK);
   }
@@ -55,8 +55,8 @@ ParTransStaggered_cb::ParTransStaggered_cb(Lattice & latt) :
 ParTransStaggered_cb::~ParTransStaggered_cb() {
   char *fname = "~ParTransStaggered_cb()";
   VRB.Func(cname,fname);
-  if ( old_str_ord !=STAG_BLOCK){
-    lat.Convert(old_str_ord);
+  if ( old_str_ord2 !=STAG_BLOCK){
+    lat.Convert(old_str_ord2);
   }
 }
 

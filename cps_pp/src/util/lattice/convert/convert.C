@@ -195,7 +195,7 @@ void Lattice::Convert(StrOrdType new_str_ord)
 			      for(x[0]=0;x[0]<cas.lx;x[0]++)
 				for(x[3]=0;x[3]<cas.lt;x[3]++)
 				  {
-				    current = cas.vol*mu+x[3]+cas.lt*(x[0]+cas.lx*(x[1]+cas.ly*x[2]));
+				    current = cas.vol*mu+(x[3]+cas.lt*(x[0]+cas.lx*(x[1]+cas.ly*x[2])))/2+((x[3]+x[2]+x[1]+x[0])%2)*cas.vol/2;
 				    new_index = 4*(x[0]+cas.lx*(x[1]+cas.ly*(x[2]+cas.lz*x[3])))+mu;
 				    moveMem(tmp_gauge+new_index,cas.start_ptr+18*current,sizeof(Matrix));
 				  }
