@@ -8,7 +8,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.10 2005-04-05 06:44:43 chulwoo Exp $
+  $Id: pt_int.h,v 1.11 2005-05-12 20:56:24 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 //#include <util/lattice.h>
@@ -236,6 +236,7 @@ int conjugated;
     static int lex_g_xyzt(int *x, int mu);
     static int lex_g_xyzt_cb_o(int *x, int mu);
     static int lex_g_txyz(int *x, int mu);
+    static int lex_g_txyz_cb(int * x, int mu);
     static int set_offset(int dir, int hop);
     void set_hop_pointer();
   public:
