@@ -4,19 +4,19 @@
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.5 2005-05-09 07:14:55 chulwoo Exp $
+  $Id: enum.x,v 1.6 2005-05-12 20:00:41 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2005-05-09 07:14:55 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.5 2005-05-09 07:14:55 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.5 2005-05-09 07:14:55 chulwoo Exp $*/
+/*  $Date: 2005-05-12 20:00:41 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.6 2005-05-12 20:00:41 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.6 2005-05-12 20:00:41 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.5 $*/
+/*  $Revision: 1.6 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -57,7 +57,8 @@ enum GclassType {
     G_CLASS_POWER_PLAQ,
     G_CLASS_IMPR_RECT,
     G_CLASS_POWER_RECT,
-    G_CLASS_IMPR_OLSYM
+    G_CLASS_IMPR_OLSYM,
+    G_CLASS_TADPOLE_RECT
 };
 
 
