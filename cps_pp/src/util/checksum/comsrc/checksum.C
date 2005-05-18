@@ -15,7 +15,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <util/checksum.h>
-#include <qcdocos/gint.h>
+//#include <qcdocos/gint.h>
 #include <stdio.h>
 #include <string.h> //strcpy
 #include <util/smalloc.h>
