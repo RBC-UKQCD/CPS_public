@@ -5,8 +5,9 @@ RPCGEN=${SRCDIR}/misc/vml_encode/rpcgenvml/rpcgenvml
 RHFLAGS=-h -C -x -u util/vml/ -v alg/
 RCFLAGS=-c -C -x -u util/vml/ -v alg/
 
-all: enum.x cg_arg.x do_arg.x w_spect_arg.x hmd_arg.x
-	$(MAKE) -C ${SRCDIR}/misc/vml_encode/ clean all
+all: vml.stmp 
+
+vml.stmp: enum.x cg_arg.x do_arg.x w_spect_arg.x hmd_arg.x pbp_arg.x eig_arg.x
 	- cp ${BUILDDIR}/config.h .
 	- cp ${BUILDDIR}/precision.h .
 	- cp ${SRCDIR}/include/input/*.x .
@@ -21,6 +22,11 @@ all: enum.x cg_arg.x do_arg.x w_spect_arg.x hmd_arg.x
 	${RPCGEN}  $(RCFLAGS)  w_spect_arg.x >${SRCDIR}/src/alg/alg_arg/w_spect_arg.C
 	${RPCGEN} $(RHFLAGS) hmd_arg.x >${SRCDIR}/include/alg/hmd_arg.h
 	${RPCGEN}  $(RCFLAGS)  hmd_arg.x >${SRCDIR}/src/alg/alg_arg/hmd_arg.C
+	${RPCGEN} $(RHFLAGS) pbp_arg.x >${SRCDIR}/include/alg/pbp_arg.h
+	${RPCGEN}  $(RCFLAGS)  pbp_arg.x >${SRCDIR}/src/alg/alg_arg/pbp_arg.C
+	${RPCGEN} $(RHFLAGS) eig_arg.x >${SRCDIR}/include/alg/eig_arg.h
+	${RPCGEN}  $(RCFLAGS)  eig_arg.x >${SRCDIR}/src/alg/alg_arg/eig_arg.C
+	touch vml.stmp
 
 clean: 
 

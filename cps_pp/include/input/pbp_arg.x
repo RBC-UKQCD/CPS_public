@@ -1,29 +1,17 @@
-#include<config.h>
-CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the PbpArg structure.
 
-  $Id: pbp_arg.x,v 1.2 2004-12-11 20:57:36 chulwoo Exp $
+  $Id: pbp_arg.x,v 1.3 2005-05-18 06:17:35 chulwoo Exp $
 */
 /*---------------------------------------------------------------------------*/
 
-#ifndef INCLUDED_PBP_ARG_H
-#define INCLUDED_PBP_ARG_H          /*!< Prevent multiple inclusion.*/
-
-
 /*! The maximum number of masses for which the condensate can be measured.*/
-#define MAX_PBP_MASSES  100     
+enum PBP_LIM { MAX_PBP_MASSES = 100     };
                                 /* Used when PatternType = ARRAY */
-
-/*! How to obtain the masses at which the condensate is measured.*/
-enum PatternType {ARRAY = 0,	/*!< Masses are defined in a list. */
-		  LIN   = 1,	/*!< Masses are elements of an arithmetic progression. */
-		  LOG   = 2	/*!< Masses are elements of a geometric progression. */
-};
 
 /*! A structure holding the parameters relevant to the condensate measurement.*/
 /*!  \ingroup algargs */
-struct PbpArg {
+class PbpArg {
 
   PatternType	pattern_kind;	/*!< Specifies the pattern used
                                 to obtain the mass values. For
@@ -101,6 +89,3 @@ struct PbpArg {
 			       */
 };
 
-#endif /* !INCLUDED_PBP_ARG_H */
-
-CPS_END_NAMESPACE

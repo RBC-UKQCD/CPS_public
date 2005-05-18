@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definitions of the bigfloat wrapper class.
 
-  $Id: bigfloat.h,v 1.3 2004-12-21 19:02:36 chulwoo Exp $
+  $Id: bigfloat.h,v 1.4 2005-05-18 06:17:13 chulwoo Exp $
 */
 //------------------------------------------------------------------
 #include<config.h>
@@ -205,7 +205,7 @@ public:
 
   /* Miscellaneous Functions */
 
-  friend bigfloat& random(void);
+//  friend bigfloat& random(void);
 };
 
 #endif

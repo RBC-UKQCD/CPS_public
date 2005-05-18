@@ -8,17 +8,18 @@
 #include <config.h>
 #include <util/vml/vml_config.h>
 #include <util/vml/types.h>
-
-#ifdef AIX
-typedef unsigned long long u_quad_t;
-typedef long long quad_t;
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 
+CPS_START_NAMESPACE
+
+
 #ifdef __cplusplus 
 extern "C" { 
+#endif
+#ifdef AIX
+typedef unsigned long long u_quad_t;
+typedef long long quad_t;
 #endif
 /*
  *
@@ -224,4 +225,5 @@ extern void vml_class_end   (VML *vmls, char *type, char *instance);
 #ifdef __cplusplus 
 }
 #endif
+CPS_END_NAMESPACE
 #endif /* rpc/vml.h */

@@ -1,29 +1,34 @@
-#include<config.h>
-CPS_START_NAMESPACE
 /*------------------------------------------------------------------*/
 /*!\file
   \brief  Definitions of the EigArg structure.
   
-  $Id: eig_arg.x,v 1.2 2004-12-11 20:57:32 chulwoo Exp $
+  $Id: eig_arg.x,v 1.3 2005-05-18 06:17:33 chulwoo Exp $
 */
 /*------------------------------------------------------------------*/
 
-#ifndef INCLUDED_EIG_ARG_H
-#define INCLUDED_EIG_ARG_H           /*!< Prevent multiple inclusion.*/
-
-CPS_END_NAMESPACE
-#include <util/vector.h>
-CPS_START_NAMESPACE
+//! The maximum number of masses for which the eigenvalue can be measured
+enum EIG_LIM { MAX_EIG_MASSES = 100 };
+                                /* Used when PatternType = ARRAY */
 
 /*! A structure holding the parameters relevant to the eigenvalue measurement.*/
 /*! \ingroup algargs */
 
-struct EigArg {
+class EigArg {
 
+    PatternType   pattern_kind;	/*!< Specifies the pattern used
+                                to obtain the mass values. For
+                                each mass value the eigenvalue is measured.*/
+ 
     Float Mass_init;	/*!< The initial mass to use  */
     Float Mass_final;	/*!< The final mass to use */
     Float Mass_step;      /*!< The step size in mass */
     
+    Float Mass[MAX_EIG_MASSES];   /*!< Relevant to the ::ARRAY pattern:
+				The array of mass values for which 
+                                the eigenvalue is measured. */
+  
+    int n_masses;
+
 
     int N_eig;		/*!< The number of eigenvectors/values to calculate */
     int Kalk_Sim;       /*!< Use the Kalkreuter-Simma algorithm. */
@@ -59,6 +64,4 @@ struct EigArg {
     
 };
 
-#endif /* !INCLUDED_EIG_ARG_H */
 
-CPS_END_NAMESPACE

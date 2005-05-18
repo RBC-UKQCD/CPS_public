@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.26 2005-03-07 00:46:09 chulwoo Exp $
+# $Id: Makefile.in,v 1.27 2005-05-18 06:16:36 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -16,7 +16,7 @@ else
 builddir_isnt_srcdir=
 endif
 
-all: recurse copy_testdir
+all: rpcgenvml vml recurse copy_testdir
 
 cps: recurse
 
@@ -38,8 +38,11 @@ vml:
 	-cp $(BUILDDIR)/include/input/Makefile ${SRCDIR}/include/input
 	$(MAKE) -C $(SRCDIR)/include/input
 
+rpcgenvml:
+	$(MAKE) -C $(SRCDIR)/misc/vml_encode/rpcgenvml all
+
 cleanlib: 
-	rm -f *.a
+	rm -f (BUILDDLIR)/*.a
 
 copy_makefile:
 	-cp $(BUILDDIR)/Makefile $(BUILDDIR)/Makefile.rules ${SRCDIR}

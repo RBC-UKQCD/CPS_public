@@ -37,6 +37,9 @@
 #include<alg/alg_plaq.h>
 #include<alg/alg_remez.h>
 
+#include<alg/alg_eig.h>
+#include<alg/eig_arg.h>
+
 #include<util/gjp.h>
 #include<util/verbose.h>
 #include<util/error.h>
@@ -45,7 +48,10 @@
 #include<util/ReadLatticePar.h>
 #include<util/qioarg.h>
 
-//#include <qcdocos/scu_checksum.h>
+#undef USE_SCU_CHECKSUMS
+#ifdef USE_SCU_CHECKSUMS
+#include <qcdocos/scu_checksum.h>
+#endif
 //--------------------------------------------------------------
 
 USING_NAMESPACE_CPS
@@ -68,15 +74,16 @@ int main(int argc, char *argv[])
   CommonArg common_arg_plaq;
 
   EvoArg evo_arg;
+  EigArg eig_arg;
   DoArg do_arg;
   NoArg no_arg;
 
-  if ( argc!=5 ) { 
-    printf("Args: doarg-file hmdarg-file evoarg-file initial-directory\n");
+  if ( argc!=6 ) { 
+    printf("Args: doarg-file hmdarg-file evoarg-file eigarg_file initial-directory\n");
     exit(-1);
   }
 
-  chdir (argv[4]);
+  chdir (argv[5]);
 
   if ( !do_arg.Decode(argv[1],"do_arg") ) { printf("Bum do_arg\n"); exit(-1);}
 
@@ -100,14 +107,17 @@ int main(int argc, char *argv[])
 
   if ( !hmd_arg.Decode(argv[2],"hmd_arg")){printf("Bum hmd_arg\n"); exit(-1);}
   if ( !evo_arg.Decode(argv[3],"evo_arg")){printf("Bum evo_arg\n"); exit(-1);}
+  if ( !eig_arg.Decode(argv[4],"eig_arg")){printf("Bum eig_arg\n"); exit(-1);}
 
   chdir(evo_arg.work_directory);
 
- // ScuChecksum::Initialise();
+#ifdef USE_SCU_CHECKSUMS
+  ScuChecksum::Initialise(evo_arg.hdw_xcsum,evo_arg.hdw_rcsum);
+#endif
 
-//  do_arg.verbose_level=VERBOSE_RESULT_LEVEL;
+  // do_arg.verbose_level=VERBOSE_RESULT_LEVEL;
   GJP.Initialize(do_arg);
-//  VRB.Level(VERBOSE_RESULT_LEVEL);
+  // VRB.Level(VERBOSE_RESULT_LEVEL);
   LRG.Initialize();
 
   /************************************************
@@ -133,6 +143,7 @@ int main(int argc, char *argv[])
     Fclose(truncate_it);
     common_arg_plaq.set_filename(plaq_file);
 
+
     sprintf(hmd_file,"%s.%d",evo_arg.evo_stem,traj);
     common_arg_hmdr.set_filename(hmd_file);
 
@@ -145,17 +156,61 @@ int main(int argc, char *argv[])
 	AlgPlaq plaq(lat,&common_arg_plaq,&no_arg);
 	plaq.run();
 
-	printf("Running rhmc\n");
+	if ( (traj % 100 ) < evo_arg.reproduce_percent ) { 
+	  printf("Running traj %d with reproduction\n",traj);
+	  hmd_arg_pass.reproduce = 1;
+	} else { 
+	  printf("Running traj %d without reproduction\n",traj);
+	  hmd_arg_pass.reproduce = 0;
+	}
 	AlgHmcRHMC rhmc(lat,&common_arg_hmdr,&hmd_arg_pass);
 	rhmc.run();
-
-//        if ( ! ScuChecksum::CsumSwap() ) { 
-//	  fprintf(stderr, "Checksum mismatch\n");
-//	  exit(-1);
-//	}
+#ifdef USE_SCU_CHECKSUMS
+        if ( ! ScuChecksum::CsumSwap() ) { 
+	  fprintf(stderr, "Checksum mismatch\n");
+	  exit(-1);
+	}
+#endif
 
       }
     }/*End of inter-cfg sweep*/
+
+    // Measure the lowest eigenvalue
+    printf("Checking eigen-spectrum\n");
+    {
+      CommonArg ca_eig;
+      char eig_file[256];
+
+      sprintf(eig_file,"%s.%d",evo_arg.eig_lo_stem,traj);
+
+      FILE * truncate_it = Fopen(eig_file,"w");
+      Fclose(truncate_it);
+
+      ca_eig.set_filename(eig_file);
+      eig_arg.RitzMatOper = MATPCDAG_MATPC;
+
+      AlgEig eig(lat,&ca_eig,&eig_arg);
+      eig.run();
+
+    }
+      
+    // Measure the highest eigenvalue
+    {
+      CommonArg ca_eig;
+      char eig_file[256];
+
+      sprintf(eig_file,"%s.%d",evo_arg.eig_hi_stem,traj);
+
+      FILE * truncate_it = Fopen(eig_file,"w");
+      Fclose(truncate_it);
+
+      ca_eig.set_filename(eig_file);
+      eig_arg.RitzMatOper = NEG_MATPCDAG_MATPC;
+
+      AlgEig eig(lat,&ca_eig,&eig_arg);
+      eig.run();
+
+    }
 
     checkpoint(lat, do_arg, hmd_arg, evo_arg, traj);
 

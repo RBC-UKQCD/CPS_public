@@ -114,6 +114,9 @@ public:
 	int gauge_unload_period;
 	int gauge_configurations;
 	int io_concurrency;
+	int hdw_xcsum;
+	int hdw_rcsum;
+	int reproduce_percent;
 	char *ensemble_id;
 	char *ensemble_label;
 	char *creator;
@@ -122,6 +125,8 @@ public:
 	char *plaquette_stem;
 	char *evo_stem;
 	char *work_directory;
+	char *eig_lo_stem;
+	char *eig_hi_stem;
 };
 
 class VML;
@@ -182,10 +187,10 @@ extern  bool_t vml_EvoArg (VML *, char *instance, EvoArg*);
 extern  bool_t vml_RhmcPolesState (VML *, char *instance, RhmcPolesState*);
 
 #endif /* K&R C */
-CPS_END_NAMESPACE
 
 #ifdef __cplusplus
 }
 #endif
+CPS_END_NAMESPACE
 
 #endif /* !_HMD_ARG_H_RPCGEN */

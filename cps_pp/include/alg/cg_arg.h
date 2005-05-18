@@ -40,10 +40,10 @@ extern  bool_t vml_CgArg (VML *, char *instance, CgArg*);
 extern  bool_t vml_CgArg (VML *, char *instance, CgArg*);
 
 #endif /* K&R C */
-CPS_END_NAMESPACE
 
 #ifdef __cplusplus
 }
 #endif
+CPS_END_NAMESPACE
 
 #endif /* !_CG_ARG_H_RPCGEN */

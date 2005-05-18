@@ -97,10 +97,10 @@ extern  bool_t vml_DoArg (VML *, char *instance, DoArg*);
 extern  bool_t vml_DoArg (VML *, char *instance, DoArg*);
 
 #endif /* K&R C */
-CPS_END_NAMESPACE
 
 #ifdef __cplusplus
 }
 #endif
+CPS_END_NAMESPACE
 
 #endif /* !_DO_ARG_H_RPCGEN */

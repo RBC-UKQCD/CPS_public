@@ -32,7 +32,7 @@
  * From @(#)rpc_main.c 1.30 89/03/30 (C) 1987 SMI;
  */
 const char main_rcsid[] =
-  "$Id: rpc_main.c,v 1.5 2005-05-09 07:16:03 chulwoo Exp $";
+  "$Id: rpc_main.c,v 1.6 2005-05-18 06:19:46 chulwoo Exp $";
 
 /*
  * rpc_main.c, Top level of the RPC protocol compiler.
@@ -637,6 +637,7 @@ h_output (const char *infile, const char *define, int extend,
     {
       print_funcdef (l->val);
     }
+
   /* Now  print all xdr func declarations */
   if (xdrfunc_head != NULL)
     {
@@ -689,18 +690,18 @@ h_output (const char *infile, const char *define, int extend,
       fprintf (fout, rpcgen_table_dcl);
     }
 
-  if ( VMLoutput ) {
-    if (in_CPS) {
-      fprintf (fout, "CPS_END_NAMESPACE\n");
-    }
-  }
-
   if (Cflag)
     {
       fprintf (fout, "\n#ifdef __cplusplus\n");
       fprintf (fout, "}\n");
       fprintf (fout, "#endif\n");
     }
+
+  if ( VMLoutput ) {
+    if (in_CPS) {
+      fprintf (fout, "CPS_END_NAMESPACE\n");
+    }
+  }
 
   fprintf (fout, "\n#endif /* !_%s */\n", guard);
   close_input ();

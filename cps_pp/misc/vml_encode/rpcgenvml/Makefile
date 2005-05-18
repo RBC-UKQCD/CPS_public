@@ -12,6 +12,10 @@ CPPOBJ=$(CPPSRC:.C=.o)
 .C.o: $(CPPSRC)
 	$(CXX) $(CFLAGS) -c $< -o $@
 
+$(COBJ): $(CSRC) 
+
+$(CPPOBJ): $(CPPSRC)
+
 all: rpcgenvml
 
 rpcgenvml: $(COBJ)

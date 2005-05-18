@@ -4,19 +4,19 @@
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.6 2005-05-12 20:00:41 chulwoo Exp $
+  $Id: enum.x,v 1.7 2005-05-18 06:17:33 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2005-05-12 20:00:41 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.6 2005-05-12 20:00:41 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.6 2005-05-12 20:00:41 chulwoo Exp $*/
+/*  $Date: 2005-05-18 06:17:33 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.7 2005-05-18 06:17:33 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.7 2005-05-18 06:17:33 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.6 $*/
+/*  $Revision: 1.7 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -680,5 +680,10 @@ enum FieldTensorId{
   
 };
   
-
+/*! How to obtain the masses at which the observable is measured.*/
+enum PatternType {
+  LIN=0,	/*!< Masses are elements of an arithmetic progression. */
+  ARRAY,	/*!< Masses are defined in a list. */
+  LOG	/*!< Masses are elements of a geometric progression. */
+};
 

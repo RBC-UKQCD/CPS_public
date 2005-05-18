@@ -189,6 +189,9 @@ class EvoArg {
   int gauge_unload_period;
   int gauge_configurations;
   int io_concurrency;
+  int hdw_xcsum;
+  int hdw_rcsum;
+  int reproduce_percent;
   string ensemble_id<>;
   string ensemble_label<>;
   string creator<>;
@@ -197,6 +200,8 @@ class EvoArg {
   string plaquette_stem<>;
   string evo_stem<>;
   string work_directory<>;
+  string eig_lo_stem<>;
+  string eig_hi_stem<>;
 };
 
 class RhmcPolesState {

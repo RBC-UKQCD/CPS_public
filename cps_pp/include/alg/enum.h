@@ -538,6 +538,14 @@ enum FieldTensorId {
 typedef enum FieldTensorId FieldTensorId;
 extern struct vml_enum_map FieldTensorId_map[];
 
+enum PatternType {
+	LIN = 0,
+	ARRAY = 0 + 1,
+	LOG = 0 + 2,
+};
+typedef enum PatternType PatternType;
+extern struct vml_enum_map PatternType_map[];
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -580,6 +588,7 @@ extern  bool_t vml_WExtMesonBEState (VML *, char *instance, WExtMesonBEState*);
 extern  bool_t vml_WExtMesonBEOp (VML *, char *instance, WExtMesonBEOp*);
 extern  bool_t vml_WExtMesonBECategory (VML *, char *instance, WExtMesonBECategory*);
 extern  bool_t vml_FieldTensorId (VML *, char *instance, FieldTensorId*);
+extern  bool_t vml_PatternType (VML *, char *instance, PatternType*);
 
 #else /* K&R C */
 extern  bool_t vml_Float (VML *, char *instance, Float*);
@@ -617,12 +626,13 @@ extern  bool_t vml_WExtMesonBEState (VML *, char *instance, WExtMesonBEState*);
 extern  bool_t vml_WExtMesonBEOp (VML *, char *instance, WExtMesonBEOp*);
 extern  bool_t vml_WExtMesonBECategory (VML *, char *instance, WExtMesonBECategory*);
 extern  bool_t vml_FieldTensorId (VML *, char *instance, FieldTensorId*);
+extern  bool_t vml_PatternType (VML *, char *instance, PatternType*);
 
 #endif /* K&R C */
-CPS_END_NAMESPACE
 
 #ifdef __cplusplus
 }
 #endif
+CPS_END_NAMESPACE
 
 #endif /* !_ENUM_H_RPCGEN */

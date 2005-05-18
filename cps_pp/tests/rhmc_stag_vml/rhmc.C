@@ -1,5 +1,6 @@
+
 /***********************************************************
- * PAB: simplified main programme for Stag RHMC algorithm
+ * PAB: simplified main programme for DWF RHMC algorithm
  *      using VML for parameter loading
  *  Arguments
  *     DoArg ParameterFile in absolute node-path
@@ -44,13 +45,17 @@
 #include<util/ReadLatticePar.h>
 #include<util/qioarg.h>
 
-//#include <qcdocos/scu_checksum.h>
+#undef USE_SCU_CHECKSUMS
+#ifdef USE_SCU_CHECKSUMS
+#include <qcdocos/scu_checksum.h>
+#endif
 //--------------------------------------------------------------
 
 USING_NAMESPACE_CPS
 using namespace std;
 
 HmdArg hmd_arg;
+HmdArg hmd_arg_pass;
 
 void checkpoint(GimprRectFasqtad &lat, DoArg &do_arg, HmdArg &hmd_arg,EvoArg &evo_arg, int traj);
 
@@ -69,7 +74,12 @@ int main(int argc, char *argv[])
   DoArg do_arg;
   NoArg no_arg;
 
-  bzero((char *)&hmd_arg,sizeof(hmd_arg));  
+  if ( argc!=5 ) { 
+    printf("Args: doarg-file hmdarg-file evoarg-file initial-directory\n");
+    exit(-1);
+  }
+
+  chdir (argv[4]);
 
   if ( !do_arg.Decode(argv[1],"do_arg") ) { printf("Bum do_arg\n"); exit(-1);}
 
@@ -96,11 +106,13 @@ int main(int argc, char *argv[])
 
   chdir(evo_arg.work_directory);
 
-//  ScuChecksum::Initialise();
+#ifdef USE_SCU_CHECKSUMS
+  ScuChecksum::Initialise(evo_arg.hdw_xcsum,evo_arg.hdw_rcsum);
+#endif
 
-  do_arg.verbose_level=VERBOSE_RESULT_LEVEL;
+  // do_arg.verbose_level=VERBOSE_RESULT_LEVEL;
   GJP.Initialize(do_arg);
-  VRB.Level(VERBOSE_RESULT_LEVEL);
+  // VRB.Level(VERBOSE_RESULT_LEVEL);
   LRG.Initialize();
 
   /************************************************
@@ -116,6 +128,7 @@ int main(int argc, char *argv[])
     checkpoint(lat, do_arg, hmd_arg, evo_arg, traj);
   }
 
+  hmd_arg_pass = hmd_arg;
   for(int conf=0; conf< evo_arg.gauge_configurations; conf ++ ) {
 
     GimprRectFasqtad lat;
@@ -137,14 +150,21 @@ int main(int argc, char *argv[])
 	AlgPlaq plaq(lat,&common_arg_plaq,&no_arg);
 	plaq.run();
 
-	printf("Running rhmc\n");
-	AlgHmcRHMC rhmc(lat,&common_arg_hmdr,&hmd_arg);
+	if ( (traj % 100 ) < evo_arg.reproduce_percent ) { 
+	  printf("Running traj %d with reproduction\n",traj);
+	  hmd_arg_pass.reproduce = 1;
+	} else { 
+	  printf("Running traj %d without reproduction\n",traj);
+	  hmd_arg_pass.reproduce = 0;
+	}
+	AlgHmcRHMC rhmc(lat,&common_arg_hmdr,&hmd_arg_pass);
 	rhmc.run();
-
-//        if ( ! ScuChecksum::CsumSwap() ) { 
-//	  fprintf(stderr, "Checksum mismatch\n");
-//	  exit(-1);
-//	}
+#ifdef USE_SCU_CHECKSUMS
+        if ( ! ScuChecksum::CsumSwap() ) { 
+	  fprintf(stderr, "Checksum mismatch\n");
+	  exit(-1);
+	}
+#endif
 
       }
     }/*End of inter-cfg sweep*/

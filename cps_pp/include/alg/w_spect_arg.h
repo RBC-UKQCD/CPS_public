@@ -113,10 +113,10 @@ extern  bool_t vml_WspectOutput (VML *, char *instance, WspectOutput*);
 extern  bool_t vml_WspectArg (VML *, char *instance, WspectArg*);
 
 #endif /* K&R C */
-CPS_END_NAMESPACE
 
 #ifdef __cplusplus
 }
 #endif
+CPS_END_NAMESPACE
 
 #endif /* !_W_SPECT_ARG_H_RPCGEN */
