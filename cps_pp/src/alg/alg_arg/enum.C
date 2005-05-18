@@ -777,4 +777,19 @@ struct vml_enum_map FieldTensorId_map[] = {
 	{"FieldTensorId","SUM_MAGN_ELEC",SUM_MAGN_ELEC},
 	{"FieldTensorId","NUM_FLD_OPS",NUM_FLD_OPS}
 };
+
+bool_t
+vml_PatternType (VML *vmls, char *name,PatternType *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,PatternType_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map PatternType_map[] = {
+	{"PatternType","LIN",LIN},
+	{"PatternType","ARRAY",ARRAY},
+	{"PatternType","LOG",LOG}
+};
 CPS_END_NAMESPACE

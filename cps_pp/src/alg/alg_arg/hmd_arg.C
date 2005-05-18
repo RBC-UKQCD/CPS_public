@@ -257,6 +257,12 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "io_concurrency", &objp->io_concurrency))
 		 return FALSE;
+	 if (!vml_int (vmls, "hdw_xcsum", &objp->hdw_xcsum))
+		 return FALSE;
+	 if (!vml_int (vmls, "hdw_rcsum", &objp->hdw_rcsum))
+		 return FALSE;
+	 if (!vml_int (vmls, "reproduce_percent", &objp->reproduce_percent))
+		 return FALSE;
 	 if (!vml_string (vmls, "ensemble_id", &objp->ensemble_id, ~0))
 		 return FALSE;
 	 if (!vml_string (vmls, "ensemble_label", &objp->ensemble_label, ~0))
@@ -272,6 +278,10 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 	 if (!vml_string (vmls, "evo_stem", &objp->evo_stem, ~0))
 		 return FALSE;
 	 if (!vml_string (vmls, "work_directory", &objp->work_directory, ~0))
+		 return FALSE;
+	 if (!vml_string (vmls, "eig_lo_stem", &objp->eig_lo_stem, ~0))
+		 return FALSE;
+	 if (!vml_string (vmls, "eig_hi_stem", &objp->eig_hi_stem, ~0))
 		 return FALSE;
 	 vml_class_end(vmls,"EvoArg",name);
 	return TRUE;
