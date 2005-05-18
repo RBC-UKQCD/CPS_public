@@ -182,8 +182,6 @@ lab1:
 	stfs	   10,	16(%r14)
 	lfs	   15,	100(%r4)
 	stfs	   11,	20(%r14)
-	stfs	   30,	24(%r14)
-	stfs	   30,	28(%r14)
 	fmuls	 6, 12,  0
 	dcbt	 %r19,	 %r29
 	fmuls	 7, 12,  1
@@ -285,8 +283,6 @@ lab1:
 
 	stfs	   11,	20(%r13)
 	addi %r4, %r4, 160 
-	stfs	   30,	24(%r13)
-	stfs	   30,	28(%r13)
 	bf gt,	lab2
 	b  lab1
 lab2:
@@ -384,8 +380,6 @@ lab2:
 	stfs	   10,	16(%r14)
 	lfs	   15,	100(%r4)
 	stfs	   11,	20(%r14)
-	stfs	   30,	24(%r14)
-	stfs	   30,	28(%r14)
 	fmuls	 6, 12,  0
 
 	fmuls	 7, 12,  1
@@ -488,8 +482,6 @@ lab2:
 	stfs	   10,	16(%r13)
 	addi %r4, %r4, 160 
 	stfs	   11,	20(%r13)
-	stfs	   30,	24(%r13)
-	stfs	   30,	28(%r13)
 lab0:
 	lwz	%r14,	368(%r1)
 	lwz	%r15,	376(%r1)

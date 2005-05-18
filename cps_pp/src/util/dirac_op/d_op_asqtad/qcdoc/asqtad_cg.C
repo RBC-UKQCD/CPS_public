@@ -13,13 +13,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-04-05 06:44:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.4 2005-04-05 06:44:45 chulwoo Exp $
-//  $Id: asqtad_cg.C,v 1.4 2005-04-05 06:44:45 chulwoo Exp $
+//  $Date: 2005-05-18 20:18:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.5 2005-05-18 20:18:09 chulwoo Exp $
+//  $Id: asqtad_cg.C,v 1.5 2005-05-18 20:18:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_cg.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v $
 //  $State: Exp $
 //
@@ -49,14 +49,14 @@ void report_flops(int flops, struct timeval *start,struct timeval *end);
 #ifdef ASQD_SINGLE
 extern "C"   void asq_vaxmy_cpp(Float *scale,vector *mult,vector *sub,int ncvec);
 #define asq_vaxmy(A,B,C,D) asq_vaxmy_cpp(A,B,C,D)
-extern "C"   void asq_vaxmy_vxdot_cpp(Float *scale, vector *mult, vector *sub, 
+extern "C"   void asq_vaxmy_vxdot_s(Float *scale, vector *mult, vector *sub, 
                int ncvec, Float *norm);
-#define asq_vaxmy_vxdot(A,B,C,D,E) asq_vaxmy_vxdot_cpp(A,B,C,D,E)
-extern "C"   void asq_vaxpy3_cpp(Float *res,Float *scale,Float *mult,Float *add, int ncvec);
-#define asq_vaxpy3(A,B,C,D,E) asq_vaxpy3_cpp(A,B,C,D,E)
-extern "C"   void asq_vaxpy3_norm_cpp(Float *res,Float *scale,Float *mult,
+#define asq_vaxmy_vxdot(A,B,C,D,E) asq_vaxmy_vxdot_s(A,B,C,D,E)
+extern "C"   void asq_vaxpy3_s(Float *res,Float *scale,Float *mult,Float *add, int ncvec);
+#define asq_vaxpy3(A,B,C,D,E) asq_vaxpy3_s(A,B,C,D,E)
+extern "C"   void asq_vaxpy3_norm_s(Float *res,Float *scale,Float *mult,
                Float *add, int ncvec,Float *norm);
-#define asq_vaxpy3_norm(A,B,C,D,E,F) asq_vaxpy3_norm_cpp(A,B,C,D,E,F)
+#define asq_vaxpy3_norm(A,B,C,D,E,F) asq_vaxpy3_norm_s(A,B,C,D,E,F)
 #else
 extern "C"   void asq_vaxmy(Float *scale,vector *mult,vector *sub,int ncvec);
 extern "C"   void asq_vaxmy_vxdot(Float *scale, vector *mult, vector *sub, 
@@ -67,7 +67,7 @@ extern "C"   void asq_vaxpy3_norm(Float *res,Float *scale,Float *mult,
                Float *add, int ncvec,Float *norm);
 #endif
 
-Float asq_print_flops(char *cname, char *fname, int nflops, struct timeval *start, struct timeval
+Float asq_print_flops(char *cname, char *fname, unsigned long long nflops, struct timeval *start, struct timeval
 *end){
         int sec = end->tv_sec - start->tv_sec;
         int usec = end->tv_usec - start->tv_usec;
@@ -81,11 +81,11 @@ Float asq_print_flops(char *cname, char *fname, int nflops, struct timeval *star
 // The granularity used in the interleaving
 #define GRAN 12
 
+#undef PROFILE
 void AsqD::Dslash(Float *out, Float *in ){
- long nflops = 1146*vol;
+ unsigned long long nflops = 1146*vol;
  static int called=0;
   printf("f_size_cb=%d\n",f_size_cb);
-#undef PROFILE
 #ifdef PROFILE
   struct timeval start,end;
   gettimeofday(&start,NULL);
@@ -99,39 +99,45 @@ void AsqD::Dslash(Float *out, Float *in ){
 #endif
 }
 
+#undef PROFILE
 void AsqD::MdagM(Float *mass_sq, Float *out, Float *in, 
  Float *dot_prd){
- long nflops = 1146*vol;
+ unsigned long long nflops = 1146*vol;
  static int called=0;
  if (!called){
 // printf("mass_sq=%e\n",mass_sq);
   called=1;
  }
-#undef PROFILE
+ int odd = node_odd;
 #ifdef PROFILE
+  printf("in=%p frm_tmp=%p out=%p\n",in,frm_tmp,out);
   struct timeval start,end;
   gettimeofday(&start,NULL);
 #endif
-  dirac((Float *)frm_tmp, (Float *)in, node_odd, 0);
-  dirac((Float *)out, (Float *)frm_tmp, 1-node_odd, 0);
-//  CGflops += nflops;
+  dirac((Float *)frm_tmp, (Float *)in, odd, 0);
+  dirac((Float *)out, (Float *)frm_tmp, 1-odd, 0);
+
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  asq_print_flops(cname,"MdagM",nflops,&start,&end);
+  gettimeofday(&start,NULL);
+#endif
 
 
   if( dot_prd !=0 ){
 	asq_vaxmy_vxdot(mass_sq,in,out,f_size_cb/6,dot_prd);
 //    CGflOps +=f_size_cb*4;
-    nflops +=f_size_cb*4;
+    nflops =f_size_cb*4;
   } else {
 //    CGflops +=f_size_cb*2;
-    nflops +=f_size_cb*2;
+    nflops =f_size_cb*2;
     asq_vaxmy(mass_sq,in,out,f_size_cb/6);
   }
-
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  printf("DiracOpAsqtad::MatPcDagMatPc:: ");
   asq_print_flops(cname,"MdagM",nflops,&start,&end);
 #endif
+
 }
 
 //------------------------------------------------------------------
@@ -286,9 +292,9 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
   struct timeval start;
   struct timeval end;
 
-    int CGflops    = 0;
-    int nflops = 0;
-    int nflops_tmp;
+    unsigned long long CGflops    = 0;
+    unsigned long long nflops = 0;
+    unsigned long long nflops_tmp;
     gettimeofday(&start,NULL);
 
 #endif

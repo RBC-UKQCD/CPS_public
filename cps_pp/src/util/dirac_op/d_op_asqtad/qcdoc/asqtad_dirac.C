@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-09 15:14:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.22 2005-05-09 15:14:31 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.22 2005-05-09 15:14:31 chulwoo Exp $
+//  $Date: 2005-05-18 20:18:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.23 2005-05-18 20:18:09 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.23 2005-05-18 20:18:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -22,12 +22,16 @@
 //-------------------------------------------------------------------
 
 #include <string.h>
+#include <sys/time.h>
 #include <util/asqtad_int.h>
 #include <util/asqtad_int.h>
 #include <qcdocos/scu_mmap.h>
 #include <ppc_lib.h>
 #include <qcdoc.h>
 #include <math.h>
+
+Float asq_print_flops(char *cname, char *fname, unsigned long long nflops, struct
+timeval *start, struct timeval *end);
 
 void matrix::Dagger(const Float* a)
 {
@@ -43,6 +47,7 @@ void matrix::Dagger(const Float* a)
 }
 
 
+#if 0
 const char *uc_l_filename = "uc_l.h";
 const char *uc_nl_filename = "uc_nl.h";
 const char *Toffset_filename = "Toffset.h";
@@ -50,6 +55,7 @@ const char *uc_l_agg_filename = "uc_l_agg.h";
 const char *uc_nl_agg_filename = "uc_nl_agg.h";
 const char *chi_l_filename = "chi_l.h";
 const char *chi_nl_filename = "chi_nl.h";
+#endif
 
 /*****************************************************************
  SIMUL switched on/off the hack CJ put in to help speed up the
@@ -64,6 +70,8 @@ CPP is a switch for using C++ routine for dirac_cmv.
 
 void asqd_sum_acc_cpp(int s, long chi, long tmpfrm, long b);
 
+#define NEW_SPLIT
+
 #undef CPP
 #ifdef CPP
 void dirac_sum2_64_cpp( int sites, long chi, long tmpfrm,long b);
@@ -73,13 +81,18 @@ void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long a, long tmpfrm);
 #else
 #ifdef ASQD_SINGLE
 extern "C" void asq_cmv_s( int sites, long u,long a, long tmpfrm);
+extern "C" void asq_cmv_4_s( int sites, long chi,long u,long a, long tmpfrm);
+#define asq_cmv_4(A,B,C,D) asq_cmv_4_s(A,0,B,C,D)
 #define asq_cmv(A,B,C,D) asq_cmv_s(A,B,C,D)
 extern "C" void asq_dsum_s( int sites, long tmpfrm,long b);
 #define asq_dsum(A,B,C) asq_dsum_s(A,B,C)
 extern "C" void copy_buffer_s(int n, long src, long dest, long ptable);
 #define copy_buffer(A,B,C,D) copy_buffer_s(A,B,C,D)
 #else
+extern "C" void  dirac_cmv_jcw_agg( int sites, long chi, long u,long a, long tmpfrm);
+extern "C" void  dirac_cmv_agg_4( int sites, long chi, long u,long a, long tmpfrm);
 extern "C" void asq_cmv( int sites, long u,long a, long tmpfrm);
+#define asq_cmv_4(A,B,C,D) dirac_cmv_agg_4(A,0,B,C,D)
 extern "C" void asq_dsum( int sites, long tmpfrm,long b);
 extern "C" void copy_buffer(int n, long src, long dest, long ptable);
 #endif
@@ -220,11 +233,11 @@ void AsqD::init(AsqDArg *arg)
 
   vol = size[0] * size[1] * size[2] * size[3];
   f_size_cb = vol*3;
-  split =  (  vol>64 ? 0 : 1 ); 
+//  split =  (  vol>64 ? 0 : 1 ); 
   split = 1;
-//  if (vol >64 || (size[0]%2) || (size[1]%2) || (size[2]%2) || (size[3]%2) )
+  if (vol >1000 || (size[0]%2) || (size[1]%2) || (size[2]%2) || (size[3]%2) )
   split = 0;
-//  printf("vol=%d split=%d\n",vol,split);
+  printf("vol=%d split=%d\n",vol,split);
 
 
   int area[2][4];
@@ -293,7 +306,10 @@ void AsqD::init(AsqDArg *arg)
   local_chi_3[i] = NUM_DIR*chk_vol[i] - (non_local_chi_3[i][3]);
   }
   
-  isplit = (non_local_chi_3[0][1]+non_local_chi[0]);
+  isplit  = (non_local_chi_3[0][1]+non_local_chi[0]);
+  if(isplit %2){
+    printf("isplit=%d\n",isplit);exit(-4);
+  }
 
 #if 0
   for(int i =0;i<2;i++)
@@ -319,7 +335,7 @@ void AsqD::init(AsqDArg *arg)
   //-----------------------------------------------------------------
   //  Allocate 8 receive buffers for off-node vectors
   //-----------------------------------------------------------------
-  if(vol>1024) chi_off_node_total=NULL;
+  if(vol>4096) chi_off_node_total=NULL;
     else
     chi_off_node_total = ( Float * ) qalloc(QFAST|QCOMMS,
       3*PAD(non_local_chi[0])* VECT_LEN * sizeof( Float )  );
@@ -381,12 +397,14 @@ void AsqD::init(AsqDArg *arg)
 
   for ( int k = 0; k < 3; k++ ) {
   for ( i = 0; i < 2; i++ ) {
-  if(vol>1024) Tbuffer[k][i]=NULL;
-    else
+//  if(vol>1024) Tbuffer[k][i]=NULL;
+//    else
     Tbuffer[k][i] = (Float *) qalloc (QFAST|QNONCACHE, PAD4(area[0][0])* VECT_LEN * sizeof( Float ) );
 
-  if( Tbuffer[k][i] == NULL)
+  if( Tbuffer[k][i] == NULL){
     Tbuffer[k][i] = (Float *) qalloc (QCOMMS, PAD4(area[0][0])* VECT_LEN * sizeof( Float ) );
+    printf("Tbuffer[%d][%d] is allocated at DDR (%p)\n",k,i,Tbuffer[k][i]);
+  }
 
    if(Tbuffer[k][i] == NULL)
 	PointerErr(cname,fname, "Tbuffer[i][j]");
@@ -1104,11 +1122,11 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
 
 #if 1
   tmpfrm = NULL;
-  if (vol<=4096)
+//  if (vol<1296)
   tmpfrm = (Float *) qalloc (QFAST|QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(Float));
   if(tmpfrm == NULL){ 
     tmpfrm = (Float *) qalloc (QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(Float));
-    printf("tmpfrm is allocated at (%p),length 0x%x \n",tmpfrm,NUM_DIR*vol*VECT_LEN2*sizeof(Float));
+    printf("tmpfrm is allocated at DDR(%p),length 0x%x \n",tmpfrm,NUM_DIR*vol*VECT_LEN2*sizeof(Float));
   }
   if(tmpfrm == 0) 
     PointerErr(cname,fname, "tmpfrm");
@@ -1178,6 +1196,7 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
     }
     int index = 0;
     int div = 4;
+#ifndef NEW_SPLIT
     for( n = 0; n*div<NUM_DIR*2;n++)
     for(i=0;i<vol/2;i++){
       for(m=0;m<div;m++){
@@ -1189,11 +1208,41 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
            index++;
         }
       }
-      if (n==0) odd_num +=num_ind[i]%div;
+//      if (n==0) odd_num +=num_ind[i]%div;
     }
+#else
+    for( n = 0; n*div<NUM_DIR*2;n++)
+    for(i=0;i<vol/2;i++){
+      if( num_ind[i] >= (n+1)*div )
+      for(m=0;m<div;m++){
+           uc_l_agg[j][index].src = temp[i*NUM_DIR*2+n*div+m].src;
+           uc_l_agg[j][index].dest = temp[i*NUM_DIR*2+n*div+m].dest;
+           for(k=0;k<18;k++)
+              uc_l_agg[j][index].mat[k] = temp[i*NUM_DIR*2+n*div+m].mat[k];
+           index++;
+      }
+    }
+    even_l[j] = index;
+    printf("even_l[%d]=%d\n",j,even_l[j]);
+    for( n = 0; n*div<NUM_DIR*2;n++)
+    for(i=0;i<vol/2;i++){
+      if( (num_ind[i] > n*div) && (num_ind[i] <(n+1)*div) )
+      for(m=0;m<div;m++){
+        if(num_ind[i] > n*div+m) {
+           uc_l_agg[j][index].src = temp[i*NUM_DIR*2+n*div+m].src;
+           uc_l_agg[j][index].dest = temp[i*NUM_DIR*2+n*div+m].dest;
+           for(k=0;k<18;k++)
+              uc_l_agg[j][index].mat[k] = temp[i*NUM_DIR*2+n*div+m].mat[k];
+           index++;
+        }
+      }
+    }
+    odd_l[j] = index-even_l[j];
+    printf("odd_l[%d]=%d\n",j,odd_l[j]);
+#endif
     if (index != comp_l[j]){
       printf("index(%d) = comp_l[%d](%d)\n",
-       index, j,comp_nl[j]);
+       index, j,comp_l[j]);
       exit(1);
     }
   }
@@ -1435,16 +1484,9 @@ void AsqD::comm_assert()
 
 
 
+#undef PROFILE
 void AsqD::dirac(Float* b, Float* a, int a_odd, int add_flag)
 {
-  int i;
-  int odd = 1 - a_odd;
-  long c = (long) chi_off_node_total;
-  long uc_l = (long)uc_l_agg[odd];
-  long uc_nl = (long)uc_nl_agg[odd];
-  long uc_nl2 = (long)&(uc_nl_agg[odd][isplit]);
-  
-#undef PROFILE
 #ifdef PROFILE
   int num_flops;
   Float dtime;  
@@ -1453,6 +1495,13 @@ void AsqD::dirac(Float* b, Float* a, int a_odd, int add_flag)
   num_flops = 0;
   gettimeofday(&start,NULL);
 #endif
+
+  int i;
+  int odd = 1 - a_odd;
+  long c = (long) chi_off_node_total;
+  long uc_l = (long)uc_l_agg[odd];
+  long uc_nl = (long)uc_nl_agg[odd];
+  long uc_nl2 = (long)&(uc_nl_agg[odd][isplit]);
 
   if( (unsigned long)a != address[odd]){
     address[odd] = (unsigned long)a;
@@ -1532,17 +1581,24 @@ void AsqD::dirac(Float* b, Float* a, int a_odd, int add_flag)
 #endif
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  print_flops(0,&start,&end);
+  asq_print_flops(cname,"copy_buffer",0,&start,&end);
 #endif
 
 
   //make sure spinor field is in main memory before starting transfers
 
-  SCUmulti_1[odd].StartTrans();
-
-#undef PROFILE
 #ifdef PROFILE
-  num_flops = 33*(local_chi + local_chi_3);
+  gettimeofday(&start,NULL);
+#endif
+  SCUmulti_1[odd].StartTrans();
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  asq_print_flops(cname,"StartTrans()",0,&start,&end);
+#endif
+
+//  printf("uc=%p a=%p tmpfrm=%p\n",uc_l_agg[odd],a,tmpfrm);
+#ifdef PROFILE
+  num_flops = 66*comp_l[odd];
   gettimeofday(&start,NULL);
 #endif
 
@@ -1550,7 +1606,13 @@ void AsqD::dirac(Float* b, Float* a, int a_odd, int add_flag)
   //-----------------------------------------------------------------
   //do first local computations
   //-----------------------------------------------------------------
+#ifdef NEW_SPLIT
+  asq_cmv_4( even_l[odd], (long)uc_l_agg[odd], (long)a, (long)tmpfrm);
+  if (odd_l[odd])
+    asq_cmv( odd_l[odd], (long)(uc_l_agg[odd]+even_l[odd]), (long)a, (long)tmpfrm);
+#else
   asq_cmv( comp_l[odd], (long)uc_l_agg[odd], (long)a, (long)tmpfrm);
+#endif
 
 
   //-----------------------------------------------------------------
@@ -1559,17 +1621,30 @@ void AsqD::dirac(Float* b, Float* a, int a_odd, int add_flag)
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  print_flops(num_flops,&start,&end);
+  asq_print_flops(cname,"asq_cmv",num_flops,&start,&end);
 #endif
 
+#ifdef PROFILE
+  gettimeofday(&start,NULL);
+#endif
   SCUmulti_1[odd].TransComplete();
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  asq_print_flops(cname,"TrnasComplete()",0,&start,&end);
+#endif
 
 if(split) {
 
+#ifdef PROFILE
+  gettimeofday(&start,NULL);
+#endif
   SCUmulti_2[odd].StartTrans();
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  asq_print_flops(cname,"StartTrans()",0,&start,&end);
+#endif
 
 
-#undef PROFILE
 #ifdef PROFILE
   num_flops = 66*isplit;
   gettimeofday(&start,NULL);
@@ -1579,14 +1654,14 @@ if(split) {
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  print_flops(num_flops,&start,&end);
+  asq_print_flops(cname,"asq_cmv",num_flops,&start,&end);
 #endif
   SCUmulti_2[odd].TransComplete();
 
   SCUmulti[odd].StartTrans();
 
 #ifdef PROFILE
-  num_flops = 33*(non_local_chi);
+  num_flops = 66*(non_local_chi[odd]);
   gettimeofday(&start,NULL);
 #endif
 
@@ -1594,7 +1669,14 @@ if(split) {
 
 } else {
 
-  SCUmulti[odd].SlowStartTrans();
+#ifdef PROFILE
+  gettimeofday(&start,NULL);
+#endif
+  SCUmulti[odd].StartTrans();
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  asq_print_flops(cname,"StartTrans()",0,&start,&end);
+#endif
 
   //-----------------------------------------------------------------
   //do the computations involving "chi" non-local spinors
@@ -1602,7 +1684,7 @@ if(split) {
 
 
 #ifdef PROFILE
-  num_flops = 33*(non_local_chi + non_local_chi_3[2]);
+  num_flops = 66*comp_nl[odd];
   gettimeofday(&start,NULL);
 #endif
 
@@ -1612,9 +1694,18 @@ if(split) {
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  print_flops(num_flops,&start,&end);
+  asq_print_flops(cname,"asq_cmv",num_flops,&start,&end);
+#endif
+
+#ifdef PROFILE
+  gettimeofday(&start,NULL);
 #endif
   SCUmulti[odd].TransComplete();
+
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  asq_print_flops(cname,"TrnasComplete()",0,&start,&end);
+#endif
 
  
 
@@ -1623,18 +1714,16 @@ if(split) {
   //----------------------------------------------------------------
 
 
-#undef PROFILE
 #ifdef PROFILE
-//  num_flops = 1146*vol/2;
-  num_flops = 33*non_local_chi;
-  dtime = -dclock();
+  num_flops = 66*comp_nl_2[odd];
+  gettimeofday(&start,NULL);
 #endif
 
   asq_cmv( comp_nl_2[odd], (long)&(uc_nl_agg[odd][comp_nl[odd]]) , (long)c, (long)tmpfrm);
 
 #ifdef PROFILE
-  dtime +=dclock();
-  printf("dirac_cmv_jcw_agg::%ld flops/%e seconds = %e MFlops\n",num_flops,dtime,(Float)num_flops/(dtime*1e6));
+  gettimeofday(&end,NULL);
+  asq_print_flops(cname,"asq_cmv",num_flops,&start,&end);
 #endif
 
 
@@ -1646,10 +1735,9 @@ if(split) {
   //-----------------------------------------------------------------
 
 
-#undef PROFILE
 #ifdef PROFILE
   num_flops = 45*vol;
-  dtime = -dclock();
+  gettimeofday(&start,NULL);
 #endif
   if ( add_flag == 0){
     asq_dsum( vol/2, (long)tmpfrm, (long)b);
@@ -1658,8 +1746,8 @@ if(split) {
     asqd_sum_acc_cpp( vol/2, (long)0, (long)tmpfrm, (long)b);
   }
 #ifdef PROFILE
-  dtime +=dclock();
-  printf("dirac_cmv_jcw_agg::%ld flops/%e seconds = %e MFlops\n",num_flops,dtime,(Float)num_flops/(dtime*1e6));
+  gettimeofday(&end,NULL);
+  asq_print_flops(cname,"asq_dsum",num_flops,&start,&end);
 #endif
 
 }

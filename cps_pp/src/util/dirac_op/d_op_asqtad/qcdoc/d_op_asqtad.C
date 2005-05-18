@@ -175,27 +175,31 @@ void DiracOpAsqtad::MatPcDagMatPc(Vector *out,
 
 #undef PROFILE
 #ifdef PROFILE
+  printf("in=%p out=%p\n",in,out);
   struct timeval start,end;
   gettimeofday(&start,NULL);
 #endif
   asqtad_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
   asqtad_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
   CGflops += (unsigned long long)nflops;
-
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+  print_flops(cname, "MatPcDagMatPc()",nflops,&start,&end);
+  gettimeofday(&start,NULL);
+#endif
   if( dot_prd !=0 ){
 	vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);
     CGflops +=(unsigned long long)f_size_cb*4;
-    nflops +=(unsigned long long)f_size_cb*4;
+    nflops =(unsigned long long)f_size_cb*4;
   } else {
     CGflops +=(unsigned long long)f_size_cb*2;
-    nflops +=(unsigned long long)f_size_cb*2;
+    nflops =(unsigned long long)f_size_cb*2;
     vaxmy(&mass_sq,in,out,f_size_cb/6);
   }
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  printf("DiracOpAsqtad::MatPcDagMatPc:: ");
-  print_flops(nflops,&start,&end);
+  print_flops(cname, "MatPcDagMatPc()",nflops,&start,&end);
 #endif
 }
 
