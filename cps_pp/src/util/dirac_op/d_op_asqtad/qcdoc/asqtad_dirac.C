@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-18 20:18:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.23 2005-05-18 20:18:09 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.23 2005-05-18 20:18:09 chulwoo Exp $
+//  $Date: 2005-05-20 06:08:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.24 2005-05-20 06:08:33 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.24 2005-05-20 06:08:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -80,20 +80,20 @@ void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long a, long tmpfrm);
 #define asq_dsum(A,B,C,D) dirac_sum2_64_cpp(A,B,C,D)
 #else
 #ifdef ASQD_SINGLE
-extern "C" void asq_cmv_s( int sites, long u,long a, long tmpfrm);
-extern "C" void asq_cmv_4_s( int sites, long chi,long u,long a, long tmpfrm);
+extern "C" void asq_cmv_s( int sites, long u,long a, unsigned long tmpfrm);
+extern "C" void asq_cmv_4_s( int sites, long chi,long u,long a, unsigned long tmpfrm);
 #define asq_cmv_4(A,B,C,D) asq_cmv_4_s(A,0,B,C,D)
 #define asq_cmv(A,B,C,D) asq_cmv_s(A,B,C,D)
-extern "C" void asq_dsum_s( int sites, long tmpfrm,long b);
+extern "C" void asq_dsum_s( int sites, unsigned long tmpfrm,long b);
 #define asq_dsum(A,B,C) asq_dsum_s(A,B,C)
 extern "C" void copy_buffer_s(int n, long src, long dest, long ptable);
 #define copy_buffer(A,B,C,D) copy_buffer_s(A,B,C,D)
 #else
 extern "C" void  dirac_cmv_jcw_agg( int sites, long chi, long u,long a, long tmpfrm);
-extern "C" void  dirac_cmv_agg_4( int sites, long chi, long u,long a, long tmpfrm);
-extern "C" void asq_cmv( int sites, long u,long a, long tmpfrm);
+extern "C" void  dirac_cmv_agg_4( int sites, long chi, long u,long a, unsigned long tmpfrm);
+extern "C" void asq_cmv( int sites, long u,long a, unsigned long tmpfrm);
 #define asq_cmv_4(A,B,C,D) dirac_cmv_agg_4(A,0,B,C,D)
-extern "C" void asq_dsum( int sites, long tmpfrm,long b);
+extern "C" void asq_dsum( int sites, unsigned long tmpfrm,long b);
 extern "C" void copy_buffer(int n, long src, long dest, long ptable);
 #endif
 #endif
@@ -1120,7 +1120,6 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
 
 }
 
-#if 1
   tmpfrm = NULL;
 //  if (vol<1296)
   tmpfrm = (Float *) qalloc (QFAST|QCOMMS,NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(Float));
@@ -1130,7 +1129,11 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
   }
   if(tmpfrm == 0) 
     PointerErr(cname,fname, "tmpfrm");
-#endif
+  if (qalloc_is_fast(tmpfrm) && (sizeof(Float)==4))  //single precision
+    tmpfrm2 = (unsigned long)tmpfrm - 0xb0000000 + 0x9c000000;
+  else
+    tmpfrm2 = (unsigned long)tmpfrm;
+  printf("tmpfrm=%p tmpfrm2=%p\n",tmpfrm,tmpfrm2);
 
   bzero( (char *)tmpfrm, NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(Float));
   for(i=0;i<2;i++){
@@ -1607,11 +1610,11 @@ void AsqD::dirac(Float* b, Float* a, int a_odd, int add_flag)
   //do first local computations
   //-----------------------------------------------------------------
 #ifdef NEW_SPLIT
-  asq_cmv_4( even_l[odd], (long)uc_l_agg[odd], (long)a, (long)tmpfrm);
+  asq_cmv_4( even_l[odd], (long)uc_l_agg[odd], (long)a, tmpfrm2);
   if (odd_l[odd])
-    asq_cmv( odd_l[odd], (long)(uc_l_agg[odd]+even_l[odd]), (long)a, (long)tmpfrm);
+    asq_cmv( odd_l[odd], (long)(uc_l_agg[odd]+even_l[odd]), (long)a, (long)tmpfrm2);
 #else
-  asq_cmv( comp_l[odd], (long)uc_l_agg[odd], (long)a, (long)tmpfrm);
+  asq_cmv( comp_l[odd], (long)uc_l_agg[odd], (long)a, (long)tmpfrm2);
 #endif
 
 
@@ -1650,7 +1653,7 @@ if(split) {
   gettimeofday(&start,NULL);
 #endif
 
-  asq_cmv( isplit, uc_nl, c, (long)tmpfrm);
+  asq_cmv( isplit, uc_nl, c, (long)tmpfrm2);
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
@@ -1665,7 +1668,7 @@ if(split) {
   gettimeofday(&start,NULL);
 #endif
 
-  asq_cmv( non_local_chi[odd], uc_nl2, (long)c, (long)tmpfrm);
+  asq_cmv( non_local_chi[odd], uc_nl2, (long)c, (long)tmpfrm2);
 
 } else {
 
@@ -1688,7 +1691,7 @@ if(split) {
   gettimeofday(&start,NULL);
 #endif
 
-  asq_cmv( comp_nl[odd], (long)&(uc_nl_agg[odd][0]), (long)c, (long)tmpfrm);
+  asq_cmv( comp_nl[odd], (long)&(uc_nl_agg[odd][0]), (long)c, (long)tmpfrm2);
 }
 
 
@@ -1719,7 +1722,7 @@ if(split) {
   gettimeofday(&start,NULL);
 #endif
 
-  asq_cmv( comp_nl_2[odd], (long)&(uc_nl_agg[odd][comp_nl[odd]]) , (long)c, (long)tmpfrm);
+  asq_cmv( comp_nl_2[odd], (long)&(uc_nl_agg[odd][comp_nl[odd]]) , (long)c, (long)tmpfrm2);
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
