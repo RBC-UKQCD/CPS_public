@@ -1,6 +1,6 @@
 #include<config.h>
 #include<qalloc.h>
-#include "glb_sum_internal.h"
+#include <comms/glb_sum_internal.h>
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file

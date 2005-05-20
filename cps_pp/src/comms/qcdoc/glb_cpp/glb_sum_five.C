@@ -27,7 +27,7 @@ CPS_END_NAMESPACE
 #include<util/gjp.h>
 #include<comms/double64.h>
 #include <comms/sysfunc.h>
-#include "glb_sum_internal.h"
+#include <comms/glb_sum_internal.h>
 CPS_START_NAMESPACE
 
 

@@ -25,7 +25,7 @@ CPS_END_NAMESPACE
 #include<comms/double64.h>
 #include <comms/sysfunc.h>
 #include <util/lat_data.h>
-#include "glb_sum_internal.h"
+#include <comms/glb_sum_internal.h>
 CPS_START_NAMESPACE
 
 #define MAX_NUM_WORDS 40  //set to larger than size of double precision 3x3 matrix
