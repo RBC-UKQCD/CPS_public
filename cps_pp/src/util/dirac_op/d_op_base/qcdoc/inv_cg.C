@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-03 20:25:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.17 2005-05-03 20:25:32 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.17 2005-05-03 20:25:32 chulwoo Exp $
+//  $Date: 2005-05-20 06:37:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.18 2005-05-20 06:37:30 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.18 2005-05-20 06:37:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -167,10 +167,11 @@ int DiracOp::InvCg(Vector *out,
 // Allocate memory for the direction vector dir.
 //------------------------------------------------------------------
   Vector *dir;
-  if(GJP.VolNodeSites() >1024) dir=0;
+  if(GJP.VolNodeSites() >4096) dir=0;
     else dir = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
   if(dir == 0){
     dir = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
+    printf("dir is allcoated in DDR(%p)\n",dir);
   }
   if(dir == 0)
     ERR.Pointer(cname,fname, "dir");
@@ -179,10 +180,11 @@ int DiracOp::InvCg(Vector *out,
 // Allocate mem. for the result vector of matrix multiplication mmp.
 //------------------------------------------------------------------
   Vector *mmp;
-  if(GJP.VolNodeSites() >1024) mmp=0;
+  if(GJP.VolNodeSites() >4096) mmp=0;
     else mmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
   if(mmp == 0){
     mmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
+    printf("mmp is allcoated in DDR(%p)\n",mmp);
   }
   if(mmp == 0)
     ERR.Pointer(cname,fname, "mmp");
