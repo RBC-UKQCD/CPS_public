@@ -148,6 +148,7 @@ N=4};
 //------------------------------------------------------------------
 
     Float *tmpfrm;
+    unsigned long tmpfrm2;
 
     Float *Tbuffer[3][2];
 
@@ -211,6 +212,8 @@ SCUDirArgMulti SCUmulti_2[2];
     unsigned long address[2];
 
     int comp_l[2];
+    int even_l[2];
+    int odd_l[2];
     int comp_nl[2];
     int comp_nl_2[2];
 
