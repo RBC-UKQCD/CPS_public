@@ -4,6 +4,10 @@
 #include<alg/hmd_arg.h>
 #include<alg/do_arg.h>
 #include<alg/w_spect_arg.h>
+#include<alg/meas_arg.h>
+#include<alg/pot_arg.h>
+#include<alg/pbp_arg.h>
+#include<alg/fix_gauge_arg.h>
 
 //--------------------------------------------------------------
 
@@ -16,10 +20,24 @@ EvoArg evo_arg;
 DoArg  do_arg;
 WspectArg  ws_arg;
 WspectOutput ws_out;
+PotArg pa;
+PbpArg pbp;
+FixGaugeArg fga;
 RhmcPolesState rhmc_poles;
+MeasArg Meas;
+MeasTask Task;
 
 int main(int argc, char *argv[])
 { 
+
+  Meas.TaskList.TaskList_len = 1;
+  Meas.TaskList.TaskList_val = &Task;
+
+  Meas.GaugeStem = "config_stem";
+  Meas.RNGStem = "rng_stem";
+
+  Task.OutputFilestem = "out_stem";
+  Task.ArgFilename = "arg_stem";
 
   ws_out.cg = "filename";
   ws_out.cg2 = "filename";
@@ -64,6 +82,8 @@ int main(int argc, char *argv[])
   evo_arg.evo_stem = "hmd";
   evo_arg.work_directory = "";
 
+  ws_arg.CgArgFile = "CgFile";
+
     cg_arg.Encode("cg_arg.vml","cg_arg");
     hmd_arg.Encode("hmd_arg.vml","hmd_arg");
     evo_arg.Encode("evo_arg.vml","evo_arg");
@@ -71,6 +91,10 @@ int main(int argc, char *argv[])
     ws_arg.Encode("w_spect_arg.vml","w_spect_arg");
     ws_out.Encode("w_spect_output.vml","w_spect_output");
     rhmc_poles.Encode("rhmc_poles_state.vml","rhmc_poles_state");
+    Meas.Encode("meas_arg.vml","meas_arg");
+    pa.Encode("pot_arg.vml","pot_arg");
+    pbp.Encode("pbp_arg.vml","pbp_arg");
+    fga.Encode("fix_gauge_arg.vml","fix_gauge_arg");
     
     vml_markup_type(VML_XML);
     

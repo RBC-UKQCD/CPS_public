@@ -25,8 +25,8 @@
 <item><name>start_conf_kind</name><value><StartConfType>START_CONF_ORD </StartConfType></value></item>
 <item><name>start_conf_load_addr</name><value><ui4>0</ui4></value></item>
 <item><name>start_seed_kind</name><value><StartSeedType>START_SEED_FIXED </StartSeedType></value></item>
-<item><name>start_seed_filename</name><value><string> </string></value></item>
-<item><name>start_conf_filename</name><value><string> </string></value></item>
+<item><name>start_seed_filename</name><value><string>start_seed </string></value></item>
+<item><name>start_conf_filename</name><value><string>start_conf </string></value></item>
 <item><name>start_conf_alloc_flag</name><value><int>2</int></value></item>
 <item><name>wfm_alloc_flag</name><value><int>6</int></value></item>
 <item><name>wfm_send_alloc_flag</name><value><int>6</int></value></item>

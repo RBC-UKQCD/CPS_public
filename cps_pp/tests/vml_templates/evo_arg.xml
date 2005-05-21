@@ -3,6 +3,9 @@
 <item><name>gauge_unload_period</name><value><int>0</int></value></item>
 <item><name>gauge_configurations</name><value><int>0</int></value></item>
 <item><name>io_concurrency</name><value><int>0</int></value></item>
+<item><name>hdw_xcsum</name><value><int>0</int></value></item>
+<item><name>hdw_rcsum</name><value><int>0</int></value></item>
+<item><name>reproduce_percent</name><value><int>0</int></value></item>
 <item><name>ensemble_id</name><value><string>id </string></value></item>
 <item><name>ensemble_label</name><value><string>label </string></value></item>
 <item><name>creator</name><value><string>creator </string></value></item>
@@ -11,4 +14,6 @@
 <item><name>plaquette_stem</name><value><string>plaq </string></value></item>
 <item><name>evo_stem</name><value><string>hmd </string></value></item>
 <item><name>work_directory</name><value><string> </string></value></item>
+<item><name>eig_lo_stem</name><value><string> </string></value></item>
+<item><name>eig_hi_stem</name><value><string> </string></value></item>
 </data></class>

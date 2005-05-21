@@ -1,4 +1,6 @@
 <class><name>WspectArg</name><instance>w_spect_arg</instance><data>
+<item><name>CgArgFile</name><value><string>CgFile </string></value></item>
+<item><name>WspectOutputFile</name><value><string> </string></value></item>
 <item><name>prop_dir</name><value><int>0</int></value></item>
 <item><name>num_mom</name><value><int>0</int></value></item>
 <item><name>source_kind</name><value><SourceKind>POINT_W </SourceKind></value></item>
