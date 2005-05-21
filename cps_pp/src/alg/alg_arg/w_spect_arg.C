@@ -123,6 +123,10 @@ vml_WspectArg (VML *vmls, char *name,WspectArg *objp)
 
 	 vml_class_begin(vmls,"WspectArg",name);
 	int i;
+	 if (!vml_string (vmls, "CgArgFile", &objp->CgArgFile, ~0))
+		 return FALSE;
+	 if (!vml_string (vmls, "WspectOutputFile", &objp->WspectOutputFile, ~0))
+		 return FALSE;
 	 if (!vml_int (vmls, "prop_dir", &objp->prop_dir))
 		 return FALSE;
 	 if (!vml_int (vmls, "num_mom", &objp->num_mom))

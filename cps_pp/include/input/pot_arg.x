@@ -1,11 +1,6 @@
-#include<config.h>
-CPS_START_NAMESPACE
 /*  pot_arg.h*/
 
-#ifndef INCLUDED_POT_ARG_H
-#define INCLUDED_POT_ARG_H
-
-struct PotArg {
+class PotArg {
   int prop_dir;    
   /* "temporal" direction along which the potential*/
   /* is measure as exponential decay*/
@@ -23,6 +18,3 @@ struct PotArg {
 };
 
 
-#endif
-
-CPS_END_NAMESPACE

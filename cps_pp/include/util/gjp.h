@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.20 2005-05-09 07:15:14 chulwoo Exp $
+  $Id: gjp.h,v 1.21 2005-05-21 09:44:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-09 07:15:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.20 2005-05-09 07:15:14 chulwoo Exp $
-//  $Id: gjp.h,v 1.20 2005-05-09 07:15:14 chulwoo Exp $
+//  $Date: 2005-05-21 09:44:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.21 2005-05-21 09:44:15 chulwoo Exp $
+//  $Id: gjp.h,v 1.21 2005-05-21 09:44:15 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -644,6 +644,9 @@ public:
   void Initialize(char *filename);
   void Initialize(const DoArg& do_arg);
   void Initialize();
+
+  //PAB... Need to serialise the do arg as a means of meta-data preservation
+  DoArg *GetDoArg(void) { return &doarg_int;};
 
   void SnodeSites(int sites)
       {node_sites[4] = sites;}

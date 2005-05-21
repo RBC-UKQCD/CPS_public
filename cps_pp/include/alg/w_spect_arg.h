@@ -60,6 +60,8 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
+	char *CgArgFile;
+	char *WspectOutputFile;
 	int prop_dir;
 	int num_mom;
 	SourceKind source_kind;

@@ -110,6 +110,8 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
+	FclassType Fermion;
+	GclassType Gluon;
 	int traj_start;
 	int gauge_unload_period;
 	int gauge_configurations;
@@ -125,6 +127,7 @@ public:
 	char *plaquette_stem;
 	char *evo_stem;
 	char *work_directory;
+	int CalcEig;
 	char *eig_lo_stem;
 	char *eig_hi_stem;
 };

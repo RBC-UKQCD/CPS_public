@@ -1,16 +1,5 @@
-#include<config.h>
-CPS_START_NAMESPACE
-/*  fix_gauge_arg.h*/
 
-#ifndef INCLUDED_FIX_GAUGE_ARG_H
-#define INCLUDED_FIX_GAUGE_ARG_H
-
-CPS_END_NAMESPACE
-#include <util/enum.h>
-#include <util/vector.h>
-CPS_START_NAMESPACE
-
-struct FixGaugeArg {
+class FixGaugeArg {
   FixGaugeType fix_gauge_kind;   /* The kind of gauge fixing*/
   int hyperplane_start;          /* The full lattice coordinate of the first */
                                  /* hyperplane of gauge fixing matrices.*/
@@ -24,7 +13,3 @@ struct FixGaugeArg {
                                  /* condition is satisfied.*/
 };
 
-
-#endif
-
-CPS_END_NAMESPACE

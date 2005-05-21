@@ -124,6 +124,7 @@ class DoArg {
     Float p4_lepage; 
     
 memfun  DoArg();
+memfun  void SetupAsqTadU0(double u0);
 
 /*!< Default values of some parameters.*/
 /*!<

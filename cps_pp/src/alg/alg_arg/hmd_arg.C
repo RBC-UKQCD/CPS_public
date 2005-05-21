@@ -249,6 +249,10 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 	register int32_t *buf;
 
 	 vml_class_begin(vmls,"EvoArg",name);
+	 if (!vml_FclassType (vmls, "Fermion", &objp->Fermion))
+		 return FALSE;
+	 if (!vml_GclassType (vmls, "Gluon", &objp->Gluon))
+		 return FALSE;
 	 if (!vml_int (vmls, "traj_start", &objp->traj_start))
 		 return FALSE;
 	 if (!vml_int (vmls, "gauge_unload_period", &objp->gauge_unload_period))
@@ -278,6 +282,8 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 	 if (!vml_string (vmls, "evo_stem", &objp->evo_stem, ~0))
 		 return FALSE;
 	 if (!vml_string (vmls, "work_directory", &objp->work_directory, ~0))
+		 return FALSE;
+	 if (!vml_int (vmls, "CalcEig", &objp->CalcEig))
 		 return FALSE;
 	 if (!vml_string (vmls, "eig_lo_stem", &objp->eig_lo_stem, ~0))
 		 return FALSE;

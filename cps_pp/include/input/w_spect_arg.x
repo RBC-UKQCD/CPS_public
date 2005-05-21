@@ -91,6 +91,9 @@ class  WspectOutput
 
 class WspectArg {
 
+  string CgArgFile<>;
+  string WspectOutputFile<>;
+
   /* Propagation direction. [0..3] as [x,y,z,t]*/
   int prop_dir;               
 
@@ -130,7 +133,6 @@ class WspectArg {
   int g_n;
   int g_center[4]; /*center of the Gaussian source*/
       
-
   /* rescaling the source vector to get the full*/
   /* range of single precision arithmetic*/
   /* important for heavy quarks where the strong exponential*/

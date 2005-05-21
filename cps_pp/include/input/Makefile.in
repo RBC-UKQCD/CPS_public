@@ -7,25 +7,31 @@ RCFLAGS=-c -C -x -u util/vml/ -v alg/
 
 all: vml.stmp 
 
-vml.stmp: enum.x cg_arg.x do_arg.x w_spect_arg.x hmd_arg.x pbp_arg.x eig_arg.x
+vml.stmp: enum.x cg_arg.x do_arg.x w_spect_arg.x hmd_arg.x pbp_arg.x eig_arg.x pot_arg.x fix_gauge_arg.x meas_arg.x
 	- cp ${BUILDDIR}/config.h .
 	- cp ${BUILDDIR}/precision.h .
 	- cp ${SRCDIR}/include/input/*.x .
 	${RPCGEN} $(RHFLAGS) enum.x >${SRCDIR}/include/util/enum.h
 	${RPCGEN} $(RHFLAGS) enum.x >${SRCDIR}/include/alg/enum.h
-	${RPCGEN}  $(RCFLAGS) enum.x >${SRCDIR}/src/alg/alg_arg/enum.C
+	${RPCGEN} $(RCFLAGS) enum.x >${SRCDIR}/src/alg/alg_arg/enum.C
 	${RPCGEN} $(RHFLAGS) cg_arg.x >${SRCDIR}/include/alg/cg_arg.h
 	${RPCGEN} $(RCFLAGS) cg_arg.x >${SRCDIR}/src/alg/alg_arg/cg_arg.C
 	${RPCGEN} $(RHFLAGS) do_arg.x >${SRCDIR}/include/alg/do_arg.h
 	${RPCGEN} $(RCFLAGS) do_arg.x >${SRCDIR}/src/alg/alg_arg/do_arg.C
 	${RPCGEN} $(RHFLAGS) w_spect_arg.x >${SRCDIR}/include/alg/w_spect_arg.h
-	${RPCGEN}  $(RCFLAGS)  w_spect_arg.x >${SRCDIR}/src/alg/alg_arg/w_spect_arg.C
+	${RPCGEN} $(RCFLAGS) w_spect_arg.x >${SRCDIR}/src/alg/alg_arg/w_spect_arg.C
 	${RPCGEN} $(RHFLAGS) hmd_arg.x >${SRCDIR}/include/alg/hmd_arg.h
-	${RPCGEN}  $(RCFLAGS)  hmd_arg.x >${SRCDIR}/src/alg/alg_arg/hmd_arg.C
+	${RPCGEN} $(RCFLAGS) hmd_arg.x >${SRCDIR}/src/alg/alg_arg/hmd_arg.C
 	${RPCGEN} $(RHFLAGS) pbp_arg.x >${SRCDIR}/include/alg/pbp_arg.h
-	${RPCGEN}  $(RCFLAGS)  pbp_arg.x >${SRCDIR}/src/alg/alg_arg/pbp_arg.C
+	${RPCGEN} $(RCFLAGS) pbp_arg.x >${SRCDIR}/src/alg/alg_arg/pbp_arg.C
 	${RPCGEN} $(RHFLAGS) eig_arg.x >${SRCDIR}/include/alg/eig_arg.h
-	${RPCGEN}  $(RCFLAGS)  eig_arg.x >${SRCDIR}/src/alg/alg_arg/eig_arg.C
+	${RPCGEN} $(RCFLAGS) eig_arg.x >${SRCDIR}/src/alg/alg_arg/eig_arg.C
+	${RPCGEN} $(RHFLAGS) pot_arg.x >${SRCDIR}/include/alg/pot_arg.h
+	${RPCGEN} $(RCFLAGS) pot_arg.x >${SRCDIR}/src/alg/alg_arg/pot_arg.C
+	${RPCGEN} $(RHFLAGS) fix_gauge_arg.x >${SRCDIR}/include/alg/fix_gauge_arg.h
+	${RPCGEN} $(RCFLAGS) fix_gauge_arg.x >${SRCDIR}/src/alg/alg_arg/fix_gauge_arg.C 
+	${RPCGEN} $(RHFLAGS) meas_arg.x >${SRCDIR}/include/alg/meas_arg.h
+	${RPCGEN} $(RCFLAGS) meas_arg.x >${SRCDIR}/src/alg/alg_arg/meas_arg.C
 	touch vml.stmp
 
 clean: 

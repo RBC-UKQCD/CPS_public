@@ -185,6 +185,8 @@ class HmdArg {
  * the VML portion of the HMD algorithm.
  */
 class EvoArg {
+  FclassType Fermion;
+  GclassType Gluon;
   int traj_start;
   int gauge_unload_period;
   int gauge_configurations;
@@ -200,6 +202,7 @@ class EvoArg {
   string plaquette_stem<>;
   string evo_stem<>;
   string work_directory<>;
+  int CalcEig;
   string eig_lo_stem<>;
   string eig_hi_stem<>;
 };

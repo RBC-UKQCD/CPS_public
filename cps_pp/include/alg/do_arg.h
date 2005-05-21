@@ -82,6 +82,7 @@ public:
 	Float p4_7staple;
 	Float p4_lepage;
 	   DoArg (  ) ;
+	   void SetupAsqTadU0 (  double u0 ) ;
 };
 
 /* the xdr functions */

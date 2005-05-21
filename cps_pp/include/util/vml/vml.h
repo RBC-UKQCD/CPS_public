@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct VML;
+typedef struct VML VML;
+
 CPS_START_NAMESPACE
 
 
@@ -66,34 +69,7 @@ enum vml_op {
     VML_STDIO
   };
 
-typedef struct VML VML;
-struct VML
-  {
-    public :
-    enum vml_op x_op;		/* operation; fast additional param */
-
-    /*
-     * VML type dependent data
-     */
-    enum vml_type StreamType;
-    FILE *x_fp;
-    int   x_descriptor;
-
-    caddr_t x_private;		/* pointer to private data */
-    caddr_t x_base;		/* private used for position info */
-    int x_handy;		/* extra private word */
-    /*
-     * Methods available 
-     */
-    int Puts(char *str);
-    char *Gets(char *str,int sz);
-    bool_t Create(char * bf,int length, vml_op op);
-    bool_t Create(int fd, vml_op op);
-    bool_t Create(char *file, vml_op op);
-    bool_t Create(FILE *file, vml_op op);
-    void Destroy(void);
-  };
-
+ 
 /*
  * A vmlproc_t exists for each data type which is to be encoded or decoded.
  * adds the member name.
@@ -225,5 +201,32 @@ extern void vml_class_end   (VML *vmls, char *type, char *instance);
 #ifdef __cplusplus 
 }
 #endif
+struct VML
+  {
+    public :
+    enum vml_op x_op;		/* operation; fast additional param */
+
+    /*
+     * VML type dependent data
+     */
+    enum vml_type StreamType;
+    FILE *x_fp;
+    int   x_descriptor;
+
+    caddr_t x_private;		/* pointer to private data */
+    caddr_t x_base;		/* private used for position info */
+    int x_handy;		/* extra private word */
+    /*
+     * Methods available 
+     */
+    int Puts(char *str);
+    char *Gets(char *str,int sz);
+    bool_t Create(char * bf,int length, vml_op op);
+    bool_t Create(int fd, vml_op op);
+    bool_t Create(char *file, vml_op op);
+    bool_t Create(FILE *file, vml_op op);
+    void Destroy(void);
+  };
+
 CPS_END_NAMESPACE
 #endif /* rpc/vml.h */
