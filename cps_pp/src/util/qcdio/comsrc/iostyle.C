@@ -164,6 +164,12 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
   if(synchronize(error) != 0)  
     ERR.General(cname, fname, "Loading failed\n");
 
+  // This 3 lines differ from unloading part
+  // these nodes participate in loading but not in summation
+  if(dimension == 4 && rd_arg.Scoor()!=0) { 
+    csum = pdcsum = 0;
+    RandSum = Rand2Sum = 0;
+  }
 
   if(ptrcsum) *ptrcsum = csum;
   if(ptrpdcsum) *ptrpdcsum = pdcsum;
@@ -890,6 +896,9 @@ void SerialIO::sShift(char * data, const int xblk, const int dir) const {
 
 
 void SerialIO::sSpread(char * data, const int datablk) const {  
+
+  const char *fname = "sSpread()";
+
   // clone the lattice from s==0 nodes to all s>0 nodes
   // only used in loading process
   if(qio_arg.Snodes() <= 1)  return;
@@ -902,6 +911,8 @@ void SerialIO::sSpread(char * data, const int datablk) const {
   //        7   -->  6   -->   5   -->   4
 
   SCUDirArg  socket;
+
+  VRB.Flow(cname, fname, "Spread on S dimension:: 0 ==> %d\n", qio_arg.Snodes()-1);
 
   if(qio_arg.Scoor() == 0) {
     socket.Init(data, SCU_SM, SCU_SEND, datablk);
@@ -919,6 +930,11 @@ void SerialIO::sSpread(char * data, const int datablk) const {
   int receiver[2] = { 1, sender[1]-1 };
 
   while(receiver[0] < receiver[1]) {  // send until two directions converge
+    synchronize();
+
+    VRB.Flow(cname, fname, "Spread on S dimension:: %d ==> %d\n", sender[0], receiver[0]);
+    VRB.Flow(cname, fname, "Spread on S dimension:: %d ==> %d\n", sender[1], receiver[1]);
+
     if(qio_arg.Scoor() == sender[0]) {
       socket.Init(data, SCU_SP, SCU_SEND, datablk);
       SCUTrans(&socket);
@@ -935,7 +951,7 @@ void SerialIO::sSpread(char * data, const int datablk) const {
       SCUTransComplete();
     }
     else if(qio_arg.Scoor() == receiver[1]) {
-      socket.Init(data, SCU_SP, SCU_SEND, datablk);
+      socket.Init(data, SCU_SP, SCU_REC, datablk);
       SCUTrans(&socket);
       SCUTransComplete();
     }
@@ -945,6 +961,7 @@ void SerialIO::sSpread(char * data, const int datablk) const {
     
     receiver[0]++;
     receiver[1]--;
+
   }
 
 }
