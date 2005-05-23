@@ -77,7 +77,8 @@ struct vml_enum_map GclassType_map[] = {
 	{"GclassType","G_CLASS_POWER_PLAQ",G_CLASS_POWER_PLAQ},
 	{"GclassType","G_CLASS_IMPR_RECT",G_CLASS_IMPR_RECT},
 	{"GclassType","G_CLASS_POWER_RECT",G_CLASS_POWER_RECT},
-	{"GclassType","G_CLASS_IMPR_OLSYM",G_CLASS_IMPR_OLSYM}
+	{"GclassType","G_CLASS_IMPR_OLSYM",G_CLASS_IMPR_OLSYM},
+	{"GclassType","G_CLASS_TADPOLE_RECT",G_CLASS_TADPOLE_RECT}
 };
 
 bool_t
