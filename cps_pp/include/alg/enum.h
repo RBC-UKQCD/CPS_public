@@ -46,6 +46,7 @@ enum GclassType {
 	G_CLASS_IMPR_RECT = 3,
 	G_CLASS_POWER_RECT = 4,
 	G_CLASS_IMPR_OLSYM = 5,
+	G_CLASS_TADPOLE_RECT = 6,
 };
 typedef enum GclassType GclassType;
 extern struct vml_enum_map GclassType_map[];

@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.27 2005-05-18 06:16:36 chulwoo Exp $
+# $Id: Makefile.in,v 1.28 2005-05-23 06:00:41 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -42,7 +42,7 @@ rpcgenvml:
 	$(MAKE) -C $(SRCDIR)/misc/vml_encode/rpcgenvml all
 
 cleanlib: 
-	rm -f (BUILDDLIR)/*.a
+	rm -f $(BUILDDIR)/*.a
 
 copy_makefile:
 	-cp $(BUILDDIR)/Makefile $(BUILDDIR)/Makefile.rules ${SRCDIR}
