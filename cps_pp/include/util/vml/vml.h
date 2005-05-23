@@ -11,10 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+CPS_START_NAMESPACE
 struct VML;
 typedef struct VML VML;
 
-CPS_START_NAMESPACE
 
 
 #ifdef __cplusplus 

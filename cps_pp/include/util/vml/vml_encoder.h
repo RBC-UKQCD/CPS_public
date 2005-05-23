@@ -7,6 +7,8 @@
  * Try to abstract out references, inheritance, arrays, structs etc..
  */
 
+CPS_START_NAMESPACE
+
 class GenericEncoder
 {
  public:
@@ -204,4 +206,5 @@ class XdrEncoder : public GenericEncoder
   virtual bool_t ClassEnd   ( VML *vmls, char *name, char *instance ){NOSUP};
 
 };
+CPS_END_NAMESPACE
 #endif
