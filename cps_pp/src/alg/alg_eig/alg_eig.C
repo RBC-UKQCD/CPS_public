@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.11 2004-09-17 18:10:04 chulwoo Exp $
+  $Id: alg_eig.C,v 1.12 2005-05-26 14:32:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-17 18:10:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.11 2004-09-17 18:10:04 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.11 2004-09-17 18:10:04 chulwoo Exp $
+//  $Date: 2005-05-26 14:32:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.12 2005-05-26 14:32:26 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.12 2005-05-26 14:32:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -24,7 +24,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <util/qcdio.h>
-//#include <math.h>
+#include <math.h>
 #include <alg/alg_eig.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
@@ -122,7 +122,23 @@ AlgEig::AlgEig(Lattice& latt,
   VRB.Input(cname,fname,
 	    "Mass_step = %g\n",IFloat(alg_eig_arg->Mass_step));
 
-  //???
+  // Calculate n_masses if necessary
+  switch( alg_eig_arg->pattern_kind ) {
+  case ARRAY: 
+  case LOG:   
+    // Should be specified already
+    break;
+  case LIN:   
+    alg_eig_arg->n_masses = (int) (fabs((alg_eig_arg->Mass_final 
+      - alg_eig_arg->Mass_init)/alg_eig_arg->Mass_step) + 1.000001); 
+    break;
+  default: 
+    ERR.General(cname, fname,
+		"alg_eig_arg->pattern_kind = %d is unrecognized\n", 
+		alg_eig_arg->pattern_kind);
+    break;
+  }  
+
 }
 
 
@@ -236,14 +252,36 @@ void AlgEig::run()
   
   // Loop over mass values
   int sign_dm = (eig_arg->Mass_step < 0.0) ? -1 : 1;
-  if (sign_dm*eig_arg->Mass_init > sign_dm*eig_arg->Mass_final)
-    ERR.General(cname,fname,"initial and final mass not valid\n");
 
-  for(Float mass = eig_arg->Mass_init; 
-      sign_dm*mass <= sign_dm*eig_arg->Mass_final;
-      mass += eig_arg->Mass_step)
-  {
-    eig_arg->mass = mass;
+  // Initialize the cg_arg mass, with the first mass we
+  // want to compute for:
+  switch( eig_arg->pattern_kind ) {
+  case ARRAY: 
+    eig_arg->mass = eig_arg->Mass[0]; 
+    break;
+  case LIN:   
+    eig_arg->mass = eig_arg->Mass_init; 
+    if (sign_dm*eig_arg->Mass_init > sign_dm*eig_arg->Mass_final)
+      ERR.General(cname,fname,"initial and final mass not valid\n");
+    break;
+  case LOG:   
+    eig_arg->mass = eig_arg->Mass_init; 
+    break;
+  default: 
+    ERR.General(cname, fname,
+		"eig_arg->pattern_kind = %d is unrecognized\n", 
+		eig_arg->pattern_kind);
+    break;
+  }
+
+  // Loop over masses
+  for(int m=0; m<eig_arg->n_masses; m++){
+    
+    //for(Float mass = eig_arg->Mass_init; 
+    //sign_dm*mass <= sign_dm*eig_arg->Mass_final;
+    //mass += eig_arg->Mass_step){
+
+    //eig_arg->mass = mass;
 
     // Solve for eigenvectors and eigenvalues.
     // Use eigenv as initial guess. Lambda is not used initially.
@@ -278,6 +316,22 @@ void AlgEig::run()
       }
       
       Fclose(fp);
+    }
+
+    // If there is another mass loop iteration ahead, we should
+    // set the eig_arg->mass to it's next desired value
+    if( m < eig_arg->n_masses - 1 ) {
+      switch( eig_arg->pattern_kind ) {
+      case ARRAY: 
+	eig_arg->mass = eig_arg->Mass[m+1]; 
+	break;
+      case LIN:   
+	eig_arg->mass += eig_arg->Mass_step; 
+	break;
+      case LOG:   
+	eig_arg->mass *= eig_arg->Mass_step; 
+	break;
+      }
     }
   }
 
