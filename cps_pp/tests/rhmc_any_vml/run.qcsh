@@ -1,0 +1,11 @@
+
+qpartition_remap -X0 -Y1 -Z34 -T25
+
+
+set DIR=`pwd`
+set NDIR=`echo $DIR | sed "s/host./host/g" `
+set TRAJ=`grep traj evo_arg.vml | awk '{print $4}'`
+echo traj $TRAJ
+qrun ../binaries/QCDOC.x do_arg.vml hmd_arg.vml evo_arg.vml eig_arg.vml $NDIR > ../results/work/output.log.${TRAJ}
+
+

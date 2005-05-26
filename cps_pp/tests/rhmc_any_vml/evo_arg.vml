@@ -1,0 +1,22 @@
+class EvoArg evo_arg = {
+FclassType Fermion = F_CLASS_DWF
+GclassType Gluon = G_CLASS_IMPR_RECT
+int traj_start = 0
+int gauge_unload_period = 10
+int gauge_configurations = 1000
+int io_concurrency = 32
+int hdw_xcsum = 0
+int hdw_rcsum = 0
+int reproduce_percent = 10
+string ensemble_id = "UKQCD_24x64x16_Iwasaki_2.2_2+1_0.02_0.042_DWF"
+string ensemble_label = "UKQCD_24x64x16_Iwasaki_2.2_2+1_0.02_0.042_DWF"
+string creator = "pab"
+string gauge_file_stem = "../configurations/ckpoint_lat"
+string rng_file_stem = "../rngs/ckpoint_rng"
+string plaquette_stem = "../results/alg_plaq/plaq"
+string evo_stem = "../results/alg_hmd/hmd"
+string work_directory = "../work/"
+int CalcEig = 0
+string eig_lo_stem = "../results/alg_eig/eig_lo"
+string eig_hi_stem = "../results/alg_eig/eig_hi"
+}
