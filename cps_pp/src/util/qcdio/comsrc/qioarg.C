@@ -397,7 +397,7 @@ void QioControl::log(const char * short_note) {
   int error = 0;
 
   if(!do_log || !logging) return;
-  if(!logs.is_open() || !logs.good())  error = 1;
+  //  if(!logs.is_open() || !logs.good())  error = 1;
   if(syncError(error)>0) {
     ERR.Hardware(cname,fname,"Wrinting to file qcdio.log.* failed");
   }
@@ -420,7 +420,7 @@ void QioControl::finishLogging(const char * ending_word) {
   int error = 0;
 
   if(!do_log || !logging) return;
-  if(!logs.is_open() || !logs.good()) error=1;
+  //  if(!logs.is_open() || !logs.good()) error=1;
   if(syncError(error)>0) {
     ERR.Hardware(cname,fname,"Closing file qcdio.log.* failed");
   }

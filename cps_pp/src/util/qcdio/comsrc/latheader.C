@@ -431,7 +431,7 @@ void LatRngHeader::read(istream & fin) {
   // due to an error in the calculation of the old tag "POS_DEP_CSUM", 
   // now use a new tag "ORDER_CSUM" and deprecate the old one
   pos_dep_csum = hd.asHex("ORDER_CSUM");
-  cout << "ORDER_CSUM = " << pos_dep_csum << endl;
+  //cout << "ORDER_CSUM = " << pos_dep_csum << endl;
 
   average = hd.asFloat("AVERAGE");
   variance = hd.asFloat("VARIANCE");

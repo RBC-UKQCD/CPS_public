@@ -89,6 +89,10 @@ vml_EigArg (VML *vmls, char *name,EigArg *objp)
 		 return FALSE;
 	 if (!vml_Float (vmls, "mass", &objp->mass))
 		 return FALSE;
+	 if (!vml_string (vmls, "fname", &objp->fname, ~0))
+		 return FALSE;
+	 if (!vml_int (vmls, "ncorr", &objp->ncorr))
+		 return FALSE;
 	 vml_class_end(vmls,"EigArg",name);
 	return TRUE;
 }

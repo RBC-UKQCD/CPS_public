@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.16 2005-02-18 20:18:15 mclark Exp $
+  $Id: f_wilson.C,v 1.17 2005-05-30 08:26:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -301,48 +301,95 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
   cg_arg.mass = eig_arg->mass;
   cg_arg.RitzMatOper = eig_arg->RitzMatOper;
   int N_eig = eig_arg->N_eig;
+  int i;
 
-  if(cnv_frm == CNV_FRM_YES)
-    for(int i=0; i < N_eig; ++i)
-      Fconvert(f_eigenv[i], WILSON, StrOrd());
+  //=========================
+  // convert fermion field
+  //=========================
 
-  // Call constructor and solve for eigenvectors.
-  // Use null pointers to fake out constructor.
-  Vector *v1 = (Vector *)0;
-  Vector *v2 = (Vector *)0;
 
-  DiracOpWilson wilson(*this, v1, v2, &cg_arg, CNV_FRM_NO);
+  for(i=0; i < N_eig; ++i)
+    Fconvert(f_eigenv[i], WILSON, CANONICAL);
+
+
+
+  //------------------------------------------------------------------
+  //  we want both the eigenvalues of D_{hermitian} and
+  //  D^{+}D.  To not change the arguments passed to RitzEig,
+  //  we pass a float pointer which points to 2 * N_eig values
+  //  and return both lambda and lambda^2 from RitzEig
+  //------------------------------------------------------------------
+
+  Float * lambda2 = (Float * ) smalloc (N_eig*2*sizeof(Float));
+  if ( lambda2 == 0 ) ERR.Pointer(cname,fname, "lambda2");
   
-  iter = wilson.RitzEig(f_eigenv, lambda, valid_eig, eig_arg);
-  
-  if(cnv_frm == CNV_FRM_YES)
-    for(int i=0; i < N_eig; ++i)
-      Fconvert(f_eigenv[i], CANONICAL, StrOrd());
+  {
+    DiracOpWilson wilson(*this, (Vector*) 0 , (Vector*) 0, &cg_arg, CNV_FRM_NO);
+    iter = wilson.RitzEig(f_eigenv, lambda2, valid_eig, eig_arg);
+  }
+
+
+  for(i=0; i < N_eig; ++i)
+    {
+      Fconvert(f_eigenv[i], CANONICAL, WILSON);
+    }
+
+  /*
+    the call to RitzEig returns a negative number if either the KS or CG maxes
+    out, we wish to cope with this in alg_eig, so "pass it up". Clean up the
+    storage order first in case we still want to use the eigenvectors as a
+    guess.
+  */
+  if ( iter < 0 ) { return iter ; }
+
 
   // Compute chirality
-  // Also, rescale wilson eigenvalues to the convention  m + Dslash(U)
   int f_size = (GJP.VolNodeSites() * FsiteSize());
-  //Float factor = 4.0 + eig_arg->mass;
-  v1 = (Vector *)smalloc(f_size*sizeof(Float));
+
+  Vector* v1 = (Vector *)smalloc(f_size*sizeof(Float));
   if (v1 == 0)
     ERR.Pointer(cname, fname, "v1");
   VRB.Smalloc(cname, fname, "v1", v1, f_size*sizeof(Float));
 
-  int i;
   for(i=0; i < N_eig; ++i)
   {
     Gamma5(v1, f_eigenv[i], GJP.VolNodeSites());
     chirality[i] = f_eigenv[i]->ReDotProductGlbSum(v1, f_size);
-    //lambda[i] *= factor;
   }
 
   VRB.Sfree(cname, fname, "v1", v1);
   sfree(v1);
 
+
+  // rescale wilson eigenvalues to the convention  m + Dslash(U)
+  Float factor = 4.0 + eig_arg->mass;
+    
+  
+  FILE* fp=Fopen(eig_arg->fname,"a");
+  for(i=0; i<N_eig; ++i)
+    {
+      lambda2[i] *= factor;	 		 //rescale eigenvalue
+      lambda2[N_eig + i] *= ( factor * factor ); //rescale squared evalue
+      lambda[i]=lambda2[i];                      //copy back
+      
+      //print out eigenvalue, eigenvalue^2, chirality 
+      Fprintf(fp,"%d %g %g %g %d\n",i,
+              (float)lambda2[i],
+              (float)lambda2[N_eig + i],
+	      (float)chirality[i],valid_eig[i]);
+    }
+  Fclose(fp);
+  sfree(lambda2); 
+
+
   // Slice-sum the eigenvector density to make a 1D vector
   if (eig_arg->print_hsum)
     for(i=0; i < N_eig; ++i)
       f_eigenv[i]->NormSqArraySliceSum(hsum[i], FsiteSize(), eig_arg->hsum_dir);
+
+
+  // The remaining part in QCDSP version are all about "downloading
+  // eigenvectors", supposedly not applicable here.
 
   // Return the number of iterations
   return iter;
