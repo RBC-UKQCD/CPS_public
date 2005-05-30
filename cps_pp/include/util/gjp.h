@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.21 2005-05-21 09:44:15 chulwoo Exp $
+  $Id: gjp.h,v 1.22 2005-05-30 23:29:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-21 09:44:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.21 2005-05-21 09:44:15 chulwoo Exp $
-//  $Id: gjp.h,v 1.21 2005-05-21 09:44:15 chulwoo Exp $
+//  $Date: 2005-05-30 23:29:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.22 2005-05-30 23:29:40 chulwoo Exp $
+//  $Id: gjp.h,v 1.22 2005-05-30 23:29:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -517,6 +517,7 @@ public:
   */
 
   Float XiGfix() const            {return doarg_int.xi_gfix;}
+  int GfixChkb() const 		  {return doarg_int.gfix_chkb;}
   //!< Gets the Landau gauge coefficient
   /*!<
     The coefficient for fixing to the Landau gauge on anisotropic
