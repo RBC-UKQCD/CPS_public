@@ -69,6 +69,7 @@ public:
 	Float clover_coeff;
 	Float clover_coeff_xi;
 	Float xi_gfix;
+	int gfix_chkb;
 	Float asqtad_KS;
 	Float asqtad_naik;
 	Float asqtad_3staple;

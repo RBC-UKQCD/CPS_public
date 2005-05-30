@@ -91,6 +91,7 @@ class DoArg {
   Float clover_coeff_xi;    /*!< The coefficient of the clover term for plaquettes with links along the anisotropic direction.*/
   /* Added for Landau gauge fixing for anisotropic lattices*/
   Float xi_gfix;            /*!< Coefficient for Landau gauge fixing.*/
+  int gfix_chkb;	    /*!< Checkerboarding for the gauge fixing? */
  
 
     /* Parameters for the asqtad improved staggered action.*/
