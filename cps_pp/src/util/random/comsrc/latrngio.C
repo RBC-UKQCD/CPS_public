@@ -131,6 +131,9 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 		    hd, intconv, 5,
 		    &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0]))
       ERR.General(cname, fname, "Loading failed\n");
+    
+    VRB.Flow(cname,fname,"Node %d - 5D: csum=%x, order_csum=%x\n",
+	       UniqueID(),csum[0],pos_dep_csum[0]);
 
     hd.data_start += size_rng_chars * rng_arg.VolSites() * 
                      rng_arg.Snodes() * rng_arg.SnodeSites();
@@ -140,6 +143,9 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 		    hd, intconv, 4,
 		    &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1]))
       ERR.General(cname, fname, "Loading failed\n");
+
+    VRB.Flow(cname,fname,"Node %d - 4D: csum=%x, order_csum=%x\n",
+	       UniqueID(),csum[1],pos_dep_csum[1]);
   }
 #if TARGET == QCDOC
   else {
@@ -163,19 +169,25 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   }
 #endif
 
+  cout << "Starting logging" << endl;
+
   log();
+
+  cout << "Starting globalSumUint()" << endl;
 
   // Step 2.1: verify checksum
   csum[0] += csum[1];
   csum[0] = globalSumUint(csum[0]);
 
+  cout << "Finish globalSumUint()" << endl;
+
   if(isRoot()) {
     if( hd.checksum != csum[0] ) {
-      VRB.Flow(cname,fname, "CheckSUM error!! Header:%x  Host calc:%x\n",hd.checksum,csum[0]);
+      VRB.Result(cname,fname, "CheckSUM error!! Header:%x  Host calc:%x\n",hd.checksum,csum[0]);
       error = 1;
     }
     else
-      VRB.Flow(cname,fname,"CheckSUM is ok\n");
+      VRB.Result(cname,fname,"CheckSUM is ok\n");
   }
 
   if(synchronize(error) != 0) 
@@ -187,12 +199,12 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   if(isRoot()) {
     // pos_dep_csum could be absent
     if( hd.pos_dep_csum > 0 && hd.pos_dep_csum != pos_dep_csum[0] ) { 
-      VRB.Flow(cname,fname, "Position Dependent CheckSUM error!! Header:%x  Host_calc:%x\n",
+      VRB.Result(cname,fname, "Position Dependent CheckSUM error!! Header:%x  Host_calc:%x\n",
 	       hd.pos_dep_csum, pos_dep_csum[0]);
       error = 1;
     }
     else
-      VRB.Flow(cname,fname, "Position Dependent CheckSUM is ok\n");
+      VRB.Result(cname,fname, "Position Dependent CheckSUM is ok\n");
   }
 
   if(synchronize(error) != 0) 
@@ -320,6 +332,10 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 		     &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0]))
       ERR.General(cname, fname, "Unloading failed\n");
 
+    VRB.Flow(cname,fname,"Node %d - 5D: csum=%x, order_csum=%x\n",
+	       UniqueID(),csum[0],pos_dep_csum[0]);
+
+
     hd.data_start += size_rng_chars * rng_arg.VolSites() * 
                      rng_arg.Snodes() * rng_arg.SnodeSites();
  
@@ -329,6 +345,10 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 		     sizeof(UGrandomGenerator), hd, intconv, 4,
 		     &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1]))
       ERR.General(cname, fname, "Unloading Failed\n");
+
+    VRB.Flow(cname,fname,"Node %d - 4D: csum=%x, order_csum=%x\n",
+	       UniqueID(),csum[1],pos_dep_csum[1]);
+
   }
 #if TARGET == QCDOC
   else {
