@@ -1,18 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  $Id: fix_gauge.C,v 1.6 2004-09-02 17:16:50 zs Exp $
+  $Id: fix_gauge.C,v 1.7 2005-05-30 08:28:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 17:16:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.6 2004-09-02 17:16:50 zs Exp $
-//  $Id: fix_gauge.C,v 1.6 2004-09-02 17:16:50 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-05-30 08:28:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.7 2005-05-30 08:28:05 chulwoo Exp $
+//  $Id: fix_gauge.C,v 1.7 2005-05-30 08:28:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -612,8 +612,27 @@ void FixHPlane::iter()
   VRB.Func(cname, fname);
   
   int recurse = hplane_dim - 1;
+  //----------------------------------------------------------------------
+  // I divided distance loop to even and odd part.
+  //
+  // Even or Odd is defined by
+  // mod( index[0]+...+index[hplane_dim-1], 2 ) = 0 or 1
+  //                                        Takeshi Yamazaki
+  //----------------------------------------------------------------------
+  if (GJP.GfixChkb()==0){
+     VRB.Flow(cname,fname,"using sequential order gauge fixing");
   for(int dist = dist_max[recurse] + 1; dist-- > 0; )
     iter(recurse, dist);
+  } else {
+     VRB.Flow(cname,fname,"using checkerboared order gauge fixing");
+  //Even or Odd part
+  for(int dist = dist_max[recurse] + 1; (dist=dist-2) >= 0; )
+    iter(recurse, dist);
+  //Odd or Even part
+  for(int dist = dist_max[recurse] + 2; (dist=dist-2) >= 0; )
+    iter(recurse, dist);
+  }
+
 }
 
 
@@ -642,7 +661,14 @@ void FixHPlane::iter(int recurse, int dist)
       if(recurse > 0)
 	iter(recurse-1, dist-xx);
       else
+	/*	{
+	int go_sign = 0;
+	for(int dim=0; dim < hplane_dim ; dim++) go_sign+=index[dim];
+	go_sign = go_sign % 2;
+	printf("(%d,%d,%d) = %d\n",index[0],index[1],index[2],go_sign);
+	*/
 	fix_g(G_loc());
+        //}
     }
 }
 
