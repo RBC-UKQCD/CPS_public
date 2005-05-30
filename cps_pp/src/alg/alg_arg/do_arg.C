@@ -130,6 +130,8 @@ vml_DoArg (VML *vmls, char *name,DoArg *objp)
 		 return FALSE;
 	 if (!vml_Float (vmls, "xi_gfix", &objp->xi_gfix))
 		 return FALSE;
+	 if (!vml_int (vmls, "gfix_chkb", &objp->gfix_chkb))
+		 return FALSE;
 	 if (!vml_Float (vmls, "asqtad_KS", &objp->asqtad_KS))
 		 return FALSE;
 	 if (!vml_Float (vmls, "asqtad_naik", &objp->asqtad_naik))

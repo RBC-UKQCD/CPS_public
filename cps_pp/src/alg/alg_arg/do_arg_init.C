@@ -30,6 +30,7 @@ DoArg::DoArg () {
   c_1=0.0;
   u0=1.0;
   xi_gfix=1.0;
+  xi_gfix=0; //old style gauge fixing by default (for now!)
   start_seed_filename = "start_seed";
   start_conf_filename = "start_conf";
 #if TARGET == QCDOC
