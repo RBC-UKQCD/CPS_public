@@ -4,7 +4,8 @@
 #include <util/asqtad_int.h>
 #include <util/asqtad.h>
 
-AsqD asqd;
+//AsqD asqd;
+AsqD *asqd_p;
 static Fasqtad *lat_pt;
 
 #if 0
@@ -40,18 +41,20 @@ extern "C" void asqtad_dirac_init(Fasqtad *lat){
   arg.Naik = (IFloat *)lat_pt->Fields(1);
   arg.NaikM = (IFloat *)lat_pt->Fields(2);
 //  arg.NaikM = NULL;
-  asqd.init(&arg);
+  asqd_p = new AsqD;
+  asqd_p->init(&arg);
 }
 
 void asqtad_dirac_init_g(IFloat *frm_tmp){
   lat_pt->Smear();
-  asqd.init_g(frm_tmp);
+  asqd_p->init_g(frm_tmp);
 }
 
 void asqtad_destroy_dirac_buf(){
-  asqd.destroy_buf();
+  asqd_p->destroy_buf();
+  delete asqd_p;
 }
 
 void asqtad_destroy_dirac_buf_g(){
-  asqd.destroy_buf_g();
+  asqd_p->destroy_buf_g();
 }

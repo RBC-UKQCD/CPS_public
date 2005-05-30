@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-20 06:08:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.24 2005-05-20 06:08:33 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.24 2005-05-20 06:08:33 chulwoo Exp $
+//  $Date: 2005-05-30 08:06:35 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.25 2005-05-30 08:06:35 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.25 2005-05-30 08:06:35 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.24 $
+//  $Revision: 1.25 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -237,7 +237,7 @@ void AsqD::init(AsqDArg *arg)
   split = 1;
   if (vol >1000 || (size[0]%2) || (size[1]%2) || (size[2]%2) || (size[3]%2) )
   split = 0;
-  printf("vol=%d split=%d\n",vol,split);
+//  printf("vol=%d split=%d\n",vol,split);
 
 
   int area[2][4];
@@ -1226,7 +1226,7 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
       }
     }
     even_l[j] = index;
-    printf("even_l[%d]=%d\n",j,even_l[j]);
+//    printf("even_l[%d]=%d\n",j,even_l[j]);
     for( n = 0; n*div<NUM_DIR*2;n++)
     for(i=0;i<vol/2;i++){
       if( (num_ind[i] > n*div) && (num_ind[i] <(n+1)*div) )
@@ -1241,7 +1241,7 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
       }
     }
     odd_l[j] = index-even_l[j];
-    printf("odd_l[%d]=%d\n",j,odd_l[j]);
+//    printf("odd_l[%d]=%d\n",j,odd_l[j]);
 #endif
     if (index != comp_l[j]){
       printf("index(%d) = comp_l[%d](%d)\n",

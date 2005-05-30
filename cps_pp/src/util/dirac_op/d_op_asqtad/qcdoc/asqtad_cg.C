@@ -13,13 +13,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-18 20:18:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.5 2005-05-18 20:18:09 chulwoo Exp $
-//  $Id: asqtad_cg.C,v 1.5 2005-05-18 20:18:09 chulwoo Exp $
+//  $Date: 2005-05-30 08:06:35 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.6 2005-05-30 08:06:35 chulwoo Exp $
+//  $Id: asqtad_cg.C,v 1.6 2005-05-30 08:06:35 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_cg.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v $
 //  $State: Exp $
 //
@@ -281,7 +281,6 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
   Sum(&res_norm_sq_cur);
 
   // if( |res|^2 <= stp_cnd ) we are done
-//  VRB.Flow(cname,fname, "|res[0]|^2 = %e\n", Float(res_norm_sq_cur));
 //  printf("AsqD::InvCg: |res[0]|^2 = %e\n", Float(res_norm_sq_cur));
   itr = 0;
   max_itr = inv_arg->niter-1;
