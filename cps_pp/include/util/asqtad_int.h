@@ -291,5 +291,5 @@ SCUDirArgMulti SCUmulti_2[2];
   void Sum( Float *sum);
 };
 
-extern AsqD asqd;
+extern AsqD *asqd_p;
 #endif

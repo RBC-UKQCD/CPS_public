@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Utility routines for the asqtad fermions Dirac operator
 
-  $Id: asqtad.h,v 1.6 2005-01-13 07:46:13 chulwoo Exp $
+  $Id: asqtad.h,v 1.7 2005-05-30 23:29:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-01-13 07:46:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/asqtad.h,v 1.6 2005-01-13 07:46:13 chulwoo Exp $
-//  $Id: asqtad.h,v 1.6 2005-01-13 07:46:13 chulwoo Exp $
+//  $Date: 2005-05-30 23:29:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/asqtad.h,v 1.7 2005-05-30 23:29:20 chulwoo Exp $
+//  $Id: asqtad.h,v 1.7 2005-05-30 23:29:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad.h,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/asqtad.h,v $
 //  $State: Exp $
 //
@@ -47,7 +47,7 @@ extern "C"{
 #if TARGET == QCDOC
  inline void asqtad_dirac(IFloat *f_out, IFloat *f_in, int cb, int dag , 
 		      int dir_flag = 0){
-  asqd.dirac(f_out,f_in,cb,dag);
+  asqd_p->dirac(f_out,f_in,cb,dag);
 }
 #else
  void asqtad_dirac(IFloat *f_out, IFloat *f_in, int cb, int dag , 
