@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definitions of the EigArg structure.
   
-  $Id: eig_arg.x,v 1.3 2005-05-18 06:17:33 chulwoo Exp $
+  $Id: eig_arg.x,v 1.4 2005-05-30 23:28:53 chulwoo Exp $
 */
 /*------------------------------------------------------------------*/
 
@@ -61,6 +61,10 @@ class EigArg {
 			   */
 
     Float mass;		/*!< The mass to use in the eigenvector solver */
+
+      // the following two variables should be added, as in QCDSP -- Sam
+    string fname<>;   // should be moved from common_arg to here -- Sam
+    int ncorr;
     
 };
 

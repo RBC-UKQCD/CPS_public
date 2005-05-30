@@ -47,6 +47,8 @@ public:
 	int print_hsum;
 	int hsum_dir;
 	Float mass;
+	char *fname;
+	int ncorr;
 };
 
 /* the xdr functions */
