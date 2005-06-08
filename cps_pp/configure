@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX LD AR AS CXXFLAGS ac_ct_CXX NOT_TESTING_QCDSP topwd_srcdir ARCH ARCHDIR ASFLAGS DFLAGS INCLUDE_FLAGS TESTING_PARALLEL ENABLE_PARALLEL QOS DO_GMP CPS_END_NAMESPACE CPS_START_NAMESPACE USING_NAMESPACE_CPS CWD GSUMPRECISION LOCALPRECISION PRECDIR VERSION_MAJOR VERSION_MINOR VERSION_SUB VERSION_STR INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA have_doxygen LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CXX LD AR AS CXXFLAGS ac_ct_CXX CC_PATH NOT_TESTING_QCDSP topwd_srcdir ARCH ARCHDIR ASFLAGS DFLAGS INCLUDE_FLAGS TESTING_PARALLEL ENABLE_PARALLEL QOS DO_GMP CPS_END_NAMESPACE CPS_START_NAMESPACE USING_NAMESPACE_CPS CWD GSUMPRECISION LOCALPRECISION PRECDIR VERSION_MAJOR VERSION_MINOR VERSION_SUB VERSION_STR INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA have_doxygen LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3713,6 +3713,8 @@ done
      exit 1
    fi
 fi
+CC_PATH=`which "$CXX" |sed -e 's/bin\/powerpc-gnu-elf-g++//'`
+
 
 NOT_TESTING_QCDSP="yes"
 
@@ -5773,6 +5775,7 @@ s,@AR@,$AR,;t t
 s,@AS@,$AS,;t t
 s,@CXXFLAGS@,$CXXFLAGS,;t t
 s,@ac_ct_CXX@,$ac_ct_CXX,;t t
+s,@CC_PATH@,$CC_PATH,;t t
 s,@NOT_TESTING_QCDSP@,$NOT_TESTING_QCDSP,;t t
 s,@topwd_srcdir@,$topwd_srcdir,;t t
 s,@ARCH@,$ARCH,;t t

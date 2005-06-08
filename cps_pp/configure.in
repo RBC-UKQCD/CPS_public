@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2005-05-03 20:13:15 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.33 2005-05-03 20:13:15 chulwoo Exp $
-dnl  $Id: configure.in,v 1.33 2005-05-03 20:13:15 chulwoo Exp $
+dnl  $Date: 2005-06-08 06:36:48 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.34 2005-06-08 06:36:48 chulwoo Exp $
+dnl  $Id: configure.in,v 1.34 2005-06-08 06:36:48 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.33 $
+dnl  $Revision: 1.34 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -54,6 +54,9 @@ dnl check if Intel compiler is available if running on 686
      exit 1
    fi
 fi
+dnl path for the compiler
+CC_PATH=`which "$CXX" |sed -e 's/bin\/powerpc-gnu-elf-g++//'`
+AC_SUBST(CC_PATH)
 
 dnl If using this script, then we are not making the QCDSP version.
 NOT_TESTING_QCDSP="yes"
