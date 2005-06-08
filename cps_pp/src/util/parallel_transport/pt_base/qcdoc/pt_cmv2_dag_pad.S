@@ -1,8 +1,8 @@
 	.section	".text"
 	.align 2
-	.globl pt_cmv_dag_pad
-	.type	pt_cmv_dag_pad,@function
-pt_cmv_dag_pad:
+	.globl pt_cmv2_dag_pad
+	.type	pt_cmv2_dag_pad,@function
+pt_cmv2_dag_pad:
 	la   %r1,	-864(%r1)
 	stw	%r14,	368(%r1)
 	stw	%r15,	376(%r1)
@@ -117,9 +117,9 @@ lab1:
 	lfd	   29,	88(%r27)
 	stfd	   17,	40(%r24)
 	lfd	   2,	16 ( % r19)
-	stfd	   17,	48(%r24)
+	stfd	   30,	48(%r24)
 	lfd	   3,	24 ( % r19)
-	stfd	   17,	56(%r24)
+	stfd	   30,	56(%r24)
 #<<<<<< Break 1
 	lfd	   18,	96(%r27)
 	fmadd	 6, 24,  2,  6
@@ -201,28 +201,25 @@ lab1:
 	fmul	16, 28,  0
 	lfd	   19,	56(%r28)
 	fmul	17, 28,  1
-	dcbt	 %r13,	 %r4
-	fmadd	12, 25,  1, 12
 	stfd	   7,	8(%r23)
-	fnmsub	13, 25,  0, 13
-	dcbt	 %r14,	 %r4
-	fmadd	14, 27,  1, 14
+	fmadd	12, 25,  1, 12
 	lfd	   20,	64(%r28)
-	fnmsub	15, 27,  0, 15
-
-	fmadd	16, 29,  1, 16
+	fnmsub	13, 25,  0, 13
 	stfd	   8,	16(%r23)
-	fnmsub	17, 29,  0, 17
+	fmadd	14, 27,  1, 14
 	lfd	   21,	72(%r28)
+	fnmsub	15, 27,  0, 15
 	stfd	   9,	24(%r23)
+	fmadd	16, 29,  1, 16
 	lfd	   22,	80(%r28)
+	fnmsub	17, 29,  0, 17
 	stfd	   10,	32(%r23)
 	lfd	   23,	88(%r28)
 	stfd	   11,	40(%r23)
 	lfd	   2,	16 ( % r20)
-	stfd	   11,	48(%r23)
+	stfd	   30,	48(%r23)
 	lfd	   3,	24 ( % r20)
-	stfd	   11,	56(%r23)
+	stfd	   30,	56(%r23)
 #<<<<<< Break 5
 	lfd	   24,	96(%r28)
 	fmadd	12, 18,  2, 12
@@ -324,9 +321,9 @@ lab2:
 	fnmsub	11, 23,  0, 11
 	stfd	   17,	40(%r24)
 	lfd	   2,	16 ( % r19)
-	stfd	   17,	48(%r24)
+	stfd	   30,	48(%r24)
 	lfd	   3,	24 ( % r19)
-	stfd	   17,	56(%r24)
+	stfd	   30,	56(%r24)
 #<<<<<< Break 1
 	lfd	   18,	96(%r27)
 	mr	 %r20,	 %r22
@@ -399,9 +396,9 @@ lab2:
 	stfd	   11,	40(%r23)
 	fnmsub	17, 29,  0, 17
 	lfd	   2,	16 ( % r20)
-	stfd	   11,	48(%r23)
+	stfd	   30,	48(%r23)
 	lfd	   3,	24 ( % r20)
-	stfd	   11,	56(%r23)
+	stfd	   30,	56(%r23)
 #<<<<<< Break 5
 	lfd	   24,	96(%r28)
 	fmadd	12, 18,  2, 12
@@ -450,8 +447,8 @@ lab2:
 	stfd	   15,	24(%r24)
 	stfd	   16,	32(%r24)
 	stfd	   17,	40(%r24)
-	stfd	   17,	48(%r24)
-	stfd	   17,	56(%r24)
+	stfd	   30,	48(%r24)
+	stfd	   30,	56(%r24)
 lab0:
 	lwz	%r14,	368(%r1)
 	lwz	%r15,	376(%r1)

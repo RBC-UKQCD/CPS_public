@@ -72,7 +72,7 @@ void pt_delete_g(){
 
 void pt_1vec(int n, IFloat **mout, IFloat **min, int const *dir){
   StaticPT.vec(n,mout,min,dir);
-  ParTrans::PTflops +=66*n*PT::vol;
+  ParTrans::PTflops +=33*n*PT::vol;
 }
 
 void pt_mat(int n, IFloat **mout, IFloat **min, int const *dir){
@@ -108,19 +108,23 @@ void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb, Fl
 void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb)
 {
   StaticPT.vec_cb(n,vout,vin,dir,cb);
+  ParTrans::PTflops +=33*n*PT::vol;
 }
 
 void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb, Float * new_gauge_field)
 {
   StaticPT.vec_cb(n,vout,vin,dir,cb,new_gauge_field);
+  ParTrans::PTflops +=33*n*PT::vol;
 }
 
 void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, int pad)
 {
   StaticPT.vec_cb(n,vout,vin,dir,cb,pad);
+  ParTrans::PTflops +=33*n*PT::vol;
 }
 
 void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, int pad, Float * new_gauge_field)
 {
   StaticPT.vec_cb(n,vout,vin,dir,cb,pad,new_gauge_field);
+  ParTrans::PTflops +=33*n*PT::vol;
 }

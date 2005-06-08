@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.23 2005-05-12 20:47:35 chulwoo Exp $
+  $Id: pt.C,v 1.24 2005-06-08 06:34:29 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-12 20:47:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.23 2005-05-12 20:47:35 chulwoo Exp $
-//  $Id: pt.C,v 1.23 2005-05-12 20:47:35 chulwoo Exp $
+//  $Date: 2005-06-08 06:34:29 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.24 2005-06-08 06:34:29 chulwoo Exp $
+//  $Id: pt.C,v 1.24 2005-06-08 06:34:29 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -31,6 +31,9 @@
 #include <comms/scu.h>
 #include <stdio.h>
 #endif
+
+static unsigned long PEC = 0xb0000000;
+static unsigned long PLB = 0xb0000000;
 
 #undef CPP
 //#define CPP
@@ -50,7 +53,10 @@ extern "C"{
   void pt_cmv_dag(int count, ind_agg *ind, double *gauge, double *src, double *dest);
   void pt_cmv_dag_pad(int count, ind_agg *ind, double *gauge, double *src, double *dest);
 
-  void copy_buffer(int n, long src, long dest, long ptable);
+  void pt_copy(int count, ind_agg *ind, double *src, double *dest);
+  void pt_copy_pad(int count, ind_agg *ind, double *src, double *dest);
+
+  void pt_copy_buffer(int n, long src, long dest, long ptable);
   // Assembler copying routines
   void copy_matrix(IFloat *res, IFloat *src, int *length, 
 		   unsigned long *res_ptr, unsigned long *src_ptr);
@@ -520,21 +526,23 @@ void PT::init(PTArg *pt_arg)
       uc_l_cb[parity][i] = (gauge_agg_cb *)qalloc(0,sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
       uc_nl_cb[parity][i] = (gauge_agg_cb *)qalloc(0,sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
 
-      uc_l_pad_cb[parity][i] = (gauge_agg_cb *)qalloc(0,sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
-      uc_nl_pad_cb[parity][i] = (gauge_agg_cb *)qalloc(0,sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
+      uc_l_pad_cb[parity][i] = (gauge_agg_cb *)((unsigned long)qalloc(0,sizeof(gauge_agg_cb)*(1+local_chi_cb[i]))-PEC+PLB);
+      uc_nl_pad_cb[parity][i] = (gauge_agg_cb *)((unsigned long)qalloc(0,sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]))-PEC+PLB);
+//      printf("uc_pad_cb = %p %p\n",uc_l_pad_cb[parity][i],uc_nl_pad_cb[parity][i]);
     }
 
     //-------------------------------------------------------------------------
 
-    if(non_local_chi[i]>0){
     // This buffer is actually overkill, but ensures will work if
     // shift_field is called with hop>1
-    rcv_buf[i] = (IFloat *)qalloc(QCOMMS,3*MAX_HOP*non_local_chi[i]*vlen);
+    if(non_local_chi[i]>0){
+      rcv_buf[i] = (IFloat *)FastAlloc(3*MAX_HOP*non_local_chi[i]*vlen);
+//    rcv_buf[i] = (IFloat *)qalloc(QCOMMS,3*MAX_HOP*non_local_chi[i]*vlen);
     if(rcv_buf[i]==NULL)PointerErr("",fname,"rcv_buf[i]");
 
     //Used buffer used in vvpd
-    rcv_buf2[i] = (IFloat *)qalloc(QCOMMS,MAX_HOP*non_local_chi[i]*vlen);
-    if(rcv_buf2[i]==NULL)PointerErr("",fname,"rcv_buf2[i]");
+      rcv_buf2[i] = (IFloat *)qalloc(QCOMMS,MAX_HOP*non_local_chi[i]*vlen);
+      if(rcv_buf2[i]==NULL)PointerErr("",fname,"rcv_buf2[i]");
     } else{
       rcv_buf[i] = rcv_buf2[i] = NULL;
     }
@@ -643,7 +651,7 @@ void PT::init(PTArg *pt_arg)
 	    parity = (x[0]+x[1]+x[2]+x[3])%2;
 	    //Calculate offsets for transfers in the negative T direction
 	    if((x[3] == 0) && !local[3])
-	      *(Toffset[parity] +non_local_count_cb[parity][6]) = LexVector_cb(x);
+	      *(Toffset[parity] +non_local_count_cb[parity][6]) = LexVector_cb(x)*VECT_LEN;
 
 	    for(i=0;i<NDIM;i++){
 
@@ -857,8 +865,8 @@ void PT::delete_buf(){
       {
 	Free(uc_l_cb[parity][i]);
 	Free(uc_nl_cb[parity][i]);
-	Free(uc_l_pad_cb[parity][i]);
-	Free(uc_nl_pad_cb[parity][i]);
+	Free( (void *) ((unsigned long)uc_l_pad_cb[parity][i]-PLB+PEC) );
+	Free( (void *) ((unsigned long)uc_nl_pad_cb[parity][i]-PLB+PEC) );
       }
 
     //-------------------------------------------------------------------
@@ -1156,6 +1164,7 @@ parity)
   mat_cb_norm(n,mout,min,dir,parity,gauge_field_addr);
 }
 
+#define PROFILE
 #undef PROFILE
 void PT::mat_cb_norm(int n, IFloat **mout, IFloat **min, const int *dir, int
 parity, IFloat * gauge)
@@ -1207,7 +1216,7 @@ parity, IFloat * gauge)
 	else if((wire[i] == 6))
 	  {
 	    for(int j = 0; j < non_local_chi_cb[6];j++)
-	      moveMem(snd_buf_t_cb + j*GAUGE_LEN,min[i] + 3 * *(Toffset[parity]+j)*vlen,GAUGE_LEN*sizeof(IFloat));
+	      moveMem(snd_buf_t_cb + j*GAUGE_LEN,min[i] + 3 * *(Toffset[parity]+j)*3,GAUGE_LEN*sizeof(IFloat));
 	  }
       }
     }
@@ -1233,13 +1242,15 @@ parity, IFloat * gauge)
       non_local_dir++;
     }
 
-  SCUmulti.Init(SCUarg_p,2*non_local_dir);
+  if(non_local_dir){
+    SCUmulti.Init(SCUarg_p,2*non_local_dir);
 
-  //Begin transmission
-  SCUmulti.SlowStartTrans();
+//Begin transmission
+    SCUmulti.SlowStartTrans();
 
-  //End transmission
-  SCUmulti.TransComplete();
+//End transmission
+    SCUmulti.TransComplete();
+  }
 
   //Do local calculations
   for(i=0;i<n;i++)
@@ -1349,6 +1360,7 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
   static int call_num = 0;
   int vlen = VECT_LEN;
   int vlen2 = VECT_LEN;
+//  printf("gauge=%p\n",gauge);
 
   call_num++;
   
@@ -1393,10 +1405,21 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	      }
 	    else if((wire[i] == 6))
 	      {
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
+#if 1
+            pt_copy_buffer(non_local_chi_cb[6],(long)vin[i],(long)snd_buf_t_cb,(long)Toffset[parity]);
+#else
 		for(j = 0; j < non_local_chi_cb[6];j++)
 		  for(k = 0; k < VECT_LEN;k++)
-		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)*vlen + k);
+		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)+ k);
 		  //moveMem(snd_buf_t_cb + j*VECT_LEN,vin[i] + *(Toffset[parity]+j)*vlen,VECT_LEN*sizeof(IFloat));
+#endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"pt_copy_buffer()",0,dtime);
+#endif
 	      }
 	  }
       }
@@ -1422,13 +1445,27 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	      }
 	    else if(wire[i] == 6)
 	      {
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
+#if 1
+            pt_copy_buffer(non_local_chi_cb[6],(long)vin[i],(long)snd_buf_t_cb,(long)Toffset[parity]);
+#else
 		for(j = 0; j < non_local_chi_cb[6];j++)
 		  for(k = 0; k < VECT_LEN;k++)
-		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)*vlen + k);
-		  moveMem(snd_buf_t_cb + j*VECT_LEN,vin[i] + *(Toffset[parity]+j)*vlen,VECT_LEN*sizeof(IFloat));
+		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)+ k);
+//		  moveMem(snd_buf_t_cb + j*VECT_LEN,vin[i] + *(Toffset[parity]+j),VECT_LEN*sizeof(IFloat));
+#endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"pt_copy_buffer()",0,dtime);
+#endif
 	      }
 	  }
       }
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
 
   #if 1
   int comms = 0;
@@ -1455,33 +1492,12 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
     }
   #endif
 
-  #if 0
-  for(i=0;i<n;i++)
-    {
-      //Calculate the starting address for the data to be sent
-      IFloat *addr = vin[i] + VECT_LEN * offset_cb[wire[i]];
-      //This points to the appropriate SCUDirArg for receiving
-      SCUarg_p[2*i] = SCUarg_cb[2*wire[i]];
-      //This points to the appropriate SCUDirArg for sending
-      SCUarg_p[2*i+1] = SCUarg_cb[2*wire[i]+1];
 
-      //Set the send address
-      if(wire[i]%2)
-	SCUarg_p[2*i+1]->Addr((void *)snd_buf_cb[wire[i]/2]);
-      else if(wire[i] == 6)
-	SCUarg_p[2*i+1]->Addr((void *)snd_buf_t_cb);
-      else
-	SCUarg_p[2*i+1]->Addr((void *)addr);
-    }
-  #endif
-
-  SCUmulti.Init(SCUarg_p,2*comms);
-  //SCUmulti.Init(SCUarg_p,2*n);
-
-  //Begin transmission
-  SCUmulti.SlowStartTrans();
-  //End transmission
-//  SCUmulti.TransComplete();
+  if(comms){
+    SCUmulti.Init(SCUarg_p,2*comms);
+//Begin transmission
+    SCUmulti.SlowStartTrans();
+  }
 
   //Do local calculations
   if(conjugated)
@@ -1534,7 +1550,7 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
     }
   
   //End transmission
-  SCUmulti.TransComplete();
+  if(comms){ SCUmulti.TransComplete(); }
 
   //If wire[i] is even, then we have transport in the negative direction.
   //In this case, the vector field is multiplied by the SU(3) link matrix
@@ -1570,6 +1586,12 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	  //All we need to do is to put the transported field in the correct place
 	  else
 	    {
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
+#if 1
+              pt_copy(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],rcv_buf[wire[i]],vout[i]);
+#else
 	      //Place the data in the receive buffer into the result vector
 	      for(s=0;s<non_local_chi_cb[wire[i]];s++)
 		{
@@ -1579,6 +1601,11 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 		    *(fp1+d) = *(fp0+d);
 		  //moveMem(fp1,fp0,VECT_LEN*sizeof(IFloat));
 		}
+#endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"pt_copy()",0,dtime);
+#endif
 	    }
 	}
     }
@@ -1602,6 +1629,12 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   static int call_num = 0;
   int vlen = VECT_LEN;
   int vlen2 = 8;
+#ifdef PROFILE
+  printf("gauge=%p parity =%d\n",gauge,parity);
+  for(i=0;i<n;i++){
+    printf("%d: vin=%p vout=%p\n",i,vin[i],vout);
+  }
+#endif
 
   call_num++;
   
@@ -1667,14 +1700,27 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	    }
 	  else if(wire[i] == 6)
 	    {
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
+#if 1
+            pt_copy_buffer(non_local_chi_cb[6],(long)vin[i],(long)snd_buf_t_cb,(long)Toffset[parity]);
+#else
 	      for(int j = 0; j < non_local_chi_cb[6];j++)
 		  for(k = 0; k < VECT_LEN;k++)
-		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)*vlen + k);
-	      //moveMem(snd_buf_t_cb + j*VECT_LEN,vin[i] + *(Toffset[parity]+j)*vlen,VECT_LEN*sizeof(IFloat));
+		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)+ k);
+#endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"pt_copy_buffer()",0,dtime);
+#endif
 	    }
 	}
     }
 
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
   #if 1
   int comms = 0;
   for(i=0;i<n;i++)
@@ -1699,6 +1745,11 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	}
     }
   #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"Addr",0,dtime);
+#endif
+
   #if 0
   for(i=0;i<n;i++)
     {
@@ -1719,12 +1770,18 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
     }
   #endif
 
-  SCUmulti.Init(SCUarg_p,2*comms);
-  //SCUmulti.Init(SCUarg_p,2*n);
-  //Begin transmission
-  SCUmulti.SlowStartTrans();
-  //End transmission
-  SCUmulti.TransComplete();
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
+  if(comms){
+    SCUmulti.Init(SCUarg_p,2*comms);
+//Begin transmission
+    SCUmulti.SlowStartTrans();
+  }
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"StartTrans()",0,dtime);
+#endif
 
 
   //Do local calculations
@@ -1758,6 +1815,14 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
 #endif
     }
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
+  if(comms){ SCUmulti.TransComplete(); }
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"TransComplete()",0,dtime);
+#endif
 
   //If wire[i] is even, then we have transport in the negative direction.
   //In this case, the vector field is multiplied by the SU(3) link matrix
@@ -1769,6 +1834,9 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	{
 	  if(!(wire[i]%2))
 	    {
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
               #ifdef CPP
 	      if(conjugated)
 		pt_cmv_dag_pad_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_pad_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout,(long)gauge);
@@ -1780,12 +1848,22 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	      else
 		pt_cmv_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout);
 	      #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
+#endif
 	    }
 	  //Otherwise we have parallel transport in the positive direction.
 	  //In this case, the received data has already been pre-multiplied
 	  //All we need to do is to put the transported field in the correct place
 	  else
 	    {
+#ifdef PROFILE
+  dtime  = - dclock();
+#endif
+#if 1
+              pt_copy_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],rcv_buf[wire[i]],vout);
+#else
 	      //Place the data in the receive buffer into the result vector
 	      for(int s=0;s<non_local_chi_cb[wire[i]];s++)
 		{
@@ -1795,6 +1873,11 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 		    *(fp1+d) = *(fp0+d);
 		  //moveMem(fp1,fp0,VECT_LEN*sizeof(IFloat));
 		}
+#endif
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"pt_copy_pad()",0,dtime);
+#endif
 	    }
 	}
     }
@@ -1821,7 +1904,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   call_num++;
   char *fname="pt_mat()";
 //  VRB.Func("",fname);
-	
+  
   for(i=0;i<n;i++) wire[i] = dir[i]; 
 #ifdef PROFILE
   Float dtime  = - dclock();
@@ -1839,11 +1922,11 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
     SCUarg_p[2*non_local_dir+1]->Addr((void *)addr);
     non_local_dir++;
   }
+if (non_local_dir){
   SCUmulti.Init(SCUarg_p,non_local_dir*2);
   //Start transmission
   SCUmulti.SlowStartTrans();
-  //End transmission
-  SCUmulti.TransComplete();
+}
 //  #define CPP
   //Initerleaving of local computation of matrix multiplication
   for(i=0;i<n;i++){
@@ -1855,6 +1938,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
 #endif
   }
 
+  if (non_local_dir)
   SCUmulti.TransComplete();
   //Do non-local computations
   for(i=0;i<n;i++) 
@@ -1912,8 +1996,10 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
     SCUarg_p[2*non_local_dir+1]->Addr((void *)addr);
     non_local_dir++;
   }
-  SCUmulti.Init(SCUarg_p,non_local_dir*2);
-  SCUmulti.SlowStartTrans();
+  if(non_local_dir){
+    SCUmulti.Init(SCUarg_p,non_local_dir*2);
+    SCUmulti.SlowStartTrans();
+  }
 	
 #ifndef CPP
   for(i=0;i<n;i++) pt_asqtad_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
@@ -1922,7 +2008,7 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
     cmv_agg_cpp(local_chi[wire[i]],(long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
 #endif
 	
-  SCUmulti.TransComplete();
+  if(non_local_dir){ SCUmulti.TransComplete(); }
 #ifndef CPP
   for(i=0;i<n;i++) 
     if(non_local_chi[wire[i]])
@@ -1982,7 +2068,7 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
         }
 
       // Start communication
-      SCUmulti.Init(SCUarg_p,2*comms);
+      if (comms) SCUmulti.Init(SCUarg_p,2*comms);
     } else {
       comms=0;
       for(i=0;i<n_dir;i++)
@@ -1992,11 +2078,11 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
       }
 
       // Start communication
-      SCUmulti.Init(SCUarg_p2,2*comms);
+      if (comms) SCUmulti.Init(SCUarg_p2,2*comms);
     }
-    SCUmulti.SlowStartTrans();
+    if (comms) SCUmulti.SlowStartTrans();
     // Finalise communication
-    SCUmulti.TransComplete();
+    if (comms) SCUmulti.TransComplete();
 
     // Perform non-local calculation for previous v
     if (v>0)
@@ -2063,8 +2149,8 @@ void PT::shift_field(IFloat **v, const int *dir, int n_dir,
     comms++;
   }
 
-  SCUmulti.Init(SCUarg_p,2*comms);
-  SCUmulti.SlowStartTrans();
+  if (comms) SCUmulti.Init(SCUarg_p,2*comms);
+  if (comms) SCUmulti.SlowStartTrans();
 //  SCUmulti.TransComplete();
   
   for (i=0; i<n_dir; i++) {
@@ -2072,7 +2158,7 @@ void PT::shift_field(IFloat **v, const int *dir, int n_dir,
     copy_matrix(u[i],v[i],&length,dest_l[hop-1][wire[i]],
 		src_l[hop-1][wire[i]]);
   }
-  SCUmulti.TransComplete();
+  if (comms) SCUmulti.TransComplete();
 
   for (i=0; i<n_dir; i++) {
     length = hop*non_local_chi[wire[i]];

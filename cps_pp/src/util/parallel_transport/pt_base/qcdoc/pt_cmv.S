@@ -199,18 +199,21 @@ lab1:
 	fmul	16, 28,  0
 	lfd	   19,	24(%r28)
 	fmul	17, 28,  1
-	stfd	   7,	8(%r23)
+	dcbt	 %r13,	 %r4
 	fnmsub	12, 21,  1, 12
-	lfd	   22,	64(%r28)
+	stfd	   7,	8(%r23)
 	fmadd	13, 21,  0, 13
-	stfd	   8,	16(%r23)
+	dcbt	 %r14,	 %r4
 	fnmsub	14, 25,  1, 14
-	lfd	   23,	72(%r28)
+	lfd	   22,	64(%r28)
 	fmadd	15, 25,  0, 15
-	stfd	   9,	24(%r23)
+
 	fnmsub	16, 29,  1, 16
-	lfd	   26,	112(%r28)
+	stfd	   8,	16(%r23)
 	fmadd	17, 29,  0, 17
+	lfd	   23,	72(%r28)
+	stfd	   9,	24(%r23)
+	lfd	   26,	112(%r28)
 	stfd	   10,	32(%r23)
 	lfd	   27,	120(%r28)
 	stfd	   11,	40(%r23)
