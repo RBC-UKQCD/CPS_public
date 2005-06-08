@@ -21,9 +21,10 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include <config.h>
+#if 0
 #include <util/qcdio.h>
 #include <math.h>
-#include <util/lattice.h>
 #include <util/dirac_op.h>
 #include <util/dwf.h>
 #include <util/gjp.h>
@@ -33,10 +34,30 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
+#endif
+#include <util/lattice.h>
+#include <util/time.h>
 USING_NAMESPACE_CPS
 
 Fdwf::Fdwf() : FdwfBase(){
+  cname = "Fdwf";
 }
 
 Fdwf::~Fdwf(){
+}
+
+#define PROFILE
+void Fdwf::EvolveMomFforce(Matrix *mom, Vector *chi,
+                           Float mass, Float step_size){
+  char *fname = "EvolveMomFforce()";
+#ifdef PROFILE
+  Float time = -dclock();
+  ForceFlops=0;
+#endif
+   FdwfBase::EvolveMomFforce(mom, chi, mass, step_size);
+#ifdef PROFILE
+  time += dclock();
+  print_flops(cname,fname,ForceFlops,time);
+#endif
+     
 }

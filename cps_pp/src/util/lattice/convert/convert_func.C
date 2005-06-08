@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.10 2005-05-12 20:44:38 chulwoo Exp $
+  $Id: convert_func.C,v 1.11 2005-06-08 06:40:02 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-12 20:44:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.10 2005-05-12 20:44:38 chulwoo Exp $
-//  $Id: convert_func.C,v 1.10 2005-05-12 20:44:38 chulwoo Exp $
+//  $Date: 2005-06-08 06:40:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.11 2005-06-08 06:40:02 chulwoo Exp $
+//  $Id: convert_func.C,v 1.11 2005-06-08 06:40:02 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -687,10 +687,10 @@ void FstagToCanon(CAP cap, int num_chkbds)
 
         RunGConverter(cap, site_sort_tbl, component_sort_tbl);
 
-        VRB.Sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
-        sfree(component_sort_tbl);
-        VRB.Sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
-        sfree(site_sort_tbl);
+        sfree(component_sort_tbl, cname_none,fname, "component_sort_tbl");
+//        sfree(component_sort_tbl);
+        sfree(site_sort_tbl,cname_none,fname, "site_sort_tbl");
+//        sfree(site_sort_tbl);
 }
 
 

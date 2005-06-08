@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.38 2005-05-12 20:11:55 chulwoo Exp $
+  $Id: lattice.h,v 1.39 2005-06-08 06:37:37 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2005-05-12 20:11:55 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.38 2005-05-12 20:11:55 chulwoo Exp $
-  $Id: lattice.h,v 1.38 2005-05-12 20:11:55 chulwoo Exp $
+  $Date: 2005-06-08 06:37:37 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.39 2005-06-08 06:37:37 chulwoo Exp $
+  $Id: lattice.h,v 1.39 2005-06-08 06:37:37 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.38 $
+  $Revision: 1.39 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -2538,6 +2538,10 @@ class Fdwf : public FdwfBase {
 
     Fdwf(void);
     ~Fdwf(void);
+    void EvolveMomFforce(Matrix *mom, Vector *frm, 
+				 Float mass, Float step_size);
+        // It evolves the canonical momentum mom by step_size
+        // using the fermion force.
 };
 
 //------------------------------------------------------------------

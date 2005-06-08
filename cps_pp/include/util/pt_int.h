@@ -8,7 +8,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.11 2005-05-12 20:56:24 chulwoo Exp $
+  $Id: pt_int.h,v 1.12 2005-06-08 06:37:49 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 //#include <util/lattice.h>
@@ -282,6 +282,11 @@ int conjugated;
     }
   void *Alloc(int request){
     return qalloc(QCOMMS,request);
+  }
+  void *FastAlloc(int request){
+    void *p =  qalloc(QFAST,request);
+    if (!p) p = qalloc(QCOMMS,request);
+    return p;
   }
   void *Alloc(char *cname, char *fname, char *vname, int request){
     if (request<0){ 

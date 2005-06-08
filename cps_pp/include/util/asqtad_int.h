@@ -196,7 +196,7 @@ SCUDirArgMulti SCUmulti[2];
 SCUDirArgIR SCUarg_1[2][2*NUM_DIR];
 SCUDirArgMulti SCUmulti_1[2];
 
-SCUDMAInst *SCUDMAarg_p[2][NUM_DIR*4];
+//SCUDMAInst *SCUDMAarg_p[2][NUM_DIR*4];
 SCUDMAInst SCUDMAarg[2][NUM_DIR*4];
 
 SCUDirArgIR SCUarg_2[2][2*NUM_DIR];

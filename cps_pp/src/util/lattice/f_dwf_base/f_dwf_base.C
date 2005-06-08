@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.21 2005-05-09 15:24:50 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.22 2005-06-08 06:40:41 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -619,12 +619,19 @@ void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				    Float *alpha, Float mass, Float dt,
 				    Vector **sol_d) {
   char *fname = "RHMC_EvolveMomFforce";
-
+#ifdef PROFILE
+  Float time = -dclock();
+  ForceFlops=0;
+#endif
   // Temporary fix for the moment.
   int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
   for (int i=0; i<degree; i++){
     EvolveMomFforce(mom,sol[i],mass,alpha[i]*dt);
   }
+#ifdef PROFILE
+  time += dclock();
+  print_flops(cname,fname,ForceFlops,time);
+#endif
 
 }
 

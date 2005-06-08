@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.6 2005-05-06 20:17:54 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.7 2005-06-08 06:40:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -38,7 +38,7 @@ CPS_END_NAMESPACE
 #include <comms/glb.h>
 CPS_START_NAMESPACE
 
-#define PROFILE
+#undef PROFILE
 
 static int offset (int *size, int *pos, int mu = -1){
   if (mu>3) printf("FdwfBase::offset: Error!\n");

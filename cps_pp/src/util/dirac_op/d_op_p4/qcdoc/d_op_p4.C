@@ -168,6 +168,7 @@ void DiracOpP4::MatPcDagMatPc(Vector *out,
 #ifdef PROFILE
   struct timeval start,end;
   gettimeofday(&start,NULL);
+  CGflops=0;
 #endif
   p4_dirac(frm_tmp, in, 0, 0);
   p4_dirac(out, frm_tmp, 1, 0);
@@ -185,7 +186,7 @@ void DiracOpP4::MatPcDagMatPc(Vector *out,
 #ifdef PROFILE
   gettimeofday(&end,NULL);
   printf("DiracOpP4::MatPcDagMatPc:: ");
-  print_flops(nflops,&start,&end);
+  print_flops(CGflops,&start,&end);
 #endif
 }
 

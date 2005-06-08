@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-30 08:06:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.25 2005-05-30 08:06:35 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.25 2005-05-30 08:06:35 chulwoo Exp $
+//  $Date: 2005-06-08 06:32:58 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.26 2005-06-08 06:32:58 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.26 2005-06-08 06:32:58 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.25 $
+//  $Revision: 1.26 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -688,23 +688,24 @@ void AsqD::init(AsqDArg *arg)
 
       if (i==0) buf_len = frm_len*area[(1+odd)%2][0];
       if (i==4) buf_len = frm_len*area[(odd)%2][0];
-      SCUDMAarg_p[odd][(i+NUM_DIR)*2]  = new SCUDMAInst;
-      SCUDMAarg_p[odd][(i+NUM_DIR)*2] ->Init(chi_off_node[odd][0][i],
+      SCUDMAarg[odd][(i+NUM_DIR)*2].Init(chi_off_node[odd][0][i],
         buf_len, 1, 0);
 
       if (i==0) buf_len = frm_len*area[(odd)%2][0];
       if (i==4) buf_len = frm_len*area[(1+odd)%2][0];
-      SCUDMAarg_p[odd][(i+NUM_DIR)*2+1]  = new SCUDMAInst;
-      SCUDMAarg_p[odd][(i+NUM_DIR)*2+1] ->Init(chi_off_node[odd][1][i],
+      SCUDMAarg[odd][(i+NUM_DIR)*2+1].Init(chi_off_node[odd][1][i],
         buf_len, 1, 0);
+      SCUDMAInst *temp[2];
+      temp[0] = &SCUDMAarg[odd][(i+NUM_DIR)*2];
+      temp[1] = &SCUDMAarg[odd][(i+NUM_DIR)*2+1];
       if( split ){
         SCUarg_1[odd][2*comms].Init(scudir[i],SCU_REC, 
-          &SCUDMAarg_p[odd][(i+NUM_DIR)*2],1, scu_irs[odd][0]);
+          temp,1, scu_irs[odd][0]);
         SCUarg_2[odd][2*comms].Init(scudir[i],SCU_REC, 
-          &SCUDMAarg_p[odd][(i+NUM_DIR)*2+1],1, scu_irs[odd][1]);
+          temp+1,1,scu_irs[odd][1]);
       } else {
         SCUarg_1[odd][2*comms].Init(scudir[i],SCU_REC, 
-          &SCUDMAarg_p[odd][(i+NUM_DIR)*2],2, scu_irs[odd][0]);
+          temp,2, scu_irs[odd][0]);
       }
   
       //send arguments
@@ -724,28 +725,26 @@ void AsqD::init(AsqDArg *arg)
   
         if (i==0) buf_len = frm_len*area[odd%2][0];
         else buf_len = frm_len*area[(1+odd)%2][0];
-        SCUDMAarg_p[odd][i*2] = new SCUDMAInst;
-        SCUDMAarg_p[odd][i*2] ->Init(Tbuffer[0][(4 - i)/4], 
+        SCUDMAarg[odd][i*2].Init(Tbuffer[0][(4 - i)/4], 
   		       buf_len, 1, 0);
 
         if (i==0) buf_len = frm_len*area[(1+odd)%2][0];
         else buf_len = frm_len*area[(odd)%2][0];
-        SCUDMAarg_p[odd][i*2+1] = new SCUDMAInst;
         if(size[j]>2)
-          SCUDMAarg_p[odd][i*2+1] ->Init(Tbuffer[1][(4 - i)/4], 
+          SCUDMAarg[odd][i*2+1].Init(Tbuffer[1][(4 - i)/4], 
   		       buf_len, 1, 0);
         else
-          SCUDMAarg_p[odd][i*2+1] ->Init(Tbuffer[0][i/4], 
+          SCUDMAarg[odd][i*2+1].Init(Tbuffer[0][i/4], 
   		       buf_len, 1, 0);
   
+        SCUDMAInst *temp[2];
+        temp[0]=&(SCUDMAarg[odd][i*2]);
+        temp[1]=&(SCUDMAarg[odd][i*2+1]);
         if( split ){
-          SCUarg_1[odd][2*comms+1].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],1,
-            scu_irs[odd][0]);
-          SCUarg_2[odd][2*comms+1].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2+1],1,
-            scu_irs[odd][1]);
+          SCUarg_1[odd][2*comms+1].Init(scudir[i],SCU_SEND,temp,1,scu_irs[odd][0]);
+          SCUarg_2[odd][2*comms+1].Init(scudir[i],SCU_SEND,temp+1,1,scu_irs[odd][1]);
         } else {
-          SCUarg_1[odd][2*comms+1].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],2,
-            scu_irs[odd][0]);
+          SCUarg_1[odd][2*comms+1].Init(scudir[i],SCU_SEND,temp,2,scu_irs[odd][0]);
         }
       }
       else{
@@ -759,17 +758,18 @@ void AsqD::init(AsqDArg *arg)
           SCUarg[odd][2*comms+1].Init(chi_off_node[odd][0][(i+4)%NUM_DIR], scudir[i], SCU_SEND,
              VECT_LEN * sizeof(Float) * vol / ( 2 * size[j]),1,0, scu_irs[odd][2] );
 
-        SCUDMAarg_p[odd][i*2] = new SCUDMAInst;
-        SCUDMAarg_p[odd][i*2] ->Init(chi_off_node_total, 
+        SCUDMAarg[odd][i*2].Init(chi_off_node_total, 
   		       blklen[j], numblk[j], stride[j]);
-        SCUDMAarg_p[odd][i*2+1] = new SCUDMAInst;
-        SCUDMAarg_p[odd][i*2+1] ->Init(chi_off_node_total, 
+        SCUDMAarg[odd][i*2+1].Init(chi_off_node_total, 
   		       blklen[j], numblk[j], stride[j]);
+        SCUDMAInst *temp[2];
+        temp[0]=&SCUDMAarg[odd][i*2];
+        temp[1]=&SCUDMAarg[odd][i*2+1];
         if( split ){
-          SCUarg_1[odd][2*comms+1].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],1,scu_irs[odd][0]);
-          SCUarg_2[odd][2*comms+1]. Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2+1],1,scu_irs[odd][1]);
+          SCUarg_1[odd][2*comms+1].Init(scudir[i],SCU_SEND,temp,1,scu_irs[odd][0]);
+          SCUarg_2[odd][2*comms+1]. Init(scudir[i],SCU_SEND,temp+1,1,scu_irs[odd][1]);
         } else {
-          SCUarg_1[odd][2*comms+1].Init(scudir[i],SCU_SEND,&SCUDMAarg_p[odd][i*2],2,scu_irs[odd][0]);
+          SCUarg_1[odd][2*comms+1].Init(scudir[i],SCU_SEND,temp,2,scu_irs[odd][0]);
         }
       }
       comms++;
@@ -824,13 +824,6 @@ void AsqD::destroy_buf()
     }
   }
     
-
-  for (int odd = 0; odd<2;odd++){
-    for ( i = 0; i < NUM_DIR; i++ ) {
-      for(k=0;k<4;k++)
-        delete SCUDMAarg_p[odd][i*4+k];
-    }
-  }
 }
 //-------------------------------------------------------------------
 //  Given a lexical value for gauge fields, set the coordinates.
