@@ -178,7 +178,7 @@ void p4_dirac_init_g()
 	  tmp_frm2[i] = (Vector *) smalloc (vol/2*VECT_LEN*sizeof(IFloat));
 	}
     }
-  smeared_gauge = (IFloat *) smalloc(vol*SITE_LEN*sizeof(IFloat));
+  smeared_gauge = (IFloat *) fmalloc(vol*SITE_LEN*sizeof(IFloat));
 
   if(smeared_gauge == 0)
     ERR.Pointer(cname,fname, "smeared_gauge");
@@ -225,7 +225,7 @@ void p4_destroy_dirac_buf_g()
       qfree(knight_onetwo);
       qfree(knight_twoone);
       qfree(smeared_onelink);
-      sfree(smeared_gauge);
+      ffree(smeared_gauge);
       for(int i = 0; i < 8; i++)
 	{
 	  qfree(tmp_frm[i]);
@@ -290,7 +290,7 @@ static int LexGauge_block_cb(int *x, int dir)
 //cb - 0 if the input field is located on even sites, 1 if odd
 //dag - not used in this implementation
 
-#define PROFILE
+#undef PROFILE
 extern "C"
 void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
 {
@@ -298,6 +298,7 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   //Let mu = dir[i]/2;
   //If dir[i] is even, then this transport in the negative mu direction
   //If dir[i] is odd, then we have transport in the positive mu direction
+  char *fname = "p4_dirac()";
   int dir[8] = {0,1,2,3,4,5,6,7};
 
   IFloat * fp0,*fp1,*fp2,*fp3,*fp4,*fp5,*fp6,*fp7,*fp8,*fp9,*fp10;
@@ -309,11 +310,12 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   for(int mu = 0; mu < NUM_DIR; mu++)
     fermion[mu] = f_in;
 
-  #ifdef PROFILE
   int nflops=0;
-  Float dtime = -dclock();
+  Float dtime;
+#ifdef PROFILE
+  dtime = -dclock();
   ParTrans::PTflops = 0;
-  #endif
+#endif
 
   //First step, gather one link and two link parallel transports from
   //all eight directions
@@ -321,9 +323,30 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   //Calculation of P_mu(x); result-> knight_onetwo
   pt->run(8,knight_onetwo,fermion,dir,(ChkbType) cb,1);
 
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"PT",ParTrans::PTflops,dtime);
+  ParTrans::PTflops = 0;
+  dtime = -dclock();
+#endif
+
   //Calculation of P_nu_nu(x); result-> knight_twoone
   pt->run(8,tmp_frm,fermion,dir,(ChkbType) cb);
+
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"PT",ParTrans::PTflops,dtime);
+  ParTrans::PTflops = 0;
+  dtime = -dclock();
+#endif
   pt->run(8,knight_twoone,tmp_frm,dir,(ChkbType) (1-cb),1);
+
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"PT",ParTrans::PTflops,dtime);
+  ParTrans::PTflops = 0;
+  dtime = -dclock();
+#endif
 
   //Do appropriate linear combinations for the initial one link term
   //
@@ -367,7 +390,7 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   #else
   for(nu = 0; nu < 4; nu++)
     {
-      bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
+//      bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
       res_p[nu] = (Float *)tmp_frm[nu];
     }
   p4_recom_n(vol/2, (Float *)knight_onetwo, res_p);
@@ -378,13 +401,30 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
     }
   #endif
 
-  #ifdef PROFILE
-  nflops += 4*(vol/2)*6*6;
-  #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  nflops = 4*(vol/2)*5*6;
+  print_flops(fname,"recom",nflops,dtime);
+  dtime = -dclock();
+#endif
 
   //Transport the resulting combinations in the nu direction
   pt->run(8,tmp_frm2,tmp_frm_p,dir,(ChkbType) (1-cb));
+
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"PT2",ParTrans::PTflops,dtime);
+  ParTrans::PTflops = 0;
+  dtime = -dclock();
+#endif
   pt->run(8,knight_onetwo,tmp_frm2,dir,(ChkbType) cb, 1);
+
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"PT2",ParTrans::PTflops,dtime);
+  ParTrans::PTflops=0;
+  dtime =-dclock();
+#endif
 
   //Do linear combination for the initial two-link terms
   //
@@ -422,7 +462,7 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   #else
   for(nu = 0; nu < 4; nu++)
     {
-      bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
+ //     bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
       res_p[nu] = (Float *)tmp_frm[nu];
     }
   p4_recom(vol/2, (Float *)knight_twoone, res_p);
@@ -433,12 +473,22 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
     }
   #endif
 
-  #ifdef PROFILE
-  nflops += 4*(vol/2)*6*6;
-  #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  nflops = 4*(vol/2)*5*6;
+  print_flops(fname,"recom2",nflops,dtime);
+  dtime =-dclock();
+#endif
 
   //Transport these by one link
   pt->run(8,knight_twoone,tmp_frm_p,dir,(ChkbType) cb, 1);
+
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"PT3",ParTrans::PTflops,dtime);
+  ParTrans::PTflops=0;
+  dtime =-dclock();
+#endif
 
   //Calculate the smeared one link term
   pt->run(8,smeared_onelink,fermion,dir,(ChkbType) cb,1,smeared_gauge);
@@ -446,8 +496,16 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   //Sum up contributions from the knight's move terms
   //and the smeared one link term and place them in fout
 
-  bzero((char*)f_out,(vol/2)*VECT_LEN*sizeof(IFloat));
 
+#ifdef PROFILE
+  dtime +=dclock();
+  print_flops(fname,"PT3",ParTrans::PTflops,dtime);
+  ParTrans::PTflops=0;
+  dtime =-dclock();
+#endif
+
+
+  bzero((char*)f_out,(vol/2)*VECT_LEN*sizeof(IFloat));
   #ifdef CPP
    for(n = 0; n < vol/2; n++)
     {
@@ -487,22 +545,27 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
    #endif
 
 
-  #ifdef PROFILE
-  nflops += (vol/2)*6*4*6;
-  #endif
+#ifdef PROFILE
+  dtime +=dclock();
+  nflops = (vol/2)*(2*8*2+8)*6;
+  print_flops(fname,"dsum",nflops,dtime);
+  dtime =-dclock();
+#endif
   
+#if 0
    #ifdef PROFILE
    dtime += dclock();
    nflops += ParTrans::PTflops;
    #endif
+#endif
 
    //Parallel Transport flops:
    //7 parallel transports * (264*vol) flops/transport = 1848*vol
    //Linear combination flops:
-   //72*vol + 72*vol + 72*vol = 216*vol
-   //Total flop count = 2064*vol
+   //60*vol + 60*vol + 120*vol = 240*vol
+   //Total flop count = 2088*vol
 
-   DiracOp::CGflops += 7*264*vol+216*vol;
+   DiracOp::CGflops += 2088*vol;
 }
 
 CPS_END_NAMESPACE
