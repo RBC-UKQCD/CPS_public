@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
 
-  $Id: alg_hmc_phi.C,v 1.22 2005-06-16 07:16:42 chulwoo Exp $
+  $Id: alg_hmc_phi.C,v 1.23 2005-06-16 07:18:55 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-16 07:16:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.22 2005-06-16 07:16:42 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.22 2005-06-16 07:16:42 chulwoo Exp $
+//  $Date: 2005-06-16 07:18:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.23 2005-06-16 07:18:55 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.23 2005-06-16 07:18:55 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -389,7 +389,7 @@ Float AlgHmcPhi::run(void)
   Float acceptance;
 
 #ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
-  if(!ScuChecksum::ChecksumsOn(void))
+  if(!ScuChecksum::ChecksumsOn())
   ScuChecksum::Initialise(true,true);
 #endif
   // Get the Lattice object

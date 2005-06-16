@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.17 2005-06-16 07:16:43 chulwoo Exp $
+  $Id: alg_hmd_r.C,v 1.18 2005-06-16 07:18:55 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-16 07:16:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.17 2005-06-16 07:16:43 chulwoo Exp $
-//  $Id: alg_hmd_r.C,v 1.17 2005-06-16 07:16:43 chulwoo Exp $
+//  $Date: 2005-06-16 07:18:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.18 2005-06-16 07:18:55 chulwoo Exp $
+//  $Id: alg_hmd_r.C,v 1.18 2005-06-16 07:18:55 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //
@@ -252,7 +252,7 @@ Float AlgHmdR::run(void)
   CSM.SaveComment(step_cnt);
 
 #ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
-  if(!ScuChecksum::ChecksumsOn(void))
+  if(!ScuChecksum::ChecksumsOn())
   ScuChecksum::Initialise(true,true);
 #endif
   // Get the Lattice object
