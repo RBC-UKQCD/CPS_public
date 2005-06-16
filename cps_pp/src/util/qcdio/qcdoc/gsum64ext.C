@@ -2,6 +2,7 @@
 //
 #include <qalloc.h>
 #include <util/gsum64ext.h>
+#include <util/error.h>
 
 void Gsum64Ext::Init(const SCUAxis *axis_p, int Nd)
 {
@@ -13,8 +14,10 @@ void Gsum64Ext::Init(const SCUAxis *axis_p, int Nd)
   SCUAxis axs;
 
   if ( GsumArrayFW == NULL  ) { 
-    GsumArrayFW = (double *)qalloc(QNONCACHE,sizeof(double) * MAX_NODE_DIM);
-    GsumArrayBW = (double *)qalloc(QNONCACHE,sizeof(double) * MAX_NODE_DIM);
+      GsumArrayFW = (double *)qalloc(QNONCACHE,sizeof(double) * MAX_NODE_DIM);
+      if(!GsumArrayFW) ERR.Pointer("Gsum64Ext", "Init", "GsumArrayFW");
+      GsumArrayBW = (double *)qalloc(QNONCACHE,sizeof(double) * MAX_NODE_DIM);
+      if(!GsumArrayBW) ERR.Pointer("Gsum64Ext", "Init", "GsumArrayBW");      
   }
 
   // Fill out machine size info

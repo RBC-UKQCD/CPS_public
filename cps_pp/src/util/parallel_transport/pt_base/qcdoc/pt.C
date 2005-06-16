@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.24 2005-06-08 06:34:29 chulwoo Exp $
+  $Id: pt.C,v 1.25 2005-06-16 07:26:57 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-08 06:34:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.24 2005-06-08 06:34:29 chulwoo Exp $
-//  $Id: pt.C,v 1.24 2005-06-08 06:34:29 chulwoo Exp $
+//  $Date: 2005-06-16 07:26:57 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.25 2005-06-16 07:26:57 chulwoo Exp $
+//  $Id: pt.C,v 1.25 2005-06-16 07:26:57 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.24 $
+//  $Revision: 1.25 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -523,11 +523,11 @@ void PT::init(PTArg *pt_arg)
     //Allocate memory for gauge_agg_cb
     for(int parity = 0; parity < 2; parity++)
     {
-      uc_l_cb[parity][i] = (gauge_agg_cb *)qalloc(0,sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
-      uc_nl_cb[parity][i] = (gauge_agg_cb *)qalloc(0,sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
+      uc_l_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_l_cb",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]),0);
+      uc_nl_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]),0);
 
-      uc_l_pad_cb[parity][i] = (gauge_agg_cb *)((unsigned long)qalloc(0,sizeof(gauge_agg_cb)*(1+local_chi_cb[i]))-PEC+PLB);
-      uc_nl_pad_cb[parity][i] = (gauge_agg_cb *)((unsigned long)qalloc(0,sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]))-PEC+PLB);
+      uc_l_pad_cb[parity][i] = (gauge_agg_cb *)(unsigned long)Alloc(cname,fname,"uc_l_pad_cb",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]),0);
+      uc_nl_pad_cb[parity][i] = (gauge_agg_cb *)(unsigned long)Alloc(cname,fname,"uc_nl_pad_cb",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]),0);
 //      printf("uc_pad_cb = %p %p\n",uc_l_pad_cb[parity][i],uc_nl_pad_cb[parity][i]);
     }
 
@@ -537,12 +537,11 @@ void PT::init(PTArg *pt_arg)
     // shift_field is called with hop>1
     if(non_local_chi[i]>0){
       rcv_buf[i] = (IFloat *)FastAlloc(3*MAX_HOP*non_local_chi[i]*vlen);
-//    rcv_buf[i] = (IFloat *)qalloc(QCOMMS,3*MAX_HOP*non_local_chi[i]*vlen);
-    if(rcv_buf[i]==NULL)PointerErr("",fname,"rcv_buf[i]");
+    if(!rcv_buf[i])PointerErr("",fname,"rcv_buf[i]");
 
     //Used buffer used in vvpd
-      rcv_buf2[i] = (IFloat *)qalloc(QCOMMS,MAX_HOP*non_local_chi[i]*vlen);
-      if(rcv_buf2[i]==NULL)PointerErr("",fname,"rcv_buf2[i]");
+      rcv_buf2[i] = (IFloat *)FastAlloc(MAX_HOP*non_local_chi[i]*vlen);
+      if(!rcv_buf2[i])PointerErr("",fname,"rcv_buf2[i]");
     } else{
       rcv_buf[i] = rcv_buf2[i] = NULL;
     }
@@ -554,13 +553,11 @@ void PT::init(PTArg *pt_arg)
   for(i=0; i<NDIM;i++)
     if(non_local_chi_cb[2*i+1])
     {
-      snd_buf_cb[i] = (IFloat *)qalloc(QCOMMS,3*non_local_chi_cb[2*i+1]*vlen);
-      if(snd_buf_cb[i]==NULL)PointerErr("",fname,"snd_buf_cb[i]");
+      snd_buf_cb[i] = (IFloat *)Alloc(cname,fname,"snd_buf_cb[i]",3*non_local_chi_cb[2*i+1]*vlen);
     } else
       snd_buf_cb[i] = NULL;
   if(non_local_chi_cb[6]){
-    snd_buf_t_cb = (IFloat *)qalloc(QCOMMS,3*non_local_chi_cb[6]*vlen);
-    if(snd_buf_t_cb==NULL) PointerErr("",fname,"snd_buf_t_cb");
+    snd_buf_t_cb = (IFloat *)Alloc("",fname,"snd_buf_t_cb",3*non_local_chi_cb[6]*vlen);
   } else
     snd_buf_t_cb = NULL;
 
@@ -816,8 +813,8 @@ void PT::init(PTArg *pt_arg)
 
     if (l_size>0){
       hp_l[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
-      src_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
-      dest_l[j][i] = (unsigned long*)qalloc(0,l_size*sizeof(unsigned long));
+      src_l[j][i] = (unsigned long*)Alloc(cname,fname,"src_l[j][i]",l_size*sizeof(unsigned long),0);
+      dest_l[j][i] = (unsigned long*)Alloc(cname,fname,"dest_l[j][i]",l_size*sizeof(unsigned long),0);
     } else {
       hp_l[j][i] = NULL;
       src_l[j][i] = NULL;
@@ -825,8 +822,8 @@ void PT::init(PTArg *pt_arg)
     }
       
       hp_nl[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
-      dest_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
-      src_nl[j][i] = (unsigned long*)qalloc(0,nl_size*sizeof(unsigned long));
+      src_nl[j][i] = (unsigned long*)Alloc(cname,fname,"src_nl[j][i]",nl_size*sizeof(unsigned long),0);
+      dest_nl[j][i] = (unsigned long*)Alloc(cname,fname,"dest_nl[j][i]",nl_size*sizeof(unsigned long),0);
     }
   }
   
@@ -991,9 +988,7 @@ void PT::init_g(void){
   SCUDir snd_dir[]={SCU_XM, SCU_XP, SCU_YM, SCU_YP, SCU_ZM, SCU_ZP,SCU_TM,SCU_TP};
 
   //Temporary buffer (allocated on cache) that receives an SU(3) matrix
-  IFloat *rcv_mat = (IFloat *)qalloc(QFAST|QNONCACHE,18*sizeof(IFloat));
-//  if (!rcv_mat) ERR.Pointer("",fname,"rcv_mat");
-//  VRB.Smalloc(cname,fname,"rcv_mat",rcv_mat,18*sizeof(IFloat));
+  IFloat *rcv_mat = (IFloat *)Alloc(cname,fname,"rcv_mat",18*sizeof(IFloat),QFAST|QNONCACHE);
 
   sys_cacheflush(0);
 
