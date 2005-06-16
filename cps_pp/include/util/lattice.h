@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.39 2005-06-08 06:37:37 chulwoo Exp $
+  $Id: lattice.h,v 1.40 2005-06-16 07:16:08 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2005-06-08 06:37:37 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.39 2005-06-08 06:37:37 chulwoo Exp $
-  $Id: lattice.h,v 1.39 2005-06-08 06:37:37 chulwoo Exp $
+  $Date: 2005-06-16 07:16:08 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.40 2005-06-16 07:16:08 chulwoo Exp $
+  $Id: lattice.h,v 1.40 2005-06-16 07:16:08 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.39 $
+  $Revision: 1.40 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -605,6 +605,17 @@ class Lattice
 //------------------------------------------------------------------
     virtual FclassType Fclass() const = 0;
         //!< Returns the type of fermion action.
+    int FstagType(){
+      if (Fclass()==F_CLASS_STAG || Fclass() ==F_CLASS_ASQTAD || 
+        Fclass() ==F_CLASS_P4) return 1;
+      else return 0;
+    }
+
+    int FwilsonType(){
+      if (Fclass()==F_CLASS_WILSON || Fclass() ==F_CLASS_CLOVER || 
+        Fclass() ==F_CLASS_DWF) return 1;
+      else return 0;
+    }
 
     virtual int FsiteOffsetChkb(const int *x) const = 0;
     //!< Gets the lattice site index for the odd-even (checkerboard) order.
