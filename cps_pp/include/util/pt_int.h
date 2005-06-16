@@ -8,77 +8,11 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.12 2005-06-08 06:37:49 chulwoo Exp $
+  $Id: pt_int.h,v 1.13 2005-06-16 14:27:56 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
-//#include <util/lattice.h>
-#if 0
-CPS_START_NAMESPACE
-void pt_init(Lattice &lat);  //!< Initialization for parallel transporters
-void pt_init_g();
-void pt_delete();
-void pt_delete_g();
-void pt_mat(int n, Float **mout, Float **min, const int *dir);
-void pt_1vec(int n, Float **vout, Float **vin, int const *dir);
-void pt_2vec(int n, Float **vout, Float **vin, const int *dir);
-//void pt_set_hop_pointer();
-int pt_offset(int dir, int hop);
-
-void pt_vvpd(Float **vect, int n_vect, const int *dir,
-	     int n_dir, int hop, Float **sum);
-void pt_shift_field(Float **v, const int *dir, int n_dir,
-		    int hop, Float **u);
-void pt_shift_link(Float **u, const int *dir, int n_dir);
-
-//---------------------------------------------------------------
-//Checkerboarding methods
-void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb);  //!<Parallel transport for checkerboarded Matrix fields
-void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb,new_gauge_field);  //!<Parallel transport for checkerboarded Matrix fields
-
-void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb); //!<Parallel transport for checkerboarded Vector fields
-void pt_1vec_cb(int n, Float **vout, Float **vin, const int *dir, ChkbType cb, Float * new_gauge_field); //!<Parallel transport for checkerboarded Vector fields
-void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, int pad); //!<Parallel transport for padded checkerboarded Vector fields
-void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, int pad, Float * new_gauge_field); //!<Parallel transport for padded checkerboarded Vector fields
-void pt_1vec_cb_norm(int n, Float **vout, Float **vin, const int *dir,ChkbType cb, Float * gauge);
-void pt_1vec_cb_pad(int n, Float *vout, Float **vin, const int *dir,ChkbType cb,int pad, Float * gauge);
-//---------------------------------------------------------------
-#endif
 
 
-#if 0
-struct gauge_agg{
-  int src;
-  int dest;
-  Float mat[18];
-};
-
-//-----------------------------------------------------------------------
-//Checkerboarded parallel transport
-
-struct gauge_agg_cb{
-  //Index for initial position of field
-  int src;
-  //Index for "transported field"
-  int dest;
-  //Index for the padded field.  This assumes that the field will be
-  //transported in all 8 possible directions.  Instead of storing
-  //each direction in a single block, fields transported to each
-  //lattice site from different directions are stored together
-  //This allows for faster linear combination in the p4 action.
-  int dest2;
-  //Index for the gauge link
-  int gauge_index;
-  //Determines if the gauge link needs to be complex conjugated
-  int dagger;
-};
-
-//-----------------------------------------------------------------------
-
-struct hop_pointer {
-  int src;
-  int dest;
-};
-#endif
 
 #include <qcdocos/scu_dir_arg.h>
 struct PTArg {
@@ -278,24 +212,20 @@ int conjugated;
 	void asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float dt);
 	void PointerErr(char *cname, char *fname, char *vname){
 	  printf("%s::%s: %s not allocated\n",cname,fname,vname);
-  	  exit(-1);
+  	  exit(-42);
     }
-  void *Alloc(int request){
-    return qalloc(QCOMMS,request);
-  }
+
   void *FastAlloc(int request){
     void *p =  qalloc(QFAST,request);
     if (!p) p = qalloc(QCOMMS,request);
     return p;
   }
-  void *Alloc(char *cname, char *fname, char *vname, int request){
-    if (request<0){ 
-      printf("Alloc(): %s::%s: %s %d bytes\n",cname,fname,vname,request);
-      exit(-42);
-    }
-    if (request==0) return NULL;
-    return qalloc(QCOMMS,request);
-  }
+
+  void *Alloc(char *cname, char *fname, char *vname, int request,unsigned
+int flag = QCOMMS);
+
+  void *FastAlloc(char *cname, char *fname, char *vname, int request );
+
   void Free(void *p){
     if (p) qfree(p);
   }
