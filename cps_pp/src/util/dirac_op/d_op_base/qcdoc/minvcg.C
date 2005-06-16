@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpBase class multishift CG solver method.
 
-  $Id: minvcg.C,v 1.14 2005-05-09 15:13:40 chulwoo Exp $
+  $Id: minvcg.C,v 1.15 2005-06-16 14:36:19 chulwoo Exp $
 */
 
 CPS_END_NAMESPACE
@@ -109,46 +109,27 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   }
   
   int convP;
-  int *convsP = (int*)smalloc(Nmass*sizeof(int));
-  int *converged = (int*)smalloc(Nmass*sizeof(int));
-  if(convsP == 0) ERR.Pointer(cname,fname, "convsP");
-  VRB.Smalloc(cname,fname,"convsP", convsP, Nmass * sizeof(int));
+  int *convsP = (int*)smalloc(cname,fname,"convsP",Nmass*sizeof(int));
+  int *converged = (int*)smalloc(cname,fname,"converged",Nmass*sizeof(int));
 
   Float a, as, b, bp;
-  Float *bs = (Float*)smalloc(Nmass * sizeof(Float));
-  if(bs == 0) ERR.Pointer(cname,fname, "bs");
-  VRB.Smalloc(cname,fname,"bs", bs, Nmass * sizeof(Float));
+  Float *bs = (Float*)smalloc(cname,fname,"bs",Nmass * sizeof(Float));
 
-#if 1
+
   Float *z[2];
-#else
-  Float **z = (Float**)smalloc(2 * sizeof(Float*));
-  if(z == 0) ERR.Pointer(cname,fname, "z");
-  VRB.Smalloc(cname,fname,"z", z, 2 * sizeof(Float*));
-#endif
-
   for (s=0; s<2; s++) {
-    z[s] = (Float*)smalloc(Nmass * sizeof(Float));
-    if (z[s] == 0) ERR.Pointer(cname,fname, "z[s]");
-//    *(z+s) = (Float*)smalloc(Nmass * sizeof(Float));
-//    if (*(z+s) == 0) ERR.Pointer(cname,fname, "z[s]");
-    VRB.Smalloc(cname,fname,"z[s]", z[s], Nmass * sizeof(Float));
+    z[s] = (Float*)smalloc(Nmass * sizeof(Float), cname,fname,"z[s]");
   }
 
   Float css, ztmp;  
   Float c, cp, d;
   
-  Float *rsd_sq = (Float*)smalloc(Nmass*sizeof(Float)); 
-  if(rsd_sq == 0) ERR.Pointer(cname,fname, "rsd_sq");
-  VRB.Smalloc(cname,fname,"rsd_sq", rsd_sq, Nmass * sizeof(Float));
+  Float *rsd_sq = (Float*)smalloc(Nmass*sizeof(Float), cname,fname, "rsd_sq");
 
-  Float *rsdcg_sq = (Float*)smalloc(Nmass*sizeof(Float)); 
-  if(rsdcg_sq == 0) ERR.Pointer(cname,fname, "rsdcg_sq");
-  VRB.Smalloc(cname,fname,"rsdcg_sq", rsdcg_sq, Nmass * sizeof(Float));
+  Float *rsdcg_sq = (Float*)smalloc(Nmass*sizeof(Float), cname,fname, "rsdcg_sq");
   
-  Float *at = (Float*)smalloc(Nmass*sizeof(Float));
-  if (at == 0) ERR.Pointer(cname,fname, "at");
-  VRB.Smalloc(cname,fname,"at", at, Nmass * sizeof(Float));
+  Float *at = (Float*)smalloc(Nmass*sizeof(Float),  cname,fname, "at");
+
 
   Float b_tmp;
 
