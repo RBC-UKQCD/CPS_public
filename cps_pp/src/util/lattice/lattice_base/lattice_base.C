@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.30 2005-05-20 06:37:44 chulwoo Exp $
+  $Id: lattice_base.C,v 1.31 2005-06-16 07:25:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-20 06:37:44 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.30 2005-05-20 06:37:44 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.30 2005-05-20 06:37:44 chulwoo Exp $
+//  $Date: 2005-06-16 07:25:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.31 2005-06-16 07:25:25 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.31 2005-06-16 07:25:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.30 $
+//  $Revision: 1.31 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -338,7 +338,6 @@ Lattice::~Lattice()
   MltFloat(1.0 / GJP.XiBare(), GJP.XiDir());
 
 }
-
 
 //------------------------------------------------------------------
 // const Matrix *GaugeField(void) const:
@@ -2132,7 +2131,7 @@ void Lattice::RandGaussVector(Vector *frm, Float sigma2)
 void Lattice::RandGaussVector(Vector *frm, Float sigma2, int
 chkbds,FermionFieldDimension frm_field_dim  )
 {
-  if (Fclass()==F_CLASS_STAG || Fclass() ==F_CLASS_ASQTAD|| Fclass() ==F_CLASS_P4)
+  if (FstagType())
 	RandGaussVector(frm, sigma2, chkbds, STAG, frm_field_dim);
   else
 	RandGaussVector(frm, sigma2, chkbds, CANONICAL, frm_field_dim);

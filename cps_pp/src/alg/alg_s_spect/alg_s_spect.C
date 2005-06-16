@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-09 20:36:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.9 2005-03-09 20:36:21 chulwoo Exp $
-//  $Id: alg_s_spect.C,v 1.9 2005-03-09 20:36:21 chulwoo Exp $
+//  $Date: 2005-06-16 07:21:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.10 2005-06-16 07:21:22 chulwoo Exp $
+//  $Id: alg_s_spect.C,v 1.10 2005-06-16 07:21:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_s_spect.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v $
 //  $State: Exp $
 //
@@ -173,7 +173,7 @@ AlgStagQuark::AlgStagQuark(Lattice& latt,
 
   // Check fermion type
   //----------------------------------------------------------------
-  if(latt.Fclass() != F_CLASS_STAG)
+  if(!latt.FstagType())
     ERR.General(cname,fname, class_str, int(latt.Fclass()));
 
 
@@ -257,7 +257,7 @@ AlgStagMeson::AlgStagMeson(Lattice& latt,
 
   // Check fermion type
   //----------------------------------------------------------------
-  if(latt.Fclass() != F_CLASS_STAG)
+  if(!latt.FstagType())
     ERR.General(cname,fname, class_str, int(latt.Fclass()));
 
   
@@ -354,7 +354,7 @@ AlgStagMomMeson::AlgStagMomMeson(Lattice& latt,
 
   // Check fermion type
   //----------------------------------------------------------------
-  if(latt.Fclass() != F_CLASS_STAG)
+  if(!latt.FstagType())
     ERR.General(cname,fname, class_str, int(latt.Fclass()));
 
 
@@ -453,7 +453,7 @@ AlgStagNucleon::AlgStagNucleon(Lattice& latt,
 
   // Check fermion type
   //----------------------------------------------------------------
-  if(latt.Fclass() != F_CLASS_STAG)
+  if(!latt.FstagType())
     ERR.General(cname,fname, class_str, int(latt.Fclass()));
 
 
@@ -550,7 +550,7 @@ AlgStagNonLocal::AlgStagNonLocal(Lattice& latt,
 
   // Check fermion type
   //----------------------------------------------------------------
-  if(latt.Fclass() != F_CLASS_STAG)
+  if(!latt.FstagType())
     ERR.General(cname,fname, class_str, int(latt.Fclass()));
 
 
