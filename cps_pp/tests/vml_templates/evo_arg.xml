@@ -1,4 +1,6 @@
 <class><name>EvoArg</name><instance>evo_arg</instance><data>
+<item><name>Fermion</name><value><FclassType>F_CLASS_NONE </FclassType></value></item>
+<item><name>Gluon</name><value><GclassType>G_CLASS_NONE </GclassType></value></item>
 <item><name>traj_start</name><value><int>0</int></value></item>
 <item><name>gauge_unload_period</name><value><int>0</int></value></item>
 <item><name>gauge_configurations</name><value><int>0</int></value></item>
@@ -14,6 +16,7 @@
 <item><name>plaquette_stem</name><value><string>plaq </string></value></item>
 <item><name>evo_stem</name><value><string>hmd </string></value></item>
 <item><name>work_directory</name><value><string> </string></value></item>
+<item><name>CalcEig</name><value><int>0</int></value></item>
 <item><name>eig_lo_stem</name><value><string> </string></value></item>
 <item><name>eig_hi_stem</name><value><string> </string></value></item>
 </data></class>

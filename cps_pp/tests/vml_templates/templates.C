@@ -33,13 +33,13 @@ int main(int argc, char *argv[])
   Meas.TaskList.TaskList_len = 1;
   Meas.TaskList.TaskList_val = &Task;
 
-  Meas.GaugeStem = "config_stem";
-  Meas.RNGStem = "rng_stem";
+  Meas.GaugeStem = "";
+  Meas.RNGStem = "";
 
-  Task.OutputFilestem = "out_stem";
+  Task.OutputFilestem = "";
   Task.ArgFilename = "arg_stem";
 
-  ws_out.cg = "filename";
+  ws_out.cg = "";
   ws_out.cg2 = "filename";
   ws_out.pbp = "filename";
   ws_out.mid_point = "filename";

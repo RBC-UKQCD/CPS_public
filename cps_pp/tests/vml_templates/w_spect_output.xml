@@ -1,6 +1,6 @@
 <class><name>WspectOutput</name><instance>w_spect_output</instance><data>
 <item><name>fold</name><value><WbaryonFold>BARYON_FOLD </WbaryonFold></value></item>
-<item><name>cg</name><value><string>filename </string></value></item>
+<item><name>cg</name><value><string> </string></value></item>
 <item><name>cg2</name><value><string>filename </string></value></item>
 <item><name>pbp</name><value><string>filename </string></value></item>
 <item><name>mid_point</name><value><string>filename </string></value></item>
