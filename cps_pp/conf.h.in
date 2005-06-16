@@ -33,6 +33,9 @@
 /* Define to 1 if the system has the type `netobj'. */
 #undef HAVE_NETOBJ
 
+/* Define to 1 if you have the <qcdocos/scu_checksum.h> header file. */
+#undef HAVE_QCDOCOS_SCU_CHECKSUM_H
+
 /* Define to 1 if the system has the type `quad_t'. */
 #undef HAVE_QUAD_T
 

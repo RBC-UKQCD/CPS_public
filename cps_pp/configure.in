@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2005-06-08 06:36:48 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.34 2005-06-08 06:36:48 chulwoo Exp $
-dnl  $Id: configure.in,v 1.34 2005-06-08 06:36:48 chulwoo Exp $
+dnl  $Date: 2005-06-16 07:13:20 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.35 2005-06-16 07:13:20 chulwoo Exp $
+dnl  $Id: configure.in,v 1.35 2005-06-16 07:13:20 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.34 $
+dnl  $Revision: 1.35 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -273,6 +273,7 @@ AC_CHECK_TYPES(uint64_t)
 AC_CHECK_TYPES(u_quad_t)
 AC_CHECK_TYPES(netobj)
 AC_CHECK_FUNCS(sync)
+AC_CHECK_HEADERS([qcdocos/scu_checksum.h])
 AC_CONFIG_HEADERS([conf.h])
 
 
