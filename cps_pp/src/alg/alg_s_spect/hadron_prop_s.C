@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-09 20:36:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.8 2005-03-09 20:36:22 chulwoo Exp $
-//  $Id: hadron_prop_s.C,v 1.8 2005-03-09 20:36:22 chulwoo Exp $
+//  $Date: 2005-06-16 07:21:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.9 2005-06-16 07:21:46 chulwoo Exp $
+//  $Id: hadron_prop_s.C,v 1.9 2005-06-16 07:21:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v $
 //  $State: Exp $
 //
@@ -17,7 +17,7 @@
 // hadron_prop_s.C
 
 #ifndef lint
-static char vcid[] = "$Id: hadron_prop_s.C,v 1.8 2005-03-09 20:36:22 chulwoo Exp $";
+static char vcid[] = "$Id: hadron_prop_s.C,v 1.9 2005-06-16 07:21:46 chulwoo Exp $";
 #endif /* lint */
 
 #include <util/qcdio.h>
@@ -227,9 +227,10 @@ void HadronPropS::collect_prop(HadronType type, Float *sum_buf,
 	 //-----------------------------------------------------------
          // do SCU transfers
 	 //-----------------------------------------------------------
-         SCUTrans(&send);
-         SCUTrans(&recv);
-	 SCUTransComplete();
+         send.StartTrans();
+         recv.StartTrans();
+         send.TransComplete();
+         recv.TransComplete();
 
 	 //-----------------------------------------------------------
          // the received data will be sent out     
