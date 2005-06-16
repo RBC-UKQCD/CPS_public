@@ -15,93 +15,78 @@
 
 CPS_START_NAMESPACE
 
-enum SourceType {POINT      = 0 ,  
-		 VOLUME     = 1 , 
-		 WALL       = 2 ,
-		 BOX        = 3 ,
-		 RANDVOLUME = 4 , 
-		 RANDWALL   = 5 , 
-		 RANDSLAB   = 6 , 
-		 MESSEQ     = 7 , 
-		 PROT_U_SEQ = 8 , 
-		 PROT_D_SEQ = 9 ,
-                 UNDEF      = 10,
-		 DERIV      = 11 };
+enum SourceType {
+  POINT      = 0 ,  
+  VOLUME     = 1 , 
+  WALL       = 2 ,
+  BOX        = 3 ,
+  RANDVOLUME = 4 , 
+  RANDWALL   = 5 , 
+  RANDSLAB   = 6 , 
+  MESSEQ     = 7 , 
+  PROT_U_SEQ = 8 , 
+  PROT_D_SEQ = 9 ,
+  UNDEF      = 10,
+  DERIV      = 11 };
 
-enum RandomType {GAUSS  = 0, 
-		 UONE   = 1, 
-		 ZTWO   = 2, 
-		 NORAND = 3 } ;
+enum RandomType {
+  GAUSS  = 0, 
+  UONE   = 1, 
+  ZTWO   = 2, 
+  NORAND = 3 } ;
 
-class QPropWArg 
-{
+class QPropWArg {
 public:
 
-  /*! 
-    The conjugate gradient argument for 
-    the quark propagator inversion 
-  */
+  //! CG arguments for quark propagator inversion
   CgArg cg;		
 
-  //! Propagator filename
-  /*!
-    100 characters i.e 100 words should be enough I guess
-  */
-  char file[100]    ; 
+  //! filename from which propagator may be loaded
+  char file[100];
 
-  // source location:
-  int x;
+  //! source location
+  int x,y,z,t;
 
-  int y;
- 
-  int z;
-
-  int t;
-
-  //! end of time slice range for random src
-  int tEnd;
+  //! width of slab for random source
+  int slab_width;
 
   // box source size
-  int bstart;
-  int bend;
+  int box_start;
+  int box_end;
 
-  //Gauge Fixing flags
+  //! Gauge Fixing flags
+  int gauge_fix_src;
+  int gauge_fix_snk;
 
-  int GaugeFixSrc ;
-  int GaugeFixSnk ;
+  //! random number generator type
+  RandomType rng;
 
-  //! Random number generator type
-  RandomType rnd ;
+  //! random number seed
+  int seed;
 
-  /*!
-    store mid point prop ?
-  */
-  int StoreMidpointProp;
+  //! should midpoint propagator be stored?
+  int store_midprop;
 
-  /*!
-    flag for saving prop to disk
-  */
-  int SaveProp;
+  //! should propagator be saved to disk?
+  int save_prop;
 
-  /*!
-    flag for doing the (1+gamma_t)/2 projected sources
-    this saves a factor of 4 for the baryon matrix elemets
-  */
-  int DoHalfFermion ;
+  //!  should (1+gamma_t)/2 projected sources be used? (good far baryons)
+  int do_half_fermion;
 
   QPropWArg() :
     x(0),y(0),z(0),t(0),
-    tEnd(0),
-    bstart(0),bend(0),
-    GaugeFixSrc(0), 
-    GaugeFixSnk(0), 
-    rnd(NORAND),
-    StoreMidpointProp(0),
-    SaveProp(0),
-    DoHalfFermion(0)
+    slab_width(1),
+    box_start(0),box_end(0),
+    gauge_fix_src(0), 
+    gauge_fix_snk(0), 
+    rng(NORAND),
+	seed(1111),
+    store_midprop(0),
+    save_prop(0),
+    do_half_fermion(0)
     { 
-      file[0]=(char)0 ; // empty string 
-    } ;
+      file[0]=(char)0; // empty string 
+    };
   
 };
 CPS_END_NAMESPACE

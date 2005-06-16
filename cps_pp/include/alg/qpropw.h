@@ -32,31 +32,27 @@
 #include <alg/qpropw_arg.h>
 #include <alg/diquark.h>
 
-#define PROP_MID 1
+#define MIDPROP 1
 #define PROP  0
 
 CPS_START_NAMESPACE
 
-//! The QPropW class.
+//! The Quark Propagator (Wilson type) class.
 
-class QPropW : public Alg 
-{
+class QPropW : public Alg  {
+
   //! pointer to 4d prop 
   WilsonMatrix* prop;
 
   //! pointer to 4d prop at s-mid-point
-  WilsonMatrix* prop_mid;
+  WilsonMatrix* midprop;
 
 protected:
   
-  /*!
-    Copy of the arguments used for construction
-    could be valuable in checking the restore from disk
-  */
-  QPropWArg Arg ; 
+  QPropWArg qp_arg; 
   
   //! The class name
-  char *cname ; 
+  char *cname; 
   
 public:
 
@@ -70,46 +66,46 @@ public:
   //! averaging constructor
   QPropW(QPropW& prop1, QPropW& prop2 ); 
 
-  Float Mass() const { return Arg.cg.mass ;}    
-  int SourceTime() const { return Arg.t ;}       
-  int BoxSrcStart() const { return Arg.bstart ;} 
-  int BoxSrcEnd() const { return Arg.bend ;}     
-  int PointSrcX() const { return Arg.x ;}       
-  int PointSrcY() const { return Arg.y ;}        
-  int PointSrcZ() const { return Arg.z ;}
+  Float Mass()      const { return qp_arg.cg.mass; }    
+  int SourceTime()  const { return qp_arg.t; }       
+  int BoxSrcStart() const { return qp_arg.box_start; } 
+  int BoxSrcEnd()   const { return qp_arg.box_end; }     
+  int PointSrcX()   const { return qp_arg.x; }       
+  int PointSrcY()   const { return qp_arg.y; }        
+  int PointSrcZ()   const { return qp_arg.z; }
 
   //! Is sink gauge fixed?
-  int GFixedSink() const { return Arg.GaugeFixSnk;} 
+  int GFixedSnk() const { return qp_arg.gauge_fix_snk; } 
   //! Is source gauge fixed?
-  int GFixedSource() const { return Arg.GaugeFixSrc;} 
+  int GFixedSrc() const { return qp_arg.gauge_fix_src; } 
 
-  RandomType Rnd() const { return Arg.rnd ;}
+  RandomType Rng() const { return qp_arg.rng; }
 
-  int MidpointProp() const { return  Arg.StoreMidpointProp ;}
+  int StoreMidprop() const { return  qp_arg.store_midprop; }
 
   //! Returns the half fermion flag
-  int  HalfFermion() const { return Arg.DoHalfFermion ;}
+  int DoHalfFermion() const { return qp_arg.do_half_fermion; }
 
-  void run();
+  void Run();
   
   void CG(FermionVectorTp&, FermionVectorTp&, FermionVectorTp&, int&, Float&);
   void FixSol(FermionVectorTp& sol);
   void LoadRow(int spin, int color, FermionVectorTp&, FermionVectorTp&);
-  void setFileName(char *nm) ;
+  void SetFileName(char *nm);
   void ShiftPropForward(int n);
   void ShiftPropBackward(int n);
 
   //! Allocates memory for prop or prop_mid
-  void Allocate(int) ;
+  void Allocate(int);
 
   //! Deallocates memory of prop or prop_mid 
   void Delete(int);   
 
   //! Sets the QPropW arguments
-  void setArgs(QPropWArg& qargs){ Arg=qargs; }
+  void SetArgs(QPropWArg& arg){ qp_arg = arg; }
 
-  /*! computes .5(prop+Q) */
-  void Average(QPropW& Q) ; 
+  //! computes .5(prop+Q)
+  void Average(QPropW& Q); 
 
   //! Comunicate Wilson Matrices...
   WilsonMatrix& GetMatrix(const int *, WilsonMatrix&) const;
@@ -121,7 +117,7 @@ public:
 
   virtual SourceType SrcType() { return UNDEF; }
 
-  virtual Complex& rand_src(int i) const ;
+  virtual Complex& rand_src(int i) const;
 
   /*! This is a better name for the WallWallProp */
   WilsonMatrix WallSinkProp(int t_sink);
@@ -134,109 +130,96 @@ public:
   QPropW& operator=(const QPropW& rhs);
 
   /*! Returns the prop */
-  WilsonMatrix& operator[](int i){return prop[i];}
+  WilsonMatrix& operator[](int i){ return prop[i]; }
 
   /*! Returns the midpoint prop */
-  WilsonMatrix& operator()(int i){return prop_mid[i];}
+  WilsonMatrix& operator()(int i){ return midprop[i]; }
   
   // DESTRUCTORS
   virtual ~QPropW();
-  
   
 };
   
 
 
-class QPropWWallSrc : public QPropW
-{
+class QPropWWallSrc : public QPropW {
   
 public:
   
   // CONSTRUCTORS
-  QPropWWallSrc(Lattice& lat, CommonArg* c_arg) ;
+  QPropWWallSrc(Lattice& lat, CommonArg* c_arg);
   // Most likely it is not needed since the base class copy constructor 
   // will be used. CHECK it!!!
   //    QPropWWallSrc(const QPropWWallSrc& rhs);
   QPropWWallSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
   QPropWWallSrc(QPropWWallSrc& prop1, QPropWWallSrc& prop2 );
-  QPropWWallSrc(QPropWWallSrc* prop1, QPropWWallSrc* prop2 );
-  
-  //Not used
-  //QPropWWallSrc& Sum(QPropWWallSrc* prop1, QPropWWallSrc* prop2 );
   
   void SetSource(FermionVectorTp& src, int spin, int color);
-  SourceType SrcType(){return WALL ; }
+  SourceType SrcType() { return WALL; }
 };
 
-class QPropWMomSrc : public QPropWWallSrc
-{
+class QPropWMomSrc : public QPropWWallSrc {
 
-  ThreeMom mom ;
+  ThreeMom mom;
   
 public:
   
   // CONSTRUCTORS
-  QPropWMomSrc(Lattice& lat, CommonArg* c_arg) ;
+  QPropWMomSrc(Lattice& lat, CommonArg* c_arg);
   QPropWMomSrc(const QPropWMomSrc& rhs);
   QPropWMomSrc(Lattice& lat, QPropWArg* arg, int *p, CommonArg* c_arg);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
   
-  ThreeMom Mom(){return mom;} 
+  ThreeMom Mom() { return mom; } 
 };
 
-class QPropWVolSrc : public QPropW
-{
+class QPropWVolSrc : public QPropW {
   
 public:
   
   // CONSTRUCTORS
-  QPropWVolSrc(Lattice& lat, CommonArg* c_arg) ;
+  QPropWVolSrc(Lattice& lat, CommonArg* c_arg);
   // Most likely it is not needed since the base class copy constructor 
   // will be used. CHECK it!!!
   //    QPropWVolSrc(const QPropWVolSrc& rhs);
   QPropWVolSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
-  SourceType SrcType(){return VOLUME ; }
+  SourceType SrcType() { return VOLUME; }
 };
 
-class QPropWPointSrc : public QPropW
-{
+class QPropWPointSrc : public QPropW {
   
 public:
   
   // CONSTRUCTORS
-  QPropWPointSrc(Lattice& lat, CommonArg* c_arg) ;
+  QPropWPointSrc(Lattice& lat, CommonArg* c_arg);
   // Most likely it is not needed since the base class copy constructor 
   // will be used. CHECK it!!!
   //    QPropWPointSrc(const QPropWPointSrc& rhs);
   QPropWPointSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
-  SourceType SrcType(){return POINT ;}
+  SourceType SrcType() { return POINT; }
 };
 
-class QPropWBoxSrc : public QPropW
-{
-
-  
+class QPropWBoxSrc : public QPropW {
   
 public:
   
   // CONSTRUCTORS
-  QPropWBoxSrc(Lattice& lat, CommonArg* c_arg) ;
+  QPropWBoxSrc(Lattice& lat, CommonArg* c_arg);
   // Most likely it is not needed since the base class copy constructor 
   // will be used. CHECK it!!!
   //    QPropWBoxSrc(const QPropWBoxSrc& rhs);
   QPropWBoxSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
-  SourceType SrcType(){return BOX ;}
+  SourceType SrcType(){ return BOX; }
 };
 
-class QPropWRand : public QPropW
-{
+class QPropWRand : public QPropW {
   
 protected:
 
@@ -251,22 +234,18 @@ public:
 
   QPropWRand(const QPropWRand& rhs);  //copy constructor
 
-    
-    
   //MANIPULATORS
-  Complex& rand_src(int i) const ;
+  Complex& rand_src(int i) const;
 
   // operator functions
   QPropWRand& operator=(const QPropWRand& rhs);
-
-    
 
   void ShiftPropForward(int n);
   void ShiftPropBackward(int n);
 
   //Free prop
-  void AllocateRsrc() ; // Allocates memory for rsrc
-  void DeleteRsrc();   // Deallocates memory for rsrc
+  void AllocateRsrc(); // Allocates memory for rsrc
+  void DeleteRsrc();    // Deallocates memory for rsrc
   void RestoreQProp(char*, int mid);
   void SaveQProp(char*, int mid);
   
@@ -276,49 +255,45 @@ public:
 };
 
 
-class QPropWRandWallSrc : public QPropWRand
-{
+class QPropWRandWallSrc : public QPropWRand {
   
 public:
-  QPropWRandWallSrc(Lattice& lat, CommonArg* c_arg) ;
+  QPropWRandWallSrc(Lattice& lat, CommonArg* c_arg);
   QPropWRandWallSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
-  SourceType SrcType(){return RANDWALL; }
+  SourceType SrcType() { return RANDWALL; }
 
-} ;
+};
 
-class QPropWRandVolSrc : public QPropWRand
-{
+class QPropWRandVolSrc : public QPropWRand {
 
 public:
-  QPropWRandVolSrc(Lattice& lat, CommonArg* c_arg) ;
+  QPropWRandVolSrc(Lattice& lat, CommonArg* c_arg);
   QPropWRandVolSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
    
   void SetSource(FermionVectorTp& src, int spin, int color);
-  SourceType SrcType(){return RANDVOLUME ; }
-} ;
+  SourceType SrcType() { return RANDVOLUME; }
+};
 
-class QPropWRandSlabSrc : public QPropWRand
-{
+class QPropWRandSlabSrc : public QPropWRand {
 
 public:
-  QPropWRandSlabSrc(Lattice& lat, CommonArg* c_arg) ;
+  QPropWRandSlabSrc(Lattice& lat, CommonArg* c_arg);
   QPropWRandSlabSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
   QPropWRandSlabSrc(Lattice& lat, QPropWArg* arg, Float* src, CommonArg* );
   
   void SetSource(FermionVectorTp& src, int spin, int color);
-  SourceType SrcType(){return RANDSLAB; }
+  SourceType SrcType() { return RANDSLAB; }
 
-} ;
+};
 
-class QPropWSeq : public QPropW
-{
+class QPropWSeq : public QPropW {
 
 protected:
-  QPropW&  quark;
-  ThreeMom mom ;
-  Float quark_mass ;
+  QPropW& quark;
+  ThreeMom mom;
+  Float quark_mass;
 
 public:
   
@@ -328,55 +303,50 @@ public:
   
   //QPropWSeq(const QPropWSeq& rhs);  //copy constructor not needed
   
-  ThreeMom Mom(){return mom;}
+  ThreeMom Mom() { return mom; }
 
-  /*!
-    Returns the quark mass of the source propagator  
-   */
-  Float SourceMass(){ return quark_mass ;}
-} ;
+  //! Returns the quark mass of the source propagator  
+  Float SourceMass(){ return quark_mass; }
+};
 
-class QPropWSeqMesSrc : public QPropWSeq
-{
+class QPropWSeqMesSrc : public QPropWSeq {
   /*!
     Only does a single gamma matrix insersion at the sink
     This is only used for pseudoscalars and vectors only anyway.
     should be enough for the Nucleon Decay project
   */
-  int gamma ;
+  int gamma;
   
 public:
   
   // CONSTRUCTORS
   
   QPropWSeqMesSrc(Lattice& lat, QPropW& quark,  int *p, 
-		  int g, QPropWArg*, CommonArg*);
+				  int g, QPropWArg*, CommonArg*);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
-  SourceType SrcType(){return MESSEQ; }
-} ;
+  SourceType SrcType() { return MESSEQ; }
+};
 
 
-class QPropWSeqBar : public QPropWSeq
-{
+class QPropWSeqBar : public QPropWSeq {
 
 protected:
   
-  ProjectType P ;
+  ProjectType proj;
   
 public:
   
   // CONSTRUCTORS
   
   QPropWSeqBar(Lattice& lat, QPropW& quark,  int *p, 
-	       ProjectType pp, QPropWArg*, CommonArg*);
+			   ProjectType pp, QPropWArg*, CommonArg*);
 
-  ProjectType Projection(){return P;}
+  ProjectType Projection() { return proj; }
 
-} ;
+};
 
-class QPropWSeqProtUSrc : public QPropWSeqBar
-{
+class QPropWSeqProtUSrc : public QPropWSeqBar {
   
 public:
   
@@ -388,24 +358,24 @@ public:
   //QPropWSeq(const QPropWSeq& rhs);  //copy constructor not needed
 
   void SetSource(FermionVectorTp& src, int spin, int color);
-  SourceType SrcType(){return PROT_U_SEQ;}
-} ;
+  SourceType SrcType() { return PROT_U_SEQ; }
+};
 
-class QPropWSeqProtDSrc : public QPropWSeqBar
-{
+class QPropWSeqProtDSrc : public QPropWSeqBar {
 
 public:
   
   // CONSTRUCTORS
 
   QPropWSeqProtDSrc(Lattice& lat, QPropW& quark,  int *p, 
-		ProjectType pp, QPropWArg*, CommonArg*);
+					ProjectType pp, QPropWArg*, CommonArg*);
 
   //QPropWSeq(const QPropWSeq& rhs);  //copy constructor not needed
   
   void SetSource(FermionVectorTp& src, int spin, int color);
-  SourceType SrcType(){return PROT_D_SEQ;}
-} ;
+  SourceType SrcType() { return PROT_D_SEQ; }
+};
+
 CPS_END_NAMESPACE
 
 #endif

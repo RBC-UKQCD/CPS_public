@@ -88,45 +88,46 @@ typedef struct { Complex c[3]; } su3_vector;
 class WilsonVector 
 {
 public:
-  su3_vector d[4] ;
+  su3_vector d[4];
 
-  WilsonVector() {;}
+  WilsonVector() {}
 
-  ~WilsonVector(){;}
+  ~WilsonVector() {}
 
-  void Zero(){for(int s(0);s<4;s++)for(int cc(0); cc<3 ; cc++)d[s].c[cc]=0.0;}
+  void Zero()
+	{ for(int s1=0;s1<4;s1++) for(int c1=0;c1<3;c1++) d[s1].c[c1] = 0.0; }
 
-  WilsonVector& operator+=(WilsonVector& rhs){
-    for(int s(0);s<4;s++)for(int cc(0); cc<3 ; cc++)
-      d[s].c[cc]+=rhs.d[s].c[cc] ;
-    return *this ;
+  WilsonVector& operator+=(WilsonVector& rhs) {
+    for(int s1=0;s1<4;s1++) for(int c1=0; c1<3;c1++)
+      d[s1].c[c1] += rhs.d[s1].c[c1];
+    return *this;
   }
 
-  WilsonVector& operator-=(WilsonVector& rhs){
-    for(int s(0);s<4;s++)for(int cc(0); cc<3 ; cc++)
-      d[s].c[cc]-=rhs.d[s].c[cc] ;
-    return *this ;
+  WilsonVector& operator-=(WilsonVector& rhs) {
+    for(int s1=0;s1<4;s1++) for(int c1=0;c1<3;c1++)
+      d[s1].c[c1] -= rhs.d[s1].c[c1];
+    return *this;
   }
 
-  WilsonVector& conj(){
-    for(int s(0);s<4;s++)for(int cc(0); cc<3 ; cc++)
-      d[s].c[cc].imag(-d[s].c[cc].imag()) ;
-    return *this ;
+  WilsonVector& conj() {
+    for(int s1=0;s1<4;s1++) for(int c1=0;c1<3;c1++)
+      d[s1].c[c1].imag(-d[s1].c[c1].imag());
+    return *this;
   }
 
-  WilsonVector& operator*=(Complex& rhs){
-    for(int s(0);s<4;s++)for(int cc(0); cc<3 ; cc++)
-      d[s].c[cc]*=rhs ;
-    return *this ;
+  WilsonVector& operator*=(Complex& rhs) {
+    for(int s1=0;s1<4;s1++) for(int c1=0;c1<3;c1++)
+      d[s1].c[c1] *= rhs;
+    return *this;
   }
 
-  WilsonVector& operator*=(const Float rhs){
-    for(int s(0);s<4;s++)for(int cc(0); cc<3 ; cc++)
-      d[s].c[cc]*=rhs ;
-    return *this ;
+  WilsonVector& operator*=(const Float rhs) {
+    for(int s1=0;s1<4;s1++)for(int c1=0;c1<3;c1++)
+      d[s1].c[c1] *= rhs;
+    return *this;
   }
 
-  WilsonVector& gamma(int dir) ;
+  WilsonVector& gamma(int dir);
   
   /*!
     Rotate from Dirac to Chiral basis.
@@ -170,7 +171,7 @@ public:
     
     this routine is identical with DiracToChiral
   */ 
-  WilsonVector& ChiralToDirac(){ return DiracToChiral() ; }
+  WilsonVector& ChiralToDirac(){ return DiracToChiral(); }
 
   /*!
     Multiplies  by \f$ \frac{1}{2}(1+\gamma_t)\$
@@ -179,9 +180,8 @@ public:
     \f]
   */
   WilsonVector& PParProject();
-  
 
-} ;
+};
 
 typedef WilsonVector wilson_vector;
 typedef struct { wilson_vector c[3]; } color_wilson_vector;
@@ -237,8 +237,8 @@ typedef struct { color_wilson_vector d[4]; } wilson_matrix;
        \end{tabular}\right)
        \f]
 */
-class WilsonMatrix
-{
+class WilsonMatrix {
+
   wilson_matrix p;
   
 public:
@@ -265,10 +265,8 @@ public:
     s2 - sink_spin
     c2 - sink_colour
    */
-  Complex& operator()( int s1, int c1, int s2, int c2 ) 
-  {
-    return p.d[s1].c[c1].d[s2].c[c2];
-  }
+  Complex& operator()(int s1, int c1, int s2, int c2) 
+	{ return p.d[s1].c[c1].d[s2].c[c2]; }
   
   /*!
     Return the complex number references by
@@ -278,13 +276,11 @@ public:
     c2 - sink_colour
     ( const version )
   */
-  Complex  operator()( int s1, int c1, int s2, int c2 ) const
-  {
-    return p.d[s1].c[c1].d[s2].c[c2];
-  }
+  Complex  operator()(int s1, int c1, int s2, int c2) const
+	{ return p.d[s1].c[c1].d[s2].c[c2]; }
   
   //! hermitean conjugate the WilsonMatrix
-  void hconj();
+  WilsonMatrix& hconj();
  
   //! mult the prop by gamma_dir on the left
   WilsonMatrix& gl(int dir); 
@@ -308,13 +304,13 @@ public:
   WilsonMatrix& LeftTimesEqual(const WilsonMatrix& rhs);
   
   //! Projects positive parity on the sink
-  WilsonMatrix& PParProjectSink()   ;
+  WilsonMatrix& PParProjectSink();
 
   //! Projects positive parity on the source
-  WilsonMatrix& PParProjectSource() ;
+  WilsonMatrix& PParProjectSource();
 
   //! sink chiral to dirac rotation
-  WilsonMatrix& SinkChiralToDirac() ;
+  WilsonMatrix& SinkChiralToDirac();
   
   // operator functions
 
@@ -327,8 +323,8 @@ public:
   WilsonMatrix& operator*=(const Float& rhs);
   WilsonMatrix& operator*=(const Rcomplex& rhs);
   
-  WilsonMatrix& UMultSource   ( Matrix& U, WilsonMatrix& W) ;
-  WilsonMatrix& UdagMultSource( Matrix& U, WilsonMatrix& W) ;
+  WilsonMatrix& UMultSource   ( Matrix& U, WilsonMatrix& W);
+  WilsonMatrix& UdagMultSource( Matrix& U, WilsonMatrix& W);
   
   // algebra shortcuts
 

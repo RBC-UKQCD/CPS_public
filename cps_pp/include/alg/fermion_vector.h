@@ -28,7 +28,7 @@ CPS_START_NAMESPACE
 class FermionVectorTp {
 
 private:
-  Float *fv_;
+  Float *fv;
 
   char *cname ;
 
@@ -39,19 +39,19 @@ public:
 
   // ACCESSORS
   void   print(void) const;
-  Float *data (void) const { return fv_; }
+  Float *data (void) const { return fv; }
 
   // MANIPULATORS
 
-  void setPointSource( int color, int spin, int x, int y, int z, int t);
+  void SetPointSource( int color, int spin, int x, int y, int z, int t);
 
   /*! Point source, fixed into Landau gauge */
-  void setGFPointSource( Lattice& lat, int colour, int spin,
+  void SetGFPointSource( Lattice& lat, int colour, int spin,
                          int x, int y, int z, int t );
 
-  void setWallSource ( int color, int spin, int time_slice);
-  void setWallSource ( int color, int spin, int time_slice, Float* src);
-  void setBoxSource  ( int color, int spin, int bstart, int bend, 
+  void SetWallSource ( int color, int spin, int time_slice);
+  void SetWallSource ( int color, int spin, int time_slice, Float* src);
+  void SetBoxSource  ( int color, int spin, int bstart, int bend, 
 		    int time_slice);
 
   /*! Gauge fix sink - Coulomb gauge only */
@@ -59,18 +59,18 @@ public:
 
   /*! Gauge fix sink - Landau gauge */
   void LandauGaugeFixSink ( Lattice& lat );
-  void setLandauGaugeMomentaSource ( Lattice& lat , 
+  void SetLandauGaugeMomentaSource ( Lattice& lat , 
                                      int colour   , 
                                      int spin     ,
                                      int p[]     );
 
 
-  void setLandauWallSource( Lattice& lat, int spin, int where );
+  void SetLandauWallSource( Lattice& lat, int spin, int where );
   void GFWallSource       ( Lattice& lat, int spin, int dir, int source_time );
 
-  void setVolSourceEqualZero();
-  void setVolSource(int color, int spin);
-  void setVolSource(int color, int spin, Float* src) ;
+  void ZeroSource();
+  void SetVolSource(int color, int spin);
+  void SetVolSource(int color, int spin, Float* src) ;
 
   ///
   //  Tom's momentum stuff
@@ -78,21 +78,21 @@ public:
   //  void FermionVectorTp::setMomSource(int color, int spin, int source_time,
   //                                   int* mom);
 
-  void setMomSource(int color, int spin, int source_time, ThreeMom& mom) ;
+  void SetMomSource(int color, int spin, int source_time, ThreeMom& mom) ;
 
   void ChiralToDirac();
   void DiracToChiral();
 
   const Float& operator[](int i);
   /*! Copies a WilsonVector into the site i of the FermionVectorTp */
-  void copyWilsonVec(int i, WilsonVector& WV) ;
+  void CopyWilsonVec(int i, WilsonVector& WV) ;
 
    /*! Copies the sink  of a WilsonMatrix  into 
      the site i of the FermionVectorTp                             */
-  void copyWilsonMatSink(int i, int spin, int color, WilsonMatrix& WM) ;
+  void CopyWilsonMatSink(int i, int spin, int color, WilsonMatrix& WM) ;
 
   /* source for the NPR of derivative operators */
-  void setGFDerivativeSource(Lattice& lat,int color, int spin,
+  void SetGFDerivativeSource(Lattice& lat,int color, int spin,
 			     int d, int x, int y, int z, int t) ;
 };
 

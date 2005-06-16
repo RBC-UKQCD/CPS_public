@@ -1,3 +1,4 @@
+#include <config.h>
 //------------------------------------------------------------------
 //
 // SpinMatrix.C
@@ -14,74 +15,59 @@
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
-//------------------------------------------------------------------
 // The SpinMatrix class.
 //------------------------------------------------------------------
-//------------------------------------------------------------------
 
-SpinMatrix::SpinMatrix()
-{}
+SpinMatrix::SpinMatrix() {}
 
 //------------------------------------------------------------------
-SpinMatrix::SpinMatrix(Float c) 
-{ *this = c; }
+SpinMatrix::SpinMatrix(IFloat c) { *this = c; }
 
 
 //------------------------------------------------------------------
-SpinMatrix::SpinMatrix(const Complex& c) 
-{ *this = c; }
+SpinMatrix::SpinMatrix(const Complex& c) { *this = c; }
 
 
 //------------------------------------------------------------------
-SpinMatrix::SpinMatrix(const SpinMatrix& m) 
-{ *this = m; }
+SpinMatrix::SpinMatrix(const SpinMatrix& m) { *this = m; }
 
 
 //------------------------------------------------------------------
-SpinMatrix& SpinMatrix::operator = (Float c)
-{
-  this -> ZeroSpinMatrix();
-  u[0] = u[10] = u[20] = u[30] = c;
+SpinMatrix& SpinMatrix::operator=(IFloat c) {
+  ZeroSpinMatrix();
+  u[2*(0+0*SPINS)] = u[2*(1+1*SPINS)] = u[2*(2+2*SPINS)] = u[2*(3+3*SPINS)] = c;
   return *this;
 }
 
 //------------------------------------------------------------------
-SpinMatrix& SpinMatrix::operator = (const Complex& c)
-{
-  this -> ZeroSpinMatrix();
-  ((Complex*)u)[0] = ((Complex*)u)[5] = ((Complex*)u)[10] =
-	((Complex*)u)[15] = c;
+SpinMatrix& SpinMatrix::operator=(const Complex& c) {
+  ZeroSpinMatrix();
+  ((Complex*)u)[0+0*SPINS] = 
+	((Complex*)u)[1+1*SPINS] = 
+	((Complex*)u)[2+2*SPINS] = 
+	((Complex*)u)[3+3*SPINS] = c;
   return *this;
 }
 
 
 //------------------------------------------------------------------
-void SpinMatrix::UnitSpinMatrix(void)
-{
-  Float *p = (Float *)u;
+void SpinMatrix::UnitSpinMatrix(void) {
+  IFloat *p = (IFloat*)u;
 
-  for(int i = 0; i < 32; ++i) {
-    *p++ = 0.0;
-  }
-  p = (Float *)u;
-  *p = 1.0;
-  *(p+10) = 1.0;
-  *(p+20) = 1.0;
-  *(p+30) = 1.0;
+  for(int i=0; i<2*SPINS*SPINS; i++) *p++ = 0.0;
+  p = (IFloat *)u;
+  p[2*(0+0*SPINS)] = 1.0;
+  p[2*(1+1*SPINS)] = 1.0;
+  p[2*(2+2*SPINS)] = 1.0;
+  p[2*(3+3*SPINS)] = 1.0;
 }
 
 //------------------------------------------------------------------
-void SpinMatrix::ZeroSpinMatrix(void)
-{
-  Float *p = (Float *)u;
+void SpinMatrix::ZeroSpinMatrix(void) {
+  IFloat *p = (IFloat*)u;
 
-  for(int i = 0; i < 32; ++i) {
-    *p++ = 0.0;
-  }
+  for(int i=0; i<2*SPINS*SPINS; i++) *p++ = 0.0;
 }
-
-
-//------------------------------------------------------------------
 
 //------------------------------------------------------------------
 Complex& SpinMatrix::operator()(int i, int j)
@@ -95,9 +81,8 @@ const Complex& SpinMatrix::operator()(int i, int j) const
 
 //------------------------------------------------------------------
 Complex SpinMatrix::Tr() const
-{ return ((Complex*)u)[0] + ((Complex*)u)[5] + 
-		((Complex*)u)[10] + ((Complex*)u)[15];
+{ return ((Complex*)u)[0+0*SPINS] + ((Complex*)u)[1+1*SPINS] + 
+	((Complex*)u)[2+2*SPINS] + ((Complex*)u)[3+3*SPINS];
 }
 
 CPS_END_NAMESPACE
-
