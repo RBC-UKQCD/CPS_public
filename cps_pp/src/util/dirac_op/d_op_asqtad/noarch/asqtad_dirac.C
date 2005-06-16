@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.16 2005-03-09 18:11:54 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.17 2005-06-16 07:23:42 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -295,8 +295,6 @@ void asqtad_dirac_init(Fasqtad * lat )
   local_chi_3 = NUM_DIR*vol - non_local_chi_3;
   nflush = vol/8;
   tmpfrm = (IFloat *) smalloc ( NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
-  if(tmpfrm == 0) 
-    ERR.Pointer(cname,fname, "tmpfrm");
 
 
   //-----------------------------------------------------------------
@@ -306,8 +304,6 @@ void asqtad_dirac_init(Fasqtad * lat )
 
     chi_off_node_total = ( IFloat * ) smalloc( 3*non_local_chi*
       VECT_LEN * sizeof( IFloat ) / 2 );
-    if(chi_off_node_total == 0)
-      ERR.Pointer(cname,fname, "chi_off_node_total");
  for ( j= 0; j < 3; j++ ){
     chi_off_node[j][0] = &(chi_off_node_total[ j*non_local_chi* VECT_LEN/2 ] ); 
     chi_off_node_p[j][0] = (IFloat *)(sizeof (IFloat)*j*non_local_chi* VECT_LEN/2 );
@@ -327,13 +323,9 @@ void asqtad_dirac_init(Fasqtad * lat )
 
   for ( i = 0; i < 2; i++ ){
     chi_l[i] = ( IFloat ** ) smalloc((2*(local_chi+local_chi_3)/2)*sizeof(IFloat *));
-   if(chi_l[i] == NULL)
-	ERR.Pointer(cname,fname, "chi_l[i]");
 
     chi_nl[i] = (IFloat ** ) smalloc((2* (non_local_chi + non_local_chi_3)/2)*sizeof(IFloat *));
 
-      if(chi_nl[i] == NULL)
-	ERR.Pointer(cname,fname, "chi_nl[i]");
   }
   
   for ( i = 0; i < 2; i++){
@@ -1504,16 +1496,11 @@ int non_local_count_3[3][2];
 
 #ifndef SIMUL_U
     uc_l[i]  = (IFloat*)smalloc(MATRIX_SIZE*((local_chi+local_chi_3)/2)*sizeof(IFloat));
-     if(uc_l[i] == 0){
-       ERR.Pointer(cname,fname, "uc_l[i]"); exit(3);
-	}
     for(int j=0;j<MATRIX_SIZE*(local_chi+local_chi_3)/2;j++)
 	uc_l[i][j]=0.;
 #endif
     uc_l_agg[i]  = (gauge_agg *)smalloc(((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
 
-     if(uc_l[i] == 0)
-       ERR.Pointer(cname,fname, "uc_l[i]");
  
 #ifndef SIMUL_U
     uc_nl[i] = (IFloat*)smalloc( MATRIX_SIZE * ((non_local_chi +non_local_chi_3)/2) * sizeof(IFloat) );
@@ -1522,9 +1509,6 @@ int non_local_count_3[3][2];
 #endif
     uc_nl_agg[i]  = (gauge_agg*)smalloc(((non_local_chi+non_local_chi_3)/2)*sizeof(gauge_agg));
 
-    if(uc_nl[i] == 0){
-       ERR.Pointer(cname,fname, "uc_nl[i]");
-     }
   }
 
 #ifndef SIMUL_U

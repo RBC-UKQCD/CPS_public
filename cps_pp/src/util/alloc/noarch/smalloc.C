@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc.C,v 1.5 2004-12-16 00:10:56 chulwoo Exp $
+  $Id: smalloc.C,v 1.6 2005-06-16 07:23:12 chulwoo Exp $
 */
 
 #include <util/error.h>
@@ -19,10 +19,6 @@ void* smalloc(size_t request,
     return p;
 }
 
-void* smalloc(size_t request){
-    void *p = malloc(request);
-    return p;
-}
 
 void sfree(void* p, const char *vname, const char *fname, const char *cname){
     VRB.Sfree(cname, fname, vname, p);

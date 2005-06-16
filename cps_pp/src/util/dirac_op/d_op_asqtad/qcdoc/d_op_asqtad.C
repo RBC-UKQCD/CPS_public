@@ -94,13 +94,9 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   frm_tmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
 
   if(frm_tmp == 0){
-    frm_tmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
+    frm_tmp = (Vector *) smalloc(cname,fname,"frm_tmp",f_size_cb * sizeof(Float));
     printf("frm_tmp is allocated int DDR (%p)\n",frm_tmp);
   }
-  if(frm_tmp == 0)
-    ERR.Pointer(cname,fname, "frm_tmp");
-  VRB.Smalloc(cname,fname, "frm_tmp", 
-	      frm_tmp, f_size_cb * sizeof(Float));
   asqtad_dirac_init_g((IFloat *)frm_tmp);
 
 

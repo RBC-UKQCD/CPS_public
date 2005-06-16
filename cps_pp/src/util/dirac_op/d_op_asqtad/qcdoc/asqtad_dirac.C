@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-08 06:32:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.26 2005-06-08 06:32:58 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.26 2005-06-08 06:32:58 chulwoo Exp $
+//  $Date: 2005-06-16 07:24:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.27 2005-06-16 07:24:28 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.27 2005-06-16 07:24:28 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.26 $
+//  $Revision: 1.27 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -946,6 +946,7 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
   }
   Fat = fat;
   Float *rcv_mat = (Float *)qalloc(QFAST|QNONCACHE,sizeof(matrix));
+  if(!rcv_mat) PointerErr(cname,fname, "rcv_mat");
   SCUDir snd_dirs[]={SCU_TP,SCU_XP,SCU_YP,SCU_ZP};
   SCUDir rcv_dirs[]={SCU_TM,SCU_XM,SCU_YM,SCU_ZM};
   sys_cacheflush(0);

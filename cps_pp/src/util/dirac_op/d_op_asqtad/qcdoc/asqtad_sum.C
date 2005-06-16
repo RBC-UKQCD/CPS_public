@@ -34,8 +34,10 @@ void AsqD::Sum(Float * float_p)
       for (int i = 1;i<ndir;i++)
 	if (max <NP[i]) max = NP[i];
       transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64)*2);
+      if(!transmit_buf) PointerErr(cname, "Sum", "transmit_buf");
       receive_buf = transmit_buf+1;
       gsum_buf = (Double64 *)qalloc(QFAST,sizeof(Double64)*max);
+      if(!gsum_buf) PointerErr(cname, "Sum", "gsum_buf");
       for(int i = 0;i<ndir;i++)
       if (NP[i]>1){
       Send[i] = new SCUDirArgIR(transmit_buf, scudir[i+4], SCU_SEND, sizeof(Double64));

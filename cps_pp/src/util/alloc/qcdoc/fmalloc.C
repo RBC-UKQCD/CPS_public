@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: fmalloc.C,v 1.9 2004-12-16 00:10:56 chulwoo Exp $
+  $Id: fmalloc.C,v 1.10 2005-06-16 07:23:12 chulwoo Exp $
 */
 
 #include <util/error.h>
@@ -22,9 +22,7 @@ void* fmalloc(size_t request,
 }
 
 void* fmalloc(size_t request){
-    void *p = qalloc(QFAST,request);
-    if (!p) return smalloc(request);
-    return p;
+    return fmalloc(request, "", "fmalloc", "");
 }
 
 

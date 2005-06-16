@@ -1,7 +1,7 @@
 /*!\file
   Staggered Dirac operator for QCDOC
 
-  $Id: dirac.C,v 1.12 2004-12-22 08:39:17 chulwoo Exp $
+  $Id: dirac.C,v 1.13 2005-06-16 07:24:48 chulwoo Exp $
 */
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian
@@ -207,8 +207,8 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   int non_local_count[2];
 
   int x[NUM_DIR/2];
-  char *cname = "DiracOpStag";
-  char *fname = "dirac_init(const void *gauge)";
+  char *cname = "";
+  char *fname = "stag_dirac_init(const void *gauge)";
   if (initted !=0) {
     Fprintf(stderr,"stag_dirac_init already initted\n");
     return;
@@ -265,9 +265,8 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   // flush_cache_spinor() function will flush 192 bytes * nflush 
   //-------------------------------------------------------------
   nflush = vol/8;
-  tmpfrm = (IFloat *) smalloc ( 8 * vol/2 * VECT_LEN * sizeof(IFloat));
-  if(tmpfrm == 0) 
-    ERR.Pointer(cname,fname, "tmpfrm");
+  tmpfrm = (IFloat *) smalloc ( 8 * vol/2 * VECT_LEN * sizeof(IFloat),
+				cname,fname, "tmpfrm");
 
   
 
@@ -298,18 +297,14 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   
 
   for ( i = 0; i < 2; i++ ){
-//    chi_l[i] = ( IFloat ** ) pmalloc(2*(local_chi/2)*sizeof(IFloat *));
-  VRB.Result(cname,fname,"local_chi=%d sizeof(IFloat)=%d\n",local_chi,
-     sizeof(IFloat));
-    chi[i] = (IFloat **) smalloc(9 * vol/2 * sizeof(IFloat *));
-      if(chi[i] == NULL)
-	ERR.Pointer(cname,fname, "chi[i]");
-    chi_l[i] = ( IFloat ** ) smalloc(2*(local_chi/2)*sizeof(IFloat *));
-      if(chi_l[i] == NULL)
-	ERR.Pointer(cname,fname, "chi_l[i]");
-    chi_nl[i] = (IFloat ** ) smalloc(2*(non_local_chi/2)*sizeof(IFloat *));
-      if(chi_nl[i] == NULL)
-	ERR.Pointer(cname,fname, "chi_nl[i]");
+      VRB.Result(cname,fname,"local_chi=%d sizeof(IFloat)=%d\n",local_chi,
+		 sizeof(IFloat));
+      chi[i] = (IFloat **) smalloc(9 * vol/2 * sizeof(IFloat *),
+				   cname,fname, "chi[i]");
+      chi_l[i] = ( IFloat ** ) smalloc(2*(local_chi/2)*sizeof(IFloat *),
+				       cname,fname, "chi_l[i]");
+      chi_nl[i] = (IFloat ** ) smalloc(2*(non_local_chi/2)*sizeof(IFloat *),
+				       cname,fname, "chi_nl[i]");
   }
   
   for ( i = 0; i < 2; i++){
@@ -476,7 +471,8 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   for ( i = 0; i < 2; i++ ) {
 #if 1
     Tbuffer[i] = (IFloat *) qalloc (QFAST|QNONCACHE, size[1] * size[2] * size[3] *
-			    VECT_LEN * sizeof( IFloat ) / 2);
+				    VECT_LEN * sizeof( IFloat ) / 2);
+    if(!Tbuffer) ERR.Pointer(cname, fname, "Tbuffer");
 #else
     if( size[1]*size[2]*size[3]*VECT_LEN/2 >MAX_TBUF_LEN ){
 	ERR.General(cname,fname,"Tbuffer size overflow\n");
@@ -661,7 +657,7 @@ extern "C" void stag_dirac_init_g()
   SCUDirArg R;
 #endif
   IFloat *mtmp;
-  mtmp = (IFloat *)qalloc(QFAST,18*sizeof(IFloat));
+  mtmp = (IFloat *)fmalloc(18*sizeof(IFloat));
 
   VRB.Func(cname,fname);
 //  print("dirac_init_g start\n");
@@ -679,14 +675,10 @@ extern "C" void stag_dirac_init_g()
   //  Allocate space for two copies of the gauge fields on this node
   //-----------------------------------------------------------------
   for ( i = 0; i < 2; i++ ){
-   uc_l[i] = ( IFloat * ) smalloc( MATRIX_SIZE * (local_chi/2) * 
-				   sizeof(IFloat) );
-   if(uc_l[i] == 0) 
-     ERR.Pointer(cname,fname, "uc_l[i]");
-   uc_nl[i] = ( IFloat * ) smalloc( MATRIX_SIZE * (non_local_chi/2) * 
-				    sizeof(IFloat) ); 
-   if(uc_nl[i] == 0) 
-     ERR.Pointer(cname,fname, "uc_l[i]");
+      uc_l[i] = (IFloat*) smalloc(MATRIX_SIZE* local_chi/2 * sizeof(IFloat),
+				  cname,fname, "uc_l[i]");
+      uc_nl[i] = (IFloat*) smalloc(MATRIX_SIZE* non_local_chi/2 * sizeof(IFloat),
+				   cname,fname, "uc_l[i]");
   }
 
   for ( i = 0; i < 2; i++){
