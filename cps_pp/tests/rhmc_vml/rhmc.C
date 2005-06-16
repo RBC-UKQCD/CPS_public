@@ -48,8 +48,7 @@
 #include<util/ReadLatticePar.h>
 #include<util/qioarg.h>
 
-#undef USE_SCU_CHECKSUMS
-#ifdef USE_SCU_CHECKSUMS
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
 #include <qcdocos/scu_checksum.h>
 #endif
 //--------------------------------------------------------------
@@ -111,7 +110,7 @@ int main(int argc, char *argv[])
 
   chdir(evo_arg.work_directory);
 
-#ifdef USE_SCU_CHECKSUMS
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
   ScuChecksum::Initialise(evo_arg.hdw_xcsum,evo_arg.hdw_rcsum);
 #endif
 
@@ -165,7 +164,7 @@ int main(int argc, char *argv[])
 	}
 	AlgHmcRHMC rhmc(lat,&common_arg_hmdr,&hmd_arg_pass);
 	rhmc.run();
-#ifdef USE_SCU_CHECKSUMS
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
         if ( ! ScuChecksum::CsumSwap() ) { 
 	  fprintf(stderr, "Checksum mismatch\n");
 	  exit(-1);
