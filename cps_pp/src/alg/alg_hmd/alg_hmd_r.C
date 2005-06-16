@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmdR methods.
 
-  $Id: alg_hmd_r.C,v 1.16 2005-04-25 07:16:37 chulwoo Exp $
+  $Id: alg_hmd_r.C,v 1.17 2005-06-16 07:16:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-04-25 07:16:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.16 2005-04-25 07:16:37 chulwoo Exp $
-//  $Id: alg_hmd_r.C,v 1.16 2005-04-25 07:16:37 chulwoo Exp $
+//  $Date: 2005-06-16 07:16:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v 1.17 2005-06-16 07:16:43 chulwoo Exp $
+//  $Id: alg_hmd_r.C,v 1.17 2005-06-16 07:16:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmd_r.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmd_r.C,v $
 //  $State: Exp $
 //
@@ -43,6 +43,9 @@ CPS_END_NAMESPACE
 #include <util/smalloc.h>
 #include <util/verbose.h>
 #include <util/error.h>
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+#include <qcdocos/scu_checksum.h>
+#endif
 CPS_START_NAMESPACE
 
 
@@ -248,6 +251,10 @@ Float AlgHmdR::run(void)
   unsigned long step_cnt = 0;
   CSM.SaveComment(step_cnt);
 
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+  if(!ScuChecksum::ChecksumsOn(void))
+  ScuChecksum::Initialise(true,true);
+#endif
   // Get the Lattice object
   //----------------------------------------------------------------
   Lattice& lat = AlgLattice();
@@ -295,17 +302,6 @@ Float AlgHmdR::run(void)
   glb_sum(&mom_sum);
   VRB.Flow(cname,fname,"mom_sum = %0.14e\n",mom_sum);
   Float *phi_p = (Float *)mom;
-#if 0
-      for(int ii = 0; ii<GJP.VolNodeSites();ii++){
-	printf("%0.4d ",ii);
-      for(int j = 0; j<72;j++){
-	if ( j%6==0) printf("\n");
-	printf("%0.8e ",*phi_p);
-	phi_p++;
-      }
-	printf("\n");
-      }
-#endif
 
 
   // Evolve gauge field by dt/2
@@ -361,18 +357,6 @@ Float AlgHmdR::run(void)
   glb_sum(&mom_sum);
   VRB.Flow(cname,fname,"mom_sum = %0.14e\n",mom_sum);
   phi_p = (Float *)mom;
-#if 0
-      for(int ii = 0; ii<GJP.VolNodeSites();ii++){
-	printf("%0.4d ",ii);
-      for(int j = 0; j<72;j++){
-	if ( j%6==0) printf("\n");
-	printf("%0.8e ",*phi_p);
-	phi_p++;
-      }
-	printf("\n");
-      }
-//  exit(1);
-#endif
 
     // Evolve momenta by one step using the fermion force
     //--------------------------------------------------------------
@@ -399,39 +383,12 @@ Float AlgHmdR::run(void)
       frm_time_step = 
 	hmd_arg->frm_flavors[i] * flavor_coeff * dt ;
 
-#if 0
-  phi_p = (Float *)mom;
-      for(int ii = 0; ii<GJP.VolNodeSites();ii++){
-	printf("%0.4d ",ii);
-      for(int j = 0; j<72;j++){
-	if ( j%6==0) printf("\n");
-	printf("%0.8e ",*phi_p);
-	phi_p++;
-      }
-	printf("\n");
-      }
-#endif
-
       lat.EvolveMomFforce(mom, frm1, 
 			  hmd_arg->frm_mass[i], 
 			  frm_time_step);
   Float mom_sum = lat.MomHamiltonNode(mom);
   glb_sum(&mom_sum);
   VRB.Flow(cname,fname,"mom_sum = %0.14e\n",mom_sum);
-
-#if 0
-  phi_p = (Float *)mom;
-      for(int ii = 0; ii<GJP.VolNodeSites();ii++){
-	printf("%0.4d ",ii);
-      for(int j = 0; j<72;j++){
-	if ( j%6==0) printf("\n");
-	printf("%0.8e ",*phi_p);
-	phi_p++;
-      }
-	printf("\n");
-      }
-	exit(1);
-#endif
 
     }
 
@@ -536,6 +493,10 @@ Float AlgHmdR::run(void)
   //----------------------------------------------------------------
   lat.MdTime(0.0);
   VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+  if ( ! ScuChecksum::CsumSwap() )
+    ERR.Hardware(cname,fname, "SCU Checksum mismatch\n");
+#endif
 
   return (Float)1.0;
 

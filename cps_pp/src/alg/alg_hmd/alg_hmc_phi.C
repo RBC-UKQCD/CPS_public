@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
 
-  $Id: alg_hmc_phi.C,v 1.21 2005-04-25 07:16:36 chulwoo Exp $
+  $Id: alg_hmc_phi.C,v 1.22 2005-06-16 07:16:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-04-25 07:16:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.21 2005-04-25 07:16:36 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.21 2005-04-25 07:16:36 chulwoo Exp $
+//  $Date: 2005-06-16 07:16:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.22 2005-06-16 07:16:42 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.22 2005-06-16 07:16:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -45,6 +45,9 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 #include <comms/glb.h>
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+#include <qcdocos/scu_checksum.h>
+#endif
 CPS_START_NAMESPACE
 
 
@@ -385,6 +388,10 @@ Float AlgHmcPhi::run(void)
   CSM.SaveComment(step_cnt);
   Float acceptance;
 
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+  if(!ScuChecksum::ChecksumsOn(void))
+  ScuChecksum::Initialise(true,true);
+#endif
   // Get the Lattice object
   //----------------------------------------------------------------
   Lattice& lat = AlgLattice();
@@ -719,6 +726,10 @@ Float AlgHmcPhi::run(void)
   lat.MdTime(0.0);
   VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
 
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+  if ( ! ScuChecksum::CsumSwap() )
+    ERR.Hardware(cname,fname, "SCU Checksum mismatch\n");
+#endif
   return acceptance;
 }
 
