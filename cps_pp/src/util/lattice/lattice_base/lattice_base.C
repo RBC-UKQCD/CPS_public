@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.31 2005-06-16 07:25:25 chulwoo Exp $
+  $Id: lattice_base.C,v 1.32 2005-06-23 18:29:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-16 07:25:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.31 2005-06-16 07:25:25 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.31 2005-06-16 07:25:25 chulwoo Exp $
+//  $Date: 2005-06-23 18:29:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.32 2005-06-23 18:29:26 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.32 2005-06-23 18:29:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.31 $
+//  $Revision: 1.32 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -1712,6 +1712,247 @@ Float Lattice::AveReTrPlaqXi() const
   VRB.Func(cname,fname);
   
   Float sum = AveReTrPlaqNodeXi();
+  glb_sum(&sum);
+  return (sum * GJP.VolNodeSites() / GJP.VolSites());
+}
+
+//------------------------------------------------------------------
+// Added by Schmidt for anisotropic lattices / Thermo
+//------------------------------------------------------------------
+enum {NUM_SPACE_RECT = 6, //!< Number of planes in a 3-dimensional lattice slice times two.
+      NUM_TIME_RECT = 3, //!< Number of planes in a 3-dimensional lattice slice.
+};
+
+//------------------------------------------------------------------
+// Float AveReTrRectNodeNoXi(void) const
+//------------------------------------------------------------------
+// Normalization:  1 for ordered links
+// Added by Schmidt for anisotropic lattices
+/*!
+  At a site \a x and in the \f$ \mu-\nu plane\f$, the rectangle with the long axis of the rectangle in the \f$ \mu \f$ direction is:
+
+\f[
+  U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all local lattice sites and all three \f$x \mu-\nu \f$ planes
+  where neither \f$ \mu \f$nor \f$ \nu \f$ is the anisotropic direction and all 
+  two rectangles in this plane.
+
+  \return The real trace of the rectangle averaged over local sites,
+  planes and colours.
+
+*/
+//------------------------------------------------------------------
+Float Lattice::AveReTrRectNodeNoXi() const
+{
+  char *fname = "AveReTrRectNodeNoXi()";
+  VRB.Func(cname,fname);
+  
+  Float sum = 0.0;
+  int x[4];
+  
+  for(x[0] = 0; x[0] < node_sites[0]; ++x[0]) {
+    for(x[1] = 0; x[1] < node_sites[1]; ++x[1]) {
+      for(x[2] = 0; x[2] < node_sites[2]; ++x[2]) {
+        for(x[3] = 0; x[3] < node_sites[3]; ++x[3]) {
+          for (int mu = 0; mu < NUM_DIM; ++mu) {
+            for(int nu = mu+1; nu < NUM_DIM; ++nu) {
+	      if (mu != GJP.XiDir() && nu != GJP.XiDir()) {
+		sum += ReTrRect(x,mu,nu);
+		sum += ReTrRect(x,nu,mu);
+	      }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  return (sum / (GJP.VolNodeSites() * NUM_SPACE_RECT * NUM_COLORS));
+}
+
+//------------------------------------------------------------------
+// Float AveReTrRectNodeXi1(void) const
+//------------------------------------------------------------------
+// Normalization:  1 for ordered links
+// Added by Schmidt for anisotropic lattices / Thermo
+/*!
+  At a site \a x and in the \f$ \mu-\nu plane\f$, the rectangle with the long axis of the rectangle in the \f$ \mu \f$ direction is:
+
+\f[
+  U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all local lattice sites and all three \f$x \mu-\nu \f$ planes
+  where the \f$ \nu \f$ (short axis of the rectangle) is the anisotropic direction. The bare anisotropy is taken into account here. 
+
+  \return The real trace of the rectangle averaged over local sites,
+  planes and colours.
+
+*/
+//------------------------------------------------------------------
+Float Lattice::AveReTrRectNodeXi1() const
+{
+  char *fname = "AveReTrRectNodeXi1()";
+  VRB.Func(cname,fname);
+  
+  Float sum = 0.0;
+  int x[4];
+  
+  for(x[0] = 0; x[0] < node_sites[0]; ++x[0]) {
+    for(x[1] = 0; x[1] < node_sites[1]; ++x[1]) {
+      for(x[2] = 0; x[2] < node_sites[2]; ++x[2]) {
+        for(x[3] = 0; x[3] < node_sites[3]; ++x[3]) {
+          for (int mu = 0; mu < NUM_DIM; ++mu) {
+            for(int nu = mu+1; nu < NUM_DIM; ++nu) {
+	      if (nu == GJP.XiDir()) 
+		sum += ReTrRect(x,mu,nu);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  return (sum / (GJP.VolNodeSites() * NUM_TIME_RECT * NUM_COLORS *
+		 GJP.XiBare() * GJP.XiBare()));
+}
+
+//------------------------------------------------------------------
+// Float AveReTrRectNodeXi2(void) const
+//------------------------------------------------------------------
+// Normalization:  1 for ordered links
+// Added by Schmidt for anisotropic lattices / Thermo
+/*!
+  At a site \a x and in the \f$ \mu-\nu plane\f$, the rectangle with the long axis of the rectangle in the \f$ \mu \f$ direction is:
+
+\f[
+  U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all local lattice sites and all three \f$x \mu-\nu \f$ planes
+  where the \f$ \mu \f$ (long axis of the rectangle) is the anisotropic direction. The bare anisotropy is taken into account here.
+
+  \return The real trace of the rectangle averaged over local sites,
+  planes and colours.
+
+*/
+//------------------------------------------------------------------
+Float Lattice::AveReTrRectNodeXi2() const
+{
+  char *fname = "AveReTrRectNodeXi2()";
+  VRB.Func(cname,fname);
+  
+  Float sum = 0.0;
+  int x[4];
+  
+  for(x[0] = 0; x[0] < node_sites[0]; ++x[0]) {
+    for(x[1] = 0; x[1] < node_sites[1]; ++x[1]) {
+      for(x[2] = 0; x[2] < node_sites[2]; ++x[2]) {
+        for(x[3] = 0; x[3] < node_sites[3]; ++x[3]) {
+          for (int mu = 0; mu < NUM_DIM; ++mu) {
+            for(int nu = mu+1; nu < NUM_DIM; ++nu) {
+	      if (mu == GJP.XiDir()) 
+		sum += ReTrRect(x,mu,nu);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  return (sum / (GJP.VolNodeSites() * NUM_TIME_RECT * NUM_COLORS *
+		 GJP.XiBare() * GJP.XiBare() * GJP.XiBare() * GJP.XiBare()));
+}
+
+//------------------------------------------------------------------
+// Float AveReTrRectNoXi(void) const
+//------------------------------------------------------------------
+// Normalization:  1 for ordered links
+// Added by Schmidt for anisotropic lattices / Thermo
+/*!
+  At a site \a x and in the \f$ \mu-\nu plane\f$, the rectangle with the long axis of the rectangle in the \f$ \mu \f$ direction is:
+
+\f[
+  U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all lattice sites and all three \f$x \mu-\nu \f$ planes
+  where neither \f$ \mu \f$nor \f$ \nu \f$ is the anisotropic direction and all 
+  two rectangles in this plane.
+
+  \return The real trace of the rectangle averaged over local sites,
+  planes and colours.
+
+*/
+//------------------------------------------------------------------
+Float Lattice::AveReTrRectNoXi() const
+{
+  char *fname = "AveReTrRectNoXi()";
+  VRB.Func(cname,fname);
+
+  Float sum = AveReTrRectNodeNoXi();
+  glb_sum(&sum);
+  return (sum * GJP.VolNodeSites() / GJP.VolSites());
+}
+
+//------------------------------------------------------------------
+// Float AveReTrRectXi1(void) const
+//------------------------------------------------------------------
+// Normalization:  1 for ordered links
+// Added by Schmidt for anisotropic lattices / Thermo
+/*!
+  At a site \a x and in the \f$ \mu-\nu plane\f$, the rectangle with the long axis of the rectangle in the \f$ \mu \f$ direction is:
+
+\f[
+  U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all lattice sites and all three \f$x \mu-\nu \f$ planes
+  where the \f$ \nu \f$ (short axis of the rectangle) is the anisotropic direction. The bare anisotropy is taken into account here. 
+
+  \return The real trace of the rectangle averaged over local sites,
+  planes and colours.
+
+*/
+//------------------------------------------------------------------
+Float Lattice::AveReTrRectXi1() const
+{
+  char *fname = "AveReTrRectXi1()";
+  VRB.Func(cname,fname);
+  
+  Float sum = AveReTrRectNodeXi1();
+  glb_sum(&sum);
+  return (sum * GJP.VolNodeSites() / GJP.VolSites());
+}
+
+//------------------------------------------------------------------
+// Float AveReTrRectXi2(void) const
+//------------------------------------------------------------------
+// Normalization:  1 for ordered links
+// Added by Schmidt for anisotropic lattices / Thermo
+/*!
+  At a site \a x and in the \f$ \mu-\nu plane\f$, the rectangle with the long axis of the rectangle in the \f$ \mu \f$ direction is:
+
+\f[
+  U_\mu(x) U_\mu(x+\mu) U_\nu(x+2\mu) U^\dagger_\mu(x+\mu+\nu) U^\dagger_\mu(x+\nu) U^\dagger_\nu(x)
+\f]
+  
+  The sum is over all lattice sites and all three \f$x \mu-\nu \f$ planes
+  where the \f$ \mu \f$ (long axis of the rectangle) is the anisotropic direction. The bare anisotropy is taken into account here. 
+
+  \return The real trace of the rectangle averaged over local sites,
+  planes and colours.
+
+*/
+//------------------------------------------------------------------
+Float Lattice::AveReTrRectXi2() const
+{
+  char *fname = "AveReTrRectXi2()";
+  VRB.Func(cname,fname);
+  
+  Float sum = AveReTrRectNodeXi2();
   glb_sum(&sum);
   return (sum * GJP.VolNodeSites() / GJP.VolSites());
 }
