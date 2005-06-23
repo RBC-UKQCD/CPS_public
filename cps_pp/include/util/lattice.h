@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.40 2005-06-16 07:16:08 chulwoo Exp $
+  $Id: lattice.h,v 1.41 2005-06-23 17:59:15 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2005-06-16 07:16:08 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.40 2005-06-16 07:16:08 chulwoo Exp $
-  $Id: lattice.h,v 1.40 2005-06-16 07:16:08 chulwoo Exp $
+  $Date: 2005-06-23 17:59:15 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.41 2005-06-23 17:59:15 chulwoo Exp $
+  $Id: lattice.h,v 1.41 2005-06-23 17:59:15 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.40 $
+  $Revision: 1.41 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -385,6 +385,35 @@ class Lattice
   //!< Calculates the global average of the real part of the trace of the plaquettes parallel to the special anisotropic direction.
   // Normalization:  1 for ordered links
   // Average over plaq's parallel to the special anisotropic dir.
+
+  // Added in by Schmidt for anisotropic lattices / Thermo
+  //------------------------------------------------------------------
+  Float AveReTrRectNodeNoXi() const;
+  //!< Calculates the local average of the real part of the trace of the rectangle perpendicular to the special anisotropic direction.
+  // Normalization:  1 for ordered links
+
+  Float AveReTrRectNodeXi1() const;
+  //!< Calculates the local average of the real part of the trace of the rectangle, where the short axix is the special anisotropic direction.
+  // Normalization:  1 for ordered links
+
+  Float AveReTrRectNodeXi2() const;
+  //!< Calculates the local average of the real part of the trace of the rectangle, where the long axis is the special anisotropic direction.
+  // Normalization:  1 for ordered links
+
+  Float AveReTrRectNoXi() const;
+  //!< Calculates the global average of the real part of the trace of the rectangle perpendicular to the special anisotropic direction.  
+  // Normalization:  1 for ordered links
+  // Average over rect's perpendicular to the special anisotropic dir.
+
+  Float AveReTrRectXi1() const;
+  //!< Calculates the global average of the real part of the trace of the rectangle, where the short axis is the special anisotropic direction.
+  // Normalization:  1 for ordered links
+  // Average over rect's with short axis in the special anisotropic dir.
+
+  Float AveReTrRectXi2() const;
+  //!< Calculates the global average of the real part of the trace of the rectangle, where the long axis is the special anisotropic direction.
+  // Normalization:  1 for ordered links
+  // Average over rect's with long axis in the special anisotropic dir.
 
   void MltFloat(Float factor, int dir)      {
     if (factor != 1.0)    MltFloatImpl(factor, dir);
