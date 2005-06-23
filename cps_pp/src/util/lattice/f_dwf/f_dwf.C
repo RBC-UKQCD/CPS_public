@@ -46,7 +46,7 @@ Fdwf::Fdwf() : FdwfBase(){
 Fdwf::~Fdwf(){
 }
 
-#define PROFILE
+#undef PROFILE
 void Fdwf::EvolveMomFforce(Matrix *mom, Vector *chi,
                            Float mass, Float step_size){
   char *fname = "EvolveMomFforce()";
