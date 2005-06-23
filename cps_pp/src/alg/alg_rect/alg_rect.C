@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_rect/alg_rect.C,v 1.7 2004-08-18 11:57:39 zs Exp $
-//  $Id: alg_rect.C,v 1.7 2004-08-18 11:57:39 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-06-23 18:01:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_rect/alg_rect.C,v 1.8 2005-06-23 18:01:01 chulwoo Exp $
+//  $Id: alg_rect.C,v 1.8 2005-06-23 18:01:01 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_rect.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_rect/alg_rect.C,v $
 //  $State: Exp $
 //
@@ -76,7 +76,20 @@ AlgRect::~AlgRect() {
 
 
 //------------------------------------------------------------------
-//
+//! Performs the computation.
+/*!
+  The real trace of the rectangle is averaged over the lattice and normalised
+  to unity.
+  \post The following data are written to the file specified in the
+  common_arg structure:
+  -# mean rectangle
+  -# variance of mean rectangle
+  -# maximum rectangle
+  -# minimum rectangle
+  -# mean temporal 1x2 rectangle (the short axis is the time direction)
+  -# mean temporal 2x1 rectangle (the long axis is the time direction)
+  -# mean spatial rectangle
+*/
 //------------------------------------------------------------------
 void AlgRect::run()
 {
@@ -86,18 +99,33 @@ void AlgRect::run()
   char *fname = "run()";
   VRB.Func(cname, fname);
 
-  //----------------------------------------------------------------
-  // Check if anisotropy is present and exit 
-  //----------------------------------------------------------------
-  if(GJP.XiBare() != 1 ) {
-    ERR.General(cname,fname,
-    "XiBare=%g : Not implemented for anisotropy\n", GJP.XiBare());
-  }
-
   // Set the Lattice pointer
   //----------------------------------------------------------------
   Lattice& lat = AlgLattice();
 
+  // Modified by Schmidt for anisotropic lattices
+  //----------------------------------------------------------------
+  if (GJP.XiBare() != 1.0 || GJP.XiV() != 1 || GJP.XiVXi() != 1   ) {
+    Float ave_time1  = lat.AveReTrRectXi1();
+    Float ave_time2  = lat.AveReTrRectXi2();
+    Float ave_space = lat.AveReTrRectNoXi();
+    Float ave_both  = ((ave_time1+ave_time2)/2 + ave_space) / 2;  
+ 
+    if (common_arg->results != 0){
+      FILE *fp;
+      if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
+        ERR.FileA(cname,fname, (char *)common_arg->results);
+      }
+      Fprintf(fp, "%0.16e %0.16e %0.16e %0.16e \n", 
+              (IFloat)ave_space, (IFloat)ave_time1, (IFloat)ave_time2, (IFloat)ave_both);  
+      Fclose(fp);  
+    }
+    return;
+  }
+
+
+  Float r_temporal1, r_temporal2, r_spacial;
+  r_temporal1 = r_temporal2 = r_spacial = 0.0;
   Float r_sum    =  0.0 ;
   Float r_sq_sum =  0.0 ;
   Float r_min    =  3.0 ;
@@ -118,12 +146,25 @@ void AlgRect::run()
      r_sq_sum += tmp_flt * tmp_flt ;
      r_min     = min(r_min, tmp_flt) ;
      r_max     = max(r_max, tmp_flt) ;
+
+     if(nu==DIR_T) {
+       r_temporal1+=tmp_flt;
+     } else {
+       if (mu==DIR_T){
+	 r_temporal2+=tmp_flt;
+       } else {
+	 r_spacial+=tmp_flt;
+       }
+     }
   }
 
   glb_sum(&r_sum) ;
   glb_sum(&r_sq_sum) ;
   glb_min(&r_min) ;
   glb_max(&r_max) ;
+  glb_sum(&r_temporal1) ;
+  glb_sum(&r_temporal2) ;
+  glb_sum(&r_spacial) ;
 
   Float one_third = 1.0 / 3.0 ;
 
@@ -136,8 +177,9 @@ void AlgRect::run()
                 * (r_sq_sum - norm_fac*r_sum*r_sum) ;
 
   r_sum *= norm_fac ;
-
-  x[0]=0 ; x[1]=0 ; x[2]=0 ; x[3]=0 ;
+  r_temporal1 *= 4.0*norm_fac*one_third;
+  r_temporal2 *= 4.0*norm_fac*one_third;
+  r_spacial   *= 2.0*norm_fac*one_third;
 
   // Print out results
   //----------------------------------------------------------------
@@ -146,9 +188,9 @@ void AlgRect::run()
     if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
-    Fprintf(fp, "%e %e %e %e %e\n", IFloat(r_sum), IFloat(r_var),
+    Fprintf(fp, "%0.16e %0.16e %0.16e %0.16e %0.16e %0.16e %0.16e \n", IFloat(r_sum), IFloat(r_var),
       IFloat(r_max), IFloat(r_min),
-      IFloat(one_third*lat.ReTrRect(x, 0, 1)) ) ;
+      IFloat(r_temporal1), IFloat(r_temporal2), IFloat(r_spacial) ) ;
     Fclose(fp);
   }
 
