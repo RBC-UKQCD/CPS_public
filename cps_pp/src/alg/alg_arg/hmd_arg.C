@@ -279,6 +279,8 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 		 return FALSE;
 	 if (!vml_string (vmls, "plaquette_stem", &objp->plaquette_stem, ~0))
 		 return FALSE;
+	 if (!vml_string (vmls, "pbp_stem", &objp->pbp_stem, ~0))
+		 return FALSE;
 	 if (!vml_string (vmls, "evo_stem", &objp->evo_stem, ~0))
 		 return FALSE;
 	 if (!vml_string (vmls, "work_directory", &objp->work_directory, ~0))

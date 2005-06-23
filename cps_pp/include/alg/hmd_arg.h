@@ -125,6 +125,7 @@ public:
 	char *gauge_file_stem;
 	char *rng_file_stem;
 	char *plaquette_stem;
+	char *pbp_stem;
 	char *evo_stem;
 	char *work_directory;
 	int CalcEig;

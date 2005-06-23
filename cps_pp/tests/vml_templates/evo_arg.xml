@@ -14,6 +14,7 @@
 <item><name>gauge_file_stem</name><value><string>ckpoint_lat </string></value></item>
 <item><name>rng_file_stem</name><value><string>ckpoint_rng </string></value></item>
 <item><name>plaquette_stem</name><value><string>plaq </string></value></item>
+<item><name>pbp_stem</name><value><string> </string></value></item>
 <item><name>evo_stem</name><value><string>hmd </string></value></item>
 <item><name>work_directory</name><value><string> </string></value></item>
 <item><name>CalcEig</name><value><int>0</int></value></item>

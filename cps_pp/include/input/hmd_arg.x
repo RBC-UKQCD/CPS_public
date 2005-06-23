@@ -200,6 +200,7 @@ class EvoArg {
   string gauge_file_stem<>;
   string rng_file_stem<>;
   string plaquette_stem<>;
+  string pbp_stem<>;
   string evo_stem<>;
   string work_directory<>;
   int CalcEig;
