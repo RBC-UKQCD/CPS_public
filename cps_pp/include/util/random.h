@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.21 2005-02-18 19:50:20 mclark Exp $
+  $Id: random.h,v 1.22 2005-06-23 18:00:19 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2005-02-18 19:50:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.21 2005-02-18 19:50:20 mclark Exp $
-//  $Id: random.h,v 1.21 2005-02-18 19:50:20 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-06-23 18:00:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.22 2005-06-23 18:00:19 chulwoo Exp $
+//  $Id: random.h,v 1.22 2005-06-23 18:00:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -371,6 +371,21 @@ class LatRanGen
   allows control of and access to the random number generation.
 */
 extern LatRanGen LRG;
+
+class LRGState {
+  public:
+
+  char *cname;
+  unsigned int ** rng4d;
+  unsigned int ** rng5d;
+
+  LRGState();
+  ~LRGState();
+  
+  void GetStates();
+  void SetStates();
+
+};
 
 
 #endif
