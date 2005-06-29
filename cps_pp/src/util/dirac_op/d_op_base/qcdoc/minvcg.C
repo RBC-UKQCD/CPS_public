@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpBase class multishift CG solver method.
 
-  $Id: minvcg.C,v 1.16 2005-06-23 18:26:34 chulwoo Exp $
+  $Id: minvcg.C,v 1.17 2005-06-29 19:12:16 chulwoo Exp $
 */
 
 CPS_END_NAMESPACE
@@ -19,6 +19,9 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <math.h>
 #include <util/checksum.h>
+#ifdef HAVE_STRINGS_H
+#include <strings.h> // for bzero()
+#endif
 
 #define PROFILE
 
@@ -102,7 +105,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
       psi[s] = (Vector*)fmalloc(f_size * sizeof(Float),
 				cname,fname, "psi[s]");
       if (psi[s] == 0) ERR.Pointer(cname,fname,"psi[s]");
-      if (type == MULTI) psi[s] -> VecTimesEquFloat(0.0,f_size);
+//      if (type == MULTI) psi[s] -> VecTimesEquFloat(0.0,f_size);
+      if (type == MULTI) bzero((char *)psi[s],sizeof(Float)*f_size);
       else psi[s] -> CopyVec(psi_slow[s],f_size);
     }
 
@@ -135,8 +139,10 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
 
   // If source norm = 0, solution must be 0
   if (chi_norm == 0.0) {
-    if (type == SINGLE) psi[0]->VecTimesEquFloat(0.0,f_size);
-    else for (k=0; k<Nmass; k++) psi[k]->VecTimesEquFloat(0.0,f_size);
+//    if (type == SINGLE) psi[0]->VecTimesEquFloat(0.0,f_size);
+//    else for (k=0; k<Nmass; k++) psi[k]->VecTimesEquFloat(0.0,f_size);
+    if (type == SINGLE) bzero((char *)psi[0],f_size*sizeof(Float));
+    else for (k=0; k<Nmass; k++) bzero((char *)psi[k],f_size*sizeof(Float));
     return 0;
   }
   

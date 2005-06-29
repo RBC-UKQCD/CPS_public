@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.18 2005-06-16 07:18:55 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.19 2005-06-29 19:09:28 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2005-06-16 07:18:55 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.18 2005-06-16 07:18:55 chulwoo Exp $
-  $Id: alg_hmc_rhmc.C,v 1.18 2005-06-16 07:18:55 chulwoo Exp $
+  $Date: 2005-06-29 19:09:28 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.19 2005-06-29 19:09:28 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.19 2005-06-29 19:09:28 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.18 $
+  $Revision: 1.19 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -44,6 +44,9 @@ CPS_END_NAMESPACE
 #include<util/error.h>
 #include<comms/glb.h>
 #include<alg/alg_remez.h>
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif
 #ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
 #include <qcdocos/scu_checksum.h>
 #endif
@@ -613,7 +616,8 @@ Float AlgHmcRHMC::run(void)
 			  hmd_arg->FRatPole[i], RENORM_FORWARDS);
       
 	  for (j=0; j<hmd_arg->FRatDeg[i]; j++) 
-	    frmn[j+shift] -> VecTimesEquFloat(0.0,f_size);
+	    bzero((char *)frmn[j+shift],f_size*sizeof(Float));
+//	    frmn[j+shift] -> VecTimesEquFloat(0.0,f_size);
       
 	  cg_iter = lat.FmatEvlMInv(frmn + shift, phi[i], hmd_arg->FRatPole[i], 
 				    hmd_arg->FRatDeg[i], hmd_arg->isz, frm_cg_arg[i], 
