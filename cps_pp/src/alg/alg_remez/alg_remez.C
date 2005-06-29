@@ -508,7 +508,8 @@ int AlgRemez::simq(bigfloat A[], bigfloat B[], bigfloat X[], int n) {
   bigfloat em, q, rownrm, big, size, pivot, sum;
   bigfloat *aa;
 
-  int *IPS = (int*)smalloc((neq) * sizeof(int));		// simq() work vector
+//  int *IPS = (int*)smalloc((neq) * sizeof(int));		// simq() work vector
+  int *IPS = new int[neq];
   if(IPS == 0) ERR.Pointer(cname,fname,"IPS");
   VRB.Smalloc(cname,fname,"IPS",IPS,(neq) * sizeof(int));
 
