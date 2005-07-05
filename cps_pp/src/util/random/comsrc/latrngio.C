@@ -191,7 +191,12 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   }
 
   if(synchronize(error) != 0) 
-      ERR.General(cname,fname, "CheckSUM error\n");
+ //     ERR.General(cname,fname, "CheckSUM error\n");
+  { 
+    VRB.Warn(cname,fname, "CheckSUM error\n");
+    log(); finishLogging();
+    return;
+  }
 
   // Step 2.2: verify position-dep. Checksum
   pos_dep_csum[0] += pos_dep_csum[1];
@@ -208,7 +213,12 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   }
 
   if(synchronize(error) != 0) 
-    ERR.General(cname, fname, "Position-Dependent Checksum error\n");
+//    ERR.General(cname, fname, "Position-Dependent Checksum error\n");
+  { 
+    VRB.Warn(cname, fname, "Position-Dependent Checksum error\n");
+    log(); finishLogging();
+    return;
+  }
 
 
   // STEP 3: Verify Rand Average and Variance

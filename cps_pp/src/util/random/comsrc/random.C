@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.24 2005-05-09 15:18:51 chulwoo Exp $
+  $Id: random.C,v 1.25 2005-07-05 02:47:38 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-09 15:18:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.24 2005-05-09 15:18:51 chulwoo Exp $
-//  $Id: random.C,v 1.24 2005-05-09 15:18:51 chulwoo Exp $
+//  $Date: 2005-07-05 02:47:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.25 2005-07-05 02:47:38 chulwoo Exp $
+//  $Id: random.C,v 1.25 2005-07-05 02:47:38 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.24 $
+//  $Revision: 1.25 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -524,9 +524,9 @@ void LatRanGen::GetStates(unsigned int **s,
 }
 
 
-bool LatRanGen::Read(const char * filename) {
+bool LatRanGen::Read(const char * filename, int concur_io_number) {
   io_good = false;
-  QioArg rd_arg(filename);
+  QioArg rd_arg(filename, concur_io_number);
   LatRngRead  rd;
   if(parIO()) rd.setParallel();
   else        rd.setSerial();
@@ -536,9 +536,9 @@ bool LatRanGen::Read(const char * filename) {
 }
 
 
-bool LatRanGen::Write(const char * filename) {
+bool LatRanGen::Write(const char * filename, int concur_io_number) {
   io_good = false;
-  QioArg wt_arg(filename);
+  QioArg wt_arg(filename, concur_io_number);
   LatRngWrite  wt;
   if(parIO()) wt.setParallel();
   else        wt.setSerial();

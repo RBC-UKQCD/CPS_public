@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.11 2004-09-17 19:25:46 chulwoo Exp $
+  $Id: random_asm.C,v 1.12 2005-07-05 02:47:39 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-17 19:25:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.11 2004-09-17 19:25:46 chulwoo Exp $
-//  $Id: random_asm.C,v 1.11 2004-09-17 19:25:46 chulwoo Exp $
+//  $Date: 2005-07-05 02:47:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.12 2005-07-05 02:47:39 chulwoo Exp $
+//  $Id: random_asm.C,v 1.12 2005-07-05 02:47:39 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -65,16 +65,30 @@ IFloat RandomGenerator::Rand(void)
   \pre ::Reset must have already been called.
   \return A random number from a gaussian distribution with zero mean.
 */
-IFloat GaussianRandomGenerator::Rand()
+IFloat GaussianRandomGenerator::Rand(int noexit)
 {
+    char *cname = "GaussianRandomGenerator";
+    char *fname = "Rand()";
     if(iset == 0) {	// We don't have an extra deviate handy
+        int num_try = 1;
 	IFloat v1, v2, rsq;
         do {
 	    v1 = 2.0 * RandomGenerator::Rand() - 1.0;
 	    v2 = 2.0 * RandomGenerator::Rand() - 1.0;
-//	    printf("v1=%e v2=%e\n",v1,v2);
+            if ((num_try %1000)==0) 
+	      fprintf(stderr,"%s::%s: num_try=%d v1=%e v2=%e\n",cname,fname,num_try,v1,v2);
 	    rsq = v1*v1 + v2*v2;
-	} while(rsq >= 1.0 || rsq == 0);
+            num_try++;
+	} while((num_try<10000) &&(rsq >= 1.0 || rsq == 0) );
+        if (num_try >9999) {
+	  if(noexit){
+	      fprintf(stderr,"%s::%s: failed after 10000 tries (corrupted RNG?), returning ridiculous numbers (1e+10)\n");
+             gset=1e+10; iset=1;
+             return 1e+10;
+          }
+    	  else 
+	  ERR.General(cname,fname,"num_try=%d rsq>1.0",num_try);
+ 	}
 	    // pick 2 uniform numbers in the square extending from
 	    // -1 to 1 in each direction, see if they are in the
 	    // unit circle, and try again if they are not.

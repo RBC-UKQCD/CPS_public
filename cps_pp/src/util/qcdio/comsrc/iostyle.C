@@ -125,7 +125,7 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
 	      dconv.file2host(rng,fbuf,data_per_site);
 	      ugran[siteid].load(rng.IntPtr());
 	      // generate next rand for verification
-	      Float rn = ugran[siteid].Grand();
+	      Float rn = ugran[siteid].Grand(1);
 	      RandSum += rn;
 	      Rand2Sum += rn*rn;
 	      // recover loading
@@ -400,7 +400,7 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
 		  dconv.file2host(rng,fbuf,data_per_site);
 		  ugran[xst].load(rng.IntPtr());
 		  // generate next rand for verification
-		  Float rn = ugran[xst].Grand();
+		  Float rn = ugran[xst].Grand(1);
 		  RandSum += rn;
 		  Rand2Sum += rn*rn;
 		  // recover loading

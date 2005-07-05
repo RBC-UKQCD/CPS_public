@@ -92,6 +92,9 @@ class QioArg {
   QioArg(const char * file) {  
     init(file, 0, 0.01, FP_AUTOMATIC, INT_AUTOMATIC, 1); 
   }
+  QioArg(const char * file, int concur_io_number) {  
+    init(file, concur_io_number, 0.01, FP_AUTOMATIC, INT_AUTOMATIC, 1); 
+  }
   QioArg(const char * file, const Float chkprec) {  
     // used in ReadLatticePar
     init(file, 0, chkprec, FP_AUTOMATIC, INT_AUTOMATIC, 1);

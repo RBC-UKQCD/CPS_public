@@ -6,3 +6,4 @@ MPI_DIR = mpi
 NOARCH_DIR = noarch
 
 include ../Makefile.rules
+# DO NOT DELETE

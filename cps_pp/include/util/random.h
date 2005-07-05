@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.22 2005-06-23 18:00:19 chulwoo Exp $
+  $Id: random.h,v 1.23 2005-07-05 02:47:37 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-23 18:00:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.22 2005-06-23 18:00:19 chulwoo Exp $
-//  $Id: random.h,v 1.22 2005-06-23 18:00:19 chulwoo Exp $
+//  $Date: 2005-07-05 02:47:37 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.23 2005-07-05 02:47:37 chulwoo Exp $
+//  $Id: random.h,v 1.23 2005-07-05 02:47:37 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -183,8 +183,7 @@ class GaussianRandomGenerator : public virtual RandomGenerator
 	sigma2 = s2;
     }
 
-    IFloat Rand();
-#if 1
+    IFloat Rand(int noexit=0);
     //! Number of Integers in RNG, that should be stored to record status
     int RNGints() const { return RandomGenerator::RNGints()+1; } // iset
     int RNGIFloats() const { return 1; } // gset
@@ -202,7 +201,6 @@ class GaussianRandomGenerator : public virtual RandomGenerator
       RandomGenerator::load(buf);
       iset = buf[RandomGenerator::RNGints()];
     }
-#endif
 };
  
 
@@ -225,7 +223,7 @@ public UniformRandomGenerator, public GaussianRandomGenerator
 	GaussianRandomGenerator() {};
 
     //! Get a gaussian random number
-    IFloat Grand() { return GaussianRandomGenerator::Rand(); }
+    IFloat Grand(int noexit=0) { return GaussianRandomGenerator::Rand(noexit); }
 
     //! Get a uniform random number.
     IFloat Urand() { return UniformRandomGenerator::Rand(); }
@@ -333,8 +331,8 @@ class LatRanGen
         FermionFieldDimension frm_dim = FIVE_D ) const;
     
     //! Save the RNGs to a file (due to multi-type class members, not only supports read/write on same platform)
-    bool Read(const char* filename);
-    bool Write(const char* filename);
+    bool Read(const char* filename, int concur_io_num = 0);
+    bool Write(const char* filename, int concur_io_num = 0);
 
  private:
     bool UseParIO;
