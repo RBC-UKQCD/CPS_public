@@ -1,6 +1,7 @@
 #include <config.h>
 #include <util/lat_data.h>
 #include <util/vector.h>
+#include <util/verbose.h>
 #include <util/error.h>
 #include <qalloc.h>
 
@@ -16,6 +17,7 @@ void LatData::Init(int flags, int len, int volume){
 	data = (IFloat *)qalloc(DEFAULT_FLAG, sizeof(IFloat)*size*vol);
 	if (data == NULL)
 	ERR.General("LatData","Init()","out of memory");
+        VRB.Flow(cname,"Init()","flags=%x vol=%d data=%p\n",flags,vol,data);
 }
 
 #if 0

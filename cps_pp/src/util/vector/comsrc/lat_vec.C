@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of LatData class methods.
 
-  $Id: lat_vec.C,v 1.4 2004-09-02 16:58:11 zs Exp $
+  $Id: lat_vec.C,v 1.5 2005-07-05 02:32:38 chulwoo Exp $
 */
 //------------------------------------------------------------------
 
@@ -55,12 +55,14 @@ LatMatrix::LatMatrix(int flag, int n_vec, int vol)
 	mat_size = 2*GJP.Colors()*GJP.Colors();
 	if (vol == 0) vol = GJP.VolNodeSites();
 	LatData::Init(flag, n_vec*mat_size,vol);
+        printf("%p::data(%p)=%p\n",this,&data,data);
 }
 LatMatrix::~LatMatrix(){
 //	printf("LatMatrix::~LatMatrix()\n");
 }
 
 Matrix *LatMatrix::Mat(int pos, int vec_row){
+        printf("%p::data(%p)=%p\n",this,&data,data);
 	Matrix *pointer = (Matrix *)(data+pos*size+vec_row*mat_size);
 	return pointer;
 }

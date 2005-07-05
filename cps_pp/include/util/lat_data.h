@@ -40,7 +40,7 @@ class LatData{
 
 };
 
-class LatVector: public virtual LatData{
+class LatVector: public LatData{
   private:
     int vec_size;
   public: 
@@ -59,7 +59,7 @@ class LatVector: public virtual LatData{
     }
 };
 
-class LatMatrix: public virtual LatData{
+class LatMatrix: public LatData{
   private:
     int mat_size;
   public: 
