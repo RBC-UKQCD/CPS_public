@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.34 2005-07-05 02:47:38 chulwoo Exp $
+  $Id: lattice_base.C,v 1.35 2005-07-06 00:57:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-07-05 02:47:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.34 2005-07-05 02:47:38 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.34 2005-07-05 02:47:38 chulwoo Exp $
+//  $Date: 2005-07-06 00:57:15 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.35 2005-07-06 00:57:15 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.35 2005-07-06 00:57:15 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.34 $
+//  $Revision: 1.35 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -1225,7 +1225,7 @@ Float Lattice::SumReTrPlaqNode(void) const
 	  
 	  for (int mu = 0; mu < 3; ++mu) {
 	    for(int nu = mu+1; nu < 4; ++nu) {
-		VRB.Flow(cname,fname,"%d %d %d %d %d %d\n",x[0],x[1],x[2],x[3],mu,nu);
+//		VRB.Flow(cname,fname,"%d %d %d %d %d %d\n",x[0],x[1],x[2],x[3],mu,nu);
 	      sum += ReTrPlaq(x,mu,nu);
 	    }
 	  }
