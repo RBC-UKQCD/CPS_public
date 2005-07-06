@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.12 2005-05-26 14:32:26 chulwoo Exp $
+  $Id: alg_eig.C,v 1.13 2005-07-06 00:56:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-26 14:32:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.12 2005-05-26 14:32:26 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.12 2005-05-26 14:32:26 chulwoo Exp $
+//  $Date: 2005-07-06 00:56:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.13 2005-07-06 00:56:49 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.13 2005-07-06 00:56:49 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -34,6 +34,12 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 CPS_START_NAMESPACE
 
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+using namespace std;
+
+extern void gamma_5(Float *v_out, Float *v_in, int num_sites);
 
 //------------------------------------------------------------------
 // Constructor 
@@ -99,15 +105,9 @@ AlgEig::AlgEig(Lattice& latt,
 
   lambda = (Float *) smalloc(cname,fname, "lambda", N_eig * sizeof(Float));
 
-  chirality = (Float *) smalloc(N_eig * sizeof(Float));
-  if(chirality == 0)
-    ERR.Pointer(cname,fname, "chirality");
-  VRB.Smalloc(cname,fname, "chirality", chirality, N_eig * sizeof(Float));
+  chirality = (Float *) smalloc(cname,fname,"chirality", N_eig * sizeof(Float));
 
-  valid_eig = (int *) smalloc(N_eig * sizeof(int));
-  if(valid_eig == 0)
-    ERR.Pointer(cname,fname, "valid_eig");
-  VRB.Smalloc(cname,fname, "valid_eig", valid_eig, N_eig * sizeof(int));
+  valid_eig = (int *) smalloc(cname,fname,"valid_eig",N_eig * sizeof(int));
 
   // Print out input parameters
   //----------------------------------------------------------------
@@ -196,9 +196,10 @@ void AlgEig::run()
   Lattice& lat = AlgLattice();
   eig_arg = alg_eig_arg;
   Float **hsum;
-  int N_eig = eig_arg->N_eig;
-//  int f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
+  const int N_eig = eig_arg->N_eig;
+  const int f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
   int hsum_len = 0;
+  int n;
 
   if (eig_arg->print_hsum)
   {
@@ -231,7 +232,7 @@ void AlgEig::run()
       ERR.Pointer(cname,fname, "hsum");
     VRB.Smalloc(cname,fname, "hsum", hsum, N_eig * sizeof(Float*));
   
-    for(int n = 0; n < N_eig; ++n)
+    for(n = 0; n < N_eig; ++n)
     {
       hsum[n] = (Float *) smalloc(hsum_len * sizeof(Float));
       if(hsum[n] == 0)
@@ -244,11 +245,25 @@ void AlgEig::run()
     hsum = (Float **) 0;
   }
 
+  // allocate memory to store the eigenvectors
+  Vector** eig_store=0;
+  if(eig_arg->ncorr) 
+  {
+    eig_store = (Vector**)smalloc(N_eig * sizeof(Vector*));
+    if(eig_store == 0) { ERR.Pointer(cname,fname, "eig_store"); }
+    for(n=0;n<N_eig;++n)
+    {
+      eig_store[n] = (Vector*) smalloc(f_size * sizeof(Float));
+      if(eig_store[n] == 0) {ERR.Pointer(cname,fname,"eig_store[n]"); }
+    }
+  }
+
+
   // Initialize eigenvectors to gaussian
   // and compute eigenvectors
   //----------------------------------------------------------------
-  for(int n = 0; n < eig_arg->N_eig; ++n)
-    lat.RandGaussVector(eigenv[n], 0.5, Ncb);
+  //for(int n = 0; n < eig_arg->N_eig; ++n)
+  //  lat.RandGaussVector(eigenv[n], 0.5, Ncb);
   
   // Loop over mass values
   int sign_dm = (eig_arg->Mass_step < 0.0) ? -1 : 1;
@@ -282,41 +297,161 @@ void AlgEig::run()
     //mass += eig_arg->Mass_step){
 
     //eig_arg->mass = mass;
+  // count the number of masses 
+  int count(0);
+
+
+    // store eigenvectors from previous mass
+    if(eig_arg->ncorr && ( count > 0 ) ){
+      for ( n=0; n<N_eig; n++ )
+      {
+        eig_store[n]->CopyVec(eigenv[n],f_size); 
+      }
+    }
+
+
+    // random guess every time; do *not* put in the old solution
+    for(n = 0; n<N_eig; ++n)
+    {
+      lat.RandGaussVector(eigenv[n], 0.5, Ncb);
+    }
+
+/*
+    // DEBUG, dumping start vector from QCDOC to be read in QCDSP
+    cout << "Dump DEBUGGING info...startvector.dat" << endl;
+    int f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
+    ofstream fout ( "startvector.dat");
+    fout << "f_size=" << f_size << endl;
+    for(n=0;n<N_eig;++n) {
+      fout << "n=" << n << endl;
+      for(int i=0;i<f_size;i++) {
+	fout << setprecision(15) << ((Float*)eigenv[n])[i] << endl;
+      }
+      fout << endl;
+    }
+    fout.close();
+    //    exit(0);
+    //DEBUG end
+*/
+   
+    //==============================================
+    // print out mass here in case we want to
+    // do any output from within the FeigSolv call
+    //==============================================
+			      
+    if (eig_arg->fname!=0)
+    {
+      FILE* filep;
+      filep=Fopen(eig_arg->fname,"a");
+      Fprintf(filep,"mass = %g\n",(Float)eig_arg->mass);
+      Fclose(filep); // close file
+    }
+         
+    VRB.Result(cname,fname, "mass = %g\n", (Float)eig_arg->mass);
 
     // Solve for eigenvectors and eigenvalues.
     // Use eigenv as initial guess. Lambda is not used initially.
+
+    /*  SUSPICIOUS, does QCDOC really need to distinguish Ncb? 
     if(Ncb==2)
       iter = lat.FeigSolv(eigenv, lambda, chirality, valid_eig, 
 			hsum, eig_arg, CNV_FRM_YES);
     else if(Ncb==1)
       iter = lat.FeigSolv(eigenv, lambda, chirality, valid_eig, 
       			hsum, eig_arg, CNV_FRM_NO);
-    // Print out number of iterations and eigs
-    //----------------------------------------------------------------
-    if(common_arg->results != 0)
-    {
-      FILE *fp;
-      if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
-	ERR.FileA(cname,fname, (char *)common_arg->results);
-      }
+    */
 
-      Fprintf(fp, "mass = %g\n", (IFloat)(eig_arg->mass));
-      Fprintf(fp, "  iter = %d\n", iter);
-      for(int n = 0; n < eig_arg->N_eig; ++n)
+    //------------------------------------------------------------
+    // Solve for eigenvectors and eigenvalues.
+    // Lambda is not used initially.
+    // This call will return a negative value for the iteration number
+    // if either the solver maxes out on one of the limits.
+			          
+    iter = lat.FeigSolv(eigenv,lambda,chirality, valid_eig,
+    			hsum, eig_arg, CNV_FRM_YES);
+   
+    if ( iter < 0 )
+    {
+      FILE* filep;
+      filep=Fopen(eig_arg->fname,"a");
+      if ( iter == -1 )
       {
-	Fprintf(fp, "  lambda[%d] = %g  chirality = %g  valid = %d\n", 
-		n, (IFloat)lambda[n], (IFloat)chirality[n], valid_eig[n]);
+        Fprintf(filep, "maxed out in ritz\n");
       }
-      
-      if (eig_arg->print_hsum)
+      else
       {
-	for(int n = 0; n < eig_arg->N_eig; ++n)
-	  for(int i = 0; i < hsum_len; ++i)
-	    Fprintf(fp, "  hsum[%d][%d] = %g\n",n,i,(IFloat)hsum[n][i]);
+        Fprintf(filep, "maxed out for KS steps\n");
       }
-      
-      Fclose(fp);
+      Fclose(filep);
     }
+    else
+    {   
+      //----------------------------------------
+      //  spatial correlations of eigen vectors
+      //---------------------------------------
+      
+      if ( eig_arg->fname != 0x0 )
+	{
+	  
+	  FILE* filep;
+	  filep=Fopen(eig_arg->fname,"a");
+              
+	  int i_eig,j_eig;
+              
+	  // GM5Correlation
+              
+	  //tmp vector v1
+	  Vector* v1 = (Vector *)smalloc(f_size*sizeof(Float));
+	  if (v1 == 0)
+	    ERR.Pointer(cname, fname, "v1");
+	  VRB.Smalloc(cname, fname, "v1", v1, f_size*sizeof(Float));
+              
+	  for(i_eig=0;i_eig<N_eig;i_eig++){
+	    for(j_eig=i_eig;j_eig<N_eig;j_eig++){
+	      gamma_5((Float*)v1, 
+		      (Float*)eigenv[j_eig], 
+		      f_size/24);
+	      Complex cr = eigenv[i_eig]->CompDotProductGlbSum(v1,f_size);
+	      Fprintf(filep,"GM5CORR: %d %d %g %g\n",
+		      i_eig, j_eig, (Float)cr.real(), (Float)cr.imag());
+	    }
+	  }
+	  VRB.Sfree(cname,fname, "v1", v1);
+	  sfree(v1);
+              
+	  // Correlation with previous eigen vector
+	  if(count >0 && eig_arg->ncorr ){
+	    for(i_eig=0;i_eig<N_eig;i_eig++){
+	      for(j_eig=0;j_eig<N_eig;j_eig++){
+		Complex cr = eig_store[i_eig]
+		  ->CompDotProductGlbSum(eigenv[j_eig],f_size);
+		Fprintf(filep,"NeibCORR: %d %d %g %g\n",
+			i_eig, j_eig, (Float)cr.real(), (Float)cr.imag());
+	      }
+	    }
+	  }
+
+
+	  //------------------------------------------
+	  // Print out number of iterations  and hsum
+	  //------------------------------------------
+	  
+	  int i;
+	  Fprintf(filep, "  iter = %d\n", iter);
+	  if (eig_arg->print_hsum)
+	    {
+	      for(n = 0; n < eig_arg->N_eig; ++n)
+		{
+		  for(i = 0; i < hsum_len; ++i)
+		    {
+		      Fprintf(filep, "  hsum[%d][%d] = %g\n",n,i,
+			      (Float)hsum[n][i]);
+		    }
+		}
+	    }
+	  Fclose(filep);
+	} // output
+    } // solver worked
 
     // If there is another mass loop iteration ahead, we should
     // set the eig_arg->mass to it's next desired value
@@ -333,7 +468,21 @@ void AlgEig::run()
 	break;
       }
     }
-  }
+    count++;
+  } // mass loop
+
+  //==============================
+  // deallocate eigenvalue store
+  //==============================
+  
+  if ( eig_arg->ncorr )
+    {
+      for(n = 0; n < N_eig; ++n)
+        {
+          sfree(eig_store[n]);
+        }
+      sfree(eig_store);
+    }
 
 }
 
