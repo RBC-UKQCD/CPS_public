@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fp4::EvolveMomFforce.
 
-  $Id: Fforce_p4.C,v 1.2 2005-05-12 20:45:24 chulwoo Exp $
+  $Id: Fforce_p4.C,v 1.3 2005-08-02 18:07:41 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -21,8 +21,8 @@ CPS_START_NAMESPACE
 
 
 
-#define PROFILE
 #undef PROFILE
+#define PROFILE
 
 // N.B. No optimising provision is made if any of the p4 coefficients
 // are zero.

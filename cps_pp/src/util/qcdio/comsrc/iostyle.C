@@ -64,10 +64,7 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
 
   // all open file and check error
   ifstream input(rd_arg.FileName);
-  if ( !input.good() )
-    {
-      error = 1;
-    }
+  if ( !input.good() )   error = 1;
 
   // executed by all, sync and share error status information
   if(synchronize(error) != 0)   
@@ -89,7 +86,7 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
   int siteid = 0;
   char * pd = data;
 
-  VRB.Flow(cname, fname, "Parallel loading starting\n");
+  VRB.Result(cname, fname, "Parallel loading starting\n");
   setConcurIONumber(rd_arg.ConcurIONumber);
   //
   getIOTimeSlot();
@@ -111,6 +108,11 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
 
 	  for(int xr=xbegin;xr<xend;xr++) {
 	    input.read(fbuf,chars_per_site);
+	    if(!input.good()) {
+	      error = 1;
+	      goto sync_error;
+	    }
+
 	    csum += dconv.checksum(fbuf,data_per_site);
 	    pdcsum += dconv.posDepCsum(fbuf, data_per_site, dimension,	rd_arg, siteid, 0);
 
@@ -141,28 +143,28 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
       jump += (nz-zend) * zblk;
       
       if(dimension == 4)
-	cout << "Parallel loading: " << (int)((tr-tbegin+1) * 100.0 /(tend-tbegin)) << "% done." << endl;
+	VRB.Result(cname,fname, "Parallel loading: %d%% done.\n", (int)((tr-tbegin+1) * 100.0 /(tend-tbegin)));
     }
     
     if(dimension == 4) break;
 
     jump += (nt-tend) * tblk;
 
-    cout << "Parallel loading: " << (int)((sr-sbegin+1) * 100.0 /(send-sbegin)) << "% done." << endl;
+    VRB.Result(cname,fname, "Parallel loading: %d%% done.\n",(int)((sr-sbegin+1) * 100.0 /(send-sbegin)));
   }
 
-  if ( !input.good() )    error = 1;
-
   VRB.Flow(cname,fname, "This Group Done!\n");
+
+ sync_error:
 
   finishIOTimeSlot();
   //
   
   input.close();
-
+  if ( !input.good() )  error = 1;
 
   if(synchronize(error) != 0)  
-    ERR.General(cname, fname, "Loading failed\n");
+    ERR.FileR(cname, fname, rd_arg.FileName);
 
   // This 3 lines differ from unloading part
   // these nodes participate in loading but not in summation
@@ -170,6 +172,8 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
     csum = pdcsum = 0;
     RandSum = Rand2Sum = 0;
   }
+
+  VRB.Result(cname,fname,"Parallel Loading done!\n");
 
   if(ptrcsum) *ptrcsum = csum;
   if(ptrpdcsum) *ptrpdcsum = pdcsum;
@@ -225,7 +229,7 @@ int ParallelIO::store(ostream & output,
   const char * pd = data;
   int siteid=0;
 
-  VRB.Flow(cname, fname, "Parallel unloading starting\n");
+  VRB.Result(cname, fname, "Parallel unloading starting\n");
   setConcurIONumber(wt_arg.ConcurIONumber);
   getIOTimeSlot();
 
@@ -273,6 +277,11 @@ int ParallelIO::store(ostream & output,
 	      pdcsum += dconv.posDepCsum(fbuf, data_per_site, dimension, wt_arg, siteid, 0);
 	      output.write(fbuf,chars_per_site);
 
+	      if(!output.good()) {
+		error = 1;
+		goto sync_error;
+	      }
+
 	      siteid++;
 	    }	  
 	  
@@ -283,25 +292,27 @@ int ParallelIO::store(ostream & output,
 	jump += (nz-zend) * zblk;
 
 	if(dimension==4)
-	  cout << "Parallel Unloading: " << (int)((tr-tbegin+1)*100.0/(tend-tbegin))
-	       << "% done." << endl;
+	  VRB.Result(cname,fname, "Parallel Unloading: %d%% done.\n", (int)((tr-tbegin+1)*100.0/(tend-tbegin)));
       }
 
       if(dimension == 4) break;
 
       jump += (nt-tend) * tblk;
 
-      cout << "Parallel Unloading: " << (int)((sr-sbegin+1)*100.0/(send-sbegin))
-	   << "% done." << endl;
+      VRB.Result(cname,fname, "Parallel Unloading: %d%% done.\n",(int)((sr-sbegin+1)*100.0/(send-sbegin)));
     }
-      
-    if ( !output.good() )   error = 1;
   }
 
   VRB.Flow(cname, fname, "This Group done!\n");
 
+ sync_error:
   finishIOTimeSlot();
   //
+
+  if(synchronize(error)>0) 
+    ERR.FileW(cname,fname,wt_arg.FileName);
+
+  VRB.Result(cname,fname,"Parallel Unloading done!\n");
 
   if(ptrcsum) *ptrcsum = csum;
   if(ptrpdcsum) *ptrpdcsum = pdcsum;
@@ -345,9 +356,7 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
   if(isNode0()) {
     input.open(rd_arg.FileName);
     if ( !input.good() )
-      {
-	error = 1;
-      }
+      error = 1;
   }
 
   // executed by all, sync and share error status information
@@ -358,12 +367,8 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
   TempBufAlloc fbuf(chars_per_site);
   TempBufAlloc rng(data_per_site * dconv.hostDataSize());
 
-  if(isNode0()) {
-    input.seekg(hd.dataStart(),ios_base::beg);
-    if(!input.good()) error = 1;
-  }
-  if(synchronize(error) != 0)   
-    ERR.General(cname, fname, "Loading failed\n");
+  if(isNode0())   input.seekg(hd.dataStart(),ios_base::beg);
+  
   
   int global_id = 0;
   unsigned int csum = 0;
@@ -372,7 +377,7 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
   Float Rand2Sum = 0;
   UGrandomGenerator * ugran = (UGrandomGenerator*)data;
 
-  VRB.Flow(cname, fname, "Serial loading <thru node 0> starting\n");
+  VRB.Result(cname, fname, "Serial loading <thru node 0> starting\n");
   for(int sc=0; dimension==4 || sc<ns; sc++) {
     for(int tc=0;tc<nt;tc++) {
       for(int zc=0;zc<nz;zc++) {
@@ -385,6 +390,11 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
 	      // then shift (counter-shift) to final place
 	      for(int xst=0; xst<rd_arg.XnodeSites(); xst++) {
 		input.read(fbuf,chars_per_site);
+		if(!input.good()) {
+		  error = 1;
+		  goto sync_error;
+		}
+
 		csum += dconv.checksum(fbuf,data_per_site);
 		pdcsum += dconv.posDepCsum(fbuf, data_per_site, dimension, rd_arg,
 					   -1, global_id);
@@ -406,20 +416,10 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
 		  // recover loading
 		  ugran[xst].load(rng.IntPtr());
 		}
-		
 		global_id ++;
-
-		if(!input.good()) {
-		  error = 1;
-		  break;
-		}
 	      }
 	    } // endif(isNode0())
 	  
-	    // execute by all
-	    if(synchronize(error) != 0)  
-	      ERR.General(cname, fname, "Loading failed\n");
-
 	    xShiftNode(data, site_mem * rd_arg.XnodeSites());
 	  }
 
@@ -432,26 +432,27 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
       tShift(data, site_mem * rd_arg.XnodeSites());
 
       if(dimension==4)
-	cout << "Serial loading: " << (int)((tc+1) * 100.0 / nt) << "% finished." << endl;
+	VRB.Result(cname,fname,"Serial loading: %d%% done.\n",(int)((tc+1) * 100.0 / nt));
     }
 
     if(dimension==4) break;
 
     sShift(data, site_mem * rd_arg.XnodeSites());
-    cout << "Serial loading: " << (int)((sc+1) * 100.0 / ns) << "% finished." << endl;
+    VRB.Result(cname,fname, "Serial loading: %d%% done.\n", (int)((sc+1) * 100.0 / ns));
   }
   
-  if(synchronize(error)!=0) 
-    ERR.General(cname, fname, "Loading failed\n");
-
-  if(isNode0()) 
-    input.close();
+  if(isNode0())     input.close();
+  if(!input.good()) error = 1;
   
+ sync_error:
+  if(synchronize(error)!=0) 
+    ERR.FileR(cname, fname, rd_arg.FileName);
+
   // spread (clone) lattice data along s-dim
   if(dimension==4) 
     sSpread(data, site_mem * rd_arg.VolNodeSites());
   
-  VRB.Flow(cname, fname, "Loading done!\n");
+  VRB.Result(cname, fname, "Serial Loading done!\n");
 
   if(ptrcsum) *ptrcsum = csum;
   if(ptrpdcsum) *ptrpdcsum = pdcsum;
@@ -494,7 +495,7 @@ int SerialIO::store(ostream & output,
 
   output.seekp(hd.dataStart(), ios_base::beg);
 
-  VRB.Flow(cname, fname, "Serial unloading <thru node 0> starting\n");
+  VRB.Result(cname, fname, "Serial unloading <thru node 0> starting\n");
   for(int sc=0; dimension==4 || sc<ns; sc++) {
     for(int tc=0;tc<nt;tc++) {
       for(int zc=0;zc<nz;zc++) {
@@ -533,17 +534,13 @@ int SerialIO::store(ostream & output,
 		output.write(fbuf,chars_per_site);
 		if(!output.good()) {
 		  error = 1;
-		  break;
+		  goto sync_error;
 		}
 
 		global_id ++;
 	      }
 	    }
 
-	    // run by all nodes
-	    if(synchronize(error) != 0) 
-	      ERR.General(cname, fname, "Unloading failed\n");
-	    
 	    xShiftNode(data, site_mem * wt_arg.XnodeSites());
 	  }
 	  
@@ -556,16 +553,20 @@ int SerialIO::store(ostream & output,
       tShift(data, site_mem * wt_arg.XnodeSites());
 
       if(dimension==4)
-	cout << "Serial unloading: " << (int)((tc+1)*100.0/nt) << "% done." <<endl;
+	VRB.Result(cname,fname,"Serial unloading: %d%% done.\n",(int)((tc+1)*100.0/nt));
     }
     
     if(dimension==4) break;
 
     sShift(data, site_mem * wt_arg.XnodeSites());
-    cout << "Serial unloading: " << (int)((sc+1)*100.0/ns) << "% done." <<endl;
+    VRB.Result(cname,fname, "Serial unloading: %d%% done.\n", (int)((sc+1)*100.0/ns));
   }
 
-  VRB.Flow(cname, fname, "Unloading done!\n");
+ sync_error:
+  if(synchronize(error)>0) 
+    ERR.FileW(cname,fname,wt_arg.FileName);
+
+  VRB.Result(cname, fname, "Serial Unloading done!\n");
 
   if(ptrcsum) *ptrcsum = csum;
   if(ptrpdcsum) *ptrpdcsum = pdcsum;
@@ -971,6 +972,8 @@ void SerialIO::sSpread(char * data, const int datablk) const {
 // Testing functions for *Shift() class
 
 int SerialIO::backForthTest() {
+  const char * fname = "backForthTest()";
+
   int error = 0;
 
   srand(1234);
@@ -988,14 +991,14 @@ int SerialIO::backForthTest() {
   xShiftNode(data,xblk,1);
   if(memcmp(buf, data, xblk)) {
     error = 1;
-    cout << "xShiftNode() error!!" << endl << endl;
+    cout << "xShiftNode() error!!\n";
   }
 
   xShiftNode(data,xblk,1);
   xShiftNode(data,xblk,-1);
   if(memcmp(buf, data, xblk)) {
     error = 1;
-    cout << "xShiftNode() error!!" << endl << endl;
+    cout << "xShiftNode() error!!\n";
   }
 
 
@@ -1003,7 +1006,7 @@ int SerialIO::backForthTest() {
   yShift(data,xblk,1);
   if(memcmp(buf, data, xblk)) {
     error = 1;
-    cout << "yShift() error!!" << endl << endl;
+    cout << "yShift() error!!\n";
   }
 
   yShift(data,xblk,1);

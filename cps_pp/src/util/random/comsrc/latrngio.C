@@ -129,8 +129,10 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
     ParallelIO pario(rng_arg);
     if(! pario.load((char*)ugran, size_rng_ints, sizeof(UGrandomGenerator),
 		    hd, intconv, 5,
-		    &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0]))
-      ERR.General(cname, fname, "Loading failed\n");
+		    &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0])){
+//      ERR.General(cname, fname, "Loading failed\n");
+      VRB.Warn(cname, fname, "Loading failed\n");
+    }
     
     VRB.Flow(cname,fname,"Node %d - 5D: csum=%x, order_csum=%x\n",
 	       UniqueID(),csum[0],pos_dep_csum[0]);

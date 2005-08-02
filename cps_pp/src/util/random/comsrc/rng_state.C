@@ -5,20 +5,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Wrapper for saving/restoring RNG states
 
-  $Id: rng_state.C,v 1.1 2005-06-23 17:40:21 chulwoo Exp $
+  $Id: rng_state.C,v 1.2 2005-08-02 18:07:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2005-06-23 17:40:21 $
+  $Date: 2005-08-02 18:07:43 $
   $Header: /home/cvs/cps/cps++/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.18
 2005/06/16
 07:18:55 chulwoo Exp $
-  $Id: rng_state.C,v 1.1 2005-06-23 17:40:21 chulwoo Exp $
+  $Id: rng_state.C,v 1.2 2005-08-02 18:07:43 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: rng_state.C,v $
-  $Revision: 1.1 $
+  $Revision: 1.2 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/rng_state.C,v $
   $State: Exp $
 */
@@ -28,6 +28,7 @@ LRGState::LRGState(){
   cname = "LRGState";
   char *fname = "LRGState()";
 
+  VRB.Func(cname,fname);
   // Allocate memory for the initial rng state
   //----------------------------------------------------------------
   rng4d  = (unsigned int**) smalloc(LRG.NStates(FOUR_D)*sizeof(unsigned int*), 
@@ -46,6 +47,7 @@ LRGState::LRGState(){
 LRGState::~LRGState(){
 
   char *fname = "~LRGState()";
+  VRB.Func(cname,fname);
    // Free memory for the initial rng state
     //----------------------------------------------------------------
     for (int i=0; i<LRG.NStates(); i++)
@@ -59,11 +61,15 @@ LRGState::~LRGState(){
 }
 
 void LRGState::GetStates(){
+   char *fname = "GetState()";
+   VRB.Func(cname,fname);
    LRG.GetStates(rng5d, FIVE_D);
    LRG.GetStates(rng4d, FOUR_D);
 }
 
 void LRGState::SetStates(){
+   char *fname = "SetState()";
+   VRB.Func(cname,fname);
    LRG.SetStates(rng5d, FIVE_D);
    LRG.SetStates(rng4d, FOUR_D);
 }
