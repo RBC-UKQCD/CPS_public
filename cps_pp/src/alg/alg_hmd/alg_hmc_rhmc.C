@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.19 2005-06-29 19:09:28 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.20 2005-08-09 06:42:01 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2005-06-29 19:09:28 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.19 2005-06-29 19:09:28 chulwoo Exp $
-  $Id: alg_hmc_rhmc.C,v 1.19 2005-06-29 19:09:28 chulwoo Exp $
+  $Date: 2005-08-09 06:42:01 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.20 2005-08-09 06:42:01 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.20 2005-08-09 06:42:01 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.19 $
+  $Revision: 1.20 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -933,7 +933,9 @@ void AlgHmcRHMC::generateApprox(HmdArg *hmd_arg)
     for (int j=0; j<i; j++) {
       // no need to recalculate approximation if same mass
       if (hmd_arg->frm_mass[j] == hmd_arg->frm_mass[i] &&
-	  hmd_arg->field_type[j] == hmd_arg->field_type[i]) {
+	  hmd_arg->field_type[j] == hmd_arg->field_type[i]
+	  hmd_arg->frm_power_num[j] ==hmd_arg-> frm_power_num[i] &&
+	  hmd_arg->frm_power_den[j] ==hmd_arg-> frm_power_den[i] ) {
 	hmd_arg->FRatDeg[i] = hmd_arg->FRatDeg[j];
 	hmd_arg->FRatNorm[i] = hmd_arg->FRatNorm[j];
 	for (int k=0; k<hmd_arg->FRatDeg[i]; k++) {
