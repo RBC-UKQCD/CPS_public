@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.25 2005-07-05 02:47:38 chulwoo Exp $
+  $Id: random.C,v 1.26 2005-09-06 21:09:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-07-05 02:47:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.25 2005-07-05 02:47:38 chulwoo Exp $
-//  $Id: random.C,v 1.25 2005-07-05 02:47:38 chulwoo Exp $
+//  $Date: 2005-09-06 21:09:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.26 2005-09-06 21:09:59 chulwoo Exp $
+//  $Id: random.C,v 1.26 2005-09-06 21:09:59 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.25 $
+//  $Revision: 1.26 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -31,6 +31,7 @@ CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/error.h>
 #include <util/latrngio.h>
+#include <util/data_shift.h>
 #include <comms/glb.h>
 #include <comms/sysfunc.h>
 CPS_START_NAMESPACE
@@ -105,6 +106,11 @@ void RandomGenerator::StoreSeeds(unsigned int *to) const
     *to++ = (unsigned int)inext;
     *to++ = (unsigned int)inextp;
     for(int i = 0; i < 55; ++i) *to++ = ma[i];
+}
+
+void UGrandomGenerator::StoreSeeds(unsigned int *to) const
+{
+    RandomGenerator::StoreSeeds(to);
 }
 
 /*!
@@ -303,6 +309,15 @@ IFloat LatRanGen::Urand(FermionFieldDimension frm_dim)
     return ugran[rgen_pos].Urand();
   else
     return ugran_4d[rgen_pos_4d].Urand();
+}
+
+IFloat LatRanGen::Urand(Float hi, Float lo, FermionFieldDimension frm_dim)
+{
+  char *fname = "Urand(FermionFieldDimension)";
+  if (frm_dim == FIVE_D)
+    return ugran[rgen_pos].Urand(hi,lo);
+  else
+    return ugran_4d[rgen_pos_4d].Urand(hi,lo);
 }
 
 //---------------------------------------------------------
@@ -547,4 +562,9 @@ bool LatRanGen::Write(const char * filename, int concur_io_number) {
   return (io_good=wt.good());
 }
 
+void LatRanGen::Shift()
+{
+   GDS.Shift(ugran, n_rgen*sizeof(UGrandomGenerator));
+   GDS.Shift(ugran_4d, n_rgen_4d*sizeof(UGrandomGenerator));
+}
 CPS_END_NAMESPACE
