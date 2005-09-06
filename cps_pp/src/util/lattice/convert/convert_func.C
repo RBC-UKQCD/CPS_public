@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.11 2005-06-08 06:40:02 chulwoo Exp $
+  $Id: convert_func.C,v 1.12 2005-09-06 21:35:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-08 06:40:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.11 2005-06-08 06:40:02 chulwoo Exp $
-//  $Id: convert_func.C,v 1.11 2005-06-08 06:40:02 chulwoo Exp $
+//  $Date: 2005-09-06 21:35:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.12 2005-09-06 21:35:25 chulwoo Exp $
+//  $Id: convert_func.C,v 1.12 2005-09-06 21:35:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -122,26 +122,11 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 // cram1, cram2 should be in CRAM
 //-------------------------------------------------------------------------
 
-#if 0
-	cram1 = (Float *) qalloc(0,cap->site_size*sizeof(Float)) ;
-#else
-	cram1 = (Float *) smalloc(cap->site_size*sizeof(Float)) ;
-#endif
-	if(cram1 == 0)
-	  ERR.Pointer(cname_none,fname, "cram1"); 
-	VRB.Smalloc(cname_none,fname,
-		    "cram1" , cram1,
-		    cap->site_size*sizeof(Float)) ;
-#if 0
-	cram2 = (Float *) qalloc(0,cap->site_size*sizeof(Float)) ;
-#else
-	cram2 = (Float *) smalloc(cap->site_size*sizeof(Float)) ;
-#endif
-	if(cram2 == 0)
-	  ERR.Pointer(cname_none,fname, "cram2"); 
-	VRB.Smalloc(cname_none,fname,
-		    "cram2" , cram2,
-		    cap->site_size*sizeof(Float)) ;
+//	cram1 = (Float *) qalloc(0,cap->site_size*sizeof(Float)) ;
+	cram1 = (Float *) smalloc(cname_none,fname,"cram1",cap->site_size*sizeof(Float)) ;
+//	cram2 = (Float *) qalloc(0,cap->site_size*sizeof(Float)) ;
+	cram2 = (Float *) smalloc(cname_none,fname,"cram2",cap->site_size*sizeof(Float)) ;
+
 
 	for (low=0; low<cap->vol; low++) {
 		current = low ;
@@ -183,10 +168,8 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 		}
 	}
 
-	VRB.Sfree(cname_none,fname, "cram2", cram2);
-	sfree(cram2) ;
-	VRB.Sfree(cname_none,fname, "cram1", cram1);
-	sfree(cram1) ;
+	sfree(cname_none,fname, "cram2", cram2);
+	sfree(cname_none,fname, "cram1", cram1);
 }
 
 void CanonToAnything(CAP cap, StrOrdType new_str_ord)

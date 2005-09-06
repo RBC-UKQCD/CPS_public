@@ -588,6 +588,7 @@ void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 	  
 	  // convert from canonical to intermediate conversion
 	  field_ptr = (Float *) f_field;
+//      printf("field_ptr=%p\n",field_ptr);
 	  for(i=0; i<ls; i++){
 	    cas.start_ptr = field_ptr;
 	    FcanonToWilson(&cas) ;
