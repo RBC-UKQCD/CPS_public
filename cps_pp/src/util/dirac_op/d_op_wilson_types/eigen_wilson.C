@@ -1,4 +1,5 @@
 #include <config.h>
+
 CPS_START_NAMESPACE
  /*! \file
   \brief  Definition of DiracOpWilsonTypes class eigensolver methods.
@@ -56,6 +57,9 @@ void MatHermElements( DiracOpWilsonTypes * dirac_op,
 		      Vector ** psi, int n_vec, int f_size, 
  		      Float * diag, Complex * off_diag );
 
+inline void PrintDot(char *fname, char *vname, Vector *tmp, int f_size){
+//      printf("%s: %s=%e\n",fname,vname,tmp->ReDotProductGlbSum(tmp, f_size));
+}
 
 /*
   A normalised gram-shcmidt orthoganalisation the input vectors
@@ -65,6 +69,7 @@ void MatHermElements( DiracOpWilsonTypes * dirac_op,
 inline Float Norm( Vector* psi, int f_size )
 {
   Float norm( sqrt(psi->NormSqGlbSum(f_size)) );
+//  printf("Norm=%e\n",norm);
   psi->VecTimesEquFloat(1.0/norm,f_size);
   return norm;
 }
@@ -193,10 +198,7 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
   Complex *off_diag (0x0);
   if (N_eig > 1)
   {
-    off_diag = (Complex *) smalloc(N_eig*(N_eig-1)/2 * sizeof(Complex));
-    if(off_diag == 0)
-      ERR.Pointer(cname,fname, "off_diag");
-    VRB.Smalloc(cname,fname, "off_diag", off_diag, N_eig*(N_eig-1)/2 * sizeof(Complex));
+    off_diag = (Complex *) smalloc(cname,fname, "off_diag", N_eig*(N_eig-1)/2 * sizeof(Complex));
 
     for(int i=0; i < N_eig*(N_eig-1)/2; ++i)
       off_diag[i] = 0.0;
@@ -328,10 +330,7 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
     /* Diagonalize again for  H.v = lambda.v */
 
       /*
-    Vector *tmp = (Vector *) smalloc(f_size * sizeof(Float));
-    if(tmp == 0)
-      ERR.Pointer(cname,fname, "tmp");
-    VRB.Smalloc(cname,fname, "tmp", tmp, f_size * sizeof(Float));
+    Vector *tmp = (Vector *) smalloc(cname,fname, "tmp", tmp, f_size * sizeof(Float));
 
     ij = 0;
     for(i = 0; i < N_eig; i++)
@@ -345,8 +344,7 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
 	off_diag[ij++] = psi[j]->CompDotProductGlbSum(tmp, f_size);
     }
 
-    VRB.Sfree(cname,fname, "tmp", tmp);
-    sfree(tmp);
+    sfree(cname,fname, "tmp", tmp);
 
       */
 
@@ -467,6 +465,7 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
     int i, j;
     FILE* fp(Fopen(eig_arg->fname,"a"));
     Fprintf(fp,"Eig2 before projection/jacobi\n");
+//    printf("Eig2 before projection/jacobi\n");
     for(i = 0; i < N_eig; i++)
       {
         Fprintf(fp,"%i %e %i\n",i,lambda_old[i],valid_eig[i]);
@@ -494,6 +493,7 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
       else { break; }
     }
   // invalidate the rest of the eigenvectors
+  VRB.Flow(cname,fname,"N_dp=%d\n",N_dp);
   for (i++;i<N_eig;i++) { valid_eig[i] = 0; }
   
   //allocate tmp vector
@@ -506,24 +506,30 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
     {
       valid_eig[N_dp] = 1;
       
-      const Float lam(sqrt(lambda_old[N_dp]));
+      const Float lam(sqrt(fabs(lambda_old[N_dp])));
+      VRB.Flow(cname,fname,"lam=%e\n",lam);
             
       // tmp=  (HemiteMatrix) .  psi[N_dp] 
       RitzEigMat(tmp,psi[N_dp]);
+      PrintDot(fname,"psi[N_sp]",psi[N_dp],f_size);
+      PrintDot(fname,"tmp",tmp,f_size);
 
       const Float proj(tmp->ReDotProductGlbSum(psi[N_dp], f_size));
+      VRB.Flow(cname,fname,"proj=%e\n",proj);
       
       Float sign(1);
       if ( proj <  0 ) { sign = -1; }
 
             
       tmp2->FTimesV1PlusV2( sign/lam, tmp, psi[N_dp], f_size );
+      PrintDot(fname,"tmp2",tmp2,f_size);
       Rcomplex snorm(0,0),onorm(0,0);
       for (i=0;i<N_dp;i++)
         {
           snorm+=tmp2->CompDotProductGlbSum(psi[i],f_size);
         }
       tmp->FTimesV1PlusV2( -sign/lam, tmp, psi[N_dp], f_size );
+      PrintDot(fname,"tmp",tmp,f_size);
       for (i=0;i<N_dp;i++)
         {
           onorm+=tmp->CompDotProductGlbSum(psi[i],f_size);
@@ -537,13 +543,17 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
           psi[N_dp]->CopyVec( tmp, f_size );
         }
       Norm(psi[N_dp],f_size);
+      PrintDot(fname,"psi[N_sp]",psi[N_dp],f_size);
       N_dp++;
     }
+//  printf("GramSchm");
   for (i=0;i<N_eig;i++)
     {
       for(j=i+1;j<N_eig;j++)
         {
           GramSchmNorm(psi[j],psi[i],f_size);
+          PrintDot(fname,"psi[i]",psi[i],f_size);
+          PrintDot(fname,"psi[j]",psi[j],f_size);
         }
     }
 
@@ -571,7 +581,8 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
     int ij = 0;
     int i, j;
     FILE* fp(Fopen(eig_arg->fname,"a"));
-    Fprintf(fp,"jacobi matrix after projection\n");
+    Fprintf(fp,"Jacobi matrix after projection\n");
+//    printf("Jacobi matrix after projection\n");
     for(i = 0; i < N_eig; i++) 
       {
         Fprintf(fp,"Jacobi matrix: %i %i %e\n",i,i,(float)lambda_H[i]);
@@ -609,7 +620,8 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
 
 
 
-#if 0  // ################ OLD VERSION OF CODE ############
+#if 0
+  // ################ OLD VERSION OF CODE ############
   // Check for a common failure mode. If all goes well, the eigenvalues
   // should be in increasing order out of Jacobi. Sometimes, the last one
   // is not since it didn't converge well enough, or there are nearby 
@@ -730,8 +742,8 @@ void MatHermElements( DiracOpWilsonTypes * dirac_op,
  		      Float * diag, Complex * off_diag ){
 
   char * fname  = "MatHermElements";
-  Vector *tmp = (Vector *) smalloc(f_size * sizeof(Float));
-  if(tmp == 0) ERR.Pointer("",fname, "tmp");
+  Vector *tmp = (Vector *) smalloc("DiracOpWilsonTypes",fname,"tmp",f_size * sizeof(Float));
+//  if(tmp == 0) ERR.Pointer("",fname, "tmp");
   
   int ij = 0;
   int i, j;
@@ -739,8 +751,24 @@ void MatHermElements( DiracOpWilsonTypes * dirac_op,
   for(i = 0; i < n_vec; i++) {
       dirac_op->RitzEigMat(tmp, psi[i]);
       diag[i] = psi[i]->ReDotProductGlbSum(tmp, f_size);
-      for(j = 0; j < i; j++)
+#if 0
+      Float *tmp_p = (Float*)tmp;
+      for(j = 0; j < 10; j++)
+        printf("tmp[%d]=%e\n",j,*(tmp_p+j));
+      tmp_p = (Float*)psi[i];
+      for(j = 0; j < 10; j++)
+        printf("psi[%d][%d]=%e\n",i,j,*(tmp_p+j));
+      printf("%s: diag[%d]=%e\n",fname,i,diag[i]);
+#endif
+      PrintDot(fname,"psi[i]",psi[i],f_size);
+      PrintDot(fname,"tmp",tmp,f_size);
+      for(j = 0; j < i; j++){
 	off_diag[ij++] = psi[j]->CompDotProductGlbSum(tmp, f_size);
+#if 0
+        tmp_p = (Float*) off_diag+ij;
+        printf("%s: off_diag[%d]=%e %e\n",fname,ij-1,*tmp_p, *(tmp_p+1));
+#endif
+      }
   }
 
   sfree(tmp);
