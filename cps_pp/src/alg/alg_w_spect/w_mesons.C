@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 17:18:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v 1.9 2004-09-02 17:18:29 zs Exp $
-//  $Id: w_mesons.C,v 1.9 2004-09-02 17:18:29 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-09-06 20:42:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v 1.10 2005-09-06 20:42:00 chulwoo Exp $
+//  $Id: w_mesons.C,v 1.10 2005-09-06 20:42:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_mesons.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v $
 //  $State: Exp $
 //
@@ -738,7 +738,7 @@ WspectMesons::DiracAlgebra(int lclW)
 // void WspectMesons::print(const CommonArg *common_arg) const
 //--------------------------------------------------------------------------- 
 void
-WspectMesons::print(char *filename[MESONs]) const
+WspectMesons::print(WspectOutput *w_spect_output) const
 {
 
 #if TARGET==cpsMPI
@@ -788,14 +788,51 @@ WspectMesons::print(char *filename[MESONs]) const
     map[rho_prime]  = map[rho_x_prime];
   }
 
+  char *meson_names[16];
+  meson_names[0] = w_spect_output->meson_name00;
+  meson_names[1] = w_spect_output->meson_name01;
+  meson_names[2] = w_spect_output->meson_name02;
+  meson_names[3] = w_spect_output->meson_name03;
+  meson_names[4] = w_spect_output->meson_name04;
+  meson_names[5] = w_spect_output->meson_name05;
+  meson_names[6] = w_spect_output->meson_name06;
+  meson_names[7] = w_spect_output->meson_name07;
+  meson_names[8] = w_spect_output->meson_name08;
+  meson_names[9] = w_spect_output->meson_name09;
+  meson_names[10] = w_spect_output->meson_name10;
+  meson_names[11] = w_spect_output->meson_name11;
+  meson_names[12] = w_spect_output->meson_name12;
+  meson_names[13] = w_spect_output->meson_name13;
+  meson_names[14] = w_spect_output->meson_name14;
+  meson_names[15] = w_spect_output->meson_name15;
+
   // -mcneile
   // this routine was only correct for the a0, a0_prime
   // I can not see a simple way to fix it in the previous style
   // The meson names were obtained by empirically matching 
   // against the regression tests.
 
+#if 0
   char *meson_names[] = 
   {
+#if 1
+    "Scalar.dat" , 
+    "Vector_x.dat" , 
+    "Vector_y.dat"    ,
+    "Tensor_xy.dat"     ,
+    "Vector_z.dat"    ,
+    "Tensor_xz.dat",
+    "Tensor_yz.dat",
+    "PV_t.dat",
+    "Vector_t.dat",
+    "Tensor_xt.dat",
+    "Tensor_yt.dat",
+    "PV_z.dat" ,
+    "Tensor_zt.dat" , 
+    "PV_y.dat" , 
+    "PV_x.dat" , 
+    "PS.dat" 
+#else
     "a0.dat" , 
     "rho_x.dat" , 
     "rho_y.dat"    ,
@@ -812,8 +849,10 @@ WspectMesons::print(char *filename[MESONs]) const
     "a1_y.dat" , 
     "a1_x.dat" , 
     "pion.dat" 
+#endif
 
   };
+#endif
 
   for(int imap= 0 ; imap < NUM_MAP ; ++imap)
     {  map[imap] = imap ; }
