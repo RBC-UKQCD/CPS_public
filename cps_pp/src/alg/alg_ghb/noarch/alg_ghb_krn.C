@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Routines used by the AlgGheatBath class methods:
 
-  $Id: alg_ghb_krn.C,v 1.8 2004-08-18 11:57:38 zs Exp $
+  $Id: alg_ghb_krn.C,v 1.9 2005-09-06 20:33:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v 1.8 2004-08-18 11:57:38 zs Exp $
-//  $Id: alg_ghb_krn.C,v 1.8 2004-08-18 11:57:38 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-09-06 20:33:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v 1.9 2005-09-06 20:33:36 chulwoo Exp $
+//  $Id: alg_ghb_krn.C,v 1.9 2005-09-06 20:33:36 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb_krn.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v $
 //  $State: Exp $
 //
@@ -405,15 +405,5 @@ void  cmhb_kernel( Float *sigma, Float *u)
   }
 #endif  
 }
-
-
-
-
-
-
-
-
-
-
 
 CPS_END_NAMESPACE
