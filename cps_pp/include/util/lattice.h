@@ -4,17 +4,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.41 2005-06-23 17:59:15 chulwoo Exp $
+  $Id: lattice.h,v 1.42 2005-09-06 20:23:02 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2005-06-23 17:59:15 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.41 2005-06-23 17:59:15 chulwoo Exp $
-  $Id: lattice.h,v 1.41 2005-06-23 17:59:15 chulwoo Exp $
+  $Date: 2005-09-06 20:23:02 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.42 2005-09-06 20:23:02 chulwoo Exp $
+  $Id: lattice.h,v 1.42 2005-09-06 20:23:02 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.41 $
+  $Revision: 1.42 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -574,12 +574,12 @@ class Lattice
     
     //! Not implemented here.
     virtual void Ffour2five(Vector *five, Vector *four, 
-			    int s_r, int s_l);
+			    int s_r, int s_l, int Ncb =2);
     // This is "truly" implemented only in the Fdwf derived class
 
     //! Not implemented here.
     virtual void Ffive2four(Vector *four, Vector *five, 
-			    int s_r, int s_l);
+			    int s_r, int s_l, int Ncb =2);
         // This is "truly" implemented only in the Fdwf derived class
 
     //! Not implemented here.
@@ -1125,6 +1125,10 @@ class Lattice
 
     virtual Float BhamiltonNode(Vector *boson, Float mass) = 0;
         // The boson Hamiltonian of the node sublattice.
+  
+    void ClearSmeared() {smeared = 0;}
+
+    void Shift();
 
 };
 
@@ -2493,7 +2497,7 @@ class FdwfBase : public virtual FwilsonTypes
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
 	
-    void Ffour2five(Vector *five, Vector *four, int s_u, int s_l);
+    void Ffour2five(Vector *five, Vector *four, int s_u, int s_l, int Ncb=2);
     //!< Transforms a 4-dimensional fermion field into a 5-dimensional field.
     /* The 5d field is zero */
     // The 5d field is zero
@@ -2505,7 +2509,7 @@ class FdwfBase : public virtual FwilsonTypes
     // s coordinate i.e. their range is from 
     // 0 to [GJP.Snodes() * GJP.SnodeSites() - 1]
 
-    void Ffive2four(Vector *four, Vector *five, int s_u, int s_l);
+    void Ffive2four(Vector *four, Vector *five, int s_u, int s_l, int Ncb=2);
     //!< Transforms a 5-dimensional fermion field into a 4-dimensional field.
     //The 4d field has
         // the upper two components (right chirality) equal to the
