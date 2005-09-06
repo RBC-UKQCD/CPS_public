@@ -188,6 +188,7 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   log();
   finishLogging();
 
+  lat.ClearSmeared();
   VRB.FuncEnd(cname,fname);
 };
 
@@ -202,8 +203,8 @@ bool ReadLatticeParallel::CheckPlaqLinktrace(Lattice &lat, const QioArg & rd_arg
   Float devplaq(0.0);
   if(isRoot()) {
     devplaq = fabs(  (plaq - plaq_inheader) / plaq ) ;
-    VRB.Flow(cname,fname,"plaquette::  calc: %lf  header: %lf   rel.dev.: %lf\n",
-	     plaq, plaq_inheader, devplaq);
+    printf("%s::%s: plaquette::  calc: %0.8e  header: %0.8e   rel.dev.: %0.8e\n",
+	     cname,fname,plaq, plaq_inheader, devplaq);
   }
 
   Float linktrace(0);
@@ -222,12 +223,16 @@ bool ReadLatticeParallel::CheckPlaqLinktrace(Lattice &lat, const QioArg & rd_arg
     Float devlinktrace =   
       fabs(  (linktrace - linktrace_inheader) / linktrace );
 
-    VRB.Flow(cname,fname,"linktrace::  calc: %lf  header: %lf   rel.dev.: %lf\n",
-	     linktrace, linktrace_inheader, devlinktrace);
+    printf("%s::%s: linktrace::  calc: %0.8e  header: %0.8e   rel.dev.: %0.8e\n",
+	     cname,fname,linktrace, linktrace_inheader, devlinktrace);
   
     Float chkprec = rd_arg.CheckPrecision;
-    if(devplaq > chkprec || devlinktrace > chkprec) {
-      VRB.Flow(cname,fname, "Plaquette and/or Link trace different from header\n");
+
+//  CJ:  turning off the link trace test, as some lattices have a very small link trace by accident.
+//    if(devplaq > chkprec || devlinktrace > chkprec) {
+//      VRB.Flow(cname,fname, "Plaquette and/or Link trace different from header\n");
+    if(devplaq > chkprec) {
+      VRB.Flow(cname,fname, "Plaquette different from header\n");
       error = 1;
     }
   }
