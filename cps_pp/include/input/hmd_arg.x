@@ -193,7 +193,7 @@ class EvoArg {
   int io_concurrency;
   int hdw_xcsum;
   int hdw_rcsum;
-  int reproduce_percent;
+  int reproduce_period;
   string ensemble_id<>;
   string ensemble_label<>;
   string creator<>;
@@ -202,8 +202,9 @@ class EvoArg {
   string plaquette_stem<>;
   string pbp_stem<>;
   string evo_stem<>;
+  string w_spect_directory<>;
   string work_directory<>;
-  int CalcEig;
+  int inline_measure;
   string eig_lo_stem<>;
   string eig_hi_stem<>;
 };
