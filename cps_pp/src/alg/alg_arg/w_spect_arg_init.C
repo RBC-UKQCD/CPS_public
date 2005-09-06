@@ -7,7 +7,7 @@ CPS_START_NAMESPACE
 
 WspectArg::WspectArg()
 {
-
+  rescale_factor = 1.;
 };
 WspectOutput::WspectOutput()
 {
