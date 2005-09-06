@@ -47,7 +47,7 @@ public:
 
   // ACCESSOR
   //-------------------------------------------------------------------------
-  void print(char *filenames[MESONs]) const;  
+  void print(WspectOutput *w_spect_output) const;  
   void print_mp(char *filename) const;
 
 

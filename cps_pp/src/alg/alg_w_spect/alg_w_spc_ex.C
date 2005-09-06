@@ -130,7 +130,7 @@ void AlgWspectExtMeson::run()
       if(d_arg_p->normal_mesons_on) {
 	WspectMesons mes(q1, q1, hyperRect, mom);
 	//write data to files
-	mes.print(&(output->a0));	
+	mes.print(output);	
       }
     }//end of normal mesons 
     

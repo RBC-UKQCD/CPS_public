@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:46:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.9 2005-03-07 00:46:15 chulwoo Exp $
-//  $Id: alg_w_spect.C,v 1.9 2005-03-07 00:46:15 chulwoo Exp $
+//  $Date: 2005-09-06 20:39:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.10 2005-09-06 20:39:46 chulwoo Exp $
+//  $Id: alg_w_spect.C,v 1.10 2005-09-06 20:39:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_w_spect.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v $
 //  $State: Exp $
 //
@@ -242,7 +242,7 @@ void AlgWspect::run()
         meson_m = clock();
 #endif
         //write data to files
-        mes.print(&(output->a0));
+        mes.print(output);
       }
 #ifdef  TIMING_ALG_W_SPECT
       meson_e = clock();
