@@ -118,7 +118,7 @@ public:
 	int io_concurrency;
 	int hdw_xcsum;
 	int hdw_rcsum;
-	int reproduce_percent;
+	int reproduce_period;
 	char *ensemble_id;
 	char *ensemble_label;
 	char *creator;
@@ -127,8 +127,9 @@ public:
 	char *plaquette_stem;
 	char *pbp_stem;
 	char *evo_stem;
+	char *w_spect_directory;
 	char *work_directory;
-	int CalcEig;
+	int inline_measure;
 	char *eig_lo_stem;
 	char *eig_hi_stem;
 };
