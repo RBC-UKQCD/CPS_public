@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgGheatBath class methods.
   
-  $Id: alg_ghb.C,v 1.12 2005-03-07 00:46:12 chulwoo Exp $
+  $Id: alg_ghb.C,v 1.13 2005-09-06 20:33:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:46:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.12 2005-03-07 00:46:12 chulwoo Exp $
-//  $Id: alg_ghb.C,v 1.12 2005-03-07 00:46:12 chulwoo Exp $
+//  $Date: 2005-09-06 20:33:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.13 2005-09-06 20:33:14 chulwoo Exp $
+//  $Id: alg_ghb.C,v 1.13 2005-09-06 20:33:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
 //  $State: Exp $
 //
@@ -260,6 +260,7 @@ void AlgGheatBath::NoCheckerBoardRun()
   Lattice& lat = AlgLattice();
 
   relocate(); 
+  LRG.SetInterval(1,-1);
 
   // Run the gauge heat bath
   //----------------------------------------------------------------
@@ -351,6 +352,7 @@ void AlgGheatBath::NodeCheckerBoardRun()
           do_checker[v]= 1;
 
   relocate();
+  LRG.SetInterval(1,-1);
 
   int node_checker = (GJP.XnodeCoor()+GJP.YnodeCoor()
                       +GJP.ZnodeCoor()+GJP.TnodeCoor())&1;
@@ -524,8 +526,8 @@ AlgGheatBath::UpdateLink(Matrix * pmLink, const Matrix & mStaple){
 
           // Call the heat bath
           {
-	    metropolis_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
-   //         cmhb_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
+//	    metropolis_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
+            cmhb_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
           }
           
           // Copy the link back into the lattice, and
