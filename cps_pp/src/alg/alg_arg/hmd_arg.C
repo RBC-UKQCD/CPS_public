@@ -265,7 +265,7 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "hdw_rcsum", &objp->hdw_rcsum))
 		 return FALSE;
-	 if (!vml_int (vmls, "reproduce_percent", &objp->reproduce_percent))
+	 if (!vml_int (vmls, "reproduce_period", &objp->reproduce_period))
 		 return FALSE;
 	 if (!vml_string (vmls, "ensemble_id", &objp->ensemble_id, ~0))
 		 return FALSE;
@@ -283,9 +283,11 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 		 return FALSE;
 	 if (!vml_string (vmls, "evo_stem", &objp->evo_stem, ~0))
 		 return FALSE;
+	 if (!vml_string (vmls, "w_spect_directory", &objp->w_spect_directory, ~0))
+		 return FALSE;
 	 if (!vml_string (vmls, "work_directory", &objp->work_directory, ~0))
 		 return FALSE;
-	 if (!vml_int (vmls, "CalcEig", &objp->CalcEig))
+	 if (!vml_int (vmls, "inline_measure", &objp->inline_measure))
 		 return FALSE;
 	 if (!vml_string (vmls, "eig_lo_stem", &objp->eig_lo_stem, ~0))
 		 return FALSE;
