@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.23 2005-06-23 18:28:15 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.24 2005-09-06 21:36:39 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -33,6 +33,7 @@ CPS_END_NAMESPACE
 #include <util/random.h>
 #include <util/error.h>
 #include <util/time.h>
+#include <util/enum_func.h>
 #include <comms/scu.h> // GRF
 #include <comms/glb.h>
 CPS_START_NAMESPACE
@@ -311,7 +312,7 @@ int FdwfBase::FmatInv(Vector *f_out, Vector *f_in,
    explained above.
 */
 //------------------------------------------------------------------
-void FdwfBase::Ffour2five(Vector *five, Vector *four, int s_u, int s_l)
+void FdwfBase::Ffour2five(Vector *five, Vector *four, int s_u, int s_l, int Ncb)
 {
   int x;
   int i;
@@ -324,9 +325,9 @@ void FdwfBase::Ffour2five(Vector *five, Vector *four, int s_u, int s_l)
 //------------------------------------------------------------------
 // Initializations
 //------------------------------------------------------------------
-  int f_size = GJP.VolNodeSites() * FsiteSize();
+  int f_size = GJP.VolNodeSites() * FsiteSize()*Ncb/2;
   int ls = GJP.SnodeSites();
-  int vol_4d = GJP.VolNodeSites();
+  int vol_4d = GJP.VolNodeSites()*Ncb/2;
   int ls_stride = 24 * vol_4d;
   int s_u_local = s_u % GJP.SnodeSites();
   int s_l_local = s_l % GJP.SnodeSites();
@@ -396,7 +397,7 @@ void FdwfBase::Ffour2five(Vector *five, Vector *four, int s_u, int s_l)
    direction.
 */
 //------------------------------------------------------------------
-void FdwfBase::Ffive2four(Vector *four, Vector *five, int s_u, int s_l)
+void FdwfBase::Ffive2four(Vector *four, Vector *five, int s_u, int s_l, int Ncb)
 {
   int x;
   int i;
@@ -410,8 +411,8 @@ void FdwfBase::Ffive2four(Vector *four, Vector *five, int s_u, int s_l)
 // Initializations
 //------------------------------------------------------------------
   int ls = GJP.SnodeSites();
-  int f_size = GJP.VolNodeSites() * FsiteSize() / ls;
-  int vol_4d = GJP.VolNodeSites();
+  int f_size = GJP.VolNodeSites() * FsiteSize()*Ncb / (ls*2);
+  int vol_4d = GJP.VolNodeSites()*Ncb/2;
   int ls_stride = 24 * vol_4d;
   int s_u_local = s_u % GJP.SnodeSites();
   int s_l_local = s_l % GJP.SnodeSites();
@@ -527,20 +528,21 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float *lambda,
   //lambda[i] *= factor;
 
   // calculate chirality
-  int f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents();
+  int Ncb = NumChkb(cg_arg.RitzMatOper);
+  int f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents()*Ncb/2;
   Vector *four = (Vector *) smalloc (cname,fname, "four", f_size * sizeof(Float));
   Vector *fourg5 = (Vector *) smalloc (cname,fname, "fourg5", f_size * sizeof(Float));
   Float help;
 
   for (i=0; i<N_eig; i++) {
-    Ffive2four (four, f_eigenv[i], 0, GJP.Snodes()*GJP.SnodeSites()-1);
+    Ffive2four (four, f_eigenv[i], 0, GJP.Snodes()*GJP.SnodeSites()-1,Ncb);
 
     // normalize four
     factor=four->NormSqNode(f_size);
     glb_sum(&factor);
     factor=1./sqrt(factor);
     four->VecTimesEquFloat(factor,f_size);
-    Gamma5(fourg5,four,GJP.VolNodeSites());
+    Gamma5(fourg5,four,GJP.VolNodeSites()*Ncb/2);
     chirality[i]= four->ReDotProductNode(fourg5, f_size);
     glb_sum(&chirality[i]);
   }
