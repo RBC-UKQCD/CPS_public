@@ -34,7 +34,10 @@
 /* */
 /*---------------------------------------------------------------------------*/
 
+enum MesonLimits {NumMesonChannels=16};
 
+
+//typedef string MesonN<> ;
 
 class  WspectOutput 
 {
@@ -55,20 +58,37 @@ class  WspectOutput
   string           rho_prime<>;
 
 /* The a0 and a1's must be continguous because of part of the code*/
-  string           a0<>;                  /* datafile for meson a0*/
-  string           a0_prime<>;
-  string           a1_x<>;                /* x, y, z are to be understood*/
-  string           a1_y<>;                /* as the three directions other*/
-  string           a1_z<>;                /* than the propagation direction.*/
-  string           b1_x<>;
-  string           b1_y<>;
-  string           b1_z<>;
-  string           rho_x<>;
-  string           rho_y<>;
-  string           rho_z<>;
-  string           rho_x_prime<>;
-  string           rho_y_prime<>;
-  string           rho_z_prime<>;
+//  string           a0<>;                  /* datafile for meson a0*/
+//  string           a0_prime<>;
+//  string           a1_x<>;                /* x, y, z are to be understood*/
+//  string           a1_y<>;                /* as the three directions other*/
+//  string           a1_z<>;                /* than the propagation direction.*/
+//  string           b1_x<>;
+//  string           b1_y<>;
+//  string           b1_z<>;
+//  string           rho_x<>;
+//  string           rho_y<>;
+//  string           rho_z<>;
+//  string           rho_x_prime<>;
+//  string           rho_y_prime<>;
+//  string           rho_z_prime<>;
+//  MesonName          List[16];
+  string	   meson_name00<>;
+  string	   meson_name01<>;
+  string	   meson_name02<>;
+  string	   meson_name03<>;
+  string	   meson_name04<>;
+  string	   meson_name05<>;
+  string	   meson_name06<>;
+  string	   meson_name07<>;
+  string	   meson_name08<>;
+  string	   meson_name09<>;
+  string	   meson_name10<>;
+  string	   meson_name11<>;
+  string	   meson_name12<>;
+  string	   meson_name13<>;
+  string	   meson_name14<>;
+  string	   meson_name15<>;
   string           nucleon<>;
   string           nucleon_prime<>;
   string           delta_x<>;

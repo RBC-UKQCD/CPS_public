@@ -13,6 +13,12 @@
 #include <util/defines.h>
 CPS_START_NAMESPACE
 
+enum MesonLimits {
+	NumMesonChannels = 16,
+};
+typedef enum MesonLimits MesonLimits;
+extern struct vml_enum_map MesonLimits_map[];
+
 class VML;
 class WspectOutput {
 public:
@@ -31,20 +37,22 @@ public:
 	char *pion_prime;
 	char *rho;
 	char *rho_prime;
-	char *a0;
-	char *a0_prime;
-	char *a1_x;
-	char *a1_y;
-	char *a1_z;
-	char *b1_x;
-	char *b1_y;
-	char *b1_z;
-	char *rho_x;
-	char *rho_y;
-	char *rho_z;
-	char *rho_x_prime;
-	char *rho_y_prime;
-	char *rho_z_prime;
+	char *meson_name00;
+	char *meson_name01;
+	char *meson_name02;
+	char *meson_name03;
+	char *meson_name04;
+	char *meson_name05;
+	char *meson_name06;
+	char *meson_name07;
+	char *meson_name08;
+	char *meson_name09;
+	char *meson_name10;
+	char *meson_name11;
+	char *meson_name12;
+	char *meson_name13;
+	char *meson_name14;
+	char *meson_name15;
 	char *nucleon;
 	char *nucleon_prime;
 	char *delta_x;
@@ -107,10 +115,12 @@ extern "C" {
 #endif
 
 #if defined(__STDC__) || defined(__cplusplus)
+extern  bool_t vml_MesonLimits (VML *, char *instance, MesonLimits*);
 extern  bool_t vml_WspectOutput (VML *, char *instance, WspectOutput*);
 extern  bool_t vml_WspectArg (VML *, char *instance, WspectArg*);
 
 #else /* K&R C */
+extern  bool_t vml_MesonLimits (VML *, char *instance, MesonLimits*);
 extern  bool_t vml_WspectOutput (VML *, char *instance, WspectOutput*);
 extern  bool_t vml_WspectArg (VML *, char *instance, WspectArg*);
 

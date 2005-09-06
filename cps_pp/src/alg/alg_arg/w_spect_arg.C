@@ -5,6 +5,19 @@
 
 #include <alg/w_spect_arg.h>
 CPS_START_NAMESPACE
+
+bool_t
+vml_MesonLimits (VML *vmls, char *name,MesonLimits *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,MesonLimits_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map MesonLimits_map[] = {
+	{"MesonLimits","NumMesonChannels",NumMesonChannels}
+};
 	 bool WspectOutput::Encode(char *filename,char *instance){
 		 VML vmls;
 		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
@@ -54,33 +67,37 @@ vml_WspectOutput (VML *vmls, char *name,WspectOutput *objp)
 		 return FALSE;
 	 if (!vml_string (vmls, "rho_prime", &objp->rho_prime, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "a0", &objp->a0, ~0))
+	 if (!vml_string (vmls, "meson_name00", &objp->meson_name00, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "a0_prime", &objp->a0_prime, ~0))
+	 if (!vml_string (vmls, "meson_name01", &objp->meson_name01, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "a1_x", &objp->a1_x, ~0))
+	 if (!vml_string (vmls, "meson_name02", &objp->meson_name02, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "a1_y", &objp->a1_y, ~0))
+	 if (!vml_string (vmls, "meson_name03", &objp->meson_name03, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "a1_z", &objp->a1_z, ~0))
+	 if (!vml_string (vmls, "meson_name04", &objp->meson_name04, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "b1_x", &objp->b1_x, ~0))
+	 if (!vml_string (vmls, "meson_name05", &objp->meson_name05, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "b1_y", &objp->b1_y, ~0))
+	 if (!vml_string (vmls, "meson_name06", &objp->meson_name06, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "b1_z", &objp->b1_z, ~0))
+	 if (!vml_string (vmls, "meson_name07", &objp->meson_name07, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "rho_x", &objp->rho_x, ~0))
+	 if (!vml_string (vmls, "meson_name08", &objp->meson_name08, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "rho_y", &objp->rho_y, ~0))
+	 if (!vml_string (vmls, "meson_name09", &objp->meson_name09, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "rho_z", &objp->rho_z, ~0))
+	 if (!vml_string (vmls, "meson_name10", &objp->meson_name10, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "rho_x_prime", &objp->rho_x_prime, ~0))
+	 if (!vml_string (vmls, "meson_name11", &objp->meson_name11, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "rho_y_prime", &objp->rho_y_prime, ~0))
+	 if (!vml_string (vmls, "meson_name12", &objp->meson_name12, ~0))
 		 return FALSE;
-	 if (!vml_string (vmls, "rho_z_prime", &objp->rho_z_prime, ~0))
+	 if (!vml_string (vmls, "meson_name13", &objp->meson_name13, ~0))
+		 return FALSE;
+	 if (!vml_string (vmls, "meson_name14", &objp->meson_name14, ~0))
+		 return FALSE;
+	 if (!vml_string (vmls, "meson_name15", &objp->meson_name15, ~0))
 		 return FALSE;
 	 if (!vml_string (vmls, "nucleon", &objp->nucleon, ~0))
 		 return FALSE;
