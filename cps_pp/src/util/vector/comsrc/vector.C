@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definition of Vector and Matrix classes.
 
   Definitions of functions that perform operations on complex vectors.
-  $Id: vector.C,v 1.5 2005-05-09 15:19:46 chulwoo Exp $
+  $Id: vector.C,v 1.6 2005-09-06 21:07:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-09 15:19:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.5 2005-05-09 15:19:46 chulwoo Exp $
-//  $Id: vector.C,v 1.5 2005-05-09 15:19:46 chulwoo Exp $
+//  $Date: 2005-09-06 21:07:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.6 2005-09-06 21:07:12 chulwoo Exp $
+//  $Id: vector.C,v 1.6 2005-09-06 21:07:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v $
 //  $State: Exp $
 //
@@ -237,7 +237,7 @@ Float Vector::NormSqGlbSum(int len)
 Float Vector::ReDotProductGlbSum(const Vector *b, int len)
 {
   IFloat sum = dotProduct((IFloat *)&v, (IFloat *)b, len);
-  glb_sum((Float *)&sum);
+  glb_sum_five((Float *)&sum);
   return Float(sum);
 }
 
@@ -252,8 +252,8 @@ Complex Vector::CompDotProductGlbSum(const Vector *b, int len)
 {
   IFloat c_r, c_i;
   compDotProduct(&c_r, &c_i, (IFloat *)&v, (IFloat *)b, len);
-  glb_sum((Float *)&c_r);
-  glb_sum((Float *)&c_i);
+  glb_sum_five((Float *)&c_r);
+  glb_sum_five((Float *)&c_i);
   return Complex(c_r,c_i);
 }
 
