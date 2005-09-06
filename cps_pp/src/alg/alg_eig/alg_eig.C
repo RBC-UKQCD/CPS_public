@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.13 2005-07-06 00:56:49 chulwoo Exp $
+  $Id: alg_eig.C,v 1.14 2005-09-06 21:23:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-07-06 00:56:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.13 2005-07-06 00:56:49 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.13 2005-07-06 00:56:49 chulwoo Exp $
+//  $Date: 2005-09-06 21:23:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.14 2005-09-06 21:23:33 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.14 2005-09-06 21:23:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -24,6 +24,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <util/qcdio.h>
+#include <util/enum.h>
 #include <math.h>
 #include <alg/alg_eig.h>
 #include <util/lattice.h>
@@ -40,6 +41,34 @@ CPS_START_NAMESPACE
 using namespace std;
 
 extern void gamma_5(Float *v_out, Float *v_in, int num_sites);
+
+int NumChkb( RitzMatType ritz_mat)
+{
+  // Determine the number of checkerboards
+  int Ncb;
+  char *fname = "NumChkb(RitzType)";
+  switch(ritz_mat)
+  {
+  case MAT_HERM:
+  case MATDAG_MAT:
+  case NEG_MATDAG_MAT:
+  case MATDAG_MAT_NORM:
+  case NEG_MATDAG_MAT_NORM:
+    Ncb = 2;
+    break;
+    
+  case MATPC_HERM:
+  case MATPCDAG_MATPC:
+  case NEG_MATPCDAG_MATPC:
+    Ncb = 1;
+    break;
+
+  default:
+    ERR.General("",fname,"RitzMatOper %d not implemented",
+		ritz_mat);
+  }
+  return Ncb;
+}
 
 //------------------------------------------------------------------
 // Constructor 
@@ -64,6 +93,9 @@ AlgEig::AlgEig(Lattice& latt,
     ERR.Pointer(cname,fname, "arg");
   alg_eig_arg = arg;
 
+#if 1
+  Ncb = NumChkb(alg_eig_arg->RitzMatOper);
+#else 
   // Determine the number of checkerboards
   switch(alg_eig_arg->RitzMatOper)
   {
@@ -85,6 +117,7 @@ AlgEig::AlgEig(Lattice& latt,
     ERR.General(cname,fname,"RitzMatOper %d not implemented",
 		alg_eig_arg->RitzMatOper);
   }
+#endif
 
 
   // Set the node size of the full (non-checkerboarded) fermion field
@@ -100,10 +133,10 @@ AlgEig::AlgEig(Lattice& latt,
   
   for(int n = 0; n < N_eig; ++n)
   {
-    eigenv[n] = (Vector *) smalloc(cname,fname, "eigenv[n]", f_size * sizeof(Float));
+    eigenv[n] = (Vector *) smalloc(cname,fname, "eigenv[n]", (f_size)* sizeof(Float));
   }
 
-  lambda = (Float *) smalloc(cname,fname, "lambda", N_eig * sizeof(Float));
+  lambda = (Float *) smalloc(cname,fname, "lambda", 2*N_eig * sizeof(Float));
 
   chirality = (Float *) smalloc(cname,fname,"chirality", N_eig * sizeof(Float));
 
@@ -352,23 +385,22 @@ void AlgEig::run()
     // Solve for eigenvectors and eigenvalues.
     // Use eigenv as initial guess. Lambda is not used initially.
 
-    /*  SUSPICIOUS, does QCDOC really need to distinguish Ncb? 
     if(Ncb==2)
       iter = lat.FeigSolv(eigenv, lambda, chirality, valid_eig, 
 			hsum, eig_arg, CNV_FRM_YES);
     else if(Ncb==1)
       iter = lat.FeigSolv(eigenv, lambda, chirality, valid_eig, 
       			hsum, eig_arg, CNV_FRM_NO);
-    */
 
     //------------------------------------------------------------
     // Solve for eigenvectors and eigenvalues.
     // Lambda is not used initially.
     // This call will return a negative value for the iteration number
     // if either the solver maxes out on one of the limits.
-			          
+#if 0
     iter = lat.FeigSolv(eigenv,lambda,chirality, valid_eig,
     			hsum, eig_arg, CNV_FRM_YES);
+#endif
    
     if ( iter < 0 )
     {
