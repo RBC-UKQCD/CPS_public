@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.29 2005-05-09 15:17:29 chulwoo Exp $
+  $Id: gjp.C,v 1.30 2005-09-06 21:34:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-09 15:17:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.29 2005-05-09 15:17:29 chulwoo Exp $
-//  $Id: gjp.C,v 1.29 2005-05-09 15:17:29 chulwoo Exp $
+//  $Date: 2005-09-06 21:34:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.30 2005-09-06 21:34:49 chulwoo Exp $
+//  $Id: gjp.C,v 1.30 2005-09-06 21:34:49 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.29 $
+//  $Revision: 1.30 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -50,6 +50,7 @@ CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/vector.h>
 #include <util/error.h>
+#include <util/checksum.h>
 #include <alg/do_arg.h>
 #include <mem/p2v.h>
 CPS_START_NAMESPACE
@@ -150,6 +151,8 @@ void GlobalJobParameter::Initialize() {
     nodes[3] = SizeT();
     nodes[4] = SizeS();
   }
+  VRB.Result(cname,fname, "nodes= %d %d %d %d %d\n",
+nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
 
   // Check that the number of nodes divides the machine into
   // same size partitions.
@@ -160,6 +163,8 @@ void GlobalJobParameter::Initialize() {
   size[2] = SizeZ(); 
   size[3] = SizeT(); 
   size[4] = SizeS(); 
+//  VRB.Result(cname,fname, "size= %d %d %d %d %d\n",
+//size[0], size[1], size[2], size[3], size[4]);
   for(i = 0; i<5 ; i++)
   if( nodes[i] == 0 || size[i]%nodes[i] != 0) 
       ERR.General(cname,fname,	
@@ -218,8 +223,6 @@ void GlobalJobParameter::Initialize() {
   }
   VRB.Result(cname,fname, "node_sites= %d %d %d %d %d\n",
 node_sites[0], node_sites[1], node_sites[2], node_sites[3], node_sites[4]);
-  VRB.Result(cname,fname, "nodes= %d %d %d %d %d\n",
-nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
   VRB.Result(cname,fname, "coor= %d %d %d %d %d\n",
 node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
 
@@ -299,6 +302,8 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
 //  printf("verbose_level =%d\n",doarg_int.verbose_level);
   VRB.Level(doarg_int.verbose_level);
   printf("verbose_level =%d\n",VRB.Level());
+  CSM.Activate(doarg_int.checksum_level);
+  printf("checksum_level =%d\n",doarg_int.checksum_level);
 
 }
 
