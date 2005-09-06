@@ -61,6 +61,7 @@ public:
 	Float power_rect_cutoff;
 	int power_rect_exponent;
 	int verbose_level;
+	int checksum_level;
 	int exec_task_list;
 	Float xi_bare;
 	int xi_dir;
