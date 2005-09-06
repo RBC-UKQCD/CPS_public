@@ -70,8 +70,8 @@ class DoArg {
     /*!< The exponent for the power rectangle term in the pure gauge action.*/
     
 
-    int verbose_level;           /*!< Not used.*/
-    /*!<Retained for backward compatibility. */
+  int verbose_level;           /*!< Revived now!.*/
+  int checksum_level;           /*!< Revived now!.*/
     
   int exec_task_list; /*!< Not used*/
 
