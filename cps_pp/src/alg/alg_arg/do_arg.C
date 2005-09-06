@@ -114,6 +114,8 @@ vml_DoArg (VML *vmls, char *name,DoArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "verbose_level", &objp->verbose_level))
 		 return FALSE;
+	 if (!vml_int (vmls, "checksum_level", &objp->checksum_level))
+		 return FALSE;
 	 if (!vml_int (vmls, "exec_task_list", &objp->exec_task_list))
 		 return FALSE;
 	 if (!vml_Float (vmls, "xi_bare", &objp->xi_bare))
