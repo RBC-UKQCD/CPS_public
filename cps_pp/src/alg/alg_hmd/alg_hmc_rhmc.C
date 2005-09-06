@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.20 2005-08-09 06:42:01 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.21 2005-09-06 20:34:55 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2005-08-09 06:42:01 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.20 2005-08-09 06:42:01 chulwoo Exp $
-  $Id: alg_hmc_rhmc.C,v 1.20 2005-08-09 06:42:01 chulwoo Exp $
+  $Date: 2005-09-06 20:34:55 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.21 2005-09-06 20:34:55 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.21 2005-09-06 20:34:55 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.20 $
+  $Revision: 1.21 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -32,6 +32,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include<util/data_shift.h>
 #include<util/checksum.h>
 #include<util/qcdio.h>
 #include<math.h>
@@ -44,11 +45,9 @@ CPS_END_NAMESPACE
 #include<util/error.h>
 #include<comms/glb.h>
 #include<alg/alg_remez.h>
+#include<util/data_shift.h>
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
-#endif
-#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
-#include <qcdocos/scu_checksum.h>
 #endif
 CPS_START_NAMESPACE
 
@@ -435,10 +434,6 @@ Float AlgHmcRHMC::run(void)
   Float acceptance;                            // The acceptance probability
   Float efficiency;
 
-#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
-  if(!ScuChecksum::ChecksumsOn())
-  ScuChecksum::Initialise(true,true);
-#endif
  
   // Get the Lattice object
   //----------------------------------------------------------------
@@ -448,7 +443,7 @@ Float AlgHmcRHMC::run(void)
   //----------------------------------------------------------------
   Float dt = hmd_arg->step_size;
 
-  if(hmd_arg->metropolis){
+  if(hmd_arg->metropolis) {
     // Save initial gauge field configuration
     //--------------------------------------------------------------
     lat.CopyGaugeField(gauge_field_init);
@@ -456,16 +451,20 @@ Float AlgHmcRHMC::run(void)
 
   Float delta_h0;                       // save first run dH
   int Ntests;
+  LRGState lrg_state;
 
   if (hmd_arg->reproduce) {
     // Save initial rng state
     //--------------------------------------------------------------
-    LRG.GetStates(rng5d_init, FIVE_D);
-    LRG.GetStates(rng4d_init, FOUR_D);
+//    LRG.GetStates(rng5d_init, FIVE_D);
+//    LRG.GetStates(rng4d_init, FOUR_D);
+    lrg_state.GetStates();
+    
     
     // Need to save initial lattice if have not already done so
     if (!hmd_arg->metropolis)
       lat.CopyGaugeField(gauge_field_init);
+
 
     if (hmd_arg->reproduce_attempt_limit < 1 ||
 	hmd_arg->reproduce_attempt_limit > 5)
@@ -482,6 +481,8 @@ Float AlgHmcRHMC::run(void)
 	alpha[i][j] = sqrt(hmd_arg->FRatRes[i][j]);
   }
 
+  GDS.Set(0,0,0,0);
+  GDS.SetOrigin(0,0,0,0);
   // Try attempt_limit times to generate the same final gauge config 
   // consecutively
   for (int attempt = 0; attempt < hmd_arg->reproduce_attempt_limit; attempt++) {
@@ -494,8 +495,13 @@ Float AlgHmcRHMC::run(void)
 
       if ( !(test == 0 && attempt ==0) ) {
 	lat.GaugeField(gauge_field_init);
-	LRG.SetStates(rng4d_init, FOUR_D);
-	LRG.SetStates(rng5d_init, FIVE_D);
+//	LRG.SetStates(rng4d_init, FOUR_D);
+//	LRG.SetStates(rng5d_init, FIVE_D);
+        lrg_state.SetStates();
+        GDS.Set(1,1,1,0);
+        LRG.Shift();
+        lat.Shift();
+        GDS.SetOrigin(1,1,1,0);
       }
 
       // Initialize Hamiltonian variables
@@ -762,8 +768,16 @@ Float AlgHmcRHMC::run(void)
 
       if (hmd_arg->reproduce) {
 	// Save final gauge field configuration
-	lat.CopyGaugeField(gauge_field_final);
-	if (test == 0) delta_h0 = delta_h;
+        if ( test != 0) {
+          GDS.Set(-1,-1,-1,0);
+          LRG.Shift();
+          lat.Shift();
+          GDS.SetOrigin(0,0,0,0);
+        }
+        else {
+	  lat.CopyGaugeField(gauge_field_final);
+	  delta_h0 = delta_h;
+        }
       }
     } // end test loop
   
@@ -891,10 +905,8 @@ Float AlgHmcRHMC::run(void)
   //----------------------------------------------------------------
   lat.MdTime(0.0);
   VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
-#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
-  if ( ! ScuChecksum::CsumSwap() )
-    ERR.Hardware(cname,fname, "SCU Checksum mismatch\n");
-#endif
+
+  ERR.HdwCheck(cname,fname);
 
   return acceptance;
 }
@@ -933,7 +945,7 @@ void AlgHmcRHMC::generateApprox(HmdArg *hmd_arg)
     for (int j=0; j<i; j++) {
       // no need to recalculate approximation if same mass
       if (hmd_arg->frm_mass[j] == hmd_arg->frm_mass[i] &&
-	  hmd_arg->field_type[j] == hmd_arg->field_type[i]
+	  hmd_arg->field_type[j] == hmd_arg->field_type[i] &&
 	  hmd_arg->frm_power_num[j] ==hmd_arg-> frm_power_num[i] &&
 	  hmd_arg->frm_power_den[j] ==hmd_arg-> frm_power_den[i] ) {
 	hmd_arg->FRatDeg[i] = hmd_arg->FRatDeg[j];
