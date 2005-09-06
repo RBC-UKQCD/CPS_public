@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.23 2005-07-05 02:47:37 chulwoo Exp $
+  $Id: random.h,v 1.24 2005-09-06 20:23:56 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-07-05 02:47:37 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.23 2005-07-05 02:47:37 chulwoo Exp $
-//  $Id: random.h,v 1.23 2005-07-05 02:47:37 chulwoo Exp $
+//  $Date: 2005-09-06 20:23:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.24 2005-09-06 20:23:56 chulwoo Exp $
+//  $Id: random.h,v 1.24 2005-09-06 20:23:56 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -248,6 +248,10 @@ public UniformRandomGenerator, public GaussianRandomGenerator
 
     //! Number of Integers in RNG, that should be stored to record status
     int RNGints() const { return GaussianRandomGenerator::RNGints(); } // iset
+
+    //! Stores the RNG state.
+    void StoreSeeds(unsigned int *to) const;
+
 };
 
   
@@ -287,6 +291,7 @@ class LatRanGen
 
     //! Get a uniform random number.
     IFloat Urand(FermionFieldDimension frm_dim=FOUR_D);
+    IFloat Urand(Float high, Float low, FermionFieldDimension frm_dim=FOUR_D);
 
     //! Get a gaussian random number
     IFloat Grand(FermionFieldDimension frm_dim=FOUR_D);
@@ -353,6 +358,8 @@ class LatRanGen
 
     inline bool good() const { return io_good; }
 
+    void Shift();
+
  private:
     int do_log;
     char log_dir[200];
@@ -361,7 +368,7 @@ class LatRanGen
       do_log = 1;
       strcpy(log_dir,LogDir);
     }
-	
+
 };
 
 /*! An instance of the LatRanGen class, named LRG, should be
