@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.35 2005-07-06 00:57:15 chulwoo Exp $
+  $Id: lattice_base.C,v 1.36 2005-09-06 21:54:31 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-07-06 00:57:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.35 2005-07-06 00:57:15 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.35 2005-07-06 00:57:15 chulwoo Exp $
+//  $Date: 2005-09-06 21:54:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.36 2005-09-06 21:54:31 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.36 2005-09-06 21:54:31 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.35 $
+//  $Revision: 1.36 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -42,6 +42,7 @@ CPS_END_NAMESPACE
 #include <util/random.h>
 #include <util/ReadLatticePar.h>
 #include <util/checksum.h>
+#include <util/data_shift.h>
 #include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
@@ -2630,7 +2631,7 @@ void Lattice::Gamma5(Vector *v_out, Vector *v_in, int num_sites){
 // This is "truly" implemented only in the Fdwf derived class
 //------------------------------------------------------------------
 void Lattice::Ffour2five(Vector *five, Vector *four, 
-			 int s_r, int s_l)
+			 int s_r, int s_l, int Ncb)
 {
   char *fname = "Ffour2five";
   ERR.NotImplemented(cname,fname);
@@ -2640,7 +2641,7 @@ void Lattice::Ffour2five(Vector *five, Vector *four,
 // This is "truly" implemented only in the Fdwf derived class
 //------------------------------------------------------------------
 void Lattice::Ffive2four(Vector *four, Vector *five, 
-			 int s_r, int s_l)
+			 int s_r, int s_l, int Ncb)
 {
   char *fname = "Ffive2four";
   ERR.NotImplemented(cname,fname);
@@ -2854,9 +2855,10 @@ void Lattice::SoCheck(Float num){
 
 }
 
-
-
-
+void Lattice::Shift()
+{
+   GDS.Shift(gauge_field, GJP.VolNodeSites()*4*sizeof(Matrix));
+}
 
 
 CPS_END_NAMESPACE
