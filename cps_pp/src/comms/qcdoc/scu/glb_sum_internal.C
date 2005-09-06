@@ -1,5 +1,6 @@
 #include<config.h>
 #include<util/qcdio.h>
+#include<util/data_shift.h>
 #include<qalloc.h>
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
@@ -92,7 +93,7 @@ void glb_sum_internal (Float * float_p, int dir,int len)
          Recv[dir]= new SCUDirArgIR(receive_buf,gjp_scu_dir[2*dir],SCU_REC,length[dir]*sizeof(Double64));
   }
 
-  int coor = GJP.NodeCoor(dir);
+  int coor = (GJP.NodeCoor(dir)-GDS.Origin(dir)+NP[dir])%NP[dir];
   //printf("coor(%d)=%d\n",dir,coor);
   for(int i = 0;i<len;i++){
   transmit_buf[i] = gsum_buf[coor*len+i] = (Double64)(float_p[i]);
@@ -102,22 +103,13 @@ void glb_sum_internal (Float * float_p, int dir,int len)
  //     *transmit_buf = *gsum_buf;
 
   if (NP[dir]>1){
-  //       SCUDirArg Send2(transmit_buf,gjp_scu_dir[2*dir+1],SCU_SEND,length[dir]*sizeof(Double64));
-  //       SCUDirArg Recv2(receive_buf,gjp_scu_dir[2*dir],SCU_REC,length[dir]*sizeof(Double64));
     for (int itmp = 1; itmp < NP[dir]; itmp++) {
 //      printf("dir=%d itmp=%d\n",dir,itmp);
       coor = (coor+1)%NP[dir];
-#if 0
-      Send2.StartTrans();
-      Recv2.StartTrans();
-      Send2.TransComplete();
-      Recv2.TransComplete();
-#else
       Send[dir]->StartTrans();
       Recv[dir]->StartTrans();
       Send[dir]->TransComplete();
       Recv[dir]->TransComplete();
-#endif
 
       for(int i = 0;i<len;i++){
         gsum_buf[coor*len+i] = receive_buf[i];
@@ -134,20 +126,6 @@ void glb_sum_internal (Float * float_p, int dir,int len)
     float_p[i] = (Float)tmp_sum[i];
 //  printf("float_p[%d]=%e\n",i,float_p[i]);
   }
-#if 0
-  int coor = GJP.NodeCoor(dir);
-	if (coor ==0 ){
-		Send[dir]->StartTrans();Send[dir] ->TransComplete();
-	}else {
-		Recv[dir]->StartTrans(); Recv[dir]->TransComplete();
-		if (coor < NP[dir]-1 ){
-			Send[dir]->StartTrans(); Send[dir]->TransComplete();
-		}
-	}
-
-  for(int i = 0;i<len;i++)
-  float_p[i] = (Float )transmit_buf[i];
-#endif
   if (output)   printf("after = %e\n", (double)*float_p);
 }
 CPS_END_NAMESPACE

@@ -24,6 +24,7 @@ CPS_END_NAMESPACE
 #include<comms/scu.h>
 #include<util/gjp.h>
 #include<util/checksum.h>
+#include<util/data_shift.h>
 #include<comms/double64.h>
 #include <comms/sysfunc.h>
 CPS_START_NAMESPACE
@@ -92,7 +93,7 @@ void glb_sum_internal2(Float * float_p,int ndir)
 
   for(int i = 0; i < ndir; ++i) 
   if (NP[i] >1) {
-      int coor = GJP.NodeCoor(i);
+      int coor = (GJP.NodeCoor(i)-GDS.Origin(i)+NP[i])%NP[i];
 //fprintf(stderr,"coor[%d]=%d\n",i,coor);
       *transmit_buf = gsum_buf[coor]= tmp_sum;
 
