@@ -1,20 +1,9 @@
-#if 0
-#include <util/gjp.h>
-#include <comms/scu.h>
-#include <comms/glb.h>
-#include <util/lattice.h>
-#include <util/dirac_op.h>
-#include <util/vector.h>
-#include <sysfunc.h>
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
-#endif
-#include <config.h>
-#include <util/vector.h>
 #include <stdio.h>
-typedef double IFloat;
+#include "pt_int.h"
+//#include <util/gauge_agg.h>
 
+#if 0
+typedef double IFloat;
 struct gauge_agg{
   int src;
   int dest;
@@ -29,6 +18,7 @@ struct gauge_agg_cb{
   int gauge;
 };
 //---------------------------------------------------------------
+#endif
 
 
 //-----------------------------------------------------------------------------

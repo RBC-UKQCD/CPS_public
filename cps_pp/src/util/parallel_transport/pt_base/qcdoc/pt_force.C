@@ -2,24 +2,31 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: pt_force.C,v 1.2 2005-01-13 07:46:23 chulwoo Exp $
+  $Id: pt_force.C,v 1.3 2005-09-15 19:47:29 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
 #include <string.h>
-#include <util/pt_int.h>
+#include "pt_int.h"
 
 extern "C"{
 void Force_cross2dag(vector *chi, vector *phi, matrix *result,
                       int counter, double *fac);
-void vaxpy3(vector *res,Float *scale,vector *mult,vector *add,
-int ncvec);
+void Force_cross2dag_s(vector *chi, vector *phi, matrix *result,
+                      int counter, float *fac);
+void asq_vaxpy3(vector *res,Float *scale,vector *mult,vector *add, int ncvec);
+void asq_vaxpy3_s(vector *res,Float *scale,vector *mult,vector *add, int ncvec);
 }
 
 void *pt_alloc(size_t request, const char *cname, const
 char *fname, const char *vname){
     return qalloc(QCOMMS,request);
 }
+
+#ifdef ASQD_SINGLE
+#define Force_cross2dag(A,B,C,D,E) Force_cross2dag_s(A,B,C,D,E)
+#define asq_vaxpy3(A,B,C,D,E) asq_vaxpy3_s(A,B,C,D,E)
+#endif
 
 
 
@@ -73,7 +80,7 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
     // Array in which to accumulate the force term:
     // this must be initialised to zero 
 
-    matrix **force = (matrix**)amalloc(pt_alloc, sizeof(matrix), 2, 4, vol);
+    matrix **force = (matrix**)pt_amalloc(pt_alloc, sizeof(matrix), 2, 4, vol);
     bzero( (char *)force,sizeof(matrix)*4*vol);
 #if 0
     for(int i=0; i<4; i++)
@@ -83,17 +90,17 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
 
     // vector arrays for which we must allocate memory
 
-    vector ***Pnu = (vector***)amalloc(pt_alloc, sizeof(vector), 3, n_sign, N, vol);
+    vector ***Pnu = (vector***)pt_amalloc(pt_alloc, sizeof(vector), 3, n_sign, N, vol);
     
-    vector ****P3 = (vector****)amalloc(pt_alloc, sizeof(vector), 4, n_sign, n_sign, N, vol);
+    vector ****P3 = (vector****)pt_amalloc(pt_alloc, sizeof(vector), 4, n_sign, n_sign, N, vol);
 
-    vector ****Prhonu = (vector****)amalloc(pt_alloc, sizeof(vector), 4, n_sign, n_sign, N, vol);
+    vector ****Prhonu = (vector****)pt_amalloc(pt_alloc, sizeof(vector), 4, n_sign, n_sign, N, vol);
 
-    vector *****P5 = (vector*****)amalloc(pt_alloc, sizeof(vector), 5, n_sign, n_sign, n_sign, N, vol);
+    vector *****P5 = (vector*****)pt_amalloc(pt_alloc, sizeof(vector), 5, n_sign, n_sign, n_sign, N, vol);
 
-    vector ******P7 = (vector******)amalloc(pt_alloc, sizeof(vector), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
+    vector ******P7 = (vector******)pt_amalloc(pt_alloc, sizeof(vector), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
 
-    vector ******Psigma7 = (vector******)amalloc(pt_alloc, sizeof(vector), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
+    vector ******Psigma7 = (vector******)pt_amalloc(pt_alloc, sizeof(vector), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
 
 
     
@@ -314,7 +321,7 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
 		    Float c75 = asq_arg->c7/asq_arg->c5;
 		    for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(ss=0; ss<n_sign; ss++) for(w=0; w<N; w++)
 			
-			vaxpy3(P5[ms][ns][rs][w],&c75, Psigma7[ms][ns][rs][ss][w], P5[ms][ns][rs][w], vax_len);
+			asq_vaxpy3(P5[ms][ns][rs][w],&c75, Psigma7[ms][ns][rs][ss][w], P5[ms][ns][rs][w], vax_len);
 #ifdef PROFILE
 			ForceFlops += 2*GJP.VolNodeSites()*VECT_LEN*N*n_sign*n_sign*n_sign*n_sign;
 #endif
@@ -375,7 +382,7 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
 		if(asq_arg->c3!=0.0){
 		    Float c53 = asq_arg->c5/asq_arg->c3;
 		    for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(w=0; w<N; w++)
-			vaxpy3(P3[ms][ns][w],&c53,Prho5[ms][ns][rs][w], P3[ms][ns][w], vax_len);
+			asq_vaxpy3(P3[ms][ns][w],&c53,Prho5[ms][ns][rs][w], P3[ms][ns][w], vax_len);
 #ifdef PROFILE
 		ForceFlops += 2*vol*VECT_LEN*N*n_sign*n_sign*n_sign;
 #endif
@@ -476,7 +483,7 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
 	    if(asq_arg->c3!=0.0){
 		    Float cl3 = asq_arg->c6/asq_arg->c3;
 		for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(w=0; w<N; w++)
-		    vaxpy3(P3[ms][ns][w], &cl3, Pnu5[ms][ns][w], P3[ms][ns][w], vax_len);
+		    asq_vaxpy3(P3[ms][ns][w], &cl3, Pnu5[ms][ns][w], P3[ms][ns][w], vax_len);
 #ifdef PROFILE
 		ForceFlops += 2*vol*VECT_LEN*N*n_sign*n_sign;
 #endif

@@ -1,5 +1,5 @@
+#include "pt_int.h"
 #include <config.h>
-#include <util/pt_int.h>
 #include <util/pt.h>
 #include <util/gjp.h>
 

@@ -1,36 +1,24 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.25 2005-06-16 07:26:57 chulwoo Exp $
+  $Id: pt.C,v 1.26 2005-09-15 19:47:28 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-16 07:26:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.25 2005-06-16 07:26:57 chulwoo Exp $
-//  $Id: pt.C,v 1.25 2005-06-16 07:26:57 chulwoo Exp $
+//  $Date: 2005-09-15 19:47:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.26 2005-09-15 19:47:28 chulwoo Exp $
+//  $Id: pt.C,v 1.26 2005-09-15 19:47:28 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.25 $
+//  $Revision: 1.26 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-#include <config.h>
-#include <util/pt_int.h>
-#include <util/vector.h>
-#include <qalloc.h>
-#include <util/time.h>
-#if 0
-#include <util/gjp.h>
-#include <util/pt.h>
-#include <util/time.h>
-#include <sysfunc.h>
-#include <comms/scu.h>
-#include <stdio.h>
-#endif
+#include "pt_int.h"
 
 static unsigned long PEC = 0xb0000000;
 static unsigned long PLB = 0xb0000000;
@@ -47,14 +35,20 @@ extern "C"{
   void cmm_agg_cpp( int sites, long chi, long u,long in, long out);
   void cmv_agg_cpp( int sites, long u,long in, long out);
   void pt_asqtad_agg( int sites, long chi, long u,long in, long out);
-
+  void pt_asqtad_agg_s( int sites, long chi, long u,long in, long out);
   void pt_cmv(int count, ind_agg *ind, double *gauge, double *src, double *dest);
   void pt_cmv_pad(int count, ind_agg *ind, double *gauge, double *src, double *dest);
   void pt_cmv_dag(int count, ind_agg *ind, double *gauge, double *src, double *dest);
   void pt_cmv_dag_pad(int count, ind_agg *ind, double *gauge, double *src, double *dest);
+  void pt_cmv_s(int count, ind_agg *ind, float *gauge, float *src, float *dest);
+  void pt_cmv_pad_s(int count, ind_agg *ind, float *gauge, float *src, float *dest);
+  void pt_cmv_dag_s(int count, ind_agg *ind, float *gauge, float *src, float *dest);
+  void pt_cmv_dag_pad_s(int count, ind_agg *ind, float *gauge, float *src, float *dest);
 
   void pt_copy(int count, ind_agg *ind, double *src, double *dest);
   void pt_copy_pad(int count, ind_agg *ind, double *src, double *dest);
+  void pt_copy_s(int count, ind_agg *ind, float *src, float *dest);
+  void pt_copy_pad_s(int count, ind_agg *ind, float *src, float *dest);
 
   void pt_copy_buffer(int n, long src, long dest, long ptable);
   // Assembler copying routines
@@ -100,6 +94,16 @@ extern "C"{
 		     unsigned long *dest, unsigned long *dest);
   
 }
+
+#ifdef ASQD_SINGLE
+#define pt_asqtad_agg(A,B,C,D,E) pt_asqtad_agg_s(A,B,C,D,E)
+#define pt_cmv(A,B,C,D,E) pt_cmv_s(A,B,C,D,E)
+#define pt_cmv_dag(A,B,C,D,E) pt_cmv_dag_s(A,B,C,D,E)
+#define pt_cmv_pad(A,B,C,D,E) pt_cmv_pad_s(A,B,C,D,E)
+#define pt_cmv_dag_pad(A,B,C,D,E) pt_cmv_dag_pad_s(A,B,C,D,E)
+#define pt_copy_pad(A,B,C,D) pt_copy_pad_s(A,B,C,D)
+#define pt_copy(A,B,C,D) pt_copy_s(A,B,C,D)
+#endif
 
 
 int PT::size[NDIM];
@@ -1211,7 +1215,8 @@ parity, IFloat * gauge)
 	else if((wire[i] == 6))
 	  {
 	    for(int j = 0; j < non_local_chi_cb[6];j++)
-	      moveMem(snd_buf_t_cb + j*GAUGE_LEN,min[i] + 3 * *(Toffset[parity]+j)*3,GAUGE_LEN*sizeof(IFloat));
+//	      moveMem(snd_buf_t_cb + j*GAUGE_LEN,min[i] + 3 * *(Toffset[parity]+j)*3,GAUGE_LEN*sizeof(IFloat));
+	      memcpy(snd_buf_t_cb + j*GAUGE_LEN,min[i] + 3 * *(Toffset[parity]+j)*3,GAUGE_LEN*sizeof(IFloat));
 	  }
       }
     }
@@ -1286,7 +1291,8 @@ parity, IFloat * gauge)
 		  fp1 = (IFloat *)(mout[i]+3*uc_nl_cb[parity][wire[i]][s].dest);
 		  //for(int d = 0;d<GAUGE_LEN;d++)
 		  //*(fp1+d) = *(fp0+d);
-		  moveMem(fp1,fp0,GAUGE_LEN*sizeof(IFloat));
+//		  moveMem(fp1,fp0,GAUGE_LEN*sizeof(IFloat));
+		  memcpy(fp1,fp0,GAUGE_LEN*sizeof(IFloat));
 		}
 	    }
 	}
@@ -2179,4 +2185,4 @@ void PT::shift_link(IFloat **u, const int *dir, int n_dir){
 
 }
 
-CPS_END_NAMESPACE
+//CPS_END_NAMESPACE
