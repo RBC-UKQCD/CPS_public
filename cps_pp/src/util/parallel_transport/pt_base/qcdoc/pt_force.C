@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: pt_force.C,v 1.3 2005-09-15 19:47:29 chulwoo Exp $
+  $Id: pt_force.C,v 1.4 2005-09-15 20:00:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -10,9 +10,9 @@
 #include "pt_int.h"
 
 extern "C"{
-void Force_cross2dag(vector *chi, vector *phi, matrix *result,
+void asq_force_cross2dag(vector *chi, vector *phi, matrix *result,
                       int counter, double *fac);
-void Force_cross2dag_s(vector *chi, vector *phi, matrix *result,
+void asq_force_cross2dag_s(vector *chi, vector *phi, matrix *result,
                       int counter, float *fac);
 void asq_vaxpy3(vector *res,Float *scale,vector *mult,vector *add, int ncvec);
 void asq_vaxpy3_s(vector *res,Float *scale,vector *mult,vector *add, int ncvec);
@@ -24,7 +24,7 @@ char *fname, const char *vname){
 }
 
 #ifdef ASQD_SINGLE
-#define Force_cross2dag(A,B,C,D,E) Force_cross2dag_s(A,B,C,D,E)
+#define asq_force_cross2dag(A,B,C,D,E) asq_force_cross2dag_s(A,B,C,D,E)
 #define asq_vaxpy3(A,B,C,D,E) asq_vaxpy3_s(A,B,C,D,E)
 #endif
 
@@ -624,7 +624,7 @@ void PT::force_product_sum(vector *v, vector *w,
   Float dtime = -dclock();
 #endif
   IFloat coeff2 = 2.0*coeff;
-  Force_cross2dag((vector *)v2, w, f, vol/2, &coeff2);
+  asq_force_cross2dag((vector *)v2, w, f, vol/2, &coeff2);
 #ifdef PROFILE
   dtime += dclock();
   print_flops(cname,fname,78*vol,dtime);
