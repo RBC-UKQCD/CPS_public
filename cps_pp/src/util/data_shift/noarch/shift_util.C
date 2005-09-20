@@ -5,7 +5,6 @@
 CPS_START_NAMESPACE
 void GlobalDataShift::Shift(int i, int n_disp){
   if (n_disp==0) return;
-  else
-    ERR.General(cname,"Shift(i,i)");
+  ERR.NotImplemented(cname, "Shift(int, int)", "");
 }
 CPS_END_NAMESPACE
