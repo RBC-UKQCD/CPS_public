@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.6 2005-03-07 00:33:45 chulwoo Exp $
+  $Id: vector_util.C,v 1.7 2005-10-04 05:22:16 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:33:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdoc/vector_util.C,v 1.6 2005-03-07 00:33:45 chulwoo Exp $
-//  $Id: vector_util.C,v 1.6 2005-03-07 00:33:45 chulwoo Exp $
+//  $Date: 2005-10-04 05:22:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdoc/vector_util.C,v 1.7 2005-10-04 05:22:16 chulwoo Exp $
+//  $Id: vector_util.C,v 1.7 2005-10-04 05:22:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/qcdoc/vector_util.C,v $
 //  $State: Exp $
 //
@@ -297,6 +297,20 @@ void vecTimesEquFloat(IFloat *a, IFloat b, int len)
     }
 }
 
+/*! Multiplication by a real scalar
+  \param u The input vector
+  \param fb The real scalar
+  \param len The number of real numbers in the vectors.
+  \post This vector is multiplied by \a fb
+*/
+void vecEqualsVecTimesEquFloat(IFloat *a, IFloat *b, Float c, int len)
+{
+  for (int i=0; i<len; i++) {
+    *a++ = c * *b++;
+  }
+
+}
+
 /*!
   \param a A vector to be added to.
   \param b Another vector.
@@ -436,5 +450,15 @@ void cTimesV1MinusV2(IFloat *a, IFloat re, IFloat im, const IFloat *c,
     }
 }
 
+/*! Assign vector to zero.
+  \param len The number of real numbers in the vectors.
+  \post This vector has the value 0.
+*/
+void vecZero(IFloat *a, int len) {
+
+  for (int i=0; i<len; i++)
+    *a++ = 0.0;
+
+}
 
 CPS_END_NAMESPACE
