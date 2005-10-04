@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.36 2005-09-06 21:54:31 chulwoo Exp $
+  $Id: lattice_base.C,v 1.37 2005-10-04 05:24:04 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 21:54:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.36 2005-09-06 21:54:31 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.36 2005-09-06 21:54:31 chulwoo Exp $
+//  $Date: 2005-10-04 05:24:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.37 2005-10-04 05:24:04 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.37 2005-10-04 05:24:04 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.36 $
+//  $Revision: 1.37 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2238,7 +2238,8 @@ int Lattice::MetropolisAccept(Float delta_h, Float *accept)
     if(delta_h <= 0.0) {
       flag = 1.0;
       *accept = 1.0;
-    } else if(delta_h < 20.0) {
+//    } else if (delta_h < 20.0) {
+    } else {
       LRG.AssignGenerator(0, 0, 0, 0);
       LRG.SetInterval(1, 0);
       IFloat exp_mdh;
@@ -2332,7 +2333,6 @@ void Lattice::RandGaussAntiHermMatrix(Matrix *mat, Float sigma2)
 	    p++;
 	}
     }
-
 }
 
 
@@ -2463,7 +2463,6 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
   glb_sum_five(&square);
   printf("sum=%0.18e square=%0.18e\n",sum,square);
 #endif
-
 }
 
 
@@ -2858,6 +2857,36 @@ void Lattice::SoCheck(Float num){
 void Lattice::Shift()
 {
    GDS.Shift(gauge_field, GJP.VolNodeSites()*4*sizeof(Matrix));
+}
+
+void Lattice::ForceMagnitude(Matrix *mom, Matrix *mom_old, 
+			     Float mass, Float dt, char *type) {
+
+  char *fname = "ForceMagnitude(Matrix*, Matrix*, Float, Float, char*)";
+  FILE *fp;
+
+#if TARGET==cpsMPI
+  using MPISCU::fprintf;
+#endif
+
+  int g_size = GJP.VolNodeSites() * GsiteSize();
+  
+  vecMinusEquVec( (IFloat*)mom_old, (const IFloat*)mom, g_size);
+  Float force;
+  if (Fclass() == F_CLASS_DWF)
+    force = sqrt(((Vector*)mom_old)->NormSqGlbSum(g_size));
+  else
+    force = sqrt(((Vector*)mom_old)->NormSqGlbSum4D(g_size));
+
+  // Print out monitor info
+  //---------------------------------------------------------------
+  if( (fp = Fopen("force.dat", "a")) == NULL ) {
+    ERR.FileA(cname,fname, "force.dat");
+  }
+  Fprintf(fp,"%s = %e mass = %f dt = %f\n", type, IFloat(force), 
+	  (IFloat)mass, (IFloat)dt);
+  Fclose(fp);
+
 }
 
 
