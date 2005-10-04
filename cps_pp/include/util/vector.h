@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.13 2005-03-07 00:03:12 chulwoo Exp $
+  $Id: vector.h,v 1.14 2005-10-04 05:57:31 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:03:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.13 2005-03-07 00:03:12 chulwoo Exp $
-//  $Id: vector.h,v 1.13 2005-03-07 00:03:12 chulwoo Exp $
+//  $Date: 2005-10-04 05:57:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.14 2005-10-04 05:57:31 chulwoo Exp $
+//  $Id: vector.h,v 1.14 2005-10-04 05:57:31 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -69,8 +69,14 @@ void vecMinusEquVec(IFloat *a, const IFloat *b, int);
     //! vector negation; a = -b
 void vecNegative(IFloat *a, const IFloat *b, int); 	
 
+    //! set all elements to zero
+void vecZero(IFloat *a, int size);
+
     //! real scalar times vector multiplication; a *= b
 void vecTimesEquFloat(IFloat *a, IFloat b, int); // 
+
+    //! real scalar times vector multiplication; a = c*b
+void vecEqualsVecTimesEquFloat(IFloat *a, IFloat *b, IFloat c, int); // 
 
     //! vector linear combination; a = bc+d
 void fTimesV1PlusV2(IFloat *a, IFloat b, const IFloat *c,
@@ -207,7 +213,8 @@ class Matrix
       \return The multiplied matrix
     */
      Matrix& operator*=(IFloat c)
-    { vecTimesEquFloat((IFloat *)u, c, COLORS*COLORS*2); return *this; }
+    { vecTimesEquFloat((IFloat *)u, c, COLORS*COLORS*2); 
+    return *this; }
 
      //! Assignment to matrix product; \a ab
      /*!
@@ -395,7 +402,8 @@ class Vector
       \return The multiplied vector
     */
     Vector& operator*=(IFloat p)
-    { vecTimesEquFloat((IFloat *)v, p, COLORS*2); return *this; }
+    { vecTimesEquFloat((IFloat *)v, p, COLORS*2); 
+    return *this; }
 
     //! Adds a vector \a m to this vector.
     /*!
@@ -467,6 +475,7 @@ class Vector
 
     //! Square norm with global sum.
     Float NormSqGlbSum(int len);
+    Float NormSqGlbSum4D(int len);
 
     //! The real part of the dot product
     /*!
@@ -479,6 +488,7 @@ class Vector
 
     //! The real part of the dot product with global sum.
     Float ReDotProductGlbSum(const Vector *b, int len);
+    Float ReDotProductGlbSum4D(const Vector *b, int len);
 
     void NormSqArraySliceSum(Float *f_out, const int size, const int dir);
     //!< Sum the square norms of vectors in 3-dim slices.
@@ -488,6 +498,14 @@ class Vector
 
     void SliceArraySumFive(Float *sum, const Float *f_in, const int dir);
     //!< Sum an array of Floats on a 5-dim lattice in 4-dim slices.
+
+    //! Assign vector to zero.
+    /*!
+      \param len The number of real numbers in the vectors.
+      \post This vector has the value 0.
+    */
+    void VecZero(int len)
+      {vecZero((IFloat*)&v, len);}
 
     //! Assignment to a negated vector.
     /*!
@@ -506,6 +524,16 @@ class Vector
     */
     void VecTimesEquFloat(const Float &fb, int len)
     {vecTimesEquFloat((IFloat *)&v, IFloat(fb), len);}
+
+    //! Multiplication by a real scalar
+    /*!
+      \param u The input vector
+      \param fb The real scalar
+      \param len The number of real numbers in the vectors.
+      \post This vector is multiplied by \a fb
+    */
+    void VecEqualsVecTimesEquFloat(const Vector *u, const Float &fb, int len)
+    {vecEqualsVecTimesEquFloat((IFloat *)&v, (IFloat*)u, IFloat(fb), len);}
 
     //! Addition of another vector
     /*!
@@ -566,6 +594,7 @@ class Vector
 
     //! The dot product with another vector, with global sum
      Complex CompDotProductGlbSum(const Vector *b, int len);
+     Complex CompDotProductGlbSum4D(const Vector *b, int len);
   
     //! Assignment of the linear combination  fb * c + d
     /*!

@@ -1,17 +1,3 @@
-
-enum ReunitarizeType { REUNITARIZE_NO    = 0,
-		       REUNITARIZE_YES   = 1 };
-
-enum MetropolisType { METROPOLIS_NO    = 0,
-		      METROPOLIS_YES   = 1 };
-
-enum RhmcPolesAction { 	RHMC_POLES_CALC = 0,
- 			RHMC_POLES_READ = 1,
-			RHMC_POLES_CALC_WRITE = 2 };
-
-enum HmdLimits { MAX_HMD_MASSES=8 ,   /* The maximum number of dynamical masses.*/
-                 MAX_RAT_DEGREE=20 }; /* The maximum degree of the rational approximation.*/
-
 /*! A structure holding the parameters relevant to the HMD algorithms.*/
 /*!
   Not all parameters are relevant to all algorithms. An algorithm should
@@ -22,6 +8,7 @@ typedef Float FRatVec[MAX_RAT_DEGREE];
 typedef int IMassVec[MAX_HMD_MASSES];
 typedef Float FMassVec[MAX_HMD_MASSES];
 typedef FRatVec FRatMassVec[MAX_HMD_MASSES];
+
 
 class HmdArg {
 
@@ -79,7 +66,7 @@ class HmdArg {
       The number of previous solutions used to form the initial solver
       guess (HMC only).
     */
-    int chrono;
+    IMassVec chrono;
 
     //! Reproduce test? 1 = TRUE, 0 = FALSE
     int reproduce;
@@ -112,11 +99,11 @@ class HmdArg {
 					stopping condition for each mass 
 					of dynamical fermions/bosons */
 
-    FMassVec stop_rsd_md;  /*!< The target residual for the solver
+    FRatMassVec stop_rsd_md;  /*!< The target residual for the solver
 					   stopping condition for each mass 
 					   of dynamical fermions/bosons */
 
-    FMassVec stop_rsd_mc;  /*!< The target residual for the solver
+    FRatMassVec stop_rsd_mc;  /*!< The target residual for the solver
 					   stopping condition for each mass 
 					   of dynamical fermions/bosons */
 
@@ -144,6 +131,9 @@ class HmdArg {
     //! Parameters for the RHMC force rational approximations.
     IMassVec FRatDeg;
 
+    //! Parameters for the RHMC action rational approximations. 
+    IMassVec SRatDeg;
+
     //! The new degrees to use for dynamic RHMC.
     IMassVec FRatDegNew;
 
@@ -159,8 +149,6 @@ class HmdArg {
     //! Parameters for the RHMC rational approximations..
     FRatMassVec FRatPole;
 
-    //! Parameters for the RHMC action rational approximations. 
-    IMassVec SRatDeg;
     //! Parameters for the RHMC action rational approximations.     
     FMassVec SRatError;
     //! Parameters for the RHMC action rational approximations.     
@@ -185,15 +173,13 @@ class HmdArg {
  * the VML portion of the HMD algorithm.
  */
 class EvoArg {
-  FclassType Fermion;
-  GclassType Gluon;
   int traj_start;
   int gauge_unload_period;
   int gauge_configurations;
   int io_concurrency;
   int hdw_xcsum;
   int hdw_rcsum;
-  int reproduce_period;
+  int reproduce_interval;
   string ensemble_id<>;
   string ensemble_label<>;
   string creator<>;
@@ -204,7 +190,9 @@ class EvoArg {
   string evo_stem<>;
   string w_spect_directory<>;
   string work_directory<>;
-  int inline_measure;
+  int measure_pbp;
+  int measure_eig;
+  int measure_w_spect;
   string eig_lo_stem<>;
   string eig_hi_stem<>;
 };
@@ -218,6 +206,9 @@ class RhmcPolesState {
 
     //! Parameters for the RHMC force rational approximations.
     IMassVec FRatDeg;
+
+    //! Parameters for the RHMC action rational approximations. 
+    IMassVec SRatDeg;
 
     //! The new degrees to use for dynamic RHMC.
     IMassVec FRatDegNew;
@@ -234,8 +225,6 @@ class RhmcPolesState {
     //! Parameters for the RHMC rational approximations..
     FRatMassVec FRatPole;
 
-    //! Parameters for the RHMC action rational approximations. 
-    IMassVec SRatDeg;
     //! Parameters for the RHMC action rational approximations.     
     FMassVec SRatError;
     //! Parameters for the RHMC action rational approximations.     

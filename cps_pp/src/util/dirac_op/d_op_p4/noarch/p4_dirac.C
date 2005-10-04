@@ -272,8 +272,10 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   //twice in the nu direction
   for(nu = 0; nu < NUM_DIR; nu+=2)
     {
-      bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
-      bzero((char *)tmp_frm[nu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
+//      bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
+//      bzero((char *)tmp_frm[nu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
+      memset(tmp_frm[nu],0,(vol/2)*VECT_LEN*sizeof(IFloat));
+      memset(tmp_frm[nu+1],0,(vol/2)*VECT_LEN*sizeof(IFloat));
       for(n = 0; n < vol/2; n++)
 	{
 	  fp2 = knight_onetwo + n*NUM_DIR*VECT_LEN2;
@@ -315,8 +317,10 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   //mu direction
   for(mu = 0; mu < NUM_DIR; mu+=2)
     {
-      bzero((char *)tmp_frm[mu],(vol/2)*VECT_LEN*sizeof(IFloat));
-      bzero((char *)tmp_frm[mu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
+//      bzero((char *)tmp_frm[mu],(vol/2)*VECT_LEN*sizeof(IFloat));
+//      bzero((char *)tmp_frm[mu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
+      memset(tmp_frm[mu],0,(vol/2)*VECT_LEN*sizeof(IFloat));
+      memset(tmp_frm[mu+1],0,(vol/2)*VECT_LEN*sizeof(IFloat));
       for(n = 0; n < vol/2; n++)
 	{
 	  fp2 = knight_twoone + n*NUM_DIR*VECT_LEN2;
@@ -350,7 +354,8 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   //Sum up contributions from the knight's move terms
   //and the smeared one link term and place them in fout
 
-  bzero((char*)f_out,(vol/2)*VECT_LEN*sizeof(IFloat));
+//  bzero((char*)f_out,(vol/2)*VECT_LEN*sizeof(IFloat));
+  memset(f_out,0,(vol/2)*VECT_LEN*sizeof(IFloat));
    for(n = 0; n < vol/2; n++)
     {
       fp3 = knight_onetwo + n*NUM_DIR*VECT_LEN2;

@@ -10,6 +10,7 @@
 #include <util/pmalloc.h>
 #include <alg/common_arg.h>
 #include <alg/bigfloat.h>
+#include <alg/remez_arg.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
 //
@@ -31,6 +32,9 @@ class AlgRemez
  private:
   char *cname;
 
+  //!< The storage area for the rational approximation
+  RemezArg *remez_arg;
+
   // The approximation parameters
   bigfloat *param, *roots, *poles;
   bigfloat norm;
@@ -44,9 +48,6 @@ class AlgRemez
   // the numerator and denominator of the power we are approximating
   unsigned long power_num; 
   unsigned long power_den;
-
-  // Flag to determine whether the arrays have been allocated
-  int alloc;
 
   // Variables used to calculate the approximation
   int nd1, iter;
@@ -101,28 +102,22 @@ class AlgRemez
   // Solve the system AX=B
   int simq(bigfloat *A, bigfloat *B, bigfloat *X, int n);
 
-  // Free memory and reallocate as necessary
-  void allocate(int num_degree, int den_degree);
- public:
-  
-  // Constructor
-  AlgRemez(Float lower, Float upper, long prec);
-
-  // Destructor
-  virtual ~AlgRemez();
-
-  // Reset the bounds of the approximation
-  void setBounds(Float lower, Float upper);
-
-  // Generate the rational approximation x^(pnum/pden)
-  Float generateApprox(int num_degree, int den_degree, unsigned long power_num, unsigned long power_den);
-  Float generateApprox(int degree, unsigned long power_num, unsigned long power_den);
-
   // Return the partial fraction expansion of the approximation x^(pnum/pden)
   int getPFE(Float *res, Float *pole, Float *norm);
 
   // Return the partial fraction expansion of the approximation x^(-pnum/pden)
   int getIPFE(Float *res, Float *pole, Float *norm);
+
+ public:
+  
+  // Constructor
+  AlgRemez(RemezArg &);
+
+  // Destructor
+  virtual ~AlgRemez();
+
+  // Generate the rational approximation x^(pnum/pden)
+  void generateApprox();
 
 };
 CPS_END_NAMESPACE
@@ -130,6 +125,7 @@ CPS_END_NAMESPACE
 #else             // If not defined GMP
 
 
+#include <alg/remez_arg.h>
 #include <util/error.h>
 #include <util/data_types.h>
 CPS_START_NAMESPACE
@@ -142,20 +138,21 @@ class AlgRemez
  private:
   char *cname;
 
- public:
-  
-  AlgRemez(Float lower, Float upper, long prec) {
-    cname = "AlgRemez";
-    char *fname = "AlgRemez(Float, Float, long)";
-    ERR.General(cname,fname,"AlgRemez cannot be instantiated without GMP installed\n");
-  }
-  ~AlgRemez() {;}
-  void setBounds(Float lower, Float upper) {;}
-  Float generateApprox(int num_degree, int den_degree, unsigned long power_num, unsigned long power_den);
-  Float generateApprox(int degree, unsigned long power_num, unsigned long power_den)
-    {return 0;}
   int getPFE(Float *res, Float *pole, Float *norm) {return 0;}
   int getIPFE(Float *res, Float *pole, Float *norm) {return 0;}
+
+ public:
+  
+  AlgRemez(RemezArg&) {
+    cname = "AlgRemez";
+    char *fname = "AlgRemez(RemezArg&)";
+    ERR.General(cname,fname,
+		"AlgRemez cannot be instantiated without GMP installed\n");
+  }
+
+  ~AlgRemez() {;}
+
+  Float generateApprox() {return 0.0;}
 
 };
 CPS_END_NAMESPACE

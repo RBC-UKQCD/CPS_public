@@ -7,7 +7,7 @@ RCFLAGS=-c -C -x -u util/vml/ -v alg/
 
 all: vml.stmp 
 
-vml.stmp: enum.x cg_arg.x do_arg.x w_spect_arg.x hmd_arg.x pbp_arg.x eig_arg.x pot_arg.x fix_gauge_arg.x meas_arg.x
+vml.stmp: enum.x cg_arg.x do_arg.x w_spect_arg.x hmc_arg.x hmd_arg.x pbp_arg.x eig_arg.x pot_arg.x fix_gauge_arg.x meas_arg.x int_arg.x Makefile.in
 	- cp ${BUILDDIR}/config.h .
 	- cp ${BUILDDIR}/precision.h .
 	- cp ${SRCDIR}/include/input/*.x .
@@ -20,6 +20,8 @@ vml.stmp: enum.x cg_arg.x do_arg.x w_spect_arg.x hmd_arg.x pbp_arg.x eig_arg.x p
 	${RPCGEN} $(RCFLAGS) do_arg.x >${SRCDIR}/src/alg/alg_arg/do_arg.C
 	${RPCGEN} $(RHFLAGS) w_spect_arg.x >${SRCDIR}/include/alg/w_spect_arg.h
 	${RPCGEN} $(RCFLAGS) w_spect_arg.x >${SRCDIR}/src/alg/alg_arg/w_spect_arg.C
+	${RPCGEN} $(RHFLAGS) hmc_arg.x >${SRCDIR}/include/alg/hmc_arg.h
+	${RPCGEN} $(RCFLAGS) hmc_arg.x >${SRCDIR}/src/alg/alg_arg/hmc_arg.C
 	${RPCGEN} $(RHFLAGS) hmd_arg.x >${SRCDIR}/include/alg/hmd_arg.h
 	${RPCGEN} $(RCFLAGS) hmd_arg.x >${SRCDIR}/src/alg/alg_arg/hmd_arg.C
 	${RPCGEN} $(RHFLAGS) pbp_arg.x >${SRCDIR}/include/alg/pbp_arg.h
@@ -32,6 +34,8 @@ vml.stmp: enum.x cg_arg.x do_arg.x w_spect_arg.x hmd_arg.x pbp_arg.x eig_arg.x p
 	${RPCGEN} $(RCFLAGS) fix_gauge_arg.x >${SRCDIR}/src/alg/alg_arg/fix_gauge_arg.C 
 	${RPCGEN} $(RHFLAGS) meas_arg.x >${SRCDIR}/include/alg/meas_arg.h
 	${RPCGEN} $(RCFLAGS) meas_arg.x >${SRCDIR}/src/alg/alg_arg/meas_arg.C
+	${RPCGEN} $(RHFLAGS) int_arg.x >${SRCDIR}/include/alg/int_arg.h
+	${RPCGEN} $(RCFLAGS) int_arg.x >${SRCDIR}/src/alg/alg_arg/int_arg.C
 	touch vml.stmp
 
 clean: 

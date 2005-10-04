@@ -1,22 +1,25 @@
+
+typedef float pooh;
+
 #ifndef VMLH
 #include"precision.h"
 #endif
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.7 2005-05-18 06:17:33 chulwoo Exp $
+  $Id: enum.x,v 1.8 2005-10-04 05:55:02 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2005-05-18 06:17:33 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.7 2005-05-18 06:17:33 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.7 2005-05-18 06:17:33 chulwoo Exp $*/
+/*  $Date: 2005-10-04 05:55:02 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.8 2005-10-04 05:55:02 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.8 2005-10-04 05:55:02 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.7 $*/
+/*  $Revision: 1.8 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -686,4 +689,61 @@ enum PatternType {
   ARRAY,	/*!< Masses are defined in a list. */
   LOG	/*!< Masses are elements of a geometric progression. */
 };
+
+/*! Different types of integrators used by the AlgIntFactory. */
+enum IntegratorType {
+  INT_LEAP=0,
+  INT_OMELYAN,
+  INT_SUM
+/*  INT_MOM,  These are currently not used by the IntegratorFactory
+  INT_GAUGE,
+  INT_FERMION,
+  INT_BOSON,
+  INT_RATIONAL,
+  INT_RATIONAL_SPLIT*/
+};
+
+/*! Define the level of the integrator (used to determine whether a CSM.comment is necesssary. */
+enum IntegratorLevel {
+  EMBEDDED_INTEGRATOR=0,
+  TOP_LEVEL_INTEGRATOR
+};
+
+/* Moved these from hmd_arg.x to allow use in other classes. */
+enum ReunitarizeType { 
+  REUNITARIZE_NO    = 0,
+  REUNITARIZE_YES   = 1 
+};
+
+/* Perform a reproducibility test? */
+enum ReproduceTest {
+  REPRODUCE_NO    = 0,
+  REPRODUCE_YES   = 1 
+};
+
+/* Perform a reproducibility test? */
+enum TestReproduceTest {
+  TEST_REPRODUCE_NO    = 0,
+  TEST_REPRODUCE_YES   = 1 
+};
+
+/* Perform a reversibility test? */
+enum ReverseTest { 
+  REVERSE_NO    = 0,
+  REVERSE_YES   = 1 
+};
+
+enum MetropolisType { 
+  METROPOLIS_NO    = 0,
+  METROPOLIS_YES   = 1 
+};
+
+enum RhmcPolesAction { 	RHMC_POLES_CALC = 0,
+ 			RHMC_POLES_READ = 1,
+			RHMC_POLES_CALC_WRITE = 2 };
+
+enum HmdLimits { 
+  MAX_HMD_MASSES=8 ,   /* The maximum number of dynamical masses.*/
+  MAX_RAT_DEGREE=20 /* The maximum degree of the rational approximation.*/
+}; 
 

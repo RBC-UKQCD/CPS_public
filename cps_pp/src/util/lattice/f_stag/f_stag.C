@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.16 2005-02-18 20:18:14 mclark Exp $
+  $Id: f_stag.C,v 1.17 2005-10-04 05:44:41 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -201,7 +201,8 @@ int Fstag::FmatEvlInv(Vector *f_out, Vector *f_in,
   VRB.Func(cname,fname);
 
   DiracOpStag stag(*this, f_out, f_in, cg_arg, cnv_frm);
-  iter = stag.InvCg(true_res);
+  iter = stag.InvCg(&(cg_arg->true_rsd));
+  if (true_res) *true_res = cg_arg ->true_rsd;
 
   stag.Dslash(f_tmp, f_out, CHKB_EVEN, DAG_NO);
 
@@ -212,7 +213,7 @@ int Fstag::FmatEvlInv(Vector *f_out, Vector *f_in,
 //------------------------------------------------------------------
 // int FmatEvlMInv(Vector *f_out, Vector *f_in, 
 //                Float shift[], int Nshift, 
-//                CgArg *cg_arg, Float *true_res,
+//                CgArg **cg_arg, Float *true_res,
 //		  CnvFrmType cnv_frm = CNV_FRM_YES):
 // It calculates f_out where (A + shift)* f_out = f_in and
 // A is the fermion matrix that appears in the HMC 
@@ -225,26 +226,26 @@ int Fstag::FmatEvlInv(Vector *f_out, Vector *f_in,
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
 int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
-		       int Nshift, int isz, CgArg *cg_arg,
+		       int Nshift, int isz, CgArg **cg_arg,
 		       CnvFrmType cnv_frm, MultiShiftSolveType type, 
 		       Float *alpha, Vector **f_out_d)
 {
   char *fname = "FmatMInv(V*, V*, .....)";
   VRB.Func(cname,fname);
 
-  Float dot = f_in -> NormSqGlbSum(e_vsize);
+  Float dot = f_in -> NormSqGlbSum4D(e_vsize);
 
   Float *RsdCG = new Float[Nshift];
-  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
+  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg[s]->stop_rsd;
 
   //Fake the constructor
-  DiracOpStag stag(*this, f_out[0], f_in, cg_arg, cnv_frm);
+  DiracOpStag stag(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
   int iter = stag.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
 
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
       stag.Dslash(f_out_d[s], f_out[s], CHKB_EVEN, DAG_NO);
-  cg_arg->true_rsd = RsdCG[isz];
+  for (int s=0; s<Nshift; s++) cg_arg[s]->true_rsd = RsdCG[s];
 
   delete[] RsdCG;
   return iter;
@@ -254,7 +255,7 @@ int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 //------------------------------------------------------------------
 // Lattice class api to the chronological inverter
 //------------------------------------------------------------------
-Float Fstag::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+void Fstag::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
 {
 
@@ -262,7 +263,7 @@ Float Fstag::FminResExt(Vector *sol, Vector *source, Vector **sol_old,
   VRB.Func(cname,fname);
   
   DiracOpStag stag(*this, sol, source, cg_arg, cnv_frm);
-  return stag.MinResExt(sol,source,sol_old,vm,degree);
+  stag.MinResExt(sol,source,sol_old,vm,degree);
   
 }
 
@@ -375,8 +376,8 @@ int Fstag::FeigSolv(Vector **f_eigenv, Float *lambda,
 // SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass):
 // It sets the pseudofermion field phi from frm_e, frm_o.
 //------------------------------------------------------------------
-void Fstag::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
-		   Float mass){
+Float Fstag::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
+		    Float mass){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
   CgArg cg_arg;
@@ -390,6 +391,8 @@ void Fstag::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o,
   fTimesV1MinusV2((IFloat *)phi, 2.*mass*GJP.XiBare()/GJP.XiV(), 
 	(IFloat *)frm_e, (IFloat *)phi, e_vsize);
   // End modification
+  
+  return 0.0;
 }
 
 
@@ -446,6 +449,19 @@ void Fstag::FforceSite(Matrix& force, Vector *frm, int *x, int mu)
     force.TrLessAntiHermMatrix(*mp1);
 }
 
+//!< Routine which allows bosonic staggered formulation.  Not sure why
+//!< anyone would want this, but included for completeness.
+void Fstag::BforceVector(Vector *in, CgArg *cg_arg) {
+
+  int iter;
+  char *fname = "BforceVector(V*)";
+  VRB.Func(cname,fname);
+
+  DiracOpStag stag(*this, f_tmp, in, cg_arg, CNV_FRM_NO);
+  stag.Dslash(f_tmp, in, CHKB_EVEN, DAG_NO);
+
+}
+
 
 //------------------------------------------------------------------
 // EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, 
@@ -482,7 +498,7 @@ void Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
 }
 
 void Fstag::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				 Float *alpha, Float mass, Float dt,
+				 int isz, Float *alpha, Float mass, Float dt,
 				 Vector **sol_d) {
   char *fname = "RHMC_EvolveMomFforce";
 

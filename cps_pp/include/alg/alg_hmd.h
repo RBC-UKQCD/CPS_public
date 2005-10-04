@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHmd class and derived classes.
 
-  $Id: alg_hmd.h,v 1.16 2005-10-03 04:56:42 chulwoo Exp $
+  $Id: alg_hmd.h,v 1.17 2005-10-04 05:53:40 chulwoo Exp $
 */
 //------------------------------------------------------------------
 
@@ -19,6 +19,7 @@ CPS_END_NAMESPACE
 #include <alg/alg_base.h>
 #include <alg/common_arg.h>
 #include <alg/hmd_arg.h>
+#include <alg/remez_arg.h>
 CPS_START_NAMESPACE
 
 
@@ -334,6 +335,7 @@ class AlgHmcQPQ : public AlgHmd
   to be greater than 2 in all directions.
 */
 //------------------------------------------------------------------
+
 class AlgHmcRHMC : public AlgHmd
 {
  private:
@@ -359,34 +361,32 @@ class AlgHmcRHMC : public AlgHmd
     int f_count;       
     int f_size;       
     //!< The size of a fermion field.
-    /*!< The size is given in terms of the total number of floating point
-      numbers in the field on the local lattice, taking into account whether
-      or not the field is defined on just a single parity.
-    */
 
-    CgArg **frm_cg_arg;
+    //!< The size is given in terms of the total number of floating
+    //!< point numbers in the field on the local lattice, taking into
+    //!< account whether or not the field is defined on just a single parity.
+
+    CgArg ***frm_cg_arg_md;
+    CgArg ***frm_cg_arg_mc;
     //!< Pointer to an array of structures containing solver parameters.
-    /*!<
-      These are the parameters corresponding to each of the dynamical fermion
-      masses.      
-     */
+    //!< These are the parameters corresponding to each of the dynamical 
+    //!< fermion masses.      
 
 
     CgArg **bsn_cg_arg;
     //!< Pointer to an array of structures containing solver parameters.
-    /*!<
-      These are the parameters corresponding to each of the dynamical boson
-      masses.      
-     */
+
+    //!< These are the parameters corresponding to each of the
+    //!< dynamical boson masses.      
 
     Vector** phi;
     //!< Pseudofermion fields
-    /*!< One for each mass */
+    //!< One for each mass
 
 
     Vector** bsn;
     //!< Boson (pseudoboson?) fields 
-    /*!< One for each mass */
+    //!< One for each mass
 
 
     Matrix* gauge_field_init;
@@ -403,37 +403,37 @@ class AlgHmcRHMC : public AlgHmd
 
     Vector** frmn;
     //!< Array of vectors
-    /*!< These will hold the solutions from the solves. */
+    //!< These will hold the solutions from the solves.
 
     Vector** frmn_d;
     //!< Array of vectors
-    /*!< These will hold the solutions from the solves multiplied by
-      the D-slash operator. */ 
+    //!< These will hold the solutions from the solves multiplied by
+    //!< the D-slash operator.
 
     Float *h_f_init;    
     //!< The initial value of the pseudofermion action.
-    /*!< The value at the start of the trajectory. One for each mass */
+    //!< The value at the start of the trajectory. One for each mass
 
     Float *h_f_final;   
     //!< The final value of the pseudofermion action.
-    /*!< The value at the end of the trajectory. One for each mass */
+    //!< The value at the end of the trajectory. One for each mass 
 
 
     Float *delta_h_f;   
     //!< The change in the value of the pseudofermion action.
-    /*!< The final value - the initial value. One for each mass */
+    //!< The final value - the initial value. One for each mass
 
     Float *h_b_init;    
     //!< The initial value of the boson action.
-    /*!< The value at the start of the trajectory. One for each mass */
+    //!< The value at the start of the trajectory. One for each mass
 
     Float *h_b_final;   
     //!< The final value of the boson action.
-    /*!< The value at the end of the trajectory. One for each mass */
+    //!< The value at the end of the trajectory. One for each mass
 
     Float *delta_h_b;   
     //!< The change in the value of the boson action.
-    /*!< The final value - the initial value. One for each mass */
+    //!< The final value - the initial value. One for each mass 
 
     int total_size;
     //!< The sum of the rational approximation degrees used for the force
@@ -445,6 +445,8 @@ class AlgHmcRHMC : public AlgHmd
     //!< ?
 
     Float **alpha;
+
+    RemezArg remez_arg;
 
  public:
 
@@ -460,9 +462,11 @@ class AlgHmcRHMC : public AlgHmd
   Float run(void);
 
   //! Automatic generation of the rational approximation.
+  // currently broken
   void generateApprox(HmdArg*);
 
   //! Dynamical generation of the rational approximation.
+  // currently broken
   void dynamicalApprox();
 
 };
@@ -592,7 +596,7 @@ class AlgHmdR2 : public AlgHmd
       or not the field is defined on just a single parity.
     */
 
-    CgArg *frm_cg_arg;
+    CgArg **frm_cg_arg;
     //!< Pointer to an array of structures containing solver parameters.
     /*!<
       These are the parameters corresponding to each of the dynamical fermion

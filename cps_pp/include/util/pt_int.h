@@ -1,20 +1,19 @@
 #ifndef _PT_INT_H_
 #define _PT_INT_H_
-#include <config.h>
+//#include <config.h>
 #include <util/gauge_agg.h>
-//#include <util/lattice.h>
-#include <util/amalloc.h>
+
 #include <util/asqtad_int.h>
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.13 2005-06-16 14:27:56 chulwoo Exp $
+  $Id: pt_int.h,v 1.14 2005-10-04 05:56:24 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
-
-
-
 #include <qcdocos/scu_dir_arg.h>
+void* pt_amalloc(void*  (*allocator)(size_t, const char *vname,
+			  const char *fname, const char *cname),
+	      size_t, int, ...);
 struct PTArg {
   int size[4];
   int local[4];

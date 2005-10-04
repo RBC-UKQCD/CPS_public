@@ -13,6 +13,8 @@
 #include <util/defines.h>
 CPS_START_NAMESPACE
 
+typedef float pooh;
+
 typedef double Float;
 
 typedef double IFloat;
@@ -547,6 +549,71 @@ enum PatternType {
 typedef enum PatternType PatternType;
 extern struct vml_enum_map PatternType_map[];
 
+enum IntegratorType {
+	INT_LEAP = 0,
+	INT_OMELYAN = 0 + 1,
+	INT_SUM = 0 + 2,
+};
+typedef enum IntegratorType IntegratorType;
+extern struct vml_enum_map IntegratorType_map[];
+
+enum IntegratorLevel {
+	EMBEDDED_INTEGRATOR = 0,
+	TOP_LEVEL_INTEGRATOR = 0 + 1,
+};
+typedef enum IntegratorLevel IntegratorLevel;
+extern struct vml_enum_map IntegratorLevel_map[];
+
+enum ReunitarizeType {
+	REUNITARIZE_NO = 0,
+	REUNITARIZE_YES = 1,
+};
+typedef enum ReunitarizeType ReunitarizeType;
+extern struct vml_enum_map ReunitarizeType_map[];
+
+enum ReproduceTest {
+	REPRODUCE_NO = 0,
+	REPRODUCE_YES = 1,
+};
+typedef enum ReproduceTest ReproduceTest;
+extern struct vml_enum_map ReproduceTest_map[];
+
+enum TestReproduceTest {
+	TEST_REPRODUCE_NO = 0,
+	TEST_REPRODUCE_YES = 1,
+};
+typedef enum TestReproduceTest TestReproduceTest;
+extern struct vml_enum_map TestReproduceTest_map[];
+
+enum ReverseTest {
+	REVERSE_NO = 0,
+	REVERSE_YES = 1,
+};
+typedef enum ReverseTest ReverseTest;
+extern struct vml_enum_map ReverseTest_map[];
+
+enum MetropolisType {
+	METROPOLIS_NO = 0,
+	METROPOLIS_YES = 1,
+};
+typedef enum MetropolisType MetropolisType;
+extern struct vml_enum_map MetropolisType_map[];
+
+enum RhmcPolesAction {
+	RHMC_POLES_CALC = 0,
+	RHMC_POLES_READ = 1,
+	RHMC_POLES_CALC_WRITE = 2,
+};
+typedef enum RhmcPolesAction RhmcPolesAction;
+extern struct vml_enum_map RhmcPolesAction_map[];
+
+enum HmdLimits {
+	MAX_HMD_MASSES = 8,
+	MAX_RAT_DEGREE = 20,
+};
+typedef enum HmdLimits HmdLimits;
+extern struct vml_enum_map HmdLimits_map[];
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -554,6 +621,7 @@ extern "C" {
 #endif
 
 #if defined(__STDC__) || defined(__cplusplus)
+extern  bool_t vml_pooh (VML *, char *instance, pooh*);
 extern  bool_t vml_Float (VML *, char *instance, Float*);
 extern  bool_t vml_IFloat (VML *, char *instance, IFloat*);
 extern  bool_t vml_DirType (VML *, char *instance, DirType*);
@@ -590,8 +658,18 @@ extern  bool_t vml_WExtMesonBEOp (VML *, char *instance, WExtMesonBEOp*);
 extern  bool_t vml_WExtMesonBECategory (VML *, char *instance, WExtMesonBECategory*);
 extern  bool_t vml_FieldTensorId (VML *, char *instance, FieldTensorId*);
 extern  bool_t vml_PatternType (VML *, char *instance, PatternType*);
+extern  bool_t vml_IntegratorType (VML *, char *instance, IntegratorType*);
+extern  bool_t vml_IntegratorLevel (VML *, char *instance, IntegratorLevel*);
+extern  bool_t vml_ReunitarizeType (VML *, char *instance, ReunitarizeType*);
+extern  bool_t vml_ReproduceTest (VML *, char *instance, ReproduceTest*);
+extern  bool_t vml_TestReproduceTest (VML *, char *instance, TestReproduceTest*);
+extern  bool_t vml_ReverseTest (VML *, char *instance, ReverseTest*);
+extern  bool_t vml_MetropolisType (VML *, char *instance, MetropolisType*);
+extern  bool_t vml_RhmcPolesAction (VML *, char *instance, RhmcPolesAction*);
+extern  bool_t vml_HmdLimits (VML *, char *instance, HmdLimits*);
 
 #else /* K&R C */
+extern  bool_t vml_pooh (VML *, char *instance, pooh*);
 extern  bool_t vml_Float (VML *, char *instance, Float*);
 extern  bool_t vml_IFloat (VML *, char *instance, IFloat*);
 extern  bool_t vml_DirType (VML *, char *instance, DirType*);
@@ -628,6 +706,15 @@ extern  bool_t vml_WExtMesonBEOp (VML *, char *instance, WExtMesonBEOp*);
 extern  bool_t vml_WExtMesonBECategory (VML *, char *instance, WExtMesonBECategory*);
 extern  bool_t vml_FieldTensorId (VML *, char *instance, FieldTensorId*);
 extern  bool_t vml_PatternType (VML *, char *instance, PatternType*);
+extern  bool_t vml_IntegratorType (VML *, char *instance, IntegratorType*);
+extern  bool_t vml_IntegratorLevel (VML *, char *instance, IntegratorLevel*);
+extern  bool_t vml_ReunitarizeType (VML *, char *instance, ReunitarizeType*);
+extern  bool_t vml_ReproduceTest (VML *, char *instance, ReproduceTest*);
+extern  bool_t vml_TestReproduceTest (VML *, char *instance, TestReproduceTest*);
+extern  bool_t vml_ReverseTest (VML *, char *instance, ReverseTest*);
+extern  bool_t vml_MetropolisType (VML *, char *instance, MetropolisType*);
+extern  bool_t vml_RhmcPolesAction (VML *, char *instance, RhmcPolesAction*);
+extern  bool_t vml_HmdLimits (VML *, char *instance, HmdLimits*);
 
 #endif /* K&R C */
 

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpStagTypes class eigensolver methods.
    
-  $Id: eigen_stag.C,v 1.8 2004-08-18 11:57:51 zs Exp $
+  $Id: eigen_stag.C,v 1.9 2005-10-04 05:49:47 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.8 2004-08-18 11:57:51 zs Exp $
-//  $Id: eigen_stag.C,v 1.8 2004-08-18 11:57:51 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-10-04 05:49:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.9 2005-10-04 05:49:47 chulwoo Exp $
+//  $Id: eigen_stag.C,v 1.9 2005-10-04 05:49:47 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: eigen_stag.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v $
 //  $State: Exp $
 //
@@ -186,7 +186,7 @@ int DiracOpStagTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[], E
 	RitzMat(tmp, psi[i]);
 
 	for(j = 0; j < i; j++)
-	  off_diag[ij++] = psi[j]->CompDotProductGlbSum(tmp, f_size);
+	  off_diag[ij++] = psi[j]->CompDotProductGlbSum4D(tmp, f_size);
 
 	VRB.Sfree(cname,fname, "tmp", tmp);
 	sfree(tmp);
@@ -267,7 +267,7 @@ int DiracOpStagTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[], E
        of (-1)^x D_slash */
     Dslash(tmp, psi[i], CHKB_EVEN, DAG_NO);
     
-    Float normfact = 0.5 / tmp->ReDotProductGlbSum(tmp, f_size);
+    Float normfact = 0.5 / tmp->ReDotProductGlbSum4D(tmp, f_size);
     psi[i]->VecTimesEquFloat(sqrt(0.5), f_size);
     tmp->VecTimesEquFloat(sqrt(normfact), f_size);
 

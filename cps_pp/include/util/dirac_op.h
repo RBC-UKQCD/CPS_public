@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.16 2005-03-07 00:03:10 chulwoo Exp $
+  $Id: dirac_op.h,v 1.17 2005-10-04 05:55:53 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -139,8 +139,8 @@ class DiracOp
 	     MultiShiftSolveType type, Float *alpha);
 
   //! Chronological initial guess for the solver. 
-  Float MinResExt(Vector *psi, Vector *phi, Vector **psi_old, 
-		  Vector **vm, int degree);
+  void MinResExt(Vector *psi, Vector *phi, Vector **psi_old, 
+		 Vector **vm, int degree);
 
 // Pure virtual functions
 //------------------------------------------------------------------

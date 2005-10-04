@@ -13,35 +13,6 @@
 #include <util/defines.h>
 CPS_START_NAMESPACE
 
-enum ReunitarizeType {
-	REUNITARIZE_NO = 0,
-	REUNITARIZE_YES = 1,
-};
-typedef enum ReunitarizeType ReunitarizeType;
-extern struct vml_enum_map ReunitarizeType_map[];
-
-enum MetropolisType {
-	METROPOLIS_NO = 0,
-	METROPOLIS_YES = 1,
-};
-typedef enum MetropolisType MetropolisType;
-extern struct vml_enum_map MetropolisType_map[];
-
-enum RhmcPolesAction {
-	RHMC_POLES_CALC = 0,
-	RHMC_POLES_READ = 1,
-	RHMC_POLES_CALC_WRITE = 2,
-};
-typedef enum RhmcPolesAction RhmcPolesAction;
-extern struct vml_enum_map RhmcPolesAction_map[];
-
-enum HmdLimits {
-	MAX_HMD_MASSES = 8,
-	MAX_RAT_DEGREE = 20,
-};
-typedef enum HmdLimits HmdLimits;
-extern struct vml_enum_map HmdLimits_map[];
-
 typedef Float FRatVec[MAX_RAT_DEGREE];
 
 typedef int IMassVec[MAX_HMD_MASSES];
@@ -67,7 +38,7 @@ public:
 	long precision;
 	int isz;
 	int sw;
-	int chrono;
+	IMassVec chrono;
 	int reproduce;
 	int reproduce_attempt_limit;
 	FMassVec frm_mass;
@@ -75,8 +46,8 @@ public:
 	FMassVec bsn_mass;
 	IMassVec max_num_iter;
 	FMassVec stop_rsd;
-	FMassVec stop_rsd_md;
-	FMassVec stop_rsd_mc;
+	FRatMassVec stop_rsd_md;
+	FRatMassVec stop_rsd_mc;
 	FieldType field_type[MAX_HMD_MASSES];
 	IMassVec valid_approx;
 	FMassVec lambda_low;
@@ -88,13 +59,13 @@ public:
 	IMassVec frm_power_num;
 	IMassVec frm_power_den;
 	IMassVec FRatDeg;
+	IMassVec SRatDeg;
 	IMassVec FRatDegNew;
 	IMassVec SRatDegNew;
 	FMassVec FRatError;
 	FMassVec FRatNorm;
 	FRatMassVec FRatRes;
 	FRatMassVec FRatPole;
-	IMassVec SRatDeg;
 	FMassVec SRatError;
 	FMassVec SRatNorm;
 	FRatMassVec SRatRes;
@@ -110,15 +81,13 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
-	FclassType Fermion;
-	GclassType Gluon;
 	int traj_start;
 	int gauge_unload_period;
 	int gauge_configurations;
 	int io_concurrency;
 	int hdw_xcsum;
 	int hdw_rcsum;
-	int reproduce_period;
+	int reproduce_interval;
 	char *ensemble_id;
 	char *ensemble_label;
 	char *creator;
@@ -129,7 +98,9 @@ public:
 	char *evo_stem;
 	char *w_spect_directory;
 	char *work_directory;
-	int inline_measure;
+	int measure_pbp;
+	int measure_eig;
+	int measure_w_spect;
 	char *eig_lo_stem;
 	char *eig_hi_stem;
 };
@@ -143,13 +114,13 @@ public:
 	IMassVec frm_power_num;
 	IMassVec frm_power_den;
 	IMassVec FRatDeg;
+	IMassVec SRatDeg;
 	IMassVec FRatDegNew;
 	IMassVec SRatDegNew;
 	FMassVec FRatError;
 	FMassVec FRatNorm;
 	FRatMassVec FRatRes;
 	FRatMassVec FRatPole;
-	IMassVec SRatDeg;
 	FMassVec SRatError;
 	FMassVec SRatNorm;
 	FRatMassVec SRatRes;
@@ -166,10 +137,6 @@ extern "C" {
 #endif
 
 #if defined(__STDC__) || defined(__cplusplus)
-extern  bool_t vml_ReunitarizeType (VML *, char *instance, ReunitarizeType*);
-extern  bool_t vml_MetropolisType (VML *, char *instance, MetropolisType*);
-extern  bool_t vml_RhmcPolesAction (VML *, char *instance, RhmcPolesAction*);
-extern  bool_t vml_HmdLimits (VML *, char *instance, HmdLimits*);
 extern  bool_t vml_FRatVec (VML *, char *instance, FRatVec);
 extern  bool_t vml_IMassVec (VML *, char *instance, IMassVec);
 extern  bool_t vml_FMassVec (VML *, char *instance, FMassVec);
@@ -179,10 +146,6 @@ extern  bool_t vml_EvoArg (VML *, char *instance, EvoArg*);
 extern  bool_t vml_RhmcPolesState (VML *, char *instance, RhmcPolesState*);
 
 #else /* K&R C */
-extern  bool_t vml_ReunitarizeType (VML *, char *instance, ReunitarizeType*);
-extern  bool_t vml_MetropolisType (VML *, char *instance, MetropolisType*);
-extern  bool_t vml_RhmcPolesAction (VML *, char *instance, RhmcPolesAction*);
-extern  bool_t vml_HmdLimits (VML *, char *instance, HmdLimits*);
 extern  bool_t vml_FRatVec (VML *, char *instance, FRatVec);
 extern  bool_t vml_IMassVec (VML *, char *instance, IMassVec);
 extern  bool_t vml_FMassVec (VML *, char *instance, FMassVec);

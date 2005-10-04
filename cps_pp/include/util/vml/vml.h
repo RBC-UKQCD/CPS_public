@@ -135,7 +135,7 @@ extern bool_t vml_bytes (VML *__vmls, char *name, char **__cpp, u_int *__sizep,
 extern bool_t vml_opaque (VML *__vmls, char *name, caddr_t __cp, u_int __cnt);
 extern bool_t vml_string (VML *__vmls, char *name, char **__cpp, u_int __maxsize);
 extern bool_t vml_union (VML *__vmls, char *name, enum_t *__dscmp, char *__unp,
-			      __const struct vml_discrim *__choices,
+			      const struct vml_discrim *__choices,
 			      vmlproc_t dfault);
 extern bool_t vml_char (VML *__vmls, char *name, char *__cp);
 extern bool_t vml_u_char (VML *__vmls, char *name, u_char *__cp);
