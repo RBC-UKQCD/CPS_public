@@ -21,6 +21,7 @@ DoArg::DoArg () {
   s_nodes=1;
   cg_reprod_freq = 0;
   verbose_level=-1202; //RESULT
+  checksum_level=0;
   xi_bare=1.0;
   xi_dir=3;
   xi_v=1.0;
@@ -34,13 +35,13 @@ DoArg::DoArg () {
   start_seed_filename = "start_seed";
   start_conf_filename = "start_conf";
 #if TARGET == QCDOC
-  start_conf_alloc_flag = QCOMMS; 
+  start_conf_alloc_flag = QFAST|QCOMMS; 
   wfm_send_alloc_flag = QFAST|QCOMMS;
   wfm_alloc_flag = QFAST|QCOMMS;
 #else
-  wfm_send_alloc_flag = 0;
-  wfm_alloc_flag = 0;
-  start_conf_alloc_flag = 0; 
+  wfm_send_alloc_flag = 6;
+  wfm_alloc_flag = 6;
+  start_conf_alloc_flag = 6; 
 #endif
   dwf_a5_inv=1.0;
   power_plaq_cutoff = 0.;
