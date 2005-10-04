@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.7 2005-05-12 20:45:24 chulwoo Exp $
+  $Id: f_p4.C,v 1.8 2005-10-04 05:43:22 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -104,7 +104,9 @@ int Fp4::FmatEvlInv(Vector *f_out, Vector *f_in,
   VRB.Func(cname,fname);
 
   DiracOpP4 p4(*this, f_out, f_in, cg_arg, cnv_frm);
-  iter = p4.InvCg(true_res);
+
+  iter = p4.InvCg(&(cg_arg->true_rsd));
+  if (true_res) *true_res = cg_arg ->true_rsd;
 
   p4.Dslash(f_tmp, f_out, CHKB_EVEN, DAG_NO);
 
@@ -140,25 +142,28 @@ int Fp4::FmatEvlMInv(Vector * a, Vector * b, Float * c, int d, int e,
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
 int Fp4::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
-			 int Nshift, int isz, CgArg *cg_arg,
+			 int Nshift, int isz, CgArg **cg_arg,
 			 CnvFrmType cnv_frm, MultiShiftSolveType type, 
 			 Float *alpha, Vector** f_out_d)
 {
   char *fname = "FmatMInv(V**, V*, .....)";
   VRB.Func(cname,fname);
 
-  double dot = f_in -> NormSqGlbSum(e_vsize);
+  double dot = f_in -> NormSqGlbSum4D(e_vsize);
 
 //  Float RsdCG[Nshift];
   Float *RsdCG = (Float *)smalloc(sizeof(Float)*Nshift);
-  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
+  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg[s]->stop_rsd;
 
   //Fake the constructor
-  DiracOpP4 p4(*this, f_out[0], f_in, cg_arg, cnv_frm);
+  DiracOpP4 p4(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
 
   int iter = p4.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);
 
-  cg_arg->true_rsd = RsdCG[isz];
+  if (type == MULTI && f_out_d != 0)
+    for (int s=0; s<Nshift; s++)
+      p4.Dslash(f_out_d[s], f_out[s], CHKB_EVEN, DAG_NO);
+  for (int s=0; s<Nshift; s++) cg_arg[s]->true_rsd = RsdCG[s];
 
   sfree(RsdCG);
   return iter;
@@ -168,7 +173,7 @@ int Fp4::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 //------------------------------------------------------------------
 // Lattice class api to the chronological inverter
 //------------------------------------------------------------------
-Float Fp4::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+void Fp4::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
 {
 
@@ -176,7 +181,7 @@ Float Fp4::FminResExt(Vector *sol, Vector *source, Vector **sol_old,
   VRB.Func(cname,fname);
   
   DiracOpP4 p4(*this, sol, source, cg_arg, cnv_frm);
-  return p4.MinResExt(sol,source,sol_old,vm,degree);
+  p4.MinResExt(sol,source,sol_old,vm,degree);
   
 }
 
@@ -274,8 +279,9 @@ int Fp4::FeigSolv(Vector **f_eigenv, Float lambda[],
 //------------------------------------------------------------------
 // SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass):
 // It sets the pseudofermion field phi from frm_e, frm_o.
+// Modified - now returns the (trivial) value of the action
 //------------------------------------------------------------------
-void Fp4::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
+Float Fp4::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
 		   Float mass){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
@@ -291,6 +297,7 @@ void Fp4::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o,
   fTimesV1MinusV2((IFloat *)phi, 2.*mass*GJP.XiBare()/GJP.XiV(), 
 	(IFloat *)frm_e, (IFloat *)phi, e_vsize);
 
+  return 0.0;
 }
 
 
@@ -338,8 +345,24 @@ void Fp4::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
 
 }
 
+
+//!< Routine which allows bosonic p4 formulation.  Not sure why
+//!< anyone would want this, but included for completeness.
+void Fp4::BforceVector(Vector *in, CgArg *cg_arg) {
+
+  int iter;
+  char *fname = "BforceVector(V*)";
+  VRB.Func(cname,fname);
+
+  DiracOpStag stag(*this, f_tmp, in, cg_arg, CNV_FRM_NO);
+  stag.Dslash(f_tmp, in, CHKB_EVEN, DAG_NO);
+
+}
+
+
 void Fp4::RHMC_EvolveMomFforce(Matrix * mom, Vector ** vect, int abc,
-Float * def, Float ghi, Float jkl, Vector ** vect2)
+			       int isz, Float * def, Float ghi, 
+			       Float jkl, Vector ** vect2)
 {
   ERR.NotImplemented(cname,"RHMC_EvolveMomFforce()");
 }

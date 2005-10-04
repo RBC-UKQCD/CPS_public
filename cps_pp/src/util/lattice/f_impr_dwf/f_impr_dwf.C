@@ -61,7 +61,7 @@ int FimprDwf::FmatEvlInv(Vector *f_out, Vector *f_in,
 // It sets the pseudofermion field phi from frm1, frm2.
 // Note that frm2 is not used.
 //------------------------------------------------------------------
-void FimprDwf::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+Float FimprDwf::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 		  Float mass){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
@@ -78,7 +78,7 @@ void FimprDwf::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 
   dwf.MatPcDag(phi, frm1) ;
 
-  return ;
+  return FhamiltonNode(frm1, frm1);
 }
 
 //------------------------------------------------------------------

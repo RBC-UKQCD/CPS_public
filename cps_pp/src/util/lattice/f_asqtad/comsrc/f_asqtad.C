@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of some Fasqtad class methods.
 
-  $Id: f_asqtad.C,v 1.23 2005-04-05 06:44:49 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.24 2005-10-04 05:42:37 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -102,7 +102,8 @@ int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in,
   VRB.Func(cname,fname);
 
   DiracOpAsqtad asqtad(*this, f_out, f_in, cg_arg, cnv_frm);
-  iter = asqtad.InvCg(true_res);
+  iter = asqtad.InvCg(&(cg_arg->true_rsd));
+  if (true_res) *true_res = cg_arg ->true_rsd;
 
   asqtad.Dslash(f_tmp, f_out, CHKB_EVEN, DAG_NO);
 
@@ -129,29 +130,29 @@ int Fasqtad::FmatEvlInv(Vector *f_out, Vector *f_in,
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
 int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
-			 int Nshift, int isz, CgArg *cg_arg,
+			 int Nshift, int isz, CgArg **cg_arg,
 			 CnvFrmType cnv_frm, MultiShiftSolveType type, 
-			 Float *alpha, Vector** f_out_d)
+			 Float *alpha, Vector **f_out_d)
 {
   char *fname = "FmatMInv(V**, V*, .....)";
   VRB.Func(cname,fname);
 
-  Float dot = f_in -> NormSqGlbSum(e_vsize);
+  Float dot = f_in -> NormSqGlbSum4D(e_vsize);
 
-  Float *RsdCG = (Float *)smalloc(sizeof(Float)*Nshift);
-  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
+  Float *RsdCG = new Float[Nshift];
+  for (int s=0; s<Nshift; s++)
+    RsdCG[s] = cg_arg[s]->stop_rsd;
 
   //Fake the constructor
-  DiracOpAsqtad asqtad(*this, f_out[0], f_in, cg_arg, cnv_frm);
-
+  DiracOpAsqtad asqtad(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
   int iter = asqtad.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);
 
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
       asqtad.Dslash(f_out_d[s], f_out[s], CHKB_EVEN, DAG_NO);
-  cg_arg->true_rsd = RsdCG[isz];
+  for (int s=0; s<Nshift; s++) cg_arg[s]->true_rsd = RsdCG[s];
   
-  sfree(RsdCG);
+  delete[] RsdCG;
   return iter;
 
 }
@@ -159,7 +160,7 @@ int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 //------------------------------------------------------------------
 // Lattice class api to the chronological inverter
 //------------------------------------------------------------------
-Float Fasqtad::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+void Fasqtad::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
 {
 
@@ -167,7 +168,7 @@ Float Fasqtad::FminResExt(Vector *sol, Vector *source, Vector **sol_old,
   VRB.Func(cname,fname);
   
   DiracOpAsqtad asqtad(*this, sol, source, cg_arg, cnv_frm);
-  return asqtad.MinResExt(sol,source,sol_old,vm,degree);
+  asqtad.MinResExt(sol,source,sol_old,vm,degree);
   
 }
 
@@ -265,8 +266,9 @@ int Fasqtad::FeigSolv(Vector **f_eigenv, Float lambda[],
 //------------------------------------------------------------------
 // SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass):
 // It sets the pseudofermion field phi from frm_e, frm_o.
+// Modified - now returns the (trivial) value of the action
 //------------------------------------------------------------------
-void Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
+Float Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
 		   Float mass){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
@@ -282,6 +284,7 @@ void Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o,
   fTimesV1MinusV2((IFloat *)phi, 2.*mass*GJP.XiBare()/GJP.XiV(), 
 	(IFloat *)frm_e, (IFloat *)phi, e_vsize);
 
+  return 0.0;
 }
 
 
@@ -303,6 +306,19 @@ Float Fasqtad::BhamiltonNode(Vector *boson, Float mass){
   return ham;
 }
 
+
+//!< Routine which allows bosonic asqtad formulation.  Not sure why
+//!< anyone would want this, but included for completeness.
+void Fasqtad::BforceVector(Vector *in, CgArg *cg_arg) {
+
+  int iter;
+  char *fname = "BforceVector(V*)";
+  VRB.Func(cname,fname);
+
+  DiracOpAsqtad asqtad(*this, f_tmp, in, cg_arg, CNV_FRM_NO);
+  asqtad.Dslash(f_tmp, in, CHKB_EVEN, DAG_NO);
+
+}
 
 
 //------------------------------------------------------------------

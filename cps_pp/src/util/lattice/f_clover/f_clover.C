@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fclover class.
 
-  $Id: f_clover.C,v 1.15 2005-02-18 20:18:12 mclark Exp $
+  $Id: f_clover.C,v 1.16 2005-10-04 05:42:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2005-02-18 20:18:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.15 2005-02-18 20:18:12 mclark Exp $
-//  $Id: f_clover.C,v 1.15 2005-02-18 20:18:12 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-10-04 05:42:50 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.16 2005-10-04 05:42:50 chulwoo Exp $
+//  $Id: f_clover.C,v 1.16 2005-10-04 05:42:50 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_clover.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -168,14 +168,16 @@ int Fclover::FmatEvlInv(Vector *f_out, Vector *f_in,
 
   DiracOpClover clover(*this, f_out, f_in, cg_arg, cnv_frm);
   
-  iter = clover.MatEvlInv(true_res);
+  iter = clover.InvCg(&(cg_arg->true_rsd));
+  if (true_res) *true_res = cg_arg ->true_rsd;
+
 
   // Return the number of CG iterations
   return iter;
 }
 
 int Fclover::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
-			 int Nshift, int isz, CgArg *cg_arg, 
+			 int Nshift, int isz, CgArg **cg_arg, 
 			 CnvFrmType cnv_frm, MultiShiftSolveType type, 
 			 Float *alpha, Vector **f_out_d)
 {
@@ -186,7 +188,7 @@ int Fclover::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 }
 
 
-Float Fclover::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+void Fclover::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
 {
 
@@ -194,7 +196,7 @@ Float Fclover::FminResExt(Vector *sol, Vector *source, Vector **sol_old,
   VRB.Func(cname,fname);
   
   DiracOpClover clover(*this, sol, source, cg_arg, cnv_frm);
-  return clover.MinResExt(sol,source,sol_old,vm,degree);
+  clover.MinResExt(sol,source,sol_old,vm,degree);
   
 }
 
@@ -294,7 +296,7 @@ int Fclover::FeigSolv(Vector **f_eigenv, Float *lambda,
   for(int i=0; i < eig_arg->N_eig; ++i)
   {
     Gamma5(v1, f_eigenv[i], GJP.VolNodeSites());
-    chirality[i] = f_eigenv[i]->ReDotProductGlbSum(v1, f_size);
+    chirality[i] = f_eigenv[i]->ReDotProductGlbSum4D(v1, f_size);
     lambda[i] *= factor;
   }
 
@@ -309,8 +311,9 @@ int Fclover::FeigSolv(Vector **f_eigenv, Float *lambda,
 //------------------------------------------------------------------
 // SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass):
 // It sets the pseudofermion field phi from frm1, frm2.
+// Modified - now returns the (trivial) value of the action
 //------------------------------------------------------------------
-void Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+Float Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 		     Float mass){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
@@ -318,11 +321,8 @@ void Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
   CgArg cg_arg;
   cg_arg.mass = mass;
 
-  if (phi == 0)
-    ERR.Pointer(cname,fname,"phi") ;
-
-  if (frm1 == 0)
-    ERR.Pointer(cname,fname,"frm1") ;
+  if (phi == 0) ERR.Pointer(cname,fname,"phi") ;
+  if (frm1 == 0) ERR.Pointer(cname,fname,"frm1") ;
 
   Fconvert(frm1,WILSON,CANONICAL);
   DiracOpClover clover(*this, frm1, frm2, &cg_arg, CNV_FRM_NO);
@@ -332,43 +332,11 @@ void Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
   IFloat *frm1_even = (IFloat *)frm1 + vec_size;
   IFloat *phi_even = (IFloat *)phi + vec_size;  
   IFloat *A_even = (IFloat *)Aux0Ptr();
-//  printf("frm1_even %e %e\n",*(frm1_even-1),*frm1_even);
 
 // phi_odd = (Aoo - kappa*kappa*Doe Aee^inv Deo)^dagger frm1_odd
-
-#if 0
-  {IFloat *tmp = (IFloat *)frm1;
-    printf("Coor = %d %d %d %d\n",
-      GJP.XnodeCoor(),
-      GJP.YnodeCoor(),
-      GJP.ZnodeCoor(),
-      GJP.TnodeCoor());
-    for(int i = 0;i<GJP.VolNodeSites()*FsiteSize();i++,tmp++){
-    *tmp=0.;
-    if(GJP.XnodeCoor() == 0 &&
-      GJP.YnodeCoor() == 0 &&
-      GJP.ZnodeCoor() == 0 &&
-      GJP.TnodeCoor() == 0 &&
-	i==96) *tmp=1.;
-    if (fabs(*tmp)>1e-5)
-    printf("frm1[%d][%d]=%e\n",i/FsiteSize(),i%FsiteSize(),*(tmp) );
-    }
-  }
-#endif
   clover.MatPcDag(phi, frm1);  
-#if 0
-  {IFloat *tmp = (IFloat *)phi;
-    for(int i = 0;i<GJP.VolNodeSites()*FsiteSize();i++,tmp++)
-//    if (fabs(*tmp)>1e-5 && (i%FsiteSize()==0))
-    if (fabs(*tmp)>1e-5)
-    printf("phi[%d][%d]=%e\n",i/FsiteSize(),i%FsiteSize(),*(tmp) );
-    tmp++;
-  }
-#endif
 
-//--------------------------------------------------------------------
 // Calculate the clover matrices for the EVEN checkerboard
-
   IFloat *Ap = A_even;
   for (int i = 0; i < GJP.VolNodeSites(); ++i) {
     mat_inv(Ap, Ap, 6, MAT_INV_ALG_LDL_CMPR, 0);    
@@ -381,7 +349,7 @@ void Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
                    (const IFloat *)frm1_even, 
                    half_sites);    
 
-  return;
+  return FhamiltonNode(frm1, frm1);
   
 }
 
@@ -663,7 +631,7 @@ void Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
 }
 
 void Fclover::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				   Float *alpha, Float mass, Float dt,
+				   int isz, Float *alpha, Float mass, Float dt,
 				   Vector **sol_d) {
   char *fname = "RHMC_EvolveMomFforce";
 

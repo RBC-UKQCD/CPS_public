@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fnone class.
 
-  $Id: f_none.C,v 1.11 2005-02-18 20:18:13 mclark Exp $
+  $Id: f_none.C,v 1.12 2005-10-04 05:43:21 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -129,13 +129,13 @@ int Fnone::FmatEvlInv(Vector *f_out, Vector *f_in,
 
 //------------------------------------------------------------------
 // int FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
-//                 int Nshift, int isz, CgArg *cg_arg, 
+//                 int Nshift, int isz, CgArg **cg_arg, 
 //                 CnvFrmType cnv_frm, MultiShiftSolveType type,
 //                 Float *alpha, Vector **f_out_d);
 // It does nothing and returns 0.
 //------------------------------------------------------------------
 int Fnone::FmatEvlMInv(Vector **out, Vector *in, Float *shift, 
-		       int Nshift, int isz, CgArg *cg_arg, CnvFrmType cnv_frm,
+		       int Nshift, int isz, CgArg **cg_arg, CnvFrmType cnv_frm,
 		       MultiShiftSolveType type, Float *alpha, Vector **out_d)
 {
   char *fname = "FmatEvlMInv(V**,V*, .....)";
@@ -149,14 +149,13 @@ int Fnone::FmatEvlMInv(Vector **out, Vector *in, Float *shift,
 // Lattice class api to the chronological inverter
 // It does nothing and returns 0.
 //------------------------------------------------------------------
-Float Fnone::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+void Fnone::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
 {
 
   char *fname = "FminResExt(V*, V*, V**, V**, int, CgArg *, CnvFrmType)";
   VRB.Func(cname,fname);
-  
-  return 0.0;
+
 }
 
 
@@ -213,10 +212,11 @@ int Fnone::FeigSolv(Vector **f_eigenv, Float *lambda,
 // SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass):
 //! Does nothing.
 //------------------------------------------------------------------
-void Fnone::SetPhi(Vector *phi, Vector *frm1, Vector *frm2, 
+Float Fnone::SetPhi(Vector *phi, Vector *frm1, Vector *frm2, 
 		   Float mass){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
+  return 0.0;
 }
 
 
@@ -248,8 +248,8 @@ void Fnone::EvolveMomFforce(Matrix *mom, Vector *frm,
 }
 
 void Fnone::RHMC_EvolveMomFforce(Matrix *mom, Vector **frm, int degree, 
-				 Float *alpha, Float mass,  Float step_size,
-				 Vector **frm_d){
+				 int isz, Float *alpha, Float mass,  
+				 Float step_size, Vector **frm_d){
   char *fname = "EvolveMomFforce(M*,V**,F,F,F)";
   VRB.Func(cname,fname);
 }
@@ -281,6 +281,10 @@ Float Fnone::BhamiltonNode(Vector *boson, Float mass){
 }
 
 
+//!< Dummy routine for Wilson fermions
+void Fnone::BforceVector(Vector *in, CgArg *cg_arg) {
+
+}
 
 
 //------------------------------------------------------------------

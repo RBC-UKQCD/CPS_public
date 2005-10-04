@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce.C,v 1.8 2005-03-09 18:23:54 chulwoo Exp $
+  $Id: RHMC_Fforce.C,v 1.9 2005-10-04 05:40:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -41,8 +41,8 @@ CPS_START_NAMESPACE
 #define PROFILE
 
 void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				   Float *alpha, Float mass, Float dt,
-				   Vector **sol_d){
+				   int isz, Float *alpha, Float mass, 
+				   Float dt, Vector **sol_d){
 
     char *fname = "RHMC_EvolveMomFforce";
     VRB.Func(cname,fname);
@@ -60,8 +60,9 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
     const int vol = GJP.VolNodeSites();
     const int f_size = vol*FsiteSize()/2;
     
-    for (int i=0; i<degree; i++)
+    for (int i=0; i<degree; i++) {
       sol[i]->VecTimesEquFloat(alpha[i], f_size);
+    }
 
     // X_odd = D X_even    
     for (int p=0; p<degree; p++) {
@@ -909,7 +910,7 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
     ffree(Lmusigmarhonu);
 */
 
-    Convert(CANONICAL);
+  Convert(CANONICAL);
   for (int p=0; p<degree; p++) {
     Fconvert(sol[p], STAG, CANONICAL);
   }

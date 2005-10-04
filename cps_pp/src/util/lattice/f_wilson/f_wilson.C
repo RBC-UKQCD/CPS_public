@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.17 2005-05-30 08:26:50 chulwoo Exp $
+  $Id: f_wilson.C,v 1.18 2005-10-04 05:41:02 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -164,7 +164,8 @@ int Fwilson::FmatEvlInv(Vector *f_out, Vector *f_in,
   struct timeval t_start, t_stop;
   gettimeofday(&t_start,NULL);
   
-  iter = wilson.InvCg(true_res);
+  iter = wilson.InvCg(&(cg_arg->true_rsd));
+  if (true_res) *true_res = cg_arg ->true_rsd;
 
   gettimeofday(&t_stop,NULL);
   timersub(&t_stop,&t_start,&t_start);
@@ -181,7 +182,7 @@ int Fwilson::FmatEvlInv(Vector *f_out, Vector *f_in,
 //------------------------------------------------------------------
 // int FmatEvlMInv(Vector *f_out, Vector *f_in, 
 //                Float shift[], int Nshift, 
-//                CgArg *cg_arg, Float *true_res,
+//                CgArg **cg_arg, Float *true_res,
 //		  CnvFrmType cnv_frm = CNV_FRM_YES):
 // It calculates f_out where (A + shift)* f_out = f_in and
 // A is the fermion matrix that appears in the HMC 
@@ -194,7 +195,7 @@ int Fwilson::FmatEvlInv(Vector *f_out, Vector *f_in,
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
 int Fwilson::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
-			 int Nshift, int isz, CgArg *cg_arg,
+			 int Nshift, int isz, CgArg **cg_arg,
 			 CnvFrmType cnv_frm, MultiShiftSolveType type, 
 			 Float *alpha, Vector **f_out_d)
 {
@@ -202,16 +203,17 @@ int Fwilson::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   VRB.Func(cname,fname);
 
   int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
-  Float dot = f_in -> NormSqGlbSum(f_size);
+  Float dot = f_in -> NormSqGlbSum4D(f_size);
 
   Float *RsdCG = new Float[Nshift];
-  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
+  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg[s]->stop_rsd;
 
   //Fake the constructor
-  DiracOpWilson wilson(*this, f_out[0], f_in, cg_arg, cnv_frm);
-  cg_arg->true_rsd = RsdCG[isz];
+  DiracOpWilson wilson(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
 
   int return_value = wilson.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+
+  for (int s=0; s<Nshift; s++) cg_arg[s]->true_rsd = RsdCG[s];
   delete[] RsdCG;
   return return_value;
 }
@@ -219,7 +221,7 @@ int Fwilson::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 //------------------------------------------------------------------
 // Lattice class api to the chronological inverter
 //------------------------------------------------------------------
-Float Fwilson::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+void Fwilson::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
 {
 
@@ -227,7 +229,7 @@ Float Fwilson::FminResExt(Vector *sol, Vector *source, Vector **sol_old,
   VRB.Func(cname,fname);
   
   DiracOpWilson wilson(*this, sol, source, cg_arg, cnv_frm);
-  return wilson.MinResExt(sol,source,sol_old,vm,degree);
+  wilson.MinResExt(sol,source,sol_old,vm,degree);
   
 }
 
@@ -354,7 +356,7 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
   for(i=0; i < N_eig; ++i)
   {
     Gamma5(v1, f_eigenv[i], GJP.VolNodeSites());
-    chirality[i] = f_eigenv[i]->ReDotProductGlbSum(v1, f_size);
+    chirality[i] = f_eigenv[i]->ReDotProductGlbSum4D(v1, f_size);
   }
 
   VRB.Sfree(cname, fname, "v1", v1);
@@ -400,8 +402,9 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
 // SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass):
 // It sets the pseudofermion field phi from frm1, frm2.
 // Note that frm2 is not used.
+// Modified - now returns the (trivial) value of the action
 //------------------------------------------------------------------
-void Fwilson::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+Float Fwilson::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 		     Float mass){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
@@ -418,7 +421,7 @@ void Fwilson::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 
   wilson.MatPcDag(phi, frm1) ;
 
-  return ;
+  return FhamiltonNode(frm1, frm1);
 }
 
 
@@ -629,8 +632,8 @@ void Fwilson::EvolveMomFforce(Matrix *mom, Vector *chi,
 }
 
 void Fwilson::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				   Float *alpha, Float mass, Float dt,
-				   Vector **sol_d) {
+				   int isz, Float *alpha, Float mass, 
+				   Float dt, Vector **sol_d) {
   char *fname = "RHMC_EvolveMomFforce";
 
   for (int i=0; i<degree; i++)

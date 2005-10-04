@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.24 2005-09-06 21:36:39 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.25 2005-10-04 05:39:56 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -174,7 +174,8 @@ int FdwfBase::FmatEvlInv(Vector *f_out, Vector *f_in,
 
   DiracOpDwf dwf(*this, f_out, f_in, cg_arg, cnv_frm);
   
-  iter = dwf.InvCg(true_res);
+  iter = dwf.InvCg(&(cg_arg->true_rsd));
+  if (true_res) *true_res = cg_arg ->true_rsd;
 
   // Return the number of iterations
   return iter;
@@ -193,7 +194,7 @@ int FdwfBase::FmatEvlInv(Vector *f_out, Vector *f_in,
 //------------------------------------------------------------------
 // int FmatEvlMInv(Vector *f_out, Vector *f_in, 
 //                Float shift[], int Nshift, 
-//                CgArg *cg_arg, Float *true_res,
+//                CgArg **cg_arg, Float *true_res,
 //		  CnvFrmType cnv_frm = CNV_FRM_YES):
 // It calculates f_out where (A + shift)* f_out = f_in and
 // A is the fermion matrix that appears in the HMC 
@@ -206,7 +207,7 @@ int FdwfBase::FmatEvlInv(Vector *f_out, Vector *f_in,
 // The function returns the total number of CG iterations.
 //------------------------------------------------------------------
 int FdwfBase::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
-			  int Nshift, int isz, CgArg *cg_arg, 
+			  int Nshift, int isz, CgArg **cg_arg, 
 			  CnvFrmType cnv_frm, MultiShiftSolveType type, 
 			  Float *alpha, Vector **f_out_d)
 {
@@ -218,13 +219,14 @@ int FdwfBase::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   Float dot = f_in -> NormSqGlbSum(f_size);
 
   Float *RsdCG = new Float[Nshift];
-  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg->stop_rsd;
+  for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg[s]->stop_rsd;
 
   //Fake the constructor
-  DiracOpDwf dwf(*this, f_out[0], f_in, cg_arg, cnv_frm);
-  cg_arg->true_rsd = RsdCG[isz];
+  DiracOpDwf dwf(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
 
   int return_value= dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+  for (int s=0; s<Nshift; s++) cg_arg[s]->true_rsd = RsdCG[s];  
+
   delete[] RsdCG;
   return return_value;
 }
@@ -232,7 +234,7 @@ int FdwfBase::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 //------------------------------------------------------------------
 // Lattice class api to the chronological inverter
 //------------------------------------------------------------------
-Float FdwfBase::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+void FdwfBase::FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 			 Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm)
 {
 
@@ -240,7 +242,7 @@ Float FdwfBase::FminResExt(Vector *sol, Vector *source, Vector **sol_old,
   VRB.Func(cname,fname);
   
   DiracOpDwf dwf(*this, sol, source, cg_arg, cnv_frm);
-  return dwf.MinResExt(sol,source,sol_old,vm,degree);
+  dwf.MinResExt(sol,source,sol_old,vm,degree);
   
 }
 
@@ -587,7 +589,7 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float *lambda,
 // It sets the pseudofermion field phi from frm1, frm2.
 // Note that frm2 is not used.
 //------------------------------------------------------------------
-void FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+Float FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 		  Float mass){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
@@ -611,25 +613,40 @@ void FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
   printf("phi[0]=%e\n",*tmp);}
 #endif
 
-  return ;
+  return FhamiltonNode(frm1, frm1);
 }
 
 #undef PROFILE
 
 
 void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				    Float *alpha, Float mass, Float dt,
-				    Vector **sol_d) {
+				    int isz, Float *alpha, Float mass, 
+				    Float dt, Vector **sol_d) {
   char *fname = "RHMC_EvolveMomFforce";
+  char *fer_force = (char*)smalloc(cname,fname,"fer_force",100*sizeof(char));
+
 #ifdef PROFILE
   Float time = -dclock();
   ForceFlops=0;
 #endif
+
   // Temporary fix for the moment.
   int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
+  int g_size = GJP.VolNodeSites() * GsiteSize();
+
+  Matrix *mom_old = (Matrix*)smalloc(g_size*sizeof(Float));
+
   for (int i=0; i<degree; i++){
+    // Copy the momenta before the update
+    ((Vector*)mom_old)->CopyVec((Vector*)mom,g_size);
     FdwfBase::EvolveMomFforce(mom,sol[i],mass,alpha[i]*dt);
+    sprintf(fer_force, "Fermion (pole = %d):", i);
+    ForceMagnitude(mom, mom_old, mass, dt, fer_force);
   }
+
+  sfree(fer_force);
+  sfree(mom_old);
+
 #ifdef PROFILE
   time += dclock();
   print_flops(cname,fname,ForceFlops,time);

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FwilsonTypes class.
 
-  $Id: f_wilson_t.C,v 1.6 2004-08-18 11:58:04 zs Exp $
+  $Id: f_wilson_t.C,v 1.7 2005-10-04 05:35:47 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.6 2004-08-18 11:58:04 zs Exp $
-//  $Id: f_wilson_t.C,v 1.6 2004-08-18 11:58:04 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-10-04 05:35:47 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.7 2005-10-04 05:35:47 chulwoo Exp $
+//  $Id: f_wilson_t.C,v 1.7 2005-10-04 05:35:47 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_wilson_t.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v $
 //  $State: Exp $
 //
@@ -184,6 +184,11 @@ int FwilsonTypes::FsiteOffset(const int *x) const {
 int FwilsonTypes::SpinComponents() const
 {
   return 4;
+}
+
+//!< Dummy routine for Wilson fermions
+void FwilsonTypes::BforceVector(Vector *in, CgArg *cg_arg) {
+
 }
 
 CPS_END_NAMESPACE
