@@ -1,0 +1,13 @@
+# 4k mapping
+#qpartition_remap -X0 -Y1 -Z45 -T23
+# More standard mapping
+#qpartition_remap -X0 -Y1 -Z34 -T25
+qpartition_remap -X13 -Y2 -Z45 -T0
+
+set DIR=`pwd`
+set NDIR=`echo $DIR | sed "s/host/host/g" `
+set TRAJ=`grep traj evo_arg.vml | awk '{print $4}'`
+echo traj $TRAJ
+qrun ../binaries/QCDOC.x do_arg.vml hmd_arg.vml evo_arg.vml eig_arg.vml $NDIR > ../work/output.log.${TRAJ}
+
+

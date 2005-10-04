@@ -1,0 +1,20 @@
+class ActionRationalSplitArg split2_arg = {
+Array fractionSplit[4] = { 
+class SplitRange fractionSplit[0] = {
+int split_low = 0
+int split_high = 3
+}
+class SplitRange fractionSplit[1] = {
+int split_low = 0
+int split_high = 3
+}
+class SplitRange fractionSplit[2] = {
+int split_low = 0
+int split_high = 2
+}
+class SplitRange fractionSplit[3] = {
+int split_low = 0
+int split_high = 1
+}
+}
+}

@@ -32,7 +32,7 @@
  * From: @(#)rpc_cout.c 1.13 89/02/22 (C) 1987 SMI
  */
 char cout_rcsid[] =
-"$Id: rpc_cout.c,v 1.4 2005-05-09 07:16:02 chulwoo Exp $";
+"$Id: rpc_cout.c,v 1.5 2005-10-04 15:30:08 chulwoo Exp $";
 
 /*
  * rpc_cout.c, XDR routine outputter for the RPC protocol compiler
@@ -499,14 +499,11 @@ emit_enum (definition * def)
 
     f_print (fout, "struct vml_enum_map %s_map[] = {\n", name, name);
     for (l = def->def.en.vals; l != NULL; l = l->next) {
-      f_print( fout,"\t{\"%s\",\"%s\",%s}",
+      f_print( fout,"\t{\"%s\",\"%s\",%s},\n",
 	       def->def_name,
 	       l->name,l->name);
-      if ( l->next != NULL ) {
-	f_print( fout,",");
-      }
-      f_print( fout,"\n");
     }
+    f_print( fout,"\t{NULL,NULL,0}\n");
     f_print (fout, "};\n");
   }
 }

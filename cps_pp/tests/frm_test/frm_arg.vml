@@ -1,0 +1,18 @@
+class ActionFermionArg frm_arg = {
+class ActionBilinearArg bi_arg = {
+FclassType fermion = F_CLASS_WILSON
+Array bilinears[1] = { 
+class BilinearDescr bilinears[0] = {
+double mass =   -0.02
+int max_num_iter = 5000
+}
+}
+}
+Array fermions[1] = { 
+class FermionDescr fermions[0] = {
+int chrono = 10
+double stop_rsd_md =   1e-6
+double stop_rsd_mc =   1e-10
+}
+}
+}
