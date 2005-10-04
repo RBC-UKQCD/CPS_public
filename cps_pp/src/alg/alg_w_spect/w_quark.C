@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.9 2004-12-11 20:58:02 chulwoo Exp $
+  $Id: w_quark.C,v 1.10 2005-10-04 05:13:47 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP
@@ -503,10 +503,10 @@ WspectQuark::WspectQuark(Lattice &lat,
           lat.Ffive2four(sol_4d_mid_point, sol_5d, ls_glb/2-1, ls_glb/2);
 	// ==== end added ===== 
 
-        VRB.Sfree(d_class_name,ctor_str, "sol_5d", sol_5d);
-        sfree(sol_5d);
-        VRB.Sfree(d_class_name,ctor_str, "src_5d", src_5d);
-        sfree(src_5d);
+        sfree(d_class_name,ctor_str, "sol_5d", sol_5d);
+//        sfree(sol_5d);
+        sfree(d_class_name,ctor_str, "src_5d", src_5d);
+//        sfree(src_5d);
 	
       }
       else {

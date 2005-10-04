@@ -21,7 +21,7 @@ void GlobalDataShift::Set(int x, int y, int z, int t, int s)
       ERR.General(cname,fname,
         "Bc(%d) cannot be shifted due to the boundary condition\n",i);
     shifts[i] = shifts[i]%GJP.Nodes(i);
-    printf("shifts[%d]=%d\n",i,shifts[i]);
+//    printf("shifts[%d]=%d\n",i,shifts[i]);
     VRB.Flow(cname,fname,"shifts[%d]=%d\n",i,shifts[i]);
   }
 }
