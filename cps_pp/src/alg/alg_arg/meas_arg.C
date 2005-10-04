@@ -16,7 +16,8 @@ vml_MeasLimits (VML *vmls, char *name,MeasLimits *objp)
 	return TRUE;
 }
 struct vml_enum_map MeasLimits_map[] = {
-	{"MeasLimits","MAX_MEAS_TASK",MAX_MEAS_TASK}
+	{"MeasLimits","MAX_MEAS_TASK",MAX_MEAS_TASK},
+	{NULL,NULL,0}
 };
 
 bool_t
@@ -35,7 +36,8 @@ struct vml_enum_map MeasType_map[] = {
 	{"MeasType","MeasAlgEig",MeasAlgEig},
 	{"MeasType","MeasAlgPot",MeasAlgPot},
 	{"MeasType","MeasAlgFixGauge",MeasAlgFixGauge},
-	{"MeasType","MeasAlgFixGaugeFree",MeasAlgFixGaugeFree}
+	{"MeasType","MeasAlgFixGaugeFree",MeasAlgFixGaugeFree},
+	{NULL,NULL,0}
 };
 
 bool_t
@@ -50,7 +52,8 @@ vml_MeasIOTask (VML *vmls, char *name,MeasIOTask *objp)
 struct vml_enum_map MeasIOTask_map[] = {
 	{"MeasIOTask","MeasIOLoad",MeasIOLoad},
 	{"MeasIOTask","MeasIOSave",MeasIOSave},
-	{"MeasIOTask","MeasIONone",MeasIONone}
+	{"MeasIOTask","MeasIONone",MeasIONone},
+	{NULL,NULL,0}
 };
 	 bool MeasTask::Encode(char *filename,char *instance){
 		 VML vmls;

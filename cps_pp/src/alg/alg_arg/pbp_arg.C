@@ -16,7 +16,8 @@ vml_PBP_LIM (VML *vmls, char *name,PBP_LIM *objp)
 	return TRUE;
 }
 struct vml_enum_map PBP_LIM_map[] = {
-	{"PBP_LIM","MAX_PBP_MASSES",MAX_PBP_MASSES}
+	{"PBP_LIM","MAX_PBP_MASSES",MAX_PBP_MASSES},
+	{NULL,NULL,0}
 };
 	 bool PbpArg::Encode(char *filename,char *instance){
 		 VML vmls;

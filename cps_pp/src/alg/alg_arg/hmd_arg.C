@@ -7,63 +7,6 @@
 CPS_START_NAMESPACE
 
 bool_t
-vml_ReunitarizeType (VML *vmls, char *name,ReunitarizeType *objp)
-{
-	register int32_t *buf;
-
-	if (!vml_enum (vmls,name,(enum_t *)objp,ReunitarizeType_map))
-		return FALSE;
-	return TRUE;
-}
-struct vml_enum_map ReunitarizeType_map[] = {
-	{"ReunitarizeType","REUNITARIZE_NO",REUNITARIZE_NO},
-	{"ReunitarizeType","REUNITARIZE_YES",REUNITARIZE_YES}
-};
-
-bool_t
-vml_MetropolisType (VML *vmls, char *name,MetropolisType *objp)
-{
-	register int32_t *buf;
-
-	if (!vml_enum (vmls,name,(enum_t *)objp,MetropolisType_map))
-		return FALSE;
-	return TRUE;
-}
-struct vml_enum_map MetropolisType_map[] = {
-	{"MetropolisType","METROPOLIS_NO",METROPOLIS_NO},
-	{"MetropolisType","METROPOLIS_YES",METROPOLIS_YES}
-};
-
-bool_t
-vml_RhmcPolesAction (VML *vmls, char *name,RhmcPolesAction *objp)
-{
-	register int32_t *buf;
-
-	if (!vml_enum (vmls,name,(enum_t *)objp,RhmcPolesAction_map))
-		return FALSE;
-	return TRUE;
-}
-struct vml_enum_map RhmcPolesAction_map[] = {
-	{"RhmcPolesAction","RHMC_POLES_CALC",RHMC_POLES_CALC},
-	{"RhmcPolesAction","RHMC_POLES_READ",RHMC_POLES_READ},
-	{"RhmcPolesAction","RHMC_POLES_CALC_WRITE",RHMC_POLES_CALC_WRITE}
-};
-
-bool_t
-vml_HmdLimits (VML *vmls, char *name,HmdLimits *objp)
-{
-	register int32_t *buf;
-
-	if (!vml_enum (vmls,name,(enum_t *)objp,HmdLimits_map))
-		return FALSE;
-	return TRUE;
-}
-struct vml_enum_map HmdLimits_map[] = {
-	{"HmdLimits","MAX_HMD_MASSES",MAX_HMD_MASSES},
-	{"HmdLimits","MAX_RAT_DEGREE",MAX_RAT_DEGREE}
-};
-
-bool_t
 vml_FRatVec (VML *vmls, char *name,FRatVec objp)
 {
 	register int32_t *buf;
@@ -150,7 +93,7 @@ vml_HmdArg (VML *vmls, char *name,HmdArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "sw", &objp->sw))
 		 return FALSE;
-	 if (!vml_int (vmls, "chrono", &objp->chrono))
+	 if (!vml_IMassVec (vmls, "chrono", objp->chrono))
 		 return FALSE;
 	 if (!vml_int (vmls, "reproduce", &objp->reproduce))
 		 return FALSE;
@@ -166,9 +109,9 @@ vml_HmdArg (VML *vmls, char *name,HmdArg *objp)
 		 return FALSE;
 	 if (!vml_FMassVec (vmls, "stop_rsd", objp->stop_rsd))
 		 return FALSE;
-	 if (!vml_FMassVec (vmls, "stop_rsd_md", objp->stop_rsd_md))
+	 if (!vml_FRatMassVec (vmls, "stop_rsd_md", objp->stop_rsd_md))
 		 return FALSE;
-	 if (!vml_FMassVec (vmls, "stop_rsd_mc", objp->stop_rsd_mc))
+	 if (!vml_FRatMassVec (vmls, "stop_rsd_mc", objp->stop_rsd_mc))
 		 return FALSE;
 	 if (!vml_vector (vmls, "field_type", (char *)objp->field_type, MAX_HMD_MASSES,
 		sizeof (FieldType), (vmlproc_t) vml_FieldType))
@@ -193,6 +136,8 @@ vml_HmdArg (VML *vmls, char *name,HmdArg *objp)
 		 return FALSE;
 	 if (!vml_IMassVec (vmls, "FRatDeg", objp->FRatDeg))
 		 return FALSE;
+	 if (!vml_IMassVec (vmls, "SRatDeg", objp->SRatDeg))
+		 return FALSE;
 	 if (!vml_IMassVec (vmls, "FRatDegNew", objp->FRatDegNew))
 		 return FALSE;
 	 if (!vml_IMassVec (vmls, "SRatDegNew", objp->SRatDegNew))
@@ -204,8 +149,6 @@ vml_HmdArg (VML *vmls, char *name,HmdArg *objp)
 	 if (!vml_FRatMassVec (vmls, "FRatRes", objp->FRatRes))
 		 return FALSE;
 	 if (!vml_FRatMassVec (vmls, "FRatPole", objp->FRatPole))
-		 return FALSE;
-	 if (!vml_IMassVec (vmls, "SRatDeg", objp->SRatDeg))
 		 return FALSE;
 	 if (!vml_FMassVec (vmls, "SRatError", objp->SRatError))
 		 return FALSE;
@@ -249,10 +192,6 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 	register int32_t *buf;
 
 	 vml_class_begin(vmls,"EvoArg",name);
-	 if (!vml_FclassType (vmls, "Fermion", &objp->Fermion))
-		 return FALSE;
-	 if (!vml_GclassType (vmls, "Gluon", &objp->Gluon))
-		 return FALSE;
 	 if (!vml_int (vmls, "traj_start", &objp->traj_start))
 		 return FALSE;
 	 if (!vml_int (vmls, "gauge_unload_period", &objp->gauge_unload_period))
@@ -265,7 +204,7 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "hdw_rcsum", &objp->hdw_rcsum))
 		 return FALSE;
-	 if (!vml_int (vmls, "reproduce_period", &objp->reproduce_period))
+	 if (!vml_int (vmls, "reproduce_interval", &objp->reproduce_interval))
 		 return FALSE;
 	 if (!vml_string (vmls, "ensemble_id", &objp->ensemble_id, ~0))
 		 return FALSE;
@@ -287,7 +226,11 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 		 return FALSE;
 	 if (!vml_string (vmls, "work_directory", &objp->work_directory, ~0))
 		 return FALSE;
-	 if (!vml_int (vmls, "inline_measure", &objp->inline_measure))
+	 if (!vml_int (vmls, "measure_pbp", &objp->measure_pbp))
+		 return FALSE;
+	 if (!vml_int (vmls, "measure_eig", &objp->measure_eig))
+		 return FALSE;
+	 if (!vml_int (vmls, "measure_w_spect", &objp->measure_w_spect))
 		 return FALSE;
 	 if (!vml_string (vmls, "eig_lo_stem", &objp->eig_lo_stem, ~0))
 		 return FALSE;
@@ -327,6 +270,8 @@ vml_RhmcPolesState (VML *vmls, char *name,RhmcPolesState *objp)
 		 return FALSE;
 	 if (!vml_IMassVec (vmls, "FRatDeg", objp->FRatDeg))
 		 return FALSE;
+	 if (!vml_IMassVec (vmls, "SRatDeg", objp->SRatDeg))
+		 return FALSE;
 	 if (!vml_IMassVec (vmls, "FRatDegNew", objp->FRatDegNew))
 		 return FALSE;
 	 if (!vml_IMassVec (vmls, "SRatDegNew", objp->SRatDegNew))
@@ -338,8 +283,6 @@ vml_RhmcPolesState (VML *vmls, char *name,RhmcPolesState *objp)
 	 if (!vml_FRatMassVec (vmls, "FRatRes", objp->FRatRes))
 		 return FALSE;
 	 if (!vml_FRatMassVec (vmls, "FRatPole", objp->FRatPole))
-		 return FALSE;
-	 if (!vml_IMassVec (vmls, "SRatDeg", objp->SRatDeg))
 		 return FALSE;
 	 if (!vml_FMassVec (vmls, "SRatError", objp->SRatError))
 		 return FALSE;

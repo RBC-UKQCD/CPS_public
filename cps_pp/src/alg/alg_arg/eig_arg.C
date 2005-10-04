@@ -16,7 +16,8 @@ vml_EIG_LIM (VML *vmls, char *name,EIG_LIM *objp)
 	return TRUE;
 }
 struct vml_enum_map EIG_LIM_map[] = {
-	{"EIG_LIM","MAX_EIG_MASSES",MAX_EIG_MASSES}
+	{"EIG_LIM","MAX_EIG_MASSES",MAX_EIG_MASSES},
+	{NULL,NULL,0}
 };
 	 bool EigArg::Encode(char *filename,char *instance){
 		 VML vmls;

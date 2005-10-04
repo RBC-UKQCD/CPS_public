@@ -25,6 +25,8 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 
+
+
 //------------------------------------------------------------------
 /*!
   \param latt The lattice on which  the HMD algorithm run.
@@ -77,8 +79,11 @@ AlgHmdR2::AlgHmdR2(Lattice& latt,
 
   // Allocate memory for the fermion CG arguments.
   //----------------------------------------------------------------
-  frm_cg_arg = (CgArg *) 
-    smalloc(sizeof(CgArg),cname,fname,"frm_cg_arg");
+  frm_cg_arg = (CgArg **) 
+    smalloc(sizeof(CgArg*),cname,fname,"frm_cg_arg");
+  for (i=0; i<n_frm_masses; i++)
+    frm_cg_arg[i] = (CgArg *) 
+      smalloc(sizeof(CgArg),cname,fname,"frm_cg_arg[i]");
 
   light=0;
   heavy=1;
@@ -90,9 +95,11 @@ AlgHmdR2::AlgHmdR2(Lattice& latt,
 
   // Initialize the fermion CG argument
   //----------------------------------------------------------------
-  frm_cg_arg->mass = hmd_arg->frm_mass[light];
-  frm_cg_arg->max_num_iter = hmd_arg->max_num_iter[light];
-  frm_cg_arg->stop_rsd = hmd_arg->stop_rsd[light];
+  for (i=0; i<n_frm_masses; i++) {
+    frm_cg_arg[i]->mass = hmd_arg->frm_mass[i];
+    frm_cg_arg[i]->max_num_iter = hmd_arg->max_num_iter[i];
+    frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd[i];
+  }
 
   shift = (Float*) smalloc(n_frm_masses*sizeof(Float), cname, fname, "shift");
 
@@ -158,6 +165,8 @@ AlgHmdR2::~AlgHmdR2() {
 
   // Free memory for the fermion CG arguments
   //----------------------------------------------------------------
+  for (i=0; i<n_frm_masses; i++)
+    sfree(frm_cg_arg[i], cname,fname, "frm_cg_arg[i]");
   sfree(frm_cg_arg, cname,fname, "frm_cg_arg");
 
   // Free memory for the flavor time step array
@@ -312,7 +321,7 @@ Float AlgHmdR2::run(void)
     cg_calls++;
 
     // Now calculate the force (currently uses RHMC force)
-    lat.RHMC_EvolveMomFforce(mom, frmn, 2, force_coeff, 0.0, dt, frmn_d);
+    lat.RHMC_EvolveMomFforce(mom, frmn, 2, 0, force_coeff, 0.0, dt, frmn_d);
     // decrease the loop counter by 1
     step--;
 

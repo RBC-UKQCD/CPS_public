@@ -16,7 +16,8 @@ vml_MesonLimits (VML *vmls, char *name,MesonLimits *objp)
 	return TRUE;
 }
 struct vml_enum_map MesonLimits_map[] = {
-	{"MesonLimits","NumMesonChannels",NumMesonChannels}
+	{"MesonLimits","NumMesonChannels",NumMesonChannels},
+	{NULL,NULL,0}
 };
 	 bool WspectOutput::Encode(char *filename,char *instance){
 		 VML vmls;
