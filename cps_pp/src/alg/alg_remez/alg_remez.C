@@ -34,23 +34,29 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 // Constructor
-AlgRemez::AlgRemez(Float lower, Float upper, long precision) 
+AlgRemez::AlgRemez(RemezArg &arg_remez)
 {
   cname = "AlgRemez";
   char *fname = "AlgRemez()";
   VRB.Func(cname,fname);
 
-  prec = precision;
+  remez_arg = &arg_remez;
+  prec = remez_arg->precision;
   bigfloat::setDefaultPrecision(prec);
 
-  apstrt = lower;
-  apend = upper;
+  apstrt = remez_arg->lambda_low;
+  apend = remez_arg->lambda_high;
   apwidt = apend - apstrt;
-  VRB.Flow(cname,fname,"Approximation bounds are [%e,%e]\n", (Float)apstrt,(Float)apend);
+  VRB.Flow(cname,fname,"Approximation bounds are [%e,%e]\n", 
+	   (Float)apstrt,(Float)apend);
 
-  alloc = 0;
-  n = 0;
-  d = 0;
+  power_num = remez_arg->power_num;
+  power_den = remez_arg->power_den;
+
+  n = remez_arg->degree;
+  d = remez_arg->degree;
+
+  neq = n + d + 1;
 
   // Only require the approximation spread to be less than tolerance 
   if (sizeof(Float)==sizeof(double)) {
@@ -58,6 +64,31 @@ AlgRemez::AlgRemez(Float lower, Float upper, long precision)
   } else if (sizeof(Float)==sizeof(float)) {
     tolerance = 1e-8;
   }
+
+  // Note use of new and delete in memory allocation - cannot run on qcdsp
+  param = new bigfloat[n+d+1];
+  if(param == 0) ERR.Pointer(cname,fname,"param");
+  VRB.Smalloc(cname,fname,"param",param,(n+d+1) * sizeof(bigfloat));
+
+  roots = new bigfloat[n];
+  if(roots == 0) ERR.Pointer(cname,fname,"roots");
+  VRB.Smalloc(cname,fname,"roots",roots,n * sizeof(bigfloat));
+
+  poles = new bigfloat[d];
+  if(poles == 0) ERR.Pointer(cname,fname,"poles");
+  VRB.Smalloc(cname,fname,"poles",poles,d * sizeof(bigfloat));
+
+  xx = new bigfloat[n+d+3];
+  if(xx== 0) ERR.Pointer(cname,fname,"xx");
+  VRB.Smalloc(cname,fname,"xx",xx,(n+d+2) * sizeof(bigfloat));
+
+  mm = new bigfloat[n+d+2];
+  if(mm == 0) ERR.Pointer(cname,fname,"mm");
+  VRB.Smalloc(cname,fname,"mm",mm,(n+d+2) * sizeof(bigfloat));
+
+  step = new bigfloat[n+d+2];
+  if(step == 0) ERR.Pointer(cname,fname,"step");
+  VRB.Smalloc(cname,fname,"step",step,(n+d+2) * sizeof(bigfloat));
 
 }
 
@@ -67,101 +98,28 @@ AlgRemez::~AlgRemez()
   char *fname = "~AlgRemez()";
   VRB.Func(cname,fname);
 
-  if (alloc) {
-    VRB.Sfree(cname,fname, "param",param);
-    delete [] param;
-    VRB.Sfree(cname,fname, "roots",roots);
-    delete [] roots;
-    VRB.Sfree(cname,fname, "poles",poles);
-    delete [] poles;
-    VRB.Sfree(cname,fname, "xx",xx);
-    delete [] xx;
-    VRB.Sfree(cname,fname, "mm",mm);
-    delete [] mm;
-  }
-}
+  VRB.Sfree(cname,fname, "param",param);
+  delete [] param;
+  VRB.Sfree(cname,fname, "roots",roots);
+  delete [] roots;
+  VRB.Sfree(cname,fname, "poles",poles);
+  delete [] poles;
+  VRB.Sfree(cname,fname, "xx",xx);
+  delete [] xx;
+  VRB.Sfree(cname,fname, "mm",mm);
+  delete [] mm;
+  VRB.Sfree(cname,fname, "step",step);
+  delete [] step;
 
-// Free memory and reallocate as necessary
-void AlgRemez::allocate(int num_degree, int den_degree)
-{
-  char *fname = "allocate(int,int)";
-  VRB.Func(cname,fname);
-
-  // Arrays have previously been allocated, deallocate first, then allocate
-  if (alloc) {
-    VRB.Sfree(cname,fname, "param",param);
-    delete [] param;
-    VRB.Sfree(cname,fname, "roots",roots);
-    delete [] roots;
-    VRB.Sfree(cname,fname, "poles",poles);
-    delete [] poles;
-    VRB.Sfree(cname,fname, "xx",xx);
-    delete [] xx;
-    VRB.Sfree(cname,fname, "mm",mm);
-    delete [] mm;
-  }
-
-  // Note use of new and delete in memory allocation - cannot run on qcdsp
-  param = new bigfloat[num_degree+den_degree+1];
-  if(param == 0) ERR.Pointer(cname,fname,"param");
-  VRB.Smalloc(cname,fname,"param",param,num_degree+den_degree+1 * sizeof(bigfloat));
-
-  roots = new bigfloat[num_degree];
-  if(roots == 0) ERR.Pointer(cname,fname,"roots");
-  VRB.Smalloc(cname,fname,"roots",roots,num_degree * sizeof(bigfloat));
-
-  poles = new bigfloat[den_degree];
-  if(poles == 0) ERR.Pointer(cname,fname,"poles");
-  VRB.Smalloc(cname,fname,"poles",poles,den_degree * sizeof(bigfloat));
-
-  xx = new bigfloat[num_degree+den_degree+3];
-  if(xx== 0) ERR.Pointer(cname,fname,"xx");
-  VRB.Smalloc(cname,fname,"xx",xx,num_degree+den_degree+2 * sizeof(bigfloat));
-
-  mm = new bigfloat[num_degree+den_degree+2];
-  if(mm == 0) ERR.Pointer(cname,fname,"mm");
-  VRB.Smalloc(cname,fname,"mm",mm,num_degree+den_degree+2 * sizeof(bigfloat));
-
-  alloc = 1;
-}
-
-// Reset the bounds of the approximation
-void AlgRemez::setBounds(Float lower, Float upper)
-{
-  char *fname = "setbounds(Float, Float)";
-  VRB.Func(cname,fname);
-
-  apstrt = lower;
-  apend = upper;
-  apwidt = apend - apstrt;
 }
 
 // Generate the rational approximation x^(pnum/pden)
-Float AlgRemez::generateApprox(int degree, unsigned long pnum, unsigned long pden)
+void AlgRemez::generateApprox()
 {
-  return generateApprox(degree, degree, pnum, pden);
-}
+  char *fname = "generateApprox()";
 
-// Generate the rational approximation x^(pnum/pden)
-Float AlgRemez::generateApprox(int num_degree, int den_degree, unsigned long pnum, unsigned long pden)
-{
-  char *fname = "generateApprox(int, unsigned long, unsigned long)";
-
-  // Reallocate arrays, since degree has changed
-  if (num_degree != n || den_degree != d) allocate(num_degree,den_degree);
-
-  step = new bigfloat[num_degree+den_degree+2];
-  if(step == 0) ERR.Pointer(cname,fname,"step");
-  VRB.Smalloc(cname,fname,"step",step,(num_degree+den_degree+2) * sizeof(bigfloat));
-
-  power_num = pnum;
-  power_den = pden;
-  spread = 1.0e37;
   iter = 0;
-
-  n = num_degree;
-  d = den_degree;
-  neq = n + d + 1;
+  spread = 1.0e37;
 
   initialGuess();
   stpini(step);
@@ -180,26 +138,31 @@ Float AlgRemez::generateApprox(int num_degree, int den_degree, unsigned long pnu
 
   int sign;
   Float error = (Float)getErr(mm[0],&sign);
-  VRB.Result(cname,fname,"Converged at %d iterations, error = %e\n",iter,error);
+  VRB.Result(cname,fname,"Converged at %d iterations, error = %e\n",
+	     iter,error);
 
-  // Once the approximation has been generated, calculate the roots
+  //!< Once the approximation has been generated, calculate the roots
   if(!root()) ERR.General(cname,fname,"Root finding failed\n");
   
-  VRB.Sfree(cname,fname, "step",step);
-  delete [] step;
+  //!< Now find the partial fraction expansions
+  if (remez_arg->field_type == BOSON) {
+    getPFE(remez_arg->residue, remez_arg->pole, &(remez_arg->norm));
+    getIPFE(remez_arg->residue_inv, remez_arg->pole_inv, &(remez_arg->norm_inv));
+  } else {
+    getIPFE(remez_arg->residue, remez_arg->pole, &(remez_arg->norm));
+    getPFE(remez_arg->residue_inv, remez_arg->pole_inv, &(remez_arg->norm_inv));
+  }
 
-  // Return the maximum error in the approximation
-  return error;
+  remez_arg->error = error;
+
 }
 
-// Return the partial fraction expansion of the approximation x^(pnum/pden)
+//!< Return the partial fraction expansion of the approximation x^(pnum/pden)
 int AlgRemez::getPFE(Float *Res, Float *Pole, Float *Norm) {
   char *fname = "getPFE(Float*, Float*, Float*)";
-//   VRB.Func(cname,fname);
+  VRB.Func(cname,fname);
 
   if (n!=d) ERR.General(cname,fname,"Cannot handle case: Numerator degree neq Denominator degree\n");
-
-  if (!alloc) ERR.General(cname,fname,"Approximation not yet generated\n");
 
   bigfloat *r = new bigfloat[n];
   if(r == 0) ERR.Pointer(cname,fname,"r");
@@ -231,9 +194,7 @@ int AlgRemez::getPFE(Float *Res, Float *Pole, Float *Norm) {
 // Return the partial fraction expansion of the approximation x^(-pnum/pden)
 int AlgRemez::getIPFE(Float *Res, Float *Pole, Float *Norm) {
   char *fname = "getIPFE(Float*, Float*, Float*)";
-//   VRB.Func(cname,fname);
-
-  if (!alloc) ERR.General(cname,fname,"Approximation not yet generated\n");
+  VRB.Func(cname,fname);
 
   bigfloat *r = new bigfloat[d];
   if(r == 0) ERR.Pointer(cname,fname,"r");
@@ -270,7 +231,8 @@ int AlgRemez::getIPFE(Float *Res, Float *Pole, Float *Norm) {
 // Initial values of maximal and minimal errors
 void AlgRemez::initialGuess() {
   char *fname = "initialGuess()";
-//   VRB.Func(cname,fname);
+  VRB.Func(cname,fname);
+
   // Supply initial guesses for solution points
   long ncheb = neq;			// Degree of Chebyshev error estimate
   bigfloat a, r;

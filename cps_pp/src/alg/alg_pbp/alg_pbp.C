@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgPbp class.
   
-  $Id: alg_pbp.C,v 1.11 2005-05-12 20:13:31 chulwoo Exp $
+  $Id: alg_pbp.C,v 1.12 2005-10-04 05:12:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-12 20:13:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.11 2005-05-12 20:13:31 chulwoo Exp $
-//  $Id: alg_pbp.C,v 1.11 2005-05-12 20:13:31 chulwoo Exp $
+//  $Date: 2005-10-04 05:12:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.12 2005-10-04 05:12:25 chulwoo Exp $
+//  $Id: alg_pbp.C,v 1.12 2005-10-04 05:12:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_pbp.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v $
 //  $State: Exp $
 //
@@ -241,12 +241,12 @@ void AlgPbp::run()
           lat.Ffive2four(sol_4d, sol, i, ls_glb - i - 1);
 	  
           // Calculate pbp
-          pbp_all[i] = sol_4d->ReDotProductGlbSum(src_4d, f_size/ls)
+          pbp_all[i] = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls)
 	             / pbp_norm;
 
           // Calculate pbg5p = Tr[ PsiBar * Gamma5 * Psi]
 	  lat.Gamma5(sol_4d, sol_4d, GJP.VolNodeSites());
-          pbg5p_all[i] = sol_4d->ReDotProductGlbSum(src_4d, f_size/ls)
+          pbg5p_all[i] = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls)
 	               / pbp_norm;
         }
       } 
@@ -255,11 +255,11 @@ void AlgPbp::run()
         lat.Ffive2four(sol_4d, sol, pbp_arg->snk_u_s, pbp_arg->snk_l_s);
 
         // Calculate pbp
-        pbp = sol_4d->ReDotProductGlbSum(src_4d, f_size/ls) / pbp_norm;
+        pbp = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls) / pbp_norm;
 
 	// Calculate pbg5p = Tr[ PsiBar * Gamma5 * Psi]
 	lat.Gamma5(sol_4d, sol_4d, GJP.VolNodeSites());
-	pbg5p = sol_4d->ReDotProductGlbSum(src_4d, f_size/ls) / pbp_norm;
+	pbg5p = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls) / pbp_norm;
       }
 
       // Open file for results
@@ -374,11 +374,11 @@ void AlgPbp::run()
 	         * ( lat.FsiteSize()) / 2 );
 
       // calculate pbp
-      pbp = sol->ReDotProductGlbSum(src, f_size) / pbp_norm;
+      pbp = sol->ReDotProductGlbSum4D(src, f_size) / pbp_norm;
 
       // Calculate pbg5p = Tr[ PsiBar * Gamma5 * Psi]
       lat.Gamma5(sol_g5, sol, GJP.VolNodeSites());
-      pbg5p = sol_g5->ReDotProductGlbSum(src, f_size) / pbp_norm;
+      pbg5p = sol_g5->ReDotProductGlbSum4D(src, f_size) / pbp_norm;
 
       // Print out mass, pbp, pbg5p number of iterations and true residual
       if(common_arg->results != 0){
@@ -506,16 +506,16 @@ void AlgPbp::run()
       pbp_norm = GJP.VolSites() * ( lat.FsiteSize() / 2 );
       #endif
 
-      Float norm = src->ReDotProductGlbSum(src, f_size) / pbp_norm;
+      Float norm = src->ReDotProductGlbSum4D(src, f_size) / pbp_norm;
 
       lat.Fdslash(alt_sol, sol, cg_arg, CNV_FRM_YES, 1);
-      pbd0p = alt_sol->ReDotProductGlbSum(src, f_size) 
+      pbd0p = alt_sol->ReDotProductGlbSum4D(src, f_size) 
 	/ (pbp_norm * GJP.XiVXi());
 
       pbp_norm *= GJP.XiV()/GJP.XiBare(); 
       
       // calculate pbp and pbdip
-      pbp = sol->ReDotProductGlbSum(src, f_size) / pbp_norm * 2;
+      pbp = sol->ReDotProductGlbSum4D(src, f_size) / pbp_norm * 2;
       pbdip = (norm- (cg_arg->mass)*pbp 
 	       - GJP.XiVXi()*pbd0p)*GJP.XiBare()/GJP.XiV();
         
@@ -554,278 +554,6 @@ void AlgPbp::run()
     sfree(alt_sol);
     
   }
-#if 0
-
- //----------------------------------------------------------------
-  // Asqtad fermions
-  //----------------------------------------------------------------
-  else if (lat.Fclass() == F_CLASS_ASQTAD) {
-
-    Vector*  alt_sol = (Vector *) smalloc(f_size * sizeof(Float));
-    if(alt_sol == 0)
-      ERR.Pointer(cname,fname, "alt_sol");
-    VRB.Smalloc(cname,fname, "alt_sol", alt_sol, f_size * sizeof(Float));
-
-    // set source
-    #ifdef POINT
-    bzero((char *)src, f_size*sizeof(Float));
-    if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0)
-      {
-	*((IFloat *) &src[0]) = 1.0;
-	printf("Setting point source at origin\n");
-      }
-    for(int zz = 0; zz < GJP.VolNodeSites(); zz++)
-      for(int yy = 0; yy < 6; yy++)
-	if(*(((IFloat *)&src[zz])+yy) > 1e-15)
-	  printf("zz = %d, yy = %d, *(src+zz) = %0.16e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
-    #else
-    lat.RandGaussVector(src, 0.5);
-    #endif
-
-   #ifdef Z2
-    IFloat * tmp1;
-    for(int zz = 0; zz < GJP.VolNodeSites(); zz++)
-      for(int yy = 0; yy < 6; yy+=2)
-	{
-	  tmp1 = (IFloat *)(src + zz);
-	  if(*(tmp1+yy) > 0)
-	    *(tmp1+yy) = 1.0;
-	  else
-	    *(tmp1+yy) = -1.0;
-	  *(tmp1 + yy+ 1) = 0.0;
-	}
-    //printf("Setting Z_2 source.\n");
-    //int check_site = 29;
-    //printf("Site %d =\n",check_site);
-    //tmp1 = (IFloat *)(src + check_site);
-    //for(int yy = 0; yy < 6; yy++)
-    //  printf("%0.16e  ",*(tmp1+yy));
-    //printf("\n");
-    #endif
-
-    // Initialize the cg_arg mass, with the first mass we
-    // want to compute for:
-    switch( pbp_arg->pattern_kind ) {
-    case ARRAY: 
-      cg_arg->mass = pbp_arg->mass[0]; 
-      break;
-    case LIN:   
-      cg_arg->mass = pbp_arg->mass_start; 
-      break;
-    case LOG:   
-      cg_arg->mass = pbp_arg->mass_start; 
-      break;
-    default: 
-      ERR.General(cname, fname,
-		  "pbp_arg->kind = %d is unrecognized\n", 
-		  pbp_arg->pattern_kind);
-      break;
-    }
-
-    // Loop over masses
-    for(int m=0; m<pbp_arg->n_masses; m++){
-      
-      // initialize solution (initial guess) to 1
-      for(int i=0; i< f_size/2; i++){
-	f_sol[2*i] = 1.0;     // real part
-	f_sol[2*i+1] = 0.0;   // imaginary part
-      }
-
-      // do inversion
-      iter = lat.FmatInv(sol, src, cg_arg, &true_res, CNV_FRM_YES);
-
-      // Modified for anisotropic lattices
-      // Calculate the pbp normalization factor
-      #ifdef POINT
-      pbp_norm = 1.0;
-      #else
-      pbp_norm = GJP.VolSites() * ( lat.FsiteSize() / 2 );
-      #endif
-
-      Float norm = src->ReDotProductGlbSum(src, f_size) / pbp_norm;
-
-      lat.Fdslash(alt_sol, sol, cg_arg, CNV_FRM_YES, 1);
-      pbd0p = alt_sol->ReDotProductGlbSum(src, f_size) 
-	/ (pbp_norm * GJP.XiVXi());
-
-      pbp_norm *= GJP.XiV()/GJP.XiBare(); 
-      
-      // calculate pbp and pbdip
-      pbp = sol->ReDotProductGlbSum(src, f_size) / pbp_norm * 2;
-      pbdip = (norm- (cg_arg->mass)*pbp 
-	       - GJP.XiVXi()*pbd0p)*GJP.XiBare()/GJP.XiV();
-        
-      // Print out mass, pbp number of iterations and true residual
-      if(common_arg->results != 0){
-	FILE *fp;
-	if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
-	  ERR.FileA(cname,fname, (char *)common_arg->results);
-	}
-	Fprintf(fp, "%0.16e %0.16e %0.16e %0.16e %d %0.16e\n", 
-		IFloat(cg_arg->mass), 
-		IFloat(pbp), IFloat(pbd0p), IFloat(pbdip), 
-		iter, 
-		IFloat(true_res));
-	Fclose(fp);
-      }
-
-      // If there is another mass loop iteration ahead, we should
-      // set the cg_arg->mass to it's next desired value
-      if( m < pbp_arg->n_masses - 1 ) {
-        switch( pbp_arg->pattern_kind ) {
-	case ARRAY: 
-	  cg_arg->mass = pbp_arg->mass[m+1]; 
-	  break;
-	case LIN:   
-	  cg_arg->mass += pbp_arg->mass_step; 
-	  break;
-	case LOG:   
-	  cg_arg->mass *= pbp_arg->mass_step; 
-	  break;
-        }
-      }
-
-    }
-    VRB.Sfree(cname,fname, "alt_sol", alt_sol);
-    sfree(alt_sol);
-    
-  }
-
-  //----------------------------------------------------------------
-  // P4 staggered  fermions
-  //----------------------------------------------------------------
-  else if (lat.Fclass() == F_CLASS_P4) {
-
-    Vector*  alt_sol = (Vector *) smalloc(f_size * sizeof(Float));
-    if(alt_sol == 0)
-      ERR.Pointer(cname,fname, "alt_sol");
-    VRB.Smalloc(cname,fname, "alt_sol", alt_sol, f_size * sizeof(Float));
-
-    // set source
-    #ifdef POINT
-    bzero((char *)src, f_size*sizeof(Float));
-    if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0)
-      {
-	*((IFloat *) &src[0]) = 1.0;
-	printf("Setting source = 1.0\n");
-      }
-    //for(int zz = 0; zz < GJP.VolNodeSites(); zz++)
-    //  for(int yy = 0; yy < 6; yy++)
-    //	if(*(((IFloat *)&src[zz])+yy) > 1e-15)
-    //	  printf("zz = %d, yy = %d, *(src+zz) = %0.16e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
-    #else
-    lat.RandGaussVector(src, 0.5);
-    #endif
-
-   #ifdef Z2
-    IFloat * tmp1;
-    for(int zz = 0; zz < GJP.VolNodeSites(); zz++)
-      for(int yy = 0; yy < 6; yy+=2)
-	{
-	  tmp1 = (IFloat *)(src + zz);
-	  if(*(tmp1+yy) > 0)
-	    *(tmp1+yy) = 1.0;
-	  else
-	    *(tmp1+yy) = -1.0;
-	  *(tmp1 +yy + 1) = 0.0;
-	}
-    //printf("Setting Z_2 source.\n");
-    //int check_site = 29;
-    //printf("Site %d =\n",check_site);
-    //tmp1 = (IFloat *)(src + check_site);
-    //for(int yy = 0; yy < 6; yy++)
-    //  printf("%0.16e  ",*(tmp1+yy));
-    //printf("\n");
-    #endif
-
-    // Initialize the cg_arg mass, with the first mass we
-    // want to compute for:
-    switch( pbp_arg->pattern_kind ) {
-    case ARRAY: 
-      cg_arg->mass = pbp_arg->mass[0]; 
-      break;
-    case LIN:   
-      cg_arg->mass = pbp_arg->mass_start; 
-      break;
-    case LOG:   
-      cg_arg->mass = pbp_arg->mass_start; 
-      break;
-    default: 
-      ERR.General(cname, fname,
-		  "pbp_arg->kind = %d is unrecognized\n", 
-		  pbp_arg->pattern_kind);
-      break;
-    }
-
-    // Loop over masses
-    for(int m=0; m<pbp_arg->n_masses; m++){
-      
-      // initialize solution (initial guess) to 1
-      for(int i=0; i< f_size/2; i++){
-	f_sol[2*i] = 1.0;     // real part
-	f_sol[2*i+1] = 0.0;   // imaginary part
-      }
-
-      // do inversion
-      iter = lat.FmatInv(sol, src, cg_arg, &true_res, CNV_FRM_YES);
-
-      // Modified for anisotropic lattices
-      // Calculate the pbp normalization factor
-      #ifdef POINT
-      pbp_norm=1.0;
-      #else
-      pbp_norm = GJP.VolSites() * ( lat.FsiteSize() / 2 );
-      #endif
-
-      Float norm = src->ReDotProductGlbSum(src, f_size) / pbp_norm;
-
-      lat.Fdslash(alt_sol, sol, cg_arg, CNV_FRM_YES, 1);
-      pbd0p = alt_sol->ReDotProductGlbSum(src, f_size) 
-	/ (pbp_norm * GJP.XiVXi());
-
-      pbp_norm *= GJP.XiV()/GJP.XiBare(); 
-      
-      // calculate pbp and pbdip
-      pbp = sol->ReDotProductGlbSum(src, f_size) / pbp_norm * 2;
-      pbdip = (norm- (cg_arg->mass)*pbp 
-	       - GJP.XiVXi()*pbd0p)*GJP.XiBare()/GJP.XiV();
-        
-      // Print out mass, pbp number of iterations and true residual
-      if(common_arg->results != 0){
-	FILE *fp;
-	if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
-	  ERR.FileA(cname,fname, (char *)common_arg->results);
-	}
-	Fprintf(fp, "%0.16e %0.16e %0.16e %0.16e %d %0.16e\n", 
-		IFloat(cg_arg->mass), 
-		IFloat(pbp), IFloat(pbd0p), IFloat(pbdip), 
-		iter, 
-		IFloat(true_res));
-	Fclose(fp);
-      }
-
-      // If there is another mass loop iteration ahead, we should
-      // set the cg_arg->mass to it's next desired value
-      if( m < pbp_arg->n_masses - 1 ) {
-        switch( pbp_arg->pattern_kind ) {
-	case ARRAY: 
-	  cg_arg->mass = pbp_arg->mass[m+1]; 
-	  break;
-	case LIN:   
-	  cg_arg->mass += pbp_arg->mass_step; 
-	  break;
-	case LOG:   
-	  cg_arg->mass *= pbp_arg->mass_step; 
-	  break;
-        }
-      }
-
-    }
-    VRB.Sfree(cname,fname, "alt_sol", alt_sol);
-    sfree(alt_sol);
-    
-  }
-#endif
 
   //----------------------------------------------------------------
   // Unknown fermion type
@@ -1038,14 +766,14 @@ void AlgPbp::runPointSource(int x, int y, int z, int t)
 		lat.Ffive2four(sol_4d, sol, i, ls_glb - i - 1);
 		
 		// Calculate pbp
-		pbp_all[i] = sol_4d->ReDotProductGlbSum(src_4d, f_size/ls)
+		pbp_all[i] = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls)
 		  / pbp_norm;
 		
 		pbp_tmp[i] += pbp_all[i];
 		
 		// Calculate pbg5p = Tr[ PsiBar * Gamma5 * Psi]
 		lat.Gamma5(sol_4d, sol_4d, GJP.VolNodeSites());
-		pbg5p_all[i] = sol_4d->ReDotProductGlbSum(src_4d, f_size/ls)
+		pbg5p_all[i] = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls)
 		  / pbp_norm;
 		
 		pbg5p_tmp[i] += pbg5p_all[i];
@@ -1057,12 +785,12 @@ void AlgPbp::runPointSource(int x, int y, int z, int t)
 	      lat.Ffive2four(sol_4d, sol, pbp_arg->snk_u_s, pbp_arg->snk_l_s);
 	      
 	      // Calculate pbp
-	      pbp = sol_4d->ReDotProductGlbSum(src_4d, f_size/ls) / pbp_norm;
+	      pbp = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls) / pbp_norm;
 	      pbptmp += pbp;
 	      
 	      // Calculate pbg5p = Tr[ PsiBar * Gamma5 * Psi]
 	      lat.Gamma5(sol_4d, sol_4d, GJP.VolNodeSites());
-	      pbg5p = sol_4d->ReDotProductGlbSum(src_4d, f_size/ls) / pbp_norm;
+	      pbg5p = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls) / pbp_norm;
 	      pbg5ptmp += pbg5p;
 	      
 	    }

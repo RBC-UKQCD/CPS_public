@@ -24,19 +24,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief PAB... Definitions of the AlgMeas class methods.
   
-  $Id: alg_meas.C,v 1.2 2005-05-26 14:37:11 chulwoo Exp $
+  $Id: alg_meas.C,v 1.3 2005-10-04 05:11:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-26 14:37:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.2 2005-05-26 14:37:11 chulwoo Exp $
-//  $Id: alg_meas.C,v 1.2 2005-05-26 14:37:11 chulwoo Exp $
+//  $Date: 2005-10-04 05:11:49 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.3 2005-10-04 05:11:49 chulwoo Exp $
+//  $Id: alg_meas.C,v 1.3 2005-10-04 05:11:49 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_meas.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v $
 //  $State: Exp $
 //
@@ -306,7 +306,7 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
   }
 
 
-  /* CLOVEER VALENCE ANALYSIS */
+  /* CLOVER VALENCE ANALYSIS */
   if ( (fermion == F_CLASS_CLOVER) && (gluon == G_CLASS_NONE ) ) {
     lat_p = new GnoneFclover;
     return *lat_p;
@@ -320,7 +320,7 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     return *lat_p;
   }
 
-   /* STAGGERED VALENCE ANALYSIS 
+  /* STAGGERED VALENCE ANALYSIS */
   if ( (fermion == F_CLASS_STAG) && (gluon == G_CLASS_NONE ) ) {
     lat_p = new GnoneFstag;
     return *lat_p;
@@ -333,7 +333,7 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     lat_p = new GimprRectFstag;
     return *lat_p;
   }
-*/
+
   /* ASQTAD STAGGERED VALENCE ANALYSIS */
   if ( (fermion == F_CLASS_ASQTAD) && (gluon == G_CLASS_NONE ) ) {
     lat_p = new GnoneFasqtad;
@@ -348,8 +348,22 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     return *lat_p;
   }
 
-  
-  exit(-1);
+  /* F_NONE VALENCE ANALYSIS */
+  if ( (fermion == F_CLASS_NONE) && (gluon == G_CLASS_NONE ) ) {
+    lat_p = new GnoneFnone;
+    return *lat_p;
+  }
+  if ( (fermion == F_CLASS_NONE) && (gluon == G_CLASS_WILSON ) ) {
+    lat_p = new GwilsonFnone;
+    return *lat_p;
+  }
+  if ( (fermion == F_CLASS_NONE) && (gluon == G_CLASS_IMPR_RECT ) ) {
+    lat_p = new GimprRectFnone;
+    return *lat_p;
+  }
+
+  ERR.General("LatticeFactory","Create()","Lattice type not defined\n");
+
 }
 char *AlgMeas::Dirname (char *path)
 {
@@ -390,6 +404,7 @@ void AlgMeas::TruncateWspectFiles(void)
   TruncateFile(woe.pion);
   TruncateFile(woe.pion_prime);
   TruncateFile(woe.rho);
+#if 0
   TruncateFile(woe.a0);
   TruncateFile(woe.a0_prime);
   TruncateFile(woe.a1_x);
@@ -404,6 +419,24 @@ void AlgMeas::TruncateWspectFiles(void)
   TruncateFile(woe.rho_x_prime);
   TruncateFile(woe.rho_y_prime);
   TruncateFile(woe.rho_z_prime);
+#else
+  TruncateFile(woe.meson_name00);
+  TruncateFile(woe.meson_name01);
+  TruncateFile(woe.meson_name02);
+  TruncateFile(woe.meson_name03);
+  TruncateFile(woe.meson_name04);
+  TruncateFile(woe.meson_name05);
+  TruncateFile(woe.meson_name06);
+  TruncateFile(woe.meson_name07);
+  TruncateFile(woe.meson_name08);
+  TruncateFile(woe.meson_name09);
+  TruncateFile(woe.meson_name10);
+  TruncateFile(woe.meson_name11);
+  TruncateFile(woe.meson_name12);
+  TruncateFile(woe.meson_name13);
+  TruncateFile(woe.meson_name14);
+  TruncateFile(woe.meson_name15);
+#endif
   TruncateFile(woe.nucleon);
   TruncateFile(woe.nucleon_prime);
   TruncateFile(woe.delta_x);
