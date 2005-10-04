@@ -1,0 +1,100 @@
+#include<config.h>
+#include<math.h>
+CPS_START_NAMESPACE 
+//------------------------------------------------------------------
+//
+// alg_action_rational_split.C
+//
+// AlgActionRationalSplit represents a subset of a bilinear action
+// with a rational approximation kernel.  The rational function is
+// split to allow each partial fraction to evolve at independent rates.
+//
+//------------------------------------------------------------------
+
+CPS_END_NAMESPACE
+#include<alg/alg_hmd.h>
+#include<util/lattice.h>
+#include<util/vector.h>
+#include<util/gjp.h>
+#include<util/smalloc.h>
+#include<util/verbose.h>
+#include<util/error.h>
+#include<alg/alg_int.h>
+#include<alg/alg_remez.h>
+CPS_START_NAMESPACE
+
+AlgActionRationalSplit::AlgActionRationalSplit(AlgActionRational &Rat,
+					       ActionRationalSplitArg &r_arg)
+					       
+					       
+  : AlgActionRational()
+{
+  cname = "AlgActionRationalSplit";
+  char *fname = "AlgActionRationalSplit(AlgActionRational *, int **)";
+  VRB.Func(cname,fname);
+
+  rat_split_arg = &r_arg;
+  rat = &Rat;
+  n_masses = 0;
+  fermion = rat->getFermion();
+
+  //!< First check n_masses split = n_masses rational
+  if (rat_split_arg->fractionSplit.fractionSplit_len != rat->getNmass())
+    ERR.General(cname, fname,
+		"Inconsistency between RationalSplitArg and AlgActionRational n_masses");
+
+  if (rat->getNmass() > 0) {
+    fractionSplit = (int**)smalloc(2*sizeof(int*),cname,fname,"fractionSplit");
+    fractionSplit[0] = 
+      (int*)smalloc(rat->getNmass()*sizeof(int),cname,fname,"fractionSplit[0]");
+    fractionSplit[1] = 
+      (int*)smalloc(rat->getNmass()*sizeof(int),cname,fname,"fractionSplit[1]");
+    
+    for (int i=0; i<rat->getNmass(); i++) {
+      fractionSplit[0][i] = 
+	rat_split_arg->fractionSplit.fractionSplit_val[i].split_low;
+      fractionSplit[1][i] = 
+	rat_split_arg->fractionSplit.fractionSplit_val[i].split_high;
+    }
+  }
+
+}
+
+AlgActionRationalSplit::~AlgActionRationalSplit() {
+
+  char *fname = "~AlgActionRationalSplit()";
+  VRB.Func(cname,fname);
+  
+  if (rat->getNmass() > 0) {
+    sfree(fractionSplit[0], cname, fname, "fractionSplit[0]");
+    sfree(fractionSplit[1], cname, fname, "fractionSplit[1]");
+    sfree(fractionSplit, cname, fname, "fractionSplit");
+  }
+
+}
+
+void AlgActionRationalSplit::heatbath() {
+  rat->heatbath();
+}
+
+Float AlgActionRationalSplit::energy() {
+  return rat->energy();
+}
+
+void AlgActionRationalSplit::cost(CgStats *cg_stats_global) {
+  rat->cost(cg_stats_global);
+}
+
+void AlgActionRationalSplit::evolve(Float dt, int steps) {
+  rat->evolve(dt, steps, fractionSplit);
+}
+
+int AlgActionRationalSplit::getNmass() {
+  return rat->getNmass();
+}
+
+Float AlgActionRationalSplit::getMass(int i) {
+  return rat->getMass(i);
+}
+
+CPS_END_NAMESPACE
