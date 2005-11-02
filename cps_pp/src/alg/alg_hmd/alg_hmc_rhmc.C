@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.22 2005-10-04 04:35:27 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.23 2005-11-02 07:20:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2005-10-04 04:35:27 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.22 2005-10-04 04:35:27 chulwoo Exp $
-  $Id: alg_hmc_rhmc.C,v 1.22 2005-10-04 04:35:27 chulwoo Exp $
+  $Date: 2005-11-02 07:20:52 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.23 2005-11-02 07:20:52 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.23 2005-11-02 07:20:52 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.22 $
+  $Revision: 1.23 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -32,6 +32,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include<util/data_shift.h>
 #include<util/checksum.h>
 #include<util/qcdio.h>
 #include<math.h>
@@ -45,8 +46,6 @@ CPS_END_NAMESPACE
 #include<comms/glb.h>
 #include<alg/alg_remez.h>
 #include<util/data_shift.h>
-#include<alg/alg_int.h>
-#include<alg/remez_arg.h>
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
@@ -152,42 +151,22 @@ void AlgHmcRHMC::init()
   // Allocate memory for the fermion CG arguments.
   //----------------------------------------------------------------
   if(n_frm_masses != 0){
-    frm_cg_arg_md = (CgArg ***) smalloc (cname,fname, "frm_cg_arg_md", 
-					 n_frm_masses * sizeof(CgArg**));
-
-    frm_cg_arg_mc = (CgArg ***) smalloc (cname,fname, "frm_cg_arg_mc", 
-					 n_frm_masses * sizeof(CgArg**));
+    frm_cg_arg = (CgArg **) smalloc (cname,fname, "frm_cg_arg", 
+				     n_frm_masses * sizeof(CgArg*));
 
     for(i=0; i<n_frm_masses; i++) {
-      frm_cg_arg_md[i] = (CgArg **)smalloc(cname,fname, "frm_cg_arg_md[i]",
-					   hmd_arg->FRatDeg[i]*sizeof(CgArg*));
-      frm_cg_arg_mc[i] = (CgArg **)smalloc(cname,fname, "frm_cg_arg_mc[i]",
-					   hmd_arg->SRatDeg[i]*sizeof(CgArg*));
-      for(j=0; j<hmd_arg->FRatDeg[i]; j++)
-	frm_cg_arg_md[i][j] = (CgArg *) 
-	  smalloc(cname,fname, "frm_cg_arg_md[i][j]",sizeof(CgArg));
-
-      for(j=0; j<hmd_arg->SRatDeg[i]; j++)
-	frm_cg_arg_mc[i][j] = (CgArg *) 
-	  smalloc(cname,fname, "frm_cg_arg_mc[i][j]",sizeof(CgArg));
+      frm_cg_arg[i] = (CgArg *) 
+	smalloc(cname,fname, "frm_cg_arg[i]",sizeof(CgArg));
     }
 
     // Initialize the fermion CG arguments
     //----------------------------------------------------------------
     for(i=0; i<n_frm_masses; i++){
-      for (j=0; j<hmd_arg->FRatDeg[i]; j++) {
-	frm_cg_arg_md[i][j]->mass = hmd_arg->frm_mass[i];
-	frm_cg_arg_md[i][j]->max_num_iter = hmd_arg->max_num_iter[i];
-	frm_cg_arg_md[i][j]->stop_rsd = hmd_arg->stop_rsd_md[i][j];
-      }
-      for (j=0; j<hmd_arg->SRatDeg[i]; j++) {
-	frm_cg_arg_mc[i][j]->mass = hmd_arg->frm_mass[i];
-	frm_cg_arg_mc[i][j]->max_num_iter = hmd_arg->max_num_iter[i];
-	frm_cg_arg_mc[i][j]->stop_rsd = hmd_arg->stop_rsd_mc[i][j];
-      }
+      frm_cg_arg[i]->mass = hmd_arg->frm_mass[i];
+      frm_cg_arg[i]->max_num_iter = hmd_arg->max_num_iter[i];
+      frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_mc[i];
     }
   }
-
   // Allocate memory for the boson CG arguments.
   //----------------------------------------------------------------
   if(n_bsn_masses != 0){
@@ -203,10 +182,11 @@ void AlgHmcRHMC::init()
 
   // Initialize the boson CG arguments
   //----------------------------------------------------------------
+  //??? Complete this
   for(i=0; i<n_bsn_masses; i++){
     bsn_cg_arg[i]->mass = hmd_arg->bsn_mass[i];
     bsn_cg_arg[i]->max_num_iter = hmd_arg->max_num_iter[i];
-    bsn_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd[i];
+    bsn_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_mc[i];
   }
 
   // Allocate memory for the phi pseudo fermion field.
@@ -312,7 +292,7 @@ void AlgHmcRHMC::init()
 //------------------------------------------------------------------
 AlgHmcRHMC::~AlgHmcRHMC() {
 
-  int i,j;
+  int i;
   char *fname = "~AlgHmcRHMC()" ;
   VRB.Func(cname,fname);
 
@@ -389,20 +369,12 @@ AlgHmcRHMC::~AlgHmcRHMC() {
   //----------------------------------------------------------------
   if(n_frm_masses != 0){
     for(i=0; i<n_frm_masses; i++){
-      for (j=0; j<hmd_arg->FRatDeg[i]; j++)
-	sfree(frm_cg_arg_md[i][j], cname,fname, "frm_cg_arg_md[i][j]");
-
-      for (j=0; j<hmd_arg->SRatDeg[i]; j++)
-	sfree(frm_cg_arg_mc[i][j], cname,fname, "frm_cg_arg_mc[i][j]");
-
-      sfree(frm_cg_arg_md[i], cname, fname, "frm_cg_arg_md[i]");
-      sfree(frm_cg_arg_mc[i], cname, fname, "frm_cg_arg_mc[i]");
+      VRB.Sfree(cname,fname, "frm_cg_arg[i]",frm_cg_arg[i]);
+      sfree(frm_cg_arg[i], cname,fname, "frm_cg_arg[i]");
     }
-
-    sfree(frm_cg_arg_md, cname,fname, "frm_cg_arg_md");
-    sfree(frm_cg_arg_mc, cname,fname, "frm_cg_arg_mc");
+    VRB.Sfree(cname,fname, "frm_cg_arg",frm_cg_arg);
+    sfree(frm_cg_arg, cname,fname, "frm_cg_arg");
   }
-
   
 }
 
@@ -432,8 +404,6 @@ Float AlgHmcRHMC::run(void)
 #if TARGET==cpsMPI
   using MPISCU::fprintf;
 #endif
-
-  /*
   int step;                            // Trajectory step
   Float h_init;                        // Initial Hamiltonian
   Float h_final;                       // Final Hamiltonian
@@ -580,26 +550,24 @@ Float AlgHmcRHMC::run(void)
 	lat.RandGaussVector(frmn[i], 0.5, Ncb);
 	h_init += lat.FhamiltonNode(frmn[i],frmn[i]);
 	
-	massRenormalise(&(frm_cg_arg_mc[i][0]->mass), &trueMass, hmd_arg->SRatDeg[i], 
+	massRenormalise(&(frm_cg_arg[i]->mass), &trueMass, hmd_arg->SRatDeg[i], 
 			hmd_arg->SIRatPole[i], RENORM_FORWARDS);
 
 	phi[i] -> CopyVec(frmn[i], f_size);
 	phi[i] -> VecTimesEquFloat(hmd_arg->SIRatNorm[i], f_size);
 	cg_iter = lat.FmatEvlMInv(phi+i, frmn[i], hmd_arg->SIRatPole[i], hmd_arg->SRatDeg[i],
-				  hmd_arg->isz, frm_cg_arg_mc[i], CNV_FRM_NO, SINGLE, 
+				  hmd_arg->isz, frm_cg_arg[i], CNV_FRM_NO, SINGLE, 
 				  hmd_arg->SIRatRes[i]);
 	
-	massRenormalise(&(frm_cg_arg_mc[i][0]->mass), &trueMass, hmd_arg->SRatDeg[i], 
+	massRenormalise(&(frm_cg_arg[i]->mass), &trueMass, hmd_arg->SRatDeg[i], 
 			hmd_arg->SIRatPole[i], RENORM_BACKWARDS);
 	
 	cg_iter_av += cg_iter;
 	if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
 	if(cg_iter > cg_iter_max) cg_iter_max = cg_iter;
-	true_res_av += frm_cg_arg_mc[i][0]->true_rsd;
-	if(frm_cg_arg_mc[i][0]->true_rsd < true_res_min) 
-	  true_res_min = frm_cg_arg_mc[i][0]->true_rsd;
-	if(frm_cg_arg_mc[i][0]->true_rsd > true_res_max) 
-	  true_res_max = frm_cg_arg_mc[i][0]->true_rsd;
+	true_res_av += frm_cg_arg[i]->true_rsd;
+	if(frm_cg_arg[i]->true_rsd < true_res_min) true_res_min = frm_cg_arg[i]->true_rsd;
+	if(frm_cg_arg[i]->true_rsd > true_res_max) true_res_max = frm_cg_arg[i]->true_rsd;
 	cg_calls++;      
 
       }
@@ -612,6 +580,11 @@ Float AlgHmcRHMC::run(void)
       //----------------------------------------------------------------
       // Molecular Dynamics Trajectory
       //----------------------------------------------------------------
+
+      // Reset the residual error for the Molecular Dynamics
+      //--------------------------------------------------------------
+      for (i=0; i<n_frm_masses; i++)
+	frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_md[i];
 
       // Perform initial QPQ integration
       //--------------------------------------------------------------
@@ -645,7 +618,7 @@ Float AlgHmcRHMC::run(void)
 	shift = 0;
 	for(i=0; i<n_frm_masses; i++){
 
-	  massRenormalise(&(frm_cg_arg_md[i][0]->mass), &trueMass, hmd_arg->FRatDeg[i], 
+	  massRenormalise(&(frm_cg_arg[i]->mass), &trueMass, hmd_arg->FRatDeg[i], 
 			  hmd_arg->FRatPole[i], RENORM_FORWARDS);
       
 	  for (j=0; j<hmd_arg->FRatDeg[i]; j++) 
@@ -653,19 +626,19 @@ Float AlgHmcRHMC::run(void)
 //	    frmn[j+shift] -> VecTimesEquFloat(0.0,f_size);
       
 	  cg_iter = lat.FmatEvlMInv(frmn + shift, phi[i], hmd_arg->FRatPole[i], 
-				    hmd_arg->FRatDeg[i], hmd_arg->isz, frm_cg_arg_md[i], 
+				    hmd_arg->FRatDeg[i], hmd_arg->isz, frm_cg_arg[i], 
 				    CNV_FRM_NO, frmn_d + shift);
-	  massRenormalise(&(frm_cg_arg_md[i][0]->mass), &trueMass, hmd_arg->FRatDeg[i], 
+	  massRenormalise(&(frm_cg_arg[i]->mass), &trueMass, hmd_arg->FRatDeg[i], 
 			  hmd_arg->FRatPole[i], RENORM_BACKWARDS);
       
 	  cg_iter_av += cg_iter;
 	  if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
 	  if(cg_iter > cg_iter_max) cg_iter_max = cg_iter;
-	  true_res_av += frm_cg_arg_md[i][0]->true_rsd;
-	  if(frm_cg_arg_md[i][0]->true_rsd < true_res_min) 
-	    true_res_min = frm_cg_arg_md[i][0]->true_rsd;
-	  if(frm_cg_arg_md[i][0]->true_rsd > true_res_max) 
-	    true_res_max = frm_cg_arg_md[i][0]->true_rsd;
+	  true_res_av += frm_cg_arg[i]->true_rsd;
+	  if(frm_cg_arg[i]->true_rsd < true_res_min) 
+	    true_res_min = frm_cg_arg[i]->true_rsd;
+	  if(frm_cg_arg[i]->true_rsd > true_res_max) 
+	    true_res_max = frm_cg_arg[i]->true_rsd;
 	  cg_calls++;      
 
 	  if (lat.Fclass() != F_CLASS_ASQTAD)
@@ -744,27 +717,28 @@ Float AlgHmcRHMC::run(void)
       //---------------------------------------------------------------
       shift = 0;
       for (i=0; i<n_frm_masses; i++) {
-	massRenormalise(&(frm_cg_arg_mc[i][0]->mass), &trueMass, hmd_arg->SRatDeg[i], 
+	massRenormalise(&(frm_cg_arg[i]->mass), &trueMass, hmd_arg->SRatDeg[i], 
 			hmd_arg->SRatPole[i], RENORM_FORWARDS);
+
+	// Reset the residual error to the mc error
+	frm_cg_arg[i]->stop_rsd = hmd_arg->stop_rsd_mc[i];
 
 	frmn[shift] -> CopyVec(phi[i],f_size);
 	frmn[shift] -> VecTimesEquFloat(hmd_arg->SRatNorm[i], f_size);
 
 	cg_iter = lat.FmatEvlMInv(frmn+shift, phi[i], hmd_arg->SRatPole[i], 
-				  hmd_arg->SRatDeg[i], hmd_arg->isz, frm_cg_arg_mc[i], 
+				  hmd_arg->SRatDeg[i], hmd_arg->isz, frm_cg_arg[i], 
 				  CNV_FRM_NO, SINGLE, hmd_arg->SRatRes[i]);
 
-	massRenormalise(&(frm_cg_arg_mc[i][0]->mass), &trueMass, hmd_arg->SRatDeg[i], 
+	massRenormalise(&(frm_cg_arg[i]->mass), &trueMass, hmd_arg->SRatDeg[i], 
 			hmd_arg->SRatPole[i], RENORM_BACKWARDS);
 
 	cg_iter_av += cg_iter;
 	if(cg_iter < cg_iter_min) cg_iter_min = cg_iter;
 	if(cg_iter > cg_iter_max) cg_iter_max = cg_iter;
-	true_res_av += frm_cg_arg_mc[i][0]->true_rsd;
-	if(frm_cg_arg_mc[i][0]->true_rsd < true_res_min) 
-	  true_res_min = frm_cg_arg_mc[i][0]->true_rsd;
-	if(frm_cg_arg_mc[i][0]->true_rsd > true_res_max) 
-	  true_res_max = frm_cg_arg_mc[i][0]->true_rsd;
+	true_res_av += frm_cg_arg[i]->true_rsd;
+	if(frm_cg_arg[i]->true_rsd < true_res_min) true_res_min = frm_cg_arg[i]->true_rsd;
+	if(frm_cg_arg[i]->true_rsd > true_res_max) true_res_max = frm_cg_arg[i]->true_rsd;
 	cg_calls++;      
 
 	h_final += lat.FhamiltonNode(frmn[shift], frmn[shift]);
@@ -922,6 +896,10 @@ Float AlgHmcRHMC::run(void)
 
   VRB.Result(cname,fname,"Configuration number = %d\n", lat.GupdCnt());
 
+  for (int i=0; i<n_frm_masses; i++)
+    VRB.Result(cname,fname,"%d psi_bar psi = %e\n", 
+	       i, lat.FhamiltonNode(phi[i],phi[i]));
+  
 
   // Reset Molecular Dynamics time counter
   //----------------------------------------------------------------
@@ -931,9 +909,6 @@ Float AlgHmcRHMC::run(void)
   ERR.HdwCheck(cname,fname);
 
   return acceptance;
-  */
-  return 0;
-
 }
 
 /*!
@@ -965,10 +940,6 @@ void AlgHmcRHMC::massRenormalise(Float *mass, Float *trueMass, int degree,
 void AlgHmcRHMC::generateApprox(HmdArg *hmd_arg)
 {
 
-  char *fname = "generateApprox(HmdArg *hmd_arg)";
-  ERR.General(cname, fname, "Not implemented");
-  
-  /*
   // Construct approximations
   for (int i=0; i<hmd_arg->n_frm_masses; i++) {
     for (int j=0; j<i; j++) {
@@ -1019,23 +990,18 @@ void AlgHmcRHMC::generateApprox(HmdArg *hmd_arg)
     }      
     
   }
-  */  
+  
 }
 
 /*!
   Measures the eigenvalue bounds and regenerates the approximation
   if necessary.
 */
-
 void AlgHmcRHMC::dynamicalApprox()
 {
 
   char *fname = "dynamicalApprox()";
   VRB.Func(cname,fname);
-
-  ERR.General(cname, fname, "Not implemented");
-
-  /*
 
   // Get the Lattice object
   //----------------------------------------------------------------
@@ -1163,9 +1129,7 @@ void AlgHmcRHMC::dynamicalApprox()
   sfree(chirality, cname,fname, "chirality");
   sfree(valid_eig, cname,fname, "valid_eig");
 
-*/
-
-
 }
+
 
 CPS_END_NAMESPACE
