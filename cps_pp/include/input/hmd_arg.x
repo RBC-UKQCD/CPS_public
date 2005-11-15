@@ -9,7 +9,6 @@ typedef int IMassVec[MAX_HMD_MASSES];
 typedef Float FMassVec[MAX_HMD_MASSES];
 typedef FRatVec FRatMassVec[MAX_HMD_MASSES];
 
-
 class HmdArg {
 
 
@@ -66,7 +65,7 @@ class HmdArg {
       The number of previous solutions used to form the initial solver
       guess (HMC only).
     */
-    IMassVec chrono;
+    int chrono;
 
     //! Reproduce test? 1 = TRUE, 0 = FALSE
     int reproduce;
@@ -99,11 +98,11 @@ class HmdArg {
 					stopping condition for each mass 
 					of dynamical fermions/bosons */
 
-    FRatMassVec stop_rsd_md;  /*!< The target residual for the solver
+    FMassVec stop_rsd_md;  /*!< The target residual for the solver
 					   stopping condition for each mass 
 					   of dynamical fermions/bosons */
 
-    FRatMassVec stop_rsd_mc;  /*!< The target residual for the solver
+    FMassVec stop_rsd_mc;  /*!< The target residual for the solver
 					   stopping condition for each mass 
 					   of dynamical fermions/bosons */
 
@@ -131,9 +130,6 @@ class HmdArg {
     //! Parameters for the RHMC force rational approximations.
     IMassVec FRatDeg;
 
-    //! Parameters for the RHMC action rational approximations. 
-    IMassVec SRatDeg;
-
     //! The new degrees to use for dynamic RHMC.
     IMassVec FRatDegNew;
 
@@ -149,6 +145,8 @@ class HmdArg {
     //! Parameters for the RHMC rational approximations..
     FRatMassVec FRatPole;
 
+    //! Parameters for the RHMC action rational approximations. 
+    IMassVec SRatDeg;
     //! Parameters for the RHMC action rational approximations.     
     FMassVec SRatError;
     //! Parameters for the RHMC action rational approximations.     
@@ -207,9 +205,6 @@ class RhmcPolesState {
     //! Parameters for the RHMC force rational approximations.
     IMassVec FRatDeg;
 
-    //! Parameters for the RHMC action rational approximations. 
-    IMassVec SRatDeg;
-
     //! The new degrees to use for dynamic RHMC.
     IMassVec FRatDegNew;
 
@@ -225,6 +220,8 @@ class RhmcPolesState {
     //! Parameters for the RHMC rational approximations..
     FRatMassVec FRatPole;
 
+    //! Parameters for the RHMC action rational approximations. 
+    IMassVec SRatDeg;
     //! Parameters for the RHMC action rational approximations.     
     FMassVec SRatError;
     //! Parameters for the RHMC action rational approximations.     

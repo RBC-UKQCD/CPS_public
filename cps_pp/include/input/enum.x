@@ -1,4 +1,5 @@
 
+
 typedef float pooh;
 
 #ifndef VMLH
@@ -7,19 +8,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.8 2005-10-04 05:55:02 chulwoo Exp $
+  $Id: enum.x,v 1.9 2005-11-15 06:33:47 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2005-10-04 05:55:02 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.8 2005-10-04 05:55:02 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.8 2005-10-04 05:55:02 chulwoo Exp $*/
+/*  $Date: 2005-11-15 06:33:47 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.9 2005-11-15 06:33:47 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.9 2005-11-15 06:33:47 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.8 $*/
+/*  $Revision: 1.9 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
