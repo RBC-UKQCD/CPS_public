@@ -93,7 +93,7 @@ vml_HmdArg (VML *vmls, char *name,HmdArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "sw", &objp->sw))
 		 return FALSE;
-	 if (!vml_IMassVec (vmls, "chrono", objp->chrono))
+	 if (!vml_int (vmls, "chrono", &objp->chrono))
 		 return FALSE;
 	 if (!vml_int (vmls, "reproduce", &objp->reproduce))
 		 return FALSE;
@@ -109,9 +109,9 @@ vml_HmdArg (VML *vmls, char *name,HmdArg *objp)
 		 return FALSE;
 	 if (!vml_FMassVec (vmls, "stop_rsd", objp->stop_rsd))
 		 return FALSE;
-	 if (!vml_FRatMassVec (vmls, "stop_rsd_md", objp->stop_rsd_md))
+	 if (!vml_FMassVec (vmls, "stop_rsd_md", objp->stop_rsd_md))
 		 return FALSE;
-	 if (!vml_FRatMassVec (vmls, "stop_rsd_mc", objp->stop_rsd_mc))
+	 if (!vml_FMassVec (vmls, "stop_rsd_mc", objp->stop_rsd_mc))
 		 return FALSE;
 	 if (!vml_vector (vmls, "field_type", (char *)objp->field_type, MAX_HMD_MASSES,
 		sizeof (FieldType), (vmlproc_t) vml_FieldType))
@@ -136,8 +136,6 @@ vml_HmdArg (VML *vmls, char *name,HmdArg *objp)
 		 return FALSE;
 	 if (!vml_IMassVec (vmls, "FRatDeg", objp->FRatDeg))
 		 return FALSE;
-	 if (!vml_IMassVec (vmls, "SRatDeg", objp->SRatDeg))
-		 return FALSE;
 	 if (!vml_IMassVec (vmls, "FRatDegNew", objp->FRatDegNew))
 		 return FALSE;
 	 if (!vml_IMassVec (vmls, "SRatDegNew", objp->SRatDegNew))
@@ -149,6 +147,8 @@ vml_HmdArg (VML *vmls, char *name,HmdArg *objp)
 	 if (!vml_FRatMassVec (vmls, "FRatRes", objp->FRatRes))
 		 return FALSE;
 	 if (!vml_FRatMassVec (vmls, "FRatPole", objp->FRatPole))
+		 return FALSE;
+	 if (!vml_IMassVec (vmls, "SRatDeg", objp->SRatDeg))
 		 return FALSE;
 	 if (!vml_FMassVec (vmls, "SRatError", objp->SRatError))
 		 return FALSE;
@@ -270,8 +270,6 @@ vml_RhmcPolesState (VML *vmls, char *name,RhmcPolesState *objp)
 		 return FALSE;
 	 if (!vml_IMassVec (vmls, "FRatDeg", objp->FRatDeg))
 		 return FALSE;
-	 if (!vml_IMassVec (vmls, "SRatDeg", objp->SRatDeg))
-		 return FALSE;
 	 if (!vml_IMassVec (vmls, "FRatDegNew", objp->FRatDegNew))
 		 return FALSE;
 	 if (!vml_IMassVec (vmls, "SRatDegNew", objp->SRatDegNew))
@@ -283,6 +281,8 @@ vml_RhmcPolesState (VML *vmls, char *name,RhmcPolesState *objp)
 	 if (!vml_FRatMassVec (vmls, "FRatRes", objp->FRatRes))
 		 return FALSE;
 	 if (!vml_FRatMassVec (vmls, "FRatPole", objp->FRatPole))
+		 return FALSE;
+	 if (!vml_IMassVec (vmls, "SRatDeg", objp->SRatDeg))
 		 return FALSE;
 	 if (!vml_FMassVec (vmls, "SRatError", objp->SRatError))
 		 return FALSE;
