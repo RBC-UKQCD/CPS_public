@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.37 2005-10-04 05:24:04 chulwoo Exp $
+  $Id: lattice_base.C,v 1.38 2005-11-15 07:22:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-10-04 05:24:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.37 2005-10-04 05:24:04 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.37 2005-10-04 05:24:04 chulwoo Exp $
+//  $Date: 2005-11-15 07:22:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.38 2005-11-15 07:22:18 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.38 2005-11-15 07:22:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.37 $
+//  $Revision: 1.38 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2889,5 +2889,16 @@ void Lattice::ForceMagnitude(Matrix *mom, Matrix *mom_old,
 
 }
 
+int Lattice::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
+                            int Nshift, int isz, CgArg *cg_arg,
+                            CnvFrmType cnv_frm, MultiShiftSolveType type,
+                            Float *alpha, Vector **f_out_d){
+    CgArg **cg_arg_p = new CgArg *[Nshift];
+    for(int i =0;i<Nshift;i++) cg_arg_p[i] = cg_arg;
+ 
+    return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg_p,cnv_frm,
+                               type,alpha, f_out_d);
+    delete[] cg_arg_p;
+}
 
 CPS_END_NAMESPACE
