@@ -102,12 +102,6 @@ class AlgRemez
   // Solve the system AX=B
   int simq(bigfloat *A, bigfloat *B, bigfloat *X, int n);
 
-  // Return the partial fraction expansion of the approximation x^(pnum/pden)
-  int getPFE(Float *res, Float *pole, Float *norm);
-
-  // Return the partial fraction expansion of the approximation x^(-pnum/pden)
-  int getIPFE(Float *res, Float *pole, Float *norm);
-
  public:
   
   // Constructor
@@ -118,6 +112,12 @@ class AlgRemez
 
   // Generate the rational approximation x^(pnum/pden)
   void generateApprox();
+
+  // Return the partial fraction expansion of the approximation x^(pnum/pden)
+  int getPFE(Float *res, Float *pole, Float *norm);
+
+  // Return the partial fraction expansion of the approximation x^(-pnum/pden)
+  int getIPFE(Float *res, Float *pole, Float *norm);
 
 };
 CPS_END_NAMESPACE
@@ -138,8 +138,6 @@ class AlgRemez
  private:
   char *cname;
 
-  int getPFE(Float *res, Float *pole, Float *norm) {return 0;}
-  int getIPFE(Float *res, Float *pole, Float *norm) {return 0;}
 
  public:
   
@@ -153,6 +151,8 @@ class AlgRemez
   ~AlgRemez() {;}
 
   Float generateApprox() {return 0.0;}
+  int getPFE(Float *res, Float *pole, Float *norm) {return 0;}
+  int getIPFE(Float *res, Float *pole, Float *norm) {return 0;}
 
 };
 CPS_END_NAMESPACE
