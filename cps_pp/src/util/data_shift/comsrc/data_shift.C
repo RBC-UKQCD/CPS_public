@@ -8,6 +8,11 @@ GlobalDataShift GDS;
 
 char *GlobalDataShift::cname = "GlobalDataShift";
 
+GlobalDataShift::GlobalDataShift(){
+  for(int i =0;i<5;i++) shifts[i]=0;
+  for(int i =0;i<5;i++) origin[i]=0;
+}
+
 void GlobalDataShift::Set(int x, int y, int z, int t, int s)
 {
   char *fname = "Set(x,y,z,t,s)";

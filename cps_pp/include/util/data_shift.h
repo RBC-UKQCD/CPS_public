@@ -13,9 +13,7 @@ class GlobalDataShift{
     void *temp_buf;
     void Shift(int i, int n_disp);
   public:
-  GlobalDataShift()
-    { Set(0,0,0,0,0);
-      SetOrigin(0,0,0,0,0); }
+  GlobalDataShift();
   ~GlobalDataShift(){};
   void Set(int x, int y, int z, int t, int s=0);
   void SetOrigin(int x, int y, int z, int t, int s=0);
