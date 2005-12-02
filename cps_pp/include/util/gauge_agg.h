@@ -1,6 +1,10 @@
 #ifndef GAUGE_AGG_H
 #define GAUGE_AGG_H
+#ifdef SCIDAC
+#include <asq_data_types.h>
+#else
 #include <util/asq_data_types.h>
+#endif
 struct gauge_agg{
   int src;
   int dest;
