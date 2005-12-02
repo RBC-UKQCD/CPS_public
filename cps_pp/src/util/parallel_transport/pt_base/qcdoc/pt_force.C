@@ -2,11 +2,12 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: pt_force.C,v 1.4 2005-09-15 20:00:25 chulwoo Exp $
+  $Id: pt_force.C,v 1.5 2005-12-02 17:51:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
 #include <string.h>
+#include "asq_data_types.h"
 #include "pt_int.h"
 
 extern "C"{
@@ -30,41 +31,23 @@ char *fname, const char *vname){
 
 
 
-#undef PROFILE
+#define PROFILE
 
 // N.B. No optimising provision is made if any of the asqtad coefficients
 // are zero.
 
-void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float dt){
+void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float dt){
 
-//    char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
+    char *fname = "asqtad_force()";
 //    VRB.Func(cname,fname);
 
 #ifdef PROFILE    
-    ParTrans::PTflops = 0;
-    ForceFlops = 0;
-    Float dtime;
+    Flops = 0;
+    Float dtime = -dclock();
+//    struct timeval start,end;
+//    gettimeofday(&start, NULL);
 #endif
 
-    size_t size;
-
-    size = vol*3*sizeof(Float);
-
-#if 0
-    vector *X = (vector *)smalloc(2*size);
-    vector *X_e = X;                             // even sites
-    vector *X_o = X+GJP.VolNodeSites()/2;  // odd sites
-
-    // The argument frm should have the CG solution.
-    // The FstagTypes protected pointer f_tmp should contain Dslash frm
-
-    moveMem(X_e, frm, size);
-    moveMem(X_o, sol, size);
-    Fconvert(X, CANONICAL, STAG);
-#endif
-
-//    Convert(STAG);  // Puts staggered phases into gauge field.
-    
     const int VAXPY_UNROLL = 6; // For optimised linear algebra functions.
     const int vax_len = vol*6/VAXPY_UNROLL;
     
@@ -80,14 +63,18 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
     // Array in which to accumulate the force term:
     // this must be initialised to zero 
 
-    matrix **force = (matrix**)pt_amalloc(pt_alloc, sizeof(matrix), 2, 4, vol);
-    bzero( (char *)force,sizeof(matrix)*4*vol);
 #if 0
-    for(int i=0; i<4; i++)
-	for(int s=0; s<vol; s++) force[i][s].ZeroMatrix();
+    matrix **force = (matrix**)pt_amalloc(pt_alloc, sizeof(matrix), 2, 4, vol);
+    memset( (char *)force,0,sizeof(matrix)*4*vol);
 #endif
+    matrix *force[4];
+    for(int i =0;i<4;i++){
+      force[i] = (matrix *)FastAlloc(sizeof(matrix)*vol);
+      memset( (char *)force[i],0,sizeof(matrix)*vol);
+    }
 
 
+#if 0
     // vector arrays for which we must allocate memory
 
     vector ***Pnu = (vector***)pt_amalloc(pt_alloc, sizeof(vector), 3, n_sign, N, vol);
@@ -101,17 +88,58 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
     vector ******P7 = (vector******)pt_amalloc(pt_alloc, sizeof(vector), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
 
     vector ******Psigma7 = (vector******)pt_amalloc(pt_alloc, sizeof(vector), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
+#else
+    vector *Pnu[2][4];
+    vector *P3[2][2][4];
+    vector *Prhonu[2][2][4];
+    vector *P5[2][2][2][4];
+    vector *P7[2][2][2][2][4];
+    vector *Psigma7[2][2][2][2][4];
+    vector *Pnununu[4];
+    vector *Pnunu[2][4];
+    vector *Pnu5[2][2][4];
+    vector *Pnu3[2][2][4];
+    vector *Prho5[2][2][2][4];
+    vector *Psigmarhonu[2][2][2][4];
+
+    size_t vec_size = 6*vol*sizeof(Float);
+    for(int i = 0;i<N;i++){
+      for(int j = 0;j<n_sign;j++){
+        Pnu[j][i] = (vector *)Alloc(cname,fname,"Pnu",vec_size,QCOMMS);
+//        printf("Pnu[%d][%d]=%p\n",j,i,Pnu[j][i]);
+        for(int k = 0;k<n_sign;k++){
+          P3[k][j][i] = (vector *)Alloc(cname,fname,"Pnu",vec_size,QCOMMS);
+          Prhonu[k][j][i] = (vector *)Alloc(cname,fname,"Pnu",vec_size,QCOMMS);
+          for(int l = 0;l<n_sign;l++){
+            P5[l][k][j][i] = (vector *)FastAlloc(vec_size);
+            for(int m = 0;m<n_sign;m++){
+              P7[m][l][k][j][i] = (vector *)FastAlloc(vec_size);
+              Psigma7[m][l][k][j][i] = (vector *)FastAlloc(vec_size);
+            }
+            Prho5[l][k][j][i] = Psigma7[0][l][k][j][i];
+            Psigmarhonu[l][k][j][i] = Psigma7[0][l][k][j][i];
+          }
+          Pnu3[k][j][i] = P7[0][0][k][j][i];
+          Pnu5[k][j][i] = P7[0][0][k][j][i];
+        }
+        Pnunu[j][i] = Psigma7[0][0][0][j][i];
+      }
+      Pnununu[i] = Prhonu[0][0][i];
+    }
+#endif
 
 
     
+#if 0
     // These vectors can be overlapped with previously allocated memory
     
-    vector **Pnununu = Prhonu[0][0];
-    vector ***Pnunu = Psigma7[0][0][0];;
+    vector *Pnununu[4] = Prhonu[0][0];
+    vector *Pnunu[2][4] = Psigma7[0][0][0];;
     vector ****Pnu5 = P7[0][0];
     vector ****Pnu3 = P7[0][0];
     vector *****Prho5 = Psigma7[0];
     vector *****Psigmarhonu = Psigma7[0];
+#endif
 
 
     // input/output arrays for the parallel transport routines
@@ -125,7 +153,7 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
                                                // nu directions we have done.
 //    ParTransAsqtad parallel_transport(*this);
 	    
-#ifdef PROFILE
+#if 0
    dtime = -dclock();
 #endif
     for (int m=0; m<4; m+=N){                     	    // Loop over mu
@@ -322,9 +350,7 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
 		    for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(ss=0; ss<n_sign; ss++) for(w=0; w<N; w++)
 			
 			asq_vaxpy3(P5[ms][ns][rs][w],&c75, Psigma7[ms][ns][rs][ss][w], P5[ms][ns][rs][w], vax_len);
-#ifdef PROFILE
-			ForceFlops += 2*GJP.VolNodeSites()*VECT_LEN*N*n_sign*n_sign*n_sign*n_sign;
-#endif
+			Flops += 2*vol*VECT_LEN*N*n_sign*n_sign*n_sign*n_sign;
 		}
 		// F_rho -= P5 Prhonu^\dagger
 	        for(w=0; w<N; w++)
@@ -383,9 +409,7 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
 		    Float c53 = asq_arg->c5/asq_arg->c3;
 		    for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(rs=0; rs<n_sign; rs++) for(w=0; w<N; w++)
 			asq_vaxpy3(P3[ms][ns][w],&c53,Prho5[ms][ns][rs][w], P3[ms][ns][w], vax_len);
-#ifdef PROFILE
-		ForceFlops += 2*vol*VECT_LEN*N*n_sign*n_sign*n_sign;
-#endif
+		Flops += 2*vol*VECT_LEN*N*n_sign*n_sign*n_sign;
 		}
 		
 	    } // rho+sigma loop
@@ -484,9 +508,7 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
 		    Float cl3 = asq_arg->c6/asq_arg->c3;
 		for(ms=0; ms<n_sign; ms++) for(ns=0; ns<n_sign; ns++) for(w=0; w<N; w++)
 		    asq_vaxpy3(P3[ms][ns][w], &cl3, Pnu5[ms][ns][w], P3[ms][ns][w], vax_len);
-#ifdef PROFILE
-		ForceFlops += 2*vol*VECT_LEN*N*n_sign*n_sign;
-#endif
+		Flops += 2*vol*VECT_LEN*N*n_sign*n_sign;
 	    }
 	    // F_nu += P3 Pnu^\dagger
 
@@ -589,12 +611,26 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
 
     // Now that we have computed the force, we can update the momenta
 
-#ifdef PROFILE
-    dtime += dclock();
-    print_flops(cname, fname, ParTrans::PTflops+ForceFlops, dtime);
-#endif
-
     update_momenta(force, dt, mom);
+
+#if 1
+    for(int i = 0;i<N;i++){
+      for(int j = 0;j<n_sign;j++){
+        Free(Pnu[j][i]);
+        for(int k = 0;k<n_sign;k++){
+          Free(P3[k][j][i]);
+          Free(Prhonu[k][j][i]);
+          for(int l = 0;l<n_sign;l++){
+            Free(P5[l][k][j][i]);
+            for(int m = 0;m<n_sign;m++){
+              Free(P7[m][l][k][j][i]);
+              Free(Psigma7[m][l][k][j][i]);
+            }
+          }
+        }
+      }
+    }
+#else
 
     // Tidy up
 
@@ -604,16 +640,29 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float
     Free(P5);
     Free(P7);
     Free(Psigma7);
-    Free(X);
+#endif
+#if 0
     Free(force);
+#else
+    for(int i =0;i<4;i++){
+      Free(force[i]);
+    }
+#endif
+
+#ifdef PROFILE
+//    gettimeofday(&end,NULL);
+    dtime +=dclock();
+    print_flops(fname, Flops, dtime);
+#endif
 
 }
 
+#undef PROFILE
 void PT::force_product_sum(vector *v, vector *w,
 				    Float coeff, matrix *f){
 
-  char *fname = "force_product_sum(*V,*V,F,*M)";
-  //ForceFlops +=78*vol;
+//  char *fname = "force_product_sum(*V,*V,F,*M)";
+  Flops +=78*vol;
   unsigned long v2 = (unsigned long)v;
   if( qalloc_is_fast(v) &&
       qalloc_is_fast(w) &&
@@ -624,7 +673,13 @@ void PT::force_product_sum(vector *v, vector *w,
   Float dtime = -dclock();
 #endif
   IFloat coeff2 = 2.0*coeff;
+//  printf("force_product_sum::coeff =%e\n",coeff);
+//  Float *f_p = (Float *)f;
+//  printf("f = %0.3e %0.3e %0.3e %0.3e %0.3e %0.3e\n",
+//        f_p[0],f_p[1],f_p[2],f_p[3],f_p[4],f_p[5]);
   asq_force_cross2dag((vector *)v2, w, f, vol/2, &coeff2);
+//  printf("f = %0.3e %0.3e %0.3e %0.3e %0.3e %0.3e\n",
+ //         f_p[0],f_p[1],f_p[2],f_p[3],f_p[4],f_p[5]);
 #ifdef PROFILE
   dtime += dclock();
   print_flops(cname,fname,78*vol,dtime);
@@ -646,26 +701,24 @@ void PT::update_momenta(matrix **force, Float dt, matrix *mom) {
 	    for(s[1]=0; s[1]<size[1]; s[1]++)
 		for(s[0]=0; s[0]<size[0]; s[0]++){
 
-		    matrix *ip = mom+LexGauge(s,0);
+//		    matrix *ip = mom+LexGauge(s,0);
 
 		    for (int mu=0; mu<4; mu++){			
 			mf = force[mu][LexVector(s)];
 			mf.TrLessAntiHermMatrix();
-#ifdef MILC_COMPATIBILITY
-			mf *= 0.5;	
-#endif
+//			mf *= 0.5;	
 			if(parity(s)) dt_tmp =-dt;
 			else dt_tmp = dt;
-#if 1
-			(ip+mu)->fTimesV1Plus(dt_tmp,mf);
-#else
-			fTimesV1PlusV2((IFloat*)(ip+mu), dt_tmp, (IFloat*)&mf,
-				       (IFloat*)(ip+mu),
-				       MATRIX_SIZE);
+		        matrix *ip = mom+LexGauge(s,mu);
+			(ip)->fTimesV1Plus(0.5*dt_tmp,mf);
+#if 0
+                    Float *ip_f =(Float *)ip;
+                    printf("update_momenta[%d](%d %d %d %d)(%d)= (%0.3e %0.3e)\n",
+                    LexGauge(s,mu),s[0],s[1],s[2],s[3],mu,ip_f[1],ip_f[2]);
 #endif
 		    }
 		}
-//    ForceFlops += GJP.VolNodeSites()*54;	
+    Flops += vol*54;	
     
 }
 
