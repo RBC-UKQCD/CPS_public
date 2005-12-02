@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.23 2005-11-02 07:20:52 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.24 2005-12-02 15:20:21 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2005-11-02 07:20:52 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.23 2005-11-02 07:20:52 chulwoo Exp $
-  $Id: alg_hmc_rhmc.C,v 1.23 2005-11-02 07:20:52 chulwoo Exp $
+  $Date: 2005-12-02 15:20:21 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.24 2005-12-02 15:20:21 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.24 2005-12-02 15:20:21 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.23 $
+  $Revision: 1.24 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -967,26 +967,49 @@ void AlgHmcRHMC::generateApprox(HmdArg *hmd_arg)
       }
     }
 
-    if (!hmd_arg->valid_approx[i]) {
-      AlgRemez remez(hmd_arg->lambda_low[i],hmd_arg->lambda_high[i],hmd_arg->precision);
-      hmd_arg->FRatError[i] = remez.generateApprox(hmd_arg->FRatDeg[i],hmd_arg->frm_power_num[i],
-						  hmd_arg->frm_power_den[i]);
-      if (hmd_arg->field_type[i] == BOSON) {
-	remez.getPFE(hmd_arg->FRatRes[i],hmd_arg->FRatPole[i],&hmd_arg->FRatNorm[i]);
-      } else {
-	remez.getIPFE(hmd_arg->FRatRes[i],hmd_arg->FRatPole[i],&hmd_arg->FRatNorm[i]);
-      }
+// CJ: backward compatibility
 
-      hmd_arg->SRatError[i] = remez.generateApprox(hmd_arg->SRatDeg[i],hmd_arg->frm_power_num[i],
-						  2*hmd_arg->frm_power_den[i]);
-      if (hmd_arg->field_type[i] == BOSON) {
-	remez.getPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i],&hmd_arg->SRatNorm[i]);
-	remez.getIPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i],&hmd_arg->SIRatNorm[i]);
-      } else {
-	remez.getIPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i],&hmd_arg->SRatNorm[i]);
-	remez.getPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i],&hmd_arg->SIRatNorm[i]);
-      }
-      hmd_arg->valid_approx[i] = 1;
+    if (!hmd_arg->valid_approx[i]) {
+//      AlgRemez remez(hmd_arg->lambda_low[i],hmd_arg->lambda_high[i],hmd_arg->precision);
+//      hmd_arg->FRatError[i] = remez.generateApprox(hmd_arg->FRatDeg[i],hmd_arg->frm_power_num[i], hmd_arg->frm_power_den[i]);
+
+        RemezArg remez_arg;
+        remez_arg.degree = hmd_arg->FRatDeg[i];
+        remez_arg.field_type = hmd_arg->field_type[i];
+        remez_arg.lambda_low = hmd_arg->lambda_low[i];
+        remez_arg.lambda_high = hmd_arg->lambda_high[i];
+        remez_arg.power_num = hmd_arg->frm_power_num[i];
+        remez_arg.power_den = hmd_arg->frm_power_den[i];
+        remez_arg.precision = hmd_arg->precision;
+        {
+            AlgRemez remez(remez_arg);
+            remez.generateApprox();
+            hmd_arg->FRatError[i] = remez_arg.error;
+            if (hmd_arg->field_type[i] == BOSON) {
+                remez.getPFE(hmd_arg->FRatRes[i],hmd_arg->FRatPole[i],&hmd_arg->FRatNorm[i]);
+             } else {
+                remez.getIPFE(hmd_arg->FRatRes[i],hmd_arg->FRatPole[i],&hmd_arg->FRatNorm[i]);
+             }
+        }
+
+   //   hmd_arg->SRatError[i] = remez.generateApprox(hmd_arg->SRatDeg[i],hmd_arg->frm_power_num[i], 2*hmd_arg->frm_power_den[i]);
+        remez_arg.degree = hmd_arg->SRatDeg[i];
+        remez_arg.power_num = hmd_arg->frm_power_num[i];
+        remez_arg.power_den = 2*hmd_arg->frm_power_den[i];
+        {
+            AlgRemez remez(remez_arg);
+            remez.generateApprox();
+            hmd_arg->SRatError[i] = remez_arg.error;
+
+            if (hmd_arg->field_type[i] == BOSON) {
+                remez.getPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i],&hmd_arg->SRatNorm[i]);
+                remez.getIPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i],&hmd_arg->SIRatNorm[i]);
+            }else {
+                remez.getIPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i],&hmd_arg->SRatNorm[i]);
+                remez.getPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i],&hmd_arg->SIRatNorm[i]);
+            }
+        }
+        hmd_arg->valid_approx[i] = 1;
     }      
     
   }
@@ -1095,25 +1118,44 @@ void AlgHmcRHMC::dynamicalApprox()
       else
 	hmd_arg->lambda_high[i] = hmd_arg->lambda_max[i];
 
-      AlgRemez remez(hmd_arg->lambda_low[i], hmd_arg->lambda_high[i], hmd_arg->precision);
+//      AlgRemez remez(hmd_arg->lambda_low[i], hmd_arg->lambda_high[i], hmd_arg->precision);
       
-      remez.generateApprox(hmd_arg->FRatDeg[i],hmd_arg->frm_power_num[i], 
-			   hmd_arg->frm_power_den[i]);
-      if (hmd_arg->field_type[i] == BOSON) {
-	remez.getPFE(hmd_arg->FRatRes[i], hmd_arg->FRatPole[i], &hmd_arg->FRatNorm[i]);
-      } else {
-	remez.getIPFE(hmd_arg->FRatRes[i], hmd_arg->FRatPole[i], &hmd_arg->FRatNorm[i]);
+//      remez.generateApprox(hmd_arg->FRatDeg[i],hmd_arg->frm_power_num[i], hmd_arg->frm_power_den[i]);
+      RemezArg remez_arg;
+      remez_arg.degree = hmd_arg->FRatDeg[i];
+      remez_arg.field_type = hmd_arg->field_type[i];
+      remez_arg.lambda_low = hmd_arg->lambda_low[i];
+      remez_arg.lambda_high = hmd_arg->lambda_high[i];
+      remez_arg.power_num = hmd_arg->frm_power_num[i];
+      remez_arg.power_den = hmd_arg->frm_power_den[i];
+      remez_arg.precision = hmd_arg->precision;
+      {
+        AlgRemez remez(remez_arg);
+        remez.generateApprox();
+        hmd_arg->FRatError[i] = remez_arg.error;
+        if (hmd_arg->field_type[i] == BOSON) {
+          remez.getPFE(hmd_arg->FRatRes[i], hmd_arg->FRatPole[i], &hmd_arg->FRatNorm[i]);
+        } else {
+          remez.getIPFE(hmd_arg->FRatRes[i], hmd_arg->FRatPole[i], &hmd_arg->FRatNorm[i]);
+        }
       }
 
-      remez.generateApprox(hmd_arg->SRatDeg[i],hmd_arg->frm_power_num[i],
-			   2*hmd_arg->frm_power_den[i]);
+//      remez.generateApprox(hmd_arg->SRatDeg[i],hmd_arg->frm_power_num[i], 2*hmd_arg->frm_power_den[i]);
 
-      if (hmd_arg->field_type[i] == BOSON) {
-	remez.getPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i], &hmd_arg->SRatNorm[i]);
-	remez.getIPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i], &hmd_arg->SIRatNorm[i]);
-      } else {
-	remez.getIPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i], &hmd_arg->SRatNorm[i]);
-	remez.getPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i], &hmd_arg->SIRatNorm[i]);
+      remez_arg.degree = hmd_arg->SRatDeg[i];
+      remez_arg.power_num = hmd_arg->frm_power_num[i];
+      remez_arg.power_den = 2*hmd_arg->frm_power_den[i];
+      {
+        AlgRemez remez(remez_arg);
+        remez.generateApprox();
+        hmd_arg->SRatError[i] = remez_arg.error;
+        if (hmd_arg->field_type[i] == BOSON) {
+          remez.getPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i], &hmd_arg->SRatNorm[i]);
+          remez.getIPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i], &hmd_arg->SIRatNorm[i]);
+        } else {
+          remez.getIPFE(hmd_arg->SRatRes[i],hmd_arg->SRatPole[i], &hmd_arg->SRatNorm[i]);
+          remez.getPFE(hmd_arg->SIRatRes[i],hmd_arg->SIRatPole[i], &hmd_arg->SIRatNorm[i]);
+        }
       }
     } else {
       VRB.Result(cname,fname,"Reconstruction not necessary\n");
