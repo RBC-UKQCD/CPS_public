@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fp4::EvolveMomFforce.
 
-  $Id: p4_Fforce.C,v 1.4 2005-03-09 18:12:51 chulwoo Exp $
+  $Id: p4_Fforce.C,v 1.5 2005-12-02 17:58:53 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ void Fp4::RHMC_EvolveMomFforce(Matrix * mom, Vector ** vect, int abc, double * d
 }
 #endif
 
-void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
+Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   ERR.NotImplemented(cname,fname);
 #if 0
@@ -720,6 +720,8 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
   Convert(CANONICAL);
 #endif   
+
+  return 0.0;
 }
 
 CPS_END_NAMESPACE
