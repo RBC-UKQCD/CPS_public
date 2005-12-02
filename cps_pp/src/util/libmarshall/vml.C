@@ -202,6 +202,7 @@ enum_t *vml_enum_val  ( char *string, struct vml_enum_map * map)
     }
   }
   fprintf(stderr,"logic bomb in vml_enum_val\n"); exit(-1);
+  fprintf(stderr,"%s\n",string);
 }
 /*
  * VML enumerations
@@ -543,8 +544,12 @@ bool_t VML::Puts(char *string)
   switch ( StreamType ) { 
   case VML_STDIO:
   case VML_DESCRIPTOR:
+#ifndef NO_CPS
+    Fprintf(x_fp,string);
+#else
     fprintf(x_fp,string);
     fflush(x_fp);
+#endif
     return true;
     break;
   case VML_MEM:
@@ -611,11 +616,19 @@ bool_t VML::Create(int fd,enum vml_op op)
 bool_t VML::Create(char *file, enum vml_op op)
 {
   FILE *fp = NULL;
+#ifndef NO_CPS
+  if ( op == VML_ENCODE ) { 
+    fp  = Fopen(file,"w");
+  } else if ( op == VML_DECODE ) { 
+    fp  = fopen(file,"r");
+  }
+#else
   if ( op == VML_ENCODE ) { 
     fp  = fopen(file,"w");
   } else if ( op == VML_DECODE ) { 
     fp  = fopen(file,"r");
   }
+#endif
   if ( fp == NULL ) return VML_FALSE;
   return Create(fp,op);
 
@@ -632,7 +645,11 @@ bool_t VML::Create(FILE *file, enum vml_op op)
 void VML::Destroy(void) 
 {
   if ( StreamType == VML_MEM ) return;
+#ifndef NO_CPS
+  else if (x_fp) Fclose(x_fp);
+#else
   else if (x_fp) fclose(x_fp);
+#endif
 }
 bool_t vmlmem_create (VML *__vmls, char * __addr,
 				int __size, enum vml_op __xop)
