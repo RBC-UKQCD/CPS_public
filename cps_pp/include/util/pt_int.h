@@ -1,13 +1,17 @@
 #ifndef _PT_INT_H_
 #define _PT_INT_H_
-//#include <config.h>
+#include <sys/time.h>
+#ifdef SCIDAC
+#include <gauge_agg.h>
+#include <asqtad_int.h>
+#else
 #include <util/gauge_agg.h>
-
 #include <util/asqtad_int.h>
+#endif
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.14 2005-10-04 05:56:24 chulwoo Exp $
+  $Id: pt_int.h,v 1.15 2005-12-02 15:17:57 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 #include <qcdocos/scu_dir_arg.h>
@@ -26,12 +30,10 @@ struct PTArg {
   int prec;
 };
 
-enum {
-PT_DAG_YES=1,PT_DAG_NO=0,
-PT_CHKB_EVEN=0,PT_CHKB_ODD=1,
-PT_XYZT = 0, PT_TXYZ, PT_XYZT_CB_O,
-PT_EVEN, PT_ODD
-};
+enum { PT_DAG_YES=1,PT_DAG_NO=0};
+enum { PT_CHKB_EVEN=0,PT_CHKB_ODD=1};
+enum { PT_XYZT = 0, PT_TXYZ, PT_XYZT_CB_O, PT_XYZT_CB_E};
+enum { PT_EVEN = 0, PT_ODD };
 
 
 
@@ -152,6 +154,9 @@ int conjugated;
     SCUDirArgIR *SCUarg_mat_cb[4*NDIM];
 //--------------------------------------------------------------
 
+// flop counter
+  unsigned long long Flops;
+
 //Function primitives
     void (*Copy) (Float *dest, Float *src);
     void (*DagCopy) (Float *dest, Float *src);
@@ -163,11 +168,13 @@ int conjugated;
     static void dag_cpy (Float *dest, Float *src);
     static int lex_xyzt(int *x);
     static int lex_xyzt_cb_o(int *x);
+    static int lex_xyzt_cb_e(int *x);
     static int lex_txyz_cb(int *x);
     static int lex_txyz(int *x);
     int LexSurface(int *x);
     static int lex_g_xyzt(int *x, int mu);
     static int lex_g_xyzt_cb_o(int *x, int mu);
+    static int lex_g_xyzt_cb_e(int *x, int mu);
     static int lex_g_txyz(int *x, int mu);
     static int lex_g_txyz_cb(int * x, int mu);
     static int set_offset(int dir, int hop);
@@ -177,7 +184,7 @@ int conjugated;
     ~PT() {};
     static  int vol;
     void init (PTArg *pt_arg);
-	void init_g();
+	void init_g(Float *g_addr = NULL);
 	void delete_buf();
 	void delete_g_buf();
 
@@ -208,7 +215,7 @@ int conjugated;
 	void shift_field(Float **v, const int *dir, int n_dir,
 			 int hop, Float **u);
 	void shift_link(Float **u, const int *dir, int n_dir);
-	void asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float mass, Float dt);
+	void asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float dt);
 	void PointerErr(char *cname, char *fname, char *vname){
 	  printf("%s::%s: %s not allocated\n",cname,fname,vname);
   	  exit(-42);
@@ -227,6 +234,18 @@ int flag = QCOMMS);
 
   void Free(void *p){
     if (p) qfree(p);
+  }
+
+  Float dclock(){
+    struct timeval start;
+    gettimeofday(&start,NULL);
+    return start.tv_sec + 1e-06*start.tv_usec;
+  }
+
+  Float print_flops(char *fname, unsigned long long nflops, Float time){
+        printf("PT::%s: %e flops /%e seconds = %e MFlops\n",
+        fname,(Float)nflops,time,(Float)nflops/(time*1.e6));
+        return nflops/time;
   }
   void force_product_sum(vector *v, vector *w, Float coeff, matrix *f);
   void update_momenta(matrix **force, Float dt, matrix *mom);
