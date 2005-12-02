@@ -66,13 +66,13 @@ AlgActionRational::AlgActionRational(AlgMomentum &mom,
     
     for(int i=0; i<n_masses; i++) {
       remez_arg_md[i].degree = 
-	rat_arg->rationals.rationals_val[i].md_approx.md_approx_len;
+	rat_arg->rationals.rationals_val[i].md_approx.stop_rsd.stop_rsd_len;
       remez_arg_md[i].field_type = 
 	rat_arg->rationals.rationals_val[i].field_type;
       remez_arg_md[i].lambda_low = 
-	rat_arg->rationals.rationals_val[i].lambda_low;
+	rat_arg->rationals.rationals_val[i].md_approx.lambda_low;
       remez_arg_md[i].lambda_high = 
-	rat_arg->rationals.rationals_val[i].lambda_high;
+	rat_arg->rationals.rationals_val[i].md_approx.lambda_high;
       remez_arg_md[i].power_num = 
 	rat_arg->rationals.rationals_val[i].power_num;
       remez_arg_md[i].power_den = 
@@ -81,13 +81,13 @@ AlgActionRational::AlgActionRational(AlgMomentum &mom,
       remez_arg_md[i].valid_approx = 0;
       
       remez_arg_mc[i].degree = 
-	rat_arg->rationals.rationals_val[i].mc_approx.mc_approx_len;
+	rat_arg->rationals.rationals_val[i].mc_approx.stop_rsd.stop_rsd_len;
       remez_arg_mc[i].field_type = 
 	rat_arg->rationals.rationals_val[i].field_type;
       remez_arg_mc[i].lambda_low = 
-	rat_arg->rationals.rationals_val[i].lambda_low;
+	rat_arg->rationals.rationals_val[i].mc_approx.lambda_low;
       remez_arg_mc[i].lambda_high = 
-	rat_arg->rationals.rationals_val[i].lambda_high;
+	rat_arg->rationals.rationals_val[i].mc_approx.lambda_high;
       remez_arg_mc[i].power_num = 
 	rat_arg->rationals.rationals_val[i].power_num;
       remez_arg_mc[i].power_den = 
@@ -127,13 +127,14 @@ AlgActionRational::AlgActionRational(AlgMomentum &mom,
 	frm_cg_arg_md[i][j]->mass = mass[i];
 	frm_cg_arg_md[i][j]->max_num_iter = max_num_iter[i];
 	frm_cg_arg_md[i][j]->stop_rsd = 
-	  rat_arg->rationals.rationals_val[i].md_approx.md_approx_val[j].stop_rsd;
+	  rat_arg->rationals.rationals_val[i].md_approx.stop_rsd.stop_rsd_val[j];
       }
       for (int j=0; j<remez_arg_mc[i].degree; j++) {
 	frm_cg_arg_mc[i][j]->mass = mass[i];
 	frm_cg_arg_mc[i][j]->max_num_iter = max_num_iter[i];
 	frm_cg_arg_mc[i][j]->stop_rsd = 
-	  rat_arg->rationals.rationals_val[i].mc_approx.mc_approx_val[j].stop_rsd;      }
+	  rat_arg->rationals.rationals_val[i].mc_approx.stop_rsd.stop_rsd_val[j];
+      }
     }
   
     max_size = 0;
@@ -188,6 +189,41 @@ AlgActionRational::AlgActionRational(AlgMomentum &mom,
       fractionSplit[1][i] = remez_arg_md[i].degree;
     }
 
+    //!< Setup AlgEig parameters if necessary
+    if (rat_arg->eigen.eigen_measure == EIGEN_MEASURE_YES) {
+      eig_arg.pattern_kind = ARRAY;
+      eig_arg.Mass.Mass_len = n_masses;
+      eig_arg.Mass.Mass_val = 
+	(Float*) smalloc(n_masses*sizeof(Float),cname, fname, "Mass_val");
+      for (int i=0; i<n_masses; i++)
+	eig_arg.Mass.Mass_val[i] = mass[i];
+      eig_arg.N_eig = 1;
+      eig_arg.Kalk_Sim = 0;
+      eig_arg.MaxCG = rat_arg->eigen.max_num_iter;
+      eig_arg.RsdR_a =  rat_arg->eigen.stop_rsd;
+      eig_arg.RsdR_r =  rat_arg->eigen.stop_rsd;
+      eig_arg.Rsdlam =  rat_arg->eigen.stop_rsd;
+      eig_arg.Cv_fact =   0.0;
+      eig_arg.N_min = 0;
+      eig_arg.N_max = 0;
+      eig_arg.N_KS_max = 0;
+      eig_arg.n_renorm = 100;
+      eig_arg.ProjApsiP = 0;
+      eig_arg.print_hsum = 0;
+      eig_arg.hsum_dir = 0;
+      eig_arg.ncorr = 0;
+
+      lambda_low = (Float**)smalloc(eig_arg.N_eig*sizeof(Float*),
+				    cname,fname,"lambda_low");
+      lambda_high = (Float**)smalloc(eig_arg.N_eig*sizeof(Float*),
+				     cname,fname,"lambda_high");
+      for (int i=0; i<eig_arg.N_eig; i++) {
+	lambda_low[i] = (Float*)smalloc(n_masses*sizeof(Float),
+					cname,fname,"lambda_low[i]");
+	lambda_high[i] = (Float*)smalloc(n_masses*sizeof(Float),
+					cname,fname,"lambda_high[i]");
+      }
+    }
   }
 
   init();
@@ -200,7 +236,7 @@ void AlgActionRational::init() {
   evolved = 1;
   heatbathEval = 0;
   energyEval = 0;
-    
+  traj = -1;  
 }
 
 AlgActionRational::~AlgActionRational() {
@@ -210,6 +246,17 @@ AlgActionRational::~AlgActionRational() {
 
   //!< Free memory for timescale split partial fraction
   if (n_masses > 0) {
+    if (rat_arg->eigen.eigen_measure == EIGEN_MEASURE_YES) {
+      for (int i=0; i<eig_arg.N_eig; i++) {
+	sfree(lambda_high, cname, fname, "lambda_low[i]");
+	sfree(lambda_low, cname, fname, "lambda_high[i]");
+      }
+      sfree(lambda_low,cname, fname, "lambda_low");
+      sfree(lambda_high,cname, fname, "lambda_high");
+
+      sfree(eig_arg.Mass.Mass_val, cname, fname, "Mass_val");
+    }
+
     //!< Free dummy fractionSplit parameters
     sfree(fractionSplit[0], cname, fname, "fractionSplit[0]");
     sfree(fractionSplit[1], cname, fname, "fractionSplit[1]");
@@ -295,7 +342,7 @@ void AlgActionRational::heatbath() {
     evolved = 0;
     heatbathEval = 1;
     energyEval = 0;
-
+    traj++;
   }
 
 }
@@ -314,6 +361,11 @@ Float AlgActionRational::energy() {
     int shift = 0;
     Float trueMass;
     Float h = 0.0;
+
+    //!< Before energy is measured, do we want to check bounds?
+    if (rat_arg->eigen.eigen_measure == EIGEN_MEASURE_YES) {
+      checkApprox();
+    }
 
     //!< Create an appropriate lattice
     Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
@@ -397,9 +449,15 @@ void AlgActionRational::evolve(Float dt, int nsteps, int **fractionSplit)
 	  updateCgStats(frm_cg_arg_md[i][isz]);
 	  
 	  if (fermion != F_CLASS_ASQTAD) {
-	    lat.RHMC_EvolveMomFforce(mom, frmn+shift+isz, deg, isz,
-				     remez_arg_md[i].residue+isz, mass[i],
-				     dt, frmn_d+shift+isz);
+	    Fdt = lat.RHMC_EvolveMomFforce(mom, frmn+shift+isz, deg, isz,
+					   remez_arg_md[i].residue+isz, 
+					   mass[i], dt, frmn_d+shift+isz,
+					   force_measure);
+
+	    if (force_measure == FORCE_MEASURE_YES) {
+	      sprintf(force_label, "Rational total, mass = %e:", mass[i]);
+	      printForce(Fdt, dt, force_label);
+	    }
 	  } else {
 	    //!< Do appropriate pointer arithmetic for asqtad
 	    for (int j=0; j<deg; j++) {
@@ -417,7 +475,7 @@ void AlgActionRational::evolve(Float dt, int nsteps, int **fractionSplit)
       
       if (fermion == F_CLASS_ASQTAD && total_split_degree > 0)
 	lat.RHMC_EvolveMomFforce(mom, frmn_tmp, total_split_degree, 0,
-				 all_res, 0.0, dt, frmn_d);
+				 all_res, 0.0, dt, frmn_d, force_measure);
       
       evolved = 1;
       heatbathEval = 0;
@@ -513,6 +571,55 @@ int AlgActionRational::compareApprox(RemezArg &arg1, RemezArg &arg2) {
     return 0;
   }
   
+}
+
+//!< Check that the approximation bounds are still valid for the mc approx
+void AlgActionRational::checkApprox() {
+
+  char *fname = "checkApprox()";
+
+  Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
+  
+  {
+    //!< Measure the lowest eigenvalue
+    sprintf(eig_file,"%s.%d",rat_arg->eigen.eig_lo_stem,traj);
+    eig_arg.fname = eig_file;        
+    eig_arg.RitzMatOper = MATPCDAG_MATPC;
+    
+    AlgEig eig(lat,&ca_eig,&eig_arg);
+    eig.run(lambda_low);
+
+    for (int i=0; i<n_masses; i++) {
+      if (lambda_low[0][i] < remez_arg_mc[i].lambda_low) {
+	ERR.General(cname, fname, 
+		    "Lower bound exceeded: mass[%d] = %f, %e < %e\n", 
+		    i, mass[i], lambda_low[0][i], remez_arg_mc[i].lambda_low);
+      }
+    }
+
+  }
+  
+  {
+    //!< Measure the highest eigenvalue
+    sprintf(eig_file,"%s.%d",rat_arg->eigen.eig_hi_stem,traj);
+    eig_arg.fname = eig_file;    
+    eig_arg.RitzMatOper = NEG_MATPCDAG_MATPC;
+    
+    AlgEig eig(lat,&ca_eig,&eig_arg);
+    eig.run(lambda_high);
+    
+    for (int i=0; i<n_masses; i++) {
+      lambda_high[0][i] *= -1.0;
+      if (lambda_high[0][i] > remez_arg_mc[i].lambda_high) {
+	ERR.General(cname, fname, 
+		    "Upper bound exceeded: mass[%d] = %f, %e < %e\n", 
+		    i, mass[i], lambda_high[0][i], remez_arg_mc[i].lambda_high);
+      }
+    }
+    
+  }
+  
+  LatticeFactory::Destroy();
 }
 
 CPS_END_NAMESPACE

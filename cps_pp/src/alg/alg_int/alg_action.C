@@ -19,11 +19,14 @@ CPS_END_NAMESPACE
 #include<alg/alg_int.h>
 CPS_START_NAMESPACE
 
-AlgAction::AlgAction(AlgMomentum &momentum) : AlgHamiltonian()
+AlgAction::AlgAction(AlgMomentum &momentum, ActionArg &action_arg) 
+  : AlgHamiltonian()
 {
 
   cname = "AlgAction(Matrix*)";
+  char *fname = "AlgAction(AlgMomentum&,ActionArg&)";
   mom = momentum.getMom();
+  force_measure = action_arg.force_measure;
 
 }
 
@@ -34,13 +37,32 @@ AlgAction::AlgAction() : AlgHamiltonian()
 
 AlgAction::~AlgAction()
 {
-
+  char *fname = "~AlgAction()";
 }
 
 //!< Dummy method
 void AlgAction::reverse()
 {
   
+}
+
+void AlgAction::printForce(Float Fdt, Float dt, char *label) {
+
+  char *fname = "printForce(Float, Float, char*)";
+  FILE *fp;
+
+#if TARGET==cpsMPI
+  using MPISCU::fprintf;
+#endif
+
+  // Print out monitor info
+  //---------------------------------------------------------------
+  if( (fp = Fopen("force.dat", "a")) == NULL ) {
+    ERR.FileA(cname,fname, "force.dat");
+  }
+  Fprintf(fp,"%s %e (L2) dt = %f\n", label, (IFloat)Fdt, (IFloat)dt);
+  Fclose(fp);
+
 }
 
 CPS_END_NAMESPACE

@@ -32,7 +32,7 @@ AlgActionBilinear::AlgActionBilinear()
 AlgActionBilinear::AlgActionBilinear(AlgMomentum &mom,
 				     ActionBilinearArg &b_arg)
 				     
-  : AlgAction(mom) {
+  : AlgAction(mom, b_arg.action_arg) {
 
   char *fname="AlgActionBilinear(FclassType, int, HmdArg*, Matrix*)";
 
@@ -84,6 +84,8 @@ AlgActionBilinear::AlgActionBilinear(AlgMomentum &mom,
       max_num_iter[i] = bi_arg->bilinears.bilinears_val[i].max_num_iter;
     }
 
+    force_label = new char[100];
+
   }
 
   init();
@@ -102,6 +104,8 @@ AlgActionBilinear::~AlgActionBilinear() {
   char *fname="~AlgActionBilinear()";
 
   if (n_masses > 0) {
+    delete[] force_label;
+
     //!< Free memory
     sfree(mass, cname, fname, "mass");
     sfree(max_num_iter, cname, fname, "max_num_iter");

@@ -93,6 +93,8 @@ void AlgActionBoson::heatbath() {
     sfree(tmp1, cname, fname, "tmp1");
     
     LatticeFactory::Destroy();
+
+    traj++;
   }
 
 }
@@ -129,7 +131,12 @@ void AlgActionBoson::evolve(Float dt, int nsteps)
       for (int i = 0; i<n_masses; i++) {
 	//!< Need to include this hack for stag force to be correct
 	lat.BforceVector(phi[i], bsn_cg_arg[i]);
-	lat.EvolveMomFforce(mom, phi[i], mass[i], -dt);
+	Fdt = lat.EvolveMomFforce(mom, phi[i], mass[i], -dt);
+
+	if (force_measure == FORCE_MEASURE_YES) {
+	  sprintf(force_label, "Boson, mass = %e:", mass[i]);
+	  printForce(Fdt, dt, force_label);
+	}
       }
     
     LatticeFactory::Destroy();

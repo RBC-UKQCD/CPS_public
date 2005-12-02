@@ -24,6 +24,7 @@ CPS_START_NAMESPACE
 AlgInt::AlgInt()
 {
   cname = "AlgInt()";
+  traj = -1;
 }
 
 AlgInt::~AlgInt()
@@ -32,7 +33,7 @@ AlgInt::~AlgInt()
 }
 
 /*
-friend AlgInt& operator+(AlgInt &A, AlgInt &B) {
+AlgInt operator+(AlgInt &A, AlgInt &B) {
   Lattice &lat = AlgLattice();
   AlgIntSum sum(&A, &B, lat, c_arg);
   return sum;

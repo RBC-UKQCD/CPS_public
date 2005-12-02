@@ -170,7 +170,7 @@ void AlgActionFermion::heatbath() {
     LatticeFactory::Destroy();
 
     evolved = 0;
-
+    traj++;
   }
 
 }
@@ -246,7 +246,12 @@ void AlgActionFermion::evolve(Float dt, int nsteps)
 
 	updateCgStats(frm_cg_arg_md[i]);
 
-	lat.EvolveMomFforce(mom, cg_sol, mass[i], dt);
+	Fdt = lat.EvolveMomFforce(mom, cg_sol, mass[i], dt);
+
+	if (force_measure == FORCE_MEASURE_YES) {
+	  sprintf(force_label, "Fermion, mass = %e:", mass[i]);
+	  printForce(Fdt, dt, force_label);
+	}
 
       }
 

@@ -33,7 +33,6 @@ AlgIntAB::AlgIntAB(AlgInt &a, AlgInt &b,  IntABArg &a_arg)
   A_steps = ab_arg->A_steps;
   B_steps = ab_arg->B_steps;
   level = ab_arg->level;
-
 }
 
 AlgIntAB::~AlgIntAB() {
@@ -42,6 +41,7 @@ AlgIntAB::~AlgIntAB() {
 
 // Maybe use tmp in future but can ignore for now
 void AlgIntAB::heatbath() {
+  traj++;
   A->heatbath();
   B->heatbath();
 }
