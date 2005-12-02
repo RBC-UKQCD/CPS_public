@@ -1,4 +1,5 @@
-#include <util/asq_data_types.h>
+#include "asq_data_types.h"
+#include "asqtad_int.h"
 
 extern "C" 
 void asq_vaxpy3_cpp(Float *res,Float *scale, Float *mult, Float *add,int

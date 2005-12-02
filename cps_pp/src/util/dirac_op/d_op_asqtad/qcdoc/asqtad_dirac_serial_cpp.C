@@ -1,28 +1,13 @@
 /*!\file
     Asqtad Dirac operator code for QCDOC.
 
-    $Id: asqtad_dirac_serial_cpp.C,v 1.6 2005-04-05 06:44:46 chulwoo Exp $
+    $Id: asqtad_dirac_serial_cpp.C,v 1.7 2005-12-02 16:07:32 chulwoo Exp $
 */
 
-#if 0
-#include <util/gjp.h>
-#include <comms/scu.h>
-#include <comms/glb.h>
-#include <util/lattice.h>
-#include <util/dirac_op.h>
-#include <util/vector.h>
-#include <sysfunc.h>
-//#include <stdio.h>
-struct gauge_agg{
-  int src;
-  int dest;
-  IFloat mat[18];
-};
-#endif
 #include <stdio.h>
-#include <util/asqtad_int.h>
+#include "asq_data_types.h"
+#include "asqtad_int.h"
 
-//CPS_START_NAMESPACE
 
 
 extern void SCUTransCRC(SCUDirArg *X, SCUDirArg *R);

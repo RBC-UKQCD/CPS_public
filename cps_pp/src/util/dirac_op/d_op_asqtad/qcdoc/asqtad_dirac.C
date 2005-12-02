@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-16 07:24:28 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.27 2005-06-16 07:24:28 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.27 2005-06-16 07:24:28 chulwoo Exp $
+//  $Date: 2005-12-02 16:07:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.28 2005-12-02 16:07:16 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.28 2005-12-02 16:07:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.27 $
+//  $Revision: 1.28 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -23,8 +23,8 @@
 
 #include <string.h>
 #include <sys/time.h>
-#include <util/asqtad_int.h>
-#include <util/asqtad_int.h>
+#include "asq_data_types.h"
+#include "asqtad_int.h"
 #include <qcdocos/scu_mmap.h>
 #include <ppc_lib.h>
 #include <qcdoc.h>
@@ -221,9 +221,11 @@ void AsqD::init(AsqDArg *arg)
   c5 = arg->c5;
   c7 = -arg->c7;
   c6 = arg->c6;
-  fat = (matrix *)arg->Fat;
-  naik = (matrix *)arg->Naik;
-  naik_m = (matrix *)arg->NaikM;
+  for(int i = 0;i<4;i++){
+    fat[i] = (matrix *)arg->Fat[i];
+    naik[i] = (matrix *)arg->Naik[i];
+    naik_m[i] = (matrix *)arg->NaikM[i];
+  }
 
   node_odd=0;
   for(int i = 0;i<4;i++)
@@ -846,7 +848,7 @@ int AsqD::SetCoord( int sg )
 //-------------------------------------------------------------------
 
 extern "C"
-void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
+void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
 {
 
   int i,j,m,n;
@@ -866,9 +868,11 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
   // c7 -> 7-link staple; c6 -> 5-link "straight" staple
   //--------------------------------------------------------------------
  
-  if (fat_p) fat = (matrix *)fat_p;
-  if (naik_p) naik = (matrix *)naik_p;
-  if (naikm_p) naik_m = (matrix *)naikm_p;
+  for(int i =0;i<4;i++){
+    if (fat_p) fat[i] = (matrix *)fat_p[i];
+    if (naik_p) naik[i] = (matrix *)naik_p[i];
+    if (naikm_p) naik_m[i] = (matrix *)naikm_p[i];
+  }
   frm_tmp = frm_p;
 //  printf("fat=%p naik=%p naik_m=%p frm_tmp=%p\n",fat,naik,naik_m,frm_tmp);
  
@@ -918,7 +922,7 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
   //-----------------------------------------------------------------
 
   matrix *tmp;
-  matrix * Fat = fat;
+  matrix * Fat;
   matrix *nl[2]; 
   matrix *l[2]; 
   for(i = 0;i<2;i++){
@@ -926,6 +930,7 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
     l[i] = (matrix *)(uc_l[i]);
   }
   for ( n = 0; n < NUM_DIR/2; n++ ) {
+    Fat = (matrix *)fat[n];
     int coor=0;
     for (coord[3] = 0; coord[3] < size[3]; coord[3]++)
     for (coord[2] = 0; coord[2] < size[2]; coord[2]++)
@@ -942,15 +947,14 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
       }
       coor++;
     }
-    Fat += vol;
   }
-  Fat = fat;
   Float *rcv_mat = (Float *)qalloc(QFAST|QNONCACHE,sizeof(matrix));
   if(!rcv_mat) PointerErr(cname,fname, "rcv_mat");
   SCUDir snd_dirs[]={SCU_TP,SCU_XP,SCU_YP,SCU_ZP};
   SCUDir rcv_dirs[]={SCU_TM,SCU_XM,SCU_YM,SCU_ZM};
   sys_cacheflush(0);
   for ( n = 0; n < NUM_DIR/2; n++ ) {
+    Fat = (matrix *)fat[n];
     SCUDirArgIR snd;
     SCUDirArgIR rcv;
     if(NP[n]>1){
@@ -978,7 +982,6 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
         local_count[odd]++;
       }
     }
-    Fat += vol;
   } // n
   for(i = 0;i<2;i++)
   if (local_count[i] != local_chi[i]){
@@ -991,8 +994,9 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
     exit(-4);
   }
 
-  matrix * Naik = naik;
+  matrix * Naik;
   for ( n = 0; n < NUM_DIR/2; n++ ) {
+    Naik = (matrix *)naik[n];
     for (x[3] = 0; x[3] < size[3]; x[3]++)
     for (x[2] = 0; x[2] < size[2]; x[2]++)
     for (x[1] = 0; x[1] < size[1]; x[1]++)
@@ -1015,12 +1019,11 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
         local_count_3[odd]++;
       }
     }
-    Naik += vol;
   }
 
   if (naik_m){
-  Naik = naik_m;
   for ( n = 0; n < NUM_DIR/2; n++ ) {
+    Naik = (matrix *)naik_m[n]; 
     for (x[3] = 0; x[3] < size[3]; x[3]++)
     for (x[2] = 0; x[2] < size[2]; x[2]++)
     for (x[1] = 0; x[1] < size[1]; x[1]++)
@@ -1044,7 +1047,6 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
         local_count_3[odd]++;
       }
     }
-    Naik += vol;
   }
   } else {
 //    printf("USING NAIK INSTEAD OF NAIK_M\n");
@@ -1053,9 +1055,9 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
       printf("Asqd::size[%d](%d) <3\n",i,size[i]);
       exit(13);
     }
-    Naik = naik;
     sys_cacheflush(0);
     for ( n = 0; n < NUM_DIR/2; n++ ) {
+      Naik = (matrix *)naik[n];
       SCUDirArgIR snd_naik;
       SCUDirArgIR rcv_naik;
       if(NP[n]>1){
@@ -1096,7 +1098,6 @@ void AsqD::init_g(Float *frm_p,Float *fat_p,Float *naik_p, Float *naikm_p)
           local_count_3[odd]++;
         }
       }
-      Naik += vol;
     }
   }
   for(int i = 0;i<2;i++)

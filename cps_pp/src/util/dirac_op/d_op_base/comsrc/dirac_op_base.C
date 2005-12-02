@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class methods.
   
-  $Id: dirac_op_base.C,v 1.10 2005-03-07 00:24:46 chulwoo Exp $
+  $Id: dirac_op_base.C,v 1.11 2005-12-02 16:07:57 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:24:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.10 2005-03-07 00:24:46 chulwoo Exp $
-//  $Id: dirac_op_base.C,v 1.10 2005-03-07 00:24:46 chulwoo Exp $
+//  $Date: 2005-12-02 16:07:57 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.11 2005-12-02 16:07:57 chulwoo Exp $
+//  $Id: dirac_op_base.C,v 1.11 2005-12-02 16:07:57 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v $
 //  $State: Exp $
 //
@@ -24,6 +24,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <util/dirac_op.h>
+#include "asq_data_types.h"
 #include <util/pt.h>
 #include <util/lattice.h>
 #include <util/verbose.h>

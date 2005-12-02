@@ -1,10 +1,11 @@
 /*!\file
     Asqtad Dirac operator code for QCDOC.
 
-    $Id: asqd_sum_cpp.C,v 1.1 2005-03-07 00:22:21 chulwoo Exp $
+    $Id: asqd_sum_cpp.C,v 1.2 2005-12-02 16:06:10 chulwoo Exp $
 */
 
-#include <util/asq_data_types.h>
+#include "asq_data_types.h"
+#include "asqtad_int.h"
 #if 0
 #include <util/gjp.h>
 #include <comms/scu.h>

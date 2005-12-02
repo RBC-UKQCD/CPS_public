@@ -1,5 +1,5 @@
-//#include<config.h>
-#include<util/asqtad_int.h>
+#include "asq_data_types.h"
+#include "asqtad_int.h"
 
 typedef double Double64;
 

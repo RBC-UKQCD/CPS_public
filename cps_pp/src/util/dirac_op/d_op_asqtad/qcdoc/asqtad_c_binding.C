@@ -8,14 +8,6 @@
 AsqD *asqd_p;
 static Fasqtad *lat_pt;
 
-#if 0
-void set_pt (Fasqtad *lat)
-{
-  lat_pt = lat;
-  printf("set_pt:lat_pt=%p\n",lat);
-}
-#endif
-
 extern "C" void asqtad_dirac_init(Fasqtad *lat){
   AsqDArg arg;
   lat_pt = lat;
@@ -23,6 +15,8 @@ extern "C" void asqtad_dirac_init(Fasqtad *lat){
   arg.size[1] = GJP.XnodeSites();
   arg.size[2] = GJP.YnodeSites();
   arg.size[3] = GJP.ZnodeSites();
+  int vol = 1;
+  for(int i =0;i<4;i++) vol *= arg.size[i];
   arg.NP[0] = GJP.Tnodes();
   arg.NP[1] = GJP.Xnodes();
   arg.NP[2] = GJP.Ynodes();
@@ -37,9 +31,17 @@ extern "C" void asqtad_dirac_init(Fasqtad *lat){
   arg.c5 = GJP.staple5_coeff();
   arg.c7 = GJP.staple7_coeff();
   arg.c6 = GJP.Lepage_coeff();
-  arg.Fat = (IFloat *)lat_pt->Fields(0);
-  arg.Naik = (IFloat *)lat_pt->Fields(1);
-  arg.NaikM = (IFloat *)lat_pt->Fields(2);
+  Float *tmp_fat = (Float *)lat_pt->Fields(0);
+  Float *tmp_naik = (Float *)lat_pt->Fields(1);
+  Float *tmp_naik_m = (Float *)lat_pt->Fields(2);
+  for(int i =0;i<4;i++){
+    arg.Fat[i] = tmp_fat+vol*18*i;
+    arg.Naik[i] = tmp_naik+vol*18*i;
+    arg.NaikM[i] = tmp_naik_m+vol*18*i;
+  }
+//  arg.Fat = (IFloat *)lat_pt->Fields(0);
+//  arg.Naik = (IFloat *)lat_pt->Fields(1);
+//  arg.NaikM = (IFloat *)lat_pt->Fields(2);
 //  arg.NaikM = NULL;
   asqd_p = new AsqD;
   asqd_p->init(&arg);
