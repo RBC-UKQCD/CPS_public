@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.6 2005-05-30 08:25:40 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.7 2005-12-02 16:11:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -44,10 +44,11 @@ CPS_START_NAMESPACE
 // It evolves the canonical momentum mom by step_size
 // using the fermion force.
 //------------------------------------------------------------------
-void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi, 
+Float FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi, 
 			   Float mass, Float step_size){
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
+
   Matrix *gauge = GaugeField() ;
 
   if (Colors() != 3)
@@ -95,6 +96,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   if (site_v2 == 0) ERR.Pointer(cname, fname, str_site_v2) ;
   VRB.Smalloc(cname, fname, str_site_v2, site_v2, FsiteSize()*sizeof(Float)) ;
 
+  Float Fdt = 0.0;
 
   //----------------------------------------------------------------
   // Calculate v1, v2. Both v1, v2 must be in CANONICAL order after
@@ -263,6 +265,7 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       tmp_mat2 *= coeff ;
 
       *(mom+gauge_offset) += tmp_mat2 ;
+      Fdt += dotProduct((Float*)&tmp_mat2, (Float*)&tmp_mat2, 18);
 
     } } } } // end for x,y,z,t
   } // end for mu
@@ -287,7 +290,9 @@ void FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   VRB.Sfree(cname, fname, str_v1, v1) ;
   sfree(v1) ;
  
-  return ;
+  glb_sum(&Fdt);
+
+  return sqrt(Fdt);
 }
 // CJ: change end
 

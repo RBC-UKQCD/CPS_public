@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce.C,v 1.9 2005-10-04 05:40:12 chulwoo Exp $
+  $Id: RHMC_Fforce.C,v 1.10 2005-12-02 16:09:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -40,9 +40,10 @@ CPS_START_NAMESPACE
 
 #define PROFILE
 
-void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+Float Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				   int isz, Float *alpha, Float mass, 
-				   Float dt, Vector **sol_d){
+				   Float dt, Vector **sol_d, 
+				   ForceMeasure force_measure){
 
     char *fname = "RHMC_EvolveMomFforce";
     VRB.Func(cname,fname);
@@ -914,6 +915,8 @@ void Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
   for (int p=0; p<degree; p++) {
     Fconvert(sol[p], STAG, CANONICAL);
   }
+
+  return 0.0;
 
 }
 

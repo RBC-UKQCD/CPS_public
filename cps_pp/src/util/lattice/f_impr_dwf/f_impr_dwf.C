@@ -171,7 +171,7 @@ int FimprDwf::FmatInv(Vector *f_out, Vector *f_in,
 // It evolves the canonical momentum mom by step_size
 // using the fermion force.
 //------------------------------------------------------------------
-void FimprDwf::EvolveMomFforce(Matrix *mom, Vector *frm, 
+Float FimprDwf::EvolveMomFforce(Matrix *mom, Vector *frm, 
 			   Float mass, Float step_size){
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
@@ -223,6 +223,7 @@ void FimprDwf::EvolveMomFforce(Matrix *mom, Vector *frm,
   if (site_v2 == 0) ERR.Pointer(cname, fname, str_site_v2) ;
   VRB.Smalloc(cname, fname, str_site_v2, site_v2, FsiteSize()*sizeof(Float)) ;
 
+  Float Fdt = 0.0;
 
   //----------------------------------------------------------------
   // Calculate v1, v2. Both v1, v2 must be in CANONICAL order after
@@ -787,6 +788,7 @@ void FimprDwf::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    mf *= 0.5;				// for MILC compatibility
 	    fTimesV1PlusV2((IFloat*)(ip+mu), dt, (IFloat*)&mf,
 			   (IFloat*)(ip+mu)+BANK4_BASE, MATRIX_SIZE);
+	    Fdt += dotProduct((Float*)&mf, (Float*)&mf, 18);
 	}
     }
     
@@ -823,7 +825,9 @@ void FimprDwf::EvolveMomFforce(Matrix *mom, Vector *frm,
   VRB.Sfree(cname, fname, str_v1, v1) ;
   sfree(v1) ;
  
-  return ;
+  glb_sum(&Fdt);
+
+  return sqrt(Fdt);
 }
 
 void FimprDwf::ForceProductSum(const Vector *v, const Vector *w,

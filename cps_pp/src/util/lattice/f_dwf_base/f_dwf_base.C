@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.25 2005-10-04 05:39:56 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.26 2005-12-02 16:11:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -619,39 +619,65 @@ Float FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 #undef PROFILE
 
 
-void FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+Float FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				    int isz, Float *alpha, Float mass, 
-				    Float dt, Vector **sol_d) {
+				    Float dt, Vector **sol_d, 
+				    ForceMeasure force_measure) {
   char *fname = "RHMC_EvolveMomFforce";
-  char *fer_force = (char*)smalloc(cname,fname,"fer_force",100*sizeof(char));
+  char *force_label;
+
+  Float Fdt = 0.0;
+
+  int g_size = GJP.VolNodeSites() * GsiteSize();
+
+  Matrix *mom_tmp;
+  FILE *fp;
+
+  if (force_measure == FORCE_MEASURE_YES) {
+    mom_tmp = (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
+    if( (fp = Fopen("force.dat", "a")) == NULL )
+      ERR.FileA(cname,fname, "force.dat");
+    ((Vector*)mom_tmp) -> VecZero(g_size);
+    force_label = new char[100];
+  } else {
+    mom_tmp = mom;
+  }
+
+#if TARGET==cpsMPI
+  using MPISCU::fprintf;
+#endif
 
 #ifdef PROFILE
   Float time = -dclock();
   ForceFlops=0;
 #endif
 
-  // Temporary fix for the moment.
-  int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
-  int g_size = GJP.VolNodeSites() * GsiteSize();
-
-  Matrix *mom_old = (Matrix*)smalloc(g_size*sizeof(Float));
-
   for (int i=0; i<degree; i++){
-    // Copy the momenta before the update
-    ((Vector*)mom_old)->CopyVec((Vector*)mom,g_size);
-    FdwfBase::EvolveMomFforce(mom,sol[i],mass,alpha[i]*dt);
-    sprintf(fer_force, "Fermion (pole = %d):", i);
-    ForceMagnitude(mom, mom_old, mass, dt, fer_force);
-  }
+    Fdt = FdwfBase::EvolveMomFforce(mom_tmp,sol[i],mass,alpha[i]*dt);
 
-  sfree(fer_force);
-  sfree(mom_old);
+    if (force_measure == FORCE_MEASURE_YES) {
+      sprintf(force_label, "Rational, mass = %e, pole = %d:", mass, i+isz);
+      Fprintf(fp,"%s %e (L2) dt = %f\n", force_label, (IFloat)Fdt, (IFloat)dt);
+    }
+  }
 
 #ifdef PROFILE
   time += dclock();
   print_flops(cname,fname,ForceFlops,time);
 #endif
 
+  // If measuring the force, need to measure and then sum to mom
+  if (force_measure == FORCE_MEASURE_YES) {
+    Fdt = dotProduct((IFloat*)mom_tmp, (IFloat*)mom_tmp, g_size);
+    glb_sum(&Fdt);
+    fTimesV1PlusV2((IFloat*)mom, 1.0, (IFloat*)mom_tmp, (IFloat*)mom, g_size);
+
+    Fclose(fp);
+    delete[] force_label;
+    sfree(mom_tmp, cname, fname, "mom_tmp");
+  }
+
+  return sqrt(Fdt);
 }
 
 //------------------------------------------------------------------
