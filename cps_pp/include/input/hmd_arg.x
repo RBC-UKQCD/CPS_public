@@ -189,10 +189,10 @@ class EvoArg {
   string w_spect_directory<>;
   string work_directory<>;
   int measure_pbp;
-  int measure_eig;
+//  int measure_eig;
   int measure_w_spect;
-  string eig_lo_stem<>;
-  string eig_hi_stem<>;
+//  string eig_lo_stem<>;
+//  string eig_hi_stem<>;
 };
 
 class RhmcPolesState {

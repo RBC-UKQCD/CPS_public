@@ -13,12 +13,6 @@
 #include <util/defines.h>
 CPS_START_NAMESPACE
 
-enum EIG_LIM {
-	MAX_EIG_MASSES = 100,
-};
-typedef enum EIG_LIM EIG_LIM;
-extern struct vml_enum_map EIG_LIM_map[];
-
 class VML;
 class EigArg {
 public:
@@ -29,7 +23,10 @@ public:
 	Float Mass_init;
 	Float Mass_final;
 	Float Mass_step;
-	Float Mass[MAX_EIG_MASSES];
+	struct {
+		u_int Mass_len;
+		Float *Mass_val;
+	} Mass;
 	int n_masses;
 	int N_eig;
 	int Kalk_Sim;
@@ -58,11 +55,9 @@ extern "C" {
 #endif
 
 #if defined(__STDC__) || defined(__cplusplus)
-extern  bool_t vml_EIG_LIM (VML *, char *instance, EIG_LIM*);
 extern  bool_t vml_EigArg (VML *, char *instance, EigArg*);
 
 #else /* K&R C */
-extern  bool_t vml_EIG_LIM (VML *, char *instance, EIG_LIM*);
 extern  bool_t vml_EigArg (VML *, char *instance, EigArg*);
 
 #endif /* K&R C */

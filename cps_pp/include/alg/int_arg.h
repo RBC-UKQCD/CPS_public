@@ -27,6 +27,15 @@ public:
 };
 
 class VML;
+class ActionArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	ForceMeasure force_measure;
+};
+
+class VML;
 class BilinearDescr {
 public:
 	 bool Encode(char *filename,char *instance);
@@ -48,6 +57,7 @@ public:
 		u_int bilinears_len;
 		BilinearDescr *bilinears_val;
 	} bilinears;
+	ActionArg action_arg;
 };
 
 class VML;
@@ -56,7 +66,12 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
-	Float stop_rsd;
+	Float lambda_low;
+	Float lambda_high;
+	struct {
+		u_int stop_rsd_len;
+		Float *stop_rsd_val;
+	} stop_rsd;
 };
 
 class VML;
@@ -66,18 +81,23 @@ public:
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
 	FieldType field_type;
-	Float lambda_low;
-	Float lambda_high;
 	int power_num;
 	int power_den;
-	struct {
-		u_int md_approx_len;
-		ApproxDescr *md_approx_val;
-	} md_approx;
-	struct {
-		u_int mc_approx_len;
-		ApproxDescr *mc_approx_val;
-	} mc_approx;
+	ApproxDescr md_approx;
+	ApproxDescr mc_approx;
+};
+
+class VML;
+class EigenDescr {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	EigenMeasure eigen_measure;
+	Float stop_rsd;
+	int max_num_iter;
+	char *eig_lo_stem;
+	char *eig_hi_stem;
 };
 
 class VML;
@@ -89,8 +109,6 @@ public:
 	   void resize (  int nmass ) ;
 	   void resize (  int mass ,  int deg_md ,  int deg_mc ) ;
 	ActionBilinearArg bi_arg;
-	RatApproxType approx_type;
-	Float spread;
 	long precision;
 	int remez_generate;
 	char *rat_poles_file;
@@ -98,6 +116,7 @@ public:
 		u_int rationals_len;
 		RationalDescr *rationals_val;
 	} rationals;
+	EigenDescr eigen;
 };
 
 class VML;
@@ -178,6 +197,7 @@ public:
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
 	GclassType gluon;
+	ActionArg action_arg;
 };
 
 /* the xdr functions */
@@ -188,10 +208,12 @@ extern "C" {
 
 #if defined(__STDC__) || defined(__cplusplus)
 extern  bool_t vml_IntABArg (VML *, char *instance, IntABArg*);
+extern  bool_t vml_ActionArg (VML *, char *instance, ActionArg*);
 extern  bool_t vml_BilinearDescr (VML *, char *instance, BilinearDescr*);
 extern  bool_t vml_ActionBilinearArg (VML *, char *instance, ActionBilinearArg*);
 extern  bool_t vml_ApproxDescr (VML *, char *instance, ApproxDescr*);
 extern  bool_t vml_RationalDescr (VML *, char *instance, RationalDescr*);
+extern  bool_t vml_EigenDescr (VML *, char *instance, EigenDescr*);
 extern  bool_t vml_ActionRationalArg (VML *, char *instance, ActionRationalArg*);
 extern  bool_t vml_SplitRange (VML *, char *instance, SplitRange*);
 extern  bool_t vml_ActionRationalSplitArg (VML *, char *instance, ActionRationalSplitArg*);
@@ -203,10 +225,12 @@ extern  bool_t vml_ActionGaugeArg (VML *, char *instance, ActionGaugeArg*);
 
 #else /* K&R C */
 extern  bool_t vml_IntABArg (VML *, char *instance, IntABArg*);
+extern  bool_t vml_ActionArg (VML *, char *instance, ActionArg*);
 extern  bool_t vml_BilinearDescr (VML *, char *instance, BilinearDescr*);
 extern  bool_t vml_ActionBilinearArg (VML *, char *instance, ActionBilinearArg*);
 extern  bool_t vml_ApproxDescr (VML *, char *instance, ApproxDescr*);
 extern  bool_t vml_RationalDescr (VML *, char *instance, RationalDescr*);
+extern  bool_t vml_EigenDescr (VML *, char *instance, EigenDescr*);
 extern  bool_t vml_ActionRationalArg (VML *, char *instance, ActionRationalArg*);
 extern  bool_t vml_SplitRange (VML *, char *instance, SplitRange*);
 extern  bool_t vml_ActionRationalSplitArg (VML *, char *instance, ActionRationalSplitArg*);

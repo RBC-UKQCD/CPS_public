@@ -2,13 +2,9 @@
 /*!\file
   \brief  Definitions of the EigArg structure.
   
-  $Id: eig_arg.x,v 1.4 2005-05-30 23:28:53 chulwoo Exp $
+  $Id: eig_arg.x,v 1.5 2005-12-02 15:07:04 chulwoo Exp $
 */
 /*------------------------------------------------------------------*/
-
-//! The maximum number of masses for which the eigenvalue can be measured
-enum EIG_LIM { MAX_EIG_MASSES = 100 };
-                                /* Used when PatternType = ARRAY */
 
 /*! A structure holding the parameters relevant to the eigenvalue measurement.*/
 /*! \ingroup algargs */
@@ -23,12 +19,10 @@ class EigArg {
     Float Mass_final;	/*!< The final mass to use */
     Float Mass_step;      /*!< The step size in mass */
     
-    Float Mass[MAX_EIG_MASSES];   /*!< Relevant to the ::ARRAY pattern:
+    Float Mass<>;   /*!< Relevant to the ::ARRAY pattern:
 				The array of mass values for which 
                                 the eigenvalue is measured. */
-  
-    int n_masses;
-
+    int n_masses; 
 
     int N_eig;		/*!< The number of eigenvectors/values to calculate */
     int Kalk_Sim;       /*!< Use the Kalkreuter-Simma algorithm. */

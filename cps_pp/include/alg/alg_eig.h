@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgEig class.
 
-  $Id: alg_eig.h,v 1.3 2004-08-18 11:57:35 zs Exp $
+  $Id: alg_eig.h,v 1.4 2005-12-02 15:00:21 chulwoo Exp $
 */
 //------------------------------------------------------------------
 
@@ -46,12 +46,16 @@ class AlgEig : public Alg
     int *valid_eig;
         // Whether the eigenvalues are valid or not (final)
 
+    int n_masses;
+    // The number of masses in the loop
+
  public:
     AlgEig(Lattice & latt, CommonArg *c_arg, EigArg *arg);
 
     virtual ~AlgEig();
 
     void run(void);
+    void run(Float **lambda);
 };
 
 #endif

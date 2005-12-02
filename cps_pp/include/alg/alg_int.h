@@ -21,12 +21,18 @@ CPS_END_NAMESPACE
 #include <util/checksum.h>
 #include <alg/int_arg.h>
 #include <alg/remez_arg.h>
+#include <util/qcdio.h>
+#include <alg/alg_eig.h> 
 CPS_START_NAMESPACE
 
 class AlgInt {
 
  private:
   char *cname;
+
+ protected:
+  //!< the current trajectory number
+  int traj;
 
  public:
   
@@ -142,6 +148,9 @@ public:
 //!< Super class of all Hamiltonian constituents
 class AlgHamiltonian : public AlgInt {
 
+ protected:
+  int g_size;
+
  private:
   char *cname;
 
@@ -165,7 +174,6 @@ class AlgMomentum : public AlgHamiltonian {
   //!< This class tracks the MD time since it updates the gauge field
   char *md_time_str;
   Matrix *mom;
-  int g_size;
 
  public:
   AlgMomentum();
@@ -196,17 +204,20 @@ class AlgAction : public AlgHamiltonian {
 
  protected:
   Matrix *mom;
+  ForceMeasure force_measure;
+  char *force_label;
+  Float Fdt;
 
  public:
   AlgAction();
-  AlgAction(AlgMomentum &mom);
+  AlgAction(AlgMomentum &mom, ActionArg &action_arg);
   ~AlgAction();
 
   virtual void heatbath() = 0;
   virtual Float energy() = 0;
   virtual void evolve(Float dt, int steps) = 0;
   virtual void cost(CgStats*) = 0;
-
+  void printForce(Float Fdt, Float dt, char *label);
   void reverse();
 
 };
@@ -320,14 +331,29 @@ class AlgActionRational : public AlgActionBilinear {
   Float *all_res;
   //!< An array holding the residues - used for asqtad force
 
+  EigArg eig_arg;
+  //!< AlgEig parameters
 
-  //!< Renormalise the mass (optimisation)
+  char eig_file[256];
+  //!< Used to store eigenvalue filename
+
+  CommonArg ca_eig;
+  //!< Used to store eigenvalue filename
+
+  Float **lambda_low;
+  Float **lambda_high;
+  //!< Used to store calculated eigenvalue bounds
+
   void massRenormalise(Float *mass, Float *trueMass, int degree, 
 		       Float *shift, MassRenormaliseDir direction);
+  //!< Renormalise the mass (staggeredoptimisation)
 
-  //!< Automatic generation of the rational approximation.
   void generateApprox();
+  //!< Automatic generation of the rational approximation.
 
+  void checkApprox();
+  //!< Check that the approximation is still valid
+  
  public:
 
   AlgActionRational();

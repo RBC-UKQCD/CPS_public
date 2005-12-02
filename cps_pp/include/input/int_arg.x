@@ -18,6 +18,12 @@ class IntABArg {
 
 };
 
+class ActionArg {
+
+  ForceMeasure force_measure;
+
+};
+
 class BilinearDescr {
   Float mass;
   int max_num_iter;
@@ -29,25 +35,40 @@ class ActionBilinearArg {
 
   FclassType fermion;
   BilinearDescr bilinears<>;
+  ActionArg action_arg;
 
 };
 
 class ApproxDescr {
 
-  Float stop_rsd;
+  Float lambda_low;
+  Float lambda_high;
+  Float stop_rsd<>;
 
 };
 
 class RationalDescr {
 
   FieldType field_type;
-  Float lambda_low;
-  Float lambda_high;
   int power_num;
   int power_den;
-  ApproxDescr md_approx<>;
-  ApproxDescr mc_approx<>;
+  ApproxDescr md_approx;
+  ApproxDescr mc_approx;
 
+} ;
+
+class EigenDescr {
+  //! Whether the approximation bounds are checked
+  EigenMeasure eigen_measure;
+
+  //! Tolerance in the eigenvalue measurement
+  Float stop_rsd;
+
+  int max_num_iter;
+
+  //! Where the eigenvalues should be output to
+  string eig_lo_stem<>;
+  string eig_hi_stem<>;
 } ;
 
 class ActionRationalArg {
@@ -57,12 +78,6 @@ class ActionRationalArg {
 
   ActionBilinearArg bi_arg;
    
-  //! Whether the RHMC approximation is static or dynamic.
-  RatApproxType approx_type;
-
-  //! the allowed sprectral spread in the rational approximation
-  Float spread;
-
   //! The precision used in the Remez algorithm of the RHMC approximation.
   long precision;
 
@@ -70,6 +85,8 @@ class ActionRationalArg {
   string rat_poles_file<>;
 
   RationalDescr rationals<>;
+
+  EigenDescr eigen;
 
 };
 
@@ -117,6 +134,7 @@ class ActionFermionArg {
 class ActionGaugeArg {
 
   GclassType gluon;
+  ActionArg action_arg;
 
 };
 

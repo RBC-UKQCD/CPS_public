@@ -8,19 +8,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.9 2005-11-15 06:33:47 chulwoo Exp $
+  $Id: enum.x,v 1.10 2005-12-02 15:09:24 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2005-11-15 06:33:47 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.9 2005-11-15 06:33:47 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.9 2005-11-15 06:33:47 chulwoo Exp $*/
+/*  $Date: 2005-12-02 15:09:24 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.10 2005-12-02 15:09:24 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.10 2005-12-02 15:09:24 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.9 $*/
+/*  $Revision: 1.10 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -332,7 +332,6 @@ enum RatApproxType {
   CONSTANT,  /*!< CONSTANT - approximation is held constant*/
   DYNAMIC    /*!< DYNAMIC - approximation recalculated at the end of the trajectory*/
 };
-		  
 /*------------------------------------------------------------------*/
 /*! The types multishift solve to perform*/
 /*------------------------------------------------------------------*/
@@ -734,9 +733,22 @@ enum ReverseTest {
   REVERSE_YES   = 1 
 };
 
+/* Perform a Metropolis accept/reject? */
 enum MetropolisType { 
   METROPOLIS_NO    = 0,
   METROPOLIS_YES   = 1 
+};
+
+/* Measure the magnitude of the force? */
+enum ForceMeasure {
+  FORCE_MEASURE_NO = 0,
+  FORCE_MEASURE_YES = 1
+};
+
+/* Measure the eigenvalue bounds? */
+enum EigenMeasure {
+  EIGEN_MEASURE_NO = 0,
+  EIGEN_MEASURE_YES = 1
 };
 
 enum RhmcPolesAction { 	RHMC_POLES_CALC = 0,
