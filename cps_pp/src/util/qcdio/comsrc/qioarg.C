@@ -349,7 +349,7 @@ void QioControl::startLogging(const char * action) {
     }
   }
   if(syncError(error)>0) {
-    ERR.FileA(cname,fname,"qcdio.log.*"); 
+    ERR.FileA(cname,fname,logname); 
   }
 
   /*
