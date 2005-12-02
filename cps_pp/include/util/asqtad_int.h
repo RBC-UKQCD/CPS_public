@@ -1,8 +1,14 @@
 #ifndef ASQTAD_INT_H
 #define ASQTAD_INT_H
 #include <qalloc.h>
+#ifdef SCIDAC
+#include <asq_data_types.h>
+#include <qcdocos/scu_dir_arg.h>
+#include <gauge_agg.h>
+#else
 #include <util/asq_data_types.h>
 #include <util/gauge_agg.h>
+#endif
 
 class matrix{
   private:
@@ -64,20 +70,6 @@ inline void VecMinusEquVec(vector *dest,vector *src, int size){
   for(int i = 0;i<size;i++) dest[i] -= src[i];
 }
 
-#if 0
-class vector{
-  private:
-  Float v[6];
-  public:
-    vector(){};
-    ~vector(){};
-    Float void NormSqNode(int size){
-      Float sum = 0;
-      for(int i = 0;i<size;i++) sum += 
-    }
-} ;
-#endif
-
 typedef struct InvArg{
   Float mass;
   Float stop_rsd;
@@ -96,18 +88,18 @@ typedef struct AsqDArg{
   Float c5; // 5staple
   Float c7; // 7staple
   Float c6; // LePage
-  Float *Fat;
-  Float *Naik;
-  Float *NaikM;
+  Float *Fat[4];
+  Float *Naik[4];
+  Float *NaikM[4];
 } AsqDArg;
 
 class AsqD : public AsqDArg{
   private:
     char *cname;
     Float *frm_tmp;
-    matrix *fat;
-    matrix *naik;
-    matrix *naik_m;
+    matrix *fat[4];
+    matrix *naik[4];
+    matrix *naik_m[4];
 
     static SCUDir scudir[8];
     static int cg_called;
@@ -263,8 +255,8 @@ SCUDirArgMulti SCUmulti_2[2];
   int Size(int dir){return size[dir];}
   int Vol() {return vol;}
   void init(AsqDArg  *arg);
-  void init_g(Float *frm_p,Float *fat_p=NULL, Float *naik_p=NULL, 
-    Float *naikm_p=NULL);
+  void init_g(Float *frm_p,Float **fat_p=NULL, Float **naik_p=NULL, 
+    Float **naikm_p=NULL);
   void destroy_buf();
   void destroy_buf_g();
   void comm_assert();
