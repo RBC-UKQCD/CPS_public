@@ -56,6 +56,7 @@ AlgRemez::AlgRemez(RemezArg &arg_remez)
   n = remez_arg->degree;
   d = remez_arg->degree;
 
+  VRB.Flow(cname,fname,"precision=%d power_num=%d power_den=%d degree = %d \n",prec,power_num,power_den,n);
   neq = n + d + 1;
 
   // Only require the approximation spread to be less than tolerance 
