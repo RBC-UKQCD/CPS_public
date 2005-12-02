@@ -22,13 +22,13 @@ void ActionRationalArg::resize(int mass, int deg_md, int deg_mc) {
 
   if (rationals.rationals_len > mass) {
 
-    rationals.rationals_val[mass].md_approx.md_approx_len = deg_md;
-    rationals.rationals_val[mass].md_approx.md_approx_val = 
-      new ApproxDescr[deg_md];
+    rationals.rationals_val[mass].md_approx.stop_rsd.stop_rsd_len = deg_md;
+    rationals.rationals_val[mass].md_approx.stop_rsd.stop_rsd_val = 
+      new Float[deg_md];
 
-    rationals.rationals_val[mass].mc_approx.mc_approx_len = deg_mc;
-    rationals.rationals_val[mass].mc_approx.mc_approx_val = 
-      new ApproxDescr[deg_mc];
+    rationals.rationals_val[mass].mc_approx.stop_rsd.stop_rsd_len = deg_mc;
+    rationals.rationals_val[mass].mc_approx.stop_rsd.stop_rsd_val = 
+      new Float[deg_mc];
 
   } else {
     char *cname = "ActionRationalArg";

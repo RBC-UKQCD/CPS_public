@@ -5,20 +5,6 @@
 
 #include <alg/eig_arg.h>
 CPS_START_NAMESPACE
-
-bool_t
-vml_EIG_LIM (VML *vmls, char *name,EIG_LIM *objp)
-{
-	register int32_t *buf;
-
-	if (!vml_enum (vmls,name,(enum_t *)objp,EIG_LIM_map))
-		return FALSE;
-	return TRUE;
-}
-struct vml_enum_map EIG_LIM_map[] = {
-	{"EIG_LIM","MAX_EIG_MASSES",MAX_EIG_MASSES},
-	{NULL,NULL,0}
-};
 	 bool EigArg::Encode(char *filename,char *instance){
 		 VML vmls;
 		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
@@ -44,7 +30,6 @@ vml_EigArg (VML *vmls, char *name,EigArg *objp)
 	register int32_t *buf;
 
 	 vml_class_begin(vmls,"EigArg",name);
-	int i;
 	 if (!vml_PatternType (vmls, "pattern_kind", &objp->pattern_kind))
 		 return FALSE;
 	 if (!vml_Float (vmls, "Mass_init", &objp->Mass_init))
@@ -53,7 +38,7 @@ vml_EigArg (VML *vmls, char *name,EigArg *objp)
 		 return FALSE;
 	 if (!vml_Float (vmls, "Mass_step", &objp->Mass_step))
 		 return FALSE;
-	 if (!vml_vector (vmls, "Mass", (char *)objp->Mass, MAX_EIG_MASSES,
+	 if (!vml_array (vmls, "Mass", (char **)&objp->Mass.Mass_val, (u_int *) &objp->Mass.Mass_len, ~0,
 		sizeof (Float), (vmlproc_t) vml_Float))
 		 return FALSE;
 	 if (!vml_int (vmls, "n_masses", &objp->n_masses))

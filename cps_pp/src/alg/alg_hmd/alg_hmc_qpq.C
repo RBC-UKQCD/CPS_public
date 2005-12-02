@@ -2,17 +2,17 @@
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_qpq.C,v 1.5 2005-10-04 04:59:13 chulwoo Exp $
+  $Id: alg_hmc_qpq.C,v 1.6 2005-12-02 15:19:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  $Author: chulwoo $
-//  $Date: 2005-10-04 04:59:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_qpq.C,v 1.5 2005-10-04 04:59:13 chulwoo Exp $
-//  $Id: alg_hmc_qpq.C,v 1.5 2005-10-04 04:59:13 chulwoo Exp $
+//  $Date: 2005-12-02 15:19:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_qpq.C,v 1.6 2005-12-02 15:19:32 chulwoo Exp $
+//  $Id: alg_hmc_qpq.C,v 1.6 2005-12-02 15:19:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_qpq.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_qpq.C,v $
 //  $State: Exp $
 //
@@ -22,7 +22,7 @@
 //
 // AlgHmcQPQ is an implementation of the Hybrid Monte Carlo Algorithm
 // and is derived from AlgHmd.  The implementation includes the use of
-// the minimum residual chrono[0]logical inverter and preconditioner as
+// the minimum residual chronological inverter and preconditioner as
 // described in Brower et al.  A Uqpq integration scheme is used as
 // opposed to a Upqp as in the AlgHmcPhi algorithm.
 //
@@ -156,32 +156,32 @@ AlgHmcQPQ::AlgHmcQPQ(Lattice& latt,
   }
 
 
-  // Allocate memory for the chrono[0]logical inverter.
+  // Allocate memory for the chronological inverter.
   //----------------------------------------------------------------
   if(n_frm_masses != 0){
     cg_sol = (Vector ***) smalloc(n_frm_masses * sizeof(Vector**));
     if(cg_sol == 0) ERR.Pointer(cname,fname, "cg_sol_prev");
     VRB.Smalloc(cname,fname, "cg_sol", cg_sol, n_frm_masses * sizeof(Vector**));
 
-    if (hmd_arg->chrono[0] > 0) {
+    if (hmd_arg->chrono > 0) {
       vm = (Vector ***) smalloc(n_frm_masses * sizeof(Vector**));
       if(vm == 0) ERR.Pointer(cname,fname, "vm");
       VRB.Smalloc(cname,fname, "vm", vm, n_frm_masses * sizeof(Vector**));    
 
-      cg_sol_prev = (Vector **) smalloc(hmd_arg->chrono[0] * sizeof(Vector*));
+      cg_sol_prev = (Vector **) smalloc(hmd_arg->chrono * sizeof(Vector*));
       if(cg_sol_prev == 0) ERR.Pointer(cname,fname, "cg_sol_prev");
-      VRB.Smalloc(cname,fname, "cg_sol_prev", cg_sol_prev, hmd_arg->chrono[0] * sizeof(Vector**));    
+      VRB.Smalloc(cname,fname, "cg_sol_prev", cg_sol_prev, hmd_arg->chrono * sizeof(Vector**));    
       
       for(i=0; i<n_frm_masses; i++){
-	cg_sol[i] = (Vector **) smalloc(hmd_arg->chrono[0] * sizeof(Vector*));
+	cg_sol[i] = (Vector **) smalloc(hmd_arg->chrono * sizeof(Vector*));
 	if(cg_sol[i] == 0) ERR.Pointer(cname,fname, "cg_sol[i]");
-	VRB.Smalloc(cname,fname, "cg_sol[i]", cg_sol[i], hmd_arg->chrono[0] * sizeof(Vector*));
+	VRB.Smalloc(cname,fname, "cg_sol[i]", cg_sol[i], hmd_arg->chrono * sizeof(Vector*));
 	
-	vm[i] = (Vector **) smalloc(hmd_arg->chrono[0] * sizeof(Vector*));
+	vm[i] = (Vector **) smalloc(hmd_arg->chrono * sizeof(Vector*));
 	if(vm[i] == 0) ERR.Pointer(cname,fname, "vm[i]");
-	VRB.Smalloc(cname,fname, "vm[i]", vm[i], hmd_arg->chrono[0] * sizeof(Vector*));
+	VRB.Smalloc(cname,fname, "vm[i]", vm[i], hmd_arg->chrono * sizeof(Vector*));
 	
-	for(j=0; j<hmd_arg->chrono[0];j++) {
+	for(j=0; j<hmd_arg->chrono;j++) {
 	  cg_sol[i][j] = (Vector *) smalloc(f_size * sizeof(Float));
 	  if(cg_sol[i][j] == 0) ERR.Pointer(cname,fname, "cg_sol[i][j]");
 	  VRB.Smalloc(cname,fname, "cg_sol[i][j]", cg_sol[i][j], f_size * sizeof(Float));
@@ -191,7 +191,7 @@ AlgHmcQPQ::AlgHmcQPQ(Lattice& latt,
 	  VRB.Smalloc(cname,fname, "vm[i][j]", vm[i][j], f_size * sizeof(Float));
 	}
       }
-    } else if (hmd_arg->chrono[0] == 0) {
+    } else if (hmd_arg->chrono == 0) {
       for(i=0; i<n_frm_masses; i++){
 	cg_sol[i] = (Vector **) smalloc(sizeof(Vector*));
 	if(cg_sol[i] == 0) ERR.Pointer(cname,fname, "cg_sol[i]");
@@ -315,9 +315,9 @@ AlgHmcQPQ::~AlgHmcQPQ() {
   // Free memory for the chronological inverter.
   //----------------------------------------------------------------
   if(n_frm_masses != 0){
-    if (hmd_arg->chrono[0] > 0) {
+    if (hmd_arg->chrono > 0) {
       for(i=0; i<n_frm_masses; i++){
-	for(j=0; j<hmd_arg->chrono[0];j++) {
+	for(j=0; j<hmd_arg->chrono;j++) {
 	  VRB.Sfree(cname,fname, "vm[i][j]", vm[i][j]);
 	  sfree(vm[i][j]);
 	  VRB.Sfree(cname,fname, "cg_sol[i][j]", cg_sol[i][j]);
@@ -514,12 +514,12 @@ Float AlgHmcQPQ::run(void)
     //--------------------------------------------------------------
     for(i=0; i<n_frm_masses; i++){
 
-      if (step == 0 || hmd_arg->chrono[0] == 0) {
+      if (step == 0 || hmd_arg->chrono == 0) {
 
 	cg_sol_cur = cg_sol[i][0];
 	cg_sol_cur -> VecTimesEquFloat(0.0,f_size);
 
-      } else if (step < hmd_arg->chrono[0] && hmd_arg->chrono[0] > 0) {
+      } else if (step < hmd_arg->chrono && hmd_arg->chrono > 0) {
 
 	cg_sol_cur = cg_sol[i][step];
 	for (j=0; j<step; j++) cg_sol_prev[j] = cg_sol[i][(step-(j+1))];
@@ -527,13 +527,13 @@ Float AlgHmcQPQ::run(void)
 	lat.FminResExt(cg_sol_cur, phi[i], cg_sol_prev, vm[i], 
 		       step, frm_cg_arg[i], CNV_FRM_NO);
 
-      } else if (hmd_arg->chrono[0] > 0) {
+      } else if (hmd_arg->chrono > 0) {
 
-	cg_sol_cur = cg_sol[i][step%hmd_arg->chrono[0]];
-	for (j=0; j<hmd_arg->chrono[0]; j++)
-	  cg_sol_prev[j] = cg_sol[i][(step-(j+1))%hmd_arg->chrono[0]];
+	cg_sol_cur = cg_sol[i][step%hmd_arg->chrono];
+	for (j=0; j<hmd_arg->chrono; j++)
+	  cg_sol_prev[j] = cg_sol[i][(step-(j+1))%hmd_arg->chrono];
 	lat.FminResExt(cg_sol_cur, phi[i], cg_sol_prev, vm[i], 
-		       hmd_arg->chrono[0], frm_cg_arg[i], CNV_FRM_NO);
+		       hmd_arg->chrono, frm_cg_arg[i], CNV_FRM_NO);
       }
 	
       cg_iter = lat.FmatEvlInv(cg_sol_cur, phi[i], frm_cg_arg[i], &true_res, CNV_FRM_NO);
@@ -597,27 +597,27 @@ Float AlgHmcQPQ::run(void)
   //----------------------------------------------------------------
   for(i=0; i<n_frm_masses; i++){
 
-      if (step == 0 || hmd_arg->chrono[0] == 0) {
+      if (step == 0 || hmd_arg->chrono == 0) {
 
 	cg_sol_cur = cg_sol[i][0];
 	cg_sol_cur -> VecTimesEquFloat(0.0,f_size);
 
-      } else if (step < hmd_arg->chrono[0] && hmd_arg->chrono[0] > 0) {
+      } else if (step < hmd_arg->chrono && hmd_arg->chrono > 0) {
 
-	cg_sol_cur = cg_sol[i][step%hmd_arg->chrono[0]];
+	cg_sol_cur = cg_sol[i][step%hmd_arg->chrono];
 	for (j=0; j<step; j++)
-	  cg_sol_prev[j] = cg_sol[i][(step-(j+1))%hmd_arg->chrono[0]];
+	  cg_sol_prev[j] = cg_sol[i][(step-(j+1))%hmd_arg->chrono];
 
 	lat.FminResExt(cg_sol_cur, phi[i], cg_sol_prev, vm[i], 
 		       step, frm_cg_arg[i], CNV_FRM_NO);
 
-      } else if (hmd_arg->chrono[0] > 0) {
+      } else if (hmd_arg->chrono > 0) {
 
-	cg_sol_cur = cg_sol[i][step%hmd_arg->chrono[0]];
-	for (j=0; j<hmd_arg->chrono[0]; j++)
-	  cg_sol_prev[j] = cg_sol[i][(step-(j+1))%hmd_arg->chrono[0]];
+	cg_sol_cur = cg_sol[i][step%hmd_arg->chrono];
+	for (j=0; j<hmd_arg->chrono; j++)
+	  cg_sol_prev[j] = cg_sol[i][(step-(j+1))%hmd_arg->chrono];
 	lat.FminResExt(cg_sol_cur, phi[i], cg_sol_prev, vm[i], 
-		       hmd_arg->chrono[0], frm_cg_arg[i], CNV_FRM_NO);
+		       hmd_arg->chrono, frm_cg_arg[i], CNV_FRM_NO);
       }
 
     cg_iter = lat.FmatEvlInv(cg_sol_cur, phi[i], frm_cg_arg[i], &true_res, CNV_FRM_NO);

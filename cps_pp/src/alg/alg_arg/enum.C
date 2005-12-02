@@ -945,6 +945,36 @@ struct vml_enum_map MetropolisType_map[] = {
 };
 
 bool_t
+vml_ForceMeasure (VML *vmls, char *name,ForceMeasure *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,ForceMeasure_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map ForceMeasure_map[] = {
+	{"ForceMeasure","FORCE_MEASURE_NO",FORCE_MEASURE_NO},
+	{"ForceMeasure","FORCE_MEASURE_YES",FORCE_MEASURE_YES},
+	{NULL,NULL,0}
+};
+
+bool_t
+vml_EigenMeasure (VML *vmls, char *name,EigenMeasure *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,EigenMeasure_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map EigenMeasure_map[] = {
+	{"EigenMeasure","EIGEN_MEASURE_NO",EIGEN_MEASURE_NO},
+	{"EigenMeasure","EIGEN_MEASURE_YES",EIGEN_MEASURE_YES},
+	{NULL,NULL,0}
+};
+
+bool_t
 vml_RhmcPolesAction (VML *vmls, char *name,RhmcPolesAction *objp)
 {
 	register int32_t *buf;

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.14 2005-09-06 21:23:33 chulwoo Exp $
+  $Id: alg_eig.C,v 1.15 2005-12-02 15:19:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 21:23:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.14 2005-09-06 21:23:33 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.14 2005-09-06 21:23:33 chulwoo Exp $
+//  $Date: 2005-12-02 15:19:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.15 2005-12-02 15:19:09 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.15 2005-12-02 15:19:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -158,11 +158,14 @@ AlgEig::AlgEig(Lattice& latt,
   // Calculate n_masses if necessary
   switch( alg_eig_arg->pattern_kind ) {
   case ARRAY: 
-  case LOG:   
-    // Should be specified already
+    n_masses = alg_eig_arg->Mass.Mass_len;
+    break;
+  case LOG:
+    n_masses = (int) ((log(alg_eig_arg->Mass_final - alg_eig_arg->Mass_init)
+		    / log(alg_eig_arg->Mass_step)) + 1.000001);
     break;
   case LIN:   
-    alg_eig_arg->n_masses = (int) (fabs((alg_eig_arg->Mass_final 
+    n_masses = (int) (fabs((alg_eig_arg->Mass_final 
       - alg_eig_arg->Mass_init)/alg_eig_arg->Mass_step) + 1.000001); 
     break;
   default: 
@@ -205,6 +208,12 @@ AlgEig::~AlgEig() {
   //???
 }
 
+//!< Overloaded for backwards compatibility
+void AlgEig::run()
+{
+  run((Float**)0);
+}
+
 
 //------------------------------------------------------------------
 //! Performs the computation.
@@ -213,7 +222,7 @@ AlgEig::~AlgEig() {
   structure.
 */
 //------------------------------------------------------------------
-void AlgEig::run()
+void AlgEig::run(Float **evalues)
 {
 #if TARGET==cpsMPI
     using MPISCU::fprintf;
@@ -305,7 +314,7 @@ void AlgEig::run()
   // want to compute for:
   switch( eig_arg->pattern_kind ) {
   case ARRAY: 
-    eig_arg->mass = eig_arg->Mass[0]; 
+    eig_arg->mass = eig_arg->Mass.Mass_val[0]; 
     break;
   case LIN:   
     eig_arg->mass = eig_arg->Mass_init; 
@@ -323,15 +332,15 @@ void AlgEig::run()
   }
 
   // Loop over masses
-  for(int m=0; m<eig_arg->n_masses; m++){
+  for(int m=0; m<n_masses; m++){
     
     //for(Float mass = eig_arg->Mass_init; 
     //sign_dm*mass <= sign_dm*eig_arg->Mass_final;
     //mass += eig_arg->Mass_step){
 
     //eig_arg->mass = mass;
-  // count the number of masses 
-  int count(0);
+    // count the number of masses 
+    int count(0);
 
 
     // store eigenvectors from previous mass
@@ -402,6 +411,13 @@ void AlgEig::run()
     			hsum, eig_arg, CNV_FRM_YES);
 #endif
    
+    //!< Copy over eigenvalues to return them
+    if (evalues != 0) {
+      for (int eig=0; eig<eig_arg->N_eig; eig++) {
+	evalues[eig][m] = lambda[eig];
+      }
+    }
+
     if ( iter < 0 )
     {
       FILE* filep;
@@ -487,10 +503,10 @@ void AlgEig::run()
 
     // If there is another mass loop iteration ahead, we should
     // set the eig_arg->mass to it's next desired value
-    if( m < eig_arg->n_masses - 1 ) {
+    if( m < n_masses - 1 ) {
       switch( eig_arg->pattern_kind ) {
       case ARRAY: 
-	eig_arg->mass = eig_arg->Mass[m+1]; 
+	eig_arg->mass = eig_arg->Mass.Mass_val[m+1]; 
 	break;
       case LIN:   
 	eig_arg->mass += eig_arg->Mass_step; 

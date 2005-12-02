@@ -228,13 +228,7 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "measure_pbp", &objp->measure_pbp))
 		 return FALSE;
-	 if (!vml_int (vmls, "measure_eig", &objp->measure_eig))
-		 return FALSE;
 	 if (!vml_int (vmls, "measure_w_spect", &objp->measure_w_spect))
-		 return FALSE;
-	 if (!vml_string (vmls, "eig_lo_stem", &objp->eig_lo_stem, ~0))
-		 return FALSE;
-	 if (!vml_string (vmls, "eig_hi_stem", &objp->eig_hi_stem, ~0))
 		 return FALSE;
 	 vml_class_end(vmls,"EvoArg",name);
 	return TRUE;

@@ -43,6 +43,36 @@ vml_IntABArg (VML *vmls, char *name,IntABArg *objp)
 	 vml_class_end(vmls,"IntABArg",name);
 	return TRUE;
 }
+	 bool ActionArg::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool ActionArg::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool ActionArg::Vml(VML *vmls,char *instance){
+		 if(!vml_ActionArg(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_ActionArg (VML *vmls, char *name,ActionArg *objp)
+{
+	register int32_t *buf;
+
+	 vml_class_begin(vmls,"ActionArg",name);
+	 if (!vml_ForceMeasure (vmls, "force_measure", &objp->force_measure))
+		 return FALSE;
+	 vml_class_end(vmls,"ActionArg",name);
+	return TRUE;
+}
 	 bool BilinearDescr::Encode(char *filename,char *instance){
 		 VML vmls;
 		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
@@ -105,6 +135,8 @@ vml_ActionBilinearArg (VML *vmls, char *name,ActionBilinearArg *objp)
 	 if (!vml_array (vmls, "bilinears", (char **)&objp->bilinears.bilinears_val, (u_int *) &objp->bilinears.bilinears_len, ~0,
 		sizeof (BilinearDescr), (vmlproc_t) vml_BilinearDescr))
 		 return FALSE;
+	 if (!vml_ActionArg (vmls, "action_arg", &objp->action_arg))
+		 return FALSE;
 	 vml_class_end(vmls,"ActionBilinearArg",name);
 	return TRUE;
 }
@@ -133,7 +165,12 @@ vml_ApproxDescr (VML *vmls, char *name,ApproxDescr *objp)
 	register int32_t *buf;
 
 	 vml_class_begin(vmls,"ApproxDescr",name);
-	 if (!vml_Float (vmls, "stop_rsd", &objp->stop_rsd))
+	 if (!vml_Float (vmls, "lambda_low", &objp->lambda_low))
+		 return FALSE;
+	 if (!vml_Float (vmls, "lambda_high", &objp->lambda_high))
+		 return FALSE;
+	 if (!vml_array (vmls, "stop_rsd", (char **)&objp->stop_rsd.stop_rsd_val, (u_int *) &objp->stop_rsd.stop_rsd_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
 		 return FALSE;
 	 vml_class_end(vmls,"ApproxDescr",name);
 	return TRUE;
@@ -165,21 +202,53 @@ vml_RationalDescr (VML *vmls, char *name,RationalDescr *objp)
 	 vml_class_begin(vmls,"RationalDescr",name);
 	 if (!vml_FieldType (vmls, "field_type", &objp->field_type))
 		 return FALSE;
-	 if (!vml_Float (vmls, "lambda_low", &objp->lambda_low))
-		 return FALSE;
-	 if (!vml_Float (vmls, "lambda_high", &objp->lambda_high))
-		 return FALSE;
 	 if (!vml_int (vmls, "power_num", &objp->power_num))
 		 return FALSE;
 	 if (!vml_int (vmls, "power_den", &objp->power_den))
 		 return FALSE;
-	 if (!vml_array (vmls, "md_approx", (char **)&objp->md_approx.md_approx_val, (u_int *) &objp->md_approx.md_approx_len, ~0,
-		sizeof (ApproxDescr), (vmlproc_t) vml_ApproxDescr))
+	 if (!vml_ApproxDescr (vmls, "md_approx", &objp->md_approx))
 		 return FALSE;
-	 if (!vml_array (vmls, "mc_approx", (char **)&objp->mc_approx.mc_approx_val, (u_int *) &objp->mc_approx.mc_approx_len, ~0,
-		sizeof (ApproxDescr), (vmlproc_t) vml_ApproxDescr))
+	 if (!vml_ApproxDescr (vmls, "mc_approx", &objp->mc_approx))
 		 return FALSE;
 	 vml_class_end(vmls,"RationalDescr",name);
+	return TRUE;
+}
+	 bool EigenDescr::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool EigenDescr::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool EigenDescr::Vml(VML *vmls,char *instance){
+		 if(!vml_EigenDescr(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_EigenDescr (VML *vmls, char *name,EigenDescr *objp)
+{
+	register int32_t *buf;
+
+	 vml_class_begin(vmls,"EigenDescr",name);
+	 if (!vml_EigenMeasure (vmls, "eigen_measure", &objp->eigen_measure))
+		 return FALSE;
+	 if (!vml_Float (vmls, "stop_rsd", &objp->stop_rsd))
+		 return FALSE;
+	 if (!vml_int (vmls, "max_num_iter", &objp->max_num_iter))
+		 return FALSE;
+	 if (!vml_string (vmls, "eig_lo_stem", &objp->eig_lo_stem, ~0))
+		 return FALSE;
+	 if (!vml_string (vmls, "eig_hi_stem", &objp->eig_hi_stem, ~0))
+		 return FALSE;
+	 vml_class_end(vmls,"EigenDescr",name);
 	return TRUE;
 }
 	 bool ActionRationalArg::Encode(char *filename,char *instance){
@@ -209,10 +278,6 @@ vml_ActionRationalArg (VML *vmls, char *name,ActionRationalArg *objp)
 	 vml_class_begin(vmls,"ActionRationalArg",name);
 	 if (!vml_ActionBilinearArg (vmls, "bi_arg", &objp->bi_arg))
 		 return FALSE;
-	 if (!vml_RatApproxType (vmls, "approx_type", &objp->approx_type))
-		 return FALSE;
-	 if (!vml_Float (vmls, "spread", &objp->spread))
-		 return FALSE;
 	 if (!vml_long (vmls, "precision", &objp->precision))
 		 return FALSE;
 	 if (!vml_int (vmls, "remez_generate", &objp->remez_generate))
@@ -221,6 +286,8 @@ vml_ActionRationalArg (VML *vmls, char *name,ActionRationalArg *objp)
 		 return FALSE;
 	 if (!vml_array (vmls, "rationals", (char **)&objp->rationals.rationals_val, (u_int *) &objp->rationals.rationals_len, ~0,
 		sizeof (RationalDescr), (vmlproc_t) vml_RationalDescr))
+		 return FALSE;
+	 if (!vml_EigenDescr (vmls, "eigen", &objp->eigen))
 		 return FALSE;
 	 vml_class_end(vmls,"ActionRationalArg",name);
 	return TRUE;
@@ -444,6 +511,8 @@ vml_ActionGaugeArg (VML *vmls, char *name,ActionGaugeArg *objp)
 
 	 vml_class_begin(vmls,"ActionGaugeArg",name);
 	 if (!vml_GclassType (vmls, "gluon", &objp->gluon))
+		 return FALSE;
+	 if (!vml_ActionArg (vmls, "action_arg", &objp->action_arg))
 		 return FALSE;
 	 vml_class_end(vmls,"ActionGaugeArg",name);
 	return TRUE;
