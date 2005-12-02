@@ -1,4 +1,5 @@
 #include <string.h>
+#include "asq_data_types.h"
 #include "pt_int.h"
 
 extern "C" {

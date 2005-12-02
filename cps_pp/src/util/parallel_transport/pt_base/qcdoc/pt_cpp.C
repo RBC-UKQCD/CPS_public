@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "asq_data_types.h"
 #include "pt_int.h"
 //#include <util/gauge_agg.h>
 
@@ -298,9 +299,9 @@ void cmv_agg_cpp( int sites, long u, long a,
   int *ch;
 
       uu = &(agg[0].mat[0]);
-      //printf("in=%p out=%p ",a,tmpfrm);
-      //printf("src=%p dest=%p uu=%p\n",agg[0].src,agg[0].dest,uu);
-      //fflush(stdout);
+      printf("in=%p out=%p ",a,tmpfrm);
+      printf("src=%p dest=%p uu=%p\n",agg[0].src,agg[0].dest,uu);
+      fflush(stdout);
       //printf("uu[%d]= ",0);
       //for(i=0;i<18;i++){
       //printf("%0.4e ",uu[i]);
@@ -312,6 +313,12 @@ void cmv_agg_cpp( int sites, long u, long a,
       fp1 = (IFloat *)(tmpfrm + agg[s].dest);
       fp0 = (IFloat *)((int)a + agg[s].src);
       uu = &(agg[s].mat[0]);
+      if(agg[s].src< 0 || agg[s].src>48*64){
+         printf("src=%p\n",agg[s].src);exit(-40);
+      }
+      if(agg[s].dest< 0 || agg[s].dest>48*64){
+         printf("dest=%p\n",agg[s].dest);exit(-40);
+      }
 //      printf("src=%d dest=%d uu=%p\n",agg[0].src,agg[0].dest,uu);fflush(stdout);
 //      printf("fp1=%p fp0=%p\n",fp1,fp0);
 //      bzero(fp1,sizeof(IFloat)*6);

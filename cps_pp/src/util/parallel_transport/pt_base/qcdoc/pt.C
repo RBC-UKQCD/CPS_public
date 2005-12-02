@@ -1,23 +1,24 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.26 2005-09-15 19:47:28 chulwoo Exp $
+  $Id: pt.C,v 1.27 2005-12-02 16:36:01 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-15 19:47:28 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.26 2005-09-15 19:47:28 chulwoo Exp $
-//  $Id: pt.C,v 1.26 2005-09-15 19:47:28 chulwoo Exp $
+//  $Date: 2005-12-02 16:36:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.27 2005-12-02 16:36:01 chulwoo Exp $
+//  $Id: pt.C,v 1.27 2005-12-02 16:36:01 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.26 $
+//  $Revision: 1.27 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
+#include "asq_data_types.h"
 #include "pt_int.h"
 
 static unsigned long PEC = 0xb0000000;
@@ -140,6 +141,16 @@ int PT::lex_xyzt_cb_o(int *x){
   return result;
 }
 
+//Returns checkerboard index associated with coordinate x[4]
+int PT::lex_xyzt_cb_e(int *x){
+//  printf("lex_xyzt_cb_o(%d %d %d %d)\n",x[0],x[1],x[2],x[3]);
+  int result = x[0] + size[0]*(x[1]+size[1]*(x[2]+size[2]*x[3]));
+  if ( (x[0]+x[1]+x[2]+x[3])%2 == 1) result = result/2+vol/2;
+  else result = result/2;
+  return result;
+}
+
+
 //---------------------------------------------------------------------------
 //Returns index for fields in the STAG storage order on lattice
 //sites of a given parity
@@ -189,7 +200,11 @@ int PT::lex_g_txyz_cb(int *x, int mu){
 //coordinate x for checkerboarded storage
 int PT:: lex_g_xyzt_cb_o(int *x, int mu){
   int temp =  lex_xyzt_cb_o(x);
-  return (temp*NDIM + mu);
+  return (mu*vol+temp);
+}
+int PT:: lex_g_xyzt_cb_e(int *x, int mu){
+  int temp =  lex_xyzt_cb_e(x);
+  return (mu*vol+temp);
 }
 
 // Calculate the required offset given the direction and hop
@@ -391,6 +406,11 @@ void PT::init(PTArg *pt_arg)
       break;
     case PT_XYZT_CB_O:
       LexGauge = lex_g_xyzt_cb_o;
+      LexGauge2 = lex_g_txyz_cb;
+      break;
+    case PT_XYZT_CB_E:
+      LexGauge = lex_g_xyzt_cb_e;
+      LexGauge2 = lex_g_txyz_cb;
       break;
     default:
       fprintf(stderr,"PT::init got invalid g_str_ord\n");
@@ -656,7 +676,6 @@ void PT::init(PTArg *pt_arg)
 
 	    for(i=0;i<NDIM;i++){
 
-//	    printf("Toffset:%d %d %d %d %d\n",x[0],x[1],x[2],x[3],i);
 	    // positive direction
 	    //This is for transport of a vector in the negative direction
 	    //An even index for uc_nl, uc_l, uc_nl_cb, uc_l_cb corresponds
@@ -754,7 +773,6 @@ void PT::init(PTArg *pt_arg)
 	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->src = LexVector_cb(x)*6*sizeof(IFloat);
 	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->dest = LexVector_cb(nei)*6*sizeof(IFloat);
 	      (uc_l_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->gauge = LexGauge2(x,i)*GAUGE_LEN*sizeof(IFloat);
-
 	      (uc_l_pad_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->src = LexVector_cb(x)*6*sizeof(IFloat);
 	      (uc_l_pad_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->dest = (LexVector_cb(nei)*8+2*i+1)*8*sizeof(IFloat);
 	      (uc_l_pad_cb[parity][2*i+1]+local_count_cb[parity][2*i+1])->gauge = LexGauge2(x,i)*GAUGE_LEN*sizeof(IFloat);
@@ -936,7 +954,7 @@ void PT::delete_g_buf(){
   //---------------------------------------------------------------------
 }
 
-void PT::init_g(void){
+void PT::init_g(Float * g_addr){
   int x[NDIM], nei[NDIM];
   int local_count[2*NDIM];
   int non_local_count[2*NDIM];
@@ -950,6 +968,7 @@ void PT::init_g(void){
   }
   //Location of gauge field
   IFloat *u = gauge_field_addr;
+  if (g_addr) u = g_addr;
 
   //For staggered parallel transport, we need to re-order the gauge fields
   //to match the ordering of the vector field
@@ -1315,6 +1334,8 @@ parity, IFloat * gauge)
 //cb - Parity of the sites where the vectors are defined
 //gauge - Pointer to block of gauge fields in STAG order
 
+#ifndef SCIDAC 
+
 //Normal parallel transport with normal gauge fields
 #undef PROFILE
 void PT::vec_cb(int n, IFloat **vout, IFloat **vin, const int *dir, int
@@ -1353,7 +1374,8 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 {
   //List of the different directions
   int wire[n];
-  int i,j,d,s,k;
+  int i;
+//  int j,d,s,k;
   //SCUDirArgs for sending and receiving in the n directions
   SCUDirArgIR *SCUarg_p[2*non_local_dirs];
   //SCUDirArgIR *SCUarg_p[2*n];
@@ -1366,7 +1388,7 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
   call_num++;
   
   //Name our function
-  char *fname="pt_1vec_cb_norm()";
+//  char *fname="pt_1vec_cb_norm()";
   
   //Set the transfer directions
   //If wire[i] is even, then we have communication in the negative direction
@@ -1622,14 +1644,14 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 {
   //List of the different directions
   int wire[n];
-  int i,k;
+  int i;
   //SCUDirArgs for sending and receiving in the n directions
   SCUDirArgIR *SCUarg_p[2*non_local_dirs];
   //SCUDirArgIR *SCUarg_p[2*n];
   SCUDirArgMulti SCUmulti;
   static int call_num = 0;
-  int vlen = VECT_LEN;
-  int vlen2 = 8;
+//  int vlen = VECT_LEN;
+//  int vlen2 = 8;
 #ifdef PROFILE
   printf("gauge=%p parity =%d\n",gauge,parity);
   for(i=0;i<n;i++){
@@ -1640,7 +1662,7 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   call_num++;
   
   //Name our function
-  char *fname="pt_1vec_cb_pad()";
+//  char *fname="pt_1vec_cb_pad()";
   //VRB.Func("",fname);
   
   //Set the transfer directions
@@ -1828,7 +1850,7 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   //If wire[i] is even, then we have transport in the negative direction.
   //In this case, the vector field is multiplied by the SU(3) link matrix
   //after all communication is complete
-  IFloat *fp0,*fp1;
+//  IFloat *fp0,*fp1;
   for(i=0;i<n;i++)
     {
       if(!local[wire[i]/2])
@@ -1889,6 +1911,8 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 //  ParTrans::PTflops +=33*n*vol;
 }
 
+#endif // #ifndef SCIDAC
+
 //-----------------------------------------------------------------------------
 
 //Parallel transport of a matrix. through one hop.
@@ -1903,7 +1927,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   static int call_num = 0;
 
   call_num++;
-  char *fname="pt_mat()";
+//  char *fname="pt_mat()";
 //  VRB.Func("",fname);
   
   for(i=0;i<n;i++) wire[i] = dir[i]; 
@@ -1989,6 +2013,7 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
 	
   int non_local_dir=0;
   for(i=0;i<n;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
+//  for(i=0;i<n;i++) printf("wire[%d]=%d\n",i,dir[i]);
   for(i=0;i<n;i++)
   if (!local[wire[i]/2]){
     IFloat * addr = (vin[i]+VECT_LEN*offset[wire[i]]);
@@ -2003,7 +2028,12 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
   }
 	
 #ifndef CPP
-  for(i=0;i<n;i++) pt_asqtad_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
+  for(i=0;i<n;i++){ 
+//  printf("vin=%p vout=%p\n",vin[i],vout[i]);
+//  printf("uc_l[%d]=%p src=%d\n",wire[i],uc_l[wire[i]], uc_l[wire[i]]->src);
+pt_asqtad_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
+//  printf("uc_l[%d]=%p src=%d\n",wire[i],uc_l[wire[i]], uc_l[wire[i]]->src);
+  }
 #else
   for(i=0;i<n;i++) 
     cmv_agg_cpp(local_chi[wire[i]],(long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
@@ -2023,7 +2053,7 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
   dtime +=dclock();
   print_flops("",fname,66*n*vol,dtime);
 #endif
-//  ParTrans::PTflops +=66*n*vol;
+  Flops +=66*n*vol;
 }
 
 /*! 
@@ -2034,7 +2064,7 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
 	     int n_dir, int hop, IFloat **sum){
   char *fname = "pt_vvpd()";
 //  VRB.Func("",fname);
-  int i, s, v;
+  int i, v;
   Float f = 2.0;
   int wire[n_dir];
   for(i=0;i<n_dir;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
@@ -2172,7 +2202,7 @@ void PT::shift_field(IFloat **v, const int *dir, int n_dir,
 //! u[-/+nu](x) = U_[-/+nu](x) 
 void PT::shift_link(IFloat **u, const int *dir, int n_dir){
 
-  char *fname = "pt_shift_link()";
+//  char *fname = "pt_shift_link()";
   int length;
   for (int i=0; i<n_dir; i++) {
     
