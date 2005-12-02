@@ -1,0 +1,65 @@
+class ActionRationalArg rat_arg = {
+class ActionBilinearArg bi_arg = {
+FclassType fermion = F_CLASS_NONE
+Array bilinears[2] = { 
+class BilinearDescr bilinears[0] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 268435456
+}
+class BilinearDescr bilinears[1] = {
+double mass =  1.4933083644242013e-154
+int max_num_iter = 1313816914
+}
+}
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_NO
+}
+}
+long precision = 0
+int remez_generate = 0
+string rat_poles_file = ""
+Array rationals[2] = { 
+class RationalDescr rationals[0] = {
+FieldType field_type = FERMION
+int power_num = 0
+int power_den = 12521
+class ApproxDescr md_approx = {
+double lambda_low =   4.5228055552654361e-80
+double lambda_high =   2.9952129739495029e-80
+Array stop_rsd[10] = { 
+double stop_rsd[0] =   0.0000000000000000e+00
+double stop_rsd[1] =  4.7379092172263393e+226
+double stop_rsd[2] =  5.0825632205627223e-269
+double stop_rsd[3] =  2.7461158869581231e-309
+double stop_rsd[4] =  5.5121356054233359e-310
+double stop_rsd[5] =   2.9952128497993329e-80
+double stop_rsd[6] =   4.2754519327194095e+15
+double stop_rsd[7] =  6.9723980849059717e+228
+double stop_rsd[8] =  1.0192401587287503e-312
+double stop_rsd[9] =  -5.7244431421204514e+77
+}
+}
+class ApproxDescr mc_approx = {
+double lambda_low =  1.0192401587287503e-312
+double lambda_high =  -7.0562571226083604e+77
+Array stop_rsd[16] = { 
+double stop_rsd[0] =   0.0000000000000000e+00
+double stop_rsd[1] =  8.5462510370724631e+247
+double stop_rsd[2] =  1.1041199903673612e-312
+double stop_rsd[3] =  -2.6023819746919304e+79
+double stop_rsd[4] = -4.8479045176713200e+232
+double stop_rsd[5] =   4.5228055552654361e-80
+double stop_rsd[6] =   2.9952129739495029e-80
+double stop_rsd[7] =  2.1405569348975563e+161
+double stop_rsd[8] =  4.7379092172263393e+226
+double stop_rsd[9] =  5.0825632162266049e-269
+double stop_rsd[10] =  4.4963771227497925e-311
+double stop_rsd[11] =  6.2850414224516564e-312
+double stop_rsd[12] =   2.9952128497993329e-80
+double stop_rsd[13] =  1.1155453816226166e+171
+double stop_rsd[14] =  8.5462310448316802e+247
+double stop_rsd[15] =  6.8217906541958863e-316
+}
+}
+}
+class RationalDescr rationals[1] = {

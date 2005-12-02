@@ -1,0 +1,7 @@
+class IntABArg ab_arg = {
+IntegratorType type = INT_LEAP
+int A_steps = 0
+int B_steps = 0
+IntegratorLevel level = EMBEDDED_INTEGRATOR
+double lambda =   0.0000000000000000e+00
+}
