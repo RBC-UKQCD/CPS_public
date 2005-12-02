@@ -20,9 +20,6 @@
 #include<alg/alg_plaq.h>
 #include<alg/alg_remez.h>
 
-#include<alg/alg_eig.h>
-#include<alg/eig_arg.h>
-
 #include<util/gjp.h>
 #include<util/verbose.h>
 #include<util/error.h>
@@ -58,7 +55,6 @@ IntABArg ab3_arg;
 IntABArg sum_arg;
 
 EvoArg evo_arg;
-EigArg eig_arg;
 DoArg do_arg;
 NoArg no_arg;
 
@@ -85,12 +81,12 @@ int main(int argc, char *argv[])
   CommonArg common_arg_hmc;
   CommonArg common_arg_plaq;
 
-  if ( argc!=14 ) { 
-    printf("Args: doarg-file hmcarg-file evoarg-file eigarg_file initial-directory\n");
+  if ( argc!=13 ) { 
+    printf("Args: doarg-file hmcarg-file evoarg-file initial-directory\n");
     exit(-1);
   }
 
-  chdir (argv[13]);
+  chdir (argv[12]);
 
   if ( !do_arg.Decode(argv[1],"do_arg") ) { 
     do_arg.Encode("bum_arg","bum_arg");
@@ -98,7 +94,8 @@ int main(int argc, char *argv[])
     exit(-1);
   }
 
-  do_arg.x_nodes = SizeX();/*Layout the lattice on the machine (without regard to even-odd)*/
+  //Layout the lattice on the machine (without regard to even-odd)
+  do_arg.x_nodes = SizeX(); 
   do_arg.y_nodes = SizeY();
   do_arg.z_nodes = SizeZ();
   do_arg.t_nodes = SizeT();
@@ -120,16 +117,15 @@ int main(int argc, char *argv[])
 
   if ( !hmc_arg.Decode(argv[2],"hmc_arg")){printf("Bum hmc_arg\n"); exit(-1);}
   if ( !evo_arg.Decode(argv[3],"evo_arg")){printf("Bum evo_arg\n"); exit(-1);}
-  if ( !eig_arg.Decode(argv[4],"eig_arg")){printf("Bum eig_arg\n"); exit(-1);}
+  if ( !rat_arg.Decode(argv[4],"rat_arg")){printf("Bum rat_arg\n"); exit(-1);}
+  if ( !gauge_arg.Decode(argv[5],"gauge_arg")){printf("Bum gauge_arg\n"); exit(-1);}
+  if ( !split1_arg.Decode(argv[6],"split1_arg")){printf("Bum split1_arg\n"); exit(-1);}
+  if ( !split2_arg.Decode(argv[7],"split2_arg")){printf("Bum split2_arg\n"); exit(-1);}
 
-  if ( !rat_arg.Decode(argv[5],"rat_arg")){printf("Bum rat_arg\n"); exit(-1);}
-  if ( !gauge_arg.Decode(argv[6],"gauge_arg")){printf("Bum gauge_arg\n"); exit(-1);}
-  if ( !split1_arg.Decode(argv[7],"split1_arg")){printf("Bum split1_arg\n"); exit(-1);}
-  if ( !split2_arg.Decode(argv[8],"split2_arg")){printf("Bum split2_arg\n"); exit(-1);}
-  if ( !bsn_arg.Decode(argv[9],"bsn_arg")){printf("Bum bsn_arg\n"); exit(-1);}
-  if ( !ab1_arg.Decode(argv[10],"ab1_arg")){printf("Bum ab1_arg\n"); exit(-1);}
-  if ( !ab2_arg.Decode(argv[11],"ab2_arg")){printf("Bum ab2_arg\n"); exit(-1);}
-  if ( !ab3_arg.Decode(argv[12],"ab3_arg")){printf("Bum ab3_arg\n"); exit(-1);}
+  if ( !bsn_arg.Decode(argv[8],"bsn_arg")){printf("Bum bsn_arg\n"); exit(-1);}
+  if ( !ab1_arg.Decode(argv[9],"ab1_arg")){printf("Bum ab1_arg\n"); exit(-1);}
+  if ( !ab2_arg.Decode(argv[10],"ab2_arg")){printf("Bum ab2_arg\n"); exit(-1);}
+  if ( !ab3_arg.Decode(argv[11],"ab3_arg")){printf("Bum ab3_arg\n"); exit(-1);}
 
   chdir(evo_arg.work_directory);
 
@@ -142,9 +138,7 @@ int main(int argc, char *argv[])
   // VRB.Level(VERBOSE_RESULT_LEVEL);
   LRG.Initialize();
 
-  /************************************************
-   * Outer config loop
-   ************************************************/
+  // Outer config loop
   int traj = evo_arg.traj_start;
   
   if ( do_arg.start_conf_kind != START_CONF_FILE ) {
@@ -182,9 +176,7 @@ int main(int argc, char *argv[])
     sprintf(hmc_file,"%s.%d",evo_arg.evo_stem,traj);
     common_arg_hmc.set_filename(hmc_file);
 
-    /************************************************
-     * Inner trajectory loop
-     ************************************************/
+    // Inner trajectory loop
     for(int i=0;i<evo_arg.gauge_unload_period;i++,traj++ ) {
       { 
 	
@@ -193,7 +185,7 @@ int main(int argc, char *argv[])
 	  Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_WILSON);
 	  AlgPlaq plaq(lat, &common_arg_plaq, &no_arg);
 	  plaq.run();
-	  LatticeFactory::Destroy();
+ 	  LatticeFactory::Destroy();
 	}    
 
 	{
@@ -220,53 +212,11 @@ int main(int argc, char *argv[])
 
       }
 
-    }/*End of inter-cfg sweep*/
-
-    if (evo_arg.CalcEig) {
-
-      Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
-
-      {
-	//!< Measure the lowest eigenvalue
-	CommonArg ca_eig;
-	char eig_file[256];
-	
-	sprintf(eig_file,"%s.%d",evo_arg.eig_lo_stem,traj);
-	
-	FILE *truncate_it = Fopen(eig_file,"w");
-	Fclose(truncate_it);
-	
-	ca_eig.set_filename(eig_file);
-	eig_arg.RitzMatOper = MATPCDAG_MATPC;
-	
-	AlgEig eig(lat,&ca_eig,&eig_arg);
-	eig.run();
-      }
-
-      {
-	//!< Measure the highest eigenvalue
-	CommonArg ca_eig;
-	char eig_file[256];
-	
-	sprintf(eig_file,"%s.%d",evo_arg.eig_hi_stem,traj);
-	
-	FILE *truncate_it = Fopen(eig_file,"w");
-	Fclose(truncate_it);
-
-	ca_eig.set_filename(eig_file);
-	eig_arg.RitzMatOper = NEG_MATPCDAG_MATPC;
-	
-	AlgEig eig(lat,&ca_eig,&eig_arg);
-	eig.run();
-	
-	LatticeFactory::Destroy();
-      }
-
-    }
+    }//End of inter-cfg sweep
 
     checkpoint(traj);
 
-  } /*End config loop*/
+  } //End config loop
 
   AlgIntAB::Destroy(ab3);
   AlgIntAB::Destroy(ab2);
@@ -281,45 +231,41 @@ int main(int argc, char *argv[])
 
 void checkpoint(int traj)
 {
-  Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
-
   char *cname="cps::";
   char *fname="checkpoint()";
 
   char lat_file[256];
   char rng_file[256];
+  
+  // Save this config to disk
+  Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
 
-  /***************************************
-   * Save this config to disk
-   ***************************************/
   sprintf(lat_file,"%s.%d",evo_arg.gauge_file_stem,traj);
   QioArg wt_arg(lat_file,0.001);
-
+    
   wt_arg.ConcurIONumber=evo_arg.io_concurrency;
   WriteLatticeParallel wl;
   wl.setHeader(evo_arg.ensemble_id,evo_arg.ensemble_label,traj);
   wl.write(lat,wt_arg);
-    
+     
   if(!wl.good()) 
     ERR.General(cname,fname,"Failed write lattice %s",lat_file);
+
+  LatticeFactory::Destroy();
   
-  /***************************************
-   * Save the RNG's
-   ***************************************/
+  // Save the RNG's
   sprintf(rng_file,"%s.%d",evo_arg.rng_file_stem,traj);
   if ( !LRG.Write(rng_file) ) 
     ERR.General(cname,fname,"Failed RNG file %s",rng_file);
   
-  /****************************************
-   * Update the parameter files for restart
-   ******************************************/
-  
+  // Update the parameter files for restart
+
   do_arg.start_seed_filename = rng_file;
   do_arg.start_seed_kind = START_SEED_FILE;
   do_arg.start_conf_filename = lat_file;
   do_arg.start_conf_kind = START_CONF_FILE;
   evo_arg.traj_start     = traj;
-  
+
   char vml_file[256];
   sprintf(vml_file,"do_arg.%d",traj);
   if ( !do_arg.Encode(vml_file,"do_arg") ){
@@ -379,5 +325,4 @@ void checkpoint(int traj)
     exit(-1);
   }
 
-  LatticeFactory::Destroy();
 }

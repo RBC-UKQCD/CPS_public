@@ -1,5 +1,5 @@
 class IntABArg ab1_arg = {
-IntegratorType type = INT_OMELYAN
+IntegratorType type = INT_LEAP
 int A_steps = 1
 int B_steps = 1
 IntegratorLevel level = EMBEDDED_INTEGRATOR

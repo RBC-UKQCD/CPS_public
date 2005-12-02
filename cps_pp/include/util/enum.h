@@ -599,6 +599,20 @@ enum MetropolisType {
 typedef enum MetropolisType MetropolisType;
 extern struct vml_enum_map MetropolisType_map[];
 
+enum ForceMeasure {
+	FORCE_MEASURE_NO = 0,
+	FORCE_MEASURE_YES = 1,
+};
+typedef enum ForceMeasure ForceMeasure;
+extern struct vml_enum_map ForceMeasure_map[];
+
+enum EigenMeasure {
+	EIGEN_MEASURE_NO = 0,
+	EIGEN_MEASURE_YES = 1,
+};
+typedef enum EigenMeasure EigenMeasure;
+extern struct vml_enum_map EigenMeasure_map[];
+
 enum RhmcPolesAction {
 	RHMC_POLES_CALC = 0,
 	RHMC_POLES_READ = 1,
@@ -665,6 +679,8 @@ extern  bool_t vml_ReproduceTest (VML *, char *instance, ReproduceTest*);
 extern  bool_t vml_TestReproduceTest (VML *, char *instance, TestReproduceTest*);
 extern  bool_t vml_ReverseTest (VML *, char *instance, ReverseTest*);
 extern  bool_t vml_MetropolisType (VML *, char *instance, MetropolisType*);
+extern  bool_t vml_ForceMeasure (VML *, char *instance, ForceMeasure*);
+extern  bool_t vml_EigenMeasure (VML *, char *instance, EigenMeasure*);
 extern  bool_t vml_RhmcPolesAction (VML *, char *instance, RhmcPolesAction*);
 extern  bool_t vml_HmdLimits (VML *, char *instance, HmdLimits*);
 
@@ -713,6 +729,8 @@ extern  bool_t vml_ReproduceTest (VML *, char *instance, ReproduceTest*);
 extern  bool_t vml_TestReproduceTest (VML *, char *instance, TestReproduceTest*);
 extern  bool_t vml_ReverseTest (VML *, char *instance, ReverseTest*);
 extern  bool_t vml_MetropolisType (VML *, char *instance, MetropolisType*);
+extern  bool_t vml_ForceMeasure (VML *, char *instance, ForceMeasure*);
+extern  bool_t vml_EigenMeasure (VML *, char *instance, EigenMeasure*);
 extern  bool_t vml_RhmcPolesAction (VML *, char *instance, RhmcPolesAction*);
 extern  bool_t vml_HmdLimits (VML *, char *instance, HmdLimits*);
 

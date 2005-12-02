@@ -19,326 +19,178 @@ double mass =   1.00
 int max_num_iter = 5000
 }
 }
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_YES
 }
-RatApproxType approx_type = CONSTANT
-double spread =   0.0000000000000000e+00
+}
 long precision = 50
 int remez_generate = 0
 string rat_poles_file = ""
 Array rationals[4] = { 
 class RationalDescr rationals[0] = {
 FieldType field_type = FERMION
-double lambda_low =   5e-5
-double lambda_high =  2.42
 int power_num = 1
 int power_den = 2
-Array md_approx[10] = { 
-class ApproxDescr md_approx[0] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[1] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[2] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[3] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[4] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[5] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[6] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[7] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[8] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[9] = {
-double stop_rsd =   1e-6
+class ApproxDescr md_approx = {
+double lambda_low =   5e-5
+double lambda_high =   2.42
+Array stop_rsd[10] = { 
+double stop_rsd[0] =   1e-6
+double stop_rsd[1] =   1e-6
+double stop_rsd[2] =   1e-6
+double stop_rsd[3] =   1e-6
+double stop_rsd[4] =   1e-6
+double stop_rsd[5] =   1e-6
+double stop_rsd[6] =   1e-6
+double stop_rsd[7] =   1e-6
+double stop_rsd[8] =   1e-6
+double stop_rsd[9] =   1e-6
 }
 }
-Array mc_approx[16] = { 
-class ApproxDescr mc_approx[0] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[1] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[2] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[3] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[4] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[5] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[6] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[7] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[8] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[9] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[10] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[11] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[12] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[13] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[14] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[15] = {
-double stop_rsd =   1e-10
+class ApproxDescr mc_approx = {
+double lambda_low =   5e-5
+double lambda_high =   2.42
+Array stop_rsd[16] = { 
+double stop_rsd[0] =   1e-10
+double stop_rsd[1] =   1e-10
+double stop_rsd[2] =   1e-10
+double stop_rsd[3] =   1e-10
+double stop_rsd[4] =   1e-10
+double stop_rsd[5] =   1e-10
+double stop_rsd[6] =   1e-10
+double stop_rsd[7] =   1e-10
+double stop_rsd[8] =   1e-10
+double stop_rsd[9] =   1e-10
+double stop_rsd[10] =   1e-10
+double stop_rsd[11] =   1e-10
+double stop_rsd[12] =   1e-10
+double stop_rsd[13] =   1e-10
+double stop_rsd[14] =   1e-10
+double stop_rsd[15] =   1e-10
 }
 }
 }
 class RationalDescr rationals[1] = {
 FieldType field_type = FERMION
-double lambda_low =   5e-5
-double lambda_high =  2.42
 int power_num = 1
 int power_den = 2
-Array md_approx[10] = { 
-class ApproxDescr md_approx[0] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[1] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[2] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[3] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[4] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[5] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[6] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[7] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[8] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[9] = {
-double stop_rsd =   1e-6
+class ApproxDescr md_approx = {
+double lambda_low =   5e-5
+double lambda_high =   2.42
+Array stop_rsd[10] = { 
+double stop_rsd[0] =   1e-6
+double stop_rsd[1] =   1e-6
+double stop_rsd[2] =   1e-6
+double stop_rsd[3] =   1e-6
+double stop_rsd[4] =   1e-6
+double stop_rsd[5] =   1e-6
+double stop_rsd[6] =   1e-6
+double stop_rsd[7] =   1e-6
+double stop_rsd[8] =   1e-6
+double stop_rsd[9] =   1e-6
 }
 }
-Array mc_approx[16] = { 
-class ApproxDescr mc_approx[0] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[1] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[2] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[3] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[4] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[5] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[6] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[7] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[8] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[9] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[10] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[11] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[12] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[13] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[14] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[15] = {
-double stop_rsd =   1e-10
+class ApproxDescr mc_approx = {
+double lambda_low =   5e-5
+double lambda_high =   2.42
+Array stop_rsd[16] = { 
+double stop_rsd[0] =   1e-10
+double stop_rsd[1] =   1e-10
+double stop_rsd[2] =   1e-10
+double stop_rsd[3] =   1e-10
+double stop_rsd[4] =   1e-10
+double stop_rsd[5] =   1e-10
+double stop_rsd[6] =   1e-10
+double stop_rsd[7] =   1e-10
+double stop_rsd[8] =   1e-10
+double stop_rsd[9] =   1e-10
+double stop_rsd[10] =   1e-10
+double stop_rsd[11] =   1e-10
+double stop_rsd[12] =   1e-10
+double stop_rsd[13] =   1e-10
+double stop_rsd[14] =   1e-10
+double stop_rsd[15] =   1e-10
 }
 }
 }
 class RationalDescr rationals[2] = {
 FieldType field_type = FERMION
-double lambda_low =   4e-4
-double lambda_high =  2.42
 int power_num = 1
 int power_den = 2
-Array md_approx[9] = { 
-class ApproxDescr md_approx[0] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[1] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[2] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[3] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[4] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[5] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[6] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[7] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[8] = {
-double stop_rsd =   1e-6
+class ApproxDescr md_approx = {
+double lambda_low =   4e-4
+double lambda_high =   2.42
+Array stop_rsd[9] = { 
+double stop_rsd[0] =   1e-6
+double stop_rsd[1] =   1e-6
+double stop_rsd[2] =   1e-6
+double stop_rsd[3] =   1e-6
+double stop_rsd[4] =   1e-6
+double stop_rsd[5] =   1e-6
+double stop_rsd[6] =   1e-6
+double stop_rsd[7] =   1e-6
+double stop_rsd[8] =   1e-6
 }
 }
-Array mc_approx[14] = { 
-class ApproxDescr mc_approx[0] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[1] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[2] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[3] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[4] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[5] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[6] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[7] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[8] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[9] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[10] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[11] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[12] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[13] = {
-double stop_rsd =   1e-10
+class ApproxDescr mc_approx = {
+double lambda_low =   4e-4
+double lambda_high =   2.42
+Array stop_rsd[14] = { 
+double stop_rsd[0] =   1e-10
+double stop_rsd[1] =   1e-10
+double stop_rsd[2] =   1e-10
+double stop_rsd[3] =   1e-10
+double stop_rsd[4] =   1e-10
+double stop_rsd[5] =   1e-10
+double stop_rsd[6] =   1e-10
+double stop_rsd[7] =   1e-10
+double stop_rsd[8] =   1e-10
+double stop_rsd[9] =   1e-10
+double stop_rsd[10] =   1e-10
+double stop_rsd[11] =   1e-10
+double stop_rsd[12] =   1e-10
+double stop_rsd[13] =   1e-10
 }
 }
 }
 class RationalDescr rationals[3] = {
-FieldType field_type = BOSON
-double lambda_low =   1e-2
-double lambda_high =   2.42
+FieldType field_type = FERMION
 int power_num = 1
 int power_den = 2
-Array md_approx[6] = { 
-class ApproxDescr md_approx[0] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[1] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[2] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[3] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[4] = {
-double stop_rsd =   1e-6
-}
-class ApproxDescr md_approx[5] = {
-double stop_rsd =   1e-6
+class ApproxDescr md_approx = {
+double lambda_low =   4e-4
+double lambda_high =   2.42
+Array stop_rsd[6] = { 
+double stop_rsd[0] =   1e-6
+double stop_rsd[1] =   1e-6
+double stop_rsd[2] =   1e-6
+double stop_rsd[3] =   1e-6
+double stop_rsd[4] =   1e-6
+double stop_rsd[5] =   1e-6
 }
 }
-Array mc_approx[9] = { 
-class ApproxDescr mc_approx[0] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[1] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[2] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[3] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[4] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[5] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[6] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[7] = {
-double stop_rsd =   1e-10
-}
-class ApproxDescr mc_approx[8] = {
-double stop_rsd =   1e-10
+class ApproxDescr mc_approx = {
+double lambda_low =   1e-2
+double lambda_high =   2.42
+Array stop_rsd[9] = { 
+double stop_rsd[0] =   1e-10
+double stop_rsd[1] =   1e-10
+double stop_rsd[2] =   1e-10
+double stop_rsd[3] =   1e-10
+double stop_rsd[4] =   1e-10
+double stop_rsd[5] =   1e-10
+double stop_rsd[6] =   1e-10
+double stop_rsd[7] =   1e-10
+double stop_rsd[8] =   1e-10
 }
 }
 }
+}
+class EigenDescr eigen = {
+EigenMeasure eigen_measure = EIGEN_MEASURE_YES
+double stop_rsd =   1e-3
+int max_num_iter = 5000
+string eig_lo_stem = "eig_low"
+string eig_hi_stem = "eig_high"
 }
 }

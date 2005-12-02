@@ -321,7 +321,8 @@ Float AlgHmdR2::run(void)
     cg_calls++;
 
     // Now calculate the force (currently uses RHMC force)
-    lat.RHMC_EvolveMomFforce(mom, frmn, 2, 0, force_coeff, 0.0, dt, frmn_d);
+    lat.RHMC_EvolveMomFforce(mom, frmn, 2, 0, force_coeff, 0.0, dt, frmn_d,
+			     FORCE_MEASURE_NO);
     // decrease the loop counter by 1
     step--;
 

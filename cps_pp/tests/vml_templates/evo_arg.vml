@@ -1,13 +1,11 @@
 class EvoArg evo_arg = {
-FclassType Fermion = F_CLASS_NONE
-GclassType Gluon = G_CLASS_NONE
 int traj_start = 0
 int gauge_unload_period = 0
 int gauge_configurations = 0
 int io_concurrency = 0
 int hdw_xcsum = 0
 int hdw_rcsum = 0
-int reproduce_percent = 0
+int reproduce_interval = 0
 string ensemble_id = "id"
 string ensemble_label = "label"
 string creator = "creator"
@@ -16,8 +14,8 @@ string rng_file_stem = "ckpoint_rng"
 string plaquette_stem = "plaq"
 string pbp_stem = ""
 string evo_stem = "hmd"
+string w_spect_directory = ""
 string work_directory = ""
-int CalcEig = 0
-string eig_lo_stem = ""
-string eig_hi_stem = ""
+int measure_pbp = 0
+int measure_w_spect = 0
 }

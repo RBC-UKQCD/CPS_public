@@ -1,6 +1,6 @@
 class IntABArg ab2_arg = {
-IntegratorType type = INT_OMELYAN
-int A_steps = 5 
+IntegratorType type = INT_LEAP
+int A_steps = 3 
 int B_steps = 1
 IntegratorLevel level = EMBEDDED_INTEGRATOR
 double lambda =   0.1931833275037836

@@ -24,7 +24,7 @@ int g_center[1] = 0
 int g_center[2] = 0
 int g_center[3] = 0
 }
-double rescale_factor =   0.0000000000000000e+00
+double rescale_factor =   1.0000000000000000e+00
 int aots_num = 0
 int aots_start = 0
 int aots_step = 0

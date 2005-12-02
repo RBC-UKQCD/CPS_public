@@ -1,5 +1,5 @@
 class HmcArg hmc_arg = {
-int steps_per_traj = 5
+int steps_per_traj = 5 
 double step_size =   0.2
 MetropolisType metropolis = METROPOLIS_NO
 ReunitarizeType reunitarize = REUNITARIZE_YES
