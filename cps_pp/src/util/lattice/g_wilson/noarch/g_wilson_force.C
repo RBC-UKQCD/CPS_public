@@ -23,9 +23,12 @@ const unsigned CBUF_MODE4 = 0xcca52112;
 // It evolves the canonical momentum mom by step_size
 // using the pure gauge force.
 //------------------------------------------------------------------
-void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
+Float Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
+
+  Float Fdt=0.0;
+
 #ifdef PROFILE
   Float time = -dclock();
   ForceFlops=0;
@@ -49,6 +52,7 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
 	    IFloat *ihp = (IFloat *)(mom+uoff+mu);
 	    IFloat *dotp = (IFloat *)mp0;
 	    fTimesV1PlusV2(ihp, step_size, dotp, ihp+BANK4_BASE, 18);
+	    Fdt += step_size*step_size*dotProduct(dotp, dotp, 18);    
 	  }
 	}
       }
@@ -58,5 +62,10 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
   time += dclock();
   print_flops(cname,fname,ForceFlops,time);
 #endif
+
+  glb_sum(&Fdt);
+
+  return sqrt(Fdt);
+
 }
 CPS_END_NAMESPACE

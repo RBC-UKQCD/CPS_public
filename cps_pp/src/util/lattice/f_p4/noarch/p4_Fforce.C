@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fp4::EvolveMomFforce.
 
-  $Id: p4_Fforce.C,v 1.4 2005-03-09 18:12:51 chulwoo Exp $
+  $Id: p4_Fforce.C,v 1.5 2005-12-02 16:21:44 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ static void v_free(void *ptr){
 // are zero.
 
 #undef PROFILE
-void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
+Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
     char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
     ERR.NotImplemented(cname,fname);
@@ -674,6 +674,8 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
     Convert(CANONICAL);
 #endif
+
+    return 0.0;
 }
 
 

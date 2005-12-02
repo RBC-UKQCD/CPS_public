@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.17 2005-10-04 05:44:41 chulwoo Exp $
+  $Id: f_stag.C,v 1.18 2005-12-02 16:22:15 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -469,7 +469,7 @@ void Fstag::BforceVector(Vector *in, CgArg *cg_arg) {
 // It evolves the canonical momentum mom by step_size
 // using the fermion force. 
 //------------------------------------------------------------------
-void Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
+Float Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
 			    Float mass, Float dt){
   char *fname = "EvolveMomFforce(M*,V*,F,F)";
   VRB.Func(cname,fname);
@@ -477,6 +477,8 @@ void Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
   setCbufCntrlReg(4, CBUF_MODE4);
   int x[4];
   
+  Float Fdt = 0.0;
+
   for(x[0] = 0; x[0] < node_sites[0]; ++x[0]) {
     for(x[1] = 0; x[1] < node_sites[1]; ++x[1]) {
       for(x[2] = 0; x[2] < node_sites[2]; ++x[2]) {
@@ -489,24 +491,67 @@ void Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    fTimesV1PlusV2((IFloat *)(ihp+mu), dt,
 			   (IFloat *)mp0,
 			   (IFloat *)(ihp+mu)+BANK4_BASE, 18);
+	    Fdt += dt*dt*dotProduct((Float*)mp0, (Float*)mp0, 18);
 	  }
 	}
       }
     }
   }
 
+  glb_sum(&Fdt);
+
+  return sqrt(Fdt);
+
 }
 
-void Fstag::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+Float Fstag::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				 int isz, Float *alpha, Float mass, Float dt,
-				 Vector **sol_d) {
+				 Vector **sol_d, ForceMeasure force_measure) {
   char *fname = "RHMC_EvolveMomFforce";
+  char *force_label;
+
+  Float Fdt = 0.0;
+
+  int g_size = GJP.VolNodeSites() * GsiteSize();
+
+  Matrix *mom_tmp;
+  FILE *fp;
+
+  if (force_measure == FORCE_MEASURE_YES) {
+    mom_tmp = (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
+    if( (fp = Fopen("force.dat", "a")) == NULL )
+      ERR.FileA(cname,fname, "force.dat");
+    ((Vector*)mom_tmp) -> VecZero(g_size);
+    force_label = new char[100];
+  } else {
+    mom_tmp = mom;
+  }
+
+#if TARGET==cpsMPI
+  using MPISCU::fprintf;
+#endif
 
   for (int i=0; i<degree; i++) {
     f_tmp -> CopyVec(sol_d[i], e_vsize);
-    EvolveMomFforce(mom,sol[i],mass,dt*alpha[i]);
+    EvolveMomFforce(mom_tmp,sol[i],mass,dt*alpha[i]);
+    if (force_measure == FORCE_MEASURE_YES) {
+      sprintf(force_label, "Rational, mass = %e, pole = %d:", mass, i+isz);
+      Fprintf(fp,"%s %e (L2) dt = %f\n", force_label, (IFloat)Fdt, (IFloat)dt);
+    }
   }
 
+  // If measuring the force, need to measure and then sum to mom
+  if (force_measure == FORCE_MEASURE_YES) {
+    Fdt = dotProduct((IFloat*)mom_tmp, (IFloat*)mom_tmp, g_size);
+    glb_sum(&Fdt);
+    fTimesV1PlusV2((IFloat*)mom, 1.0, (IFloat*)mom_tmp, (IFloat*)mom, g_size);
+
+    Fclose(fp);
+    delete[] force_label;
+    sfree(mom_tmp, cname, fname, "mom_tmp");
+  }
+
+  return sqrt(Fdt);
 }
 
 //------------------------------------------------------------------

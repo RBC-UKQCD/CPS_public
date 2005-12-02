@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GpowerPlaq class.
 
-  $Id: g_power_plaq.C,v 1.4 2004-08-18 11:58:04 zs Exp $
+  $Id: g_power_plaq.C,v 1.5 2005-12-02 16:28:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_plaq/g_power_plaq.C,v 1.4 2004-08-18 11:58:04 zs Exp $
-//  $Id: g_power_plaq.C,v 1.4 2004-08-18 11:58:04 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-12-02 16:28:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_plaq/g_power_plaq.C,v 1.5 2005-12-02 16:28:25 chulwoo Exp $
+//  $Id: g_power_plaq.C,v 1.5 2005-12-02 16:28:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_plaq/g_power_plaq.C,v $
 //  $State: Exp $
 //
@@ -174,10 +174,12 @@ void GpowerPlaq::GforceSite(Matrix& force, int *x, int mu)
 // It evolves the canonical momentum mom by step_size
 // using the pure gauge force.
 //------------------------------------------------------------------
-void GpowerPlaq::EvolveMomGforce(Matrix *mom, Float step_size){
+Float GpowerPlaq::EvolveMomGforce(Matrix *mom, Float step_size){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
   
+  Float Fdt = 0.0;
+
   setCbufCntrlReg(4, CBUF_MODE4);
 
   int x[4];
@@ -196,11 +198,17 @@ void GpowerPlaq::EvolveMomGforce(Matrix *mom, Float step_size){
 	    IFloat *dotp = (IFloat *)mp0;
 	    fTimesV1PlusV2(ihp, step_size, dotp, ihp+BANK4_BASE, 
 			   MATRIX_SIZE);
+	    Fdt += step_size*step_size*dotProduct(dotp, dotp, 18);
 	  }
 	}
       }
     }
   }
+
+  glb_sum(&Fdt);
+
+  return sqrt(Fdt);
+
 }
 
 //------------------------------------------------------------------

@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.38 2005-11-15 07:22:18 chulwoo Exp $
+  $Id: lattice_base.C,v 1.39 2005-12-02 16:34:03 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-11-15 07:22:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.38 2005-11-15 07:22:18 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.38 2005-11-15 07:22:18 chulwoo Exp $
+//  $Date: 2005-12-02 16:34:03 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.39 2005-12-02 16:34:03 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.39 2005-12-02 16:34:03 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.38 $
+//  $Revision: 1.39 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2859,6 +2859,7 @@ void Lattice::Shift()
    GDS.Shift(gauge_field, GJP.VolNodeSites()*4*sizeof(Matrix));
 }
 
+#if 0
 void Lattice::ForceMagnitude(Matrix *mom, Matrix *mom_old, 
 			     Float mass, Float dt, char *type) {
 
@@ -2888,6 +2889,7 @@ void Lattice::ForceMagnitude(Matrix *mom, Matrix *mom_old,
   Fclose(fp);
 
 }
+#endif
 
 int Lattice::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
                             int Nshift, int isz, CgArg *cg_arg,

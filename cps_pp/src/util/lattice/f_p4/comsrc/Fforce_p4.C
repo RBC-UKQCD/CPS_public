@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fp4::EvolveMomFforce.
 
-  $Id: Fforce_p4.C,v 1.3 2005-08-02 18:07:41 chulwoo Exp $
+  $Id: Fforce_p4.C,v 1.4 2005-12-02 16:21:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ CPS_START_NAMESPACE
 // N.B. No optimising provision is made if any of the p4 coefficients
 // are zero.
 
-void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
+Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
     char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
     VRB.Func(cname,fname);
@@ -726,6 +726,8 @@ void Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 #ifdef DEBUGGING
     f_tmp = f_tmp_save;
 #endif
+
+    return 0.0;
     
 }
 

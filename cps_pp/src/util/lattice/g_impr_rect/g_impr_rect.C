@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprRect class.
 
-  $Id: g_impr_rect.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
+  $Id: g_impr_rect.C,v 1.8 2005-12-02 16:27:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-07 05:21:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
-//  $Id: g_impr_rect.C,v 1.7 2004-09-07 05:21:48 chulwoo Exp $
+//  $Date: 2005-12-02 16:27:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.8 2005-12-02 16:27:40 chulwoo Exp $
+//  $Id: g_impr_rect.C,v 1.8 2005-12-02 16:27:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v $
 //  $State: Exp $
 //
@@ -180,9 +180,12 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
 // It evolves the canonical momentum mom by step_size
 // using the pure gauge force.
 //------------------------------------------------------------------------------
-void GimprRect::EvolveMomGforce(Matrix *mom, Float step_size){
+Float GimprRect::EvolveMomGforce(Matrix *mom, Float step_size){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
+
+  Float Fdt = 0.0;
+
 #ifdef PROFILE
   Float time = -dclock();
   ForceFlops = 0;
@@ -205,6 +208,7 @@ void GimprRect::EvolveMomGforce(Matrix *mom, Float step_size){
       IFloat *ihp = (IFloat *)(mom+uoff+mu);
       IFloat *dotp = (IFloat *)mp0;
       fTimesV1PlusV2(ihp, step_size, dotp, ihp+BANK4_BASE, 18);
+      Fdt += step_size*step_size*dotProduct(dotp, dotp, 18);
     }
   }
   ForceFlops +=GJP.VolNodeSites()*4*18*2;
@@ -212,6 +216,11 @@ void GimprRect::EvolveMomGforce(Matrix *mom, Float step_size){
   time += dclock();
   print_flops(cname,fname,ForceFlops,time);
 #endif
+
+  glb_sum(&Fdt);
+
+  return sqrt(Fdt);
+
 }
 #endif
 

@@ -13,12 +13,13 @@ CPS_START_NAMESPACE
 // using the pure gauge force.
 //------------------------------------------------------------------
 static const Float invs3 = -1./3.;
-void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
+Float Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
   static Matrix mt0;
   static Matrix *mp0 = &mt0;
 
+  Float Fdt = 0.0;
 
 #ifdef PROFILE
   Float time = -dclock();
@@ -91,6 +92,9 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
 	    IFloat *ihp = (IFloat *)(mom+uoff+mu);
 	    IFloat *dotp2 = (IFloat *) (result[mu]+(uoff/4));
 	    fTimesV1PlusV2(ihp, step_size, dotp2, ihp, 18);
+	    Fdt += step_size*step_size*dotProduct(dotp2, dotp2, 18);
+	    // want to replace with something like this?
+	    //vaxpy3_norm_m(ihp, &step_size, dotp2, ihp, 3, &Fdt);
 	  }
 	}
       }
@@ -108,5 +112,9 @@ void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
   }
   for(int i = 0;i<4;i++) 
   ffree(result[i]);
+
+  glb_sum(&Fdt);
+
+  return sqrt(Fdt);
 }
 CPS_END_NAMESPACE

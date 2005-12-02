@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Gwilson class.
 
-  $Id: g_wilson.C,v 1.7 2004-09-02 16:57:14 zs Exp $
+  $Id: g_wilson.C,v 1.8 2005-12-02 16:32:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:57:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v 1.7 2004-09-02 16:57:14 zs Exp $
-//  $Id: g_wilson.C,v 1.7 2004-09-02 16:57:14 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2005-12-02 16:32:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v 1.8 2005-12-02 16:32:51 chulwoo Exp $
+//  $Id: g_wilson.C,v 1.8 2005-12-02 16:32:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v $
 //  $State: Exp $
 //

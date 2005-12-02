@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.8 2005-10-04 05:43:22 chulwoo Exp $
+  $Id: f_p4.C,v 1.9 2005-12-02 16:21:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -360,11 +360,13 @@ void Fp4::BforceVector(Vector *in, CgArg *cg_arg) {
 }
 
 
-void Fp4::RHMC_EvolveMomFforce(Matrix * mom, Vector ** vect, int abc,
-			       int isz, Float * def, Float ghi, 
-			       Float jkl, Vector ** vect2)
+Float Fp4::RHMC_EvolveMomFforce(Matrix * mom, Vector ** vect, int abc,
+				int isz, Float * def, Float ghi, 
+				Float jkl, Vector ** vect2, 
+				ForceMeasure force_measure)
 {
   ERR.NotImplemented(cname,"RHMC_EvolveMomFforce()");
+  return 0.0;
 }
 
 static int Rotate (int mu, int i){

@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprOLSym class methods.
 
-  $Id: g_impr_OLSym.C,v 1.8 2004-09-04 07:28:53 chulwoo Exp $
+  $Id: g_impr_OLSym.C,v 1.9 2005-12-02 16:27:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-04 07:28:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.8 2004-09-04 07:28:53 chulwoo Exp $
-//  $Id: g_impr_OLSym.C,v 1.8 2004-09-04 07:28:53 chulwoo Exp $
+//  $Date: 2005-12-02 16:27:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.9 2005-12-02 16:27:13 chulwoo Exp $
+//  $Id: g_impr_OLSym.C,v 1.9 2005-12-02 16:27:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v $
 //  $State: Exp $
 //
@@ -160,9 +160,11 @@ void GimprOLSym::GforceSite(Matrix& force, int *x, int mu)
 // It evolves the canonical momentum mom by step_size
 // using the pure gauge force.
 //-----------------------------------------------------------------------------
-void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size){
+Float GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
+
+  Float Fdt = 0.0;
   
   setCbufCntrlReg(4, CBUF_MODE4);
 
@@ -181,8 +183,13 @@ void GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size){
       IFloat *ihp = (IFloat *)(mom+uoff+mu);
       IFloat *dotp = (IFloat *)mp0;
       fTimesV1PlusV2(ihp, step_size, dotp, ihp+BANK4_BASE, 18);
+      Fdt += step_size*step_size*dotProduct(dotp, dotp, 18);    
     }
   }
+
+  glb_sum(&Fdt);
+
+  return sqrt(Fdt);
 }
 #endif
 
