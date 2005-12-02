@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fclover class.
 
-  $Id: f_clover.C,v 1.16 2005-10-04 05:42:50 chulwoo Exp $
+  $Id: f_clover.C,v 1.17 2005-12-02 17:46:03 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-10-04 05:42:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.16 2005-10-04 05:42:50 chulwoo Exp $
-//  $Id: f_clover.C,v 1.16 2005-10-04 05:42:50 chulwoo Exp $
+//  $Date: 2005-12-02 17:46:03 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.17 2005-12-02 17:46:03 chulwoo Exp $
+//  $Id: f_clover.C,v 1.17 2005-12-02 17:46:03 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_clover.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -360,7 +360,7 @@ Float Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 // It evolves the canonical momentum mom by step_size
 // using the fermion force.
 //------------------------------------------------------------------
-void Fclover::EvolveMomFforce(Matrix *mom, Vector *frm, 
+Float Fclover::EvolveMomFforce(Matrix *mom, Vector *frm, 
 			      Float mass, Float step_size){
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
@@ -425,6 +425,8 @@ void Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
     ERR.Pointer(cname, fname, str_site_v2) ;
   VRB.Smalloc(cname, fname, str_site_v2, site_v2,
     FsiteSize()*sizeof(Float)) ;
+
+  Float Fdt = 0.0;
 
 //------------------------------------------------------------------
 // Calculate the force vectors for the ODD checkerboard
@@ -590,6 +592,7 @@ void Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
       f.TrLessAntiHermMatrix(tmp) ;
 
       *(mom+gauge_offset) += f ;
+      Fdt += dotProduct((Float*)&f, (Float*)&f, 18);
 
     }
               
@@ -627,16 +630,18 @@ void Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
   VRB.Sfree(cname, fname, str_v1, v1) ;
   sfree(v1) ;
 
-  return ;
+  glb_sum(&Fdt);
+
+  return sqrt(Fdt);
 }
 
-void Fclover::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+Float Fclover::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				   int isz, Float *alpha, Float mass, Float dt,
-				   Vector **sol_d) {
+				   Vector **sol_d, ForceMeasure force_measure) {
   char *fname = "RHMC_EvolveMomFforce";
 
   ERR.General(cname,fname,"Not implemented\n");
-
+  return 0.0;
 }
 
 //------------------------------------------------------------------
