@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.39 2005-12-02 16:34:03 chulwoo Exp $
+  $Id: lattice_base.C,v 1.40 2005-12-05 06:57:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 16:34:03 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.39 2005-12-02 16:34:03 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.39 2005-12-02 16:34:03 chulwoo Exp $
+//  $Date: 2005-12-05 06:57:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.40 2005-12-05 06:57:07 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.40 2005-12-05 06:57:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.39 $
+//  $Revision: 1.40 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2712,12 +2712,10 @@ void Lattice::GsoCheck(void){
     snd_buf = plaq;
     for(s=1; s < s_nodes; s++){
       getMinusData(&rcv_buf, &snd_buf, 1, 4);
-//	printf("plaq=%e rcv_buf=$%e\n",plaq,rcv_buf);
       if(rcv_buf != plaq) {
+	printf("plaq=%e rcv_buf=$%e\n",plaq,rcv_buf);
 	failed_flag = 1.0;
-#ifdef _TARTAN
-	InterruptExit(-1, "GsoCheck: PLAQUETTE TEST FAILED");
-#endif
+	ERR.General(cname,fname,"GsoCheck: PLAQUETTE TEST FAILED");
 	if(failed_slice == 0) {
 	  failed_slice = s;
 	  failed_value = rcv_buf;
