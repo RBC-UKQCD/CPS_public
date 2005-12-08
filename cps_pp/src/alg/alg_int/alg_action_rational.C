@@ -33,7 +33,7 @@ AlgActionRational::AlgActionRational()
 //reconstruct actions - add calls to restart methods to hmc class
 
 AlgActionRational::AlgActionRational(AlgMomentum &mom,
-				     ActionRationalArg &r_arg)
+				     ActionRationalArg &r_arg, int traj_num)
 				     
   : AlgActionBilinear(mom, r_arg.bi_arg)
 {
@@ -226,17 +226,17 @@ AlgActionRational::AlgActionRational(AlgMomentum &mom,
     }
   }
 
-  init();
+  init(traj_num);
 
 }
 
-void AlgActionRational::init() {
+void AlgActionRational::init(int traj_num) {
 
   AlgActionBilinear::init();
   evolved = 1;
   heatbathEval = 0;
   energyEval = 0;
-  traj = -1;  
+  traj = traj_num-1;  
 }
 
 AlgActionRational::~AlgActionRational() {
