@@ -357,7 +357,7 @@ class AlgActionRational : public AlgActionBilinear {
  public:
 
   AlgActionRational();
-  AlgActionRational(AlgMomentum &mom, ActionRationalArg &rat_arg);
+  AlgActionRational(AlgMomentum &mom, ActionRationalArg &rat_arg, int traj_num=0);
   virtual ~AlgActionRational();
 
   void heatbath();
@@ -371,7 +371,7 @@ class AlgActionRational : public AlgActionBilinear {
   //!< Compare two approximations to avoid recalculation if possible
   static int compareApprox(RemezArg &, RemezArg &);
 
-  void init();
+  void init(int traj_num);
 
 };
 
