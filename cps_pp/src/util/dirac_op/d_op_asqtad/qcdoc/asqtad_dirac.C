@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 16:07:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.28 2005-12-02 16:07:16 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.28 2005-12-02 16:07:16 chulwoo Exp $
+//  $Date: 2006-01-11 16:53:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.29 2006-01-11 16:53:05 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.29 2006-01-11 16:53:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.28 $
+//  $Revision: 1.29 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -213,6 +213,7 @@ void AsqD::init(AsqDArg *arg)
   for(int i = 0;i<4;i++){
      NP[i] = arg->NP[i];
      if (NP[i]>1) non_local_dirs++;
+//     printf("size[%d] coor[%d] NP[%d]= %d %d %d \n",i,i,i,size[i],coor[i],NP[i]);
   }
 //  printf("non_local_dirs=%d\n",non_local_dirs);
   c1 = arg->c1;
@@ -560,6 +561,8 @@ void AsqD::init(AsqDArg *arg)
   for(int j = 0;j<3;j++)
     if (non_local_count_3[j][i] != (non_local_chi_3[i][j+1]-non_local_chi_3[i][j]) ){
     printf("non_local_count_3[%d][%d]=%d\n",i,j,non_local_count_3[j][i]);
+    printf("non_local_chi_3[%d][%d]=%d\n",i,j+1,non_local_chi_3[i][j+1]);
+    printf("non_local_chi_3[%d][%d]=%d\n",i,j,non_local_chi_3[i][j]);
     exit(-4);
   }
 
@@ -868,13 +871,15 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
   // c7 -> 7-link staple; c6 -> 5-link "straight" staple
   //--------------------------------------------------------------------
  
+//  printf("fat_p=%p naik_p=%p naikm_p=%p\n",fat_p,naik_p,naikm_p);
   for(int i =0;i<4;i++){
-    if (fat_p) fat[i] = (matrix *)fat_p[i];
-    if (naik_p) naik[i] = (matrix *)naik_p[i];
+    if(fat_p) fat[i] = (matrix *)fat_p[i];
+    if(naik_p) naik[i] = (matrix *)naik_p[i];
     if (naikm_p) naik_m[i] = (matrix *)naikm_p[i];
+//    printf("fat=%p naik=%p naik_m=%p\n",fat[i],naik[i],naik_m[i]);
   }
   frm_tmp = frm_p;
-//  printf("fat=%p naik=%p naik_m=%p frm_tmp=%p\n",fat,naik,naik_m,frm_tmp);
+//  printf("frm_tmp=%p\n",frm_tmp);
  
   //-----------------------------------------------------------
   //  If t + x + y + z is odd, odd = 1.  Otherwise it is 0.
@@ -931,6 +936,7 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
   }
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     Fat = (matrix *)fat[n];
+//    printf("Fat=%p\n",Fat);
     int coor=0;
     for (coord[3] = 0; coord[3] < size[3]; coord[3]++)
     for (coord[2] = 0; coord[2] < size[2]; coord[2]++)
@@ -955,6 +961,7 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
   sys_cacheflush(0);
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     Fat = (matrix *)fat[n];
+//    printf("Fat=%p\n",Fat);
     SCUDirArgIR snd;
     SCUDirArgIR rcv;
     if(NP[n]>1){
@@ -997,6 +1004,7 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
   matrix * Naik;
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     Naik = (matrix *)naik[n];
+//    printf("Naik=%p\n",Naik);
     for (x[3] = 0; x[3] < size[3]; x[3]++)
     for (x[2] = 0; x[2] < size[2]; x[2]++)
     for (x[1] = 0; x[1] < size[1]; x[1]++)
@@ -1021,9 +1029,10 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
     }
   }
 
-  if (naik_m){
+  if (naik_m[0]){
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     Naik = (matrix *)naik_m[n]; 
+//    printf("Naik=%p\n",Naik);
     for (x[3] = 0; x[3] < size[3]; x[3]++)
     for (x[2] = 0; x[2] < size[2]; x[2]++)
     for (x[1] = 0; x[1] < size[1]; x[1]++)
@@ -1109,6 +1118,8 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
   for(int i = 0;i<2;i++)
   if (non_local_count_3[j][i] != (non_local_chi_3[i][j+1]-non_local_chi_3[i][j]) ){
     printf("non_local_count_3[%d][%d]=%d\n",i,j,non_local_count_3[j][i]);
+    printf("non_local_chi_3[%d][%d]=%d\n",i,j+1,non_local_chi_3[i][j+1]);
+    printf("non_local_chi_3[%d][%d]=%d\n",i,j,non_local_chi_3[i][j]);
      exit(-4);
   }
   qfree (rcv_mat);
@@ -1128,7 +1139,7 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
     tmpfrm2 = (unsigned long)tmpfrm - 0xb0000000 + 0x9c000000;
   else
     tmpfrm2 = (unsigned long)tmpfrm;
-  printf("tmpfrm=%p tmpfrm2=%p\n",tmpfrm,tmpfrm2);
+//  printf("tmpfrm=%p tmpfrm2=%p\n",tmpfrm,tmpfrm2);
 
   bzero( (char *)tmpfrm, NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(Float));
   for(i=0;i<2;i++){
