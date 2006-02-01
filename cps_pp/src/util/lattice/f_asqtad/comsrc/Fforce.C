@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.7 2005-12-02 17:55:09 chulwoo Exp $
+  $Id: Fforce.C,v 1.8 2006-02-01 16:46:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -47,6 +47,9 @@ Float Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     // The argument frm should have the CG solution.
     // The FstagTypes protected pointer f_tmp should contain Dslash frm
 
+    #define TESTING
+    #undef TESTING
+    #ifndef TESTING
     moveMem(X_e, frm, size);
 #undef DEBUGGING
 #ifdef DEBUGGING
@@ -54,6 +57,9 @@ Float Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     f_tmp = frm+GJP.VolNodeSites()/2; // Debugging only.
 #endif
     moveMem(X_o, f_tmp, size);
+    #else
+    moveMem(X, frm, 2*size);
+    #endif
     Fconvert(X, CANONICAL, STAG);
 
     Convert(STAG);  // Puts staggered phases into gauge field.
@@ -597,7 +603,20 @@ Float Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 #endif
 
     update_momenta(force, dt, mom);
-
+    /*printf("HELLO\n");
+    IFloat temp;
+    IFloat *tmp_pointer;
+    for(int i = 0; i < 4; i++)
+      {
+	tmp_pointer = (IFloat *)force[i];
+	for(int j = 0; j < GJP.VolNodeSites(); j++)
+	  for(int k = 0;k < 18; k++)
+	    {
+	      temp = *(tmp_pointer + 18*j+k);
+	      if(temp > 1e-8)
+		printf("HMC force[%d][%d][%d] = %e\n",i,j,k,temp);
+	    }
+	    }*/
     // Tidy up
 
     sfree(Pnu);

@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.27 2005-12-02 16:36:01 chulwoo Exp $
+  $Id: pt.C,v 1.28 2006-02-01 16:46:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 16:36:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.27 2005-12-02 16:36:01 chulwoo Exp $
-//  $Id: pt.C,v 1.27 2005-12-02 16:36:01 chulwoo Exp $
+//  $Date: 2006-02-01 16:46:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.28 2006-02-01 16:46:08 chulwoo Exp $
+//  $Id: pt.C,v 1.28 2006-02-01 16:46:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.27 $
+//  $Revision: 1.28 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -24,19 +24,48 @@
 static unsigned long PEC = 0xb0000000;
 static unsigned long PLB = 0xb0000000;
 
+#define TESTING
+#undef TESTING
 #undef CPP
-//#define CPP
 //CPS_START_NAMESPACE
 //void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long in, long out);
 
 //External function definitions
 extern "C"{
-  void cmm_agg(gauge_agg *chi, matrix *phi,matrix *result, int counter);
-  void pt_cmm_agg(gauge_agg *chi, matrix *phi,matrix *result, int counter);
-  void cmm_agg_cpp( int sites, long chi, long u,long in, long out);
+
+  //matrix multiply for checkerboarded fields
+  void pt_cmm_cpp(int sites, long u, long in, long out, long gauge_field);
+  void pt_cmm_dag_cpp(int sites, long u, long in, long out, long gauge_field);
+
+  //------------------------------------------------------------------------
+  //C++ routines
+#ifdef CPP
+  //Matrix multiplication for full matrix fields
+  void cmm_agg_cpp(gauge_agg *chi, matrix *phi, matrix *result, int counter);
   void cmv_agg_cpp( int sites, long u,long in, long out);
+  #define partrans_cmm_agg(A,B,C,D) cmm_agg_cpp(A,B,C,D)
+  #define partrans_cmv_agg(A,B,C,D) cmv_agg_cpp(A,B,C,D)
+
+  //matrix vector multiply for checkerboarded fields
+  void pt_cmv_cpp(int sites, ind_agg *agg, double *gauge_field, double *src, double *dest);
+  void pt_cmv_dag_cpp(int sites, ind_agg *agg, double *gauge_field, double *src, double *dest);
+  void pt_cmv_pad_cpp(int sites, ind_agg *agg, double *gauge_field, double *src, double *dest);
+  void pt_cmv_dag_pad_cpp(int sites, ind_agg *agg, double *gauge_field, double *src, double *dest);
+  #define partrans_cmv(A,B,C,D,E) pt_cmv_cpp(A,B,C,D,E)
+  #define partrans_cmv_dag(A,B,C,D,E) pt_cmv_dag_cpp(A,B,C,D,E)
+  #define partrans_cmv_pad(A,B,C,D,E) pt_cmv_pad_cpp(A,B,C,D,E)
+  #define partrans_cmv_dag_pad(A,B,C,D,E) pt_cmv_dag_pad_cpp(A,B,C,D,E)
+  //--------------------------------------------------------------------------
+  //Assembly Routines
+#else
+  //Matrix multiplication for full matrix fields
+  void pt_cmm_agg(gauge_agg *chi, matrix *phi,matrix *result, int counter);
+  //void cmm_agg(gauge_agg *chi, matrix *phi,matrix *result, int counter);
   void pt_asqtad_agg( int sites, long chi, long u,long in, long out);
   void pt_asqtad_agg_s( int sites, long chi, long u,long in, long out);
+  #define partrans_cmm_agg(A,B,C,D) pt_cmm_agg(A,B,C,D)
+  #define partrans_cmv_agg(A,B,C,D) pt_asqtad_agg(A,0,B,C,D)
+
   void pt_cmv(int count, ind_agg *ind, double *gauge, double *src, double *dest);
   void pt_cmv_pad(int count, ind_agg *ind, double *gauge, double *src, double *dest);
   void pt_cmv_dag(int count, ind_agg *ind, double *gauge, double *src, double *dest);
@@ -45,6 +74,12 @@ extern "C"{
   void pt_cmv_pad_s(int count, ind_agg *ind, float *gauge, float *src, float *dest);
   void pt_cmv_dag_s(int count, ind_agg *ind, float *gauge, float *src, float *dest);
   void pt_cmv_dag_pad_s(int count, ind_agg *ind, float *gauge, float *src, float *dest);
+  #define partrans_cmv(A,B,C,D,E) pt_cmv(A,B,C,D,E)
+  #define partrans_cmv_dag(A,B,C,D,E) pt_cmv_dag(A,B,C,D,E)
+  #define partrans_cmv_pad(A,B,C,D,E) pt_cmv_pad(A,B,C,D,E)
+  #define partrans_cmv_dag_pad(A,B,C,D,E) pt_cmv_dag_pad(A,B,C,D,E)
+#endif
+  //--------------------------------------------------------------------------
 
   void pt_copy(int count, ind_agg *ind, double *src, double *dest);
   void pt_copy_pad(int count, ind_agg *ind, double *src, double *dest);
@@ -70,18 +105,11 @@ extern "C"{
   // cross_over_lin - one input field is linear and overwrite result
   void cross_over_lin(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
 	     int counter, unsigned long *dest, unsigned long *dest);
+  //Copies a vectors from v to u
+  void copy_vector(IFloat *u, IFloat *v, int *length, unsigned long *dest, unsigned long *src);
 
   //---------------------------------------------------------------------------
-  //matrix multiply for checkerboarded fields
-  void pt_cmm_cpp(int sites, long u, long in, long out, long gauge_field);
-  void pt_cmm_dag_cpp(int sites, long u, long in, long out, long gauge_field);
-
-  //matrix vector multiply for checkerboarded fields
-  void pt_cmv_cpp(int sites, long u, long in, long out, long gauge_field);
-  void pt_cmv_dag_cpp(int sites, long u, long in, long out, long gauge_field);
-  void pt_cmv_pad_cpp(int sites, long u, long in, long out, long gauge_field);
-  void pt_cmv_dag_pad_cpp(int sites, long u, long in, long out, long gauge_field);
-
+  
   //---------------------------------------------------------------------------
 
   void m1m2_lookup(matrix *result, matrix *m1, matrix *m2, int length,
@@ -309,11 +337,11 @@ void PT::set_hop_pointer() {
 		//Calculate the new coordinate
 		nei[i] = (size[i]+x[i]-hop)%size[i];
 
-		if ( size[i] >2){
+		//if ( size[i] >2){
 		//Calculate the index for the source and the destination
 		(h_l[2*i]+local_count[2*i])->src = LexVector(x)*vlen;
 		(h_l[2*i]+local_count[2*i])->dest = LexVector(nei)*vlen2;
-                }
+                //}
 		
 		//Increment the local count
 		local_count[i*2]++;
@@ -343,10 +371,10 @@ void PT::set_hop_pointer() {
 		//Calculate the local coordinate for this hop
 		nei[i] = (x[i]+hop)%size[i];
 		//Calculate source and destination indices
-		if ( size[i] >2){
+		//if ( size[i] >2){
 		(h_l[2*i+1]+local_count[2*i+1])->src = LexVector(x)*vlen;
 		(h_l[2*i+1]+local_count[2*i+1])->dest = LexVector(nei)*vlen2;
-		}
+		//}
 		//Increment local count, check that bounds not exceeded
 		local_count[i*2+1]++;
 		if (local_count[i*2]>local_check)
@@ -524,24 +552,11 @@ void PT::init(PTArg *pt_arg)
       local_count_cb[parity][i] = non_local_count_cb[parity][i] = 0;
     //------------------------------------------------------------------------
 
-    //For small volumes, we can allocate the memory for the gauge aggregate
-    //in the faster part of memory
-    if(vol> 4096){
-      uc_l[i]=uc_nl[i]=NULL;
-    } else {	
+
       uc_l[i] = (gauge_agg *)Alloc(cname,fname,"uc_l[i]",
 				     sizeof(gauge_agg)*(1+local_chi[i]));
       uc_nl[i] = (gauge_agg *)Alloc(cname,fname,"uc_nl[i]",
 				      sizeof(gauge_agg)*(1+non_local_chi[i]));
-    }
-      
-    //Otherwise, we will have to allocate using smalloc
-    if(uc_l[i]==NULL) {
-      uc_l[i] = (gauge_agg *)Alloc(cname,fname,"uc_l[i]",sizeof(gauge_agg)*(1+local_chi[i]));
-    }
-    if(uc_nl[i]==NULL) {
-      uc_nl[i] = (gauge_agg *)Alloc(cname,fname,"uc_nl[i]",sizeof(gauge_agg)*(1+non_local_chi[i]));
-    }
 
     //-------------------------------------------------------------------------
     //Allocate memory for gauge_agg_cb
@@ -842,10 +857,9 @@ void PT::init(PTArg *pt_arg)
       src_l[j][i] = NULL;
       dest_l[j][i] = NULL;
     }
-      
-      hp_nl[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
-      src_nl[j][i] = (unsigned long*)Alloc(cname,fname,"src_nl[j][i]",nl_size*sizeof(unsigned long),0);
-      dest_nl[j][i] = (unsigned long*)Alloc(cname,fname,"dest_nl[j][i]",nl_size*sizeof(unsigned long),0);
+	hp_nl[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
+	src_nl[j][i] = (unsigned long*)Alloc(cname,fname,"src_nl[j][i]",nl_size*sizeof(unsigned long),0);
+	dest_nl[j][i] = (unsigned long*)Alloc(cname,fname,"dest_nl[j][i]",nl_size*sizeof(unsigned long),0);
     }
   }
   
@@ -891,8 +905,11 @@ void PT::delete_buf(){
     //-------------------------------------------------------------------
 //    sfree(rcv_buf[i],cname,fname,"rcv_buf[i]");
 //    sfree(rcv_buf2[i],cname,fname,"rcv_buf2[i]");
-    Free(rcv_buf[i]);
-    Free(rcv_buf2[i]);
+    if(non_local_chi[i] > 0)
+      {
+	Free(rcv_buf[i]);
+	Free(rcv_buf2[i]);
+      }
   }
 
   //-----------------------------------------------------------------------
@@ -900,30 +917,34 @@ void PT::delete_buf(){
   for(int i = 0; i < NDIM; i++)
     {
 //      sfree(snd_buf_cb[i],cname,fname,"snd_buf_cb[i]");
-      Free(snd_buf_cb[i]);
+      if(non_local_chi_cb[2*i+1]>0)
+	Free(snd_buf_cb[i]);
       for(int parity = 0; parity < 2; parity++)
 	Free(uc_nl_cb_pre[parity][i]);
     }
-  Free(snd_buf_t_cb);
-
-  for(int i = 0; i < 2; i++)
-    Free(Toffset[i]);    
+  if(non_local_chi_cb[6] > 0)
+    {
+      Free(snd_buf_t_cb);
+      
+      for(int i = 0; i < 2; i++)
+	Free(Toffset[i]);    
+    }
 
   //-----------------------------------------------------------------------
 
   for (int hop=0; hop<MAX_HOP; hop++) {
     for(int i = 0; i < 2*NDIM; i++){
-      int nl_size = (hop+1)*non_local_chi[i];
-      int l_size = vol - nl_size;
+      int nl_size = (hop+1)*non_local_chi[i] + 1;
+      int l_size = vol - nl_size + 1;
       if (l_size>0){
         Free(hp_l[hop][i]);
         Free(src_l[hop][i]);
         Free(dest_l[hop][i]);
       }
 
-      Free(hp_nl[hop][i]);
-      Free(src_nl[hop][i]);
-      Free(dest_nl[hop][i]);
+	  Free(hp_nl[hop][i]);
+	  Free(src_nl[hop][i]);
+	  Free(dest_nl[hop][i]);
     }
   }
 }
@@ -950,7 +971,7 @@ void PT::delete_g_buf(){
     {
       delete SCUarg_cb[i];
       delete SCUarg_mat_cb[i];
-    }
+      }
   //---------------------------------------------------------------------
 }
 
@@ -1146,10 +1167,10 @@ void PT::init_g(Float * g_addr){
 	SCUarg_mat_cb[i*2+1]->Init((void *)rcv_buf[i],snd_dir[i],SCU_SEND,
 				   3*blklen_cb[i],numblk_cb[i],3*stride_cb[i],IR_9);
       //-----------------------------------------------------------------------
-  }
+    }
   
 
-  qfree(rcv_mat);
+  Free(rcv_mat);
 //printf("%s done\n",fname);
 }
 
@@ -1416,11 +1437,9 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-                #ifdef CPP
-		pt_cmv_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);
-                #else
-		pt_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
-                #endif
+
+  partrans_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
+
 #ifdef PROFILE
   dtime +=dclock();
   print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
@@ -1456,11 +1475,9 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-                #ifdef CPP
-		pt_cmv_dag_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);	    
-                #else
-		pt_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);	 
-                #endif
+ 
+  partrans_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);	 
+
 #ifdef PROFILE
   dtime +=dclock();
   print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
@@ -1529,18 +1546,13 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	{
 #ifdef PROFILE
   dtime  = - dclock();
-#endif
-          #ifdef CPP
-	  if(wire[i]%2)
-	    pt_cmv_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],(long)gauge);
-	  else
-	    pt_cmv_dag_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],(long)gauge);	
-          #else
-	  if(wire[i]%2)
-	    pt_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
-	  else
-	    pt_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
-           #endif
+#endif 
+	
+  if(wire[i]%2)
+    partrans_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+  else
+    partrans_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+  
 #ifdef PROFILE
   dtime +=dclock();
   print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
@@ -1554,17 +1566,12 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-        #ifdef CPP
-	if(!(wire[i]%2))
-	  pt_cmv_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],(long)gauge);
-	else
-	  pt_cmv_dag_cpp(local_chi_cb[wire[i]],(long)uc_l_cb[parity][wire[i]],(long)vin[i],(long)vout[i],(long)gauge);	
-        #else
-	if(!(wire[i]%2))
-	  pt_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
-	else
-	  pt_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
-        #endif
+
+  if(!(wire[i]%2))
+    partrans_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+  else
+    partrans_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+
 #ifdef PROFILE
   dtime +=dclock();
   print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
@@ -1588,17 +1595,12 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-            #ifdef CPP
+
 	    if(conjugated)
-	      pt_cmv_dag_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout[i],(long)gauge);
+	      partrans_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
 	    else
-	      pt_cmv_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout[i],(long)gauge);
-            #else
-	    if(conjugated)
-	      pt_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
-	    else
-	      pt_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
-            #endif
+	      partrans_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
+
 #ifdef PROFILE
   dtime +=dclock();
   print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
@@ -1637,8 +1639,6 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 
 #define PROFILE
 #undef PROFILE
-#define PROFILE2
-#undef PROFILE2
 
 void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
@@ -1672,13 +1672,6 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
     wire[i]=dir[i];
 
   Float dtime;
-#ifdef PROFILE3
-  dtime  = - dclock();
-#endif
-
-#ifdef PROFILE2
-  Float dtime2;
-#endif
 
   //If wire[i] is odd, then we have parallel transport in the
   //positive direction.  In this case, the matrix multiplication is
@@ -1696,26 +1689,14 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-	      #ifdef CPP
-	      if(conjugated)
-		pt_cmv_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);
-	      else
-		pt_cmv_dag_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_cb_pre[parity][wire[i]/2],(long)vin[i],(long)snd_buf_cb[wire[i]/2],(long)gauge);
-	      #else
-	      if(conjugated)
-		{
-		  #ifdef PROFILE2
-		  dtime2  = - dclock();
-                  #endif
-		pt_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
-                #ifdef PROFILE2
-		dtime2 +=dclock();
-		print_flops("Assembly Pre-multiply",fname,66*non_local_chi_cb[wire[i]],dtime2);
-                #endif
-		}
-	      else
-		pt_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
-             #endif
+
+  if(conjugated)
+    {
+      partrans_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
+    }
+  else
+    partrans_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
+  
 #ifdef PROFILE
   dtime +=dclock();
   print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
@@ -1813,26 +1794,14 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-      #ifdef CPP
-      if((wire[i]%2 && conjugated) || ((wire[i]%2 == 0) && (conjugated == 0)))
-	pt_cmv_pad_cpp(local_chi_cb[wire[i]],(long)uc_l_pad_cb[parity][wire[i]],(long)vin[i],(long)vout,(long)gauge);
-      else
-	pt_cmv_dag_pad_cpp(local_chi_cb[wire[i]],(long)uc_l_pad_cb[parity][wire[i]],(long)vin[i],(long)vout,(long)gauge);	
-      #else
+
       if((wire[i]%2 && conjugated) || ((wire[i]%2 == 0) && (conjugated == 0)))
 	{
-	  	  #ifdef PROFILE2
-		  dtime2  = - dclock();
-                  #endif
-	pt_cmv_pad(local_chi_cb[wire[i]]/2,uc_l_pad_cb[parity][wire[i]],gauge,vin[i],vout);
-               #ifdef PROFILE2
-		dtime2 +=dclock();
-		print_flops("Assembly Local multiply",fname,66*local_chi_cb[wire[i]],dtime2);
-                #endif
+	partrans_cmv_pad(local_chi_cb[wire[i]]/2,uc_l_pad_cb[parity][wire[i]],gauge,vin[i],vout);
 	}
       else
-	pt_cmv_dag_pad(local_chi_cb[wire[i]]/2,uc_l_pad_cb[parity][wire[i]],gauge,vin[i],vout);
-      #endif
+	partrans_cmv_dag_pad(local_chi_cb[wire[i]]/2,uc_l_pad_cb[parity][wire[i]],gauge,vin[i],vout);
+
 #ifdef PROFILE
   dtime +=dclock();
   print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
@@ -1860,17 +1829,12 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-              #ifdef CPP
-	      if(conjugated)
-		pt_cmv_dag_pad_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_pad_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout,(long)gauge);
-	      else
-		pt_cmv_pad_cpp(non_local_chi_cb[wire[i]],(long)uc_nl_pad_cb[parity][wire[i]],(long)rcv_buf[wire[i]],(long)vout,(long)gauge);
-              #else
-	      if(conjugated)
-		pt_cmv_dag_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout);
-	      else
-		pt_cmv_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout);
-	      #endif
+ 
+  if(conjugated)
+    partrans_cmv_dag_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout);
+  else
+    partrans_cmv_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout);
+
 #ifdef PROFILE
   dtime +=dclock();
   print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
@@ -1904,10 +1868,6 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	    }
 	}
     }
-#ifdef PROFILE3
-  dtime +=dclock();
-  print_flops("",fname,33*vol*n,dtime);
-#endif
 //  ParTrans::PTflops +=33*n*vol;
 }
 
@@ -1952,15 +1912,9 @@ if (non_local_dir){
   //Start transmission
   SCUmulti.SlowStartTrans();
 }
-//  #define CPP
-  //Initerleaving of local computation of matrix multiplication
+  //Interleaving of local computation of matrix multiplication
   for(i=0;i<n;i++){
-#ifdef CPP
-    cmm_agg_cpp(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)min[i],(long)mout[i]);
-#else
-    //cmm_agg(uc_l[wire[i]],min[i],mout[i],local_chi[wire[i]]/2);
-    pt_cmm_agg(uc_l[wire[i]],min[i],mout[i],local_chi[wire[i]]/2);
-#endif
+    partrans_cmm_agg(uc_l[wire[i]],min[i],mout[i],local_chi[wire[i]]/2);
   }
 
   if (non_local_dir)
@@ -1968,20 +1922,13 @@ if (non_local_dir){
   //Do non-local computations
   for(i=0;i<n;i++) 
   if (!local[wire[i]/2]) {
-#ifdef CPP
-    cmm_agg_cpp(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)mout[i]);
-#else
-    //cmm_agg(uc_nl[wire[i]],(matrix *)rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
-    pt_cmm_agg(uc_nl[wire[i]],(matrix *)rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
-#endif
-    //#undef CPP
+    partrans_cmm_agg(uc_nl[wire[i]],(matrix *)rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
   }
 #ifdef PROFILE
   dtime +=dclock();
   print_flops("",fname,198*vol*n,dtime);
 #endif
 //  ParTrans::PTflops +=198*n*vol;
-  #undef CPP
 }
 
 
@@ -2027,27 +1974,13 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
     SCUmulti.SlowStartTrans();
   }
 	
-#ifndef CPP
-  for(i=0;i<n;i++){ 
-//  printf("vin=%p vout=%p\n",vin[i],vout[i]);
-//  printf("uc_l[%d]=%p src=%d\n",wire[i],uc_l[wire[i]], uc_l[wire[i]]->src);
-pt_asqtad_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
-//  printf("uc_l[%d]=%p src=%d\n",wire[i],uc_l[wire[i]], uc_l[wire[i]]->src);
-  }
-#else
   for(i=0;i<n;i++) 
-    cmv_agg_cpp(local_chi[wire[i]],(long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
-#endif
+    partrans_cmv_agg(local_chi[wire[i]],(long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
 	
   if(non_local_dir){ SCUmulti.TransComplete(); }
-#ifndef CPP
+
   for(i=0;i<n;i++) 
-    if(non_local_chi[wire[i]])
-      pt_asqtad_agg(non_local_chi[wire[i]],0, (long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
-#else
-  for(i=0;i<n;i++) 
-    cmv_agg_cpp(non_local_chi[wire[i]],(long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
-#endif
+    partrans_cmv_agg(non_local_chi[wire[i]],(long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
 
 #ifdef PROFILE
   dtime +=dclock();
@@ -2062,6 +1995,31 @@ pt_asqtad_agg(local_chi[wire[i]],0, (long)uc_l[wire[i]], (long)vin[i],(long)vout
 */
 void PT::vvpd(IFloat **vect, int n_vect, const int *dir, 
 	     int n_dir, int hop, IFloat **sum){
+
+#define NEW_VVPD
+  //#undef NEW_VVPD
+  //---------------------------------------------------------------------
+  //Adapt old vvpd for usage with new interface
+
+#ifdef NEW_VVPD
+  //Convert direction array
+  int newdir[n_dir];
+  for(int i = 0; i < n_dir; i++)
+    newdir[i] = 2*dir[i];
+  IFloat ***vect_shift = (IFloat ***)Alloc("","","vect_shift",n_vect*sizeof(IFloat**));
+  for(int i = 0; i < n_vect; i++)
+    {
+      vect_shift[i] = (IFloat**)Alloc("","","vect_shift[i]",n_dir*sizeof(IFloat *));
+      for(int j = 0; j < n_dir; j++)
+	vect_shift[i][j] = vect[i];
+    }
+  vvpd(vect, vect_shift, n_vect, newdir, n_dir, hop, sum, 1);
+  for(int i = 0; i < n_vect; i++)
+    Free(vect_shift[i]);
+  Free(vect_shift);
+  //----------------------------------------------------------------------
+  //Old vvpd
+#else
   char *fname = "pt_vvpd()";
 //  VRB.Func("",fname);
   int i, v;
@@ -2069,13 +2027,21 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
   int wire[n_dir];
   for(i=0;i<n_dir;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
 
+  #ifdef TESTING
+  printf("vvpd called.  Checking input data.\n");
+  for(int kk = 0; kk < 1; kk++)
+  for(int count = 0; count < 6*vol; count++)
+    printf("vect[%d][%d]=%f\n",kk,count,(Float)vect[kk][count]);
+  printf("End input data check.\n");
+  #endif
+
   SCUDirArgIR *SCUarg_p[2*n_dir];  
   SCUDirArgIR *SCUarg_p2[2*n_dir];  
 
   // Only do communication in forward direction
   int comms=0;
   for(i=0;i<n_dir;i++)
-  if( !local[wire[i]/2]) {
+  if( !local[wire[i]]) {
     if ( size[wire[i]] <hop)
       fprintf(stderr, 
 		"%s:size(%d) in direction %d is smaller than the hop(%d)\n",
@@ -2093,7 +2059,7 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
     if (v%2==0) {
       comms=0;
       for(i=0;i<n_dir;i++)
-        if( !local[wire[i]/2]){ 
+        if( !local[wire[i]]){ 
 	  SCUarg_p[2*comms+1]->Addr((void *)(vect[v]+VECT_LEN*set_offset(2*wire[i], hop)));
           comms++;
         }
@@ -2103,7 +2069,7 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
     } else {
       comms=0;
       for(i=0;i<n_dir;i++)
-        if( !local[wire[i]/2]){ 
+        if( !local[wire[i]]){ 
 	  SCUarg_p2[2*comms+1]->Addr((void *)(vect[v]+VECT_LEN*set_offset(2*wire[i], hop)));
           comms++;
       }
@@ -2119,52 +2085,209 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
     if (v>0)
       if (v==1) {
 	for(i=0; i<n_dir; i++) 
-	  cross_over_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
+	  //if(non_local_chi[2*wire[i]] > 0)
+	    cross_over_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
 		src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
       } else if (v%2==1) {
 	for(i=0; i<n_dir; i++) 
-	  cross_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
+	  //if(non_local_chi[2*wire[i]] > 0)
+	    cross_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
 		src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
       } else {
 	for(i=0; i<n_dir; i++) 
-	  cross_lin(sum[i], &f,vect[v-1],rcv_buf2[2*wire[i]], hop*non_local_chi[2*wire[i]],
+	  //if(non_local_chi[2*wire[i]] > 0)
+	    cross_lin(sum[i], &f,vect[v-1],rcv_buf2[2*wire[i]], hop*non_local_chi[2*wire[i]],
 		src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
       }
     
     // Perform local calculation for current v
     if (v==0)
       for(i=0; i<n_dir; i++)
-	cross_over_look(sum[i], &f, vect[v], vect[v], vol-hop*non_local_chi[2*wire[i]], 
-			src_l[hop-1][2*wire[i]], dest_l[hop-1][2*wire[i]]);
+	{
+	  #ifdef TESTING
+	  printf("wire[%d] = %d\n",i,wire[i]);
+	  printf("sum[%d] = %f\n",i,(float)*(sum[i]));
+	  printf("vol-hop*non_local_chi[%d]=%d\n",2*wire[i],vol-hop*non_local_chi[2*wire[i]]);
+	  for(int count = 0; count < vol-hop*non_local_chi[2*wire[i]]; count++)
+	    {
+	      printf("src_l[%d][%d][%d] = %ld\n",hop-1,2*wire[i],count,(int)src_l[hop-1][2*wire[i]][count]);
+	      printf("dest_l[%d][%d][%d] = %ld\n",hop-1,2*wire[i],count,(int)dest_l[hop-1][2*wire[i]][count]);
+	      for(int v_count = 0; v_count < 6; v_count++)
+		{
+		  printf("vect[%d][%d] = %f\n",v,(6*((int)src_l[hop-1][2*wire[i]][count])+v_count),(Float)(vect[v][6*((int)src_l[hop-1][2*wire[i]][count])+v_count]));
+		  printf("vect[%d][%d] = %f\n",v,(6*((int)dest_l[hop-1][2*wire[i]][count])+v_count),(Float)(vect[v][(6*((int)dest_l[hop-1][2*wire[i]][count])+v_count)]));
+		}
+	    }
+	  printf("cross_over_look called\n");
+	  #endif
+	  if((vol-hop*non_local_chi[2*wire[i]]) > 0)
+	    cross_over_look(sum[i], &f, vect[v], vect[v], vol-hop*non_local_chi[2*wire[i]], src_l[hop-1][2*wire[i]], dest_l[hop-1][2*wire[i]]);
+        }
     else
+      {
       for(i=0; i<n_dir; i++)
-	cross_look(sum[i], &f, vect[v], vect[v], vol-hop*non_local_chi[2*wire[i]], 
-	      src_l[hop-1][2*wire[i]], dest_l[hop-1][2*wire[i]]);
+	if((vol-hop*non_local_chi[2*wire[i]])> 0)
+	  cross_look(sum[i], &f, vect[v], vect[v], vol-hop*non_local_chi[2*wire[i]], src_l[hop-1][2*wire[i]], dest_l[hop-1][2*wire[i]]);
+      }
 
   }
 
   if (v==1) {
     for(i=0; i<n_dir; i++) 
-      cross_over_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
+      if(non_local_chi[2*wire[i]] > 0)
+	cross_over_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
 	    src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
   } else if (v%2==1) {
     for(i=0; i<n_dir; i++) 
-      cross_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
-	    src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
+      if(non_local_chi[2*wire[i]] > 0)
+	cross_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
+		  src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
+  } else {
+    for(i=0; i<n_dir; i++)
+      if(non_local_chi[2*wire[i]] > 0)
+	cross_lin(sum[i], &f,vect[v-1],rcv_buf2[2*wire[i]], hop*non_local_chi[2*wire[i]],
+		  src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
+  }  
+//  ParTrans::PTflops += 90*n_vect*n_dir*vol;
+#endif
+  //------------------------------------------------------------------------
+}
+
+/*! 
+  Computes sum[x] = vect2[x] vect[x + hop dir]^dagger
+  where the sum is over n_vect vectors and the hop is in a forward direction.
+*/
+void PT::vvpd(IFloat **vect2, IFloat ***vect, int n_vect, const int *dir, int n_dir, int hop, IFloat **sum, int overwrite){
+
+  char *fname = "pt_vvpd()";
+//  VRB.Func("",fname);
+  int i, s, v;
+  Float f = 2.0;
+  int wire[n_dir];
+  for(i=0;i<n_dir;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
+
+  #ifdef TESTING
+  for(i = 0; i < n_dir; i++)
+    {
+      printf("wire[%d] = %d\n",i,wire[i]);
+      for(int count = 0; count < vol - hop*non_local_chi[wire[i]]; count++)
+	{
+	  printf("src_l[%d][%d][%ld] = %d\n",hop-1,wire[i],count,src_l[hop-1][wire[i]][count]);
+	  printf("dest_l[%d][%d][%ld] = %d\n",hop-1,wire[i],count,dest_l[hop-1][wire[i]][count]);
+	}
+     for(int count = 0; count < hop*non_local_chi[wire[i]]; count++)
+	{
+	  printf("src_nl[%d][%d][%ld] = %d\n",hop-1,wire[i],count,src_nl[hop-1][wire[i]][count]);
+	  printf("dest_nl[%d][%d][%ld] = %d\n",hop-1,wire[i],count,dest_nl[hop-1][wire[i]][count]);
+	}
+    }
+  #endif
+
+  SCUDirArgIR *SCUarg_p[2*n_dir];  
+  SCUDirArgIR *SCUarg_p2[2*n_dir];  
+
+  //Setup communciation
+  int comms=0;
+  for(i=0;i<n_dir;i++)
+  if( !local[wire[i]/2]) {
+    if ( size[wire[i]/2] <hop)
+      fprintf(stderr, 
+		"%s:size(%d) in direction %d is smaller than the hop(%d)\n",
+		fname,size[wire[i]],wire[i],hop);
+    SCUarg_p[2*comms] = SCUarg[hop-1][2*wire[i]];
+    SCUarg_p[2*comms+1] = SCUarg[hop-1][2*wire[i]+1];
+    SCUarg_p2[2*comms] = SCUarg2[hop-1][2*wire[i]];
+    SCUarg_p2[2*comms+1] = SCUarg2[hop-1][2*wire[i]+1];
+    comms++;
+  }
+
+  for(v=0; v<n_vect; v++){
+    SCUDirArgMulti SCUmulti;
+
+    if (v%2==0) {
+      comms=0;
+      for(i=0;i<n_dir;i++)
+        if( !local[wire[i]/2]){ 
+	  SCUarg_p[2*comms+1]->Addr((void *)(vect[v][i]+VECT_LEN*set_offset(wire[i], hop)));
+          comms++;
+        }
+
+      // Start communication
+      if (comms) SCUmulti.Init(SCUarg_p,2*comms);
+    } else {
+      comms=0;
+      for(i=0;i<n_dir;i++)
+        if( !local[wire[i]/2]){ 
+	  SCUarg_p2[2*comms+1]->Addr((void *)(vect[v][i]+VECT_LEN*set_offset(wire[i], hop)));
+          comms++;
+      }
+
+      // Start communication
+      if (comms) SCUmulti.Init(SCUarg_p2,2*comms);
+    }
+    if (comms) SCUmulti.SlowStartTrans();
+    // Finalise communication
+    if (comms) SCUmulti.TransComplete();
+
+    // Perform non-local calculation for previous v
+    if (v>0)
+      if (v==1 && overwrite==1) {
+	for(i=0; i<n_dir; i++)
+	  if(non_local_chi[wire[i]]>0)
+	    cross_over_lin(sum[i], &f, vect2[v-1],rcv_buf[wire[i]], hop*non_local_chi[wire[i]],
+			   src_nl[hop-1][wire[i]], dest_nl[hop-1][wire[i]]);
+      } else if (v%2==1) {
+	for(i=0; i<n_dir; i++) 
+	  if(non_local_chi[wire[i]]>0)
+	    cross_lin(sum[i], &f, vect2[v-1],rcv_buf[wire[i]], hop*non_local_chi[wire[i]],
+		      src_nl[hop-1][wire[i]], dest_nl[hop-1][wire[i]]);
+      } else {
+	for(i=0; i<n_dir; i++) 
+	  if(non_local_chi[wire[i]]>0)
+	    cross_lin(sum[i], &f,vect2[v-1],rcv_buf2[wire[i]], hop*non_local_chi[wire[i]],
+		      src_nl[hop-1][wire[i]], dest_nl[hop-1][wire[i]]);
+      }
+    
+    // Perform local calculation for current v
+    if (v==0 && overwrite==1)
+      {
+	for(i=0; i<n_dir; i++)
+	  if((vol-hop*non_local_chi[wire[i]])>0)
+	    cross_over_look(sum[i], &f, vect2[v], vect[v][i], vol-hop*non_local_chi[wire[i]], src_l[hop-1][wire[i]], dest_l[hop-1][wire[i]]);
+      }
+    else
+      {
+	for(i=0; i<n_dir; i++)
+	  if((vol-hop*non_local_chi[wire[i]])>0)
+	    cross_look(sum[i], &f, vect2[v], vect[v][i], vol-hop*non_local_chi[wire[i]], src_l[hop-1][wire[i]], dest_l[hop-1][wire[i]]);
+      }
+
+  }
+
+  if (v==1 && overwrite==1) {
+    for(i=0; i<n_dir; i++) 
+      if(non_local_chi[wire[i]]>0)
+	cross_over_lin(sum[i], &f, vect2[v-1],rcv_buf[wire[i]], hop*non_local_chi[wire[i]],
+		       src_nl[hop-1][wire[i]], dest_nl[hop-1][wire[i]]);
+  } else if (v%2==1) {
+    for(i=0; i<n_dir; i++)
+      if(non_local_chi[wire[i]]>0)
+	cross_lin(sum[i], &f, vect2[v-1],rcv_buf[wire[i]], hop*non_local_chi[wire[i]],
+		  src_nl[hop-1][wire[i]], dest_nl[hop-1][wire[i]]);
   } else {
     for(i=0; i<n_dir; i++) 
-      cross_lin(sum[i], &f,vect[v-1],rcv_buf2[2*wire[i]], hop*non_local_chi[2*wire[i]],
-	    src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
+      if(non_local_chi[wire[i]]>0)
+	cross_lin(sum[i], &f,vect2[v-1],rcv_buf2[wire[i]], hop*non_local_chi[wire[i]],
+		  src_nl[hop-1][wire[i]], dest_nl[hop-1][wire[i]]);
   }
   
-//  ParTrans::PTflops += 90*n_vect*n_dir*vol;
-  
+  //  ParTrans::PTflops += 90*n_vect*n_dir*vol;
 }
 
 //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
 void PT::shift_field(IFloat **v, const int *dir, int n_dir,
-		    int hop, IFloat **u){
-
+		     int hop, IFloat **u){
+  
   int i, length;
   int wire[n_dir];
   for (i=0; i<n_dir;i++) wire[i] = dir[i];
@@ -2194,6 +2317,43 @@ void PT::shift_field(IFloat **v, const int *dir, int n_dir,
   for (i=0; i<n_dir; i++) {
     length = hop*non_local_chi[wire[i]];
     copy_matrix(u[i],(IFloat*)rcv_buf[wire[i]],&length,
+		dest_nl[hop-1][wire[i]],src_nl[hop-1][wire[i]]);
+  }
+}
+
+//! u[x] = v[x+dir] for n_dir forward or backward directions dir for vector fields
+void PT::shift_field_vec(IFloat **v, const int *dir, int n_dir,
+		    int hop, IFloat **u){
+  //printf("shift_field_vec() called\n");
+  int i, length;
+  int wire[n_dir];
+  for (i=0; i<n_dir;i++) wire[i] = dir[i];
+  SCUDirArgMulti SCUmulti;
+  SCUDirArgIR *SCUarg_p[2*n_dir];
+  
+  int comms=0;
+  for (i=0; i<n_dir; i++) 
+  if (!local[wire[i]/2]){
+    SCUarg_p[2*comms] = SCUarg[hop-1][2*wire[i]];
+    SCUarg_p[2*comms+1] = SCUarg[hop-1][2*wire[i]+1];
+    SCUarg_p[2*comms+1]->Addr((void *)(v[i]+VECT_LEN*set_offset(wire[i], hop)));
+    comms++;
+  }
+
+  if (comms) SCUmulti.Init(SCUarg_p,2*comms);
+  if (comms) SCUmulti.SlowStartTrans();
+//  SCUmulti.TransComplete();
+  
+  for (i=0; i<n_dir; i++) {
+    length = vol-hop*non_local_chi[wire[i]];
+    copy_vector(u[i],v[i],&length,dest_l[hop-1][wire[i]],
+		src_l[hop-1][wire[i]]);
+  }
+  if (comms) SCUmulti.TransComplete();
+
+  for (i=0; i<n_dir; i++) {
+    length = hop*non_local_chi[wire[i]];
+    copy_vector(u[i],(IFloat*)rcv_buf[wire[i]],&length,
 		dest_nl[hop-1][wire[i]],src_nl[hop-1][wire[i]]);
   }
 

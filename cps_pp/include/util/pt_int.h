@@ -11,7 +11,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.15 2005-12-02 15:17:57 chulwoo Exp $
+  $Id: pt_int.h,v 1.16 2006-02-01 16:46:07 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 #include <qcdocos/scu_dir_arg.h>
@@ -212,7 +212,11 @@ int conjugated;
 	void vec(int n, Float **vout, Float **vin, const int *dir);
 	void vvpd(Float **vect, int n_vect, const int *dir,
 		  int n_dir, int hop, Float **sum);
+	void vvpd(Float **vect2, Float ***vect, int n_vect, const int *dir,
+		  int n_dir, int hop, Float **sum, int overwrite);
 	void shift_field(Float **v, const int *dir, int n_dir,
+			 int hop, Float **u);
+	void shift_field_vec(Float **v, const int *dir, int n_dir,
 			 int hop, Float **u);
 	void shift_link(Float **u, const int *dir, int n_dir);
 	void asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float dt);

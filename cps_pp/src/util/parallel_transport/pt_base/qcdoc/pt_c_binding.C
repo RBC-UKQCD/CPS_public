@@ -86,6 +86,12 @@ void pt_vvpd(IFloat **vect, int n_vect, const int *dir,
   ParTrans::PTflops +=90*n_vect*n_dir*PT::vol;
 }
 
+void pt_vvpd(IFloat **vect2, IFloat ***vect, int n_vect, const int *dir,
+             int n_dir, int hop, IFloat **sum, int overwrite){
+  StaticPT.vvpd(vect2, vect, n_vect, dir, n_dir, hop, sum, overwrite);
+  ParTrans::PTflops +=90*n_vect*n_dir*PT::vol;
+}
+
 void pt_shift_link(IFloat **u, const int *dir, int n_dir){
   StaticPT.shift_link(u,dir,n_dir);
 }
@@ -93,6 +99,11 @@ void pt_shift_link(IFloat **u, const int *dir, int n_dir){
 void pt_shift_field(IFloat **v, const int *dir, int n_dir,
                     int hop, IFloat **u){
   StaticPT.shift_field(v,dir,n_dir,hop,u);
+}
+
+void pt_shift_field_vec(IFloat **v, const int *dir, int n_dir,
+                    int hop, IFloat **u){
+  StaticPT.shift_field_vec(v,dir,n_dir,hop,u);
 }
 
 void pt_mat_cb(int n, Float **mout, Float **min, const int *dir, ChkbType cb)

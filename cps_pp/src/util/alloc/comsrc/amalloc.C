@@ -3,7 +3,7 @@
   \file
   \brief Functions for dynamical array allocation.
 
-  $Id: amalloc.C,v 1.9 2004-11-07 23:54:36 chulwoo Exp $
+  $Id: amalloc.C,v 1.10 2006-02-01 16:46:08 chulwoo Exp $
 */
 #include <util/smalloc.h>
 #include <stdarg.h>
@@ -128,8 +128,10 @@ void *amalloc(void*  (*allocator)(size_t, const char *vname,
     void **p;
     subarray(size, n_dim-1, 1, &p, start, dimension, 0);
 
+    #if 0
     VRB.Smalloc("","amalloc","", start,
 		n_data*size+align+n_ptr*sizeof(void*));
+    #endif
     
     sfree(dimension);
     return (void*)start;

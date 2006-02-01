@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.24 2005-12-02 15:20:21 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.25 2006-02-01 16:46:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2005-12-02 15:20:21 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.24 2005-12-02 15:20:21 chulwoo Exp $
-  $Id: alg_hmc_rhmc.C,v 1.24 2005-12-02 15:20:21 chulwoo Exp $
+  $Date: 2006-02-01 16:46:08 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.25 2006-02-01 16:46:08 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.25 2006-02-01 16:46:08 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.24 $
+  $Revision: 1.25 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -204,7 +204,7 @@ void AlgHmcRHMC::init()
   for (i=0; i<n_frm_masses; i++) total_size += hmd_arg->FRatDeg[i];
   
   // array holding coefficents used in dwf force, folded into MInv
-  alpha = (Float**) smalloc(f_size*hmd_arg->n_frm_masses*sizeof(Float*),
+  alpha = (Float**) smalloc(hmd_arg->n_frm_masses*sizeof(Float*),
 			    cname,fname,"alpha");
   for (i=0; i<n_frm_masses; i++)
     alpha[i] = (Float*) smalloc(f_size*hmd_arg->FRatDeg[i]*sizeof(Float),
@@ -276,7 +276,7 @@ void AlgHmcRHMC::init()
 
   // Used for storing residue coefficients for staggered optimisation
   //----------------------------------------------------------------
-  if (AlgLattice().Fclass() == F_CLASS_ASQTAD && total_size > 0) {
+  if ((AlgLattice().Fclass() == F_CLASS_ASQTAD || AlgLattice().Fclass() == F_CLASS_P4) && total_size > 0) {
     all_res = (Float *)smalloc(total_size * sizeof(Float),
 			       cname,fname, "all_res");
     Float *res = all_res;
@@ -298,7 +298,7 @@ AlgHmcRHMC::~AlgHmcRHMC() {
 
   // Free memory for the residue coefficients
   //----------------------------------------------------------------
-  if (AlgLattice().Fclass() == F_CLASS_ASQTAD && total_size > 0) 
+  if ((AlgLattice().Fclass() == F_CLASS_ASQTAD || AlgLattice().Fclass() == F_CLASS_P4) && total_size > 0) 
     sfree(all_res, cname,fname, "all_res");
 
   // Free memory for the initial gauge field.
@@ -358,10 +358,8 @@ AlgHmcRHMC::~AlgHmcRHMC() {
   //----------------------------------------------------------------
   if(n_bsn_masses != 0){
     for(i=0; i<n_bsn_masses; i++) {
-      VRB.Sfree(cname,fname, "bsn_cg_arg[i]",bsn_cg_arg[i]);
       sfree(bsn_cg_arg[i], cname,fname, "bsn_cg_arg[i]");
     }
-    VRB.Sfree(cname,fname, "bsn_cg_arg",bsn_cg_arg);
     sfree(bsn_cg_arg, cname,fname, "bsn_cg_arg");
   }
 
@@ -369,10 +367,8 @@ AlgHmcRHMC::~AlgHmcRHMC() {
   //----------------------------------------------------------------
   if(n_frm_masses != 0){
     for(i=0; i<n_frm_masses; i++){
-      VRB.Sfree(cname,fname, "frm_cg_arg[i]",frm_cg_arg[i]);
       sfree(frm_cg_arg[i], cname,fname, "frm_cg_arg[i]");
     }
-    VRB.Sfree(cname,fname, "frm_cg_arg",frm_cg_arg);
     sfree(frm_cg_arg, cname,fname, "frm_cg_arg");
   }
   
@@ -475,7 +471,7 @@ Float AlgHmcRHMC::run(void)
     Ntests = 1;
   }
 
-  if (lat.Fclass() == F_CLASS_DWF || lat.Fclass() == F_CLASS_ASQTAD) {
+  if (lat.Fclass() == F_CLASS_DWF || lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_P4) {
     for (int i=0; i<n_frm_masses; i++)
       for (int j=0; j<hmd_arg->FRatDeg[i]; j++)
 	alpha[i][j] = sqrt(hmd_arg->FRatRes[i][j]);
@@ -612,6 +608,7 @@ Float AlgHmcRHMC::run(void)
       for(step=0; step < hmd_arg->steps_per_traj; step++){
 	CSM.SaveComment(++step_cnt);
 
+
 	// Evolve momenta by one step using the fermion force
 	//--------------------------------------------------------------
 
@@ -624,10 +621,12 @@ Float AlgHmcRHMC::run(void)
 	  for (j=0; j<hmd_arg->FRatDeg[i]; j++) 
 	    bzero((char *)frmn[j+shift],f_size*sizeof(Float));
 //	    frmn[j+shift] -> VecTimesEquFloat(0.0,f_size);
+
       
 	  cg_iter = lat.FmatEvlMInv(frmn + shift, phi[i], hmd_arg->FRatPole[i], 
 				    hmd_arg->FRatDeg[i], hmd_arg->isz, frm_cg_arg[i], 
 				    CNV_FRM_NO, frmn_d + shift);
+
 	  massRenormalise(&(frm_cg_arg[i]->mass), &trueMass, hmd_arg->FRatDeg[i], 
 			  hmd_arg->FRatPole[i], RENORM_BACKWARDS);
       
@@ -641,19 +640,43 @@ Float AlgHmcRHMC::run(void)
 	    true_res_max = frm_cg_arg[i]->true_rsd;
 	  cg_calls++;      
 
-	  if (lat.Fclass() != F_CLASS_ASQTAD)
+	  if ((lat.Fclass() != F_CLASS_ASQTAD && lat.Fclass() != F_CLASS_P4))
 	    lat.RHMC_EvolveMomFforce(mom, frmn+shift, hmd_arg->FRatDeg[i], 
 				     hmd_arg->FRatRes[i], hmd_arg->frm_mass[i],
 				     dt, frmn_d+shift);
 
 	  shift += hmd_arg->FRatDeg[i];
 	}
-    
+
 	// Only for the case of asqtad fermions do we perform this optimisation
 	//--------------------------------------------------------------      
-	if (lat.Fclass() == F_CLASS_ASQTAD && n_frm_masses != 0)
-	  lat.RHMC_EvolveMomFforce(mom, frmn, total_size, all_res, 0.0, dt, frmn_d);
-    
+	if ((lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_P4) && n_frm_masses != 0)
+	  {
+	    VRB.Flow(cname,fname,"start EvolveMomFforce\n");
+	    #if 1
+	    #if 1
+	    lat.RHMC_EvolveMomFforce(mom, frmn, total_size, all_res, 0.0, dt, frmn_d);
+	    #else
+	    for(int jj = 0; jj< total_size; jj++)
+	      {
+		VRB.Flow(cname,fname,"before shift = %d, **(frmn+jj) = %e, all_res[jj]=%e\n",jj,*((IFloat *) *(frmn+jj)), all_res[jj]);
+		lat.RHMC_EvolveMomFforce(mom, frmn+jj, 1, all_res+jj, 0.0, dt, frmn_d+jj);
+		VRB.Flow(cname,fname,"after shift = %d, **(frmn+jj) = %e, all_res[jj]=%e\n",jj,*((IFloat *) *(frmn+jj)), all_res[jj]);
+	      }
+	    #endif
+	    #else
+	    for(int jj = 0; jj < total_size; jj++)
+	      {
+		//VRB.Flow(cname,fname,"before shift = %d, **(frmn+jj) = %e, all_res[jj]=%e\n",jj,*((IFloat *) *(frmn+jj)), all_res[jj]);
+		frmn[jj]->VecTimesEquFloat(all_res[jj], GJP.VolNodeSites()*lat.FsiteSize()/2);
+		//VRB.Flow(cname,fname,"shift = %d, **(frmn+jj) = %e\n",jj,*((IFloat *) *(frmn+jj)));
+		lat.EvolveMomFforce(mom, *(frmn+jj), 0.0, dt);
+		//VRB.Flow(cname,fname,"after shift = %d, **(frmn+jj) = %e, all_res[jj]=%e\n",jj,*((IFloat *) *(frmn+jj)), all_res[jj]);
+	      }
+	    #endif
+	    VRB.Flow(cname,fname,"*((IFloat *)mom+777) = %e\n", *((IFloat *) mom+777));
+	  }
+
 	// Increment MD Time clock in Lattice by one half time step.
 	//--------------------------------------------------------------
 	lat.MdTimeInc(0.5);
@@ -703,6 +726,7 @@ Float AlgHmcRHMC::run(void)
 	lat.Reunitarize(dev, max_diff);
       }
       h_final = lat.GhamiltonNode();
+      IFloat h_gauge = h_final;
 
       // Measure bounds and generate new approximations
       if (hmd_arg->approx_type == DYNAMIC) {
@@ -746,7 +770,9 @@ Float AlgHmcRHMC::run(void)
 
       }
   
+      IFloat h_fermion = h_final - h_gauge;
       h_final += lat.MomHamiltonNode(mom);
+      IFloat h_mom = h_final - h_gauge - h_fermion;
 
       // Calculate final boson contribution to the Hamiltonian
       //---------------------------------------------------------------
@@ -756,7 +782,18 @@ Float AlgHmcRHMC::run(void)
       // Calculate Final-Initial Hamiltonian 
       //---------------------------------------------------------------
       delta_h = h_final - h_init;
+      glb_sum(&h_gauge);
+      glb_sum(&h_fermion);
+      glb_sum(&h_mom);
+      glb_sum(&h_init);
+      glb_sum(&h_final);
       glb_sum(&delta_h);
+      VRB.Result(cname,fname,"hamilton_gauge = %e\n", h_gauge);
+      VRB.Result(cname,fname,"hamilton_fermion = %e\n", h_fermion);
+      VRB.Result(cname,fname,"hamilton_mom = %e\n", h_mom);
+      VRB.Result(cname,fname,"hamilton_final = %e\n", h_final);
+      VRB.Result(cname,fname,"hamilton_initial = %e\n", h_init);
+      VRB.Result(cname,fname,"delta_hamilton = %e\n", delta_h);
 
       // Check that delta_h is the same accross all s-slices 
       // (relevant only if GJP.Snodes() != 1)
@@ -919,7 +956,7 @@ void AlgHmcRHMC::massRenormalise(Float *mass, Float *trueMass, int degree,
 				  Float *shift, MassRenormaliseDir direction) {
 
     // Can only renormalise mass for staggered or asqtad cases
-  if (AlgLattice().Fclass() == F_CLASS_ASQTAD || AlgLattice().Fclass() == F_CLASS_STAG) {
+  if (AlgLattice().Fclass() == F_CLASS_ASQTAD || AlgLattice().Fclass() == F_CLASS_STAG || AlgLattice().Fclass() == F_CLASS_P4) {
     if (direction == RENORM_FORWARDS) {
       *trueMass = *mass;
       *mass = sqrt((*trueMass)*(*trueMass) + shift[hmd_arg->isz]/4.0);

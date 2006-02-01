@@ -9,19 +9,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.19 2005-03-09 19:17:28 chulwoo Exp $
+  $Id: pt.h,v 1.20 2006-02-01 16:46:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-09 19:17:28 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.19 2005-03-09 19:17:28 chulwoo Exp $
-//  $Id: pt.h,v 1.19 2005-03-09 19:17:28 chulwoo Exp $
+//  $Date: 2006-02-01 16:46:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.20 2006-02-01 16:46:07 chulwoo Exp $
+//  $Id: pt.h,v 1.20 2006-02-01 16:46:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -48,7 +48,11 @@ void pt_2vec(int n, Float **vout, Float **vin, const int *dir);
 int pt_offset(int dir, int hop);
 void pt_vvpd(Float **vect, int n_vect, const int *dir,
 	     int n_dir, int hop, Float **sum);
+void pt_vvpd(Float **vect2, Float ***vect, int n_vect, const int *dir,
+	     int n_dir, int hop, Float **sum, int overwrite);
 void pt_shift_field(Float **v, const int *dir, int n_dir,
+		    int hop, Float **u);
+void pt_shift_field_vec(Float **v, const int *dir, int n_dir,
 		    int hop, Float **u);
 void pt_shift_link(Float **u, const int *dir, int n_dir);
 
@@ -242,10 +246,25 @@ class ParTransAsqtad : public ParTransStagTypes
 	pt_vvpd((IFloat **)vect,n_vect,dir,n_dir,hop,(IFloat **)sum);
      }
 
+    /*! Computes sum[x] = vect2[x] vect[x + hop dir]^dagger
+      where the sum is over n_vect vectors and the hop is in a forward direction.
+    */
+    void vvpd(Vector **vect2, Vector ***vect, int n_vect,
+	      const int *dir, int n_dir, int hop, Matrix **sum, int overwrite){
+	pt_vvpd((IFloat **)vect2, (IFloat ***)vect,n_vect,dir,n_dir,hop,
+		(IFloat **)sum, overwrite);
+     }
+
     //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
     void shift_field(Matrix **v, const int *dir, int n_dir,
 		     int hop, Matrix **u){
         pt_shift_field((IFloat **)v,dir,n_dir,hop,(IFloat **)u);
+    }
+
+    //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
+    void shift_field_vec(Vector **v, const int *dir, int n_dir,
+		     int hop, Vector **u){
+        pt_shift_field_vec((IFloat **)v,dir,n_dir,hop,(IFloat **)u);
     }
     
 

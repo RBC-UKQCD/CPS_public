@@ -4,7 +4,25 @@
 //#include <util/gauge_agg.h>
 
 #if 0
+<<<<<<< pt_cpp.C
+=======
+#include <util/gjp.h>
+#include <comms/scu.h>
+#include <comms/glb.h>
+#include <util/lattice.h>
+#include <util/dirac_op.h>
+#include <util/vector.h>
+#include <sysfunc.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
+#include <config.h>
+#include <util/vector.h>
+#include <util/pt_int.h>
+#include <stdio.h>
+>>>>>>> 1.5.50.2
 typedef double IFloat;
+<<<<<<< pt_cpp.C
 struct gauge_agg{
   int src;
   int dest;
@@ -19,8 +37,30 @@ struct gauge_agg_cb{
   int gauge;
 };
 //---------------------------------------------------------------
+=======
+
+>>>>>>> 1.5.50.2
 #endif
 
+//----------------------------------------------------------------------------
+//C++ implementation of vector copy for ParTransAsqtad.shift_field_vec()
+//
+//Parameters
+//
+//u - Pointer to shifted field (destination)
+//v - Pointer to source field
+//length - number of vectors to copy
+//dest - pointer to struct holding destination index
+//src - point to struct holding source index
+
+extern "C"
+void copy_vector(IFloat *u, IFloat *v, int *length, unsigned long *dest, unsigned long *src)
+{
+ int total_copies = *(length);
+ for(int i = 0; i < total_copies; i++)
+   for(int j = 0; j < 6; j++)
+     *(u + dest[i]*6+j) = *(v + src[i]*6+j);
+}
 
 //-----------------------------------------------------------------------------
 //C++ implementation of matrix multiply for checkerboarded field
@@ -39,7 +79,7 @@ void pt_cmm_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
 {
   IFloat *fp0, *fp1, *uu;
   int s,c,d;
-  struct gauge_agg_cb *agg = (struct gauge_agg_cb*)u;
+  struct gauge_agg_cb *agg = (gauge_agg_cb *)u;
 
   for(s=0;s<sites;s++)
     {
@@ -70,7 +110,7 @@ void pt_cmm_dag_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
 {
   IFloat *fp0, *fp1, *uu;
   int s,c,d;
-  struct gauge_agg_cb *agg = (struct gauge_agg_cb*)u;
+  struct gauge_agg_cb *agg = (gauge_agg_cb *)u;
 
   for(s=0;s<sites;s++)
     {
@@ -100,12 +140,11 @@ void pt_cmm_dag_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
 //----------------------------------------------------------------------------
 
 extern "C"
-void cmm_agg_cpp( int sites, long chi, long u, long a, 
-                long tmpfrm)
+void cmm_agg_cpp(gauge_agg *u, matrix *a, matrix *tmpfrm, int sites)
 {
   IFloat *fp0, *fp1, *uu;
   int s, c,i;
-  struct gauge_agg *agg = (struct gauge_agg*)u;
+  struct gauge_agg *agg = u;
   const int SITE_LEN = 72;
   const int MATRIX_SIZE = 18;
   int *ch;
@@ -113,7 +152,7 @@ void cmm_agg_cpp( int sites, long chi, long u, long a,
   for (s = 0; s< sites; s++)
     {
       //Assignment of source, destination indexes
-      fp1 = (IFloat *)(tmpfrm + 3*agg[s].dest );
+      fp1 = (IFloat *)((long)tmpfrm + 3*agg[s].dest );
       fp0 = (IFloat *)((int)a + 3*agg[s].src);
       uu = &(agg[s].mat[0]);
 #if 0
@@ -151,19 +190,19 @@ void cmm_agg_cpp( int sites, long chi, long u, long a,
 //gauge_field - pointer to the gauge field
 
 extern "C"
-void pt_cmv_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
+void pt_cmv_cpp(int sites, ind_agg *u, double *gauge_field, double *a, double *tmpfrm)
 {
   IFloat *fp0, *fp1, *uu, *tmp;
   int s,c,d;
-  struct gauge_agg_cb *agg = (struct gauge_agg_cb*)u;
-  printf("index=%p src=%p dest=%p gauge=%p\n",u,a,tmpfrm,gauge_field);
+  struct gauge_agg_cb *agg = u;
+  //printf("index=%p src=%p dest=%p gauge=%p\n",u,a,tmpfrm,gauge_field);
 
   for(s=0;s<sites;s++)
     {
       //Assignment of source, destination, gauge field indexes
-      fp1 = (IFloat *)(tmpfrm + agg[s].dest);
+      fp1 = (IFloat *)((long)tmpfrm + agg[s].dest);
       fp0 = (IFloat *)((int)a + agg[s].src);
-      uu = (IFloat *)(gauge_field + agg[s].gauge);
+      uu = (IFloat *)((long)gauge_field + agg[s].gauge);
 
       //d indexes the row of the gauge link matrix
       for(d = 0; d<3; d++)
@@ -179,7 +218,7 @@ void pt_cmv_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
 	    *(fp0+4) * *(tmp+5) + *(fp0+5) * *(tmp+4);
 	}
 
-      printf("agg[s].dest = %d  agg[s].src = %d, agg[s].gauge = %d\n", agg[s].dest, agg[s].src, agg[s].gauge);
+      //printf("agg[s].dest = %d  agg[s].src = %d, agg[s].gauge = %d\n", agg[s].dest, agg[s].src, agg[s].gauge);
       #if 0
       for(int d = 0; d < 6; d++)
       {
@@ -193,18 +232,18 @@ void pt_cmv_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
 }
 
 extern "C"
-void pt_cmv_dag_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
+void pt_cmv_dag_cpp(int sites, ind_agg *u, double *gauge_field, double *a, double *tmpfrm)
 {
   IFloat *fp0, *fp1, *uu, *tmp;
   int s,c,d;
-  struct gauge_agg_cb *agg = (struct gauge_agg_cb*)u;
+  struct gauge_agg_cb *agg = u;
 
   for(s=0;s<sites;s++)
     {
       //Assignment of source, destination, gauge field indexes
-      fp1 = (IFloat *)(tmpfrm + agg[s].dest);
+      fp1 = (IFloat *)((long)tmpfrm + agg[s].dest);
       fp0 = (IFloat *)((int)a + agg[s].src);
-      uu = (IFloat *)(gauge_field + agg[s].gauge);
+      uu = (IFloat *)((long)gauge_field + agg[s].gauge);
 
       //d indexes the row of the gauge link matrix
       for(d = 0; d<3; d++)
@@ -223,18 +262,18 @@ void pt_cmv_dag_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
 }
 
 extern "C"
-void pt_cmv_pad_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
+void pt_cmv_pad_cpp(int sites, ind_agg *u, double *gauge_field, double *a, double *tmpfrm)
 {
   IFloat *fp0, *fp1, *uu, *tmp;
   int s,c,d;
-  struct gauge_agg_cb *agg = (struct gauge_agg_cb*)u;
+  struct gauge_agg_cb *agg = u;
 
   for(s=0;s<sites;s++)
     {
       //Assignment of source, destination, gauge field indexes
-      fp1 = (IFloat *)(tmpfrm + agg[s].dest);
+      fp1 = (IFloat *)((long)tmpfrm + agg[s].dest);
       fp0 = (IFloat *)((int)a + agg[s].src);
-      uu = (IFloat *)(gauge_field + agg[s].gauge);
+      uu = (IFloat *)((long)gauge_field + agg[s].gauge);
 
       //d indexes the row of the gauge link matrix
       for(d = 0; d<3; d++)
@@ -253,19 +292,18 @@ void pt_cmv_pad_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
 }
 
 extern "C"
-void pt_cmv_dag_pad_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
+void pt_cmv_dag_pad_cpp(int sites, ind_agg *u, double *gauge_field, double *a, double *tmpfrm)
 {
   IFloat *fp0, *fp1, *uu, *tmp;
   int s,c,d;
-  struct gauge_agg_cb *agg = (struct gauge_agg_cb*)u;
-  //printf("Number of sites = %d\n",sites);
+  struct gauge_agg_cb *agg = u;
 
   for(s=0;s<sites;s++)
     {
       //Assignment of source, destination, gauge field indexes
-      fp1 = (IFloat *)(tmpfrm + agg[s].dest);
+      fp1 = (IFloat *)((long)tmpfrm + agg[s].dest);
       fp0 = (IFloat *)((int)a + agg[s].src);
-      uu = (IFloat *)(gauge_field + agg[s].gauge);
+      uu = (IFloat *)((long)gauge_field + agg[s].gauge);
 
       //printf("agg[s].dest = %d \t agg[s].src = %ld \t agg[s].gauge=%d\n",agg[s].dest/sizeof(IFloat), agg[s].src/sizeof(IFloat),agg[s].gauge/sizeof(IFloat));
       //printf("*(fp0) = %e  *(uu) = %e\n", *(fp0),*(uu));

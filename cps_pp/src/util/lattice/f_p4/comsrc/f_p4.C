@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.9 2005-12-02 16:21:23 chulwoo Exp $
+  $Id: f_p4.C,v 1.10 2006-02-01 16:46:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -114,17 +114,6 @@ int Fp4::FmatEvlInv(Vector *f_out, Vector *f_in,
   return iter;
 }
 
-#if 0
-//-----------------------------------------------------------------
-//Added by Michael C
-int Fp4::FmatEvlMInv(Vector * a, Vector * b, Float * c, int d, int e,
-		    CgArg * f, CnvFrmType g, MultiShiftSolveType h,
-		    Float * i, Vector * j)
-{
-  return 0;
-}
-//----------------------------------------------------------------
-#endif
 
 //------------------------------------------------------------------
 // int FmatEvlMInv(Vector **f_out, Vector *f_in, 
@@ -151,7 +140,6 @@ int Fp4::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 
   double dot = f_in -> NormSqGlbSum4D(e_vsize);
 
-//  Float RsdCG[Nshift];
   Float *RsdCG = (Float *)smalloc(sizeof(Float)*Nshift);
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg[s]->stop_rsd;
 
@@ -164,6 +152,14 @@ int Fp4::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
     for (int s=0; s<Nshift; s++)
       p4.Dslash(f_out_d[s], f_out[s], CHKB_EVEN, DAG_NO);
   for (int s=0; s<Nshift; s++) cg_arg[s]->true_rsd = RsdCG[s];
+#if 0
+  if (type == MULTI && f_out_d != 0)
+    for (int s=0; s<Nshift; s++)
+      p4.Dslash(f_out_d[s], f_out[s], CHKB_EVEN, DAG_NO);
+
+  cg_arg->true_rsd = RsdCG[isz];
+>>>>>>> 1.7.30.2
+#endif
 
   sfree(RsdCG);
   return iter;

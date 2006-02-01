@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fp4::EvolveMomFforce.
 
-  $Id: Fforce_p4.C,v 1.4 2005-12-02 16:21:33 chulwoo Exp $
+  $Id: Fforce_p4.C,v 1.5 2006-02-01 16:46:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -49,6 +49,9 @@ Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     // The argument frm should have the CG solution.
     // The FstagTypes protected pointer f_tmp should contain Dslash frm
 
+    #define TESTING
+    #undef TESTING
+    #ifndef TESTING
     moveMem(X_e, frm, size);
 #undef DEBUGGING
 #ifdef DEBUGGING
@@ -56,6 +59,9 @@ Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     f_tmp = frm+GJP.VolNodeSites()/2; // Debugging only.
 #endif
     moveMem(X_o, f_tmp, size);
+    #else
+    moveMem(X, frm, 2*size);
+    #endif
     Fconvert(X, CANONICAL, STAG);
 
     Convert(STAG);  // Puts staggered phases into gauge field.
@@ -590,19 +596,34 @@ Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 	      }
 	      parallel_transport.run(N, vout, vin, dir);
 	    }
-  
+
 	    // 1st and 2nd terms : F_mu += Pmu3 X^\dagger
 	    // more precisely: P_{nu, mu, mu} X^{\dagger}-P_{-nu, mu, mu} X^{\dagger}
 	    for(w=0; w<N; w++)
 	      {
+		
 		force_product_sum(Pmu3[plus][minus][w], X,
 				  GJP.p4_knight_coeff(),
 				  force[mu[w]]);
-
 		force_product_sum(Pmu3[plus][plus][w], X,
 				  -GJP.p4_knight_coeff(),
 				  force[mu[w]]);
+		/*printf("mu[%d] = %d\n",w,mu[w]);
+		IFloat temp;
+		IFloat *tmp_pointer;
+		for(int i = 0; i < 4; i++)
+		  {
+		    tmp_pointer = (IFloat *)force[i];
+		    for(int j = 0; j < GJP.VolNodeSites(); j++)
+		      for(int k = 0;k < 18; k++)
+			{
+			  temp = *(tmp_pointer + 18*j+k);
+			  if(temp > 1e-8)
+			    printf("HMC force[%d][%d][%d] = %e\n",i,j,k,temp);
+			}
+			}*/
 	      }
+
 	    
 	    // 3rd and 4th terms : F_mu += P5 X^\dagger
 	    // more precisely: P_{nu, nu, mu} X^{\dagger} + P_{-nu, -nu, mu} X^{\dagger}
@@ -616,7 +637,6 @@ Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 				  GJP.p4_knight_coeff(),
 				  force[mu[w]]);
 	      }
-
 
 
 
@@ -706,6 +726,21 @@ Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 #endif
 
     update_momenta(force, dt, mom);
+    #if 0
+    IFloat temp;
+    IFloat *tmp_pointer;
+    for(int i = 0; i < 4; i++)
+      {
+	tmp_pointer = (IFloat *)force[i];
+      for(int j = 0; j < GJP.VolNodeSites(); j++)
+	for(int k = 0;k < 18; k++)
+	  {
+	    temp = *(tmp_pointer + 18*j+k);
+	    if(temp > 1e-8)
+		printf("HMC force[%d][%d][%d] = %e\n",i,j,k,temp);
+	  }
+      }
+    #endif
 
     // Tidy up
 
