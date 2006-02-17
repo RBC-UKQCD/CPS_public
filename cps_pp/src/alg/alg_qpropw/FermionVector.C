@@ -420,7 +420,7 @@ void FermionVectorTp::SetLandauGaugeMomentaSource( Lattice& lat,
   Float   p3( p[2] );
   Float   p4( p[3] );
  
-  const Float PI(3.141592654);
+  const Float PI(3.14159265358979323846264338327950288319716939937510);
 
   p1 *= 2.0*PI/(GJP.XnodeSites()*GJP.Xnodes());
   p2 *= 2.0*PI/(GJP.YnodeSites()*GJP.Ynodes());
@@ -454,8 +454,14 @@ void FermionVectorTp::SetLandauGaugeMomentaSource( Lattice& lat,
      The code below is temporarily isolated for purposes of merging
      with CPS main branch,  12/09/04, Oleg Loktik
     -------------------- Quarantine starts --------------------------
-        
+
+
+// Opened by Sam to do F.T on disconnected prop
+*/        
+
           cvec.Zero();
+ 
+/*
 
     -------------------- Quarantine ends ---------------------------*/
 
@@ -469,7 +475,12 @@ void FermionVectorTp::SetLandauGaugeMomentaSource( Lattice& lat,
      with CPS main branch,  12/09/04, Oleg Loktik
     -------------------- Quarantine starts --------------------------
 
+// Opened by Sam to do F.T on disconnected prop
+ */
+
                   cvec[colour] = fact;
+
+/*
 
     -------------------- Quarantine ends ---------------------------*/
                   

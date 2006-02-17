@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.14 2005-10-04 05:57:31 chulwoo Exp $
+  $Id: vector.h,v 1.15 2006-02-17 22:54:55 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-10-04 05:57:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.14 2005-10-04 05:57:31 chulwoo Exp $
-//  $Id: vector.h,v 1.14 2005-10-04 05:57:31 chulwoo Exp $
+//  $Date: 2006-02-17 22:54:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.15 2006-02-17 22:54:55 chulwoo Exp $
+//  $Id: vector.h,v 1.15 2006-02-17 22:54:55 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -439,6 +439,23 @@ class Vector
     //! Orthogonalisation
     void Orthogonalize(const Vector& p1);
 
+    //! Zeroing a color vector 
+    /*!
+      added by Sam 1/9/2006 to implement disconnected F.T
+    */
+    void Zero()
+    {
+      for(int i=0; i<2*COLORS; i++) v[i]=0;
+    }
+
+    //! simple element access (as a Complex)
+    /*!
+      added by Sam 1/9/2006 to implement disconnected F.T
+    */
+    Complex& operator[](int i) 
+    {
+      return *((Complex*)(v+2*i));
+    }
 
     //--------------------------------------------------------------
     // Functions that act on arrays of vectors of general length.

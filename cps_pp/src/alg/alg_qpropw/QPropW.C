@@ -28,6 +28,7 @@
 #include <unistd.h>     // close(). These are needed for io parts to
                         // compile on PCs
 #include <alg/qpropw.h>
+#include <util/qcdio.h>
 
 CPS_START_NAMESPACE
 
@@ -241,12 +242,12 @@ void QPropW::Run() {
 		 
 		 if (common_arg->results != 0) {
 		   FILE *fp;
-		   if ((fp = fopen((char *)common_arg->results, "a")) == NULL) {
+		   if ((fp = Fopen((char *)common_arg->results, "a")) == NULL) {
 			 ERR.FileA(cname,fname, (char *)common_arg->results);
 		   }
-		   fprintf(fp, "Cg iters = %d true residual = %e\n",
+		   Fprintf(fp, "Cg iters = %d true residual = %e\n",
 				   iter, (float)true_res);
-		   fclose(fp);
+		   Fclose(fp);
 		 }
 		 
        } // End spin-color loop
@@ -629,11 +630,11 @@ void QPropW::SaveQProp(char* name, int mid) {
     
     if (common_arg->results != 0) {
       FILE *fp;
-      if ( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+      if ( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	ERR.FileA(cname,fname, (char *)common_arg->results);
       }
-      fprintf(fp, "Saved prop in file %s\n", name);
-      fclose(fp);
+      Fprintf(fp, "Saved prop in file %s\n", name);
+      Fclose(fp);
     }
   } else {
     unsigned int* data;
@@ -641,11 +642,11 @@ void QPropW::SaveQProp(char* name, int mid) {
     save_data(name, data, GJP.VolNodeSites() * sizeof(WilsonMatrix));
     if (common_arg->results != 0) {
       FILE *fp;
-      if ( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+      if ( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	ERR.FileA(cname,fname, (char *)common_arg->results);
       }
-      fprintf(fp, "Saved mid-point prop in file %s\n", name);
-      fclose(fp);
+      Fprintf(fp, "Saved mid-point prop in file %s\n", name);
+      Fclose(fp);
     }
   }
    -------------------- Quarantine ends ----------------------------*/
@@ -672,11 +673,11 @@ void QPropW::RestoreQProp(char* name, int mid) {
 
     if (common_arg->results != 0) {
       FILE *fp;
-      if ( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+      if ( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	ERR.FileA(cname,fname, (char *)common_arg->results);
       }
-      fprintf(fp, "Read prop from file %s\n", name);
-      fclose(fp);
+      Fprintf(fp, "Read prop from file %s\n", name);
+      Fclose(fp);
     }
   } else {
     
@@ -687,11 +688,11 @@ void QPropW::RestoreQProp(char* name, int mid) {
 
     if (common_arg->results != 0) {
       FILE *fp;
-      if ( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+      if ( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
 	ERR.FileA(cname,fname, (char *)common_arg->results);
       }
-      fprintf(fp, "Read mid-point prop from file %s\n", name);
-      fclose(fp);
+      Fprintf(fp, "Read mid-point prop from file %s\n", name);
+      Fclose(fp);
     }
   }
   -------------------- Quarantine ends ----------------------------*/
