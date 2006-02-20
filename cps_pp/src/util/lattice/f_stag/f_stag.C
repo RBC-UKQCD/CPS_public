@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.18 2005-12-02 16:22:15 chulwoo Exp $
+  $Id: f_stag.C,v 1.19 2006-02-20 22:22:01 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -594,6 +594,29 @@ void Fstag::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
   
   stag.Dslash(f_out, f_in+offset, CHKB_ODD, DAG_NO, dir_flag);
   stag.Dslash(f_out+offset, f_in, CHKB_EVEN, DAG_NO, dir_flag);
+
+}
+
+//------------------------------------------------------------------
+// FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, CnvFrmType cnv_frm,
+//                    int order) :
+// FdMdmu is the derivative of the fermion matrix with respect to the
+// chemical potential.
+// order is the order of the derivative.
+//------------------------------------------------------------------
+void Fstag::FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, int order)
+{
+  int offset;
+  char *fname = "FdMdmu(V*,V*,CgArg*,CnvFrmType,int)";
+  VRB.Func(cname,fname);
+  
+  //DiracOpStag stag(*this, f_out, f_in, cg_arg, cnv_frm);
+  //offset = GJP.VolNodeSites() * FsiteSize() / (2 * VECT_LEN);
+  
+  //stag.dMdmu(f_out, f_in+offset, CHKB_ODD, DAG_NO, order);
+  //stag.dMdmu(f_out+offset, f_in, CHKB_EVEN, DAG_NO, order);
+  ERR.General(cname,fname, "Not Implemented");
 
 }
 

@@ -5,17 +5,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.44 2005-12-02 15:15:38 chulwoo Exp $
+  $Id: lattice.h,v 1.45 2006-02-20 22:20:43 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2005-12-02 15:15:38 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.44 2005-12-02 15:15:38 chulwoo Exp $
-  $Id: lattice.h,v 1.44 2005-12-02 15:15:38 chulwoo Exp $
+  $Date: 2006-02-20 22:20:43 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.45 2006-02-20 22:20:43 chulwoo Exp $
+  $Id: lattice.h,v 1.45 2006-02-20 22:20:43 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.44 $
+  $Revision: 1.45 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -607,6 +607,14 @@ class Lattice
     // dir_flag is flag which takes value 0 when all direction contribute to D
     // 1 - when only the special anisotropic direction contributes to D,
     // 2 - when all  except the special anisotropic direction.
+    // Currently this function is implemented only in the Fstag class
+    //! Not implemented here.
+
+    //! Not implemented here.
+    virtual void FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm, int order);
+
+    // order is the order of the derivative with respect to mu
     // Currently this function is implemented only in the Fstag class
 
 // Gauge action related pure virtual functions
@@ -1889,6 +1897,9 @@ class Fstag : public virtual FstagTypes
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int dir_flag);
 
+    void FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm, int order);
+
 };
 
 
@@ -1952,6 +1963,8 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int dir_flag);
 
+    void FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm, int order);
 
     //! Momentum update in the RHMC algorithm.
     Float RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
@@ -2045,6 +2058,9 @@ class Fp4 : public virtual FstagTypes, public virtual Fsmear
 
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int dir_flag);
+
+    void FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm, int order);
 
 
     //! Momentum update in the RHMC algorithm.

@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.40 2005-12-05 06:57:07 chulwoo Exp $
+  $Id: lattice_base.C,v 1.41 2006-02-20 22:22:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-05 06:57:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.40 2005-12-05 06:57:07 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.40 2005-12-05 06:57:07 chulwoo Exp $
+//  $Date: 2006-02-20 22:22:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.41 2006-02-20 22:22:20 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.41 2006-02-20 22:22:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.40 $
+//  $Revision: 1.41 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2656,6 +2656,19 @@ void Lattice::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
 		    CnvFrmType cnv_frm, int dir_flag)
 {
   char *fname = "Fdslash";
+  ERR.NotImplemented(cname,fname);
+}
+
+//----------------------------------------------------------------------
+// order is the order of the derivative  with respect to the chemical
+// potential. 
+// Currently this function is implemented only in the Fstag class
+//------------------------------------------------------------------
+
+void Lattice::FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, int order)
+{
+  char *fname = "FdMdmu";
   ERR.NotImplemented(cname,fname);
 }
 

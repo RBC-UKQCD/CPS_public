@@ -33,6 +33,12 @@ extern "C" void p4_dirac_init_g ();
 extern "C" void p4_destroy_dirac_buf();
 extern "C" void p4_destroy_dirac_buf_g();
 
+//------------------------------------------------------------------
+// The staggered p4 dMdmu operator
+//------------------------------------------------------------------
+extern "C" void p4_dMdmu(Vector *f_out, Vector *f_in, int cb, int dag, int order);
+
+
 #endif
 
 CPS_END_NAMESPACE

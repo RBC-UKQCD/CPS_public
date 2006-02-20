@@ -353,6 +353,24 @@ void DiracOpP4::Dslash(Vector *out,
 #endif
 
 //------------------------------------------------------------------
+// dMdmu(Vector *out, Vector *in, ChkbType cb, DagType dag, int order) :
+// dMdmu is the derivative of the fermion matrix with respect to the 
+// chemical potential.
+// dMdmu conects only odd-->even or even-->odd sites.
+// The in, out fields are defined on a checkerboard.
+// cb refers to the checkerboard of the in field.
+// order refers to the order of the derivative.
+//------------------------------------------------------------------
+void DiracOpP4::dMdmu(Vector *out, 
+				  Vector *in, 
+				  ChkbType cb, 
+				  DagType dag,
+		                  int order) {
+
+  p4_dMdmu(out,in, int(cb),int(dag),int(order));
+}
+
+//------------------------------------------------------------------
 // int MatInv(Vector *out, Vector *in, 
 //            Float *true_res, PreserveType prs_in);
 // The inverse of the Dirac Operator (D+m)

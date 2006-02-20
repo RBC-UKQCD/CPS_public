@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.10 2006-02-01 16:46:08 chulwoo Exp $
+  $Id: f_p4.C,v 1.11 2006-02-20 22:21:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -338,6 +338,27 @@ void Fp4::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
   
   stag.Dslash(f_out, f_in+offset, CHKB_ODD, DAG_NO);
   stag.Dslash(f_out+offset, f_in, CHKB_EVEN, DAG_NO);
+
+}
+//------------------------------------------------------------------
+// FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, CnvFrmType cnv_frm,
+//                    int order) :
+// FdMdmu is the derivative of the fermion matrix with respect
+// to the chemical potential.
+// order is the the order of the derivative.
+//------------------------------------------------------------------
+void Fp4::FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		    CnvFrmType cnv_frm, int order)
+{
+  int offset;
+  char *fname = "FdMdmu(V*,V*,CgArg*,CnvFrmType,int)";
+  VRB.Func(cname,fname);
+  
+  DiracOpP4 stag(*this, f_out, f_in, cg_arg, cnv_frm);
+  offset = GJP.VolNodeSites() * FsiteSize() / (2 * VECT_LEN);
+  
+  stag.dMdmu(f_out, f_in+offset, CHKB_ODD, DAG_NO, order);
+  stag.dMdmu(f_out+offset, f_in, CHKB_EVEN, DAG_NO, order);
 
 }
 

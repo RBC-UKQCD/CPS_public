@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.17 2005-10-04 05:55:53 chulwoo Exp $
+  $Id: dirac_op.h,v 1.18 2006-02-20 22:20:51 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -671,6 +671,18 @@ class DiracOpP4 : public DiracOpStagTypes
      // dir_flag is flag which takes value 0 when all direction contribute 
      // 1 - when only the special anisotropic direction contributes to D,
      // 2 - when all  except the special anisotropic direction.
+
+  void dMdmu(Vector *out, 
+	      Vector *in,
+	      ChkbType cb, 
+	      DagType dag,
+	      int order);
+     // dMDmu is the derivative of the fermion matrix with
+     // respect to the chemical potential. 
+     // dMdmu conects only odd-->even or even-->odd sites.
+     // The in, out fields are defined on a checkerboard.
+     // cb refers to the checkerboard of the in field.
+     // order refers to the order of the derivative.
 
   int MatInv(Vector *out, 
 	     Vector *in, 
