@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fp4::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce_p4.C,v 1.2 2006-02-01 16:46:08 chulwoo Exp $
+  $Id: RHMC_Fforce_p4.C,v 1.3 2006-02-20 22:11:44 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -16,6 +16,7 @@
 #include <util/amalloc.h>
 #include <comms/glb.h>
 #include <util/time.h>
+#include <util/qcdio.h>
 
 CPS_START_NAMESPACE
 
@@ -40,9 +41,10 @@ CPS_START_NAMESPACE
 
 #define PROFILE
 
-void Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				   Float *alpha, Float mass, Float dt,
-				   Vector **sol_d){
+Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+				   int isz, Float *alpha, Float mass, Float dt,
+				   Vector **sol_d,
+				   ForceMeasure force_measure){
 
     char *fname = "RHMC_EvolveMomFforce";
     VRB.Func(cname,fname);
@@ -52,6 +54,22 @@ void Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
     ParTrans::PTflops=0;
     ForceFlops=0;
 #endif
+
+  Float Fdt=0.0;
+  char *force_label;
+  int g_size = GJP.VolNodeSites() * GsiteSize();
+  Matrix *mom_tmp;
+  FILE *fp;
+
+  if (force_measure == FORCE_MEASURE_YES) {
+    mom_tmp = (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
+    if( (fp = Fopen("force.dat", "a")) == NULL )
+      ERR.FileA(cname,fname, "force.dat");
+    ((Vector*)mom_tmp) -> VecZero(g_size);
+    force_label = new char[100];
+  } else {
+    mom_tmp = mom;
+  }
 
     // The number of directions to do simultaneously - N can be 1, 2 or 4.
     const int N = 1;  
@@ -1166,6 +1184,19 @@ void Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
   for (int p=0; p<degree; p++) {
     Fconvert(sol[p], STAG, CANONICAL);
   }
+
+  // If measuring the force, need to measure and then sum to mom
+  if (force_measure == FORCE_MEASURE_YES) {
+    Fdt = dotProduct((IFloat*)mom_tmp, (IFloat*)mom_tmp, g_size);
+    glb_sum(&Fdt);
+    fTimesV1PlusV2((IFloat*)mom, 1.0, (IFloat*)mom_tmp, (IFloat*)mom, g_size);
+
+    Fclose(fp);
+    delete[] force_label;
+    sfree(mom_tmp, cname, fname, "mom_tmp");
+  }
+
+  return sqrt(Fdt);
 }
 
 
