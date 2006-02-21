@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-16 07:21:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.10 2005-06-16 07:21:22 chulwoo Exp $
-//  $Id: alg_s_spect.C,v 1.10 2005-06-16 07:21:22 chulwoo Exp $
+//  $Date: 2006-02-21 17:37:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.11 2006-02-21 17:37:12 chulwoo Exp $
+//  $Id: alg_s_spect.C,v 1.11 2006-02-21 17:37:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_s_spect.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v $
 //  $State: Exp $
 //
@@ -35,6 +35,7 @@ CPS_END_NAMESPACE
 #include <alg/mom_meson_p_s.h>
 #include <alg/nucl_prop_s.h>
 #include <alg/nlocal_prop_s.h>
+#include <alg/nlocal_propmes_s.h>
 #include <alg/aots_s.h>
 #include <alg/alg_s_spect.h>
 #include <alg/common_arg.h>
@@ -67,6 +68,7 @@ static void write_to_file(const Float *data_p, FILE *fp,
 			  int num_IFloats, int num_slices, int mom, 
 			  HadronType type, BndCndType bc)
 {
+
 #if TARGET==cpsMPI
     using MPISCU::fprintf;
 #endif
@@ -89,6 +91,22 @@ static void write_to_file(const Float *data_p, FILE *fp,
   
   int i, k;
 
+  //-------------------------------------------------------------
+  // for the Non Local staggered meson, just print out every result!
+  // other modification is done by anlysis script 
+  //-------------------------------------------------------------
+  if (type == NLSTAG) {
+   Float tmp;    
+    for(i = 0 ; i < num_IFloats ; i+=2) {
+      //printf("i = %d\n",i);
+      tmp = data_p[i] / num_slices;
+      Fprintf(fp,"%e    ",(IFloat)tmp);
+      tmp = data_p[i+1] / num_slices;
+      Fprintf(fp,"%e\n",(IFloat)tmp);
+      //printf("data_p[%d] = %f data_p[%d] = %f\n",i,data_p[i]/num_slices,i+1,data_p[i+1]/num_slices);
+    }
+    return ;
+  }
   //-------------------------------------------------------------
   // * write C(t = 0)
   //-------------------------------------------------------------
@@ -613,6 +631,106 @@ void AlgStagNonLocal::run()
 
     write_to_file(alg_stag_non_local_arg->nlocal_buf, fp, 
 		nlc.propLenTotal(), aots.numSlices(), 1, SNONLOCAL, nlc.bcd());
+    Fclose(fp);
+
+    VRB.Sfree(cname,fname, "alg_stag_non_local_arg->nlocal_buf", 
+			    alg_stag_non_local_arg->nlocal_buf);
+    sfree(alg_stag_non_local_arg->nlocal_buf);
+    alg_stag_non_local_arg->nlocal_buf = 0;
+  }
+}
+
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+//
+// AlgNLStagMeson is derived from Alg and is relevant to  
+// the staggered non-local hadron propagator.
+// The type of fermion is determined by the argument to the 
+// constructor. If the fermion type is not F_CLASS_STAG the 
+// constructor will exit with a general error.
+// This class use NLMesonPropS class writted by chateau
+//
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+
+//------------------------------------------------------------------
+// Constructor 
+//------------------------------------------------------------------
+AlgNLStagMeson::AlgNLStagMeson(Lattice& latt, 
+				 CommonArg *c_arg,
+				 NLStagMesonArg *arg, Aots& a) :
+				 Alg(latt, c_arg), aots(a) 
+{
+  cname = "AlgNLStagMeson";
+  char *fname = "AlgNLStagMeson(L&,CommonArg*,NLStagMesonArg*)";
+  VRB.Func(cname,fname);
+
+  // Check fermion type
+  //----------------------------------------------------------------
+  /*if(latt.Fclass() != F_CLASS_STAG)
+    ERR.General(cname,fname, class_str, int(latt.Fclass()));*/
+
+
+  // Initialize the argument pointer
+  //----------------------------------------------------------------
+  if(arg == 0)
+    ERR.Pointer(cname,fname, "arg");
+  alg_stag_non_local_arg = arg;
+}
+
+
+//------------------------------------------------------------------
+// Destructor
+//------------------------------------------------------------------
+AlgNLStagMeson::~AlgNLStagMeson() {
+  char *fname = "~AlgNLStagMeson()";
+  VRB.Func(cname,fname);
+}
+
+
+//------------------------------------------------------------------
+// Calculate propagator
+//------------------------------------------------------------------
+void AlgNLStagMeson::run()
+{
+  char *fname = "run()";
+  VRB.Func(cname,fname);
+
+  // Set the Lattice pointer
+  //----------------------------------------------------------------
+  Lattice& lat = AlgLattice();
+
+  NLSMesonPropS nlsm(lat, *alg_stag_non_local_arg);
+  nlsm.getHadronPropS();
+
+  // download propagator and AOTS 
+  //----------------------------------------------------------------
+  if(aots.begin()) {
+    alg_stag_non_local_arg->nlocal_buf = 
+		(Float *)smalloc(nlsm.propLenTotal()*sizeof(Float));
+
+    if(alg_stag_non_local_arg->nlocal_buf == 0)
+          ERR.Pointer(cname,fname, "alg_stag_non_local_arg->nlocal_buf");
+    VRB.Smalloc(cname,fname, "alg_stag_non_local_arg->nlocal_buf", 
+		alg_stag_non_local_arg->nlocal_buf, 
+		nlsm.propLenTotal()*sizeof(Float));
+
+    zero_buffer(alg_stag_non_local_arg->nlocal_buf, nlsm.propLenTotal());
+  }
+
+//  nlsm.download_prop(SNONLOCAL, alg_stag_non_local_arg->nlocal_buf);
+  nlsm.download_prop(NLSTAG, alg_stag_non_local_arg->nlocal_buf);
+
+  if (aots.last()) {
+    char *data_file = common_arg->results ? 
+		      (char *)common_arg->results : CAST_AWAY_CONST("nonlocal.def"); 
+    FILE *fp;
+    if( NULL == (fp = Fopen(data_file, "a")) ) {
+      ERR.FileA(cname,fname, data_file);
+    }
+
+    write_to_file(alg_stag_non_local_arg->nlocal_buf, fp, 
+		  nlsm.propLenTotal(), aots.numSlices(), 1, NLSTAG, nlsm.bcd());
     Fclose(fp);
 
     VRB.Sfree(cname,fname, "alg_stag_non_local_arg->nlocal_buf", 

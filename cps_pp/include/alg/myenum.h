@@ -3,13 +3,13 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/myenum.h,v 1.4 2004-08-18 11:57:36 zs Exp $
-//  $Id: myenum.h,v 1.4 2004-08-18 11:57:36 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2006-02-21 17:37:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/myenum.h,v 1.5 2006-02-21 17:37:12 chulwoo Exp $
+//  $Id: myenum.h,v 1.5 2006-02-21 17:37:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/myenum.h,v $
 //  $State: Exp $
 //
@@ -18,7 +18,7 @@ CPS_START_NAMESPACE
 #define INCLUDED_MY_ENUM_H
 
 enum { VECT_LEN = 6, MATRIX_SIZE = 18 };
-enum HadronType { SMESON, SMOMMESON, SNUCLEON, SNONLOCAL};
+enum HadronType { SMESON, SMOMMESON, SNUCLEON, SNONLOCAL, NLSTAG};
 
 #endif
 

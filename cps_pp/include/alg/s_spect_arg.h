@@ -60,6 +60,13 @@ struct StagNonLocalArg {
   Float *nlocal_buf;
 };
 
+struct NLStagMesonArg {
+  int qid0[8];
+  int dir;
+  Float *nlocal_buf;
+};
+
+
 #endif
 
 CPS_END_NAMESPACE

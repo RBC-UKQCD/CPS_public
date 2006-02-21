@@ -192,6 +192,28 @@ class AlgStagNonLocal : public Alg
 };
 
 
+class AlgNLStagMeson : public Alg
+{
+ private:
+    char *cname;
+
+    NLStagMesonArg *alg_stag_non_local_arg;
+        // The argument structure for
+        // the non-local hadron propagator
+ 
+    Aots & aots;
+        // Control info to Average Over Time Slices
+
+ public:
+    AlgNLStagMeson(Lattice & latt, CommonArg *c_arg, 
+                    NLStagMesonArg *arg, Aots& a);
+
+    virtual ~AlgNLStagMeson();
+
+    void run(void);
+
+};
+
 
 
 

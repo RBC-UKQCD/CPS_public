@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-09 20:36:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.10 2005-03-09 20:36:22 chulwoo Exp $
-//  $Id: quark_prop_s.C,v 1.10 2005-03-09 20:36:22 chulwoo Exp $
+//  $Date: 2006-02-21 17:37:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.11 2006-02-21 17:37:12 chulwoo Exp $
+//  $Id: quark_prop_s.C,v 1.11 2006-02-21 17:37:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: quark_prop_s.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v $
 //  $State: Exp $
 //
@@ -308,7 +308,9 @@ void QuarkPropS::setWallSrc(Matrix **gm, StagQuarkSrc& qs, int color )
 	    // need to set the source on this site
 	    //--------------------------------------------------
 	    if ( qs.type == WALLZ || ( qs.type == WALL2Z)&&
-	       ( (s[i]%2 == 0) && (s[j]%2 == 0) && (s[k]%2 == 0))) {
+	       ( (s[i]%2 == qs.origin[i]%2) 
+		 && (s[j]%2 == qs.origin[j]%2) 
+		 && (s[k]%2 == qs.origin[k]%2))) {
 
               int s3d[4] = { s[0], s[1], s[2], s[3] };
               s3d[dir] = 0;
