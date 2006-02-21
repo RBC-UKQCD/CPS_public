@@ -1,0 +1,26 @@
+<class><name>EigArg</name><instance>eig_arg</instance><data>
+<item><name>pattern_kind</name><value><PatternType>LIN </PatternType></value></item>
+<item><name>Mass_init</name><value><double>0.000000e+00</double></value></item>
+<item><name>Mass_final</name><value><double>0.000000e+00</double></value></item>
+<item><name>Mass_step</name><value><double>0.000000e+00</double></value></item>
+<Array><name>Mass</name><size>0</size><data>
+</data></Array>
+<item><name>N_eig</name><value><int>0</int></value></item>
+<item><name>Kalk_Sim</name><value><int>0</int></value></item>
+<item><name>MaxCG</name><value><int>0</int></value></item>
+<item><name>RsdR_a</name><value><double>0.000000e+00</double></value></item>
+<item><name>RsdR_r</name><value><double>0.000000e+00</double></value></item>
+<item><name>Rsdlam</name><value><double>0.000000e+00</double></value></item>
+<item><name>Cv_fact</name><value><double>0.000000e+00</double></value></item>
+<item><name>N_min</name><value><int>0</int></value></item>
+<item><name>N_max</name><value><int>0</int></value></item>
+<item><name>N_KS_max</name><value><int>0</int></value></item>
+<item><name>n_renorm</name><value><int>0</int></value></item>
+<item><name>ProjApsiP</name><value><int>0</int></value></item>
+<item><name>RitzMatOper</name><value><RitzMatType>NONE </RitzMatType></value></item>
+<item><name>print_hsum</name><value><int>0</int></value></item>
+<item><name>hsum_dir</name><value><int>0</int></value></item>
+<item><name>mass</name><value><double>0.000000e+00</double></value></item>
+<item><name>fname</name><value><string> </string></value></item>
+<item><name>ncorr</name><value><int>0</int></value></item>
+</data></class>

@@ -1,0 +1,19 @@
+#
+#  Simple makefile for regression testing for the generation
+#  of unquenched gauge configuratios.
+#
+# Options:
+#     make     : create the executable 
+#
+#
+
+
+#
+#  include the platform specific part of the makefile
+#
+include ../Makefile_common
+
+
+
+
+

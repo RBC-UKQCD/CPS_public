@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.9 2005-12-02 16:11:35 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.10 2006-02-21 21:14:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -38,7 +38,6 @@ CPS_END_NAMESPACE
 #include <comms/glb.h>
 CPS_START_NAMESPACE
 
-#define PROFILE
 
 static int offset (int *size, int *pos, int mu = -1){
   if (mu>3) printf("FdwfBase::offset: Error!\n");
@@ -49,6 +48,7 @@ static int offset (int *size, int *pos, int mu = -1){
   return result;
 }
 
+#undef PROFILE
 // CJ: change start
 //------------------------------------------------------------------
 // EvolveMomFforce(Matrix *mom, Vector *chi, Float mass, 
@@ -104,13 +104,23 @@ Float FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
   VRB.Clock(cname, fname, "Before calc force vecs.\n") ;
 
+#ifdef PROFILE
+  Float time = -dclock();
+  ForceFlops=0;
+#endif
   {
     CgArg cg_arg ;
     cg_arg.mass = mass ;
 
-    DiracOpDwf dwf(*this, v1, v2, &cg_arg, CNV_FRM_YES) ;
+    DiracOpDwf dwf(*this, v1, v2, &cg_arg, CNV_FRM_NO) ;
     dwf.CalcHmdForceVecs(chi) ;
+    Fconvert(v1,CANONICAL,WILSON);
+    Fconvert(v2,CANONICAL,WILSON);
   }
+#ifdef PROFILE
+  time += dclock();
+  print_flops(cname,fname,ForceFlops,time);
+#endif
 
   int mu, x, y, z, t, s, lx, ly, lz, lt, ls ;
   int size[5],surf[4],blklen[4],stride[4],numblk[4];
@@ -179,7 +189,7 @@ Float FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   VRB.Clock(cname, fname, "Before loop over links.\n") ;
 
 #ifdef PROFILE
-  Float time = -dclock();
+  time = -dclock();
   ForceFlops=0;
 #endif
 

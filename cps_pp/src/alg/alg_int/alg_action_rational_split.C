@@ -33,6 +33,7 @@ AlgActionRationalSplit::AlgActionRationalSplit(AlgActionRational &Rat,
   char *fname = "AlgActionRationalSplit(AlgActionRational *, int **)";
   VRB.Func(cname,fname);
 
+  int_type = INT_RATIONAL_SPLIT;
   rat_split_arg = &r_arg;
   rat = &Rat;
   n_masses = 0;
@@ -41,7 +42,7 @@ AlgActionRationalSplit::AlgActionRationalSplit(AlgActionRational &Rat,
   //!< First check n_masses split = n_masses rational
   if (rat_split_arg->fractionSplit.fractionSplit_len != rat->getNmass())
     ERR.General(cname, fname,
-		"Inconsistency between RationalSplitArg and AlgActionRational n_masses");
+		"Inconsistency between RationalSplitArg and AlgActionRational n_masses\n");
 
   if (rat->getNmass() > 0) {
     fractionSplit = (int**)smalloc(2*sizeof(int*),cname,fname,"fractionSplit");
@@ -55,6 +56,10 @@ AlgActionRationalSplit::AlgActionRationalSplit(AlgActionRational &Rat,
 	rat_split_arg->fractionSplit.fractionSplit_val[i].split_low;
       fractionSplit[1][i] = 
 	rat_split_arg->fractionSplit.fractionSplit_val[i].split_high;
+
+      //!< Need to check that splits are valid
+      for (int j=fractionSplit[0][i];j<fractionSplit[1][i]; j++) 
+	rat->setSplit(i,j);
     }
   }
 
@@ -74,6 +79,7 @@ AlgActionRationalSplit::~AlgActionRationalSplit() {
 }
 
 void AlgActionRationalSplit::heatbath() {
+  rat->checkSplit();
   rat->heatbath();
 }
 

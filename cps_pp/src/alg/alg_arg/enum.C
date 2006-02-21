@@ -390,6 +390,22 @@ struct vml_enum_map FieldType_map[] = {
 };
 
 bool_t
+vml_RatType (VML *vmls, char *name,RatType *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,RatType_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map RatType_map[] = {
+	{"RatType","RATIONAL_STANDARD",RATIONAL_STANDARD},
+	{"RatType","RATIONAL_QUOTIENT",RATIONAL_QUOTIENT},
+	{"RatType","RATIONAL_SPLIT",RATIONAL_SPLIT},
+	{NULL,NULL,0}
+};
+
+bool_t
 vml_WbaryonFold (VML *vmls, char *name,WbaryonFold *objp)
 {
 	register int32_t *buf;
@@ -851,6 +867,14 @@ struct vml_enum_map IntegratorType_map[] = {
 	{"IntegratorType","INT_LEAP",INT_LEAP},
 	{"IntegratorType","INT_OMELYAN",INT_OMELYAN},
 	{"IntegratorType","INT_SUM",INT_SUM},
+	{"IntegratorType","INT_MOM",INT_MOM},
+	{"IntegratorType","INT_GAUGE",INT_GAUGE},
+	{"IntegratorType","INT_FERMION",INT_FERMION},
+	{"IntegratorType","INT_BOSON",INT_BOSON},
+	{"IntegratorType","INT_QUOTIENT",INT_QUOTIENT},
+	{"IntegratorType","INT_RATIONAL",INT_RATIONAL},
+	{"IntegratorType","INT_RATIONAL_SPLIT",INT_RATIONAL_SPLIT},
+	{"IntegratorType","INT_RATIONAL_QUOTIENT",INT_RATIONAL_QUOTIENT},
 	{NULL,NULL,0}
 };
 
@@ -1002,6 +1026,51 @@ vml_HmdLimits (VML *vmls, char *name,HmdLimits *objp)
 struct vml_enum_map HmdLimits_map[] = {
 	{"HmdLimits","MAX_HMD_MASSES",MAX_HMD_MASSES},
 	{"HmdLimits","MAX_RAT_DEGREE",MAX_RAT_DEGREE},
+	{NULL,NULL,0}
+};
+
+bool_t
+vml_InverterType (VML *vmls, char *name,InverterType *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,InverterType_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map InverterType_map[] = {
+	{"InverterType","CG",CG},
+	{"InverterType","BICGSTAB",BICGSTAB},
+	{NULL,NULL,0}
+};
+
+bool_t
+vml_RationalApproxType (VML *vmls, char *name,RationalApproxType *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,RationalApproxType_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map RationalApproxType_map[] = {
+	{"RationalApproxType","RATIONAL_APPROX_POWER",RATIONAL_APPROX_POWER},
+	{"RationalApproxType","RATIONAL_APPROX_QUOTIENT",RATIONAL_APPROX_QUOTIENT},
+	{NULL,NULL,0}
+};
+
+bool_t
+vml_RationalBoundsType (VML *vmls, char *name,RationalBoundsType *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,RationalBoundsType_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map RationalBoundsType_map[] = {
+	{"RationalBoundsType","RATIONAL_BOUNDS_AUTOMATIC",RATIONAL_BOUNDS_AUTOMATIC},
+	{"RationalBoundsType","RATIONAL_BOUNDS_MANUAL",RATIONAL_BOUNDS_MANUAL},
 	{NULL,NULL,0}
 };
 CPS_END_NAMESPACE

@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.19 2006-02-20 22:22:01 chulwoo Exp $
+  $Id: f_stag.C,v 1.20 2006-02-21 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -200,6 +200,7 @@ int Fstag::FmatEvlInv(Vector *f_out, Vector *f_in,
   char *fname = "FmatEvlInv(CgArg*,V*,V*,F*,CnvFrmType)";
   VRB.Func(cname,fname);
 
+  printf("f_out = %e, f_in = %e\n", f_out->NormSqGlbSum(e_vsize), f_in->NormSqGlbSum(e_vsize));
   DiracOpStag stag(*this, f_out, f_in, cg_arg, cnv_frm);
   iter = stag.InvCg(&(cg_arg->true_rsd));
   if (true_res) *true_res = cg_arg ->true_rsd;
@@ -238,6 +239,9 @@ int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   Float *RsdCG = new Float[Nshift];
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg[s]->stop_rsd;
 
+  Float trueMass;
+  massRenormalise(&(cg_arg[0]->mass), &trueMass, Nshift, shift, RENORM_FORWARDS);
+
   //Fake the constructor
   DiracOpStag stag(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
   int iter = stag.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
@@ -246,6 +250,8 @@ int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
     for (int s=0; s<Nshift; s++)
       stag.Dslash(f_out_d[s], f_out[s], CHKB_EVEN, DAG_NO);
   for (int s=0; s<Nshift; s++) cg_arg[s]->true_rsd = RsdCG[s];
+
+  massRenormalise(&(cg_arg[0]->mass), &trueMass, Nshift, shift, RENORM_BACKWARDS);
 
   delete[] RsdCG;
   return iter;
@@ -373,11 +379,14 @@ int Fstag::FeigSolv(Vector **f_eigenv, Float *lambda,
 }
 
 //------------------------------------------------------------------
-// SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass):
+// SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass,
+//        dag):
 // It sets the pseudofermion field phi from frm_e, frm_o.
 //------------------------------------------------------------------
 Float Fstag::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
-		    Float mass){
+		    Float mass, DagType dag){
+  // dag is ignored for staggered
+
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
   CgArg cg_arg;
@@ -502,6 +511,13 @@ Float Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
 
   return sqrt(Fdt);
 
+}
+
+Float Fstag::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+		      Float mass, Float step_size) {
+  char *fname = "EvolveMomFforce(M*,V*,V*,F,F)";
+  ERR.General(cname,fname,"Not Implemented\n");
+  return 0.0;
 }
 
 Float Fstag::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,

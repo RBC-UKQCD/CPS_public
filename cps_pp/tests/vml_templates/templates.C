@@ -27,17 +27,19 @@ WspectOutput ws_out;
 PotArg pa;
 PbpArg pbp;
 FixGaugeArg fga;
-RhmcPolesState rhmc_poles;
 MeasArg Meas;
 MeasTask Task;
 HmcArg hmc_arg;
+ActionQuotientArg quo_arg;
 ActionFermionArg frm_arg;
 ActionBosonArg bsn_arg;
 ActionRationalArg rat_arg;
 ActionRationalSplitArg split_arg;
+ActionRationalQuotientArg rat_quo_arg;
 ActionGaugeArg gauge_arg;
 IntABArg ab_arg;
 EigArg eig_arg;
+
 
 int main(int argc, char *argv[])
 { 
@@ -62,8 +64,6 @@ int main(int argc, char *argv[])
   ws_out.delta_z = "filename";
   ws_out.delta_t = "filename";
 
-  hmd_arg.rhmc_poles_file = "filename";
-
   evo_arg.ensemble_id = "id";
   evo_arg.ensemble_label = "label";
   evo_arg.creator = "creator";
@@ -75,20 +75,17 @@ int main(int argc, char *argv[])
 
   ws_arg.CgArgFile = "CgFile";
 
-  rat_arg.resize(2);
+  rat_arg.resize(4);
   rat_arg.resize(0, 10, 16);
-  rat_arg.resize(1, 7, 13);
-  bsn_arg.resize(0);
+  rat_arg.resize(1, 10, 16);
+  rat_arg.resize(2, 9, 14);
+  rat_arg.resize(3, 6, 9);
+  bsn_arg.resize(1);
   frm_arg.resize(1);
   split_arg.resize(2);
-
-  double masses[3];
-  masses[0] =0.1;
-  masses[1] =0.2;
-  masses[2] =0.3;
-  eig_arg.Mass.Mass_len=3;
-  eig_arg.Mass.Mass_val=masses;
-  
+  quo_arg.resize(1);
+  rat_quo_arg.resize(1);
+  rat_quo_arg.resize(0, 9, 15, 6, 9);
 
   cg_arg.Encode("cg_arg.vml","cg_arg");
   hmd_arg.Encode("hmd_arg.vml","hmd_arg");
@@ -96,20 +93,20 @@ int main(int argc, char *argv[])
   do_arg.Encode("do_arg.vml","do_arg");
   ws_arg.Encode("w_spect_arg.vml","w_spect_arg");
   ws_out.Encode("w_spect_output.vml","w_spect_output");
-  rhmc_poles.Encode("rhmc_poles_state.vml","rhmc_poles_state");
   Meas.Encode("meas_arg.vml","meas_arg");
   pa.Encode("pot_arg.vml","pot_arg");
   pbp.Encode("pbp_arg.vml","pbp_arg");
   fga.Encode("fix_gauge_arg.vml","fix_gauge_arg");
   hmc_arg.Encode("hmc_arg.vml","hmc_arg");
+  quo_arg.Encode("quo_arg.vml","quo_arg");
   frm_arg.Encode("frm_arg.vml","frm_arg");
   bsn_arg.Encode("bsn_arg.vml","bsn_arg");
-//  rat_arg.Encode("rat_arg.vml","rat_arg");
+  rat_arg.Encode("rat_arg.vml","rat_arg");
+  rat_quo_arg.Encode("rat_quo_arg.vml","rat_quo_arg");
   split_arg.Encode("split_arg.vml","split_arg");
   gauge_arg.Encode("gauge_arg.vml","gauge_arg");
   ab_arg.Encode("ab_arg.vml","ab_arg");
   eig_arg.Encode("eig_arg.vml","eig_arg");
-#if 0
 
   vml_markup_type(VML_XML);
   
@@ -119,16 +116,16 @@ int main(int argc, char *argv[])
   do_arg.Encode("do_arg.xml","do_arg");
   ws_arg.Encode("w_spect_arg.xml","w_spect_arg");
   ws_out.Encode("w_spect_output.xml","w_spect_output");
-  rhmc_poles.Encode("rhmc_poles_state.xml","rhmc_poles_state");
   hmc_arg.Encode("hmc_arg.xml","hmc_arg");
+  quo_arg.Encode("quo_arg.xml","quo_arg");
   frm_arg.Encode("frm_arg.xml","frm_arg");
   bsn_arg.Encode("bsn_arg.xml","bsn_arg");
   rat_arg.Encode("rat_arg.xml","rat_arg");
+  rat_quo_arg.Encode("rat_quo_arg.xml","rat_quo_arg");
   split_arg.Encode("split_arg.xml","split_arg");
   gauge_arg.Encode("gauge_arg.xml","gauge_arg");
   ab_arg.Encode("ab_arg.xml","ab_arg");
   eig_arg.Encode("eig_arg.xml","eig_arg");
-#endif
 
   return(0);
 }

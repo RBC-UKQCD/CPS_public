@@ -1,0 +1,9 @@
+class HmcArg hmc_arg = {
+int steps_per_traj = 2
+double step_size =   0.5
+MetropolisType metropolis = METROPOLIS_YES
+ReunitarizeType reunitarize = REUNITARIZE_YES
+ReverseTest reverse = REVERSE_NO
+ReproduceTest reproduce = REPRODUCE_NO
+int reproduce_attempt_limit = 3
+}

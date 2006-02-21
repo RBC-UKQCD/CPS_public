@@ -25,9 +25,9 @@ AlgActionGauge::AlgActionGauge(AlgMomentum &mom, ActionGaugeArg &g_arg)
 {
 
   cname = "AlgActionGauge(Gclasstype, M*)";
+  int_type = INT_GAUGE;
   gauge_arg = &g_arg;
   gluon = g_arg.gluon;
-  force_label = "Gauge: ";
 
 }
 
@@ -64,8 +64,11 @@ void AlgActionGauge::evolve(Float dt, int steps)
   for (int i=0; i<steps; i++) {
     Fdt = lat.EvolveMomGforce(mom, dt);
 
-    if (force_measure == FORCE_MEASURE_YES)
-      printForce(Fdt, dt, force_label);
+    if (force_measure == FORCE_MEASURE_YES) {
+      char label[200];
+      sprintf(label, "%s:", force_label);
+      printForce(Fdt, dt, label);
+    }
   }
 
   LatticeFactory::Destroy();

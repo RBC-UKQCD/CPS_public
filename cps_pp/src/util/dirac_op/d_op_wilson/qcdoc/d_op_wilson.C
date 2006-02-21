@@ -1,7 +1,7 @@
 /*!\file
   Wilson Dirac operator code for QCDOC
 
-  $Id: d_op_wilson.C,v 1.9 2004-08-18 11:57:56 zs Exp $
+  $Id: d_op_wilson.C,v 1.10 2006-02-21 21:14:09 chulwoo Exp $
 */
 //------------------------------------------------------------------
 //
@@ -270,22 +270,19 @@ int DiracOpWilson::MatInv(Vector *out,
 }
 #endif
 
-  MatPcDag(in, temp);
-
-#if 0
-{
-  IFloat *temp_p = (IFloat *)in;
-  for(int ii = 0; ii< GJP.VolNodeSites()/2;ii++){
-    printf("i=%d\n",ii);
-    for(int jj = 0; jj< lat.FsiteSize();jj++)
-      printf("%e ",*(temp_p++));
-    printf("\n");
+  int iter;
+  switch (dirac_arg->Inverter) {
+  case CG:
+    MatPcDag(in, temp);
+    iter = InvCg(out,in,true_res);
+    break;
+  case BICGSTAB:
+    iter = BiCGstab(out,temp,0.0,dirac_arg->bicgstab_n,true_res);
+    break;
+  default:
+    ERR.General(cname,fname,"InverterType %d not implemented\n",
+		dirac_arg->Inverter);
   }
-  exit(44);
-}
-#endif
-
-  int iter = InvCg(out,in,true_res);
 
   Dslash(temp, out, CHKB_ODD, DAG_NO);
 

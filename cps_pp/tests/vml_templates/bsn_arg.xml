@@ -1,0 +1,12 @@
+<class><name>ActionBosonArg</name><instance>bsn_arg</instance><data>
+<class><name>ActionBilinearArg</name><instance>bi_arg</instance><data>
+<item><name>fermion</name><value><FclassType>F_CLASS_NONE </FclassType></value></item>
+<Array><name>bilinears</name><size>0</size><data>
+</data></Array>
+<class><name>ActionArg</name><instance>action_arg</instance><data>
+<item><name>force_measure</name><value><ForceMeasure>FORCE_MEASURE_NO </ForceMeasure></value></item>
+</data></class>
+</data></class>
+<Array><name>bosons</name><size>0</size><data>
+</data></Array>
+</data></class>

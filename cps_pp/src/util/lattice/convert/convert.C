@@ -171,8 +171,9 @@ void Lattice::Convert(StrOrdType new_str_ord)
 			  
 			  for(int i = 0; i < n_links; ++i) {
 			    mp2->Dagger((IFloat *)p+BANK4_BASE);
-			    moveMem((IFloat *)(p++), (IFloat *)mp2,
-				    18*sizeof(IFloat));
+//			    moveMem((IFloat *)(p++), (IFloat *)mp2,
+//				    18*sizeof(IFloat));
+			    moveFloat((IFloat *)(p++), (IFloat *)mp2, 18);
 			  }
 			}
 
@@ -183,10 +184,8 @@ void Lattice::Convert(StrOrdType new_str_ord)
 			"Converting gauge field order: STAG_BLOCK -> CANONICAL\n");
 			//Copy the links into tmp_gauge into STAG ordering
 			//Then, copy tmp_gauge back to GaugeField()
-			Matrix * tmp_gauge = (Matrix *)smalloc(cas.vol*4*sizeof(Matrix));
-			if(tmp_gauge == 0)
-			  ERR.Pointer(cname,fname,"tmp_gauge");
-			VRB.Smalloc(cname,fname,"tmp_gauge",tmp_gauge,cas.vol*4*sizeof(Matrix));
+			Matrix * tmp_gauge = (Matrix *)
+			fmalloc(cname,fname,"tmp_gauge",cas.vol*4*sizeof(Matrix));
 			int x[4];
 			int mu,current,new_index;
 			for(mu = 0; mu < 4; mu++)
@@ -197,11 +196,12 @@ void Lattice::Convert(StrOrdType new_str_ord)
 				  {
 				    current = cas.vol*mu+(x[3]+cas.lt*(x[0]+cas.lx*(x[1]+cas.ly*x[2])))/2+((x[3]+x[2]+x[1]+x[0])%2)*cas.vol/2;
 				    new_index = 4*(x[0]+cas.lx*(x[1]+cas.ly*(x[2]+cas.lz*x[3])))+mu;
-				    moveMem(tmp_gauge+new_index,cas.start_ptr+18*current,sizeof(Matrix));
+//				    moveMem(tmp_gauge+new_index,cas.start_ptr+18*current,sizeof(Matrix));
+				    moveFloat((Float *)(tmp_gauge+new_index),(Float*)(cas.start_ptr+18*current),18);
 				  }
-			moveMem(cas.start_ptr,tmp_gauge,cas.vol*4*sizeof(Matrix));
-			VRB.Sfree(cname,fname, "tmp_gauge", tmp_gauge);
-			sfree(tmp_gauge);
+//			moveMem(cas.start_ptr,tmp_gauge,cas.vol*4*sizeof(Matrix));
+			moveFloat((Float*)cas.start_ptr,(Float*)tmp_gauge,cas.vol*4*18);
+			ffree(cname,fname, "tmp_gauge", tmp_gauge);
 
 			MultStagPhases(&cas) ; // STAG -> CANONICAL
 
@@ -216,8 +216,9 @@ void Lattice::Convert(StrOrdType new_str_ord)
 			  
 			  for(int i = 0; i < n_links; ++i) {
 			    mp2->Dagger((IFloat *)p+BANK4_BASE);
-			    moveMem((IFloat *)(p++), (IFloat *)mp2,
-				    18*sizeof(IFloat));
+//			    moveMem((IFloat *)(p++), (IFloat *)mp2,
+//				    18*sizeof(IFloat));
+			    moveFloat((IFloat *)(p++), (IFloat *)mp2, 18);
 			  }
 			}
 		  }
@@ -228,11 +229,8 @@ void Lattice::Convert(StrOrdType new_str_ord)
 			"Converting gauge field order: WILSON -> CANONICAL\n");
 
 			site_sort_tbl = (unsigned *)
-				smalloc(cas.vol*sizeof(unsigned)) ;
-			if(site_sort_tbl == 0)
-			  ERR.Pointer(cname,fname, "site_sort_tbl"); 
-			VRB.Smalloc(cname,fname,
-				    "site_sort_tbl" , site_sort_tbl,
+			fmalloc(cname,fname,
+				    "site_sort_tbl" , 
 				    cas.vol*sizeof(unsigned) );
 			
 
@@ -265,12 +263,10 @@ void Lattice::Convert(StrOrdType new_str_ord)
 // link_sort_tbl should be in CRAM
 //-------------------------------------------------------------------------
 
+			
 			link_sort_tbl = (unsigned *)
-				smalloc(cas.site_size*sizeof(unsigned)) ;
-			if(link_sort_tbl == 0)
-			  ERR.Pointer(cname,fname, "link_sort_tbl"); 
-			VRB.Smalloc(cname,fname,
-				    "link_sort_tbl" , link_sort_tbl,
+			fmalloc(cname,fname,
+				    "link_sort_tbl" , 
 				    cas.site_size*sizeof(unsigned)) ;
 
 //-------------------------------------------------------------------------
@@ -295,10 +291,8 @@ void Lattice::Convert(StrOrdType new_str_ord)
 
 			RunGConverter(&cas, site_sort_tbl, link_sort_tbl) ;
 
-			VRB.Sfree(cname,fname, "link_sort_tbl", link_sort_tbl);
-			sfree(link_sort_tbl);
-			VRB.Sfree(cname,fname, "site_sort_tbl", site_sort_tbl);
-			sfree(site_sort_tbl) ;
+			ffree(cname,fname, "link_sort_tbl", link_sort_tbl);
+			ffree(cname,fname, "site_sort_tbl", site_sort_tbl);
 
 			break ;
 
@@ -309,11 +303,8 @@ void Lattice::Convert(StrOrdType new_str_ord)
 				 "G_WILSON_HB -> CANONICAL\n");
 
 			site_sort_tbl = (unsigned *)
-				smalloc(cas.vol*sizeof(unsigned)) ;
-			if(site_sort_tbl == 0)
-			  ERR.Pointer(cname,fname, "site_sort_tbl"); 
-			VRB.Smalloc(cname,fname,
-				    "site_sort_tbl" , site_sort_tbl,
+			fmalloc(cname,fname,
+				    "site_sort_tbl" , 
 				    cas.vol*sizeof(unsigned) );
 
 
@@ -345,11 +336,8 @@ void Lattice::Convert(StrOrdType new_str_ord)
 //-------------------------------------------------------------------------
 
 			link_sort_tbl = (unsigned *)
-				smalloc(cas.site_size*sizeof(unsigned)) ;
-			if(link_sort_tbl == 0)
-			  ERR.Pointer(cname,fname, "link_sort_tbl"); 
-			VRB.Smalloc(cname,fname,
-				    "link_sort_tbl" , link_sort_tbl,
+			fmalloc(cname,fname,
+				    "link_sort_tbl" , 
 				    cas.site_size*sizeof(unsigned));
 
 //-------------------------------------------------------------------------
@@ -375,10 +363,8 @@ void Lattice::Convert(StrOrdType new_str_ord)
 			RunGConverter(&cas, site_sort_tbl, link_sort_tbl) ;
 
 
-			VRB.Sfree(cname,fname, "link_sort_tbl", link_sort_tbl);
-			sfree(link_sort_tbl);
-			VRB.Sfree(cname,fname, "site_sort_tbl", site_sort_tbl);
-			sfree(site_sort_tbl) ;
+			ffree(cname,fname, "link_sort_tbl", link_sort_tbl);
+			ffree(cname,fname, "site_sort_tbl", site_sort_tbl);
 
 			break ;
 		case CANONICAL :
@@ -574,11 +560,9 @@ void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 
 	// Allocate memory for a temporary
 	//----------------------------------------------------------
-	Vector *tmp_f_field = (Vector *) smalloc(f_size * sizeof(Float));
-	if(tmp_f_field == 0)
-	  ERR.Pointer(cname,fname_fconvert, "tmp_f_field");
-	VRB.Smalloc(cname,fname_fconvert, 
-		    "tmp_f_field", tmp_f_field, f_size * sizeof(Float));
+	Vector *tmp_f_field = (Vector *) 
+	fmalloc(cname,fname_fconvert, 
+		    "tmp_f_field", f_size * sizeof(Float));
 
 
 	if ((from == CANONICAL) && (to == WILSON)) {
@@ -675,8 +659,7 @@ void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 
 	// Free temporary fermion field memory
 	//----------------------------------------------------------
-	VRB.Sfree(cname,fname_fconvert, "tmp_f_field", tmp_f_field);
-	sfree(tmp_f_field);
+	ffree(cname,fname_fconvert, "tmp_f_field", tmp_f_field);
 
 	return ;
 

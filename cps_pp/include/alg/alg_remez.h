@@ -54,8 +54,13 @@ class AlgRemez
   bigfloat *xx, *mm, *step;
   bigfloat delta, spread, tolerance;
 
+  bigfloat delta_m;
+
   // The number of equations we must solve at each iteration (n+d+1)
   int neq;
+
+  // The type of approximation
+  RationalApproxType approx_type;
 
   // The precision of the GNU MP library
   long prec;

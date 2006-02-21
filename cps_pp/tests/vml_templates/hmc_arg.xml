@@ -1,0 +1,9 @@
+<class><name>HmcArg</name><instance>hmc_arg</instance><data>
+<item><name>steps_per_traj</name><value><int>0</int></value></item>
+<item><name>step_size</name><value><double>0.000000e+00</double></value></item>
+<item><name>metropolis</name><value><MetropolisType>METROPOLIS_NO </MetropolisType></value></item>
+<item><name>reunitarize</name><value><ReunitarizeType>REUNITARIZE_NO </ReunitarizeType></value></item>
+<item><name>reverse</name><value><ReverseTest>REVERSE_NO </ReverseTest></value></item>
+<item><name>reproduce</name><value><ReproduceTest>REPRODUCE_NO </ReproduceTest></value></item>
+<item><name>reproduce_attempt_limit</name><value><int>0</int></value></item>
+</data></class>

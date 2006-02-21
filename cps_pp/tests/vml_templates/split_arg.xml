@@ -1,0 +1,12 @@
+<class><name>ActionRationalSplitArg</name><instance>split_arg</instance><data>
+<Array><name>fractionSplit</name><size>2</size><data>
+<class><name>SplitRange</name><instance>fractionSplit[0]</instance><data>
+<item><name>split_low</name><value><int>0</int></value></item>
+<item><name>split_high</name><value><int>0</int></value></item>
+</data></class>
+<class><name>SplitRange</name><instance>fractionSplit[1]</instance><data>
+<item><name>split_low</name><value><int>0</int></value></item>
+<item><name>split_high</name><value><int>0</int></value></item>
+</data></class>
+</data></Array>
+</data></class>

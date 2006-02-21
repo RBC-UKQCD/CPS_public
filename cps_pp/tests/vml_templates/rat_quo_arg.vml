@@ -1,0 +1,120 @@
+class ActionRationalQuotientArg rat_quo_arg = {
+class ActionBilinearArg bi_arg = {
+FclassType fermion = F_CLASS_NONE
+Array bilinears[1] = { 
+class BilinearDescr bilinears[0] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 0
+}
+}
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_NO
+string force_label = ""
+}
+}
+double spread =   0.0000000000000000e+00
+int remez_generate = 0
+string rat_poles_file = ""
+Array bsn_mass[1] = { 
+double bsn_mass[0] =   0.0000000000000000e+00
+}
+Array frm_mass[1] = { 
+double frm_mass[0] =   0.0000000000000000e+00
+}
+Array bosons[1] = { 
+class RationalDescr bosons[0] = {
+FieldType field_type = FERMION
+int power_num = 0
+int power_den = 0
+long precision = 0
+class ApproxDescr md_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_AUTOMATIC
+double lambda_low =   0.0000000000000000e+00
+double lambda_high =   0.0000000000000000e+00
+Array stop_rsd[6] = { 
+double stop_rsd[0] =   0.0000000000000000e+00
+double stop_rsd[1] =   0.0000000000000000e+00
+double stop_rsd[2] =   0.0000000000000000e+00
+double stop_rsd[3] =   0.0000000000000000e+00
+double stop_rsd[4] =   0.0000000000000000e+00
+double stop_rsd[5] =   0.0000000000000000e+00
+}
+}
+class ApproxDescr mc_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_AUTOMATIC
+double lambda_low =   0.0000000000000000e+00
+double lambda_high =   0.0000000000000000e+00
+Array stop_rsd[9] = { 
+double stop_rsd[0] =   0.0000000000000000e+00
+double stop_rsd[1] =   0.0000000000000000e+00
+double stop_rsd[2] =   0.0000000000000000e+00
+double stop_rsd[3] =   0.0000000000000000e+00
+double stop_rsd[4] =   0.0000000000000000e+00
+double stop_rsd[5] =   0.0000000000000000e+00
+double stop_rsd[6] =   0.0000000000000000e+00
+double stop_rsd[7] =   0.0000000000000000e+00
+double stop_rsd[8] =   0.0000000000000000e+00
+}
+}
+double stag_bsn_mass =   0.0000000000000000e+00
+}
+}
+Array fermions[1] = { 
+class RationalDescr fermions[0] = {
+FieldType field_type = FERMION
+int power_num = 0
+int power_den = 0
+long precision = 0
+class ApproxDescr md_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_AUTOMATIC
+double lambda_low =   0.0000000000000000e+00
+double lambda_high =   0.0000000000000000e+00
+Array stop_rsd[9] = { 
+double stop_rsd[0] =   0.0000000000000000e+00
+double stop_rsd[1] =   0.0000000000000000e+00
+double stop_rsd[2] =   0.0000000000000000e+00
+double stop_rsd[3] =   0.0000000000000000e+00
+double stop_rsd[4] =   0.0000000000000000e+00
+double stop_rsd[5] =   0.0000000000000000e+00
+double stop_rsd[6] =   0.0000000000000000e+00
+double stop_rsd[7] =   0.0000000000000000e+00
+double stop_rsd[8] =   0.0000000000000000e+00
+}
+}
+class ApproxDescr mc_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_AUTOMATIC
+double lambda_low =   0.0000000000000000e+00
+double lambda_high =   0.0000000000000000e+00
+Array stop_rsd[15] = { 
+double stop_rsd[0] =   0.0000000000000000e+00
+double stop_rsd[1] =   0.0000000000000000e+00
+double stop_rsd[2] =   0.0000000000000000e+00
+double stop_rsd[3] =   0.0000000000000000e+00
+double stop_rsd[4] =   0.0000000000000000e+00
+double stop_rsd[5] =   0.0000000000000000e+00
+double stop_rsd[6] =   0.0000000000000000e+00
+double stop_rsd[7] =   0.0000000000000000e+00
+double stop_rsd[8] =   0.0000000000000000e+00
+double stop_rsd[9] =   0.0000000000000000e+00
+double stop_rsd[10] =   0.0000000000000000e+00
+double stop_rsd[11] =   0.0000000000000000e+00
+double stop_rsd[12] =   0.0000000000000000e+00
+double stop_rsd[13] =   0.0000000000000000e+00
+double stop_rsd[14] =   0.0000000000000000e+00
+}
+}
+double stag_bsn_mass =   0.0000000000000000e+00
+}
+}
+class EigenDescr eigen = {
+EigenMeasure eigen_measure = EIGEN_MEASURE_NO
+double stop_rsd =   0.0000000000000000e+00
+int max_num_iter = 0
+string eig_lo_stem = ""
+string eig_hi_stem = ""
+}
+}

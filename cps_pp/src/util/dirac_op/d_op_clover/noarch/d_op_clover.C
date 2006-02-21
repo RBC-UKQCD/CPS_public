@@ -311,17 +311,22 @@ int DiracOpClover::MatInv(Vector *out, Vector *in, Float *true_res,
 		 (const IFloat *)in,     
 		 vec_size);
 
-
-  // out_even = MatPcDag [kappe * Doe out_even0 + in_odd]
-  //--------------------------------------------------------------------
-  MatPcDag((Vector *)out_even, frm_buf1);
-
-
-  // out_odd = (MatPcDagMatPc)^inv MatPcDag 
-  //           [kappe * Doe out_even0 + in_odd]           done!
-  //--------------------------------------------------------------------
-  int iter = InvCg(out, (Vector *)out_even, true_res);
-
+  int iter;
+  switch (dirac_arg->Inverter) {
+  case CG:
+    // out_even = MatPcDag [kappe * Doe out_even0 + in_odd]
+    MatPcDag((Vector *)out_even, frm_buf1);
+    // out_odd = (MatPcDagMatPc)^inv MatPcDag 
+    //           [kappe * Doe out_even0 + in_odd]           done!
+    iter = InvCg(out, (Vector *)out_even, true_res);
+    break;
+  case BICGSTAB:
+    iter = BiCGstab(out,frm_buf1,0.0,dirac_arg->bicgstab_n,true_res);
+    break;
+  default:
+    ERR.General(cname,fname,"InverterType %d not implemented\n",
+		dirac_arg->Inverter);
+  }
 
   // frm_buf1 = kappa Deo out_odd + in_even
   //--------------------------------------------------------------------

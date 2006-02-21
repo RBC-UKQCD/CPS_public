@@ -1,7 +1,7 @@
 /*!\file
   \brief  Definition of the Dirac operator MinResExt method.
 
-  $Id: minresext.C,v 1.4 2005-10-04 05:18:18 chulwoo Exp $
+  $Id: minresext.C,v 1.5 2006-02-21 21:14:08 chulwoo Exp $
 */
 
 #include <config.h>
@@ -140,9 +140,10 @@ void DiracOp::MinResExt(Vector *psi, Vector *phi, Vector **v,
     psi -> CTimesV1PlusV2(a[i],v[i],psi,f_size);
     r -> CTimesV1PlusV2(-a[i],vm[i],r,f_size);
   }
-  Float error = sqrt(r->NormSqGlbSum(f_size));
+  Float error = sqrt(r->NormSqGlbSum(f_size) / phi->NormSqGlbSum(f_size));
 
-  VRB.Result(cname,fname,"History = %d, Residual = %e\n", degree, error);
+  VRB.Result(cname,fname,"Chrono = %d, True |res| / |src| = %e\n", 
+	     degree, error);
   
   for (int j=0; j<degree; j++) sfree(*(G+j));
 

@@ -24,19 +24,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief PAB... Definitions of the AlgMeas class methods.
   
-  $Id: alg_meas.C,v 1.3 2005-10-04 05:11:49 chulwoo Exp $
+  $Id: alg_meas.C,v 1.4 2006-02-21 21:14:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-10-04 05:11:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.3 2005-10-04 05:11:49 chulwoo Exp $
-//  $Id: alg_meas.C,v 1.3 2005-10-04 05:11:49 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.4 2006-02-21 21:14:07 chulwoo Exp $
+//  $Id: alg_meas.C,v 1.4 2006-02-21 21:14:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_meas.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v $
 //  $State: Exp $
 //
@@ -333,6 +333,10 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     lat_p = new GimprRectFstag;
     return *lat_p;
   }
+  if ( (fermion == F_CLASS_STAG) && (gluon == G_CLASS_IMPR_OLSYM ) ) {
+    lat_p = new GimprOLSymFstag;
+    return *lat_p;
+  }
 
   /* ASQTAD STAGGERED VALENCE ANALYSIS */
   if ( (fermion == F_CLASS_ASQTAD) && (gluon == G_CLASS_NONE ) ) {
@@ -345,6 +349,10 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
   }
   if ( (fermion == F_CLASS_ASQTAD) && (gluon == G_CLASS_IMPR_RECT ) ) {
     lat_p = new GimprRectFasqtad;
+    return *lat_p;
+  }
+  if ( (fermion == F_CLASS_ASQTAD) && (gluon == G_CLASS_IMPR_OLSYM ) ) {
+    lat_p = new GimprOLSymFasqtad;
     return *lat_p;
   }
 
@@ -361,8 +369,14 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     lat_p = new GimprRectFnone;
     return *lat_p;
   }
+  if ( (fermion == F_CLASS_NONE) && (gluon == G_CLASS_IMPR_OLSYM ) ) {
+    lat_p = new GimprOLSymFnone;
+    return *lat_p;
+  }
 
-  ERR.General("LatticeFactory","Create()","Lattice type not defined\n");
+  ERR.General("LatticeFactory","Create()",
+	      "Lattice type (fermion = %d, gluon = %d) not defined\n",
+	      fermion, gluon);
 
 }
 char *AlgMeas::Dirname (char *path)

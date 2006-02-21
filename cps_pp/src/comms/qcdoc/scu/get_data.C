@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.10 2005-03-07 00:46:16 chulwoo Exp $
+  $Id: get_data.C,v 1.11 2006-02-21 21:14:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:46:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.10 2005-03-07 00:46:16 chulwoo Exp $
-//  $Id: get_data.C,v 1.10 2005-03-07 00:46:16 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.11 2006-02-21 21:14:07 chulwoo Exp $
+//  $Id: get_data.C,v 1.11 2006-02-21 21:14:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -69,8 +69,8 @@ void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
         ERR.General("","getPlusData","len>MAX_LENGTH(%d)\n",MAX_LENGTH);
     }
     for(i=0;i<len;i++) send_noncache[i] = send_buf[i];
-    SCUDirArg send(send_noncache, gjp_scu_dir[2*mu+1], SCU_SEND, len*sizeof(IFloat));
-    SCUDirArg rcv(rcv_noncache, gjp_scu_dir[2*mu], SCU_REC, len*sizeof(IFloat));
+    SCUDirArgIR send(send_noncache, gjp_scu_dir[2*mu+1], SCU_SEND, len*sizeof(IFloat));
+    SCUDirArgIR rcv(rcv_noncache, gjp_scu_dir[2*mu], SCU_REC, len*sizeof(IFloat));
     send.StartTrans();
     rcv.StartTrans();
     send.TransComplete();
@@ -112,8 +112,8 @@ void getMinusData(IFloat* rcv_buf, IFloat* send_buf, int len, int mu)
         ERR.General("","getMinusData","len>MAX_LENGTH(%d)\n",MAX_LENGTH);
     }
     for(i=0;i<len;i++) send_noncache[i] = send_buf[i];
-    SCUDirArg send(send_noncache, gjp_scu_dir[2*mu], SCU_SEND, len*sizeof(IFloat));
-    SCUDirArg rcv(rcv_noncache, gjp_scu_dir[2*mu+1], SCU_REC, len*sizeof(IFloat));
+    SCUDirArgIR send(send_noncache, gjp_scu_dir[2*mu], SCU_SEND, len*sizeof(IFloat));
+    SCUDirArgIR rcv(rcv_noncache, gjp_scu_dir[2*mu+1], SCU_REC, len*sizeof(IFloat));
     send.StartTrans();
     rcv.StartTrans();
     send.TransComplete();

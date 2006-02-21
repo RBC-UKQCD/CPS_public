@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgPbp class.
   
-  $Id: alg_pbp.C,v 1.12 2005-10-04 05:12:25 chulwoo Exp $
+  $Id: alg_pbp.C,v 1.13 2006-02-21 21:14:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-10-04 05:12:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.12 2005-10-04 05:12:25 chulwoo Exp $
-//  $Id: alg_pbp.C,v 1.12 2005-10-04 05:12:25 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.13 2006-02-21 21:14:07 chulwoo Exp $
+//  $Id: alg_pbp.C,v 1.13 2006-02-21 21:14:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_pbp.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v $
 //  $State: Exp $
 //
@@ -431,7 +431,7 @@ void AlgPbp::run()
     VRB.Smalloc(cname,fname, "alt_sol", alt_sol, f_size * sizeof(Float));
 
     // set source
-    #ifdef POINT
+#ifdef POINT
     bzero((char *)src, f_size*sizeof(Float));
     if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0)
       {
@@ -442,11 +442,11 @@ void AlgPbp::run()
       for(int yy = 0; yy < 6; yy++)
 	if(*(((IFloat *)&src[zz])+yy) > 1e-15)
 	  printf("zz = %d, yy = %d, *(src+zz) = %0.16e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
-    #else
+#else
     lat.RandGaussVector(src, 0.5);
-    #endif
+#endif
 
-  #ifdef Z2
+#ifdef Z2
     IFloat * tmp1;
     for(int zz = 0; zz < GJP.VolNodeSites(); zz++)
       for(int yy = 0; yy < 6; yy+=2)
@@ -465,7 +465,7 @@ void AlgPbp::run()
     //for(int yy = 0; yy < 6; yy++)
     //  printf("%0.16e  ",*(tmp1+yy));
     //printf("\n");
-    #endif
+#endif
 
     // Initialize the cg_arg mass, with the first mass we
     // want to compute for:
@@ -500,11 +500,11 @@ void AlgPbp::run()
 
       // Modified for anisotropic lattices
       // Calculate the pbp normalization factor
-      #ifdef POINT
+#ifdef POINT
       pbp_norm = 1.0;
-      #else
+#else
       pbp_norm = GJP.VolSites() * ( lat.FsiteSize() / 2 );
-      #endif
+#endif
 
       Float norm = src->ReDotProductGlbSum4D(src, f_size) / pbp_norm;
 

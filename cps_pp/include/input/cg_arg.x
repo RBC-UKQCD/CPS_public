@@ -12,6 +12,10 @@ class CgArg {
 
     enum RitzMatType RitzMatOper; /*!< Which operator to determine eigenvalues
 				    of, if any. */
-memfun CgArg();
+    enum InverterType Inverter;     /*!< Which solver to use.*/
+
+    int bicgstab_n;             /* BiCGstab(n) parameter. */
+
+    memfun CgArg();
 };
 

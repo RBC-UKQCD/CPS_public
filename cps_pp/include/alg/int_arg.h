@@ -33,6 +33,7 @@ public:
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
 	ForceMeasure force_measure;
+	char *force_label;
 };
 
 class VML;
@@ -66,6 +67,8 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
+	RationalApproxType approx_type;
+	RationalBoundsType bounds_type;
 	Float lambda_low;
 	Float lambda_high;
 	struct {
@@ -83,8 +86,10 @@ public:
 	FieldType field_type;
 	int power_num;
 	int power_den;
+	long precision;
 	ApproxDescr md_approx;
 	ApproxDescr mc_approx;
+	Float stag_bsn_mass;
 };
 
 class VML;
@@ -109,7 +114,6 @@ public:
 	   void resize (  int nmass ) ;
 	   void resize (  int mass ,  int deg_md ,  int deg_mc ) ;
 	ActionBilinearArg bi_arg;
-	long precision;
 	int remez_generate;
 	char *rat_poles_file;
 	struct {
@@ -191,6 +195,65 @@ public:
 };
 
 class VML;
+class QuotientDescr {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	Float bsn_mass;
+	Float frm_mass;
+	int chrono;
+	Float stop_rsd_hb;
+	Float stop_rsd_md;
+	Float stop_rsd_mc;
+};
+
+class VML;
+class ActionQuotientArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	   void resize (  int nmass ) ;
+	ActionBilinearArg bi_arg;
+	struct {
+		u_int quotients_len;
+		QuotientDescr *quotients_val;
+	} quotients;
+};
+
+class VML;
+class ActionRationalQuotientArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	   void resize (  int nmass ) ;
+	   void resize (  int mass ,  int frm_deg_md ,  int frm_deg_mc ,  int bsn_deg_md ,  int bsn_deg_mc ) ;
+	ActionBilinearArg bi_arg;
+	Float spread;
+	int remez_generate;
+	char *rat_poles_file;
+	struct {
+		u_int bsn_mass_len;
+		Float *bsn_mass_val;
+	} bsn_mass;
+	struct {
+		u_int frm_mass_len;
+		Float *frm_mass_val;
+	} frm_mass;
+	struct {
+		u_int bosons_len;
+		RationalDescr *bosons_val;
+	} bosons;
+	struct {
+		u_int fermions_len;
+		RationalDescr *fermions_val;
+	} fermions;
+	EigenDescr eigen;
+};
+
+class VML;
 class ActionGaugeArg {
 public:
 	 bool Encode(char *filename,char *instance);
@@ -221,6 +284,9 @@ extern  bool_t vml_BosonDescr (VML *, char *instance, BosonDescr*);
 extern  bool_t vml_ActionBosonArg (VML *, char *instance, ActionBosonArg*);
 extern  bool_t vml_FermionDescr (VML *, char *instance, FermionDescr*);
 extern  bool_t vml_ActionFermionArg (VML *, char *instance, ActionFermionArg*);
+extern  bool_t vml_QuotientDescr (VML *, char *instance, QuotientDescr*);
+extern  bool_t vml_ActionQuotientArg (VML *, char *instance, ActionQuotientArg*);
+extern  bool_t vml_ActionRationalQuotientArg (VML *, char *instance, ActionRationalQuotientArg*);
 extern  bool_t vml_ActionGaugeArg (VML *, char *instance, ActionGaugeArg*);
 
 #else /* K&R C */
@@ -238,6 +304,9 @@ extern  bool_t vml_BosonDescr (VML *, char *instance, BosonDescr*);
 extern  bool_t vml_ActionBosonArg (VML *, char *instance, ActionBosonArg*);
 extern  bool_t vml_FermionDescr (VML *, char *instance, FermionDescr*);
 extern  bool_t vml_ActionFermionArg (VML *, char *instance, ActionFermionArg*);
+extern  bool_t vml_QuotientDescr (VML *, char *instance, QuotientDescr*);
+extern  bool_t vml_ActionQuotientArg (VML *, char *instance, ActionQuotientArg*);
+extern  bool_t vml_ActionRationalQuotientArg (VML *, char *instance, ActionRationalQuotientArg*);
 extern  bool_t vml_ActionGaugeArg (VML *, char *instance, ActionGaugeArg*);
 
 #endif /* K&R C */

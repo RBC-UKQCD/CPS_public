@@ -212,6 +212,14 @@ enum FieldType {
 typedef enum FieldType FieldType;
 extern struct vml_enum_map FieldType_map[];
 
+enum RatType {
+	RATIONAL_STANDARD = 0,
+	RATIONAL_QUOTIENT = 1,
+	RATIONAL_SPLIT = 2,
+};
+typedef enum RatType RatType;
+extern struct vml_enum_map RatType_map[];
+
 enum WbaryonFold {
 	BARYON_FOLD = 0,
 	BARYON_RAW = 1,
@@ -553,6 +561,14 @@ enum IntegratorType {
 	INT_LEAP = 0,
 	INT_OMELYAN = 0 + 1,
 	INT_SUM = 0 + 2,
+	INT_MOM = 0 + 3,
+	INT_GAUGE = 0 + 4,
+	INT_FERMION = 0 + 5,
+	INT_BOSON = 0 + 6,
+	INT_QUOTIENT = 0 + 7,
+	INT_RATIONAL = 0 + 8,
+	INT_RATIONAL_SPLIT = 0 + 9,
+	INT_RATIONAL_QUOTIENT = 0 + 10,
 };
 typedef enum IntegratorType IntegratorType;
 extern struct vml_enum_map IntegratorType_map[];
@@ -628,6 +644,27 @@ enum HmdLimits {
 typedef enum HmdLimits HmdLimits;
 extern struct vml_enum_map HmdLimits_map[];
 
+enum InverterType {
+	CG = 0,
+	BICGSTAB = 1,
+};
+typedef enum InverterType InverterType;
+extern struct vml_enum_map InverterType_map[];
+
+enum RationalApproxType {
+	RATIONAL_APPROX_POWER = 0,
+	RATIONAL_APPROX_QUOTIENT = 1,
+};
+typedef enum RationalApproxType RationalApproxType;
+extern struct vml_enum_map RationalApproxType_map[];
+
+enum RationalBoundsType {
+	RATIONAL_BOUNDS_AUTOMATIC = 0,
+	RATIONAL_BOUNDS_MANUAL = 1,
+};
+typedef enum RationalBoundsType RationalBoundsType;
+extern struct vml_enum_map RationalBoundsType_map[];
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -658,6 +695,7 @@ extern  bool_t vml_RatApproxType (VML *, char *instance, RatApproxType*);
 extern  bool_t vml_MultiShiftSolveType (VML *, char *instance, MultiShiftSolveType*);
 extern  bool_t vml_MassRenormaliseDir (VML *, char *instance, MassRenormaliseDir*);
 extern  bool_t vml_FieldType (VML *, char *instance, FieldType*);
+extern  bool_t vml_RatType (VML *, char *instance, RatType*);
 extern  bool_t vml_WbaryonFold (VML *, char *instance, WbaryonFold*);
 extern  bool_t vml_SourceKind (VML *, char *instance, SourceKind*);
 extern  bool_t vml_MomentumKind (VML *, char *instance, MomentumKind*);
@@ -683,6 +721,9 @@ extern  bool_t vml_ForceMeasure (VML *, char *instance, ForceMeasure*);
 extern  bool_t vml_EigenMeasure (VML *, char *instance, EigenMeasure*);
 extern  bool_t vml_RhmcPolesAction (VML *, char *instance, RhmcPolesAction*);
 extern  bool_t vml_HmdLimits (VML *, char *instance, HmdLimits*);
+extern  bool_t vml_InverterType (VML *, char *instance, InverterType*);
+extern  bool_t vml_RationalApproxType (VML *, char *instance, RationalApproxType*);
+extern  bool_t vml_RationalBoundsType (VML *, char *instance, RationalBoundsType*);
 
 #else /* K&R C */
 extern  bool_t vml_pooh (VML *, char *instance, pooh*);
@@ -708,6 +749,7 @@ extern  bool_t vml_RatApproxType (VML *, char *instance, RatApproxType*);
 extern  bool_t vml_MultiShiftSolveType (VML *, char *instance, MultiShiftSolveType*);
 extern  bool_t vml_MassRenormaliseDir (VML *, char *instance, MassRenormaliseDir*);
 extern  bool_t vml_FieldType (VML *, char *instance, FieldType*);
+extern  bool_t vml_RatType (VML *, char *instance, RatType*);
 extern  bool_t vml_WbaryonFold (VML *, char *instance, WbaryonFold*);
 extern  bool_t vml_SourceKind (VML *, char *instance, SourceKind*);
 extern  bool_t vml_MomentumKind (VML *, char *instance, MomentumKind*);
@@ -733,6 +775,9 @@ extern  bool_t vml_ForceMeasure (VML *, char *instance, ForceMeasure*);
 extern  bool_t vml_EigenMeasure (VML *, char *instance, EigenMeasure*);
 extern  bool_t vml_RhmcPolesAction (VML *, char *instance, RhmcPolesAction*);
 extern  bool_t vml_HmdLimits (VML *, char *instance, HmdLimits*);
+extern  bool_t vml_InverterType (VML *, char *instance, InverterType*);
+extern  bool_t vml_RationalApproxType (VML *, char *instance, RationalApproxType*);
+extern  bool_t vml_RationalBoundsType (VML *, char *instance, RationalBoundsType*);
 
 #endif /* K&R C */
 

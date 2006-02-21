@@ -9,6 +9,7 @@ int max_num_iter = 5000
 }
 class ActionArg action_arg = {
 ForceMeasure force_measure = FORCE_MEASURE_YES
+string force_label = "Boson"
 }
 }
 Array bosons[1] = { 

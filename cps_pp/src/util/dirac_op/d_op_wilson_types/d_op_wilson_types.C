@@ -134,7 +134,7 @@ int DiracOpWilsonTypes::RitzLatSize() {
     break;
 
   default:
-    ERR.General(cname,fname,"RitzMatOper %d not implemented",
+    ERR.General(cname,fname,"RitzMatOper %d not implemented\n",
 		dirac_arg->RitzMatOper);
   }
 
@@ -173,7 +173,7 @@ void DiracOpWilsonTypes::RitzMat(Vector *out, Vector *in) {
       break;
       
     default:
-      ERR.General(cname,fname,"RitzMatOper %d not implemented",
+      ERR.General(cname,fname,"RitzMatOper %d not implemented\n",
 		  dirac_arg->RitzMatOper);
     }
 }

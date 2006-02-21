@@ -8,19 +8,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.10 2005-12-02 15:09:24 chulwoo Exp $
+  $Id: enum.x,v 1.11 2006-02-21 21:14:06 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2005-12-02 15:09:24 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.10 2005-12-02 15:09:24 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.10 2005-12-02 15:09:24 chulwoo Exp $*/
+/*  $Date: 2006-02-21 21:14:06 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.11 2006-02-21 21:14:06 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.11 2006-02-21 21:14:06 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.10 $*/
+/*  $Revision: 1.11 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -352,6 +352,15 @@ enum MassRenormaliseDir {
 enum FieldType {
   FERMION,  /*< FERMION - field is of fermion type*/
   BOSON /*< BOSON - field is of boson type*/
+};
+
+/*------------------------------------------------------------------*/
+/*! The type rhmc being done*/
+/*------------------------------------------------------------------*/
+enum RatType {
+  RATIONAL_STANDARD, /*< Standard rhmc, single timescale and single approx */
+  RATIONAL_QUOTIENT, /*< Single timescale with double fermion/boson approximation */
+  RATIONAL_SPLIT /* Multiple timescale with single approx */
 };
 
 enum WbaryonFold {BARYON_FOLD, BARYON_RAW, BARYON_PAST};
@@ -690,17 +699,19 @@ enum PatternType {
   LOG	/*!< Masses are elements of a geometric progression. */
 };
 
-/*! Different types of integrators used by the AlgIntFactory. */
+/*! Different types of integrators and actions. */
 enum IntegratorType {
   INT_LEAP=0,
   INT_OMELYAN,
-  INT_SUM
-/*  INT_MOM,  These are currently not used by the IntegratorFactory
+  INT_SUM,
+  INT_MOM,
   INT_GAUGE,
   INT_FERMION,
   INT_BOSON,
+  INT_QUOTIENT,
   INT_RATIONAL,
-  INT_RATIONAL_SPLIT*/
+  INT_RATIONAL_SPLIT,
+  INT_RATIONAL_QUOTIENT
 };
 
 /*! Define the level of the integrator (used to determine whether a CSM.comment is necesssary. */
@@ -760,3 +771,20 @@ enum HmdLimits {
   MAX_RAT_DEGREE=20 /* The maximum degree of the rational approximation.*/
 }; 
 
+/* Which type of solver to use? */
+enum InverterType {
+  CG = 0,       /* Conjugate Gradients. */
+  BICGSTAB = 1  /* BiCGstab(n). */
+};
+
+/* Which type of approximation to use? */
+enum RationalApproxType {
+  RATIONAL_APPROX_POWER = 0,
+  RATIONAL_APPROX_QUOTIENT = 1
+};
+
+/* Are set automatically (staggered only) or not? */
+enum RationalBoundsType {
+  RATIONAL_BOUNDS_AUTOMATIC = 0,
+  RATIONAL_BOUNDS_MANUAL = 1
+};

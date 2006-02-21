@@ -1,5 +1,6 @@
 #include<config.h>
 CPS_START_NAMESPACE 
+
 //------------------------------------------------------------------
 //
 // alg_hamiltonian.C
@@ -22,7 +23,9 @@ CPS_START_NAMESPACE
 
 AlgHamiltonian::AlgHamiltonian() : AlgInt()
 {
-
+  Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);  
+  g_size = GJP.VolNodeSites() * lat.GsiteSize();
+  LatticeFactory::Destroy();
 }
 
 AlgHamiltonian::~AlgHamiltonian()

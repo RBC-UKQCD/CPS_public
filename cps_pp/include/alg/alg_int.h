@@ -25,6 +25,9 @@ CPS_END_NAMESPACE
 #include <alg/alg_eig.h> 
 CPS_START_NAMESPACE
 
+/*!<
+  The super class for all intgrators.
+*/
 class AlgInt {
 
  private:
@@ -33,6 +36,7 @@ class AlgInt {
  protected:
   //!< the current trajectory number
   int traj;
+  IntegratorType int_type;
 
  public:
   
@@ -59,7 +63,9 @@ class AlgInt {
 
 };
 
-//!< 
+/*!< 
+  The super class for all numerical integrators.
+*/
 class AlgIntAB : public AlgInt {
 
  private:
@@ -98,7 +104,9 @@ class AlgIntAB : public AlgInt {
 
 };
 
-//!< An implementation of a leapfrog integrater
+/*!< 
+  An implementation of the 2nd order leapfrog integrater
+*/
 class AlgIntLeap : public AlgIntAB {
 
 private:
@@ -113,7 +121,9 @@ public:
   
 };
 
-//!< An implementation of the Omelyan integrater
+/*!< 
+  An implementation of the 2nd order Omelyan integrater
+*/
 class AlgIntOmelyan : public AlgIntAB {
 
 private:
@@ -129,8 +139,11 @@ public:
   
 };
 
-//!< Produces the composite integrator of A and B
-//!< If [A,B] != [B,A] then obviously order matters!
+/*!< 
+  Produces the composite integrator of A and B.  If [A,B] != [B,A]
+  then obviously order matters, the first argument passed to the
+  constructor is the first integrator that is called.
+*/
 class AlgIntSum : public AlgIntAB {
 
 private:
@@ -145,7 +158,9 @@ public:
 
 };
 
-//!< Super class of all Hamiltonian constituents
+/*!< 
+  Super class of all Hamiltonian constituents
+*/
 class AlgHamiltonian : public AlgInt {
 
  protected:
@@ -165,7 +180,9 @@ class AlgHamiltonian : public AlgInt {
 
 };
 
-//!< Class describing momentum
+/*!< 
+  Class describing the conjugate momentum contribution to the Hamiltonian.
+*/
 class AlgMomentum : public AlgHamiltonian {
 
  private:
@@ -196,7 +213,9 @@ class AlgMomentum : public AlgHamiltonian {
   void init();
 };
 
-//!< Super class of all possible actions
+/*!< 
+  Super class of all possible actions
+*/
 class AlgAction : public AlgHamiltonian {
 
  private:
@@ -222,7 +241,9 @@ class AlgAction : public AlgHamiltonian {
 
 };
 
-//!< Super class of all possible bilinear actions
+/*!< 
+  Super class of all possible bilinear actions.
+*/
 class AlgActionBilinear : public AlgAction {
 
  private:
@@ -277,13 +298,25 @@ class AlgActionBilinear : public AlgAction {
 
 };
 
-//!< Class describing bilinear action with rational matrix function
+/*!< 
+  Class describing  rational bilinear action
+
+  S = phi^dag r^2 phi
+
+  This class can be used to simulate <4 flavours of staggered fermions
+  or <2 flavours of Wilson fermions.
+*/
 class AlgActionRational : public AlgActionBilinear {
 
  private:
   char *cname;
   int **fractionSplit;
+  int **splitCheck;
   ActionRationalArg *rat_arg;
+
+  //!< This is where the rational parameters are stored
+  RemezArg *remez_arg_md;
+  RemezArg *remez_arg_mc;
 
  protected:
 
@@ -295,10 +328,6 @@ class AlgActionRational : public AlgActionBilinear {
 
   //!< Has the energy been evaluated?
   int energyEval;
-
-  //!< This is where the rational parameters are stored
-  RemezArg *remez_arg_md;
-  RemezArg *remez_arg_mc;
 
   Float h_init;
 
@@ -344,20 +373,37 @@ class AlgActionRational : public AlgActionBilinear {
   Float **lambda_high;
   //!< Used to store calculated eigenvalue bounds
 
-  void massRenormalise(Float *mass, Float *trueMass, int degree, 
-		       Float *shift, MassRenormaliseDir direction);
-  //!< Renormalise the mass (staggeredoptimisation)
-
-  void generateApprox();
   //!< Automatic generation of the rational approximation.
-
-  void checkApprox();
-  //!< Check that the approximation is still valid
+  void generateApprox(Float *mass, RemezArg **remez_arg_md, 
+		      RemezArg **remez_arg_mc, RationalDescr *rat);
   
+  //<! Free approximations
+  void destroyApprox(RemezArg *remez_arg_md, RemezArg *remez_arg_mc);
+  
+  //!< Allocate and setup cg arguments
+  void generateCgArg(Float *mass, CgArg ****cg_arg_md, 
+		     CgArg ****cg_arg_mc, char *label, 
+		     RationalDescr *rat_des);
+
+  //<! Free cg args
+  void destroyCgArg(CgArg ***cg_arg_md, CgArg ***cg_arg_mc,
+		    char *label, RemezArg *remez_arg_md,
+		    RemezArg *remez_arg_mc);
+
+  //!< Automatic generation of required EigArg
+  void generateEigArg(EigenDescr eigen);
+
+  //!< Free EigArg
+  void destroyEigArg();
+
+  void checkApprox(Float *mass, RemezArg *remez_arg, EigenDescr eigen);
+  //!< Check that the approximation is still valid
+
  public:
 
   AlgActionRational();
   AlgActionRational(AlgMomentum &mom, ActionRationalArg &rat_arg, int traj_num=0);
+  AlgActionRational(AlgMomentum &mom, ActionBilinearArg &bi_arg);
   virtual ~AlgActionRational();
 
   void heatbath();
@@ -373,10 +419,17 @@ class AlgActionRational : public AlgActionBilinear {
 
   void init(int traj_num);
 
+  void setSplit(int i, int j);
+  //!< Set mass i, pole j as included
+  void checkSplit();
+  //!< Check that all the partial fractions have been accounted for
+  
 };
 
-//!< Derived from AlgActionRational - allows independent evolution of
-//!< partial fractions.
+/*!< 
+  Derived from AlgActionRational, this class allows independent
+  evolution of partial fractions.that appear in the rational action.
+*/
 class AlgActionRationalSplit : public AlgActionRational {
 
  private:
@@ -403,7 +456,11 @@ class AlgActionRationalSplit : public AlgActionRational {
   void cost(CgStats*);
 };
 
-//!< Class describing bosonic bilinear action
+/*!< 
+  Class describing bosonic bilinear action.  Action is given by
+  
+  S = phi^dag (M_b^dag M_b) phi
+*/
 class AlgActionBoson : public AlgActionBilinear {
 
  private:
@@ -426,7 +483,14 @@ class AlgActionBoson : public AlgActionBilinear {
 
 };
 
-//!< Class describing fermionic bilinear action
+/*!< 
+  Class describing fermionic bilinear action
+
+  S = phi^dag (M_f^dag M_f)^{-1} phi
+
+  Note that a chronological inverter can be used to accelerate the
+  inversion process.
+*/
 class AlgActionFermion : public AlgActionBilinear {
 
  private:
@@ -467,7 +531,120 @@ class AlgActionFermion : public AlgActionBilinear {
   void init();
 };
 
-//!< Class describing pure gauge action
+/*!< 
+  This class is designed for simulating two flavours of domain wall
+  fermion, where the action we wish to include is the given by both a
+  bosonic and fermionic determinant.  The action is given by
+
+  S = phi^dag M_b (M_f^dag M_f)^{-1} M_b^dag phi
+
+  This class can also be used for the Hasenbusch trick for other
+  fermion types.
+*/
+class AlgActionQuotient : public AlgActionBilinear {
+
+ private:
+  char *cname;
+
+  ActionQuotientArg *quo_arg;
+
+  CgArg **bsn_cg_arg;   //!< Pointer to an array of solver parameters.
+  CgArg **frm_cg_arg_md;   //!< Pointer to an array of solver parameters.
+  CgArg **frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
+
+  Float *bsn_mass;  //!< The boson mass parameter that appears in the quotient
+  Float *frm_mass;  //!< The fermion mass parameter that appears in the quotient
+
+  int evolved;
+  Float h_init;
+
+  //!< Stores the history of cg solutions - used by chronological inversion
+  Vector ***v;
+  Vector ***cg_sol_old;
+  Vector *cg_sol;
+  Vector *tmp1;
+  Vector *tmp2;
+
+  //!< Stores the orthogonalised vectors multiplied by MatPcDagMatPc
+  //!< These currently live in AlgActionQuotient for a future
+  //!< optimisation (chronological preconditioner)
+  Vector ***vm;
+
+  int *chrono;
+
+ public:
+
+  AlgActionQuotient(AlgMomentum &mom, ActionQuotientArg &frm_arg);
+  virtual ~AlgActionQuotient();
+  
+  void heatbath();
+
+  Float energy();
+
+  //!< evolve method evolves the integrator
+  void evolve(Float dt, int steps);
+
+  void init();
+};
+
+/*!< 
+  This class is designed for simulating a single flavour of domain
+  wall fermion, the action we wish to include is the squareroot of
+  both a bosonic and fermionic determinant.  The action is given by
+
+  S = phi^dag r_b r_f^2 r_b phi
+
+  where r_b is the bosonic rational function and r_f is the fermionic
+  rational function.
+*/
+class AlgActionRationalQuotient : public AlgActionRational {
+
+ private:
+  char *cname;
+  int **fractionSplit;
+  ActionRationalQuotientArg *rat_quo_arg;
+
+ protected:
+
+  Float *bsn_mass;  //!< The boson mass parameter that appears in the quotient
+  Float *frm_mass;  //!< The fermion mass parameter that appears in the quotient
+  //!< This is where the rational parameters are stored
+  RemezArg *frm_remez_arg_md;
+  RemezArg *frm_remez_arg_mc;
+  RemezArg *bsn_remez_arg_md;
+  RemezArg *bsn_remez_arg_mc;
+
+  CgArg ***bsn_cg_arg_md;
+  CgArg ***bsn_cg_arg_mc;
+  //!< Pointer to an array of structures containing solver parameters.
+  /*!<
+    These are the parameters corresponding to each of the dynamical fermion
+    masses.      
+  */
+
+  Vector **eta; //!< Use to accumulate solver results
+
+ public:
+
+  AlgActionRationalQuotient();
+  AlgActionRationalQuotient(AlgMomentum &mom, 
+			    ActionRationalQuotientArg &rat_quo_arg, int traj_num=0);
+  virtual ~AlgActionRationalQuotient();
+
+  void heatbath();
+  Float energy();
+
+  //!< evolve method evolves the integrator
+  void evolve(Float dt, int steps);
+  //!< evolve method relevant to split timescales
+  void evolve(Float dt, int steps, int **fractionSplit);
+
+};
+
+/*!< 
+  Class describing the pure gauge action contribution to the
+  Hamiltonian.
+*/
 class AlgActionGauge : public AlgAction {
 
  private:

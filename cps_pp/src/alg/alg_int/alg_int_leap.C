@@ -31,6 +31,7 @@ CPS_START_NAMESPACE
 AlgIntLeap::AlgIntLeap(AlgInt &a, AlgInt &b, IntABArg &ab_arg) 
   : AlgIntAB(a,b,ab_arg)
 {
+  int_type = INT_LEAP;
   A_calls = 2;
   B_calls = 1;
 }

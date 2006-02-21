@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.12 2005-09-06 21:35:25 chulwoo Exp $
+  $Id: convert_func.C,v 1.13 2006-02-21 21:14:10 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 21:35:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.12 2005-09-06 21:35:25 chulwoo Exp $
-//  $Id: convert_func.C,v 1.12 2005-09-06 21:35:25 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.13 2006-02-21 21:14:10 chulwoo Exp $
+//  $Id: convert_func.C,v 1.13 2006-02-21 21:14:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -121,11 +121,17 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 //-------------------------------------------------------------------------
 // cram1, cram2 should be in CRAM
 //-------------------------------------------------------------------------
+  const int GSIZE= 72;
+  if (cap->site_size>GSIZE)
+  ERR.General("",fname,"cap->site_size(%d)>GSIZE\n",cap->site_size,GSIZE);
+  Float cram1_stack[GSIZE], cram2_stack[GSIZE];
+  cram1 = cram1_stack;
+  cram2 = cram2_stack;
 
 //	cram1 = (Float *) qalloc(0,cap->site_size*sizeof(Float)) ;
-	cram1 = (Float *) smalloc(cname_none,fname,"cram1",cap->site_size*sizeof(Float)) ;
+//	cram1 = (Float *) fmalloc(cname_none,fname,"cram1",cap->site_size*sizeof(Float)) ;
 //	cram2 = (Float *) qalloc(0,cap->site_size*sizeof(Float)) ;
-	cram2 = (Float *) smalloc(cname_none,fname,"cram2",cap->site_size*sizeof(Float)) ;
+//	cram2 = (Float *) fmalloc(cname_none,fname,"cram2",cap->site_size*sizeof(Float)) ;
 
 
 	for (low=0; low<cap->vol; low++) {
@@ -168,8 +174,8 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 		}
 	}
 
-	sfree(cname_none,fname, "cram2", cram2);
-	sfree(cname_none,fname, "cram1", cram1);
+//	sfree(cname_none,fname, "cram2", cram2);
+//	sfree(cname_none,fname, "cram1", cram1);
 }
 
 void CanonToAnything(CAP cap, StrOrdType new_str_ord)
@@ -198,8 +204,9 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 			  
 			  for(int i = 0; i < n_links; ++i) {
 			    mp2->Dagger((IFloat *)p+BANK4_BASE+BANK_SIZE);
-			    moveMem((IFloat *)(p++), (IFloat *)mp2,
-				    18*sizeof(IFloat));
+//			    moveMem((IFloat *)(p++), (IFloat *)mp2,
+//				    18*sizeof(IFloat));
+			    moveFloat((IFloat *)(p++), (IFloat *)mp2, 18);
 			  }
 			}
 
@@ -223,18 +230,17 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 			  
 			  for(int i = 0; i < n_links; ++i) {
 			    mp2->Dagger((IFloat *)p+BANK4_BASE+BANK_SIZE);
-			    moveMem((IFloat *)(p++), (IFloat *)mp2,
-				    18*sizeof(IFloat));
+//			    moveMem((IFloat *)(p++), (IFloat *)mp2,
+//				    18*sizeof(IFloat));
+			    moveFloat((IFloat *)(p++), (IFloat *)mp2, 18);
 			  }
 			}
 			
 			//Copy the links into tmp_gauge into STAG_BLOCK ordering
 			//Then, copy tmp_gauge back to GaugeField()
 
-			Matrix * tmp_gauge = (Matrix *)smalloc(cap->vol*4*sizeof(Matrix));
-			if(tmp_gauge == 0)
-			  ERR.Pointer(cname_none,fname,"tmp_gauge");
-			VRB.Smalloc(cname_none,fname,"tmp_gauge",tmp_gauge,cap->vol*4*sizeof(Matrix));
+			Matrix * tmp_gauge = (Matrix *)
+			fmalloc(cname_none,fname,"tmp_gauge",cap->vol*4*sizeof(Matrix));
 
 			int x[4];
 			int mu,current,new_index;
@@ -246,11 +252,12 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 				  {
  				    new_index = cap->vol*mu+(x[3]+cap->lt*(x[0]+cap->lx*(x[1]+cap->ly*x[2])))/2 + ((x[3]+x[2]+x[1]+x[0])%2)*cap->vol/2;
 				    current = 4*(x[0]+cap->lx*(x[1]+cap->ly*(x[2]+cap->lz*x[3])))+mu;
-				    moveMem(tmp_gauge+new_index,cap->start_ptr+18*current,sizeof(Matrix));
+//				    moveMem(tmp_gauge+new_index,cap->start_ptr+18*current,sizeof(Matrix));
+				    moveFloat((Float*)(tmp_gauge+new_index),(Float*)(cap->start_ptr+18*current),18);
 				  }
-			moveMem(cap->start_ptr,tmp_gauge,cap->vol*4*sizeof(Matrix));
-			VRB.Sfree(cname_none,fname, "tmp_gauge", tmp_gauge);
-			sfree(tmp_gauge);
+//			moveMem(cap->start_ptr,tmp_gauge,cap->vol*4*sizeof(Matrix));
+			moveFloat((Float*)cap->start_ptr,(Float*)tmp_gauge,cap->vol*4*18);
+			sfree(cname_none,fname, "tmp_gauge", tmp_gauge);
 		  }
 
 			break ;
@@ -268,11 +275,8 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 				"CANONICAL -> G_WILSON_HB\n");
 
 			site_sort_tbl = (unsigned *)
-				smalloc(cap->vol*sizeof(unsigned)) ;
-			if(site_sort_tbl == 0)
-			  ERR.Pointer(cname_none,fname, "site_sort_tbl"); 
-			VRB.Smalloc(cname_none,fname,
-				    "site_sort_tbl" , site_sort_tbl,
+			fmalloc(cname_none,fname,
+				    "site_sort_tbl" , 
 				    cap->vol*sizeof(unsigned)) ;
 
 
@@ -307,11 +311,8 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 			}
 
 			link_sort_tbl = (unsigned *)
-				smalloc(cap->site_size*sizeof(unsigned)) ;
-			if(link_sort_tbl == 0)
-			  ERR.Pointer(cname_none,fname, "link_sort_tbl"); 
-			VRB.Smalloc(cname_none,fname,
-				    "link_sort_tbl" , link_sort_tbl,
+			fmalloc(cname_none,fname,
+				    "link_sort_tbl" , 
 				    cap->site_size*sizeof(unsigned)) ;
 
 //-------------------------------------------------------------------------
@@ -364,11 +365,9 @@ void FcanonToWilson(CAP cap, int num_chkbds)
 	unsigned *site_sort_tbl ;
 	unsigned *component_sort_tbl ;
 
-	site_sort_tbl = (unsigned *) smalloc(cap->vol * sizeof(unsigned)) ;
-	if(site_sort_tbl == 0)
-	  ERR.Pointer(cname_none,fname, "site_sort_tbl"); 
-	VRB.Smalloc(cname_none,fname,
-		    "site_sort_tbl" , site_sort_tbl,
+	site_sort_tbl = (unsigned *) 
+	fmalloc(cname_none,fname,
+		    "site_sort_tbl" , 
 		    cap->vol * sizeof(unsigned)) ;
 
 //-------------------------------------------------------------------------
@@ -376,11 +375,9 @@ void FcanonToWilson(CAP cap, int num_chkbds)
 //-------------------------------------------------------------------------
 
 	component_sort_tbl = 
-		(unsigned *) smalloc(cap->site_size * sizeof(unsigned));
-	if(component_sort_tbl == 0)
-	  ERR.Pointer(cname_none,fname, "component_sort_tbl"); 
-	VRB.Smalloc(cname_none,fname,
-		    "component_sort_tbl" , component_sort_tbl,
+		(unsigned *) 
+	fmalloc(cname_none,fname,
+		    "component_sort_tbl" , 
 		    cap->site_size * sizeof(unsigned));
 
 //-------------------------------------------------------------------------
@@ -440,23 +437,17 @@ void FwilsonToCanon(CAP cap, int num_chkbds)
 	unsigned *site_sort_tbl ;
 	unsigned *component_sort_tbl ;
 
-	site_sort_tbl = (unsigned *) smalloc(cap->vol * sizeof(unsigned)) ;
-	if(site_sort_tbl == 0)
-	  ERR.Pointer(cname_none,fname, "site_sort_tbl"); 
-	VRB.Smalloc(cname_none,fname,
-		    "site_sort_tbl" , site_sort_tbl,
+	site_sort_tbl = (unsigned *) 
+	fmalloc(cname_none,fname,
+		    "site_sort_tbl" , 
 		    cap->vol * sizeof(unsigned)) ;
 
 //-------------------------------------------------------------------------
 // component_sort_tbl should be in CRAM
 //-------------------------------------------------------------------------
 
-	component_sort_tbl = 
-		(unsigned *) smalloc(cap->site_size * sizeof(unsigned));
-	if(component_sort_tbl == 0)
-	  ERR.Pointer(cname_none,fname, "component_sort_tbl"); 
-	VRB.Smalloc(cname_none,fname,
-		    "component_sort_tbl" , component_sort_tbl,
+	component_sort_tbl = (unsigned *)
+	fmalloc(cname_none,fname, "component_sort_tbl" , 
 		    cap->site_size * sizeof(unsigned));
 
 //-------------------------------------------------------------------------
@@ -516,11 +507,9 @@ void FcanonToStag(CAP cap, int num_chkbds)
         unsigned *site_sort_tbl ;
         unsigned *component_sort_tbl ;
 
-        site_sort_tbl = (unsigned *) smalloc(cap->vol * sizeof(unsigned)) ;
-        if(site_sort_tbl == 0)
-          ERR.Pointer(cname_none,fname, "site_sort_tbl");
-        VRB.Smalloc(cname_none,fname,
-                    "site_sort_tbl" , site_sort_tbl,
+        site_sort_tbl = (unsigned *) 
+        fmalloc(cname_none,fname,
+                    "site_sort_tbl" , 
                     cap->vol * sizeof(unsigned)) ;
 
 //-------------------------------------------------------------------------
@@ -528,11 +517,9 @@ void FcanonToStag(CAP cap, int num_chkbds)
 //-------------------------------------------------------------------------
 
         component_sort_tbl =
-                (unsigned *) smalloc(cap->site_size * sizeof(unsigned));
-        if(component_sort_tbl == 0)
-          ERR.Pointer(cname_none,fname, "component_sort_tbl");
-        VRB.Smalloc(cname_none,fname,
-                    "component_sort_tbl" , component_sort_tbl,
+                (unsigned *) 
+        fmalloc(cname_none,fname,
+                    "component_sort_tbl" , 
                     cap->site_size * sizeof(unsigned));
 
 //-------------------------------------------------------------------------
@@ -602,11 +589,9 @@ void FstagToCanon(CAP cap, int num_chkbds)
         unsigned *site_sort_tbl ;
         unsigned *component_sort_tbl ;
 
-        site_sort_tbl = (unsigned *) smalloc(cap->vol * sizeof(unsigned)) ;
-        if(site_sort_tbl == 0)
-          ERR.Pointer(cname_none,fname, "site_sort_tbl");
-        VRB.Smalloc(cname_none,fname,
-                    "site_sort_tbl" , site_sort_tbl,
+        site_sort_tbl = (unsigned *) 
+        fmalloc(cname_none,fname,
+                    "site_sort_tbl" , 
                     cap->vol * sizeof(unsigned)) ;
 
 //-------------------------------------------------------------------------
@@ -614,11 +599,9 @@ void FstagToCanon(CAP cap, int num_chkbds)
 //-------------------------------------------------------------------------
 
         component_sort_tbl =
-                (unsigned *) smalloc(cap->site_size * sizeof(unsigned));
-        if(component_sort_tbl == 0)
-          ERR.Pointer(cname_none,fname, "component_sort_tbl");
-        VRB.Smalloc(cname_none,fname,
-                    "component_sort_tbl" , component_sort_tbl,
+                (unsigned *) 
+        fmalloc(cname_none,fname,
+                    "component_sort_tbl" , 
                     cap->site_size * sizeof(unsigned));
 
 //-------------------------------------------------------------------------

@@ -1,13 +1,11 @@
 <class><name>EvoArg</name><instance>evo_arg</instance><data>
-<item><name>Fermion</name><value><FclassType>F_CLASS_NONE </FclassType></value></item>
-<item><name>Gluon</name><value><GclassType>G_CLASS_NONE </GclassType></value></item>
 <item><name>traj_start</name><value><int>0</int></value></item>
 <item><name>gauge_unload_period</name><value><int>0</int></value></item>
 <item><name>gauge_configurations</name><value><int>0</int></value></item>
 <item><name>io_concurrency</name><value><int>0</int></value></item>
 <item><name>hdw_xcsum</name><value><int>0</int></value></item>
 <item><name>hdw_rcsum</name><value><int>0</int></value></item>
-<item><name>reproduce_percent</name><value><int>0</int></value></item>
+<item><name>reproduce_interval</name><value><int>0</int></value></item>
 <item><name>ensemble_id</name><value><string>id </string></value></item>
 <item><name>ensemble_label</name><value><string>label </string></value></item>
 <item><name>creator</name><value><string>creator </string></value></item>
@@ -16,8 +14,8 @@
 <item><name>plaquette_stem</name><value><string>plaq </string></value></item>
 <item><name>pbp_stem</name><value><string> </string></value></item>
 <item><name>evo_stem</name><value><string>hmd </string></value></item>
+<item><name>w_spect_directory</name><value><string> </string></value></item>
 <item><name>work_directory</name><value><string> </string></value></item>
-<item><name>CalcEig</name><value><int>0</int></value></item>
-<item><name>eig_lo_stem</name><value><string> </string></value></item>
-<item><name>eig_hi_stem</name><value><string> </string></value></item>
+<item><name>measure_pbp</name><value><int>0</int></value></item>
+<item><name>measure_w_spect</name><value><int>0</int></value></item>
 </data></class>

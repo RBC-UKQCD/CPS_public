@@ -27,7 +27,7 @@ AlgAction::AlgAction(AlgMomentum &momentum, ActionArg &action_arg)
   char *fname = "AlgAction(AlgMomentum&,ActionArg&)";
   mom = momentum.getMom();
   force_measure = action_arg.force_measure;
-
+  force_label = action_arg.force_label;
 }
 
 AlgAction::AlgAction() : AlgHamiltonian()

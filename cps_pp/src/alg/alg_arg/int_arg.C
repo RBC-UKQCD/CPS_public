@@ -70,6 +70,8 @@ vml_ActionArg (VML *vmls, char *name,ActionArg *objp)
 	 vml_class_begin(vmls,"ActionArg",name);
 	 if (!vml_ForceMeasure (vmls, "force_measure", &objp->force_measure))
 		 return FALSE;
+	 if (!vml_string (vmls, "force_label", &objp->force_label, ~0))
+		 return FALSE;
 	 vml_class_end(vmls,"ActionArg",name);
 	return TRUE;
 }
@@ -165,6 +167,10 @@ vml_ApproxDescr (VML *vmls, char *name,ApproxDescr *objp)
 	register int32_t *buf;
 
 	 vml_class_begin(vmls,"ApproxDescr",name);
+	 if (!vml_RationalApproxType (vmls, "approx_type", &objp->approx_type))
+		 return FALSE;
+	 if (!vml_RationalBoundsType (vmls, "bounds_type", &objp->bounds_type))
+		 return FALSE;
 	 if (!vml_Float (vmls, "lambda_low", &objp->lambda_low))
 		 return FALSE;
 	 if (!vml_Float (vmls, "lambda_high", &objp->lambda_high))
@@ -206,9 +212,13 @@ vml_RationalDescr (VML *vmls, char *name,RationalDescr *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "power_den", &objp->power_den))
 		 return FALSE;
+	 if (!vml_long (vmls, "precision", &objp->precision))
+		 return FALSE;
 	 if (!vml_ApproxDescr (vmls, "md_approx", &objp->md_approx))
 		 return FALSE;
 	 if (!vml_ApproxDescr (vmls, "mc_approx", &objp->mc_approx))
+		 return FALSE;
+	 if (!vml_Float (vmls, "stag_bsn_mass", &objp->stag_bsn_mass))
 		 return FALSE;
 	 vml_class_end(vmls,"RationalDescr",name);
 	return TRUE;
@@ -277,8 +287,6 @@ vml_ActionRationalArg (VML *vmls, char *name,ActionRationalArg *objp)
 
 	 vml_class_begin(vmls,"ActionRationalArg",name);
 	 if (!vml_ActionBilinearArg (vmls, "bi_arg", &objp->bi_arg))
-		 return FALSE;
-	 if (!vml_long (vmls, "precision", &objp->precision))
 		 return FALSE;
 	 if (!vml_int (vmls, "remez_generate", &objp->remez_generate))
 		 return FALSE;
@@ -483,6 +491,129 @@ vml_ActionFermionArg (VML *vmls, char *name,ActionFermionArg *objp)
 		sizeof (FermionDescr), (vmlproc_t) vml_FermionDescr))
 		 return FALSE;
 	 vml_class_end(vmls,"ActionFermionArg",name);
+	return TRUE;
+}
+	 bool QuotientDescr::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool QuotientDescr::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool QuotientDescr::Vml(VML *vmls,char *instance){
+		 if(!vml_QuotientDescr(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_QuotientDescr (VML *vmls, char *name,QuotientDescr *objp)
+{
+	register int32_t *buf;
+
+	 vml_class_begin(vmls,"QuotientDescr",name);
+	 if (!vml_Float (vmls, "bsn_mass", &objp->bsn_mass))
+		 return FALSE;
+	 if (!vml_Float (vmls, "frm_mass", &objp->frm_mass))
+		 return FALSE;
+	 if (!vml_int (vmls, "chrono", &objp->chrono))
+		 return FALSE;
+	 if (!vml_Float (vmls, "stop_rsd_hb", &objp->stop_rsd_hb))
+		 return FALSE;
+	 if (!vml_Float (vmls, "stop_rsd_md", &objp->stop_rsd_md))
+		 return FALSE;
+	 if (!vml_Float (vmls, "stop_rsd_mc", &objp->stop_rsd_mc))
+		 return FALSE;
+	 vml_class_end(vmls,"QuotientDescr",name);
+	return TRUE;
+}
+	 bool ActionQuotientArg::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool ActionQuotientArg::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool ActionQuotientArg::Vml(VML *vmls,char *instance){
+		 if(!vml_ActionQuotientArg(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_ActionQuotientArg (VML *vmls, char *name,ActionQuotientArg *objp)
+{
+	register int32_t *buf;
+
+	 vml_class_begin(vmls,"ActionQuotientArg",name);
+	 if (!vml_ActionBilinearArg (vmls, "bi_arg", &objp->bi_arg))
+		 return FALSE;
+	 if (!vml_array (vmls, "quotients", (char **)&objp->quotients.quotients_val, (u_int *) &objp->quotients.quotients_len, ~0,
+		sizeof (QuotientDescr), (vmlproc_t) vml_QuotientDescr))
+		 return FALSE;
+	 vml_class_end(vmls,"ActionQuotientArg",name);
+	return TRUE;
+}
+	 bool ActionRationalQuotientArg::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool ActionRationalQuotientArg::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool ActionRationalQuotientArg::Vml(VML *vmls,char *instance){
+		 if(!vml_ActionRationalQuotientArg(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_ActionRationalQuotientArg (VML *vmls, char *name,ActionRationalQuotientArg *objp)
+{
+	register int32_t *buf;
+
+	 vml_class_begin(vmls,"ActionRationalQuotientArg",name);
+	 if (!vml_ActionBilinearArg (vmls, "bi_arg", &objp->bi_arg))
+		 return FALSE;
+	 if (!vml_Float (vmls, "spread", &objp->spread))
+		 return FALSE;
+	 if (!vml_int (vmls, "remez_generate", &objp->remez_generate))
+		 return FALSE;
+	 if (!vml_string (vmls, "rat_poles_file", &objp->rat_poles_file, ~0))
+		 return FALSE;
+	 if (!vml_array (vmls, "bsn_mass", (char **)&objp->bsn_mass.bsn_mass_val, (u_int *) &objp->bsn_mass.bsn_mass_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "frm_mass", (char **)&objp->frm_mass.frm_mass_val, (u_int *) &objp->frm_mass.frm_mass_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "bosons", (char **)&objp->bosons.bosons_val, (u_int *) &objp->bosons.bosons_len, ~0,
+		sizeof (RationalDescr), (vmlproc_t) vml_RationalDescr))
+		 return FALSE;
+	 if (!vml_array (vmls, "fermions", (char **)&objp->fermions.fermions_val, (u_int *) &objp->fermions.fermions_len, ~0,
+		sizeof (RationalDescr), (vmlproc_t) vml_RationalDescr))
+		 return FALSE;
+	 if (!vml_EigenDescr (vmls, "eigen", &objp->eigen))
+		 return FALSE;
+	 vml_class_end(vmls,"ActionRationalQuotientArg",name);
 	return TRUE;
 }
 	 bool ActionGaugeArg::Encode(char *filename,char *instance){

@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.18 2006-02-20 22:20:51 chulwoo Exp $
+  $Id: dirac_op.h,v 1.19 2006-02-21 21:14:06 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -845,6 +845,8 @@ class DiracOpWilsonTypes : public DiracOp
   //! Multiplication by the square of the fermion matrix.
   virtual void MatDagMat(Vector *out, Vector *in);
 
+  virtual void MatPc(Vector *out, Vector *in) = 0;
+
   virtual int RitzEig(Vector **eigenv, Float lambda[], int valid_eig[], 
 		      EigArg *eig_arg);
      // The eigenvector solver using Ritz minimization and Jacobi reconstruction
@@ -869,6 +871,23 @@ class DiracOpWilsonTypes : public DiracOp
      // RitzLatSize returns the size of a fermion on a node
      // It uses the RitzMatType flag to determine the operator
      // to use and relevant checkerboard sizes.
+
+  //! The matrix inversion used in to solve M out = in
+  int BiCGstab(Vector *out,
+	       Vector *in,
+	       Float src_norm_sq,
+	       int n,
+	       Float *true_res);
+     // The Conjugate Gradient inverter. 
+     // Source is *in, initial guess and solution is *out.
+     // src_norm_sq is the norm of the source squared 
+     // (dot product of source * source). If src_norm_sq=0 
+     // it is calculated inside InvCg. 
+     // n determines which BiCGstab(n) algorithm we do
+     // If true_res !=0 the value of the true residual is returned
+     // in true_res.
+     // *true_res = |src - MatPcDagMatPc * sol| / |src|
+
 };
 
 
@@ -974,6 +993,7 @@ class DiracOpWilson : public DiracOpWilsonTypes
     // CANONICAL fermion vectors with conversion enabled to the
     // constructor.  Using chi, the function fills these vectors;
     // the result may be used to compute the HMD fermion force.
+
 };
 
 

@@ -33,6 +33,7 @@ AlgIntOmelyan::AlgIntOmelyan(AlgInt &A, AlgInt &B,
   : AlgIntAB(A,B,arg_ab)
 {
 
+  int_type = INT_OMELYAN;
   A_calls = 3;
   B_calls = 2;
   lambda = ab_arg->lambda;

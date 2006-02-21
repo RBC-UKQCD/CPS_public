@@ -24,7 +24,7 @@
 <item><name>g_center[2]</name><value><int>0</int></value></item>
 <item><name>g_center[3]</name><value><int>0</int></value></item>
 </data></Vector>
-<item><name>rescale_factor</name><value><double>0.000000e+00</double></value></item>
+<item><name>rescale_factor</name><value><double>1.000000e+00</double></value></item>
 <item><name>aots_num</name><value><int>0</int></value></item>
 <item><name>aots_start</name><value><int>0</int></value></item>
 <item><name>aots_step</name><value><int>0</int></value></item>

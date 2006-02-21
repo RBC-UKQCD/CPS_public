@@ -21,8 +21,8 @@ Float GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
   char *fname = "EvolveMomGforce(M*,F)";  //Name of our function
   VRB.Func(cname,fname);                  //Sets name of function
 
-
   Float Fdt = 0.0;
+
   static Matrix mt0;
   static Matrix *mp0 = &mt0;
 

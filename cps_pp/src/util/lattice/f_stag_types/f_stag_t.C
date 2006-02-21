@@ -169,6 +169,27 @@ int FstagTypes::FsiteOffset(const int *x) const{
 }
 
 
+/*!< Renormalise the smallest shift into the mass parameters - reduces
+  linear algebra in the multi-mass solver.  This optimisation only
+  works for staggered type fermions.*/
+void FstagTypes::massRenormalise(Float *mass, Float *trueMass, 
+				 int degree, Float *shift, 
+				 MassRenormaliseDir direction) 
+{
+
+  if (direction == RENORM_FORWARDS) {
+    *trueMass = *mass;
+    *mass = sqrt((*trueMass)*(*trueMass) + shift[0]/4.0);
+    Float zeroPole = shift[0];
+    for (int j=0; j<degree; j++) shift[j] -= zeroPole;
+  } else if (direction == RENORM_BACKWARDS) {
+    Float zeroPole = 4.0*((*mass)*(*mass) - (*trueMass)*(*trueMass));
+    for (int j=0; j<degree; j++) shift[j] += zeroPole;
+    *mass = *trueMass;
+  }
+
+}
+
 //------------------------------------------------------------------
 // Destructor
 //------------------------------------------------------------------

@@ -26,6 +26,8 @@ AlgActionBoson::AlgActionBoson(AlgMomentum &mom, ActionBosonArg &b_arg)
 
   cname = "AlgActionBoson";
   char *fname = "AlgActionBoson()";
+
+  int_type = INT_BOSON;
   bsn_arg = &b_arg;
 
   //!< First check n_masses bilinear = n_masses boson
@@ -36,11 +38,11 @@ AlgActionBoson::AlgActionBoson(AlgMomentum &mom, ActionBosonArg &b_arg)
   if(n_masses > 0){
     //!< Allocate memory for the boson CG arguments.
     bsn_cg_arg = (CgArg **) smalloc(n_masses * sizeof(CgArg*), 
-				    cname, fname, "bsn_cg_arg");
+				    "bsn_cg_arg", fname, cname);
     
     for(int i=0; i<n_masses; i++){
       bsn_cg_arg[i] = (CgArg *) 
-	smalloc(sizeof(CgArg), cname, fname, "bsn_cg_arg[i]");
+	smalloc(sizeof(CgArg), "bsn_cg_arg[i]", fname, cname);
     } 
 
     //!< Initialize the boson CG arguments
@@ -61,9 +63,9 @@ AlgActionBoson::~AlgActionBoson() {
   //!< Free memory for the boson CG arguments
   if(n_masses > 0){
     for(int i=0; i<n_masses; i++) {
-      sfree(bsn_cg_arg[i], cname,fname, "bsn_cg_arg[i]");
+      sfree(bsn_cg_arg[i], "bsn_cg_arg[i]", fname, cname);
     }
-    sfree(bsn_cg_arg, cname,fname, "bsn_cg_arg");
+    sfree(bsn_cg_arg, "bsn_cg_arg", fname, cname);
   }
 
 }
@@ -76,8 +78,8 @@ void AlgActionBoson::heatbath() {
   if (n_masses > 0) {
     Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
     
-    Vector *tmp1 = (Vector*)smalloc(f_size*sizeof(Float),cname,fname,"tmp1");
-    Vector *tmp2 = (Vector*)smalloc(f_size*sizeof(Float),cname,fname,"tmp2");
+    Vector *tmp1 = (Vector*)smalloc(f_size*sizeof(Float),"tmp1",fname,cname);
+    Vector *tmp2 = (Vector*)smalloc(f_size*sizeof(Float),"tmp2",cname,fname);
     
     for(int i=0; i<n_masses; i++){
       lat.RandGaussVector(tmp1, 0.5, Ncb);
@@ -89,8 +91,8 @@ void AlgActionBoson::heatbath() {
       updateCgStats(bsn_cg_arg[i]);
     }
     
-    sfree(tmp2, cname, fname, "tmp2");
-    sfree(tmp1, cname, fname, "tmp1");
+    sfree(tmp2, "tmp2", cname, fname);
+    sfree(tmp1, "tmp1", cname, fname);
     
     LatticeFactory::Destroy();
 
@@ -134,8 +136,9 @@ void AlgActionBoson::evolve(Float dt, int nsteps)
 	Fdt = lat.EvolveMomFforce(mom, phi[i], mass[i], -dt);
 
 	if (force_measure == FORCE_MEASURE_YES) {
-	  sprintf(force_label, "Boson, mass = %e:", mass[i]);
-	  printForce(Fdt, dt, force_label);
+	  char label[200];
+	  sprintf(label, "%s, mass = %e:", force_label, mass[i]);
+	  printForce(Fdt, dt, label);
 	}
       }
     

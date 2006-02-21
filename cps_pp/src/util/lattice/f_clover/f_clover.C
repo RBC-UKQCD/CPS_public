@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fclover class.
 
-  $Id: f_clover.C,v 1.17 2005-12-02 17:46:03 chulwoo Exp $
+  $Id: f_clover.C,v 1.18 2006-02-21 21:14:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 17:46:03 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.17 2005-12-02 17:46:03 chulwoo Exp $
-//  $Id: f_clover.C,v 1.17 2005-12-02 17:46:03 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.18 2006-02-21 21:14:11 chulwoo Exp $
+//  $Id: f_clover.C,v 1.18 2006-02-21 21:14:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_clover.C,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -309,12 +309,13 @@ int Fclover::FeigSolv(Vector **f_eigenv, Float *lambda,
 
 
 //------------------------------------------------------------------
-// SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass):
+// SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass,
+//        DagType dag):
 // It sets the pseudofermion field phi from frm1, frm2.
 // Modified - now returns the (trivial) value of the action
 //------------------------------------------------------------------
 Float Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
-		     Float mass){
+		      Float mass, DagType dag){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
 
@@ -334,7 +335,8 @@ Float Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
   IFloat *A_even = (IFloat *)Aux0Ptr();
 
 // phi_odd = (Aoo - kappa*kappa*Doe Aee^inv Deo)^dagger frm1_odd
-  clover.MatPcDag(phi, frm1);  
+  if (dag == DAG_YES) clover.MatPcDag(phi, frm1);  
+  else clover.MatPc(phi, frm1);  
 
 // Calculate the clover matrices for the EVEN checkerboard
   IFloat *Ap = A_even;
@@ -1328,7 +1330,12 @@ void Fclover::EvolveMomFforceSupp(Matrix *mom, Vector *v1, Vector *v2,
   
 }
 
-
+Float Fclover::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+		      Float mass, Float step_size) {
+  char *fname = "EvolveMomFforce(M*,V*,V*,F,F)";
+  ERR.General(cname,fname,"Not Implemented\n");
+  return 0.0;
+}
 
 
 CPS_END_NAMESPACE

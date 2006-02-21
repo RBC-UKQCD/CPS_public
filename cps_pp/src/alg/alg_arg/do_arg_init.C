@@ -65,7 +65,7 @@ void DoArg::SetupAsqTadU0(double u)
   u0 = u;
   asqtad_KS     = (1.0/8.0)+(3.0/8.0)+(1.0/8.0);
   asqtad_naik   = (-1.0/24.0)*pow(u0,-2);
-  asqtad_3staple= (-1.0/16.0)*pow(u0,-4);
+  asqtad_3staple= ( 1.0/16.0)*pow(u0,-4);
   asqtad_5staple= ( 1.0/8.0)*(1.0/8.0)*pow(u0,-4);
   asqtad_7staple= (1.0/8.0)*(1.0/48.0)*pow(u0,-6);
   asqtad_lepage = (-1.0/16.0)*pow(u0,-4);

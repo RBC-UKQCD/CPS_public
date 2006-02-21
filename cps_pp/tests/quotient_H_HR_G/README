@@ -1,0 +1,9 @@
+2/8/06  RDM
+
+This test uses a 3 timescale evolution, with
+HMC, HMC+RHMC and gauge steps in order from coarsest
+to finest timescales.  The coarsest HMC is controlled
+by quo0_arg.vml and the finest by quo1_arg.vml
+
+The .vml files here were used with quotient.C on a
+2k QCDOC partition to evolve a 24^3 x 64 x 16 lattice

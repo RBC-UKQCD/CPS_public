@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fnone class.
 
-  $Id: f_none.C,v 1.13 2005-12-02 16:12:09 chulwoo Exp $
+  $Id: f_none.C,v 1.14 2006-02-21 21:14:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -209,11 +209,12 @@ int Fnone::FeigSolv(Vector **f_eigenv, Float *lambda,
 }
 
 //------------------------------------------------------------------
-// SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass):
+// SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass,
+//        DagType dag):
 //! Does nothing.
 //------------------------------------------------------------------
 Float Fnone::SetPhi(Vector *phi, Vector *frm1, Vector *frm2, 
-		   Float mass){
+		    Float mass, DagType dag){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
   return 0.0;
@@ -318,6 +319,11 @@ int Fnone::FsiteOffset(const int *x) const {
 // ???
   ERR.NotImplemented(cname, "FsiteOffset");
   return 0; 
+}
+
+Float Fnone::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+		      Float mass, Float step_size) {
+  return 0.0;
 }
 
 

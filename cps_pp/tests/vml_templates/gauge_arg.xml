@@ -1,0 +1,6 @@
+<class><name>ActionGaugeArg</name><instance>gauge_arg</instance><data>
+<item><name>gluon</name><value><GclassType>G_CLASS_NONE </GclassType></value></item>
+<class><name>ActionArg</name><instance>action_arg</instance><data>
+<item><name>force_measure</name><value><ForceMeasure>FORCE_MEASURE_NO </ForceMeasure></value></item>
+</data></class>
+</data></class>

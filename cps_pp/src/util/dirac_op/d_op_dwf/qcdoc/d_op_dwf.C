@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.8 2005-05-09 15:17:42 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.9 2006-02-21 21:14:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-09 15:17:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.8 2005-05-09 15:17:42 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.8 2005-05-09 15:17:42 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.9 2006-02-21 21:14:09 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.9 2006-02-21 21:14:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -83,10 +83,18 @@ DiracOpDwf::DiracOpDwf(Lattice & latt,
   //----------------------------------------------------------------
   // Do the necessary conversions
   //----------------------------------------------------------------
+#undef PROFILE
+#ifdef PROFILE
+  Float time = -dclock();
+#endif
   if(cnv_frm == CNV_FRM_YES)
     lat.Convert(WILSON, f_out, f_in);
   else if(cnv_frm == CNV_FRM_NO)
     lat.Convert(WILSON);
+#ifdef PROFILE
+  time += dclock();
+  print_flops("lattice","Convert()",0,time);
+#endif
 
   //----------------------------------------------------------------
   // Initialize parameters
@@ -128,10 +136,18 @@ DiracOpDwf::~DiracOpDwf() {
   //----------------------------------------------------------------
   // Do the necessary conversions
   //----------------------------------------------------------------
+#undef PROFILE
+#ifdef PROFILE
+  Float time = -dclock();
+#endif
   if(cnv_frm == CNV_FRM_YES)
     lat.Convert(CANONICAL, f_out, f_in);
   else if(cnv_frm == CNV_FRM_NO)
     lat.Convert(CANONICAL);
+#ifdef PROFILE
+  time += dclock();
+  print_flops("lattice","Convert()",0,time);
+#endif
 
 }
 
@@ -367,11 +383,20 @@ int DiracOpDwf::MatInv(Vector *out,
 		temp_size * sizeof(IFloat) / sizeof(char));
   }
 
-  MatPcDag(in, temp);
 
-//  printf("MatInv : even : Dslash : MatPcDag :  %e %e\n",in->NormSqNode(temp_size),out->NormSqNode(temp_size));
-
-  int iter = InvCg(out,in,true_res);
+  int iter;
+  switch (dirac_arg->Inverter) {
+  case CG:
+    MatPcDag(in, temp);
+    iter = InvCg(out,in,true_res);
+    break;
+  case BICGSTAB:
+    iter = BiCGstab(out,temp,0.0,dirac_arg->bicgstab_n,true_res);
+    break;
+  default:
+    ERR.General(cname,fname,"InverterType %d not implemented\n",
+		dirac_arg->Inverter);
+  }
 
   // restore source
   if(prs_in == PRESERVE_YES){

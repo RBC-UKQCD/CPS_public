@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.17 2005-06-16 07:23:42 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.18 2006-02-21 21:14:07 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -294,7 +294,8 @@ void asqtad_dirac_init(Fasqtad * lat )
   local_chi = NUM_DIR*vol - non_local_chi;
   local_chi_3 = NUM_DIR*vol - non_local_chi_3;
   nflush = vol/8;
-  tmpfrm = (IFloat *) smalloc ( NUM_DIR*2 * vol/2 * VECT_LEN2 * sizeof(IFloat));
+  tmpfrm = (IFloat*)smalloc(NUM_DIR*2*vol/2 * VECT_LEN2 * sizeof(IFloat),
+			    "tmpfrm",fname,cname);
 
 
   //-----------------------------------------------------------------
@@ -302,16 +303,17 @@ void asqtad_dirac_init(Fasqtad * lat )
   //-----------------------------------------------------------------
 
 
-    chi_off_node_total = ( IFloat * ) smalloc( 3*non_local_chi*
-      VECT_LEN * sizeof( IFloat ) / 2 );
- for ( j= 0; j < 3; j++ ){
+  chi_off_node_total = (IFloat*) 
+    smalloc(3*non_local_chi*VECT_LEN*sizeof(IFloat)/2,
+	    "chi_off_node_total",fname,cname);
+  for ( j= 0; j < 3; j++ ){
     chi_off_node[j][0] = &(chi_off_node_total[ j*non_local_chi* VECT_LEN/2 ] ); 
     chi_off_node_p[j][0] = (IFloat *)(sizeof (IFloat)*j*non_local_chi* VECT_LEN/2 );
-  for ( i = 1; i < NUM_DIR; i++ ){
-    chi_off_node[j][i] = chi_off_node[j][i-1]+vol/(2*size[i%4])*VECT_LEN;
-    chi_off_node_p[j][i] = chi_off_node_p[j][i-1]+vol/(2*size[i%4])*VECT_LEN;
+    for ( i = 1; i < NUM_DIR; i++ ){
+      chi_off_node[j][i] = chi_off_node[j][i-1]+vol/(2*size[i%4])*VECT_LEN;
+      chi_off_node_p[j][i] = chi_off_node_p[j][i-1]+vol/(2*size[i%4])*VECT_LEN;
+    }
   }
- }
   //-----------------------------------------------------------------
   //  Space for storage of pointers to chi's.  2 pointers per site,
   //  but split into even and odd groups for the first part of the
@@ -321,12 +323,15 @@ void asqtad_dirac_init(Fasqtad * lat )
   //  The size of chi_l and chi_nl has been doubled for additional U*Chi and UUU*chi
   //-----------------------------------------------------------------
 
+#ifndef SIMUL
   for ( i = 0; i < 2; i++ ){
-    chi_l[i] = ( IFloat ** ) smalloc((2*(local_chi+local_chi_3)/2)*sizeof(IFloat *));
-
-    chi_nl[i] = (IFloat ** ) smalloc((2* (non_local_chi + non_local_chi_3)/2)*sizeof(IFloat *));
-
+    chi_l[i] = (IFloat**)smalloc((2*(local_chi+local_chi_3)/2)*sizeof(IFloat*),
+				 "chi_l[i]", fname, cname);
+    chi_nl[i] = (IFloat**)
+      smalloc((2*(non_local_chi+non_local_chi_3)/2)*sizeof(IFloat*),
+	      "chi_l[i]", fname, cname);
   }
+#endif
   
   for ( i = 0; i < 2; i++){
     local_count[i] = 0;
@@ -562,9 +567,15 @@ void asqtad_dirac_init(Fasqtad * lat )
 
   for ( k = 0; k < 3; k++ ) {
   for ( i = 0; i < 2; i++ ) {
-    Tbuffer[k][i] = (IFloat *) smalloc ( size[1] * size[2] * size[3] * VECT_LEN * sizeof( IFloat ) / 2);
-    ToffsetP[k][i] = ( int * ) smalloc (  size[1] * size[2] * size[3] *  sizeof( int ) / 2 );
-    ToffsetM[k][i] = ( int * ) smalloc (  size[1] * size[2] * size[3] *  sizeof( int ) / 2 );
+#ifndef SIMUL_TBUF
+    Tbuffer[k][i] = (IFloat*) 
+      smalloc(size[1]*size[2]*size[3]*VECT_LEN*sizeof(IFloat)/2,
+	      "Tbuffer[k][i]", fname, cname);
+    ToffsetP[k][i] = (int*) smalloc(size[1]*size[2]*size[3]*sizeof(int)/2,
+				    "ToffsetP[k][i]", fname, cname);
+    ToffsetM[k][i] = (int*) smalloc(size[1]*size[2]*size[3]*sizeof(int)/2,
+				    "ToffsetM[k][i]", fname, cname);
+#endif
     countP[k][i] = 0;
     countM[k][i] = 0;
   }
@@ -730,22 +741,25 @@ for ( k = 0; k < 3; k++ ) {
 extern "C"
 void asqtad_destroy_dirac_buf()
 {
+  char *cname = "";
+  char *fname = "asqtad_destroy_dirac_buf()";
   int i,k;
 
   for ( i = 0; i < 2; i++ ) {
     for ( k = 0; k < 3; k++ ) {
 #ifndef SIMUL_TBUF
-    sfree(ToffsetP[k][i]);
-    sfree(ToffsetM[k][i]);
+      sfree(Tbuffer[k][i],"Tbuffer[k][i]",fname,cname);
+      sfree(ToffsetP[k][i],"ToffsetP[k][i]",fname,cname);
+      sfree(ToffsetM[k][i],"ToffsetM[k][i]",fname,cname);
 #endif
     }
 #ifndef SIMUL
-    sfree(chi_nl[i]);
-    sfree(chi_l[i]);
+    sfree(chi_nl[i],"chi_nl[i]",fname,cname);
+    sfree(chi_l[i],"chi_l[i]",fname,cname);
 #endif
   }
     
-   sfree(chi_off_node_total);
+   sfree(chi_off_node_total,"chi_off_node_total",fname,cname);
   for ( i = 0; i < NUM_DIR; i++ ) {
 #if 0
     delete SCUarg[i];
@@ -756,7 +770,7 @@ void asqtad_destroy_dirac_buf()
       delete SCUDMAarg_p[i*4+k];
 #endif
   }
-  sfree(tmpfrm);
+  sfree(tmpfrm,"tmpfrm",fname,cname);
 }
 //-------------------------------------------------------------------
 //  Given a lexical value for gauge fields, set the coordinates.
@@ -1495,19 +1509,27 @@ int non_local_count_3[3][2];
   for ( i = 0; i < 2; i++ ){
 
 #ifndef SIMUL_U
-    uc_l[i]  = (IFloat*)smalloc(MATRIX_SIZE*((local_chi+local_chi_3)/2)*sizeof(IFloat));
+    uc_l[i]  = (IFloat*)
+      smalloc(MATRIX_SIZE*((local_chi+local_chi_3)/2)*sizeof(IFloat),
+	      "uc_l[i]", fname, cname);
     for(int j=0;j<MATRIX_SIZE*(local_chi+local_chi_3)/2;j++)
 	uc_l[i][j]=0.;
 #endif
-    uc_l_agg[i]  = (gauge_agg *)smalloc(((local_chi+local_chi_3)/2)*sizeof(gauge_agg));
+    uc_l_agg[i]  = (gauge_agg*)
+      smalloc(((local_chi+local_chi_3)/2)*sizeof(gauge_agg),
+	      "uc_l_agg[i]", fname, cname);
 
  
 #ifndef SIMUL_U
-    uc_nl[i] = (IFloat*)smalloc( MATRIX_SIZE * ((non_local_chi +non_local_chi_3)/2) * sizeof(IFloat) );
+    uc_nl[i] = (IFloat*)
+      smalloc(MATRIX_SIZE*((non_local_chi+non_local_chi_3)/2) * sizeof(IFloat),
+	      "uc_nl[i]", fname, cname);
     for(int j=0;j<MATRIX_SIZE*(non_local_chi+non_local_chi_3)/2;j++)
 	uc_nl[i][j]=0.;
 #endif
-    uc_nl_agg[i]  = (gauge_agg*)smalloc(((non_local_chi+non_local_chi_3)/2)*sizeof(gauge_agg));
+    uc_nl_agg[i] = (gauge_agg*)
+      smalloc(((non_local_chi+non_local_chi_3)/2)*sizeof(gauge_agg),
+	      "uc_nl_agg[i]", fname, cname);
 
   }
 
@@ -2113,8 +2135,9 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
 
 #ifndef SIMUL_AGG
 
-  gauge_agg *temp = (gauge_agg *)smalloc(12*vol*sizeof(gauge_agg));
-  int *num_ind = (int *)smalloc(6*vol*sizeof(int));
+  gauge_agg *temp = (gauge_agg *)
+    smalloc(12*vol*sizeof(gauge_agg),"temp",fname,cname);
+  int *num_ind = (int *)smalloc(6*vol*sizeof(int),"num_ind",fname,cname);
   int src;
   for(j=0;j<2;j++){
     for(i=0;i<vol;i++) num_ind[i]=0;
@@ -2279,8 +2302,8 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
     }
 
   }
-  sfree(temp);
-  sfree(num_ind);
+  sfree(temp,"temp",fname,cname);
+  sfree(num_ind,"num_ind",fname,cname);
 
 #if 0
   sprintf(buf,"uc_nl_agg.h");
@@ -2356,13 +2379,16 @@ extern "C"
 void asqtad_destroy_dirac_buf_g(void)
 {
   int i;
+  char *cname = "";
   char *fname = "asqtad_destroy_dirac_buf_g()";
-  VRB.Func("",fname);
+  VRB.Func(cname,fname);
   for ( i = 0; i < 2; i++){
-    sfree(uc_l[i]);
-    sfree(uc_nl[i]);
-    sfree(uc_l_agg[i]);
-    sfree(uc_nl_agg[i]);
+#ifndef SIMUL_U
+    sfree(uc_l[i],"uc_l[i]",fname,cname);
+    sfree(uc_nl[i],"uc_nl[i]",fname,cname);
+#endif
+    sfree(uc_l_agg[i],"uc_l_agg[i]",fname,cname);
+    sfree(uc_nl_agg[i],"uc_nl_agg[i]",fname,cname);
   }
   VRB.FuncEnd("",fname);
 }

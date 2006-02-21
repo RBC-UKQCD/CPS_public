@@ -1,0 +1,12 @@
+#qreset_sys > qreset_sys.log
+qset_reset_boot -R default.qrb
+qreset_boot > qreset_boot.log
+qdiscover > qdiscover.log
+# 2k rack20-21 mapping to make 32x4x4x4 machine 
+qpartition_remap -T05 -X1 -Y2 -Z34 > qpartition_remap.log
+
+
+set DIR=`pwd`
+set NDIR=`echo $DIR | sed "s/host-r20c0/host/g" `
+
+qrun ./QCDOC.x do_arg.vml hmc_arg.vml evo_arg.vml quo_arg.vml rat_quo0_arg.vml rat_quo1_arg.vml gauge_arg.vml ab1_arg.vml ab2_arg.vml ab3_arg.vml ab4_arg.vml $NDIR > output.log

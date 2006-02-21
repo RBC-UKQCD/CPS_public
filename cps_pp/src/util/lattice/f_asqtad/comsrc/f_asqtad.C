@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of some Fasqtad class methods.
 
-  $Id: f_asqtad.C,v 1.24 2005-10-04 05:42:37 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.25 2006-02-21 21:14:10 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -143,15 +143,19 @@ int Fasqtad::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   for (int s=0; s<Nshift; s++)
     RsdCG[s] = cg_arg[s]->stop_rsd;
 
-  //Fake the constructor
+  Float trueMass;
+  massRenormalise(&(cg_arg[0]->mass), &trueMass, Nshift, shift, RENORM_FORWARDS);
+
   DiracOpAsqtad asqtad(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
   int iter = asqtad.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);
-
+  
   if (type == MULTI && f_out_d != 0)
     for (int s=0; s<Nshift; s++)
       asqtad.Dslash(f_out_d[s], f_out[s], CHKB_EVEN, DAG_NO);
   for (int s=0; s<Nshift; s++) cg_arg[s]->true_rsd = RsdCG[s];
-  
+
+  massRenormalise(&(cg_arg[0]->mass), &trueMass, Nshift, shift, RENORM_BACKWARDS);
+
   delete[] RsdCG;
   return iter;
 
@@ -264,12 +268,14 @@ int Fasqtad::FeigSolv(Vector **f_eigenv, Float lambda[],
 }
 
 //------------------------------------------------------------------
-// SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass):
+// SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass, 
+//        DagType dag):
 // It sets the pseudofermion field phi from frm_e, frm_o.
 // Modified - now returns the (trivial) value of the action
 //------------------------------------------------------------------
 Float Fasqtad::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
-		   Float mass){
+		      Float mass, DagType dag){
+  // dag is ignored for staggered
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
   CgArg cg_arg;
@@ -621,4 +627,13 @@ void Fasqtad::Smear(){
 
   smeared=1;
 }
+
+Float Fasqtad::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+		      Float mass, Float step_size) {
+  char *fname = "EvolveMomFforce(M*,V*,V*,F,F)";
+  ERR.General(cname,fname,"Not Implemented\n");
+  return 0.0;
+}
+
+
 CPS_END_NAMESPACE

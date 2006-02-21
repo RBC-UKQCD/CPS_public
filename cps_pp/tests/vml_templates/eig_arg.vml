@@ -3,12 +3,8 @@ PatternType pattern_kind = LIN
 double Mass_init =   0.0000000000000000e+00
 double Mass_final =   0.0000000000000000e+00
 double Mass_step =   0.0000000000000000e+00
-Array Mass[3] = { 
-double Mass[0] =   1.0000000000000001e-01
-double Mass[1] =   2.0000000000000001e-01
-double Mass[2] =   2.9999999999999999e-01
+Array Mass[0] = { 
 }
-int n_masses = 0
 int N_eig = 0
 int Kalk_Sim = 0
 int MaxCG = 0

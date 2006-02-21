@@ -21,6 +21,7 @@ class IntABArg {
 class ActionArg {
 
   ForceMeasure force_measure;
+  string force_label<>;
 
 };
 
@@ -41,6 +42,8 @@ class ActionBilinearArg {
 
 class ApproxDescr {
 
+  RationalApproxType approx_type;
+  RationalBoundsType bounds_type;
   Float lambda_low;
   Float lambda_high;
   Float stop_rsd<>;
@@ -52,9 +55,12 @@ class RationalDescr {
   FieldType field_type;
   int power_num;
   int power_den;
+  //! The precision used in the Remez algorithm of the RHMC approximation.
+  long precision;
   ApproxDescr md_approx;
   ApproxDescr mc_approx;
-
+  //! The boson mass parameter used for Hasenbusch trick (staggered only)
+  Float stag_bsn_mass;
 } ;
 
 class EigenDescr {
@@ -78,9 +84,6 @@ class ActionRationalArg {
 
   ActionBilinearArg bi_arg;
    
-  //! The precision used in the Remez algorithm of the RHMC approximation.
-  long precision;
-
   int remez_generate;
   string rat_poles_file<>;
 
@@ -129,6 +132,50 @@ class ActionFermionArg {
   //! Chonological inversion parameter
   FermionDescr fermions<>;
 
+};
+
+class QuotientDescr {
+  Float bsn_mass;
+  Float frm_mass;
+  int   chrono;
+  Float stop_rsd_hb;
+  Float stop_rsd_md;
+  Float stop_rsd_mc;
+} ;
+
+class ActionQuotientArg {
+
+  memfun void resize(int nmass);
+
+  // Mass parameter here is dummy
+  ActionBilinearArg bi_arg;
+
+  //!< Quotient parameters
+  QuotientDescr quotients<>;
+
+};
+
+class ActionRationalQuotientArg {
+
+  memfun void resize(int nmass);
+  memfun void resize(int mass, int frm_deg_md, int frm_deg_mc, 
+	int bsn_deg_md, int bsn_deg_mc);
+
+  ActionBilinearArg bi_arg;
+   
+  //! the allowed sprectral spread in the rational approximation
+  Float spread;
+
+  int remez_generate;
+  string rat_poles_file<>;
+
+  Float bsn_mass<>;
+  Float frm_mass<>;
+
+  RationalDescr bosons<>;
+  RationalDescr fermions<>;
+
+  EigenDescr eigen;
 };
 
 class ActionGaugeArg {

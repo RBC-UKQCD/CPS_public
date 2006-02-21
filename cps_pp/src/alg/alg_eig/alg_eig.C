@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.15 2005-12-02 15:19:09 chulwoo Exp $
+  $Id: alg_eig.C,v 1.16 2006-02-21 21:14:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 15:19:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.15 2005-12-02 15:19:09 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.15 2005-12-02 15:19:09 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.16 2006-02-21 21:14:07 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.16 2006-02-21 21:14:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -30,6 +30,7 @@ CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <util/smalloc.h>
+#include <util/time.h>
 #include <util/vector.h>
 #include <util/verbose.h>
 #include <util/error.h>
@@ -228,6 +229,7 @@ void AlgEig::run(Float **evalues)
     using MPISCU::fprintf;
 #endif
 
+  Float time = -dclock();
   int iter=0;
   EigArg *eig_arg;
   char *fname = "run()";
@@ -531,6 +533,8 @@ void AlgEig::run(Float **evalues)
         }
       sfree(eig_store);
     }
+  time +=dclock();
+  print_flops(cname,fname,0,time);
 
 }
 

@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.41 2006-02-20 22:22:20 chulwoo Exp $
+  $Id: lattice_base.C,v 1.42 2006-02-21 21:14:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-20 22:22:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.41 2006-02-20 22:22:20 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.41 2006-02-20 22:22:20 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.42 2006-02-21 21:14:13 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.42 2006-02-21 21:14:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.41 $
+//  $Revision: 1.42 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2019,8 +2019,8 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
   int n_links = 4 * GJP.VolNodeSites();
 
   Matrix *curU_p = GaugeField();
-  VRB.Result(cname,fname,"gauge checksum(before) = %p\n",
-    global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
+//  VRB.Result(cname,fname,"gauge checksum(before) = %p\n",
+//    global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
 
   // checksuming local gauge matrices before update
   //-------------------------------------------------

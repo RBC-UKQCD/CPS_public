@@ -6,18 +6,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpWilson class methods.
 
-  $Id: d_op_wilson.C,v 1.7 2004-09-02 16:59:22 zs Exp $
+  $Id: d_op_wilson.C,v 1.8 2006-02-21 21:14:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:59:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v 1.7 2004-09-02 16:59:22 zs Exp $
-//  $Id: d_op_wilson.C,v 1.7 2004-09-02 16:59:22 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2006-02-21 21:14:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v 1.8 2006-02-21 21:14:09 chulwoo Exp $
+//  $Id: d_op_wilson.C,v 1.8 2006-02-21 21:14:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v $
 //  $State: Exp $
 //
@@ -227,14 +227,6 @@ int DiracOpWilson::MatInv(Vector *out,
 
   int temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
 
-  // check out if converted
-  //for (int ii = 0; ii < 2 * temp_size; ii++) {
-  //  VRB.Result(cname, fname, "in[%d] = %e\n", ii, 
-  //  *((IFloat *)in + ii));
-  //  VRB.Result(cname, fname, "out[%d] = %e\n", ii, 
-  //  *((IFloat *)out + ii));
-  //}
-
   Vector *temp = (Vector *) smalloc(temp_size * sizeof(Float));
   if (temp == 0) ERR.Pointer(cname, fname, "temp");
   VRB.Smalloc(cname,fname, "temp", temp, temp_size * sizeof(Float));
@@ -244,22 +236,6 @@ int DiracOpWilson::MatInv(Vector *out,
     if (temp2 == 0) ERR.Pointer(cname, fname, "temp2");
     VRB.Smalloc(cname,fname, "temp2", temp2, temp_size * sizeof(Float));
   }
-
-#if 0
-{
-  printf("in(before)=\n");
-  IFloat *temp_p = (IFloat *)in;
-  for(int ii = 0; ii< GJP.VolNodeSites();ii++){
-    for(int jj = 0; jj< lat.FsiteSize();jj++){
-      if (fabs(*temp_p)>1e-7){
-        printf("i=%d j=%d\n",ii,jj);
-        printf("%e\n",*(temp_p));
-      }
-      temp_p++;
-    }
-  }
-}
-#endif
 
   // points to the even part of fermion source 
   Vector *even_in = (Vector *) ( (IFloat *) in + temp_size );
@@ -272,44 +248,25 @@ int DiracOpWilson::MatInv(Vector *out,
   fTimesV1PlusV2((IFloat *)temp, (IFloat) kappa, (IFloat *)temp,
     (IFloat *)in, temp_size);
 
-#if 0
-{
-  printf("temp(before)=\n");
-  IFloat *temp_p = (IFloat *)temp;
-  for(int ii = 0; ii< GJP.VolNodeSites();ii++){
-    for(int jj = 0; jj< lat.FsiteSize();jj++){
-      if (fabs(*temp_p)>1e-7){
-        printf("i=%d j=%d\n",ii,jj);
-        printf("%e\n",*(temp_p));
-      }
-      temp_p++;
-    }
-  }
-}
-#endif
-
   // save source
   if(prs_in == PRESERVE_YES){
     moveMem((IFloat *)temp2, (IFloat *)in, 
-		temp_size * sizeof(IFloat) / sizeof(char));
+	    temp_size * sizeof(IFloat) / sizeof(char));
   }
 
-  MatPcDag(in, temp);
-
-#if 0
-{
-  IFloat *temp_p = (IFloat *)in;
-  for(int ii = 0; ii< GJP.VolNodeSites()/2;ii++){
-    printf("i=%d\n",ii);
-    for(int jj = 0; jj< lat.FsiteSize();jj++)
-      printf("%e ",*(temp_p++));
-    printf("\n");
+  int iter;
+  switch (dirac_arg->Inverter) {
+  case CG:
+    MatPcDag(in, temp);
+    iter = InvCg(out,in,true_res);
+    break;
+  case BICGSTAB:
+    iter = BiCGstab(out,temp,0.0,dirac_arg->bicgstab_n,true_res);
+    break;
+  default:
+    ERR.General(cname,fname,"InverterType %d not implemented\n",
+		dirac_arg->Inverter);
   }
-  exit(44);
-}
-#endif
-
-  int iter = InvCg(out,in,true_res);
 
   // restore source
   if(prs_in == PRESERVE_YES){

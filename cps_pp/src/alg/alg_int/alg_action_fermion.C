@@ -29,26 +29,27 @@ AlgActionFermion::AlgActionFermion(AlgMomentum &mom,
   cname = "AlgActionFermion";
   char *fname = "AlgActionFermion(M*, L&, HmdArg*)";
 
+  int_type = INT_FERMION;
   frm_arg = &f_arg;
 
-  //!< First check n_masses bilinear = n_masses boson
+  //!< First check n_masses bilinear = n_masses fermion
   if (frm_arg->fermions.fermions_len != 
       frm_arg->bi_arg.bilinears.bilinears_len)
     ERR.General(cname, fname,
-		"Inconsistency between BosonArg and BilinearArg n_masses\n");
+		"Inconsistency between FermionArg and BilinearArg n_masses\n");
 
   if(n_masses > 0){
     //!< Allocate memory for the fermion CG arguments.
     frm_cg_arg_md = (CgArg **) smalloc(n_masses * sizeof(CgArg*), 
-				       cname, fname, "frm_cg_arg_md");
+				       "frm_cg_arg_md", fname, cname);
     frm_cg_arg_mc = (CgArg **) smalloc(n_masses * sizeof(CgArg*), 
-				       cname, fname, "frm_cg_arg_mc");
+				       "frm_cg_arg_mc", fname, cname);
     
     for(int i=0; i<n_masses; i++){
       frm_cg_arg_md[i] = (CgArg *) 
-	smalloc(sizeof(CgArg), cname, fname, "frm_cg_arg_md[i]");
+	smalloc(sizeof(CgArg), "frm_cg_arg_md[i]", fname, cname);
       frm_cg_arg_mc[i] = (CgArg *) 
-	smalloc(sizeof(CgArg), cname, fname, "frm_cg_arg_mc[i]");
+	smalloc(sizeof(CgArg), "frm_cg_arg_mc[i]", fname, cname);
     } 
 
     //!< Initialize the fermion CG arguments
@@ -70,11 +71,11 @@ AlgActionFermion::AlgActionFermion(AlgMomentum &mom,
 
     //!< Vectors used to store solution history
     v = (Vector***) smalloc(n_masses*sizeof(Vector**),
-				  cname, fname, "v");
+			    "v", fname, cname);
     cg_sol_old = (Vector***) smalloc(n_masses*sizeof(Vector**),
-				     cname, fname, "cg_sol_old");
+				     "cg_sol_old", fname, cname);
     vm = (Vector***) smalloc(n_masses*sizeof(Vector**),
-			     cname, fname, "vm");
+			     "vm", fname, cname);
 
     for (int i=0; i<n_masses; i++) {
       int deg;
@@ -83,15 +84,15 @@ AlgActionFermion::AlgActionFermion(AlgMomentum &mom,
       else ERR.General(cname,fname,"Cannot have negative chronology\n");
 
       v[i] = (Vector**) smalloc(deg*sizeof(Vector*),
-				      cname, fname, "v[i]");
+				"v[i]", fname, cname);
       cg_sol_old[i] = (Vector**) smalloc(deg*sizeof(Vector*),
-					 cname, fname, "cg_sol_old[i]");
-      vm[i] = (Vector**) smalloc(deg*sizeof(Vector*), cname, fname, "vm[i]");
+					 "cg_sol_old[i]", fname, cname);
+      vm[i] = (Vector**) smalloc(deg*sizeof(Vector*), "vm[i]", fname, cname);
       for (int j=0; j<deg; j++) {
 	v[i][j] = (Vector*) smalloc(f_size*sizeof(Float),
-					   cname, fname, "v[i][j]");
+				    "v[i][j]", fname, cname);
 	vm[i][j] = (Vector*) smalloc(f_size*sizeof(Float),
-				     cname, fname, "vm[i][j]");
+				    "vm[i][j]", fname, cname);
       }
     }
 
@@ -121,26 +122,26 @@ AlgActionFermion::~AlgActionFermion() {
       else if (chrono[i] == 0) deg = 1;
 
       for (int j=0; j<deg; j++) {
-	sfree(vm[i][j],cname, fname, "vm[i][j]");
-	sfree(v[i][j],cname, fname, "v[i][j]");
+	sfree(vm[i][j],"vm[i][j]",fname, cname);
+	sfree(v[i][j],"v[i][j]",fname, cname);
       }
-      sfree(cg_sol_old[i],cname, fname, "cg_sol_old[i]");
-      sfree(vm[i],cname, fname, "vm[i]");
-      sfree(v[i],cname, fname, "v[i]");
+      sfree(cg_sol_old[i],"cg_sol_old[i]", fname, cname);
+      sfree(vm[i],"vm[i]", fname, cname);
+      sfree(v[i],"v[i]", fname, cname);
     }
-    sfree(cg_sol_old,cname, fname, "cg_sol_old");
-    sfree(vm,cname, fname, "vm");
-    sfree(v,cname, fname, "v");
+    sfree(cg_sol_old, "cg_sol_old", fname, cname);
+    sfree(vm,"vm", fname, cname);
+    sfree(v,"v", fname, cname);
 
-    sfree(chrono,cname,fname,"chrono");
+    sfree(chrono,"chrono",fname,cname);
 
     //!< Free memory for the fermion CG arguments
     for(int i=0; i<n_masses; i++) {
-      sfree(frm_cg_arg_mc[i], cname,fname, "frm_cg_arg_mc[i]");
-      sfree(frm_cg_arg_md[i], cname,fname, "frm_cg_arg_md[i]");
+      sfree(frm_cg_arg_mc[i], "frm_cg_arg_mc[i]", fname,cname);
+      sfree(frm_cg_arg_md[i], "frm_cg_arg_md[i]", fname,cname);
     }
-    sfree(frm_cg_arg_mc, cname,fname, "frm_cg_arg_mc");
-    sfree(frm_cg_arg_md, cname,fname, "frm_cg_arg_md");
+    sfree(frm_cg_arg_mc, "frm_cg_arg_md", fname,cname);
+    sfree(frm_cg_arg_md, "frm_cg_arg_mc", fname,cname);
   }
 
 }
@@ -153,8 +154,8 @@ void AlgActionFermion::heatbath() {
   if (n_masses > 0) {
     Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
     
-    Vector *tmp1 = (Vector*)smalloc(f_size*sizeof(Float),cname,fname,"tmp1");
-    Vector *tmp2 = (Vector*)smalloc(f_size*sizeof(Float),cname,fname,"tmp2");
+    Vector *tmp1 = (Vector*)smalloc(f_size*sizeof(Float),"tmp1",fname,cname);
+    Vector *tmp2 = (Vector*)smalloc(f_size*sizeof(Float),"tmp1",fname,cname);
     
     h_init = 0.0;
 
@@ -164,8 +165,8 @@ void AlgActionFermion::heatbath() {
       h_init += lat.SetPhi(phi[i], tmp1, tmp2, mass[i]);
     }
     
-    sfree(tmp2, cname, fname, "tmp2");
-    sfree(tmp1, cname, fname, "tmp1");
+    sfree(tmp2, "tmp2", fname, cname);
+    sfree(tmp1, "tmp1", fname, cname);
     
     LatticeFactory::Destroy();
 
@@ -188,7 +189,7 @@ Float AlgActionFermion::energy() {
       Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
 
       Vector *cg_sol = 
-	(Vector*)smalloc(f_size*sizeof(Float),cname,fname,"cg_sol");
+	(Vector*)smalloc(f_size*sizeof(Float),"cg_sol",fname,cname);
       
       for(int i=0; i<n_masses; i++) {
 	cg_sol -> VecZero(f_size);
@@ -200,7 +201,7 @@ Float AlgActionFermion::energy() {
 	h += lat.FhamiltonNode(phi[i], cg_sol);
       }
       
-      sfree(cg_sol, cname, fname, "cg_sol");
+      sfree(cg_sol, "cg_sol", cname, fname);
 
       LatticeFactory::Destroy();
     }
@@ -249,8 +250,9 @@ void AlgActionFermion::evolve(Float dt, int nsteps)
 	Fdt = lat.EvolveMomFforce(mom, cg_sol, mass[i], dt);
 
 	if (force_measure == FORCE_MEASURE_YES) {
-	  sprintf(force_label, "Fermion, mass = %e:", mass[i]);
-	  printForce(Fdt, dt, force_label);
+	  char label[200];
+	  sprintf(label, "%s, mass = %e:", force_label, mass[i]);
+	  printForce(Fdt, dt, label);
 	}
 
       }

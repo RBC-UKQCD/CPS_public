@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.19 2005-12-02 16:22:55 chulwoo Exp $
+  $Id: f_wilson.C,v 1.20 2006-02-21 21:14:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -399,13 +399,14 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
 
 
 //------------------------------------------------------------------
-// SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass):
+// SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass,
+//        DagType dag):
 // It sets the pseudofermion field phi from frm1, frm2.
 // Note that frm2 is not used.
 // Modified - now returns the (trivial) value of the action
 //------------------------------------------------------------------
 Float Fwilson::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
-		     Float mass){
+		      Float mass, DagType dag){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
   CgArg cg_arg;
@@ -418,8 +419,9 @@ Float Fwilson::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
     ERR.Pointer(cname,fname,"frm1") ;
 
   DiracOpWilson wilson(*this, frm1, frm2, &cg_arg, CNV_FRM_NO) ;
-
-  wilson.MatPcDag(phi, frm1) ;
+  
+  if (dag == DAG_YES) wilson.MatPcDag(phi, frm1) ;
+  else wilson.MatPc(phi, frm1) ;
 
   return FhamiltonNode(frm1, frm1);
 }
@@ -723,6 +725,13 @@ Float Fwilson::BhamiltonNode(Vector *boson, Float mass){
   sfree(bsn_tmp) ;
 
   return ret_val;
+}
+
+Float Fwilson::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+		      Float mass, Float step_size) {
+  char *fname = "EvolveMomFforce(M*,V*,V*,F,F)";
+  ERR.General(cname,fname,"Not Implemented\n");
+  return 0.0;
 }
 
 CPS_END_NAMESPACE

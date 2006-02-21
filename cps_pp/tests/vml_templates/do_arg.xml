@@ -27,9 +27,9 @@
 <item><name>start_seed_kind</name><value><StartSeedType>START_SEED_FIXED </StartSeedType></value></item>
 <item><name>start_seed_filename</name><value><string>start_seed </string></value></item>
 <item><name>start_conf_filename</name><value><string>start_conf </string></value></item>
-<item><name>start_conf_alloc_flag</name><value><int>0</int></value></item>
-<item><name>wfm_alloc_flag</name><value><int>0</int></value></item>
-<item><name>wfm_send_alloc_flag</name><value><int>0</int></value></item>
+<item><name>start_conf_alloc_flag</name><value><int>6</int></value></item>
+<item><name>wfm_alloc_flag</name><value><int>6</int></value></item>
+<item><name>wfm_send_alloc_flag</name><value><int>6</int></value></item>
 <item><name>start_seed_value</name><value><int>0</int></value></item>
 <item><name>beta</name><value><double>0.000000e+00</double></value></item>
 <item><name>c_1</name><value><double>0.000000e+00</double></value></item>
@@ -41,6 +41,7 @@
 <item><name>power_rect_cutoff</name><value><double>0.000000e+00</double></value></item>
 <item><name>power_rect_exponent</name><value><int>0</int></value></item>
 <item><name>verbose_level</name><value><int>-1202</int></value></item>
+<item><name>checksum_level</name><value><int>0</int></value></item>
 <item><name>exec_task_list</name><value><int>0</int></value></item>
 <item><name>xi_bare</name><value><double>1.000000e+00</double></value></item>
 <item><name>xi_dir</name><value><int>3</int></value></item>

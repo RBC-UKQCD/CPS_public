@@ -40,6 +40,10 @@ vml_CgArg (VML *vmls, char *name,CgArg *objp)
 		 return FALSE;
 	 if (!vml_RitzMatType (vmls, "RitzMatOper", &objp->RitzMatOper))
 		 return FALSE;
+	 if (!vml_InverterType (vmls, "Inverter", &objp->Inverter))
+		 return FALSE;
+	 if (!vml_int (vmls, "bicgstab_n", &objp->bicgstab_n))
+		 return FALSE;
 	 vml_class_end(vmls,"CgArg",name);
 	return TRUE;
 }

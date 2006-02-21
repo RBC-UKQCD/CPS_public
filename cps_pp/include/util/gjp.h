@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.22 2005-05-30 23:29:40 chulwoo Exp $
+  $Id: gjp.h,v 1.23 2006-02-21 21:14:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-30 23:29:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.22 2005-05-30 23:29:40 chulwoo Exp $
-//  $Id: gjp.h,v 1.22 2005-05-30 23:29:40 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.23 2006-02-21 21:14:06 chulwoo Exp $
+//  $Id: gjp.h,v 1.23 2006-02-21 21:14:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -715,6 +715,9 @@ start and end of main()
 */
 
 #if TARGET == QCDOC
+extern "C" {
+  void _mcleanup(void);
+}
 void Start();
 void End();
 #else

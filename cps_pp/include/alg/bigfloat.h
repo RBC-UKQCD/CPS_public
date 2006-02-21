@@ -2,11 +2,14 @@
 /*!\file
   \brief  Definitions of the bigfloat wrapper class.
 
-  $Id: bigfloat.h,v 1.4 2005-05-18 06:17:13 chulwoo Exp $
+  $Id: bigfloat.h,v 1.5 2006-02-21 21:14:06 chulwoo Exp $
 */
 //------------------------------------------------------------------
 #include<config.h>
 #include <gmp.h>
+#include <mpfr.h>
+#include <mpf2mpfr.h>
+
 CPS_START_NAMESPACE
 
 #ifndef INCLUDED_BIGFLOAT_H
@@ -43,7 +46,6 @@ public:
   bigfloat(const int i) {mpf_init_set_si(x,(long)i);}
   bigfloat(const float d) { mpf_init_set_d(x, (double)d); }
   bigfloat(const double d) { mpf_init_set_d(x, d); }  
-  bigfloat(const char *str) { mpf_init_set_str(x, str, 10); }
   ~bigfloat(void) { mpf_clear(x); }
   operator const Float (void) const { return (Float)mpf_get_d(x); }
   static void setDefaultPrecision(unsigned long dprec) {
@@ -182,6 +184,12 @@ public:
   friend bigfloat pow_bf(const bigfloat& a, long power) {
     bigfloat b;
     mpf_pow_ui(b.x,a.x,power);
+    return b;
+  }
+
+  friend bigfloat pow_bf(const bigfloat& a, const bigfloat &power) {
+    bigfloat b;
+    mpfr_pow(b.x,a.x,power.x,GMP_RNDN);
     return b;
   }
 

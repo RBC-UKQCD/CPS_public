@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpBase class multishift CG solver method.
 
-  $Id: minvcg.C,v 1.18 2005-10-04 05:17:47 chulwoo Exp $
+  $Id: minvcg.C,v 1.19 2006-02-21 21:14:08 chulwoo Exp $
 */
 
 CPS_END_NAMESPACE
@@ -319,12 +319,13 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
 #endif
 
   if (k >= dirac_arg->max_num_iter)  // It has not reached stp_cnd: Issue a warning
-//    VRB.Warn(cname,fname,"CG reached max iterations = %d. |res| = %e\n",k, css);
     ERR.General(cname,fname,"CG reached max iterations = %d. |res| = %e\n",k, css);
+    VRB.Result(cname,fname,"iterations = %d. |res| = %e\n",k, css);
+
 
   for (s=Nmass-1; s>=0; s--) {
     if (convsP[s]) {
-      VRB.Result(cname,fname,"%d shift converged, iter = %d, res^2 = %e\n",
+      VRB.Flow(cname,fname,"%d shift converged, iter = %d, res^2 = %e\n",
 		 s+isz,converged[s],RsdCG[s]);
       RsdCG[s] = sqrt(RsdCG[s]);
     } else {

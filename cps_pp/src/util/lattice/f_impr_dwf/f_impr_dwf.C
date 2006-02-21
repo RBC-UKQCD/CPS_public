@@ -57,12 +57,13 @@ int FimprDwf::FmatEvlInv(Vector *f_out, Vector *f_in,
 }
 
 //------------------------------------------------------------------
-// SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass):
+// SetPhi(Vector *phi, Vector *frm1, Vector *frm2, Float mass,
+//        DagType dag):
 // It sets the pseudofermion field phi from frm1, frm2.
 // Note that frm2 is not used.
 //------------------------------------------------------------------
 Float FimprDwf::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
-		  Float mass){
+		       Float mass, DagType dag){
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
   CgArg cg_arg;
@@ -76,7 +77,8 @@ Float FimprDwf::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 
   DiracOpImprDwf dwf(*this, frm1, 0, &cg_arg, CNV_FRM_NO) ;
 
-  dwf.MatPcDag(phi, frm1) ;
+  if (dag == DAG_YES) dwf.MatPcDag(phi, frm1) ;
+  else dwf.MatPc(phi, frm1) ;
 
   return FhamiltonNode(frm1, frm1);
 }
@@ -828,11 +830,6 @@ Float FimprDwf::EvolveMomFforce(Matrix *mom, Vector *frm,
   glb_sum(&Fdt);
 
   return sqrt(Fdt);
-}
-
-void FimprDwf::ForceProductSum(const Vector *v, const Vector *w,
-			       IFloat coeff, Matrix *f){
-    ERR.NotImplemented(cname, "ForceProductSum");
 }
 
 CPS_END_NAMESPACE

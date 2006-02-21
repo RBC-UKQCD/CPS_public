@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce.C,v 1.11 2006-02-01 16:46:08 chulwoo Exp $
+  $Id: RHMC_Fforce.C,v 1.12 2006-02-21 21:14:10 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -41,9 +41,9 @@ CPS_START_NAMESPACE
 #define PROFILE
 
 Float Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				   int isz, Float *alpha, Float mass, 
-				   Float dt, Vector **sol_d, 
-				   ForceMeasure force_measure){
+				    int isz, Float *alpha, Float mass, 
+				    Float dt, Vector **sol_d, 
+				    ForceMeasure force_measure){
 
     char *fname = "RHMC_EvolveMomFforce";
     VRB.Func(cname,fname);
@@ -165,14 +165,12 @@ Float Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 
 
     // Array in which to accumulate the force term      
-    Matrix **force = (Matrix**)amalloc(fmalloc, sizeof(Matrix), 2, 4, vol);
+    //Matrix **force = (Matrix**)amalloc(fmalloc, sizeof(Matrix), 2, 4, vol);
 
-    /*
     Matrix **force = (Matrix**)smalloc(4*sizeof(Matrix*), cname, fname, "force");
     for (int i=0; i<4; i++) {
       force[i] = (Matrix*) fmalloc(vol*sizeof(Matrix), cname, fname, "force[i]");
     }
-    */
 
     ParTransAsqtad parallel_transport(*this);
 
@@ -866,7 +864,7 @@ Float Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 #endif
     
     // Now that we have computed the force, we can update the momenta
-    update_momenta(force, dt, mom);
+    Float Fdt = update_momenta(force, dt, mom);
 
     // Free allocated memory
     
@@ -929,7 +927,7 @@ Float Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
   sfree(Lmusigmarhonu, cname, fname, "Lmusigmarhonu");
 
   ffree(mtmp, cname, fname, "mtmp");
-  //for (int i=0; i<4; i++) ffree(force[i], cname, fname, "force[i]");
+  for (int i=0; i<4; i++) ffree(force[i], cname, fname, "force[i]");
   ffree(force, cname, fname, "force");
   
     /*
@@ -950,7 +948,7 @@ Float Fasqtad::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
     Fconvert(sol[p], STAG, CANONICAL);
   }
 
-  return 0.0;
+  return Fdt;
 
 }
 

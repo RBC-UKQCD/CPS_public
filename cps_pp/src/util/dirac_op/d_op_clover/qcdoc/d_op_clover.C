@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-07 05:21:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v 1.5 2004-09-07 05:21:48 chulwoo Exp $
-//  $Id: d_op_clover.C,v 1.5 2004-09-07 05:21:48 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v 1.6 2006-02-21 21:14:09 chulwoo Exp $
+//  $Id: d_op_clover.C,v 1.6 2006-02-21 21:14:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_clover.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v $
 //  $State: Exp $
 //
@@ -367,16 +367,22 @@ int DiracOpClover::MatInv(Vector *out, Vector *in, Float *true_res,
     CGflops+=vec_size*2;
   }
 
-  // out_even = MatPcDag [kappe * Doe out_even0 + in_odd]
-  //--------------------------------------------------------------------
-  MatPcDag((Vector *)out_even, frm_buf1);
-
-
-  // out_odd = (MatPcDagMatPc)^inv MatPcDag 
-  //           [kappe * Doe out_even0 + in_odd]           done!
-  //--------------------------------------------------------------------
-  int iter = InvCg(out, (Vector *)out_even, true_res);
-
+  int iter;
+  switch (dirac_arg->Inverter) {
+  case CG:
+    // out_even = MatPcDag [kappe * Doe out_even0 + in_odd]
+    MatPcDag((Vector *)out_even, frm_buf1);
+    // out_odd = (MatPcDagMatPc)^inv MatPcDag 
+    //           [kappe * Doe out_even0 + in_odd]           done!
+    iter = InvCg(out, (Vector *)out_even, true_res);
+    break;
+  case BICGSTAB:
+    iter = BiCGstab(out,frm_buf1,0.0,dirac_arg->bicgstab_n,true_res);
+    break;
+  default:
+    ERR.General(cname,fname,"InverterType %d not implemented\n",
+		dirac_arg->Inverter);
+  }
 
   // frm_buf1 = kappa Deo out_odd + in_even
   //--------------------------------------------------------------------

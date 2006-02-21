@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.8 2005-10-04 05:49:15 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.9 2006-02-21 21:14:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-10-04 05:49:15 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v 1.8 2005-10-04 05:49:15 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.8 2005-10-04 05:49:15 chulwoo Exp $
+//  $Date: 2006-02-21 21:14:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v 1.9 2006-02-21 21:14:09 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.9 2006-02-21 21:14:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -350,9 +350,19 @@ int DiracOpDwf::MatInv(Vector *out,
 		temp_size * sizeof(IFloat) / sizeof(char));
   }
 
-  MatPcDag(in, temp);
-
-  int iter = InvCg(out,in,true_res);
+  int iter;
+  switch (dirac_arg->Inverter) {
+  case CG:
+    MatPcDag(in, temp);
+    iter = InvCg(out,in,true_res);
+    break;
+  case BICGSTAB:
+    iter = BiCGstab(out,temp,0.0,dirac_arg->bicgstab_n,true_res);
+    break;
+  default:
+    ERR.General(cname,fname,"InverterType %d not implemented\n",
+		dirac_arg->Inverter);
+  }
 
   // restore source
   if(prs_in == PRESERVE_YES){

@@ -1,0 +1,8 @@
+2/8/06  RDM
+
+This test uses a 3 timescale evolution, with
+HMC, RHMC and gauge steps in order from coarsest
+to finest timescales. 
+
+The .vml files here were used with quotient.C on a
+2k QCDOC partition to evolve a 24^3 x 64 x 16 lattice

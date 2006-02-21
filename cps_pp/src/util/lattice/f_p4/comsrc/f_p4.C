@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.11 2006-02-20 22:21:49 chulwoo Exp $
+  $Id: f_p4.C,v 1.12 2006-02-21 21:14:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -143,9 +143,11 @@ int Fp4::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   Float *RsdCG = (Float *)smalloc(sizeof(Float)*Nshift);
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg[s]->stop_rsd;
 
+  Float trueMass;
+  massRenormalise(&(cg_arg[0]->mass), &trueMass, Nshift, shift, RENORM_FORWARDS);
+
   //Fake the constructor
   DiracOpP4 p4(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
-
   int iter = p4.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);
 
   if (type == MULTI && f_out_d != 0)
@@ -160,6 +162,8 @@ int Fp4::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   cg_arg->true_rsd = RsdCG[isz];
 >>>>>>> 1.7.30.2
 #endif
+
+  massRenormalise(&(cg_arg[0]->mass), &trueMass, Nshift, shift, RENORM_BACKWARDS);
 
   sfree(RsdCG);
   return iter;
@@ -273,12 +277,13 @@ int Fp4::FeigSolv(Vector **f_eigenv, Float lambda[],
 }
 
 //------------------------------------------------------------------
-// SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass):
+// SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass,
+//        DagType dag):
 // It sets the pseudofermion field phi from frm_e, frm_o.
-// Modified - now returns the (trivial) value of the action
 //------------------------------------------------------------------
 Float Fp4::SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, 
-		   Float mass){
+		   Float mass, DagType dag){
+  // dag is ignored for staggered
   char *fname = "SetPhi(V*,V*,V*,F)";
   VRB.Func(cname,fname);
   CgArg cg_arg;
@@ -669,4 +674,13 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
 
   smeared=1;
 }
+
+Float Fp4::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+		      Float mass, Float step_size) {
+  char *fname = "EvolveMomFforce(M*,V*,V*,F,F)";
+  ERR.General(cname,fname,"Not Implemented\n");
+  return 0.0;
+}
+
+
 CPS_END_NAMESPACE

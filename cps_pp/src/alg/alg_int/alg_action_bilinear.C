@@ -69,22 +69,20 @@ AlgActionBilinear::AlgActionBilinear(AlgMomentum &mom,
     
     //!< Allocate memory for the phi field array
     phi = (Vector **) smalloc(n_masses * sizeof(Vector*),
-			      cname, fname, "phi");
+			      "phi",fname,cname);
     
     for(int i=0; i<n_masses; i++) {
-      phi[i] = (Vector *) smalloc(f_size*sizeof(Float),cname,fname, "phi[i]");
+      phi[i] = (Vector *) smalloc(f_size*sizeof(Float),"phi[i]",fname,cname);
     }
 
     //! Copy over mass and max iteration parameters
-    mass = (Float*)smalloc(n_masses * sizeof(Float), cname, fname, "mass");
-    max_num_iter = (int*)smalloc(n_masses * sizeof(Float), cname, 
-				 fname, "max_num_iter");
+    mass = (Float*)smalloc(n_masses * sizeof(Float), "mass", fname, cname);
+    max_num_iter = (int*)smalloc(n_masses * sizeof(Float), 
+				 "max_num_iter", fname, cname);
     for(int i=0; i<n_masses; i++) {
       mass[i] = bi_arg->bilinears.bilinears_val[i].mass;
       max_num_iter[i] = bi_arg->bilinears.bilinears_val[i].max_num_iter;
     }
-
-    force_label = new char[100];
 
   }
 
@@ -104,8 +102,6 @@ AlgActionBilinear::~AlgActionBilinear() {
   char *fname="~AlgActionBilinear()";
 
   if (n_masses > 0) {
-    delete[] force_label;
-
     //!< Free memory
     sfree(mass, cname, fname, "mass");
     sfree(max_num_iter, cname, fname, "max_num_iter");

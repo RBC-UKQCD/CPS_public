@@ -29,6 +29,7 @@ CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/smalloc.h>
 #include <util/verbose.h>
+#include <util/time.h>
 #include <util/error.h>
 #include <alg/alg_remez.h>
 CPS_START_NAMESPACE
@@ -47,17 +48,26 @@ AlgRemez::AlgRemez(RemezArg &arg_remez)
   apstrt = remez_arg->lambda_low;
   apend = remez_arg->lambda_high;
   apwidt = apend - apstrt;
-  VRB.Flow(cname,fname,"Approximation bounds are [%e,%e]\n", 
+  VRB.Result(cname,fname,"Approximation bounds are [%e,%e]\n", 
 	   (Float)apstrt,(Float)apend);
 
   power_num = remez_arg->power_num;
   power_den = remez_arg->power_den;
+  VRB.Result(cname,fname,"Approximation kernel is x^{%d/%d}\n", power_num, power_den);
 
   n = remez_arg->degree;
   d = remez_arg->degree;
 
   VRB.Flow(cname,fname,"precision=%d power_num=%d power_den=%d degree = %d \n",prec,power_num,power_den,n);
+  delta_m = (Float)remez_arg->delta_m;
+
   neq = n + d + 1;
+
+  approx_type = remez_arg->approx_type;
+  VRB.Result(cname,fname,"Approximation type is %d\n", approx_type);
+
+  if (approx_type == RATIONAL_APPROX_QUOTIENT)
+    VRB.Result(cname,fname,"delta_m parameter is %e\n", (Float)delta_m);
 
   // Only require the approximation spread to be less than tolerance 
   if (sizeof(Float)==sizeof(double)) {
@@ -119,6 +129,7 @@ void AlgRemez::generateApprox()
 {
   char *fname = "generateApprox()";
 
+  Float time = -dclock();
   iter = 0;
   spread = 1.0e37;
 
@@ -155,6 +166,8 @@ void AlgRemez::generateApprox()
   }
 
   remez_arg->error = error;
+  time += dclock();
+  print_flops(cname,fname,0,time);
 
 }
 
@@ -445,17 +458,30 @@ bigfloat AlgRemez::func(const bigfloat x) {
   char *fname = "func(bigfloat)";
 //   VRB.Func(cname,fname);
 
-  bigfloat y,dy,f=1l,df;
-
-  // initial guess to accelerate convergance
-  y = (bigfloat)pow((double)x,(double)((bigfloat)1l/(bigfloat)power_den));
-  while (abs_bf(f)>(bigfloat)1l/pow_bf((bigfloat)10,prec)) { // approx good to 10^(-prec)
-    f = pow_bf(y,power_den) - x;
-    df = (bigfloat)power_den*pow_bf(y,power_den-1);// need power_den-1 because of diff
-    dy = f/df;
-    y -= dy;
+  bigfloat z;
+  switch (approx_type) { 
+  case RATIONAL_APPROX_POWER:
+    z = x;
+    break;
+  case RATIONAL_APPROX_QUOTIENT: 
+    z = (x+delta_m)/x;
+    break;
+  default:
+    ERR.General(cname,fname,"ApproxType %d not implemented\n", approx_type);
   }
-  return pow_bf(y,power_num);
+
+  if (z == (bigfloat)1.0) return (bigfloat)1.0;
+  else return pow_bf(z,(bigfloat)power_num / (bigfloat)power_den);
+
+  /*
+  bigfloat y;
+  if (z == (bigfloat)1.0) y = (bigfloat)1.0;
+  else y = pow_bf(z,pow);
+  printf("d = %e, y = %e\n",(Float)delta_m,(Float)y);fflush(stdout);
+  return y;
+
+  */
+
 }
 
 // Solve the system AX=B

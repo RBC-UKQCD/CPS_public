@@ -25,18 +25,15 @@ AlgMomentum::AlgMomentum() : AlgHamiltonian()
   cname = "AlgMomentum";
   char *fname = "AlgMomentum()";
 
+  int_type = INT_MOM;
   md_time_str = "MD_time/step_size = ";
 
-  Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);  
-  g_size = GJP.VolNodeSites() * lat.GsiteSize();
-  LatticeFactory::Destroy();
-
-  mom = (Matrix*)smalloc(g_size*sizeof(Float),cname,fname,"mom");
+  mom = (Matrix*)smalloc(g_size*sizeof(Float),"mom",fname,cname);
 }
 
 AlgMomentum::~AlgMomentum() {
   char *fname = "~AlgMomentum()";
-  sfree(mom, cname, fname, "mom");
+  sfree(mom, "mom", fname, cname);
 }
 
 //!< Heat Bath for the conjugate momentum

@@ -1,0 +1,60 @@
+class ActionRationalArg rat_light = {
+class ActionBilinearArg bi_arg = {
+FclassType fermion = F_CLASS_ASQTAD
+Array bilinears[1] = { 
+class BilinearDescr bilinears[0] = {
+double mass =   0.01
+int max_num_iter = 5000
+}
+}
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_YES
+string force_label = "Rational(2-light-preconditioned)"
+}
+}
+int remez_generate = 0
+string rat_poles_file = ""
+Array rationals[1] = { 
+class RationalDescr rationals[0] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 70
+class ApproxDescr md_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_QUOTIENT
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_AUTOMATIC
+double lambda_low =   0
+double lambda_high =   0
+Array stop_rsd[4] = { 
+double stop_rsd[0] =   1e-6
+double stop_rsd[1] =   1e-6
+double stop_rsd[2] =   1e-6
+double stop_rsd[3] =   1e-6
+}
+}
+class ApproxDescr mc_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_AUTOMATIC
+double lambda_low =   0
+double lambda_high =   0
+Array stop_rsd[7] = { 
+double stop_rsd[0] =   1e-10
+double stop_rsd[1] =   1e-10
+double stop_rsd[2] =   1e-10
+double stop_rsd[3] =   1e-10
+double stop_rsd[4] =   1e-10
+double stop_rsd[5] =   1e-10
+double stop_rsd[6] =   1e-10
+}
+}
+double stag_bsn_mass = 0.05;
+}
+}
+class EigenDescr eigen = {
+EigenMeasure eigen_measure = EIGEN_MEASURE_NO
+double stop_rsd =   1e-3
+int max_num_iter = 5000
+string eig_lo_stem = "eig_low"
+string eig_hi_stem = "eig_high"
+}
+}

@@ -4,7 +4,6 @@
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
 /*!\file
-  \brief  Definitions of the AlgIntFactory class and derived classes.
 
 */
 //------------------------------------------------------------------
@@ -21,6 +20,8 @@ CPS_START_NAMESPACE
 class RemezArg{
 
  public:
+  RationalApproxType approx_type;
+
   int valid_approx;
 
   int degree;
@@ -43,6 +44,9 @@ class RemezArg{
   Float pole_inv[MAX_RAT_DEGREE];
 
   long precision;
+
+  //!< The shifted mass parameter used when doing staggered Hasenbusch
+  Float delta_m;
 };
 
 #endif

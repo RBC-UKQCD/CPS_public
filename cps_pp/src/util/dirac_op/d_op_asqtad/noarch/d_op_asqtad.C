@@ -62,11 +62,8 @@ DiracOpAsqtad::DiracOpAsqtad(Lattice & latt,
   //----------------------------------------------------------------
   // Allocate memory for the temporary fermion vector frm_tmp.
   //----------------------------------------------------------------
-  frm_tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
-  if(frm_tmp == 0)
-    ERR.Pointer(cname,fname, "frm_tmp");
-  VRB.Smalloc(cname,fname, "frm_tmp", 
-	      frm_tmp, f_size_cb * sizeof(Float));
+  frm_tmp = 
+    (Vector *)smalloc(f_size_cb*sizeof(Float),"frm_tmp",fname,cname);
 
   //----------------------------------------------------------------
   // Make a copy of gauge fields and rearrange them
@@ -100,8 +97,7 @@ DiracOpAsqtad::~DiracOpAsqtad() {
   //----------------------------------------------------------------
   // Free memory
   //----------------------------------------------------------------
-  VRB.Sfree(cname,fname, "frm_tmp", frm_tmp);
-  sfree(frm_tmp);
+  sfree(frm_tmp,"frm_tmp",fname,cname);
 }
 
 
@@ -348,11 +344,8 @@ int DiracOpAsqtad::MatInv(Vector *out,
   IFloat *k_e = (IFloat *)in;
   IFloat *k_o = k_e+f_size_cb;
 
-  Vector *tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
-  if(tmp == 0)
-    ERR.Pointer(cname,fname, "tmp");
-  VRB.Smalloc(cname,fname, "tmp", 
-	      tmp, f_size_cb * sizeof(Float));
+  Vector *tmp =
+    (Vector *) smalloc(f_size_cb*sizeof(Float),"tmp",fname,cname);
 
   // tmp = (2m - D)k
 
@@ -370,7 +363,7 @@ int DiracOpAsqtad::MatInv(Vector *out,
   vecMinusEquVec(x_o, (IFloat *)tmp, f_size_cb);
   vecTimesEquFloat(x_o, 0.5/mass_rs, f_size_cb);
 
-  sfree(tmp);
+  sfree(tmp,"tmp",fname,cname);
 
   return iter;
 }

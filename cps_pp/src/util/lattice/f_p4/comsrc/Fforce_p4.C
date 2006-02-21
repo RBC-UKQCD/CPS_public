@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fp4::EvolveMomFforce.
 
-  $Id: Fforce_p4.C,v 1.5 2006-02-01 16:46:08 chulwoo Exp $
+  $Id: Fforce_p4.C,v 1.6 2006-02-21 21:14:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -127,9 +127,9 @@ Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
                                                // nu directions we have done.
     ParTransAsqtad parallel_transport(*this);
 	 
-    #ifdef PROFILE
+#ifdef PROFILE
     dtime = -dclock();
-    #endif
+#endif
     for (int m=0; m<4; m+=N){                     	    // Loop over mu
 	for(w=0; w<N; w++) mu[w] = (m+w)%4; 
 
