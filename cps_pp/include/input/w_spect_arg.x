@@ -122,6 +122,10 @@ class WspectArg {
   
   /* Apply multi-momenta projection.*/
   int num_mom;
+
+  //added by mflin
+  /* Location of the midpoint plane. For DWF only. */
+  int midplane;
 				
   /* Type of source for the calculation of the quark propagator*/
   SourceKind source_kind;       

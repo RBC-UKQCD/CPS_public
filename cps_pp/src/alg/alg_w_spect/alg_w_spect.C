@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 20:39:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.10 2005-09-06 20:39:46 chulwoo Exp $
-//  $Id: alg_w_spect.C,v 1.10 2005-09-06 20:39:46 chulwoo Exp $
+//  $Date: 2006-02-21 16:53:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.11 2006-02-21 16:53:33 chulwoo Exp $
+//  $Id: alg_w_spect.C,v 1.11 2006-02-21 16:53:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_w_spect.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v $
 //  $State: Exp $
 //
@@ -122,7 +122,7 @@ AlgWspect::AlgWspect(Lattice& latt,
   int aots_num   = d_arg_p->aots_num;
   if (d_num_args < 1 ||
       prop_dir < 0   || prop_dir >= g_info.LORENTZs ||
-      aots_start+aots_step*aots_num >= g_info.glb_sites[prop_dir]) {
+      aots_start+aots_step*(aots_num-1) >= g_info.glb_sites[prop_dir]) {
     ERR.General(d_class_name, 
 		g_info.ctor_str, 
 		g_info.out_range_str);
@@ -179,9 +179,9 @@ void AlgWspect::run()
 
 	  int src_slice = d_arg_p->aots_start;
 	  int src_slice_step = d_arg_p->aots_step;
-	  int src_slice_end  = src_slice_step * d_arg_p->aots_num;
+	  int src_slice_end  = src_slice + src_slice_step * d_arg_p->aots_num;
 
-	  // printf("%d %d %d \n",src_slice,src_slice_step, src_slice_end);
+	  printf("%d %d %d \n",src_slice,src_slice_step, src_slice_end);
 
 	  for ( ; src_slice < src_slice_end; src_slice += src_slice_step) {
 
@@ -258,7 +258,7 @@ void AlgWspect::run()
 #ifdef  TIMING_ALG_W_SPECT
 	meson_bmp = clock();
 #endif
-        WspectMesons mes(q1.Data_SP(), q1.Data_SP(), hyperRect, mom);
+        WspectMesons mes(q1.Data_SP1(), q1.Data_SP2(), hyperRect, mom);
 	
 #ifdef  TIMING_ALG_W_SPECT
 	meson_mmp = clock();

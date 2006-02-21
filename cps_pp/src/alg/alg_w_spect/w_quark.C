@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.10 2005-10-04 05:13:47 chulwoo Exp $
+  $Id: w_quark.C,v 1.11 2006-02-21 16:53:33 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP
@@ -51,7 +51,7 @@ WspectQuark::WspectQuark(Lattice &lat,
 			 DEVOperatorKind source_operator_kind,
 			 WspectFuzzing *src_fuzz_ptr,
 			 WspectField *fld_ptr)
-  : d_size(GJP.VolNodeSites() * (COLORs*COLORs*DIRACs*DIRACs*COMPLEXs)), prop_direction(whr.dir()), src_plane_position(whr.lclCoord()),d_lat(lat), src_op_kind(source_operator_kind), src_fuzz_p(src_fuzz_ptr), fld_p(fld_ptr)
+  : d_size(GJP.VolNodeSites() * (COLORs*COLORs*DIRACs*DIRACs*COMPLEXs)), prop_direction(whr.dir()), src_plane_position(whr.lclCoord()),d_lat(lat), src_op_kind(source_operator_kind), src_fuzz_p(src_fuzz_ptr), fld_p(fld_ptr), midplane(warg.midplane)
 {
 #if TARGET==cpsMPI
     using MPISCU::fprintf;
@@ -97,14 +97,24 @@ WspectQuark::WspectQuark(Lattice &lat,
   // In case of DWF, allocate space need for propagator for
   // calculating <\Delta J^5 \bar q \gamma^5 q> using mid_point sink
   if (lat.Fclass() == F_CLASS_DWF && mid_point_outfile !=0 ) {
-    d_data_mid_point = (IFloat *) smalloc(d_size * sizeof(IFloat));
-    if (!d_data_mid_point)
-      ERR.Pointer(d_class_name, ctor_str, "d_data_mid_point");
+     d_data_mid_point_1 = (IFloat *) smalloc(d_size * sizeof(IFloat));
+    if (!d_data_mid_point_1)
+      ERR.Pointer(d_class_name, ctor_str, "d_data_mid_point_1");
     VRB.Smalloc(d_class_name, ctor_str,
-                "d_data_mid_point", d_data_mid_point,
-                d_size * sizeof(Float));
+		"d_data_mid_point_1", d_data_mid_point_1,
+		d_size * sizeof(Float));
+    
+    
+    d_data_mid_point_2 = (IFloat *) smalloc(d_size * sizeof(IFloat));
+    if (!d_data_mid_point_2)
+      ERR.Pointer(d_class_name, ctor_str, "d_data_mid_point_2");
+    VRB.Smalloc(d_class_name, ctor_str,
+		"d_data_mid_point_2", d_data_mid_point_2,
+		d_size * sizeof(Float));
+    
   } else {
-    d_data_mid_point = 0;
+       d_data_mid_point_1 = 0;
+       d_data_mid_point_2 = 0;  
   }
   // ======== end added from phys_v4.0.0 =========================
 
@@ -468,11 +478,6 @@ WspectQuark::WspectQuark(Lattice &lat,
         Vector *src_4d = (Vector *)source.data();
         Vector *sol_4d = (Vector *)(d_data_p+f_size*(Cy+COLORs*Dy));
 
-        Vector *sol_4d_mid_point = 0;
-        if (mid_point_outfile != 0)
-          sol_4d_mid_point =
-            (Vector *)(d_data_mid_point+f_size*(Cy+COLORs*Dy));
-
         Vector *src_5d = (Vector *) smalloc(f_size_5d * sizeof(Float));
         if(src_5d == 0)
           ERR.Pointer(d_class_name,ctor_str, "src_5d");
@@ -499,8 +504,15 @@ WspectQuark::WspectQuark(Lattice &lat,
         lat.Ffive2four(sol_4d, sol_5d, ls_glb-1, 0);
 	
 	// ==== added from phys_v4.0.0 =====
-        if (mid_point_outfile != 0)
-          lat.Ffive2four(sol_4d_mid_point, sol_5d, ls_glb/2-1, ls_glb/2);
+        if (mid_point_outfile != 0){
+          Vector *sol_4d_mid_point = 0;
+	  sol_4d_mid_point =
+	    (Vector *)(d_data_mid_point_1+f_size*(Cy+COLORs*Dy));
+	  lat.Ffive2four(sol_4d_mid_point, sol_5d, midplane-1, midplane);
+	  sol_4d_mid_point =
+	    (Vector *)(d_data_mid_point_2+f_size*(Cy+COLORs*Dy)); 
+	  lat.Ffive2four(sol_4d_mid_point, sol_5d, ls_glb-midplane-1, ls_glb-midplane);
+	}
 	// ==== end added ===== 
 
         sfree(d_class_name,ctor_str, "sol_5d", sol_5d);
@@ -632,10 +644,13 @@ WspectQuark::~WspectQuark()
 {
   VRB.Func(d_class_name, dtor_str);
 
-  // added from phys_v4.0.0
-  if(d_data_mid_point != 0) {
-    VRB.Sfree(d_class_name, dtor_str, empty_str, d_data_mid_point);
-    sfree(d_data_mid_point);
+  if(d_data_mid_point_2 != 0) {
+    VRB.Sfree(d_class_name, dtor_str, empty_str, d_data_mid_point_2);
+    sfree(d_data_mid_point_2);
+  }
+  if(d_data_mid_point_1 != 0) {
+    VRB.Sfree(d_class_name, dtor_str, empty_str, d_data_mid_point_1);
+    sfree(d_data_mid_point_1);
   }
   // end added from phys_v4.0.0
 

@@ -149,6 +149,8 @@ vml_WspectArg (VML *vmls, char *name,WspectArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "num_mom", &objp->num_mom))
 		 return FALSE;
+	 if (!vml_int (vmls, "midplane", &objp->midplane))
+		 return FALSE;
 	 if (!vml_SourceKind (vmls, "source_kind", &objp->source_kind))
 		 return FALSE;
 	 if (!vml_vector (vmls, "src_box_b", (char *)objp->src_box_b, 4,

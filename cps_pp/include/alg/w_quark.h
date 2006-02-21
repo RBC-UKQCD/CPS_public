@@ -43,7 +43,8 @@ public:
   // all others are common
   //-------------------------------------------------------------------------
   const IFloat* Data()             const     { return d_data_p; }
-  const IFloat* Data_SP()      const     { return d_data_mid_point; }
+  const IFloat* Data_SP1()      const     { return d_data_mid_point_1; }
+  const IFloat* Data_SP2()      const     { return d_data_mid_point_2; }
   int dataSize()                  const          {return d_size;}
   const IFloat* SourceSlice()      const     { return source_matrix_p; }
   DEVOperatorKind srcOpKind() const { return src_op_kind;}
@@ -84,8 +85,10 @@ private:
   static Vector v_tmp1;              //static buffer for commu.
   static Vector v_tmp2[DIRACs];      //static buffer for commu(sink_dev)
   IFloat *      d_data_p;             
-  IFloat *      d_data_mid_point;    // propagator with mid_point sink
+  IFloat *      d_data_mid_point_1;    // propagator with mid_point sink
+  IFloat *      d_data_mid_point_2;    // second propagator with mid_point sink when the sink is not Ls/2
   int          d_size;  
+  int          midplane;              //location of the midpoint plane          
   
   //constant references
   const Lattice &d_lat;  

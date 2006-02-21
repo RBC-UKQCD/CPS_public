@@ -72,6 +72,7 @@ public:
 	char *WspectOutputFile;
 	int prop_dir;
 	int num_mom;
+	int midplane;
 	SourceKind source_kind;
 	int src_box_b[4];
 	int src_box_e[4];
