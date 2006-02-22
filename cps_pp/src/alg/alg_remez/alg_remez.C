@@ -649,8 +649,8 @@ int AlgRemez::root() {
 
   norm = param[n];
   VRB.Result(cname,fname,"Normalisation constant is %e\n",(double)norm);
-  for (i=0; i<n; i++) VRB.Result(cname,fname,"%ld root = %e\n",i,(Float)roots[i]);
-  for (i=0; i<d; i++) VRB.Result(cname,fname,"%ld pole = %e\n",i,(Float)poles[i]);
+  for (i=0; i<n; i++) VRB.Result(cname,fname,"%ld root = %0.14e\n",i,(Float)roots[i]);
+  for (i=0; i<d; i++) VRB.Result(cname,fname,"%ld pole = %0.14e\n",i,(Float)poles[i]);
 
   VRB.Sfree(cname,fname, "poly",poly);
   delete [] poly;
