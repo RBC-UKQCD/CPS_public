@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.21 2006-02-21 17:36:28 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.22 2006-02-22 14:31:24 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -149,10 +149,10 @@ else
 
 depend: recurse
 	echo > Makefile_depend
-#	cd $(SRCDIR2) ;makedepend -f$(BUILDDIR2)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
-	cd $(SRCDIR2) ; \
-	$(CXX) -M $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
-	| sed -e 's/:.*\.[cC]/\:/g' > $(PWD)/Makefile_depend
+	cd $(SRCDIR2) ;makedepend -f$(BUILDDIR2)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
+#	cd $(SRCDIR2) ; \
+#	$(CXX) -M $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
+#	| sed -e 's/:.*\.[cC]/\:/g' > $(PWD)/Makefile_depend
 
 endif
 
