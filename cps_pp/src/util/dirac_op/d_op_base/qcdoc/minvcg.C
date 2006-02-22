@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpBase class multishift CG solver method.
 
-  $Id: minvcg.C,v 1.19 2006-02-21 21:14:08 chulwoo Exp $
+  $Id: minvcg.C,v 1.20 2006-02-22 18:44:18 chulwoo Exp $
 */
 
 CPS_END_NAMESPACE
@@ -325,7 +325,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
 
   for (s=Nmass-1; s>=0; s--) {
     if (convsP[s]) {
-      VRB.Flow(cname,fname,"%d shift converged, iter = %d, res^2 = %e\n",
+      VRB.Result(cname,fname,"%d shift converged, iter = %d, res^2 = %e\n",
 		 s+isz,converged[s],RsdCG[s]);
       RsdCG[s] = sqrt(RsdCG[s]);
     } else {

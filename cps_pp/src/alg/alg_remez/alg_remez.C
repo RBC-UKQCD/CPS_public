@@ -763,7 +763,7 @@ void AlgRemez::pfe(bigfloat *res, bigfloat *poles, bigfloat norm) {
       res[small] = res[j];
       res[j] = temp;
     }
-    VRB.Flow(cname,fname,"Residue = %e, Pole = %e\n", (double)res[j], (double)poles[j]);
+    VRB.Result(cname,fname,"Residue = %0.14e, Pole = %0.14e\n", (double)res[j], (double)poles[j]);
   }
 
   delete [] numerator;
