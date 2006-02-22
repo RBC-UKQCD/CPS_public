@@ -17,7 +17,8 @@ vml_DENS_LIM (VML *vmls, char *name,DENS_LIM *objp)
 }
 struct vml_enum_map DENS_LIM_map[] = {
 	{"DENS_LIM","MAX_DENS_MASSES",MAX_DENS_MASSES},
-	{"DENS_LIM","MAX_DENS_OBS",MAX_DENS_OBS}
+	{"DENS_LIM","MAX_DENS_OBS",MAX_DENS_OBS},
+	{NULL,NULL,0}
 };
 	 bool DensArg::Encode(char *filename,char *instance){
 		 VML vmls;

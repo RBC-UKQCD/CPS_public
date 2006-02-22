@@ -41,6 +41,8 @@ vml_EigArg (VML *vmls, char *name,EigArg *objp)
 	 if (!vml_array (vmls, "Mass", (char **)&objp->Mass.Mass_val, (u_int *) &objp->Mass.Mass_len, ~0,
 		sizeof (Float), (vmlproc_t) vml_Float))
 		 return FALSE;
+	 if (!vml_int (vmls, "n_masses", &objp->n_masses))
+		 return FALSE;
 	 if (!vml_int (vmls, "N_eig", &objp->N_eig))
 		 return FALSE;
 	 if (!vml_int (vmls, "Kalk_Sim", &objp->Kalk_Sim))

@@ -5,17 +5,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.46 2006-02-21 21:14:06 chulwoo Exp $
+  $Id: lattice.h,v 1.47 2006-02-22 14:30:04 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2006-02-21 21:14:06 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.46 2006-02-21 21:14:06 chulwoo Exp $
-  $Id: lattice.h,v 1.46 2006-02-21 21:14:06 chulwoo Exp $
+  $Date: 2006-02-22 14:30:04 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.47 2006-02-22 14:30:04 chulwoo Exp $
+  $Id: lattice.h,v 1.47 2006-02-22 14:30:04 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.46 $
+  $Revision: 1.47 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -2022,8 +2022,10 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int dir_flag);
 
+#if 0
     void FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int order);
+#endif
 
     //! Momentum update in the RHMC algorithm.
     Float RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
