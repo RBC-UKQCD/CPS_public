@@ -7,6 +7,7 @@
 #include<alg/meas_arg.h>
 #include<alg/pot_arg.h>
 #include<alg/pbp_arg.h>
+#include<alg/array_arg.h>
 #include<alg/fix_gauge_arg.h>
 
 #include<alg/hmc_arg.h>
@@ -39,6 +40,7 @@ ActionRationalQuotientArg rat_quo_arg;
 ActionGaugeArg gauge_arg;
 IntABArg ab_arg;
 EigArg eig_arg;
+FloatArray float_array;
 
 
 int main(int argc, char *argv[])
@@ -86,6 +88,7 @@ int main(int argc, char *argv[])
   quo_arg.resize(1);
   rat_quo_arg.resize(1);
   rat_quo_arg.resize(0, 9, 15, 6, 9);
+  float_array.resize(4);
 
   cg_arg.Encode("cg_arg.vml","cg_arg");
   hmd_arg.Encode("hmd_arg.vml","hmd_arg");
@@ -107,6 +110,7 @@ int main(int argc, char *argv[])
   gauge_arg.Encode("gauge_arg.vml","gauge_arg");
   ab_arg.Encode("ab_arg.vml","ab_arg");
   eig_arg.Encode("eig_arg.vml","eig_arg");
+  float_array.Encode("float_array.vml","float_array");
 
   vml_markup_type(VML_XML);
   
