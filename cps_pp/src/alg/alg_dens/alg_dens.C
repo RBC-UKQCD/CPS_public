@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgDens class.
   
-  $Id: alg_dens.C,v 1.2 2006-02-21 02:44:33 chulwoo Exp $
+  $Id: alg_dens.C,v 1.3 2006-02-24 02:05:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 02:44:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.2 2006-02-21 02:44:33 chulwoo Exp $
-//  $Id: alg_dens.C,v 1.2 2006-02-21 02:44:33 chulwoo Exp $
+//  $Date: 2006-02-24 02:05:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.3 2006-02-24 02:05:05 chulwoo Exp $
+//  $Id: alg_dens.C,v 1.3 2006-02-24 02:05:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_dens.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v $
 //  $State: Exp $
 //
@@ -551,7 +551,7 @@ void AlgDens::clear_vector()
 
   for(int zz = 0; zz<dens_arg->max_save; zz++){
     offset=zz*GJP.VolNodeSites();
-    bzero((char *)(save+offset), f_size*sizeof(Float));
+    memset((char *)(save+offset), 0, f_size*sizeof(Float));
     // *(map_table+zz)=-1;
     map_table[zz]=-1;
   }
