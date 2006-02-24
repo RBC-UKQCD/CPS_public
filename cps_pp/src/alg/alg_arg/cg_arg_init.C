@@ -7,7 +7,7 @@ CPS_START_NAMESPACE
 
 CgArg::CgArg()
 {
-
+  Inverter = CG;
 };
 
 CPS_END_NAMESPACE
