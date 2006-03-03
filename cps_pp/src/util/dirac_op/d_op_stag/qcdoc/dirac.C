@@ -1,7 +1,7 @@
 /*!\file
   Staggered Dirac operator for QCDOC
 
-  $Id: dirac.C,v 1.13 2005-06-16 07:24:48 chulwoo Exp $
+  $Id: dirac.C,v 1.14 2006-03-03 20:52:44 chulwoo Exp $
 */
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian
@@ -572,6 +572,7 @@ extern "C" void stag_destroy_dirac_buf()
     delete SCUarg[i+8];
     qfree(chi_off_node[i]);
   }  
+  initted=0;
 }
 //-------------------------------------------------------------------
 //  Given a lexical value for gauge fields, set the coordinates.
