@@ -26,7 +26,6 @@ CPS_START_NAMESPACE
 AlgActionBilinear::AlgActionBilinear() 
   : AlgAction() 
 {
-
 }
 
 AlgActionBilinear::AlgActionBilinear(AlgMomentum &mom,
@@ -34,7 +33,9 @@ AlgActionBilinear::AlgActionBilinear(AlgMomentum &mom,
 				     
   : AlgAction(mom, b_arg.action_arg) {
 
+  cname = "AlgActionBiliniear";
   char *fname="AlgActionBilinear(FclassType, int, HmdArg*, Matrix*)";
+  VRB.Func(cname,fname);
 
   //!< First copy required instance parameters
   bi_arg = &b_arg;
@@ -87,7 +88,7 @@ AlgActionBilinear::AlgActionBilinear(AlgMomentum &mom,
   }
 
   init();
-
+  VRB.FuncEnd(cname,fname);
 }
 
 void AlgActionBilinear::init() {
