@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.5 2005-03-07 00:24:46 chulwoo Exp $
+  $Id: inv_cg.C,v 1.6 2006-03-16 16:47:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 00:24:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.5 2005-03-07 00:24:46 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.5 2005-03-07 00:24:46 chulwoo Exp $
+//  $Date: 2006-03-16 16:47:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.6 2006-03-16 16:47:59 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.6 2006-03-16 16:47:59 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -179,7 +179,8 @@ int DiracOp::InvCg(Vector *out,
 //------------------------------------------------------------------
   int cram_buf_size = CRAM_SCRATCH_SIZE / 2;
   for(i=0; i< CRAM_SCRATCH_SIZE / 2; i++){
-    cram_buf_size = cram_buf_size - i;
+// fix from Taku Izubuchi, 2/23/06
+    cram_buf_size = cram_buf_size - 1;
     if(f_size_cb % cram_buf_size == 0) break;
   }
   int cram_buf_size_sof = cram_buf_size * sizeof(Float);
