@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.28 2006-02-01 16:46:08 chulwoo Exp $
+  $Id: pt.C,v 1.29 2006-03-20 17:15:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-01 16:46:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.28 2006-02-01 16:46:08 chulwoo Exp $
-//  $Id: pt.C,v 1.28 2006-02-01 16:46:08 chulwoo Exp $
+//  $Date: 2006-03-20 17:15:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.29 2006-03-20 17:15:26 chulwoo Exp $
+//  $Id: pt.C,v 1.29 2006-03-20 17:15:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.28 $
+//  $Revision: 1.29 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -122,6 +122,35 @@ extern "C"{
 		     int length, unsigned long *dest2,
 		     unsigned long *dest, unsigned long *dest);
   
+}
+inline  void pt_cmm_agg_print(gauge_agg *chi, matrix *phi,matrix *result, int counter){
+   printf("pt_cmm_agg(%p %p %p %d)\n",chi,phi,result,counter);
+//    for(int i =0;i<2*counter;i++){
+//      printf("%d: %d %d\n",i,chi[i].src,chi[i].dest);
+//    }
+   printf("pt_cmm_agg(%p %p %p %d) done \n",chi,phi,result,counter);
+}
+
+inline  void cross_over_lin_cpp(IFloat *result, Float *fac, const IFloat *chi,
+ const IFloat *phi,  int counter, unsigned long *src, unsigned long *dest){
+    printf("cross_over_lin(%p %0.4f %p %p %d %p %p)\n",
+    result,*fac,chi,phi,counter,src,dest);
+    for(int i =0;i<counter;i++){
+      printf("%d: %d %d\n",i,src[i],dest[i]);
+    }
+    cross_over_lin(result,fac,chi,phi,counter,src,dest);
+    printf("cross_over_lin(%p %0.4f %p %p %d %p %p) done\n");
+}
+
+inline  void cross_over_look_cpp(IFloat *result, Float *fac, const IFloat *chi,
+ const IFloat *phi,  int counter, unsigned long *src, unsigned long *dest){
+    printf("cross_over_look(%p %0.4f %p %p %d %p %p)\n",
+    result,*fac,chi,phi,counter,src,dest);
+    for(int i =0;i<counter;i++){
+      printf("%d: %d %d\n",i,src[i],dest[i]);
+    }
+    cross_over_look(result,fac,chi,phi,counter,src,dest);
+    printf("cross_over_look(%p %0.4f %p %p %d %p %p) done\n");
 }
 
 #ifdef ASQD_SINGLE
@@ -845,21 +874,27 @@ void PT::init(PTArg *pt_arg)
       //Calculate the number of local and non-local sites needed 
       //j+1 is the length of the hop
       //i indicates the communication direction
-      int nl_size = (j+1)*non_local_chi[i] + 1;
-      int l_size = vol - nl_size + 1;
+      int nl_size = (j+1)*non_local_chi[i] ;
+      int l_size = vol - nl_size ;
 
-    if (l_size>0){
-      hp_l[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_l[j][i]",l_size*sizeof(hop_pointer));
-      src_l[j][i] = (unsigned long*)Alloc(cname,fname,"src_l[j][i]",l_size*sizeof(unsigned long),0);
-      dest_l[j][i] = (unsigned long*)Alloc(cname,fname,"dest_l[j][i]",l_size*sizeof(unsigned long),0);
-    } else {
-      hp_l[j][i] = NULL;
-      src_l[j][i] = NULL;
-      dest_l[j][i] = NULL;
-    }
-	hp_nl[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_nl[j][i]",nl_size*sizeof(hop_pointer));
-	src_nl[j][i] = (unsigned long*)Alloc(cname,fname,"src_nl[j][i]",nl_size*sizeof(unsigned long),0);
-	dest_nl[j][i] = (unsigned long*)Alloc(cname,fname,"dest_nl[j][i]",nl_size*sizeof(unsigned long),0);
+      if (l_size>0){
+        hp_l[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_l[j][i]",(1+l_size)*sizeof(hop_pointer));
+        src_l[j][i] = (unsigned long*)Alloc(cname,fname,"src_l[j][i]",(1+l_size)*sizeof(unsigned long),0);
+        dest_l[j][i] = (unsigned long*)Alloc(cname,fname,"dest_l[j][i]",(1+l_size)*sizeof(unsigned long),0);
+      } else {
+        hp_l[j][i] = NULL;
+        src_l[j][i] = NULL;
+        dest_l[j][i] = NULL;
+      }
+      if (nl_size>0){
+  	hp_nl[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_nl[j][i]",(1+nl_size)*sizeof(hop_pointer));
+  	src_nl[j][i] = (unsigned long*)Alloc(cname,fname,"src_nl[j][i]",(1+nl_size)*sizeof(unsigned long),0);
+  	dest_nl[j][i] = (unsigned long*)Alloc(cname,fname,"dest_nl[j][i]",(1+nl_size)*sizeof(unsigned long),0);
+      } else {
+        hp_nl[j][i] = NULL;
+        src_nl[j][i] = NULL;
+        dest_nl[j][i] = NULL;
+      }
     }
   }
   
@@ -870,14 +905,21 @@ void PT::init(PTArg *pt_arg)
     for(i=0; i<2*NDIM; i++){
       int nl_size = (j+1)*non_local_chi[i];
       int l_size = vol - nl_size;
-      if (l_size>0)
-      for (int s=0; s<l_size; s++) {
-	src_l[j][i][s] = hp_l[j][i][s].src/(VECT_LEN*sizeof(IFloat));
-	dest_l[j][i][s] = hp_l[j][i][s].dest/(VECT_LEN2*sizeof(IFloat));
+      if (l_size>0){
+        for (int s=0; s<l_size; s++) {
+          src_l[j][i][s] = hp_l[j][i][s].src/(VECT_LEN*sizeof(IFloat));
+          dest_l[j][i][s] = hp_l[j][i][s].dest/(VECT_LEN2*sizeof(IFloat));
+        }
+	src_l[j][i][l_size] = src_l[j][i][l_size-1];
+	dest_l[j][i][l_size] = dest_l[j][i][l_size-1] ;
       }
-      for (int s=0; s<nl_size; s++) {
-	src_nl[j][i][s] = hp_nl[j][i][s].src/(VECT_LEN*sizeof(IFloat));
-	dest_nl[j][i][s] = hp_nl[j][i][s].dest/(VECT_LEN2*sizeof(IFloat));
+      if (nl_size>0){
+        for (int s=0; s<nl_size; s++) {
+          src_nl[j][i][s] = hp_nl[j][i][s].src/(VECT_LEN*sizeof(IFloat));
+          dest_nl[j][i][s] = hp_nl[j][i][s].dest/(VECT_LEN2*sizeof(IFloat));
+        }
+	src_nl[j][i][nl_size] = src_nl[j][i][nl_size-1];
+	dest_nl[j][i][nl_size] = dest_nl[j][i][nl_size-1] ;
       }
     }
   }
@@ -934,17 +976,18 @@ void PT::delete_buf(){
 
   for (int hop=0; hop<MAX_HOP; hop++) {
     for(int i = 0; i < 2*NDIM; i++){
-      int nl_size = (hop+1)*non_local_chi[i] + 1;
-      int l_size = vol - nl_size + 1;
+      int nl_size = (hop+1)*non_local_chi[i];
+      int l_size = vol - nl_size ;
       if (l_size>0){
         Free(hp_l[hop][i]);
         Free(src_l[hop][i]);
         Free(dest_l[hop][i]);
       }
-
+      if (nl_size>0){
 	  Free(hp_nl[hop][i]);
 	  Free(src_nl[hop][i]);
 	  Free(dest_nl[hop][i]);
+      }
     }
   }
 }
@@ -2044,7 +2087,7 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
   if( !local[wire[i]]) {
     if ( size[wire[i]] <hop)
       fprintf(stderr, 
-		"%s:size(%d) in direction %d is smaller than the hop(%d)\n",
+		"%s::size(%d) in direction %d is smaller than the hop(%d)\n",
 		fname,size[wire[i]],wire[i],hop);
     SCUarg_p[2*comms] = SCUarg[hop-1][4*wire[i]];
     SCUarg_p[2*comms+1] = SCUarg[hop-1][4*wire[i]+1];
@@ -2073,10 +2116,10 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
 	  SCUarg_p2[2*comms+1]->Addr((void *)(vect[v]+VECT_LEN*set_offset(2*wire[i], hop)));
           comms++;
       }
-
       // Start communication
       if (comms) SCUmulti.Init(SCUarg_p2,2*comms);
-    }
+    } 
+
     if (comms) SCUmulti.SlowStartTrans();
     // Finalise communication
     if (comms) SCUmulti.TransComplete();
@@ -2085,17 +2128,17 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
     if (v>0)
       if (v==1) {
 	for(i=0; i<n_dir; i++) 
-	  //if(non_local_chi[2*wire[i]] > 0)
+	  if(non_local_chi[2*wire[i]] > 0)
 	    cross_over_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
 		src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
       } else if (v%2==1) {
 	for(i=0; i<n_dir; i++) 
-	  //if(non_local_chi[2*wire[i]] > 0)
+	  if(non_local_chi[2*wire[i]] > 0)
 	    cross_lin(sum[i], &f, vect[v-1],rcv_buf[2*wire[i]], hop*non_local_chi[2*wire[i]],
 		src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
       } else {
 	for(i=0; i<n_dir; i++) 
-	  //if(non_local_chi[2*wire[i]] > 0)
+	  if(non_local_chi[2*wire[i]] > 0)
 	    cross_lin(sum[i], &f,vect[v-1],rcv_buf2[2*wire[i]], hop*non_local_chi[2*wire[i]],
 		src_nl[hop-1][2*wire[i]], dest_nl[hop-1][2*wire[i]]);
       }
