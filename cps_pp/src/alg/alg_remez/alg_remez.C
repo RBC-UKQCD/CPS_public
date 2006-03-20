@@ -139,7 +139,7 @@ void AlgRemez::generateApprox()
   while (spread > tolerance) { //iterate until convergance
 
     if (iter++%100==0) 
-      VRB.Flow(cname,fname,"Iteration %d, spread %e delta %e\n", iter-1,(Float)spread,(Float)delta);
+      VRB.Result(cname,fname,"Iteration %d, spread %e delta %e\n", iter-1,(Float)spread,(Float)delta);
     equations();
     if (delta < tolerance)
       ERR.General(cname, fname,"Delta too small, try increasing precision\n");
@@ -648,7 +648,7 @@ int AlgRemez::root() {
   }
 
   norm = param[n];
-  VRB.Result(cname,fname,"Normalisation constant is %e\n",(double)norm);
+  VRB.Result(cname,fname,"Normalisation constant is %0.14e\n",(double)norm);
   for (i=0; i<n; i++) VRB.Result(cname,fname,"%ld root = %0.14e\n",i,(Float)roots[i]);
   for (i=0; i<d; i++) VRB.Result(cname,fname,"%ld pole = %0.14e\n",i,(Float)poles[i]);
 
