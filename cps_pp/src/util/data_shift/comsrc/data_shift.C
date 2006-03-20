@@ -44,7 +44,7 @@ void GlobalDataShift::SetOrigin(int x, int y, int z, int t, int s)
       ERR.General(cname,fname,
         "Bc(%d) cannot be shifted due to the boundary condition\n",i);
     origin[i] = origin[i]%GJP.Nodes(i);
-    printf("origin[%d]=%d\n",i,origin[i]);
+//    printf("origin[%d]=%d\n",i,origin[i]);
     VRB.Flow(cname,fname,"origin[%d]=%d\n",i,origin[i]);
   }
 }
