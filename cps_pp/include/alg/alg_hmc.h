@@ -54,6 +54,8 @@ class AlgHmc
     int reproduceTest(int attempt);
     //!< Used to test reversiblity
     void reverseTest();
+    //!< used to shift lattice/RNG for a stronger reproducibility testing
+    void shiftStates(const int x,const int y,const int z, const int t);
 
  protected:
 
@@ -70,8 +72,9 @@ class AlgHmc
     Matrix* gauge_field_final;
     //!< The initial gauge field configuration
 
-    unsigned int **rng4d_init;
-    unsigned int **rng5d_init;
+//    unsigned int **rng4d_init;
+//    unsigned int **rng5d_init;
+      LRGState lrg_state;
     //!< The initial random numbers
 
     int config_no;

@@ -16,20 +16,19 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
-#include<util/checksum.h>
-#include<util/qcdio.h>
 #include<math.h>
 #include<alg/alg_hmc.h>
+#include<alg/alg_meas.h>
+#include<comms/glb.h>
+#include <util/checksum.h>
+#include<util/data_shift.h>
+#include<util/error.h>
+#include<util/gjp.h>
 #include<util/lattice.h>
 #include<util/vector.h>
-#include<util/gjp.h>
-#include<util/smalloc.h>
 #include<util/verbose.h>
-#include<util/error.h>
-#include<comms/glb.h>
-#include<alg/alg_meas.h>
-#include<util/error.h>
-#include <util/checksum.h>
+#include<util/smalloc.h>
+#include<util/qcdio.h>
 
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
@@ -38,6 +37,10 @@ CPS_END_NAMESPACE
 #include <qcdocos/scu_checksum.h>
 #endif
 CPS_START_NAMESPACE
+
+static const int SHIFT_X = 1;
+static const int SHIFT_Y = 1;
+static const int SHIFT_Z = 1;
 
 //------------------------------------------------------------------
 /*!
@@ -74,22 +77,6 @@ AlgHmc::AlgHmc(AlgIntAB &Integrator, CommonArg &c_arg, HmcArg &arg)
       
     }
 
-    if (hmc_arg->reproduce == REPRODUCE_YES) {
-
-      //!< Allocate memory for the initial rng state
-      rng4d_init = (unsigned int**) smalloc(LRG.NStates(FOUR_D)*sizeof(unsigned int*),
-					    cname, fname, "rng4d_init");
-      rng5d_init = (unsigned int**) smalloc(LRG.NStates()*sizeof(unsigned int*),
-					    cname, fname, "rng5d_init");
-      for (int i=0; i<LRG.NStates(FOUR_D); i++)
-	rng4d_init[i] = (unsigned int*) smalloc(LRG.StateSize()*sizeof(unsigned int), 
-						cname, fname, "rng4d_init[i]");
-      for (int i=0; i<LRG.NStates(); i++)
-	rng5d_init[i] = (unsigned int*) smalloc(LRG.StateSize()*sizeof(unsigned int), 
-						cname, fname, "rng5d_init[i]");
-      
-    }
-
     LatticeFactory::Destroy();
   }
 
@@ -106,19 +93,6 @@ AlgHmc::~AlgHmc() {
 
   // Free memory for the initial gauge field.
   sfree(gauge_field_init, cname,fname, "gauge_field_init");
-
-  if (hmc_arg->reproduce == REPRODUCE_YES) {
-
-    //!< Free memory for the initial rng state
-    for (int i=0; i<LRG.NStates(); i++)
-      sfree(rng5d_init[i], cname, fname, "rng5d_init[i]");
-    for (int i=0; i<LRG.NStates(FOUR_D); i++)
-      sfree(rng4d_init[i], cname, fname, "rng4d_init[i]");
-    
-    sfree(rng5d_init, cname, fname, "rng5d_init");
-    sfree(rng4d_init, cname, fname, "rng4d_init");
-
-  }
 
   if (hmc_arg->reverse == REVERSE_YES) {
     //!< Free memory for the final gauge field.
@@ -190,7 +164,11 @@ Float AlgHmc::run(void)
       integrator->init();
 
       //!< Restore state if necessary
-      if ( !(test == 0 && attempt ==0) ) restoreInitialState();
+      if ( !(test == 0 && attempt ==0) ){
+        restoreInitialState();
+        shiftStates(SHIFT_X,SHIFT_Y,SHIFT_Z,0);
+        GDS.SetOrigin(SHIFT_X,SHIFT_Y,SHIFT_Z,0);
+      }
 
       //!< Evaluate the heatbath
       integrator->heatbath();
@@ -206,6 +184,11 @@ Float AlgHmc::run(void)
 	Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
 	lat.Reunitarize(dev, max_diff);
 	LatticeFactory::Destroy();
+      }
+
+      if ( !(test == 0 && attempt ==0) ){
+        shiftStates(-SHIFT_X,-SHIFT_Y,-SHIFT_Z,0);
+        GDS.SetOrigin(0,0,0,0);
       }
 
       //!< Calculate final Hamiltonian
@@ -365,8 +348,9 @@ int AlgHmc::saveInitialState() {
 
   if (hmc_arg->reproduce == REPRODUCE_YES) {
     //!< Save initial rng state
-    LRG.GetStates(rng5d_init, FIVE_D);
-    LRG.GetStates(rng4d_init, FOUR_D);
+//    LRG.GetStates(rng5d_init, FIVE_D);
+//    LRG.GetStates(rng4d_init, FOUR_D);
+      lrg_state.GetStates();
     
     if (hmc_arg->reproduce_attempt_limit < 1 ||
 	hmc_arg->reproduce_attempt_limit > 5)
@@ -394,8 +378,17 @@ void AlgHmc::saveFinalState() {
 void AlgHmc::restoreInitialState() {
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
   lat.GaugeField(gauge_field_init);
-  LRG.SetStates(rng4d_init, FOUR_D);
-  LRG.SetStates(rng5d_init, FIVE_D);
+//  LRG.SetStates(rng4d_init, FOUR_D);
+//  LRG.SetStates(rng5d_init, FIVE_D);
+  lrg_state.SetStates();
+  LatticeFactory::Destroy();
+}
+
+void AlgHmc::shiftStates(int x, int y, int z, int t) {
+  Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
+  GDS.Set(x,y,z,t);
+  LRG.Shift();
+  lat.Shift();
   LatticeFactory::Destroy();
 }
 
