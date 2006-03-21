@@ -25,6 +25,7 @@ AlgAction::AlgAction(AlgMomentum &momentum, ActionArg &action_arg)
 
   cname = "AlgAction(Matrix*)";
   char *fname = "AlgAction(AlgMomentum&,ActionArg&)";
+  VRB.Func(cname,fname);
   mom = momentum.getMom();
   force_measure = action_arg.force_measure;
   force_label = action_arg.force_label;
