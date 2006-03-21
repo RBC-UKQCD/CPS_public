@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.16 2006-02-21 21:14:07 chulwoo Exp $
+  $Id: alg_eig.C,v 1.17 2006-03-21 20:39:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 21:14:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.16 2006-02-21 21:14:07 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.16 2006-02-21 21:14:07 chulwoo Exp $
+//  $Date: 2006-03-21 20:39:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.17 2006-03-21 20:39:42 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.17 2006-03-21 20:39:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -94,32 +94,7 @@ AlgEig::AlgEig(Lattice& latt,
     ERR.Pointer(cname,fname, "arg");
   alg_eig_arg = arg;
 
-#if 1
   Ncb = NumChkb(alg_eig_arg->RitzMatOper);
-#else 
-  // Determine the number of checkerboards
-  switch(alg_eig_arg->RitzMatOper)
-  {
-  case MAT_HERM:
-  case MATDAG_MAT:
-  case NEG_MATDAG_MAT:
-  case MATDAG_MAT_NORM:
-  case NEG_MATDAG_MAT_NORM:
-    Ncb = 2;
-    break;
-    
-  case MATPC_HERM:
-  case MATPCDAG_MATPC:
-  case NEG_MATPCDAG_MATPC:
-    Ncb = 1;
-    break;
-
-  default:
-    ERR.General(cname,fname,"RitzMatOper %d not implemented",
-		alg_eig_arg->RitzMatOper);
-  }
-#endif
-
 
   // Set the node size of the full (non-checkerboarded) fermion field
   // NOTE: at this point we must know on what lattice size the operator 
@@ -188,23 +163,18 @@ AlgEig::~AlgEig() {
 
   // Free memory
   //----------------------------------------------------------------
-  VRB.Sfree(cname,fname, "valid_eig", valid_eig);
-  sfree(valid_eig);
+  sfree(cname,fname, "valid_eig", valid_eig);
 
-  VRB.Sfree(cname,fname, "chirality", chirality);
-  sfree(chirality);
+  sfree(cname,fname, "chirality", chirality);
 
-  VRB.Sfree(cname,fname, "lambda", lambda);
-  sfree(lambda);
+  sfree(cname,fname, "lambda", lambda);
 
   for(int n = alg_eig_arg->N_eig - 1; n >= 0; --n)
   {
-    VRB.Sfree(cname,fname, "eigenv[n] ",eigenv[n]);
-    sfree(eigenv[n]);
+    sfree(cname,fname, "eigenv[n] ",eigenv[n]);
   }
 
-  VRB.Sfree(cname,fname, "eigenv", eigenv);
-  sfree(eigenv);
+  sfree(cname,fname, "eigenv", eigenv);
 
   //???
 }
@@ -271,17 +241,11 @@ void AlgEig::run(Float **evalues)
       ERR.General(cname,fname,"Invalid direction\n");
     }
 
-    hsum = (Float **) smalloc(N_eig * sizeof(Float*)); // surely Float* ?
-    if(hsum == 0)
-      ERR.Pointer(cname,fname, "hsum");
-    VRB.Smalloc(cname,fname, "hsum", hsum, N_eig * sizeof(Float*));
+    hsum = (Float **) smalloc(cname,fname,"hsum",N_eig * sizeof(Float*)); // surely Float* ?
   
     for(n = 0; n < N_eig; ++n)
     {
-      hsum[n] = (Float *) smalloc(hsum_len * sizeof(Float));
-      if(hsum[n] == 0)
-	ERR.Pointer(cname,fname, "hsum[n]");
-      VRB.Smalloc(cname,fname, "hsum[n]", hsum[n], hsum_len*sizeof(Float));
+      hsum[n] = (Float *) smalloc(cname,fname,"hsum[n]",hsum_len * sizeof(Float));
     }
   }
   else
@@ -293,12 +257,10 @@ void AlgEig::run(Float **evalues)
   Vector** eig_store=0;
   if(eig_arg->ncorr) 
   {
-    eig_store = (Vector**)smalloc(N_eig * sizeof(Vector*));
-    if(eig_store == 0) { ERR.Pointer(cname,fname, "eig_store"); }
+    eig_store = (Vector**)smalloc(cname,fname, "eig_store",N_eig * sizeof(Vector*));
     for(n=0;n<N_eig;++n)
     {
-      eig_store[n] = (Vector*) smalloc(f_size * sizeof(Float));
-      if(eig_store[n] == 0) {ERR.Pointer(cname,fname,"eig_store[n]"); }
+      eig_store[n] = (Vector*) smalloc(cname,fname, "eig_store",f_size * sizeof(Float));
     }
   }
 
@@ -451,10 +413,7 @@ void AlgEig::run(Float **evalues)
 	  // GM5Correlation
               
 	  //tmp vector v1
-	  Vector* v1 = (Vector *)smalloc(f_size*sizeof(Float));
-	  if (v1 == 0)
-	    ERR.Pointer(cname, fname, "v1");
-	  VRB.Smalloc(cname, fname, "v1", v1, f_size*sizeof(Float));
+	  Vector* v1 = (Vector *)smalloc(cname, fname, "v1",f_size*sizeof(Float));
               
 	  for(i_eig=0;i_eig<N_eig;i_eig++){
 	    for(j_eig=i_eig;j_eig<N_eig;j_eig++){
@@ -466,8 +425,7 @@ void AlgEig::run(Float **evalues)
 		      i_eig, j_eig, (Float)cr.real(), (Float)cr.imag());
 	    }
 	  }
-	  VRB.Sfree(cname,fname, "v1", v1);
-	  sfree(v1);
+	  sfree(cname,fname, "v1", v1);
               
 	  // Correlation with previous eigen vector
 	  if(count >0 && eig_arg->ncorr ){
@@ -529,9 +487,9 @@ void AlgEig::run(Float **evalues)
     {
       for(n = 0; n < N_eig; ++n)
         {
-          sfree(eig_store[n]);
+          sfree(cname,fname,"eig_store[n]",eig_store[n]);
         }
-      sfree(eig_store);
+      sfree(cname,fname,"eig_store",eig_store);
     }
   time +=dclock();
   print_flops(cname,fname,0,time);

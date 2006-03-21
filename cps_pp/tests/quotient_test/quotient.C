@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 	  }
 
 	  //!< Run hybrid Monte Carlo
-	  AlgHmc hmc(ab2, common_arg_hmc, hmc_arg);
+	  AlgHmc hmc(ab2, common_arg_hmc, hmc_arg_pass);
 	  hmc.run();
 	}
 

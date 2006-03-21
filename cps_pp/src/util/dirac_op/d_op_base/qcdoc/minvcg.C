@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpBase class multishift CG solver method.
 
-  $Id: minvcg.C,v 1.20 2006-02-22 18:44:18 chulwoo Exp $
+  $Id: minvcg.C,v 1.21 2006-03-21 20:36:01 chulwoo Exp $
 */
 
 CPS_END_NAMESPACE
@@ -137,13 +137,6 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
 
   Float b_tmp;
 
-  // If source norm = 0, solution must be 0
-  if (chi_norm == 0.0) {
-    if (type == SINGLE) bzero((char *)psi[0],f_size*sizeof(Float));
-    else for (k=0; k<Nmass; k++) bzero((char *)psi[k],f_size*sizeof(Float));
-    return 0;
-  }
-  
   if (type == SINGLE || type == MULTI) {
     r-> CopyVec(chi,f_size);
     cp = chi_norm;
@@ -254,7 +247,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     } else {
       MatPcDagMatPc(Ap,p[0],&d);
     }
-    x_loc_csum = x_loc_csum ^ local_checksum((Float *)Ap,f_size);
+//    x_loc_csum = x_loc_csum ^ local_checksum((Float *)Ap,f_size);
     DiracOpGlbSum(&d);
     
     bp = b;
@@ -348,24 +341,18 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
       ffree(psi[s]);
       loc_csum = loc_csum ^ local_checksum((Float *)psi_slow[s],f_size);
     }
-    VRB.Sfree(cname,fname,"p[s]",p[s]);
-    ffree(p[s]);
+    ffree(cname,fname,"p[s]",p[s]);
   }
   CSM.SaveCsum(CSUM_EVL_SOL,loc_csum);
   CSM.SaveCsum(CSUM_MMP_SUM,x_loc_csum);
   CSM.SaveCsumSum(CSUM_GLB_LOC);
   CSM.SaveCsumSum(CSUM_GLB_SUM);
   
-  VRB.Sfree(cname,fname,"p",p);
-  sfree(p);
-  VRB.Sfree(cname,fname,"psi",psi);
-  sfree(psi);
-  VRB.Sfree(cname,fname,"Ap",Ap);
-  ffree(Ap);
-  VRB.Sfree(cname,fname,"r",r);
-  ffree(r);
-  VRB.Sfree(cname,fname,"bs",bs);
-  sfree(bs);
+  sfree(cname,fname,"p",p);
+  sfree(cname,fname,"psi",psi);
+  ffree(cname,fname,"Ap",Ap);
+  ffree(cname,fname,"r",r);
+  sfree(cname,fname,"bs",bs);
   VRB.Sfree(cname,fname,"z[1]",z[1]);
   sfree(*(z+1));
   VRB.Sfree(cname,fname,"z[0]",z[0]);
