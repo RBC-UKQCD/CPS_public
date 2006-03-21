@@ -464,7 +464,8 @@ bigfloat AlgRemez::func(const bigfloat x) {
     z = x;
     break;
   case RATIONAL_APPROX_QUOTIENT: 
-    z = (x+delta_m)/x;
+//    z = (x+delta_m)/x;
+    z = x/(x+delta_m);
     break;
   default:
     ERR.General(cname,fname,"ApproxType %d not implemented\n", approx_type);
