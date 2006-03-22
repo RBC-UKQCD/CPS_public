@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOp class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.11 2005-10-04 05:17:59 chulwoo Exp $
+   $Id: minvcg.C,v 1.12 2006-03-22 03:19:53 chulwoo Exp $
  */
 
 CPS_END_NAMESPACE
@@ -115,14 +115,6 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
 
   Float *rsd_sq = (Float*)smalloc(Nmass*sizeof(Float)); 
   Float *rsdcg_sq = (Float*)smalloc(Nmass*sizeof(Float)); 
-
-  // If source norm = 0, solution must be 0
-  if (chi_norm == 0.0) {
-    if (type == SINGLE) psi[0]->VecZero(f_size);
-    else for (s=0; s<Nmass; s++)
-      psi[s]->VecZero(f_size);
-    return 0;
-  }
 
   if (type == MULTI) {
     for (int i=0; i<Nmass; i++)
