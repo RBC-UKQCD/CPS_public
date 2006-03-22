@@ -4042,7 +4042,7 @@ echo "${ECHO_T}$enable_gmp" >&6
 if test "$enable_gmp" = "no"; then
    DFLAGS=""
 else
-   LDFLAGS="${LDFLAGS} -L${enable_gmp}/lib -lmpfr -lgmp"
+   LDFLAGS="${LDFLAGS} -L${enable_gmp}/lib -lgmp"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_gmp}/include"
    DFLAGS="${DFLAGS} -DGMP"
 fi

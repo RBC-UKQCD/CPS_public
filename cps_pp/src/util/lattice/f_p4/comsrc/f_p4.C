@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.12 2006-02-21 21:14:11 chulwoo Exp $
+  $Id: f_p4.C,v 1.13 2006-03-22 03:18:03 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -381,7 +381,7 @@ void Fp4::BforceVector(Vector *in, CgArg *cg_arg) {
 
 }
 
-
+#if 0
 Float Fp4::RHMC_EvolveMomFforce(Matrix * mom, Vector ** vect, int abc,
 				int isz, Float * def, Float ghi, 
 				Float jkl, Vector ** vect2, 
@@ -390,6 +390,7 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix * mom, Vector ** vect, int abc,
   ERR.NotImplemented(cname,"RHMC_EvolveMomFforce()");
   return 0.0;
 }
+#endif
 
 static int Rotate (int mu, int i){
 	int mu_p = (mu+i)%4;
@@ -675,12 +676,14 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
   smeared=1;
 }
 
+#if 1
 Float Fp4::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 		      Float mass, Float step_size) {
   char *fname = "EvolveMomFforce(M*,V*,V*,F,F)";
   ERR.General(cname,fname,"Not Implemented\n");
   return 0.0;
 }
+#endif
 
 
 CPS_END_NAMESPACE

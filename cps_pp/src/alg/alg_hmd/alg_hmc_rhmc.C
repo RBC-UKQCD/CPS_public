@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.25 2006-02-01 16:46:08 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.26 2006-03-22 03:15:45 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2006-02-01 16:46:08 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.25 2006-02-01 16:46:08 chulwoo Exp $
-  $Id: alg_hmc_rhmc.C,v 1.25 2006-02-01 16:46:08 chulwoo Exp $
+  $Date: 2006-03-22 03:15:45 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.26 2006-03-22 03:15:45 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.26 2006-03-22 03:15:45 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.25 $
+  $Revision: 1.26 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -943,7 +943,7 @@ Float AlgHmcRHMC::run(void)
   lat.MdTime(0.0);
   VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
 
-  ERR.HdwCheck(cname,fname);
+  //  ERR.HdwCheck(cname,fname);
 
   return acceptance;
 }
@@ -1011,6 +1011,11 @@ void AlgHmcRHMC::generateApprox(HmdArg *hmd_arg)
 //      hmd_arg->FRatError[i] = remez.generateApprox(hmd_arg->FRatDeg[i],hmd_arg->frm_power_num[i], hmd_arg->frm_power_den[i]);
 
         RemezArg remez_arg;
+	//-----------------------------------------------
+	//Ugly hack to make things work with this deprecated style of RHMC
+	//michaelc 03/01/06
+	remez_arg.approx_type = RATIONAL_APPROX_POWER;
+	//-----------------------------------------------
         remez_arg.degree = hmd_arg->FRatDeg[i];
         remez_arg.field_type = hmd_arg->field_type[i];
         remez_arg.lambda_low = hmd_arg->lambda_low[i];

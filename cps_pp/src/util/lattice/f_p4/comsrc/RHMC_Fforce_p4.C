@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fp4::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce_p4.C,v 1.3 2006-02-20 22:11:44 chulwoo Exp $
+  $Id: RHMC_Fforce_p4.C,v 1.4 2006-03-22 03:18:03 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -349,7 +349,9 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			if(sigma[w]!=mu[w] && sigma[w]!=nu[w]) break;
 		    }
 		}
-	  
+
+		if (fabs(GJP.p4_staple5_coeff()) > 1e-15 || fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {	  
 		// Prhonu = U_rho Pnu 
 	  
 		for(int i=0; i<N; i++){
@@ -364,7 +366,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    }
 		    parallel_transport.run(n_sign*N, vout, vin, dir);
 		}
-	  
+		  }
+
+	       if (fabs(GJP.p4_staple5_coeff()) > 1e-15)
+		{	  
 		// P5 = U_mu Prhonu
 	  
 		for(int i=0; i<N; i++){
@@ -379,7 +384,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    }
 		    parallel_transport.run(n_sign*N, vout, vin, dir);
 		}
+		}
 	  
+		if (fabs(GJP.p4_staple5_coeff()) > 1e-15 || fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// Lrhonu[x] = Lnu[x+/-rho]
 	  
 		for(int i=0; i<N; i++){
@@ -394,7 +402,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    }
 		    parallel_transport.shift_field(vin, dir, n_sign*N, 1, vout);
 		}
+		  }
 	  
+		if (fabs(GJP.p4_staple5_coeff()) > 1e-15)
+		  {
 		// F_mu += P5 (Prhonu Lrhonu)^dagger
 	  
 		for(w=0; w<N; w++)
@@ -402,7 +413,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			force_product_sum(P5[plus][ns][rs][w], Prhonu[ns][rs][w],
 					  Lrhonu[ns][rs][w], GJP.p4_staple5_coeff(),
 					  force[mu[w]], mtmp);
+		  }
 	  
+		if (fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// Psigmarhonu = U_sigma P_rhonu
 	  
 		for(int i=0; i<N; i++){
@@ -417,7 +431,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    }
 		    parallel_transport.run(n_sign*N, vout, vin, dir);
 		}
+		  }
 	  
+		if (fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// P7 = U_mu P_sigmarhonu
 		for(int i=0; i<N; i++){
 		    dir[n_sign*i] = n_sign*mu[i]+plus;        
@@ -431,7 +448,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    }
 		    parallel_transport.run(n_sign*N, vout, vin, dir);
 		}
+		  }
 	  
+		if (fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// Lsigmarhonu = Lrhonu[x+/-sigma]
 	  
 		for(int i=0; i<N; i++){
@@ -446,8 +466,11 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    }
 		    parallel_transport.shift_field(vin, dir, n_sign*N, 1, vout);
 		}
+		  }
 	  
 	  
+ 		if (fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// F_mu -= P7 (Psigmarhonu Lsigmarhonu)^\dagger
 	  
 		for(w=0; w<N; w++)
@@ -464,7 +487,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			force_product_sum(P7[plus][ns][rs][minus][w], Psigmarhonu[ns][rs][minus][w],
 					  Lsigmarhonu[ns][rs][minus][w], -GJP.p4_staple7_coeff(),
 					  force[sigma[w]], mtmp);
+		  }
 
+		if (fabs(GJP.p4_staple5_coeff()) > 1e-15 || fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// Lmusigmarhonu = Lsigmarhonu[x-mu]
 	  
 		for(int i=0; i<N; i++) dir[i] = n_sign*mu[i]+minus;
@@ -475,8 +501,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    }
 		    parallel_transport.shift_field(vin, dir, N, 1, vout);
 		}
+		  }
 	  
-	  
+		if (fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// F_sigma += Psigmarhonu (P7 Lmusigmarhonu)^\dagger
 	  
 		for(w=0; w<N; w++)
@@ -484,7 +512,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			force_product_sum(Psigmarhonu[ns][rs][minus][w], P7[minus][ns][rs][minus][w],
 					  Lmusigmarhonu[ns][rs][w], -GJP.p4_staple7_coeff(),
 					  force[sigma[w]], mtmp);
+		  }
 
+  		if (fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// Psigma7 = U_sigma P7 
 		for(int i=0; i<N; i++){
 		    dir[n_sign*i] = n_sign*sigma[i]+plus;        
@@ -499,7 +530,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    }
 		    parallel_transport.run(n_sign*N, vout, vin, dir);
 		}
+		  }
 	  
+		if (fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// F_sigma += Fsigma7 (Frhonu Lrhonu)^\dagger
 	  
 		for(w=0; w<N; w++)
@@ -507,7 +541,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			force_product_sum(Psigma7[plus][ns][rs][plus][w],	Prhonu[ns][rs][w],
 					  Lrhonu[ns][rs][w], -GJP.p4_staple7_coeff(),
 					  force[sigma[w]], mtmp);
+		  }
 
+		if (fabs(GJP.p4_staple5_coeff()) > 1e-15 || fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// Lmurhonu = Lrhonu[x-mu]
 		  
 		for(int i=0; i<N; i++) dir[i] = n_sign*mu[i]+minus;
@@ -518,7 +555,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    }
 		    parallel_transport.shift_field(vin, dir, N, 1, vout);
 		}
+		  }
 	  
+		if (fabs(GJP.p4_staple7_coeff()) > 1e-15)
+		  {
 		// F_sigma += Frhonu (Fsigma7 Lmurhonu)^\dagger
 	  
 		for(w=0; w<N; w++)
@@ -526,9 +566,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			force_product_sum(Prhonu[ns][rs][w], Psigma7[minus][ns][rs][plus][w],
 					  Lmurhonu[ns][rs][w], -GJP.p4_staple7_coeff(),
 					  force[sigma[w]], mtmp);
+		  }
 	  
-		if(GJP.p4_staple5_coeff()!=0.0) {
-		    Float tmp = -GJP.p4_staple7_coeff()/GJP.p4_staple5_coeff();
+		if(fabs(GJP.p4_staple5_coeff()) > 1e-15 && fabs(GJP.p4_staple7_coeff()) > 1e-15) {
+		Float tmp = -GJP.p4_staple7_coeff()/GJP.p4_staple5_coeff();
 		    for(ms=0; ms<n_sign; ms++) 
 			for(ns=0; ns<n_sign; ns++) 
 			    for(rs=0; rs<n_sign; rs++) 
@@ -554,6 +595,8 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				    }
 		}
 	  
+		if (fabs(GJP.p4_staple5_coeff()) > 1e-15)
+		  {
 		// F_rho -= P5 (Prhonu Lrhonu)^\dagger
 		for(w=0; w<N; w++)
 		    for(ns=0; ns<n_sign; ns++)
@@ -568,7 +611,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			force_product_sum(Prhonu[ns][minus][w], P5[minus][ns][minus][w],
 					  Lmurhonu[ns][minus][w], -GJP.p4_staple5_coeff(),
 					  force[rho[w]], mtmp);
+		  }
 
+		if (fabs(GJP.p4_staple5_coeff()) > 1e-15)
+		  {
 		// Prho5 = U_rho P5
 	  
 		for(int i=0; i<N; i++){
@@ -584,7 +630,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    }
 		    parallel_transport.run(n_sign*N, vout, vin, dir);
 		}
+		  }
 	  
+		if (fabs(GJP.p4_staple5_coeff()) > 1e-15)
+		  {
 		// F_rho -= Prho5 (Pnu Lnu)^\dagger
 	  
 		for(w=0; w<N; w++)
@@ -592,6 +641,8 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			force_product_sum(Prho5[plus][ns][plus][w], Pnu[ns][w],
 					  Lnu[ns][w], -GJP.p4_staple5_coeff(),
 					  force[rho[w]], mtmp);
+		  }
+
 		// Lmunu = Lnu[x-mu]
 	  
 		for(int i=0; i<N; i++) dir[i] = n_sign*mu[i]+minus;
@@ -603,7 +654,8 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		    parallel_transport.shift_field(vin, dir, N, 1, vout);
 		}
 	  
-	  
+		if (fabs(GJP.p4_staple5_coeff()) > 1e-15)
+		  {
 		// F_rho -= Pnu (Prho5 Lmunu)^\dagger
 	  
 		for(w=0; w<N; w++)
@@ -611,10 +663,11 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			force_product_sum(Pnu[ns][w], Prho5[minus][ns][plus][w],
 					  Lmunu[ns][w], -GJP.p4_staple5_coeff(),
 					  force[rho[w]], mtmp);
-
+		  }
+	    
 		// P3 += c_5/c_3 Prho5
 	  
-		if(GJP.p4_staple3_coeff()!=0.0) {
+		if(fabs(GJP.p4_staple3_coeff()) > 1e-15 && fabs(GJP.p4_staple5_coeff()) > 1e-15) {
 		    Float tmp = -GJP.p4_staple5_coeff()/GJP.p4_staple3_coeff();
 		    for(ms=0; ms<n_sign; ms++) 
 			for(ns=0; ns<n_sign; ns++) 
@@ -642,6 +695,8 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 	  
 	    } // rho+sigma loop
 	
+	    if (fabs(GJP.p4_Lepage_coeff()) > 1e-15)
+	      {
 	    // Pnunu = U_nu Pnu
 	
 	    for(int i=0; i<N; i++){
@@ -655,8 +710,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		vout[n_sign*i+1] = Pnunu[plus][i];
 	    }
 	    parallel_transport.run(n_sign*N, vout, vin, dir);
+	      }
 
-	
+	    if (fabs(GJP.p4_Lepage_coeff()) > 1e-15)
+	      {
 	    // P5 = U_mu Pnunu
 	
 	    for(int i=0; i<N; i++){
@@ -671,6 +728,7 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		}
 		parallel_transport.run(n_sign*N, vout, vin, dir);
 	    }
+	      }
 
 
 	    // P5prime = U_nu Pmumu
@@ -688,6 +746,8 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		parallel_transport.run(n_sign*N, vout, vin, dir);
 	    }
 	
+	    if (fabs(GJP.p4_Lepage_coeff()) > 1e-15)
+	      {
 	    //Lnunu = Lnu[x+/-nu]
 	
 	    for(int i=0; i<N; i++){
@@ -702,7 +762,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 	    }
 
 	    parallel_transport.shift_field(vin, dir, n_sign*N, 1, vout);
+	      }
 	
+	    if (fabs(GJP.p4_Lepage_coeff()) > 1e-15)
+	      {
 	    // F_mu += P5 (Pnunu Lnunu)^\dagger
 	
 	    for(w=0; w<N; w++)
@@ -717,7 +780,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		force_product_sum(P5[plus][minus][0][w], Pnunu[minus][w],
 				  Lnunu[minus][w], -GJP.p4_Lepage_coeff(),
 				  force[nu[w]], mtmp);
+	      }
 
+	    if (fabs(GJP.p4_Lepage_coeff()) > 1e-15)
+	      {
 	    // Lmununu = Lnunu[x-mu]
 	
 	    for(int i=0; i<N; i++) dir[i] = n_sign*mu[i]+minus;
@@ -727,14 +793,20 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 	    }
 
 	    parallel_transport.shift_field(vin, dir, N, 1, vout);
+	      }
 	
+	    if (fabs(GJP.p4_Lepage_coeff()) > 1e-15)
+	      {
 	    // F_nu -= Pnunu (P5 Lmununu)^\dagger
 	
 	    for(w=0; w<N; w++)
 		force_product_sum(Pnunu[minus][w], P5[minus][minus][0][w],
 				  Lmununu[w], -GJP.p4_Lepage_coeff(),
 				  force[nu[w]], mtmp);
+	      }
 
+	    if (fabs(GJP.p4_Lepage_coeff()) > 1e-15)
+	      {
 	    // Pnu5 = U_nu P5
 	
 	    for(int i=0; i<N; i++){
@@ -750,7 +822,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		}
 		parallel_transport.run(n_sign*N, vout, vin, dir);
 	    }
+	      }
 	
+	    if (fabs(GJP.p4_Lepage_coeff()) > 1e-15)
+	      {
 	    // F_nu -= Pnu5 (Pnu Lnu)^\dagger
 	
 	    for(w=0; w<N; w++)
@@ -763,10 +838,11 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		force_product_sum(Pnu[plus][w], Pnu5[minus][plus][w],
 				  Lmunu[plus][w], -GJP.p4_Lepage_coeff(),
 				  force[nu[w]], mtmp);
+	      }
 
 	    // P3 += c_L/c_3 Pnu5
 	
-	    if(GJP.p4_staple3_coeff()!=0.0) {
+	    if(fabs(GJP.p4_staple3_coeff()) > 1e-15 && fabs(GJP.p4_Lepage_coeff()) > 1e-15) {
 		Float tmp = -GJP.p4_Lepage_coeff()/GJP.p4_staple3_coeff();
 		for(ms=0; ms<n_sign; ms++) 
 		    for(ns=0; ns<n_sign; ns++) 
@@ -1079,7 +1155,7 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				  -GJP.p4_knight_coeff(),
 				  force[mu[w]], mtmp);
 	      }
-
+	
 	} // nu loop
     } // mu loop
 

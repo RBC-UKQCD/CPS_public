@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.42 2006-02-21 21:14:13 chulwoo Exp $
+  $Id: lattice_base.C,v 1.43 2006-03-22 03:18:03 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 21:14:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.42 2006-02-21 21:14:13 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.42 2006-02-21 21:14:13 chulwoo Exp $
+//  $Date: 2006-03-22 03:18:03 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.43 2006-03-22 03:18:03 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.43 2006-03-22 03:18:03 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.42 $
+//  $Revision: 1.43 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -337,6 +337,7 @@ Lattice::~Lattice()
   // No data manipulations if the scaling factor is 1.0
   // [built into lat.MltFloat].
   MltFloat(1.0 / GJP.XiBare(), GJP.XiDir());
+  VRB.FuncEnd(cname,fname);
 
 }
 

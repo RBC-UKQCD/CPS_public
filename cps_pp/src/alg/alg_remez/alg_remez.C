@@ -435,10 +435,9 @@ bigfloat AlgRemez::approx(const bigfloat x) {
   return(yn/yd);
 }
 
-// Compute size and sign of the approximation error at x
+//!< Compute size and sign of the approximation error at x
 bigfloat AlgRemez::getErr(bigfloat x, int *sign) {
   char *fname = "getErr(bigfloat)";
-//   VRB.Func(cname,fname);
   bigfloat e, f;
 
   f = func(x);
@@ -453,18 +452,16 @@ bigfloat AlgRemez::getErr(bigfloat x, int *sign) {
   return(e);
 }
 
-// Calculate function required for the approximation
+//!< Calculate function required for the approximation
 bigfloat AlgRemez::func(const bigfloat x) {
   char *fname = "func(bigfloat)";
-//   VRB.Func(cname,fname);
 
-  bigfloat z;
+  bigfloat z, y,dy,f=1l,df;
   switch (approx_type) { 
   case RATIONAL_APPROX_POWER:
     z = x;
     break;
   case RATIONAL_APPROX_QUOTIENT: 
-//    z = (x+delta_m)/x;
     z = x/(x+delta_m);
     break;
   default:
@@ -472,20 +469,20 @@ bigfloat AlgRemez::func(const bigfloat x) {
   }
 
   if (z == (bigfloat)1.0) return (bigfloat)1.0;
-  else return pow_bf(z,(bigfloat)power_num / (bigfloat)power_den);
 
-  /*
-  bigfloat y;
-  if (z == (bigfloat)1.0) y = (bigfloat)1.0;
-  else y = pow_bf(z,pow);
-  printf("d = %e, y = %e\n",(Float)delta_m,(Float)y);fflush(stdout);
-  return y;
-
-  */
+  // initial guess to accelerate convergance
+  y = (bigfloat)pow((double)z,(double)((bigfloat)1l/(bigfloat)power_den));
+  while (abs_bf(f)>(bigfloat)1l/pow_bf((bigfloat)10,prec)) { // approx good to 10^(-prec)
+    f = pow_bf(y,power_den) - z;
+    df = (bigfloat)power_den*pow_bf(y,power_den-1);// need power_den-1 because of diff
+    dy = f/df;
+    y -= dy;
+  }
+  return pow_bf(y,power_num);
 
 }
 
-// Solve the system AX=B
+//!< Solve the system AX=B
 int AlgRemez::simq(bigfloat A[], bigfloat B[], bigfloat X[], int n) {
 
   char *fname = "simq(bigfloat*, bigfloat*, bigfloat*, int, int)";
@@ -764,7 +761,8 @@ void AlgRemez::pfe(bigfloat *res, bigfloat *poles, bigfloat norm) {
       res[small] = res[j];
       res[j] = temp;
     }
-    VRB.Result(cname,fname,"Residue = %0.14e, Pole = %0.14e\n", (double)res[j], (double)poles[j]);
+    VRB.Result(cname,fname,"%d Residue = %0.14e, Pole = %0.14e\n", 
+	       j, (double)res[j], (double)poles[j]);
   }
 
   delete [] numerator;

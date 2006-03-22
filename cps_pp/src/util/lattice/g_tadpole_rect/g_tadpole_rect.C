@@ -70,7 +70,7 @@ GtadpoleRect::GtadpoleRect()
 
   plaq_coeff = - GJP.Beta() * ( 1.0 - 8.0 * GJP.C1() ) / 3.0 ;
   rect_coeff = - GJP.Beta() * ( GJP.C1()/(GJP.u0()*GJP.u0()) ) / 3.0 ;
-  printf("TADPOLE RECTANGLE COEFFICIENT = %f\n",rect_coeff);
+  //printf("TADPOLE RECTANGLE COEFFICIENT = %f\n",rect_coeff);
 }
 
 

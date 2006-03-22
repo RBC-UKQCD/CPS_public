@@ -230,8 +230,8 @@ void AlgActionRational::heatbath() {
     evolved = 0;
     heatbathEval = 1;
     energyEval = 0;
-    traj++;
   }
+  traj++;
 
 }
 
@@ -394,7 +394,12 @@ void AlgActionRational::generateApprox(Float *mass,
 	ERR.General(cname,fname,"RationalApproxType %d not implemented for FclassType %d\n",
 		    RATIONAL_BOUNDS_AUTOMATIC, fermion);
       (*remez_arg_md)[i].lambda_low = 4.0*mass[i]*mass[i];
-      (*remez_arg_md)[i].lambda_high = 64+4.0*mass[i]*mass[i];
+      if (fermion == F_CLASS_STAG)
+	(*remez_arg_md)[i].lambda_high = 16+4.*mass[i]*mass[i];
+      else if (fermion == F_CLASS_ASQTAD)
+	(*remez_arg_md)[i].lambda_high = 196./9.+4.*mass[i]*mass[i];
+      else if (fermion == F_CLASS_P4)
+	(*remez_arg_md)[i].lambda_high = 50./9.+4.*mass[i]*mass[i];
       break;
     default:
       ERR.General(cname,fname,"RationalBoundsType %d not implemented\n", rat[i].md_approx.bounds_type);
@@ -412,7 +417,7 @@ void AlgActionRational::generateApprox(Float *mass,
     (*remez_arg_md)[i].delta_m = 4.0*rat[i].stag_bsn_mass*rat[i].stag_bsn_mass - 
       (*remez_arg_md)[i].lambda_low;
     
-    (*remez_arg_mc)[i].approx_type = rat[i].md_approx.approx_type;
+    (*remez_arg_mc)[i].approx_type = rat[i].mc_approx.approx_type;
     switch (rat[i].mc_approx.bounds_type) {
     case RATIONAL_BOUNDS_MANUAL:
       (*remez_arg_mc)[i].lambda_low = rat[i].mc_approx.lambda_low;
@@ -423,7 +428,12 @@ void AlgActionRational::generateApprox(Float *mass,
 	ERR.General(cname,fname,"RationalApproxType %d not implemented for FclassType %d\n",
 		    RATIONAL_BOUNDS_AUTOMATIC, fermion);
       (*remez_arg_mc)[i].lambda_low = 4.0*mass[i]*mass[i];
-      (*remez_arg_mc)[i].lambda_high = 64+4.0*mass[i]*mass[i];
+      if (fermion == F_CLASS_STAG)
+	(*remez_arg_mc)[i].lambda_high = 16+4.*mass[i]*mass[i];
+      else if (fermion == F_CLASS_ASQTAD)
+	(*remez_arg_mc)[i].lambda_high = 196./9.+4.*mass[i]*mass[i];
+      else if (fermion == F_CLASS_P4)
+	(*remez_arg_mc)[i].lambda_high = 50./9.+4.*mass[i]*mass[i];
       break;
     default:
       ERR.General(cname,fname,"RationalBoundsType %d not implemented\n", rat[i].mc_approx.bounds_type);
