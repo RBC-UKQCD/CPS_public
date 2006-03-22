@@ -5,17 +5,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.48 2006-03-22 03:11:08 chulwoo Exp $
+  $Id: lattice.h,v 1.49 2006-03-22 03:57:19 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2006-03-22 03:11:08 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.48 2006-03-22 03:11:08 chulwoo Exp $
-  $Id: lattice.h,v 1.48 2006-03-22 03:11:08 chulwoo Exp $
+  $Date: 2006-03-22 03:57:19 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.49 2006-03-22 03:57:19 chulwoo Exp $
+  $Id: lattice.h,v 1.49 2006-03-22 03:57:19 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.48 $
+  $Revision: 1.49 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -1117,7 +1117,7 @@ class Lattice
 
     Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 		 Float mass) {
-      SetPhi(phi,frm1,frm2,mass,DAG_YES);
+      return SetPhi(phi,frm1,frm2,mass,DAG_YES);
     }
 
     //!< Initialises the pseudofermion field 
