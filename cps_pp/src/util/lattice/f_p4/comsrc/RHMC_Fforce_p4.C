@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fp4::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce_p4.C,v 1.4 2006-03-22 03:18:03 chulwoo Exp $
+  $Id: RHMC_Fforce_p4.C,v 1.5 2006-03-29 21:21:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -55,12 +55,13 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
     ForceFlops=0;
 #endif
 
-  Float Fdt=0.0;
-  char *force_label;
+    //Float Fdt=0.0;
+    //char *force_label;
   int g_size = GJP.VolNodeSites() * GsiteSize();
-  Matrix *mom_tmp;
-  FILE *fp;
+  //Matrix *mom_tmp;
+  //FILE *fp;
 
+  /*
   if (force_measure == FORCE_MEASURE_YES) {
     mom_tmp = (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
     if( (fp = Fopen("force.dat", "a")) == NULL )
@@ -69,7 +70,7 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
     force_label = new char[100];
   } else {
     mom_tmp = mom;
-  }
+    }*/
 
     // The number of directions to do simultaneously - N can be 1, 2 or 4.
     const int N = 1;  
@@ -1165,7 +1166,7 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 #endif
     
     // Now that we have computed the force, we can update the momenta
-    update_momenta(force, dt, mom);
+    Float Fdt = update_momenta(force, dt, mom);
 
     // Free allocated memory
     
@@ -1262,6 +1263,7 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
   }
 
   // If measuring the force, need to measure and then sum to mom
+  /*
   if (force_measure == FORCE_MEASURE_YES) {
     Fdt = dotProduct((IFloat*)mom_tmp, (IFloat*)mom_tmp, g_size);
     glb_sum(&Fdt);
@@ -1270,9 +1272,9 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
     Fclose(fp);
     delete[] force_label;
     sfree(mom_tmp, cname, fname, "mom_tmp");
-  }
+    }*/
 
-  return sqrt(Fdt);
+  return Fdt;
 }
 
 

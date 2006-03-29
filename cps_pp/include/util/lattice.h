@@ -5,17 +5,17 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.49 2006-03-22 03:57:19 chulwoo Exp $
+  $Id: lattice.h,v 1.50 2006-03-29 21:21:18 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2006-03-22 03:57:19 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.49 2006-03-22 03:57:19 chulwoo Exp $
-  $Id: lattice.h,v 1.49 2006-03-22 03:57:19 chulwoo Exp $
+  $Date: 2006-03-29 21:21:18 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.50 2006-03-29 21:21:18 chulwoo Exp $
+  $Id: lattice.h,v 1.50 2006-03-29 21:21:18 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: lattice.h,v $
-  $Revision: 1.49 $
+  $Revision: 1.50 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -2140,7 +2140,7 @@ class Fp4 : public virtual FstagTypes, public virtual Fsmear
     
   private:
 
-    void update_momenta(Matrix**, IFloat, Matrix*);
+    Float update_momenta(Matrix**, IFloat, Matrix*);
     
     ChkbType parity(const int*);
 
