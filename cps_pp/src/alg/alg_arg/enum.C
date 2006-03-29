@@ -440,6 +440,22 @@ struct vml_enum_map SourceKind_map[] = {
 };
 
 bool_t
+vml_SinkKind (VML *vmls, char *name,SinkKind *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,SinkKind_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map SinkKind_map[] = {
+	{"SinkKind","W_POINT",W_POINT},
+	{"SinkKind","W_WALL",W_WALL},
+	{"SinkKind","W_BOX",W_BOX},
+	{NULL,NULL,0}
+};
+
+bool_t
 vml_MomentumKind (VML *vmls, char *name,MomentumKind *objp)
 {
 	register int32_t *buf;

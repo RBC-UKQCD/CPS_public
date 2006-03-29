@@ -8,19 +8,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.11 2006-02-21 21:14:06 chulwoo Exp $
+  $Id: enum.x,v 1.12 2006-03-29 19:35:24 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2006-02-21 21:14:06 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.11 2006-02-21 21:14:06 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.11 2006-02-21 21:14:06 chulwoo Exp $*/
+/*  $Date: 2006-03-29 19:35:24 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.12 2006-03-29 19:35:24 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.12 2006-03-29 19:35:24 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.11 $*/
+/*  $Revision: 1.12 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -371,6 +371,10 @@ enum SourceKind { POINT_W = 0,
 		  MAX_NUM_SINK  /*- N/A yet */
 };
 
+enum SinkKind {  W_POINT,
+	         W_WALL,
+                 W_BOX
+};
 
 enum MomentumKind   {MOM_000 = 0,                 /* average over permutaions*/
 		     MOM_001, 

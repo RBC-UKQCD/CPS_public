@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definition of Vector and Matrix classes.
 
   Definitions of functions that perform operations on complex vectors.
-  $Id: vector.C,v 1.7 2005-10-04 05:22:09 chulwoo Exp $
+  $Id: vector.C,v 1.8 2006-03-29 19:35:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-10-04 05:22:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.7 2005-10-04 05:22:09 chulwoo Exp $
-//  $Id: vector.C,v 1.7 2005-10-04 05:22:09 chulwoo Exp $
+//  $Date: 2006-03-29 19:35:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.8 2006-03-29 19:35:25 chulwoo Exp $
+//  $Id: vector.C,v 1.8 2006-03-29 19:35:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v $
 //  $State: Exp $
 //
@@ -232,7 +232,19 @@ Float Vector::NormSqGlbSum4D(int len)
   return Float(sum);
 }
 
+//------------------------------------------------------------------
+/*!
+  \param len The number of real numbers in the vectors. 
+  For debugging purposes
+*/
+//-------------------------------------------------------------------
 
+void Vector::Print(int len){
+  for ( int n = 0; n < len; n+=2 ){
+    printf("%dth vector, %e %e\n",n/2, v[n],v[n+1]);
+  }
+
+}
 //------------------------------------------------------------------
 /*!
   \param b Another vector

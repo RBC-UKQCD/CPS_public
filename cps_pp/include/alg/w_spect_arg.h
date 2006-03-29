@@ -76,6 +76,10 @@ public:
 	SourceKind source_kind;
 	int src_box_b[4];
 	int src_box_e[4];
+	SinkKind sink_kind;
+	int snk_box_b[4];
+	int snk_box_e[4];
+	int zero_mom_box_snk;
 	Float g_epsi;
 	int g_n;
 	int g_center[4];

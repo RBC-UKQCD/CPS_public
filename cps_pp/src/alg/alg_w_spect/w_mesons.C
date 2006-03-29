@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 20:42:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v 1.10 2005-09-06 20:42:00 chulwoo Exp $
-//  $Id: w_mesons.C,v 1.10 2005-09-06 20:42:00 chulwoo Exp $
+//  $Date: 2006-03-29 19:35:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v 1.11 2006-03-29 19:35:24 chulwoo Exp $
+//  $Id: w_mesons.C,v 1.11 2006-03-29 19:35:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_mesons.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_mesons.C,v $
 //  $State: Exp $
 //
@@ -895,15 +895,12 @@ WspectMesons::print(WspectOutput *w_spect_output) const
       }
 
       printf("Writing data to file: %s\n",meson_names[meson]);
-      for (int wall = 0; wall <= d_glb_walls/2; ++wall) {
+      for (int wall = 0; wall < d_glb_walls; ++wall) {
 	for (int mom = 0; mom < d_num_mom; ++mom) {
 	  int offset = mom * d_glb_walls * MESONs + map[meson];
 	  Complex tmp = d_data_p[offset + MESONs*
 				((d_whr.glbCoord() + wall)%d_glb_walls)];
-	  tmp += d_data_p[offset + MESONs *
-			 ((d_whr.glbCoord() + d_glb_walls - wall)%d_glb_walls)];
-	  tmp /= 2.0;
-	  // only print out the imaginary parts
+	  // only print out the real parts
 	  Fprintf(fp, "%d %d %d %.10e\n", 
 		  AlgWspect::GetCounter(), wall, mom, tmp.real());
 	}
@@ -939,14 +936,12 @@ WspectMesons::print_mp(char *filename) const
     if ( !(fp = Fopen(filename, "a")))
       ERR.FileA(d_class_name,fname, filename);
   
-    for (int wall = 0; wall <= d_glb_walls/2; ++wall) {
+    for (int wall = 0; wall < d_glb_walls; ++wall) {
       for (int mom = 0; mom < d_num_mom; ++mom) {
         int offset = mom * d_glb_walls * MESONs + MESONs -1;
         Complex tmp = d_data_p[offset + MESONs*
                             ((d_whr.glbCoord() + wall)%d_glb_walls)];
-        tmp += d_data_p[offset + MESONs *
-                     ((d_whr.glbCoord() + d_glb_walls - wall)%d_glb_walls)];
-        // only print out the imaginary part
+        // only print out the real part
         Fprintf(fp, "%d %d %d %e\n",
                 AlgWspect::GetCounter(), wall, mom, tmp.real());
       }

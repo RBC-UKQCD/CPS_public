@@ -128,11 +128,9 @@ class WspectArg {
   int midplane;
 				
   /* Type of source for the calculation of the quark propagator*/
-  SourceKind source_kind;       
-
-  /*tail of output file names */
-/* stringfiletail;eg. P, W, B4, JN30E2.50,... */
-
+  SourceKind source_kind;  
+     
+   
   /*--------------------------*/
   /*Paremeter of sources*/
   /*--------------------------*/
@@ -144,12 +142,18 @@ class WspectArg {
   /*       3. We check that at least in one direction other than prop_dir*/
   /*          0 <= begin[] <  end[] <= total_sites*/
   int src_box_b[4];           
-  int src_box_e[4];      
+  int src_box_e[4]; 
 
+  /* Type of sink for the calculation of the quark propagator*/
+  SinkKind sink_kind;  
 
-  /* int snk_box_b[4];          - N/A yet. */
-  /* int snk_box_e[4];          - N/A yet.*/
+  /* Sink size. Relevant for BOX only */	
+  int snk_box_b[4];     
+  int snk_box_e[4];     
 
+  /* Whether to do zero momentum projection for the box sink or not*/
+  /* Only relevant for box sink */
+  int zero_mom_box_snk;      
 
   /*added by Thomas and Xiaodong*/
   /*relevant to Jacobi sources*/

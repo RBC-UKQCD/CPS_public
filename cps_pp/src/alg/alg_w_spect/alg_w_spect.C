@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 16:53:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.11 2006-02-21 16:53:33 chulwoo Exp $
-//  $Id: alg_w_spect.C,v 1.11 2006-02-21 16:53:33 chulwoo Exp $
+//  $Date: 2006-03-29 19:35:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.12 2006-03-29 19:35:24 chulwoo Exp $
+//  $Id: alg_w_spect.C,v 1.12 2006-03-29 19:35:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_w_spect.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v $
 //  $State: Exp $
 //
@@ -89,6 +89,7 @@ AlgWspect::AlgWspect(Lattice& latt,
   //------------------------------------------------------------------------
   WspectGinfo g_info;
   VRB.Func(d_class_name, g_info.ctor_str);
+
 
   // Check the lattice type
   //------------------------------------------------------------------------
@@ -237,6 +238,9 @@ void AlgWspect::run()
 #endif
      if(d_arg_p->normal_mesons_on) {
         WspectMesons mes(q1, q1, hyperRect, mom);
+#if 0
+	q1.dumpData("qprop.dat");
+#endif
 
 #ifdef  TIMING_ALG_W_SPECT
         meson_m = clock();

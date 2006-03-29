@@ -35,7 +35,7 @@ private:
 public:
   // CREATORS
   FermionVectorTp();
- ~FermionVectorTp();
+  ~FermionVectorTp();
 
   // ACCESSORS
   void   print(void) const;

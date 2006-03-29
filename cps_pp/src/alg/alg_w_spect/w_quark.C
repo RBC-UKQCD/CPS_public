@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.11 2006-02-21 16:53:33 chulwoo Exp $
+  $Id: w_quark.C,v 1.12 2006-03-29 19:35:24 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP
@@ -59,8 +59,7 @@ WspectQuark::WspectQuark(Lattice &lat,
 
 
   VRB.Func(d_class_name, ctor_str);
-
-
+  
   // set d_weight_* to speed up the accesses to quark propagators
   //-------------------------------------------------------------------------
   {    
@@ -319,7 +318,7 @@ WspectQuark::WspectQuark(Lattice &lat,
 
   // ======= added from phys_v4.0.0 ==================
   // For <A_0 P> calculation -- only used for DWF
-  WspectAxialCurrent axialCurrent(lat, whr, a0_p_outfile);
+  WspectAxialCurrent axialCurrent(lat, warg, whr, a0_p_outfile);
   // ======= end added from phys_v4.0.0 ==================
   
 
@@ -474,6 +473,10 @@ WspectQuark::WspectQuark(Lattice &lat,
       if (lat.Fclass() == F_CLASS_DWF) {
         int ls = GJP.SnodeSites();
         int ls_glb = GJP.SnodeSites() * GJP.Snodes();
+
+	//If midplane is negative, use canonical location for the midpoint, i.e., Ls/2
+        if ( midplane <= 0 ) midplane = ls_glb/2; 
+  
         int f_size_5d = f_size * ls;
         Vector *src_4d = (Vector *)source.data();
         Vector *sol_4d = (Vector *)(d_data_p+f_size*(Cy+COLORs*Dy));
@@ -502,8 +505,44 @@ WspectQuark::WspectQuark(Lattice &lat,
 	// ================= end added from phys_v4.0.0 ===================
 
         lat.Ffive2four(sol_4d, sol_5d, ls_glb-1, 0);
-	
-	// ==== added from phys_v4.0.0 =====
+
+	//----------------------------------------------------------
+	//Wall or Box sink -- added by mflin 03/16/06
+	//---------------------------------------------------------
+	if (warg.sink_kind == W_WALL || warg.sink_kind == W_BOX){
+	  int snk_box_b[LORENTZs],snk_box_e[LORENTZs];
+	  if (warg.sink_kind == W_WALL ){
+	    for( int n = 0; n < LORENTZs; n++ ){
+	      snk_box_b[n] = 0;
+	      snk_box_e[n] = glb_sites[n] - 1;
+	    }
+	    snk_box_b[prop_dir] = snk_box_e[prop_dir] = 0;
+	  }
+	  else {
+	    for( int n = 0; n < LORENTZs; n++ ){
+	      snk_box_b[n] = warg.snk_box_b[n];
+	      snk_box_e[n] = warg.snk_box_e[n];
+	    }
+	    snk_box_b[prop_dir] = snk_box_e[prop_dir] = 0;
+	  }
+
+	  FermionVector fv_sol_4d((Float *)sol_4d);
+	  fv_sol_4d.gaugeFixSink(lat,prop_dir);
+
+	  if(warg.sink_kind == W_BOX && warg.zero_mom_box_snk)
+	    fv_sol_4d.sumOverHyperPlaneZeroMom(prop_dir,snk_box_b,snk_box_e);
+	  else
+	    fv_sol_4d.sumOverHyperPlane(prop_dir,snk_box_b,snk_box_e);
+	}
+	//-----------------------------
+	//end added by mflin
+	//-----------------------------
+
+	//--------------------------------------------------------
+	//Calculate midpoint correlator
+	//midpoint is not necessarily at Ls/2
+	//added by mflin 03/16/06
+	//--------------------------------------------------------
         if (mid_point_outfile != 0){
           Vector *sol_4d_mid_point = 0;
 	  sol_4d_mid_point =
@@ -513,12 +552,12 @@ WspectQuark::WspectQuark(Lattice &lat,
 	    (Vector *)(d_data_mid_point_2+f_size*(Cy+COLORs*Dy)); 
 	  lat.Ffive2four(sol_4d_mid_point, sol_5d, ls_glb-midplane-1, ls_glb-midplane);
 	}
-	// ==== end added ===== 
+	// ==== end added by mflin 03/16/06 ===== 
 
         sfree(d_class_name,ctor_str, "sol_5d", sol_5d);
-//        sfree(sol_5d);
+
         sfree(d_class_name,ctor_str, "src_5d", src_5d);
-//        sfree(src_5d);
+
 	
       }
       else {
@@ -526,13 +565,45 @@ WspectQuark::WspectQuark(Lattice &lat,
 	//	printf("w_quark: enter FmatInv Cy=%4i, Dy=%4i \n",Cy,Dy);
 #endif 
 	
-        // cg.max_num_iter = 500;
-	cg_iter=0;
-	cg_iter += lat.FmatInv((Vector *)(d_data_p+
-					 f_size*(Cy+COLORs*Dy)), 
-		      (Vector *)source.data(), 
-			      &(cg), &true_res);
-
+        
+	cg_iter=0; 
+	Vector *sol_4d = (Vector *)(d_data_p+f_size*(Cy+COLORs*Dy));
+	
+	cg_iter += lat.FmatInv(sol_4d, (Vector *)source.data(), 
+			       &(cg), &true_res);
+	
+	
+	//----------------------------------------------------------
+	//Wall or Box sink -- added by mflin 03/16/06
+	//---------------------------------------------------------
+	if (warg.sink_kind == W_WALL || warg.sink_kind == W_BOX){
+	  int snk_box_b[LORENTZs],snk_box_e[LORENTZs];
+	  if (warg.sink_kind == W_WALL ){
+	    for( int n = 0; n < LORENTZs; n++ ){
+	      snk_box_b[n] = 0;
+	      snk_box_e[n] = glb_sites[n] - 1;
+	    }
+	    snk_box_b[prop_dir] = snk_box_e[prop_dir] = 0;
+	  }
+	  else {
+	    for( int n = 0; n < LORENTZs; n++ ){
+	      snk_box_b[n] = warg.snk_box_b[n];
+	      snk_box_e[n] = warg.snk_box_e[n];
+	    }
+	    snk_box_b[prop_dir] = snk_box_e[prop_dir] = 0;
+	  }
+	  
+	  FermionVector fv_sol_4d((Float *)sol_4d);
+	  fv_sol_4d.gaugeFixSink(lat,prop_dir);
+	  
+	  if(warg.sink_kind == W_BOX && warg.zero_mom_box_snk)
+	    fv_sol_4d.sumOverHyperPlaneZeroMom(prop_dir,snk_box_b,snk_box_e);
+	  else
+	    fv_sol_4d.sumOverHyperPlane(prop_dir,snk_box_b,snk_box_e);
+	}
+	//-----------------------------
+	//end added by mflin
+	//-----------------------------
 #ifdef DEBUG_W_QUARK
 	//printf("w_quark: exit FmatInv %i %22.12e \n",cg_iter,true_res);
 #endif 

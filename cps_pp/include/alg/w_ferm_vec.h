@@ -14,16 +14,15 @@ private:
   // data -- local fermionic field and its size in units of Float
   //Storage order: d_fermion_p[T][Z][Y][X][DIRACS][COLORS][COMPLEXES]
   IFloat *d_fermion_p;
-  int    d_size;  
+  int    d_size; 
+  // flag to determine if memory is allocated
+  static int allocated; 
 
   static Vector m_tmp1; 
-  //DRAM buffer for scu transfer in GetFermion, has to be static, since it
-  //will be returned by GetFermion by "retrun &recv", 
-  //will be deallocated if not static 
 
-  // not implemented
-  FermionVector(const FermionVector&);
-  FermionVector& operator=(const FermionVector&);
+  //location of the box source/sink
+  //  int box_b[LORENTZs];//start coordniates
+  //  int box_e[LORENTZs];//end coordinates
 
   // helper member function
   void zeroOut()  const;
@@ -31,14 +30,26 @@ private:
 public:
   // CTOR
   FermionVector();
+  // secondary CTOR; use an existing array
+  // This is dangerous, since user has to check if the array has the
+  // right size for the fermion vector
+  FermionVector(Float *);
   // DTOR
   ~FermionVector();
 
+  // Copy Constructor
+  FermionVector(const FermionVector& fv)
+    {*this = fv;}
+  
+  // Assignment Operator
+  FermionVector& operator=(const FermionVector& rhs);
+  FermionVector& operator+=(const FermionVector &f1);
+  
   // ACCESSORS
   Float * data(void)          const {return (Float *)d_fermion_p;}
   // Float * proj_data(void)     const {return (Float *)d_proj_fermion_p;}
   void    print(char *file)   const;
-    void    printWaveFunc(char *file) const;
+  void    printWaveFunc(char *file) const;
   // MANIPULATORS
 
   // Caller's responsibility:  check argument color and spin.
@@ -97,6 +108,24 @@ public:
 
   // removed, not implemented after March 30, 2000 (T&X)
   void projectSource(const int Cpick, const int Dpick) const;
+
+  //----------------------------------------------------------------------
+  // Coulomb gauge fix fermion solution vectors. added by mflin 01/31/06
+  //----------------------------------------------------------------------
+  void gaugeFixSink(Lattice &lat, int dir) const;
+
+  //-------------------------------------------------------------------
+  // Sum over hyperplanes. mflin 02/01/06
+  //--------------------------------------------------------------------
+  void sumOverHyperPlane(int dir, int box_b[], int box_e[]); //all hyperplanes in direction dir
+  void sumOverHyperPlane(int dir, int hp, int box_b[],int box_e[]); //one hyperplanevoid
+
+  void sumOverHyperPlaneStride(int dir, int box_b[], int box_e[]); //all hyperplanes in direction dir
+  void sumOverHyperPlaneStride(int dir, int hp, int box_b[],int box_e[]); //one hyperplanevoid
+  
+  void sumOverHyperPlaneZeroMom(int dir, int box_b[], int box_e[]);
+
+
 };
 
 #endif // ! _INCLUDED_W_FERM_VEC

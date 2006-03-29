@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.15 2006-02-17 22:54:55 chulwoo Exp $
+  $Id: vector.h,v 1.16 2006-03-29 19:35:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-17 22:54:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.15 2006-02-17 22:54:55 chulwoo Exp $
-//  $Id: vector.h,v 1.15 2006-02-17 22:54:55 chulwoo Exp $
+//  $Date: 2006-03-29 19:35:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.16 2006-03-29 19:35:24 chulwoo Exp $
+//  $Id: vector.h,v 1.16 2006-03-29 19:35:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -493,7 +493,9 @@ class Vector
     //! Square norm with global sum.
     Float NormSqGlbSum(int len);
     Float NormSqGlbSum4D(int len);
-
+    //! Print the vector content to the screen
+    void Print(int len);
+    
     //! The real part of the dot product
     /*!
       \param b Another vector

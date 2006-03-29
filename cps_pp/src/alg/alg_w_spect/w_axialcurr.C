@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-11-30 22:56:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v 1.8 2004-11-30 22:56:02 chulwoo Exp $
-//  $Id: w_axialcurr.C,v 1.8 2004-11-30 22:56:02 chulwoo Exp $
+//  $Date: 2006-03-29 19:35:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v 1.9 2006-03-29 19:35:24 chulwoo Exp $
+//  $Id: w_axialcurr.C,v 1.9 2006-03-29 19:35:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_axialcurr.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_axialcurr.C,v $
 //  $State: Exp $
 //
@@ -34,6 +34,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 
+
 //---------------------------------------------------------------------------
 // static data members
 //---------------------------------------------------------------------------
@@ -43,9 +44,10 @@ char *      WspectAxialCurrent::d_class_name = "WspectAxialCurrent";
 // WspectAxialCurrent::WspectAxialCurrent(...)
 //--------------------------------------------------------------------------- 
 WspectAxialCurrent::WspectAxialCurrent(Lattice &     lat, 
+				       WspectArg &   arg,
 				       const WspectHyperRectangle & whr,
 				       char * ap_corr_outfile )
-  :  d_lat(lat), d_whr(whr), ap_filename(ap_corr_outfile)
+  :  d_lat(lat), d_whr(whr), ap_filename(ap_corr_outfile), warg(arg)
 {
 
   VRB.Func(d_class_name, ctor_str);
@@ -88,7 +90,21 @@ WspectAxialCurrent::WspectAxialCurrent(Lattice &     lat,
 	for ( int i = 0; i < glb_walls; i++)
 	  *flt_p++ = 0.0;
       }
+
+      // For local axial current with wall sink
+      d_local_p_wall = (Float *) smalloc(fsize);
       
+      if (!d_local_p_wall)
+	ERR.Pointer(d_class_name, ctor_str, empty_str);
+      
+      VRB.Smalloc(d_class_name, ctor_str, empty_str, d_local_p_wall, fsize);
+      
+      flt_p = (Float *)d_local_p_wall;
+      {
+	for ( int i = 0; i < glb_walls; i++)
+	  *flt_p++ = 0.0;
+      }
+
       // For conserved axial current
       d_conserved_p = (Float *) smalloc(fsize);
       
@@ -221,6 +237,10 @@ WspectAxialCurrent::~WspectAxialCurrent()
     VRB.Func(d_class_name, dtor_str);
     VRB.Sfree(d_class_name, dtor_str, empty_str, d_local_p);
     sfree(d_local_p);
+    
+    VRB.Func(d_class_name, dtor_str);
+    VRB.Sfree(d_class_name, dtor_str, empty_str, d_local_p_wall);
+    sfree(d_local_p_wall);
   }
 }
 
@@ -236,7 +256,22 @@ void WspectAxialCurrent::measureAll(Vector * data_5d_p) {
 
     measureConserved(data_5d_p);
   
-    measureLocal(data_5d_p);
+    //--------------------------------------------------------------------
+    //If a wall or box source is used, need to calculate absolute 
+    //normalization factor w.r.t. conserved current. Hence a wall sink
+    //correlator is also calculated.
+    //--------------------------------------------------------------------
+    if ( warg.source_kind == WALL_W || warg.source_kind == BOX_W )
+      {
+	measureLocalWall(data_5d_p);
+      }
+    //-----------------------------------------------------------------
+    //always calculate local current with a point sink. This is to 
+    //get Z_A properly.
+    //-----------------------------------------------------------------
+    measureLocalPoint(data_5d_p);
+
+   
 }
 
 
@@ -369,6 +404,80 @@ void WspectAxialCurrent::measureConserved(Vector * data_5d_p) {
 
 }
 
+//---------------------------------------------------------------------------
+// void WspectAxialCurrent::measureLocalWall(...)
+//--------------------------------------------------------------------------- 
+// Purpose:
+//    Does the <A_0 P> calculation for DWF lattice
+//    where A_0 is the Coloumb gauge fixed wall local axial current
+//---------------------------------------------------------------------------
+
+void WspectAxialCurrent::measureLocalWall(Vector * data_5d_p) { 
+  char *fname = "measureLocalWall(Vector *)";
+  VRB.Func(d_class_name,fname);
+  
+  int box_b[LORENTZs];
+  int box_e[LORENTZs];
+  FermionVector data_4d;
+  d_lat.Ffive2four((Vector *)data_4d.data(), data_5d_p, ls_glb-1, 0);
+
+  //-----------------------------------------------------
+  //construct the wall sink:
+  //Gauge fix the sink and sum over the hyper planes
+  //-----------------------------------------------------
+  
+  data_4d.gaugeFixSink(d_lat, prop_dir);
+
+  if (warg.source_kind == WALL_W) 
+    {
+      for ( int n = 0; n < LORENTZs; n++ ){
+	box_b[n] = 0;
+	box_e[n] = glb_sites[n] - 1;
+      }
+      data_4d.sumOverHyperPlane(prop_dir,box_b,box_e); 
+ 
+    }
+
+ 
+  
+  else if ( warg.source_kind == BOX_W ){
+    for ( int n = 0; n < LORENTZs; n++ ){
+      box_b[n] = warg.src_box_b[n];
+      box_e[n] = warg.src_box_e[n];
+    }	
+
+    switch (warg.zero_mom_box_snk){
+      
+    case 0:
+      data_4d.sumOverHyperPlane(prop_dir,box_b,box_e);
+      break;
+    case 1:
+      data_4d.sumOverHyperPlaneZeroMom(prop_dir,box_b,box_e);
+      break;
+    }
+
+  }
+  
+
+  measureLocal(data_4d.data(), d_local_p_wall); 
+
+ 
+}
+
+
+//---------------------------------------------------------------------------
+// void WspectAxialCurrent::measureLocalPoint(...)
+//--------------------------------------------------------------------------- 
+// Purpose:
+//    Does the <A_0 P> calculation for DWF lattice
+//    where A_0 is the point local axial current 
+//---------------------------------------------------------------------------
+void WspectAxialCurrent::measureLocalPoint(Vector * data_5d_p) { 
+
+  d_lat.Ffive2four((Vector *) d_data_p1, data_5d_p, ls_glb-1, 0);
+  measureLocal(d_data_p1, d_local_p);
+}
+
 
 //---------------------------------------------------------------------------
 // void WspectAxialCurrent::measureLocal(...)
@@ -377,10 +486,8 @@ void WspectAxialCurrent::measureConserved(Vector * data_5d_p) {
 //    Does the <A_0 P> calculation for DWF lattice
 //    where A_0 is the local axial current 
 //---------------------------------------------------------------------------
-void WspectAxialCurrent::measureLocal(Vector * data_5d_p) { 
+void WspectAxialCurrent::measureLocal(const Float *ferm_vec_4d, Float *out) { 
 
-  d_lat.Ffive2four((Vector *) d_data_p1, data_5d_p, ls_glb-1, 0);
-  
   int lcl_walls = lcl_sites[prop_dir];
   
   for( int lclW = 0; lclW < lcl_walls; ++lclW) {
@@ -396,7 +503,7 @@ void WspectAxialCurrent::measureLocal(Vector * data_5d_p) {
 
       int lcl_offset = siteOffset(lcl) * SPINORs ;
       
-      Complex * v1 = (Complex *) (d_data_p1 + lcl_offset) ;
+      Complex * v1 = (Complex *) (ferm_vec_4d + lcl_offset) ;
 
       Complex d_proj[DIRACs][DIRACs];
       
@@ -459,12 +566,13 @@ void WspectAxialCurrent::measureLocal(Vector * data_5d_p) {
 	break;
       }
 
-      *( d_local_p + lclW + lcl2glb_offset[prop_dir] ) += result.real(); 
+      *( out + lclW + lcl2glb_offset[prop_dir] ) += result.real(); 
 
     } // for(lcl[_]..)
   } // for (int lclW...) 
   
 }
+
 
 //---------------------------------------------------------------------------
 // void WspectAxialCurrent::doSum()
@@ -489,6 +597,14 @@ void WspectAxialCurrent::doSum()
     for (int i=0; i < glb_walls; i++) 
       glb_sum(flt_p++);
   }
+  
+  
+  {
+    Float *flt_p = d_local_p_wall;
+    for (int i=0; i < glb_walls; i++) 
+      glb_sum(flt_p++);
+  }
+  
 }
 
 //---------------------------------------------------------------------------
@@ -512,16 +628,18 @@ void WspectAxialCurrent::print() const
 
   for (int wall = 0; wall < glb_walls; ++wall) {
 
-    IFloat conserved_result, local_result;
+    IFloat conserved_result, local_result, local_result_wall;
     conserved_result = 
       d_conserved_p[(d_whr.glbCoord() + wall)%glb_walls];
 
     local_result = d_local_p[(d_whr.glbCoord() + wall)%glb_walls];
+    local_result_wall = d_local_p_wall[(d_whr.glbCoord() + wall)%glb_walls];
      
-    Fprintf(fp, "%d %d %e %e\n", 
+    Fprintf(fp, "%d %d %16.12e %16.12e %16.12e\n", 
 	    AlgWspect::GetCounter(), wall, 
-	    local_result,
-	    conserved_result);
+	    local_result,conserved_result,
+	    local_result_wall
+	    );
   }
   Fclose(fp);
   

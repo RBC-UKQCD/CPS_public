@@ -159,6 +159,16 @@ vml_WspectArg (VML *vmls, char *name,WspectArg *objp)
 	 if (!vml_vector (vmls, "src_box_e", (char *)objp->src_box_e, 4,
 		sizeof (int), (vmlproc_t) vml_int))
 		 return FALSE;
+	 if (!vml_SinkKind (vmls, "sink_kind", &objp->sink_kind))
+		 return FALSE;
+	 if (!vml_vector (vmls, "snk_box_b", (char *)objp->snk_box_b, 4,
+		sizeof (int), (vmlproc_t) vml_int))
+		 return FALSE;
+	 if (!vml_vector (vmls, "snk_box_e", (char *)objp->snk_box_e, 4,
+		sizeof (int), (vmlproc_t) vml_int))
+		 return FALSE;
+	 if (!vml_int (vmls, "zero_mom_box_snk", &objp->zero_mom_box_snk))
+		 return FALSE;
 	 if (!vml_Float (vmls, "g_epsi", &objp->g_epsi))
 		 return FALSE;
 	 if (!vml_int (vmls, "g_n", &objp->g_n))

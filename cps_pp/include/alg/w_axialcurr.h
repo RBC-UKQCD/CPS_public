@@ -35,6 +35,7 @@ public:
   // CTORs
   //-------------------------------------------------------------------------
   WspectAxialCurrent(Lattice & latt,
+		     WspectArg & arg,
 	             const WspectHyperRectangle & whr ,
 		     char * ap_corr_outfile);
       
@@ -54,7 +55,7 @@ public:
   // This member function does the <A_0 P> calculation for DWF lattice. 
   // It calls function measureConserved for conserved axial current A0,
   // and function measureLocal for local axial current A0.
-  void measureAll(Vector * ); 
+  void measureAll(Vector *sol_5d); 
 
 
   // This member function does the global sum of all the data 
@@ -69,7 +70,9 @@ private:
   char *          ap_filename;
 
   Float *           d_local_p;        // Complex[global_slice]
+  Float *      d_local_p_wall;        // Complex[global_slice]
   Float *       d_conserved_p;        // Complex[global_slice]
+  WspectArg &            warg;
 
   // references
   Lattice & d_lat; 
@@ -115,9 +118,21 @@ private:
   // where A_0 is the conserved axial current and P is \bar\psi \gamma^5 \psi
   void measureConserved(Vector * );
 
-  // This member function does the <A_0 P> calculation for DWF lattice
+  // A generic function to do the mesonic contraction for <A_0 P>
+  // in is the pointer to the 4d fermion vector.
+  // out is the resulting meson correlator. 
+  // ---mflin,  March 2006
+  void measureLocal(const Float *in, Float *out);
+
+  // This member function does the <A_0 P> calculation for DWF lattice with
+  // a point sink
   // where A_0 is the local axial current and P is \bar\psi \gamma^5 \psi
-  void measureLocal(Vector *);
+  void measureLocalPoint(Vector *ferm_vec_5d);
+
+  // This member function does the <A_0 P> calculation for DWF lattice with
+  // a wall sink
+  // where A_0 is the local axial current and P is \bar\psi \gamma^5 \psi
+  void measureLocalWall(Vector *ferm_vec_5d);
 
 };
 
