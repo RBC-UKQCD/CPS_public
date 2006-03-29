@@ -72,6 +72,10 @@ class AlgWspect : public Alg
   virtual ~AlgWspect();
 
   void run(void);
+  //solution gives the initial solution for the quark propagator
+  //and returns the final solution
+  void run(IFloat *solution); 
+  
 };
 
 //derived class

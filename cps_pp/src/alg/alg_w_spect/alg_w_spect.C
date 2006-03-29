@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-03-29 19:35:24 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.12 2006-03-29 19:35:24 chulwoo Exp $
-//  $Id: alg_w_spect.C,v 1.12 2006-03-29 19:35:24 chulwoo Exp $
+//  $Date: 2006-03-29 20:47:54 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.13 2006-03-29 20:47:54 chulwoo Exp $
+//  $Id: alg_w_spect.C,v 1.13 2006-03-29 20:47:54 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_w_spect.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v $
 //  $State: Exp $
 //
@@ -152,11 +152,17 @@ AlgWspect::AlgWspect(Lattice& latt,
 AlgWspect::~AlgWspect() {
 }
 
-
+//-------------------------------------------------
+//An ugly wrapper for run()
+//-------------------------------------------------
+void AlgWspect::run(){
+  IFloat *sol = 0;
+  run(sol);
+}
 //--------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------
-void AlgWspect::run()
+void AlgWspect::run(IFloat *solution)
 {
 #ifdef  TIMING_ALG_W_SPECT
   int quark_b, quark_e;
@@ -217,7 +223,7 @@ void AlgWspect::run()
 	    // create local quark propagator
 	    // printf("create quark q1 \n");
 	     WspectQuark q1(lat, output->cg, output->pbp,
-			  output->mid_point, output->a0_p, d_arg_p[0], cg,hyperRect);
+			    output->mid_point, output->a0_p, d_arg_p[0], cg,hyperRect,UNIT,0,0,solution);
 		  
      // printf("finished quark q1 \n");
 #ifdef  TIMING_ALG_W_SPECT
