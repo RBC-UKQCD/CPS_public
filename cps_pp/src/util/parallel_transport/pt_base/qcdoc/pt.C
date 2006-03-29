@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.29 2006-03-20 17:15:26 chulwoo Exp $
+  $Id: pt.C,v 1.30 2006-03-29 17:38:55 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-03-20 17:15:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.29 2006-03-20 17:15:26 chulwoo Exp $
-//  $Id: pt.C,v 1.29 2006-03-20 17:15:26 chulwoo Exp $
+//  $Date: 2006-03-29 17:38:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.30 2006-03-29 17:38:55 chulwoo Exp $
+//  $Id: pt.C,v 1.30 2006-03-29 17:38:55 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.29 $
+//  $Revision: 1.30 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -297,13 +297,6 @@ void PT::set_hop_pointer() {
   int hp_non_local_count[MAX_HOP][2*NDIM];
   int hop, i;
 
-#if 0
-  //Local volume size in four directions
-  size[0] = GJP.XnodeSites();
-  size[1] = GJP.YnodeSites();
-  size[2] = GJP.ZnodeSites();
-  size[3] = GJP.TnodeSites();
-#endif
 
   //Initialize local and non-local hop counters.
   for (hop=0; hop<MAX_HOP; hop++) {
@@ -1037,37 +1030,6 @@ void PT::init_g(Float * g_addr){
   //For staggered parallel transport, we need to re-order the gauge fields
   //to match the ordering of the vector field
 
-  #if 0
-  int gauge_mem = vol*NDIM*GAUGE_LEN*sizeof(IFloat);
-  if(vol<4096)
-    {
-      gauge_txyz = (IFloat *)qalloc(QFAST|QCOMMS,gauge_mem);
-      if(!gauge_txyz)
-	{
-	  //printf("Qalloc unsuccessful for gauge_txyz.  Allocating to smalloc instead.\n");
-	  gauge_txyz = (IFloat *)Alloc(gauge_mem);
-	  //printf("Alloc successful gauge_txyz = %p\n",gauge_txyz);
-	}
-      else
-	{
-	  ////printf("Qalloc successful gauge_txyz = %p\n",gauge_txyz);
-	}
-    }
-  else
-    {
-      //printf("Memory required for gauge_txyz (in bytes) = %d\n", gauge_mem);
-      //printf("Local volume = %d, too large for Qalloc of gauge_txyz\n",vol);
-      gauge_txyz = (IFloat *)Alloc(gauge_mem);
-      //printf("Alloc successful gauge_txyz = %p\n",gauge_txyz); 
-    }
-  //Copy the gauge field in STAGGERED ordering into gauge_txyz
-  for(x[0]=0;x[0]<size[0];x[0]++)
-    for(x[1]=0;x[1]<size[1];x[1]++)
-      for(x[2]=0;x[2]<size[2];x[2]++)
-	for(x[3]=0;x[3]<size[3];x[3]++)
-	  for(int mu = 0; mu < NDIM; mu++)
-	    moveMem(gauge_txyz+LexGauge2(x,mu)*GAUGE_LEN,u+LexGauge(x,mu)*GAUGE_LEN,GAUGE_LEN*sizeof(IFloat));
-  #endif
 
 
   //Send and receive directions
@@ -1768,7 +1730,6 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-  #if 1
   int comms = 0;
   for(i=0;i<n;i++)
     {
@@ -1791,31 +1752,10 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	  comms++;
 	}
     }
-  #endif
 #ifdef PROFILE
   dtime +=dclock();
   print_flops(fname,"Addr",0,dtime);
 #endif
-
-  #if 0
-  for(i=0;i<n;i++)
-    {
-      //Calculate the starting address for the data to be sent
-      IFloat *addr = vin[i] + VECT_LEN * offset_cb[wire[i]];
-      //This points to the appropriate SCUDirArg for receiving
-      SCUarg_p[2*i] = SCUarg_cb[2*wire[i]];
-      //This points to the appropriate SCUDirArg for sending
-      SCUarg_p[2*i+1] = SCUarg_cb[2*wire[i]+1];
-
-      //Set the send address
-      if(wire[i]%2)
-	SCUarg_p[2*i+1]->Addr((void *)snd_buf_cb[wire[i]/2]);
-      else if(wire[i] == 6)
-	SCUarg_p[2*i+1]->Addr((void *)snd_buf_t_cb);
-      else
-	SCUarg_p[2*i+1]->Addr((void *)addr);
-    }
-  #endif
 
 #ifdef PROFILE
   dtime  = - dclock();
