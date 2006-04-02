@@ -167,6 +167,8 @@ int main(int argc, char *argv[])
     common_arg_plaq.set_filename(plaq_file);
 
     sprintf(hmc_file,"%s.%d",evo_arg.evo_stem,traj);
+    truncate_it = Fopen(hmc_file,"w");
+    Fclose(truncate_it);
     common_arg_hmc.set_filename(hmc_file);
 
     // Inner trajectory loop
