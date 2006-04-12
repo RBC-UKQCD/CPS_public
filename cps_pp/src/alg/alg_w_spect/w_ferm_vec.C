@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_ferm_vec.C,v 1.9 2006-03-29 19:35:24 chulwoo Exp $
+  $Id: w_ferm_vec.C,v 1.10 2006-04-12 22:08:21 chulwoo Exp $
 */
 
 #include<config.h>
@@ -531,7 +531,8 @@ void FermionVector::gaugeFixSink(Lattice &lat, int dir) const
     }
     else{
          ERR.General(d_class_name,fname,"Not gauge fixing matrices were found at slice = %d\n",lcl[t]); 
-
+         Float *null_p = 0;
+         *null_p = 1.;
     }
   }
 

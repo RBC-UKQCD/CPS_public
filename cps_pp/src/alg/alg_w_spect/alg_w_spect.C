@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-03-29 20:47:54 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.13 2006-03-29 20:47:54 chulwoo Exp $
-//  $Id: alg_w_spect.C,v 1.13 2006-03-29 20:47:54 chulwoo Exp $
+//  $Date: 2006-04-12 22:08:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v 1.14 2006-04-12 22:08:21 chulwoo Exp $
+//  $Id: alg_w_spect.C,v 1.14 2006-04-12 22:08:21 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_w_spect.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/alg_w_spect.C,v $
 //  $State: Exp $
 //
@@ -152,17 +152,11 @@ AlgWspect::AlgWspect(Lattice& latt,
 AlgWspect::~AlgWspect() {
 }
 
-//-------------------------------------------------
-//An ugly wrapper for run()
-//-------------------------------------------------
-void AlgWspect::run(){
-  IFloat *sol = 0;
-  run(sol);
-}
+
 //--------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------
-void AlgWspect::run(IFloat *solution)
+void AlgWspect::run()
 {
 #ifdef  TIMING_ALG_W_SPECT
   int quark_b, quark_e;
@@ -188,7 +182,7 @@ void AlgWspect::run(IFloat *solution)
 	  int src_slice_step = d_arg_p->aots_step;
 	  int src_slice_end  = src_slice + src_slice_step * d_arg_p->aots_num;
 
-	  printf("%d %d %d \n",src_slice,src_slice_step, src_slice_end);
+	  VRB.Result(d_class_name,fname,"%d %d %d \n",src_slice,src_slice_step, src_slice_end);
 
 	  for ( ; src_slice < src_slice_end; src_slice += src_slice_step) {
 
@@ -212,7 +206,7 @@ void AlgWspect::run(IFloat *solution)
 	    // to spectrum class
 
 	    // there is a problem here --> check !
-	    printf("prop_dir = %d , src_slice = %d \n",d_arg_p->prop_dir, src_slice);
+	    VRB.Result(d_class_name,fname,"prop_dir = %d , src_slice = %d \n",d_arg_p->prop_dir, src_slice);
 
 	    WspectHyperRectangle hyperRect(d_arg_p->prop_dir, src_slice);    
 
@@ -220,12 +214,12 @@ void AlgWspect::run(IFloat *solution)
 	    quark_b = clock();
 	#endif
 
+    VRB.Result(d_class_name,fname,"created quark q1 \n");
 	    // create local quark propagator
-	    // printf("create quark q1 \n");
 	     WspectQuark q1(lat, output->cg, output->pbp,
-			    output->mid_point, output->a0_p, d_arg_p[0], cg,hyperRect,UNIT,0,0,solution);
+			  output->mid_point, output->a0_p, d_arg_p[0], cg,hyperRect);
 		  
-     // printf("finished quark q1 \n");
+      VRB.Result(d_class_name,fname,"finished quark q1 \n");
 #ifdef  TIMING_ALG_W_SPECT
     quark_e = clock();
 #endif
@@ -361,6 +355,7 @@ void AlgWspect::run(IFloat *solution)
 	 nucleon_m - nucleon_b, nucleon_m, nucleon_b,
 	 nucleon_e - nucleon_m, nucleon_e, nucleon_m);  
 #endif 
+   VRB.FuncEnd(d_class_name,fname);
 
 }
 

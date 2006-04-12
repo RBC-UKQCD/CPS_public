@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.13 2006-03-29 20:47:27 chulwoo Exp $
+  $Id: w_quark.C,v 1.14 2006-04-12 22:08:21 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP
@@ -50,9 +50,8 @@ WspectQuark::WspectQuark(Lattice &lat,
 			 const WspectHyperRectangle & whr,
 			 DEVOperatorKind source_operator_kind,
 			 WspectFuzzing *src_fuzz_ptr,
-			 WspectField *fld_ptr,
-			 IFloat *init_guess)
-  : d_size(GJP.VolNodeSites() * (COLORs*COLORs*DIRACs*DIRACs*COMPLEXs)), prop_direction(whr.dir()), src_plane_position(whr.lclCoord()),d_lat(lat), src_op_kind(source_operator_kind), src_fuzz_p(src_fuzz_ptr), fld_p(fld_ptr), midplane(warg.midplane), initial_guess(init_guess)
+			 WspectField *fld_ptr)
+  : d_size(GJP.VolNodeSites() * (COLORs*COLORs*DIRACs*DIRACs*COMPLEXs)), prop_direction(whr.dir()), src_plane_position(whr.lclCoord()),d_lat(lat), src_op_kind(source_operator_kind), src_fuzz_p(src_fuzz_ptr), fld_p(fld_ptr), midplane(warg.midplane)
 {
 #if TARGET==cpsMPI
     using MPISCU::fprintf;
@@ -82,24 +81,35 @@ WspectQuark::WspectQuark(Lattice &lat,
     }
   }
   
-  //If no initial guess of the solution is provided, allocate new memory
-  //to contain the solution
-  if(!initial_guess){
   // Allocate space for the quark propagator
   //-------------------------------------------------------------------------
-    d_data_p = (IFloat *) smalloc(d_class_name, ctor_str, "d_data_p", d_size * sizeof(IFloat));
+  d_data_p = (IFloat *) smalloc(d_size * sizeof(IFloat));
 #ifdef DEBUG_W_QUARK
   printf("allocated quark propagator - %6i Floats at %x \n",d_size,d_data_p);
 #endif 
-  }
-
+  if (!d_data_p) 
+    ERR.Pointer(d_class_name, ctor_str, "d_data_p");
+  VRB.Smalloc(d_class_name, ctor_str, 
+	      "d_data_p", d_data_p, d_size * sizeof(IFloat));
+  
   // ======== added from phys_v4.0.0
   // In case of DWF, allocate space need for propagator for
   // calculating <\Delta J^5 \bar q \gamma^5 q> using mid_point sink
   if (lat.Fclass() == F_CLASS_DWF && mid_point_outfile !=0 ) {
-     d_data_mid_point_1 = (IFloat *) smalloc(d_class_name, ctor_str, "d_data_mid_point_1",d_size * sizeof(IFloat));
+     d_data_mid_point_1 = (IFloat *) smalloc(d_size * sizeof(IFloat));
+    if (!d_data_mid_point_1)
+      ERR.Pointer(d_class_name, ctor_str, "d_data_mid_point_1");
+    VRB.Smalloc(d_class_name, ctor_str,
+		"d_data_mid_point_1", d_data_mid_point_1,
+		d_size * sizeof(Float));
     
-    d_data_mid_point_2 = (IFloat *) smalloc(d_class_name, ctor_str, "d_data_mid_point_2", d_size * sizeof(IFloat));
+    
+    d_data_mid_point_2 = (IFloat *) smalloc(d_size * sizeof(IFloat));
+    if (!d_data_mid_point_2)
+      ERR.Pointer(d_class_name, ctor_str, "d_data_mid_point_2");
+    VRB.Smalloc(d_class_name, ctor_str,
+		"d_data_mid_point_2", d_data_mid_point_2,
+		d_size * sizeof(Float));
     
   } else {
        d_data_mid_point_1 = 0;
@@ -118,10 +128,15 @@ WspectQuark::WspectQuark(Lattice &lat,
   source_matrix_size *= COLORs*COLORs*COMPLEXs;
   
     
-  source_matrix_p = (IFloat *) smalloc(d_class_name, ctor_str, "source_matrix", source_matrix_size* sizeof(IFloat));
+  source_matrix_p = (IFloat *) smalloc(source_matrix_size* sizeof(IFloat));
 #ifdef DEBUG_W_QUARK
   printf("allocated source matrix - %6i Floats at %x\n",source_matrix_size, source_matrix_p);
 #endif 
+  if (!source_matrix_p) 
+    ERR.Pointer(d_class_name, ctor_str, "source_matrix");
+  VRB.Smalloc(d_class_name, ctor_str, 
+	      "source_matrix", source_matrix_p, source_matrix_size * sizeof(Float));
+  
 
   // initialisation of source_matrix
   {
@@ -270,7 +285,12 @@ WspectQuark::WspectQuark(Lattice &lat,
 
   Vector *sol_g5 = 0;
   if ( (warg.source_kind==POINT_W) && pbp_outfile ) {
-    sol_g5 = (Vector *) smalloc(d_class_name, ctor_str, "sol_g5",f_size * sizeof(Float));
+    sol_g5 = (Vector *) smalloc(f_size * sizeof(Float));
+
+    if(sol_g5 == 0)
+      ERR.Pointer(d_class_name, ctor_str, "sol_g5");
+    VRB.Smalloc(d_class_name, ctor_str, "sol_g5", sol_g5,
+                f_size * sizeof(Float));
   }
 
   // Calulate pbp normalization factor
@@ -315,6 +335,9 @@ WspectQuark::WspectQuark(Lattice &lat,
 #endif
       copyGaugefixToSource(src_matrix, whr);   // copy G^{\dag}(x) --> S(x) 
       //copied from src_matrix to source_matrix_p
+#ifdef DEBUG_W_QUARK
+      printf("copy gauge fixing matrix onto source done \n");
+#endif
     }
   }
 
@@ -361,9 +384,9 @@ WspectQuark::WspectQuark(Lattice &lat,
   // now the source has been set 
 
   // ==================================================
-  // If not initial guess is provided, use the source as initial solution:
+
   // initial guess for d_data_p = quark propagator [ N*COLORs*COLORs*DIRACs*DIRACs*COMPLEXs]
-  if(!initial_guess){
+  {
     for (int i = 0; i < d_size;i++ )  d_data_p[i] = 0.;
     if(whr.onNode()){
       int site[4];
@@ -400,11 +423,6 @@ WspectQuark::WspectQuark(Lattice &lat,
       } // endfor (int site[0] ...)
     } // endif (whr.onNode())
   } // end initial guess  
-
-  //If the initial guess is given, point to that guess. The initial_guess will then contain the solution
-  else{
-    d_data_p = initial_guess;
-  }
   // =============================================================
 
   // CHANGES COMPARED TO PHYS_V4.0.0
@@ -466,9 +484,17 @@ WspectQuark::WspectQuark(Lattice &lat,
         Vector *src_4d = (Vector *)source.data();
         Vector *sol_4d = (Vector *)(d_data_p+f_size*(Cy+COLORs*Dy));
 
-        Vector *src_5d = (Vector *) smalloc(d_class_name,ctor_str, "src_5d", f_size_5d * sizeof(Float));
+        Vector *src_5d = (Vector *) smalloc(f_size_5d * sizeof(Float));
+        if(src_5d == 0)
+          ERR.Pointer(d_class_name,ctor_str, "src_5d");
+        VRB.Smalloc(d_class_name,ctor_str, "src_5d", src_5d,
+                    f_size_5d * sizeof(Float));
 
-        Vector *sol_5d = (Vector *) smalloc(d_class_name,ctor_str, "sol_5d", f_size_5d * sizeof(Float));
+        Vector *sol_5d = (Vector *) smalloc(f_size_5d * sizeof(Float));
+        if(sol_5d == 0)
+          ERR.Pointer(d_class_name,ctor_str, "sol_5d");
+        VRB.Smalloc(d_class_name,ctor_str, "sol_5d", sol_5d,
+                    f_size_5d * sizeof(Float));
 	
         lat.Ffour2five(src_5d, src_4d, 0, ls_glb-1);
         lat.Ffour2five(sol_5d, sol_4d, ls_glb-1, 0);
@@ -617,7 +643,8 @@ WspectQuark::WspectQuark(Lattice &lat,
 
   // ======= added from phys_v4.0.0
   if ( (warg.source_kind==POINT_W) && pbp_outfile ) {
-    sfree(d_class_name,ctor_str, "sol_g5", sol_g5);
+    VRB.Sfree(d_class_name,ctor_str, "sol_g5", sol_g5);
+    sfree(sol_g5);
   }
   // ======= end added from phys_v4.0.0
     
@@ -692,21 +719,22 @@ WspectQuark::~WspectQuark()
   VRB.Func(d_class_name, dtor_str);
 
   if(d_data_mid_point_2 != 0) {
-    sfree(d_class_name, dtor_str, empty_str, d_data_mid_point_2);
+    VRB.Sfree(d_class_name, dtor_str, empty_str, d_data_mid_point_2);
+    sfree(d_data_mid_point_2);
   }
   if(d_data_mid_point_1 != 0) {
-    sfree(d_class_name, dtor_str, empty_str, d_data_mid_point_1);
+    VRB.Sfree(d_class_name, dtor_str, empty_str, d_data_mid_point_1);
+    sfree(d_data_mid_point_1);
   }
   // end added from phys_v4.0.0
-  
-  //Since we don't allocate new memory if initial guess is provided, 
-  //we don't need to deallocate.
-  if(!initial_guess){
-    sfree(d_class_name, dtor_str, empty_str, d_data_p);
-  }
+
+  VRB.Sfree(d_class_name, dtor_str, empty_str, d_data_p);
+  sfree(d_data_p);
+
   // De-allocate source_matrix_p; added by T&X March 30.
   VRB.Func(d_class_name, dtor_str);
-  sfree(d_class_name, dtor_str, empty_str, source_matrix_p);
+  VRB.Sfree(d_class_name, dtor_str, empty_str, source_matrix_p);
+  sfree(source_matrix_p);
 }
 
 
@@ -874,8 +902,18 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
   int i;
   //if source operator is a SUM operator
   if(src_op>=SUM_F && src_op<END_SUM_OP){
-    orig = (Float *) smalloc(d_class_name, ctor_str, "orig", source_matrix_size* sizeof(Float));
-    sum = (Float *) smalloc(d_class_name, ctor_str, "sum",source_matrix_size* sizeof(Float));
+    orig = (Float *) smalloc(source_matrix_size* sizeof(Float));
+    if (!orig) {
+      ERR.Pointer(d_class_name, ctor_str, "orig");
+      VRB.Smalloc(d_class_name, ctor_str, 	   
+		  "orig", orig, source_matrix_size * sizeof(Float));
+    }
+    sum = (Float *) smalloc(source_matrix_size* sizeof(Float));
+    if (!sum) {
+      ERR.Pointer(d_class_name, ctor_str, "sum");
+      VRB.Smalloc(d_class_name, ctor_str, 	   
+		  "sum", sum, source_matrix_size * sizeof(Float));
+    }
     
     //initialize sum and orig
     for (i=0; i < source_matrix_size ; i++){
@@ -1166,11 +1204,13 @@ void WspectQuark::doSourceOperator(Lattice &lat, const WspectHyperRectangle &whr
     Equal(sum);            // set source_matrix to sum
     // moveMem((Float *)source_matrix_p, (Float *)sum, source_matrix_size**sizeof(Float));
     VRB.Func(d_class_name, dtor_str);
-    sfree(d_class_name, dtor_str, empty_str, orig);
+    VRB.Sfree(d_class_name, dtor_str, empty_str, orig);
+    sfree(orig);
     
     
     VRB.Func(d_class_name, dtor_str);
-    sfree(d_class_name, dtor_str, empty_str, sum);
+    VRB.Sfree(d_class_name, dtor_str, empty_str, sum);
+    sfree(sum);
   }
 
   
@@ -1202,8 +1242,13 @@ WspectQuark::symmetricDerivative(Lattice &lat, const WspectHyperRectangle &whr, 
   //should do nothing if the node is not on the source plane at all!
   if(!whr.onNode()) return;
 
-  Float *dev = (Float *) smalloc(d_class_name, ctor_str,
-              "dev", source_matrix_size* sizeof(Float));
+  Float *dev = (Float *) smalloc(source_matrix_size* sizeof(Float));
+  if (!dev) {
+    ERR.Pointer(d_class_name, ctor_str, "dev");
+  }
+  VRB.Smalloc(d_class_name, ctor_str, 	   
+	      "dev", dev, source_matrix_size * sizeof(Float));
+
 
   int lcl_shift[LORENTZs]; 
   int lcl[LORENTZs];
@@ -1463,8 +1508,12 @@ WspectQuark::JacobiSource(Lattice &lat, const WspectHyperRectangle &whr, Float r
  
   int C1,C2;
 
-  Float *jacob = (Float *) smalloc(d_class_name, ctor_str,
-                "jacob", source_matrix_size* sizeof(Float));
+  Float *jacob = (Float *) smalloc(source_matrix_size* sizeof(Float));
+  if (!jacob) {
+    ERR.Pointer(d_class_name, ctor_str, "jacob");
+    VRB.Smalloc(d_class_name, ctor_str, 	   
+		"jacob", jacob, source_matrix_size * sizeof(Float));
+  }
 
   int lcl_shift[LORENTZs]; 
   int lcl[LORENTZs];
@@ -1602,7 +1651,8 @@ WspectQuark::JacobiSource(Lattice &lat, const WspectHyperRectangle &whr, Float r
   
   // free jacob
   VRB.Func(d_class_name, dtor_str);
-  sfree(d_class_name, dtor_str, empty_str, jacob);
+  VRB.Sfree(d_class_name, dtor_str, empty_str, jacob);
+  sfree(jacob);
 }
 
 
