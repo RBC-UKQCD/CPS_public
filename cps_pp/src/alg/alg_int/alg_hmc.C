@@ -175,6 +175,8 @@ Float AlgHmc::run(void)
 
       //!< Calculate initial Hamiltonian
       h_init = integrator->energy();
+//      Float total_h_init =h_init;
+//      glb_sum(&total_h_init);
 
       // Molecular Dynamics Trajectory
       integrator->evolve(hmc_arg->step_size, hmc_arg->steps_per_traj);
@@ -186,17 +188,16 @@ Float AlgHmc::run(void)
 	LatticeFactory::Destroy();
       }
 
-      if ( !(test == 0 && attempt ==0) ){
-        shiftStates(-SHIFT_X,-SHIFT_Y,-SHIFT_Z,0);
-        GDS.SetOrigin(0,0,0,0);
-      }
-
       //!< Calculate final Hamiltonian
       h_final = integrator->energy();
+//      Float total_h_final =h_final;
+//      glb_sum(&total_h_final);
 
       // Calculate Final-Initial Hamiltonian 
       delta_h = h_final - h_init;
       glb_sum(&delta_h);
+//      VRB.Result(cname,fname,"h_init=%0.14e h_final=%0.14e delta_h=%0.14e \n",
+//        total_h_init,total_h_final,delta_h);
 
       // Check that delta_h is the same across all s-slices 
       // (relevant only if GJP.Snodes() != 1)
@@ -205,6 +206,11 @@ Float AlgHmc::run(void)
 	VRB.Flow(cname,fname, "Checking Delta H across s-slices\n");
 	lat.SoCheck(delta_h);
 	LatticeFactory::Destroy();
+      }
+
+      if ( !(test == 0 && attempt ==0) ){
+        shiftStates(-SHIFT_X,-SHIFT_Y,-SHIFT_Z,0);
+        GDS.SetOrigin(0,0,0,0);
       }
 
       if (hmc_arg->reverse == REVERSE_YES) {
