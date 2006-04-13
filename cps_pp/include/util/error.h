@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration and definition of Error class.
 
-  $Id: error.h,v 1.5 2005-09-06 19:43:31 chulwoo Exp $
+  $Id: error.h,v 1.6 2006-04-13 19:04:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 19:43:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v 1.5 2005-09-06 19:43:31 chulwoo Exp $
-//  $Id: error.h,v 1.5 2005-09-06 19:43:31 chulwoo Exp $
+//  $Date: 2006-04-13 19:04:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v 1.6 2006-04-13 19:04:30 chulwoo Exp $
+//  $Id: error.h,v 1.6 2006-04-13 19:04:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: error.h,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v $
 //  $State: Exp $
 //
@@ -90,7 +90,7 @@ class Error
     void General(const char*, const char*, const char*, ...);
     //!< Error message for miscellaneous failure.    
 
-    void HdwCheck(char *,char *);
+    void HdwCheck(const char *,const char *);
         
 };
 

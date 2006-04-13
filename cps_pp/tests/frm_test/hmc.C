@@ -20,9 +20,6 @@
 #include<alg/alg_plaq.h>
 #include<alg/alg_remez.h>
 
-#include<alg/alg_eig.h>
-#include<alg/eig_arg.h>
-
 #include<util/gjp.h>
 #include<util/verbose.h>
 #include<util/error.h>
@@ -51,7 +48,6 @@ IntABArg ab1_arg;
 IntABArg ab2_arg;
 
 EvoArg evo_arg;
-EigArg eig_arg;
 DoArg do_arg;
 NoArg no_arg;
 
@@ -75,12 +71,12 @@ int main(int argc, char *argv[])
   CommonArg common_arg_hmc;
   CommonArg common_arg_plaq;
 
-  if ( argc!=10 ) { 
-    printf("Args: doarg-file hmcarg-file evoarg-file eigarg_file initial-directory\n");
+  if ( argc!=9 ) { 
+    printf("Args: doarg-file hmcarg-file evoarg-file initial-directory\n");
     exit(-1);
   }
 
-  chdir (argv[9]);
+  chdir (argv[8]);
 
   if ( !do_arg.Decode(argv[1],"do_arg") ) { 
     do_arg.Encode("bum_arg","bum_arg");
@@ -110,11 +106,10 @@ int main(int argc, char *argv[])
 
   if ( !hmc_arg.Decode(argv[2],"hmc_arg")){printf("Bum hmc_arg\n"); exit(-1);}
   if ( !evo_arg.Decode(argv[3],"evo_arg")){printf("Bum evo_arg\n"); exit(-1);}
-  if ( !eig_arg.Decode(argv[4],"eig_arg")){printf("Bum eig_arg\n"); exit(-1);}
-  if ( !gauge_arg.Decode(argv[5],"gauge_arg")){printf("Bum gauge_arg\n"); exit(-1);}
-  if ( !frm_arg.Decode(argv[6],"frm_arg")){printf("Bum frm_arg\n"); exit(-1);}
-  if ( !ab1_arg.Decode(argv[7],"ab1_arg")){printf("Bum ab1_arg\n"); exit(-1);}
-  if ( !ab2_arg.Decode(argv[8],"ab2_arg")){printf("Bum ab2_arg\n"); exit(-1);}
+  if ( !gauge_arg.Decode(argv[4],"gauge_arg")){printf("Bum gauge_arg\n"); exit(-1);}
+  if ( !frm_arg.Decode(argv[5],"frm_arg")){printf("Bum frm_arg\n"); exit(-1);}
+  if ( !ab1_arg.Decode(argv[6],"ab1_arg")){printf("Bum ab1_arg\n"); exit(-1);}
+  if ( !ab2_arg.Decode(argv[7],"ab2_arg")){printf("Bum ab2_arg\n"); exit(-1);}
 
   chdir(evo_arg.work_directory);
 
@@ -144,7 +139,7 @@ int main(int argc, char *argv[])
   AlgActionFermion frm(mom, frm_arg);
 
   AlgIntAB &ab1 = AlgIntAB::Create(mom, gauge, ab1_arg);
-  AlgIntAB &ab2 = AlgIntAB::Create(ab1, frm,   ab2_arg);
+  AlgIntAB &ab2 = AlgIntAB::Create(ab1, frm,  ab2_arg);
   
   for(int conf=0; conf< evo_arg.gauge_configurations; conf ++ ) {
 
@@ -195,48 +190,6 @@ int main(int argc, char *argv[])
       }
 
     }/*End of inter-cfg sweep*/
-
-    if (evo_arg.CalcEig) {
-
-      Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
-
-      {
-	//!< Measure the lowest eigenvalue
-	CommonArg ca_eig;
-	char eig_file[256];
-	
-	sprintf(eig_file,"%s.%d",evo_arg.eig_lo_stem,traj);
-	
-	FILE *truncate_it = Fopen(eig_file,"w");
-	Fclose(truncate_it);
-	
-	ca_eig.set_filename(eig_file);
-	eig_arg.RitzMatOper = MATPCDAG_MATPC;
-	
-	AlgEig eig(lat,&ca_eig,&eig_arg);
-	eig.run();
-      }
-
-      {
-	//!< Measure the highest eigenvalue
-	CommonArg ca_eig;
-	char eig_file[256];
-	
-	sprintf(eig_file,"%s.%d",evo_arg.eig_hi_stem,traj);
-	
-	FILE *truncate_it = Fopen(eig_file,"w");
-	Fclose(truncate_it);
-
-	ca_eig.set_filename(eig_file);
-	eig_arg.RitzMatOper = NEG_MATPCDAG_MATPC;
-	
-	AlgEig eig(lat,&ca_eig,&eig_arg);
-	eig.run();
-	
-	LatticeFactory::Destroy();
-      }
-
-    }
 
     checkpoint(traj);
 

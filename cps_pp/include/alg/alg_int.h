@@ -105,7 +105,8 @@ class AlgIntAB : public AlgInt {
 };
 
 /*!< 
-  An implementation of the 2nd order leapfrog integrater
+  An implementation of the 2nd order leapfrog integrater 
+  (with 1 force evaluation per step).
 */
 class AlgIntLeap : public AlgIntAB {
 
@@ -122,7 +123,8 @@ public:
 };
 
 /*!< 
-  An implementation of the 2nd order Omelyan integrater
+  An implementation of the 2nd order Omelyan integrater 
+  (with 2 force evaluations per step).
 */
 class AlgIntOmelyan : public AlgIntAB {
 
@@ -133,6 +135,69 @@ private:
 public:
   AlgIntOmelyan(AlgInt &A, AlgInt &B, IntABArg &);
   virtual ~AlgIntOmelyan();
+
+  //!< evolve method evolves the integrator
+  void evolve(Float dt, int steps);
+  
+};
+
+/*!< 
+  An implementation of the 4th order Campostrini integrator 
+  (with 3 force evaluations per step).
+*/
+class AlgIntCampostrini : public AlgIntAB {
+
+private:
+  char *cname;
+  Float sigma;
+  Float epsilon;
+
+public:
+  AlgIntCampostrini(AlgInt &A, AlgInt &B, IntABArg &);
+  virtual ~AlgIntCampostrini();
+
+  //!< evolve method evolves the integrator
+  void evolve(Float dt, int steps);
+  
+};
+
+/*!< 
+  An implementation of the 4th order Omelyan integrator with 4
+  force evaluations per step.
+*/
+class AlgIntOmelyan44 : public AlgIntAB {
+
+private:
+  char *cname;
+  Float rho;
+  Float theta;
+  Float lambda;
+
+public:
+  AlgIntOmelyan44(AlgInt &A, AlgInt &B, IntABArg &);
+  virtual ~AlgIntOmelyan44();
+
+  //!< evolve method evolves the integrator
+  void evolve(Float dt, int steps);
+  
+};
+
+/*!< 
+  An implementation of the 4th order Omelyan integrator with 5 force
+  evaluations per step.
+*/
+class AlgIntOmelyan45 : public AlgIntAB {
+
+private:
+  char *cname;
+  Float theta;
+  Float rho;
+  float lambda;
+  Float mu;
+
+public:
+  AlgIntOmelyan45(AlgInt &A, AlgInt &B, IntABArg &);
+  virtual ~AlgIntOmelyan45();
 
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
@@ -225,7 +290,7 @@ class AlgAction : public AlgHamiltonian {
   Matrix *mom;
   ForceMeasure force_measure;
   char *force_label;
-  Float Fdt;
+  ForceArg Fdt;
 
  public:
   AlgAction();
@@ -236,7 +301,6 @@ class AlgAction : public AlgHamiltonian {
   virtual Float energy() = 0;
   virtual void evolve(Float dt, int steps) = 0;
   virtual void cost(CgStats*) = 0;
-  void printForce(Float Fdt, Float dt, char *label);
   void reverse();
 
 };

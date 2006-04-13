@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.43 2006-03-22 03:18:03 chulwoo Exp $
+  $Id: lattice_base.C,v 1.44 2006-04-13 19:08:22 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-03-22 03:18:03 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.43 2006-03-22 03:18:03 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.43 2006-03-22 03:18:03 chulwoo Exp $
+//  $Date: 2006-04-13 19:08:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.44 2006-04-13 19:08:22 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.44 2006-04-13 19:08:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.43 $
+//  $Revision: 1.44 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2910,9 +2910,10 @@ int Lattice::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
     CgArg **cg_arg_p = new CgArg *[Nshift];
     for(int i =0;i<Nshift;i++) cg_arg_p[i] = cg_arg;
  
-    return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg_p,cnv_frm,
+    int iter = FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg_p,cnv_frm,
                                type,alpha, f_out_d);
     delete[] cg_arg_p;
+    return iter;
 }
 
 CPS_END_NAMESPACE

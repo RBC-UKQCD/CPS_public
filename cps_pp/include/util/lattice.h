@@ -5,17 +5,20 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.50 2006-03-29 21:21:18 chulwoo Exp $
+  $Id: lattice.h,v 1.51 2006-04-13 19:04:39 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2006-03-29 21:21:18 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.50 2006-03-29 21:21:18 chulwoo Exp $
-  $Id: lattice.h,v 1.50 2006-03-29 21:21:18 chulwoo Exp $
+  $Date: 2006-04-13 19:04:39 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.51 2006-04-13 19:04:39 chulwoo Exp $
+  $Id: lattice.h,v 1.51 2006-04-13 19:04:39 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Locker:  $
-  $RCSfile: lattice.h,v $
-  $Revision: 1.50 $
+  $Author: chulwoo $
+  $Date: 2006-04-13 19:04:39 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.51 2006-04-13 19:04:39 chulwoo Exp $
+  $Id: lattice.h,v 1.51 2006-04-13 19:04:39 chulwoo Exp $
+  $Name: not supported by cvs2svn $
+  $Revision: 1.51 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -39,6 +42,7 @@
 
 #include <alg/cg_arg.h>
 #include <alg/eig_arg.h>
+#include <alg/force_arg.h>
 #ifdef PARALLEL
 #include <comms/sysfunc.h>
 #endif
@@ -633,7 +637,7 @@ class Lattice
     static int ForceFlops;
     //!< Counter for flops in the HMD force calculations.
 
-    virtual Float EvolveMomGforce(Matrix *mom, Float step_size) = 0;
+    virtual ForceArg EvolveMomGforce(Matrix *mom, Float step_size) = 0;
     //!< Molecular dynamics evolution of the conjugate momentum
     /*!<
       The momentum is evolved for a single molecular dynamics timestep
@@ -1137,7 +1141,7 @@ class Lattice
       works for Wilson type fermions).
     */
 
-    virtual Float EvolveMomFforce(Matrix *mom, Vector *frm, 
+    virtual ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 				 Float mass, Float step_size) = 0;
     //!< Molecular dynamics evolution of the conjugate momentum
     /*!<
@@ -1153,7 +1157,7 @@ class Lattice
       dynamics evolution.
     */
 
-    virtual Float EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+    virtual ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 				  Float mass, Float step_size) = 0;
     //!< Molecular dynamics evolution of the conjugate momentum
     /*!<
@@ -1170,16 +1174,9 @@ class Lattice
       dynamics evolution.
     */
 
-    virtual Float RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				      int isz, Float *alpha, Float mass, 
-				      Float dt, Vector **sol_d, ForceMeasure measure) = 0;
-
-    void RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				      Float *alpha, Float mass, 
-				      Float dt, Vector **sol_d)
-     { RHMC_EvolveMomFforce(mom,sol,degree,alpha,mass,dt,sol_d); }
-
-
+    virtual ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+					  int isz, Float *alpha, Float mass, 
+					  Float dt, Vector **sol_d, ForceMeasure measure) = 0;
 
     virtual Float FhamiltonNode(Vector *phi, Vector *chi) = 0;
     //!< Computes the pseudofermionic action on the local sublattice.
@@ -1263,7 +1260,7 @@ class Gnone : public virtual Lattice
     void GforceSite(Matrix& force, int *x, int mu);
     //!< Calculates the gauge force at site x and direction mu.
 
-    Float EvolveMomGforce(Matrix *mom, Float step_size);
+    ForceArg EvolveMomGforce(Matrix *mom, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
@@ -1303,7 +1300,7 @@ class Gwilson : public virtual Lattice
     void GforceSite(Matrix& force, int *x, int mu);
     //!< Calculates the gauge force at site x and direction mu.
 
-    Float EvolveMomGforce(Matrix *mom, Float step_size);
+    ForceArg EvolveMomGforce(Matrix *mom, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
@@ -1356,7 +1353,7 @@ class GpowerPlaq : public virtual Lattice
     void GforceSite(Matrix& force, int *x, int mu);
     //!< Calculates the gauge force at site x and direction mu.
 
-    Float EvolveMomGforce(Matrix *mom, Float step_size);
+    ForceArg EvolveMomGforce(Matrix *mom, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
@@ -1425,7 +1422,7 @@ class GimprRect : public virtual Lattice
         // Matrix &force = *mp0.  GactionGradient typically uses
         // mp1 thru mp4, so be careful.
 
-    Float EvolveMomGforce(Matrix *mom, Float step_size);
+    ForceArg EvolveMomGforce(Matrix *mom, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
@@ -1484,7 +1481,7 @@ class GtadpoleRect : public virtual Lattice
         // Matrix &force = *mp0.  GactionGradient typically uses
         // mp1 thru mp4, so be careful.
 
-    Float EvolveMomGforce(Matrix *mom, Float step_size);
+    ForceArg EvolveMomGforce(Matrix *mom, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
@@ -1552,7 +1549,7 @@ class GpowerRect : public virtual Lattice
         // Matrix &force = *mp0.  GactionGradient typically uses
         // mp1 thru mp4, so be careful.
 
-    Float EvolveMomGforce(Matrix *mom, Float step_size);
+    ForceArg EvolveMomGforce(Matrix *mom, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
@@ -1639,7 +1636,7 @@ class GimprOLSym : public virtual Lattice
         // Matrix &force = *mp0.  GactionGradient typically uses
         // mp1 thru mp4, so be careful.
 
-    Float EvolveMomGforce(Matrix *mom, Float step_size);
+    ForceArg EvolveMomGforce(Matrix *mom, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the pure gauge force.
 
@@ -1786,17 +1783,17 @@ class Fnone : public virtual Lattice
         // resulted from the application of the inverter on 
         // the pseudofermion field.
 
-    Float EvolveMomFforce(Matrix *mom, Vector *frm, 
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 				 Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force. 
 
-    Float EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 			  Float mass, Float step_size);
         // It evolve the canonical momentum mom  by step_size
         // using the bosonic quotient force.
 
-    Float RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			      int isz, Float *alpha, Float mass, Float dt,
 			      Vector **sol_d, ForceMeasure measure);
 
@@ -1931,15 +1928,15 @@ class Fstag : public virtual FstagTypes
                             int *x, int mu);
     //!< Calculates the pseudofermion force at site x and direction mu.
 
-    Float EvolveMomFforce(Matrix *mom, Vector *frm, 
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 			 Float mass, Float step_size);
 
-    Float EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 			  Float mass, Float step_size);
         // It evolve the canonical momentum mom  by step_size
         // using the bosonic quotient force.
 
-    Float RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			       int isz, Float *alpha, Float mass, Float dt,
 			       Vector **sol_d, ForceMeasure measure);
 
@@ -2006,10 +2003,10 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
     Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 		 Float mass, DagType dag);
 
-    Float EvolveMomFforce(Matrix *mom, Vector *frm, 
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 			 Float mass, Float step_size);
 
-    Float EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 			  Float mass, Float step_size);
         // It evolve the canonical momentum mom  by step_size
         // using the bosonic quotient force.
@@ -2028,7 +2025,7 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
 #endif
 
     //! Momentum update in the RHMC algorithm.
-    Float RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			       int isz, Float *alpha, Float mass, Float dt,
 			       Vector **sol_d, ForceMeasure measure);
 
@@ -2038,7 +2035,7 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
     
   private:
 
-    Float update_momenta(Matrix**, IFloat, Matrix*);
+    ForceArg update_momenta(Matrix**, IFloat, Matrix*);
     
     ChkbType parity(const int*);
 
@@ -2109,10 +2106,10 @@ class Fp4 : public virtual FstagTypes, public virtual Fsmear
     Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 		 Float mass, DagType dag);
 
-    Float EvolveMomFforce(Matrix *mom, Vector *frm, 
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 			 Float mass, Float step_size);
 
-    Float EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 			  Float mass, Float step_size);
         // It evolve the canonical momentum mom  by step_size
         // using the bosonic quotient force.
@@ -2130,7 +2127,7 @@ class Fp4 : public virtual FstagTypes, public virtual Fsmear
 
 
     //! Momentum update in the RHMC algorithm.
-    Float RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			      int isz, Float *alpha, Float mass, Float dt,
 			      Vector **sol_d, ForceMeasure measure);
 
@@ -2140,7 +2137,7 @@ class Fp4 : public virtual FstagTypes, public virtual Fsmear
     
   private:
 
-    Float update_momenta(Matrix**, IFloat, Matrix*);
+    ForceArg update_momenta(Matrix**, IFloat, Matrix*);
     
     ChkbType parity(const int*);
 
@@ -2376,17 +2373,17 @@ class Fwilson : public virtual FwilsonTypes
 		 Float mass, DagType dag);
 	// It sets the pseudofermion field phi from frm1, frm2.
 
-    Float EvolveMomFforce(Matrix *mom, Vector *frm, 
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 				 Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force. 
 
-    Float EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 			  Float mass, Float step_size);
         // It evolve the canonical momentum mom  by step_size
         // using the bosonic quotient force.
 
-    Float RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			      int isz, Float *alpha, Float mass, Float dt,
 			      Vector **sol_d, ForceMeasure measure);
 
@@ -2536,17 +2533,17 @@ class Fclover : public virtual FwilsonTypes
 		 Float mass, DagType dag);
 	// It sets the pseudofermion field phi from frm1, frm2.
 
-    Float EvolveMomFforce(Matrix *mom, Vector *frm, 
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 				 Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
 
-    Float EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 			  Float mass, Float step_size);
         // It evolve the canonical momentum mom  by step_size
         // using the bosonic quotient force.
 
-    Float RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			      int isz, Float *alpha, Float mass, Float dt,
 			      Vector **sol_d, ForceMeasure measure);
 
@@ -2697,17 +2694,17 @@ class FdwfBase : public virtual FwilsonTypes
 		 Float mass, DagType dag);
 	// It sets the pseudofermion field phi from frm1, frm2.
 	
-    Float EvolveMomFforce(Matrix *mom, Vector *frm, 
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 			  Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
 
-    Float EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 			  Float mass, Float step_size);
         // It evolve the canonical momentum mom  by step_size
         // using the bosonic quotient force.
 
-    Float RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			      int isz, Float *alpha, Float mass, Float dt,
 			      Vector **sol_d, ForceMeasure measure);
 
@@ -2744,7 +2741,7 @@ class Fdwf : public FdwfBase {
 
     Fdwf(void);
     ~Fdwf(void);
-    Float EvolveMomFforce(Matrix *mom, Vector *frm, 
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 				 Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
@@ -2771,7 +2768,7 @@ class FimprDwf : public FdwfBase {
 		   CnvFrmType cnv_frm);
     Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 		 Float mass, DagType dag);
-    Float EvolveMomFforce(Matrix *mom, Vector *frm,
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm,
 			 Float mass, Float step_size);
     Float BhamiltonNode(Vector *boson, Float mass);
     int FmatInv(Vector *f_out, Vector *f_in,

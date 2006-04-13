@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.21 2006-04-13 18:21:03 chulwoo Exp $
+  $Id: f_stag.C,v 1.22 2006-04-13 19:07:53 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -243,7 +243,8 @@ int Fstag::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   massRenormalise(&(cg_arg[0]->mass), &trueMass, Nshift, shift, RENORM_FORWARDS);
 
   //Fake the constructor
-  DiracOpStag stag(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
+  Vector *tmp;
+  DiracOpStag stag(*this, tmp, f_in, cg_arg[0], cnv_frm);
   int iter = stag.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
 
   if (type == MULTI && f_out_d != 0)

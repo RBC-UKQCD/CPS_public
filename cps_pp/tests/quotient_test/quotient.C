@@ -270,6 +270,12 @@ void checkpoint(int traj)
     exit(-1);
   }
 
+  sprintf(vml_file,"rat_quo_arg.%d",traj);
+  if ( !quo_arg.Encode(vml_file,"quo_arg") ){
+    printf("bad quo_arg encode\n");
+    exit(-1);
+  }
+
   sprintf(vml_file,"gauge_arg.%d",traj);
   if ( !gauge_arg.Encode(vml_file,"gauge_arg") ){
     printf("bad gauge_arg encode\n");

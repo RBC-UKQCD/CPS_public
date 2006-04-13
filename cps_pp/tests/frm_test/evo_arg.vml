@@ -14,8 +14,8 @@ string rng_file_stem = "ckpoint_rng"
 string plaquette_stem = "plaq"
 string pbp_stem = "pbp"
 string evo_stem = "hmc"
+string w_spect_directory = ""
 string work_directory = ""
-int CalcEig = 1
-string eig_lo_stem = "eig_lo"
-string eig_hi_stem = "eig_hi"
+int measure_pbp = 0
+int measure_w_spect = 0
 }

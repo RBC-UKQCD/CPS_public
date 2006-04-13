@@ -568,15 +568,18 @@ extern struct vml_enum_map PatternType_map[];
 enum IntegratorType {
 	INT_LEAP = 0,
 	INT_OMELYAN = 0 + 1,
-	INT_SUM = 0 + 2,
-	INT_MOM = 0 + 3,
-	INT_GAUGE = 0 + 4,
-	INT_FERMION = 0 + 5,
-	INT_BOSON = 0 + 6,
-	INT_QUOTIENT = 0 + 7,
-	INT_RATIONAL = 0 + 8,
-	INT_RATIONAL_SPLIT = 0 + 9,
-	INT_RATIONAL_QUOTIENT = 0 + 10,
+	INT_CAMPOSTRINI = 0 + 2,
+	INT_OMELYAN_44 = 0 + 3,
+	INT_OMELYAN_45 = 0 + 4,
+	INT_SUM = 0 + 5,
+	INT_MOM = 0 + 6,
+	INT_GAUGE = 0 + 7,
+	INT_FERMION = 0 + 8,
+	INT_BOSON = 0 + 9,
+	INT_QUOTIENT = 0 + 10,
+	INT_RATIONAL = 0 + 11,
+	INT_RATIONAL_SPLIT = 0 + 12,
+	INT_RATIONAL_QUOTIENT = 0 + 13,
 };
 typedef enum IntegratorType IntegratorType;
 extern struct vml_enum_map IntegratorType_map[];
@@ -662,6 +665,7 @@ extern struct vml_enum_map InverterType_map[];
 enum RationalApproxType {
 	RATIONAL_APPROX_POWER = 0,
 	RATIONAL_APPROX_QUOTIENT = 1,
+	RATIONAL_APPROX_ZERO_POLE = 2,
 };
 typedef enum RationalApproxType RationalApproxType;
 extern struct vml_enum_map RationalApproxType_map[];

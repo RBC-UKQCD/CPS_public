@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.20 2006-02-21 21:14:12 chulwoo Exp $
+  $Id: f_wilson.C,v 1.21 2006-04-13 19:08:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -429,12 +429,12 @@ Float Fwilson::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 
 //------------------------------------------------------------------
 // EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, 
-//                 Float step_size):
-// It evolves the canonical momentum mom by step_size
+//                 Float dt):
+// It evolves the canonical momentum mom by dt
 // using the fermion force.
 //------------------------------------------------------------------
-Float Fwilson::EvolveMomFforce(Matrix *mom, Vector *chi, 
-			      Float mass, Float step_size)
+ForceArg Fwilson::EvolveMomFforce(Matrix *mom, Vector *chi, 
+			      Float mass, Float dt)
 {
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
@@ -513,7 +513,9 @@ Float Fwilson::EvolveMomFforce(Matrix *mom, Vector *chi,
 
   Matrix tmp, f ;
 
-  Float Fdt = 0.0;
+  Float L1 = 0.0;
+  Float L2 = 0.0;
+  Float Linf = 0.0;
 
   for (mu=0; mu<4; mu++) {
     for (t=0; t<lt; t++)
@@ -528,7 +530,7 @@ Float Fwilson::EvolveMomFforce(Matrix *mom, Vector *chi,
       Float *v2_plus_mu ;
       int vec_plus_mu_offset = FsiteSize() ;
 
-      Float coeff = -2.0 * step_size ;
+      Float coeff = -2.0 * dt ;
 
       switch (mu) {
         case 0 :
@@ -611,7 +613,11 @@ Float Fwilson::EvolveMomFforce(Matrix *mom, Vector *chi,
       f *= coeff ;
 
       *(mom+gauge_offset) += f ;
-      Fdt += dotProduct((Float*)&f, (Float*)&f, 18);
+      Float norm = f.norm();
+      Float tmp = sqrt(norm);
+      L1 += tmp;
+      L2 += norm;
+      Linf = (tmp>Linf ? tmp : Linf);
     }
   }
 
@@ -633,60 +639,71 @@ Float Fwilson::EvolveMomFforce(Matrix *mom, Vector *chi,
   VRB.Sfree(cname, fname, str_v1, v1) ;
   sfree(v1) ;
 
-  glb_sum(&Fdt);
+  glb_sum(&L1);
+  glb_sum(&L2);
+  glb_max(&Linf);
 
-  return sqrt(Fdt);
+  L1 /= 4.0*GJP.VolSites();
+  L2 /= 4.0*GJP.VolSites();
+
+  return ForceArg(L1, sqrt(L2), Linf);
 }
 
-Float Fwilson::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+ForceArg Fwilson::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				    int isz, Float *alpha, Float mass, 
 				    Float dt, Vector **sol_d, 
 				    ForceMeasure force_measure) {
   char *fname = "RHMC_EvolveMomFforce";
   char *force_label;
 
-  Float Fdt = 0.0;
+  ForceArg Fdt;
+  Float L1 = 0.0;
+  Float L2 = 0.0;
+  Float Linf = 0.0;
 
   int g_size = GJP.VolNodeSites() * GsiteSize();
 
   Matrix *mom_tmp;
-  FILE *fp;
 
   if (force_measure == FORCE_MEASURE_YES) {
     mom_tmp = (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
-    if( (fp = Fopen("force.dat", "a")) == NULL )
-      ERR.FileA(cname,fname, "force.dat");
     ((Vector*)mom_tmp) -> VecZero(g_size);
     force_label = new char[100];
   } else {
     mom_tmp = mom;
   }
 
-#if TARGET==cpsMPI
-  using MPISCU::fprintf;
-#endif
-
   for (int i=0; i<degree; i++) {
-    Fdt = EvolveMomFforce(mom_tmp,sol[i],mass,dt*alpha[i]);
-
+    ForceArg Fdt = EvolveMomFforce(mom_tmp,sol[i],mass,dt*alpha[i]);
     if (force_measure == FORCE_MEASURE_YES) {
       sprintf(force_label, "Rational, mass = %e, pole = %d:", mass, i+isz);
-      Fprintf(fp,"%s %e (L2) dt = %f\n", force_label, (IFloat)Fdt, (IFloat)dt);
+      Fdt.print(dt, force_label);
     }
   }
 
   // If measuring the force, need to measure and then sum to mom
   if (force_measure == FORCE_MEASURE_YES) {
-    Fdt = dotProduct((IFloat*)mom_tmp, (IFloat*)mom_tmp, g_size);
-    glb_sum(&Fdt);
+    for (int i=0; i<g_size/18; i++) {
+      Float norm = (mom_tmp+i)->norm();
+      Float tmp = sqrt(norm);
+      L1 += tmp;
+      L2 += norm;
+      Linf = (tmp>Linf ? tmp : Linf);
+    }
+    glb_sum(&L1);
+    glb_sum(&L2);
+    glb_max(&Linf);
+
+    L1 /= 4.0*GJP.VolSites();
+    L2 /= 4.0*GJP.VolSites();
+
     fTimesV1PlusV2((IFloat*)mom, 1.0, (IFloat*)mom_tmp, (IFloat*)mom, g_size);
 
-    Fclose(fp);
     delete[] force_label;
     sfree(mom_tmp, cname, fname, "mom_tmp");
   }
 
-  return sqrt(Fdt);
+  return ForceArg(L1, sqrt(L2), Linf);
 }
 
 //------------------------------------------------------------------
@@ -727,11 +744,11 @@ Float Fwilson::BhamiltonNode(Vector *boson, Float mass){
   return ret_val;
 }
 
-Float Fwilson::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
-		      Float mass, Float step_size) {
+ForceArg Fwilson::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+		      Float mass, Float dt) {
   char *fname = "EvolveMomFforce(M*,V*,V*,F,F)";
   ERR.General(cname,fname,"Not Implemented\n");
-  return 0.0;
+  return ForceArg(0.0,0.0,0.0);
 }
 
 CPS_END_NAMESPACE

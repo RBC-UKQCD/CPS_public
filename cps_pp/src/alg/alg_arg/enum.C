@@ -882,6 +882,9 @@ vml_IntegratorType (VML *vmls, char *name,IntegratorType *objp)
 struct vml_enum_map IntegratorType_map[] = {
 	{"IntegratorType","INT_LEAP",INT_LEAP},
 	{"IntegratorType","INT_OMELYAN",INT_OMELYAN},
+	{"IntegratorType","INT_CAMPOSTRINI",INT_CAMPOSTRINI},
+	{"IntegratorType","INT_OMELYAN_44",INT_OMELYAN_44},
+	{"IntegratorType","INT_OMELYAN_45",INT_OMELYAN_45},
 	{"IntegratorType","INT_SUM",INT_SUM},
 	{"IntegratorType","INT_MOM",INT_MOM},
 	{"IntegratorType","INT_GAUGE",INT_GAUGE},
@@ -1072,6 +1075,7 @@ vml_RationalApproxType (VML *vmls, char *name,RationalApproxType *objp)
 struct vml_enum_map RationalApproxType_map[] = {
 	{"RationalApproxType","RATIONAL_APPROX_POWER",RATIONAL_APPROX_POWER},
 	{"RationalApproxType","RATIONAL_APPROX_QUOTIENT",RATIONAL_APPROX_QUOTIENT},
+	{"RationalApproxType","RATIONAL_APPROX_ZERO_POLE",RATIONAL_APPROX_ZERO_POLE},
 	{NULL,NULL,0}
 };
 

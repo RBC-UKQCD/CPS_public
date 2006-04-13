@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.16 2006-03-29 19:35:24 chulwoo Exp $
+  $Id: vector.h,v 1.17 2006-04-13 19:05:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-03-29 19:35:24 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.16 2006-03-29 19:35:24 chulwoo Exp $
-//  $Id: vector.h,v 1.16 2006-03-29 19:35:24 chulwoo Exp $
+//  $Date: 2006-04-13 19:05:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.17 2006-04-13 19:05:34 chulwoo Exp $
+//  $Id: vector.h,v 1.17 2006-04-13 19:05:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -344,6 +344,8 @@ class Matrix
 
     //! The deviation of this matrix from unitarity
     IFloat ErrorSU3() const;
+
+    IFloat norm() const;
 
     // SU(3) Characters
 

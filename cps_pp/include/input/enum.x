@@ -8,19 +8,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.12 2006-03-29 19:35:24 chulwoo Exp $
+  $Id: enum.x,v 1.13 2006-04-13 19:04:07 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2006-03-29 19:35:24 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.12 2006-03-29 19:35:24 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.12 2006-03-29 19:35:24 chulwoo Exp $*/
+/*  $Date: 2006-04-13 19:04:07 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.13 2006-04-13 19:04:07 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.13 2006-04-13 19:04:07 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.12 $*/
+/*  $Revision: 1.13 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -707,6 +707,9 @@ enum PatternType {
 enum IntegratorType {
   INT_LEAP=0,
   INT_OMELYAN,
+  INT_CAMPOSTRINI,
+  INT_OMELYAN_44,
+  INT_OMELYAN_45,
   INT_SUM,
   INT_MOM,
   INT_GAUGE,
@@ -784,7 +787,8 @@ enum InverterType {
 /* Which type of approximation to use? */
 enum RationalApproxType {
   RATIONAL_APPROX_POWER = 0,
-  RATIONAL_APPROX_QUOTIENT = 1
+  RATIONAL_APPROX_QUOTIENT = 1,
+  RATIONAL_APPROX_ZERO_POLE = 2
 };
 
 /* Are set automatically (staggered only) or not? */

@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.26 2006-03-22 03:15:45 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.27 2006-04-13 19:05:56 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2006-03-22 03:15:45 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.26 2006-03-22 03:15:45 chulwoo Exp $
-  $Id: alg_hmc_rhmc.C,v 1.26 2006-03-22 03:15:45 chulwoo Exp $
+  $Date: 2006-04-13 19:05:56 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.27 2006-04-13 19:05:56 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.27 2006-04-13 19:05:56 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.26 $
+  $Revision: 1.27 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -620,10 +620,8 @@ Float AlgHmcRHMC::run(void)
       
 	  for (j=0; j<hmd_arg->FRatDeg[i]; j++) 
 	    bzero((char *)frmn[j+shift],f_size*sizeof(Float));
-//	    frmn[j+shift] -> VecTimesEquFloat(0.0,f_size);
 
-      
-	  cg_iter = lat.FmatEvlMInv(frmn + shift, phi[i], hmd_arg->FRatPole[i], 
+      	  cg_iter = lat.FmatEvlMInv(frmn + shift, phi[i], hmd_arg->FRatPole[i], 
 				    hmd_arg->FRatDeg[i], hmd_arg->isz, frm_cg_arg[i], 
 				    CNV_FRM_NO, frmn_d + shift);
 
@@ -641,9 +639,9 @@ Float AlgHmcRHMC::run(void)
 	  cg_calls++;      
 
 	  if ((lat.Fclass() != F_CLASS_ASQTAD && lat.Fclass() != F_CLASS_P4))
-	    lat.RHMC_EvolveMomFforce(mom, frmn+shift, hmd_arg->FRatDeg[i], 
+	    lat.RHMC_EvolveMomFforce(mom, frmn+shift, hmd_arg->FRatDeg[i], 0,
 				     hmd_arg->FRatRes[i], hmd_arg->frm_mass[i],
-				     dt, frmn_d+shift);
+				     dt, frmn_d+shift, FORCE_MEASURE_NO);
 
 	  shift += hmd_arg->FRatDeg[i];
 	}
@@ -653,18 +651,18 @@ Float AlgHmcRHMC::run(void)
 	if ((lat.Fclass() == F_CLASS_ASQTAD || lat.Fclass() == F_CLASS_P4) && n_frm_masses != 0)
 	  {
 	    VRB.Flow(cname,fname,"start EvolveMomFforce\n");
-	    #if 1
-	    #if 1
-	    lat.RHMC_EvolveMomFforce(mom, frmn, total_size, all_res, 0.0, dt, frmn_d);
-	    #else
+#if 1
+#if 1
+	    lat.RHMC_EvolveMomFforce(mom, frmn, total_size, 0, all_res, 0.0, dt, frmn_d, FORCE_MEASURE_NO);
+#else
 	    for(int jj = 0; jj< total_size; jj++)
 	      {
 		VRB.Flow(cname,fname,"before shift = %d, **(frmn+jj) = %e, all_res[jj]=%e\n",jj,*((IFloat *) *(frmn+jj)), all_res[jj]);
-		lat.RHMC_EvolveMomFforce(mom, frmn+jj, 1, all_res+jj, 0.0, dt, frmn_d+jj);
+		lat.RHMC_EvolveMomFforce(mom, frmn+jj, 1, 0, all_res+jj, 0.0, dt, frmn_d+jj, FORCE_MEASURE_NO);
 		VRB.Flow(cname,fname,"after shift = %d, **(frmn+jj) = %e, all_res[jj]=%e\n",jj,*((IFloat *) *(frmn+jj)), all_res[jj]);
 	      }
-	    #endif
-	    #else
+#endif
+#else
 	    for(int jj = 0; jj < total_size; jj++)
 	      {
 		//VRB.Flow(cname,fname,"before shift = %d, **(frmn+jj) = %e, all_res[jj]=%e\n",jj,*((IFloat *) *(frmn+jj)), all_res[jj]);
@@ -673,7 +671,7 @@ Float AlgHmcRHMC::run(void)
 		lat.EvolveMomFforce(mom, *(frmn+jj), 0.0, dt);
 		//VRB.Flow(cname,fname,"after shift = %d, **(frmn+jj) = %e, all_res[jj]=%e\n",jj,*((IFloat *) *(frmn+jj)), all_res[jj]);
 	      }
-	    #endif
+#endif
 	    VRB.Flow(cname,fname,"*((IFloat *)mom+777) = %e\n", *((IFloat *) mom+777));
 	  }
 
@@ -1023,6 +1021,7 @@ void AlgHmcRHMC::generateApprox(HmdArg *hmd_arg)
         remez_arg.power_num = hmd_arg->frm_power_num[i];
         remez_arg.power_den = hmd_arg->frm_power_den[i];
         remez_arg.precision = hmd_arg->precision;
+	remez_arg.delta_m = 0.0;
         {
             AlgRemez remez(remez_arg);
             remez.generateApprox();

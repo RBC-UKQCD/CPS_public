@@ -301,10 +301,10 @@ void AlgActionRational::evolve(Float dt, int nsteps, int **fractionSplit)
     //!< Create an appropriate lattice
     Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
     
-    int shift = 0;
-    int split_shift = 0;
-    
     for(int steps = 0; steps<nsteps; steps++) {
+      int shift = 0;
+      int split_shift = 0;
+    
       for(int i=0; i<n_masses; i++){
 	
 	int deg = fractionSplit[1][i] - fractionSplit[0][i];

@@ -73,6 +73,15 @@ AlgIntAB& AlgIntAB::Create(AlgInt &A, AlgInt &B, IntABArg &ab_arg) {
   } else if (ab_arg.type == INT_OMELYAN) {
     AlgIntOmelyan *ome = new AlgIntOmelyan(A, B, ab_arg);
     return *ome;
+  } else if (ab_arg.type == INT_CAMPOSTRINI) {
+    AlgIntCampostrini *ome = new AlgIntCampostrini(A, B, ab_arg);
+    return *ome;
+  } else if (ab_arg.type == INT_OMELYAN_44) {
+    AlgIntOmelyan44 *ome = new AlgIntOmelyan44(A, B, ab_arg);
+    return *ome;
+  } else if (ab_arg.type == INT_OMELYAN_45) {
+    AlgIntOmelyan45 *ome = new AlgIntOmelyan45(A, B, ab_arg);
+    return *ome;
   } else if (ab_arg.type == INT_SUM) {
     AlgIntSum *sum = new AlgIntSum(A, B, ab_arg);
     return *sum;

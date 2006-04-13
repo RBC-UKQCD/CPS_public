@@ -222,7 +222,7 @@ ForceArg GtadpoleRect::EvolveMomGforce(Matrix *mom, Float dt)
 	    IFloat *dotp = (IFloat *)mp0;
 	    IFloat *dotp2 = (IFloat *) (result[mu]+(uoff/4));
 	    fTimesV1PlusV2(ihp, dt, dotp2, ihp, 18);  //Update the gauge momentum
-	    Float norm = ((Matrix*)dotp)->norm();
+	    Float norm = ((Matrix*)dotp2)->norm();
 	    Float tmp = sqrt(norm);
 	    L1 += tmp;
 	    L2 += norm;

@@ -71,9 +71,9 @@ AlgRemez::AlgRemez(RemezArg &arg_remez)
 
   // Only require the approximation spread to be less than tolerance 
   if (sizeof(Float)==sizeof(double)) {
-    tolerance = 1e-15;
+    tolerance = 1e-17;
   } else if (sizeof(Float)==sizeof(float)) {
-    tolerance = 1e-8;
+    tolerance = 1e-10;
   }
 
   // Note use of new and delete in memory allocation - cannot run on qcdsp

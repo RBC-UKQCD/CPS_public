@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgDens class.
   
-  $Id: alg_dens.C,v 1.3 2006-02-24 02:05:05 chulwoo Exp $
+  $Id: alg_dens.C,v 1.4 2006-04-13 19:05:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-24 02:05:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.3 2006-02-24 02:05:05 chulwoo Exp $
-//  $Id: alg_dens.C,v 1.3 2006-02-24 02:05:05 chulwoo Exp $
+//  $Date: 2006-04-13 19:05:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.4 2006-04-13 19:05:48 chulwoo Exp $
+//  $Id: alg_dens.C,v 1.4 2006-04-13 19:05:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_dens.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v $
 //  $State: Exp $
 //
@@ -264,7 +264,7 @@ void AlgDens::run()
       /* set source
 	 ---------- */
 
-      #ifdef POINT
+#ifdef POINT
       bzero((char *)src, f_size*sizeof(Float));
       if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0)
 	{
@@ -275,11 +275,11 @@ void AlgDens::run()
 	for(int yy = 0; yy < 6; yy++)
 	  if(*(((IFloat *)&src[zz])+yy) > 1e-15)
 	    printf("zz = %d, yy = %d, *(src+zz) = %0.16e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
-      #else
+#else
       lat.RandGaussVector(src, 0.5);
-      #endif
+#endif
       
-      #ifdef Z2
+#ifdef Z2
       IFloat * tmp1;
       for(int zz = 0; zz < GJP.VolNodeSites(); zz++)
 	for(int yy = 0; yy < 6; yy+=2)
@@ -298,16 +298,16 @@ void AlgDens::run()
       //for(int yy = 0; yy < 6; yy++)
       //  printf("%0.16e  ",*(tmp1+yy));
       //printf("\n");
-      #endif
+#endif
 
       clear_vector();
       save_vector(src,0);
 
-      #ifdef POINT
+#ifdef POINT
       norm = 1.0;
-      #else
+#else
       norm = GJP.VolSites() * ( lat.FsiteSize() / 2 );
-      #endif
+#endif
 
       // Initialize the cg_arg mass, with the first mass we
       // want to compute for:
