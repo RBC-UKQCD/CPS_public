@@ -16,12 +16,14 @@ CPS_START_NAMESPACE
 // It evolves the canonical momentum mom by step_size
 // using the pure gauge force.
 //-----------------------------------------------------------------------------
-Float GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
+ForceArg GimprOLSym::EvolveMomGforce(Matrix *mom, Float dt)
 {
   char *fname = "EvolveMomGforce(M*,F)";  //Name of our function
   VRB.Func(cname,fname);                  //Sets name of function
 
-  Float Fdt = 0.0;
+  Float L1 = 0.0;
+  Float L2 = 0.0;
+  Float Linf = 0.0;
 
   static Matrix mt0;
   static Matrix *mp0 = &mt0;
@@ -266,8 +268,12 @@ Float GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
 	    IFloat *ihp = (IFloat *)(mom+uoff+mu);  //The gauge momentum
 	    IFloat *dotp = (IFloat *)mp0;
 	    IFloat *dotp2 = (IFloat *) (result[mu]+(uoff/4));
-	    fTimesV1PlusV2(ihp, step_size, dotp2, ihp, 18);  //Update the gauge momentum
-	    Fdt += step_size*step_size*dotProduct(dotp2, dotp2, 18);    
+	    fTimesV1PlusV2(ihp, dt, dotp2, ihp, 18);  //Update the gauge momentum
+	    Float norm = ((Matrix*)dotp2)->norm();
+	    Float tmp = sqrt(norm);
+	    L1 += tmp;
+	    L2 += norm;
+	    Linf = (tmp>Linf ? tmp : Linf);
 	  }
 	}
       }
@@ -288,8 +294,14 @@ Float GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size)
   for(int i = 0;i<4;i++) 
   ffree(result[i]);
 
-  glb_sum(&Fdt);
+  glb_sum(&L1);
+  glb_sum(&L2);
+  glb_max(&Linf);
 
-  return sqrt(Fdt);
+  L1 /= 4.0*GJP.VolSites();
+  L2 /= 4.0*GJP.VolSites();
+
+  return ForceArg(dt*L1, dt*sqrt(L2), dt*Linf);
+
 }
 CPS_END_NAMESPACE

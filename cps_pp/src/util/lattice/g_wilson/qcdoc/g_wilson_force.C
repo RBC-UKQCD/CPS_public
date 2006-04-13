@@ -8,18 +8,20 @@
 CPS_START_NAMESPACE
 #define PROFILE
 //------------------------------------------------------------------
-// EvolveMomGforce(Matrix *mom, Float step_size):
-// It evolves the canonical momentum mom by step_size
+// EvolveMomGforce(Matrix *mom, Float dt):
+// It evolves the canonical momentum mom by dt
 // using the pure gauge force.
 //------------------------------------------------------------------
 static const Float invs3 = -1./3.;
-Float Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
+ForceArg Gwilson::EvolveMomGforce(Matrix *mom, Float dt){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
   static Matrix mt0;
   static Matrix *mp0 = &mt0;
 
-  Float Fdt = 0.0;
+  Float L1=0.0;
+  Float L2=0.0;
+  Float Linf=0.0;
 
 #ifdef PROFILE
   Float time = -dclock();
@@ -91,20 +93,24 @@ Float Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
 	    
 	    IFloat *ihp = (IFloat *)(mom+uoff+mu);
 	    IFloat *dotp2 = (IFloat *) (result[mu]+(uoff/4));
-	    fTimesV1PlusV2(ihp, step_size, dotp2, ihp, 18);
-	    Fdt += step_size*step_size*dotProduct(dotp2, dotp2, 18);
-	    // want to replace with something like this?
-	    //vaxpy3_norm_m(ihp, &step_size, dotp2, ihp, 3, &Fdt);
+	    fTimesV1PlusV2(ihp, dt, dotp2, ihp, 18);
+	    Float norm = ((Matrix*)dotp2)->norm();
+	    Float tmp = sqrt(norm);
+	    L1 += tmp;
+	    L2 += norm;
+	    Linf = (tmp>Linf ? tmp : Linf);
 	  }
 	}
       }
     }
   }
   ForceFlops += vol*144;
+
 #ifdef PROFILE
   time += dclock();
   print_flops(cname,fname,ForceFlops+ParTrans::PTflops,time);
 #endif
+
   ffree(Unit);
   for(int i = 0;i<N;i++){
   ffree(tmp1[i]);
@@ -113,8 +119,14 @@ Float Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
   for(int i = 0;i<4;i++) 
   ffree(result[i]);
 
-  glb_sum(&Fdt);
+  glb_sum(&L1);
+  glb_sum(&L2);
+  glb_max(&Linf);
 
-  return sqrt(Fdt);
+  L1 /= 4.0*GJP.VolSites();
+  L2 /= 4.0*GJP.VolSites();
+
+  return ForceArg(dt*L1, dt*sqrt(L2), dt*Linf);
+
 }
 CPS_END_NAMESPACE

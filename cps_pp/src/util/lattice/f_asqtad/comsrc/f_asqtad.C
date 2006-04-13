@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of some Fasqtad class methods.
 
-  $Id: f_asqtad.C,v 1.25 2006-02-21 21:14:10 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.26 2006-04-13 18:16:16 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -628,11 +628,11 @@ void Fasqtad::Smear(){
   smeared=1;
 }
 
-Float Fasqtad::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+ForceArg Fasqtad::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 		      Float mass, Float step_size) {
   char *fname = "EvolveMomFforce(M*,V*,V*,F,F)";
   ERR.General(cname,fname,"Not Implemented\n");
-  return 0.0;
+  return ForceArg(0.0,0.0,0.0);
 }
 
 

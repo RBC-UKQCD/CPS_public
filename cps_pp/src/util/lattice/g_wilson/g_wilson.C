@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Gwilson class.
 
-  $Id: g_wilson.C,v 1.8 2005-12-02 16:32:51 chulwoo Exp $
+  $Id: g_wilson.C,v 1.9 2006-04-13 18:21:53 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 16:32:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v 1.8 2005-12-02 16:32:51 chulwoo Exp $
-//  $Id: g_wilson.C,v 1.8 2005-12-02 16:32:51 chulwoo Exp $
+//  $Date: 2006-04-13 18:21:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v 1.9 2006-04-13 18:21:53 chulwoo Exp $
+//  $Id: g_wilson.C,v 1.9 2006-04-13 18:21:53 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v $
 //  $State: Exp $
 //
@@ -152,50 +152,6 @@ void Gwilson::GforceSite(Matrix& force, int *x, int mu)
   force.TrLessAntiHermMatrix(*mp1);
   ForceFlops += 198+18+24;
 }
-
-#if 0
-#define PROFILE
-//------------------------------------------------------------------
-// EvolveMomGforce(Matrix *mom, Float step_size):
-// It evolves the canonical momentum mom by step_size
-// using the pure gauge force.
-//------------------------------------------------------------------
-void Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
-  char *fname = "EvolveMomGforce(M*,F)";
-  VRB.Func(cname,fname);
-#ifdef PROFILE
-  Float time = -dclock();
-  ForceFlops=0;
-#endif
-  
-  setCbufCntrlReg(4, CBUF_MODE4);
-
-  int x[4];
-  
-  for(x[0] = 0; x[0] < GJP.XnodeSites(); ++x[0]) {
-    for(x[1] = 0; x[1] < GJP.YnodeSites(); ++x[1]) {
-      for(x[2] = 0; x[2] < GJP.ZnodeSites(); ++x[2]) {
-	for(x[3] = 0; x[3] < GJP.TnodeSites(); ++x[3]) {
-	  
-	  int uoff = GsiteOffset(x);
-	  
-	  for (int mu = 0; mu < 4; ++mu) {
-	    GforceSite(*mp0, x, mu);
-	    
-	    IFloat *ihp = (IFloat *)(mom+uoff+mu);
-	    IFloat *dotp = (IFloat *)mp0;
-	    fTimesV1PlusV2(ihp, step_size, dotp, ihp+BANK4_BASE, 18);
-	  }
-	}
-      }
-    }
-  }
-#ifdef PROFILE
-  time += dclock();
-  print_flops(cname,fname,ForceFlops,time);
-#endif
-}
-#endif
 
 //------------------------------------------------------------------
 // Float GhamiltonNode(void):

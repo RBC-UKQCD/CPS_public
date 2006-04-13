@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.27 2006-02-21 21:14:11 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.28 2006-04-13 18:18:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -45,8 +45,13 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
+
+// Hack to measure the time for constructor/destructors
+static unsigned long called=1;
+Float ctor_time=0.;
 FdwfBase::FdwfBase()
 {
+  ctor_time -= dclock();
   cname = "FdwfBase";
   char *fname = "FdwfBase()";
   VRB.Func(cname,fname);
@@ -69,6 +74,7 @@ FdwfBase::FdwfBase()
   static Dwf dwf_struct;
   f_dirac_op_init_ptr = &dwf_struct;
   dwf_init((Dwf *) f_dirac_op_init_ptr);
+  ctor_time += dclock();
 }
 
 
@@ -77,6 +83,7 @@ FdwfBase::FdwfBase()
 //------------------------------------------------------------------
 FdwfBase::~FdwfBase()
 {
+  ctor_time -= dclock();
   char *fname = "~FdwfBase()";
   VRB.Func(cname,fname);
 
@@ -84,6 +91,12 @@ FdwfBase::~FdwfBase()
   // Un-initialize the dwf library. Memory is set free here.
   //----------------------------------------------------------------
   dwf_end((Dwf *) f_dirac_op_init_ptr);
+  ctor_time += dclock();
+  if(called%50==0){
+    print_time(cname,"(Ctor+Dtor)*10)",ctor_time);
+    ctor_time=0.;
+  }
+  called++;
 }
 
 
@@ -623,11 +636,11 @@ Float FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 // "Odd" fermion force evolution routine written by Chris Dawson, taken 
 // verbatim, so performance will suck on qcdoc.
 //------------------------------------------------------------------
-Float FdwfBase::EvolveMomFforce( Matrix* mom, // momenta
+ForceArg FdwfBase::EvolveMomFforce( Matrix* mom, // momenta
                                Vector* phi, // odd pseudo-fermion field
                                Vector* eta, // very odd pseudo-fermion field
                                Float  mass, 
-                               Float step_size )
+                               Float dt )
 {
   char *fname = "EvolveMomFforce(M*,V*,V*,F,F)";
   VRB.Func(cname,fname);
@@ -658,7 +671,10 @@ Float FdwfBase::EvolveMomFforce( Matrix* mom, // momenta
   if (v2 == 0) ERR.Pointer(cname, fname, str_v2) ;
   VRB.Smalloc(cname, fname, str_v2, v2, f_size*sizeof(Float)) ;
 
-  Float Fdt = 0.0;
+  Float L1 = 0.0;
+  Float L2 = 0.0;
+  Float Linf = 0.0;
+
 #ifdef PROFILE
   Float time = -dclock();
   ForceFlops=0;
@@ -744,7 +760,7 @@ Float FdwfBase::EvolveMomFforce( Matrix* mom, // momenta
             int vec_plus_mu_offset = f_site_size_4d ;
             
             // sign of coeff (look at momenta update)
-            Float coeff = -2.0 * step_size ;
+            Float coeff = -2.0 * dt ;
             
             switch (mu) 
               {
@@ -918,7 +934,11 @@ Float FdwfBase::EvolveMomFforce( Matrix* mom, // momenta
             
             // note the minus sign.
             *(mom+gauge_offset) -= tmp_mat2 ;
-	    Fdt += dotProduct((Float*)&tmp_mat2, (Float*)&tmp_mat2, 18);
+	    Float norm = tmp_mat2.norm();
+	    Float tmp = sqrt(norm);
+	    L1 += tmp;
+	    L2 += norm;
+	    Linf = (tmp>Linf ? tmp : Linf);
 	    
           } // end for x
         } // end for y
@@ -945,38 +965,41 @@ Float FdwfBase::EvolveMomFforce( Matrix* mom, // momenta
   VRB.Sfree(cname, fname, str_v1, v1) ;
   sfree(v1) ;
 
-  return sqrt(Fdt);
+  glb_sum(&L1);
+  glb_sum(&L2);
+  glb_max(&Linf);
+
+  L1 /= 4.0*GJP.VolSites();
+  L2 /= 4.0*GJP.VolSites();
+
+  return ForceArg(L1, sqrt(L2), Linf);
+
 }
 
 #define PROFILE
 
-Float FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				    int isz, Float *alpha, Float mass, 
-				    Float dt, Vector **sol_d, 
-				    ForceMeasure force_measure) {
+ForceArg FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+					int isz, Float *alpha, Float mass, 
+					Float dt, Vector **sol_d, 
+					ForceMeasure force_measure) {
   char *fname = "RHMC_EvolveMomFforce";
   char *force_label;
 
-  Float Fdt = 0.0;
+  Float L1 = 0.0;
+  Float L2 = 0.0;
+  Float Linf = 0.0;
 
   int g_size = GJP.VolNodeSites() * GsiteSize();
 
   Matrix *mom_tmp;
-  FILE *fp;
 
   if (force_measure == FORCE_MEASURE_YES) {
     mom_tmp = (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
-    if( (fp = Fopen("force.dat", "a")) == NULL )
-      ERR.FileA(cname,fname, "force.dat");
     ((Vector*)mom_tmp) -> VecZero(g_size);
     force_label = new char[100];
   } else {
     mom_tmp = mom;
   }
-
-#if TARGET==cpsMPI
-  using MPISCU::fprintf;
-#endif
 
 #ifdef PROFILE
   Float time = -dclock();
@@ -984,11 +1007,11 @@ Float FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 #endif
 
   for (int i=0; i<degree; i++){
-    Fdt = FdwfBase::EvolveMomFforce(mom_tmp,sol[i],mass,alpha[i]*dt);
+    ForceArg Fdt = FdwfBase::EvolveMomFforce(mom_tmp,sol[i],mass,alpha[i]*dt);
 
     if (force_measure == FORCE_MEASURE_YES) {
       sprintf(force_label, "Rational, mass = %e, pole = %d:", mass, i+isz);
-      Fprintf(fp,"%s %e (L2) dt = %f\n", force_label, (IFloat)Fdt, (IFloat)dt);
+      Fdt.print(dt, force_label);
     }
   }
 
@@ -999,16 +1022,27 @@ Float FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 
   // If measuring the force, need to measure and then sum to mom
   if (force_measure == FORCE_MEASURE_YES) {
-    Fdt = dotProduct((IFloat*)mom_tmp, (IFloat*)mom_tmp, g_size);
-    glb_sum(&Fdt);
+    for (int i=0; i<g_size/18; i++) {
+      Float norm = (mom_tmp+i)->norm();
+      Float tmp = sqrt(norm);
+      L1 += tmp;
+      L2 += norm;
+      Linf = (tmp>Linf ? tmp : Linf);
+    }
+    glb_sum(&L1);
+    glb_sum(&L2);
+    glb_max(&Linf);
+
+    L1 /= 4.0*GJP.VolSites();
+    L2 /= 4.0*GJP.VolSites();
+
     fTimesV1PlusV2((IFloat*)mom, 1.0, (IFloat*)mom_tmp, (IFloat*)mom, g_size);
 
-    Fclose(fp);
     delete[] force_label;
     sfree(mom_tmp, cname, fname, "mom_tmp");
   }
 
-  return sqrt(Fdt);
+  return ForceArg(L1, sqrt(L2), Linf);
 }
 
 //------------------------------------------------------------------

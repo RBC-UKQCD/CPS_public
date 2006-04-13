@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fclover class.
 
-  $Id: f_clover.C,v 1.18 2006-02-21 21:14:11 chulwoo Exp $
+  $Id: f_clover.C,v 1.19 2006-04-13 18:16:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 21:14:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.18 2006-02-21 21:14:11 chulwoo Exp $
-//  $Id: f_clover.C,v 1.18 2006-02-21 21:14:11 chulwoo Exp $
+//  $Date: 2006-04-13 18:16:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.19 2006-04-13 18:16:48 chulwoo Exp $
+//  $Id: f_clover.C,v 1.19 2006-04-13 18:16:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_clover.C,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -358,12 +358,12 @@ Float Fclover::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 
 //------------------------------------------------------------------
 // EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, 
-//                 Float step_size):
-// It evolves the canonical momentum mom by step_size
+//                 Float dt):
+// It evolves the canonical momentum mom by dt
 // using the fermion force.
 //------------------------------------------------------------------
-Float Fclover::EvolveMomFforce(Matrix *mom, Vector *frm, 
-			      Float mass, Float step_size){
+ForceArg Fclover::EvolveMomFforce(Matrix *mom, Vector *frm, 
+				  Float mass, Float dt) {
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
   
@@ -428,7 +428,9 @@ Float Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
   VRB.Smalloc(cname, fname, str_site_v2, site_v2,
     FsiteSize()*sizeof(Float)) ;
 
-  Float Fdt = 0.0;
+  Float L1 = 0.0;
+  Float L2 = 0.0;
+  Float Linf = 0.0;
 
 //------------------------------------------------------------------
 // Calculate the force vectors for the ODD checkerboard
@@ -487,7 +489,7 @@ Float Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
   lt = GJP.TnodeSites() ;
 
 //------------------------------------------------------------------
-// Evolves the canonical momentum mom by step_size
+// Evolves the canonical momentum mom by dt
 // using fermion force without the clover contribution. 
 // Start by summing first over direction (mu) and then over site
 // to allow SCU transfers to happen face-by-face in the outermost
@@ -512,7 +514,7 @@ Float Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
       int vec_plus_mu_offset = FsiteSize() ;
       
       Float kappa = 1.0 / (2.0 * (mass + 4.0));
-      Float coeff = 2.0 * step_size * kappa;
+      Float coeff = 2.0 * dt * kappa;
          
       switch (mu) {
         case 0 :
@@ -594,18 +596,21 @@ Float Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
       f.TrLessAntiHermMatrix(tmp) ;
 
       *(mom+gauge_offset) += f ;
-      Fdt += dotProduct((Float*)&f, (Float*)&f, 18);
-
+      Float norm = f.norm();
+      Float tmp = sqrt(norm);
+      L1 += tmp;
+      L2 += norm;
+      Linf = (tmp>Linf ? tmp : Linf);
     }
               
   }
 
 //------------------------------------------------------------------
-// Evolves the canonical momentum mom by step_size
+// Evolves the canonical momentum mom by dt
 // using the clover contribution of fermion force 
 //------------------------------------------------------------------
 
-  EvolveMomFforceSupp(mom, v1, v2, v3, v4, mass, step_size);
+  EvolveMomFforceSupp(mom, v1, v2, v3, v4, mass, dt);
     
 //------------------------------------------------------------------
 // deallocate space for two CANONICAL fermion fields on a site.
@@ -632,18 +637,23 @@ Float Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
   VRB.Sfree(cname, fname, str_v1, v1) ;
   sfree(v1) ;
 
-  glb_sum(&Fdt);
+  glb_sum(&L1);
+  glb_sum(&L2);
+  glb_max(&Linf);
 
-  return sqrt(Fdt);
+  L1 /= 4.0*GJP.VolSites();
+  L2 /= 4.0*GJP.VolSites();
+
+  return ForceArg(L1, sqrt(L2), Linf);
 }
 
-Float Fclover::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+ForceArg Fclover::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 				   int isz, Float *alpha, Float mass, Float dt,
 				   Vector **sol_d, ForceMeasure force_measure) {
   char *fname = "RHMC_EvolveMomFforce";
 
   ERR.General(cname,fname,"Not implemented\n");
-  return 0.0;
+  return ForceArg(0.0,0.0,0.0);
 }
 
 //------------------------------------------------------------------
@@ -714,12 +724,12 @@ Float Fclover::BhamiltonNode(Vector *boson, Float mass){
 
 //------------------------------------------------------------------
 // EvolveMomFforceSupp(Matrix *mom, Vector *v1, Vector *v2, 
-//                 Float mass, Float step_size):
-// It evolves the canonical momentum mom by step_size
+//                 Float mass, Float dt):
+// It evolves the canonical momentum mom by dt
 // using the clover contribution of fermion force 
 //------------------------------------------------------------------
 void Fclover::EvolveMomFforceSupp(Matrix *mom, Vector *v1, Vector *v2,
-		Vector *v3, Vector *v4, Float mass, Float step_size){
+		Vector *v3, Vector *v4, Float mass, Float dt){
   char *fname = "EvolveMomFforceSupp(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
 
@@ -765,7 +775,7 @@ void Fclover::EvolveMomFforceSupp(Matrix *mom, Vector *v1, Vector *v2,
 	  
   Float kappa = 1.0 / (2.0 * (mass + 4.0));
 	
-  Float coeff = 0.25 * step_size * kappa * GJP.CloverCoeff();
+  Float coeff = 0.25 * dt * kappa * GJP.CloverCoeff();
       
 // start by summing first over direction (mu) and then over site
 // to allow SCU transfers to happen face-by-face in the outermost
@@ -1330,11 +1340,11 @@ void Fclover::EvolveMomFforceSupp(Matrix *mom, Vector *v1, Vector *v2,
   
 }
 
-Float Fclover::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
-		      Float mass, Float step_size) {
+ForceArg Fclover::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+		      Float mass, Float dt) {
   char *fname = "EvolveMomFforce(M*,V*,V*,F,F)";
   ERR.General(cname,fname,"Not Implemented\n");
-  return 0.0;
+  return ForceArg(0.0,0.0,0.0);
 }
 
 

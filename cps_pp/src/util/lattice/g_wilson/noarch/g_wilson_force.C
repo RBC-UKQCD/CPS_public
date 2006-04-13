@@ -19,21 +19,22 @@ const unsigned CBUF_MODE4 = 0xcca52112;
 
 #define PROFILE
 //------------------------------------------------------------------
-// EvolveMomGforce(Matrix *mom, Float step_size):
+// EvolveMomGforce(Matrix *mom, Float dt):
 // It evolves the canonical momentum mom by step_size
 // using the pure gauge force.
 //------------------------------------------------------------------
-Float Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
+ForceArg Gwilson::EvolveMomGforce(Matrix *mom, Float dt){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
 
-  Float Fdt=0.0;
+  Float L1=0.0;
+  Float L2=0.0;
+  Float Linf=0.0;
 
 #ifdef PROFILE
   Float time = -dclock();
   ForceFlops=0;
 #endif
-
   
   setCbufCntrlReg(4, CBUF_MODE4);
 
@@ -51,21 +52,31 @@ Float Gwilson::EvolveMomGforce(Matrix *mom, Float step_size){
 	    
 	    IFloat *ihp = (IFloat *)(mom+uoff+mu);
 	    IFloat *dotp = (IFloat *)mp0;
-	    fTimesV1PlusV2(ihp, step_size, dotp, ihp+BANK4_BASE, 18);
-	    Fdt += step_size*step_size*dotProduct(dotp, dotp, 18);    
+	    fTimesV1PlusV2(ihp, dt, dotp, ihp+BANK4_BASE, 18);
+	    Float norm = ((Matrix*)dotp)->norm();
+	    Float tmp = sqrt(norm);
+	    L1 += tmp;
+	    L2 += norm;
+	    Linf = (tmp>Linf ? tmp : Linf);
 	  }
 	}
       }
     }
   }
+
 #ifdef PROFILE
   time += dclock();
   print_flops(cname,fname,ForceFlops,time);
 #endif
 
-  glb_sum(&Fdt);
+  glb_sum(&L1);
+  glb_sum(&L2);
+  glb_max(&Linf);
 
-  return sqrt(Fdt);
+  L1 /= 4.0*GJP.VolSites();
+  L2 /= 4.0*GJP.VolSites();
+
+  return ForceArg(dt*L1, dt*sqrt(L2), dt*Linf);
 
 }
 CPS_END_NAMESPACE

@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fp4::EvolveMomFforce.
 
-  $Id: p4_Fforce.C,v 1.5 2005-12-02 17:58:53 chulwoo Exp $
+  $Id: p4_Fforce.C,v 1.6 2006-04-13 18:20:37 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -63,9 +63,11 @@ void Fp4::RHMC_EvolveMomFforce(Matrix * mom, Vector ** vect, int abc, double * d
 }
 #endif
 
-Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
+ForceArg Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   ERR.NotImplemented(cname,fname);
+  ForceArg  Fdt;
+
 #if 0
   VRB.Func(cname,fname);
 
@@ -684,7 +686,7 @@ Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
   print_flops(nflops,dtime);
 #endif
 
-  update_momenta(force, dt, mom);
+  Fdt = update_momenta(force, dt, mom);
 
 
   // Tidy up
@@ -721,7 +723,7 @@ Float Fp4::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
   Convert(CANONICAL);
 #endif   
 
-  return 0.0;
+  return Fdt;
 }
 
 CPS_END_NAMESPACE

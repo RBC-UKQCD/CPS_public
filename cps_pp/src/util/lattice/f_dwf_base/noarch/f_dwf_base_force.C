@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.7 2005-12-02 16:11:25 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.8 2006-04-13 18:18:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -40,12 +40,12 @@ CPS_START_NAMESPACE
 // CJ: change start
 //------------------------------------------------------------------
 // EvolveMomFforce(Matrix *mom, Vector *chi, Float mass, 
-//                 Float step_size):
-// It evolves the canonical momentum mom by step_size
+//                 Float dt):
+// It evolves the canonical momentum mom by dt
 // using the fermion force.
 //------------------------------------------------------------------
-Float FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi, 
-			   Float mass, Float step_size){
+ForceArg FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi, 
+			   Float mass, Float dt){
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
 
@@ -96,7 +96,9 @@ Float FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   if (site_v2 == 0) ERR.Pointer(cname, fname, str_site_v2) ;
   VRB.Smalloc(cname, fname, str_site_v2, site_v2, FsiteSize()*sizeof(Float)) ;
 
-  Float Fdt = 0.0;
+  Float L1 = 0.0;
+  Float L2 = 0.0;
+  Float Linf = 0.0;
 
   //----------------------------------------------------------------
   // Calculate v1, v2. Both v1, v2 must be in CANONICAL order after
@@ -151,7 +153,7 @@ Float FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       int vec_plus_mu_stride ;
       int vec_plus_mu_offset = f_site_size_4d ;
 
-      Float coeff = -2.0 * step_size ;
+      Float coeff = -2.0 * dt ;
 
       switch (mu) {
         case 0 :
@@ -253,7 +255,7 @@ Float FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
       // If GJP.Snodes > 1 sum up contributions from all s nodes
       if(GJP.Snodes() > 1) {
-	  glb_sum_multi_dir((Float *)&tmp_mat1, 4, sizeof(Matrix)/sizeof(IFloat) ) ;
+	glb_sum_multi_dir((Float *)&tmp_mat1,4,sizeof(Matrix)/sizeof(IFloat));
       }
 
       tmp_mat2.DotMEqual(*(gauge+gauge_offset), tmp_mat1) ;
@@ -265,7 +267,11 @@ Float FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       tmp_mat2 *= coeff ;
 
       *(mom+gauge_offset) += tmp_mat2 ;
-      Fdt += dotProduct((Float*)&tmp_mat2, (Float*)&tmp_mat2, 18);
+      Float norm = tmp_mat2.norm();
+      Float tmp = sqrt(norm);
+      L1 += tmp;
+      L2 += norm;
+      Linf = (tmp>Linf ? tmp : Linf);
 
     } } } } // end for x,y,z,t
   } // end for mu
@@ -290,9 +296,15 @@ Float FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   VRB.Sfree(cname, fname, str_v1, v1) ;
   sfree(v1) ;
  
-  glb_sum(&Fdt);
+  glb_sum(&L1);
+  glb_sum(&L2);
+  glb_max(&Linf);
 
-  return sqrt(Fdt);
+  L1 /= 4.0*GJP.VolSites();
+  L2 /= 4.0*GJP.VolSites();
+
+  return ForceArg(L1, sqrt(L2), Linf);
+
 }
 // CJ: change end
 

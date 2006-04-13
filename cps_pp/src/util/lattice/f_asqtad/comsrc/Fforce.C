@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.8 2006-02-01 16:46:08 chulwoo Exp $
+  $Id: Fforce.C,v 1.9 2006-04-13 18:16:16 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ CPS_START_NAMESPACE
 // N.B. No optimising provision is made if any of the asqtad coefficients
 // are zero.
 
-Float Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
+ForceArg Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
 
     char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
     VRB.Func(cname,fname);
@@ -602,7 +602,7 @@ Float Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     print_flops(cname, fname, ParTrans::PTflops+ForceFlops, dtime);
 #endif
 
-    update_momenta(force, dt, mom);
+    ForceArg Fdt = update_momenta(force, dt, mom);
     /*printf("HELLO\n");
     IFloat temp;
     IFloat *tmp_pointer;
@@ -634,7 +634,7 @@ Float Fasqtad::EvolveMomFforce(Matrix *mom, Vector *frm, Float mass, Float dt){
     f_tmp = f_tmp_save;
 #endif
 
-    return 0.0;
+    return Fdt;
     
 }
 

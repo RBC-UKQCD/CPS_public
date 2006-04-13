@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fnone class.
 
-  $Id: f_none.C,v 1.14 2006-02-21 21:14:11 chulwoo Exp $
+  $Id: f_none.C,v 1.15 2006-04-13 18:19:45 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -242,22 +242,22 @@ void Fnone::FforceSite(Matrix& force, Vector *frm, int *x, int mu)
 // It evolves the canonical momentum mom by step_size
 // using the fermion force.
 //------------------------------------------------------------------
-Float Fnone::EvolveMomFforce(Matrix *mom, Vector *frm, 
+ForceArg Fnone::EvolveMomFforce(Matrix *mom, Vector *frm, 
 			    Float mass, Float step_size){
   char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   VRB.Func(cname,fname);
 
-  return 0.0;
+  return ForceArg(0.0,0.0,0.0);
 }
 
-Float Fnone::RHMC_EvolveMomFforce(Matrix *mom, Vector **frm, int degree, 
+ForceArg Fnone::RHMC_EvolveMomFforce(Matrix *mom, Vector **frm, int degree, 
 				  int isz, Float *alpha, Float mass,  
 				  Float step_size, Vector **frm_d,
 				  ForceMeasure force_measure){
   char *fname = "EvolveMomFforce(M*,V**,F,F,F)";
   VRB.Func(cname,fname);
 
-  return 0.0;
+  return ForceArg(0.0,0.0,0.0);
 }
 
 
@@ -321,9 +321,9 @@ int Fnone::FsiteOffset(const int *x) const {
   return 0; 
 }
 
-Float Fnone::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+ForceArg Fnone::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 		      Float mass, Float step_size) {
-  return 0.0;
+  return ForceArg(0.0,0.0,0.0);
 }
 
 

@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprOLSym class methods.
 
-  $Id: g_impr_OLSym.C,v 1.9 2005-12-02 16:27:13 chulwoo Exp $
+  $Id: g_impr_OLSym.C,v 1.10 2006-04-13 18:21:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 16:27:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.9 2005-12-02 16:27:13 chulwoo Exp $
-//  $Id: g_impr_OLSym.C,v 1.9 2005-12-02 16:27:13 chulwoo Exp $
+//  $Date: 2006-04-13 18:21:50 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.10 2006-04-13 18:21:50 chulwoo Exp $
+//  $Id: g_impr_OLSym.C,v 1.10 2006-04-13 18:21:50 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v $
 //  $State: Exp $
 //
@@ -160,11 +160,13 @@ void GimprOLSym::GforceSite(Matrix& force, int *x, int mu)
 // It evolves the canonical momentum mom by step_size
 // using the pure gauge force.
 //-----------------------------------------------------------------------------
-Float GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size){
+ForceArg GimprOLSym::EvolveMomGforce(Matrix *mom, Float dt){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
 
-  Float Fdt = 0.0;
+  Float L1 = 0.0;
+  Float L2 = 0.0;
+  Float Linf = 0.0;
   
   setCbufCntrlReg(4, CBUF_MODE4);
 
@@ -182,14 +184,24 @@ Float GimprOLSym::EvolveMomGforce(Matrix *mom, Float step_size){
 
       IFloat *ihp = (IFloat *)(mom+uoff+mu);
       IFloat *dotp = (IFloat *)mp0;
-      fTimesV1PlusV2(ihp, step_size, dotp, ihp+BANK4_BASE, 18);
-      Fdt += step_size*step_size*dotProduct(dotp, dotp, 18);    
+      fTimesV1PlusV2(ihp, dt, dotp, ihp+BANK4_BASE, 18);
+      Float norm = ((Matrix*)dotp)->norm();
+      Float tmp = sqrt(norm);
+      L1 += tmp;
+      L2 += norm;
+      Linf = (tmp>Linf ? tmp : Linf);
     }
   }
 
-  glb_sum(&Fdt);
+  glb_sum(&L1);
+  glb_sum(&L2);
+  glb_max(&Linf);
 
-  return sqrt(Fdt);
+  L1 /= 4.0*GJP.VolSites();
+  L2 /= 4.0*GJP.VolSites();
+
+  return ForceArg(dt*L1, dt*sqrt(L2), dt*Linf);
+
 }
 #endif
 

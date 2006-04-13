@@ -1,11 +1,11 @@
 #include<config.h>
 #include<math.h>
-#include<stdio.h>
+#include<util/qcdio.h>
 
 /*!\file
   \brief  Implementation of Fp4::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce_p4.C,v 1.5 2006-03-29 21:21:18 chulwoo Exp $
+  $Id: RHMC_Fforce_p4.C,v 1.6 2006-04-13 18:20:37 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -41,199 +41,232 @@ CPS_START_NAMESPACE
 
 #define PROFILE
 
-Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
-				   int isz, Float *alpha, Float mass, Float dt,
-				   Vector **sol_d,
-				   ForceMeasure force_measure){
+ForceArg Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+				int isz, Float *alpha, Float mass, Float dt,
+				Vector **sol_d,
+				ForceMeasure force_measure){
 
-    char *fname = "RHMC_EvolveMomFforce";
-    VRB.Func(cname,fname);
+  char *fname = "RHMC_EvolveMomFforce";
+  VRB.Func(cname,fname);
+
+  // If we want to measure the force then we must use the slow calculation
+  if (force_measure == FORCE_MEASURE_YES) {
+    Float L1 = 0.0;
+    Float L2 = 0.0;
+    Float Linf = 0.0;
+      
+    int g_size = GJP.VolNodeSites() * GsiteSize();
+      
+    Matrix *mom_tmp = 
+      (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
+    ((Vector*)mom_tmp) -> VecZero(g_size);
+
+    char force_label[100];
+
+    for (int i=0; i<degree; i++) {
+      f_tmp -> CopyVec(sol_d[i], e_vsize);
+      ForceArg Fdt = EvolveMomFforce(mom_tmp,sol[i],mass,dt*alpha[i]);
+      sprintf(force_label, "Rational, mass = %e, pole = %d:", mass, i+isz);
+      Fdt.print(dt, force_label);
+    }
+
+    for (int i=0; i<g_size/18; i++) {
+      Float norm = (mom_tmp+i)->norm();
+      Float tmp = sqrt(norm);
+      L1 += tmp;
+      L2 += norm;
+      Linf = (tmp>Linf ? tmp : Linf);
+    }
+
+    glb_sum(&L1);
+    glb_sum(&L2);
+    glb_max(&Linf);
+
+    L1 /= 4.0*GJP.VolSites();
+    L2 /= 4.0*GJP.VolSites();
+      
+    fTimesV1PlusV2((IFloat*)mom, 1.0, (IFloat*)mom_tmp, (IFloat*)mom, g_size);
+      
+    sfree(mom_tmp, cname, fname, "mom_tmp");
+      
+    return ForceArg(L1, sqrt(L2), Linf);
+
+  }
 
 #ifdef PROFILE
-    Float dtime;
-    ParTrans::PTflops=0;
-    ForceFlops=0;
+  Float dtime;
+  ParTrans::PTflops=0;
+  ForceFlops=0;
 #endif
 
-    //Float Fdt=0.0;
-    //char *force_label;
+  ForceArg Fdt;
+  char *force_label;
   int g_size = GJP.VolNodeSites() * GsiteSize();
-  //Matrix *mom_tmp;
-  //FILE *fp;
+  Matrix *mom_tmp;
+  FILE *fp;
 
-  /*
-  if (force_measure == FORCE_MEASURE_YES) {
-    mom_tmp = (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
-    if( (fp = Fopen("force.dat", "a")) == NULL )
-      ERR.FileA(cname,fname, "force.dat");
-    ((Vector*)mom_tmp) -> VecZero(g_size);
-    force_label = new char[100];
-  } else {
-    mom_tmp = mom;
-    }*/
+  // The number of directions to do simultaneously - N can be 1, 2 or 4.
+  const int N = 1;  
+  enum{plus, minus, n_sign};
 
-    // The number of directions to do simultaneously - N can be 1, 2 or 4.
-    const int N = 1;  
-    enum{plus, minus, n_sign};
-
-    const int vol = GJP.VolNodeSites();
-    const int f_size = vol*FsiteSize()/2;
+  const int vol = GJP.VolNodeSites();
+  const int f_size = vol*FsiteSize()/2;
     
-    for (int i=0; i<degree; i++)
-      sol[i]->VecTimesEquFloat(alpha[i], f_size);
+  for (int i=0; i<degree; i++)
+    sol[i]->VecTimesEquFloat(alpha[i], f_size);
 
-    // X_odd = D X_even    
-    for (int p=0; p<degree; p++) {
-      Fconvert(sol[p], CANONICAL, STAG);
+  // X_odd = D X_even    
+  for (int p=0; p<degree; p++) {
+    Fconvert(sol[p], CANONICAL, STAG);
+  }
+
+  Convert(STAG);  // Puts staggered phases into gauge field.
+
+  // These are work Matrices used in force_product_sum routines
+  Matrix *mtmp = (Matrix*)fmalloc(vol*sizeof(Matrix), cname, fname, "mtmp");
+
+  Matrix ***Pnu = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Pnu");
+  Matrix ***Pmu = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Pmu");
+  Matrix ***Pmumu = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Pmumu");
+  Matrix ****P3 = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P3");
+  Matrix ****P3prime = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P3prime");
+  Matrix ****Prhonu = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "Prhonu");
+  Matrix *****P5 = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "P5");
+  Matrix *****P5prime = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "P5prime");
+  Matrix ******P7 = (Matrix******)smalloc(n_sign*sizeof(Matrix*****), cname, fname, "P7");
+  Matrix ******Psigma7 = 
+    (Matrix******)smalloc(n_sign*sizeof(Matrix*****), cname, fname, "Psigma7");
+  Matrix ***Lnu = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Lnu");
+  Matrix ****Lrhonu = 
+    (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "Lrhonu");
+  Matrix ****Lmusigmarhonu = 
+    (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "Lmusigmarhonu");
+
+  Matrix **L = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "L");
+  for (int i=0; i<N; i++)  L[i] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "L[i]");
+
+  for (int i=0; i<n_sign; i++) {
+    Pnu[i] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Pnu[i]");
+    Pmu[i] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Pmu[i]");
+    Pmumu[i] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Pmumu[i]");
+    Lnu[i] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Lnu[i]");
+    for (int j=0; j<N; j++) {
+      Pnu[i][j] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "Pnu[i][j]");
+      Pmu[i][j] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "Pmu[i][j]");
+      Pmumu[i][j] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "Pmumu[i][j]");
+      Lnu[i][j] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "Lnu[i][j]");
     }
+    P3[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "P3[i]");
+    P3prime[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "P3prime[i]");
+    Prhonu[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Prhonu[i]");
+    Lrhonu[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Lrhonu[i]");
+    Lmusigmarhonu[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), 
+					  cname, fname, "Lmusigmarhonu[i]");
+    P5[i] = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P5[i]");
+    P5prime[i] = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P5prime[i]");
+    P7[i] = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "P7[i]");
+    Psigma7[i] = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "Psigma7[i]");
+    for (int j=0; j<n_sign; j++) {
+      P3[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "P3[i][j]");
+      P3prime[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "P3prime[i][j]");
+      Prhonu[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Prhonu[i][j]");
+      Lrhonu[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Lrhonu[i][j]");
+      Lmusigmarhonu[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), 
+					      cname, fname, "Lmusigmarhonu[i][j]");
+      for (int k=0; k<N; k++) {
+	P3[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "P3[i][j][k]");
+	P3prime[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "P3prime[i][j][k]");
 
-    Convert(STAG);  // Puts staggered phases into gauge field.
-
-    // These are work Matrices used in force_product_sum routines
-    Matrix *mtmp = (Matrix*)fmalloc(vol*sizeof(Matrix), cname, fname, "mtmp");
-
-    Matrix ***Pnu = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Pnu");
-    Matrix ***Pmu = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Pmu");
-    Matrix ***Pmumu = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Pmumu");
-    Matrix ****P3 = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P3");
-    Matrix ****P3prime = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P3prime");
-    Matrix ****Prhonu = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "Prhonu");
-    Matrix *****P5 = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "P5");
-    Matrix *****P5prime = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "P5prime");
-    Matrix ******P7 = (Matrix******)smalloc(n_sign*sizeof(Matrix*****), cname, fname, "P7");
-    Matrix ******Psigma7 = 
-      (Matrix******)smalloc(n_sign*sizeof(Matrix*****), cname, fname, "Psigma7");
-    Matrix ***Lnu = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Lnu");
-    Matrix ****Lrhonu = 
-      (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "Lrhonu");
-    Matrix ****Lmusigmarhonu = 
-      (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "Lmusigmarhonu");
-
-    Matrix **L = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "L");
-    for (int i=0; i<N; i++)  L[i] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "L[i]");
-
-    for (int i=0; i<n_sign; i++) {
-      Pnu[i] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Pnu[i]");
-      Pmu[i] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Pmu[i]");
-      Pmumu[i] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Pmumu[i]");
-      Lnu[i] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Lnu[i]");
-      for (int j=0; j<N; j++) {
-	Pnu[i][j] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "Pnu[i][j]");
-	Pmu[i][j] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "Pmu[i][j]");
-	Pmumu[i][j] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "Pmumu[i][j]");
-	Lnu[i][j] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "Lnu[i][j]");
+	Prhonu[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), "Prhonu[i][j][k]");
+	Lrhonu[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), "Lrhonu[i][j][k]");
+	Lmusigmarhonu[i][j][k] = 
+	  (Matrix*)smalloc(vol*sizeof(Matrix), "Lmusigmarhonu[i][j][k]");
       }
-      P3[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "P3[i]");
-      P3prime[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "P3prime[i]");
-      Prhonu[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Prhonu[i]");
-      Lrhonu[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "Lrhonu[i]");
-      Lmusigmarhonu[i] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), 
-					    cname, fname, "Lmusigmarhonu[i]");
-      P5[i] = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P5[i]");
-      P5prime[i] = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P5prime[i]");
-      P7[i] = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "P7[i]");
-      Psigma7[i] = (Matrix*****)smalloc(n_sign*sizeof(Matrix****), cname, fname, "Psigma7[i]");
-      for (int j=0; j<n_sign; j++) {
-	P3[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "P3[i][j]");
-	P3prime[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "P3prime[i][j]");
-	Prhonu[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Prhonu[i][j]");
-	Lrhonu[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "Lrhonu[i][j]");
-	Lmusigmarhonu[i][j] = (Matrix**)smalloc(N*sizeof(Matrix*), 
-						cname, fname, "Lmusigmarhonu[i][j]");
-	for (int k=0; k<N; k++) {
-	  P3[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "P3[i][j][k]");
-	  P3prime[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, "P3prime[i][j][k]");
-
-	  Prhonu[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), "Prhonu[i][j][k]");
-	  Lrhonu[i][j][k] = (Matrix*)smalloc(vol*sizeof(Matrix), "Lrhonu[i][j][k]");
-	  Lmusigmarhonu[i][j][k] = 
-	    (Matrix*)smalloc(vol*sizeof(Matrix), "Lmusigmarhonu[i][j][k]");
+      P5[i][j] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "P5[i][j]");
+      P5prime[i][j] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "P5prime[i][j]");
+      P7[i][j] = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P7[i][j]");
+      Psigma7[i][j] = (Matrix****)
+	smalloc(n_sign*sizeof(Matrix***), cname, fname, "Psigma7[i][j]");
+      for (int k=0; k<n_sign; k++) {
+	P5[i][j][k] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "P5[i][j][k]");
+	P5prime[i][j][k] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "P5prime[i][j][k]");
+	for (int l=0; l<N; l++) {
+	  P5[i][j][k][l] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, 
+					    fname, "P5[i][j][k][l]");
+	  P5prime[i][j][k][l] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, 
+						 fname, "P5prime[i][j][k][l]");
 	}
-	P5[i][j] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "P5[i][j]");
-	P5prime[i][j] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, fname, "P5prime[i][j]");
-	P7[i][j] = (Matrix****)smalloc(n_sign*sizeof(Matrix***), cname, fname, "P7[i][j]");
-	Psigma7[i][j] = (Matrix****)
-	  smalloc(n_sign*sizeof(Matrix***), cname, fname, "Psigma7[i][j]");
-	for (int k=0; k<n_sign; k++) {
-	  P5[i][j][k] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "P5[i][j][k]");
-	  P5prime[i][j][k] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, "P5prime[i][j][k]");
-	  for (int l=0; l<N; l++) {
-	    P5[i][j][k][l] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, 
-					      fname, "P5[i][j][k][l]");
-	    P5prime[i][j][k][l] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, 
-					      fname, "P5prime[i][j][k][l]");
-	  }
-	  P7[i][j][k] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, 
-					   fname, "P7[i][j][k]");
-	  Psigma7[i][j][k] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, 
-						fname, "Psigma7[i][j][k]");
-	  for (int l=0; l<n_sign; l++) {
-	    P7[i][j][k][l] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, 
-					       fname, "P7[i][j][k][l]");
-	    Psigma7[i][j][k][l] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, 
-						    "P7[i][j][k][l]");
-	    for (int m=0; m<N; m++) {
-	      P7[i][j][k][l][m] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, 
-						   "P7[i][j][k][l][m]");
-	      Psigma7[i][j][k][l][m] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, 
-							"Psigma7[i][j][k][l][m]");
-	    }
+	P7[i][j][k] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, 
+					 fname, "P7[i][j][k]");
+	Psigma7[i][j][k] = (Matrix***)smalloc(n_sign*sizeof(Matrix**), cname, 
+					      fname, "Psigma7[i][j][k]");
+	for (int l=0; l<n_sign; l++) {
+	  P7[i][j][k][l] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, 
+					     fname, "P7[i][j][k][l]");
+	  Psigma7[i][j][k][l] = (Matrix**)smalloc(N*sizeof(Matrix*), cname, fname, 
+						  "P7[i][j][k][l]");
+	  for (int m=0; m<N; m++) {
+	    P7[i][j][k][l][m] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, 
+						 "P7[i][j][k][l][m]");
+	    Psigma7[i][j][k][l][m] = (Matrix*)smalloc(vol*sizeof(Matrix), cname, fname, 
+						      "Psigma7[i][j][k][l][m]");
 	  }
 	}
       }
     }
+  }
 
 
-    // Array in which to accumulate the force term      
-    Matrix **force = (Matrix**)amalloc(fmalloc, sizeof(Matrix), 2, 4, vol);
+  // Array in which to accumulate the force term      
+  Matrix **force = (Matrix**)amalloc(fmalloc, sizeof(Matrix), 2, 4, vol);
 
-    ParTransAsqtad parallel_transport(*this);
+  ParTransAsqtad parallel_transport(*this);
 
-    // These fields can be overlapped with previously allocated memory
+  // These fields can be overlapped with previously allocated memory
     
-    Matrix ****Pmu3 = Prhonu;
-    Matrix ***Pnunu = Psigma7[0][0][0];
-    Matrix ****Pnu5 = P7[0][0];
-    Matrix ****Pnu3 = P7[0][0];
-    Matrix *****Prho5 = P7[0];
-    Matrix *****Psigmarhonu = Psigma7[0];
+  Matrix ****Pmu3 = Prhonu;
+  Matrix ***Pnunu = Psigma7[0][0][0];
+  Matrix ****Pnu5 = P7[0][0];
+  Matrix ****Pnu3 = P7[0][0];
+  Matrix *****Prho5 = P7[0];
+  Matrix *****Psigmarhonu = Psigma7[0];
 
-    Matrix *****Lsigmarhonu = Psigma7[1];
-    Matrix ****Lmurhonu = P7[0][0];    
-    Matrix ***Lmunu = P7[1][0][0];
-    Matrix ***Lnunu = P7[0][0][1];
-    Matrix **Lmununu = Psigma7[1][0][0][0];
-    Matrix **Lmu = Psigma7[1][0][0][0];
-    Matrix ****Lknight = Psigma7[1][0];
-    Matrix ***Lknight2 = Psigma7[1][1][0];
-    Matrix ***Lknight3 = Psigma7[1][1][1];	
+  Matrix *****Lsigmarhonu = Psigma7[1];
+  Matrix ****Lmurhonu = P7[0][0];    
+  Matrix ***Lmunu = P7[1][0][0];
+  Matrix ***Lnunu = P7[0][0][1];
+  Matrix **Lmununu = Psigma7[1][0][0][0];
+  Matrix **Lmu = Psigma7[1][0][0][0];
+  Matrix ****Lknight = Psigma7[1][0];
+  Matrix ***Lknight2 = Psigma7[1][1][0];
+  Matrix ***Lknight3 = Psigma7[1][1][1];	
 
-    //Memory for the shifted solution vectors
-    Vector ***Vnu = (Vector***)smalloc(n_sign*sizeof(Vector**), cname, fname, "Vnu");
-    for(int i = 0; i < n_sign; i++)
-      {
-	Vnu[i] = (Vector**)smalloc(N*sizeof(Vector*), cname, fname, "Vnu[i]");
-	for(int j = 0; j < N; j++)
-	  Vnu[i][j] = (Vector*)smalloc(vol*sizeof(Vector), cname, fname, "Vnu[i][j]");
-      }
+  //Memory for the shifted solution vectors
+  Vector ***Vnu = (Vector***)smalloc(n_sign*sizeof(Vector**), cname, fname, "Vnu");
+  for(int i = 0; i < n_sign; i++)
+    {
+      Vnu[i] = (Vector**)smalloc(N*sizeof(Vector*), cname, fname, "Vnu[i]");
+      for(int j = 0; j < N; j++)
+	Vnu[i][j] = (Vector*)smalloc(vol*sizeof(Vector), cname, fname, "Vnu[i][j]");
+    }
 
-    //Input/output arrays for the vvpd routine
-    Vector ***vx = (Vector ***)smalloc(sizeof(Vector**),cname,fname,"vx");
-    vx[0] = (Vector**)smalloc(n_sign*N*sizeof(Vector*),cname,fname,"vx[0]");
-    Matrix **mout = (Matrix**)smalloc(n_sign*N*sizeof(Matrix*),cname,fname,"mout");
+  //Input/output arrays for the vvpd routine
+  Vector ***vx = (Vector ***)smalloc(sizeof(Vector**),cname,fname,"vx");
+  vx[0] = (Vector**)smalloc(n_sign*N*sizeof(Vector*),cname,fname,"vx[0]");
+  Matrix **mout = (Matrix**)smalloc(n_sign*N*sizeof(Matrix*),cname,fname,"mout");
 
-    for(int i=0; i<4; i++)
-	for(int s=0; s<vol; s++) force[i][s].ZeroMatrix();
+  for(int i=0; i<4; i++)
+    for(int s=0; s<vol; s++) force[i][s].ZeroMatrix();
 
-    // input/output arrays for the parallel transport routines
-    Matrix *vin[n_sign*N], *vout[n_sign*N];
-    Vector *vvin[n_sign*N], *vvout[n_sign*N];
-    int dir[n_sign*N];
+  // input/output arrays for the parallel transport routines
+  Matrix *vin[n_sign*N], *vout[n_sign*N];
+  Vector *vvin[n_sign*N], *vvout[n_sign*N];
+  int dir[n_sign*N];
 	
-    int mu[N], nu[N], rho[N], sigma[N];   // Sets of directions
-    int w;                                // The direction index 0...N-1
-    int ms, ns, rs, ss;                   // Sign of direction
-    bool done[4] = {false,false,false,false};  // Flags to tell us which 
+  int mu[N], nu[N], rho[N], sigma[N];   // Sets of directions
+  int w;                                // The direction index 0...N-1
+  int ms, ns, rs, ss;                   // Sign of direction
+  bool done[4] = {false,false,false,false};  // Flags to tell us which 
 
 #ifdef PROFILE
     dtime = -dclock();
@@ -927,13 +960,13 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 	      parallel_transport.run(N, vout, vin, dir);
 	    }
 
-	    #if 0
+#if 0
 	    //Zero Lknight before use
 	    for(ns=0; ns<n_sign; ns++)
 	      for(ms=0; ms<n_sign;ms++)
 		for(int i=0; i<N; i++)
 		  bzero((char *)Lknight[ms][ns][i], GJP.VolNodeSites()*sizeof(Matrix));
-	    #endif
+#endif
 	      
 	      //For all fields in the multi-mass solver
 	      for(int deg = 0; deg < degree; deg++)
@@ -973,7 +1006,7 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			parallel_transport.vvpd(sol+deg, vx, 1, dir, n_sign*N, 2, mout, 0);
 
 		    }
-                  #if 0
+#if 0
 		  //Old way to calculate Sum X(x)X(x+/-nu+/-2mu)^dagger
 		  
 		  //Calculate X(x +/- nu +/- 2mu)
@@ -998,7 +1031,7 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 		      for(int i=0; i<N; i++)
 			force_product_sum(sol[deg],Vmumunu[ms][ns][i],1.0,Lknight[ms][ns][i]); 
 		  // End old way to calculate Lknight
-		  #endif
+#endif
 
 		}//end loop over fields from multi-mass solver
 
@@ -1165,10 +1198,10 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
     print_flops(cname, fname, ParTrans::PTflops+ForceFlops, dtime);
 #endif
     
-    // Now that we have computed the force, we can update the momenta
-    Float Fdt = update_momenta(force, dt, mom);
+  // Now that we have computed the force, we can update the momenta
+  update_momenta(force, dt, mom);
 
-    // Free allocated memory
+  // Free allocated memory
     
 
   for (int i=0; i<N; i++) sfree(L[i], cname, fname, "L[i]");
@@ -1257,24 +1290,12 @@ Float Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
   //for (int i=0; i<4; i++) ffree(force[i], cname, fname, "force[i]");
   ffree(force, cname, fname, "force");
 
-    Convert(CANONICAL);
+  Convert(CANONICAL);
   for (int p=0; p<degree; p++) {
     Fconvert(sol[p], STAG, CANONICAL);
   }
 
-  // If measuring the force, need to measure and then sum to mom
-  /*
-  if (force_measure == FORCE_MEASURE_YES) {
-    Fdt = dotProduct((IFloat*)mom_tmp, (IFloat*)mom_tmp, g_size);
-    glb_sum(&Fdt);
-    fTimesV1PlusV2((IFloat*)mom, 1.0, (IFloat*)mom_tmp, (IFloat*)mom, g_size);
-
-    Fclose(fp);
-    delete[] force_label;
-    sfree(mom_tmp, cname, fname, "mom_tmp");
-    }*/
-
-  return Fdt;
+  return ForceArg(0.0,0.0,0.0);
 }
 
 

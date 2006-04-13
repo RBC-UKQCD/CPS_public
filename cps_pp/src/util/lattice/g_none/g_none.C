@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Gnone class.
 
-  $Id: g_none.C,v 1.6 2005-12-02 16:28:08 chulwoo Exp $
+  $Id: g_none.C,v 1.7 2006-04-13 18:21:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 16:28:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v 1.6 2005-12-02 16:28:08 chulwoo Exp $
-//  $Id: g_none.C,v 1.6 2005-12-02 16:28:08 chulwoo Exp $
+//  $Date: 2006-04-13 18:21:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v 1.7 2006-04-13 18:21:51 chulwoo Exp $
+//  $Id: g_none.C,v 1.7 2006-04-13 18:21:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_none/g_none.C,v $
 //  $State: Exp $
 //
@@ -91,11 +91,11 @@ void Gnone::GforceSite(Matrix& force, int *x, int mu)
 // It evolves the canonical momentum mom by step_size
 // using the pure gauge force.
 //------------------------------------------------------------------
-Float Gnone::EvolveMomGforce(Matrix *mom, Float step_size){
+ForceArg Gnone::EvolveMomGforce(Matrix *mom, Float step_size){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
 
-  return 0.0;
+  return ForceArg(0.0,0.0,0.0);
 }
 
 

@@ -24,19 +24,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief PAB... Definitions of the AlgMeas class methods.
   
-  $Id: alg_meas.C,v 1.5 2006-03-22 03:15:45 chulwoo Exp $
+  $Id: alg_meas.C,v 1.6 2006-04-13 18:12:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-03-22 03:15:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.5 2006-03-22 03:15:45 chulwoo Exp $
-//  $Id: alg_meas.C,v 1.5 2006-03-22 03:15:45 chulwoo Exp $
+//  $Date: 2006-04-13 18:12:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.6 2006-04-13 18:12:17 chulwoo Exp $
+//  $Id: alg_meas.C,v 1.6 2006-04-13 18:12:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_meas.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v $
 //  $State: Exp $
 //
@@ -356,6 +356,8 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     return *lat_p;
   }
 
+  // Only enabled for QCDOC target currently
+#if TARGET == QCDOC
   /* P4 STAGGERED VALENCE ANALYSIS */
   if ( (fermion == F_CLASS_P4) && (gluon == G_CLASS_NONE ) ) {
     lat_p = new GnoneFp4;
@@ -377,6 +379,7 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     lat_p = new GtadpoleRectFp4;
     return *lat_p;
   }
+#endif
 
   /* F_NONE VALENCE ANALYSIS */
   if ( (fermion == F_CLASS_NONE) && (gluon == G_CLASS_NONE ) ) {

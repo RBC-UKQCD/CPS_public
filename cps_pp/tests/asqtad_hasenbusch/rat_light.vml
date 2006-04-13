@@ -19,7 +19,7 @@ class RationalDescr rationals[0] = {
 FieldType field_type = FERMION
 int power_num = 1
 int power_den = 2
-long precision = 70
+long precision = 60
 class ApproxDescr md_approx = {
 RationalApproxType approx_type = RATIONAL_APPROX_QUOTIENT
 RationalBoundsType bounds_type = RATIONAL_BOUNDS_AUTOMATIC
@@ -33,7 +33,7 @@ double stop_rsd[3] =   1e-6
 }
 }
 class ApproxDescr mc_approx = {
-RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalApproxType approx_type = RATIONAL_APPROX_QUOTIENT
 RationalBoundsType bounds_type = RATIONAL_BOUNDS_AUTOMATIC
 double lambda_low =   0
 double lambda_high =   0

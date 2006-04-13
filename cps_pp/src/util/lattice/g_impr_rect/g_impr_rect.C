@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprRect class.
 
-  $Id: g_impr_rect.C,v 1.8 2005-12-02 16:27:40 chulwoo Exp $
+  $Id: g_impr_rect.C,v 1.9 2006-04-13 18:21:51 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 16:27:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.8 2005-12-02 16:27:40 chulwoo Exp $
-//  $Id: g_impr_rect.C,v 1.8 2005-12-02 16:27:40 chulwoo Exp $
+//  $Date: 2006-04-13 18:21:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.9 2006-04-13 18:21:51 chulwoo Exp $
+//  $Id: g_impr_rect.C,v 1.9 2006-04-13 18:21:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v $
 //  $State: Exp $
 //
@@ -176,15 +176,17 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
 #if TARGET != QCDOC
 #define PROFILE
 //------------------------------------------------------------------------------
-// EvolveMomGforce(Matrix *mom, Float step_size):
-// It evolves the canonical momentum mom by step_size
+// EvolveMomGforce(Matrix *mom, Float dt):
+// It evolves the canonical momentum mom by dt
 // using the pure gauge force.
 //------------------------------------------------------------------------------
-Float GimprRect::EvolveMomGforce(Matrix *mom, Float step_size){
+ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt){
   char *fname = "EvolveMomGforce(M*,F)";
   VRB.Func(cname,fname);
 
-  Float Fdt = 0.0;
+  Float L1=0.0;
+  Float L2=0.0;
+  Float Linf=0.0;
 
 #ifdef PROFILE
   Float time = -dclock();
@@ -207,9 +209,13 @@ Float GimprRect::EvolveMomGforce(Matrix *mom, Float step_size){
 
       IFloat *ihp = (IFloat *)(mom+uoff+mu);
       IFloat *dotp = (IFloat *)mp0;
-      fTimesV1PlusV2(ihp, step_size, dotp, ihp+BANK4_BASE, 18);
-      Fdt += step_size*step_size*dotProduct(dotp, dotp, 18);
-    }
+      fTimesV1PlusV2(ihp, dt, dotp, ihp+BANK4_BASE, 18);
+      Float norm = ((Matrix*)dotp)->norm();
+      Float tmp = sqrt(norm);
+      L1 += tmp;
+      L2 += norm;
+      Linf = (tmp>Linf ? tmp : Linf);
+   }
   }
   ForceFlops +=GJP.VolNodeSites()*4*18*2;
 #ifdef PROFILE
@@ -217,10 +223,14 @@ Float GimprRect::EvolveMomGforce(Matrix *mom, Float step_size){
   print_flops(cname,fname,ForceFlops,time);
 #endif
 
-  glb_sum(&Fdt);
+  glb_sum(&L1);
+  glb_sum(&L2);
+  glb_max(&Linf);
 
-  return sqrt(Fdt);
+  L1 /= 4.0*GJP.VolSites();
+  L2 /= 4.0*GJP.VolSites();
 
+  return ForceArg(dt*L1, dt*sqrt(L2), dt*Linf);
 }
 #endif
 

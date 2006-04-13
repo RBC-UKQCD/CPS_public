@@ -47,14 +47,14 @@ Fdwf::~Fdwf(){
 }
 
 #undef PROFILE
-Float Fdwf::EvolveMomFforce(Matrix *mom, Vector *chi,
+ForceArg Fdwf::EvolveMomFforce(Matrix *mom, Vector *chi,
                            Float mass, Float step_size){
   char *fname = "EvolveMomFforce()";
 #ifdef PROFILE
   Float time = -dclock();
   ForceFlops=0;
 #endif
-  Float Fdt = FdwfBase::EvolveMomFforce(mom, chi, mass, step_size);
+  ForceArg Fdt = FdwfBase::EvolveMomFforce(mom, chi, mass, step_size);
 #ifdef PROFILE
   time += dclock();
   print_flops(cname,fname,ForceFlops,time);
