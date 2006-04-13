@@ -133,13 +133,18 @@ void AlgRemez::generateApprox()
   iter = 0;
   spread = 1.0e37;
 
+  if (approx_type == RATIONAL_APPROX_ZERO_POLE) {
+    n--;
+    neq--;
+  }
+
   initialGuess();
   stpini(step);
 
   while (spread > tolerance) { //iterate until convergance
 
     if (iter++%100==0) 
-      VRB.Result(cname,fname,"Iteration %d, spread %e delta %e\n", iter-1,(Float)spread,(Float)delta);
+      VRB.Flow(cname,fname,"Iteration %d, spread %e delta %e\n", iter-1,(Float)spread,(Float)delta);
     equations();
     if (delta < tolerance)
       ERR.General(cname, fname,"Delta too small, try increasing precision\n");
@@ -156,6 +161,12 @@ void AlgRemez::generateApprox()
   //!< Once the approximation has been generated, calculate the roots
   if(!root()) ERR.General(cname,fname,"Root finding failed\n");
   
+  if (approx_type == RATIONAL_APPROX_ZERO_POLE) {
+    roots[n] = (bigfloat)0.0;
+    n++;
+    neq++;
+  }
+
   //!< Now find the partial fraction expansions
   if (remez_arg->field_type == BOSON) {
     getPFE(remez_arg->residue, remez_arg->pole, &(remez_arg->norm));
@@ -435,9 +446,10 @@ bigfloat AlgRemez::approx(const bigfloat x) {
   return(yn/yd);
 }
 
-//!< Compute size and sign of the approximation error at x
+// Compute size and sign of the approximation error at x
 bigfloat AlgRemez::getErr(bigfloat x, int *sign) {
   char *fname = "getErr(bigfloat)";
+//   VRB.Func(cname,fname);
   bigfloat e, f;
 
   f = func(x);
@@ -452,13 +464,15 @@ bigfloat AlgRemez::getErr(bigfloat x, int *sign) {
   return(e);
 }
 
-//!< Calculate function required for the approximation
+// Calculate function required for the approximation
 bigfloat AlgRemez::func(const bigfloat x) {
   char *fname = "func(bigfloat)";
+//   VRB.Func(cname,fname);
 
-  bigfloat z, y,dy,f=1l,df;
+  bigfloat z,y,dy,f=1l,df;
   switch (approx_type) { 
   case RATIONAL_APPROX_POWER:
+  case RATIONAL_APPROX_ZERO_POLE:
     z = x;
     break;
   case RATIONAL_APPROX_QUOTIENT: 
@@ -469,6 +483,7 @@ bigfloat AlgRemez::func(const bigfloat x) {
   }
 
   if (z == (bigfloat)1.0) return (bigfloat)1.0;
+  else return pow_bf(z,(bigfloat)power_num / (bigfloat)power_den);
 
   // initial guess to accelerate convergance
   y = (bigfloat)pow((double)z,(double)((bigfloat)1l/(bigfloat)power_den));
@@ -478,11 +493,17 @@ bigfloat AlgRemez::func(const bigfloat x) {
     dy = f/df;
     y -= dy;
   }
-  return pow_bf(y,power_num);
 
+  if (approx_type == RATIONAL_APPROX_POWER ||
+      approx_type == RATIONAL_APPROX_QUOTIENT) {
+    return pow_bf(y,power_num);
+  } else if (approx_type == RATIONAL_APPROX_ZERO_POLE) {
+    if (power_num > power_den) return pow_bf(y,power_num-power_den);
+    else return (bigfloat)1.0/pow_bf(y,power_den-power_num);
+  }
 }
 
-//!< Solve the system AX=B
+// Solve the system AX=B
 int AlgRemez::simq(bigfloat A[], bigfloat B[], bigfloat X[], int n) {
 
   char *fname = "simq(bigfloat*, bigfloat*, bigfloat*, int, int)";
@@ -762,7 +783,7 @@ void AlgRemez::pfe(bigfloat *res, bigfloat *poles, bigfloat norm) {
       res[j] = temp;
     }
     VRB.Result(cname,fname,"%d Residue = %0.14e, Pole = %0.14e\n", 
-	       j, (double)res[j], (double)poles[j]);
+          j, (double)res[j], (double)poles[j]);
   }
 
   delete [] numerator;
