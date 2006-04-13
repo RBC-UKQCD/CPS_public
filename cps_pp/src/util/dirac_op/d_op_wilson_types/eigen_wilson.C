@@ -58,7 +58,7 @@ void MatHermElements( DiracOpWilsonTypes * dirac_op,
  		      Float * diag, Complex * off_diag );
 
 inline void PrintDot(char *fname, char *vname, Vector *tmp, int f_size){
-      printf("%s: %s=%e\n",fname,vname,tmp->ReDotProductGlbSum(tmp, f_size));
+//      printf("%s: %s=%e\n",fname,vname,tmp->ReDotProductGlbSum(tmp, f_size));
 }
 
 /*
@@ -90,39 +90,6 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
   char *fname = "RitzEig(V**,V**,I)";
   VRB.Func(cname,fname);
 
-
-#if 0
-  int i;
-  int n_jacob;
-  
-  // Initialize
-  Float RsdR_a = eig_arg->RsdR_a;
-  Float RsdR_r = eig_arg->RsdR_r;
-  Float Rsdlam = eig_arg->Rsdlam;
-  Float Cv_fact = eig_arg->Cv_fact;
-  int Kalk_Sim = eig_arg->Kalk_Sim;
-  int N_eig = eig_arg->N_eig;
-  int N_min = eig_arg->N_min;
-  int N_max = eig_arg->N_max;
-  int N_KS_max = eig_arg->N_KS_max;
-  int n_renorm = eig_arg->n_renorm;
-  int MaxCG = eig_arg->MaxCG;
-  int ProjApsiP = eig_arg->ProjApsiP;
-
-  // Local vars which are for extension purposes
-  Float lambda_t;
-  Float dummy;
-  Float del_lamb;
-  int n;
-  int j;
-  int ij;
-  int NCG_tot;
-  int n_KS;
-  int n_valid;
-
-  char *fname = "RitzEig(V**,V**,I)";
-
-#endif
 
   // Initialise constants
   const Float RsdR_a  ( eig_arg->RsdR_a    );
@@ -358,7 +325,7 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
       NCG_tot += Ritz(psi, n, lambda_t, RsdR_a, RsdR_r, Rsdlam, 0.0 /*rsdl_sq*/,
 		      n_renorm, 0, 0, 0, Cv_fact, MaxCG, ProjApsiP);
 
-      printf("lambda_old[%d]=%e\n",i,lambda_t);
+//      printf("lambda_old[%d]=%e\n",i,lambda_t);
       lambda_old[i] = lambda_t;
       VRB.Debug(cname,fname,"no KS: lambda[%d] = %g\n",i,(IFloat)lambda_old[i]);
 
