@@ -5,7 +5,7 @@
 #include <qcdocos/scu_checksum.h>
 #endif
 CPS_START_NAMESPACE
-void Error::HdwCheck(char *cname, char *fname){
+void Error::HdwCheck(const char *cname, const char *fname){
 #ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
   if(!ScuChecksum::ChecksumsOn())
   ScuChecksum::Initialise(true,true);
