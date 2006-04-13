@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definition of Vector and Matrix classes.
 
   Definitions of functions that perform operations on complex vectors.
-  $Id: vector.C,v 1.8 2006-03-29 19:35:25 chulwoo Exp $
+  $Id: vector.C,v 1.9 2006-04-13 18:23:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-03-29 19:35:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.8 2006-03-29 19:35:25 chulwoo Exp $
-//  $Id: vector.C,v 1.8 2006-03-29 19:35:25 chulwoo Exp $
+//  $Date: 2006-04-13 18:23:36 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.9 2006-04-13 18:23:36 chulwoo Exp $
+//  $Id: vector.C,v 1.9 2006-04-13 18:23:36 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v $
 //  $State: Exp $
 //
@@ -204,6 +204,18 @@ Complex Matrix::Char10() const
   return tmp ;
 }
 
+
+/*! Returns the SU(3) matrix norm, defined by
+  ||X||^2 = -2 trace X^2
+*/
+IFloat Matrix::norm() const {
+  Matrix x2;
+  x2.DotMEqual(*this, *this);
+  return -2.0*x2.ReTr();
+
+  //IFloat *m = (IFloat*)&u[0];
+  //return dotProduct(m, m, 18);
+}
 
 //------------------------------------------------------------------
 // The Vector class.
@@ -502,7 +514,5 @@ void uDagDotXEqual(IFloat* y, const IFloat* u, const IFloat* x)
     *(y+5) =  *(u+4)  * *(x+1) - *(u+5)  * *x     + *(u+10) * *(x+3)
 	    - *(u+11) * *(x+2) + *(u+16) * *(x+5) - *(u+17) * *(x+4);
 }
-
-
 
 CPS_END_NAMESPACE
