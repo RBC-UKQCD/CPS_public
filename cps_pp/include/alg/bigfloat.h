@@ -2,11 +2,13 @@
 /*!\file
   \brief  Definitions of the bigfloat wrapper class.
 
-  $Id: bigfloat.h,v 1.6 2006-03-22 03:11:07 chulwoo Exp $
+  $Id: bigfloat.h,v 1.7 2006-04-13 18:59:35 chulwoo Exp $
 */
 //------------------------------------------------------------------
 #include<config.h>
 #include <gmp.h>
+#include <mpfr.h>
+#include <mpf2mpfr.h>
 
 CPS_START_NAMESPACE
 
@@ -182,6 +184,12 @@ public:
   friend bigfloat pow_bf(const bigfloat& a, long power) {
     bigfloat b;
     mpf_pow_ui(b.x,a.x,power);
+    return b;
+  }
+
+  friend bigfloat pow_bf(const bigfloat& a, const bigfloat &power) {
+    bigfloat b;
+    mpfr_pow(b.x,a.x,power.x,GMP_RNDN);
     return b;
   }
 
