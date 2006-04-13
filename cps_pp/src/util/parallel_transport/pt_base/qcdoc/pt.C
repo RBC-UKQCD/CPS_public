@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.30 2006-03-29 17:38:55 chulwoo Exp $
+  $Id: pt.C,v 1.31 2006-04-13 19:17:44 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-03-29 17:38:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.30 2006-03-29 17:38:55 chulwoo Exp $
-//  $Id: pt.C,v 1.30 2006-03-29 17:38:55 chulwoo Exp $
+//  $Date: 2006-04-13 19:17:44 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.31 2006-04-13 19:17:44 chulwoo Exp $
+//  $Id: pt.C,v 1.31 2006-04-13 19:17:44 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.30 $
+//  $Revision: 1.31 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -584,11 +584,11 @@ void PT::init(PTArg *pt_arg)
     //Allocate memory for gauge_agg_cb
     for(int parity = 0; parity < 2; parity++)
     {
-      uc_l_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_l_cb",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]),0);
-      uc_nl_cb[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]),0);
+      uc_l_cb[parity][i] = (gauge_agg_cb *)FastAlloc(cname,fname,"uc_l_cb",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
+      uc_nl_cb[parity][i] = (gauge_agg_cb *)FastAlloc(cname,fname,"uc_nl_cb",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
 
-      uc_l_pad_cb[parity][i] = (gauge_agg_cb *)(unsigned long)Alloc(cname,fname,"uc_l_pad_cb",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]),0);
-      uc_nl_pad_cb[parity][i] = (gauge_agg_cb *)(unsigned long)Alloc(cname,fname,"uc_nl_pad_cb",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]),0);
+      uc_l_pad_cb[parity][i] = (gauge_agg_cb *)(unsigned long)FastAlloc(cname,fname,"uc_l_pad_cb",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
+      uc_nl_pad_cb[parity][i] = (gauge_agg_cb *)(unsigned long)FastAlloc(cname,fname,"uc_nl_pad_cb",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
 //      printf("uc_pad_cb = %p %p\n",uc_l_pad_cb[parity][i],uc_nl_pad_cb[parity][i]);
     }
 
@@ -614,24 +614,24 @@ void PT::init(PTArg *pt_arg)
   for(i=0; i<NDIM;i++)
     if(non_local_chi_cb[2*i+1])
     {
-      snd_buf_cb[i] = (IFloat *)Alloc(cname,fname,"snd_buf_cb[i]",3*non_local_chi_cb[2*i+1]*vlen);
+      snd_buf_cb[i] = (IFloat *)FastAlloc(cname,fname,"snd_buf_cb[i]",3*non_local_chi_cb[2*i+1]*vlen);
     } else
       snd_buf_cb[i] = NULL;
   if(non_local_chi_cb[6]){
-    snd_buf_t_cb = (IFloat *)Alloc("",fname,"snd_buf_t_cb",3*non_local_chi_cb[6]*vlen);
+    snd_buf_t_cb = (IFloat *)FastAlloc("",fname,"snd_buf_t_cb",3*non_local_chi_cb[6]*vlen);
   } else
     snd_buf_t_cb = NULL;
 
   for(i = 0; i < 2;i++)
     if(non_local_chi_cb[6])
-    Toffset[i] = (int *)Alloc(cname,fname,"Toffset[parity]",non_local_chi_cb[6]*sizeof(int));
+    Toffset[i] = (int *)FastAlloc(cname,fname,"Toffset[parity]",non_local_chi_cb[6]*sizeof(int));
     else Toffset[i]=NULL;
 
   //Allocate memory for the gauge_agg_cb used for matrix pre-multiplication
 
   for(i = 0; i< NDIM;i++)
     for(int parity = 0; parity<2;parity++)
-      uc_nl_cb_pre[parity][i] = (gauge_agg_cb *)Alloc(cname,fname,"uc_nl_cb_pre[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[2*i+1]));
+      uc_nl_cb_pre[parity][i] = (gauge_agg_cb *)FastAlloc(cname,fname,"uc_nl_cb_pre[parity][i]",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[2*i+1]));
 
   int parity = 0;
   //---------------------------------------------------------------------------
@@ -871,18 +871,18 @@ void PT::init(PTArg *pt_arg)
       int l_size = vol - nl_size ;
 
       if (l_size>0){
-        hp_l[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_l[j][i]",(1+l_size)*sizeof(hop_pointer));
-        src_l[j][i] = (unsigned long*)Alloc(cname,fname,"src_l[j][i]",(1+l_size)*sizeof(unsigned long),0);
-        dest_l[j][i] = (unsigned long*)Alloc(cname,fname,"dest_l[j][i]",(1+l_size)*sizeof(unsigned long),0);
+        hp_l[j][i] = (hop_pointer*) FastAlloc(cname,fname,"hp_l[j][i]",(1+l_size)*sizeof(hop_pointer));
+        src_l[j][i] = (unsigned long*)FastAlloc(cname,fname,"src_l[j][i]",(1+l_size)*sizeof(unsigned long));
+        dest_l[j][i] = (unsigned long*)FastAlloc(cname,fname,"dest_l[j][i]",(1+l_size)*sizeof(unsigned long));
       } else {
         hp_l[j][i] = NULL;
         src_l[j][i] = NULL;
         dest_l[j][i] = NULL;
       }
       if (nl_size>0){
-  	hp_nl[j][i] = (hop_pointer*) Alloc(cname,fname,"hp_nl[j][i]",(1+nl_size)*sizeof(hop_pointer));
-  	src_nl[j][i] = (unsigned long*)Alloc(cname,fname,"src_nl[j][i]",(1+nl_size)*sizeof(unsigned long),0);
-  	dest_nl[j][i] = (unsigned long*)Alloc(cname,fname,"dest_nl[j][i]",(1+nl_size)*sizeof(unsigned long),0);
+  	hp_nl[j][i] = (hop_pointer*) FastAlloc(cname,fname,"hp_nl[j][i]",(1+nl_size)*sizeof(hop_pointer));
+  	src_nl[j][i] = (unsigned long*)FastAlloc(cname,fname,"src_nl[j][i]",(1+nl_size)*sizeof(unsigned long));
+  	dest_nl[j][i] = (unsigned long*)FastAlloc(cname,fname,"dest_nl[j][i]",(1+nl_size)*sizeof(unsigned long));
       } else {
         hp_nl[j][i] = NULL;
         src_nl[j][i] = NULL;
@@ -1989,10 +1989,10 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
   int newdir[n_dir];
   for(int i = 0; i < n_dir; i++)
     newdir[i] = 2*dir[i];
-  IFloat ***vect_shift = (IFloat ***)Alloc("","","vect_shift",n_vect*sizeof(IFloat**));
+  IFloat ***vect_shift = (IFloat ***)FastAlloc("","","vect_shift",n_vect*sizeof(IFloat**));
   for(int i = 0; i < n_vect; i++)
     {
-      vect_shift[i] = (IFloat**)Alloc("","","vect_shift[i]",n_dir*sizeof(IFloat *));
+      vect_shift[i] = (IFloat**)FastAlloc("","","vect_shift[i]",n_dir*sizeof(IFloat *));
       for(int j = 0; j < n_dir; j++)
 	vect_shift[i][j] = vect[i];
     }
