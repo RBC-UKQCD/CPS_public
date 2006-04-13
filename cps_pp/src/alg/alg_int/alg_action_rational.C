@@ -319,7 +319,8 @@ void AlgActionRational::evolve(Float dt, int nsteps, int **fractionSplit)
 	  
 	  updateCgStats(frm_cg_arg_md[i][isz]);
 
-	  if (fermion != F_CLASS_ASQTAD) {
+	  if (force_measure == FORCE_MEASURE_YES ||
+	      (fermion != F_CLASS_ASQTAD && fermion != F_CLASS_P4) ) {
 	    Fdt = lat.RHMC_EvolveMomFforce(mom, frmn+shift+isz, deg, isz,
 					   remez_arg_md[i].residue+isz, 
 					   mass[i], dt, frmn_d+shift+isz,
@@ -328,10 +329,10 @@ void AlgActionRational::evolve(Float dt, int nsteps, int **fractionSplit)
 	    if (force_measure == FORCE_MEASURE_YES) {
 	      char label[200];
 	      sprintf(label, "%s total, mass = %e:", force_label, mass[i]);
-	      printForce(Fdt, dt, label);
+	      Fdt.print(dt, label);
 	    }
 	  } else {
-	    //!< Do appropriate pointer arithmetic for asqtad
+	    //!< Do appropriate pointer arithmetic for asqtad/p4
 	    for (int j=0; j<deg; j++) {
 	      all_res[split_shift+j] = remez_arg_md[i].residue[isz+j];
 	      frmn_tmp[split_shift+j] = frmn[shift+isz+j];
@@ -343,15 +344,15 @@ void AlgActionRational::evolve(Float dt, int nsteps, int **fractionSplit)
 	split_shift += deg;
       }
       
-      //!< Only for the case of asqtad fermions do we perform this optimisation
-
-      if (fermion == F_CLASS_ASQTAD && total_split_degree > 0) {
+      //!< Only for the case of asqtad/p4 fermions do we perform this optimisation
+      if ( (fermion == F_CLASS_ASQTAD || fermion == F_CLASS_P4) && 
+	   total_split_degree > 0 && force_measure == FORCE_MEASURE_NO ) {
 	Fdt = lat.RHMC_EvolveMomFforce(mom, frmn_tmp, total_split_degree, 0, all_res, 
 				       0.0, dt, frmn_d, force_measure);
 	if (force_measure == FORCE_MEASURE_YES) {
 	  char label[200];
 	  sprintf(label, "%s total:", force_label);
-	  printForce(Fdt, dt, label);
+	  Fdt.print(dt, label);
 	}
       }
 

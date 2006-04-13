@@ -138,7 +138,7 @@ void AlgActionBoson::evolve(Float dt, int nsteps)
 	if (force_measure == FORCE_MEASURE_YES) {
 	  char label[200];
 	  sprintf(label, "%s, mass = %e:", force_label, mass[i]);
-	  printForce(Fdt, dt, label);
+	  Fdt.print(dt, label);
 	}
       }
     

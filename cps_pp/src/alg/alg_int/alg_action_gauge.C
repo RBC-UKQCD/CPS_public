@@ -67,7 +67,7 @@ void AlgActionGauge::evolve(Float dt, int steps)
     if (force_measure == FORCE_MEASURE_YES) {
       char label[200];
       sprintf(label, "%s:", force_label);
-      printForce(Fdt, dt, label);
+      Fdt.print(dt, label);
     }
   }
 

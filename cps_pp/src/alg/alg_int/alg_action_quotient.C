@@ -251,7 +251,10 @@ void AlgActionQuotient::evolve(Float dt, int nsteps)
 
   char *fname = "run(Float,int)";
   int chronoDeg;
-  Float Fdt;
+  Float L1;
+  Float L2;
+  Float Linf;
+  ForceArg Fdt;
 
   if (n_masses > 0){
     Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
@@ -301,28 +304,39 @@ void AlgActionQuotient::evolve(Float dt, int nsteps)
 	if (force_measure == FORCE_MEASURE_YES) {
 	  char label[200];
 	  sprintf(label, "%s (fermion), mass = %e:", force_label, frm_mass[i]);
-	  printForce(Fdt, dt, label);
+	  Fdt.print(dt, label);
 	}
 
 	//!< Evolve mom using boson force
 	Fdt = lat.EvolveMomFforce(mom_tmp, phi[i], cg_sol, bsn_mass[i], dt);
+
 	if (force_measure == FORCE_MEASURE_YES) {
 	  char label[200];
 	  sprintf(label, "%s (boson), mass = %e:", force_label, bsn_mass[i]);
-	  printForce(Fdt, dt, label);
-	}
+	  Fdt.print(dt, label);
 
-	// If measuring the force, need to measure and then sum to mom
-	if (force_measure == FORCE_MEASURE_YES) {
-	  Fdt = dotProduct((IFloat*)mom_tmp, (IFloat*)mom_tmp, g_size);
-	  glb_sum(&Fdt);
+	  // If measuring the force, need to measure and then sum to mom
+	  for (int k=0; k<g_size/18; k++) {
+	    Float norm = (mom_tmp+k)->norm();
+	    Float tmp = sqrt(norm);
+	    L1 += tmp;
+	    L2 += norm;
+	    Linf = (tmp>Linf ? tmp : Linf);
+	  }
+	  glb_sum(&L1);
+	  glb_sum(&L2);
+	  glb_max(&Linf);
+
+	  L1 /= 4.0*GJP.VolSites();
+	  L2 /= 4.0*GJP.VolSites();
+
 	  fTimesV1PlusV2((IFloat*)mom, 1.0, (IFloat*)mom_tmp, 
 			 (IFloat*)mom, g_size);
 
-	  char label[200];
 	  sprintf(label, "%s (total), mass = (%e,%e):", 
 		  force_label, frm_mass[i], bsn_mass[i]);
-	  printForce(sqrt(Fdt), dt, label);
+	  Fdt = ForceArg(L1, sqrt(L2), Linf);
+	  Fdt.print(dt, label);
 
 	  sfree(mom_tmp, "mom_tmp", fname, cname);
 	}
