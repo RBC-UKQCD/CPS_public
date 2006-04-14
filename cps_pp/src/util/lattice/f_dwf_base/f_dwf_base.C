@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.28 2006-04-13 18:18:52 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.29 2006-04-14 04:34:21 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -93,7 +93,7 @@ FdwfBase::~FdwfBase()
   dwf_end((Dwf *) f_dirac_op_init_ptr);
   ctor_time += dclock();
   if(called%50==0){
-    print_time(cname,"(Ctor+Dtor)*10)",ctor_time);
+    print_time(cname,"(Ctor+Dtor)*50)",ctor_time);
     ctor_time=0.;
   }
   called++;
