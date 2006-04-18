@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file 
   \brief   Definition of Error class methods.
 
-  $Id: error.C,v 1.10 2006-04-13 19:14:33 chulwoo Exp $
+  $Id: error.C,v 1.11 2006-04-18 17:26:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 19:14:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.10 2006-04-13 19:14:33 chulwoo Exp $
-//  $Id: error.C,v 1.10 2006-04-13 19:14:33 chulwoo Exp $
+//  $Date: 2006-04-18 17:26:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.11 2006-04-18 17:26:13 chulwoo Exp $
+//  $Id: error.C,v 1.11 2006-04-18 17:26:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: error.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v $
 //  $State: Exp $
 //
@@ -39,9 +39,13 @@ Error ERR;
 
 static inline void Exit(int status){
 #if TARGET == QCDOC
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+  if ( ! ScuChecksum::CsumSwap() )
+    fprintf(stderr,"SCU Checksum mismatch\n" );
+#endif
    Float  *tmp = (Float *)0;
    *tmp = 1.;
-   exit(-50);
+   exit(status);
 #else
   exit(status);
 #endif
@@ -75,6 +79,10 @@ Error::Error() {
 // File to which error messages are written
     
     error_file_name = "phys.error";
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+  if(!ScuChecksum::ChecksumsOn())
+  ScuChecksum::Initialise(true,true);
+#endif
 
 }
 
@@ -361,7 +369,6 @@ void Error::General(const char *class_name, const char *func_name,
   Fclose(fp);
 
   Exit(exit_value[general]);
-  HdwCheck(class_name,func_name);
 }
         
 
