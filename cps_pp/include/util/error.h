@@ -1,21 +1,24 @@
 #include<config.h>
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+#include <qcdocos/scu_checksum.h>
+#endif
 CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration and definition of Error class.
 
-  $Id: error.h,v 1.6 2006-04-13 19:04:30 chulwoo Exp $
+  $Id: error.h,v 1.7 2006-04-18 17:21:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 19:04:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v 1.6 2006-04-13 19:04:30 chulwoo Exp $
-//  $Id: error.h,v 1.6 2006-04-13 19:04:30 chulwoo Exp $
+//  $Date: 2006-04-18 17:21:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v 1.7 2006-04-18 17:21:52 chulwoo Exp $
+//  $Id: error.h,v 1.7 2006-04-18 17:21:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: error.h,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v $
 //  $State: Exp $
 //
@@ -23,7 +26,6 @@ CPS_START_NAMESPACE
 
 #ifndef INCLUDED_ERROR_H
 #define INCLUDED_ERROR_H  //!< Prevent multiple inclusions
-
 
 #define MAX_ERR_STR_LEN 500
 //!< The maximum length of error message strings

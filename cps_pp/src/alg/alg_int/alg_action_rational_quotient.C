@@ -64,8 +64,8 @@ AlgActionRationalQuotient::AlgActionRationalQuotient(AlgMomentum &mom,
   }
 
   // RationalQuotient force term not implemented for asqtad or p4 yet
-//  if( fermion == F_CLASS_ASQTAD || fermion == F_CLASS_P4)
-//    ERR.General(cname,fname,"Force not implemented for Fasqtad or Fp4\n");
+  if( fermion == F_CLASS_ASQTAD || fermion == F_CLASS_P4)
+    ERR.General(cname,fname,"Force not implemented for Fasqtad or Fp4\n");
 
   //!< Allocate memory for the fermion CG arguments.
   if(n_masses > 0){
