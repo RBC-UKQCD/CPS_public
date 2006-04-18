@@ -20,7 +20,7 @@ void *PT::FastAlloc(char *cname, char *fname, char *vname, int request ){
     if (request==0) return NULL;
     void *p= FastAlloc(request);
     if (!p) PointerErr(cname,fname,vname);
-    if (!qalloc_is_fast(p))
-    printf("FastAlloc(): %s::%s: %s %d = %p bytes\n",cname,fname,vname,request,p);
+//    if (!qalloc_is_fast(p))
+//    printf("FastAlloc(): %s::%s: %s %d = %p bytes\n",cname,fname,vname,request,p);
     return p;
 }

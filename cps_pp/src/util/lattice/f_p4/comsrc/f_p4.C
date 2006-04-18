@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.14 2006-04-13 18:20:37 chulwoo Exp $
+  $Id: f_p4.C,v 1.15 2006-04-18 17:29:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -150,9 +150,12 @@ int Fp4::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   DiracOpP4 p4(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
   int iter = p4.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);
 
+//  VRB.Result(cname,fname,"f_out_d=%p f_out=%p\n",f_out_d,f_out);
   if (type == MULTI && f_out_d != 0)
-    for (int s=0; s<Nshift; s++)
+    for (int s=0; s<Nshift; s++){
+//    VRB.Result(cname,fname,"f_out_d[%d]=%p f_out[%d]=%p\n",s,f_out_d[s],s,f_out[s]);
       p4.Dslash(f_out_d[s], f_out[s], CHKB_EVEN, DAG_NO);
+    }
   for (int s=0; s<Nshift; s++) cg_arg[s]->true_rsd = RsdCG[s];
 #if 0
   if (type == MULTI && f_out_d != 0)

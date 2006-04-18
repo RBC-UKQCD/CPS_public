@@ -30,9 +30,7 @@ public:
 	      const WspectHyperRectangle & whr,
 	      DEVOperatorKind src_op_kind=UNIT,
 	      WspectFuzzing *srcfuzz_p=0,
-	      WspectField *fld_p=0,
-	      IFloat *initial_guess=0);
-	      
+	      WspectField *fld_p=0);
 
   
   // DTOR
@@ -105,9 +103,6 @@ private:
   IFloat *source_matrix_p;
   int    source_matrix_size;
   
-  // initial guess for the solution of quark propagator
-  // should be of size GJP.VolNodeSites() * (COLORs*COLORs*DIRACs*DIRACs*COMPLEXs
-  IFloat *initial_guess; 
   // twice the center point of the source, [0,0,0,0] for point source.
   // left as in phys_v3.11.4.xiaodong rather than d_source_center
   int          d_source_center2[LORENTZs];  
