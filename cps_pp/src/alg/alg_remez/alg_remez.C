@@ -70,10 +70,18 @@ AlgRemez::AlgRemez(RemezArg &arg_remez)
     VRB.Result(cname,fname,"delta_m parameter is %e\n", (Float)delta_m);
 
   // Only require the approximation spread to be less than tolerance 
-  if (sizeof(Float)==sizeof(double)) {
-    tolerance = 1e-17;
-  } else if (sizeof(Float)==sizeof(float)) {
-    tolerance = 1e-10;
+  if (approx_type == RATIONAL_APPROX_ZERO_POLE) {
+    if (sizeof(Float)==sizeof(double)) {
+      tolerance = 1e-17;
+    } else if (sizeof(Float)==sizeof(float)) {
+      tolerance = 1e-10;
+    }
+  } else {
+    if (sizeof(Float)==sizeof(double)) {
+      tolerance = 1e-15;
+    } else if (sizeof(Float)==sizeof(float)) {
+      tolerance = 1e-8;
+    }
   }
 
   // Note use of new and delete in memory allocation - cannot run on qcdsp
