@@ -188,6 +188,12 @@ Float AlgHmc::run(void)
 	LatticeFactory::Destroy();
       }
 
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+      printf("SCU checksum test\n");
+  if ( ! ScuChecksum::CsumSwap() )
+    ERR.Hardware(cname,fname, "SCU Checksum mismatch\n");
+#endif
+
       //!< Calculate final Hamiltonian
       h_final = integrator->energy();
 //      Float total_h_final =h_final;
@@ -218,6 +224,13 @@ Float AlgHmc::run(void)
 
 	integrator->reverse();
 	integrator->evolve(hmc_arg->step_size, hmc_arg->steps_per_traj);
+
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
+  printf("SCU checksum test\n");
+  if ( ! ScuChecksum::CsumSwap() )
+    ERR.Hardware(cname,fname, "SCU Checksum mismatch\n");
+#endif
+
 	h_delta = h_final - integrator->energy();
 	glb_sum(&h_delta);
 
@@ -329,11 +342,6 @@ Float AlgHmc::run(void)
 
   VRB.Result(cname,fname,"Configuration number = %d\n", config_no);
 
-
-#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
-  if ( ! ScuChecksum::CsumSwap() )
-    ERR.Hardware(cname,fname, "SCU Checksum mismatch\n");
-#endif
 
   return acceptance;
 }
