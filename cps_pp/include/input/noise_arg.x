@@ -1,22 +1,13 @@
-#include<config.h>
-CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the NoiseArg structure.
 
-  $Id: noise_arg.x,v 1.2 2004-12-11 20:57:36 chulwoo Exp $
+  $Id: noise_arg.x,v 1.3 2006-05-22 21:12:04 chulwoo Exp $
 */
 /*---------------------------------------------------------------------------*/
 /*  noise_arg.h */
 
 /*  The structure type NoiseArg holds the parameters relevant
     to the generation of a "noise" configuration. */
-
-#ifndef INCLUDED_NOISE_ARG_H
-#define INCLUDED_NOISE_ARG_H          /*!< Prevent multiple inclusion.*/
-
-CPS_END_NAMESPACE
-#include <util/data_types.h>
-CPS_START_NAMESPACE
 
 
 /*! Types of noise distribution.*/
@@ -27,7 +18,7 @@ enum NoiseType { GAUSSIAN = 0, /*!< Gaussian distribution with zero mean.  */
 
 /*! A structure holding the parameters relevant to the noisy gauge field calculation.*/
 /*!  \ingroup algargs */
-struct NoiseArg {
+class NoiseArg {
 
     NoiseType noise_kind;  /*!< The type of distribution from which
 			     to draw the random group elements. */
@@ -41,6 +32,3 @@ struct NoiseArg {
 
 };
 
-#endif /* !INCLUDED_NOISE_ARG_H */
-
-CPS_END_NAMESPACE
