@@ -436,6 +436,9 @@ struct vml_enum_map SourceKind_map[] = {
 	{"SourceKind","BOX_W",BOX_W},
 	{"SourceKind","JACOBI_W",JACOBI_W},
 	{"SourceKind","MAX_NUM_SINK",MAX_NUM_SINK},
+	{"SourceKind","Z2",Z2},
+	{"SourceKind","COMPLEX_Z2",COMPLEX_Z2},
+	{"SourceKind","KURAMASHI",KURAMASHI},
 	{NULL,NULL,0}
 };
 

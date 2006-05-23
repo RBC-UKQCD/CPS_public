@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.14 2006-04-12 22:08:21 chulwoo Exp $
+  $Id: w_quark.C,v 1.15 2006-05-23 04:43:37 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP
@@ -177,6 +177,55 @@ WspectQuark::WspectQuark(Lattice &lat,
     }
   }
 
+
+  //------------------------------------------------------------------------
+  // Kuramashi source : assign unit source for every lattice site and every
+  // spin and color without gauge fixing. 
+  // added by Meifeng Lin, 05/2006
+  //------------------------------------------------------------------------
+  
+  if ( warg.source_kind == KURAMASHI ) {
+    int per_site = COLORs * COLORs * COMPLEXs;  
+    for (int i = 0; i< source_matrix_size; i += per_site) {
+      source_matrix_p[i] =  1.0;
+      source_matrix_p[i+COMPLEXs*(COLORs+1)] = 1.0;
+      source_matrix_p[i+2*COMPLEXs*(COLORs+1)] = 1.0;
+    }
+  }
+  
+  //------------------------------------------------------------------------
+  // Z2 noise source. Every spin-color point has random noise of 1 or -1
+  // added by Meifeng Lin, 05/2006
+  //------------------------------------------------------------------------
+
+  if ( warg.source_kind == Z2 || warg.source_kind == COMPLEX_Z2 ) {
+//    LRGState rng_state;
+    //store random number seeds
+    
+//    rng_state.GetStates();
+    LRG.SetInterval(0.0,1.0);
+    int per_site = COLORs * COLORs * COMPLEXs;  
+    for (int i = 0; i< source_matrix_size; i += per_site) {
+      
+      source_matrix_p[i] =  ( LRG.Urand() > 0.5 )? 1.0 : -1.0;
+      source_matrix_p[i+COMPLEXs*(COLORs+1)] = ( LRG.Urand() > 0.5 ) ? 1.0 : -1.0;
+      source_matrix_p[i+2*COMPLEXs*(COLORs+1)] = ( LRG.Urand() > 0.5 ) ? 1.0 : -1.0;
+
+      if ( warg.source_kind == COMPLEX_Z2 ) {
+	source_matrix_p[i + 1] =  ( LRG.Urand() > 0.5 )? 1.0 : -1.0;
+	source_matrix_p[i+COMPLEXs*(COLORs+1) + 1] = ( LRG.Urand() > 0.5 ) ? 1.0 : -1.0;
+	source_matrix_p[i+2*COMPLEXs*(COLORs+1) + 1] = ( LRG.Urand() > 0.5 ) ? 1.0 : -1.0;
+      }
+    }
+    
+    //restore random number seeds
+//    rng_state.SetStates();
+
+  }
+
+  //-----------------------------------------------------------------------
+  //
+
   // For WALL_W and BOX_W only:  
   // Thomas & Xiaodong:
   // after change from setPointSrc and setSmearedSrc to --> setSource 
@@ -272,6 +321,25 @@ WspectQuark::WspectQuark(Lattice &lat,
 	d_source_center2[l] = 0;
       break;
     }
+  case Z2:
+    { 
+      for (int l = 0; l < LORENTZs; ++l) 
+	d_source_center2[l] = glb_sites[l] - 1; 
+      break; 
+    }
+  case COMPLEX_Z2:
+    { 
+      for (int l = 0; l < LORENTZs; ++l) 
+	d_source_center2[l] = glb_sites[l] - 1; 
+      break; 
+    }
+    
+  case KURAMASHI:
+    { 
+      for (int l = 0; l < LORENTZs; ++l) 
+	d_source_center2[l] = glb_sites[l] - 1; 
+      break; 
+    }
   }
   // ========= added from phys_v4.0.0
   Float pbp_norm;
@@ -329,10 +397,10 @@ WspectQuark::WspectQuark(Lattice &lat,
   // through setSource
   if(whr.onNode()){
     if (warg.source_kind == BOX_W || warg.source_kind == WALL_W){
+      if ( !(lat.FixGaugePtr())[src_plane_position] ) 
+	ERR.Pointer(d_class_name,ctor_str,"Gauge Fixing Pointer\n");
+      
       src_matrix = (const Float *)((lat.FixGaugePtr())[src_plane_position]); // G(x)
-#ifdef DEBUG_W_QUARK
-      printf("copy gauge fixing matrix onto source \n");
-#endif
       copyGaugefixToSource(src_matrix, whr);   // copy G^{\dag}(x) --> S(x) 
       //copied from src_matrix to source_matrix_p
 #ifdef DEBUG_W_QUARK

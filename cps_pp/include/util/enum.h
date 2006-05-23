@@ -234,6 +234,9 @@ enum SourceKind {
 	BOX_W = 0 + 2,
 	JACOBI_W = 0 + 3,
 	MAX_NUM_SINK = 0 + 4,
+	Z2 = 0 + 5,
+	COMPLEX_Z2 = 0 + 6,
+	KURAMASHI = 0 + 7,
 };
 typedef enum SourceKind SourceKind;
 extern struct vml_enum_map SourceKind_map[];
