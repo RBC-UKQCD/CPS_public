@@ -1,21 +1,77 @@
-#include<config.h>
-CPS_START_NAMESPACE
-/*  s_spect_arg.h*/
+//VML file for staggered spectroscopy
 
-#ifndef INCLUDED_S_SPECT_ARG_H
-#define INCLUDED_S_SPECT_ARG_H
-CPS_END_NAMESPACE
-#include <util/vector.h>	/* Float*/
-#include <alg/cg_arg.h>
-CPS_START_NAMESPACE
+enum StagQuarkSrcType{ 
+	POINT = 0, 
+	WALLZ = 1, 
+	WALL2Z = 2
+};	/* StagQuarkSrc type*/
+enum StagQuarkLocalType { 
+	LOCAL = 0, 
+	NONLOCAL =1 
+};		/* StagQuarkArg sln*/
 
-enum { POINT = 0, WALLZ, WALL2Z };	/* StagQuarkSrc type*/
-enum { LOCAL, NONLOCAL };		/* StagQuarkArg sln*/
-enum { HDM_X = 0, HDM_Y, HDM_Z, HDM_T };/* dir*/
+enum StagQuarkDir { 
+	HDM_X = 0, 
+	HDM_Y = 1, 
+	HDM_Z = 2, 
+	HDM_T = 3 
+};/* dir*/
 
-enum { MAX_LENGTH = 40 };
+//enum { MAX_LENGTH = 40 };
 
-struct StagQuarkSrc {
+class StagQuarkSrc {
+  StagQuarkSrcType type;
+  int origin[4];
+  int end[4];
+  StagQuarkDir dir;
+};
+
+class StagQuarkArg {
+  int qid;
+  CgArg cg;
+  StagQuarkSrc src;
+  StagQuarkLocalType sln;
+};
+  
+class StagMesonArg {
+  int qid0;
+  int qid1;
+  StagQuarkDir dir;
+  unsigned long meson_buf;
+};
+
+class StagMomMesonArg {
+  int qid0;
+  int qid1;
+  StagQuarkDir dir;
+  int no_of_momenta;
+  unsigned long meson_buf;
+};
+
+class StagNucleonArg {
+  int qid0;
+  int qid1;
+  int qid2;
+  StagQuarkDir dir;
+  unsigned long nucleon_buf;
+};
+
+class StagNonLocalArg {
+  int qid0;
+  int qid1;
+  int qid2;
+  StagQuarkDir dir;
+  unsigned long nlocal_buf;
+};
+
+class NLStagMesonArg {
+  int qid0[8];
+  StagQuarkDir dir;
+  unsigned long nlocal_buf;
+};
+
+
+/*struct StagQuarkSrc {
    int type;
    int origin[4];
    int end[4];
@@ -58,8 +114,8 @@ struct StagNonLocalArg {
   int qid2;
   int dir;
   Float *nlocal_buf;
-};
+};*/
 
-#endif
+//#endif
 
-CPS_END_NAMESPACE
+//CPS_END_NAMESPACE
