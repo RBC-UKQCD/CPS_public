@@ -8,19 +8,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.14 2006-05-23 04:43:36 chulwoo Exp $
+  $Id: enum.x,v 1.15 2006-06-10 02:52:30 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2006-05-23 04:43:36 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.14 2006-05-23 04:43:36 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.14 2006-05-23 04:43:36 chulwoo Exp $*/
+/*  $Date: 2006-06-10 02:52:30 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.15 2006-06-10 02:52:30 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.15 2006-06-10 02:52:30 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.14 $*/
+/*  $Revision: 1.15 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -799,3 +799,4 @@ enum RationalBoundsType {
   RATIONAL_BOUNDS_AUTOMATIC = 0,
   RATIONAL_BOUNDS_MANUAL = 1
 };
+
