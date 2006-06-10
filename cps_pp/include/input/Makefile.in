@@ -5,17 +5,17 @@ RPCGEN=${SRCDIR}/misc/vml_encode/rpcgenvml/rpcgenvml
 RHFLAGS=-h -C -x -u util/vml/ -v alg/
 RCFLAGS=-c -C -x -u util/vml/ -v alg/
 
-all: vml.done enum.stmp2 cg_arg.stmp do_arg.stmp w_spect_arg.stmp hmc_arg.stmp hmd_arg.stmp pbp_arg.stmp eig_arg.stmp pot_arg.stmp fix_gauge_arg.stmp meas_arg.stmp int_arg.stmp dens_arg.stmp array_arg.stmp ghb_arg.stmp noise_arg.stmp mom_arg.stmp hyp_smear_arg.stmp kinetic_smear_arg.stmp
+all: vml.done enum_int.stmp2 cg_arg.stmp do_arg.stmp w_spect_arg.stmp hmc_arg.stmp hmd_arg.stmp pbp_arg.stmp eig_arg.stmp pot_arg.stmp fix_gauge_arg.stmp meas_arg.stmp int_arg.stmp dens_arg.stmp array_arg.stmp ghb_arg.stmp noise_arg.stmp mom_arg.stmp hyp_smear_arg.stmp kinetic_smear_arg.stmp s_spect_arg.stmp
 
 vml.done: Makefile.in
 	- cp ${BUILDDIR}/config.h .
 	- cp ${BUILDDIR}/precision.h .
 	- cp ${SRCDIR}/include/input/*.x .
 	touch vml.done
-enum.stmp2 : enum.x vml.done
-	${RPCGEN} $(RHFLAGS) enum.x >${SRCDIR}/include/util/enum.h
-	${RPCGEN} $(RHFLAGS) enum.x >${SRCDIR}/include/alg/enum.h
-	${RPCGEN} $(RCFLAGS) enum.x >${SRCDIR}/src/alg/alg_arg/enum.C
+enum_int.stmp2 : enum.x vml.done
+#	${RPCGEN} $(RHFLAGS) enum.x >${SRCDIR}/include/util/enum_int.h
+	${RPCGEN} $(RHFLAGS) enum.x >${SRCDIR}/include/alg/enum_int.h
+	${RPCGEN} $(RCFLAGS) enum.x >${SRCDIR}/src/alg/alg_arg/enum_int.C
 	touch enum.stmp2
 %.stmp : %.x vml.done
 	${RPCGEN} $(RHFLAGS) $< >${SRCDIR}/include/alg/$*.h
