@@ -496,6 +496,9 @@ int AlgActionRational::compareApprox(RemezArg &arg1, RemezArg &arg2) {
   if (arg1.field_type == arg2.field_type &&
       arg1.power_num == arg2.power_num &&
       arg1.power_den == arg2.power_den &&
+      arg1.lambda_low == arg2.lambda_low &&
+      arg1.lambda_high == arg2.lambda_high &&
+      arg1.precision == arg2.precision &&
       arg1.degree == arg2.degree) {
     
     arg1.norm = arg2.norm;

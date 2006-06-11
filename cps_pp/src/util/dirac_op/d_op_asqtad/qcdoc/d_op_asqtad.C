@@ -425,7 +425,7 @@ int DiracOpAsqtad::MatInv(Vector *out,
   inv_arg.niter = dirac_arg->max_num_iter;
   inv_arg.evenodd = 0;
   printf("asqd.InvCg\n");
-  int iter2 = asqd.InvCg(&inv_arg,(Float *)out2,(Float *)tmp,true_res);
+  int iter2 = asqd_p->InvCg(&inv_arg,(Float *)out2,(Float *)tmp,true_res);
   printf("asqd.InvCg\n");
   printf("iter = %d out=%0.15e out2=%0.15e\n",iter2,*((Float*)out),*((Float*)out2));
 #endif

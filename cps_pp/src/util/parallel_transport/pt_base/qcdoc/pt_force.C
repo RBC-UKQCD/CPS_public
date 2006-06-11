@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: pt_force.C,v 1.5 2005-12-02 17:51:32 chulwoo Exp $
+  $Id: pt_force.C,v 1.6 2006-06-11 05:35:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ char *fname, const char *vname){
 
 
 
-#define PROFILE
+#undef PROFILE
 
 // N.B. No optimising provision is made if any of the asqtad coefficients
 // are zero.
@@ -687,7 +687,7 @@ void PT::force_product_sum(vector *v, vector *w,
 }
 
 inline int parity(int *n){
-  return( (n[0]+n[1]+n[2]+n[3])%2);
+  return( (PT::evenodd + n[0]+n[1]+n[2]+n[3])%2);
 }
 
 void PT::update_momenta(matrix **force, Float dt, matrix *mom) {

@@ -8,16 +8,18 @@
 CPS_START_NAMESPACE
 int LatData::DEFAULT_FLAG = QCOMMS;
 void LatData::Init(int flags, int len, int volume){
+//	printf("%s:Init(flags=%d len=%d volume=%d\n",cname,flags,len,volume);
 	if (status == INITTED)
-        ERR.General(cname,"Init()","not allowed to initialize twice\n");
+		ERR.General(cname,"Init()","not allowed to initialize twice\n");
 	size = len;
 	vol = volume;
 	data = (IFloat *)qalloc(flags, sizeof(IFloat)*size*vol);
 	if (data == NULL)
 	data = (IFloat *)qalloc(DEFAULT_FLAG, sizeof(IFloat)*size*vol);
 	if (data == NULL)
-	ERR.General("LatData","Init()","out of memory");
-        VRB.Flow(cname,"Init()","flags=%x vol=%d data=%p\n",flags,vol,data);
+		ERR.General("LatData","Init()","out of memory");
+	VRB.Flow(cname,"Init()","flags=%x vol=%d data=%p\n",flags,vol,data);
+        status = INITTED;
 }
 
 #if 0

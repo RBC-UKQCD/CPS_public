@@ -40,7 +40,7 @@
  *
  */
 #define USE_DOUBLE
-#define USE_QALLOC
+#define USE_CPS
 #define USE_COMMS_SCU
 
 #ifdef USE_DOUBLE
@@ -59,6 +59,14 @@ typedef float Float ;
 #define ALLOC(A) malloc(A)
 #define SEND_ALLOC(A) malloc(A)
 #define FREE(A)  free(A)
+#endif
+
+#ifdef USE_CPS
+#include <qalloc.h>
+#include <util/gjp.h>
+#define ALLOC(A) qalloc((GJP.WfmAllocFlag()),A)
+#define SEND_ALLOC(A) qalloc((GJP.WfmSendAllocFlag()),A)
+#define FREE(A)  qfree(A)
 #endif
 
 #ifdef USE_QALLOC

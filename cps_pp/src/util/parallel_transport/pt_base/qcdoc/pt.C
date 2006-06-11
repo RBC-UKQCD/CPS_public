@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt.C,v 1.31 2006-04-13 19:17:44 chulwoo Exp $
+  $Id: pt.C,v 1.32 2006-06-11 05:35:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 19:17:44 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.31 2006-04-13 19:17:44 chulwoo Exp $
-//  $Id: pt.C,v 1.31 2006-04-13 19:17:44 chulwoo Exp $
+//  $Date: 2006-06-11 05:35:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v 1.32 2006-06-11 05:35:06 chulwoo Exp $
+//  $Id: pt.C,v 1.32 2006-06-11 05:35:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.31 $
+//  $Revision: 1.32 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt.C,v $
 //  $State: Exp $
 //
@@ -166,6 +166,7 @@ inline  void cross_over_look_cpp(IFloat *result, Float *fac, const IFloat *chi,
 
 int PT::size[NDIM];
 int PT::vol;
+int PT::evenodd;
 //dest=src
 void PT::cpy (IFloat *dest, IFloat *src){
   for(int i=0;i<18;i++)
@@ -193,7 +194,7 @@ int PT::lex_xyzt(int *x){
 int PT::lex_xyzt_cb_o(int *x){
 //  printf("lex_xyzt_cb_o(%d %d %d %d)\n",x[0],x[1],x[2],x[3]);
   int result = x[0] + size[0]*(x[1]+size[1]*(x[2]+size[2]*x[3]));
-  if ( (x[0]+x[1]+x[2]+x[3])%2 == 0) result = result/2+vol/2;
+  if ( (x[0]+x[1]+x[2]+x[3]+evenodd)%2 == 0) result = result/2+vol/2;
   else result = result/2;
   return result;
 }
@@ -202,7 +203,7 @@ int PT::lex_xyzt_cb_o(int *x){
 int PT::lex_xyzt_cb_e(int *x){
 //  printf("lex_xyzt_cb_o(%d %d %d %d)\n",x[0],x[1],x[2],x[3]);
   int result = x[0] + size[0]*(x[1]+size[1]*(x[2]+size[2]*x[3]));
-  if ( (x[0]+x[1]+x[2]+x[3])%2 == 1) result = result/2+vol/2;
+  if ( (x[0]+x[1]+x[2]+x[3]+evenodd)%2 == 1) result = result/2+vol/2;
   else result = result/2;
   return result;
 }
@@ -825,10 +826,14 @@ void PT::init(PTArg *pt_arg)
 
   //Sets bits in uc_l and uc_nl to zero
   for(i=0;i<NDIM;i++){
-    memset(uc_l[2*i]+local_count[2*i],0,sizeof(gauge_agg));
-    memset(uc_l[2*i+1]+local_count[2*i+1],0,sizeof(gauge_agg));
-    memset(uc_nl[2*i]+non_local_count[2*i],0,sizeof(gauge_agg));
-    memset(uc_nl[2*i+1]+non_local_count[2*i+1],0,sizeof(gauge_agg));
+    gauge_agg *tmp = uc_l[2*i]+local_count[2*i];
+    memcpy(tmp,tmp-1,sizeof(gauge_agg));
+    tmp = uc_l[2*i+1]+local_count[2*i+1];
+    memcpy(tmp,tmp-1,sizeof(gauge_agg));
+    tmp = uc_nl[2*i]+non_local_count[2*i];
+    memcpy(tmp,tmp-1,sizeof(gauge_agg));
+    tmp = uc_nl[2*i+1]+non_local_count[2*i+1];
+    memcpy(tmp,tmp-1,sizeof(gauge_agg));
   }
 
   //Calculate offsets?

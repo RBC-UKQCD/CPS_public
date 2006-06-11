@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.21 2006-04-13 19:08:00 chulwoo Exp $
+  $Id: f_wilson.C,v 1.22 2006-06-11 05:35:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -59,6 +59,7 @@ CPS_START_NAMESPACE
 // Constructor
 //------------------------------------------------------------------
 Fwilson::Fwilson()
+: FwilsonTypes()
 {
   cname = "Fwilson";
   char *fname = "Fwilson()";
@@ -114,6 +115,11 @@ FclassType Fwilson::Fclass() const{
   return F_CLASS_WILSON;
 }
 
+int Fwilson::FsiteSize() const
+{
+  return 2 * Colors() * SpinComponents();  
+  // re/im * colors * spin_components
+}
 
 
 

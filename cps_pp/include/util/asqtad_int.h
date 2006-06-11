@@ -70,11 +70,18 @@ inline void VecMinusEquVec(vector *dest,vector *src, int size){
   for(int i = 0;i<size;i++) dest[i] -= src[i];
 }
 
+enum AsqInvParity {EVEN=0,ODD=1,EVENODD=2};
+
 typedef struct InvArg{
   Float mass;
   Float stop_rsd;
   int niter;
   int evenodd;
+  int restart;
+  double final_rsq;
+  int final_iter;
+  double final_sec;
+  double final_flop;
 } InvArg;
 
 typedef struct AsqDArg{
@@ -277,8 +284,8 @@ SCUDirArgMulti SCUmulti_2[2];
   }
 
   int NodeOdd(){return node_odd;}
-  int InvCg(InvArg *inv_arg, Float *out, Float *in, Float *true_res);
-  void MdagM(Float *mass_sq, Float *out, Float *in, Float *dot_prd = 0);
+  int InvCg(InvArg *inv_arg, Float *out, Float *in, Float *true_res, int odd=0);
+  void MdagM(Float *mass_sq, Float *out, Float *in, int odd, Float *dot_prd = 0);
   void Dslash(Float *out, Float *in);
   void Sum( Float *sum);
 };

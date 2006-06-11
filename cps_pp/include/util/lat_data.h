@@ -19,13 +19,17 @@ class LatData{
   public:
     IFloat *data; 
     LatData(const LatData &lat);
-    LatData(){status = NEW;};
-    LatData(int flags, int size, int vol){
-      Init(flags,size,vol);
-    }
-    LatData(int size, int vol){
-      Init(DEFAULT_FLAG,size,vol);
-    }
+    LatData(){
+//      printf("LatData::LatData()\n");
+      cname = "LatData";
+      status = NEW;
+    };
+//    LatData(int flags, int size, int vol){
+//      Init(flags,size,vol);
+//    }
+//    LatData(int size, int vol){
+//      Init(DEFAULT_FLAG,size,vol);
+//    }
     void  Init(int flags, int size, int vol);
     void  Init(int size, int vol){
       Init(DEFAULT_FLAG,size,vol);
@@ -44,10 +48,9 @@ class LatVector: public LatData{
   private:
     int vec_size;
   public: 
-    LatVector(int flag, int n_vec , int vol )
-      { Init(flag,n_vec,vol); }
-    LatVector(int n_vec , int vol =0)
-      { Init(DEFAULT_FLAG,n_vec,vol); }
+    LatVector();
+    LatVector(int flag, int n_vec , int vol );
+    LatVector(int n_vec , int vol =0);
     void Init(int flag, int n_vec , int vol );
     ~LatVector();
     Vector *Vec(int pos=0, int vec_row=0);

@@ -5,20 +5,20 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.51 2006-04-13 19:04:39 chulwoo Exp $
+  $Id: lattice.h,v 1.52 2006-06-11 05:35:05 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2006-04-13 19:04:39 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.51 2006-04-13 19:04:39 chulwoo Exp $
-  $Id: lattice.h,v 1.51 2006-04-13 19:04:39 chulwoo Exp $
+  $Date: 2006-06-11 05:35:05 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.52 2006-06-11 05:35:05 chulwoo Exp $
+  $Id: lattice.h,v 1.52 2006-06-11 05:35:05 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Author: chulwoo $
-  $Date: 2006-04-13 19:04:39 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.51 2006-04-13 19:04:39 chulwoo Exp $
-  $Id: lattice.h,v 1.51 2006-04-13 19:04:39 chulwoo Exp $
+  $Date: 2006-06-11 05:35:05 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.52 2006-06-11 05:35:05 chulwoo Exp $
+  $Id: lattice.h,v 1.52 2006-06-11 05:35:05 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.51 $
+  $Revision: 1.52 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -2269,6 +2269,8 @@ class Fwilson : public virtual FwilsonTypes
     Fwilson();
 
     virtual ~Fwilson();
+
+    int FsiteSize() const;
 
     FclassType Fclass() const; 
 

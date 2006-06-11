@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.17 2006-03-21 20:39:42 chulwoo Exp $
+  $Id: alg_eig.C,v 1.18 2006-06-11 05:35:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-03-21 20:39:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.17 2006-03-21 20:39:42 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.17 2006-03-21 20:39:42 chulwoo Exp $
+//  $Date: 2006-06-11 05:35:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.18 2006-06-11 05:35:05 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.18 2006-06-11 05:35:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -100,7 +100,12 @@ AlgEig::AlgEig(Lattice& latt,
   // NOTE: at this point we must know on what lattice size the operator 
   // will act.
   //----------------------------------------------------------------
+  printf("f_size=%d\n",0);
+  printf("FsiteSize()=%d\n",latt.FsiteSize());
   int f_size = GJP.VolNodeSites() * latt.FsiteSize() * Ncb / 2;
+//  int f_size = GJP.VolNodeSites() * Ncb / 2;
+  printf("f_size=%d\n",f_size);
+//  exit(1);
   int N_eig = alg_eig_arg->N_eig;
 
   // Allocate memory for the eigenvectors and eigenvalues
@@ -132,6 +137,7 @@ AlgEig::AlgEig(Lattice& latt,
 	    "Mass_step = %g\n",IFloat(alg_eig_arg->Mass_step));
 
   // Calculate n_masses if necessary
+  printf("alg_eig_arg->pattern_kind=%d\n",alg_eig_arg->pattern_kind);
   switch( alg_eig_arg->pattern_kind ) {
   case ARRAY: 
     n_masses = alg_eig_arg->Mass.Mass_len;
@@ -150,6 +156,7 @@ AlgEig::AlgEig(Lattice& latt,
 		alg_eig_arg->pattern_kind);
     break;
   }  
+  VRB.FuncEnd(cname,fname);
 
 }
 

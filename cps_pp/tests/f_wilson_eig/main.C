@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-21 20:16:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_eig/main.C,v 1.9 2004-09-21 20:16:53 chulwoo Exp $
-//  $Id: main.C,v 1.9 2004-09-21 20:16:53 chulwoo Exp $
+//  $Date: 2006-06-11 05:35:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_eig/main.C,v 1.10 2006-06-11 05:35:08 chulwoo Exp $
+//  $Id: main.C,v 1.10 2006-06-11 05:35:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_wilson_eig/main.C,v $
 //  $State: Exp $
 //
@@ -70,6 +70,7 @@ int main(int argc,char *argv[])
 
   VRB.DeactivateAll();
   VRB.Level(VERBOSE_CLOCK_LEVEL);
+  VRB.Level(VERBOSE_FUNC_LEVEL);
 
 
   //----------------------------------------------------------------

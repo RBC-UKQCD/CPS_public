@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of LatData class methods.
 
-  $Id: lat_vec.C,v 1.5 2005-07-05 02:32:38 chulwoo Exp $
+  $Id: lat_vec.C,v 1.6 2006-06-11 05:35:07 chulwoo Exp $
 */
 //------------------------------------------------------------------
 
@@ -24,11 +24,30 @@ LatData &LatData::operator=(const LatData &lat){
     ERR.General("LatData","LatData(&LatData)","Copy constructor not allowed");
 }
 
+LatVector::LatVector()
+: LatData(){
+//  printf("LatVector::LatVector()\n");
+}
+
+LatVector::LatVector(int flag, int n_vec,int vol)
+: LatData(){
+//  printf("LatVector::LatVector(flag,%d,%d)\n",flag,n_vec,vol);
+	Init(flag,n_vec,vol);
+}
+LatVector::LatVector(int n_vec,int vol)
+: LatData(){
+//  printf("LatVector::LatVector(%d,%d)\n",n_vec,vol);
+	Init(DEFAULT_FLAG,n_vec,vol);
+}
+
 void LatVector::Init(int flag, int n_vec, int vol)
 {
-//	printf("LatVector::Init(%p)\n",this);
+//	printf("LatVector::Init(%d,%d,%d)\n",flag,n_vec,vol);
+//        printf("GJP.Colors()=%d,GJP.VolNodeSites()=%d\n",
+//        GJP.Colors(),GJP.VolNodeSites());
 	vec_size = 2*GJP.Colors();
 	if (vol == 0) vol = GJP.VolNodeSites();
+//	printf("LatData::Init(%d,%d,%d)\n",flag,n_vec*vec_size,vol);
 	LatData::Init(flag,n_vec*vec_size,vol);
 //	printf("data=%p\n",data);
 }

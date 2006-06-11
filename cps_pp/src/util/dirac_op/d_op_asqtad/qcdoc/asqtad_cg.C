@@ -14,13 +14,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 17:54:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.7 2005-12-02 17:54:51 chulwoo Exp $
-//  $Id: asqtad_cg.C,v 1.7 2005-12-02 17:54:51 chulwoo Exp $
+//  $Date: 2006-06-11 05:35:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.8 2006-06-11 05:35:05 chulwoo Exp $
+//  $Id: asqtad_cg.C,v 1.8 2006-06-11 05:35:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_cg.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v $
 //  $State: Exp $
 //
@@ -101,7 +101,7 @@ void AsqD::Dslash(Float *out, Float *in ){
 }
 
 #undef PROFILE
-void AsqD::MdagM(Float *mass_sq, Float *out, Float *in, 
+void AsqD::MdagM(Float *mass_sq, Float *out, Float *in, int m_odd,
  Float *dot_prd){
  unsigned long long nflops = 1146*vol;
  static int called=0;
@@ -109,13 +109,19 @@ void AsqD::MdagM(Float *mass_sq, Float *out, Float *in,
 // printf("mass_sq=%e\n",mass_sq);
   called=1;
  }
- int odd = node_odd;
+ int odd = (node_odd+m_odd)%2;
 #ifdef PROFILE
   printf("in=%p frm_tmp=%p out=%p\n",in,frm_tmp,out);
   struct timeval start,end;
   gettimeofday(&start,NULL);
 #endif
   dirac((Float *)frm_tmp, (Float *)in, odd, 0);
+#if 0
+    Float *tmp_p = frm_tmp;
+    for(int j = 0;j<vol*3;j++)
+      if(fabs(*(tmp_p+j))>1e-5) fprintf(stderr,"%d %d %d %d frm_tmp[%d]=%e\n",
+           CoorT(),CoorX(),CoorY(),CoorZ(),j,*(tmp_p+j));
+#endif
   dirac((Float *)out, (Float *)frm_tmp, 1-odd, 0);
 
 #ifdef PROFILE
@@ -161,15 +167,16 @@ void AsqD::MdagM(Float *mass_sq, Float *out, Float *in,
   \post true_res The true residual, if this was non-zero to start with.
 */
 //------------------------------------------------------------------
-static gauge_agg *uc_l_save[2];
-static gauge_agg *uc_nl_save[2];
-static Float *dir_save;
+//static gauge_agg *uc_l_save[2];
+//static gauge_agg *uc_nl_save[2];
+//static Float *dir_save;
 int AsqD::cg_called = 0;
 #define PROFILE
 int AsqD::InvCg( InvArg *inv_arg, Float *out, 
 		   Float *in, 
 //		   Float src_norm_sq, 
-		   Float *true_res){
+		   Float *true_res,
+		   int odd ){
   int itr;                       // Current number of CG iterations
   int max_itr;                       // Max number of CG iterations
   Float stp_cnd;                   // Stop if residual^2 <= stp_cnd
@@ -250,7 +257,22 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
 // Calculate stopping condition
 //------------------------------------------------------------------
   stp_cnd = src_norm_sq * inv_arg->stop_rsd * inv_arg->stop_rsd;
-//  printf("AsqD::InvCg(): stp_cnd =%e\n", Float(stp_cnd));
+  //printf("AsqD::InvCg(): stp_cnd =%e\n", Float(stp_cnd));
+  Float mass_sq = 4*inv_arg->mass*inv_arg->mass;
+  //  printf("mass_sq=%e\n",mass_sq);
+  
+#ifdef PROFILE
+  struct timeval start;
+  struct timeval end;
+    unsigned long long CGflops    = 0;
+    unsigned long long nflops = 0;
+    unsigned long long nflops_tmp;
+    gettimeofday(&start,NULL);
+#endif
+
+  inv_arg->final_iter = 0;
+
+  for(int restart=0;restart<=inv_arg->restart;restart++){
 
 //------------------------------------------------------------------
 // Initial step:
@@ -262,108 +284,94 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
 //   return
 // }
 //------------------------------------------------------------------
-  // Mmp = MatPcDagMatPc * sol
-  Float mass_sq = 4*inv_arg->mass*inv_arg->mass;
-//  printf("mass_sq=%e\n",mass_sq);
-  MdagM(&mass_sq,mmp, sol);
-
-  // res = src
-  CopyVec(res,src, f_size_cb);
-
-  // res -= mmp
-  VecMinusEquVec(res,mmp, f_size_cb);
-
-  // dir = res
-  CopyVec(dir,res, f_size_cb);  
-
-  // res_norm_sq_cur = res * res
-  res_norm_sq_cur = NormSqNode(dir,f_size_cb);
-
-  Sum(&res_norm_sq_cur);
-
-  // if( |res|^2 <= stp_cnd ) we are done
-//  printf("AsqD::InvCg: |res[0]|^2 = %e\n", Float(res_norm_sq_cur));
-  itr = 0;
-  max_itr = inv_arg->niter-1;
-  if(res_norm_sq_cur <= stp_cnd) max_itr = 0;
-
-
-#ifdef PROFILE
-  struct timeval start;
-  struct timeval end;
-
-    unsigned long long CGflops    = 0;
-    unsigned long long nflops = 0;
-    unsigned long long nflops_tmp;
-    gettimeofday(&start,NULL);
-
-#endif
+    // Mmp = MatPcDagMatPc * sol
+    MdagM(&mass_sq,mmp, sol,odd);
+  
+    // res = src
+    CopyVec(res,src, f_size_cb);
+  
+    // res -= mmp
+    VecMinusEquVec(res,mmp, f_size_cb);
+  
+    // dir = res
+    CopyVec(dir,res, f_size_cb);  
+  
+    // res_norm_sq_cur = res * res
+    res_norm_sq_cur = NormSqNode(dir,f_size_cb);
+  
+    Sum(&res_norm_sq_cur);
+  
+    // if( |res|^2 <= stp_cnd ) we are done
+//    printf("AsqD::InvCg: |res[0]|^2 = %e\n", Float(res_norm_sq_cur));
+    itr = 0;
+    max_itr = inv_arg->niter-1;
+    if(res_norm_sq_cur <= stp_cnd) max_itr = 0;
 
 //------------------------------------------------------------------
 // Loop over CG iterations
 //------------------------------------------------------------------
 //  Gint::SynchMachine();
+    for(i=0; i < max_itr; i++){
+      itr++;
+      res_norm_sq_prv = res_norm_sq_cur;
+  
+  #if 0
+      Float *tmp_p = dir;
+      for(int j = 0;j<vol*3;j++)
+        if(fabs(*(tmp_p+j))>1e-5) fprintf(stderr,"%d %d %d %d dir[%d]=%e\n",
+             CoorT(),CoorX(),CoorY(),CoorZ(),j,*(tmp_p+j));
+  #endif
+  
+      // mmp = MatPcDagMatPc * dir
+      // d = <dir, MatPcDagMatPc*dir>
+      MdagM(&mass_sq,mmp, dir, odd,&d);
+  
+      CGflops += 1146*vol+f_size_cb*4;
+  
+      Sum(&d);
+      CGflops +=f_size_cb*2;
+  
+      // If d = 0 we are done
+      if(d == 0.0) break;
+      //??? or should we give a warning or error? Yes we should, really.
+  
+      a = res_norm_sq_prv / d;
+      // sol = a * dir + sol;
+   
+      asq_vaxpy3(sol,&a,dir,sol,f_size_cb/6);
+      CGflops +=f_size_cb*2;
+   
+   
+      // res = - a * (MatPcDagMatPc * dir) + res;
+      // res_norm_sq_cur = res * res
+  
+     // a *= -1.0;
+     Float ma = -a;
+      asq_vaxpy3_norm(res,&ma,mmp,res,f_size_cb/6,&res_norm_sq_cur);
+      Sum(&res_norm_sq_cur);
+      CGflops +=f_size_cb*6;
+  
+      b = res_norm_sq_cur / res_norm_sq_prv;
+  
+      // dir = b * dir + res;
+      asq_vaxpy3(dir,&b,dir,res,f_size_cb/6);
+      CGflops +=f_size_cb*2;
+  
+  
+      // if( |res|^2 <= stp_cnd ) we are done
+  //    printf("%s::%s:|res[%d]|^2 = %e\n", cname,fname,itr, Float(res_norm_sq_cur));
+      if(res_norm_sq_cur <= stp_cnd) break;
+  
+    }
 
-  for(i=0; i < max_itr; i++){
-//    timeval start,end;
-    itr++;
-    res_norm_sq_prv = res_norm_sq_cur;
-
-    // mmp = MatPcDagMatPc * dir
-    // d = <dir, MatPcDagMatPc*dir>
-    MdagM(&mass_sq,mmp, dir, &d);
-    CGflops += 1146*vol+f_size_cb*4;
-
-    Sum(&d);
-    CGflops +=f_size_cb*2;
-
-    // If d = 0 we are done
-    if(d == 0.0) break;
-    //??? or should we give a warning or error? Yes we should, really.
-
-    a = res_norm_sq_prv / d;
-    // sol = a * dir + sol;
- 
-    asq_vaxpy3(sol,&a,dir,sol,f_size_cb/6);
-    CGflops +=f_size_cb*2;
- 
- 
-    // res = - a * (MatPcDagMatPc * dir) + res;
-    // res_norm_sq_cur = res * res
-
-   // a *= -1.0;
-   Float ma = -a;
-    asq_vaxpy3_norm(res,&ma,mmp,res,f_size_cb/6,&res_norm_sq_cur);
-    Sum(&res_norm_sq_cur);
-    CGflops +=f_size_cb*6;
-#ifdef PROFILE
-//    nflops_tmp +=f_size_cb*4;
-#endif
-//    CGflops+=f_size_cb*4;
-
-    b = res_norm_sq_cur / res_norm_sq_prv;
-
-    // dir = b * dir + res;
-    asq_vaxpy3(dir,&b,dir,res,f_size_cb/6);
-    CGflops +=f_size_cb*2;
-
-
-    // if( |res|^2 <= stp_cnd ) we are done
-//    printf("%s::%s:|res[%d]|^2 = %e\n", cname,fname,itr, Float(res_norm_sq_cur));
-    if(res_norm_sq_cur <= stp_cnd) break;
-
+    if(res_norm_sq_cur > stp_cnd) 
+      printf("CG reached max iterations = %d, restart=%d, |res|^2 = %e\n", itr+1, restart, Float(res_norm_sq_cur) );
+  
+    inv_arg->final_iter += itr;
   }
-
-#ifdef PROFILE
-  gettimeofday(&end,NULL);
-  asq_print_flops(cname,fname,CGflops,&start,&end); 
-#endif
-
   // It has not reached stp_cnd: Issue a warning
-  if(itr == inv_arg->niter - 1){
- //   VRB.Warn(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n", itr+1, Float(res_norm_sq_cur) );
-    printf("CG reached max iterations = %d. |res|^2 = %e\n", itr+1, Float(res_norm_sq_cur) );
-  }
+  if(res_norm_sq_cur > stp_cnd) 
+    printf("CG reached max iterations = %d, restart=%d, |res|^2 = %e\n", inv_arg->final_iter , inv_arg->restart, Float(res_norm_sq_cur) );
 
 //------------------------------------------------------------------
 // Done. Finish up and return
@@ -371,7 +379,7 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
   // Calculate and set true residual: 
   // true_res = |src - MatPcDagMatPc * sol| / |src|
 
-  MdagM(&mass_sq, mmp, sol);
+  MdagM(&mass_sq, mmp, sol,odd);
   CGflops += 1146*vol+f_size_cb*2;
   CopyVec(dir,src, f_size_cb);
   VecMinusEquVec(dir,mmp, f_size_cb);
@@ -382,17 +390,27 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
   if(true_res != 0){
     *true_res = tmp;
   }
-  printf("%s::%s: True |res| / |src| = %e, iter = %d\n", cname,fname, Float(tmp), itr+1);
+//  printf("%s::%s: True |res| / |src| = %e, iter = %d\n", cname,fname, Float(tmp), itr+1);
+#ifdef PROFILE
+  gettimeofday(&end,NULL);
+//  asq_print_flops(cname,fname,CGflops,&start,&end); 
+  inv_arg->final_flop = (double)CGflops;
+  int sec = end.tv_sec - start.tv_sec;
+  int usec = end.tv_usec - start.tv_usec;
+  inv_arg->final_sec = sec + 1.e-6*usec;
+#endif
+  inv_arg->final_rsq = res_norm_sq_cur;
+//  inv_arg->final_iter = itr;
 
   // Free memory
   qfree(mmp);
   qfree(dir);
-  Free(res);
+  qfree(res);
 
   // Return number of iterations
 //  printf("AsqD::InvCG\n");
   cg_called++;
-  return itr+1;
+  return inv_arg->final_iter;
 
 }
 

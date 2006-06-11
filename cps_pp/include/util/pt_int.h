@@ -11,7 +11,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.16 2006-02-01 16:46:07 chulwoo Exp $
+  $Id: pt_int.h,v 1.17 2006-06-11 05:35:05 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 #include <qcdocos/scu_dir_arg.h>
@@ -33,7 +33,7 @@ struct PTArg {
 enum { PT_DAG_YES=1,PT_DAG_NO=0};
 enum { PT_CHKB_EVEN=0,PT_CHKB_ODD=1};
 enum { PT_XYZT = 0, PT_TXYZ, PT_XYZT_CB_O, PT_XYZT_CB_E};
-enum { PT_EVEN = 0, PT_ODD };
+enum { PT_EVEN = 0, PT_ODD  = 1};
 
 
 
@@ -46,7 +46,6 @@ class PT  {
   int g_conj;
   int v_str_ord;
   int v_str_ord_cb;
-  int evenodd;
   int prec;
   int non_local_dirs;
   IFloat * gauge_txyz;
@@ -182,6 +181,7 @@ int conjugated;
   public:
     PT() {};
     ~PT() {};
+    static int evenodd;
     static  int vol;
     void init (PTArg *pt_arg);
 	void init_g(Float *g_addr = NULL);

@@ -2,13 +2,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-01-11 16:53:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.29 2006-01-11 16:53:05 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.29 2006-01-11 16:53:05 chulwoo Exp $
+//  $Date: 2006-06-11 05:35:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.30 2006-06-11 05:35:06 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.30 2006-06-11 05:35:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
-//  $Revision: 1.29 $
+//  $Revision: 1.30 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
@@ -152,6 +152,7 @@ int k;
 void AsqD::init(AsqDArg *arg)
 {
 
+//  printf("AsqD::init()\n");
   gauge_field_addr = ( Float * ) arg->gauge_u;
   int i,j,k,m,n; 
   int blklen[NUM_DIR/2];
@@ -164,7 +165,6 @@ void AsqD::init(AsqDArg *arg)
   int x[NUM_DIR/2];
   int scu_irs[2][3];
   char *fname = "asqtad_dirac_init(const void *gauge)";
-//  printf("AsqD::init()\n");
 
   scu_irs[0][0]=IR_5;
   scu_irs[0][1]=IR_6;
@@ -215,7 +215,6 @@ void AsqD::init(AsqDArg *arg)
      if (NP[i]>1) non_local_dirs++;
 //     printf("size[%d] coor[%d] NP[%d]= %d %d %d \n",i,i,i,size[i],coor[i],NP[i]);
   }
-//  printf("non_local_dirs=%d\n",non_local_dirs);
   c1 = arg->c1;
   c2 = arg->c2;
   c3 = -arg->c3;
@@ -232,7 +231,7 @@ void AsqD::init(AsqDArg *arg)
   for(int i = 0;i<4;i++)
     node_odd += size[i]*coor[i];
   node_odd = node_odd%2;
-//  fprintf(stderr,"node_odd=%d\n",node_odd);
+//  fprintf(stdout,"node_odd=%d\n",node_odd);
 
   vol = size[0] * size[1] * size[2] * size[3];
   f_size_cb = vol*3;
@@ -936,7 +935,6 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
   }
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     Fat = (matrix *)fat[n];
-//    printf("Fat=%p\n",Fat);
     int coor=0;
     for (coord[3] = 0; coord[3] < size[3]; coord[3]++)
     for (coord[2] = 0; coord[2] < size[2]; coord[2]++)
@@ -975,6 +973,10 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
       for (i = 0; i < 4 ; i++) coord[i] = x[i];
       odd = ( coord[0] + coord[1] + coord[2] + coord[3] ) % 2;
       int off_node = CoordNN(n+4);
+      int *y = coord;
+//      printf("coord = %d %d %d %d\n",y[0],y[1],y[2],y[3]);
+      y = coord_nn;
+//      printf("coord_nn = %d %d %d %d\n",y[0],y[1],y[2],y[3]);
       if ( NP[n]>1 && off_node) {		// chi(chi-mu) off-node
         snd.Addr(Fat+LexGauge(coord_nn));
 		snd.StartTrans();rcv.StartTrans();
@@ -1004,7 +1006,6 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
   matrix * Naik;
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     Naik = (matrix *)naik[n];
-//    printf("Naik=%p\n",Naik);
     for (x[3] = 0; x[3] < size[3]; x[3]++)
     for (x[2] = 0; x[2] < size[2]; x[2]++)
     for (x[1] = 0; x[1] < size[1]; x[1]++)
@@ -1032,7 +1033,6 @@ void AsqD::init_g(Float *frm_p,Float **fat_p,Float **naik_p, Float **naikm_p)
   if (naik_m[0]){
   for ( n = 0; n < NUM_DIR/2; n++ ) {
     Naik = (matrix *)naik_m[n]; 
-//    printf("Naik=%p\n",Naik);
     for (x[3] = 0; x[3] < size[3]; x[3]++)
     for (x[2] = 0; x[2] < size[2]; x[2]++)
     for (x[1] = 0; x[1] < size[1]; x[1]++)

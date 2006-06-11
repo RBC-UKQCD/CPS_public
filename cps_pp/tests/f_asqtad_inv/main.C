@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.17 2005-04-05 06:44:52 chulwoo Exp $
+  $Id: main.C,v 1.18 2006-06-11 05:35:07 chulwoo Exp $
 */
 
 #include<config.h>
@@ -122,9 +122,9 @@ int main(int argc,char *argv[]){
     GJP.Initialize(do_arg);
 
     VRB.Level(0);
-    VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
-    VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
-    VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+//    VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
+//    VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+//    VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
     VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
 
     fp = Fopen(ADD_ID,"f_asqtad_test.out","w");
@@ -137,7 +137,7 @@ int main(int argc,char *argv[]){
     LatVector *X_in  = new LatVector(1);
 
     int s[4];
-#if 0
+#if 1
     lat.RandGaussVector(X_in->Vec(),1.0);
 #else
 
