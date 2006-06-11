@@ -2,5 +2,6 @@
 <item><name>gluon</name><value><GclassType>G_CLASS_NONE </GclassType></value></item>
 <class><name>ActionArg</name><instance>action_arg</instance><data>
 <item><name>force_measure</name><value><ForceMeasure>FORCE_MEASURE_NO </ForceMeasure></value></item>
+<item><name>force_label</name><value><string> </string></value></item>
 </data></class>
 </data></class>

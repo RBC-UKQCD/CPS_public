@@ -1,0 +1,7 @@
+class StagNucleonArg stag_nucleon_arg = {
+int qid0 = 0
+int qid1 = 1
+int qid2 = 2
+StagQuarkDir dir = HDM_T
+unsigned long nucleon_buf = 0x0
+}

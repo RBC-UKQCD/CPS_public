@@ -1,0 +1,16 @@
+<class><name>StagQuarkSrc</name><instance>stag_quark_src</instance><data>
+<item><name>type</name><value><StagQuarkSrcType>POINT </StagQuarkSrcType></value></item>
+<Vector><name>origin</name><size>4</size><data>
+<item><name>origin[0]</name><value><int>0</int></value></item>
+<item><name>origin[1]</name><value><int>0</int></value></item>
+<item><name>origin[2]</name><value><int>0</int></value></item>
+<item><name>origin[3]</name><value><int>0</int></value></item>
+</data></Vector>
+<Vector><name>end</name><size>4</size><data>
+<item><name>end[0]</name><value><int>0</int></value></item>
+<item><name>end[1]</name><value><int>0</int></value></item>
+<item><name>end[2]</name><value><int>0</int></value></item>
+<item><name>end[3]</name><value><int>0</int></value></item>
+</data></Vector>
+<item><name>dir</name><value><StagQuarkDir>HDM_T </StagQuarkDir></value></item>
+</data></class>

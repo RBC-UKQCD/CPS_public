@@ -1,0 +1,16 @@
+class StagQuarkSrc stag_quark_src = {
+StagQuarkSrcType type = POINT
+Vector origin[4] = { 
+int origin[0] = 0
+int origin[1] = 0
+int origin[2] = 0
+int origin[3] = 0
+}
+Vector end[4] = { 
+int end[0] = 0
+int end[1] = 0
+int end[2] = 0
+int end[3] = 0
+}
+StagQuarkDir dir = HDM_T
+}

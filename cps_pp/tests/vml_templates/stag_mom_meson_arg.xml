@@ -1,0 +1,7 @@
+<class><name>StagMomMesonArg</name><instance>stag_mom_meson_arg</instance><data>
+<item><name>qid0</name><value><int>0</int></value></item>
+<item><name>qid1</name><value><int>1</int></value></item>
+<item><name>dir</name><value><StagQuarkDir>HDM_T </StagQuarkDir></value></item>
+<item><name>no_of_momenta</name><value><int>4</int></value></item>
+<item><name>meson_buf</name><value><ui4>0</ui4></value></item>
+</data></class>

@@ -1,0 +1,7 @@
+class StagNonLocalArg stag_non_local_arg = {
+int qid0 = 0
+int qid1 = 1
+int qid2 = 2
+StagQuarkDir dir = HDM_T
+unsigned long nlocal_buf = 0x0
+}

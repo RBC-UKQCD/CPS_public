@@ -1,0 +1,14 @@
+<class><name>NLStagMesonArg</name><instance>nlstag_meson_arg</instance><data>
+<Vector><name>qid0</name><size>8</size><data>
+<item><name>qid0[0]</name><value><int>0</int></value></item>
+<item><name>qid0[1]</name><value><int>1</int></value></item>
+<item><name>qid0[2]</name><value><int>2</int></value></item>
+<item><name>qid0[3]</name><value><int>3</int></value></item>
+<item><name>qid0[4]</name><value><int>4</int></value></item>
+<item><name>qid0[5]</name><value><int>5</int></value></item>
+<item><name>qid0[6]</name><value><int>6</int></value></item>
+<item><name>qid0[7]</name><value><int>7</int></value></item>
+</data></Vector>
+<item><name>dir</name><value><StagQuarkDir>HDM_T </StagQuarkDir></value></item>
+<item><name>nlocal_buf</name><value><ui4>0</ui4></value></item>
+</data></class>

@@ -1,0 +1,14 @@
+class NLStagMesonArg nlstag_meson_arg = {
+Vector qid0[8] = { 
+int qid0[0] = 0
+int qid0[1] = 1
+int qid0[2] = 2
+int qid0[3] = 3
+int qid0[4] = 4
+int qid0[5] = 5
+int qid0[6] = 6
+int qid0[7] = 7
+}
+StagQuarkDir dir = HDM_T
+unsigned long nlocal_buf = 0x0
+}

@@ -6,7 +6,7 @@
 </data></class>
 <class><name>SplitRange</name><instance>fractionSplit[1]</instance><data>
 <item><name>split_low</name><value><int>0</int></value></item>
-<item><name>split_high</name><value><int>0</int></value></item>
+<item><name>split_high</name><value><int>2329</int></value></item>
 </data></class>
 </data></Array>
 </data></class>

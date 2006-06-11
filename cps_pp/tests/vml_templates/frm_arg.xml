@@ -9,6 +9,7 @@
 </data></Array>
 <class><name>ActionArg</name><instance>action_arg</instance><data>
 <item><name>force_measure</name><value><ForceMeasure>FORCE_MEASURE_NO </ForceMeasure></value></item>
+<item><name>force_label</name><value><string> </string></value></item>
 </data></class>
 </data></class>
 <Array><name>fermions</name><size>1</size><data>

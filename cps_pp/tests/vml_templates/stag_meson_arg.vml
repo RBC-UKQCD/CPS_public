@@ -1,0 +1,6 @@
+class StagMesonArg stag_meson_arg = {
+int qid0 = 0
+int qid1 = 1
+StagQuarkDir dir = HDM_T
+unsigned long meson_buf = 0x0
+}

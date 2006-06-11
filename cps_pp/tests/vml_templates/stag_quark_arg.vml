@@ -1,0 +1,29 @@
+class StagQuarkArg stag_quark_arg = {
+int qid = 0
+class CgArg cg = {
+double mass =   1.0000000000000001e-01
+int max_num_iter = 5000
+double stop_rsd =   1.0000000000000000e-10
+double true_rsd =   1.0000000000000000e-10
+RitzMatType RitzMatOper = MATPCDAG_MATPC
+InverterType Inverter = CG
+int bicgstab_n = 1
+}
+class StagQuarkSrc src = {
+StagQuarkSrcType type = POINT
+Vector origin[4] = { 
+int origin[0] = 0
+int origin[1] = 0
+int origin[2] = 0
+int origin[3] = 0
+}
+Vector end[4] = { 
+int end[0] = 0
+int end[1] = 0
+int end[2] = 0
+int end[3] = 0
+}
+StagQuarkDir dir = HDM_T
+}
+StagQuarkLocalType sln = LOCAL
+}

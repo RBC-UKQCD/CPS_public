@@ -1,0 +1,29 @@
+<class><name>StagQuarkArg</name><instance>stag_quark_arg</instance><data>
+<item><name>qid</name><value><int>0</int></value></item>
+<class><name>CgArg</name><instance>cg</instance><data>
+<item><name>mass</name><value><double>1.000000e-01</double></value></item>
+<item><name>max_num_iter</name><value><int>5000</int></value></item>
+<item><name>stop_rsd</name><value><double>1.000000e-10</double></value></item>
+<item><name>true_rsd</name><value><double>1.000000e-10</double></value></item>
+<item><name>RitzMatOper</name><value><RitzMatType>MATPCDAG_MATPC </RitzMatType></value></item>
+<item><name>Inverter</name><value><InverterType>CG </InverterType></value></item>
+<item><name>bicgstab_n</name><value><int>1</int></value></item>
+</data></class>
+<class><name>StagQuarkSrc</name><instance>src</instance><data>
+<item><name>type</name><value><StagQuarkSrcType>POINT </StagQuarkSrcType></value></item>
+<Vector><name>origin</name><size>4</size><data>
+<item><name>origin[0]</name><value><int>0</int></value></item>
+<item><name>origin[1]</name><value><int>0</int></value></item>
+<item><name>origin[2]</name><value><int>0</int></value></item>
+<item><name>origin[3]</name><value><int>0</int></value></item>
+</data></Vector>
+<Vector><name>end</name><size>4</size><data>
+<item><name>end[0]</name><value><int>0</int></value></item>
+<item><name>end[1]</name><value><int>0</int></value></item>
+<item><name>end[2]</name><value><int>0</int></value></item>
+<item><name>end[3]</name><value><int>0</int></value></item>
+</data></Vector>
+<item><name>dir</name><value><StagQuarkDir>HDM_T </StagQuarkDir></value></item>
+</data></class>
+<item><name>sln</name><value><StagQuarkLocalType>LOCAL </StagQuarkLocalType></value></item>
+</data></class>

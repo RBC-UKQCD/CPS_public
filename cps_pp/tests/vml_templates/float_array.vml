@@ -1,0 +1,8 @@
+class FloatArray float_array = {
+Array Floats[4] = { 
+double Floats[0] =   0.0000000000000000e+00
+double Floats[1] =   0.0000000000000000e+00
+double Floats[2] =   0.0000000000000000e+00
+double Floats[3] =   0.0000000000000000e+00
+}
+}

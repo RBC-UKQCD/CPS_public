@@ -4,6 +4,6 @@
 <item><name>stop_rsd</name><value><double>0.000000e+00</double></value></item>
 <item><name>true_rsd</name><value><double>0.000000e+00</double></value></item>
 <item><name>RitzMatOper</name><value><RitzMatType>NONE </RitzMatType></value></item>
-<item><name>Solver</name><value><SolverType>CG </SolverType></value></item>
+<item><name>Inverter</name><value><InverterType>CG </InverterType></value></item>
 <item><name>bicgstab_n</name><value><int>0</int></value></item>
 </data></class>

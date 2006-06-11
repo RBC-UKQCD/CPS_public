@@ -1,12 +1,20 @@
 <class><name>ActionBosonArg</name><instance>bsn_arg</instance><data>
 <class><name>ActionBilinearArg</name><instance>bi_arg</instance><data>
 <item><name>fermion</name><value><FclassType>F_CLASS_NONE </FclassType></value></item>
-<Array><name>bilinears</name><size>0</size><data>
+<Array><name>bilinears</name><size>1</size><data>
+<class><name>BilinearDescr</name><instance>bilinears[0]</instance><data>
+<item><name>mass</name><value><double>0.000000e+00</double></value></item>
+<item><name>max_num_iter</name><value><int>0</int></value></item>
+</data></class>
 </data></Array>
 <class><name>ActionArg</name><instance>action_arg</instance><data>
 <item><name>force_measure</name><value><ForceMeasure>FORCE_MEASURE_NO </ForceMeasure></value></item>
+<item><name>force_label</name><value><string> </string></value></item>
 </data></class>
 </data></class>
-<Array><name>bosons</name><size>0</size><data>
+<Array><name>bosons</name><size>1</size><data>
+<class><name>BosonDescr</name><instance>bosons[0]</instance><data>
+<item><name>stop_rsd_hb</name><value><double>0.000000e+00</double></value></item>
+</data></class>
 </data></Array>
 </data></class>
