@@ -9,6 +9,7 @@
 </data></Array>
 <class><name>ActionArg</name><instance>action_arg</instance><data>
 <item><name>force_measure</name><value><ForceMeasure>FORCE_MEASURE_NO </ForceMeasure></value></item>
+<item><name>force_label</name><value><string> </string></value></item>
 </data></class>
 </data></class>
 <item><name>spread</name><value><double>0.000000e+00</double></value></item>
@@ -27,6 +28,8 @@
 <item><name>power_den</name><value><int>0</int></value></item>
 <item><name>precision</name><value><i4>0</i4></value></item>
 <class><name>ApproxDescr</name><instance>md_approx</instance><data>
+<item><name>approx_type</name><value><RationalApproxType>RATIONAL_APPROX_POWER </RationalApproxType></value></item>
+<item><name>bounds_type</name><value><RationalBoundsType>RATIONAL_BOUNDS_AUTOMATIC </RationalBoundsType></value></item>
 <item><name>lambda_low</name><value><double>0.000000e+00</double></value></item>
 <item><name>lambda_high</name><value><double>0.000000e+00</double></value></item>
 <Array><name>stop_rsd</name><size>6</size><data>
@@ -39,6 +42,8 @@
 </data></Array>
 </data></class>
 <class><name>ApproxDescr</name><instance>mc_approx</instance><data>
+<item><name>approx_type</name><value><RationalApproxType>RATIONAL_APPROX_POWER </RationalApproxType></value></item>
+<item><name>bounds_type</name><value><RationalBoundsType>RATIONAL_BOUNDS_AUTOMATIC </RationalBoundsType></value></item>
 <item><name>lambda_low</name><value><double>0.000000e+00</double></value></item>
 <item><name>lambda_high</name><value><double>0.000000e+00</double></value></item>
 <Array><name>stop_rsd</name><size>9</size><data>
@@ -53,6 +58,7 @@
 <item><name>stop_rsd[8]</name><value><double>0.000000e+00</double></value></item>
 </data></Array>
 </data></class>
+<item><name>stag_bsn_mass</name><value><double>0.000000e+00</double></value></item>
 </data></class>
 </data></Array>
 <Array><name>fermions</name><size>1</size><data>
@@ -62,6 +68,8 @@
 <item><name>power_den</name><value><int>0</int></value></item>
 <item><name>precision</name><value><i4>0</i4></value></item>
 <class><name>ApproxDescr</name><instance>md_approx</instance><data>
+<item><name>approx_type</name><value><RationalApproxType>RATIONAL_APPROX_POWER </RationalApproxType></value></item>
+<item><name>bounds_type</name><value><RationalBoundsType>RATIONAL_BOUNDS_AUTOMATIC </RationalBoundsType></value></item>
 <item><name>lambda_low</name><value><double>0.000000e+00</double></value></item>
 <item><name>lambda_high</name><value><double>0.000000e+00</double></value></item>
 <Array><name>stop_rsd</name><size>9</size><data>
@@ -77,6 +85,8 @@
 </data></Array>
 </data></class>
 <class><name>ApproxDescr</name><instance>mc_approx</instance><data>
+<item><name>approx_type</name><value><RationalApproxType>RATIONAL_APPROX_POWER </RationalApproxType></value></item>
+<item><name>bounds_type</name><value><RationalBoundsType>RATIONAL_BOUNDS_AUTOMATIC </RationalBoundsType></value></item>
 <item><name>lambda_low</name><value><double>0.000000e+00</double></value></item>
 <item><name>lambda_high</name><value><double>0.000000e+00</double></value></item>
 <Array><name>stop_rsd</name><size>15</size><data>
@@ -97,6 +107,7 @@
 <item><name>stop_rsd[14]</name><value><double>0.000000e+00</double></value></item>
 </data></Array>
 </data></class>
+<item><name>stag_bsn_mass</name><value><double>0.000000e+00</double></value></item>
 </data></class>
 </data></Array>
 <class><name>EigenDescr</name><instance>eigen</instance><data>

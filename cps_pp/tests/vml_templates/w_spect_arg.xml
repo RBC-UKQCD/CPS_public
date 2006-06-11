@@ -17,6 +17,20 @@
 <item><name>src_box_e[2]</name><value><int>0</int></value></item>
 <item><name>src_box_e[3]</name><value><int>0</int></value></item>
 </data></Vector>
+<item><name>sink_kind</name><value><SinkKind>W_POINT </SinkKind></value></item>
+<Vector><name>snk_box_b</name><size>4</size><data>
+<item><name>snk_box_b[0]</name><value><int>0</int></value></item>
+<item><name>snk_box_b[1]</name><value><int>0</int></value></item>
+<item><name>snk_box_b[2]</name><value><int>0</int></value></item>
+<item><name>snk_box_b[3]</name><value><int>0</int></value></item>
+</data></Vector>
+<Vector><name>snk_box_e</name><size>4</size><data>
+<item><name>snk_box_e[0]</name><value><int>0</int></value></item>
+<item><name>snk_box_e[1]</name><value><int>0</int></value></item>
+<item><name>snk_box_e[2]</name><value><int>0</int></value></item>
+<item><name>snk_box_e[3]</name><value><int>0</int></value></item>
+</data></Vector>
+<item><name>zero_mom_box_snk</name><value><int>0</int></value></item>
 <item><name>g_epsi</name><value><double>0.000000e+00</double></value></item>
 <item><name>g_n</name><value><int>0</int></value></item>
 <Vector><name>g_center</name><size>4</size><data>

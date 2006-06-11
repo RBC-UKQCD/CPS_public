@@ -6,7 +6,7 @@ int split_high = 0
 }
 class SplitRange fractionSplit[1] = {
 int split_low = 0
-int split_high = 2329
+int split_high = 0
 }
 }
 }

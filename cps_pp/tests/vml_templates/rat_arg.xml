@@ -31,14 +31,14 @@
 <item><name>field_type</name><value><FieldType>FERMION </FieldType></value></item>
 <item><name>power_num</name><value><int>0</int></value></item>
 <item><name>power_den</name><value><int>0</int></value></item>
-<item><name>precision</name><value><i4>3929</i4></value></item>
+<item><name>precision</name><value><i4>0</i4></value></item>
 <class><name>ApproxDescr</name><instance>md_approx</instance><data>
 <item><name>approx_type</name><value><RationalApproxType>RATIONAL_APPROX_POWER </RationalApproxType></value></item>
 <item><name>bounds_type</name><value><RationalBoundsType>RATIONAL_BOUNDS_AUTOMATIC </RationalBoundsType></value></item>
 <item><name>lambda_low</name><value><double>0.000000e+00</double></value></item>
 <item><name>lambda_high</name><value><double>0.000000e+00</double></value></item>
 <Array><name>stop_rsd</name><size>10</size><data>
-<item><name>stop_rsd[0]</name><value><double>1.755415e-320</double></value></item>
+<item><name>stop_rsd[0]</name><value><double>0.000000e+00</double></value></item>
 <item><name>stop_rsd[1]</name><value><double>0.000000e+00</double></value></item>
 <item><name>stop_rsd[2]</name><value><double>0.000000e+00</double></value></item>
 <item><name>stop_rsd[3]</name><value><double>0.000000e+00</double></value></item>
@@ -154,7 +154,7 @@
 <item><name>lambda_high</name><value><double>0.000000e+00</double></value></item>
 <Array><name>stop_rsd</name><size>14</size><data>
 <item><name>stop_rsd[0]</name><value><double>0.000000e+00</double></value></item>
-<item><name>stop_rsd[1]</name><value><double>1.419451e-320</double></value></item>
+<item><name>stop_rsd[1]</name><value><double>0.000000e+00</double></value></item>
 <item><name>stop_rsd[2]</name><value><double>0.000000e+00</double></value></item>
 <item><name>stop_rsd[3]</name><value><double>0.000000e+00</double></value></item>
 <item><name>stop_rsd[4]</name><value><double>0.000000e+00</double></value></item>

@@ -49,8 +49,8 @@
 <item><name>xi_v_xi</name><value><double>1.000000e+00</double></value></item>
 <item><name>clover_coeff</name><value><double>0.000000e+00</double></value></item>
 <item><name>clover_coeff_xi</name><value><double>0.000000e+00</double></value></item>
-<item><name>xi_gfix</name><value><double>0.000000e+00</double></value></item>
-<item><name>gfix_chkb</name><value><int>0</int></value></item>
+<item><name>xi_gfix</name><value><double>1.000000e+00</double></value></item>
+<item><name>gfix_chkb</name><value><int>1</int></value></item>
 <item><name>asqtad_KS</name><value><double>0.000000e+00</double></value></item>
 <item><name>asqtad_naik</name><value><double>0.000000e+00</double></value></item>
 <item><name>asqtad_3staple</name><value><double>0.000000e+00</double></value></item>
