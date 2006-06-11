@@ -16,11 +16,11 @@ enum_int.stmp2 : enum.x vml.done
 #	${RPCGEN} $(RHFLAGS) enum.x >${SRCDIR}/include/util/enum_int.h
 	${RPCGEN} $(RHFLAGS) enum.x >${SRCDIR}/include/alg/enum_int.h
 	${RPCGEN} $(RCFLAGS) enum.x >${SRCDIR}/src/alg/alg_arg/enum_int.C
-	touch enum.stmp2
+	touch enum_int.stmp2
 %.stmp : %.x vml.done
 	${RPCGEN} $(RHFLAGS) $< >${SRCDIR}/include/alg/$*.h
 	${RPCGEN} $(RCFLAGS) $< >${SRCDIR}/src/alg/alg_arg/$*.C
 	touch $@
 
 clean: 
-
+	rm -f *stmp *stmp2

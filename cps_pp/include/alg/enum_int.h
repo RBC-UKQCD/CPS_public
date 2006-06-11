@@ -234,9 +234,20 @@ enum SourceKind {
 	BOX_W = 0 + 2,
 	JACOBI_W = 0 + 3,
 	MAX_NUM_SINK = 0 + 4,
+	Z2 = 0 + 5,
+	COMPLEX_Z2 = 0 + 6,
+	KURAMASHI = 0 + 7,
 };
 typedef enum SourceKind SourceKind;
 extern struct vml_enum_map SourceKind_map[];
+
+enum SinkKind {
+	W_POINT = 0,
+	W_WALL = 1,
+	W_BOX = 2,
+};
+typedef enum SinkKind SinkKind;
+extern struct vml_enum_map SinkKind_map[];
 
 enum MomentumKind {
 	MOM_000 = 0,
@@ -702,6 +713,7 @@ extern  bool_t vml_FieldType (VML *, char *instance, FieldType*);
 extern  bool_t vml_RatType (VML *, char *instance, RatType*);
 extern  bool_t vml_WbaryonFold (VML *, char *instance, WbaryonFold*);
 extern  bool_t vml_SourceKind (VML *, char *instance, SourceKind*);
+extern  bool_t vml_SinkKind (VML *, char *instance, SinkKind*);
 extern  bool_t vml_MomentumKind (VML *, char *instance, MomentumKind*);
 extern  bool_t vml_DEVOperatorKind (VML *, char *instance, DEVOperatorKind*);
 extern  bool_t vml_WMesonOpKind (VML *, char *instance, WMesonOpKind*);
@@ -756,6 +768,7 @@ extern  bool_t vml_FieldType (VML *, char *instance, FieldType*);
 extern  bool_t vml_RatType (VML *, char *instance, RatType*);
 extern  bool_t vml_WbaryonFold (VML *, char *instance, WbaryonFold*);
 extern  bool_t vml_SourceKind (VML *, char *instance, SourceKind*);
+extern  bool_t vml_SinkKind (VML *, char *instance, SinkKind*);
 extern  bool_t vml_MomentumKind (VML *, char *instance, MomentumKind*);
 extern  bool_t vml_DEVOperatorKind (VML *, char *instance, DEVOperatorKind*);
 extern  bool_t vml_WMesonOpKind (VML *, char *instance, WMesonOpKind*);
