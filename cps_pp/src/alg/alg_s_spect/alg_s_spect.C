@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 17:37:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.11 2006-02-21 17:37:12 chulwoo Exp $
-//  $Id: alg_s_spect.C,v 1.11 2006-02-21 17:37:12 chulwoo Exp $
+//  $Date: 2006-06-11 03:36:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.12 2006-06-11 03:36:00 chulwoo Exp $
+//  $Id: alg_s_spect.C,v 1.12 2006-06-11 03:36:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_s_spect.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v $
 //  $State: Exp $
 //
@@ -315,15 +315,15 @@ void AlgStagMeson::run()
   //----------------------------------------------------------------
   if(aots.begin()) {
     alg_stag_meson_arg->meson_buf = 
-		(Float *)smalloc(m1.propLenTotal()*sizeof(Float));
+		(unsigned long)smalloc(m1.propLenTotal()*sizeof(Float));
     if(alg_stag_meson_arg->meson_buf == 0)
           ERR.Pointer(cname,fname, "alg_stag_meson_arg->meson_buf");
     VRB.Smalloc(cname,fname, "alg_stag_meson_arg->meson_buf", 
-		alg_stag_meson_arg->meson_buf, m1.propLenTotal()*sizeof(Float));
-    zero_buffer(alg_stag_meson_arg->meson_buf, m1.propLenTotal());
+		(void *)alg_stag_meson_arg->meson_buf, m1.propLenTotal()*sizeof(Float));
+    zero_buffer((Float *)alg_stag_meson_arg->meson_buf, m1.propLenTotal());
   }
 
-  m1.download_prop(SMESON, alg_stag_meson_arg->meson_buf);
+  m1.download_prop(SMESON, (Float *)alg_stag_meson_arg->meson_buf);
 
   if (aots.last()) {
     char *data_file = common_arg->results ? 
@@ -333,13 +333,13 @@ void AlgStagMeson::run()
       ERR.FileA(cname,fname, data_file);
     }
 
-    write_to_file(alg_stag_meson_arg->meson_buf, fp, 
+    write_to_file((Float *)alg_stag_meson_arg->meson_buf, fp, 
    	          m1.propLenTotal(), aots.numSlices(), 1, SMESON, m1.bcd());
     Fclose(fp);
 
     VRB.Sfree(cname,fname, "alg_stag_meson_arg->meson_buf", 
-			    alg_stag_meson_arg->meson_buf);
-    sfree(alg_stag_meson_arg->meson_buf);
+			    (void *)alg_stag_meson_arg->meson_buf);
+    sfree((Float *)alg_stag_meson_arg->meson_buf);
     alg_stag_meson_arg->meson_buf = 0;
   }
 }
@@ -412,16 +412,16 @@ void AlgStagMomMeson::run()
   //----------------------------------------------------------------
   if(aots.begin()) {
     alg_stag_mom_meson_arg->meson_buf =
-      (Float *)smalloc(m1.propLenTotal()*sizeof(Float));
+      (unsigned long)smalloc(m1.propLenTotal()*sizeof(Float));
     if(alg_stag_mom_meson_arg->meson_buf == 0)
       ERR.Pointer(cname,fname, "alg_stag_mom_meson_arg->meson_buf");
     VRB.Smalloc(cname,fname, "alg_stag_mom_meson_arg->meson_buf",
-         alg_stag_mom_meson_arg->meson_buf, m1.propLenTotal()*sizeof(Float));
-    zero_buffer(alg_stag_mom_meson_arg->meson_buf, m1.propLenTotal());
+         (void *)alg_stag_mom_meson_arg->meson_buf, m1.propLenTotal()*sizeof(Float));
+    zero_buffer((Float *)alg_stag_mom_meson_arg->meson_buf, m1.propLenTotal());
   }
 
 
-  m1.download_prop(SMOMMESON, alg_stag_mom_meson_arg->meson_buf);
+  m1.download_prop(SMOMMESON, (Float *)alg_stag_mom_meson_arg->meson_buf);
 
   if (aots.last()) {
     char *data_file = common_arg->results ?
@@ -431,14 +431,14 @@ void AlgStagMomMeson::run()
       ERR.FileA(cname,fname, data_file);
     }
 
-    write_to_file(alg_stag_mom_meson_arg->meson_buf, fp,
+    write_to_file((Float *)alg_stag_mom_meson_arg->meson_buf, fp,
                   m1.propLenTotal(), aots.numSlices(), 
 	alg_stag_mom_meson_arg->no_of_momenta,SMOMMESON, m1.bcd());
     Fclose(fp);
 
     VRB.Sfree(cname,fname, "alg_stag_mom_meson_arg->meson_buf",
-                            alg_stag_mom_meson_arg->meson_buf);
-    sfree(alg_stag_mom_meson_arg->meson_buf);
+                            (void *)alg_stag_mom_meson_arg->meson_buf);
+    sfree((void *)alg_stag_mom_meson_arg->meson_buf);
     alg_stag_mom_meson_arg->meson_buf = 0;
   }
 }
@@ -511,15 +511,15 @@ void AlgStagNucleon::run()
   //----------------------------------------------------------------
   if(aots.begin()) {
     alg_stag_nucleon_arg->nucleon_buf = 
-		(Float *)smalloc(n1.propLenTotal()*sizeof(Float));
+		(unsigned long)smalloc(n1.propLenTotal()*sizeof(Float));
     if(alg_stag_nucleon_arg->nucleon_buf == 0)
           ERR.Pointer(cname,fname, "alg_stag_nucleon_arg->nucleon_buf");
     VRB.Smalloc(cname,fname, "alg_stag_nucleon_arg->nucleon_buf", 
-		alg_stag_nucleon_arg->nucleon_buf, n1.propLenTotal()*sizeof(Float));
-    zero_buffer(alg_stag_nucleon_arg->nucleon_buf, n1.propLenTotal());
+		(void *)alg_stag_nucleon_arg->nucleon_buf, n1.propLenTotal()*sizeof(Float));
+    zero_buffer((Float *)alg_stag_nucleon_arg->nucleon_buf, n1.propLenTotal());
   }
 
-  n1.download_prop(SNUCLEON, alg_stag_nucleon_arg->nucleon_buf);
+  n1.download_prop(SNUCLEON, (Float *)alg_stag_nucleon_arg->nucleon_buf);
 
   if (aots.last()) {
     char *data_file = common_arg->results ? 
@@ -529,13 +529,13 @@ void AlgStagNucleon::run()
       ERR.FileA(cname,fname, data_file);
     }
    
-    write_to_file(alg_stag_nucleon_arg->nucleon_buf, fp, 
+    write_to_file((Float *)alg_stag_nucleon_arg->nucleon_buf, fp, 
 		  n1.propLenTotal(), aots.numSlices(), 1, SNUCLEON, n1.bcd());
     Fclose(fp);
 
     VRB.Sfree(cname,fname, "alg_stag_nucleon_arg->nucleon_buf", 
-			    alg_stag_nucleon_arg->nucleon_buf);
-    sfree(alg_stag_nucleon_arg->nucleon_buf);
+			    (void *)alg_stag_nucleon_arg->nucleon_buf);
+    sfree((void *)alg_stag_nucleon_arg->nucleon_buf);
     alg_stag_nucleon_arg->nucleon_buf = 0;
   }
 }
@@ -608,18 +608,18 @@ void AlgStagNonLocal::run()
   //----------------------------------------------------------------
   if(aots.begin()) {
     alg_stag_non_local_arg->nlocal_buf = 
-		(Float *)smalloc(nlc.propLenTotal()*sizeof(Float));
+		(unsigned long)smalloc(nlc.propLenTotal()*sizeof(Float));
 
     if(alg_stag_non_local_arg->nlocal_buf == 0)
           ERR.Pointer(cname,fname, "alg_stag_non_local_arg->nlocal_buf");
     VRB.Smalloc(cname,fname, "alg_stag_non_local_arg->nlocal_buf", 
-		alg_stag_non_local_arg->nlocal_buf, 
+		(void *)alg_stag_non_local_arg->nlocal_buf, 
 		nlc.propLenTotal()*sizeof(Float));
 
-    zero_buffer(alg_stag_non_local_arg->nlocal_buf, nlc.propLenTotal());
+    zero_buffer((Float *)alg_stag_non_local_arg->nlocal_buf, nlc.propLenTotal());
   }
 
-  nlc.download_prop(SNONLOCAL, alg_stag_non_local_arg->nlocal_buf);
+  nlc.download_prop(SNONLOCAL, (Float *)alg_stag_non_local_arg->nlocal_buf);
 
   if (aots.last()) {
     char *data_file = common_arg->results ? 
@@ -629,13 +629,13 @@ void AlgStagNonLocal::run()
       ERR.FileA(cname,fname, data_file);
     }
 
-    write_to_file(alg_stag_non_local_arg->nlocal_buf, fp, 
+    write_to_file((Float *)alg_stag_non_local_arg->nlocal_buf, fp, 
 		nlc.propLenTotal(), aots.numSlices(), 1, SNONLOCAL, nlc.bcd());
     Fclose(fp);
 
     VRB.Sfree(cname,fname, "alg_stag_non_local_arg->nlocal_buf", 
-			    alg_stag_non_local_arg->nlocal_buf);
-    sfree(alg_stag_non_local_arg->nlocal_buf);
+			    (void *)alg_stag_non_local_arg->nlocal_buf);
+    sfree((void *)alg_stag_non_local_arg->nlocal_buf);
     alg_stag_non_local_arg->nlocal_buf = 0;
   }
 }
@@ -707,19 +707,19 @@ void AlgNLStagMeson::run()
   //----------------------------------------------------------------
   if(aots.begin()) {
     alg_stag_non_local_arg->nlocal_buf = 
-		(Float *)smalloc(nlsm.propLenTotal()*sizeof(Float));
+		(unsigned long)smalloc(nlsm.propLenTotal()*sizeof(Float));
 
     if(alg_stag_non_local_arg->nlocal_buf == 0)
           ERR.Pointer(cname,fname, "alg_stag_non_local_arg->nlocal_buf");
     VRB.Smalloc(cname,fname, "alg_stag_non_local_arg->nlocal_buf", 
-		alg_stag_non_local_arg->nlocal_buf, 
+		(void *)alg_stag_non_local_arg->nlocal_buf, 
 		nlsm.propLenTotal()*sizeof(Float));
 
-    zero_buffer(alg_stag_non_local_arg->nlocal_buf, nlsm.propLenTotal());
+    zero_buffer((Float *)alg_stag_non_local_arg->nlocal_buf, nlsm.propLenTotal());
   }
 
 //  nlsm.download_prop(SNONLOCAL, alg_stag_non_local_arg->nlocal_buf);
-  nlsm.download_prop(NLSTAG, alg_stag_non_local_arg->nlocal_buf);
+  nlsm.download_prop(NLSTAG, (Float *)alg_stag_non_local_arg->nlocal_buf);
 
   if (aots.last()) {
     char *data_file = common_arg->results ? 
@@ -729,13 +729,13 @@ void AlgNLStagMeson::run()
       ERR.FileA(cname,fname, data_file);
     }
 
-    write_to_file(alg_stag_non_local_arg->nlocal_buf, fp, 
+    write_to_file((Float *)alg_stag_non_local_arg->nlocal_buf, fp, 
 		  nlsm.propLenTotal(), aots.numSlices(), 1, NLSTAG, nlsm.bcd());
     Fclose(fp);
 
     VRB.Sfree(cname,fname, "alg_stag_non_local_arg->nlocal_buf", 
-			    alg_stag_non_local_arg->nlocal_buf);
-    sfree(alg_stag_non_local_arg->nlocal_buf);
+			    (void *)alg_stag_non_local_arg->nlocal_buf);
+    sfree((void *)alg_stag_non_local_arg->nlocal_buf);
     alg_stag_non_local_arg->nlocal_buf = 0;
   }
 }
