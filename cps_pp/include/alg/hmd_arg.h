@@ -99,7 +99,7 @@ public:
 	char *w_spect_directory;
 	char *work_directory;
 	int measure_pbp;
-	int measure_w_spect;
+	int measure_w_spect_interval;
 };
 
 class VML;
