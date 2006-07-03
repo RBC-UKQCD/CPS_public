@@ -228,7 +228,7 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "measure_pbp", &objp->measure_pbp))
 		 return FALSE;
-	 if (!vml_int (vmls, "measure_w_spect", &objp->measure_w_spect))
+	 if (!vml_int (vmls, "measure_w_spect_interval", &objp->measure_w_spect_interval))
 		 return FALSE;
 	 vml_class_end(vmls,"EvoArg",name);
 	return TRUE;

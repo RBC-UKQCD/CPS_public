@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgGheatBath class methods.
   
-  $Id: alg_ghb.C,v 1.13 2005-09-06 20:33:14 chulwoo Exp $
+  $Id: alg_ghb.C,v 1.14 2006-07-03 04:48:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 20:33:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.13 2005-09-06 20:33:14 chulwoo Exp $
-//  $Id: alg_ghb.C,v 1.13 2005-09-06 20:33:14 chulwoo Exp $
+//  $Date: 2006-07-03 04:48:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.14 2006-07-03 04:48:06 chulwoo Exp $
+//  $Id: alg_ghb.C,v 1.14 2006-07-03 04:48:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
 //  $State: Exp $
 //
@@ -162,6 +162,9 @@ void AlgGheatBath::run()
   // Set the Lattice pointer
   //----------------------------------------------------------------
   Lattice& lat = AlgLattice();
+  if (lat.Gclass() != G_CLASS_WILSON){
+    ERR.General(cname,fname," Only correct for Wilson gauge action\n");
+  }
   int i; 
 
   // relocate the heatbath kernal and set up rand seeds
@@ -252,12 +255,15 @@ void AlgGheatBath::run()
 //------------------------------------------------------------------
 void AlgGheatBath::NoCheckerBoardRun()
 {
-  //char *fname = "NoCheckerBoardRun()";
-  //VRB.Func(cname,fname);
+  char *fname = "NoCheckerBoardRun()";
+  VRB.Func(cname,fname);
 
   // Set the Lattice pointer
   //----------------------------------------------------------------
   Lattice& lat = AlgLattice();
+  if (lat.Gclass() != G_CLASS_WILSON){
+    ERR.General(cname,fname," Only correct for Wilson gauge action\n");
+  }
 
   relocate(); 
   LRG.SetInterval(1,-1);
@@ -336,8 +342,8 @@ void AlgGheatBath::NoCheckerBoardRun()
 //------------------------------------------------------------------
 void AlgGheatBath::NodeCheckerBoardRun()
 {
-  //char *fname = "NodeCheckerBoardRun()";
-  //VRB.Func(cname,fname);
+  char *fname = "NodeCheckerBoardRun()";
+  VRB.Func(cname,fname);
 
   // Set the Lattice pointer
   //----------------------------------------------------------------
@@ -526,8 +532,8 @@ AlgGheatBath::UpdateLink(Matrix * pmLink, const Matrix & mStaple){
 
           // Call the heat bath
           {
-//	    metropolis_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
-            cmhb_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
+	    metropolis_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
+//            cmhb_kernel( pfStapleCMHBorder, pfLinkCMHBorder );
           }
           
           // Copy the link back into the lattice, and

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.30 2005-09-06 21:34:49 chulwoo Exp $
+  $Id: gjp.C,v 1.31 2006-07-03 04:48:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 21:34:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.30 2005-09-06 21:34:49 chulwoo Exp $
-//  $Id: gjp.C,v 1.30 2005-09-06 21:34:49 chulwoo Exp $
+//  $Date: 2006-07-03 04:48:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.31 2006-07-03 04:48:06 chulwoo Exp $
+//  $Id: gjp.C,v 1.31 2006-07-03 04:48:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.30 $
+//  $Revision: 1.31 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -168,8 +168,8 @@ nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
   for(i = 0; i<5 ; i++)
   if( nodes[i] == 0 || size[i]%nodes[i] != 0) 
       ERR.General(cname,fname,	
-		  "Illegal machine partition in %s direction; physical grid size = %d must be a multiple of DoArg::x_nodes = %d\n",
-		  dim_name[i], size[i], nodes[i] );
+		  "Illegal machine partition in %s direction; physical grid size = %d must be a multiple of DoArg::%s_nodes = %d\n",
+		  dim_name[i], size[i], dim_name[i], nodes[i] );
   
 
   // Set the number of sites of a single node
