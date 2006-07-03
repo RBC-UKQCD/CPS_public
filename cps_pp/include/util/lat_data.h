@@ -8,31 +8,35 @@
 
 CPS_START_NAMESPACE
 enum { NEW = 0, INITTED};
+enum LatDataAlloc { DEFAULT = 0,
+       FAST = 1};
 class LatData{
   private:
-    char *cname;
+    static char *cname;
     int status;
   protected:
-    static int DEFAULT_FLAG;
+//    static LatDataAlloc DEFAULT_FLAG;
     int size; //number of IFlots per site
     int vol;  //number of sites
-  public:
     IFloat *data; 
+    StrOrdType str_ord;
+    int Check ( const LatData &lat_data);
+  public:
     LatData(const LatData &lat);
-    LatData(){
-//      printf("LatData::LatData()\n");
-      cname = "LatData";
+    LatData();
+#if 0
+    LatData(LatDataAlloc flags, int size, int vol){
       status = NEW;
-    };
-//    LatData(int flags, int size, int vol){
-//      Init(flags,size,vol);
-//    }
-//    LatData(int size, int vol){
-//      Init(DEFAULT_FLAG,size,vol);
-//    }
-    void  Init(int flags, int size, int vol);
+      Init(flags,size,vol);
+    }
+    LatData(int size, int vol){
+      status = NEW;
+      Init(DEFAULT,size,vol);
+    }
+#endif
+    void  Init(LatDataAlloc flags, int size, int vol);
     void  Init(int size, int vol){
-      Init(DEFAULT_FLAG,size,vol);
+      Init(DEFAULT,size,vol);
     }
     LatData &operator=(const LatData &lat);
     ~LatData();
@@ -46,12 +50,14 @@ class LatData{
 
 class LatVector: public LatData{
   private:
+    int n_vec;
     int vec_size;
   public: 
-    LatVector();
-    LatVector(int flag, int n_vec , int vol );
-    LatVector(int n_vec , int vol =0);
-    void Init(int flag, int n_vec , int vol );
+    LatVector(LatDataAlloc flag, int n_vec , int vol )
+      { Init(flag,n_vec,vol); }
+    LatVector(int n_vec=1 , int vol =0)
+      { Init(DEFAULT,n_vec,vol); }
+    void Init(LatDataAlloc flag, int n_vec , int vol );
     ~LatVector();
     Vector *Vec(int pos=0, int vec_row=0);
     Float *Field(int pos=0, int vec_row=0,int n=0); 
@@ -62,17 +68,33 @@ class LatVector: public LatData{
     }
 };
 
-class LatMatrix: public LatData{
+class LatMatrix: virtual public LatData{
   private:
+    static char *cname;
+    int n_mat;
     int mat_size;
+    int Check ( const LatMatrix &lat_data);
   public: 
-    LatMatrix(int flag, int n_vec , int vol );
-    LatMatrix(int n_vec = 1, int vol = 0){
-      LatMatrix(DEFAULT_FLAG,n_vec,vol);
+    LatMatrix();
+    LatMatrix(const LatMatrix &lat);
+    LatMatrix(LatDataAlloc flag, int n_vec = 1 , int vol = 0 ){
+      printf("LatMatrix::LatMatrix(f,i,i)\n");
+      Init(flag,n_vec,vol);
+    }
+    LatMatrix(int n_vec, int vol = 0){
+      printf("LatMatrix::LatMatrix(i,i)\n");
+      Init(DEFAULT,n_vec,vol);
     }
     ~LatMatrix();
+    void Init(LatDataAlloc flag, int n_vec , int vol );
     Matrix *Mat(int pos=0, int mat_row=0); 
     Float *Field(int pos=0, int mat_row=0, int n=0) ; 
+    LatMatrix &operator=(const LatMatrix &lat);
+    void operator= (IFloat c); 
+    void operator+= (LatMatrix & lat_mat); 
+    void MulDag (LatMatrix &c);
+    void TrLessAntiHermMatrix();
+    Float norm();
 };
 CPS_END_NAMESPACE
 #endif

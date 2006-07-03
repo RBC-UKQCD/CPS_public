@@ -1,25 +1,33 @@
 #include <config.h>
 #include <util/lat_data.h>
+#include <util/smalloc.h>
 #include <util/vector.h>
 #include <util/verbose.h>
 #include <util/error.h>
 #include <qalloc.h>
 
 CPS_START_NAMESPACE
-int LatData::DEFAULT_FLAG = QCOMMS;
-void LatData::Init(int flags, int len, int volume){
-//	printf("%s:Init(flags=%d len=%d volume=%d\n",cname,flags,len,volume);
+//int LatData::DEFAULT_FLAG = QCOMMS;
+void LatData::Init(LatDataAlloc flags, int len, int volume){
 	if (status == INITTED)
-		ERR.General(cname,"Init()","not allowed to initialize twice\n");
+        ERR.General(cname,"Init()","not allowed to initialize twice\n");
 	size = len;
 	vol = volume;
-	data = (IFloat *)qalloc(flags, sizeof(IFloat)*size*vol);
+	switch (flags){
+		case DEFAULT:
+			data = (IFloat *)smalloc(sizeof(IFloat)*size*vol);
+			break;
+		case FAST:
+			data = (IFloat *)fmalloc(sizeof(IFloat)*size*vol);
+			break;
+		default:
+			ERR.General("LatData","Init()","invalid allocation flag");
+	}
 	if (data == NULL)
-	data = (IFloat *)qalloc(DEFAULT_FLAG, sizeof(IFloat)*size*vol);
-	if (data == NULL)
-		ERR.General("LatData","Init()","out of memory");
-	VRB.Flow(cname,"Init()","flags=%x vol=%d data=%p\n",flags,vol,data);
-        status = INITTED;
+	ERR.General("LatData","Init()","out of memory");
+        VRB.Flow(cname,"Init()","this=%p flags=%x vol=%d data=%p\n",this,flags,vol,data);
+
+    status = INITTED;
 }
 
 #if 0

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.23 2006-02-21 21:14:06 chulwoo Exp $
+  $Id: gjp.h,v 1.24 2006-07-03 05:29:45 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 21:14:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.23 2006-02-21 21:14:06 chulwoo Exp $
-//  $Id: gjp.h,v 1.23 2006-02-21 21:14:06 chulwoo Exp $
+//  $Date: 2006-07-03 05:29:45 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.24 2006-07-03 05:29:45 chulwoo Exp $
+//  $Id: gjp.h,v 1.24 2006-07-03 05:29:45 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -116,6 +116,8 @@ public:
   /*!\defgroup gjp_get_methods Methods that return the value of a global variable
     @{ */
 
+  int Sites(int dir) const { return node_sites[dir]*nodes[dir]; }
+   
   int NodeSites(int dir) const { return node_sites[dir]; }
   //!< Gets the dimension of the local lattice in a given direction.
   /*!<

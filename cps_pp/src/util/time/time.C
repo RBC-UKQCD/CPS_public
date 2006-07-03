@@ -1,7 +1,7 @@
 /*!\file
   \brief Implementation of functions for timing and performance measurement.
 
-  $Id: time.C,v 1.7 2006-04-13 19:43:19 chulwoo Exp $
+  $Id: time.C,v 1.8 2006-07-03 05:29:46 chulwoo Exp $
 */
 
 #include <config.h>
@@ -60,7 +60,7 @@ Float print_flops(char *cname, char *fname, unsigned long long nflops, struct ti
   \param time The elapsed time in seconds.
   \return The FLOPS rate.
 */
-Float print_time(char *cname, char *fname, Float time){
+Float print_time(const char *cname, const char *fname, Float time){
 	printf("%s::%s: %e seconds\n",cname,fname,time);
 	return time;
 }
