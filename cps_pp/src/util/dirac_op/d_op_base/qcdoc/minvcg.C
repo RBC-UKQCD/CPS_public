@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpBase class multishift CG solver method.
 
-  $Id: minvcg.C,v 1.21 2006-03-21 20:36:01 chulwoo Exp $
+  $Id: minvcg.C,v 1.22 2006-07-05 17:55:52 chulwoo Exp $
 */
 
 CPS_END_NAMESPACE
@@ -100,12 +100,10 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   for (s=0; s<Nmass; s++) {
     p[s] = (Vector*)fmalloc(f_size * sizeof(Float),
 			    cname,fname, "p[s]");
-    if (p[s] == 0) ERR.Pointer(cname,fname,"p[s]");
 
     if (type == MULTI || s==0) {
       psi[s] = (Vector*)fmalloc(f_size * sizeof(Float),
 				cname,fname, "psi[s]");
-      if (psi[s] == 0) ERR.Pointer(cname,fname,"psi[s]");
       if (type == MULTI) bzero((char *)psi[s],sizeof(Float)*f_size);
       else psi[s] -> CopyVec(psi_slow[s],f_size);
     }
@@ -134,6 +132,43 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   
   Float *at = (Float*)smalloc(Nmass*sizeof(Float),  cname,fname, "at");
 
+  // code for reproducing CG
+  Vector *sol_store;
+  int test_num = 0;
+  unsigned int *d_store;
+  int test_freq = GJP.CGreprodFreq();
+
+  if (test_freq && (CGcount % test_freq == 0) ) {
+    test_num = 1;
+  VRB.Result(cname,fname,"reproducibility testing interval reachaed\n");
+// Allocate space for storing solution
+//------------------------------------------------------------------
+    sol_store = (Vector *) smalloc(cname,fname,"sol_store", f_size* sizeof(Float));
+
+    sol_store->CopyVec(chi, f_size);
+
+
+// Allocate space for storing d
+//------------------------------------------------------------------
+    d_store = (unsigned int *) smalloc(cname,fname, "d_store", (dirac_arg->max_num_iter-1) * sizeof(unsigned int));
+  
+    for ( int n = 0; n < dirac_arg->max_num_iter-1; n++ )  d_store[n] = 0;
+
+  }   // --- end code for setting up the reproducing CG
+
+
+  unsigned long x_loc_csum ; 
+#ifdef PROFILE
+  struct timeval start;
+  struct timeval end;
+#endif
+
+  for ( int test = 0; test < test_num+1; test++ ) {
+    if( test_num != 0 ) 
+      {
+	VRB.Result(cname,fname,"Repro CG test number = %d\n",test);
+      }
+    if (test == 1) chi-> CopyVec(sol_store, f_size);
 
   Float b_tmp;
 
@@ -167,7 +202,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   } else {
     MatPcDagMatPc(Ap,p[0],&d);
   }
-  unsigned long x_loc_csum = local_checksum((Float *)Ap,f_size);
+  x_loc_csum = local_checksum((Float *)Ap,f_size);
 
   DiracOpGlbSum(&d);
   Ap_tmp = (IFloat *)Ap;
@@ -211,8 +246,6 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   convP = (c < rsd_sq[0]) ? 1 : 0;
 
 #ifdef PROFILE
-  struct timeval start;
-  struct timeval end;
   CGflops = 0;
   gettimeofday(&start,NULL);
 #endif
@@ -249,6 +282,25 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     }
 //    x_loc_csum = x_loc_csum ^ local_checksum((Float *)Ap,f_size);
     DiracOpGlbSum(&d);
+
+
+    if (test_num != 0 ) {
+      unsigned int mmp_checksum = local_checksum((Float *)Ap,f_size);
+      //    VRB.Result(cname,fname,"DEBUG iter %d checksum = %p\n",k,mmp_checksum);
+      // fprintf(stderr, "NODE (%d %d %d %d %d)FAILS checksum[%d] %p\n",
+      //        GJP.XnodeCoor(),GJP.YnodeCoor(),GJP.ZnodeCoor(),GJP.TnodeCoor(),GJP.SnodeCoor(),k,mmp_checksum );
+
+      /* Check reproducibility */
+      if ( test == 0) d_store[ k ] = mmp_checksum;
+      else if ( mmp_checksum != d_store[ k ] ){
+        fprintf(stderr, "NODE (%d %d %d %d %d)FAILS TO REPRODUCE\n",
+        GJP.XnodeCoor(),GJP.YnodeCoor(),GJP.ZnodeCoor(),GJP.TnodeCoor(),GJP.SnodeCoor());
+        fprintf(stderr,"mmp =%p mmp_store = %p\n",mmp_checksum,d_store[k]);
+// Temporary hack to exit immediately
+        Float *null_p = NULL; *null_p = 0.;
+        InterruptExit(-1, "NODE FAILS TO REPRODUCE");
+      }
+    } // end of repro CG test
     
     bp = b;
     b = -cp/(d*at[0]*at[0]);
@@ -306,6 +358,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     if (convP) for (s=0; s<Nmass; s++) if (!convsP[s]) convP = 0;
   }
 
+  } // end of the loop over the repro test
+
 #ifdef PROFILE
   gettimeofday(&end,NULL);
   print_flops(cname,fname,CGflops,&start,&end); 
@@ -337,8 +391,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
     if (type == MULTI || s==0) {
       // Copy solution vectors from fast memory to DDR
       psi_slow[s] -> CopyVec(psi[s],f_size);
-      VRB.Sfree(cname,fname,"psi[s]",psi[s]);
-      ffree(psi[s]);
+      ffree(cname,fname,"psi[s]",psi[s]);
       loc_csum = loc_csum ^ local_checksum((Float *)psi_slow[s],f_size);
     }
     ffree(cname,fname,"p[s]",p[s]);
@@ -353,22 +406,15 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   ffree(cname,fname,"Ap",Ap);
   ffree(cname,fname,"r",r);
   sfree(cname,fname,"bs",bs);
-  VRB.Sfree(cname,fname,"z[1]",z[1]);
-  sfree(*(z+1));
-  VRB.Sfree(cname,fname,"z[0]",z[0]);
-  sfree(*z);
-  VRB.Sfree(cname,fname,"z",z);
-//  sfree(z);
-  sfree(converged);
-  VRB.Sfree(cname,fname,"convsP",convsP);
-  sfree(convsP);
-  VRB.Sfree(cname,fname,"rsdcg_sq",rsdcg_sq);
-  sfree(rsdcg_sq);
-  VRB.Sfree(cname,fname,"rsd_sq",rsd_sq);
-  sfree(rsd_sq);
-  VRB.Sfree(cname,fname,"at",at);
-  sfree(at);
+  sfree(cname,fname,"z[1]",z[1]);
+  sfree(cname,fname,"z[0]",z[0]);
+  sfree(cname,fname,"converged",converged);
+  sfree(cname,fname,"convsP",convsP);
+  sfree(cname,fname,"rsdcg_sq",rsdcg_sq);
+  sfree(cname,fname,"rsd_sq",rsd_sq);
+  sfree(cname,fname,"at",at);
   
+  CGcount++;
   return k;
 }
 
