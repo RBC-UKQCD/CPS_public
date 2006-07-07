@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.17 2006-04-13 19:05:34 chulwoo Exp $
+  $Id: vector.h,v 1.18 2006-07-07 20:54:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 19:05:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.17 2006-04-13 19:05:34 chulwoo Exp $
-//  $Id: vector.h,v 1.17 2006-04-13 19:05:34 chulwoo Exp $
+//  $Date: 2006-07-07 20:54:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.18 2006-07-07 20:54:52 chulwoo Exp $
+//  $Id: vector.h,v 1.18 2006-07-07 20:54:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -652,7 +652,7 @@ extern "C" {
   void xaxpy_norm (Float *scalep, Float *InOutScale, Float *Add, int len, Float *res);
   
   void vaxpy3(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec);
-  inline void vaxpy3_m(Matrix *res,Float *scale,Matrix *mult,Matrix *add, int ncvec){
+  inline void vaxpy3_m(Matrix *res,Float *scale,Matrix *mult,const Matrix *add, int ncvec){
     vaxpy3((Vector *)res, scale, (Vector *)mult,(Vector *)add,ncvec);
   }
 
