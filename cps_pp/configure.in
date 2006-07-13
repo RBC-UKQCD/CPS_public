@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2006-05-22 21:09:34 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.39 2006-05-22 21:09:34 chulwoo Exp $
-dnl  $Id: configure.in,v 1.39 2006-05-22 21:09:34 chulwoo Exp $
+dnl  $Date: 2006-07-13 20:17:39 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.40 2006-07-13 20:17:39 chulwoo Exp $
+dnl  $Id: configure.in,v 1.40 2006-07-13 20:17:39 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.39 $
+dnl  $Revision: 1.40 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -177,9 +177,14 @@ else
    if test "X${QIO_DIR}X" = "XX"; then
      echo "QIO_DIR environment variable not set"
      exit 1
+   elif test "X${QMP_DIR}X" = "XX"; then
+     echo "QMP_DIR environment variable not set"
+     exit 1
    else
-     LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib"
-     INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${QIO_DIR}/include"
+     QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
+     QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
+     LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib ${QMP_LDFLAGS} -lqio -llime -lqmp"
+     INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_CFLAGS} -I${QIO_DIR}/include"
      DFLAGS="${DFLAGS} -DUSE_QIO"
    fi
 fi

@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.29 2005-06-16 07:11:28 chulwoo Exp $
+# $Id: Makefile.in,v 1.30 2006-07-13 20:17:39 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -64,7 +64,7 @@ copy_testdir: $(TESTSUBDIRS) $(HDW_TESTSUBDIRS)
 
 $(TESTSUBDIRS):
 	$(if $(builddir_isnt_srcdir), mkdir -p $(TESTDIR)/$@)
-	-cp -p $(SRCDIR)/$(TESTDIR)/$@/Makefile_regression  $(TESTDIR)/$@
+	-cp -p $(SRCDIR)/$(TESTDIR)/$@/Makefile*  $(TESTDIR)/$@
 	-cp -p $(SRCDIR)/$(TESTDIR)/$@/*.in  $(TESTDIR)/$@
 
 $(HDW_TESTSUBDIRS):

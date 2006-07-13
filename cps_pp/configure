@@ -4065,9 +4065,14 @@ else
    if test "X${QIO_DIR}X" = "XX"; then
      echo "QIO_DIR environment variable not set"
      exit 1
+   elif test "X${QMP_DIR}X" = "XX"; then
+     echo "QMP_DIR environment variable not set"
+     exit 1
    else
-     LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib"
-     INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${QIO_DIR}/include"
+     QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
+     QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
+     LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib ${QMP_LDFLAGS} -lqio -llime -lqmp"
+     INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_CFLAGS} -I${QIO_DIR}/include"
      DFLAGS="${DFLAGS} -DUSE_QIO"
    fi
 fi

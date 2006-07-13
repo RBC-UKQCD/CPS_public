@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.22 2006-02-22 14:31:24 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.23 2006-07-13 20:17:39 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -116,8 +116,8 @@ XLCOBJS := $(notdir $(XLCOBJS_SRC))
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.o:%.C
+#	$(CXX) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR2)/$*.i
 	${CXX} -c $< -o $(BUILDDIR2)/$@ ${libcps_CXXFLAGS}
-	$(CXX) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR2)/$*.i
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 %.xlo:%.c
