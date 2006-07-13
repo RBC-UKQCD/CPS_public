@@ -1,0 +1,27 @@
+
+Simple test-code for qio-ReadWrite Lattices.
+
+Produces a random gauge, writes it to disk(s), re-reads it and compares plaquette and link-trace.
+
+Using the provided do_arg.vml on a motherboard should work with:
+
+
+qpartition_remap -T05 -X14 -Y2 -Z3
+
+qrun x.x  DIR do_arg.vml lat_stand.in lat_stand.out qio_file.in qio_file.out 17
+
+The general syntax is:
+
+x.x DIR DO_ARG STANDARD_IN STANDARD_OUT QIO_IN QIO_OUT RANDOM
+
+where:
+
+DIR: directory, where the code is executed
+
+STANDARD_[IN,OUT]: filenames, if standard lattices are read/written 
+   (defines-switches in main.C)
+
+QIO_[IN,OUT]: filenames, if qio-lattices are read/written
+  (defines-switches in main.C) 
+ 
+RANDOM: number of random-gauge-configuration used for test 

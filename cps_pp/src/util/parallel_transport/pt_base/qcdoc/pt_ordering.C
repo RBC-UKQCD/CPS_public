@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_ordering.C,v 1.1 2006-07-05 18:13:49 chulwoo Exp $
+  $Id: pt_ordering.C,v 1.2 2006-07-13 20:14:44 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-07-05 18:13:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_ordering.C,v 1.1 2006-07-05 18:13:49 chulwoo Exp $
-//  $Id: pt_ordering.C,v 1.1 2006-07-05 18:13:49 chulwoo Exp $
+//  $Date: 2006-07-13 20:14:44 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_ordering.C,v 1.2 2006-07-13 20:14:44 chulwoo Exp $
+//  $Id: pt_ordering.C,v 1.2 2006-07-13 20:14:44 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_ordering.C,v $
-//  $Revision: 1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_ordering.C,v $
 //  $State: Exp $
 //
@@ -260,5 +260,153 @@ int PT:: lex_g_xyzt_cb_o(int *x, int mu){
 int PT:: lex_g_xyzt_cb_e(int *x, int mu){
   int temp =  lex_xyzt_cb_e(x);
   return (mu*vol+temp);
+}
+
+// Calculate the required offset given the direction and hop
+int PT::set_offset(int dir, int hop) {
+
+  // if positive direction then start at 0
+  if (dir%2 == 0) return 0;
+
+  int temp=1;
+  int offset=0;
+  for(int i=0;i<dir/2+1;i++){
+    offset = temp*(size[i]-hop);
+    temp *= size[i];
+  }
+  return offset;
+
+}
+
+void PT::set_hop_pointer() {
+
+  char *fname = "set_hop_pointer()";
+
+//  VRB.Func("PT",fname);
+  //Actual memory usage of vectors
+  int vlen = VECT_LEN*sizeof(IFloat);
+  int vlen2 =VECT_LEN2*sizeof(IFloat);
+
+  int x[NDIM], nei[NDIM];
+  
+  //Counts how many parallel transports of given length and direction are local
+  //and non-local, respectively
+  int hp_local_count[MAX_HOP][2*NDIM];
+  int hp_non_local_count[MAX_HOP][2*NDIM];
+  int hop, i;
+
+
+  //Initialize local and non-local hop counters.
+  for (hop=0; hop<MAX_HOP; hop++) {
+    for (i=0; i<2*NDIM; i++) {
+      hp_non_local_count[hop][i] = 0;
+      hp_local_count[hop][i] = 0;
+    }
+  }
+  
+  //For a given length of the parallel transport
+  for (hop = 1; hop <= MAX_HOP; hop++) {
+    hop_pointer **h_l = hp_l[hop-1];
+    hop_pointer **h_nl = hp_nl[hop-1];
+
+    //Local and non-local counts for given length of the hop
+    int *local_count = hp_local_count[hop-1];
+    int *non_local_count = hp_non_local_count[hop-1];
+
+    //Loop over all directions
+    for (i=0; i<NDIM; i++) {
+
+      //Total number of sites that require non-local communication
+      int non_local_check = hop*non_local_chi[i*2];
+      //Total number of sites where parallel transport can be done locally
+      int local_check = vol - non_local_check;
+
+      //Loop through all the sites on the lattice
+      //nei represents the coordinates of the neighboring site.
+      for(x[3]=0,nei[3]=0;x[3]<size[3];x[3]++,nei[3]++)
+	for(x[2]=0,nei[2]=0;x[2]<size[2];x[2]++,nei[2]++)
+	  for(x[1]=0,nei[1]=0;x[1]<size[1];x[1]++,nei[1]++)
+	    for(x[0]=0,nei[0]=0;x[0]<size[0];x[0]++,nei[0]++){
+
+	      //This is the parallel transport of the field in the 
+	      //negative direction to another node
+	      //"Positive hop" because the link variable points in the 
+	      //positive direction, even though the resulting field is 
+	      //"transported" in the negative direction
+	      // positive direction
+
+	      if((x[i] < hop) && (!local[i])){
+		//This calculates the neighbor coordinate
+		nei[i] = size[i]-hop+x[i];  
+
+		//Sets the index for source and destination
+		(h_nl[2*i]+non_local_count[2*i])->src = non_local_count[2*i]*vlen;
+		(h_nl[2*i]+non_local_count[2*i])->dest = LexVector(nei)*vlen2;
+
+		//Increments the non-local count
+		non_local_count[i*2]++;
+
+		//Make sure we haven't gone over the non non-local check
+		if (non_local_count[i*2]>non_local_check)
+		  fprintf(stderr,
+			"%s:non_local_count[%d](%d)>non_local_check[%d](%d)\n",
+			 fname,2*i,non_local_count[2*i],2*i,non_local_check);
+		//The rest of the parallel transports in the local volume can 
+		//be handled locally
+	      } else {
+		//Calculate the new coordinate
+		nei[i] = (size[i]+x[i]-hop)%size[i];
+
+		//if ( size[i] >2){
+		//Calculate the index for the source and the destination
+		(h_l[2*i]+local_count[2*i])->src = LexVector(x)*vlen;
+		(h_l[2*i]+local_count[2*i])->dest = LexVector(nei)*vlen2;
+                //}
+		
+		//Increment the local count
+		local_count[i*2]++;
+		//Make sure we haven't exceeded the number of local sites
+		if (local_count[i*2]>local_check)
+		  fprintf(stderr,"%s:local_count[%d](%d)>local_check[%d](%d)\n",
+			      fname,2*i,local_count[2*i],2*i,local_check);
+	      }
+	      
+	      //Consider hopping in the negative direction, which is parallel 
+	      //transport in the positive direction
+	      // negative direction
+	      if( (x[i] >= (size[i]-hop)) && (!local[i])){
+		//Calculate the non-local coordinate for this hop
+		nei[i] = (x[i]+hop)%size[i];
+		//Calculate source and destination indices
+		(h_nl[2*i+1]+non_local_count[2*i+1])->src = non_local_count[2*i+1]*vlen;
+		(h_nl[2*i+1]+non_local_count[2*i+1])->dest = LexVector(nei)*vlen2;
+
+		//Increment the non-local count, check that bounds have not 
+		//been exceeded
+		non_local_count[i*2+1]++;
+		if (non_local_count[i*2]>non_local_check)
+		  fprintf(stderr,"%s:non_local_count[%d](%d)>non_local_check[%d](%d)\n",
+			      fname,2*i,non_local_count[2*i],2*i,non_local_check);
+	      } else {
+		//Calculate the local coordinate for this hop
+		nei[i] = (x[i]+hop)%size[i];
+		//Calculate source and destination indices
+		//if ( size[i] >2){
+		(h_l[2*i+1]+local_count[2*i+1])->src = LexVector(x)*vlen;
+		(h_l[2*i+1]+local_count[2*i+1])->dest = LexVector(nei)*vlen2;
+		//}
+		//Increment local count, check that bounds not exceeded
+		local_count[i*2+1]++;
+		if (local_count[i*2]>local_check)
+		  fprintf(stderr,"%s:local_count[%d](%d)>local_check[%d](%d)\n",
+			      fname,2*i,local_count[2*i],2*i,local_check);
+	      }
+	      // Need to reset the neighbour pointer
+	      nei[i] = x[i];
+	    }
+    }
+  }
+//  VRB.Func("PT",fname);
+//  exit(44);
 }
 //CPS_END_NAMESPACE
