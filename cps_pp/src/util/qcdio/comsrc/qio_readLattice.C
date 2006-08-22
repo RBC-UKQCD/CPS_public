@@ -1,3 +1,4 @@
+#ifdef USE_QIO
 #include <util/qio_readLattice.h>
 
 CPS_START_NAMESPACE
@@ -417,9 +418,5 @@ void qio_readLattice::read(char *infile, Lattice &lat)
 
 }
 
-
-
-
-
-
 CPS_END_NAMESPACE
+#endif

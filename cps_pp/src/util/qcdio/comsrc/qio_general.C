@@ -1,3 +1,5 @@
+#ifdef USE_QIO
+#include <config.h>
 #include <util/qio_general.h>
 
 CPS_START_NAMESPACE
@@ -193,3 +195,4 @@ void qio_init::qio_setLayout()
 
  
 CPS_END_NAMESPACE
+#endif

@@ -1,3 +1,5 @@
+#ifdef USE_QIO
+#include <config.h>
 #include <util/qio_writeLattice.h>
 
 CPS_START_NAMESPACE
@@ -9,9 +11,9 @@ using namespace std;
 void qio_getField(char *buf, size_t index, int count, void *arg)
 {
 
-  #ifdef DEBUG_GetField
+#ifdef DEBUG_GetField
   printf("UID: %i, called qio_getField with index: %i, count: %i\n",UniqueID(), index, count);
-  #endif // DEBUG_GetField
+#endif // DEBUG_GetField
 
   Matrix *lat = (Matrix *)arg;
 
@@ -30,9 +32,9 @@ void qio_getField(char *buf, size_t index, int count, void *arg)
   *mat2 = *src_mat2;
   *mat3 = *src_mat3;
 
-  #ifdef DEBUG_GetField
+#ifdef DEBUG_GetField
   printf("UID: %i, finished qio_getField (called with index: %i, count: %i)\n",UniqueID(), index, count);
-  #endif // DEBUG_GetField
+#endif // DEBUG_GetField
 
 }
 
@@ -41,9 +43,9 @@ void qio_getFieldSingle(char *buf, size_t index, int count, void *arg)
 {
 
 
-  #ifdef DEBUG_GetField
+#ifdef DEBUG_GetField
   printf("UID: %i, called qio_getFieldSingle with index: %i, count: %i\n",UniqueID(), index, count);
-  #endif // DEBUG_GetField
+#endif // DEBUG_GetField
 
   float *mat = (float *) buf;
 
@@ -55,9 +57,9 @@ void qio_getFieldSingle(char *buf, size_t index, int count, void *arg)
     *(mat + ii) = *(src_mat +ii);
   
 
-  #ifdef DEBUG_GetField
+#ifdef DEBUG_GetField
   printf("UID: %i, finished qio_getFieldSingle (called with index: %i, count: %i)\n",UniqueID(), index, count);
-  #endif // DEBUG_GetField
+#endif // DEBUG_GetField
 
 }
 
@@ -161,9 +163,9 @@ void qio_writeLattice::write(char *outfile, Lattice &lat, FP_FORMAT floatFormat)
   int return_val(0), return_val_globDat(0);
 
 
-  #ifdef DEBUG_GlobalWrite
+#ifdef DEBUG_GlobalWrite
   printf(" initializing global-data\n");
-  #endif
+#endif
 
   const int globCount(2);  // number of global-data Floats
 
@@ -186,9 +188,9 @@ void qio_writeLattice::write(char *outfile, Lattice &lat, FP_FORMAT floatFormat)
 
   globdat[1] = ltrace / (4*3*GJP.VolSites());
 
-  #ifdef DEBUG_GlobalWrite
+#ifdef DEBUG_GlobalWrite
   printf("UID: %i: loaded %f %f to GlobalData\n",UniqueID(),globdat[0], globdat[1]);
-  #endif // DEBUG_GlobalWrite
+#endif // DEBUG_GlobalWrite
 
 
 
@@ -273,12 +275,12 @@ void qio_writeLattice::write(char *outfile, Lattice &lat, FP_FORMAT floatFormat)
     ERR.General(cname,fname,"ERROR QIO: QIO_write returned %i %i (global, field)\n",return_val_globDat, return_val);
 
 
-  #ifdef PRINT_checksums
+#ifdef PRINT_checksums
   uint32_t writeCheckA(QIO_get_writer_last_checksuma( output));
   uint32_t writeCheckB(QIO_get_writer_last_checksumb( output));
  
   printf("Checksums: a: %s -- b: %s \n",writeCheckA, writeCheckB);
-  #endif //PRINT_checksums
+#endif //PRINT_checksums
 
   // clean-up
 
@@ -296,9 +298,5 @@ void qio_writeLattice::write(char *outfile, Lattice &lat, FP_FORMAT floatFormat)
   VRB.FuncEnd(cname,fname);
 
 }
-
-
-
-
-
 CPS_END_NAMESPACE
+#endif
