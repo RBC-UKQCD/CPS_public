@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.12 2005-07-05 02:47:39 chulwoo Exp $
+  $Id: random_asm.C,v 1.13 2006-08-22 21:40:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-07-05 02:47:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.12 2005-07-05 02:47:39 chulwoo Exp $
-//  $Id: random_asm.C,v 1.12 2005-07-05 02:47:39 chulwoo Exp $
+//  $Date: 2006-08-22 21:40:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.13 2006-08-22 21:40:09 chulwoo Exp $
+//  $Id: random_asm.C,v 1.13 2006-08-22 21:40:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -82,7 +82,7 @@ IFloat GaussianRandomGenerator::Rand(int noexit)
 	} while((num_try<10000) &&(rsq >= 1.0 || rsq == 0) );
         if (num_try >9999) {
 	  if(noexit){
-	      fprintf(stderr,"%s::%s: failed after 10000 tries (corrupted RNG?), returning ridiculous numbers (1e+10)\n");
+	      fprintf(stderr,"%s::%s: failed after 10000 tries (corrupted RNG?), returning ridiculous numbers (1e+10)\n",cname,fname);
              gset=1e+10; iset=1;
              return 1e+10;
           }
