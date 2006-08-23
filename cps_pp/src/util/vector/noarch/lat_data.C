@@ -6,9 +6,9 @@
 #include <util/smalloc.h>
 
 CPS_START_NAMESPACE
-int LatData::DEFAULT_FLAG = 0;
+//int LatData::DEFAULT_FLAG = 0;
 
-void LatData::Init(int flags, int len, int volume){
+void LatData::Init(LatDataAlloc flags, int len, int volume){
 //	printf("LatData::Init(%p)\n",this);
 	if (status != NEW)
 	ERR.General(cname,"Init()","not allowed to initialize twice\n");
