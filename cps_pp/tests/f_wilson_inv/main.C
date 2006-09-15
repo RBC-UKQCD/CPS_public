@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.11 2004-09-21 20:16:53 chulwoo Exp $
+  $Id: main.C,v 1.12 2006-09-15 06:20:16 chulwoo Exp $
 */
 
 #include<config.h>
@@ -137,7 +137,8 @@ int main(int argc,char *argv[]){
     int s[4];
     Vector *X_in =
 	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-	bzero(X_in,GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+//	bzero(X_in,GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+	memset(X_in,0,GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
     if(!X_in) ERR.Pointer("","","X_in");
 #if 1
 	lat.RandGaussVector(X_in,1.0);
@@ -181,7 +182,7 @@ int main(int argc,char *argv[]){
 			out = result;
 		else
 			out = X_out;
-		bzero((char *)out, GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+		memset((char *)out, 0,GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
 		lat.Fconvert(out,WILSON,CANONICAL);
 		lat.Fconvert(X_in,WILSON,CANONICAL);
 		int offset = GJP.VolNodeSites()*lat.FsiteSize()/ (2*6);
@@ -202,7 +203,7 @@ int main(int argc,char *argv[]){
 #endif
 
 		if (k == 0){
-			bzero((char *)X_out2, GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+			memset((char *)X_out2, 0,GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
 			dirac.Dslash(X_out2,out+offset,CHKB_EVEN,DAG_NO);
 			dirac.Dslash(X_out2+offset,out,CHKB_ODD,DAG_NO);
 			lat.Fconvert(X_out2,CANONICAL,WILSON);

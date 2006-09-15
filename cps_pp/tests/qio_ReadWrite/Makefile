@@ -1,3 +1,3 @@
 
-include ../../Makefile.users
+include ../Makefile_common
 
