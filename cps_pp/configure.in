@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2006-07-13 20:17:39 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.40 2006-07-13 20:17:39 chulwoo Exp $
-dnl  $Id: configure.in,v 1.40 2006-07-13 20:17:39 chulwoo Exp $
+dnl  $Date: 2006-09-15 06:23:54 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.41 2006-09-15 06:23:54 chulwoo Exp $
+dnl  $Id: configure.in,v 1.41 2006-09-15 06:23:54 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.40 $
+dnl  $Revision: 1.41 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -97,7 +97,7 @@ if test "$enable_target" = "qcdoc"; then
 
    ARCH="QCDOC"
    ARCHDIR="QCDOC_DIR"
-   DFLAGS=""
+dnl   DFLAGS=""
    TESTING_PARALLEL="yes";
    namespace_default="no" 
 
@@ -109,14 +109,14 @@ elif test "$enable_target" = "mpi"; then
      AC_MSG_WARN([Using g++])
      AC_SEARCH_LIBS(MPI_Init, mpi mpich, ,echo "CPS needs the MPI library for a parallel build - bailing out."; exit 1)
    fi
-   DFLAGS=""
+dnl   DFLAGS=""
    TESTING_PARALLEL="yes";
    ARCH=cpsMPI
    ARCHDIR="MPI_DIR"
 
 else
 
-   DFLAGS=""
+dnl   DFLAGS=""
    ARCH=NOARCH
    ARCHDIR="NOARCH_DIR"
    TESTING_PARALLEL="no";
@@ -156,9 +156,7 @@ AC_ARG_ENABLE(gmp,
 	,[enable_gmp="no"])
 AC_MSG_CHECKING([if including gmp])
 AC_MSG_RESULT($enable_gmp)
-if test "$enable_gmp" = "no"; then
-   DFLAGS=""
-else
+if test "$enable_gmp" != "no"; then
    LDFLAGS="${LDFLAGS} -L${enable_gmp}/lib -lmpfr -lgmp"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_gmp}/include"
    DFLAGS="${DFLAGS} -DGMP"
@@ -171,9 +169,7 @@ AC_ARG_ENABLE(qio,
 	,[enable_qio="no"])
 AC_MSG_CHECKING([if including QIO])
 AC_MSG_RESULT($enable_qio)
-if test "$enable_qio" = "no"; then
-   DFLAGS=""
-else
+if test "$enable_qio" = "yes"; then
    if test "X${QIO_DIR}X" = "XX"; then
      echo "QIO_DIR environment variable not set"
      exit 1
