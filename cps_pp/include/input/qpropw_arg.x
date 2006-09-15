@@ -1,0 +1,103 @@
+/*  The structure type QPropWArg holds the parameters specific to
+    QPropW class   */
+
+
+enum SourceType {
+  POINT      = 0 ,  
+  VOLUME     = 1 , 
+  WALL       = 2 ,
+  BOX        = 3 ,
+  RANDVOLUME = 4 , 
+  RANDWALL   = 5 , 
+  RANDSLAB   = 6 , 
+  MESSEQ     = 7 , 
+  PROT_U_SEQ = 8 , 
+  PROT_D_SEQ = 9 ,
+  UNDEF      = 10,
+  DERIV      = 11,
+  GAUSS_GAUGE_INV = 12,
+  EXP             = 13,  // for exponential smearing
+  SUM_MOM         = 14,
+  FL_FUNC         = 15,
+  MOM         = 16};
+
+enum RandomType {
+  GAUSS  = 0, 
+  UONE   = 1, 
+  ZTWO   = 2, 
+  NORAND = 3 } ;
+
+class QPropWArg {
+
+  //! CG arguments for quark propagator inversion
+  CgArg cg;		
+
+  //! filename from which propagator may be loaded
+  string file<>;
+
+  //! source location
+  int x;
+  int y;
+  int z;
+  int t;
+
+
+  //! Gauge Fixing flags
+  int gauge_fix_src;
+  int gauge_fix_snk;
+
+  //! should midpoint propagator be stored?
+  int store_midprop;
+  //! should propagator be saved to disk?
+  int save_prop;
+
+  //!  should (1+gamma_t)/2 projected sources be used? (good far baryons)
+  int do_half_fermion;
+
+  memfun QPropWArg();
+};
+
+class QPropWGFArg {
+  //! Gauge Fixing flags
+  int gauge_fix_src;
+};
+
+class QPropWPointArg {
+  int x;
+  int y;
+  int z;
+  memfun QPropWPointArg();
+};
+
+class QPropWBoxArg {
+  // box source size
+  int box_start;
+  int box_end;
+  memfun QPropWBoxArg();
+};
+
+class QPropWRandArg {
+  //! random number generator type
+  RandomType rng;
+  //! random number seed
+  int seed;
+  memfun QPropWRandArg();
+};
+
+class QPropWSlabArg {
+  QPropWRandArg rand_arg;
+  //! width of slab for random source
+  int slab_width;
+  memfun QPropWSlabArg();
+};
+
+class QPropWExpArg {
+
+  // for exponential smeared source
+  // phi(|x-y|) = exp_A*exp(-exp_B*|x-y|) for |x-y| <= exp_C
+  //            = 0                       for |x-y| >  exp_C
+  Float exp_A;
+  Float exp_B;
+  Float exp_C;
+  memfun QPropWExpArg();
+};

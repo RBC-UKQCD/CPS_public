@@ -41,13 +41,14 @@ CPS_START_NAMESPACE
 
 class QPropW : public Alg  {
 
-  //! pointer to 4d prop 
-  WilsonMatrix* prop;
-
   //! pointer to 4d prop at s-mid-point
   WilsonMatrix* midprop;
 
 protected:
+
+  // Hueywen: move prop from private to protected
+  //! pointer to 4d prop
+  WilsonMatrix* prop;
   
   QPropWArg qp_arg; 
   
@@ -68,18 +69,16 @@ public:
 
   Float Mass()      const { return qp_arg.cg.mass; }    
   int SourceTime()  const { return qp_arg.t; }       
-  int BoxSrcStart() const { return qp_arg.box_start; } 
-  int BoxSrcEnd()   const { return qp_arg.box_end; }     
+#if 0
   int PointSrcX()   const { return qp_arg.x; }       
   int PointSrcY()   const { return qp_arg.y; }        
   int PointSrcZ()   const { return qp_arg.z; }
+#endif
 
   //! Is sink gauge fixed?
   int GFixedSnk() const { return qp_arg.gauge_fix_snk; } 
   //! Is source gauge fixed?
-  int GFixedSrc() const { return qp_arg.gauge_fix_src; } 
 
-  RandomType Rng() const { return qp_arg.rng; }
 
   int StoreMidprop() const { return  qp_arg.store_midprop; }
 
@@ -89,6 +88,9 @@ public:
   void Run();
   
   void CG(FermionVectorTp&, FermionVectorTp&, FermionVectorTp&, int&, Float&);
+   // HueyWen: addtional CG definition
+  void CG(Lattice &lat, CgArg *arg, FermionVectorTp& source,
+        FermionVectorTp& sol , int& iter, Float& true_res);
   void FixSol(FermionVectorTp& sol);
   void LoadRow(int spin, int color, FermionVectorTp&, FermionVectorTp&);
   void SetFileName(char *nm);
@@ -137,13 +139,17 @@ public:
   
   // DESTRUCTORS
   virtual ~QPropW();
-  
+  int GFixedSrc() const { return qp_arg.gauge_fix_src; } 
+  int PointSrcX()   const { return qp_arg.x; }       
+  int PointSrcY()   const { return qp_arg.y; }        
+  int PointSrcZ()   const { return qp_arg.z; }
+
 };
   
 
 
 class QPropWWallSrc : public QPropW {
-  
+
 public:
   
   // CONSTRUCTORS
@@ -175,7 +181,7 @@ public:
 };
 
 class QPropWVolSrc : public QPropW {
-  
+
 public:
   
   // CONSTRUCTORS
@@ -189,8 +195,30 @@ public:
   SourceType SrcType() { return VOLUME; }
 };
 
+//HueyWen and Peter for general smearing function
+class QPropWGFLfuncSrc : public QPropW
+{
+
+  Float (*func)(int gx,int gy,int gz,int gt);
+
+  public:
+
+    // CONSTRUCTORS
+  QPropWGFLfuncSrc(Lattice &lat,
+                   CgArg *arg,
+                   CommonArg *common_arg,
+                   Float (*fn) (int,int,int,int)
+                  );
+
+    // DESTRUCTOR
+  ~QPropWGFLfuncSrc();
+  SourceType SrcType() { return FL_FUNC; }
+
+};
+
+
 class QPropWPointSrc : public QPropW {
-  
+
 public:
   
   // CONSTRUCTORS
@@ -205,6 +233,9 @@ public:
 };
 
 class QPropWBoxSrc : public QPropW {
+
+protected:
+  QPropWBoxArg box_arg;
   
 public:
   
@@ -217,12 +248,15 @@ public:
   
   void SetSource(FermionVectorTp& src, int spin, int color);
   SourceType SrcType(){ return BOX; }
+//  int BoxSrcStart() const { return qp_arg.box_start; } 
+//  int BoxSrcEnd()   const { return qp_arg.box_end; }     
 };
 
 class QPropWRand : public QPropW {
   
 protected:
 
+  QPropWRandArg rand_arg;
   Float* rsrc;
   
 public:
@@ -230,7 +264,7 @@ public:
   // CONSTRUCTORS
   QPropWRand(Lattice& lat, CommonArg* c_arg);
   
-  QPropWRand(Lattice& lat, QPropWArg* arg,  CommonArg*);
+  QPropWRand(Lattice& lat, QPropWArg* , QPropWRandArg *, CommonArg*);
 
   QPropWRand(const QPropWRand& rhs);  //copy constructor
 
@@ -248,6 +282,8 @@ public:
   void DeleteRsrc();    // Deallocates memory for rsrc
   void RestoreQProp(char*, int mid);
   void SaveQProp(char*, int mid);
+
+  RandomType Rng() const { return rand_arg.rng; }
   
   // DESTRUCTOR
   virtual ~QPropWRand();
@@ -259,7 +295,7 @@ class QPropWRandWallSrc : public QPropWRand {
   
 public:
   QPropWRandWallSrc(Lattice& lat, CommonArg* c_arg);
-  QPropWRandWallSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
+  QPropWRandWallSrc(Lattice& lat, QPropWArg* , QPropWRandArg *, CommonArg*);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
   SourceType SrcType() { return RANDWALL; }
@@ -270,7 +306,7 @@ class QPropWRandVolSrc : public QPropWRand {
 
 public:
   QPropWRandVolSrc(Lattice& lat, CommonArg* c_arg);
-  QPropWRandVolSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
+  QPropWRandVolSrc(Lattice& lat, QPropWArg* , QPropWRandArg *, CommonArg*);
    
   void SetSource(FermionVectorTp& src, int spin, int color);
   SourceType SrcType() { return RANDVOLUME; }
@@ -278,9 +314,12 @@ public:
 
 class QPropWRandSlabSrc : public QPropWRand {
 
+protected:
+  int slab_width;
+
 public:
   QPropWRandSlabSrc(Lattice& lat, CommonArg* c_arg);
-  QPropWRandSlabSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
+  QPropWRandSlabSrc(Lattice& lat, QPropWArg* , QPropWSlabArg *, CommonArg*);
   QPropWRandSlabSrc(Lattice& lat, QPropWArg* arg, Float* src, CommonArg* );
   
   void SetSource(FermionVectorTp& src, int spin, int color);
@@ -374,6 +413,44 @@ public:
   
   void SetSource(FermionVectorTp& src, int spin, int color);
   SourceType SrcType() { return PROT_D_SEQ; }
+};
+
+// === for exponential smeared source ==================================
+
+// exponential smeared source
+class QPropWExpSrc : public QPropW
+{
+
+  protected:
+  // exponential smeared source
+  // phi(|x-y|) = exp_A*exp(-exp_B*|x-y|) for |x-y| <= exp_C
+  //            = 0                       for |x-y| >  exp_C
+//  Float exp_A,exp_B,exp_C ;
+
+  QPropWExpArg exp_arg;
+
+ public:
+  
+  // CONSTRUCTORS
+  QPropWExpSrc(Lattice& lat, CommonArg* c_arg) ;
+
+  QPropWExpSrc(Lattice& lat, QPropWArg* arg, QPropWExpArg *exp_arg, 
+    CommonArg* c_arg);
+  QPropWExpSrc(QPropWExpSrc& prop1, QPropWExpSrc& prop2 );
+  QPropWExpSrc(QPropWExpSrc* prop1, QPropWExpSrc* prop2 );
+  QPropWExpSrc(QPropW& prop1) ;
+
+  void SetSource(FermionVectorTp& src, int spin, int color);
+  SourceType SrcType(){return EXP ; }
+};
+
+// =====================================================================
+
+class QPropWFactory {
+ public:
+  static QPropW * Create (Lattice &lat,SourceType type, QPropWArg *arg, 
+       CommonArg *c_arg, void *e_arg);
+  static void Destroy(QPropW *qp);
 };
 
 CPS_END_NAMESPACE

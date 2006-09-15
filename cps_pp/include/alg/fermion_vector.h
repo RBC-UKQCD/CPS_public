@@ -69,8 +69,19 @@ public:
   void GFWallSource       ( Lattice& lat, int spin, int dir, int source_time );
 
   void ZeroSource();
+//  void SetVolSourceEqualZero();
   void SetVolSource(int color, int spin);
   void SetVolSource(int color, int spin, Float* src) ;
+
+  //Peter and HueyWen for general function source
+  void SetGFLfuncSource(Lattice& lat, int color, int spin,
+                Float (*func)(int gx,int gy,int gz,int gt));
+
+  // === for exponential smeared source ================================
+  void SetExpSource( int color, int spin, int x, int y, int z, int t,
+                     Float A, Float B, Float C) ;
+  void dumpqrkvec( int t);
+  // ===================================================================
 
   ///
   //  Tom's momentum stuff
