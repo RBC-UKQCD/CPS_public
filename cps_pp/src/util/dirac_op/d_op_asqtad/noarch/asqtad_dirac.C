@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//  $Id: asqtad_dirac.C,v 1.18 2006-02-21 21:14:07 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.19 2006-09-18 05:07:40 chulwoo Exp $
 //
 //    12/21/02 HueyWen Lin, Chulwoo Jung
 //
@@ -2142,7 +2142,7 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
   for(j=0;j<2;j++){
     for(i=0;i<vol;i++) num_ind[i]=0;
     for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
-      src = (int)chi_l[j][2*i];
+      src = (unsigned long)chi_l[j][2*i];
       if (src%(VECT_LEN*sizeof(IFloat))!=0){
         ERR.General(cname,fname,"src = %d\n",src);
         exit(1);
@@ -2152,8 +2152,8 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
         ERR.General(cname,fname,"src[%d](%d) > vol/2\n",i,src);
         exit(1);
       }
-      temp[src*NUM_DIR*2+num_ind[src]].src = (int)chi_l[j][2*i];
-      temp[src*NUM_DIR*2+num_ind[src]].dest= (int)chi_l[j][2*i+1];
+      temp[src*NUM_DIR*2+num_ind[src]].src = (unsigned long)chi_l[j][2*i];
+      temp[src*NUM_DIR*2+num_ind[src]].dest= (unsigned long)chi_l[j][2*i+1];
       for(k=0;k<MATRIX_SIZE;k++){
         temp[src*NUM_DIR*2+num_ind[src]].mat[k] = uc_l[j][i*MATRIX_SIZE+k];
       }
@@ -2218,8 +2218,8 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
     for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
       sprintf(buf,"{%d,%d,{\n",*(chi_l[j]+2*i),*(chi_l[j]+2*i+1));
       write(fd,buf,strlen(buf));
-      uc_l_agg[j][i].src = (int)chi_l[j][2*i];
-      uc_l_agg[j][i].dest = (int)chi_l[j][2*i+1];
+      uc_l_agg[j][i].src = (unsigned long)chi_l[j][2*i];
+      uc_l_agg[j][i].dest = (unsigned long)chi_l[j][2*i+1];
       for(k=0;k<18;k++){
         sprintf(buf,"%0.8e",*(uc_l[j]+i*18+k));
         write(fd,buf,strlen(buf));
@@ -2268,7 +2268,7 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
   for(j=0;j<2;j++){
     for(i=0;i<non_local_chi*3/2;i++) num_ind[i]=0;
     for(i=0;i< ((non_local_chi+ non_local_chi_3)/2);i++){
-      src = (int)chi_nl[j][2*i];
+      src = (unsigned long)chi_nl[j][2*i];
       if (src%(VECT_LEN*sizeof(IFloat))!=0){
         ERR.General(cname,fname,"src = %d\n",src);
         exit(1);
@@ -2278,8 +2278,8 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
         ERR.General(cname,fname,"src(%d) > non_local_chi*3\n",src);
         exit(1);
       }
-      temp[src*max+num_ind[src]].src = (int)chi_nl[j][2*i];
-      temp[src*max+num_ind[src]].dest= (int)chi_nl[j][2*i+1];
+      temp[src*max+num_ind[src]].src = (unsigned long)chi_nl[j][2*i];
+      temp[src*max+num_ind[src]].dest= (unsigned long)chi_nl[j][2*i+1];
       for(k=0;k<18;k++)
         temp[src*max+num_ind[src]].mat[k] = uc_nl[j][i*18+k];
       num_ind[src]++;
@@ -2344,8 +2344,8 @@ if  (nu%4 != n && nu%4 != ro%4 && nu%4 != de%4)
     write(fd,buf,strlen(buf));
     for(i=0;i< ((local_chi+ local_chi_3)/2);i++){
       sprintf(buf,"{%d,%d,{\n",*(chi_nl[j]+2*i),*(chi_nl[j]+2*i+1));
-      uc_nl_agg[j][i].src = (int)chi_nl[j][2*i];
-      uc_nl_agg[j][i].dest = (int)chi_nl[j][2*i+1];
+      uc_nl_agg[j][i].src = (unsigned long)chi_nl[j][2*i];
+      uc_nl_agg[j][i].dest = (unsigned long)chi_nl[j][2*i+1];
       write(fd,buf,strlen(buf));
       for(k=0;k<18;k++){
         sprintf(buf,"%0.8e",*(uc_nl[j]+i*18+k));
@@ -2533,8 +2533,9 @@ extern "C" void dirac_comm_assert()
 extern "C"
 void asqtad_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
 {
-//  int i,j,k,c = (int) chi_off_node_total;
-  int i,j,k,c = (int) a;
+//  int i,j,k,c = (unsigned long) chi_off_node_total;
+  int i,j,k;
+  long c = (long) a;
   int odd = 1 - a_odd;
   //-----------------------------------------------------------------
   //  Transfer chi's on faces.  

@@ -9,13 +9,13 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.6 2004-08-18 11:58:05 zs Exp $
-//  $Id: link_buffer.C,v 1.6 2004-08-18 11:58:05 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2006-09-18 05:07:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.7 2006-09-18 05:07:41 chulwoo Exp $
+//  $Id: link_buffer.C,v 1.7 2006-09-18 05:07:41 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v $
 //  $State: Exp $
 //
@@ -352,7 +352,8 @@ int Lattice::EnableLinkBuffer(int buf_sz){
   //VRB.Func(cname, fname);
   if(link_buffer==0 && buf_sz > 0 )
     link_buffer = new LinkBuffer(*this, buf_sz);
-  return (int) link_buffer; 
+  if(link_buffer) return 1;
+  else return 0;
 }
 
 void Lattice::DisableLinkBuffer(){

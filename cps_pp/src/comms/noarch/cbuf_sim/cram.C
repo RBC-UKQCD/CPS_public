@@ -3,13 +3,13 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/cbuf_sim/cram.C,v 1.4 2004-08-18 11:57:41 zs Exp $
-//  $Id: cram.C,v 1.4 2004-08-18 11:57:41 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2006-09-18 05:07:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/cbuf_sim/cram.C,v 1.5 2006-09-18 05:07:40 chulwoo Exp $
+//  $Id: cram.C,v 1.5 2006-09-18 05:07:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/cbuf_sim/cram.C,v $
 //  $State: Exp $
 //
@@ -21,6 +21,6 @@ CPS_START_NAMESPACE
 //Workstation version only
 #ifndef _TARTAN
 int CRAM_SCRATCH_INTS[CRAM_SCRATCH_SIZE] ;
-unsigned int CRAM_SCRATCH_ADDR = (unsigned int)CRAM_SCRATCH_INTS ;
+unsigned long CRAM_SCRATCH_ADDR = (unsigned long)CRAM_SCRATCH_INTS ;
 #endif
 CPS_END_NAMESPACE
