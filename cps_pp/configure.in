@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2006-09-15 06:23:54 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.41 2006-09-15 06:23:54 chulwoo Exp $
-dnl  $Id: configure.in,v 1.41 2006-09-15 06:23:54 chulwoo Exp $
+dnl  $Date: 2006-10-30 21:17:43 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.42 2006-10-30 21:17:43 chulwoo Exp $
+dnl  $Id: configure.in,v 1.42 2006-10-30 21:17:43 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.41 $
+dnl  $Revision: 1.42 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -82,6 +82,7 @@ AC_MSG_RESULT($enable_target)
 
 CFLAGS=""
 CXXFLAGS=""
+DFLAGS=""
 dnl Can add more cases as we need to, e.g. QCDSP
 if test "$enable_target" = "qcdoc"; then
    CC="env QGCC_EXEC_PREFIX=\${QOSLIB} ${CC}"
@@ -97,7 +98,6 @@ if test "$enable_target" = "qcdoc"; then
 
    ARCH="QCDOC"
    ARCHDIR="QCDOC_DIR"
-dnl   DFLAGS=""
    TESTING_PARALLEL="yes";
    namespace_default="no" 
 
@@ -109,14 +109,12 @@ elif test "$enable_target" = "mpi"; then
      AC_MSG_WARN([Using g++])
      AC_SEARCH_LIBS(MPI_Init, mpi mpich, ,echo "CPS needs the MPI library for a parallel build - bailing out."; exit 1)
    fi
-dnl   DFLAGS=""
    TESTING_PARALLEL="yes";
    ARCH=cpsMPI
    ARCHDIR="MPI_DIR"
 
 else
 
-dnl   DFLAGS=""
    ARCH=NOARCH
    ARCHDIR="NOARCH_DIR"
    TESTING_PARALLEL="no";
@@ -169,20 +167,44 @@ AC_ARG_ENABLE(qio,
 	,[enable_qio="no"])
 AC_MSG_CHECKING([if including QIO])
 AC_MSG_RESULT($enable_qio)
-if test "$enable_qio" = "yes"; then
+
+dnl Are we compiling with QMP library?
+AC_ARG_ENABLE(qmp, 
+	AC_HELP_STRING([--enable-qmp], 
+		[Compile with SciDAC Communication (QMP) lib. (default=no)]), 
+	,[enable_qmp="no"])
+AC_MSG_CHECKING([if including QMP])
+AC_MSG_RESULT($enable_qmp)
+
+if test "$enable_qio" != "no"; then
    if test "X${QIO_DIR}X" = "XX"; then
-     echo "QIO_DIR environment variable not set"
-     exit 1
-   elif test "X${QMP_DIR}X" = "XX"; then
+dnl     echo "QIO_DIR environment variable not set"
+     QIO_DIR=${enable_qio}
+   fi
+   if test "X${QMP_DIR}X" = "XX"; then
      echo "QMP_DIR environment variable not set"
      exit 1
-   else
-     QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
-     QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
-     LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib ${QMP_LDFLAGS} -lqio -llime -lqmp"
-     INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_CFLAGS} -I${QIO_DIR}/include"
-     DFLAGS="${DFLAGS} -DUSE_QIO"
    fi
+   QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
+   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
+   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
+   LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib ${QMP_LDFLAGS} -lqio -llime ${QMP_LIBS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_FLAGS}  -I${QIO_DIR}/include"
+   DFLAGS="${DFLAGS} -DUSE_QIO"
+fi
+
+if test "$enable_qmp" != "no"; then
+   if test "X${QMP_DIR}X" = "XX"; then
+dnl     echo "QMP_DIR environment variable not set"
+     QMP_DIR=${enable_qmp}
+   fi
+   QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
+   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
+   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
+   LDFLAGS="${LDFLAGS} ${QMP_LDFLAGS} ${QMP_LIBS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_CFLAGS} "
+   DFLAGS="${DFLAGS} -DUSE_QMP"
+   TESTING_PARALLEL="yes";
 fi
 
 if test "$TESTING_PARALLEL" = "yes"; then

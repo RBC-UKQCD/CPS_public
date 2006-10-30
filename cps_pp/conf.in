@@ -27,6 +27,11 @@ case "$enable_target" in
 	HOST=powerpc-gnu-elf
 	ENABLE_TARGET='--enable-target=qcdoc'
 	;;
+	bgl)
+	BUILD=$build
+	HOST=powerpc-bgl-blrts-gnu
+	ENABLE_TARGET='--enable-target=bgl'
+	;;
 	*)
 	BUILD=$build
 	HOST=$host

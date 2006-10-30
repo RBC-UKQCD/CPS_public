@@ -117,7 +117,8 @@ esac
 # Here we must recognize all the valid KERNEL-OS combinations.
 maybe_os=`echo $1 | sed 's/^\(.*\)-\([^-]*-[^-]*\)$/\2/'`
 case $maybe_os in
-  nto-qnx* | linux-gnu* | storm-chaos* | os2-emx* | windows32-*)
+#  nto-qnx* | linux-gnu* | storm-chaos* | os2-emx* | windows32-*)
+  blrts-gnu* | nto-qnx* | linux-gnu* | storm-chaos* | os2-emx* | windows32-*)
     os=-$maybe_os
     basic_machine=`echo $1 | sed 's/^\(.*\)-\([^-]*-[^-]*\)$/\1/'`
     ;;
@@ -128,6 +129,7 @@ case $maybe_os in
     else os=; fi
     ;;
 esac
+#echo basic_machine= $basic_machine
 
 ### Let's recognize common machines as not being operating systems so
 ### that things like config.sub decstation-3100 work.  We also
@@ -1026,6 +1028,7 @@ esac
 
 # Decode manufacturer-specific aliases for certain operating systems.
 
+#echo os= $os
 if [ x"$os" != x"" ]
 then
 case $os in
@@ -1092,6 +1095,9 @@ case $os in
 		;;
 	-linux*)
 		os=`echo $os | sed -e 's|linux|linux-gnu|'`
+		;;
+	-blrts-gnu)
+		os=-blrts-gnu
 		;;
 	-sunos5*)
 		os=`echo $os | sed -e 's|sunos5|solaris2|'`
