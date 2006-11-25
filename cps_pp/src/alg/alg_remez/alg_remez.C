@@ -186,7 +186,7 @@ void AlgRemez::generateApprox()
 
   remez_arg->error = error;
   time += dclock();
-  print_flops(cname,fname,0,time);
+  print_time(cname,fname,time);
 
 }
 

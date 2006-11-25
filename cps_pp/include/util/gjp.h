@@ -1,21 +1,22 @@
 #include<config.h>
-CPS_START_NAMESPACE
+#ifndef INCLUDED_GLOBAL_JOB_PARAMETER_H
+#define INCLUDED_GLOBAL_JOB_PARAMETER_H     //!< Prevent multiple inclusion
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.24 2006-07-03 05:29:45 chulwoo Exp $
+  $Id: gjp.h,v 1.25 2006-11-25 19:09:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-07-03 05:29:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.24 2006-07-03 05:29:45 chulwoo Exp $
-//  $Id: gjp.h,v 1.24 2006-07-03 05:29:45 chulwoo Exp $
+//  $Date: 2006-11-25 19:09:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.25 2006-11-25 19:09:48 chulwoo Exp $
+//  $Id: gjp.h,v 1.25 2006-11-25 19:09:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.24 $
+//  $Revision: 1.25 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -39,15 +40,13 @@ CPS_START_NAMESPACE
 // 
 //------------------------------------------------------------------
 
-#ifndef INCLUDED_GLOBAL_JOB_PARAMETER_H
-#define INCLUDED_GLOBAL_JOB_PARAMETER_H     //!< Prevent multiple inclusion
-
-
-CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/vector.h>
 #include <comms/sysfunc.h>
 #include <alg/do_arg.h>
+#ifdef USE_QMP
+#include <qmp.h>
+#endif
 CPS_START_NAMESPACE
 
 //struct DoArg;
@@ -61,6 +60,7 @@ extern int gjp_local_axis[];
      // It is set by GJP.Initialize.
      // {0,1,2,3,4} corresponds to {x,y,z,t,s}
 
+#if TARGET==QCDOC
 extern SCUDir gjp_scu_dir[];
      // set to:  SCU_XP, SCU_XM, SCU_YP, SCU_YM,
      // SCU_ZP, SCU_ZM, SCU_TP, SCU_TM, s_p, s_m
@@ -70,6 +70,7 @@ extern SCUDir gjp_scu_dir[];
      // the direction for communication.
      // It is set by GJP.Initialize.
      // {0,1,2,3,4} corresponds to {x,y,z,t,s}
+#endif
 
 extern int gjp_scu_wire_map[];
      // it gives the wire number for directions
@@ -716,11 +717,16 @@ public:
 start and end of main()
 */
 
-#if TARGET == QCDOC
+#if TARGET == QCDOC 
 extern "C" {
   void _mcleanup(void);
 }
 void Start();
+void Start(int * argc, char ***argv);
+void End();
+#elif USE_QMP
+void Start();
+void Start(int * argc, char ***argv);
 void End();
 #else
 inline void Start(){}
@@ -733,10 +739,11 @@ inline void End(){}
 */
 extern GlobalJobParameter GJP;
 
-
-
-
-
-#endif
-
 CPS_END_NAMESPACE
+
+namespace QMPSCU {
+  void init_qmp();
+  void init_qmp(int * argc, char *** argv);
+  void destroy_qmp();
+}
+#endif

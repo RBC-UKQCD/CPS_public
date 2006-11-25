@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-16 07:21:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.9 2005-06-16 07:21:46 chulwoo Exp $
-//  $Id: hadron_prop_s.C,v 1.9 2005-06-16 07:21:46 chulwoo Exp $
+//  $Date: 2006-11-25 19:09:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.10 2006-11-25 19:09:56 chulwoo Exp $
+//  $Id: hadron_prop_s.C,v 1.10 2006-11-25 19:09:56 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v $
 //  $State: Exp $
 //
@@ -17,7 +17,7 @@
 // hadron_prop_s.C
 
 #ifndef lint
-static char vcid[] = "$Id: hadron_prop_s.C,v 1.9 2005-06-16 07:21:46 chulwoo Exp $";
+static char vcid[] = "$Id: hadron_prop_s.C,v 1.10 2006-11-25 19:09:56 chulwoo Exp $";
 #endif /* lint */
 
 #include <util/qcdio.h>
@@ -215,6 +215,9 @@ void HadronPropS::collect_prop(HadronType type, Float *sum_buf,
   //--------------------------------------------------------------
   transmit_buf_p = (IFloat *)IFloat_p; 
 
+#if USE_QMP
+  ERR.General(cname,fname,"Not implemented with QMP\n");
+#else
   SCUDirArg send(transmit_buf_p, neg_dir[direction], SCU_SEND, blcklength);
   SCUDirArg recv(receive_buf_p, pos_dir[direction], SCU_REC, blcklength);
 
@@ -239,6 +242,7 @@ void HadronPropS::collect_prop(HadronType type, Float *sum_buf,
 	 send.Addr(transmit_buf_p = receive_buf_p);
 	 recv.Addr(receive_buf_p += blcklength/sizeof(Float) );
   }
+#endif
 
 
 

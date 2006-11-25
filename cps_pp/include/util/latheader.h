@@ -101,7 +101,7 @@ class LatticeHeader : public LatHeaderBase {
   }
 
   void init(const QioArg & qio_arg, FP_FORMAT FileFormat, Float LinkTrace, Float Plaq);
-  void setHeader(const char * EnsembleId, const char * EnsembleLabel, const int SequenceNumber);
+  void setHeader(const char * EnsembleId, const char * EnsembleLabel, const int SequenceNumber,const char *CreatorName = NULL, const char *CreatorHardware = NULL );
   void write(ostream & fout);
   void fillInChecksum(ostream & fout, unsigned int checksum) const;
   

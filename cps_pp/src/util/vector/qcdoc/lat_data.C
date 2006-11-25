@@ -4,7 +4,7 @@
 #include <util/vector.h>
 #include <util/verbose.h>
 #include <util/error.h>
-#include <qalloc.h>
+//#include <qalloc.h>
 
 CPS_START_NAMESPACE
 //int LatData::DEFAULT_FLAG = QCOMMS;
@@ -38,7 +38,7 @@ IFloat *LatData::Field(int pos, int n){
 #endif
 
 LatData::~LatData(){
- 	if (data!= NULL) qfree(data);
+ 	if (data!= NULL) ffree(data);
 }
 
 CPS_END_NAMESPACE

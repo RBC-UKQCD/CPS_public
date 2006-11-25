@@ -138,6 +138,7 @@ void GtadpoleRect::GforceSite(Matrix& force, int *x, int mu)
   RectStaple(*mp1, x, mu) ;
   ForceFlops += 198*3*18+216*3*6;
 
+
   //----------------------------------------------------------------------------
   // mp2 = -(beta*c_1/3)*U_mu(x)
   //----------------------------------------------------------------------------
@@ -158,7 +159,7 @@ void GtadpoleRect::GforceSite(Matrix& force, int *x, int mu)
   ForceFlops +=198+24;
 }
 
-#if TARGET != QCDOC
+#if 0
 #define PROFILE
 //------------------------------------------------------------------------------
 // EvolveMomGforce(Matrix *mom, Float dt):

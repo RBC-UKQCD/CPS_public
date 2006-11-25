@@ -11,9 +11,7 @@
 #include <util/site.h>
 #include <util/momentum.h>
 
-#ifdef PARALLEL
-#include <sysfunc.h>
-#endif
+#include <comms/sysfunc.h>
 #include <alg/fermion_vector.h>
 
 CPS_START_NAMESPACE

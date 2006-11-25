@@ -1,13 +1,31 @@
 #ifndef ASQTAD_INT_H
 #define ASQTAD_INT_H
-#include <qalloc.h>
+#include <stdlib.h>
 #ifdef SCIDAC
 #include <asq_data_types.h>
 #include <qcdocos/scu_dir_arg.h>
 #include <gauge_agg.h>
-#else
+#define USE_SCU
+#else //SCIDAC
+#include <config.h>
 #include <util/asq_data_types.h>
 #include <util/gauge_agg.h>
+#ifndef USE_QMP
+#define USE_SCU
+#define USE_QALLOC
+#endif //USE_QMP
+#if TARGET == QCDOC
+#define USE_QALLOC
+#endif
+#endif //SCIDAC
+
+#ifdef USE_QALLOC
+#include <qalloc.h>
+#else
+#include <malloc.h>
+#endif
+#ifdef USE_QMP
+#include <qmp.h>
 #endif
 
 class matrix{
@@ -108,7 +126,9 @@ class AsqD : public AsqDArg{
     matrix *naik[4];
     matrix *naik_m[4];
 
+#ifdef USE_SCU
     static SCUDir scudir[8];
+#endif
     static int cg_called;
     int node_odd;
     int non_local_dirs;
@@ -189,6 +209,7 @@ N=4};
 //  SCUarg[3] is set up for different Xoffset and Toffset.
 //------------------------------------------------------------------
 
+#ifdef USE_SCU
 SCUDirArgIR SCUarg[2][2*NUM_DIR];
 SCUDirArgMulti SCUmulti[2];
 
@@ -200,6 +221,7 @@ SCUDMAInst SCUDMAarg[2][NUM_DIR*4];
 
 SCUDirArgIR SCUarg_2[2][2*NUM_DIR];
 SCUDirArgMulti SCUmulti_2[2];
+#endif
 
 //------------------------------------------------------------------
 //  The offset into the even or odd checkboard chi's and chi3's used for a send
@@ -268,6 +290,8 @@ SCUDirArgMulti SCUmulti_2[2];
   void destroy_buf_g();
   void comm_assert();
   void dirac(Float* b, Float* a, int a_odd, int add_flag);
+
+#if TARGET == QCDOC
   void *Alloc(int request){
     void *ptr = qalloc(QCOMMS,request);
     if (!ptr) ptr = qalloc(0,request);
@@ -277,6 +301,16 @@ SCUDirArgMulti SCUmulti_2[2];
   void Free(void *p){
     qfree(p);
   }
+#else
+  void *Alloc(int request){
+    void *ptr = malloc(request);
+    if (!ptr){ printf("AsqD::Alloc failed\n"); exit(-4);}
+    return ptr;
+  }
+  void Free(void *p){
+    free(p);
+  }
+#endif
 
   void PointerErr(char *cname, char *fname, char *vname){
     printf("%s::%s: %s not allocated\n",cname,fname,vname);

@@ -233,6 +233,7 @@ ForceArg GtadpoleRect::EvolveMomGforce(Matrix *mom, Float dt)
     }
   }
   ForceFlops += vol*144;
+
 #ifdef PROFILE
   time += dclock();
   print_flops(cname,fname,ForceFlops+ParTrans::PTflops,time);

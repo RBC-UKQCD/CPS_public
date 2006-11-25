@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.31 2006-07-03 04:48:06 chulwoo Exp $
+  $Id: gjp.C,v 1.32 2006-11-25 19:10:21 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-07-03 04:48:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.31 2006-07-03 04:48:06 chulwoo Exp $
-//  $Id: gjp.C,v 1.31 2006-07-03 04:48:06 chulwoo Exp $
+//  $Date: 2006-11-25 19:10:21 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.32 2006-11-25 19:10:21 chulwoo Exp $
+//  $Id: gjp.C,v 1.32 2006-11-25 19:10:21 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.31 $
+//  $Revision: 1.32 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -225,6 +225,8 @@ nodes[0], nodes[1], nodes[2], nodes[3], nodes[4]);
 node_sites[0], node_sites[1], node_sites[2], node_sites[3], node_sites[4]);
   VRB.Result(cname,fname, "coor= %d %d %d %d %d\n",
 node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
+//  printf("Node %d: coor= %d %d %d %d %d\n",UniqueID(),
+//node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
 
   // Set the static arrays gjp_local_axis[5], gjp_scu_dir[10],
   // and gjp_scu_wire_map[10].
@@ -235,6 +237,10 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
   if(nodes[la] == 1) gjp_local_axis[la] = gjp_local_axis[5] = 1;
   }
   if(nodes[4] == 1) gjp_local_axis[4] = 1;
+  if (!UniqueID())
+  for(int la=0; la<4; la++){
+    printf("dim %d: nodes=%d gjp_local_axis=%d\n",la,nodes[la],gjp_local_axis[la]);
+  }
 
   gjp_scu_dir[0] = SCU_XP;
   gjp_scu_dir[1] = SCU_XM;
@@ -301,8 +307,10 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
   VRB.DeactivateAll();
 //  printf("verbose_level =%d\n",doarg_int.verbose_level);
   VRB.Level(doarg_int.verbose_level);
+if (!UniqueID())
   printf("verbose_level =%d\n",VRB.Level());
   CSM.Activate(doarg_int.checksum_level);
+if (!UniqueID())
   printf("checksum_level =%d\n",doarg_int.checksum_level);
 
 }

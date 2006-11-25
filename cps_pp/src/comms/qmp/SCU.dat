@@ -1,0 +1,38 @@
+scu/get_data.C:    SCUDirArgIR send(send_noncache, gjp_scu_dir[2*mu+1], SCU_SEND, len*sizeof(IFloat));
+scu/get_data.C:    SCUDirArgIR rcv(rcv_noncache, gjp_scu_dir[2*mu], SCU_REC, len*sizeof(IFloat));
+scu/get_data.C:    SCUDirArgIR send(send_noncache, gjp_scu_dir[2*mu], SCU_SEND, len*sizeof(IFloat));
+scu/get_data.C:    SCUDirArgIR rcv(rcv_noncache, gjp_scu_dir[2*mu+1], SCU_REC, len*sizeof(IFloat));
+scu/get_data.C:const SCUDir pos_dir[] = { SCU_XP, SCU_YP, SCU_ZP, SCU_TP };
+scu/get_data.C:const SCUDir neg_dir[] = { SCU_XM, SCU_YM, SCU_ZM, SCU_TM };
+scu/get_data.C://  the spatial cube: 2 times SCU transfer
+scu/get_data.C:    SCUDirArg send1(send_buf, pos_dir[mu], SCU_SEND, len*sizeof(IFloat));
+scu/get_data.C:    SCUDirArg recv1(tmp_buf, neg_dir[mu], SCU_REC, len*sizeof(IFloat));
+scu/get_data.C:    SCUDirArg send2(tmp_buf, pos_dir[nu], SCU_SEND, len*sizeof(IFloat));
+scu/get_data.C:    SCUDirArg recv2(rcv_buf, neg_dir[nu], SCU_REC, len*sizeof(IFloat));
+scu/get_data.C:    SCUDirArg send1(send_noncache, pos_dir[i], SCU_SEND, len*sizeof(IFloat) );
+scu/get_data.C:    SCUDirArg recv1(rcv_noncache, neg_dir[i], SCU_REC, len*sizeof(IFloat) );
+scu/get_data.C:    SCUDirArg send2(rcv_noncache, pos_dir[j], SCU_SEND, len*sizeof(IFloat) );
+scu/get_data.C:    SCUDirArg recv2(tmp_buf, neg_dir[j], SCU_REC, len*sizeof(IFloat));
+scu/get_data.C:    SCUDirArg send3(tmp_buf, pos_dir[k], SCU_SEND, len*sizeof(IFloat));
+scu/get_data.C:    SCUDirArg recv3(rcv_noncache, neg_dir[k], SCU_REC, len*sizeof(IFloat));
+scu/get_data.C:static SCUDirArg scu_send;
+scu/get_data.C:static SCUDirArg scu_recv;
+scu/get_data.C:    		scu_send.Init(send_noncache, gjp_scu_dir[s_dir], SCU_SEND, 
+scu/get_data.C:    	scu_send.Init(send_buf, gjp_scu_dir[s_dir], SCU_SEND,
+scu/get_data.C:    		scu_recv.Init(rcv_noncache, gjp_scu_dir[r_dir], SCU_SEND, 
+scu/get_data.C:    		scu_recv.Init(rcv_buf, gjp_scu_dir[r_dir], SCU_SEND, 
+scu/glb_sum2.C:  static SCUDirArgIR *Send[5];
+scu/glb_sum2.C:  static SCUDirArgIR *Recv[5];
+scu/glb_sum2.C:      Send[i] = new SCUDirArgIR(transmit_buf, gjp_scu_dir[2*i+1], SCU_SEND, sizeof(Double64));
+scu/glb_sum2.C:      Recv[i] = new SCUDirArgIR(receive_buf, gjp_scu_dir[2*i], SCU_REC, sizeof(Double64));
+scu/glb_sum2.C:  static SCUDirArgIR *Send[5];
+scu/glb_sum2.C:  static SCUDirArgIR *Recv[5];
+scu/glb_sum2.C:		Send[i] = new SCUDirArgIR(transmit_buf_u, gjp_scu_dir[2*i+1], SCU_SEND, sizeof(unsigned long long));
+scu/glb_sum2.C:		Recv[i] = new SCUDirArgIR(receive_buf_u, gjp_scu_dir[2*i], SCU_REC, sizeof(unsigned long long));
+scu/glb_sum_internal.C:static SCUDirArgIR *Send[5];
+scu/glb_sum_internal.C:static SCUDirArgIR *Recv[5];
+scu/glb_sum_internal.C:static SCUDirArgMulti *multi[5];
+scu/glb_sum_internal.C:      Send[i]= new SCUDirArgIR(transmit_buf,gjp_scu_dir[2*i+1],SCU_SEND,length[i]*sizeof(Double64));
+scu/glb_sum_internal.C:       Recv[i]= new SCUDirArgIR(receive_buf,gjp_scu_dir[2*i],SCU_REC,length[i]*sizeof(Double64));
+scu/glb_sum_internal.C:         Send[dir]= new SCUDirArgIR(transmit_buf,gjp_scu_dir[2*dir+1],SCU_SEND,length[dir]*sizeof(Double64));
+scu/glb_sum_internal.C:         Recv[dir]= new SCUDirArgIR(receive_buf,gjp_scu_dir[2*dir],SCU_REC,length[dir]*sizeof(Double64));

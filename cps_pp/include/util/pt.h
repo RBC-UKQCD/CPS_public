@@ -2,26 +2,29 @@
 #ifdef PARALLEL
 #include<comms/sysfunc.h>
 #endif
-#if TARGET == QCDOC
+#if TARGET == QCDOC 
+#include<util/pt_int.h>
+#endif
+#ifdef USE_QMP
 #include<util/pt_int.h>
 #endif
 CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.20 2006-02-01 16:46:07 chulwoo Exp $
+  $Id: pt.h,v 1.21 2006-11-25 19:09:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-01 16:46:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.20 2006-02-01 16:46:07 chulwoo Exp $
-//  $Id: pt.h,v 1.20 2006-02-01 16:46:07 chulwoo Exp $
+//  $Date: 2006-11-25 19:09:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.21 2006-11-25 19:09:48 chulwoo Exp $
+//  $Id: pt.h,v 1.21 2006-11-25 19:09:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -34,7 +37,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/vector.h>
-#include <comms/scu.h>
+//#include <comms/scu.h>
 CPS_START_NAMESPACE
 
 void pt_init(Lattice &lat);  //!< Initialization for parallel transporters

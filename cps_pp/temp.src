@@ -1,0 +1,9 @@
+foreach file (`find . -name "*.C"`)
+set length = `grep "SCUDMA" $file | wc -l`
+if ($length != "0") then
+echo "--------------------------------------------------" >> SCUDMA.dat
+echo $file >> SCUDMA.dat
+echo "--------------------------------------------------" >> SCUDMA.dat
+grep "SCUDMA" $file >> SCUDMA.dat
+endif
+end

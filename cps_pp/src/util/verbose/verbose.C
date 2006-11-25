@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
-  $Id: verbose.C,v 1.10 2005-05-20 06:38:21 chulwoo Exp $
+  $Id: verbose.C,v 1.11 2006-11-25 19:10:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-20 06:38:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.10 2005-05-20 06:38:21 chulwoo Exp $
-//  $Id: verbose.C,v 1.10 2005-05-20 06:38:21 chulwoo Exp $
+//  $Date: 2006-11-25 19:10:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.11 2006-11-25 19:10:52 chulwoo Exp $
+//  $Id: verbose.C,v 1.11 2006-11-25 19:10:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
@@ -35,6 +35,7 @@ CPS_START_NAMESPACE
 #ifndef CLOCKS_PER_SEC
 # define CLOCKS_PER_SEC 1000000
 #endif
+const int MAX_STRING = 256;
 
 //------------------------------------------------------------------
 // Constructor
@@ -44,6 +45,13 @@ CPS_START_NAMESPACE
   function progress messages, clock output messages and RNG seed
   information by default.
 */
+static void vrb_printf(const char *cname,const char *fname,const char *string){
+#if 1
+  if (!UniqueID()) printf("Node %d: %s::%s: %s\n",UniqueID(),cname,fname,string);
+#else
+  printf("%s::%s: %s\n",cname,fname,string);
+#endif
+}
 
 Verbose VRB;
 Verbose::Verbose(){
@@ -143,7 +151,8 @@ int Verbose::Active(int test_level, int level){
 	for(i=0; i<base; i++){
 	    y = x % base;
 	    if( int(test_level) == y){
-//             printf("Verbose::Acitve(%d,%d)=1\n",test_level,level);
+             if (!UniqueID())
+             printf("Verbose::Acitve(%d,%d)=1\n",test_level,level);
              return 1;
              }
 	    x = (x - y) / base;
@@ -172,7 +181,8 @@ void Verbose::Func(const char *class_name, const char *func_name) {
 
     if(!active[VERBOSE_FUNC_LEVEL]) return;
 
-    printf("%s::%s : Entered :", class_name, func_name);
+//    printf("%s::%s : Entered :", class_name, func_name);
+    vrb_printf(class_name,func_name,"Entered :");
     if(active[VERBOSE_FUNC_CLOCK_LEVEL]){
 #ifdef _TARTAN
 	printf("  Clock (12.5 MHz) = %d\n", (int)clock());
@@ -182,7 +192,7 @@ void Verbose::Func(const char *class_name, const char *func_name) {
 #endif
     }
     else {
-	printf("\n");
+//	printf("\n");
     }
     
 } 
@@ -204,17 +214,19 @@ void Verbose::FuncEnd(const char *class_name, const char *func_name){
     
     if(!active[VERBOSE_FUNC_LEVEL]) return;
 
-    printf("%s::%s : Exiting :", class_name, func_name);
+//    printf("%s::%s : Exiting :", class_name, func_name);
+    vrb_printf(class_name,func_name,"Exiting :");
     if(active[VERBOSE_FUNC_CLOCK_LEVEL]){
 #ifdef _TARTAN
 	printf("  Clock (12.5 MHz) = %d\n", (int)clock());
 #else
 	int cps = CLOCKS_PER_SEC;
+     if(!UniqueID())
 	printf("  Clock (%2.1f MHz) = %d\n", cps/1.e+06, (int)clock());
 #endif
     }
     else {
-	printf("\n");
+//	printf("\n");
     }
     
 }
@@ -372,22 +384,26 @@ void Verbose::Flow(const char *class_name, const char *func_name,
 		   const char *format, ...){
     
     if(!active[VERBOSE_FLOW_LEVEL]) return;
+    char string[MAX_STRING];
     
-    printf("%s::%s :", class_name, func_name);
+//    printf("%s::%s :", class_name, func_name);
+    va_list args;
+    va_start(args, format);
+//    vprintf(format, args);
+    vsnprintf(string, MAX_STRING,format, args);
+    vrb_printf(class_name,func_name,string);
     if(active[VERBOSE_FLOW_CLOCK_LEVEL]){
 #ifdef _TARTAN
 	printf(" Clock (12.5 MHz) = %d\n\t", (int)clock());
 #else
 	int cps = CLOCKS_PER_SEC;
+      if (!UniqueID())
 	printf(" Clock (%2.1f MHz) = %d\n\t", cps/1.e+06, (int)clock());
 #endif
     }
     else {
-	printf("\n\t");
+//	printf("\n\t");
     }
-    va_list args;
-    va_start(args, format);
-    vprintf(format, args);
     
 }
         
@@ -434,12 +450,14 @@ void Verbose::Input(const char *class_name, const char *func_name,
 void Verbose::Result(const char *class_name, const char *func_name,
 		     const char *format, ...) {
     
+    char string[MAX_STRING];
     if( !active[VERBOSE_RESULT_LEVEL] ) return;
     
     va_list args;
     va_start(args, format);
-    printf("%s::%s :\n\t", class_name, func_name);
-    vprintf(format, args);
+    vsnprintf(string, MAX_STRING,format, args);
+    vrb_printf(class_name,func_name,string);
+//    printf("%s::%s :\n\t", class_name, func_name);
     
 }
 
@@ -626,17 +644,19 @@ void Verbose::Clock(const char *class_name, const char *func_name,
 		    const char *format, ...){
     
     if(!active[VERBOSE_CLOCK_LEVEL]) return;
+    char string[MAX_STRING];
 
-    printf("%s::%s :", class_name, func_name);
-#ifdef _TARTAN
-    printf(" Clock (12.5 MHz cycles) = %d\n\t", (int)clock());
-#else
-    int cps = CLOCKS_PER_SEC;
-    printf(" Clock (%2.1f MHz) = %d\n\t", cps/1.e+06, (int)clock());
-#endif
+//    printf("%s::%s :", class_name, func_name);
     va_list args;
     va_start(args, format);
-    vprintf(format, args);
+//    vprintf(format, args);
+    vsnprintf(string, MAX_STRING,format, args);
+    vrb_printf(class_name,func_name,string);
+    int cps = CLOCKS_PER_SEC;
+#if TARGET == BGL
+  if(!UniqueID())
+#endif
+    printf(" Clock (%2.1f MHz) = %d\n\t", cps/1.e+06, (int)clock());
     
 }
 

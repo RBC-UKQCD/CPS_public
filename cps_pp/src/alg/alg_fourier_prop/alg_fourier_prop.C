@@ -32,9 +32,7 @@
 #include <util/site.h>
 #include <util/qcdio.h>
 
-#ifdef PARALLEL
-#include <sysfunc.h>
-#endif
+#include <comms/sysfunc.h>
 
 CPS_START_NAMESPACE
 

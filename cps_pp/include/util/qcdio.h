@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Prototypes of gauge configuration IO functions.
 
-  $Id: qcdio.h,v 1.8 2006-04-13 19:12:15 chulwoo Exp $
+  $Id: qcdio.h,v 1.9 2006-11-25 19:09:48 chulwoo Exp $
 */
 /*2  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
    $Author: chulwoo $
-   $Date: 2006-04-13 19:12:15 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.8 2006-04-13 19:12:15 chulwoo Exp $
-   $Id: qcdio.h,v 1.8 2006-04-13 19:12:15 chulwoo Exp $
+   $Date: 2006-11-25 19:09:48 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.9 2006-11-25 19:09:48 chulwoo Exp $
+   $Id: qcdio.h,v 1.9 2006-11-25 19:09:48 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.h,v $
-   $Revision: 1.8 $
+   $Revision: 1.9 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v $
    $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -83,7 +83,7 @@ enum FileIoType{
     ZERO_ONLY,          /*!< Write from a single node only. */
     ADD_ID,              /*!< Each node writes to a seperate file which
 			  has the node ID number appended to its name. */
-    ALL
+    ALL_NODES
 };
 
 //! Opens a file

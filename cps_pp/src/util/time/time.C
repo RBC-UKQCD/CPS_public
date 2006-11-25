@@ -1,7 +1,7 @@
 /*!\file
   \brief Implementation of functions for timing and performance measurement.
 
-  $Id: time.C,v 1.8 2006-07-03 05:29:46 chulwoo Exp $
+  $Id: time.C,v 1.9 2006-11-25 19:10:50 chulwoo Exp $
 */
 
 #include <config.h>
@@ -33,6 +33,7 @@ Float print_flops(unsigned long long nflops, struct timeval *start, struct timev
 	int sec = end->tv_sec - start->tv_sec; 
 	int usec = end->tv_usec - start->tv_usec; 
 	Float time = sec + 1.e-6*usec;
+	if(!UniqueID())
 	printf("%e flops /%e seconds = %e MFlops\n",(Float)nflops,time,(Float)nflops/(time*1.e6));
 	return nflops/time;
 }
@@ -49,7 +50,9 @@ Float print_flops(unsigned long long nflops, struct timeval *start, struct timev
   \return The FLOPS rate.
 */
 Float print_flops(char *cname, char *fname, unsigned long long nflops, struct timeval *start, struct timeval *end){
+  if (!UniqueID()){
 	printf("%s:%s: ",cname,fname);
+  }
 	return print_flops(nflops,start,end);
 }
 
@@ -61,11 +64,13 @@ Float print_flops(char *cname, char *fname, unsigned long long nflops, struct ti
   \return The FLOPS rate.
 */
 Float print_time(const char *cname, const char *fname, Float time){
+  if (!UniqueID())
 	printf("%s::%s: %e seconds\n",cname,fname,time);
 	return time;
 }
 
 Float print_flops(unsigned long long nflops, Float time){
+	if(!UniqueID())
 	printf("%e flops /%e seconds = %e MFlops\n",(Float)nflops,time,(Float)nflops/(time*1.e6));
 	return nflops/time;
 }
@@ -82,6 +87,7 @@ Float print_flops(unsigned long long nflops, Float time){
 */
 
 Float print_flops(char *cname, char *fname, unsigned long long nflops, Float time){
+	if(!UniqueID())
 	printf("%s::%s: ",cname,fname);
 	return print_flops(nflops,time);
 }

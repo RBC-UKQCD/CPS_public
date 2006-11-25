@@ -1,0 +1,178 @@
+# $Id: Makefile.rules,v 1.2 2006-11-25 19:09:46 chulwoo Exp $
+# Makefile.rules.  Generated from Makefile.rules.in by configure.
+
+SRCDIR = /home/chulwoo/CPS/qcdserver2/v4_9_14/cps++
+BUILDDIR = /home/chulwoo/CPS/qcdserver2/v4_9_14/qcdoc_qmp
+QOS = /qcdoc/sfw/qos/devel/v2.6.0-CJ/aix5.2f_debug
+QOSLIB = ${QOS}/quser/gcc-lib-user///
+
+PWD := $(shell pwd)
+DIR := $(subst $(BUILDDIR)/objs,,$(PWD))
+DIR := $(subst $(SRCDIR)/src,,$(DIR))/
+SRCDIR2 := $(SRCDIR)/src/$(DIR)
+BUILDDIR2 := $(BUILDDIR)/objs/$(DIR)
+VPATH:=$(SRCDIR2) ${BUILDDIR2}
+
+CC = env QGCC_EXEC_PREFIX=${QOSLIB} /qcdoc/sfw/packages/v1.6/aix5.2/local/bin/powerpc-gnu-elf-gcc
+CXX = env QGCC_EXEC_PREFIX=${QOSLIB} /qcdoc/sfw/packages/v1.6/aix5.2/local/bin/powerpc-gnu-elf-g++
+AR = env QGCC_EXEC_PREFIX=${QOSLIB} /qcdoc/sfw/packages/v1.6/aix5.2/local/bin/powerpc-gnu-elf-ar
+AS = env QGCC_EXEC_PREFIX=${QOSLIB} /qcdoc/sfw/packages/v1.6/aix5.2/local/bin/powerpc-gnu-elf-as
+CC_PATH = /qcdoc/sfw/packages/v1.6/aix5.2/local/
+
+CFLAGS = -D_GCC_ -O3
+CXXFLAGS = -D_GCC_ -O3
+ASFLAGS = 
+XLCFLAGS = -qarch=pwr3 -O3 -D_XLC_
+
+INCLUDE_FLAGS = -I${BUILDDIR} -I${SRCDIR}/include  -I/qcdoc/sfw/packages/gmp/qos-2.6.0j//include  
+
+ifeq	($(LIB_NAME_SET),yes)
+SEPARATE_LIB = yes
+endif
+
+ifeq	($(SEPARATE_LIB),yes)
+DIR2 := $(subst util/,,$(DIR))
+DIR2 := $(subst dirac_op/,,$(DIR2))
+DIR2 := $(subst mem/,,$(DIR2))
+DIR2 := $(subst comms/,,$(DIR2))
+DIR2 := $(subst alg/,,$(DIR2))
+LIBNAME := XXX$(subst /,_,$(DIR2))XXX
+LIBNAME := $(subst XXX_,,$(LIBNAME))
+LIBNAME := $(subst _XXX,,$(LIBNAME))
+LIBNAME := $(subst XXX,,$(LIBNAME))
+else
+LIBNAME = cps
+endif
+LIBNAME ?= cps
+
+DFLAGS +=  -DGMP -DUSE_QMP
+
+DIRLIST := $(shell ls  $(SRCDIR2)/*/Makefile )
+DIRLIST := $(filter %/Makefile ,$(DIRLIST))
+DIRLIST := $(patsubst $(SRCDIR2)/%/Makefile, %, $(DIRLIST))
+
+ARCH = QCDOC
+ARCHDIR := $(BGL_QMP_DIR)
+
+PRECDIR := $(DOUBLE_DIR)
+
+FILTERDIR := $(filter-out $(ARCHDIR) $(PRECDIR), $(NORECURSE_DIR))
+RECURSEDIRS := $(filter-out $(FILTERDIR) , $(DIRLIST))
+
+ifeq "$(ARCH)" "cpsMPI"
+  ifeq "$(findstring $(NOARCH_DIR), $(DIRLIST))" "$(NOARCH_DIR)"
+    ifneq "$(findstring $(MPI_DIR), $(DIRLIST))" "$(MPI_DIR)"
+      RECURSEDIRS += $(NOARCH_DIR)
+    endif
+  endif
+endif 
+
+libcps_CXXFLAGS = $(INCLUDE_FLAGS) $(CXXFLAGS) $(DFLAGS)
+libcps_CFLAGS = $(INCLUDE_FLAGS) $(CFLAGS) $(DFLAGS)
+.PHONY: $(RECURSEDIRS) cps all recurse clean
+
+all: cps 
+
+recurse: $(RECURSEDIRS)
+
+$(RECURSEDIRS):
+	$(if $(findstring s, $(MAKEFLAGS)),,@echo RECURSEDIRS = $(RECURSEDIRS))
+	mkdir -p $(BUILDDIR2)/$@
+	touch -a $(BUILDDIR2)/$@/Makefile_depend
+	cp -p $(SRCDIR2)/$@/Makefile $(BUILDDIR2)/$@
+ifeq	($(LIB_NAME_SET),yes)
+	$(MAKE) -C $@ LIBNAME=$(LIBNAME) $(MAKECMDGOALS)
+else
+ifeq	($(SEPARATE_LIB),yes)
+	$(MAKE) -C $@ SEPARATE_LIB=$(SEPARATE_LIB) $(MAKECMDGOALS)
+else
+	$(MAKE) -C $@ $(MAKECMDGOALS)
+endif
+endif
+
+
+.SUFFIXES:
+.SUFFIXES:  .o .C .S .c
+
+CSRC :=$(wildcard $(SRCDIR2)/*.c)
+CCSRC:=$(wildcard $(SRCDIR2)/*.C)
+SSRC := $(wildcard $(SRCDIR2)/*.S)
+
+COBJ=$(CSRC:.c=.o)
+CCOBJ=$(CCSRC:.C=.o)
+SOBJ=$(SSRC:.S=.o)
+
+OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
+OBJS := $(notdir $(OBJS_SRC))
+
+XLCOBJ=$(CSRC:.c=.xlo)
+XLCCOBJ=$(CCSRC:.C=.xlo)
+XLCOBJS_SRC = $(XLCCOBJ) $(XLCOBJ)
+XLCOBJS := $(notdir $(XLCOBJS_SRC))
+
+
+%.o:%.c
+	${CC} -c $< -o $(BUILDDIR2)/$@ ${libcps_CFLAGS}
+	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+
+%.o:%.C
+	$(CXX) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR2)/$*.i
+	${CXX} -c $< -o $(BUILDDIR2)/$@ ${libcps_CXXFLAGS}
+	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+
+%.xlo:%.c
+	cd $(BUILDDIR2)/ ; xlC -F$(BUILDDIR)/XLC.cfg -S $< ${XLCFLAGS}
+	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@ ${XLCFLAGS}
+	cd $(BUILDDIR2) ; objcopy -R .eh_frame $@
+	cd $(BUILDDIR2) ; ar  rcs ${BUILDDIR}/$(LIBNAME).xla $@
+
+%.xlo:%.C
+	cd $(BUILDDIR2)/ ; xlC -F$(BUILDDIR)/XLC.cfg -S $< ${XLCFLAGS}
+	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@ ${XLCFLAGS}
+	cd $(BUILDDIR2) ; objcopy -R .eh_frame $@
+	cd $(BUILDDIR2) ; ar  rcs ${BUILDDIR}/$(LIBNAME).xla $@
+
+%.o:%.S
+	$(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR2)/$*.i
+	$(AS) $(ASFLAGS) -o $(BUILDDIR2)/$@ $(BUILDDIR2)/$*.i
+	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+
+ifeq "${ARCH}" "cpsMPI"
+
+depend: recurse
+	cd $(SRCDIR2) ; \
+	$(CXX) -M $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
+	| sed -e 's/:.*\.[cC]/\:/g' > $(PWD)/Makefile_depend
+
+else
+
+
+depend: recurse
+	echo > Makefile_depend
+	cd $(SRCDIR2) ;makedepend -f$(BUILDDIR2)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
+#	cd $(SRCDIR2) ; \
+#	$(CXX) -M $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
+#	| sed -e 's/:.*\.[cC]/\:/g' > $(PWD)/Makefile_depend
+
+endif
+
+clean: recurse
+	cd $(BUILDDIR2) ; rm -f *.o *.i *.xlo *.bak
+
+cleanlib:
+	rm -f $(BUILDDIR)/*.a
+
+cps: recurse $(OBJS) 
+
+cps_xlc: recurse $(XLCOBJS) 
+
+buildlib: recurse $(OBJS)
+ifneq ($(OBJS),)
+	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $(OBJS)
+endif
+
+$(BUILDDIR2)/Makefile_depend: depend
+
+ifneq ($(MAKECMDGOALS), clean)
+include $(BUILDDIR2)/Makefile_depend
+endif

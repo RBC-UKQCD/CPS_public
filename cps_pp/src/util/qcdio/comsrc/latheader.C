@@ -152,7 +152,7 @@ void LatticeHeader::init(const QioArg & qio_arg, FP_FORMAT FileFormat, Float Lin
     creator = "RBC";
     creator_hardware = "CU-QCDSP ";
 #else
-    creator = getlogin();
+    creator = "RBC";
     creator_hardware = "CU-NOARCH ";
 #endif
 #endif
@@ -182,10 +182,12 @@ void LatticeHeader::init(const QioArg & qio_arg, FP_FORMAT FileFormat, Float Lin
 }
 
 
-void LatticeHeader::setHeader(const char * EnsembleId, const char * EnsembleLabel, const int SequenceNumber) {
+void LatticeHeader::setHeader(const char * EnsembleId, const char * EnsembleLabel, const int SequenceNumber, const char *CreatorName, const char *CreatorHardware) {
   ensemble_id = EnsembleId;
   ensemble_label= EnsembleLabel;
   sequence_number = SequenceNumber;
+  if (CreatorName) creator = CreatorName;
+  if (CreatorHardware) creator_hardware = CreatorHardware;
 }
 
 void LatticeHeader::write(ostream & fout) {
@@ -310,7 +312,7 @@ void LatRngHeader::init(const QioArg & qio_arg, INT_FORMAT FileFormat) {
   creator = "RBC";
   creator_hardware = "CU-QCDSP ";
 #else
-  creator = getlogin();
+  creator = "RBC";
   creator_hardware = "CU-NOARCH ";
 #endif
 #endif

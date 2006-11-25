@@ -2,10 +2,10 @@
 #define ASQ_DATA_TYPES_H
 
 #if TARGET == QCDOC
-#ifndef _XLC_
+#ifdef USE_SCU
 #include <qcdocos/scu_dir_arg.h>
 #endif
-#include <precision.h>
 #endif
+#include <precision.h>
 
 #endif

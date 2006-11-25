@@ -4,17 +4,22 @@
 #ifdef SCIDAC
 #include <gauge_agg.h>
 #include <asqtad_int.h>
-#else
+#else //SCIDAC
 #include <util/gauge_agg.h>
 #include <util/asqtad_int.h>
-#endif
+#endif //SCIDAC
+
+
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.17 2006-06-11 05:35:05 chulwoo Exp $
+  $Id: pt_int.h,v 1.18 2006-11-25 19:09:48 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
+#ifdef USE_SCU
 #include <qcdocos/scu_dir_arg.h>
+#endif 
+
 void* pt_amalloc(void*  (*allocator)(size_t, const char *vname,
 			  const char *fname, const char *cname),
 	      size_t, int, ...);
@@ -142,15 +147,39 @@ int conjugated;
 //Pointer to the gauge field
     Float *gauge_field_addr;
 
+#ifdef USE_SCU
 //SCU communication parameters
     SCUDirArgIR *SCUarg[MAX_HOP][4*NDIM];
     SCUDirArgIR *SCUarg_mat[MAX_HOP][4*NDIM];
     SCUDirArgIR *SCUarg2[MAX_HOP][4*NDIM];
+#endif
+
+#ifdef USE_QMP
+    //QMP communication parameters
+    QMP_msgmem_t *msg_mem[MAX_HOP][4*NDIM];
+    QMP_msgmem_t *msg_mem_mat[MAX_HOP][4*NDIM];
+    QMP_msgmem_t *msg_mem2[MAX_HOP][4*NDIM];
+
+    QMP_msghandle_t *msg_handle[MAX_HOP][4*NDIM];
+    QMP_msghandle_t *msg_handle_mat[MAX_HOP][4*NDIM];
+    QMP_msghandle_t *msg_handle2[MAX_HOP][4*NDIM];
+#endif
 
 //--------------------------------------------------------------
 //Checkerboarded SCU
+#ifdef USE_SCU
     SCUDirArgIR *SCUarg_cb[4*NDIM];
     SCUDirArgIR *SCUarg_mat_cb[4*NDIM];
+#endif
+
+#ifdef USE_QMP
+    //QMP communication parameters
+    QMP_msgmem_t *msg_mem_cb[4*NDIM];
+    QMP_msgmem_t *msg_mem_mat_cb[4*NDIM];
+
+    QMP_msghandle_t *msg_handle_cb[4*NDIM];
+    QMP_msghandle_t *msg_handle_mat_cb[4*NDIM];
+#endif
 //--------------------------------------------------------------
 
 // flop counter
@@ -225,20 +254,30 @@ int conjugated;
   	  exit(-42);
     }
 
+#ifdef USE_QALLOC
   void *FastAlloc(int request){
     void *p =  qalloc(QFAST,request);
     if (!p) p = qalloc(QCOMMS,request);
     return p;
   }
-
   void *Alloc(char *cname, char *fname, char *vname, int request,unsigned
 int flag = QCOMMS);
-
-  void *FastAlloc(char *cname, char *fname, char *vname, int request );
-
   void Free(void *p){
     if (p) qfree(p);
   }
+#else
+  void *FastAlloc(int request){
+    void *p =  malloc(request);
+    return p;
+  }
+  void *Alloc(char *cname, char *fname, char *vname, int request,unsigned
+int flag = 0);
+  void Free(void *p){
+    if (p) free(p);
+  }
+#endif
+
+  void *FastAlloc(char *cname, char *fname, char *vname, int request );
 
   Float dclock(){
     struct timeval start;

@@ -69,7 +69,7 @@ QioControl::~QioControl() {
 
 }
 
-
+#if 0
 // The following are NEW functions added to QioControl class 
 // to enable message passing between parallel processors, based on QMP calls
 // (some are pretty useful...)
@@ -174,6 +174,7 @@ int QioControl::globalMinInt(const int data) const{
   return data;
 #endif
 }
+#endif
 
 // IO control pattern:  two broadcast to set id range who got control
 //                      read/write
@@ -181,6 +182,7 @@ int QioControl::globalMinInt(const int data) const{
 int QioControl::getIOTimeSlot() const {
   const char * fname = "getIOTimeSlot()";
 
+//  printf("Node %d: GetIOTimeSlot()\n",UniqueID());
   if(NumNodes() > 1) {
     // using intelligent commander(node-0), dumb server(others) mode
     if(unique_id == 0) {
@@ -191,8 +193,10 @@ int QioControl::getIOTimeSlot() const {
       while(1) {
 	broadcastInt(&firstID);
 	broadcastInt(&lastID);
-	if(unique_id >= firstID && unique_id <= lastID) // got time slot
+	if(unique_id >= firstID && unique_id <= lastID){ // got time slot
+//          printf("Node %d: Got time slot!\n",UniqueID());
 	  return 1;
+        }
 	
 	synchronize();
       }
@@ -203,6 +207,7 @@ int QioControl::getIOTimeSlot() const {
 }
 
 int QioControl::finishIOTimeSlot() const {
+//  printf("Node %d: finishIOTimeSlot()\n",UniqueID());
   if(NumNodes() > 1) {
     if(unique_id == 0) {
       return IOCommander(1);
@@ -237,6 +242,7 @@ int QioControl::IOCommander(int caller) const {
     firstID = 0;
     lastID = do_concur_io-1;
     if(lastID > totalnodes-1)  lastID = totalnodes-1;
+    printf("Node %d: IOCommander(%d) batches=%d firstID=%d lastID=%d\n",UniqueID(),caller, batches, firstID,lastID);
 
     broadcastInt(&firstID);
     broadcastInt(&lastID);
@@ -253,6 +259,7 @@ int QioControl::IOCommander(int caller) const {
       synchronize(0);  // one batch done, but still more
       firstID = i * do_concur_io;
       lastID = (i+1) * do_concur_io - 1;
+//    printf("Node %d: IOCommander(%d) firstID=%d lastID=%d\n",UniqueID(),caller, firstID,lastID);
       if(lastID > totalnodes-1)  lastID = totalnodes-1;
 
       broadcastInt(&firstID);

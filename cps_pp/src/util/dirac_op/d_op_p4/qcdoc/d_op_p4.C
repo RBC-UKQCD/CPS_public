@@ -84,6 +84,9 @@ DiracOpP4::DiracOpP4(Lattice & latt,
   //----------------------------------------------------------------
   // Allocate memory for the temporary fermion vector frm_tmp.
   //----------------------------------------------------------------
+#if 1
+  frm_tmp = (Vector *) fmalloc(cname,fname,"frm_tmp",f_size_cb * sizeof(Float));
+#else
   frm_tmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
   if(frm_tmp == 0){
     frm_tmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
@@ -93,6 +96,8 @@ DiracOpP4::DiracOpP4(Lattice & latt,
     ERR.Pointer(cname,fname, "frm_tmp");
   VRB.Smalloc(cname,fname, "frm_tmp", 
 	      frm_tmp, f_size_cb * sizeof(Float));
+#endif
+  
 
 
   //----------------------------------------------------------------
@@ -185,8 +190,8 @@ void DiracOpP4::MatPcDagMatPc(Vector *out,
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  printf("DiracOpP4::MatPcDagMatPc:: ");
-  print_flops(CGflops,&start,&end);
+//  printf("DiracOpP4::MatPcDagMatPc:: ");
+  print_flops(cname,fname,CGflops,&start,&end);
 #endif
 }
 
@@ -416,8 +421,8 @@ int DiracOpP4::MatInv(Vector *out,
   int iter = InvCg(out, tmp, true_res);
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  printf("DiracOpP4::InvCg:: ");
-  print_flops(DiracOp::CGflops,&start,&end);
+//  printf("DiracOpP4::InvCg:: ");
+  print_flops(cname,fname,DiracOp::CGflops,&start,&end);
 #endif
 
   // calculate odd solution

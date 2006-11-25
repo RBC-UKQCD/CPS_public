@@ -151,39 +151,23 @@ void p4_dirac_init_g()
   char *cname = "DiracOpP4";
   char *fname = "p4_dirac_init_g()";
 
-  if (vol < 4096)
-    {
-      knight_onetwo = (IFloat *) qalloc (QFAST|QCOMMS,NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
-      knight_twoone = (IFloat *) qalloc (QFAST|QCOMMS,NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
-      smeared_onelink = (IFloat *) qalloc (QFAST|QCOMMS,NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
-      for(int i = 0; i < 8; i++)
-	{
-	  tmp_frm[i] = (Vector *) qalloc (QFAST|QCOMMS,vol/2*VECT_LEN*sizeof(IFloat));
-	  tmp_frm2[i] = (Vector *) qalloc (QFAST|QCOMMS,vol/2*VECT_LEN*sizeof(IFloat));
-	}
-    }
-  else if(1)
-    {;
-      knight_onetwo = (IFloat *) qalloc (QCOMMS,NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
-      knight_twoone = (IFloat *) qalloc (QCOMMS,NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
-      smeared_onelink = (IFloat *) qalloc (QCOMMS,NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
-      for(int i = 0; i < 8; i++)
-	{
-	  tmp_frm[i] = (Vector *) qalloc (QCOMMS,vol/2*VECT_LEN*sizeof(IFloat));
-	  tmp_frm2[i] = (Vector *) qalloc (QCOMMS,vol/2*VECT_LEN*sizeof(IFloat));
-	}
-    }
-  else
-    {
+  if (vol < 4096) {
+      knight_onetwo = (IFloat *) fmalloc (NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
+      knight_twoone = (IFloat *) fmalloc (NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
+      smeared_onelink = (IFloat *) fmalloc (NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
+      for(int i = 0; i < 8; i++) {
+	  tmp_frm[i] = (Vector *) fmalloc (vol/2*VECT_LEN*sizeof(IFloat));
+	  tmp_frm2[i] = (Vector *) fmalloc (vol/2*VECT_LEN*sizeof(IFloat));
+      }
+  } else {
       knight_onetwo = (IFloat *) smalloc (NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
       knight_twoone = (IFloat *) smalloc (NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
       smeared_onelink = (IFloat *) smalloc (NUM_DIR * vol/2 * VECT_LEN2 * sizeof(IFloat));
-      for(int i = 0; i < 8; i++)
-	{
+      for(int i = 0; i < 8; i++) {
 	  tmp_frm[i] = (Vector *) smalloc (vol/2*VECT_LEN*sizeof(IFloat));
 	  tmp_frm2[i] = (Vector *) smalloc (vol/2*VECT_LEN*sizeof(IFloat));
-	}
-    }
+      }
+  }
   smeared_gauge = (IFloat *) fmalloc(vol*SITE_LEN*sizeof(IFloat));
 
   if(smeared_gauge == 0)
@@ -226,28 +210,28 @@ void p4_destroy_dirac_buf()
 extern "C"
 void p4_destroy_dirac_buf_g()
 {
-  if(1)
+  if(vol<4096)
     {
-      qfree(knight_onetwo);
-      qfree(knight_twoone);
-      qfree(smeared_onelink);
+      ffree(knight_onetwo);
+      ffree(knight_twoone);
+      ffree(smeared_onelink);
       ffree(smeared_gauge);
       for(int i = 0; i < 8; i++)
 	{
-	  qfree(tmp_frm[i]);
-	  qfree(tmp_frm2[i]);
+	  ffree(tmp_frm[i]);
+	  ffree(tmp_frm2[i]);
 	}
     }
   else
     {
-      sfree(knight_onetwo);
-      sfree(knight_twoone);
-      sfree(smeared_onelink);
-      sfree(smeared_gauge);
+      ffree(knight_onetwo);
+      ffree(knight_twoone);
+      ffree(smeared_onelink);
+      ffree(smeared_gauge);
       for(int i = 0; i < 8; i++)
 	{
-	  sfree(tmp_frm[i]);
-	  sfree(tmp_frm2[i]);
+	  ffree(tmp_frm[i]);
+	  ffree(tmp_frm2[i]);
 	}
     }
   delete pt;

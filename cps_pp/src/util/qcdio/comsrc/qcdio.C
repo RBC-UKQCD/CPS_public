@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  The QCD I/O Interface.
 
-  $Id: qcdio.C,v 1.6 2004-09-02 16:59:24 zs Exp $
+  $Id: qcdio.C,v 1.7 2006-11-25 19:10:44 chulwoo Exp $
 */
 /*  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
-   $Author: zs $ 
-   $Date: 2004-09-02 16:59:24 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v 1.6 2004-09-02 16:59:24 zs Exp $
-   $Id: qcdio.C,v 1.6 2004-09-02 16:59:24 zs Exp $
+   $Author: chulwoo $ 
+   $Date: 2006-11-25 19:10:44 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v 1.7 2006-11-25 19:10:44 chulwoo Exp $
+   $Id: qcdio.C,v 1.7 2006-11-25 19:10:44 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.C,v $
-   $Revision: 1.6 $
+   $Revision: 1.7 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v $
    $State: Exp $  */ 
 /*----------------------------------------------------------*/
@@ -44,6 +44,7 @@ CPS_START_NAMESPACE
 
 static int qcdio_latt[4];
 static  int qcdio_normalize_the_data = 1;
+void qloadsave_pump_data( int* pos, unsigned char* buf, int byte_size, int inout);
 
   /* ------------------------------------------------------
   	Gauge configuration I/O:
@@ -343,6 +344,7 @@ static  int qcdio_normalize_the_data = 1;
     return;
   }
 
+#ifndef USE_QMP
   // --------------------------------------------------------------------------
   //! A utility routine used by qloadsave_gauge.
 
@@ -471,6 +473,7 @@ static  int qcdio_normalize_the_data = 1;
     
     return;
   }
+#endif
 
   // --------------------------------------------------------------------------
   //! A utility routine used by qloadsave_gauge.

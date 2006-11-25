@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.44 2006-04-13 19:08:22 chulwoo Exp $
+  $Id: lattice_base.C,v 1.45 2006-11-25 19:10:38 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 19:08:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.44 2006-04-13 19:08:22 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.44 2006-04-13 19:08:22 chulwoo Exp $
+//  $Date: 2006-11-25 19:10:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.45 2006-11-25 19:10:38 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.45 2006-11-25 19:10:38 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.44 $
+//  $Revision: 1.45 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -337,6 +337,7 @@ Lattice::~Lattice()
   // No data manipulations if the scaling factor is 1.0
   // [built into lat.MltFloat].
   MltFloat(1.0 / GJP.XiBare(), GJP.XiDir());
+  sync();
   VRB.FuncEnd(cname,fname);
 
 }
@@ -2013,6 +2014,8 @@ void Lattice::MltFloatImpl(Float factor, int dir)
 //------------------------------------------------------------------
 void Lattice::EvolveGfield(Matrix *mom, Float step_size){
   char *fname = "EvolveGfield(M*,F)";
+
+  sync();
   VRB.Func(cname,fname);
 
   setCbufCntrlReg(4, CBUF_MODE4);
@@ -2073,8 +2076,12 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
   loc_sum = local_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE);
   CSM.SaveCsum(CSUM_EVL_LAT,loc_sum);
 
+#if 0
   VRB.Result(cname,fname,"gauge checksum(after) = %p\n",
     global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
+#endif
+  sync();
+  VRB.FuncEnd(cname,fname);
   smeared = 0;
 }
 
