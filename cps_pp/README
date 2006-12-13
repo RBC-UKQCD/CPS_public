@@ -89,12 +89,17 @@ If you don't want to remember that, use use the script 'conf':
 
 $ <sourcedir>/conf --enable-target=qcdoc
 
+or
+
+$ <sourcedir>/conf --enable-target=bgl for BG/L
+
+
 which puts the command above into a file called 'config_wrapper'.
 
 Using 'conf' script, the whole configuring process would look lik:
 
 cd <builddir>
-<sourcedir>/conf --enable-target=qcdoc
+<sourcedir>/conf --enable-target=qcdoc (or bgl)
 source config_wrapper --enable-gmp=<GNU GMP library>
 
     1.3 Build for a parallel MPI machine

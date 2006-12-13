@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2006-10-30 21:17:43 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.42 2006-10-30 21:17:43 chulwoo Exp $
-dnl  $Id: configure.in,v 1.42 2006-10-30 21:17:43 chulwoo Exp $
+dnl  $Date: 2006-12-13 18:26:28 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.43 2006-12-13 18:26:28 chulwoo Exp $
+dnl  $Id: configure.in,v 1.43 2006-12-13 18:26:28 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.42 $
+dnl  $Revision: 1.43 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -100,6 +100,24 @@ if test "$enable_target" = "qcdoc"; then
    ARCHDIR="QCDOC_DIR"
    TESTING_PARALLEL="yes";
    namespace_default="no" 
+
+elif test "$enable_target" = "bgl"; then
+#     AC_PATH_PROG(CC, blrts_xlc)
+#    AC_PATH_PROG(CXX, blrts_xlC)
+
+dnl  c++ compiler is used as linker
+#     AC_PATH_PROG(CXX,blrts_xlC)
+
+   CFLAGS="${CFLAGS}"
+   CXXFLAGS="${CXXFLAGS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I/bgl/BlueLight/ppcfloor/bglsys/include/"
+   LDFLAGS="-I/bgl/BlueLight/ppcfloor/bglsys/include/ -L/bgl/BlueLight/ppcfloor/bglsys/lib/ -lrts.rts"
+#   LDFLAGS="-I/bgl/BlueLight/ppcfloor/bglsys/include/ -L/bgl/BlueLight/ppcfloor/bglsys/lib/ -lkek.rts -lbgl_perfctr.rts -lbglnet.rts -lmpich.rts -lmsglayer.rts -lrts.rts -ldevices.rts"
+
+   ARCH="BGL"
+   ARCHDIR="BGL_DIR"
+   TESTING_PARALLEL="yes";
+   namespace_default="yes"
 
 elif test "$enable_target" = "mpi"; then
    CXX=""

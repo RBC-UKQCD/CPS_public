@@ -3826,6 +3826,23 @@ if test "$enable_target" = "qcdoc"; then
    TESTING_PARALLEL="yes";
    namespace_default="no"
 
+elif test "$enable_target" = "bgl"; then
+#     AC_PATH_PROG(CC, blrts_xlc)
+#    AC_PATH_PROG(CXX, blrts_xlC)
+
+#     AC_PATH_PROG(CXX,blrts_xlC)
+
+   CFLAGS="${CFLAGS}"
+   CXXFLAGS="${CXXFLAGS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I/bgl/BlueLight/ppcfloor/bglsys/include/"
+   LDFLAGS="-I/bgl/BlueLight/ppcfloor/bglsys/include/ -L/bgl/BlueLight/ppcfloor/bglsys/lib/ -lrts.rts"
+#   LDFLAGS="-I/bgl/BlueLight/ppcfloor/bglsys/include/ -L/bgl/BlueLight/ppcfloor/bglsys/lib/ -lkek.rts -lbgl_perfctr.rts -lbglnet.rts -lmpich.rts -lmsglayer.rts -lrts.rts -ldevices.rts"
+
+   ARCH="BGL"
+   ARCHDIR="BGL_DIR"
+   TESTING_PARALLEL="yes";
+   namespace_default="yes"
+
 elif test "$enable_target" = "mpi"; then
    CXX=""
    for ac_prog in mpic++ mpiCC mpCC
