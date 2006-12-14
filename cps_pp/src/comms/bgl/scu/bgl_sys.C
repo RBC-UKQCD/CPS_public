@@ -1,0 +1,417 @@
+#include<config.h>
+CPS_START_NAMESPACE
+/*!\file
+  \brief  Interface to the BGL operating system.
+*/
+//------------------------------------------------------------------
+//
+// bgl_sys.C
+//
+// Here the necessary operating system function calls are interfaced
+// to the BGL operating system.
+// 
+//------------------------------------------------------------------
+
+CPS_END_NAMESPACE
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/bgl/bgl_sys_all.h>
+#include <util/gjp.h>
+#include <util/verbose.h>
+#include <util/error.h>
+
+
+
+#include <comms/sysfunc.h>
+
+CPS_START_NAMESPACE
+
+#ifdef PARALLEL
+
+//#ifndef TARGET_BGL
+//ERR.General("sys_bgl", "sys_bgl","TARGET_BGL is not defined");
+//#endif
+	
+
+//! 1 if the dir is a torus, 0 if it is not
+int TorusT()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirT() == 0){
+    //rc = (pers.isTorus & PERSONALITY_TORUS_X);
+    rc = (BGLPersonality_isTorusX(&pers));
+  } 
+  else if (GJP.BglMachineDirT() == 1){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_Y);
+    rc = (BGLPersonality_isTorusY(&pers));
+  } 
+  else if (GJP.BglMachineDirT() == 2){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_Z);
+    rc = (BGLPersonality_isTorusZ(&pers));
+  } 
+  else if (GJP.BglMachineDirT() == 3){
+    rc = 1;
+  } 
+
+  return rc;
+}
+
+//! 1 if the dir is a torus, 0 if it is not
+int TorusX()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirX() == 0){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_X);
+    rc = (BGLPersonality_isTorusX(&pers));
+  } 
+  else if (GJP.BglMachineDirX() == 1){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_Y);
+    rc = (BGLPersonality_isTorusY(&pers));
+  } 
+  else if (GJP.BglMachineDirX() == 2){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_Z);
+    rc = (BGLPersonality_isTorusZ(&pers));
+  } 
+  else if (GJP.BglMachineDirX() == 3){
+    rc = 1;
+  } 
+
+  return rc;
+}
+
+//! 1 if the dir is a torus, 0 if it is not
+int TorusY()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirY() == 0){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_X);
+    rc = (BGLPersonality_isTorusX(&pers));
+  } 
+  else if (GJP.BglMachineDirY() == 1){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_Y);
+    rc = (BGLPersonality_isTorusY(&pers));
+  } 
+  else if (GJP.BglMachineDirY() == 2){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_Z);
+    rc = (BGLPersonality_isTorusZ(&pers));
+  } 
+  else if (GJP.BglMachineDirY() == 3){
+    rc = 1;
+  } 
+
+  return rc;
+}
+
+//! 1 if the dir is a torus, 0 if it is not
+int TorusZ()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirZ() == 0){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_X);
+    rc = (BGLPersonality_isTorusX(&pers));
+  } 
+  else if (GJP.BglMachineDirZ() == 1){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_Y);
+    rc = (BGLPersonality_isTorusY(&pers));
+  } 
+  else if (GJP.BglMachineDirZ() == 2){
+    //    rc = (pers.isTorus & PERSONALITY_TORUS_Z);
+    rc = (BGLPersonality_isTorusZ(&pers));
+  } 
+  else if (GJP.BglMachineDirZ() == 3){
+    rc = 1;
+  } 
+
+  return rc;
+}
+
+/*  Functions to return physics four dimensional coordinates of the
+  node.  The physics coordinate axes are labeled T, X, Y, Z*/
+
+//!< Gets the grid coordinate of this node in the T direction.
+int CoorT()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirT() == 0){
+    rc = pers.xCoord;
+  } 
+  else if (GJP.BglMachineDirT() == 1){
+    rc = pers.yCoord;
+  } 
+  else if (GJP.BglMachineDirT() == 2){
+    rc = pers.zCoord;
+  } 
+  else if (GJP.BglMachineDirT() == 3){
+    rc = rts_get_processor_id();
+  } 
+  
+  return rc;
+}
+
+//!< Gets the grid coordinate of this node in the X direction.
+int CoorX()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirX() == 0){
+    rc = pers.xCoord;
+  } 
+  else if (GJP.BglMachineDirX() == 1){
+    rc = pers.yCoord;
+  } 
+  else if (GJP.BglMachineDirX() == 2){
+    rc = pers.zCoord;
+  } 
+  else if (GJP.BglMachineDirX() == 3){
+    rc = rts_get_processor_id();
+  } 
+  
+  return rc;
+}
+
+//!< Gets the grid coordinate of this node in the Y direction.
+int CoorY()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirY() == 0){
+    rc = pers.xCoord;
+  } 
+  else if (GJP.BglMachineDirY() == 1){
+    rc = pers.yCoord;
+  } 
+  else if (GJP.BglMachineDirY() == 2){
+    rc = pers.zCoord;
+  } 
+  else if (GJP.BglMachineDirY() == 3){
+    rc = rts_get_processor_id();
+  } 
+
+  return rc;
+}
+
+//!< Gets the grid coordinate of this node in the Z direction.
+int CoorZ()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirZ() == 0){
+    rc = pers.xCoord;
+  } 
+  else if (GJP.BglMachineDirZ() == 1){
+    rc = pers.yCoord;
+  } 
+  else if (GJP.BglMachineDirZ() == 2){
+    rc = pers.zCoord;
+  } 
+  else if (GJP.BglMachineDirZ() == 3){
+    rc = rts_get_processor_id();
+  } 
+
+  return rc;
+}
+
+//!< Gets the size of the grid in the T direction.
+int SizeT()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirT() == 0){
+    rc = pers.xSize;
+  } 
+  else if (GJP.BglMachineDirT() == 1){
+    rc = pers.ySize;
+  } 
+  else if (GJP.BglMachineDirT() == 2){
+    rc = pers.zSize;
+  } 
+  else if (GJP.BglMachineDirT() == 3){
+    rc = 2;
+  } 
+
+  return rc;
+}
+
+
+//!< Gets the size of the grid in the X direction.
+int SizeX()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirX() == 0){
+    rc = pers.xSize;
+  } 
+  else if (GJP.BglMachineDirX() == 1){
+    rc = pers.ySize;
+  } 
+  else if (GJP.BglMachineDirX() == 2){
+    rc = pers.zSize;
+  } 
+  else if (GJP.BglMachineDirX() == 3){
+    rc = 2;
+  } 
+
+  return rc;
+}
+
+//!< Gets the size of the grid in the Y direction.
+int SizeY()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirY() == 0){
+    rc = pers.xSize;
+  } 
+  else if (GJP.BglMachineDirY() == 1){
+    rc = pers.ySize;
+  } 
+  else if (GJP.BglMachineDirY() == 2){
+    rc = pers.zSize;
+  } 
+  else if (GJP.BglMachineDirY() == 3){
+    rc = 2;
+  } 
+
+  return rc;
+}
+
+//!< Gets the size of the grid in the Z direction.
+int SizeZ()
+{
+  int rc;
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+
+  if(      GJP.BglMachineDirZ() == 0){
+    rc = pers.xSize;
+  } 
+  else if (GJP.BglMachineDirZ() == 1){
+    rc = pers.ySize;
+  } 
+  else if (GJP.BglMachineDirZ() == 2){
+    rc = pers.zSize;
+  } 
+  else if (GJP.BglMachineDirZ() == 3){
+    rc = 2;
+  } 
+
+  return rc;
+}
+
+
+//! Gets an ID which is unique for each node.
+int UniqueID()
+{
+  int rc;
+
+  rc = CoorT();
+  rc = rc*SizeZ() + CoorZ();
+  rc = rc*SizeY() + CoorY();
+  rc = rc*SizeX() + CoorX();
+#if 0
+  if((CoorX() == 0) && (CoorY() == 0) && (CoorZ() == 0) && (CoorT() == 0)) {
+    rc = 1;
+  }
+
+#ifdef BGL_PRINT_ALL
+  rc = 1;
+#endif
+#endif
+
+  return rc;
+}
+
+
+//! Returns the total number of nodes in the processor grid.
+int NumNodes()
+{
+  int rc;
+
+  rc = SizeX() * SizeY() * SizeZ() * 2;
+
+  return rc;
+}
+
+/* Random number seeds loaded at boot time */
+//!< Gets a RNG seed.
+unsigned int Seed()
+{
+  int rc;
+
+  rc = 0;
+  rc = rc + CoorX(); 
+  rc = rc + SizeX() * CoorY();
+  rc = rc + SizeX() * SizeY() * CoorZ();
+  rc = rc + SizeX() * SizeY() * SizeZ() * CoorT();
+
+  rc = rc + rc * (rts_get_timebase() / 1000);
+
+  return rc;
+}
+
+//!< Gets a RNG seed.
+unsigned int SeedS()
+{
+  int rc;
+
+  rc = rts_get_timebase() / 1000;
+
+  return rc;
+}
+
+//!< Gets a RNG seed.
+unsigned int SeedT()
+{
+  int rc;
+
+  rc = 0;
+  rc = rc + CoorX(); 
+  rc = rc + SizeX() * CoorY();
+  rc = rc + SizeX() * SizeY() * CoorZ();
+  rc = rc + SizeX() * SizeY() * SizeZ() * CoorT();
+
+  return rc;
+}
+
+//!< Gets a RNG seed.
+unsigned int SeedST()
+{
+  int rc;
+  rc = 1234321;
+  return rc;
+}
+
+
+#endif //PARALLEL
+
+
+
+CPS_END_NAMESPACE

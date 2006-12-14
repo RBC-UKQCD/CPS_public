@@ -1,3 +1,4 @@
+#include <config.h>
 #include <string.h>
 #include <iostream>
 #include <util/data_types.h>

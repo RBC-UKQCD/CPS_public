@@ -8,6 +8,7 @@
 //
 //------------------------------------------------------------------
 
+#include <config.h>
 #include <stdio.h>
 #include <util/dirac_op.h>
 #include <util/lattice.h>
@@ -97,15 +98,15 @@ DiracOpP4::~DiracOpP4() {
   char *fname = "~DiracOpP4()";
   VRB.Func(cname,fname);
 
-  if(cnv_frm == CNV_FRM_YES)
-    lat.Convert(CANONICAL, f_out, f_in);
-  else if(cnv_frm == CNV_FRM_NO)
-    lat.Convert(CANONICAL);
-
 #if 0
   p4_destroy_dirac_buf();
 #endif
   p4_destroy_dirac_buf_g();
+
+  if(cnv_frm == CNV_FRM_YES)
+    lat.Convert(CANONICAL, f_out, f_in);
+  else if(cnv_frm == CNV_FRM_NO)
+    lat.Convert(CANONICAL);
 
   //----------------------------------------------------------------
   // Free memory
@@ -162,7 +163,7 @@ void DiracOpP4::MatPcDagMatPc(Vector *out,
 
 #ifdef PROFILE
   gettimeofday(&end,NULL);
-  printf("DiracOpAsqtad::MatPcDagMatPc:: ");
+  printf("DiracOpP4::MatPcDagMatPc:: ");
   print_flops(nflops,&start,&end);
 #endif
 }
@@ -466,6 +467,25 @@ void DiracOpP4::RitzMat(Vector *out, Vector *in) {
     }
   
 }
+
+//------------------------------------------------------------------
+// dMdmu(Vector *out, Vector *in, ChkbType cb, DagType dag, int order) :
+// dMdmu is the derivative of the fermion matrix with respect to the 
+// chemical potential.
+// dMdmu conects only odd-->even or even-->odd sites.
+// The in, out fields are defined on a checkerboard.
+// cb refers to the checkerboard of the in field.
+// order refers to the order of the derivative.
+//------------------------------------------------------------------
+void DiracOpP4::dMdmu(Vector *out, 
+                                  Vector *in, 
+                                  ChkbType cb, 
+                                  DagType dag,
+                                  int order) {
+
+  ERR.NotImplemented(cname,"dMdmu");
+}
+
 
 //------------------------------------------------------------------
 // RitzEigMat(Vector *out, Vector *in) :

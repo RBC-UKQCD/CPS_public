@@ -334,8 +334,9 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
 
 	//!< Now construct additional vectors needed
 	for (int j=0; j<bsn_deg; j++) {
+      Float one=1.;
 	  frmn[j+shift+bsn_deg] -> 
-	    FTimesV1PlusV2(1.0, frmn[j], frmn[j+shift], f_size);
+	    FTimesV1PlusV2(one, frmn[j], frmn[j+shift], f_size);
 	}
 
 	//!< Copy over required residues and setup pointers for bosonic force

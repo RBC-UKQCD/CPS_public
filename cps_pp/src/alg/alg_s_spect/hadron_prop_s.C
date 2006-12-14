@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-11-25 19:09:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.10 2006-11-25 19:09:56 chulwoo Exp $
-//  $Id: hadron_prop_s.C,v 1.10 2006-11-25 19:09:56 chulwoo Exp $
+//  $Date: 2006-12-14 17:53:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.11 2006-12-14 17:53:41 chulwoo Exp $
+//  $Id: hadron_prop_s.C,v 1.11 2006-12-14 17:53:41 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v $
 //  $State: Exp $
 //
@@ -17,18 +17,15 @@
 // hadron_prop_s.C
 
 #ifndef lint
-static char vcid[] = "$Id: hadron_prop_s.C,v 1.10 2006-11-25 19:09:56 chulwoo Exp $";
+static char vcid[] = "$Id: hadron_prop_s.C,v 1.11 2006-12-14 17:53:41 chulwoo Exp $";
 #endif /* lint */
 
 #include <util/qcdio.h>
 #include <alg/hadron_prop_s.h>
 #include <util/rcomplex.h>
 #include <comms/glb.h>
-#include <alg/myenum.h>
-
-#ifdef PARALLEL
 #include <comms/sysfunc.h>
-#endif
+#include <alg/myenum.h>
 CPS_START_NAMESPACE
 
 const int MAX_LEN = 1023;     // max. number of IFloats that can be transfered
@@ -167,7 +164,7 @@ void HadronPropS::download_prop(HadronType type, Float *buf)
 }
 
 
-#ifdef PARALLEL
+#if (defined PARALLEL) && (TARGET != BGL)
 //---------------------------------------------------------------------
 // download data from all nodes in the propagator direction to
 // node 0 (origin of the lattice)

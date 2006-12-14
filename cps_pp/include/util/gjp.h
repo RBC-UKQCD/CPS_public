@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.25 2006-11-25 19:09:48 chulwoo Exp $
+  $Id: gjp.h,v 1.26 2006-12-14 17:53:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-11-25 19:09:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.25 2006-11-25 19:09:48 chulwoo Exp $
-//  $Id: gjp.h,v 1.25 2006-11-25 19:09:48 chulwoo Exp $
+//  $Date: 2006-12-14 17:53:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.26 2006-12-14 17:53:33 chulwoo Exp $
+//  $Id: gjp.h,v 1.26 2006-12-14 17:53:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.25 $
+//  $Revision: 1.26 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -39,6 +39,7 @@
 // qos sytem function call.
 // 
 //------------------------------------------------------------------
+
 
 #include <util/lattice.h>
 #include <util/vector.h>
@@ -81,7 +82,31 @@ extern int gjp_scu_wire_map[];
      // so that the local direction wire number is not
      // used. 
 
-#endif
+#if TARGET == BGL
+extern int bgl_machine_dir[8];
+     // This array is set by GJP.Initialize to:
+     // bgl_machine_dir[0] = 2*bgl_machine_dir_x;
+     // bgl_machine_dir[1] = 2*bgl_machine_dir_x+1;
+     // bgl_machine_dir[2] = 2*bgl_machine_dir_y;
+     // bgl_machine_dir[3] = 2*bgl_machine_dir_y+1;
+     // bgl_machine_dir[4] = 2*bgl_machine_dir_z;
+     // bgl_machine_dir[5] = 2*bgl_machine_dir_z+1;
+     // bgl_machine_dir[6] = 2*bgl_machine_dir_t;
+     // bgl_machine_dir[7] = 2*bgl_machine_dir_t+1;
+     // This array is for convenience when translating
+     // from the physics system directions to the processor
+     // grid directions.
+
+extern int bgl_cps_dir[8];
+     // This array is set by GJP.Initialize to be the
+     // "reverse" array of bgl_machine_dir. 
+     // This array is for convenience when translating
+     // from the the processor grid directions to the
+     // physics system directions
+
+#endif //TARGET == BGL
+
+#endif //PARALLEL
 
 //! A container class for global parameters.
 /*! An object of this class, called GJP, should be created at the highest
@@ -99,6 +124,25 @@ class GlobalJobParameter
   char *cname;    // Class name.
   DoArg doarg_int;
 
+#if 0
+  int bgl_machine_dir_x;
+  int bgl_machine_dir_y;
+  int bgl_machine_dir_z;
+  int bgl_machine_dir_t;
+     // For a given direction of the physics system 
+     // (x,y,z,t) it gives the direction of the processor 
+     // grid that it is "mapped" on. The processor grid has dir 0,1,2,3
+     // with 3 being the chip internal direction connecting the two
+     // cores. The hardware x,y,z,t are labeled 0,1,2,3.
+     // For example if the physics sytem direction y is mapped
+     // allong the processor grid direction t then 
+     // bgl_machine_dir_y = 3. These variables must be set before any 
+     // calls to bgl_sys routines are made. These variables are used 
+     // to "rotate" the physics system with respect to the 
+     // processor grid.
+
+#endif //TARGET == BGL
+
   int node_sites[5]; // sites of a single node along {X,Y,Z,T,S} direction
   int nodes[5];      // number of nodes along {X,Y,Z,T,S} direction
   BndCndType bc[5];       // sites of a single node along {X,Y,Z,T,S} direction
@@ -113,6 +157,41 @@ public:
   GlobalJobParameter();
 
   ~GlobalJobParameter();
+
+#if TARGET == BGL
+
+  int BglMachineDirX(void)
+    {return bgl_machine_dir[0]/2;}
+     // bgl_machine_dir[0] = 2*bgl_machine_dir_x;
+  //!< Gets the direction of the processor grid that X is "mapped" on. 
+  /*!<
+    \return The direction of the processor grid that X is "mapped" on. 
+  */
+
+  int BglMachineDirY(void)
+    {return bgl_machine_dir[2]/2;}
+  //!< Gets the direction of the processor grid that X is "mapped" on. 
+  /*!<
+    \return The direction of the processor grid that X is "mapped" on. 
+  */
+
+  int BglMachineDirZ(void)
+    {return bgl_machine_dir[4]/2;}
+  //!< Gets the direction of the processor grid that X is "mapped" on. 
+  /*!<
+    \return The direction of the processor grid that X is "mapped" on. 
+  */
+
+  int BglMachineDirT(void)
+    {return bgl_machine_dir[6]/2;}
+  //!< Gets the direction of the processor grid that X is "mapped" on. 
+  /*!<
+    \return The direction of the processor grid that X is "mapped" on. 
+  */
+
+#endif
+
+
 
   /*!\defgroup gjp_get_methods Methods that return the value of a global variable
     @{ */
@@ -725,12 +804,20 @@ void Start();
 void Start(int * argc, char ***argv);
 void End();
 #elif USE_QMP
+namespace QMPSCU {
+  void init_qmp();
+  void init_qmp(int * argc, char *** argv);
+  void destroy_qmp();
+}
 void Start();
 void Start(int * argc, char ***argv);
 void End();
 #else
 inline void Start(){}
 inline void End(){}
+#endif
+#if TARGET == BGL
+void Start(const BGLAxisMap *);
 #endif
 
 /*! An instance of the GlobalJobParameter class, named GJP, should be
@@ -739,11 +826,8 @@ inline void End(){}
 */
 extern GlobalJobParameter GJP;
 
+
 CPS_END_NAMESPACE
 
-namespace QMPSCU {
-  void init_qmp();
-  void init_qmp(int * argc, char *** argv);
-  void destroy_qmp();
-}
+
 #endif

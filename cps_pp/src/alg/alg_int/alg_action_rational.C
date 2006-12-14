@@ -146,6 +146,8 @@ AlgActionRational::AlgActionRational(AlgMomentum &mom,
 
 void AlgActionRational::init(int traj_num) {
 
+  char *fname = "init(int)" ;
+  VRB.Func(cname,fname);
   AlgActionBilinear::init();
   evolved = 1;
   heatbathEval = 0;

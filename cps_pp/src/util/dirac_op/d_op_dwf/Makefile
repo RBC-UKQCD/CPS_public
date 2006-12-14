@@ -1,4 +1,5 @@
 SEPARATE_LIB=no
+BGL_DIR = noarch
 NORECURSE_DIR = CVS qcdoc noarch qcdsp_nos qcdsp_nos_hdw_diag qmp
 BGL_QMP_DIR = qmp
 QCDOC_DIR = qcdoc

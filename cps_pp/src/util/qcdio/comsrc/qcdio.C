@@ -1,40 +1,34 @@
 #include<config.h>
-CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 /*!\file
   \brief  The QCD I/O Interface.
 
-  $Id: qcdio.C,v 1.7 2006-11-25 19:10:44 chulwoo Exp $
+  $Id: qcdio.C,v 1.8 2006-12-14 17:54:31 chulwoo Exp $
 */
 /*  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
    $Author: chulwoo $ 
-   $Date: 2006-11-25 19:10:44 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v 1.7 2006-11-25 19:10:44 chulwoo Exp $
-   $Id: qcdio.C,v 1.7 2006-11-25 19:10:44 chulwoo Exp $
+   $Date: 2006-12-14 17:54:31 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v 1.8 2006-12-14 17:54:31 chulwoo Exp $
+   $Id: qcdio.C,v 1.8 2006-12-14 17:54:31 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.C,v $
-   $Revision: 1.7 $
+   $Revision: 1.8 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v $
    $State: Exp $  */ 
 /*----------------------------------------------------------*/
 
-CPS_END_NAMESPACE
 #include <util/qcdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <math.h>
 #include <util/qcdio.h>
-CPS_START_NAMESPACE
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
-CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/error.h>
 CPS_START_NAMESPACE
@@ -351,7 +345,7 @@ void qloadsave_pump_data( int* pos, unsigned char* buf, int byte_size, int inout
   // if inout = 0, pump down to t,0,0,0 (for saving).
   // if inout = 1, pump up from t,0,0,0 (for loading).
   void qloadsave_pump_data( int* pos, unsigned char* buf, int byte_size, int inout) {
-#ifdef PARALLEL
+#if TARGET == QCDOC 
     // Size of buffer in appropriate units:
     // It is technically possible that the fact that the minimum unit of comms
     // is either 4 or 8 bytes could mean that the size of the transmitted data

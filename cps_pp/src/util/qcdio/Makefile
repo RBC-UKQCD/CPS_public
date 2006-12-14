@@ -1,4 +1,5 @@
-NORECURSE_DIR = qmp qcdoc qcdsp noarch mpi CVS 
+NORECURSE_DIR = bgl qmp qcdoc qcdsp noarch mpi CVS 
+BGL_DIR = bgl
 BGL_QMP_DIR = qmp
 QCDOC_DIR = qcdoc
 QCDOC_SERIAL_DIR = qcdoc

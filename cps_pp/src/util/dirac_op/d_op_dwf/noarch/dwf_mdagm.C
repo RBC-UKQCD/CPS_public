@@ -19,6 +19,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include<util/dwf.h>
 #include<util/gjp.h>
+#include<util/dirac_op.h>
 #include<util/vector.h>
 #include<util/verbose.h>
 #include<util/error.h>
@@ -45,6 +46,7 @@ void dwf_mdagm(Vector *out,
   if(dot_prd != 0){
     int f_size = 24 * dwf_lib_arg->vol_4d * dwf_lib_arg->ls / 2;
     *dot_prd = frm_tmp1->NormSqNode(f_size);
+    DiracOp::CGflops+=2*f_size;
   }
 
 //------------------------------------------------------------------

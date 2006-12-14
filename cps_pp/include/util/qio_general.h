@@ -1,7 +1,7 @@
 #ifndef __QIOGENERAL__
 #define __QIOGENERAL__
 
-
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>

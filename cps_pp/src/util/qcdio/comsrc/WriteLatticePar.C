@@ -1,3 +1,4 @@
+#include <config.h>
 #include <util/WriteLatticePar.h>
 #include <util/iostyle.h>
 

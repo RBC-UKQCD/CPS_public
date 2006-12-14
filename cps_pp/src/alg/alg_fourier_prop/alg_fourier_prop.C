@@ -8,6 +8,7 @@
 //
 //------------------------------------------------------------------
 
+#include <config.h>     
 #include <stdlib.h>     // exit()
 #include <stdio.h>
 #include <math.h>
@@ -25,14 +26,13 @@
 #include <util/error.h>
 #include <alg/do_arg.h>
 #include <comms/glb.h>
+#include <comms/sysfunc.h>
 #include <alg/qpropw.h>
 #include <alg/qpropw_arg.h>
 #include <alg/wilson_matrix.h>
 #include <alg/spin_matrix.h>
 #include <util/site.h>
 #include <util/qcdio.h>
-
-#include <comms/sysfunc.h>
 
 CPS_START_NAMESPACE
 

@@ -1,0 +1,1466 @@
+#include<config.h>
+CPS_START_NAMESPACE
+//--------------------------------------------------------------------
+// Pavlos Vranas 9/30/2005
+//
+// BGL communications layer for QCD
+//
+//--------------------------------------------------------------------
+CPS_END_NAMESPACE
+#include <sys/bgl/bgl_sys_all.h>
+#include <bgllockbox.h>
+#include <comms/bgl_net.h>
+#include <comms/scu.h>
+#include <comms/sysfunc.h>
+#include <util/wilson.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <util/gjp.h>
+CPS_START_NAMESPACE
+
+//------------------------------------------------------------------
+// In these routines:
+//
+// The directions are labeled as:
+// 0,1,2,3,4,5,6,7 -> x+, x-, y+, y-, z+, z-, t+, t-
+//
+// 3 hardware packet sizes are used:
+// For a given message size a hardware size is used as follows:
+// message size <= 16B  ---->  32B hardware packet
+// message size <= 112B ----> 128B hardware packet
+// message size <= 240B ----> 256B hardware packet
+//
+//------------------------------------------------------------------
+
+
+//------------------------------------------------------------------
+// Communication routines for BlueGene/L.
+//
+// In these routines:
+//
+// The directions are labeled as:
+// 0,1,2,3,4,5,6,7 -> x+, x-, y+, y-, z+, z-, t+, t-
+//
+// In the generic routines 3 hardware packet sizes are used:
+// For a given message size a hardware size is used as follows:
+// message size <= 16B  ---->  32B hardware packet
+// message size <= 112B ----> 128B hardware packet
+// message size <= 240B ----> 256B hardware packet
+//
+//------------------------------------------------------------------
+
+
+//------------------------------------------------------------------
+// Externals
+//------------------------------------------------------------------
+int send_poll[8];
+int recv_poll[8];
+double com_reg[64]   __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+
+//------------------------------------------------------------------
+// # define parameters
+//------------------------------------------------------------------
+// If the send fifo has less than SEND_FIFO_LEVEL 32-byte chuncks
+// then the send can proceed.
+#define SEND_FIFO_LEVEL 24
+
+// If the receiver fifo has more than RECV_FIFO_LEVEL 32-byte chuncks
+// then the receive can proceed.
+#define RECV_FIFO_LEVEL 0
+
+
+#if BLRTS_SUPERV == 1
+
+// Common inter-core buffers in SRAM
+#define SCRATCH_MEM_BASE 0xFFFFD000
+#define SCRATCH_MEM_SIZE 0x2000
+
+#else
+
+// Common inter-core buffers in scratch memory
+static unsigned scratch_base;
+static unsigned scratch_size;
+#define SCRATCH_MEM_BASE scratch_base
+#define SCRATCH_MEM_SIZE scratch_size
+
+#endif
+
+
+
+#define MFIFO_SIZE 256
+#define MFIFO_A (BGLQuad *) (SCRATCH_MEM_BASE + 0 * MFIFO_SIZE)
+#define MFIFO_B (BGLQuad *) (SCRATCH_MEM_BASE + 1 * MFIFO_SIZE)
+#define MFIFO_C (BGLQuad *) (SCRATCH_MEM_BASE + 2 * MFIFO_SIZE)
+#define MFIFO_D (BGLQuad *) (SCRATCH_MEM_BASE + 3 * MFIFO_SIZE)
+#define MFIFO_C0_SEND_P MFIFO_A
+#define MFIFO_C0_RECV_P MFIFO_B
+#define MFIFO_C0_SEND_M MFIFO_D
+#define MFIFO_C0_RECV_M MFIFO_C
+#define MFIFO_C1_SEND_P MFIFO_C
+#define MFIFO_C1_RECV_P MFIFO_D
+#define MFIFO_C1_SEND_M MFIFO_B
+#define MFIFO_C1_RECV_M MFIFO_A
+
+
+// The delays for a mesh end send/recv
+#define MESH_END_DELAY 1000000
+
+//------------------------------------------------------------------
+// # define code
+//------------------------------------------------------------------
+#define MEM_SEND_SPINOR(dir, fifo, qdata) \
+      stat[stat_se[dir]] = 0xFF; \
+      QuadLoad(qdata,  0);       \
+      QuadLoadU(qdata, 1, u);    \
+      QuadLoadU(qdata, 2, u);    \
+      QuadLoadU(qdata, 3, u);    \
+      QuadStore(fifo,  0);       \
+      QuadLoadU(qdata, 4, u);    \
+      QuadStoreU(fifo, 1, u);    \
+      QuadLoadU(qdata, 5, u);    \
+      QuadStoreU(fifo, 2, u);    \
+      QuadLoad(&stat,20);        \
+      QuadStoreU(fifo, 3, u);    \
+      QuadStoreU(fifo, 4, u);    \
+      QuadStoreU(fifo, 5, u);    \
+      QuadStore(stat_se_ptr[dir],20)
+
+#define TORUS_SEND_SPINOR(dir, fifo, qdata) \
+      QuadLoad(&(hdr_send_buf[dir][1]), 0); \
+      QuadLoad(qdata,  1);                  \
+      QuadLoadU(qdata, 2, u);               \
+      QuadLoadU(qdata, 3, u);               \
+      QuadStore(fifo,  0);                  \
+      QuadLoadU(qdata, 4, u);               \
+      QuadStore(fifo,  1);                  \
+      QuadLoadU(qdata, 5, u);               \
+      QuadStore(fifo,  2);                  \
+      QuadLoadU(qdata, 6, u);               \
+      QuadStore(fifo,  3);                  \
+      QuadStore(fifo,  4);                  \
+      QuadStore(fifo,  5);                  \
+      QuadStore(fifo,  6);                  \
+      QuadStore(fifo, 1)
+
+#define MEM_RECV_SPINOR(dir, fifo, qdata) \
+      stat[stat_re[dir]] = 0x00; \
+      QuadLoad(fifo,    0);      \
+      QuadLoadU(fifo,   1, u);   \
+      QuadLoadU(fifo,   2, u);   \
+      QuadLoadU(fifo,   3, u);   \
+      QuadStore(qdata,  0);      \
+      QuadLoadU(fifo,   4, u);   \
+      QuadStoreU(qdata, 1, u);   \
+      QuadLoadU(fifo,   5, u);   \
+      QuadStoreU(qdata, 2, u);   \
+      QuadLoad(&stat,20);        \
+      QuadStoreU(qdata, 3, u);   \
+      QuadStoreU(qdata, 4, u);   \
+      QuadStoreU(qdata, 5, u);   \
+      QuadStore(stat_re_ptr[dir],20)
+      
+#define TORUS_RECV_SPINOR(dir, fifo, qdata) \
+      QuadLoad(fifo,    0);    \
+      QuadLoad(fifo,    1);    \
+      QuadLoad(fifo,    2);    \
+      QuadLoad(fifo,    3);    \
+      QuadStore(qdata,  1);    \
+      QuadLoad(fifo,    4);    \
+      QuadStoreU(qdata, 2, u); \
+      QuadLoad(fifo,    5);    \
+      QuadStoreU(qdata, 3, u); \
+      QuadLoad(fifo,    6);    \
+      QuadStoreU(qdata, 4, u); \
+      QuadStoreU(qdata, 5, u); \
+      QuadStoreU(qdata, 6, u); \
+      QuadLoad(fifo,    7)
+
+
+//------------------------------------------------------------------
+// An array that contains the end of grid info
+//------------------------------------------------------------------
+int grid_end[8] __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+
+//------------------------------------------------------------------
+// Buffers containing a packet headers for the 8 different 
+// directions and the 3 different sizes. These headers are used 
+// to send packets
+//------------------------------------------------------------------
+BGLCPSTorusPacketHeader hdr_send_buf[8][3] __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+
+//------------------------------------------------------------------
+// A dummy buffer to deposit the header of a packet as it is 
+// received. This is common to all directions since the data
+// is not used.
+//------------------------------------------------------------------
+BGLCPSTorusPacketHeader hdr_recv_buf __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+
+//------------------------------------------------------------------
+// This array contains the addresses where the sender status are.
+//------------------------------------------------------------------
+BGLQuad *stat_se_ptr[8];
+
+//------------------------------------------------------------------
+// This array contains the addresses where the receiver status are.
+//------------------------------------------------------------------
+BGLQuad *stat_re_ptr[8];
+
+//------------------------------------------------------------------
+// This array contains the offset within the status quad-word value,
+// addressed in Bytes, where the 1 Byte status for a given
+// sender is located. The possible offsets are 0, 1, ...15.
+//------------------------------------------------------------------
+int stat_se[8];
+
+//------------------------------------------------------------------
+// This array contains the offset within the status quad-word value,
+// addressed in Bytes, where the 1 Byte status for a given
+// receiver is located. The possible offsets are 0, 1, ...15.
+//------------------------------------------------------------------
+int stat_re[8];
+
+//------------------------------------------------------------------
+// This array contains the sender fifo addresses.
+//------------------------------------------------------------------
+BGLQuad *fifo_se_ptr[8];
+
+//------------------------------------------------------------------
+// This array contains the receiver fifo addresses.
+//------------------------------------------------------------------
+BGLQuad *fifo_re_ptr[8];
+
+/*--------------------------------------------------------------------------*/
+/* Externals                                                                */
+/*--------------------------------------------------------------------------*/
+extern int wfm_max_numchunk;
+extern int wfm_numchunk[];
+extern IFloat **wfm_send_ad;
+extern IFloat **wfm_recv_ad;
+
+
+int ccount=0;
+
+
+//------------------------------------------------------------------
+// Makes a packet header for nearest neighbor communication.
+//------------------------------------------------------------------
+void BGLCPSTorusPacketHeader_Init (BGLCPSTorusPacketHeader * h,
+				   int hxp, int hxm, 
+				   int hyp, int hym, 
+				   int hzp, int hzm, 
+				   int x, int y, int z, 
+				   int fifo_id, int size)
+{
+
+  /* setting relevant fields */
+  h->hh.type        = 0;
+  h->hh.hintXPlus   = hxp;
+  h->hh.hintXMinus  = hxm;
+  h->hh.hintYPlus   = hyp;
+  h->hh.hintYMinus  = hym;
+  h->hh.hintZPlus   = hzp;
+  h->hh.hintZMinus  = hzm;
+  h->hh.deposit = 0;
+  h->hh.fifoID = fifo_id;
+  h->hh.size =  size;
+  h->hh.avail = 0;
+  h->hh.dynamicRoute = 0;
+  h->hh.vc = 2;
+  h->hh.destX  = x;
+  h->hh.destY  = y;
+  h->hh.destZ  = z;
+  h->hh.seqno = 0;
+  h->hh.chksum = 0;
+
+
+  // now the soft header
+  h->sh.val1    = 0;  
+  h->sh.val2    = 0;
+
+}
+
+
+
+//------------------------------------------------------------------
+// It fills in the buffer hdr_send_buf allocated in this file with
+// 8x3=24 headers : one for each of x+, x-, y+, y-, z+, z-, t_, t-
+// and for each of those for sizes 32B, 128B, 256B. The headers
+// for t+, t- are set to 0, since they are not used by the memory
+// communications.
+//
+// It also sets the hint bits for nearest neighbor communication.
+//
+// Should be called once before any other routines in this file are 
+// used. 
+//------------------------------------------------------------------
+void BGLCPSTorusPacketHeader_InitFill (void)
+{
+  int nn;
+  int x, y, z;
+  int Lx, Ly, Lz;
+  int pir;
+  BGLPersonality pers;
+
+  // Get the core id 
+  pir = rts_get_processor_id();
+
+  // Get personality info
+  rts_get_personality(&pers, sizeof(pers));
+
+  // Set the sizes of each direction 
+  // (size starts from 1)
+  Lx = pers.xSize;
+  Ly = pers.ySize;
+  Lz = pers.zSize;
+
+  // Set the coordinates of this node 
+  // (coordinate ranges fro 0 to size-1)
+  x = pers.xCoord;
+  y = pers.yCoord;
+  z = pers.zCoord;
+
+  // Fill the header for a packet destined to go to the 
+  // nearest neighbor along x+
+  if(x == Lx-1){
+    nn = 0;
+  } else {
+    nn = x+1;
+  }
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[0][0]), 1, 0, 0, 0, 0, 0, nn, y, z, pir, 0);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[0][1]), 1, 0, 0, 0, 0, 0, nn, y, z, pir, 3);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[0][2]), 1, 0, 0, 0, 0, 0, nn, y, z, pir, 7);
+
+
+  // Fill the header for a packet destined to go to the 
+  // nearest neighbor along x-
+  if(x == 0){
+    nn = Lx-1;
+  } else {
+    nn = x-1;
+  }
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[1][0]), 0, 1, 0, 0, 0, 0, nn, y, z, pir, 0);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[1][1]), 0, 1, 0, 0, 0, 0, nn, y, z, pir, 3);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[1][2]), 0, 1, 0, 0, 0, 0, nn, y, z, pir, 7);
+
+  // Fill the header for a packet destined to go to the 
+  // nearest neighbor along y+
+  if(y == Ly-1){
+    nn = 0;
+  } else {
+    nn = y+1;
+  }
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[2][0]), 0, 0, 1, 0, 0, 0, x, nn, z, pir, 0);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[2][1]), 0, 0, 1, 0, 0, 0, x, nn, z, pir, 3);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[2][2]), 0, 0, 1, 0, 0, 0, x, nn, z, pir, 7);
+
+  // Fill the header for a packet destined to go to the 
+  // nearest neighbor along y-
+  if(y == 0){
+    nn = Ly-1;
+  } else {
+    nn = y-1;
+  }
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[3][0]), 0, 0, 0, 1, 0, 0, x, nn, z, pir, 0);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[3][1]), 0, 0, 0, 1, 0, 0, x, nn, z, pir, 3);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[3][2]), 0, 0, 0, 1, 0, 0, x, nn, z, pir, 7);
+
+  // Fill the header for a packet destined to go to the 
+  // nearest neighbor along z+
+  if(z == Lz-1){
+    nn = 0;
+  } else {
+    nn = z+1;
+  }
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[4][0]), 0, 0, 0, 0, 1, 0, x, y, nn, pir, 0);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[4][1]), 0, 0, 0, 0, 1, 0, x, y, nn, pir, 3);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[4][2]), 0, 0, 0, 0, 1, 0, x, y, nn, pir, 7);
+
+  // Fill the header for a packet destined to go to the 
+  // nearest neighbor along z-
+  if(z == 0){
+    nn = Lz-1;
+  } else {
+    nn = z-1;
+  }
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[5][0]), 0, 0, 0, 0, 0, 1, x, y, nn, pir, 0);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[5][1]), 0, 0, 0, 0, 0, 1, x, y, nn, pir, 3);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[5][2]), 0, 0, 0, 0, 0, 1, x, y, nn, pir, 7);
+
+  // Fill a dummy header for t+ with 0 
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[6][0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[6][1]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[6][2]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+  // Fill a dummy header for t- with 0 
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[7][0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[7][1]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  BGLCPSTorusPacketHeader_Init(&(hdr_send_buf[7][2]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+
+}
+  
+//------------------------------------------------------------------
+// It fills in the array grid_end[8] allocated in this file with
+// 0 or 1. If the machine is a torus all entries are set to 0.
+// If it is a mesh then if a single hop along the direction dir
+// is outside the machine the grid_end[dir] is set to 1.
+// Should be called once before any other routines in this file are 
+// used. 
+//------------------------------------------------------------------
+void BGLCPSGrid_InitFill (void)
+{
+  int nn;
+  int x, y, z;
+  int Lx, Ly, Lz;
+  BGLPersonality pers;
+
+  // Get personality info
+  rts_get_personality(&pers, sizeof(pers));
+
+  // Get the sizes of each direction 
+  // (size starts from 1)
+  Lx = pers.xSize;
+  Ly = pers.ySize;
+  Lz = pers.zSize;
+
+  // Get the coordinates of this node 
+  // (coordinate ranges fro 0 to size-1)
+  x = pers.xCoord;
+  y = pers.yCoord;
+  z = pers.zCoord;
+
+
+  // Set the grid_end array
+  grid_end[0] = 0;
+  //  if( (!(pers.isTorus & PERSONALITY_TORUS_X)) && (x == Lx-1) ) {
+  if( (!(BGLPersonality_isTorusX(&pers))) && (x == Lx-1) ) {
+    grid_end[0] = 1;
+  }
+
+  grid_end[1] = 0;
+  //  if( (!(pers.isTorus & PERSONALITY_TORUS_X)) && (x == 0) ) {
+  if( (!(BGLPersonality_isTorusX(&pers))) && (x == 0) ) {
+    grid_end[1] = 1;
+  }
+
+  grid_end[2] = 0;
+  //  if( (!(pers.isTorus & PERSONALITY_TORUS_Y)) && (y == Ly-1) ) {
+  if( (!(BGLPersonality_isTorusY(&pers))) && (y == Ly-1) ) {
+    grid_end[2] = 1;
+  }
+
+  grid_end[3] = 0;
+  //  if( (!(pers.isTorus & PERSONALITY_TORUS_Y)) && (y == 0) ) {
+  if( (!(BGLPersonality_isTorusY(&pers))) && (y == 0) ) {
+    grid_end[3] = 1;
+  }
+
+  grid_end[4] = 0;
+  //  if( (!(pers.isTorus & PERSONALITY_TORUS_Z)) && (z == Lz-1) ) {
+  if( (!(BGLPersonality_isTorusZ(&pers))) && (z == Lz-1) ) {
+    grid_end[4] = 1;
+  }
+
+  grid_end[5] = 0;
+  //  if( (!(pers.isTorus & PERSONALITY_TORUS_Z)) && (z == 0) ) {
+  if( (!(BGLPersonality_isTorusZ(&pers))) && (z == 0) ) {
+    grid_end[5] = 1;
+  }
+
+  grid_end[6] = 0;
+
+  grid_end[7] = 0;
+
+  /*
+  int t = rts_get_processor_id();
+  qprintf_all("V=(%d,%d,%d), ts=(%d,%d,%d), r=(%d, %d, %d, %d), ge=(%d,%d,%d,%d,%d,%d)\n", 
+	      Lx,Ly,Lz,
+	      (int) BGLPersonality_isTorusX(&pers),
+	      (int) BGLPersonality_isTorusY(&pers),
+	      (int) BGLPersonality_isTorusZ(&pers),
+	      x,y,z,t,
+	      grid_end[0],
+	      grid_end[1],
+	      grid_end[2],
+	      grid_end[3],
+	      grid_end[4],
+	      grid_end[5]);
+  */
+
+}
+
+
+//------------------------------------------------------------------
+// It initialize the inter-core ic_locks of the 4 memory-fifos 
+// to 0 indicating that the fifos are empty.
+//------------------------------------------------------------------
+void BGLCPSTorusMFifo_Init (void)
+{
+  char ic_lock[16] __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+
+  // Get core id
+  int pir = rts_get_processor_id();
+
+  // Initialize the inter-core ic_locks to 0
+  ic_lock[0] = 0;
+
+  if(pir = 0){
+    QuadMove(&ic_lock,MFIFO_A,0);
+    QuadMove(&ic_lock,MFIFO_D,0);
+  } else {
+    QuadMove(&ic_lock,MFIFO_B,0);
+    QuadMove(&ic_lock,MFIFO_C,0);
+  }
+
+  // Local barrier
+  BGL_Barrier_Pass(BGL_AppBarriers);
+}
+
+
+//------------------------------------------------------------------
+// Various initializations
+// Here it is assumed that the TLBs for cores 0, 1 are set
+// so that the addresses below translate appropriately.
+//------------------------------------------------------------------
+void BGLCPSVarious_Init (void)
+{
+  int pir;
+
+  //----------------------------------------------------------------
+  // get the core id
+  //----------------------------------------------------------------
+  pir = rts_get_processor_id();
+
+  //----------------------------------------------------------------
+  // Set the addresses where the sender status are stored
+  //----------------------------------------------------------------
+  if(pir == 0){
+    stat_se_ptr[0] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[1] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[2] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[3] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[4] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[5] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[6] = MFIFO_C0_SEND_P;
+    stat_se_ptr[7] = MFIFO_C0_SEND_M;
+  } else {
+    stat_se_ptr[0] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[1] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[2] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[3] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[4] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[5] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_se_ptr[6] = MFIFO_C1_SEND_P;
+    stat_se_ptr[7] = MFIFO_C1_SEND_M;
+  }
+
+  //----------------------------------------------------------------
+  // Set the addresses where the receiver status are stored
+  //----------------------------------------------------------------
+  if(pir == 0){
+    stat_re_ptr[0] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[1] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[2] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[3] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[4] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[5] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[6] = MFIFO_C0_RECV_P;
+    stat_re_ptr[7] = MFIFO_C0_RECV_M;
+  } else {
+    stat_re_ptr[0] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[1] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[2] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[3] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[4] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[5] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_STATUS0_OFFSET);
+    stat_re_ptr[6] = MFIFO_C1_RECV_P;
+    stat_re_ptr[7] = MFIFO_C1_RECV_M;
+  }
+
+  //----------------------------------------------------------------
+  // Set the offset within the status quad-word value,
+  // addressed in Bytes, where the 1 Byte status for a given
+  // sender is located. The possible offsets are 0, 1, ...15.
+  //----------------------------------------------------------------
+  stat_se[0] = 7; // status of recv fifo 0
+  stat_se[1] = 7; // status of recv fifo 1
+  stat_se[2] = 8; // status of recv fifo 2
+  stat_se[3] = 8; // status of recv fifo 3
+  stat_se[4] = 9; // status of recv fifo 4
+  stat_se[5] = 9; // status of recv fifo 5
+  stat_se[6] = 0; // status of memory recv fifo 6
+  stat_se[7] = 0; // status of memory recv fifo 7
+
+  //----------------------------------------------------------------
+  // Set the offset within the status quad-word value,
+  // addressed in Bytes, where the 1 Byte status for a given
+  // receiver is located. The possible offsets are 0, 1, ...15.
+  //----------------------------------------------------------------
+  stat_re[0] = 0; // status of recv fifo 0
+  stat_re[1] = 1; // status of recv fifo 1
+  stat_re[2] = 2; // status of recv fifo 2
+  stat_re[3] = 3; // status of recv fifo 3
+  stat_re[4] = 4; // status of recv fifo 4
+  stat_re[5] = 5; // status of recv fifo 5
+  stat_re[6] = 0; // status of memory recv fifo 6
+  stat_re[7] = 0; // status of memory recv fifo 7
+
+
+  //----------------------------------------------------------------
+  // Set the sender fifo addresses.
+  //----------------------------------------------------------------
+  if(pir == 0){
+    fifo_se_ptr[0] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_0_OFFSET);
+    fifo_se_ptr[1] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_0_OFFSET);
+    fifo_se_ptr[2] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_1_OFFSET);
+    fifo_se_ptr[3] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_1_OFFSET);
+    fifo_se_ptr[4] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_2_OFFSET);
+    fifo_se_ptr[5] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_2_OFFSET);
+    fifo_se_ptr[6] = MFIFO_C0_SEND_P + 1;
+    fifo_se_ptr[7] = MFIFO_C0_SEND_M + 1;
+  } else {
+    fifo_se_ptr[0] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_0_OFFSET);
+    fifo_se_ptr[1] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_0_OFFSET);
+    fifo_se_ptr[2] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_1_OFFSET);
+    fifo_se_ptr[3] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_1_OFFSET);
+    fifo_se_ptr[4] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_2_OFFSET);
+    fifo_se_ptr[5] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAIN_2_OFFSET);
+    fifo_se_ptr[6] = MFIFO_C1_SEND_P + 1;
+    fifo_se_ptr[7] = MFIFO_C1_SEND_M + 1;
+  }
+
+  //----------------------------------------------------------------
+  // Set the receiver fifo addresses.
+  //----------------------------------------------------------------
+  if(pir == 0){
+    fifo_re_ptr[0] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_0_OFFSET);
+    fifo_re_ptr[1] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_1_OFFSET);
+    fifo_re_ptr[2] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_2_OFFSET);
+    fifo_re_ptr[3] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_3_OFFSET);
+    fifo_re_ptr[4] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_4_OFFSET);
+    fifo_re_ptr[5] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_5_OFFSET);
+    fifo_re_ptr[6] = MFIFO_C0_RECV_P + 1;
+    fifo_re_ptr[7] = MFIFO_C0_RECV_M + 1;
+  } else {
+    fifo_re_ptr[0] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_0_OFFSET);
+    fifo_re_ptr[1] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_1_OFFSET);
+    fifo_re_ptr[2] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_2_OFFSET);
+    fifo_re_ptr[3] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_3_OFFSET);
+    fifo_re_ptr[4] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_4_OFFSET);
+    fifo_re_ptr[5] = (BGLQuad *) (BGL_MEM_TORUS_G0_BASE+BGL_MEM_TORUS_DATAOUT_5_OFFSET);
+    fifo_re_ptr[6] = MFIFO_C1_RECV_P + 1;
+    fifo_re_ptr[7] = MFIFO_C1_RECV_M + 1;
+  }
+
+  for(int i=0; i<8; i++){
+    send_poll[i] = 0;
+    recv_poll[i] = 0;
+  }
+
+
+}
+
+
+
+//------------------------------------------------------------------
+// It initializes the BGL net buffers for comms of the type needed
+// by CPS.
+// Should be called once before any other routines in this file are 
+// used. 
+//------------------------------------------------------------------
+void BGLCPSNet_Init (void)
+{
+
+  //----------------------------------------------------------------
+  // Save double hummer floating point registers
+  //----------------------------------------------------------------
+  QuadStore(com_reg  ,  0);
+  QuadStore(com_reg+2,  1);
+  QuadStore(com_reg+4,  2);
+  QuadStore(com_reg+6,  3);
+  QuadStore(com_reg+8,  4);
+  QuadStore(com_reg+10, 5);
+  QuadStore(com_reg+12, 6);
+  QuadStore(com_reg+14, 7);
+  QuadStore(com_reg+16, 20);
+
+#if BLRTS_SUPERV != 1
+
+#if BLRTS_CX == 1
+  // Initialize scratch memory
+
+  // L3 processor intercom memory
+  /*
+  scratch_size = 1048576;
+  if(rts_get_ipc_scratchpad_window((void **) &scratch_base, &scratch_size) != 0){
+    ERR.General("bgl_net", "BGLCPSNet_Init", "Failed to get pointer to scratch memory\n");
+  }
+  */
+
+  // SRAM processor intercom memory
+  if(rts_get_sram_ipc_scratchpad_window((void **) &scratch_base, &scratch_size) != 0){
+    ERR.General("bgl_net", "BGLCPSNet_Init", "Failed to get pointer to scratch memory\n");
+  }
+
+#else
+  // Initialize scratch memory
+  scratch_size = 1048576;
+  if(rts_get_scratchpad_window((void **) &scratch_base, &scratch_size) != 0){
+    ERR.General("bgl_net", "BGLCPSNet_Init", "Failed to get pointer to scratch memory\n");
+  }
+#endif
+
+#endif
+
+  // Initialize the grid_end array
+  BGLCPSGrid_InitFill ();
+
+  // Initialize the packet headers
+  BGLCPSTorusPacketHeader_InitFill ();
+
+  // Initialize the memory fifo locks for inter-core comms
+  BGLCPSTorusMFifo_Init ();
+
+  // Various initializations
+  BGLCPSVarious_Init ();
+
+  //----------------------------------------------------------------
+  // Restore double hummer floating point registers
+  //----------------------------------------------------------------
+  QuadLoad(com_reg  ,  0);
+  QuadLoad(com_reg+2,  1);
+  QuadLoad(com_reg+4,  2);
+  QuadLoad(com_reg+6,  3);
+  QuadLoad(com_reg+8,  4);
+  QuadLoad(com_reg+10, 5);
+  QuadLoad(com_reg+12, 6);
+  QuadLoad(com_reg+14, 7);
+  QuadLoad(com_reg+16, 20);
+}
+
+
+//------------------------------------------------------------------
+// It sends the data to the nearest neighbor along the 
+// the direction dir. If the machine is a mesh and there is no 
+// nearest neighbor it just returns without sending. 
+// dir = 0,1,2,3,4,5,6,7 -> x+,x-,y+,y-,z+,z-,t+,t-
+//------------------------------------------------------------------
+void BGLCPSTorus_send(int phys_dir, 
+		      int size, 
+		      IFloat *data) 
+{
+  int i;
+  int delay;
+  int qsize;
+  BGLQuad *fifo;
+  BGLQuad *qdata;
+  char stat[16]        __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+  int ihdr;
+  int qhdw_size;
+
+  /*
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+  int x = pers.xCoord;
+  int y = pers.yCoord;
+  int z = pers.zCoord;
+  if((x==0) &&  (y==0) && (z==0)){
+    qprintf_all("SEND(%d,%d,%d), phys_dir = %d\n", x, y, z, phys_dir);
+  }
+  */
+
+  //----------------------------------------------------------------
+  // Save double hummer floating point registers
+  //----------------------------------------------------------------
+  QuadStore(com_reg  ,  0);
+  QuadStore(com_reg+2,  1);
+  QuadStore(com_reg+4,  2);
+  QuadStore(com_reg+6,  3);
+  QuadStore(com_reg+8,  4);
+  QuadStore(com_reg+10, 5);
+  QuadStore(com_reg+12, 6);
+  QuadStore(com_reg+14, 7);
+  QuadStore(com_reg+16, 20);
+
+  //----------------------------------------------------------------
+  // Get the processor grid dir that corresponds to the physics 
+  // system phys_dir;
+  //----------------------------------------------------------------
+  int dir = bgl_machine_dir[phys_dir];
+
+  //----------------------------------------------------------------
+  // Initializations
+  //----------------------------------------------------------------
+  qsize = size/2;
+  qdata = (BGLQuad *) data;
+  fifo = fifo_se_ptr[dir];
+  if       (qsize < 2){
+    qhdw_size = 2;
+    ihdr = 0;
+  } else if(qsize < 8){
+    qhdw_size = 8;
+    ihdr = 1;
+  } else if(qsize < 16){
+    qhdw_size = 16;
+    ihdr = 2;
+  } else {
+    ERR.General("bgl_net", "BGLCPSTorus_send", "Size = %d is larger than 15\n", qsize);
+  }
+
+
+  //----------------------------------------------------------------
+  // If the grid does not end one hop in this dir
+  //----------------------------------------------------------------
+  if(grid_end[dir] != 1) {
+
+    //--------------------------------------------------------------
+    // Wait until the fifo has less data than SEND_FIFO_LEVEL
+    //--------------------------------------------------------------
+    while (1) {
+      QuadMove(stat_se_ptr[dir], &stat, 0);
+      if ( (stat[stat_se[dir]] < SEND_FIFO_LEVEL)){
+	break;
+      }
+    }
+
+    //--------------------------------------------------------------
+    // memory comm
+    //--------------------------------------------------------------
+    if( dir > 5) {
+      
+      // Send "qsize" quad words
+      for(i=0; i<qsize; i++){
+	QuadLoad(qdata,0);
+	QuadStore(fifo, 0);
+	qdata++;
+	fifo++;
+      }
+      
+      // Put in some small delay to make sure all data has been copied
+      delay = 0;
+#if BLRTS_SUPERV == 1
+      for(i=0; i< 20; i++){
+	delay++;
+      }
+#else
+      for(i=0; i< 2000; i++){
+	delay++;
+      }
+#endif
+
+
+      // Set the status to full
+      stat[stat_se[dir]] = 0xFF;
+      QuadMove(&stat,stat_se_ptr[dir],0);
+
+    //--------------------------------------------------------------
+    // torus comm  
+    //--------------------------------------------------------------
+    } else {
+
+      // Send hardware and software header
+      QuadLoad(&(hdr_send_buf[dir][ihdr]), 0);
+      QuadStore(fifo, 0);
+    
+      // Send "qsize" quad words
+      for(i=0; i<qsize; i++){
+	QuadLoad(qdata,0);
+	QuadStore(fifo, 0);
+	qdata++;
+      }
+    
+      // Fill in the rest of the hardware packet with junk
+      for(i=qsize; i<qhdw_size-1; i++){
+	QuadStore(fifo, 0);
+      }
+    }
+  //----------------------------------------------------------------
+  // If it is a mesh and the grid ends one hop in this dir then 
+  // do not send anything, just delay for sync reasons 
+  //----------------------------------------------------------------
+  } else {
+    int delay = 0;
+    for(i=0; i < MESH_END_DELAY; i++){
+      delay++;
+    }
+  }
+
+
+
+  //----------------------------------------------------------------
+  // Restore double hummer floating point registers
+  //----------------------------------------------------------------
+  QuadLoad(com_reg  ,  0);
+  QuadLoad(com_reg+2,  1);
+  QuadLoad(com_reg+4,  2);
+  QuadLoad(com_reg+6,  3);
+  QuadLoad(com_reg+8,  4);
+  QuadLoad(com_reg+10, 5);
+  QuadLoad(com_reg+12, 6);
+  QuadLoad(com_reg+14, 7);
+  QuadLoad(com_reg+16, 20);
+}
+
+
+//------------------------------------------------------------------
+// It receives the data from the reception fifo "dir". If the 
+// machine is a mesh and there is no nearest neighbor along "dir" 
+// it copies 0s into the receive buf and returns. 
+// dir = 0,1,2,3,4,5,6,7 -> x+,x-,y+,y-,z+,z-,t+,t-
+//------------------------------------------------------------------
+void BGLCPSTorus_recv(int phys_dir, 
+		      int size, 
+		      IFloat *data)
+{
+  int i;
+  int delay;
+  int qsize;
+  BGLQuad *fifo;
+  BGLQuad *qdata;
+  char stat[16]        __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+  int qhdw_size;
+
+  /*
+  BGLPersonality pers;
+  rts_get_personality(&pers, sizeof(pers));
+  int x = pers.xCoord;
+  int y = pers.yCoord;
+  int z = pers.zCoord;
+  if((x==0) &&  (y==0) && (z==0)){
+    qprintf_all("RECV(%d,%d,%d), phys_dir = %d\n", x, y, z, phys_dir);
+  }
+  */
+
+  //----------------------------------------------------------------
+  // Save double hummer floating point registers
+  //----------------------------------------------------------------
+  QuadStore(com_reg  ,  0);
+  QuadStore(com_reg+2,  1);
+  QuadStore(com_reg+4,  2);
+  QuadStore(com_reg+6,  3);
+  QuadStore(com_reg+8,  4);
+  QuadStore(com_reg+10, 5);
+  QuadStore(com_reg+12, 6);
+  QuadStore(com_reg+14, 7);
+  QuadStore(com_reg+16, 20);
+
+  //----------------------------------------------------------------
+  // Get the processor grid dir that corresponds to the physics 
+  // system phys_dir;
+  //----------------------------------------------------------------
+  int dir = bgl_machine_dir[phys_dir];
+
+  //----------------------------------------------------------------
+  // Initializations
+  //----------------------------------------------------------------
+  qsize = size/2;
+  qdata = (BGLQuad *) data;
+  fifo = fifo_re_ptr[dir];
+  if       (qsize < 2){
+    qhdw_size = 2;
+  } else if(qsize < 8){
+    qhdw_size = 8;
+  } else if(qsize < 16){
+    qhdw_size = 16;
+  } else {
+    ERR.General("bgl_net", "BGLCPSTorus_recv", "Size = %d is larger than 15\n", qsize);
+  }
+
+
+  //----------------------------------------------------------------
+  // If the grid does not end one hop in this dir
+  //----------------------------------------------------------------
+  if(grid_end[dir] != 1) {
+
+    //----------------------------------------------------------------
+    // Wait until the fifo has more data than RECV_FIFO_LEVEL
+    //----------------------------------------------------------------
+    while (1) {
+      QuadMove(stat_re_ptr[dir], &stat, 0);
+      if (stat[stat_re[dir]] > RECV_FIFO_LEVEL) { 
+	break;
+      }
+    }
+
+    //----------------------------------------------------------------
+    // memory comm
+    //----------------------------------------------------------------
+    if( dir > 5) {
+
+      // Receive "qsize" quad words
+      for(i=0; i<qsize; i++){
+	QuadLoad(fifo, 0);
+	QuadStore(qdata, 0);
+	qdata++;
+	fifo++;
+      }
+
+      // Put in some small delay to make sure all data has been copied
+      delay = 0;
+#if BLRTS_SUPERV == 1
+      for(i=0; i< 20; i++){
+	delay++;
+      }
+#else
+      for(i=0; i< 2000; i++){
+	delay++;
+      }
+#endif
+
+      // Set the status to empty
+      stat[stat_re[dir]] = 0x00;
+      QuadMove(&stat,stat_re_ptr[dir], 0);
+      
+
+    //----------------------------------------------------------------
+    // torus comm  
+    //----------------------------------------------------------------
+    } else {
+
+      // Get hardware and software header
+      QuadLoad(fifo, 0);
+      QuadStore(&hdr_recv_buf, 0);
+    
+      // Receive "qsize" quad words
+      for(i=0; i<qsize; i++){
+	QuadLoad(fifo, 0);
+	QuadStore(qdata, 0);
+	qdata++;
+      }
+    
+      // Receive the rest of the hardware packet into a dummy register
+      for(i=qsize; i<qhdw_size-1; i++){
+	QuadLoad(fifo, 0);
+      }
+    }
+
+  //----------------------------------------------------------------
+  // If it is a mesh and the grid ends one hop in this dir then 
+  // fill in the recv array with 0s and delay for sync reasons 
+  //----------------------------------------------------------------
+  } else {
+    for(i=0; i<size; i++){
+      data[i] = 0;
+    }
+
+    int delay = 0;
+    for(i=0; i < MESH_END_DELAY; i++){
+      delay++;
+    }
+  }
+
+  //----------------------------------------------------------------
+  // Restore double hummer floating point registers
+  //----------------------------------------------------------------
+  QuadLoad(com_reg  ,  0);
+  QuadLoad(com_reg+2,  1);
+  QuadLoad(com_reg+4,  2);
+  QuadLoad(com_reg+6,  3);
+  QuadLoad(com_reg+8,  4);
+  QuadLoad(com_reg+10, 5);
+  QuadLoad(com_reg+12, 6);
+  QuadLoad(com_reg+14, 7);
+  QuadLoad(com_reg+16, 20);
+}
+
+
+
+//------------------------------------------------------------------
+// The data is assumed to be 6 quad words (half spinor = 12 doubles).
+// It sends the data to the nearest neighbor along the 
+// the direction dir. If the machine is a mesh and there is no 
+// nearest neighbor it just returns without sending. 
+// dir = 0,1,2,3,4,5,6,7 -> x+,x-,y+,y-,z+,z-,t+,t-
+//------------------------------------------------------------------
+void BGLCPSTorus_send_spinor(int phys_dir, BGLQuad *qdata) 
+{
+  int i;
+  BGLQuad *fifo;
+  char stat[16]        __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+
+  //  register int u asm("r6") = 16;
+  register int u = 16;
+
+  //----------------------------------------------------------------
+  // Get the processor grid dir that corresponds to the physics 
+  // system phys_dir;
+  //----------------------------------------------------------------
+  int dir = bgl_machine_dir[phys_dir];
+
+  fifo = fifo_se_ptr[dir];
+
+  if(grid_end[dir] != 1) {
+
+    //--------------------------------------------------------------
+    // Wait until the fifo has less data than SEND_FIFO_LEVEL
+    //--------------------------------------------------------------
+    QuadMove(stat_se_ptr[dir], &stat, 30);
+    while( (stat[stat_se[dir]] >= SEND_FIFO_LEVEL) ){
+      QuadMove(stat_se_ptr[dir], &stat, 30);
+    }
+
+    //--------------------------------------------------------------
+    // memory comm
+    //--------------------------------------------------------------
+    if( dir > 5) {
+      MEM_SEND_SPINOR(dir, fifo, qdata);
+    //--------------------------------------------------------------
+    // torus comm  
+    //--------------------------------------------------------------
+    } else {
+      TORUS_SEND_SPINOR(dir, fifo, qdata);
+    }
+
+  }
+
+
+}
+
+
+//------------------------------------------------------------------
+// The data is assumed to be 6 quad words (half spinor = 12 doubles).
+// It receives the data from the reception fifo "dir". If the 
+// machine is a mesh and there is no nearest neighbor along "dir" 
+// it copies 0s into the receive buf and returns. 
+// dir = 0,1,2,3,4,5,6,7 -> x+,x-,y+,y-,z+,z-,t+,t-
+//------------------------------------------------------------------
+void BGLCPSTorus_recv_spinor(int phys_dir, BGLQuad *qdata)
+{
+  int i;
+  BGLQuad *fifo;
+  char stat[16]        __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+
+  //  register int u asm("r6") = 16;
+  register int u = 16;
+
+  //----------------------------------------------------------------
+  // Get the processor grid dir that corresponds to the physics 
+  // system phys_dir;
+  //----------------------------------------------------------------
+  int dir = bgl_machine_dir[phys_dir];
+
+  fifo = fifo_re_ptr[dir];
+
+  if(grid_end[dir] != 1) {
+
+    //----------------------------------------------------------------
+    // Wait until the fifo has more data than RECV_FIFO_LEVEL
+    //----------------------------------------------------------------
+    QuadMove(stat_re_ptr[dir], &stat, 30);
+    while( (stat[stat_re[dir]] <= RECV_FIFO_LEVEL) ){
+      QuadMove(stat_re_ptr[dir], &stat, 30);
+    }
+
+    //----------------------------------------------------------------
+    // memory comm
+    //----------------------------------------------------------------
+    if( dir > 5) {
+      MEM_RECV_SPINOR(dir, fifo, qdata);
+    //----------------------------------------------------------------
+    // torus comm  
+    //----------------------------------------------------------------
+    } else {
+      TORUS_RECV_SPINOR(dir, fifo, qdata);
+    }
+
+  } else {
+
+    IFloat *data = (IFloat *) qdata;
+    for(i=0; i<12; i++){
+      data[i] = 0;
+    }
+
+  }
+
+}
+
+
+
+//------------------------------------------------------------------
+// The Wilson fermion communication routine.
+//------------------------------------------------------------------
+void wfm_comm()
+{
+  int i, k, dir, ig, ic, group, d;
+  int mu_se[8];
+  int mu_re[8];
+  int mu_nc[8];
+  BGLQuad *fifo;
+  BGLQuad *qdata;
+  char stat[16]        __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+  int pir;
+  int wfm_dir;
+
+  //  register int u asm("r9") = 16;
+  register int u = 16;
+
+  // Get the core id 
+  pir = rts_get_processor_id();
+
+  mu_se[0] = 0;
+  mu_se[1] = 4;
+  mu_se[2] = 1;
+  mu_se[3] = 5;
+  mu_se[4] = 2;
+  mu_se[5] = 6;
+  mu_se[6] = 3;
+  mu_se[7] = 7;
+
+  mu_re[0] = 4;
+  mu_re[1] = 0;
+  mu_re[2] = 5;
+  mu_re[3] = 1;
+  mu_re[4] = 6;
+  mu_re[5] = 2;
+  mu_re[6] = 7;
+  mu_re[7] = 3;
+
+  mu_nc[0] = 0;
+  mu_nc[1] = 4;
+  mu_nc[2] = 1;
+  mu_nc[3] = 5;
+  mu_nc[4] = 2;
+  mu_nc[5] = 6;
+  mu_nc[6] = 3;
+  mu_nc[7] = 7;
+
+  group = 4;
+
+  //------------------------------------------------------------------------
+  // Send plus receive minus x y z
+  //------------------------------------------------------------------------
+  for(ig=0; ig<wfm_max_numchunk/group; ig++){
+
+    //Send x y z
+    //----------------------------------------------------------------------
+    for(ic=0;ic<group;ic++){
+      i = group*ig + ic;
+      QuadMove(stat_se_ptr[0], &stat, 30);
+      for(d=0; d<3; d++){
+	dir = 2*d + pir;
+	wfm_dir = bgl_cps_dir[dir];
+	if( (i < wfm_numchunk[mu_nc[wfm_dir]]) && (grid_end[dir] != 1)   ){
+	  while (1) {
+	    if (stat[stat_se[dir]] < SEND_FIFO_LEVEL) { 
+	      break;
+	    }
+	    send_poll[dir]++;
+	    QuadMove(stat_se_ptr[0], &stat, 30);
+	  }
+	  fifo = fifo_se_ptr[dir];
+	  qdata = (BGLQuad *) wfm_send_ad[mu_se[wfm_dir]+8*i];
+	  TORUS_SEND_SPINOR(dir, fifo, qdata);
+	}
+      }
+    }
+
+    //    printf("send xyz 0\n");
+
+
+    //Send / Receive t
+    //----------------------------------------------------------------------
+
+    for(ic=0;ic<group;ic++){
+      i = group*ig + ic;
+
+      // Send t
+      dir = 6;
+      wfm_dir = bgl_cps_dir[dir];
+      {
+	if( (i < wfm_numchunk[mu_nc[wfm_dir]]) && (grid_end[dir] != 1)   ){
+	  while (1) {
+	    QuadMove(stat_se_ptr[dir], &stat, 30);
+	    if (stat[stat_se[dir]] < SEND_FIFO_LEVEL) { 
+	      break;
+	    }
+	    send_poll[dir]++;
+	  }
+	  fifo = fifo_se_ptr[dir];
+	  qdata = (BGLQuad *) wfm_send_ad[mu_se[wfm_dir]+8*i];
+	  MEM_SEND_SPINOR(dir, fifo, qdata);
+	}
+      }     
+      
+      // Receive t
+      dir = 7;
+      wfm_dir = bgl_cps_dir[dir];
+      {
+	if(i < wfm_numchunk[mu_nc[wfm_dir]] && (grid_end[dir] != 1)   ){
+	  while (1) {
+	    QuadMove(stat_re_ptr[dir], &stat, 30);
+	    if (stat[stat_re[dir]] > RECV_FIFO_LEVEL) { 
+	      break;
+	    }
+	    recv_poll[dir]++;
+	  }
+	  fifo = fifo_re_ptr[dir];
+	  qdata = (BGLQuad *) wfm_recv_ad[mu_re[wfm_dir]+8*i];
+	  MEM_RECV_SPINOR(dir, fifo, qdata);
+	}
+	if(i < wfm_numchunk[mu_nc[wfm_dir]] && (grid_end[dir] == 1)   ){
+	  IFloat *data = wfm_recv_ad[mu_re[wfm_dir]+8*i];
+	  for(k=0; k<12; k++){
+	    data[k] = 0;
+	  }
+	}
+      }
+    }
+
+
+    //    printf("send receive t 0\n");
+
+
+    // Recv x y z
+    //----------------------------------------------------------------------
+    for(ic=0;ic<group;ic++){
+      i = group*ig + ic;
+      QuadMove(stat_re_ptr[0], &stat, 30);
+      for(d=0; d<3; d++){
+	dir = 2*d + (1+pir)%2;
+	wfm_dir = bgl_cps_dir[dir];
+	if(i < wfm_numchunk[mu_nc[wfm_dir]] && (grid_end[dir] != 1)   ){
+	  while (1) {
+	    if (stat[stat_re[dir]] > RECV_FIFO_LEVEL) { 
+	      break;
+	    }
+	    recv_poll[dir]++;
+	    QuadMove(stat_re_ptr[0], &stat, 30);
+	  }
+	  fifo = fifo_re_ptr[dir];
+	  qdata = (BGLQuad *) wfm_recv_ad[mu_re[wfm_dir]+8*i];
+	  TORUS_RECV_SPINOR(dir, fifo, qdata);
+	}
+	if(i < wfm_numchunk[mu_nc[wfm_dir]] && (grid_end[dir] == 1)   ){
+	  IFloat *data = wfm_recv_ad[mu_re[wfm_dir]+8*i];
+	  for(k=0; k<12; k++){
+	    data[k] = 0;
+	  }
+	} 
+      }
+    }
+
+    //    printf("recv xyz 0\n");
+  }
+
+
+
+  //------------------------------------------------------------------------
+  // Send minus receive plus x,y,z
+  //------------------------------------------------------------------------
+  for(ig=0; ig<wfm_max_numchunk/group; ig++){
+
+    //    time_4[ig] = BGLTimebase();
+    //    poll_count_4[ig] = poll_count;
+    
+    //Send x y z
+    //----------------------------------------------------------------------
+    for(ic=0;ic<group;ic++){
+      i = group*ig + ic;
+      QuadMove(stat_se_ptr[0], &stat, 30);
+      for(d=0; d<3; d++){
+	dir = 2*d + (1+pir)%2;
+	wfm_dir = bgl_cps_dir[dir];
+	if( (i < wfm_numchunk[mu_nc[wfm_dir]]) && (grid_end[dir] != 1)   ){
+	  while (1) {
+	    if (stat[stat_se[dir]] < SEND_FIFO_LEVEL) { 
+	      break;
+	    }
+	    send_poll[dir]++;
+	    QuadMove(stat_se_ptr[0], &stat, 30);
+	  }
+	  fifo = fifo_se_ptr[dir];
+	  qdata = (BGLQuad *) wfm_send_ad[mu_se[wfm_dir]+8*i];
+	  TORUS_SEND_SPINOR(dir, fifo, qdata);
+	}
+      }
+    }
+
+    //    printf("send xyz 1\n");
+ 
+    //Send / Receive t
+    //----------------------------------------------------------------------
+
+    for(ic=0;ic<group;ic++){
+      i = group*ig + ic;
+
+      // Send t
+      dir = 7;
+      wfm_dir = bgl_cps_dir[dir];
+      {
+	if( (i < wfm_numchunk[mu_nc[wfm_dir]]) && (grid_end[dir] != 1)   ){
+	  while (1) {
+	    QuadMove(stat_se_ptr[dir], &stat, 30);
+	    if (stat[stat_se[dir]] < SEND_FIFO_LEVEL) { 
+	      break;
+	    }
+	    send_poll[dir]++;
+	  }
+	  fifo = fifo_se_ptr[dir];
+	  qdata = (BGLQuad *) wfm_send_ad[mu_se[wfm_dir]+8*i];
+	  MEM_SEND_SPINOR(dir, fifo, qdata);
+	}
+      }     
+      
+      // Receive t
+      dir = 6;
+      wfm_dir = bgl_cps_dir[dir];
+      {
+	if(i < wfm_numchunk[mu_nc[wfm_dir]] && (grid_end[dir] != 1)   ){
+	  while (1) {
+	    QuadMove(stat_re_ptr[dir], &stat, 30);
+	    if (stat[stat_re[dir]] > RECV_FIFO_LEVEL) { 
+	      break;
+	    }
+	    recv_poll[dir]++;
+	  }
+	  fifo = fifo_re_ptr[dir];
+	  qdata = (BGLQuad *) wfm_recv_ad[mu_re[wfm_dir]+8*i];
+	  MEM_RECV_SPINOR(dir, fifo, qdata);
+	}
+	if(i < wfm_numchunk[mu_nc[wfm_dir]] && (grid_end[dir] == 1)   ){
+	  IFloat *data = wfm_recv_ad[mu_re[wfm_dir]+8*i];
+	  for(k=0; k<12; k++){
+	    data[k] = 0;
+	  }
+	}
+      }
+    }
+
+    //    printf("send recv t 1\n");
+
+    // Recv x y z
+    //----------------------------------------------------------------------
+    for(ic=0;ic<group;ic++){
+      i = group*ig + ic;
+      QuadMove(stat_re_ptr[0], &stat, 30);
+      for(d=0; d<3; d++){
+	dir = 2*d + pir;
+	wfm_dir = bgl_cps_dir[dir];
+	if(i < wfm_numchunk[mu_nc[wfm_dir]] && (grid_end[dir] != 1)   ){
+	  while (1) {
+	    if (stat[stat_re[dir]] > RECV_FIFO_LEVEL) { 
+	      break;
+	    }
+	    recv_poll[dir]++;
+	    QuadMove(stat_re_ptr[0], &stat, 30);
+	  }
+	  fifo = fifo_re_ptr[dir];
+	  qdata = (BGLQuad *) wfm_recv_ad[mu_re[wfm_dir]+8*i];
+	  TORUS_RECV_SPINOR(dir, fifo, qdata);
+	}
+	if(i < wfm_numchunk[mu_nc[wfm_dir]] && (grid_end[dir] == 1)   ){
+	  IFloat *data = wfm_recv_ad[mu_re[wfm_dir]+8*i];
+	  for(k=0; k<12; k++){
+	    data[k] = 0;
+	  }
+	} 
+      }
+    }
+    //    printf("recv xyz 1\n");
+
+  }
+
+}
+
+
+CPS_END_NAMESPACE

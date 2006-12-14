@@ -1,7 +1,7 @@
 /*!\file
   \brief Implementation of functions for timing and performance measurement.
 
-  $Id: time.C,v 1.9 2006-11-25 19:10:50 chulwoo Exp $
+  $Id: time.C,v 1.10 2006-12-14 17:54:37 chulwoo Exp $
 */
 
 #include <config.h>
@@ -50,10 +50,15 @@ Float print_flops(unsigned long long nflops, struct timeval *start, struct timev
   \return The FLOPS rate.
 */
 Float print_flops(char *cname, char *fname, unsigned long long nflops, struct timeval *start, struct timeval *end){
-  if (!UniqueID()){
-	printf("%s:%s: ",cname,fname);
-  }
+#if TARGET == BGL
+    if(!UniqueID()){
+	printf("BGL!: %s:%s: ",cname,fname);
 	return print_flops(nflops,start,end);
+    }
+#else
+	printf("%s:%s: ",cname,fname);
+	return print_flops(nflops,start,end);
+#endif
 }
 
 /*!
@@ -87,9 +92,15 @@ Float print_flops(unsigned long long nflops, Float time){
 */
 
 Float print_flops(char *cname, char *fname, unsigned long long nflops, Float time){
-	if(!UniqueID())
+#if TARGET == BGL
+    if(!UniqueID()){
+	printf("Node 0: %s:%s: ",cname,fname);
+	return print_flops(nflops,time);
+    }
+#else
 	printf("%s::%s: ",cname,fname);
 	return print_flops(nflops,time);
+#endif
 }
 
 CPS_END_NAMESPACE

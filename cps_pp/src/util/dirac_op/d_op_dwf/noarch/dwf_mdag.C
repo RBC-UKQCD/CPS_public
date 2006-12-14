@@ -19,6 +19,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include<util/dwf.h>
 #include<util/gjp.h>
+#include<util/dirac_op.h>
 #include<util/vector.h>
 #include<util/verbose.h>
 #include<util/error.h>
@@ -53,6 +54,7 @@ void  dwf_mdag(Vector *out,
 // out = in - dwf_kappa_sq * out
 //------------------------------------------------------------------
   out->FTimesV1PlusV2(minus_kappa_sq, out, in, f_size); 
+  DiracOp::CGflops+=2*f_size;
 
 }
 CPS_END_NAMESPACE

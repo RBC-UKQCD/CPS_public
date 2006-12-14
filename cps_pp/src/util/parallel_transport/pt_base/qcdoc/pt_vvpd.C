@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_vvpd.C,v 1.1 2006-07-05 18:13:49 chulwoo Exp $
+  $Id: pt_vvpd.C,v 1.2 2006-12-14 17:54:28 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-07-05 18:13:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_vvpd.C,v 1.1 2006-07-05 18:13:49 chulwoo Exp $
-//  $Id: pt_vvpd.C,v 1.1 2006-07-05 18:13:49 chulwoo Exp $
+//  $Date: 2006-12-14 17:54:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_vvpd.C,v 1.2 2006-12-14 17:54:28 chulwoo Exp $
+//  $Id: pt_vvpd.C,v 1.2 2006-12-14 17:54:28 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_vvpd.C,v $
-//  $Revision: 1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_vvpd.C,v $
 //  $State: Exp $
 //
@@ -188,7 +188,8 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
 
 /*! 
   Computes sum[x] = vect2[x] vect[x + hop dir]^dagger
-  where the sum is over n_vect vectors and the hop is in a forward direction.
+  where the sum is over n_vect vectors and the hop is in forward
+  or negative direction.
 */
 void PT::vvpd(IFloat **vect2, IFloat ***vect, int n_vect, const int *dir, int n_dir, int hop, IFloat **sum, int overwrite){
 

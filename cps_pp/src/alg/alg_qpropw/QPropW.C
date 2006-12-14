@@ -15,6 +15,7 @@
 //
 //------------------------------------------------------------------
 
+#include <config.h> 
 #include <stdlib.h>     // exit()
 #include <stdio.h>
 #include <string.h>

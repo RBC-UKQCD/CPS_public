@@ -26,7 +26,8 @@ AlgIntAB::AlgIntAB(AlgInt &a, AlgInt &b,  IntABArg &a_arg)
   : AlgInt()
 {
 
-  cname = "AlgIntAB()";
+  cname = "AlgIntAB";
+  VRB.Func(cname,"AlgIngAB()");
   A = &a;
   B = &b;
   ab_arg = &a_arg;
@@ -66,7 +67,7 @@ void AlgIntAB::init() {
 }
 
 AlgIntAB& AlgIntAB::Create(AlgInt &A, AlgInt &B, IntABArg &ab_arg) {
-  
+  VRB.Func("AlgIntAB","Create()");
   if (ab_arg.type == INT_LEAP) {
     AlgIntLeap *leap = new AlgIntLeap(A, B, ab_arg);
     return *leap;

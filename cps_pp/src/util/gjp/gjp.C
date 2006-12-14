@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.32 2006-11-25 19:10:21 chulwoo Exp $
+  $Id: gjp.C,v 1.33 2006-12-14 17:54:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-11-25 19:10:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.32 2006-11-25 19:10:21 chulwoo Exp $
-//  $Id: gjp.C,v 1.32 2006-11-25 19:10:21 chulwoo Exp $
+//  $Date: 2006-12-14 17:54:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.33 2006-12-14 17:54:07 chulwoo Exp $
+//  $Id: gjp.C,v 1.33 2006-12-14 17:54:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.32 $
+//  $Revision: 1.33 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -89,6 +89,28 @@ int gjp_scu_wire_map[10] = {0, 1, 2, 3, 4, 5, 6, 7, 0, 0};
      // assumed that gjp_local_axis is used in conjunction
      // so that the local direction wire number is not
      // used. 
+#if TARGET == BGL
+int bgl_machine_dir[8];
+     // This array is set by GJP.Initialize to:
+     // bgl_machine_dir[0] = 2*bgl_machine_dir_x;
+     // bgl_machine_dir[1] = 2*bgl_machine_dir_x+1;
+     // bgl_machine_dir[2] = 2*bgl_machine_dir_y;
+     // bgl_machine_dir[3] = 2*bgl_machine_dir_y+1;
+     // bgl_machine_dir[4] = 2*bgl_machine_dir_z;
+     // bgl_machine_dir[5] = 2*bgl_machine_dir_z+1;
+     // bgl_machine_dir[6] = 2*bgl_machine_dir_t;
+     // bgl_machine_dir[7] = 2*bgl_machine_dir_t+1;
+     // This array is for convenience when translating
+     // from the physics system directions to the processor
+     // grid directions.
+
+int bgl_cps_dir[8];
+     // This array is set by GJP.Initialize to be the
+     // "reverse" array of bgl_machine_dir. 
+     // This array is for convenience when translating
+     // from the the processor grid directions to the
+     // physics system directions
+#endif //TARGET == BGL
 #endif
 
 GlobalJobParameter GJP;
@@ -133,6 +155,26 @@ void GlobalJobParameter::Initialize() {
   VRB.Func(cname,fname);
   int i, j;
   char *dim_name[5] = {"X","Y","Z","T","S"};
+
+#if 0
+  bgl_machine_dir[0] = 2*doarg_int.bgl_machine_dir_x;
+  bgl_machine_dir[1] = 2*doarg_int.bgl_machine_dir_x+1;
+  bgl_machine_dir[2] = 2*doarg_int.bgl_machine_dir_y;
+  bgl_machine_dir[3] = 2*doarg_int.bgl_machine_dir_y+1;
+  bgl_machine_dir[4] = 2*doarg_int.bgl_machine_dir_z;
+  bgl_machine_dir[5] = 2*doarg_int.bgl_machine_dir_z+1;
+  bgl_machine_dir[6] = 2*doarg_int.bgl_machine_dir_t;
+  bgl_machine_dir[7] = 2*doarg_int.bgl_machine_dir_t+1;
+  
+  for(i = 0; i<8 ; i++)
+    bgl_cps_dir[bgl_machine_dir[i]] = i;
+  if (UniqueID()==0)
+  for(i = 0; i<8 ; i++){
+    printf("bgl_machine_dir[%d]=%d bgl_cps_dir[%d]=%d\n",
+    i, bgl_machine_dir[i], i, bgl_cps_dir[i]);
+  }
+#endif
+
 
 
   // Set the number of nodes
@@ -253,11 +295,51 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
   gjp_scu_dir[8] = SCU_SP;
   gjp_scu_dir[9] = SCU_SM;
 
+#if TARGET != BGL
   for(int i = 0;i<5;i++)
   if(nodes[i] > 1){
   gjp_scu_wire_map[2*i]   = SCURemap(gjp_scu_dir[2*i]);
   gjp_scu_wire_map[2*i+1] = SCURemap(gjp_scu_dir[2*i+1]);
   }
+
+#if 0 
+  gjp_scu_wire_map[0] = SCU_XP;
+  gjp_scu_wire_map[1] = SCU_XM;
+  gjp_scu_wire_map[2] = SCU_YP;
+  gjp_scu_wire_map[3] = SCU_YM;
+  gjp_scu_wire_map[4] = SCU_ZP;
+  gjp_scu_wire_map[5] = SCU_ZM;
+  gjp_scu_wire_map[6] = SCU_TP;
+  gjp_scu_wire_map[7] = SCU_TM;
+
+  if(s_nodes != 1) {
+    if (s_axis == SCU_X) {
+      gjp_scu_dir[8] = SCU_XP;
+      gjp_scu_dir[9] = SCU_XM;
+      gjp_scu_wire_map[8] = SCU_XP;
+      gjp_scu_wire_map[9] = SCU_XM;
+    }
+    if (s_axis == SCU_Y) {
+      gjp_scu_dir[8] = SCU_YP;
+      gjp_scu_dir[9] = SCU_YM;
+      gjp_scu_wire_map[8] = SCU_YP;
+      gjp_scu_wire_map[9] = SCU_YM;
+    }
+    if (s_axis == SCU_Z) {
+      gjp_scu_dir[8] = SCU_ZP;
+      gjp_scu_dir[9] = SCU_ZM;
+      gjp_scu_wire_map[8] = SCU_ZP;
+      gjp_scu_wire_map[9] = SCU_ZM;
+    }
+    if (s_axis == SCU_T) {
+      gjp_scu_dir[8] = SCU_TP;
+      gjp_scu_dir[9] = SCU_TM;
+      gjp_scu_wire_map[8] = SCU_TP;
+      gjp_scu_wire_map[9] = SCU_TM;
+    }
+  }
+#endif
+#endif //TARGET_BGL == 1
   
 #endif //PARALLEL
 

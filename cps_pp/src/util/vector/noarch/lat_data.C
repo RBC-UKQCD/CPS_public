@@ -1,36 +1,42 @@
 #include <config.h>
-#include <stdio.h>
-#include <util/error.h>
 #include <util/lat_data.h>
-#include <util/vector.h>
 #include <util/smalloc.h>
+#include <util/vector.h>
+#include <util/verbose.h>
+#include <util/error.h>
+//#include <qalloc.h>
 
 CPS_START_NAMESPACE
-//int LatData::DEFAULT_FLAG = 0;
-
 void LatData::Init(LatDataAlloc flags, int len, int volume){
-//	printf("LatData::Init(%p)\n",this);
-	if (status != NEW)
-	ERR.General(cname,"Init()","not allowed to initialize twice\n");
+	if (status == INITTED)
+        ERR.General(cname,"Init()","not allowed to initialize twice\n");
 	size = len;
 	vol = volume;
-	data = (IFloat *)smalloc(sizeof(IFloat)*size*vol);
+	switch (flags){
+		case DEFAULT:
+			data = (IFloat *)smalloc(sizeof(IFloat)*size*vol);
+			break;
+		case FAST:
+			data = (IFloat *)fmalloc(sizeof(IFloat)*size*vol);
+			break;
+		default:
+			ERR.General("LatData","Init()","invalid allocation flag");
+	}
 	if (data == NULL)
-        ERR.General("LatData","Init()","out of memory");
-//	printf("size=%d vol=%d data(%p)=%p\n",size,vol,&data,data);
-	status = INITTED;
-//	return status;
+	ERR.General("LatData","Init()","out of memory");
+        VRB.Flow(cname,"Init()","this=%p flags=%x vol=%d data=%p\n",this,flags,vol,data);
+
+    status = INITTED;
 }
 
 #if 0
-const IFloat *LatData::Field(int pos, int n){
+IFloat *LatData::Field(int pos, int n){
 	IFloat *pointer = data+pos*size+n;
 	return pointer;
 }
 #endif
 
 LatData::~LatData(){
-//	printf("LatData::~LatData(%p)\n",this);
  	if (data!= NULL) sfree(data);
 }
 

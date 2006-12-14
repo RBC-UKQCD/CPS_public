@@ -144,17 +144,19 @@ void LatticeHeader::init(const QioArg & qio_arg, FP_FORMAT FileFormat, Float Lin
   //  sequence_number = 0;
   
 
-#if TARGET == QCDOC
+#if TARGET == QCDOC 
     creator = "RBC"; // getlogin() not supported on QCDOC yet
-    creator_hardware = "CU-QCDOC ";
-#else
-#if TARGET == QCDSP
+    creator_hardware = "QCDOC";
+#elif TARGET == BGL 
+    creator = "RBC"; // getlogin() not supported on QCDOC yet
+    creator_hardware = "BGL";
+#elif TARGET == QCDSP
     creator = "RBC";
     creator_hardware = "CU-QCDSP ";
 #else
+//    creator = getlogin();
     creator = "RBC";
     creator_hardware = "CU-NOARCH ";
-#endif
 #endif
 
     char buf[256];
@@ -307,14 +309,15 @@ void LatRngHeader::init(const QioArg & qio_arg, INT_FORMAT FileFormat) {
 #if TARGET == QCDOC
   creator = "RBC"; // getlogin() not supported on QCDOC yet
   creator_hardware = "CU-QCDOC ";
-#else
-#if TARGET == QCDSP
+#elif TARGET == BGL
+  creator = "RBC"; // getlogin() not supported on QCDOC yet
+  creator_hardware = "BGL";
+#elif TARGET == QCDSP
   creator = "RBC";
   creator_hardware = "CU-QCDSP ";
 #else
   creator = "RBC";
   creator_hardware = "CU-NOARCH ";
-#endif
 #endif
   
   char buf[256];

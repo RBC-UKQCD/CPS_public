@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Implementation of AlgWline class methods.
 
-  $Id: alg_wline.C,v 1.10 2005-05-12 20:14:30 chulwoo Exp $
+  $Id: alg_wline.C,v 1.11 2006-12-14 17:53:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-12 20:14:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v 1.10 2005-05-12 20:14:30 chulwoo Exp $
-//  $Id: alg_wline.C,v 1.10 2005-05-12 20:14:30 chulwoo Exp $
+//  $Date: 2006-12-14 17:53:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v 1.11 2006-12-14 17:53:42 chulwoo Exp $
+//  $Id: alg_wline.C,v 1.11 2006-12-14 17:53:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_wline.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_wline/alg_wline.C,v $
 //  $State: Exp $
 //
@@ -33,6 +33,9 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
+#if TARGET == BGL
+#include <sys/bgl/bgl_sys_all.h>
+#endif
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
@@ -121,7 +124,12 @@ void AlgWline::run()
   for (int mu=0; mu<4; mu++) {
     VRB.Debug(cname, fname, "Begin Direction = %i\n", mu) ;
 
-    Complex wline[4] = { 0.0, 0.0, 0.0, 0.0 } ;
+    Complex wline[4] CPS_FLOAT_ALIGN;
+    wline[0] = 0.0;
+    wline[1] = 0.0;
+    wline[2] = 0.0;
+    wline[3] = 0.0;
+
     int x[4] ;
 
     for (x[(mu+1)%4]=0; x[(mu+1)%4] < node_sites[(mu+1)%4]; x[(mu+1)%4]++) 
@@ -163,7 +171,8 @@ void AlgWline::run()
 
     } // end for loop over coords != mu
 
-    slice_sum((Float *)wline, 4*sizeof(Complex)/sizeof(IFloat), mu) ;
+//    slice_sum((Float *)wline, 4*sizeof(Complex)/sizeof(IFloat), mu) ;
+    slice_sum((Float *)wline, 8, mu) ;
 
     wline[0] *= norm[mu] ;
     wline[1] *= norm[mu] ;

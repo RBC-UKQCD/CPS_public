@@ -1,7 +1,5 @@
-#define PROFILE
-
-#include <stdio.h>
 #include <config.h>
+#include <stdio.h>
 CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOp class BiCGstab(n) solver method.
@@ -17,6 +15,7 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <math.h>
 
+#define PROFILE
 #ifdef PROFILE
 #include <util/time.h>
 #endif
@@ -66,6 +65,9 @@ int DiracOpWilsonTypes::BiCGstab(Vector *psi, Vector *chi,
 
   if (n <= 0)
     ERR.General(cname, fname, "Invalid n parameter: %d\n",n);
+  const int n_max=10;
+  if (n > n_max)
+    ERR.General(cname, fname, "n(%d)>n_max(%d)\n",n,n_max);
 
   if(lat.Fclass() == F_CLASS_CLOVER)
     f_size = lat.FsiteSize()*GJP.VolNodeSites() / 2;
@@ -84,9 +86,9 @@ int DiracOpWilsonTypes::BiCGstab(Vector *psi, Vector *chi,
   Complex rho0(1.0,0.0), rho1;
   Complex alpha(0.0,0.0), omega(1.0,0.0), beta;
 
-  Float sigma[n+1];
-  Complex gamma[n+1], gamma_prime[n+1], gamma_prime_prime[n+1];
-  Complex tau[n+1][n+1];
+  Float sigma[n_max+1];
+  Complex gamma[n_max+1], gamma_prime[n_max+1], gamma_prime_prime[n_max+1];
+  Complex tau[n_max+1][n_max+1];
     
   Float rsd_sq;
   Float rsdcg_sq;

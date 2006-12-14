@@ -1,3 +1,4 @@
+#include <config.h>
 #include <stdio.h>
 #include <util/gjp.h>
 #include <util/site.h>

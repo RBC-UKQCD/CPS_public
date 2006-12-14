@@ -1,3 +1,4 @@
+#include <config.h>
 #include <stdio.h>
 #include <util/error.h>
 #include <util/command_line.h>

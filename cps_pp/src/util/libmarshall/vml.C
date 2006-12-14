@@ -3,6 +3,9 @@
  * vml.c, Generic VML routines implementation.
  */
 
+#ifndef NO_CPS
+#include <config.h>
+#endif
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>

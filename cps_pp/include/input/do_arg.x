@@ -1,3 +1,9 @@
+class BGLAxisMap {
+  int bgl_machine_dir_x; //!< Direction of the processor grid that X is "mapped" on. 
+  int bgl_machine_dir_y; //!< Direction of the processor grid that Y is "mapped" on.
+  int bgl_machine_dir_z; //!< Direction of the processor grid that Z is "mapped" on.  
+  int bgl_machine_dir_t; //!< Direction of the processor grid that T is "mapped" on. 
+};
 
 class DoArg {
   int x_sites;  /*!< Global lattice dimension in the X direction*/

@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.9 2006-02-21 21:14:09 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.10 2006-12-14 17:53:59 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 21:14:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v 1.9 2006-02-21 21:14:09 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.9 2006-02-21 21:14:09 chulwoo Exp $
+//  $Date: 2006-12-14 17:53:59 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v 1.10 2006-12-14 17:53:59 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.10 2006-12-14 17:53:59 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -623,6 +623,7 @@ void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
 // is the 5-dimensional globals sum glb_sum_five.
 //------------------------------------------------------------------
 void DiracOpDwf::DiracOpGlbSum(Float *float_p) {
+    VRB.Func(cname,"DiracOpGlbSum(*F)");
 //  if(GJP.Snodes() == 1) {
 //    glb_sum(float_p);
 //  }

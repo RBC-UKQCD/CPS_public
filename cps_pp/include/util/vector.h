@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.20 2006-11-25 19:09:48 chulwoo Exp $
+  $Id: vector.h,v 1.21 2006-12-14 17:53:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-11-25 19:09:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.20 2006-11-25 19:09:48 chulwoo Exp $
-//  $Id: vector.h,v 1.20 2006-11-25 19:09:48 chulwoo Exp $
+//  $Date: 2006-12-14 17:53:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.21 2006-12-14 17:53:33 chulwoo Exp $
+//  $Id: vector.h,v 1.21 2006-12-14 17:53:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -588,10 +588,15 @@ class Vector
       \param len The number of real numbers in the vectors.
       \post \a  This vector takes the value fb * c + d
     */
-    void FTimesV1PlusV2(const Float &fb, const Vector *c,
-			const Vector *d, int len)
+//    void FTimesV1PlusV2(const Float &fb, const Vector *c,
+//			const Vector *d, int len)
+     void FTimesV1PlusV2(Float fb, Vector *c, Vector *d, int len)
+#if TARGET == BGL  || TAGET == QCDOC
+    { Float coef = fb; vaxpy3 ((Vector *)v, &coef, c, d, len/6); }
+#else
     { fTimesV1PlusV2((IFloat *)&v, IFloat(fb), (IFloat *)c, 
                         (IFloat *)d, len); }
+#endif
 
 
     //! Assignment of the linear combination  fb * c - d
@@ -651,7 +656,7 @@ class Vector
 
 };
 
-#if TARGET == QCDOC || ( defined USE_QMP )
+#if TARGET == QCDOC ||  TARGET == BGL || ( defined USE_QMP )
 
 extern "C" {
   void xaxpy (Float *scalep,Float *InOutScale, Float *Add, int len);

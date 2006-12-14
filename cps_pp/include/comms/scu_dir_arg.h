@@ -1,10 +1,9 @@
 #include<config.h>
-CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 /*!\file
   \brief  Declaration of the SCUDirArg class.
   
-  $Id: scu_dir_arg.h,v 1.5 2004-08-18 11:57:36 zs Exp $
+  $Id: scu_dir_arg.h,v 1.6 2006-12-14 17:53:32 chulwoo Exp $
 */
 /*----------------------------------------------------------*/
 /* The SCUDirArg Class: scu_dir_arg.h
@@ -16,32 +15,28 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: zs $
-  $Date: 2004-08-18 11:57:36 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_dir_arg.h,v 1.5 2004-08-18 11:57:36 zs Exp $
-  $Id: scu_dir_arg.h,v 1.5 2004-08-18 11:57:36 zs Exp $
+  $Author: chulwoo $
+  $Date: 2006-12-14 17:53:32 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_dir_arg.h,v 1.6 2006-12-14 17:53:32 chulwoo Exp $
+  $Id: scu_dir_arg.h,v 1.6 2006-12-14 17:53:32 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_dir_arg.h,v $
-  $Revision: 1.5 $
+  $Revision: 1.6 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu_dir_arg.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
-
-CPS_END_NAMESPACE
-CPS_START_NAMESPACE
 
 
 #ifndef INCLUDED_SCU_DIR_ARG_H
 #define INCLUDED_SCU_DIR_ARG_H
 
-CPS_END_NAMESPACE
 #include <mpi.h>
 #include <comms/scu_enum.h>
 CPS_START_NAMESPACE
 
 //*! Labels for Boolean logic values. 
-enum { FALSE, TRUE };
+//enum { FALSE, TRUE };
 
 
 

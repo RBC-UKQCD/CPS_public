@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.6 2006-03-16 16:47:59 chulwoo Exp $
+  $Id: inv_cg.C,v 1.7 2006-12-14 17:53:56 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-03-16 16:47:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.6 2006-03-16 16:47:59 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.6 2006-03-16 16:47:59 chulwoo Exp $
+//  $Date: 2006-12-14 17:53:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.7 2006-12-14 17:53:56 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.7 2006-12-14 17:53:56 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -35,9 +35,13 @@ CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/verbose.h>
 #include <util/error.h>
+#include <util/time.h>
 #include <comms/nga_reg.h>
 #include <comms/cbuf.h>
 #include <math.h>
+#if TARGET == BGL
+#include <sys/bgl/bgl_sys_all.h>
+#endif
 CPS_START_NAMESPACE
 
 #ifdef  PARALLEL
@@ -46,11 +50,15 @@ CPS_START_NAMESPACE
 #endif
 #undef REPRODUCE_TEST
 
+#define PROFILE
+
 #ifdef  REPRODUCE_TEST
 CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
 CPS_START_NAMESPACE
 #endif
+
+static int bgl_cg_count = 0;
 
 //------------------------------------------------------------------
 // Circular buffer zero wait state access setting
@@ -264,6 +272,16 @@ int DiracOp::InvCg(Vector *out,
 //------------------------------------------------------------------
 // Loop over CG iterations
 //------------------------------------------------------------------
+#ifdef PROFILE
+    struct timeval start;
+    struct timeval end;
+	CGflops    = 0;
+    gettimeofday(&start,NULL);
+#if TARGET == BGL
+   unsigned long long start_time = rts_get_timebase();
+#endif
+#endif
+
   for(i=0; i < max_itr; i++){
   //printf("i=%d\n",i);
 
@@ -299,25 +317,13 @@ int DiracOp::InvCg(Vector *out,
     a = res_norm_sq_prv / d;
 
     // Set circular buffer
-    setCbufCntrlReg(4, CBUF_MODE4);
+//    setCbufCntrlReg(4, CBUF_MODE4);
 
     // sol = a * dir + sol;
-    // sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
-    for(icb = 0; icb < cram_blocks; icb++){
-      ic = icb * cram_buf_size;
-      moveMem(cram_a, f_sol+ic+BANK4_BASE, cram_buf_size_sof);
-      moveMem(cram_b, f_dir+ic+BANK4_BASE+BANK_SIZE, cram_buf_size_sof);
-      fTimesV1PlusV2(f_sol+ic, a, cram_b, cram_a, cram_buf_size);
-    }
+    sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
 
     // res = - a * (MatPcDagMatPc * dir) + res;
-    // res->FTimesV1PlusV2(-a, mmp, res, f_size_cb);
-    for(icb = 0; icb < cram_blocks; icb++){
-      ic = icb * cram_buf_size;
-      moveMem(cram_a, f_res+ic+BANK4_BASE, cram_buf_size_sof);
-      moveMem(cram_b, f_mmp+ic+BANK4_BASE+BANK_SIZE, cram_buf_size_sof);
-      fTimesV1PlusV2(f_res+ic, -a, cram_b, cram_a, cram_buf_size);
-    }
+    res->FTimesV1PlusV2(-a, mmp, res, f_size_cb);
 
     // res_norm_sq_cur = res * res
     res_norm_sq_cur = res->NormSqNode(f_size_cb);
@@ -331,16 +337,35 @@ int DiracOp::InvCg(Vector *out,
     b = res_norm_sq_cur / res_norm_sq_prv;
 
     // dir = b * dir + res;
-    // dir->FTimesV1PlusV2(b, dir, res, f_size_cb);
-    for(icb = 0; icb < cram_blocks; icb++){
-      ic = icb * cram_buf_size;
-      moveMem(cram_a, f_res+ic+BANK4_BASE, cram_buf_size_sof);
-      moveMem(cram_b, f_dir+ic+BANK4_BASE+BANK_SIZE, cram_buf_size_sof);
-      fTimesV1PlusV2(f_dir+ic, b, cram_b, cram_a, cram_buf_size);
-    }
-
+    dir->FTimesV1PlusV2(b, dir, res, f_size_cb);
+    CGflops+=f_size_cb*8;
 
   }
+
+#ifdef PROFILE
+    gettimeofday(&end,NULL);
+#if TARGET == BGL
+   unsigned long long stop_time = rts_get_timebase();
+   int inv_time = stop_time - start_time;
+   Float perf = inv_time;
+   perf = perf / (itr+1);
+   perf = perf / GJP.VolNodeSites();
+   perf = GJP.SnodeSites()* 678.0 * 100.0 / perf;
+   
+   //----------------------------------------------------------------
+   // Performance reporting
+   //----------------------------------------------------------------
+   if(!UniqueID() && bgl_cg_count%1 == 0){
+     printf("INVERTER TIME IN PCYCLES = %llu\n", stop_time - start_time);
+     printf("INVERTER PERFORMANCE     = %3.1f\%\n", perf);
+   }
+   bgl_cg_count++;
+#endif
+    unsigned long long flops_per_site = CGflops;
+    flops_per_site /= (GJP.VolNodeSites()*(itr+1));
+    print_flops(cname,fname,CGflops,&start,&end);
+    VRB.Result(cname,fname,"flops_per_site=%llu\n",flops_per_site);
+#endif
 
   // It has not reached stp_cnd: Issue a warning
   if(itr == dirac_arg->max_num_iter - 1){

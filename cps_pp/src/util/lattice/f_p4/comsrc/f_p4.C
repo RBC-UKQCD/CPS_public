@@ -1,11 +1,11 @@
-#include<stdio.h>
 #include<config.h>
+#include<stdio.h>
 #include<math.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.15 2006-04-18 17:29:19 chulwoo Exp $
+  $Id: f_p4.C,v 1.16 2006-12-14 17:54:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords

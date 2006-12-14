@@ -3,23 +3,22 @@
 #if TARGET == QCDOC
 #include<qalloc.h>
 #endif
-CPS_START_NAMESPACE
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.45 2006-11-25 19:10:38 chulwoo Exp $
+  $Id: lattice_base.C,v 1.46 2006-12-14 17:54:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-11-25 19:10:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.45 2006-11-25 19:10:38 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.45 2006-11-25 19:10:38 chulwoo Exp $
+//  $Date: 2006-12-14 17:54:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.46 2006-12-14 17:54:26 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.46 2006-12-14 17:54:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.45 $
+//  $Revision: 1.46 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -32,7 +31,6 @@ CPS_START_NAMESPACE
 //
 //------------------------------------------------------------------
 
-CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/vector.h>
 #include <util/gjp.h>
@@ -48,23 +46,21 @@ CPS_END_NAMESPACE
 #include <comms/scu.h>
 #include <comms/cbuf.h>
 
-CPS_START_NAMESPACE
-
 #ifdef _TARTAN
-CPS_END_NAMESPACE
 #include <math64.h>
-CPS_START_NAMESPACE
 #else
-CPS_END_NAMESPACE
 #include <math.h>
-CPS_START_NAMESPACE
 #endif
 
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc.h>
-CPS_START_NAMESPACE
 #endif
+
+#if TARGET == BGL
+#include <sys/bgl/bgl_sys_all.h>
+#endif
+
+CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
 //! A macro  defining the opposite direction.
@@ -97,8 +93,9 @@ int* Lattice::g_upd_cnt = 0 ;
 Float Lattice::md_time = (Float) 0.0 ;
 
 
-static Matrix m_tmp1, m_tmp2;	// DRAM temp buffer
-				// used for scu transfer
+static Matrix m_tmp1 CPS_FLOAT_ALIGN;
+static Matrix m_tmp2 CPS_FLOAT_ALIGN;
+// DRAM temp buffer, used for scu transfer
 
 //------------------------------------------------------------------
 // static variables used only inside this file
@@ -234,7 +231,7 @@ Lattice::Lattice()
     GJP.StartConfKind(START_CONF_MEM);
   }
   else if(start_conf_kind == START_CONF_FILE){
-#if TARGET == QCDOC || TARGET == NOARCH
+#if TARGET == QCDOC || TARGET == NOARCH || TARGET == BGL
 //    gauge_field = GJP.StartConfLoadAddr();
     VRB.Flow(cname,fname, "Load starting configuration addr = %x\n",
 	     gauge_field);

@@ -1,0 +1,97 @@
+#include<config.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+
+//#include "bgltoruspacket.h"
+#include "bglpersonality.h"
+#include "bglmemmap.h"
+#include "bgllockbox.h"
+#include "rts.h"
+
+#include <comms/bgl_glb.h>
+
+CPS_START_NAMESPACE
+
+void BGLTreeBarrierFunc (BGLTreeDevice *dev, int amRoot);
+
+void BGLGlobalTreeBarrier(void)
+{
+  BGLPersonality pers;
+  BGLTreeDevice dev;
+  int buffer[207], i, cpuid;
+  unsigned amRoot;
+  volatile unsigned long long j;
+
+  rts_get_personality(&pers, sizeof(pers));
+  cpuid = rts_get_processor_id();
+  amRoot = (pers.xCoord==0 && pers.yCoord == 0 && pers.zCoord==0);   
+
+
+  if (cpuid==1)  BGLTreeDevice_Init(&dev, BGLTreeDeviceChannel1, NULL);
+  else           BGLTreeDevice_Init(&dev, BGLTreeDeviceChannel0, NULL);
+
+  //  printf ("<%d,%d,%d,%d> BEFORE barrier\n", pers.xCoord,pers.yCoord,pers.zCoord,cpuid);
+
+  for (j=0; j<100000000; j++) ;
+
+  BGLTreeBarrierFunc (&dev, amRoot);
+
+  for (j=0; j<100000000; j++) ;
+
+
+  //  printf ("<%d,%d,%d,%d> AFTER barrier\n", pers.xCoord,pers.yCoord,pers.zCoord,cpuid);
+
+}
+
+
+void BGLTreeBarrierFunc (BGLTreeDevice *dev, int amRoot)
+{
+  BGLTreePacketHardHeader hardHeader;
+  BGLTreePacket packet;
+  int i, j;
+
+  memset((char *)&packet, 0, sizeof(packet));
+
+
+  /* phase 1 - reduce on both trees */
+  
+  BGLTreePacketHardHeader_InitGlobal(&hardHeader,
+				     1, 
+				     0, 
+				     BGLTreeCombineOp_ADD,
+				     1, 
+				     0);
+  
+  if (amRoot) 
+    while (BGLTreeDevice_recv(dev, &hardHeader, &packet)!=BGLDeviceStatus_OK);
+  else
+    while (BGLTreeDevice_send(dev, &hardHeader, (BGLQuad *)&packet) 
+	   != BGLDeviceStatus_OK);
+
+  /* phase 2 - synchronize the two tree roots */
+  
+  if (amRoot) BGL_Barrier_Pass (BGL_AppBarriers+0 );
+ 
+
+  /* phase 3 - broadcast on both trees */
+ 
+  BGLTreePacketHardHeader_InitGlobal(&hardHeader,
+				     1,
+				     0,
+				     BGLTreeCombineOp_NONE,
+				     1,
+				     0);
+  
+  if (amRoot)
+    while (BGLTreeDevice_send(dev, &hardHeader, (BGLQuad *)&packet) 
+	   != BGLDeviceStatus_OK) ;
+  else
+    while (BGLTreeDevice_recv(dev, &hardHeader, &packet)!=BGLDeviceStatus_OK);
+
+}
+
+CPS_END_NAMESPACE

@@ -1,3 +1,4 @@
+#include <config.h>
 #include <iostream>
 #include <unistd.h>
 #include <util/gjp.h>
@@ -115,7 +116,7 @@ int QioControl::round(const Float fdata) const{
 }
 
 int QioControl::globalSumInt(const int data) const{
-#if TARGET == QCDOC
+#ifdef PARALLEL
   //  Gsum64Ext  gsum;
   //  return gsum.Sum(data);
   int hfbits = sizeof(unsigned int) * 8 / 2;
@@ -134,7 +135,7 @@ int QioControl::globalSumInt(const int data) const{
 }
 
 unsigned int QioControl::globalSumUint(const unsigned int data) const{
-#if TARGET == QCDOC
+#ifdef  PARALLEL 
   //  Gsum64Ext  gsum;
   //  return gsum.Sum(data);
   int hfbits = sizeof(unsigned int) * 8 / 2;
@@ -153,7 +154,7 @@ unsigned int QioControl::globalSumUint(const unsigned int data) const{
 }
 
 Float QioControl::globalSumFloat(const Float data) const {
-#if TARGET == QCDOC
+#ifdef  PARALLEL
   //  Gsum64Ext  gsum;
   //  return gsum.Sum(data);
   Float sumdata = data;
@@ -165,7 +166,7 @@ Float QioControl::globalSumFloat(const Float data) const {
 }
 
 int QioControl::globalMinInt(const int data) const{
-#if TARGET == QCDOC
+#ifdef  PARALLEL
   Float fdata = data;
   glb_min(&fdata);
   int res = round(fdata);

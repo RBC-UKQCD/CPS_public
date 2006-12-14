@@ -92,6 +92,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include<util/dwf.h>
 #include<util/gjp.h>
+#include<util/dirac_op.h>
 #include<util/vector.h>
 #include<util/verbose.h>
 #include<util/error.h>
@@ -247,6 +248,7 @@ void dwf_dslash_5_plus(Vector *out,
     f_in  =  f_in + 24;
     f_out = f_out + 24;
   }
+  DiracOp::CGflops+=2*2*vol_4d_cb*local_ls*12;
 
 
 }

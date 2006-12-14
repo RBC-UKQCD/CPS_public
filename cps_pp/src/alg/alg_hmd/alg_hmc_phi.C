@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcPhi methods.
 
-  $Id: alg_hmc_phi.C,v 1.23 2005-06-16 07:18:55 chulwoo Exp $
+  $Id: alg_hmc_phi.C,v 1.24 2006-12-14 17:53:37 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-16 07:18:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.23 2005-06-16 07:18:55 chulwoo Exp $
-//  $Id: alg_hmc_phi.C,v 1.23 2005-06-16 07:18:55 chulwoo Exp $
+//  $Date: 2006-12-14 17:53:37 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v 1.24 2006-12-14 17:53:37 chulwoo Exp $
+//  $Id: alg_hmc_phi.C,v 1.24 2006-12-14 17:53:37 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_phi.C,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_phi.C,v $
 //  $State: Exp $
 //
@@ -681,7 +681,7 @@ Float AlgHmcPhi::run(void)
   // Print out monitor info
   //---------------------------------------------------------------
   if(common_arg->results != 0){
-    printf("Results ptr is %p\n",common_arg->results);
+    VRB.Flow(cname,fname,"Results ptr is %p\n",common_arg->results);
     if (common_arg->results == NULL) printf("FUCK\n");fflush(stdout);
     if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);

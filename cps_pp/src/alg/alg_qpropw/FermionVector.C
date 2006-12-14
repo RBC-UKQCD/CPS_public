@@ -1,3 +1,4 @@
+#include <config.h>
 //------------------------------------------------------------------
 //
 // The class functions for FermionVectorTp.
@@ -10,7 +11,6 @@
 #include <comms/scu.h>
 #include <util/site.h>
 #include <util/momentum.h>
-
 #include <comms/sysfunc.h>
 #include <alg/fermion_vector.h>
 

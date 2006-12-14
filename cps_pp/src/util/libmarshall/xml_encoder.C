@@ -1,4 +1,5 @@
 #ifndef NO_CPS
+#include <config.h>
 #include <util/vml/vml_encoder.h>
 #else
 #include <vml_encoder.h>
