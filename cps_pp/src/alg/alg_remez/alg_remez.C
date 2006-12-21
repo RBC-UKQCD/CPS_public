@@ -303,6 +303,13 @@ void AlgRemez::stpini(bigfloat *step) {
   step[neq] = step[neq-1];
 }
 
+// CJ: eliminating frequent malloc/free
+#define STATIC_YY
+#ifdef  STATIC_YY
+static const int yy_num= 100;
+static bigfloat yy[yy_num];
+#endif
+
 // Search for error maxima and minima
 void AlgRemez::search(bigfloat *step) {
   char *fname = "search()";
@@ -311,9 +318,14 @@ void AlgRemez::search(bigfloat *step) {
   int i, j, meq, emsign, ensign, steps;
 
   meq = neq + 1;
+#ifdef  STATIC_YY
+  if (meq > yy_num)
+    ERR.General(cname,fname,"meq(%d) >> yy_num(%d)\n",meq,yy_num);
+#else
   bigfloat *yy = new bigfloat[meq];
   if(yy == 0) ERR.Pointer(cname,fname,"yy");
   VRB.Smalloc(cname,fname,"yy",yy,meq * sizeof(bigfloat));
+#endif
 
   bigfloat eclose = 1.0e30;
   bigfloat farther = 0l;
@@ -388,8 +400,10 @@ void AlgRemez::search(bigfloat *step) {
     xx[i] = xm;
   }
 
+#ifndef  STATIC_YY
   VRB.Sfree(cname,fname, "yy",yy);
   delete [] yy;
+#endif
 }
 
 // Solve the equations

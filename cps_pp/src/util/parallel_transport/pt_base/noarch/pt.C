@@ -1,19 +1,19 @@
 /*! \file
   \brief  Functions used by the ParTransAsqtad class.
   
-  $Id: pt.C,v 1.9 2006-12-14 17:54:28 chulwoo Exp $
+  $Id: pt.C,v 1.10 2006-12-21 20:40:31 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-14 17:54:28 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.9 2006-12-14 17:54:28 chulwoo Exp $
-//  $Id: pt.C,v 1.9 2006-12-14 17:54:28 chulwoo Exp $
+//  $Date: 2006-12-21 20:40:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.10 2006-12-21 20:40:31 chulwoo Exp $
+//  $Id: pt.C,v 1.10 2006-12-21 20:40:31 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v $
 //  $State: Exp $
 //
@@ -21,6 +21,7 @@
 #include <config.h>
 #include <util/gjp.h>
 #include <util/pt.h>
+#include <comms/scu.h>
 
 CPS_START_NAMESPACE
 

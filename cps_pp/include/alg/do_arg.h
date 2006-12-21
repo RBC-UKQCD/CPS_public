@@ -14,6 +14,18 @@
 CPS_START_NAMESPACE
 
 class VML;
+class BGLAxisMap {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	int bgl_machine_dir_x;
+	int bgl_machine_dir_y;
+	int bgl_machine_dir_z;
+	int bgl_machine_dir_t;
+};
+
+class VML;
 class DoArg {
 public:
 	 bool Encode(char *filename,char *instance);
@@ -94,9 +106,11 @@ extern "C" {
 #endif
 
 #if defined(__STDC__) || defined(__cplusplus)
+extern  bool_t vml_BGLAxisMap (VML *, char *instance, BGLAxisMap*);
 extern  bool_t vml_DoArg (VML *, char *instance, DoArg*);
 
 #else /* K&R C */
+extern  bool_t vml_BGLAxisMap (VML *, char *instance, BGLAxisMap*);
 extern  bool_t vml_DoArg (VML *, char *instance, DoArg*);
 
 #endif /* K&R C */

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.33 2006-12-14 17:54:07 chulwoo Exp $
+  $Id: gjp.C,v 1.34 2006-12-21 20:40:31 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-14 17:54:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.33 2006-12-14 17:54:07 chulwoo Exp $
-//  $Id: gjp.C,v 1.33 2006-12-14 17:54:07 chulwoo Exp $
+//  $Date: 2006-12-21 20:40:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.34 2006-12-21 20:40:31 chulwoo Exp $
+//  $Id: gjp.C,v 1.34 2006-12-21 20:40:31 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.33 $
+//  $Revision: 1.34 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -391,6 +391,7 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
   VRB.Level(doarg_int.verbose_level);
 if (!UniqueID())
   printf("verbose_level =%d\n",VRB.Level());
+  CSM.Initialize(1000);
   CSM.Activate(doarg_int.checksum_level);
 if (!UniqueID())
   printf("checksum_level =%d\n",doarg_int.checksum_level);

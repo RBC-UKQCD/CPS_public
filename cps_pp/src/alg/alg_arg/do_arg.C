@@ -5,6 +5,42 @@
 
 #include <alg/do_arg.h>
 CPS_START_NAMESPACE
+	 bool BGLAxisMap::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool BGLAxisMap::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool BGLAxisMap::Vml(VML *vmls,char *instance){
+		 if(!vml_BGLAxisMap(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_BGLAxisMap (VML *vmls, char *name,BGLAxisMap *objp)
+{
+	register int32_t *buf;
+
+	 vml_class_begin(vmls,"BGLAxisMap",name);
+	 if (!vml_int (vmls, "bgl_machine_dir_x", &objp->bgl_machine_dir_x))
+		 return FALSE;
+	 if (!vml_int (vmls, "bgl_machine_dir_y", &objp->bgl_machine_dir_y))
+		 return FALSE;
+	 if (!vml_int (vmls, "bgl_machine_dir_z", &objp->bgl_machine_dir_z))
+		 return FALSE;
+	 if (!vml_int (vmls, "bgl_machine_dir_t", &objp->bgl_machine_dir_t))
+		 return FALSE;
+	 vml_class_end(vmls,"BGLAxisMap",name);
+	return TRUE;
+}
 	 bool DoArg::Encode(char *filename,char *instance){
 		 VML vmls;
 		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
