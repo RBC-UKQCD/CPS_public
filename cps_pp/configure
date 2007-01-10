@@ -4024,8 +4024,13 @@ echo $ECHO_N "checking if optimising... $ECHO_C" >&6
 echo "$as_me:$LINENO: result: $enable_optimise" >&5
 echo "${ECHO_T}$enable_optimise" >&6
 if test "$enable_optimise" = "yes"; then
-   CFLAGS="${CFLAGS} -O3"
-   CXXFLAGS="${CXXFLAGS} -O3"
+   if test "$enable_target" = "bgl"; then
+     CFLAGS="${CFLAGS} -O"
+     CXXFLAGS="${CXXFLAGS} -O"
+   else
+     CFLAGS="${CFLAGS} -O3"
+     CXXFLAGS="${CXXFLAGS} -O3"
+   fi
 fi
 
 

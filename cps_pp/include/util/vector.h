@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.23 2007-01-10 17:53:36 chulwoo Exp $
+  $Id: vector.h,v 1.24 2007-01-10 21:56:56 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-10 17:53:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.23 2007-01-10 17:53:36 chulwoo Exp $
-//  $Id: vector.h,v 1.23 2007-01-10 17:53:36 chulwoo Exp $
+//  $Date: 2007-01-10 21:56:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.24 2007-01-10 21:56:56 chulwoo Exp $
+//  $Id: vector.h,v 1.24 2007-01-10 21:56:56 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -259,7 +259,7 @@ class Matrix
 
     //! Not what you might think.
     void TrLessAntiHermMatrix(const Matrix& this_dag);
-#if TARGET == QCDOC
+#if TARGET == QCDOC || TARGET == BGL
     void TrLessAntiHermMatrix();
 #else
     void TrLessAntiHermMatrix(){
