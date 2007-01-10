@@ -4113,6 +4113,9 @@ if test "$enable_qmp" != "no"; then
    LDFLAGS="${LDFLAGS} ${QMP_LDFLAGS} ${QMP_LIBS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_CFLAGS} "
    DFLAGS="${DFLAGS} -DUSE_QMP"
+   if test "$enable_target" = "bgl"; then
+     ARCHDIR="BGL_QMP_DIR"
+   fi
    TESTING_PARALLEL="yes";
 fi
 

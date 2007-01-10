@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2006-12-13 18:26:28 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.43 2006-12-13 18:26:28 chulwoo Exp $
-dnl  $Id: configure.in,v 1.43 2006-12-13 18:26:28 chulwoo Exp $
+dnl  $Date: 2007-01-10 17:53:36 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.44 2007-01-10 17:53:36 chulwoo Exp $
+dnl  $Id: configure.in,v 1.44 2007-01-10 17:53:36 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.43 $
+dnl  $Revision: 1.44 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -222,6 +222,9 @@ dnl     echo "QMP_DIR environment variable not set"
    LDFLAGS="${LDFLAGS} ${QMP_LDFLAGS} ${QMP_LIBS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_CFLAGS} "
    DFLAGS="${DFLAGS} -DUSE_QMP"
+   if test "$enable_target" = "bgl"; then
+     ARCHDIR="BGL_QMP_DIR"
+   fi
    TESTING_PARALLEL="yes";
 fi
 
