@@ -70,7 +70,7 @@ QioControl::~QioControl() {
 
 }
 
-#if 0
+#ifndef USE_QMP
 // The following are NEW functions added to QioControl class 
 // to enable message passing between parallel processors, based on QMP calls
 // (some are pretty useful...)

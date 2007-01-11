@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.26 2006-12-14 17:53:33 chulwoo Exp $
+  $Id: gjp.h,v 1.27 2007-01-11 22:48:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-14 17:53:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.26 2006-12-14 17:53:33 chulwoo Exp $
-//  $Id: gjp.h,v 1.26 2006-12-14 17:53:33 chulwoo Exp $
+//  $Date: 2007-01-11 22:48:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.27 2007-01-11 22:48:12 chulwoo Exp $
+//  $Id: gjp.h,v 1.27 2007-01-11 22:48:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.26 $
+//  $Revision: 1.27 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -796,27 +796,27 @@ public:
 start and end of main()
 */
 
+#if TARGET == NOARCH
+inline void Start(){}
+inline void End(){}
+#else
+void Start();
+void End();
+void Start(int * argc, char ***argv);
+#endif
+
 #if TARGET == QCDOC 
 extern "C" {
   void _mcleanup(void);
 }
-void Start();
-void Start(int * argc, char ***argv);
-void End();
+void Start(int * argc, char ***argv){Start();}
 #elif USE_QMP
 namespace QMPSCU {
   void init_qmp();
   void init_qmp(int * argc, char *** argv);
   void destroy_qmp();
 }
-void Start();
-void Start(int * argc, char ***argv);
-void End();
-#else
-inline void Start(){}
-inline void End(){}
-#endif
-#if TARGET == BGL
+#elif TARGET == BGL
 void Start(const BGLAxisMap *);
 #endif
 

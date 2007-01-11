@@ -121,12 +121,14 @@ int CoorX() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::pePo
 int CoorY() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::pePos[1];}
 int CoorZ() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::pePos[2];}
 int CoorS(){return 0;}
+int CoorW(){return 0;}
 
 int SizeT() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peGrid[3];}
 int SizeX() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peGrid[0];}
 int SizeY() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peGrid[1];}
 int SizeZ() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peGrid[2];}
 int SizeS() {return 1;}
+int SizeW() {return 1;}
 
 int NumNodes() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peNum;}
 

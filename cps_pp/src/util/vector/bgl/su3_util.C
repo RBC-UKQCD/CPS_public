@@ -2,7 +2,23 @@
 CPS_START_NAMESPACE
 /*!\file
   \brief  Utility routines for SU(3) matrices.
+
+  $Id: su3_util.C,v 1.3 2007-01-11 22:48:17 chulwoo Exp $
 */
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Author: chulwoo $
+//  $Date: 2007-01-11 22:48:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v 1.3 2007-01-11 22:48:17 chulwoo Exp $
+//  $Id: su3_util.C,v 1.3 2007-01-11 22:48:17 chulwoo Exp $
+//  $Name: not supported by cvs2svn $
+//  $Locker:  $
+//  $Revision: 1.3 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <math.h>
@@ -19,7 +35,6 @@ static IFloat inv3 = 1./3.;
 //---------------------------------------------------------------//
 //  Matrix
 //---------------------------------------------------------------//
-
 /*!
   \param a A linear array representation of a 3x3 complex matrix, such that 
   real part of the (i,j) element is at array position [6i+2j] 
@@ -47,7 +62,7 @@ void Matrix::Dagger(const IFloat* a)
   <em>1/2(M-A) - 1/6 Trace M-A)</em>
   \n where \a M is the original value of this matrix.
 */
-void Matrix::TrLessAntiHermMatrix(const Matrix& dag)
+void Matrix::TrLessAntiHermMatrix(const Matrix &dag)
 {
     // get 1/2(A - dag(A)) =  1/2A - dag(1/2A)
     *this -= dag;
@@ -59,6 +74,30 @@ void Matrix::TrLessAntiHermMatrix(const Matrix& dag)
     *(p+1) -= c;
     *(p+9) -= c;
     *(p+17) -= c;
+}
+
+void Matrix::TrLessAntiHermMatrix()
+{
+
+    IFloat *p = (IFloat *)u;
+    *p = *(p+8) = *(p+16)=0.;
+    IFloat tmp = 0.5*(p[2] - p[6]);
+    p[2]=tmp; p[6] = -tmp;
+    tmp = 0.5*(p[3] + p[7]);
+    p[3]=tmp; p[7] = tmp;
+    tmp = 0.5*(p[4] - p[12]);
+    p[4]=tmp; p[12] = -tmp;
+    tmp = 0.5*(p[5] + p[13]);
+    p[5]=tmp; p[13] = tmp;
+    tmp = 0.5*(p[10] - p[14]);
+    p[10]=tmp; p[14] = -tmp;
+    tmp = 0.5*(p[11] + p[15]);
+    p[11]=tmp; p[15] = tmp;
+
+    IFloat c = inv3 * (*(p+1) + *(p+9) + *(p+17));
+    p[1] -= c;
+    p[9] -= c;
+    p[17] -= c;
 }
 
 /*!

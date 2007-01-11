@@ -59,12 +59,14 @@ int CoorX();  //!< Gets the grid coordinate of this node in the X direction.
 int CoorY();  //!< Gets the grid coordinate of this node in the Y direction.
 int CoorZ();  //!< Gets the grid coordinate of this node in the Z direction.
 inline int CoorS() {return 0;}
+inline int CoorW() {return 0;}
 
 int SizeT(); //!< Gets the size of the grid  in the T direction.
 int SizeX(); //!< Gets the size of the grid  in the X direction.
 int SizeY(); //!< Gets the size of the grid  in the Y direction.
 int SizeZ(); //!< Gets the size of the grid  in the Z direction.
 inline int SizeS() {return 1;}
+inline int SizeW() {return 1;}
 
 //! Returns the total number of nodes in the processor grid.
 int NumNodes();

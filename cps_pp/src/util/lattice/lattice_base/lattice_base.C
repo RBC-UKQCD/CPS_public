@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.46 2006-12-14 17:54:26 chulwoo Exp $
+  $Id: lattice_base.C,v 1.47 2007-01-11 22:48:16 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-14 17:54:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.46 2006-12-14 17:54:26 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.46 2006-12-14 17:54:26 chulwoo Exp $
+//  $Date: 2007-01-11 22:48:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.47 2007-01-11 22:48:16 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.47 2007-01-11 22:48:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.46 $
+//  $Revision: 1.47 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -334,8 +334,7 @@ Lattice::~Lattice()
   // No data manipulations if the scaling factor is 1.0
   // [built into lat.MltFloat].
   MltFloat(1.0 / GJP.XiBare(), GJP.XiDir());
-  sync();
-  VRB.FuncEnd(cname,fname);
+//  sync();
 
 }
 
@@ -504,14 +503,12 @@ char *fname = "GetLink()";
   }
 
 #ifndef PARALLEL
-//VRB.FuncEnd(cname, fname) ;
   return on_node_link;
 #endif
 
   // send to the destination node if the site is off-node
   //------------------------------------------------------------------------
   if (on_node) {
-//  VRB.FuncEnd(cname, fname) ;
     return on_node_link;
   } else {
     Matrix send = *on_node_link;
@@ -528,7 +525,6 @@ char *fname = "GetLink()";
         send = recv;
       }
     }
-//  VRB.FuncEnd(cname, fname) ;
     return &recv ;
   }
 }
@@ -1073,7 +1069,6 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     *((IFloat *)mp4) = *((IFloat *)p1+BANK4_BASE+BANK_SIZE) ;
   }
-//VRB.FuncEnd(cname, fname) ;
 }
 
 
@@ -2012,7 +2007,7 @@ void Lattice::MltFloatImpl(Float factor, int dir)
 void Lattice::EvolveGfield(Matrix *mom, Float step_size){
   char *fname = "EvolveGfield(M*,F)";
 
-  sync();
+//  sync();
   VRB.Func(cname,fname);
 
   setCbufCntrlReg(4, CBUF_MODE4);
@@ -2077,8 +2072,7 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
   VRB.Result(cname,fname,"gauge checksum(after) = %p\n",
     global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
 #endif
-  sync();
-  VRB.FuncEnd(cname,fname);
+//  sync();
   smeared = 0;
 }
 

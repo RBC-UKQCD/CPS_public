@@ -4,6 +4,9 @@
 
 CPS_START_NAMESPACE
 
+void Start(int * argc, char ***argv)
+{Start(NULL);}
+
 void Start(){
   Start(NULL);
 }
