@@ -2,7 +2,7 @@
 UseCVSACL=yes
 
 # Default CVSACL Permission to use.
-CVSACLDefaultPermissions=p
+CVSACLDefaultPermissions=a
 
 # Default file location for CVS ACL file (access) is CVSROOT/access.
 # If you want to use a different location, define it below.
