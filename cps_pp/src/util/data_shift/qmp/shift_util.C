@@ -8,7 +8,7 @@ CPS_START_NAMESPACE
 #define QMP
 #endif
 
-void GlobalDataShift::Shift(int i, int n_disp){
+void GlobalDataShift::Shift(int direction, int n_disp){
   if (n_disp==0) return;
  
   SCUDir s_dir,r_dir;
@@ -23,9 +23,9 @@ void GlobalDataShift::Shift(int i, int n_disp){
    a_disp = -n_disp;
    s_dir = gjp_scu_dir[i*2+1];
    r_dir = gjp_scu_dir[i*2];
-  }
+  }
 #else
-  int direction = i;
+//  int direction = i;
   int sflag;
   if (n_disp > 0)
     sflag = +1;
@@ -47,7 +47,7 @@ void GlobalDataShift::Shift(int i, int n_disp){
 #endif
 
 //  sys_cacheflush(0);
-  for(int i = 0;i<n_disp-1;i++){
+  for(int i = 0;i<a_disp-1;i++){
 
 #ifndef USE_QMP
     Send.StartTrans();Recv.StartTrans();
