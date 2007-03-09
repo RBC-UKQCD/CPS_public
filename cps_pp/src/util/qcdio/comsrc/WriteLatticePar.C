@@ -56,24 +56,31 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 
   unsigned int csum = 0;
 
-#if TARGET != QCDOC   // when not on QCDOC(like on LINUX), use parallel(direct IO) mode
+#if 0   // when not on QCDOC(like on LINUX), use parallel(direct IO) mode
   setParallel();
+#else
+  setSerial();
 #endif
   
-  ofstream output;
+  fstream output;
 
+//  cps::sync();
   if(parIO()) {
     // all open file, start writing
     output.open(wt_arg.FileName);
     if(!output.good())    {
       //      VRB.Flow(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);
       //      VRB.Flow(cname,fname,"USER: maybe you should kill the process\n");
+      
+      printf("Node %d:Could not open file: [%s] for output.\n",UniqueID(),wt_arg.FileName);
       error = 1;
     }
   }
   else {
     // only node 0 open file, start writing
     if(isRoot()) {
+      FILE *fp = fopen(wt_arg.FileName,"w");
+      fclose(fp);
       output.open(wt_arg.FileName);
       if(!output.good())    {
 	//	VRB.Flow(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);
@@ -82,16 +89,21 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
       }
     }
   }
-  if(synchronize(error) > 0)  
-    ERR.FileW(cname,fname,wt_arg.FileName);
+  if (error)
+    printf("Node %d: says opening %s failed\n",UniqueID(),wt_arg.FileName);
+//  if(synchronize(error) > 0)  
+//    ERR.FileW(cname,fname,wt_arg.FileName);
+   error=0;
 
   // write header
   if(isRoot()){
     hd.init(wt_arg, fpconv.fileFormat, ltrace, plaq);
     hd.write(output);
   }
-  if(synchronize(error) > 0) 
-    ERR.General(cname,fname,"Writing header failed\n");
+  if (error)
+    printf("Node %d: says Writing header failed  %s failed\n",UniqueID(),wt_arg.FileName);
+//  if(synchronize(error) > 0) 
+//    ERR.General(cname,fname,"Writing header failed\n");
   log();
 
   broadcastInt(&hd.data_start);
@@ -101,12 +113,14 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
     if(!pario.store(output, (char*)lpoint, data_per_site, sizeof(Matrix)*4,
 		    hd, fpconv, 4, &csum)) 
       ERR.General(cname, fname, "Unload failed\n");
+
+//    printf("Node %d: lattice write csum=%x\n",UniqueID(),csum);
     if(wt_arg.Scoor() == 0) 
       csum = globalSumUint(csum);
     else 
       globalSumUint(0);
   }
-#if TARGET == QCDOC
+#if 1
   else {
     SerialIO serio(wt_arg);
     if(!serio.store(output, (char*)lpoint, data_per_site, sizeof(Matrix)*4,
@@ -114,6 +128,7 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
       ERR.General(cname, fname, "Unload failed\n");
   }
 #endif
+  output.flush();
 
   log();
 

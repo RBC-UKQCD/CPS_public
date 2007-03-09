@@ -14,6 +14,7 @@
 #include <util/iostyle.h>
 #include <util/fpconv.h>
 #include <util/time.h>
+#include <comms/scu.h>
 
 #include <iostream>
 #include <fstream>
@@ -87,7 +88,8 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
   char * pd = data;
 
   VRB.Result(cname, fname, "Parallel loading starting\n");
-  setConcurIONumber(rd_arg.ConcurIONumber);
+//  setConcurIONumber(rd_arg.ConcurIONumber);
+  setConcurIONumber(1);
   //
   getIOTimeSlot();
 
@@ -107,14 +109,28 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
 	  input.seekg(jump,ios_base::cur);
 
 	  for(int xr=xbegin;xr<xend;xr++) {
-	    input.read(fbuf,chars_per_site);
-	    if(!input.good()) {
-	      error = 1;
-	      goto sync_error;
-	    }
+            unsigned int r_pos = input.tellg();
+	    int try_num =0;
+            long long lcsum=-1,lcsum2=-1;
+            do {
+              lcsum2=lcsum;
+	      input.seekg(r_pos,ios::beg);
+	      input.read(fbuf,chars_per_site);
+              lcsum = dconv.checksum(fbuf,data_per_site);
+              try_num++;
+              if(try_num%100==0)
+                printf("Node %d:read jump=%d csum=%x try_num=%d\n",UniqueID(),jump,dconv.checksum(fbuf,data_per_site),try_num);
+            } while ( ( (lcsum==0) || (lcsum!=lcsum2)) && try_num<1000);
+//	    if(!input.good()) {
+//	      error = 1;
+//             printf("Node %d: csum error in ParIO::load()\n",UniqueID());
+//	      goto sync_error;
+//	    }
 
 	    csum += dconv.checksum(fbuf,data_per_site);
 	    pdcsum += dconv.posDepCsum(fbuf, data_per_site, dimension,	rd_arg, siteid, 0);
+            if(try_num>2)
+            printf("Node %d:read jump=%d csum=%x try_num=%d\n",UniqueID(),jump,dconv.checksum(fbuf,data_per_site),try_num);
 
 	    if(hd.headerType() == LatHeaderBase::LATTICE_HEADER) {
 	      for(int mat=0;mat<4;mat++) {
@@ -183,13 +199,14 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
   return 1;
 }
 
-int ParallelIO::store(ostream & output,
+int ParallelIO::store(iostream & output,
 		      char * data, const int data_per_site, const int site_mem,
 		      LatHeaderBase & hd, const DataConversion & dconv,
 		      const int dimension /* 4 or 5 */,
 		      unsigned int * ptrcsum, unsigned int * ptrpdcsum,
 		      Float * rand_sum, Float * rand_2_sum)  { 
   const char * fname = "store()";
+//  printf("Node %d: ParallelIO::store()\n",UniqueID());
   
   int error = 0;
 
@@ -218,6 +235,7 @@ int ParallelIO::store(ostream & output,
 
   // TempBufAlloc is a mem allocator that prevents mem leak on function exits
   TempBufAlloc fbuf(chars_per_site);
+  TempBufAlloc fbuf2(chars_per_site);  // buffer only stores one site
 
   // these two only need when doing LatRng unloading
   TempBufAlloc rng(data_per_site * dconv.hostDataSize());
@@ -230,13 +248,17 @@ int ParallelIO::store(ostream & output,
   int siteid=0;
 
   VRB.Result(cname, fname, "Parallel unloading starting\n");
-  setConcurIONumber(wt_arg.ConcurIONumber);
+//  setConcurIONumber(wt_arg.ConcurIONumber);
+  setConcurIONumber(1);
   getIOTimeSlot();
 
+  int retry=0;
+do {
   if(dimension ==5 || wt_arg.Scoor() == 0) { // this line differs from read()
     output.seekp(hd.data_start,ios_base::beg);
 
     int jump=0;
+    unsigned long long  r_pos=0, w_pos;
     if(dimension==5) jump = sbegin * sblk;
 
     for(int sr=sbegin; dimension==4 || sr<send; sr++) {
@@ -275,13 +297,30 @@ int ParallelIO::store(ostream & output,
 
 	      csum += dconv.checksum(fbuf,data_per_site);
 	      pdcsum += dconv.posDepCsum(fbuf, data_per_site, dimension, wt_arg, siteid, 0);
-	      output.write(fbuf,chars_per_site);
 
-	      if(!output.good()) {
-		error = 1;
-		goto sync_error;
-	      }
-
+              unsigned int lcsum,lcsum2;
+              lcsum=dconv.checksum(fbuf,data_per_site);
+              r_pos=0;w_pos=0;
+              int try_num=0;
+              do{
+                if (!r_pos) r_pos = output.tellp();
+		else output.seekp(r_pos,ios_base::beg);
+  	        output.write(fbuf,chars_per_site);
+                output.flush();
+                if (!w_pos) w_pos = output.tellp();
+  	        if(!output.good()) {
+    		  error = 1;
+                  printf("Node %d: csum error in ParIO::store()\n",UniqueID());
+  		  goto sync_error;
+  	        }
+  	        output.seekg(r_pos, ios_base::beg);
+  	        output.read(fbuf2,chars_per_site);
+                lcsum2=dconv.checksum(fbuf2,data_per_site);
+                try_num++;
+                if (lcsum != lcsum2)
+                printf("Node %d:write jump=%d csum=%x csum2=%x\n",UniqueID(),jump,lcsum,lcsum2);
+              }while (lcsum !=lcsum2|| try_num<10);
+  	      output.seekp(w_pos, ios_base::beg);
 	      siteid++;
 	    }	  
 	  
@@ -304,15 +343,25 @@ int ParallelIO::store(ostream & output,
   }
 
   VRB.Flow(cname, fname, "This Group done!\n");
+//  printf("Node %d: csum=%x pdcsum=%x RandSum=%e Rand2Sum=%e\n",
+//  UniqueID(),csum,pdcsum,RandSum,Rand2Sum);
 
  sync_error:
+ if (error){ printf("Node %d: Write error\n"); retry++;}
+} while (error!=0 && retry<20);
   finishIOTimeSlot();
   //
 
+//  printf("Node %d: IOTimeSlot done!\n",UniqueID());
+  cps::sync();
   if(synchronize(error)>0) 
     ERR.FileW(cname,fname,wt_arg.FileName);
+//  printf("Node %d: synchronize done!\n",UniqueID());
 
+  cps::sync();
   VRB.Result(cname,fname,"Parallel Unloading done!\n");
+//  printf("Node %d: Parallel Unloading done!\n",UniqueID());
+  cps::sync();
 
   if(ptrcsum) *ptrcsum = csum;
   if(ptrpdcsum) *ptrpdcsum = pdcsum;
@@ -325,7 +374,7 @@ int ParallelIO::store(ostream & output,
 
 
 
-#if TARGET == QCDOC
+#if 1
 
 /*********************************************************************/
 /* SerialIO functions ***********************************************/
@@ -462,7 +511,7 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
   return 1;
 }
 
-int SerialIO::store(ostream & output,
+int SerialIO::store(iostream & output,
 		    char * data, const int data_per_site, const int site_mem,
 		    LatHeaderBase & hd, const DataConversion & dconv,
 		    const int dimension /* 4 or 5 */,
@@ -591,9 +640,17 @@ void SerialIO::xShiftNode(char * data, const int xblk, const int dir) const {
     //    const SCUDir pos_dir[] = { SCU_XP, SCU_YP, SCU_ZP, SCU_TP };
     //    const SCUDir neg_dir[] = { SCU_XM, SCU_YM, SCU_ZM, SCU_TM };
     
-    TempBufAlloc  recvbuf (xblk);
     char * sendbuf = data;
+
+    int fsize = xblk/sizeof(IFloat);
+    if (xblk%sizeof(IFloat)>0) fsize++;
+    TempBufAlloc  recvbuf (fsize*sizeof(IFloat));
+    if(dir>0) 
+      getMinusData(recvbuf.FPtr(),(IFloat *)sendbuf,fsize,0);
+    else
+      getPlusData(recvbuf.FPtr(),(IFloat *)sendbuf,fsize,0);
     
+#if 0
     SCUDirArg send, recv;
     if(dir>0) {
       send.Init(sendbuf, SCU_XP, SCU_SEND, xblk);
@@ -607,6 +664,7 @@ void SerialIO::xShiftNode(char * data, const int xblk, const int dir) const {
     SCUTrans(&send);
     SCUTrans(&recv);
     SCUTransComplete();
+#endif
     
     memcpy(sendbuf, recvbuf, xblk);
   }
@@ -617,9 +675,20 @@ void SerialIO::yShift(char * data, const int xblk, const int dir) const {
   if(qio_arg.Ynodes() <= 1) useSCU = 0;
 
   if(isFace0()) {
-    TempBufAlloc sendbuf(xblk);
-    TempBufAlloc recvbuf(xblk);
+    int fsize = xblk/sizeof(IFloat);
+    if (xblk%sizeof(IFloat)>0) fsize++;
+    TempBufAlloc  sendbuf (fsize*sizeof(IFloat));
+    TempBufAlloc  recvbuf (fsize*sizeof(IFloat));
+    if(dir>0){ 
+      memcpy(sendbuf, data + xblk * (qio_arg.YnodeSites() - 1), xblk);
+      getMinusData(recvbuf.FPtr(),sendbuf.FPtr(),fsize,1);
+    } else {
+      memcpy(sendbuf, data, xblk);
+      getPlusData(recvbuf.FPtr(),sendbuf.FPtr(),fsize,1);
+    }
 
+
+#if 0
     SCUDirArg send, recv;
 
     if(dir>0) {
@@ -647,6 +716,7 @@ void SerialIO::yShift(char * data, const int xblk, const int dir) const {
       SCUTrans(&send);
       SCUTrans(&recv);
     }
+#endif
 
     // doing memory move at the same time
     if(dir>0) {
@@ -660,9 +730,9 @@ void SerialIO::yShift(char * data, const int xblk, const int dir) const {
       //      memmove(data, data+xblk, xblk * (qio_arg.YnodeSites()-1));
     }
 
-    if(useSCU) {
-      SCUTransComplete();
-    }
+//    if(useSCU) {
+//      SCUTransComplete();
+//    }
 
     if(dir>0) {
       memcpy(data, recvbuf, xblk);
@@ -681,15 +751,31 @@ void SerialIO::zShift(char * data, const int xblk, const int dir) const {
   if(isCube0()) {
     int yblk = xblk * qio_arg.YnodeSites();
 
+    int fsize = xblk/sizeof(IFloat);
+    if (xblk%sizeof(IFloat)>0) fsize++;
+    TempBufAlloc  sendbuf (fsize*sizeof(IFloat));
+    TempBufAlloc  recvbuf (fsize*sizeof(IFloat));
+
+#if 0
     TempBufAlloc sendbuf(xblk);
     TempBufAlloc recvbuf(xblk);
 
     SCUDirArg send, recv;
+#endif
 
     char * loface = data;
     char * hiface = data + yblk * (qio_arg.ZnodeSites()-1);
 
     for(int yc=0;yc<qio_arg.YnodeSites();yc++) {
+      if(dir>0){ 
+	memcpy(sendbuf, hiface + yc*xblk, xblk);
+        getMinusData(recvbuf.FPtr(),sendbuf.FPtr(),fsize,2);
+      } else {
+	memcpy(sendbuf, loface + yc*xblk, xblk);
+        getPlusData(recvbuf.FPtr(),sendbuf.FPtr(),fsize,2);
+      }
+
+#if 0
       if(dir>0) {
 	if(useSCU) {
 	  memcpy(sendbuf, hiface + yc*xblk, xblk);
@@ -715,6 +801,7 @@ void SerialIO::zShift(char * data, const int xblk, const int dir) const {
 	SCUTrans(&send);
 	SCUTrans(&recv);
       }
+#endif
 
       if(dir > 0) {
 	for(int zc=qio_arg.ZnodeSites()-1;zc>0;zc--) {
@@ -727,9 +814,9 @@ void SerialIO::zShift(char * data, const int xblk, const int dir) const {
 	}
       }
 	  
-      if(useSCU) {
-	SCUTransComplete();
-      }
+//      if(useSCU) {
+//	SCUTransComplete();
+//      }
 
       if(dir>0) {
 	memcpy(loface + yc*xblk, recvbuf, xblk);
@@ -749,10 +836,17 @@ void SerialIO::tShift(char * data, const int xblk, const int dir) const {
     int yblk = xblk * qio_arg.YnodeSites();
     int zblk = yblk * qio_arg.ZnodeSites();
 
+    int fsize = xblk/sizeof(IFloat);
+    if (xblk%sizeof(IFloat)>0) fsize++;
+    TempBufAlloc  sendbuf (fsize*sizeof(IFloat));
+    TempBufAlloc  recvbuf (fsize*sizeof(IFloat));
+
+#if 0
     TempBufAlloc sendbuf(xblk);
     TempBufAlloc recvbuf(xblk);
 
     SCUDirArg send, recv;
+#endif
 
     char * locube = data;
     char * hicube = data + zblk * (qio_arg.TnodeSites()-1);
@@ -761,6 +855,16 @@ void SerialIO::tShift(char * data, const int xblk, const int dir) const {
       char * loface = locube + zc*yblk;
       char * hiface = hicube + zc*yblk;
       for(int yc=0;yc<qio_arg.YnodeSites();yc++) {
+
+        if(dir>0){ 
+	  memcpy(sendbuf, hiface + yc*xblk, xblk);
+          getMinusData(recvbuf.FPtr(),sendbuf.FPtr(),fsize,3);
+        } else {
+	  memcpy(sendbuf, loface + yc*xblk, xblk);
+          getPlusData(recvbuf.FPtr(),sendbuf.FPtr(),fsize,3);
+        }
+
+#if 0
 	if(dir>0) {
 	  if(useSCU) {
 	    memcpy(sendbuf, hiface + yc*xblk, xblk);
@@ -786,6 +890,7 @@ void SerialIO::tShift(char * data, const int xblk, const int dir) const {
 	  SCUTrans(&send);
 	  SCUTrans(&recv);
 	}
+#endif
 
 	if(dir > 0) {
 	  for(int tc=qio_arg.TnodeSites()-1;tc>0;tc--) {
@@ -798,9 +903,9 @@ void SerialIO::tShift(char * data, const int xblk, const int dir) const {
 	  }
 	}
 	 
-	if(useSCU) {
-	  SCUTransComplete();
-	}
+//	if(useSCU) {
+//	  SCUTransComplete();
+//	}
 
 	if(dir>0) {
 	  memcpy(loface + yc*xblk, recvbuf, xblk);
@@ -822,11 +927,18 @@ void SerialIO::sShift(char * data, const int xblk, const int dir) const {
   int yblk = xblk * qio_arg.YnodeSites();
   int zblk = yblk * qio_arg.ZnodeSites();
   int tblk = zblk * qio_arg.TnodeSites();
-  
+
+    int fsize = xblk/sizeof(IFloat);
+    if (xblk%sizeof(IFloat)>0) fsize++;
+    TempBufAlloc  sendbuf (fsize*sizeof(IFloat));
+    TempBufAlloc  recvbuf (fsize*sizeof(IFloat));
+
+#if 0  
   TempBufAlloc sendbuf(xblk);
   TempBufAlloc recvbuf(xblk);
   
   SCUDirArg send, recv;
+#endif
   
   char * lohypcb = data;
   char * hihypcb = data + tblk * (qio_arg.SnodeSites()-1);
@@ -839,6 +951,15 @@ void SerialIO::sShift(char * data, const int xblk, const int dir) const {
       char * loface = locube + zc*yblk;
       char * hiface = hicube + zc*yblk;
       for(int yc=0;yc<qio_arg.YnodeSites();yc++) {
+
+        if(dir>0){ 
+	  memcpy(sendbuf, hiface + yc*xblk, xblk);
+          getMinusData(recvbuf.FPtr(),sendbuf.FPtr(),fsize,4);
+        } else {
+	  memcpy(sendbuf, loface + yc*xblk, xblk);
+          getPlusData(recvbuf.FPtr(),sendbuf.FPtr(),fsize,4);
+        }
+#if 0
 	if(dir>0) {
 	  if(useSCU) {
 	    memcpy(sendbuf, hiface + yc*xblk, xblk);
@@ -864,6 +985,7 @@ void SerialIO::sShift(char * data, const int xblk, const int dir) const {
 	  SCUTrans(&send);
 	  SCUTrans(&recv);
 	}
+#endif
 	
 	if(dir > 0) {
 	  for(int sc=qio_arg.SnodeSites()-1;sc>0;sc--) {
@@ -880,9 +1002,9 @@ void SerialIO::sShift(char * data, const int xblk, const int dir) const {
 	  }
 	}
 	
-	if(useSCU) {
-	  SCUTransComplete();
-	}
+//	if(useSCU) {
+//	  SCUTransComplete();
+//	}
 		
 	if(dir>0) {
 	  memcpy(loface + yc*xblk, recvbuf, xblk);
@@ -903,6 +1025,9 @@ void SerialIO::sSpread(char * data, const int datablk) const {
   // clone the lattice from s==0 nodes to all s>0 nodes
   // only used in loading process
   if(qio_arg.Snodes() <= 1)  return;
+#if TARGET != QCDOC
+  else ERR.General(cname,fname,"not implemented for Snodes()>1");
+#endif
 
   // eg. 8 nodes
   // step:  i   ii       iii       iv
@@ -911,6 +1036,7 @@ void SerialIO::sSpread(char * data, const int datablk) const {
   //        \/    
   //        7   -->  6   -->   5   -->   4
 
+#if TARGET == QCDOC
   SCUDirArg  socket;
 
   VRB.Flow(cname, fname, "Spread on S dimension:: 0 ==> %d\n", qio_arg.Snodes()-1);
@@ -964,6 +1090,7 @@ void SerialIO::sSpread(char * data, const int datablk) const {
     receiver[1]--;
 
   }
+#endif
 
 }
 

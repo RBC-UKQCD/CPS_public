@@ -105,8 +105,10 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   unsigned int csum;
 
 
-#if TARGET != QCDOC  // choice only applicable to QCDOC
+#if 0  // choice only applicable to QCDOC
   setParallel();
+#else
+  setSerial();
 #endif
 
   log();
@@ -118,7 +120,7 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 		    hd, fpconv, 4, &csum))  
       ERR.General(cname,fname,"Load Failed\n");  // failed to load
   }
-#if TARGET == QCDOC
+#if 1
   else {
     SerialIO serio(rd_arg);
     if(! serio.load((char*)rd_arg.StartConfLoadAddr, data_per_site, sizeof(Matrix)*4,
@@ -129,6 +131,7 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 
   log();
 
+//  printf("Node %d: lattice read csum=%x\n",UniqueID(),csum);
   //  cout << "loader finish, csum = " << hex << csum << dec << endl << endl;
   //  cout << "loader done" << endl << endl;
 
@@ -143,6 +146,8 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   if(isRoot()) {
     if( hd.checksum != csum ) {
       VRB.Flow(cname,fname, "CheckSUM error !! Header: %x  Host calc: %x\n",hd.checksum,csum);
+      
+      printf("Node %d: CheckSUM error !! Header: %x  Host calc: %x\n",UniqueID(),hd.checksum,csum);
       error = 1;
     }
     else
