@@ -186,6 +186,7 @@ class TempBufAlloc {
   inline char * CharPtr() { return buf; }
   //  operator int*() {  return (int*)buf; }
   inline int *IntPtr() { return (int*)buf; }
+  inline Float *FPtr() { return (Float*)buf; }
 };
 
 

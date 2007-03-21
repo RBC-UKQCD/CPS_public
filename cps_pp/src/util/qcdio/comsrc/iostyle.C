@@ -353,15 +353,15 @@ do {
   //
 
 //  printf("Node %d: IOTimeSlot done!\n",UniqueID());
-  cps::sync();
+//  cps::sync();
   if(synchronize(error)>0) 
     ERR.FileW(cname,fname,wt_arg.FileName);
 //  printf("Node %d: synchronize done!\n",UniqueID());
 
-  cps::sync();
+//  cps::sync();
   VRB.Result(cname,fname,"Parallel Unloading done!\n");
 //  printf("Node %d: Parallel Unloading done!\n",UniqueID());
-  cps::sync();
+//  cps::sync();
 
   if(ptrcsum) *ptrcsum = csum;
   if(ptrpdcsum) *ptrpdcsum = pdcsum;

@@ -119,11 +119,15 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   log();
 
 
-#if TARGET != QCDOC  // when on LINUX, only parallel (direct IO) mode is used
+#if 0  // when on LINUX, only parallel (direct IO) mode is used
   setParallel();
+#else
+  setSerial();
 #endif
+  VRB.Result(cname,fname,"parIO()=%d\n",parIO());
 
-  if(parIO()) {
+//  if(parIO()) {
+  if(0) {
     VRB.Flow(cname,fname, "Start Loading 5-D RNGs\n");
 
     ParallelIO pario(rng_arg);
@@ -136,6 +140,8 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
     
     VRB.Flow(cname,fname,"Node %d - 5D: csum=%x, order_csum=%x\n",
 	       UniqueID(),csum[0],pos_dep_csum[0]);
+//    printf("Node %d - 5D: csum=%x, order_csum=%x\n",
+//	       UniqueID(),csum[0],pos_dep_csum[0]);
 
     hd.data_start += size_rng_chars * rng_arg.VolSites() * 
                      rng_arg.Snodes() * rng_arg.SnodeSites();
@@ -148,8 +154,11 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
     VRB.Flow(cname,fname,"Node %d - 4D: csum=%x, order_csum=%x\n",
 	       UniqueID(),csum[1],pos_dep_csum[1]);
+//    printf("Node %d - 4D: csum=%x, order_csum=%x\n",
+//	       UniqueID(),csum[1],pos_dep_csum[1]);
+
   }
-#if TARGET == QCDOC
+#if 1
   else {
     VRB.Flow(cname,fname, "Start Loading 5-D RNGs\n");
 
@@ -171,16 +180,19 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   }
 #endif
 
+  if (isRoot())
   cout << "Starting logging" << endl;
 
   log();
 
+  if (isRoot())
   cout << "Starting globalSumUint()" << endl;
 
   // Step 2.1: verify checksum
   csum[0] += csum[1];
   csum[0] = globalSumUint(csum[0]);
 
+  if (isRoot())
   cout << "Finish globalSumUint()" << endl;
 
   if(isRoot()) {
@@ -291,14 +303,17 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   //  cout << "size_rng_ints = " << size_rng_ints << endl;
   int size_rng_chars = size_rng_ints * intconv.fileIntSize();
 
-#if TARGET != QCDOC
+#if 0
   setParallel();
+#else
+  setSerial();
 #endif
+  VRB.Result(cname,fname,"parIO()=%d\n",parIO());
 
   log();
 
   // start writing file
-  ofstream output;
+  fstream output;
 
   if(parIO()) {
     output.open(wt_arg.FileName);
@@ -307,19 +322,24 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
       error = 1;
     }
   }
-#if TARGET == QCDOC
+#if 1
   else {
     if(isRoot()) {
+      FILE *fp = fopen(wt_arg.FileName,"w");
+      fclose(fp);
       output.open(wt_arg.FileName);
       if(!output.good()) {
 	//	VRB.Flow(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
+      printf("Node %d:Could not open file: [%s] for output.\n",UniqueID(),wt_arg.FileName);
 	error = 1;
       }
     }    
   }  
 #endif
-  if(synchronize(error) > 0)  
-    ERR.General(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
+//  if(synchronize(error) > 0)  
+//    ERR.General(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
+  if (error)
+    printf("Node %d: says opening %s failed\n",UniqueID(),wt_arg.FileName);
 
   // write header
   if(isRoot()) {
@@ -346,6 +366,8 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
     VRB.Flow(cname,fname,"Node %d - 5D: csum=%x, order_csum=%x\n",
 	       UniqueID(),csum[0],pos_dep_csum[0]);
+//    printf("Node %d - 5D: csum=%x, order_csum=%x\n",
+//	       UniqueID(),csum[0],pos_dep_csum[0]);
 
 
     hd.data_start += size_rng_chars * rng_arg.VolSites() * 
@@ -360,9 +382,11 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
     VRB.Flow(cname,fname,"Node %d - 4D: csum=%x, order_csum=%x\n",
 	       UniqueID(),csum[1],pos_dep_csum[1]);
+//    printf("Node %d - 4D: csum=%x, order_csum=%x\n",
+//	       UniqueID(),csum[1],pos_dep_csum[1]);
 
   }
-#if TARGET == QCDOC
+#if 1
   else {
     VRB.Flow(cname,fname,"Start Unloading 5-D RNGs\n");
 

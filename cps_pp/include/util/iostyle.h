@@ -27,7 +27,7 @@ class IoStyle : protected QioControl {
 		   const int dimension /* 4 or 5 */,
 		   unsigned int * ptrcsum, unsigned int * ptrpdcsum = 0,
 		   Float * rand_sum = 0, Float * rand_2_sum = 0) = 0;
-  virtual int store(ostream & output,
+  virtual int store(iostream & output,
 		    char * data, const int data_per_site, const int site_mem,
 		    LatHeaderBase & hd, const DataConversion & dconv,
 		    const int dimension /* 4 or 5 */,
@@ -47,7 +47,7 @@ class ParallelIO : public IoStyle {
 		   const int dimension /* 4 or 5 */,
 		   unsigned int * ptrcsum, unsigned int * ptrpdcsum = 0,
 		   Float * rand_sum = 0, Float * rand_2_sum = 0);
-  virtual int store(ostream & output,
+  virtual int store(iostream & output,
 		    char * data, const int data_per_site, const int site_mem,
 		    LatHeaderBase & hd, const DataConversion & dconv,
 		    const int dimension /* 4 or 5 */,
@@ -58,7 +58,7 @@ class ParallelIO : public IoStyle {
 
 
 
-#if TARGET == QCDOC  // Serial IO mode only applicable to QCDOC
+#if 1  // Serial IO mode only applicable to QCDOC
 
 class SerialIO : public IoStyle {
  private:
@@ -71,7 +71,7 @@ class SerialIO : public IoStyle {
 		   const int dimension /* 4 or 5 */,
 		   unsigned int * ptrcsum, unsigned int * ptrpdcsum = 0,
 		   Float * rand_sum = 0, Float * rand_2_sum = 0);
-  virtual int store(ostream & output,
+  virtual int store(iostream & output,
 		    char * data, const int data_per_site, const int site_mem,
 		    LatHeaderBase & hd, const DataConversion & dconv,
 		    const int dimension /* 4 or 5 */,
