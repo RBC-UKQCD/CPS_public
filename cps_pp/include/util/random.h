@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.24 2005-09-06 20:23:56 chulwoo Exp $
+  $Id: random.h,v 1.25 2007-03-24 16:03:24 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 20:23:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.24 2005-09-06 20:23:56 chulwoo Exp $
-//  $Id: random.h,v 1.24 2005-09-06 20:23:56 chulwoo Exp $
+//  $Date: 2007-03-24 16:03:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.25 2007-03-24 16:03:24 chulwoo Exp $
+//  $Id: random.h,v 1.25 2007-03-24 16:03:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.24 $
+//  $Revision: 1.25 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -346,7 +346,7 @@ class LatRanGen
     inline void setParallel() { UseParIO = 1; }
     
     inline void setSerial() { 
-#if TARGET == QCDOC
+#if 1
       UseParIO = 0; 
 #else
       const char * fname = "setSerial";

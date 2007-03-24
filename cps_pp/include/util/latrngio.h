@@ -29,7 +29,7 @@ class LatRngIO : public QioControl {
     inline void setParallel() { UseParIO = 1; }
 
     inline void setSerial() { 
-#if TARGET == QCDOC
+#if 1
       UseParIO = 0; 
 #else
       const char * fname = "setSerial()";
