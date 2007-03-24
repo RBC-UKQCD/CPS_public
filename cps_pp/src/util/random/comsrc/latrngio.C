@@ -386,11 +386,11 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 //	       UniqueID(),csum[1],pos_dep_csum[1]);
 
   }
-#if 1
   else {
     VRB.Flow(cname,fname,"Start Unloading 5-D RNGs\n");
 
     SerialIO serio(rng_arg);
+//    printf("Node %d: ugran[0]=%e\n",UniqueID(),ugran[0].Urand(0,1));
     if(! serio.store(output, (char*)ugran, size_rng_ints, 
 		     sizeof(UGrandomGenerator), hd, intconv, 5,
 		     &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0]))
@@ -406,7 +406,6 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 		     &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1]))
       ERR.General(cname, fname, "Unloading Failed\n");
   }
-#endif
 
   log();
 

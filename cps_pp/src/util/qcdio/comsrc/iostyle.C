@@ -540,6 +540,8 @@ int SerialIO::store(iostream & output,
   unsigned int csum = 0, pdcsum = 0;
   Float RandSum = 0, Rand2Sum = 0;
   UGrandomGenerator * ugran = (UGrandomGenerator*)data;
+//if(hd.headerType() != LatHeaderBase::LATTICE_HEADER)
+//  printf("Node %d: ugran[0]=%e\n",UniqueID(),ugran[0].Urand(0,1));
   int global_id = 0;
 
   output.seekp(hd.dataStart(), ios_base::beg);
@@ -554,6 +556,7 @@ int SerialIO::store(iostream & output,
 	      const char * pd = data;
 
 	      for(int xst=0;xst<wt_arg.XnodeSites();xst++) {
+//                printf("Node %d: %d %d %d %d %d %d\n",UniqueID(),xst,xnd,yc,zc,tc,sc);
 		if(hd.headerType() == LatHeaderBase::LATTICE_HEADER) {
 		  for(int mat=0;mat<4;mat++) {
 		    dconv.host2file(fbuf + chars_per_site/4*mat, pd, data_per_site/4);
@@ -562,10 +565,12 @@ int SerialIO::store(iostream & output,
 		}
 		else { //LatHeaderBase::LATRNG_HEADER
 		  // dump
+//                  printf("Node %d: ugran[%d]=%e\n",UniqueID(),xst,ugran[xst].Urand(0,1));
 		  ugran[xst].store(rng.IntPtr());
 		  dconv.host2file(fbuf,rng,data_per_site);
 		  // next rand
 		  Float rn = ugran[xst].Grand();
+//		  printf("Node %d:rn=%0.15e \n",UniqueID(),rn);
 		  RandSum += rn;
 		  Rand2Sum += rn*rn;
 		  // recover
@@ -575,7 +580,7 @@ int SerialIO::store(iostream & output,
 		  printf("rn=%0.15e rn2=%0.15e\n",rn,rn2);
 		  ugran[xst].load(rng.IntPtr());
 #endif
-		}
+		} // if(hd.headerType() == LatHeaderBase::LATTICE_HEADER)
 
 		csum += dconv.checksum(fbuf,data_per_site);
 		pdcsum += dconv.posDepCsum(fbuf, data_per_site, dimension, wt_arg, 
@@ -584,11 +589,11 @@ int SerialIO::store(iostream & output,
 		if(!output.good()) {
 		  error = 1;
 		  goto sync_error;
-		}
+		} 
 
 		global_id ++;
-	      }
-	    }
+	      } //xst
+	    } // ifNode0()
 
 	    xShiftNode(data, site_mem * wt_arg.XnodeSites());
 	  }
@@ -644,29 +649,15 @@ void SerialIO::xShiftNode(char * data, const int xblk, const int dir) const {
 
     int fsize = xblk/sizeof(IFloat);
     if (xblk%sizeof(IFloat)>0) fsize++;
+//    int  *tmp_p = (int *)sendbuf;
     TempBufAlloc  recvbuf (fsize*sizeof(IFloat));
     if(dir>0) 
       getMinusData(recvbuf.FPtr(),(IFloat *)sendbuf,fsize,0);
     else
       getPlusData(recvbuf.FPtr(),(IFloat *)sendbuf,fsize,0);
+//    tmp_p = (int *)recvbuf.FPtr();
     
-#if 0
-    SCUDirArg send, recv;
-    if(dir>0) {
-      send.Init(sendbuf, SCU_XP, SCU_SEND, xblk);
-      recv.Init(recvbuf, SCU_XM, SCU_REC,  xblk);
-    }
-    else {
-      send.Init(sendbuf, SCU_XM, SCU_SEND, xblk);
-      recv.Init(recvbuf, SCU_XP, SCU_REC,  xblk);
-    }
-    
-    SCUTrans(&send);
-    SCUTrans(&recv);
-    SCUTransComplete();
-#endif
-    
-    memcpy(sendbuf, recvbuf, xblk);
+    memcpy(sendbuf, recvbuf.FPtr(), xblk);
   }
 }
 

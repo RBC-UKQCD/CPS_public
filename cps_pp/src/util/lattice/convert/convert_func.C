@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.13 2006-02-21 21:14:10 chulwoo Exp $
+  $Id: convert_func.C,v 1.14 2007-03-24 17:43:35 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 21:14:10 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.13 2006-02-21 21:14:10 chulwoo Exp $
-//  $Id: convert_func.C,v 1.13 2006-02-21 21:14:10 chulwoo Exp $
+//  $Date: 2007-03-24 17:43:35 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.14 2007-03-24 17:43:35 chulwoo Exp $
+//  $Id: convert_func.C,v 1.14 2007-03-24 17:43:35 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -122,6 +122,7 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 // cram1, cram2 should be in CRAM
 //-------------------------------------------------------------------------
   const int GSIZE= 72;
+   VRB.Func("",fname);
   if (cap->site_size>GSIZE)
   ERR.General("",fname,"cap->site_size(%d)>GSIZE\n",cap->site_size,GSIZE);
   Float cram1_stack[GSIZE], cram2_stack[GSIZE];
@@ -135,6 +136,7 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 
 
 	for (low=0; low<cap->vol; low++) {
+//               VRB.Flow("",fname,"low=%d\n",low);
 		current = low ;
 		desired = *(site_tbl+low) ;
 
@@ -174,6 +176,7 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 		}
 	}
 
+//   VRB.Func("",fname);
 //	sfree(cname_none,fname, "cram2", cram2);
 //	sfree(cname_none,fname, "cram1", cram1);
 }
@@ -352,6 +355,7 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 		default :
 			break ;
 	}
+   VRB.FuncEnd("",fname);
 }
 
 
