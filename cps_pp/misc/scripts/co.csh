@@ -13,7 +13,7 @@ echo cp wfm_comm.C.$mode wfm_comm.C
 cp wfm_comm.C.$mode wfm_comm.C
 echo popd
 popd
-echo cp Makefile.rules.$mode Makefiles.rules
-cp Makefile.rules.$mode Makefile.rules
-cp Makefile.rules.$mode ../ANL/Makefile.rules
+#echo cp Makefile.rules.$mode Makefiles.rules
+#cp Makefile.rules.$mode Makefile.rules
+#cp Makefile.rules.$mode ../ANL/Makefile.rules
 
