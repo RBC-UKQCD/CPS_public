@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.13 2006-08-22 21:40:09 chulwoo Exp $
+  $Id: random_asm.C,v 1.14 2007-03-24 18:32:39 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-08-22 21:40:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.13 2006-08-22 21:40:09 chulwoo Exp $
-//  $Id: random_asm.C,v 1.13 2006-08-22 21:40:09 chulwoo Exp $
+//  $Date: 2007-03-24 18:32:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.14 2007-03-24 18:32:39 chulwoo Exp $
+//  $Id: random_asm.C,v 1.14 2007-03-24 18:32:39 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -51,7 +51,7 @@ IFloat RandomGenerator::Rand(void)
     if ( mj < 0 ) mj += MBIG ;
     ma[inext] = mj ;
 #if 0
-    if (called %100==0)
+    if (!UniqueID() && called %100==0)
     printf("mj = %d mj*FAC=%0.16e\n",mj,mj*FAC);
     called++;
 #endif
