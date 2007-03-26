@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fclover class.
 
-  $Id: f_clover.C,v 1.19 2006-04-13 18:16:48 chulwoo Exp $
+  $Id: f_clover.C,v 1.20 2007-03-26 21:25:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 18:16:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.19 2006-04-13 18:16:48 chulwoo Exp $
-//  $Id: f_clover.C,v 1.19 2006-04-13 18:16:48 chulwoo Exp $
+//  $Date: 2007-03-26 21:25:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.20 2007-03-26 21:25:48 chulwoo Exp $
+//  $Id: f_clover.C,v 1.20 2007-03-26 21:25:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_clover.C,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -168,7 +168,8 @@ int Fclover::FmatEvlInv(Vector *f_out, Vector *f_in,
 
   DiracOpClover clover(*this, f_out, f_in, cg_arg, cnv_frm);
   
-  iter = clover.InvCg(&(cg_arg->true_rsd));
+//  iter = clover.InvCg(&(cg_arg->true_rsd));
+  iter = clover.MatEvlInv(&(cg_arg->true_rsd));
   if (true_res) *true_res = cg_arg ->true_rsd;
 
 

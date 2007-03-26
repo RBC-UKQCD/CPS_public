@@ -4,13 +4,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-03-07 22:35:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.26 2005-03-07 22:35:01 chulwoo Exp $
-//  $Id: main.C,v 1.26 2005-03-07 22:35:01 chulwoo Exp $
+//  $Date: 2007-03-26 21:23:51 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v 1.27 2007-03-26 21:23:51 chulwoo Exp $
+//  $Id: main.C,v 1.27 2007-03-26 21:23:51 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.26 $
+//  $Revision: 1.27 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -95,19 +95,6 @@ int main(int argc,char *argv[])
 #endif
   
   GJP.Initialize(do_arg);
-
-  //----------------------------------------------------------------
-  // Set verbose level
-  //----------------------------------------------------------------
-
-  VRB.Level(0);
-  VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
-//  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
-//  VRB.ActivateLevel(VERBOSE_SMALLOC_LEVEL);
-//  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
-  VRB.ActivateLevel(VERBOSE_CLOCK_LEVEL);
-  VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
-
 
 
   //----------------------------------------------------------------
