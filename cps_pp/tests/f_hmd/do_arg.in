@@ -41,6 +41,7 @@ int power_plaq_exponent = 0
 double power_rect_cutoff =   0.0000000000000000e+00
 int power_rect_exponent = 2
 int verbose_level = -1202
+int checksum_level = 0
 int exec_task_list = 6
 double xi_bare =   1.0000000000000000e+00
 int xi_dir = 3
