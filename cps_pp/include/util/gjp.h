@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.27 2007-01-11 22:48:12 chulwoo Exp $
+  $Id: gjp.h,v 1.28 2007-03-30 06:20:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-11 22:48:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.27 2007-01-11 22:48:12 chulwoo Exp $
-//  $Id: gjp.h,v 1.27 2007-01-11 22:48:12 chulwoo Exp $
+//  $Date: 2007-03-30 06:20:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.28 2007-03-30 06:20:12 chulwoo Exp $
+//  $Id: gjp.h,v 1.28 2007-03-30 06:20:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.27 $
+//  $Revision: 1.28 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -809,7 +809,7 @@ void Start(int * argc, char ***argv);
 extern "C" {
   void _mcleanup(void);
 }
-void Start(int * argc, char ***argv){Start();}
+inline void Start(int * argc, char ***argv){Start();}
 #elif USE_QMP
 namespace QMPSCU {
   void init_qmp();

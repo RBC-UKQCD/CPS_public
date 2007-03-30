@@ -56,9 +56,7 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 
   unsigned int csum = 0;
 
-#if 0   // when not on QCDOC(like on LINUX), use parallel(direct IO) mode
-  setParallel();
-#else
+#if TARGET != QCDOC   // when not on QCDOC(like on LINUX), use serial IO mode
   setSerial();
 #endif
   

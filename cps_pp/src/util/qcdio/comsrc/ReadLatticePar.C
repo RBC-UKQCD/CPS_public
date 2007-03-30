@@ -105,9 +105,7 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   unsigned int csum;
 
 
-#if 0  // choice only applicable to QCDOC
-  setParallel();
-#else
+#if TARGET != QCDOC
   setSerial();
 #endif
 
