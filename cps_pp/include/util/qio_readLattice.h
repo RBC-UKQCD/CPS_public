@@ -17,8 +17,8 @@ class qio_readLattice: private qio_init {
 
   qio_readLattice(int argc, char *argv[]): qio_init(argc, argv), cname("qio_readLattice"){}
 
-  qio_readLattice(char *infile, Lattice &lat, int argc, char *argv[]): qio_init(argc, argv), cname("qio_readLattice")
-   {read(infile, lat);}
+  qio_readLattice(char *infile, Lattice &lat, int argc, char *argv[], int volFormat=QIO_UNKNOWN): qio_init(argc, argv), cname("qio_readLattice")
+   {read(infile, lat, volFormat);}
 
   virtual ~qio_readLattice(){
     #ifdef DEBUG_Init
@@ -26,13 +26,13 @@ class qio_readLattice: private qio_init {
     #endif //DEBUG_Init
   }
 
-  void read(char *infile, Lattice &lat);
+  void read(char *infile, Lattice &lat, int volFormat=QIO_UNKNOWN);
 
  private:
 
   QIO_Reader *qio_Input;
 
-  void qio_openInput(char *filename);
+  void qio_openInput(char *filename, int volFormat);
 
   void qio_closeInput()
     { QIO_close_read(qio_Input);}

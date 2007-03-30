@@ -105,7 +105,7 @@ void qio_putGlobalSingle(char *buf, size_t index, int count, void *arg)
 // now start class-functions...
 
 
-void qio_readLattice::qio_openInput(char *filename)
+void qio_readLattice::qio_openInput(char *filename, int volFormat)
 {
 
   char * fname = "qio_openInput(...)";
@@ -117,6 +117,7 @@ void qio_readLattice::qio_openInput(char *filename)
 
   const int serpar(QIO_SERPAR);
 
+
   QIO_String *xml_file_in;
   QIO_Reader *infile;
   QIO_Iflag iflag;
@@ -124,11 +125,19 @@ void qio_readLattice::qio_openInput(char *filename)
   xml_file_in = QIO_string_create();
 
   iflag.serpar = serpar;
-  iflag.volfmt = QIO_UNKNOWN;
+  iflag.volfmt = volFormat;
   
   VRB.Flow(cname,fname,"open input file %s\n",filename);
 
   infile = QIO_open_read(xml_file_in, filename, &layout, &iflag);
+
+  #ifdef DEBUG_openInput
+  printf("done QIO_open_read\n");
+  #endif // DEBUG_openInput
+
+
+
+
 
   QIO_string_destroy(xml_file_in);
 
@@ -145,7 +154,7 @@ void qio_readLattice::qio_openInput(char *filename)
 
 
 
-void qio_readLattice::read(char *infile, Lattice &lat)
+void qio_readLattice::read(char *infile, Lattice &lat, int volFormat)
 {
 
   char * fname="read(...)";
@@ -156,25 +165,21 @@ void qio_readLattice::read(char *infile, Lattice &lat)
   printf("UID: %i, qio_readField called with filename: %s\n",UniqueID(),infile);
 #endif // DEBUG_ReadField
 
-  int return_val(0), return_val_globDat(0);
+  int return_val(0); 
 
   #ifdef DEBUG_GlobalRead
   printf(" initializing global-data\n");
   #endif
 
-  const int globCount(2);  // number of global-data Floats
-
-  Float globdat[globCount];
 
 
-
+  
   QIO_RecordInfo *record;
-  QIO_RecordInfo *record_globDat;
   QIO_String *record_xml;
-  QIO_String *record_xml_globDat;
+  CPS_QIO_UserRecordInfo *qio_UserRecordInfo;
 
   record_xml = QIO_string_create();
-  record_xml_globDat = QIO_string_create();
+
 
   qio_setLayout();
 
@@ -184,10 +189,11 @@ void qio_readLattice::read(char *infile, Lattice &lat)
 
   // create the record info
    record         = QIO_create_record_info(0, "", "", 0, 0, 0, 0);
-   record_globDat = QIO_create_record_info(0, "", "", 0, 0, 0, 0);
+   qio_UserRecordInfo = CPS_QIO_create_user_record_info("", "", "");
+
   
    //input = qio_openInput(infile, &layout);
-   qio_openInput(infile);
+   qio_openInput(infile, volFormat);
 
 
   #ifdef DEBUG_ReadField
@@ -221,53 +227,6 @@ void qio_readLattice::read(char *infile, Lattice &lat)
   #endif // DEBUG_ReadField
 
 
-   return_val = QIO_read_record_info( qio_Input, record_globDat, record_xml_globDat);
-
-   if( return_val == 0)
-     VRB.Flow(cname, fname,"QIO_read_record_info successfull...\n");
-   else
-     ERR.General(cname,fname,"ERROR QIO: QIO_read_record_info returned %i\n",return_val);
-
-
-   char *readPrecisionGlobal(QIO_get_precision(record_globDat));
-
-   VRB.Result(cname,fname," global prec: %s\n", readPrecisionGlobal);
-
-   switch ( *readPrecisionGlobal)
-     {
-     case 'D':
-
-       #ifdef DEBUG_GlobalRead
-       printf("UID: %i, reading global data in DOUBLE-precision\n", UniqueID());
-       #endif //DEBUG_GlobalRead
-
-       return_val = QIO_read(qio_Input, record_globDat, record_xml_globDat, qio_putGlobal, globCount*sizeof(Float), sizeof(Float), &globdat[0]);
-
-       if ( return_val == 0)
-	 VRB.Flow(cname,fname,"QIO_read (D) successfull...\n");
-       else
-	 ERR.General(cname,fname,"ERROR QIO: QIO_read (D) returned %i\n",return_val);
-
-       break;
-
-     case 'F':
-       #ifdef DEBUG_GlobalRead
-       printf("UID: %i, reading global data in SINGLE-precision\n", UniqueID());
-       #endif //DEBUG_GlobalRead
-
-       return_val = QIO_read(qio_Input, record_globDat, record_xml_globDat, qio_putGlobalSingle, globCount*sizeof(float), sizeof(float), &globdat[0]);
-
-       break;
-
-     default:
-
-       ERR.General(cname,fname,"ERROR: unrecognized precision: %s\n",*readPrecisionGlobal);
-       exit(-1);
-
-     }
-
-
-   VRB.Result(cname,fname,"read plaquette value: %f, LinkTrace %f\n",globdat[0], globdat[1]);
 
   #ifdef DO_recordInfo
     return_val = QIO_read_record_info( qio_Input, record, record_xml);
@@ -360,17 +319,18 @@ void qio_readLattice::read(char *infile, Lattice &lat)
    printf("UID: %i, qio_readField intermediate with filenames: %s\n",UniqueID(),infile);
    #endif // DEBUG_ReadField
 
-  
-  // clean-up
-  QIO_destroy_record_info(record);
-  QIO_destroy_record_info(record_globDat); 
-  qio_closeInput();
-  QIO_string_destroy(record_xml);
-  QIO_string_destroy(record_xml_globDat);
 
+
+   CPS_QIO_decode_user_record_info(qio_UserRecordInfo, record_xml);
+  
+   
   
   // now check the plaquette, linkTrace
 
+  char *plaq_str, *linktr_str, *info_str;
+  Float readPlaq, readLink;
+
+   
   Float measPlaq(lat.SumReTrPlaq()/(18*GJP.VolSites())), measLink(0.0);
   Float diffPlaq, diffLink;
 
@@ -390,22 +350,83 @@ void qio_readLattice::read(char *infile, Lattice &lat)
   measLink = ltrace / (4*3*GJP.VolSites());
 
 
-  diffPlaq = fabs(globdat[0] - measPlaq);
-  diffLink = fabs(globdat[1] - measLink);
 
-  VRB.Result(cname,fname," Plaquette: measured %8.4g <-> read %8.4g; delta: %8.4g\n LinkTrace: measured %8.4g <-> read %8.4g; delta %8.4g\n",
-	 measPlaq, globdat[0], diffPlaq, 
-	 measLink, globdat[1], diffLink);
 
-  if ( ( fabs(diffLink/measLink) > Float(TOLERANCE) ) || ( fabs(diffPlaq/measPlaq) > Float(TOLERANCE) ) )
+
+
+  if( CPS_QIO_defined_plaq(qio_UserRecordInfo) )
+    {
+      plaq_str = CPS_QIO_get_plaq(qio_UserRecordInfo);
+      readPlaq = atof(plaq_str);
+    }
+  else
+    {
+      plaq_str = "UNDEFINED";
+      readPlaq = 0.0;
+    }
+    
+  if( CPS_QIO_defined_linktr(qio_UserRecordInfo) )
+    {
+      linktr_str = CPS_QIO_get_linktr(qio_UserRecordInfo);
+      readLink = atof(linktr_str);
+    }
+  else
+    {
+      linktr_str = "UNDEFINED";
+      readLink = 0.0;
+    }
+
+  if( CPS_QIO_defined_info(qio_UserRecordInfo) )
+    {
+      info_str = CPS_QIO_get_info(qio_UserRecordInfo);
+    }
+  else
+    {
+      info_str = "UNDEFINED";
+    }
+  
+
+
+  #ifdef DEBUG_ReadField
+  VRB.Result(cname,fname," Plaquette read: %s (%12.12g), LinkTr read: %s (%12.12g)\n info-str:\n%s\n", plaq_str,readPlaq,linktr_str,readLink, info_str);
+  #endif // DEBUG_ReadField
+
+
+
+  diffPlaq = fabs(readPlaq - measPlaq);
+  diffLink = fabs(readLink - measLink);
+
+  VRB.Result(cname,fname," Plaquette: measured %12.12g <-> read %12.12g; delta: %12.12g\n LinkTrace: measured %12.12g <-> read %12.12g; delta %12.12g\n",
+	 measPlaq, readPlaq, diffPlaq, 
+	 measLink, readLink, diffLink);
+
+
+
+  VRB.Result(cname, fname," additional information:\n%s", info_str);
+
+  // tolerance depend on read-precision???
+
+  if ( 
+      ( ( fabs(diffLink/measLink) > Float(TOLERANCE) ) && ( strcmp(linktr_str, "UNDEFINED")!=0 ) ) 
+      || 
+      ( ( fabs(diffPlaq/measPlaq) > Float(TOLERANCE) ) && ( strcmp(plaq_str  , "UNDEFINED")!=0 ) ) 
+      )
     {
       ERR.General(cname,fname,"ERROR: plaquette or linkTrace mismatch!!!\n");
-      ERR.General(cname,fname,"%8.4g %8.4g %8.4g \n", (fabs(diffPlaq/measPlaq)), ( fabs(diffLink/measLink)), Float(TOLERANCE));
+      //      ERR.General(cname,fname,"%8.4g %8.4g %8.4g \n", (fabs(diffPlaq/measPlaq)), ( fabs(diffLink/measLink)), Float(TOLERANCE) );
 
       exit(-1);
     }
  
   
+
+
+  // clean-up
+  QIO_destroy_record_info(record);
+  qio_closeInput();
+  QIO_string_destroy(record_xml);
+  CPS_QIO_destroy_user_record_info(qio_UserRecordInfo);
+
 
 
 

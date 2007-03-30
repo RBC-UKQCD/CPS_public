@@ -2,6 +2,8 @@
 #include <config.h>
 #include <util/qio_writeLattice.h>
 
+
+
 CPS_START_NAMESPACE
 using namespace std;
 
@@ -108,13 +110,13 @@ void qio_getGlobalSingle(char *buf, size_t index, int count, void *arg)
 // now start class-functions...
 
 
-void qio_writeLattice::qio_openOutput(char *filename, char *stringLFN, char *xml_write_file)
+void qio_writeLattice::qio_openOutput(char *filename, char *stringLFN, char *xml_write_file, int volFormat)
 {
 
   char * fname = "qio_openOutput(...)";
   VRB.Func(cname,fname);
 
-  const int volfmt(QIO_VOLFMT);
+  const int volfmt(volFormat);
   const int serpar(QIO_SERPAR);
   const int ildgstyle(QIO_ILDGSTYLE);
 
@@ -125,9 +127,12 @@ void qio_writeLattice::qio_openOutput(char *filename, char *stringLFN, char *xml
 
   VRB.Flow(cname,fname,"open output file %s with xml-info: %s\n",filename, xml_write_file);
 
+
+
   xml_file_out = QIO_string_create();
   QIO_string_set(xml_file_out, xml_write_file);
 
+ 
   oflag.serpar=serpar;
   oflag.ildgstyle=ildgstyle;
 
@@ -153,25 +158,21 @@ void qio_writeLattice::qio_openOutput(char *filename, char *stringLFN, char *xml
 
 
 
-void qio_writeLattice::write(char *outfile, Lattice &lat, FP_FORMAT floatFormat)
+void qio_writeLattice::write(char *outfile, char *ildgLFN, Lattice &lat, int volFormat, FP_FORMAT floatFormat)
 {
 
   const char * fname = "write(...)";
 
   VRB.Func(cname,fname);
 
-  int return_val(0), return_val_globDat(0);
-
+  int return_val(0);
 
 #ifdef DEBUG_GlobalWrite
   printf(" initializing global-data\n");
 #endif
 
-  const int globCount(2);  // number of global-data Floats
 
-  Float globdat[globCount];
-
-  globdat[0] = lat.SumReTrPlaq()/(18*GJP.VolSites()) ;
+  Float plaq( lat.SumReTrPlaq()/(18*GJP.VolSites()) );
 
   Float ltrace(0.0);
   Matrix * lpoint = lat.GaugeField();
@@ -186,18 +187,22 @@ void qio_writeLattice::write(char *outfile, Lattice &lat, FP_FORMAT floatFormat)
   else
     glb_sum_five(&ltrace);  // everyone has to participate in global ops
 
-  globdat[1] = ltrace / (4*3*GJP.VolSites());
+  //globdat[1] = ltrace / (4*3*GJP.VolSites());
+
+  ltrace =  ltrace / (4*3*GJP.VolSites());
 
 #ifdef DEBUG_GlobalWrite
-  printf("UID: %i: loaded %f %f to GlobalData\n",UniqueID(),globdat[0], globdat[1]);
+  printf("UID: %i: loaded %f %f to GlobalData\n",UniqueID(),plaq, ltrace);
 #endif // DEBUG_GlobalWrite
 
 
 
   QIO_RecordInfo *record;
-  QIO_RecordInfo *record_globDat;
+  record = QIO_create_record_info(0, "", "", 0,0,0,0);
+
+
   QIO_String *record_xml;
-  QIO_String *record_xml_globDat;
+  record_xml = QIO_string_create();
 
   qio_setLayout();
 
@@ -220,37 +225,80 @@ void qio_writeLattice::write(char *outfile, Lattice &lat, FP_FORMAT floatFormat)
   else VRB.Flow(cname,fname," output-precision: SINGLE\n");
 
   
-  char dummy[] = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><title>Dummy QCDML</title>";
+  //char xml_file[] = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><title>Dummy QCDML</title>";
+  char xml_file[] = QIO_XML_FILE_GAUGE ;
 
-  record_xml = QIO_string_create();
-  QIO_string_set(record_xml, dummy);
+  char xml_plaq[20];
+  char xml_linktr[20];
 
-  char dummy2[] = "?xml version=\"1.0\" encoding=\"UTF-8\"?><title>Plaquette, LinkTrace</title>";
 
-  record_xml_globDat = QIO_string_create();
-  QIO_string_set(record_xml_globDat, dummy2);
-
-  char xml_outfile[] = "gauge_field";
- 
-  Matrix * wlat = lat.GaugeField();
+  if(SingleDouble)
+    {
+      sprintf( xml_plaq, "%.12g", plaq);
+      sprintf( xml_linktr, "%.12g", ltrace); 
+    }
+  else
+    {
+      sprintf( xml_plaq, "%.8g", plaq);
+      sprintf( xml_linktr, "%.8g", ltrace);
+    }
   
 
-  qio_openOutput(outfile, NULL, xml_outfile);
-  // no idea what ildgLFN member of oflag should be, fill with NULL
+  #ifdef DEBUG_GlobalWrite
+  VRB.Result(cname,fname,"%.12g %s\n%.12g %s\n",plaq,xml_plaq,ltrace,xml_linktr);
+  #endif // DEBUG_GlobalWrite
+
+
+  // this can contain the add. header
+  // char xml_info[] = "gauge_field";
+ 
+  char xml_info[6*(MAX_HEADER_LINE+10)];
+
+
+
+  sprintf(xml_info, "DATATYPE = 4D_SU3_GAUGE\nLINK_TRACE = %.10g\nPLAQUETTE = %.10g\nENSEMBLE_ID = %s\nENSEMBLE_LABEL = %s\nSEQUENCE_NUMBER = %i",
+	  ltrace, plaq, header_ensemble_id, header_ensemble_label, header_traj);
+
+
+
+
+
+  #ifdef DEBUG_GlobalWrite
+  VRB.Result(cname, fname," adding plaq %s and linkTr %s to xml-record\n add. info:\n %s\n", xml_plaq, xml_linktr, xml_info);
+  #endif //DEBUG_GlobalWrite
+
+  CPS_QIO_UserRecordInfo *userrecordinfo = CPS_QIO_create_user_record_info(xml_plaq, xml_linktr, xml_info);
+
+  CPS_QIO_encode_user_record_info(record_xml,userrecordinfo); 
+
+
+  Matrix * wlat = lat.GaugeField();
+  
+  //char ildg_lfn[] = "ildg-lfn n/a";
+
+
+
+  if( strlen(ildgLFN) >  0 )
+
+      qio_openOutput(outfile, ildgLFN, xml_file, volFormat);
+
+  else
+    {
+      char ildg_lfn[] = "ildg-lfn n/a";
+      qio_openOutput(outfile, ildg_lfn, xml_file, volFormat);
+    }
+
 
   if(SingleDouble)
     {
       //output in double-precision
 
       // create the record info
-      record = QIO_create_record_info(QIO_FIELD, "float_double", "D", 3, 4, 18*sizeof(Float), 4);
+      record = QIO_create_record_info(QIO_FIELD, "QDP_D3_ColorMatrix", "D", 3, 4, 18*sizeof(Float), 4);
       // color=3 (not used), spin=4 (not used), 3*3*2*size (color*color*complex*size), 4 matrices per side
 
-      record_globDat = QIO_create_record_info(QIO_GLOBAL, "float_double", "D",0,0, sizeof(Float),globCount);
-      // store Plaquette and LinkTr
 
       // call write...  
-      return_val_globDat = QIO_write( qio_Output, record_globDat, record_xml_globDat, qio_getGlobal, globCount*sizeof(Float), sizeof(Float), &globdat[0]);
       return_val = QIO_write( qio_Output, record, record_xml, qio_getField, 4*3*3*2*sizeof(Float), sizeof(Float), wlat);  
 
     }
@@ -259,20 +307,18 @@ void qio_writeLattice::write(char *outfile, Lattice &lat, FP_FORMAT floatFormat)
       //output in single-precision
 
       // create the record info
-      record = QIO_create_record_info(QIO_FIELD, "float_single", "F", 3, 4, 18*sizeof(float), 4);
+      record = QIO_create_record_info(QIO_FIELD, "QDP_F3_ColorMatrix", "F", 3, 4, 18*sizeof(float), 4);
       // color=3 (not used), spin=4 (not used), 3*3*2*size (color*color*complex*size), 4 matrices per side
 
-      record_globDat = QIO_create_record_info(QIO_GLOBAL, "float_single", "F",0,0, sizeof(float),globCount);
-      // store Plaquette and LinkTr
 
-      return_val_globDat = QIO_write( qio_Output, record_globDat, record_xml_globDat, qio_getGlobalSingle, globCount*sizeof(float), sizeof(float), &globdat[0]);
       return_val = QIO_write( qio_Output, record, record_xml, qio_getFieldSingle, 4*3*3*2*sizeof(float), sizeof(float), wlat);  
     }
 
-  if ( (return_val == 0) && (return_val_globDat == 0) )
+
+  if ( return_val == 0 )
     VRB.Result(cname,fname,"QIO_write successfull...\n");
   else
-    ERR.General(cname,fname,"ERROR QIO: QIO_write returned %i %i (global, field)\n",return_val_globDat, return_val);
+    ERR.General(cname,fname,"ERROR QIO: QIO_write returned %i \n",return_val);
 
 
 #ifdef PRINT_checksums
@@ -284,19 +330,52 @@ void qio_writeLattice::write(char *outfile, Lattice &lat, FP_FORMAT floatFormat)
 
   // clean-up
 
-  QIO_destroy_record_info(record);
-  QIO_destroy_record_info(record_globDat);
+
 
   //different call
   //qio_closeOutput( output);
-  qio_closeOutput();
 
+
+  QIO_destroy_record_info(record);
+  CPS_QIO_destroy_user_record_info(userrecordinfo);  
   QIO_string_destroy(record_xml);
-  QIO_string_destroy(record_xml_globDat);
+  
 
+  qio_closeOutput();
 
   VRB.FuncEnd(cname,fname);
 
 }
+
+
+void qio_writeLattice::setHeader(const char * ensemble_id, const char * ensemble_label, const int traj)
+{
+
+  const char * fname = "setHeader(...)";
+
+  VRB.Func(cname,fname);
+
+  if(strlen(ensemble_id) > MAX_HEADER_LINE)
+    {
+     ERR.General(cname,fname,"ERROR: length of ensemble_id exceeds maximum length!\n");
+	  exit(-1); 
+    }
+  else
+    strcpy(header_ensemble_id, ensemble_id);
+
+  if(strlen(ensemble_label) > MAX_HEADER_LINE)
+    {
+       ERR.General(cname,fname,"ERROR: length of ensemble_label exceeds maximum length!\n");
+	  exit(-1); 
+    }
+  else
+    strcpy(header_ensemble_label, ensemble_label);
+
+  header_traj = traj;
+  
+  VRB.FuncEnd(cname,fname);
+
+}
+
 CPS_END_NAMESPACE
 #endif

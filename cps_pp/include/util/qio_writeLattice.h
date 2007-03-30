@@ -17,11 +17,21 @@ class qio_writeLattice: private qio_init {
 
  public:
 
-  qio_writeLattice( int argc, char *argv[]): qio_init(argc, argv), cname("qio_writeLattice"){}
+  qio_writeLattice( int argc, char *argv[]): qio_init(argc, argv), cname("qio_writeLattice")
+    {initHeader();}
 
-  qio_writeLattice(char *outfile, Lattice &lat, int argc, char *argv[], FP_FORMAT floatFormat=FP_AUTOMATIC):
+  qio_writeLattice(char *outfile, Lattice &lat, int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
    qio_init(argc, argv), cname("qio_writeLattice")
-    { write(outfile, lat, floatFormat);}
+    { initHeader(); write(outfile, "", lat, volFormat, floatFormat);}
+
+  qio_writeLattice(char *outfile, Lattice &lat, char *ildgLFN, int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
+   qio_init(argc, argv), cname("qio_writeLattice")
+    { initHeader(); write(outfile, ildgLFN, lat, volFormat, floatFormat);}
+ 
+  qio_writeLattice(char *outfile, Lattice &lat, char *ildgLFN, const char * ensemble_id, const char * ensemble_label, const int traj,
+		   int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
+   qio_init(argc, argv), cname("qio_writeLattice")
+    { setHeader(ensemble_id, ensemble_label, traj); write(outfile, ildgLFN, lat, volFormat, floatFormat);}
 
   virtual ~qio_writeLattice(){ 
     #ifdef DEBUG_Init
@@ -29,18 +39,33 @@ class qio_writeLattice: private qio_init {
     #endif // DEBUG_Init
   }
 
-  void write(char *outfile, Lattice &lat, FP_FORMAT floatFormat=FP_AUTOMATIC);
+  void write(char *outfile, char *ildgLFN, Lattice &lat, int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC);
+
+  void setHeader(const char * ensemble_id, const char * ensemble_label, const int traj);
+
  
  private:
 
   QIO_Writer *qio_Output;
 
-  void qio_openOutput(char *filename, char *stringLFN, char *xml_write_file);
+  void qio_openOutput(char *filename, char *stringLFN, char *xml_write_file, int volFormat);
 
   void qio_closeOutput()
     { QIO_close_write(qio_Output);}
 
+
+  void initHeader()
+    { 
+      header_traj = -1; 
+      strcpy(header_ensemble_id, "not specified" );
+      strcpy(header_ensemble_label, "not specified");
+    }
+
+  int header_traj;
+  char header_ensemble_id[MAX_HEADER_LINE];
+  char header_ensemble_label[MAX_HEADER_LINE];
     
+
 
 };
 

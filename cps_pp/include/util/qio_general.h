@@ -17,6 +17,14 @@
 #include <alg/do_arg.h>
 
 #include <qio.h>
+
+#include <util/qio_xmlinfo.h>
+
+extern "C"
+{
+#include <util/qio_xml_miss.h>
+}
+
 #include <qmp.h>
 
 
@@ -60,24 +68,30 @@
 
 #define QIO_RW_DIMENSION 4
 
+
+/* default OUTPUT-format (default input is QIO_UNKNOWN) */
 /* one of QIO_UNKNOWN, QIO_SINGLEFILE, QIO_PARTFILE, QIO_MULTIFILE */ 
  #define QIO_VOLFMT QIO_PARTFILE
 
 /* one of QIO_SERIAL, QIO_PARALLEL */
  #define QIO_SERPAR QIO_SERIAL
 
-/* one of QIO_ILDGNO, ???? */
- #define QIO_ILDGSTYLE QIO_ILDGNO
+/* one of QIO_ILDGNO, ??ILDGLAT?? */
+ #define QIO_ILDGSTYLE QIO_ILDGLAT 
 
 /* one of QIO_VERB_DEBUG, QIO_VERB_REG, QIO_VERB_MED, QIO_VERB_LOW, QIO_VERB_OFF */
  #define QIO_VERB_LEVEL QIO_VERB_LOW
 
 /* debug-level for qmp */
- #define QMP_VERB_LEVEL 0
+ #define QMP_VERB_LEVEL 0 
 
 
 #define TOLERANCE 1e-5 //for Plaq, LinkTr check
 
+/* xml-file header for gauge-config */
+#define QIO_XML_FILE_GAUGE "<?xml version=\"1.0\" encoding=\"UTF-8\"?><title>Dummy QCDML</title>"
+
+#define MAX_HEADER_LINE 255 //maximal length for char-string ensemble-label,-id
 
 /***********************************************************************************************/
 
@@ -124,15 +138,22 @@ class qio_init {
       if( !qmp_run )
 	{
 	  VRB.Flow(cname,fname,"QIO starts QMP...\n");
-	  
+	  //VRB.Result(cname,fname,"QIO starts QMP...\n");
+
 	  qmp_init = QMP_init_msg_passing(&argc, &argv,QMP_THREAD_SINGLE , &qmp_level); 
 	  
 	  QMP_verbose(QMP_VERB_LEVEL); //this sometimes magically fixes a QMP/QIO-bug...
 
+
+	  
+
 	}
       else
-	VRB.Flow(cname,fname,"QMP was already up !?!?!?\n");
+	{
+	  VRB.Flow(cname,fname,"QMP was already up !?!?!?\n");
+	  //VRB.Result(cname,fname,"QMP was already up !?!?!?\n");
 
+	}
       QIO_verbose(QIO_VERB_LEVEL);
 
 
@@ -158,10 +179,14 @@ class qio_init {
 	if(qmp_run)
 	  {
 	    VRB.Flow(cname,fname," ...finish QMP\n");
+	    //VRB.Result(cname,fname," ...finish QMP\n");
 	    QMP_finalize_msg_passing();
 	  }
 	else
-	  VRB.Flow(cname,fname," no QMP up to be finished ?!?!?\n");
+	  {
+	    VRB.Flow(cname,fname," no QMP up to be finished ?!?!?\n");
+	    //VRB.Result(cname,fname," no QMP up to be finished ?!?!?\n");
+	  }
 
 	VRB.FuncEnd(cname,fname);
 

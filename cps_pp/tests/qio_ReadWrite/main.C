@@ -18,6 +18,9 @@ moving to CPS-implementation
 
 // what to do and what not...
 
+# define VOLFMT QIO_SINGLEFILE
+//undef, QIO_SINGLEFILE QIO_PARTFILE
+
 #undef DO_readStandard
 #undef DO_writeStandard
 #undef DO_readQIO
@@ -28,7 +31,7 @@ moving to CPS-implementation
  #undef DO_scramble
  #define DO_ordered
 #undef DO_measure
-#define DO_measure_compare
+#undef DO_measure_compare
 
 
 #include <stdio.h>
@@ -37,6 +40,7 @@ moving to CPS-implementation
 #include <util/lattice.h>
 #include <alg/do_arg.h>
 #include <alg/common_arg.h>
+#include <alg/hmd_arg.h>
 
 #if(0==1)
  #include <ReadLattice.h>
@@ -77,12 +81,13 @@ int main(int argc,char *argv[])
   CommandLine::is(argc,argv);
 
   DoArg do_arg;
+  EvoArg evo_arg;
 
   /* get parameter from command line */
 
-  /* 7 parameters: */
+  /* 8 parameters: */
   /* x.x  
-          DIRECTORY do_arg 
+          DIRECTORY do_arg evo_arg 
           read_file write_file (for standard)
 	  read_file write_file (for QIO)
 	  number, which random gauge to take
@@ -94,6 +99,7 @@ int main(int argc,char *argv[])
   
   
   if ( !do_arg.Decode(CommandLine::arg(),"do_arg") ) { printf("Bum do_arg\n"); exit(-1);}
+  if ( !evo_arg.Decode(CommandLine::arg(),"evo_arg") ) { printf("Bum evo_arg\n"); exit(-1);}
 
   GJP.Initialize(do_arg);
 
@@ -213,8 +219,12 @@ int main(int argc,char *argv[])
 
       //qio_readField( in_qio, lattice, argc, argv);
 
-      readLatQio.read(in_qio, lattice);
-      
+	#ifdef VOLFMT
+	readLatQio.read(in_qio, lattice, VOLFMT);
+	#else
+      	readLatQio.read(in_qio, lattice);
+      	#endif
+
       }
 
       #ifdef DO_measure_compare
@@ -300,12 +310,21 @@ int main(int argc,char *argv[])
 
 	  qio_writeLattice writeLatQio(argc, argv);
 
+
+
+	int traj(1203);
+	writeLatQio.setHeader(evo_arg.ensemble_id, evo_arg.ensemble_label, traj);
+
       printf("  writing: %s (QIO-format, double)\n",out_qio);
 
       //qio_writeField( out_qio, lattice, argc, argv);
 
-      writeLatQio.write( out_qio, lattice);
+	#ifdef VOLFMT
+        writeLatQio.write(out_qio, "added ildgLFN", lattice, VOLFMT);
+        #else
 
+      writeLatQio.write( out_qio, "added ildgLFN", lattice);
+	#endif
 	}
 
       #endif // DO_writeQIO
@@ -319,8 +338,11 @@ int main(int argc,char *argv[])
 
       //qio_writeField( out_qio, lattice, argc, argv, FP_IEEE32);
 
-      writeLatQio.write( out_qio, lattice, FP_IEEE32);
-
+	#ifdef VOLFMT
+      writeLatQio.write( out_qio, "added ildgLFN", lattice, VOLFMT, FP_IEEE32);
+	#else
+	writeLatQio.write( out_qio, "added ildgLFN", lattice,QIO_PARTFILE,  FP_IEEE32);
+	#endif
       }
 
       #endif // DO_writeQIOsingle
@@ -349,8 +371,13 @@ int main(int argc,char *argv[])
       printf("  re-reading: %s  (QIO-format)\n",out_qio);
 
       //qio_readField( out_qio, lattice, argc, argv);
-      readLatQio.read(out_qio, lattice);
+      
+	#ifdef VOLFMT
+        readLatQio.read(out_qio, lattice, VOLFMT);
+        #else
 
+	readLatQio.read(out_qio, lattice);
+	#endif
       }
 
       #ifdef DO_measure_compare
