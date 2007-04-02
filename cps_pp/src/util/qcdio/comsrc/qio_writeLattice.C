@@ -117,7 +117,11 @@ void qio_writeLattice::qio_openOutput(char *filename, char *stringLFN, char *xml
   VRB.Func(cname,fname);
 
   const int volfmt(volFormat);
-  const int serpar(QIO_SERPAR);
+  int serpar = QIO_SERPAR;
+#if TARGET == QCDOC
+  if ( volFormat == QIO_SINGLEFILE) 
+    serpar = QIO_PARALLEL;
+#endif
   const int ildgstyle(QIO_ILDGSTYLE);
 
   QIO_String *xml_file_out;
