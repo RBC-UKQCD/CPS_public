@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 	  }
 
 	  //!< Run hybrid Monte Carlo
-	  AlgHmc hmc(ab3, common_arg_hmc, hmc_arg);
+	  AlgHmc hmc(ab3, common_arg_hmc, hmc_arg_pass);
           Float time = -dclock();
 	  hmc.run();
           time += dclock();
