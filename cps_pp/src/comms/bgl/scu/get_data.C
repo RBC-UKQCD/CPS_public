@@ -40,6 +40,7 @@ void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
     BGLCPSTorus_recv(dir_re, len, rcv_p);
     }
   }
+
   // all other are local
   else {
     for(i = 0; i < len; ++i) {
@@ -61,10 +62,21 @@ void getMinusData(IFloat* rcv_buf, IFloat* send_buf, int len, int mu)
   if(GJP.Nodes(mu)>1){
     dir_se = (2 * mu);
     dir_re = (2 * mu) + 1;
-    // Send-receive data
-    BGLCPSTorus_send(dir_se, len, send_buf);
-    BGLCPSTorus_recv(dir_re, len, rcv_buf);
+
+    IFloat *send_p=send_buf;
+    IFloat *rcv_p= rcv_buf;
+    while (len >24){
+      BGLCPSTorus_send(dir_se, 24, send_p);
+      BGLCPSTorus_recv(dir_re, 24, rcv_p);
+      len -=24;
+      send_p+=24;rcv_p+=24;   
+    } 
+    if (len>0){
+    BGLCPSTorus_send(dir_se, len, send_p);
+    BGLCPSTorus_recv(dir_re, len, rcv_p);
+    }
   }
+
   // all other are local
   else {
     for(i = 0; i < len; ++i) {
