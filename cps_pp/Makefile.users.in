@@ -1,4 +1,4 @@
-# $Id: Makefile.users.in,v 1.4 2005-03-07 00:46:10 chulwoo Exp $
+# $Id: Makefile.users.in,v 1.5 2007-04-06 20:44:47 chulwoo Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -83,4 +83,3 @@ clean:
 	rm -f *.dat *.o  $(BIN)
 	rm -f ../regressions/*$(me).dat
 	rm -f ../regressions/*$(me).checklog
-

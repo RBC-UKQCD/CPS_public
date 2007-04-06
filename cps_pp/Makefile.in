@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.30 2006-07-13 20:17:39 chulwoo Exp $
+# $Id: Makefile.in,v 1.31 2007-04-06 20:44:47 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -113,5 +113,3 @@ test: cps
 
 realclean: 
 	rm -rf objs *.a
-
-

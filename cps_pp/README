@@ -96,33 +96,17 @@ $ <sourcedir>/conf --enable-target=bgl for BG/L
 
 which puts the command above into a file called 'config_wrapper'.
 
-Using 'conf' script, the whole configuring process would look lik:
+Using 'conf' script, the whole configuring process would look like:
 
 cd <builddir>
 <sourcedir>/conf --enable-target=qcdoc (or bgl)
 source config_wrapper --enable-gmp=<GNU GMP library>
 
-    1.3 Build for a parallel MPI machine
 
-Use the flag
+   1.3 Build with SciDAC packages (QIO,QMP)
 
---enable-target=mpi 
-
-The configure script then looks for a compiler called mpic++, mpiCC or
-mpCC, which are common names for compiler wrapper scripts on MPI
-systems which supply all the other necessary compiler and linker
-flags. If these don't exist, g++ will be used as the compiler, and
-configure will look for a library called mpi or mpich in the standard
-locations. If your MPI headers and library are in a non-standard
-location then you will need to specify this on the command line with
-
-$ <sourcedir>/configure --enable-taget=mpi CXXFLAGS=/path/to/mpiheaders LIBS=-lmpi LDFLAGS=/path/to/mpilibraries
-
-See the autoconf(1) documentatoin for more details.
-
-    1.4 Build for QCDSP
-
-Has anyone tried this recently?
+Building with QMP and QIO packages is supported. The configure flags
+--enable-<qio or qmp> are used. The location of the packages can be specified by either QMP_DIR and QIO_DIR evironment variable or specifing it in the configure command ( for example, --enable-qmp=/qcdoc/sfw/SciDAC/qmp)
 
 	2. Compiling
 

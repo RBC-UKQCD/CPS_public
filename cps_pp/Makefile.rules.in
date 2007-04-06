@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.23 2006-07-13 20:17:39 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.24 2007-04-06 20:44:47 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -176,3 +176,4 @@ $(BUILDDIR2)/Makefile_depend: depend
 ifneq ($(MAKECMDGOALS), clean)
 include $(BUILDDIR2)/Makefile_depend
 endif
+
