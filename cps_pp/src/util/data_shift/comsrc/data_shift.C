@@ -51,6 +51,7 @@ void GlobalDataShift::SetOrigin(int x, int y, int z, int t, int s)
 
 void GlobalDataShift::Shift(void *a, long long len){
   char *fname = "Shift(a,i)";
+  VRB.Func(cname,fname);
   if (data_len%8)
     ERR.General(cname,fname,"buffer length should be a multiple of 8\n");
   addr = a; data_len = len;

@@ -7,6 +7,7 @@ CPS_START_NAMESPACE
 void GlobalDataShift::Shift(int mu, int n_disp){
   if (n_disp==0) return;
  
+  VRB.Flow(cname,"Shift(i,i)","mu=%d n_disp=%d\n",mu,n_disp);
 //  SCUDir s_dir,r_dir;
   int a_disp;
   Float *send_p,*recv_p,*temp_p;
