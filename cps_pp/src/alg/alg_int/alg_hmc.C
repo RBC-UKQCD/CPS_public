@@ -38,9 +38,15 @@ CPS_END_NAMESPACE
 #endif
 CPS_START_NAMESPACE
 
+#if TARGET==QCDOC
 static const int SHIFT_X = 1;
 static const int SHIFT_Y = 1;
 static const int SHIFT_Z = 1;
+#else
+static const int SHIFT_X = 0;
+static const int SHIFT_Y = 0;
+static const int SHIFT_Z = 0;
+#endif
 
 //------------------------------------------------------------------
 /*!
