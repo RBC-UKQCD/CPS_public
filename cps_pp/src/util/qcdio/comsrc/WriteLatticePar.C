@@ -65,6 +65,8 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 //  cps::sync();
   if(parIO()) {
     // all open file, start writing
+    output.open(wt_arg.FileName,ios::out);
+	output.close();
     output.open(wt_arg.FileName);
     if(!output.good())    {
       //      VRB.Flow(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);
