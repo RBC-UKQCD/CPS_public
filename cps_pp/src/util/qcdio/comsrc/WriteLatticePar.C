@@ -79,8 +79,10 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   else {
     // only node 0 open file, start writing
     if(isRoot()) {
-      FILE *fp = fopen(wt_arg.FileName,"w");
-      fclose(fp);
+    output.open(wt_arg.FileName,ios::out);
+	output.close();
+//      FILE *fp = fopen(wt_arg.FileName,"w");
+//      fclose(fp);
       output.open(wt_arg.FileName);
       if(!output.good())    {
 	//	VRB.Flow(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);

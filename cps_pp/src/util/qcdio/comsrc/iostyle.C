@@ -347,7 +347,7 @@ do {
 //  UniqueID(),csum,pdcsum,RandSum,Rand2Sum);
 
  sync_error:
- if (error){ printf("Node %d: Write error\n"); retry++;}
+ if (error){ printf("Node %d: Write error\n",UniqueID()); retry++;}
 } while (error!=0 && retry<20);
   finishIOTimeSlot();
   //
