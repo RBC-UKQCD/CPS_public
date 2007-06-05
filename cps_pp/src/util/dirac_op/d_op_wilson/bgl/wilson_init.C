@@ -43,6 +43,11 @@ int wfm_max_numchunk;
 int wfm_numchunk[8];
 IFloat **wfm_send_ad;
 IFloat **wfm_recv_ad;
+IFloat *wfm_s_start[8];
+IFloat *wfm_r_start[8];
+unsigned long wfm_blklen[8];
+unsigned long wfm_numblk[8];
+unsigned long wfm_stride[8];
 
 /*--------------------------------------------------------------------------*/
 /* Function declarations                                                    */
@@ -57,7 +62,7 @@ void wfm_sublatt_pointers(int slx,
 /*=========================================================================*/
 /* wilson_init:                                                            */
 /*=========================================================================*/
-
+int wilson_initted=0;
 void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 {
   char *cname = " ";
@@ -250,17 +255,11 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
   for(i=0; i<4; i++){
     half_spinor_words = HALF_SPINOR_SIZE * wilson_p->padded_subgrid_vol[i];
 
-    wilson_p->af[i] = (IFloat *) smalloc(half_spinor_words*sizeof(IFloat));
-    if(wilson_p->af[i] == 0)
-      ERR.Pointer(cname,fname, "af[i]");
-    VRB.Smalloc(cname,fname,
-		"af[i]", wilson_p->af[i], half_spinor_words*sizeof(IFloat));
+    wilson_p->af[i] = (IFloat *) smalloc (cname,fname,
+		"af[i]", half_spinor_words*sizeof(IFloat));
 
-    wilson_p->ab[i] = (IFloat *) smalloc(half_spinor_words*sizeof(IFloat));
-    if(wilson_p->ab[i] == 0)
-      ERR.Pointer(cname,fname, "ab[i]");
-    VRB.Smalloc(cname,fname,
-		"ab[i]", wilson_p->ab[i], half_spinor_words*sizeof(IFloat));
+    wilson_p->ab[i] = (IFloat *) smalloc (cname,fname,
+		"ab[i]", half_spinor_words*sizeof(IFloat));
   }
 
 #endif
@@ -295,17 +294,34 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 /*--------------------------------------------------------------------------*/
   wfm_send_ad = (IFloat **) smalloc(cname,fname,"wfm_send_ad",8*wfm_max_numchunk*sizeof(int));
 
-  wfm_recv_ad = (IFloat **) smalloc(8*wfm_max_numchunk*sizeof(int));
-  if(wfm_recv_ad == 0)
-    ERR.Pointer(cname,fname, "wfm_recv_ad");
-  VRB.Smalloc(cname,fname,
-	      "wfm_recv_ad", wfm_recv_ad, 8*wfm_max_numchunk*sizeof(int));
+  wfm_recv_ad = (IFloat **) smalloc (cname,fname,
+	      "wfm_recv_ad", 8*wfm_max_numchunk*sizeof(int));
 
 
 /*--------------------------------------------------------------------------*/
 /* Set the send address for all +directions -> x+,y+,z+,t+                  */
 /* Set the recv address for all -directions -> x-,y-,z-,t-                  */
 /*--------------------------------------------------------------------------*/
+  for(mu=0; mu<ND; ++mu){
+    wfm_s_start[mu]= wilson_p->comm_offset[mu] + wilson_p->ab[mu];
+    wfm_r_start[mu]= wilson_p->ab[mu];
+    wfm_numblk[mu] = wilson_p->comm_numblk[mu];
+    wfm_blklen[mu] = wilson_p->comm_blklen[mu]*BLOCK*sizeof(IFloat);
+    wfm_stride[mu] = (wilson_p->comm_stride[mu]-1)*sizeof(IFloat)+wfm_blklen[mu];
+#if 0
+    if(!UniqueID())
+    printf("Node 0: wfm %d: %p %p %d %d %d\n", mu, wfm_s_start[mu],
+          wfm_r_start[mu],wfm_numblk[mu],wfm_blklen[mu],wfm_stride[mu]);
+#endif
+  }
+  for(mu=0; mu<ND; ++mu){
+    wfm_s_start[4+mu]= wilson_p->af[mu];
+    wfm_r_start[4+mu]= wilson_p->comm_offset[mu] + wilson_p->af[mu];
+    wfm_numblk[4+mu] = wilson_p->comm_numblk[mu];
+    wfm_blklen[4+mu] = wilson_p->comm_blklen[mu]*BLOCK*sizeof(IFloat);
+    wfm_stride[4+mu] = (wilson_p->comm_stride[mu]-1)*sizeof(IFloat)+wfm_blklen[mu];
+  }
+
   for(mu=0; mu<ND; ++mu)
     {
       k = 0;
@@ -315,9 +331,8 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 
 	for(j=0; j<wilson_p->comm_blklen[mu]; ++j) {
 	  wfm_send_ad[mu+8*k] = send_ad;
-//  if (!UniqueID())
-//    printf("wfm_send_ad[%d]=%p\n",mu+8*k,send_ad);
 	  wfm_recv_ad[mu+8*k] = receive_ad;
+    if(!UniqueID()) printf("Node 0: wfm_ad[%d][%d]: %p %p \n",mu,k,send_ad,receive_ad);
 	  k = k+1;
 	  //sends to +dir (2*mu), receives from - dir (2*mu+1)
 	  //getMinusData(receive_ad, send_ad, BLOCK, mu);
@@ -333,6 +348,7 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 /* Set the send address for all -directions -> x-,y-,z-,t-                  */
 /* Set the recv address for all +directions -> x+,y+,z+,t+                  */
 /*--------------------------------------------------------------------------*/
+
   for(mu=0; mu<ND; ++mu)
     {
       k = 0;
@@ -343,17 +359,20 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 	for(j=0; j<wilson_p->comm_blklen[mu]; ++j) {
 	  wfm_send_ad[4+mu+8*k] = send_ad;
 	  wfm_recv_ad[4+mu+8*k] = receive_ad;
+
 	  k = k+1;
 	  //sends to -dir (2*mu+1), receives from + dir (2*mu)
 	  //getPlusData(receive_ad, send_ad, BLOCK, mu);
 	  send_ad    = send_ad    + BLOCK;
 	  receive_ad = receive_ad + BLOCK;
+    if(!UniqueID()) printf("Node 0: wfm_ad[%d][%d]: %p %p \n",mu+4,k,send_ad,receive_ad);
 	}
 	send_ad = send_ad + wilson_p->comm_stride[mu] - 1;
 	receive_ad = receive_ad + wilson_p->comm_stride[mu] - 1;
       }
    }
 
+   wilson_initted=1;
 }
 
 

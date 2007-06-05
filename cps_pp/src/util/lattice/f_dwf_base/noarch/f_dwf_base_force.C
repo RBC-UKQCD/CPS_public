@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.8 2006-04-13 18:18:52 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.9 2007-06-05 15:44:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -255,6 +255,7 @@ ForceArg FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
       // If GJP.Snodes > 1 sum up contributions from all s nodes
       if(GJP.Snodes() > 1) {
+        if(!UniqueID())printf("%s::%s:GJP.Snodes()=%d\n",cname,fname,GJP.Snodes()); 
 	glb_sum_multi_dir((Float *)&tmp_mat1,4,sizeof(Matrix)/sizeof(IFloat));
       }
 
@@ -303,6 +304,7 @@ ForceArg FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   L1 /= 4.0*GJP.VolSites();
   L2 /= 4.0*GJP.VolSites();
 
+  VRB.FuncEnd(cname,fname);
   return ForceArg(L1, sqrt(L2), Linf);
 
 }

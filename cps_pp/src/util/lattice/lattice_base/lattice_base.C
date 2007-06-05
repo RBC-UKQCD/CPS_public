@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.47 2007-01-11 22:48:16 chulwoo Exp $
+  $Id: lattice_base.C,v 1.48 2007-06-05 15:44:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-11 22:48:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.47 2007-01-11 22:48:16 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.47 2007-01-11 22:48:16 chulwoo Exp $
+//  $Date: 2007-06-05 15:44:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.48 2007-06-05 15:44:19 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.48 2007-06-05 15:44:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.47 $
+//  $Revision: 1.48 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -1208,6 +1208,7 @@ Float Lattice::ReTrPlaq(int *x, int mu, int nu) const
 Float Lattice::SumReTrPlaqNode(void) const
 {
   char *fname = "SumReTrPlaqNode() const";
+  sync();
   VRB.Func(cname,fname);
   
   Float sum = 0.0;
@@ -1228,6 +1229,8 @@ Float Lattice::SumReTrPlaqNode(void) const
       }
     }
   }
+  sync();
+  VRB.FuncEnd(cname,fname);
   return sum;
 }
 

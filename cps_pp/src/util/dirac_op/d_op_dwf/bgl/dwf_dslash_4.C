@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-14 17:53:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/dwf_dslash_4.C,v 1.2 2006-12-14 17:53:58 chulwoo Exp $
-//  $Id: dwf_dslash_4.C,v 1.2 2006-12-14 17:53:58 chulwoo Exp $
+//  $Date: 2007-06-05 15:44:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/dwf_dslash_4.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
+//  $Id: dwf_dslash_4.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/dwf_dslash_4.C,v $
 //  $State: Exp $
 //
@@ -82,7 +82,9 @@ void dwf_dslash_4(Vector *out,
 #ifdef _TARTAN  
     SyncMax(10000);
 #endif
+     sync();
     wilson_dslash(frm_out, g_field, frm_in, parity, dag, wilson_p);
+     sync();
     frm_in = frm_in + size_cb[parity];
     frm_out = frm_out + size_cb[parity];
   }

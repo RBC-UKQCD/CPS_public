@@ -1,0 +1,88 @@
+#include <config.h>
+#ifdef USE_QMP
+#include <comms/sysfunc.h>
+#include <util/wilson.h>
+#include <util/verbose.h>
+#include <util/error.h>
+#include <util/gjp.h>
+CPS_START_NAMESPACE
+
+/*--------------------------------------------------------------------------*/
+/* Externals                                                                */
+/*--------------------------------------------------------------------------*/
+extern int wfm_max_numchunk;
+extern int wfm_numchunk[];
+extern IFloat **wfm_send_ad;
+extern IFloat **wfm_recv_ad;
+
+
+void wfm_comm(){
+
+  char *fname="wfm_comm()";
+  const int group = 8;
+  void *addr[group];
+  size_t blksize[group];
+  int  numblk[group];
+  ptrdiff_t stride[group];
+
+  for(int ig=0; ig<wfm_max_numchunk/group; ig++){
+    VRB.Flow("",fname,"ig=%d",ig);
+    for(int dir=0;dir<8;dir++){
+      int sign=1;
+      if(dir>3) sign = -1;
+//      VRB.Flow("",fname,"dir=%d",dir);
+       int n_site=0;
+       for(int g=0;g<group;g++){
+         int index = ig*group+g;
+         if (index <wfm_numchunk[dir]){
+           addr[n_site] = wfm_send_ad[dir+8*index];
+           Float *tmp_p = wfm_send_ad[dir+8*index];
+//           if ( (*tmp_p)*(*tmp_p) >0.0001)
+//           printf("Node %d: wfm_send_ad[%d][%d]=%e\n",UniqueID(),dir,index,*tmp_p);
+           blksize[n_site] = 12*sizeof(Float);
+           numblk[n_site] = 1;
+           stride[n_site] = 1;
+           n_site++;
+         }
+       }
+       QMP_msgmem_t send_mem  = QMP_declare_strided_array_msgmem(addr,blksize,numblk,stride,n_site);
+       QMP_msghandle_t send_h = QMP_declare_send_relative(send_mem,dir%4,sign,0);
+
+       int r_site=0;
+       for(int g=0;g<group;g++){
+         int index = ig*group+g;
+         if (index <wfm_numchunk[dir]){
+           addr[r_site] = wfm_recv_ad[dir+8*index];
+           blksize[r_site] = 12*sizeof(Float);
+           numblk[r_site] = 1;
+           stride[r_site] = 1;
+           r_site++;
+         }
+       }
+       if (n_site!=r_site)
+         ERR.General("",fname,"n_site(%d)!=r_site(%d)\n",n_site,r_site);
+//       VRB.Flow("",fname,"n_site=%d r_site=%d",n_site,r_site);
+       QMP_msgmem_t recv_mem  = QMP_declare_strided_array_msgmem(addr,blksize,numblk,stride,r_site);
+       QMP_msghandle_t recv_h = QMP_declare_receive_relative(recv_mem,dir%4,-sign,0);
+
+       QMP_start(send_h); QMP_start(recv_h);
+       QMP_wait(send_h); QMP_wait(recv_h);
+
+       for(int g=0;g<r_site;g++){
+         int index = ig*group+g;
+           Float *tmp_p = wfm_recv_ad[dir+8*index];
+//           if ( (*tmp_p)*(*tmp_p) >0.0001)
+//           printf("Node %d: wfm_recv_ad[%d][%d]=%e\n",UniqueID(),dir,index,*tmp_p);
+       }
+       QMP_free_msghandle(send_h);
+       QMP_free_msghandle(recv_h);
+       QMP_free_msgmem(send_mem);
+       QMP_free_msgmem(recv_mem);
+    }
+  }
+
+  
+}
+
+CPS_END_NAMESPACE
+#endif

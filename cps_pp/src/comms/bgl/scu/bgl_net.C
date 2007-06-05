@@ -239,6 +239,11 @@ extern IFloat **wfm_recv_ad;
 
 
 int ccount=0;
+static long long count, count2;
+unsigned int sync(){
+  BGL_Barrier_Pass(BGL_AppBarriers);
+  return 0;
+}
 
 
 //------------------------------------------------------------------
@@ -1240,12 +1245,13 @@ void wfm_comm()
 	dir = 2*d + pir;
 	wfm_dir = bgl_cps_dir[dir];
 	if( (i < wfm_numchunk[mu_nc[wfm_dir]]) && (grid_end[dir] != 1)   ){
+	  QuadMove(stat_se_ptr[dir], &stat, 30);
 	  while (1) {
 	    if (stat[stat_se[dir]] < SEND_FIFO_LEVEL) { 
 	      break;
 	    }
 	    send_poll[dir]++;
-	    QuadMove(stat_se_ptr[0], &stat, 30);
+	    QuadMove(stat_se_ptr[dir], &stat, 30);
 	  }
 	  fifo = fifo_se_ptr[dir];
 	  qdata = (BGLQuad *) wfm_send_ad[mu_se[wfm_dir]+8*i];
@@ -1319,12 +1325,13 @@ void wfm_comm()
 	dir = 2*d + (1+pir)%2;
 	wfm_dir = bgl_cps_dir[dir];
 	if(i < wfm_numchunk[mu_nc[wfm_dir]] && (grid_end[dir] != 1)   ){
+          QuadMove(stat_re_ptr[dir], &stat, 30);
 	  while (1) {
 	    if (stat[stat_re[dir]] > RECV_FIFO_LEVEL) { 
 	      break;
 	    }
 	    recv_poll[dir]++;
-	    QuadMove(stat_re_ptr[0], &stat, 30);
+	    QuadMove(stat_re_ptr[dir], &stat, 30);
 	  }
 	  fifo = fifo_re_ptr[dir];
 	  qdata = (BGLQuad *) wfm_recv_ad[mu_re[wfm_dir]+8*i];
@@ -1361,12 +1368,13 @@ void wfm_comm()
 	dir = 2*d + (1+pir)%2;
 	wfm_dir = bgl_cps_dir[dir];
 	if( (i < wfm_numchunk[mu_nc[wfm_dir]]) && (grid_end[dir] != 1)   ){
+	  QuadMove(stat_se_ptr[dir], &stat, 30);
 	  while (1) {
 	    if (stat[stat_se[dir]] < SEND_FIFO_LEVEL) { 
 	      break;
 	    }
 	    send_poll[dir]++;
-	    QuadMove(stat_se_ptr[0], &stat, 30);
+	    QuadMove(stat_se_ptr[dir], &stat, 30);
 	  }
 	  fifo = fifo_se_ptr[dir];
 	  qdata = (BGLQuad *) wfm_send_ad[mu_se[wfm_dir]+8*i];
@@ -1437,12 +1445,13 @@ void wfm_comm()
 	dir = 2*d + pir;
 	wfm_dir = bgl_cps_dir[dir];
 	if(i < wfm_numchunk[mu_nc[wfm_dir]] && (grid_end[dir] != 1)   ){
+	  QuadMove(stat_re_ptr[dir], &stat, 30);
 	  while (1) {
 	    if (stat[stat_re[dir]] > RECV_FIFO_LEVEL) { 
 	      break;
 	    }
 	    recv_poll[dir]++;
-	    QuadMove(stat_re_ptr[0], &stat, 30);
+	    QuadMove(stat_re_ptr[dir], &stat, 30);
 	  }
 	  fifo = fifo_re_ptr[dir];
 	  qdata = (BGLQuad *) wfm_recv_ad[mu_re[wfm_dir]+8*i];

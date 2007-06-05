@@ -72,7 +72,7 @@ void wfm_trick(IFloat *chi,
 /* external variables                                                      */
 /***************************************************************************/
 double wfm_reg[64]   __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
-int count=0;
+static int count=0;
 
 
 void wilson_dslash(IFloat *chi, 

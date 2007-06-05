@@ -145,7 +145,7 @@ void wilson_mdagm(IFloat *chi_f,
 #if 0
   fTimesV1PlusV2(chi, mkappa2, chi, tmp2, size);
 #else
-  xaxpy(&mkappa2,chi,psi,size/6);
+  xaxpy(&mkappa2,chi,tmp2,size/6);
 #endif
 
   DiracOp::CGflops += vol*24*2;

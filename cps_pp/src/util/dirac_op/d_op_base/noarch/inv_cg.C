@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.7 2006-12-14 17:53:56 chulwoo Exp $
+  $Id: inv_cg.C,v 1.8 2007-06-05 15:44:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-14 17:53:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.7 2006-12-14 17:53:56 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.7 2006-12-14 17:53:56 chulwoo Exp $
+//  $Date: 2007-06-05 15:44:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.8 2007-06-05 15:44:19 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.8 2007-06-05 15:44:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -65,6 +65,15 @@ static int bgl_cg_count = 0;
 //------------------------------------------------------------------
 const unsigned CBUF_MODE4 = 0xcb18c1ff;
 
+static int f_size_cb;     // Node checkerboard size of the fermion field
+
+static inline void print_vec( Vector *vec, char *name){
+  Float temp_f = vec->NormSqNode(f_size_cb);
+  Float *temp_p = (Float *)vec;
+  glb_sum(&temp_f);
+  VRB.Flow("","print_vec()", "%s = %e %e \n", name,IFloat(temp_f),*temp_p);
+}
+
 //------------------------------------------------------------------
 /*!
   Solves \f$ M^\dagger M out = in \f$ for \a out using the Conjugate
@@ -89,7 +98,6 @@ int DiracOp::InvCg(Vector *out,
 		   Vector *in, 
 		   Float src_norm_sq, 
 		   Float *true_res){
-  int f_size_cb;     // Node checkerboard size of the fermion field
   int itr;                       // Current number of CG iterations
   int max_itr;                       // Max number of CG iterations
   Float stp_cnd;                   // Stop if residual^2 <= stp_cnd
@@ -169,6 +177,7 @@ int DiracOp::InvCg(Vector *out,
     src_norm_sq = src->NormSqNode(f_size_cb);
     DiracOpGlbSum(&src_norm_sq);
   }
+  VRB.Flow(cname,fname,"src_norm_sq=%e\n",src_norm_sq);
 
 // Calculate stopping condition
 //------------------------------------------------------------------
@@ -245,15 +254,19 @@ int DiracOp::InvCg(Vector *out,
   Float *in_f =  (Float *) sol;
   // Mmp = MatPcDagMatPc * sol
   MatPcDagMatPc(mmp, sol);
+  print_vec( mmp, "mmp");
 
   // res = src
   res->CopyVec(src, f_size_cb);
+  print_vec( res, "res");
 
   // res -= mmp
   res->VecMinusEquVec(mmp, f_size_cb);
+  print_vec( res, "res");
 
   // dir = res
   dir->CopyVec(res, f_size_cb);  
+  print_vec( dir, "dir");
 
   // res_norm_sq_cur = res * res
   res_norm_sq_cur = res->NormSqNode(f_size_cb);
@@ -293,6 +306,7 @@ int DiracOp::InvCg(Vector *out,
 
     MatPcDagMatPc(mmp, dir, &d);
     //printf("d=%e\n",d);
+  print_vec( mmp, "mmp");
 
 #ifdef REPRODUCE_TEST 
 
@@ -305,6 +319,7 @@ int DiracOp::InvCg(Vector *out,
 #endif
   
     DiracOpGlbSum(&d);
+  VRB.Flow(cname,fname, "d = %e\n", IFloat(d));
 
     // If d = 0 we are done
     if(d == 0.0) {
@@ -315,15 +330,18 @@ int DiracOp::InvCg(Vector *out,
     }
 
     a = res_norm_sq_prv / d;
+    VRB.Flow(cname,fname, "a = %e\n", IFloat(a));
 
     // Set circular buffer
 //    setCbufCntrlReg(4, CBUF_MODE4);
 
     // sol = a * dir + sol;
     sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
+  print_vec( sol, "sol");
 
     // res = - a * (MatPcDagMatPc * dir) + res;
     res->FTimesV1PlusV2(-a, mmp, res, f_size_cb);
+  print_vec( res, "res");
 
     // res_norm_sq_cur = res * res
     res_norm_sq_cur = res->NormSqNode(f_size_cb);
@@ -335,9 +353,11 @@ int DiracOp::InvCg(Vector *out,
     if(res_norm_sq_cur <= stp_cnd) break;
 
     b = res_norm_sq_cur / res_norm_sq_prv;
+    VRB.Flow(cname,fname, "b = %e\n", IFloat(b));
 
     // dir = b * dir + res;
     dir->FTimesV1PlusV2(b, dir, res, f_size_cb);
+    print_vec( dir, "dir");
     CGflops+=f_size_cb*8;
 
   }

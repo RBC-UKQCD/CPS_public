@@ -52,7 +52,10 @@ void dwf_mdagm(Vector *out,
 //------------------------------------------------------------------
 // Apply M^dag
 //------------------------------------------------------------------
+  sync();
+  VRB.Func("dwf_mdagm","dwf_mdag");
   dwf_mdag(out, gauge_field, frm_tmp1, mass, dwf_lib_arg);
+  sync();
 
 }
 

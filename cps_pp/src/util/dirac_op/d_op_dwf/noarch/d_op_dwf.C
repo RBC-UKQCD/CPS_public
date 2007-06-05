@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.10 2006-12-14 17:53:59 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.11 2007-06-05 15:44:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-14 17:53:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v 1.10 2006-12-14 17:53:59 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.10 2006-12-14 17:53:59 chulwoo Exp $
+//  $Date: 2007-06-05 15:44:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v 1.11 2007-06-05 15:44:19 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.11 2007-06-05 15:44:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -598,7 +598,9 @@ void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
 
   psi = f_in ;
 
+  VRB.Func(fname,"MatPc") ;
   MatPc(psi,chi) ;
+  VRB.FuncEnd(fname,"MatPc") ;
 
   {
     Float kappa = ((Dwf *)dwf_lib_arg)->dwf_kappa ;
@@ -607,12 +609,16 @@ void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
 
   rho = (Vector *)((Float *)f_out + f_size_cb) ;
 
+  VRB.Func(fname,"Dslash") ;
   Dslash(rho, chi, CHKB_ODD, DAG_NO) ;
+  VRB.FuncEnd(fname,"Dslash") ;
 
   sigma = (Vector *)((Float *)f_in + f_size_cb) ;
 
+  VRB.Func(fname,"Dslash") ;
   Dslash(sigma, psi, CHKB_ODD, DAG_YES) ;
-
+  VRB.FuncEnd(fname,"Dslash") ;
+  VRB.FuncEnd(cname,fname) ;
   return ;
 }
 

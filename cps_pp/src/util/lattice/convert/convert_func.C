@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.14 2007-03-24 17:43:35 chulwoo Exp $
+  $Id: convert_func.C,v 1.15 2007-06-05 15:44:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-03-24 17:43:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.14 2007-03-24 17:43:35 chulwoo Exp $
-//  $Id: convert_func.C,v 1.14 2007-03-24 17:43:35 chulwoo Exp $
+//  $Date: 2007-06-05 15:44:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.15 2007-06-05 15:44:19 chulwoo Exp $
+//  $Id: convert_func.C,v 1.15 2007-06-05 15:44:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -25,7 +25,8 @@ CPS_END_NAMESPACE
 #include <util/smalloc.h>
 #include <util/verbose.h>
 #include <util/lattice.h>
-#include <comms/nga_reg.h>
+#include <comms/sysfunc.h>
+//#include <comms/nga_reg.h>
 #include <comms/cbuf.h>
 CPS_START_NAMESPACE
 
@@ -121,8 +122,10 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 //-------------------------------------------------------------------------
 // cram1, cram2 should be in CRAM
 //-------------------------------------------------------------------------
+//   VRB.Func("",fname);
+  sync();
   const int GSIZE= 72;
-   VRB.Func("",fname);
+//  if(!UniqueID())printf("%s:cap->site_size=%d\n",fname,cap->site_size);
   if (cap->site_size>GSIZE)
   ERR.General("",fname,"cap->site_size(%d)>GSIZE\n",cap->site_size,GSIZE);
   Float cram1_stack[GSIZE], cram2_stack[GSIZE];
@@ -176,6 +179,7 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 		}
 	}
 
+  sync();
 //   VRB.Func("",fname);
 //	sfree(cname_none,fname, "cram2", cram2);
 //	sfree(cname_none,fname, "cram1", cram1);

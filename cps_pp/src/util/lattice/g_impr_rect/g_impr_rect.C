@@ -1,20 +1,21 @@
+
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprRect class.
 
-  $Id: g_impr_rect.C,v 1.9 2006-04-13 18:21:51 chulwoo Exp $
+  $Id: g_impr_rect.C,v 1.10 2007-06-05 15:44:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 18:21:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.9 2006-04-13 18:21:51 chulwoo Exp $
-//  $Id: g_impr_rect.C,v 1.9 2006-04-13 18:21:51 chulwoo Exp $
+//  $Date: 2007-06-05 15:44:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.10 2007-06-05 15:44:19 chulwoo Exp $
+//  $Id: g_impr_rect.C,v 1.10 2007-06-05 15:44:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v $
 //  $State: Exp $
 //
@@ -117,7 +118,7 @@ unsigned GimprRect::CBUF_MODE4 = 0xcca52112;
 void GimprRect::GforceSite(Matrix& force, int *x, int mu)
 {
   char *fname = "GforceSite(M&,i*,i)";
-  VRB.Func(cname,fname);
+//  VRB.Func(cname,fname);
 
   Float tmp ;
 
@@ -173,7 +174,7 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
   ForceFlops +=198+24;
 }
 
-#if TARGET != QCDOC
+#if 0
 #define PROFILE
 //------------------------------------------------------------------------------
 // EvolveMomGforce(Matrix *mom, Float dt):
@@ -230,6 +231,7 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt){
   L1 /= 4.0*GJP.VolSites();
   L2 /= 4.0*GJP.VolSites();
 
+  VRB.FuncEnd(cname,fname);
   return ForceArg(dt*L1, dt*sqrt(L2), dt*Linf);
 }
 #endif

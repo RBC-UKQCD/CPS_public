@@ -42,12 +42,26 @@ void  dwf_m(Vector *out,
 //------------------------------------------------------------------
 // Apply Dslash E <- O
 //------------------------------------------------------------------
-  dwf_dslash(frm_tmp2, gauge_field, in, mass, 1, 0, dwf_lib_arg);
+  sync();
+  VRB.Func("dwf_m","dwf_dslash_4");
+//  dwf_dslash(frm_tmp2, gauge_field, in, mass, 1, 0, dwf_lib_arg);
+  dwf_dslash_4(frm_tmp2, gauge_field, in, 1, 0, dwf_lib_arg);
+  sync();
+  VRB.Func("dwf_m","dwf_dslash_5_plus");
+  dwf_dslash_5_plus(frm_tmp2, in, mass, 0, dwf_lib_arg);
 
 //------------------------------------------------------------------
 // Apply Dslash O <- E
 //------------------------------------------------------------------
-  dwf_dslash(out, gauge_field, frm_tmp2, mass, 0, 0, dwf_lib_arg);
+  sync();
+  VRB.Func("dwf_m","dwf_dslash_4");
+//  dwf_dslash(out, gauge_field, frm_tmp2, mass, 0, 0, dwf_lib_arg);
+  dwf_dslash_4(out, gauge_field, frm_tmp2, 0, 0, dwf_lib_arg);
+  sync();
+  VRB.Func("dwf_m","dwf_dslash_5_plus");
+  dwf_dslash_5_plus(out, frm_tmp2, mass, 0, dwf_lib_arg);
+
+  sync();
   
 //------------------------------------------------------------------
 // out = in - dwf_kappa_sq * out

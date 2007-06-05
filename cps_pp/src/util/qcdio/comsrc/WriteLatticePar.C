@@ -18,6 +18,7 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   struct timeval start,end;
   gettimeofday(&start,NULL);
 #endif
+   sync();
 
   // init
   int error = 0;
@@ -62,7 +63,7 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   
   fstream output;
 
-//  cps::sync();
+  cps::sync();
   if(parIO()) {
     // all open file, start writing
     output.open(wt_arg.FileName,ios::out);
@@ -79,10 +80,8 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   else {
     // only node 0 open file, start writing
     if(isRoot()) {
-    output.open(wt_arg.FileName,ios::out);
-	output.close();
-//      FILE *fp = fopen(wt_arg.FileName,"w");
-//      fclose(fp);
+      FILE *fp = fopen(wt_arg.FileName,"w");
+      fclose(fp);
       output.open(wt_arg.FileName);
       if(!output.good())    {
 	//	VRB.Flow(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);
@@ -157,7 +156,7 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 
   log();
   finishLogging();
-
+  sync();
   VRB.FuncEnd(cname,fname);
 }
 

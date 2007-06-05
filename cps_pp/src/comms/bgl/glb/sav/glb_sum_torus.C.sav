@@ -1,0 +1,96 @@
+#include<config.h>
+CPS_START_NAMESPACE
+
+//--------------------------------------------------------------------
+/*
+ *  glb_sum.C 
+ *  Global sum using a torus nearest neighbor communications method.
+ *  This is in double precision only.
+ *  This is accurate for a torus only.
+ *  This is a slow way to do global sums. Use it until a faster 
+ *  "hardware" way is available.
+ */
+//--------------------------------------------------------------------
+
+CPS_END_NAMESPACE
+#include <comms/scu.h>
+#include <comms/bgl_net.h>
+#include <sys/bgl/bgl_sys.h>
+#include<comms/glb.h>
+#include<util/gjp.h>
+#include<util/qcdio.h>
+CPS_START_NAMESPACE
+
+static double transmit_buf[2] __attribute__((aligned(BGL_QUAD_ALIGNSIZE))); 
+static double receive_buf[2] __attribute__((aligned(BGL_QUAD_ALIGNSIZE)));
+static double gsum_buf[2];
+static int initted=0;
+
+void glb_sum(Float * gsum_p){
+
+  static int NP[4];
+  if (!initted){
+    NP[0]= GJP.Xnodes();
+    NP[1]= GJP.Ynodes();
+    NP[2]= GJP.Znodes();
+    NP[3]= GJP.Tnodes();
+	for(int i =0;i<4;i++){
+      printf("Node %d: NP[%d]=%d\n",UniqueID(),i,NP[i]);
+    }
+    initted=1;
+  }
+  gsum_buf[0] = *gsum_p;
+
+
+  // Sum.If torus the result is in all nodes. 
+  // If mesh the result is in the node with highest coordinates
+  for(int i = 0; i < 4; ++i) {
+
+      transmit_buf[0] = gsum_buf[0];
+
+      for (int itmp = 1; itmp < NP[i]; itmp++) {
+
+//      printf("Node %d: i=%d itmp=%d\n",UniqueID(),i,itmp);
+	getMinusData(receive_buf, transmit_buf, 2, i);
+//     printf("Node %d: getMinusData done\n",UniqueID());
+
+        gsum_buf[0] += receive_buf[0];
+        transmit_buf[0] = receive_buf[0];
+      }
+  }
+
+
+  if( !( (GJP.Xnodes() == GJP.XnodeCoor()+1) &&
+	 (GJP.Ynodes() == GJP.YnodeCoor()+1) &&
+	 (GJP.Znodes() == GJP.ZnodeCoor()+1) &&
+	 (GJP.Tnodes() == GJP.TnodeCoor()+1) )) {
+    gsum_buf[0] = 0;
+  }
+
+
+  for(int i = 0; i < 4; ++i) {
+
+      transmit_buf[0] = gsum_buf[0];
+
+      for (int itmp = 1; itmp < NP[i]; itmp++) {
+
+//   printf("Node %d: i=%d itmp=%d\n",UniqueID(),i,itmp);
+	  getPlusData(receive_buf, transmit_buf, 2, i);
+//      printf("Node %d: getMinusData done\n",UniqueID());
+
+        gsum_buf[0] += receive_buf[0];
+        transmit_buf[0] = receive_buf[0];
+      }
+  }
+
+  FILE *fp = Fopen(ADD_ID,"gsum","a");
+  Fprintf(fp,"%0.20e\n",gsum_buf[0]);
+  Fclose(fp);
+
+  *gsum_p = gsum_buf[0];
+
+
+}
+
+
+CPS_END_NAMESPACE

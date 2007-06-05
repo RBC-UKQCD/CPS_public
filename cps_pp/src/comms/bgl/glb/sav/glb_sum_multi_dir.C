@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 
 //--------------------------------------------------------------------
 /*
- *  glb_sum_five.C
+ *  glb_sum_dir.C
  */
 //--------------------------------------------------------------------
 
@@ -12,10 +12,9 @@ CPS_END_NAMESPACE
 #include<util/error.h>
 CPS_START_NAMESPACE
 
-void glb_sum_five(Float * float_p)
+void glb_sum_multi_dir(Float const * float_p, int dir, int len)
 {
-//    VRB.Func("glb_sum_five","glb_sum_five");
-    glb_sum(float_p);
+  ERR.NotImplemented("glb_sum_multi_dir","glb_sum_multi_dir");
 }
 
 

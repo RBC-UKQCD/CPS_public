@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.29 2006-04-14 04:34:21 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.30 2007-06-05 15:44:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -972,6 +972,7 @@ ForceArg FdwfBase::EvolveMomFforce( Matrix* mom, // momenta
   L1 /= 4.0*GJP.VolSites();
   L2 /= 4.0*GJP.VolSites();
 
+  VRB.FuncEnd(cname,fname);
   return ForceArg(L1, sqrt(L2), Linf);
 
 }

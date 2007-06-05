@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations for the serial emulation of the QCDSP/QCDOC communications  layer.
   
-  $Id: sysfunc_noarch.h,v 1.7 2005-03-07 00:03:22 chulwoo Exp $
+  $Id: sysfunc_noarch.h,v 1.8 2007-06-05 15:44:19 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   The Sysfunc Comms Interface: sysfunc.h
@@ -17,13 +17,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: chulwoo $
-  $Date: 2005-03-07 00:03:22 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v 1.7 2005-03-07 00:03:22 chulwoo Exp $
-  $Id: sysfunc_noarch.h,v 1.7 2005-03-07 00:03:22 chulwoo Exp $
+  $Date: 2007-06-05 15:44:19 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v 1.8 2007-06-05 15:44:19 chulwoo Exp $
+  $Id: sysfunc_noarch.h,v 1.8 2007-06-05 15:44:19 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc_noarch.h,v $
-  $Revision: 1.7 $
+  $Revision: 1.8 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -76,7 +76,7 @@ inline unsigned int SeedS(){return SERIAL_SEED;}  //!< Gets a RNG seed.
 inline unsigned int SeedT(){return SERIAL_SEED;}  //!< Gets a RNG seed.
 inline unsigned int SeedST(){return SERIAL_SEED;} //!< Gets a RNG seed.
 
-#ifndef HAVE_SYNC
+#if 1
 //! A barrier function.
 inline unsigned int sync(){return 1;}
 #endif

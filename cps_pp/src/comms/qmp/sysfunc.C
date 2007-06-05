@@ -63,8 +63,13 @@ namespace QMPSCU {
   //Get Allocated machine size, and declare logical machine
   void init_qmp(int * argc, char ***argv) {
 //    printf("init_qmp(%d %p)\n",*argc,*argv);
+//      for(int i = 0; i<*argc;i++){
+//        printf("argv[%d]=%s\n",i,(*argv)[i]); 
+//      }
     QMP_thread_level_t prv;
     QMP_status_t init_status = QMP_init_msg_passing(argc, argv, QMP_THREAD_SINGLE, &prv);
+    peRank = QMP_get_node_number();
+    if(!peRank)printf("QMP_init_msg_passing returned %d\n",init_status);
     if (init_status != QMP_SUCCESS) {
       QMP_error("%s\n",QMP_error_string(init_status));
     }
@@ -74,7 +79,6 @@ namespace QMPSCU {
     QMP_ictype qmp_type = QMP_get_msg_passing_type();
 
     //Get information about the allocated machine
-    peRank = QMP_get_node_number();
     peNum = QMP_get_number_of_nodes();
     NDIM = QMP_get_allocated_number_of_dimensions();
     peGrid = QMP_get_allocated_dimensions();

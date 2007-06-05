@@ -1,0 +1,171 @@
+#define PROFILE
+#undef PROFILE
+void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
+{
+  //List of the different directions
+  int wire[n];
+  int i;
+//  int j,d,s,k;
+
+  QMP_msgmem_t *msg_mem_p = (QMP_msgmem_t *)Alloc("","vec_cb_norm", "msg_mem_p", 2*non_local_dirs*sizeof(QMP_msgmem_t));
+  QMP_msghandle_t* msg_handle_p = (QMP_msghandle_t *)Alloc("","vec_cb_norm", "msg_handle_p", 2*non_local_dirs*sizeof(QMP_msghandle_t));
+  QMP_msghandle_t multiple;
+  static int call_num = 0;
+
+  call_num++;
+  
+  //Name our function
+//  char *fname="pt_1vec_cb_norm()";
+  
+  //Set the transfer directions
+  //If wire[i] is even, then we have communication in the negative direction
+  //If wire[i] is odd, then we have communication in the positive direction
+  for(i=0;i<n;i++)
+    wire[i]=dir[i];
+
+  Float dtime;
+
+
+  //If wire[i] is odd, then we have parallel transport in the
+  //positive direction.  In this case, the matrix multiplication is
+  //done before the field is transferred over to the adjacent node
+  //
+  //If we have transfer in the negative T direction (wire[i] = 6) then
+  //we have to copy the appropriate fields into the send buffer
+  if(conjugated)
+    for(i=0;i<n;i++)
+      {
+	if(!local[wire[i]/2])
+	  {
+	    if(wire[i]%2)
+	      {
+		//printf("dir = %d, pre-mulitply\n", wire[i]);
+
+  partrans_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
+
+	      }
+	    else if((wire[i] == 6))
+	      {
+            pt_copy_buffer(non_local_chi_cb[6],(long)vin[i],(long)snd_buf_t_cb,(long)Toffset[parity]);
+	      }
+	  }
+      }
+  else
+    for(i=0;i<n;i++)
+      {
+	if(!local[wire[i]/2])
+	  {
+	    if(wire[i]%2)
+	      {
+ 
+  partrans_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);	 
+
+	      }
+	    else if(wire[i] == 6)
+	      {
+            pt_copy_buffer(non_local_chi_cb[6],(long)vin[i],(long)snd_buf_t_cb,(long)Toffset[parity]);
+	      }
+	  }
+      }
+
+  int comms = 0;
+  for(i=0;i<n;i++)
+    {
+      if(!local[wire[i]/2])
+	{
+	  //Calculate the starting address for the data to be sent
+	  IFloat *addr = vin[i] + VECT_LEN * offset_cb[wire[i]];
+
+
+	  //msg_mem_p[2*comms] = msg_mem_cb[2*wire[i]];
+	  //msg_mem_p[2*comms+1] = msg_mem_cb[2*wire[i]+1];
+
+	  msg_mem_p[2*comms] = QMP_declare_msgmem((void *)rcv_buf[wire[i]], non_local_chi_cb[wire[i]]*VECT_LEN*sizeof(IFloat));
+
+	  //Initialize the msg_mem for sends
+	  if(wire[i]%2) 
+	    msg_mem_p[2*comms+1] = QMP_declare_msgmem((void *)snd_buf_cb[wire[i]/2], non_local_chi_cb[wire[i]]*VECT_LEN*sizeof(IFloat));
+	  else if(wire[i] == 6)
+	    msg_mem_p[2*comms+1] = QMP_declare_msgmem((void *)snd_buf_t_cb, non_local_chi_cb[wire[i]]*VECT_LEN*sizeof(IFloat));
+	  else
+	    msg_mem_p[2*comms+1] = QMP_declare_strided_msgmem((void *)addr, (size_t)blklen_cb[wire[i]], numblk_cb[wire[i]], (ptrdiff_t)(stride_cb[wire[i]]+blklen_cb[wire[i]]));
+
+	  msg_handle_p[2*comms] = QMP_declare_receive_relative(msg_mem_p[2*comms], wire[i]/2, 1-2*(wire[i]%2), 0);
+	  msg_handle_p[2*comms+1] = QMP_declare_send_relative(msg_mem_p[2*comms+1], wire[i]/2, 2*(wire[i]%2)-1, 0);
+	  //printf("wire[%d] = %d, rcv = %d, snd = %d\n", i, wire[i], 1-2*(wire[i]%2), 2*(wire[i]%2)-1);
+	  comms++;
+	}
+    }
+  
+
+  if(comms) {
+    multiple = QMP_declare_multiple(msg_handle_p, 2*comms);
+    QMP_start(multiple);
+  }
+
+  //Do local calculations
+  if(conjugated)
+    {
+      for(i=0;i<n;i++)
+	{
+	
+  if(wire[i]%2)
+    partrans_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+  else
+    partrans_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+  
+	}
+    }
+  else
+    {
+    for(i=0;i<n;i++)
+      {
+
+  if(!(wire[i]%2))
+    partrans_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+  else
+    partrans_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
+
+      }
+    }
+  
+  //End transmission
+  if(comms) {
+    QMP_status_t qmp_complete_status = QMP_wait(multiple);
+    if (qmp_complete_status != QMP_SUCCESS)
+	  QMP_error("Send failed in vec_cb_norm: %s\n", QMP_error_string(qmp_complete_status));
+    QMP_free_msghandle(multiple);
+    for(int i = 0; i < 2*comms; i++)
+      QMP_free_msgmem(msg_mem_p[i]);
+    Free(msg_handle_p);
+    Free(msg_mem_p);
+  }
+
+  //If wire[i] is even, then we have transport in the negative direction.
+  //In this case, the vector field is multiplied by the SU(3) link matrix
+  //after all communication is complete
+  IFloat *fp0, *fp1;
+  for(i=0;i<n;i++)
+    {
+      if(!local[wire[i]/2])
+      	{
+	  if(!(wire[i]%2))
+	    {
+
+	    if(conjugated)
+	      partrans_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
+	    else
+	      partrans_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
+
+	    }
+	  //Otherwise we have parallel transport in the positive direction.
+	  //In this case, the received data has already been pre-multiplied
+	  //All we need to do is to put the transported field in the correct place
+	  else
+	    {
+              pt_copy(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],rcv_buf[wire[i]],vout[i]);
+	    }
+	}
+    }
+//  ParTrans::PTflops +=33*n*vol;
+}

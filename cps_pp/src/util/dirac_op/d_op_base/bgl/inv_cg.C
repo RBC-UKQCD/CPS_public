@@ -10,13 +10,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-14 17:53:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/bgl/inv_cg.C,v 1.2 2006-12-14 17:53:55 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.2 2006-12-14 17:53:55 chulwoo Exp $
+//  $Date: 2007-06-05 15:44:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/bgl/inv_cg.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/bgl/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -216,6 +216,8 @@ int DiracOp::InvCg(Vector *out,
     if (test == 1) sol-> CopyVec(sol_store, f_size_cb);
       
   
+   sync();
+
 //------------------------------------------------------------------
 // Initial step:
 // res = src - MatPcDagMatPc * sol
@@ -281,6 +283,7 @@ int DiracOp::InvCg(Vector *out,
 // Loop over CG iterations
 //------------------------------------------------------------------
 //  Gint::SynchMachine();
+   sync();
 
     unsigned long x_loc_sum = 0x0;
     for(i=0; i < max_itr; i++){
@@ -321,12 +324,14 @@ int DiracOp::InvCg(Vector *out,
   #endif
     
       DiracOpGlbSum(&d);
+//    VRB.Flow(cname,fname, "d = %e\n", IFloat(d));
   
       // If d = 0 we are done
       if(d == 0.0) break;
       //??? or should we give a warning or error? Yes we should, really.
   
       a = -res_norm_sq_prv / d;
+//      VRB.Flow(cname,fname, "a = %e\n", IFloat(a));
   
       // res = - a * (MatPcDagMatPc * dir) + res;
       // res_norm_sq_cur = res * res
@@ -367,10 +372,10 @@ int DiracOp::InvCg(Vector *out,
   
     // It has not reached stp_cnd: Issue a warning
     if(itr == dirac_arg->max_num_iter - 1){
-//      VRB.Warn(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
-//	     itr+1, IFloat(res_norm_sq_cur) );
-      ERR.General(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
-  	     itr+1, IFloat(res_norm_sq_cur) );
+      VRB.Warn(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
+	     itr+1, IFloat(res_norm_sq_cur) );
+//      ERR.General(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
+//  	     itr+1, IFloat(res_norm_sq_cur) );
     }
   
 //------------------------------------------------------------------
@@ -426,6 +431,7 @@ int DiracOp::InvCg(Vector *out,
 
 // Flash the LED and then turn it on
 //------------------------------------------------------------------
+   sync();
   VRB.FuncEnd(cname,fname);
   VRB.LedFlash(cname,fname,2);
   VRB.LedOn(cname,fname);

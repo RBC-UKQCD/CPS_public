@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.23 2006-12-13 18:26:28 chulwoo Exp $
+  $Id: config.h.in,v 1.24 2007-06-05 15:44:19 chulwoo Exp $
 */
 /* Global options for compiling the Columbia code:  
  * @configure_input@
@@ -12,13 +12,13 @@
  *  CVS keywords
  *
  *  $Author: chulwoo $
- *  $Date: 2006-12-13 18:26:28 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.23 2006-12-13 18:26:28 chulwoo Exp $
- *  $Id: config.h.in,v 1.23 2006-12-13 18:26:28 chulwoo Exp $
+ *  $Date: 2007-06-05 15:44:19 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.24 2007-06-05 15:44:19 chulwoo Exp $
+ *  $Id: config.h.in,v 1.24 2007-06-05 15:44:19 chulwoo Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.23 $
+ *  $Revision: 1.24 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -68,7 +68,6 @@
 #endif
 
 
-#if TARGET != QCDSP        /* General non-QCDSP version: */
 
 /*! Explicit casting away of the const-ness  */
 #define CAST_AWAY_CONST(x) ( const_cast<char*>(x) )
@@ -97,25 +96,6 @@
 #endif
 
 /* ------------------------------------------------------------------*/
-
-#else /* For compiling on QCDSP: */
-
-#define CPS_END_NAMESPACE 
-#define CPS_START_NAMESPACE  
-#define USING_NAMESPACE_CPS using namespace cps 
-#define CAST_AWAY_CONST(x) ( x )
-#define LOCALCALC_TYPE rfloat
-#define INTERNAL_LOCALCALC_TYPE float
-#define COMMS_DATASIZE 4
-#include<util/qcdio_qprintf.h>
-
-#ifdef _TARTAN  
-#define PARALLEL 1
-#endif /* END of TARTAN */
-
-
-#endif /* END of TARGET_ */
-
 
 #endif /* INCLUDED_CONFIG_H_ */
 

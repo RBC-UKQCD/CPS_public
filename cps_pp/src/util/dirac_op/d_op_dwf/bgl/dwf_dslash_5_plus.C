@@ -121,8 +121,10 @@ void dwf_dslash_5_plus(Vector *out,
 // Initializations
 //------------------------------------------------------------------
   int local_ls = GJP.SnodeSites(); 
-  int s_nodes = GJP.Snodes();
-  int s_node_coor = GJP.SnodeCoor();
+//  int s_nodes = GJP.Snodes();
+//  int s_node_coor = GJP.SnodeCoor();
+  int s_nodes = 1;
+  int s_node_coor = 0;
   int vol_4d_cb = dwf_lib_arg->vol_4d / 2;
   int ls_stride = 24 * vol_4d_cb;
   IFloat *f_in;

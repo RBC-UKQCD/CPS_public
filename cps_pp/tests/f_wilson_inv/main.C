@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.12 2006-09-15 06:20:16 chulwoo Exp $
+  $Id: main.C,v 1.13 2007-06-05 15:44:19 chulwoo Exp $
 */
 
 #include<config.h>
@@ -34,6 +34,7 @@ const char *psi_filename = CWDPREFIX("psi");
 
 int main(int argc,char *argv[]){
 
+    Start(&argc, &argv);
 #if TARGET == QCDOC
     DefaultSetup();
     printf("Sizes = %d %d %d %d %d %d\n",SizeX(),SizeY(),SizeZ(),SizeT(),SizeS(),SizeW());
@@ -55,8 +56,7 @@ int main(int argc,char *argv[]){
     sscanf(argv[2],"%d",&ny);
     sscanf(argv[3],"%d",&nz);
     sscanf(argv[4],"%d",&nt);
-    printf("total sites = %d %d %d %d\n",nx,ny,nz,nt);
-#if TARGET == QCDOC
+    VRB.Result("","main()","total sites = %d %d %d %d\n",nx,ny,nz,nt);
     do_arg.x_node_sites = nx/SizeX();
     do_arg.y_node_sites = ny/SizeY();
     do_arg.z_node_sites = nz/SizeZ();
@@ -67,18 +67,6 @@ int main(int argc,char *argv[]){
     do_arg.z_nodes = SizeZ();
     do_arg.t_nodes = SizeT();
     do_arg.s_nodes = 1;
-#else
-    do_arg.x_node_sites = nx;
-    do_arg.y_node_sites = ny;
-    do_arg.z_node_sites = nz;
-    do_arg.t_node_sites = nt;
-    do_arg.s_node_sites = 0;
-    do_arg.x_nodes = 1;
-    do_arg.y_nodes = 1;
-    do_arg.z_nodes = 1;
-    do_arg.t_nodes = 1;
-    do_arg.s_nodes = 1;
-#endif 
     do_arg.x_bc = BND_CND_PRD;
     do_arg.y_bc = BND_CND_PRD;
     do_arg.z_bc = BND_CND_PRD;
@@ -90,7 +78,7 @@ int main(int argc,char *argv[]){
     do_arg.beta = 5.5;
     do_arg.dwf_height = 0.9;
     do_arg.clover_coeff = 2.0171;
- //   do_arg.verbose_level = -1205;
+    do_arg.verbose_level = -12020504;
 
     do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
     do_arg.asqtad_naik = -1.0/24.0;
@@ -99,16 +87,16 @@ int main(int argc,char *argv[]){
     do_arg.asqtad_7staple = (-1.0/8.0)*0.125*(1.0/6.0);
     do_arg.asqtad_lepage = -1.0/16;
 
-	VRB.Level(0);
-	VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
-	VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
-	VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
+//	VRB.Level(0);
+//	VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
+//	VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
+//	VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
     
     CgArg cg_arg;
 
     cg_arg.mass = 0.1;
     cg_arg.stop_rsd = 1e-12;
-    cg_arg.max_num_iter = 500;
+    cg_arg.max_num_iter = 2;
     GJP.Initialize(do_arg);
 
 //    VRB.Level(GJP.VerboseLevel());
@@ -128,6 +116,8 @@ int main(int argc,char *argv[]){
     Vector *X_out =
 	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
     Vector *X_out2 =
+	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+    Vector *tmp =
 	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
 
     if(!result) ERR.Pointer("","","result");
@@ -156,11 +146,7 @@ int main(int argc,char *argv[]){
 			IFloat *temp_p = (IFloat *)(gf+4*n+3);
 
 		    IFloat crd = 1.0*s[0]+0.1*s[1]+0.01*s[2]+0.001*s[3];
-#if TARGET==QCDOC
 		  if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0 &&n==0) crd=1.0; else crd = 0.0;
-#else
-	if(n==0) crd = 1.0; else crd = 0.0;
-#endif
 					
 		    for(int v=0; v<6; v+=2){ 
 			if (v==0)
@@ -187,18 +173,19 @@ int main(int argc,char *argv[]){
 		lat.Fconvert(X_in,WILSON,CANONICAL);
 		int offset = GJP.VolNodeSites()*lat.FsiteSize()/ (2*6);
 #if 1
-#if 1
-#if TARGET==QCDOC
 		int vol = nx*ny*nz*nt/(SizeX()*SizeY()*SizeZ()*SizeT());
-#else
-		int vol = nx*ny*nz*nt;
-#endif
 		dtime = -dclock();
    		int iter = dirac.MatInv(out,X_in);
 		dtime +=dclock();
 #else
+#if 1
 		dirac.Dslash(out,X_in+offset,CHKB_EVEN,DAG_NO);
 		dirac.Dslash(out+offset,X_in,CHKB_ODD,DAG_NO);
+#else
+		dirac.Dslash(tmp,X_in+offset,CHKB_EVEN,DAG_NO);
+		dirac.Dslash(tmp+offset,X_in,CHKB_ODD,DAG_NO);
+		dirac.Dslash(out,tmp+offset,CHKB_EVEN,DAG_NO);
+		dirac.Dslash(out+offset,tmp,CHKB_ODD,DAG_NO);
 #endif
 #endif
 
@@ -222,7 +209,7 @@ int main(int argc,char *argv[]){
 
 		    int n = lat.FsiteOffset(s)*lat.SpinComponents();
 			for(int i=0; i<(lat.FsiteSize()/2); i++){
-#if TARGET == QCDOC
+#ifdef PARALLEL
 		    if ( k==0 )
 				Fprintf(ADD_ID, fp," %d %d %d %d %d ", CoorX()*GJP.NodeSites(0)+s[0], CoorY()*GJP.NodeSites(1)+s[1], CoorZ()*GJP.NodeSites(2)+s[2], CoorT()*GJP.NodeSites(3)+s[3], i);
 #else
@@ -259,5 +246,6 @@ int main(int argc,char *argv[]){
     sfree(result);
     sfree(X_out);
     sfree(X_out2);
+//    End();
     return 0; 
 }

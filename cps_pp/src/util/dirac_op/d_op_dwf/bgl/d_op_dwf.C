@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.2 2006-12-14 17:53:58 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-14 17:53:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/d_op_dwf.C,v 1.2 2006-12-14 17:53:58 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.2 2006-12-14 17:53:58 chulwoo Exp $
+//  $Date: 2007-06-05 15:44:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/d_op_dwf.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -561,6 +561,7 @@ void DiracOpDwf::MatHerm(Vector *out, Vector *in) {
 void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
 {
   char *fname = "CalcHmdForceVecs(V*)" ;
+  sync();
   VRB.Func(cname,fname) ;
 
   if (f_out == 0)
@@ -598,7 +599,11 @@ void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
 
   psi = f_in ;
 
+  sync();
+  VRB.Func(fname,"MatPc()");
   MatPc(psi,chi) ;
+  sync();
+  VRB.FuncEnd(fname,"MatPc()");
 
   {
     Float kappa = ((Dwf *)dwf_lib_arg)->dwf_kappa ;
@@ -607,12 +612,19 @@ void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
 
   rho = (Vector *)((Float *)f_out + f_size_cb) ;
 
+  sync();
+  VRB.Func(fname,"Dslash(rho,chi)");
   Dslash(rho, chi, CHKB_ODD, DAG_NO) ;
+  sync();
+  VRB.FuncEnd(fname,"Dslash(rho,chi)");
 
   sigma = (Vector *)((Float *)f_in + f_size_cb) ;
 
+  sync();
+  VRB.Func(fname,"Dslash(sigma,psi)");
   Dslash(sigma, psi, CHKB_ODD, DAG_YES) ;
 
+  VRB.FuncEnd(cname,fname) ;
   return ;
 }
 
@@ -623,7 +635,7 @@ void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
 // is the 5-dimensional globals sum glb_sum_five.
 //------------------------------------------------------------------
 void DiracOpDwf::DiracOpGlbSum(Float *float_p) {
-    VRB.Func(cname,"DiracOpGlbSum(*F)");
+//    VRB.Func(cname,"DiracOpGlbSum(*F)");
 //  if(GJP.Snodes() == 1) {
 //    glb_sum(float_p);
 //  }

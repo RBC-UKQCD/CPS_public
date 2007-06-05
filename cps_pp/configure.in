@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2007-01-10 21:54:17 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.45 2007-01-10 21:54:17 chulwoo Exp $
-dnl  $Id: configure.in,v 1.45 2007-01-10 21:54:17 chulwoo Exp $
+dnl  $Date: 2007-06-05 15:44:19 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.46 2007-06-05 15:44:19 chulwoo Exp $
+dnl  $Id: configure.in,v 1.46 2007-06-05 15:44:19 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.45 $
+dnl  $Revision: 1.46 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -148,11 +148,11 @@ AC_MSG_CHECKING([if optimising])
 AC_MSG_RESULT($enable_optimise)
 if test "$enable_optimise" = "yes"; then
    if test "$enable_target" = "bgl"; then
-     CFLAGS="${CFLAGS} -O"
-     CXXFLAGS="${CXXFLAGS} -O"
+     CFLAGS="${CFLAGS} -O -Wall"
+     CXXFLAGS="${CXXFLAGS} -O -Wall"
    else
-     CFLAGS="${CFLAGS} -O3"
-     CXXFLAGS="${CXXFLAGS} -O3"
+     CFLAGS="${CFLAGS} -O3 -Wall"
+     CXXFLAGS="${CXXFLAGS} -O3 -Wall"
    fi
 fi
 
