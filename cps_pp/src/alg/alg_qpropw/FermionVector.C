@@ -671,6 +671,14 @@ void FermionVectorTp::SetGFPointSource(Lattice& lat,int color, int spin,
  } // endif
 }
 
+void FermionVectorTp::SetGFLfuncSource(Lattice& lat, int color, int spin,
+                Float (*func)(int gx,int gy,int gz,int gt)){
+	ERR.NotImplemented(cname,"SetGFLfuncSource()");
+}
+void FermionVectorTp::SetExpSource(int color, int spin, int x, int y, int z, 
+int t, Float A, Float B, Float C){
+	ERR.NotImplemented(cname,"SetExpSource()");
+}
 
 
 void FermionVectorTp::CopyWilsonVec(int i, WilsonVector& WV) {

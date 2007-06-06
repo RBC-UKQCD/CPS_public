@@ -269,6 +269,10 @@ void QPropW::Run() {
    }
 }
 
+void QPropW::CG(Lattice &lat, CgArg *arg, FermionVectorTp& source,
+        FermionVectorTp& sol , int& iter, Float& true_res){
+	ERR.NotImplemented(cname,"CG(Lattice,CgArg,FermionVector...)");
+}
 
 // Do conjugate gradient
 void QPropW::CG(FermionVectorTp& source, FermionVectorTp& sol, 

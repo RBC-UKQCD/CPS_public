@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.15 2006-05-23 04:43:37 chulwoo Exp $
+  $Id: w_quark.C,v 1.16 2007-06-06 16:06:22 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP
@@ -16,7 +16,7 @@
 CPS_START_NAMESPACE
 
  
-#define DEBUG_W_QUARK
+#undef DEBUG_W_QUARK
 //#define DEBUG_CHECKSU3
 //#define DEBUG_W_WAVEFUNC
 #ifdef DEBUG_W_WAVEFUNC

@@ -25,8 +25,8 @@ QPropWRandArg::QPropWRandArg()
 :rng(NORAND),seed(1111)
 {}
 
-#if 0
-QPRropWExpArg::QPRropWExpArg()
+#if 1
+QPropWExpArg::QPropWExpArg()
 :exp_A(1.2),exp_B(0.1),exp_C(8)
 {}
 #endif

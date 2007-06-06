@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Routines used by the AlgOverRelax class methods:
 
-  $Id: alg_overrelax_kern.C,v 1.3 2004-10-27 10:26:09 mclark Exp $
+  $Id: alg_overrelax_kern.C,v 1.4 2007-06-06 16:06:22 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: mclark $
-//  $Date: 2004-10-27 10:26:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_overrelax/noarch/alg_overrelax_kern.C,v 1.3 2004-10-27 10:26:09 mclark Exp $
-//  $Id: alg_overrelax_kern.C,v 1.3 2004-10-27 10:26:09 mclark Exp $
+//  $Author: chulwoo $
+//  $Date: 2007-06-06 16:06:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_overrelax/noarch/alg_overrelax_kern.C,v 1.4 2007-06-06 16:06:22 chulwoo Exp $
+//  $Id: alg_overrelax_kern.C,v 1.4 2007-06-06 16:06:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_overrelax_kern.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_overrelax/noarch/alg_overrelax_kern.C,v $
 //  $State: Exp $
 //
@@ -50,9 +50,9 @@ CPS_START_NAMESPACE
 
 
 
-static int	NHITS = 10;
-static Float	SMALL = 0.2;
-static Float	EPSILON[MATRIXSIZE];
+//static int	NHITS = 10;
+//static Float	SMALL = 0.2;
+//static Float	EPSILON[MATRIXSIZE];
 static Float	MTEMP1[MATRIXSIZE];
 static Float	u_sigma[MATRIXSIZE];
 

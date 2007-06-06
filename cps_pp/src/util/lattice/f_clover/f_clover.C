@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fclover class.
 
-  $Id: f_clover.C,v 1.20 2007-03-26 21:25:48 chulwoo Exp $
+  $Id: f_clover.C,v 1.21 2007-06-06 16:06:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-03-26 21:25:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.20 2007-03-26 21:25:48 chulwoo Exp $
-//  $Id: f_clover.C,v 1.20 2007-03-26 21:25:48 chulwoo Exp $
+//  $Date: 2007-06-06 16:06:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v 1.21 2007-06-06 16:06:23 chulwoo Exp $
+//  $Id: f_clover.C,v 1.21 2007-06-06 16:06:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: f_clover.C,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_clover/f_clover.C,v $
 //  $State: Exp $
 //
@@ -510,8 +510,8 @@ ForceArg Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
       int vec_offset = FsiteSize()*gauge_offset ;
       gauge_offset = mu+4*gauge_offset ;		
 
-      Float *v1_plus_mu ;
-      Float *v2_plus_mu ;
+      Float *v1_plus_mu=NULL ;
+      Float *v2_plus_mu=NULL ;
       int vec_plus_mu_offset = FsiteSize() ;
       
       Float kappa = 1.0 / (2.0 * (mass + 4.0));

@@ -8,6 +8,8 @@
 #include <qcdocos.h>
 #include <qcdocos/gsum64.h>
 
+CPS_START_NAMESPACE
+
 enum GsumReduceType { SumReduce, MinReduce,  MaxReduce };
 
 
@@ -147,5 +149,6 @@ public:
   unsigned int Max(unsigned int);
 
 };
+CPS_END_NAMESPACE
 
 #endif

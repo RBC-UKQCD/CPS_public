@@ -1,8 +1,11 @@
 //PAB
 //
 #include <qalloc.h>
-#include <util/gsum64ext.h>
+#include <config.h>
 #include <util/error.h>
+#include <util/gsum64ext.h>
+
+CPS_START_NAMESPACE
 
 void Gsum64Ext::Init(const SCUAxis *axis_p, int Nd)
 {
@@ -408,4 +411,5 @@ double *Gsum64Ext::GsumArrayBW;
 int Gsum64Ext::Gnodes[Ndim];
 int Gsum64Ext::GCoord[Ndim];
 
+CPS_END_NAMESPACE
 

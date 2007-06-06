@@ -107,7 +107,7 @@ AlgActionQuotient::AlgActionQuotient(AlgMomentum &mom,
     tmp2 = (Vector*)smalloc(f_size*sizeof(Float),"tmp2",fname,cname);
     
     for (int i=0; i<n_masses; i++) {
-      int deg;
+      int deg=0;
       if (chrono[i] > 0) deg = chrono[i];
       else if (chrono[i] == 0) deg = 1;
       else ERR.General(cname,fname,"Cannot have negative chronology\n");
@@ -145,7 +145,7 @@ AlgActionQuotient::~AlgActionQuotient() {
   if(n_masses > 0){
     //!< Free chronology
     for (int i=0; i<n_masses; i++) {
-      int deg;
+      int deg=0;
       if (chrono[i] > 0) deg = chrono[i];
       else if (chrono[i] == 0) deg = 1;
 

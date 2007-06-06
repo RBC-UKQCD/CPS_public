@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.30 2007-06-05 15:44:19 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.31 2007-06-06 16:06:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -754,9 +754,9 @@ ForceArg FdwfBase::EvolveMomFforce( Matrix* mom, // momenta
             // offset for link in mu direction from this point
             gauge_offset = mu+4*gauge_offset ; 
             
-            Float *v1_plus_mu ;
-            Float *v2_plus_mu ;
-            int vec_plus_mu_stride ;
+            Float *v1_plus_mu=NULL ;
+            Float *v2_plus_mu=NULL ;
+            int vec_plus_mu_stride=0 ;
             int vec_plus_mu_offset = f_site_size_4d ;
             
             // sign of coeff (look at momenta update)
@@ -984,7 +984,7 @@ ForceArg FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 					Float dt, Vector **sol_d, 
 					ForceMeasure force_measure) {
   char *fname = "RHMC_EvolveMomFforce";
-  char *force_label;
+  char *force_label=NULL;
 
   Float L1 = 0.0;
   Float L2 = 0.0;

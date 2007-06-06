@@ -5,6 +5,7 @@
 #include <gauge_agg.h>
 #include <asqtad_int.h>
 #else //SCIDAC
+//#include <precision.h>
 #include <util/gauge_agg.h>
 #include <util/asqtad_int.h>
 #endif //SCIDAC
@@ -13,7 +14,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.18 2006-11-25 19:09:48 chulwoo Exp $
+  $Id: pt_int.h,v 1.19 2007-06-06 16:06:22 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 #ifdef USE_SCU

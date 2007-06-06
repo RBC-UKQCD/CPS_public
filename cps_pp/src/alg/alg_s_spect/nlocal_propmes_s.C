@@ -148,7 +148,7 @@ void NLSMesonPropS::transfer(Float **qp, Float **buffer, int t)
 
 int NLSMesonPropS::x_map(int *x)
 {
-  int offset1;
+  int offset1=0;
   int y[4]={ x[0]+1, x[1]+1, x[2]+1,0};  
   int offset0 = y[0] + ( nx[0]+2 ) * y[1] + ( nx[0]+2 ) * ( nx[1]+2 ) * y[2] ;
   if (x[2]== -1) offset1=0;

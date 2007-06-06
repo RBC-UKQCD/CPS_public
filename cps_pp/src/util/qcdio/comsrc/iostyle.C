@@ -88,8 +88,8 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
   char * pd = data;
 
   VRB.Result(cname, fname, "Parallel loading starting\n");
-//  setConcurIONumber(rd_arg.ConcurIONumber);
-  setConcurIONumber(1);
+  setConcurIONumber(rd_arg.ConcurIONumber);
+//  setConcurIONumber(1);
   //
   getIOTimeSlot();
 
@@ -109,8 +109,15 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
 	  input.seekg(jump,ios_base::cur);
 
 	  for(int xr=xbegin;xr<xend;xr++) {
-            unsigned int r_pos = input.tellg();
 	    int try_num =0;
+#if 1
+           input.read(fbuf,chars_per_site);
+           if(!input.good()) {
+             error = 1;
+             goto sync_error;
+           }
+#else
+            unsigned int r_pos = input.tellg();
             long long lcsum=-1,lcsum2=-1;
             do {
               lcsum2=lcsum;
@@ -126,6 +133,7 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
 //             printf("Node %d: csum error in ParIO::load()\n",UniqueID());
 //	      goto sync_error;
 //	    }
+#endif
 
 	    csum += dconv.checksum(fbuf,data_per_site);
 	    pdcsum += dconv.posDepCsum(fbuf, data_per_site, dimension,	rd_arg, siteid, 0);
@@ -248,8 +256,8 @@ int ParallelIO::store(iostream & output,
   int siteid=0;
 
   VRB.Result(cname, fname, "Parallel unloading starting\n");
-//  setConcurIONumber(wt_arg.ConcurIONumber);
-  setConcurIONumber(1);
+  setConcurIONumber(wt_arg.ConcurIONumber);
+//  setConcurIONumber(1);
   getIOTimeSlot();
 
   int retry=0;
@@ -297,6 +305,14 @@ do {
 
 	      csum += dconv.checksum(fbuf,data_per_site);
 	      pdcsum += dconv.posDepCsum(fbuf, data_per_site, dimension, wt_arg, siteid, 0);
+#if 1
+             output.write(fbuf,chars_per_site);
+ 
+             if(!output.good()) {
+               error = 1;
+               goto sync_error;
+             }
+#else
 
               unsigned int lcsum,lcsum2;
               lcsum=dconv.checksum(fbuf,data_per_site);
@@ -321,6 +337,7 @@ do {
                 printf("Node %d:write jump=%d csum=%x csum2=%x\n",UniqueID(),jump,lcsum,lcsum2);
               }while (lcsum !=lcsum2|| try_num<10);
   	      output.seekp(w_pos, ios_base::beg);
+#endif
 	      siteid++;
 	    }	  
 	  

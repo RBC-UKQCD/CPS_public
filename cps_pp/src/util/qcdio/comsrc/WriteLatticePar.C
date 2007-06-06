@@ -2,8 +2,8 @@
 #include <util/WriteLatticePar.h>
 #include <util/iostyle.h>
 
-CPS_START_NAMESPACE
 using namespace std;
+CPS_START_NAMESPACE
 
 void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 {
@@ -63,7 +63,7 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   
   fstream output;
 
-  cps::sync();
+  sync();
   if(parIO()) {
     // all open file, start writing
     output.open(wt_arg.FileName,ios::out);

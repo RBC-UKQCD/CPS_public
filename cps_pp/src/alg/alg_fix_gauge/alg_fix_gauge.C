@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Implementation of AlgFixGauge class methods.
 
-  $Id: alg_fix_gauge.C,v 1.9 2004-09-02 16:56:30 zs Exp $
+  $Id: alg_fix_gauge.C,v 1.10 2007-06-06 16:06:22 chulwoo Exp $
 */
 //------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:56:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v 1.9 2004-09-02 16:56:30 zs Exp $
-//  $Id: alg_fix_gauge.C,v 1.9 2004-09-02 16:56:30 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2007-06-06 16:06:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v 1.10 2007-06-06 16:06:22 chulwoo Exp $
+//  $Id: alg_fix_gauge.C,v 1.10 2007-06-06 16:06:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_fix_gauge.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -116,6 +116,10 @@ void AlgFixGauge::run()
 	  break;
       case FIX_GAUGE_COULOMB_T:
 	  lattice_dir_size = GJP.TnodeSites() * GJP.Tnodes();
+	  break;
+      case FIX_GAUGE_NONE:
+      case FIX_GAUGE_LANDAU:
+	  break;
       }
 
     if(start+step*(num-1) >= lattice_dir_size)

@@ -16,6 +16,7 @@
 //------------------------------------------------------------------
 
 #include <stdio.h>
+#include <config.h>
 #include <util/dirac_op.h>
 #include <util/lattice.h>
 #include <util/gjp.h>
@@ -32,8 +33,8 @@
 #include <qalloc.h>
 #include <ppc_lib.h>
 #endif
-CPS_START_NAMESPACE
 
+CPS_START_NAMESPACE
 extern "C"{
   void vaxmy(Float *scale,Vector *mult,Vector *sub,int ncvec);
   void vaxmy_vxdot(Float *scale, Vector *mult, Vector *sub, int ncvec, Float *norm);

@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2007-06-05 15:44:19 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.46 2007-06-05 15:44:19 chulwoo Exp $
-dnl  $Id: configure.in,v 1.46 2007-06-05 15:44:19 chulwoo Exp $
+dnl  $Date: 2007-06-06 16:06:22 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.47 2007-06-06 16:06:22 chulwoo Exp $
+dnl  $Id: configure.in,v 1.47 2007-06-06 16:06:22 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.46 $
+dnl  $Revision: 1.47 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -99,7 +99,7 @@ if test "$enable_target" = "qcdoc"; then
    ARCH="QCDOC"
    ARCHDIR="QCDOC_DIR"
    TESTING_PARALLEL="yes";
-   namespace_default="no" 
+#   namespace_default="no" 
 
 elif test "$enable_target" = "bgl"; then
 #     AC_PATH_PROG(CC, blrts_xlc)

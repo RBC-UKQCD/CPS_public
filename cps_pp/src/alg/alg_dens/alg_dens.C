@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgDens class.
   
-  $Id: alg_dens.C,v 1.4 2006-04-13 19:05:48 chulwoo Exp $
+  $Id: alg_dens.C,v 1.5 2007-06-06 16:06:22 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 19:05:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.4 2006-04-13 19:05:48 chulwoo Exp $
-//  $Id: alg_dens.C,v 1.4 2006-04-13 19:05:48 chulwoo Exp $
+//  $Date: 2007-06-06 16:06:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.5 2007-06-06 16:06:22 chulwoo Exp $
+//  $Id: alg_dens.C,v 1.5 2007-06-06 16:06:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_dens.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v $
 //  $State: Exp $
 //
@@ -190,7 +190,7 @@ void AlgDens::run()
   int ls_glb;
   int obsID;
   int order;
-  Complex TrObs=(0.,0.);
+  Complex TrObs(0.,0.);
   Float norm;
   Float true_res;
   Float true_res2;

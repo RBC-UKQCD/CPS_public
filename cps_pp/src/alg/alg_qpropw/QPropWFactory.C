@@ -7,7 +7,7 @@ QPropW* QPropWFactory::Create(
   Lattice &lat, SourceType type, 
   QPropWArg *arg, CommonArg *c_arg, void *e_arg
 ){
-  QPropW *qpropw;
+  QPropW *qpropw=NULL;
   switch (type) {
     case WALL:
       qpropw = new QPropWWallSrc(lat, arg, c_arg);

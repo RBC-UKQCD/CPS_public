@@ -6,6 +6,7 @@
 
 //AsqD asqd;
 AsqD *asqd_p;
+CPS_START_NAMESPACE
 static Fasqtad *lat_pt;
 
 extern "C" void asqtad_dirac_init(Fasqtad *lat){
@@ -60,3 +61,4 @@ void asqtad_destroy_dirac_buf(){
 void asqtad_destroy_dirac_buf_g(){
   asqd_p->destroy_buf_g();
 }
+CPS_END_NAMESPACE

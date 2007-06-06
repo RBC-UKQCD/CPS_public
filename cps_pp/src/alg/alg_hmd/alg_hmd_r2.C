@@ -198,7 +198,7 @@ Float AlgHmdR2::run(void)
   Float cg_iter_av;
   int   cg_iter_min;
   int   cg_iter_max;
-  Float true_res;
+  Float true_res=0.;
   Float true_res_av;
   Float true_res_min;
   Float true_res_max;
