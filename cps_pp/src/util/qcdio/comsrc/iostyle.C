@@ -110,7 +110,7 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
 
 	  for(int xr=xbegin;xr<xend;xr++) {
 	    int try_num =0;
-#if 1
+#if 0
            input.read(fbuf,chars_per_site);
            if(!input.good()) {
              error = 1;
@@ -305,7 +305,7 @@ do {
 
 	      csum += dconv.checksum(fbuf,data_per_site);
 	      pdcsum += dconv.posDepCsum(fbuf, data_per_site, dimension, wt_arg, siteid, 0);
-#if 1
+#if 0
              output.write(fbuf,chars_per_site);
  
              if(!output.good()) {

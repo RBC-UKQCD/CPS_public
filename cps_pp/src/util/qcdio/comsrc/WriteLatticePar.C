@@ -63,11 +63,15 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   
   fstream output;
 
+  if (isRoot()){
+    output.open(wt_arg.FileName,ios::out);
+	output.close();
+  }
+  Float temp=0.;
+  glb_sum(&temp);
   sync();
   if(parIO()) {
     // all open file, start writing
-    output.open(wt_arg.FileName,ios::out);
-	output.close();
     output.open(wt_arg.FileName);
     if(!output.good())    {
       //      VRB.Flow(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);
@@ -129,7 +133,7 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
       ERR.General(cname, fname, "Unload failed\n");
   }
 #endif
-  output.flush();
+//  output.flush();
 
   log();
 
