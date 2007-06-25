@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.28 2007-03-30 06:20:12 chulwoo Exp $
+  $Id: gjp.h,v 1.29 2007-06-25 21:07:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-03-30 06:20:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.28 2007-03-30 06:20:12 chulwoo Exp $
-//  $Id: gjp.h,v 1.28 2007-03-30 06:20:12 chulwoo Exp $
+//  $Date: 2007-06-25 21:07:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.29 2007-06-25 21:07:42 chulwoo Exp $
+//  $Id: gjp.h,v 1.29 2007-06-25 21:07:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.28 $
+//  $Revision: 1.29 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -799,6 +799,7 @@ start and end of main()
 #if TARGET == NOARCH
 inline void Start(){}
 inline void End(){}
+void Start(int * argc, char ***argv){}
 #else
 void Start();
 void End();
