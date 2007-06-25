@@ -65,46 +65,6 @@ void qio_getFieldSingle(char *buf, size_t index, int count, void *arg)
 
 }
 
-void qio_getGlobal(char *buf, size_t index, int count, void *arg)
-{
-
-#ifdef DEBUG_GlobalWrite
-  printf("GetGlobal: UID: %i: called with index: %i, count: %i\n",UniqueID(),index, count);
-#endif // DEBUG_GlobalWrite
-    
-
-  Float *data = (Float *) arg;
-  Float *outp = (Float *) buf;
-
-  for(int ii(0); ii < count; ++ ii)
-    *(outp + ii) = *(data + ii);
-
-#ifdef DEBUG_GlobalWrite
-  printf("GetGlobal: UID: %i: wrote %f %f to GlobalData\n",UniqueID(),*(outp), *(outp+1));
-#endif // DEBUG_GlobalWrite
-
-}
-
-
-void qio_getGlobalSingle(char *buf, size_t index, int count, void *arg)
-{
-
-#ifdef DEBUG_GlobalWrite
-  printf("GetGlobalSingle: UID: %i: called with index: %i, count: %i\n",UniqueID(),index, count);
-#endif // DEBUG_GlobalWrite
-    
-
-  Float *data = (Float *) arg;
-  float *outp = (float *) buf;
-
-  for(int ii(0); ii < count; ++ ii)
-    *(outp + ii) = *(data + ii);
-
-#ifdef DEBUG_GlobalWrite
-  printf("GetGlobalSingle: UID: %i: wrote %f %f to GlobalData\n",UniqueID(),*(outp), *(outp+1));
-#endif // DEBUG_GlobalWrite
-
-}
 
 
 // now start class-functions...
@@ -117,11 +77,7 @@ void qio_writeLattice::qio_openOutput(char *filename, char *stringLFN, char *xml
   VRB.Func(cname,fname);
 
   const int volfmt(volFormat);
-  int serpar = QIO_SERPAR;
-#if TARGET == QCDOC
-  if ( volFormat == QIO_SINGLEFILE) 
-    serpar = QIO_PARALLEL;
-#endif
+  const int serpar(QIO_SERPAR);
   const int ildgstyle(QIO_ILDGSTYLE);
 
   QIO_String *xml_file_out;

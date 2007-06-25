@@ -37,6 +37,7 @@ class qio_readLattice: private qio_init {
   void qio_closeInput()
     { QIO_close_read(qio_Input);}
 
+  void qio_communicateTchunks(void *start);
 
 };
 

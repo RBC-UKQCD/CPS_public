@@ -1,0 +1,9 @@
+
+for name in reordersplit reorderunsplit; do
+
+	command="g++ -o a.$name $name.C"
+	echo $command
+	$command
+
+done
+

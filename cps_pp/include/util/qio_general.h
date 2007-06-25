@@ -1,7 +1,7 @@
 #ifndef __QIOGENERAL__
 #define __QIOGENERAL__
 
-#include <config.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -19,6 +19,7 @@
 #include <qio.h>
 
 #include <util/qio_xmlinfo.h>
+#include <util/qio_xmlinfo_prop.h>
 
 extern "C"
 {
@@ -43,6 +44,11 @@ extern "C"
 #undef DEBUG_GlobalWrite
 #undef DEBUG_GlobalRead
 #undef DEBUG_Init
+#undef DEBUG_commTchunk
+#undef DEBUG_GetProp
+#undef DEBUG_PutProp
+#undef DEBUG_ReadPropagator
+#undef DEBUG_WritePropagator
 
 #ifdef DEBUG_PARANOID
  #define DEBUG_NodeIndex
@@ -55,6 +61,11 @@ extern "C"
  #define DEBUG_GlobalWrite
  #define DEBUG_GlobalRead
  #define DEBUG_Init
+ #define DEBUG_commTchunk
+ #define DEBUG_GetProp
+ #define DEBUG_PutProp
+ #define DEBUG_ReadPropagator
+ #define DEBUG_WritePropagator
 #endif //DEBUG_PARANOID
 
 #define DO_recordInfo
@@ -74,7 +85,14 @@ extern "C"
  #define QIO_VOLFMT QIO_PARTFILE
 
 /* one of QIO_SERIAL, QIO_PARALLEL */
- #define QIO_SERPAR QIO_SERIAL
+ #define QIO_SERPAR QIO_PARALLEL
+
+/* for safety added for QCDOC */
+
+#if TARGET == QCDOC
+	#define QIO_SERPAR QIO_PARALLEL
+#endif
+
 
 /* one of QIO_ILDGNO, ??ILDGLAT?? */
  #define QIO_ILDGSTYLE QIO_ILDGLAT 
@@ -86,12 +104,20 @@ extern "C"
  #define QMP_VERB_LEVEL 0 
 
 
-#define TOLERANCE 1e-5 //for Plaq, LinkTr check
+#define TOLERANCE 1e-5 //for Plaq, LinkTr, Propagator-Slice check
 
 /* xml-file header for gauge-config */
-#define QIO_XML_FILE_GAUGE "<?xml version=\"1.0\" encoding=\"UTF-8\"?><title>Dummy QCDML</title>"
+#define QIO_XML_FILE_GAUGE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 
 #define MAX_HEADER_LINE 255 //maximal length for char-string ensemble-label,-id
+
+/* xml-file header for propagator */
+#define QIO_XML_FILE_PROP "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+
+/* spin and color range for propagator-output in QIO */
+#define QIO_PROP_SPIN_MAX 4
+#define QIO_PROP_COLOR_MAX 3
+
 
 /***********************************************************************************************/
 
@@ -99,6 +125,8 @@ extern "C"
 CPS_START_NAMESPACE
 using namespace std;
 
+
+enum QIO_PROP_SOURCE_TYPES {QIO_UNKNOWN_SOURCE=0, QIO_SCALAR_SOURCE, QIO_FULL_SOURCE};
 
 class qio_init {
 
@@ -121,11 +149,32 @@ class qio_init {
       // check for 5th Dim
 
       
+      //if(GJP.Snodes() > 1)
+      //{
+      //  ERR.General(cname,fname,"QIO-WARNING: QIO (so far) only tested without 5th dim. parallelized. BE CAREFUL!!!\n");
+      //exit(-1);
+      //}
+
+
+      
       if(GJP.Snodes() > 1)
 	{
-	  ERR.General(cname,fname,"QIO-ERROR: QIO (so far) only works without 5th dim. parallelized, SORRY!\n");
-	  exit(-1);
+	  // check if local-T-size can be splitted by S-nodes
+	  int Tchunk=GJP.NodeSites(3)/GJP.Snodes();
+
+	  if( Tchunk == 0 )
+	    {
+	      ERR.General(cname,fname,"QIO-ERROR: local-T-size too small for number of nodes in S-direction!!!!\n");
+	      exit(-1);
+	    }
+
+	  if( (Tchunk*GJP.Snodes()) != GJP.NodeSites(3) )
+	    {
+	      ERR.General(cname,fname,"QIO-ERROR: number of nodes in S-direction is not a divider of locat-T-size!!!\n");
+	      exit(-1);
+	    }
 	}
+
 
 
       // start QMP
@@ -199,6 +248,25 @@ class qio_init {
 
 
 };
+
+// general functions for reading global data
+
+
+void qio_putGlobal(char *buf, size_t index, int count, void *arg);
+
+void qio_putGlobalSingle(char *buf, size_t index, int count, void *arg);
+
+
+// writing global data
+
+
+void qio_getGlobal(char *buf, size_t index, int count, void *arg);
+
+void qio_getGlobalSingle(char *buf, size_t index, int count, void *arg);
+
+
+
+
 
 
 CPS_END_NAMESPACE

@@ -63,43 +63,6 @@ void qio_putFieldSingle(char *buf, size_t index, int count, void *arg)
 }
 
 
-void qio_putGlobal(char *buf, size_t index, int count, void *arg)
-{
-
-#ifdef DEBUG_GlobalRead
-  printf("PutGlobal: UID: %i: called with index: %i, count: %i\n",UniqueID(),index, count);
-#endif // DEBUG_GlobalRead
-    
-  Float *data = (Float *) buf;
-  Float *outp = (Float *) arg;
-
-  for(int ii(0); ii < count; ++ ii)
-    *(outp + ii) = *(data + ii);
-
-#ifdef DEBUG_GlobalRead
-  printf("PutGlobal: UID: %i: wrote %f %f to GlobalData\n",UniqueID(),*(outp), *(outp+1));
-#endif // DEBUG_GlobalRead
-
-}
-
-void qio_putGlobalSingle(char *buf, size_t index, int count, void *arg)
-{
-
-#ifdef DEBUG_GlobalRead
-  printf("PutGlobalSingle: UID: %i: called with index: %i, count: %i\n",UniqueID(),index, count);
-#endif // DEBUG_GlobalRead
-    
-  float *data = (float *) buf;
-  Float *outp = (Float *) arg;
-
-  for(int ii(0); ii < count; ++ ii)
-    *(outp + ii) = *(data + ii);
-
-#ifdef DEBUG_GlobalRead
-  printf("PutGlobal: UID: %i: wrote %f %f to GlobalData\n",UniqueID(),*(outp), *(outp+1));
-#endif // DEBUG_GlobalRead
-
-}
 
 
 // now start class-functions...
@@ -183,8 +146,8 @@ void qio_readLattice::read(char *infile, Lattice &lat, int volFormat)
 
   qio_setLayout();
 
-  // forces reading ???
-  layout.latdim = 0;
+  // forces reading ???  ERROR after v2.1.2 !!!
+  //layout.latdim = 0;
   
 
   // create the record info
@@ -323,6 +286,10 @@ void qio_readLattice::read(char *infile, Lattice &lat, int volFormat)
 
    CPS_QIO_decode_user_record_info(qio_UserRecordInfo, record_xml);
   
+
+   // communicate T-chunks in S-direction
+   if( GJP.Snodes() > 1)
+     qio_communicateTchunks(rlat);
    
   
   // now check the plaquette, linkTrace
@@ -438,6 +405,117 @@ void qio_readLattice::read(char *infile, Lattice &lat, int volFormat)
 
 
 }
+
+
+void qio_readLattice::qio_communicateTchunks(void *start)
+{
+
+
+  char * fname="qio_communicateTchunks()";
+  VRB.Func(cname,fname);
+
+
+#ifdef DEBUG_commTchunk
+  printf("UID: %i, qio_communicateTchunks called\n",UniqueID());
+#endif // DEBUG_commTchunk
+
+
+  Matrix *mat = (Matrix *)start;
+
+
+  //figure out chunk size
+  
+  int chunk_size = 4 * GJP.NodeSites(0) * GJP.NodeSites(1) * GJP.NodeSites(2) * GJP.NodeSites(3)/ GJP.Snodes();
+  int data_size = chunk_size * sizeof(Matrix);
+
+#ifdef DEBUG_commTchunk
+  printf("matrix size: %i, Float size: %i, comm-size: %i\n",sizeof(Matrix), sizeof(Float), COMMS_DATASIZE);
+  printf("UID: %i, qio_communicateTchunks chunk_size: %i, data_size: %i\n",UniqueID(), chunk_size, data_size);
+#endif // DEBUG_commTchunk
+
+
+
+  SCUDirArg* data_send    = new SCUDirArg();
+  SCUDirArg* data_receive = new SCUDirArg();
+  
+
+  int send_chunk, receive_chunk;
+
+  send_chunk = GJP.SnodeCoor();
+
+  receive_chunk = send_chunk + GJP.Snodes() - 1;
+  receive_chunk %= GJP.Snodes();
+
+  //loop over number nodes in S-direction
+  for( int nn(0); nn < (GJP.Snodes()-1); ++nn)
+    {
+      
+
+#ifdef DEBUG_commTchunk
+      printf("UID: %i, qio_communicateTchunks: S-coor:%i sends %i, receives %i\n",UniqueID(),GJP.SnodeCoor(),send_chunk, receive_chunk);
+#endif // DEBUG_commTchunk
+
+
+
+      // send address, receive address
+      
+      Matrix *send_mat = mat + send_chunk*chunk_size;
+      Matrix *receive_mat = mat + receive_chunk*chunk_size;
+      
+      // sending up, receiving down 
+
+#ifdef DEBUG_commTchunk
+      printf("UID: %i, qio_communicateTchunks: S-coor:%i start send/receive at %i/%i...\n",UniqueID(),GJP.SnodeCoor(), send_mat, receive_mat);
+#endif // DEBUG_commTchunk
+
+
+      data_send->   Init( (void*)send_mat,    SCU_SP, SCU_SEND, data_size );
+      data_receive->Init( (void*)receive_mat, SCU_SM, SCU_REC,  data_size );
+
+#ifdef DEBUG_commTchunk
+      printf("UID: %i, qio_communicateTchunks: S-coor:%i ...initialized...\n",UniqueID(),GJP.SnodeCoor());
+
+      Float *test1_s= (Float *)send_mat;
+      Float *test1_r= (Float *)receive_mat;
+      Float *test2_s= (Float *)send_mat + ( 18 * 4 * GJP.NodeSites(0) * GJP.NodeSites(1) * GJP.NodeSites(2) * GJP.NodeSites(3)/ GJP.Snodes() ) -1;
+      Float *test2_r= (Float *)receive_mat + ( 18 * 4 * GJP.NodeSites(0) * GJP.NodeSites(1) * GJP.NodeSites(2) * GJP.NodeSites(3)/ GJP.Snodes() ) -1;
+      printf("UID: %i, qio_communicateTchunks: S-coor:%i  send: %f, receive: %f, end: %f %f\n",UniqueID(),GJP.SnodeCoor(), *test1_s, *test1_r, *test2_s, *test2_r);
+#endif // DEBUG_commTchunk
+
+
+
+      SCUTrans(data_send);
+      SCUTrans(data_receive);
+      SCUTransComplete();
+
+#ifdef DEBUG_commTchunk
+      printf("UID: %i, qio_communicateTchunks: S-coor:%i ...done!\n",UniqueID(),GJP.SnodeCoor());
+
+      printf("UID: %i, qio_communicateTchunks: S-coor:%i  send: %f, receive: %f end: %f %f\n",UniqueID(),GJP.SnodeCoor(), *test1_s, *test1_r, *test2_s, *test2_r);
+#endif // DEBUG_commTchunk
+
+
+      // new send/receive
+
+      send_chunk = receive_chunk;
+      
+      receive_chunk = send_chunk + GJP.Snodes() - 1;
+      receive_chunk %= GJP.Snodes();
+
+
+
+    }
+
+
+#ifdef DEBUG_commTchunk
+  printf("UID: %i, qio_communicateTchunks finished\n",UniqueID());
+#endif // DEBUG_commTchunk
+  
+  VRB.FuncEnd(cname,fname);
+
+}
+
+
 
 CPS_END_NAMESPACE
 #endif

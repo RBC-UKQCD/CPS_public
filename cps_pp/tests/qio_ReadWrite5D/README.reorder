@@ -1,0 +1,18 @@
+
+
+these codes produce scripts to re-order your configs after splitting/before unsplitting.
+
+Use the qio-convert-tool with
+
+dim = 4
+
+Xdim Ydim Zdim (Tdim*Sdim)
+
+e.g. the layout-file should read
+
+4
+2 2 2 8
+
+if you run with 
+
+qpartition_remap -T05 -X1 -Y2 -Z3 -S4 

@@ -35,7 +35,7 @@ typedef struct {
 } CPS_QIO_UserRecordInfo;
 
 
-#define CPS_QIO_USERRECORDFORMATVERSION "0.0"
+#define CPS_QIO_USERRECORDFORMATVERSION "1.0"
 
 #define CPS_QIO_USER_RECORD_INFO_TEMPLATE {\
    {"version", "", "", 0}, \
