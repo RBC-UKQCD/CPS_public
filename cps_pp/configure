@@ -3816,8 +3816,8 @@ if test "$enable_target" = "qcdoc"; then
    AR="env QGCC_EXEC_PREFIX=\${QOSLIB} ${AR}"
    LD="env QGCC_EXEC_PREFIX=\${QOSLIB} ${LD}"
    INCLUDE_FLAGS=""
-   CFLAGS="-D_GCC_"
-   CXXFLAGS="-D_GCC_"
+   CFLAGS="-D_GCC_ -Wall"
+   CXXFLAGS="-D_GCC_ -Wall"
    ASFLAGS=""
    LDFLAGS=""
 
@@ -4028,8 +4028,8 @@ if test "$enable_optimise" = "yes"; then
      CFLAGS="${CFLAGS} -O -Wall"
      CXXFLAGS="${CXXFLAGS} -O -Wall"
    else
-     CFLAGS="${CFLAGS} -O3 -Wall"
-     CXXFLAGS="${CXXFLAGS} -O3 -Wall"
+     CFLAGS="${CFLAGS} -O3"
+     CXXFLAGS="${CXXFLAGS} -O3"
    fi
 fi
 
