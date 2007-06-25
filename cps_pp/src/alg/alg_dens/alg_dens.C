@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgDens class.
   
-  $Id: alg_dens.C,v 1.5 2007-06-06 16:06:22 chulwoo Exp $
+  $Id: alg_dens.C,v 1.6 2007-06-25 15:49:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-06 16:06:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.5 2007-06-06 16:06:22 chulwoo Exp $
-//  $Id: alg_dens.C,v 1.5 2007-06-06 16:06:22 chulwoo Exp $
+//  $Date: 2007-06-25 15:49:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.6 2007-06-25 15:49:20 chulwoo Exp $
+//  $Id: alg_dens.C,v 1.6 2007-06-25 15:49:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_dens.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v $
 //  $State: Exp $
 //
@@ -185,7 +185,7 @@ void AlgDens::run()
 #if TARGET==cpsMPI
     using MPISCU::fprintf;
 #endif
-  int iter;
+  int iter=0;
   int ls;
   int ls_glb;
   int obsID;
@@ -194,7 +194,7 @@ void AlgDens::run()
   Float norm;
   Float true_res;
   Float true_res2;
-  FILE *fp;
+  FILE *fp=NULL;
   DensArg *dens_arg;
   CgArg cg_arg_struct;
   CgArg *cg_arg = &cg_arg_struct;

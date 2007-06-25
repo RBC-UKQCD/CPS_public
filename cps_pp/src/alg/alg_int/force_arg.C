@@ -3,13 +3,13 @@
 
 CPS_START_NAMESPACE
 
-ForceArg::ForceArg() : L1(0.0), L2(0.0), Linf(0.0), cname("ForceArg") 
+ForceArg::ForceArg() : cname("ForceArg"), L1(0.0), L2(0.0), Linf(0.0)
 {
 //  char *fname="ForceArg()";
 //  printf("%s::%s: allocated (%p)\n",cname,fname,this);
 }
 
-ForceArg::ForceArg(Float L1, Float L2, Float Linf) : L1(fabs(L1)), L2(fabs(L2)), Linf(fabs(Linf)), cname("ForceArg")
+ForceArg::ForceArg(Float L1, Float L2, Float Linf) : cname("ForceArg"), L1(fabs(L1)), L2(fabs(L2)), Linf(fabs(Linf))
 {
 //  char *fname="ForceArg()";
 //  printf("%s::%s: allocated (%p)\n",cname,fname,this);

@@ -98,7 +98,7 @@ QPropW::QPropW(Lattice& lat, QPropWArg* arg, CommonArg* c_arg):
   midprop = NULL;
 }
 // copy constructor
-QPropW::QPropW(const QPropW& rhs):Alg(rhs),prop(NULL),midprop(NULL) {
+QPropW::QPropW(const QPropW& rhs):Alg(rhs),midprop(NULL),prop(NULL) {
 
   char *fname = "QPropW(const QPropW&)";
   cname = "QPropW";

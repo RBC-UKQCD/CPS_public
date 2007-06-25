@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 
 QPropWArg::QPropWArg()
 : 
-t(0),
+  file(NULL),
+  t(0),
   gauge_fix_src(0),
   gauge_fix_snk(0),
   store_midprop(0),
   save_prop(0),
-  do_half_fermion(0),
-  file(NULL)
+  do_half_fermion(0)
 {}
 
 QPropWPointArg::QPropWPointArg()

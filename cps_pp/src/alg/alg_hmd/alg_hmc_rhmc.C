@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_rhmc.C,v 1.27 2006-04-13 19:05:56 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.28 2007-06-25 15:49:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 /*
   $Author: chulwoo $
-  $Date: 2006-04-13 19:05:56 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.27 2006-04-13 19:05:56 chulwoo Exp $
-  $Id: alg_hmc_rhmc.C,v 1.27 2006-04-13 19:05:56 chulwoo Exp $
+  $Date: 2007-06-25 15:49:20 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.28 2007-06-25 15:49:20 chulwoo Exp $
+  $Id: alg_hmc_rhmc.C,v 1.28 2007-06-25 15:49:20 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: alg_hmc_rhmc.C,v $
-  $Revision: 1.27 $
+  $Revision: 1.28 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_rhmc.C,v $
   $State: Exp $
 */
@@ -407,13 +407,13 @@ Float AlgHmcRHMC::run(void)
   int accept;
 
   int cg_iter;
-  Float cg_iter_av;
-  int cg_iter_min;
-  int cg_iter_max;
-  Float true_res_av;
-  Float true_res_min;
-  Float true_res_max;
-  int cg_calls;
+  Float cg_iter_av=0;
+  int cg_iter_min=0;
+  int cg_iter_max=0;
+  Float true_res_av=0;
+  Float true_res_min=0;
+  Float true_res_max=0;
+  int cg_calls=0;
   int shift;
   int i, j;
   char *fname = "run()";
@@ -1085,7 +1085,7 @@ void AlgHmcRHMC::dynamicalApprox()
   Float **hsum = (Float**) smalloc(sizeof(Float*), 
 				   cname,fname, "hsum");
 
-  size_t hsum_size;
+  size_t hsum_size=0;
   switch(eig_arg->hsum_dir == 0){
   case DIR_X:
     hsum_size = GJP.Xnodes()*GJP.XnodeSites() * sizeof(Float);

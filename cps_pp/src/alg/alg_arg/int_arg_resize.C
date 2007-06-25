@@ -3,14 +3,14 @@
 
 CPS_START_NAMESPACE
 
-void ActionBilinearArg::resize(int nmass) {
+void ActionBilinearArg::resize(u_int nmass) {
 
   bilinears.bilinears_len = nmass;
   bilinears.bilinears_val = new BilinearDescr[nmass];
 
 }
 
-void ActionRationalArg::resize(int nmass) {
+void ActionRationalArg::resize(u_int nmass) {
 
   bi_arg.resize(nmass);
   rationals.rationals_len = nmass;
@@ -18,7 +18,7 @@ void ActionRationalArg::resize(int nmass) {
 
 }
 
-void ActionRationalArg::resize(int mass, int deg_md, int deg_mc) {
+void ActionRationalArg::resize(u_int mass, int deg_md, int deg_mc) {
 
   if (rationals.rationals_len > mass) {
 
@@ -38,14 +38,14 @@ void ActionRationalArg::resize(int mass, int deg_md, int deg_mc) {
 
 }
 
-void ActionRationalSplitArg::resize(int nmass) {
+void ActionRationalSplitArg::resize(u_int nmass) {
 
   fractionSplit.fractionSplit_len = nmass;
   fractionSplit.fractionSplit_val = new SplitRange[nmass];  
 
 }
 
-void ActionBosonArg::resize(int nmass) {
+void ActionBosonArg::resize(u_int nmass) {
 
   bi_arg.resize(nmass);
   bosons.bosons_len = nmass;
@@ -53,7 +53,7 @@ void ActionBosonArg::resize(int nmass) {
 
 }
 
-void ActionFermionArg::resize(int nmass) {
+void ActionFermionArg::resize(u_int nmass) {
 
   bi_arg.resize(nmass);
   fermions.fermions_len = nmass;
@@ -61,7 +61,7 @@ void ActionFermionArg::resize(int nmass) {
 
 }
 
-void ActionQuotientArg::resize(int nmass) {
+void ActionQuotientArg::resize(u_int nmass) {
 
   bi_arg.resize(nmass);
   quotients.quotients_len = nmass;
@@ -69,7 +69,7 @@ void ActionQuotientArg::resize(int nmass) {
 
 }
 
-void ActionRationalQuotientArg::resize(int nmass) {
+void ActionRationalQuotientArg::resize(u_int nmass) {
 
   bi_arg.resize(nmass);
   bsn_mass.bsn_mass_len = nmass;
@@ -83,7 +83,7 @@ void ActionRationalQuotientArg::resize(int nmass) {
 
 }
 
-void ActionRationalQuotientArg::resize(int mass, int frm_deg_md, int frm_deg_mc, 
+void ActionRationalQuotientArg::resize(u_int mass, int frm_deg_md, int frm_deg_mc, 
 			       int bsn_deg_md, int bsn_deg_mc)
 {
 

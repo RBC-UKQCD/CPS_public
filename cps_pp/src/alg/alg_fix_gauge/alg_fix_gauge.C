@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Implementation of AlgFixGauge class methods.
 
-  $Id: alg_fix_gauge.C,v 1.10 2007-06-06 16:06:22 chulwoo Exp $
+  $Id: alg_fix_gauge.C,v 1.11 2007-06-25 15:49:20 chulwoo Exp $
 */
 //------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-06 16:06:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v 1.10 2007-06-06 16:06:22 chulwoo Exp $
-//  $Id: alg_fix_gauge.C,v 1.10 2007-06-06 16:06:22 chulwoo Exp $
+//  $Date: 2007-06-25 15:49:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v 1.11 2007-06-25 15:49:20 chulwoo Exp $
+//  $Id: alg_fix_gauge.C,v 1.11 2007-06-25 15:49:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_fix_gauge.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_fix_gauge/alg_fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -94,7 +94,7 @@ void AlgFixGauge::run()
   int start = alg_fix_gauge_arg->hyperplane_start;
   int step = alg_fix_gauge_arg->hyperplane_step;
   int num = alg_fix_gauge_arg->hyperplane_num;
-  int lattice_dir_size;
+  int lattice_dir_size=0;
   int *h_planes = 0;
 
   // If coulomb gauge

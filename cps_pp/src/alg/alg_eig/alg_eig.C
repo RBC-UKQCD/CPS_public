@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.19 2007-06-05 15:44:19 chulwoo Exp $
+  $Id: alg_eig.C,v 1.20 2007-06-25 15:49:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-05 15:44:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.19 2007-06-05 15:44:19 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.19 2007-06-05 15:44:19 chulwoo Exp $
+//  $Date: 2007-06-25 15:49:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.20 2007-06-25 15:49:20 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.20 2007-06-25 15:49:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -46,7 +46,7 @@ extern void gamma_5(Float *v_out, Float *v_in, int num_sites);
 int NumChkb( RitzMatType ritz_mat)
 {
   // Determine the number of checkerboards
-  int Ncb;
+  int Ncb=0;
   char *fname = "NumChkb(RitzType)";
   switch(ritz_mat)
   {
