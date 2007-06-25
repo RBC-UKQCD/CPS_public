@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-21 19:32:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v 1.10 2004-09-21 19:32:22 chulwoo Exp $
-//  $Id: main.C,v 1.10 2004-09-21 19:32:22 chulwoo Exp $
+//  $Date: 2007-06-25 21:39:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v 1.11 2007-06-25 21:39:14 chulwoo Exp $
+//  $Id: main.C,v 1.11 2007-06-25 21:39:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/w_spect/main.C,v $
 //  $State: Exp $
 //
@@ -53,7 +53,7 @@ int main(int argc,char *argv[])
   do_arg.z_bc = BND_CND_PRD;
   do_arg.t_bc = BND_CND_PRD;
   do_arg.start_conf_kind = START_CONF_DISORD;
-  do_arg.start_conf_load_addr = (Matrix *) 0x12f13;
+  do_arg.start_conf_load_addr = 0x12f13;
   do_arg.start_seed_kind = START_SEED_FIXED;
   do_arg.start_seed_value = 1111;
   do_arg.beta = 5.8;
@@ -74,9 +74,10 @@ int main(int argc,char *argv[])
   // The above is also the default behavior.
 
   WspectArg w_spect_arg;
-  w_spect_arg.cg.mass = 0.1;
-  w_spect_arg.cg.stop_rsd = 1.0E-12;
-  w_spect_arg.cg.max_num_iter = 5000;
+  CgArg w_spect_cg_arg;
+  w_spect_cg_arg.mass = 0.1;
+  w_spect_cg_arg.stop_rsd = 1.0E-12;
+  w_spect_cg_arg.max_num_iter = 5000;
   w_spect_arg.prop_dir = 3;
   w_spect_arg.num_mom = 1;              // zero spatial momentum only
   w_spect_arg.source_kind = POINT_W; 
@@ -321,8 +322,8 @@ int main(int argc,char *argv[])
 	  if(spect_yes == 1){
 	    {
 	      common_arg.results = &wout;
-	      w_spect_arg.cg.mass = mass;
-	      AlgWspect ws(lat,&common_arg,&w_spect_arg);
+	      w_spect_cg_arg.mass = mass;
+	      AlgWspect ws(lat,&common_arg,&w_spect_arg,&w_spect_cg_arg);
 	      
 	      ws.run();
 	    }

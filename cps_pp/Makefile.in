@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.32 2007-06-25 21:05:39 chulwoo Exp $
+# $Id: Makefile.in,v 1.33 2007-06-25 21:40:04 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -80,7 +80,7 @@ $(TESTBUILDDIRS):
 	$(if $(builddir_isnt_srcdir), mkdir -p $(TESTDIR)/$(@D))
 	-cp -p $(SRCDIR)/$(TESTDIR)/$(@D)/Makefile*  $(TESTDIR)/$(@D)
 	-cp -p $(SRCDIR)/$(TESTDIR)/$(@D)/*.in  $(TESTDIR)/$(@D)
-	cd $(TESTDIR)/$(@D); (gmake -f Makefile_regression clean all 2>&1 |tee make.log )
+	cd $(TESTDIR)/$(@D); ($(MAKE) -f Makefile_regression all 2>&1 |tee make.log )
 
 #  Create the documentation
 

@@ -58,7 +58,6 @@ int main(int argc,char *argv[]){
     sscanf(argv[3],"%d",&nz);
     sscanf(argv[4],"%d",&nt);
     printf("total sites = %d %d %d %d\n",nx,ny,nz,nt);
-#if TARGET == QCDOC
     do_arg.x_node_sites = nx/SizeX();
     do_arg.y_node_sites = ny/SizeY();
     do_arg.z_node_sites = nz/SizeZ();
@@ -69,18 +68,6 @@ int main(int argc,char *argv[]){
     do_arg.z_nodes = SizeZ();
     do_arg.t_nodes = SizeT();
     do_arg.s_nodes = 1;
-#else
-    do_arg.x_node_sites = nx;
-    do_arg.y_node_sites = ny;
-    do_arg.z_node_sites = nz;
-    do_arg.t_node_sites = nt;
-    do_arg.s_node_sites = 0;
-    do_arg.x_nodes = 1;
-    do_arg.y_nodes = 1;
-    do_arg.z_nodes = 1;
-    do_arg.t_nodes = 1;
-    do_arg.s_nodes = 1;
-#endif 
     do_arg.x_bc = BND_CND_PRD;
     do_arg.y_bc = BND_CND_PRD;
     do_arg.z_bc = BND_CND_PRD;
