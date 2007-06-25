@@ -1,0 +1,2 @@
+./QCDOC.x do_arg.vml hmc_arg.vml evo_arg.vml quo_arg.vml rat_quo_arg.vml ga
+uge_arg.vml ab1_arg.vml ab2_arg.vml ab3_arg.vml $NDIR > output.log

@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.31 2007-04-06 20:44:47 chulwoo Exp $
+# $Id: Makefile.in,v 1.32 2007-06-25 21:05:39 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -58,6 +58,8 @@ TESTSUBDIRS :=$(patsubst $(SRCDIR)/$(TESTDIR)/%/, %, $(TESTSUBDIRS))
 HDW_TESTSUBDIRS :=$(shell ls -p $(SRCDIR)/$(HDW_TESTDIR)/*/Makefile_regression)
 HDW_TESTSUBDIRS :=$(dir $(HDW_TESTSUBDIRS))
 HDW_TESTSUBDIRS :=$(patsubst $(SRCDIR)/$(HDW_TESTDIR)/%/, %, $(HDW_TESTSUBDIRS))
+TESTBUILDDIRS :=$(shell ls -p $(SRCDIR)/$(TESTDIR)/*/test_command)
+TESTBUILDDIRS :=$(patsubst $(SRCDIR)/$(TESTDIR)/%/test_command, %/build.done, $(TESTBUILDDIRS))
 
 copy_testdir: $(TESTSUBDIRS) $(HDW_TESTSUBDIRS)
 	$(if $(findstring s, $(MAKEFLAGS)),,@echo TESTSUBDIRS = $(TESTSUBDIRS))
@@ -70,6 +72,16 @@ $(TESTSUBDIRS):
 $(HDW_TESTSUBDIRS):
 	$(if $(builddir_isnt_srcdir), mkdir -p $(HDW_TESTDIR)/$@)
 	-cp -p $(SRCDIR)/$(HDW_TESTDIR)/$@/Makefile_regression  $(HDW_TESTDIR)/$@
+ 
+testbuild: $(TESTBUILDDIRS)
+	echo TESTBUILDDIR = $(TESTBUILDDIRS)
+ 
+$(TESTBUILDDIRS):
+	$(if $(builddir_isnt_srcdir), mkdir -p $(TESTDIR)/$(@D))
+	-cp -p $(SRCDIR)/$(TESTDIR)/$(@D)/Makefile*  $(TESTDIR)/$(@D)
+	-cp -p $(SRCDIR)/$(TESTDIR)/$(@D)/*.in  $(TESTDIR)/$(@D)
+	cd $(TESTDIR)/$(@D); (gmake -f Makefile_regression clean all 2>&1 |tee make.log )
+
 #  Create the documentation
 
 have_doxygen = @have_doxygen@
