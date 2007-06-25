@@ -52,7 +52,7 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
-	   void resize (  int nmass ) ;
+	   void resize (  u_int nmass ) ;
 	FclassType fermion;
 	struct {
 		u_int bilinears_len;
@@ -111,8 +111,8 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
-	   void resize (  int nmass ) ;
-	   void resize (  int mass ,  int deg_md ,  int deg_mc ) ;
+	   void resize (  u_int nmass ) ;
+	   void resize (  u_int mass ,  int deg_md ,  int deg_mc ) ;
 	ActionBilinearArg bi_arg;
 	int remez_generate;
 	char *rat_poles_file;
@@ -139,7 +139,7 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
-	   void resize (  int nmass ) ;
+	   void resize (  u_int nmass ) ;
 	struct {
 		u_int fractionSplit_len;
 		SplitRange *fractionSplit_val;
@@ -161,7 +161,7 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
-	   void resize (  int nmass ) ;
+	   void resize (  u_int nmass ) ;
 	ActionBilinearArg bi_arg;
 	struct {
 		u_int bosons_len;
@@ -186,7 +186,7 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
-	   void resize (  int nmass ) ;
+	   void resize (  u_int nmass ) ;
 	ActionBilinearArg bi_arg;
 	struct {
 		u_int fermions_len;
@@ -214,7 +214,7 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
-	   void resize (  int nmass ) ;
+	   void resize (  u_int nmass ) ;
 	ActionBilinearArg bi_arg;
 	struct {
 		u_int quotients_len;
@@ -228,8 +228,8 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
-	   void resize (  int nmass ) ;
-	   void resize (  int mass ,  int frm_deg_md ,  int frm_deg_mc ,  int bsn_deg_md ,  int bsn_deg_mc ) ;
+	   void resize (  u_int nmass ) ;
+	   void resize (  u_int mass ,  int frm_deg_md ,  int frm_deg_mc ,  int bsn_deg_md ,  int bsn_deg_mc ) ;
 	ActionBilinearArg bi_arg;
 	Float spread;
 	int remez_generate;

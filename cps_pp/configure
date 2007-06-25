@@ -3824,7 +3824,7 @@ if test "$enable_target" = "qcdoc"; then
    ARCH="QCDOC"
    ARCHDIR="QCDOC_DIR"
    TESTING_PARALLEL="yes";
-   namespace_default="no"
+#   namespace_default="no"
 
 elif test "$enable_target" = "bgl"; then
 #     AC_PATH_PROG(CC, blrts_xlc)
@@ -4025,11 +4025,11 @@ echo "$as_me:$LINENO: result: $enable_optimise" >&5
 echo "${ECHO_T}$enable_optimise" >&6
 if test "$enable_optimise" = "yes"; then
    if test "$enable_target" = "bgl"; then
-     CFLAGS="${CFLAGS} -O"
-     CXXFLAGS="${CXXFLAGS} -O"
+     CFLAGS="${CFLAGS} -O -Wall"
+     CXXFLAGS="${CXXFLAGS} -O -Wall"
    else
-     CFLAGS="${CFLAGS} -O3"
-     CXXFLAGS="${CXXFLAGS} -O3"
+     CFLAGS="${CFLAGS} -O3 -Wall"
+     CXXFLAGS="${CXXFLAGS} -O3 -Wall"
    fi
 fi
 

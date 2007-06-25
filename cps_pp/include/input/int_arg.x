@@ -32,7 +32,7 @@ class BilinearDescr {
 
 class ActionBilinearArg {
 
-  memfun void resize(int nmass);
+  memfun void resize(u_int nmass);
 
   FclassType fermion;
   BilinearDescr bilinears<>;
@@ -79,8 +79,8 @@ class EigenDescr {
 
 class ActionRationalArg {
 
-  memfun void resize(int nmass);
-  memfun void resize(int mass, int deg_md, int deg_mc);
+  memfun void resize(u_int nmass);
+  memfun void resize(u_int mass, int deg_md, int deg_mc);
 
   ActionBilinearArg bi_arg;
    
@@ -100,7 +100,7 @@ class SplitRange {
 
 class ActionRationalSplitArg {
 
-  memfun void resize(int nmass);
+  memfun void resize(u_int nmass);
   SplitRange fractionSplit<>;
 
 };
@@ -111,7 +111,7 @@ class BosonDescr {
 
 class ActionBosonArg {
 
-  memfun void resize(int nmass);
+  memfun void resize(u_int nmass);
   ActionBilinearArg bi_arg;
   BosonDescr bosons<>;
 
@@ -125,7 +125,7 @@ class FermionDescr {
 
 class ActionFermionArg {
 
-  memfun void resize(int nmass);
+  memfun void resize(u_int nmass);
 
   ActionBilinearArg bi_arg;
 
@@ -145,7 +145,7 @@ class QuotientDescr {
 
 class ActionQuotientArg {
 
-  memfun void resize(int nmass);
+  memfun void resize(u_int nmass);
 
   // Mass parameter here is dummy
   ActionBilinearArg bi_arg;
@@ -157,8 +157,8 @@ class ActionQuotientArg {
 
 class ActionRationalQuotientArg {
 
-  memfun void resize(int nmass);
-  memfun void resize(int mass, int frm_deg_md, int frm_deg_mc, 
+  memfun void resize(u_int nmass);
+  memfun void resize(u_int mass, int frm_deg_md, int frm_deg_mc, 
 	int bsn_deg_md, int bsn_deg_mc);
 
   ActionBilinearArg bi_arg;
