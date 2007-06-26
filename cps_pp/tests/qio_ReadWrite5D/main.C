@@ -34,6 +34,7 @@ moving to CPS-implementation
 #define DO_measure_compare
 
 
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -61,7 +62,7 @@ moving to CPS-implementation
 
 
 
-
+USING_NAMESPACE_CPS
 
 using namespace std;
 
