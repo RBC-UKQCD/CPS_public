@@ -6,4 +6,5 @@
 <item><name>reverse</name><value><ReverseTest>REVERSE_NO </ReverseTest></value></item>
 <item><name>reproduce</name><value><ReproduceTest>REPRODUCE_NO </ReproduceTest></value></item>
 <item><name>reproduce_attempt_limit</name><value><int>0</int></value></item>
+<item><name>wfm_md_sloppy</name><value><boolean>0</boolean></value></item>
 </data></class>

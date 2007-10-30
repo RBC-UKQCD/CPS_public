@@ -17,5 +17,5 @@ string evo_stem = "hmd"
 string w_spect_directory = ""
 string work_directory = ""
 int measure_pbp = 0
-int measure_w_spect = 0
+int measure_w_spect_interval = 0
 }

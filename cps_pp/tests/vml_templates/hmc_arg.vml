@@ -6,4 +6,5 @@ ReunitarizeType reunitarize = REUNITARIZE_NO
 ReverseTest reverse = REVERSE_NO
 ReproduceTest reproduce = REPRODUCE_NO
 int reproduce_attempt_limit = 0
+bool wfm_md_sloppy = 0
 }
