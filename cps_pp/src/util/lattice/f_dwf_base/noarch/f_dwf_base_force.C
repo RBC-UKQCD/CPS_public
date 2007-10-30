@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.10 2007-06-06 16:06:23 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.11 2007-10-30 20:40:35 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -255,8 +255,8 @@ ForceArg FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
       // If GJP.Snodes > 1 sum up contributions from all s nodes
       if(GJP.Snodes() > 1) {
-        if(!UniqueID())printf("%s::%s:GJP.Snodes()=%d\n",cname,fname,GJP.Snodes()); 
-	    glb_sum_multi_dir((const Float *)&tmp_mat1,4,sizeof(Matrix)/sizeof(IFloat));
+//        if(!UniqueID())printf("%s::%s:GJP.Snodes()=%d\n",cname,fname,GJP.Snodes()); 
+	glb_sum_multi_dir((Float *)&tmp_mat1,4,sizeof(Matrix)/sizeof(IFloat));
       }
 
       tmp_mat2.DotMEqual(*(gauge+gauge_offset), tmp_mat1) ;

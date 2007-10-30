@@ -54,6 +54,7 @@ void wilson_mdag(IFloat *chi_f,
 /* DslashDag_E0                                                             */
 /*--------------------------------------------------------------------------*/
   wilson_dslash(tmp1_f, u_f, psi_f, 1, 1, wilson_p);
+//  wilson_dslash(chi_f, u_f, psi_f, 1, 1, wilson_p);
 
 /*--------------------------------------------------------------------------*/
 /* DslashDag_0E                                                             */

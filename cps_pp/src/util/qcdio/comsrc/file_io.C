@@ -2,23 +2,30 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <util/qcdio.h>
-#include <qalloc.h>
+//#include <qalloc.h>
 CPS_START_NAMESPACE
 static FILE FAKE;
 const int MAX_FILENAME =200;
 FILE *Fopen( FileIoType type, const char *filename, const char *mode){
+  FILE *result = NULL;
   if ( type == ZERO_ONLY && UniqueID() ) return &FAKE;
   if(type == ADD_ID){
     char fname[MAX_FILENAME];
     if(strlen(filename)+6 >MAX_FILENAME){
 	  fprintf(stderr,"Fopen: filename(%s) is too long\n",filename);
-      return NULL;
+      result = NULL;
     }
-    sprintf(fname,"%s.%d",filename,UniqueID());
-    return fopen(fname,mode);
+    else {
+      sprintf(fname,"%s.%d",filename,UniqueID());
+      result = fopen(fname,mode);
+    }
   } else {
-    return fopen(filename,mode);
+    result = fopen(filename,mode);
   }
+  if (result == NULL){
+	fprintf(stderr,"Fopen: opening %s failed\n",filename);
+  }
+  return result;
 }
 
 int Fclose( FileIoType type, FILE *stream){

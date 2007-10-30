@@ -2,13 +2,21 @@
 /*!\file
   \brief  Definitions of the bigfloat wrapper class.
 
-  $Id: bigfloat.h,v 1.7 2006-04-13 18:59:35 chulwoo Exp $
+  $Id: bigfloat.h,v 1.8 2007-10-30 20:40:34 chulwoo Exp $
 */
 //------------------------------------------------------------------
 #include<config.h>
 #include <gmp.h>
+#if TARGET == QCDOC
+#define USE_MPFR
+#else
+#undef USE_MPFR
+#endif
+
+#ifdef USE_MPFR
 #include <mpfr.h>
 #include <mpf2mpfr.h>
+#endif
 
 CPS_START_NAMESPACE
 
@@ -187,11 +195,13 @@ public:
     return b;
   }
 
+#ifdef USE_MPFR
   friend bigfloat pow_bf(const bigfloat& a, const bigfloat &power) {
     bigfloat b;
     mpfr_pow(b.x,a.x,power.x,GMP_RNDN);
     return b;
   }
+#endif
 
   /* Comparison Functions */
 

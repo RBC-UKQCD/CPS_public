@@ -64,19 +64,19 @@ pt_copy:
 	or.	 3,	3,	3
 	mr	 %r25,	 %r23
 	bf gt,	lab0
-	lfd	   0,	0 ( % r18)
-	lfd	   1,	8 ( % r18)
+	lfd	   0,	0 ( %r18)
+	lfd	   1,	8 ( %r18)
 	mr	 %r25,	 %r23
 	subic.	 3,	3,	1
 	bf gt,	lab2
 	b  lab1
 lab1:
-	lfd	   2,	16 ( % r18)
+	lfd	   2,	16 ( %r18)
 #<<<<<< Break 0
 	lwz	%r20, 24(%r4)
 	stfd	   6,	0(%r23)
 	lwz	%r24, 28(%r4)
-	lfd	   3,	24 ( % r18)
+	lfd	   3,	24 ( %r18)
 	add	%r20, %r20, %r5
 	stfd	   7,	8(%r23)
 	add	%r24, %r24, %r6
@@ -85,45 +85,45 @@ lab1:
 	stfd	   10,	32(%r23)
 	stfd	   11,	40(%r23)
 #<<<<<< Break 1
-	lfd	   4,	32 ( % r18)
+	lfd	   4,	32 ( %r18)
 	dcbt	 %r9,	 %r20
-	lfd	   5,	40 ( % r18)
+	lfd	   5,	40 ( %r18)
 	dcbt	 %r10,	 %r20
 #<<<<<< Break 2
-	lfd	   6,	0 ( % r19)
+	lfd	   6,	0 ( %r19)
 	mr	 %r23,	 %r25
 
-	lfd	   7,	8 ( % r19)
+	lfd	   7,	8 ( %r19)
 	dcbt	 %r13,	 %r4
 #<<<<<< Break 3
 	mr	 %r18,	 %r20
 	subic.	 3,	3,	1
 #<<<<<< Break 4
 	lwz	%r21, 36(%r4)
-	lfd	   8,	16 ( % r19)
+	lfd	   8,	16 ( %r19)
 	lwz	%r25, 40(%r4)
 	dcbt	 %r14,	 %r4
 	add	%r21, %r21, %r5
 	stfd	   0,	0(%r22)
 	add	%r25, %r25, %r6
 
-	lfd	   9,	24 ( % r19)
+	lfd	   9,	24 ( %r19)
 	stfd	   1,	8(%r22)
 	stfd	   2,	16(%r22)
 	stfd	   3,	24(%r22)
 	stfd	   4,	32(%r22)
 	stfd	   5,	40(%r22)
 #<<<<<< Break 5
-	lfd	   10,	32 ( % r19)
+	lfd	   10,	32 ( %r19)
 	dcbt	 %r9,	 %r21
-	lfd	   11,	40 ( % r19)
+	lfd	   11,	40 ( %r19)
 	dcbt	 %r10,	 %r21
 #<<<<<< Break 6
-	lfd	   0,	0 ( % r20)
+	lfd	   0,	0 ( %r20)
 	mr	 %r22,	 %r24
 
 	addi %r4, %r4, 24 
-	lfd	   1,	8 ( % r20)
+	lfd	   1,	8 ( %r20)
 	mr	 %r19,	 %r21
 
 
@@ -135,36 +135,36 @@ lab1:
 	bf gt,	lab2
 	b  lab1
 lab2:
-	lfd	   2,	16 ( % r18)
+	lfd	   2,	16 ( %r18)
 #<<<<<< Break 0
 	stfd	   6,	0(%r23)
-	lfd	   3,	24 ( % r18)
+	lfd	   3,	24 ( %r18)
 	stfd	   7,	8(%r23)
 	stfd	   8,	16(%r23)
 	stfd	   9,	24(%r23)
 	stfd	   10,	32(%r23)
 	stfd	   11,	40(%r23)
 #<<<<<< Break 1
-	lfd	   4,	32 ( % r18)
+	lfd	   4,	32 ( %r18)
 	mr	 %r19,	 %r21
-	lfd	   5,	40 ( % r18)
+	lfd	   5,	40 ( %r18)
 #<<<<<< Break 2
-	lfd	   6,	0 ( % r19)
+	lfd	   6,	0 ( %r19)
 	mr	 %r23,	 %r25
-	lfd	   7,	8 ( % r19)
+	lfd	   7,	8 ( %r19)
 #<<<<<< Break 3
 #<<<<<< Break 4
-	lfd	   8,	16 ( % r19)
+	lfd	   8,	16 ( %r19)
 	stfd	   0,	0(%r22)
-	lfd	   9,	24 ( % r19)
+	lfd	   9,	24 ( %r19)
 	stfd	   1,	8(%r22)
 	stfd	   2,	16(%r22)
 	stfd	   3,	24(%r22)
 	stfd	   4,	32(%r22)
 	stfd	   5,	40(%r22)
 #<<<<<< Break 5
-	lfd	   10,	32 ( % r19)
-	lfd	   11,	40 ( % r19)
+	lfd	   10,	32 ( %r19)
+	lfd	   11,	40 ( %r19)
 #<<<<<< Break 6
 
 

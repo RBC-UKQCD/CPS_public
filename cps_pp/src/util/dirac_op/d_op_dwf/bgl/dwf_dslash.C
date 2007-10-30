@@ -34,6 +34,10 @@ void dwf_dslash(Vector *out,
 		int dag, 
 		Dwf *dwf_lib_arg)
 {
+
+#if 0
+  dwf_dslash_all(out, gauge_field, in, mass, cb, dag, dwf_lib_arg);
+#else
 //------------------------------------------------------------------
 // Apply 4-dimensional Dslash
 //------------------------------------------------------------------
@@ -44,6 +48,7 @@ void dwf_dslash(Vector *out,
 // Apply 5th-direction Dslash
 //------------------------------------------------------------------
   dwf_dslash_5_plus(out, in, mass, dag, dwf_lib_arg);
+#endif
 
 }
 

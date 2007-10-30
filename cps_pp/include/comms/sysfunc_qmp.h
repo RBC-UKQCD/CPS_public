@@ -12,7 +12,7 @@
   comms-layer.
 
   M. Cheng michaelc@phys.columbia.edu               
-  -----------------------------------------------------------
+  -----------------------------------------------------------*/
 
 /*----------------------------------------------------------*/
 #include <comms/scu_enum.h>
@@ -60,8 +60,10 @@ unsigned int SeedS();  //!< Gets a RNG seed.
 unsigned int SeedT();  //!< Gets a RNG seed.
 unsigned int SeedST(); //!< Gets a RNG seed.
 
+#ifndef HAVE_SYNC
 //! A barrier function.
 unsigned int sync();
+#endif
 
 //! Gets the direction used internally by the comms layer.
 int SCURemap( SCUDir dir );

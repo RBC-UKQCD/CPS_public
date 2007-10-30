@@ -79,10 +79,10 @@ pt_asqtad_agg:
 	add	%r14, %r14, %r7
 	add	%r13, %r13, %r7
 	add	%r29, %r5, %r16
-	lfd	   0,	0 ( % r12)
-	lfd	   1,	8 ( % r12)
-	lfd	   2,	16 ( % r12)
-	lfd	   3,	24 ( % r12)
+	lfd	   0,	0 ( %r12)
+	lfd	   1,	8 ( %r12)
+	lfd	   2,	16 ( %r12)
+	lfd	   3,	24 ( %r12)
 	mr	 %r10,	 %r13
 	addi %r29, %r29, 432
 	subic.	 3,	3,	1
@@ -116,11 +116,11 @@ pt_asqtad_agg_lab1:
 	fnmsub	10, 25,  1, 10
 	dcbt	 %r18,	 %r29
 	fmadd	11, 25,  0, 11
-	lfd	   4,	32 ( % r12)
+	lfd	   4,	32 ( %r12)
 	mr	 %r13,	 %r10
 
 	fmadd	 6, 14,  2,  6
-	lfd	   5,	40 ( % r12)
+	lfd	   5,	40 ( %r12)
 	fmadd	 7, 14,  3,  7
 
 	fmadd	 8, 20,  2,  8
@@ -148,11 +148,11 @@ pt_asqtad_agg_lab1:
 	fmadd	 7, 16,  5,  7
 
 	fmadd	 8, 22,  4,  8
-	lfd	   0,	0 ( % r11)
+	lfd	   0,	0 ( %r11)
 	fmadd	 9, 22,  5,  9
 	dcbt	 %r20,	 %r29
 	fmadd	10, 28,  4, 10
-	lfd	   1,	8 ( % r11)
+	lfd	   1,	8 ( %r11)
 	fmadd	11, 28,  5, 11
 
 	fnmsub	 6, 17,  5,  6
@@ -172,9 +172,9 @@ pt_asqtad_agg_lab1:
 	subic.	 3,	3,	1
 	lfd	   25,	264(%r5)
 	stfd	   7,	8(%r14)
-	lfd	   2,	16 ( % r11)
+	lfd	   2,	16 ( %r11)
 	stfd	   8,	16(%r14)
-	lfd	   3,	24 ( % r11)
+	lfd	   3,	24 ( %r11)
 	stfd	   9,	24(%r14)
 	lfd	   14,	176(%r5)
 	stfd	   10,	32(%r14)
@@ -207,11 +207,11 @@ pt_asqtad_agg_lab1:
 	fnmsub	10, 25,  1, 10
 	dcbt	 %r23,	 %r29
 	fmadd	11, 25,  0, 11
-	lfd	   4,	32 ( % r11)
+	lfd	   4,	32 ( %r11)
 	mr	 %r14,	 %r9
 
 	fmadd	 6, 14,  2,  6
-	lfd	   5,	40 ( % r11)
+	lfd	   5,	40 ( %r11)
 	fmadd	 7, 14,  3,  7
 
 	fmadd	 8, 20,  2,  8
@@ -239,11 +239,11 @@ pt_asqtad_agg_lab1:
 	fmadd	 7, 16,  5,  7
 
 	fmadd	 8, 22,  4,  8
-	lfd	   0,	0 ( % r12)
+	lfd	   0,	0 ( %r12)
 	fmadd	 9, 22,  5,  9
 	dcbt	 %r25,	 %r29
 	fmadd	10, 28,  4, 10
-	lfd	   1,	8 ( % r12)
+	lfd	   1,	8 ( %r12)
 	fmadd	11, 28,  5, 11
 
 	fnmsub	 6, 17,  5,  6
@@ -265,11 +265,11 @@ pt_asqtad_agg_lab1:
 
 	stfd	   7,	8(%r13)
 
-	lfd	   2,	16 ( % r12)
+	lfd	   2,	16 ( %r12)
 
 	stfd	   8,	16(%r13)
 
-	lfd	   3,	24 ( % r12)
+	lfd	   3,	24 ( %r12)
 
 	stfd	   9,	24(%r13)
 
@@ -311,11 +311,11 @@ lab2:
 	fnmsub	10, 25,  1, 10
 
 	fmadd	11, 25,  0, 11
-	lfd	   4,	32 ( % r12)
+	lfd	   4,	32 ( %r12)
 	mr	 %r13,	 %r10
 
 	fmadd	 6, 14,  2,  6
-	lfd	   5,	40 ( % r12)
+	lfd	   5,	40 ( %r12)
 	fmadd	 7, 14,  3,  7
 
 	fmadd	 8, 20,  2,  8
@@ -343,11 +343,11 @@ lab2:
 	fmadd	 7, 16,  5,  7
 
 	fmadd	 8, 22,  4,  8
-	lfd	   0,	0 ( % r11)
+	lfd	   0,	0 ( %r11)
 	fmadd	 9, 22,  5,  9
 
 	fmadd	10, 28,  4, 10
-	lfd	   1,	8 ( % r11)
+	lfd	   1,	8 ( %r11)
 	fmadd	11, 28,  5, 11
 
 	fnmsub	 6, 17,  5,  6
@@ -370,9 +370,9 @@ lab2:
 	stfd	   6,	0(%r14)
 	lfd	   25,	264(%r5)
 	stfd	   7,	8(%r14)
-	lfd	   2,	16 ( % r11)
+	lfd	   2,	16 ( %r11)
 	stfd	   8,	16(%r14)
-	lfd	   3,	24 ( % r11)
+	lfd	   3,	24 ( %r11)
 	stfd	   9,	24(%r14)
 	lfd	   14,	176(%r5)
 	stfd	   10,	32(%r14)
@@ -405,11 +405,11 @@ lab2:
 	fnmsub	10, 25,  1, 10
 
 	fmadd	11, 25,  0, 11
-	lfd	   4,	32 ( % r11)
+	lfd	   4,	32 ( %r11)
 	mr	 %r14,	 %r9
 
 	fmadd	 6, 14,  2,  6
-	lfd	   5,	40 ( % r11)
+	lfd	   5,	40 ( %r11)
 	fmadd	 7, 14,  3,  7
 
 	fmadd	 8, 20,  2,  8

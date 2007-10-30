@@ -77,11 +77,12 @@ public:
  public:
     inline void setParallel() { UseParIO = 1; }
     inline void setSerial() { 
-#if TARGET == QCDOC
+#if 1
       UseParIO = 0; 
 #else
       const char * fname = "setSerial()";
-      VRB.Flow(cname,fname,"On non-QCDOC platform, setSerial() has no effect!\n");
+      VRB.Result(cname,fname,"On non-QCDOC platform, setSerial() has no effect!\n");
+      exit(-42);
 #endif
     }
     inline int parIO() const { return UseParIO; }

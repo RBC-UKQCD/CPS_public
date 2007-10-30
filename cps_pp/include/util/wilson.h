@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief Declarations of routine used internally in the DiracOpWilson class.
 
-  $Id: wilson.h,v 1.7 2004-09-02 16:59:02 zs Exp $
+  $Id: wilson.h,v 1.8 2007-10-30 20:40:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 16:59:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.7 2004-09-02 16:59:02 zs Exp $
-//  $Id: wilson.h,v 1.7 2004-09-02 16:59:02 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2007-10-30 20:40:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.8 2007-10-30 20:40:34 chulwoo Exp $
+//  $Id: wilson.h,v 1.8 2007-10-30 20:40:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: wilson.h,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v $
 //  $State: Exp $
 //
@@ -42,7 +42,9 @@ CPS_START_NAMESPACE
 #define ND                 4      //!< Number of space-time dimensions.
 #define SPINOR_SIZE        24     //!< Number of floating-point numbers in a Dirac spinor.
 #define HALF_SPINOR_SIZE   12     //!< Number of floating-point numbers in half a Dirac spinor.
+#if TARGET != BGL && TARGET != BGP
 #define PAD_HALF_SPINOR_SIZE 16
+#endif
 #define BLOCK   HALF_SPINOR_SIZE  //!< Number of floating-point numbers in a two-spinor.
 #define COLUMN_SPINOR_SIZE  6     //!< Number of floating-point numbers in a colour vector.
 #define GAUGE_SIZE         72     //!< Number of floating-point numbers in a colour matrix.
@@ -205,6 +207,13 @@ void wilson_dslash(IFloat *chi,
 		   int dag,
 		   Wilson *wilson_p);
 
+void wilson_dslash_two(Float *chi0, Float *chi1,
+		   Float *u, 
+		   Float *psi0, Float *psi1, 
+		   int cb0, int cb1,
+		   int dag,
+		   Wilson *wp);
+
 //--------------------------------------------------------------------
 
 //! Multiplication by the odd-even preconditioned Wilson matrix
@@ -250,6 +259,12 @@ void wilson_mdag(IFloat *chi,
 		 Wilson *wilson_p);
 
 }
+
+#if TARGET == BGL || TARGET == BGP
+void wilson_set_sloppy(bool sloppy);
+#else
+inline void wilson_set_sloppy(bool sloppy) {}
+#endif
 
 #endif
 

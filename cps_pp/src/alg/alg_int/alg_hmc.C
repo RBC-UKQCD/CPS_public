@@ -29,6 +29,7 @@ CPS_END_NAMESPACE
 #include<util/verbose.h>
 #include<util/smalloc.h>
 #include<util/qcdio.h>
+#include<util/wilson.h>
 
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
@@ -180,12 +181,15 @@ Float AlgHmc::run(void)
       integrator->heatbath();
 
       //!< Calculate initial Hamiltonian
+      wilson_set_sloppy( false);
       h_init = integrator->energy();
 //      Float total_h_init =h_init;
 //      glb_sum(&total_h_init);
 
       // Molecular Dynamics Trajectory
+      if(hmc_arg->wfm_md_sloppy) wilson_set_sloppy(true);
       integrator->evolve(hmc_arg->step_size, hmc_arg->steps_per_traj);
+      wilson_set_sloppy(false);
 
       // Reunitarize
       if(hmc_arg->reunitarize == REUNITARIZE_YES){
@@ -229,7 +233,9 @@ Float AlgHmc::run(void)
 	saveFinalState();
 
 	integrator->reverse();
+      if(hmc_arg->wfm_md_sloppy) wilson_set_sloppy(true);
 	integrator->evolve(hmc_arg->step_size, hmc_arg->steps_per_traj);
+      wilson_set_sloppy(false);
 
 #ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
   printf("SCU checksum test\n");

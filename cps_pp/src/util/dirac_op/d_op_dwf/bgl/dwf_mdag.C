@@ -53,7 +53,10 @@ void  dwf_mdag(Vector *out,
 //------------------------------------------------------------------
 // out = in - dwf_kappa_sq * out
 //------------------------------------------------------------------
-  out->FTimesV1PlusV2(minus_kappa_sq, out, in, f_size); 
+//  out->FTimesV1PlusV2(minus_kappa_sq, out, in, f_size); 
+  Float *out_f = (Float *)out;
+  Float *in_f = (Float *)in;
+  xaxpy(&minus_kappa_sq,out_f,in_f,f_size/6);
   DiracOp::CGflops+=2*f_size;
 
 }

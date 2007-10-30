@@ -115,6 +115,8 @@ void dwf_dslash_5_plus(Vector *out,
 		       int dag, 
 		       Dwf *dwf_lib_arg)
 {
+
+
   int x;
   int s;
 
@@ -127,6 +129,12 @@ void dwf_dslash_5_plus(Vector *out,
   int s_node_coor = 0;
   int vol_4d_cb = dwf_lib_arg->vol_4d / 2;
   int ls_stride = 24 * vol_4d_cb;
+
+#if 1
+  for(int i =0;i<local_ls;i++){
+    dwf_dslash_5_plus_slice(out,in,mass,dag,dwf_lib_arg,i);
+  }
+#else
   IFloat *f_in;
   IFloat *f_out;
   IFloat *f_temp;
@@ -185,7 +193,7 @@ void dwf_dslash_5_plus(Vector *out,
     
     f_temp = f_in;
     
-    if (s_nodes != 1 ) {
+    if (s_nodes > 1 ) {
       f_temp = comm_buf;
       getMinusData(f_temp, f_in, 12, 4);
     }
@@ -201,10 +209,15 @@ void dwf_dslash_5_plus(Vector *out,
     f_out = f_out + 24;
   }
 #else
+  f_temp = f_in;
+  if (s_nodes > 1 ) {
+    getMinusData(comm_buf, f_in, 24*vol_4d_cb, 4);
+    f_temp = comm_buf;
+  }
     if(s_node_coor == 0) { 
-      FtV1pV2Skip_asm(f_out,&neg_mass_two_over_a5,f_in,f_out,vol_4d_cb);
+      FtV1pV2Skip_asm(f_out,&neg_mass_two_over_a5,f_temp,f_out,vol_4d_cb);
     } else {
-      FtV1pV2Skip_asm(f_out,&two_over_a5,f_in,f_out,vol_4d_cb);
+      FtV1pV2Skip_asm(f_out,&two_over_a5,f_temp,f_out,vol_4d_cb);
     }
 #endif
 
@@ -276,12 +289,18 @@ void dwf_dslash_5_plus(Vector *out,
     f_out = f_out + 24;
   }
 #else
-    if(s_node_coor == 0) { 
-      FtV1pV2Skip_asm(f_out,&neg_mass_two_over_a5,f_in,f_out,vol_4d_cb);
+    f_temp = f_in;
+  if (s_nodes > 1 ) {
+    getPlusData(comm_buf, f_in, 24*vol_4d_cb, 4);
+    f_temp = comm_buf;
+  }
+    if(s_node_coor == s_nodes - 1) { 
+      FtV1pV2Skip_asm(f_out,&neg_mass_two_over_a5,f_temp,f_out,vol_4d_cb);
     } else {
-      FtV1pV2Skip_asm(f_out,&two_over_a5,f_in,f_out,vol_4d_cb);
+      FtV1pV2Skip_asm(f_out,&two_over_a5,f_temp,f_out,vol_4d_cb);
     }
 #endif
+#endif //#if 1
   DiracOp::CGflops+=2*2*vol_4d_cb*local_ls*12;
 
 

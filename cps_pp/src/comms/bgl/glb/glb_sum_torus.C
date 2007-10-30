@@ -1,5 +1,5 @@
 #include<config.h>
-//#include<qalloc.h>
+#include<unistd.h>
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file

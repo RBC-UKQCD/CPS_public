@@ -50,7 +50,11 @@ static Double64 *gsum_buf = NULL;
 
 void glb_sum_five(Float * float_p)
 {
-	glb_sum_internal2(float_p,5);
+#if 1
+  QMP_sum_double(float_p);
+#else
+  glb_sum_internal2(float_p,5);
+#endif
 }
 
 CPS_END_NAMESPACE

@@ -70,7 +70,7 @@ void dwf_init(Dwf *dwf_p)
 // Allocate memory for a 12 word communications buffer needed
 // for the spread-out case.
 //------------------------------------------------------------------
-  dwf_p->comm_buf = (IFloat *) smalloc(12 * sizeof(IFloat));
+  dwf_p->comm_buf = (IFloat *) smalloc(f_size * sizeof(IFloat));
   if(dwf_p->comm_buf == 0)
     ERR.Pointer(cname,fname, "comm_buf");
   VRB.Smalloc(cname,fname,

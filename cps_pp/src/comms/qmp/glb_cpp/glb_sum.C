@@ -50,11 +50,15 @@ static int output = 0;
 //---------------------------------------------------------------------- 
 void glb_sum(Float * float_p)
 {
-#ifdef USE_QMP
-  QMP_sum_double(float_p);
-#else
-  glb_sum_internal2(float_p,4);
-#endif
+  static int five_dim=-1;
+  if (five_dim<0){
+    five_dim = GJP.Snodes();
+    if (!UniqueID()) printf("glb_sum:five_dim=%d\n",five_dim);
+  }
+  if (five_dim>1)
+    glb_sum_internal2(float_p,4);
+  else
+    QMP_sum_double(float_p);
 }
 
 void glb_sum_gimp(Float * float_p)

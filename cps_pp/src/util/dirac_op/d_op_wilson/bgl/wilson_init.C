@@ -29,6 +29,8 @@ CPS_END_NAMESPACE
 #include <sys/bgl/bgl_sys_all.h>
 CPS_START_NAMESPACE
 
+void wilson_set_sloppy(bool sloppy) {}
+
 
 
 /*--------------------------------------------------------------------------*/
@@ -332,7 +334,7 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 	for(j=0; j<wilson_p->comm_blklen[mu]; ++j) {
 	  wfm_send_ad[mu+8*k] = send_ad;
 	  wfm_recv_ad[mu+8*k] = receive_ad;
-    if(!UniqueID()) printf("Node 0: wfm_ad[%d][%d]: %p %p \n",mu,k,send_ad,receive_ad);
+//    if(!UniqueID()) printf("Node 0: wfm_ad[%d][%d]: %p %p \n",mu,k,send_ad,receive_ad);
 	  k = k+1;
 	  //sends to +dir (2*mu), receives from - dir (2*mu+1)
 	  //getMinusData(receive_ad, send_ad, BLOCK, mu);

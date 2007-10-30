@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2007-06-25 18:47:38 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.48 2007-06-25 18:47:38 chulwoo Exp $
-dnl  $Id: configure.in,v 1.48 2007-06-25 18:47:38 chulwoo Exp $
+dnl  $Date: 2007-10-30 20:40:34 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.49 2007-10-30 20:40:34 chulwoo Exp $
+dnl  $Id: configure.in,v 1.49 2007-10-30 20:40:34 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.48 $
+dnl  $Revision: 1.49 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -105,9 +105,6 @@ elif test "$enable_target" = "bgl"; then
 #     AC_PATH_PROG(CC, blrts_xlc)
 #    AC_PATH_PROG(CXX, blrts_xlC)
 
-dnl  c++ compiler is used as linker
-#     AC_PATH_PROG(CXX,blrts_xlC)
-
    CFLAGS="${CFLAGS}"
    CXXFLAGS="${CXXFLAGS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I/bgl/BlueLight/ppcfloor/bglsys/include/"
@@ -116,6 +113,20 @@ dnl  c++ compiler is used as linker
 
    ARCH="BGL"
    ARCHDIR="BGL_DIR"
+   TESTING_PARALLEL="yes";
+   namespace_default="yes"
+
+elif test "$enable_target" = "bgp"; then
+   AC_CHECK_PROGS(CC, mpicc)
+   AC_CHECK_PROGS(CXX, mpicxx)
+
+   CFLAGS="${CFLAGS}"
+   CXXFLAGS="${CXXFLAGS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I/bgl/BlueLight/ppcfloor/bglsys/include/"
+#   LDFLAGS="-I/bgl/BlueLight/ppcfloor/bglsys/include/ -L/bgl/BlueLight/ppcfloor/bglsys/lib/ -lrts.rts"
+
+   ARCH="BGP"
+   ARCHDIR="BGL_QMP_DIR"
    TESTING_PARALLEL="yes";
    namespace_default="yes"
 
@@ -228,6 +239,8 @@ dnl     echo "QMP_DIR environment variable not set"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_CFLAGS} "
    DFLAGS="${DFLAGS} -DUSE_QMP"
    if test "$enable_target" = "bgl"; then
+     ARCHDIR="BGL_QMP_DIR"
+   elif test "$enable_target" = "bgp"; then
      ARCHDIR="BGL_QMP_DIR"
    fi
    TESTING_PARALLEL="yes";

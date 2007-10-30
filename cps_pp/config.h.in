@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.24 2007-06-05 15:44:19 chulwoo Exp $
+  $Id: config.h.in,v 1.25 2007-10-30 20:40:34 chulwoo Exp $
 */
 /* Global options for compiling the Columbia code:  
  * @configure_input@
@@ -12,13 +12,13 @@
  *  CVS keywords
  *
  *  $Author: chulwoo $
- *  $Date: 2007-06-05 15:44:19 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.24 2007-06-05 15:44:19 chulwoo Exp $
- *  $Id: config.h.in,v 1.24 2007-06-05 15:44:19 chulwoo Exp $
+ *  $Date: 2007-10-30 20:40:34 $
+ *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.25 2007-10-30 20:40:34 chulwoo Exp $
+ *  $Id: config.h.in,v 1.25 2007-10-30 20:40:34 chulwoo Exp $
  *  $Name: not supported by cvs2svn $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
- *  $Revision: 1.24 $
+ *  $Revision: 1.25 $
  *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
  *  $State: Exp $
  */
@@ -32,8 +32,9 @@
 #define NOARCH 0
 #define QCDOC  1
 #define QCDSP  2
-#define cpsMPI    3
+#define cpsMPI 3
 #define BGL    4
+#define BGP    5
 
 
 #define VERSION_MAJOR @VERSION_MAJOR@
@@ -42,7 +43,6 @@
 #define VERSION_STR @VERSION_STR@
 
 #define TARGET @ARCH@
-#@ENABLE_PARALLEL@
 
 // The configure procedure should make this unnecessary, but just in case...
 #ifndef TARGET
@@ -78,7 +78,7 @@
 #define CPS_END_NAMESPACE    @CPS_END_NAMESPACE@  
 #define CPS_START_NAMESPACE  @CPS_START_NAMESPACE@
 #define USING_NAMESPACE_CPS  @USING_NAMESPACE_CPS@
-#define CPS_COLON	     @CPS_COLON@
+#define CPS_NAMESPACE	     @CPS_NAMESPACE@
 
 
 #if TARGET == cpsMPI

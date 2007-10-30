@@ -1,13 +1,21 @@
 /*!\file
   \brief Implementation of functions for timing and performance measurement.
 
-  $Id: time.C,v 1.10 2006-12-14 17:54:37 chulwoo Exp $
+  $Id: time.C,v 1.11 2007-10-30 20:40:35 chulwoo Exp $
 */
 
 #include <config.h>
 #include <sys/time.h>
 #include <util/qcdio.h>
 #include <util/data_types.h>
+
+#undef ZERO_ONLY
+#if TARGET == BGL
+#define ZERO_ONLY
+#endif
+#if TARGET == BGP
+#define ZERO_ONLY
+#endif
 
 CPS_START_NAMESPACE
 
@@ -50,7 +58,7 @@ Float print_flops(unsigned long long nflops, struct timeval *start, struct timev
   \return The FLOPS rate.
 */
 Float print_flops(char *cname, char *fname, unsigned long long nflops, struct timeval *start, struct timeval *end){
-#if TARGET == BGL
+#ifdef ZERO_ONLY
     if(!UniqueID()){
 	printf("BGL!: %s:%s: ",cname,fname);
 	return print_flops(nflops,start,end);
@@ -92,7 +100,7 @@ Float print_flops(unsigned long long nflops, Float time){
 */
 
 Float print_flops(char *cname, char *fname, unsigned long long nflops, Float time){
-#if TARGET == BGL
+#ifdef ZERO_ONLY
     if(!UniqueID()){
 	printf("Node 0: %s:%s: ",cname,fname);
 	return print_flops(nflops,time);

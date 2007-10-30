@@ -75,8 +75,8 @@ pt_cmv:
 	lfd	   26,	96(%r27)
 	lfd	   27,	104(%r27)
 	add	%r18, %r5, %r9
-	lfd	   0,	0 ( % r19)
-	lfd	   1,	8 ( % r19)
+	lfd	   0,	0 ( %r19)
+	lfd	   1,	8 ( %r19)
 	mr	 %r26,	 %r24
 	subic.	 3,	3,	1
 	bf gt,	lab2
@@ -116,8 +116,8 @@ lab1:
 	stfd	   16,	32(%r24)
 	lfd	   29,	120(%r27)
 	stfd	   17,	40(%r24)
-	lfd	   2,	16 ( % r19)
-	lfd	   3,	24 ( % r19)
+	lfd	   2,	16 ( %r19)
+	lfd	   3,	24 ( %r19)
 #<<<<<< Break 1
 	lfd	   18,	32(%r27)
 	fmadd	 6, 20,  2,  6
@@ -143,9 +143,9 @@ lab1:
 	fnmsub	10, 29,  3, 10
 
 	fmadd	11, 29,  2, 11
-	lfd	   4,	32 ( % r19)
+	lfd	   4,	32 ( %r19)
 	dcbt	 %r11,	 %r29
-	lfd	   5,	40 ( % r19)
+	lfd	   5,	40 ( %r19)
 
 #<<<<<< Break 2
 	lfd	   20,	0(%r28)
@@ -173,9 +173,9 @@ lab1:
 	fnmsub	10, 27,  5, 10
 
 	fmadd	11, 27,  4, 11
-	lfd	   0,	0 ( % r20)
+	lfd	   0,	0 ( %r20)
 
-	lfd	   1,	8 ( % r20)
+	lfd	   1,	8 ( %r20)
 	dcbt	 %r13,	 %r29
 #<<<<<< Break 3
 	mr	 %r19,	 %r21
@@ -217,8 +217,8 @@ lab1:
 	stfd	   10,	32(%r23)
 	lfd	   27,	120(%r28)
 	stfd	   11,	40(%r23)
-	lfd	   2,	16 ( % r20)
-	lfd	   3,	24 ( % r20)
+	lfd	   2,	16 ( %r20)
+	lfd	   3,	24 ( %r20)
 #<<<<<< Break 5
 	lfd	   20,	32(%r28)
 	fmadd	12, 18,  2, 12
@@ -244,9 +244,9 @@ lab1:
 	fnmsub	16, 27,  3, 16
 
 	fmadd	17, 27,  2, 17
-	lfd	   4,	32 ( % r20)
+	lfd	   4,	32 ( %r20)
 	dcbt	 %r11,	 %r30
-	lfd	   5,	40 ( % r20)
+	lfd	   5,	40 ( %r20)
 
 #<<<<<< Break 6
 	lfd	   18,	0(%r29)
@@ -284,10 +284,10 @@ lab1:
 	fnmsub	16, 29,  5, 16
 
 	fmadd	17, 29,  4, 17
-	lfd	   0,	0 ( % r21)
+	lfd	   0,	0 ( %r21)
 #<<<<<< Break 7
 
-	lfd	   1,	8 ( % r21)
+	lfd	   1,	8 ( %r21)
 	dcbt	 %r13,	 %r30
 
 
@@ -319,8 +319,8 @@ lab2:
 	lfd	   29,	120(%r27)
 	fmadd	11, 27,  0, 11
 	stfd	   17,	40(%r24)
-	lfd	   2,	16 ( % r19)
-	lfd	   3,	24 ( % r19)
+	lfd	   2,	16 ( %r19)
+	lfd	   3,	24 ( %r19)
 #<<<<<< Break 1
 	lfd	   18,	32(%r27)
 	mr	 %r20,	 %r22
@@ -336,9 +336,9 @@ lab2:
 	fmadd	10, 28,  2, 10
 	lfd	   27,	136(%r27)
 	fmadd	11, 28,  3, 11
-	lfd	   4,	32 ( % r19)
+	lfd	   4,	32 ( %r19)
 	fnmsub	 6, 21,  3,  6
-	lfd	   5,	40 ( % r19)
+	lfd	   5,	40 ( %r19)
 	fmadd	 7, 21,  2,  7
 	fnmsub	 8, 25,  3,  8
 	fmadd	 9, 25,  2,  9
@@ -359,9 +359,9 @@ lab2:
 	fmadd	11, 26,  5, 11
 	lfd	   29,	104(%r28)
 	fnmsub	 6, 19,  5,  6
-	lfd	   0,	0 ( % r20)
+	lfd	   0,	0 ( %r20)
 	fmadd	 7, 19,  4,  7
-	lfd	   1,	8 ( % r20)
+	lfd	   1,	8 ( %r20)
 	fnmsub	 8, 23,  5,  8
 	fmadd	 9, 23,  4,  9
 	fnmsub	10, 27,  5, 10
@@ -392,8 +392,8 @@ lab2:
 	fnmsub	16, 29,  1, 16
 	stfd	   11,	40(%r23)
 	fmadd	17, 29,  0, 17
-	lfd	   2,	16 ( % r20)
-	lfd	   3,	24 ( % r20)
+	lfd	   2,	16 ( %r20)
+	lfd	   3,	24 ( %r20)
 #<<<<<< Break 5
 	lfd	   20,	32(%r28)
 	fmadd	12, 18,  2, 12
@@ -407,9 +407,9 @@ lab2:
 	fmadd	16, 26,  2, 16
 	lfd	   29,	136(%r28)
 	fmadd	17, 26,  3, 17
-	lfd	   4,	32 ( % r20)
+	lfd	   4,	32 ( %r20)
 	fnmsub	12, 19,  3, 12
-	lfd	   5,	40 ( % r20)
+	lfd	   5,	40 ( %r20)
 	fmadd	13, 19,  2, 13
 	fnmsub	14, 23,  3, 14
 	fmadd	15, 23,  2, 15

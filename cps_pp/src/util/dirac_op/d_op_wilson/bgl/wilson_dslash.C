@@ -36,8 +36,12 @@ CPS_END_NAMESPACE
 #include <util/wilson.h>
 #include <util/dirac_op.h>
 #include <util/error.h>
+#include <util/time.h>
 #include <comms/scu.h>
 #include <sys/bgl/bgl_sys_all.h>
+#if TARGET != BGL
+inline double rts_get_timebase() {return 0;}
+#endif
 CPS_START_NAMESPACE
 
 /***************************************************************************/
@@ -106,8 +110,10 @@ void wilson_dslash(IFloat *chi,
   int dslash_time_i;
   int cb_vol;
   IFloat dslash_perf;
+  Float total_time=0.;
   
   start_time_dslash = rts_get_timebase();
+  total_time -=dclock();
 
   /*------------------------------------------------------------------------*/
   /* Save double hummer floating point registers                            */
@@ -266,6 +272,7 @@ void wilson_dslash(IFloat *chi,
 
 
   stop_time_dslash = rts_get_timebase();
+  total_time +=dclock();
 
 
   /*------------------------------------------------------------------------*/
@@ -288,12 +295,23 @@ void wilson_dslash(IFloat *chi,
     printf("TRICK             TIME IN PCYCLES PER SITE = %llu\n", trick_time/cb_vol);
     printf("DSLASH_eo         TIME IN PCYCLES PER SITE = %llu\n", dslash_time/cb_vol);
     printf("DSLASH_eo         PERFORMANCE     = %3.1f\%\n",   dslash_perf);
+    print_flops("",fname,1320*cb_vol,total_time);
   }
 #endif
   count++;
 
   /*------------------------------------------------------------------------*/
 
+}
+void wilson_dslash_two(Float *chi0, Float *chi1,
+                   Float *u,
+                   Float *psi0, Float *psi1,
+                   int cb0, int cb1,
+                   int dag,
+                   Wilson *wp)
+{
+  wilson_dslash(chi0,u,psi0,cb0,dag,wp);
+  wilson_dslash(chi1,u,psi1,cb1,dag,wp);
 }
 
 CPS_END_NAMESPACE

@@ -240,10 +240,12 @@ extern IFloat **wfm_recv_ad;
 
 int ccount=0;
 static long long count, count2;
+#ifndef HAVE_SYNC
 unsigned int sync(){
   BGL_Barrier_Pass(BGL_AppBarriers);
   return 0;
 }
+#endif
 
 
 //------------------------------------------------------------------

@@ -152,7 +152,7 @@ void AlgRemez::generateApprox()
   while (spread > tolerance) { //iterate until convergance
 
     if (iter++%100==0) 
-      VRB.Flow(cname,fname,"Iteration %d, spread %e delta %e\n", iter-1,(Float)spread,(Float)delta);
+      VRB.Result(cname,fname,"Iteration %d, spread %e delta %e\n", iter-1,(Float)spread,(Float)delta);
     equations();
     if (delta < tolerance)
       ERR.General(cname, fname,"Delta too small, try increasing precision\n");
@@ -504,8 +504,13 @@ bigfloat AlgRemez::func(const bigfloat x) {
     ERR.General(cname,fname,"ApproxType %d not implemented\n", approx_type);
   }
 
-  if (z == (bigfloat)1.0) return (bigfloat)1.0;
-  else return pow_bf(z,(bigfloat)power_num / (bigfloat)power_den);
+#ifdef USE_MPFR
+  if (approx_type == RATIONAL_APPROX_POWER ||
+      approx_type == RATIONAL_APPROX_QUOTIENT) {
+    if (z == (bigfloat)1.0) return (bigfloat)1.0;
+    else return pow_bf(z,(bigfloat)power_num / (bigfloat)power_den);
+  }
+#endif
 
   // initial guess to accelerate convergance
   y = (bigfloat)pow((double)z,(double)((bigfloat)1l/(bigfloat)power_den));

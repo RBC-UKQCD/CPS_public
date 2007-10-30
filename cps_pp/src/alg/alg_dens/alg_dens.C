@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgDens class.
   
-  $Id: alg_dens.C,v 1.6 2007-06-25 15:49:20 chulwoo Exp $
+  $Id: alg_dens.C,v 1.7 2007-10-30 20:40:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-25 15:49:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.6 2007-06-25 15:49:20 chulwoo Exp $
-//  $Id: alg_dens.C,v 1.6 2007-06-25 15:49:20 chulwoo Exp $
+//  $Date: 2007-10-30 20:40:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.7 2007-10-30 20:40:34 chulwoo Exp $
+//  $Id: alg_dens.C,v 1.7 2007-10-30 20:40:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_dens.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v $
 //  $State: Exp $
 //
@@ -264,7 +264,7 @@ void AlgDens::run()
       /* set source
 	 ---------- */
 
-#ifdef POINT
+      #ifdef POINT
       bzero((char *)src, f_size*sizeof(Float));
       if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0)
 	{
@@ -275,11 +275,11 @@ void AlgDens::run()
 	for(int yy = 0; yy < 6; yy++)
 	  if(*(((IFloat *)&src[zz])+yy) > 1e-15)
 	    printf("zz = %d, yy = %d, *(src+zz) = %0.16e\n", zz, yy, *(((IFloat *)&src[zz])+yy));
-#else
+      #else
       lat.RandGaussVector(src, 0.5);
-#endif
+      #endif
       
-#ifdef Z2
+      #ifdef Z2
       IFloat * tmp1;
       for(int zz = 0; zz < GJP.VolNodeSites(); zz++)
 	for(int yy = 0; yy < 6; yy+=2)
@@ -298,16 +298,15 @@ void AlgDens::run()
       //for(int yy = 0; yy < 6; yy++)
       //  printf("%0.16e  ",*(tmp1+yy));
       //printf("\n");
-#endif
+      #endif
 
       clear_vector();
-      save_vector(src,0);
 
-#ifdef POINT
+      #ifdef POINT
       norm = 1.0;
-#else
+      #else
       norm = GJP.VolSites() * ( lat.FsiteSize() / 2 );
-#endif
+      #endif
 
       // Initialize the cg_arg mass, with the first mass we
       // want to compute for:
@@ -331,6 +330,8 @@ void AlgDens::run()
       /***** Loop over masses *****/
       for(int m=0; m<dens_arg->n_masses; m++){
 	
+	save_vector(src,0);
+      
 	/***** loop over operators *****/
 	for (int iobs=0; iobs<dens_arg->n_obs; iobs++){
 
@@ -369,14 +370,24 @@ void AlgDens::run()
 	  }
 	  else{
 	    TrObs = sol->CompDotProductGlbSum(src, f_size) / norm;
-	    if(obsID==1) TrObs *= 2.0 ;
+	    //if(obsID==1) TrObs *= 2.0 ;
+	    if(b_coor_table[iobs]==0){
+	      for(int i=0; i<a_coor_table[iobs]; i++){
+		TrObs *= 2.0;
+	      }
+	    }
 	  }
 	  
 	  /* save vector
 	     ----------- */
 
 	  if(save_table[iobs]){
-	    save_vector(solM,obsID);
+	    if(order>0){
+	      save_vector(solM,obsID);
+	    }
+	    else{
+	      save_vector(sol,obsID);
+	    }
 	  }
 	  
 	  /* print out results
@@ -481,9 +492,8 @@ void AlgDens::make_tables()
     }
 
     aprev=a-1;
-    mult=1;
-    for(int i=0; i<aprev; i++) mult*=(dens_arg->max_deri)+1;
-    bprev=b%mult;
+    mult=(dens_arg->max_deri)+1;
+    bprev=b/mult;
 
     brefmin=b-b%((dens_arg->max_deri)+1);
     brefmax=brefmin+(dens_arg->max_deri);
@@ -551,7 +561,7 @@ void AlgDens::clear_vector()
 
   for(int zz = 0; zz<dens_arg->max_save; zz++){
     offset=zz*GJP.VolNodeSites();
-    memset((char *)(save+offset), 0, f_size*sizeof(Float));
+    bzero((char *)(save+offset), f_size*sizeof(Float));
     // *(map_table+zz)=-1;
     map_table[zz]=-1;
   }
@@ -605,7 +615,7 @@ void AlgDens::load_vector(Vector *v, int obsID)
   IFloat *tmp1;
   IFloat *tmp2;
   DensArg *dens_arg;
-  char *fname = "save_vector()";
+  char *fname = "load_vector()";
   VRB.Func(cname,fname);
 
   dens_arg = alg_dens_arg;

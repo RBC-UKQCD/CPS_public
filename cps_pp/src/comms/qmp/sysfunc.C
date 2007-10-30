@@ -5,14 +5,14 @@
   
 */
 /*----------------------------------------------------------------------
-/* The Sysfunc Comms Interface: sysfunc.C
+  The Sysfunc Comms Interface: sysfunc.C
 
   The QMP implementation of the QCDOC/QCDSP SCU comms-layer.
 
   M. Cheng michaelc@phys.columbia.edu
   -----------------------------------------------------------
 
-/*----------------------------------------------------------*/
+----------------------------------------------------------*/
 
 #include <comms/sysfunc_qmp.h>
 //#include <comms/scu_dir_arg.h>
@@ -21,6 +21,12 @@
 #include <string.h>
 #include <math.h>
 #include <qmp.h>
+#if TARGET == BGL
+#include <sys/bgl/bgl_sys_all.h>
+#endif
+#if TARGET == BGP
+void spi_init();
+#endif
 CPS_START_NAMESPACE
 
 /*!\namespace cps
@@ -33,7 +39,7 @@ CPS_START_NAMESPACE
 //Useful global variables
 namespace QMPSCU {
   
-  bool initialized = false;
+  static bool initialized = false;
   
   //! Number of grid dimensions.
   static int NDIM = 5;
@@ -59,16 +65,31 @@ namespace QMPSCU {
   }
 #endif
 
-  //Initialize QMP
-  //Get Allocated machine size, and declare logical machine
-  void init_qmp(int * argc, char ***argv) {
-//    printf("init_qmp(%d %p)\n",*argc,*argv);
-//      for(int i = 0; i<*argc;i++){
-//        printf("argv[%d]=%s\n",i,(*argv)[i]); 
-//      }
+//Initialize QMP
+//Get Allocated machine size, and declare logical machine
+
+void init_qmp(int * argc, char ***argv) {
+
+#if 0
+  printf("init_qmp(%d %p)\n",*argc,*argv);
+  for(int i = 0; i<*argc;i++){
+    printf("argv[%d](before)=%s\n",i,(*argv)[i]); 
+  }
+#endif
+
+#if TARGET == BGP
+   spi_init();
+#endif
+  
     QMP_thread_level_t prv;
     QMP_status_t init_status = QMP_init_msg_passing(argc, argv, QMP_THREAD_SINGLE, &prv);
+//      for(int i = 0; i<*argc;i++){
+//        printf("argv[%d](after)=%s\n",i,(*argv)[i]); 
+//      }
     peRank = QMP_get_node_number();
+    peNum = QMP_get_number_of_nodes();
+//    printf("in init_qmp(argc,argv): peRank peNum=%d %d\n",peRank,peNum);
+ //   exit(-43);
     if(!peRank)printf("QMP_init_msg_passing returned %d\n",init_status);
     if (init_status != QMP_SUCCESS) {
       QMP_error("%s\n",QMP_error_string(init_status));
@@ -90,13 +111,29 @@ namespace QMPSCU {
         printf("argv[%d]=%s\n",i,(*argv)[i]); 
       }
 #endif
-      printf("Rank=%d Num=%d NDIM=%d\n",peRank,peNum,NDIM);
-      for(int i = 0;i<NDIM;i++){
-        printf("dim %d: %d %d\n",i, peGrid[i],pePos[i]);
-      }
     }
 
-#if 1
+#if (TARGET == BGL) || (TARGET == BGP)
+      printf("Rank=%d Num=%d NDIM=%d\n",peRank,peNum,NDIM);
+      printf("dim:");
+      for(int i = 0;i<NDIM;i++)
+        printf(" %d",peGrid[i]);
+      printf("\n");
+      printf("pos:");
+      for(int i = 0;i<NDIM;i++)
+        printf(" %d",pePos[i]);
+      printf("\n");
+#endif
+
+
+#if TARGET == BGL
+    int rc;
+    BGLPersonality pers;
+    rts_get_personality(&pers, sizeof(pers));
+    printf("from personality: %d %d %d %d\n",pers.xCoord,pers.yCoord,pers.zCoord,rts_get_processor_id());
+#endif
+
+#if 0
     if ( (qmp_type!= QMP_GRID) && (qmp_type !=QMP_MESH)  ) {
       QMP_error("CPS on QMP only implemented for GRID or MESH, not (%d) machines\n",qmp_type);
     }
@@ -118,20 +155,28 @@ namespace QMPSCU {
 /* Definitions of the actual emulated SCU system functions                 */
 /*-------------------------------------------------------------------------*/
 
-int UniqueID() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peRank;}
+int UniqueID() {return QMPSCU::peRank;}
 
-int CoorT() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::pePos[3];}
 int CoorX() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::pePos[0];}
 int CoorY() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::pePos[1];}
 int CoorZ() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::pePos[2];}
-int CoorS(){return 0;}
+int CoorT() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} 
+               if (QMPSCU::NDIM>3) return QMPSCU::pePos[3];
+               else return 0; }
+int CoorS() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} 
+               if (QMPSCU::NDIM>4) return QMPSCU::pePos[4];
+               else return 0; }
 int CoorW(){return 0;}
 
-int SizeT() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peGrid[3];}
 int SizeX() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peGrid[0];}
 int SizeY() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peGrid[1];}
 int SizeZ() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peGrid[2];}
-int SizeS() {return 1;}
+int SizeT() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} 
+               if (QMPSCU::NDIM>3) return QMPSCU::peGrid[3];
+               else return 1; }
+int SizeS() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} 
+               if (QMPSCU::NDIM>4) return QMPSCU::peGrid[4];
+               else return 1; }
 int SizeW() {return 1;}
 
 int NumNodes() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::peNum;}
@@ -145,7 +190,10 @@ int NumNodes() {if (!QMPSCU::initialized) {QMPSCU::init_qmp();} return QMPSCU::p
   may differ from that of the QCDSP/QCDOC system function.
 */
 //----------------------------------------------------------------
-unsigned int Seed(){}
+static const unsigned int SERIAL_SEED = 112319;
+
+
+unsigned int Seed(){return SERIAL_SEED;}   //!< Gets a RNG seed.
 //----------------------------------------------------------------
 /*
   The seed is the same for each node (spatially fixed, hence the S), but
@@ -155,7 +203,7 @@ unsigned int Seed(){}
   from that of the QCDSP/QCDOC system function.
 */
 //----------------------------------------------------------------
-unsigned int SeedS(){}
+unsigned int SeedS(){return SERIAL_SEED;}  //!< Gets a RNG seed.
 //----------------------------------------------------------------
 /*
   SeedT can be different for each node, but is fixed in time (the T), so it is
@@ -165,7 +213,7 @@ unsigned int SeedS(){}
   differ from that of the QCDSP/QCDOC system function.
 */
 //----------------------------------------------------------------
-unsigned int SeedT(){}
+unsigned int SeedT(){return SERIAL_SEED;}  //!< Gets a RNG seed.
 //----------------------------------------------------------------
 /*
   SeedST is the same for each node (spatially fixed, hence the S), and the
@@ -175,7 +223,7 @@ unsigned int SeedT(){}
   from that of the QCDSP/QCDOC system function.
 */
 //----------------------------------------------------------------
-unsigned int SeedST(){}
+unsigned int SeedST(){return SERIAL_SEED;} //!< Gets a RNG seed.
 
 //----------------------------------------------------------------
 /*
@@ -185,6 +233,7 @@ unsigned int SeedST(){}
   \return 0
 */
 //----------------------------------------------------------------
+#ifndef HAVE_SYNC
 unsigned int sync() {
 QMP_status_t sync_status = QMP_barrier(); 
 if (sync_status != QMP_SUCCESS) {
@@ -192,6 +241,7 @@ if (sync_status != QMP_SUCCESS) {
 }
 return 0;
 }
+#endif
 
 //----------------------------------------------------------------
 /*

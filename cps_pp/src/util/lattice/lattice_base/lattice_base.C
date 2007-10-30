@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.48 2007-06-05 15:44:19 chulwoo Exp $
+  $Id: lattice_base.C,v 1.49 2007-10-30 20:40:35 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-05 15:44:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.48 2007-06-05 15:44:19 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.48 2007-06-05 15:44:19 chulwoo Exp $
+//  $Date: 2007-10-30 20:40:35 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.49 2007-10-30 20:40:35 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.49 2007-10-30 20:40:35 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.48 $
+//  $Revision: 1.49 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -231,7 +231,7 @@ Lattice::Lattice()
     GJP.StartConfKind(START_CONF_MEM);
   }
   else if(start_conf_kind == START_CONF_FILE){
-#if TARGET == QCDOC || TARGET == NOARCH || TARGET == BGL
+#if TARGET == QCDOC || TARGET == NOARCH || TARGET == BGL || TARGET == BGP
 //    gauge_field = GJP.StartConfLoadAddr();
     VRB.Flow(cname,fname, "Load starting configuration addr = %x\n",
 	     gauge_field);
@@ -2705,8 +2705,8 @@ void Lattice::GsoCheck(void){
   char *fname = "GsoCheck()";
   VRB.Func(cname,fname);
   int s;
-  IFloat rcv_buf;
-  IFloat snd_buf;
+  IFloat rcv_buf[2];
+  IFloat snd_buf[2];
   IFloat failed_value;
   Float failed_flag;
   int failed_slice;
@@ -2724,19 +2724,19 @@ void Lattice::GsoCheck(void){
     //--------------------------------------------------------------
     failed_flag = 0.0;
     failed_slice = 0;
-    snd_buf = plaq;
+    snd_buf[0] = plaq;
     for(s=1; s < s_nodes; s++){
-      getMinusData(&rcv_buf, &snd_buf, 1, 4);
-      if(rcv_buf != plaq) {
-	printf("plaq=%e rcv_buf=$%e\n",plaq,rcv_buf);
+      getMinusData(rcv_buf, snd_buf, 2, 4);
+      if(rcv_buf[0] != plaq) {
+	printf("plaq=%e rcv_buf=%e\n",plaq,rcv_buf[0]);
 	failed_flag = 1.0;
 	ERR.General(cname,fname,"GsoCheck: PLAQUETTE TEST FAILED");
 	if(failed_slice == 0) {
 	  failed_slice = s;
-	  failed_value = rcv_buf;
+	  failed_value = rcv_buf[0];
 	}
       }
-      snd_buf = rcv_buf;
+      snd_buf[0] = rcv_buf[0];
     }
     glb_sum_five(&failed_flag);
     if(failed_flag > 0.1) {
@@ -2765,20 +2765,20 @@ void Lattice::GsoCheck(void){
     //--------------------------------------------------------------
     failed_flag = 0.0;
     failed_slice = 0;
-    snd_buf = checksum;
+    snd_buf[0] = checksum;
     for(s=1; s < s_nodes; s++){
-      getMinusData(&rcv_buf, &snd_buf, 1, 4);
-      if(rcv_buf != checksum) {
+      getMinusData(rcv_buf, snd_buf, 2, 4);
+      if(rcv_buf[0] != checksum) {
 	failed_flag = 1.0;
 #ifdef _TARTAN
 	InterruptExit(-1, "GsoCheck: CHECKSUM TEST FAILED");
 #endif
 	if(failed_slice == 0) {
 	  failed_slice = s;
-	  failed_value = rcv_buf;
+	  failed_value = rcv_buf[0];
 	}
       }
-      snd_buf = rcv_buf;
+      snd_buf[0] = rcv_buf[0];
     }
     glb_sum_five(&failed_flag);
     if(failed_flag > 0.1) {

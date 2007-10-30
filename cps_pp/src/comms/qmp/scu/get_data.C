@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.2 2006-11-25 19:10:05 chulwoo Exp $
+  $Id: get_data.C,v 1.3 2007-10-30 20:40:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-11-25 19:10:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.2 2006-11-25 19:10:05 chulwoo Exp $
-//  $Id: get_data.C,v 1.2 2006-11-25 19:10:05 chulwoo Exp $
+//  $Date: 2007-10-30 20:40:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.3 2007-10-30 20:40:34 chulwoo Exp $
+//  $Id: get_data.C,v 1.3 2007-10-30 20:40:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -69,16 +69,6 @@ inline static void allocate_buffer(){
     send_mem = QMP_allocate_memory(sizeof(Float)*MAX_LENGTH);
     send_noncache = (IFloat *)QMP_get_memory_pointer(send_mem);
   }
-#if 0
-  if(rcv_noncache==NULL) rcv_noncache = 
-    (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
-  if(rcv_noncache==NULL)
-    ERR.Pointer("","getPlusData","rcv_noncache");
-  if(send_noncache==NULL) send_noncache = 
-    (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
-  if(send_noncache==NULL)
-    ERR.Pointer("","getPlusData","send_noncache");
-#endif
 
 }
 
@@ -96,21 +86,15 @@ inline static void check_length(int len){
     }
 }
 
-static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len, int mu, int sign){
+static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len_i, int mu, int sign){
 
   if(gjp_local_axis[mu] == 1) {
-    for(int i=0;i<len;i++) rcv_noncache[i] = send_noncache[i];
+    for(int i=0;i<len_i;i++) rcv_noncache[i] = send_noncache[i];
     return;
   }
 
-#ifndef USE_QMP
-    SCUDirArgIR send(send_noncache, gjp_scu_dir[2*mu+1], SCU_SEND, len*sizeof(IFloat));
-    SCUDirArgIR rcv(rcv_noncache, gjp_scu_dir[2*mu], SCU_REC, len*sizeof(IFloat));
-    send.StartTrans();
-    rcv.StartTrans();
-    send.TransComplete();
-    rcv.TransComplete();
-#else
+  int len = len_i + (len_i%2);
+
     QMP_msgmem_t send_msgmem = QMP_declare_msgmem(send_noncache, len*sizeof(IFloat));
     QMP_msgmem_t rcv_msgmem = QMP_declare_msgmem(rcv_noncache, len*sizeof(IFloat));
     QMP_msghandle_t send_msghandle = QMP_declare_send_relative(send_msgmem, mu,-sign, 0);
@@ -127,7 +111,6 @@ static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len, int m
     QMP_free_msghandle(rcv_msghandle);
     QMP_free_msgmem(send_msgmem);
     QMP_free_msgmem(rcv_msgmem);
-#endif
 
 }
 
@@ -150,11 +133,29 @@ static void getData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu, int sign
 }
 
 void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu){
-  getData(rcv_buf,send_buf,len,mu,+1);
+  IFloat *rcv_p = rcv_buf;
+  IFloat *send_p = send_buf;
+  int  len_t = len;
+  while (len_t > MAX_LENGTH){
+    getData(rcv_p,send_p,MAX_LENGTH,mu,+1);
+    len_t -= MAX_LENGTH;
+    rcv_p += MAX_LENGTH;
+    send_p += MAX_LENGTH;
+  }
+  getData(rcv_p,send_p,len_t,mu,+1);
 }
 
 void getMinusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu){
-  getData(rcv_buf,send_buf,len,mu,-1);
+  IFloat *rcv_p = rcv_buf;
+  IFloat *send_p = send_buf;
+  int  len_t = len;
+  while (len_t > MAX_LENGTH){
+    getData(rcv_p,send_p,MAX_LENGTH,mu,-1);
+    len_t -= MAX_LENGTH;
+    rcv_p += MAX_LENGTH;
+    send_p += MAX_LENGTH;
+  }
+  getData(rcv_p,send_p,len_t,mu,-1);
 }
 
 //====================================================================

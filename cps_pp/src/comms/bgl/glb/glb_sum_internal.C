@@ -115,7 +115,7 @@ void glb_sum_internal (Float * float_p, int dir,int len)
 //  printf("float_p[%d]=%e\n",i,float_p[i]);
   }
 //  Fprintf(fp,"%p %d %d %0.20e\n",float_p,dir,len,*float_p);
-  printf("glb_sum_internal %d:%p %d %d %0.20e\n",UniqueID(),float_p,dir,len,*float_p);
+//  printf("glb_sum_internal %d:%p %d %d %0.20e\n",UniqueID(),float_p,dir,len,*float_p);
   if (output)   printf("after = %e\n", (double)*float_p);
 }
 CPS_END_NAMESPACE

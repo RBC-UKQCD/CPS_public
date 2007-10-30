@@ -32,6 +32,11 @@ case "$enable_target" in
 	HOST=powerpc-bgl-blrts-gnu
 	ENABLE_TARGET='--enable-target=bgl'
 	;;
+	bgp)
+	BUILD=$build
+	HOST=powerpc-bgp-linux
+	ENABLE_TARGET='--enable-target=bgp'
+	;;
 	*)
 	BUILD=$build
 	HOST=$host

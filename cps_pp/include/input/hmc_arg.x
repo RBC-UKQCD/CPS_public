@@ -30,4 +30,6 @@ class HmcArg {
     //! How many attempts do we try to reproduce?
     int reproduce_attempt_limit;
 
+    //! whether sloppy precision is used for MD
+    bool wfm_md_sloppy;
 };

@@ -21,6 +21,7 @@ CPS_END_NAMESPACE
 #include<util/vector.h>
 #include<util/verbose.h>
 #include<util/error.h>
+#include<util/time.h>
 #include<util/dirac_op.h>
 CPS_START_NAMESPACE
 
@@ -32,6 +33,11 @@ void  dwf_m(Vector *out,
 	    Dwf *dwf_lib_arg)
 {
 
+  static int called=0;
+  called++;
+  Float dslash_4_time=0.;
+  Float dslash_5_time=0.;
+
 //------------------------------------------------------------------
 // Initializations
 //------------------------------------------------------------------
@@ -42,32 +48,45 @@ void  dwf_m(Vector *out,
 //------------------------------------------------------------------
 // Apply Dslash E <- O
 //------------------------------------------------------------------
-  sync();
-  VRB.Func("dwf_m","dwf_dslash_4");
+//  sync();
 //  dwf_dslash(frm_tmp2, gauge_field, in, mass, 1, 0, dwf_lib_arg);
+  dslash_4_time -=dclock();
   dwf_dslash_4(frm_tmp2, gauge_field, in, 1, 0, dwf_lib_arg);
-  sync();
-  VRB.Func("dwf_m","dwf_dslash_5_plus");
+  dslash_4_time +=dclock();
+//  sync();
+  dslash_5_time -=dclock();
   dwf_dslash_5_plus(frm_tmp2, in, mass, 0, dwf_lib_arg);
+  dslash_5_time +=dclock();
 
 //------------------------------------------------------------------
 // Apply Dslash O <- E
 //------------------------------------------------------------------
-  sync();
-  VRB.Func("dwf_m","dwf_dslash_4");
+//  sync();
 //  dwf_dslash(out, gauge_field, frm_tmp2, mass, 0, 0, dwf_lib_arg);
+  dslash_4_time -=dclock();
   dwf_dslash_4(out, gauge_field, frm_tmp2, 0, 0, dwf_lib_arg);
-  sync();
-  VRB.Func("dwf_m","dwf_dslash_5_plus");
+  dslash_4_time +=dclock();
+//  sync();
+  dslash_5_time -=dclock();
   dwf_dslash_5_plus(out, frm_tmp2, mass, 0, dwf_lib_arg);
+  dslash_5_time +=dclock();
 
-  sync();
+//  sync();
   
 //------------------------------------------------------------------
 // out = in - dwf_kappa_sq * out
 //------------------------------------------------------------------
-  out->FTimesV1PlusV2(minus_kappa_sq, out, in, f_size); 
+//  out->FTimesV1PlusV2(minus_kappa_sq, out, in, f_size); 
+  Float *out_f = (Float *)out;
+  Float *in_f = (Float *)in;
+  xaxpy(&minus_kappa_sq,out_f,in_f,f_size/6);
   DiracOp::CGflops+=2*f_size;
+  if(called%1000==0){
+    print_time("dwf_m","dslash_4_time",dslash_4_time/1000.);
+    print_time("dwf_m","dslash_5_time",dslash_5_time/1000.);
+    dslash_4_time=0.;
+    dslash_5_time=0.;
+  }
 
 }
 

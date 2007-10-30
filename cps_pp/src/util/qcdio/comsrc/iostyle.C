@@ -1026,6 +1026,7 @@ void SerialIO::sShift(char * data, const int xblk, const int dir) const {
 }
 
 
+#if TARGET == QCDOC
 void SerialIO::sSpread(char * data, const int datablk) const {  
 
   const char *fname = "sSpread()";
@@ -1033,9 +1034,6 @@ void SerialIO::sSpread(char * data, const int datablk) const {
   // clone the lattice from s==0 nodes to all s>0 nodes
   // only used in loading process
   if(qio_arg.Snodes() <= 1)  return;
-#if TARGET != QCDOC
-  else ERR.General(cname,fname,"not implemented for Snodes()>1");
-#endif
 
   // eg. 8 nodes
   // step:  i   ii       iii       iv
@@ -1044,7 +1042,6 @@ void SerialIO::sSpread(char * data, const int datablk) const {
   //        \/    
   //        7   -->  6   -->   5   -->   4
 
-#if TARGET == QCDOC
   SCUDirArg  socket;
 
   VRB.Flow(cname, fname, "Spread on S dimension:: 0 ==> %d\n", qio_arg.Snodes()-1);
@@ -1098,9 +1095,35 @@ void SerialIO::sSpread(char * data, const int datablk) const {
     receiver[1]--;
 
   }
-#endif
+}
+#else
+void SerialIO::sSpread(char * data, const int datablk) const {  
+
+  const char *fname = "sSpread()";
+
+  // clone the lattice from s==0 nodes to all s>0 nodes
+  // only used in loading process
+  if(qio_arg.Snodes() <= 1)  return;
+
+  // eg. 8 nodes
+  // step:  i   ii       iii       iv
+  //        0   -->  1   -->   2   -->   3 
+  //        |     
+  //        \/    
+  //        7   -->  6   -->   5   -->   4
+  TempBufAlloc snd_buf(datablk);
+  TempBufAlloc rcv_buf(datablk);
+  int s_nodes=qio_arg.Snodes();
+  int s_coor=qio_arg.Scoor();
+  if(s_coor == 0) memcpy(snd_buf.FPtr(), data, datablk);
+  for(int i =0;i<s_nodes-1;i++){
+    getMinusData(rcv_buf.FPtr(),snd_buf.FPtr(),datablk/sizeof(IFloat),4);
+    if(i+1 == s_coor) memcpy(data, rcv_buf.FPtr(), datablk);
+    memcpy(snd_buf.FPtr(), rcv_buf.FPtr(), datablk);
+  }
 
 }
+#endif
 
 
 

@@ -10,13 +10,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-05 15:44:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/bgl/inv_cg.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
+//  $Date: 2007-10-30 20:40:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/bgl/inv_cg.C,v 1.4 2007-10-30 20:40:34 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.4 2007-10-30 20:40:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/bgl/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -99,6 +99,10 @@ int DiracOp::InvCg(Vector *out,
   Float d;
   int i, j;
   char *fname = "InvCg(V*,V*,F,F*)";
+
+  Float mdagm_time=0.;
+  Float gsum_time=0.;
+  Float linalg_time=0.;
 
 // Flash the LED and then turn it off
 //------------------------------------------------------------------
@@ -214,6 +218,19 @@ int DiracOp::InvCg(Vector *out,
 
   for ( int test = 0; test < test_num+1; test++ ) {
     if (test == 1) sol-> CopyVec(sol_store, f_size_cb);
+
+#ifdef PROFILE
+    struct timeval start;
+    struct timeval end;
+    struct timeval linalg_tmp;
+    struct timeval linalg_start;
+    struct timeval linalg_end;
+  
+    CGflops    = 0;
+    unsigned long long linalg_flops = 0;
+    int nflops_tmp;
+    gettimeofday(&start,NULL);
+#endif
       
   
    sync();
@@ -229,13 +246,18 @@ int DiracOp::InvCg(Vector *out,
 // }
 //------------------------------------------------------------------
     // Mmp = MatPcDagMatPc * sol
+    mdagm_time -=dclock();
     MatPcDagMatPc(mmp, sol);
+    mdagm_time +=dclock();
   
     // res = src
     dir->CopyVec(src, f_size_cb);
   
+    linalg_time -=dclock();
     // res -= mmp
     dir->VecMinusEquVec(mmp, f_size_cb);
+    linalg_time +=dclock();
+    linalg_flops += f_size_cb;
   
     // dir = res
     //dir->CopyVec(res, f_size_cb);  
@@ -252,10 +274,15 @@ int DiracOp::InvCg(Vector *out,
       for (i=0; i<GRAN; i++) *Xptr++ = *(Fdir+j*GRAN+i);
     }
   
+    linalg_time -=dclock();
     // res_norm_sq_cur = res * res
     res_norm_sq_cur = dir->NormSqNode(f_size_cb);
+    linalg_time +=dclock();
+    linalg_flops += 2*f_size_cb;
   
+    gsum_time -=dclock();
     DiracOpGlbSum(&res_norm_sq_cur);
+    gsum_time +=dclock();
   
     // if( |res|^2 <= stp_cnd ) we are done
     VRB.Flow(cname,fname,
@@ -264,21 +291,7 @@ int DiracOp::InvCg(Vector *out,
     max_itr = dirac_arg->max_num_iter-1;
     if(res_norm_sq_cur <= stp_cnd) max_itr = 0;
   
-  
-  #ifdef PROFILE
-    struct timeval start;
-    struct timeval end;
-    struct timeval linalg_tmp;
-    struct timeval linalg_start;
-    struct timeval linalg_end;
-  
-    CGflops    = 0;
-    int nflops = 0;
-    int nflops_tmp;
-    gettimeofday(&start,NULL);
-  
-  #endif
-  
+
 //------------------------------------------------------------------
 // Loop over CG iterations
 //------------------------------------------------------------------
@@ -293,17 +306,19 @@ int DiracOp::InvCg(Vector *out,
   
       // mmp = MatPcDagMatPc * dir
       // d = <dir, MatPcDagMatPc*dir>
+      mdagm_time -=dclock();
       MatPcDagMatPc(mmp, dir, &d);
+      mdagm_time +=dclock();
       //--------------------------------------------------------------
       // checksuming the intermediate vectors and put into the memory
       // --mflin Apr.05
       //--------------------------------------------------------------
-      loc_sum = local_checksum((Float *)mmp,f_size_cb);
+//      loc_sum = local_checksum((Float *)mmp,f_size_cb);
 
       // checksum of the checksums of intermediate vectors
       //-----------------------------------------------------------
-      x_loc_sum = x_loc_sum ^ loc_sum;
-      CSM.SaveCsum(CSUM_EVL_MMP,loc_sum);
+//      x_loc_sum = x_loc_sum ^ loc_sum;
+//      CSM.SaveCsum(CSUM_EVL_MMP,loc_sum);
 
 
     if (test_num) {
@@ -318,12 +333,10 @@ int DiracOp::InvCg(Vector *out,
       /* End of Check */
   
     }
-  #ifdef PROFILE
-//    gettimeofday(&linalg_tmp,NULL);
-//    nflops_tmp = 0;
-  #endif
     
+    gsum_time -=dclock();
       DiracOpGlbSum(&d);
+    gsum_time +=dclock();
 //    VRB.Flow(cname,fname, "d = %e\n", IFloat(d));
   
       // If d = 0 we are done
@@ -336,12 +349,14 @@ int DiracOp::InvCg(Vector *out,
       // res = - a * (MatPcDagMatPc * dir) + res;
       // res_norm_sq_cur = res * res
   
+      linalg_time -=dclock();
       invcg_r_norm(X+GRAN, &a, Fmmp, X+GRAN, f_size_cb/GRAN, &res_norm_sq_cur);
+      linalg_time +=dclock();
+      gsum_time -=dclock();
       DiracOpGlbSum(&res_norm_sq_cur);
-  #ifdef PROFILE
-//    nflops_tmp +=f_size_cb*4;
-  #endif
-      CGflops+=f_size_cb*4;
+      gsum_time +=dclock();
+      linalg_flops +=f_size_cb*4;
+//      CGflops+=f_size_cb*4;
   
       a = -a;
       b = res_norm_sq_cur / res_norm_sq_prv;
@@ -349,15 +364,12 @@ int DiracOp::InvCg(Vector *out,
       // sol = a * dir + sol;
       //sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
       // dir = b * dir + res;
+      linalg_time -=dclock();
       invcg_xp_update(X, Fdir, &a, &b, Fdir, X, f_size_cb/GRAN);
+      linalg_time +=dclock();
   
-  
-  #ifdef PROFILE
-//    linalg_start = linalg_tmp;
-//    gettimeofday(&linalg_end,NULL);
-//    nflops =nflops_tmp+f_size_cb*4;
-  #endif
-      CGflops+=f_size_cb*4;
+      linalg_flops+=f_size_cb*4;
+//      CGflops+=f_size_cb*4;
   
       // if( |res|^2 <= stp_cnd ) we are done
       VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", itr, IFloat(res_norm_sq_cur));
@@ -365,10 +377,10 @@ int DiracOp::InvCg(Vector *out,
   
     }
   
-  #ifdef PROFILE
+#ifdef PROFILE
     gettimeofday(&end,NULL);
-    print_flops(cname,fname,CGflops,&start,&end); 
-  #endif
+    print_flops(cname,fname,CGflops+linalg_flops,&start,&end); 
+#endif
   
     // It has not reached stp_cnd: Issue a warning
     if(itr == dirac_arg->max_num_iter - 1){
@@ -389,16 +401,25 @@ int DiracOp::InvCg(Vector *out,
       *(Fsol++) = *(Xptr++);
     }
   
+    mdagm_time -=dclock();
     MatPcDagMatPc(mmp, sol);
+    mdagm_time +=dclock();
     dir->CopyVec(src, f_size_cb);
+    linalg_time -=dclock();
     dir->VecMinusEquVec(mmp, f_size_cb);
     res_norm_sq_cur = dir->NormSqNode(f_size_cb);
+    linalg_time +=dclock();
+    gsum_time -=dclock();
     DiracOpGlbSum(&res_norm_sq_cur);
+    gsum_time +=dclock();
     Float tmp = res_norm_sq_cur / src_norm_sq;
     tmp = sqrt(tmp);
     if(true_res != 0){
       *true_res = tmp;
     }
+    print_flops(fname,"mdagm",CGflops,mdagm_time);
+    print_time(fname,"gsum_time",gsum_time);
+    print_flops(fname,"linalg",linalg_flops,linalg_time);
     VRB.Result(cname,fname, "True |res| / |src| = %e, iter = %d\n", 
   	     IFloat(tmp), itr+1);
     VRB.Result(cname,fname, "Output checksum = %p\n",
