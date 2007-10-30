@@ -5,20 +5,20 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.52 2006-06-11 05:35:05 chulwoo Exp $
+  $Id: lattice.h,v 1.53 2007-10-30 04:14:04 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2006-06-11 05:35:05 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.52 2006-06-11 05:35:05 chulwoo Exp $
-  $Id: lattice.h,v 1.52 2006-06-11 05:35:05 chulwoo Exp $
+  $Date: 2007-10-30 04:14:04 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.53 2007-10-30 04:14:04 chulwoo Exp $
+  $Id: lattice.h,v 1.53 2007-10-30 04:14:04 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Author: chulwoo $
-  $Date: 2006-06-11 05:35:05 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.52 2006-06-11 05:35:05 chulwoo Exp $
-  $Id: lattice.h,v 1.52 2006-06-11 05:35:05 chulwoo Exp $
+  $Date: 2007-10-30 04:14:04 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.53 2007-10-30 04:14:04 chulwoo Exp $
+  $Id: lattice.h,v 1.53 2007-10-30 04:14:04 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.52 $
+  $Revision: 1.53 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -2749,37 +2749,6 @@ class Fdwf : public FdwfBase {
         // using the fermion force.
 };
 
-//------------------------------------------------------------------
-//! A class implementing  domain wall fermions.
-/*!
-  \ingroup factions
-*/
-//------------------------------------------------------------------
-class FimprDwf : public FdwfBase {
-  private:
-    char *cname;    // Class name.
-    
-  public:
-
-    FimprDwf(void);
-    ~FimprDwf(void);
-
-    int FmatEvlInv(Vector *f_out, Vector *f_in,
-		   CgArg *cg_arg,
-		   Float *true_res,
-		   CnvFrmType cnv_frm);
-    Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
-		 Float mass, DagType dag);
-    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm,
-			 Float mass, Float step_size);
-    Float BhamiltonNode(Vector *boson, Float mass);
-    int FmatInv(Vector *f_out, Vector *f_in,
-		CgArg *cg_arg,
-		Float *true_res,
-		CnvFrmType cnv_frm,
-		PreserveType prs_f_in);
-
-};
 
 //------------------------------------------------------------------
 //
@@ -3051,24 +3020,6 @@ class GwilsonFdwf
  public:
     GwilsonFdwf();
     virtual ~GwilsonFdwf();
-};
-
-//------------------------------------------------------------------
-//! Wilson gauge action with domain wall fermion action
-/*! \ingroup latactions */
-//------------------------------------------------------------------
-class GwilsonFimprDwf 
-    : public virtual Lattice, 
-    public virtual FwilsonTypes, 
-    public Gwilson, 
-    public FimprDwf
-{
- private:
-    char *cname;    // Class name.
-
- public:
-    GwilsonFimprDwf(void);
-    virtual ~GwilsonFimprDwf(void);
 };
 
 
@@ -3450,24 +3401,6 @@ class GimprOLSymFdwf
  public:
     GimprOLSymFdwf();
     virtual ~GimprOLSymFdwf();
-};
-
-//------------------------------------------------------------------
-//! One Loop Symanzik improved gauge action with domain wall fermion action
-/*! \ingroup latactions */
-//------------------------------------------------------------------
-class GimprOLSymFimprDwf
-    : public virtual Lattice,
-    public virtual FwilsonTypes,
-    public GimprOLSym,
-    public FimprDwf
-{
- private:
-    char *cname;    // Class name.
-
- public:
-    GimprOLSymFimprDwf(void);
-    virtual ~GimprOLSymFimprDwf(void);
 };
 
 //------------------------------------------------------------------
