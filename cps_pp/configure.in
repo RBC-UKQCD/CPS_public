@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2007-10-30 20:40:34 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.49 2007-10-30 20:40:34 chulwoo Exp $
-dnl  $Id: configure.in,v 1.49 2007-10-30 20:40:34 chulwoo Exp $
+dnl  $Date: 2007-11-06 17:00:12 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.50 2007-11-06 17:00:12 chulwoo Exp $
+dnl  $Id: configure.in,v 1.50 2007-11-06 17:00:12 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.49 $
+dnl  $Revision: 1.50 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -262,15 +262,14 @@ AC_MSG_RESULT($enable_namespace)
 	
 if test "$enable_namespace" = "yes"
 then
+        CPS_END_NAMESPACE="}" 
+        USING_NAMESPACE_CPS="using namespace cps;"
+        CPS_NAMESPACE="cps"
     if test "$enable_target" = "mpi"
     then
-        CPS_END_NAMESPACE="}" 
         CPS_START_NAMESPACE="namespace cps { using MPISCU::printf; using MPISCU::vprintf;"
-        USING_NAMESPACE_CPS="using namespace cps;"
     else
-        CPS_END_NAMESPACE="}" 
         CPS_START_NAMESPACE="namespace cps {"
-        USING_NAMESPACE_CPS="using namespace cps;"
     fi
 fi
 
@@ -293,6 +292,7 @@ AC_SUBST(DO_GMP)
 AC_SUBST(CPS_END_NAMESPACE)
 AC_SUBST(CPS_START_NAMESPACE)
 AC_SUBST(USING_NAMESPACE_CPS)
+AC_SUBST(CPS_NAMESPACE)
 
 
 
