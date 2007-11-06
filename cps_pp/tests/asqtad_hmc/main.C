@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.18 2005-04-05 06:44:52 chulwoo Exp $
+  $Id: main.C,v 1.19 2007-11-06 14:14:43 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */
@@ -16,10 +16,10 @@
 #include <util/random.h>
 #include <comms/sysfunc.h>
 
-const int nx = 16;
-const int ny = 16;
-const int nz = 16;
-const int nt = 8;
+const int nx = 4;
+const int ny = 4;
+const int nz = 4;
+const int nt = 4;
 
 const int SAVE_DOARG = 1;
 const int LOAD_DOARG = 0;
@@ -42,11 +42,6 @@ int main(int argc,char *argv[])
   DoArg do_arg;
   if (LOAD_DOARG) do_arg.Decode("asqtad_hmc.in","do_arg");
   else setup_do_arg(do_arg); 
-#if TARGET==cpsMPI
-  MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
-  using MPISCU::fprintf;
-  using MPISCU::printf;  
-#endif
   if (SAVE_DOARG) do_arg.Encode("asqtad_hmc.out","do_arg");
   GJP.Initialize(do_arg);
 
@@ -55,8 +50,6 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
 
   VRB.Level(0);
-//  VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
-//  VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
   VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
   char *cname = "asqtad_hmd_r";
   char *fname = "main";

@@ -26,6 +26,7 @@ public:
 	ReverseTest reverse;
 	ReproduceTest reproduce;
 	int reproduce_attempt_limit;
+	bool_t wfm_md_sloppy;
 };
 
 /* the xdr functions */

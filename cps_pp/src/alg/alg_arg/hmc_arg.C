@@ -44,6 +44,8 @@ vml_HmcArg (VML *vmls, char *name,HmcArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "reproduce_attempt_limit", &objp->reproduce_attempt_limit))
 		 return FALSE;
+	 if (!vml_bool (vmls, "wfm_md_sloppy", &objp->wfm_md_sloppy))
+		 return FALSE;
 	 vml_class_end(vmls,"HmcArg",name);
 	return TRUE;
 }

@@ -5,18 +5,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
 
-  $Id: wilson_dslash.C,v 1.6 2004-08-18 11:57:51 zs Exp $
+  $Id: wilson_dslash.C,v 1.7 2007-11-06 14:14:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.6 2004-08-18 11:57:51 zs Exp $
-//  $Id: wilson_dslash.C,v 1.6 2004-08-18 11:57:51 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2007-11-06 14:14:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.7 2007-11-06 14:14:42 chulwoo Exp $
+//  $Id: wilson_dslash.C,v 1.7 2007-11-06 14:14:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v $
 //  $State: Exp $
 //
@@ -584,6 +584,17 @@ void wilson_dslash(IFloat *chi_p_f,
 
 
 
+}
+
+void wilson_dslash_two(Float *chi0, Float *chi1,
+                   Float *u,
+                   Float *psi0, Float *psi1,
+                   int cb0, int cb1,
+                   int dag,
+                   Wilson *wp)
+{
+  wilson_dslash(chi0,u,psi0,cb0,dag,wp);
+  wilson_dslash(chi1,u,psi1,cb1,dag,wp);
 }
 
 CPS_END_NAMESPACE

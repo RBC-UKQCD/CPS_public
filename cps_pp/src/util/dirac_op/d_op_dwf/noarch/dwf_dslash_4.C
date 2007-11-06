@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-10-30 20:40:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.5 2007-10-30 20:40:34 chulwoo Exp $
-//  $Id: dwf_dslash_4.C,v 1.5 2007-10-30 20:40:34 chulwoo Exp $
+//  $Date: 2007-11-06 14:14:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.6 2007-11-06 14:14:42 chulwoo Exp $
+//  $Id: dwf_dslash_4.C,v 1.6 2007-11-06 14:14:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v $
 //  $State: Exp $
 //
@@ -71,7 +71,7 @@ void dwf_dslash_4(Vector *out,
   //----------------------------------------------------------------
   // Apply 4-dimensional Dslash
   //----------------------------------------------------------------
-  int vec_len=2;
+  int vec_len=1;
   for(i=0; i<ls; i+= vec_len){
 
     // parity of 4-D checkerboard
@@ -85,8 +85,9 @@ void dwf_dslash_4(Vector *out,
 #endif
   if(vec_len==1)
     wilson_dslash(frm_out, g_field, frm_in, parity, dag, wilson_p);
-  else
+  else{
     wilson_dslash_two(frm_out, frm_out+size_cb[parity], g_field, frm_in, frm_in+size_cb[parity], parity, 1-parity,dag, wilson_p);
+    }
     frm_in = frm_in + vec_len*size_cb[parity];
     frm_out = frm_out + vec_len*size_cb[parity];
   }
