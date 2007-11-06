@@ -40,8 +40,14 @@
  *
  */
 #define USE_DOUBLE
+#if TARGET == QCDOC
 #define USE_CPS
 #define USE_COMMS_SCU
+#else
+#undef USE_CPS
+#define USE_COMMS_QMP
+#define USE_MALLOC
+#endif
 
 #ifdef USE_DOUBLE
 typedef double Float ;
