@@ -2,16 +2,11 @@
 /*!\file
   \brief  Definitions of the bigfloat wrapper class.
 
-  $Id: bigfloat.h,v 1.8 2007-10-30 20:40:34 chulwoo Exp $
+  $Id: bigfloat.h,v 1.9 2007-11-07 05:24:41 chulwoo Exp $
 */
 //------------------------------------------------------------------
 #include<config.h>
 #include <gmp.h>
-#if TARGET == QCDOC
-#define USE_MPFR
-#else
-#undef USE_MPFR
-#endif
 
 #ifdef USE_MPFR
 #include <mpfr.h>

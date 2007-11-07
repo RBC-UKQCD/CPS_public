@@ -856,6 +856,7 @@ Optional Features:
   --enable-optimise       Compile with maximum optimisation. (default=yes)
   --enable-debug          Compile with debug information. (default=no)
   --enable-gmp            Compile with GNU Multiprecision lib. (default=no)
+  --enable-mpfr           Compile with GMP mpfr routines. (default=no)
   --enable-qio            Compile with SciDAC I/O (QIO) lib. (default=no)
   --enable-qmp            Compile with SciDAC Communication (QMP) lib.
                           (default=no)
@@ -4152,10 +4153,25 @@ echo "$as_me:$LINENO: checking if including gmp" >&5
 echo $ECHO_N "checking if including gmp... $ECHO_C" >&6
 echo "$as_me:$LINENO: result: $enable_gmp" >&5
 echo "${ECHO_T}$enable_gmp" >&6
+# Check whether --enable-mpfr or --disable-mpfr was given.
+if test "${enable_mpfr+set}" = set; then
+  enableval="$enable_mpfr"
+
+else
+  enable_mpfr="no"
+fi;
+echo "$as_me:$LINENO: checking if including gmp mpfr" >&5
+echo $ECHO_N "checking if including gmp mpfr... $ECHO_C" >&6
+echo "$as_me:$LINENO: result: $enable_mpfr" >&5
+echo "${ECHO_T}$enable_mpfr" >&6
 if test "$enable_gmp" != "no"; then
-   LDFLAGS="${LDFLAGS} -L${enable_gmp}/lib -lmpfr -lgmp"
+   LDFLAGS="${LDFLAGS} -L${enable_gmp}/lib -lgmp"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_gmp}/include"
    DFLAGS="${DFLAGS} -DGMP"
+  if test "$enable_mpfr" != "no"; then
+     LDFLAGS="${LDFLAGS} -lmpfr"
+     DFLAGS="${DFLAGS} -DUSE_MPFR"
+  fi
 fi
 
 # Check whether --enable-qio or --disable-qio was given.

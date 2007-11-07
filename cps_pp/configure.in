@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2007-11-06 17:00:12 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.50 2007-11-06 17:00:12 chulwoo Exp $
-dnl  $Id: configure.in,v 1.50 2007-11-06 17:00:12 chulwoo Exp $
+dnl  $Date: 2007-11-07 05:24:41 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.51 2007-11-07 05:24:41 chulwoo Exp $
+dnl  $Id: configure.in,v 1.51 2007-11-07 05:24:41 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.50 $
+dnl  $Revision: 1.51 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -188,10 +188,20 @@ AC_ARG_ENABLE(gmp,
 	,[enable_gmp="no"])
 AC_MSG_CHECKING([if including gmp])
 AC_MSG_RESULT($enable_gmp)
+AC_ARG_ENABLE(mpfr, 
+	AC_HELP_STRING([--enable-mpfr], 
+		[Compile with GMP mpfr routines. (default=no)]), 
+	,[enable_mpfr="no"])
+AC_MSG_CHECKING([if including gmp mpfr])
+AC_MSG_RESULT($enable_mpfr)
 if test "$enable_gmp" != "no"; then
-   LDFLAGS="${LDFLAGS} -L${enable_gmp}/lib -lmpfr -lgmp"
+   LDFLAGS="${LDFLAGS} -L${enable_gmp}/lib -lgmp"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_gmp}/include"
    DFLAGS="${DFLAGS} -DGMP"
+  if test "$enable_mpfr" != "no"; then
+     LDFLAGS="${LDFLAGS} -lmpfr"
+     DFLAGS="${DFLAGS} -DUSE_MPFR"
+  fi
 fi
 
 dnl Are we compiling with QIO library?
