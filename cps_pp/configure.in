@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2007-11-07 05:24:41 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.51 2007-11-07 05:24:41 chulwoo Exp $
-dnl  $Id: configure.in,v 1.51 2007-11-07 05:24:41 chulwoo Exp $
+dnl  $Date: 2007-11-09 22:20:35 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.52 2007-11-09 22:20:35 chulwoo Exp $
+dnl  $Id: configure.in,v 1.52 2007-11-09 22:20:35 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.51 $
+dnl  $Revision: 1.52 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -22,8 +22,13 @@ AC_CANONICAL_TARGET
 
 dnl Set correct compiler information
 if test "$cross_compiling" = "yes"; then
-   AC_PATH_PROGS(CC, ${host_alias}-gcc)
-   AC_PATH_PROGS(CXX, ${host_alias}-g++)
+   if test "$host" = "powerpc-bgl-blrts-gnu"; then
+     AC_PATH_PROGS(CC, mpicc, ${host_alias}-gcc)
+     AC_PATH_PROGS(CXX, mpicxx, ${host_alias}-g++)
+   else
+     AC_PATH_PROGS(CC, ${host_alias}-gcc)
+     AC_PATH_PROGS(CXX, ${host_alias}-g++)
+   fi
    AC_PATH_PROGS(LD, ${host_alias}-ld)
    AC_PATH_PROGS(AR, ${host_alias}-ar)
    AC_PATH_PROGS(AS, ${host_alias}-as)
