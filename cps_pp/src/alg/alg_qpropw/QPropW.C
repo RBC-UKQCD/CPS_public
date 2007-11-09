@@ -269,6 +269,153 @@ void QPropW::Run() {
    }
 }
 
+
+#ifdef USE_QIO
+// run and save in QIO, EES
+// copy and pace from Run(), QIO save added...
+void QPropW::Run_saveQIO(const char *filename, const char *label, const char *id, const int seqNum, int argc, char* argv[], const int volFormat) {
+
+   char *fname = "Run_saveQIO()";
+   VRB.Func(cname, fname);
+
+   // we need to store the source
+   Float *save_source = (Float*)smalloc(GJP.VolNodeSites()*288*sizeof(Float));
+
+
+   // Set the node size of the full (non-checkerboarded) fermion field
+   //----------------------------------------------------------------
+   //int f_size = GJP.VolNodeSites() * Lat.FsiteSize()/GJP.SnodeSites();
+   int iter;
+   Float true_res;
+
+   int Nspins = 4; // Number of spin components to be done
+   
+   // Flag set if sequential propagator 
+   int seq_src = ((SrcType()==PROT_U_SEQ)||
+				  (SrcType()==PROT_D_SEQ)||
+				  (SrcType()==MESSEQ)      );
+
+   if (DoHalfFermion()) Nspins = 2;
+
+   // does prop exist? Assume it does not.
+   int do_cg = 1;
+
+   /****************************************************************
+     The code below is temporarily isolated for purposes of merging
+     with CPS main branch,  12/09/04, Oleg Loktik
+   -------------------- Quarantine starts --------------------------
+
+   if (pfs_file_exists(Arg.file)){
+     // read data into prop
+     RestoreQProp(Arg.file,PROP); // Only restores stuff into prop 
+
+     // multiply source by 1/2(1+gamma_t). If the propagator  
+     // on disk is half fermion it does nothing. Otherwise it gets
+     // converted to the half fermion propagator. 
+     if (Arg.DoHalfFermion) 
+       for (int s(0);s<GJP.VolNodeSites();s++)
+	 prop[s].PParProjectSink() ;
+      
+     do_cg = 0;
+   }
+   -------------------- End of quarantine -------------------------*/ 
+
+   if (do_cg) {
+
+     Allocate(PROP); 
+     if (StoreMidprop()) Allocate(MIDPROP);
+     
+     FermionVectorTp src;
+     FermionVectorTp sol;
+     FermionVectorTp midsol;
+     
+     for (int spn=0; spn < Nspins; spn++)
+       for (int col=0; col < GJP.Colors(); col++) {
+		 
+		 // initial guess (Zero)
+		 sol.ZeroSource();
+		 SetSource(src,spn,col);
+		 
+		 if ((DoHalfFermion())&&(!seq_src)) // Rotate to chiral basis
+		   src.DiracToChiral();
+
+		 // store the source
+		 for(int index(0); index < GJP.VolNodeSites(); ++index)
+		  for(int spn_src(0); spn_src < 4; ++ spn_src)
+		    for(int col_src(0); col_src < GJP.Colors(); ++col_src){
+		      *(save_source + 288*index+72*spn+24*col+6*spn_src+2*col_src) = src[24*index+6*spn_src+2*col_src]; 
+		      *(save_source + 288*index+72*spn+24*col+6*spn_src+2*col_src+1) = src[24*index+6*spn_src+2*col_src+1]; 
+		     }
+		 
+		 // Get the prop
+		 printf("Before CG in QpropW.Run() \n");
+		 CG(src, sol, midsol, iter, true_res);
+		 //gauge fix solution
+		 FixSol(sol);
+		 if (StoreMidprop()) FixSol(midsol);
+		 
+		 // Collect solutions in propagator.
+		 LoadRow(spn,col,sol,midsol);
+		 
+		 if (DoHalfFermion()) {// copy spin 0 to spin 1 and spin 2 to spin 3
+		   int spn2 = spn + 2;
+		   if (seq_src) {
+			 LoadRow(spn2,col,sol,midsol);
+		   } else { // Regular propagator zero the extra components
+			 src.ZeroSource();
+			 LoadRow(spn2,col,src,src);
+		   }
+		 }
+		 
+		 if (common_arg->results != 0) {
+		   FILE *fp;
+		   if ((fp = Fopen((char *)common_arg->results, "a")) == NULL) {
+			 ERR.FileA(cname,fname, (char *)common_arg->results);
+		   }
+		   Fprintf(fp, "Cg iters = %d true residual = %e\n",
+				   iter, (float)true_res);
+		   Fclose(fp);
+		 }
+		 
+       } // End spin-color loop
+	 
+     // Rotate the source indices to Chiral basis if needed
+     if ((DoHalfFermion())&&(!seq_src)) {	
+	   for (int s=0;s<GJP.VolNodeSites();s++)
+		 prop[s].SinkChiralToDirac(); // multiply by V^\dagger
+	   
+	   if (StoreMidprop())
+		 for (int s=0;s<GJP.VolNodeSites();s++)
+		   midprop[s].SinkChiralToDirac(); // multiply by V^\dagger
+	 }
+   }
+   // save prop
+   if (do_cg && qp_arg.save_prop) {
+     SaveQProp(qp_arg.file,PROP); 
+   }
+
+
+   if (do_cg){
+
+     char propType[256], sourceType[256], tmp_filename[256];
+
+     sprintf(propType,"4D propagator, mass = %f", qp_arg.cg.mass);
+     sprintf(sourceType, "fullSource");
+     strcpy(tmp_filename, filename);
+
+     qio_writePropagator writePropQio(tmp_filename, QIO_FULL_SOURCE, &prop[0], save_source,
+				id, label, seqNum, propType, sourceType,
+				argc, argv, volFormat);
+   }
+
+   sfree(save_source);
+
+}
+
+
+// end EES
+#endif // USE_QIO
+
 void QPropW::CG(Lattice &lat, CgArg *arg, FermionVectorTp& source,
         FermionVectorTp& sol , int& iter, Float& true_res){
 	ERR.NotImplemented(cname,"CG(Lattice,CgArg,FermionVector...)");

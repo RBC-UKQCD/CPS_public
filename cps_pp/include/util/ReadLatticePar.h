@@ -68,6 +68,10 @@ public:
 
   void read(Lattice & lat, const QioArg & rd_arg);
 
+  string getEnsembleId(){ return hd.ensemble_id; } // CAREFULL: only on MasterNode!!
+  string getEnsembleLabel(){ return hd.ensemble_label; } // CAREFULL: only on MasterNode!!
+  int getSequenceNumber();// same on all nodes!
+
  private:
   bool CheckPlaqLinktrace(Lattice & lat, const QioArg & rd_arg,
 			  const Float plaq_inheader, const Float linktrace_inheader);

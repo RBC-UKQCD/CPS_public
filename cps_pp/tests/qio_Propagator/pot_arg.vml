@@ -1,0 +1,12 @@
+class PotArg pot_arg = {
+int prop_dir = 0
+int therm_steps = 0
+int therm_meas = 0
+int xi = 0
+int check = 0
+int sweep = 0
+int max_X = 0
+int max_Y = 0
+int max_Z = 0
+int max_T = 0
+}

@@ -245,4 +245,16 @@ bool ReadLatticeParallel::CheckPlaqLinktrace(Lattice &lat, const QioArg & rd_arg
   return true;
 }
 
+// added EES for getting header info consistent on every node
+int ReadLatticeParallel::getSequenceNumber(){
+
+  int tmp=hd.sequence_number;
+  broadcastInt(&tmp);
+  return tmp;
+
+}
+
+
+
+
 CPS_END_NAMESPACE

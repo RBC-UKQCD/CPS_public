@@ -1,7 +1,5 @@
 
-Simple test-code for qio-ReadWrite Lattices, in case 5th dimension is parallelized, too.
-
-Be careful, you will have to reorder the output-files before using the unsplit-tool of qio. See tools in reorder-dir.
+Simple test-code for qio-ReadWrite Lattices.
 
 Produces a random gauge, writes it to disk(s), re-reads it and compares plaquette and link-trace.
 
@@ -10,11 +8,11 @@ Using the provided do_arg.vml on a motherboard should work with:
 
 qpartition_remap -T05 -Y1  -Z2 -X3 -S4
 
-qrun x.x  DIR do_arg.vml evo_arg.vml lat_stand.in lat_stand.out qio_file.in qio_file.out 17
+qrun QCDOC.x $PWD do_arg.vml evo_arg.vml lat_stand.in lat_stand.out qio_file.in qio_file.out 17 qio_prop.in qio_prop.out
 
 The general syntax is:
 
-x.x DIR DO_ARG EVO_ARG STANDARD_IN STANDARD_OUT QIO_IN QIO_OUT RANDOM
+x.x DIR DO_ARG EVO_ARG STANDARD_IN STANDARD_OUT QIO_IN QIO_OUT RANDOM PROP_IN PROP_OUT
 
 where:
 

@@ -106,7 +106,7 @@ void qio_writeLattice::qio_openOutput(char *filename, char *stringLFN, char *xml
 
   oflag.mode = QIO_TRUNC;
 
-  outfile = QIO_open_write(xml_file_out, filename, volfmt, &layout, &oflag);
+  outfile = QIO_open_write(xml_file_out, filename, volfmt, &layout, NULL, &oflag);
 
   QIO_string_destroy(xml_file_out);
   
@@ -158,7 +158,7 @@ void qio_writeLattice::write(char *outfile, char *ildgLFN, Lattice &lat, int vol
 
 
   QIO_RecordInfo *record;
-  record = QIO_create_record_info(0, "", "", 0,0,0,0);
+  record = QIO_create_record_info(0,NULL,NULL,0, "", "", 0,0,0,0);
 
 
   QIO_String *record_xml;
@@ -220,6 +220,12 @@ void qio_writeLattice::write(char *outfile, char *ildgLFN, Lattice &lat, int vol
 	  ltrace, plaq, header_ensemble_id, header_ensemble_label, header_traj);
 
 
+  //check for length...
+  if( (strlen(xml_info)*sizeof(char)) > QIO_INFO_STRING_MAX){
+    ERR.General(cname,fname," xml_info too large: %i\n %s\n", (strlen(xml_info)*sizeof(char)), xml_info);
+    exit(-12);
+  }
+
 
 
 
@@ -227,9 +233,9 @@ void qio_writeLattice::write(char *outfile, char *ildgLFN, Lattice &lat, int vol
   VRB.Result(cname, fname," adding plaq %s and linkTr %s to xml-record\n add. info:\n %s\n", xml_plaq, xml_linktr, xml_info);
   #endif //DEBUG_GlobalWrite
 
-  CPS_QIO_UserRecordInfo *userrecordinfo = CPS_QIO_create_user_record_info(xml_plaq, xml_linktr, xml_info);
+  QIO_USQCDLatticeInfo *userrecordinfo = QIO_create_usqcd_lattice_info(xml_plaq, xml_linktr, xml_info);
 
-  CPS_QIO_encode_user_record_info(record_xml,userrecordinfo); 
+  QIO_encode_usqcd_lattice_info(record_xml,userrecordinfo); 
 
 
   Matrix * wlat = lat.GaugeField();
@@ -254,7 +260,7 @@ void qio_writeLattice::write(char *outfile, char *ildgLFN, Lattice &lat, int vol
       //output in double-precision
 
       // create the record info
-      record = QIO_create_record_info(QIO_FIELD, "QDP_D3_ColorMatrix", "D", 3, 4, 18*sizeof(Float), 4);
+      record = QIO_create_record_info(QIO_FIELD,NULL,NULL,0, "QDP_D3_ColorMatrix", "D", 3, 4, 18*sizeof(Float), 4);
       // color=3 (not used), spin=4 (not used), 3*3*2*size (color*color*complex*size), 4 matrices per side
 
 
@@ -267,7 +273,7 @@ void qio_writeLattice::write(char *outfile, char *ildgLFN, Lattice &lat, int vol
       //output in single-precision
 
       // create the record info
-      record = QIO_create_record_info(QIO_FIELD, "QDP_F3_ColorMatrix", "F", 3, 4, 18*sizeof(float), 4);
+      record = QIO_create_record_info(QIO_FIELD,NULL,NULL,0, "QDP_F3_ColorMatrix", "F", 3, 4, 18*sizeof(float), 4);
       // color=3 (not used), spin=4 (not used), 3*3*2*size (color*color*complex*size), 4 matrices per side
 
 
@@ -289,17 +295,9 @@ void qio_writeLattice::write(char *outfile, char *ildgLFN, Lattice &lat, int vol
 #endif //PRINT_checksums
 
   // clean-up
-
-
-
-  //different call
-  //qio_closeOutput( output);
-
-
   QIO_destroy_record_info(record);
-  CPS_QIO_destroy_user_record_info(userrecordinfo);  
+  QIO_destroy_usqcd_lattice_info(userrecordinfo);  
   QIO_string_destroy(record_xml);
-  
 
   qio_closeOutput();
 

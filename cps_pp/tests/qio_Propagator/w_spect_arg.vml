@@ -1,0 +1,76 @@
+class WspectArg w_spect_arg = {
+string CgArgFile = "cg_arg.vml"
+string WspectOutputFile = "w_spect_output.vml"
+int prop_dir = 3
+int num_mom = 1
+SourceKind source_kind = POINT_W
+Vector src_box_b[4] = { 
+int src_box_b[0] = 0
+int src_box_b[1] = 0
+int src_box_b[2] = 0
+int src_box_b[3] = 0
+}
+Vector src_box_e[4] = { 
+int src_box_e[0] = 0
+int src_box_e[1] = 0
+int src_box_e[2] = 0
+int src_box_e[3] = 0
+}
+double g_epsi =   0.0
+int g_n = 0
+Vector g_center[4] = { 
+int g_center[0] = 0
+int g_center[1] = 0
+int g_center[2] = 0
+int g_center[3] = 0
+}
+double rescale_factor =   1.0
+int aots_num = 1
+int aots_start = 0
+int aots_step = 1
+int baryons_on = 1
+int normal_mesons_on = 1
+int extended_mesons_on = 0
+int extended_mesonsBE_on = 0
+int extended_mesons_op_groupId = 0
+int extended_mesons_first_dev_on = 0
+int extended_mesons_second_sym_dev_on = 0
+int extended_mesons_second_antisym_dev_on = 0
+int extended_mesons_second_diag_dev_on = 0
+int fuzzing_on = 0
+int sink_fuzzing_only = 0
+int fuzzing_level = 0
+int fuzzing_c_num = 0
+Vector fuzzing_c[10] = { 
+double fuzzing_c[0] =   0.0
+double fuzzing_c[1] =   0.0000000000000000e+00
+double fuzzing_c[2] =   0.0000000000000000e+00
+double fuzzing_c[3] =   0.0000000000000000e+00
+double fuzzing_c[4] =   0.0000000000000000e+00
+double fuzzing_c[5] =   0.0000000000000000e+00
+double fuzzing_c[6] =   0.0000000000000000e+00
+double fuzzing_c[7] =   0.0000000000000000e+00
+double fuzzing_c[8] =   0.0000000000000000e+00
+double fuzzing_c[9] =   0.0000000000000000e+00
+}
+int fuzzing_hits = 0
+int extended_mesonsBE_op_groupId = 0
+int extended_mesonsBE_Elec_on = 0
+int extended_mesonsBE_Magn_on = 0
+int BEfuzzing_on = 0
+int BEfuzzing_level = 0
+int BEfuzzing_c_num = 0
+Vector BEfuzzing_c[10] = { 
+double BEfuzzing_c[0] =   0.0000000000000000e+00
+double BEfuzzing_c[1] =   0.0000000000000000e+00
+double BEfuzzing_c[2] =   0.0000000000000000e+00
+double BEfuzzing_c[3] =   0.0000000000000000e+00
+double BEfuzzing_c[4] =   0.0000000000000000e+00
+double BEfuzzing_c[5] =   0.0000000000000000e+00
+double BEfuzzing_c[6] =   0.0000000000000000e+00
+double BEfuzzing_c[7] =   0.0000000000000000e+00
+double BEfuzzing_c[8] =   0.0000000000000000e+00
+double BEfuzzing_c[9] =   0.0000000000000000e+00
+}
+int BEfuzzing_hits = 0
+}

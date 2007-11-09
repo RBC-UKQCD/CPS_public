@@ -8,11 +8,11 @@ Using the provided do_arg.vml on a motherboard should work with:
 
 qpartition_remap -T05 -X14 -Y2 -Z3
 
-qrun x.x  DIR do_arg.vml evo_arg.vml lat_stand.in lat_stand.out qio_file.in qio_file.out 17
+qrun QCDOC.x $PWD do_arg.vml evo_arg.vml lat_stand.in lat_stand.out qio_file.in qio_file.out 17 qio_prop.in qio_prop.out
 
 The general syntax is:
 
-x.x DIR DO_ARG EVO_ARG STANDARD_IN STANDARD_OUT QIO_IN QIO_OUT RANDOM
+x.x DIR DO_ARG EVO_ARG STANDARD_IN STANDARD_OUT QIO_IN QIO_OUT RANDOM PROP_IN PROP_OUT
 
 where:
 

@@ -32,6 +32,11 @@
 #include <alg/qpropw_arg.h>
 #include <alg/diquark.h>
 
+#ifdef USE_QIO
+#include <util/qio_general.h>
+#include <util/qio_writePropagator.h>
+#endif
+
 #define MIDPROP 1
 #define PROP  0
 
@@ -86,6 +91,10 @@ public:
   int DoHalfFermion() const { return qp_arg.do_half_fermion; }
 
   void Run();
+
+#ifdef USE_QIO
+  void Run_saveQIO(const char *filename, const char *id, const char *label, const int seqNum, int argc, char* argv[], const int volFormat=QIO_VOLFMT);
+#endif
   
   void CG(FermionVectorTp&, FermionVectorTp&, FermionVectorTp&, int&, Float&);
    // HueyWen: addtional CG definition

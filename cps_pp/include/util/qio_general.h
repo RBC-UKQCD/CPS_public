@@ -14,19 +14,20 @@
 #include <util/verbose.h>
 #include <util/error.h>
 
+#include <comms/scu.h>
+
 #include <alg/do_arg.h>
 
 #include <qio.h>
-
-#include <util/qio_xmlinfo.h>
-#include <util/qio_xmlinfo_prop.h>
-
-extern "C"
-{
-#include <util/qio_xml_miss.h>
-}
-
 #include <qmp.h>
+
+#undef EES_ADDON
+
+#ifdef EES_ADDON
+// define as soon as QIO 2.2 supports...
+#define SPINCOLORCHECK
+#define SPINCOLORINSERT
+#endif // EES_ADDON
 
 
 // some definitions for QIO/QMP
@@ -110,6 +111,7 @@ extern "C"
 #define QIO_XML_FILE_GAUGE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 
 #define MAX_HEADER_LINE 255 //maximal length for char-string ensemble-label,-id
+#define QIO_INFO_STRING_MAX 1023 // maximal length (bytes) for info-field
 
 /* xml-file header for propagator */
 #define QIO_XML_FILE_PROP "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
