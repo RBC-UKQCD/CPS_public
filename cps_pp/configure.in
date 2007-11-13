@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2007-11-09 22:20:35 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.52 2007-11-09 22:20:35 chulwoo Exp $
-dnl  $Id: configure.in,v 1.52 2007-11-09 22:20:35 chulwoo Exp $
+dnl  $Date: 2007-11-13 05:55:43 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.53 2007-11-13 05:55:43 chulwoo Exp $
+dnl  $Id: configure.in,v 1.53 2007-11-13 05:55:43 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.52 $
+dnl  $Revision: 1.53 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -225,23 +225,6 @@ AC_ARG_ENABLE(qmp,
 AC_MSG_CHECKING([if including QMP])
 AC_MSG_RESULT($enable_qmp)
 
-if test "$enable_qio" != "no"; then
-   if test "X${QIO_DIR}X" = "XX"; then
-dnl     echo "QIO_DIR environment variable not set"
-     QIO_DIR=${enable_qio}
-   fi
-   if test "X${QMP_DIR}X" = "XX"; then
-     echo "QMP_DIR environment variable not set"
-     exit 1
-   fi
-   QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
-   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
-   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
-   LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib ${QMP_LDFLAGS} -lqio -llime ${QMP_LIBS}"
-   INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_FLAGS}  -I${QIO_DIR}/include"
-   DFLAGS="${DFLAGS} -DUSE_QIO"
-fi
-
 if test "$enable_qmp" != "no"; then
    if test "X${QMP_DIR}X" = "XX"; then
 dnl     echo "QMP_DIR environment variable not set"
@@ -259,6 +242,23 @@ dnl     echo "QMP_DIR environment variable not set"
      ARCHDIR="BGL_QMP_DIR"
    fi
    TESTING_PARALLEL="yes";
+fi
+
+if test "$enable_qio" != "no"; then
+   if test "X${QIO_DIR}X" = "XX"; then
+dnl     echo "QIO_DIR environment variable not set"
+     QIO_DIR=${enable_qio}
+   fi
+   if test "X${QMP_DIR}X" = "XX"; then
+     echo "QMP_DIR environment variable not set"
+     exit 1
+   fi
+   QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
+   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
+   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
+   LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib ${QMP_LDFLAGS} -lqio -llime ${QMP_LIBS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_FLAGS}  -I${QIO_DIR}/include"
+   DFLAGS="${DFLAGS} -DUSE_QIO"
 fi
 
 if test "$TESTING_PARALLEL" = "yes"; then

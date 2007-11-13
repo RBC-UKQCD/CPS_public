@@ -4291,22 +4291,6 @@ echo $ECHO_N "checking if including QMP... $ECHO_C" >&6
 echo "$as_me:$LINENO: result: $enable_qmp" >&5
 echo "${ECHO_T}$enable_qmp" >&6
 
-if test "$enable_qio" != "no"; then
-   if test "X${QIO_DIR}X" = "XX"; then
-     QIO_DIR=${enable_qio}
-   fi
-   if test "X${QMP_DIR}X" = "XX"; then
-     echo "QMP_DIR environment variable not set"
-     exit 1
-   fi
-   QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
-   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
-   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
-   LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib ${QMP_LDFLAGS} -lqio -llime ${QMP_LIBS}"
-   INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_FLAGS}  -I${QIO_DIR}/include"
-   DFLAGS="${DFLAGS} -DUSE_QIO"
-fi
-
 if test "$enable_qmp" != "no"; then
    if test "X${QMP_DIR}X" = "XX"; then
      QMP_DIR=${enable_qmp}
@@ -4323,6 +4307,22 @@ if test "$enable_qmp" != "no"; then
      ARCHDIR="BGL_QMP_DIR"
    fi
    TESTING_PARALLEL="yes";
+fi
+
+if test "$enable_qio" != "no"; then
+   if test "X${QIO_DIR}X" = "XX"; then
+     QIO_DIR=${enable_qio}
+   fi
+   if test "X${QMP_DIR}X" = "XX"; then
+     echo "QMP_DIR environment variable not set"
+     exit 1
+   fi
+   QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
+   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
+   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
+   LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib ${QMP_LDFLAGS} -lqio -llime ${QMP_LIBS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_FLAGS}  -I${QIO_DIR}/include"
+   DFLAGS="${DFLAGS} -DUSE_QIO"
 fi
 
 if test "$TESTING_PARALLEL" = "yes"; then
