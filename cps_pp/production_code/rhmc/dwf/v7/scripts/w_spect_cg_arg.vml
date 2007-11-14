@@ -1,0 +1,9 @@
+class CgArg w_spect_cg_arg = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 5000
+double stop_rsd =   1.0000000000000000e-08
+double true_rsd =   0.0000000000000000e+00
+RitzMatType RitzMatOper = NONE
+InverterType Inverter = CG
+int bicgstab_n = 0
+}

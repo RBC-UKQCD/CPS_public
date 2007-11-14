@@ -1,0 +1,8 @@
+class FloatArray w_spect_mass_list = {
+Array Floats[4] = {
+double Floats[0] =   0.01
+double Floats[1] =   0.02
+double Floats[2] =   0.03
+double Floats[3] =   0.04
+}
+}

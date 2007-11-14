@@ -1,0 +1,29 @@
+# @ job_type = bluegene
+# @ class = normal
+#
+# The executable  that will run your parallel application should always be specified as per the next line.
+# @ executable = /bgl/BlueLight/ppcfloor/bglsys/bin/mpirun
+#
+# Run on 1024 nodes using partition B01KTB01.
+# Specify partition using the following statement. This statement is the only way a partition should ever be 
+# specified in a LoadLeveler job control file.
+# The partition you designate here indicates the number of nodes, so note that we do not specify a
+# desired number of nodes anywhere in the job control file.
+# @ bg_partition = B512TB02
+#
+# Provide full path to the executable of your parallel application.
+# @ arguments =  -cwd /gpfs/scratch1/chulwoo/32nt64/rhmc_H_R_G/evol1/scripts -verbose 1 -label -mode VN  -env "BGL_APP_L1_SWOA=1" /gpfs/scratch1/chulwoo/32nt64/rhmc_H_R_G/evol1/binaries/BGL_v4_9_16.x do_arg.vml hmc_arg.vml evo_arg.vml quo_arg.vml rat_quo_arg.vml gauge_arg.vml ab1_arg.vml ab2_arg.vml ab3_arg.vml pbp_arg.vml /gpfs/scratch1/chulwoo/32nt64/rhmc_H_R_G/evol1/scripts -qmp-geom native
+# initialdir (see the next active line) will be used as the working directory for this batch job. 
+# @ initialdir = /gpfs/scratch1/chulwoo/32nt64/rhmc_H_R_G/evol1/scripts
+#
+# If for example your jobid is 82, your output and error will be written in
+# directory /home/johndoe/app1, to files 82.out and 82.err respectively.
+# @ input = /dev/null
+# @ output = $(jobid).out
+# @ error = $(jobid).err
+# 
+# Maximum wall clock time for job will be 5 minutes.
+# @ wall_clock_limit = 48:00:00
+#
+# @ notification = complete
+# @ queue
