@@ -637,8 +637,8 @@ void AlgActionRational::destroyEigArg() {
   char *fname = "destroyEigArg()";
 
   for (int i=0; i<eig_arg.N_eig; i++) {
-    sfree(lambda_high, "lambda_low[i]", fname, cname);
-    sfree(lambda_low, "lambda_high[i]", fname, cname);
+    sfree(lambda_high[i], "lambda_low[i]", fname, cname);
+    sfree(lambda_low[i], "lambda_high[i]", fname, cname);
   }
   sfree(lambda_low,"lambda_low", fname, cname);
   sfree(lambda_high,"lambda_high",fname, cname);

@@ -42,7 +42,12 @@
 #include <alg/qpropw.h>
 #include <alg/qpropw_arg.h>
 
+#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
 #define USE_SCU_CHECKSUMS
+#else
+#undef USE_SCU_CHECKSUMS
+#endif
+
 #ifdef USE_SCU_CHECKSUMS
 #include <qcdocos/scu_checksum.h>
 #endif
@@ -71,28 +76,11 @@ int main(int argc, char *argv[])
     exit(-1);
   }
 
+  CPS_NAMESPACE::Start(&argc,&argv);
+
   chdir (argv[3]);
 
   if ( !do_arg.Decode(argv[1],"do_arg") ) { printf("Bum do_arg\n"); exit(-1);}
-
-  /*Layout the lattice on the machine (without regard to even-odd)*/
-  do_arg.x_nodes = SizeX();
-  do_arg.y_nodes = SizeY();
-  do_arg.z_nodes = SizeZ();
-  do_arg.t_nodes = SizeT();
-  do_arg.s_nodes = SizeS();
-
-  do_arg.x_node_sites = do_arg.x_sites/do_arg.x_nodes; 
-  do_arg.y_node_sites = do_arg.y_sites/do_arg.y_nodes;
-  do_arg.z_node_sites = do_arg.z_sites/do_arg.z_nodes;
-  do_arg.t_node_sites = do_arg.t_sites/do_arg.t_nodes;
-  do_arg.s_node_sites = do_arg.s_sites/do_arg.s_nodes;
-
-  if (do_arg.x_sites!=do_arg.x_node_sites*do_arg.x_nodes) {printf("Lattice does not fit\n");exit(-1);}
-  if (do_arg.y_sites!=do_arg.y_node_sites*do_arg.y_nodes) {printf("Lattice does not fit\n");exit(-1);}
-  if (do_arg.z_sites!=do_arg.z_node_sites*do_arg.z_nodes) {printf("Lattice does not fit\n");exit(-1);}
-  if (do_arg.t_sites!=do_arg.t_node_sites*do_arg.t_nodes) {printf("Lattice does not fit\n");exit(-1);}
-  if (do_arg.s_sites!=do_arg.s_node_sites*do_arg.s_nodes) {printf("Lattice does not fit\n");exit(-1);}
 
   if ( !meas_arg.Decode(argv[2],"meas_arg")){printf("Bum meas_arg\n"); exit(-1);}
 
