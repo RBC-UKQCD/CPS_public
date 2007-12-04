@@ -79,7 +79,7 @@ p4_dsum:
 	dcbt	 %r22,	 %r10
 	dcbt	 %r23,	 %r10
 	or.	 3,	3,	3
-	bf gt,	lab0
+	bf gt,	p4_dsum_lab0
 	lfd	   12,	0(%r4)
 	lfd	   13,	8(%r4)
 	lfd	   14,	16(%r4)
@@ -93,9 +93,9 @@ p4_dsum:
 	lfd	   4,	32(%r5)
 	lfd	   5,	40(%r5)
 	subic.	 3,	3,	1
-	bf gt,	lab2
-	b  lab1
-lab1:
+	bf gt,	p4_dsum_lab2
+	b  p4_dsum_lab1
+p4_dsum_lab1:
 	lfd	   18,	64(%r4)
 	dcbt	 %r8,	 %r16
 	fmadd	0,	30,	12,	0
@@ -241,8 +241,8 @@ lab1:
 
 	fmadd	10,	31,	22,	10
 	stfd	   6,	0(%r11)
-	fmadd	11,	31,	23,	11
 	stfd	   7,	8(%r11)
+	fmadd	11,	31,	23,	11
 	stfd	   8,	16(%r11)
 	stfd	   9,	24(%r11)
 	stfd	   10,	32(%r11)
@@ -253,9 +253,9 @@ lab1:
 	lfd	   3,	24(%r5)
 	lfd	   4,	32(%r5)
 	lfd	   5,	40(%r5)
-	bf gt,	lab2
-	b  lab1
-lab2:
+	bf gt,	p4_dsum_lab2
+	b  p4_dsum_lab1
+p4_dsum_lab2:
 	fmadd	0,	30,	12,	0
 	lfd	   18,	64(%r4)
 	fmadd	1,	30,	13,	1
@@ -361,7 +361,7 @@ lab2:
 	stfd	   9,	24(%r11)
 	stfd	   10,	32(%r11)
 	stfd	   11,	40(%r11)
-lab0:
+p4_dsum_lab0:
 	lwz	%r14,	368(%r1)
 	lwz	%r15,	376(%r1)
 	lwz	%r16,	384(%r1)

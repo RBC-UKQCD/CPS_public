@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_vec.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+  $Id: pt_vec.C,v 1.3 2007-12-04 17:51:39 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-11 22:45:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
-//  $Id: pt_vec.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+//  $Date: 2007-12-04 17:51:39 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.3 2007-12-04 17:51:39 chulwoo Exp $
+//  $Id: pt_vec.C,v 1.3 2007-12-04 17:51:39 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_vec.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v $
 //  $State: Exp $
 //
@@ -21,6 +21,10 @@
 #include "asq_data_types.h"
 #include "pt_int.h"
 #include "pt_qcdoc.h"
+#ifndef SCIDAC 
+#include <config.h>
+#include <util/time.h>
+#endif
 
 #ifndef USE_QMP
 #define USE_QMP
@@ -48,7 +52,6 @@ void PT::vec_cb(int n, IFloat **vout, IFloat **vin, const int *dir, int
 }
 
 //Normal parallel transport, but with user-specified gauge fields
-#undef PROFILE
 void PT::vec_cb(int n, IFloat **vout, IFloat **vin, const int *dir, int
 parity, IFloat * new_gauge_field)
 {
@@ -56,7 +59,6 @@ parity, IFloat * new_gauge_field)
 }
 
 //Padded parallel transport with normal gauge fields
-#undef PROFILE
 void PT::vec_cb(int n, IFloat *vout, IFloat **vin, const int *dir, int
 parity, int pad)
 {
@@ -64,7 +66,6 @@ parity, int pad)
 }
 
 //Padded parallel transport, but with user-specified gauge fields
-#undef PROFILE
 void PT::vec_cb(int n, IFloat *vout, IFloat **vin, const int *dir, int
 parity, int pad, IFloat * new_gauge_field)
 {
@@ -72,33 +73,34 @@ parity, int pad, IFloat * new_gauge_field)
 }
 
 #define PROFILE
-#undef PROFILE
 void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
+
+  //Name our function
+//  char *fname="pt_1vec_cb_norm()";
   //List of the different directions
   int wire[n];
   int i;
-//  int j,d,s,k;
+  int vlen = VECT_LEN;
+  int vlen2 = VECT_LEN;
 
-  #ifdef USE_QMP
+//  Float dtime;
+  static int call_num = 0;
+  static double setup_time=0.;
+  static double total_time=0.;
+  static double comp_time=0.;
+  static double comm_init_time=0.;
+  static double comm_complete_time=0.;
+
+  total_time -=CPS_NAMESPACE::dclock();
+  setup_time -=dclock();
   QMP_msgmem_t *msg_mem_p = (QMP_msgmem_t *)Alloc("","vec_cb_norm", "msg_mem_p", 2*non_local_dirs*sizeof(QMP_msgmem_t));
   QMP_msghandle_t* msg_handle_p = (QMP_msghandle_t *)Alloc("","vec_cb_norm", "msg_handle_p", 2*non_local_dirs*sizeof(QMP_msghandle_t));
   QMP_msghandle_t multiple;
-  #else
-  //SCUDirArgs for sending and receiving in the n directions
-  SCUDirArgIR *SCUarg_p[2*non_local_dirs];
-  //SCUDirArgIR *SCUarg_p[2*n];
-  SCUDirArgMulti SCUmulti;
-  #endif
-  static int call_num = 0;
-  int vlen = VECT_LEN;
-  int vlen2 = VECT_LEN;
-//  printf("gauge=%p\n",gauge);
+  setup_time +=dclock();
 
   call_num++;
   
-  //Name our function
-//  char *fname="pt_1vec_cb_norm()";
   
   //Set the transfer directions
   //If wire[i] is even, then we have communication in the negative direction
@@ -106,7 +108,6 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
   for(i=0;i<n;i++)
     wire[i]=dir[i];
 
-  Float dtime;
 
 
   //If wire[i] is odd, then we have parallel transport in the
@@ -115,6 +116,8 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
   //
   //If we have transfer in the negative T direction (wire[i] = 6) then
   //we have to copy the appropriate fields into the send buffer
+
+  comp_time -= dclock();
   if(conjugated)
     for(i=0;i<n;i++)
       {
@@ -123,34 +126,13 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	    if(wire[i]%2)
 	      {
 		//printf("dir = %d, pre-mulitply\n", wire[i]);
-#ifdef PROFILE
-  dtime  = - dclock();
-#endif
 
   partrans_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);
 
-#ifdef PROFILE
-  dtime +=dclock();
-  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
-#endif
 	      }
 	    else if((wire[i] == 6))
 	      {
-#ifdef PROFILE
-  dtime  = - dclock();
-#endif
-#if 1
             pt_copy_buffer(non_local_chi_cb[6],(long)vin[i],(long)snd_buf_t_cb,(long)Toffset[parity]);
-#else
-		for(j = 0; j < non_local_chi_cb[6];j++)
-		  for(k = 0; k < VECT_LEN;k++)
-		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)+ k);
-		  //moveMem(snd_buf_t_cb + j*VECT_LEN,vin[i] + *(Toffset[parity]+j)*vlen,VECT_LEN*sizeof(IFloat));
-#endif
-#ifdef PROFILE
-  dtime +=dclock();
-  print_flops(fname,"pt_copy_buffer()",0,dtime);
-#endif
 	      }
 	  }
       }
@@ -161,42 +143,19 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	  {
 	    if(wire[i]%2)
 	      {
-#ifdef PROFILE
-  dtime  = - dclock();
-#endif
  
   partrans_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb_pre[parity][wire[i]/2],gauge,vin[i],snd_buf_cb[wire[i]/2]);	 
 
-#ifdef PROFILE
-  dtime +=dclock();
-  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
-#endif
 	      }
 	    else if(wire[i] == 6)
 	      {
-#ifdef PROFILE
-  dtime  = - dclock();
-#endif
-#if 1
             pt_copy_buffer(non_local_chi_cb[6],(long)vin[i],(long)snd_buf_t_cb,(long)Toffset[parity]);
-#else
-		for(j = 0; j < non_local_chi_cb[6];j++)
-		  for(k = 0; k < VECT_LEN;k++)
-		    *(snd_buf_t_cb+j*VECT_LEN+k) = *(vin[i] + *(Toffset[parity]+j)+ k);
-//		  moveMem(snd_buf_t_cb + j*VECT_LEN,vin[i] + *(Toffset[parity]+j),VECT_LEN*sizeof(IFloat));
-#endif
-#ifdef PROFILE
-  dtime +=dclock();
-  print_flops(fname,"pt_copy_buffer()",0,dtime);
-#endif
 	      }
 	  }
       }
-#ifdef PROFILE
-  dtime  = - dclock();
-#endif
+  comp_time +=dclock();
 
-  #if 1
+  setup_time  -= dclock();
   int comms = 0;
   for(i=0;i<n;i++)
     {
@@ -204,21 +163,6 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	{
 	  //Calculate the starting address for the data to be sent
 	  IFloat *addr = vin[i] + VECT_LEN * offset_cb[wire[i]];
-
-	  #ifndef USE_QMP
-	  //This points to the appropriate SCUDirArg for receiving
-	  SCUarg_p[2*comms] = SCUarg_cb[2*wire[i]];
-	  //This points to the appropriate SCUDirArg for sending
-	  SCUarg_p[2*comms+1] = SCUarg_cb[2*wire[i]+1];
-	  
-	  //Set the send address
-	  if(wire[i]%2)
-	    SCUarg_p[2*comms+1]->Addr((void *)snd_buf_cb[wire[i]/2]);
-	  else if(wire[i] == 6)
-	    SCUarg_p[2*comms+1]->Addr((void *)snd_buf_t_cb);
-	  else
-	    SCUarg_p[2*comms+1]->Addr((void *)addr);
-	  #else
 
 	  //msg_mem_p[2*comms] = msg_mem_cb[2*wire[i]];
 	  //msg_mem_p[2*comms+1] = msg_mem_cb[2*wire[i]+1];
@@ -236,82 +180,64 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	  msg_handle_p[2*comms] = QMP_declare_receive_relative(msg_mem_p[2*comms], wire[i]/2, 1-2*(wire[i]%2), 0);
 	  msg_handle_p[2*comms+1] = QMP_declare_send_relative(msg_mem_p[2*comms+1], wire[i]/2, 2*(wire[i]%2)-1, 0);
 	  //printf("wire[%d] = %d, rcv = %d, snd = %d\n", i, wire[i], 1-2*(wire[i]%2), 2*(wire[i]%2)-1);
-	  #endif
 	  comms++;
 	}
     }
-  #endif
+  if(comms) 
+    multiple = QMP_declare_multiple(msg_handle_p, 2*comms);
+  setup_time +=dclock();
   
 
-  #ifndef USE_QMP
-  if(comms){
-    SCUmulti.Init(SCUarg_p,2*comms);
-//Begin transmission
-    SCUmulti.SlowStartTrans();
-  }
-  #else
-  if(comms) {
-    multiple = QMP_declare_multiple(msg_handle_p, 2*comms);
+  comm_init_time -=dclock();
+  if(comms) 
     QMP_start(multiple);
-  }
-  #endif
+  comm_init_time +=dclock();
 
+  comp_time -=dclock();
   //Do local calculations
   if(conjugated)
     {
       for(i=0;i<n;i++)
 	{
-#ifdef PROFILE
-  dtime  = - dclock();
-#endif 
 	
   if(wire[i]%2)
     partrans_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
   else
     partrans_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
   
-#ifdef PROFILE
-  dtime +=dclock();
-  print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
-#endif
 	}
     }
   else
     {
     for(i=0;i<n;i++)
       {
-#ifdef PROFILE
-  dtime  = - dclock();
-#endif
 
   if(!(wire[i]%2))
     partrans_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
   else
     partrans_cmv_dag(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
 
-#ifdef PROFILE
-  dtime +=dclock();
-  print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
-#endif
       }
     }
+  comp_time +=dclock();
   
   //End transmission
-  #ifndef USE_QMP
-  if(comms){ SCUmulti.TransComplete(); }
-  #else
   if(comms) {
+    comm_complete_time -=dclock();
     QMP_status_t qmp_complete_status = QMP_wait(multiple);
     if (qmp_complete_status != QMP_SUCCESS)
 	  QMP_error("Send failed in vec_cb_norm: %s\n", QMP_error_string(qmp_complete_status));
+    comm_complete_time +=dclock();
+    setup_time -=dclock();
     QMP_free_msghandle(multiple);
     for(int i = 0; i < 2*comms; i++)
       QMP_free_msgmem(msg_mem_p[i]);
     Free(msg_handle_p);
     Free(msg_mem_p);
+    setup_time +=dclock();
   }
-  #endif
 
+  comp_time -=dclock();
   //If wire[i] is even, then we have transport in the negative direction.
   //In this case, the vector field is multiplied by the SU(3) link matrix
   //after all communication is complete
@@ -322,49 +248,34 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
       	{
 	  if(!(wire[i]%2))
 	    {
-#ifdef PROFILE
-  dtime  = - dclock();
-#endif
-
 	    if(conjugated)
 	      partrans_cmv_dag(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
 	    else
 	      partrans_cmv(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],gauge,rcv_buf[wire[i]],vout[i]);
 
-#ifdef PROFILE
-  dtime +=dclock();
-  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
-#endif
 	    }
 	  //Otherwise we have parallel transport in the positive direction.
 	  //In this case, the received data has already been pre-multiplied
 	  //All we need to do is to put the transported field in the correct place
 	  else
 	    {
-#ifdef PROFILE
-  dtime  = - dclock();
-#endif
-#if 1
               pt_copy(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],rcv_buf[wire[i]],vout[i]);
-#else
-	      //Place the data in the receive buffer into the result vector
-	      for(s=0;s<non_local_chi_cb[wire[i]];s++)
-		{
-		  fp0 = (IFloat *)((long)rcv_buf[wire[i]]+uc_nl_cb[parity][wire[i]][s].src);
-		  fp1 = (IFloat *)((long)vout[i]+uc_nl_cb[parity][wire[i]][s].dest);
-		  for(d = 0;d<VECT_LEN;d++)
-		    *(fp1+d) = *(fp0+d);
-		  //moveMem(fp1,fp0,VECT_LEN*sizeof(IFloat));
-		}
-#endif
-#ifdef PROFILE
-  dtime +=dclock();
-  print_flops(fname,"pt_copy()",0,dtime);
-#endif
 	    }
 	}
     }
+  comp_time +=dclock();
+  total_time +=CPS_NAMESPACE::dclock();
 //  ParTrans::PTflops +=33*n*vol;
+  if(call_num %100==0){
+    double fac = 0.01;
+    CPS_NAMESPACE::print_time("vec_cb_norm","total_time",total_time*fac);
+    CPS_NAMESPACE::print_time("vec_cb_norm","comp_time",comp_time*fac);
+    CPS_NAMESPACE::print_time("vec_cb_norm","setup_time",setup_time*fac);
+    CPS_NAMESPACE::print_time("vec_cb_norm","comm_init_time",comm_init_time*fac);
+    CPS_NAMESPACE::print_time("vec_cb_norm","comm_complete_time",comm_complete_time*fac);
+    call_num=0;
+    total_time=comp_time=setup_time=comm_init_time=comm_complete_time=0.;
+  }
 }
 
 #define PROFILE
@@ -376,20 +287,13 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   int wire[n];
   int i;
 
-  #ifdef USE_QMP
   QMP_msgmem_t *msg_mem_p = (QMP_msgmem_t *)Alloc("","vec_cb_norm", "msg_mem_p", 2*non_local_dirs*sizeof(QMP_msgmem_t));
   QMP_msghandle_t* msg_handle_p = (QMP_msghandle_t *)Alloc("","vec_cb_norm", "msg_handle_p", 2*non_local_dirs*sizeof(QMP_msghandle_t));
   QMP_msghandle_t multiple;
-  #else
-  //SCUDirArgs for sending and receiving in the n directions
-  SCUDirArgIR *SCUarg_p[2*non_local_dirs];
-  //SCUDirArgIR *SCUarg_p[2*n];
-  SCUDirArgMulti SCUmulti;
-  #endif
   static int call_num = 0;
 //  int vlen = VECT_LEN;
 //  int vlen2 = 8;
-#ifdef PROFILE
+#if 0
   printf("gauge=%p parity =%d\n",gauge,parity);
   for(i=0;i<n;i++){
     printf("%d: vin=%p vout=%p\n",i,vin[i],vout);
@@ -436,7 +340,7 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   
 #ifdef PROFILE
   dtime +=dclock();
-  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
+//  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
 #endif
 	    }
 	  else if(wire[i] == 6)
@@ -470,22 +374,6 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	  //Calculate the starting address for the data to be sent
 	  IFloat *addr = vin[i] + VECT_LEN * offset_cb[wire[i]];
 
-	  #ifndef USE_QMP
-	  //This points to the appropriate SCUDirArg for receiving
-	  SCUarg_p[2*comms] = SCUarg_cb[2*wire[i]];
-	  //This points to the appropriate SCUDirArg for sending
-	  SCUarg_p[2*comms+1] = SCUarg_cb[2*wire[i]+1];
-	  
-	  //Set the send address
-	  if(wire[i]%2)
-	    SCUarg_p[2*comms+1]->Addr((void *)snd_buf_cb[wire[i]/2]);
-	  else if(wire[i] == 6)
-	    SCUarg_p[2*comms+1]->Addr((void *)snd_buf_t_cb);
-	  else
-	    SCUarg_p[2*comms+1]->Addr((void *)addr);
-
-	  #else
-
 	  msg_mem_p[2*comms] = QMP_declare_msgmem((void *)rcv_buf[wire[i]], non_local_chi_cb[wire[i]]*VECT_LEN*sizeof(IFloat));
 
 	  //Initialize the msg_mem for sends
@@ -499,35 +387,26 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	  msg_handle_p[2*comms] = QMP_declare_receive_relative(msg_mem_p[2*comms], wire[i]/2, 1-2*(wire[i]%2), 0);
 	  msg_handle_p[2*comms+1] = QMP_declare_send_relative(msg_mem_p[2*comms+1], wire[i]/2, 2*(wire[i]%2)-1, 0);
 	  //printf("wire[%d] = %d, rcv = %d, snd = %d\n", i, wire[i], 1-2*(wire[i]%2), 2*(wire[i]%2)-1);
-	  #endif
 	  comms++;
 	}
     }
 #ifdef PROFILE
   dtime +=dclock();
-  print_flops(fname,"Addr",0,dtime);
+//  print_flops(fname,"Addr",0,dtime);
 #endif
 
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
 
-  #ifndef USE_QMP
-  if(comms){
-    SCUmulti.Init(SCUarg_p,2*comms);
-//Begin transmission
-    SCUmulti.SlowStartTrans();
-  }
-  #else
   if(comms) {
     multiple = QMP_declare_multiple(msg_handle_p, 2*comms);
     QMP_start(multiple);
   }
-  #endif
 
 #ifdef PROFILE
   dtime +=dclock();
-  print_flops(fname,"StartTrans()",0,dtime);
+//  print_flops(fname,"StartTrans()",0,dtime);
 #endif
 
 
@@ -547,15 +426,12 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 
 #ifdef PROFILE
   dtime +=dclock();
-  print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
+//  print_flops("",fname,66*local_chi_cb[wire[i]],dtime);
 #endif
     }
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-  #ifndef USE_QMP
-  if(comms){ SCUmulti.TransComplete(); }
-  #else
   if(comms) {
     QMP_status_t qmp_complete_status = QMP_wait(multiple);
     if (qmp_complete_status != QMP_SUCCESS)
@@ -566,10 +442,9 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
     Free(msg_handle_p);
     Free(msg_mem_p);
   }
-  #endif
 #ifdef PROFILE
   dtime +=dclock();
-  print_flops(fname,"TransComplete()",0,dtime);
+//  print_flops(fname,"TransComplete()",0,dtime);
 #endif
 
   //If wire[i] is even, then we have transport in the negative direction.
@@ -593,7 +468,7 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 
 #ifdef PROFILE
   dtime +=dclock();
-  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
+//  print_flops("",fname,66*non_local_chi_cb[wire[i]],dtime);
 #endif
 	    }
 	  //Otherwise we have parallel transport in the positive direction.
@@ -604,22 +479,10 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-#if 1
               pt_copy_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],rcv_buf[wire[i]],vout);
-#else
-	      //Place the data in the receive buffer into the result vector
-	      for(int s=0;s<non_local_chi_cb[wire[i]];s++)
-		{
-		  fp0 = (IFloat *)((long)rcv_buf[wire[i]]+uc_nl_pad_cb[parity][wire[i]][s].src);
-		  fp1 = (IFloat *)((long)vout +  uc_nl_pad_cb[parity][wire[i]][s].dest);
-		  for(int d = 0;d<VECT_LEN;d++)
-		    *(fp1+d) = *(fp0+d);
-		  //moveMem(fp1,fp0,VECT_LEN*sizeof(IFloat));
-		}
-#endif
 #ifdef PROFILE
   dtime +=dclock();
-  print_flops(fname,"pt_copy_pad()",0,dtime);
+//  print_flops(fname,"pt_copy_pad()",0,dtime);
 #endif
 	    }
 	}

@@ -35,7 +35,7 @@ void dwf_dslash(Vector *out,
 		Dwf *dwf_lib_arg)
 {
 
-#if 0
+#if 1
   dwf_dslash_all(out, gauge_field, in, mass, cb, dag, dwf_lib_arg);
 #else
 //------------------------------------------------------------------

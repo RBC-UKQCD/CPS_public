@@ -92,7 +92,7 @@ p4_recom:
 	dcbt	 %r21,	 %r4
 	dcbt	 %r22,	 %r4
 	dcbt	 %r23,	 %r4
-	bf gt,	lab0
+	bf gt,	p4_recom_lab0
 	dcbt	 %r24,	 %r4
 	dcbt	 %r25,	 %r4
 	dcbt	 %r26,	 %r4
@@ -102,9 +102,9 @@ p4_recom:
 	dcbt	 %r29,	 %r4
 	dcbt	 %r30,	 %r4
 	dcbt	 %r31,	 %r4
-	bf gt,	lab2
-	b  lab1
-lab1:
+	bf gt,	p4_recom_lab2
+	b  p4_recom_lab1
+p4_recom_lab1:
 	lfd	   18,	192(%r4)
 	addi %r7, %r7, 512 
 	fadd	   0,	0,	6
@@ -316,9 +316,9 @@ lab1:
 	lfd	   17,	168(%r4)
 	stfd	   29,	48(%r11)
 	stfd	   29,	56(%r11)
-	bf gt,	lab2
-	b  lab1
-lab2:
+	bf gt,	p4_recom_lab2
+	b  p4_recom_lab1
+p4_recom_lab2:
 	lfd	   18,	192(%r4)
 	lfd	   19,	200(%r4)
 	fadd	   0,	0,	6
@@ -453,7 +453,7 @@ lab2:
 	stfd	   27,	24(%r11)
 	stfd	   28,	32(%r11)
 	stfd	   29,	40(%r11)
-lab0:
+p4_recom_lab0:
 	lwz	%r14,	368(%r1)
 	lwz	%r15,	376(%r1)
 	lwz	%r16,	384(%r1)
