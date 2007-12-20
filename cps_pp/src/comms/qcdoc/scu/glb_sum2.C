@@ -69,8 +69,10 @@ void glb_sum_internal2(Float * float_p,int ndir)
       for (int i = 1;i<5;i++)
 	if (max <NP[i]) max = NP[i];
       transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64)*2);
+	  if(!transmit_buf) ERR.Pointer("","glb_sum_internal2(p,i)","transmit_buf");
       receive_buf = transmit_buf+1;
-      gsum_buf = (Double64 *)qalloc(QFAST,sizeof(Double64)*max);
+//      gsum_buf = (Double64 *)qalloc(QFAST,sizeof(Double64)*max);
+	  gsum_buf = (Double64 *)fmalloc("","glb_sum_internal2(p,i)","gsum_buf",sizeof(Double64)*max);
       for(int i = 0;i<5;i++)
       if (NP[i]>1){
       Send[i] = new SCUDirArgIR(transmit_buf, gjp_scu_dir[2*i+1], SCU_SEND, sizeof(Double64));
@@ -88,13 +90,13 @@ void glb_sum_internal2(Float * float_p,int ndir)
   // Save checksum of local floating points
   //---------------------------------------------------
   unsigned long sum_sum = local_checksum(float_p,1);
- CSM.AccumulateCsum(CSUM_GLB_LOC,sum_sum);
+// CSM.AccumulateCsum(CSUM_GLB_LOC,sum_sum);
 
 
   for(int i = 0; i < ndir; ++i) 
   if (NP[i] >1) {
       int coor = (GJP.NodeCoor(i)-GDS.Origin(i)+NP[i])%NP[i];
-//fprintf(stderr,"coor[%d]=%d\n",i,coor);
+//      fprintf(stdout,"GDS.Origin(%d)=%d coor[%d]=%d\n",i,GDS.Origin(i),i,coor);
       *transmit_buf = gsum_buf[coor]= tmp_sum;
 
       for (int itmp = 1; itmp < NP[i]; itmp++) {
@@ -115,7 +117,7 @@ void glb_sum_internal2(Float * float_p,int ndir)
   // accumulate final global sum checksum
   //------------------------------------
   sum_sum = local_checksum(float_p,1);
-  CSM.AccumulateCsum(CSUM_GLB_SUM,sum_sum);
+//  CSM.AccumulateCsum(CSUM_GLB_SUM,sum_sum);
   
 }
 
@@ -141,8 +143,10 @@ void glb_sum_internal2(unsigned int *uint_p, int ndir, int sum_flag) {
 	for (int i = 1;i<5;i++)
 	  if (max<NP[i]) max = NP[i];
 	transmit_buf_u = (unsigned long long*)qalloc(QFAST|QNONCACHE,sizeof(unsigned long long)*2);
+	if(!transmit_buf_u) ERR.Pointer("","glb_sum_internal2(p,i,i)","transmit_buf_u");
 	receive_buf_u = transmit_buf_u+1;
-	gsum_buf_u = (unsigned long long*)qalloc(QFAST,sizeof(unsigned long long)*max);
+	gsum_buf_u = (unsigned long long*)fmalloc("","glb_sum_internal2(p,i,i)","gsum_buf_u",sizeof(unsigned long long)*max);
+//	  printf("transmit_buf_u=%p gsum_buf_u=%p\n",transmit_buf_u,gsum_buf_u);
 	for(int i=0; i<5; i++)
       if (NP[i]>1) {
 		Send[i] = new SCUDirArgIR(transmit_buf_u, gjp_scu_dir[2*i+1], SCU_SEND, sizeof(unsigned long long));
@@ -160,11 +164,12 @@ void glb_sum_internal2(unsigned int *uint_p, int ndir, int sum_flag) {
   for(int i=0; i<ndir; ++i) 
 	if (NP[i] > 1) {
       int coor = GJP.NodeCoor(i);
-	  //printf("coor[%d]=%d\n",i,coor);
+//	  printf("coor[%d]=%d\n",i,coor);
       *transmit_buf_u = gsum_buf_u[coor] = (unsigned long long)tmp_sum;
 	  
       for (int itmp = 1; itmp < NP[i]; itmp++) {
 		coor = (coor+1)%NP[i];
+//	    printf("coor[%d]=%d\n",i,coor);
 		Send[i]->StartTrans(); Recv[i]->StartTrans();
 		Send[i]->TransComplete(); Recv[i]->TransComplete();
 		
