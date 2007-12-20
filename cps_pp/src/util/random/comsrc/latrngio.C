@@ -119,15 +119,15 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   log();
 
 
-#if 0  // when on LINUX, only parallel (direct IO) mode is used
+#if TARGET == QCDOC  // when on QCDOC, only Parallel (direct IO) mode is used
   setParallel();
 #else
   setSerial();
 #endif
   VRB.Result(cname,fname,"parIO()=%d\n",parIO());
 
-//  if(parIO()) {
-  if(0) {
+  if(parIO()) {
+//  if(0) {
     VRB.Flow(cname,fname, "Start Loading 5-D RNGs\n");
 
     ParallelIO pario(rng_arg);
@@ -303,12 +303,12 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   //  cout << "size_rng_ints = " << size_rng_ints << endl;
   int size_rng_chars = size_rng_ints * intconv.fileIntSize();
 
-#if 0
+#if TARGET == QCDOC
   setParallel();
 #else
   setSerial();
 #endif
-  VRB.Result(cname,fname,"parIO()=%d\n",parIO());
+  VRB.Result(cname,fname,"parIO()=%d ConcurIONumber=%d\n",parIO(),wt_arg.ConcurIONumber);
 
   log();
 
