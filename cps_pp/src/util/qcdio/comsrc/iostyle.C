@@ -257,6 +257,7 @@ int ParallelIO::store(iostream & output,
 
   VRB.Result(cname, fname, "Parallel unloading starting\n");
   setConcurIONumber(wt_arg.ConcurIONumber);
+  VRB.Result(cname, fname, "ConcurIONumber=%d\n",wt_arg.ConcurIONumber);
 //  setConcurIONumber(1);
   getIOTimeSlot();
 

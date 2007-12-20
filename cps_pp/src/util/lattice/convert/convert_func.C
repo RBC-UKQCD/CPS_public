@@ -1,22 +1,26 @@
 #include<config.h>
+#if TARGET != QCDOC
+#ifndef HAVE_SYNC
 void inline sync(){}
+#endif
+#endif
 CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.16 2007-10-30 20:40:34 chulwoo Exp $
+  $Id: convert_func.C,v 1.17 2007-12-20 18:01:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-10-30 20:40:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.16 2007-10-30 20:40:34 chulwoo Exp $
-//  $Id: convert_func.C,v 1.16 2007-10-30 20:40:34 chulwoo Exp $
+//  $Date: 2007-12-20 18:01:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.17 2007-12-20 18:01:40 chulwoo Exp $
+//  $Id: convert_func.C,v 1.17 2007-12-20 18:01:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //

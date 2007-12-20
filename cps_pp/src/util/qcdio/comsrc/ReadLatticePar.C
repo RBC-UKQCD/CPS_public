@@ -206,7 +206,7 @@ bool ReadLatticeParallel::CheckPlaqLinktrace(Lattice &lat, const QioArg & rd_arg
   Float devplaq(0.0);
   if(isRoot()) {
     devplaq = fabs(  (plaq - plaq_inheader) / plaq ) ;
-    printf("%s::%s: plaquette::  calc: %0.8e  header: %0.8e   rel.dev.: %0.8e\n",
+    printf("%s::%s: plaquette::\n  calc: %0.8e  header: %0.8e   rel.dev.: %0.8e\n",
 	     cname,fname,plaq, plaq_inheader, devplaq);
   }
 
@@ -226,7 +226,7 @@ bool ReadLatticeParallel::CheckPlaqLinktrace(Lattice &lat, const QioArg & rd_arg
     Float devlinktrace =   
       fabs(  (linktrace - linktrace_inheader) / linktrace );
 
-    printf("%s::%s: linktrace::  calc: %0.8e  header: %0.8e   rel.dev.: %0.8e\n",
+    printf("%s::%s: linktrace::\n  calc: %0.8e  header: %0.8e   rel.dev.: %0.8e\n",
 	     cname,fname,linktrace, linktrace_inheader, devlinktrace);
   
     Float chkprec = rd_arg.CheckPrecision;

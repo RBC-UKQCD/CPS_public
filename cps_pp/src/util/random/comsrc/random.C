@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.26 2005-09-06 21:09:59 chulwoo Exp $
+  $Id: random.C,v 1.27 2007-12-20 18:01:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 21:09:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.26 2005-09-06 21:09:59 chulwoo Exp $
-//  $Id: random.C,v 1.26 2005-09-06 21:09:59 chulwoo Exp $
+//  $Date: 2007-12-20 18:01:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.27 2007-12-20 18:01:40 chulwoo Exp $
+//  $Id: random.C,v 1.27 2007-12-20 18:01:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.26 $
+//  $Revision: 1.27 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -554,6 +554,7 @@ bool LatRanGen::Read(const char * filename, int concur_io_number) {
 bool LatRanGen::Write(const char * filename, int concur_io_number) {
   io_good = false;
   QioArg wt_arg(filename, concur_io_number);
+  VRB.Result(cname,"Write()","concur_io_number=%d\n",concur_io_number);
   LatRngWrite  wt;
   if(parIO()) wt.setParallel();
   else        wt.setSerial();
