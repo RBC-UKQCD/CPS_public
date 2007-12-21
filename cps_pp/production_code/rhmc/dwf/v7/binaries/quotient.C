@@ -32,7 +32,7 @@
 #include<util/ReadLatticePar.h>
 #include<util/qioarg.h>
 
-#include <sys/bgl/bgl_sys_all.h>
+//#include <sys/bgl/bgl_sys_all.h>
 
 #undef USE_SCU_CHECKSUMS
 #ifdef USE_SCU_CHECKSUMS

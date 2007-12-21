@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.20 2007-06-25 15:49:20 chulwoo Exp $
+  $Id: alg_eig.C,v 1.21 2007-12-21 22:54:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-25 15:49:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.20 2007-06-25 15:49:20 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.20 2007-06-25 15:49:20 chulwoo Exp $
+//  $Date: 2007-12-21 22:54:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.21 2007-12-21 22:54:27 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.21 2007-12-21 22:54:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -276,8 +276,7 @@ void AlgEig::run(Float **evalues)
   //for(int n = 0; n < eig_arg->N_eig; ++n)
   //  lat.RandGaussVector(eigenv[n], 0.5, Ncb);
   
-  // Loop over mass values
-  int sign_dm = (eig_arg->Mass_step < 0.0) ? -1 : 1;
+  int sign_dm=1;
 
   // Initialize the cg_arg mass, with the first mass we
   // want to compute for:
@@ -286,6 +285,8 @@ void AlgEig::run(Float **evalues)
     eig_arg->mass = eig_arg->Mass.Mass_val[0]; 
     break;
   case LIN:   
+    // Loop over mass values
+    sign_dm = (eig_arg->Mass_step < 0.0) ? -1 : 1;
     eig_arg->mass = eig_arg->Mass_init; 
     if (sign_dm*eig_arg->Mass_init > sign_dm*eig_arg->Mass_final)
       ERR.General(cname,fname,"initial and final mass not valid\n");

@@ -1,8 +1,8 @@
 class DoArg do_arg = {
-int x_sites = 8
-int y_sites = 8
-int z_sites = 8
-int t_sites = 8
+int x_sites = 4
+int y_sites = 4
+int z_sites = 4
+int t_sites = 4
 int s_sites = 8
 int x_node_sites = 0
 int y_node_sites = 0

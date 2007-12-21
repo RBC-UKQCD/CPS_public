@@ -1,7 +1,7 @@
 class EvoArg evo_arg = {
-int traj_start = 621
+int traj_start = 0
 int gauge_unload_period = 1
-int gauge_configurations = 1
+int gauge_configurations = 5
 int io_concurrency = 32
 int hdw_xcsum = 1
 int hdw_rcsum = 1

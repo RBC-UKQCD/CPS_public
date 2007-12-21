@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.25 2007-03-24 16:03:24 chulwoo Exp $
+  $Id: random.h,v 1.26 2007-12-21 22:54:26 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-03-24 16:03:24 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.25 2007-03-24 16:03:24 chulwoo Exp $
-//  $Id: random.h,v 1.25 2007-03-24 16:03:24 chulwoo Exp $
+//  $Date: 2007-12-21 22:54:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.26 2007-12-21 22:54:26 chulwoo Exp $
+//  $Id: random.h,v 1.26 2007-12-21 22:54:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.25 $
+//  $Revision: 1.26 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -55,6 +55,7 @@ class RandomGenerator {
   public:
 
     RandomGenerator() {    }
+    ~RandomGenerator() {    }
 
     //! Gets a random number 
     IFloat Rand();
@@ -124,6 +125,7 @@ class UniformRandomGenerator: public virtual RandomGenerator
     UniformRandomGenerator(IFloat high_limit = 0.5, IFloat low_limit = -0.5):
 //	RandomGenerator(), A(low_limit), B(high_limit) {} //what's wrong with this?
 	RandomGenerator() {}
+	~UniformRandomGenerator() {}
 
 //! Sets the interval over which the uniform distribution is defined.
 /*!
@@ -174,6 +176,7 @@ class GaussianRandomGenerator : public virtual RandomGenerator
 */
     GaussianRandomGenerator(IFloat s2 = 1.0):
 	RandomGenerator(), iset(0) {SetSigma(s2);}    
+    ~GaussianRandomGenerator() {}
 
 //! Sets the variance of the distribution.
 /*!

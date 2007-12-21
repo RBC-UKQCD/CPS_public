@@ -620,6 +620,7 @@ void AlgActionRational::generateEigArg(EigenDescr eigen) {
   eig_arg.print_hsum = 0;
   eig_arg.hsum_dir = 0;
   eig_arg.ncorr = 0;
+  eig_arg.fname = 0;
   
   lambda_low = (Float**)smalloc(eig_arg.N_eig*sizeof(Float*),
 				"lambda_low",fname,cname);

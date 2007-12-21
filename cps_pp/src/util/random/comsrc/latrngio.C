@@ -1,8 +1,7 @@
-
 #include <config.h>
-
 #include <stdlib.h>
 #include <math.h>
+#include <util/qcdio.h>
 #include <util/latrngio.h>
 #include <util/qioarg.h>
 #include <util/iostyle.h>
@@ -325,8 +324,8 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 #if 1
   else {
     if(isRoot()) {
-      FILE *fp = fopen(wt_arg.FileName,"w");
-      fclose(fp);
+      FILE *fp = Fopen(wt_arg.FileName,"w");
+      Fclose(fp);
       output.open(wt_arg.FileName);
       if(!output.good()) {
 	//	VRB.Flow(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);

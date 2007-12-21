@@ -1,6 +1,7 @@
 #include <config.h>
 #include <util/WriteLatticePar.h>
 #include <util/iostyle.h>
+#include <util/qcdio.h>
 
 using namespace std;
 CPS_START_NAMESPACE
@@ -74,7 +75,7 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
     // all open file, start writing
     output.open(wt_arg.FileName);
     if(!output.good())    {
-      //      VRB.Flow(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);
+            ERR.General(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);
       //      VRB.Flow(cname,fname,"USER: maybe you should kill the process\n");
       
       printf("Node %d:Could not open file: [%s] for output.\n",UniqueID(),wt_arg.FileName);
@@ -84,8 +85,8 @@ void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
   else {
     // only node 0 open file, start writing
     if(isRoot()) {
-      FILE *fp = fopen(wt_arg.FileName,"w");
-      fclose(fp);
+      FILE *fp = Fopen(wt_arg.FileName,"w");
+      Fclose(fp);
       output.open(wt_arg.FileName);
       if(!output.good())    {
 	//	VRB.Flow(cname,fname, "Could not open file: [%s] for output.\n",wt_arg.FileName);
