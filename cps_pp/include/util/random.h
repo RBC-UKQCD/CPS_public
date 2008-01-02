@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.26 2007-12-21 22:54:26 chulwoo Exp $
+  $Id: random.h,v 1.27 2008-01-02 20:29:23 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-12-21 22:54:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.26 2007-12-21 22:54:26 chulwoo Exp $
-//  $Id: random.h,v 1.26 2007-12-21 22:54:26 chulwoo Exp $
+//  $Date: 2008-01-02 20:29:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.27 2008-01-02 20:29:23 chulwoo Exp $
+//  $Id: random.h,v 1.27 2008-01-02 20:29:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.26 $
+//  $Revision: 1.27 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -49,13 +49,13 @@ class RandomGenerator {
     int ma[state_size];	// The value 55(range ma[0...54])
     				// is special and should not be
 				// modified.
-    int inext;
+    int inext;  
     int inextp;
     
   public:
 
     RandomGenerator() {    }
-    ~RandomGenerator() {    }
+    virtual ~RandomGenerator() {    }
 
     //! Gets a random number 
     IFloat Rand();
