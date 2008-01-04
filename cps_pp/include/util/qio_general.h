@@ -135,6 +135,7 @@ class qio_init {
  private:
 
   char *cname;
+  QMP_bool_t qmp_run;
 
  public:
 
@@ -181,15 +182,14 @@ class qio_init {
 
       // start QMP
       
-      QMP_bool_t qmp_run(QMP_is_initialized());
+      qmp_run = QMP_is_initialized();
       QMP_status_t qmp_init;  
       QMP_thread_level_t qmp_level;
 
 
       if( !qmp_run )
 	{
-	  VRB.Flow(cname,fname,"QIO starts QMP...\n");
-	  //VRB.Result(cname,fname,"QIO starts QMP...\n");
+	  VRB.Result(cname,fname,"QIO starts QMP...\n");
 
 	  qmp_init = QMP_init_msg_passing(&argc, &argv,QMP_THREAD_SINGLE , &qmp_level); 
 	  
@@ -201,8 +201,7 @@ class qio_init {
 	}
       else
 	{
-	  VRB.Flow(cname,fname,"QMP was already up !?!?!?\n");
-	  //VRB.Result(cname,fname,"QMP was already up !?!?!?\n");
+	  VRB.Result(cname,fname,"QMP was already up !?!?!?\n");
 
 	}
       QIO_verbose(QIO_VERB_LEVEL);
@@ -223,20 +222,18 @@ class qio_init {
 	const char * fname = "~qio_init()";
 	VRB.Func(cname,fname);
 
-	QMP_bool_t qmp_run(QMP_is_initialized());
+//	QMP_bool_t qmp_run(QMP_is_initialized());
 	
 	// finish QMP
 	
-	if(qmp_run)
+	if(!qmp_run)
 	  {
-	    VRB.Flow(cname,fname," ...finish QMP\n");
-	    //VRB.Result(cname,fname," ...finish QMP\n");
+	    VRB.Result(cname,fname," ...finish QMP\n");
 	    QMP_finalize_msg_passing();
 	  }
 	else
 	  {
-	    VRB.Flow(cname,fname," no QMP up to be finished ?!?!?\n");
-	    //VRB.Result(cname,fname," no QMP up to be finished ?!?!?\n");
+	    VRB.Result(cname,fname," no QMP up to be finished ?!?!?\n");
 	  }
 
 	VRB.FuncEnd(cname,fname);
