@@ -37,7 +37,7 @@ bool_t TextEncoder::Void(void)
     if ( sscanf(line,format,&val) == 1 ) { \
       return true;\
     } else { \
-      DEB("scanf"); DEB(line); return false; \
+      DEB("scanf"); DEB(name); DEB(line); return false; \
     } \
   }  \
   return true;
@@ -56,7 +56,7 @@ bool_t TextEncoder::Void(void)
     if ( sscanf(line,format,&val) == 1 ) { \
       return true;\
     } else { \
-      DEB("scanf"); DEB(line); return false; \
+      DEB("scanf"); DEB(name); DEB(line); return false; \
     } \
   }  \
   return true;
@@ -77,7 +77,7 @@ bool_t TextEncoder::Enum ( VML *vmls,char *ename, char *name, char *&value)
     if ( sscanf(line,format,value) == 1 ) { 
       return true;
     } else { 
-      value = NULL; DEB("enum"); DEB(line);
+      value = NULL; DEB("enum"); DEB(name);DEB(line);
       return false; 
     } 
   }  

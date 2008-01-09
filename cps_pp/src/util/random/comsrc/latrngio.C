@@ -315,9 +315,12 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   fstream output;
 
   if(parIO()) {
+    FILE *fp = Fopen(wt_arg.FileName,"w");
+    Fclose(fp);
+	Float temp;glb_sum_five(&temp);
     output.open(wt_arg.FileName);
     if(!output.good())  {
-      //      VRB.Flow(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
+          VRB.Flow(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
       error = 1;
     }
   }
@@ -326,6 +329,7 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
     if(isRoot()) {
       FILE *fp = Fopen(wt_arg.FileName,"w");
       Fclose(fp);
+	  
       output.open(wt_arg.FileName);
       if(!output.good()) {
 	//	VRB.Flow(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
@@ -338,7 +342,8 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 //  if(synchronize(error) > 0)  
 //    ERR.General(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
   if (error)
-    printf("Node %d: says opening %s failed\n",UniqueID(),wt_arg.FileName);
+    ERR.General(cname,fname,"Could not open file: [%s] for output.\n",wt_arg.FileName);
+//    printf("Node %d: says opening %s failed\n",UniqueID(),wt_arg.FileName);
 
   // write header
   if(isRoot()) {
