@@ -15,7 +15,9 @@ enum ProjectType {PPAR    = 0,
 		  PPAR_5X = 6, 
 		  NPAR_5X = 7,
 		  PPAR_XY = 8,
-		  NPAR_XY = 9
+		  NPAR_XY = 9,
+                  PPAR_5  = 10,
+                  NPAR_5  = 11
 } ;
 
 // The Diquark class.

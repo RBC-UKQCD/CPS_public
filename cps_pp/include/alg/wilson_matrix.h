@@ -280,7 +280,8 @@ public:
 	{ return p.d[s1].c[c1].d[s2].c[c2]; }
   
   //! hermitean conjugate the WilsonMatrix
-  WilsonMatrix& hconj();
+  //WilsonMatrix& hconj();
+  void hconj();
  
   //! mult the prop by gamma_dir on the left
   WilsonMatrix& gl(int dir); 
@@ -305,6 +306,7 @@ public:
   
   //! Projects positive parity on the sink
   WilsonMatrix& PParProjectSink();
+  WilsonMatrix& NParProjectSink();
 
   //! Projects positive parity on the source
   WilsonMatrix& PParProjectSource();

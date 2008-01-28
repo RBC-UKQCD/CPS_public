@@ -21,7 +21,7 @@
 #include <alg/common_arg.h>
 #include <util/site.h>
 #include <util/momentum.h>
-#include "wilson_matrix.h"
+#include <alg/wilson_matrix.h>
 
 CPS_START_NAMESPACE
 
@@ -40,6 +40,8 @@ public:
   // ACCESSORS
   void   print(void) const;
   Float *data (void) const { return fv; }
+
+  Float Norm();
 
   // MANIPULATORS
 
@@ -83,6 +85,18 @@ public:
   void dumpqrkvec( int t);
   // ===================================================================
 
+  // Wuppertal-like smearing on fv
+  void GaussianSmearVector(Lattice& lat,
+                           int spin,
+                           int iter,
+                           Float omega,
+                           int source_time);
+  // Wuppertal-like smearing on fv
+  void GaussianSmearVector(Lattice& lat,
+                           int spin,
+                           int iter,
+                           Float omega);
+
   ///
   //  Tom's momentum stuff
   //  void setMomentum(int* mom, int color, int spin);
@@ -95,6 +109,8 @@ public:
   void DiracToChiral();
 
   const Float& operator[](int i);
+  FermionVectorTp& operator*=(Float f) ;
+
   /*! Copies a WilsonVector into the site i of the FermionVectorTp */
   void CopyWilsonVec(int i, WilsonVector& WV) ;
 

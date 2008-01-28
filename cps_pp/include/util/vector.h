@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.25 2007-10-30 20:40:34 chulwoo Exp $
+  $Id: vector.h,v 1.26 2008-01-28 20:23:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-10-30 20:40:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.25 2007-10-30 20:40:34 chulwoo Exp $
-//  $Id: vector.h,v 1.25 2007-10-30 20:40:34 chulwoo Exp $
+//  $Date: 2008-01-28 20:23:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.26 2008-01-28 20:23:09 chulwoo Exp $
+//  $Id: vector.h,v 1.26 2008-01-28 20:23:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.25 $
+//  $Revision: 1.26 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -105,6 +105,9 @@ void oneMinusfTimesMatrix(IFloat *a, IFloat b, const IFloat *c, int n);
 // operations on vectors. For these functions there is
 // no optimized assembly.
 //------------------------------------------------------------------
+
+//! Multiplication of complex vector by matrix and addition; y += Mx
+void uDotXPlus(IFloat* y, const IFloat* u, const IFloat* x);
 
 //! Multiplication of complex vector by matrix and subtraction; y -= Mx
 void uDotXMinus(IFloat* y, const IFloat* u, const IFloat* x);

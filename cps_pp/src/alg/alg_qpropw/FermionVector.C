@@ -496,6 +496,557 @@ void FermionVectorTp::SetLandauGaugeMomentaSource( Lattice& lat,
     }
 }
 
+// Gaussian smear previously defined source (or sink)
+// * Does not zero the rest of the  time slices
+// * Smearing is done on a color vector across a time-slice
+//   for a definite value of the spin, so the source is a 12 component
+//   object at each site which should have been set previously,
+//   that is, we smear fv, the member data of the FermionVector that
+//   called this routine.
+// * based on Smearing note by K. Orginos, 9/29/2004
+// * essentially, hit a vector with the gauge invariant Laplacian:
+//                    __
+//     S = 1 + w^2/4N \/^2
+//     __
+//     \/^2 psi = Sum_{i=1,2,3} {U_i(x)psi(x+i) + U^\dagger_i(x-i)psi(x-i)
+//                               - 2 psi
+// Typical vales: w=4.35, N=40
+//
+// TB 9/2004
+void FermionVectorTp::GaussianSmearVector(Lattice& lat, 
+					  int spin, 
+					  int Niter, 
+					  Float omega, 
+					  int source_time)
+{
+  char *fname = "GaussianSmearedVector(int spin, int source_time)";
+  
+  VRB.Func(cname, fname);
+
+  if (spin < 0 || spin > 3)
+    ERR.General(cname, fname,
+		"Spin index out of range: spin = %d\n", spin);
+#ifdef PARALLEL
+  int my_node=GJP.TnodeCoor();
+  int ts_node = (int)(source_time/GJP.TnodeSites());
+#endif
+  int node_ts = source_time%GJP.TnodeSites();
+  
+  //Niter = 40;
+  //omega = 4.35;
+  // the smearing factor 
+  Float factor = omega*omega/(4*Niter);
+
+  // the following code is from d_stag_opt_rdm dslash,
+  // modified
+
+  const int VECT_LEN=6;
+
+  int nx[4];
+  int nb[4];
+  int xv[4];
+  
+  //-----------------------------------------------------------
+  //  nx[4]
+  //-----------------------------------------------------------
+  nx[0] = GJP.XnodeSites();
+  nx[1] = GJP.YnodeSites();
+  nx[2] = GJP.ZnodeSites();
+  nx[3] = GJP.TnodeSites();
+  
+  //-----------------------------------------------------------
+  //  nb[4]
+  //-----------------------------------------------------------
+  nb[0] = 4;
+  nb[1] = nb[0]*nx[0];
+  nb[2] = nb[1]*nx[1];
+  nb[3] = nb[2]*nx[2];
+  
+  //-----------------------------------------------------------
+  //  xv[4]
+  //-----------------------------------------------------------
+  xv[0] = 1;
+  xv[1] = xv[0]*nx[0];
+  xv[2] = xv[1]*nx[1];
+  xv[3] = xv[2]*nx[2];
+
+  
+  int x[4], offset;
+
+  const Matrix *uoff;
+  const Matrix *mp0;
+
+  Vector vtmp0, vtmp1;
+  Vector *src;  
+  Vector *vp0;
+  Vector *vp1;
+  // working vector for the smeared source
+  Vector* chi;
+ 
+  src = (Vector*) smalloc(sizeof(Vector)*nx[0]*nx[1]*nx[2]);
+  if(src == 0) ERR.Pointer(cname, fname, "src");
+  VRB.Smalloc(cname,fname, "src", src, nx[0]*nx[1]*nx[2]*sizeof(Vector));
+  chi = (Vector*) smalloc(sizeof(Vector)*nx[0]*nx[1]*nx[2]);
+  if(chi == 0) ERR.Pointer(cname, fname, "chi");
+  VRB.Smalloc(cname,fname, "chi", chi, nx[0]*nx[1]*nx[2]*sizeof(Vector));
+
+  // do the smearchig on all nodes since they have to wait anyway.
+  // In the end we take only the result for the source time_slice
+
+  // set time-slice
+  x[3] = node_ts;
+
+  // do Niter hits on src
+  for(int n=0;n<Niter;n++){
+    
+    //initialize src
+    for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
+      for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
+	for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
+
+	  int j=xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	  int i=j+xv[3]*x[3];
+	  *(src+j)=*((Vector *)fv + spin + 4 * i);
+	}
+      }
+    }
+
+    // loop over all sites on time-slice
+    for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
+      for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
+	for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
+	  
+	  //the offset of the link at lattice site
+	  offset = nb[0]*x[0]+nb[1]*x[1]+nb[2]*x[2]+nb[3]*x[3];
+	  // the gauge field link, obviously
+	  uoff = (Matrix *) lat.GaugeField() + offset;
+
+	  for (int mu = 0; mu < 3; ++mu) {
+	    
+	    //-------------------------------------------
+	    //  calculate U_mu(x) chi(x+mu)
+	    //-------------------------------------------
+	    
+	    // gather chi(x+mu)
+	    if(x[mu] == nx[mu]-1) { 	// x+mu off node
+	      x[mu] = 0;
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      getPlusData((IFloat *)&vtmp0, 
+			  (IFloat *)src + VECT_LEN*offset, 
+			  VECT_LEN, mu);
+	      x[mu] = nx[mu]-1;
+	      vp0 = &vtmp0;
+	      
+	    } else { 			// x+mu on node
+	      x[mu]++;
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      vp0 = src + offset;
+	      x[mu]--;
+	    }
+	    
+	    mp0 = uoff+mu;
+	    
+	    // link x chi
+	    offset = VECT_LEN*(xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2]);
+	    if(mu == 0) uDotXEqual((IFloat *)chi+offset, (const IFloat *)mp0,
+				   (const IFloat *)vp0);
+	    else uDotXPlus((IFloat *)chi+offset,(const IFloat *)mp0,
+			   (const IFloat *)vp0);
+	    
+	    
+	    //-------------------------------------------
+	    //  calculate U^dag_mu(x-mu) chi(x-mu)
+	    //-------------------------------------------
+	    if(x[mu] == 0) { 		// x-mu off node
+	      x[mu] = nx[mu]-1;
+	      mp0 = uoff+x[mu]*nb[mu]+mu;
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      vp1 = (Vector *)src + offset;
+	      x[mu] = 0;
+	      
+	      uDagDotXEqual((IFloat *)&vtmp0, (const IFloat *)mp0,
+			    (const IFloat *)vp1);
+	      
+	      getMinusData((IFloat *)&vtmp1, (IFloat *)&vtmp0, VECT_LEN, mu);
+
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      *(chi+offset) += vtmp1;
+	      
+	    } else { 			// x-mu on node
+	      
+	      x[mu]--;
+	      mp0 = uoff-nb[mu]+mu;
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      vp0 = (Vector *)src + offset;
+	      x[mu]++;
+	      
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      uDagDotXPlus((IFloat *)chi+VECT_LEN*offset,(const IFloat *)mp0,
+			   (const IFloat *)vp0);
+	    }
+	  } // mu
+	  
+	  offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	  *(chi+offset) *= factor;
+
+	  // on site term is just (1-6*w^2/(4N))*src
+	  offset *=VECT_LEN;
+	  fTimesV1PlusV2((IFloat*)chi+offset, 1.-6.*factor, 
+			 (IFloat*)src+offset, 
+			 (IFloat*)chi+offset, VECT_LEN);
+	  //debug: 
+	  /*printf("SRC, CHI (%d,%d,%d)= %e %e %e %e\n", 
+		 x[0], x[1], x[2], 
+		 *((IFloat*)src+offset), 
+		 *((IFloat*)chi+offset),
+		 *((IFloat*)chi+offset+2),
+		 *((IFloat*)chi+offset+4));*/
+	}
+      }
+    } // end loop over sites on time slice
+
+    //copy chi into fv
+    for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
+      for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
+	for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
+	  
+	  // only save if we are on the right node
+#ifdef PARALLEL
+	  if(my_node != ts_node)continue; 
+#endif
+	  int j=xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	  int i=j+xv[3]*x[3];
+	  *((Vector *)fv + spin + 4 * i)=*(chi+j);
+	}
+      }
+    }
+  } // iters
+  
+  VRB.Func(cname, fname);
+  VRB.Sfree(cname, fname, "chi", chi);
+  sfree(chi);
+  VRB.Func(cname, fname);
+  VRB.Sfree(cname, fname, "src", src);
+  sfree(src); 
+
+  //multiply  fv by 1000. Makes the source a little larger to preven
+  //numerical instabilities
+  for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
+    for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
+      for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
+	// only save if we are on the right node                              
+#ifdef PARALLEL
+	if(my_node != ts_node)continue;
+#endif
+	int i=xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2] + xv[3]*x[3];
+	*((Vector *)fv + spin + 4 * i)*= 1.0e3 ;
+      }
+    }
+  }
+
+#ifdef DEBUG_GAUSS_SMEAR
+Float nn = 0 ;
+for(x[0] = 0; x[0] < nx[0]; ++x[0]) 
+   for(x[1] = 0; x[1] < nx[1]; ++x[1]) 
+     for(x[2] = 0; x[2] < nx[2]; ++x[2]) 
+       for(x[3] = 0; x[3] < nx[3]; ++x[3]) {
+	 int i = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2]+xv[3]*x[3];
+	 Vector foo = *((Vector *)fv + spin + 4 * i);	
+	 nn += foo.NormSqNode(VECT_LEN) ;
+	 printf("%i %i %i %i: %g\n",x[0],x[1],x[2],x[3],foo.NormSqNode(VECT_LEN)); 
+       }
+ printf("SOURCE NORM: %g\n", nn);
+#endif
+}
+
+// Gaussian smear previously defined source (or sink)
+// * Does not zero the rest of the  time slices
+// * Smearing is done on a color vector across a time-slice
+//   for a definite value of the spin, so the source is a 12 component
+//   object at each site which should have been set previously,
+//   that is, we smear fv, the member data of the FermionVector that
+//   called this routine.
+// * based on Smearing note by K. Orginos, 9/29/2004
+// * essentially, hit a vector with the gauge invariant Laplacian:
+//                    __
+//     S = 1 + w^2/4N \/^2
+//     __
+//     \/^2 psi = Sum_{i=1,2,3} {U_i(x)psi(x+i) + U^\dagger_i(x-i)psi(x-i)
+//                               - 2 psi
+// Typical vales: w=4.35, N=40
+//
+// TB 9/2004
+void FermionVectorTp::GaussianSmearVector(Lattice& lat, 
+					  int spin, 
+					  int Niter, 
+					  Float omega)
+{
+  char *fname = "GaussianSmearedVector(int spin, int source_time)";
+  
+  VRB.Func(cname, fname);
+
+  if (spin < 0 || spin > 3)
+    ERR.General(cname, fname,
+		"Spin index out of range: spin = %d\n", spin);
+  /*
+#ifdef PARALLEL
+  int my_node=GJP.TnodeCoor();
+  int ts_node = (int)(source_time/GJP.TnodeSites());
+#endif
+  int node_ts = source_time%GJP.TnodeSites();
+  */
+  //Niter = 40;
+  //omega = 4.35;
+  // the smearing factor 
+  Float factor = omega*omega/(4*Niter);
+
+  // the following code is from d_stag_opt_rdm dslash,
+  // modified
+
+  const int VECT_LEN=6;
+
+  int nx[4];
+  int nb[4];
+  int xv[4];
+  
+  //-----------------------------------------------------------
+  //  nx[4]
+  //-----------------------------------------------------------
+  nx[0] = GJP.XnodeSites();
+  nx[1] = GJP.YnodeSites();
+  nx[2] = GJP.ZnodeSites();
+  nx[3] = GJP.TnodeSites();
+  
+  //-----------------------------------------------------------
+  //  nb[4]
+  //-----------------------------------------------------------
+  nb[0] = 4;
+  nb[1] = nb[0]*nx[0];
+  nb[2] = nb[1]*nx[1];
+  nb[3] = nb[2]*nx[2];
+  
+  //-----------------------------------------------------------
+  //  xv[4]
+  //-----------------------------------------------------------
+  xv[0] = 1;
+  xv[1] = xv[0]*nx[0];
+  xv[2] = xv[1]*nx[1];
+  xv[3] = xv[2]*nx[2];
+
+  
+  int x[4], offset;
+
+  const Matrix *uoff;
+  const Matrix *mp0;
+
+  Vector vtmp0, vtmp1;
+  Vector *src;  
+  Vector *vp0;
+  Vector *vp1;
+  // working vector for the smeared source
+  Vector* chi;
+ 
+  src = (Vector*) smalloc(sizeof(Vector)*nx[0]*nx[1]*nx[2]);
+  if(src == 0) ERR.Pointer(cname, fname, "src");
+  VRB.Smalloc(cname,fname, "src", src, nx[0]*nx[1]*nx[2]*sizeof(Vector));
+  chi = (Vector*) smalloc(sizeof(Vector)*nx[0]*nx[1]*nx[2]);
+  if(chi == 0) ERR.Pointer(cname, fname, "chi");
+  VRB.Smalloc(cname,fname, "chi", chi, nx[0]*nx[1]*nx[2]*sizeof(Vector));
+
+  // do the smearchig on all nodes since they have to wait anyway.
+  // In the end we take only the result for the source time_slice
+
+  // set time-slice
+  //x[3] = node_ts;
+  for(x[3]=0;x[3]<GJP.TnodeSites();x[3]++) {
+  // do Niter hits on src
+  for(int n=0;n<Niter;n++){
+    
+    //initialize src
+    for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
+      for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
+	for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
+
+	  int j=xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	  int i=j+xv[3]*x[3];
+	  *(src+j)=*((Vector *)fv + spin + 4 * i);
+	}
+      }
+    }
+
+    // loop over all sites on time-slice
+    for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
+      for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
+	for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
+	  
+	  //the offset of the link at lattice site
+	  offset = nb[0]*x[0]+nb[1]*x[1]+nb[2]*x[2]+nb[3]*x[3];
+	  // the gauge field link, obviously
+	  uoff = (Matrix *) lat.GaugeField() + offset;
+
+	  for (int mu = 0; mu < 3; ++mu) {
+	    
+	    //-------------------------------------------
+	    //  calculate U_mu(x) chi(x+mu)
+	    //-------------------------------------------
+	    
+	    // gather chi(x+mu)
+	    if(x[mu] == nx[mu]-1) { 	// x+mu off node
+	      x[mu] = 0;
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      getPlusData((IFloat *)&vtmp0, 
+			  (IFloat *)src + VECT_LEN*offset, 
+			  VECT_LEN, mu);
+	      x[mu] = nx[mu]-1;
+	      vp0 = &vtmp0;
+	      
+	    } else { 			// x+mu on node
+	      x[mu]++;
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      vp0 = src + offset;
+	      x[mu]--;
+	    }
+	    
+	    mp0 = uoff+mu;
+	    
+	    // link x chi
+	    offset = VECT_LEN*(xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2]);
+	    if(mu == 0) uDotXEqual((IFloat *)chi+offset, (const IFloat *)mp0,
+				   (const IFloat *)vp0);
+	    else uDotXPlus((IFloat *)chi+offset,(const IFloat *)mp0,
+			   (const IFloat *)vp0);
+	    
+	    
+	    //-------------------------------------------
+	    //  calculate U^dag_mu(x-mu) chi(x-mu)
+	    //-------------------------------------------
+	    if(x[mu] == 0) { 		// x-mu off node
+	      x[mu] = nx[mu]-1;
+	      mp0 = uoff+x[mu]*nb[mu]+mu;
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      vp1 = (Vector *)src + offset;
+	      x[mu] = 0;
+	      
+	      uDagDotXEqual((IFloat *)&vtmp0, (const IFloat *)mp0,
+			    (const IFloat *)vp1);
+	      
+	      getMinusData((IFloat *)&vtmp1, (IFloat *)&vtmp0, VECT_LEN, mu);
+
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      *(chi+offset) += vtmp1;
+	      
+	    } else { 			// x-mu on node
+	      
+	      x[mu]--;
+	      mp0 = uoff-nb[mu]+mu;
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      vp0 = (Vector *)src + offset;
+	      x[mu]++;
+	      
+	      offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	      uDagDotXPlus((IFloat *)chi+VECT_LEN*offset,(const IFloat *)mp0,
+			   (const IFloat *)vp0);
+	    }
+	  } // mu
+	  
+	  offset = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	  *(chi+offset) *= factor;
+
+	  // on site term is just (1-6*w^2/(4N))*src
+	  offset *=VECT_LEN;
+	  fTimesV1PlusV2((IFloat*)chi+offset, 1.-6.*factor, 
+			 (IFloat*)src+offset, 
+			 (IFloat*)chi+offset, VECT_LEN);
+	  //debug: 
+	  /*printf("SRC, CHI (%d,%d,%d)= %e %e %e %e\n", 
+		 x[0], x[1], x[2], 
+		 *((IFloat*)src+offset), 
+		 *((IFloat*)chi+offset),
+		 *((IFloat*)chi+offset+2),
+		 *((IFloat*)chi+offset+4));*/
+	}
+      }
+    } // end loop over sites on time slice
+
+    //copy chi into fv
+    for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
+      for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
+	for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
+	  
+	  // only save if we are on the right node
+	  //#ifdef PARALLEL
+	  //if(my_node != ts_node)continue; 
+	  //#endif
+	  int j=xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2];
+	  int i=j+xv[3]*x[3];
+	  *((Vector *)fv + spin + 4 * i)=*(chi+j);
+	}
+      }
+    }
+  } // iters
+  } // time loop
+  
+  VRB.Func(cname, fname);
+  VRB.Sfree(cname, fname, "chi", chi);
+  sfree(chi);
+  VRB.Func(cname, fname);
+  VRB.Sfree(cname, fname, "src", src);
+  sfree(src); 
+
+  //multiply  fv by 1000. Makes the source a little larger to preven
+  //numerical instabilities
+  for(x[3]=0;x[3]<GJP.TnodeSites();x[3]++) {
+  for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
+    for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
+      for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
+	// only save if we are on the right node                              
+	//#ifdef PARALLEL
+	//if(my_node != ts_node)continue;
+	//#endif
+	int i=xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2] + xv[3]*x[3];
+	*((Vector *)fv + spin + 4 * i)*= 1.0e3 ;
+      }
+    }
+  }
+  }
+
+#ifdef DEBUG_GAUSS_SMEAR
+Float nn = 0 ;
+for(x[0] = 0; x[0] < nx[0]; ++x[0]) 
+   for(x[1] = 0; x[1] < nx[1]; ++x[1]) 
+     for(x[2] = 0; x[2] < nx[2]; ++x[2]) 
+       for(x[3] = 0; x[3] < nx[3]; ++x[3]) {
+	 int i = xv[0]*x[0]+xv[1]*x[1]+xv[2]*x[2]+xv[3]*x[3];
+	 Vector foo = *((Vector *)fv + spin + 4 * i);	
+	 nn += foo.NormSqNode(VECT_LEN) ;
+	 printf("%i %i %i %i: %g\n",x[0],x[1],x[2],x[3],foo.NormSqNode(VECT_LEN)); 
+       }
+ printf("SOURCE NORM: %g\n", nn);
+#endif
+}
+
+Float FermionVectorTp::Norm(){
+  Site s;
+  Float norm(0);
+  for(s.Begin();s.End();s.nextSite()){
+    for(int spin(0);spin<4;spin++)
+      norm += ((Vector *)fv + spin + 4 * s.Index())->NormSqNode(6) ;
+  }
+#ifdef PARALLEL
+      slice_sum(&norm, 1, 99);
+#endif
+  return sqrt(norm) ;
+}
+
+FermionVectorTp& FermionVectorTp::operator*=(Float f){
+  Site s;
+  for(s.Begin();s.End();s.nextSite()){
+    for(int spin(0);spin<4;spin++)
+      *((Vector *)fv + spin + 4 * s.Index()) *= f;
+  }
+  return *this ;
+}
+
 // Momentum wall source
 // Check this if it is correct...
 void FermionVectorTp::SetMomSource(int color, int spin, int source_time,
@@ -546,9 +1097,9 @@ void FermionVectorTp::SetPointSource(int color, int spin,
     "Spin index out of range: spin = %d\n", spin);
 
   // zero the vector
-  int fv_size = GJP.VolNodeSites() * GJP.Colors() * 8;
-  for (int i = 0; i < fv_size; i++)
-    *((Float *)fv + i) = 0;
+  //int fv_size = GJP.VolNodeSites() * GJP.Colors() * 8;
+  //for (int i = 0; i < fv_size; i++)
+  //*((Float *)fv + i) = 0;
 
   // set point source
   int procCoorX = x / GJP.XnodeSites();

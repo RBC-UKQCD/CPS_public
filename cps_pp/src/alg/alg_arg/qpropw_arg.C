@@ -97,7 +97,11 @@ vml_QPropWArg (VML *vmls, char *name,QPropWArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "save_prop", &objp->save_prop))
 		 return FALSE;
+	 if (!vml_int (vmls, "save_ls_prop", &objp->save_ls_prop))
+		 return FALSE;
 	 if (!vml_int (vmls, "do_half_fermion", &objp->do_half_fermion))
+		 return FALSE;
+	 if (!vml_SourceType (vmls, "SeqSmearSink", &objp->SeqSmearSink))
 		 return FALSE;
 	 vml_class_end(vmls,"QPropWArg",name);
 	return TRUE;
@@ -294,6 +298,44 @@ vml_QPropWExpArg (VML *vmls, char *name,QPropWExpArg *objp)
 	 if (!vml_Float (vmls, "exp_C", &objp->exp_C))
 		 return FALSE;
 	 vml_class_end(vmls,"QPropWExpArg",name);
+	return TRUE;
+}
+	 bool QPropWGaussArg::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool QPropWGaussArg::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool QPropWGaussArg::Vml(VML *vmls,char *instance){
+		 if(!vml_QPropWGaussArg(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_QPropWGaussArg (VML *vmls, char *name,QPropWGaussArg *objp)
+{
+	register int32_t *buf;
+
+	 vml_class_begin(vmls,"QPropWGaussArg",name);
+	int i;
+	 if (!vml_int (vmls, "gauss_N", &objp->gauss_N))
+		 return FALSE;
+	 if (!vml_Float (vmls, "gauss_W", &objp->gauss_W))
+		 return FALSE;
+	 if (!vml_int (vmls, "nt", &objp->nt))
+		 return FALSE;
+	 if (!vml_vector (vmls, "mt", (char *)objp->mt, 5,
+		sizeof (int), (vmlproc_t) vml_int))
+		 return FALSE;
+	 vml_class_end(vmls,"QPropWGaussArg",name);
 	return TRUE;
 }
 CPS_END_NAMESPACE

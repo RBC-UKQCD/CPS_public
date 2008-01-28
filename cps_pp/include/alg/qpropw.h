@@ -49,6 +49,9 @@ class QPropW : public Alg  {
   //! pointer to 4d prop at s-mid-point
   WilsonMatrix* midprop;
 
+  //! pointer to 5d prop 
+  WilsonMatrix* propls;
+
 protected:
 
   // Hueywen: move prop from private to protected
@@ -61,6 +64,11 @@ protected:
   char *cname; 
   
 public:
+
+  Float* conserved;
+     
+  //! pointer to 5d prop counter
+  int spnclr_cnt;
 
   QPropW(Lattice& lat, CommonArg* c_arg);
 
@@ -79,6 +87,13 @@ public:
   int PointSrcY()   const { return qp_arg.y; }        
   int PointSrcZ()   const { return qp_arg.z; }
 #endif
+
+  virtual int BoxSrcStart() const;
+  virtual int BoxSrcEnd() const;
+
+  virtual const QPropWGaussArg &GaussArg(void);
+  virtual int   Gauss_N() const;
+  virtual Float Gauss_W() const;
 
   //! Is sink gauge fixed?
   int GFixedSnk() const { return qp_arg.gauge_fix_snk; } 
@@ -124,9 +139,28 @@ public:
   virtual void RestoreQProp(char*, int mid);
   virtual void SaveQProp(char*, int mid);
 
+  virtual void RestoreQPropLs(char*, int ls);
+  virtual void SaveQPropLs(Vector* sol_5d, char*, int ls);
+  virtual void RestoreQPropLs_ftom(char* );
+  virtual void DeleteQPropLs();
+  virtual void RestoreOrgProp(char*, int ls);
+
+  void SwapQPropLs();
+  void NonRelProp(int ls);
+
+  virtual void MeasConAxialOld(Vector* sol_5d);
+
   virtual void SetSource(FermionVectorTp& src, int spin, int color);
 
   virtual SourceType SrcType() { return UNDEF; }
+
+  // used to signal if there was a sequential smeared sink
+  SourceType SeqSmearSink() const { return qp_arg.SeqSmearSink ; }
+
+  /*! Gauge invariant gaussian smearing of the sink at time t*/
+  void GaussSmearSinkProp(int t_sink, const QPropWGaussArg &gauss_arg);
+  /*! Gauge invariant gaussian smearing of the sink at time t*/
+  void GaussSmearSinkProp(const QPropWGaussArg &gauss_arg);
 
   virtual Complex& rand_src(int i) const;
 
@@ -152,7 +186,7 @@ public:
   int PointSrcX()   const { return qp_arg.x; }       
   int PointSrcY()   const { return qp_arg.y; }        
   int PointSrcZ()   const { return qp_arg.z; }
-
+  int siteOffset(const int lcl_site[], const int lcl_sites[]) const; 
 };
   
 
@@ -172,6 +206,63 @@ public:
   void SetSource(FermionVectorTp& src, int spin, int color);
   SourceType SrcType() { return WALL; }
 };
+
+//Gauge Invariant gaussian smeared source
+class QPropWGaussSrc : public QPropW
+{
+ private:
+//  int N ; // Iterations
+//  Float W ; //width
+ QPropWGaussArg gauss_arg;
+ public:
+
+  // CONSTRUCTORS
+  QPropWGaussSrc(Lattice& lat, CommonArg* c_arg) ;
+
+  QPropWGaussSrc(Lattice& lat, QPropWArg* arg, QPropWGaussArg *gauss_arg, CommonArg* c_arg);
+  QPropWGaussSrc(QPropWGaussSrc& prop1, QPropWGaussSrc& prop2 );
+  QPropWGaussSrc(QPropWGaussSrc* prop1, QPropWGaussSrc* prop2 );
+  QPropWGaussSrc(QPropW& prop1) ;
+  //! copy constructor
+  QPropWGaussSrc(const QPropW& rhs):
+    QPropW(rhs)
+    {}
+  const QPropWGaussArg &GaussArg(void) {return gauss_arg;}
+  int   Gauss_N() const{return gauss_arg.gauss_N;}
+  Float Gauss_W() const{return gauss_arg.gauss_W;};
+
+  void SetSource(FermionVectorTp& src, int spin, int color);
+  SourceType SrcType(){return GAUSS_GAUGE_INV ; }
+};
+
+//Multi Gauge Invariant gaussian smeared source
+class QPropWMultGaussSrc : public QPropW
+{
+//  int N ; // Iterations
+//  Float W ; //width
+ QPropWGaussArg gauss_arg;
+ public:
+
+  // CONSTRUCTORS
+  QPropWMultGaussSrc(Lattice& lat, CommonArg* c_arg) ;
+
+  QPropWMultGaussSrc(Lattice& lat, QPropWArg* arg, QPropWGaussArg *gauss_arg, CommonArg* c_arg);
+  QPropWMultGaussSrc(QPropWGaussSrc& prop1, QPropWGaussSrc& prop2 );
+  QPropWMultGaussSrc(QPropWGaussSrc* prop1, QPropWGaussSrc* prop2 );
+  QPropWMultGaussSrc(QPropW& prop1) ;
+  //! copy constructor
+  QPropWMultGaussSrc(const QPropW& rhs):
+    QPropW(rhs)
+    {}
+  const QPropWGaussArg &GaussArg(void) {return gauss_arg;}
+  int   Gauss_N() const{return gauss_arg.gauss_N;}
+  Float Gauss_W() const{return gauss_arg.gauss_W;};
+
+  void SetSource(FermionVectorTp& src, int spin, int color);
+  SourceType SrcType(){return GAUSS_GAUGE_INV ; }
+};
+
+
 
 class QPropWMomSrc : public QPropWWallSrc {
 
@@ -253,12 +344,12 @@ public:
   // Most likely it is not needed since the base class copy constructor 
   // will be used. CHECK it!!!
   //    QPropWBoxSrc(const QPropWBoxSrc& rhs);
-  QPropWBoxSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
+  QPropWBoxSrc(Lattice& lat, QPropWArg* arg, QPropWBoxArg *box_arg, CommonArg* c_arg);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
   SourceType SrcType(){ return BOX; }
-//  int BoxSrcStart() const { return qp_arg.box_start; } 
-//  int BoxSrcEnd()   const { return qp_arg.box_end; }     
+  int BoxSrcStart() const { return box_arg.box_start; } 
+  int BoxSrcEnd()   const { return box_arg.box_end; }     
 };
 
 class QPropWRand : public QPropW {
@@ -353,6 +444,8 @@ public:
   
   ThreeMom Mom() { return mom; }
 
+  SourceType SeqSmearSource() const { return quark.SeqSmearSink() ; }
+
   //! Returns the quark mass of the source propagator  
   Float SourceMass(){ return quark_mass; }
 };
@@ -395,13 +488,18 @@ public:
 };
 
 class QPropWSeqProtUSrc : public QPropWSeqBar {
+
+private:
+  QPropWGaussArg gauss_arg;
   
 public:
   
   // CONSTRUCTORS
 
   QPropWSeqProtUSrc(Lattice& lat, QPropW& quark,  int *p, 
-		ProjectType pp, QPropWArg*, CommonArg*);
+		ProjectType pp, QPropWArg*, QPropWGaussArg *gauss_arg, CommonArg*);
+  QPropWSeqProtUSrc(Lattice& lat, QPropW& quark,  int *p, 
+		ProjectType pp, QPropWArg*, QPropWGaussArg *gauss_arg, CommonArg*, char*);
 
   //QPropWSeq(const QPropWSeq& rhs);  //copy constructor not needed
 
@@ -411,12 +509,17 @@ public:
 
 class QPropWSeqProtDSrc : public QPropWSeqBar {
 
+private:
+  QPropWGaussArg gauss_arg;
+
 public:
   
   // CONSTRUCTORS
 
   QPropWSeqProtDSrc(Lattice& lat, QPropW& quark,  int *p, 
-					ProjectType pp, QPropWArg*, CommonArg*);
+		    ProjectType pp, QPropWArg*, QPropWGaussArg *gauss_arg, CommonArg*);
+  QPropWSeqProtDSrc(Lattice& lat, QPropW& quark,  int *p, 
+		    ProjectType pp, QPropWArg*, QPropWGaussArg *gauss_arg, CommonArg*, char*);
 
   //QPropWSeq(const QPropWSeq& rhs);  //copy constructor not needed
   

@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definition of Vector and Matrix classes.
 
   Definitions of functions that perform operations on complex vectors.
-  $Id: vector.C,v 1.9 2006-04-13 18:23:36 chulwoo Exp $
+  $Id: vector.C,v 1.10 2008-01-28 20:23:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 18:23:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.9 2006-04-13 18:23:36 chulwoo Exp $
-//  $Id: vector.C,v 1.9 2006-04-13 18:23:36 chulwoo Exp $
+//  $Date: 2008-01-28 20:23:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.10 2008-01-28 20:23:09 chulwoo Exp $
+//  $Id: vector.C,v 1.10 2008-01-28 20:23:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v $
 //  $State: Exp $
 //
@@ -437,6 +437,25 @@ void Vector::SliceArraySumFive(Float *sum, const Float *f_in, const int dir)
   }
 }
 
+
+//
+//  y  +=  U x
+//
+void uDotXPlus(IFloat* y, const IFloat* u, const IFloat* x)
+{
+    *y    += *u      * *x     - *(u+1)  * *(x+1) + *(u+2)  * *(x+2)
+             - *(u+3)  * *(x+3) + *(u+4)  * *(x+4) - *(u+5)  * *(x+5);
+    *(y+1)+= *u      * *(x+1) + *(u+1)  * *x     + *(u+2)  * *(x+3)
+             + *(u+3)  * *(x+2) + *(u+4)  * *(x+5) + *(u+5)  * *(x+4);
+    *(y+2)+= *(u+6)  * *x     - *(u+7)  * *(x+1) + *(u+8)  * *(x+2)
+             - *(u+9)  * *(x+3) + *(u+10) * *(x+4) - *(u+11) * *(x+5);
+    *(y+3)+= *(u+6)  * *(x+1) + *(u+7)  * *x     + *(u+8)  * *(x+3)
+             + *(u+9)  * *(x+2) + *(u+10) * *(x+5) + *(u+11) * *(x+4);
+    *(y+4)+= *(u+12) * *x     - *(u+13) * *(x+1) + *(u+14) * *(x+2)
+             - *(u+15) * *(x+3) + *(u+16) * *(x+4) - *(u+17) * *(x+5);
+    *(y+5)+= *(u+12) * *(x+1) + *(u+13) * *x     + *(u+14) * *(x+3)
+             + *(u+15) * *(x+2) + *(u+16) * *(x+5) + *(u+17) * *(x+4);
+}
 
 /*! The 3x3 complex matrix is assumed to be stored in a linear form
   where the real part of the (i,j) element is at vector position [6i+2j]

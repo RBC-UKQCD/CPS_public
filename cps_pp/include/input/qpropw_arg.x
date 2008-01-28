@@ -50,10 +50,11 @@ class QPropWArg {
   int store_midprop;
   //! should propagator be saved to disk?
   int save_prop;
-
+  //! should 5d propagator be saved to disk(1) or memory(2)?
+    int save_ls_prop;
   //!  should (1+gamma_t)/2 projected sources be used? (good far baryons)
   int do_half_fermion;
-
+  SourceType SeqSmearSink ;
   memfun QPropWArg();
 };
 
@@ -100,4 +101,14 @@ class QPropWExpArg {
   Float exp_B;
   Float exp_C;
   memfun QPropWExpArg();
+};
+
+class QPropWGaussArg{
+  //Gaussian source params
+    int gauss_N ;
+    Float gauss_W ;
+  //Multi Gaussian source params
+    int nt;
+    int mt[5];
+  memfun QPropWGaussArg();
 };

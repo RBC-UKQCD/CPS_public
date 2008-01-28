@@ -8,4 +8,8 @@
 #ifdef _QPROPW_ARG_H_RPCGEN
 #include <alg/cg_arg.h>
 #endif
+#ifdef _NUC3PT_ARG_H_RPCGEN
+#include <alg/cg_arg.h>
+#include <alg/qpropw_arg.h>
+#endif
 #endif /* !_UTIL_ENUM_INT_H */

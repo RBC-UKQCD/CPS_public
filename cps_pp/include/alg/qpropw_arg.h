@@ -60,7 +60,9 @@ public:
 	int gauge_fix_snk;
 	int store_midprop;
 	int save_prop;
+	int save_ls_prop;
 	int do_half_fermion;
+	SourceType SeqSmearSink;
 	   QPropWArg (  ) ;
 };
 
@@ -130,6 +132,19 @@ public:
 	   QPropWExpArg (  ) ;
 };
 
+class VML;
+class QPropWGaussArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	int gauss_N;
+	Float gauss_W;
+	int nt;
+	int mt[5];
+	   QPropWGaussArg (  ) ;
+};
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -146,6 +161,7 @@ extern  bool_t vml_QPropWBoxArg (VML *, char *instance, QPropWBoxArg*);
 extern  bool_t vml_QPropWRandArg (VML *, char *instance, QPropWRandArg*);
 extern  bool_t vml_QPropWSlabArg (VML *, char *instance, QPropWSlabArg*);
 extern  bool_t vml_QPropWExpArg (VML *, char *instance, QPropWExpArg*);
+extern  bool_t vml_QPropWGaussArg (VML *, char *instance, QPropWGaussArg*);
 
 #else /* K&R C */
 extern  bool_t vml_SourceType (VML *, char *instance, SourceType*);
@@ -157,6 +173,7 @@ extern  bool_t vml_QPropWBoxArg (VML *, char *instance, QPropWBoxArg*);
 extern  bool_t vml_QPropWRandArg (VML *, char *instance, QPropWRandArg*);
 extern  bool_t vml_QPropWSlabArg (VML *, char *instance, QPropWSlabArg*);
 extern  bool_t vml_QPropWExpArg (VML *, char *instance, QPropWExpArg*);
+extern  bool_t vml_QPropWGaussArg (VML *, char *instance, QPropWGaussArg*);
 
 #endif /* K&R C */
 

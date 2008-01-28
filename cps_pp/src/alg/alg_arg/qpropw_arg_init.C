@@ -10,25 +10,35 @@ QPropWArg::QPropWArg()
   gauge_fix_snk(0),
   store_midprop(0),
   save_prop(0),
-  do_half_fermion(0)
-{}
+  save_ls_prop(0),
+  do_half_fermion(0),
+//  bstart(0),
+//  bend(0),
+//  gauss_N(30),
+//  gauss_W(4.35), 
+  SeqSmearSink(POINT)
+{};
 
 QPropWPointArg::QPropWPointArg()
 : x(0),y(0),z(0)
-{}
+{};
 
 QPropWBoxArg::QPropWBoxArg()
 :box_start(0),box_end(0)
-{}
+{};
 
 QPropWRandArg::QPropWRandArg()
 :rng(NORAND),seed(1111)
-{}
+{};
 
 #if 1
 QPropWExpArg::QPropWExpArg()
 :exp_A(1.2),exp_B(0.1),exp_C(8)
-{}
+{};
 #endif
+
+QPropWGaussArg::QPropWGaussArg()
+:gauss_N(30),gauss_W(4.35)
+{};
 
 CPS_END_NAMESPACE
