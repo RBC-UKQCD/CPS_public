@@ -4,20 +4,20 @@
 /*!\file
   \brief Redefinitions of stdio functions for MPI. 
 
-  $Id: qcdio_qprintf.C,v 1.5 2004-08-18 11:58:07 zs Exp $
+  $Id: qcdio_qprintf.C,v 1.6 2008-02-08 18:35:08 chulwoo Exp $
 */
 
 /*  -----------------------------------------------------------
    CVS keywords
  
-   $Author: zs $ 
-   $Date: 2004-08-18 11:58:07 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/mpi/qcdio_qprintf.C,v 1.5 2004-08-18 11:58:07 zs Exp $
-   $Id: qcdio_qprintf.C,v 1.5 2004-08-18 11:58:07 zs Exp $
+   $Author: chulwoo $ 
+   $Date: 2008-02-08 18:35:08 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/mpi/qcdio_qprintf.C,v 1.6 2008-02-08 18:35:08 chulwoo Exp $
+   $Id: qcdio_qprintf.C,v 1.6 2008-02-08 18:35:08 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio_qprintf.C,v $
-   $Revision: 1.5 $
+   $Revision: 1.6 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/mpi/qcdio_qprintf.C,v $
    $State: Exp $  
  ----------------------------------------------------------------------*/
@@ -25,7 +25,7 @@
 #include <util/qcdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <util/gjp.h>
 
 namespace cps{

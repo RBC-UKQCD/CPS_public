@@ -21,7 +21,7 @@
 #include <alg/fix_gauge_arg.h>
 #include <alg/alg_fix_gauge.h>
 #include <alg/aots_s.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <util/vector.h>
 #include <util/random.h>
 #include <time.h>

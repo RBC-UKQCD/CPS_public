@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-04-05 06:44:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_p4_inv/main.C,v 1.3 2005-04-05 06:44:52 chulwoo Exp $
-//  $Id: main.C,v 1.3 2005-04-05 06:44:52 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_p4_inv/main.C,v 1.4 2008-02-08 18:35:08 chulwoo Exp $
+//  $Id: main.C,v 1.4 2008-02-08 18:35:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_p4_inv/main.C,v $
 //  $State: Exp $
 //
@@ -24,9 +24,9 @@
 #include<util/lat_data.h>
 #include<util/dirac_op.h>
 #include<util/error.h>
-#include<util/time.h>
+#include<util/time_cps.h>
 #include<comms/scu.h>
-#include<comms/sysfunc.h>
+#include<comms/sysfunc_cps.h>
 #include<alg/alg_hmd.h>
 #include<alg/alg_rnd_gauge.h>
 #include<alg/do_arg.h>

@@ -1,6 +1,6 @@
 #include <config.h>
 #include <qalloc.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 
 CPS_START_NAMESPACE
 /*! \file
@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-06-23 18:27:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.19 2005-06-23 18:27:22 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.19 2005-06-23 18:27:22 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.20 2008-02-08 18:35:07 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.20 2008-02-08 18:35:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -52,7 +52,7 @@ void report_flops(int flops, struct timeval *start,struct timeval *end);
 #endif
 
 CPS_END_NAMESPACE
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 extern "C" { 

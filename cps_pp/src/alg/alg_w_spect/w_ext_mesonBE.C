@@ -2,7 +2,7 @@
 CPS_START_NAMESPACE
 /*! \file
 
-  $Id: w_ext_mesonBE.C,v 1.10 2004-12-11 20:58:01 chulwoo Exp $
+  $Id: w_ext_mesonBE.C,v 1.11 2008-02-08 18:35:05 chulwoo Exp $
 */  
 
 /*w_ext_mesonBE.C
@@ -13,7 +13,7 @@ CPS_END_NAMESPACE
 #include <alg/w_all.h>
 #include <alg/w_gamma_mat.h>
 #ifdef PARALLEL
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 #include <util/error.h>                // ERR
 #include <util/qcdio.h>                // ERR

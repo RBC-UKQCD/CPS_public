@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-10-30 20:40:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/dwf_dslash_4.C,v 1.4 2007-10-30 20:40:34 chulwoo Exp $
-//  $Id: dwf_dslash_4.C,v 1.4 2007-10-30 20:40:34 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/dwf_dslash_4.C,v 1.5 2008-02-08 18:35:07 chulwoo Exp $
+//  $Id: dwf_dslash_4.C,v 1.5 2008-02-08 18:35:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/dwf_dslash_4.C,v $
 //  $State: Exp $
 //
@@ -38,7 +38,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #ifdef PARALLEL
 CPS_END_NAMESPACE
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 #endif
 void dwf_dslash_4(Vector *out, 

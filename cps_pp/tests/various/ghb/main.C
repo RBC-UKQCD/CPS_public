@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/ghb/main.C,v 1.6 2004-08-18 11:58:11 zs Exp $
-//  $Id: main.C,v 1.6 2004-08-18 11:58:11 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2008-02-08 18:35:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/ghb/main.C,v 1.7 2008-02-08 18:35:09 chulwoo Exp $
+//  $Id: main.C,v 1.7 2008-02-08 18:35:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/ghb/main.C,v $
 //  $State: Exp $
 //
@@ -33,7 +33,7 @@ CPS_START_NAMESPACE
 
 #ifdef PARALLEL
 CPS_END_NAMESPACE
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 #endif
 

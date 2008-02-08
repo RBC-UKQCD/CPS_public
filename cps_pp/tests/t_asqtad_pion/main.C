@@ -3,7 +3,7 @@
 ///
 
 /*!----------------------------------------------------------------------
-  $Id: main.C,v 1.9 2004-09-21 20:16:55 chulwoo Exp $
+  $Id: main.C,v 1.10 2008-02-08 18:35:09 chulwoo Exp $
   Test Asqtad dirac operator code.	
 
    This is a simple regression test of the Asqtad inverter.
@@ -27,7 +27,7 @@
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
 #include <util/qcdio.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include<util/testing_framework.h>
 #include<util/dump_xml.h>
 

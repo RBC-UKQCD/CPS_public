@@ -17,7 +17,7 @@ CPS_END_NAMESPACE
 #include<comms/glb.h>
 #include<util/smalloc.h>
 #include<util/gjp.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 const SCUDir pos_dir[] = { SCU_XP, SCU_YP, SCU_ZP, SCU_TP };

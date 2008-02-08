@@ -6,7 +6,7 @@
 
 #include<util/lattice.h>
 #include<util/random.h>
-#include<util/time.h>
+#include<util/time_cps.h>
 
 #include<alg/alg_hmc.h>
 #include<alg/common_arg.h>

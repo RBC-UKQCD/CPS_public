@@ -27,7 +27,7 @@
 #include <alg/nuc3pt_gammar.h>
 
 #if TARGET == QCDOC
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 
 #include <alg/qio_prop.h>

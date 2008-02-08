@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.16 2006-12-14 17:54:19 chulwoo Exp $
+  $Id: f_p4.C,v 1.17 2008-02-08 18:35:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -31,7 +31,7 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/smalloc.h>
 #include <util/pt.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/gjp.h>
 #include <util/error.h>
 CPS_START_NAMESPACE

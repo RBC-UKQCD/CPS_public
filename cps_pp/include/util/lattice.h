@@ -5,20 +5,20 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.53 2007-10-30 04:14:04 chulwoo Exp $
+  $Id: lattice.h,v 1.54 2008-02-08 18:35:05 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2007-10-30 04:14:04 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.53 2007-10-30 04:14:04 chulwoo Exp $
-  $Id: lattice.h,v 1.53 2007-10-30 04:14:04 chulwoo Exp $
+  $Date: 2008-02-08 18:35:05 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.54 2008-02-08 18:35:05 chulwoo Exp $
+  $Id: lattice.h,v 1.54 2008-02-08 18:35:05 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Author: chulwoo $
-  $Date: 2007-10-30 04:14:04 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.53 2007-10-30 04:14:04 chulwoo Exp $
-  $Id: lattice.h,v 1.53 2007-10-30 04:14:04 chulwoo Exp $
+  $Date: 2008-02-08 18:35:05 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.54 2008-02-08 18:35:05 chulwoo Exp $
+  $Id: lattice.h,v 1.54 2008-02-08 18:35:05 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.53 $
+  $Revision: 1.54 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -44,7 +44,7 @@
 #include <alg/eig_arg.h>
 #include <alg/force_arg.h>
 #ifdef PARALLEL
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 
 CPS_START_NAMESPACE

@@ -8,7 +8,7 @@
 #include <util/lattice.h>
 #include <util/smalloc.h>
 #include <util/pt.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 CPS_START_NAMESPACE
 
 // I don't know what this does

@@ -11,7 +11,7 @@ CPS_END_NAMESPACE
 #include <bgllockbox.h>
 #include <comms/bgl_net.h>
 #include <comms/scu.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <util/wilson.h>
 #include <util/verbose.h>
 #include <util/error.h>

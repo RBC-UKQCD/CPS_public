@@ -1,7 +1,7 @@
 
 
 %------------------------------------------------------------------
-% $Id: changelog.tex,v 1.4 2004-08-18 11:57:34 zs Exp $
+% $Id: changelog.tex,v 1.5 2008-02-08 18:35:05 chulwoo Exp $
 %------------------------------------------------------------------
 %Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
 %
@@ -43,7 +43,7 @@ urlcolor=blue,
 pdfpagemode=None,
 %=UseOutlines,
 pdfhighlight={/I},
-pdftitle={Notes on changes to the Columbia code. $Revision: 1.4 $ - $Date: 2004-08-18 11:57:34 $.},
+pdftitle={Notes on changes to the Columbia code. $Revision: 1.5 $ - $Date: 2008-02-08 18:35:05 $.},
 pdfauthor={A.N. Jackson \& S. Booth},
 plainpages=false
 ]{hyperref}
@@ -62,7 +62,7 @@ plainpages=false
 % title information:
 \title{Notes on changes to the Columbia code.}
 \author{A.N. Jackson \& S. Booth}
-\date{\mbox{\small $$Revision: 1.4 $$  $$Date: 2004-08-18 11:57:34 $$}}
+\date{\mbox{\small $$Revision: 1.5 $$  $$Date: 2008-02-08 18:35:05 $$}}
 
 %------------------------------------------------------------------
 \begin{document}
@@ -105,7 +105,7 @@ fell into the following categories:
  \item No type declaration for \cde{main}.
  \item Cannot pass \cde{Float} through \cde{(...)}.  Only native types can be
  passed through ellipsis, see section of floating-point below.
- \item Could not find \cde{sysfunc.h}, \cde{flotar.h},
+ \item Could not find \cde{sysfunc_cps.h}, \cde{flotar.h},
  etcetera. i.e. could not find QCDSP-specific header files.
  \item Implicit declarations of functions and variables, mainly due
  to the missing header files.

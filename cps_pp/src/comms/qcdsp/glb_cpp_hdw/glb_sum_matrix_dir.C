@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw/glb_sum_matrix_dir.C,v 1.4 2004-08-18 11:57:46 zs Exp $
-//  $Id: glb_sum_matrix_dir.C,v 1.4 2004-08-18 11:57:46 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2008-02-08 18:35:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw/glb_sum_matrix_dir.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
+//  $Id: glb_sum_matrix_dir.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: glb_sum_matrix_dir.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw/glb_sum_matrix_dir.C,v $
 //  $State: Exp $
 //
@@ -26,7 +26,7 @@ CPS_END_NAMESPACE
 #include<comms/scu.h>
 #include<util/gjp.h>
 #include<util/vector.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 

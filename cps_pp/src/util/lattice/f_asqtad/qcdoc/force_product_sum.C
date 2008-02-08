@@ -4,13 +4,13 @@
 /*!\file
   \brief Helper routines for the fermionic force term
 
-  $Id: force_product_sum.C,v 1.3 2004-08-19 22:20:49 mclark Exp $
+  $Id: force_product_sum.C,v 1.4 2008-02-08 18:35:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
 #include <stdio.h>
 #include <util/lattice.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/gjp.h>
 
 USING_NAMESPACE_CPS

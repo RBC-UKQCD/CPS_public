@@ -3,20 +3,20 @@
 /*!\file
   \brief  The QCD I/O Interface.
 
-  $Id: qcdio.C,v 1.8 2006-12-14 17:54:31 chulwoo Exp $
+  $Id: qcdio.C,v 1.9 2008-02-08 18:35:08 chulwoo Exp $
 */
 /*  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
    $Author: chulwoo $ 
-   $Date: 2006-12-14 17:54:31 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v 1.8 2006-12-14 17:54:31 chulwoo Exp $
-   $Id: qcdio.C,v 1.8 2006-12-14 17:54:31 chulwoo Exp $
+   $Date: 2008-02-08 18:35:08 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v 1.9 2008-02-08 18:35:08 chulwoo Exp $
+   $Id: qcdio.C,v 1.9 2008-02-08 18:35:08 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.C,v $
-   $Revision: 1.8 $
+   $Revision: 1.9 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/qcdio/comsrc/qcdio.C,v $
    $State: Exp $  */ 
 /*----------------------------------------------------------*/
@@ -27,7 +27,7 @@
 #include <math.h>
 #include <util/qcdio.h>
 #ifdef PARALLEL
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 #include <util/gjp.h>
 #include <util/error.h>

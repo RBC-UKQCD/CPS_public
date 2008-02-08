@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_nos/slice_sum.C,v 1.4 2004-08-18 11:57:47 zs Exp $
-//  $Id: slice_sum.C,v 1.4 2004-08-18 11:57:47 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2008-02-08 18:35:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_nos/slice_sum.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
+//  $Id: slice_sum.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: slice_sum.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_nos/slice_sum.C,v $
 //  $State: Exp $
 //
@@ -26,7 +26,7 @@ CPS_END_NAMESPACE
 #include<comms/glb.h>
 #include<util/smalloc.h>
 #include<util/gjp.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 const SCUDir pos_dir[] = { SCU_XP, SCU_YP, SCU_ZP, SCU_TP };

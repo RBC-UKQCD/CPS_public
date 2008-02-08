@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.49 2007-10-30 20:40:35 chulwoo Exp $
+  $Id: lattice_base.C,v 1.50 2008-02-08 18:35:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-10-30 20:40:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.49 2007-10-30 20:40:35 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.49 2007-10-30 20:40:35 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.50 2008-02-08 18:35:08 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.50 2008-02-08 18:35:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.49 $
+//  $Revision: 1.50 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -53,7 +53,7 @@
 #endif
 
 #ifdef PARALLEL
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 
 #if TARGET == BGL

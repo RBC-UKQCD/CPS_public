@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of some Fasqtad class methods.
 
-  $Id: f_asqtad.C,v 1.26 2006-04-13 18:16:16 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.27 2008-02-08 18:35:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -31,7 +31,7 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/smalloc.h>
 #include <util/pt.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/gjp.h>
 CPS_START_NAMESPACE
 

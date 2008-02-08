@@ -4,7 +4,7 @@
 #ifdef USE_QALLOC
 #include <qcdoc_align.h>
 #endif
-#include <util/time.h>
+#include <util/time_cps.h>
 
 /* qcdoc_align.h defines a cache touch macro which this code uses. However
    it doesnt get defined unless qcdoc_align.h is included. This causes

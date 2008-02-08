@@ -36,7 +36,7 @@ CPS_END_NAMESPACE
 #include <util/wilson.h>
 #include <util/dirac_op.h>
 #include <util/error.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <comms/scu.h>
 #include <sys/bgl/bgl_sys_all.h>
 #if TARGET != BGL

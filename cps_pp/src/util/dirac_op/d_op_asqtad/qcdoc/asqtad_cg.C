@@ -1,5 +1,5 @@
 //#include <config.h>
-//#include <util/time.h>
+//#include <util/time_cps.h>
 #include <sys/time.h>
 #include <qalloc.h>
 #include "asq_data_types.h"
@@ -14,13 +14,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-06-11 05:35:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.8 2006-06-11 05:35:05 chulwoo Exp $
-//  $Id: asqtad_cg.C,v 1.8 2006-06-11 05:35:05 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.9 2008-02-08 18:35:07 chulwoo Exp $
+//  $Id: asqtad_cg.C,v 1.9 2008-02-08 18:35:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_cg.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v $
 //  $State: Exp $
 //
@@ -38,7 +38,7 @@
 
 #ifdef PROFILE
 #include <time.h>
-#include <sys/time.h>
+#include <sys/time_cps.h>
 void report_flops(int flops, struct timeval *start,struct timeval *end);
 #endif
 

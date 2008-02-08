@@ -1,6 +1,6 @@
 #include <alg/dterms.h>
 #if TARGET == QCDOC
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 
 CPS_START_NAMESPACE

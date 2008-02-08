@@ -24,7 +24,7 @@
 #include <util/smalloc.h>
 #include <util/verbose.h>
 #include <util/error.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/asqtad.h>
 #include <comms/cbuf.h>
 #include <comms/glb.h>

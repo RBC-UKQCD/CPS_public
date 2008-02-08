@@ -2,7 +2,7 @@
 
 #include <util/qcdio.h>
 #ifdef PARALLEL
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 #include<util/lattice.h>
 #include<util/gjp.h>

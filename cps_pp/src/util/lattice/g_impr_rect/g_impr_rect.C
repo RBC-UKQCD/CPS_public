@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprRect class.
 
-  $Id: g_impr_rect.C,v 1.10 2007-06-05 15:44:19 chulwoo Exp $
+  $Id: g_impr_rect.C,v 1.11 2008-02-08 18:35:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-05 15:44:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.10 2007-06-05 15:44:19 chulwoo Exp $
-//  $Id: g_impr_rect.C,v 1.10 2007-06-05 15:44:19 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.11 2008-02-08 18:35:08 chulwoo Exp $
+//  $Id: g_impr_rect.C,v 1.11 2008-02-08 18:35:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v $
 //  $State: Exp $
 //
@@ -29,7 +29,7 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/gjp.h>
 #include <util/gw_hb.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/cbuf.h>

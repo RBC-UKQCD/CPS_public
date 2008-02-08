@@ -1,7 +1,7 @@
 /*!\file
     Asqtad Dirac operator code for QCDOC.
 
-    $Id: asqd_sum_cpp.C,v 1.2 2005-12-02 16:06:10 chulwoo Exp $
+    $Id: asqd_sum_cpp.C,v 1.3 2008-02-08 18:35:07 chulwoo Exp $
 */
 
 #include "asq_data_types.h"
@@ -13,7 +13,7 @@
 #include <util/lattice.h>
 #include <util/dirac_op.h>
 #include <util/vector.h>
-#include <sysfunc.h>
+#include <sysfunc_cps.h>
 //#include <stdio.h>
 
 

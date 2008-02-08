@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw_nos/global_sum_init.C,v 1.4 2004-08-18 11:57:46 zs Exp $
-//  $Id: global_sum_init.C,v 1.4 2004-08-18 11:57:46 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2008-02-08 18:35:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw_nos/global_sum_init.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
+//  $Id: global_sum_init.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: global_sum_init.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_hdw_nos/global_sum_init.C,v $
 //  $State: Exp $
 //
@@ -73,7 +73,7 @@ inline unsigned int bitCode(unsigned int wire)
 // void global_sum_init(int, int) 
 //--------------------------------------------------------------------------
 CPS_END_NAMESPACE
-#include <comms/sysfunc.h>                   // SizeT() and etc.
+#include <comms/sysfunc_cps.h>                   // SizeT() and etc.
 CPS_START_NAMESPACE
 void global_sum_init(int fast_mode, int max_num_try)
 {

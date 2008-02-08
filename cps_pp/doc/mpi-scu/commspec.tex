@@ -1,7 +1,7 @@
 
 
 %------------------------------------------------------------------
-% $Id: commspec.tex,v 1.4 2004-08-18 11:57:34 zs Exp $
+% $Id: commspec.tex,v 1.5 2008-02-08 18:35:05 chulwoo Exp $
 %------------------------------------------------------------------
 %Anj: EPCC: e-mail: a.jackson@epcc.ed.ac.uk
 %
@@ -43,7 +43,7 @@ urlcolor=blue,
 pdfpagemode=None,
 %=UseOutlines,
 pdfhighlight={/I},
-pdftitle={QCDSP parallel comms specification \& MPI implementation.  $Revision: 1.4 $ - $Date: 2004-08-18 11:57:34 $.},
+pdftitle={QCDSP parallel comms specification \& MPI implementation.  $Revision: 1.5 $ - $Date: 2008-02-08 18:35:05 $.},
 pdfauthor={A.N. Jackson \& S. Booth},
 plainpages=false
 ]{hyperref}
@@ -69,7 +69,7 @@ plainpages=false
 % title information:
 \title{QCDSP Communications Specification \& the MPI implementation.}
 \author{A.N. Jackson \& S. Booth}
-\date{\mbox{\small $$Revision: 1.4 $$  $$Date: 2004-08-18 11:57:34 $$}}
+\date{\mbox{\small $$Revision: 1.5 $$  $$Date: 2008-02-08 18:35:05 $$}}
 
 %------------------------------------------------------------------
 \begin{document}
@@ -86,7 +86,7 @@ the OS, and this will also be the case for QCDOC.  However, for
 development purposes, we need a parallel implementation of the code
 that can be run here at EPCC while the QCDOC hardware is being
 developed.  To do this, we intend to implement the communications
-using MPI (v.1), via the interface defined in \cde{sysfunc.h}.  This
+using MPI (v.1), via the interface defined in \cde{sysfunc_cps.h}.  This
 interface appears to offer a greater level of functionality than is
 currently required, as only a subset of the available subroutines are
 used by the C++ QCDSP code.  For now, only the essential elements of
@@ -225,7 +225,7 @@ communication pattern into the DMA.}
 \subsection{The OS Interface}
 \label{col:comm:func}
 On both QCDSP and QCDOC, the operating system interface is defined in
-the header file \cde{sysfunc.h}, apart from standard subroutines such
+the header file \cde{sysfunc_cps.h}, apart from standard subroutines such
 as \cde{printf} which are defined elsewhere.  In the original
 implementation, every subroutine in the communications layer is given
 ``friend function'' access to the \cde{SCUDirArg} class, so they can
@@ -396,7 +396,7 @@ The MPI-SCU distribution contains the following files:
 communications enums. \\
 \cde{scu\_dir\_arg.h} & Headers for the data-structure definition routines. \\
 \cde{scu\_dir\_arg.C} & Implementation of the above. \\
-\cde{sysfunc.h} & Headers for the MPI-emulated QOS calls. \\
+\cde{sysfunc_cps.h} & Headers for the MPI-emulated QOS calls. \\
 \cde{sysfunc.C} & Implementation of the above. \\
 \cde{mpi\_requests.h} & Source for the MPI-implementation-specific request handler. \\
 \cde{Makefile} & Makefile for the MPI-SCU library. Does not make the test-programs. \\

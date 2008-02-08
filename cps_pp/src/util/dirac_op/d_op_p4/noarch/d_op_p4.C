@@ -17,7 +17,7 @@
 #include <util/smalloc.h>
 #include <util/verbose.h>
 #include <util/error.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/asqtad.h>
 #include <util/p4.h>
 #include <comms/cbuf.h>

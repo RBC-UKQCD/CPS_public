@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of glb_sum_multi_dir routine.
 
-  $Id: glb_sum_multi_dir.C,v 1.4 2004-08-18 11:57:44 zs Exp $
+  $Id: glb_sum_multi_dir.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:44 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp/glb_sum_multi_dir.C,v 1.4 2004-08-18 11:57:44 zs Exp $
-//  $Id: glb_sum_multi_dir.C,v 1.4 2004-08-18 11:57:44 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2008-02-08 18:35:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp/glb_sum_multi_dir.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
+//  $Id: glb_sum_multi_dir.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp/glb_sum_multi_dir.C,v $
 //  $State: Exp $
 //
@@ -31,7 +31,7 @@ CPS_END_NAMESPACE
 #include<comms/scu.h>
 #include<util/gjp.h>
 #include<comms/double64.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 #define MAX_NUM_WORDS 40  //set to larger than size of double precision 3x3 matrix

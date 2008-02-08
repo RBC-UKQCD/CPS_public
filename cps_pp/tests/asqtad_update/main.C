@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.13 2004-12-21 19:02:43 chulwoo Exp $
+  $Id: main.C,v 1.14 2008-02-08 18:35:08 chulwoo Exp $
 */
 
 #include<config.h>
@@ -9,7 +9,7 @@
 #include<util/verbose.h>
 #include<util/error.h>
 #include<alg/do_arg.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 
 
 USING_NAMESPACE_CPS

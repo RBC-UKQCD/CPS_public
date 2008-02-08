@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-01 07:34:44 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hb/main.C,v 1.8 2004-12-01 07:34:44 chulwoo Exp $
-//  $Id: main.C,v 1.8 2004-12-01 07:34:44 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hb/main.C,v 1.9 2008-02-08 18:35:08 chulwoo Exp $
+//  $Id: main.C,v 1.9 2008-02-08 18:35:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hb/main.C,v $
 //  $State: Exp $
 //
@@ -20,7 +20,7 @@
 #include<alg/alg_ghb.h>
 #include<alg/no_arg.h>
 #include<alg/alg_plaq.h>
-#include<comms/sysfunc.h>
+#include<comms/sysfunc_cps.h>
 
 
 USING_NAMESPACE_CPS

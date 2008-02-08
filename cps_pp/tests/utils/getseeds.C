@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-21 20:16:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v 1.6 2004-09-21 20:16:56 chulwoo Exp $
-//  $Id: getseeds.C,v 1.6 2004-09-21 20:16:56 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v 1.7 2008-02-08 18:35:09 chulwoo Exp $
+//  $Id: getseeds.C,v 1.7 2008-02-08 18:35:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: getseeds.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v $
 //  $State: Exp $
 //
@@ -25,7 +25,7 @@
 #include<alg/pbp_arg.h>
 
 #ifdef PARALLEL
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 
 USING_NAMESPACE_CPS

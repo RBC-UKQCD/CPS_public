@@ -26,7 +26,7 @@
 #include <util/error.h>
 #include <alg/do_arg.h>
 #include <comms/glb.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <alg/qpropw.h>
 #include <alg/qpropw_arg.h>
 #include <alg/wilson_matrix.h>

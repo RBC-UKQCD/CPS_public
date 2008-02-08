@@ -4,13 +4,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-16 00:10:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.13 2004-12-16 00:10:59 chulwoo Exp $
-//  $Id: main.C,v 1.13 2004-12-16 00:10:59 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v 1.14 2008-02-08 18:35:08 chulwoo Exp $
+//  $Id: main.C,v 1.14 2008-02-08 18:35:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hmd/main.C,v $
 //  $State: Exp $
 //
@@ -23,7 +23,7 @@
 #include<alg/alg_rect.h>
 #include<alg/do_arg.h>
 #include<alg/no_arg.h>
-#include<comms/sysfunc.h>
+#include<comms/sysfunc_cps.h>
 
 
 

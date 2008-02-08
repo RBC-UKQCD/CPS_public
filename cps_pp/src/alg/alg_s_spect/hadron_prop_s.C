@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-14 17:53:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.11 2006-12-14 17:53:41 chulwoo Exp $
-//  $Id: hadron_prop_s.C,v 1.11 2006-12-14 17:53:41 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.12 2008-02-08 18:35:05 chulwoo Exp $
+//  $Id: hadron_prop_s.C,v 1.12 2008-02-08 18:35:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v $
 //  $State: Exp $
 //
@@ -17,14 +17,14 @@
 // hadron_prop_s.C
 
 #ifndef lint
-static char vcid[] = "$Id: hadron_prop_s.C,v 1.11 2006-12-14 17:53:41 chulwoo Exp $";
+static char vcid[] = "$Id: hadron_prop_s.C,v 1.12 2008-02-08 18:35:05 chulwoo Exp $";
 #endif /* lint */
 
 #include <util/qcdio.h>
 #include <alg/hadron_prop_s.h>
 #include <util/rcomplex.h>
 #include <comms/glb.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <alg/myenum.h>
 CPS_START_NAMESPACE
 

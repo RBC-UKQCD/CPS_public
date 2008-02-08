@@ -1,9 +1,9 @@
 #include <config.h>
 #include <util/qcdio.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <util/sproj_tr.h>
 #include <util/vector.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 
 #if 0
 #define qalloc(A,B) malloc(B)

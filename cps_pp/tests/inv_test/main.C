@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.2 2006-02-21 21:14:13 chulwoo Exp $
+  $Id: main.C,v 1.3 2008-02-08 18:35:08 chulwoo Exp $
 */
 
 #include<stdlib.h>
@@ -13,7 +13,7 @@
 #include<util/verbose.h>
 #include<util/dirac_op.h>
 #include<util/error.h>
-#include<util/time.h>
+#include<util/time_cps.h>
 #include<comms/scu.h>
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>

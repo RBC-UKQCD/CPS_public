@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_vec.C,v 1.3 2007-12-04 17:51:39 chulwoo Exp $
+  $Id: pt_vec.C,v 1.4 2008-02-08 18:35:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-12-04 17:51:39 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.3 2007-12-04 17:51:39 chulwoo Exp $
-//  $Id: pt_vec.C,v 1.3 2007-12-04 17:51:39 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.4 2008-02-08 18:35:08 chulwoo Exp $
+//  $Id: pt_vec.C,v 1.4 2008-02-08 18:35:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_vec.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v $
 //  $State: Exp $
 //
@@ -23,7 +23,7 @@
 #include "pt_qcdoc.h"
 #ifndef SCIDAC 
 #include <config.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #endif
 
 #ifndef USE_QMP

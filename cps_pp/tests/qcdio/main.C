@@ -10,13 +10,13 @@
   CVS keywords
  
   $Author: chulwoo $
-  $Date: 2004-09-21 20:16:54 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.7 2004-09-21 20:16:54 chulwoo Exp $
-  $Id: main.C,v 1.7 2004-09-21 20:16:54 chulwoo Exp $
+  $Date: 2008-02-08 18:35:08 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v 1.8 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: main.C,v 1.8 2008-02-08 18:35:08 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: main.C,v $
-  $Revision: 1.7 $
+  $Revision: 1.8 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/qcdio/main.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -32,7 +32,7 @@
 #include<alg/common_arg.h>
 #include<util/qcdio.h>
 #ifdef PARALLEL
-#include<comms/sysfunc.h>
+#include<comms/sysfunc_cps.h>
 #endif
 
 CPS_START_NAMESPACE

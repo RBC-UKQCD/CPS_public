@@ -1,5 +1,5 @@
 #include <config.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 
 CPS_START_NAMESPACE
 /*! \file
@@ -10,13 +10,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-05 15:44:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qmp/inv_cg.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.3 2007-06-05 15:44:19 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qmp/inv_cg.C,v 1.4 2008-02-08 18:35:07 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.4 2008-02-08 18:35:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qmp/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -46,12 +46,12 @@ CPS_START_NAMESPACE
 
 #ifdef PROFILE
 #include <time.h>
-#include <sys/time.h>
+#include <sys/time_cps.h>
 void report_flops(int flops, struct timeval *start,struct timeval *end);
 #endif
 
 CPS_END_NAMESPACE
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 extern "C" { 

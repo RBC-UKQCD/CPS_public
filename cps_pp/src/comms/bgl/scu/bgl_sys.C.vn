@@ -23,7 +23,7 @@ CPS_END_NAMESPACE
 
 
 
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 
 CPS_START_NAMESPACE
 

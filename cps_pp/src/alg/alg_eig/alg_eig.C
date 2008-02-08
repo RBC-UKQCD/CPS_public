@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.21 2007-12-21 22:54:27 chulwoo Exp $
+  $Id: alg_eig.C,v 1.22 2008-02-08 18:35:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-12-21 22:54:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.21 2007-12-21 22:54:27 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.21 2007-12-21 22:54:27 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.22 2008-02-08 18:35:05 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.22 2008-02-08 18:35:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -30,7 +30,7 @@ CPS_END_NAMESPACE
 #include <util/lattice.h>
 #include <util/gjp.h>
 #include <util/smalloc.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/vector.h>
 #include <util/verbose.h>
 #include <util/error.h>

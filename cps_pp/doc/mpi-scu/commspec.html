@@ -79,7 +79,7 @@ the OS, and this will also be the case for QCDOC.  However, for
 development purposes, we need a parallel implementation of the code
 that can be run here at EPCC while the QCDOC hardware is being
 developed.  To do this, we intend to implement the communications
-using MPI (v.1), via the interface defined in <tt>sysfunc.h</tt>.  This
+using MPI (v.1), via the interface defined in <tt>sysfunc_cps.h</tt>.  This
 interface appears to offer a greater level of functionality than is
 currently required, as only a subset of the available subroutines are
 used by the C++ QCDSP code.  For now, only the essential elements of
@@ -253,7 +253,7 @@ communication pattern into the DMA.
 <a name="col:comm:func">
 </a>
 On both QCDSP and QCDOC, the operating system interface is defined in
-the header file <tt>sysfunc.h</tt>, apart from standard subroutines such
+the header file <tt>sysfunc_cps.h</tt>, apart from standard subroutines such
 as <tt>printf</tt> which are defined elsewhere.  In the original
 implementation, every subroutine in the communications layer is given
 ``friend function'' access to the <tt>SCUDirArg</tt> class, so they can
@@ -444,7 +444,7 @@ The MPI-SCU distribution contains the following files:
 communications enums. </td></tr>
 <tr><td><tt>scu_dir_arg.h</tt> </td><td>Headers for the data-structure definition routines. </td></tr>
 <tr><td><tt>scu_dir_arg.C</tt> </td><td>Implementation of the above. </td></tr>
-<tr><td><tt>sysfunc.h</tt> </td><td>Headers for the MPI-emulated QOS calls. </td></tr>
+<tr><td><tt>sysfunc_cps.h</tt> </td><td>Headers for the MPI-emulated QOS calls. </td></tr>
 <tr><td><tt>sysfunc.C</tt> </td><td>Implementation of the above. </td></tr>
 <tr><td><tt>mpi_requests.h</tt> </td><td>Source for the MPI-implementation-specific request handler. </td></tr>
 <tr><td><tt>Makefile</tt> </td><td>Makefile for the MPI-SCU library. Does not make the test-programs. </td></tr>

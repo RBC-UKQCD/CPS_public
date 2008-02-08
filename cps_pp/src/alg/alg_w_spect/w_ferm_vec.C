@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_ferm_vec.C,v 1.10 2006-04-12 22:08:21 chulwoo Exp $
+  $Id: w_ferm_vec.C,v 1.11 2008-02-08 18:35:05 chulwoo Exp $
 */
 
 #include<config.h>
@@ -12,7 +12,7 @@
 #include <util/qcdio.h>
 #include <comms/glb.h>               // glb_sum(...)
 #include <comms/scu.h>              //getMinusData, getPlusData
-#include <util/time.h>             //dclock(),print_flops()
+#include <util/time_cps.h>             //dclock(),print_flops()
 //Warning: do not use math64.h, seems to use some rsgisters that
 //is in conflict with optimized code.
 #include <math.h>

@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: Fforce.C,v 1.9 2006-04-13 18:16:16 chulwoo Exp $
+  $Id: Fforce.C,v 1.10 2008-02-08 18:35:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 #include <util/lattice.h>
 #include <util/pt.h>
 #include <util/gjp.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/amalloc.h>
 #include <stdio.h>
 #include <stdlib.h>

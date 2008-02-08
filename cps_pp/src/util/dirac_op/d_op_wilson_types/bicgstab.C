@@ -17,7 +17,7 @@ CPS_END_NAMESPACE
 
 #define PROFILE
 #ifdef PROFILE
-#include <util/time.h>
+#include <util/time_cps.h>
 #endif
 
 CPS_START_NAMESPACE

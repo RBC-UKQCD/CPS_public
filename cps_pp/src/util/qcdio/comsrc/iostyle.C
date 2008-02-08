@@ -13,7 +13,7 @@
 #include <util/gjp.h>
 #include <util/iostyle.h>
 #include <util/fpconv.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <comms/scu.h>
 
 #include <iostream>

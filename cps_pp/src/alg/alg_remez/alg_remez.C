@@ -29,7 +29,7 @@ CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/smalloc.h>
 #include <util/verbose.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/error.h>
 #include <alg/alg_remez.h>
 CPS_START_NAMESPACE

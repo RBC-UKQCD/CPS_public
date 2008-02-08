@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>	// exit()
 #if TARGET==QCDOC
-#include <sysfunc.h>
+#include <sysfunc_cps.h>
 #endif
 #include <util/lattice.h>
 #include <util/gjp.h>

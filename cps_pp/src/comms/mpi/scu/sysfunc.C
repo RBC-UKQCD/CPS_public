@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions for the MPI implementation of the QCDSP/QCDOC communications layer.
   
-  $Id: sysfunc.C,v 1.9 2004-09-07 18:05:59 zs Exp $
+  $Id: sysfunc.C,v 1.10 2008-02-08 18:35:06 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
 /* The Sysfunc Comms Interface: sysfunc.C
@@ -15,20 +15,20 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: zs $
-  $Date: 2004-09-07 18:05:59 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v 1.9 2004-09-07 18:05:59 zs Exp $
-  $Id: sysfunc.C,v 1.9 2004-09-07 18:05:59 zs Exp $
+  $Author: chulwoo $
+  $Date: 2008-02-08 18:35:06 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v 1.10 2008-02-08 18:35:06 chulwoo Exp $
+  $Id: sysfunc.C,v 1.10 2008-02-08 18:35:06 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: sysfunc.C,v $
-  $Revision: 1.9 $
+  $Revision: 1.10 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
 CPS_END_NAMESPACE
-#include<comms/sysfunc.h>
+#include<comms/sysfunc_cps.h>
 #include <util/qcdio.h>
 #include <stdlib.h>
 #include <string.h>

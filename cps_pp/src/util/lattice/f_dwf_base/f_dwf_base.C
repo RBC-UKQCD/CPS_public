@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.31 2007-06-06 16:06:23 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.32 2008-02-08 18:35:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -32,7 +32,7 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/random.h>
 #include <util/error.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/enum_func.h>
 #include <comms/scu.h> // GRF
 #include <comms/glb.h>

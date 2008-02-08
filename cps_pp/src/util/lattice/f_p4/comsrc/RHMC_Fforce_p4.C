@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fp4::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce_p4.C,v 1.6 2006-04-13 18:20:37 chulwoo Exp $
+  $Id: RHMC_Fforce_p4.C,v 1.7 2008-02-08 18:35:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -15,7 +15,7 @@
 #include <util/gjp.h>
 #include <util/amalloc.h>
 #include <comms/glb.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/qcdio.h>
 
 CPS_START_NAMESPACE

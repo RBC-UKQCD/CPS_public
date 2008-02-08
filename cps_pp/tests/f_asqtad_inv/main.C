@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.18 2006-06-11 05:35:07 chulwoo Exp $
+  $Id: main.C,v 1.19 2008-02-08 18:35:08 chulwoo Exp $
 */
 
 #include<config.h>
@@ -11,9 +11,9 @@
 #include<util/lat_data.h>
 #include<util/dirac_op.h>
 #include<util/error.h>
-#include<util/time.h>
+#include<util/time_cps.h>
 #include<comms/scu.h>
-#include<comms/sysfunc.h>
+#include<comms/sysfunc_cps.h>
 #include<alg/alg_hmd.h>
 #include<alg/do_arg.h>
 #ifdef HAVE_STRINGS_H

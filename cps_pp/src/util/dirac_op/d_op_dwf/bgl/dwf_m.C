@@ -21,7 +21,7 @@ CPS_END_NAMESPACE
 #include<util/vector.h>
 #include<util/verbose.h>
 #include<util/error.h>
-#include<util/time.h>
+#include<util/time_cps.h>
 #include<util/dirac_op.h>
 CPS_START_NAMESPACE
 

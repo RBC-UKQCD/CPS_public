@@ -26,7 +26,7 @@ CPS_END_NAMESPACE
 #include<util/checksum.h>
 #include<util/data_shift.h>
 #include<comms/double64.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 #ifndef USE_QMP

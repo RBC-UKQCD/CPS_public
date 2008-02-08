@@ -12,7 +12,7 @@
 #include <util/lattice.h>
 #include <util/dirac_op.h>
 #include <util/vector.h>
-#include <sysfunc.h>
+#include <sysfunc_cps.h>
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>

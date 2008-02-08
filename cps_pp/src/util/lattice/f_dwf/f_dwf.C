@@ -36,7 +36,7 @@ CPS_END_NAMESPACE
 #include <comms/glb.h>
 #endif
 #include <util/lattice.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 USING_NAMESPACE_CPS
 
 Fdwf::Fdwf() : FdwfBase(){

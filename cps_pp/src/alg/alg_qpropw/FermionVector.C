@@ -11,7 +11,7 @@
 #include <comms/scu.h>
 #include <util/site.h>
 #include <util/momentum.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <alg/fermion_vector.h>
 
 CPS_START_NAMESPACE

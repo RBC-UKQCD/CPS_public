@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of glb_sum_matrix_dir routine.
 
-  $Id: glb_sum_matrix_dir.C,v 1.3 2004-08-18 11:57:41 zs Exp $
+  $Id: glb_sum_matrix_dir.C,v 1.4 2008-02-08 18:35:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/glb/glb_sum_matrix_dir.C,v 1.3 2004-08-18 11:57:41 zs Exp $
-//  $Id: glb_sum_matrix_dir.C,v 1.3 2004-08-18 11:57:41 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2008-02-08 18:35:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/glb/glb_sum_matrix_dir.C,v 1.4 2008-02-08 18:35:06 chulwoo Exp $
+//  $Id: glb_sum_matrix_dir.C,v 1.4 2008-02-08 18:35:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: glb_sum_matrix_dir.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/glb/glb_sum_matrix_dir.C,v $
 //  $State: Exp $
 //
@@ -32,7 +32,7 @@ CPS_END_NAMESPACE
 #include<comms/scu.h>
 #include<util/gjp.h>
 #include<util/vector.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 

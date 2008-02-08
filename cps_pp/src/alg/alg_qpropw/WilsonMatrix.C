@@ -11,7 +11,7 @@
 #include <comms/glb.h>
 
 #ifdef PARALLEL
-#include <sysfunc.h>
+#include <sysfunc_cps.h>
 #endif
 #include <stdio.h>
 #include <alg/wilson_matrix.h>

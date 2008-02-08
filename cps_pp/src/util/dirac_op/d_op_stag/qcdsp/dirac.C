@@ -3,13 +3,13 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac.C,v 1.5 2004-08-18 11:57:51 zs Exp $
-//  $Id: dirac.C,v 1.5 2004-08-18 11:57:51 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2008-02-08 18:35:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac.C,v 1.6 2008-02-08 18:35:07 chulwoo Exp $
+//  $Id: dirac.C,v 1.6 2008-02-08 18:35:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/qcdsp/dirac.C,v $
 //  $State: Exp $
 //
@@ -31,7 +31,7 @@ CPS_END_NAMESPACE
 #include<util/lattice.h>
 #include<util/dirac_op.h>
 #include<util/vector.h>
-#include <sysfunc.h>
+#include <sysfunc_cps.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

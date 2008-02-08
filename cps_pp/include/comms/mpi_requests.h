@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration and definition of the MPIRequestManager class
 
-  $Id: mpi_requests.h,v 1.6 2004-09-07 05:20:52 chulwoo Exp $
+  $Id: mpi_requests.h,v 1.7 2008-02-08 18:35:05 chulwoo Exp $
 */
 /*----------------------------------------------------------*/
 /* The MPI comms request handle manager: mpi_requests.h
@@ -15,13 +15,13 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: chulwoo $
-  $Date: 2004-09-07 05:20:52 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/mpi_requests.h,v 1.6 2004-09-07 05:20:52 chulwoo Exp $
-  $Id: mpi_requests.h,v 1.6 2004-09-07 05:20:52 chulwoo Exp $
+  $Date: 2008-02-08 18:35:05 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/mpi_requests.h,v 1.7 2008-02-08 18:35:05 chulwoo Exp $
+  $Id: mpi_requests.h,v 1.7 2008-02-08 18:35:05 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: mpi_requests.h,v $
-  $Revision: 1.6 $
+  $Revision: 1.7 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/mpi_requests.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -34,7 +34,7 @@ CPS_START_NAMESPACE
 #define INCLUDED_MPI_REQ_MAN
 
 CPS_END_NAMESPACE
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 //! Maximum number of concurrent MPI requests.

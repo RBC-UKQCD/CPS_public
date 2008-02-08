@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:58 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wilson_init.C,v 1.4 2004-08-18 11:57:58 zs Exp $
-//  $Id: wilson_init.C,v 1.4 2004-08-18 11:57:58 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2008-02-08 18:35:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wilson_init.C,v 1.5 2008-02-08 18:35:07 chulwoo Exp $
+//  $Id: wilson_init.C,v 1.5 2008-02-08 18:35:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: wilson_init.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wilson_init.C,v $
 //  $State: Exp $
 //
@@ -32,7 +32,7 @@ CPS_START_NAMESPACE
 /* Include header files                                                     */
 /*--------------------------------------------------------------------------*/
 CPS_END_NAMESPACE
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <scu_dir_arg.h>
 #include<util/wilson.h>
 #include<util/gjp.h>

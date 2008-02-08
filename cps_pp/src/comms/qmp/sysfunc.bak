@@ -16,7 +16,7 @@ CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 
 CPS_END_NAMESPACE
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <comms/scu_dir_arg.h>
 #include <util/qcdio.h>
 #include <stdlib.h>

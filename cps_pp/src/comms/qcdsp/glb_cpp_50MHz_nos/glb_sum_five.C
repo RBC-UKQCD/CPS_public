@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_50MHz_nos/glb_sum_five.C,v 1.4 2004-08-18 11:57:45 zs Exp $
-//  $Id: glb_sum_five.C,v 1.4 2004-08-18 11:57:45 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2008-02-08 18:35:06 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_50MHz_nos/glb_sum_five.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
+//  $Id: glb_sum_five.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: glb_sum_five.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdsp/glb_cpp_50MHz_nos/glb_sum_five.C,v $
 //  $State: Exp $
 //
@@ -30,7 +30,7 @@ CPS_END_NAMESPACE
 #include<util/gjp.h>
 #include<global_sum.h>
 #include<comms/glb_sum_init.h>
-#include <comms/sysfunc.h>                // CoorT(), ...
+#include <comms/sysfunc_cps.h>                // CoorT(), ...
 #include <stdlib.h>                 // void *malloc(unsigned size)
 CPS_START_NAMESPACE
 

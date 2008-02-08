@@ -1,4 +1,4 @@
-///  $Id: main.C,v 1.12 2004-10-27 14:34:22 zs Exp $
+///  $Id: main.C,v 1.13 2008-02-08 18:35:09 chulwoo Exp $
 ///  Demonstrate the random gauge transformation code.
 ///
 
@@ -29,7 +29,7 @@
 #include <alg/alg_rnd_gauge.h>
 #include<util/testing_framework.h>
 #include<util/dump_xml.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 
 USING_NAMESPACE_CPS
 

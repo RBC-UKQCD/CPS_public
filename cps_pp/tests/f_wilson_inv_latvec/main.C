@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.3 2004-09-21 20:16:54 chulwoo Exp $
+  $Id: main.C,v 1.4 2008-02-08 18:35:08 chulwoo Exp $
 */
 
 #include<config.h>
@@ -10,7 +10,7 @@
 #include<util/verbose.h>
 #include<util/dirac_op.h>
 #include<util/error.h>
-#include<util/time.h>
+#include<util/time_cps.h>
 #include<util/lat_data.h>
 #include<comms/scu.h>
 #include<alg/alg_hmd.h>

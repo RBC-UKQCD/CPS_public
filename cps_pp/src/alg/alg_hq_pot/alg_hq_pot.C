@@ -17,12 +17,12 @@
 #include <comms/glb.h>
 #include <alg/alg_plaq.h>
 #include <alg/alg_hq_pot.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <util/pt.h>
 #include <string.h>
 
 #ifdef PARALLEL
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 
 CPS_START_NAMESPACE

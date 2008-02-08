@@ -1,7 +1,7 @@
 /*!\file
   Staggered Dirac operator for QCDOC
 
-  $Id: dirac.C,v 1.14 2006-03-03 20:52:44 chulwoo Exp $
+  $Id: dirac.C,v 1.15 2008-02-08 18:35:07 chulwoo Exp $
 */
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian
@@ -19,7 +19,7 @@
 #include <util/dirac_op.h>
 #include <util/vector.h>
 #include <stdio.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <qalloc.h>
 
 #undef CPP

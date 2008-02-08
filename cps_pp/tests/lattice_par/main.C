@@ -6,11 +6,11 @@
 #include <alg/alg_ghb.h>
 #include <alg/do_arg.h>
 #include <alg/ghb_arg.h>
-//#include <sysfunc.h>
+//#include <sysfunc_cps.h>
 #include <util/ReadLatticePar.h>
 #include <util/WriteLatticePar.h>
 #include <util/fpconv.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 
 
 USING_NAMESPACE_CPS

@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-06-11 03:36:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.12 2006-06-11 03:36:00 chulwoo Exp $
-//  $Id: alg_s_spect.C,v 1.12 2006-06-11 03:36:00 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v 1.13 2008-02-08 18:35:05 chulwoo Exp $
+//  $Id: alg_s_spect.C,v 1.13 2008-02-08 18:35:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_s_spect.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/alg_s_spect.C,v $
 //  $State: Exp $
 //
@@ -49,7 +49,7 @@ CPS_END_NAMESPACE
 #include <alg/myenum.h>
 
 #ifdef PARALLEL
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 
 CPS_START_NAMESPACE

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the SCUDirArg class.
 
-  $Id: scu_dir_arg.C,v 1.4 2004-08-18 11:57:41 zs Exp $
+  $Id: scu_dir_arg.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
 */
 /*----------------------------------------------------------*/
 /* The SCUDirArg Class: scu_dir_arg.C
@@ -17,14 +17,14 @@ CPS_START_NAMESPACE
   -----------------------------------------------------------
   CVS keywords
  
-  $Author: zs $
-  $Date: 2004-08-18 11:57:41 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/scu_dir_arg.C,v 1.4 2004-08-18 11:57:41 zs Exp $
-  $Id: scu_dir_arg.C,v 1.4 2004-08-18 11:57:41 zs Exp $
+  $Author: chulwoo $
+  $Date: 2008-02-08 18:35:06 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/scu_dir_arg.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
+  $Id: scu_dir_arg.C,v 1.5 2008-02-08 18:35:06 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Locker:  $
   $RCSfile: scu_dir_arg.C,v $
-  $Revision: 1.4 $
+  $Revision: 1.5 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/scu_dir_arg.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -36,7 +36,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include<comms/scu_dir_arg.h>
-#include<comms/sysfunc.h>
+#include<comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 //----------------------------------

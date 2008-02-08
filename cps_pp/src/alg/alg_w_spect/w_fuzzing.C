@@ -21,7 +21,7 @@ CPS_END_NAMESPACE
 #include <alg/w_all.h>
 
 #ifdef PARALLEL
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 
 #include <util/error.h>                // ERR

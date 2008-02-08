@@ -7,26 +7,26 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.3 2007-10-30 20:40:34 chulwoo Exp $
+  $Id: get_data.C,v 1.4 2008-02-08 18:35:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-10-30 20:40:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.3 2007-10-30 20:40:34 chulwoo Exp $
-//  $Id: get_data.C,v 1.3 2007-10-30 20:40:34 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:07 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.4 2008-02-08 18:35:07 chulwoo Exp $
+//  $Id: get_data.C,v 1.4 2008-02-08 18:35:07 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 CPS_END_NAMESPACE
 #include<util/gjp.h>
-//#include<sysfunc.h>
+//#include<sysfunc_cps.h>
 CPS_START_NAMESPACE
 #ifndef USE_QMP
 #define USE_QMP

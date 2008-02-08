@@ -1,6 +1,6 @@
 #include <config.h>
 #ifdef USE_QMP
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <util/wilson.h>
 #include <util/verbose.h>
 #include <util/error.h>

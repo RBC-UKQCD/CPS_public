@@ -31,7 +31,7 @@
 #include <alg/enum.h>
 
 #ifdef PARALLEL
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #endif
 CPS_START_NAMESPACE
 //enum { VECT_LEN = 6, MATRIX_SIZE = 18 };

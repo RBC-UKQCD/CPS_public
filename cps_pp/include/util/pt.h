@@ -1,6 +1,6 @@
 #include<config.h>
 #ifdef PARALLEL
-#include<comms/sysfunc.h>
+#include<comms/sysfunc_cps.h>
 #endif
 #if TARGET == QCDOC 
 #include<util/pt_int.h>
@@ -12,19 +12,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.21 2006-11-25 19:09:48 chulwoo Exp $
+  $Id: pt.h,v 1.22 2008-02-08 18:35:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-11-25 19:09:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.21 2006-11-25 19:09:48 chulwoo Exp $
-//  $Id: pt.h,v 1.21 2006-11-25 19:09:48 chulwoo Exp $
+//  $Date: 2008-02-08 18:35:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.22 2008-02-08 18:35:05 chulwoo Exp $
+//  $Id: pt.h,v 1.22 2008-02-08 18:35:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.21 $
+//  $Revision: 1.22 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //

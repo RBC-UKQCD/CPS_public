@@ -4,7 +4,7 @@
 #include <math.h>
 #endif
 #include <util/gjp.h>
-#include <util/time.h>
+#include <util/time_cps.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
 #include <util/lattice.h>

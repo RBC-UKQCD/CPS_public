@@ -9,13 +9,13 @@ CPS_START_NAMESPACE
   George T. Fleming <gfleming@mps.ohio-state.edu>
   [recieved Wed, 11 Apr 2001 16:03:40 -0400]
 
-  $Id: stridetest.C,v 1.4 2004-08-18 11:58:11 zs Exp $
+  $Id: stridetest.C,v 1.5 2008-02-08 18:35:08 chulwoo Exp $
 
   A.N.Jackson: ajackson@epcc.ed.ac.uk                       */
 /*----------------------------------------------------------*/
 CPS_END_NAMESPACE
 #include <util/qcdio.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 main() {

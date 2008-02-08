@@ -23,7 +23,7 @@
 #include <comms/glb.h>
 #include <comms/scu.h>
 // #include <util/data_io.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 
 #include <fcntl.h>      // read and write control flags,
 #include <unistd.h>     // close(). These are needed for io parts to

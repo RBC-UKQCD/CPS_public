@@ -11,7 +11,7 @@ CPS_END_NAMESPACE
 #include<comms/glb.h>
 #include<util/smalloc.h>
 #include<util/gjp.h>
-#include <comms/sysfunc.h>
+#include <comms/sysfunc_cps.h>
 #include <comms/scu.h>
 #include <comms/bgl_net.h>
 #include <sys/bgl/bgl_sys_all.h>

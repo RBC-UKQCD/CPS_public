@@ -30,7 +30,7 @@ CPS_END_NAMESPACE
 //#include<comms/scu.h>
 //#include<util/gjp.h>
 //#include<comms/double64.h>
-//#include <comms/sysfunc.h>
+//#include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
 unsigned int local_checksum(Float * float_p, int len) {

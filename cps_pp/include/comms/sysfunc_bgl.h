@@ -10,7 +10,7 @@
 
 /*----------------------------------------------------------*/
 /*  
-  The Sysfunc Comms Interface: sysfunc.h
+  The Sysfunc Comms Interface: sysfunc_cps.h
 
   Declarations for the MPI implementation of the QCDSP SCU
   comms-layer.
