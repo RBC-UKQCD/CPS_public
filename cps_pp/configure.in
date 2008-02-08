@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2007-11-13 05:55:43 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.53 2007-11-13 05:55:43 chulwoo Exp $
-dnl  $Id: configure.in,v 1.53 2007-11-13 05:55:43 chulwoo Exp $
+dnl  $Date: 2008-02-08 22:01:05 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.54 2008-02-08 22:01:05 chulwoo Exp $
+dnl  $Id: configure.in,v 1.54 2008-02-08 22:01:05 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.53 $
+dnl  $Revision: 1.54 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -262,7 +262,7 @@ dnl     echo "QIO_DIR environment variable not set"
 fi
 
 if test "$TESTING_PARALLEL" = "yes"; then
-   ENABLE_PARALLEL="define PARALLEL"
+   ENABLE_PARALLEL="define PARALLEL 1"
 else
    ENABLE_PARALLEL="undef PARALLEL"
 fi

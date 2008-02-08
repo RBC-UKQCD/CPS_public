@@ -6,26 +6,26 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.12 2008-02-08 18:35:06 chulwoo Exp $
+  $Id: get_data.C,v 1.13 2008-02-08 22:01:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.12 2008-02-08 18:35:06 chulwoo Exp $
-//  $Id: get_data.C,v 1.12 2008-02-08 18:35:06 chulwoo Exp $
+//  $Date: 2008-02-08 22:01:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.13 2008-02-08 22:01:05 chulwoo Exp $
+//  $Id: get_data.C,v 1.13 2008-02-08 22:01:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 CPS_END_NAMESPACE
 #include<util/gjp.h>
-#include<sysfunc_cps.h>
+#include<sysfunc.h>
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
@@ -53,38 +53,57 @@ const int MAX_LENGTH = 4096;
 const int MAX_COPY = 128;
 static IFloat *rcv_noncache=NULL;
 static IFloat *send_noncache=NULL;
-void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
+
+void get1Data(IFloat *rcv_buf, IFloat *send_buf, int len, int mu, int plus)
 {
+  char *fname = "get1Data";
+//  printf("get1Data(%p %p %d %d %d\n\n",rcv_buf,send_buf,len,mu,plus);
   if(rcv_noncache==NULL) rcv_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
   if(rcv_noncache==NULL)
-    ERR.Pointer("","getPlusData","rcv_noncache");
+    ERR.Pointer("",fname,"rcv_noncache");
   if(send_noncache==NULL) send_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
   if(send_noncache==NULL)
-    ERR.Pointer("","getPlusData","send_noncache");
+    ERR.Pointer("",fname,"send_noncache");
 //  printf("rcv_buf=%p send_buf=%p len=%d \n",rcv_buf,send_buf,len);
 	
   int i = 0;
-  if(gjp_local_axis[mu] == 0) {
-    if ( len > MAX_LENGTH){
-        ERR.General("","getPlusData","len>MAX_LENGTH(%d)\n",MAX_LENGTH);
+  while (len >0){
+    int copy_len = len;
+    if (copy_len >MAX_LENGTH) copy_len = MAX_LENGTH;
+    if(gjp_local_axis[mu] == 0) {
+      if ( len > MAX_LENGTH){
+//          ERR.General("",fname,"len(%d)>MAX_LENGTH(%d)\n",len,MAX_LENGTH);
+      }
+      for(i=0;i<copy_len;i++) send_noncache[i] = send_buf[i];
+      SCUDirArgIR send(send_noncache, gjp_scu_dir[2*mu+plus], SCU_SEND, copy_len*sizeof(IFloat));
+      SCUDirArgIR rcv(rcv_noncache, gjp_scu_dir[2*mu+(1-plus)], SCU_REC, copy_len*sizeof(IFloat));
+      send.StartTrans();
+      rcv.StartTrans();
+      send.TransComplete();
+      rcv.TransComplete();
+      for(i=0;i<copy_len;i++) rcv_buf[i] = rcv_noncache[i];
     }
-    for(i=0;i<len;i++) send_noncache[i] = send_buf[i];
-    SCUDirArgIR send(send_noncache, gjp_scu_dir[2*mu+1], SCU_SEND, len*sizeof(IFloat));
-    SCUDirArgIR rcv(rcv_noncache, gjp_scu_dir[2*mu], SCU_REC, len*sizeof(IFloat));
-    send.StartTrans();
-    rcv.StartTrans();
-    send.TransComplete();
-    rcv.TransComplete();
-    for(i=0;i<len;i++) rcv_buf[i] = rcv_noncache[i];
-  }
-  else {
-    for(int i = 0; i < len; ++i) {
-      *rcv_buf++ = *send_buf++;
+    else {
+      for(int i = 0; i < copy_len; ++i) {
+        *rcv_buf++ = *send_buf++;
+      }
     }
+    send_buf += MAX_LENGTH;
+    rcv_buf += MAX_LENGTH;
+    len = len - MAX_LENGTH;
   }
+//  printf("get1Data() done\n");
+}
+
+void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu){
+  get1Data(rcv_buf,send_buf,len,mu,1);
+}
+void getMinusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu){
+  get1Data(rcv_buf,send_buf,len,mu,0);
 }
 
 
+#if 0
 /*!
   Gets a contiguous block of floating point data from the neighbouring
   node in a negative direction.
@@ -112,8 +131,8 @@ void getMinusData(IFloat* rcv_buf, IFloat* send_buf, int len, int mu)
         ERR.General("","getMinusData","len>MAX_LENGTH(%d)\n",MAX_LENGTH);
     }
     for(i=0;i<len;i++) send_noncache[i] = send_buf[i];
-    SCUDirArgIR send(send_noncache, gjp_scu_dir[2*mu], SCU_SEND, len*sizeof(IFloat));
-    SCUDirArgIR rcv(rcv_noncache, gjp_scu_dir[2*mu+1], SCU_REC, len*sizeof(IFloat));
+    SCUDirArg send(send_noncache, gjp_scu_dir[2*mu], SCU_SEND, len*sizeof(IFloat));
+    SCUDirArg rcv(rcv_noncache, gjp_scu_dir[2*mu+1], SCU_REC, len*sizeof(IFloat));
     send.StartTrans();
     rcv.StartTrans();
     send.TransComplete();
@@ -126,6 +145,7 @@ void getMinusData(IFloat* rcv_buf, IFloat* send_buf, int len, int mu)
     }
   }
 }
+#endif
 
 
 //====================================================================

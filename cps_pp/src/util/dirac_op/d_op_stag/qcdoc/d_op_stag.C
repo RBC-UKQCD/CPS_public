@@ -83,13 +83,7 @@ DiracOpStag::DiracOpStag(Lattice & latt,
   //----------------------------------------------------------------
   // Allocate memory for the temporary fermion vector frm_tmp.
   //----------------------------------------------------------------
-  frm_tmp = (Vector *) qalloc(QFAST,f_size_cb * sizeof(Float));
-  if(frm_tmp == 0)
-  frm_tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
-  if(frm_tmp == 0)
-    ERR.Pointer(cname,fname, "frm_tmp");
-  VRB.Smalloc(cname,fname, "frm_tmp", 
-	      frm_tmp, f_size_cb * sizeof(Float));
+  frm_tmp = (Vector *) fmalloc(cname,fname,"frm_tmp",f_size_cb * sizeof(Float));
 
 
   //----------------------------------------------------------------
@@ -360,6 +354,13 @@ int DiracOpStag::MatInv(Vector *out,
 
   IFloat *k_e = (IFloat *)in;
   IFloat *k_o = k_e+f_size_cb;
+  Float *tmp_p = (Float *)in;
+#if 0
+  for(int i =0;i<GJP.VolNodeSites()*6;i++){
+    if(fabs(tmp_p[i])>1e-6)
+      printf("%s::%s:in[%d]=%e\n",cname,fname,i,tmp_p[i]);
+  }
+#endif
 
   Vector *tmp = (Vector *) smalloc(f_size_cb * sizeof(Float));
   if(tmp == 0)
@@ -369,10 +370,40 @@ int DiracOpStag::MatInv(Vector *out,
 
   // tmp = (2m - D)k
 
+#if 0
+  tmp_p = (Float *)k_o;
+  for(int i =0;i<GJP.VolNodeSites()*3;i++){
+    if(fabs(tmp_p[i])>1e-6)
+      printf("%s::%s:k_o[%d]=%e\n",cname,fname,i,tmp_p[i]);
+  }
+#endif
   stag_dirac((IFloat *)tmp, k_o, 1, 0);
+#if 0
+  tmp_p = (Float *)tmp;
+  for(int i =0;i<GJP.VolNodeSites()*3;i++){
+    if(fabs(tmp_p[i])>1e-6)
+      printf("%s::%s:tmp[%d]=%e\n",cname,fname,i,tmp_p[i]);
+  }
+#endif
+
+#if 0
+  tmp_p = (Float *)k_e;
+  for(int i =0;i<GJP.VolNodeSites()*3;i++){
+    if(fabs(tmp_p[i])>1e-6)
+      printf("%s::%s:k_e[%d]=%e\n",cname,fname,i,tmp_p[i]);
+  }
+#endif
+  printf("mass_rs=%e f_size_cb=%d\n",mass_rs,f_size_cb);
   fTimesV1MinusV2((IFloat *)tmp, 2.*mass_rs, k_e,
   	(IFloat *)tmp, f_size_cb);
 
+#if 0
+  tmp_p = (Float *)tmp;
+  for(int i =0;i<GJP.VolNodeSites()*3;i++){
+    if(fabs(tmp_p[i])>1e-6)
+      printf("%s::%s:tmp[%d]=%e\n",cname,fname,i,tmp_p[i]);
+  }
+#endif
   int iter = InvCg(out, tmp, true_res);
 
   // calculate odd solution

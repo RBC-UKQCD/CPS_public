@@ -4326,7 +4326,7 @@ if test "$enable_qio" != "no"; then
 fi
 
 if test "$TESTING_PARALLEL" = "yes"; then
-   ENABLE_PARALLEL="define PARALLEL"
+   ENABLE_PARALLEL="define PARALLEL 1"
 else
    ENABLE_PARALLEL="undef PARALLEL"
 fi

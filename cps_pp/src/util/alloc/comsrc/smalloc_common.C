@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc_common.C,v 1.7 2005-06-16 07:23:12 chulwoo Exp $
+  $Id: smalloc_common.C,v 1.8 2008-02-08 22:01:05 chulwoo Exp $
 */
 
 #include <util/smalloc.h>
@@ -22,7 +22,7 @@ void sfree(const char *cname, const char *fname, const char *vname, void *p){
 }
 
 void* fmalloc(const char *cname, const char *fname, const char *vname, size_t request){
-    return fmalloc(request, cname, fname, vname);
+    return fmalloc(request, vname, fname, cname);
 }
 
 void ffree(const char *cname, const char *fname, const char *vname, void *p){

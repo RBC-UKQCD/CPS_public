@@ -3,13 +3,13 @@
 /*!\file
   \brief Declarations for the communications layer.
   
-  $Id: sysfunc_cps.h,v 1.2 2008-02-08 18:38:26 chulwoo Exp $
+  $Id: sysfunc_cps.h,v 1.3 2008-02-08 22:01:05 chulwoo Exp $
 */
 
 #ifdef USE_QMP
 #include <comms/sysfunc_qmp.h>
 #elif TARGET == QCDOC || TARGET == QCDSP
-#include <sysfunc_cps.h>
+#include <sysfunc.h>
 #elif TARGET == cpsMPI 
 #include <comms/sysfunc_mpi.h>
 #elif TARGET == BGL

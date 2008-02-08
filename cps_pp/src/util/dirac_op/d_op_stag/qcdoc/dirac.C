@@ -1,7 +1,7 @@
 /*!\file
   Staggered Dirac operator for QCDOC
 
-  $Id: dirac.C,v 1.15 2008-02-08 18:35:07 chulwoo Exp $
+  $Id: dirac.C,v 1.16 2008-02-08 22:01:05 chulwoo Exp $
 */
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian
@@ -139,7 +139,7 @@ static IFloat ** chi[2];
 //  the buffers for the specified direction.
 //------------------------------------------------------------------
 
-static SCUDirArgIR * SCUarg[2*NUM_DIR];
+static SCUDirArgIR * SCUarg[16];
 static SCUDirArgMulti * SCUmulti;
 
 //------------------------------------------------------------------
@@ -265,8 +265,15 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   // flush_cache_spinor() function will flush 192 bytes * nflush 
   //-------------------------------------------------------------
   nflush = vol/8;
+
+#if 0
+  if (vol>16000)
   tmpfrm = (IFloat *) smalloc ( 8 * vol/2 * VECT_LEN * sizeof(IFloat),
 				cname,fname, "tmpfrm");
+  else
+  tmpfrm = (IFloat *) fmalloc ( 8 * vol/2 * VECT_LEN * sizeof(IFloat),
+				cname,fname, "tmpfrm");
+#endif
 
   
 
@@ -277,8 +284,8 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   
   for ( i = 0; i < NUM_DIR; i++ ){
 #if 1
-    chi_off_node[i] = ( IFloat * ) qalloc(QFAST,
-      VECT_LEN * vol * sizeof( IFloat ) / ( 2 * size[ i % 4 ] ) );    
+    chi_off_node[i] = ( IFloat * ) fmalloc(cname,fname,"chi_off_node[i]",
+ VECT_LEN * vol * sizeof( IFloat ) / ( 2 * size[ i % 4 ] ) );    
     if(chi_off_node[i] == 0)
       ERR.Pointer(cname,fname, "chi_off_node[i]");
 #else
@@ -299,11 +306,11 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   for ( i = 0; i < 2; i++ ){
       VRB.Result(cname,fname,"local_chi=%d sizeof(IFloat)=%d\n",local_chi,
 		 sizeof(IFloat));
-      chi[i] = (IFloat **) smalloc(9 * vol/2 * sizeof(IFloat *),
+      chi[i] = (IFloat **) fmalloc(9 * vol/2 * sizeof(IFloat *),
 				   cname,fname, "chi[i]");
-      chi_l[i] = ( IFloat ** ) smalloc(2*(local_chi/2)*sizeof(IFloat *),
+      chi_l[i] = ( IFloat ** ) fmalloc(2*(local_chi/2)*sizeof(IFloat *),
 				       cname,fname, "chi_l[i]");
-      chi_nl[i] = (IFloat ** ) smalloc(2*(non_local_chi/2)*sizeof(IFloat *),
+      chi_nl[i] = (IFloat ** ) fmalloc(2*(non_local_chi/2)*sizeof(IFloat *),
 				       cname,fname, "chi_nl[i]");
   }
   
@@ -449,6 +456,7 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   blklen[1] = VECT_LEN * sizeof(IFloat) * size[0] / 2;
   blklen[2] = VECT_LEN * sizeof(IFloat) * size[0] * size[1] / 2;
   blklen[3] = VECT_LEN * sizeof(IFloat) * size[0] * size[1] * size[2] / 2;
+  
 
   numblk[0] = 1; 
   numblk[1] = size[2] * size[3];
@@ -460,7 +468,6 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   stride[2] = (VECT_LEN * size[0] * size[1] * ( size[2] - 1 ) / 2)*
     sizeof(IFloat) ;
   stride[3] = 0;
-
   //-------------------------------------------------------------------
   //  Calculate offsets for T transfers done one word at a time.
   //  We have plus (P) transfers for both the even and odd
@@ -478,10 +485,10 @@ extern "C" void stag_dirac_init(const void * gauge_u )
 	ERR.General(cname,fname,"Tbuffer size overflow\n");
     }
 #endif
-    ToffsetP[i] = ( int * ) smalloc ( size[1] * size[2] * size[3] *
+    ToffsetP[i] = ( int * ) fmalloc ( size[1] * size[2] * size[3] *
       sizeof( int ) / 2 );
 
-    ToffsetM[i] = ( int * ) smalloc ( size[1] * size[2] * size[3] *
+    ToffsetM[i] = ( int * ) fmalloc ( size[1] * size[2] * size[3] *
       sizeof( int ) / 2 );
 
     countP[i] = 0;
@@ -512,15 +519,20 @@ extern "C" void stag_dirac_init(const void * gauge_u )
   //  YM, ZM
   //-------------------------------------------------------------------
 
+//  for(i=0;i<4;i++)
+//   printf("blklen numblk stride [%d]= %d %d %d\n",i, blklen[i],numblk[i],stride[i]);
+
   for ( i = 0; i < NUM_DIR; i++ ) {
     j = i % (NUM_DIR/2);
-      SCUarg[i + 8] = new SCUDirArgIR;
-      SCUarg[i + 8] ->Init(chi_off_node[i], scudir[i], SCU_REC, 
+//      SCUarg[i + 8] = new SCUDirArgIR;
+//      printf("%d: %p %d\n",i+8,chi_off_node[i],blklen[j]*numblk[j]);
+      SCUarg[i + 8]  = new SCUDirArgIR(chi_off_node[i], scudir[i], SCU_REC, 
 		    blklen[j]*numblk[j], 1, 0, IR_5);
 //		    VECT_LEN * sizeof(IFloat) * vol / ( 2 * size[j] ), 
 //			       1, 0, IR_5);
 //      buffer_flush[i] = VECT_LEN * sizeof(IFloat) * vol/ (384 * size[j]);
 //send arguments
+//   SCUarg[i+8]->Print();
     if ((i == 0) || ( i == 4)){
       SCUarg[i] = new SCUDirArgIR(Tbuffer[(4 - i)/4], scudir[i], SCU_SEND, 
 		       blklen[j], numblk[j], stride[j], IR_5 );
@@ -529,9 +541,13 @@ extern "C" void stag_dirac_init(const void * gauge_u )
       SCUarg[i] = new SCUDirArgIR(Tbuffer[0], scudir[i], SCU_SEND, 
 		       blklen[j], numblk[j], stride[j], IR_5 );
     }
+//   SCUarg[i]->Print();
+//    printf("SCUarg[%d] done\n",i);
   }
+//  for(i = 0;i<2*NUM_DIR;i++) SCUarg[i]->Print();
   SCUmulti = new SCUDirArgMulti();
   SCUmulti->Init(SCUarg, 16);
+//  for(i = 0;i<2*NUM_DIR;i++) SCUarg[i]->Print();
   //-------------------------------------------------------------------
   //  Need send offsets for various transfers.  The index for
   //  sends is TM, XM, YM, ZM, TP, XP, YP, ZP, since the
@@ -555,22 +571,22 @@ extern "C" void stag_dirac_init(const void * gauge_u )
 extern "C" void stag_destroy_dirac_buf()
 {
   int i;
-  sfree(tmpfrm);
+//  ffree(tmpfrm);
   delete SCUmulti;
   
   for ( i = 0; i < 2; i++ ) {
     qfree(Tbuffer[i]);
-    sfree(ToffsetP[i]);
-    sfree(ToffsetM[i]);
-    sfree(chi_nl[i]);
-    sfree(chi[i]);
-    sfree(chi_l[i]);
+    ffree(ToffsetP[i]);
+    ffree(ToffsetM[i]);
+    ffree(chi_nl[i]);
+    ffree(chi[i]);
+    ffree(chi_l[i]);
   }
     
   for ( i = 0; i < NUM_DIR; i++ ) {
     delete SCUarg[i];
     delete SCUarg[i+8];
-    qfree(chi_off_node[i]);
+    ffree(chi_off_node[i]);
   }  
   initted=0;
 }
@@ -657,8 +673,18 @@ extern "C" void stag_dirac_init_g()
   SCUDirArg X;
   SCUDirArg R;
 #endif
+
+#if 1
+  if (vol>16000)
+  tmpfrm = (IFloat *) smalloc ( 8 * vol/2 * VECT_LEN * sizeof(IFloat),
+				cname,fname, "tmpfrm");
+  else
+  tmpfrm = (IFloat *) fmalloc ( 8 * vol/2 * VECT_LEN * sizeof(IFloat),
+				cname,fname, "tmpfrm");
+#endif
   IFloat *mtmp;
-  mtmp = (IFloat *)fmalloc(18*sizeof(IFloat));
+  mtmp = (IFloat *)smalloc(18*sizeof(IFloat));
+//  printf("mtmp=%p\n",mtmp);
 
   VRB.Func(cname,fname);
 //  print("dirac_init_g start\n");
@@ -676,10 +702,10 @@ extern "C" void stag_dirac_init_g()
   //  Allocate space for two copies of the gauge fields on this node
   //-----------------------------------------------------------------
   for ( i = 0; i < 2; i++ ){
-      uc_l[i] = (IFloat*) smalloc(MATRIX_SIZE* local_chi/2 * sizeof(IFloat),
+      uc_l[i] = (IFloat*) fmalloc(MATRIX_SIZE* local_chi/2 * sizeof(IFloat),
 				  cname,fname, "uc_l[i]");
-      uc_nl[i] = (IFloat*) smalloc(MATRIX_SIZE* non_local_chi/2 * sizeof(IFloat),
-				   cname,fname, "uc_l[i]");
+      uc_nl[i] = (IFloat*) fmalloc( cname,fname, "uc_nl[i]", 
+       MATRIX_SIZE* non_local_chi/2 * sizeof(IFloat));
   }
 
   for ( i = 0; i < 2; i++){
@@ -820,7 +846,8 @@ extern "C" void stag_dirac_init_g()
 	}
       }
     }
-    qfree(mtmp);
+    ffree(mtmp);
+//    printf("Copying links done\n");
 
 #if 0
   char buf[200];
@@ -864,9 +891,10 @@ extern "C" void stag_dirac_init_g()
 extern "C" void stag_destroy_dirac_buf_g(void)
 {
   int i;
+  ffree(tmpfrm);
   for ( i = 0; i < 2; i++){
-  sfree(uc_l[i]);
-  sfree(uc_nl[i]);
+  ffree(uc_l[i]);
+  ffree(uc_nl[i]);
   }
 }
 
@@ -977,10 +1005,13 @@ void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
   SCUarg[6]->Addr( a + Xoffset[6]);
   SCUarg[3]->Addr( a + Xoffset[3]);
   SCUarg[7]->Addr( a + Xoffset[7]);
+//    printf("Setting offsets done\n");
   
   sys_cacheflush(0);
-//  for(int i = 0;i<2*NUM_DIR;i++) SCUarg[i]->Assert();
-  SCUmulti->StartTrans();
+//  for(int i = 0;i<2*NUM_DIR;i++) SCUarg[i]->Print();
+//  exit(-34);
+  for(int i = 0;i<2*NUM_DIR;i++) SCUarg[i]->Assert();
+  SCUmulti->SlowStartTrans();
 //  printf("SCUmulti started\n");
 //  save_reg((long)intreg, (long)dreg);
   //-----------------------------------------------------------------

@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the CommonArg structure.
 
-  $Id: common_arg.h,v 1.5 2004-08-18 11:57:36 zs Exp $
+  $Id: common_arg.h,v 1.6 2008-02-08 22:01:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------------
 #ifndef INCLUDED_COMMON_ARG_H
@@ -13,6 +13,8 @@ CPS_END_NAMESPACE
 #include <util/smalloc.h>
 #include <util/error.h>
 CPS_START_NAMESPACE
+
+const int MAX_STRING_LEN = 20;
 
 
 /*! \defgroup algargs Algorithm parameters

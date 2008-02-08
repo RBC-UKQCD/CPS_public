@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.31 2008-02-08 18:35:05 chulwoo Exp $
+  $Id: gjp.h,v 1.32 2008-02-08 22:01:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.31 2008-02-08 18:35:05 chulwoo Exp $
-//  $Id: gjp.h,v 1.31 2008-02-08 18:35:05 chulwoo Exp $
+//  $Date: 2008-02-08 22:01:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.32 2008-02-08 22:01:05 chulwoo Exp $
+//  $Id: gjp.h,v 1.32 2008-02-08 22:01:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.31 $
+//  $Revision: 1.32 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -499,6 +499,8 @@ public:
   /*!<
     \return The number of colours.
   */
+
+  int VerboseLevel() const   {return doarg_int.verbose_level;}
 
 
   Float Beta() const
