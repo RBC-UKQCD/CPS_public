@@ -1,7 +1,7 @@
 /*!\file
   \brief Declaration of functions for timing and performance measurement.
 
-  $Id: time.h,v 1.8 2006-07-03 05:29:45 chulwoo Exp $
+  $Id: time_cps.h,v 1.2 2008-02-08 18:38:26 chulwoo Exp $
 */
 
 #ifndef UTIL_TIME_H
