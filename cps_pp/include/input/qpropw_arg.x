@@ -51,10 +51,15 @@ class QPropWArg {
   //! should propagator be saved to disk?
   int save_prop;
   //! should 5d propagator be saved to disk(1) or memory(2)?
-    int save_ls_prop;
+  int save_ls_prop;
   //!  should (1+gamma_t)/2 projected sources be used? (good far baryons)
   int do_half_fermion;
   SourceType SeqSmearSink ;
+
+  //! header information of qio write prop
+  char *ensemble_label;
+  char *ensemble_id;
+  int seqNum;
   memfun QPropWArg();
 };
 
@@ -110,5 +115,9 @@ class QPropWGaussArg{
   //Multi Gaussian source params
     int nt;
     int mt[5];
+  // smearing scheme for links in Gaussian smearing by YA
+    GaussianKernelLinkSmearType gauss_link_smear_type;
+    int gauss_link_smear_N;
+    Float gauss_link_smear_coeff;
   memfun QPropWGaussArg();
 };

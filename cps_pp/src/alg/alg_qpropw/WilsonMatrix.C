@@ -11,7 +11,7 @@
 #include <comms/glb.h>
 
 #ifdef PARALLEL
-#include <sysfunc_cps.h>
+#include <comms/sysfunc_cps.h>
 #endif
 #include <stdio.h>
 #include <alg/wilson_matrix.h>
@@ -38,7 +38,7 @@ WilsonMatrix::WilsonMatrix(const WilsonMatrix& rhs)
 WilsonMatrix::WilsonMatrix(int source_spin, int source_color, 
 			   int sink_spin, int sink_color, const Rcomplex& z)
 {
-	p.d[source_spin].c[source_color].d[sink_spin].c[sink_color]=z;
+	p.d[sink_spin].c[sink_color].d[source_spin].c[source_color]=z;
 	return;
 }
 
@@ -46,14 +46,14 @@ WilsonMatrix::WilsonMatrix(int source_spin, int source_color,
 void WilsonMatrix::Element(int source_spin, int source_color, 
 			   int sink_spin, int sink_color, const Rcomplex& z)
 {
-	p.d[source_spin].c[source_color].d[sink_spin].c[sink_color]=z;
+	p.d[sink_spin].c[sink_color].d[source_spin].c[source_color]=z;
 	return;
 }
 
 // copy wilson vector
-WilsonMatrix::WilsonMatrix(int src_spin, int src_color, const wilson_vector& z)
+WilsonMatrix::WilsonMatrix(int sink_spin, int sink_color, const wilson_vector& z)
 {
-	p.d[src_spin].c[src_color]=z;
+	p.d[sink_spin].c[sink_color]=z;
 	return;
 }
 
@@ -103,9 +103,9 @@ const wilson_matrix& WilsonMatrix::wmat() const
 }
 
 // return a wilson vector
-wilson_vector& WilsonMatrix::sol(int src_spin, int src_color)
+wilson_vector& WilsonMatrix::sol(int sink_spin, int sink_color)
 {
-	return p.d[src_spin].c[src_color];
+	return p.d[sink_spin].c[sink_color];
 }
 
 /*! 

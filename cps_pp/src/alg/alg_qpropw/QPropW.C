@@ -1,3 +1,5 @@
+//#define VOLFMT QIO_SINGLEFILE
+# define VOLFMT QIO_PARTFILE
 //------------------------------------------------------------------
 //
 // QPropW.C
@@ -33,6 +35,11 @@
 
 #include <util/qioarg.h>
 #include <util/sproj_tr.h>
+
+//YA
+#include <alg/alg_plaq.h>
+#include <alg/alg_smear.h>
+#include <alg/no_arg.h>
 
 CPS_START_NAMESPACE
 
@@ -88,6 +95,11 @@ QPropW::QPropW(Lattice& lat, CommonArg* c_arg): Alg(lat, c_arg) {
   
   prop = NULL;
   midprop = NULL;
+
+  // YA
+  lat_back = NULL;
+  link_status_smeared = false;
+  sink_type = POINT;
 }
 QPropW::QPropW(Lattice& lat, QPropWArg* arg, CommonArg* c_arg): 
   Alg(lat, c_arg) {
@@ -100,6 +112,11 @@ QPropW::QPropW(Lattice& lat, QPropWArg* arg, CommonArg* c_arg):
   prop = NULL;
   midprop = NULL;
   propls = NULL;
+
+  // YA
+  lat_back = NULL;
+  link_status_smeared = false;
+  sink_type = POINT;
 
   //-----------------------------------------------------------------
   // TY Add Start
@@ -152,6 +169,11 @@ QPropW::QPropW(const QPropW& rhs):Alg(rhs),midprop(NULL),prop(NULL) {
 	  midprop[i] = rhs.midprop[i];
   }
 
+  // YA
+  lat_back = NULL;
+  link_status_smeared = false;
+  sink_type = rhs.sink_type;
+
   //-----------------------------------------------------------------
   // TY Add Start
   propls = rhs.propls;
@@ -180,6 +202,12 @@ QPropW& QPropW::operator=(const QPropW& rhs) {
 	}
   
     qp_arg = rhs.qp_arg;
+
+    // YA
+    lat_back = NULL;
+    link_status_smeared = false;
+    sink_type = rhs.sink_type;
+
   }
   
   return *this;
@@ -194,6 +222,10 @@ QPropW::QPropW(QPropW& prop1, QPropW& prop2):Alg(prop1)
 
    prop = NULL;
    midprop = NULL;
+   // YA
+   lat_back = NULL;
+   link_status_smeared = false;
+   sink_type = prop1.sink_type;
 
    Allocate(PROP);
    for (int i=0; i<GJP.VolNodeSites(); i++)
@@ -245,6 +277,13 @@ void QPropW::Run() {
    }
    -------------------- End of quarantine -------------------------*/ 
 
+  //-----------------------------------------------------------------
+  // TY Add Start
+   // we need to store the source
+   Float *save_source=NULL;
+  // TY Add End
+  //-----------------------------------------------------------------
+
    if (do_cg) {
 
      Allocate(PROP); 
@@ -268,6 +307,10 @@ void QPropW::Run() {
      for ( int i = 0; i < glb_walls; i++) *flt_p++ = 0.0;
 
      spnclr_cnt = 0;
+
+   // we need to store the source
+     if (qp_arg.save_prop) 
+       save_source = (Float*)smalloc(GJP.VolNodeSites()*288*sizeof(Float));
   // TY Add End
   //-----------------------------------------------------------------
 
@@ -282,6 +325,19 @@ void QPropW::Run() {
 		 if ((DoHalfFermion())&&(!seq_src)) // Rotate to chiral basis
 		   src.DiracToChiral();
 		 
+
+		 // store the source
+		 if (qp_arg.save_prop) {
+		 for(int index(0); index < GJP.VolNodeSites(); ++index)
+                  for(int mm(0); mm < 4; ++ mm)
+                    for(int cc(0); cc < GJP.Colors(); ++cc){
+                      // now same ordering as propagator [volume][spin][color][solution_spin][solution_color][ReIm]
+                      *(save_source + 288*index + 72*mm + 24*cc + 6*spn + 2*col)       = src[24*index + 6*mm + 2*cc];
+                      *(save_source + 288*index + 72*mm + 24*cc + 6*spn + 2*col + 1)   = src[24*index + 6*mm + 2*cc+1];
+		    }
+		 }
+
+
 		 // Get the prop
 		 printf("Before CG in QpropW.Run() \n");
 		 CG(src, sol, midsol, iter, true_res);
@@ -348,7 +404,21 @@ void QPropW::Run() {
 
    // save prop
    if (do_cg && qp_arg.save_prop) {
-     SaveQProp(qp_arg.file,PROP); 
+#ifdef USE_QIO
+     int argc=0; 
+     char** argv=NULL;
+     char propType[256], sourceType[256], tmp_filename[256];
+
+     sprintf(propType,"4D propagator, mass = %f", qp_arg.cg.mass);
+     sprintf(sourceType, "fullSource");
+     strcpy(tmp_filename, qp_arg.file);
+
+     qio_writePropagator writePropQio(tmp_filename, QIO_FULL_SOURCE, &prop[0], save_source,
+				qp_arg.ensemble_id, qp_arg.ensemble_label, qp_arg.seqNum, propType, sourceType,
+				argc, argv, VOLFMT);
+#endif // USE_QIO
+     sfree(save_source);
+   //SaveQProp(qp_arg.file,PROP); 
    }
 }
 
@@ -424,11 +494,12 @@ void QPropW::Run_saveQIO(const char *filename, const char *label, const char *id
 
 		 // store the source
 		 for(int index(0); index < GJP.VolNodeSites(); ++index)
-		  for(int spn_src(0); spn_src < 4; ++ spn_src)
-		    for(int col_src(0); col_src < GJP.Colors(); ++col_src){
-		      *(save_source + 288*index+72*spn+24*col+6*spn_src+2*col_src) = src[24*index+6*spn_src+2*col_src]; 
-		      *(save_source + 288*index+72*spn+24*col+6*spn_src+2*col_src+1) = src[24*index+6*spn_src+2*col_src+1]; 
-		     }
+                  for(int mm(0); mm < 4; ++ mm)
+                    for(int cc(0); cc < GJP.Colors(); ++cc){
+                      // now same ordering as propagator [volume][spin][color][solution_spin][solution_color][ReIm]
+                      *(save_source + 288*index + 72*mm + 24*cc + 6*spn + 2*col)        = src[24*index + 6*mm + 2*cc];
+                      *(save_source + 288*index + 72*mm + 24*cc + 6*spn + 2*col + 1)   = src[24*index + 6*mm + 2*cc+1];
+		    }
 		 
 		 // Get the prop
 		 printf("Before CG in QpropW.Run() \n");
@@ -858,6 +929,11 @@ QPropW::~QPropW() {
   //  VRB.Sfree(cname, fname, "Arg.file", qp_arg.file);
   //  sfree(Arg.file);
   // }
+
+  // YA 
+  //UndoLinkSmear(); // set original link back if replaced with smeared link
+  if( lat_back )
+    delete[] lat_back;
 }
 
 void QPropW::SaveQProp(char* name, int mid) {
@@ -906,46 +982,36 @@ void QPropW::RestoreQProp(char* name, int mid) {
   char *fname = "RestoreQProp()";
   VRB.Func(cname, fname);
 
-   /****************************************************************
-     The code below is temporarily isolated for purposes of merging
-     with CPS main branch,  12/09/04, Oleg Loktik 
-   -------------------- Quarantine starts --------------------------
+  if( prop == NULL ) Allocate(PROP);
 
-  if (! mid) {
+  // we need to store the source
+  Float *read_source = (Float*)smalloc(GJP.VolNodeSites()*288*sizeof(Float));
+#ifdef USE_QIO
+     int argc=0; 
+     char** argv=NULL;
+     char tmp_filename[256];
 
-    Allocate(PROP) ;
-    
-    unsigned int* data;
-    data = (unsigned int*)prop;
-    read_data(name, data, GJP.VolNodeSites() * sizeof(WilsonMatrix),0);
+     strcpy(tmp_filename, qp_arg.file);
 
-    if (common_arg->results != 0) {
-      FILE *fp;
-      if ( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
-	ERR.FileA(cname,fname, (char *)common_arg->results);
-      }
-      Fprintf(fp, "Read prop from file %s\n", name);
-      Fclose(fp);
-    }
-  } else {
-    
-    Allocate(MIDPROP) ;
-    unsigned int* data;
-    data = (unsigned int*)midprop;
-    read_data(name, data, GJP.VolNodeSites() * sizeof(WilsonMatrix),0);
+     qio_readPropagator readPropQio(tmp_filename, QIO_FULL_SOURCE, &prop[0], read_source,
+				argc, argv, VOLFMT);
+#endif // USE_QIO
+  sfree(read_source);
 
-    if (common_arg->results != 0) {
-      FILE *fp;
-      if ( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
-	ERR.FileA(cname,fname, (char *)common_arg->results);
-      }
-      Fprintf(fp, "Read mid-point prop from file %s\n", name);
-      Fclose(fp);
+  // Flag set if sequential propagator 
+  int seq_src = ((SrcType()==PROT_U_SEQ)||
+		 (SrcType()==PROT_D_SEQ)||
+		 (SrcType()==MESSEQ));
+
+  if(seq_src) {
+    Site s;
+    for (s.Begin();s.End();s.nextSite()) {
+      QPropW::operator[](s.Index()).gl(-5);
+      QPropW::operator[](s.Index()).hconj();
     }
   }
-  -------------------- Quarantine ends ----------------------------*/
-
 }
+
   //-----------------------------------------------------------------
   // TY Add Start
 // Save 5d prop at each ls
@@ -1221,12 +1287,12 @@ void QPropW::SwapQPropLs() {
 
   if(qp_arg.save_ls_prop == 2){
     int f_size = sizeof(WilsonMatrix) * GJP.VolNodeSites() / sizeof(Float);
-    int ls;
+//    int ls;
 
     for(int ls=0; ls<GJP.SnodeSites(); ls++){
       int s_local = ls % GJP.SnodeSites();
       int s_node = ls / GJP.SnodeSites();
-      int l_local = ( ls + GJP.SnodeSites() ) % GJP.SnodeSites();
+//      int l_local = ( ls + GJP.SnodeSites() ) % GJP.SnodeSites();
       int l_node = ( ls + GJP.SnodeSites() ) / GJP.SnodeSites();
       // for(int s=0; s<GJP.VolNodeSites(); s++) prop[s] = 0.0;
 
@@ -1234,8 +1300,8 @@ void QPropW::SwapQPropLs() {
       int shft = f_size * s_local;
       Float sum;
       Float* field_5D = (Float *) propls;
-      Float* field_4D = (Float *) prop;
-      Float tmp; 
+//      Float* field_4D = (Float *) prop;
+      Float tmp=0.; 
       for(int i=0; i<f_size; i++){
 	// ls=0 to ls=GJP.SnodeCoor()
 	if( s_node == GJP.SnodeCoor() ) sum = field_5D[i+shft];
@@ -1322,7 +1388,7 @@ void QPropW::RestoreOrgProp(char* name, int ls) {
   int Nspin = 4;
   if (DoHalfFermion()) Nspin = 2;
 
-  FILE *fp, *gp;
+  FILE *fp, *gp=NULL;
   if (fp=fopen(sname,"r"))
   if (gp=fopen(lname,"r")) {
     for (int spn=0; spn < Nspin; spn++)
@@ -1540,7 +1606,7 @@ void QPropW::MeasConAxialOld(Vector* sol_5d) {
 
   int prop_dir = 3;
 
-  int fv_size = GJP.Colors() * 4 * 2 * sizeof(Float) * GJP.VolNodeSites();
+//  int fv_size = GJP.Colors() * 4 * 2 * sizeof(Float) * GJP.VolNodeSites();
   int ls_glb = GJP.SnodeSites() * GJP.Snodes();
 
   int LORENTZs(4), lcl_sites[LORENTZs]; 
@@ -1566,8 +1632,8 @@ void QPropW::MeasConAxialOld(Vector* sol_5d) {
  
   int SPINORs = 2 * GJP.Colors() * LORENTZs;
 
-  int glb_walls = lcl_sites[prop_dir];
-  int fsize = glb_walls * sizeof(Float);
+//  int glb_walls = lcl_sites[prop_dir];
+//  int fsize = glb_walls * sizeof(Float);
 
     
   // allocate space for two 4d field 
@@ -1767,6 +1833,138 @@ void QPropW::MeasConAxialOld(Vector* sol_5d) {
   // TY Add End
   //-----------------------------------------------------------------
 
+// YA, this does smearing of the link in the kernel of the Gaussian src smear
+void QPropW::DoLinkSmear(const QPropWGaussArg& gauss_arg) {
+  char *fname = "DoLinkSmear()";
+  VRB.Func(cname, fname);
+
+  Lattice& lattice = AlgLattice();
+  CommonArg ca; // if output of smearing needed, set ca.filename
+
+  if( link_status_smeared || gauss_arg.gauss_link_smear_type == GKLS_NONE ) {
+    return;
+  }
+  if( lat_back != NULL ) {
+    // and as (! link_status_smeared), then lat_back is smeared link
+    // which has been previouly calculated.
+    // rotate lattice <-> lat_back
+
+    Matrix* lat_tmp = new Matrix[GJP.VolNodeSites()*4];
+    if( lat_tmp == NULL ) { ERR.Pointer(cname, cname,"lat_tmp"); }
+    // make the temporal copy of orginal link
+    lattice.CopyGaugeField(lat_tmp);
+    // set the smeared link
+    lattice.GaugeField(lat_back);
+
+    for(int j=0;j<GJP.VolNodeSites()*4;j++) {
+      lat_back[j] = lat_tmp[j];
+    }
+    // now lat_back is orginal & lattice is smeared link
+
+    delete[] lat_tmp;
+  
+  } else { // then calculate smeared link
+
+    // print plaq before smearing
+    NoArg no_arg;
+    AlgPlaq ap(lattice,common_arg,&no_arg);
+    if (common_arg->results != 0) {
+      FILE *fp;
+      if ((fp = Fopen((char *)common_arg->results, "a")) == NULL) {
+	ERR.FileA(cname,fname, (char *)common_arg->results);
+      }
+      Fprintf(fp, "QPropW::DoLinkSmear():Plaq_before ");
+      Fclose(fp);
+    }
+    ap.run();
+
+    lat_back = new Matrix[GJP.VolNodeSites()*4];
+    if( lat_back == NULL ) { ERR.Pointer(cname, cname,"lat_back"); }
+    // make the copy of orginal link
+    lattice.CopyGaugeField(lat_back);
+
+    // AlgSmear* as(NULL);
+    // we could use pointer and then run after selection of smearing scheme,
+    // if AlgSmear::run() were a virtual function.
+
+    switch(gauss_arg.gauss_link_smear_type) {
+      /*
+    case GKLS_NONE:
+      // actually this already returned
+      return;
+      break;
+      */
+    case GKLS_APE:
+      {
+	ApeSmearArg asa;
+	asa.coef = gauss_arg.gauss_link_smear_coeff;
+	asa.orthog = 3; // set the smear orthogonal direction to temporal
+	AlgApeSmear as(lattice,&ca,&asa,1);
+	for(int i=0;i<gauss_arg.gauss_link_smear_N;i++)
+	  as.run();
+      }
+      break;
+    case GKLS_STOUT:
+      ERR.NotImplemented(cname,fname, "GKLS_STOUT yet to implement");
+      /*
+	StoutSmearArg asa;
+	asa.rho = action_link_smear_coeff;
+	as = new AlgStoutSmear(lattice,&ca,&asa);
+	break;
+      */
+      break;
+    default:
+      ERR.General(cname,fname, "unknown qp_arg.gauss_link_smear_type=%d",\
+		  gauss_arg.gauss_link_smear_type);
+    }
+
+    // print plaq after smear
+    if (common_arg->results != 0) {
+      FILE *fp;
+      if ((fp = Fopen((char *)common_arg->results, "a")) == NULL) {
+	ERR.FileA(cname,fname, (char *)common_arg->results);
+      }
+      Fprintf(fp, "QPropW::DoLinkSmear():Plaq_after  ");
+      Fclose(fp);
+    }
+    ap.run();
+  }
+
+  link_status_smeared=true;
+}
+
+// YA, use this to set back the original link which has been replaced with
+//    the smeared link for the Gaissian src smearing.
+//    The smeared link is kept in lat_back.
+void QPropW::UndoLinkSmear(const QPropWGaussArg& gauss_arg) {
+  char *fname = "UndoLinkSmear()";
+  VRB.Func(cname, fname);
+
+  if( (! link_status_smeared) || gauss_arg.gauss_link_smear_type == GKLS_NONE ) {
+    return;
+  }
+  // then lattice is smeared link & lat_back is original link
+  // now rotate lattice <-> lat_back
+  Lattice& lattice = AlgLattice();
+  if( lat_back == NULL )
+    ERR.General(cname,fname, "lat_back=NULL, DoLinkSmear never called");
+  Matrix* lat_tmp = new Matrix[GJP.VolNodeSites()*4];
+  if( lat_tmp == NULL ) { ERR.Pointer(cname, cname,"lat_tmp"); }
+  // make the temporal copy of smeared link
+  lattice.CopyGaugeField(lat_tmp);
+  // set the original link back
+  lattice.GaugeField(lat_back);
+
+  for(int j=0;j<GJP.VolNodeSites()*4;j++) {
+    lat_back[j] = lat_tmp[j];
+  }
+  // now lat_back is smeared & lattice is original link
+
+  delete[] lat_tmp;
+  
+  link_status_smeared=false;
+}
+
 
 
 //HueyWen and Peter
@@ -1785,8 +1983,8 @@ QPropWGFLfuncSrc::QPropWGFLfuncSrc(Lattice &lat,
    // Set the node size of the full (non-checkerboarded) fermion field
    //----------------------------------------------------------------
    int f_size = GJP.VolNodeSites() * lat.FsiteSize()/GJP.SnodeSites();
-   int iter;
-   Float true_res;
+   int iter=0;
+   Float true_res=0.;
 
    // allocate space for the quark propagator
    //----------------------------------------------------------------
@@ -1934,6 +2132,17 @@ QPropWGaussSrc::QPropWGaussSrc(QPropW& prop1) :
   // VRB.Func(cname, fname);
   gauss_arg = prop1.GaussArg();
 }
+
+
+QPropWGaussSrc::QPropWGaussSrc(Lattice& lat,  QPropWArg* arg, QPropWGaussArg *g_arg, CommonArg* c_arg, char* dummy):
+QPropW(lat, arg, c_arg),gauss_arg(*g_arg)
+{
+  //char *fname = "QPropWGaussSrc(L&, QPropWArg*, ComArg*)";
+  //cname = "QPropWGaussSrc";
+  //VRB.Func(cname, fname);
+}
+
+
 //Set gaussian source
 void QPropWGaussSrc::SetSource(FermionVectorTp& src, int spin, int color)
 {
@@ -1942,7 +2151,9 @@ void QPropWGaussSrc::SetSource(FermionVectorTp& src, int spin, int color)
 
   src.ZeroSource();
   src.SetPointSource(color, spin, qp_arg.x,qp_arg.y,qp_arg.z,qp_arg.t);
+  DoLinkSmear(gauss_arg);  // YA: smear link if needed
   src.GaussianSmearVector(AlgLattice(),spin, gauss_arg.gauss_N, gauss_arg.gauss_W, qp_arg.t);
+  UndoLinkSmear(gauss_arg); // YA: get back the original link
 }
 
 // Smear the sink of a propagator
@@ -1950,6 +2161,8 @@ void QPropW::GaussSmearSinkProp(int t_sink, const QPropWGaussArg &gauss_arg){
   Site site; 
   FermionVectorTp tmp ;
   WilsonMatrix wm ;
+
+  DoLinkSmear(gauss_arg); // YA: smear link if needed
   for(int spin(0);spin<4;spin++)
     for(int color(0);color<3;color++){    
       //Copy to FermionVector
@@ -1964,6 +2177,8 @@ void QPropW::GaussSmearSinkProp(int t_sink, const QPropWGaussArg &gauss_arg){
         prop[site.Index()].load_row(spin,color,(wilson_vector &)tmp[i]);
       }
     }
+  UndoLinkSmear(gauss_arg); // YA: get original link back
+
   qp_arg.SeqSmearSink=GAUSS_GAUGE_INV ;
   // This is a little dangerous. It's up to the user to know which
   // sink time slice is smeared. For the moment it's OK
@@ -1974,6 +2189,8 @@ void QPropW::GaussSmearSinkProp(const QPropWGaussArg &gauss_arg){
   Site site; 
   FermionVectorTp tmp ;
   WilsonMatrix wm ;
+
+  DoLinkSmear(gauss_arg); // YA: smear link if needed
   for(int spin(0);spin<4;spin++)
     for(int color(0);color<3;color++){    
       //Copy to FermionVector
@@ -1988,6 +2205,8 @@ void QPropW::GaussSmearSinkProp(const QPropWGaussArg &gauss_arg){
         prop[site.Index()].load_row(spin,color,(wilson_vector &)tmp[i]);
       }
     }
+  UndoLinkSmear(gauss_arg); // YA: get original link back
+
   qp_arg.SeqSmearSink=GAUSS_GAUGE_INV ;
   // This is a little dangerous. It's up to the user to know which
   // sink time slice is smeared. For the moment it's OK
@@ -2059,7 +2278,9 @@ void QPropWMultGaussSrc::SetSource(FermionVectorTp& src, int spin, int color)
 
   for(int nt(0); nt<gauss_arg.nt; nt++){
   src.SetPointSource(color, spin, qp_arg.x,qp_arg.y,qp_arg.z,gauss_arg.mt[nt]);
+  DoLinkSmear(gauss_arg); // YA: smear link if needed
   src.GaussianSmearVector(AlgLattice(),spin, gauss_arg.gauss_N, gauss_arg.gauss_W, gauss_arg.mt[nt]);
+  UndoLinkSmear(gauss_arg); // YA: get back the original link
   }
 }
 
@@ -2148,6 +2369,12 @@ QPropWMomSrc::QPropWMomSrc(Lattice& lat,  QPropWArg* arg,
   char *fname = "QPropWMomSrc(L&, QPropWArg*, ComArg*)";
   cname = "QPropWMomSrc";
   VRB.Func(cname, fname);
+
+//------------------------------------------------------------------
+// T.Y Add
+  qp_arg = *arg;
+// T.Y Add
+//------------------------------------------------------------------
 
   Run();
 }
@@ -2782,12 +3009,14 @@ void QPropWSeqProtDSrc::SetSource(FermionVectorTp& src, int spin, int color) {
 	  src.GFWallSource(AlgLattice(), ss, 3, qp_arg.t);
   }
   if(quark.SeqSmearSink()==GAUSS_GAUGE_INV){
+  DoLinkSmear(gauss_arg);  // YA: smear link if needed
   for(int nt=0; nt<gauss_arg.nt; nt++){
     for(int ss=0;ss<4;ss++)
       src.GaussianSmearVector(AlgLattice(),ss,
-                              gauss_arg.gauss_N,gauss_arg.gauss_W,gauss_arg.mt[nt]);
+                              quark.GaussArg().gauss_N,quark.GaussArg().gauss_W,gauss_arg.mt[nt]);
     //source sink smearing is the same
   }
+  UndoLinkSmear(gauss_arg); // YA: get back the original link
   }
 }
 
@@ -2882,12 +3111,14 @@ void QPropWSeqProtUSrc::SetSource(FermionVectorTp& src, int spin, int color) {
 	  src.GFWallSource(AlgLattice(), ss, 3, qp_arg.t);
   }
   if(quark.SeqSmearSink()==GAUSS_GAUGE_INV){
+  DoLinkSmear(gauss_arg);  // YA: smear link if needed
   for(int nt=0; nt<gauss_arg.nt; nt++){
     for(int ss=0;ss<4;ss++)
       src.GaussianSmearVector(AlgLattice(),ss,
-                              gauss_arg.gauss_N,gauss_arg.gauss_W,gauss_arg.mt[nt]);
+                              quark.GaussArg().gauss_N,quark.GaussArg().gauss_W,gauss_arg.mt[nt]);
     //source sink smearing is the same
   }
+  UndoLinkSmear(gauss_arg); // YA: get back the original link
   }
 }
 
@@ -2908,18 +3139,26 @@ int QPropW::siteOffset(const int lcl[], const int lcl_sites[]) const
 
 int QPropW::BoxSrcStart() const{
   ERR.NotImplemented(cname,"BoxSrcStart()");
+  return 0;
 }
 int QPropW::BoxSrcEnd() const{
   ERR.NotImplemented(cname,"BoxSrcEnd()");
+  return 0;
 }
+
+static  QPropWGaussArg dummy_arg;
 const QPropWGaussArg &QPropW::GaussArg(void){
   ERR.NotImplemented(cname,"GaussArg()");
+  //dummy code to get rid or warnings
+  return dummy_arg;
 }
 int QPropW::Gauss_N() const{
   ERR.NotImplemented(cname,"Gauss_N()");
+  return 0;
 }
 Float QPropW::Gauss_W() const{
   ERR.NotImplemented(cname,"Gauss_W()");
+  return 0;
 }
 
 CPS_END_NAMESPACE

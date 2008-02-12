@@ -1096,4 +1096,41 @@ struct vml_enum_map RationalBoundsType_map[] = {
 	{"RationalBoundsType","RATIONAL_BOUNDS_MANUAL",RATIONAL_BOUNDS_MANUAL},
 	{NULL,NULL,0}
 };
+
+bool_t
+vml_StaticBActionLinkSmearType (VML *vmls, char *name,StaticBActionLinkSmearType *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,StaticBActionLinkSmearType_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map StaticBActionLinkSmearType_map[] = {
+	{"StaticBActionLinkSmearType","SB_ALS_NONE",SB_ALS_NONE},
+	{"StaticBActionLinkSmearType","SB_ALS_APE",SB_ALS_APE},
+	{"StaticBActionLinkSmearType","SB_ALS_APE_NO_PROJ",SB_ALS_APE_NO_PROJ},
+	{"StaticBActionLinkSmearType","SB_ALS_APE_OLEG",SB_ALS_APE_OLEG},
+	{"StaticBActionLinkSmearType","SB_ALS_HYP_HK",SB_ALS_HYP_HK},
+	{"StaticBActionLinkSmearType","SB_ALS_HYP_L",SB_ALS_HYP_L},
+	{"StaticBActionLinkSmearType","SB_ALS_HYP_2",SB_ALS_HYP_2},
+	{"StaticBActionLinkSmearType","SB_ALS_STOUT",SB_ALS_STOUT},
+	{NULL,NULL,0}
+};
+
+bool_t
+vml_GaussianKernelLinkSmearType (VML *vmls, char *name,GaussianKernelLinkSmearType *objp)
+{
+	register int32_t *buf;
+
+	if (!vml_enum (vmls,name,(enum_t *)objp,GaussianKernelLinkSmearType_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map GaussianKernelLinkSmearType_map[] = {
+	{"GaussianKernelLinkSmearType","GKLS_NONE",GKLS_NONE},
+	{"GaussianKernelLinkSmearType","GKLS_APE",GKLS_APE},
+	{"GaussianKernelLinkSmearType","GKLS_STOUT",GKLS_STOUT},
+	{NULL,NULL,0}
+};
 CPS_END_NAMESPACE

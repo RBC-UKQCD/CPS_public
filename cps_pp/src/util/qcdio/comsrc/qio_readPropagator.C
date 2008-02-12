@@ -3,6 +3,16 @@
 
 
 
+// adapted functions to Qpropw-class
+// 
+// assuming ordering of propagator object:
+// 
+// [volume][sink_spin][sink_color][source_spin][source_color][ReIm]
+// (volume slowest, ReIm fastest)
+//
+// ees, 02/05/08
+
+
 
 
 
@@ -15,9 +25,9 @@ using namespace std;
 void qio_putTmpSource(char *buf, size_t index, int count, void *arg)
 {
   Float *prop = (Float *)arg; 
-  Float *array = prop + index*count; 
+  Float *array = prop + index*2*count; 
   Float *src_array = (Float *)buf;
-  for(int ii(0); ii < count; ++ii) 
+  for(int ii(0); ii < 2*count; ++ii) 
     *(array + ii) = *(src_array + ii); 
 
 }
@@ -25,9 +35,9 @@ void qio_putTmpSource(char *buf, size_t index, int count, void *arg)
 void qio_putTmpSourceSingle(char *buf, size_t index, int count, void *arg)
 {
   double *prop = (double *)arg; 
-  double *array = prop + index*count; 
+  double *array = prop + index*2*count; 
   float *src_array = (float *)buf;
-  for(int ii(0); ii < count; ++ii) 
+  for(int ii(0); ii < 2*count; ++ii) 
     *(array + ii) = *(src_array + ii); 
 
 }
@@ -36,14 +46,18 @@ void qio_putTmpSourceSingle(char *buf, size_t index, int count, void *arg)
 #define QIO_PUTPROP_BASIC(SOURCE_SPIN, SOURCE_COLOR)\
 \
 {\
+ /*printf(" called putprop with count %i\n",count);*/ \
+\
  Float *prop = (Float *)arg; \
 \
- Float *array = prop + index*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*count + SOURCE_SPIN*QIO_PROP_COLOR_MAX*count + SOURCE_COLOR*count; \
+ Float *array = prop + index*2*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*count + 2*SOURCE_COLOR + 2*QIO_PROP_COLOR_MAX*SOURCE_SPIN;\
 \
  Float *src_array = (Float *)buf;\
 \
- for(int ii(0); ii < count; ++ii) \
-  *(array + ii) = *(src_array + ii); \
+ for(int ii(0); ii < count; ++ii){ \
+  *(array + 2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*ii )  = *(src_array + 2*ii );\
+\
+  *(array + 2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*ii + 1 )  = *(src_array + 2*ii+ 1 ); }\
 \
 }
 
@@ -55,10 +69,12 @@ void qio_putTmpSourceSingle(char *buf, size_t index, int count, void *arg)
 \
  double *prop = (double *)arg; \
 \
- double *array = prop + index*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*count + SOURCE_SPIN*QIO_PROP_COLOR_MAX*count + SOURCE_COLOR*count; \
+ double *array = prop + index*2*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*count + 2*SOURCE_COLOR + 2*QIO_PROP_COLOR_MAX*SOURCE_SPIN;\
 \
- for(int ii(0); ii < count; ++ii) \
-    *(array +ii) = *(src_array + ii); \
+ for(int ii(0); ii < count; ++ii){ \
+  *(array + 2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*ii )  = *(src_array + 2*ii );\
+\
+  *(array + 2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*ii + 1 )  = *(src_array + 2*ii + 1 ); }\
 \
 }
 
@@ -143,69 +159,6 @@ void qio_putPropSingle_SpinColor(3,2) (char *buf, size_t index, int count, void 
   QIO_PUTPROP_SINGLE_BASIC(3,2)
 
 
- 
-
-// old functions for whole propagator in one record
-
-void qio_putProp(char *buf, size_t index, int count, void *arg)
-{
-
-
-  #ifdef DEBUG_PutProp
-  printf("UID: %i, called qio_putProp with index: %i, count: %i\n",UniqueID(), index, count);
-  #endif // DEBUG_PutProp
-
-  Float *prop = (Float *) arg;  
-
-  Float *array = prop + index * count;
-
-  Float *src_array = (Float *) buf;
-
-  for(int ii(0); ii < count; ++ii)
-    {
-      #ifdef DEBUG_PutProp
-      printf("UID: %i, qio_putProp value at %i before: %f\n",UniqueID(), ii, *(array +ii));
-      #endif // DEBUG_PutProp
-      *(array + ii) = *(src_array + ii);
-      #ifdef DEBUG_PutProp
-      printf("UID: %i, qio_putProp value at %i after : %f\n",UniqueID(), ii, *(array +ii));
-      #endif // DEBUG_PutProp
-    }
-
-  #ifdef DEBUG_PutProp
-  printf("UID: %i, finished qio_putProp (called with index: %i, count: %i)\n",UniqueID(), index, count);
-  #endif // DEBUG_PutProp
-   
-  
-
-}
-
-
-
-
-void qio_putPropSingle(char *buf, size_t index, int count, void *arg)
-{
-  
-  #ifdef DEBUG_PutProp
-  printf("UID: %i, called qio_putPropSingle with index: %i, count: %i\n",UniqueID(), index, count);
-  #endif // DEBUG_PutProp
-
-  float *src_array = (float *)buf;
-
-  double *prop = (double *)arg;
-
-  double *array = prop + index*count;
-
-  for(int ii(0); ii < count; ++ii)
-    *(array +ii) = *(src_array + ii);
-
-  #ifdef DEBUG_PutProp
-  printf("UID: %i, finished qio_putPropSingle (called with index: %i, count: %i)\n",UniqueID(), index, count);
-  #endif // DEBUG_PutProp
-    
-  
- 
-}
 
 
 // calls for ScalarSource
@@ -493,18 +446,19 @@ void qio_readPropagator::read_12pairs(char *infile, void *prop, void *source, co
      //Float tmpSrc[GJP.VolNodeSites()][source_size][2];
      //return_val += qio_readTmpSourceRecord(2*source_size, &tmpSrc[0][0][0]);
      
-     return_val += qio_readTmpSourceRecord(2*source_size, tmpSrc);
+     return_val += qio_readTmpSourceRecord(source_size, tmpSrc);
 
      // read next source record -> spin, color, precision
      //return_val += qio_readNextSourcePairRecord(2*source_size, rsource, readSpin, readColor);
 
      
      // read next sink record (pass spin, color) -> precision
-     return_val += qio_readNextPropPairRecord(2*sizepersite, rprop, readSpin, readColor);
+     return_val += qio_readNextPropPairRecord(sizepersite, rprop, readSpin, readColor);
 
      // now move tmpSrc to right position (spin, color)
      for(int site(0); site < GJP.VolNodeSites(); ++site){
-		 
+	
+       /*
        Float *putSource = rsource + site*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*2*source_size + readSpin*QIO_PROP_COLOR_MAX*2*source_size + readColor*2*source_size ;
        for(int ii(0); ii < source_size; ++ii) {	   
 	 //*(putSource + 2*ii ) =  tmpSrc[site][ii][0];
@@ -512,9 +466,64 @@ void qio_readPropagator::read_12pairs(char *infile, void *prop, void *source, co
 	 *(putSource + 2*ii ) =  *(tmpSrc + 2*source_size*site + 2*ii);
 	 *(putSource + 2*ii + 1 ) =  *(tmpSrc + 2*source_size*site + 2*ii + 1);
        }
+       */
+
+       Float *putSource = rsource + site*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*2*source_size + 2*readSpin*QIO_PROP_COLOR_MAX+2*readColor;
+       for(int ii(0); ii < source_size; ++ii){
+	 *(putSource +2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*ii) = *(tmpSrc + 2*source_size*site + 2*ii);
+	 *(putSource +2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*ii + 1 ) = *(tmpSrc + 2*source_size*site + 2*ii + 1 );
+       }
+       
+
      }
        
-       
+
+#ifdef DEBUG_PAIRRECORD
+     // only works if S-direction is local
+
+     printf(" checking for source-index %i %i...\n",readSpin, readColor);
+
+     Float err_cnt(0.);
+
+     for(int site(0); site < GJP.VolNodeSites(); ++site){
+       for( int mm(0); mm < 4; ++mm)
+	 for( int cc(0); cc < 3; ++cc){
+	   
+	   Float index = ( readColor + 3*readSpin + 12*cc + 36*mm)/144.; 
+
+	   Float *tmp_r = rprop +     2*readColor + 6*readSpin + 24*cc + 72*mm + 288*site;  
+	   Float *tmp_i = rprop + 1 + 2*readColor + 6*readSpin + 24*cc + 72*mm + 288*site;  
+	   
+
+	   if( (fabs(*tmp_r - site - index) > 1e-5) || (fabs(*tmp_i - site +index) > 1e-5 ) ){
+	     ++ err_cnt;
+	     printf("mismatch propagator at %i %i %i %i %i, read: (%f, %f) expected: (%f, %f)\n",site, mm, cc, readSpin, readColor, *tmp_r, *tmp_i, (site+index), (site-index));
+	   }
+	 }
+
+       for( int ii(0); ii < source_size; ++ii){
+
+	 Float index = ( readColor + 3*readSpin + 12*ii)/144.;
+
+	 Float *tmp_r = rsource +     2*readColor + 6*readSpin + 24*ii + 24*source_size*site;  
+	 Float *tmp_i = rsource + 1 + 2*readColor + 6*readSpin + 24*ii + 24*source_size*site;  
+	   
+
+	 if( (fabs(*tmp_r - site - index) > 1e-5) || (fabs(*tmp_i - site +index) > 1e-5 ) ){
+	   ++ err_cnt;
+	   printf("mismatch source at %i %i %i %i, read: (%f, %f) expected: (%f, %f)\n",site, ii, readSpin, readColor, *tmp_r, *tmp_i, (site+index), (site-index));
+	 }
+	 
+       } 
+
+     }
+
+     glb_sum_five(&err_cnt);
+
+      printf(" ...error-cnt: %f\n",err_cnt);
+
+#endif      
+ 
 
 
    }
@@ -687,12 +696,66 @@ void qio_readPropagator::read_ScS_12sink(char *infile, void *prop, void *source,
 
 	 case 'D':
 	   
-	   return_val += QIO_read(qio_Input, record_source, record_xml_source, qio_putScSource, 2*sizeof(Float), sizeof(Float), rsource);
+	   return_val += QIO_read(qio_Input, record_source, record_xml_source, qio_putScSource, 2*sizeof(Float), 2*sizeof(Float), rsource);
 
+#ifdef DEBUG_PAIRRECORD
+	   // only works if S-direction is local
+	   {
+	     printf(" checking for source ...\n");
 
-	   for(int ii(0); ii < 12; ++ii)
-	     return_val += qio_readNextPropagatorRecord(2*sizepersite, rprop);
+	     Float err_cnt(0);
 
+	     for(int site(0); site < GJP.VolNodeSites(); ++site){
+
+	       Float *tmp_r = rsource + 2*site;  
+	       Float *tmp_i = rsource + 1 + 2*site;  
+	   
+
+	       if( (fabs(*tmp_r - site ) > 1e-5) || (fabs(*tmp_i + site ) > 1e-5 ) ){
+		 ++ err_cnt;
+		 printf("mismatch source at %i, read: (%f, %f) expected: (%f, %f)\n",site, *tmp_r, *tmp_i, (site), (-site));
+	       }
+
+	     }
+	     glb_sum_five(&err_cnt);
+	     
+	     printf(" ...error-cnt: %f\n",err_cnt);
+	       
+	   }
+#endif //DEBUG_PAIRRECORD
+
+	   for(int ii(0); ii < 12; ++ii){
+
+	     return_val += qio_readNextPropagatorRecord(sizepersite, rprop);
+
+#ifdef DEBUG_PAIRRECORD
+
+	     printf(" checking for source-index, record  %i...\n",ii);
+
+	     Float err_cnt(0.);
+	     
+	     for(int site(0); site < GJP.VolNodeSites(); ++site)
+	       for( int mm(0); mm < 4; ++mm)
+		 for( int cc(0); cc < 3; ++cc){
+	   
+		   Float index = ( ii + 12*cc + 36*mm)/144.; 
+		   
+		   Float *tmp_r = rprop +     2*ii + 24*cc + 72*mm + 288*site;  
+		   Float *tmp_i = rprop + 1 + 2*ii + 24*cc + 72*mm + 288*site;  
+		   
+		   
+		   if( (fabs(*tmp_r - site - index) > 1e-5) || (fabs(*tmp_i - site +index) > 1e-5 ) ){
+		     ++ err_cnt;
+		     printf("mismatch propagator at %i %i %i %i, read: (%f, %f) expected: (%f, %f)\n",site, mm, cc, ii, *tmp_r, *tmp_i, (site+index), (site-index));
+		   }
+		 }
+	     
+	     glb_sum_five(&err_cnt);
+	     
+	     printf(" ...error-cnt: %f\n",err_cnt);
+	     
+#endif //DEBUG_PAIRRECORD
+	   }
 
 	   if ( return_val == 0 )
 	     VRB.Result(cname,fname,"QIO_read (D) successfull...\n");
@@ -705,10 +768,10 @@ void qio_readPropagator::read_ScS_12sink(char *infile, void *prop, void *source,
 
 	 case 'F':
 
-       	   return_val += QIO_read(qio_Input, record_source, record_xml_source, qio_putScSourceSingle, 2*sizeof(float), sizeof(float), rsource);
+       	   return_val += QIO_read(qio_Input, record_source, record_xml_source, qio_putScSourceSingle, 2*sizeof(float), 2*sizeof(float), rsource);
 
 	   for(int ii(0); ii < 12; ++ii)
-	     return_val += qio_readNextPropagatorRecordSingle(2*sizepersite, rprop);
+	     return_val += qio_readNextPropagatorRecordSingle(sizepersite, rprop);
 
 
 	   if ( return_val == 0 )
@@ -978,13 +1041,13 @@ int qio_readPropagator::qio_readNextPropagatorRecord(int datacount, Float *rprop
 	switch(readColor)
 	  {
 	  case 0:
-	    return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,0), datacount*sizeof(Float), sizeof(Float), rprop);
+	    return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,0), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	    break;
 	  case 1:
-	    return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,1), datacount*sizeof(Float), sizeof(Float), rprop);
+	    return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,1), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	    break;
 	  case 2:
-	    return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,2), datacount*sizeof(Float), sizeof(Float), rprop);
+	    return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,2), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	    break;
 	  default:
 	    ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -998,13 +1061,13 @@ int qio_readPropagator::qio_readNextPropagatorRecord(int datacount, Float *rprop
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,0), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,0), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,1), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,1), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,2), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,2), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1018,13 +1081,13 @@ int qio_readPropagator::qio_readNextPropagatorRecord(int datacount, Float *rprop
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,0), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,0), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,1), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,1), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,2), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,2), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1038,13 +1101,13 @@ int qio_readPropagator::qio_readNextPropagatorRecord(int datacount, Float *rprop
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,0), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,0), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,1), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,1), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,2), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,2), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1147,13 +1210,13 @@ int qio_readPropagator::qio_readNextPropagatorRecordSingle(int datacount, Float 
 	switch(readColor)
 	  {
 	  case 0:
-	    return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,0), datacount*sizeof(float), sizeof(float), rprop);
+	    return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,0), 2*datacount*sizeof(float), sizeof(float), rprop);
 	    break;
 	  case 1:
-	    return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,1), datacount*sizeof(float), sizeof(float), rprop);
+	    return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,1), 2*datacount*sizeof(float), sizeof(float), rprop);
 	    break;
 	  case 2:
-	    return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,2), datacount*sizeof(float), sizeof(float), rprop);
+	    return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,2), 2*datacount*sizeof(float), sizeof(float), rprop);
 	    break;
 	  default:
 	    ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1167,13 +1230,13 @@ int qio_readPropagator::qio_readNextPropagatorRecordSingle(int datacount, Float 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,0), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,0), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,1), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,1), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,2), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,2), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1187,13 +1250,13 @@ int qio_readPropagator::qio_readNextPropagatorRecordSingle(int datacount, Float 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,0), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,0), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,1), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,1), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,2), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,2), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1207,13 +1270,13 @@ int qio_readPropagator::qio_readNextPropagatorRecordSingle(int datacount, Float 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,0), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,0), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,1), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,1), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,2), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,2), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1332,13 +1395,13 @@ int qio_readPropagator::qio_readNextPropPairRecord(int datacount, Float *rprop, 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,0), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,0), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,1), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,1), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,2), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(0,2), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1353,13 +1416,13 @@ int qio_readPropagator::qio_readNextPropPairRecord(int datacount, Float *rprop, 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,0), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,0), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,1), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,1), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,2), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(1,2), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1373,13 +1436,13 @@ int qio_readPropagator::qio_readNextPropPairRecord(int datacount, Float *rprop, 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,0), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,0), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,1), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,1), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,2), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(2,2), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1393,13 +1456,13 @@ int qio_readPropagator::qio_readNextPropPairRecord(int datacount, Float *rprop, 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,0), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,0), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,1), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,1), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,2), datacount*sizeof(Float), sizeof(Float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putProp_SpinColor(3,2), 2*datacount*sizeof(Float), sizeof(Float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1430,13 +1493,13 @@ int qio_readPropagator::qio_readNextPropPairRecord(int datacount, Float *rprop, 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,0), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,0), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,1), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,1), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,2), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(0,2), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1451,13 +1514,13 @@ int qio_readPropagator::qio_readNextPropPairRecord(int datacount, Float *rprop, 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,0), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,0), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,1), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,1), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,2), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(1,2), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1471,13 +1534,13 @@ int qio_readPropagator::qio_readNextPropPairRecord(int datacount, Float *rprop, 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,0), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,0), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,1), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,1), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,2), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(2,2), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1491,13 +1554,13 @@ int qio_readPropagator::qio_readNextPropPairRecord(int datacount, Float *rprop, 
 	  switch(readColor)
 	    {
 	    case 0:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,0), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,0), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 1:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,1), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,1), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    case 2:
-	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,2), datacount*sizeof(float), sizeof(float), rprop);
+	      return_val += QIO_read(qio_Input, record, record_xml, qio_putPropSingle_SpinColor(3,2), 2*datacount*sizeof(float), sizeof(float), rprop);
 	      break;
 	    default:
 	      ERR.General(cname, fname, "ERROR QIO: color out of range: %i\n", readColor);
@@ -1603,13 +1666,13 @@ int qio_readPropagator::qio_readTmpSourceRecord(int datacount, Float *rprop)
 
     case 'D':
 
-      return_val += QIO_read(qio_Input, record, record_xml, qio_putTmpSource, datacount*sizeof(Float), sizeof(Float), rprop);
+      return_val += QIO_read(qio_Input, record, record_xml, qio_putTmpSource, 2*datacount*sizeof(Float), sizeof(Float), rprop);
       break;
 
 
     case 'F':
 
-      return_val += QIO_read(qio_Input, record, record_xml, qio_putTmpSourceSingle, datacount*sizeof(float), sizeof(float), rprop);
+      return_val += QIO_read(qio_Input, record, record_xml, qio_putTmpSourceSingle, 2*datacount*sizeof(float), sizeof(float), rprop);
       break;
 
     default:

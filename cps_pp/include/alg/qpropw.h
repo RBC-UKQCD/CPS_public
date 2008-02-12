@@ -35,6 +35,7 @@
 #ifdef USE_QIO
 #include <util/qio_general.h>
 #include <util/qio_writePropagator.h>
+#include <util/qio_readPropagator.h>
 #endif
 
 #define MIDPROP 1
@@ -51,6 +52,12 @@ class QPropW : public Alg  {
 
   //! pointer to 5d prop 
   WilsonMatrix* propls;
+
+  //! pointer to 3d smeared lattice used for Gaussian smearing by YA
+  Matrix* lat_back; // points backup of either original  or smeared link
+  bool link_status_smeared; // shows if "lattice" is smeared
+
+  SourceType sink_type;  // shows sink state by YA
 
 protected:
 
@@ -170,6 +177,10 @@ public:
   // This is for compatibility with the old alg_threept code 
 #define   WallWallProp WallSinkProp
 
+  // Link smaering stuff for the Gaussian Kernel
+  void DoLinkSmear(const QPropWGaussArg &gauss_arg);
+  void UndoLinkSmear(const QPropWGaussArg &gauss_arg);
+
   // operator functions
   
   QPropW& operator=(const QPropW& rhs);
@@ -223,6 +234,7 @@ class QPropWGaussSrc : public QPropW
   QPropWGaussSrc(QPropWGaussSrc& prop1, QPropWGaussSrc& prop2 );
   QPropWGaussSrc(QPropWGaussSrc* prop1, QPropWGaussSrc* prop2 );
   QPropWGaussSrc(QPropW& prop1) ;
+  QPropWGaussSrc(Lattice& lat, QPropWArg* arg, QPropWGaussArg *gauss_arg, CommonArg* c_arg, char*);
   //! copy constructor
   QPropWGaussSrc(const QPropW& rhs):
     QPropW(rhs)

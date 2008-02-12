@@ -103,6 +103,12 @@ vml_QPropWArg (VML *vmls, char *name,QPropWArg *objp)
 		 return FALSE;
 	 if (!vml_SourceType (vmls, "SeqSmearSink", &objp->SeqSmearSink))
 		 return FALSE;
+	 if (!vml_pointer (vmls, "ensemble_label", (char **)&objp->ensemble_label, sizeof (char), (vmlproc_t) vml_char))
+		 return FALSE;
+	 if (!vml_pointer (vmls, "ensemble_id", (char **)&objp->ensemble_id, sizeof (char), (vmlproc_t) vml_char))
+		 return FALSE;
+	 if (!vml_int (vmls, "seqNum", &objp->seqNum))
+		 return FALSE;
 	 vml_class_end(vmls,"QPropWArg",name);
 	return TRUE;
 }
@@ -334,6 +340,12 @@ vml_QPropWGaussArg (VML *vmls, char *name,QPropWGaussArg *objp)
 		 return FALSE;
 	 if (!vml_vector (vmls, "mt", (char *)objp->mt, 5,
 		sizeof (int), (vmlproc_t) vml_int))
+		 return FALSE;
+	 if (!vml_GaussianKernelLinkSmearType (vmls, "gauss_link_smear_type", &objp->gauss_link_smear_type))
+		 return FALSE;
+	 if (!vml_int (vmls, "gauss_link_smear_N", &objp->gauss_link_smear_N))
+		 return FALSE;
+	 if (!vml_Float (vmls, "gauss_link_smear_coeff", &objp->gauss_link_smear_coeff))
 		 return FALSE;
 	 vml_class_end(vmls,"QPropWGaussArg",name);
 	return TRUE;

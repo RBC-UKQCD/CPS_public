@@ -4,7 +4,9 @@
 
   AlgSmear, AlgApeSmear, AlgKineticSmear and AlgHypSmear classes.
   
-  $Id: alg_smear.h,v 1.6 2005-05-03 18:57:37 chulwoo Exp $
+  AlgOlegSmear added by Yasumichi 6/8/07.
+
+  $Id: alg_smear.h,v 1.7 2008-02-12 18:16:30 chulwoo Exp $
 */
 //------------------------------------------------------------------
 #ifndef _ALG_SMEAR_CD_
@@ -73,6 +75,9 @@ public:
   //! get tolerance for the SU(3) projection
   Float get_tol() const { return tolerance; }
 
+  // YA
+  int ifSu3Proj() const {return bool_su3_proj;}
+
 protected:
   
   //! Smear a  link.
@@ -131,8 +136,9 @@ public:
   
   AlgApeSmear(Lattice&     lat,
               CommonArg*   ca ,
-              ApeSmearArg* asa );
-  
+              ApeSmearArg* asa,
+  	      int 	 in_bool_su3_proj=1);
+
   ~AlgApeSmear()
   {;}
   
@@ -263,6 +269,22 @@ protected:
   
 };
 
+class AlgOlegSmear:public AlgApeSmear {
+
+private:
+  
+  char *cname;
+  Matrix* lat_back2 ;
+
+public:
+  AlgOlegSmear(Lattice&     lat,
+	       CommonArg*   ca,
+	       ApeSmearArg* asa);
+  ~AlgOlegSmear();
+
+  Float coef;
+  void run();
+};
 
 CPS_END_NAMESPACE
 #endif /* _ALG_SMEAR_CD_ */

@@ -30,8 +30,6 @@
 #include <comms/sysfunc_cps.h>
 #endif
 
-#include <alg/qio_prop.h>
-
 
 CPS_START_NAMESPACE
 

@@ -38,7 +38,10 @@ QPropWExpArg::QPropWExpArg()
 #endif
 
 QPropWGaussArg::QPropWGaussArg()
-:gauss_N(30),gauss_W(4.35)
+  :gauss_N(30),gauss_W(4.35),
+   gauss_link_smear_type(GKLS_NONE),
+   gauss_link_smear_N(0),
+  gauss_link_smear_coeff(0)
 {};
 
 CPS_END_NAMESPACE

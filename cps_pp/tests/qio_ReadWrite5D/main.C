@@ -27,10 +27,13 @@
    #define DO_scrambleProp
    #define DO_compareProp   
 
+// for use if Lib compiled with DEBUG_PAIRRECORD
+// only works for S-direction local
+#undef DO_recordCheck
 
 
 // if defined writes sg prec. prop.
-#define WRITE_propSG
+#undef WRITE_propSG
 
 #define WRITE_propTypeA
 #define WRITE_propTypeB
@@ -39,6 +42,10 @@
 // B= source sink pairs
 // C= scalarSource sink pairs
 
+
+#ifdef DO_recordCheck
+ #undef DO_compareProp
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -481,8 +488,11 @@ int main(int argc,char *argv[])
       for(int ii(0); ii < GJP.VolNodeSites(); ++ii)
 	for(int jj(0); jj < 12; ++jj)
 	  { 
-	    dummy_scSourcePairs_write[ii][jj][0] = Float(ii);
-	    dummy_scSourcePairs_write[ii][jj][1] = Float(jj);
+	    //dummy_scSourcePairs_write[ii][jj][0] = Float(ii);
+	    //dummy_scSourcePairs_write[ii][jj][1] = Float(jj);
+	    dummy_scSourcePairs_write[ii][jj][0] = Float( ii + jj/144.);
+	    dummy_scSourcePairs_write[ii][jj][1] = Float( ii - jj/144.);
+
 	  }
 	   
 
@@ -505,8 +515,11 @@ int main(int argc,char *argv[])
 	for(int jj(0); jj < 12; ++jj)
 	  for(int kk(0); kk < 12; ++kk)
 	    { 
-	      dummy_fSourcePairs_write[ii][jj][kk][0] = Float(ii);
-	      dummy_fSourcePairs_write[ii][jj][kk][1] = Float(kk)+12*Float(jj);
+	      //dummy_fSourcePairs_write[ii][jj][kk][0] = Float(ii);
+	      //dummy_fSourcePairs_write[ii][jj][kk][1] = Float(kk)+12*Float(jj);
+	      dummy_fSourcePairs_write[ii][jj][kk][0] = Float(ii + (12.*jj + kk)/144.);
+	      dummy_fSourcePairs_write[ii][jj][kk][1] = Float(ii - (12.*jj + kk)/144.);
+
 	    }
 	
 
@@ -560,11 +573,35 @@ int main(int argc,char *argv[])
 	qpropw_arg.cg.Inverter=CG;
 	qpropw_arg.cg.bicgstab_n=0;
 
+#ifdef DO_recordCheck
+	QPropWPointSrc propagator_org(lattice, &qpropw_arg, &common_arg);
+#else
 	QPropWPointSrc propagator(lattice, &qpropw_arg, &common_arg);
+#endif //DO_recordCheck
 
 
 	printf("   **** propagator ready ***** \n");
 
+#ifdef DO_recordCheck
+	printf("   ...now manipulate for test....\n");
+
+	Float propagator[GJP.VolNodeSites()][4][3][4][3][2];
+	
+	// mm1, cc1: sink
+	// mm2, cc2: source
+
+	for(int ii(0); ii< GJP.VolNodeSites(); ++ii)
+	  for(int mm1(0); mm1< 4; ++mm1)
+	    for(int cc1(0); cc1 < 3; ++cc1)
+	      for(int mm2(0); mm2 < 4; ++mm2)
+		for(int cc2(0); cc2 < 3; ++ cc2){
+		  
+		  Float index = (cc2 + 3*mm2 + 12*cc1 + 36*mm1)/144.;
+
+		  propagator[ii][mm1][cc1][mm2][cc2][0] = ii + index;
+		  propagator[ii][mm1][cc1][mm2][cc2][1] = ii - index;
+		}
+#endif //DO_recordCheck
 
 	printf("   ---- starting QIO-part ----- \n");
 

@@ -63,6 +63,9 @@ public:
 	int save_ls_prop;
 	int do_half_fermion;
 	SourceType SeqSmearSink;
+	char *ensemble_label;
+	char *ensemble_id;
+	int seqNum;
 	   QPropWArg (  ) ;
 };
 
@@ -142,6 +145,9 @@ public:
 	Float gauss_W;
 	int nt;
 	int mt[5];
+	GaussianKernelLinkSmearType gauss_link_smear_type;
+	int gauss_link_smear_N;
+	Float gauss_link_smear_coeff;
 	   QPropWGaussArg (  ) ;
 };
 

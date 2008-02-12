@@ -4,7 +4,7 @@
 
   AlgSmear, AlgApeSmear, AlgKineticSmear and AlgHypSmear classes.
   
-  $Id: alg_smear.C,v 1.6 2005-05-03 20:22:37 chulwoo Exp $
+  $Id: alg_smear.C,v 1.7 2008-02-12 18:16:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 #include <config.h>
@@ -340,8 +340,9 @@ void lepage_staple( Lattice& latt,  Matrix& link ,
 
 AlgApeSmear::AlgApeSmear(Lattice&     lat,
             CommonArg*   ca ,
-            ApeSmearArg* asa ):
-  AlgSmear(lat,ca,1),
+            ApeSmearArg* asa,
+	    int 	 in_bool_su3_proj):
+  AlgSmear(lat,ca,in_bool_su3_proj),
   cname("AlgApeSmear")
 {
   c = asa->coef;
@@ -359,7 +360,11 @@ void AlgApeSmear::run()
   if(common_arg->filename != 0){
     FILE* f = Fopen(common_arg->filename, "a");
     if(!f) ERR.FileA(cname, "run", common_arg->filename);
-    Fprintf(f,"AlgApeSmear: coef = %e \n",c);
+    Fprintf(f,"AlgApeSmear: coef = %e ",c);
+    // YA changed AlgApeSmear being able for no projection, print in that case
+    if( ! ifSu3Proj() )
+      Fprintf(f,"with NO SU(3) projection");
+    Fprintf(f,"\n");
     Fclose(f);
   }
   AlgSmear::run();
@@ -632,7 +637,9 @@ void AlgHypSmear::smear_link(Matrix& link,
 */
 void AlgHypSmear::run()
 {
-  if ( get_orthog() >=0 || get_orthog() <4 )
+  //  if ( get_orthog() >=0 || get_orthog() <4 )
+  //   ^ YA: this will bring anything to ERR
+  if ( get_orthog() >=0 && get_orthog() <4 )
       ERR.General(cname, "run",
 		  "Bad value %d for orthogonal direction", get_orthog());
    

@@ -69,6 +69,10 @@
  #define DEBUG_WritePropagator
 #endif //DEBUG_PARANOID
 
+#undef DEBUG_PAIRRECORD
+
+
+
 #define DO_recordInfo
 #define DO_readDimSize
 

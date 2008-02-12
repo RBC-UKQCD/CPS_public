@@ -8,19 +8,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.15 2006-06-10 02:52:30 chulwoo Exp $
+  $Id: enum.x,v 1.16 2008-02-12 18:16:30 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2006-06-10 02:52:30 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.15 2006-06-10 02:52:30 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.15 2006-06-10 02:52:30 chulwoo Exp $*/
+/*  $Date: 2008-02-12 18:16:30 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.16 2008-02-12 18:16:30 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.16 2008-02-12 18:16:30 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.15 $*/
+/*  $Revision: 1.16 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -798,5 +798,25 @@ enum RationalApproxType {
 enum RationalBoundsType {
   RATIONAL_BOUNDS_AUTOMATIC = 0,
   RATIONAL_BOUNDS_MANUAL = 1
+};
+
+/* for AlgStaticB & QPropS by YA */
+enum StaticBActionLinkSmearType {
+  SB_ALS_NONE,
+  SB_ALS_APE,
+  SB_ALS_APE_NO_PROJ,
+  SB_ALS_APE_OLEG,
+  SB_ALS_HYP_HK,
+  SB_ALS_HYP_L,
+  SB_ALS_HYP_2,
+  SB_ALS_STOUT
+};
+
+/* for AlgStaticB & QPropW by YA */
+// to apply links in Gaussian smearing for src and sink
+enum GaussianKernelLinkSmearType {
+  GKLS_NONE = 0,
+  GKLS_APE = 1,
+  GKLS_STOUT = 2
 };
 

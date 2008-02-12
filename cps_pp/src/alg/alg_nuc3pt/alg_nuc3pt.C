@@ -142,7 +142,7 @@ void AlgNuc3pt::run()
   char *fname = "run()";
   VRB.Func(cname,fname);
 
-  if( Nuc3pt_arg->DoHalfFermion == 2 && Nuc3pt_arg->DoConserved != 2 ) {
+  if( Nuc3pt_arg->DoHalfFermion == 2 && Nuc3pt_arg->DoConserved == 1 ) {
     ERR.General(cname,fname,"DoConserved should be 2 when DoHalfFermion = 2!!!\n");
   }
 
@@ -714,6 +714,17 @@ void AlgNuc3pt::GetThePropagator(int time, Float mass){
   if(q_prop!=NULL)
     delete q_prop ;
 
+  // save prop
+  qp_arg.save_prop=0;
+  if(Nuc3pt_arg->calc_QProp==2) {
+    qp_arg.save_prop=1;
+    char chartmp[200];
+    sprintf(chartmp,"Nuc3pt");
+    qp_arg.ensemble_id = chartmp;
+    qp_arg.ensemble_label = Nuc3pt_arg->ensemble_label;
+    qp_arg.seqNum=Nuc3pt_arg->ensemble_id;
+  }
+
   int mu;
 
   switch (Nuc3pt_arg->src_type){
@@ -774,7 +785,7 @@ void AlgNuc3pt::GetThePropagator(int time, Float mass){
     break ;
   case GAUSS_GAUGE_INV:
     {
-	  QPropWGaussArg gauss_arg;
+      QPropWGaussArg gauss_arg;
       qp_arg.gauge_fix_src=0; // No Gauge fixing is needed for Point source
       qp_arg.x = Nuc3pt_arg->x[0];
       qp_arg.y = Nuc3pt_arg->x[1];
@@ -784,6 +795,10 @@ void AlgNuc3pt::GetThePropagator(int time, Float mass){
       // Multi Gauss
       gauss_arg.nt = Nuc3pt_arg->num_mult ;
       for(int nt=0; nt<gauss_arg.nt; nt++) gauss_arg.mt[nt] = Nuc3pt_arg->mt[nt] ;
+      //Ape Smearing
+      gauss_arg.gauss_link_smear_type = Nuc3pt_arg->gauss_link_smear_type;
+      gauss_arg.gauss_link_smear_coeff = Nuc3pt_arg->gauss_link_smear_coeff;
+      gauss_arg.gauss_link_smear_N = Nuc3pt_arg->gauss_link_smear_N;
 
       if(Nuc3pt_arg->DoPerPlusAper){
 	BndCndType save_bc = GJP.Tbc() ; // Save current BC
@@ -805,23 +820,19 @@ void AlgNuc3pt::GetThePropagator(int time, Float mass){
 			     Nuc3pt_arg->theta, mu);
 	  }
 	}
-	QIO_Prop qio_prop;
 
 	char out_prop[200];
-	sprintf( out_prop, "PROP/prop_m%g_tsrc%d_GS_w%g_n%d_%s_%d",mass,time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
-	if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "PROP/prop_m%g_tsrc%d_%d_GS_w%g_n%d_%s_%d",mass,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	sprintf( out_prop, "/pfs/prop_m%g_tsrc%d_GS_w%g_n%d_%s_%d",mass,time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "/pfs/prop_m%g_tsrc%d_%d_GS_w%g_n%d_%s_%d",mass,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	qp_arg.file=out_prop;
 
 	//q_prop = new QPropWGaussSrc(AlgLattice(),&qp_arg,common_arg);
 	if(Nuc3pt_arg->calc_QProp){
 	  q_prop = new QPropWMultGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg);
-	  if(Nuc3pt_arg->calc_QProp==2) qio_prop.QIO_SaveProp(*q_prop,out_prop,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id);
 	} else {
-	  QPropW* dprop;
-	  dprop = new QPropW(AlgLattice(),&qp_arg,common_arg);
-	  dprop->Allocate(0);
-	  q_prop = new QPropWGaussSrc(*dprop);
-	  delete dprop;
-	  qio_prop.QIO_ReadProp(*q_prop,out_prop);
+	  q_prop = new QPropWGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg,out_prop);
+	  q_prop->Allocate(0);
+	  q_prop->RestoreQProp(out_prop,0);
 	}
       }
     }
@@ -892,6 +903,20 @@ void  AlgNuc3pt::GetTheSeqPropagator(int time, Float mass, SourceType type,
   QPropWGaussArg gauss_arg;
   gauss_arg.nt = Nuc3pt_arg->num_mult;
   for(int nt=0; nt<gauss_arg.nt; nt++) gauss_arg.mt[nt] = Nuc3pt_arg->mt[nt] ;
+  //Ape Smearing
+  gauss_arg.gauss_link_smear_type = Nuc3pt_arg->gauss_link_smear_type;
+  gauss_arg.gauss_link_smear_coeff = Nuc3pt_arg->gauss_link_smear_coeff;
+  gauss_arg.gauss_link_smear_N = Nuc3pt_arg->gauss_link_smear_N;
+
+  qp_arg.save_prop=0;
+  if(Nuc3pt_arg->calc_QProp==2) {
+    qp_arg.save_prop=1;
+    char chartmp[200];
+    sprintf(chartmp,"Nuc3pt");
+    qp_arg.ensemble_id = chartmp;
+    qp_arg.ensemble_label = Nuc3pt_arg->ensemble_label;
+    qp_arg.seqNum=Nuc3pt_arg->ensemble_id;
+  }
 
   char out_prop[200];
   char prjct[10];
@@ -934,18 +959,17 @@ void  AlgNuc3pt::GetTheSeqPropagator(int time, Float mass, SourceType type,
 	else{
 	  //Save 5d prop in memory
 	  if(Nuc3pt_arg->DoConserved) qp_arg.save_ls_prop = 2;
-	  QIO_Prop qio_prop;
+          qp_arg.file=out_prop;
 
-	  sprintf( out_prop, "PROP/prop_seq_u_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
-	  if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "PROP/prop_seq_u_m%g_tsrc%d_%d_tsnk%d_%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),Nuc3pt_arg->mt[1]-Nuc3pt_arg->t_sink,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	  sprintf( out_prop, "/pfs/prop_seq_u_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	  if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "/pfs/prop_seq_u_m%g_tsrc%d_%d_tsnk%d_%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),Nuc3pt_arg->mt[1]-Nuc3pt_arg->t_sink,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
 	  if(Nuc3pt_arg->calc_QProp){
 	    u_s_prop = new QPropWSeqProtUSrc(AlgLattice(),*q_prop, mom, P, 
 					     &qp_arg,&gauss_arg, common_arg);
-	    if(Nuc3pt_arg->calc_QProp==2) qio_prop.QIO_SaveProp(*u_s_prop,out_prop,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id);
 	  } else {
 	    u_s_prop = new QPropWSeqProtUSrc(AlgLattice(), *q_prop, mom, P, &qp_arg, &gauss_arg, common_arg, out_prop);
 	    u_s_prop->Allocate(0);
-	    qio_prop.QIO_ReadProp(*u_s_prop,out_prop);
+	    u_s_prop->RestoreQProp(out_prop,0);
 	  }
 	}
       }
@@ -976,19 +1000,18 @@ void  AlgNuc3pt::GetTheSeqPropagator(int time, Float mass, SourceType type,
 	    sprintf(qp_arg.file,"prop_d");
 	  }
 	  if(Nuc3pt_arg->DoConserved == 2) qp_arg.save_ls_prop = 2;
-	  QIO_Prop qio_prop;
+          qp_arg.file=out_prop;
 
-	  sprintf( out_prop, "PROP/prop_seq_d_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
-	  if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "PROP/prop_seq_d_m%g_tsrc%d_%d_tsnk%d_%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),Nuc3pt_arg->mt[1]-Nuc3pt_arg->t_sink,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	  sprintf( out_prop, "/pfs/prop_seq_d_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	  if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "/pfs/prop_seq_d_m%g_tsrc%d_%d_tsnk%d_%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),Nuc3pt_arg->mt[1]-Nuc3pt_arg->t_sink,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
 
 	  if(Nuc3pt_arg->calc_QProp){
 	  d_s_prop = new QPropWSeqProtDSrc(AlgLattice(),*q_prop, mom, P, 
 					   &qp_arg, &gauss_arg,common_arg);
-	    if(Nuc3pt_arg->calc_QProp==2) qio_prop.QIO_SaveProp(*d_s_prop,out_prop,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id);
 	  } else {
 	    d_s_prop = new QPropWSeqProtDSrc(AlgLattice(), *q_prop, mom, P, &qp_arg, &gauss_arg, common_arg, out_prop);
 	    d_s_prop->Allocate(0);
-	    qio_prop.QIO_ReadProp(*d_s_prop,out_prop);
+	    d_s_prop->RestoreQProp(out_prop,0);
 	  }
 	}
       }

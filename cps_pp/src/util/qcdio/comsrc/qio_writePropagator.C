@@ -3,6 +3,17 @@
 #include <util/qio_writePropagator.h>
 
 
+// adapted functions to Qpropw-class
+// 
+// assuming ordering of propagator object:
+// 
+// [volume][sink_spin][sink_color][source_spin][source_color][ReIm]
+// (volume slowest, ReIm fastest)
+//
+// the same ordering is applied for the source field (if full source/pairs otherwise unneeded indices removed)
+//
+// ees, 02/05/08
+
 
 CPS_START_NAMESPACE
 using namespace std;
@@ -15,14 +26,18 @@ using namespace std;
 #define QIO_GETPROP_BASIC(SOURCE_SPIN, SOURCE_COLOR)\
 \
 {\
+ /*printf(" called getprop with count %i\n",count);*/ \
+\
  Float *prop = (Float *)arg; \
 \
  Float *array = (Float *)buf; \
 \
- Float *src_array = prop + index*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*count + SOURCE_SPIN*QIO_PROP_COLOR_MAX*count + SOURCE_COLOR*count; \
+ Float *src_array = prop + index*2*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*count + 2*SOURCE_COLOR + 2*QIO_PROP_COLOR_MAX*SOURCE_SPIN ;\
 \
- for (int ii(0); ii < count; ++ii) \
-    *(array + ii)  = *(src_array + ii); \
+ for( int ii(0); ii < count; ++ii){ \
+   *(array + 2*ii) = *(src_array + 2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*ii ); \
+\
+   *(array + 2*ii + 1 ) = *(src_array + 2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*ii + 1 ); } \
 \
 }
 
@@ -33,10 +48,13 @@ using namespace std;
 \
  double *prop = (double *)arg; \
 \
- double *src_array = prop +  index*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*count + SOURCE_SPIN*QIO_PROP_COLOR_MAX*count + SOURCE_COLOR*count; \
+ double *src_array = prop + index*2*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*count + 2*SOURCE_COLOR * 2*QIO_PROP_COLOR_MAX*SOURCE_SPIN;\
 \
- for(int ii(0); ii < count; ++ii) \
-    *(array + ii) = *(src_array + ii); \
+ for( int ii(0); ii < count; ++ii){ \
+\
+   *(array + 2*ii) = *(src_array + 2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*ii); \
+\
+   *(array + 2*ii + 1 ) = *(src_array + 2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*ii + 1) ; }\
 \
 }
 
@@ -123,7 +141,7 @@ void qio_getPropSingle_SpinColor(3,2) (char *buf, size_t index, int count, void 
 
   // calls for ScalarSource
 
-  // these may be replaced by identical getProp calls! (just count differs...)
+  // these may be replaced by identical getProp calls! (spin, color=0, just count differs...)
 
 void qio_getScSource(char *buf, size_t index, int count, void *arg)
 {
@@ -173,57 +191,6 @@ void qio_getScSourceSingle(char *buf, size_t index, int count, void *arg)
 }
 
 
-
-// old calls for whole propagator...
-// may be used for ARBIRTARY paired format, if order is [record][volume][spin][color][C]  ( not what CPS is using!!!)
-// source can be treated the same way, just different size if scalar source!
-
-void qio_getProp(char *buf, size_t index, int count, void *arg)
-{
-
-#ifdef DEBUG_GetProp
-  printf("UID: %i, called qio_getProp with index: %i, count: %i\n",UniqueID(), index, count);
-#endif // DEBUG_GetProp
-
-  Float *prop = (Float *)arg;
-
-  Float *array = (Float *) buf;
-
-  Float *src_array = prop + index*count;
-
-  for (int ii(0); ii < count; ++ii)
-    *(array + ii)  = *(src_array + ii); 
-  
-
-#ifdef DEBUG_GetProp
-  printf("UID: %i, finished qio_getProp (called with index: %i, count: %i)\n",UniqueID(), index, count);
-#endif // DEBUG_GetProp
-
-}
-
-
-void qio_getPropSingle(char *buf, size_t index, int count, void *arg)
-{
-
-
-#ifdef DEBUG_GetProp
-  printf("UID: %i, called qio_getPropSingle with index: %i, count: %i\n",UniqueID(), index, count);
-#endif // DEBUG_GetProp
-
-  float *array = (float *) buf;
-
-  double *prop = (double *)arg;
-
-  double *src_array = prop + index * count;
-
-  for(int ii(0); ii < count; ++ii)
-    *(array + ii) = *(src_array + ii);
-
-#ifdef DEBUG_GetProp
-  printf("UID: %i, finished qio_getPropSingle (called with index: %i, count: %i)\n",UniqueID(), index, count);
-#endif // DEBUG_GetProp
-
-}
 
 
 
@@ -367,7 +334,7 @@ void qio_writePropagator::write_ScS_12sink(char *outfile, const void *prop, cons
       //output in double-precision
 
       // create the record info
-      record_prop = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_DiracFermion", "D", 3, 4, sizeof(Float), 2*sizepersite);
+      record_prop = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_DiracFermion", "D", 3, 4, 2*sizeof(Float), sizepersite);
       // color=3 (not used), spin=4 (not used), size 2 (complex), count per site
 
       record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_Complex", "D", 0, 0, sizeof(Float), 2);
@@ -494,7 +461,7 @@ void qio_writePropagator::write_ScS_12sink(char *outfile, const void *prop, cons
       //output in single-precision
 
       // create the record info
-      record_prop = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_DiracFermion", "F", 3, 4, sizeof(float), 2*sizepersite);
+      record_prop = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_DiracFermion", "F", 3, 4, 2*sizeof(float), sizepersite);
       // color=3 (not used), spin=4 (not used), size 2 (complex), count per side
 
       record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_Complex", "F", 0, 0, sizeof(float), 2);
@@ -771,20 +738,20 @@ void qio_writePropagator::write_12pairs(char *outfile, const QIO_PROP_SOURCE_TYP
       //output in double-precision
 
       // create the record info
-      record_prop = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_DiracFermion", "D", 3, 4, sizeof(Float), 2*sizepersite);
+      record_prop = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_DiracFermion", "D", 3, 4, 2*sizeof(Float), sizepersite);
       // color=3 (not used), spin=4 (not used), size 2 (complex), count per site
 
 
       if( sType == 1)  // scalar source
 	{
-	  record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_Complex", "D", 0, 0, sizeof(Float), 2);
+	  record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_Complex", "D", 0, 0, 2*sizeof(Float), 1);
 	  // color, spin not used, size 2(complex)
 	  source_size = 2;
 	}
 
       if( sType == 2) // full source
 	{
-	  record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_DiracFermion", "D", 3, 4, sizeof(Float), 2*sizepersite);
+	  record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_DiracFermion", "D", 3, 4, 2*sizeof(Float), sizepersite);
 	  // color=3 (not used), spin=4 (not used), size 2(complex), count per site
 	  source_size = 2*sizepersite;
 	}
@@ -917,20 +884,20 @@ void qio_writePropagator::write_12pairs(char *outfile, const QIO_PROP_SOURCE_TYP
       //output in single-precision
 
       // create the record info
-      record_prop = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_DiracFermion", "F", 3, 4, sizeof(float), 2*sizepersite);
+      record_prop = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_DiracFermion", "F", 3, 4, 2*sizeof(float), sizepersite);
       // color=3 (not used), spin=4 (not used), size 2 (complex), count per site
 
 
       if( sType == 1)  // scalar source
 	{
-	  record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_Complex", "F", 0, 0, sizeof(float), 2);
+	  record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_Complex", "F", 0, 0, 2*sizeof(float), 1);
 	  // color, spin not used, size 2(complex)
 	  source_size = 2;
 	}
 
       if( sType == 2) // full source
 	{
-	  record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_DiracFermion", "F", 3, 4, sizeof(float), 2*sizepersite);
+	  record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_DiracFermion", "F", 3, 4, 2*sizeof(float), sizepersite);
 	  // color=3 (not used), spin=4 (not used), size 2(complex), count per site
 	  source_size = 2*sizepersite;
 	}

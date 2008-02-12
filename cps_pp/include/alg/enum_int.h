@@ -680,6 +680,27 @@ enum RationalBoundsType {
 typedef enum RationalBoundsType RationalBoundsType;
 extern struct vml_enum_map RationalBoundsType_map[];
 
+enum StaticBActionLinkSmearType {
+	SB_ALS_NONE = 0,
+	SB_ALS_APE = 1,
+	SB_ALS_APE_NO_PROJ = 2,
+	SB_ALS_APE_OLEG = 3,
+	SB_ALS_HYP_HK = 4,
+	SB_ALS_HYP_L = 5,
+	SB_ALS_HYP_2 = 6,
+	SB_ALS_STOUT = 7,
+};
+typedef enum StaticBActionLinkSmearType StaticBActionLinkSmearType;
+extern struct vml_enum_map StaticBActionLinkSmearType_map[];
+
+enum GaussianKernelLinkSmearType {
+	GKLS_NONE = 0,
+	GKLS_APE = 1,
+	GKLS_STOUT = 2,
+};
+typedef enum GaussianKernelLinkSmearType GaussianKernelLinkSmearType;
+extern struct vml_enum_map GaussianKernelLinkSmearType_map[];
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -740,6 +761,8 @@ extern  bool_t vml_HmdLimits (VML *, char *instance, HmdLimits*);
 extern  bool_t vml_InverterType (VML *, char *instance, InverterType*);
 extern  bool_t vml_RationalApproxType (VML *, char *instance, RationalApproxType*);
 extern  bool_t vml_RationalBoundsType (VML *, char *instance, RationalBoundsType*);
+extern  bool_t vml_StaticBActionLinkSmearType (VML *, char *instance, StaticBActionLinkSmearType*);
+extern  bool_t vml_GaussianKernelLinkSmearType (VML *, char *instance, GaussianKernelLinkSmearType*);
 
 #else /* K&R C */
 extern  bool_t vml_pooh (VML *, char *instance, pooh*);
@@ -795,6 +818,8 @@ extern  bool_t vml_HmdLimits (VML *, char *instance, HmdLimits*);
 extern  bool_t vml_InverterType (VML *, char *instance, InverterType*);
 extern  bool_t vml_RationalApproxType (VML *, char *instance, RationalApproxType*);
 extern  bool_t vml_RationalBoundsType (VML *, char *instance, RationalBoundsType*);
+extern  bool_t vml_StaticBActionLinkSmearType (VML *, char *instance, StaticBActionLinkSmearType*);
+extern  bool_t vml_GaussianKernelLinkSmearType (VML *, char *instance, GaussianKernelLinkSmearType*);
 
 #endif /* K&R C */
 
