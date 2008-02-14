@@ -27,6 +27,30 @@ public:
 	} Floats;
 };
 
+class VML;
+class ParamArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	char *name;
+	Float val;
+};
+
+class VML;
+class ParamArray {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	   void resize (  u_int num ) ;
+	   ParamArray (  ) ;
+	struct {
+		u_int params_len;
+		ParamArg *params_val;
+	} params;
+};
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -35,9 +59,13 @@ extern "C" {
 
 #if defined(__STDC__) || defined(__cplusplus)
 extern  bool_t vml_FloatArray (VML *, char *instance, FloatArray*);
+extern  bool_t vml_ParamArg (VML *, char *instance, ParamArg*);
+extern  bool_t vml_ParamArray (VML *, char *instance, ParamArray*);
 
 #else /* K&R C */
 extern  bool_t vml_FloatArray (VML *, char *instance, FloatArray*);
+extern  bool_t vml_ParamArg (VML *, char *instance, ParamArg*);
+extern  bool_t vml_ParamArray (VML *, char *instance, ParamArray*);
 
 #endif /* K&R C */
 

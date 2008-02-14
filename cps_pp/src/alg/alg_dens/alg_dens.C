@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgDens class.
   
-  $Id: alg_dens.C,v 1.7 2007-10-30 20:40:34 chulwoo Exp $
+  $Id: alg_dens.C,v 1.8 2008-02-14 20:45:44 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-10-30 20:40:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.7 2007-10-30 20:40:34 chulwoo Exp $
-//  $Id: alg_dens.C,v 1.7 2007-10-30 20:40:34 chulwoo Exp $
+//  $Date: 2008-02-14 20:45:44 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v 1.8 2008-02-14 20:45:44 chulwoo Exp $
+//  $Id: alg_dens.C,v 1.8 2008-02-14 20:45:44 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_dens.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_dens/alg_dens.C,v $
 //  $State: Exp $
 //
@@ -265,7 +265,8 @@ void AlgDens::run()
 	 ---------- */
 
       #ifdef POINT
-      bzero((char *)src, f_size*sizeof(Float));
+//      bzero((char *)src, f_size*sizeof(Float));
+      memset((char *)src, 0,f_size*sizeof(Float));
       if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0)
 	{
 	  *((IFloat *) &src[0]) = 1.0;
@@ -561,7 +562,8 @@ void AlgDens::clear_vector()
 
   for(int zz = 0; zz<dens_arg->max_save; zz++){
     offset=zz*GJP.VolNodeSites();
-    bzero((char *)(save+offset), f_size*sizeof(Float));
+//    bzero((char *)(save+offset), f_size*sizeof(Float));
+    memset((char *)(save+offset), 0, f_size*sizeof(Float));
     // *(map_table+zz)=-1;
     map_table[zz]=-1;
   }

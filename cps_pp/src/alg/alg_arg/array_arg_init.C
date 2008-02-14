@@ -23,4 +23,19 @@ void FloatArray::resize ( int n_floats){
   else
     Floats.Floats_val= NULL;
 }
+
+ParamArray::ParamArray(){
+  params.params_len=0;
+  params.params_val=NULL;
+}
+
+void ParamArray::resize ( u_int n_params){
+  params.params_len=n_params;
+  if(params.params_val)
+    delete[] params.params_val;
+  if(n_params>0)
+    params.params_val= new ParamArg[n_params];
+  else
+    params.params_val= NULL;
+}
 CPS_END_NAMESPACE
