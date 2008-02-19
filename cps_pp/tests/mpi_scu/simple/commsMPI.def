@@ -1,7 +1,0 @@
-#include<config.h>
-CPS_START_NAMESPACE
-{ GRID = 2,2,2,2 }
-{ LOGFILE = comms.log }
-{ SEED = 1287743 }
-{ SEEDFILE = rngseeds.dat }
-CPS_END_NAMESPACE
