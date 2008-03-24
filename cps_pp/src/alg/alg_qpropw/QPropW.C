@@ -1609,7 +1609,8 @@ void QPropW::MeasConAxialOld(Vector* sol_5d) {
 //  int fv_size = GJP.Colors() * 4 * 2 * sizeof(Float) * GJP.VolNodeSites();
   int ls_glb = GJP.SnodeSites() * GJP.Snodes();
 
-  int LORENTZs(4), lcl_sites[LORENTZs]; 
+  const int LORENTZs(4); 
+  int lcl_sites[LORENTZs]; 
   lcl_sites[0] = GJP.XnodeSites();
   lcl_sites[1] = GJP.YnodeSites();
   lcl_sites[2] = GJP.ZnodeSites();

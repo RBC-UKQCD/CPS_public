@@ -340,7 +340,9 @@ void Nuc3pt::Calc3pt(QPropWSeqBar& seqQ, QPropW& Quark, int Nmom, ThreeMom* momo
   // Copy the sink momentum (just for IO reasons)
   snk_mom = seqQ.Mom() ; 
 
-  CorrFunc tmp[Nmom] ; // tmp is zeroed at construction
+//  CorrFunc tmp[Nmom] ; // tmp is zeroed at construction
+  CorrFunc *tmp = new CorrFunc[Nmom];
+  if(tmp == 0) ERR.Pointer(cname, fname, "tmp");
 
   InsertOp(tmp,seqQ,Quark,Nmom,momo) ;
 
@@ -363,6 +365,7 @@ void Nuc3pt::Calc3pt(QPropWSeqBar& seqQ, QPropW& Quark, int Nmom, ThreeMom* momo
       ERR.General(cname,fname,"Unknown quark...\n") ;
     }
   }
+  delete[] tmp;
 }
 
 
@@ -814,7 +817,8 @@ void Nuc3ptCons::InsertOp(CorrFunc& tmp,QPropW& seqQ, QPropW& Quark)
   int dir = G[G.N()-1];
 
 
-  int LORENTZs(4), lcl_sites[LORENTZs]; 
+  const int LORENTZs(4); 
+  int lcl_sites[LORENTZs]; 
   lcl_sites[0] = GJP.XnodeSites();
   lcl_sites[1] = GJP.YnodeSites();
   lcl_sites[2] = GJP.ZnodeSites();
@@ -1010,7 +1014,8 @@ void Nuc3ptCons::InsertOp(CorrFunc* tmp,QPropW& seqQ, QPropW& Quark, int Nmom, T
   int dir = G[G.N()-1];
 
 
-  int LORENTZs(4), lcl_sites[LORENTZs]; 
+  const int LORENTZs(4); 
+  int lcl_sites[LORENTZs]; 
   lcl_sites[0] = GJP.XnodeSites();
   lcl_sites[1] = GJP.YnodeSites();
   lcl_sites[2] = GJP.ZnodeSites();

@@ -1151,7 +1151,10 @@ void AlgNuc3pt::calc_Cons_Vector(int Nmom, ThreeMom* mom)
 {     
   Gamma Gt(T);
   Nuc3ptCons VectCurr(Gt);
-  Nuc3ptCons *VectCurrp[Nmom][4];
+  const int MaxNmom=50;
+  if(Nmom>MaxNmom)
+    ERR.General(cname,"calc_Cons_Vector","Nmom(%d)>MaxNmom(%d)",Nmom,MaxNmom);
+  Nuc3ptCons *VectCurrp[MaxNmom][4];
   for(int ip(0);ip<Nmom;ip++) for (int i(X);i<4;i++){
     DIR d = DIR(i) ;
     Gamma G(d);
@@ -1200,14 +1203,17 @@ void AlgNuc3pt::calc_Cons_Axial_Vector(int Nmom, ThreeMom* mom)
 { 
   Gamma G5z(G5,Z);
   Nuc3ptCons AxialCurr(Complex(0.0,1.0),G5z);
-  Nuc3ptCons *AxialCurrp[Nmom][4];
+  const int MaxNmom=50;
+  if(Nmom>MaxNmom)
+    ERR.General(cname,"calc_Cons_Vector","Nmom(%d)>MaxNmom(%d)",Nmom,MaxNmom);
+  Nuc3ptCons *AxialCurrp[MaxNmom][4];
   for(int ip(0);ip<Nmom;ip++) for (int i(X);i<4;i++){
     DIR d = DIR(i);
     Gamma G5d(G5,d);
     AxialCurrp[ip][i] = new Nuc3ptCons(mom[ip],Complex(0.0,1.0),G5d);
   }
 
-  Nuc3ptCons *VectCurrp[Nmom][4];
+  Nuc3ptCons *VectCurrp[MaxNmom][4];
   for(int ip(0);ip<Nmom;ip++) for (int i(X);i<4;i++){
     DIR d = DIR(i) ;
     Gamma G(d);
