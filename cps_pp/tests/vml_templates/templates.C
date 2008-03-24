@@ -42,6 +42,7 @@ ActionGaugeArg gauge_arg;
 IntABArg ab_arg;
 EigArg eig_arg;
 FloatArray float_array;
+ParamArray param_array;
 StagQuarkSrc stag_quark_src;
 StagQuarkArg stag_quark_arg;
 StagMesonArg stag_meson_arg;
@@ -96,6 +97,10 @@ int main(int argc, char *argv[])
   rat_quo_arg.resize(1);
   rat_quo_arg.resize(0, 9, 15, 6, 9);
   float_array.resize(4);
+  param_array.resize(3);
+  param_array.params.params_val[0].name="mass";
+  param_array.params.params_val[1].name="epsilon";
+  param_array.params.params_val[2].name="u0";
   stag_quark_src.type = POINT;
   for(int i = 0; i < 4; i++)
     {
@@ -158,6 +163,7 @@ int main(int argc, char *argv[])
   ab_arg.Encode("ab_arg.vml","ab_arg");
   eig_arg.Encode("eig_arg.vml","eig_arg");
   float_array.Encode("float_array.vml","float_array");
+  param_array.Encode("param_array.vml","param_array");
   stag_quark_src.Encode("stag_quark_src.vml","stag_quark_src");
   stag_quark_arg.Encode("stag_quark_arg.vml","stag_quark_arg");
   stag_meson_arg.Encode("stag_meson_arg.vml","stag_meson_arg");
