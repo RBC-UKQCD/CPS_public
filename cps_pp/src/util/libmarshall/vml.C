@@ -194,7 +194,8 @@ char *vml_enum_string ( enum_t *val, struct vml_enum_map *map )
       return map[i].name;
     }
   }
-  fprintf(stderr,"logic bomb in vml_enum_string\n"); exit(-1);
+  fprintf(stderr,"logic bomb in vml_enum_string\n");
+  // exit(-1);
   return NULL;
 }
 enum_t *vml_enum_val  ( char *string, struct vml_enum_map * map)
@@ -204,8 +205,7 @@ enum_t *vml_enum_val  ( char *string, struct vml_enum_map * map)
       return &map[i].val;
     }
   }
-  fprintf(stderr,"logic bomb in vml_enum_val\n"); exit(-1);
-  fprintf(stderr,"%s\n",string);
+  fprintf(stderr,"logic bomb in vml_enum_val in \"%s\" \n",string); exit(-1);
 }
 /*
  * VML enumerations
@@ -218,6 +218,7 @@ vml_enum (VML *vmls, char *name, enum_t *ep,struct vml_enum_map *list)
   /*Fix me... error codes?*/
   if ( vmls->x_op == VML_ENCODE ) { 
     val_str = vml_enum_string(ep,list);
+	if(!val_str) {fprintf(stderr,"%d not in %s\n",ep,list->enum_name);exit(-1);}
   }
   
   VmlEncode->Enum(vmls,list[0].enum_name,name,val_str);
