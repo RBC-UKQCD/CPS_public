@@ -75,6 +75,7 @@ public:
 		u_int stop_rsd_len;
 		Float *stop_rsd_val;
 	} stop_rsd;
+	   ApproxDescr (  void ) ;
 };
 
 class VML;

@@ -47,6 +47,7 @@ class ApproxDescr {
   Float lambda_low;
   Float lambda_high;
   Float stop_rsd<>;
+  memfun ApproxDescr(void);
 
 };
 

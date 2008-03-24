@@ -116,4 +116,13 @@ void ActionRationalQuotientArg::resize(u_int mass, int frm_deg_md, int frm_deg_m
 
 }
 
+ApproxDescr::ApproxDescr(){
+  approx_type=RATIONAL_APPROX_POWER;
+  bounds_type=RATIONAL_BOUNDS_AUTOMATIC;
+  lambda_low=0.;
+  lambda_high=0.;
+  stop_rsd.stop_rsd_len=0;
+  stop_rsd.stop_rsd_val=NULL;
+}
+
 CPS_END_NAMESPACE
