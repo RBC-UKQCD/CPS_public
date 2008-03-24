@@ -76,13 +76,13 @@ doesn't make sense).
 
 No further flags should be needed if you are building for a workstation.
 
-    1.2 Build for QCDOC
+    1.2 Build for QCDOC and Blue Gene
 
 This is slightly complicated because in this case a cross-compilation
 is needed. 
 
 The flags are
---enable-target=qcdoc --build=sparc-sun-solaris2.9 --host=powerpc-gnu-elf QOS=$QOS
+--enable-target=qcdoc --build=powerpc-ibm-aix5.2.0.0 (for AIX frontend) --host=powerpc-gnu-elf QOS=$QOS
 where $QOS should be be the path to the main QOS directory. 
 
 If you don't want to remember that, use use the script 'conf':
@@ -99,8 +99,9 @@ which puts the command above into a file called 'config_wrapper'.
 Using 'conf' script, the whole configuring process would look like:
 
 cd <builddir>
-<sourcedir>/conf --enable-target=qcdoc (or bgl)
+<sourcedir>/conf --enable-target=qcdoc (or bgl, bgp)
 source config_wrapper --enable-gmp=<GNU GMP library>
+For BG/L and P, you usually need QMP, described below.
 
 
    1.3 Build with SciDAC packages (QIO,QMP)
