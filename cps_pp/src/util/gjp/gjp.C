@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.34 2006-12-21 20:40:31 chulwoo Exp $
+  $Id: gjp.C,v 1.35 2008-03-25 17:53:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-21 20:40:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.34 2006-12-21 20:40:31 chulwoo Exp $
-//  $Id: gjp.C,v 1.34 2006-12-21 20:40:31 chulwoo Exp $
+//  $Date: 2008-03-25 17:53:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.35 2008-03-25 17:53:43 chulwoo Exp $
+//  $Id: gjp.C,v 1.35 2008-03-25 17:53:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.34 $
+//  $Revision: 1.35 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -122,6 +122,8 @@ GlobalJobParameter::GlobalJobParameter()
   cname = "GlobalJobParameter";
   char *fname = "GlobalJobParameter()";
   VRB.Func(cname,fname);
+
+  arg_set=0;
 }
 
 
@@ -421,5 +423,33 @@ void GlobalJobParameter::Bc(int dir, BndCndType cond){
 }
 
 
+int GlobalJobParameter::argc(void){
+
+  char *fname="argc()";
+  if (!arg_set){
+    ERR.General(cname,fname,"ERROR: GJP.argc not initialized\n");
+    exit(-1);
+  }
+  return *argc_int;
+}
+
+
+char** GlobalJobParameter::argv(void){
+
+  char *fname="argv()";
+  if (!arg_set){
+    ERR.General(cname,fname,"ERROR: GJP.argv not initialized\n");
+    exit(-1);
+  }
+  return *argv_int;
+}
+
+void GlobalJobParameter::setArg(int* argc, char*** argv){
+
+  argc_int = argc;
+  argv_int = argv;
+
+  arg_set=1;
+}
 
 CPS_END_NAMESPACE

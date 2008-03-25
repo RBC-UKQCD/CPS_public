@@ -1,18 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  $Id: fix_gauge.C,v 1.7 2005-05-30 08:28:05 chulwoo Exp $
+  $Id: fix_gauge.C,v 1.8 2008-03-25 17:53:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-30 08:28:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.7 2005-05-30 08:28:05 chulwoo Exp $
-//  $Id: fix_gauge.C,v 1.7 2005-05-30 08:28:05 chulwoo Exp $
+//  $Date: 2008-03-25 17:53:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.8 2008-03-25 17:53:43 chulwoo Exp $
+//  $Id: fix_gauge.C,v 1.8 2008-03-25 17:53:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -971,6 +971,10 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
 		  "Called with Colors == %d\n", COLORS, Colors());
   }
 
+  // set last Stopping Condition
+  fix_gauge_stpCond = SmallFloat;
+
+
   //------------------------------------------------------------------------
   // NormDir is numerically identical to fix_gauge_kind
   //------------------------------------------------------------------------
@@ -1171,7 +1175,7 @@ void Lattice::FixGaugeAllocate(FixGaugeType GaugeKind,
   // set system parameter
   //------------------------------------------------------------------------
   fix_gauge_kind = GaugeKind;
-
+  fix_gauge_stpCond = 0.;
 
   //------------------------------------------------------------------------
   // set some local parameters
@@ -1324,6 +1328,7 @@ void Lattice::FixGaugeFree()
   {
     fix_gauge_ptr = NULL;
     fix_gauge_kind = FIX_GAUGE_NONE;
+    fix_gauge_stpCond = 0;
   }
 }
 

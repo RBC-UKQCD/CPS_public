@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.13 2008-02-08 22:01:05 chulwoo Exp $
+  $Id: get_data.C,v 1.14 2008-03-25 17:53:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 22:01:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.13 2008-02-08 22:01:05 chulwoo Exp $
-//  $Id: get_data.C,v 1.13 2008-02-08 22:01:05 chulwoo Exp $
+//  $Date: 2008-03-25 17:53:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.14 2008-03-25 17:53:43 chulwoo Exp $
+//  $Id: get_data.C,v 1.14 2008-03-25 17:53:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -74,19 +74,22 @@ void get1Data(IFloat *rcv_buf, IFloat *send_buf, int len, int mu, int plus)
       if ( len > MAX_LENGTH){
 //          ERR.General("",fname,"len(%d)>MAX_LENGTH(%d)\n",len,MAX_LENGTH);
       }
-      for(i=0;i<copy_len;i++) send_noncache[i] = send_buf[i];
+//      for(i=0;i<copy_len;i++) send_noncache[i] = send_buf[i];
+	  memcpy(send_noncache,send_buf,copy_len*sizeof(IFloat));
       SCUDirArgIR send(send_noncache, gjp_scu_dir[2*mu+plus], SCU_SEND, copy_len*sizeof(IFloat));
       SCUDirArgIR rcv(rcv_noncache, gjp_scu_dir[2*mu+(1-plus)], SCU_REC, copy_len*sizeof(IFloat));
       send.StartTrans();
       rcv.StartTrans();
       send.TransComplete();
       rcv.TransComplete();
-      for(i=0;i<copy_len;i++) rcv_buf[i] = rcv_noncache[i];
+//      for(i=0;i<copy_len;i++) rcv_buf[i] = rcv_noncache[i];
+	  memcpy(rcv_buf,rcv_noncache,copy_len*sizeof(IFloat));
     }
     else {
       for(int i = 0; i < copy_len; ++i) {
-        *rcv_buf++ = *send_buf++;
+//        *rcv_buf++ = *send_buf++;
       }
+	  memcpy(rcv_buf,send_buf,copy_len*sizeof(IFloat));
     }
     send_buf += MAX_LENGTH;
     rcv_buf += MAX_LENGTH;

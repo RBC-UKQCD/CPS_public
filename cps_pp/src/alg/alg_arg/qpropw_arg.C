@@ -103,9 +103,9 @@ vml_QPropWArg (VML *vmls, char *name,QPropWArg *objp)
 		 return FALSE;
 	 if (!vml_SourceType (vmls, "SeqSmearSink", &objp->SeqSmearSink))
 		 return FALSE;
-	 if (!vml_pointer (vmls, "ensemble_label", (char **)&objp->ensemble_label, sizeof (char), (vmlproc_t) vml_char))
+	 if (!vml_string (vmls, "ensemble_label", &objp->ensemble_label, ~0))
 		 return FALSE;
-	 if (!vml_pointer (vmls, "ensemble_id", (char **)&objp->ensemble_id, sizeof (char), (vmlproc_t) vml_char))
+	 if (!vml_string (vmls, "ensemble_id", &objp->ensemble_id, ~0))
 		 return FALSE;
 	 if (!vml_int (vmls, "seqNum", &objp->seqNum))
 		 return FALSE;

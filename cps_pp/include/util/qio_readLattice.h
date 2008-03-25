@@ -15,10 +15,21 @@ class qio_readLattice: private qio_init {
 
  public:
 
+  // versions with argc/argv
+
   qio_readLattice(int argc, char *argv[]): qio_init(argc, argv), cname("qio_readLattice"){}
 
   qio_readLattice(char *infile, Lattice &lat, int argc, char *argv[], int volFormat=QIO_UNKNOWN): qio_init(argc, argv), cname("qio_readLattice")
    {read(infile, lat, volFormat);}
+
+  //version w/o argc/argv, using GJP
+
+  qio_readLattice(): qio_init(GJP.argc(), GJP.argv()), cname("qio_readLattice"){}
+
+  qio_readLattice(char *infile, Lattice &lat, int volFormat=QIO_UNKNOWN): qio_init(GJP.argc(), GJP.argv()), cname("qio_readLattice")
+   {read(infile, lat, volFormat);}
+  
+
 
   virtual ~qio_readLattice(){
     #ifdef DEBUG_Init

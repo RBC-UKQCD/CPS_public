@@ -32,6 +32,7 @@
 #include <alg/qpropw_arg.h>
 #include <alg/diquark.h>
 
+
 #ifdef USE_QIO
 #include <util/qio_general.h>
 #include <util/qio_writePropagator.h>
@@ -73,6 +74,8 @@ protected:
 public:
 
   Float* conserved;
+
+  Float* j5q_pion;  //M. Lightman
      
   //! pointer to 5d prop counter
   int spnclr_cnt;
@@ -112,12 +115,24 @@ public:
   //! Returns the half fermion flag
   int DoHalfFermion() const { return qp_arg.do_half_fermion; }
 
-  void Run();
 
-#ifdef USE_QIO
-  void Run_saveQIO(const char *filename, const char *id, const char *label, const int seqNum, int argc, char* argv[], const int volFormat=QIO_VOLFMT);
-#endif
-  
+  //EES merged Run and ReRun
+  //void Run();
+  //
+  ////void ReRun( int argc, char* argv[], const Float precision=1e-8);
+  //void ReRun( const Float precision=1e-8);
+
+  // this is the basic routine, do_rerun=0: normal run, do_rerun=1: load prop from file, rerun and compare with prec.
+  void Run( const int do_rerun, const Float precision=1e-8);
+
+  // to have the usual call
+  void Run() { Run(0);}
+
+  // and a reminder for ReRun
+  void ReRun( const Float precision=1e-8) { Run(1, precision);}
+
+  void ReLoad( char *infile);
+
   void CG(FermionVectorTp&, FermionVectorTp&, FermionVectorTp&, int&, Float&);
    // HueyWen: addtional CG definition
   void CG(Lattice &lat, CgArg *arg, FermionVectorTp& source,
@@ -156,6 +171,8 @@ public:
   void NonRelProp(int ls);
 
   virtual void MeasConAxialOld(Vector* sol_5d);
+
+  virtual void MeasJ5qPion(Vector* sol_5d); //M. Lightman
 
   virtual void SetSource(FermionVectorTp& src, int spin, int color);
 

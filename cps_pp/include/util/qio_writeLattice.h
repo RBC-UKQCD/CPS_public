@@ -17,6 +17,8 @@ class qio_writeLattice: private qio_init {
 
  public:
 
+  // versions with argc/argv
+
   qio_writeLattice( int argc, char *argv[]): qio_init(argc, argv), cname("qio_writeLattice")
     {initHeader();}
 
@@ -30,8 +32,28 @@ class qio_writeLattice: private qio_init {
  
   qio_writeLattice(char *outfile, Lattice &lat, char *ildgLFN, const char * ensemble_id, const char * ensemble_label, const int traj,
 		   int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
-   qio_init(argc, argv), cname("qio_writeLattice")
+    qio_init(argc, argv), cname("qio_writeLattice")
     { setHeader(ensemble_id, ensemble_label, traj); write(outfile, ildgLFN, lat, volFormat, floatFormat);}
+  
+  // versions w/o argc/argv, using GJP
+  
+  qio_writeLattice(): qio_init(GJP.argc(), GJP.argv()), cname("qio_writeLattice")
+    {initHeader();}
+
+  qio_writeLattice(char *outfile, Lattice &lat, int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
+   qio_init(GJP.argc(), GJP.argv()), cname("qio_writeLattice")
+    { initHeader(); write(outfile, "", lat, volFormat, floatFormat);}
+
+  qio_writeLattice(char *outfile, Lattice &lat, char *ildgLFN, int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
+   qio_init(GJP.argc(), GJP.argv()), cname("qio_writeLattice")
+    { initHeader(); write(outfile, ildgLFN, lat, volFormat, floatFormat);}
+ 
+  qio_writeLattice(char *outfile, Lattice &lat, char *ildgLFN, const char * ensemble_id, const char * ensemble_label, const int traj,
+		   int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
+   qio_init(GJP.argc(), GJP.argv()), cname("qio_writeLattice")
+    { setHeader(ensemble_id, ensemble_label, traj); write(outfile, ildgLFN, lat, volFormat, floatFormat);}
+  
+
 
   virtual ~qio_writeLattice(){ 
     #ifdef DEBUG_Init

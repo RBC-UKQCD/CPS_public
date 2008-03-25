@@ -4,12 +4,12 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-06 16:06:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/glb_sum_multi_dir.C,v 1.6 2007-06-06 16:06:22 chulwoo Exp $
-//  $Id: glb_sum_multi_dir.C,v 1.6 2007-06-06 16:06:22 chulwoo Exp $
+//  $Date: 2008-03-25 17:53:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/glb_sum_multi_dir.C,v 1.7 2008-03-25 17:53:43 chulwoo Exp $
+//  $Id: glb_sum_multi_dir.C,v 1.7 2008-03-25 17:53:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/glb_sum_multi_dir.C,v $
 //  $State: Exp $
 //
@@ -23,7 +23,7 @@ CPS_END_NAMESPACE
 #include<util/error.h>
 CPS_START_NAMESPACE
 
-void glb_sum_multi_dir(const Float * float_p, int dir, int len)
+void glb_sum_multi_dir(const Float * float_p, const int dir, const int len)
 {
   Float tmp;
   tmp = *float_p;

@@ -32,7 +32,7 @@
  * From: @(#)rpc_cout.c 1.13 89/02/22 (C) 1987 SMI
  */
 char cout_rcsid[] =
-"$Id: rpc_cout.c,v 1.5 2005-10-04 15:30:08 chulwoo Exp $";
+"$Id: rpc_cout.c,v 1.6 2008-03-25 17:53:43 chulwoo Exp $";
 
 /*
  * rpc_cout.c, XDR routine outputter for the RPC protocol compiler
@@ -167,6 +167,7 @@ emit (definition * def)
     char *name = def->def_name;
     f_print (fout, "\t bool %s::Encode(char *filename,char *instance){\n",
 	     def->def_name);
+//	f_print (fout, "\t\t printf(\"Encoding %%s to %%s\\n\",instance,filename);\n");
     f_print (fout, "\t\t VML vmls;\n");
     f_print (fout, "\t\t if ( !vmls.Create(filename,VML_ENCODE)) return false;\n");
     f_print (fout, "\t\t if ( !Vml(&vmls,instance) ) return false;\n",name);
@@ -175,6 +176,7 @@ emit (definition * def)
     f_print (fout, "\n");
     f_print (fout, "\t bool %s::Decode(char *filename,char *instance){\n",
 	     def->def_name);
+//	f_print (fout, "\t\t printf(\"Decoding %%s from %%s\\n\",instance,filename);\n");
     f_print (fout, "\t\t VML vmls;\n");
     f_print (fout, "\t\t if ( !vmls.Create(filename,VML_DECODE)) return false;\n");
     f_print (fout, "\t\t if ( !Vml(&vmls,instance)) return false;\n");

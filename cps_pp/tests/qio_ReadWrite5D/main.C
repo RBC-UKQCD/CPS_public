@@ -490,8 +490,8 @@ int main(int argc,char *argv[])
 	  { 
 	    //dummy_scSourcePairs_write[ii][jj][0] = Float(ii);
 	    //dummy_scSourcePairs_write[ii][jj][1] = Float(jj);
-	    dummy_scSourcePairs_write[ii][jj][0] = Float( ii + jj/144.);
-	    dummy_scSourcePairs_write[ii][jj][1] = Float( ii - jj/144.);
+	    dummy_scSourcePairs_write[ii][jj][0] = Float( ii + jj/1000.);
+	    dummy_scSourcePairs_write[ii][jj][1] = Float( ii - jj/1000.);
 
 	  }
 	   
@@ -517,8 +517,8 @@ int main(int argc,char *argv[])
 	    { 
 	      //dummy_fSourcePairs_write[ii][jj][kk][0] = Float(ii);
 	      //dummy_fSourcePairs_write[ii][jj][kk][1] = Float(kk)+12*Float(jj);
-	      dummy_fSourcePairs_write[ii][jj][kk][0] = Float(ii + (12.*jj + kk)/144.);
-	      dummy_fSourcePairs_write[ii][jj][kk][1] = Float(ii - (12.*jj + kk)/144.);
+	      dummy_fSourcePairs_write[ii][jj][kk][0] = Float(ii + (12.*jj + kk)/1000.);
+	      dummy_fSourcePairs_write[ii][jj][kk][1] = Float(ii - (12.*jj + kk)/1000.);
 
 	    }
 	
@@ -596,7 +596,7 @@ int main(int argc,char *argv[])
 	      for(int mm2(0); mm2 < 4; ++mm2)
 		for(int cc2(0); cc2 < 3; ++ cc2){
 		  
-		  Float index = (cc2 + 3*mm2 + 12*cc1 + 36*mm1)/144.;
+		  Float index = (cc2 + 3*mm2 + 12*cc1 + 36*mm1)/1000.;
 
 		  propagator[ii][mm1][cc1][mm2][cc2][0] = ii + index;
 		  propagator[ii][mm1][cc1][mm2][cc2][1] = ii - index;
@@ -745,7 +745,7 @@ int main(int argc,char *argv[])
 	  Float prec(1e-10);
 
 	  #ifdef WRITE_propSG
-	  prec = 1e-5;
+	  prec = 2e-5;
 	  #endif
 
 	  WilsonMatrix matrix_calc, matrix_read;
@@ -844,7 +844,7 @@ int main(int argc,char *argv[])
 	  Float prec(1e-10);
 
 	  #ifdef WRITE_propSG
-	  prec = 1e-5;
+	  prec = 2e-5;
 	  #endif
 
 	  WilsonMatrix matrix_calc, matrix_read;
@@ -945,7 +945,7 @@ int main(int argc,char *argv[])
 	  Float prec(1e-10);
 
 	  #ifdef WRITE_propSG
-	  prec = 1e-5;
+	  prec = 2e-5;
 	  #endif
 
 	  WilsonMatrix matrix_calc, matrix_read;

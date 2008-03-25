@@ -249,31 +249,31 @@ public:
   WilsonMatrix(const wilson_matrix& rhs);
   WilsonMatrix(const Float& rhs);
   WilsonMatrix(const Rcomplex& rhs);
-  WilsonMatrix(int source_spin, int source_color, const wilson_vector&);
-  WilsonMatrix(int source_spin, int source_color, int sink_spin, 
-               int sink_color, const Rcomplex&);
+  WilsonMatrix(int sink_spin, int sink_color, const wilson_vector&);
+  WilsonMatrix(int sink_spin, int sink_color, int source_spin, 
+               int source_color, const Rcomplex&);
 
   // Access to elements 
 
-  void Element(int source_spin, int source_color, 
-               int sink_spin, int sink_color, const Rcomplex& z);
+  void Element(int sink_spin, int sink_color, 
+               int source_spin, int source_color, const Rcomplex& z);
 
    /*!
     Return the complex number references by
-    s1 - source_spin
-    c1 - source_colour
-    s2 - sink_spin
-    c2 - sink_colour
+    s1 - sink_spin
+    c1 - sink_colour
+    s2 - source_spin
+    c2 - source_colour
    */
   Complex& operator()(int s1, int c1, int s2, int c2) 
 	{ return p.d[s1].c[c1].d[s2].c[c2]; }
   
   /*!
     Return the complex number references by
-    s1 - source_spin
-    c1 - source_colour
-    s2 - sink_spin
-    c2 - sink_colour
+    s1 - sink_spin
+    c1 - sink_colour
+    s2 - source_spin
+    c2 - source_colour
     ( const version )
   */
   Complex  operator()(int s1, int c1, int s2, int c2) const
@@ -298,7 +298,7 @@ public:
   //! get a sol. vector
   wilson_vector& sol(int source_spin, int source_color); 
 
-  void load_vec(int source_spin, int source_color, const wilson_vector&);
+  void load_vec(int sink_spin, int sink_color, const wilson_vector&);
   void load_row(int source_spin, int source_color, const wilson_vector&);
   Rcomplex Trace();
   const wilson_matrix& wmat() const; // get p 

@@ -5,7 +5,7 @@
 CPS_START_NAMESPACE
 
 void Start(int * argc, char ***argv)
-{Start(NULL);}
+{Start(NULL); GJP.setArg(argc,argv);}
 
 void Start(){
   Start(NULL);

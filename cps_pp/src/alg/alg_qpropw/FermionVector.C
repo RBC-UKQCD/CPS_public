@@ -1251,6 +1251,7 @@ void FermionVectorTp::CopyWilsonMatSink(int i, int spin, int color,
 	}
 }
 
+
 /*! Rotates from Chiral to Dirac basis using the WilsonVector :: ChiralToDirac
   routine
 */

@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.50 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: lattice_base.C,v 1.51 2008-03-25 17:53:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.50 2008-02-08 18:35:08 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.50 2008-02-08 18:35:08 chulwoo Exp $
+//  $Date: 2008-03-25 17:53:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.51 2008-03-25 17:53:43 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.51 2008-03-25 17:53:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.50 $
+//  $Revision: 1.51 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -85,6 +85,7 @@ int Lattice::is_initialized = 0;
 StrOrdType Lattice::str_ord = CANONICAL;
 Matrix** Lattice::fix_gauge_ptr = 0;
 FixGaugeType Lattice::fix_gauge_kind = FIX_GAUGE_NONE;
+Float Lattice::fix_gauge_stpCond = 0.;
 
 int Lattice::node_sites[5];
 int Lattice::g_dir_offset[4];
@@ -2599,6 +2600,10 @@ Matrix **Lattice::FixGaugePtr(void){
 //------------------------------------------------------------------
 FixGaugeType Lattice::FixGaugeKind(void){
   return fix_gauge_kind;
+}
+
+Float Lattice::FixGaugeStopCond(void){
+  return fix_gauge_stpCond;
 }
 
 

@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.32 2008-02-08 22:01:05 chulwoo Exp $
+  $Id: gjp.h,v 1.33 2008-03-25 17:53:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 22:01:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.32 2008-02-08 22:01:05 chulwoo Exp $
-//  $Id: gjp.h,v 1.32 2008-02-08 22:01:05 chulwoo Exp $
+//  $Date: 2008-03-25 17:53:43 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.33 2008-03-25 17:53:43 chulwoo Exp $
+//  $Id: gjp.h,v 1.33 2008-03-25 17:53:43 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.32 $
+//  $Revision: 1.33 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -123,6 +123,11 @@ class GlobalJobParameter
  private:
   char *cname;    // Class name.
   DoArg doarg_int;
+
+  int* argc_int;
+  char*** argv_int;
+  int arg_set;
+
 
 #if 0
   int bgl_machine_dir_x;
@@ -790,9 +795,24 @@ public:
      // Sets the inverse of the dwf 5th dir. lattice spacing.
 
 
+  // accessor for the main-arguments argc, argv
+
+  int argc(void);
+  char** argv(void);
+  
+  void setArg(int* argc, char*** argv);
+
+
   /*! @} */
 
 };
+
+/*! An instance of the GlobalJobParameter class, named GJP, should be
+  created at the highest scope (outside main). This external declaration
+  allows access to all global variables.
+*/
+extern GlobalJobParameter GJP;
+
 
 /*! declaration for Start() and End() which should be called at the
 start and end of main()
@@ -812,7 +832,7 @@ void Start(int * argc, char ***argv);
 extern "C" {
   void _mcleanup(void);
 }
-inline void Start(int * argc, char ***argv){Start();}
+inline void Start(int * argc, char ***argv){Start(); GJP.setArg(argc, argv);}
 #elif USE_QMP
 namespace QMPSCU {
   void init_qmp();
@@ -823,11 +843,6 @@ namespace QMPSCU {
 void Start(const BGLAxisMap *);
 #endif
 
-/*! An instance of the GlobalJobParameter class, named GJP, should be
-  created at the highest scope (outside main). This external declaration
-  allows access to all global variables.
-*/
-extern GlobalJobParameter GJP;
 
 
 CPS_END_NAMESPACE

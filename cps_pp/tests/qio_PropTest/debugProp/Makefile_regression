@@ -11,7 +11,7 @@
 #
 #  include the platform specific part of the makefile
 #
-include ../Makefile_common
+include ../../Makefile_common
 
 
 

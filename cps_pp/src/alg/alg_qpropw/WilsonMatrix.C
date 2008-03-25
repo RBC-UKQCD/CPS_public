@@ -35,16 +35,17 @@ WilsonMatrix::WilsonMatrix(const WilsonMatrix& rhs)
 { p=rhs.p; };
 
 // copy complex element
-WilsonMatrix::WilsonMatrix(int source_spin, int source_color, 
-			   int sink_spin, int sink_color, const Rcomplex& z)
+WilsonMatrix::WilsonMatrix(int sink_spin, int sink_color, 
+			   int source_spin, int source_color, const Rcomplex& z)
+
 {
 	p.d[sink_spin].c[sink_color].d[source_spin].c[source_color]=z;
 	return;
 }
 
 // copy complex element
-void WilsonMatrix::Element(int source_spin, int source_color, 
-			   int sink_spin, int sink_color, const Rcomplex& z)
+void WilsonMatrix::Element(int sink_spin, int sink_color, 
+			   int source_spin, int source_color, const Rcomplex& z)
 {
 	p.d[sink_spin].c[sink_color].d[source_spin].c[source_color]=z;
 	return;
@@ -80,18 +81,18 @@ WilsonMatrix::WilsonMatrix(const Rcomplex& rhs)
 }
 
 
-void WilsonMatrix::load_vec(int spin, int color, const wilson_vector& rhs)
+void WilsonMatrix::load_vec(int sink_spin, int sink_color, const wilson_vector& rhs)
 {
-         p.d[spin].c[color]=rhs;
+         p.d[sink_spin].c[sink_color]=rhs;
 }
-void WilsonMatrix::load_row(int spin, int color, const wilson_vector& rhs)
+void WilsonMatrix::load_row(int source_spin, int source_color, const wilson_vector& rhs)
 {
         int c1;
         int s1;
 
 	for(s1=0;s1<4;++s1){
 	  for(c1=0;c1<3;++c1){
-	    p.d[s1].c[c1].d[spin].c[color] = rhs.d[s1].c[c1];
+	    p.d[s1].c[c1].d[source_spin].c[source_color] = rhs.d[s1].c[c1];
 	  }
 	}
 }

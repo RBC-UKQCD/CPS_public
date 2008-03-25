@@ -16,6 +16,7 @@ void Start(int * argc, char *** argv) {
 //  printf("Start(%d %p)\n",*argc,*argv);
   //Initialize QMP
   QMPSCU::init_qmp(argc, argv);
+  GJP.setArg(argc,argv);
 }
 void End(){
   QMPSCU::destroy_qmp();

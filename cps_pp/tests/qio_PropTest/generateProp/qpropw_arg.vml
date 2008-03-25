@@ -1,0 +1,26 @@
+class QPropWArg qpropw_arg = {
+class CgArg cg = {
+double mass =   5.0000000000000000e-01
+int max_num_iter = 5000
+double stop_rsd =   1.0000000000000001e-05
+double true_rsd =   1.0000000000000001e-05
+RitzMatType RitzMatOper = MAT_HERM
+InverterType Inverter = CG
+int bicgstab_n = 0
+}
+string file = "propagator"
+int x = 0
+int y = 0
+int z = 0
+int t = 0
+int gauge_fix_src = 0
+int gauge_fix_snk = 0
+int store_midprop = 0
+int save_prop = 1
+int save_ls_prop = 0
+int do_half_fermion = 0
+SourceType SeqSmearSink = POINT
+string ensemble_label = "test_prop"
+string ensemble_id = "1234"
+int seqNum = 0
+}

@@ -5,20 +5,20 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.55 2008-02-14 20:45:44 chulwoo Exp $
+  $Id: lattice.h,v 1.56 2008-03-25 17:53:43 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2008-02-14 20:45:44 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.55 2008-02-14 20:45:44 chulwoo Exp $
-  $Id: lattice.h,v 1.55 2008-02-14 20:45:44 chulwoo Exp $
+  $Date: 2008-03-25 17:53:43 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.56 2008-03-25 17:53:43 chulwoo Exp $
+  $Id: lattice.h,v 1.56 2008-03-25 17:53:43 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Author: chulwoo $
-  $Date: 2008-02-14 20:45:44 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.55 2008-02-14 20:45:44 chulwoo Exp $
-  $Id: lattice.h,v 1.55 2008-02-14 20:45:44 chulwoo Exp $
+  $Date: 2008-03-25 17:53:43 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.56 2008-03-25 17:53:43 chulwoo Exp $
+  $Id: lattice.h,v 1.56 2008-03-25 17:53:43 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.55 $
+  $Revision: 1.56 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -108,6 +108,9 @@ class Lattice
     static FixGaugeType fix_gauge_kind;
       // The kind of gauge fixing. It is set to FIX_GAUGE_NONE
       // if the gauge is not fixed.
+
+    static Float fix_gauge_stpCond;
+      // The last stopping condition used.
 
     static int scope_lock;
 
@@ -559,6 +562,10 @@ class Lattice
 
     FixGaugeType FixGaugeKind();
       //!< Returns the kind of gauge fixing.
+
+    Float FixGaugeStopCond();
+      //!< Returns the stopping condition used 
+
 
     void *Aux0Ptr();
      //!< Returns a general purpose auxiliary pointer.

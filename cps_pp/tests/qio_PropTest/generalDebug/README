@@ -1,0 +1,40 @@
+
+Writes and/or reads a "debug propagator".
+
+The debug propagator at site x,y,z,t (global coord.) and source spin/color s_src, c_src and sink spin/color s_snk, c_snk has as a value the Complex number
+
+ site+index + I (site-index)
+
+where
+	
+	site= x + y Lx + z LxLy + t LxLyLt
+	index = ( c_src + 3 s_src + 12 c_snk + 36 s_snk ) / 1000
+
+(Lx global size in x-dir, Ly,Lz,Lt..., x=0,...,Lx-1, c=0,1,2, s=0,1,2,3 )
+
+The full source is set to the same value. Scalar source: sink-indices=0
+
+Using the provided do_arg.vml on a motherboard should work with:
+
+
+qpartition_remap -T045 -Y1  -Z2 -X3 
+
+qrun QCDOC.x $PWD do_arg.vml propagator A F
+
+The general syntax is:
+
+x.x DIR DO_ARG BASE_OUT TYPE  PREC 
+
+where:
+
+DIR: directory, where the code is executed
+
+BASE_OUT: basic name for out files
+
+TYPE: 	A: scalar source + 12 sinks
+	B: 12 pairs of scalar source + sink
+	C: 12 pairs of full source + sink 
+	
+
+PREC: 	F: single
+  	D: double

@@ -4,11 +4,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <string>
- 
+
+
 #include <util/gjp.h>
 #include <util/vector.h>
 #include <util/verbose.h>
@@ -19,12 +21,13 @@
 #include <alg/do_arg.h>
 
 #include <qio.h>
+
 #include <qmp.h>
 
-#undef EES_ADDON
+#define EES_ADDON
 
 #ifdef EES_ADDON
-// define as soon as QIO 2.2 supports...
+// supported only since qio v2.3.4  (not v2.2.X)
 #define SPINCOLORCHECK
 #define SPINCOLORINSERT
 #endif // EES_ADDON
@@ -50,6 +53,7 @@
 #undef DEBUG_PutProp
 #undef DEBUG_ReadPropagator
 #undef DEBUG_WritePropagator
+#undef DEBUG_ReadSpinColor
 
 #ifdef DEBUG_PARANOID
  #define DEBUG_NodeIndex
@@ -67,11 +71,20 @@
  #define DEBUG_PutProp
  #define DEBUG_ReadPropagator
  #define DEBUG_WritePropagator
+ #define DEBUG_ReadSpinColor
 #endif //DEBUG_PARANOID
 
 #undef DEBUG_PAIRRECORD
+#undef DEBUG_PAIRRECORD_STD
+#ifdef RUN_PAIRRECORD_CHECK
+ #define DEBUG_PAIRRECORD
+ #undef DEBUG_PAIRRECORD_STD
+#endif
 
-
+#ifdef RUN_PAIRRECORD_STD_CHECK
+ #define DEBUG_PAIRRECORD
+ #define DEBUG_PAIRRECORD_STD
+#endif
 
 #define DO_recordInfo
 #define DO_readDimSize
@@ -109,7 +122,7 @@
  #define QMP_VERB_LEVEL 0 
 
 
-#define TOLERANCE 1e-5 //for Plaq, LinkTr, Propagator-Slice check
+#define TOLERANCE 1e-5 //for Plaq, LinkTr check
 
 /* xml-file header for gauge-config */
 #define QIO_XML_FILE_GAUGE "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"

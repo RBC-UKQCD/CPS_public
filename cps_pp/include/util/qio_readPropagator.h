@@ -15,29 +15,58 @@ class qio_readPropagator: private qio_init {
 
  public:
 
+  // version with argc, argv
+
   qio_readPropagator(int argc, char *argv[]): 
-    qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(-1){}
+    qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0){}
 
 
   // general reader
   qio_readPropagator(char *infile, void *prop, void *source, 
 		     const int max_Float_prop, const int max_Float_source, 
 		     int argc, char *argv[], int volFormat=QIO_UNKNOWN): 
-    qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(-1)
+    qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
     {read(infile, prop, source, max_Float_prop, max_Float_source, volFormat);}
 
 
   // read scS_12sink
   qio_readPropagator(char *infile, void *prop, void *source, 
 		     int argc, char *argv[], int volFormat=QIO_UNKNOWN): 
-    qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(-1)
+    qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
     {read_ScS_12sink(infile, prop, source, volFormat);}
 
   // read 12pairs
-   qio_readPropagator(char *infile, const QIO_PROP_SOURCE_TYPES sType, void *prop, void *source, 
+  qio_readPropagator(char *infile, const QIO_PROP_SOURCE_TYPES sType, void *prop, void *source, 
 		     int argc, char *argv[], int volFormat=QIO_UNKNOWN): 
-    qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(-1)
-     { read_12pairs(infile, prop, source, sType, volFormat); }
+    qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
+    { read_12pairs(infile, prop, source, sType, volFormat); }
+  
+  // versions w/o argc/argv, using GJP
+
+  qio_readPropagator(): 
+    qio_init(GJP.argc(), GJP.argv()), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0){}
+
+  // general reader
+  qio_readPropagator(char *infile, void *prop, void *source, 
+		     const int max_Float_prop, const int max_Float_source, 
+		     int volFormat=QIO_UNKNOWN): 
+    qio_init(GJP.argc(), GJP.argv()), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
+    {read(infile, prop, source, max_Float_prop, max_Float_source, volFormat);}
+
+
+  // read scS_12sink
+  qio_readPropagator(char *infile, void *prop, void *source, 
+		     int volFormat=QIO_UNKNOWN): 
+    qio_init(GJP.argc(), GJP.argv()), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
+    {read_ScS_12sink(infile, prop, source, volFormat);}
+
+  // read 12pairs
+  qio_readPropagator(char *infile, const QIO_PROP_SOURCE_TYPES sType, void *prop, void *source, 
+		     int volFormat=QIO_UNKNOWN): 
+    qio_init(GJP.argc(), GJP.argv()), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
+    { read_12pairs(infile, prop, source, sType, volFormat); }
+  
+
 
   virtual ~qio_readPropagator(){
     #ifdef DEBUG_Init
@@ -68,17 +97,17 @@ class qio_readPropagator: private qio_init {
   void qio_openInput(char *filename, QIO_String *xml_file_in, int volFormat);
 
   void qio_closeInput()
-    { QIO_close_read(qio_Input);}
+    { QIO_close_read(qio_Input); }
 
   void qio_communicateTchunks(void *start, const int sizepersite);
 
-  int qio_readNextPropagatorRecord(int datacount, Float *rprop);
+  int qio_readNextPropagatorRecord(Float *rprop);
   
-  int qio_readNextPropagatorRecordSingle(int datacount, Float *rprop);
+  int qio_readNextPropagatorRecordSingle(Float *rprop);
 
-  int qio_readNextPropPairRecord(int datacount, Float *rprop, int &readSpin, int &readColor);
+  int qio_readNextPropPairRecord(Float *rprop, int &readSpin, int &readColor);
 
-  int qio_readTmpSourceRecord(int datacount, Float *rprop);
+  int qio_readTmpSourceRecord(const QIO_PROP_SOURCE_TYPES sType, Float *rsource);
 
 };
 

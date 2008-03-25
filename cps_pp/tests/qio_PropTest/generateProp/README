@@ -1,0 +1,25 @@
+
+
+This code produces a random gauge configuration (both in NERSC and QIO-format) and a propagator (if save_prop=1 in the qpropw_arg-file) in QIO-format.
+
+The configuration and propagator can then be used by the rerun-code.
+
+
+Using the provided *.vml on a motherboard should work with:
+
+
+qpartition_remap -T045 -Y1  -Z2 -X3 
+
+qrun QCDOC.x $PWD do_arg.vml evo_arg.vml qpropw_arg.vml 17 randomlattice
+
+The general syntax is:
+
+x.x DIR DO_ARG EVO_ARG QPROPW_ARG RANDOM LATTICE_OUT
+
+where:
+
+DIR: directory, where the code is executed
+ 
+RANDOM: number of random-gauge-configuration used for test 
+
+LATTICE_OUT: basis name for output configuration

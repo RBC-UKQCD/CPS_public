@@ -122,7 +122,12 @@ int main(int argc, char *argv[])
 
       QPropWArg qpropw_arg;
 
-      qpropw_arg.file="my_cg_prop_file";
+      //qpropw_arg.file="my_cg_prop_file";
+      sprintf(qpropw_arg.file,"propagator_mass%f.%d", qpropw_arg.cg.mass, readSeqNum);
+      sprintf(qpropw_arg.ensemble_label, readLabel.c_str());
+      sprintf(qpropw_arg.ensemble_id, readID.c_str());
+      qpropw_arg.seqNum = readSeqNum;
+
       qpropw_arg.x=0;
       qpropw_arg.y=0;
       qpropw_arg.z=0;
@@ -130,7 +135,7 @@ int main(int argc, char *argv[])
       qpropw_arg.gauge_fix_src=0;
       qpropw_arg.gauge_fix_snk=0;
       qpropw_arg.store_midprop=0;
-      qpropw_arg.save_prop=0;
+      qpropw_arg.save_prop=1;
       qpropw_arg.do_half_fermion=0;	
       
       qpropw_arg.cg.mass=0.5;
@@ -145,14 +150,11 @@ int main(int argc, char *argv[])
 
       propagator.SetArgs(qpropw_arg);
 
-      char outprop[256];
-      sprintf(outprop,"propagator_mass%f.%d", qpropw_arg.cg.mass, readSeqNum);
 
+      printf("\n running \'propagator.Run_saveQIO\'\n  saving propagator -> [work-dir] %s\n", qpropw_arg.file);
 
-      printf("\n running \'propagator.Run_saveQIO\'\n  saving propagator -> [work-dir] %s\n", outprop);
-
-      propagator.Run_saveQIO(outprop, readID.c_str(), readLabel.c_str(), readSeqNum, argc, argv);
-
+      //propagator.Run_saveQIO(outprop, readID.c_str(), readLabel.c_str(), readSeqNum, argc, argv);
+      propagator.Run();
 
 
 

@@ -57,8 +57,8 @@ class QPropWArg {
   SourceType SeqSmearSink ;
 
   //! header information of qio write prop
-  char *ensemble_label;
-  char *ensemble_id;
+  string ensemble_label<>;
+  string ensemble_id<>;
   int seqNum;
   memfun QPropWArg();
 };

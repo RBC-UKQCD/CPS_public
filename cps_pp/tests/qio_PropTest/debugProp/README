@@ -1,0 +1,41 @@
+
+Writes and/or reads a "debug propagator" in "12 pairs of full source plus sink" format.
+
+The debug propagator at site x,y,z,t (global coord.) and source spin/color s_src, c_src and sink spin/color s_snk, c_snk has as a value the Complex number
+
+ site+index + I (site-index)
+
+where
+	
+	site= x + y Lx + z LxLy + t LxLyLt
+	index = ( c_src + 3 s_src + 12 c_snk + 36 s_snk ) / 1000
+
+(Lx global size in x-dir, Ly,Lz,Lt..., x=0,...,Lx-1, c=0,1,2, s=0,1,2,3 )
+
+The source is set to the same value.
+
+Using the provided do_arg.vml on a motherboard should work with:
+
+
+qpartition_remap -T045 -Y1  -Z2 -X3 
+
+qrun QCDOC.x $PWD do_arg.vml fS_sink_pairs_db.propagator propagator rw 1e-6
+
+The general syntax is:
+
+x.x DIR DO_ARG PROP_IN BASE_OUT MODE [ PREC ]
+
+where:
+
+DIR: directory, where the code is executed
+
+PROP_IN: propagator to be read ( if mode contains "r")
+
+BASE_OUT: basic name for out files ( will generate fS_sink_pairs_db.BASE_OUT and fS_sink_pairs_sg.BASE_OUT if mode contains "w")
+
+MODE: 	r: just read prop
+	w: just write prop
+	rw: first write then read 
+	(wr=rw)
+
+PREC: (opt): precision for comparision (if mode contains "r")	
