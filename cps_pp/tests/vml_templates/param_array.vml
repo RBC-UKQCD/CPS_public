@@ -1,0 +1,16 @@
+class ParamArray param_array = {
+Array params[3] = { 
+class ParamArg params[0] = {
+string name = "mass"
+double val =   0.0000000000000000e+00
+}
+class ParamArg params[1] = {
+string name = "epsilon"
+double val =   0.0000000000000000e+00
+}
+class ParamArg params[2] = {
+string name = "u0"
+double val =   0.0000000000000000e+00
+}
+}
+}
