@@ -1,3 +1,4 @@
+
 2008-02-14 15:50  chulwoo
 
 	* include/util/lattice/f_wilson_types.h (1.1),
@@ -13289,6 +13290,9 @@
 	  v4_9_8_mike_release1, v4_9_8_mike_release2,
 	  v4_9_8_mike_release2_michaelc_1, v4_9_9, v4_9_9_RBC_v7,
 	  v4_9_9_gfix_1, v4_9_9_mflin_v1): removed $Log: not supported by cvs2svn $
+	  v4_9_9_gfix_1, v4_9_9_mflin_v1): removed Revision 1.1  2008/03/24 18:11:56  chulwoo
+	  v4_9_9_gfix_1, v4_9_9_mflin_v1): removed Adding cvs2cl2.pl to create Changlog
+	  v4_9_9_gfix_1, v4_9_9_mflin_v1): removed
 
 2004-08-17 16:35  mclark
 
