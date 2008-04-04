@@ -22,9 +22,9 @@ void GlobalDataShift::Set(int x, int y, int z, int t, int s)
   shifts[3]=t;
   shifts[4]=s;
   for(int i =0;i<5;i++){
-    if( (GJP.Bc(i)!=BND_CND_PRD) && (shifts[i]!=0) )
-      ERR.General(cname,fname,
-        "Bc(%d) cannot be shifted due to the boundary condition\n",i);
+//    if( (GJP.Bc(i)!=BND_CND_PRD) && (shifts[i]!=0) )
+//      ERR.General(cname,fname,
+//        "Bc(%d) cannot be shifted due to the boundary condition\n",i);
     shifts[i] = shifts[i]%GJP.Nodes(i);
 //    printf("shifts[%d]=%d\n",i,shifts[i]);
     VRB.Flow(cname,fname,"shifts[%d]=%d\n",i,shifts[i]);
@@ -52,7 +52,7 @@ void GlobalDataShift::SetOrigin(int x, int y, int z, int t, int s)
 void GlobalDataShift::Shift(void *a, long long len){
   char *fname = "Shift(a,i)";
   VRB.Func(cname,fname);
-  if (data_len%8)
+  if (len%8)
     ERR.General(cname,fname,"buffer length should be a multiple of 8\n");
   addr = a; data_len = len;
   temp_buf = smalloc(cname,fname,"temp_buf",len);
