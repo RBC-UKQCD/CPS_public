@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.24 2007-04-06 20:44:47 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.25 2008-04-21 14:09:15 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -133,8 +133,9 @@ XLCOBJS := $(notdir $(XLCOBJS_SRC))
 	cd $(BUILDDIR2) ; ar  rcs ${BUILDDIR}/$(LIBNAME).xla $@
 
 %.o:%.S
-	$(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR2)/$*.i
-	$(AS) $(ASFLAGS) -o $(BUILDDIR2)/$@ $(BUILDDIR2)/$*.i
+	${CC} -c $< -o $(BUILDDIR2)/$@ ${libcps_CFLAGS}
+#       $(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR2)/$*.i
+#       $(AS) $(ASFLAGS) -o $(BUILDDIR2)/$@ $(BUILDDIR2)/$*.i
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
 ifeq "${ARCH}" "cpsMPI"
