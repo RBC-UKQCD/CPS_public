@@ -1,0 +1,93 @@
+##########################################
+#
+# Example of user provided qcsh script
+#
+# Filename: user.qcsh 
+#
+###########################################
+echo "`date` : Starting user provided qcsh script: $QCSH_SCRIPT "  >> $LOGFILE
+echo " Value of QDATA: $QDATA" >> $LOGFILE
+
+set version_tag=v3_0
+
+set t_src=32
+set ensemble_label=IWASAKI_Nf2p1_32c64s16_b2.25M1.80mu0.004ms0.03_rhmc_H_R_G
+set ensemble_id=141
+
+set exec_file=/host/rack20-23/lightman/propagator_production/binary_${version_tag}/QCDOC.x
+set logs_configs_dir=/host/rack20-23/lightman/propagator_production/logfiles_t_src_${t_src}/logs_configs/
+set configs_done_log=/host/rack20-23/lightman/propagator_production/logfiles_t_src_${t_src}/configs_done.txt
+set configs_temp_dir=/host/rack20-23/lightman/propagator_production/configurations/
+set keep_running_file=/host/rack20-23/lightman/propagator_production/logfiles_t_src_${t_src}/keep_running_${version_tag}.txt
+set overall_log=/host/rack20-23/lightman/propagator_production/logfiles_t_src_${t_src}/log.txt
+
+set exec_dir=/host/lightman/propagator_production
+set logs_configs_dir_qrun=/host/lightman/propagator_production/logfiles_t_src_${t_src}/logs_configs/
+set configs_temp_dir_qrun=/host/lightman/propagator_production/configurations/
+set plaq_gfix_info_dir=/host/lightman/propagator_production/logfiles_t_src_${t_src}/plaq_gfix_info/
+set midprop_contractions_dir=/host/lightman/propagator_production/logfiles_t_src_${t_src}/midprop_contractions/
+set configs_done_log_qrun=/host/lightman/propagator_production/logfiles_t_src_${t_src}/configs_done.txt
+set gauge_rotated_lats_saved_dir=/host/lightman/propagator_production/gfixed_configs/
+set gauge_rotated_lats_saved_log=/host/lightman/propagator_production/logfiles_t_src_${t_src}/gauge_rotated_lats_saved.txt
+
+echo >> $overall_log
+echo "Starting job number $JOBID at `date`" >> $overall_log
+
+foreach config_no ( ` ls $logs_configs_dir | sort -n ` )
+	set c=`grep -w $config_no $configs_done_log | wc -l`
+	if ( $c == 0 ) then
+		echo "Starting configuration number $config_no in job $JOBID at `date`" >> $overall_log
+		if ( $config_no >= 44 && $config_no <= 298 ) then
+			scp qcdochosta:/host2/qcddata/DWF/2+1f/32nt64/IWASAKI/b2.25/ls16/M1.8/ms0.03/mu0.004/rhmc_H_R_G/evol0/configurations/ckpoint_lat.$config_no $configs_temp_dir
+		else if ( $config_no >= 300 && $config_no <= 756 ) then
+			scp qcdochosta:/host5/qcddata/DWF/2+1f/32nt64/IWASAKI/b2.25/ls16/M1.8/ms0.03/mu0.004/rhmc_H_R_G/evol1/configurations/ckpoint_lat.$config_no $configs_temp_dir
+		else if ( $config_no >= 758 && $config_no <= 1092 ) then
+			scp qcdochosta:/host5/qcddata/DWF/2+1f/32nt64/IWASAKI/b2.25/ls16/M1.8/ms0.03/mu0.004/rhmc_H_R_G/evol2/configurations/ckpoint_lat.$config_no $configs_temp_dir
+		else if ( $config_no >= 1094 && $config_no <= 1420 ) then
+			scp qcdochosta:/host7/qcddata/DWF/2+1f/32nt64/IWASAKI/b2.25/ls16/M1.8/ms0.03/mu0.004/rhmc_H_R_G/evol3/configurations/ckpoint_lat.$config_no $configs_temp_dir
+		else if ( $config_no >= 1422 && $config_no <= 1740 ) then
+			scp qcdochosta:/host7/qcddata/DWF/2+1f/32nt64/IWASAKI/b2.25/ls16/M1.8/ms0.03/mu0.004/rhmc_H_R_G/evol4/ckpoint_lat.$config_no $configs_temp_dir
+		else if ( $config_no >= 1742 && $config_no <= 1820 ) then
+			scp qcdochosta:/host7/qcddata/DWF/2+1f/32nt64/IWASAKI/b2.25/ls16/M1.8/ms0.03/mu0.004/rhmc_H_R_G/evol5/configurations/ckpoint_lat.$config_no $configs_temp_dir
+		else
+			echo "No lattice for configuration number $config_no" > ./$JOBID/qrun.$JOBNAME.$JOBID.config$config_no.no_lat.out
+			echo "No lattice for configuration number $config_no.  Job $JOBID, `date`" >> $overall_log
+			continue
+		endif
+		set qrun_no=0
+		while ( $c == 0 )
+			@ qrun_no++
+			echo "Starting qrun number $qrun_no in configuration number $config_no, job number $JOBID at `date`" >> $overall_log
+			qrun $exec_file 1 $exec_dir vml_files/do_arg.vml vml_files/evo_arg.vml $configs_temp_dir_qrun/ckpoint_lat.$config_no none 17 $t_src $ensemble_label $ensemble_id $config_no $logs_configs_dir_qrun $plaq_gfix_info_dir $midprop_contractions_dir $configs_done_log_qrun $gauge_rotated_lats_saved_dir $gauge_rotated_lats_saved_log >> ./$JOBID/qrun.$JOBNAME.$JOBID.out
+			echo "Finished qrun number $qrun_no in configuration number $config_no, job number $JOBID at `date`" >> $overall_log
+			set c=`grep -w $config_no $configs_done_log | wc -l`
+		        set keep_running_val=`head -1 $keep_running_file`
+        		if ( $keep_running_val != "Continue" ) then
+                		break
+        		endif
+		end
+		rm $configs_temp_dir/ckpoint_lat.$config_no
+		echo "Finished configuration number $config_no in job $JOBID at `date`" >> $overall_log
+	endif
+	set keep_running_val=`head -1 $keep_running_file`
+	if ( $keep_running_val != "Continue" ) then
+		echo "User terminated job $JOBID using the keep_running file." >> $overall_log
+		echo "Stopped at configuration number $config_no at `date`" >> $overall_log
+                echo "Putting Continue back into $keep_running_file" >> $overall_log
+                echo Continue > $keep_running_file
+		break
+	endif
+end
+
+echo "Finished job $JOBID at `date`" >> $overall_log
+
+
+
+if ( $? != 0 ) then
+   echo "`date` : ERROR in running: qrun " >> $LOGFILE
+   exit 1
+endif
+
+echo "`date` : Reached End of user provided script " >> $LOGFILE
+
+
