@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.10 2008-02-08 18:35:07 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.2 2008-04-21 17:18:02 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v 1.10 2008-02-08 18:35:07 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.10 2008-02-08 18:35:07 chulwoo Exp $
+//  $Date: 2008-04-21 17:18:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v 1.2 2008-04-21 17:18:02 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.2 2008-04-21 17:18:02 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.10 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C,v $
+//  $Revision: 1.2 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -38,7 +38,7 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 #include <util/wilson.h>
-#include <util/time_cps.h>
+#include <util/time.h>
 #include <util/dwf.h>
 #include <mem/p2v.h>
 #include <comms/glb.h>

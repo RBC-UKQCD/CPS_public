@@ -3,20 +3,20 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.5 2007-11-14 18:52:49 chulwoo Exp $
+  $Id: d_op_dwf.C.sav,v 1.2 2008-04-21 17:18:02 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-11-14 18:52:49 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/d_op_dwf.C,v 1.5 2007-11-14 18:52:49 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.5 2007-11-14 18:52:49 chulwoo Exp $
+//  $Date: 2008-04-21 17:18:02 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/d_op_dwf.C.sav,v 1.2 2008-04-21 17:18:02 chulwoo Exp $
+//  $Id: d_op_dwf.C.sav,v 1.2 2008-04-21 17:18:02 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/d_op_dwf.C,v $
+//  $RCSfile: d_op_dwf.C.sav,v $
+//  $Revision: 1.2 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/d_op_dwf.C.sav,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -44,7 +44,7 @@ CPS_START_NAMESPACE
 
 //CJ: Hack to delete sync()'s
 
-#if TARGET == BGP
+#if 0
 inline void sync() {}
 #endif
 
