@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2008-04-21 14:09:15 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.55 2008-04-21 14:09:15 chulwoo Exp $
-dnl  $Id: configure.in,v 1.55 2008-04-21 14:09:15 chulwoo Exp $
+dnl  $Date: 2008-04-21 19:13:48 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.56 2008-04-21 19:13:48 chulwoo Exp $
+dnl  $Id: configure.in,v 1.56 2008-04-21 19:13:48 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.55 $
+dnl  $Revision: 1.56 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -130,7 +130,7 @@ elif test "$enable_target" = "bgp"; then
 
    CFLAGS="${CFLAGS}"
    CXXFLAGS="${CXXFLAGS}"
-   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I/bgl/BlueLight/ppcfloor/bglsys/include/ -I/bgsys/drivers/ppcfloor/arch/include/"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I/bgsys/drivers/ppcfloor/arch/include/"
 #   LDFLAGS="-I/bgl/BlueLight/ppcfloor/bglsys/include/ -L/bgl/BlueLight/ppcfloor/bglsys/lib/ -lrts.rts"
 
    ARCH="BGP"
