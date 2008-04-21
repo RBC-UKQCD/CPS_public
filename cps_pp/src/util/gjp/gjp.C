@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.35 2008-03-25 17:53:43 chulwoo Exp $
+  $Id: gjp.C,v 1.36 2008-04-21 14:19:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-03-25 17:53:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.35 2008-03-25 17:53:43 chulwoo Exp $
-//  $Id: gjp.C,v 1.35 2008-03-25 17:53:43 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.36 2008-04-21 14:19:18 chulwoo Exp $
+//  $Id: gjp.C,v 1.36 2008-04-21 14:19:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.35 $
+//  $Revision: 1.36 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -297,50 +297,13 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
   gjp_scu_dir[8] = SCU_SP;
   gjp_scu_dir[9] = SCU_SM;
 
-#if TARGET != BGL
+#if TARGET != BGL && TARGET != BGP
   for(int i = 0;i<5;i++)
   if(nodes[i] > 1){
   gjp_scu_wire_map[2*i]   = SCURemap(gjp_scu_dir[2*i]);
   gjp_scu_wire_map[2*i+1] = SCURemap(gjp_scu_dir[2*i+1]);
   }
 
-#if 0 
-  gjp_scu_wire_map[0] = SCU_XP;
-  gjp_scu_wire_map[1] = SCU_XM;
-  gjp_scu_wire_map[2] = SCU_YP;
-  gjp_scu_wire_map[3] = SCU_YM;
-  gjp_scu_wire_map[4] = SCU_ZP;
-  gjp_scu_wire_map[5] = SCU_ZM;
-  gjp_scu_wire_map[6] = SCU_TP;
-  gjp_scu_wire_map[7] = SCU_TM;
-
-  if(s_nodes != 1) {
-    if (s_axis == SCU_X) {
-      gjp_scu_dir[8] = SCU_XP;
-      gjp_scu_dir[9] = SCU_XM;
-      gjp_scu_wire_map[8] = SCU_XP;
-      gjp_scu_wire_map[9] = SCU_XM;
-    }
-    if (s_axis == SCU_Y) {
-      gjp_scu_dir[8] = SCU_YP;
-      gjp_scu_dir[9] = SCU_YM;
-      gjp_scu_wire_map[8] = SCU_YP;
-      gjp_scu_wire_map[9] = SCU_YM;
-    }
-    if (s_axis == SCU_Z) {
-      gjp_scu_dir[8] = SCU_ZP;
-      gjp_scu_dir[9] = SCU_ZM;
-      gjp_scu_wire_map[8] = SCU_ZP;
-      gjp_scu_wire_map[9] = SCU_ZM;
-    }
-    if (s_axis == SCU_T) {
-      gjp_scu_dir[8] = SCU_TP;
-      gjp_scu_dir[9] = SCU_TM;
-      gjp_scu_wire_map[8] = SCU_TP;
-      gjp_scu_wire_map[9] = SCU_TM;
-    }
-  }
-#endif
 #endif //TARGET_BGL == 1
   
 #endif //PARALLEL
@@ -349,10 +312,15 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
   
   // Set the boundary conditions for the whole lattice
   //----------------------------------------------------------------
+#ifndef UNIFORM_SEED_TESTING
   bc[0] = doarg_int.x_bc;
   bc[1] = doarg_int.y_bc;
   bc[2] = doarg_int.z_bc;
   bc[3] = doarg_int.t_bc;
+#else
+  for(i = 0; i<4 ; i++)
+    bc[i] = BND_CND_PRD;
+#endif
 
   // Set the boundary conditions for the sub-lattice on this node
   //----------------------------------------------------------------

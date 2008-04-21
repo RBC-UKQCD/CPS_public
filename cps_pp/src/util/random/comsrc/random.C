@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.28 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: random.C,v 1.29 2008-04-21 14:19:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.28 2008-02-08 18:35:08 chulwoo Exp $
-//  $Id: random.C,v 1.28 2008-02-08 18:35:08 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.29 2008-04-21 14:19:18 chulwoo Exp $
+//  $Id: random.C,v 1.29 2008-04-21 14:19:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.28 $
+//  $Revision: 1.29 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -220,6 +220,37 @@ void LatRanGen::Initialize()
   vx[3] = hx[3] * GJP.Tnodes();
   vx[4] = hx[4] * GJP.Snodes();
 
+  int index, index_4d;
+  index = index_4d = 0;
+
+  /*PAB: Implement the Britney and Christina tests correctly*/
+#ifdef UNIFORM_SEED_TESTING
+  if (1) {
+#else
+  if ( GJP.StartSeedKind() ==  START_SEED_FIXED_UNIFORM ) {
+#endif
+    int x[5];
+    int start_seed = default_seed;
+
+    for(x[4] = 0; x[4] < GJP.SnodeSites(); x[4]+=2) {
+    for(x[3] = 0; x[3] < GJP.TnodeSites(); x[3]+=2) {
+    for(x[2] = 0; x[2] < GJP.ZnodeSites(); x[2]+=2) {
+    for(x[1] = 0; x[1] < GJP.YnodeSites(); x[1]+=2) {
+    for(x[0] = 0; x[0] < GJP.XnodeSites(); x[0]+=2) {
+
+      start_seed += 23;
+      ugran[index++].Reset(start_seed);
+      if ( x[4] == 0 ) ugran_4d[index_4d++].Reset(start_seed);
+
+    }
+    }
+    }
+    }
+    }
+    return;
+  }
+
+
 
   // Sort out what the seed should be depending on the GJP.StartSeedKind()
 
@@ -261,7 +292,7 @@ void LatRanGen::Initialize()
   // Seed the hypercube RNGs
 
   int x[5];
-  int index, index_4d;
+//  int index, index_4d;
   index = index_4d = 0;
   
 for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {

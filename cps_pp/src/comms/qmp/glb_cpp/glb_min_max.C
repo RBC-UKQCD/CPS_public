@@ -53,9 +53,11 @@ static Float *gsum_buf = NULL;
 
 void glb_max(Float * float_p)
 {
-  #ifdef USE_QMP
+#if 1
+#ifndef UNIFORM_SEED_TESTING
   QMP_max_double(float_p);
-  #else
+#endif
+#else
   int NP[4] = {GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes()};
 
   if (transmit_buf == NULL) 
@@ -72,15 +74,6 @@ void glb_max(Float * float_p)
 
       for (int itmp = 1; itmp < NP[i]; itmp++) {
 
-	#ifndef USE_QMP
-	SCUDirArg send(transmit_buf, dir[2*i], SCU_SEND, sizeof(Float));
-	SCUDirArg rcv(receive_buf, dir[2*i+1], SCU_REC, sizeof(Float));
-
-	send.StartTrans();
-	rcv.StartTrans();
-	send.TransComplete();
-	rcv.TransComplete();
-	#else
 	QMP_msgmem_t msgmem[2];
 	QMP_msghandle_t msghandle[2];
 	QMP_msghandle_t sndrcv;
@@ -97,14 +90,13 @@ void glb_max(Float * float_p)
 	QMP_free_msghandle(sndrcv);
 	QMP_free_msgmem(msgmem[0]);
 	QMP_free_msgmem(msgmem[1]);
-	#endif
 
         *gsum_buf = max(*gsum_buf, *receive_buf) ;
         *transmit_buf = *receive_buf;
       }
   }
   *float_p = *gsum_buf;
-  #endif
+#endif
 }
 
 
@@ -120,9 +112,11 @@ void glb_max(Float * float_p)
 //---------------------------------------------------------------------- 
 void glb_min(Float * float_p)
 {
-  #ifdef USE_QMP
+#if 1
+#ifndef UNIFORM_SEED_TESTING
   QMP_min_double(float_p);
-  #else
+#endif
+#else
   int NP[4] = {GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes()};
   if (transmit_buf == NULL) 
       transmit_buf = (Float *)qalloc(QFAST|QNONCACHE,sizeof(Float));
@@ -138,15 +132,6 @@ void glb_min(Float * float_p)
       *transmit_buf = *gsum_buf;
 
       for (int itmp = 1; itmp < NP[i]; itmp++) {
-	#ifndef USE_QMP
-	SCUDirArg send(transmit_buf, dir[2*i], SCU_SEND, sizeof(Float));
-	SCUDirArg rcv(receive_buf, dir[2*i+1], SCU_REC, sizeof(Float));
-
-	send.StartTrans();
-	rcv.StartTrans();
-	send.TransComplete();
-	rcv.TransComplete();
-	#else
 	QMP_msgmem_t msgmem[2];
 	QMP_msghandle_t msghandle[2];
 	QMP_msghandle_t sndrcv;
@@ -163,7 +148,6 @@ void glb_min(Float * float_p)
 	QMP_free_msghandle(sndrcv);
 	QMP_free_msgmem(msgmem[0]);
 	QMP_free_msgmem(msgmem[1]);
-	#endif
 
 
         *gsum_buf = min(*gsum_buf, *receive_buf) ;
@@ -171,7 +155,7 @@ void glb_min(Float * float_p)
       }
   }
   *float_p = *gsum_buf;
-  #endif
+#endif
 }
 
 CPS_END_NAMESPACE

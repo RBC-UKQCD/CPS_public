@@ -39,7 +39,7 @@ CPS_END_NAMESPACE
 #endif
 CPS_START_NAMESPACE
 
-#if TARGET==QCDOC
+#if (TARGET==QCDOC) || (TARGET==BGP)
 static const int SHIFT_X = 1;
 static const int SHIFT_Y = 1;
 static const int SHIFT_Z = 1;
@@ -94,7 +94,7 @@ AlgHmc::AlgHmc(AlgIntAB &Integrator, CommonArg &c_arg, HmcArg &arg)
 //------------------------------------------------------------------
 AlgHmc::~AlgHmc() {
 
-  int i,j;
+//  int i,j;
   char *fname = "~AlgHmc()" ;
   VRB.Func(cname,fname);
 
@@ -135,7 +135,7 @@ Float AlgHmc::run(void)
 #if TARGET==cpsMPI
   using MPISCU::fprintf;
 #endif
-  int step;                            // Trajectory step
+//  int step;                            // Trajectory step
   int accept;
 
   char *fname = "run()";
@@ -154,10 +154,11 @@ Float AlgHmc::run(void)
 #endif
  
   // Set the microcanonical time step
-  Float dt = hmc_arg->step_size;
+//  Float dt = hmc_arg->step_size;
 
   //!< Save initial lattice and rngs (if necessary)
   int Ntests = saveInitialState();
+  VRB.Result(cname,fname,"shifts=%d %d %d\n",SHIFT_X,SHIFT_Y,SHIFT_Z);
 
   // Try attempt_limit times to generate the same final gauge config 
   // consecutively

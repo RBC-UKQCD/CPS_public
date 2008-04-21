@@ -134,6 +134,7 @@ extern "C" {
 
 }
 
+
 void wfm_dslash_two( Float *chi0, Float *chi1, 
 		     Float *u, 
 		     Float *psi0, Float *psi1,
@@ -205,11 +206,13 @@ void wfm_dslash_two( Float *chi0, Float *chi1,
   unsigned long long offset = 1000;
   unsigned long long interval = 10000;
   if (called%interval==offset){
+#ifndef  UNIFORM_SEED_TESTING
     CPS_NAMESPACE::print_time("wfm_dslash_two","dslash_time",dslash_time/offset);
     CPS_NAMESPACE::print_time("wfm_dslash_two","decom_time",decom_time/offset);
     CPS_NAMESPACE::print_time("wfm_dslash_two","recom_time",recom_time/offset);
     CPS_NAMESPACE::print_time("wfm_dslash_two","comm_init_time",comm_init_time/offset);
     CPS_NAMESPACE::print_time("wfm_dslash_two","comm_time",comm_time/offset);
+#endif
   }
   if (called%interval==0){
     called=0;

@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpBase class multishift CG solver method.
 
-  $Id: minvcg.C,v 1.3 2008-02-08 18:35:07 chulwoo Exp $
+  $Id: minvcg.C,v 1.4 2008-04-21 14:19:18 chulwoo Exp $
 */
 
 CPS_END_NAMESPACE
@@ -80,10 +80,17 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   else
     f_size = lat.FsiteSize()*GJP.VolNodeSites() / (lat.FchkbEvl()+1);
 
+#ifdef UNIFORM_SEED_TESTING
+  unsigned int g_csum = global_checksum((Float *)chi,f_size);
+  if(!UniqueID()) printf("%s::%s: Input checksum = %p\n",
+      cname,fname,g_csum);
+  unsigned long loc_csum;
+#else
   unsigned long loc_csum = local_checksum((Float *)chi,f_size);
   CSM.SaveCsum(CSUM_EVL_SRC,loc_csum);
   CSM.Clear(CSUM_GLB_LOC);
   CSM.Clear(CSUM_GLB_SUM);
+#endif
 
   Vector *r = (Vector *)fmalloc(f_size * sizeof(Float),
 				cname,fname, "r");
@@ -298,7 +305,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
         fprintf(stderr,"mmp =%p mmp_store = %p\n",mmp_checksum,d_store[k]);
 // Temporary hack to exit immediately
         Float *null_p = NULL; *null_p = 0.;
-#ifdef USE_QMP
+#if (defined USE_QMP) && ( !defined UNIFORM_SEED_NO_COMMS)
         QMP_abort_string(-1, "NODE FAILS TO REPRODUCE");
 #else
         ERR.General(cname,fname, "NODE FAILS TO REPRODUCE");
@@ -397,6 +404,11 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
       psi_slow[s] -> CopyVec(psi[s],f_size);
       ffree(cname,fname,"psi[s]",psi[s]);
       loc_csum = loc_csum ^ local_checksum((Float *)psi_slow[s],f_size);
+#ifdef UNIFORM_SEED_TESTING
+  unsigned int g_csum = global_checksum((Float *)psi_slow[s],f_size);
+  if(!UniqueID()) printf("%s::%s: Output checksum = %p\n",
+      cname,fname,g_csum);
+#endif
     }
     ffree(cname,fname,"p[s]",p[s]);
   }
@@ -419,11 +431,7 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   sfree(cname,fname,"at",at);
   
   CGcount++;
-#ifdef USE_QMP
-  QMP_barrier();
-#else
-//  sync();
-#endif
+  sync();
   VRB.FuncEnd(cname,fname);
   return k;
 }

@@ -79,6 +79,7 @@ void wfm::pointers_init(void)
   bit_bucket = ALLOC(32);
 
 
+#ifndef UNIFORM_SEED_TESTING
   if ( SloppyPrecision ) { 
     if ( isBoss() ) printf("Configuring for MIXED precision kernels: word sizes %d,%d\n",sizeof(Float),sizeof(float));
   } else {
@@ -89,13 +90,16 @@ void wfm::pointers_init(void)
   } else { 
     if ( isBoss() ) printf("Configuring for QCDOC kernels\n");
   }
+#endif
   if ( SloppyPrecision ) {
     SizeofTwoSpin = sizeof(float);
   } else {
     SizeofTwoSpin = sizeof(Float);
   }
+#ifndef UNIFORM_SEED_TESTING
   if ( isBoss() ) printf("Padded 2-spinor size is %d words, %d bytes\n",PAD_HALF_SPINOR_SIZE,
 	PAD_HALF_SPINOR_SIZE*SizeofTwoSpin);
+#endif
 
   for ( cb = 0 ; cb<2 ; cb++) {
     //ND * plus_minus * hvol * parities

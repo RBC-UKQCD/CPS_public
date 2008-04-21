@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.27 2008-01-02 20:29:23 chulwoo Exp $
+  $Id: random.h,v 1.28 2008-04-21 14:19:17 chulwoo Exp $
  */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-01-02 20:29:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.27 2008-01-02 20:29:23 chulwoo Exp $
-//  $Id: random.h,v 1.27 2008-01-02 20:29:23 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v 1.28 2008-04-21 14:19:17 chulwoo Exp $
+//  $Id: random.h,v 1.28 2008-04-21 14:19:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.h,v $
-//  $Revision: 1.27 $
+//  $Revision: 1.28 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/random.h,v $
 //  $State: Exp $
 //
@@ -193,6 +193,7 @@ class GaussianRandomGenerator : public virtual RandomGenerator
 
     //! to store this object
     void store(int *buf) {
+//      VRB.Result("GaussianRandomGenerator","store()","iset=%d",iset);
       if (iset)
         ERR.General("GaussianRandomGenerator","store()","iset !=0, RNG state cannot be saved correctly");
       RandomGenerator::store(buf);
@@ -203,6 +204,10 @@ class GaussianRandomGenerator : public virtual RandomGenerator
     void load(int *buf) {
       RandomGenerator::load(buf);
       iset = buf[RandomGenerator::RNGints()];
+//      VRB.Result("GaussianRandomGenerator","load","iset=%d",iset);
+      if (iset)
+        ERR.General("GaussianRandomGenerator","load()","iset !=0, RNG state is not correct");
+      RandomGenerator::store(buf);
     }
 };
  

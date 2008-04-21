@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.5 2008-03-25 17:53:43 chulwoo Exp $
+  $Id: get_data.C,v 1.6 2008-04-21 14:19:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-03-25 17:53:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.5 2008-03-25 17:53:43 chulwoo Exp $
-//  $Id: get_data.C,v 1.5 2008-03-25 17:53:43 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.6 2008-04-21 14:19:18 chulwoo Exp $
+//  $Id: get_data.C,v 1.6 2008-04-21 14:19:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -90,7 +90,7 @@ static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len_i, int
 
   if(gjp_local_axis[mu] == 1) {
 //    for(int i=0;i<len_i;i++) rcv_noncache[i] = send_noncache[i];
-    memcpy(rcv_noncache,send_noncache,len_i*sizeof(IFloat);  
+    memcpy(rcv_noncache,send_noncache,len_i*sizeof(IFloat));
     return;
   }
 
@@ -129,9 +129,7 @@ static void getData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu, int sign
     memcpy(rcv_buf,rcv_noncache,len*sizeof(IFloat));
   }
   else {
-    for(int i = 0; i < len; ++i) {
-//      *rcv_buf++ = *send_buf++;
-    }
+//    for(int i = 0; i < len; ++i) *rcv_buf++ = *send_buf++;
     memcpy(rcv_buf,send_buf,len*sizeof(IFloat));
   }
 }

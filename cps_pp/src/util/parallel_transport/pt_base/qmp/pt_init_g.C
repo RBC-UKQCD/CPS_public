@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_init_g.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+  $Id: pt_init_g.C,v 1.3 2008-04-21 14:19:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-11 22:45:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init_g.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
-//  $Id: pt_init_g.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init_g.C,v 1.3 2008-04-21 14:19:18 chulwoo Exp $
+//  $Id: pt_init_g.C,v 1.3 2008-04-21 14:19:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_init_g.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init_g.C,v $
 //  $State: Exp $
 //
@@ -57,8 +57,8 @@ void PT::delete_g_buf(){
 
   //----------------------------------------------------------------------
   //Checkerboarding
-  for(int i = 0; i < 4*NDIM; i++)
-    if(!local[i/4])
+  for(int i = 0; i < 2*NDIM; i++)
+    if(!local[i/2])
     {
 #ifdef USE_SCU
       delete SCUarg_cb[i];
@@ -66,12 +66,17 @@ void PT::delete_g_buf(){
 #endif
       
       //Free msg_mem created during initialization (receive only)
-      if (i%2 == 0) {
-	QMP_free_msgmem(*(msg_mem_cb[i]));
-	QMP_free_msgmem(*(msg_mem_mat_cb[i]));
+      QMP_free_msgmem(msg_mem_cb[i*2]);
+      QMP_free_msghandle(msg_handle_cb[i*2]);
+      QMP_free_msgmem(msg_mem_mat_cb[i*2]);
+      if(i%2){
+        QMP_free_msgmem(msg_mem_cb[i*2+1]);
+        QMP_free_msghandle(msg_handle_cb[i*2+1]);
+      } else if(i==6){
+        QMP_free_msgmem(msg_mem_cb[i*2+1]);
+        QMP_free_msghandle(msg_handle_cb[i*2+1]);
       }
-      delete msg_mem_cb[i];
-      delete msg_mem_mat_cb[i];
+
     }
   //---------------------------------------------------------------------
 }
@@ -214,9 +219,6 @@ void PT::init_g(Float * g_addr){
 
 	//printf("%d %d\n",i,hop);
 	
-	//#ifdef USE_QMP
-        //Declare QMP routines elsewhere
-	//#else
 	//Allocate memory for all msg_mem
 	//Initialize msg_mem but for receive only
 
@@ -287,8 +289,9 @@ void PT::init_g(Float * g_addr){
 			   non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
 #endif
 
-      msg_mem_cb[i*2] = new QMP_msgmem_t;
-      *(msg_mem_cb[i*2]) = QMP_declare_msgmem((void*)rcv_buf[i], non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat));
+//      msg_mem_cb[i*2] = new QMP_msgmem_t;
+      msg_mem_cb[i*2] = QMP_declare_msgmem((void*)rcv_buf[i], non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat));
+      msg_handle_cb[i*2] = QMP_declare_receive_relative(msg_mem_cb[i*2], i/2, 1-2*(i%2), 0); 
 
 #ifdef USE_SCU
       //Initialize SCUArg to send fermion field
@@ -303,7 +306,14 @@ void PT::init_g(Float * g_addr){
 				   numblk_cb[i],stride_cb[i],IR_9);
 #endif
 
-      msg_mem_cb[i*2+1] = new QMP_msgmem_t;
+//      msg_mem_cb[i*2+1] = new QMP_msgmem_t;
+    if(i%2){
+      msg_mem_cb[i*2+1] = QMP_declare_msgmem((void*)snd_buf_cb[i/2], non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat));
+      msg_handle_cb[i*2+1] = QMP_declare_send_relative(msg_mem_cb[i*2+1], i/2, 2*(i%2)-1, 0); 
+    } else if(i==6){
+      msg_mem_cb[i*2+1] = QMP_declare_msgmem((void*)snd_buf_t_cb, non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat));
+      msg_handle_cb[i*2+1] = QMP_declare_send_relative(msg_mem_cb[i*2+1], i/2, 2*(i%2)-1, 0); 
+    }
     
 #ifdef USE_SCU
       //Receive for Matrices
@@ -312,8 +322,8 @@ void PT::init_g(Float * g_addr){
       SCUarg_mat_cb[i*2]->Init((void *)rcv_buf[i],rcv_dir[i],SCU_REC,
 			       3*non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat),1,0,IR_9);
 #endif
-      msg_mem_mat_cb[i*2] = new QMP_msgmem_t;
-      *(msg_mem_mat_cb[i*2]) = QMP_declare_msgmem((void*)rcv_buf[i], 3*non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat));
+//      msg_mem_mat_cb[i*2] = new QMP_msgmem_t;
+      msg_mem_mat_cb[i*2] = QMP_declare_msgmem((void*)rcv_buf[i], 3*non_local_chi_cb[i]*VECT_LEN*sizeof(IFloat));
       
 #ifdef USE_SCU
       //send for matrices
@@ -327,7 +337,7 @@ void PT::init_g(Float * g_addr){
 				   3*blklen_cb[i],numblk_cb[i],3*stride_cb[i],IR_9);
 #endif
 
-      msg_mem_mat_cb[i*2+1] = new QMP_msgmem_t;
+//      msg_mem_mat_cb[i*2+1] = new QMP_msgmem_t;
       //-----------------------------------------------------------------------
     }
   

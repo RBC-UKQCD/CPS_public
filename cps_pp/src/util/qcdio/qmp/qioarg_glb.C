@@ -20,7 +20,7 @@ int QioControl::synchronize(const int errorStatus)  const {
   const char * fname = "synchronize()";
   int error = errorStatus;
  
-  QMP_barrier();
+//  QMP_barrier();
 //  printf("Node %d:synchronize(%d)\n",UniqueID(),errorStatus);
   if(NumNodes()>1) {
     error = globalSumInt(error);
@@ -28,7 +28,7 @@ int QioControl::synchronize(const int errorStatus)  const {
       VRB.Flow(cname,fname,"Totally %d nodes reported error!\n",error);
     }
   }
-  QMP_barrier();
+//  QMP_barrier();
 //  printf("Node %d:synchronize(%d)\n",UniqueID(),errorStatus);
   return error;
 }
@@ -61,11 +61,13 @@ int QioControl::round(const Float fdata) const{
 
 int QioControl::globalSumInt(const int data) const{
   int temp=data;
+#ifndef UNIFORM_SEED_TESTING
 //  QMP_barrier();
 //  printf("Node %d: before QMP_sum_int(%d)\n",UniqueID(),data);
   QMP_sum_int(&temp);
 //  QMP_barrier();
 //  printf("Node %d: after QMP_sum_int(%d)\n",UniqueID(),temp);
+#endif
   return temp;
 }
 
@@ -99,13 +101,17 @@ unsigned int QioControl::globalSumUint(const unsigned int data) const{
 
 Float QioControl::globalSumFloat(const Float data) const {
   double temp=data;
+#ifndef UNIFORM_SEED_TESTING
   QMP_sum_double(&temp);
+#endif
   return (Float)temp;
 }
 
 int QioControl::globalMinInt(const int data) const{
   double temp=data;
+#ifndef UNIFORM_SEED_TESTING
   QMP_min_double(&temp);
+#endif
   return (int)temp;
 }
 

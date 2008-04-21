@@ -55,20 +55,36 @@ void glb_sum(Float * float_p)
     five_dim = GJP.Snodes();
     if (!UniqueID()) printf("glb_sum:five_dim=%d\n",five_dim);
   }
+#ifdef UNIFORM_SEED_TESTING
+//  fprintf(stderr,"glb_sum() called!\n");
+    glb_sum_internal2(float_p,4);
+#else
   if (five_dim>1)
     glb_sum_internal2(float_p,4);
   else
     QMP_sum_double(float_p);
+#endif
 }
 
 void glb_sum_gimp(Float * float_p)
 {
   int NP[4] = {GJP.Xnodes(), GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes()};
   static int counter = 0;
-
-  #ifdef USE_QMP
-  QMP_sum_double(float_p);
-  #else
+#ifdef UNIFORM_SEED_TESTING
+  fprintf(stderr,"glb_sum_gimp() called!\n");
+  glb_sum_internal2(float_p,4);
+#else 
+#if 1
+  static int five_dim=-1;
+  if (five_dim<0){
+    five_dim = GJP.Snodes();
+    if (!UniqueID()) printf("glb_sum_gimp:five_dim=%d\n",five_dim);
+  }
+  if (five_dim>1)
+    glb_sum_internal2(float_p,4);
+  else
+    QMP_sum_double(float_p);
+#else
   if (transmit_buf == NULL) 
       transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
   if (receive_buf == NULL) 
@@ -78,51 +94,36 @@ void glb_sum_gimp(Float * float_p)
   if (output) printf("glb_sum cpp %d before = %e ", counter, (double)*float_p);
   *gsum_buf = (Double64)*float_p;
 
-  #ifdef USE_QMP
   QMP_msgmem_t msgmem[2];
   QMP_msghandle_t msghandle[2];
   QMP_msghandle_t sndrcv;
-  #endif
 
   for(int i = 0; i < 4; ++i) {
 
       *transmit_buf = *gsum_buf;
-      #ifdef USE_QMP
       msgmem[0] = QMP_declare_msgmem((void *)transmit_buf, sizeof(Double64));
       msghandle[0] = QMP_declare_send_relative(msgmem[0], i, 1, 0);
       msgmem[1] = QMP_declare_msgmem((void *)receive_buf, sizeof(Double64));
       msghandle[1] = QMP_declare_receive_relative(msgmem[1], i, -1, 0);
       sndrcv = QMP_declare_multiple(msghandle, 2);
-      #endif
 
       for (int itmp = 1; itmp < NP[i]; itmp++) {
-	#ifndef USE_QMP
-	SCUDirArg send(transmit_buf, gjp_scu_dir[2*i], SCU_SEND, sizeof(Double64) );
-	SCUDirArg rcv(receive_buf, gjp_scu_dir[2*i+1], SCU_REC, sizeof(Double64) );
-
-	send.StartTrans();
-	rcv.StartTrans();
-	send.TransComplete();
-	rcv.TransComplete();
-	#else
 	QMP_start(sndrcv);
 	QMP_status_t status = QMP_wait(sndrcv);
 	if (status != QMP_SUCCESS)
 	  QMP_error("Communication error in glb_sum_gimp:%s\n", QMP_error_string(status));
-	#endif
 
         *gsum_buf += *receive_buf;
         *transmit_buf = *receive_buf;
       }
-      #ifdef USE_QMP
       QMP_free_msghandle(sndrcv);
       QMP_free_msgmem(msgmem[0]);
       QMP_free_msgmem(msgmem[1]);
-      #endif
   }
   *float_p = (Float)*gsum_buf;
   if (output)   printf("after = %e\n", (double)*float_p);
-  #endif
+#endif
+#endif
   counter++;
 }
 

@@ -8,6 +8,9 @@ static FILE FAKE;
 const int MAX_FILENAME =200;
 FILE *Fopen( FileIoType type, const char *filename, const char *mode){
   FILE *result = NULL;
+#ifdef UNIFORM_SEED_NO_COMMS
+  return &FAKE;
+#endif
   if ( type == ZERO_ONLY && UniqueID() ) return &FAKE;
   if(type == ADD_ID){
     char fname[MAX_FILENAME];

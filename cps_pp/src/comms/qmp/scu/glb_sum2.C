@@ -28,10 +28,6 @@ CPS_END_NAMESPACE
 #include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 
-#ifndef USE_QMP
-#define USE_QMP
-#endif
-
 union DoubleBytes {
     Float dblval;
     char byte[8];
@@ -61,7 +57,8 @@ void glb_sum_internal2(Float * float_p,int ndir)
   static int coor[5] ={0,0,0,0,0};
 //  static SCUDirArgIR *Send[5];
 //  static SCUDirArgIR *Recv[5];
-#ifdef USE_QMP
+
+#ifndef  UNIFORM_SEED_NO_COMMS
   static QMP_mem_t *trans_mem, *gsum_mem;
   static QMP_msgmem_t msgmem2[10];
   static QMP_msghandle_t msghandle2[10];
@@ -77,32 +74,24 @@ void glb_sum_internal2(Float * float_p,int ndir)
       NP[4] = GJP.Snodes();
       for (int i = 1;i<5;i++)
 	if (max <NP[i]) max = NP[i];
-#ifndef USE_QMP
-      transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64)*2);
-      gsum_buf = (Double64 *)qalloc(QFAST,sizeof(Double64)*max);
-#else
+#ifndef  UNIFORM_SEED_NO_COMMS
       trans_mem = QMP_allocate_memory(sizeof(Double64)*2);
       transmit_buf = (Double64 *)QMP_get_memory_pointer(trans_mem);
       gsum_mem = QMP_allocate_memory(sizeof(Double64)*max);
       gsum_buf = (Double64 *)QMP_get_memory_pointer(gsum_mem);
-#endif
       if(!UniqueID())
         printf("transmit_buf=%p gsum_buf=%p\n",transmit_buf,gsum_buf);
       receive_buf = transmit_buf+1;
 
       for(int i = 0;i<5;i++)
       if (NP[i]>1){
-#ifndef USE_QMP
-      Send[i] = new SCUDirArgIR(transmit_buf, gjp_scu_dir[2*i+1], SCU_SEND, sizeof(Double64));
-      Recv[i] = new SCUDirArgIR(receive_buf, gjp_scu_dir[2*i], SCU_REC, sizeof(Double64));
-#else
       msgmem2[2*i] = QMP_declare_msgmem(transmit_buf, sizeof(Double64));
       msghandle2[2*i] = QMP_declare_send_relative(msgmem2[2*i], i, -1, 0);
       msgmem2[2*i+1] = QMP_declare_msgmem(receive_buf, sizeof(Double64));
       msghandle2[2*i+1] = QMP_declare_receive_relative(msgmem2[2*i+1], i, +1, 0);
-      sndrcv_msghandle2[i] = QMP_declare_multiple(&msghandle2[2*i], 2);
-#endif
+//      sndrcv_msghandle2[i] = QMP_declare_multiple(&msghandle2[2*i], 2);
       }
+#endif
   }
   initted = 1;
 
@@ -119,6 +108,8 @@ void glb_sum_internal2(Float * float_p,int ndir)
  CSM.AccumulateCsum(CSUM_GLB_LOC,sum_sum);
 
 
+
+#ifndef  UNIFORM_SEED_NO_COMMS
   for(int i = 0; i < ndir; ++i) 
   if (NP[i] >1) {
       int coor = (GJP.NodeCoor(i)-GDS.Origin(i)+NP[i])%NP[i];
@@ -127,15 +118,16 @@ void glb_sum_internal2(Float * float_p,int ndir)
 
       for (int itmp = 1; itmp < NP[i]; itmp++) {
 	coor = (coor+1)%NP[i];
-#ifndef USE_QMP
-	Send[i]->StartTrans(); Recv[i]->StartTrans();
-	Send[i]->TransComplete(); Recv[i]->TransComplete();
-#else
-	QMP_start(sndrcv_msghandle2[i]);
-	QMP_status_t status = QMP_wait(sndrcv_msghandle2[i]);
+//	QMP_start(sndrcv_msghandle2[i]);
+    QMP_start(msghandle2[2*i]);
+    QMP_start(msghandle2[2*i+1]);
+//	QMP_status_t status = QMP_wait(sndrcv_msghandle2[i]);
+    QMP_status_t status = QMP_wait (msghandle2[2*i]);
 	if (status != QMP_SUCCESS)
 	  QMP_error("Error in glb_sum_internal2: %s\n", QMP_error_string(status));
-#endif
+    status = QMP_wait (msghandle2[2*i+1]);
+	if (status != QMP_SUCCESS)
+	  QMP_error("Error in glb_sum_internal2: %s\n", QMP_error_string(status));
 
         gsum_buf[coor] = *receive_buf;
         *transmit_buf = *receive_buf;
@@ -146,16 +138,8 @@ void glb_sum_internal2(Float * float_p,int ndir)
       }
   }
   *float_p = (Float)tmp_sum;
-
-#if 0
-  for(int i = 0; i < 5; i++) 
-    if (NP[i] > 1) {
-    QMP_free_msghandle(sndrcv_msghandle2[i]);
-    QMP_free_msgmem(msgmem2[2*i]);
-    QMP_free_msgmem(msgmem2[2*i+1]);
-    }
-  initted = 0;
 #endif
+
 
   // accumulate final global sum checksum
   //------------------------------------
@@ -172,10 +156,7 @@ static unsigned long long *gsum_buf_u = NULL;
 void glb_sum_internal2(unsigned int *uint_p, int ndir, int sum_flag) {
   static int NP[5] = {0,0,0,0,0};
   static int coor[5] = {0,0,0,0,0};
-#ifndef USE_QMP
-  static SCUDirArgIR *Send[5];
-  static SCUDirArgIR *Recv[5];
-#else
+#ifndef  UNIFORM_SEED_NO_COMMS
   static QMP_mem_t *trans_mem, *gsum_mem;
   static QMP_msgmem_t msgmem[10];
   static QMP_msghandle_t msghandle[10];
@@ -191,33 +172,23 @@ void glb_sum_internal2(unsigned int *uint_p, int ndir, int sum_flag) {
 	NP[4] = GJP.Snodes();
 	for (int i = 1;i<5;i++)
 	  if (max<NP[i]) max = NP[i];
-#ifndef USE_QMP
-	transmit_buf_u = (unsigned long long*)qalloc(QFAST|QNONCACHE,sizeof(unsigned long long)*2);
-	gsum_buf_u = (unsigned long long*)qalloc(QFAST,sizeof(unsigned long long)*max);
-#else
+#ifndef  UNIFORM_SEED_NO_COMMS
       trans_mem = QMP_allocate_memory(sizeof(unsigned long long)*2);
       transmit_buf_u = (unsigned long long *)QMP_get_memory_pointer(trans_mem);
       gsum_mem = QMP_allocate_memory(sizeof(unsigned long long)*max);
       gsum_buf_u = (unsigned long long *)QMP_get_memory_pointer(gsum_mem);
-#endif
 	receive_buf_u = transmit_buf_u+1;
 
 	for(int i=0; i<5; i++)
       if (NP[i]>1) {
-#ifndef USE_QMP
-	Send[i] = new SCUDirArgIR(transmit_buf_u, gjp_scu_dir[2*i+1], 
-          SCU_SEND, sizeof(unsigned long long));
-	Recv[i] = new SCUDirArgIR(receive_buf_u, gjp_scu_dir[2*i], 
-          SCU_REC, sizeof(unsigned long long));
-#else
 
       msgmem[2*i] = QMP_declare_msgmem(transmit_buf_u, sizeof(unsigned long long));
       msghandle[2*i] = QMP_declare_send_relative(msgmem[2*i], i, -1, 0);
       msgmem[2*i+1] = QMP_declare_msgmem(receive_buf_u, sizeof(unsigned long long));
       msghandle[2*i+1] = QMP_declare_receive_relative(msgmem[2*i+1], i, +1, 0);
       sndrcv_msghandle[i] = QMP_declare_multiple(&msghandle[2*i], 2);
-#endif
       }
+#endif
   }
   initted_u = 1;
   
@@ -227,6 +198,7 @@ void glb_sum_internal2(unsigned int *uint_p, int ndir, int sum_flag) {
   
   unsigned int tmp_sum = *uint_p;
   
+#ifndef  UNIFORM_SEED_NO_COMMS
   for(int i=0; i<ndir; ++i) 
 	if (NP[i] > 1) {
       int coor = GJP.NodeCoor(i);
@@ -235,15 +207,10 @@ void glb_sum_internal2(unsigned int *uint_p, int ndir, int sum_flag) {
 	  
       for (int itmp = 1; itmp < NP[i]; itmp++) {
 		coor = (coor+1)%NP[i];
-#ifndef USE_QMP
-		Send[i]->StartTrans(); Recv[i]->StartTrans();
-		Send[i]->TransComplete(); Recv[i]->TransComplete();
-#else
 		QMP_start(sndrcv_msghandle[i]);
 		QMP_status_t status = QMP_wait(sndrcv_msghandle[i]);
 		if (status != QMP_SUCCESS)
 		  QMP_error("Error in glb_sum_internal2: %s\n", QMP_error_string(status));
-#endif
 		
         gsum_buf_u[coor] = *receive_buf_u;
         *transmit_buf_u = *receive_buf_u;
@@ -255,16 +222,8 @@ void glb_sum_internal2(unsigned int *uint_p, int ndir, int sum_flag) {
       }
 	}
 
-#if 0
-  for(int i = 0; i < 5; i++)
-    if (NP[i] > 1) {
-    QMP_free_msghandle(sndrcv_msghandle[i]);
-    QMP_free_msgmem(msgmem[2*i]);
-    QMP_free_msgmem(msgmem[2*i+1]);
-    }
-  initted_u = 0;
-#endif
   *uint_p = tmp_sum;
+#endif
 }
 
 

@@ -64,6 +64,7 @@ void glb_sum_dir(Float * float_p, int dir)
 		 GJP.TnodeCoor(), 
 		 GJP.SnodeCoor()}; 
 
+#ifndef UNIFORM_SEED_NO_COMMS
   if (transmit_buf == NULL){
     QMP_mem_t *mem_t= QMP_allocate_memory (sizeof(Double64));
       transmit_buf = (Double64 *)QMP_get_memory_pointer(mem_t);
@@ -77,15 +78,6 @@ void glb_sum_dir(Float * float_p, int dir)
       gsum_buf = (Double64 *)QMP_get_memory_pointer(mem_t);
   }
 
-#if 0
-  if (transmit_buf == NULL)
-      transmit_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
-  if (receive_buf == NULL) 
-      receive_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
-  if (gsum_buf == NULL) 
-      gsum_buf = (Double64 *)qalloc(QFAST|QNONCACHE,sizeof(Double64));
-#endif
-
   // Sum along dir
   //--------------------------------------------------------------
   *gsum_buf = *float_p;
@@ -95,14 +87,6 @@ void glb_sum_dir(Float * float_p, int dir)
   int itmp;
   for (itmp = 1; itmp < NP[dir]; itmp++) {
 
-    #ifndef USE_QMP
-    SCUDirArg send(transmit_buf, gjp_scu_dir[2*dir], SCU_SEND, sizeof(Double64));
-    SCUDirArg rcv(receive_buf, gjp_scu_dir[2*dir+1], SCU_REC, sizeof(Double64));
-    send.StartTrans();
-    rcv.StartTrans();
-    send.TransComplete();
-    rcv.TransComplete();	
-    #else
     QMP_msgmem_t msgmem[2];
     QMP_msghandle_t msghandle[2];
     QMP_msghandle_t sndrcv;
@@ -119,7 +103,6 @@ void glb_sum_dir(Float * float_p, int dir)
     QMP_free_msghandle(sndrcv);
     QMP_free_msgmem(msgmem[0]);
     QMP_free_msgmem(msgmem[1]);
-    #endif
 
 
     *gsum_buf += *receive_buf;
@@ -137,14 +120,6 @@ void glb_sum_dir(Float * float_p, int dir)
   *transmit_buf = *gsum_buf;
   
   for (itmp = 1; itmp < NP[dir]; itmp++) {
-    #ifndef USE_QMP
-    SCUDirArg send(transmit_buf, gjp_scu_dir[2*dir], SCU_SEND, sizeof(Double64));
-    SCUDirArg rcv(receive_buf, gjp_scu_dir[2*dir+1], SCU_REC, sizeof(Double64));
-    send.StartTrans();
-    rcv.StartTrans();
-    send.TransComplete();
-    rcv.TransComplete();
-    #else
     QMP_msgmem_t msgmem[2];
     QMP_msghandle_t msghandle[2];
     QMP_msghandle_t sndrcv;
@@ -161,7 +136,6 @@ void glb_sum_dir(Float * float_p, int dir)
     QMP_free_msghandle(sndrcv);
     QMP_free_msgmem(msgmem[0]);
     QMP_free_msgmem(msgmem[1]);
-    #endif
     
     *gsum_buf += *receive_buf;
     *transmit_buf = *receive_buf;
@@ -169,6 +143,7 @@ void glb_sum_dir(Float * float_p, int dir)
 
 
   *float_p = *gsum_buf;
+#endif
 //  fprintf(stdout,"glb_sum_dir():NP[%d]=%d COOR[%d]=%d sum=%0.16e \n",dir,NP[dir],dir,COOR[dir],float_p);
 }
 

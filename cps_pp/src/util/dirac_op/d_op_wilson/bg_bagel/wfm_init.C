@@ -64,7 +64,7 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
   WFM_BGL             = wilson_p->WFM_BGL;
 
 
-  if ( isBoss() ) printf("wfm::init setting up BG/L MMU state\n");
+//  if ( isBoss() ) printf("wfm::init setting up BG/L MMU state\n");
   mmu_optimise();
   mmu_print();
 
@@ -95,7 +95,7 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
   slz = local_latt[2];
   slt = local_latt[3];
 
-#ifdef USE_COMMS_QMP
+#if (defined USE_COMMS_QMP) && (!defined UNIFORM_SEED_NO_COMMS)
   QMP_bool_t qmp_inited=QMP_is_initialized();
   if( !qmp_inited ) { 
 	if ( isBoss() ) printf("QMP_not_initialized\n");
@@ -119,6 +119,14 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
   local_comm[1] = wilson_p->local_comm[1];
   local_comm[2] = wilson_p->local_comm[2];
   local_comm[3] = wilson_p->local_comm[3];
+#ifdef  UNIFORM_SEED_NO_COMMS
+  for(int i=0;i<4;i++)
+    if(local_comm[0]!=1){
+       fprintf(stderr,"wfm::local_comm[%d]=%d!\n",i,local_comm[i]);
+       exit(-33);
+    }
+#endif
+
 
 
 /*-----------------------------------------------------------------------*/
@@ -131,6 +139,7 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
   nbound[1] = (slx * slz * slt)/2;
   nbound[2] = (slx * sly * slt)/2;
   nbound[3] = (slx * sly * slz)/2;
+
 
   allbound  = nbound[0]
             + nbound[1]
@@ -249,7 +258,8 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
  /* spinors.                                                                 */
  /*--------------------------------------------------------------------------*/
   for ( int pm = 0;pm<2;pm++ ) {
-    for ( mu = 0 ; mu < 4 ; mu++) {
+    for ( mu = 0 ; mu < 4 ; mu++)
+    if (local_comm[mu]==0) {
 
       half_spinor_words = PAD_HALF_SPINOR_SIZE * nbound[mu];
 

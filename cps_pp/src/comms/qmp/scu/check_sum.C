@@ -45,27 +45,47 @@ unsigned int local_checksum(Float * float_p, int len) {
 }
 
 unsigned int global_checksum(Float * float_p, int len) {
-  unsigned int locsum = local_checksum(float_p, len);
+  static int initted = 0;
+  if (!initted)
   if (sizeof(unsigned int) != sizeof(unsigned long))
     ERR.General("","global_checksum",
     "sizeof(unsigned int)(%d) != sizeof(unsigned long)(%d)\n",
     sizeof(unsigned int),sizeof(unsigned long));
+
+  unsigned int locsum;
+
+#ifdef UNIFORM_SEED_TESTING
+  locsum = test_checksum(float_p,len);
+#else
+  locsum = local_checksum(float_p, len);
 //  glb_sum_internal2(&locsum,4,0); // 0 for XOR
   QMP_xor_ulong ((unsigned long*)&locsum);
+#endif
+  initted=1;
   return locsum;
 }
 
 unsigned int test_checksum(Float * float_p, int len) {
   static int gcsum_count = 1;
+  static int peRank = 0;
+  if (gcsum_count==1){
+    peRank = QMP_get_node_number();
+//    fprintf(stderr,"peRank=%d\n",peRank);
+  }
   unsigned int locsum = local_checksum(float_p, len);
   unsigned int bosssum;
-  if(UniqueID() == 0) bosssum = locsum;
+
+//  if(UniqueID() == 0) bosssum = locsum;
+  if(CoorX()==0 &&
+  CoorY()==0 &&
+  CoorZ()==0 &&
+  CoorT()==0 ) bosssum = locsum;
   else                bosssum = 0;
   glb_sum_internal2(&bosssum,4,0); // 0 for XOR
   if(bosssum != locsum) {
       fprintf( stderr,
                "GCheckSum %d : Node %d : Oops I did it again: me (%d,%d,%d,%d,%d) %u != boss %u\n",
-               gcsum_count++,
+               gcsum_count,
 	       UniqueID(),
                CoorX(),
                CoorY(),
@@ -75,6 +95,13 @@ unsigned int test_checksum(Float * float_p, int len) {
                locsum,  bosssum );
       exit(-30);
   }
+#if 0
+  if(gcsum_count>2 && peRank==0){
+    fprintf(stderr,"peRank=%d exiting\n",peRank);
+    exit(-24);
+  }
+#endif
+  gcsum_count++;
 
   return bosssum;
 }

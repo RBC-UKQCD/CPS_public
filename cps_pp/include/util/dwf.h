@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-10-30 20:40:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dwf.h,v 1.5 2007-10-30 20:40:34 chulwoo Exp $
-//  $Id: dwf.h,v 1.5 2007-10-30 20:40:34 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dwf.h,v 1.6 2008-04-21 14:19:17 chulwoo Exp $
+//  $Id: dwf.h,v 1.6 2008-04-21 14:19:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf.h,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dwf.h,v $
 //  $State: Exp $
 //
@@ -172,6 +172,11 @@ void dwf_dslash_5_plus_slice(Vector *out,
 		       int dag,
 		       Dwf *dwf_lib_arg,
      		       int s_slice);
+void dwf_dslash_5_plus_start(Vector *out, 
+		       Vector *in,
+		       Float mass,
+		       int dag,
+		       Dwf *dwf_lib_arg);
 void dwf_dslash_all(Vector *out, 
 		Matrix *gauge_field, 
 		Vector *in,

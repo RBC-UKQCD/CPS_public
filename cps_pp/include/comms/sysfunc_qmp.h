@@ -15,15 +15,14 @@
   -----------------------------------------------------------*/
 
 /*----------------------------------------------------------*/
-#include <comms/scu_enum.h>
-CPS_START_NAMESPACE
 
 #ifndef SYSFUNC_QMP_H
 #define SYSFUNC_QMP_H
-
-
-
-
+#ifndef UNIFORM_SEED_NO_COMMS
+#include<qmp.h>
+#endif
+#include <comms/scu_enum.h>
+CPS_START_NAMESPACE
 
 
 //--------------------------------------------------------------------
@@ -60,50 +59,24 @@ unsigned int SeedS();  //!< Gets a RNG seed.
 unsigned int SeedT();  //!< Gets a RNG seed.
 unsigned int SeedST(); //!< Gets a RNG seed.
 
-#ifndef HAVE_SYNC
+#if 1
 //! A barrier function.
-unsigned int sync();
+//inline void sync(){QMP_barrier();}
 #endif
+unsigned int sync();
 
 //! Gets the direction used internally by the comms layer.
-int SCURemap( SCUDir dir );
+//int SCURemap( SCUDir dir );
 
-/* The following are the primary functions for generic SCU transfers: */
-
-#if 0
-//! Generic single communication.
-void SCUTrans( SCUDirArg * arg );
-
-//! Generic multiple communication.
-void SCUTrans( SCUDirArg ** arg, int n );
-
-//! Does a number of similar communications.
-void SCUTrans( SCUDirArg * arg, unsigned int * offset, int n );
-
-//! Initialise a data transfer.
-void SCUSetDMA( SCUDirArg * arg );
-
-//! Initialise multiple data transfers.
-void SCUSetDMA( SCUDirArg ** arg, int n );
-
-//! Performs a previously set-up data transfer.
-void SCUTransAddr( SCUDirArg * arg );
-
-//! Performs multiple previously set-up data transfers.
-void SCUTransAddr( SCUDirArg ** arg, int n );
-
-//! A communications barrier function,
-void SCUTransComplete(void);
-#endif
 
 namespace QMPSCU {
   void init_qmp();
   void init_qmp(int * argc, char *** argv);
   void destroy_qmp();
 }
-#endif
 
 CPS_END_NAMESPACE
+#endif
 
 
 

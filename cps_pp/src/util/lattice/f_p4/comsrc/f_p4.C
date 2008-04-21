@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.17 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: f_p4.C,v 1.18 2008-04-21 14:19:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -662,8 +662,8 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
   }
   dtime +=dclock();
   nflops += ParTrans::PTflops;
-  printf("%s:%s:",cname,fname);
-  print_flops(nflops,dtime);
+//  printf("%s:%s: ",cname,fname);
+  print_flops(cname,fname,nflops,dtime);
 
 #if 0
   printf("%s:%s:",cname,fname);

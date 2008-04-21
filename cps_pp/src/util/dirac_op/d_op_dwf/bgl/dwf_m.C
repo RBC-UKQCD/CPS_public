@@ -49,7 +49,8 @@ void  dwf_m(Vector *out,
 // Apply Dslash E <- O
 //------------------------------------------------------------------
 //  sync();
-//  dwf_dslash(frm_tmp2, gauge_field, in, mass, 1, 0, dwf_lib_arg);
+  dwf_dslash(frm_tmp2, gauge_field, in, mass, 1, 0, dwf_lib_arg);
+#if 0
   dslash_4_time -=dclock();
   dwf_dslash_4(frm_tmp2, gauge_field, in, 1, 0, dwf_lib_arg);
   dslash_4_time +=dclock();
@@ -57,12 +58,14 @@ void  dwf_m(Vector *out,
   dslash_5_time -=dclock();
   dwf_dslash_5_plus(frm_tmp2, in, mass, 0, dwf_lib_arg);
   dslash_5_time +=dclock();
+#endif
 
 //------------------------------------------------------------------
 // Apply Dslash O <- E
 //------------------------------------------------------------------
 //  sync();
-//  dwf_dslash(out, gauge_field, frm_tmp2, mass, 0, 0, dwf_lib_arg);
+  dwf_dslash(out, gauge_field, frm_tmp2, mass, 0, 0, dwf_lib_arg);
+#if 0
   dslash_4_time -=dclock();
   dwf_dslash_4(out, gauge_field, frm_tmp2, 0, 0, dwf_lib_arg);
   dslash_4_time +=dclock();
@@ -70,6 +73,7 @@ void  dwf_m(Vector *out,
   dslash_5_time -=dclock();
   dwf_dslash_5_plus(out, frm_tmp2, mass, 0, dwf_lib_arg);
   dslash_5_time +=dclock();
+#endif
 
 //  sync();
   
@@ -81,12 +85,14 @@ void  dwf_m(Vector *out,
   Float *in_f = (Float *)in;
   xaxpy(&minus_kappa_sq,out_f,in_f,f_size/6);
   DiracOp::CGflops+=2*f_size;
+#if 0
   if(called%1000==0){
     print_time("dwf_m","dslash_4_time",dslash_4_time/1000.);
     print_time("dwf_m","dslash_5_time",dslash_5_time/1000.);
     dslash_4_time=0.;
     dslash_5_time=0.;
   }
+#endif
 
 }
 

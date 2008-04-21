@@ -14,7 +14,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.19 2007-06-06 16:06:22 chulwoo Exp $
+  $Id: pt_int.h,v 1.20 2008-04-21 14:19:17 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 #ifdef USE_SCU
@@ -175,11 +175,11 @@ int conjugated;
 
 #ifdef USE_QMP
     //QMP communication parameters
-    QMP_msgmem_t *msg_mem_cb[4*NDIM];
-    QMP_msgmem_t *msg_mem_mat_cb[4*NDIM];
+    QMP_msgmem_t msg_mem_cb[4*NDIM];
+    QMP_msgmem_t msg_mem_mat_cb[4*NDIM];
 
-    QMP_msghandle_t *msg_handle_cb[4*NDIM];
-    QMP_msghandle_t *msg_handle_mat_cb[4*NDIM];
+    QMP_msghandle_t msg_handle_cb[4*NDIM];
+    QMP_msghandle_t msg_handle_mat_cb[4*NDIM];
 #endif
 //--------------------------------------------------------------
 

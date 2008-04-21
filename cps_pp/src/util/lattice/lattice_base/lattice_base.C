@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.51 2008-03-25 17:53:43 chulwoo Exp $
+  $Id: lattice_base.C,v 1.52 2008-04-21 14:19:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-03-25 17:53:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.51 2008-03-25 17:53:43 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.51 2008-03-25 17:53:43 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.52 2008-04-21 14:19:18 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.52 2008-04-21 14:19:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.51 $
+//  $Revision: 1.52 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -406,16 +406,20 @@ int Lattice::CompareGaugeField(Matrix* u)
   char *fname = "CompareGaugeField(M*)";
   VRB.Func(cname,fname);
 
-  int m_size = GsiteSize() * GJP.VolNodeSites() * sizeof(Float)/sizeof(int);
-
-  unsigned int g1 = 0;
-  unsigned int g2 = 0;
+  int m_size = GsiteSize() * GJP.VolNodeSites() ;
+  Float *g1 = (Float*)u;
+  Float *g2 = (Float*)gauge_field;
+  int val=1;
   for (int i=0; i<m_size; i++) {
-    g1 += *((unsigned int*)u + i);
-    g2 += *((unsigned int*)gauge_field + i);
+    if (*(g1+i) != *(g2+i) ){
+	double diff = *(g1+i) - *(g2+i);
+        fprintf(stderr,"Node %d: u[%d](%0.16e)!=gauge_field[%d](%0.16e), rel. diff=%e \n", UniqueID(),i,*(g1+i),i,*(g2+i),diff/(*(g1+1)) );
+       val=0;
+       exit(-3);
+    }
   }
-  if (g1 == g2) return 1;
-  else return 0;
+
+  return val;
 
 }
 

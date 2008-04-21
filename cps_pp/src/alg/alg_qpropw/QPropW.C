@@ -452,7 +452,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      }
      Fprintf(fp,"Conserved Axial w_spect\n");
      for(int t=0; t<time_size; t++){
-       Fprintf(fp,"%d = %e\n", t,conserved[t]);
+       Fprintf(fp,"%d = %.16e\n", t,conserved[t]);
      }
      Fclose(fp);
    }
@@ -472,7 +472,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      }
      Fprintf(fp1,"J5q Pion Contraction\n");
      for(int t=0; t<time_size; t++){
-       Fprintf(fp1,"%d = %e\n", t, j5q_pion[t]);
+       Fprintf(fp1,"%d = %.16e\n", t, j5q_pion[t]);
      }
     Fclose(fp1);
    }
@@ -621,6 +621,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      //now compare prop and read_prop
      
      Float errCnt(0.);
+     Float sumerr(0.);
      
      for(int index(0); index < GJP.VolNodeSites(); ++index){
        
@@ -643,6 +644,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
 	       if( diff > precision){
 		 
 		 errCnt += 1.0;
+		 sumerr+=diff;
 		 printf("mismatch propagator: index %i snk %i %i src %i %i\n %f: (%f,%f) <-> (%f,%f)\n",
 			index, s_snk,c_snk,s_src,c_src,
 			diff, tmp_calc.real(), tmp_calc.imag(), tmp_read.real(), tmp_read.imag() );
@@ -653,11 +655,17 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      
      
      glb_sum_five(&errCnt);
+     glb_sum_five(&sumerr);
+     Float averr=sumerr/errCnt;
      
-     if( fabs(errCnt) > 0.)
+     if( fabs(errCnt) > 0.){
        VRB.Result(cname,fname," ReRun prop. with TOTAL NUMBER OF ERRORS: %f\n",errCnt);
-     else
+       VRB.Result(cname,fname," Average error: %e\n",averr);
+       VRB.Result(cname,fname," The precision is set at: %e\n",precision);
+     } else {
        VRB.Result(cname,fname," ReRun prop. successfully!\n");
+       VRB.Result(cname,fname," The precision is set at: %e\n",precision);
+     }
      
    }
    
@@ -3389,4 +3397,3 @@ Float QPropW::Gauss_W() const{
 }
 
 CPS_END_NAMESPACE
-

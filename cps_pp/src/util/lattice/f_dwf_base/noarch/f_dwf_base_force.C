@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.12 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.13 2008-04-21 14:19:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -35,7 +35,7 @@ CPS_END_NAMESPACE
 #include <comms/scu.h> // GRF
 #include <comms/glb.h>
 CPS_START_NAMESPACE
-#define PROFILE
+#undef PROFILE
 
 // CJ: change start
 //------------------------------------------------------------------

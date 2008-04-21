@@ -78,11 +78,11 @@ class LatMatrix: virtual public LatData{
     LatMatrix();
     LatMatrix(const LatMatrix &lat);
     LatMatrix(LatDataAlloc flag, int n_vec = 1 , int vol = 0 ){
-      printf("LatMatrix::LatMatrix(f,i,i)\n");
+//      printf("LatMatrix::LatMatrix(f,i,i)\n");
       Init(flag,n_vec,vol);
     }
     LatMatrix(int n_vec, int vol = 0){
-      printf("LatMatrix::LatMatrix(i,i)\n");
+//      printf("LatMatrix::LatMatrix(i,i)\n");
       Init(DEFAULT,n_vec,vol);
     }
     ~LatMatrix();

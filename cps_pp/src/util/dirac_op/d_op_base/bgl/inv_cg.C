@@ -10,13 +10,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/bgl/inv_cg.C,v 1.5 2008-02-08 18:35:07 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.5 2008-02-08 18:35:07 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/bgl/inv_cg.C,v 1.6 2008-04-21 14:19:18 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.6 2008-04-21 14:19:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/bgl/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -42,12 +42,18 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 #define PROFILE
+#undef PART_PROF
 
 
 #ifdef PROFILE
 #include <time.h>
 #include <sys/time.h>
 void report_flops(int flops, struct timeval *start,struct timeval *end);
+#endif
+#ifndef PART_PROF
+inline Float dclock(){return 0.;};
+#define DCLOCK_P(A)
+#define DCLOCK_M(A)
 #endif
 
 CPS_END_NAMESPACE
@@ -144,8 +150,14 @@ int DiracOp::InvCg(Vector *out,
   } else {
     f_size_cb = GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
   }
+#ifdef UNIFORM_SEED_TESTING
+  unsigned int g_csum = global_checksum((Float *)in,f_size_cb);
+  if(!UniqueID()) printf("%s::%s: Input checksum = %p\n",
+      cname,fname,g_csum);
+#else
   VRB.Result(cname,fname, "Input checksum = %p\n",
       global_checksum((Float *)in,f_size_cb));
+#endif
 
   // checksuming the local source vector
   //----------------------------------------------------
@@ -306,9 +318,11 @@ int DiracOp::InvCg(Vector *out,
   
       // mmp = MatPcDagMatPc * dir
       // d = <dir, MatPcDagMatPc*dir>
-      mdagm_time -=dclock();
+//      mdagm_time -=dclock();
+      DCLOCK_M(mdagm_time);
       MatPcDagMatPc(mmp, dir, &d);
-      mdagm_time +=dclock();
+//      mdagm_time +=dclock();
+      DCLOCK_P(mdagm_time);
       //--------------------------------------------------------------
       // checksuming the intermediate vectors and put into the memory
       // --mflin Apr.05
@@ -334,9 +348,11 @@ int DiracOp::InvCg(Vector *out,
   
     }
     
-    gsum_time -=dclock();
+//    gsum_time -=dclock();
+      DCLOCK_M(gsum_time);
       DiracOpGlbSum(&d);
-    gsum_time +=dclock();
+//    gsum_time +=dclock();
+      DCLOCK_P(gsum_time);
 //    VRB.Flow(cname,fname, "d = %e\n", IFloat(d));
   
       // If d = 0 we are done
@@ -349,12 +365,16 @@ int DiracOp::InvCg(Vector *out,
       // res = - a * (MatPcDagMatPc * dir) + res;
       // res_norm_sq_cur = res * res
   
-      linalg_time -=dclock();
+//      linalg_time -=dclock();
+      DCLOCK_M(linalg_time);
       invcg_r_norm(X+GRAN, &a, Fmmp, X+GRAN, f_size_cb/GRAN, &res_norm_sq_cur);
-      linalg_time +=dclock();
-      gsum_time -=dclock();
+//      linalg_time +=dclock();
+      DCLOCK_P(linalg_time);
+//      gsum_time -=dclock();
+      DCLOCK_M(gsum_time);
       DiracOpGlbSum(&res_norm_sq_cur);
-      gsum_time +=dclock();
+//      gsum_time +=dclock();
+      DCLOCK_P(gsum_time);
       linalg_flops +=f_size_cb*4;
 //      CGflops+=f_size_cb*4;
   
@@ -364,9 +384,11 @@ int DiracOp::InvCg(Vector *out,
       // sol = a * dir + sol;
       //sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
       // dir = b * dir + res;
-      linalg_time -=dclock();
+//      linalg_time -=dclock();
+      DCLOCK_M(linalg_time);
       invcg_xp_update(X, Fdir, &a, &b, Fdir, X, f_size_cb/GRAN);
-      linalg_time +=dclock();
+//      linalg_time +=dclock();
+      DCLOCK_P(linalg_time);
   
       linalg_flops+=f_size_cb*4;
 //      CGflops+=f_size_cb*4;
@@ -417,13 +439,21 @@ int DiracOp::InvCg(Vector *out,
     if(true_res != 0){
       *true_res = tmp;
     }
+#ifdef PART_PROF
     print_flops(fname,"mdagm",CGflops,mdagm_time);
     print_time(fname,"gsum_time",gsum_time);
     print_flops(fname,"linalg",linalg_flops,linalg_time);
+#endif
     VRB.Result(cname,fname, "True |res| / |src| = %e, iter = %d\n", 
   	     IFloat(tmp), itr+1);
+#ifdef UNIFORM_SEED_TESTING
+  unsigned int g_csum = global_checksum((Float *)out,f_size_cb);
+  if(!UniqueID()) printf("%s::%s: Output checksum = %p\n",
+      cname,fname,g_csum);
+#else
     VRB.Result(cname,fname, "Output checksum = %p\n",
       global_checksum((Float *)out,f_size_cb));
+#endif
 
     // checksuming the local solution vector
     //----------------------------------------------

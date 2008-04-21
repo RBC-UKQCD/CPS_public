@@ -1,7 +1,7 @@
 /*!\file
   \brief Implementation of functions for timing and performance measurement.
 
-  $Id: time.C,v 1.11 2007-10-30 20:40:35 chulwoo Exp $
+  $Id: time.C,v 1.12 2008-04-21 14:19:19 chulwoo Exp $
 */
 
 #include <config.h>
@@ -15,6 +15,12 @@
 #endif
 #if TARGET == BGP
 #define ZERO_ONLY
+#endif
+
+#ifdef UNIFORM_SEED_TESTING
+const int if_print = 0;
+#else
+const int if_print = 1;
 #endif
 
 CPS_START_NAMESPACE
@@ -41,7 +47,7 @@ Float print_flops(unsigned long long nflops, struct timeval *start, struct timev
 	int sec = end->tv_sec - start->tv_sec; 
 	int usec = end->tv_usec - start->tv_usec; 
 	Float time = sec + 1.e-6*usec;
-	if(!UniqueID())
+	if(!UniqueID() && if_print)
 	printf("%e flops /%e seconds = %e MFlops\n",(Float)nflops,time,(Float)nflops/(time*1.e6));
 	return nflops/time;
 }
@@ -58,15 +64,9 @@ Float print_flops(unsigned long long nflops, struct timeval *start, struct timev
   \return The FLOPS rate.
 */
 Float print_flops(char *cname, char *fname, unsigned long long nflops, struct timeval *start, struct timeval *end){
-#ifdef ZERO_ONLY
-    if(!UniqueID()){
-	printf("BGL!: %s:%s: ",cname,fname);
-	return print_flops(nflops,start,end);
-    }
-#else
+    if(!UniqueID() && if_print)
 	printf("%s:%s: ",cname,fname);
 	return print_flops(nflops,start,end);
-#endif
 }
 
 /*!
@@ -77,13 +77,13 @@ Float print_flops(char *cname, char *fname, unsigned long long nflops, struct ti
   \return The FLOPS rate.
 */
 Float print_time(const char *cname, const char *fname, Float time){
-  if (!UniqueID())
+  if (!UniqueID() && if_print)
 	printf("%s::%s: %e seconds\n",cname,fname,time);
 	return time;
 }
 
 Float print_flops(unsigned long long nflops, Float time){
-	if(!UniqueID())
+    if(!UniqueID() && if_print)
 	printf("%e flops /%e seconds = %e MFlops\n",(Float)nflops,time,(Float)nflops/(time*1.e6));
 	return nflops/time;
 }
@@ -100,15 +100,9 @@ Float print_flops(unsigned long long nflops, Float time){
 */
 
 Float print_flops(char *cname, char *fname, unsigned long long nflops, Float time){
-#ifdef ZERO_ONLY
-    if(!UniqueID()){
+    if(!UniqueID() && if_print)
 	printf("Node 0: %s:%s: ",cname,fname);
-	return print_flops(nflops,time);
-    }
-#else
-	printf("%s::%s: ",cname,fname);
-	return print_flops(nflops,time);
-#endif
+    return print_flops(nflops,time);
 }
 
 CPS_END_NAMESPACE

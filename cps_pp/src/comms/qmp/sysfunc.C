@@ -36,6 +36,8 @@ CPS_START_NAMESPACE
   \brief Namespace for the QMP emulations of the SCU.
 */
 
+
+
 //Useful global variables
 namespace QMPSCU {
   
@@ -46,8 +48,13 @@ namespace QMPSCU {
  
   static int peRank;        /*!< Rank/identify of this  process */
   static int peNum;          /*!< Total number of processors */
+#ifdef UNIFORM_SEED_NO_COMMS
+  static const int pePos[4] = {0,0,0,0};
+  static const int peGrid[4] = {1,1,1,1};
+#else
   static const int* pePos;  /*!< Position of this process in the grid.*/ 
   static const int* peGrid; /*!< Number of processors in each direction */
+#endif
 
   //Clean up resources used by QMP
   void destroy_qmp() {
@@ -82,14 +89,10 @@ void init_qmp(int * argc, char ***argv) {
 #endif
   
     QMP_thread_level_t prv;
+#ifndef UNIFORM_SEED_NO_COMMS
     QMP_status_t init_status = QMP_init_msg_passing(argc, argv, QMP_THREAD_SINGLE, &prv);
-//      for(int i = 0; i<*argc;i++){
-//        printf("argv[%d](after)=%s\n",i,(*argv)[i]); 
-//      }
     peRank = QMP_get_node_number();
     peNum = QMP_get_number_of_nodes();
-//    printf("in init_qmp(argc,argv): peRank peNum=%d %d\n",peRank,peNum);
- //   exit(-43);
     if(!peRank)printf("QMP_init_msg_passing returned %d\n",init_status);
     if (init_status != QMP_SUCCESS) {
       QMP_error("%s\n",QMP_error_string(init_status));
@@ -106,14 +109,29 @@ void init_qmp(int * argc, char ***argv) {
     pePos = QMP_get_allocated_coordinates();
 
     if(peRank==0){
-#if 1
       for(int i = 0; i<*argc;i++){
         printf("argv[%d]=%s\n",i,(*argv)[i]); 
       }
-#endif
     }
+#else
+    QMP_status_t init_status = QMP_SUCCESS;
+    peRank=0;
+    peNum=1;
+    NDIM=4;
+#endif
 
-#if (TARGET == BGL) || (TARGET == BGP)
+//#if (TARGET == BGL) || (TARGET == BGP)
+  if (NDIM>5){
+    peNum = 1;
+    for(int i = 0;i<5;i++)
+	peNum *= peGrid[i];
+    peRank = peRank % peNum;
+  }
+  int if_print=1;
+#if 1
+  for(int i = 0;i<NDIM;i++)
+  if (pePos[i]>=2) if_print=0;
+  if (if_print){
       printf("Rank=%d Num=%d NDIM=%d\n",peRank,peNum,NDIM);
       printf("dim:");
       for(int i = 0;i<NDIM;i++)
@@ -123,14 +141,15 @@ void init_qmp(int * argc, char ***argv) {
       for(int i = 0;i<NDIM;i++)
         printf(" %d",pePos[i]);
       printf("\n");
-#endif
-
 
 #if TARGET == BGL
     int rc;
     BGLPersonality pers;
     rts_get_personality(&pers, sizeof(pers));
     printf("from personality: %d %d %d %d\n",pers.xCoord,pers.yCoord,pers.zCoord,rts_get_processor_id());
+#endif
+  }
+
 #endif
 
 #if 0
@@ -139,11 +158,13 @@ void init_qmp(int * argc, char ***argv) {
     }
 #endif
 
+#ifndef UNIFORM_SEED_NO_COMMS
     //Declare the logical topology (Redundant for GRID machines)
     if (QMP_declare_logical_topology(peGrid, NDIM) != QMP_SUCCESS) {
       QMP_error("Node %d: Failed to declare logical topology\n",peRank);
       exit(-4);
     }
+#endif
     initialized = true;
     
   }
@@ -233,13 +254,16 @@ unsigned int SeedST(){return SERIAL_SEED;} //!< Gets a RNG seed.
   \return 0
 */
 //----------------------------------------------------------------
-#ifndef HAVE_SYNC
+#ifdef UNIFORM_SEED_TESTING
+unsigned int sync(){return 1;}
+#else
 unsigned int sync() {
 QMP_status_t sync_status = QMP_barrier(); 
 if (sync_status != QMP_SUCCESS) {
       QMP_error("Error in QMP sync:%s\n", QMP_error_string(sync_status));
+      return 0;
 }
-return 0;
+return 1;
 }
 #endif
 

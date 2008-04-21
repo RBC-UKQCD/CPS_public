@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.33 2008-03-25 17:53:43 chulwoo Exp $
+  $Id: gjp.h,v 1.34 2008-04-21 14:19:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-03-25 17:53:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.33 2008-03-25 17:53:43 chulwoo Exp $
-//  $Id: gjp.h,v 1.33 2008-03-25 17:53:43 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.34 2008-04-21 14:19:17 chulwoo Exp $
+//  $Id: gjp.h,v 1.34 2008-04-21 14:19:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.33 $
+//  $Revision: 1.34 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -45,9 +45,6 @@
 #include <util/vector.h>
 #include <comms/sysfunc_cps.h>
 #include <alg/do_arg.h>
-#ifdef USE_QMP
-#include <qmp.h>
-#endif
 CPS_START_NAMESPACE
 
 //struct DoArg;

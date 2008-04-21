@@ -2,7 +2,7 @@
 /*!\file
   Wilson Dirac operator code for QCDOC
 
-  $Id: wilson_init.C,v 1.2 2007-10-30 20:40:34 chulwoo Exp $
+  $Id: wilson_init.C,v 1.3 2008-04-21 14:19:18 chulwoo Exp $
 */
 
 #include <util/wilson.h>
@@ -62,11 +62,13 @@ void wilson_init(Wilson *wilson_p)
   if ( GJP.Tnodes() > 1 )  wil.local_comm[3] = 0; 
   else  wil.local_comm[3] = 1; 
 
+#if 0
   //Temporary hack to force non-local comms
   wil.local_comm[0] = 0;
   wil.local_comm[1] = 0;
   wil.local_comm[2] = 0;
   wil.local_comm[3] = 0;
+#endif
 
   wfm_vec_init (&wil);
   wilson_compat_init(wilson_p);

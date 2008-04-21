@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_init.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+  $Id: pt_init.C,v 1.3 2008-04-21 14:19:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-11 22:45:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
-//  $Id: pt_init.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init.C,v 1.3 2008-04-21 14:19:18 chulwoo Exp $
+//  $Id: pt_init.C,v 1.3 2008-04-21 14:19:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_init.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init.C,v $
 //  $State: Exp $
 //
@@ -53,6 +53,12 @@ void PT::init(PTArg *pt_arg)
   local[2] = pt_arg->local[2];
   local[3] = pt_arg->local[3];
   non_local_dirs = 2*(4-local[0]-local[1]-local[2]-local[3]);
+#ifdef UNIFORM_SEED_NO_COMMS
+  if( non_local_dirs>0){
+    fprintf(stderr,"PT::non_local_dirs=%d\n",non_local_dirs);
+    exit(-33);
+  }
+#endif
   //printf("Local directions = %d %d %d %d\n", local[0],local[1],local[2],local[3]);
 
   gauge_field_addr = pt_arg->gauge_field_addr;

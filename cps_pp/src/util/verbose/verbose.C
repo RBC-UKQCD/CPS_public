@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
-  $Id: verbose.C,v 1.13 2007-10-30 20:40:35 chulwoo Exp $
+  $Id: verbose.C,v 1.14 2008-04-21 14:19:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-10-30 20:40:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.13 2007-10-30 20:40:35 chulwoo Exp $
-//  $Id: verbose.C,v 1.13 2007-10-30 20:40:35 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.14 2008-04-21 14:19:19 chulwoo Exp $
+//  $Id: verbose.C,v 1.14 2008-04-21 14:19:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
@@ -273,6 +273,7 @@ void Verbose::Pfree(const char *class_name, const char *func_name,
     
     if(!active[VERBOSE_PMALLOC_LEVEL] ) return;
 
+    
     printf("%s::%s : pfree will free pointer\t%s = %p\n", 
 	   class_name, func_name, ptr_name, ptr);
     
@@ -314,9 +315,11 @@ void Verbose::Smalloc(const char *class_name, const char *func_name,
 		      const char *ptr_name, const void *ptr, int size){
     
     if(!active[VERBOSE_SMALLOC_LEVEL]) return;
+    char string[MAX_STRING];
 
-    printf("%s::%s : smalloc initialized pointer\t%s to %p with size 0x%x\n",
+    sprintf(string,"smalloc initialized pointer\t%s to %p with size 0x%x\n",
 	   class_name, func_name, ptr_name, ptr, size);
+    vrb_printf(class_name,func_name,string);
     
 }
 
@@ -337,9 +340,11 @@ void Verbose::Sfree(const char *class_name, const char *func_name,
 		    const char *ptr_name, const void *ptr) {
     
     if(! active[VERBOSE_SMALLOC_LEVEL] ) return;
+    char string[MAX_STRING];
 
-    printf("%s::%s : sfree will free pointer\t%s = %p\n",
+    sprintf(string,"sfree will free pointer\t%s = %p\n",
 	   class_name, func_name, ptr_name, ptr);
+    vrb_printf(class_name,func_name,string);
 
 }
 

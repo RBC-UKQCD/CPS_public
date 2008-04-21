@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_vec.C,v 1.4 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: pt_vec.C,v 1.5 2008-04-21 14:19:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.4 2008-02-08 18:35:08 chulwoo Exp $
-//  $Id: pt_vec.C,v 1.4 2008-02-08 18:35:08 chulwoo Exp $
+//  $Date: 2008-04-21 14:19:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.5 2008-04-21 14:19:18 chulwoo Exp $
+//  $Id: pt_vec.C,v 1.5 2008-04-21 14:19:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_vec.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v $
 //  $State: Exp $
 //
@@ -26,9 +26,6 @@
 #include <util/time_cps.h>
 #endif
 
-#ifndef USE_QMP
-#define USE_QMP
-#endif
 
 //Parallel transport of a vector defined on single parity sites
 //
@@ -94,9 +91,9 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 
   total_time -=CPS_NAMESPACE::dclock();
   setup_time -=dclock();
-  QMP_msgmem_t *msg_mem_p = (QMP_msgmem_t *)Alloc("","vec_cb_norm", "msg_mem_p", 2*non_local_dirs*sizeof(QMP_msgmem_t));
-  QMP_msghandle_t* msg_handle_p = (QMP_msghandle_t *)Alloc("","vec_cb_norm", "msg_handle_p", 2*non_local_dirs*sizeof(QMP_msghandle_t));
-  QMP_msghandle_t multiple;
+  QMP_msgmem_t msg_mem_p[4*NDIM];
+  QMP_msghandle_t msg_handle_p[4*NDIM];
+//  QMP_msghandle_t multiple;
   setup_time +=dclock();
 
   call_num++;
@@ -163,34 +160,34 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	{
 	  //Calculate the starting address for the data to be sent
 	  IFloat *addr = vin[i] + VECT_LEN * offset_cb[wire[i]];
+      msg_mem_p[2*comms]=msg_mem_p[2*comms+1]=NULL;
 
-	  //msg_mem_p[2*comms] = msg_mem_cb[2*wire[i]];
-	  //msg_mem_p[2*comms+1] = msg_mem_cb[2*wire[i]+1];
-
-	  msg_mem_p[2*comms] = QMP_declare_msgmem((void *)rcv_buf[wire[i]], non_local_chi_cb[wire[i]]*VECT_LEN*sizeof(IFloat));
+      msg_handle_p[2*comms] = msg_handle_cb[wire[i]*2];
 
 	  //Initialize the msg_mem for sends
-	  if(wire[i]%2) 
-	    msg_mem_p[2*comms+1] = QMP_declare_msgmem((void *)snd_buf_cb[wire[i]/2], non_local_chi_cb[wire[i]]*VECT_LEN*sizeof(IFloat));
-	  else if(wire[i] == 6)
-	    msg_mem_p[2*comms+1] = QMP_declare_msgmem((void *)snd_buf_t_cb, non_local_chi_cb[wire[i]]*VECT_LEN*sizeof(IFloat));
-	  else
+	  if(wire[i]%2) {
+        msg_handle_p[2*comms+1] = msg_handle_cb[wire[i]*2+1];
+	  } else if(wire[i] == 6) {
+        msg_handle_p[2*comms+1] = msg_handle_cb[wire[i]*2+1];
+	  } else{
 	    msg_mem_p[2*comms+1] = QMP_declare_strided_msgmem((void *)addr, (size_t)blklen_cb[wire[i]], numblk_cb[wire[i]], (ptrdiff_t)(stride_cb[wire[i]]+blklen_cb[wire[i]]));
+	    msg_handle_p[2*comms+1] = QMP_declare_send_relative(msg_mem_p[2*comms+1], wire[i]/2, 2*(wire[i]%2)-1, 0);
+      }
 
-	  msg_handle_p[2*comms] = QMP_declare_receive_relative(msg_mem_p[2*comms], wire[i]/2, 1-2*(wire[i]%2), 0);
-	  msg_handle_p[2*comms+1] = QMP_declare_send_relative(msg_mem_p[2*comms+1], wire[i]/2, 2*(wire[i]%2)-1, 0);
-	  //printf("wire[%d] = %d, rcv = %d, snd = %d\n", i, wire[i], 1-2*(wire[i]%2), 2*(wire[i]%2)-1);
 	  comms++;
 	}
     }
-  if(comms) 
-    multiple = QMP_declare_multiple(msg_handle_p, 2*comms);
+//  if(comms) 
+//    multiple = QMP_declare_multiple(msg_handle_p, 2*comms);
   setup_time +=dclock();
   
 
   comm_init_time -=dclock();
   if(comms) 
-    QMP_start(multiple);
+  for(i=0;i<2*comms;i++)
+    QMP_start(msg_handle_p[i]);
+    
+//    QMP_start(multiple);
   comm_init_time +=dclock();
 
   comp_time -=dclock();
@@ -224,16 +221,19 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
   //End transmission
   if(comms) {
     comm_complete_time -=dclock();
-    QMP_status_t qmp_complete_status = QMP_wait(multiple);
-    if (qmp_complete_status != QMP_SUCCESS)
-	  QMP_error("Send failed in vec_cb_norm: %s\n", QMP_error_string(qmp_complete_status));
+    for(i=0;i<2*comms;i++){
+      QMP_status_t qmp_complete_status = QMP_wait(msg_handle_p[i]);
+      if (qmp_complete_status != QMP_SUCCESS)
+        QMP_error("Send failed in vec_cb_norm: %s\n", QMP_error_string(qmp_complete_status));
+    }
     comm_complete_time +=dclock();
     setup_time -=dclock();
-    QMP_free_msghandle(multiple);
+//    QMP_free_msghandle(multiple);
     for(int i = 0; i < 2*comms; i++)
-      QMP_free_msgmem(msg_mem_p[i]);
-    Free(msg_handle_p);
-    Free(msg_mem_p);
+      if(msg_mem_p[i]!=NULL){
+        QMP_free_msgmem(msg_mem_p[i]);
+        QMP_free_msghandle(msg_handle_p[i]);
+      }
     setup_time +=dclock();
   }
 
@@ -287,9 +287,9 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   int wire[n];
   int i;
 
-  QMP_msgmem_t *msg_mem_p = (QMP_msgmem_t *)Alloc("","vec_cb_norm", "msg_mem_p", 2*non_local_dirs*sizeof(QMP_msgmem_t));
-  QMP_msghandle_t* msg_handle_p = (QMP_msghandle_t *)Alloc("","vec_cb_norm", "msg_handle_p", 2*non_local_dirs*sizeof(QMP_msghandle_t));
-  QMP_msghandle_t multiple;
+  QMP_msgmem_t msg_mem_p[4*NDIM];
+  QMP_msghandle_t msg_handle_p[4*NDIM];
+//  QMP_msghandle_t multiple;
   static int call_num = 0;
 //  int vlen = VECT_LEN;
 //  int vlen2 = 8;
@@ -373,20 +373,19 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 	{
 	  //Calculate the starting address for the data to be sent
 	  IFloat *addr = vin[i] + VECT_LEN * offset_cb[wire[i]];
+      msg_mem_p[2*comms]=msg_mem_p[2*comms+1]=NULL;
 
-	  msg_mem_p[2*comms] = QMP_declare_msgmem((void *)rcv_buf[wire[i]], non_local_chi_cb[wire[i]]*VECT_LEN*sizeof(IFloat));
+      msg_handle_p[2*comms] = msg_handle_cb[wire[i]*2];
 
 	  //Initialize the msg_mem for sends
-	  if(wire[i]%2) 
-	    msg_mem_p[2*comms+1] = QMP_declare_msgmem((void *)snd_buf_cb[wire[i]/2], non_local_chi_cb[wire[i]]*VECT_LEN*sizeof(IFloat));
-	  else if(wire[i] == 6)
-	    msg_mem_p[2*comms+1] = QMP_declare_msgmem((void *)snd_buf_t_cb, non_local_chi_cb[wire[i]]*VECT_LEN*sizeof(IFloat));
-	  else
+	  if(wire[i]%2) {
+        msg_handle_p[2*comms+1] = msg_handle_cb[wire[i]*2+1];
+	  } else if(wire[i] == 6) {
+        msg_handle_p[2*comms+1] = msg_handle_cb[wire[i]*2+1];
+	  } else{
 	    msg_mem_p[2*comms+1] = QMP_declare_strided_msgmem((void *)addr, (size_t)blklen_cb[wire[i]], numblk_cb[wire[i]], (ptrdiff_t)(stride_cb[wire[i]]+blklen_cb[wire[i]]));
-
-	  msg_handle_p[2*comms] = QMP_declare_receive_relative(msg_mem_p[2*comms], wire[i]/2, 1-2*(wire[i]%2), 0);
-	  msg_handle_p[2*comms+1] = QMP_declare_send_relative(msg_mem_p[2*comms+1], wire[i]/2, 2*(wire[i]%2)-1, 0);
-	  //printf("wire[%d] = %d, rcv = %d, snd = %d\n", i, wire[i], 1-2*(wire[i]%2), 2*(wire[i]%2)-1);
+	    msg_handle_p[2*comms+1] = QMP_declare_send_relative(msg_mem_p[2*comms+1], wire[i]/2, 2*(wire[i]%2)-1, 0);
+      }
 	  comms++;
 	}
     }
@@ -400,8 +399,10 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 #endif
 
   if(comms) {
-    multiple = QMP_declare_multiple(msg_handle_p, 2*comms);
-    QMP_start(multiple);
+//    multiple = QMP_declare_multiple(msg_handle_p, 2*comms);
+//    QMP_start(multiple);
+  for(i=0;i<2*comms;i++)
+    QMP_start(msg_handle_p[i]);
   }
 
 #ifdef PROFILE
@@ -433,14 +434,18 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   dtime  = - dclock();
 #endif
   if(comms) {
-    QMP_status_t qmp_complete_status = QMP_wait(multiple);
-    if (qmp_complete_status != QMP_SUCCESS)
-	  QMP_error("Send failed in vec_cb_norm: %s\n", QMP_error_string(qmp_complete_status));
-    QMP_free_msghandle(multiple);
+//    QMP_status_t qmp_complete_status = QMP_wait(multiple);
+    for(i=0;i<2*comms;i++){
+      QMP_status_t qmp_complete_status = QMP_wait(msg_handle_p[i]);
+      if (qmp_complete_status != QMP_SUCCESS)
+	  QMP_error("Send failed in vec_cb_pad: status(%d)=%s\n", i,QMP_error_string(qmp_complete_status));
+    }
+//    QMP_free_msghandle(multiple);
     for(int i = 0; i < 2*comms; i++)
-      QMP_free_msgmem(msg_mem_p[i]);
-    Free(msg_handle_p);
-    Free(msg_mem_p);
+      if(msg_mem_p[i]!=NULL){
+        QMP_free_msgmem(msg_mem_p[i]);
+        QMP_free_msghandle(msg_handle_p[i]);
+      }
   }
 #ifdef PROFILE
   dtime +=dclock();
@@ -521,38 +526,22 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
   for(i=0;i<n;i++)
   if (!local[wire[i]/2]){
     IFloat * addr = (vin[i]+VECT_LEN*offset[wire[i]]);
-    #ifndef USE_QMP
-    SCUarg_p[2*non_local_dir] = SCUarg[0][2*wire[i]];
-    SCUarg_p[2*non_local_dir+1] = SCUarg[0][2*wire[i]+1];
-    SCUarg_p[2*non_local_dir+1]->Addr((void *)addr);
-    #else
     msg_mem_p[2*non_local_dir] = QMP_declare_msgmem((void *)rcv_buf[wire[i]], non_local_chi[wire[i]]*VECT_LEN*sizeof(IFloat));
     msg_mem_p[2*non_local_dir+1] = QMP_declare_strided_msgmem((void *)addr, (size_t)blklen[wire[i]], numblk[wire[i]], (ptrdiff_t)(stride[wire[i]]+blklen[wire[i]]));
     
     msg_handle_p[2*non_local_dir] = QMP_declare_receive_relative(msg_mem_p[2*non_local_dir], wire[i]/2, 1-2*(wire[i]%2), 0);
     msg_handle_p[2*non_local_dir+1] = QMP_declare_send_relative(msg_mem_p[2*non_local_dir+1], wire[i]/2, 2*(wire[i]%2)-1, 0);
-    #endif
     non_local_dir++;
   }
 
-  #ifndef USE_QMP
-  if(non_local_dir){
-    SCUmulti.Init(SCUarg_p,non_local_dir*2);
-    SCUmulti.SlowStartTrans();
-  }
-  #else
   if(non_local_dir) {
     multiple = QMP_declare_multiple(msg_handle_p, 2*non_local_dir);
     QMP_start(multiple);
   }
-  #endif
 	
   for(i=0;i<n;i++) 
     partrans_cmv_agg(local_chi[wire[i]],(long)uc_l[wire[i]], (long)vin[i],(long)vout[i]);
 	
-  #ifndef USE_QMP
-  if(non_local_dir){ SCUmulti.TransComplete(); }
-  #else
   if(non_local_dir) {
     QMP_status_t qmp_complete_status = QMP_wait(multiple);
     if (qmp_complete_status != QMP_SUCCESS)
@@ -563,7 +552,6 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
     Free(msg_handle_p);
     Free(msg_mem_p);
   }
-  #endif
 
   for(i=0;i<n;i++) 
     partrans_cmv_agg(non_local_chi[wire[i]],(long)uc_nl[wire[i]], (long)rcv_buf[wire[i]],(long)vout[i]);
