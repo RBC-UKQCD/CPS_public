@@ -60,9 +60,11 @@ int IND(int x, int y, int z, int t, int l);
 int main(int argc,char *argv[])
 {
 
+  char *cname="";
+  char *fname="main()";
   Start(&argc,&argv);
 
-  printf("Starting next configuration.\n");
+  VRB.Result(cname,fname,"Starting next configuration.\n");
 
   //Initialize Timing
   const int dtime_size=200;
@@ -149,7 +151,7 @@ int main(int argc,char *argv[])
   sprintf(gauge_rotated_lats_dir, CommandLine::arg() );
   sprintf(gauge_rotated_lats_saved_log, CommandLine::arg() );
   
-  printf("This is configuration number %d.\n",seqNum);
+  VRB.Result(cname,fname,"This is configuration number %d.\n",seqNum);
 
   //Checkpoint
   if (chkpoints)
@@ -181,21 +183,21 @@ int main(int argc,char *argv[])
   //the file lat_stand_in.
   
   if (strcmp(lat_stand_in,"none")==0){
-    printf("\ncreate random gauge - field (taking # %i) \n", gauge_ran);
+    VRB.Result(cname,fname,"ncreate random gauge - field (taking # %i) \n", gauge_ran);
     
     for(int ii(0); ii < gauge_ran; ++ii)
       lattice.SetGfieldDisOrd();
     
-    printf("Created random gauge field.\n");
+    VRB.Result(cname,fname,"Created random gauge field.\n");
   } 
   else {
     ReadLatticeParallel readLat;
     
-    printf("  reading: %s (NERSC-format)\n",lat_stand_in);
+    VRB.Result(cname,fname,"  reading: %s (NERSC-format)\n",lat_stand_in);
 
     readLat.read(lattice,lat_stand_in);
 
-    printf("Lattice read.\n");
+    VRB.Result(cname,fname,"Lattice read.\n");
     
   }
 
@@ -205,11 +207,11 @@ int main(int argc,char *argv[])
   if (strcmp(lat_stand_out,"none")!=0) {
       WriteLatticeParallel writeLat;
 
-      printf("  writing: %s (NERSC-format)\n",lat_stand_out);
+      VRB.Result(cname,fname,"  writing: %s (NERSC-format)\n",lat_stand_out);
 
       writeLat.write(lattice, lat_stand_out, outformat);
   
-      printf("Lattice written.\n");
+      VRB.Result(cname,fname,"Lattice written.\n");
   }
 
   //Checkpoint
@@ -218,10 +220,10 @@ int main(int argc,char *argv[])
 
   //Shift lattice so that time slice t_src moves to t=0
   int t_shift=-t_src/do_arg.t_node_sites;
-  printf("Shifting lattice by %d, command GDS.Set(0,0,0,%d).\n",-t_src,t_shift);
+  VRB.Result(cname,fname,"Shifting lattice by %d, command GDS.Set(0,0,0,%d).\n",-t_src,t_shift);
   GDS.Set(0,0,0,t_shift);
   lattice.Shift();
-  printf("Lattice shifted.\n");
+  VRB.Result(cname,fname,"Lattice shifted.\n");
   
   //Checkpoint
   if (chkpoints)
@@ -256,19 +258,19 @@ int main(int argc,char *argv[])
   }
   Fclose(fp);
 
-  printf("Calculating plaquette.\n");
+  VRB.Result(cname,fname,"Calculating plaquette.\n");
   AlgPlaq plaq(lattice,&common_arg_plaq,&plaq_arg);
   plaq.run();
-  printf("Plaquette calculated.\n");
+  VRB.Result(cname,fname,"Plaquette calculated.\n");
 
   //Checkpoint
   if (chkpoints)
     chkpt(num_nodes,chkpoint_no,dtime,dtime_size);
 
-  printf("Calculating gauge fixing matrices.\n");
+  VRB.Result(cname,fname,"Calculating gauge fixing matrices.\n");
   AlgFixGauge fix_gauge(lattice,&common_arg_gfix,&fix_arg);
   fix_gauge.run();
-  printf("Gauge fixing matrices calculated.\n");
+  VRB.Result(cname,fname,"Gauge fixing matrices calculated.\n");
 
   //Checkpoint
   if (chkpoints)
@@ -304,22 +306,22 @@ int main(int argc,char *argv[])
   for (int i=0; i<num_masses; i++)
     for (int j=0; j<2; j++)
       mass_done[i][j]=0;
-  printf("Finished masses and boundary conditions as read from log (config no. %d):\n",seqNum);
+  VRB.Result(cname,fname,"Finished masses and boundary conditions as read from log (config no. %d):\n",seqNum);
   while (fscanf(fp,"%f",&mass_read_tmp)>=0){
     mass_read=(Float) mass_read_tmp;
     fscanf(fp,"%d",&bc);
-    printf("%f %d\n",mass_read,bc);
+    VRB.Result(cname,fname,"f %d\n",mass_read,bc);
     for (int i=0; i<num_masses; i++) {
       if (fabs(masses[i]-mass_read)<=1e-6)
 	mass_done[i][bc]=1;
     }
   }
   fclose(fp);
-  printf("Masses and boundary conditions to do (config. no. %d):\n",seqNum);
+  VRB.Result(cname,fname,"Masses and boundary conditions to do (config. no. %d):\n",seqNum);
   for (int i=0; i<num_masses; i++)
     for (bc=0; bc<2; bc++)
       if (!mass_done[i][bc])
-	printf("%f %d\n",masses[i],bc);
+	VRB.Result(cname,fname,"f %d\n",masses[i],bc);
   
   //Checkpoint
   if (chkpoints)
@@ -328,10 +330,10 @@ int main(int argc,char *argv[])
   //Loop over masses and calculate props
   CommonArg common_arg;
   char prop_name[200], midprop_contractions_fname[200], qio_out[200];
-  printf("Begin mass loop for configuration number %d.\n",seqNum);
+  VRB.Result(cname,fname,"Begin mass loop for configuration number %d.\n",seqNum);
   for (int i=0; i<num_masses; i++) {
     if (mass_done[i][0] && mass_done[i][1]){
-      printf("Nothing to do mass %f\n",masses[i]);
+      VRB.Result(cname,fname,"Nothing to do mass %f\n",masses[i]);
       continue;
     }
     qpropw_arg.cg.mass=masses[i];
@@ -345,7 +347,7 @@ int main(int argc,char *argv[])
 	  sprintf(bc_type,"periodic");
 	  sprintf(bc_label,"PRD");
 	}
-	printf("Inverting mass %f, %s boundary conditions, configuration number %d.\n",masses[i],bc_type,seqNum);
+	VRB.Result(cname,fname,"Inverting mass %f, %s boundary conditions, configuration number %d.\n",masses[i],bc_type,seqNum);
 	//Checkpoint
 	if (chkpoints)
 	  chkpt(num_nodes,chkpoint_no,dtime,dtime_size);
@@ -366,7 +368,7 @@ int main(int argc,char *argv[])
 	else
 	  GJP.Tbc(BND_CND_PRD);
 	QPropWWallSrc propagator(lattice, &qpropw_arg, &common_arg);
-	printf("Finished inversion, mass %f, %s boundary conditions, configuration number %d.\n",masses[i],bc_type,seqNum);
+	VRB.Result(cname,fname,"Finished inversion, mass %f, %s boundary conditions, configuration number %d.\n",masses[i],bc_type,seqNum);
 	//Checkpoint
 	if (chkpoints)
 	  chkpt(num_nodes,chkpoint_no,dtime,dtime_size);
@@ -378,7 +380,7 @@ int main(int argc,char *argv[])
       }
     }
   }
-  printf("Finished mass loop for configuration number %d.\n",seqNum);
+  VRB.Result(cname,fname,"Finished mass loop for configuration number %d.\n",seqNum);
 
   //Gauge rotate and save the lattice if this hasn't been done already
   //First check if the gauge rotated lattice has already been saved
@@ -396,24 +398,24 @@ int main(int argc,char *argv[])
   fclose(fp);
   //If it hasn't then gauge rotate the lattice and save it
   if (!config_saved){
-    printf("Gauge rotating the lattice and saving it.\n");
+    VRB.Result(cname,fname,"Gauge rotating the lattice and saving it.\n");
     //Gauge rotate lattice
-    printf("Gauge rotating lattice.\n");
+    VRB.Result(cname,fname,"Gauge rotating lattice.\n");
     rotate_gauge_explicit(lattice);
-    printf("Gauge rotated lattice.\n");
+    VRB.Result(cname,fname,"Gauge rotated lattice.\n");
     //Shift the lattice back
-    printf("Shifting lattice back.  Shifting by %d, command GDS.Set(0,0,0,%d).\n",t_src,-t_shift);
+    VRB.Result(cname,fname,"Shifting lattice back.  Shifting by %d, command GDS.Set(0,0,0,%d).\n",t_src,-t_shift);
     GDS.Set(0,0,0,-t_shift);
     lattice.Shift();
-    printf("Lattice shifted.\n");
+    VRB.Result(cname,fname,"Lattice shifted.\n");
     //Save it
     char rotated_lat_fname[200];
     sprintf(rotated_lat_fname,"%s/ckpoint_lat_gauge_rotated.%d",gauge_rotated_lats_dir,seqNum);
-    printf("Writing gauge rotated lattice.\n");
+    VRB.Result(cname,fname,"Writing gauge rotated lattice.\n");
     WriteLatticeParallel writeLat;
     writeLat.write(lattice, rotated_lat_fname, outformat);
-    printf("Wrote gauge rotated lattice.\n");
-    printf("Finished gauge rotating and saving lattice.\n");
+    VRB.Result(cname,fname,"Wrote gauge rotated lattice.\n");
+    VRB.Result(cname,fname,"Finished gauge rotating and saving lattice.\n");
     //Checkpoint
     if (chkpoints)
       chkpt(num_nodes,chkpoint_no,dtime,dtime_size);
@@ -439,7 +441,7 @@ int main(int argc,char *argv[])
 
   fix_gauge.free();
 
-  printf("Finished configuration number %d.\n",seqNum);
+  VRB.Result(cname,fname,"Finished configuration number %d.\n",seqNum);
   //Checkpoint
   if (chkpoints)
     chkpt(num_nodes,chkpoint_no,dtime,dtime_size);
@@ -458,6 +460,8 @@ void chkpt(const int num_nodes,int& chkpoint_no,Float dtime[],const int dtime_si
   int dummy=0;
   Float test_val;
   Float* ptest_val=&test_val;
+  char *cname="";
+  char *fname="chkpt()";
   
   for (int ii=0; ii<num_nodes; ii++){
     test_val=0.0;
@@ -468,7 +472,7 @@ void chkpt(const int num_nodes,int& chkpoint_no,Float dtime[],const int dtime_si
     while(test_val==0.0)
       dummy=0; //Does absolutely nothing, here as a placeholder for while
   }
-  printf("Checkpoint no. %d reached.\n",chkpoint_no++);
+  VRB.Result(cname,fname,"Checkpoint no. %d reached.\n",chkpoint_no++);
   if ( chkpoint_no < dtime_size ) {
     dtime[chkpoint_no]=dclock();
 
@@ -476,13 +480,13 @@ void chkpt(const int num_nodes,int& chkpoint_no,Float dtime[],const int dtime_si
     int hr_tmp=time_tmp/3600.0;
     int min_tmp=(time_tmp-3600.0*hr_tmp)/60.0;
     Float sec_tmp=time_tmp-3600.0*hr_tmp-60.0*min_tmp;
-    printf("Time since last checkpoint: %d hours %d minutes %f seconds.\n",hr_tmp,min_tmp,sec_tmp);
+    VRB.Result(cname,fname,"Time since last checkpoint: %d hours %d minutes %f seconds.\n",hr_tmp,min_tmp,sec_tmp);
 
     time_tmp=dtime[chkpoint_no]-dtime[0];
     hr_tmp=time_tmp/3600.0;
     min_tmp=(time_tmp-3600.0*hr_tmp)/60.0;
     sec_tmp=time_tmp-3600.0*hr_tmp-60.0*min_tmp;
-    printf("Time since beginning: %d hours %d minutes %f seconds.\n",hr_tmp, min_tmp,sec_tmp);
+    VRB.Result(cname,fname,"Time since beginning: %d hours %d minutes %f seconds.\n",hr_tmp, min_tmp,sec_tmp);
   }
 }
 //---------------------------------------------------------------------------
@@ -499,7 +503,7 @@ void rotate_gauge_explicit(Lattice &lat,int dir)
   VRB.Func(cname,fname);
 
   if ((dir<0)||(dir>3)){
-    printf("Error:: direction should be 0,1,2,3\n");
+    VRB.Result(cname,fname,"Error:: direction should be 0,1,2,3\n");
     return;
   }
 
@@ -582,8 +586,8 @@ void rotate_gauge_explicit(Lattice &lat,int dir)
     }
   }
   
-  printf("dir == %d \n",dir);
-  printf("slice index == %d %d %d\n",slice_ind[0],slice_ind[1],slice_ind[2]);
+  VRB.Result(cname,fname,"dir == %d \n",dir);
+  VRB.Result(cname,fname,"slice index == %d %d %d\n",slice_ind[0],slice_ind[1],slice_ind[2]);
   
   // the dummy node_sites for each dummy dirction
   int NN[4];

@@ -574,7 +574,7 @@ int SerialIO::store(iostream & output,
 	      const char * pd = data;
 
 	      for(int xst=0;xst<wt_arg.XnodeSites();xst++) {
-//                printf("Node %d: %d %d %d %d %d %d\n",UniqueID(),xst,xnd,yc,zc,tc,sc);
+                if(!UniqueID()) printf("Node %d: %d %d %d %d %d %d\n",UniqueID(),xst,xnd,yc,zc,tc,sc);
 		if(hd.headerType() == LatHeaderBase::LATTICE_HEADER) {
 		  for(int mat=0;mat<4;mat++) {
 		    dconv.host2file(fbuf + chars_per_site/4*mat, pd, data_per_site/4);
@@ -664,6 +664,7 @@ void SerialIO::xShiftNode(char * data, const int xblk, const int dir) const {
     //    const SCUDir neg_dir[] = { SCU_XM, SCU_YM, SCU_ZM, SCU_TM };
     
     char * sendbuf = data;
+    VRB.Func(cname,"xShift");
 
     int fsize = xblk/sizeof(IFloat);
     if (xblk%sizeof(IFloat)>0) fsize++;
@@ -682,6 +683,7 @@ void SerialIO::xShiftNode(char * data, const int xblk, const int dir) const {
 void SerialIO::yShift(char * data, const int xblk, const int dir) const {
   int useSCU = 1;
   if(qio_arg.Ynodes() <= 1) useSCU = 0;
+    VRB.Func(cname,"yShift");
 
   if(isFace0()) {
     int fsize = xblk/sizeof(IFloat);
@@ -756,6 +758,7 @@ void SerialIO::yShift(char * data, const int xblk, const int dir) const {
 void SerialIO::zShift(char * data, const int xblk, const int dir) const {
   int useSCU = 1;
   if(qio_arg.Znodes() <= 1) useSCU = 0;
+    VRB.Func(cname,"zShift");
 
   if(isCube0()) {
     int yblk = xblk * qio_arg.YnodeSites();
@@ -840,6 +843,7 @@ void SerialIO::zShift(char * data, const int xblk, const int dir) const {
 void SerialIO::tShift(char * data, const int xblk, const int dir) const {
   int useSCU = 1;
   if(qio_arg.Tnodes() <= 1) useSCU = 0;
+    VRB.Func(cname,"tShift");
 
   if(isSdim0()) {
     int yblk = xblk * qio_arg.YnodeSites();
@@ -932,6 +936,7 @@ void SerialIO::sShift(char * data, const int xblk, const int dir) const {
 
   int useSCU = 1;
   if(qio_arg.Snodes() <= 1) useSCU = 0;
+    VRB.Func(cname,"sShift");
 
   int yblk = xblk * qio_arg.YnodeSites();
   int zblk = yblk * qio_arg.ZnodeSites();

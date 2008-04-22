@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.6 2008-04-21 14:19:18 chulwoo Exp $
+  $Id: get_data.C,v 1.7 2008-04-22 20:54:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-21 14:19:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.6 2008-04-21 14:19:18 chulwoo Exp $
-//  $Id: get_data.C,v 1.6 2008-04-21 14:19:18 chulwoo Exp $
+//  $Date: 2008-04-22 20:54:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.7 2008-04-22 20:54:18 chulwoo Exp $
+//  $Id: get_data.C,v 1.7 2008-04-22 20:54:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -93,6 +93,7 @@ static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len_i, int
     memcpy(rcv_noncache,send_noncache,len_i*sizeof(IFloat));
     return;
   }
+  if(!UniqueID())printf("PassData(%p %p %d %d %d)\n",rcv_noncache,send_noncache,len_i,mu,sign);
 
   int len = len_i + (len_i%2);
 
@@ -100,14 +101,14 @@ static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len_i, int
     QMP_msgmem_t rcv_msgmem = QMP_declare_msgmem(rcv_noncache, len*sizeof(IFloat));
     QMP_msghandle_t send_msghandle = QMP_declare_send_relative(send_msgmem, mu,-sign, 0);
     QMP_msghandle_t rcv_msghandle = QMP_declare_receive_relative(rcv_msgmem, mu, sign, 0);
-    QMP_start(send_msghandle);
     QMP_start(rcv_msghandle);
+    QMP_start(send_msghandle);
     QMP_status_t send_status = QMP_wait(send_msghandle);
-    QMP_status_t rcv_status = QMP_wait(rcv_msghandle);
     if (send_status != QMP_SUCCESS) 
-      QMP_error("Send failed in getPlusData: %s\n", QMP_error_string(send_status));
+      QMP_error("Send failed in PassData: %s\n", QMP_error_string(send_status));
+    QMP_status_t rcv_status = QMP_wait(rcv_msghandle);
     if (rcv_status != QMP_SUCCESS) 
-      QMP_error("Receive failed in getPlusData: %s\n", QMP_error_string(rcv_status));
+      QMP_error("Receive failed in PassData: %s\n", QMP_error_string(rcv_status));
     QMP_free_msghandle(send_msghandle);
     QMP_free_msghandle(rcv_msghandle);
     QMP_free_msgmem(send_msgmem);

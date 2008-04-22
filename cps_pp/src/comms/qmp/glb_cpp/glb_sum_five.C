@@ -72,7 +72,7 @@ void glb_sum_five(Float * float_p)
 #else
   Float shifted = *float_p;
   QMP_sum_double(float_p);
-#if 1
+#if 0
   if (initted==0 && !UniqueID()) fprintf(stderr,"shifting glb_sum_five (1,1,1,0)\n");
   GDS.Set(1,1,1,0);
   GDS.Shift(&shifted,sizeof(Float));
@@ -83,6 +83,7 @@ void glb_sum_five(Float * float_p)
                *float_p,  shifted );
     exit(-30);
   }
+  if (initted==0 && !UniqueID()) fprintf(stderr,"shifting glb_sum_five (1,1,1,0) done \n");
 #endif
 #endif
   initted++;

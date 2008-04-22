@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.34 2008-04-21 14:19:17 chulwoo Exp $
+  $Id: gjp.h,v 1.35 2008-04-22 20:57:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-21 14:19:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.34 2008-04-21 14:19:17 chulwoo Exp $
-//  $Id: gjp.h,v 1.34 2008-04-21 14:19:17 chulwoo Exp $
+//  $Date: 2008-04-22 20:57:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.35 2008-04-22 20:57:19 chulwoo Exp $
+//  $Id: gjp.h,v 1.35 2008-04-22 20:57:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.34 $
+//  $Revision: 1.35 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -815,10 +815,10 @@ extern GlobalJobParameter GJP;
 start and end of main()
 */
 
-#if TARGET == NOARCH
+#if TARGET == NOARCH && (!defined USE_QMP)
 inline void Start(){}
 inline void End(){}
-inline void Start(int * argc, char ***argv){}
+inline void Start(int * argc, char ***argv){GJP.setArg(argc, argv);}
 #else
 void Start();
 void End();
