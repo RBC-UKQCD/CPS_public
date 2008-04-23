@@ -134,7 +134,7 @@ QPropW::QPropW(Lattice& lat, QPropWArg* arg, CommonArg* c_arg):
 #endif
   FILE *fp;
   if (fp=fopen(sname,"w")) {
-	printf("Remove file %s\n", sname);
+	VRB.Flow(cname,fname,"Remove file %s\n", sname);
   } else {
 	ERR.FileA(cname, fname, sname);
   }
@@ -142,13 +142,13 @@ QPropW::QPropW(Lattice& lat, QPropWArg* arg, CommonArg* c_arg):
   }
   }
   if(qp_arg.save_ls_prop == 2){
-  printf("Before allocate porpls\n");
+  VRB.Debug(cname,fname,"Before allocate porpls\n");
   if (propls == NULL) { 
   propls = (WilsonMatrix*)smalloc(GJP.VolNodeSites()*GJP.SnodeSites()*sizeof(WilsonMatrix));
   if (propls == 0) ERR.Pointer(cname, fname, "propls");
   VRB.Smalloc(cname, fname, "propls", propls,
 	      GJP.VolNodeSites()*GJP.SnodeSites()*sizeof(WilsonMatrix));
-  printf("Allocate porpls\n");
+  VRB.Debug(cname,fname,"Allocate porpls\n");
   }
   }
   // TY Add End
@@ -397,7 +397,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
 
 
 	 // Get the prop
-	 printf("Before CG in QpropW.Run() \n");
+	 VRB.Debug(cname,fname,"Before CG in QpropW.Run() \n");
 	 CG(src, sol, midsol, iter, true_res);
 	 //gauge fix solution
 	 FixSol(sol);
@@ -597,7 +597,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      
      // just writing one time-slice?
      if( (SrcType() == POINT) || (SrcType() == VOLUME) || (SrcType() == BOX) || (SrcType() == WALL) ){
-       printf(" source-type: %s only write t-slice %i to file\n",SourceType_map[SrcType()].name ,SourceTime());
+       VRB.Flow(cname,fname," source-type: %s only write t-slice %i to file\n",SourceType_map[SrcType()].name ,SourceTime());
        writePropQio.setSourceTslice(SourceTime());
      }
 
@@ -645,7 +645,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
 		 
 		 errCnt += 1.0;
 		 sumerr+=diff;
-		 printf("mismatch propagator: index %i snk %i %i src %i %i\n %f: (%f,%f) <-> (%f,%f)\n",
+		 VRB.Result(cname,fname,"mismatch propagator: index %i snk %i %i src %i %i\n %f: (%f,%f) <-> (%f,%f)\n",
 			index, s_snk,c_snk,s_src,c_src,
 			diff, tmp_calc.real(), tmp_calc.imag(), tmp_read.real(), tmp_read.imag() );
 	       }
@@ -1171,7 +1171,7 @@ void QPropW::RestoreQProp(char* name, int mid) {
   
   VRB.Func(cname, fname);
 
-  printf("Saving propagator to pfs...\n");
+  VRB.Flow(cname,fname,"Saving propagator to pfs...\n");
 
   int fv_size = GJP.Colors() * 4 * 2 * sizeof(Float) * GJP.VolNodeSites();
   char sname[100];
@@ -1290,7 +1290,7 @@ void QPropW::RestoreQPropLs(char* name, int ls) {
 	ERR.FileA(cname, fname, name);
   }
 
-  printf("Read prop from file %s\n", sname);
+  VRB.Flow(cname,fname,"Read prop from file %s\n", sname);
   fclose(fp);
   }
 
@@ -1307,10 +1307,10 @@ void QPropW::RestoreQPropLs(char* name, int ls) {
 	prop[s] = propls[s+shft_buf];
 	//printf("%d %e %e\n",s,*((Float*)&prop[s]),*((Float*)&propls[s+shft_buf]));
       }
-      printf("End read propagator from memory\n");
+      VRB.Debug(cname,fname,"End read propagator from memory\n");
     }
     if( GJP.Snodes() > 1 && GJP.Snodes() != 2 )  {
-      printf("%d gsum start restore\n",f_size);
+      VRB.Flow(cname,fname,"d gsum start restore\n",f_size);
       Float sum;
       Float* field_4D  = (Float *) prop;
       for(int i=0; i<f_size; i++){
@@ -1318,7 +1318,7 @@ void QPropW::RestoreQPropLs(char* name, int ls) {
 	glb_sum_dir(&sum, 4);
 	field_4D[i] = sum;    
       }
-      printf("%d gsum end restore\n",f_size);
+      VRB.Flow(cname,fname,"d gsum end restore\n",f_size);
     }
   }
 
@@ -1358,7 +1358,7 @@ void QPropW::RestoreQPropLs_ftom(char* name) {
   if (propls == 0) ERR.Pointer(cname, fname, "propls");
   VRB.Smalloc(cname, fname, "propls", propls,
 	      GJP.VolNodeSites()*GJP.SnodeSites()*sizeof(WilsonMatrix));
-  printf("Allocate porpls\n");
+  VRB.Debug(cname,fname,"Allocate porpls\n");
   }
 
   FILE *fp;
@@ -1406,7 +1406,7 @@ void QPropW::RestoreQPropLs_ftom(char* name) {
 	ERR.FileA(cname, fname, name);
   }
 
-  printf("Read 5d prop from file to memory\n");
+  VRB.Debug(cname,fname,"Read 5d prop from file to memory\n");
   fclose(fp);
   } // ls loop
 
@@ -1446,7 +1446,7 @@ void QPropW::SwapQPropLs() {
       int l_node = ( ls + GJP.SnodeSites() ) / GJP.SnodeSites();
       // for(int s=0; s<GJP.VolNodeSites(); s++) prop[s] = 0.0;
 
-      printf("%d gsum start swap\n",f_size);
+      VRB.Debug(cname,fname,"d gsum start swap\n",f_size);
       int shft = f_size * s_local;
       Float sum;
       Float* field_5D = (Float *) propls;
@@ -1468,7 +1468,7 @@ void QPropW::SwapQPropLs() {
 	if( s_node == GJP.SnodeCoor() ) field_5D[i+shft] = sum;
 	if( l_node == GJP.SnodeCoor() ) field_5D[i+shft] = tmp;
       }
-      printf("%d gsum end swap\n",f_size);
+      VRB.Debug(cname,fname,"d gsum end swap\n",f_size);
     }
   }
 
@@ -1622,7 +1622,7 @@ void QPropW::RestoreOrgProp(char* name, int ls) {
 	}
       }
       
-      printf("%d gsum start org 0\n",f_size);
+      VRB.Debug(cname,fname,"d gsum start org 0\n",f_size);
       Float sum;
       Float* field_4D  = (Float *) prop;
       for(int i=0; i<f_size; i++){
@@ -1670,7 +1670,7 @@ void QPropW::RestoreOrgProp(char* name, int ls) {
 	}
       }
       
-      printf("%d gsum start org 1\n",f_size);
+      VRB.Debug(cname,fname,"d gsum start org 1\n",f_size);
       Float sum;
       Float* field_4D  = (Float *) prop;
       for(int i=0; i<f_size; i++){
@@ -2919,7 +2919,7 @@ void QPropWRand::RestoreQProp(char* name, int mid) {
    read_data(name, data, 
 	     GJP.VolNodeSites() * sizeof(Complex),
 	     GJP.VolNodeSites() * sizeof(WilsonMatrix));
-   printf("Read rsrc from file %s\n", name);
+   VRB.Flow(cname,fname,"Read rsrc from file %s\n", name);
   -------------------- Quarantine ends ---------------------------*/
 }
 // Save prop
@@ -2937,7 +2937,7 @@ void QPropWRand::SaveQProp(char* name, int mid) {
   unsigned int* data;
   data = (unsigned int*)rsrc;
   append_data(name, data, GJP.VolNodeSites() * sizeof(Complex));
-  printf("Appended rsrc to file %s\n", name);
+  VRB.Flow(cname,fname,"Appended rsrc to file %s\n", name);
   DeleteRsrc();
   -------------------- Quarantine ends ---------------------------*/
 }
