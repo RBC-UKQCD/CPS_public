@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.7 2008-04-22 20:54:18 chulwoo Exp $
+  $Id: get_data.C,v 1.8 2008-04-23 03:40:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-22 20:54:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.7 2008-04-22 20:54:18 chulwoo Exp $
-//  $Id: get_data.C,v 1.7 2008-04-22 20:54:18 chulwoo Exp $
+//  $Date: 2008-04-23 03:40:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.8 2008-04-23 03:40:32 chulwoo Exp $
+//  $Id: get_data.C,v 1.8 2008-04-23 03:40:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -93,7 +93,7 @@ static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len_i, int
     memcpy(rcv_noncache,send_noncache,len_i*sizeof(IFloat));
     return;
   }
-  if(!UniqueID())printf("PassData(%p %p %d %d %d)\n",rcv_noncache,send_noncache,len_i,mu,sign);
+//  if(!UniqueID())printf("PassData(%p %p %d %d %d)\n",rcv_noncache,send_noncache,len_i,mu,sign);
 
   int len = len_i + (len_i%2);
 

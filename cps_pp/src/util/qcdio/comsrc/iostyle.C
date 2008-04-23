@@ -574,7 +574,7 @@ int SerialIO::store(iostream & output,
 	      const char * pd = data;
 
 	      for(int xst=0;xst<wt_arg.XnodeSites();xst++) {
-                if(!UniqueID()) printf("Node %d: %d %d %d %d %d %d\n",UniqueID(),xst,xnd,yc,zc,tc,sc);
+//                if(!UniqueID()) printf("Node %d: %d %d %d %d %d %d\n",UniqueID(),xst,xnd,yc,zc,tc,sc);
 		if(hd.headerType() == LatHeaderBase::LATTICE_HEADER) {
 		  for(int mat=0;mat<4;mat++) {
 		    dconv.host2file(fbuf + chars_per_site/4*mat, pd, data_per_site/4);

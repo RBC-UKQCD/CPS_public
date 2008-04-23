@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
-  $Id: verbose.C,v 1.15 2008-04-22 20:57:20 chulwoo Exp $
+  $Id: verbose.C,v 1.16 2008-04-23 03:40:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-22 20:57:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.15 2008-04-22 20:57:20 chulwoo Exp $
-//  $Id: verbose.C,v 1.15 2008-04-22 20:57:20 chulwoo Exp $
+//  $Date: 2008-04-23 03:40:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.16 2008-04-23 03:40:32 chulwoo Exp $
+//  $Id: verbose.C,v 1.16 2008-04-23 03:40:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
@@ -45,11 +45,11 @@ const int MAX_STRING = 256;
   function progress messages, clock output messages and RNG seed
   information by default.
 */
-static void vrb_printf(const char *cname,const char *fname,const char *string){
+static void vrb_printf(const char *cname,const char *fname,const char *str){
 #if TARGET == BGL || TARGET == BGP
-  if (!UniqueID()) printf("Node %d: %s::%s: %s\n",UniqueID(),cname,fname,string);
+  if (!UniqueID()) printf("Node %d: %s::%s: %s\n",UniqueID(),cname,fname,str);
 #else
-  printf("%s::%s: %s\n",cname,fname,string);
+  printf("%s::%s: %s\n",cname,fname,str);
 #endif
 }
 
@@ -249,11 +249,11 @@ void Verbose::Pmalloc(const char *class_name, const char *func_name,
 		      const char *ptr_name, const void *ptr, int size) {
 
     if(!active[VERBOSE_PMALLOC_LEVEL]) return;
+    char vrb_string[MAX_STRING];
     
-    sprintf(string,"pmalloc initialized pointer\t%s to %p with size 0x%x\n",
-	   class_name, func_name, ptr_name, ptr, size);
-    vrb_printf(class_name,func_name,string);
-	   class_name, func_name, ptr_name, ptr, size);
+    sprintf(vrb_string,"pmalloc initialized pointer\t%s to %p with size 0x%x\n",
+	   ptr_name, ptr, size);
+    vrb_printf(class_name,func_name,vrb_string);
 
 }
 
@@ -274,11 +274,11 @@ void Verbose::Pfree(const char *class_name, const char *func_name,
 		    const char *ptr_name, const void *ptr){
     
     if(!active[VERBOSE_PMALLOC_LEVEL] ) return;
-    char string[MAX_STRING];
+    char vrb_string[MAX_STRING];
 
-    sprintf(string,"pfree will free pointer\t%s = %p\n",
-	   class_name, func_name, ptr_name, ptr);
-    vrb_printf(class_name,func_name,string);
+    sprintf(vrb_string,"pfree will free pointer\t%s = %p\n",
+	   ptr_name, ptr);
+    vrb_printf(class_name,func_name,vrb_string);
     
 }
 
@@ -317,11 +317,11 @@ void Verbose::Smalloc(const char *class_name, const char *func_name,
 		      const char *ptr_name, const void *ptr, int size){
     
     if(!active[VERBOSE_SMALLOC_LEVEL]) return;
-    char string[MAX_STRING];
+    char vrb_string[MAX_STRING];
 
-    sprintf(string,"smalloc initialized pointer\t%s to %p with size 0x%x\n",
-	   class_name, func_name, ptr_name, ptr, size);
-    vrb_printf(class_name,func_name,string);
+    sprintf(vrb_string,"smalloc initialized pointer\t%s to %p with size 0x%x\n",
+	   ptr_name, ptr, size);
+    vrb_printf(class_name,func_name,vrb_string);
     
 }
 
@@ -342,11 +342,11 @@ void Verbose::Sfree(const char *class_name, const char *func_name,
 		    const char *ptr_name, const void *ptr) {
     
     if(! active[VERBOSE_SMALLOC_LEVEL] ) return;
-    char string[MAX_STRING];
+    char vrb_string[MAX_STRING];
 
-    sprintf(string,"sfree will free pointer\t%s = %p\n",
-	   class_name, func_name, ptr_name, ptr);
-    vrb_printf(class_name,func_name,string);
+    sprintf(vrb_string,"sfree will free pointer\t%s = %p\n",
+	   ptr_name, ptr);
+    vrb_printf(class_name,func_name,vrb_string);
 
 }
 
@@ -391,14 +391,14 @@ void Verbose::Flow(const char *class_name, const char *func_name,
 		   const char *format, ...){
     
     if(!active[VERBOSE_FLOW_LEVEL]) return;
-    char string[MAX_STRING];
+    char vrb_string[MAX_STRING];
     
 //    printf("%s::%s :", class_name, func_name);
     va_list args;
     va_start(args, format);
 //    vprintf(format, args);
-    vsnprintf(string, MAX_STRING,format, args);
-    vrb_printf(class_name,func_name,string);
+    vsnprintf(vrb_string, MAX_STRING,format, args);
+    vrb_printf(class_name,func_name,vrb_string);
     if(active[VERBOSE_FLOW_CLOCK_LEVEL]){
 #ifdef _TARTAN
 	printf(" Clock (12.5 MHz) = %d\n\t", (int)clock());
@@ -457,13 +457,13 @@ void Verbose::Input(const char *class_name, const char *func_name,
 void Verbose::Result(const char *class_name, const char *func_name,
 		     const char *format, ...) {
     
-    char string[MAX_STRING];
+    char vrb_string[MAX_STRING];
     if( !active[VERBOSE_RESULT_LEVEL] ) return;
     
     va_list args;
     va_start(args, format);
-    vsnprintf(string, MAX_STRING,format, args);
-    vrb_printf(class_name,func_name,string);
+    vsnprintf(vrb_string, MAX_STRING,format, args);
+    vrb_printf(class_name,func_name,vrb_string);
 //    printf("%s::%s :\n\t", class_name, func_name);
     
 }
@@ -651,14 +651,14 @@ void Verbose::Clock(const char *class_name, const char *func_name,
 		    const char *format, ...){
     
     if(!active[VERBOSE_CLOCK_LEVEL]) return;
-    char string[MAX_STRING];
+    char vrb_string[MAX_STRING];
 
 //    printf("%s::%s :", class_name, func_name);
     va_list args;
     va_start(args, format);
 //    vprintf(format, args);
-    vsnprintf(string, MAX_STRING,format, args);
-    vrb_printf(class_name,func_name,string);
+    vsnprintf(vrb_string, MAX_STRING,format, args);
+    vrb_printf(class_name,func_name,vrb_string);
     int cps = CLOCKS_PER_SEC;
 #if TARGET == BGL
   if(!UniqueID())
