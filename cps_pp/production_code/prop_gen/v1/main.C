@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <time.h>
 
 #include <util/qcdio.h>
@@ -43,7 +44,7 @@
 #include <util/data_shift.h>
 
 using namespace std;
-using namespace cps;
+USING_NAMESPACE_CPS
 
 const int num_masses=6;
 const Float masses[num_masses]={0.002,0.004,0.006,0.008,0.025,0.03};
@@ -357,7 +358,13 @@ int main(int argc,char *argv[])
 	  ERR.FileA("main","main", (char *)(midprop_contractions_fname) );
 	}
 	Fclose(fp);
+#if TARGET==QCDOC
 	sprintf(qio_out,"/pfs/qio_prop.%s",prop_name);
+#else
+	sprintf(qio_out,"%d",seqNum);
+        mkdir(qio_out,0777);
+	sprintf(qio_out,"%d/qio_prop.%s",seqNum,prop_name);
+#endif
 	common_arg.results=midprop_contractions_fname;
 	qpropw_arg.file=qio_out;
 	qpropw_arg.ensemble_id=id;
