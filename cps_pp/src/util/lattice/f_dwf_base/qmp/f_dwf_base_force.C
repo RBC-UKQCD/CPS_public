@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.6 2008-04-25 21:33:29 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.7 2008-04-28 20:44:58 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -169,8 +169,8 @@ ForceArg FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   tmp_mat1 = (Matrix *)fmalloc(cname,fname,"tmp_mat1",sizeof(Matrix)*2);
   tmp_mat2 = tmp_mat1+1;
 
-  int f_bytes = sizeof(Float)*f_site_size_4d;
-  int st_bytes = sizeof(Float)*f_size_4d - f_bytes;
+  size_t f_bytes = sizeof(Float)*f_site_size_4d;
+  size_t st_bytes = sizeof(Float)*f_size_4d - f_bytes;
   if((ls*f_bytes)!=FsiteSize()*sizeof(Float))
     ERR.General(cname,fname,"ls(%d)*f_bytes(%d)!=FsiteSize()(%d)*sizeof(Float)(%d)\n",
     ls,f_bytes,FsiteSize(),sizeof(Float));
@@ -212,11 +212,11 @@ ForceArg FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
       Recv[mu]=QMP_declare_receive_relative(Recv_mem[mu],mu,1,0);
       addr[0]=v1; addr[1]=v2;
       blksize[0]=blksize[1]=(size_t)blklen[mu];
-      strds[0]=strds[1]=(ptrdiff_t)(stride[mu]+blklen[mu]);
-      if((surf[mu]*ls*f_bytes)!=(blklen[mu]*nblocks[mu])){
-         ERR.General(cname,fname,"receiveing bytes(%d) does not match with sending bytes(%d)\n",(surf[mu]*ls*f_bytes), blklen[mu]*nblocks[mu]);
-      }
       nblocks[0]=nblocks[1]=numblk[mu];
+      strds[0]=strds[1]=(ptrdiff_t)(stride[mu]+blklen[mu]);
+      if((size_t)(surf[mu]*ls*f_bytes)!=(blklen[mu]*numblk[mu])){
+         ERR.General(cname,fname,"mu=%d: receiving bytes(%d*%d*%d) does not match with sending bytes(%d*%d)\n",mu, surf[mu],ls,f_bytes, blklen[mu],numblk[mu]);
+      }
       Send_mem[mu]=QMP_declare_strided_array_msgmem(addr,blksize,nblocks,strds,2);
       Send[mu]=QMP_declare_send_relative(Send_mem[mu],mu,-1,0);
   }
