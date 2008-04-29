@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
-  $Id: verbose.C,v 1.16 2008-04-23 03:40:32 chulwoo Exp $
+  $Id: verbose.C,v 1.17 2008-04-29 16:11:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-23 03:40:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.16 2008-04-23 03:40:32 chulwoo Exp $
-//  $Id: verbose.C,v 1.16 2008-04-23 03:40:32 chulwoo Exp $
+//  $Date: 2008-04-29 16:11:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.17 2008-04-29 16:11:05 chulwoo Exp $
+//  $Id: verbose.C,v 1.17 2008-04-29 16:11:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
@@ -521,12 +521,13 @@ void Verbose::Debug(const char *class_name, const char *func_name,
 		    const char *format, ...) {
     
     if(!active[VERBOSE_DEBUG_LEVEL]) return;
-
+    char vrb_string[MAX_STRING];
+    
     va_list args;
     va_start(args, format);
-    printf("%s::%s :\n\t", class_name, func_name);
-    vprintf(format, args);
-    
+    vsnprintf(vrb_string, MAX_STRING,format, args);
+    vrb_printf(class_name,func_name,vrb_string);
+
 }
 
 

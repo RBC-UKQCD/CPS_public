@@ -67,7 +67,7 @@ void glb_sum_internal (Float * float_p, int dir,int len)
     NP[4]=GJP.Snodes();
     for (int i = 1;i<5;i++)
       if (max <NP[i]) max = NP[i]; 
-//    printf("max=%d\n",max);
+    VRB.Result("","glb_sum_internal","max=%d",max);
     transmit_buf = (Double64 *)smalloc(sizeof(Double64)*MAX_BUF*2);
     receive_buf = transmit_buf +MAX_BUF;
     gsum_buf = (Double64 *)smalloc(sizeof(Double64)*MAX_BUF*max);
@@ -75,8 +75,6 @@ void glb_sum_internal (Float * float_p, int dir,int len)
     for(int i = 0;i<5;i++)
     if (NP[i] >1){
 	  length[i] = 1;
-//      Send[i]= new SCUDirArgIR(transmit_buf,gjp_scu_dir[2*i+1],SCU_SEND,length[i]*sizeof(Double64));
-//       Recv[i]= new SCUDirArgIR(receive_buf,gjp_scu_dir[2*i],SCU_REC,length[i]*sizeof(Double64));
     }
 //    fp = Fopen(ADD_ID,"glb_sum_internal","a");
   }
