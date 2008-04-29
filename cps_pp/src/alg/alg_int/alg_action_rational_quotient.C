@@ -275,10 +275,6 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
   int shift = 0;
   int isz = 0;
 
-  Float L1 = 0.0;
-  Float L2 = 0.0;
-  Float Linf = 0.0;
-
   if (n_masses > 0) {
     //!< Create an appropriate lattice
     Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
@@ -382,6 +378,9 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
 
 	//!< Monitor total force contribution
 	if (force_measure == FORCE_MEASURE_YES) {
+      Float L1 = 0.0;
+      Float L2 = 0.0;
+      Float Linf = 0.0;
 	  for (int k=0; k<g_size/18; k++) {
 	    Float norm = (mom_tmp+k)->norm();
 	    Float tmp = sqrt(norm);

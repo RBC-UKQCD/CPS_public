@@ -39,7 +39,8 @@ CPS_END_NAMESPACE
 #endif
 CPS_START_NAMESPACE
 
-#if (TARGET==QCDOC) || (TARGET==BGP)
+//#if (TARGET==QCDOC) || (TARGET==BGP)
+#if (TARGET==QCDOC) 
 static const int SHIFT_X = 1;
 static const int SHIFT_Y = 1;
 static const int SHIFT_Z = 1;
