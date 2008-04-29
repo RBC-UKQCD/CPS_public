@@ -15,6 +15,7 @@
 #include <util/lattice.h>
 #include <util/time_cps.h>
 #include <alg/do_arg.h>
+#include <alg/array_arg.h>
 #include <alg/no_arg.h>
 #include <alg/common_arg.h>
 #include <alg/hmd_arg.h>
@@ -46,8 +47,16 @@
 using namespace std;
 USING_NAMESPACE_CPS
 
+#if 0
 const int num_masses=6;
 const Float masses[num_masses]={0.002,0.004,0.006,0.008,0.025,0.03};
+#else
+//const int num_masses=2;
+//const Float masses[num_masses]={0.025,0.03};
+FloatArray mass_list;
+static int num_masses;
+static Float *masses;
+#endif
 
 void chkpt(const int num_nodes,int& chkpoint_no,Float dtime[],const int dtime_size);
 
@@ -86,7 +95,7 @@ int main(int argc,char *argv[])
   /* 17 parameters: */
   /* x.x  
 	  chkpoints (1 to turn checkpoints on, 0 to turn them off)
-          DIRECTORY do_arg evo_arg 
+          DIRECTORY do_arg evo_arg mass_list
           lat_stand_in lat_stand_out
 	  number (which random gauge to take)
 	  t_src
@@ -107,6 +116,9 @@ int main(int argc,char *argv[])
   
   if ( !do_arg.Decode(CommandLine::arg(),"do_arg") ) { printf("Bum do_arg\n"); exit(-1);}
   if ( !evo_arg.Decode(CommandLine::arg(),"evo_arg") ) { printf("Bum evo_arg\n"); exit(-1);}
+  if ( !mass_list.Decode(CommandLine::arg(),"mass_list") ) { printf("Bum mass_lilst\n"); exit(-1);}
+  num_masses = mass_list.Floats.Floats_len;
+  masses = mass_list.Floats.Floats_val;
 
   do_arg.gfix_chkb=1;
 
@@ -129,12 +141,12 @@ int main(int argc,char *argv[])
   
   int gauge_ran(CommandLine::arg_as_int() );
   int t_src(CommandLine::arg_as_int() );
-  if ( t_src<0 || t_src>=do_arg.t_sites ) {
-    printf("t_src must be in the range 0 <= t_src < %d.\n",do_arg.t_sites);
+  if ( t_src<0 || t_src>=GJP.Sites(3) ) {
+    printf("t_src must be in the range 0 <= t_src < %d.\n",GJP.Sites(3));
     printf("Abort.\n");
     return 1;
   }
-  if ( t_src % do_arg.t_node_sites ) {
+  if ( t_src % GJP.TnodeSites() ) {
     printf("t_src must be at the beginning of a node since we are shifting\n");
     printf("the lattice rather than putting a source at time t_src.\n");
     printf("Abort.\n");
@@ -295,34 +307,34 @@ int main(int argc,char *argv[])
   qpropw_arg.cg.bicgstab_n=0;
 
   //See which masses we need to calculate props for
-  char logfile[200];
-  sprintf(logfile,"%s/%d",logdir,seqNum);
-  if( (fp = fopen((char *)(logfile),"r")) == NULL ){
-    ERR.FileA("main","main", (char *)(logfile) );
-  }
   float mass_read_tmp;
   Float mass_read;
   int bc;
   int mass_done[num_masses][2];
-  for (int i=0; i<num_masses; i++)
-    for (int j=0; j<2; j++)
-      mass_done[i][j]=0;
-  VRB.Result(cname,fname,"Finished masses and boundary conditions as read from log (config no. %d):\n",seqNum);
-  while (fscanf(fp,"%f",&mass_read_tmp)>=0){
-    mass_read=(Float) mass_read_tmp;
-    fscanf(fp,"%d",&bc);
-    VRB.Result(cname,fname,"f %d\n",mass_read,bc);
-    for (int i=0; i<num_masses; i++) {
-      if (fabs(masses[i]-mass_read)<=1e-6)
-	mass_done[i][bc]=1;
+  char logfile[200];
+  sprintf(logfile,"%s/%d",logdir,seqNum);
+  if( (fp = fopen((char *)(logfile),"r")) != NULL ){
+//    ERR.FileA("main","main", (char *)(logfile) );
+    for (int i=0; i<num_masses; i++)
+      for (int j=0; j<2; j++)
+        mass_done[i][j]=0;
+    VRB.Result(cname,fname,"Finished masses and boundary conditions as read from log (config no. %d):\n",seqNum);
+    while (fscanf(fp,"%f",&mass_read_tmp)>=0){
+      mass_read=(Float) mass_read_tmp;
+      fscanf(fp,"%d",&bc);
+      VRB.Result(cname,fname,"f %d\n",mass_read,bc);
+      for (int i=0; i<num_masses; i++) {
+        if (fabs(masses[i]-mass_read)<=1e-6)
+  	mass_done[i][bc]=1;
+      }
     }
+    fclose(fp);
   }
-  fclose(fp);
   VRB.Result(cname,fname,"Masses and boundary conditions to do (config. no. %d):\n",seqNum);
   for (int i=0; i<num_masses; i++)
     for (bc=0; bc<2; bc++)
       if (!mass_done[i][bc])
-	VRB.Result(cname,fname,"f %d\n",masses[i],bc);
+	VRB.Result(cname,fname,"%f %d",masses[i],bc);
   
   //Checkpoint
   if (chkpoints)
@@ -428,14 +440,14 @@ int main(int argc,char *argv[])
       chkpt(num_nodes,chkpoint_no,dtime,dtime_size);
     //Record in log that this lattice has been saved
     if( (fp = Fopen((char *)(gauge_rotated_lats_saved_log),"a")) == NULL ){
-      ERR.FileA("main","main", (char *)(plaq_fname) );
+    ERR.FileA("main","main", (char *)(gauge_rotated_lats_saved_log) );
     }
     Fprintf(fp,"%d\n",seqNum);
     Fclose(fp);
   }
 
   if( (fp = Fopen((char *)(configs_done_log),"a")) == NULL ){
-    ERR.FileA("main","main", (char *)(plaq_fname) );
+    ERR.FileA("main","main", (char *)(configs_done_log ) );
   }
   Fprintf(fp,"%d\n",seqNum);
   Fclose(fp);
