@@ -251,9 +251,6 @@ void AlgActionQuotient::evolve(Float dt, int nsteps)
 
   char *fname = "run(Float,int)";
   int chronoDeg;
-  Float L1;
-  Float L2;
-  Float Linf;
   ForceArg Fdt;
 
   if (n_masses > 0){
@@ -316,6 +313,9 @@ void AlgActionQuotient::evolve(Float dt, int nsteps)
 	  Fdt.print(dt, label);
 
 	  // If measuring the force, need to measure and then sum to mom
+      Float L1;
+      Float L2;
+      Float Linf;
 	  for (int k=0; k<g_size/18; k++) {
 	    Float norm = (mom_tmp+k)->norm();
 	    Float tmp = sqrt(norm);
