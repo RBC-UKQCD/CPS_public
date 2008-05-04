@@ -334,6 +334,7 @@ void qio_writePropagator::qio_openOutput(char *filename, QIO_String *record_file
   const int volfmt(volFormat);
   const int serpar(QIO_SERPAR);
   const int ildgstyle = QIO_ILDGNO;
+  VRB.Result(cname,fname,"volfmt=%d serpar=%d",volfmt,serpar);
 
   QIO_Writer *outfile;
   QIO_Oflag oflag;

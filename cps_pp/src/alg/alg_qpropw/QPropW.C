@@ -1,5 +1,3 @@
-//#define VOLFMT QIO_SINGLEFILE
-# define VOLFMT QIO_PARTFILE
 //------------------------------------------------------------------
 //
 // QPropW.C
@@ -35,11 +33,14 @@
 
 #include <util/qioarg.h>
 #include <util/sproj_tr.h>
+#include <util/time_cps.h>
 
 //YA
 #include <alg/alg_plaq.h>
 #include <alg/alg_smear.h>
 #include <alg/no_arg.h>
+
+#define VOLFMT QIO_VOLFMT
 
 CPS_START_NAMESPACE
 
@@ -133,7 +134,7 @@ QPropW::QPropW(Lattice& lat, QPropWArg* arg, CommonArg* c_arg):
 	  qp_arg.file,qp_arg.cg.mass,nls,UniqueID());
 #endif
   FILE *fp;
-  if (fp=fopen(sname,"w")) {
+  if ((fp=fopen(sname,"w"))!=NULL) {
 	VRB.Flow(cname,fname,"Remove file %s\n", sname);
   } else {
 	ERR.FileA(cname, fname, sname);
@@ -583,13 +584,13 @@ void QPropW::Run(const int do_rerun, const Float precision) {
        save_prop = &prop[0];
      
 #ifdef USE_QIO
+     Float qio_time = -dclock();
      
      // always writes the full 4D source
      //qio_writePropagator writePropQio(propOutfile, QIO_FULL_SOURCE, save_prop, save_source,
      //			      qp_arg.ensemble_id, qp_arg.ensemble_label, qp_arg.seqNum, propType, sourceType,
      //			      GJP.argc(), GJP.argv(), VOLFMT);
      
-
      // write a t-slice/slices or hypercube in some cases for the source
      qio_writePropagator writePropQio;
 
@@ -602,6 +603,8 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      }
 
      writePropQio.write_12pairs(propOutfile, QIO_FULL_SOURCE, save_prop, save_source, VOLFMT);
+     qio_time +=dclock();
+     print_time("QPropW::Run","qio_writePropagator",qio_time);
 
 
 #endif // USE_QIO
@@ -1189,7 +1192,7 @@ void QPropW::RestoreQProp(char* name, int mid) {
 #endif
 
   FILE *fp;
-  if (fp=fopen(sname,"a")) {
+  if ((fp=fopen(sname,"a"))!=NULL) {
 	fwrite(sol_5d+skip_buf,1,fv_size,fp);
   } else {
 	ERR.FileA(cname, fname, sname);
@@ -1270,7 +1273,7 @@ void QPropW::RestoreQPropLs(char* name, int ls) {
   if (DoHalfFermion()) Nspin = 2;
 
   FILE *fp;
-  if (fp=fopen(sname,"r")) {
+  if ((fp=fopen(sname,"r"))!=NULL) {
     for (int spn=0; spn < Nspin; spn++)
     for (int col=0; col < GJP.Colors(); col++) {
       fread((Vector*)sol.data(),1,fv_size,fp);
@@ -1539,8 +1542,8 @@ void QPropW::RestoreOrgProp(char* name, int ls) {
   if (DoHalfFermion()) Nspin = 2;
 
   FILE *fp, *gp=NULL;
-  if (fp=fopen(sname,"r"))
-  if (gp=fopen(lname,"r")) {
+  if ((fp=fopen(sname,"r"))!=NULL)
+  if ((gp=fopen(lname,"r"))!=NULL) {
     for (int spn=0; spn < Nspin; spn++)
     for (int col=0; col < GJP.Colors(); col++) {
       fread((Vector*)sol.data(),1,fv_size,fp);
