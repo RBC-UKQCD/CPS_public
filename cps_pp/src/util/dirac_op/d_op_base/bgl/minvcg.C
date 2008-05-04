@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpBase class multishift CG solver method.
 
-  $Id: minvcg.C,v 1.4 2008-04-21 14:19:18 chulwoo Exp $
+  $Id: minvcg.C,v 1.5 2008-05-04 05:12:30 chulwoo Exp $
 */
 
 CPS_END_NAMESPACE
@@ -145,7 +145,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   unsigned int *d_store;
   int test_freq = GJP.CGreprodFreq();
 
-  if (test_freq && (CGcount % test_freq == 0) ) {
+//  if (test_freq && (CGcount % test_freq == 0) ) {
+  if (0){
     test_num = 1;
   VRB.Result(cname,fname,"reproducibility testing interval reachaed\n");
 // Allocate space for storing solution
@@ -177,197 +178,197 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
       }
     if (test == 1) chi-> CopyVec(sol_store, f_size);
 
-  Float b_tmp;
-
-  if (type == SINGLE || type == MULTI) {
-    r-> CopyVec(chi,f_size);
-    cp = chi_norm;
-  } else if (type == GENERAL) {
-    MatPcDagMatPc(r,psi[0]);
-    r -> FTimesV1MinusV2(1.0,chi,r,f_size);
-    cp = r -> NormSqGlbSum(f_size);
-  }
-
-  for (s=0; s<Nmass; s++) p[s] -> CopyVec(r,f_size);
+    Float b_tmp;
   
-  for (s=0; s<Nmass; s++) {
-    rsdcg_sq[s] = RsdCG[s]*RsdCG[s];
-    rsd_sq[s] = cp*rsdcg_sq[s];
-    VRB.Flow(cname,fname,"rsq_sd[%d]= %0.16e\n",s,rsd_sq[s]);
-    converged[s] = 0;
-  }
-
-  Ap_tmp = (IFloat *)p[0];
-  VRB.Flow(cname,fname,"mass[%d]=%e p[%d]= %e\n",0,mass[0],0,*Ap_tmp);
-  /*  d = <p, A.p>  */
-  if (mass[0] > 0) {
-    MatPcDagMatPc(Ap,p[0]);
-    Ap_tmp = (IFloat *)Ap;
-    VRB.Flow(cname,fname,"Ap= %e\n",*Ap_tmp);
-    vaxpy_vxdot(mass,p[0],Ap,f_size/6,&d);
-    VRB.Flow(cname,fname,"Ap= %e\n",*Ap_tmp);
-  } else {
-    MatPcDagMatPc(Ap,p[0],&d);
-  }
-  x_loc_csum = local_checksum((Float *)Ap,f_size);
-
-  DiracOpGlbSum(&d);
-  Ap_tmp = (IFloat *)Ap;
-  VRB.Flow(cname,fname,"Ap= %e pAp =%e\n",*Ap_tmp,d);
- 
-  b = -cp/d;
-  
-  *(z[0]) = 1.0;
-  *(z[1]) = 1.0;
-  bs[0] = -b;
-  iz = 1;
-  
-  for (s=0; s<Nmass; s++) {
-    if (s==0) continue;
-    z[1-iz][s] = 1.0;
-    z[iz][s] = 1.0 / ( 1.0 - b*(mass[s] - mass[0]));
-    bs[s] = -b*z[iz][s];
-  }
-
-  // r[1] += b[0] A.p[0]
-  // c = |r[1]|^2
-  vaxpy_norm(&b,Ap,r,f_size/6,&c);
-  DiracOpGlbSum(&c);
-  VRB.Flow(cname,fname, "|res[%d]|^2 = %0.16e\n", 0, IFloat(c));
-
-  // Psi[1] -= b[0] p[0] =- b[0] chi;
-  if (type == SINGLE) {
-    b_tmp = 0;
-    for (s=0; s<Nmass; s++) b_tmp += alpha[s]*bs[s];
-    vaxpy(&b_tmp,chi,psi[0],f_size/6);
-  } else {
-    for (s=0; s<Nmass; s++) vaxpy(bs+s,chi,psi[s],f_size/6);
-  }
-
-  // Check the convergance of the first solution
-  for (s=0; s<Nmass; s++) {
-    convsP[s] = 0;
-    at[s] = (Float)1.0;
-  }
-  
-  convP = (c < rsd_sq[0]) ? 1 : 0;
-
-#ifdef PROFILE
-  CGflops = 0;
-  gettimeofday(&start,NULL);
-#endif
-
-  
-  // for k=1 until MaxCG do
-  // if |psi[k+1] - psi[k]| <= RsdCG |psi[k+1]| then return
-  for (k=1; k<=dirac_arg->max_num_iter && !convP; k++) {
-    // a[k+1] = |r[k]**2/ |r[k-1]|**2
-    a = c/cp;
-
-    // p[k+1] = r[k+1] + a[k+1] p[k]
-    //   Compute the shifted as
-    //   ps[k+1] = zs[k+1] r[k+1] + a[k+1] ps[k]
-    for (s=0; s<Nmass; s++) {
-      if (convsP[s]) continue;
-      as = -a * (z[iz][s] * bs[s]) / (z[1-iz][s] * b);
-      at[s] *= as;
-      as = z[iz][s]/at[s];
-      vaxpy(&as,r,p[s],f_size/6);
-      CGflops += f_size*2;
+    if (type == SINGLE || type == MULTI) {
+      r-> CopyVec(chi,f_size);
+      cp = chi_norm;
+    } else if (type == GENERAL) {
+      MatPcDagMatPc(r,psi[0]);
+      r -> FTimesV1MinusV2(1.0,chi,r,f_size);
+      cp = r -> NormSqGlbSum(f_size);
     }
-
-    // cp = |r[k]**2
-    cp = c;
+  
+    for (s=0; s<Nmass; s++) p[s] -> CopyVec(r,f_size);
     
-    // b[k] = |r[k]**2 / <p[k], Ap[k]>    
+    for (s=0; s<Nmass; s++) {
+      rsdcg_sq[s] = RsdCG[s]*RsdCG[s];
+      rsd_sq[s] = cp*rsdcg_sq[s];
+      VRB.Flow(cname,fname,"rsq_sd[%d]= %0.16e\n",s,rsd_sq[s]);
+      converged[s] = 0;
+    }
+  
+    Ap_tmp = (IFloat *)p[0];
+    VRB.Flow(cname,fname,"mass[%d]=%e p[%d]= %e\n",0,mass[0],0,*Ap_tmp);
+    /*  d = <p, A.p>  */
     if (mass[0] > 0) {
       MatPcDagMatPc(Ap,p[0]);
+      Ap_tmp = (IFloat *)Ap;
+      VRB.Flow(cname,fname,"Ap= %e\n",*Ap_tmp);
       vaxpy_vxdot(mass,p[0],Ap,f_size/6,&d);
-      CGflops += f_size*4;
+      VRB.Flow(cname,fname,"Ap= %e\n",*Ap_tmp);
     } else {
       MatPcDagMatPc(Ap,p[0],&d);
     }
-//    x_loc_csum = x_loc_csum ^ local_checksum((Float *)Ap,f_size);
+    x_loc_csum = local_checksum((Float *)Ap,f_size);
+  
     DiracOpGlbSum(&d);
-
-
-    if (test_num != 0 ) {
-      unsigned int mmp_checksum = local_checksum((Float *)Ap,f_size);
-      //    VRB.Result(cname,fname,"DEBUG iter %d checksum = %p\n",k,mmp_checksum);
-      // fprintf(stderr, "NODE (%d %d %d %d %d)FAILS checksum[%d] %p\n",
-      //        GJP.XnodeCoor(),GJP.YnodeCoor(),GJP.ZnodeCoor(),GJP.TnodeCoor(),GJP.SnodeCoor(),k,mmp_checksum );
-
-      /* Check reproducibility */
-      if ( test == 0) d_store[ k ] = mmp_checksum;
-      else if ( mmp_checksum != d_store[ k ] ){
-        fprintf(stderr, "NODE (%d %d %d %d %d)FAILS TO REPRODUCE\n",
-        GJP.XnodeCoor(),GJP.YnodeCoor(),GJP.ZnodeCoor(),GJP.TnodeCoor(),GJP.SnodeCoor());
-        fprintf(stderr,"mmp =%p mmp_store = %p\n",mmp_checksum,d_store[k]);
-// Temporary hack to exit immediately
-        Float *null_p = NULL; *null_p = 0.;
-#if (defined USE_QMP) && ( !defined UNIFORM_SEED_NO_COMMS)
-        QMP_abort_string(-1, "NODE FAILS TO REPRODUCE");
-#else
-        ERR.General(cname,fname, "NODE FAILS TO REPRODUCE");
-#endif
-      }
-    } // end of repro CG test
+    Ap_tmp = (IFloat *)Ap;
+    VRB.Flow(cname,fname,"Ap= %e pAp =%e\n",*Ap_tmp,d);
+   
+    b = -cp/d;
     
-    bp = b;
-    b = -cp/(d*at[0]*at[0]);
-
-    //Compute the shifted bs and z
+    *(z[0]) = 1.0;
+    *(z[1]) = 1.0;
     bs[0] = -b;
-    iz = 1 - iz;
-    for (s=0; s<Nmass; s++) {
-      if (s==0 || convsP[s]) continue;      
-      ztmp = z[1-iz][s]*z[iz][s]*bp / 
-	( b*a*(z[iz][s]-z[1-iz][s]) + z[iz][s]*bp*(1-b*(mass[s] - mass[0])));
-      bs[s] = -b*ztmp / z[1-iz][s];
-      z[iz][s] = ztmp;
-    }
+    iz = 1;
     
-    // r[k+1] += b[k] A.p[k]
-    // c = |r[k]|**2
-    b_tmp = b*at[0];
-    vaxpy_norm(&b_tmp,Ap,r,f_size/6,&c);
-    CGflops += f_size*4;
+    for (s=0; s<Nmass; s++) {
+      if (s==0) continue;
+      z[1-iz][s] = 1.0;
+      z[iz][s] = 1.0 / ( 1.0 - b*(mass[s] - mass[0]));
+      bs[s] = -b*z[iz][s];
+    }
+  
+    // r[1] += b[0] A.p[0]
+    // c = |r[1]|^2
+    vaxpy_norm(&b,Ap,r,f_size/6,&c);
     DiracOpGlbSum(&c);
-    VRB.Flow(cname,fname, "|res[%d]|^2 = %0.16e\n", k, IFloat(c));
-
-    // Psi[k+1] -= b[k] p[k]
-    if (type == SINGLE)
-      for (s=0; s<Nmass; s++) {
-	if (convsP[s]) continue;
-	b_tmp = bs[s]*alpha[s]*at[s];
-	vaxpy(&b_tmp,p[s],psi[0],f_size/6);
-	CGflops += f_size*2;
-      }
-    else 
-      for (s=0; s<Nmass; s++) {
-	if (convsP[s]) continue;
-	b_tmp = bs[s]*at[s];
-	vaxpy(&b_tmp,p[s],psi[s],f_size/6);
-	CGflops += f_size*2;
-      }    
-
-    // if |psi[k+1] -psi[k]| <= rsdCG |psi[k+1]| then return
-    // or if |r[k+1]| <= RsdCG |chi| then return
+    VRB.Flow(cname,fname, "|res[%d]|^2 = %0.16e\n", 0, IFloat(c));
+  
+    // Psi[1] -= b[0] p[0] =- b[0] chi;
+    if (type == SINGLE) {
+      b_tmp = 0;
+      for (s=0; s<Nmass; s++) b_tmp += alpha[s]*bs[s];
+      vaxpy(&b_tmp,chi,psi[0],f_size/6);
+    } else {
+      for (s=0; s<Nmass; s++) vaxpy(bs+s,chi,psi[s],f_size/6);
+    }
+  
+    // Check the convergance of the first solution
     for (s=0; s<Nmass; s++) {
-      if (convsP[s]) continue;
-      //check norm of shifted residuals
-      css = c * z[iz][s] * z[iz][s];
-      convsP[s] = (css < rsd_sq[s]) ? 1 : 0;
-      if (convsP[s]) {
-	RsdCG[s] = css;
-	converged[s] = k;
-      }
+      convsP[s] = 0;
+      at[s] = (Float)1.0;
     }
     
-    convP = convsP[0];
-    // if zero solution has converged, exit unless other solutions have not
-    if (convP) for (s=0; s<Nmass; s++) if (!convsP[s]) convP = 0;
-  }
+    convP = (c < rsd_sq[0]) ? 1 : 0;
+  
+#ifdef PROFILE
+    CGflops = 0;
+    gettimeofday(&start,NULL);
+#endif
+  
+    
+    // for k=1 until MaxCG do
+    // if |psi[k+1] - psi[k]| <= RsdCG |psi[k+1]| then return
+    for (k=1; k<=dirac_arg->max_num_iter && !convP; k++) {
+      // a[k+1] = |r[k]**2/ |r[k-1]|**2
+      a = c/cp;
+  
+      // p[k+1] = r[k+1] + a[k+1] p[k]
+      //   Compute the shifted as
+      //   ps[k+1] = zs[k+1] r[k+1] + a[k+1] ps[k]
+      for (s=0; s<Nmass; s++) {
+        if (convsP[s]) continue;
+        as = -a * (z[iz][s] * bs[s]) / (z[1-iz][s] * b);
+        at[s] *= as;
+        as = z[iz][s]/at[s];
+        vaxpy(&as,r,p[s],f_size/6);
+        CGflops += f_size*2;
+      }
+  
+      // cp = |r[k]**2
+      cp = c;
+      
+      // b[k] = |r[k]**2 / <p[k], Ap[k]>    
+      if (mass[0] > 0) {
+        MatPcDagMatPc(Ap,p[0]);
+        vaxpy_vxdot(mass,p[0],Ap,f_size/6,&d);
+        CGflops += f_size*4;
+      } else {
+        MatPcDagMatPc(Ap,p[0],&d);
+      }
+  //    x_loc_csum = x_loc_csum ^ local_checksum((Float *)Ap,f_size);
+      DiracOpGlbSum(&d);
+  
+  
+      if (test_num != 0 ) {
+        unsigned int mmp_checksum = local_checksum((Float *)Ap,f_size);
+        //    VRB.Result(cname,fname,"DEBUG iter %d checksum = %p\n",k,mmp_checksum);
+        // fprintf(stderr, "NODE (%d %d %d %d %d)FAILS checksum[%d] %p\n",
+        //        GJP.XnodeCoor(),GJP.YnodeCoor(),GJP.ZnodeCoor(),GJP.TnodeCoor(),GJP.SnodeCoor(),k,mmp_checksum );
+  
+        /* Check reproducibility */
+        if ( test == 0) d_store[ k ] = mmp_checksum;
+        else if ( mmp_checksum != d_store[ k ] ){
+          fprintf(stderr, "NODE (%d %d %d %d %d)FAILS TO REPRODUCE\n",
+          GJP.XnodeCoor(),GJP.YnodeCoor(),GJP.ZnodeCoor(),GJP.TnodeCoor(),GJP.SnodeCoor());
+          fprintf(stderr,"mmp =%p mmp_store = %p\n",mmp_checksum,d_store[k]);
+  // Temporary hack to exit immediately
+          Float *null_p = NULL; *null_p = 0.;
+#if (defined USE_QMP) && ( !defined UNIFORM_SEED_NO_COMMS)
+          QMP_abort_string(-1, "NODE FAILS TO REPRODUCE");
+#else
+          ERR.General(cname,fname, "NODE FAILS TO REPRODUCE");
+#endif
+        }
+      } // end of repro CG test
+    
+      bp = b;
+      b = -cp/(d*at[0]*at[0]);
+  
+      //Compute the shifted bs and z
+      bs[0] = -b;
+      iz = 1 - iz;
+      for (s=0; s<Nmass; s++) {
+        if (s==0 || convsP[s]) continue;      
+        ztmp = z[1-iz][s]*z[iz][s]*bp / 
+  	( b*a*(z[iz][s]-z[1-iz][s]) + z[iz][s]*bp*(1-b*(mass[s] - mass[0])));
+        bs[s] = -b*ztmp / z[1-iz][s];
+        z[iz][s] = ztmp;
+      }
+      
+      // r[k+1] += b[k] A.p[k]
+      // c = |r[k]|**2
+      b_tmp = b*at[0];
+      vaxpy_norm(&b_tmp,Ap,r,f_size/6,&c);
+      CGflops += f_size*4;
+      DiracOpGlbSum(&c);
+      VRB.Flow(cname,fname, "|res[%d]|^2 = %0.16e\n", k, IFloat(c));
+  
+      // Psi[k+1] -= b[k] p[k]
+      if (type == SINGLE)
+        for (s=0; s<Nmass; s++) {
+  	if (convsP[s]) continue;
+  	b_tmp = bs[s]*alpha[s]*at[s];
+  	vaxpy(&b_tmp,p[s],psi[0],f_size/6);
+  	CGflops += f_size*2;
+        }
+      else 
+        for (s=0; s<Nmass; s++) {
+  	if (convsP[s]) continue;
+  	b_tmp = bs[s]*at[s];
+  	vaxpy(&b_tmp,p[s],psi[s],f_size/6);
+  	CGflops += f_size*2;
+        }    
+  
+      // if |psi[k+1] -psi[k]| <= rsdCG |psi[k+1]| then return
+      // or if |r[k+1]| <= RsdCG |chi| then return
+      for (s=0; s<Nmass; s++) {
+        if (convsP[s]) continue;
+        //check norm of shifted residuals
+        css = c * z[iz][s] * z[iz][s];
+        convsP[s] = (css < rsd_sq[s]) ? 1 : 0;
+        if (convsP[s]) {
+  	RsdCG[s] = css;
+  	converged[s] = k;
+        }
+      }
+      
+      convP = convsP[0];
+      // if zero solution has converged, exit unless other solutions have not
+      if (convP) for (s=0; s<Nmass; s++) if (!convsP[s]) convP = 0;
+    }
 
   } // end of the loop over the repro test
 
