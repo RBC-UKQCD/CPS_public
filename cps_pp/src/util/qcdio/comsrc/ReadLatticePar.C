@@ -1,10 +1,12 @@
 #include <config.h>
 #include <math.h>
 #include <util/ReadLatticePar.h>
+#include <util/time_cps.h>
 
 CPS_START_NAMESPACE
 using namespace std;
 
+#define PROFILE
 void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 {
   const char * fname = "read()";

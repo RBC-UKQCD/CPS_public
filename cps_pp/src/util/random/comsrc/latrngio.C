@@ -11,7 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include <sys/time.h>
+#include <util/time_cps.h>
 #include <unistd.h>
 
 CPS_START_NAMESPACE
@@ -271,7 +271,7 @@ LatRngWrite::~LatRngWrite()
 { }
 
 
-
+#define PROFILE
 void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 			const QioArg & wt_arg) {
   const char * fname = "write()";
@@ -280,6 +280,9 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   char loginfo[100];
   sprintf(loginfo, "Unload %s", wt_arg.FileName);
   startLogging(loginfo);
+#ifdef PROFILE 
+  Float dtime = -dclock();
+#endif
 
   io_good = false;
   int error = 0;
@@ -444,6 +447,10 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   io_good = true;
 
   finishLogging();
+#ifdef PROFILE 
+  dtime +=dclock();
+  print_time(cname,fname,dtime);
+#endif
 
   VRB.FuncEnd(cname,fname);
 }

@@ -2,10 +2,12 @@
 #include <util/WriteLatticePar.h>
 #include <util/iostyle.h>
 #include <util/qcdio.h>
+#include <util/time_cps.h>
 
 using namespace std;
 CPS_START_NAMESPACE
 
+#define PROFILE
 void WriteLatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 {
   const char * fname = "write()";
