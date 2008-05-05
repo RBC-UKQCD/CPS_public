@@ -1,18 +1,13 @@
 Welcome to the Columbia Physics System 
 
-**********************************************************
-PLEASE CHECK the entries bracked with "CHANGES in v4_8_11"
-**********************************************************
-
 	0. Preliminaries
 
 The CPS consists of code to build a library which is can be statically
 linked to your code to create an executable. In addition there are
 tests and documentation. More about this in the 'Compiling' section.
 
-The primary intended target architecture is QCDOC, but builds for
-scalar machines or parallel machines with MPI are also supported, as
-well as QCDSP in some sort of legacy sense. This will be covered in
+CPS has optimized codes for QCDOC, IBM Blue Gene machines, and builds for
+scalar machines or parallel machines with QMP. This will be covered in
 the 'Configuring' section. 
 
 The directory containg this file is the source directory and will be 
@@ -91,7 +86,7 @@ $ <sourcedir>/conf --enable-target=qcdoc
 
 or
 
-$ <sourcedir>/conf --enable-target=bgl for BG/L
+$ <sourcedir>/conf --enable-target=(bgl,bgp) for BG/(L,P)
 
 
 which puts the command above into a file called 'config_wrapper'.
@@ -166,7 +161,29 @@ a whole raft of other documentation in a form suitable for publishing
 on the web. N.B. THIS COMMAND WILL DELETE ALL THE SOURCE CODE.
 
 
-	4. Separate libraries
+	4. Makefiles & Separate libraries
+
+While the configured Makefiles (Makefile,Makefile.rules,Makefile.users) has
+all the usual compiling & linking options, the architecture-dependent 
+implementations are  specified in Makefile's in each subdirectories
+
+For example, in cps++/src/util/dirac_op/d_op_wilson/Makefile:
+
+#SEPARATE_LIB=yes
+NORECURSE_DIR = CVS  bgl noarch qcdoc qcdsp qcdsp_lcl_nos qcdsp_nos qcdsp_nos_hdw_diag qcdsp_scl noarch_pv bgp bgp_asm bg_bagel bg_bagel_spi bgl
+BGL_DIR = bgl
+BGL_QMP_DIR = bg_bagel
+QCDOC_DIR = qcdoc
+QCDSP_DIR = qcdsp
+MPI_DIR = mpi
+NOARCH_DIR = noarch
+include ../../../../Makefile.rules
+
+NONRECURSE_DIR refers to all the directories which may or may not be compiled
+depending on the acrhitecture. 'QCDOC_DIR = qcdoc' would mean the QCDOC-specific
+implementation (defined as ARCHDIR in Makefile.rules) is in the directory 
+'qcdoc'. Please note that directories without Makefile will be ignored in the 
+compile process -- YOU HAVE TO PUT Makefile IN IT IF YOU ADD A DIRECTORY!
 
 By default, CPS produces a single library called cps.a containing all
 the object code. However, you can divide the object code into separate
