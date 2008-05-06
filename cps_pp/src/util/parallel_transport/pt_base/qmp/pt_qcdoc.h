@@ -80,13 +80,13 @@ extern "C"{
 	     int counter, unsigned long *src, unsigned long *dest);
   // cross_lin - one input field is linear and sum to result
   void cross_lin(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
-	     int counter, unsigned long *dest, unsigned long *dest);
+	     int counter, unsigned long *src, unsigned long *dest);
   // cross_over_look - all input fields are lookup and overwrite result
   void cross_over_look(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
 	     int counter, unsigned long *src, unsigned long *dest);
   // cross_over_lin - one input field is linear and overwrite result
   void cross_over_lin(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
-	     int counter, unsigned long *dest, unsigned long *dest);
+	     int counter, unsigned long *src, unsigned long *dest);
   //Copies a vectors from v to u
   void copy_vector(IFloat *u, IFloat *v, int *length, unsigned long *dest, unsigned long *src);
 
@@ -95,14 +95,14 @@ extern "C"{
   //---------------------------------------------------------------------------
 
   void m1m2_lookup(matrix *result, matrix *m1, matrix *m2, int length,
-		   unsigned long *dest, unsigned long *dest, unsigned long *src);
+		   unsigned long *dest, unsigned long *dest2, unsigned long *src);
   void m1m2_lookup_copy(matrix *result2, matrix *result, matrix *m1, matrix *m2, 
 			int length, unsigned long *dest2,  
-			unsigned long *dest, unsigned long *dest, 
+			unsigned long *dest, unsigned long *dest3, 
 			unsigned long *src);
   void m1m2_lin_copy(matrix *result2, matrix *result, matrix *m1, matrix *m2, 
 		     int length, unsigned long *dest2,
-		     unsigned long *dest, unsigned long *dest);
+		     unsigned long *dest, unsigned long *dest3);
   
 }
 inline  void pt_cmm_agg_print(gauge_agg *chi, matrix *phi,matrix *result, int counter){

@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_ordering.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+  $Id: pt_ordering.C,v 1.3 2008-05-06 15:19:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-11 22:45:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_ordering.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
-//  $Id: pt_ordering.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+//  $Date: 2008-05-06 15:19:50 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_ordering.C,v 1.3 2008-05-06 15:19:50 chulwoo Exp $
+//  $Id: pt_ordering.C,v 1.3 2008-05-06 15:19:50 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_ordering.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_ordering.C,v $
 //  $State: Exp $
 //
@@ -98,13 +98,13 @@ extern "C"{
 	     int counter, unsigned long *src, unsigned long *dest);
   // cross_lin - one input field is linear and sum to result
   void cross_lin(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
-	     int counter, unsigned long *dest, unsigned long *dest);
+	     int counter, unsigned long *dest, unsigned long *dest2);
   // cross_over_look - all input fields are lookup and overwrite result
   void cross_over_look(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
 	     int counter, unsigned long *src, unsigned long *dest);
   // cross_over_lin - one input field is linear and overwrite result
   void cross_over_lin(IFloat *result, Float *fac, const IFloat *chi, const IFloat *phi,  
-	     int counter, unsigned long *dest, unsigned long *dest);
+	     int counter, unsigned long *dest, unsigned long *dest2);
   //Copies a vectors from v to u
   void copy_vector(IFloat *u, IFloat *v, int *length, unsigned long *dest, unsigned long *src);
 
@@ -113,14 +113,14 @@ extern "C"{
   //---------------------------------------------------------------------------
 
   void m1m2_lookup(matrix *result, matrix *m1, matrix *m2, int length,
-		   unsigned long *dest, unsigned long *dest, unsigned long *src);
+		   unsigned long *dest, unsigned long *dest2, unsigned long *src);
   void m1m2_lookup_copy(matrix *result2, matrix *result, matrix *m1, matrix *m2, 
 			int length, unsigned long *dest2,  
-			unsigned long *dest, unsigned long *dest, 
+			unsigned long *dest, unsigned long *dest3, 
 			unsigned long *src);
   void m1m2_lin_copy(matrix *result2, matrix *result, matrix *m1, matrix *m2, 
 		     int length, unsigned long *dest2,
-		     unsigned long *dest, unsigned long *dest);
+		     unsigned long *dest, unsigned long *dest3);
   
 }
 inline  void pt_cmm_agg_print(gauge_agg *chi, matrix *phi,matrix *result, int counter){
