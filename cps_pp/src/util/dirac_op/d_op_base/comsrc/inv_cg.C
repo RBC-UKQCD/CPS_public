@@ -1,5 +1,5 @@
 #include <config.h>
-#include <qalloc.h>
+#if !(TARGET == NOARCH)
 #include <util/time_cps.h>
 
 CPS_START_NAMESPACE
@@ -11,14 +11,14 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v 1.20 2008-02-08 18:35:07 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.20 2008-02-08 18:35:07 chulwoo Exp $
+//  $Date: 2008-05-12 21:03:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/inv_cg.C,v 1.1 2008-05-12 21:03:55 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.1 2008-05-12 21:03:55 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.20 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qcdoc/inv_cg.C,v $
+//  $Revision: 1.1 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/inv_cg.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -39,16 +39,26 @@ CPS_END_NAMESPACE
 #include <comms/glb.h>
 #include <math.h>
 #include <stdio.h>
-#include <qcdocos/gint.h>
+//#include <qcdocos/gint.h>
 CPS_START_NAMESPACE
 
 #define PROFILE
+#undef PART_PROF
 
 
 #ifdef PROFILE
 #include <time.h>
 #include <sys/time.h>
 void report_flops(int flops, struct timeval *start,struct timeval *end);
+#endif
+
+#ifdef PART_PROF
+#define DCLOCK_P(A) (A)+=dclock();
+#define DCLOCK_M(A) (A)-=dclock();
+#else
+inline Float dclock(){return 0.;};
+#define DCLOCK_P(A)
+#define DCLOCK_M(A)
 #endif
 
 CPS_END_NAMESPACE
@@ -101,6 +111,10 @@ int DiracOp::InvCg(Vector *out,
   int i, j;
   char *fname = "InvCg(V*,V*,F,F*)";
 
+  Float mdagm_time=0.;
+  Float gsum_time=0.;
+  Float linalg_time=0.;
+
 // Flash the LED and then turn it off
 //------------------------------------------------------------------
   VRB.LedFlash(cname,fname,3);
@@ -141,8 +155,14 @@ int DiracOp::InvCg(Vector *out,
   } else {
     f_size_cb = GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
   }
+#ifdef UNIFORM_SEED_TESTING
+  unsigned int g_csum = global_checksum((Float *)in,f_size_cb);
+  if(!UniqueID()) printf("%s::%s: Input checksum = %p\n",
+      cname,fname,g_csum);
+#else
   VRB.Result(cname,fname, "Input checksum = %p\n",
       global_checksum((Float *)in,f_size_cb));
+#endif
 
   // checksuming the local source vector
   //----------------------------------------------------
@@ -156,39 +176,21 @@ int DiracOp::InvCg(Vector *out,
 
 // Allocate memory for the solution/residual field.
 //------------------------------------------------------------------
-  IFloat *X = (IFloat *) qalloc(QCOMMS|QFAST,2*f_size_cb * sizeof(Float));
-  if(X == 0){
-    X = (IFloat *) qalloc(QCOMMS,2*f_size_cb * sizeof(Float));
-    printf("X=%p\n",X);
-  }
-  if(X == 0) ERR.Pointer(cname,fname, "X");
-  VRB.Smalloc(cname,fname, "X", X, 2*f_size_cb * sizeof(Float));
+  IFloat *X = (IFloat *) fmalloc(cname,fname,"X",2*f_size_cb * sizeof(Float));
 
 // Allocate memory for the direction vector dir.
 //------------------------------------------------------------------
   Vector *dir;
-  if(GJP.VolNodeSites() >4096) dir=0;
-    else dir = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
-  if(dir == 0){
-    dir = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
-    printf("dir is allcoated in DDR(%p)\n",dir);
-  }
-  if(dir == 0)
-    ERR.Pointer(cname,fname, "dir");
-  VRB.Smalloc(cname,fname, "dir", dir, f_size_cb * sizeof(Float));
+  if(GJP.VolNodeSites() >4096) 
+    dir = (Vector *) smalloc(cname,fname,"dir",f_size_cb * sizeof(Float));
+  else dir = (Vector *) fmalloc(cname,fname,"dir",f_size_cb * sizeof(Float));
 
 // Allocate mem. for the result vector of matrix multiplication mmp.
 //------------------------------------------------------------------
   Vector *mmp;
-  if(GJP.VolNodeSites() >4096) mmp=0;
-    else mmp = (Vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
-  if(mmp == 0){
-    mmp = (Vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
-    printf("mmp is allcoated in DDR(%p)\n",mmp);
-  }
-  if(mmp == 0)
-    ERR.Pointer(cname,fname, "mmp");
-  VRB.Smalloc(cname,fname, "mmp", mmp, f_size_cb * sizeof(Float));
+  if(GJP.VolNodeSites() >4096) 
+    mmp = (Vector *) smalloc(cname,fname,"mmp",f_size_cb * sizeof(Float));
+  else mmp = (Vector *) fmalloc(cname,fname,"mmp",f_size_cb * sizeof(Float));
 
 // If src_norm_sq is not provided calculate it
 //------------------------------------------------------------------
@@ -233,8 +235,23 @@ int DiracOp::InvCg(Vector *out,
 
   for ( int test = 0; test < test_num+1; test++ ) {
     if (test == 1) sol-> CopyVec(sol_store, f_size_cb);
+
+#ifdef PROFILE
+    struct timeval start;
+    struct timeval end;
+    struct timeval linalg_tmp;
+    struct timeval linalg_start;
+    struct timeval linalg_end;
+  
+    CGflops    = 0;
+    unsigned long long linalg_flops = 0;
+    int nflops_tmp;
+    gettimeofday(&start,NULL);
+#endif
       
   
+   sync();
+
 //------------------------------------------------------------------
 // Initial step:
 // res = src - MatPcDagMatPc * sol
@@ -246,13 +263,18 @@ int DiracOp::InvCg(Vector *out,
 // }
 //------------------------------------------------------------------
     // Mmp = MatPcDagMatPc * sol
+    mdagm_time -=dclock();
     MatPcDagMatPc(mmp, sol);
+    mdagm_time +=dclock();
   
     // res = src
     dir->CopyVec(src, f_size_cb);
   
+    linalg_time -=dclock();
     // res -= mmp
     dir->VecMinusEquVec(mmp, f_size_cb);
+    linalg_time +=dclock();
+    linalg_flops += f_size_cb;
   
     // dir = res
     //dir->CopyVec(res, f_size_cb);  
@@ -269,10 +291,15 @@ int DiracOp::InvCg(Vector *out,
       for (i=0; i<GRAN; i++) *Xptr++ = *(Fdir+j*GRAN+i);
     }
   
+    linalg_time -=dclock();
     // res_norm_sq_cur = res * res
     res_norm_sq_cur = dir->NormSqNode(f_size_cb);
+    linalg_time +=dclock();
+    linalg_flops += 2*f_size_cb;
   
+    gsum_time -=dclock();
     DiracOpGlbSum(&res_norm_sq_cur);
+    gsum_time +=dclock();
   
     // if( |res|^2 <= stp_cnd ) we are done
     VRB.Flow(cname,fname,
@@ -281,25 +308,12 @@ int DiracOp::InvCg(Vector *out,
     max_itr = dirac_arg->max_num_iter-1;
     if(res_norm_sq_cur <= stp_cnd) max_itr = 0;
   
-  
-  #ifdef PROFILE
-    struct timeval start;
-    struct timeval end;
-    struct timeval linalg_tmp;
-    struct timeval linalg_start;
-    struct timeval linalg_end;
-  
-    CGflops    = 0;
-    int nflops = 0;
-    int nflops_tmp;
-    gettimeofday(&start,NULL);
-  
-  #endif
-  
+
 //------------------------------------------------------------------
 // Loop over CG iterations
 //------------------------------------------------------------------
 //  Gint::SynchMachine();
+   sync();
 
     unsigned long x_loc_sum = 0x0;
     for(i=0; i < max_itr; i++){
@@ -309,17 +323,19 @@ int DiracOp::InvCg(Vector *out,
   
       // mmp = MatPcDagMatPc * dir
       // d = <dir, MatPcDagMatPc*dir>
+      DCLOCK_M(mdagm_time);
       MatPcDagMatPc(mmp, dir, &d);
+      DCLOCK_P(mdagm_time);
       //--------------------------------------------------------------
       // checksuming the intermediate vectors and put into the memory
       // --mflin Apr.05
       //--------------------------------------------------------------
-      loc_sum = local_checksum((Float *)mmp,f_size_cb);
+//      loc_sum = local_checksum((Float *)mmp,f_size_cb);
 
       // checksum of the checksums of intermediate vectors
       //-----------------------------------------------------------
-      x_loc_sum = x_loc_sum ^ loc_sum;
-      CSM.SaveCsum(CSUM_EVL_MMP,loc_sum);
+//      x_loc_sum = x_loc_sum ^ loc_sum;
+//      CSM.SaveCsum(CSUM_EVL_MMP,loc_sum);
 
 
     if (test_num) {
@@ -327,38 +343,37 @@ int DiracOp::InvCg(Vector *out,
       /* Check reproducibility */
       if ( test == 0) d_store[ i ] = mmp_checksum;
       else if ( mmp_checksum != d_store[ i ] ){
-        fprintf(stderr, "NODE (%d %d %d %d %d)FAILS TO REPRODUCE\n",
-        GJP.XnodeCoor(),GJP.YnodeCoor(),GJP.ZnodeCoor(),GJP.TnodeCoor(),GJP.SnodeCoor());
-        fprintf(stderr,"mmp =%p mmp_store = %p\n",mmp_checksum,d_store[i]);
-// Temporary hack to exit immediately
-        Float *null_p = NULL; *null_p = 0.;
-        InterruptExit(-1, "NODE FAILS TO REPRODUCE");
+        fprintf(stderr, "NODE (%d %d %d %d %d)FAILS TO REPRODUCE\nmmp =%p mmp_store = %p\n", 
+        GJP.XnodeCoor(),GJP.YnodeCoor(),GJP.ZnodeCoor(),GJP.TnodeCoor(),GJP.SnodeCoor(), mmp_checksum,d_store[i]);
+        exit(-1);
       }
       /* End of Check */
   
     }
-  #ifdef PROFILE
-//    gettimeofday(&linalg_tmp,NULL);
-//    nflops_tmp = 0;
-  #endif
     
+      DCLOCK_M(gsum_time);
       DiracOpGlbSum(&d);
+      DCLOCK_P(gsum_time);
+//    VRB.Flow(cname,fname, "d = %e\n", IFloat(d));
   
       // If d = 0 we are done
       if(d == 0.0) break;
       //??? or should we give a warning or error? Yes we should, really.
   
       a = -res_norm_sq_prv / d;
+//      VRB.Flow(cname,fname, "a = %e\n", IFloat(a));
   
       // res = - a * (MatPcDagMatPc * dir) + res;
       // res_norm_sq_cur = res * res
   
+      DCLOCK_M(linalg_time);
       invcg_r_norm(X+GRAN, &a, Fmmp, X+GRAN, f_size_cb/GRAN, &res_norm_sq_cur);
+      DCLOCK_P(linalg_time);
+      DCLOCK_M(gsum_time);
       DiracOpGlbSum(&res_norm_sq_cur);
-  #ifdef PROFILE
-//    nflops_tmp +=f_size_cb*4;
-  #endif
-      CGflops+=f_size_cb*4;
+      DCLOCK_P(gsum_time);
+      linalg_flops +=f_size_cb*4;
+//      CGflops+=f_size_cb*4;
   
       a = -a;
       b = res_norm_sq_cur / res_norm_sq_prv;
@@ -366,15 +381,12 @@ int DiracOp::InvCg(Vector *out,
       // sol = a * dir + sol;
       //sol->FTimesV1PlusV2(a, dir, sol, f_size_cb);
       // dir = b * dir + res;
+      DCLOCK_M(linalg_time);
       invcg_xp_update(X, Fdir, &a, &b, Fdir, X, f_size_cb/GRAN);
+      DCLOCK_P(linalg_time);
   
-  
-  #ifdef PROFILE
-//    linalg_start = linalg_tmp;
-//    gettimeofday(&linalg_end,NULL);
-//    nflops =nflops_tmp+f_size_cb*4;
-  #endif
-      CGflops+=f_size_cb*4;
+      linalg_flops+=f_size_cb*4;
+//      CGflops+=f_size_cb*4;
   
       // if( |res|^2 <= stp_cnd ) we are done
       VRB.Flow(cname,fname, "|res[%d]|^2 = %e\n", itr, IFloat(res_norm_sq_cur));
@@ -382,17 +394,17 @@ int DiracOp::InvCg(Vector *out,
   
     }
   
-  #ifdef PROFILE
+#ifdef PROFILE
     gettimeofday(&end,NULL);
-    print_flops(cname,fname,CGflops,&start,&end); 
-  #endif
+    print_flops(cname,fname,CGflops+linalg_flops,&start,&end); 
+#endif
   
     // It has not reached stp_cnd: Issue a warning
     if(itr == dirac_arg->max_num_iter - 1){
-//      VRB.Warn(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
-//	     itr+1, IFloat(res_norm_sq_cur) );
-      ERR.General(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
-  	     itr+1, IFloat(res_norm_sq_cur) );
+      VRB.Warn(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
+	     itr+1, IFloat(res_norm_sq_cur) );
+//      ERR.General(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
+//  	     itr+1, IFloat(res_norm_sq_cur) );
     }
   
 //------------------------------------------------------------------
@@ -406,20 +418,37 @@ int DiracOp::InvCg(Vector *out,
       *(Fsol++) = *(Xptr++);
     }
   
+    mdagm_time -=dclock();
     MatPcDagMatPc(mmp, sol);
+    mdagm_time +=dclock();
     dir->CopyVec(src, f_size_cb);
+    linalg_time -=dclock();
     dir->VecMinusEquVec(mmp, f_size_cb);
     res_norm_sq_cur = dir->NormSqNode(f_size_cb);
+    linalg_time +=dclock();
+    gsum_time -=dclock();
     DiracOpGlbSum(&res_norm_sq_cur);
+    gsum_time +=dclock();
     Float tmp = res_norm_sq_cur / src_norm_sq;
     tmp = sqrt(tmp);
     if(true_res != 0){
       *true_res = tmp;
     }
+#ifdef PART_PROF
+    print_flops(fname,"mdagm",CGflops,mdagm_time);
+    print_time(fname,"gsum_time",gsum_time);
+    print_flops(fname,"linalg",linalg_flops,linalg_time);
+#endif
     VRB.Result(cname,fname, "True |res| / |src| = %e, iter = %d\n", 
   	     IFloat(tmp), itr+1);
+#ifdef UNIFORM_SEED_TESTING
+  unsigned int g_csum = global_checksum((Float *)out,f_size_cb);
+  if(!UniqueID()) printf("%s::%s: Output checksum = %p\n",
+      cname,fname,g_csum);
+#else
     VRB.Result(cname,fname, "Output checksum = %p\n",
       global_checksum((Float *)out,f_size_cb));
+#endif
 
     // checksuming the local solution vector
     //----------------------------------------------
@@ -439,18 +468,16 @@ int DiracOp::InvCg(Vector *out,
   }
 
 // Free memory
-  VRB.Sfree(cname,fname, "mmp", mmp);
-  qfree(mmp);
-  VRB.Sfree(cname,fname, "dir", dir);
-  qfree(dir);
+  sfree(cname,fname, "mmp", mmp);
+  sfree(cname,fname, "dir", dir);
   VRB.Debug("b ============\n");
-  VRB.Sfree(cname,fname, "X", X);
-  sfree(X);
+  sfree(cname,fname, "X", X);
 
   VRB.Debug("a ============\n");
 
 // Flash the LED and then turn it on
 //------------------------------------------------------------------
+   sync();
   VRB.FuncEnd(cname,fname);
   VRB.LedFlash(cname,fname,2);
   VRB.LedOn(cname,fname);
@@ -651,3 +678,4 @@ void report_flops(int flops, struct timeval *start,struct timeval *end)
 #endif
 
 CPS_END_NAMESPACE
+#endif
