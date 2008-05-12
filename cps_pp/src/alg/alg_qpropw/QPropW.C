@@ -796,7 +796,7 @@ void QPropW::CG(FermionVectorTp& source, FermionVectorTp& sol,
     Lat.Ffive2four(sol_4d, sol_5d, ls_glb-1, 0);
     // midpoint prop
     if (StoreMidprop())
-      Lat.Ffive2four(midsol_4d, sol_5d, ls_glb/2, ls_glb/2-1);
+      Lat.Ffive2four(midsol_4d, sol_5d, ls_glb/2-1, ls_glb/2);
 
     VRB.Sfree(cname,fname, "sol_5d", sol_5d);
     sfree(sol_5d);
