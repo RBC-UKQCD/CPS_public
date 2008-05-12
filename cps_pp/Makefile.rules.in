@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.25 2008-04-21 14:09:15 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.26 2008-05-12 18:54:43 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -138,24 +138,15 @@ XLCOBJS := $(notdir $(XLCOBJS_SRC))
 #       $(AS) $(ASFLAGS) -o $(BUILDDIR2)/$@ $(BUILDDIR2)/$*.i
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
 
-ifeq "${ARCH}" "cpsMPI"
-
-depend: recurse
-	cd $(SRCDIR2) ; \
-	$(CXX) -M $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
-	| sed -e 's/:.*\.[cC]/\:/g' > $(PWD)/Makefile_depend
-
-else
-
-
 depend: recurse
 	echo > Makefile_depend
 	cd $(SRCDIR2) ;makedepend -f$(BUILDDIR2)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
+######################################################################
+# use these lines if you don't have makedepend (is a bit slower)
+######################################################################
 #	cd $(SRCDIR2) ; \
 #	$(CXX) -M $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
 #	| sed -e 's/:.*\.[cC]/\:/g' > $(PWD)/Makefile_depend
-
-endif
 
 clean: recurse
 	cd $(BUILDDIR2) ; rm -f *.o *.i *.xlo *.bak
