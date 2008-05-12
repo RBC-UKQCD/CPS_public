@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.26 2008-05-12 18:54:43 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.27 2008-05-12 19:00:43 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -58,14 +58,6 @@ PRECDIR := $(@PRECDIR@)
 
 FILTERDIR := $(filter-out $(ARCHDIR) $(PRECDIR), $(NORECURSE_DIR))
 RECURSEDIRS := $(filter-out $(FILTERDIR) , $(DIRLIST))
-
-ifeq "$(ARCH)" "cpsMPI"
-  ifeq "$(findstring $(NOARCH_DIR), $(DIRLIST))" "$(NOARCH_DIR)"
-    ifneq "$(findstring $(MPI_DIR), $(DIRLIST))" "$(MPI_DIR)"
-      RECURSEDIRS += $(NOARCH_DIR)
-    endif
-  endif
-endif 
 
 libcps_CXXFLAGS = $(INCLUDE_FLAGS) $(CXXFLAGS) $(DFLAGS)
 libcps_CFLAGS = $(INCLUDE_FLAGS) $(CFLAGS) $(DFLAGS)
