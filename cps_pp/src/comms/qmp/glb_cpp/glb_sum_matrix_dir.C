@@ -1,4 +1,5 @@
 #include<config.h>
+#ifdef PARALLEL
 //#include<qalloc.h>
 #include <comms/glb_sum_internal.h>
 CPS_START_NAMESPACE
@@ -165,3 +166,4 @@ void glb_sum_matrix_dir(Matrix * matrix_p, int dir)
 
 
 CPS_END_NAMESPACE
+#endif

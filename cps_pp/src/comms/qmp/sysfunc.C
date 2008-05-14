@@ -1,4 +1,5 @@
 #include<config.h>
+#ifdef PARALLEL
 /*----------------------------------------------------------*/
 /*!\file
   \brief  Definitions for the QMP implementation of the QCDSP/QCDOC communications layer.
@@ -286,3 +287,4 @@ int SCURemap( SCUDir dir ) {
 
 
 CPS_END_NAMESPACE
+#endif

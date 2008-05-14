@@ -1,4 +1,5 @@
 #include<config.h>
+#ifdef PARALLEL
 #include<util/qcdio.h>
 //#include<qalloc.h>
 CPS_START_NAMESPACE
@@ -128,3 +129,4 @@ void glb_sum_gimp(Float * float_p)
 }
 
 CPS_END_NAMESPACE
+#endif

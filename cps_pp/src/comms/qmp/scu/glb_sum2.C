@@ -1,4 +1,5 @@
 #include<config.h>
+#ifdef PARALLEL
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
@@ -228,3 +229,4 @@ void glb_sum_internal2(unsigned int *uint_p, int ndir, int sum_flag) {
 
 
 CPS_END_NAMESPACE
+#endif

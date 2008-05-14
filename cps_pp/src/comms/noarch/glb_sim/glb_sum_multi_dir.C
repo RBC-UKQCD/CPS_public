@@ -1,15 +1,16 @@
 #include<config.h>
+#ifndef PARALLEL
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-03-25 17:53:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/glb_sum_multi_dir.C,v 1.7 2008-03-25 17:53:43 chulwoo Exp $
-//  $Id: glb_sum_multi_dir.C,v 1.7 2008-03-25 17:53:43 chulwoo Exp $
+//  $Date: 2008-05-14 21:20:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/glb_sum_multi_dir.C,v 1.8 2008-05-14 21:20:52 chulwoo Exp $
+//  $Id: glb_sum_multi_dir.C,v 1.8 2008-05-14 21:20:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/glb_sum_multi_dir.C,v $
 //  $State: Exp $
 //
@@ -31,3 +32,4 @@ void glb_sum_multi_dir(const Float * float_p, const int dir, const int len)
 
 
 CPS_END_NAMESPACE
+#endif

@@ -1,4 +1,5 @@
 #include<config.h>
+#ifdef PARALLEL
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 /*!\file
@@ -57,3 +58,4 @@ void slice_sum(Float * float_p, int blcklength, int dir)
 
 
 CPS_END_NAMESPACE
+#endif

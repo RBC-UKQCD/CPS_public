@@ -5,5 +5,5 @@ QCDOC_DIR = qcdoc
 QCDOC_SERIAL_DIR = qcdoc
 QCDSP_DIR = qcdsp
 MPI_DIR = mpi
-NOARCH_DIR = noarch
+NOARCH_DIR = noarch qmp
 include ../../Makefile.rules

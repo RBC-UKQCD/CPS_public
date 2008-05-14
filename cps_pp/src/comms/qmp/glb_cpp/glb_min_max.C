@@ -1,5 +1,5 @@
 #include<config.h>
-//#include<qalloc.h>
+#ifdef PARALLEL
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
@@ -159,3 +159,4 @@ void glb_min(Float * float_p)
 }
 
 CPS_END_NAMESPACE
+#endif

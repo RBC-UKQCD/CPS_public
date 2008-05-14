@@ -1,4 +1,5 @@
 #include<config.h>
+#ifdef PARALLEL
 //#include<qalloc.h>
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
@@ -149,3 +150,4 @@ void glb_sum_dir(Float * float_p, int dir)
 
 
 CPS_END_NAMESPACE
+#endif

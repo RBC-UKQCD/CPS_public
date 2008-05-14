@@ -1,4 +1,5 @@
 #include<config.h>
+#ifndef PARALLEL
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
@@ -49,3 +50,4 @@ unsigned int test_checksum(Float * float_p, int len) {
 }
 
 CPS_END_NAMESPACE
+#endif

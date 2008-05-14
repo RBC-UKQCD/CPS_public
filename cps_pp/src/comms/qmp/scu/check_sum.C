@@ -1,5 +1,6 @@
 #include<qmp.h>
 #include<config.h>
+#ifdef PARALLEL
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
@@ -107,3 +108,4 @@ unsigned int test_checksum(Float * float_p, int len) {
 }
 
 CPS_END_NAMESPACE
+#endif

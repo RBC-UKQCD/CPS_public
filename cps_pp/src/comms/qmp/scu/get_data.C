@@ -1,4 +1,5 @@
 #include<config.h>
+#ifdef PARALLEL
 #include<qmp.h>
 #include<util/qcdio.h>
 //#include<qalloc.h>
@@ -7,19 +8,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.8 2008-04-23 03:40:32 chulwoo Exp $
+  $Id: get_data.C,v 1.9 2008-05-14 21:20:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-23 03:40:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.8 2008-04-23 03:40:32 chulwoo Exp $
-//  $Id: get_data.C,v 1.8 2008-04-23 03:40:32 chulwoo Exp $
+//  $Date: 2008-05-14 21:20:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.9 2008-05-14 21:20:52 chulwoo Exp $
+//  $Id: get_data.C,v 1.9 2008-05-14 21:20:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -257,3 +258,4 @@ void getMinus3Data(IFloat* rcv_buf, IFloat* send_buf, int len, int dir)
 }
 
 CPS_END_NAMESPACE
+#endif
