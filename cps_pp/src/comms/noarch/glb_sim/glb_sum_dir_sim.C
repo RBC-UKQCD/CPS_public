@@ -5,13 +5,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-14 21:20:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/glb_sum_matrix_dir.C,v 1.5 2008-05-14 21:20:52 chulwoo Exp $
-//  $Id: glb_sum_matrix_dir.C,v 1.5 2008-05-14 21:20:52 chulwoo Exp $
+//  $Date: 2008-05-15 16:29:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/glb_sum_dir_sim.C,v 1.1 2008-05-15 16:29:26 chulwoo Exp $
+//  $Id: glb_sum_dir_sim.C,v 1.1 2008-05-15 16:29:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/glb_sum_matrix_dir.C,v $
+//  $Revision: 1.1 $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/glb_sum_dir_sim.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -24,9 +24,9 @@ CPS_END_NAMESPACE
 #include<util/error.h>
 CPS_START_NAMESPACE
 
-void glb_sum_matrix_dir(Matrix * float_p, int dir)
+void glb_sum_dir(Float * float_p, int dir)
 {
-  Matrix tmp;
+  Float tmp;
   tmp = *float_p;
 }
 
