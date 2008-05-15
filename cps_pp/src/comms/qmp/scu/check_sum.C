@@ -1,4 +1,3 @@
-#include<qmp.h>
 #include<config.h>
 #ifdef PARALLEL
 CPS_START_NAMESPACE
