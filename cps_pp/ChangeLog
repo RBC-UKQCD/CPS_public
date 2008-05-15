@@ -1,3 +1,413 @@
+2008-05-15 00:00  chulwoo
+
+	* src/util/gjp/gjp.C (1.37): Fixing #if condition for QCDOC
+	  specific routine
+
+2008-05-14 17:20  chulwoo
+
+	* src/comms/: Makefile (1.6), noarch/cbuf_sim/Makefile (1.5),
+	  noarch/cbuf_sim/cbuf.C (1.5), noarch/cbuf_sim/cram.C (1.6),
+	  noarch/glb_sim/check_sum.C (1.4), noarch/glb_sim/glb_min_max.C
+	  (1.5), noarch/glb_sim/glb_sum.C (1.5),
+	  noarch/glb_sim/glb_sum_dir.C (1.5), noarch/glb_sim/glb_sum_five.C
+	  (1.5), noarch/glb_sim/glb_sum_matrix_dir.C (1.5),
+	  noarch/glb_sim/glb_sum_multi_dir.C (1.8),
+	  noarch/glb_sim/slice_sum.C (1.5), noarch/scu_sim/get_data.C
+	  (1.5), qmp/sysfunc.C (1.7), qmp/glb_cpp/glb_min_max.C (1.5),
+	  qmp/glb_cpp/glb_sum.C (1.6), qmp/glb_cpp/glb_sum_dir.C (1.5),
+	  qmp/glb_cpp/glb_sum_five.C (1.9), qmp/glb_cpp/glb_sum_internal.C
+	  (1.5), qmp/glb_cpp/glb_sum_matrix_dir.C (1.4),
+	  qmp/glb_cpp/glb_sum_multi_dir.C (1.4), qmp/glb_cpp/slice_sum.C
+	  (1.5), qmp/scu/check_sum.C (1.5), qmp/scu/get_data.C (1.9),
+	  qmp/scu/glb_sum2.C (1.5): Fixes to compile QMP or non-QMP
+	  implementations for noarch
+
+2008-05-12 17:03  chulwoo
+
+	* src/util/dirac_op/d_op_base/: bgl/inv_cg.C (1.7),
+	  bgl/inv_cg.C.old (1.1), comsrc/inv_cg.C (1.1), qcdoc/inv_cg.C
+	  (1.21), qcdoc/inv_cg.C.old (1.1): Consolidating inv_cg.C for
+	  QCDOC and Blue Gene
+
+2008-05-12 15:01  chulwoo
+
+	* src/alg/alg_qpropw/QPropW.C (1.19): Fixing an error for storing
+	  midpoint propagator
+
+2008-05-12 15:00  chulwoo
+
+	* Makefile.rules.in (1.27): Deleting obsolete cpsMPI related
+	  entries
+
+2008-05-06 14:08  chulwoo
+
+	* src/util/dirac_op/d_op_wilson/qcdsp/Makefile (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/d_op_wilson.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_buffers.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_cb_reg0.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_cmat_spproj.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_comm_backward.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_comm_backward_l.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_comm_forward.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_comm_forward_l.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_copy_backward.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_copy_forward.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_dslash.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_m.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_mat_trick.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_mdag.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_mdagm.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_nga_reg.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_scu_init.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_scu_wait.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_spproj.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_spproj_segment.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_sublatt_pointers.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_trick.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_trick_kappa.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wfm_trick_kappa_spproj.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp/wfm_trick_segment.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp/wfm_trick_spproj.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp/wilson_dslash.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp/wilson_end.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wilson_init.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wilson_m.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wilson_mdag.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wilson_mdagm.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp/wilson_scu.C (1.6),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/Makefile (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/d_op_wilson.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_buffers.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_cb_reg0.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_cmat_spproj.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_comm_backward.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_comm_backward_l.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_comm_forward.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_comm_forward_l.C
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_dslash.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_m.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_mat_trick.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_mdag.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_mdagm.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_nga_reg.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_scu_init.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_scu_wait.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_spproj.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_spproj_segment.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_sublatt_pointers.C
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_trick.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_trick_kappa.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_trick_kappa_spproj.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_trick_segment.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wfm_trick_spproj.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wilson_dslash.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wilson_end.C
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wilson_init.C
+	  (1.6), src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wilson_m.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wilson_mdag.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_lcl_nos/wilson_mdagm.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos/Makefile (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/d_op_wilson.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_buffers.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_cb_reg0.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_cmat_spproj.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_comm_backward.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_comm_backward_l.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_comm_backward_l.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_comm_forward.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_comm_forward_l.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_copy_backward.C
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_copy_forward.C
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_dslash.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_m.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_mat_trick.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_mdag.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_mdagm.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_nga_reg.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_scu_init.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_scu_wait.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_spproj.asm (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_spproj_segment.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_sublatt_pointers.C
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_trick.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_trick_kappa.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_trick_kappa_spproj.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_trick_segment.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos/wfm_trick_spproj.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos/wilson_dslash.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos/wilson_end.C
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos/wilson_init.C
+	  (1.6), src/util/dirac_op/d_op_wilson/qcdsp_nos/wilson_m.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos/wilson_mdag.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos/wilson_mdagm.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/Makefile
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/d_op_wilson.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_buffers.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_cb_reg0.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_cmat_spproj.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_comm_backward.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_comm_backward_l.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_comm_backward_l.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_comm_forward.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_comm_forward_l.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_copy_backward.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_copy_forward.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_dslash.asm
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_m.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_mat_trick.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_mdag.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_mdagm.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_nga_reg.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_scu_init.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_scu_wait.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_spproj.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_spproj_segment.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_sublatt_pointers.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_trick.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_trick_kappa.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_trick_kappa_spproj.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_trick_segment.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wfm_trick_spproj.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wilson_dslash.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wilson_end.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wilson_init.C
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wilson_m.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wilson_mdag.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wilson_mdagm.asm
+	  (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_nos_hdw_diag/wilson_scu_error.C
+	  (1.5), src/util/dirac_op/d_op_wilson/qcdsp_scl/Makefile (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_scl/d_op_wilson.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_scl/wilson_dslash.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_scl/wilson_end.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_scl/wilson_init.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_scl/wilson_m.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_scl/wilson_mdag.C (1.5),
+	  src/util/dirac_op/d_op_wilson/qcdsp_scl/wilson_mdagm.C (1.5),
+	  src/util/dirac_op/d_op_clover/qcdsp/Makefile (1.5),
+	  src/util/dirac_op/d_op_clover/qcdsp/clover_mat_mlt_asm.asm (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos/Makefile (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos/d_op_dwf.C (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos/dwf_dslash.C (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos/dwf_dslash_4.C (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos/dwf_dslash_5_plus.C (1.6),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos/dwf_end.C (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos/dwf_init.C (1.6),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos/dwf_m.C (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos/dwf_mdag.C (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos/dwf_mdagm.C (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/Makefile (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/d_op_dwf.C (1.4),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/dwf_dslash.C (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/dwf_dslash_4.C
+	  (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/dwf_dslash_5_plus.C
+	  (1.5), src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/dwf_end.C
+	  (1.5), src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/dwf_init.C
+	  (1.5), src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/dwf_m.C
+	  (1.5), src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/dwf_mdag.C
+	  (1.5), src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/dwf_mdagm.C
+	  (1.5),
+	  src/util/dirac_op/d_op_dwf/qcdsp_nos_hdw_diag/dwf_scu_error.C
+	  (1.5), src/util/dirac_op/d_op_stag/qcdsp/Makefile (1.5),
+	  src/util/dirac_op/d_op_stag/qcdsp/d_op_stag.C (1.6),
+	  src/util/dirac_op/d_op_stag/qcdsp/dirac.C (1.7),
+	  src/util/dirac_op/d_op_stag/qcdsp/dirac_init.C (1.6),
+	  src/util/dirac_op/d_op_stag/qcdsp/dirac_serial.asm (1.5),
+	  src/util/dirac_op/d_op_stag/qcdsp/stag_scu.C (1.6),
+	  src/util/random/qcdsp/Makefile (1.5),
+	  src/util/random/qcdsp/random_asm.asm (1.5),
+	  src/alg/alg_ghb/qcdsp/Makefile (1.5),
+	  src/alg/alg_ghb/qcdsp/assign_cram0.asm (1.5),
+	  src/alg/alg_ghb/qcdsp/assign_cram1.asm (1.5),
+	  src/alg/alg_ghb/qcdsp/c_func.C (1.8),
+	  src/alg/alg_ghb/qcdsp/cmhb_kern.asm (1.5),
+	  src/alg/alg_ghb/qcdsp/cmhb_kern_sup.asm (1.5),
+	  src/alg/alg_ghb/qcdsp/cram.C (1.8),
+	  src/alg/alg_ghb/qcdsp/grand.asm (1.5),
+	  src/alg/alg_ghb/qcdsp/metro_kern.asm (1.5),
+	  src/alg/alg_ghb/qcdsp/mtxelse.asm (1.5),
+	  src/alg/alg_ghb/qcdsp/mtxfast.asm (1.5),
+	  src/alg/alg_qpropw/qcdsp/wmat.asm (1.2),
+	  tests/f_hmd/old/qcdsp.map.s (1.2): Deleting legacy QCDSP files
+
+2008-05-06 14:04  chulwoo
+
+	* src/: comms/qcdsp/Makefile (1.5),
+	  comms/qcdsp/glb_25MHz/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_25MHz/glb_sum.C (1.6),
+	  comms/qcdsp/glb_25MHz/glb_sum_dir.C (1.5),
+	  comms/qcdsp/glb_25MHz/glb_sum_five.C (1.5),
+	  comms/qcdsp/glb_25MHz/glb_sum_init.C (1.5),
+	  comms/qcdsp/glb_25MHz/glb_sum_matrix_dir.C (1.5),
+	  comms/qcdsp/glb_25MHz/glb_sum_multi_dir.C (1.5),
+	  comms/qcdsp/glb_25MHz/slice_sum.C (1.6),
+	  comms/qcdsp/glb_50MHz/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_50MHz/glb_sum.C (1.6),
+	  comms/qcdsp/glb_50MHz/glb_sum_dir.C (1.5),
+	  comms/qcdsp/glb_50MHz/glb_sum_five.C (1.5),
+	  comms/qcdsp/glb_50MHz/glb_sum_init.C (1.5),
+	  comms/qcdsp/glb_50MHz/glb_sum_matrix_dir.C (1.5),
+	  comms/qcdsp/glb_50MHz/glb_sum_multi_dir.C (1.5),
+	  comms/qcdsp/glb_50MHz/slice_sum.C (1.6),
+	  comms/qcdsp/glb_cpp/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_cpp/glb_sum.C (1.6),
+	  comms/qcdsp/glb_cpp/glb_sum_dir.C (1.6),
+	  comms/qcdsp/glb_cpp/glb_sum_five.C (1.6),
+	  comms/qcdsp/glb_cpp/glb_sum_matrix_dir.C (1.6),
+	  comms/qcdsp/glb_cpp/glb_sum_multi_dir.C (1.6),
+	  comms/qcdsp/glb_cpp/slice_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz/glb_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz/glb_sum_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz/glb_sum_five.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz/glb_sum_init.C (1.5),
+	  comms/qcdsp/glb_cpp_25MHz/glb_sum_matrix_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz/glb_sum_multi_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz/slice_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz_nos/bsm.C (1.5),
+	  comms/qcdsp/glb_cpp_25MHz_nos/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz_nos/glb_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz_nos/glb_sum_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz_nos/glb_sum_five.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz_nos/glb_sum_init.C (1.5),
+	  comms/qcdsp/glb_cpp_25MHz_nos/glb_sum_matrix_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz_nos/glb_sum_multi_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_25MHz_nos/slice_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz/glb_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz/glb_sum_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz/glb_sum_five.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz/glb_sum_init.C (1.5),
+	  comms/qcdsp/glb_cpp_50MHz/glb_sum_matrix_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz/glb_sum_multi_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz/slice_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz_nos/bsm.C (1.5),
+	  comms/qcdsp/glb_cpp_50MHz_nos/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz_nos/glb_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz_nos/glb_sum_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz_nos/glb_sum_five.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz_nos/glb_sum_init.C (1.5),
+	  comms/qcdsp/glb_cpp_50MHz_nos/glb_sum_matrix_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz_nos/glb_sum_multi_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_50MHz_nos/slice_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw/glb_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw/glb_sum_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw/glb_sum_five.C (1.5),
+	  comms/qcdsp/glb_cpp_hdw/glb_sum_matrix_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw/glb_sum_multi_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw/global_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw/global_sum_handler.C (1.7),
+	  comms/qcdsp/glb_cpp_hdw/global_sum_init.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw/slice_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw_nos/bsm.C (1.5),
+	  comms/qcdsp/glb_cpp_hdw_nos/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw_nos/glb_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw_nos/glb_sum_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw_nos/glb_sum_five.C (1.5),
+	  comms/qcdsp/glb_cpp_hdw_nos/glb_sum_matrix_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw_nos/glb_sum_multi_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw_nos/global_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw_nos/global_sum_handler.C (1.7),
+	  comms/qcdsp/glb_cpp_hdw_nos/global_sum_init.C (1.6),
+	  comms/qcdsp/glb_cpp_hdw_nos/slice_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_nos/bsm.C (1.5),
+	  comms/qcdsp/glb_cpp_nos/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_cpp_nos/glb_sum.C (1.6),
+	  comms/qcdsp/glb_cpp_nos/glb_sum_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_nos/glb_sum_five.C (1.6),
+	  comms/qcdsp/glb_cpp_nos/glb_sum_matrix_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_nos/glb_sum_multi_dir.C (1.6),
+	  comms/qcdsp/glb_cpp_nos/slice_sum.C (1.6),
+	  comms/qcdsp/glb_hdw/glb_min_max.C (1.6),
+	  comms/qcdsp/glb_hdw/glb_sum.C (1.5),
+	  comms/qcdsp/glb_hdw/glb_sum_dir.C (1.5),
+	  comms/qcdsp/glb_hdw/glb_sum_five.C (1.5),
+	  comms/qcdsp/glb_hdw/glb_sum_matrix_dir.C (1.5),
+	  comms/qcdsp/glb_hdw/glb_sum_multi_dir.C (1.5),
+	  comms/qcdsp/glb_hdw/global_sum.C (1.6),
+	  comms/qcdsp/glb_hdw/global_sum_handler.C (1.7),
+	  comms/qcdsp/glb_hdw/global_sum_init.C (1.6),
+	  comms/qcdsp/glb_hdw/slice_sum.C (1.6), comms/qcdsp/scu/get_data.C
+	  (1.6), comms/qcdsp/scu_nos/bsm.C (1.5),
+	  comms/qcdsp/scu_nos/get_data.C (1.6),
+	  util/lattice/f_wilson_types/qcdsp/Makefile (1.5),
+	  util/lattice/f_wilson_types/qcdsp/gamma_5_asm.asm (1.5),
+	  util/lattice/f_wilson_types/qcdsp/sproj_tr_asm.asm (1.5),
+	  util/rcomplex/qcdsp/Makefile (1.5),
+	  util/rcomplex/qcdsp/rcomplex_asm.asm (1.5),
+	  util/rfloat/qcdsp/Makefile (1.5),
+	  util/rfloat/qcdsp/rfloat_rnd_op.asm (1.5),
+	  util/vector/qcdsp/Makefile (1.5),
+	  util/vector/qcdsp/su3_char_asm.asm (1.5),
+	  util/vector/qcdsp/su3_util_asm.asm (1.5),
+	  util/vector/qcdsp/vector_util_asm.asm (1.5),
+	  util/vector/qcdsp/vector_util_asm_cram.asm (1.5): Deleting legacy
+	  QCDSP files
+
 2008-05-06 11:19  chulwoo
 
 	* src/util/parallel_transport/pt_base/qmp/: pt_ordering.C (1.3),
