@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.36 2008-04-21 14:19:18 chulwoo Exp $
+  $Id: gjp.C,v 1.37 2008-05-15 04:00:56 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-21 14:19:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.36 2008-04-21 14:19:18 chulwoo Exp $
-//  $Id: gjp.C,v 1.36 2008-04-21 14:19:18 chulwoo Exp $
+//  $Date: 2008-05-15 04:00:56 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.37 2008-05-15 04:00:56 chulwoo Exp $
+//  $Id: gjp.C,v 1.37 2008-05-15 04:00:56 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.36 $
+//  $Revision: 1.37 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -297,14 +297,14 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
   gjp_scu_dir[8] = SCU_SP;
   gjp_scu_dir[9] = SCU_SM;
 
-#if TARGET != BGL && TARGET != BGP
+#if TARGET == QCDOC
   for(int i = 0;i<5;i++)
   if(nodes[i] > 1){
   gjp_scu_wire_map[2*i]   = SCURemap(gjp_scu_dir[2*i]);
   gjp_scu_wire_map[2*i+1] = SCURemap(gjp_scu_dir[2*i+1]);
   }
 
-#endif //TARGET_BGL == 1
+#endif // TARGET == QCDOC
   
 #endif //PARALLEL
 
