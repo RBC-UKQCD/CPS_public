@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.33 2007-06-25 21:40:04 chulwoo Exp $
+# $Id: Makefile.in,v 1.34 2008-05-16 16:07:47 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -45,7 +45,7 @@ cleanlib:
 	rm -f $(BUILDDIR)/*.a $(BUILDDIR)/*.xla
 
 copy_makefile:
-	-cp $(BUILDDIR)/Makefile $(BUILDDIR)/Makefile.rules ${SRCDIR}
+	-cp $(BUILDDIR)/Makefile* ${SRCDIR}
 	-cp $(BUILDDIR)/$(TESTDIR)/Makefile_common* ${SRCDIR}/$(TESTDIR)
 	-cp $(BUILDDIR)/$(TESTDIR)/regression.pl ${SRCDIR}/$(TESTDIR)
 
