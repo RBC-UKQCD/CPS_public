@@ -1,1 +1,1 @@
-include ../../../../../tests/Makefile_common
+include ../../../../../Makefile.users
