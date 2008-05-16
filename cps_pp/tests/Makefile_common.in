@@ -1,4 +1,4 @@
-# $Id: Makefile_common.in,v 1.22 2008-01-28 20:23:09 chulwoo Exp $
+# $Id: Makefile_common.in,v 1.23 2008-05-16 04:26:35 chulwoo Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.
@@ -55,9 +55,9 @@ all:$(BIN)
 .SUFFIXES:
 .SUFFIXES:  .o .C .S .c
 
-CSRC :=$(wildcard *.c)
-CCSRC :=$(wildcard *.C)
-SSRC :=$(wildcard *.S)
+CSRC := $(notdir $(wildcard $(VPATH)/*.c) )
+CCSRC := $(notdir $(wildcard $(VPATH)/*.C) )
+SSRC := $(notdir $(wildcard $(VPATH)/*.S) )
 
 COBJ=$(CSRC:.c=.o)
 CCOBJ=$(CCSRC:.C=.o)
