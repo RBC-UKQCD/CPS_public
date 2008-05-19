@@ -32,7 +32,7 @@
  * From: @(#)rpc_scan.c 1.11 89/02/22 (C) 1987 SMI
  */
 char scan_rcsid[] =
-  "$Id: rpc_scan.c,v 1.3 2005-05-09 07:16:05 chulwoo Exp $";
+  "$Id: rpc_scan.c,v 1.4 2008-05-19 21:06:37 chulwoo Exp $";
 
 /*
  * rpc_scan.c, Scanner for the RPC protocol compiler
@@ -247,6 +247,7 @@ get_token (token *tokp)
   /*
    * 'where' is not whitespace, comment or directive Must be a token!
    */
+//	  printf("where=%s\n",where);
   switch (*where)
     {
     case ':':
@@ -326,7 +327,8 @@ get_token (token *tokp)
       break;
 
     default:
-      if (!(isalpha (*where) || *where == '_'))
+      if (!(isalpha (*where) || *where == '_' || *where == '~'))
+//      if (!(isalpha (*where) || *where == '_' ))
 	{
 	  char buf[100];
 	  char *p;
@@ -500,7 +502,7 @@ findkind (const char **mark, token *tokp)
 	}
     }
   tokp->kind = TOK_IDENT;
-  for (len = 0; isalnum (str[len]) || str[len] == '_'; len++);
+  for (len = 0; isalnum (str[len]) || str[len] == '_' ||str[len] == '~' ; len++);
   tmp = alloc (len + 1);
   strncpy (tmp, str, len);
   tmp[len] = 0;

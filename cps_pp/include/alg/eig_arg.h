@@ -47,6 +47,9 @@ public:
 	Float mass;
 	char *fname;
 	int ncorr;
+	   void resize (  u_int nmass ) ;
+	   EigArg (  ) ;
+	   ~EigArg (  ) ;
 };
 
 /* the xdr functions */
