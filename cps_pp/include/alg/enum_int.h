@@ -564,6 +564,7 @@ enum PatternType {
 	LIN = 0,
 	ARRAY = 0 + 1,
 	LOG = 0 + 2,
+	FLOW = 0 + 3,
 };
 typedef enum PatternType PatternType;
 extern struct vml_enum_map PatternType_map[];

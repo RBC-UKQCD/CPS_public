@@ -8,19 +8,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.16 2008-02-12 18:16:30 chulwoo Exp $
+  $Id: enum.x,v 1.17 2008-05-19 19:25:06 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2008-02-12 18:16:30 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.16 2008-02-12 18:16:30 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.16 2008-02-12 18:16:30 chulwoo Exp $*/
+/*  $Date: 2008-05-19 19:25:06 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.17 2008-05-19 19:25:06 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.17 2008-05-19 19:25:06 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.16 $*/
+/*  $Revision: 1.17 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -703,7 +703,8 @@ enum FieldTensorId{
 enum PatternType {
   LIN=0,	/*!< Masses are elements of an arithmetic progression. */
   ARRAY,	/*!< Masses are defined in a list. */
-  LOG	/*!< Masses are elements of a geometric progression. */
+  LOG,	/*!< Masses are elements of a geometric progression. */
+  FLOW	/*!< Used for the spetral flow */
 };
 
 /*! Different types of integrators and actions. */

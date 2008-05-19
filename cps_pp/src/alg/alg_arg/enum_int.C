@@ -870,6 +870,7 @@ struct vml_enum_map PatternType_map[] = {
 	{"PatternType","LIN",LIN},
 	{"PatternType","ARRAY",ARRAY},
 	{"PatternType","LOG",LOG},
+	{"PatternType","FLOW",FLOW},
 	{NULL,NULL,0}
 };
 

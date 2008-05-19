@@ -45,6 +45,8 @@ vml_EigArg (VML *vmls, char *name,EigArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "N_eig", &objp->N_eig))
 		 return FALSE;
+	 if (!vml_int (vmls, "N_eigacc", &objp->N_eigacc))
+		 return FALSE;
 	 if (!vml_int (vmls, "Kalk_Sim", &objp->Kalk_Sim))
 		 return FALSE;
 	 if (!vml_int (vmls, "MaxCG", &objp->MaxCG))

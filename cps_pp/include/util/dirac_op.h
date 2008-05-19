@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.20 2007-10-30 04:14:04 chulwoo Exp $
+  $Id: dirac_op.h,v 1.21 2008-05-19 19:25:06 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -118,7 +118,7 @@ class DiracOp
   //! Ritz eigensolver.
   int Ritz(Vector **psi_all, int N_eig, Float &lambda,
 	   Float RsdR_a, Float RsdR_r, Float Rsdlam, Float Cutl_zero,
-	   int n_renorm, int Kalk_Sim, int N_min, int N_max, Float Cv_fact,
+	   int n_renorm, int Kalk_Sim, int N_min, int N_max, Float &Cv_fact,
 	   int MaxCG, int ProjApsiP);
      // Ritz minimizer for eigenvectors.
      // The matrix that is used is RitzMat.

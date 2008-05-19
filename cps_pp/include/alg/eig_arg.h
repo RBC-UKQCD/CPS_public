@@ -29,6 +29,7 @@ public:
 	} Mass;
 	int n_masses;
 	int N_eig;
+	int N_eigacc;
 	int Kalk_Sim;
 	int MaxCG;
 	Float RsdR_a;

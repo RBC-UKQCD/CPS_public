@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definitions of the EigArg structure.
   
-  $Id: eig_arg.x,v 1.5 2005-12-02 15:07:04 chulwoo Exp $
+  $Id: eig_arg.x,v 1.6 2008-05-19 19:25:06 chulwoo Exp $
 */
 /*------------------------------------------------------------------*/
 
@@ -25,6 +25,8 @@ class EigArg {
     int n_masses; 
 
     int N_eig;		/*!< The number of eigenvectors/values to calculate */
+    /* CLAUDIO: added number of accurate eigenvalues to compute */
+    int N_eigacc;	/*!< The number of accurate eigenvectors/values to calculate */
     int Kalk_Sim;       /*!< Use the Kalkreuter-Simma algorithm. */
     int MaxCG;		/*!<  */
     Float RsdR_a;         /*!< Absolute residual.  */
