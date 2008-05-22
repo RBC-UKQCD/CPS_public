@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.37 2008-05-15 04:00:56 chulwoo Exp $
+  $Id: gjp.C,v 1.38 2008-05-22 21:25:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-15 04:00:56 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.37 2008-05-15 04:00:56 chulwoo Exp $
-//  $Id: gjp.C,v 1.37 2008-05-15 04:00:56 chulwoo Exp $
+//  $Date: 2008-05-22 21:25:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.38 2008-05-22 21:25:46 chulwoo Exp $
+//  $Id: gjp.C,v 1.38 2008-05-22 21:25:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.37 $
+//  $Revision: 1.38 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -142,14 +142,16 @@ GlobalJobParameter::~GlobalJobParameter() {
   \param rda Structure containing the initial values of the global variables
 */
 
-void GlobalJobParameter::Initialize(char *filename) {
-  doarg_int.Decode(filename,"doarg_int");
+void GlobalJobParameter::Initialize(char *filename, char *instname) {
+  doarg_int.Decode(filename,instname);
   Initialize();
 }
 
 void GlobalJobParameter::Initialize(const DoArg& rda) {
-  doarg_int = rda;
-  Initialize();
+  ERR.General(cname,"Initizlize(DoArg)", 
+    "No longer allowed. Please use GlobalJobParameter::Initialize(char *filename, char *instname) instead");
+//  doarg_int = rda;
+//  Initialize();
 }
 
 void GlobalJobParameter::Initialize() {

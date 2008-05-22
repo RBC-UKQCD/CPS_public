@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.35 2008-04-22 20:57:19 chulwoo Exp $
+  $Id: gjp.h,v 1.36 2008-05-22 21:25:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-22 20:57:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.35 2008-04-22 20:57:19 chulwoo Exp $
-//  $Id: gjp.h,v 1.35 2008-04-22 20:57:19 chulwoo Exp $
+//  $Date: 2008-05-22 21:25:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.36 2008-05-22 21:25:46 chulwoo Exp $
+//  $Id: gjp.h,v 1.36 2008-05-22 21:25:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.35 $
+//  $Revision: 1.36 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -153,6 +153,8 @@ class GlobalJobParameter
 
   int vol_node_sites;  // The number of sites (4-D) of a single node.
   int vol_sites;       // The number of sites (4-D) of the whole lattice
+
+  void Initialize();
       
 
 public:
@@ -728,9 +730,9 @@ public:
     @{ */
 
   //!  Initializes all global variables
-  void Initialize(char *filename);
+  void Initialize(char *filename, char *instname);
+  //! to be deprecated. Will point to the routine above
   void Initialize(const DoArg& do_arg);
-  void Initialize();
 
   //PAB... Need to serialise the do arg as a means of meta-data preservation
   DoArg *GetDoArg(void) { return &doarg_int;};
