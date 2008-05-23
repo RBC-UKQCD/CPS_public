@@ -121,11 +121,13 @@ int main(int argc,char *argv[])
   masses = mass_list.Floats.Floats_val;
 
   do_arg.gfix_chkb=1;
+  do_arg.cg_reprod_freq=10;
 
   GJP.Initialize(do_arg);
 
 
-  const int num_nodes=do_arg.x_nodes*do_arg.y_nodes*do_arg.z_nodes*do_arg.t_nodes*do_arg.s_nodes;
+//  const int num_nodes=do_arg.x_nodes*do_arg.y_nodes*do_arg.z_nodes*do_arg.t_nodes*do_arg.s_nodes;
+  const int num_nodes=GJP.Xnodes()*GJP.Ynodes()*GJP.Znodes()*GJP.Tnodes()*GJP.Snodes();
 
   //Checkpoint
   if (chkpoints)
@@ -232,7 +234,7 @@ int main(int argc,char *argv[])
     chkpt(num_nodes,chkpoint_no,dtime,dtime_size);
 
   //Shift lattice so that time slice t_src moves to t=0
-  int t_shift=-t_src/do_arg.t_node_sites;
+  int t_shift=-t_src/GJP.TnodeSites();
   VRB.Result(cname,fname,"Shifting lattice by %d, command GDS.Set(0,0,0,%d).\n",-t_src,t_shift);
   GDS.Set(0,0,0,t_shift);
   lattice.Shift();
