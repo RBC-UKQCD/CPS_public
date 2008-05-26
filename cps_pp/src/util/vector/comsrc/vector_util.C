@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.1 2008-05-26 01:41:43 chulwoo Exp $
+  $Id: vector_util.C,v 1.2 2008-05-26 01:49:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-26 01:41:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.1 2008-05-26 01:41:43 chulwoo Exp $
-//  $Id: vector_util.C,v 1.1 2008-05-26 01:41:43 chulwoo Exp $
+//  $Date: 2008-05-26 01:49:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.2 2008-05-26 01:49:19 chulwoo Exp $
+//  $Id: vector_util.C,v 1.2 2008-05-26 01:49:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v $
 //  $State: Exp $
 //
@@ -73,7 +73,7 @@ void moveVec(Float *b, const Float *a, int len) {
 #ifdef PROFILE
     double time  = -dclock();
 #endif
-    for(int i =0;i<len*6;i++) *b++ = *a++; 
+//    for(int i =0;i<len*6;i++) *b++ = *a++; 
     memcpy(b, a, len*sizeof(Vector)); 
 #ifdef PROFILE
     time += dclock();
@@ -427,8 +427,9 @@ void cTimesV1PlusV2(IFloat *a, IFloat re, IFloat im, const IFloat *c,
 {
     for(int i = 0; i < len; i += 2, c += 2) 
     {
-      *a++ = re * *c     - im * *(c+1) + *d++;   // real part
-      *a++ = re * *(c+1) + im * *c     + *d++;   // imag part
+      Float c_re = *c; Float c_im = *(c+1);
+      *a++ = re * c_re     - im * c_im+ *d++;   // real part
+      *a++ = re * c_im + im * c_re   + *d++;   // imag part
     }
 }
 
@@ -445,8 +446,9 @@ void cTimesV1MinusV2(IFloat *a, IFloat re, IFloat im, const IFloat *c,
 {
     for(int i = 0; i < len; i += 2, c += 2) 
     {
-      *a++ = re * *c     - im * *(c+1) - *d++;   // real part
-      *a++ = re * *(c+1) + im * *c     - *d++;   // imag part
+      Float c_re = *c; Float c_im = *(c+1);
+      *a++ = re * c_re     - im * c_im - *d++;   // real part
+      *a++ = re * c_im + im * c_re   - *d++;   // imag part
     }
 }
 
