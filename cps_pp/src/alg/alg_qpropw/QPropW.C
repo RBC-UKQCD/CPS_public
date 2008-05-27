@@ -1997,7 +1997,7 @@ void QPropW::MeasJ5qPion(Vector* sol_5d) {
   int prop_dir=3;
   int ls_glb = GJP.SnodeSites() * GJP.Snodes();
   
-  int LORENTZs=4;
+  const int LORENTZs(4); 
   int SPINORs=2*GJP.Colors()*LORENTZs;
 
   int lcl_sites[LORENTZs];
