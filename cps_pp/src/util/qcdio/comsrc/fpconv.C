@@ -4,6 +4,7 @@
 #include <util/data_types.h>
 #include <util/fpconv.h>
 #include <util/qioarg.h>
+#include <sys/types.h>
 
 CPS_START_NAMESPACE
 using namespace std;
@@ -225,9 +226,11 @@ enum FP_FORMAT  FPConv::testHostFormat() { // test the type of CPS::Float
   const char * fname = "testHostFormat()";
   // 1. endian
   char end_check[4] = {1,0,0,0};
-  unsigned long *lp = (unsigned long *)end_check;
+//  unsigned long *lp = (unsigned long *)end_check;
+  uint32_t *lp = (uint32_t *)end_check;
   int host_big;
 
+  VRB.Flow(cname,fname,"size(unsigned long)=%d lp=%x",sizeof(unsigned long),*lp);
   if ( *lp == 0x1 ) { 
     //    cout << "Host is little-endian\n";
     host_big = 0;
@@ -268,7 +271,7 @@ enum FP_FORMAT  FPConv::testHostFormat() { // test the type of CPS::Float
     }
 
   } // end of 32 bits
-  //  VRB.Flow(cname,fname, "Host FP Format : %s\n", name(hostFormat) );
+    VRB.Flow(cname,fname, "Host FP Format : %s\n", name(hostFormat) );
 
   return hostFormat;
 }
