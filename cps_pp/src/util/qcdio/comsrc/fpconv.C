@@ -230,7 +230,7 @@ enum FP_FORMAT  FPConv::testHostFormat() { // test the type of CPS::Float
   uint32_t *lp = (uint32_t *)end_check;
   int host_big;
 
-  VRB.Flow(cname,fname,"size(unsigned long)=%d lp=%x",sizeof(unsigned long),*lp);
+  VRB.Flow(cname,fname,"size(uint32_t)=%d lp=%x",sizeof(uint32_t),*lp);
   if ( *lp == 0x1 ) { 
     //    cout << "Host is little-endian\n";
     host_big = 0;
@@ -328,19 +328,24 @@ unsigned int FPConv::checksum(char * data, const int data_len,
   if(!sim_qcdsp && big_endian(hostFormat) != big_endian(chkFormat))
     need_byterevn = 1;
 
+  uint32_t *buf = (uint32_t*)data;
+//  VRB.Result(cname,fname,"data = %x %x",*buf,*(buf+1));
   if(need_byterevn)
     byterevn((type32*)data, csumcnt);
+//  VRB.Result(cname,fname,"data = %x %x",*buf,*(buf+1));
 
-  unsigned int *buf = (unsigned int*)data;
-  unsigned int s = 0;
+  uint32_t s = 0;
   for(int i=0;i<csumcnt;i++)  {
     s += *buf;
+//	if(i%1000<2)
+//       VRB.Result(cname,fname,"i=%d s=%x",i,s);
     buf++;
   }
 
   if(need_byterevn)
     byterevn((type32*)data, csumcnt);
 
+//  VRB.Result(cname,fname," need_byterevn=%d s=%x",need_byterevn,s);
   return s;
 }
 

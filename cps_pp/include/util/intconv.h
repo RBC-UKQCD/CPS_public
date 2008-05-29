@@ -7,8 +7,8 @@
 CPS_START_NAMESPACE
 using namespace std;
 
-typedef unsigned long int type32;
-typedef unsigned long long type64; // maybe later we'll have 64-bit int...
+typedef uint32_t type32;
+typedef uint64_t type64; // maybe later we'll have 64-bit int...
 
 
 enum INT_FORMAT {

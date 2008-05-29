@@ -2,7 +2,7 @@
   \file
   \brief
   
-  $Id: fpconv.h,v 1.8 2004-12-21 19:02:38 chulwoo Exp $
+  $Id: fpconv.h,v 1.9 2008-05-29 21:04:27 chulwoo Exp $
  */
 
 #ifndef __FP_CONV__
@@ -14,8 +14,8 @@
 CPS_START_NAMESPACE
 using namespace std;
 
-typedef unsigned long int type32 ;
-typedef unsigned long long type64;
+typedef uint32_t type32 ;
+typedef uint64_t type64;
 
 
 class QioArg;

@@ -80,8 +80,8 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
 
 
   // read in parallel manner, node 0 will assign & dispatch IO time slots
-  unsigned int csum = 0;
-  unsigned int pdcsum = 0;
+  uint32_t csum = 0;
+  uint32_t pdcsum = 0;
   Float RandSum = 0;
   Float Rand2Sum = 0;
   int siteid = 0;
@@ -250,7 +250,7 @@ int ParallelIO::store(iostream & output,
   UGrandomGenerator * ugran = (UGrandomGenerator*)data;
 
   // start parallel writing
-  unsigned int csum = 0, pdcsum = 0;
+  uint32_t csum = 0, pdcsum = 0;
   Float RandSum=0, Rand2Sum=0;
   const char * pd = data;
   int siteid=0;
