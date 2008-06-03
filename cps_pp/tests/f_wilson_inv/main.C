@@ -1,11 +1,12 @@
 /*
-  $Id: main.C,v 1.14 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: main.C,v 1.15 2008-06-03 19:43:37 chulwoo Exp $
 */
 
 #include<config.h>
 #include <util/qcdio.h>
 #include <math.h>
 #include<util/lattice.h>
+#include<util/lat_cont.h>
 #include<util/gjp.h>
 #include<util/verbose.h>
 #include<util/dirac_op.h>
@@ -78,7 +79,7 @@ int main(int argc,char *argv[]){
     do_arg.beta = 5.5;
     do_arg.dwf_height = 0.9;
     do_arg.clover_coeff = 2.0171;
-    do_arg.verbose_level = -12020504;
+    do_arg.verbose_level = -1202;
 
     do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
     do_arg.asqtad_naik = -1.0/24.0;
@@ -96,7 +97,7 @@ int main(int argc,char *argv[]){
 
     cg_arg.mass = 0.1;
     cg_arg.stop_rsd = 1e-12;
-    cg_arg.max_num_iter = 2;
+    cg_arg.max_num_iter = 500;
     GJP.Initialize(do_arg);
 
 //    VRB.Level(GJP.VerboseLevel());
@@ -110,6 +111,7 @@ int main(int argc,char *argv[]){
 #endif
 
     GwilsonFwilson lat;
+	LatticeContainer lat_cont;
 
     Vector *result = 
 	(Vector*)smalloc(GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
@@ -158,7 +160,10 @@ int main(int argc,char *argv[]){
 		}
 #endif
 
+	lat_cont.Get(lat);
+
     Vector *out;
+{
     DiracOpWilson dirac(lat,X_out,X_in,&cg_arg,CNV_FRM_NO);
 
 	for(int k = 0; k< 1; k++){
@@ -241,6 +246,8 @@ int main(int argc,char *argv[]){
     printf("Max diff between X_in and M*X_out = %0.2e\n", maxdiff);
 }
     Fclose(fp);
+}
+	lat_cont.Set(lat);
     
     sfree(X_in);
     sfree(result);
