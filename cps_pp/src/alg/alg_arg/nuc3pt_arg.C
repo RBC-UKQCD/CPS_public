@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_Nuc3ptArg (VML *vmls, char *name,Nuc3ptArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"Nuc3ptArg",name);
 	int i;
 	 if (!vml_pointer (vmls, "cname", (char **)&objp->cname, sizeof (char), (vmlproc_t) vml_char))

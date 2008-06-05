@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_BGLAxisMap (VML *vmls, char *name,BGLAxisMap *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"BGLAxisMap",name);
 	 if (!vml_int (vmls, "bgl_machine_dir_x", &objp->bgl_machine_dir_x))
 		 return FALSE;
@@ -63,8 +61,6 @@ vml_BGLAxisMap (VML *vmls, char *name,BGLAxisMap *objp)
 bool_t
 vml_DoArg (VML *vmls, char *name,DoArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"DoArg",name);
 	 if (!vml_int (vmls, "x_sites", &objp->x_sites))
 		 return FALSE;

@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_MomArg (VML *vmls, char *name,MomArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"MomArg",name);
 	int i;
 	 if (!vml_int (vmls, "no_of_momenta", &objp->no_of_momenta))

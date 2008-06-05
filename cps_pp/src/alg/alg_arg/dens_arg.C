@@ -9,8 +9,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_DENS_LIM (VML *vmls, char *name,DENS_LIM *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,DENS_LIM_map))
 		return FALSE;
 	return TRUE;
@@ -42,8 +40,6 @@ struct vml_enum_map DENS_LIM_map[] = {
 bool_t
 vml_DensArg (VML *vmls, char *name,DensArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"DensArg",name);
 	int i;
 	 if (!vml_int (vmls, "n_src", &objp->n_src))

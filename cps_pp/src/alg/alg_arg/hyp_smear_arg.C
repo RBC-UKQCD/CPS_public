@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_HypSmearArg (VML *vmls, char *name,HypSmearArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"HypSmearArg",name);
 	 if (!vml_Float (vmls, "tolerance", &objp->tolerance))
 		 return FALSE;

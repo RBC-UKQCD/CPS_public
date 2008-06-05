@@ -9,8 +9,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_NoiseType (VML *vmls, char *name,NoiseType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,NoiseType_map))
 		return FALSE;
 	return TRUE;
@@ -42,8 +40,6 @@ struct vml_enum_map NoiseType_map[] = {
 bool_t
 vml_NoiseArg (VML *vmls, char *name,NoiseArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"NoiseArg",name);
 	 if (!vml_NoiseType (vmls, "noise_kind", &objp->noise_kind))
 		 return FALSE;

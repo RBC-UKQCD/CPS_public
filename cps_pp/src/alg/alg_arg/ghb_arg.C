@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_GhbArg (VML *vmls, char *name,GhbArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"GhbArg",name);
 	 if (!vml_int (vmls, "num_iter", &objp->num_iter))
 		 return FALSE;

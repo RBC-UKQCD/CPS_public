@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_HmcArg (VML *vmls, char *name,HmcArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"HmcArg",name);
 	 if (!vml_int (vmls, "steps_per_traj", &objp->steps_per_traj))
 		 return FALSE;

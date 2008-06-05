@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_CgArg (VML *vmls, char *name,CgArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"CgArg",name);
 	 if (!vml_Float (vmls, "mass", &objp->mass))
 		 return FALSE;

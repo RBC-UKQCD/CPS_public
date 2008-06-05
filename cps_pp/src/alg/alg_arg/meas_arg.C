@@ -9,8 +9,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_MeasLimits (VML *vmls, char *name,MeasLimits *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,MeasLimits_map))
 		return FALSE;
 	return TRUE;
@@ -23,8 +21,6 @@ struct vml_enum_map MeasLimits_map[] = {
 bool_t
 vml_MeasType (VML *vmls, char *name,MeasType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,MeasType_map))
 		return FALSE;
 	return TRUE;
@@ -43,8 +39,6 @@ struct vml_enum_map MeasType_map[] = {
 bool_t
 vml_MeasIOTask (VML *vmls, char *name,MeasIOTask *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,MeasIOTask_map))
 		return FALSE;
 	return TRUE;
@@ -77,8 +71,6 @@ struct vml_enum_map MeasIOTask_map[] = {
 bool_t
 vml_MeasTask (VML *vmls, char *name,MeasTask *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"MeasTask",name);
 	 if (!vml_MeasType (vmls, "Measurement", &objp->Measurement))
 		 return FALSE;
@@ -111,8 +103,6 @@ vml_MeasTask (VML *vmls, char *name,MeasTask *objp)
 bool_t
 vml_MeasArg (VML *vmls, char *name,MeasArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"MeasArg",name);
 	 if (!vml_FclassType (vmls, "Fermion", &objp->Fermion))
 		 return FALSE;

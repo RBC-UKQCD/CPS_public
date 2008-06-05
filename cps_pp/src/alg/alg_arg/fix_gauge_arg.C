@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_FixGaugeArg (VML *vmls, char *name,FixGaugeArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"FixGaugeArg",name);
 	 if (!vml_FixGaugeType (vmls, "fix_gauge_kind", &objp->fix_gauge_kind))
 		 return FALSE;

@@ -9,8 +9,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_MesonLimits (VML *vmls, char *name,MesonLimits *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,MesonLimits_map))
 		return FALSE;
 	return TRUE;
@@ -41,8 +39,6 @@ struct vml_enum_map MesonLimits_map[] = {
 bool_t
 vml_WspectOutput (VML *vmls, char *name,WspectOutput *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"WspectOutput",name);
 	 if (!vml_WbaryonFold (vmls, "fold", &objp->fold))
 		 return FALSE;
@@ -137,8 +133,6 @@ vml_WspectOutput (VML *vmls, char *name,WspectOutput *objp)
 bool_t
 vml_WspectArg (VML *vmls, char *name,WspectArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"WspectArg",name);
 	int i;
 	 if (!vml_string (vmls, "CgArgFile", &objp->CgArgFile, ~0))

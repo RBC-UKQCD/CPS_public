@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_KineticSmearArg (VML *vmls, char *name,KineticSmearArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"KineticSmearArg",name);
 	 if (!vml_int (vmls, "orthog", &objp->orthog))
 		 return FALSE;

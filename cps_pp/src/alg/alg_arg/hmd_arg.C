@@ -9,8 +9,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_FRatVec (VML *vmls, char *name,FRatVec objp)
 {
-	register int32_t *buf;
-
 	if (!vml_vector (vmls,name,(char *)objp,MAX_RAT_DEGREE,sizeof(Float),(vmlproc_t)vml_Float))
 		return FALSE;
 	return TRUE;
@@ -19,8 +17,6 @@ vml_FRatVec (VML *vmls, char *name,FRatVec objp)
 bool_t
 vml_IMassVec (VML *vmls, char *name,IMassVec objp)
 {
-	register int32_t *buf;
-
 	if (!vml_vector (vmls,name,(char *)objp,MAX_HMD_MASSES,sizeof(int),(vmlproc_t)vml_int))
 		return FALSE;
 	return TRUE;
@@ -29,8 +25,6 @@ vml_IMassVec (VML *vmls, char *name,IMassVec objp)
 bool_t
 vml_FMassVec (VML *vmls, char *name,FMassVec objp)
 {
-	register int32_t *buf;
-
 	if (!vml_vector (vmls,name,(char *)objp,MAX_HMD_MASSES,sizeof(Float),(vmlproc_t)vml_Float))
 		return FALSE;
 	return TRUE;
@@ -39,8 +33,6 @@ vml_FMassVec (VML *vmls, char *name,FMassVec objp)
 bool_t
 vml_FRatMassVec (VML *vmls, char *name,FRatMassVec objp)
 {
-	register int32_t *buf;
-
 	if (!vml_vector (vmls,name,(char *)objp,MAX_HMD_MASSES,sizeof(FRatVec),(vmlproc_t)vml_FRatVec))
 		return FALSE;
 	return TRUE;
@@ -67,8 +59,6 @@ vml_FRatMassVec (VML *vmls, char *name,FRatMassVec objp)
 bool_t
 vml_HmdArg (VML *vmls, char *name,HmdArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"HmdArg",name);
 	int i;
 	 if (!vml_int (vmls, "n_frm_masses", &objp->n_frm_masses))
@@ -189,8 +179,6 @@ vml_HmdArg (VML *vmls, char *name,HmdArg *objp)
 bool_t
 vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"EvoArg",name);
 	 if (!vml_int (vmls, "traj_start", &objp->traj_start))
 		 return FALSE;
@@ -255,8 +243,6 @@ vml_EvoArg (VML *vmls, char *name,EvoArg *objp)
 bool_t
 vml_RhmcPolesState (VML *vmls, char *name,RhmcPolesState *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"RhmcPolesState",name);
 	 if (!vml_IMassVec (vmls, "frm_power_num", objp->frm_power_num))
 		 return FALSE;

@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_IntABArg (VML *vmls, char *name,IntABArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"IntABArg",name);
 	 if (!vml_IntegratorType (vmls, "type", &objp->type))
 		 return FALSE;
@@ -65,8 +63,6 @@ vml_IntABArg (VML *vmls, char *name,IntABArg *objp)
 bool_t
 vml_ActionArg (VML *vmls, char *name,ActionArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ActionArg",name);
 	 if (!vml_ForceMeasure (vmls, "force_measure", &objp->force_measure))
 		 return FALSE;
@@ -97,8 +93,6 @@ vml_ActionArg (VML *vmls, char *name,ActionArg *objp)
 bool_t
 vml_BilinearDescr (VML *vmls, char *name,BilinearDescr *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"BilinearDescr",name);
 	 if (!vml_Float (vmls, "mass", &objp->mass))
 		 return FALSE;
@@ -129,8 +123,6 @@ vml_BilinearDescr (VML *vmls, char *name,BilinearDescr *objp)
 bool_t
 vml_ActionBilinearArg (VML *vmls, char *name,ActionBilinearArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ActionBilinearArg",name);
 	 if (!vml_FclassType (vmls, "fermion", &objp->fermion))
 		 return FALSE;
@@ -164,8 +156,6 @@ vml_ActionBilinearArg (VML *vmls, char *name,ActionBilinearArg *objp)
 bool_t
 vml_ApproxDescr (VML *vmls, char *name,ApproxDescr *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ApproxDescr",name);
 	 if (!vml_RationalApproxType (vmls, "approx_type", &objp->approx_type))
 		 return FALSE;
@@ -203,8 +193,6 @@ vml_ApproxDescr (VML *vmls, char *name,ApproxDescr *objp)
 bool_t
 vml_RationalDescr (VML *vmls, char *name,RationalDescr *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"RationalDescr",name);
 	 if (!vml_FieldType (vmls, "field_type", &objp->field_type))
 		 return FALSE;
@@ -245,8 +233,6 @@ vml_RationalDescr (VML *vmls, char *name,RationalDescr *objp)
 bool_t
 vml_EigenDescr (VML *vmls, char *name,EigenDescr *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"EigenDescr",name);
 	 if (!vml_EigenMeasure (vmls, "eigen_measure", &objp->eigen_measure))
 		 return FALSE;
@@ -283,8 +269,6 @@ vml_EigenDescr (VML *vmls, char *name,EigenDescr *objp)
 bool_t
 vml_ActionRationalArg (VML *vmls, char *name,ActionRationalArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ActionRationalArg",name);
 	 if (!vml_ActionBilinearArg (vmls, "bi_arg", &objp->bi_arg))
 		 return FALSE;
@@ -322,8 +306,6 @@ vml_ActionRationalArg (VML *vmls, char *name,ActionRationalArg *objp)
 bool_t
 vml_SplitRange (VML *vmls, char *name,SplitRange *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"SplitRange",name);
 	 if (!vml_int (vmls, "split_low", &objp->split_low))
 		 return FALSE;
@@ -354,8 +336,6 @@ vml_SplitRange (VML *vmls, char *name,SplitRange *objp)
 bool_t
 vml_ActionRationalSplitArg (VML *vmls, char *name,ActionRationalSplitArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ActionRationalSplitArg",name);
 	 if (!vml_array (vmls, "fractionSplit", (char **)&objp->fractionSplit.fractionSplit_val, (u_int *) &objp->fractionSplit.fractionSplit_len, ~0,
 		sizeof (SplitRange), (vmlproc_t) vml_SplitRange))
@@ -385,8 +365,6 @@ vml_ActionRationalSplitArg (VML *vmls, char *name,ActionRationalSplitArg *objp)
 bool_t
 vml_BosonDescr (VML *vmls, char *name,BosonDescr *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"BosonDescr",name);
 	 if (!vml_Float (vmls, "stop_rsd_hb", &objp->stop_rsd_hb))
 		 return FALSE;
@@ -415,8 +393,6 @@ vml_BosonDescr (VML *vmls, char *name,BosonDescr *objp)
 bool_t
 vml_ActionBosonArg (VML *vmls, char *name,ActionBosonArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ActionBosonArg",name);
 	 if (!vml_ActionBilinearArg (vmls, "bi_arg", &objp->bi_arg))
 		 return FALSE;
@@ -448,8 +424,6 @@ vml_ActionBosonArg (VML *vmls, char *name,ActionBosonArg *objp)
 bool_t
 vml_FermionDescr (VML *vmls, char *name,FermionDescr *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"FermionDescr",name);
 	 if (!vml_int (vmls, "chrono", &objp->chrono))
 		 return FALSE;
@@ -482,8 +456,6 @@ vml_FermionDescr (VML *vmls, char *name,FermionDescr *objp)
 bool_t
 vml_ActionFermionArg (VML *vmls, char *name,ActionFermionArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ActionFermionArg",name);
 	 if (!vml_ActionBilinearArg (vmls, "bi_arg", &objp->bi_arg))
 		 return FALSE;
@@ -515,8 +487,6 @@ vml_ActionFermionArg (VML *vmls, char *name,ActionFermionArg *objp)
 bool_t
 vml_QuotientDescr (VML *vmls, char *name,QuotientDescr *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"QuotientDescr",name);
 	 if (!vml_Float (vmls, "bsn_mass", &objp->bsn_mass))
 		 return FALSE;
@@ -555,8 +525,6 @@ vml_QuotientDescr (VML *vmls, char *name,QuotientDescr *objp)
 bool_t
 vml_ActionQuotientArg (VML *vmls, char *name,ActionQuotientArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ActionQuotientArg",name);
 	 if (!vml_ActionBilinearArg (vmls, "bi_arg", &objp->bi_arg))
 		 return FALSE;
@@ -588,8 +556,6 @@ vml_ActionQuotientArg (VML *vmls, char *name,ActionQuotientArg *objp)
 bool_t
 vml_ActionRationalQuotientArg (VML *vmls, char *name,ActionRationalQuotientArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ActionRationalQuotientArg",name);
 	 if (!vml_ActionBilinearArg (vmls, "bi_arg", &objp->bi_arg))
 		 return FALSE;
@@ -638,8 +604,6 @@ vml_ActionRationalQuotientArg (VML *vmls, char *name,ActionRationalQuotientArg *
 bool_t
 vml_ActionGaugeArg (VML *vmls, char *name,ActionGaugeArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ActionGaugeArg",name);
 	 if (!vml_GclassType (vmls, "gluon", &objp->gluon))
 		 return FALSE;

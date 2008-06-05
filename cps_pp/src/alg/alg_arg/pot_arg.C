@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_PotArg (VML *vmls, char *name,PotArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"PotArg",name);
 	 if (!vml_int (vmls, "prop_dir", &objp->prop_dir))
 		 return FALSE;

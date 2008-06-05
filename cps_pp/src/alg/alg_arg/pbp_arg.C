@@ -9,8 +9,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_PBP_LIM (VML *vmls, char *name,PBP_LIM *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,PBP_LIM_map))
 		return FALSE;
 	return TRUE;
@@ -41,8 +39,6 @@ struct vml_enum_map PBP_LIM_map[] = {
 bool_t
 vml_PbpArg (VML *vmls, char *name,PbpArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"PbpArg",name);
 	int i;
 	 if (!vml_PatternType (vmls, "pattern_kind", &objp->pattern_kind))

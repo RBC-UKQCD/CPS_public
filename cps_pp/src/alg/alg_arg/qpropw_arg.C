@@ -9,8 +9,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_SourceType (VML *vmls, char *name,SourceType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,SourceType_map))
 		return FALSE;
 	return TRUE;
@@ -39,8 +37,6 @@ struct vml_enum_map SourceType_map[] = {
 bool_t
 vml_RandomType (VML *vmls, char *name,RandomType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,RandomType_map))
 		return FALSE;
 	return TRUE;
@@ -74,8 +70,6 @@ struct vml_enum_map RandomType_map[] = {
 bool_t
 vml_QPropWArg (VML *vmls, char *name,QPropWArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"QPropWArg",name);
 	 if (!vml_CgArg (vmls, "cg", &objp->cg))
 		 return FALSE;
@@ -134,8 +128,6 @@ vml_QPropWArg (VML *vmls, char *name,QPropWArg *objp)
 bool_t
 vml_QPropWGFArg (VML *vmls, char *name,QPropWGFArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"QPropWGFArg",name);
 	 if (!vml_int (vmls, "gauge_fix_src", &objp->gauge_fix_src))
 		 return FALSE;
@@ -164,8 +156,6 @@ vml_QPropWGFArg (VML *vmls, char *name,QPropWGFArg *objp)
 bool_t
 vml_QPropWPointArg (VML *vmls, char *name,QPropWPointArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"QPropWPointArg",name);
 	 if (!vml_int (vmls, "x", &objp->x))
 		 return FALSE;
@@ -198,8 +188,6 @@ vml_QPropWPointArg (VML *vmls, char *name,QPropWPointArg *objp)
 bool_t
 vml_QPropWBoxArg (VML *vmls, char *name,QPropWBoxArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"QPropWBoxArg",name);
 	 if (!vml_int (vmls, "box_start", &objp->box_start))
 		 return FALSE;
@@ -230,8 +218,6 @@ vml_QPropWBoxArg (VML *vmls, char *name,QPropWBoxArg *objp)
 bool_t
 vml_QPropWRandArg (VML *vmls, char *name,QPropWRandArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"QPropWRandArg",name);
 	 if (!vml_RandomType (vmls, "rng", &objp->rng))
 		 return FALSE;
@@ -262,8 +248,6 @@ vml_QPropWRandArg (VML *vmls, char *name,QPropWRandArg *objp)
 bool_t
 vml_QPropWSlabArg (VML *vmls, char *name,QPropWSlabArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"QPropWSlabArg",name);
 	 if (!vml_QPropWRandArg (vmls, "rand_arg", &objp->rand_arg))
 		 return FALSE;
@@ -294,8 +278,6 @@ vml_QPropWSlabArg (VML *vmls, char *name,QPropWSlabArg *objp)
 bool_t
 vml_QPropWExpArg (VML *vmls, char *name,QPropWExpArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"QPropWExpArg",name);
 	 if (!vml_Float (vmls, "exp_A", &objp->exp_A))
 		 return FALSE;
@@ -328,8 +310,6 @@ vml_QPropWExpArg (VML *vmls, char *name,QPropWExpArg *objp)
 bool_t
 vml_QPropWGaussArg (VML *vmls, char *name,QPropWGaussArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"QPropWGaussArg",name);
 	int i;
 	 if (!vml_int (vmls, "gauss_N", &objp->gauss_N))

@@ -9,8 +9,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_pooh (VML *vmls, char *name,pooh *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_float (vmls,name,objp))
 		return FALSE;
 	return TRUE;
@@ -19,8 +17,6 @@ vml_pooh (VML *vmls, char *name,pooh *objp)
 bool_t
 vml_Float (VML *vmls, char *name,Float *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_double (vmls,name,objp))
 		return FALSE;
 	return TRUE;
@@ -29,8 +25,6 @@ vml_Float (VML *vmls, char *name,Float *objp)
 bool_t
 vml_IFloat (VML *vmls, char *name,IFloat *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_double (vmls,name,objp))
 		return FALSE;
 	return TRUE;
@@ -39,8 +33,6 @@ vml_IFloat (VML *vmls, char *name,IFloat *objp)
 bool_t
 vml_DirType (VML *vmls, char *name,DirType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,DirType_map))
 		return FALSE;
 	return TRUE;
@@ -57,8 +49,6 @@ struct vml_enum_map DirType_map[] = {
 bool_t
 vml_FclassType (VML *vmls, char *name,FclassType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,FclassType_map))
 		return FALSE;
 	return TRUE;
@@ -77,8 +67,6 @@ struct vml_enum_map FclassType_map[] = {
 bool_t
 vml_GclassType (VML *vmls, char *name,GclassType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,GclassType_map))
 		return FALSE;
 	return TRUE;
@@ -97,8 +85,6 @@ struct vml_enum_map GclassType_map[] = {
 bool_t
 vml_StrOrdType (VML *vmls, char *name,StrOrdType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,StrOrdType_map))
 		return FALSE;
 	return TRUE;
@@ -115,8 +101,6 @@ struct vml_enum_map StrOrdType_map[] = {
 bool_t
 vml_CnvFrmType (VML *vmls, char *name,CnvFrmType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,CnvFrmType_map))
 		return FALSE;
 	return TRUE;
@@ -130,8 +114,6 @@ struct vml_enum_map CnvFrmType_map[] = {
 bool_t
 vml_FermionFieldDimension (VML *vmls, char *name,FermionFieldDimension *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,FermionFieldDimension_map))
 		return FALSE;
 	return TRUE;
@@ -145,8 +127,6 @@ struct vml_enum_map FermionFieldDimension_map[] = {
 bool_t
 vml_PreserveType (VML *vmls, char *name,PreserveType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,PreserveType_map))
 		return FALSE;
 	return TRUE;
@@ -160,8 +140,6 @@ struct vml_enum_map PreserveType_map[] = {
 bool_t
 vml_StartConfType (VML *vmls, char *name,StartConfType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,StartConfType_map))
 		return FALSE;
 	return TRUE;
@@ -178,8 +156,6 @@ struct vml_enum_map StartConfType_map[] = {
 bool_t
 vml_StartSeedType (VML *vmls, char *name,StartSeedType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,StartSeedType_map))
 		return FALSE;
 	return TRUE;
@@ -199,8 +175,6 @@ struct vml_enum_map StartSeedType_map[] = {
 bool_t
 vml_ChkbType (VML *vmls, char *name,ChkbType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,ChkbType_map))
 		return FALSE;
 	return TRUE;
@@ -214,8 +188,6 @@ struct vml_enum_map ChkbType_map[] = {
 bool_t
 vml_DagType (VML *vmls, char *name,DagType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,DagType_map))
 		return FALSE;
 	return TRUE;
@@ -229,8 +201,6 @@ struct vml_enum_map DagType_map[] = {
 bool_t
 vml_BndCndType (VML *vmls, char *name,BndCndType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,BndCndType_map))
 		return FALSE;
 	return TRUE;
@@ -244,8 +214,6 @@ struct vml_enum_map BndCndType_map[] = {
 bool_t
 vml_FixGaugeType (VML *vmls, char *name,FixGaugeType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,FixGaugeType_map))
 		return FALSE;
 	return TRUE;
@@ -263,8 +231,6 @@ struct vml_enum_map FixGaugeType_map[] = {
 bool_t
 vml_SprojType (VML *vmls, char *name,SprojType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,SprojType_map))
 		return FALSE;
 	return TRUE;
@@ -284,8 +250,6 @@ struct vml_enum_map SprojType_map[] = {
 bool_t
 vml_SigmaprojType (VML *vmls, char *name,SigmaprojType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,SigmaprojType_map))
 		return FALSE;
 	return TRUE;
@@ -309,8 +273,6 @@ struct vml_enum_map SigmaprojType_map[] = {
 bool_t
 vml_RitzMatType (VML *vmls, char *name,RitzMatType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,RitzMatType_map))
 		return FALSE;
 	return TRUE;
@@ -331,8 +293,6 @@ struct vml_enum_map RitzMatType_map[] = {
 bool_t
 vml_RatApproxType (VML *vmls, char *name,RatApproxType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,RatApproxType_map))
 		return FALSE;
 	return TRUE;
@@ -346,8 +306,6 @@ struct vml_enum_map RatApproxType_map[] = {
 bool_t
 vml_MultiShiftSolveType (VML *vmls, char *name,MultiShiftSolveType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,MultiShiftSolveType_map))
 		return FALSE;
 	return TRUE;
@@ -362,8 +320,6 @@ struct vml_enum_map MultiShiftSolveType_map[] = {
 bool_t
 vml_MassRenormaliseDir (VML *vmls, char *name,MassRenormaliseDir *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,MassRenormaliseDir_map))
 		return FALSE;
 	return TRUE;
@@ -377,8 +333,6 @@ struct vml_enum_map MassRenormaliseDir_map[] = {
 bool_t
 vml_FieldType (VML *vmls, char *name,FieldType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,FieldType_map))
 		return FALSE;
 	return TRUE;
@@ -392,8 +346,6 @@ struct vml_enum_map FieldType_map[] = {
 bool_t
 vml_RatType (VML *vmls, char *name,RatType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,RatType_map))
 		return FALSE;
 	return TRUE;
@@ -408,8 +360,6 @@ struct vml_enum_map RatType_map[] = {
 bool_t
 vml_WbaryonFold (VML *vmls, char *name,WbaryonFold *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,WbaryonFold_map))
 		return FALSE;
 	return TRUE;
@@ -424,8 +374,6 @@ struct vml_enum_map WbaryonFold_map[] = {
 bool_t
 vml_SourceKind (VML *vmls, char *name,SourceKind *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,SourceKind_map))
 		return FALSE;
 	return TRUE;
@@ -445,8 +393,6 @@ struct vml_enum_map SourceKind_map[] = {
 bool_t
 vml_SinkKind (VML *vmls, char *name,SinkKind *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,SinkKind_map))
 		return FALSE;
 	return TRUE;
@@ -461,8 +407,6 @@ struct vml_enum_map SinkKind_map[] = {
 bool_t
 vml_MomentumKind (VML *vmls, char *name,MomentumKind *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,MomentumKind_map))
 		return FALSE;
 	return TRUE;
@@ -482,8 +426,6 @@ struct vml_enum_map MomentumKind_map[] = {
 bool_t
 vml_DEVOperatorKind (VML *vmls, char *name,DEVOperatorKind *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,DEVOperatorKind_map))
 		return FALSE;
 	return TRUE;
@@ -529,8 +471,6 @@ struct vml_enum_map DEVOperatorKind_map[] = {
 bool_t
 vml_WMesonOpKind (VML *vmls, char *name,WMesonOpKind *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,WMesonOpKind_map))
 		return FALSE;
 	return TRUE;
@@ -615,8 +555,6 @@ struct vml_enum_map WMesonOpKind_map[] = {
 bool_t
 vml_WMesonState (VML *vmls, char *name,WMesonState *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,WMesonState_map))
 		return FALSE;
 	return TRUE;
@@ -701,8 +639,6 @@ struct vml_enum_map WMesonState_map[] = {
 bool_t
 vml_WMesonOutputName (VML *vmls, char *name,WMesonOutputName *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,WMesonOutputName_map))
 		return FALSE;
 	return TRUE;
@@ -744,8 +680,6 @@ struct vml_enum_map WMesonOutputName_map[] = {
 bool_t
 vml_WMesonCategory (VML *vmls, char *name,WMesonCategory *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,WMesonCategory_map))
 		return FALSE;
 	return TRUE;
@@ -763,8 +697,6 @@ struct vml_enum_map WMesonCategory_map[] = {
 bool_t
 vml_WExtMesonBEOutputName (VML *vmls, char *name,WExtMesonBEOutputName *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,WExtMesonBEOutputName_map))
 		return FALSE;
 	return TRUE;
@@ -779,8 +711,6 @@ struct vml_enum_map WExtMesonBEOutputName_map[] = {
 bool_t
 vml_WExtMesonBEState (VML *vmls, char *name,WExtMesonBEState *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,WExtMesonBEState_map))
 		return FALSE;
 	return TRUE;
@@ -799,8 +729,6 @@ struct vml_enum_map WExtMesonBEState_map[] = {
 bool_t
 vml_WExtMesonBEOp (VML *vmls, char *name,WExtMesonBEOp *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,WExtMesonBEOp_map))
 		return FALSE;
 	return TRUE;
@@ -819,8 +747,6 @@ struct vml_enum_map WExtMesonBEOp_map[] = {
 bool_t
 vml_WExtMesonBECategory (VML *vmls, char *name,WExtMesonBECategory *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,WExtMesonBECategory_map))
 		return FALSE;
 	return TRUE;
@@ -835,8 +761,6 @@ struct vml_enum_map WExtMesonBECategory_map[] = {
 bool_t
 vml_FieldTensorId (VML *vmls, char *name,FieldTensorId *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,FieldTensorId_map))
 		return FALSE;
 	return TRUE;
@@ -860,8 +784,6 @@ struct vml_enum_map FieldTensorId_map[] = {
 bool_t
 vml_PatternType (VML *vmls, char *name,PatternType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,PatternType_map))
 		return FALSE;
 	return TRUE;
@@ -877,8 +799,6 @@ struct vml_enum_map PatternType_map[] = {
 bool_t
 vml_IntegratorType (VML *vmls, char *name,IntegratorType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,IntegratorType_map))
 		return FALSE;
 	return TRUE;
@@ -904,8 +824,6 @@ struct vml_enum_map IntegratorType_map[] = {
 bool_t
 vml_IntegratorLevel (VML *vmls, char *name,IntegratorLevel *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,IntegratorLevel_map))
 		return FALSE;
 	return TRUE;
@@ -919,8 +837,6 @@ struct vml_enum_map IntegratorLevel_map[] = {
 bool_t
 vml_ReunitarizeType (VML *vmls, char *name,ReunitarizeType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,ReunitarizeType_map))
 		return FALSE;
 	return TRUE;
@@ -934,8 +850,6 @@ struct vml_enum_map ReunitarizeType_map[] = {
 bool_t
 vml_ReproduceTest (VML *vmls, char *name,ReproduceTest *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,ReproduceTest_map))
 		return FALSE;
 	return TRUE;
@@ -949,8 +863,6 @@ struct vml_enum_map ReproduceTest_map[] = {
 bool_t
 vml_TestReproduceTest (VML *vmls, char *name,TestReproduceTest *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,TestReproduceTest_map))
 		return FALSE;
 	return TRUE;
@@ -964,8 +876,6 @@ struct vml_enum_map TestReproduceTest_map[] = {
 bool_t
 vml_ReverseTest (VML *vmls, char *name,ReverseTest *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,ReverseTest_map))
 		return FALSE;
 	return TRUE;
@@ -979,8 +889,6 @@ struct vml_enum_map ReverseTest_map[] = {
 bool_t
 vml_MetropolisType (VML *vmls, char *name,MetropolisType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,MetropolisType_map))
 		return FALSE;
 	return TRUE;
@@ -994,8 +902,6 @@ struct vml_enum_map MetropolisType_map[] = {
 bool_t
 vml_ForceMeasure (VML *vmls, char *name,ForceMeasure *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,ForceMeasure_map))
 		return FALSE;
 	return TRUE;
@@ -1009,8 +915,6 @@ struct vml_enum_map ForceMeasure_map[] = {
 bool_t
 vml_EigenMeasure (VML *vmls, char *name,EigenMeasure *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,EigenMeasure_map))
 		return FALSE;
 	return TRUE;
@@ -1024,8 +928,6 @@ struct vml_enum_map EigenMeasure_map[] = {
 bool_t
 vml_RhmcPolesAction (VML *vmls, char *name,RhmcPolesAction *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,RhmcPolesAction_map))
 		return FALSE;
 	return TRUE;
@@ -1040,8 +942,6 @@ struct vml_enum_map RhmcPolesAction_map[] = {
 bool_t
 vml_HmdLimits (VML *vmls, char *name,HmdLimits *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,HmdLimits_map))
 		return FALSE;
 	return TRUE;
@@ -1055,8 +955,6 @@ struct vml_enum_map HmdLimits_map[] = {
 bool_t
 vml_InverterType (VML *vmls, char *name,InverterType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,InverterType_map))
 		return FALSE;
 	return TRUE;
@@ -1070,8 +968,6 @@ struct vml_enum_map InverterType_map[] = {
 bool_t
 vml_RationalApproxType (VML *vmls, char *name,RationalApproxType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,RationalApproxType_map))
 		return FALSE;
 	return TRUE;
@@ -1086,8 +982,6 @@ struct vml_enum_map RationalApproxType_map[] = {
 bool_t
 vml_RationalBoundsType (VML *vmls, char *name,RationalBoundsType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,RationalBoundsType_map))
 		return FALSE;
 	return TRUE;
@@ -1101,8 +995,6 @@ struct vml_enum_map RationalBoundsType_map[] = {
 bool_t
 vml_StaticBActionLinkSmearType (VML *vmls, char *name,StaticBActionLinkSmearType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,StaticBActionLinkSmearType_map))
 		return FALSE;
 	return TRUE;
@@ -1122,8 +1014,6 @@ struct vml_enum_map StaticBActionLinkSmearType_map[] = {
 bool_t
 vml_GaussianKernelLinkSmearType (VML *vmls, char *name,GaussianKernelLinkSmearType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,GaussianKernelLinkSmearType_map))
 		return FALSE;
 	return TRUE;

@@ -9,8 +9,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_StagQuarkSrcType (VML *vmls, char *name,StagQuarkSrcType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,StagQuarkSrcType_map))
 		return FALSE;
 	return TRUE;
@@ -25,8 +23,6 @@ struct vml_enum_map StagQuarkSrcType_map[] = {
 bool_t
 vml_StagQuarkLocalType (VML *vmls, char *name,StagQuarkLocalType *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,StagQuarkLocalType_map))
 		return FALSE;
 	return TRUE;
@@ -40,8 +36,6 @@ struct vml_enum_map StagQuarkLocalType_map[] = {
 bool_t
 vml_StagQuarkDir (VML *vmls, char *name,StagQuarkDir *objp)
 {
-	register int32_t *buf;
-
 	if (!vml_enum (vmls,name,(enum_t *)objp,StagQuarkDir_map))
 		return FALSE;
 	return TRUE;
@@ -75,8 +69,6 @@ struct vml_enum_map StagQuarkDir_map[] = {
 bool_t
 vml_StagQuarkSrc (VML *vmls, char *name,StagQuarkSrc *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"StagQuarkSrc",name);
 	int i;
 	 if (!vml_StagQuarkSrcType (vmls, "type", &objp->type))
@@ -114,8 +106,6 @@ vml_StagQuarkSrc (VML *vmls, char *name,StagQuarkSrc *objp)
 bool_t
 vml_StagQuarkArg (VML *vmls, char *name,StagQuarkArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"StagQuarkArg",name);
 	 if (!vml_int (vmls, "qid", &objp->qid))
 		 return FALSE;
@@ -150,8 +140,6 @@ vml_StagQuarkArg (VML *vmls, char *name,StagQuarkArg *objp)
 bool_t
 vml_StagMesonArg (VML *vmls, char *name,StagMesonArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"StagMesonArg",name);
 	 if (!vml_int (vmls, "qid0", &objp->qid0))
 		 return FALSE;
@@ -186,8 +174,6 @@ vml_StagMesonArg (VML *vmls, char *name,StagMesonArg *objp)
 bool_t
 vml_StagMomMesonArg (VML *vmls, char *name,StagMomMesonArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"StagMomMesonArg",name);
 	 if (!vml_int (vmls, "qid0", &objp->qid0))
 		 return FALSE;
@@ -224,8 +210,6 @@ vml_StagMomMesonArg (VML *vmls, char *name,StagMomMesonArg *objp)
 bool_t
 vml_StagNucleonArg (VML *vmls, char *name,StagNucleonArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"StagNucleonArg",name);
 	 if (!vml_int (vmls, "qid0", &objp->qid0))
 		 return FALSE;
@@ -262,8 +246,6 @@ vml_StagNucleonArg (VML *vmls, char *name,StagNucleonArg *objp)
 bool_t
 vml_StagNonLocalArg (VML *vmls, char *name,StagNonLocalArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"StagNonLocalArg",name);
 	 if (!vml_int (vmls, "qid0", &objp->qid0))
 		 return FALSE;
@@ -300,8 +282,6 @@ vml_StagNonLocalArg (VML *vmls, char *name,StagNonLocalArg *objp)
 bool_t
 vml_NLStagMesonArg (VML *vmls, char *name,NLStagMesonArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"NLStagMesonArg",name);
 	int i;
 	 if (!vml_vector (vmls, "qid0", (char *)objp->qid0, 8,

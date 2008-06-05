@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_FloatArray (VML *vmls, char *name,FloatArray *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"FloatArray",name);
 	 if (!vml_array (vmls, "Floats", (char **)&objp->Floats.Floats_val, (u_int *) &objp->Floats.Floats_len, ~0,
 		sizeof (Float), (vmlproc_t) vml_Float))
@@ -58,8 +56,6 @@ vml_FloatArray (VML *vmls, char *name,FloatArray *objp)
 bool_t
 vml_ParamArg (VML *vmls, char *name,ParamArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ParamArg",name);
 	 if (!vml_string (vmls, "name", &objp->name, ~0))
 		 return FALSE;
@@ -90,8 +86,6 @@ vml_ParamArg (VML *vmls, char *name,ParamArg *objp)
 bool_t
 vml_ParamArray (VML *vmls, char *name,ParamArray *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"ParamArray",name);
 	 if (!vml_array (vmls, "params", (char **)&objp->params.params_val, (u_int *) &objp->params.params_len, ~0,
 		sizeof (ParamArg), (vmlproc_t) vml_ParamArg))

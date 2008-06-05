@@ -27,8 +27,6 @@ CPS_START_NAMESPACE
 bool_t
 vml_EigArg (VML *vmls, char *name,EigArg *objp)
 {
-	register int32_t *buf;
-
 	 vml_class_begin(vmls,"EigArg",name);
 	 if (!vml_PatternType (vmls, "pattern_kind", &objp->pattern_kind))
 		 return FALSE;
