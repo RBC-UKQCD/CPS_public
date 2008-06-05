@@ -32,7 +32,7 @@
  * From: @(#)rpc_cout.c 1.13 89/02/22 (C) 1987 SMI
  */
 char cout_rcsid[] =
-"$Id: rpc_cout.c,v 1.6 2008-03-25 17:53:43 chulwoo Exp $";
+"$Id: rpc_cout.c,v 1.7 2008-06-05 19:26:42 chulwoo Exp $";
 
 /*
  * rpc_cout.c, XDR routine outputter for the RPC protocol compiler
@@ -302,7 +302,7 @@ print_header (const definition * def)
   if (inlineflag == 0)
     return;
   /*May cause lint to complain. but  ... */
-  f_print (fout, "\tregister int32_t *buf;\n\n");
+//  f_print (fout, "\tregister int32_t *buf;\n\n");
 }
 
 static void
