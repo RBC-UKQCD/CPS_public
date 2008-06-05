@@ -7,7 +7,7 @@ RCFLAGS=-c -C -x -u util/vml/ -v alg/
 
 all: vml.done enum_int.stmp2 cg_arg.stmp do_arg.stmp w_spect_arg.stmp hmc_arg.stmp hmd_arg.stmp pbp_arg.stmp eig_arg.stmp pot_arg.stmp fix_gauge_arg.stmp meas_arg.stmp int_arg.stmp dens_arg.stmp array_arg.stmp ghb_arg.stmp noise_arg.stmp mom_arg.stmp hyp_smear_arg.stmp kinetic_smear_arg.stmp s_spect_arg.stmp 
 
-all: qpropw_arg.stmp nuc3pt_arg.stmp
+all: qpropw_arg.stmp nuc3pt_arg.stmp ape_smear_arg.stmp
 
 vml.done: Makefile.in
 	- cp ${BUILDDIR}/config.h .
