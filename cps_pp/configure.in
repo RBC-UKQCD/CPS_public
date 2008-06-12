@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2008-04-21 19:13:48 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.56 2008-04-21 19:13:48 chulwoo Exp $
-dnl  $Id: configure.in,v 1.56 2008-04-21 19:13:48 chulwoo Exp $
+dnl  $Date: 2008-06-12 17:56:10 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.57 2008-06-12 17:56:10 chulwoo Exp $
+dnl  $Id: configure.in,v 1.57 2008-06-12 17:56:10 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.56 $
+dnl  $Revision: 1.57 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -19,6 +19,15 @@ AC_CHECK_HEADERS([malloc.h])
 
 dnl Get host and target information:
 AC_CANONICAL_TARGET
+
+dnl Are we compiling with QMP library?
+AC_ARG_ENABLE(qmp, 
+	AC_HELP_STRING([--enable-qmp], 
+		[Compile with SciDAC Communication (QMP) lib. (default=no)]), 
+	,[enable_qmp="no"])
+AC_MSG_CHECKING([if including QMP])
+AC_MSG_RESULT($enable_qmp)
+
 
 dnl Set correct compiler information
 if test "$cross_compiling" = "yes"; then
@@ -51,6 +60,9 @@ dnl check if Intel compiler is available if running on 686
 	   CC=""
        AC_CHECK_PROGS(CC, xlC, gcc)
        AC_CHECK_PROGS(CXX, xlC, g++)
+   elif test "$enable_qmp" != "no"; then
+     AC_PATH_PROGS(CC, mpicc)
+     AC_PATH_PROGS(CXX, mpicxx)
    else
      AC_PROG_CXX
    fi
@@ -219,14 +231,6 @@ AC_ARG_ENABLE(qio,
 	,[enable_qio="no"])
 AC_MSG_CHECKING([if including QIO])
 AC_MSG_RESULT($enable_qio)
-
-dnl Are we compiling with QMP library?
-AC_ARG_ENABLE(qmp, 
-	AC_HELP_STRING([--enable-qmp], 
-		[Compile with SciDAC Communication (QMP) lib. (default=no)]), 
-	,[enable_qmp="no"])
-AC_MSG_CHECKING([if including QMP])
-AC_MSG_RESULT($enable_qmp)
 
 if test "$enable_qmp" != "no"; then
    if test "X${QMP_DIR}X" = "XX"; then

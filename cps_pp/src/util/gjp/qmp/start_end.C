@@ -1,11 +1,12 @@
 #include <config.h>
+#ifdef USE_QMP
 #include <util/gjp.h>
 #include <util/error.h>
 #include <qmp.h>
 
 //QMP definitions for CPS::Start() and CPS::End()
 
-extern "C" void _mcleanup();
+//extern "C" void _mcleanup();
 CPS_START_NAMESPACE
 void Start(){
   ERR.General("cps","Start()","Start(&argc,&argv should be used with QMP");
@@ -23,3 +24,4 @@ void End(){
 //  _mcleanup();
 }
 CPS_END_NAMESPACE
+#endif
