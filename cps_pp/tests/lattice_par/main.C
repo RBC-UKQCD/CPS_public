@@ -136,15 +136,16 @@ int write_lattice(int argc, char ** argv) {
 
 
 int main(int argc, char ** argv) {
-  if(argc<9) {
-    cout << "Usage:" << endl<<"      qrun QCDOC.x  -[r|w]  <conf.dat>  <x/y/z sites>  <t sites>  <Xbc> <Ybc> <Zbc> <Tbc>"<< endl;
+  if(argc<11) {
+    cout << "Usage:" << endl<<"      qrun QCDOC.x  -[r|w]  <conf.dat>  <x sites> <y sites> <z sites> <t sites>  <Xbc> <Ybc> <Zbc> <Tbc>"<< endl;
     cout << "(use letter \'P\' or \'A\' for arguments of gauge BC's)" << endl;
-    cout << "Eg,   qrun QCDOC.x -r  conf8x8x8x16.file   8  16  P P P P"<< endl;
-    cout << "      qrun QCDOC.x -w  conf4x4x4x32.file   4  32  P P A A"<< endl;
+    cout << "Eg,   qrun QCDOC.x -r  conf8x8x8x16.file   8 8 8 16  P P P P"<< endl;
+    cout << "      qrun QCDOC.x -w  conf4x4x4x32.file   4 4 4 32  P P A A"<< endl;
     exit(1);
   }
 
 
+  Start(&argc,&argv);
   // init  GJP
   DoArg do_arg;
 
@@ -155,9 +156,9 @@ int main(int argc, char ** argv) {
   do_arg.s_nodes = SizeS();
 
   int nx = atoi(argv[3]);
-  int ny = atoi(argv[3]);
-  int nz = atoi(argv[3]);
-  int nt = atoi(argv[4]);
+  int ny = atoi(argv[4]);
+  int nz = atoi(argv[5]);
+  int nt = atoi(argv[6]);
 
   do_arg.x_node_sites = nx/do_arg.x_nodes;
   do_arg.y_node_sites = ny/do_arg.y_nodes;
@@ -165,10 +166,10 @@ int main(int argc, char ** argv) {
   do_arg.t_node_sites = nt/do_arg.t_nodes;
   do_arg.s_node_sites = 1;
 
-  do_arg.x_bc = (argv[5][0]=='A' ? BND_CND_APRD : BND_CND_PRD);
-  do_arg.y_bc = (argv[6][0]=='A' ? BND_CND_APRD : BND_CND_PRD);
-  do_arg.z_bc = (argv[7][0]=='A' ? BND_CND_APRD : BND_CND_PRD);
-  do_arg.t_bc = (argv[8][0]=='A' ? BND_CND_APRD : BND_CND_PRD);
+  do_arg.x_bc = (argv[7][0]=='A' ? BND_CND_APRD : BND_CND_PRD);
+  do_arg.y_bc = (argv[8][0]=='A' ? BND_CND_APRD : BND_CND_PRD);
+  do_arg.z_bc = (argv[9][0]=='A' ? BND_CND_APRD : BND_CND_PRD);
+  do_arg.t_bc = (argv[10][0]=='A' ? BND_CND_APRD : BND_CND_PRD);
 
   do_arg.start_seed_kind = START_SEED_FIXED;
   do_arg.beta = 5.3;
