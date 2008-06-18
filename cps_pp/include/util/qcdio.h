@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Prototypes of gauge configuration IO functions.
 
-  $Id: qcdio.h,v 1.9 2006-11-25 19:09:48 chulwoo Exp $
+  $Id: qcdio.h,v 1.10 2008-06-18 16:07:10 chulwoo Exp $
 */
 /*2  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
    $Author: chulwoo $
-   $Date: 2006-11-25 19:09:48 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.9 2006-11-25 19:09:48 chulwoo Exp $
-   $Id: qcdio.h,v 1.9 2006-11-25 19:09:48 chulwoo Exp $
+   $Date: 2008-06-18 16:07:10 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.10 2008-06-18 16:07:10 chulwoo Exp $
+   $Id: qcdio.h,v 1.10 2008-06-18 16:07:10 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.h,v $
-   $Revision: 1.9 $
+   $Revision: 1.10 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v $
    $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -132,6 +132,25 @@ int Fclose( FileIoType type, FILE *stream);
   ZERO_ONLY mode and this function is called by a different mode (in which
   case \a stream will be the dummy file handle), then 1 is returned.
 */
+
+size_t Fwrite( const void *ptr, size_t size, size_t n, FILE *stream);
+size_t Fread(void *ptr, size_t size, size_t n, FILE *stream);
+
+//! Read & Write from a file
+/*!
+  This works like \a fread & fwrite in the C standard library, except that on a
+  parallel machine we can decide whether just one node does the IO, or
+  whether each node performs IO to a seperate file which has the node
+  number appended to its name.
+  
+  \param stream The file handle
+  \return Normally, the number of elements written, but if the file was opened 
+  in ZERO_ONLY mode and this function is called by a different mode (in which
+  case \a stream will be the dummy file handle), then n is returned from 
+  Fwrite().
+*/
+
+
 int Fprintf( FileIoType type, FILE *stream, const char *format,...);
 
 //! Prints a variable-length argument list to a file
