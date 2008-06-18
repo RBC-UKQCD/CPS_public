@@ -21,7 +21,8 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 
-void glb_sum_internal (Float * float_p, int dir,int len);
+//void glb_sum_internal (Float * float_p, int dir,int len);
+void glb_sum_multi_dir(const Float * float_p, const int dir, const int len);
 
 
 //-------------------------------------------------------------------
@@ -52,10 +53,9 @@ void slice_sum(Float * float_p, int blcklength, int dir)
 
   for (int i =0;i<4;i++)
   if (i != dir)
-    glb_sum_internal(float_p,i,blcklength);
+    glb_sum_multi_dir(float_p,i,blcklength);
 
 }
-
 
 CPS_END_NAMESPACE
 #endif
