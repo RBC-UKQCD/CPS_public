@@ -5,7 +5,7 @@
 //#include <qalloc.h>
 CPS_START_NAMESPACE
 static FILE FAKE;
-static FILE *FAKE_P = NULL;
+static FILE *FAKE_P = &FAKE;
 const int MAX_FILENAME =200;
 FILE *Fopen( FileIoType type, const char *filename, const char *mode){
   FILE *result = NULL;
