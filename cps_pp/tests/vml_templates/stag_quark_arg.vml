@@ -10,7 +10,7 @@ InverterType Inverter = CG
 int bicgstab_n = 1
 }
 class StagQuarkSrc src = {
-StagQuarkSrcType type = POINT
+StagQuarkSrcType type = S_QUARK_POINT
 Vector origin[4] = { 
 int origin[0] = 0
 int origin[1] = 0

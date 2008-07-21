@@ -10,7 +10,7 @@
 <item><name>bicgstab_n</name><value><int>1</int></value></item>
 </data></class>
 <class><name>StagQuarkSrc</name><instance>src</instance><data>
-<item><name>type</name><value><StagQuarkSrcType>POINT </StagQuarkSrcType></value></item>
+<item><name>type</name><value><StagQuarkSrcType>S_QUARK_POINT </StagQuarkSrcType></value></item>
 <Vector><name>origin</name><size>4</size><data>
 <item><name>origin[0]</name><value><int>0</int></value></item>
 <item><name>origin[1]</name><value><int>0</int></value></item>

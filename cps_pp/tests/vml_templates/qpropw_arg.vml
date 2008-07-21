@@ -1,0 +1,26 @@
+class QPropWArg qpropw_arg = {
+class CgArg cg = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 0
+double stop_rsd =   0.0000000000000000e+00
+double true_rsd =   0.0000000000000000e+00
+RitzMatType RitzMatOper = NONE
+InverterType Inverter = CG
+int bicgstab_n = 0
+}
+string file = ""
+int x = 0
+int y = 0
+int z = 0
+int t = 0
+int gauge_fix_src = 0
+int gauge_fix_snk = 0
+int store_midprop = 0
+int save_prop = 0
+int save_ls_prop = 0
+int do_half_fermion = 0
+SourceType SeqSmearSink = POINT
+string ensemble_label = ""
+string ensemble_id = ""
+int seqNum = 0
+}

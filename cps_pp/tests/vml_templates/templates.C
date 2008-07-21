@@ -14,6 +14,7 @@
 #include<alg/hmc_arg.h>
 #include<alg/int_arg.h>
 #include<alg/eig_arg.h>
+#include<alg/qpropw_arg.h>
 
 //--------------------------------------------------------------
 
@@ -50,6 +51,7 @@ StagMomMesonArg stag_mom_meson_arg;
 StagNucleonArg stag_nucleon_arg;
 StagNonLocalArg stag_non_local_arg;
 NLStagMesonArg nlstag_meson_arg;
+QPropWArg qpropw_arg;
 
 int main(int argc, char *argv[])
 { 
@@ -101,7 +103,7 @@ int main(int argc, char *argv[])
   param_array.params.params_val[0].name="mass";
   param_array.params.params_val[1].name="epsilon";
   param_array.params.params_val[2].name="u0";
-  stag_quark_src.type = POINT;
+  stag_quark_src.type = S_QUARK_POINT;
   for(int i = 0; i < 4; i++)
     {
       stag_quark_src.origin[i] = 0;
@@ -171,6 +173,7 @@ int main(int argc, char *argv[])
   stag_nucleon_arg.Encode("stag_nucleon_arg.vml","stag_nucleon_arg");
   stag_non_local_arg.Encode("stag_non_local_arg.vml","stag_non_local_arg");
   nlstag_meson_arg.Encode("nlstag_meson_arg.vml","nlstag_meson_arg");
+  qpropw_arg.Encode("qpropw_arg.vml","qpropw_arg");
 
   vml_markup_type(VML_XML);
   
@@ -197,6 +200,7 @@ int main(int argc, char *argv[])
   stag_nucleon_arg.Encode("stag_nucleon_arg.xml","stag_nucleon_arg");
   stag_non_local_arg.Encode("stag_non_local_arg.xml","stag_non_local_arg");
   nlstag_meson_arg.Encode("nlstag_meson_arg.xml","nlstag_meson_arg");
+  qpropw_arg.Encode("qpropw_arg.xml","qpropw_arg");
 
   return(0);
 }

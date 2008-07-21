@@ -1,5 +1,5 @@
 class StagQuarkSrc stag_quark_src = {
-StagQuarkSrcType type = POINT
+StagQuarkSrcType type = S_QUARK_POINT
 Vector origin[4] = { 
 int origin[0] = 0
 int origin[1] = 0

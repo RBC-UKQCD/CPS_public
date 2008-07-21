@@ -7,6 +7,7 @@
 </data></Array>
 <item><name>n_masses</name><value><int>0</int></value></item>
 <item><name>N_eig</name><value><int>0</int></value></item>
+<item><name>N_eigacc</name><value><int>0</int></value></item>
 <item><name>Kalk_Sim</name><value><int>0</int></value></item>
 <item><name>MaxCG</name><value><int>0</int></value></item>
 <item><name>RsdR_a</name><value><double>0.000000e+00</double></value></item>

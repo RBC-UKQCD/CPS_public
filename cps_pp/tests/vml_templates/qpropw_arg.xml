@@ -1,0 +1,26 @@
+<class><name>QPropWArg</name><instance>qpropw_arg</instance><data>
+<class><name>CgArg</name><instance>cg</instance><data>
+<item><name>mass</name><value><double>0.000000e+00</double></value></item>
+<item><name>max_num_iter</name><value><int>0</int></value></item>
+<item><name>stop_rsd</name><value><double>0.000000e+00</double></value></item>
+<item><name>true_rsd</name><value><double>0.000000e+00</double></value></item>
+<item><name>RitzMatOper</name><value><RitzMatType>NONE </RitzMatType></value></item>
+<item><name>Inverter</name><value><InverterType>CG </InverterType></value></item>
+<item><name>bicgstab_n</name><value><int>0</int></value></item>
+</data></class>
+<item><name>file</name><value><string> </string></value></item>
+<item><name>x</name><value><int>0</int></value></item>
+<item><name>y</name><value><int>0</int></value></item>
+<item><name>z</name><value><int>0</int></value></item>
+<item><name>t</name><value><int>0</int></value></item>
+<item><name>gauge_fix_src</name><value><int>0</int></value></item>
+<item><name>gauge_fix_snk</name><value><int>0</int></value></item>
+<item><name>store_midprop</name><value><int>0</int></value></item>
+<item><name>save_prop</name><value><int>0</int></value></item>
+<item><name>save_ls_prop</name><value><int>0</int></value></item>
+<item><name>do_half_fermion</name><value><int>0</int></value></item>
+<item><name>SeqSmearSink</name><value><SourceType>POINT </SourceType></value></item>
+<item><name>ensemble_label</name><value><string> </string></value></item>
+<item><name>ensemble_id</name><value><string> </string></value></item>
+<item><name>seqNum</name><value><int>0</int></value></item>
+</data></class>

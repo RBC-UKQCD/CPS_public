@@ -7,6 +7,7 @@ Array Mass[0] = {
 }
 int n_masses = 0
 int N_eig = 0
+int N_eigacc = 0
 int Kalk_Sim = 0
 int MaxCG = 0
 double RsdR_a =   0.0000000000000000e+00
