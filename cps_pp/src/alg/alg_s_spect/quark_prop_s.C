@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.12 2008-02-08 18:35:05 chulwoo Exp $
-//  $Id: quark_prop_s.C,v 1.12 2008-02-08 18:35:05 chulwoo Exp $
+//  $Date: 2008-07-21 16:56:44 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.13 2008-07-21 16:56:44 chulwoo Exp $
+//  $Id: quark_prop_s.C,v 1.13 2008-07-21 16:56:44 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: quark_prop_s.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v $
 //  $State: Exp $
 //
@@ -365,7 +365,7 @@ void QuarkPropS::getQuarkPropS(char *results)
     FILE *fp;		// monitoring info of CG
 
     for (int color = 0; color < 3; ++color)  {
-      if ( qarg.src.type == POINT ) {
+      if ( qarg.src.type == S_QUARK_POINT ) {
 	setPntSrc(qarg.src.origin, color);
       }
       else {

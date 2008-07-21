@@ -14,7 +14,7 @@ vml_StagQuarkSrcType (VML *vmls, char *name,StagQuarkSrcType *objp)
 	return TRUE;
 }
 struct vml_enum_map StagQuarkSrcType_map[] = {
-	{"StagQuarkSrcType","POINT",POINT},
+	{"StagQuarkSrcType","S_QUARK_POINT",S_QUARK_POINT},
 	{"StagQuarkSrcType","WALLZ",WALLZ},
 	{"StagQuarkSrcType","WALL2Z",WALL2Z},
 	{NULL,NULL,0}

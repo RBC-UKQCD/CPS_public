@@ -1,7 +1,7 @@
 //VML file for staggered spectroscopy
 
 enum StagQuarkSrcType{ 
-	POINT = 0, 
+	S_QUARK_POINT = 0, 
 	WALLZ = 1, 
 	WALL2Z = 2
 };	/* StagQuarkSrc type*/
