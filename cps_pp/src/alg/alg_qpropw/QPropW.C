@@ -2775,33 +2775,41 @@ CommonArg* c_arg) : QPropW(lat, arg, c_arg),rand_arg(*r_arg)
   int rsrc_size = 2*GJP.VolNodeSites();
 
   if (rand_arg.rng == GAUSS) {
-	GaussianRandomGenerator rng(0.5);
-	rng.Reset(rand_arg.seed);
-	for (int i=0; i<rsrc_size; i++)
-	  rsrc[i] = rng.Rand();
+    // MGE 06/10/2008
+        LRG.SetSigma(0.5);
+    for (int i=0; i<rsrc_size/2; i++) {
+      LRG.AssignGenerator(i);
+      rsrc[2*i] = LRG.Grand(FOUR_D);
+      rsrc[2*i+1] = LRG.Grand(FOUR_D);
+    }
+    // END MGE 06/10/2008
+
   }
   if (rand_arg.rng == UONE) {
-	UniformRandomGenerator rng(0,6.2831853);
-	rng.Reset(rand_arg.seed);
-	for (int i=0; i<rsrc_size/2; i++) {
-	  Float theta(rng.Rand());
-	  rsrc[2*i  ] = cos(theta); // real part
-	  rsrc[2*i+1] = sin(theta); // imaginary part
-	}
-  }
+    // MGE 06/10/2008
+        LRG.SetInterval(6.283185307179586,0);
+    for (int i=0; i<rsrc_size/2; i++) {
+      LRG.AssignGenerator(i);
+      Float theta(LRG.Urand(FOUR_D));
+      rsrc[2*i  ] = cos(theta); // real part
+      rsrc[2*i+1] = sin(theta); // imaginary part
+    }
+    // END MGE 06/10/2008
+  } 
   if (rand_arg.rng == ZTWO) {
-	UniformRandomGenerator rng(0.0,1.0);
-	rng.Reset(rand_arg.seed);
-	for (int i=0; i<rsrc_size/2; i++) {
-	  if (rng.Rand()>.5) {
-	    rsrc[2*i] =  1.0;
-	  } else {
-	    rsrc[2*i] = -1.0;
-	  }
-	  rsrc[2*i+1] = 0.0; // source is purely real
-	}
+    // MGE 06/10/2008  
+        LRG.SetInterval(1,-1);
+    for (int i=0; i<rsrc_size/2; i++) {
+      LRG.AssignGenerator(i);
+      if (LRG.Urand(FOUR_D)>0.) {
+        rsrc[2*i] =  1.;
+      } else {
+        rsrc[2*i] = -1.;
+      }
+      rsrc[2*i+1] = 0.0; // source is purely real
+    }
+    // END MGE 06/10/2008
   }
-  
 }
 
 QPropWRand::QPropWRand(const QPropWRand& rhs) : QPropW(rhs),rsrc(NULL) {
