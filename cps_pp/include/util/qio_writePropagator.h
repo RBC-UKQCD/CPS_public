@@ -23,21 +23,44 @@ class qio_writePropagator: private qio_init {
     {initHeader();}
 
 
-  // writing Scalar Source + 12 Sinks
+  //! write propagator, format scalar source + 12 sinks
+  /*!
+    \param outfile file to write to
+    \param prop    pointer to sinks
+    \param scSource pointer to scalar source
+   */
   qio_writePropagator(char *outfile, const void *prop, const void *scSource, 
 		      int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
     qio_init(argc, argv), cname("qio_writePropagator"), source_hypercube(0)
     { initHeader(); write_ScS_12sink(outfile, prop, scSource, volFormat, floatFormat);}
 
    
-  // writing Scalar Source + 12 Sinks, setting header id, label, traj
+  //! write propagator, format scalar source + 12 sinks, set add. info
+  /*!
+    \param outfile file to write to
+    \param prop    pointer to sinks
+    \param scSource pointer to scalar source
+    \param ensemble_id ensemble id
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+   */
   qio_writePropagator(char *outfile, const void *prop, const void *scSource, 
 		      const char * ensemble_id, const char * ensemble_label, const int traj,
 		      int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
     qio_init(argc, argv), cname("qio_writePropagator"), source_hypercube(0)
     { setHeader(ensemble_id, ensemble_label, traj); write_ScS_12sink(outfile, prop, scSource, volFormat, floatFormat);}
 
-  // writing Scalar Source + 12 Sinks, setting header id, label, traj, prop_type, source_type
+  //! write propagator, format scalar source + 12 sinks, set add. info
+  /*!
+    \param outfile file to write to
+    \param prop    pointer to sinks
+    \param scSource pointer to scalar source
+    \param ensemble_id ensemble id
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+    \param propagator_type descr. of prop. type
+    \param source_type descr. of source type
+   */
   qio_writePropagator(char *outfile, const void *prop, const void *scSource, 
 		      const char * ensemble_id, const char * ensemble_label, const int traj,
 		      const char * propagator_type, const char * source_type,
@@ -48,20 +71,47 @@ class qio_writePropagator: private qio_init {
 
   
   
-  // writing 12 pairs of Scalar/Full Source and full Sink 
+  //! write propagator, format 12 pairs of source and sink
+  /*!
+    \param outfile file to write to
+    \param sType source type (scalar, full)
+    \param prop    pointer to sinks
+    \param source pointer to scalar source
+   */
   qio_writePropagator(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
 		      int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
     qio_init(argc, argv), cname("qio_writePropagator"), source_hypercube(0)
     { initHeader(); write_12pairs(outfile, sType, prop, source, volFormat, floatFormat);}
 
-  // writing 12 pairs of Scalar/Full Source and full Sink, setting header id, label, traj
+  //! write propagator, format 12 pairs of source and sink, set add. info
+  /*!
+    \param outfile file to write to
+    \param sType source type (scalar, full)
+    \param prop    pointer to sinks
+    \param source pointer to scalar source
+    \param ensemble_id ensemble id
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+   */
   qio_writePropagator(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
 		      const char * ensemble_id, const char * ensemble_label, const int traj, 
 		      int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
     qio_init(argc, argv), cname("qio_writePropagator"), source_hypercube(0)
     { setHeader(ensemble_id, ensemble_label, traj); write_12pairs(outfile, sType, prop, source, volFormat, floatFormat);}
   
-  // writing 12 pairs of Scalar/Full Source and full Sink, setting header id, label, traj
+
+  //! write propagator, format 12 pairs of source and sink, set add. info
+  /*!
+    \param outfile file to write to
+    \param sType source type (scalar, full)
+    \param prop    pointer to sinks
+    \param source pointer to scalar source
+    \param ensemble_id ensemble id
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+    \param propagator_type descr. of prop. type
+    \param source_type descr. of source type
+   */
   qio_writePropagator(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
 		      const char * ensemble_id, const char * ensemble_label, const int traj,
 		      const char * propagator_type, const char * source_type,
@@ -76,21 +126,44 @@ class qio_writePropagator: private qio_init {
     {initHeader();}
   
   
-  // writing Scalar Source + 12 Sinks
+  //! write propagator, format scalar source + 12 sinks
+  /*!
+    \param outfile file to write to
+    \param prop    pointer to sinks
+    \param scSource pointer to scalar source
+  */
   qio_writePropagator(char *outfile, const void *prop, const void *scSource, 
 		      int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
     qio_init(GJP.argc(), GJP.argv()), cname("qio_writePropagator"), source_hypercube(0)
     { initHeader(); write_ScS_12sink(outfile, prop, scSource, volFormat, floatFormat);}
 
    
-  // writing Scalar Source + 12 Sinks, setting header id, label, traj
+  //! write propagator, format scalar source + 12 sinks, set add. info
+  /*!
+    \param outfile file to write to
+    \param prop    pointer to sinks
+    \param scSource pointer to scalar source
+    \param ensemble_id ensemble id
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+   */
   qio_writePropagator(char *outfile, const void *prop, const void *scSource, 
 		      const char * ensemble_id, const char * ensemble_label, const int traj,
 		      int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
     qio_init(GJP.argc(), GJP.argv()), cname("qio_writePropagator"), source_hypercube(0)
     { setHeader(ensemble_id, ensemble_label, traj); write_ScS_12sink(outfile, prop, scSource, volFormat, floatFormat);}
 
-  // writing Scalar Source + 12 Sinks, setting header id, label, traj, prop_type, source_type
+  //! write propagator, format scalar source + 12 sinks, set add. info
+  /*!
+    \param outfile file to write to
+    \param prop    pointer to sinks
+    \param scSource pointer to scalar source
+    \param ensemble_id ensemble id
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+    \param propagator_type descr. of prop. type
+    \param source_type descr. of source type
+   */
   qio_writePropagator(char *outfile, const void *prop, const void *scSource, 
 		      const char * ensemble_id, const char * ensemble_label, const int traj,
 		      const char * propagator_type, const char * source_type,
@@ -101,20 +174,46 @@ class qio_writePropagator: private qio_init {
 
   
   
-  // writing 12 pairs of Scalar/Full Source and full Sink 
+  //! write propagator, format 12 pairs of source and sink
+  /*!
+    \param outfile file to write to
+    \param sType source type (scalar, full)
+    \param prop    pointer to sinks
+    \param source pointer to scalar source
+   */
   qio_writePropagator(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
 		      int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
     qio_init(GJP.argc(), GJP.argv()), cname("qio_writePropagator"), source_hypercube(0)
     { initHeader(); write_12pairs(outfile, sType, prop, source, volFormat, floatFormat);}
 
-  // writing 12 pairs of Scalar/Full Source and full Sink, setting header id, label, traj
+  //! write propagator, format 12 pairs of source and sink, set add. info
+  /*!
+    \param outfile file to write to
+    \param sType source type (scalar, full)
+    \param prop    pointer to sinks
+    \param source pointer to scalar source
+    \param ensemble_id ensemble id
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+   */
   qio_writePropagator(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
 		      const char * ensemble_id, const char * ensemble_label, const int traj, 
 		      int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
     qio_init(GJP.argc(), GJP.argv()), cname("qio_writePropagator"), source_hypercube(0)
     { setHeader(ensemble_id, ensemble_label, traj); write_12pairs(outfile, sType, prop, source, volFormat, floatFormat);}
   
-  // writing 12 pairs of Scalar/Full Source and full Sink, setting header id, label, traj
+  //! write propagator, format 12 pairs of source and sink, set add. info
+  /*!
+    \param outfile file to write to
+    \param sType source type (scalar, full)
+    \param prop    pointer to sinks
+    \param source pointer to scalar source
+    \param ensemble_id ensemble id
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+    \param propagator_type descr. of prop. type
+    \param source_type descr. of source type
+   */
   qio_writePropagator(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
 		      const char * ensemble_id, const char * ensemble_label, const int traj,
 		      const char * propagator_type, const char * source_type,
@@ -132,16 +231,49 @@ class qio_writePropagator: private qio_init {
     #endif // DEBUG_Init
   }
 
+
+  //! write propagator, format scalar source + 12 sinks
+  /*!
+    \param outfile file to write to
+    \param prop    pointer to sinks
+    \param scSource pointer to scalar source
+  */  
   void write_ScS_12sink(char *outfile, const void *prop, const void *scSource, 
 			int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC);
 
+  //! write propagator, format 12 pairs of source and sink
+  /*!
+    \param outfile file to write to
+    \param sType source type (scalar, full)
+    \param prop    pointer to sinks
+    \param source pointer to scalar source
+   */  
   void write_12pairs(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
 		     int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC);
 
+  //! set additional info
+  /*!
+    \param ensemble_id ensemble id
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+  */
   void setHeader(const char * ensemble_id, const char * ensemble_label, const int traj);
 
+  //! set additional info
+  /*!
+    \param propagator_type descr. of prop. type
+    \param source_type descr. of source type
+   */
   void setHeader(const char * propagator_type, const char * source_type);
 
+   //! set additional info
+  /*!
+    \param ensemble_id ensemble id
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+    \param propagator_type descr. of prop. type
+    \param source_type descr. of source type
+  */
   void setHeader(const char * ensemble_id, const char * ensemble_label, const int traj, 
 		 const char * propagator_type, const char * source_type)
     {
@@ -149,15 +281,20 @@ class qio_writePropagator: private qio_init {
       setHeader(propagator_type, source_type);
     }
 
+  //! set tslice (only writing this one and only tslice for the source) 
   void setSourceTslice( const int tslice);
 
+  //! set tslices (only writing from tslices from t_start to t_end for the source)
   void setSourceTslices( const int t_start, const int t_end);
 
+  //! only write a hypercube with start-, end-coordinates for the source
   void setSourceHypercube( const int start[4], const int end[4]);
 
+  //! write a complete source
   void setSourceComplete(void)
     { source_hypercube=0;}
 
+  //! writing a complete (0) or hypercube/tslices source (1)
   int SourceHypercube(void)
     { return source_hypercube;}
 

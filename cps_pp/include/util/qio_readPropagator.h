@@ -21,7 +21,14 @@ class qio_readPropagator: private qio_init {
     qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0){}
 
 
-  // general reader
+  //! read propagator, auto-detect format
+  /*!
+    \param infile file to read from
+    \param prop   allocated memory for propagator
+    \param source allocated memory for source
+    \param max_Float_prop maximal number of Floats allocated for propagator
+    \param max_Float_source maximal number of Floats allocated for source
+  */
   qio_readPropagator(char *infile, void *prop, void *source, 
 		     const int max_Float_prop, const int max_Float_source, 
 		     int argc, char *argv[], int volFormat=QIO_UNKNOWN): 
@@ -29,13 +36,24 @@ class qio_readPropagator: private qio_init {
     {read(infile, prop, source, max_Float_prop, max_Float_source, volFormat);}
 
 
-  // read scS_12sink
+  //! read propagator, format scalar source + 12 sinks
+  /*!
+    \param infile file to read from
+    \param prop   allocated memory for propagator
+    \param source allocated memory for source
+  */
   qio_readPropagator(char *infile, void *prop, void *source, 
 		     int argc, char *argv[], int volFormat=QIO_UNKNOWN): 
     qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
     {read_ScS_12sink(infile, prop, source, volFormat);}
 
-  // read 12pairs
+  //! read propagator 12 pairs of sink and source
+  /*!
+    \param infile file to read from
+    \param sType  source type (full, scalar)
+    \param prop   allocated memory for propagator
+    \param source allocated memory for source
+   */
   qio_readPropagator(char *infile, const QIO_PROP_SOURCE_TYPES sType, void *prop, void *source, 
 		     int argc, char *argv[], int volFormat=QIO_UNKNOWN): 
     qio_init(argc, argv), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
@@ -46,7 +64,14 @@ class qio_readPropagator: private qio_init {
   qio_readPropagator(): 
     qio_init(GJP.argc(), GJP.argv()), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0){}
 
-  // general reader
+  //! read propagator, auto-detect format
+  /*!
+    \param infile file to read from
+    \param prop   allocated memory for propagator
+    \param source allocated memory for source
+    \param max_Float_prop maximal number of Floats allocated for propagator
+    \param max_Float_source maximal number of Floats allocated for source
+  */
   qio_readPropagator(char *infile, void *prop, void *source, 
 		     const int max_Float_prop, const int max_Float_source, 
 		     int volFormat=QIO_UNKNOWN): 
@@ -54,13 +79,24 @@ class qio_readPropagator: private qio_init {
     {read(infile, prop, source, max_Float_prop, max_Float_source, volFormat);}
 
 
-  // read scS_12sink
+  //! read propagator, format scalar source + 12 sinks
+  /*!
+    \param infile file to read from
+    \param prop   allocated memory for propagator
+    \param source allocated memory for source
+  */
   qio_readPropagator(char *infile, void *prop, void *source, 
 		     int volFormat=QIO_UNKNOWN): 
     qio_init(GJP.argc(), GJP.argv()), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
     {read_ScS_12sink(infile, prop, source, volFormat);}
 
-  // read 12pairs
+  //! read propagator 12 pairs of sink and source
+  /*!
+    \param infile file to read from
+    \param sType  source type (full, scalar)
+    \param prop   allocated memory for propagator
+    \param source allocated memory for source
+  */
   qio_readPropagator(char *infile, const QIO_PROP_SOURCE_TYPES sType, void *prop, void *source, 
 		     int volFormat=QIO_UNKNOWN): 
     qio_init(GJP.argc(), GJP.argv()), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
@@ -74,14 +110,38 @@ class qio_readPropagator: private qio_init {
     #endif //DEBUG_Init
   }
 
+  //! read propagator, auto-detect format
+  /*!
+    \param infile file to read from
+    \param prop   allocated memory for propagator
+    \param source allocated memory for source
+    \param max_Float_prop maximal number of Floats allocated for propagator
+    \param max_Float_source maximal number of Floats allocated for source
+  */
   void read(char *infile, void *prop, void *source, int max_Float_prop, int max_Float_source, int volFormat=QIO_UNKNOWN);
 
+  //! read propagator, format scalar source + 12 sinks
+  /*!
+    \param infile file to read from
+    \param prop   allocated memory for propagator
+    \param source allocated memory for source
+  */
   void read_ScS_12sink(char *infile, void *prop, void *source, int volFormat=QIO_UNKNOWN);
 
+  //! read propagator 12 pairs of sink and source
+  /*!
+    \param infile file to read from
+    \param sType  source type (full, scalar)
+    \param prop   allocated memory for propagator
+    \param source allocated memory for source
+  */
   void read_12pairs(char *infile, void *prop, void *source, const QIO_PROP_SOURCE_TYPES sType, int volFormat=QIO_UNKNOWN);
 
+  //! number of sinks read
   int readProps;
+  //! number of sources read
   int readSources;
+  //! type of source read
   QIO_PROP_SOURCE_TYPES readSourceType;  // 0=UNKNOWN, 1=Scalar, 2=full
 
  private:

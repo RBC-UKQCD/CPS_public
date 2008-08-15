@@ -123,14 +123,18 @@ public:
   //void ReRun( const Float precision=1e-8);
 
   // this is the basic routine, do_rerun=0: normal run, do_rerun=1: load prop from file, rerun and compare with prec.
+  //! calculate the propagator (or, if do_rerun=1, load, recompute, compare)
   void Run( const int do_rerun, const Float precision=1e-8);
 
   // to have the usual call
+  //! calculate the propagator
   void Run() { Run(0);}
 
   // and a reminder for ReRun
+  //! reloads the propagator (QIO), recomputes it and does a comparison between those
   void ReRun( const Float precision=1e-8) { Run(1, precision);}
 
+  //! Loads a propagator(QIO) from file infile
   void ReLoad( char *infile);
 
   void CG(FermionVectorTp&, FermionVectorTp&, FermionVectorTp&, int&, Float&);

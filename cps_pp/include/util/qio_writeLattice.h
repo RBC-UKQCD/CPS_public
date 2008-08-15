@@ -22,14 +22,34 @@ class qio_writeLattice: private qio_init {
   qio_writeLattice( int argc, char *argv[]): qio_init(argc, argv), cname("qio_writeLattice")
     {initHeader();}
 
+  //! write a lattice configuration using QIO
+  /*!
+    \param outfile file to write to
+    \param lat pointer to lattice
+   */
   qio_writeLattice(char *outfile, Lattice &lat, int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
    qio_init(argc, argv), cname("qio_writeLattice")
     { initHeader(); write(outfile, "", lat, volFormat, floatFormat);}
 
+  //! write a lattice configuration using QIO, set add. info
+  /*!
+    \param outfile file to write to
+    \param lat pointer to lattice
+    \param ildgLFN ILDG logical file name
+   */
   qio_writeLattice(char *outfile, Lattice &lat, char *ildgLFN, int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
    qio_init(argc, argv), cname("qio_writeLattice")
     { initHeader(); write(outfile, ildgLFN, lat, volFormat, floatFormat);}
  
+  //! write a lattice configuration using QIO, set add. info
+  /*!
+    \param outfile file to write to
+    \param lat pointer to lattice
+    \param ildgLFN ILDG logical file name
+    \param ensemble_id ensemble ID
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+   */
   qio_writeLattice(char *outfile, Lattice &lat, char *ildgLFN, const char * ensemble_id, const char * ensemble_label, const int traj,
 		   int argc, char *argv[], int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
     qio_init(argc, argv), cname("qio_writeLattice")
@@ -37,17 +57,46 @@ class qio_writeLattice: private qio_init {
   
   // versions w/o argc/argv, using GJP
   
+  //! write a lattice configuration using QIO, set add. info
+  /*!
+    \param outfile file to write to
+    \param lat pointer to lattice
+    \param ildgLFN ILDG logical file name
+    \param ensemble_id ensemble ID
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+   */
   qio_writeLattice(): qio_init(GJP.argc(), GJP.argv()), cname("qio_writeLattice")
     {initHeader();}
 
+  //! write a lattice configuration using QIO
+  /*!
+    \param outfile file to write to
+    \param lat pointer to lattice
+  */
   qio_writeLattice(char *outfile, Lattice &lat, int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
    qio_init(GJP.argc(), GJP.argv()), cname("qio_writeLattice")
     { initHeader(); write(outfile, "", lat, volFormat, floatFormat);}
 
+  //! write a lattice configuration using QIO, set add. info
+  /*!
+    \param outfile file to write to
+    \param lat pointer to lattice
+    \param ildgLFN ILDG logical file name
+  */
   qio_writeLattice(char *outfile, Lattice &lat, char *ildgLFN, int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
    qio_init(GJP.argc(), GJP.argv()), cname("qio_writeLattice")
     { initHeader(); write(outfile, ildgLFN, lat, volFormat, floatFormat);}
  
+  //! write a lattice configuration using QIO, set add. info
+  /*!
+    \param outfile file to write to
+    \param lat pointer to lattice
+    \param ildgLFN ILDG logical file name
+    \param ensemble_id ensemble ID
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+   */
   qio_writeLattice(char *outfile, Lattice &lat, char *ildgLFN, const char * ensemble_id, const char * ensemble_label, const int traj,
 		   int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC):
    qio_init(GJP.argc(), GJP.argv()), cname("qio_writeLattice")
@@ -61,8 +110,20 @@ class qio_writeLattice: private qio_init {
     #endif // DEBUG_Init
   }
 
+  //! write a lattice configuration using QIO
+  /*!
+    \param outfile file to write to
+    \param lat pointer to lattice
+    \param ildgLFN ILDG logical file name
+  */
   void write(char *outfile, char *ildgLFN, Lattice &lat, int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC);
 
+  //! set additional info
+  /*!
+    \param ensemble_id ensemble ID
+    \param ensemble_label ensemble label
+    \param traj trajectory number
+   */
   void setHeader(const char * ensemble_id, const char * ensemble_label, const int traj);
 
  

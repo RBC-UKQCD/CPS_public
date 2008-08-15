@@ -22,6 +22,8 @@
 CPS_START_NAMESPACE
 using namespace std;
 
+#define IGNORE_QIO_BAD_XML
+
 
 // qio-factory functions outside class!!
 
@@ -1081,7 +1083,7 @@ int qio_readPropagator::qio_readNextPropagatorRecord(Float *rprop)
   char * fname="qio_readNextPropagatorRecord()";
   VRB.Func(cname,fname);
 
-  int return_val(0);
+  int return_val(0), return_val_info(0), return_val_decode(0);
 
   int sizepersite(QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX);
 
@@ -1094,13 +1096,31 @@ int qio_readPropagator::qio_readNextPropagatorRecord(Float *rprop)
   QIO_USQCDPropRecordInfo *qio_UserRecordInfo;
   qio_UserRecordInfo = QIO_create_usqcd_proprecord_sc_info(0, 0, "");
 
-  return_val += QIO_read_record_info( qio_Input, record, record_xml);
+  return_val_info += QIO_read_record_info( qio_Input, record, record_xml);
 
-  return_val += QIO_decode_usqcd_proprecord_info(qio_UserRecordInfo, record_xml);
+  return_val_decode += QIO_decode_usqcd_proprecord_info(qio_UserRecordInfo, record_xml);
 
-  if(return_val != 0)
+#ifdef IGNORE_QIO_BAD_XML
+  if(return_val_info == QIO_BAD_XML){
+    
+    VRB.Result(cname,fname,"WARNING QIO: reading info (prop record) returned %d (QIO_BAD_XML), IGNORING...\n",return_val_info);
+    return_val_info=0;
+
+  }
+
+   if(return_val_decode == QIO_BAD_XML){
+    
+    VRB.Result(cname,fname,"WARNING QIO: decoding info (prop record) returned %d (QIO_BAD_XML), IGNORING...\n",return_val_decode);
+    return_val_decode=0;
+
+  }
+#endif //IGNORE_QIO_BAD_XML
+
+
+
+  if(return_val_info != 0 || return_val_decode != 0)
     {
-      ERR.General(cname, fname,"ERROR QIO-Prop: failed reading next propagator record info!");
+      ERR.General(cname, fname,"ERROR QIO-Prop: failed reading next propagator record info!  read record: %d, decode_usqcd_propsource_info: %d\n", return_val_decode, return_val_info);
  
       QIO_destroy_record_info(record);
       QIO_string_destroy(record_xml);
@@ -1259,7 +1279,7 @@ int qio_readPropagator::qio_readNextPropagatorRecordSingle(Float *rprop)
   char * fname="qio_readNextPropagatorRecordSingle()";
   VRB.Func(cname,fname);
 
-  int return_val(0);
+  int return_val(0), return_val_info(0), return_val_decode(0);
 
   int sizepersite(QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX);
 
@@ -1272,13 +1292,30 @@ int qio_readPropagator::qio_readNextPropagatorRecordSingle(Float *rprop)
   QIO_USQCDPropRecordInfo *qio_UserRecordInfo;
   qio_UserRecordInfo = QIO_create_usqcd_proprecord_sc_info(0, 0, "");
 
-  return_val += QIO_read_record_info( qio_Input, record, record_xml);
+  return_val_info += QIO_read_record_info( qio_Input, record, record_xml);
 
-  return_val += QIO_decode_usqcd_proprecord_info(qio_UserRecordInfo, record_xml);
+  return_val_decode += QIO_decode_usqcd_proprecord_info(qio_UserRecordInfo, record_xml);
 
-  if(return_val != 0)
+#ifdef IGNORE_QIO_BAD_XML
+  if(return_val_info == QIO_BAD_XML){
+    
+    VRB.Result(cname,fname,"WARNING QIO: reading info (prop record) returned %d (QIO_BAD_XML), IGNORING...\n",return_val_info);
+    return_val_info=0;
+
+  }
+
+   if(return_val_decode == QIO_BAD_XML){
+    
+    VRB.Result(cname,fname,"WARNING QIO: decoding info (prop record) returned %d (QIO_BAD_XML), IGNORING...\n",return_val_decode);
+    return_val_decode=0;
+
+  }
+#endif //IGNORE_QIO_BAD_XML
+
+
+  if(return_val_info != 0 || return_val_decode != 0)
     {
-      ERR.General(cname, fname,"ERROR QIO-Prop: failed reading next propagator record info!");
+      ERR.General(cname, fname,"ERROR QIO-Prop: failed reading next propagator record info! read record: %d, decode_usqcd_propsource_info: %d\n", return_val_decode, return_val_info);
  
       QIO_destroy_record_info(record);
       QIO_string_destroy(record_xml);
@@ -1438,7 +1475,7 @@ int qio_readPropagator::qio_readNextPropPairRecord(Float *rprop, int &readSpin, 
   char * fname="qio_readNextPropPairRecord()";
   VRB.Func(cname,fname);
 
-  int return_val(0);
+  int return_val(0), return_val_info(0), return_val_decode(0);
 
   int sizepersite(QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX);
 
@@ -1451,13 +1488,30 @@ int qio_readPropagator::qio_readNextPropPairRecord(Float *rprop, int &readSpin, 
   QIO_USQCDPropRecordInfo *qio_UserRecordInfo;
   qio_UserRecordInfo = QIO_create_usqcd_proprecord_sc_info(0, 0, "");
 
-  return_val += QIO_read_record_info( qio_Input, record, record_xml);
+  return_val_info += QIO_read_record_info( qio_Input, record, record_xml);
 
-  return_val += QIO_decode_usqcd_proprecord_info(qio_UserRecordInfo, record_xml);
+  return_val_decode += QIO_decode_usqcd_proprecord_info(qio_UserRecordInfo, record_xml);
 
-  if(return_val != 0)
+#ifdef IGNORE_QIO_BAD_XML
+  if(return_val_info == QIO_BAD_XML){
+    
+    VRB.Result(cname,fname,"WARNING QIO: reading info (prop record) returned %d (QIO_BAD_XML), IGNORING...\n",return_val_info);
+    return_val_info=0;
+
+  }
+
+   if(return_val_decode == QIO_BAD_XML){
+    
+    VRB.Result(cname,fname,"WARNING QIO: decoding info (prop record) returned %d (QIO_BAD_XML), IGNORING...\n",return_val_decode);
+    return_val_decode=0;
+
+  }
+#endif //IGNORE_QIO_BAD_XML
+
+
+  if(return_val_decode != 0 || return_val_info != 0)
     {
-      ERR.General(cname, fname,"ERROR QIO-Prop: failed reading next source record info!");
+      ERR.General(cname, fname,"ERROR QIO-Prop: failed reading next prop record info! read record: %d, decode_usqcd_propsource_info: %d\n", return_val_decode, return_val_info);
  
       QIO_destroy_record_info(record);
       QIO_string_destroy(record_xml);
@@ -1751,7 +1805,7 @@ int qio_readPropagator::qio_readTmpSourceRecord(const QIO_PROP_SOURCE_TYPES sTyp
   char * fname="qio_readTmpSourceRecord()";
   VRB.Func(cname,fname);
 
-  int return_val(0);
+  int return_val(0), return_val_info(0), return_val_decode(0);
 
   QIO_RecordInfo *record;
   QIO_String *record_xml;
@@ -1762,13 +1816,31 @@ int qio_readPropagator::qio_readTmpSourceRecord(const QIO_PROP_SOURCE_TYPES sTyp
   QIO_USQCDPropSourceInfo *qio_UserRecordInfo;
   qio_UserRecordInfo = QIO_create_usqcd_propsource_info("");
 
-  return_val += QIO_read_record_info( qio_Input, record, record_xml);
+  return_val_info += QIO_read_record_info( qio_Input, record, record_xml);
 
-  return_val += QIO_decode_usqcd_propsource_info(qio_UserRecordInfo, record_xml);
+  return_val_decode += QIO_decode_usqcd_propsource_info(qio_UserRecordInfo, record_xml);
 
-  if(return_val != 0)
+
+#ifdef IGNORE_QIO_BAD_XML
+  if(return_val_info == QIO_BAD_XML){
+    
+    VRB.Result(cname,fname,"WARNING QIO: reading info (source record) returned %d (QIO_BAD_XML), IGNORING...\n",return_val_info);
+    return_val_info=0;
+
+  }
+
+   if(return_val_decode == QIO_BAD_XML){
+    
+    VRB.Result(cname,fname,"WARNING QIO: decoding info (source record) returned %d (QIO_BAD_XML), IGNORING...\n",return_val_decode);
+    return_val_decode=0;
+
+  }
+#endif //IGNORE_QIO_BAD_XML
+
+
+  if(return_val_decode != 0 || return_val_info != 0 )
     {
-      ERR.General(cname, fname,"ERROR QIO-Prop: failed reading next source record info!");
+      ERR.General(cname, fname,"ERROR QIO-Prop: failed reading next source record info! read record: %d, decode_usqcd_propsource_info: %d\n", return_val_decode, return_val_info );
  
       QIO_destroy_record_info(record);
       QIO_string_destroy(record_xml);

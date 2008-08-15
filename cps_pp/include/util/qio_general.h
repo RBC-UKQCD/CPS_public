@@ -148,9 +148,10 @@
 CPS_START_NAMESPACE
 using namespace std;
 
-
+//! source types
 enum QIO_PROP_SOURCE_TYPES {QIO_UNKNOWN_SOURCE=0, QIO_SCALAR_SOURCE, QIO_FULL_SOURCE};
 
+//! initialize everything needed for QIO
 class qio_init {
 
  private:

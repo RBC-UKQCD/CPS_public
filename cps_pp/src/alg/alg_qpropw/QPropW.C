@@ -597,7 +597,8 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      writePropQio.setHeader(qp_arg.ensemble_id, qp_arg.ensemble_label, qp_arg.seqNum, propType, sourceType);
      
      // just writing one time-slice?
-     if( (SrcType() == POINT) || (SrcType() == VOLUME) || (SrcType() == BOX) || (SrcType() == WALL) ){
+     if(  (!do_rerun) && 
+	  ( (SrcType() == POINT) || (SrcType() == BOX) || (SrcType() == WALL) ) ){
        VRB.Flow(cname,fname," source-type: %s only write t-slice %i to file\n",SourceType_map[SrcType()].name ,SourceTime());
        writePropQio.setSourceTslice(SourceTime());
      }
