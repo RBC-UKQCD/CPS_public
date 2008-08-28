@@ -1,7 +1,7 @@
 /*!\file
   \brief  Definition of the Dirac operator MinResExt method.
 
-  $Id: minresext.C,v 1.5 2006-02-21 21:14:08 chulwoo Exp $
+  $Id: minresext.C,v 1.6 2008-08-28 14:19:30 chulwoo Exp $
 */
 
 #include <config.h>
@@ -93,6 +93,7 @@ void DiracOp::MinResExt(Vector *psi, Vector *phi, Vector **v,
   for (int i=0; i<degree; i++) {
     b[i] = v[i] -> CompDotProductGlbSum(phi,f_size);
     MatPcDagMatPc(vm[i],v[i],&dot);
+    DiracOpGlbSum(&dot); // Fixes bug, from P. Vranas and M. Clark
     G[i][i].real(dot);
     G[i][i].imag(0.0);
   }
