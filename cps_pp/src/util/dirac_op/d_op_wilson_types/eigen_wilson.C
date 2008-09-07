@@ -342,9 +342,9 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
   }
 
   // Print out input parameters
-  VRB.Input(cname,fname,"mass = %g\n" ,IFloat(eig_arg->mass));
+  VRB.Result(cname,fname,"mass = %g\n" ,IFloat(eig_arg->mass));
   /* CLAUDIO: added N_eigacc */
-  VRB.Input(cname,fname,"N_eig = %d\n",N_eig);
+  VRB.Result(cname,fname,"N_eig = %d N_eigacc=%d fname=%s\n",N_eig,N_eigacc,eig_arg->fname);
   FILE * fp(Fopen(eig_arg->fname,"a"));
   Fprintf(fp,"neig = %i neigacc = %i\n",N_eig,N_eigacc);
 
@@ -877,6 +877,7 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
       }
       NCG_tot += nret;
       lambda_HH[i] = lambda_t;
+      MatHermElements(this, psi, tmp, N_eig, f_size, lambda_H, off_diag); 
       VRB.Debug(cname,fname,"no KS: lambda[%d] = %g\n",i,(IFloat)lambda_HH[i]);
     }
   }
@@ -928,10 +929,10 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
   VRB.Result(cname,fname,"Final Jacobi: n_jacob=%d  NCG=%d\n", 
       n_jacob,NCG_tot); 
 
-  //for(n = 0; n < N_eig; n++)
-  //  VRB.Result(cname,fname,"lambda_HH[%d] = %g\n",n,(float)lambda_HH[n]);
-  //for(n = 0; n < N_eig; n++)
-  //  VRB.Result(cname,fname,"lambda_H[%d] = %g\n",n,(float)lambda_H[n]);
+  for(n = 0; n < N_eig; n++)
+    VRB.Debug(cname,fname,"lambda_HH[%d] = %g\n",n,(float)lambda_HH[n]);
+  for(n = 0; n < N_eig; n++)
+    VRB.Debug(cname,fname,"lambda_H[%d] = %g\n",n,(float)lambda_H[n]);
 
   return NCG_tot;
 
@@ -957,6 +958,7 @@ void MatHermElements( DiracOpWilsonTypes * dirac_op,
   {
     dirac_op->RitzEigMat(tmp, psi[i]);
     diag[i] = psi[i]->ReDotProductGlbSum(tmp, f_size);
+    VRB.Debug("","MatHermElements","diag[%d] = %g\n",i,(float)diag[i]);
     for(int j = 0; j < i; j++)
       off_diag[ij++] = psi[j]->CompDotProductGlbSum(tmp, f_size);
   }

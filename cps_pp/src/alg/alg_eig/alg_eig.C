@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.23 2008-05-19 19:25:06 chulwoo Exp $
+  $Id: alg_eig.C,v 1.24 2008-09-07 04:35:38 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-19 19:25:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.23 2008-05-19 19:25:06 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.23 2008-05-19 19:25:06 chulwoo Exp $
+//  $Date: 2008-09-07 04:35:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.24 2008-09-07 04:35:38 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.24 2008-09-07 04:35:38 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -48,7 +48,7 @@ extern void gamma_5(Float *v_out, Float *v_in, int num_sites);
 int NumChkb( RitzMatType ritz_mat)
 {
   // Determine the number of checkerboards
-  int Ncb;
+  int Ncb(0);
   char *fname = "NumChkb(RitzType)";
   switch(ritz_mat)
   {
@@ -239,6 +239,7 @@ void AlgEig::run(Float **evalues)
   EigArg *eig_arg;
   char *fname = "run()";
   VRB.Func(cname,fname);
+  VRB.Result(cname,fname,"evalues=%p\n",evalues);
 
   // Set the Lattice pointer eig_arg
   //----------------------------------------------------------------
@@ -344,7 +345,8 @@ void AlgEig::run(Float **evalues)
   /* CLAUDIO: changed to loop over mass value */
   // Loop over masses
   int count(0);
-  while(eig_arg->mass*sign_dm<sign_dm*eig_arg->Mass_final){
+  while ( ( eig_arg->pattern_kind == ARRAY && count<n_masses ) ||
+  (eig_arg->mass*sign_dm<sign_dm*eig_arg->Mass_final) ){
     //for(int m=0; m<n_masses; m++){
     
     //for(Float mass = eig_arg->Mass_init; 
@@ -366,7 +368,7 @@ void AlgEig::run(Float **evalues)
 
     // random guess every time; do *not* put in the old solution
     /* CLAUDIO: PUT IN OLD SOLUTION!!! */
-    if(count==0) {
+    if(count==0 || (eig_arg->pattern_kind !=FLOW) ) {
     for(n = 0; n<N_eig; ++n)
     {
       lat.RandGaussVector(eigenv[n], 0.5, Ncb);
@@ -399,6 +401,8 @@ void AlgEig::run(Float **evalues)
       			hsum, eig_arg, CNV_FRM_NO);
 
    
+      for (int eig=0; eig<eig_arg->N_eig; eig++) 
+      VRB.Debug(cname,fname,"lambda[%d]=%e\n",eig,lambda[eig]);
     //!< Copy over eigenvalues to return them
     if (evalues != 0) {
       for (int eig=0; eig<eig_arg->N_eig; eig++) {
@@ -524,8 +528,8 @@ void AlgEig::run(Float **evalues)
 
     // If there is another mass loop iteration ahead, we should
     // set the eig_arg->mass to it's next desired value
-   
-    //if( m < n_masses - 1 ) {
+  
+    if( count < n_masses - 1 ) {
       switch( eig_arg->pattern_kind ) {
       case ARRAY: 
 	eig_arg->mass = eig_arg->Mass.Mass_val[count+1]; 
@@ -540,7 +544,7 @@ void AlgEig::run(Float **evalues)
 	eig_arg->mass += sign_dm*fabs(lambda[1]); 
 	break;
       }
-      //}
+    }
     count++;
   } // mass loop
 
