@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations of collective communications routines
 
-  $Id: glb.h,v 1.7 2005-05-09 15:22:11 chulwoo Exp $
+  $Id: glb.h,v 1.8 2008-09-18 14:40:18 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-05-09 15:22:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v 1.7 2005-05-09 15:22:11 chulwoo Exp $
-//  $Id: glb.h,v 1.7 2005-05-09 15:22:11 chulwoo Exp $
+//  $Date: 2008-09-18 14:40:18 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v 1.8 2008-09-18 14:40:18 chulwoo Exp $
+//  $Id: glb.h,v 1.8 2008-09-18 14:40:18 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v $
 //  $State: Exp $
 //
@@ -29,7 +29,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/lattice.h>
-#include <comms/nga_reg.h>
+//#include <comms/nga_reg.h>
 CPS_START_NAMESPACE
 
 /*! \defgroup collectivecomms Collective communications routines
