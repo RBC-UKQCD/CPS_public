@@ -170,7 +170,7 @@ void Lattice::Convert(StrOrdType new_str_ord)
 			  setCbufCntrlReg(4, CBUF_MODE4);
 			  
 			  for(int i = 0; i < n_links; ++i) {
-			    mp2->Dagger((IFloat *)p+BANK4_BASE);
+			    mp2->Dagger((IFloat *)p);
 //			    moveMem((IFloat *)(p++), (IFloat *)mp2,
 //				    18*sizeof(IFloat));
 			    moveFloat((IFloat *)(p++), (IFloat *)mp2, 18);
@@ -215,7 +215,7 @@ void Lattice::Convert(StrOrdType new_str_ord)
 			  setCbufCntrlReg(4, CBUF_MODE4);
 			  
 			  for(int i = 0; i < n_links; ++i) {
-			    mp2->Dagger((IFloat *)p+BANK4_BASE);
+			    mp2->Dagger((IFloat *)p);
 //			    moveMem((IFloat *)(p++), (IFloat *)mp2,
 //				    18*sizeof(IFloat));
 			    moveFloat((IFloat *)(p++), (IFloat *)mp2, 18);

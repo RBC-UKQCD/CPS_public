@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GpowerRect class.
 
-  $Id: g_power_rect.C,v 1.6 2006-04-13 18:21:52 chulwoo Exp $
+  $Id: g_power_rect.C,v 1.7 2008-09-18 15:23:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 18:21:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_rect/g_power_rect.C,v 1.6 2006-04-13 18:21:52 chulwoo Exp $
-//  $Id: g_power_rect.C,v 1.6 2006-04-13 18:21:52 chulwoo Exp $
+//  $Date: 2008-09-18 15:23:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_rect/g_power_rect.C,v 1.7 2008-09-18 15:23:17 chulwoo Exp $
+//  $Id: g_power_rect.C,v 1.7 2008-09-18 15:23:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_rect/g_power_rect.C,v $
 //  $State: Exp $
 //
@@ -153,7 +153,7 @@ void GpowerRect::GforceSite(Matrix& force, int *x, int mu)
   //----------------------------------------------------------------------------
   // mp2 = U_mu(x)
   //----------------------------------------------------------------------------
-  moveMem((IFloat *)mp2, (IFloat *)u_off+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp2, (IFloat *)u_off,
           MATRIX_SIZE*sizeof(IFloat)) ;
 
   //----------------------------------------------------------------------------
@@ -173,7 +173,7 @@ void GpowerRect::GforceSite(Matrix& force, int *x, int mu)
   //----------------------------------------------------------------------------
   // mp2 = -(1/3)*U_mu(x)
   //----------------------------------------------------------------------------
-  moveMem((IFloat *)mp2, (IFloat *)u_off+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp2, (IFloat *)u_off,
           MATRIX_SIZE*sizeof(IFloat));
 
   tmp = coeff ;
@@ -218,7 +218,7 @@ ForceArg GpowerRect::EvolveMomGforce(Matrix *mom, Float dt){
 
       IFloat *ihp = (IFloat *)(mom+uoff+mu);
       IFloat *dotp = (IFloat *)mp0;
-      fTimesV1PlusV2(ihp, dt, dotp, ihp+BANK4_BASE, 18);
+      fTimesV1PlusV2(ihp, dt, dotp, ihp, 18);
       Float norm = ((Matrix*)dotp)->norm();
       Float tmp = sqrt(norm);
       L1 += tmp;
@@ -443,7 +443,7 @@ void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
       // mp3 = U_u(x+v)~
       //----------------------------------------------------------
       p1 = GetLinkOld(g_offset, x, nu, mu);
-      mp3->Dagger((IFloat *)p1+BANK4_BASE+BANK_SIZE);
+      mp3->Dagger((IFloat *)p1);
 
       //----------------------------------------------------------
       // p1 = &U_v(x+u)
@@ -454,13 +454,13 @@ void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
       // mp2 = U_v(x+u) U_u(x+v)~
       //----------------------------------------------------------
       mDotMEqual((IFloat *)mp2, 
-		 (const IFloat *)p1+BANK2_BASE,
+		 (const IFloat *)p1,
 		 (const IFloat *)mp3);
       
       //----------------------------------------------------------
       //  mp3 = U_v(x)~
       //----------------------------------------------------------
-      mp3->Dagger((IFloat *)(g_offset+nu)+BANK4_BASE);
+      mp3->Dagger((IFloat *)(g_offset+nu));
       
       //----------------------------------------------------------
       // m_tmp1 = mp2*mp3 = m_tmp1*U_v(x+u)*U_u(x+v)~*U_v(x)~
@@ -473,7 +473,7 @@ void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
       // m_tmp2 = U_u(x)*m_tmp1 = U_u(x)*U_v(x+u)*U_u(x+v)~*U_v(x)~
       //----------------------------------------------------------
       mDotMEqual((IFloat *)&m_tmp2, 
-		 (const IFloat *)(g_offset+mu)+BANK2_BASE,
+		 (const IFloat *)(g_offset+mu),
 		 (const IFloat *)&m_tmp1);
 
       //----------------------------------------------------------
@@ -497,11 +497,11 @@ void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
       //----------------------------------------------------------
       if( nu == 0  ||  (mu==0 && nu==1) )
 	moveMem((IFloat *)&pstap, 
-		(const IFloat *)&m_tmp1+BANK4_BASE, 
+		(const IFloat *)&m_tmp1, 
 		MATRIX_SIZE*sizeof(Float));
       else
 	vecAddEquVec((IFloat *)&pstap, 
-		     (const IFloat *)&m_tmp1+BANK4_BASE,
+		     (const IFloat *)&m_tmp1,
 		     MATRIX_SIZE);
 
       
@@ -520,14 +520,14 @@ void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
       // mp3 = U_v(x+u-v)
       //----------------------------------------------------------
       p1 = GetLinkOld(g_offpv, x, mu, nu);
-      moveMem((IFloat *)mp3, (IFloat *)p1+BANK2_BASE, 
+      moveMem((IFloat *)mp3, (IFloat *)p1, 
 	      MATRIX_SIZE * sizeof(IFloat));
 
       //----------------------------------------------------------
       // mp2 = U_u(x-v)*U_v(x+u-v)
       //----------------------------------------------------------
       mDotMEqual((IFloat *)mp2, 
-		 (const IFloat *)(g_offpv+mu)+BANK4_BASE,
+		 (const IFloat *)(g_offpv+mu),
 		 (const IFloat *)mp3);
       
       //----------------------------------------------------------
@@ -540,7 +540,7 @@ void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
       // mp2 = U_v(x-v)
       //----------------------------------------------------------
       moveMem((IFloat *)mp2, 
-	      (const IFloat *)(g_offpv+nu)+BANK2_BASE,
+	      (const IFloat *)(g_offpv+nu),
 	      MATRIX_SIZE * sizeof(IFloat));
       
       //----------------------------------------------------------
@@ -565,7 +565,7 @@ void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
       // m_tmp2 = U_m(x)*m_tmp1 = U_v(x+u-v)~*U_u(x-v)~*U_v(x-v)*U_u(x)
       //----------------------------------------------------------
       mDotMEqual((IFloat *)&m_tmp2, 
-		 (const IFloat *)(g_offset+mu)+BANK4_BASE,
+		 (const IFloat *)(g_offset+mu),
 		 (const IFloat *)&m_tmp1);
 
       //----------------------------------------------------------
@@ -588,7 +588,7 @@ void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
       // Add to the staple
       //----------------------------------------------------------
       vecAddEquVec((IFloat *)&pstap, 
-		   (IFloat *)&m_tmp1+BANK2_BASE,
+		   (IFloat *)&m_tmp1,
 		   MATRIX_SIZE);
 
     }
@@ -670,13 +670,13 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // mp4 = U_v(x)~
     //----------------------------------------------------------
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_u(x+v)~
     //----------------------------------------------------------
     ++(link_site[nu]) ;
-    mp3->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE+BANK_SIZE) ;
+    mp3->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_u(x+v)~ U_v(x)~
@@ -687,7 +687,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x+u+v)~
     //----------------------------------------------------------
     ++(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE);
+    mp4->Dagger((IFloat *)GetLink(link_site, mu));
 
     //----------------------------------------------------------
     // mp3 = U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
@@ -704,14 +704,14 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // mp4 = U_v(x+2u) U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
     //----------------------------------------------------------
-    mDotMEqual((IFloat *)mp4, (const IFloat *)p1+BANK4_BASE+BANK_SIZE,
+    mDotMEqual((IFloat *)mp4, (const IFloat *)p1,
                (const IFloat *)mp3);
 
     //----------------------------------------------------------
     // mp2 = U_u(x+u)
     //----------------------------------------------------------
     --(link_site[mu]) ;
-    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, mu)+BANK4_BASE,
+    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, mu),
             MATRIX_SIZE * sizeof(IFloat)) ;
 
 //PMV
@@ -728,7 +728,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // m_tmp2 = U_u(x)*m_tmp1 
     //----------------------------------------------------------
     mDotMEqual((IFloat *)&m_tmp2, 
-	       (const IFloat *)(g_offset+mu)+BANK4_BASE+BANK_SIZE,
+	       (const IFloat *)(g_offset+mu),
 	       (const IFloat *)&m_tmp1);
 
     //----------------------------------------------------------
@@ -751,7 +751,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // Add to the staple
     //----------------------------------------------------------
     vecAddEquVec((IFloat *)&rect, 
-		 (const IFloat *)&m_tmp1+BANK4_BASE,
+		 (const IFloat *)&m_tmp1,
 		 MATRIX_SIZE);
 
 //PMV
@@ -761,7 +761,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     ++(link_site[mu]) ;
     --(link_site[nu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_u(x+u) U_v(x+2u-v)~
@@ -772,7 +772,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x+u-v)~
     //----------------------------------------------------------
     --(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_u(x+u) U_v(x+2u-v)~ U_u(x+u-v)~
@@ -783,7 +783,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x-v)~
     //----------------------------------------------------------
     --(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_u(x+u) U_v(x+2u-v)~ U_u(x+u-v)~ U_u(x-v)~
@@ -793,7 +793,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // mp2 = U_v(x-v)
     //----------------------------------------------------------
-    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, nu)+BANK4_BASE,
+    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, nu),
             MATRIX_SIZE * sizeof(IFloat)) ;
 
 //PMV
@@ -810,7 +810,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // m_tmp2 = U_u(x)*m_tmp1 
     //----------------------------------------------------------
     mDotMEqual((IFloat *)&m_tmp2, 
-	       (const IFloat *)(g_offset+mu)+BANK4_BASE+BANK_SIZE,
+	       (const IFloat *)(g_offset+mu),
 	       (const IFloat *)&m_tmp1);
 
     //----------------------------------------------------------
@@ -833,7 +833,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // Add to the staple
     //----------------------------------------------------------
     vecAddEquVec((IFloat *)&rect, 
-		 (const IFloat *)&m_tmp1+BANK4_BASE,
+		 (const IFloat *)&m_tmp1,
 		 MATRIX_SIZE);
 
 //PMV
@@ -847,13 +847,13 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // mp3 = U_v(x-2v) U_v(x-v)
     //----------------------------------------------------------
-    mDotMEqual((IFloat *)mp3, (const IFloat *)p1+BANK4_BASE+BANK_SIZE,
+    mDotMEqual((IFloat *)mp3, (const IFloat *)p1,
                (const IFloat *)mp2) ;
 
     //----------------------------------------------------------
     // mp4 = U_u(x-2v)~
     //----------------------------------------------------------
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_u(x-2v)~ U_v(x-2v) U_v(x-v)
@@ -864,7 +864,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_v(x+u-2v)~
     //----------------------------------------------------------
     ++(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_v(x+u-2v)~ U_u(x-2v)~ U_v(x-2v) U_v(x-v)
@@ -875,7 +875,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp2 = U_v(x+u-v)~
     //----------------------------------------------------------
     ++(link_site[nu]) ;
-    mp2->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE) ;
+    mp2->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
 //PMV
 
@@ -891,7 +891,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // m_tmp2 = U_u(x)*m_tmp1 
     //----------------------------------------------------------
     mDotMEqual((IFloat *)&m_tmp2, 
-	       (const IFloat *)(g_offset+mu)+BANK4_BASE+BANK_SIZE,
+	       (const IFloat *)(g_offset+mu),
 	       (const IFloat *)&m_tmp1);
 
     //----------------------------------------------------------
@@ -914,7 +914,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // Add to the staple
     //----------------------------------------------------------
     vecAddEquVec((IFloat *)&rect, 
-		 (const IFloat *)&m_tmp1+BANK4_BASE,
+		 (const IFloat *)&m_tmp1,
 		 MATRIX_SIZE);
 
 //PMV
@@ -923,7 +923,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x-v)~
     //----------------------------------------------------------
     --(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp3 =  U_v(x+u-v)~ U_u(x-v)~
@@ -934,7 +934,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x-u-v)~
     //----------------------------------------------------------
     --(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_v(x+u-v)~ U_u(x-v)~ U_u(x-u-v)~
@@ -960,7 +960,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_v(x-u-v)
     //----------------------------------------------------------
     moveMem((IFloat *)mp4,
-            (const IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE,
+            (const IFloat *)GetLink(link_site, nu),
             MATRIX_SIZE*sizeof(IFloat)) ;
 
     //----------------------------------------------------------
@@ -974,7 +974,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp2 = U_u(x-u)
     //----------------------------------------------------------
     ++(link_site[nu]) ;
-    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, mu)+BANK4_BASE,
+    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, mu),
             MATRIX_SIZE * sizeof(IFloat)) ;
 
 //PMV
@@ -991,7 +991,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // m_tmp2 = U_u(x)*m_tmp1 
     //----------------------------------------------------------
     mDotMEqual((IFloat *)&m_tmp2, 
-	       (const IFloat *)(g_offset+mu)+BANK4_BASE+BANK_SIZE,
+	       (const IFloat *)(g_offset+mu),
 	       (const IFloat *)&m_tmp1);
 
     //----------------------------------------------------------
@@ -1014,7 +1014,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // Add to the staple
     //----------------------------------------------------------
     vecAddEquVec((IFloat *)&rect, 
-		 (const IFloat *)&m_tmp1+BANK4_BASE,
+		 (const IFloat *)&m_tmp1,
 		 MATRIX_SIZE);
 
 //PMV
@@ -1022,7 +1022,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // mp4 = U_v(x-u)~
     //----------------------------------------------------------
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_v(x-u)~ U_u(x-u)
@@ -1033,7 +1033,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x-u+v)~
     //----------------------------------------------------------
     ++(link_site[nu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_u(x-u+v)~ U_v(x-u)~ U_u(x-u)
@@ -1044,7 +1044,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x+v)~
     //----------------------------------------------------------
     ++(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_u(x+v)~ U_u(x-u+v)~ U_v(x-u)~ U_u(x-u)
@@ -1056,7 +1056,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     ++(link_site[mu]) ;
     --(link_site[nu]) ;
-    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, nu)+BANK4_BASE,
+    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, nu),
             MATRIX_SIZE * sizeof(IFloat)) ;
 
 
@@ -1074,7 +1074,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // m_tmp2 = U_u(x)*m_tmp1 
     //----------------------------------------------------------
     mDotMEqual((IFloat *)&m_tmp2, 
-	       (const IFloat *)(g_offset+mu)+BANK4_BASE+BANK_SIZE,
+	       (const IFloat *)(g_offset+mu),
 	       (const IFloat *)&m_tmp1);
 
     //----------------------------------------------------------
@@ -1097,7 +1097,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // Add to the staple
     //----------------------------------------------------------
     vecAddEquVec((IFloat *)&rect, 
-		 (const IFloat *)&m_tmp1+BANK4_BASE,
+		 (const IFloat *)&m_tmp1,
 		 MATRIX_SIZE);
 
 //PMV
@@ -1124,7 +1124,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     ++(link_site[nu]) ;
     moveMem((IFloat *)mp4,
-            (const IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE,
+            (const IFloat *)GetLink(link_site, nu),
             MATRIX_SIZE*sizeof(IFloat)) ;
 
     //----------------------------------------------------------
@@ -1139,7 +1139,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     --(link_site[mu]) ;
     ++(link_site[nu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_v(x+u) U_v(x+u+v) U_u(x+2v)~
@@ -1150,7 +1150,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_v(x+v)~
     //----------------------------------------------------------
     --(link_site[nu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_v(x+u) U_v(x+u+v) U_u(x+2v)~ U_v(x+v)~
@@ -1161,7 +1161,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // mp2 = U_v(x)~
     //----------------------------------------------------------
     --(link_site[nu]) ;
-    mp2->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE) ;
+    mp2->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
 
 //PMV
@@ -1178,7 +1178,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // m_tmp2 = U_u(x)*m_tmp1 
     //----------------------------------------------------------
     mDotMEqual((IFloat *)&m_tmp2, 
-	       (const IFloat *)(g_offset+mu)+BANK4_BASE+BANK_SIZE,
+	       (const IFloat *)(g_offset+mu),
 	       (const IFloat *)&m_tmp1);
 
     //----------------------------------------------------------
@@ -1201,7 +1201,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     // Add to the staple
     //----------------------------------------------------------
     vecAddEquVec((IFloat *)&rect, 
-		 (const IFloat *)&m_tmp1+BANK4_BASE,
+		 (const IFloat *)&m_tmp1,
 		 MATRIX_SIZE);
 
 //PMV
@@ -1209,7 +1209,7 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // dummy read to switch CBUF banks for looping
     //----------------------------------------------------------
-    *((IFloat *)mp4) = *((IFloat *)p1+BANK4_BASE+BANK_SIZE) ;
+    *((IFloat *)mp4) = *((IFloat *)p1) ;
   }
 
 //VRB.FuncEnd(cname, fname) ;

@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.52 2008-04-21 14:19:18 chulwoo Exp $
+  $Id: lattice_base.C,v 1.53 2008-09-18 15:23:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-21 14:19:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.52 2008-04-21 14:19:18 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.52 2008-04-21 14:19:18 chulwoo Exp $
+//  $Date: 2008-09-18 15:23:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.53 2008-09-18 15:23:17 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.53 2008-09-18 15:23:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.52 $
+//  $Revision: 1.53 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -589,7 +589,7 @@ void Lattice::Staple(Matrix& stap, int *x, int mu)
       // mp3 = U_u(x+v)~
       //----------------------------------------------------------
       p1 = GetLinkOld(g_offset, x, nu, mu);
-      mp3->Dagger((IFloat *)p1+BANK4_BASE+BANK_SIZE);
+      mp3->Dagger((IFloat *)p1);
 
 
       //----------------------------------------------------------
@@ -601,14 +601,14 @@ void Lattice::Staple(Matrix& stap, int *x, int mu)
       //----------------------------------------------------------
       // mp2 = U_v(x+u) U_u(x+v)~
       //----------------------------------------------------------
-      mDotMEqual((IFloat *)mp2, (const IFloat *)p1+BANK2_BASE,
+      mDotMEqual((IFloat *)mp2, (const IFloat *)p1,
 		 (const IFloat *)mp3);
       
 
       //----------------------------------------------------------
       //  mp3 = U_v(x)~
       //----------------------------------------------------------
-      mp3->Dagger((IFloat *)(g_offset+nu)+BANK4_BASE);
+      mp3->Dagger((IFloat *)(g_offset+nu));
       
 
       //----------------------------------------------------------
@@ -639,14 +639,14 @@ void Lattice::Staple(Matrix& stap, int *x, int mu)
       // mp3 = U_v(x+u-v)
       //----------------------------------------------------------
       p1 = GetLinkOld(g_offpv, x, mu, nu);
-      moveMem((IFloat *)mp3, (IFloat *)p1+BANK2_BASE, 
+      moveMem((IFloat *)mp3, (IFloat *)p1, 
 	      MATRIX_SIZE * sizeof(IFloat));
 
 
       //----------------------------------------------------------
       // mp2 = U_u(x-v) U_v(x+u-v)
       //----------------------------------------------------------
-      mDotMEqual((IFloat *)mp2, (const IFloat *)(g_offpv+mu)+BANK4_BASE,
+      mDotMEqual((IFloat *)mp2, (const IFloat *)(g_offpv+mu),
 		 (const IFloat *)mp3);
       
 
@@ -659,7 +659,7 @@ void Lattice::Staple(Matrix& stap, int *x, int mu)
       //----------------------------------------------------------
       // mp2 = U_v(x-v)
       //----------------------------------------------------------
-      moveMem((IFloat *)mp2, (const IFloat *)(g_offpv+nu)+BANK2_BASE,
+      moveMem((IFloat *)mp2, (const IFloat *)(g_offpv+nu),
 	  MATRIX_SIZE * sizeof(IFloat));
       
 
@@ -675,14 +675,14 @@ void Lattice::Staple(Matrix& stap, int *x, int mu)
 		     MATRIX_SIZE, nu);
 	
 	//stap += m_tmp2;
-	vecAddEquVec((IFloat *)&stap, (IFloat *)&m_tmp2+BANK4_BASE,
+	vecAddEquVec((IFloat *)&stap, (IFloat *)&m_tmp2,
 		MATRIX_SIZE);
 	
       } else {
 	mDotMPlus((IFloat *)&stap, (const IFloat *)mp3,
 		  (const IFloat *)mp2);
         // dummy read
-	*((IFloat *)mp2) = *((IFloat *)g_offpv+BANK4_BASE);
+	*((IFloat *)mp2) = *((IFloat *)g_offpv);
       }
     }
   }
@@ -748,13 +748,13 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // mp4 = U_v(x)~
     //----------------------------------------------------------
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_mu(x+v)~
     //----------------------------------------------------------
     ++(link_site[nu]) ;
-    mp3->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE+BANK_SIZE) ;
+    mp3->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_u(x+v)~ U_v(x)~
@@ -765,7 +765,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x+u+v)~
     //----------------------------------------------------------
     ++(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE);
+    mp4->Dagger((IFloat *)GetLink(link_site, mu));
 
     //----------------------------------------------------------
     // mp3 = U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
@@ -782,14 +782,14 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // mp4 = U_v(x+2u) U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
     //----------------------------------------------------------
-    mDotMEqual((IFloat *)mp4, (const IFloat *)p1+BANK4_BASE+BANK_SIZE,
+    mDotMEqual((IFloat *)mp4, (const IFloat *)p1,
                (const IFloat *)mp3);
 
     //----------------------------------------------------------
     // mp2 = U_u(x+u)
     //----------------------------------------------------------
     --(link_site[mu]) ;
-    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, mu)+BANK4_BASE,
+    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, mu),
             MATRIX_SIZE * sizeof(IFloat)) ;
 
     //----------------------------------------------------------
@@ -804,7 +804,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     ++(link_site[mu]) ;
     --(link_site[nu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_u(x+u) U_v(x+2u-v)~
@@ -815,7 +815,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x+u-v)~
     //----------------------------------------------------------
     --(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_u(x+u) U_v(x+2u-v)~ U_u(x+u-v)~
@@ -826,7 +826,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x-v)~
     //----------------------------------------------------------
     --(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_u(x+u) U_v(x+2u-v)~ U_u(x+u-v)~ U_u(x-v)~
@@ -836,7 +836,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // mp2 = U_v(x-v)
     //----------------------------------------------------------
-    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, nu)+BANK4_BASE,
+    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, nu),
             MATRIX_SIZE * sizeof(IFloat)) ;
 
     //----------------------------------------------------------
@@ -855,13 +855,13 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // mp3 = U_v(x-2v) U_v(x-v)
     //----------------------------------------------------------
-    mDotMEqual((IFloat *)mp3, (const IFloat *)p1+BANK4_BASE+BANK_SIZE,
+    mDotMEqual((IFloat *)mp3, (const IFloat *)p1,
                (const IFloat *)mp2) ;
 
     //----------------------------------------------------------
     // mp4 = U_u(x-2v)~
     //----------------------------------------------------------
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_u(x-2v)~ U_v(x-2v) U_v(x-v)
@@ -872,7 +872,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_v(x+u-2v)~
     //----------------------------------------------------------
     ++(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_v(x+u-2v)~ U_u(x-2v)~ U_v(x-2v) U_v(x-v)
@@ -883,7 +883,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp2 = U_v(x+u-v)~
     //----------------------------------------------------------
     ++(link_site[nu]) ;
-    mp2->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE) ;
+    mp2->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // rect += U_v(x+u-v)~ U_v(x+u-2v)~ U_u(x-2v)~ U_v(x-2v) U_v(x-v)
@@ -896,7 +896,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x-v)~
     //----------------------------------------------------------
     --(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp3 =  U_v(x+u-v)~ U_u(x-v)~
@@ -907,7 +907,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x-u-v)~
     //----------------------------------------------------------
     --(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_v(x+u-v)~ U_u(x-v)~ U_u(x-u-v)~
@@ -925,7 +925,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
 //  // mp3 = U_v(x+u-v)~ U_u(x-v)~ U_u(x-u-v)~ U_v(x-u-v)
 //  //----------------------------------------------------------
 //  mDotMEqual((IFloat *)mp3, (const IFloat *)mp2,
-//             (const IFloat *)p1+BANK4_BASE+BANK_SIZE) ;
+//             (const IFloat *)p1) ;
 //
 //  GRF: here is a work-around
 
@@ -933,7 +933,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_v(x-u-v)
     //----------------------------------------------------------
     moveMem((IFloat *)mp4,
-            (const IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE,
+            (const IFloat *)GetLink(link_site, nu),
             MATRIX_SIZE*sizeof(IFloat)) ;
 
     //----------------------------------------------------------
@@ -947,7 +947,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp2 = U_u(x-u)
     //----------------------------------------------------------
     ++(link_site[nu]) ;
-    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, mu)+BANK4_BASE,
+    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, mu),
             MATRIX_SIZE * sizeof(IFloat)) ;
 
     //----------------------------------------------------------
@@ -960,7 +960,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // mp4 = U_v(x-u)~
     //----------------------------------------------------------
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_v(x-u)~ U_u(x-u)
@@ -971,7 +971,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x-u+v)~
     //----------------------------------------------------------
     ++(link_site[nu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_u(x-u+v)~ U_v(x-u)~ U_u(x-u)
@@ -982,7 +982,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_u(x+v)~
     //----------------------------------------------------------
     ++(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_u(x+v)~ U_u(x-u+v)~ U_v(x-u)~ U_u(x-u)
@@ -994,7 +994,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     ++(link_site[mu]) ;
     --(link_site[nu]) ;
-    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, nu)+BANK4_BASE,
+    moveMem((IFloat *)mp2, (const IFloat *)GetLink(link_site, nu),
             MATRIX_SIZE * sizeof(IFloat)) ;
 
     //----------------------------------------------------------
@@ -1016,7 +1016,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
 //  // mp3 = U_v(x+u) U_v(x+u+v)
 //  //----------------------------------------------------------
 //  mDotMEqual((IFloat *)mp3, (const IFloat *)mp2,
-//             (const IFloat *)p1+BANK4_BASE+BANK_SIZE) ;
+//             (const IFloat *)p1) ;
 //
 //  GRF: here is a work-around
 
@@ -1025,7 +1025,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     ++(link_site[nu]) ;
     moveMem((IFloat *)mp4,
-            (const IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE,
+            (const IFloat *)GetLink(link_site, nu),
             MATRIX_SIZE*sizeof(IFloat)) ;
 
     //----------------------------------------------------------
@@ -1040,7 +1040,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     --(link_site[mu]) ;
     ++(link_site[nu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_v(x+u) U_v(x+u+v) U_u(x+2v)~
@@ -1051,7 +1051,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp4 = U_v(x+v)~
     //----------------------------------------------------------
     --(link_site[nu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE+BANK_SIZE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_v(x+u) U_v(x+u+v) U_u(x+2v)~ U_v(x+v)~
@@ -1062,7 +1062,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     // mp2 = U_v(x)~
     //----------------------------------------------------------
     --(link_site[nu]) ;
-    mp2->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE) ;
+    mp2->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // rect += U_v(x+u) U_v(x+u+v) U_u(x+2v)~ U_v(x+v)~  U_v(x)~
@@ -1072,7 +1072,7 @@ void Lattice::RectStaple(Matrix& rect, int *x, int mu)
     //----------------------------------------------------------
     // dummy read to switch CBUF banks for looping
     //----------------------------------------------------------
-    *((IFloat *)mp4) = *((IFloat *)p1+BANK4_BASE+BANK_SIZE) ;
+    *((IFloat *)mp4) = *((IFloat *)p1) ;
   }
 }
 
@@ -1114,9 +1114,9 @@ void Lattice::Plaq(Matrix &plaq, int *x, int mu, int nu) const
   //    p1 = &U_v(x+u) --> mp2
   //----------------------------------------
   p1 = GetLinkOld(g_offset, x, mu, nu);
-  moveMem((IFloat *)mp2, (const IFloat *)p1+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp2, (const IFloat *)p1,
           MATRIX_SIZE * sizeof(IFloat));
-  mDotMEqual((IFloat *)mp3, (const IFloat *)(g_offset+mu)+BANK4_BASE,
+  mDotMEqual((IFloat *)mp3, (const IFloat *)(g_offset+mu),
              (const IFloat *)mp2);
   
   //----------------------------------------
@@ -1126,9 +1126,9 @@ void Lattice::Plaq(Matrix &plaq, int *x, int mu, int nu) const
   //    mp1 = mp2~
   //----------------------------------------
   p1 = GetLinkOld(g_offset, x, nu, mu);
-  moveMem((IFloat *)mp1, (const IFloat *)p1+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp1, (const IFloat *)p1,
           MATRIX_SIZE * sizeof(IFloat));
-  mDotMEqual((IFloat *)mp2, (const IFloat *)(g_offset+nu)+BANK4_BASE,
+  mDotMEqual((IFloat *)mp2, (const IFloat *)(g_offset+nu),
              (const IFloat *)mp1);
   mp1->Dagger((IFloat *)mp2);
  
@@ -1171,9 +1171,9 @@ Float Lattice::ReTrPlaq(int *x, int mu, int nu) const
   //	p1 = &U_v(x+u) --> mp2
   //----------------------------------------
   p1 = GetLinkOld(g_offset, x, mu, nu);
-  moveMem((IFloat *)mp2, (const IFloat *)p1+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp2, (const IFloat *)p1,
 	  MATRIX_SIZE * sizeof(IFloat));
-  mDotMEqual((IFloat *)mp3, (const IFloat *)(g_offset+mu)+BANK4_BASE,
+  mDotMEqual((IFloat *)mp3, (const IFloat *)(g_offset+mu),
 	     (const IFloat *)mp2);
 
 
@@ -1184,9 +1184,9 @@ Float Lattice::ReTrPlaq(int *x, int mu, int nu) const
   //	mp1 = mp2~
   //----------------------------------------
   p1 = GetLinkOld(g_offset, x, nu, mu);
-  moveMem((IFloat *)mp1, (const IFloat *)p1+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp1, (const IFloat *)p1,
 	  MATRIX_SIZE * sizeof(IFloat));
-  mDotMEqual((IFloat *)mp2, (const IFloat *)(g_offset+nu)+BANK4_BASE,
+  mDotMEqual((IFloat *)mp2, (const IFloat *)(g_offset+nu),
 	     (const IFloat *)mp1);
   mp1->Dagger((IFloat *)mp2);
 
@@ -1310,13 +1310,13 @@ Float Lattice::ReTrRect(int *x, int mu, int nu) const
     //----------------------------------------------------------
     // mp4 = U_v(x)~
     //----------------------------------------------------------
-    mp4->Dagger((IFloat *)GetLink(link_site, nu)+BANK4_BASE) ;
+    mp4->Dagger((IFloat *)GetLink(link_site, nu)) ;
 
     //----------------------------------------------------------
     // mp3 = U_u(x+v)~
     //----------------------------------------------------------
     ++(link_site[nu]) ;
-    mp3->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE+BANK_SIZE) ;
+    mp3->Dagger((IFloat *)GetLink(link_site, mu)) ;
 
     //----------------------------------------------------------
     // mp2 = U_u(x+v)~ U_v(x)~
@@ -1327,7 +1327,7 @@ Float Lattice::ReTrRect(int *x, int mu, int nu) const
     // mp4 = U_u(x+u+v)~
     //----------------------------------------------------------
     ++(link_site[mu]) ;
-    mp4->Dagger((IFloat *)GetLink(link_site, mu)+BANK4_BASE);
+    mp4->Dagger((IFloat *)GetLink(link_site, mu));
 
     //----------------------------------------------------------
     // mp3 = U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
@@ -1344,7 +1344,7 @@ Float Lattice::ReTrRect(int *x, int mu, int nu) const
     //----------------------------------------------------------
     // mp2 = U_v(x+2u) U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
     //----------------------------------------------------------
-    mDotMEqual((IFloat *)mp2, (const IFloat *)p1+BANK4_BASE+BANK_SIZE,
+    mDotMEqual((IFloat *)mp2, (const IFloat *)p1,
                (const IFloat *)mp3);
 
     //----------------------------------------------------------
@@ -1356,7 +1356,7 @@ Float Lattice::ReTrRect(int *x, int mu, int nu) const
     //----------------------------------------------------------
     // mp3 = U_u(x+u) U_v(x+2u) U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
     //----------------------------------------------------------
-    mDotMEqual((IFloat *)mp3, (const IFloat *)p1+BANK4_BASE,
+    mDotMEqual((IFloat *)mp3, (const IFloat *)p1,
                (const IFloat *)mp2);
 
     //----------------------------------------------------------
@@ -1367,7 +1367,7 @@ Float Lattice::ReTrRect(int *x, int mu, int nu) const
     //----------------------------------------------------------
     // mp2 = U_u(x) U_u(x+u) U_v(x+2u) U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
     //----------------------------------------------------------
-    mDotMEqual((IFloat *)mp2, (const IFloat *)p1+BANK4_BASE+BANK_SIZE,
+    mDotMEqual((IFloat *)mp2, (const IFloat *)p1,
                (const IFloat *)mp3);
 
   }
@@ -2038,7 +2038,7 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
   for(int i = 0; i < n_links; ++i) {
 
     // *mp1 = *(mom+i)
-    moveMem((IFloat *)mp1, (IFloat *)(mom+i)+BANK4_BASE+BANK_SIZE,
+    moveMem((IFloat *)mp1, (IFloat *)(mom+i),
     	MATRIX_SIZE * sizeof(IFloat));
 
     *mp1 *= step_size;	// t*iH
@@ -2062,7 +2062,7 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
     
 
     // need to copy
-    moveMem((IFloat *)mp2, (IFloat *)(curU_p+i)+BANK4_BASE,
+    moveMem((IFloat *)mp2, (IFloat *)(curU_p+i),
 	    MATRIX_SIZE * sizeof(IFloat));
 
     // U' = mp3 U

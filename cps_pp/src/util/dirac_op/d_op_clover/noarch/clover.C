@@ -36,7 +36,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include<comms/nga_reg.h>
 CPS_START_NAMESPACE
-extern const unsigned int clover_cram_scratch_addr = CRAM_SCRATCH_ADDR;
+//extern const unsigned int clover_cram_scratch_addr = CRAM_SCRATCH_ADDR;
 
 
 //---------------------------------------------------------------------------

@@ -10,12 +10,12 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-09-18 05:07:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.7 2006-09-18 05:07:41 chulwoo Exp $
-//  $Id: link_buffer.C,v 1.7 2006-09-18 05:07:41 chulwoo Exp $
+//  $Date: 2008-09-18 15:23:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.8 2008-09-18 15:23:17 chulwoo Exp $
+//  $Id: link_buffer.C,v 1.8 2008-09-18 15:23:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v $
 //  $State: Exp $
 //
@@ -735,10 +735,10 @@ PathOrdProdPlus(Matrix & mat, const int * x, const int* dirs, int n){
     //already moved.
 
   if (dir_sign) 
-      result1_mp->Dagger((IFloat*)p1+BANK4_BASE+BANK_SIZE); 
+      result1_mp->Dagger((IFloat*)p1); 
         //if dir_sign==1 the link is going backward so get its dagger
   else 
-      moveMem((IFloat*) result1_mp, (IFloat*)p1+BANK4_BASE+BANK_SIZE, 
+      moveMem((IFloat*) result1_mp, (IFloat*)p1, 
               MATRIX_SIZE * sizeof(IFloat));
         //simply move to the cram
   
@@ -755,10 +755,10 @@ PathOrdProdPlus(Matrix & mat, const int * x, const int* dirs, int n){
     //put the next link on the path in mat1
     //--------------------------------------
     if(dir_sign){  
-      mat1.Dagger((IFloat*)p1+BANK2_BASE); 
+      mat1.Dagger((IFloat*)p1); 
     }
     else 
-      moveMem((IFloat*)&mat1, (IFloat*)p1+BANK2_BASE, 
+      moveMem((IFloat*)&mat1, (IFloat*)p1, 
               MATRIX_SIZE*sizeof(IFloat));
 
     if(i!=n-1)

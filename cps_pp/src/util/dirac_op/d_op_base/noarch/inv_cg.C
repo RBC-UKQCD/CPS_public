@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.9 2008-02-08 18:35:07 chulwoo Exp $
+  $Id: inv_cg.C,v 1.10 2008-09-18 15:23:16 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.9 2008-02-08 18:35:07 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.9 2008-02-08 18:35:07 chulwoo Exp $
+//  $Date: 2008-09-18 15:23:16 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.10 2008-09-18 15:23:16 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.10 2008-09-18 15:23:16 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -192,6 +192,7 @@ int DiracOp::InvCg(Vector *out,
   IFloat *f_res = (IFloat *) res; 
   IFloat *f_mmp = (IFloat *) mmp; 
 
+#if 0
 // Calculate the cram buffers size (must divide f_size_cb exactly)
 //------------------------------------------------------------------
   int cram_buf_size = CRAM_SCRATCH_SIZE / 2;
@@ -211,6 +212,7 @@ int DiracOp::InvCg(Vector *out,
 #else
   IFloat cram_a[CRAM_SCRATCH_SIZE/2];
   IFloat cram_b[CRAM_SCRATCH_SIZE/2];
+#endif
 #endif
 
 

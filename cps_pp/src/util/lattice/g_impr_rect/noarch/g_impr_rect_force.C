@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprRect class.
 
-  $Id: g_impr_rect_force.C,v 1.2 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: g_impr_rect_force.C,v 1.3 2008-09-18 15:23:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/noarch/g_impr_rect_force.C,v 1.2 2008-02-08 18:35:08 chulwoo Exp $
-//  $Id: g_impr_rect_force.C,v 1.2 2008-02-08 18:35:08 chulwoo Exp $
+//  $Date: 2008-09-18 15:23:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/noarch/g_impr_rect_force.C,v 1.3 2008-09-18 15:23:17 chulwoo Exp $
+//  $Id: g_impr_rect_force.C,v 1.3 2008-09-18 15:23:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/noarch/g_impr_rect_force.C,v $
 //  $State: Exp $
 //
@@ -91,7 +91,7 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt){
 
       IFloat *ihp = (IFloat *)(mom+uoff+mu);
       IFloat *dotp = (IFloat *)mp0;
-      fTimesV1PlusV2(ihp, dt, dotp, ihp+BANK4_BASE, 18);
+      fTimesV1PlusV2(ihp, dt, dotp, ihp, 18);
       Float norm = ((Matrix*)dotp)->norm();
       Float tmp = sqrt(norm);
       L1 += tmp;

@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GpowerPlaq class.
 
-  $Id: g_power_plaq.C,v 1.6 2006-04-13 18:21:52 chulwoo Exp $
+  $Id: g_power_plaq.C,v 1.7 2008-09-18 15:23:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 18:21:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_plaq/g_power_plaq.C,v 1.6 2006-04-13 18:21:52 chulwoo Exp $
-//  $Id: g_power_plaq.C,v 1.6 2006-04-13 18:21:52 chulwoo Exp $
+//  $Date: 2008-09-18 15:23:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_plaq/g_power_plaq.C,v 1.7 2008-09-18 15:23:17 chulwoo Exp $
+//  $Id: g_power_plaq.C,v 1.7 2008-09-18 15:23:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_power_plaq/g_power_plaq.C,v $
 //  $State: Exp $
 //
@@ -148,7 +148,7 @@ void GpowerPlaq::GforceSite(Matrix& force, int *x, int mu)
   //----------------------------------------
   // mp2 = U_mu(x)
   //----------------------------------------
-  moveMem((IFloat *)mp2, (IFloat *)u_off+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp2, (IFloat *)u_off,
   	MATRIX_SIZE * sizeof(IFloat));
 
   
@@ -198,7 +198,7 @@ ForceArg GpowerPlaq::EvolveMomGforce(Matrix *mom, Float dt){
 	    
 	    IFloat *ihp = (IFloat *)(mom+uoff+mu);
 	    IFloat *dotp = (IFloat *)mp0;
-	    fTimesV1PlusV2(ihp, dt, dotp, ihp+BANK4_BASE, 
+	    fTimesV1PlusV2(ihp, dt, dotp, ihp, 
 			   MATRIX_SIZE);
 	    Float norm = ((Matrix*)dotp)->norm();
 	    Float tmp = sqrt(norm);
@@ -391,7 +391,7 @@ void GpowerPlaq::PowerStaple(Matrix& pstap, int *x, int mu)
       // mp3 = U_u(x+v)~
       //----------------------------------------------------------
       p1 = GetLinkOld(g_offset, x, nu, mu);
-      mp3->Dagger((IFloat *)p1+BANK4_BASE+BANK_SIZE);
+      mp3->Dagger((IFloat *)p1);
 
       //----------------------------------------------------------
       // p1 = &U_v(x+u)
@@ -402,13 +402,13 @@ void GpowerPlaq::PowerStaple(Matrix& pstap, int *x, int mu)
       // mp2 = U_v(x+u) U_u(x+v)~
       //----------------------------------------------------------
       mDotMEqual((IFloat *)mp2, 
-		 (const IFloat *)p1+BANK2_BASE,
+		 (const IFloat *)p1,
 		 (const IFloat *)mp3);
       
       //----------------------------------------------------------
       //  mp3 = U_v(x)~
       //----------------------------------------------------------
-      mp3->Dagger((IFloat *)(g_offset+nu)+BANK4_BASE);
+      mp3->Dagger((IFloat *)(g_offset+nu));
       
       //----------------------------------------------------------
       // m_tmp1 = mp2*mp3 = m_tmp1*U_v(x+u)*U_u(x+v)~*U_v(x)~
@@ -421,7 +421,7 @@ void GpowerPlaq::PowerStaple(Matrix& pstap, int *x, int mu)
       // m_tmp2 = U_u(x)*m_tmp1 = U_u(x)*U_v(x+u)*U_u(x+v)~*U_v(x)~
       //----------------------------------------------------------
       mDotMEqual((IFloat *)&m_tmp2, 
-		 (const IFloat *)(g_offset+mu)+BANK2_BASE,
+		 (const IFloat *)(g_offset+mu),
 		 (const IFloat *)&m_tmp1);
 
       //----------------------------------------------------------
@@ -445,11 +445,11 @@ void GpowerPlaq::PowerStaple(Matrix& pstap, int *x, int mu)
       //----------------------------------------------------------
       if( nu == 0  ||  (mu==0 && nu==1) )
 	moveMem((IFloat *)&pstap, 
-		(const IFloat *)&m_tmp1+BANK4_BASE, 
+		(const IFloat *)&m_tmp1, 
 		MATRIX_SIZE*sizeof(Float));
       else
 	vecAddEquVec((IFloat *)&pstap, 
-		     (const IFloat *)&m_tmp1+BANK4_BASE,
+		     (const IFloat *)&m_tmp1,
 		     MATRIX_SIZE);
 
       
@@ -468,14 +468,14 @@ void GpowerPlaq::PowerStaple(Matrix& pstap, int *x, int mu)
       // mp3 = U_v(x+u-v)
       //----------------------------------------------------------
       p1 = GetLinkOld(g_offpv, x, mu, nu);
-      moveMem((IFloat *)mp3, (IFloat *)p1+BANK2_BASE, 
+      moveMem((IFloat *)mp3, (IFloat *)p1, 
 	      MATRIX_SIZE * sizeof(IFloat));
 
       //----------------------------------------------------------
       // mp2 = U_u(x-v)*U_v(x+u-v)
       //----------------------------------------------------------
       mDotMEqual((IFloat *)mp2, 
-		 (const IFloat *)(g_offpv+mu)+BANK4_BASE,
+		 (const IFloat *)(g_offpv+mu),
 		 (const IFloat *)mp3);
       
       //----------------------------------------------------------
@@ -488,7 +488,7 @@ void GpowerPlaq::PowerStaple(Matrix& pstap, int *x, int mu)
       // mp2 = U_v(x-v)
       //----------------------------------------------------------
       moveMem((IFloat *)mp2, 
-	      (const IFloat *)(g_offpv+nu)+BANK2_BASE,
+	      (const IFloat *)(g_offpv+nu),
 	      MATRIX_SIZE * sizeof(IFloat));
       
       //----------------------------------------------------------
@@ -513,7 +513,7 @@ void GpowerPlaq::PowerStaple(Matrix& pstap, int *x, int mu)
       // m_tmp2 = U_m(x)*m_tmp1 = U_v(x+u-v)~*U_u(x-v)~*U_v(x-v)*U_u(x)
       //----------------------------------------------------------
       mDotMEqual((IFloat *)&m_tmp2, 
-		 (const IFloat *)(g_offset+mu)+BANK4_BASE,
+		 (const IFloat *)(g_offset+mu),
 		 (const IFloat *)&m_tmp1);
 
       //----------------------------------------------------------
@@ -536,7 +536,7 @@ void GpowerPlaq::PowerStaple(Matrix& pstap, int *x, int mu)
       // Add to the staple
       //----------------------------------------------------------
       vecAddEquVec((IFloat *)&pstap, 
-		   (IFloat *)&m_tmp1+BANK2_BASE,
+		   (IFloat *)&m_tmp1,
 		   MATRIX_SIZE);
 
     }

@@ -8,19 +8,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.18 2008-02-08 18:35:07 chulwoo Exp $
+  $Id: convert_func.C,v 1.19 2008-09-18 15:23:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.18 2008-02-08 18:35:07 chulwoo Exp $
-//  $Id: convert_func.C,v 1.18 2008-02-08 18:35:07 chulwoo Exp $
+//  $Date: 2008-09-18 15:23:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.19 2008-09-18 15:23:17 chulwoo Exp $
+//  $Id: convert_func.C,v 1.19 2008-09-18 15:23:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.18 $
+//  $Revision: 1.19 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -215,7 +215,7 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 			  setCbufCntrlReg(4, CBUF_MODE4);
 			  
 			  for(int i = 0; i < n_links; ++i) {
-			    mp2->Dagger((IFloat *)p+BANK4_BASE+BANK_SIZE);
+			    mp2->Dagger((IFloat *)p);
 //			    moveMem((IFloat *)(p++), (IFloat *)mp2,
 //				    18*sizeof(IFloat));
 			    moveFloat((IFloat *)(p++), (IFloat *)mp2, 18);
@@ -241,7 +241,7 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 			  setCbufCntrlReg(4, CBUF_MODE4);
 			  
 			  for(int i = 0; i < n_links; ++i) {
-			    mp2->Dagger((IFloat *)p+BANK4_BASE+BANK_SIZE);
+			    mp2->Dagger((IFloat *)p);
 //			    moveMem((IFloat *)(p++), (IFloat *)mp2,
 //				    18*sizeof(IFloat));
 			    moveFloat((IFloat *)(p++), (IFloat *)mp2, 18);

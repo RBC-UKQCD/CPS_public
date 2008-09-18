@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprOLSym class methods.
 
-  $Id: g_impr_OLSym.C,v 1.10 2006-04-13 18:21:50 chulwoo Exp $
+  $Id: g_impr_OLSym.C,v 1.11 2008-09-18 15:23:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-13 18:21:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.10 2006-04-13 18:21:50 chulwoo Exp $
-//  $Id: g_impr_OLSym.C,v 1.10 2006-04-13 18:21:50 chulwoo Exp $
+//  $Date: 2008-09-18 15:23:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v 1.11 2008-09-18 15:23:17 chulwoo Exp $
+//  $Id: g_impr_OLSym.C,v 1.11 2008-09-18 15:23:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_OLSym/g_impr_OLSym.C,v $
 //  $State: Exp $
 //
@@ -140,7 +140,7 @@ void GimprOLSym::GforceSite(Matrix& force, int *x, int mu)
   //---------------------------------------------------------------------------
   // mp2 = U_mu(x)
   //---------------------------------------------------------------------------
-  moveMem((IFloat *)mp2, (IFloat *)u_off+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp2, (IFloat *)u_off,
           MATRIX_SIZE*sizeof(IFloat)) ;
 
   //---------------------------------------------------------------------------
@@ -184,7 +184,7 @@ ForceArg GimprOLSym::EvolveMomGforce(Matrix *mom, Float dt){
 
       IFloat *ihp = (IFloat *)(mom+uoff+mu);
       IFloat *dotp = (IFloat *)mp0;
-      fTimesV1PlusV2(ihp, dt, dotp, ihp+BANK4_BASE, 18);
+      fTimesV1PlusV2(ihp, dt, dotp, ihp, 18);
       Float norm = ((Matrix*)dotp)->norm();
       Float tmp = sqrt(norm);
       L1 += tmp;

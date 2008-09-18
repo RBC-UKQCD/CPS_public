@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.22 2006-04-13 19:07:53 chulwoo Exp $
+  $Id: f_stag.C,v 1.23 2008-09-18 15:23:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -126,7 +126,7 @@ getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const
     // mp1 = U(x)
     //----------------------------------------
     // mp1->Dagger((IFloat *)uoff+BANK4_BASE+BANK_SIZE);
-    moveMem(mp1, (IFloat *)uoff+BANK4_BASE+BANK_SIZE,
+    moveMem(mp1, (IFloat *)uoff,
     	MATRIX_SIZE*sizeof(IFloat));
 
     // Modified for anisotropic lattices
@@ -161,7 +161,7 @@ getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const
     //----------------------------------------
     // copy *p to CRAM
     //----------------------------------------
-    moveMem(vp0, (IFloat *)p+BANK3_BASE, VECT_LEN*sizeof(IFloat));
+    moveMem(vp0, (IFloat *)p, VECT_LEN*sizeof(IFloat));
 
     if(eta_u == -1) {
         vecNegative((IFloat *)mp1, (IFloat *)mp1, MATRIX_SIZE);
@@ -440,7 +440,7 @@ void Fstag::FforceSite(Matrix& force, Vector *frm, int *x, int mu)
 	moveMem(vp3, vp2, VECT_LEN*sizeof(IFloat));
 
 	vecMinusEquVec((IFloat *)vp3,
-		(IFloat *)&f_tmp[x_off]+BANK3_BASE+BANK_SIZE, VECT_LEN);
+		(IFloat *)&f_tmp[x_off], VECT_LEN);
 
     } else {	// even
 	getUDagX(*vp2, f_tmp, x, mu);
@@ -448,7 +448,7 @@ void Fstag::FforceSite(Matrix& force, Vector *frm, int *x, int mu)
         //----------------------------------------
 	// *vp3 = X[x]
         //----------------------------------------
-	moveMem(vp3, (IFloat *)&frm[x_off]+BANK3_BASE+BANK_SIZE,
+	moveMem(vp3, (IFloat *)&frm[x_off],
 	    VECT_LEN*sizeof(IFloat));
 	*vp2 += *vp3;
     }
@@ -502,7 +502,7 @@ ForceArg Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
 	    FforceSite(*mp0, frm, x, mu);
 	    fTimesV1PlusV2((IFloat *)(ihp+mu), dt,
 			   (IFloat *)mp0,
-			   (IFloat *)(ihp+mu)+BANK4_BASE, 18);
+			   (IFloat *)(ihp+mu), 18);
 	    Float norm = mp0->norm();
 	    Float tmp = sqrt(norm);
 	    L1 += tmp;

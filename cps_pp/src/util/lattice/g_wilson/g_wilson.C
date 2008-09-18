@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Gwilson class.
 
-  $Id: g_wilson.C,v 1.10 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: g_wilson.C,v 1.11 2008-09-18 15:23:17 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v 1.10 2008-02-08 18:35:08 chulwoo Exp $
-//  $Id: g_wilson.C,v 1.10 2008-02-08 18:35:08 chulwoo Exp $
+//  $Date: 2008-09-18 15:23:17 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v 1.11 2008-09-18 15:23:17 chulwoo Exp $
+//  $Id: g_wilson.C,v 1.11 2008-09-18 15:23:17 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_wilson/g_wilson.C,v $
 //  $State: Exp $
 //
@@ -132,7 +132,7 @@ void Gwilson::GforceSite(Matrix& force, int *x, int mu)
   //----------------------------------------
   // mp2 = U_mu(x)
   //----------------------------------------
-  moveMem((IFloat *)mp2, (IFloat *)u_off+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp2, (IFloat *)u_off,
   	MATRIX_SIZE * sizeof(IFloat));
 
   

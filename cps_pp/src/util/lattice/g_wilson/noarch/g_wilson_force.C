@@ -52,7 +52,7 @@ ForceArg Gwilson::EvolveMomGforce(Matrix *mom, Float dt){
 	    
 	    IFloat *ihp = (IFloat *)(mom+uoff+mu);
 	    IFloat *dotp = (IFloat *)mp0;
-	    fTimesV1PlusV2(ihp, dt, dotp, ihp+BANK4_BASE, 18);
+	    fTimesV1PlusV2(ihp, dt, dotp, ihp, 18);
 	    Float norm = ((Matrix*)dotp)->norm();
 	    Float tmp = sqrt(norm);
 	    L1 += tmp;

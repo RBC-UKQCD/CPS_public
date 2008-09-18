@@ -120,7 +120,7 @@ void GtadpoleRect::GforceSite(Matrix& force, int *x, int mu)
   //----------------------------------------------------------------------------
   // mp2 = U_mu(x)
   //----------------------------------------------------------------------------
-  moveMem((IFloat *)mp2, (IFloat *)u_off+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp2, (IFloat *)u_off,
           MATRIX_SIZE*sizeof(IFloat)) ;
 
   //----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ void GtadpoleRect::GforceSite(Matrix& force, int *x, int mu)
   //----------------------------------------------------------------------------
   // mp2 = -(beta*c_1/3)*U_mu(x)
   //----------------------------------------------------------------------------
-  moveMem((IFloat *)mp2, (IFloat *)u_off+BANK4_BASE+BANK_SIZE,
+  moveMem((IFloat *)mp2, (IFloat *)u_off,
           MATRIX_SIZE*sizeof(IFloat));
 
   tmp = rect_coeff ;
@@ -195,7 +195,7 @@ ForceArg GtadpoleRect::EvolveMomGforce(Matrix *mom, Float dt){
 
       IFloat *ihp = (IFloat *)(mom+uoff+mu);
       IFloat *dotp = (IFloat *)mp0;
-      fTimesV1PlusV2(ihp, dt, dotp, ihp+BANK4_BASE, 18);
+      fTimesV1PlusV2(ihp, dt, dotp, ihp, 18);
       Float norm = ((Matrix*)dotp)->norm();
       Float tmp = sqrt(norm);
       L1 += tmp;
