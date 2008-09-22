@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-01 06:38:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/clover.C,v 1.6 2004-12-01 06:38:17 chulwoo Exp $
-//  $Id: clover.C,v 1.6 2004-12-01 06:38:17 chulwoo Exp $
+//  $Date: 2008-09-22 15:35:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/clover.C,v 1.7 2008-09-22 15:35:08 chulwoo Exp $
+//  $Id: clover.C,v 1.7 2008-09-22 15:35:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: clover.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/clover.C,v $
 //  $State: Exp $
 //
@@ -44,7 +44,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include<comms/nga_reg.h>
 CPS_START_NAMESPACE
-extern const unsigned int clover_cram_scratch_addr = CRAM_SCRATCH_ADDR;
+//extern const unsigned int clover_cram_scratch_addr = CRAM_SCRATCH_ADDR;
 
 
 //---------------------------------------------------------------------------
