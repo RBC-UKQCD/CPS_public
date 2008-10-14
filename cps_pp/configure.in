@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2008-06-12 17:56:10 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.57 2008-06-12 17:56:10 chulwoo Exp $
-dnl  $Id: configure.in,v 1.57 2008-06-12 17:56:10 chulwoo Exp $
+dnl  $Date: 2008-10-14 20:24:50 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.58 2008-10-14 20:24:50 chulwoo Exp $
+dnl  $Id: configure.in,v 1.58 2008-10-14 20:24:50 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.57 $
+dnl  $Revision: 1.58 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -61,8 +61,8 @@ dnl check if Intel compiler is available if running on 686
        AC_CHECK_PROGS(CC, xlC, gcc)
        AC_CHECK_PROGS(CXX, xlC, g++)
    elif test "$enable_qmp" != "no"; then
-     AC_PATH_PROGS(CC, mpicc)
-     AC_PATH_PROGS(CXX, mpicxx)
+     AC_PATH_PROGS(CC, mpicc, gcc)
+     AC_PATH_PROGS(CXX, mpicxx,g++)
    else
      AC_PROG_CXX
    fi
