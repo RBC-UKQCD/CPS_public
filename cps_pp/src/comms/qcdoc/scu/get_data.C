@@ -6,19 +6,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.14 2008-03-25 17:53:43 chulwoo Exp $
+  $Id: get_data.C,v 1.15 2008-11-05 21:22:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-03-25 17:53:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.14 2008-03-25 17:53:43 chulwoo Exp $
-//  $Id: get_data.C,v 1.14 2008-03-25 17:53:43 chulwoo Exp $
+//  $Date: 2008-11-05 21:22:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v 1.15 2008-11-05 21:22:42 chulwoo Exp $
+//  $Id: get_data.C,v 1.15 2008-11-05 21:22:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qcdoc/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -59,9 +59,11 @@ void get1Data(IFloat *rcv_buf, IFloat *send_buf, int len, int mu, int plus)
   char *fname = "get1Data";
 //  printf("get1Data(%p %p %d %d %d\n\n",rcv_buf,send_buf,len,mu,plus);
   if(rcv_noncache==NULL) rcv_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
+  if(rcv_noncache==NULL) rcv_noncache = (IFloat *)qalloc(QFAST,sizeof(IFloat)*MAX_LENGTH);
   if(rcv_noncache==NULL)
     ERR.Pointer("",fname,"rcv_noncache");
   if(send_noncache==NULL) send_noncache = (IFloat *)qalloc(QNONCACHE|QFAST,sizeof(IFloat)*MAX_LENGTH);
+  if(send_noncache==NULL) send_noncache = (IFloat *)qalloc(QFAST,sizeof(IFloat)*MAX_LENGTH);
   if(send_noncache==NULL)
     ERR.Pointer("",fname,"send_noncache");
 //  printf("rcv_buf=%p send_buf=%p len=%d \n",rcv_buf,send_buf,len);
@@ -78,8 +80,11 @@ void get1Data(IFloat *rcv_buf, IFloat *send_buf, int len, int mu, int plus)
 	  memcpy(send_noncache,send_buf,copy_len*sizeof(IFloat));
       SCUDirArgIR send(send_noncache, gjp_scu_dir[2*mu+plus], SCU_SEND, copy_len*sizeof(IFloat));
       SCUDirArgIR rcv(rcv_noncache, gjp_scu_dir[2*mu+(1-plus)], SCU_REC, copy_len*sizeof(IFloat));
-      send.StartTrans();
-      rcv.StartTrans();
+	if (qalloc_is_noncache(send_noncache)) send.StartTrans();
+	else send.SlowStartTrans();
+	if (qalloc_is_noncache(rcv_noncache)) rcv.StartTrans();
+	else rcv.SlowStartTrans();
+
       send.TransComplete();
       rcv.TransComplete();
 //      for(i=0;i<copy_len;i++) rcv_buf[i] = rcv_noncache[i];
