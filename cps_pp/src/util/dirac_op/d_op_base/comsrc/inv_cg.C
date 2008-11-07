@@ -11,13 +11,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-12 21:03:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/inv_cg.C,v 1.1 2008-05-12 21:03:55 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.1 2008-05-12 21:03:55 chulwoo Exp $
+//  $Date: 2008-11-07 21:08:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/inv_cg.C,v 1.2 2008-11-07 21:08:05 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.2 2008-11-07 21:08:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -401,10 +401,10 @@ int DiracOp::InvCg(Vector *out,
   
     // It has not reached stp_cnd: Issue a warning
     if(itr == dirac_arg->max_num_iter - 1){
-      VRB.Warn(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
-	     itr+1, IFloat(res_norm_sq_cur) );
-//      ERR.General(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
-//  	     itr+1, IFloat(res_norm_sq_cur) );
+//      VRB.Warn(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
+//	     itr+1, IFloat(res_norm_sq_cur) );
+      ERR.General(cname,fname, "CG reached max iterations = %d. |res|^2 = %e\n",
+  	     itr+1, IFloat(res_norm_sq_cur) );
     }
   
 //------------------------------------------------------------------
