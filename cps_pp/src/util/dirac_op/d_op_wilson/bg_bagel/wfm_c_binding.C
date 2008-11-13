@@ -134,13 +134,27 @@ extern "C" {
 
 }
 
+#undef PROFILE
+static unsigned long long called=0;
+static int m_int = 100;
+static unsigned long long p_int = 10000;
+// should be p_int / m_int
+static unsigned long long m_num = 100;
+
+static inline double DCLOCK(){
+#ifdef PROFILE
+    if(called%m_int==0) return CPS_NAMESPACE::dclock();
+    else 
+#endif
+      return 0.;
+}
+
 
 void wfm_dslash_two( Float *chi0, Float *chi1, 
 		     Float *u, 
 		     Float *psi0, Float *psi1,
 		     int cb0, int cb1, int dag)
 {
-   static unsigned long long called=0;
    static Float dslash_time=0.;
    static Float decom_time=0.;
    static Float recom_time=0.;
@@ -148,11 +162,11 @@ void wfm_dslash_two( Float *chi0, Float *chi1,
    static Float comm_init_time=0.;
 
    called++;
-   dslash_time -=CPS_NAMESPACE::dclock();
+   dslash_time -=DCLOCK();
     wfm_scope_assert(0);
     wfm_scope_assert(1);
 
-  decom_time -=CPS_NAMESPACE::dclock();
+  decom_time -=DCLOCK();
   cache_touch(psi0);
   cache_touch(psi0+4);
   cache_touch(psi0+8);
@@ -160,13 +174,13 @@ void wfm_dslash_two( Float *chi0, Float *chi1,
   cache_touch(psi0+16);
   cache_touch(psi0+20);
   StaticWilsonPAB[0].decom(psi0,u,cb0,dag);
-  decom_time +=CPS_NAMESPACE::dclock();
+  decom_time +=DCLOCK();
 
-  comm_init_time -=CPS_NAMESPACE::dclock();
+  comm_init_time -=DCLOCK();
   StaticWilsonPAB[0].comm_start(cb0);
-  comm_init_time +=CPS_NAMESPACE::dclock();
+  comm_init_time +=DCLOCK();
 
-  decom_time -=CPS_NAMESPACE::dclock();
+  decom_time -=DCLOCK();
   cache_touch(psi1);
   cache_touch(psi1+4);
   cache_touch(psi1+8);
@@ -174,50 +188,48 @@ void wfm_dslash_two( Float *chi0, Float *chi1,
   cache_touch(psi1+16);
   cache_touch(psi1+20);
   StaticWilsonPAB[1].decom(psi1,u,cb1,dag);
-  decom_time +=CPS_NAMESPACE::dclock();
+  decom_time +=DCLOCK();
 
-  comm_time -=CPS_NAMESPACE::dclock();
+  comm_time -=DCLOCK();
   StaticWilsonPAB[0].comm_complete(cb0);
-  comm_time +=CPS_NAMESPACE::dclock();
+  comm_time +=DCLOCK();
 
-  comm_init_time -=CPS_NAMESPACE::dclock();
+  comm_init_time -=DCLOCK();
   StaticWilsonPAB[1].comm_start(cb1);
-  comm_init_time +=CPS_NAMESPACE::dclock();
+  comm_init_time +=DCLOCK();
 
-  recom_time -=CPS_NAMESPACE::dclock();
+  recom_time -=DCLOCK();
   cache_touch(StaticWilsonPAB[0].two_spinor);
   cache_touch(StaticWilsonPAB[0].two_spinor+4);
   cache_touch(StaticWilsonPAB[0].two_spinor+8);
   StaticWilsonPAB[0].recon(chi0,u,cb0,dag);
-  recom_time +=CPS_NAMESPACE::dclock();
+  recom_time +=DCLOCK();
 
-  comm_time -=CPS_NAMESPACE::dclock();
+  comm_time -=DCLOCK();
   StaticWilsonPAB[1].comm_complete(cb1);
-  comm_time +=CPS_NAMESPACE::dclock();
+  comm_time +=DCLOCK();
 
-  recom_time -=CPS_NAMESPACE::dclock();
+  recom_time -=DCLOCK();
   cache_touch(StaticWilsonPAB[1].two_spinor);
   cache_touch(StaticWilsonPAB[1].two_spinor+4);
   cache_touch(StaticWilsonPAB[1].two_spinor+8);
   StaticWilsonPAB[1].recon(chi1,u,cb1,dag);
-  recom_time +=CPS_NAMESPACE::dclock();
+  recom_time +=DCLOCK();
 
-  dslash_time +=CPS_NAMESPACE::dclock();
-  unsigned long long offset = 1000;
-  unsigned long long interval = 10000;
-  if (called%interval==offset){
+  dslash_time +=DCLOCK();
+#ifdef PROFILE
 #ifndef  UNIFORM_SEED_TESTING
-    CPS_NAMESPACE::print_time("wfm_dslash_two","dslash_time",dslash_time/offset);
-    CPS_NAMESPACE::print_time("wfm_dslash_two","decom_time",decom_time/offset);
-    CPS_NAMESPACE::print_time("wfm_dslash_two","recom_time",recom_time/offset);
-    CPS_NAMESPACE::print_time("wfm_dslash_two","comm_init_time",comm_init_time/offset);
-    CPS_NAMESPACE::print_time("wfm_dslash_two","comm_time",comm_time/offset);
-#endif
-  }
-  if (called%interval==0){
+  if (called%p_int==0){
+    CPS_NAMESPACE::print_time("wfm_dslash_two","dslash_time",dslash_time/m_num);
+    CPS_NAMESPACE::print_time("wfm_dslash_two","decom_time",decom_time/m_num);
+    CPS_NAMESPACE::print_time("wfm_dslash_two","recom_time",recom_time/m_num);
+    CPS_NAMESPACE::print_time("wfm_dslash_two","comm_init_time",comm_init_time/m_num);
+    CPS_NAMESPACE::print_time("wfm_dslash_two","comm_time",comm_time/m_num);
     called=0;
     decom_time=recom_time=comm_time=dslash_time=comm_init_time=0.;
   }
+#endif
+#endif
 
   return;
 }
