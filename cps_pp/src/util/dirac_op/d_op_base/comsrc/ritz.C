@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class Ritz eigensolver methods.
 
-  $Id: ritz.C,v 1.7 2008-05-19 19:25:06 chulwoo Exp $
+  $Id: ritz.C,v 1.8 2009-01-15 15:50:10 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-19 19:25:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.7 2008-05-19 19:25:06 chulwoo Exp $
-//  $Id: ritz.C,v 1.7 2008-05-19 19:25:06 chulwoo Exp $
+//  $Date: 2009-01-15 15:50:10 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.8 2009-01-15 15:50:10 chulwoo Exp $
+//  $Id: ritz.C,v 1.8 2009-01-15 15:50:10 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v $
 //  $State: Exp $
 //
@@ -212,6 +212,9 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   Vector *p    = (Vector *) smalloc(cname,fname, "p"   , f_size * sizeof(Float));
   Vector *Apsi = (Vector *) smalloc(cname,fname, "Apsi", f_size * sizeof(Float));
   Vector *Ap   = (Vector *) smalloc(cname,fname, "Ap"  , f_size * sizeof(Float));
+
+  VRB.Input(cname,fname,"RsdR_a=%e RsdR_r=%e Rsdlam=%e Cv_fact=%e\n", 
+      RsdR_a,RsdR_r,Rsdlam,Cv_fact);
 
   rsda_sq = RsdR_a * RsdR_a;
   rsdr_sq = RsdR_r * RsdR_r;
