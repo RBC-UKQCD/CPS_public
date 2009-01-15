@@ -691,6 +691,8 @@ void AlgActionRational::checkApprox(Float *mass, RemezArg *remez_arg,
     //!< Measure the lowest eigenvalue
     sprintf(eig_file,"%s.%d",eigen.eig_lo_stem,traj);
     eig_arg.fname = eig_file;        
+	// CJ: rescaling RsdR_a to be in range with rational approximation 
+    eig_arg.RsdR_a = eig_arg.RsdR_r * remez_arg[0].lambda_high;
     eig_arg.RitzMatOper = MATPCDAG_MATPC;
     
     AlgEig eig(lat,&ca_eig,&eig_arg);
