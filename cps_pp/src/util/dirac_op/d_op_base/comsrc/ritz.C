@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class Ritz eigensolver methods.
 
-  $Id: ritz.C,v 1.8 2009-01-15 15:50:10 chulwoo Exp $
+  $Id: ritz.C,v 1.9 2009-01-16 22:54:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-01-15 15:50:10 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.8 2009-01-15 15:50:10 chulwoo Exp $
-//  $Id: ritz.C,v 1.8 2009-01-15 15:50:10 chulwoo Exp $
+//  $Date: 2009-01-16 22:54:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.9 2009-01-16 22:54:52 chulwoo Exp $
+//  $Id: ritz.C,v 1.9 2009-01-16 22:54:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v $
 //  $State: Exp $
 //
@@ -288,12 +288,16 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
     return n_count;
   }
 
+  del_lam = mu;
+
   /*  FOR k FROM 1 TO MaxCG DO */
   for(k = 0; k < MaxCG; ++k)
   {
-    if (k % 50 == 0)
-      VRB.Result(cname,fname,"nn = %d, iter=%d, lambda=%e, g2/g2_0=%e/%e=Cv_fact=%e > %e\n",
-          nn, k, (IFloat)mu, (IFloat)g2, (IFloat)g2_0, (IFloat)g2/g2_0, (IFloat)Cv_fact);
+    if (k % 100 == 0)
+      VRB.Result(cname,fname,"nn = %d, iter=%d, lambda=%e, del_lam=%e\n", 
+          nn, k, (IFloat)mu, del_lam);
+      VRB.Result(cname,fname, "g2/g2_0=%e/%e=Cv_fact=%e > %e\n",
+(IFloat)g2, (IFloat)g2_0, (IFloat)g2/g2_0, (IFloat)Cv_fact);
 
     /*  Ap = A * p  */
     RitzMat(Ap, p);
