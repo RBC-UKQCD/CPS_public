@@ -313,9 +313,9 @@ void AlgActionQuotient::evolve(Float dt, int nsteps)
 	  Fdt.print(dt, label);
 
 	  // If measuring the force, need to measure and then sum to mom
-      Float L1;
-      Float L2;
-      Float Linf;
+      Float L1=0.;
+      Float L2=0.;
+      Float Linf=0.;
 	  for (int k=0; k<g_size/18; k++) {
 	    Float norm = (mom_tmp+k)->norm();
 	    Float tmp = sqrt(norm);
