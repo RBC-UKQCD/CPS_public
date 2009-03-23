@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.53 2008-09-18 15:23:17 chulwoo Exp $
+  $Id: lattice_base.C,v 1.54 2009-03-23 19:13:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-09-18 15:23:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.53 2008-09-18 15:23:17 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.53 2008-09-18 15:23:17 chulwoo Exp $
+//  $Date: 2009-03-23 19:13:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.54 2009-03-23 19:13:32 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.54 2009-03-23 19:13:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.53 $
+//  $Revision: 1.54 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -168,6 +168,7 @@ Lattice::Lattice()
        gauge_field = (Matrix *) qalloc(GJP.StartConfAllocFlag(),array_size);
     VRB.Flow(cname,fname,"gauge_field=%p\n",gauge_field);
 #else
+     printf("Here we are!\n");
       gauge_field = (Matrix *) pmalloc(array_size);
 #endif
 //     printf("gauge_field=%p\n",gauge_field);
@@ -2682,6 +2683,43 @@ void Lattice::FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg,
   char *fname = "FdMdmu";
   ERR.NotImplemented(cname,fname);
 }
+
+//~~------------------------------------------------------------------
+//~~ Added by DHR for twisted-mass fermions
+//~~ For most functions, twisted mass parameter passed in cg_arg
+//~~ For functions not using cg_arg, added explicit twisted-mass
+//~~ parameter to function call parameters
+//~~ These functions implemented in lattice_base as an error, and
+//~~ "truly" implemented only in the F_wilsonTm derived class
+//~~------------------------------------------------------------------
+
+Float Lattice::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+    		Float mass, Float epsilon, DagType dag) { 
+  char *fname = "SetPhi(V*,V*,V*,F,F,DagType)";
+  ERR.NotImplemented(cname,fname);
+  return ((Float) 0.0);
+};
+
+ForceArg Lattice::EvolveMomFforce(Matrix *mom, Vector *frm, 
+				 Float mass, Float epsilon, Float step_size) {
+  char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
+  ERR.NotImplemented(cname,fname);
+  return ForceArg(0.0,0.0,0.0);
+};
+
+ForceArg Lattice::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+		 Float mass, Float epsilon, Float step_size) {
+  char *fname = "EvolveMomFforce(M*,V*,V*,F,F,F)";
+  ERR.NotImplemented(cname,fname);
+  return ForceArg(0.0,0.0,0.0);
+};
+
+Float Lattice::BhamiltonNode(Vector *boson, Float mass, Float epsilon)  {
+  char *fname = "BhamiltonNode(V*,F,F)";
+  ERR.NotImplemented(cname,fname);
+  return ((Float) 0.0);
+};
+
 
 //------------------------------------------------------------------
 //void *Lattice::Aux0Ptr(void):

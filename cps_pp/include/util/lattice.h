@@ -5,20 +5,20 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.56 2008-03-25 17:53:43 chulwoo Exp $
+  $Id: lattice.h,v 1.57 2009-03-23 19:13:32 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2008-03-25 17:53:43 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.56 2008-03-25 17:53:43 chulwoo Exp $
-  $Id: lattice.h,v 1.56 2008-03-25 17:53:43 chulwoo Exp $
+  $Date: 2009-03-23 19:13:32 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.57 2009-03-23 19:13:32 chulwoo Exp $
+  $Id: lattice.h,v 1.57 2009-03-23 19:13:32 chulwoo Exp $
   $Name: not supported by cvs2svn $
   $Author: chulwoo $
-  $Date: 2008-03-25 17:53:43 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.56 2008-03-25 17:53:43 chulwoo Exp $
-  $Id: lattice.h,v 1.56 2008-03-25 17:53:43 chulwoo Exp $
+  $Date: 2009-03-23 19:13:32 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.57 2009-03-23 19:13:32 chulwoo Exp $
+  $Id: lattice.h,v 1.57 2009-03-23 19:13:32 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.56 $
+  $Revision: 1.57 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -233,7 +233,10 @@ class Lattice
 
  public: 
 
-// Base class functions
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+// BASE CLASS FUNCTIONS
+//------------------------------------------------------------------
 //------------------------------------------------------------------
 
     Lattice();
@@ -587,11 +590,18 @@ class Lattice
     void SoCheck(Float num);
     //!< Checks that a number is identical on 5th dimension local lattice slices.
 
-// Gauge action related virtual functions.
+
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+// GAUGE ACTION RELATED VIRTUAL FUNCTIONS.
+//------------------------------------------------------------------
 //------------------------------------------------------------------
 
 
-// Fermion action related virtual functions.
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+// FERMION ACTION RELATED VIRTAUL FUNCTIONS.
+//------------------------------------------------------------------
 //------------------------------------------------------------------
 
     //! Not implemented here.
@@ -624,12 +634,51 @@ class Lattice
     //! Not implemented here.
     virtual void FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int order);
-
     // order is the order of the derivative with respect to mu
     // Currently this function is implemented only in the Fstag class
 
-// Gauge action related pure virtual functions
+   //~~ Added by DHR for twisted-mass fermions
+   //~~------------------------------------------------------------------
+   //~~ For most functions, twisted mass parameter passed in cg_arg
+   //~~ For functions not using cg_arg, added explicit twisted-mass
+   //~~ parameter to function call parameters
+   //~~ These functions implemented in lattice_base as an error, and
+   //~~ "truly" implemented only in the F_wilsonTm derived class
+
+    virtual Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+    		Float mass, Float epsilon, DagType dag);
+
+    virtual ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
+			 Float mass, Float epsilon, Float step_size);
+    //~~ Molecular dynamics evolution due to the fermion force
+
+    virtual ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+			 Float mass, Float epsilon, Float step_size);
+    //~~ Molecular dynamics evolution due to the boson part of quotient integrator
+
 //------------------------------------------------------------------
+//------------------------------------------------------------------
+// Bosonic action related virtual functions.
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+
+   //~~ Added by DHR for twisted-mass fermions
+   //~~------------------------------------------------------------------
+   //~~ For most functions, twisted mass parameter passed in cg_arg
+   //~~ For functions not using cg_arg, added explicit twisted-mass
+   //~~ parameter to function call parameters
+   //~~ These functions implemented in lattice_base as an error, and
+   //~~ "truly" implemented only in the F_wilsonTm derived class
+
+    virtual Float BhamiltonNode(Vector *boson, Float mass, Float epsilon);
+
+
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+// GAUGE ACTION RELATED PURE VIRTUAL FUNCTIONS
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+
     virtual GclassType Gclass() = 0;
         //!< Returns the type of gauge action
 
@@ -662,9 +711,12 @@ class Lattice
       \return The value of the pure gauge action on this node.
     */
 
-
+//------------------------------------------------------------------
+//------------------------------------------------------------------
 // Fermion action related pure virtual functions 
 //------------------------------------------------------------------
+//------------------------------------------------------------------
+
     virtual FclassType Fclass() const = 0;
         //!< Returns the type of fermion action.
     int FstagType(){
@@ -673,9 +725,11 @@ class Lattice
       else return 0;
     }
 
+    //~~ added F_CLASS_WILSON_TM for twisted mass fermions
     int FwilsonType(){
       if (Fclass()==F_CLASS_WILSON || Fclass() ==F_CLASS_CLOVER || 
-        Fclass() ==F_CLASS_DWF) return 1;
+        Fclass() ==F_CLASS_DWF 
+        || Fclass() ==F_CLASS_WILSON_TM) return 1;
       else return 0;
     }
 
@@ -757,26 +811,6 @@ class Lattice
 			   CgArg *cg_arg,  
 			   CnvFrmType cnv_frm = CNV_FRM_YES)
 	{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
-    
-    //!< The matrix inversion used in the molecular dynamics algorithms.
-    /*!<
-      Solves \f$ M^\dagger M f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
-      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
-
-      \param f_out The initial guess of solution vector.
-      \param f_in The source vector
-      \param cg_arg The solver parameters
-      \param cnv_frm Whether the lattice fields need to be converted to
-  to a new storage order appropriate for the type of fermion action.
-  If this is ::CNV_FRM_NO, then just the gauge field is converted.
-  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
-  are also converted: This assumes they are initially in the same order as
-  the gauge field. Fields that are converted are restored to their original
-  order upon exit of this method. \e N.B. If the fields are already in the
-  suitable order, then specifying ::CNV_FRM_YES here has no effect.
-      \return The number of solver iterations.
-      \post \a f_out contains the solution vector.
-    */
 
     virtual int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 			    int Nshift, int isz, CgArg **cg_arg, 
@@ -839,38 +873,7 @@ class Lattice
 	    return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
 			       type,alpha, f_out_d);
 	}
-
-    //!< The multishift matrix inversion used in the RHMC molecular dynamics algorithms.
-    /*!<
-      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out}\f$
-      for a given number of shifts,
-      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
-
-      \param f_out The solution vectors.
-      \param f_in The source vector
-      \param shift The shifts of the fermion matrix.
-      \param Nshift The number of shifts
-      \param isz The smallest shift (required by MInvCG)
-      \param cg_arg The solver parameters  for each shift
-      \param cnv_frm Whether the lattice fields need to be converted to
-      to a new storage order appropriate for the type of fermion action.
-      If this is ::CNV_FRM_NO, then just the gauge field is converted.
-      If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
-      are also converted: This assumes they are initially in the same order as
-      the gauge field. Fields that are converted are restored to their original
-      order upon exit of this method. \e N.B. If the fields are already in the
-      suitable order, then specifying ::CNV_FRM_YES here has no effect.
-      \param type The type of multimass inverter.
-      If type is ::MULTI, then regular multishift inversion is performed with
-      each solution stored separately.
-      If type is ::SINGLE, then each solution is multiplied by an
-      amount in parameter \a alpha and summed to a single solution vector.
-      \param alpha The contribution of each shifted solution to the total
-      solution vector if \a type is SINGLE.
-      \return The number of solver iterations.
-      \post \a f_out contains the solution vector(s).
-    */
-    
+   
     int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg **cg_arg, CnvFrmType cnv_frm,
 		    Vector **f_out_d)
@@ -888,35 +891,6 @@ class Lattice
 			       MULTI,alpha, f_out_d);
 	}
 
-    //!< The multishift matrix inversion used in the RHMC molecular dynamics algorithms.
-    /*!<
-      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out}\f$
-      for a given number of shifts,
-      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
-
-      \param f_out The solution vectors.
-      \param f_in The source vector
-      \param shift The shifts of the fermion matrix.
-      \param Nshift The number of shifts
-      \param isz The smallest shift (required by MInvCG)
-      \param cg_arg The solver parameters
-      \param cnv_frm Whether the lattice fields need to be converted to
-      to a new storage order appropriate for the type of fermion action.
-      If this is ::CNV_FRM_NO, then just the gauge field is converted.
-      If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
-      are also converted: This assumes they are initially in the same order as
-      the gauge field. Fields that are converted are restored to their original
-      order upon exit of this method. \e N.B. If the fields are already in the
-      suitable order, then specifying ::CNV_FRM_YES here has no effect.
-      \param f_out_d Not implemented or ignored with Wilsonesque fermions.
-      With staggered fermions, if this is initially non-zero
-      and ::MULTI is also specified,
-      then <em> D f<sub>out</sub></em>, the solution vectors acted on with the
-      Dirac D-slash operator, is written here. 
-      \return The number of solver iterations.
-      \post \a f_out contains the solution vectors.
-    */
-
     int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg **cg_arg, CnvFrmType cnv_frm)
 	{
@@ -925,34 +899,6 @@ class Lattice
 	    return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
 			       MULTI,alpha,f_out_d);
 	}
-    //!< The multishift matrix inversion used in the RHMC molecular dynamics algorithms.
-    /*!<
-      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out}\f$
-      for a given number of shifts,
-      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
-
-      \param f_out The solution vectors.
-      \param f_in The source vector
-      \param shift The shifts of the fermion matrix.
-      \param Nshift The number of shifts
-      \param isz The smallest shift (required by MInvCG)
-      \param cg_arg The solver parameters
-      \param cnv_frm Whether the lattice fields need to be converted to
-      to a new storage order appropriate for the type of fermion action.
-      If this is ::CNV_FRM_NO, then just the gauge field is converted.
-      If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
-      are also converted: This assumes they are initially in the same order as
-      the gauge field. Fields that are converted are restored to their original
-      order upon exit of this method. \e N.B. If the fields are already in the
-      suitable order, then specifying ::CNV_FRM_YES here has no effect.
-      \param f_out_d Not implemented or ignored with Wilsonesque fermions.
-      With staggered fermions, if this is initially non-zero
-      and ::MULTI is also specified,
-      then <em> D f<sub>out</sub></em>, the solution vectors acted on with the
-      Dirac D-slash operator, is written here. 
-      \return The number of solver iterations.
-      \post \a f_out contains the solution vectors.
-    */
 
     int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg **cg_arg, CnvFrmType cnv_frm,
@@ -962,30 +908,6 @@ class Lattice
 	    return FmatEvlMInv(f_out,f_in,shift,Nshift,isz,cg_arg,cnv_frm,
 			       MULTI,alpha,f_out_d);
 	}
-    //!< The multishift matrix inversion used in the RHMC molecular dynamics algorithms.
-    /*!<
-      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out}\f$
-      for a given number of shifts,
-      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
-
-      \param f_out The solution vectors.
-      \param f_in The source vector
-      \param shift The shifts of the fermion matrix.
-      \param Nshift The number of shifts
-      \param isz The smallest shift (required by MInvCG)
-      \param cg_arg The solver parameters for each shift
-      \param cnv_frm Whether the lattice fields need to be converted to
-      to a new storage order appropriate for the type of fermion action.
-      If this is ::CNV_FRM_NO, then just the gauge field is converted.
-      If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
-      are also converted: This assumes they are initially in the same order as
-      the gauge field. Fields that are converted are restored to their original
-      order upon exit of this method. \e N.B. If the fields are already in the
-      suitable order, then specifying ::CNV_FRM_YES here has no effect.
-      \return The number of solver iterations.
-      \post \a f_out contains the solution vectors.
-    */
-
 
     virtual void FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 			    Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm) = 0;
@@ -1056,30 +978,6 @@ class Lattice
 			PreserveType prs_f_in = PRESERVE_YES)
 	{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
     
-    //!< Fermion matrix inversion.
-    /*!<
-      Solves <em> A f_out = f_in </em> for \a f_out, where \a A is the
-      fermion matrix. The vectors must be defined on the whole lattice,
-      not just on sites of a single parity.
-
-      \param f_out The initial guess of solution vector.
-      \param f_in The source vector
-      \param cg_arg The solver parameters
-      \param cnv_frm Whether the lattice fields need to be converted to
-  to a new storage order appropriate for the type of fermion action.
-  If this is ::CNV_FRM_NO, then just the gauge field is converted.
-  If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
-  are also converted: This assumes they are initially in the same order as
-  the gauge field. Fields that are converted are restored to their original
-  order upon exit of this method. \e N.B. If the fields are already in the
-  suitable order, then specifying ::CNV_FRM_YES here has no effect.
-      \param prs_f_in Whether or not the source vector is allowed to be
-      overwritten, thereby saving memory. For staggered fermions f_in is
-      preserved regardless of the value of prs_f_in. 
-      \return The number of solver iterations.
-      \post \a f_out contains the solution vector.
-    */
-    
     virtual int FeigSolv(Vector **f_eigenv, Float *lambda, 
 			 Float *chirality, int *valid_eig,
 			 Float **hsum,
@@ -1131,33 +1029,16 @@ class Lattice
       return SetPhi(phi,frm1,frm2,mass,DAG_YES);
     }
 
-    //!< Initialises the pseudofermion field 
-    //!< Overloaded version of above which defaults to DAG_YES
-    /*!<
-      The heatbath initialisation of the pseudofermion field
-      is done by setting \f$ \phi = M^\dagger \eta \f$ where \f$ \eta \f$
-      is a zero mean, unit variance random gaussian field.
-      The pseudofermion field may be computed on a single parity only.	     
-    
-      \pre The random field must already be initialised.
-      \param phi The pseudofermion field.
-      \param frm1 A random field, possibly on a single parity.
-      \param frm2 Another random field, or possibly workspace.
-      \param mass The mass parameter of the fermion matrix.       
-      \return The value of the pseudofermionic action on this node (only 
-      works for Wilson type fermions).
-    */
-
     virtual ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 				 Float mass, Float step_size) = 0;
-    //!< Molecular dynamics evolution of the conjugate momentum
+    //!< Molecular dynamics evolution due to the fermion force
     /*!<
       The momentum is evolved for a single molecular dynamics timestep
       using the force from the fermion action.
       \param mom The momentum matrices on all links of the local lattice.
       \param frm The solution of the fermion matrix inverse with the
       pseudofermion vector source, as computed by FmatEvlInv.
-      \param mass The fermion mass (not used in staggered fermion classes).
+      \param mass The FERMION mass (not used in staggered fermion classes).
       \param step_size The molecular dynamics timestep used in the numerical
       integration.
       \post \a mom is assigned the value of the momentum after the molecular
@@ -1166,15 +1047,16 @@ class Lattice
 
     virtual ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 				  Float mass, Float step_size) = 0;
-    //!< Molecular dynamics evolution of the conjugate momentum
+    //!< Molecular dynamics evolution due to the boson part of quotient integrator
     /*!<
       The momentum is evolved for a single molecular dynamics timestep
       using the force from the bosonic part of a quotient action.
       \param mom The momentum matrices on all links of the local lattice.
-      \param phi The pseudofermion vector source.
-      \param frm The solution of the fermion matrix inverse applied to 
+      \param frm The solution of the fermion matrix inverse with the
+      pseudofermion vector source, as computed by FmatEvlInv.
+      \param eta The solution of the fermion matrix inverse applied to 
       bosonic operator times the pseudofermion vector source.
-      \param mass The fermion mass (not used in staggered fermion classes).
+      \param mass The BOSON/FERMION mass (not used in staggered fermion classes).
       \param step_size The molecular dynamics timestep used in the numerical
       integration.
       \post \a mom is assigned the value of the momentum after the molecular
@@ -1218,8 +1100,11 @@ class Lattice
     }
 
 
+//------------------------------------------------------------------
+//------------------------------------------------------------------
 // Bosonic action related pure virtual functions.
-//---------------------------------------------------------1---------
+//------------------------------------------------------------------
+//------------------------------------------------------------------
 
     virtual Float BhamiltonNode(Vector *boson, Float mass) = 0;
         // The boson Hamiltonian of the node sublattice.
@@ -1233,6 +1118,12 @@ class Lattice
     virtual void BforceVector(Vector *in, CgArg *cg_arg) = 0;
 
 };
+
+//------------------------------------------------------------------
+//------------------------------------------------------------------
+// DERIVED CLASSES
+//------------------------------------------------------------------
+//------------------------------------------------------------------
 
 /*! \defgroup gactions Gauge Actions
   \ingroup latactions */

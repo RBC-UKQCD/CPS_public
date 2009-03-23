@@ -2,7 +2,7 @@
 /*! \file
  \brief Definitions for the Wilson fermion matrix code
 
- $Id: wfm.h,v 1.6 2004-08-18 11:57:38 zs Exp $
+ $Id: wfm.h,v 1.7 2009-03-23 19:13:32 chulwoo Exp $
 */
 /* Jan/2003                                                                 */
 /* Peter Boyle.                                                             */
@@ -24,6 +24,12 @@ struct WilsonArg {
    int local_latt[4];
    int local_comm[4];
    int instruction_reg_num;
+//~~
+//~~ twisted mass fermions: passes address of spinor_tmp from wfm_h 
+//~~ for use by cps_compat.C
+//~~
+   Float *spinor_tmp;
+//~~
 };
 
 #ifdef USE_COMMS_SCU
@@ -58,7 +64,12 @@ void wfm_vec_end(struct WilsonArg *);
 /*
  * Used to fill out the CPS wilson structure
  */
-void wilson_compat_init(Wilson *wilson_p);
+
+//~~
+//~~ added for twisted mass fermions
+//~~
+void wilson_compat_init(Wilson *wilson_p, WilsonArg *wil);
+
 void wilson_compat_end(Wilson *wilson_p);
 
 void wfm_mdagm(Float  *chi,        /* chi = MdagM(u) psi          */
@@ -179,7 +190,8 @@ class wfm : public WilsonArg {
    unsigned long *face_table[Ncb][NMinusPlus][ND];
 
    int   vol;
-   Float *spinor_tmp;/* temp spinor needed by mdagm                 */
+   Float *spinor_tmp;/* temp spinor needed by mdagm; also redefined */
+                     /* as Wilson af[0] and af[1]   s                */
    Float *two_spinor;/* point. array to 8 interleaved fwd proj half spinors  */
    Float *send_bufs[NMinusPlus][ND];
    Float *recv_bufs[NMinusPlus][ND];

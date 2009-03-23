@@ -99,13 +99,13 @@ void CloverLeaf(Lattice& lattice, Matrix& pl,  int* pos, int mu, int nu)
    lattice.PathOrdProdPlus(P3, pos, dirs3, 4);
 
 
-
-    P0 -=  P1;
-    P0 +=  P2;
-    P0 -=  P3;
-    P0 *= 0.25;
-
-    moveMem((Float*) &pl,(Float*) &P0, 18 * sizeof(Float) );
+   
+   P0 -=  P1;
+   P0 +=  P2;
+   P0 -=  P3;
+   P0 *= 0.25;
+   
+   moveMem((Float*) &pl,(Float*) &P0, 18 * sizeof(Float) );
 
 }
 
@@ -181,19 +181,203 @@ void CloverLeafRect(Lattice& lattice, Matrix& pl,  int* pos, int mu, int nu)
 
    pl += P0;
    pl *= 1.0/16.0;
+}
+
+void CloverLeaf1x3(Lattice& lattice, Matrix& pl,  int* pos, int mu, int nu)
+{
+   Matrix P0,P1,P2,P3;
+
+
+   // 1x3 size
+   P0.ZeroMatrix();
+   P1.ZeroMatrix();
+   P2.ZeroMatrix();
+   P3.ZeroMatrix();
+
+   // each direction could be {0,1,2,3,4,5,6,7} coresponding to
+   // the directions {n_x, n_y, n_z, n_t, -n_x, -n_y, -n_z, -n_t}
+
+
+   {
+     int dirs0[8]={mu,mu, mu,
+		   nu, 
+		   mu+4,mu+4,mu+4,
+		   nu+4};
+     lattice.PathOrdProdPlus(P0, pos, dirs0, 8);
+     
+
+     int dirs1[8]={nu+4,
+		   mu+4,mu+4, mu+4,
+		   nu, 
+		   mu,mu,mu };
+     lattice.PathOrdProdPlus(P1, pos, dirs1, 8);
+
+     int dirs2[8]={nu,
+		   mu+4,mu+4,mu+4,
+		   nu+4, 
+		   mu,mu,mu};
+     lattice.PathOrdProdPlus(P2, pos, dirs2, 8);
+
+     int dirs3[8]={mu,mu,mu,
+		   nu+4, 
+		   mu+4,mu+4, mu+4,
+		   nu};
+     lattice.PathOrdProdPlus(P3, pos, dirs3, 8);
+   }
+
+   P0 -=  P1;
+   P0 +=  P2;
+   P0 -=  P3;
    
 
+   moveMem((Float*) &pl,(Float*) &P0, 18 * sizeof(Float) );
+   
+   // 3x1  size
+   P0.ZeroMatrix();
+   P1.ZeroMatrix();
+   P2.ZeroMatrix();
+   P3.ZeroMatrix();
+
+   // each direction could be {0,1,2,3,4,5,6,7} coresponding to
+   // the directions {n_x, n_y, n_z, n_t, -n_x, -n_y, -n_z, -n_t}
+   {
+     int dirs0[8]={mu,
+		   nu,nu,nu,
+		   mu+4, 
+		   nu+4,nu+4,nu+4};
+     lattice.PathOrdProdPlus(P0, pos, dirs0, 8);
+     
+     int dirs1[8]={nu+4,nu+4,nu+4,
+		   mu+4, 
+		   nu,nu,nu,
+		   mu};
+     lattice.PathOrdProdPlus(P1, pos, dirs1, 8);
+
+     int dirs2[8]={nu,nu,nu,
+		   mu+4, 
+		   nu+4,nu+4,nu+4,
+		   mu};
+     lattice.PathOrdProdPlus(P2, pos, dirs2, 8);
+     
+     int dirs3[8]={mu,
+		   nu+4,nu+4,nu+4,
+		   mu+4, 
+		   nu, nu, nu};
+     lattice.PathOrdProdPlus(P3, pos, dirs3, 8);
+   }
+
+   P0 -=  P1;
+   P0 +=  P2;
+   P0 -=  P3;
+
+   pl += P0;
+   pl *= 1.0/24.0;
 }
+
+void CloverLeaf2x2(Lattice& lattice, Matrix& pl,  int* pos, int mu, int nu)
+{
+  Matrix P0,P1,P2,P3;
+  // 1x2 size
+  P0.ZeroMatrix();
+  P1.ZeroMatrix();
+  P2.ZeroMatrix();
+  P3.ZeroMatrix();
+  
+  // each direction could be {0,1,2,3,4,5,6,7} coresponding to
+  // the directions {n_x, n_y, n_z, n_t, -n_x, -n_y, -n_z, -n_t}
+  int dirs0[8]={mu,mu, nu, nu, mu+4,mu+4, nu+4, nu+4};
+  lattice.PathOrdProdPlus(P0, pos, dirs0, 8);
+    
+  int dirs1[8]={nu+4, nu+4, mu+4, mu+4, nu, nu, mu,mu };
+  lattice.PathOrdProdPlus(P1, pos, dirs1, 8);
+  
+  int dirs2[8]={nu, nu, mu+4, mu+4, nu+4, nu+4, mu, mu };
+  lattice.PathOrdProdPlus(P2, pos, dirs2, 8);
+  
+  int dirs3[8]={mu,mu, nu+4, nu+4, mu+4, mu+4, nu, nu };
+  lattice.PathOrdProdPlus(P3, pos, dirs3, 8);
+  
+  P0 -=  P1;
+  P0 +=  P2;
+  P0 -=  P3;
+  P0 *= 1.0/16;
+   
+  moveMem((Float*) &pl,(Float*) &P0, 18 * sizeof(Float) );
+  
+}
+
+void CloverLeaf3x3(Lattice& lattice, Matrix& pl,  int* pos, int mu, int nu)
+{
+  Matrix P0,P1,P2,P3;
+  // 1x2 size
+  P0.ZeroMatrix();
+  P1.ZeroMatrix();
+  P2.ZeroMatrix();
+  P3.ZeroMatrix();
+  
+  // each direction could be {0,1,2,3,4,5,6,7} coresponding to
+  // the directions {n_x, n_y, n_z, n_t, -n_x, -n_y, -n_z, -n_t}
+  int dirs0[12]={ mu, mu, mu,
+		  nu, nu, nu,
+		  mu+4, mu+4, mu+4,
+		  nu+4, nu+4, nu+4 };
+  lattice.PathOrdProdPlus(P0, pos, dirs0, 12);
+    
+  int dirs1[12]={nu+4, nu+4, nu+4,
+		 mu+4, mu+4, mu+4,
+		 nu,   nu,   nu, 
+		 mu,   mu,   mu   };
+  lattice.PathOrdProdPlus(P1, pos, dirs1, 12);
+  
+  int dirs2[12]={nu, nu, nu,
+		 mu+4, mu+4, mu+4,
+		 nu+4, nu+4, nu+4,
+		 mu,   mu  , mu   };
+  lattice.PathOrdProdPlus(P2, pos, dirs2, 12);
+  
+  int dirs3[12]={mu  , mu,   mu,
+		 nu+4, nu+4, nu+4, 
+		 mu+4, mu+4, mu+4, 
+		 nu  , nu  , nu };
+  lattice.PathOrdProdPlus(P3, pos, dirs3, 12);
+  
+  P0 -=  P1;
+  P0 +=  P2;
+  P0 -=  P3;
+  P0 *= 1./(9*4);
+   
+  moveMem((Float*) &pl,(Float*) &P0, 18 * sizeof(Float) );
+}
+
+
+// number of clover-leaf functions
+const int nfunc(5);
+
+typedef void (*leaf_function)(Lattice&, Matrix&,  int*, int, int);
+
+// map to the functions used
+leaf_function leaf_map[5] = { &CloverLeaf,
+			      &CloverLeafRect,
+			      &CloverLeaf2x2,
+			      &CloverLeaf3x3,
+			      &CloverLeaf1x3 };
+// map to the names
+const char* names[5] = { "1x1",
+			 "1x2",
+			 "2x2",
+			 "3x3",
+			 "1x3" };
 
 
 void AlgTcharge::run()
 {
   Lattice& lattice( AlgLattice() );  
 
-  Float tcharge_node     (0);
-  Float tchargeCross_node(0);
-  Float tchargeRect_node (0);
-  
+  Float tmat[nfunc][nfunc];
+  for (int f1(0);f1<nfunc;f1++)
+    for (int f2(0);f2<nfunc;f2++)
+      tmat[f1][f2] = 0;
+
   // sum over lattice
   Site nloop;
   
@@ -209,9 +393,7 @@ void AlgTcharge::run()
       // plaqs[4]  = F_13
       // plaqs[5]  = F_23
 
-      Matrix plaqs1[6];
-      Matrix plaqs2[6];
-      
+      Matrix plaqs[nfunc][6];
       //
       // fill plaqs with the full plaquettes
       // - then zero the real parts
@@ -225,54 +407,32 @@ void AlgTcharge::run()
         {
           for (nu=mu+1;nu<4;nu++)
             { 
-	      CloverLeaf    ( lattice, plaqs1[index], nloop.pos(), mu, nu );
-              ZeroReal(plaqs1[index]);
-              
-              CloverLeafRect( lattice, plaqs2[index], nloop.pos(), mu, nu );
-              ZeroReal(plaqs2[index]);
-                            
-              index++;
+	      for (int f(0);f<nfunc;f++)
+		{
+		  (*(leaf_map[f]))( lattice, plaqs[f][index], nloop.pos(), mu, nu );
+		  ZeroReal(plaqs[f][index]);
+		}
+	      index++;
             }
         }
-
-      /*
-        construct the matrix that must be traced to
-        give the topological charge
-      */
-      const Float clover( MkTop(plaqs1,plaqs1).real() );
-      const Float rect  ( MkTop(plaqs2,plaqs2).real() );
-      const Float cross ( MkTop(plaqs1,plaqs2).real() );
-      
-        
-      /*
-        keep running sum for node
-      */
-      tcharge_node     += clover;
-      tchargeCross_node+= cross ;
-      tchargeRect_node += rect  ;
-
+      for (int f1(0);f1<nfunc;f1++)
+	{
+	  for (int f2(f1);f2<nfunc;f2++)
+	    {
+	      tmat[f1][f2] += MkTop(plaqs[f1],plaqs[f2]).real();
+	    }
+	}
     }
   
-  glb_sum( &tcharge_node      ) ;
-  glb_sum( &tchargeCross_node ) ;
-  glb_sum( &tchargeRect_node  ) ;
-
-  charge_clov = tcharge_node;
-  charge_rect = tchargeRect_node;
+  // global sum the approximations
+  for (int f1(0);f1<nfunc;f1++)
+    {
+      for (int f2(f1);f2<nfunc;f2++)
+	{
+	  glb_sum( &tmat[f1][f2] );
+	}
+    }
   
-  // construct O(a^2) improved definition of Q by cancelling the
-  // o(a^2) errors of Q^R and Q^C
-  const Float c0(+5.0/3.0);
-  const Float c1(-2.0/3.0);
-  charge = c0*charge_clov + c1*charge_rect;
-  
-  // construct O(a^2) improved of Q from O(a^2) definition
-  // of F.
-  charge_2 = 
-      (25.0/9.0) * tcharge_node 
-    + (4.0 /9.0) * tchargeRect_node 
-    - (20.0/9.0) * tchargeCross_node; 
-
   // Print out results
   //----------------------------------------------------------------
 
@@ -283,11 +443,17 @@ void AlgTcharge::run()
       if( (fp = Fopen(common_arg->filename, "a")) == NULL ) {
         ERR.FileA(cname,fname,common_arg->filename);
       }
-      Fprintf(fp,"AlgTcharge   :\n Clov      : %e\n", tcharge_node);
-      Fprintf(fp," Rect      : %e\n", tchargeRect_node );
-      Fprintf(fp," Cross     : %e\n", tchargeCross_node);
-      Fprintf(fp," Tot(a^2) Q: %e \n",charge    );
-      Fprintf(fp," Tot(a^2) F: %e \n",charge_2 );
+      Fprintf(fp,"AlgTcharge:\n");
+      Fprintf(fp,"nleaf : %i\n",nfunc);
+      for (int f(0);f<nfunc;f++)
+	Fprintf(fp,"   %i : %s\n",f,names[f]);
+      for (int f1(0);f1<nfunc;f1++)
+	{
+	  for (int f2(f1);f2<nfunc;f2++)
+	    {
+	      Fprintf(fp,"%i %i : %15e\n",f1,f2,tmat[f1][f2]);
+	    }
+	}
       Fclose(fp);
     }
 

@@ -26,6 +26,10 @@ public:
    bool SloppyPrecision;
    bool WFM_BGL;
    int CoreCount;
+//~~ twisted mass fermions: passes address of spinor_tmp from wfm_h 
+//~~ for use by cps_compat.C
+//~~
+   Float *spinor_tmp;
 
    WilsonArg () {
      CoreCount=1;
@@ -87,7 +91,7 @@ void wfm_vec_end(struct WilsonArg *);
  * Used to fill out the CPS wilson structure
  */
 CPS_START_NAMESPACE
-void wilson_compat_init(CPS_NAMESPACE::Wilson *wilson_p);
+void wilson_compat_init(CPS_NAMESPACE::Wilson *wilson_p, WilsonArg *wil);
 void wilson_compat_end(CPS_NAMESPACE::Wilson *wilson_p);
 CPS_END_NAMESPACE
 

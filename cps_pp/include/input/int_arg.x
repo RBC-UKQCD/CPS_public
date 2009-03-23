@@ -107,6 +107,8 @@ class ActionRationalSplitArg {
 };
 
 class BosonDescr {
+  //! ~~epsilon parameter for twisted mass wilson fermions
+  Float epsilon;
   Float stop_rsd_hb;
 } ;
 
@@ -119,6 +121,8 @@ class ActionBosonArg {
 };
 
 class FermionDescr {
+  //! ~~epsilon parameter for twisted mass wilson fermions
+  Float epsilon;
   int   chrono;
   Float stop_rsd_md;
   Float stop_rsd_mc;
@@ -137,7 +141,11 @@ class ActionFermionArg {
 
 class QuotientDescr {
   Float bsn_mass;
+  //! ~~epsilon parameter for twisted mass wilson fermions
+  Float bsn_mass_epsilon;
   Float frm_mass;
+  //! ~~epsilon parameter for twisted mass wilson fermions
+  Float frm_mass_epsilon;
   int   chrono;
   Float stop_rsd_hb;
   Float stop_rsd_md;

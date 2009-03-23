@@ -34,7 +34,7 @@ AlgActionBoson::AlgActionBoson(AlgMomentum &mom, ActionBosonArg &b_arg)
   if (bsn_arg->bosons.bosons_len != bsn_arg->bi_arg.bilinears.bilinears_len)
     ERR.General(cname, fname,
 		"Inconsistency between BosonArg and BilinearArg n_masses");
-
+      // ~~bsn_cp_arg local to AlgActionBoson
   if(n_masses > 0){
     //!< Allocate memory for the boson CG arguments.
     bsn_cg_arg = (CgArg **) smalloc(n_masses * sizeof(CgArg*), 
@@ -48,6 +48,8 @@ AlgActionBoson::AlgActionBoson(AlgMomentum &mom, ActionBosonArg &b_arg)
     //!< Initialize the boson CG arguments
     for(int i=0; i<n_masses; i++){
       bsn_cg_arg[i]->mass = mass[i];
+      // ~~added for twisted mass Wilson fermions
+      bsn_cg_arg[i]->epsilon = bsn_arg->bosons.bosons_val[i].epsilon;
       bsn_cg_arg[i]->max_num_iter = max_num_iter[i];
       bsn_cg_arg[i]->stop_rsd = bsn_arg->bosons.bosons_val[i].stop_rsd_hb;
     }
@@ -84,7 +86,8 @@ void AlgActionBoson::heatbath() {
     for(int i=0; i<n_masses; i++){
       lat.RandGaussVector(tmp1, 0.5, Ncb);
       lat.RandGaussVector(phi[i], 0.5, Ncb);
-      lat.SetPhi(tmp2, tmp1, phi[i], mass[i]);
+      // ~~changed for twisted mass Wilson fermions; also added DAG_YES parameter
+      lat.SetPhi(tmp2, tmp1, phi[i], bsn_cg_arg[i]->mass, bsn_cg_arg[i]->epsilon, DAG_YES);
       phi[i] -> VecZero(f_size);
       cg_iter = lat.FmatEvlInv(phi[i], tmp2, bsn_cg_arg[i], CNV_FRM_NO);
       
@@ -111,7 +114,8 @@ Float AlgActionBoson::energy() {
     Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
 
     for(int i=0; i<n_masses; i++)
-      h += lat.BhamiltonNode(phi[i], mass[i]);
+      // ~~changed for twisted mass Wilson fermions
+      h += lat.BhamiltonNode(phi[i], bsn_cg_arg[i]->mass, bsn_cg_arg[i]->epsilon);
 
     LatticeFactory::Destroy();
   }
@@ -131,9 +135,11 @@ void AlgActionBoson::evolve(Float dt, int nsteps)
     
     for (int steps=0; steps<nsteps; steps++) 
       for (int i = 0; i<n_masses; i++) {
-	//!< Need to include this hack for stag force to be correct
+	//!< Need to include this hack for stag force to be correct;
+	//!< implemented in F_none.C
 	lat.BforceVector(phi[i], bsn_cg_arg[i]);
-	Fdt = lat.EvolveMomFforce(mom, phi[i], mass[i], -dt);
+      // ~~changed for twisted mass Wilson fermions
+	Fdt = lat.EvolveMomFforce(mom, phi[i], bsn_cg_arg[i]->mass, bsn_cg_arg[i]->epsilon, -dt);
 
 	if (force_measure == FORCE_MEASURE_YES) {
 	  char label[200];

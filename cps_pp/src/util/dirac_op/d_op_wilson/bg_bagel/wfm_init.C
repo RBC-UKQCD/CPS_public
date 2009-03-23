@@ -182,6 +182,7 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
   spinor_words = SPINOR_SIZE * vol;
 
   spinor_tmp = (Float *)ALLOC(spinor_words*sizeof(Float)*2);
+//printf("wfm_init::spinor_tmp=%p\n",spinor_tmp);
 //  VRB.Flow(cname,fname,"spinor_tmp=%p\n",spinor_tmp);
 #ifdef USE_QALLOC
   // If we used QALLOC, and the ALLOC macro failed we can try 
@@ -198,6 +199,13 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
     if ( isBoss() ) printf("wfm::spinor_tmp allocate\n");
     exit(-1);
   }
+
+//~~
+//~~ twisted mass fermions:  sets WilsonArg.spinor_tmp tp 
+//~~ address of temporary spinor in wfm class
+//~~    
+  wilson_p->spinor_tmp = spinor_tmp;
+//~~
 /*--------------------------------------------------------------------------*/
 /* Reserve memory for the 4 forward and 4 backward spin projected half      */ 
 /* spinors.                                                                 */

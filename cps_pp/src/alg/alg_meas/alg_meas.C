@@ -24,19 +24,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief PAB... Definitions of the AlgMeas class methods.
   
-  $Id: alg_meas.C,v 1.7 2006-11-25 19:09:53 chulwoo Exp $
+  $Id: alg_meas.C,v 1.8 2009-03-23 19:13:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-11-25 19:09:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.7 2006-11-25 19:09:53 chulwoo Exp $
-//  $Id: alg_meas.C,v 1.7 2006-11-25 19:09:53 chulwoo Exp $
+//  $Date: 2009-03-23 19:13:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.8 2009-03-23 19:13:32 chulwoo Exp $
+//  $Id: alg_meas.C,v 1.8 2009-03-23 19:13:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_meas.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v $
 //  $State: Exp $
 //
@@ -305,6 +305,23 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     return *lat_p;
   }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// added for twisted-mass wilson fermions
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  /* twisted-mass WILSON VALENCE ANALYSIS */
+  if ( (fermion == F_CLASS_WILSON_TM) && (gluon == G_CLASS_NONE ) ) {
+    lat_p = new GnoneFwilsonTm ;
+    return *lat_p;
+  }
+  if ( (fermion == F_CLASS_WILSON_TM) && (gluon == G_CLASS_WILSON ) ) {
+    lat_p = new GwilsonFwilsonTm;
+    return *lat_p;
+  }
+  if ( (fermion == F_CLASS_WILSON_TM) && (gluon == G_CLASS_IMPR_RECT ) ) {
+    lat_p =  new GimprRectFwilsonTm;
+    return *lat_p;
+  }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   /* CLOVER VALENCE ANALYSIS */
   if ( (fermion == F_CLASS_CLOVER) && (gluon == G_CLASS_NONE ) ) {

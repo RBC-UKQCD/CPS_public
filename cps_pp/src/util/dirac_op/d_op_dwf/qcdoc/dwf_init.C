@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-10-15 03:59:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.9 2004-10-15 03:59:06 chulwoo Exp $
-//  $Id: dwf_init.C,v 1.9 2004-10-15 03:59:06 chulwoo Exp $
+//  $Date: 2009-03-23 19:13:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v 1.10 2009-03-23 19:13:32 chulwoo Exp $
+//  $Id: dwf_init.C,v 1.10 2009-03-23 19:13:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_init.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_init.C,v $
 //  $State: Exp $
 //
@@ -79,7 +79,14 @@ void dwf_init(Dwf *dwf_p)
   wil.local_comm[3] = 0;
 
   wfm_vec_init(&wil);
-  wilson_compat_init(dwf_p->wilson_p);
+//~~ 
+//~~ twisted mass fermions:  added second argument WilsonArg *wil
+//~~ for transfer of *spinor_tmp from WilsonArg to Wilson
+//~~ 
+//~~  wilson_compat_init(dwf_p->wilson_p);
+  wilson_compat_init(dwf_p->wilson_p, &wil);
+//~~
+
 
 //------------------------------------------------------------------
 // Allocate memory for two temporary fermion checkerboard fields  

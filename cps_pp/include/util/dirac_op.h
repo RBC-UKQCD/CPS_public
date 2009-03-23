@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.21 2008-05-19 19:25:06 chulwoo Exp $
+  $Id: dirac_op.h,v 1.22 2009-03-23 19:13:32 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -118,7 +118,7 @@ class DiracOp
   //! Ritz eigensolver.
   int Ritz(Vector **psi_all, int N_eig, Float &lambda,
 	   Float RsdR_a, Float RsdR_r, Float Rsdlam, Float Cutl_zero,
-	   int n_renorm, int Kalk_Sim, int N_min, int N_max, Float &Cv_fact,
+	   int n_renorm, int Kalk_Sim, int N_min, int N_max, Float Cv_fact,
 	   int MaxCG, int ProjApsiP);
      // Ritz minimizer for eigenvectors.
      // The matrix that is used is RitzMat.
@@ -909,13 +909,12 @@ class DiracOpWilson : public DiracOpWilsonTypes
  private:
   char *cname;    // Class name.
 
+ public:
+
   void *wilson_lib_arg;  // pointer to an argument structure related
                          // to the wilson library.
-
   Float kappa;           // Wilson kappa = 1 /[2 (4 +mass) ]
 
-
- public:
   DiracOpWilson(Lattice& latt,            // Lattice object.
 		Vector *f_field_out,      // Output fermion field ptr.
 		Vector *f_field_in,       // Input fermion field ptr.
@@ -996,6 +995,91 @@ class DiracOpWilson : public DiracOpWilsonTypes
 
 };
 
+//-----------------------------------------------------------------
+//! ~~ A class describing the Dirac operator for twisted-mass Wilson fermions.
+/*!
+  The constructor changes the storage order of the gauge field to ::WILSON
+  order This change persists throughout the lifetime of the object.
+
+  Only one instance of this class is allowed to be in existence at any time. 
+*/
+//------------------------------------------------------------------
+class DiracOpWilsonTm : public DiracOpWilson
+{
+ private:
+  char *cname;    // Class name.
+
+  Float epsilon;	 // fractional imaginary mass 
+  Float ctheta, stheta;	 // gamma_5(theta) parameters
+
+ public:
+
+//
+// Functions DiracOpWilson to CalcHmdForceVecs are as in DiracOpWilson 
+// with twisted mass term - gamma_5(theta) added where necessary
+//
+
+  DiracOpWilsonTm(Lattice& latt,            // Lattice object.
+		Vector *f_field_out,      // Output fermion field ptr.
+		Vector *f_field_in,       // Input fermion field ptr.
+		CgArg *arg,               // Argument structure
+		CnvFrmType convert);  // Fermion conversion flag
+
+  virtual ~DiracOpWilsonTm();
+
+  void DiracArg(CgArg *arg);
+     // It sets the dirac_arg pointer to arg and initializes
+     // kappa.
+
+  void MatPcDagMatPc(Vector *out, Vector *in, Float *dot_prd=0);
+
+  void Dslash(Vector *out, 
+		      Vector *in,
+		      ChkbType cb, 
+		      DagType dag);
+
+  void Dslash_tm(Vector *out, 
+		      Vector *in,
+		      ChkbType cb, 
+		      DagType dag);
+//
+  void MatPc(Vector *out, Vector *in);
+
+  void MatPcDag(Vector *out, Vector *in);
+
+  void CalcHmdForceVecs(Vector *chi) ;
+
+  void CalcBsnForceVecs(Vector *chi, Vector *eta) ;
+ 
+//
+// Function MatInv to MatDag are not (yet) implemented because
+// no calls of these functions have been found.  Correct twisted 
+// mass modification depends on calling context.
+//
+
+  int MatInv(Vector *out, 
+	     Vector *in, 
+	     Float *true_res,
+	     PreserveType prs_in = PRESERVE_YES);
+     // The inverse of the unconditioned Dirac Operator 
+     // using Conjugate gradient.
+     
+  int MatInv(Vector *out, 
+	     Vector *in,
+	     PreserveType prs_in = PRESERVE_YES);
+     
+  int MatInv(Float *true_res,
+	     PreserveType prs_in = PRESERVE_YES);
+     
+  int MatInv(PreserveType prs_in = PRESERVE_YES);
+     
+  void MatHerm(Vector *out, Vector *in);
+
+  void Mat(Vector *out, Vector *in);
+
+  void MatDag(Vector *out, Vector *in);
+  
+};
 
 //------------------------------------------------------------------
 // Forward struct declaration for class DiracOpClover

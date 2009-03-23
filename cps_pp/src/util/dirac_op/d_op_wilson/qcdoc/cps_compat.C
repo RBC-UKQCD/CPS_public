@@ -1,10 +1,15 @@
 /*! \file
 
-$Id: cps_compat.C,v 1.6 2004-08-18 11:57:52 zs Exp $
+$Id: cps_compat.C,v 1.7 2009-03-23 19:13:32 chulwoo Exp $
 */
 	
-  
-#include <util/wilson.h>
+//~~
+//~~ (Ok for noarch)
+//~~
+//~~ removed for twisted mass fermions
+//~~ wilson.h is included by wfm.h
+//~~
+// #include <util/wilson.h>
 #include <util/gjp.h>
 #include <util/smalloc.h>
 #include <util/verbose.h>
@@ -18,11 +23,17 @@ CPS_START_NAMESPACE
 void wilson_compat_init(Wilson *wilson_p);
 void wilson_compat_end(Wilson *wilson_p);
 
-void wilson_compat_init(Wilson *wilson_p)
+//~~ 
+//~~ twisted mass fermions:  added second argument WilsonArg *wil
+//~~ for transfer of *spinor_tmp from WilsonArg to Wilson
+//~~ 
+void wilson_compat_init(Wilson *wilson_p, WilsonArg *wil)
+//~~
 {
   int size;
   char *cname = "wfm";
   char *fname = "wilson_compat_init(Wilson *)";
+  int spinor_words;
 
 
         /*--------------------------------------------------------------------------*/
@@ -45,8 +56,16 @@ void wilson_compat_init(Wilson *wilson_p)
           wilson_p->vol[0] = wilson_p->ptr[0] * wilson_p->ptr[1] *
                              wilson_p->ptr[2] * wilson_p->ptr[3] / 2;
           wilson_p->vol[1] = wilson_p->vol[0];
-	  wilson_p->af[0] = NULL;
-	  wilson_p->af[1] = NULL;
+//~~ 
+//~~ twisted mass fermions:  defines half-fields Wilson.af[0] & Wilson.af[1]
+//~~ in temporary spinor temporary full field 
+//~~ af[0], af[1] used in d_op_wilson & d_op_wilsonTm members 
+//~~ MatPc, MatPcDag, and MatPcDagMatPc
+//~~ 
+          spinor_words = SPINOR_SIZE * wilson_p->vol[0];
+          wilson_p->af[0] = wil->spinor_tmp;
+          wilson_p->af[1] = wil->spinor_tmp + spinor_words;
+//~~
 /*----------------------------------------------------------------------*/
 /* end of for backward and dwf compatibility                            */
 /*----------------------------------------------------------------------*/

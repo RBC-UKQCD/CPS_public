@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.24 2008-09-07 04:35:38 chulwoo Exp $
+  $Id: alg_eig.C,v 1.25 2009-03-23 19:13:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-09-07 04:35:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.24 2008-09-07 04:35:38 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.24 2008-09-07 04:35:38 chulwoo Exp $
+//  $Date: 2009-03-23 19:13:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.25 2009-03-23 19:13:32 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.25 2009-03-23 19:13:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.24 $
+//  $Revision: 1.25 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -24,7 +24,6 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include <util/qcdio.h>
-//#include <comms/sysfunc.h>
 #include <util/enum.h>
 #include <math.h>
 #include <alg/alg_eig.h>
@@ -35,7 +34,6 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/verbose.h>
 #include <util/error.h>
-#include <util/site.h>
 CPS_START_NAMESPACE
 
 #include <iostream>
@@ -48,7 +46,7 @@ extern void gamma_5(Float *v_out, Float *v_in, int num_sites);
 int NumChkb( RitzMatType ritz_mat)
 {
   // Determine the number of checkerboards
-  int Ncb(0);
+  int Ncb=0;
   char *fname = "NumChkb(RitzType)";
   switch(ritz_mat)
   {
@@ -96,38 +94,16 @@ AlgEig::AlgEig(Lattice& latt,
     ERR.Pointer(cname,fname, "arg");
   alg_eig_arg = arg;
 
-#if 1
   Ncb = NumChkb(alg_eig_arg->RitzMatOper);
-#else 
-  // Determine the number of checkerboards
-  switch(alg_eig_arg->RitzMatOper)
-  {
-  case MAT_HERM:
-  case MATDAG_MAT:
-  case NEG_MATDAG_MAT:
-  case MATDAG_MAT_NORM:
-  case NEG_MATDAG_MAT_NORM:
-    Ncb = 2;
-    break;
-    
-  case MATPC_HERM:
-  case MATPCDAG_MATPC:
-  case NEG_MATPCDAG_MATPC:
-    Ncb = 1;
-    break;
-
-  default:
-    ERR.General(cname,fname,"RitzMatOper %d not implemented",
-		alg_eig_arg->RitzMatOper);
-  }
-#endif
-
 
   // Set the node size of the full (non-checkerboarded) fermion field
   // NOTE: at this point we must know on what lattice size the operator 
   // will act.
   //----------------------------------------------------------------
   int f_size = GJP.VolNodeSites() * latt.FsiteSize() * Ncb / 2;
+  VRB.Flow(cname,fname,"f_size=%d\n",0);
+//  int f_size = GJP.VolNodeSites() * Ncb / 2;
+//  exit(1);
   int N_eig = alg_eig_arg->N_eig;
 
   // Allocate memory for the eigenvectors and eigenvalues
@@ -159,6 +135,7 @@ AlgEig::AlgEig(Lattice& latt,
 	    "Mass_step = %g\n",IFloat(alg_eig_arg->Mass_step));
 
   // Calculate n_masses if necessary
+  VRB.Flow(cname,fname,"alg_eig_arg->pattern_kind=%d\n",alg_eig_arg->pattern_kind);
   switch( alg_eig_arg->pattern_kind ) {
   case ARRAY: 
     n_masses = alg_eig_arg->Mass.Mass_len;
@@ -171,15 +148,13 @@ AlgEig::AlgEig(Lattice& latt,
     n_masses = (int) (fabs((alg_eig_arg->Mass_final 
       - alg_eig_arg->Mass_init)/alg_eig_arg->Mass_step) + 1.000001); 
     break;
-  case FLOW:   
-    n_masses = 0;
-    break;
   default: 
     ERR.General(cname, fname,
 		"alg_eig_arg->pattern_kind = %d is unrecognized\n", 
 		alg_eig_arg->pattern_kind);
     break;
   }  
+  VRB.FuncEnd(cname,fname);
 
 }
 
@@ -193,23 +168,18 @@ AlgEig::~AlgEig() {
 
   // Free memory
   //----------------------------------------------------------------
-  VRB.Sfree(cname,fname, "valid_eig", valid_eig);
-  sfree(valid_eig);
+  sfree(cname,fname, "valid_eig", valid_eig);
 
-  VRB.Sfree(cname,fname, "chirality", chirality);
-  sfree(chirality);
+  sfree(cname,fname, "chirality", chirality);
 
-  VRB.Sfree(cname,fname, "lambda", lambda);
-  sfree(lambda);
+  sfree(cname,fname, "lambda", lambda);
 
   for(int n = alg_eig_arg->N_eig - 1; n >= 0; --n)
   {
-    VRB.Sfree(cname,fname, "eigenv[n] ",eigenv[n]);
-    sfree(eigenv[n]);
+    sfree(cname,fname, "eigenv[n] ",eigenv[n]);
   }
 
-  VRB.Sfree(cname,fname, "eigenv", eigenv);
-  sfree(eigenv);
+  sfree(cname,fname, "eigenv", eigenv);
 
   //???
 }
@@ -239,7 +209,6 @@ void AlgEig::run(Float **evalues)
   EigArg *eig_arg;
   char *fname = "run()";
   VRB.Func(cname,fname);
-  VRB.Result(cname,fname,"evalues=%p\n",evalues);
 
   // Set the Lattice pointer eig_arg
   //----------------------------------------------------------------
@@ -277,17 +246,11 @@ void AlgEig::run(Float **evalues)
       ERR.General(cname,fname,"Invalid direction\n");
     }
 
-    hsum = (Float **) smalloc(N_eig * sizeof(Float*)); // surely Float* ?
-    if(hsum == 0)
-      ERR.Pointer(cname,fname, "hsum");
-    VRB.Smalloc(cname,fname, "hsum", hsum, N_eig * sizeof(Float*));
+    hsum = (Float **) smalloc(cname,fname,"hsum",N_eig * sizeof(Float*)); // surely Float* ?
   
     for(n = 0; n < N_eig; ++n)
     {
-      hsum[n] = (Float *) smalloc(hsum_len * sizeof(Float));
-      if(hsum[n] == 0)
-	ERR.Pointer(cname,fname, "hsum[n]");
-      VRB.Smalloc(cname,fname, "hsum[n]", hsum[n], hsum_len*sizeof(Float));
+      hsum[n] = (Float *) smalloc(cname,fname,"hsum[n]",hsum_len * sizeof(Float));
     }
   }
   else
@@ -299,12 +262,10 @@ void AlgEig::run(Float **evalues)
   Vector** eig_store=0;
   if(eig_arg->ncorr) 
   {
-    eig_store = (Vector**)smalloc(N_eig * sizeof(Vector*));
-    if(eig_store == 0) { ERR.Pointer(cname,fname, "eig_store"); }
+    eig_store = (Vector**)smalloc(cname,fname, "eig_store",N_eig * sizeof(Vector*));
     for(n=0;n<N_eig;++n)
     {
-      eig_store[n] = (Vector*) smalloc(f_size * sizeof(Float));
-      if(eig_store[n] == 0) {ERR.Pointer(cname,fname,"eig_store[n]"); }
+      eig_store[n] = (Vector*) smalloc(cname,fname, "eig_store",f_size * sizeof(Float));
     }
   }
 
@@ -315,8 +276,7 @@ void AlgEig::run(Float **evalues)
   //for(int n = 0; n < eig_arg->N_eig; ++n)
   //  lat.RandGaussVector(eigenv[n], 0.5, Ncb);
   
-  // Loop over mass values
-  int sign_dm = (eig_arg->Mass_step < 0.0) ? -1 : 1;
+  int sign_dm=1;
 
   // Initialize the cg_arg mass, with the first mass we
   // want to compute for:
@@ -325,6 +285,8 @@ void AlgEig::run(Float **evalues)
     eig_arg->mass = eig_arg->Mass.Mass_val[0]; 
     break;
   case LIN:   
+    // Loop over mass values
+    sign_dm = (eig_arg->Mass_step < 0.0) ? -1 : 1;
     eig_arg->mass = eig_arg->Mass_init; 
     if (sign_dm*eig_arg->Mass_init > sign_dm*eig_arg->Mass_final)
       ERR.General(cname,fname,"initial and final mass not valid\n");
@@ -332,9 +294,6 @@ void AlgEig::run(Float **evalues)
   case LOG:   
     eig_arg->mass = eig_arg->Mass_init; 
     break;
-  case FLOW:   
-    eig_arg->mass = eig_arg->Mass_init; 
-    break;  
   default: 
     ERR.General(cname, fname,
 		"eig_arg->pattern_kind = %d is unrecognized\n", 
@@ -342,12 +301,8 @@ void AlgEig::run(Float **evalues)
     break;
   }
 
-  /* CLAUDIO: changed to loop over mass value */
   // Loop over masses
-  int count(0);
-  while ( ( eig_arg->pattern_kind == ARRAY && count<n_masses ) ||
-  (eig_arg->mass*sign_dm<sign_dm*eig_arg->Mass_final) ){
-    //for(int m=0; m<n_masses; m++){
+  for(int m=0; m<n_masses; m++){
     
     //for(Float mass = eig_arg->Mass_init; 
     //sign_dm*mass <= sign_dm*eig_arg->Mass_final;
@@ -355,6 +310,7 @@ void AlgEig::run(Float **evalues)
 
     //eig_arg->mass = mass;
     // count the number of masses 
+    int count(0);
 
 
     // store eigenvectors from previous mass
@@ -367,15 +323,30 @@ void AlgEig::run(Float **evalues)
 
 
     // random guess every time; do *not* put in the old solution
-    /* CLAUDIO: PUT IN OLD SOLUTION!!! */
-    if(count==0 || (eig_arg->pattern_kind !=FLOW) ) {
     for(n = 0; n<N_eig; ++n)
     {
       lat.RandGaussVector(eigenv[n], 0.5, Ncb);
     }
+
+/*
+    // DEBUG, dumping start vector from QCDOC to be read in QCDSP
+    cout << "Dump DEBUGGING info...startvector.dat" << endl;
+    int f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
+    ofstream fout ( "startvector.dat");
+    fout << "f_size=" << f_size << endl;
+    for(n=0;n<N_eig;++n) {
+      fout << "n=" << n << endl;
+      for(int i=0;i<f_size;i++) {
+	fout << setprecision(15) << ((Float*)eigenv[n])[i] << endl;
+      }
+      fout << endl;
     }
-
-
+    fout.close();
+    //    exit(0);
+    //DEBUG end
+*/
+   
+    //==============================================
     // print out mass here in case we want to
     // do any output from within the FeigSolv call
     //==============================================
@@ -384,7 +355,7 @@ void AlgEig::run(Float **evalues)
     {
       FILE* filep;
       filep=Fopen(eig_arg->fname,"a");
-      Fprintf(filep,"mass = %e\n",(Float)eig_arg->mass);
+      Fprintf(filep,"mass = %g\n",(Float)eig_arg->mass);
       Fclose(filep); // close file
     }
          
@@ -400,13 +371,20 @@ void AlgEig::run(Float **evalues)
       iter = lat.FeigSolv(eigenv, lambda, chirality, valid_eig, 
       			hsum, eig_arg, CNV_FRM_NO);
 
+    //------------------------------------------------------------
+    // Solve for eigenvectors and eigenvalues.
+    // Lambda is not used initially.
+    // This call will return a negative value for the iteration number
+    // if either the solver maxes out on one of the limits.
+#if 0
+    iter = lat.FeigSolv(eigenv,lambda,chirality, valid_eig,
+    			hsum, eig_arg, CNV_FRM_YES);
+#endif
    
-      for (int eig=0; eig<eig_arg->N_eig; eig++) 
-      VRB.Debug(cname,fname,"lambda[%d]=%e\n",eig,lambda[eig]);
     //!< Copy over eigenvalues to return them
     if (evalues != 0) {
       for (int eig=0; eig<eig_arg->N_eig; eig++) {
-	evalues[eig][count] = lambda[eig];
+	evalues[eig][m] = lambda[eig];
       }
     }
 
@@ -441,10 +419,7 @@ void AlgEig::run(Float **evalues)
 	  // GM5Correlation
               
 	  //tmp vector v1
-	  Vector* v1 = (Vector *)smalloc(f_size*sizeof(Float));
-	  if (v1 == 0)
-	    ERR.Pointer(cname, fname, "v1");
-	  VRB.Smalloc(cname, fname, "v1", v1, f_size*sizeof(Float));
+	  Vector* v1 = (Vector *)smalloc(cname, fname, "v1",f_size*sizeof(Float));
               
 	  for(i_eig=0;i_eig<N_eig;i_eig++){
 	    for(j_eig=i_eig;j_eig<N_eig;j_eig++){
@@ -456,8 +431,7 @@ void AlgEig::run(Float **evalues)
 		      i_eig, j_eig, (Float)cr.real(), (Float)cr.imag());
 	    }
 	  }
-	  VRB.Sfree(cname,fname, "v1", v1);
-	  sfree(v1);
+	  sfree(cname,fname, "v1", v1);
               
 	  // Correlation with previous eigen vector
 	  if(count >0 && eig_arg->ncorr ){
@@ -471,7 +445,7 @@ void AlgEig::run(Float **evalues)
 	    }
 	  }
 
-	  
+
 	  //------------------------------------------
 	  // Print out number of iterations  and hsum
 	  //------------------------------------------
@@ -491,57 +465,20 @@ void AlgEig::run(Float **evalues)
 	    }
 	  Fclose(filep);
 	} // output
-
-      /*
-      FILE* eout;
-
-      // output the eigenvectors
-      //eout=fopen("/pfs/eigs.dat","w");
-      eout=fopen("eigs.dat","w");
-
-      fprintf(eout,"mass : %e\nneig : %i\nf_size : %i\n",
-              (Float)eig_arg->mass,N_eig,f_size);
-      
-      Site site;
-      while ( site.LoopsOverNode() )
-        {
-          fprintf(eout," %i %i %i %i\n",site.physX(),
-                  site.physY(),site.physZ(),
-                  site.physT());
-        }
-      for (int i(0);i<N_eig;i++)
-	{
-          fprintf(eout,"eig : %e\n",lambda[i]);
-        }
-      const unsigned int _5296383(5296383);
-      fwrite((void*)&_5296383,sizeof(unsigned int),1,eout);
-      for (int i(0);i<N_eig;i++)
-        {
-          fwrite((void*)((Float*)(eigenv[i])+site.Index()),
-                 sizeof(Float),
-                 f_size,
-                 eout);
-        }
-      fclose(eout);
-      */
     } // solver worked
 
     // If there is another mass loop iteration ahead, we should
     // set the eig_arg->mass to it's next desired value
-  
-    if( count < n_masses - 1 ) {
+    if( m < n_masses - 1 ) {
       switch( eig_arg->pattern_kind ) {
       case ARRAY: 
-	eig_arg->mass = eig_arg->Mass.Mass_val[count+1]; 
+	eig_arg->mass = eig_arg->Mass.Mass_val[m+1]; 
 	break;
       case LIN:   
 	eig_arg->mass += eig_arg->Mass_step; 
 	break;
       case LOG:   
 	eig_arg->mass *= eig_arg->Mass_step; 
-	break;
-      case FLOW:   
-	eig_arg->mass += sign_dm*fabs(lambda[1]); 
 	break;
       }
     }
@@ -556,9 +493,9 @@ void AlgEig::run(Float **evalues)
     {
       for(n = 0; n < N_eig; ++n)
         {
-          sfree(eig_store[n]);
+          sfree(cname,fname,"eig_store[n]",eig_store[n]);
         }
-      sfree(eig_store);
+      sfree(cname,fname,"eig_store",eig_store);
     }
   time +=dclock();
   print_flops(cname,fname,0,time);

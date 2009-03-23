@@ -153,6 +153,7 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
+	Float epsilon;
 	Float stop_rsd_hb;
 };
 
@@ -176,6 +177,7 @@ public:
 	 bool Encode(char *filename,char *instance);
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
+	Float epsilon;
 	int chrono;
 	Float stop_rsd_md;
 	Float stop_rsd_mc;
@@ -202,7 +204,9 @@ public:
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
 	Float bsn_mass;
+	Float bsn_mass_epsilon;
 	Float frm_mass;
+	Float frm_mass_epsilon;
 	int chrono;
 	Float stop_rsd_hb;
 	Float stop_rsd_md;

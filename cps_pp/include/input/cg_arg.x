@@ -3,6 +3,7 @@
 class CgArg {
 
     Float mass;			/*!<  The mass parameter. */
+    Float epsilon;             /*!< ~~The epsilon parameter for twisted mass Wilson fermions */
 
     int max_num_iter;		/*!<  The maximum number of solver
 				 iterations to do. */

@@ -55,9 +55,13 @@ AlgActionFermion::AlgActionFermion(AlgMomentum &mom,
     //!< Initialize the fermion CG arguments
     for(int i=0; i<n_masses; i++){
       frm_cg_arg_md[i]->mass = mass[i];
+      //~~ added for twisted mass Wilson fermions
+      frm_cg_arg_md[i]->epsilon = frm_arg->fermions.fermions_val[i].epsilon;
       frm_cg_arg_md[i]->max_num_iter = max_num_iter[i];
       frm_cg_arg_md[i]->stop_rsd = frm_arg->fermions.fermions_val[i].stop_rsd_md;
       frm_cg_arg_mc[i]->mass = mass[i];
+      //~~ added for twisted mass Wilson fermions
+      frm_cg_arg_mc[i]->epsilon = frm_arg->fermions.fermions_val[i].epsilon;
       frm_cg_arg_mc[i]->max_num_iter = max_num_iter[i];
       frm_cg_arg_mc[i]->stop_rsd = frm_arg->fermions.fermions_val[i].stop_rsd_mc;
     }
@@ -162,7 +166,10 @@ void AlgActionFermion::heatbath() {
     for(int i=0; i<n_masses; i++){
       lat.RandGaussVector(tmp1, 0.5, Ncb);
       lat.RandGaussVector(tmp2, 0.5, Ncb);
-      h_init += lat.SetPhi(phi[i], tmp1, tmp2, mass[i]);
+      //~~ changed for twisted mass Wilson fermions; also added DAG_YES parameter
+      h_init += (lat.Fclass() == F_CLASS_WILSON_TM) ?
+			lat.SetPhi(phi[i], tmp1, tmp2, frm_cg_arg_mc[i]->mass, frm_cg_arg_mc[i]->epsilon, DAG_YES) :
+   			lat.SetPhi(phi[i], tmp1, tmp2, frm_cg_arg_mc[i]->mass, DAG_YES);
     }
     
     sfree(tmp2, "tmp2", fname, cname);
@@ -199,10 +206,9 @@ Float AlgActionFermion::energy() {
 	updateCgStats(frm_cg_arg_mc[i]);
 	  
 	h += lat.FhamiltonNode(phi[i], cg_sol);
-      }
+  }
       
       sfree(cg_sol, "cg_sol", cname, fname);
-
       LatticeFactory::Destroy();
     }
   }
@@ -247,7 +253,10 @@ void AlgActionFermion::evolve(Float dt, int nsteps)
 
 	updateCgStats(frm_cg_arg_md[i]);
 
-	Fdt = lat.EvolveMomFforce(mom, cg_sol, mass[i], dt);
+     //~~ changed for twisted mass Wilson fermions; also added DAG_YES parameter
+     Fdt = (lat.Fclass() == F_CLASS_WILSON_TM) ?
+			lat.EvolveMomFforce(mom, cg_sol, mass[i], frm_cg_arg_mc[i]->epsilon, dt) :
+   			lat.EvolveMomFforce(mom, cg_sol, mass[i], dt);
 
 	if (force_measure == FORCE_MEASURE_YES) {
 	  char label[200];

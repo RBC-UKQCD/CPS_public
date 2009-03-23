@@ -238,6 +238,65 @@ class Fwilson : public virtual FwilsonTypes
 
 };
 
+//------------------------------------------------------------------
+//! A class implementing twisted mass Wilson fermions.
+/*!
+  \ingroup factions
+*/
+//------------------------------------------------------------------
+class FwilsonTm : public virtual Fwilson
+{
+ private:
+    char *cname;    // Class name.
+    
+ public:
+
+    FwilsonTm();
+
+    virtual ~FwilsonTm();
+
+    FclassType Fclass() const; 
+
+   //
+   // ~~ modified in f_wilsonTm to create wilsonTm fermions 
+   // 
+    int FmatEvlInv(Vector *f_out, Vector *f_in, 
+		   CgArg *cg_arg, 
+		   Float *true_res,
+		   CnvFrmType cnv_frm = CNV_FRM_YES);
+
+   //
+   //~~ the following functions are versions with the epsilon parameter  
+   //~~ for twisted mass Wilson fermions; all implemented here
+   //
+    Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+		 Float mass, Float epsilon, DagType dag);
+
+   // ~~ evolves the  momentum mom using the fermion force.
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
+				 Float mass, Float epsilon, Float step_size);
+
+   // ~~ evolves the  momentum mom using the boson force.
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+				  Float mass, Float epsilon, Float step_size);
+
+    Float BhamiltonNode(Vector *boson, Float mass, Float epsilon);
+
+    //
+    //~~ the following functions are "normal" versions without the
+    //~~ epsilon parameter; should never be called by wilsonTm fermions
+    //~~ and are implemented here as errors
+    // 
+    Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+		 Float mass, DagType dag);
+ 
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
+				 Float mass, Float step_size);
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+				  Float mass, Float step_size);
+    Float BhamiltonNode(Vector *boson, Float mass);
+};
+
 
 //------------------------------------------------------------------
 //! A class implementing clover improved Wilson fermions.
@@ -591,82 +650,6 @@ class Fdwf : public FdwfBase {
 				 Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
-};
-
-//------------------------------------------------------------------
-//! A class implementing twisted mass Wilson fermions.
-/*!
-  \ingroup factions
-*/
-//------------------------------------------------------------------
-class FwilsonTm : public virtual Fwilson
-{
- private:
-    char *cname;    // Class name.
-    
- public:
-
-    FwilsonTm();
-
-    virtual ~FwilsonTm();
-
-   //
-   // ~~ version of these functions with 
-   // ~~ epsilon parameter for twisted mass 
-   // ~~ Wilson fermions; all implemented 
-   // ~~ in f_class_wilsonTm
-   //
-    FclassType Fclass() const; 
-
-   //
-   // ~~ modified in f_wilsonTm to create wilsonTm fermions 
-   // 
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
-		   CgArg *cg_arg, 
-		   Float *true_res,
-		   CnvFrmType cnv_frm = CNV_FRM_YES);
-
-    Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
-		 Float mass, Float epsilon, DagType dag);
-	//
-	// ~~ should never be called by wilsonTm fermions
-	// ~~	implemented as an error in f_wilsonTm
-	// 
-	 Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
-		 Float mass, DagType dag);
-
-    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
-				 Float mass, Float epsilon, Float step_size);
- 
-	//
-	// ~~ should never be called by wilsonTm fermions
-	// ~~	implemented as an error in f_wilsonTm
-	// 
-	 ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
-				 Float mass, Float step_size);
-
-   //
-   // ~~ evolves the  momentum mom using the bosonic quotient force.
-   // ~~ currently implemented in f_wilsonTm as an error
-   // ~~ during implementation need to add an epsilon parameter
-   //
-    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
-				  Float mass, Float epsilon, Float step_size);
-
-	//
-	// ~~ should never be called by wilsonTm fermions
-	// ~~	implemented as an error in f_wilsonTm
-	// 
-    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
-				  Float mass, Float step_size);
-	
-    Float BhamiltonNode(Vector *boson, Float mass, Float epsilon);
-
-	//
-	// ~~ should never be called by wilsonTm fermions
-	// ~~	implemented as an error in f_wilsonTm
-	// 
-    Float BhamiltonNode(Vector *boson, Float mass);
 };
 
 

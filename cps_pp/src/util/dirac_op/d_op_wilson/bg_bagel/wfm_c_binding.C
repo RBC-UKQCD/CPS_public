@@ -59,6 +59,7 @@ void wfm_init_internal(int num,WilsonArg *wilson_p)
   wfm_scope_check(num);
   WilsonLock[num] = 1;
   StaticWilsonPAB[num].init(wilson_p);
+//printf("wfm_init_internal::wilson_p->spinor_tmp= %p\n", wilson_p->spinor_tmp);
 }
 void wfm_end_internal(int num)
 {

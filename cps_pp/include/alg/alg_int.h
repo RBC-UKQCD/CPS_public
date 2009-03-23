@@ -617,7 +617,11 @@ class AlgActionQuotient : public AlgActionBilinear {
   CgArg **frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
 
   Float *bsn_mass;  //!< The boson mass parameter that appears in the quotient
+      // ~~added for twisted mass Wilson fermions
+  Float *bsn_mass_epsilon;  //!< The boson mass parameter that appears in the quotient
   Float *frm_mass;  //!< The fermion mass parameter that appears in the quotient
+      // ~~added for twisted mass Wilson fermions
+  Float *frm_mass_epsilon;  //!< The fermion mass parameter that appears in the quotient
 
   int evolved;
   Float h_init;
@@ -641,6 +645,7 @@ class AlgActionQuotient : public AlgActionBilinear {
   AlgActionQuotient(AlgMomentum &mom, ActionQuotientArg &frm_arg);
   virtual ~AlgActionQuotient();
   
+  void reweight(Float *rw_fac,Float *norm);
   void heatbath();
 
   Float energy();
@@ -695,6 +700,7 @@ class AlgActionRationalQuotient : public AlgActionRational {
 			    ActionRationalQuotientArg &rat_quo_arg, int traj_num=0);
   virtual ~AlgActionRationalQuotient();
 
+  void reweight(Float *rw_fac,Float *norm);
   void heatbath();
   Float energy();
 

@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class Ritz eigensolver methods.
 
-  $Id: ritz.C,v 1.9 2009-01-16 22:54:52 chulwoo Exp $
+  $Id: ritz.C,v 1.10 2009-03-23 19:13:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-01-16 22:54:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.9 2009-01-16 22:54:52 chulwoo Exp $
-//  $Id: ritz.C,v 1.9 2009-01-16 22:54:52 chulwoo Exp $
+//  $Date: 2009-03-23 19:13:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.10 2009-03-23 19:13:32 chulwoo Exp $
+//  $Id: ritz.C,v 1.10 2009-03-23 19:13:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v $
 //  $State: Exp $
 //
@@ -69,11 +69,10 @@ CPS_START_NAMESPACE
 /*  Kalk_Sim	Use Kalkreuter-Simma criterion  (Read) */
 /*  N_min	Minimal CG iterations		(Read) */
 /*  N_max	Maximal CG iterations		(Read) */
-/* CLAUDIO: Cv_fact is now inout (modify): it returs the actual Cv_fact */
-/*  Cv_fact	"Convergence factor" required	(Modify) */
+/*  Cv_fact	"Convergence factor" required	(Read) */
 /*  ProjApsiP	flag for projecting A.psi	(Read) */
 
-/* Local Variables: */
+ /* Local Variables: */
 
 /*  psi			New eigenvector */
 /*  p			Direction vector */
@@ -115,17 +114,17 @@ CPS_START_NAMESPACE
 
 //! Vector orthogonalisation
 /*!
- * Implementation of the Gram-Schmidt method to orthogonalise vectors.
- * \param psi An array of vectors to be orthogonalised.
- * \param Npsi The number of vectors to be orthogonalised.
- * \param vec An array of vectors against which each vector in \a psi is to
- * be orthogonalised.
- * \pre The vectors in the array \a vec should have unit norm.
- * \param Nvec The number of vectors in the array \a vec.
- * \param f_size The length, in floating point numbers, of the vectors.
- * \post Each vector in the array \a psi is orthogonal to all of the vectors
- * in the array \a vec.
- */
+  Implementation of the Gram-Schmidt method to orthogonalise vectors.
+  \param psi An array of vectors to be orthogonalised.
+  \param Npsi The number of vectors to be orthogonalised.
+  \param vec An array of vectors against which each vector in \a psi is to
+  be orthogonalised.
+  \pre The vectors in the array \a vec should have unit norm.
+  \param Nvec The number of vectors in the array \a vec.
+  \param f_size The length, in floating point numbers, of the vectors.
+  \post Each vector in the array \a psi is orthogonal to all of the vectors
+  in the array \a vec.
+*/
 void DiracOp::GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size) 
 {
   Complex xp;
@@ -142,46 +141,31 @@ void DiracOp::GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_siz
   }
 }
 
-static void GramSchmTEST(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size) 
-{
-  Complex xp;
-  Npsi=Nvec;
-  Nvec=4;
-
-    for(int i=0; i<Nvec; ++i) {
-      if (i!=Npsi) {
-        xp = vec[i]->CompDotProductGlbSum(psi[0], f_size);
-        /* psi[s] = psi[s] - <vec[i],psi[s]> vec[i] */
-        psi[0]->CTimesV1PlusV2(-xp, vec[i], psi[0], f_size);
-      }
-    }
-}
-
 /*!
- * The eigensolver implemented here finds the \e n th lowest eigenvalue
- * \e lambda_n of a of a hermitian matrix \a A by using a Conjugate Gradient
- * based method to minimize the Ritz functional in the subspace orthogonal
- * to the \e (n-1) lower eigenvectors of \e A.
- */
+  The eigensolver implemented here finds the \e n th lowest eigenvalue
+  \e lambda_n of a of a hermitian matrix \a A by using a Conjugate Gradient
+  based method to minimize the Ritz functional in the subspace orthogonal
+  to the \e (n-1) lower eigenvectors of \e A.
+*/
 
 int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda, 
-    Float RsdR_a, Float RsdR_r, Float Rsdlam, 
-    Float Cutl_zero, int n_renorm, int Kalk_Sim,
-    int N_min, int N_max, Float &Cv_fact,
-    int MaxCG, int ProjApsiP)
+		  Float RsdR_a, Float RsdR_r, Float Rsdlam, 
+		  Float Cutl_zero, int n_renorm, int Kalk_Sim,
+		  int N_min, int N_max, Float Cv_fact,
+		  int MaxCG, int ProjApsiP)
 
 { /* Local Variables */
 
   int n_count;
   Complex xp;
-  Float mu;  
-  Float p2;  
-  Float g2;  
-  Float a;  
-  Float d;  
-  Float s1; 
-  Float s2; 
-  Float s3; 
+  Float mu;  // Double
+  Float p2;  // Double
+  Float g2;  // Double
+  Float a;  // Double
+  Float d;  // Double
+  Float s1;  // Double
+  Float s2;  // Double
+  Float s3;  // Double
   Float g2_0;
   Float del_lam;
   Float rsd;
@@ -190,43 +174,44 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   Float ct;
   Float st;
   Float b;
-  /* CLAUDIO: added mu_0 */
-  Float mu_0;
-
-
+  Float acc;
   int k;
   int nn;
-  char *fname = "Ritz";
+  char *fname = "Ritz(V*,F,...)";
 
-  // Flash the LED and then turn it off
-  //------------------------------------------------------------------
+// Flash the LED and then turn it off
+//------------------------------------------------------------------
+  VRB.LedFlash(cname,fname,3);
+  VRB.LedOff(cname,fname);
   VRB.Func(cname,fname);
 
-  // Set the node checkerboard size of the fermion field
-  //------------------------------------------------------------------
+// Set the node checkerboard size of the fermion field
+//------------------------------------------------------------------
   int f_size = RitzLatSize();
+    
+// Set the node checkerboard size of the fermion field
+//------------------------------------------------------------------
+  Vector *psi = (Vector *) smalloc(cname,fname, "psi", f_size * sizeof(Float));
 
-  // Set the node checkerboard size of the fermion field
-  //------------------------------------------------------------------
-  Vector *psi  = (Vector *) smalloc(cname,fname, "psi" , f_size * sizeof(Float));
-  Vector *p    = (Vector *) smalloc(cname,fname, "p"   , f_size * sizeof(Float));
+  Vector *p = (Vector *) smalloc(cname,fname, "p", f_size * sizeof(Float));
+
   Vector *Apsi = (Vector *) smalloc(cname,fname, "Apsi", f_size * sizeof(Float));
-  Vector *Ap   = (Vector *) smalloc(cname,fname, "Ap"  , f_size * sizeof(Float));
+  Vector *Ap = (Vector *) smalloc(cname,fname, "Ap", f_size * sizeof(Float));
 
   VRB.Input(cname,fname,"RsdR_a=%e RsdR_r=%e Rsdlam=%e Cv_fact=%e\n", 
       RsdR_a,RsdR_r,Rsdlam,Cv_fact);
 
+  acc = 2.0e-6;
+  acc *= acc;
   rsda_sq = RsdR_a * RsdR_a;
   rsdr_sq = RsdR_r * RsdR_r;
-  Float acc;
-  acc = 2.0e-13;
-  acc *= acc;
   rsda_sq = (rsda_sq > acc) ? rsda_sq : acc;
+
 
   /*  Make Psi_all(N_eig-1) orthogonal to the previous eigenvectors  */
   nn = N_eig - 1;
 
-  /*  First copy it into the local psi  */
+  /*  First copy it into a the local psi  */
   psi->CopyVec(psi_all[nn], f_size);
 
   GramSchm(&psi, 1, psi_all, nn, f_size);
@@ -240,10 +225,8 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   /*  Apsi[0]   :=  A . Psi[0]  */
   RitzMat(Apsi, psi);
 
-  /* CLAUDIO: Le seguenti due righe sono inutili!
-   * xp = psi->CompDotProductGlbSum(Apsi, f_size);
-   * mu = psi->ReDotProductGlbSum(Apsi, f_size);
-   */
+  xp = psi->CompDotProductGlbSum(Apsi, f_size);
+  mu = psi->ReDotProductGlbSum(Apsi, f_size);
 
   /*  Project to orthogonal subspace, if wanted  */
   /** Should not be necessary, following Kalkreuter-Simma **/
@@ -256,33 +239,31 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   /*  p[0] = g[0]   :=  ( A - mu[0] ) Psi[0]  =  Apsi - mu psi */
   lambda = mu;
   p->FTimesV1PlusV2(-lambda, psi, Apsi, f_size);
-
+  
 
   /*  g2 = p2 = |g[0]|^2 = |p[0]|^2 */
   g2 = p->NormSqGlbSum(f_size);
   p2 = g2;
   g2_0 = g2;
-  /* CLAUDIO: la seguente linea e` commentata: ora Cv_fact non e` piu' incluso in g2_0 
-   * g2_0 *= Cv_fact;
-   */
-  /* CLAUDIO: remove this  
-   * g2_0 = (g2_0 > acc) ? g2_0 : acc;
-   */
-  /* CLAUDIO: added mu_0 */
-  mu_0=mu;
+  g2_0 *= Cv_fact;
+  g2_0 = (g2_0 > acc) ? g2_0 : acc;
+
+  if (ProjApsiP == 1)
+    VRB.Result(cname,fname,"nn = %d, lambda=%g, g2=%g, g2_0=%g\n",
+	    nn, (IFloat)mu, (IFloat)g2, (IFloat)g2_0);
 
   /*  IF |g[0]| <= min(RsdR_a, RsdR_r |mu[0]|) THEN RETURN; */
   rsd = rsdr_sq * lambda * lambda;
-  rsd = (rsda_sq < rsd) ? rsda_sq : rsd; /* CLAUDIO: c'era un > invece di <  */
+  rsd = (rsda_sq > rsd) ? rsda_sq : rsd;
   if ( Kalk_Sim == 0 && N_min <= 0 && g2 <= rsd )
   {
     /*  Copy psi back into psi_all(N_eig-1)  */
     psi_all[nn]->CopyVec(psi, f_size);
 
-    sfree(cname,fname, "Ap"  , Ap  );
+    sfree(cname,fname, "Ap", Ap);
     sfree(cname,fname, "Apsi", Apsi);
-    sfree(cname,fname, "p"   , p   );
-    sfree(cname,fname, "psi" , psi );
+    sfree(cname,fname, "p", p);
+    sfree(cname,fname, "psi", psi);
 
     n_count = 0;
     return n_count;
@@ -291,13 +272,17 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   del_lam = mu;
 
   /*  FOR k FROM 1 TO MaxCG DO */
-  for(k = 0; k < MaxCG; ++k)
+  for(k = 1; k <= MaxCG; ++k)
   {
-    if (k % 100 == 0)
+    if (k % 100 == 0){
       VRB.Result(cname,fname,"nn = %d, iter=%d, lambda=%e, del_lam=%e\n", 
           nn, k, (IFloat)mu, del_lam);
       VRB.Result(cname,fname, "g2/g2_0=%e/%e=Cv_fact=%e > %e\n",
 (IFloat)g2, (IFloat)g2_0, (IFloat)g2/g2_0, (IFloat)Cv_fact);
+    }
+//   if (k % 100 == 0)
+//      VRB.Result(cname,fname,"nn = %d, lambda=%g, g2=%g, g2_0=%g\n",
+//		 nn, (IFloat)mu, (IFloat)g2, (IFloat)g2_0);
 
     /*  Ap = A * p  */
     RitzMat(Ap, p);
@@ -357,10 +342,10 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
 
     /*  Psi[k] = ct Psi[k-1] + st p[k-1] */
     /*  Apsi[k] = ct Apsi[k-1] + st Ap */
-    psi->VecTimesEquFloat  (ct, f_size);
-    psi->FTimesV1PlusV2    (st, p, psi, f_size);
-    Apsi->VecTimesEquFloat (ct, f_size);
-    Apsi->FTimesV1PlusV2   (st, Ap, Apsi, f_size);
+    psi->VecTimesEquFloat(ct, f_size);
+    psi->FTimesV1PlusV2(st, p, psi, f_size);
+    Apsi->VecTimesEquFloat(ct, f_size);
+    Apsi->FTimesV1PlusV2(st, Ap, Apsi, f_size);
 
     /*  Ap = g[k] = Apsi[k] - mu[k] Psi[k] */
     Ap->FTimesV1PlusV2(-lambda, psi, Apsi, f_size);
@@ -370,22 +355,22 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
     g2 = Ap->NormSqGlbSum(f_size);
 
     /*+  */
+    /*  IF |g[k]| <= min(RsdR_a, RsdR_r |mu[k]|)
+	   && |del_lam| <= Rsdlam*|lambda|  THEN RETURN; */
     rsd = rsdr_sq * lambda * lambda;
-    rsd = (rsda_sq < rsd) ? rsda_sq : rsd; /* CLAUDIO: errore: c'era un > invece di < !!! */
+    rsd = (rsda_sq > rsd) ? rsda_sq : rsd;
     st = Rsdlam * fabs(mu);	/* old value of st is no longer needed */
 
-    /*    if ( TO_REAL(g2) <= rsd && del_lam <= st ) */
-    if ( (Kalk_Sim==0 && k>N_min && (fabs(mu)<Cutl_zero || (g2<=rsd && del_lam<=st) ) ) ||
-        /* CLAUDIO: changed to match eigen_Wilson.C */
-        /* CLAUDIO: for KS require only that Cv_fact is reached */
-        (Kalk_Sim==1 && k>N_min && ( k>N_max || fabs(mu)<Cutl_zero || (g2<(g2_0*Cv_fact)) ) )
-        //(Kalk_Sim == 1 && ( k>N_max || fabs(mu)<Cutl_zero || fabs((mu-mu_0)/(1.-g2/g2_0))<=st) || (k>N_min &&(g2<(g2_0*Cv_fact))) ) 
-       )
+/*    if ( TO_REAL(g2) <= rsd && del_lam <= st ) */
+    if ( (Kalk_Sim == 0 && k >= N_min && (fabs(mu) < Cutl_zero ||
+	       (g2 <=  rsd && del_lam <= st ) ) ) ||
+	 (Kalk_Sim == 1 && ( del_lam <= st || fabs(mu) < Cutl_zero ||
+	       (k >= N_min && (g2 < g2_0 || k >= N_max ) ) ) ) )
     {
       VRB.Result(cname, fname, "Converged at iter %d, lambda = %g, del_lam = %g\n",
-          k, (IFloat)lambda, (IFloat)del_lam);
+		 k, (IFloat)lambda, (IFloat)del_lam);
       VRB.Result(cname, fname, "  rsd = %g, g2 = %g, g2_0 = %g\n",
-          (IFloat)rsd, (IFloat)g2, (IFloat)g2_0);
+		 (IFloat)rsd, (IFloat)g2, (IFloat)g2_0);
       n_count = k;
 
       /* Renormalize and recompute lambda */
@@ -401,29 +386,15 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
       /*  Apsi  :=  A . Psi  */
       RitzMat(Apsi, psi);
 
-      /* CLAUDIO: do not add projection here!!
-       * We want <psi|Apsi> for the extimate of the error 
-       */
-
       /*  mu  := < Psi | A Psi >  */
       s1 = mu;
       mu = psi->ReDotProductGlbSum(Apsi, f_size);
       lambda = mu;
       VRB.Result(cname, fname, "Mu-s at convergence: old %g vs. nn %g\n", 
-          (IFloat)s1, (IFloat)mu);
+		 (IFloat)s1, (IFloat)mu);
 
       /*  Copy psi back into psi_all(N_eig-1)  */
       psi_all[nn]->CopyVec(psi, f_size);
-
-      /* CLAUDIO: write Cv_fact */
-      Cv_fact=g2/g2_0;
-      /* Cv_fact=g2/g2_0; */
-      /* CLAUDIO: recompute g2 needed for error bounds */
-      /* not nedded here... only after diagonalization in eigen_Wilson.C */
-      //  Ap = g[k] = Apsi[k] - mu[k] Psi[k] 
-      //Ap->FTimesV1PlusV2(-lambda, psi, Apsi, f_size);
-      //  g2  =  |g[k]|**2 = |Ap|**2 
-      //g2 = Ap->NormSqGlbSum(f_size);
 
       VRB.Sfree(cname,fname, "Ap", Ap);
       sfree(Ap);
@@ -434,8 +405,12 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
       VRB.Sfree(cname,fname, "psi", psi);
       sfree(psi);
 
+// Flash the LED and then turn it on
+//------------------------------------------------------------------
       VRB.FuncEnd(cname,fname);
-
+      VRB.LedFlash(cname,fname,2);
+      VRB.LedOn(cname,fname);
+      
       return k;
     }
 
@@ -448,7 +423,7 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
     {
       /* Restart: p[k] = g[k] = Ap */
       VRB.Result(cname, fname, "Restart at iter %d since beta = %g\n", 
-          k, (IFloat)b);
+		 k, (IFloat)b);
       p->CopyVec(Ap, f_size);
     }
     else
@@ -473,8 +448,8 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
       psi->VecTimesEquFloat(ct, f_size);
       d -= 1.0;
 
-      //if (ProjApsiP == 1)
-      //  VRB.Result(cname,fname,"Deviation at iter %d: %g\n", k, (IFloat)d);
+      if (ProjApsiP == 1)
+	VRB.Result(cname,fname,"Deviation at iter %d: %g\n", k, (IFloat)d);
 
       /*  Apsi  :=  A . Psi  */
       RitzMat(Apsi, psi);
@@ -482,14 +457,14 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
       /*  Project to orthogonal subspace, if wanted  */
       /** Should not be necessary, following Kalkreuter-Simma **/
       if (ProjApsiP == 1)
-        GramSchm(&Apsi, 1, psi_all, nn, f_size);
+	GramSchm(&Apsi, 1, psi_all, nn, f_size);
 
       /*  mu  := < Psi | A Psi >  */
       s1 = mu;
       mu = psi->ReDotProductGlbSum(Apsi, f_size);
-      //if (ProjApsiP == 1)
-      //  VRB.Result(cname,fname,"Mu-s at iter %d: old %g vs. new %g\n", 
-      //      k, (IFloat)s1, (IFloat)mu);
+      if (ProjApsiP == 1)
+	VRB.Result(cname,fname,"Mu-s at iter %d: old %g vs. new %g\n", 
+		   k, (IFloat)s1, (IFloat)mu);
 
       /*  g[k] = Ap = ( A - mu ) Psi  */
       lambda = mu;
@@ -505,31 +480,33 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
       GramSchm(&p, 1, &psi, 1, f_size);
 
       /*  Make < g[k] | p[k] > = |g[k]|**2: p[k] = p_old[k] + xp g[k],
-          xp = (g2 - < g | p_old >) / g2; g[k] = Ap */
+	  xp = (g2 - < g | p_old >) / g2; g[k] = Ap */
       xp = g2 - Ap->CompDotProductGlbSum(p, f_size);
       ct = 1.0 / g2;
       xp *= ct;
       p->CTimesV1PlusV2(xp, Ap, p, f_size);
     }
-  
-    /* CLAUDIO: this is not necessary */
-    /*
     else if (ProjApsiP == 1 && nn > 0)
     {
-      //  Project psi and p to orthogonal subspace
+      /*  Project psi and p to orthogonal subspace  */
       GramSchm(&psi, 1, psi_all, nn, f_size);
       GramSchm(&p, 1, psi_all, nn, f_size);
     }
-    */
 
     /*  p2  =  |p[k]|**2 */
     p2 = p->NormSqGlbSum(f_size);
 
+#if 0
+    if (ProjApsiP == 1)
+      VRB.Result(cname,fname,"At iter %d, lambda = %g, del_lam = %g, g2 = %g\n",
+	     k, (IFloat)lambda, (IFloat)del_lam, (IFloat)g2);
+#endif
   }
 
   /*  Copy psi back into psi_all(N_eig-1)  */
   psi_all[nn]->CopyVec(psi, f_size);
 
+  n_count = MaxCG;
   VRB.Sfree(cname,fname, "Ap", Ap);
   sfree(Ap);
   VRB.Sfree(cname,fname, "Apsi", Apsi);
@@ -538,7 +515,9 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   sfree(p);
   VRB.Sfree(cname,fname, "psi", psi);
   sfree(psi);
-  return -1;
+
+  ERR.General(cname,fname, "too many CG/Ritz iterations: %d\n",n_count);
+  return n_count;
 }
 
 CPS_END_NAMESPACE

@@ -1,7 +1,7 @@
 /*!\file
   Wilson Dirac operator code for QCDOC
 
-  $Id: wilson_init.C,v 1.8 2007-06-25 21:07:42 chulwoo Exp $
+  $Id: wilson_init.C,v 1.9 2009-03-23 19:13:32 chulwoo Exp $
 */
 
 #include <util/wilson.h>
@@ -13,8 +13,47 @@
 
 CPS_START_NAMESPACE
 
+//~~
+//~~ (Ok for noarch)
+//~~
+//~~ added for twisted mass fermions
+//~~
 /*----------------------------------------------------------------------*/
-/* Pointer to Wilson type structure is ignored here                     */
+/*                                                                      */
+/* the qcdoc initialization is even more contorted that usual (hard     */
+/* to believe that would be possible)                                   */
+/*                                                                      */
+/* f_wilson: declares static Wilson data area                           */
+/*         : calls (qcdoc) wilson_init with ptr to Wilson struct        */
+/*                                                                      */
+/* wilson_init: declares static WilsonArg struct                        */
+/*            : calls wfm_init with ptr to WilsonArg struct             */
+/*            : calls wilson_compat_init.C (cps_compat.C) with ptr      */
+/*              to WilsonArg struct and prt to Wilson struct            */
+/*                                                                      */
+/* wfm_init: (wfm_c_binding.C) allocates copy of wfm (a subclass        */
+/*           of WilsonArg)                                              */
+/*         : calls wfm_init_internal                                    */
+/*                                                                      */
+/* wfm_init_internal: calls wfm::init with ptr to WilsonArg struct      */
+/*                                                                      */
+/*----------------------------------------------------------------------*/
+/*                                                                      */
+/* twisted mass fermion modifications                                   */
+/*                                                                      */
+/* - WilsonArg struct:  add ptr to spinor_tmp in                        */
+/*                                                                      */
+/* - wfm::init:   set *spinor_tmp to address of temporary spinor        */
+/*                                                                      */
+/* - wilson_compat_init.C:  arguments are prt to the WilsonArg struct   */
+/* and ptr to the Wilson struct; its uses *spinor_tmp from WilsonArg    */
+/* to define temporary checkerboards af[0] and af[1] in Wilson struct;  */
+/* af[0] and af[1] are used in d_op_wilson and d_op_wilsonTm            */
+/*                                                                      */
+/*----------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------*/
+/* WilsonArg data structure is declared here                            */
 /*----------------------------------------------------------------------*/
 static WilsonArg wil;
 
@@ -63,8 +102,12 @@ void wilson_init(Wilson *wilson_p)
 //  wil.local_comm[3] = 0;
 
   wfm_init (&wil);
-  wilson_compat_init(wilson_p);
-
+//~~ 
+//~~ twisted mass fermions:  added second argument WilsonArg *wil
+//~~ for transfer of *spinor_tmp from WilsonArg to Wilson
+//~~ 
+  wilson_compat_init(wilson_p, &wil);
+//~~
 }
 
 /*Wrapper used by the clover code*/

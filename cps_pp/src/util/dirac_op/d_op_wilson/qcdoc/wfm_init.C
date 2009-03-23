@@ -126,10 +126,17 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
   if(spinor_tmp == 0){
     printf("wfm::spinor_tmp allocate\n");
     exit(-1);
-  }
+  }  
   bzero((char *)spinor_tmp,spinor_words*sizeof(Float)*2);
 //  printf("spinor_tmp is %x\n",spinor_tmp);
-    
+
+
+//~~
+//~~ twisted mass fermions:  sets WilsonArg.spinor_tmp tp 
+//~~ address of temporary spinor in wfm class
+//~~    
+  wilson_p->spinor_tmp = spinor_tmp;
+//~~
 
 /*--------------------------------------------------------------------------*/
 /* Reserve memory for the 4 forward and 4 backward spin projected half      */ 
@@ -145,8 +152,8 @@ void wfm::init(WilsonArg *wilson_p)  /* pointer to Wilson type structure    */
   if(two_spinor == 0){
     printf("wfm::two_spinor allocate\n");
     exit(-1);
-  }
-
+  } 
+    
   for ( int pm = 0;pm<2;pm++ ) {
     for ( mu = 0 ; mu < 4 ; mu ++) {
       half_spinor_words = PAD_HALF_SPINOR_SIZE * nbound[mu];

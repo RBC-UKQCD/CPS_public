@@ -20,6 +20,7 @@ public:
 	 bool Decode(char *filename,char *instance);
 	 bool Vml(VML *vmls,char *instance);
 	Float mass;
+	Float epsilon;
 	int max_num_iter;
 	Float stop_rsd;
 	Float true_rsd;

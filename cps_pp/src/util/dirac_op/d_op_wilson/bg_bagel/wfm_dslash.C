@@ -160,8 +160,10 @@ void *wfm::recon_internal(void *pooh)
 
     if ( arg->bgl && arg->sloppy )
       s_bgl_rec_su3_dag(arg->chi,arg->u,arg->two_spinor,&arg->vol,complex_i);
-    else if ( arg->bgl )
+    else if ( arg->bgl ){
+//printf("recon internal: chi= %e u= %e two spinor= %e vol= %d \n", *(float*)arg->chi,*(float*)arg->u,*(float*)arg->two_spinor,arg->vol);fflush(stdout);
       bgl_rec_su3_dag(arg->chi,arg->u,arg->two_spinor,&arg->vol,complex_i);
+    }
     else if( arg->sloppy)
       s_rec_su3_dag(arg->chi,arg->u,arg->two_spinor,&arg->vol);
     else 
@@ -357,11 +359,5 @@ void wfm::dslash(Float *chi,
 #endif 
   return;
 }
-
-
-
-
-
-
 
 

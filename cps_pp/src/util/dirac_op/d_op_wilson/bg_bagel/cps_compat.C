@@ -1,6 +1,6 @@
 /*! \file
 
-$Id: cps_compat.C,v 1.2 2007-10-30 20:40:34 chulwoo Exp $
+$Id: cps_compat.C,v 1.3 2009-03-23 19:13:32 chulwoo Exp $
 */
 	
   
@@ -18,12 +18,12 @@ CPS_START_NAMESPACE
 void wilson_compat_init(Wilson *wilson_p);
 void wilson_compat_end(Wilson *wilson_p);
 
-void wilson_compat_init(Wilson *wilson_p)
+void wilson_compat_init(Wilson *wilson_p, WilsonArg *wil)
 {
   int size;
   char *cname = "wfm";
   char *fname = "wilson_compat_init(Wilson *)";
-
+  int spinor_words;
 
         /*--------------------------------------------------------------------------*/
         /* Reserve memory for the node sublattice sizes                             */
@@ -45,8 +45,23 @@ void wilson_compat_init(Wilson *wilson_p)
           wilson_p->vol[0] = wilson_p->ptr[0] * wilson_p->ptr[1] *
                              wilson_p->ptr[2] * wilson_p->ptr[3] / 2;
           wilson_p->vol[1] = wilson_p->vol[0];
-	  wilson_p->af[0] = NULL;
-	  wilson_p->af[1] = NULL;
+// TB modified:
+//	  wilson_p->af[0] = NULL;
+//	  wilson_p->af[1] = NULL;
+//~~ 
+//~~ twisted mass fermions:  defines half-fields Wilson.af[0] & Wilson.af[1]
+//~~ in temporary spinor temporary full field 
+//~~ af[0], af[1] used in d_op_wilson & d_op_wilsonTm members 
+//~~ MatPc, MatPcDag, and MatPcDagMatPc
+//~~ 
+          spinor_words = SPINOR_SIZE * wilson_p->vol[0];
+          wilson_p->af[0] = wil->spinor_tmp;
+          wilson_p->af[1] = wil->spinor_tmp + spinor_words;
+//printf("set af[] temps. size= %d\n",spinor_words);
+//printf("cps_compat_init::af[0]=%p\n",wilson_p->af[0]);
+//printf("cps_compat_init::af[1]=%p\n",wilson_p->af[1]);
+//~~
+// End TB
 /*----------------------------------------------------------------------*/
 /* end of for backward and dwf compatibility                            */
 /*----------------------------------------------------------------------*/

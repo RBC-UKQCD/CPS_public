@@ -159,6 +159,67 @@ AlgActionRationalQuotient::~AlgActionRationalQuotient() {
 }
 
 //!< Heat Bath for the pseudo-fermions (phi)
+void AlgActionRationalQuotient::reweight(Float *rw_fac,Float *norm) {
+
+  char *fname = "reweight()";
+
+
+//    if (n_masses>1)
+//      ERR.General(cname,fname,"not implemented for n_mass>1(%d)\n",n_masses);
+
+    //!< Before energy is measured, do we want to check bounds?
+    if (rat_quo_arg->eigen.eigen_measure == EIGEN_MEASURE_YES) {
+      checkApprox(bsn_mass, bsn_remez_arg_mc, rat_quo_arg->eigen);
+      checkApprox(frm_mass, frm_remez_arg_mc, rat_quo_arg->eigen);
+    }
+
+    //!< Create an appropriate lattice
+    Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
+    
+    for(int i=0; i<n_masses; i++){
+
+      lat.RandGaussVector(phi[i], 0.5, Ncb);
+      norm[i] = lat.FhamiltonNode(phi[i],phi[i]);
+
+      //!< First apply boson rational
+      frmn[0] -> VecEqualsVecTimesEquFloat(phi[i],bsn_remez_arg_mc[i].norm,
+					   f_size);
+      
+      cg_iter = lat.FmatEvlMInv(frmn, phi[i], bsn_remez_arg_mc[i].pole, 
+				bsn_remez_arg_mc[i].degree, 0, 
+				bsn_cg_arg_mc[i], CNV_FRM_NO, SINGLE, 
+				bsn_remez_arg_mc[i].residue);
+      
+      //!< Now apply fermion rational
+      frmn[1] -> VecEqualsVecTimesEquFloat(frmn[0],frm_remez_arg_mc[i].norm,
+					   f_size);
+      
+      cg_iter = lat.FmatEvlMInv(frmn+1, frmn[0], frm_remez_arg_mc[i].pole, 
+				frm_remez_arg_mc[i].degree, 0, 
+				frm_cg_arg_mc[i], CNV_FRM_NO, SINGLE, 
+				frm_remez_arg_mc[i].residue);
+      
+      updateCgStats(bsn_cg_arg_mc[i][0]);
+      updateCgStats(frm_cg_arg_mc[i][0]);
+
+      // shift this evaluation into minvcg?
+      rw_fac[i] = lat.FhamiltonNode(frmn[1], frmn[1]);
+      rw_fac[i] -= norm[i];
+      glb_sum_five(rw_fac+i);
+      glb_sum_five(norm+i);
+
+    }
+
+    LatticeFactory::Destroy();
+
+//    evolved = 0;
+//    heatbathEval = 1;
+//    energyEval = 0;
+//    traj++;
+
+}
+
+//!< Heat Bath for the pseudo-fermions (phi)
 void AlgActionRationalQuotient::heatbath() {
 
   char *fname = "heatbath()";
