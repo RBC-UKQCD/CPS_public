@@ -8,14 +8,14 @@ EigArg::EigArg(){
 }
 
 EigArg::~EigArg(){
-  if(Mass.Mass_val)
-    delete[] Mass.Mass_val;
+//  if(Mass.Mass_val)
+//    delete[] Mass.Mass_val;
 }
 
 void EigArg::resize ( u_int n_floats){
   Mass.Mass_len=n_floats;
-  if(Mass.Mass_val)
-    delete[] Mass.Mass_val;
+//  if(Mass.Mass_val)
+//    delete[] Mass.Mass_val;
   if(n_floats>0)
     Mass.Mass_val= new Float[n_floats];
   else
