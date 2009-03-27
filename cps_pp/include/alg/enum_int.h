@@ -37,6 +37,7 @@ enum FclassType {
 	F_CLASS_DWF = 4,
 	F_CLASS_ASQTAD = 5,
 	F_CLASS_P4 = 6,
+	F_CLASS_WILSON_TM = 7,
 };
 typedef enum FclassType FclassType;
 extern struct vml_enum_map FclassType_map[];
@@ -653,7 +654,7 @@ typedef enum RhmcPolesAction RhmcPolesAction;
 extern struct vml_enum_map RhmcPolesAction_map[];
 
 enum HmdLimits {
-	MAX_HMD_MASSES = 8,
+	MAX_HMD_MASSES = 10,
 	MAX_RAT_DEGREE = 20,
 };
 typedef enum HmdLimits HmdLimits;

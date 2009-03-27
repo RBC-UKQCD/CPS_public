@@ -366,6 +366,8 @@ bool_t
 vml_BosonDescr (VML *vmls, char *name,BosonDescr *objp)
 {
 	 vml_class_begin(vmls,"BosonDescr",name);
+	 if (!vml_Float (vmls, "epsilon", &objp->epsilon))
+		 return FALSE;
 	 if (!vml_Float (vmls, "stop_rsd_hb", &objp->stop_rsd_hb))
 		 return FALSE;
 	 vml_class_end(vmls,"BosonDescr",name);
@@ -425,6 +427,8 @@ bool_t
 vml_FermionDescr (VML *vmls, char *name,FermionDescr *objp)
 {
 	 vml_class_begin(vmls,"FermionDescr",name);
+	 if (!vml_Float (vmls, "epsilon", &objp->epsilon))
+		 return FALSE;
 	 if (!vml_int (vmls, "chrono", &objp->chrono))
 		 return FALSE;
 	 if (!vml_Float (vmls, "stop_rsd_md", &objp->stop_rsd_md))
@@ -490,7 +494,11 @@ vml_QuotientDescr (VML *vmls, char *name,QuotientDescr *objp)
 	 vml_class_begin(vmls,"QuotientDescr",name);
 	 if (!vml_Float (vmls, "bsn_mass", &objp->bsn_mass))
 		 return FALSE;
+	 if (!vml_Float (vmls, "bsn_mass_epsilon", &objp->bsn_mass_epsilon))
+		 return FALSE;
 	 if (!vml_Float (vmls, "frm_mass", &objp->frm_mass))
+		 return FALSE;
+	 if (!vml_Float (vmls, "frm_mass_epsilon", &objp->frm_mass_epsilon))
 		 return FALSE;
 	 if (!vml_int (vmls, "chrono", &objp->chrono))
 		 return FALSE;

@@ -30,6 +30,8 @@ vml_CgArg (VML *vmls, char *name,CgArg *objp)
 	 vml_class_begin(vmls,"CgArg",name);
 	 if (!vml_Float (vmls, "mass", &objp->mass))
 		 return FALSE;
+	 if (!vml_Float (vmls, "epsilon", &objp->epsilon))
+		 return FALSE;
 	 if (!vml_int (vmls, "max_num_iter", &objp->max_num_iter))
 		 return FALSE;
 	 if (!vml_Float (vmls, "stop_rsd", &objp->stop_rsd))
