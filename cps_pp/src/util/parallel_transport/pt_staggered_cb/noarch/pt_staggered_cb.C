@@ -40,7 +40,7 @@ ParTransStaggered_cb::ParTransStaggered_cb(Lattice & latt) :
 
   //Conversion to STAG_BLOCK to optimize QCDOC matrix multiplication
   //noarch version does not use STAG_BLOCK gauge fields
-  #if 0
+  #if 1
   old_str_ord2 = lat.StrOrd();
   if (lat.StrOrd() != STAG_BLOCK){
     lat.Convert(STAG_BLOCK);
@@ -63,7 +63,7 @@ ParTransStaggered_cb::~ParTransStaggered_cb() {
 
   //Conversion to STAG_BLOCK to optimize QCDOC matrix multiplication
   //noarch version does not use STAG_BLOCK gauge fields
-  #if 0
+  #if 1
   if ( old_str_ord2 !=STAG_BLOCK){
     lat.Convert(old_str_ord2);
   }

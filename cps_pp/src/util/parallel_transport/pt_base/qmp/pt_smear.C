@@ -1,3 +1,4 @@
+#ifdef USE_QMP
 #include <string.h>
 #include "asq_data_types.h"
 #include "pt_int.h"
@@ -307,3 +308,4 @@ void PT::asqtad_long(AsqDArg *asq_arg, matrix *longlink, matrix *longlink_m){
 #endif
 
 }
+#endif

@@ -1,8 +1,9 @@
 
+#ifdef USE_QMP
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: pt_force.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+  $Id: pt_force.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -735,3 +736,4 @@ void PT::update_momenta(matrix **force, Float dt, matrix *mom) {
 }
 
 
+#endif

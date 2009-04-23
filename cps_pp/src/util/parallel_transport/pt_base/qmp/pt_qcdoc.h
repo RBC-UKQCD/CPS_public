@@ -8,7 +8,11 @@ static unsigned long PLB = 0xb0000000;
 
 #define TESTING
 #undef TESTING
+#if ( TARGET == BGL ) || (TAGET == BGP)
 #undef CPP
+#else
+#define CPP
+#endif
 //CPS_START_NAMESPACE
 //void dirac_cmv_jcw_agg_cpp( int sites, long chi, long u,long in, long out);
 
@@ -25,7 +29,7 @@ extern "C"{
   //Matrix multiplication for full matrix fields
   void cmm_agg_cpp(gauge_agg *chi, matrix *phi, matrix *result, int counter);
   void cmv_agg_cpp( int sites, long u,long in, long out);
-  #define partrans_cmm_agg(A,B,C,D) cmm_agg_cpp(A,B,C,D)
+  #define partrans_cmm_agg(A,B,C,D) cmm_agg_cpp(A,B,C,2*D)
   #define partrans_cmv_agg(A,B,C,D) cmv_agg_cpp(A,B,C,D)
 
   //matrix vector multiply for checkerboarded fields
@@ -33,10 +37,16 @@ extern "C"{
   void pt_cmv_dag_cpp(int sites, ind_agg *agg, double *gauge_field, double *src, double *dest);
   void pt_cmv_pad_cpp(int sites, ind_agg *agg, double *gauge_field, double *src, double *dest);
   void pt_cmv_dag_pad_cpp(int sites, ind_agg *agg, double *gauge_field, double *src, double *dest);
-  #define partrans_cmv(A,B,C,D,E) pt_cmv_cpp(A,B,C,D,E)
-  #define partrans_cmv_dag(A,B,C,D,E) pt_cmv_dag_cpp(A,B,C,D,E)
-  #define partrans_cmv_pad(A,B,C,D,E) pt_cmv_pad_cpp(A,B,C,D,E)
-  #define partrans_cmv_dag_pad(A,B,C,D,E) pt_cmv_dag_pad_cpp(A,B,C,D,E)
+  void pt_copy_cpp(int count, ind_agg *ind, double *src, double *dest);
+  void pt_copy_pad_cpp(int count, ind_agg *ind, double *src, double *dest);
+  void pt_copy_buffer_cpp(int n, double * src, double * dest, int * ptable);
+  #define partrans_cmv(A,B,C,D,E) pt_cmv_cpp(2*A,B,C,D,E)
+  #define partrans_cmv_dag(A,B,C,D,E) pt_cmv_dag_cpp(2*A,B,C,D,E)
+  #define partrans_cmv_pad(A,B,C,D,E) pt_cmv_pad_cpp(2*A,B,C,D,E)
+  #define partrans_cmv_dag_pad(A,B,C,D,E) pt_cmv_dag_pad_cpp(2*A,B,C,D,E)
+  #define partrans_copy(A,B,C,D) pt_copy_cpp(2*A,B,C,D)
+  #define partrans_copy_pad(A,B,C,D) pt_copy_pad_cpp(2*A,B,C,D)
+  #define partrans_copy_buffer(A,B,C,D) pt_copy_buffer_cpp(A,B,C,D)
   //--------------------------------------------------------------------------
   //Assembly Routines
 #else
@@ -56,19 +66,21 @@ extern "C"{
   void pt_cmv_pad_s(int count, ind_agg *ind, float *gauge, float *src, float *dest);
   void pt_cmv_dag_s(int count, ind_agg *ind, float *gauge, float *src, float *dest);
   void pt_cmv_dag_pad_s(int count, ind_agg *ind, float *gauge, float *src, float *dest);
-  #define partrans_cmv(A,B,C,D,E) pt_cmv(A,B,C,D,E)
-  #define partrans_cmv_dag(A,B,C,D,E) pt_cmv_dag(A,B,C,D,E)
-  #define partrans_cmv_pad(A,B,C,D,E) pt_cmv_pad(A,B,C,D,E)
-  #define partrans_cmv_dag_pad(A,B,C,D,E) pt_cmv_dag_pad(A,B,C,D,E)
-#endif
-  //--------------------------------------------------------------------------
-
   void pt_copy(int count, ind_agg *ind, double *src, double *dest);
   void pt_copy_pad(int count, ind_agg *ind, double *src, double *dest);
   void pt_copy_s(int count, ind_agg *ind, float *src, float *dest);
   void pt_copy_pad_s(int count, ind_agg *ind, float *src, float *dest);
+  void pt_copy_buffer(int n, double * src, double * dest, int * ptable);
+  #define partrans_cmv(A,B,C,D,E) pt_cmv(A,B,C,D,E)
+  #define partrans_cmv_dag(A,B,C,D,E) pt_cmv_dag(A,B,C,D,E)
+  #define partrans_cmv_pad(A,B,C,D,E) pt_cmv_pad(A,B,C,D,E)
+  #define partrans_cmv_dag_pad(A,B,C,D,E) pt_cmv_dag_pad(A,B,C,D,E)
+  #define partrans_copy(A,B,C,D) pt_copy(A,B,C,D)
+  #define partrans_copy_pad(A,B,C,D) pt_copy_pad(A,B,C,D)
+  #define partrans_copy_buffer(A,B,C,D) pt_copy_buffer(A,B,C,D)
+#endif
+  //--------------------------------------------------------------------------
 
-  void pt_copy_buffer(int n, long src, long dest, long ptable);
   // Assembler copying routines
   void copy_matrix(IFloat *res, IFloat *src, int *length, 
 		   unsigned long *res_ptr, unsigned long *src_ptr);

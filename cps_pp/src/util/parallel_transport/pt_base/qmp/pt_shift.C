@@ -1,19 +1,20 @@
+#ifdef USE_QMP
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_shift.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+  $Id: pt_shift.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-11 22:45:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_shift.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
-//  $Id: pt_shift.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+//  $Date: 2009-04-23 03:33:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_shift.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
+//  $Id: pt_shift.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_shift.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_shift.C,v $
 //  $State: Exp $
 //
@@ -22,9 +23,6 @@
 #include "pt_int.h"
 #include "pt_qcdoc.h"
 
-#ifndef USE_QMP
-#define USE_QMP
-#endif
 
 //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
 void PT::shift_field(IFloat **v, const int *dir, int n_dir,
@@ -189,3 +187,4 @@ void PT::shift_link(IFloat **u, const int *dir, int n_dir){
   }
 
 }
+#endif

@@ -1,19 +1,20 @@
+#ifdef USE_QMP
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_vec.C,v 1.5 2008-04-21 14:19:18 chulwoo Exp $
+  $Id: pt_vec.C,v 1.6 2009-04-23 03:33:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-21 14:19:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.5 2008-04-21 14:19:18 chulwoo Exp $
-//  $Id: pt_vec.C,v 1.5 2008-04-21 14:19:18 chulwoo Exp $
+//  $Date: 2009-04-23 03:33:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.6 2009-04-23 03:33:25 chulwoo Exp $
+//  $Id: pt_vec.C,v 1.6 2009-04-23 03:33:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_vec.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v $
 //  $State: Exp $
 //
@@ -24,6 +25,12 @@
 #ifndef SCIDAC 
 #include <config.h>
 #include <util/time_cps.h>
+#endif
+
+#if 1
+void inline PRINT(char *format,...) {}
+#else
+#define PRINT printf
 #endif
 
 
@@ -70,6 +77,8 @@ parity, int pad, IFloat * new_gauge_field)
 }
 
 #define PROFILE
+//inline double dclock(){return CPS_NAMESPACE::dclock();}
+inline double dclock(){return 0.;}
 void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
 
@@ -89,7 +98,7 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
   static double comm_init_time=0.;
   static double comm_complete_time=0.;
 
-  total_time -=CPS_NAMESPACE::dclock();
+  total_time -=dclock();
   setup_time -=dclock();
   QMP_msgmem_t msg_mem_p[4*NDIM];
   QMP_msghandle_t msg_handle_p[4*NDIM];
@@ -129,7 +138,7 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	      }
 	    else if((wire[i] == 6))
 	      {
-            pt_copy_buffer(non_local_chi_cb[6],(long)vin[i],(long)snd_buf_t_cb,(long)Toffset[parity]);
+            partrans_copy_buffer(non_local_chi_cb[6],vin[i],snd_buf_t_cb,Toffset[parity]);
 	      }
 	  }
       }
@@ -146,7 +155,7 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	      }
 	    else if(wire[i] == 6)
 	      {
-            pt_copy_buffer(non_local_chi_cb[6],(long)vin[i],(long)snd_buf_t_cb,(long)Toffset[parity]);
+            partrans_copy_buffer(non_local_chi_cb[6],vin[i],snd_buf_t_cb,Toffset[parity]);
 	      }
 	  }
       }
@@ -192,10 +201,12 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 
   comp_time -=dclock();
   //Do local calculations
+  PRINT("//Do local calculations\n");
   if(conjugated)
     {
       for(i=0;i<n;i++)
 	{
+PRINT("wire=%d\n",i);
 	
   if(wire[i]%2)
     partrans_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
@@ -208,6 +219,7 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
     {
     for(i=0;i<n;i++)
       {
+PRINT("wire=%d\n",i);
 
   if(!(wire[i]%2))
     partrans_cmv(local_chi_cb[wire[i]]/2,uc_l_cb[parity][wire[i]],gauge,vin[i],vout[i]);
@@ -259,13 +271,14 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 	  //All we need to do is to put the transported field in the correct place
 	  else
 	    {
-              pt_copy(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],rcv_buf[wire[i]],vout[i]);
+              partrans_copy(non_local_chi_cb[wire[i]]/2,uc_nl_cb[parity][wire[i]],rcv_buf[wire[i]],vout[i]);
 	    }
 	}
     }
   comp_time +=dclock();
-  total_time +=CPS_NAMESPACE::dclock();
+  total_time +=dclock();
 //  ParTrans::PTflops +=33*n*vol;
+#ifdef PROFILE
   if(call_num %100==0){
     double fac = 0.01;
     CPS_NAMESPACE::print_time("vec_cb_norm","total_time",total_time*fac);
@@ -276,6 +289,7 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
     call_num=0;
     total_time=comp_time=setup_time=comm_init_time=comm_complete_time=0.;
   }
+#endif
 }
 
 #define PROFILE
@@ -284,15 +298,13 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
 void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
   //List of the different directions
-  int wire[n];
+  int wire[8];
   int i;
 
   QMP_msgmem_t msg_mem_p[4*NDIM];
   QMP_msghandle_t msg_handle_p[4*NDIM];
 //  QMP_msghandle_t multiple;
   static int call_num = 0;
-//  int vlen = VECT_LEN;
-//  int vlen2 = 8;
 #if 0
   printf("gauge=%p parity =%d\n",gauge,parity);
   for(i=0;i<n;i++){
@@ -349,7 +361,7 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   dtime  = - dclock();
 #endif
 #if 1
-            pt_copy_buffer(non_local_chi_cb[6],(long)vin[i],(long)snd_buf_t_cb,(long)Toffset[parity]);
+            partrans_copy_buffer(non_local_chi_cb[6],vin[i],snd_buf_t_cb,Toffset[parity]);
 #else
 	      for(int j = 0; j < non_local_chi_cb[6];j++)
 		  for(k = 0; k < VECT_LEN;k++)
@@ -411,6 +423,7 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 #endif
 
 
+  PRINT("//Do local calculations\n");
   //Do local calculations
   for(i=0;i<n;i++)
     {
@@ -418,12 +431,14 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
   dtime  = - dclock();
 #endif
 
+PRINT("wire=%d\n",i);
       if((wire[i]%2 && conjugated) || ((wire[i]%2 == 0) && (conjugated == 0)))
 	{
 	partrans_cmv_pad(local_chi_cb[wire[i]]/2,uc_l_pad_cb[parity][wire[i]],gauge,vin[i],vout);
 	}
       else
 	partrans_cmv_dag_pad(local_chi_cb[wire[i]]/2,uc_l_pad_cb[parity][wire[i]],gauge,vin[i],vout);
+  PRINT("//local done\n");
 
 #ifdef PROFILE
   dtime +=dclock();
@@ -484,7 +499,7 @@ void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity
 #ifdef PROFILE
   dtime  = - dclock();
 #endif
-              pt_copy_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],rcv_buf[wire[i]],vout);
+              partrans_copy_pad(non_local_chi_cb[wire[i]]/2,uc_nl_pad_cb[parity][wire[i]],rcv_buf[wire[i]],vout);
 #ifdef PROFILE
   dtime +=dclock();
 //  print_flops(fname,"pt_copy_pad()",0,dtime);
@@ -562,3 +577,4 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
 #endif
   Flops +=66*n*vol;
 }
+#endif

@@ -1,4 +1,6 @@
+#ifdef USE_QMP
 #include <stdlib.h>
+#include <stdio.h>
 #include "asq_data_types.h"
 #include "pt_int.h"
 void *PT::Alloc(char *cname, char *fname, char *vname, int request,unsigned
@@ -25,3 +27,4 @@ void *PT::FastAlloc(char *cname, char *fname, char *vname, int request ){
 //    printf("FastAlloc(): %s::%s: %s %d = %p bytes\n",cname,fname,vname,request,p);
     return p;
 }
+#endif

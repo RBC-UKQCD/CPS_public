@@ -1,4 +1,5 @@
 #include <config.h>
+#ifdef USE_QMP
 #include <util/pt.h>
 #include <util/gjp.h>
 #include <util/lattice.h>
@@ -142,3 +143,4 @@ void pt_1vec_cb(int n, Float *vout, Float **vin, const int *dir, ChkbType cb, in
   ParTrans::PTflops +=33*n*PT::vol;
 }
 CPS_END_NAMESPACE
+#endif

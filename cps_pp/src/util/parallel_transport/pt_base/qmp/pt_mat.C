@@ -1,19 +1,20 @@
+#ifdef USE_QMP
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_mat.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+  $Id: pt_mat.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-11 22:45:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
-//  $Id: pt_mat.C,v 1.2 2007-01-11 22:45:57 chulwoo Exp $
+//  $Date: 2009-04-23 03:33:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
+//  $Id: pt_mat.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_mat.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v $
 //  $State: Exp $
 //
@@ -51,6 +52,8 @@ parity)
 {
   mat_cb_norm(n,mout,min,dir,parity,gauge_field_addr);
 }
+
+static const int MAX_DIR=10;
 
 #define PROFILE
 #undef PROFILE
@@ -248,14 +251,11 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
     
   int wire[n];
   int i;
-  #ifdef USE_QMP
-  QMP_msgmem_t *msg_mem_p = (QMP_msgmem_t *)Alloc("","vec_cb_norm", "msg_mem_p", 2*non_local_dirs*sizeof(QMP_msgmem_t));
-  QMP_msghandle_t* msg_handle_p = (QMP_msghandle_t *)Alloc("","vec_cb_norm", "msg_handle_p", 2*non_local_dirs*sizeof(QMP_msghandle_t));
+//  QMP_msgmem_t *msg_mem_p = (QMP_msgmem_t *)Alloc("","vec_cb_norm", "msg_mem_p", 2*non_local_dirs*sizeof(QMP_msgmem_t));
+//  QMP_msghandle_t* msg_handle_p = (QMP_msghandle_t *)Alloc("","vec_cb_norm", "msg_handle_p", 2*non_local_dirs*sizeof(QMP_msghandle_t));
+  QMP_msgmem_t msg_mem_p[2*MAX_DIR];
+  QMP_msghandle_t msg_handle_p[2*MAX_DIR];
   QMP_msghandle_t multiple;
-  #else
-  SCUDirArgIR *SCUarg_p[2*n];
-  SCUDirArgMulti SCUmulti;
-  #endif
   static int call_num = 0;
 
   call_num++;
@@ -271,45 +271,25 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   if (!local[wire[i]/2]) {
     //Calculate the address for transfer in a particular direction
     Float * addr = ((Float *)min[i]+GAUGE_LEN*offset[wire[i]]);
-    #ifndef USE_QMP
-    //This should point to the appropriate SCUDirArg for receiving
-    SCUarg_p[2*non_local_dir] = SCUarg_mat[0][2*wire[i]];
-    //This points to the appropriate SCUDirArg for sending
-    SCUarg_p[2*non_local_dir+1] = SCUarg_mat[0][2*wire[i]+1];
-    //Reset the send address
-    SCUarg_p[2*non_local_dir+1]->Addr((void *)addr);
-   #else
     msg_mem_p[2*non_local_dir] = QMP_declare_msgmem((void *)rcv_buf[wire[i]], 3*non_local_chi[wire[i]]*VECT_LEN*sizeof(IFloat));
     msg_mem_p[2*non_local_dir+1] = QMP_declare_strided_msgmem((void *)addr, (size_t)(3*blklen[wire[i]]), numblk[wire[i]], (ptrdiff_t)(3*stride[wire[i]]+3*blklen[wire[i]]));
     
     msg_handle_p[2*non_local_dir] = QMP_declare_receive_relative(msg_mem_p[2*non_local_dir], wire[i]/2, 1-2*(wire[i]%2), 0);
     msg_handle_p[2*non_local_dir+1] = QMP_declare_send_relative(msg_mem_p[2*non_local_dir+1], wire[i]/2, 2*(wire[i]%2)-1, 0);
-    #endif
 
     non_local_dir++;
   }
+  if (call_num==1)printf("non_local_dir=%d\n",non_local_dir);
 
-  #ifndef USE_QMP
-if (non_local_dir){
-  SCUmulti.Init(SCUarg_p,non_local_dir*2);
-  //Start transmission
-  SCUmulti.SlowStartTrans();
-}
-  #else
   if(non_local_dir) {
     multiple = QMP_declare_multiple(msg_handle_p, 2*non_local_dir);
     QMP_start(multiple);
   }
-  #endif
   //Interleaving of local computation of matrix multiplication
   for(i=0;i<n;i++){
     partrans_cmm_agg(uc_l[wire[i]],min[i],mout[i],local_chi[wire[i]]/2);
   }
 
-  #ifndef USE_QMP
-  if (non_local_dir)
-  SCUmulti.TransComplete();
-  #else
   if(non_local_dir) {
     QMP_status_t qmp_complete_status = QMP_wait(multiple);
     if (qmp_complete_status != QMP_SUCCESS)
@@ -317,10 +297,9 @@ if (non_local_dir){
     QMP_free_msghandle(multiple);
     for(int i = 0; i < 2*non_local_dir; i++)
       QMP_free_msgmem(msg_mem_p[i]);
-    Free(msg_handle_p);
-    Free(msg_mem_p);
+//    Free(msg_handle_p);
+//    Free(msg_mem_p);
   }
-  #endif
 
   //Do non-local computations
   for(i=0;i<n;i++) 
@@ -334,3 +313,4 @@ if (non_local_dir){
 //  ParTrans::PTflops +=198*n*vol;
 }
 
+#endif

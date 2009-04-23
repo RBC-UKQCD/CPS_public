@@ -1,24 +1,25 @@
+#include <config.h>
+#ifndef USE_QMP
 /*! \file
   \brief  Functions used by the ParTransAsqtad class.
   
-  $Id: pt.C,v 1.10 2006-12-21 20:40:31 chulwoo Exp $
+  $Id: pt.C,v 1.11 2009-04-23 03:33:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-12-21 20:40:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.10 2006-12-21 20:40:31 chulwoo Exp $
-//  $Id: pt.C,v 1.10 2006-12-21 20:40:31 chulwoo Exp $
+//  $Date: 2009-04-23 03:33:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.11 2009-04-23 03:33:24 chulwoo Exp $
+//  $Id: pt.C,v 1.11 2009-04-23 03:33:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-#include <config.h>
 #include <util/gjp.h>
 #include <util/pt.h>
 #include <comms/scu.h>
@@ -860,4 +861,5 @@ void pt_1vec_cb_pad(int n, IFloat *fout, IFloat **fin, const int *dir,ChkbType c
 //-----------------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#endif //USE_QMP
 	

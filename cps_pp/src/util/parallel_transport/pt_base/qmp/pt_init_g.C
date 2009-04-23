@@ -1,19 +1,20 @@
+#ifdef USE_QMP
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_init_g.C,v 1.3 2008-04-21 14:19:18 chulwoo Exp $
+  $Id: pt_init_g.C,v 1.4 2009-04-23 03:33:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-21 14:19:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init_g.C,v 1.3 2008-04-21 14:19:18 chulwoo Exp $
-//  $Id: pt_init_g.C,v 1.3 2008-04-21 14:19:18 chulwoo Exp $
+//  $Date: 2009-04-23 03:33:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init_g.C,v 1.4 2009-04-23 03:33:25 chulwoo Exp $
+//  $Id: pt_init_g.C,v 1.4 2009-04-23 03:33:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_init_g.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init_g.C,v $
 //  $State: Exp $
 //
@@ -347,3 +348,4 @@ void PT::init_g(Float * g_addr){
 }
 
 //CPS_END_NAMESPACE
+#endif

@@ -1,19 +1,20 @@
+#ifdef USE_QMP
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_ordering.C,v 1.3 2008-05-06 15:19:50 chulwoo Exp $
+  $Id: pt_ordering.C,v 1.4 2009-04-23 03:33:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-06 15:19:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_ordering.C,v 1.3 2008-05-06 15:19:50 chulwoo Exp $
-//  $Id: pt_ordering.C,v 1.3 2008-05-06 15:19:50 chulwoo Exp $
+//  $Date: 2009-04-23 03:33:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_ordering.C,v 1.4 2009-04-23 03:33:25 chulwoo Exp $
+//  $Id: pt_ordering.C,v 1.4 2009-04-23 03:33:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_ordering.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_ordering.C,v $
 //  $State: Exp $
 //
@@ -410,3 +411,4 @@ void PT::set_hop_pointer() {
 //  exit(44);
 }
 //CPS_END_NAMESPACE
+#endif

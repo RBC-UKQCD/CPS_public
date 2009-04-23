@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
-  $Id: verbose.C,v 1.17 2008-04-29 16:11:05 chulwoo Exp $
+  $Id: verbose.C,v 1.18 2009-04-23 03:33:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-29 16:11:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.17 2008-04-29 16:11:05 chulwoo Exp $
-//  $Id: verbose.C,v 1.17 2008-04-29 16:11:05 chulwoo Exp $
+//  $Date: 2009-04-23 03:33:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.18 2009-04-23 03:33:25 chulwoo Exp $
+//  $Id: verbose.C,v 1.18 2009-04-23 03:33:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.17 $
+//  $Revision: 1.18 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
@@ -46,7 +46,7 @@ const int MAX_STRING = 256;
   information by default.
 */
 static void vrb_printf(const char *cname,const char *fname,const char *str){
-#if TARGET == BGL || TARGET == BGP
+#if TARGET == BGL || TARGET == BGP || (defined USE_QMP )
   if (!UniqueID()) printf("Node %d: %s::%s: %s\n",UniqueID(),cname,fname,str);
 #else
   printf("%s::%s: %s\n",cname,fname,str);
