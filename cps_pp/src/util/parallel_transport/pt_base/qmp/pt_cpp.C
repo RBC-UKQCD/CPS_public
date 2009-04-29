@@ -153,7 +153,7 @@ void pt_copy_cpp(int sites, ind_agg *u, double *a, double *tmpfrm)
   IFloat *fp0, *fp1, *uu, *tmp;
   int s,c,d;
   struct gauge_agg_cb *agg = u;
-  printf("sites=%d u=%p src=%p dest=%p\n",sites,u,a,tmpfrm);
+  PRINT("sites=%d u=%p src=%p dest=%p\n",sites,u,a,tmpfrm);
 
   for(s=0;s<sites;s++)
     {

@@ -477,13 +477,14 @@ void DiracOpP4::RitzMat(Vector *out, Vector *in) {
 // cb refers to the checkerboard of the in field.
 // order refers to the order of the derivative.
 //------------------------------------------------------------------
-void DiracOpP4::dMdmu(Vector *out, 
-                                  Vector *in, 
-                                  ChkbType cb, 
+void DiracOpP4::dMdmu(Vector *out,
+                                  Vector *in,
+                                  ChkbType cb,
                                   DagType dag,
                                   int order) {
 
-  ERR.NotImplemented(cname,"dMdmu");
+  p4_dMdmu(out,in, int(cb),int(dag),int(order));
+//  ERR.NotImplemented(cname,"dMdmu");
 }
 
 
