@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_init.C,v 1.2 2006-07-13 20:14:44 chulwoo Exp $
+  $Id: pt_init.C,v 1.3 2009-05-06 04:10:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-07-13 20:14:44 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_init.C,v 1.2 2006-07-13 20:14:44 chulwoo Exp $
-//  $Id: pt_init.C,v 1.2 2006-07-13 20:14:44 chulwoo Exp $
+//  $Date: 2009-05-06 04:10:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_init.C,v 1.3 2009-05-06 04:10:42 chulwoo Exp $
+//  $Id: pt_init.C,v 1.3 2009-05-06 04:10:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_init.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_init.C,v $
 //  $State: Exp $
 //
@@ -35,7 +35,7 @@ void PT::init(PTArg *pt_arg)
   int local_count[2*NDIM];
   int non_local_count[2*NDIM];
   int vlen = VECT_LEN*sizeof(IFloat); //size of incoming vector
-  int vlen2 =VECT_LEN2*sizeof(IFloat); //size of outgoing vector (maybe different to optimize for QCDOC PEC)
+  int vlen2 =VECT_LEN_OUT*sizeof(IFloat); //size of outgoing vector (maybe different to optimize for QCDOC PEC)
 
   //---------------------------------------------------------------------------
   int local_count_cb[2][2*NDIM];
@@ -517,7 +517,7 @@ void PT::init(PTArg *pt_arg)
       if (l_size>0){
         for (int s=0; s<l_size; s++) {
           src_l[j][i][s] = hp_l[j][i][s].src/(VECT_LEN*sizeof(IFloat));
-          dest_l[j][i][s] = hp_l[j][i][s].dest/(VECT_LEN2*sizeof(IFloat));
+          dest_l[j][i][s] = hp_l[j][i][s].dest/(VECT_LEN_OUT*sizeof(IFloat));
         }
 	src_l[j][i][l_size] = src_l[j][i][l_size-1];
 	dest_l[j][i][l_size] = dest_l[j][i][l_size-1] ;
@@ -525,7 +525,7 @@ void PT::init(PTArg *pt_arg)
       if (nl_size>0){
         for (int s=0; s<nl_size; s++) {
           src_nl[j][i][s] = hp_nl[j][i][s].src/(VECT_LEN*sizeof(IFloat));
-          dest_nl[j][i][s] = hp_nl[j][i][s].dest/(VECT_LEN2*sizeof(IFloat));
+          dest_nl[j][i][s] = hp_nl[j][i][s].dest/(VECT_LEN_OUT*sizeof(IFloat));
         }
 	src_nl[j][i][nl_size] = src_nl[j][i][nl_size-1];
 	dest_nl[j][i][nl_size] = dest_nl[j][i][nl_size-1] ;

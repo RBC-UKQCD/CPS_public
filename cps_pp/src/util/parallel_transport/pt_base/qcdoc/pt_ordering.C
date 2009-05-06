@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_ordering.C,v 1.2 2006-07-13 20:14:44 chulwoo Exp $
+  $Id: pt_ordering.C,v 1.3 2009-05-06 04:10:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-07-13 20:14:44 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_ordering.C,v 1.2 2006-07-13 20:14:44 chulwoo Exp $
-//  $Id: pt_ordering.C,v 1.2 2006-07-13 20:14:44 chulwoo Exp $
+//  $Date: 2009-05-06 04:10:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_ordering.C,v 1.3 2009-05-06 04:10:42 chulwoo Exp $
+//  $Id: pt_ordering.C,v 1.3 2009-05-06 04:10:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_ordering.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_ordering.C,v $
 //  $State: Exp $
 //
@@ -285,7 +285,7 @@ void PT::set_hop_pointer() {
 //  VRB.Func("PT",fname);
   //Actual memory usage of vectors
   int vlen = VECT_LEN*sizeof(IFloat);
-  int vlen2 =VECT_LEN2*sizeof(IFloat);
+  int vlen2 =VECT_LEN_OUT*sizeof(IFloat);
 
   int x[NDIM], nei[NDIM];
   

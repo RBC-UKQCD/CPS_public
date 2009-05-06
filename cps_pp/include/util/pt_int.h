@@ -14,7 +14,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.20 2008-04-21 14:19:17 chulwoo Exp $
+  $Id: pt_int.h,v 1.21 2009-05-06 04:10:41 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 #ifdef USE_SCU
@@ -45,6 +45,8 @@ enum { PT_EVEN = 0, PT_ODD  = 1};
 
 class PT  {
   private:
+	enum {NDIM = 4,
+		  MAX_HOP = 3};
   char *cname;
   static int size[4];
   int local[4];
@@ -55,11 +57,7 @@ class PT  {
   int prec;
   int non_local_dirs;
   IFloat * gauge_txyz;
-	enum {NDIM = 4,
-		  MAX_HOP = 3,
-    	  GAUGE_LEN=18,
-		  VECT_LEN=6, 
-		  VECT_LEN2=6};
+
 //gauge_agg holds source and destination indices, as well as the SU(3)
 //link matrix.  One for local parallel transport, another for non-local
     gauge_agg *uc_l[2*NDIM];
@@ -209,6 +207,11 @@ int conjugated;
     static int set_offset(int dir, int hop);
     void set_hop_pointer();
   public:
+	enum {
+    	  GAUGE_LEN=18,
+		  VECT_LEN=6, 
+		  VECT_LEN_OUT=6,
+		  VECT_LEN_PAD=8};
     PT() {};
     ~PT() {};
     static int evenodd;
