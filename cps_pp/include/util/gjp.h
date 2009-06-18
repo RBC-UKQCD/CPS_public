@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.36 2008-05-22 21:25:46 chulwoo Exp $
+  $Id: gjp.h,v 1.37 2009-06-18 04:25:20 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-22 21:25:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.36 2008-05-22 21:25:46 chulwoo Exp $
-//  $Id: gjp.h,v 1.36 2008-05-22 21:25:46 chulwoo Exp $
+//  $Date: 2009-06-18 04:25:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.37 2009-06-18 04:25:20 chulwoo Exp $
+//  $Id: gjp.h,v 1.37 2009-06-18 04:25:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.36 $
+//  $Revision: 1.37 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -603,6 +603,11 @@ public:
     direction Sheikoleslami-Wohlert improved anisotropic fermion action.
     \return The anisotropic clover coefficient.
   */
+  void  XiV( Float xi_v ) {doarg_int.xi_v = xi_v;}
+  void CloverCoeff(Float clover_coeff)
+         {doarg_int.clover_coeff = clover_coeff;}
+  void CloverCoeffXi(Float clover_coeff_xi)
+         {doarg_int.clover_coeff_xi = clover_coeff_xi;}
 
   Float XiGfix() const            {return doarg_int.xi_gfix;}
   int GfixChkb() const 		  {return doarg_int.gfix_chkb;}
