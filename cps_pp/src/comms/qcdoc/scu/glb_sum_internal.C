@@ -56,6 +56,8 @@ static int length[5];
 void glb_sum_internal (Float * float_p, int dir,int len)
 {
 //  printf("float_p(%p)=%e dir=%d len=%d\n",float_p,*float_p,dir,len);
+  if (dir<0 || dir>4)
+  ERR.General("","glb_sum_internal","dir(%d) out of range",dir);
   if(len>MAX_BUF)
   ERR.General("","glb_sum_internal","len(%d)>MAX_BUF(%d)",len,MAX_BUF);
   if (!initted) {
