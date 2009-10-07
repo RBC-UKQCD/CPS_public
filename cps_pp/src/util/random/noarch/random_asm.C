@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.15 2009-04-29 15:50:35 chulwoo Exp $
+  $Id: random_asm.C,v 1.16 2009-10-07 22:02:38 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-04-29 15:50:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.15 2009-04-29 15:50:35 chulwoo Exp $
-//  $Id: random_asm.C,v 1.15 2009-04-29 15:50:35 chulwoo Exp $
+//  $Date: 2009-10-07 22:02:38 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.16 2009-10-07 22:02:38 chulwoo Exp $
+//  $Id: random_asm.C,v 1.16 2009-10-07 22:02:38 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.15 $
+//  $Revision: 1.16 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -47,13 +47,13 @@ IFloat RandomGenerator::Rand(void)
     //---------------------------------------------------------
     // Start generating random numbers here
     //---------------------------------------------------------
-    VRB.Result(cname,fname,"inext=%d inextp=%d\n",inext,inextp);
+//    VRB.Result(cname,fname,"inext=%d inextp=%d\n",inext,inextp);
     if ( ++inext == state_size ) inext = 0 ;
     if ( ++inextp == state_size ) inextp = 0 ;
     long mj = ma[inext] - ma[inextp] ;
     if ( mj < 0 ) mj += MBIG ;
     ma[inext] = mj ;
-#if 1
+#if 0
     if (!UniqueID() && called %100==0)
     printf("mj = %d mj*FAC=%0.16e\n",mj,mj*FAC);
     called++;
@@ -72,16 +72,16 @@ IFloat GaussianRandomGenerator::Rand(int noexit)
 {
     char *cname = "GaussianRandomGenerator";
     char *fname = "Rand()";
-    VRB.Result(cname,fname,"noexit=%d iset=%d\n",noexit,iset);
+//    VRB.Result(cname,fname,"noexit=%d iset=%d\n",noexit,iset);
     if(iset == 0) {	// We don't have an extra deviate handy
         int num_try = 0;
 	IFloat v1, v2, rsq;
         do {
-	    VRB.Result(cname,fname,"v1 = 2.0 * RandomGenerator::Rand() - 1.0;\n");
+//	    VRB.Result(cname,fname,"v1 = 2.0 * RandomGenerator::Rand() - 1.0;\n");
 	    v1 = 2.0 * RandomGenerator::Rand() - 1.0;
-	    VRB.Result(cname,fname,"v2 = 2.0 * RandomGenerator::Rand() - 1.0;\n");
+//	    VRB.Result(cname,fname,"v2 = 2.0 * RandomGenerator::Rand() - 1.0;\n");
 	    v2 = 2.0 * RandomGenerator::Rand() - 1.0;
-//            if ((num_try %1000)==0) 
+            if ((num_try %1000)==0) 
 	      VRB.Result(cname,fname,"num_try=%d v1=%e v2=%e\n",cname,fname,num_try,v1,v2);
 	    rsq = v1*v1 + v2*v2;
             num_try++;
