@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.16 2009-10-07 22:02:38 chulwoo Exp $
+  $Id: random_asm.C,v 1.17 2009-10-08 15:00:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-10-07 22:02:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.16 2009-10-07 22:02:38 chulwoo Exp $
-//  $Id: random_asm.C,v 1.16 2009-10-07 22:02:38 chulwoo Exp $
+//  $Date: 2009-10-08 15:00:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.17 2009-10-08 15:00:24 chulwoo Exp $
+//  $Id: random_asm.C,v 1.17 2009-10-08 15:00:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
-//  $Revision: 1.16 $
+//  $Revision: 1.17 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
@@ -74,7 +74,7 @@ IFloat GaussianRandomGenerator::Rand(int noexit)
     char *fname = "Rand()";
 //    VRB.Result(cname,fname,"noexit=%d iset=%d\n",noexit,iset);
     if(iset == 0) {	// We don't have an extra deviate handy
-        int num_try = 0;
+        int num_try = 1;
 	IFloat v1, v2, rsq;
         do {
 //	    VRB.Result(cname,fname,"v1 = 2.0 * RandomGenerator::Rand() - 1.0;\n");
