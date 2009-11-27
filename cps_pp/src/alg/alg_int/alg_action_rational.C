@@ -456,13 +456,14 @@ void AlgActionRational::generateApprox(Float *mass,
   for (int i=0; i<n_masses; i++) {
     for (int j=0; j<i; j++) {
       //!< Avoid unnecessary reconstruction
-      if (mass[j] == mass[i]) {
+//      if (mass[j] == mass[i]) {
+    VRB.Result(cname,fname,"i=%d j=%d\n",i,j);
 	(*remez_arg_md)[i].valid_approx = 
 	  compareApprox((*remez_arg_md)[i], (*remez_arg_md)[j]);
 
 	(*remez_arg_mc)[i].valid_approx = 
 	  compareApprox((*remez_arg_mc)[i], (*remez_arg_mc)[j]);
-      }
+//      }
     }
 
     //!< First generate the md appropximation
@@ -493,6 +494,17 @@ void AlgActionRational::destroyApprox(RemezArg *remez_arg_md,
 }
 
 int AlgActionRational::compareApprox(RemezArg &arg1, RemezArg &arg2) {
+
+
+#if 0
+ printf("field type: %d %d\n",arg1.field_type,arg2.field_type);
+ printf("power_num: %d %d\n",arg1.power_num,arg2.power_num);
+ printf("power_den: %d %d\n",arg1.power_den,arg2.power_den);
+ printf("lambda_low: %e %e\n",arg1.lambda_low,arg2.lambda_low);
+ printf("lambda_high: %e %e\n",arg1.lambda_high,arg2.lambda_high);
+ printf("precision: %d %d\n",arg1.precision,arg2.precision);
+ printf("degree: %d %d\n",arg1.degree,arg2.degree);
+#endif
 
   //!< no need to recalculate approximation if same mass
   if (arg1.field_type == arg2.field_type &&

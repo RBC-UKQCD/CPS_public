@@ -654,7 +654,7 @@ typedef enum RhmcPolesAction RhmcPolesAction;
 extern struct vml_enum_map RhmcPolesAction_map[];
 
 enum HmdLimits {
-	MAX_HMD_MASSES = 10,
+	MAX_HMD_MASSES = 200,
 	MAX_RAT_DEGREE = 20,
 };
 typedef enum HmdLimits HmdLimits;

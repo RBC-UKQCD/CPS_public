@@ -205,8 +205,8 @@ void AlgActionRationalQuotient::reweight(Float *rw_fac,Float *norm) {
       // shift this evaluation into minvcg?
       rw_fac[i] = lat.FhamiltonNode(frmn[1], frmn[1]);
       rw_fac[i] -= norm[i];
-      glb_sum_five(rw_fac+i);
-      glb_sum_five(norm+i);
+      glb_sum(rw_fac+i);
+      glb_sum(norm+i);
 
     }
 

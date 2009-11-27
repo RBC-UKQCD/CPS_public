@@ -8,19 +8,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.18 2009-03-23 19:13:32 chulwoo Exp $
+  $Id: enum.x,v 1.19 2009-11-27 06:11:11 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2009-03-23 19:13:32 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.18 2009-03-23 19:13:32 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.18 2009-03-23 19:13:32 chulwoo Exp $*/
+/*  $Date: 2009-11-27 06:11:11 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.19 2009-11-27 06:11:11 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.19 2009-11-27 06:11:11 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.18 $*/
+/*  $Revision: 1.19 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -780,7 +780,7 @@ enum RhmcPolesAction { 	RHMC_POLES_CALC = 0,
 			RHMC_POLES_CALC_WRITE = 2 };
 
 enum HmdLimits { 
-  MAX_HMD_MASSES=10 ,   /* The maximum number of dynamical masses.*/
+  MAX_HMD_MASSES=200 ,   /* The maximum number of dynamical masses.*/
   MAX_RAT_DEGREE=20 /* The maximum degree of the rational approximation.*/
 }; 
 
