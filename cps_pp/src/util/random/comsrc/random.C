@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.30 2010-04-05 20:26:52 chulwoo Exp $
+  $Id: random.C,v 1.31 2010-04-05 20:28:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2010-04-05 20:26:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.30 2010-04-05 20:26:52 chulwoo Exp $
-//  $Id: random.C,v 1.30 2010-04-05 20:26:52 chulwoo Exp $
+//  $Date: 2010-04-05 20:28:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.31 2010-04-05 20:28:46 chulwoo Exp $
+//  $Id: random.C,v 1.31 2010-04-05 20:28:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.30 $
+//  $Revision: 1.31 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -310,7 +310,7 @@ for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
 			  + 23 * (x[0]/2 + vx[0]*
 				 (x[1]/2 + vx[1]*
 				 (x[2]/2 + vx[2]*
-				 (x[3]/2 + vx[3]*(x[4]/2) ))));
+				 (x[3]/2 + vx[3]*(x[4]/2+1) ))));
 		      start_seed_4d = base_seed
 			  + 23 * (x[0]/2 + vx[0]*
 				 (x[1]/2 + vx[1]*
