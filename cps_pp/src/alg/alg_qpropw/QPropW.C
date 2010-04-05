@@ -244,6 +244,11 @@ void QPropW::Run(const int do_rerun, const Float precision) {
    char *fname = "Run()";
    VRB.Func(cname, fname);
 
+   //Start timing
+   Float dtime_begin=dclock();
+   Float dtime_last=dtime_begin;
+   Float dtime_this=dtime_begin;
+
    // Set the node size of the full (non-checkerboarded) fermion field
    //----------------------------------------------------------------
    //int f_size = GJP.VolNodeSites() * Lat.FsiteSize()/GJP.SnodeSites();
@@ -440,6 +445,16 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      }
    }
 
+   //Print out time taken to invert
+   dtime_this=dclock();
+   Float time_tmp=dtime_this-dtime_last;
+   int hr_tmp=time_tmp/3600.0;
+   int min_tmp=(time_tmp-3600.0*hr_tmp)/60.0;
+   Float sec_tmp=time_tmp-3600.0*hr_tmp-60.0*min_tmp;
+   VRB.Result(cname,fname,"Time taken to invert: %d hours %d minutes %f seconds.\n",hr_tmp,min_tmp,sec_tmp);
+   //Start timing midpoint calculations
+   dtime_last=dtime_this;
+
    //-----------------------------------------------------------------
    // TY Add Start
    // Print out conserved axial results
@@ -481,8 +496,19 @@ void QPropW::Run(const int do_rerun, const Float precision) {
    // End M. Lightman
    //-----------------------------------------------------------------
 
+   //Print out time taken for midpoint calculations.
+   dtime_this=dclock();
+   time_tmp=dtime_this-dtime_last;
+   hr_tmp=time_tmp/3600.0;
+   min_tmp=(time_tmp-3600.0*hr_tmp)/60.0;
+   sec_tmp=time_tmp-3600.0*hr_tmp-60.0*min_tmp;
+   VRB.Result(cname,fname,"Time spent calculating midpoint and conserved axial current: %d hours %d minutes %f seconds.\n",hr_tmp,min_tmp,sec_tmp);
+
    // save prop
    if (do_cg && qp_arg.save_prop) {
+
+     //Start timing how long it takes to save
+     dtime_last=dclock();
      
      char propType[256], sourceType[256], propOutfile[256];
 
@@ -547,7 +573,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
 
        
 
-     sprintf(propType,"4D propagator, mass=%0.3f, StpCond=%0.0E,\nBC=%s%s%s%s,\n%s,\n%s", 
+     sprintf(propType,"4D propagator, mass=%0.4f, StpCond=%0.0E,\nBC=%s%s%s%s,\n%s,\n%s", 
 	     qp_arg.cg.mass, qp_arg.cg.stop_rsd,
 	     ((GJP.Xbc()==BND_CND_PRD) ? "P" : "A"),
 	     ((GJP.Ybc()==BND_CND_PRD) ? "P" : "A"),
@@ -597,8 +623,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      writePropQio.setHeader(qp_arg.ensemble_id, qp_arg.ensemble_label, qp_arg.seqNum, propType, sourceType);
      
      // just writing one time-slice?
-     if(  (!do_rerun) && 
-	  ( (SrcType() == POINT) || (SrcType() == BOX) || (SrcType() == WALL) ) ){
+     if( (SrcType() == POINT) || (SrcType() == VOLUME) || (SrcType() == BOX) || (SrcType() == WALL) ){
        VRB.Flow(cname,fname," source-type: %s only write t-slice %i to file\n",SourceType_map[SrcType()].name ,SourceTime());
        writePropQio.setSourceTslice(SourceTime());
      }
@@ -615,6 +640,15 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      
      // the old storage function
      //SaveQProp(qp_arg.file,PROP); 
+
+     //Print out time taken to save
+     dtime_this=dclock();
+     time_tmp=dtime_this-dtime_last;
+     hr_tmp=time_tmp/3600.0;
+     min_tmp=(time_tmp-3600.0*hr_tmp)/60.0;
+     sec_tmp=time_tmp-3600.0*hr_tmp-60.0*min_tmp;
+     VRB.Result(cname,fname,"Time taken to save: %d hours %d minutes %f seconds.\n",hr_tmp,min_tmp,sec_tmp);
+     
    }
 
    
@@ -675,6 +709,14 @@ void QPropW::Run(const int do_rerun, const Float precision) {
    
    if (qp_arg.save_prop || do_rerun )   
      sfree(read_prop);
+
+   //Print out total time spent in Run function
+   dtime_this=dclock();
+   time_tmp=dtime_this-dtime_begin;
+   hr_tmp=time_tmp/3600.0;
+   min_tmp=(time_tmp-3600.0*hr_tmp)/60.0;
+   sec_tmp=time_tmp-3600.0*hr_tmp-60.0*min_tmp;
+   VRB.Result(cname,fname,"Total time spent in QPropW::Run() function: %d hours %d minutes %f seconds.\n",hr_tmp,min_tmp,sec_tmp);
    
 }
 
@@ -937,7 +979,7 @@ void QPropW::ShiftPropBackward(int n) {
 }
 
 /*!
-  Compute the average of the current propagator and the propagaror Q
+  Compute the average of the current propagator and the propagator Q
   \f[
   prop[i] =\frac{1}{2}(prop[i] + Q.prop[i])
   \f]
@@ -955,6 +997,27 @@ void QPropW::Average(QPropW& Q) {
   if ((Q.midprop != NULL)&&(midprop !=NULL))
     for (int i=0; i< GJP.VolNodeSites(); i++)
       midprop[i] = ((Float)0.5)*(midprop[i]+Q.midprop[i]);
+}
+
+/*!
+  Compute a general linear combination of the current propagator 
+  and the propagator Q
+  \f[
+  prop[i] =a*prop[i] + b*Q.prop[i]
+  \f]
+  It does this for both prop and midprop
+
+  This is needed when taking both P+A and P-A.
+ */
+void QPropW::LinComb(QPropW& Q, Float a, Float b) {
+
+  if ((Q.prop != NULL)&&(prop !=NULL))
+    for (int i=0; i< GJP.VolNodeSites(); i++)
+      prop[i] = a*prop[i]+b*Q.prop[i];
+
+  if ((Q.midprop != NULL)&&(midprop !=NULL))
+    for (int i=0; i< GJP.VolNodeSites(); i++)
+      midprop[i] = a*midprop[i]+b*Q.midprop[i];
 }
 
 /*!
@@ -1061,6 +1124,82 @@ WilsonMatrix QPropW::WallSinkProp(int t_sink) {
 	  wmat += prop[i];	  
     }
 	
+#ifdef PARALLEL
+    slice_sum((Float*)&wmat, 288, 99);
+#endif
+	
+    return wmat;
+}
+
+WilsonMatrix QPropW::MomSinkProp(int t_sink, int* p) {
+
+    ThreeMom mom(p);
+    WilsonMatrix wmat = (Float)0.0;
+
+    Site s;
+    for(s.Begin();s.End();s.nextSite()) {
+      if (s.physT() != t_sink) continue;
+      wmat += prop[s.Index()]*mom.Fact(s);
+    }
+
+
+#ifdef PARALLEL
+    slice_sum((Float*)&wmat, 288, 99);
+#endif
+	
+    return wmat;
+}
+
+WilsonMatrix QPropW::TwistMomSinkProp(int t_sink, int* p) {
+
+    ThreeMomTwist mom(p);
+    WilsonMatrix wmat = (Float)0.0;
+
+    Site s;
+    for(s.Begin();s.End();s.nextSite()) {
+      if (s.physT() != t_sink) continue;
+      wmat += prop[s.Index()]*mom.Fact(s);
+    }
+
+
+#ifdef PARALLEL
+    slice_sum((Float*)&wmat, 288, 99);
+#endif
+	
+    return wmat;
+}
+
+WilsonMatrix QPropW::CosSinkProp(int t_sink, int* p) {
+
+    ThreeMom mom(p);
+    WilsonMatrix wmat = (Float)0.0;
+
+    Site s;
+    for(s.Begin();s.End();s.nextSite()) {
+      if (s.physT() != t_sink) continue;
+      wmat += prop[s.Index()]*mom.FactCos(s);
+    }
+
+
+#ifdef PARALLEL
+    slice_sum((Float*)&wmat, 288, 99);
+#endif
+	
+    return wmat;
+}
+
+WilsonMatrix QPropW::TwistCosSinkProp(int t_sink, int* p) {
+
+    ThreeMomTwist mom(p);
+    WilsonMatrix wmat = (Float)0.0;
+
+    Site s;
+    for(s.Begin();s.End();s.nextSite()) {
+      if (s.physT() != t_sink) continue;
+      wmat += prop[s.Index()]*mom.FactCos(s);
+    }
+
+
 #ifdef PARALLEL
     slice_sum((Float*)&wmat, 288, 99);
 #endif
@@ -2637,6 +2776,98 @@ void QPropWMomSrc::SetSource(FermionVectorTp& src, int spin, int color) {
 }
 
 //------------------------------------------------------------------
+// Quark Propagator (Wilson type) with Momentum Cosine Source
+//------------------------------------------------------------------
+QPropWMomCosSrc::QPropWMomCosSrc(Lattice& lat, CommonArg* c_arg):
+  QPropWWallSrc(lat, c_arg) {
+  
+  char *fname = "QPropWMomCosSrc(L&, ComArg*)";
+  cname = "QPropWMomCosSrc";
+  VRB.Func(cname, fname);
+}
+QPropWMomCosSrc::QPropWMomCosSrc(Lattice& lat,  QPropWArg* arg, 
+			   int* p, CommonArg* c_arg): 
+  QPropWWallSrc(lat, c_arg), mom(p) {
+ 
+  char *fname = "QPropWMomCosSrc(L&, QPropWArg*, ComArg*)";
+  cname = "QPropWMomCosSrc";
+  VRB.Func(cname, fname);
+
+//------------------------------------------------------------------
+// T.Y Add
+  qp_arg = *arg;
+// T.Y Add
+//------------------------------------------------------------------
+
+  Run();
+}
+// copy constructor
+QPropWMomCosSrc::QPropWMomCosSrc(const QPropWMomCosSrc& rhs) : 
+  QPropWWallSrc(rhs), mom(rhs.mom) {
+
+  char *fname = "QPropW(const QPropW&)";
+  cname = "QPropW";
+  VRB.Func(cname, fname);
+}
+
+void QPropWMomCosSrc::SetSource(FermionVectorTp& src, int spin, int color) {
+  char *fname = "SetSource()";
+  VRB.Func(cname, fname);
+  
+  src.ZeroSource();
+  src.SetMomCosSource(color, spin, qp_arg.t, mom);
+  if (GFixedSrc())
+    src.GFWallSource(AlgLattice(), spin, 3, qp_arg.t);
+}
+
+//------------------------------------------------------------------
+// Quark Propagator (Wilson type) with Momentum Cosine Source
+// Twisted Boundary Conditions
+//------------------------------------------------------------------
+QPropWMomCosTwistSrc::QPropWMomCosTwistSrc(Lattice& lat, CommonArg* c_arg):
+  QPropWWallSrc(lat, c_arg) {
+  
+  char *fname = "QPropWMomCosTwistSrc(L&, ComArg*)";
+  cname = "QPropWMomCosTwistSrc";
+  VRB.Func(cname, fname);
+}
+QPropWMomCosTwistSrc::QPropWMomCosTwistSrc(Lattice& lat,  QPropWArg* arg, 
+			   int* p, CommonArg* c_arg): 
+  QPropWWallSrc(lat, c_arg), mom(p) {
+ 
+  char *fname = "QPropWMomCosTwistSrc(L&, QPropWArg*, ComArg*)";
+  cname = "QPropWMomCosTwistSrc";
+  VRB.Func(cname, fname);
+
+//------------------------------------------------------------------
+// T.Y Add
+  qp_arg = *arg;
+// T.Y Add
+//------------------------------------------------------------------
+
+  Run();
+}
+// copy constructor
+QPropWMomCosTwistSrc::QPropWMomCosTwistSrc(const QPropWMomCosTwistSrc& rhs) : 
+  QPropWWallSrc(rhs), mom(rhs.mom) {
+
+  char *fname = "QPropW(const QPropW&)";
+  cname = "QPropW";
+  VRB.Func(cname, fname);
+}
+
+void QPropWMomCosTwistSrc::SetSource(FermionVectorTp& src, int spin, int color) {
+  char *fname = "SetSource()";
+  VRB.Func(cname, fname);
+  
+  src.ZeroSource();
+  src.SetMomCosTwistSource(color, spin, qp_arg.t, mom);
+  if (GFixedSrc())
+    src.GFWallSource(AlgLattice(), spin, 3, qp_arg.t);
+}
+
+
+//------------------------------------------------------------------
 // Quark Propagator (Wilson type) with Volume Source
 //------------------------------------------------------------------
 QPropWVolSrc::QPropWVolSrc(Lattice& lat, CommonArg* c_arg) : QPropW(lat, c_arg) {
@@ -2776,41 +3007,33 @@ CommonArg* c_arg) : QPropW(lat, arg, c_arg),rand_arg(*r_arg)
   int rsrc_size = 2*GJP.VolNodeSites();
 
   if (rand_arg.rng == GAUSS) {
-    // MGE 06/10/2008
-        LRG.SetSigma(0.5);
-    for (int i=0; i<rsrc_size/2; i++) {
-      LRG.AssignGenerator(i);
-      rsrc[2*i] = LRG.Grand(FOUR_D);
-      rsrc[2*i+1] = LRG.Grand(FOUR_D);
-    }
-    // END MGE 06/10/2008
-
+	GaussianRandomGenerator rng(0.5);
+	rng.Reset(rand_arg.seed);
+	for (int i=0; i<rsrc_size; i++)
+	  rsrc[i] = rng.Rand();
   }
   if (rand_arg.rng == UONE) {
-    // MGE 06/10/2008
-        LRG.SetInterval(6.283185307179586,0);
-    for (int i=0; i<rsrc_size/2; i++) {
-      LRG.AssignGenerator(i);
-      Float theta(LRG.Urand(FOUR_D));
-      rsrc[2*i  ] = cos(theta); // real part
-      rsrc[2*i+1] = sin(theta); // imaginary part
-    }
-    // END MGE 06/10/2008
-  } 
-  if (rand_arg.rng == ZTWO) {
-    // MGE 06/10/2008  
-        LRG.SetInterval(1,-1);
-    for (int i=0; i<rsrc_size/2; i++) {
-      LRG.AssignGenerator(i);
-      if (LRG.Urand(FOUR_D)>0.) {
-        rsrc[2*i] =  1.;
-      } else {
-        rsrc[2*i] = -1.;
-      }
-      rsrc[2*i+1] = 0.0; // source is purely real
-    }
-    // END MGE 06/10/2008
+	UniformRandomGenerator rng(0,6.2831853);
+	rng.Reset(rand_arg.seed);
+	for (int i=0; i<rsrc_size/2; i++) {
+	  Float theta(rng.Rand());
+	  rsrc[2*i  ] = cos(theta); // real part
+	  rsrc[2*i+1] = sin(theta); // imaginary part
+	}
   }
+  if (rand_arg.rng == ZTWO) {
+	UniformRandomGenerator rng(0.0,1.0);
+	rng.Reset(rand_arg.seed);
+	for (int i=0; i<rsrc_size/2; i++) {
+	  if (rng.Rand()>.5) {
+	    rsrc[2*i] =  1.0;
+	  } else {
+	    rsrc[2*i] = -1.0;
+	  }
+	  rsrc[2*i+1] = 0.0; // source is purely real
+	}
+  }
+  
 }
 
 QPropWRand::QPropWRand(const QPropWRand& rhs) : QPropW(rhs),rsrc(NULL) {

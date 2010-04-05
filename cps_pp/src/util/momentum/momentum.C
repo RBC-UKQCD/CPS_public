@@ -1,3 +1,4 @@
+#include <config.h>
 #include <util/momentum.h>
 
 CPS_START_NAMESPACE
@@ -39,6 +40,29 @@ Complex  ThreeMom::Fact(Site& s){
       }
   
   Complex F(cos(xp), -sin(xp) );
+  
+  return F ;
+}
+
+// cos(p1*x1)*cos(p2*x2)*cos(p3*x3)
+Complex  ThreeMom::FactCos(Site& s){  
+  if(ZeroMom)
+    {
+      Complex F(1.0,0.0) ;
+      return F ;
+    }
+  
+  Float ccc(1.0) ;
+  
+  for(int i = 0 ; i< 3; i++)
+    if(p[i]!=0)
+      {
+	int xx ;
+	xx = p[i]*(s.physCoor(i)) ;
+	ccc *= cos(pp[i]*xx) ;
+      }
+  
+  Complex F(ccc, 0 );
   
   return F ;
 }
@@ -108,4 +132,27 @@ ThreeMom::ThreeMom(const ThreeMom& rhs)
   pp[2] = rhs.pp[2] ;
   ZeroMom = rhs.ZeroMom ;
 }
+
+ThreeMomTwist::ThreeMomTwist() : ThreeMom()
+{
+  for (int i=0 ; i<3 ; i++)
+    pp[i]*=0.5;
+}
+
+ThreeMomTwist::ThreeMomTwist(int *q) : ThreeMom(q)
+{
+  for (int i=0 ; i<3 ; i++)
+    pp[i]*=0.5;
+}
+
+ThreeMomTwist::ThreeMomTwist(int q0,int q1,int q2) : ThreeMom(q0,q1,q2)
+{
+  for (int i=0 ; i<3 ; i++)
+    pp[i]*=0.5;
+}
+
+ThreeMomTwist::ThreeMomTwist(const ThreeMomTwist& rhs) : ThreeMom(rhs)
+{ }
+
+
 CPS_END_NAMESPACE

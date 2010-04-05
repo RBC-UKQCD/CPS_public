@@ -1070,6 +1070,40 @@ void FermionVectorTp::SetMomSource(int color, int spin, int source_time,
       ((Complex *)fv)[color + COLORS*(spin + 4*s.Index())] = mom.Fact(s);
 }
 
+// Momentum Cosine wall source
+// Check this if it is correct...
+void FermionVectorTp::SetMomCosSource(int color, int spin, int source_time,
+				    ThreeMom& mom) {
+  char *fname = "SetMomCosSource(color,spin,source_time,Mom)";
+  
+  VRB.Func(cname, fname);
+  
+  if (color < 0 || color >= GJP.Colors()) {
+    ERR.General(cname, fname,
+		"Color index out of range: color = %d\n", color);
+  }
+  if (spin < 0 || spin > 3) {
+    ERR.General(cname, fname,
+		"Spin index out of range: spin = %d\n", spin);
+  }
+
+  Site s ;
+  for(s.Begin();s.End();s.nextSite())
+    if( source_time == s.physT()) // continue only physical time is source_time
+      ((Complex *)fv)[color + COLORS*(spin + 4*s.Index())] = mom.FactCos(s);
+}
+
+// Momentum Cosine wall source for twisted boundary conditions
+// Momenta are given in units of Pi/L rather than 2*Pi/L
+// Check this if it is correct...
+void FermionVectorTp::SetMomCosTwistSource(int color, int spin, int source_time, ThreeMomTwist& mom) {
+  char *fname = "SetMomCosTwistSource(color,spin,source_time,Mom)";
+  
+  VRB.Func(cname, fname);
+
+  SetMomCosSource(color,spin,source_time,mom);
+}
+
 
 // set point source 
 void FermionVectorTp::SetPointSource(int color, int spin, 

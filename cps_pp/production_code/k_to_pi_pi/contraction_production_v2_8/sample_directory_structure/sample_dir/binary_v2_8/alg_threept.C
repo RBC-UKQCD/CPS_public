@@ -39,10 +39,10 @@ CPS_START_NAMESPACE
 #endif
 CPS_END_NAMESPACE
 //#include <alg/alg_threept.h>
-#include <alg/alg_threept.h>
+#include "alg_threept.h"
 #include <alg/wilson_matrix.h>
 #include <alg/spin_matrix.h>
-#include <alg/qpropw.h>
+#include "qpropw.h"
 CPS_START_NAMESPACE
 
 // Sums a quantity over the whole lattice; 99 is a magic number.
@@ -57,7 +57,6 @@ void lat_sum(Float *float_p, int block) {slice_sum(float_p,block,99);}
 // Checkpoint function for timing.
 void chkpt(const int num_nodes,int& chkpoint_no,const Float dtime_start,Float& dtime_last,Float& dtime_now);
 
-#define FFLUSH(A)
 //------------------------------------------------------------------
 /*!
   \param latt The lattice on which to compute the three-point function.
@@ -100,7 +99,7 @@ AlgThreePt::AlgThreePt(Lattice& latt, CommonArg *c_arg, ThreePtArg *arg, ThreePt
   }
 
   Fprintf(fp,"Three-Point Code Version 4.9.20\nMASS= STRANGE LIGHT (PUPIL)\n");
-  FFLUSH(fp);
+  fflush(fp);
 
   if (arg->results_mres_ZA != 0) {
     if ((fp_mres_ZA = Fopen((char*)arg->results_mres_ZA, "w")) == NULL) {
@@ -109,7 +108,7 @@ AlgThreePt::AlgThreePt(Lattice& latt, CommonArg *c_arg, ThreePtArg *arg, ThreePt
   }
 
   Fprintf(fp_mres_ZA,"Three-Point Code Version 4.9.20\nMASS= STRANGE LIGHT (PUPIL)\n");
-  FFLUSH(fp_mres_ZA);
+  fflush(fp_mres_ZA);
 
   if (arg->results_pipi != 0) {
     if ((fp_pipi = Fopen((char*)arg->results_pipi, "w")) == NULL) {
@@ -118,7 +117,7 @@ AlgThreePt::AlgThreePt(Lattice& latt, CommonArg *c_arg, ThreePtArg *arg, ThreePt
   }
 
   Fprintf(fp_pipi,"Three-Point Code Version 4.9.20\nMASS= STRANGE LIGHT (PUPIL)\n");
-  FFLUSH(fp_pipi);
+  fflush(fp_pipi);
 
   
 }
@@ -156,7 +155,7 @@ void AlgThreePt::run() {
   char *fname = "run()";
   VRB.Func(cname,fname);
 
-  VRB.Flow(cname,fname,"Starting AlgThreePt::run()\n");
+  printf("Starting AlgThreePt::run()\n");
   //Checkpoint
   if (chkpoints)
     chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -364,7 +363,7 @@ void AlgThreePt::run() {
     
   } //m (for loop, strange quarks)
 
-  FFLUSH(fp_mres_ZA);
+  fflush(fp_mres_ZA);
   
   
   /*----------------------------------------------------------------------------------
@@ -388,7 +387,7 @@ void AlgThreePt::run() {
       pipi(*q_light_tpi[m][0][0][0]);
       pipi(*q_light_tpi[m][1][0][0]);
       
-      VRB.Flow(cname,fname,"Did Pi Pi correlator 0 momentum, mass=%f.\n",l_mass[m]);
+      printf("Did Pi Pi correlator 0 momentum, mass=%f.\n",l_mass[m]);
       //Checkpoint
       if (chkpoints)
 	chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -411,14 +410,14 @@ void AlgThreePt::run() {
 	pipi(*q_light_tpi[m][1][0][0],*q_light_tpi[m][1][mom_num][mom_dir],mom_num,mom_dir);
       } //mom_dir for loop
 
-      VRB.Flow(cname,fname,"Did Pi Pi correlator momnum=%d, mass=%f.\n",mom_num,l_mass[m]);
+      printf("Did Pi Pi correlator momnum=%d, mass=%f.\n",mom_num,l_mass[m]);
       //Checkpoint
       if (chkpoints)
 	chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 
     } //mom_num for loop
 
-    FFLUSH(fp_pipi);
+    fflush(fp_pipi);
 
   } //m for loop (light quarks)
 
@@ -440,7 +439,7 @@ void AlgThreePt::run() {
 	}
       }
 
-      VRB.Flow(cname,fname,"Did (heavy) Pi Pi correlator 0 momentum, mass=%f.\n",s_mass[m]);
+      printf("Did (heavy) Pi Pi correlator 0 momentum, mass=%f.\n",s_mass[m]);
       //Checkpoint
       if (chkpoints)
 	chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -448,7 +447,7 @@ void AlgThreePt::run() {
     } //do_zero_mom if statement
 
 
-    FFLUSH(fp_pipi);
+    fflush(fp_pipi);
 
   } //m for loop (strange quarks)
 
@@ -481,7 +480,7 @@ void AlgThreePt::run() {
 		}
 	      }
 
-	      VRB.Flow(cname,fname,"Did 0 momentum pion correlators, mass=%f.\n",l_mass[m_l]);
+	      printf("Did 0 momentum pion correlators, mass=%f.\n",l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -508,7 +507,7 @@ void AlgThreePt::run() {
 		box_spectrum(*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][mom_num][mom_dir],mom_num,mom_dir);
 	      } //mom_dir for loop
 
-	      VRB.Flow(cname,fname,"Did pion correlators, momnum=%d, mass=%f.\n",mom_num,l_mass[m_l]);
+	      printf("Did pion correlators, momnum=%d, mass=%f.\n",mom_num,l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -534,7 +533,7 @@ void AlgThreePt::run() {
 	      }
 	    }
 
-	    VRB.Flow(cname,fname,"Did heavy pion correlators mass=%f.\n",s_mass[m_s]);
+	    printf("Did heavy pion correlators mass=%f.\n",s_mass[m_s]);
 	    //Checkpoint
 	    if (chkpoints)
 	      chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -555,7 +554,7 @@ void AlgThreePt::run() {
 	      box_spectrum(*q_strange_tpi[m_s][0],*q_light_tpi[m_l][0][0][0]);
 	      box_spectrum(*q_strange_tpi[m_s][1],*q_light_tpi[m_l][1][0][0]);
 
-	      VRB.Flow(cname,fname,"Did kaon correlators at walls, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
+	      printf("Did kaon correlators at walls, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -563,31 +562,31 @@ void AlgThreePt::run() {
 
 	      
 	      figure8(*q_strange_tpi[m_s][0],*q_light_tpi[m_l][0][0][0],*q_strange_tpi[m_s][1],*q_light_tpi[m_l][1][0][0]);
-	      VRB.Flow(cname,fname,"Did figure8 number 1, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
+	      printf("Did figure8 number 1, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 	      //----------------------------------------------
 	      figure8(*q_strange_tpi[m_s][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],1);
-	      VRB.Flow(cname,fname,"Did figure8 number 2, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
+	      printf("Did figure8 number 2, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 	      //----------------------------------------------
 	      figure8(*q_strange_tpi[m_s][1],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0],1);
-	      VRB.Flow(cname,fname,"Did figure8 number 3, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
+	      printf("Did figure8 number 3, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 	      //----------------------------------------------
 	      figure8_vacuum(*q_strange_tpi[m_s][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0]);
-	      VRB.Flow(cname,fname,"Did figure8_vacuum number 1, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
+	      printf("Did figure8_vacuum number 1, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 	      //----------------------------------------------
 	      figure8_vacuum(*q_strange_tpi[m_s][1],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0]);
-	      VRB.Flow(cname,fname,"Did figure8_vacuum number 2, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
+	      printf("Did figure8_vacuum number 2, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -602,13 +601,13 @@ void AlgThreePt::run() {
 	      //Kaon and pion at very left (t=t_src) and very right (t=t_snk) walls.
 	      //----------------------------------------------
 	      figure8_spectator(*q_strange_tpi[m_s][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0]);
-	      VRB.Flow(cname,fname,"Did figure8_spectator number 1, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
+	      printf("Did figure8_spectator number 1, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 	      //----------------------------------------------
 	      figure8_spectator(*q_strange_tpi[m_s][1],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0]);
-	      VRB.Flow(cname,fname,"Did figure8_spectator number 2, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
+	      printf("Did figure8_spectator number 2, 0 momentum, m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -624,26 +623,43 @@ void AlgThreePt::run() {
 	      }
 	    }
 	    
-	    VRB.Flow(cname,fname,"Did kaon correlators at times tK[j], m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
+	    printf("Did kaon correlators at times tK[j], m_s=%f, m_l=%f.\n",s_mass[m_s],l_mass[m_l]);
 	    //Checkpoint
 	    if (chkpoints)
 	      chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 	    
-	    //Kaon at tK[j] and pion at left and right (to get both a time separation of
-	    //tK[j] and Nt-tK[j] between the kaon and the two pions)
+	    //Kaon at tK[j] and pion at left or right (whichever is closer to tK[j])
 	    for (int j=0; j<num_tK; j++) {
 	      
-	      //Do contractions with pions at BOTH walls
-	      figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0]);
-	      figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0]);
+	      int dtsrc;
+	      if ( tK[j]>t_src )
+		dtsrc=tK[j]-t_src;
+	      else
+		dtsrc=t_src-tK[j];
+
+	      int dtsnk;
+	      if ( tK[j]>t_snk )
+		dtsnk=tK[j]-t_snk;
+	      else
+		dtsnk=t_snk-tK[j];
 	      
-	      VRB.Flow(cname,fname,"Did figure8_spectator with 0 momentum, tK=%d, m_s=%f, m_l=%f.\n",tK[j],s_mass[m_s],l_mass[m_l]);
+	      if (dtsrc<dtsnk)
+		figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0]);
+	      else if (dtsrc>dtsnk)
+		figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0]);
+	      else {
+		//dtsrc=dtsnk, do contractions with pions at BOTH wall
+		figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0]);
+		figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0]);
+	      }
+
+	      printf("Did figure8_spectator with 0 momentum, tK=%d, m_s=%f, m_l=%f.\n",tK[j],s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 	      
 	    } //j for loop
-	    
+
 	  } //do_zero_mom if statement
 	  
 
@@ -670,7 +686,7 @@ void AlgThreePt::run() {
 		box_spectrum(*q_strange_tpi[m_s][1],*q_light_tpi[m_l][1][mom_num][mom_dir],mom_num,mom_dir);
 	      }
 
-	      VRB.Flow(cname,fname,"Did kaon correlators at walls, momnum=%d, momdir=%d, m_s=%f, m_l=%f.\n",mom_num,mom_dir,s_mass[m_s],l_mass[m_l]);
+	      printf("Did kaon correlators at walls, momnum=%d, momdir=%d, m_s=%f, m_l=%f.\n",mom_num,mom_dir,s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -684,19 +700,37 @@ void AlgThreePt::run() {
 		figure8_spectator(*q_strange_tpi[m_s][1],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][0][mom_num][mom_dir],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][mom_num][mom_dir],mom_num,mom_dir);
 	      } //do_kaon_at_walls if statement
 
-	      VRB.Flow(cname,fname,"Did figure8_spectator at walls, momnum=%d, momdir=%d, m_s=%f, m_l=%f.\n",mom_num,mom_dir,s_mass[m_s],l_mass[m_l]);
+	      printf("Did figure8_spectator at walls, momnum=%d, momdir=%d, m_s=%f, m_l=%f.\n",mom_num,mom_dir,s_mass[m_s],l_mass[m_l]);
 	      //Checkpoint
 	      if (chkpoints)
 		chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 	      
-	      //Kaon at tK[j] and pion at left and right
+	      //Kaon at tK[j] and pion at left or right (whichever is closer to tK[j])
 	      for (int j=0; j<num_tK; j++) {
 		
-		//Do contractions with pions at BOTH walls
-		figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][mom_num][mom_dir],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][mom_num][mom_dir],mom_num,mom_dir);
-		figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][mom_num][mom_dir],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][mom_num][mom_dir],mom_num,mom_dir);
+		int dtsrc;
+		if ( tK[j]>t_src )
+		  dtsrc=tK[j]-t_src;
+		else
+		  dtsrc=t_src-tK[j];
 		
-		VRB.Flow(cname,fname,"Did figure8_spectator with momnum=%d, momdir=%d, tK=%d, m_s=%f, m_l=%f.\n",mom_num,mom_dir,tK[j],s_mass[m_s],l_mass[m_l]);
+		int dtsnk;
+		if ( tK[j]>t_snk )
+		  dtsnk=tK[j]-t_snk;
+		else
+		  dtsnk=t_snk-tK[j];
+		
+		if (dtsrc<dtsnk)
+		  figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][mom_num][mom_dir],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][mom_num][mom_dir],mom_num,mom_dir);
+		else if (dtsrc>dtsnk)
+		  figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][mom_num][mom_dir],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][mom_num][mom_dir],mom_num,mom_dir);
+		else {
+		  //dtsrc=dtsnk, do contractions with pions at BOTH wall
+		  figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][mom_num][mom_dir],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][mom_num][mom_dir],mom_num,mom_dir);
+		  figure8_spectator(*q_strange_tK[m_s][0][j],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][mom_num][mom_dir],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][mom_num][mom_dir],mom_num,mom_dir);
+		}
+
+		printf("Did figure8_spectator with momnum=%d, momdir=%d, tK=%d, m_s=%f, m_l=%f.\n",mom_num,mom_dir,tK[j],s_mass[m_s],l_mass[m_l]);
 		//Checkpoint
 		if (chkpoints)
 		  chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -707,7 +741,7 @@ void AlgThreePt::run() {
 
 	  } //mom_num for loop
 	  
-	  FFLUSH(fp);
+	  fflush(fp);
 	} // for strange masses
    //----------------------------------------------------------------
 
@@ -743,7 +777,7 @@ void AlgThreePt::run() {
 	    eye(*q_strange_tpi[m_s][1],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][0][0][0],*q_ppl);
 	    eye_vacuum(*q_strange_tpi[m_s][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][1][0][0],*q_ppl);
 	    eye_vacuum(*q_strange_tpi[m_s][1],*q_light_tpi[m_l][1][0][0],*q_light_tpi[m_l][0][0][0],*q_light_tpi[m_l][0][0][0],*q_ppl);
-	    FFLUSH(fp);
+	    fflush(fp);
 	  } // for strange masses
 	} // for light masses
 	//----------------------------------------------------------------
@@ -2522,12 +2556,10 @@ void AlgThreePt::eye_vacuum(QPropW& q_str, QPropW& q_spc,
 //---------------------------------------------------------------------------
 void chkpt(const int num_nodes,int& chkpoint_no,const Float dtime_start,Float& dtime_last,Float& dtime_now)
 {
+  ERR.HdwCheck("main","chkpt");
   int dummy=0;
   Float test_val;
   Float* ptest_val=&test_val;
-  char *cname = "AlgThreePt";
-  char *fname = "chkpt";
-  ERR.HdwCheck(cname,fname);
   
   for (int ii=0; ii<num_nodes; ii++){
     test_val=0.0;
@@ -2538,7 +2570,7 @@ void chkpt(const int num_nodes,int& chkpoint_no,const Float dtime_start,Float& d
     while(test_val==0.0)
       dummy=0; //Does absolutely nothing, here as a placeholder for while
   }
-  VRB.Flow(cname,fname,"Checkpoint no. %d reached.\n",chkpoint_no++);
+  printf("Checkpoint no. %d reached.\n",chkpoint_no++);
 
   dtime_last=dtime_now;
   dtime_now=dclock();
@@ -2547,13 +2579,13 @@ void chkpt(const int num_nodes,int& chkpoint_no,const Float dtime_start,Float& d
   int hr_tmp=time_tmp/3600.0;
   int min_tmp=(time_tmp-3600.0*hr_tmp)/60.0;
   Float sec_tmp=time_tmp-3600.0*hr_tmp-60.0*min_tmp;
-  VRB.Flow(cname,fname,"Time since last checkpoint: %d hours %d minutes %f seconds.\n",hr_tmp,min_tmp,sec_tmp);
+  printf("Time since last checkpoint: %d hours %d minutes %f seconds.\n",hr_tmp,min_tmp,sec_tmp);
   
   time_tmp=dtime_now-dtime_start;
   hr_tmp=time_tmp/3600.0;
   min_tmp=(time_tmp-3600.0*hr_tmp)/60.0;
   sec_tmp=time_tmp-3600.0*hr_tmp-60.0*min_tmp;
-  VRB.Flow(cname,fname,"Time since beginning: %d hours %d minutes %f seconds.\n",hr_tmp, min_tmp,sec_tmp);
+  printf("Time since beginning: %d hours %d minutes %f seconds.\n",hr_tmp, min_tmp,sec_tmp);
 }
 //---------------------------------------------------------------------------
 

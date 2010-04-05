@@ -1,0 +1,117 @@
+#!/bin/bash
+#################################################
+#
+# file:   qbatch.pbs
+#
+# Sections:
+#      The PBS section contains PBS directives
+#      The Environment section contains env. variables.
+#
+# use: Submit the script as: 
+#           qsub qbatch.pbs
+#
+#################################################
+################## PBS SECTION ##################
+# Give a name to your job
+#PBS -N contractions24nt64_v2_8
+#
+# Specify the PBS queue 
+#PBS -q rack08-11
+#
+# Send an email when the job begins(b), ends(e), or aborts(a)
+#PBS -m bea
+#
+# Specify your email address (where the notification email will be sent).
+#PBS -M lightman@phys.columbia.edu
+#
+# Standard error and standard output will be combined in one file.
+# Standard error will be added to the standard output file.
+#PBS -j oe
+#
+# Export all my environment variables to the job
+#PBS -V
+#
+#############################################
+######### ENVIRONMENT SECTION ######################
+#
+# Users should specify a qcsh script to run (required)
+# for a simple example: $QBATCH_HOME/user.qcsh
+export QCSH_SCRIPT="user.qcsh"
+
+# Topology (optional)
+export TOPOLOGY=" -T0 -X1 -Y2 -Z35 -S4 "
+
+# email address where job status information may be sent 
+export MAILTO=lightman@phys.columbia.edu
+
+# qrb file. If defined use user-specified qrb file (optional)
+export QRB_FILE=myDefault.qrb
+
+# Maximum number of power cycles
+export MAX_PCOUNT=3
+
+# PBS JOBID and JOBNAME (should not be modified)
+export JOBID=`echo $PBS_JOBID | cut -f1 -d .`
+export JOBNAME=$PBS_JOBNAME
+
+# LOGFILE
+export LOGFILE="$JOBID/$JOBNAME.$JOBID.log"
+
+###############################################################
+# IDLEFILE, IDLEFILENAMES, MAX_IDLE_TIME, CHECK_IDLE_TIME
+#
+#    To find out if a a job is idle, we check
+#    the file: $IDLEFILE every $CHECK_IDLE_TIME (secs). If the file
+#    $IDLEFILE has not been modified for $MAX_IDLE_TIME (secs)
+#    we declare the job as idle. 
+#     
+#    Users who want to change the file $IDLEFILE during a run
+#    should append the new file name in file $IDLEFILENAMES. The PBS
+#    scripts will read the last line of file $IFLEFILENAMES every 
+#    $CHECK_IDLE_TIME and use that as the new $IDLEFILE.
+#
+#    If you leave the env. variable $IDLEFILE undefined, you will not 
+#    be using this feature.
+#
+export IDLEFILE="$JOBID/qrun.$JOBNAME.$JOBID.out"
+#
+export IDLEFILENAMES="$JOBID/idlefilenames"
+#
+#    Maximum Idle time before declaring the job as idle (seconds)
+export MAX_IDLE_TIME=10000
+#
+#    How often to check the idle time of the job (seconds)
+export CHECK_IDLE_TIME=300 
+#
+###############################################################
+
+###############################################################
+# ERRORLIMITSFILE
+#
+#   /qcdoc/local/batch/qhdwcheck.qcsh wrapper executes the 
+#   standard qcsh command qhdwcheck and gets the error counts
+#   from the output file. The error counts are then compared
+#   with default error limits. If the error counts are larger
+#   that the limits the job should rerun.  
+#
+#   The default error limits are in: 
+#   /qcdoc/machines/status/$QMACHINE/error_limits.dat
+#   The user, however, can provide his/her own error limits file 
+#   by defining the env. variable ERRORLIMITSFILE.
+#   
+#export ERRORLIMITSFILE="/home/user/workdir/error_limits.dat"
+#
+################################################################
+
+###############################################################
+# CHECKSUM
+#
+#  The checksum test is performed at the end of every job. 
+#  To turn off the checksum test set CHECKSUM to 0.
+export CHECKSUM=1
+#
+###############################################################
+ 
+cd $PBS_O_WORKDIR
+$QBATCH_HOME/qstart.csh
+# exit $EXITVAL 

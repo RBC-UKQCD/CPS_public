@@ -104,6 +104,8 @@ public:
   //                                   int* mom);
 
   void SetMomSource(int color, int spin, int source_time, ThreeMom& mom) ;
+  void SetMomCosSource(int color, int spin, int source_time, ThreeMom& mom) ;
+  void SetMomCosTwistSource(int color, int spin, int source_time, ThreeMomTwist& mom); // Use this if you are using twisted boundary conditions
 
   void ChiralToDirac();
   void DiracToChiral();

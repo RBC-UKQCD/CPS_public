@@ -92,6 +92,7 @@ public:
 
   Float Mass()      const { return qp_arg.cg.mass; }    
   int SourceTime()  const { return qp_arg.t; }       
+  void ChangeSourceTime(int t) { qp_arg.t=t; }
 #if 0
   int PointSrcX()   const { return qp_arg.x; }       
   int PointSrcY()   const { return qp_arg.y; }        
@@ -123,18 +124,14 @@ public:
   //void ReRun( const Float precision=1e-8);
 
   // this is the basic routine, do_rerun=0: normal run, do_rerun=1: load prop from file, rerun and compare with prec.
-  //! calculate the propagator (or, if do_rerun=1, load, recompute, compare)
   void Run( const int do_rerun, const Float precision=1e-8);
 
   // to have the usual call
-  //! calculate the propagator
   void Run() { Run(0);}
 
   // and a reminder for ReRun
-  //! reloads the propagator (QIO), recomputes it and does a comparison between those
   void ReRun( const Float precision=1e-8) { Run(1, precision);}
 
-  //! Loads a propagator(QIO) from file infile
   void ReLoad( char *infile);
 
   void CG(FermionVectorTp&, FermionVectorTp&, FermionVectorTp&, int&, Float&);
@@ -157,7 +154,10 @@ public:
   void SetArgs(QPropWArg& arg){ qp_arg = arg; }
 
   //! computes .5(prop+Q)
-  void Average(QPropW& Q); 
+  void Average(QPropW& Q);
+
+   //! computes a*prop+b*Q
+  void LinComb(QPropW& Q, Float a, Float b);
 
   //! Comunicate Wilson Matrices...
   WilsonMatrix& GetMatrix(const int *, WilsonMatrix&) const;
@@ -197,6 +197,18 @@ public:
 
   // This is for compatibility with the old alg_threept code 
 #define   WallWallProp WallSinkProp
+
+  /*! Momentum sink */
+  WilsonMatrix MomSinkProp(int t_sink, int* p);
+
+  /*! Momentum sink when there are twisted boundary conditions involved. */
+  WilsonMatrix TwistMomSinkProp(int t_sink, int* p);
+
+  /*! Cosine sink */
+  WilsonMatrix CosSinkProp(int t_sink, int* p);
+
+  /*! Cosine sink when there are twisted boundary conditions involved. */
+  WilsonMatrix TwistCosSinkProp(int t_sink, int* p);
 
   // Link smaering stuff for the Gaussian Kernel
   void DoLinkSmear(const QPropWGaussArg &gauss_arg);
@@ -311,6 +323,38 @@ public:
   void SetSource(FermionVectorTp& src, int spin, int color);
   
   ThreeMom Mom() { return mom; } 
+};
+
+class QPropWMomCosSrc : public QPropWWallSrc {
+
+  ThreeMom mom;
+  
+public:
+  
+  // CONSTRUCTORS
+  QPropWMomCosSrc(Lattice& lat, CommonArg* c_arg);
+  QPropWMomCosSrc(const QPropWMomCosSrc& rhs);
+  QPropWMomCosSrc(Lattice& lat, QPropWArg* arg, int *p, CommonArg* c_arg);
+  
+  void SetSource(FermionVectorTp& src, int spin, int color);
+  
+  ThreeMom Mom() { return mom; } 
+};
+
+class QPropWMomCosTwistSrc : public QPropWWallSrc {
+
+  ThreeMomTwist mom;
+  
+public:
+  
+  // CONSTRUCTORS
+  QPropWMomCosTwistSrc(Lattice& lat, CommonArg* c_arg);
+  QPropWMomCosTwistSrc(const QPropWMomCosTwistSrc& rhs);
+  QPropWMomCosTwistSrc(Lattice& lat, QPropWArg* arg, int *p, CommonArg* c_arg);
+  
+  void SetSource(FermionVectorTp& src, int spin, int color);
+  
+  ThreeMomTwist Mom() { return mom; } 
 };
 
 class QPropWVolSrc : public QPropW {
