@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.29 2008-04-21 14:19:18 chulwoo Exp $
+  $Id: random.C,v 1.30 2010-04-05 20:26:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-21 14:19:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.29 2008-04-21 14:19:18 chulwoo Exp $
-//  $Id: random.C,v 1.29 2008-04-21 14:19:18 chulwoo Exp $
+//  $Date: 2010-04-05 20:26:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.30 2010-04-05 20:26:52 chulwoo Exp $
+//  $Id: random.C,v 1.30 2010-04-05 20:26:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.29 $
+//  $Revision: 1.30 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -451,6 +451,7 @@ void LatRanGen::AssignGenerator(const int * x)
 //----------------------------------------------------------------------
 void LatRanGen ::AssignGenerator(int i)
 {
+  char *fname = "AssignGenerator(i)";
   int x = (i/can[0]) % hx[0];
   int y = (i/can[1]) % hx[1];
   int z = (i/can[2]) % hx[2];
@@ -460,6 +461,10 @@ void LatRanGen ::AssignGenerator(int i)
   else  s = (i/can[4]) % hx[4];
   rgen_pos = x + hx[0] * (y + hx[1] * (z + hx[2] * (t + hx[3] * s)));
   rgen_pos_4d = x + hx[0] * (y + hx[1] * (z + hx[2] * t ));
+  if (rgen_pos >=  n_rgen)
+      ERR.General(cname, fname, "rgen_pos(%d)>=n_rgen(%d)",rgen_pos,n_rgen);
+  if (rgen_pos_4d >=  n_rgen_4d)
+      ERR.General(cname, fname, "rgen_pos_4d(%d)>=n_rgen_4d(%d)",rgen_pos_4d,n_rgen_4d);
 //  Fprintf(stdout,"i=%d x = %d %d %d %d %d rgen_pos=%d ",i,x,y,z,t,s,rgen_pos);
 }
 
