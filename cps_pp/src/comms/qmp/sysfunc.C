@@ -18,6 +18,7 @@
 #include <comms/sysfunc_qmp.h>
 //#include <comms/scu_dir_arg.h>
 #include <util/qcdio.h>
+#include <util/error.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -63,15 +64,17 @@ namespace QMPSCU {
   }
 
   //Initialize QMP with null command line
-#if 1
   void init_qmp() {
+#if 1
+	ERR.General("","init_qmp()","default arguments no loger supported. Call init_qmp(&argc,&argv) via (CPS_NAMESPACE)::Start(&argc,&argv)");
+#else
     int argc=2;
     char *argv[2];
     argv[0] = "-qmp-geom";
     argv[1] = "native";
     init_qmp(&argc, (char ***)&argv);
-  }
 #endif
+  }
 
 //Initialize QMP
 //Get Allocated machine size, and declare logical machine
