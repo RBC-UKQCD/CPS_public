@@ -52,17 +52,11 @@ void QPropW::Allocate(int mid) {
 
   if (!mid) {
     if (prop == NULL) { // Allocate only if needed
-	prop = (WilsonMatrix*)smalloc(GJP.VolNodeSites()*sizeof(WilsonMatrix));
-	if (prop == 0) ERR.Pointer(cname, fname, "prop");
-	VRB.Smalloc(cname, fname, "prop", prop,
-				GJP.VolNodeSites() * sizeof(WilsonMatrix));
+	prop = (WilsonMatrix*)smalloc(cname, fname, "prop", GJP.VolNodeSites()*sizeof(WilsonMatrix));
 	}
   } else {
     if (midprop == NULL) { // Allocate only if needed
-	  midprop = (WilsonMatrix*)smalloc(GJP.VolNodeSites()*sizeof(WilsonMatrix));
-	  if (midprop == 0) ERR.Pointer(cname, fname, "midprop");
-	  VRB.Smalloc(cname, fname, "midprop", midprop,
-				  GJP.VolNodeSites() * sizeof(WilsonMatrix));
+	  midprop = (WilsonMatrix*)smalloc(cname, fname, "midprop", GJP.VolNodeSites()*sizeof(WilsonMatrix));
 	}
   }
 }
@@ -145,10 +139,7 @@ QPropW::QPropW(Lattice& lat, QPropWArg* arg, CommonArg* c_arg):
   if(qp_arg.save_ls_prop == 2){
   VRB.Debug(cname,fname,"Before allocate porpls\n");
   if (propls == NULL) { 
-  propls = (WilsonMatrix*)smalloc(GJP.VolNodeSites()*GJP.SnodeSites()*sizeof(WilsonMatrix));
-  if (propls == 0) ERR.Pointer(cname, fname, "propls");
-  VRB.Smalloc(cname, fname, "propls", propls,
-	      GJP.VolNodeSites()*GJP.SnodeSites()*sizeof(WilsonMatrix));
+  propls = (WilsonMatrix*)smalloc(cname, fname, "propls", GJP.VolNodeSites()*GJP.SnodeSites()*sizeof(WilsonMatrix));
   VRB.Debug(cname,fname,"Allocate porpls\n");
   }
   }
@@ -322,20 +313,14 @@ void QPropW::Run(const int do_rerun, const Float precision) {
 
      // we need to store the source
      if (qp_arg.save_prop || do_rerun ){ 
-       save_source = (Float*)smalloc(GJP.VolNodeSites()*288*sizeof(Float));
-       if (save_source == 0) ERR.Pointer(cname, fname, "save_source");
-       VRB.Smalloc(cname, fname, "save_source", save_source,
-		   GJP.VolNodeSites() * 288*sizeof(Float));
+       save_source = (Float*)smalloc(cname, fname, "save_source",GJP.VolNodeSites()*288*sizeof(Float));
      }
      // TY Add End
      //-----------------------------------------------------------------
 
      // in case we do a rerun, we also need to store a propagator
      if(do_rerun){
-       read_prop = (WilsonMatrix*)smalloc(GJP.VolNodeSites()*sizeof(WilsonMatrix));
-       if (read_prop == 0) ERR.Pointer(cname, fname, "pr3op");
-       VRB.Smalloc(cname, fname, "read_prop", read_prop,
-		   GJP.VolNodeSites() * sizeof(WilsonMatrix));     
+       read_prop = (WilsonMatrix*)smalloc(cname, fname, "read_prop",GJP.VolNodeSites()*sizeof(WilsonMatrix));
        
 #ifdef USE_QIO
        qio_readPropagator readPropQio(qp_arg.file, QIO_FULL_SOURCE, read_prop, save_source,
@@ -355,10 +340,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      //-----------------------------------------------------------------
      // M. Lightman
      // For m_res
-     j5q_pion = (Float *) smalloc(fsize);
-     if (!j5q_pion)
-       ERR.Pointer(cname, fname, "d_j5q_pion_p");
-     VRB.Smalloc(cname, fname, "d_j5q_pion_p", j5q_pion, fsize);
+     j5q_pion = (Float *) smalloc(cname, fname, "d_j5q_pion_p", fsize);
      
      flt_p = (Float *) j5q_pion;
      for ( int i = 0; i < glb_walls; i++) *flt_p++ = 0.0;
@@ -596,10 +578,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
        
        Float renFac = 1./(5. - GJP.DwfHeight());
        
-       save_prop = (WilsonMatrix*)smalloc(GJP.VolNodeSites()*sizeof(WilsonMatrix));
-       if (save_prop == 0) ERR.Pointer(cname, fname, "pr3op");
-       VRB.Smalloc(cname, fname, "save_prop", save_prop,
-		   GJP.VolNodeSites() * sizeof(WilsonMatrix));
+       save_prop = (WilsonMatrix*)smalloc(cname, fname, "save_prop",GJP.VolNodeSites()*sizeof(WilsonMatrix));
        
        for(int ii(0); ii <  GJP.VolNodeSites(); ++ii)
 	 *(save_prop + ii) = renFac * prop[ii];
@@ -623,7 +602,8 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      writePropQio.setHeader(qp_arg.ensemble_id, qp_arg.ensemble_label, qp_arg.seqNum, propType, sourceType);
      
      // just writing one time-slice?
-     if( (SrcType() == POINT) || (SrcType() == VOLUME) || (SrcType() == BOX) || (SrcType() == WALL) ){
+     if(  (!do_rerun) &&
+       ( (SrcType() == POINT) || (SrcType() == VOLUME) || (SrcType() == BOX) || (SrcType() == WALL) ) ){
        VRB.Flow(cname,fname," source-type: %s only write t-slice %i to file\n",SourceType_map[SrcType()].name ,SourceTime());
        writePropQio.setSourceTslice(SourceTime());
      }
@@ -652,7 +632,7 @@ void QPropW::Run(const int do_rerun, const Float precision) {
    }
 
    
-   sfree(save_source);
+   if (qp_arg.save_prop || do_rerun ) sfree(save_source);
    
    if(do_rerun){
      
@@ -707,7 +687,8 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      
    }
    
-   if (qp_arg.save_prop || do_rerun )   
+//   if (qp_arg.save_prop || do_rerun )   
+   if(do_rerun)
      sfree(read_prop);
 
    //Print out total time spent in Run function
@@ -3007,33 +2988,41 @@ CommonArg* c_arg) : QPropW(lat, arg, c_arg),rand_arg(*r_arg)
   int rsrc_size = 2*GJP.VolNodeSites();
 
   if (rand_arg.rng == GAUSS) {
-	GaussianRandomGenerator rng(0.5);
-	rng.Reset(rand_arg.seed);
-	for (int i=0; i<rsrc_size; i++)
-	  rsrc[i] = rng.Rand();
+    // MGE 06/10/2008
+        LRG.SetSigma(0.5);
+    for (int i=0; i<rsrc_size/2; i++) {
+      LRG.AssignGenerator(i);
+      rsrc[2*i] = LRG.Grand(FOUR_D);
+      rsrc[2*i+1] = LRG.Grand(FOUR_D);
+    }
+    // END MGE 06/10/2008
+
   }
   if (rand_arg.rng == UONE) {
-	UniformRandomGenerator rng(0,6.2831853);
-	rng.Reset(rand_arg.seed);
-	for (int i=0; i<rsrc_size/2; i++) {
-	  Float theta(rng.Rand());
-	  rsrc[2*i  ] = cos(theta); // real part
-	  rsrc[2*i+1] = sin(theta); // imaginary part
-	}
-  }
+    // MGE 06/10/2008
+        LRG.SetInterval(6.283185307179586,0);
+    for (int i=0; i<rsrc_size/2; i++) {
+      LRG.AssignGenerator(i);
+      Float theta(LRG.Urand(FOUR_D));
+      rsrc[2*i  ] = cos(theta); // real part
+      rsrc[2*i+1] = sin(theta); // imaginary part
+    }
+    // END MGE 06/10/2008
+  } 
   if (rand_arg.rng == ZTWO) {
-	UniformRandomGenerator rng(0.0,1.0);
-	rng.Reset(rand_arg.seed);
-	for (int i=0; i<rsrc_size/2; i++) {
-	  if (rng.Rand()>.5) {
-	    rsrc[2*i] =  1.0;
-	  } else {
-	    rsrc[2*i] = -1.0;
-	  }
-	  rsrc[2*i+1] = 0.0; // source is purely real
-	}
+    // MGE 06/10/2008  
+        LRG.SetInterval(1,-1);
+    for (int i=0; i<rsrc_size/2; i++) {
+      LRG.AssignGenerator(i);
+      if (LRG.Urand(FOUR_D)>0.) {
+        rsrc[2*i] =  1.;
+      } else {
+        rsrc[2*i] = -1.;
+      }
+      rsrc[2*i+1] = 0.0; // source is purely real
+    }
+    // END MGE 06/10/2008
   }
-  
 }
 
 QPropWRand::QPropWRand(const QPropWRand& rhs) : QPropW(rhs),rsrc(NULL) {
