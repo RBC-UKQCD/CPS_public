@@ -75,13 +75,13 @@ AlgHmc::AlgHmc(AlgIntAB &Integrator, CommonArg &c_arg, HmcArg &arg)
 
     //!< Allocate memory for the initial gauge field.
     gauge_field_init = (Matrix *) smalloc(g_size * sizeof(Float), 
-					  cname,fname, "gauge_field_init");
+					  "gauge_field_init",fname,cname);
     
     if (hmc_arg->reverse == REVERSE_YES) {
       
       //!< Allocate memory for the final gauge field.
       gauge_field_final = (Matrix *) smalloc(g_size * sizeof(Float), 
-					     cname,fname, "gauge_field_final");
+					     "gauge_field_final",fname,cname);
       
     }
 
@@ -100,11 +100,11 @@ AlgHmc::~AlgHmc() {
   VRB.Func(cname,fname);
 
   // Free memory for the initial gauge field.
-  sfree(gauge_field_init, cname,fname, "gauge_field_init");
+  sfree(gauge_field_init, "gauge_field_init",fname,cname);
 
   if (hmc_arg->reverse == REVERSE_YES) {
     //!< Free memory for the final gauge field.
-    sfree(gauge_field_final, cname, fname, "gauge_field_final");
+    sfree(gauge_field_final, "gauge_field_final",fname,cname);
 
   }
 
