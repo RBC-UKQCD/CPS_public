@@ -1,22 +1,23 @@
 #include<config.h>
+#include <util/lattice.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief Declaration of utility routines for the staggered fermions Dirac operator.
 
-  $Id: stag.h,v 1.7 2006-11-25 19:09:48 chulwoo Exp $
+  $Id: stag.h,v 1.8 2010-07-26 17:39:53 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-11-25 19:09:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/stag.h,v 1.7 2006-11-25 19:09:48 chulwoo Exp $
-//  $Id: stag.h,v 1.7 2006-11-25 19:09:48 chulwoo Exp $
+//  $Date: 2010-07-26 17:39:53 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/stag.h,v 1.8 2010-07-26 17:39:53 chulwoo Exp $
+//  $Id: stag.h,v 1.8 2010-07-26 17:39:53 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: stag.h,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/stag.h,v $
 //  $State: Exp $
 //
@@ -39,7 +40,7 @@ CPS_START_NAMESPACE
 // 2 - when all  except the special anisotropic direction. 
 //------------------------------------------------------------------
 extern "C"{
-void stag_dirac(IFloat *f_out, IFloat *f_in, int cb, int dag , 
+void stag_dirac(Vector *f_out, Vector *f_in, int cb, int dag , 
 		      int dir_flag = 0);
 
 //------------------------------------------------------------------
@@ -48,6 +49,7 @@ void stag_dirac(IFloat *f_out, IFloat *f_in, int cb, int dag ,
 //------------------------------------------------------------------
 void stag_dirac_init(const void *gauge_field_addr);
 void stag_dirac_init_g();
+void stag_dirac_init_with_lat (Lattice& lat);
 
 //------------------------------------------------------------------
 // Destroy all address tables needed by staggered dirac() function
