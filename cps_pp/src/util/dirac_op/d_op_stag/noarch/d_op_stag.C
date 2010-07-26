@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStag class methods.
 
-  $Id: d_op_stag.C,v 1.10 2004-09-02 16:59:04 zs Exp $
+  $Id: d_op_stag.C,v 1.11 2010-07-26 18:07:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
-//  $Author: zs $
-//  $Date: 2004-09-02 16:59:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.10 2004-09-02 16:59:04 zs Exp $
-//  $Id: d_op_stag.C,v 1.10 2004-09-02 16:59:04 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2010-07-26 18:07:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.11 2010-07-26 18:07:23 chulwoo Exp $
+//  $Id: d_op_stag.C,v 1.11 2010-07-26 18:07:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_stag.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v $
 //  $State: Exp $
 //
@@ -171,8 +171,8 @@ void DiracOpStag::MatPcDagMatPc(Vector *out,
   setCbufCntrlReg(3, CBUF_MODE3);
   setCbufCntrlReg(4, CBUF_MODE4);
 
-  stag_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
-  stag_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
+  stag_dirac(frm_tmp, in, 0, 0);
+  stag_dirac(out, frm_tmp, 1, 0);
   out->FTimesV1MinusV2(mass_sq, in, out, f_size_cb);
 
   if( dot_prd !=0 ){
@@ -198,8 +198,8 @@ void DiracOpStag::Dslash(Vector *out,
   setCbufCntrlReg(3, CBUF_MODE3);
   setCbufCntrlReg(4, CBUF_MODE4);
 
-  stag_dirac((IFloat *)out, 
-	(IFloat *)in, 
+  stag_dirac(out, 
+	in, 
 	int(cb),
 	int(dag));
 }
@@ -243,8 +243,8 @@ void DiracOpStag::Dslash(Vector *out,
   setCbufCntrlReg(3, CBUF_MODE3);
   setCbufCntrlReg(4, CBUF_MODE4);
 
-  stag_dirac((IFloat *)out, 
-	(IFloat *)in, 
+  stag_dirac(out, 
+	in, 
 	int(cb),
 	int(dag),
 	dir_flag);
@@ -288,7 +288,7 @@ int DiracOpStag::MatInv(Vector *out,
 	      tmp, f_size_cb * sizeof(Float));
 
   // tmp = (2m - D)k
-  stag_dirac((IFloat *)tmp, k_o, 1, 0);
+  stag_dirac(tmp, (Vector *)k_o, 1, 0);
   fTimesV1MinusV2((IFloat *)tmp, 2.*mass_rs, k_e,
   	(IFloat *)tmp, f_size_cb);
 
@@ -299,7 +299,7 @@ int DiracOpStag::MatInv(Vector *out,
   IFloat *x_e = (IFloat *)out;
   IFloat *x_o = x_e+f_size_cb;
   moveMem(x_o, k_o, f_size_cb*sizeof(Float) / sizeof(char));
-  stag_dirac((IFloat *)tmp, x_e, 0, 0);
+  stag_dirac(tmp, (Vector *)x_e, 0, 0);
   vecMinusEquVec(x_o, (IFloat *)tmp, f_size_cb);
   vecTimesEquFloat(x_o, 0.5/mass_rs, f_size_cb);
 

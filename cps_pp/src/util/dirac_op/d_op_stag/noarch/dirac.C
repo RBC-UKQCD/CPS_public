@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routines used internally in the DiracOpStag class.
 
-  $Id: dirac.C,v 1.5 2004-08-18 11:57:51 zs Exp $
+  $Id: dirac.C,v 1.6 2010-07-26 18:07:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/dirac.C,v 1.5 2004-08-18 11:57:51 zs Exp $
-//  $Id: dirac.C,v 1.5 2004-08-18 11:57:51 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2010-07-26 18:07:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/dirac.C,v 1.6 2010-07-26 18:07:23 chulwoo Exp $
+//  $Id: dirac.C,v 1.6 2010-07-26 18:07:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/dirac.C,v $
 //  $State: Exp $
 //
@@ -110,10 +110,12 @@ inline int x_offset(const int *x)
 //------------------------------------------------------------------
 
 extern "C"
-void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag, int dir_flag)
+void stag_dirac(Vector* b_v, Vector* a_v, int a_odd, int add_flag, int dir_flag)
 {
   int x[4], nu=GJP.XiDir();
   const Matrix *uoff;
+  IFloat* b = (IFloat *)b_v;
+  IFloat* a = (IFloat *)a_v;
   Vector *boff;
   
   Vector *vp0;
