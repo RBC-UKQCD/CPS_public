@@ -1,7 +1,7 @@
 /*!\file
   Staggered Dirac operator for QCDOC
 
-  $Id: dirac.C,v 1.16 2008-02-08 22:01:05 chulwoo Exp $
+  $Id: dirac.C,v 1.17 2010-08-16 20:56:18 chulwoo Exp $
 */
 //-------------------------------------------------------------------
 //   12/27/01 Calin Cristian
@@ -985,8 +985,11 @@ static int LexSurface( int * cc, int surface )
 
 
 extern "C"
-void stag_dirac(IFloat* b, IFloat* a, int a_odd, int add_flag)
+void stag_dirac(Vector* b_v, Vector* a_v, int a_odd, int add_flag, int dir_flag)
 {
+  IFloat* b = (IFloat *)b_v;
+  IFloat* a = (IFloat *)a_v;
+
   int c =0;
   int odd = 1 - a_odd;
   //-----------------------------------------------------------------

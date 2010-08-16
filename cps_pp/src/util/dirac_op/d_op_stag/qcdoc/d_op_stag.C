@@ -153,8 +153,8 @@ void DiracOpStag::MatPcDagMatPc(Vector *out,
 			       Vector *in, 
 			       Float *dot_prd){
 //  static long nflops = (570)*GJP.VolNodeSites();
-  stag_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
-  stag_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
+  stag_dirac(frm_tmp, in, 0, 0);
+  stag_dirac(out, frm_tmp, 1, 0);
 
   if( dot_prd !=0 ){
 	vaxmy_vxdot(&mass_sq,in,out,f_size_cb/6,dot_prd);
@@ -181,7 +181,7 @@ void DiracOpStag::Dslash(Vector *out,
 				  Vector *in, 
 				  ChkbType cb, 
 				  DagType dag) {
-  stag_dirac((IFloat *)out, (IFloat *)in, int(cb), int(dag));
+  stag_dirac(out, in, int(cb), int(dag));
 }
 
 
@@ -377,7 +377,7 @@ int DiracOpStag::MatInv(Vector *out,
       printf("%s::%s:k_o[%d]=%e\n",cname,fname,i,tmp_p[i]);
   }
 #endif
-  stag_dirac((IFloat *)tmp, k_o, 1, 0);
+  stag_dirac(tmp, (Vector *)k_o, 1, 0);
 #if 0
   tmp_p = (Float *)tmp;
   for(int i =0;i<GJP.VolNodeSites()*3;i++){
@@ -410,7 +410,7 @@ int DiracOpStag::MatInv(Vector *out,
   IFloat *x_e = (IFloat *)out;
   IFloat *x_o = x_e+f_size_cb;
   moveMem(x_o, k_o, f_size_cb*sizeof(Float) / sizeof(char));
-  stag_dirac((IFloat *)tmp, x_e, 0, 0);
+  stag_dirac(tmp, out, 0, 0);
   vecMinusEquVec(x_o, (IFloat *)tmp, f_size_cb);
   vecTimesEquFloat(x_o, 0.5/mass_rs, f_size_cb);
 
