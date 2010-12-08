@@ -3,7 +3,5 @@ BGL_DIR = noarch
 BGL_QMP_DIR = qmp bg_asm
 QCDOC_DIR = qcdoc
 QCDOC_SERIAL_DIR = qcdoc
-QCDSP_DIR = qcdsp
-MPI_DIR = mpi
 NOARCH_DIR = noarch qmp bagel_c
 include ../../../../Makefile.rules

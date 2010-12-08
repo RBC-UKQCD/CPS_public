@@ -3,7 +3,5 @@ BGL_DIR = bgl
 BGL_QMP_DIR = qmp
 QCDOC_DIR = qcdoc
 QCDOC_SERIAL_DIR = qcdoc
-QCDSP_DIR = qcdsp
-MPI_DIR = mpi
 NOARCH_DIR = noarch qmp
 include ../../Makefile.rules
