@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2008-10-14 20:24:50 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.58 2008-10-14 20:24:50 chulwoo Exp $
-dnl  $Id: configure.in,v 1.58 2008-10-14 20:24:50 chulwoo Exp $
+dnl  $Date: 2010-12-08 03:45:50 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.59 2010-12-08 03:45:50 chulwoo Exp $
+dnl  $Id: configure.in,v 1.59 2010-12-08 03:45:50 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.58 $
+dnl  $Revision: 1.59 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -150,18 +150,6 @@ elif test "$enable_target" = "bgp"; then
    TESTING_PARALLEL="yes";
    namespace_default="yes"
 
-elif test "$enable_target" = "mpi"; then
-   CXX=""
-   AC_CHECK_PROGS(CXX, mpic++ mpiCC mpCC, g++)
-   if test "$CXX" = "g++"; then
-     AC_MSG_NOTICE([Path is $PATH])
-     AC_MSG_WARN([Using g++])
-     AC_SEARCH_LIBS(MPI_Init, mpi mpich, ,echo "CPS needs the MPI library for a parallel build - bailing out."; exit 1)
-   fi
-   TESTING_PARALLEL="yes";
-   ARCH=cpsMPI
-   ARCHDIR="MPI_DIR"
-
 else
 
    ARCH=NOARCH
@@ -287,12 +275,7 @@ then
         CPS_END_NAMESPACE="}" 
         USING_NAMESPACE_CPS="using namespace cps;"
         CPS_NAMESPACE="cps"
-    if test "$enable_target" = "mpi"
-    then
-        CPS_START_NAMESPACE="namespace cps { using MPISCU::printf; using MPISCU::vprintf;"
-    else
         CPS_START_NAMESPACE="namespace cps {"
-    fi
 fi
 
 dnl Make visible all variables declared above

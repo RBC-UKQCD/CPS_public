@@ -41,7 +41,7 @@ for a summary. Here are some useful general flags
 
 --enable-target[=<target architecture>]
 Specifies that target architecture for which the compilation is to be
-made. Valid values are 'qcdoc', 'qcdsp', 'mpi' and 'noarch' (scalar
+made. Valid values are 'qcdoc', 'qcdsp', and 'noarch' (scalar
 architecture). The latter is the default.
 
 --enable-optimise  
@@ -173,7 +173,6 @@ BGL_DIR = bgl
 BGL_QMP_DIR = bg_bagel
 QCDOC_DIR = qcdoc
 QCDSP_DIR = qcdsp
-MPI_DIR = mpi
 NOARCH_DIR = noarch
 include ../../../../Makefile.rules
 
