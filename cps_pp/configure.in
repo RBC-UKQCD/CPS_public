@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2010-12-08 03:45:50 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.59 2010-12-08 03:45:50 chulwoo Exp $
-dnl  $Id: configure.in,v 1.59 2010-12-08 03:45:50 chulwoo Exp $
+dnl  $Date: 2010-12-09 21:00:10 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.60 2010-12-09 21:00:10 chulwoo Exp $
+dnl  $Id: configure.in,v 1.60 2010-12-09 21:00:10 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.59 $
+dnl  $Revision: 1.60 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -100,9 +100,9 @@ AC_ARG_ENABLE(target,
 AC_MSG_CHECKING([what target we are compiling for])
 AC_MSG_RESULT($enable_target)
 
-CFLAGS=""
-CXXFLAGS=""
-DFLAGS=""
+#CFLAGS=""
+#CXXFLAGS=""
+#DFLAGS=""
 dnl Can add more cases as we need to, e.g. QCDSP
 if test "$enable_target" = "qcdoc"; then
    CC="env QGCC_EXEC_PREFIX=\${QOSLIB} ${CC}"
