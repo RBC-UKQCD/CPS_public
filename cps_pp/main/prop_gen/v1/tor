@@ -1,0 +1,29 @@
+JOBID=propgen-500
+#num of OpenMP threads
+n_omp=2
+#num of MPI processes
+n_mpi=2
+
+exec_file="/home/izubuchi/Work/CPS508/main/prop_gen/v1/cpsMPI.x"
+
+exec_dir="/tmp/rundir"
+
+configs_temp_dir_qrun="/tmp/rundir/configurations"
+config_no=500
+t_src=0
+
+ensemble_label=IWASAKI_Nf2p1_32c64s64_b1.75AuxDet_mu0.001ms0.045
+ensemble_id=141
+logs_configs_dir_qrun=/tmp/rundir/logs'
+plaq_gfix_info_dir=$logs_configs_dir_qrun
+
+midprop_contractions_dir=/tmp/rundir/midprop_contractions
+configs_done_log_qrun=$logs_configs_dir_qrun
+
+OMP_NUM_THREADS=$n_omp mpirun -np $n_mpi -x OMP_NUM_THREADS \
+$exec_file 1 $exec_dir vml_files/do_arg.vml dummy vml_files/mas_list.vml \
+$configs_temp_dir_qrun/ckpoint_lat.$config_no none 17 $t_src \
+$ensemble_label $ensemble_id $config_no $logs_configs_dir_qrun \
+$plaq_gfix_info_dir $midprop_contractions_dir $configs_done_log_qrun \
+>> ./$JOBID.out
+

@@ -1,0 +1,13 @@
+*~
+phys.error
+phys.warn
+*.x
+*.o
+*.s
+\#*#
+*.dyn
+*.dpi
+*.dpi.lock
+trash
+testrun
+
