@@ -1,0 +1,13 @@
+# 4k mapping
+#qpartition_remap -T0 -X1 -Y2 -Z45 -S3
+# More standard mapping
+#qpartition_remap -T01 -X2 -Y3 -Z45
+
+set DIR=`pwd`
+#set NDIR=`echo $DIR | sed "s/host1\/1MB//g" `
+echo $DIR
+set exec_file = ../binaries/NOARCH.x
+
+set cmd = ($exec_file do_arg.vml meas_arg.vml $DIR 0 0 0)
+echo $cmd
+$cmd >& output.log &

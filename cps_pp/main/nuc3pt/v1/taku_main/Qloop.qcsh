@@ -1,0 +1,182 @@
+#!/bin/tcsh -f
+##########################################################
+#Qloop: a shell script to control lattice evolution
+#	and produce a detailed log of jobs. 
+#	- initial development, 01/06/05 mflin
+#VERSION: v5 
+#	* added parameter checking
+#	* added more log information
+#VERSION: v5a
+#	* combined Qevol and Qrepeat into one file
+#	  Qrepeat is no longer needed
+#	- March 2005, mflin
+#PRODUCTION VERSION 1.0:
+#	* modified to be compatible with vml and Peter's 
+#	  directory structure
+#	- June 22 2005, mflin
+#PRODUCTION VERSION 1.1:
+#       * modified to be compatible with PBS
+#       - Nov 08 2005, mflin
+#PRODUCTION VERSION 1.2:
+#       * do reproducibility test according to the trajectory 
+#         number. 
+#       - Nov 30 2005, mflin 
+#       
+##########################################################
+
+###########################################################
+# The script is meant to be used with qbatch.pbs
+# If PBS is not used, need to 
+# emulate environment variables as used in PBS.
+# Commment out the following lines if using PBS
+set JOBID = `date +%m-%d-%Y`
+if ( ! -d $JOBID ) mkdir $JOBID
+
+if ( ! ${?QMACHINE} ) set QMACHINE = `hostname`
+if ( ! ${?QOS} ) set QOS = `uname -a`
+set JOBNAME = alg_w_spect
+set QCSH_SCRIPT = Qloop.qcsh
+set LOGFILE = $JOBID/$JOBNAME.out
+set MAILTO = mflin@qcdserver0.phys.columbia.edu
+set lretry = 0
+set IDLEFILE = $JOBID/qrun.$JOBNAME.out 
+
+# end of environment variables
+########################################################### 
+
+echo "`date` : Starting user provided qcsh script: $QCSH_SCRIPT "  >> $LOGFILE
+
+###########################################
+# To be edited by user
+###########################################
+set exec_file = ../binaries/NOARCH.x
+set interrupt=END # generate this file if want to terminate the loop
+
+#set remap=(qpartition_remap -T0 -X1 -Y23 -Z45) 
+#set repro_remap=(qpartition_remap -T0 -X2 -Y1 -Z35 -S4) 
+
+set repeat=0          #flag to determine whether to do reproducibility tests or not
+set repeat_percent=10 # how much do we repeat 
+set repeat_offset=0 # offset of the reproduced lattice
+set stop_conf=`grep TrajLessThan meas_arg.vml | awk '{print $4}'`
+set start_conf=`grep TrajStart meas_arg.vml | awk '{print $4}'`
+echo start_conf = $start_conf
+echo stop_conf = $stop_conf
+
+# command line arguments
+set DIR=`pwd`
+#set NDIR=`echo $DIR | sed "s/host1\/1MB//g" `
+
+set cmd = ( $exec_file \
+    $DIR \
+    do_arg.vml \
+    meas_arg.vml \
+    $repeat \
+    $repeat_percent )
+
+
+########################################################
+#            EDIT BELOW WITH CAUTION
+########################################################
+set scr=Qloop.qcsh
+echo Running script $scr
+
+
+if( -r $interrupt ) echo "WARNING: $interrupt found. Remove it if it is UNINTENTIONAL"
+sleep 5
+
+#create logs
+set mylog=run.Log
+touch $mylog
+echo " " >> $mylog
+
+set conf = $start_conf
+		   
+echo $scr : Start Time : `date` >> $mylog
+echo $scr : machine = $QMACHINE QOS = $QOS JOBID = $JOBID >> $mylog
+
+start:
+
+#########################################################
+# Start running from the most recent trajectory
+#########################################################
+if ( `find ../work/ -name "meas_arg.*" -print | wc -l` > 0 ) then
+        set recent=`ls ../work/meas_arg.* | awk -F. '{print $NF}' | sort -n | tail -1`
+	cp -p ../work/meas_arg.$recent meas_arg.vml
+	cp -p ../work/do_arg.$recent do_arg.vml
+        set conf = $recent
+endif
+
+while( $conf < $stop_conf)
+
+#    echo $scr : $remap >> $mylog
+#    $remap >!  ./$JOBID/partition_remap.$JOBNAME.$JOBID.out
+#    if ( $? != 0 ) then
+#	echo "`date` : ======ERROR in running qpartition_remap" >> $LOGFILE
+#	echo "`date` : More details in partition_remap.$JOBNAME.$JOBID.out" >> $LOGFILE
+#	if ( $?MAILTO ) then
+#	    echo "Log file ./$JOBID/partition_remap.$JOBNAME.$JOBID.out.$lretry" \
+#	    | mail -s " Error in running partition_remap in job $JOBID partition $QMACHINE." ${MAILTO}
+#	endif
+#	exit 10
+#     endif
+
+    ##########################
+    # qrun user program
+    ##########################
+    echo "$scr : $cmd" >> $mylog
+    echo "$scr : Start Time : `date`" >> $mylog
+    $cmd >! $IDLEFILE
+    if ( $? != 0 ) then
+      echo "`date` : ======ERROR in running: qrun. " >> $LOGFILE
+      if ( $?MAILTO ) then
+         echo "Log file $PWD/$IDLEFILE" \
+	   | mail -s " Error in running qrun in job $JOBID partition $QMACHINE." ${MAILTO}
+      endif
+      source Qcheck.qcsh
+      foreach output ( ./$JOBID/*.out ./$JOBID/*.out.? )
+	 if ( `ls $output.$conf.* | wc -l ` > 0 ) then
+		    set count = `ls $output.$conf.* | awk -F. '{print $NF}' | sort -n | tail -1`
+		    @ count ++ # increase the counter by one to avoid overwriting previous logs
+		    cp -p $output $output.$conf.$count
+	 else
+		    cp -p $output $output.$conf.0
+	 endif
+      end
+        
+      goto start
+
+    else
+      source Qcheck.qcsh
+      foreach output ( ./$JOBID/*.out ./$JOBID/*.out.? )
+	 if ( `ls $output.$conf.* | wc -l ` > 0 ) then
+		    set count = `ls $output.$conf.* | awk -F. '{print $NF}' | sort -n | tail -1`
+		    @ count ++ # increase the counter by one to avoid overwriting previous logs
+		    mv $output $output.$conf.$count
+	 else
+		    mv $output $output.$conf.0
+	 endif
+      end
+    endif
+   
+    echo "$scr : Conf $conf Stop Time : `date`" >> $mylog
+    
+   if ( -r $interrupt ) then
+	echo "$scr : Interrupt signal found. Exit." >> $mylog
+	goto done
+   endif
+   #find the latest checkpoint
+   if ( `find ../work/ -name "meas_arg.*" -print | wc -l` > 0 ) then
+        set recent=`ls ../work/meas_arg.* | awk -F. '{print $NF}' | sort -n | tail -1`
+	cp -p ../work/meas_arg.$recent meas_arg.vml
+	cp -p ../work/do_arg.$recent do_arg.vml
+        set conf = $recent
+   endif
+
+end
+
+
+done:
+    echo "`date` : Reached End of user provided script " >> $LOGFILE
+    
+    echo $scr : Stop Time : `date` >> $mylog  

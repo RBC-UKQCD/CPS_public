@@ -1,0 +1,14 @@
+#ROOT=/home/izubuchi/Work/CPS508/objs-debug
+#ROOT=/home/izubuchi/Work/CPS508/objs-fj
+
+ROOT=/home/izubuchi/Code/CPS508RICC/objs-intel-fjmpi
+
+AR="ar -pc" \
+CC=$ROOT/mpicc CXX=$ROOT/mpic++ \
+./configure  --with-qmp-comms-type=MPI --prefix=$ROOT/qmp-2.3.1/ 
+
+
+
+
+
+

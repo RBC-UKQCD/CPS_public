@@ -1,0 +1,6 @@
+class FloatArray mass_list = {
+Array Floats[2] = {
+double Floats[0] =   0.2
+double Floats[1] =   0.4
+}
+}

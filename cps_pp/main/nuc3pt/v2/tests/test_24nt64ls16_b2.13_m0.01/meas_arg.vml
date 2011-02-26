@@ -1,0 +1,29 @@
+class MeasArg meas_arg = {
+FclassType Fermion = F_CLASS_DWF
+GclassType Gluon = G_CLASS_WILSON
+string WorkDirectory = "./"
+string GaugeStem = "configurations/ckpoint_lat"
+string RNGStem = ""
+MeasIOTask GaugeIO = MeasIOLoad
+MeasIOTask RNGIO = MeasIONone
+int TrajStart = 1500
+int TrajIncrement = 1
+int TrajLessThanLimit = 1501
+int TrajCur = 1500
+int HdwXCsum = 1
+int HdwRCsum = 1
+int IOconcurrency = 32
+Array TaskList[2] = { 
+class MeasTask TaskList[0] = {
+MeasType Measurement = MeasAlgPlaq
+string ArgFilename = "no_arg"
+string OutputFilestem = "./"
+}
+class MeasTask TaskList[1] = {
+MeasType Measurement = MeasAlgNuc3pt
+string ArgFilename = "nuc3pt_arg.vml"
+string OutputFilestem = "./"
+}
+}
+}
+
