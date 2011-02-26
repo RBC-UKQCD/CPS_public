@@ -1,8 +1,9 @@
+#include<conf.h>
 #include<config.h>
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc.C,v 1.7 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: smalloc.C,v 1.8 2011-02-26 16:57:39 chulwoo Exp $
 */
 
 #include <util/error.h>
@@ -15,9 +16,8 @@ CPS_START_NAMESPACE
 
 void* smalloc(size_t request, 
 	      const char *vname, const char *fname, const char *cname){
-#define USE_POSIX_MEMALIGN
 
-#ifdef USE_POSIX_MEMALIGN
+#ifdef HAVE_POSIX_MEMALIGN
 #define ALLOC_MEMALIGN_NUM 4096
   void *p;
   if( posix_memalign((void**)&p, ALLOC_MEMALIGN_NUM, request) ) ERR.Pointer(cname, fname, vname);
