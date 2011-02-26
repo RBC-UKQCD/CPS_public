@@ -3629,7 +3629,6 @@ fi
 done
 test -n "$CXX" || CXX="g++"
 
-#     AC_PATH_PROGS(CC, mpicc, gcc)
      for ac_prog in mpicxx
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -4395,6 +4394,9 @@ echo "${ECHO_T}$enable_sse" >&6
 if test "$enable_target" != "noarch"; then
    enable_sse="no"
 fi
+if test "$enable_qmp" == "no"; then
+   enable_sse="no"
+fi
 if test "$enable_sse" != "no"; then
    CFLAGS="${CFLAGS} -msse -msse2 -msse3"
    CXXFLAGS="${CXXFLAGS} -msse -msse2 -msse3"
@@ -4440,9 +4442,9 @@ if test "$enable_cg_dwf" != "no"; then
    	DFLAGS="${DFLAGS} -DUSE_CG_DWF"
 fi
 
-# Check whether --enable-cg_dwf or --disable-cg_dwf was given.
-if test "${enable_cg_dwf+set}" = set; then
-  enableval="$enable_cg_dwf"
+# Check whether --enable-blas or --disable-blas was given.
+if test "${enable_blas+set}" = set; then
+  enableval="$enable_blas"
 
 else
   enable_blas="no"

@@ -5,7 +5,9 @@
 #include <sys/stat.h>
 #include <time.h>
 
+#ifdef USE_OMP
 #include <omp.h>
+#endif
 
 #include <util/qcdio.h>
 #ifdef PARALLEL
@@ -206,9 +208,10 @@ int main(int argc,char *argv[])
 				FP_IEEE64LITTLE
 			     */
 
-  
+#ifdef USE_OMP
 #pragma omp parallel
     printf("OMP: %d/%d\n", omp_get_num_threads(), omp_get_thread_num());
+#endif
 
     {//lattice factory
     //GwilsonFdwf lattice;
