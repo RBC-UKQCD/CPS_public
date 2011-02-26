@@ -27,6 +27,9 @@ enum MeasType {
 	MeasAlgPot = 4,
 	MeasAlgFixGauge = 5,
 	MeasAlgFixGaugeFree = 6,
+	MeasAlgQPropW = 7,
+	MeasAlgNuc3pt = 8,
+	MeasAlgRandomGauge = 9,
 };
 typedef enum MeasType MeasType;
 extern struct vml_enum_map MeasType_map[];

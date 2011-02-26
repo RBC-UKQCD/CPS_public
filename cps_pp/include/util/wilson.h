@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief Declarations of routine used internally in the DiracOpWilson class.
 
-  $Id: wilson.h,v 1.8 2007-10-30 20:40:34 chulwoo Exp $
+  $Id: wilson.h,v 1.9 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-10-30 20:40:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.8 2007-10-30 20:40:34 chulwoo Exp $
-//  $Id: wilson.h,v 1.8 2007-10-30 20:40:34 chulwoo Exp $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.9 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: wilson.h,v 1.9 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: wilson.h,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v $
 //  $State: Exp $
 //
@@ -33,6 +33,9 @@ CPS_START_NAMESPACE
 #define INCLUDED_WILSON_H
 
 CPS_END_NAMESPACE
+#ifdef USE_QMP
+#include <qmp.h>
+#endif
 #include <util/data_types.h>
 CPS_START_NAMESPACE
 
@@ -111,20 +114,36 @@ struct comm_params
   routines.
  */
 typedef struct
-	{
-    int   *ptr;               //!< The dimensions of the local lattice.
-   int   yztmax;             /* # of points of the y-z-t lattice per node   */
-   int   offset;             /* communication addressing related            */
-   int   comm_offset[ND];    /* communication addressing related            */
-   int   comm_stride[ND];    /* communication addressing related            */
-   int   comm_blklen[ND];    /* communication addressing related            */
-   int   comm_numblk[ND];    /* communication addressing related            */
-   struct  comm_params comm[ND];  
-    int   vol[2];             //!< The local lattice volume
-   int   padded_subgrid_vol[ND];
-    IFloat *spinor_tmp;        //!< Workspace array 
-    IFloat *af[ND];     //!< Array of spinors
-   IFloat *ab[ND];      //!< Array of spinors  
+{
+  int   *ptr;               //!< The dimensions of the local lattice.
+  int   yztmax;             /* # of points of the y-z-t lattice per node   */
+  int   offset;             /* communication addressing related            */
+  int   comm_offset[ND];    /* communication addressing related            */
+  int   comm_stride[ND];    /* communication addressing related            */
+  int   comm_blklen[ND];    /* communication addressing related            */
+  int   comm_numblk[ND];    /* communication addressing related            */
+  struct  comm_params comm[ND];  
+  int   vol[2];             //!< The local lattice volume
+  int   padded_subgrid_vol[ND];
+  IFloat *spinor_tmp;        //!< Workspace array 
+  IFloat *af[ND];     //!< Array of spinors
+  IFloat *ab[ND];      //!< Array of spinors  
+
+  // For Communication in SSEOMP
+  IFloat *send_buf[8];
+  IFloat *recv_buf[8];
+#ifdef USE_QMP
+  QMP_msgmem_t msgmem[8][2];
+  QMP_msghandle_t msghandle[8][2];
+  QMP_msghandle_t multiple[8];
+#endif
+
+
+  // For Profile in SSEOMP
+  IFloat MultFlops,MultFlops_bnd, MultFlops_blk;
+  IFloat CPU_GHZ;
+  int NITR, num_threads;
+
 } Wilson;
 
 

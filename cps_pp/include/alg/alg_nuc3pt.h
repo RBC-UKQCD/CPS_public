@@ -78,6 +78,7 @@ class AlgNuc3pt : public Alg
     void OpenFile();
     void CloseFile() 
       {
+//	Fprintf(stdout,"====closing nuc3pt file\n");
 	if(fp != NULL)
 	  Fclose(fp);
       }

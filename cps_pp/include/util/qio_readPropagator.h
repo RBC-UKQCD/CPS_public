@@ -78,6 +78,13 @@ class qio_readPropagator: private qio_init {
     qio_init(GJP.argc(), GJP.argv()), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
     {read(infile, prop, source, max_Float_prop, max_Float_source, volFormat);}
 
+  qio_readPropagator(char *infile,  
+		     int spin, int color,
+		     void *prop, void *source,
+		     const int max_Float_prop, const int max_Float_source, 
+		     int volFormat=QIO_UNKNOWN): 
+    qio_init(GJP.argc(), GJP.argv()), cname("qio_readPropagator"), readProps(0), readSources(0), readSourceType(QIO_UNKNOWN_SOURCE), lastColor(-1), lastSpin(0)
+      {read(infile, spin, color, prop, source, max_Float_prop, max_Float_source, volFormat);}
 
   //! read propagator, format scalar source + 12 sinks
   /*!
@@ -119,6 +126,7 @@ class qio_readPropagator: private qio_init {
     \param max_Float_source maximal number of Floats allocated for source
   */
   void read(char *infile, void *prop, void *source, int max_Float_prop, int max_Float_source, int volFormat=QIO_UNKNOWN);
+  void read(char *infile, int spin, int color, void *prop, void *source, int max_Float_prop, int max_Float_source, int volFormat=QIO_UNKNOWN);
 
   //! read propagator, format scalar source + 12 sinks
   /*!
@@ -136,6 +144,7 @@ class qio_readPropagator: private qio_init {
     \param source allocated memory for source
   */
   void read_12pairs(char *infile, void *prop, void *source, const QIO_PROP_SOURCE_TYPES sType, int volFormat=QIO_UNKNOWN);
+  void read_pair(char *infile, int spin, int color, void *prop, void *source, const QIO_PROP_SOURCE_TYPES sType, int volFormat=QIO_UNKNOWN);
 
   //! number of sinks read
   int readProps;

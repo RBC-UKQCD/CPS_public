@@ -963,6 +963,7 @@ vml_InverterType (VML *vmls, char *name,InverterType *objp)
 struct vml_enum_map InverterType_map[] = {
 	{"InverterType","CG",CG},
 	{"InverterType","BICGSTAB",BICGSTAB},
+	{"InverterType","EIGCG",EIGCG},
 	{NULL,NULL,0}
 };
 
@@ -1023,6 +1024,34 @@ struct vml_enum_map GaussianKernelLinkSmearType_map[] = {
 	{"GaussianKernelLinkSmearType","GKLS_NONE",GKLS_NONE},
 	{"GaussianKernelLinkSmearType","GKLS_APE",GKLS_APE},
 	{"GaussianKernelLinkSmearType","GKLS_STOUT",GKLS_STOUT},
+	{NULL,NULL,0}
+};
+
+bool_t
+vml_CalcQpropType (VML *vmls, char *name,CalcQpropType *objp)
+{
+	if (!vml_enum (vmls,name,(enum_t *)objp,CalcQpropType_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map CalcQpropType_map[] = {
+	{"CalcQpropType","READ_QPROP",READ_QPROP},
+	{"CalcQpropType","NOIO_QPROP",NOIO_QPROP},
+	{"CalcQpropType","WRITE_QPROP",WRITE_QPROP},
+	{NULL,NULL,0}
+};
+
+bool_t
+vml_CalcSeqType (VML *vmls, char *name,CalcSeqType *objp)
+{
+	if (!vml_enum (vmls,name,(enum_t *)objp,CalcSeqType_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map CalcSeqType_map[] = {
+	{"CalcSeqType","READ_SEQ",READ_SEQ},
+	{"CalcSeqType","NOIO_SEQ",NOIO_SEQ},
+	{"CalcSeqType","WRITE_SEQ",WRITE_SEQ},
 	{NULL,NULL,0}
 };
 CPS_END_NAMESPACE

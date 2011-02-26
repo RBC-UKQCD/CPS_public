@@ -234,6 +234,8 @@ void QPropW::Run(const int do_rerun, const Float precision) {
 
    char *fname = "Run()";
    VRB.Func(cname, fname);
+//CJ: make it skip running CG when EigCG is intended
+   if (qp_arg.cg.Inverter==EIGCG) return;
 
    //Start timing
    Float dtime_begin=dclock();
@@ -257,6 +259,11 @@ void QPropW::Run(const int do_rerun, const Float precision) {
 
    // does prop exist? Assume it does not.
    int do_cg = 1;
+
+   int StartSpin = qp_arg.StartSrcSpin;
+   int EndSpin = qp_arg.EndSrcSpin;
+   int StartColor = qp_arg.StartSrcColor;
+   int EndColor = qp_arg.EndSrcColor;
 
    /****************************************************************
      The code below is temporarily isolated for purposes of merging
@@ -347,10 +354,8 @@ void QPropW::Run(const int do_rerun, const Float precision) {
      // End M. Lightman
      //-----------------------------------------------------------------
      
-
-
-     for (int spn=0; spn < Nspins; spn++)
-       for (int col=0; col < GJP.Colors(); col++) {
+     for (int spn=StartSpin; spn < EndSpin; spn++)
+       for (int col=StartColor; col < EndColor; col++) {
 		 
 	 // initial guess (Zero)
 	 sol.ZeroSource();
@@ -608,7 +613,21 @@ void QPropW::Run(const int do_rerun, const Float precision) {
        writePropQio.setSourceTslice(SourceTime());
      }
 
-     writePropQio.write_12pairs(propOutfile, QIO_FULL_SOURCE, save_prop, save_source, VOLFMT);
+     switch(qp_arg.save_prop){
+     case 1:
+	writePropQio.write_12pairs(propOutfile, QIO_FULL_SOURCE, save_prop, save_source, VOLFMT);
+        break;
+     case 2:
+        for (int spn=StartSpin; spn < EndSpin; spn++){
+          for (int col=StartColor; col < EndColor; col++) {
+	    char file[256];
+	    sprintf(file,"%ss%dc%d",propOutfile,spn,col);
+	    writePropQio.write_pair(file, QIO_FULL_SOURCE, save_prop, save_source, spn, col, VOLFMT);
+          }
+        }
+	break;
+     default: ERR.General(cname,fname,"invalid save_prop in qp arge\n");
+     }
      qio_time +=dclock();
      print_time("QPropW::Run","qio_writePropagator",qio_time);
 
@@ -738,6 +757,39 @@ void QPropW::ReLoad( char *infile){
   
 }
 
+// reload spin-color source(s)
+void QPropW::ReLoadSC(char *infile, int spin, int color){
+
+  char *fname = "ReLoadSC( char *)";
+
+  int float_size = sizeof(WilsonMatrix)*GJP.VolNodeSites()/sizeof(Float);
+
+
+  // assumes prop is already allocated
+  if (prop == 0) ERR.General(cname, fname, "prop should be allocated already");
+  
+  Float *dummy_source = (Float*)smalloc(float_size*sizeof(Float));
+  if (dummy_source == 0) ERR.Pointer(cname, fname, "dummy_source");
+  VRB.Smalloc(cname, fname, "dummy_source", dummy_source,
+	      float_size * sizeof(Float));
+
+#ifdef USE_QIO
+  qio_readPropagator readPropQio(infile, spin, color, &prop[0], dummy_source, float_size, float_size, VOLFMT);
+#endif
+
+  // must renormalize after return in calling function
+  //if(AlgLattice().Fclass() == F_CLASS_DWF){
+    
+  //Float renFac = 5.-GJP.DwfHeight();
+    
+    //for(int ii(0); ii < GJP.VolNodeSites(); ++ii)
+    //prop[ii] *= renFac;
+    
+  //}
+  
+  //sfree(dummy_source);
+  
+}
 
 void QPropW::CG(Lattice &lat, CgArg *arg, FermionVectorTp& source,
         FermionVectorTp& sol , int& iter, Float& true_res){
@@ -2936,6 +2988,8 @@ void QPropWBoxSrc::SetSource(FermionVectorTp& src, int spin, int color) {
   src.SetBoxSource(color, spin, box_arg.box_start, box_arg.box_end, qp_arg.t );
   if (GFixedSrc()) 
     src.GFWallSource(AlgLattice(), spin, 3, qp_arg.t);
+  else
+    VRB.Warn(cname,fname,"Warning: box src not gauge fixed");
 }
 
 //------------------------------------------------------------------

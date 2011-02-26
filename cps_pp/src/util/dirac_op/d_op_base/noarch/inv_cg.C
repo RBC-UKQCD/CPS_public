@@ -1,23 +1,24 @@
 #include <config.h>
+#ifndef USE_BLAS
 #include <stdio.h>
 #include <stdlib.h>
 CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.10 2008-09-18 15:23:16 chulwoo Exp $
+  $Id: inv_cg.C,v 1.11 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-09-18 15:23:16 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.10 2008-09-18 15:23:16 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.10 2008-09-18 15:23:16 chulwoo Exp $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.11 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.11 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -616,3 +617,4 @@ int DiracOp::InvCg(void)
 
 
 CPS_END_NAMESPACE
+#endif

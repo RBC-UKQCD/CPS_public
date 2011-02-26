@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.27 2008-05-12 19:00:43 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.28 2011-02-26 00:19:27 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -36,6 +36,7 @@ DIR2 := $(subst dirac_op/,,$(DIR2))
 DIR2 := $(subst mem/,,$(DIR2))
 DIR2 := $(subst comms/,,$(DIR2))
 DIR2 := $(subst alg/,,$(DIR2))
+DIR2 := $(subst comsrc/,,$(DIR2))
 LIBNAME := XXX$(subst /,_,$(DIR2))XXX
 LIBNAME := $(subst XXX_,,$(LIBNAME))
 LIBNAME := $(subst _XXX,,$(LIBNAME))

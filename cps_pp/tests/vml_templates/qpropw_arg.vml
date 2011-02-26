@@ -1,6 +1,7 @@
 class QPropWArg qpropw_arg = {
 class CgArg cg = {
 double mass =   0.0000000000000000e+00
+double epsilon =   0.0000000000000000e+00
 int max_num_iter = 0
 double stop_rsd =   0.0000000000000000e+00
 double true_rsd =   0.0000000000000000e+00

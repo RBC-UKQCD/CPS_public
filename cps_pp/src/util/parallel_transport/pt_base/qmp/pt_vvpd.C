@@ -2,19 +2,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_vvpd.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
+  $Id: pt_vvpd.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-04-23 03:33:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vvpd.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
-//  $Id: pt_vvpd.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vvpd.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: pt_vvpd.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_vvpd.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vvpd.C,v $
 //  $State: Exp $
 //
@@ -25,6 +25,8 @@
 #ifndef USE_QMP
 #define USE_QMP
 #endif
+
+static int MAX_DIR=10;
 
 /*! 
   Computes sum[x] = vect[x] vect[x + hop dir]^dagger
@@ -37,7 +39,7 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
   //Adapt old vvpd for usage with new interface
 
   //Convert direction array
-  int newdir[n_dir];
+  int newdir[MAX_DIR];
   for(int i = 0; i < n_dir; i++)
     newdir[i] = 2*dir[i];
   IFloat ***vect_shift = (IFloat ***)FastAlloc("","","vect_shift",n_vect*sizeof(IFloat**));
@@ -52,7 +54,6 @@ void PT::vvpd(IFloat **vect, int n_vect, const int *dir,
     Free(vect_shift[i]);
   Free(vect_shift);
   //--------------------------------------------------------------------
-
 }
 
 /*! 
@@ -65,7 +66,7 @@ void PT::vvpd(IFloat **vect2, IFloat ***vect, int n_vect, const int *dir, int n_
 //  VRB.Func("",fname);
   int i, s, v;
   Float f = 2.0;
-  int wire[n_dir];
+  int wire[MAX_DIR];
   for(i=0;i<n_dir;i++) wire[i] = dir[i]; // from (x,y,z,t) to (t,x,y,z)
 
    #ifdef USE_QMP

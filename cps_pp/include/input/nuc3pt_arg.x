@@ -1,5 +1,5 @@
 class Nuc3ptArg {
-	char *cname;
+	string cname<>;
 	int num_masses;
 	Float mass[10];
 	CgArg cg;
@@ -31,8 +31,10 @@ class Nuc3ptArg {
 	GaussianKernelLinkSmearType gauss_link_smear_type;
 	int gauss_link_smear_N;
 	Float gauss_link_smear_coeff;
-	int calc_QProp;
-	char *ensemble_label;
+	CalcQpropType calc_QProp;
+	CalcSeqType calc_seqQ;
+	string prop_file<>;
+	string ensemble_label<>;
 	int ensemble_id;
 	memfun   Nuc3ptArg (  ) ;
 	memfun   void check_args (  ) ;

@@ -485,11 +485,13 @@ class FdwfBase : public virtual FwilsonTypes
         // to the Dwf fermion type. x[i] is the 
         // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
 
+#if 0
     int FsiteOffset(const int *x) const;
         // Sets the offsets for the fermion fields on a 
         // checkerboard. The fermion field storage order
         // is the canonical one. X[I] is the
         // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+#endif
 
     int FsiteSize() const;
         // Returns the number of fermion field 
@@ -553,6 +555,13 @@ class FdwfBase : public virtual FwilsonTypes
 	// The function returns the total number of CG iterations.
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
+		CnvFrmType cnv_frm = CNV_FRM_YES,
+		PreserveType prs_f_in = PRESERVE_YES);
+	
+    int eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart,const int restart_len,
+			Vector *f_out, Vector *f_in, 
+		CgArg *cg_arg, 
+		Float *true_res,
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
 	

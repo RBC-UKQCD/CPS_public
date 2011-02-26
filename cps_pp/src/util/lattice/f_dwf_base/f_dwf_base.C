@@ -1,9 +1,12 @@
 #include<config.h>
+#ifdef USE_OMP
+#include<omp.h>
+#endif
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.32 2008-02-08 18:35:07 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.33 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -295,6 +298,25 @@ int FdwfBase::FmatInv(Vector *f_out, Vector *f_in,
   DiracOpDwf dwf(*this, f_out, f_in, cg_arg, cnv_frm);
     
   iter = dwf.MatInv(true_res, prs_f_in);
+
+  // Return the number of iterations
+  return iter;
+}
+
+int FdwfBase::eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len,
+		Vector *f_out, Vector *f_in, 
+		  CgArg *cg_arg, 
+		  Float *true_res,
+		  CnvFrmType cnv_frm,
+		  PreserveType prs_f_in)
+{
+  int iter;
+  char *fname = "eig_FmatInv(CgArg*,V*,V*,F*,CnvFrmType)";
+  VRB.Func(cname,fname);
+
+  DiracOpDwf dwf(*this, f_out, f_in, cg_arg, cnv_frm);
+    
+  iter = dwf.eig_MatInv(V,vec_len, M, nev, m, U, invH, def_len, restart,restart_len, f_out, f_in, true_res, prs_f_in);
 
   // Return the number of iterations
   return iter;
@@ -1118,11 +1140,25 @@ Float FdwfBase::BhamiltonNode(Vector *boson, Float mass){
 //------------------------------------------------------------------
 int FdwfBase::FsiteOffsetChkb(const int *x) const {
 // ???
-  ERR.NotImplemented(cname, "FsiteOffsetChkb");
-  return 0; 
+//  ERR.NotImplemented(cname, "FsiteOffsetChkb");
+  int index = x[4];
+  int vol = GJP.NodeSites(4);
+  int parity = (x[4]+x[3]+x[2]+x[1]+x[0]+1)%2; //Odd first
+  for(int i = 3; i>=0;i--){
+    index = index*GJP.NodeSites(i)+x[i];
+    vol *= GJP.NodeSites(i);
+  }
+  index = (index + vol*parity)/2;
+  if (0){
+	printf("FsiteOffsetChkb:(%d %d %d %d %d) %d\n",
+	x[0],x[1],x[2],x[3],x[4],index);
+  }
+
+  return index; 
 }
 
 
+#if 0
 //------------------------------------------------------------------
 // int FsiteOffset(const int *x):
 // Sets the offsets for the fermion fields on a 
@@ -1135,6 +1171,7 @@ int FdwfBase::FsiteOffset(const int *x) const {
   ERR.NotImplemented(cname, "FsiteOffset");
   return 0; 
 }
+#endif
 
 
 //--------------------------------------------------------------------

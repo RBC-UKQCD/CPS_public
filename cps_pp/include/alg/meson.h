@@ -72,11 +72,11 @@ class Meson {
 
   void Print(FILE *fp)
   {
-    fprintf(fp,"STARTPROP\nMASSES:  %e   %e\nSOURCE: %s\nSINKS: %s\n",
+    Fprintf(fp,"STARTPROP\nMASSES:  %e   %e\nSOURCE: %s\nSINKS: %s\n",
 	    //(float)m[0],(float)m[1],src,snk);
 	    (Float)m[0],(Float)m[1],src,snk);
     func.print(fp) ;
-    fprintf(fp,"ENDPROP\n");
+    Fprintf(fp,"ENDPROP\n");
   } 
 
   Meson& operator*=(const Float& r){func *=r  ; return *this ; }

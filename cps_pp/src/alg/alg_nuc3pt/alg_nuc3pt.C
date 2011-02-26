@@ -263,17 +263,22 @@ void AlgNuc3pt::run()
       vector[2].Print(fp) ;
       CloseFile();
 
+
       //Do the projections needed for disconnected Ga
       for(int p(0);p<4;p++)
 	{
 	  Nuc2pt Nuc_c5_p(NUC_G5C,POINT,ptype[p]) ;
+	  Nuc_c5_p.Zero();
+
 	  if(Nuc3pt_arg->DoGa1Proj||(p>2))
 	    {
 	      Nuc_c5_p.calcNucleon(*q_prop) ;
+
 	      OpenFile();
 	      Nuc_c5_p.Print(fp) ;
 	      CloseFile();
 	    }
+
 	}
       
       //do some non-zero momenta
@@ -716,7 +721,7 @@ void AlgNuc3pt::GetThePropagator(int time, Float mass){
 
   // save prop
   qp_arg.save_prop=0;
-  if(Nuc3pt_arg->calc_QProp==2) {
+  if(Nuc3pt_arg->calc_QProp==WRITE_QPROP) {
     qp_arg.save_prop=1;
     char chartmp[200];
     sprintf(chartmp,"Nuc3pt");
@@ -821,18 +826,18 @@ void AlgNuc3pt::GetThePropagator(int time, Float mass){
 	  }
 	}
 
-	char out_prop[200];
-	sprintf( out_prop, "/pfs/prop_m%g_tsrc%d_GS_w%g_n%d_%s_%d",mass,time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
-	if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "/pfs/prop_m%g_tsrc%d_%d_GS_w%g_n%d_%s_%d",mass,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
-	qp_arg.file=out_prop;
+	qp_arg.file=Nuc3pt_arg->prop_file;
+	
+	Fprintf(stdout, "prop outfile = %s\n", qp_arg.file);
 
 	//q_prop = new QPropWGaussSrc(AlgLattice(),&qp_arg,common_arg);
-	if(Nuc3pt_arg->calc_QProp){
+	if(Nuc3pt_arg->calc_QProp != READ_QPROP){
 	  q_prop = new QPropWMultGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg);
 	} else {
-	  q_prop = new QPropWGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg,out_prop);
+	  q_prop = new QPropWGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg,qp_arg.file);
 	  q_prop->Allocate(0);
-	  q_prop->RestoreQProp(out_prop,0);
+//	  q_prop->RestoreQProp(qp_arg.file,0);
+	  q_prop->ReLoad(qp_arg.file);
 	}
       }
     }
@@ -909,7 +914,7 @@ void  AlgNuc3pt::GetTheSeqPropagator(int time, Float mass, SourceType type,
   gauss_arg.gauss_link_smear_N = Nuc3pt_arg->gauss_link_smear_N;
 
   qp_arg.save_prop=0;
-  if(Nuc3pt_arg->calc_QProp==2) {
+  if(Nuc3pt_arg->calc_seqQ==WRITE_SEQ) {
     qp_arg.save_prop=1;
     char chartmp[200];
     sprintf(chartmp,"Nuc3pt");
@@ -961,15 +966,16 @@ void  AlgNuc3pt::GetTheSeqPropagator(int time, Float mass, SourceType type,
 	  if(Nuc3pt_arg->DoConserved) qp_arg.save_ls_prop = 2;
           qp_arg.file=out_prop;
 
-	  sprintf( out_prop, "/pfs/prop_seq_u_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
-	  if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "/pfs/prop_seq_u_m%g_tsrc%d_%d_tsnk%d_%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),Nuc3pt_arg->mt[1]-Nuc3pt_arg->t_sink,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
-	  if(Nuc3pt_arg->calc_QProp){
+	  sprintf( out_prop, "prop_seq_u_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	  if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "prop_seq_u_m%g_tsrc%d_%d_tsnk%d_%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),Nuc3pt_arg->mt[1]-Nuc3pt_arg->t_sink,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	  if(Nuc3pt_arg->calc_seqQ != READ_SEQ){
 	    u_s_prop = new QPropWSeqProtUSrc(AlgLattice(),*q_prop, mom, P, 
 					     &qp_arg,&gauss_arg, common_arg);
 	  } else {
 	    u_s_prop = new QPropWSeqProtUSrc(AlgLattice(), *q_prop, mom, P, &qp_arg, &gauss_arg, common_arg, out_prop);
 	    u_s_prop->Allocate(0);
-	    u_s_prop->RestoreQProp(out_prop,0);
+//	    u_s_prop->RestoreQProp(out_prop,0);
+	    u_s_prop->ReLoad(out_prop);	
 	  }
 	}
       }
@@ -1002,16 +1008,17 @@ void  AlgNuc3pt::GetTheSeqPropagator(int time, Float mass, SourceType type,
 	  if(Nuc3pt_arg->DoConserved == 2) qp_arg.save_ls_prop = 2;
           qp_arg.file=out_prop;
 
-	  sprintf( out_prop, "/pfs/prop_seq_d_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
-	  if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "/pfs/prop_seq_d_m%g_tsrc%d_%d_tsnk%d_%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),Nuc3pt_arg->mt[1]-Nuc3pt_arg->t_sink,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	  sprintf( out_prop, "prop_seq_d_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	  if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "prop_seq_d_m%g_tsrc%d_%d_tsnk%d_%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),Nuc3pt_arg->mt[1]-Nuc3pt_arg->t_sink,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
 
-	  if(Nuc3pt_arg->calc_QProp){
+	  if(Nuc3pt_arg->calc_seqQ != READ_SEQ){
 	  d_s_prop = new QPropWSeqProtDSrc(AlgLattice(),*q_prop, mom, P, 
 					   &qp_arg, &gauss_arg,common_arg);
 	  } else {
 	    d_s_prop = new QPropWSeqProtDSrc(AlgLattice(), *q_prop, mom, P, &qp_arg, &gauss_arg, common_arg, out_prop);
 	    d_s_prop->Allocate(0);
-	    d_s_prop->RestoreQProp(out_prop,0);
+//	    d_s_prop->RestoreQProp(out_prop,0);
+	    d_s_prop->ReLoad(out_prop);
 	  }
 	}
       }

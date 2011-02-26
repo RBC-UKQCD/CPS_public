@@ -8,19 +8,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.19 2009-11-27 06:11:11 chulwoo Exp $
+  $Id: enum.x,v 1.20 2011-02-26 00:19:27 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2009-11-27 06:11:11 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.19 2009-11-27 06:11:11 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.19 2009-11-27 06:11:11 chulwoo Exp $*/
+/*  $Date: 2011-02-26 00:19:27 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.20 2011-02-26 00:19:27 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.20 2011-02-26 00:19:27 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.19 $*/
+/*  $Revision: 1.20 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -787,7 +787,8 @@ enum HmdLimits {
 /* Which type of solver to use? */
 enum InverterType {
   CG = 0,       /* Conjugate Gradients. */
-  BICGSTAB = 1  /* BiCGstab(n). */
+  BICGSTAB = 1,  /* BiCGstab(n). */
+  EIGCG = 2  /* EigCG */
 };
 
 /* Which type of approximation to use? */
@@ -822,4 +823,19 @@ enum GaussianKernelLinkSmearType {
   GKLS_APE = 1,
   GKLS_STOUT = 2
 };
+
+/*! IO type for the quark propagator calculations in AlgNuc3pt. */
+
+enum CalcQpropType {
+ READ_QPROP,
+ NOIO_QPROP,
+ WRITE_QPROP
+};
+
+enum CalcSeqType {
+ READ_SEQ,
+ NOIO_SEQ,
+ WRITE_SEQ
+} ;
+
 

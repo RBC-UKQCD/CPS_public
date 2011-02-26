@@ -9,7 +9,10 @@ enum MeasType {
 	MeasAlgEig,
 	MeasAlgPot,
 	MeasAlgFixGauge,
-	MeasAlgFixGaugeFree
+	MeasAlgFixGaugeFree,
+	MeasAlgQPropW,
+	MeasAlgNuc3pt,
+	MeasAlgRandomGauge
 };	
 
 enum MeasIOTask {

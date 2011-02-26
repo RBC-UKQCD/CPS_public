@@ -250,6 +250,10 @@ class qio_writePropagator: private qio_init {
    */  
   void write_12pairs(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
 		     int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC);
+  void write_pair(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source,
+		  int spin,
+		  int color,
+		  int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC);
 
   //! set additional info
   /*!

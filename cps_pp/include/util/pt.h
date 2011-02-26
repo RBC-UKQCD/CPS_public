@@ -12,19 +12,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the parallel transport classes.
 
-  $Id: pt.h,v 1.22 2008-02-08 18:35:05 chulwoo Exp $
+  $Id: pt.h,v 1.23 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.22 2008-02-08 18:35:05 chulwoo Exp $
-//  $Id: pt.h,v 1.22 2008-02-08 18:35:05 chulwoo Exp $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v 1.23 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: pt.h,v 1.23 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.h,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt.h,v $
 //  $State: Exp $
 //
@@ -424,6 +424,18 @@ class ParTransGauge : public ParTrans
 
   void run(int n, Matrix **mout, Matrix **min, const int *dir )
     { pt_mat(n,(IFloat **)mout, (IFloat **)min, dir);}
+
+    //! u[x] = v[x+dir] for n_dir forward or backward directions dir.
+    void shift_field(Matrix **v, const int *dir, int n_dir,
+		     int hop, Matrix **u){
+        pt_shift_field((IFloat **)v,dir,n_dir,hop,(IFloat **)u);
+    }
+
+
+    //! u[-/+nu](x) = U_[-/+nu](x)
+    void shift_link(Matrix **u, const int *dir, int n_dir){
+        pt_shift_link((IFloat **)u,dir,n_dir);
+    }
 
 };
 

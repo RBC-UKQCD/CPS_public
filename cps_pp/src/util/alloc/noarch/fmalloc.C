@@ -2,16 +2,18 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: fmalloc.C,v 1.6 2004-12-16 00:10:56 chulwoo Exp $
+  $Id: fmalloc.C,v 1.7 2011-02-26 00:19:27 chulwoo Exp $
 */
 
 #include <stdlib.h>
 #include <util/verbose.h>
 #include <util/error.h>
 #include <util/smalloc.h>
+#include <stdlib.h> //  posix_memalign
 
 CPS_START_NAMESPACE
 
+#define ALLOC_MEMALIGN_NUM 4096
 void* fmalloc(size_t request,
 	      const char *vname, const char *fname, const char *cname){
 

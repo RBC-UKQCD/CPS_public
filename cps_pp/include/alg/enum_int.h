@@ -663,6 +663,7 @@ extern struct vml_enum_map HmdLimits_map[];
 enum InverterType {
 	CG = 0,
 	BICGSTAB = 1,
+	EIGCG = 2,
 };
 typedef enum InverterType InverterType;
 extern struct vml_enum_map InverterType_map[];
@@ -702,6 +703,22 @@ enum GaussianKernelLinkSmearType {
 };
 typedef enum GaussianKernelLinkSmearType GaussianKernelLinkSmearType;
 extern struct vml_enum_map GaussianKernelLinkSmearType_map[];
+
+enum CalcQpropType {
+	READ_QPROP = 0,
+	NOIO_QPROP = 1,
+	WRITE_QPROP = 2,
+};
+typedef enum CalcQpropType CalcQpropType;
+extern struct vml_enum_map CalcQpropType_map[];
+
+enum CalcSeqType {
+	READ_SEQ = 0,
+	NOIO_SEQ = 1,
+	WRITE_SEQ = 2,
+};
+typedef enum CalcSeqType CalcSeqType;
+extern struct vml_enum_map CalcSeqType_map[];
 
 /* the xdr functions */
 
@@ -765,6 +782,8 @@ extern  bool_t vml_RationalApproxType (VML *, char *instance, RationalApproxType
 extern  bool_t vml_RationalBoundsType (VML *, char *instance, RationalBoundsType*);
 extern  bool_t vml_StaticBActionLinkSmearType (VML *, char *instance, StaticBActionLinkSmearType*);
 extern  bool_t vml_GaussianKernelLinkSmearType (VML *, char *instance, GaussianKernelLinkSmearType*);
+extern  bool_t vml_CalcQpropType (VML *, char *instance, CalcQpropType*);
+extern  bool_t vml_CalcSeqType (VML *, char *instance, CalcSeqType*);
 
 #else /* K&R C */
 extern  bool_t vml_pooh (VML *, char *instance, pooh*);
@@ -822,6 +841,8 @@ extern  bool_t vml_RationalApproxType (VML *, char *instance, RationalApproxType
 extern  bool_t vml_RationalBoundsType (VML *, char *instance, RationalBoundsType*);
 extern  bool_t vml_StaticBActionLinkSmearType (VML *, char *instance, StaticBActionLinkSmearType*);
 extern  bool_t vml_GaussianKernelLinkSmearType (VML *, char *instance, GaussianKernelLinkSmearType*);
+extern  bool_t vml_CalcQpropType (VML *, char *instance, CalcQpropType*);
+extern  bool_t vml_CalcSeqType (VML *, char *instance, CalcSeqType*);
 
 #endif /* K&R C */
 

@@ -38,6 +38,7 @@ class LatData{
     void  Init(int size, int vol){
       Init(DEFAULT,size,vol);
     }
+    int Vol() { return vol;}
     LatData &operator=(const LatData &lat);
     ~LatData();
     const IFloat *Field(int pos=0, int n=0)

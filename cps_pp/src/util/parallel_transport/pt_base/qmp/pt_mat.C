@@ -2,19 +2,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_mat.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
+  $Id: pt_mat.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-04-23 03:33:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
-//  $Id: pt_mat.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: pt_mat.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_mat.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v $
 //  $State: Exp $
 //
@@ -61,7 +61,7 @@ void PT::mat_cb_norm(int n, IFloat **mout, IFloat **min, const int *dir, int
 parity, IFloat * gauge)
 {
   //List of the different directions
-  int wire[n];
+  int wire[MAX_DIR];
   int i;
 
   #ifdef USE_QMP
@@ -249,7 +249,7 @@ parity, IFloat * gauge)
 #undef PROFILE
 void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
     
-  int wire[n];
+  int wire[MAX_DIR];
   int i;
 //  QMP_msgmem_t *msg_mem_p = (QMP_msgmem_t *)Alloc("","vec_cb_norm", "msg_mem_p", 2*non_local_dirs*sizeof(QMP_msgmem_t));
 //  QMP_msghandle_t* msg_handle_p = (QMP_msghandle_t *)Alloc("","vec_cb_norm", "msg_handle_p", 2*non_local_dirs*sizeof(QMP_msghandle_t));
@@ -279,7 +279,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
 
     non_local_dir++;
   }
-  if (call_num==1)printf("non_local_dir=%d\n",non_local_dir);
+//  if (call_num==1)printf("non_local_dir=%d\n",non_local_dir);
 
   if(non_local_dir) {
     multiple = QMP_declare_multiple(msg_handle_p, 2*non_local_dir);

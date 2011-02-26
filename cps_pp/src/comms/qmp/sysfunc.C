@@ -66,7 +66,7 @@ namespace QMPSCU {
   //Initialize QMP with null command line
   void init_qmp() {
 #if 1
-	ERR.General("","init_qmp()","default arguments no loger supported. Call init_qmp(&argc,&argv) via (CPS_NAMESPACE)::Start(&argc,&argv)");
+    ERR.General("","init_qmp()","default arguments no loger supported. Call init_qmp(&argc,&argv) via (CPS_NAMESPACE)::Start(&argc,&argv)");
 #else
     int argc=2;
     char *argv[2];

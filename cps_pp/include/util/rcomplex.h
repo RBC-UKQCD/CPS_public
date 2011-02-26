@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of complex floating point data type.
 
-  $Id: rcomplex.h,v 1.4 2004-12-01 06:38:14 chulwoo Exp $
+  $Id: rcomplex.h,v 1.5 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-01 06:38:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rcomplex.h,v 1.4 2004-12-01 06:38:14 chulwoo Exp $
-//  $Id: rcomplex.h,v 1.4 2004-12-01 06:38:14 chulwoo Exp $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rcomplex.h,v 1.5 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: rcomplex.h,v 1.5 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: rcomplex.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/rcomplex.h,v $
 //  $State: Exp $
 //
@@ -59,6 +59,12 @@ class Rcomplex {
   /*! \return the imaginary part */
   IFloat imag() const { return im; }
 
+  IFloat& realx() { return re; }
+  IFloat& imagx() { return im; }
+
+  //! Get the imaginary part
+  /*! \return the imaginary part */
+  
   //! Assign to the real part
   /*! \param r the real part */
   void real(IFloat r) { re = r; }

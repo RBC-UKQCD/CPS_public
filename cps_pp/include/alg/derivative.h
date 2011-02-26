@@ -11,9 +11,10 @@
 //------------------------------------------------------------------*/
 #ifndef INCLUDED_DERIVATIVE_H
 #define INCLUDED_DERIVATIVE_H
-#include <stdio.h>
+//#include <stdio.h>
 #include <util/data_types.h>
 #include <util/site.h>
+#include <util/qcdio.h>
 
 CPS_START_NAMESPACE
 
@@ -284,7 +285,7 @@ class Derivative
   int N(){return Num;}
 
   /*! prints the tag */
-  void printTag(FILE *fp){fprintf(fp,"%s",tag);}
+  void printTag(FILE *fp){Fprintf(fp,"%s",tag);}
 
   // For debugging 
   //void sh_print(){for(int i(0);i<Num; i++) sh[i].print(); printf("\n"); }

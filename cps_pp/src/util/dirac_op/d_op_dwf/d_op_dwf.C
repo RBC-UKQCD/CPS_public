@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.3 2008-04-21 19:13:48 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-21 19:13:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v 1.3 2008-04-21 19:13:48 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.3 2008-04-21 19:13:48 chulwoo Exp $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -42,6 +42,15 @@ CPS_END_NAMESPACE
 #include <util/dwf.h>
 #include <mem/p2v.h>
 #include <comms/glb.h>
+
+#ifdef USE_CG_DWF_WRAPPER
+#include "cps_cg_dwf.h"
+int CgDwfWrapper::lat_allocated=0;
+const char *CgDwfWrapper::cname = "CPSCgDwf";
+LatMatrix *CgDwfWrapper::Plus[4];
+LatMatrix *CgDwfWrapper::Minus[4];
+#endif
+
 CPS_START_NAMESPACE
 
 
@@ -299,7 +308,7 @@ void DiracOpDwf::MatPcDag(Vector *out, Vector *in) {
   tmp = (IFloat *)out;
 }
 
-
+#if defined (USE_CG_DWF_WRAPPER)|| !defined (USE_CG_DWF)  || (TARGET != NOARCH)
 //------------------------------------------------------------------
 // int MatInv(Vector *out, Vector *in, 
 //            Float *true_res, PreserveType prs_in);
@@ -319,6 +328,7 @@ int DiracOpDwf::MatInv(Vector *out,
 		       PreserveType prs_in) {
   char *fname = "MatInv(V*,V*,F*)";
   VRB.Func(cname,fname);
+//  VRB.Result(cname,fname,"Not using cg-dwf");
 
   //----------------------------------------------------------------
   // Initialize kappa and ls. This has already been done by the Fdwf
@@ -335,9 +345,9 @@ int DiracOpDwf::MatInv(Vector *out,
   // Implement routine
   //----------------------------------------------------------------
   Vector *temp2;
-  int temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
+  unsigned long long temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
 
-//  printf("temp_size:%d\n",temp_size);
+  printf("temp_size:%d\n",temp_size);
 //  printf("MatInv : %e %e\n",in->NormSqNode(temp_size),out->NormSqNode(temp_size));
 
 
@@ -384,9 +394,18 @@ int DiracOpDwf::MatInv(Vector *out,
   }
 
 
+
   int iter;
   switch (dirac_arg->Inverter) {
   case CG:
+#ifdef USE_CG_DWF_WRAPPER
+	{
+  		CgDwfWrapper cg_dwf;
+		cg_dwf.Init(lat);
+		printf("lat.FsiteSize()=%d\n",lat.FsiteSize());
+		cg_dwf.Inv(&lat,out,in,dirac_arg,temp_size);
+	}
+#endif
     MatPcDag(in, temp);
     iter = InvCg(out,in,true_res);
     break;
@@ -419,6 +438,7 @@ int DiracOpDwf::MatInv(Vector *out,
 
   return iter;
 }
+#endif
 
 
 //------------------------------------------------------------------

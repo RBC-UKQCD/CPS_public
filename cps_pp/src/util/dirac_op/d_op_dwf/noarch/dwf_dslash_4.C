@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.7 2008-02-08 18:35:07 chulwoo Exp $
-//  $Id: dwf_dslash_4.C,v 1.7 2008-02-08 18:35:07 chulwoo Exp $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.8 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: dwf_dslash_4.C,v 1.8 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v $
 //  $State: Exp $
 //
@@ -80,13 +80,14 @@ void dwf_dslash_4(Vector *out,
 
     // Apply on 4-dim "parity" checkerboard part
     //------------------------------------------------------------
-#ifdef _TARTAN  
-    SyncMax(10000);
-#endif
   if(vec_len==1)
     wilson_dslash(frm_out, g_field, frm_in, parity, dag, wilson_p);
   else{
+#if TARGET == NOARCH
+    ERR.NotImplemented("","dwf_dslash_4(..)","wilson_dslash_two() doesn't exists\n");
+#else
     wilson_dslash_two(frm_out, frm_out+size_cb[parity], g_field, frm_in, frm_in+size_cb[parity], parity, 1-parity,dag, wilson_p);
+#endif
     }
     frm_in = frm_in + vec_len*size_cb[parity];
     frm_out = frm_out + vec_len*size_cb[parity];

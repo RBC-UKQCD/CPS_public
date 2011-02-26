@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.55 2010-04-05 19:55:48 chulwoo Exp $
+  $Id: lattice_base.C,v 1.56 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2010-04-05 19:55:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.55 2010-04-05 19:55:48 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.55 2010-04-05 19:55:48 chulwoo Exp $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.56 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.56 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.55 $
+//  $Revision: 1.56 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -168,7 +168,6 @@ Lattice::Lattice()
        gauge_field = (Matrix *) qalloc(GJP.StartConfAllocFlag(),array_size);
     VRB.Flow(cname,fname,"gauge_field=%p\n",gauge_field);
 #else
-//     printf("Here we are!\n");
       gauge_field = (Matrix *) pmalloc(array_size);
 #endif
 //     printf("gauge_field=%p\n",gauge_field);
@@ -427,7 +426,7 @@ int Lattice::CompareGaugeField(Matrix* u)
 //------------------------------------------------------------------
 // StrOrd(): returns the value of the current storage order.
 //------------------------------------------------------------------
-StrOrdType Lattice::StrOrd(void)
+StrOrdType Lattice::StrOrd(void) const
 {
   return str_ord;
 }
@@ -2926,9 +2925,6 @@ void Lattice::ForceMagnitude(Matrix *mom, Matrix *mom_old,
   char *fname = "ForceMagnitude(Matrix*, Matrix*, Float, Float, char*)";
   FILE *fp;
 
-#if TARGET==cpsMPI
-  using MPISCU::fprintf;
-#endif
 
   int g_size = GJP.VolNodeSites() * GsiteSize();
   
@@ -2962,6 +2958,33 @@ int Lattice::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
                                type,alpha, f_out_d);
     delete[] cg_arg_p;
     return iter;
+}
+
+//by Qi Liu
+int Lattice::eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart,const int restart_len, Vector *f_out, Vector *f_in, CgArg *cg_arg, Float *true_res, CnvFrmType cnv_frm , PreserveType prs_f_in)
+{
+	 char *cname = "Lattice";
+	 char *fname = "FmatInvProj()";
+	 ERR.General(cname,fname,"Only have code for dwf class not others so this is not a pure virtual function\n");
+}
+unsigned long Lattice::GsiteOffset(const int *x, const int dir) const{
+  char *fname="GsiteOffset(*i,i)";
+  int parity = (x[0]+x[1]+x[2]+x[3])%2;
+  int vol = GJP.VolNodeSites();
+  unsigned long index;
+  switch(StrOrd()){
+  case WILSON:
+// XYZT ordering, checkerboarded, even first
+    index = x[3];
+    for(int i=2;i>=0;i--) index = x[i]+GJP.NodeSites(i)*index;
+    index = (index+vol*parity)/2;  
+// dir also XYZT
+    index = index * 4 + dir; 
+    break;
+  default:
+    ERR.NotImplemented(cname,fname);
+  }
+  return index;
 }
 
 CPS_END_NAMESPACE

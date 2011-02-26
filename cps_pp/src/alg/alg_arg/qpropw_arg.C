@@ -103,6 +103,14 @@ vml_QPropWArg (VML *vmls, char *name,QPropWArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "seqNum", &objp->seqNum))
 		 return FALSE;
+	 if (!vml_int (vmls, "StartSrcSpin", &objp->StartSrcSpin))
+		 return FALSE;
+	 if (!vml_int (vmls, "EndSrcSpin", &objp->EndSrcSpin))
+		 return FALSE;
+	 if (!vml_int (vmls, "StartSrcColor", &objp->StartSrcColor))
+		 return FALSE;
+	 if (!vml_int (vmls, "EndSrcColor", &objp->EndSrcColor))
+		 return FALSE;
 	 vml_class_end(vmls,"QPropWArg",name);
 	return TRUE;
 }

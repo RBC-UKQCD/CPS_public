@@ -60,6 +60,10 @@ class QPropWArg {
   string ensemble_label<>;
   string ensemble_id<>;
   int seqNum;
+  int StartSrcSpin;
+  int EndSrcSpin;
+  int StartSrcColor;
+  int EndSrcColor;
   memfun QPropWArg();
 };
 

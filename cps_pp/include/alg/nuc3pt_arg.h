@@ -51,7 +51,9 @@ public:
 	GaussianKernelLinkSmearType gauss_link_smear_type;
 	int gauss_link_smear_N;
 	Float gauss_link_smear_coeff;
-	int calc_QProp;
+	CalcQpropType calc_QProp;
+	CalcSeqType calc_seqQ;
+	char *prop_file;
 	char *ensemble_label;
 	int ensemble_id;
 	   Nuc3ptArg (  ) ;

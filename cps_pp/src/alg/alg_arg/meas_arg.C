@@ -33,6 +33,9 @@ struct vml_enum_map MeasType_map[] = {
 	{"MeasType","MeasAlgPot",MeasAlgPot},
 	{"MeasType","MeasAlgFixGauge",MeasAlgFixGauge},
 	{"MeasType","MeasAlgFixGaugeFree",MeasAlgFixGaugeFree},
+	{"MeasType","MeasAlgQPropW",MeasAlgQPropW},
+	{"MeasType","MeasAlgNuc3pt",MeasAlgNuc3pt},
+	{"MeasType","MeasAlgRandomGauge",MeasAlgRandomGauge},
 	{NULL,NULL,0}
 };
 

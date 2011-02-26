@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.22 2009-03-23 19:13:32 chulwoo Exp $
+  $Id: dirac_op.h,v 1.23 2011-02-26 00:19:27 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -68,6 +68,9 @@ class DiracOp
 	  CnvFrmType convert); // Fermion conversion flag
 
   virtual ~DiracOp();
+
+  //eigen CG //by Qi Liu
+  int InvEigCg(Vector *sol, Vector *src, Float *true_res, const int nev, const int m, Vector **V, const int vec_len, Float *M, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len);
 
   //! The matrix inversion used in the molecular dynamics algorithms.
   int InvCg(Vector *out,
@@ -219,6 +222,15 @@ class DiracOp
     \return The number of solver iterations.
     \post \a out contains the solution vector \e x.
   */
+
+  virtual int eig_MatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len, Vector *out, Vector *in, Float *true_res, PreserveType prs_in = PRESERVE_YES)
+  {
+	  char *fname="eig_MatInv()";
+	  ERR.General(cname, fname,"only implemented for dwf currently, so not pure virtual\n");
+	  return 0;
+  } 
+  //eigCG inversion //by Qi Liu
+
   virtual int MatInv(Vector *out, Vector *in, 
 		     PreserveType prs_in = PRESERVE_YES) = 0;
      // Same as original but true_res=0.
@@ -1394,6 +1406,9 @@ class DiracOpDwf : public DiracOpWilsonTypes
      // is less by half the size of a fermion vector.
      // The function returns the total number of CG iterations.
 
+  int eig_MatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len,Vector *out, Vector *in, Float *true_res, PreserveType prs_in = PRESERVE_YES);
+  //eigCG inversion //by Qi Liu
+  //
   int MatInv(Vector *out, 
 	     Vector *in,
 	     PreserveType prs_in = PRESERVE_YES);

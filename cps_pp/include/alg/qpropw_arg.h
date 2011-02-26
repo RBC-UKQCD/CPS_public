@@ -66,6 +66,10 @@ public:
 	char *ensemble_label;
 	char *ensemble_id;
 	int seqNum;
+	int StartSrcSpin;
+	int EndSrcSpin;
+	int StartSrcColor;
+	int EndSrcColor;
 	   QPropWArg (  ) ;
 };
 

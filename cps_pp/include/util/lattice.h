@@ -5,20 +5,15 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.57 2009-03-23 19:13:32 chulwoo Exp $
+  $Id: lattice.h,v 1.58 2011-02-26 00:19:27 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2009-03-23 19:13:32 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.57 2009-03-23 19:13:32 chulwoo Exp $
-  $Id: lattice.h,v 1.57 2009-03-23 19:13:32 chulwoo Exp $
+  $Date: 2011-02-26 00:19:27 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.58 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: lattice.h,v 1.58 2011-02-26 00:19:27 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Author: chulwoo $
-  $Date: 2009-03-23 19:13:32 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.57 2009-03-23 19:13:32 chulwoo Exp $
-  $Id: lattice.h,v 1.57 2009-03-23 19:13:32 chulwoo Exp $
-  $Name: not supported by cvs2svn $
-  $Revision: 1.57 $
+  $Revision: 1.58 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -260,6 +255,7 @@ class Lattice
 	\param x The lattice site coordinates.
 	\return The array index.
 	*/
+    virtual unsigned long GsiteOffset(const int *x, const int dir) const;
 
 
     void CopyGaugeField(Matrix* u);
@@ -268,7 +264,7 @@ class Lattice
     int CompareGaugeField(Matrix* u);
         //!< Compares the gauge configuration to the lattice instance;
 
-    StrOrdType StrOrd();
+    StrOrdType StrOrd() const ;
         //!< Returns the storage order.
 
     int Colors() const;
@@ -937,6 +933,13 @@ class Lattice
       
       \return The residue of this guess.
      */
+
+    virtual int eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len,
+			Vector *f_out, Vector *f_in, 
+			CgArg *cg_arg, 
+                        Float *true_res,
+			CnvFrmType cnv_frm = CNV_FRM_YES,
+			PreserveType prs_f_in = PRESERVE_YES);
 
     virtual int FmatInv(Vector *f_out, Vector *f_in, 
 			CgArg *cg_arg, 

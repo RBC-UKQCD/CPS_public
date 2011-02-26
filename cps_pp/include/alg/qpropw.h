@@ -125,6 +125,7 @@ public:
 
   // this is the basic routine, do_rerun=0: normal run, do_rerun=1: load prop from file, rerun and compare with prec.
   void Run( const int do_rerun, const Float precision=1e-8);
+  void eig_Run(Vector **V, const int vec_len, Float *M, Float max_eig, const int nev, const int m, float **U, Rcomplex *H, const int max_def_len, int &def_len, const Float *restart, const int restart_len,const bool always_restart, const int do_rerun, const Float precision=1e-8) ;
 
   // to have the usual call
   void Run() { Run(0);}
@@ -133,7 +134,10 @@ public:
   void ReRun( const Float precision=1e-8) { Run(1, precision);}
 
   void ReLoad( char *infile);
+  // loads a single spin-color source prop
+  void ReLoadSC( char *infile, int spin, int color);
 
+  void eig_CG(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len, FermionVectorTp& source, FermionVectorTp& sol, FermionVectorTp& midsol, int& iter, Float& true_res); //by Qi Liu
   void CG(FermionVectorTp&, FermionVectorTp&, FermionVectorTp&, int&, Float&);
    // HueyWen: addtional CG definition
   void CG(Lattice &lat, CgArg *arg, FermionVectorTp& source,

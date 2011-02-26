@@ -58,9 +58,7 @@ class CorrFunc {
 
   void GlobalSum(void)
     {
-#if TARGET == QCDOC
       slice_sum((Float*)func, 2*Nt, 99);
-#endif
     }
 
   Complex& operator[](int i) { return func[i] ; }

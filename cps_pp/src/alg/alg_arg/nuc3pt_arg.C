@@ -29,7 +29,7 @@ vml_Nuc3ptArg (VML *vmls, char *name,Nuc3ptArg *objp)
 {
 	 vml_class_begin(vmls,"Nuc3ptArg",name);
 	int i;
-	 if (!vml_pointer (vmls, "cname", (char **)&objp->cname, sizeof (char), (vmlproc_t) vml_char))
+	 if (!vml_string (vmls, "cname", &objp->cname, ~0))
 		 return FALSE;
 	 if (!vml_int (vmls, "num_masses", &objp->num_masses))
 		 return FALSE;
@@ -96,9 +96,13 @@ vml_Nuc3ptArg (VML *vmls, char *name,Nuc3ptArg *objp)
 		 return FALSE;
 	 if (!vml_Float (vmls, "gauss_link_smear_coeff", &objp->gauss_link_smear_coeff))
 		 return FALSE;
-	 if (!vml_int (vmls, "calc_QProp", &objp->calc_QProp))
+	 if (!vml_CalcQpropType (vmls, "calc_QProp", &objp->calc_QProp))
 		 return FALSE;
-	 if (!vml_pointer (vmls, "ensemble_label", (char **)&objp->ensemble_label, sizeof (char), (vmlproc_t) vml_char))
+	 if (!vml_CalcSeqType (vmls, "calc_seqQ", &objp->calc_seqQ))
+		 return FALSE;
+	 if (!vml_string (vmls, "prop_file", &objp->prop_file, ~0))
+		 return FALSE;
+	 if (!vml_string (vmls, "ensemble_label", &objp->ensemble_label, ~0))
 		 return FALSE;
 	 if (!vml_int (vmls, "ensemble_id", &objp->ensemble_id))
 		 return FALSE;

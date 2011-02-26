@@ -2,19 +2,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_vec.C,v 1.6 2009-04-23 03:33:25 chulwoo Exp $
+  $Id: pt_vec.C,v 1.7 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-04-23 03:33:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.6 2009-04-23 03:33:25 chulwoo Exp $
-//  $Id: pt_vec.C,v 1.6 2009-04-23 03:33:25 chulwoo Exp $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.7 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: pt_vec.C,v 1.7 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_vec.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v $
 //  $State: Exp $
 //
@@ -32,6 +32,8 @@ void inline PRINT(char *format,...) {}
 #else
 #define PRINT printf
 #endif
+
+static int MAX_DIR=10;
 
 
 //Parallel transport of a vector defined on single parity sites
@@ -85,7 +87,7 @@ void PT::vec_cb_norm(int n, IFloat **vout, IFloat **vin, const int *dir,int pari
   //Name our function
 //  char *fname="pt_1vec_cb_norm()";
   //List of the different directions
-  int wire[n];
+  int wire[MAX_DIR];
   int i;
   int vlen = VECT_LEN;
   int vlen2 = VECT_LEN;
@@ -298,7 +300,7 @@ PRINT("wire=%d\n",i);
 void PT::vec_cb_pad(int n, IFloat *vout, IFloat **vin, const int *dir,int parity, IFloat * gauge)
 {
   //List of the different directions
-  int wire[8];
+  int wire[MAX_DIR];
   int i;
 
   QMP_msgmem_t msg_mem_p[4*NDIM];
@@ -530,7 +532,7 @@ void PT::vec(int n, IFloat **vout, IFloat **vin, const int *dir){
 #ifdef PROFILE
   Float dtime  = - dclock();
 #endif
-  int wire[n];
+  int wire[MAX_DIR];
 
   char *fname="pt_1vec";
 //  VRB.Func("",fname);

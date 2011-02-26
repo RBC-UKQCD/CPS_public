@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of ParTransStagTypes class constructor and destructor.
 
-  $Id: pt_gauge.C,v 1.3 2004-08-18 11:58:07 zs Exp $
+  $Id: pt_gauge.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:58:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_gauge/pt_gauge.C,v 1.3 2004-08-18 11:58:07 zs Exp $
-//  $Id: pt_gauge.C,v 1.3 2004-08-18 11:58:07 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2011-02-26 00:19:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_gauge/pt_gauge.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
+//  $Id: pt_gauge.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_gauge.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_gauge/pt_gauge.C,v $
 //  $State: Exp $
 //
@@ -40,7 +40,8 @@ ParTransGauge::ParTransGauge(Lattice & latt) :
   cname = "ParTransGauge";
   char *fname = "ParTransGauge(Lattice&)";
   VRB.Func(cname,fname);
-  if (lat.StrOrd() != WILSON && lat.StrOrd() != CANONICAL ){
+//  if (lat.StrOrd() != WILSON && lat.StrOrd() != CANONICAL ){
+  if (lat.StrOrd() != CANONICAL ){
     old_str_ord = lat.StrOrd();
     lat.Convert(CANONICAL);
   }
@@ -55,7 +56,8 @@ ParTransGauge::~ParTransGauge() {
   VRB.Func(cname,fname);
   pt_delete_g();
   pt_delete();
-  if (old_str_ord != WILSON && old_str_ord != CANONICAL ){
+//  if (old_str_ord != WILSON && old_str_ord != CANONICAL ){
+  if (old_str_ord != CANONICAL ){
     lat.Convert(old_str_ord);
   }
 }

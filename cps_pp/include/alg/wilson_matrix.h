@@ -255,6 +255,11 @@ public:
 
   // Access to elements 
 
+  Rcomplex* ptr() { return reinterpret_cast<Rcomplex*>(p.d); }
+  const Rcomplex* ptr() const { 
+    return reinterpret_cast<const Rcomplex*>(p.d);
+  }
+
   void Element(int sink_spin, int sink_color, 
                int source_spin, int source_color, const Rcomplex& z);
 
@@ -285,6 +290,20 @@ public:
  
   //! mult the prop by gamma_dir on the left
   WilsonMatrix& gl(int dir); 
+  //! mult the prop by gamma_dir*(1-gamma_5) on the left, and return the new matrix
+  WilsonMatrix glL(int dir);
+  //! mult the prop by gamma_dir*(1+gamma_5) on the left, and return the new matrix
+  WilsonMatrix glR(int dir);
+
+  //! mult the prop by gamma_dir*gamma_5 on the left, and return the new matrix
+  WilsonMatrix glA(int dir);
+  //! glA another version. result = gamma_dir*gamma_5*from
+  void glA(const WilsonMatrix & from, int dir);
+  //! mult the prop by gamma_dir on the left, and return the new matrix
+  WilsonMatrix glV(int dir);
+  //! glV another version. result = gamma_dir*from
+  void glV(const WilsonMatrix & from, int dir);
+
 
   //! mult the prop by gamma_dir on the left
   WilsonMatrix& gr(int dir); 
@@ -346,6 +365,9 @@ public:
   
 };
 
+WilsonMatrix& eq_mult( WilsonMatrix& xmat,
+		       const WilsonMatrix& amat,
+		       const WilsonMatrix& bmat );
 
 // some proto-types for functions that operate on WilsonMatrices
 #ifdef _TARTAN
