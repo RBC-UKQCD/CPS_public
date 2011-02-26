@@ -54,6 +54,9 @@
 /* Define to 1 if you have the `sync' function. */
 #undef HAVE_SYNC
 
+/* Define to 1 if you have the `posix_memalign' function. */
+#undef HAVE_POSIX_MEMALIGN
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
