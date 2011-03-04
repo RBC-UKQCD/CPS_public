@@ -1,16 +1,19 @@
 #include<config.h>
+#ifdef USE_SSE
+#include "../sse/sse-dwf_dslash_4.C"
+#else
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-02-26 00:19:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.8 2011-02-26 00:19:27 chulwoo Exp $
-//  $Id: dwf_dslash_4.C,v 1.8 2011-02-26 00:19:27 chulwoo Exp $
+//  $Date: 2011-03-04 11:25:20 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.9 2011-03-04 11:25:20 chulwoo Exp $
+//  $Id: dwf_dslash_4.C,v 1.9 2011-03-04 11:25:20 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v $
 //  $State: Exp $
 //
@@ -99,3 +102,4 @@ void dwf_dslash_4(Vector *out,
 
 
 CPS_END_NAMESPACE
+#endif

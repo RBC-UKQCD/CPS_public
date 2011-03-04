@@ -1,22 +1,25 @@
 #include <config.h>
+#ifdef USE_SSE
+#include "../sse/sse-wilson_dslash.C"
+#else
 #include <stdio.h>
 #include <math.h>
 CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
 
-  $Id: wilson_dslash.C,v 1.7 2007-11-06 14:14:42 chulwoo Exp $
+  $Id: wilson_dslash.C,v 1.8 2011-03-04 11:25:28 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-11-06 14:14:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.7 2007-11-06 14:14:42 chulwoo Exp $
-//  $Id: wilson_dslash.C,v 1.7 2007-11-06 14:14:42 chulwoo Exp $
+//  $Date: 2011-03-04 11:25:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.8 2011-03-04 11:25:28 chulwoo Exp $
+//  $Id: wilson_dslash.C,v 1.8 2011-03-04 11:25:28 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v $
 //  $State: Exp $
 //
@@ -598,3 +601,4 @@ void wilson_dslash_two(Float *chi0, Float *chi1,
 }
 
 CPS_END_NAMESPACE
+#endif

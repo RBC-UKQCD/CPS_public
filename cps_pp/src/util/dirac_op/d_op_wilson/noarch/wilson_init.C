@@ -1,20 +1,23 @@
 #include <config.h>
+#ifdef USE_SSE
+#include "../sse/wilson_init.C"
+#else
 CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
   
-  $Id: wilson_init.C,v 1.4 2004-08-18 11:57:52 zs Exp $
+  $Id: wilson_init.C,v 1.5 2011-03-04 11:25:28 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v 1.4 2004-08-18 11:57:52 zs Exp $
-//  $Id: wilson_init.C,v 1.4 2004-08-18 11:57:52 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2011-03-04 11:25:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v 1.5 2011-03-04 11:25:28 chulwoo Exp $
+//  $Id: wilson_init.C,v 1.5 2011-03-04 11:25:28 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v $
 //  $State: Exp $
 //
@@ -114,3 +117,4 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 
 
 CPS_END_NAMESPACE
+#endif

@@ -1,4 +1,7 @@
 #include<config.h>
+#ifdef USE_SSE
+#include "../sse/dwf_init_sse.C"
+#else
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -89,3 +92,4 @@ void dwf_init(Dwf *dwf_p)
 
 
 CPS_END_NAMESPACE
+#endif

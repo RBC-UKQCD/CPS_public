@@ -20,7 +20,9 @@
 #include <util/gjp.h>
 //#include <comms/scu.h>
 #include <util/data_types.h>
-#include <omp.h>
+//#include <omp.h>
+#include "fake_omp.h"
+//inline int omp_get_num_threads(void) {return 1;}
 #include <pmmintrin.h>
 
 
@@ -39,9 +41,6 @@
  *     2           0           1     <---     1
  *     3           1           1     <---     3
  */
-//#include <omp.h>
-inline int omp_get_num_threads(void) {return 1;}
-#include "fake_omp.h"
 #include <sys/types.h>
 #include <linux/unistd.h>
 #include <errno.h>

@@ -1,4 +1,7 @@
 #include<config.h>
+#ifdef USE_SSE
+#include "../sse/dwf_dslash.C"
+#else
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -48,3 +51,4 @@ void dwf_dslash(Vector *out,
 }
 
 CPS_END_NAMESPACE
+#endif
