@@ -101,110 +101,33 @@
 	  aux/qmp-2.3.1/lib/QMP_mem_single.c (1.2, v5_0_11),
 	  aux/qmp-2.3.1/lib/QMP_topology.c (1.2, v5_0_11),
 	  aux/qmp-2.3.1/lib/QMP_util.c (1.2, v5_0_11),
-	  main/nuc3pt/v1/.gitignore (1.2), main/nuc3pt/v1/main/Makefile
 	  (1.2), main/nuc3pt/v1/main/Qloop.qcsh (1.2),
-	  main/nuc3pt/v1/main/Qrun.qcsh (1.2), main/nuc3pt/v1/main/cpsMPI.x
 	  (1.2), main/nuc3pt/v1/main/do_arg.vml (1.2),
-	  main/nuc3pt/v1/main/fix_gauge_arg.vml (1.2),
-	  main/nuc3pt/v1/main/main.C (1.2), main/nuc3pt/v1/main/main.C.old
 	  (1.2), main/nuc3pt/v1/main/meas_arg.vml (1.2),
-	  main/nuc3pt/v1/main/nuc3pt_arg.vml (1.2),
-	  main/nuc3pt/v1/main/run.sh (1.2),
-	  main/nuc3pt/v1/taku_main/Makefile (1.2),
-	  main/nuc3pt/v1/taku_main/Qloop.qcsh (1.2),
-	  main/nuc3pt/v1/taku_main/Qrun.qcsh (1.2),
-	  main/nuc3pt/v1/taku_main/Run.sh (1.2),
-	  main/nuc3pt/v1/taku_main/cpsMPI.x (1.2),
-	  main/nuc3pt/v1/taku_main/do_arg.vml (1.2),
-	  main/nuc3pt/v1/taku_main/fix_gauge_arg.vml (1.2),
-	  main/nuc3pt/v1/taku_main/main.C (1.2),
-	  main/nuc3pt/v1/taku_main/meas_arg.vml (1.2),
-	  main/nuc3pt/v1/taku_main/nuc3pt_arg.vml (1.2),
-	  main/nuc3pt/v1/taku_main/run.sh.bk (1.2),
-	  main/nuc3pt/v1/taku_main/configurations/ckpoint_lat.500 (1.2),
-	  main/nuc3pt/v1/test88816/binaries/.main.C.swp (1.2),
-	  main/nuc3pt/v1/test88816/binaries/Makefile (1.2),
-	  main/nuc3pt/v1/test88816/binaries/main.C (1.2),
-	  main/nuc3pt/v1/test88816/scripts/.nuc3pt_arg.vml.swp (1.2),
-	  main/nuc3pt/v1/test88816/scripts/Qloop.qcsh (1.2),
-	  main/nuc3pt/v1/test88816/scripts/Qrun.qcsh (1.2),
-	  main/nuc3pt/v1/test88816/scripts/do_arg.vml (1.2),
-	  main/nuc3pt/v1/test88816/scripts/fix_gauge_arg.vml (1.2),
-	  main/nuc3pt/v1/test88816/scripts/meas_arg.vml (1.2),
-	  main/nuc3pt/v1/test88816/scripts/nuc3pt_arg.vml (1.2),
-	  main/nuc3pt/v1/test88816/scripts/run.sh (1.2),
-	  main/nuc3pt/v1/test_qmp/Makefile (1.2),
-	  main/nuc3pt/v1/test_qmp/cpsMPI.x (1.2),
-	  main/nuc3pt/v1/test_qmp/do_arg.vml (1.2),
-	  main/nuc3pt/v1/test_qmp/fix_gauge_arg.vml (1.2),
-	  main/nuc3pt/v1/test_qmp/main.C (1.2),
-	  main/nuc3pt/v1/test_qmp/meas_arg.vml (1.2),
-	  main/nuc3pt/v1/test_qmp/nuc3pt_arg.vml (1.2),
-	  main/nuc3pt/v1/test_qmp/run.sh (1.2),
-	  main/nuc3pt/v2/binaries/Makefile (1.2),
-	  main/nuc3pt/v2/binaries/Makefile.orig (1.2),
-	  main/nuc3pt/v2/binaries/Run.sh (1.2),
-	  main/nuc3pt/v2/binaries/do_arg.vml (1.2),
-	  main/nuc3pt/v2/binaries/main.C (1.2),
-	  main/nuc3pt/v2/binaries/meas_arg.vml (1.2),
-	  main/nuc3pt/v2/binaries/nuc3pt_arg.vml (1.2),
-	  main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/.gauss_arg.vml.swp
 	  (1.2), main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/Run.sh
 	  (1.2), main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/TEST
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/do_arg.vml
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/meas_arg.vml
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/nuc3pt.dat.1500
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/nuc3pt_arg.vml
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/plaq.dat.1500
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/2500024.jms/TEST
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/2500024.jms/nuc3pt.dat.1500
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_24nt64ls16_b2.13_m0.01/2500024.jms/plaq.dat.1500
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=0/.gauss_arg.vml.swp
 	  (1.2), main/nuc3pt/v2/tests/test_88816_calc_QProp=0/Run.sh (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=0/Run.sh.o2500021.jms
 	  (1.2), main/nuc3pt/v2/tests/test_88816_calc_QProp=0/TEST (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=0/do_arg.vml (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=0/meas_arg.vml (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=0/nuc3pt.dat.0 (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=0/nuc3pt_arg.vml
 	  (1.2), main/nuc3pt/v2/tests/test_88816_calc_QProp=0/plaq.dat.0
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=2/.gauss_arg.vml.swp
 	  (1.2), main/nuc3pt/v2/tests/test_88816_calc_QProp=2/Run.sh (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=2/Run.sh.o2506737.jms
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=2/Run.sh.o2506739.jms
 	  (1.2), main/nuc3pt/v2/tests/test_88816_calc_QProp=2/TEST (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=2/do_arg.vml (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=2/meas_arg.vml (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=2/nuc3pt.dat.0 (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=2/nuc3pt_arg.vml
 	  (1.2), main/nuc3pt/v2/tests/test_88816_calc_QProp=2/plaq.dat.0
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=2/2506737.jms/nuc3pt.dat.0
 	  (1.2),
-	  main/nuc3pt/v2/tests/test_88816_calc_QProp=2/2506737.jms/plaq.dat.0
 	  (1.2), main/nuc3pt/v3/Makefile (1.2), main/nuc3pt/v3/main.C
 	  (1.2), main/prop_gen/v1/.gitignore (1.2),
-	  main/prop_gen/v1/Makefile (1.2),
-	  main/prop_gen/v1/Makefile.ubuntu-vm (1.2),
-	  main/prop_gen/v1/Run.sh (1.2), main/prop_gen/v1/main.C (1.2),
-	  main/prop_gen/v1/mass_list.vml (1.2), main/prop_gen/v1/mymake
 	  (1.2), main/prop_gen/v1/tor (1.2),
-	  main/prop_gen/v1/run_templ/Run.sh (1.2),
-	  main/prop_gen/v1/run_templ/vml_files/do_arg.in (1.2),
-	  main/prop_gen/v1/run_templ/vml_files/mass_list.in (1.2),
-	  main/prop_gen/v1/vml_files/do_arg.in (1.2),
-	  main/prop_gen/v1/vml_files/mass_list.in (1.2),
 	  src/alg/alg_arg/eigcg_arg.C (1.2, v5_0_11),
 	  src/alg/alg_arg/eigcg_arg_init.C (1.2, v5_0_11),
 	  src/alg/alg_qpropw/eq_mult.C (1.2, v5_0_11),
