@@ -1,4 +1,7 @@
 #include <config.h>
+#ifdef USE_SSE
+#include "../sse/d_op_wilson.C"
+#else
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
@@ -6,18 +9,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpWilson class methods.
 
-  $Id: d_op_wilson.C,v 1.8 2006-02-21 21:14:09 chulwoo Exp $
+  $Id: d_op_wilson.C,v 1.9 2011-03-04 11:25:28 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 21:14:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v 1.8 2006-02-21 21:14:09 chulwoo Exp $
-//  $Id: d_op_wilson.C,v 1.8 2006-02-21 21:14:09 chulwoo Exp $
+//  $Date: 2011-03-04 11:25:28 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v 1.9 2011-03-04 11:25:28 chulwoo Exp $
+//  $Id: d_op_wilson.C,v 1.9 2011-03-04 11:25:28 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/d_op_wilson.C,v $
 //  $State: Exp $
 //
@@ -444,3 +447,4 @@ void DiracOpWilson::CalcHmdForceVecs(Vector *chi)
 }
 
 CPS_END_NAMESPACE
+#endif

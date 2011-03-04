@@ -1,4 +1,7 @@
 #include<config.h>
+#ifdef USE_SSE
+#include "../sse/dwf_m.C"
+#else
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -63,3 +66,4 @@ void  dwf_m(Vector *out,
 
 
 CPS_END_NAMESPACE
+#endif
