@@ -3,21 +3,13 @@
 # Please feel free to add
 
 To-do list:
-# Please move entries to Done: with the date and the branch/tag number
-# when finished. The entry numbers are meant to be permanant.
+# Please delete when done. Also, please add appropriate comment, so that it can be followed via CVS/Changelog!
 
-1. RHMC force term should be checked after merging Mike Clark(MC)'s
-improvement.
-Started branch/tag: v4_8_9 date: 12/01/04
-# Finished branch/tag: ??    date: ???
+v5_0_11:
 
-2. Parameter serialization via VML
-Started branch/tag: vml date: ??
-# Finished branch/tag: ??    date: ???
+The following are merged to the main trunk, but not tested after it.
 
-3. DWF force term improvement: Merging Pauli-vilars to the normal force
-term
-Started branch/tag: v4_8_10 date: 12/01/04
-# Finished branch/tag: ??    date: ???
+1. EigCG by Qi Liu 
 
-Done:
+2. Splitting propagators by color and spin, by Tom Blum
+
