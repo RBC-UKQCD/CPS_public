@@ -1,8 +1,0 @@
-class FixGaugeArg fix_gauge_arg = {
-FixGaugeType fix_gauge_kind = FIX_GAUGE_COULOMB_T
-int hyperplane_start = 0
-int hyperplane_step = 1
-int hyperplane_num = 16
-double stop_cond =   1.0000000000000000e-08
-int max_iter_num = 2000
-}
