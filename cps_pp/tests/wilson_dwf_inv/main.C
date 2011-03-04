@@ -1,8 +1,7 @@
 /*
-  $Id: main.C,v 1.2 2011-02-26 00:36:17 chulwoo Exp $
+  $Id: main.C,v 1.3 2011-03-04 14:23:10 chulwoo Exp $
 */
 
-#include<omp.h>
 #include<config.h>
 #include <util/qcdio.h>
 #include <math.h>
@@ -30,7 +29,9 @@ USING_NAMESPACE_CPS
 static int nx,ny,nz,nt,ns;
 static CgArg cg_arg;
 
-#ifndef USE_OMP
+#ifdef USE_OMP
+#include<omp.h>
+#else
 void omp_set_num_threads(int num){}
 int omp_get_num_threads(){return 1;}
 int omp_get_thread_num(){return 0;}
@@ -41,6 +42,7 @@ void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, i
 int main(int argc,char *argv[]){
 
     Start(&argc, &argv);
+#ifdef USE_OMP
 omp_set_num_threads(16);
 #pragma omp parallel default(shared)
 {
@@ -53,6 +55,7 @@ for(int  i = 0;i<100;i++){
   printf("thread %d of %d i=%d\n",omp_get_thread_num(),tnum,i);
 }
 }
+#endif
 
     //----------------------------------------------------------------
     // Initializes all Global Job Parameters
