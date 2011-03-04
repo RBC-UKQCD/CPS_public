@@ -857,7 +857,7 @@ Optional Features:
                           (default=no)
   --enable-target         What target are we compiling for? (default=noarch)
   --enable-optimise       Compile with maximum optimisation. (default=yes)
-  --enable-sse            Compile with SSE Multiprecision lib. (default=yes)
+  --enable-sse            Compile with SSE. (default=yes)
   --enable-debug          Compile with debug information. (default=no)
   --enable-cg-dwf         Compile with cg-dwf (default=no)
   --enable-blas           Compile with BLAS (default=no)
