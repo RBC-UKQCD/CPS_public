@@ -1,18 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  $Id: fix_gauge.C,v 1.8 2008-03-25 17:53:43 chulwoo Exp $
+  $Id: fix_gauge.C,v 1.9 2011-03-06 03:13:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-03-25 17:53:43 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.8 2008-03-25 17:53:43 chulwoo Exp $
-//  $Id: fix_gauge.C,v 1.8 2008-03-25 17:53:43 chulwoo Exp $
+//  $Date: 2011-03-06 03:13:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.9 2011-03-06 03:13:12 chulwoo Exp $
+//  $Id: fix_gauge.C,v 1.9 2011-03-06 03:13:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -1075,7 +1075,7 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
 		hplane.unitarize();
 	      }
 
-	    if(iternum > MaxIterNum)
+	    if(iternum >= MaxIterNum)
 	      not_converged += 1;
 	    
 	    tot_iternum += iternum;
