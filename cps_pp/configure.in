@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2011-03-08 22:09:34 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.67 2011-03-08 22:09:34 chulwoo Exp $
-dnl  $Id: configure.in,v 1.67 2011-03-08 22:09:34 chulwoo Exp $
+dnl  $Date: 2011-03-09 01:44:33 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.68 2011-03-09 01:44:33 chulwoo Exp $
+dnl  $Id: configure.in,v 1.68 2011-03-09 01:44:33 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.67 $
+dnl  $Revision: 1.68 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -242,7 +242,7 @@ AC_MSG_CHECKING([if including blas])
 AC_MSG_RESULT($enable_blas)
 if test "$enable_blas" != "no"; then
 	if test "$enable_blas" != "yes"; then
-   		LDFLAGS="${LDFLAGS} -L${enable_blas}/lib -lblas"
+   		LDFLAGS="${LDFLAGS} -L${enable_blas}/lib -lgoto2"
    		INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_blas}/include"
 	else
    		LDFLAGS="${LDFLAGS} -L\${SRCDIR}/aux/GotoBLAS2 -lgoto2"
