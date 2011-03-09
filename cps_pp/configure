@@ -4456,7 +4456,7 @@ echo "$as_me:$LINENO: result: $enable_blas" >&5
 echo "${ECHO_T}$enable_blas" >&6
 if test "$enable_blas" != "no"; then
 	if test "$enable_blas" != "yes"; then
-   		LDFLAGS="${LDFLAGS} -L${enable_blas}/lib -lblas"
+   		LDFLAGS="${LDFLAGS} -L${enable_blas}/lib -lgoto2"
    		INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_blas}/include"
 	else
    		LDFLAGS="${LDFLAGS} -L\${SRCDIR}/aux/GotoBLAS2 -lgoto2"
