@@ -1,0 +1,78 @@
+set DIR=`pwd`
+set MAPPING=/intrepid-fs0/users/chulwoo/persistent/mappings/map2k_XYTZ.txt
+set node_num=2048
+set proc_num=8192
+set HOME=/gpfs/home/chulwoo/
+set CONFDIR=../configurations
+set exec_file=/gpfs/home/chulwoo/CPS/v5_0_9-6d/cps++/production_code/k_to_pi_pi/v3/BGP.x.v2
+set vml_dir=.
+set dir=test
+set RUNDIR=$DIR
+set contractions_done_log=$RUNDIR/configs_contracted.txt
+set prefix = 32cube_tw_b1.75_Iw_msea0.001
+set stp_cnd = 1e-10
+set midpt_dir = $RUNDIR/midpt
+set l_prop_dir = /intrepid-fs0/users/chulwoo/persistent/CPS/DWFtw/175_0001/prop_gen
+#trajectories 500+40n  up to trajectory 1800,
+#set mass = $1
+set queue = 'prod'
+set alloc_name = LatticeQCD
+set time = $1
+@ start = $2 
+set last_job = $3
+echo last_job = $last_job
+@ rem = ( $start - 500) % 32
+#echo   rem = $rem
+if ( $rem  == 0 ) then
+set t_src=0
+else if ( $rem  == 8 ) then
+set t_src=16
+else if ( $rem  == 16 ) then
+set t_src=32
+else if ( $rem  == 24 ) then
+set t_src=48
+else
+echo t_src not defined for lattice $start
+exit
+endif
+echo t_src= $t_src
+set ensemble_label = "auxdet_b175ml001_ms045_eps0.02/0.1_32_3x64x32"
+set ensemble_id=100
+#if ( $2 == 'prod' ) then
+#set alloc_name=LatticeQCD
+#else
+#set alloc_name=LatticeQCDES
+#endif
+echo alloc_name = $alloc_name
+#if ( -f prop_gen_"$dir"_"$start"_mass"$mass".output ) then
+#  prop_gen_"$dir"_"$start"_mass"$mass".output exists
+#  exit
+#endif
+mkdir -p results
+mkdir -p $start
+mkdir -p $l_prop_dir/$start
+mkdir -p $midpt_dir
+mkdir -p $RUNDIR/logs
+mkdir -p $RUNDIR/gfix
+touch $RUNDIR/logs/$start
+touch $RUNDIR/configs_done_log.txt
+touch $RUNDIR/gauge_rotated_lats_saved.txt
+touch $contractions_done_log
+if ( $last_job == '') then
+	qsub -A $alloc_name -O wme_"$dir"_"$start" -q $queue -t $time \
+	-n $node_num --proccount $proc_num --mode vn --env BG_MAPPING="$MAPPING":MPIRUN_LABEL=1:DCMF_EAGER=65536 \
+	$exec_file 1 $DIR $vml_dir/do_arg.vml $vml_dir/evo_arg.vml $vml_dir/threept_arg.vml $CONFDIR/ckpoint_lat.$start\
+	none 17 $t_src $prefix $ensemble_id $start $RUNDIR/logs $RUNDIR/gfix $midpt_dir \
+	$RUNDIR/configs_done_log.txt $RUNDIR/$start $RUNDIR/gauge_rotated_lats_saved.txt  $contractions_done_log 1 1 1 0\
+	$l_prop_dir -qmp-geom  8 8 8 16 |& tee -a $RUNDIR/JobID
+else
+	qsub -A $alloc_name -O k_to_pi_pi_"$dir"_"$start" -q $queue -t $time \
+	-n $node_num --proccount $proc_num --mode vn --env BG_MAPPING="$MAPPING":MPIRUN_LABEL=1:DCMF_EAGER=65536 \
+	--dependencies $last_job \
+	$exec_file 1 $DIR $vml_dir/do_arg.vml $vml_dir/evo_arg.vml $vml_dir/threept_arg.vml $CONFDIR/ckpoint_lat.$start\
+	none 17 $t_src $prefix $ensemble_id $start $RUNDIR/logs $RUNDIR/gfix $midpt_dir \
+	$RUNDIR/configs_done_log.txt $RUNDIR/$start $RUNDIR/gauge_rotated_lats_saved.txt  $contractions_done_log 1 1 1 0\
+	$l_prop_dir -qmp-geom  8 8 8 16 |& tee -a $RUNDIR/JobID
+endif
+#-qmp-geom  4 8 8 16 |& tee -a $RUNDIR/JobID |tail -1 |xargs qhold
+echo $start >> $RUNDIR/JobID

@@ -47,4 +47,45 @@ vml_CgArg (VML *vmls, char *name,CgArg *objp)
 	 vml_class_end(vmls,"CgArg",name);
 	return TRUE;
 }
+	 bool MdwfArg::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool MdwfArg::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool MdwfArg::Vml(VML *vmls,char *instance){
+		 if(!vml_MdwfArg(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_MdwfArg (VML *vmls, char *name,MdwfArg *objp)
+{
+	 vml_class_begin(vmls,"MdwfArg",name);
+	 if (!vml_array (vmls, "b5", (char **)&objp->b5.b5_val, (u_int *) &objp->b5.b5_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "c5", (char **)&objp->c5.c5_val, (u_int *) &objp->c5.c5_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_Float (vmls, "M5", &objp->M5))
+		 return FALSE;
+	 if (!vml_pointer (vmls, "cg_arg_p", (char **)&objp->cg_arg_p, sizeof (CgArg), (vmlproc_t) vml_CgArg))
+		 return FALSE;
+	 if (!vml_array (vmls, "rsd_vec", (char **)&objp->rsd_vec.rsd_vec_val, (u_int *) &objp->rsd_vec.rsd_vec_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_int (vmls, "use_single_precision", &objp->use_single_precision))
+		 return FALSE;
+	 vml_class_end(vmls,"MdwfArg",name);
+	return TRUE;
+}
 CPS_END_NAMESPACE

@@ -61,7 +61,7 @@ int main(int argc,char *argv[])
 
   Start(&argc,&argv);
 
-  printf("Starting next configuration.\n");
+  VRB.Result("","main()","Starting next configuration.\n");
 
   //Initialize Timing
   Float dtime_start=dclock();
@@ -165,7 +165,7 @@ int main(int argc,char *argv[])
   int save_gauge_rot_lats(CommandLine::arg_as_int() );
   int overwrite_previous_config_props(CommandLine::arg_as_int() );
   
-  printf("This is configuration number %d.\n",seqNum);
+  VRB.Result("","main()","This is configuration number %d.\n",seqNum);
 
   //Checkpoint
   if (chkpoints)
@@ -197,21 +197,21 @@ int main(int argc,char *argv[])
   //the file lat_stand_in.
   
   if (strcmp(lat_stand_in,"none")==0){
-    printf("\ncreate random gauge - field (taking # %i) \n", gauge_ran);
+    VRB.Result("","main()","create random gauge - field (taking # %i) \n", gauge_ran);
     
     for(int ii(0); ii < gauge_ran; ++ii)
       lattice.SetGfieldDisOrd();
     
-    printf("Created random gauge field.\n");
+    VRB.Result("","main()","Created random gauge field.\n");
   } 
   else {
     ReadLatticeParallel readLat;
     
-    printf("  reading: %s (NERSC-format)\n",lat_stand_in);
+    VRB.Result("","main()","  reading: %s (NERSC-format)\n",lat_stand_in);
 
     readLat.read(lattice,lat_stand_in);
 
-    printf("Lattice read.\n");
+    VRB.Result("","main()","Lattice read.\n");
     
   }
 
@@ -221,13 +221,13 @@ int main(int argc,char *argv[])
   if (strcmp(lat_stand_out,"none")!=0) {
       WriteLatticeParallel writeLat;
 
-      printf("  writing: %s (NERSC-format)\n",lat_stand_out);
+      VRB.Result("","main()","  writing: %s (NERSC-format)\n",lat_stand_out);
 
       QioArg qio_arg_lat_stand;
       qio_arg_lat_stand.init(lat_stand_out,evo_arg.io_concurrency,0.01,outformat,INT_AUTOMATIC,1); //Have to do it this way to pass it the io_concurrency from evo_arg
       writeLat.write(lattice, qio_arg_lat_stand);
   
-      printf("Lattice written.\n");
+      VRB.Result("","main()","Lattice written.\n");
   }
 
   //Checkpoint
@@ -236,10 +236,10 @@ int main(int argc,char *argv[])
 
   //Shift lattice so that time slice t_src moves to t=0
   int t_shift=-t_src/GJP.TnodeSites();
-  printf("Shifting lattice by %d, command GDS.Set(0,0,0,%d).\n",-t_src,t_shift);
+  VRB.Result("","main()","Shifting lattice by %d, command GDS.Set(0,0,0,%d).\n",-t_src,t_shift);
   GDS.Set(0,0,0,t_shift);
   lattice.Shift();
-  printf("Lattice shifted.\n");
+  VRB.Result("","main()","Lattice shifted.\n");
   
   //Checkpoint
   if (chkpoints)
@@ -274,19 +274,19 @@ int main(int argc,char *argv[])
   }
   Fclose(fp);
 
-  printf("Calculating plaquette.\n");
+  VRB.Result("","main()","Calculating plaquette.\n");
   AlgPlaq plaq(lattice,&common_arg_plaq,&plaq_arg);
   plaq.run();
-  printf("Plaquette calculated.\n");
+  VRB.Result("","main()","Plaquette calculated.\n");
 
   //Checkpoint
   if (chkpoints)
     chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 
-  printf("Calculating gauge fixing matrices.\n");
+  VRB.Result("","main()","Calculating gauge fixing matrices.\n");
   AlgFixGauge fix_gauge(lattice,&common_arg_gfix,&fix_arg);
   fix_gauge.run();
-  printf("Gauge fixing matrices calculated.\n");
+  VRB.Result("","main()","Gauge fixing matrices calculated.\n");
 
   //Checkpoint
   if (chkpoints)
@@ -330,7 +330,7 @@ int main(int argc,char *argv[])
       tK[ii]=threept_arg.tK[i];
       ii++;
     } else {
-      printf("threept_arg.tK[%d]=0.  Won't do repeat of kaon with source at 0.\n",i);
+      VRB.Result("","main()","threept_arg.tK[%d]=0.  Won't do repeat of kaon with source at 0.\n",i);
     }
   }
   //Now fix up threept_arg.tK so that there are no zeroes.
@@ -369,28 +369,28 @@ int main(int argc,char *argv[])
     for (int j=0; j<2; j++)
       for (int k=0; k<num_tK; k++)
 	s_mass_tK_done[i][j][k]=0;
-  printf("Finished masses, boundary conditions, momenta/twists, and source times as read from log (config no. %d):\n",seqNum);
+  VRB.Result("","main()","Finished masses, boundary conditions, momenta/twists, and source times as read from log (config no. %d):\n",seqNum);
   while (fscanf(fp,"%f",&mass_read_tmp)>=0){
     mass_read=(Float) mass_read_tmp;
     fscanf(fp,"%d",&bc);
     fscanf(fp,"%d",&mom_num);
     fscanf(fp,"%d",&mom_dir);
     fscanf(fp,"%d",&tsrc_read);
-    printf("%f %d %d %d %d ",mass_read,bc,mom_num,mom_dir,tsrc_read);
+    VRB.Result("","main()","f %d %d %d %d ",mass_read,bc,mom_num,mom_dir,tsrc_read);
     if (bc<0 || bc>1) {
-      printf("\n");
+      VRB.Result("","main()","n");
       continue;
     }
     if (mom_num<0 || mom_num>3) {
-      printf("\n");
+      VRB.Result("","main()","n");
       continue;
     }
     if (mom_dir<0 || mom_dir>2) {
-      printf("\n");
+      VRB.Result("","main()","n");
       continue;
     }
     if ( tsrc_read<0 || tsrc_read>=GJP.Tnodes()*GJP.TnodeSites() ) {
-      printf("\n");
+      VRB.Result("","main()","n");
       continue;
     }
     for (int i=0; i<num_light; i++) {
@@ -406,7 +406,7 @@ int main(int argc,char *argv[])
 	    if (tK[j]==tsrc_read)
 	      l_mass_tK_done[i][bc][j]=1;
 	} //tsrc_read if statement
-	printf("(light mass) ");
+	VRB.Result("","main()","light mass) ");
       } //mass_read if statement
     } //i for loop
     for (int i=0; i<num_strange; i++) {
@@ -419,13 +419,13 @@ int main(int argc,char *argv[])
 	      if (tK[j]==tsrc_read)
 		s_mass_tK_done[i][bc][j]=1;
 	} //mom_num, mom_dir if statement
-	printf("(strange mass) ");
+	VRB.Result("","main()","strange mass) ");
       } //mass_read if statement
     } //i for loop
-    printf("\n");
+    VRB.Result("","main()","n");
   } //fscanf while loop
   fclose(fp);
-  printf("Masses, boundary conditions, momenta/twists and source times to do (config. no. %d):\n",seqNum);
+  VRB.Result("","main()","Masses, boundary conditions, momenta/twists and source times to do (config. no. %d):\n",seqNum);
   int all_masses_done=1;
   int do_first_mom=threept_arg.do_first_mom;
   int do_second_mom=threept_arg.do_second_mom;
@@ -433,7 +433,7 @@ int main(int argc,char *argv[])
   int do_p_plus_a_kaon=threept_arg.do_p_plus_a_kaon;
   int do_kaon_at_walls=threept_arg.do_kaon_at_walls;
   int do_kaons_tK=threept_arg.do_kaons_tK;
-  printf("Light masses\n");
+  VRB.Result("","main()","Light masses\n");
   for (int i=0; i<num_light; i++) {
     for (bc=0; bc<2; bc++) {
       //Zero Momentum
@@ -441,7 +441,7 @@ int main(int argc,char *argv[])
       mom_num=0;
       mom_dir=0;
       if (!l_mass_tpi_done[i][bc][mom_num][mom_dir]) {
-	printf("%f %d %d %d 0\n",l_mass[i],bc,mom_num,mom_dir);
+	VRB.Result("","main()","f %d %d %d 0\n",l_mass[i],bc,mom_num,mom_dir);
 	all_masses_done=0;
       }
       //One Twist
@@ -449,7 +449,7 @@ int main(int argc,char *argv[])
 	mom_num=1;
 	for (mom_dir=0; mom_dir<3; mom_dir++)
 	  if (!l_mass_tpi_done[i][bc][mom_num][mom_dir]) {
-	    printf("%f %d %d %d 0\n",l_mass[i],bc,mom_num,mom_dir);
+	    VRB.Result("","main()","f %d %d %d 0\n",l_mass[i],bc,mom_num,mom_dir);
 	    all_masses_done=0;
 	  }
       } //do_first_mom if statement
@@ -458,7 +458,7 @@ int main(int argc,char *argv[])
 	mom_num=2;
 	for (mom_dir=0; mom_dir<3; mom_dir++)
 	  if (!l_mass_tpi_done[i][bc][mom_num][mom_dir]) {
-	    printf("%f %d %d %d 0\n",l_mass[i],bc,mom_num,mom_dir);
+	    VRB.Result("","main()","f %d %d %d 0\n",l_mass[i],bc,mom_num,mom_dir);
 	    all_masses_done=0;
 	  }
       } //do_second_mom if statement
@@ -467,7 +467,7 @@ int main(int argc,char *argv[])
 	mom_num=3;
 	mom_dir=0;
 	if (!l_mass_tpi_done[i][bc][mom_num][mom_dir]) {
-	  printf("%f %d %d %d 0\n",l_mass[i],bc,mom_num,mom_dir);
+	  VRB.Result("","main()","f %d %d %d 0\n",l_mass[i],bc,mom_num,mom_dir);
 	  all_masses_done=0;
 	}
       } //do_third_mom if statement
@@ -475,20 +475,20 @@ int main(int argc,char *argv[])
       if (do_kaons_tK) {
 	for (int j=0; j<num_tK; j++) {
 	  if (!l_mass_tK_done[i][bc][j]) {
-	    printf("%f %d 0 0 %d\n",l_mass[i],bc,tK[j]);
+	    VRB.Result("","main()","f %d 0 0 %d\n",l_mass[i],bc,tK[j]);
 	    all_masses_done=0;
 	  } //l_mass_tK_done if statement
 	} //j for loop
       } //do_kaons_tK if statement
     } //bc for loop
   } //i for loop
-  printf("Strange masses\n");
+  VRB.Result("","main()","Strange masses\n");
   for (int i=0; i<num_strange; i++) {
 
     if (do_kaon_at_walls) {
       for (bc=0; bc<2; bc++) {
 	if (!s_mass_tpi_done[i][bc]) {
-	  printf("%f %d 0 0 0\n",s_mass[i],bc);
+	  VRB.Result("","main()","f %d 0 0 0\n",s_mass[i],bc);
 	  all_masses_done=0;
 	} //s_mass_tpi_done if statement
       } //bc for loop
@@ -498,7 +498,7 @@ int main(int argc,char *argv[])
     for (bc=0; bc<bc_num; bc++) {
       for (int j=0; j<num_tK; j++) {
 	if (!s_mass_tK_done[i][bc][j]) {
-	  printf("%f %d 0 0 %d\n",s_mass[i],bc,tK[j]);
+	  VRB.Result("","main()","f %d 0 0 %d\n",s_mass[i],bc,tK[j]);
 	  all_masses_done=0;
 	} //s_mass_tK_done if statement
       } //j for loop
@@ -520,7 +520,7 @@ int main(int argc,char *argv[])
   int l_mass_contracted[num_light];
   for (int i=0; i<num_light; i++)
     l_mass_contracted[i]=0;
-  printf("Contractions done for light quark masses:\n");
+  VRB.Result("","main()","Contractions done for light quark masses:\n");
   while (fscanf(fp,"%d",&config_no_read)>=0){
     fscanf(fp,"%f",&mass_read_tmp);
     mass_read=(Float) mass_read_tmp;
@@ -529,7 +529,7 @@ int main(int argc,char *argv[])
 	if (fabs(l_mass[i]-mass_read)<=1e-6) {
 	  l_mass_contracted[i]=1;
 	  no_contractions_done=0;
-	  printf("%f\n",l_mass[i]);
+	  VRB.Result("","main()","%f\n",l_mass[i]);
 	}  //l_mass[i]-mass_read if statement
       } //i for loop
     } //config_no_read if statement
@@ -537,10 +537,10 @@ int main(int argc,char *argv[])
   fclose(fp);
   //See if any light masses still need to be contracted.
   int all_contractions_done=1;
-  printf("Light quark masses for which contractions must be done:\n");
+  VRB.Result("","main()","Light quark masses for which contractions must be done:\n");
   for (int i=0; i<num_light; i++) {
     if (!l_mass_contracted[i]) {
-      printf("%f\n",l_mass[i]);
+      VRB.Result("","main()","f\n",l_mass[i]);
       all_contractions_done=0;
     }
   }
@@ -592,7 +592,7 @@ int main(int argc,char *argv[])
     CommonArg common_arg;
     char prop_name[200], midprop_contractions_fname[200], qio_filename[200];
     char prop_name_w_config_no[200];
-    printf("Begin mass loop for configuration number %d.\n",seqNum);
+    VRB.Result("","main()","Begin mass loop for configuration number %d.\n",seqNum);
     QPropW* q_light_tpi[1][2][4][3];
     QPropW* q_light_tK[1][2][num_tK];
     QPropW* q_strange_tpi[num_strange][2];
@@ -777,7 +777,8 @@ int main(int argc,char *argv[])
 		      sprintf(prop_name,"24cube_b0.87_DBW2_m%0.4f_tshift%d_%s%s%s",this_mass,-t_src,source_info,bc_label,mom_info);
 		    else
 		      sprintf(prop_name,"%s",prop_name_w_config_no);
-		    sprintf(qio_filename,"/pfs/qio_prop.%s",prop_name);
+//		    sprintf(qio_filename,"/pfs/qio_prop.%s",prop_name);
+		    sprintf(qio_filename,"%d/qio_prop.%s",seqNum,prop_name);
 		    qpropw_arg.file=qio_filename;
 		    qpropw_arg.ensemble_id=id;
 		    qpropw_arg.ensemble_label=label;
@@ -817,7 +818,7 @@ int main(int argc,char *argv[])
 
 			if (!testval2) { //Only need to reload if not already in memory.
 			  
-			  printf("Already inverted mass %f, %s boundary conditions, %s%sconfiguration number %d.  Reloading.\n",this_mass,bc_type,mom_string,source_string,seqNum);
+			  VRB.Result("","main()","Already inverted mass %f, %s boundary conditions, %s%sconfiguration number %d.  Reloading.\n",this_mass,bc_type,mom_string,source_string,seqNum);
 			  //Checkpoint
 			  if (chkpoints)
 			    chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -839,7 +840,7 @@ int main(int argc,char *argv[])
 			      q_light_tpi[0][bc][mom_num][mom_dir]->ReLoad(qio_filename);
 			    }
 			  }
-			  printf("Reloaded mass %f, %s boundary conditions, %s%sconfiguration number %d.\n",this_mass,bc_type,mom_string,source_string,seqNum);
+			  VRB.Result("","main()","Reloaded mass %f, %s boundary conditions, %s%sconfiguration number %d.\n",this_mass,bc_type,mom_string,source_string,seqNum);
 			  //Checkpoint
 			  if (chkpoints)
 			    chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -874,7 +875,7 @@ int main(int argc,char *argv[])
 			
 			if (!testval2) { //Only need to reload if not already in memory.
 			  
-			  printf("Inverting mass %f, %s boundary conditions, %s%sconfiguration number %d.\n",this_mass,bc_type,mom_string,source_string,seqNum);
+			  VRB.Result("","main()","Inverting mass %f, %s boundary conditions, %s%sconfiguration number %d.\n",this_mass,bc_type,mom_string,source_string,seqNum);
 			  //Checkpoint
 			  if (chkpoints)
 			    chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -912,7 +913,7 @@ int main(int argc,char *argv[])
 			      q_light_tpi[0][bc][mom_num][mom_dir] = new QPropWMomCosTwistSrc(lattice, &qpropw_arg, p, &common_arg);
 			    } //src_type if statement
 			  } //q_type if statement
-			  printf("Finished inversion, mass %f, %s boundary conditions, %s%sconfiguration number %d.\n",this_mass,bc_type,mom_string,source_string,seqNum);
+			  VRB.Result("","main()","Finished inversion, mass %f, %s boundary conditions, %s%sconfiguration number %d.\n",this_mass,bc_type,mom_string,source_string,seqNum);
 			  //Checkpoint
 			  if (chkpoints)
 			    chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -957,7 +958,7 @@ int main(int argc,char *argv[])
       //Do contractions for this light mass if not done.
       if (!l_mass_contracted[i_light]) {
 	
-	printf("Starting threept calculations for configuration number %d, light mass %f.\n",seqNum,l_mass[i_light]);
+	VRB.Result("","main()","Starting threept calculations for configuration number %d, light mass %f.\n",seqNum,l_mass[i_light]);
 	
 	//The following is what alg_threept should see.
 	threept_arg.num_light=1;
@@ -1010,7 +1011,7 @@ int main(int argc,char *argv[])
 	  chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
 	AlgThreePt alg_threept(lattice,&common_arg,&threept_arg,&threept_prop_arg);
 	alg_threept.run();
-	printf("Finished threept calculations for configuration number %d, light mass %f.\n",seqNum,l_mass[i_light]);
+	VRB.Result("","main()","Finished threept calculations for configuration number %d, light mass %f.\n",seqNum,l_mass[i_light]);
 	//Checkpoint
 	if (chkpoints)
 	  chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -1062,7 +1063,7 @@ int main(int argc,char *argv[])
       
     } //i_light for loop
 
-    printf("Finished mass loop for configuration number %d.\n",seqNum);
+    VRB.Result("","main()","Finished mass loop for configuration number %d.\n",seqNum);
 
     //Delete remaining propagators to avoid memory leak.
     for (int bc_tmp=0; bc_tmp<2; bc_tmp++) {
@@ -1106,26 +1107,26 @@ int main(int argc,char *argv[])
     fclose(fp);
     //If it hasn't then gauge rotate the lattice and save it
     if (!config_saved){
-      printf("Gauge rotating the lattice and saving it.\n");
+      VRB.Result("","main()","Gauge rotating the lattice and saving it.\n");
       //Gauge rotate lattice
-      printf("Gauge rotating lattice.\n");
+      VRB.Result("","main()","Gauge rotating lattice.\n");
       rotate_gauge_explicit(lattice);
-      printf("Gauge rotated lattice.\n");
+      VRB.Result("","main()","Gauge rotated lattice.\n");
       //Shift the lattice back
-      printf("Shifting lattice back.  Shifting by %d, command GDS.Set(0,0,0,%d).\n",t_src,-t_shift);
+      VRB.Result("","main()","Shifting lattice back.  Shifting by %d, command GDS.Set(0,0,0,%d).\n",t_src,-t_shift);
       GDS.Set(0,0,0,-t_shift);
       lattice.Shift();
-      printf("Lattice shifted.\n");
+      VRB.Result("","main()","Lattice shifted.\n");
       //Save it
       char rotated_lat_fname[200];
       sprintf(rotated_lat_fname,"%s/ckpoint_lat_gauge_rotated.%d",gauge_rotated_lats_dir,seqNum);
-      printf("Writing gauge rotated lattice.\n");
+      VRB.Result("","main()","Writing gauge rotated lattice.\n");
       WriteLatticeParallel writeLat;
       QioArg qio_arg;
       qio_arg.init(rotated_lat_fname,evo_arg.io_concurrency,0.01,outformat,INT_AUTOMATIC,1); //Have to do it this way to pass it the io_concurrency from evo_arg
       writeLat.write(lattice, qio_arg);
-      printf("Wrote gauge rotated lattice.\n");
-      printf("Finished gauge rotating and saving lattice.\n");
+      VRB.Result("","main()","Wrote gauge rotated lattice.\n");
+      VRB.Result("","main()","Finished gauge rotating and saving lattice.\n");
       //Checkpoint
       if (chkpoints)
 	chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -1153,7 +1154,7 @@ int main(int argc,char *argv[])
 
   fix_gauge.free();
 
-  printf("Finished configuration number %d.\n",seqNum);
+  VRB.Result("","main()","Finished configuration number %d.\n",seqNum);
   //Checkpoint
   if (chkpoints)
     chkpt(num_nodes,chkpoint_no,dtime_start,dtime_last,dtime_now);
@@ -1182,7 +1183,7 @@ void chkpt(const int num_nodes,int& chkpoint_no,const Float dtime_start,Float& d
     while(test_val==0.0)
       dummy=0; //Does absolutely nothing, here as a placeholder for while
   }
-  printf("Checkpoint no. %d reached.\n",chkpoint_no++);
+  VRB.Result("","main()","Checkpoint no. %d reached.\n",chkpoint_no++);
 
   dtime_last=dtime_now;
   dtime_now=dclock();
@@ -1191,13 +1192,13 @@ void chkpt(const int num_nodes,int& chkpoint_no,const Float dtime_start,Float& d
   int hr_tmp=time_tmp/3600.0;
   int min_tmp=(time_tmp-3600.0*hr_tmp)/60.0;
   Float sec_tmp=time_tmp-3600.0*hr_tmp-60.0*min_tmp;
-  printf("Time since last checkpoint: %d hours %d minutes %f seconds.\n",hr_tmp,min_tmp,sec_tmp);
+  VRB.Result("","main()","Time since last checkpoint: %d hours %d minutes %f seconds.\n",hr_tmp,min_tmp,sec_tmp);
   
   time_tmp=dtime_now-dtime_start;
   hr_tmp=time_tmp/3600.0;
   min_tmp=(time_tmp-3600.0*hr_tmp)/60.0;
   sec_tmp=time_tmp-3600.0*hr_tmp-60.0*min_tmp;
-  printf("Time since beginning: %d hours %d minutes %f seconds.\n",hr_tmp, min_tmp,sec_tmp);
+  VRB.Result("","main()","Time since beginning: %d hours %d minutes %f seconds.\n",hr_tmp, min_tmp,sec_tmp);
 }
 //---------------------------------------------------------------------------
 
@@ -1213,7 +1214,7 @@ void rotate_gauge_explicit(Lattice &lat,int dir)
   VRB.Func(cname,fname);
 
   if ((dir<0)||(dir>3)){
-    printf("Error:: direction should be 0,1,2,3\n");
+    VRB.Result("","main()","Error:: direction should be 0,1,2,3\n");
     return;
   }
 
@@ -1296,8 +1297,8 @@ void rotate_gauge_explicit(Lattice &lat,int dir)
     }
   }
   
-  printf("dir == %d \n",dir);
-  printf("slice index == %d %d %d\n",slice_ind[0],slice_ind[1],slice_ind[2]);
+  VRB.Result("","main()","dir == %d \n",dir);
+  VRB.Result("","main()","slice index == %d %d %d\n",slice_ind[0],slice_ind[1],slice_ind[2]);
   
   // the dummy node_sites for each dummy dirction
   int NN[4];
