@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.33 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.34 2011-03-21 21:04:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -27,6 +27,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <util/qcdio.h>
 #include <math.h>
+#include <cstdlib>
 #include <util/lattice.h>
 #include <util/dirac_op.h>
 #include <util/dwf.h>
@@ -295,8 +296,11 @@ int FdwfBase::FmatInv(Vector *f_out, Vector *f_in,
   char *fname = "FmatInv(CgArg*,V*,V*,F*,CnvFrmType)";
   VRB.Func(cname,fname);
 
+  if(_mdwf_arg_p != NULL){
+    return FmatInvMobius(f_out, f_in, cg_arg, _mdwf_arg_p, true_res, cnv_frm, prs_f_in);
+  }
+  
   DiracOpDwf dwf(*this, f_out, f_in, cg_arg, cnv_frm);
-    
   iter = dwf.MatInv(true_res, prs_f_in);
 
   // Return the number of iterations
@@ -322,6 +326,148 @@ int FdwfBase::eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev
   return iter;
 }
 
+// FmatInvMobius: same as FmatInv, except that we use mobius DWF
+// formalism to speed up the CG inversion (via constructing initial guess).
+// n_restart: How many restarts we perform
+int FdwfBase::FmatInvMobius(Vector * f_out,
+                            Vector * f_in,
+                            CgArg * cg_arg_dwf,
+                            MdwfArg * mdwf_arg,
+                            Float * true_res,
+                            CnvFrmType cnv_frm,
+                            PreserveType prs_f_in)
+{
+  const char * fname = "FmatInvMobius(V*, V*, ...)";
+  // this implementation doesn't allow splitting in s direction(yet).
+  if(GJP.Snodes() != 1){
+    ERR.NotImplemented(cname, fname);
+  }
+  if(cnv_frm != CNV_FRM_YES){
+    ERR.NotImplemented(cname, fname);
+  }
+  Float * rsd_vec = mdwf_arg->rsd_vec.rsd_vec_val;
+  int n_restart = mdwf_arg->rsd_vec.rsd_vec_len;
+  CgArg * cg_arg_mob = mdwf_arg->cg_arg_p;
+
+  if(n_restart < 2){
+    ERR.General(cname, fname, "Value %d is invalid for n_restart.\n", n_restart);
+  }
+
+  int mob_ls = mdwf_arg->b5.b5_len;
+  int dwf_size_5d = GJP.VolNodeSites() * FsiteSize();
+  int mob_size_5d = GJP.VolNodeSites() * mob_ls * SPINOR_SIZE;
+  int size_4d = GJP.VolNodeSites() * SPINOR_SIZE;
+
+
+  Vector * tmp_dwf_5d = (Vector *) smalloc(cname, fname, "tmp_dwf_5d", sizeof(Float) * dwf_size_5d);
+  Vector * tmp2_dwf_5d = (Vector *) smalloc(cname, fname, "tmp2_dwf_5d", sizeof(Float) * dwf_size_5d);
+  Vector * tmp_mob_5d = (Vector *) smalloc(cname, fname, "tmp_mob_5d", sizeof(Float) * mob_size_5d);
+
+  // the first time, we solve in DWF to some degree of accuracy
+  {
+    Float rsd = cg_arg_dwf->stop_rsd;
+    cg_arg_dwf->stop_rsd = rsd_vec[0];
+    
+    DiracOpDwf dwf(*this, f_out, f_in, cg_arg_dwf, CNV_FRM_YES);
+    dwf.MatInv(f_out, f_in, NULL, PRESERVE_YES);
+    cg_arg_dwf->stop_rsd = rsd;
+  }
+  
+  int restart_cnt;
+  for(restart_cnt = 1; restart_cnt < n_restart; ++restart_cnt){
+    //constructing the new residue
+    tmp2_dwf_5d->CopyVec(f_in, dwf_size_5d);
+    {
+      DiracOpDwf dwf(*this, tmp_dwf_5d, f_out, cg_arg_dwf, CNV_FRM_YES);
+      dwf.Mat(tmp_dwf_5d, f_out);
+    }
+    tmp2_dwf_5d->VecMinusEquVec(tmp_dwf_5d, dwf_size_5d);
+    //end constructing the new residue
+    
+    cg_arg_mob->stop_rsd = rsd_vec[restart_cnt];
+
+    tmp_dwf_5d->VecZero(dwf_size_5d);
+    {
+      CgArg cg_arg;
+      cg_arg.mass = 1.0;
+
+      cg_arg.stop_rsd = rsd_vec[restart_cnt];
+      cg_arg.max_num_iter = cg_arg_mob->max_num_iter;
+      
+      DiracOpDwf dwf(*this, tmp_dwf_5d, tmp2_dwf_5d, &cg_arg, CNV_FRM_YES);
+      dwf.MatInv(tmp_dwf_5d, tmp2_dwf_5d, NULL, PRESERVE_YES);
+    }
+    SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 1);
+    
+
+    tmp_mob_5d->VecZero(mob_size_5d);
+    tmp_mob_5d->CopyVec(tmp2_dwf_5d, size_4d);
+    
+    SpinProject(tmp_dwf_5d, tmp_mob_5d, mob_ls, 0);
+    
+    {
+      Float mass= cg_arg_mob->mass; 
+      cg_arg_mob->mass = 1.0;
+      
+      DiracOpMdwf mdwf(*this, mdwf_arg);
+      mdwf.Mat(tmp_mob_5d, tmp_dwf_5d);
+      
+      cg_arg_mob->mass = mass;
+    }
+    
+    tmp_dwf_5d->VecZero(mob_size_5d);
+    {
+      DiracOpMdwf mdwf(*this, mdwf_arg);
+      mdwf.MatInv(tmp_dwf_5d, tmp_mob_5d, NULL, PRESERVE_YES);
+    }
+    SpinProject(tmp_mob_5d, tmp_dwf_5d, mob_ls, 1);
+    
+    //OV2DWF
+    tmp_dwf_5d->VecNegative(tmp_mob_5d, size_4d);
+    {
+      Vector * tmp_2nd_plane = (Vector *)((Float *)tmp_dwf_5d + size_4d);
+      Vector * src_2nd_plane = (Vector *)((Float *)tmp2_dwf_5d + size_4d);
+      tmp_2nd_plane->CopyVec(src_2nd_plane, dwf_size_5d - size_4d);
+    }
+    
+    SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 0);
+    
+    {
+      DiracOpDwf dwf(*this, tmp_dwf_5d, tmp2_dwf_5d, cg_arg_dwf, CNV_FRM_YES);
+      dwf.Mat(tmp_dwf_5d, tmp2_dwf_5d);
+    }
+    
+    tmp2_dwf_5d->VecZero(dwf_size_5d);
+    {
+      CgArg cg_arg_tmp;
+      cg_arg_tmp.mass = 1.0;
+      cg_arg_tmp.stop_rsd = cg_arg_mob->stop_rsd;
+      cg_arg_tmp.max_num_iter = cg_arg_mob->max_num_iter;
+      DiracOpDwf dwf(*this, tmp2_dwf_5d, tmp_dwf_5d, &cg_arg_tmp, CNV_FRM_YES);
+      dwf.MatInv(tmp2_dwf_5d, tmp_dwf_5d, NULL, PRESERVE_NO);
+    }
+    SpinProject(tmp_dwf_5d, tmp2_dwf_5d, GJP.SnodeSites(), 1);
+    
+    tmp_dwf_5d->CopyVec(tmp_mob_5d, size_4d);
+    
+    SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 0);
+
+    f_out->VecAddEquVec(tmp2_dwf_5d, dwf_size_5d);
+  }
+
+  // final solve
+  int iter;
+  {
+    DiracOpDwf dwf(*this, f_out, f_in, cg_arg_dwf, cnv_frm);
+    iter = dwf.MatInv(f_out, f_in, true_res, prs_f_in);
+  }
+
+  sfree(cname, fname,  "tmp_dwf_5d",  tmp_dwf_5d);
+  sfree(cname, fname, "tmp2_dwf_5d", tmp2_dwf_5d);
+  sfree(cname, fname,  "tmp_mob_5d",  tmp_mob_5d);
+
+  return iter;
+}
 
 //------------------------------------------------------------------
 // Overloaded function is same as original but with true_res=0;
@@ -1173,6 +1319,88 @@ int FdwfBase::FsiteOffset(const int *x) const {
 }
 #endif
 
+//--------------------------------------------------------------------
+// void SpinProject():
+//
+// Does a spin projection along s direction, specifically (the
+// matrices appear below apply in s direction, the example are given
+// for Ls=5):
+// 
+// for type == 0:
+//
+//       [ P- P+ 0  0  0  ]
+//       [ 0  P- P+ 0  0  ]
+// out = [ 0  0  P- P+ 0  ] in
+//       [ 0  0  0  P- P+ ]
+//       [ P+ 0  0  0  P- ]
+//
+// for type == 1:
+//
+//       [ P- 0  0  0  P+ ]
+//       [ P+ P- 0  0  0  ]
+// out = [ 0  P+ P- 0  0  ] in
+//       [ 0  0  P+ P- 0  ]
+//       [ 0  0  0  P+ P- ]
+//
+// in and out are assumed to be in CANONICAL storage order.
+//--------------------------------------------------------------------
+void FdwfBase::SpinProject(Vector * out, Vector *in, int s_size, int type)
+{
+  const char * fname = "SpinProject(V*, V*, int)";
+
+  // this implementation doesn't allow splitting in s direction(yet).
+  if(GJP.Snodes() != 1){
+    ERR.NotImplemented(cname, fname);
+  }
+
+  int lcl_size[5];
+
+  lcl_size[0] = GJP.XnodeSites();
+  lcl_size[1] = GJP.YnodeSites();
+  lcl_size[2] = GJP.ZnodeSites();
+  lcl_size[3] = GJP.TnodeSites();
+  lcl_size[4] = s_size;
+
+#define for_each_site_4d(x)                             \
+  for(x[0] = 0; x[0] < lcl_size[0]; ++x[0])             \
+    for(x[1] = 0; x[1] < lcl_size[1]; ++x[1])           \
+      for(x[2] = 0; x[2] < lcl_size[2]; ++x[2])         \
+        for(x[3] = 0; x[3] < lcl_size[3]; ++x[3])       
+
+  int lcl_pos[4], color;
+  int s;
+
+  int f_size_4d= GJP.VolNodeSites()*2*Colors()*SpinComponents();
+
+  for(s = 0; s < lcl_size[4]; ++s){
+    for_each_site_4d(lcl_pos){
+      int offset = s*f_size_4d;
+
+      int offset_next;
+      if(type == 0){
+        offset_next = s == lcl_size[4]-1 ? 0: offset+f_size_4d;
+      }else{
+        offset_next = s == 0 ? (lcl_size[4]-1)*f_size_4d: offset-f_size_4d;
+      }
+      
+      offset += SPINOR_SIZE * (lcl_pos[0] + lcl_size[0]*(lcl_pos[1] + lcl_size[1]*(lcl_pos[2] + lcl_size[2]*lcl_pos[3])));
+      offset_next += SPINOR_SIZE * (lcl_pos[0] + lcl_size[0]*(lcl_pos[1] + lcl_size[1]*(lcl_pos[2] + lcl_size[2]*lcl_pos[3])));
+      
+      Float * out_site = (Float *)out + offset;
+      Float * in_site = (Float *)in + offset;
+      Float * in_site_next = (Float *)in + offset_next;
+      
+      memcpy((void *)out_site,
+             (void *)in_site_next,
+             SPINOR_SIZE/2*sizeof(Float));
+      
+      memcpy((void *)(out_site + SPINOR_SIZE/2),
+             (void *)(in_site  + SPINOR_SIZE/2),
+             SPINOR_SIZE/2*sizeof(Float));
+    }
+  }
+  return;
+}
 
 //--------------------------------------------------------------------
 // void Freflex (Vector *out, Vector *in)

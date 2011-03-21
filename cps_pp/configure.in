@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2011-03-09 01:44:33 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.68 2011-03-09 01:44:33 chulwoo Exp $
-dnl  $Id: configure.in,v 1.68 2011-03-09 01:44:33 chulwoo Exp $
+dnl  $Date: 2011-03-21 21:04:50 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.69 2011-03-21 21:04:50 chulwoo Exp $
+dnl  $Id: configure.in,v 1.69 2011-03-21 21:04:50 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.68 $
+dnl  $Revision: 1.69 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -285,6 +285,14 @@ AC_ARG_ENABLE(qio,
 AC_MSG_CHECKING([if including QIO])
 AC_MSG_RESULT($enable_qio)
 
+AC_ARG_ENABLE(mdwf, 
+	AC_HELP_STRING([--enable-mdwf], 
+		[Compile with Mobius DWF lib. (default=no)]), 
+	,[enable_mdwf="no"])
+AC_MSG_CHECKING([if including QIO])
+AC_MSG_RESULT($enable_mdwf)
+
+
 if test "$enable_qmp" != "no"; then
    if test "$enable_qmp" != "yes"; then
      QMP_DIR=${enable_qmp}
@@ -304,6 +312,21 @@ if test "$enable_qmp" != "no"; then
      ARCHDIR="BGL_QMP_DIR"
    fi
    TESTING_PARALLEL="yes";
+fi
+
+if test "$enable_mdwf" != "no"; then
+   if test "X${MDWF_DIR}X" = "XX"; then
+     MDWF_DIR=${enable_mdwf}
+   fi
+   if test "X${QMP_DIR}X" = "XX"; then
+     echo "QMP_DIR environment variable not set"
+     exit 1
+   fi
+   MDWF_CFLAGS=`${MDWF_DIR}/bin/mdwf-config --cflags`
+   MDWF_LDFLAGS=`${MDWF_DIR}/bin/mdwf-config --ldflags`
+   MDWF_LIBS=`${MDWF_DIR}/bin/mdwf-config --libs`
+   LDFLAGS="${LDFLAGS} ${MDWF_LDFLAGS} ${MDWF_LIBS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} ${MDWF_CFLAGS}"
 fi
 
 if test "$enable_qio" != "no"; then

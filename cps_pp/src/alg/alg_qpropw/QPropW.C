@@ -821,7 +821,7 @@ void QPropW::CG(FermionVectorTp& source, FermionVectorTp& sol,
 
   // Do inversion
   //----------------------------------------------------------------
-  if (Lat.Fclass() == F_CLASS_DWF) {
+  if (Lat.Fclass() == F_CLASS_DWF || Lat.Fclass() == F_CLASS_MDWF) {
     Vector *src_4d    = (Vector*)source.data();
     Vector *sol_4d    = (Vector*)sol.data();
     Vector *midsol_4d = (Vector*)midsol.data();
@@ -858,7 +858,7 @@ void QPropW::CG(FermionVectorTp& source, FermionVectorTp& sol,
        for(int nls(0);nls<GJP.SnodeSites();nls++) SaveQPropLs(sol_5d, qp_arg.file, nls);
     spnclr_cnt++;
 
-    MeasConAxialOld(sol_5d);
+    //MeasConAxialOld(sol_5d);
   // TY Add End
   //-----------------------------------------------------------------
 
