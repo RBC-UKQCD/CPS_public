@@ -858,7 +858,7 @@ void QPropW::CG(FermionVectorTp& source, FermionVectorTp& sol,
        for(int nls(0);nls<GJP.SnodeSites();nls++) SaveQPropLs(sol_5d, qp_arg.file, nls);
     spnclr_cnt++;
 
-    //MeasConAxialOld(sol_5d);
+    MeasConAxialOld(sol_5d);
   // TY Add End
   //-----------------------------------------------------------------
 
