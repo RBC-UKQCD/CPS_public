@@ -864,6 +864,7 @@ Optional Features:
   --enable-gmp            Compile with GNU Multiprecision lib. (default=no)
   --enable-mpfr           Compile with GMP mpfr routines. (default=no)
   --enable-qio            Compile with SciDAC I/O (QIO) lib. (default=no)
+  --enable-mdwf           Compile with Mobius DWF lib. (default=no)
   --enable-namespace      Build the library inside a 'cps' namespace.
                           (default=no for QCDOC, yes otherwise)
   --enable-double-prec    Build the library in double precision (default=yes)
@@ -4512,6 +4513,19 @@ echo $ECHO_N "checking if including QIO... $ECHO_C" >&6
 echo "$as_me:$LINENO: result: $enable_qio" >&5
 echo "${ECHO_T}$enable_qio" >&6
 
+# Check whether --enable-mdwf or --disable-mdwf was given.
+if test "${enable_mdwf+set}" = set; then
+  enableval="$enable_mdwf"
+
+else
+  enable_mdwf="no"
+fi;
+echo "$as_me:$LINENO: checking if including QIO" >&5
+echo $ECHO_N "checking if including QIO... $ECHO_C" >&6
+echo "$as_me:$LINENO: result: $enable_mdwf" >&5
+echo "${ECHO_T}$enable_mdwf" >&6
+
+
 if test "$enable_qmp" != "no"; then
    if test "$enable_qmp" != "yes"; then
      QMP_DIR=${enable_qmp}
@@ -4531,6 +4545,21 @@ if test "$enable_qmp" != "no"; then
      ARCHDIR="BGL_QMP_DIR"
    fi
    TESTING_PARALLEL="yes";
+fi
+
+if test "$enable_mdwf" != "no"; then
+   if test "X${MDWF_DIR}X" = "XX"; then
+     MDWF_DIR=${enable_mdwf}
+   fi
+   if test "X${QMP_DIR}X" = "XX"; then
+     echo "QMP_DIR environment variable not set"
+     exit 1
+   fi
+   MDWF_CFLAGS=`${MDWF_DIR}/bin/mdwf-config --cflags`
+   MDWF_LDFLAGS=`${MDWF_DIR}/bin/mdwf-config --ldflags`
+   MDWF_LIBS=`${MDWF_DIR}/bin/mdwf-config --libs`
+   LDFLAGS="${LDFLAGS} ${MDWF_LDFLAGS} ${MDWF_LIBS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} ${MDWF_CFLAGS}"
 fi
 
 if test "$enable_qio" != "no"; then
