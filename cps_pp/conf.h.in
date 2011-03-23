@@ -6,6 +6,9 @@
 /* Define to 1 if the system has the type `enum_t'. */
 #undef HAVE_ENUM_T
 
+/* Define to 1 if you have the <gmp.h> header file. */
+#undef HAVE_GMP_H
+
 /* Define to 1 if the system has the type `int16_t'. */
 #undef HAVE_INT16_T
 
@@ -33,6 +36,9 @@
 /* Define to 1 if the system has the type `netobj'. */
 #undef HAVE_NETOBJ
 
+/* Define to 1 if you have the `posix_memalign' function. */
+#undef HAVE_POSIX_MEMALIGN
+
 /* Define to 1 if you have the <qcdocos/scu_checksum.h> header file. */
 #undef HAVE_QCDOCOS_SCU_CHECKSUM_H
 
@@ -53,12 +59,6 @@
 
 /* Define to 1 if you have the `sync' function. */
 #undef HAVE_SYNC
-
-/* Define to 1 if you have the `posix_memalign' function. */
-#undef HAVE_POSIX_MEMALIGN
-
-/* Define to 1 if you have the <gmp.h> header file. */
-#undef HAVE_GMP_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
