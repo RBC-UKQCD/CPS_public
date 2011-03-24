@@ -30,6 +30,29 @@ public:
 	   CgArg (  ) ;
 };
 
+class VML;
+class MdwfArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	struct {
+		u_int b5_len;
+		Float *b5_val;
+	} b5;
+	struct {
+		u_int c5_len;
+		Float *c5_val;
+	} c5;
+	Float M5;
+	CgArg *cg_arg_p;
+	struct {
+		u_int rsd_vec_len;
+		Float *rsd_vec_val;
+	} rsd_vec;
+	int use_single_precision;
+};
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -38,9 +61,11 @@ extern "C" {
 
 #if defined(__STDC__) || defined(__cplusplus)
 extern  bool_t vml_CgArg (VML *, char *instance, CgArg*);
+extern  bool_t vml_MdwfArg (VML *, char *instance, MdwfArg*);
 
 #else /* K&R C */
 extern  bool_t vml_CgArg (VML *, char *instance, CgArg*);
+extern  bool_t vml_MdwfArg (VML *, char *instance, MdwfArg*);
 
 #endif /* K&R C */
 

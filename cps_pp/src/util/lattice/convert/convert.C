@@ -665,5 +665,4 @@ void FdwfBase::Fconvert(Vector *f_field, StrOrdType to, StrOrdType from)
 
 }
 
-
 CPS_END_NAMESPACE
