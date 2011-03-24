@@ -146,6 +146,23 @@ class GnoneFdwf
     virtual ~GnoneFdwf();
 };
 
+//------------------------------------------------------------------
+//! Trivial gauge action with Mobius domain wall fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GnoneFmdwf 
+    : public virtual Lattice, 
+    public Gnone, 
+    public Fmdwf
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GnoneFmdwf();
+    virtual ~GnoneFmdwf();
+};
+
 
 //------------------------------------------------------------------
 //! Wilson gauge action with no fermions
@@ -276,6 +293,23 @@ class GwilsonFdwf
     virtual ~GwilsonFdwf();
 };
 
+//------------------------------------------------------------------
+//! Wilson gauge action with domain wall fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GwilsonFmdwf 
+    : public virtual Lattice, 
+    public Gwilson, 
+    public Fmdwf
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GwilsonFmdwf();
+    virtual ~GwilsonFmdwf();
+};
+
 
 //------------------------------------------------------------------
 //! Power plaquette gauge action with no fermions
@@ -367,6 +401,22 @@ class GpowerPlaqFdwf
     virtual ~GpowerPlaqFdwf();
 };
 
+//------------------------------------------------------------------
+//! Power plaquette gauge action with domain wall fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GpowerPlaqFmdwf 
+    : public virtual Lattice, 
+    public GpowerPlaq, 
+    public Fmdwf
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GpowerPlaqFmdwf();
+    virtual ~GpowerPlaqFmdwf();
+};
 
 //------------------------------------------------------------------
 //! Improved rectangle gauge action with no fermions
@@ -459,6 +509,23 @@ class GimprRectFdwf
  public:
     GimprRectFdwf();
     virtual ~GimprRectFdwf();
+};
+
+//------------------------------------------------------------------
+//! Improved rectangle gauge action with domain wall fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GimprRectFmdwf
+    : public virtual Lattice,
+    public GimprRect,
+    public Fmdwf
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GimprRectFmdwf();
+    virtual ~GimprRectFmdwf();
 };
 
 //------------------------------------------------------------------
