@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.23 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: dirac_op.h,v 1.24 2011-03-24 15:56:27 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -14,6 +14,14 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <alg/cg_arg.h>
 #include <alg/eig_arg.h>
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#include <qop-mdwf3.h>
+#ifdef __cplusplus
+}
+#endif
 CPS_START_NAMESPACE
 
 
@@ -1448,6 +1456,132 @@ class DiracOpDwf : public DiracOpWilsonTypes
   //!< Not implemented
     // Reflexion in s operator, needed for the hermitian version 
     // of the dirac operator in the Ritz solver.
+};
+
+
+//------------------------------------------------------------------
+// A class describing the Dirac operator for Mobius domain-wall fermions.
+//------------------------------------------------------------------
+class DiracOpMdwf : public DiracOpWilsonTypes
+{
+ private:
+  char *cname;    // Class name.
+
+  Float epsilon;
+  int max_num_iter;
+  int use_single_precision;
+
+  struct QOP_MDWF_State * mdwf_state;
+  struct QOP_MDWF_Parameters * mdwf_param;
+  // gauge field
+  union {
+    struct QOP_F3_MDWF_Gauge * f;
+    struct QOP_D3_MDWF_Gauge * d;
+  } mdwf_gauge_ptr;
+  // pointer to the lattice instance
+  // as a consequence, you can't destroy the lattice instance while
+  // this class is in use.
+  Lattice * latt_ptr;
+ protected:
+  void DiracOpGlbSum(Float *float_p);					
+     // The global sum used by InvCg. If s_nodes = 1
+     // it is the usual global sum. If s_nodes > 1 it
+     // is the 5-dimensional globals sum glb_sum_five.
+
+
+ public:
+  DiracOpMdwf(Lattice& latt,            // Lattice object.
+              MdwfArg * mdwf_arg_p);
+
+  virtual ~DiracOpMdwf();
+
+  void MatPcDagMatPc(Vector *out, Vector *in, Float *dot_prd=0);
+     // MatPcDagMatPc is the fermion matrix that appears in the HMC 
+     // evolution. It is a Hermitian matrix.
+     // The in, out fields are defined on the checkerboard lattice.
+     // If dot_prd is not 0 then the dot product (on node)
+     // <out, in> = <MatPcDagMatPc*in, in> is returned in dot_prd.
+
+  void Dslash(Vector *out, 
+		      Vector *in,
+		      ChkbType cb, 
+		      DagType dag);
+     // Dslash is the derivative part of the fermion matrix. 
+     // The in, out fields are defined on the checkerboard lattice
+     // cb = 0/1 <--> even/odd checkerboard of in field.
+     // dag = 0/1 <--> Dslash/Dslash^dagger is calculated.
+
+  //! Multiplication by the odd-even preconditioned fermion matrix.
+  void MatPc(Vector *out, Vector *in);
+     // MatPc is the fermion matrix.  
+     // The in, out fields are defined on the checkerboard lattice.
+
+  //! Multiplication by the  hermitian conjugate odd-even preconditioned fermion matrix.
+  void MatPcDag(Vector *out, Vector *in);
+     // MatPcDag is the dagger of the fermion matrix. 
+     // The in, out fields are defined on the checkerboard lattice.
+
+  int MatInv(Vector *out, 
+	     Vector *in, 
+	     Float *true_res,
+	     PreserveType prs_in = PRESERVE_YES);
+     // The inverse of the unconditioned Dirac Operator 
+     // using Conjugate gradient.  source is *in, initial
+     // guess and solution is *out.
+     // If true_res !=0 the value of the true residual is returned
+     // in true_res.
+     // *true_res = |src - MatPcDagMatPc * sol| / |src|
+     // prs_in is used to specify if the source
+     // in should be preserved or not. If not the memory usage
+     // is less by half the size of a fermion vector.
+     // The function returns the total number of CG iterations.
+
+  int MatInv(Vector *out, 
+	     Vector *in,
+	     PreserveType prs_in = PRESERVE_YES);
+     // Same as original but true_res=0.
+
+  int MatInv(Float *true_res,
+	     PreserveType prs_in = PRESERVE_YES);
+     // Same as original but in = f_in and out = f_out.
+
+  int MatInv(PreserveType prs_in = PRESERVE_YES);
+     // Same as original but in = f_in, out = f_out, true_res=0.
+ 
+  void MatHerm(Vector *out, Vector *in);
+     // MatHerm is the hermitian version of Mat.
+     // MatHerm works on the full lattice.
+     // The in, out fields are defined on the ful.
+
+  void Mat(Vector *out, Vector *in);
+     // Mat is the unpreconditioned fermion matrix.  
+     // Mat works on the full lattice
+     // The in, out fields are defined on the full lattice.
+
+  void MatDag(Vector *out, Vector *in);
+     // MatDag is the dagger of the unpreconditioned fermion matrix. 
+     // MatDag works on the full lattice
+     // The in, out fields are defined on the full lattice.
+
+  //! Multiplication by the square of the fermion matrix.
+  virtual void MatDagMat(Vector *out, Vector *in);
+
+  void CalcHmdForceVecs(Vector *chi);
+  //!< Computes vectors used in the HMD pseudofermionic force term.
+    // GRF
+    // chi is the solution to MatPcInv.  The user passes two full size
+    // CANONICAL fermion vectors with conversion enabled to the
+    // constructor.  Using chi, the function fills these vectors;
+    // the result may be used to compute the HMD fermion force.
+
+  void Reflex(Vector *out, Vector *in);
+  //!< Not implemented
+    // Reflexion in s operator, needed for the hermitian version 
+    // of the dirac operator in the Ritz solver.
+
+  void DiracArg(CgArg *arg);
+     // It sets the dirac_arg pointer to arg and initializes
+     // the relevant parameters (kappa, m^2, ...).
 };
 
 #endif

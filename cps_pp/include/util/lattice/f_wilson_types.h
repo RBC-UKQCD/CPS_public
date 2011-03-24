@@ -553,6 +553,19 @@ class FdwfBase : public virtual FwilsonTypes
         // f_in should be preserved or not. If not the memory usage
         // is less by half the size of a fermion vector.
 	// The function returns the total number of CG iterations.
+
+    int FmatInvMobius(Vector * f_out,
+                      Vector * f_in,
+                      CgArg * cg_arg_dwf,
+                      MdwfArg * mdwf_arg,
+                      Float * true_res,
+                      CnvFrmType cnv_frm,
+                      PreserveType prs_f_in);
+    // FmatInvMobius: same as FmatInv, except that we use mobius DWF
+    // formalism to speed up the CG inversion (via constructing initial guess).
+    // ======================================================================
+    // n_restart: How many restarts we perform
+      
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		CnvFrmType cnv_frm = CNV_FRM_YES,
@@ -631,6 +644,36 @@ class FdwfBase : public virtual FwilsonTypes
 			  StrOrdType from);
         // Convert fermion field f_field from -> to
 
+    void SpinProject(Vector * out, Vector *in, int s_size, int type);
+    //--------------------------------------------------------------------
+    // void SpinProject():
+    //
+    // Does a spin projection along s direction, specifically (the
+    // matrices appear below apply in s direction, the example are given
+    // for Ls=5):
+    // 
+    // for type == 0:
+    //
+    //       [ P- P+ 0  0  0  ]
+    //       [ 0  P- P+ 0  0  ]
+    // out = [ 0  0  P- P+ 0  ] in
+    //       [ 0  0  0  P- P+ ]
+    //       [ P+ 0  0  0  P- ]
+    //
+    // for type == 1:
+    //
+    //       [ P- 0  0  0  P+ ]
+    //       [ P+ P- 0  0  0  ]
+    // out = [ 0  P+ P- 0  0  ] in
+    //       [ 0  0  P+ P- 0  ]
+    //       [ 0  0  0  P+ P- ]
+    //
+    // in and out are assumed to be in CANONICAL storage order.
+    // Since this function may be used by Mobius fermions, the
+    // parameter s_size specifies the length in s direction for both
+    // in and out vectors.
+    //--------------------------------------------------------------------
+
     Float BhamiltonNode(Vector *boson, Float mass);
         // The boson Hamiltonian of the node sublattice
 
@@ -661,6 +704,227 @@ class Fdwf : public FdwfBase {
         // using the fermion force.
 };
 
+
+// the MdwfArg parameter used to initialize Mdwf library.
+extern MdwfArg * _mdwf_arg_p;
+
+class Fmdwf : public virtual Lattice {
+ private:
+  char * cname;
+  //  CgArg * mdwf_cg_arg_p;
+
+ public:
+  Fmdwf(void);
+  ~Fmdwf(void);
+
+  // added for FeigSolv. Since we need a CgArg anyway, and we can't change FeigSolv.
+  //  Fmdwf(const CgArg * cg_arg);
+
+  FclassType Fclass() const;
+  // It returns the type of fermion class
+  
+  //! Multiplication of a lattice spin-colour vector by gamma_5.
+  void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
+
+  int FsiteOffsetChkb(const int *x) const;
+  // Sets the offsets for the fermion fields on a 
+  // checkerboard. The fermion field storage order
+  // is not the canonical one but it is particular
+  // to the Dwf fermion type. x[i] is the 
+  // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+  
+  int FsiteOffset(const int *x) const;
+  // Sets the offsets for the fermion fields on a 
+  // checkerboard. The fermion field storage order
+  // is the canonical one. X[I] is the
+  // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+  
+  int FsiteSize() const;
+  // Returns the number of fermion field 
+  // components (including real/imaginary) on a
+  // site of the 4-D lattice.
+  
+  int FchkbEvl() const;
+  // Returns 0 => If no checkerboard is used for the evolution
+  //      or the CG that inverts the evolution matrix.
+  
+  int FmatEvlInv(Vector *f_out, Vector *f_in, 
+                 CgArg *cg_arg, 
+                 Float *true_res,
+                 CnvFrmType cnv_frm = CNV_FRM_YES);
+  // It calculates f_out where A * f_out = f_in and
+  // A is the preconditioned fermion matrix that appears
+  // in the HMC evolution (even/odd preconditioning 
+  // of [Dirac^dag Dirac]). The inversion is done
+  // with the conjugate gradient. cg_arg is the structure
+  // that contains all the control parameters, f_in is the
+  // fermion field source vector, f_out should be set to be
+  // the initial guess and on return is the solution.
+  // f_in and f_out are defined on a checkerboard.
+  // If true_res !=0 the value of the true residual is returned
+  // in true_res.
+  // *true_res = |src - MatPcDagMatPc * sol| / |src|
+  // The function returns the total number of CG iterations.
+  int FmatEvlInv(Vector *f_out, Vector *f_in, 
+                 CgArg *cg_arg, 
+                 CnvFrmType cnv_frm = CNV_FRM_YES);
+  
+  int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+                  int Nshift, int isz, CgArg **cg_arg, 
+                  CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
+                  Vector **f_out_d);
+  
+  void FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+                  Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
+  
+  int FmatInv(Vector *f_out, Vector *f_in, 
+              CgArg *cg_arg, 
+              Float *true_res,
+              CnvFrmType cnv_frm = CNV_FRM_YES,
+              PreserveType prs_f_in = PRESERVE_YES);
+  // It calculates f_out where A * f_out = f_in and
+  // A is the fermion matrix (Dirac operator). The inversion
+  // is done with the conjugate gradient. cg_arg is the 
+  // structure that contains all the control parameters, f_in 
+  // is the fermion field source vector, f_out should be set 
+  // to be the initial guess and on return is the solution.
+  // f_in and f_out are defined on the whole lattice.
+  // If true_res !=0 the value of the true residual is returned
+  // in true_res.
+  // *true_res = |src - MatPcDagMatPc * sol| / |src|
+  // cnv_frm is used to specify if f_in should be converted 
+  // from canonical to fermion order and f_out from fermion 
+  // to canonical. 
+  // prs_f_in is used to specify if the source
+  // f_in should be preserved or not. If not the memory usage
+  // is less by half the size of a fermion vector.
+  // The function returns the total number of CG iterations.
+  int FmatInv(Vector *f_out, Vector *f_in, 
+              CgArg *cg_arg, 
+              CnvFrmType cnv_frm = CNV_FRM_YES,
+              PreserveType prs_f_in = PRESERVE_YES);
+  
+  // FmatInvMobius: same as FmatInv, except that we use mobius DWF
+  // formalism to speed up the CG inversion (via constructing initial guess).
+  // n_restart: How many restarts we perform
+  int FmatInvMobius(Vector * f_out,
+                    Vector * f_in,
+                    MdwfArg * mob_l,
+                    MdwfArg * mob_s,
+                    Float * true_res,
+                    CnvFrmType cnv_frm,
+                    PreserveType prs_f_in,
+                    int n_restart, Float rsd_vec[]);
+  
+  void Ffour2five(Vector *five, Vector *four, int s_u, int s_l, int Ncb=2);
+  //!< Transforms a 4-dimensional fermion field into a 5-dimensional field.
+  /* The 5d field is zero */
+  // The 5d field is zero
+  // except for the upper two components (right chirality)
+  // at s = s_u which are equal to the ones of the 4d field
+  // and the lower two components (left chirality) 
+  // at s_l, which are equal to the ones of the 4d field
+  // For spread-out DWF s_u, s_l refer to the global
+  // s coordinate i.e. their range is from 
+  // 0 to [GJP.Snodes() * GJP.SnodeSites() - 1]
+  
+  void Ffive2four(Vector *four, Vector *five, int s_u, int s_l, int Ncb=2);
+  //!< Transforms a 5-dimensional fermion field into a 4-dimensional field.
+  //The 4d field has
+  // the upper two components (right chirality) equal to the
+  // ones of the 5d field at s = s_u and the lower two 
+  // components (left chirality) equal to the
+  // ones of the 5d field at s = s_l, where s is the 
+  // coordinate in the 5th direction.
+  // For spread-out DWF s_u, s_l refer to the global
+  // s coordinate i.e. their range is from 
+  // 0 to [GJP.Snodes() * GJP.SnodeSites() - 1]
+  // The same 4D field is generarted in all s node slices.
+  
+  int FeigSolv(Vector **f_eigenv, Float *lambda,
+               Float *chirality, int *valid_eig,
+               Float **hsum,
+               EigArg *eig_arg, 
+               CnvFrmType cnv_frm = CNV_FRM_YES);
+  // It finds the eigenvectors and eigenvalues of A where
+  // A is the fermion matrix (Dirac operator). The solution
+  // uses Ritz minimization. eig_arg is the 
+  // structure that contains all the control parameters, f_eigenv
+  // are the fermion field source vectors which should be
+  // defined initially, lambda are the eigenvalues returned 
+  // on solution. f_eigenv is defined on the whole lattice.
+  // The function returns the total number of Ritz iterations.
+  
+  Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,	       
+               Float mass, DagType dag);
+  // It sets the pseudofermion field phi from frm1, frm2.
+  
+  ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
+                           Float mass, Float step_size);
+  // It evolves the canonical momentum mom by step_size
+  // using the fermion force.
+  
+  ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+                           Float mass, Float step_size);
+  // It evolve the canonical momentum mom  by step_size
+  // using the bosonic quotient force.
+  
+  ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+                                int isz, Float *alpha, Float mass, Float dt,
+                                Vector **sol_d, ForceMeasure measure);
+  
+  Float FhamiltonNode( Vector *phi,  Vector *chi) ;
+  // The fermion Hamiltonian of the node sublattice.
+  // chi must be the solution of Cg with source phi.	       
+  
+  void Fconvert(Vector *f_field,
+                StrOrdType to,
+                StrOrdType from);
+  // Convert fermion field f_field from -> to
+  
+  Float BhamiltonNode(Vector *boson, Float mass);
+  // The boson Hamiltonian of the node sublattice
+  
+  void SpinProject(Vector * out, Vector *in, int s_size, int type);
+  //--------------------------------------------------------------------
+  // void SpinProject():
+  //
+  // Does a spin projection along s direction, specifically (the
+  // matrices appear below apply in s direction, the example are given
+  // for Ls=5):
+  // 
+  // for type == 0:
+  //
+  //       [ P- P+ 0  0  0  ]
+  //       [ 0  P- P+ 0  0  ]
+  // out = [ 0  0  P- P+ 0  ] in
+  //       [ 0  0  0  P- P+ ]
+  //       [ P+ 0  0  0  P- ]
+  //
+  // for type == 1:
+  //
+  //       [ P- 0  0  0  P+ ]
+  //       [ P+ P- 0  0  0  ]
+  // out = [ 0  P+ P- 0  0  ] in
+  //       [ 0  0  P+ P- 0  ]
+  //       [ 0  0  0  P+ P- ]
+  //
+  // in and out are assumed to be in CANONICAL storage order.
+  //--------------------------------------------------------------------
+
+  void Freflex (Vector *out, Vector *in);
+  //!< Does something really cool.
+  // Reflexion in s operator, needed for the hermitian version 
+  // of the dirac operator in the Ritz solver.
+
+  int SpinComponents() const;
+
+  int ExactFlavors() const;
+    
+  //!< Method to ensure bosonic force works (does nothing for Wilson
+  //!< theories.
+  void BforceVector(Vector *in, CgArg *cg_arg);
+};
 
 CPS_END_NAMESPACE
 #endif

@@ -5,15 +5,15 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.58 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: lattice.h,v 1.59 2011-03-24 15:56:27 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2011-02-26 00:19:27 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.58 2011-02-26 00:19:27 chulwoo Exp $
-  $Id: lattice.h,v 1.58 2011-02-26 00:19:27 chulwoo Exp $
+  $Date: 2011-03-24 15:56:27 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.59 2011-03-24 15:56:27 chulwoo Exp $
+  $Id: lattice.h,v 1.59 2011-03-24 15:56:27 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.58 $
+  $Revision: 1.59 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
