@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.28 2011-02-26 00:19:27 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.29 2011-03-24 16:20:52 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@

@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.56 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: lattice_base.C,v 1.57 2011-03-24 16:20:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-02-26 00:19:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.56 2011-02-26 00:19:27 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.56 2011-02-26 00:19:27 chulwoo Exp $
+//  $Date: 2011-03-24 16:20:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.57 2011-03-24 16:20:52 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.57 2011-03-24 16:20:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.56 $
+//  $Revision: 1.57 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -168,7 +168,12 @@ Lattice::Lattice()
        gauge_field = (Matrix *) qalloc(GJP.StartConfAllocFlag(),array_size);
     VRB.Flow(cname,fname,"gauge_field=%p\n",gauge_field);
 #else
+<<<<<<< lattice_base.C
       gauge_field = (Matrix *) pmalloc(array_size);
+=======
+    VRB.Flow(cname, fname, "Here we are!\n");
+    gauge_field = (Matrix *) pmalloc(array_size);
+>>>>>>> 1.54.28.1
 #endif
 //     printf("gauge_field=%p\n",gauge_field);
       if( gauge_field == 0) ERR.Pointer(cname,fname, "gauge_field");

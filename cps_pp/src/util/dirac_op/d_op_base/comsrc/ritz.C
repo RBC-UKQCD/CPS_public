@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class Ritz eigensolver methods.
 
-  $Id: ritz.C,v 1.10 2009-03-23 19:13:32 chulwoo Exp $
+  $Id: ritz.C,v 1.11 2011-03-24 16:20:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-03-23 19:13:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.10 2009-03-23 19:13:32 chulwoo Exp $
-//  $Id: ritz.C,v 1.10 2009-03-23 19:13:32 chulwoo Exp $
+//  $Date: 2011-03-24 16:20:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.11 2011-03-24 16:20:52 chulwoo Exp $
+//  $Id: ritz.C,v 1.11 2011-03-24 16:20:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v $
 //  $State: Exp $
 //

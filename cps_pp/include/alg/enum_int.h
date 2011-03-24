@@ -38,6 +38,7 @@ enum FclassType {
 	F_CLASS_ASQTAD = 5,
 	F_CLASS_P4 = 6,
 	F_CLASS_WILSON_TM = 7,
+	F_CLASS_MDWF = 8,
 };
 typedef enum FclassType FclassType;
 extern struct vml_enum_map FclassType_map[];
