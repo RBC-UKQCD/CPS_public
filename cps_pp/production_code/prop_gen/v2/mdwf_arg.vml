@@ -1,0 +1,48 @@
+class MdwfArg mdwf_arg = {
+Array b5[12] = {
+double b5[0] = 1.841556
+double b5[1] = 1.841556
+double b5[2] = 1.841556
+double b5[3] = 1.841556
+double b5[4] = 1.841556
+double b5[5] = 1.841556
+double b5[6] = 1.841556
+double b5[7] = 1.841556
+double b5[8] = 1.841556
+double b5[9] = 1.841556
+double b5[10] = 1.841556
+double b5[11] = 1.841556
+}
+Array c5[12] = {
+double c5[0] = 0.841556
+double c5[1] = 0.841556
+double c5[2] = 0.841556
+double c5[3] = 0.841556
+double c5[4] = 0.841556
+double c5[5] = 0.841556
+double c5[6] = 0.841556
+double c5[7] = 0.841556
+double c5[8] = 0.841556
+double c5[9] = 0.841556
+double c5[10] = 0.841556
+double c5[11] = 0.841556
+}
+double M5 = 1.8
+class CgArg cg_arg_mob = {
+double mass = 1.0e-3
+double epsilon = 0.0
+int max_num_iter = 50000
+double stop_rsd = 1.0e-10
+double true_rsd = 1.0e-10
+RitzMatType RitzMatOper = MAT_HERM
+InverterType Inverter = CG
+int bicgstab_n = 0
+}
+Array rsd_vec[4] = {
+double rsd_vec[0] = 1.0e-2
+double rsd_vec[1] = 2.0e-5
+double rsd_vec[2] = 2.0e-5
+double rsd_vec[3] = 2.0e-5
+}
+int use_single_precision = 1
+}
