@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.39 2008-05-27 20:55:29 chulwoo Exp $
+  $Id: gjp.C,v 1.40 2011-03-28 16:01:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-27 20:55:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.39 2008-05-27 20:55:29 chulwoo Exp $
-//  $Id: gjp.C,v 1.39 2008-05-27 20:55:29 chulwoo Exp $
+//  $Date: 2011-03-28 16:01:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.40 2011-03-28 16:01:11 chulwoo Exp $
+//  $Id: gjp.C,v 1.40 2011-03-28 16:01:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.39 $
+//  $Revision: 1.40 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -371,6 +371,8 @@ if (!UniqueID())
 if (!UniqueID())
   printf("checksum_level =%d\n",doarg_int.checksum_level);
 
+ mdwf_arg = NULL;
+
 }
 
 
@@ -423,6 +425,39 @@ void GlobalJobParameter::setArg(int* argc, char*** argv){
   argv_int = argv;
 
   arg_set=1;
+}
+
+void GlobalJobParameter::SetMdwfArg(MdwfArg *_mdwf_arg)
+{
+  const char *fname = "SetMdwfArg()";
+  mdwf_arg = (MdwfArg *)smalloc(cname, fname, "mdwf_arg", sizeof(MdwfArg));
+  *mdwf_arg = *_mdwf_arg;
+
+  int ls = mdwf_arg->b5.b5_len;
+  int rsd_len = mdwf_arg->rsd_vec.rsd_vec_len;
+  mdwf_arg->b5.b5_val = (Float *)smalloc(cname, fname, "b5_val", sizeof(Float)*ls);
+  mdwf_arg->c5.c5_val = (Float *)smalloc(cname, fname, "c5_val", sizeof(Float)*ls);
+  mdwf_arg->rsd_vec.rsd_vec_val = (Float *)smalloc(cname, fname, "rsd_vec_val", sizeof(Float)*rsd_len);
+
+  int i;
+  for(i = 0; i < ls; ++i){
+    mdwf_arg->b5.b5_val[i] = _mdwf_arg->b5.b5_val[i];
+    mdwf_arg->c5.c5_val[i] = _mdwf_arg->c5.c5_val[i];
+  }
+  for(i = 0; i < rsd_len; ++i){
+    mdwf_arg->rsd_vec.rsd_vec_val[i] = _mdwf_arg->rsd_vec.rsd_vec_val[i];
+  }
+}
+
+void GlobalJobParameter::FreeMdwfArg(void)
+{
+  const char *fname = "FreeMdwfArg()";
+  if(mdwf_arg == NULL) return;
+
+  sfree(cname, fname, "b5_val", mdwf_arg->b5.b5_val);
+  sfree(cname, fname, "c5_val", mdwf_arg->c5.c5_val);
+  sfree(cname, fname, "rsd_vec_val", mdwf_arg->rsd_vec.rsd_vec_val);
+  sfree(cname, fname, "mdwf_arg", mdwf_arg);
 }
 
 CPS_END_NAMESPACE

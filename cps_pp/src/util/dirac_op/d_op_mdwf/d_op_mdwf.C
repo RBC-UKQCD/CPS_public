@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpMdwf class methods.
 
-  $Id: d_op_mdwf.C,v 1.2 2011-03-21 21:04:50 chulwoo Exp $
+  $Id: d_op_mdwf.C,v 1.3 2011-03-28 16:01:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-03-21 21:04:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v 1.2 2011-03-21 21:04:50 chulwoo Exp $
-//  $Id: d_op_mdwf.C,v 1.2 2011-03-21 21:04:50 chulwoo Exp $
+//  $Date: 2011-03-28 16:01:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v 1.3 2011-03-28 16:01:11 chulwoo Exp $
+//  $Id: d_op_mdwf.C,v 1.3 2011-03-28 16:01:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_mdwf.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v $
 //  $State: Exp $
 //
@@ -41,6 +41,8 @@ CPS_END_NAMESPACE
 #include <util/dwf.h>
 #include <mem/p2v.h>
 #include <comms/glb.h>
+CPS_START_NAMESPACE
+#ifdef USE_MDWF
 #ifdef __cplusplus
 extern "C"
 {
@@ -49,8 +51,9 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-CPS_START_NAMESPACE
+#endif
 
+#ifdef USE_MDWF
 // helper function used by QOP_MDWF_init only, should not be used
 // otherwise.
 static void sublattice(int lo[], int hi[], const int node[],
@@ -222,12 +225,13 @@ static void write_fermion_precond(const int pos[5], int color, int dirac, int re
     + SPINOR_SIZE * (lcl_pos[0]/2 + lcl_size[0]/2*(lcl_pos[1] + lcl_size[1]*(lcl_pos[2] + lcl_size[2]*(lcl_pos[3] + lcl_size[3]*lcl_pos[4]))));
   fermion_field[offset] = value;
 }
+#endif
 
 DiracOpMdwf::DiracOpMdwf(Lattice& latt,            // Lattice object.
                          MdwfArg * mdwf_arg_p): DiracOpWilsonTypes(latt,
                                                                    NULL,
                                                                    NULL,
-                                                                   mdwf_arg_p->cg_arg_p,
+                                                                   &mdwf_arg_p->cg_arg,
                                                                    CNV_FRM_NO)
 
 {
@@ -235,6 +239,7 @@ DiracOpMdwf::DiracOpMdwf(Lattice& latt,            // Lattice object.
   const char * fname = "DiracOpMdwf(L&, MdwfArg *)";
   VRB.Func(cname, fname);
 
+#ifdef USE_MDWF
   if( GJP.Snodes() != 1 ) {
     // mdwf library doesn't allow splitting in Ls direction.
     // is this the case?
@@ -243,7 +248,7 @@ DiracOpMdwf::DiracOpMdwf(Lattice& latt,            // Lattice object.
 
   latt_ptr = &latt;
 
-  CgArg * cg_arg_p = mdwf_arg_p->cg_arg_p;
+  CgArg * cg_arg_p = &mdwf_arg_p->cg_arg;
   if(cg_arg_p == NULL){
     ERR.General(cname, fname, "Invalid CgArg pointer in MdwfArg.\n");
   }
@@ -289,6 +294,9 @@ DiracOpMdwf::DiracOpMdwf(Lattice& latt,            // Lattice object.
   } else {
     QOP_D3_MDWF_import_gauge(&mdwf_gauge_ptr.d, mdwf_state, read_gauge, latt_ptr);
   }
+#else
+  ERR.NotImplemented(cname, fname);
+#endif
 }
 
 DiracOpMdwf::~DiracOpMdwf()
@@ -296,6 +304,7 @@ DiracOpMdwf::~DiracOpMdwf()
   const char * fname = "~DiracOpMdwf()";
   VRB.Func(cname, fname);
 
+#ifdef USE_MDWF
   if(use_single_precision){
     QOP_F3_MDWF_free_gauge(&mdwf_gauge_ptr.f);
   }else{
@@ -310,6 +319,9 @@ DiracOpMdwf::~DiracOpMdwf()
   if(mdwf_state != NULL){ //an error occured
     ERR.General(cname, fname, "An error occured while exiting MDWF library.\n");
   }
+#else
+  ERR.NotImplemented(cname, fname);
+#endif
 }
 
 // It sets the dirac_arg pointer to arg and initializes
@@ -332,6 +344,7 @@ void DiracOpMdwf::MatPcDagMatPc(Vector *out, Vector *in, Float *dot_prd)
   const char * fname = "MatPcDagMatPc()";
   VRB.Func(cname, fname);
 
+#ifdef USE_MDWF
   if(use_single_precision){
     struct QOP_F3_MDWF_HalfFermion *hfermion_ptr_in = NULL;
     struct QOP_F3_MDWF_HalfFermion *hfermion_ptr_out = NULL;
@@ -377,6 +390,9 @@ void DiracOpMdwf::MatPcDagMatPc(Vector *out, Vector *in, Float *dot_prd)
     QOP_D3_MDWF_free_half_fermion(&hfermion_ptr_in);
     QOP_D3_MDWF_free_half_fermion(&hfermion_ptr_out);
   }
+#else
+  ERR.NotImplemented(cname, fname);
+#endif
 }
 
 // Dslash is the derivative part of the fermion matrix. 
@@ -401,6 +417,7 @@ void DiracOpMdwf::MatPc(Vector *out, Vector *in)
   const char * fname = "MatPc()";
   VRB.Func(cname, fname);
 
+#ifdef USE_MDWF
   if(use_single_precision){
     struct QOP_F3_MDWF_HalfFermion *hfermion_ptr_in = NULL;
     struct QOP_F3_MDWF_HalfFermion *hfermion_ptr_out = NULL;
@@ -434,6 +451,9 @@ void DiracOpMdwf::MatPc(Vector *out, Vector *in)
     QOP_D3_MDWF_free_half_fermion(&hfermion_ptr_in);
     QOP_D3_MDWF_free_half_fermion(&hfermion_ptr_out);
   }
+#else
+  ERR.NotImplemented(cname, fname);
+#endif
 }
 
 //! Multiplication by the  hermitian conjugate odd-even preconditioned fermion matrix.
@@ -444,6 +464,7 @@ void DiracOpMdwf::MatPcDag(Vector *out, Vector *in)
   const char * fname = "MatPcDag()";
   VRB.Func(cname, fname);
 
+#ifdef USE_MDWF
   if(use_single_precision){
     struct QOP_F3_MDWF_HalfFermion *hfermion_ptr_in = NULL;
     struct QOP_F3_MDWF_HalfFermion *hfermion_ptr_out = NULL;
@@ -477,6 +498,9 @@ void DiracOpMdwf::MatPcDag(Vector *out, Vector *in)
     QOP_D3_MDWF_free_half_fermion(&hfermion_ptr_in);
     QOP_D3_MDWF_free_half_fermion(&hfermion_ptr_out);
   }
+#else
+  ERR.NotImplemented(cname, fname);
+#endif
 }
 
 // The inverse of the unconditioned Dirac Operator 
@@ -496,6 +520,7 @@ int DiracOpMdwf::MatInv(Vector *out,
 {
   const char * fname = "MatInv()";
 
+#ifdef USE_MDWF
   int n_iter;
   Float true_res_dummy;
   Float * true_res_ptr = (true_res != NULL) ? true_res : &true_res_dummy;
@@ -553,6 +578,10 @@ int DiracOpMdwf::MatInv(Vector *out,
   }
     
   return n_iter;
+#else
+  ERR.NotImplemented(cname, fname);
+  return -1;
+#endif
 }
 
 // Same as original but true_res=0.
@@ -615,6 +644,7 @@ void DiracOpMdwf::Mat(Vector *out, Vector *in)
   const char * fname = "Mat(V*, V*)";
   VRB.Func(cname, fname);
 
+#ifdef USE_MDWF
   if(use_single_precision){
     struct QOP_F3_MDWF_Fermion * fermion_ptr_in = NULL;
     struct QOP_F3_MDWF_Fermion * fermion_ptr_out = NULL;
@@ -648,6 +678,9 @@ void DiracOpMdwf::Mat(Vector *out, Vector *in)
     QOP_D3_MDWF_free_fermion(&fermion_ptr_in);
     QOP_D3_MDWF_free_fermion(&fermion_ptr_out);
   }
+#else
+  ERR.NotImplemented(cname, fname);
+#endif
 }
 
 // MatDag is the dagger of the unpreconditioned fermion matrix. 
@@ -658,6 +691,7 @@ void DiracOpMdwf::MatDag(Vector *out, Vector *in)
   const char * fname = "MatDag(V*, V*)";
   VRB.Func(cname, fname);
 
+#ifdef USE_MDWF
   if(use_single_precision){
     struct QOP_F3_MDWF_Fermion * fermion_ptr_in = NULL;
     struct QOP_F3_MDWF_Fermion * fermion_ptr_out = NULL;
@@ -691,6 +725,9 @@ void DiracOpMdwf::MatDag(Vector *out, Vector *in)
     QOP_D3_MDWF_free_fermion(&fermion_ptr_in);
     QOP_D3_MDWF_free_fermion(&fermion_ptr_out);
   }
+#else
+  ERR.NotImplemented(cname, fname);
+#endif
 }
 
 //! Multiplication by the square of the fermion matrix.
@@ -699,6 +736,7 @@ void DiracOpMdwf::MatDagMat(Vector *out, Vector *in)
   const char * fname = "MatDagMat(V*, V*)";
   VRB.Func(cname, fname);
 
+#ifdef USE_MDWF
   if(use_single_precision){
     struct QOP_F3_MDWF_Fermion * fermion_ptr_in = NULL;
     struct QOP_F3_MDWF_Fermion * fermion_ptr_out = NULL;
@@ -736,6 +774,9 @@ void DiracOpMdwf::MatDagMat(Vector *out, Vector *in)
     QOP_D3_MDWF_free_fermion(&fermion_ptr_in);
     QOP_D3_MDWF_free_fermion(&fermion_ptr_out);
   }
+#else
+  ERR.NotImplemented(cname, fname);
+#endif
 }
 
 

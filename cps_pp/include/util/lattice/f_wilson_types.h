@@ -705,13 +705,9 @@ class Fdwf : public FdwfBase {
 };
 
 
-// the MdwfArg parameter used to initialize Mdwf library.
-extern MdwfArg * _mdwf_arg_p;
-
 class Fmdwf : public virtual Lattice {
  private:
   char * cname;
-  //  CgArg * mdwf_cg_arg_p;
 
  public:
   Fmdwf(void);

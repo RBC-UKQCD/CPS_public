@@ -45,7 +45,7 @@ public:
 		Float *c5_val;
 	} c5;
 	Float M5;
-	CgArg *cg_arg_p;
+	CgArg cg_arg;
 	struct {
 		u_int rsd_vec_len;
 		Float *rsd_vec_val;

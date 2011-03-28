@@ -78,7 +78,7 @@ vml_MdwfArg (VML *vmls, char *name,MdwfArg *objp)
 		 return FALSE;
 	 if (!vml_Float (vmls, "M5", &objp->M5))
 		 return FALSE;
-	 if (!vml_pointer (vmls, "cg_arg_p", (char **)&objp->cg_arg_p, sizeof (CgArg), (vmlproc_t) vml_CgArg))
+	 if (!vml_CgArg (vmls, "cg_arg", &objp->cg_arg))
 		 return FALSE;
 	 if (!vml_array (vmls, "rsd_vec", (char **)&objp->rsd_vec.rsd_vec_val, (u_int *) &objp->rsd_vec.rsd_vec_len, ~0,
 		sizeof (Float), (vmlproc_t) vml_Float))

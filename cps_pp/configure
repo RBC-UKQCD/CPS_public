@@ -4376,8 +4376,8 @@ if test "$enable_optimise" = "yes"; then
      CFLAGS="${CFLAGS} -O -Wall"
      CXXFLAGS="${CXXFLAGS} -O -Wall"
    else
-     CFLAGS="${CFLAGS} -O3"
-     CXXFLAGS="${CXXFLAGS} -O3"
+     CFLAGS="${CFLAGS} -O2"
+     CXXFLAGS="${CXXFLAGS} -O2"
    fi
 fi
 
@@ -4560,6 +4560,7 @@ if test "$enable_mdwf" != "no"; then
    MDWF_LIBS=`${MDWF_DIR}/bin/mdwf-config --libs`
    LDFLAGS="${LDFLAGS} ${MDWF_LDFLAGS} ${MDWF_LIBS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${MDWF_CFLAGS}"
+   DFLAGS="${DFLAGS} -DUSE_MDWF"
 fi
 
 if test "$enable_qio" != "no"; then
