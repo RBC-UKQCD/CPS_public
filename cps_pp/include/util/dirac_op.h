@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.24 2011-03-24 15:56:27 chulwoo Exp $
+  $Id: dirac_op.h,v 1.25 2011-03-28 16:01:11 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -14,14 +14,6 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <alg/cg_arg.h>
 #include <alg/eig_arg.h>
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-#include <qop-mdwf3.h>
-#ifdef __cplusplus
-}
-#endif
 CPS_START_NAMESPACE
 
 

@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.37 2009-06-18 04:25:20 chulwoo Exp $
+  $Id: gjp.h,v 1.38 2011-03-28 16:01:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-06-18 04:25:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.37 2009-06-18 04:25:20 chulwoo Exp $
-//  $Id: gjp.h,v 1.37 2009-06-18 04:25:20 chulwoo Exp $
+//  $Date: 2011-03-28 16:01:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.38 2011-03-28 16:01:11 chulwoo Exp $
+//  $Id: gjp.h,v 1.38 2011-03-28 16:01:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.37 $
+//  $Revision: 1.38 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -45,6 +45,7 @@
 #include <util/vector.h>
 #include <comms/sysfunc_cps.h>
 #include <alg/do_arg.h>
+#include <alg/cg_arg.h>
 CPS_START_NAMESPACE
 
 //struct DoArg;
@@ -156,6 +157,8 @@ class GlobalJobParameter
 
   void Initialize();
       
+
+  MdwfArg *mdwf_arg;
 
 public:
   GlobalJobParameter();
@@ -807,8 +810,13 @@ public:
   void setArg(int* argc, char*** argv);
 
 
-  /*! @} */
+  void SetMdwfArg(MdwfArg *_mdwf_arg);
 
+  MdwfArg *GetMdwfArg(void){return mdwf_arg;}
+
+  void FreeMdwfArg(void);
+
+  /*! @} */
 };
 
 /*! An instance of the GlobalJobParameter class, named GJP, should be

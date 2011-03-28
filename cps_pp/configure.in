@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2011-03-21 21:04:50 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.69 2011-03-21 21:04:50 chulwoo Exp $
-dnl  $Id: configure.in,v 1.69 2011-03-21 21:04:50 chulwoo Exp $
+dnl  $Date: 2011-03-28 16:01:11 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.70 2011-03-28 16:01:11 chulwoo Exp $
+dnl  $Id: configure.in,v 1.70 2011-03-28 16:01:11 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.69 $
+dnl  $Revision: 1.70 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -177,8 +177,8 @@ if test "$enable_optimise" = "yes"; then
      CFLAGS="${CFLAGS} -O -Wall"
      CXXFLAGS="${CXXFLAGS} -O -Wall"
    else
-     CFLAGS="${CFLAGS} -O3"
-     CXXFLAGS="${CXXFLAGS} -O3"
+     CFLAGS="${CFLAGS} -O2"
+     CXXFLAGS="${CXXFLAGS} -O2"
    fi
 fi
 
@@ -327,6 +327,7 @@ if test "$enable_mdwf" != "no"; then
    MDWF_LIBS=`${MDWF_DIR}/bin/mdwf-config --libs`
    LDFLAGS="${LDFLAGS} ${MDWF_LDFLAGS} ${MDWF_LIBS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${MDWF_CFLAGS}"
+   DFLAGS="${DFLAGS} -DUSE_MDWF"
 fi
 
 if test "$enable_qio" != "no"; then

@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_mdwf.C,v 1.2 2011-03-21 21:04:50 chulwoo Exp $
+  $Id: f_mdwf.C,v 1.3 2011-03-28 16:01:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -52,21 +52,15 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
-// Initialize static variables.
-// 
-// You MUST set the following pointer so that it points to a valid
-// MdwfArg structure to use Fmdwf class.
-// ------------------------------------------------------------------
-MdwfArg * _mdwf_arg_p = NULL;
-
-//------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------
 Fmdwf::Fmdwf(void)
 {
   cname = "Fmdwf";
-  const char * fname = "Fmdwf()";
+  const char *fname = "Fmdwf()";
   VRB.Func(cname,fname);
+
+  MdwfArg *_mdwf_arg_p = GJP.GetMdwfArg();
 
   if(_mdwf_arg_p == NULL){
     ERR.General(cname, fname, "MdwfArg is not initialized.\n");
@@ -79,22 +73,8 @@ Fmdwf::Fmdwf(void)
 //------------------------------------------------------------------
 Fmdwf::~Fmdwf(void)
 {
-  const char * fname = "~Fmdwf()";
+  const char *fname = "~Fmdwf()";
   VRB.Func(cname,fname);
-
-  // // free CgArg
-  // if(mdwf_cg_arg_p != NULL){
-  //   if(mdwf_cg_arg_p->b5.b5_val == NULL){
-  //     ERR.General(cname, fname, "Corrupted mdwf_cg_arg.\n");
-  //   }
-  //   if(mdwf_cg_arg_p->c5.c5_val == NULL){
-  //     ERR.General(cname, fname, "Corrupted mdwf_cg_arg.\n");
-  //   }
-  //   sfree(mdwf_cg_arg_p->b5.b5_val, "mdwf_cg_arg_p->b5.b5_val", fname, cname); 
-  //   sfree(mdwf_cg_arg_p->c5.c5_val, "mdwf_cg_arg_p->c5.c5_val", fname, cname);
-
-  //   sfree(mdwf_cg_arg_p, "mdwf_cg_arg_p", fname, cname);
-  // }
 }
 
 //! Multiplication of a lattice spin-colour vector by gamma_5.
@@ -147,6 +127,7 @@ int Fmdwf::FsiteOffset(const int *x) const
 // site of the 4-D lattice.
 int Fmdwf::FsiteSize(void)const
 {
+  MdwfArg *_mdwf_arg_p = GJP.GetMdwfArg();
   return 2 * Colors() * SpinComponents() * _mdwf_arg_p->b5.b5_len;  
 }
 
@@ -230,24 +211,31 @@ int Fmdwf::FmatInv(Vector *f_out, Vector *f_in,
   const char * fname = "FmatInv(V*, V*, CgArg *, ...)";
   VRB.Func(cname, fname);
 
-  _mdwf_arg_p->cg_arg_p = cg_arg;  
+  MdwfArg *_mdwf_arg_p = GJP.GetMdwfArg();
+
+  CgArg cg_arg_old = _mdwf_arg_p->cg_arg;
+  _mdwf_arg_p->cg_arg = *cg_arg;  
+
   DiracOpMdwf mdwf(*this, _mdwf_arg_p);
-  return mdwf.MatInv(f_out, f_in, true_res, prs_f_in);
+  int iter = mdwf.MatInv(f_out, f_in, true_res, prs_f_in);
+
+  _mdwf_arg_p->cg_arg = cg_arg_old;
+  return iter;
 }
 
 // FmatInvMobius: same as FmatInv, except that we use mobius DWF
 // formalism to speed up the CG inversion (via constructing initial guess).
 // n_restart: How many restarts we perform
-int Fmdwf::FmatInvMobius(Vector * f_out,
-                         Vector * f_in,
-                         MdwfArg * mob_l,
-                         MdwfArg * mob_s,
-                         Float * true_res,
+int Fmdwf::FmatInvMobius(Vector *f_out,
+                         Vector *f_in,
+                         MdwfArg *mob_l,
+                         MdwfArg *mob_s,
+                         Float *true_res,
                          CnvFrmType cnv_frm,
                          PreserveType prs_f_in,
                          int n_restart, Float rsd_vec[])
 {
-  const char * fname = "FmatInvMobius(V*, V*, ...)";
+  const char *fname = "FmatInvMobius(V*, V*, ...)";
   // this implementation doesn't allow splitting in s direction(yet).
   if(GJP.Snodes() != 1){
     ERR.NotImplemented(cname, fname);
@@ -265,12 +253,12 @@ int Fmdwf::FmatInvMobius(Vector * f_out,
   int mob_l_size_5d = size_4d * mob_l_ls;
   int mob_s_size_5d = size_4d * mob_s_ls;
 
-  Vector * tmp_mob_l_5d = (Vector *) smalloc(cname, fname, "tmp_mob_l_5d", sizeof(Float) * mob_l_size_5d);
-  Vector * tmp2_mob_l_5d = (Vector *) smalloc(cname, fname, "tmp2_mob_l_5d", sizeof(Float) * mob_l_size_5d);
-  Vector * tmp_mob_s_5d = (Vector *) smalloc(cname, fname, "tmp_mob_s_5d", sizeof(Float) * mob_s_size_5d);
+  Vector *tmp_mob_l_5d = (Vector *) smalloc(cname, fname, "tmp_mob_l_5d", sizeof(Float) * mob_l_size_5d);
+  Vector *tmp2_mob_l_5d = (Vector *) smalloc(cname, fname, "tmp2_mob_l_5d", sizeof(Float) * mob_l_size_5d);
+  Vector *tmp_mob_s_5d = (Vector *) smalloc(cname, fname, "tmp_mob_s_5d", sizeof(Float) * mob_s_size_5d);
 
-  CgArg * cg_arg_l = mob_l->cg_arg_p;
-  CgArg * cg_arg_s = mob_s->cg_arg_p;
+  CgArg *cg_arg_l = &mob_l->cg_arg;
+  CgArg *cg_arg_s = &mob_s->cg_arg;
 
   // the first time, we solve in DWF to some degree of accuracy
   {
@@ -591,14 +579,15 @@ int Fmdwf::FeigSolv(Vector **f_eigenv, Float *lambda,
   cg_arg.RitzMatOper = eig_arg->RitzMatOper;
   int N_eig = eig_arg->N_eig;
 
+  MdwfArg *_mdwf_arg_p = GJP.GetMdwfArg();
   {
-    CgArg * old_cg_arg = _mdwf_arg_p->cg_arg_p;
-    _mdwf_arg_p->cg_arg_p = &cg_arg;
+    CgArg cg_arg_old = _mdwf_arg_p->cg_arg;
+    _mdwf_arg_p->cg_arg = cg_arg;
 
     DiracOpMdwf mdwf(*this, _mdwf_arg_p);
   
     iter = mdwf.RitzEig(f_eigenv, lambda, valid_eig, eig_arg);
-    _mdwf_arg_p->cg_arg_p = old_cg_arg;
+    _mdwf_arg_p->cg_arg = cg_arg_old;
   }
  
   // rescale eigenvalues to normal convention
@@ -665,7 +654,7 @@ int Fmdwf::FeigSolv(Vector **f_eigenv, Float *lambda,
 Float Fmdwf::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,	       
                     Float mass, DagType dag)
 {
-  const char * fname = "SetPhi()";
+  const char *fname = "SetPhi()";
   ERR.NotImplemented(cname, fname);
 }
 
@@ -675,7 +664,7 @@ Float Fmdwf::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 ForceArg Fmdwf::EvolveMomFforce(Matrix *mom, Vector *frm, 
                                 Float mass, Float step_size)
 {
-  const char * fname = "EvolveMomFforce()";
+  const char *fname = "EvolveMomFforce()";
   ERR.NotImplemented(cname, fname);
 }
 
@@ -684,7 +673,7 @@ ForceArg Fmdwf::EvolveMomFforce(Matrix *mom, Vector *frm,
 ForceArg Fmdwf::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
                          Float mass, Float step_size)
 {
-  const char * fname = "EvolveMomFforce()";
+  const char *fname = "EvolveMomFforce()";
   ERR.NotImplemented(cname, fname);
 }
 
@@ -692,7 +681,7 @@ ForceArg Fmdwf::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			      int isz, Float *alpha, Float mass, Float dt,
 			      Vector **sol_d, ForceMeasure measure)
 {
-  const char * fname = "RHMC_EvolveMomFforce()";
+  const char *fname = "RHMC_EvolveMomFforce()";
   ERR.NotImplemented(cname, fname);
 }
 
@@ -701,7 +690,7 @@ ForceArg Fmdwf::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 // copied from FdwfBase
 Float Fmdwf::FhamiltonNode( Vector *phi,  Vector *chi)
 {
-  const char * fname = "FhamiltonNode(V*, V*)";
+  const char *fname = "FhamiltonNode(V*, V*)";
   VRB.Func(cname,fname);
 
   if (phi == 0) ERR.Pointer(cname,fname,"phi") ;
@@ -829,6 +818,7 @@ void Fmdwf::Freflex(Vector *out, Vector *in)
   VRB.Func(cname,fname);
 
   int i;
+  MdwfArg *_mdwf_arg_p = GJP.GetMdwfArg();
   int ls = _mdwf_arg_p->b5.b5_len;
   // for MDWF, GJP.Snode() must be 1
   int slice_len = SPINOR_SIZE * GJP.VolNodeSites();

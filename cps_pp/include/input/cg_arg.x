@@ -27,7 +27,8 @@ class MdwfArg {
   /* equivalent of DWF height in Mobius fermions */
   Float M5;
 
-  CgArg * cg_arg_p;
+  /* CgArg used by the Mobius library */
+  CgArg cg_arg;
 
   /* stopping condition array for Mobius approximation of DWF */
   /* fermions, the Mobius Dirac operator(DiracOpMdwf) does not */ 

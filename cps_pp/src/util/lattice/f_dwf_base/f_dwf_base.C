@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.34 2011-03-21 21:04:50 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.35 2011-03-28 16:01:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -296,6 +296,7 @@ int FdwfBase::FmatInv(Vector *f_out, Vector *f_in,
   char *fname = "FmatInv(CgArg*,V*,V*,F*,CnvFrmType)";
   VRB.Func(cname,fname);
 
+  MdwfArg *_mdwf_arg_p = GJP.GetMdwfArg();
   if(_mdwf_arg_p != NULL){
     return FmatInvMobius(f_out, f_in, cg_arg, _mdwf_arg_p, true_res, cnv_frm, prs_f_in);
   }
@@ -329,15 +330,17 @@ int FdwfBase::eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev
 // FmatInvMobius: same as FmatInv, except that we use mobius DWF
 // formalism to speed up the CG inversion (via constructing initial guess).
 // n_restart: How many restarts we perform
-int FdwfBase::FmatInvMobius(Vector * f_out,
-                            Vector * f_in,
-                            CgArg * cg_arg_dwf,
-                            MdwfArg * mdwf_arg,
-                            Float * true_res,
+int FdwfBase::FmatInvMobius(Vector *f_out,
+                            Vector *f_in,
+                            CgArg *cg_arg_dwf,
+                            MdwfArg *mdwf_arg,
+                            Float *true_res,
                             CnvFrmType cnv_frm,
                             PreserveType prs_f_in)
 {
-  const char * fname = "FmatInvMobius(V*, V*, ...)";
+  const char *fname = "FmatInvMobius(V*, V*, ...)";
+
+#ifdef USE_MDWF
   // this implementation doesn't allow splitting in s direction(yet).
   if(GJP.Snodes() != 1){
     ERR.NotImplemented(cname, fname);
@@ -345,9 +348,9 @@ int FdwfBase::FmatInvMobius(Vector * f_out,
   if(cnv_frm != CNV_FRM_YES){
     ERR.NotImplemented(cname, fname);
   }
-  Float * rsd_vec = mdwf_arg->rsd_vec.rsd_vec_val;
+  Float *rsd_vec = mdwf_arg->rsd_vec.rsd_vec_val;
   int n_restart = mdwf_arg->rsd_vec.rsd_vec_len;
-  CgArg * cg_arg_mob = mdwf_arg->cg_arg_p;
+  CgArg *cg_arg_mob = &mdwf_arg->cg_arg;
 
   if(n_restart < 2){
     ERR.General(cname, fname, "Value %d is invalid for n_restart.\n", n_restart);
@@ -359,9 +362,9 @@ int FdwfBase::FmatInvMobius(Vector * f_out,
   int size_4d = GJP.VolNodeSites() * SPINOR_SIZE;
 
 
-  Vector * tmp_dwf_5d = (Vector *) smalloc(cname, fname, "tmp_dwf_5d", sizeof(Float) * dwf_size_5d);
-  Vector * tmp2_dwf_5d = (Vector *) smalloc(cname, fname, "tmp2_dwf_5d", sizeof(Float) * dwf_size_5d);
-  Vector * tmp_mob_5d = (Vector *) smalloc(cname, fname, "tmp_mob_5d", sizeof(Float) * mob_size_5d);
+  Vector *tmp_dwf_5d = (Vector *) smalloc(cname, fname, "tmp_dwf_5d", sizeof(Float) * dwf_size_5d);
+  Vector *tmp2_dwf_5d = (Vector *) smalloc(cname, fname, "tmp2_dwf_5d", sizeof(Float) * dwf_size_5d);
+  Vector *tmp_mob_5d = (Vector *) smalloc(cname, fname, "tmp_mob_5d", sizeof(Float) * mob_size_5d);
 
   // the first time, we solve in DWF to some degree of accuracy
   {
@@ -467,6 +470,10 @@ int FdwfBase::FmatInvMobius(Vector * f_out,
   sfree(cname, fname,  "tmp_mob_5d",  tmp_mob_5d);
 
   return iter;
+#else
+  ERR.NotImplemented(cname, fname);
+  return 1;
+#endif
 }
 
 //------------------------------------------------------------------
