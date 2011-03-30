@@ -207,8 +207,10 @@ int main(int argc,char *argv[])
 			     */
 
   
+#ifdef USE_OMP
 #pragma omp parallel
     printf("OMP: %d/%d\n", omp_get_num_threads(), omp_get_thread_num());
+#endif
 
     {//lattice factory
     //GwilsonFdwf lattice;
