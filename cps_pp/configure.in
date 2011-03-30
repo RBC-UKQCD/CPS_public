@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2011-03-28 16:01:11 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.70 2011-03-28 16:01:11 chulwoo Exp $
-dnl  $Id: configure.in,v 1.70 2011-03-28 16:01:11 chulwoo Exp $
+dnl  $Date: 2011-03-30 13:33:54 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.71 2011-03-30 13:33:54 chulwoo Exp $
+dnl  $Id: configure.in,v 1.71 2011-03-30 13:33:54 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.70 $
+dnl  $Revision: 1.71 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -84,7 +84,7 @@ NOT_TESTING_QCDSP="yes"
 AC_SUBST(NOT_TESTING_QCDSP)
 
 dnl Check for maths library
-AC_CHECK_LIB(m, sin, ,echo "CPS needs the math library - bailing out"; exit 1)
+dnl AC_CHECK_LIB(m, sin, ,echo "CPS needs the math library - bailing out"; exit 1)
 
 dnl Set the relevant include files
 topwd_srcdir=`pwd`
@@ -440,7 +440,7 @@ AC_PROG_INSTALL
 AC_CHECK_PROG(have_doxygen, doxygen, "yes")
 AC_CHECK_TYPES(bool_t)
 AC_CHECK_TYPES(enum_t)
-AC_CHECK_TYPES(int8_t)
+AC_CHECK_TYPES([int8_t],,,[#include<stdint.h>])
 AC_CHECK_TYPES(int16_t)
 AC_CHECK_TYPES(int32_t)
 AC_CHECK_TYPES(int64_t)
