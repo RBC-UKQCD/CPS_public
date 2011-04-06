@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc.C,v 1.8 2011-02-26 16:57:39 chulwoo Exp $
+  $Id: smalloc.C,v 1.9 2011-04-06 20:43:34 chulwoo Exp $
 */
 
 #include <util/error.h>
@@ -22,11 +22,11 @@ void* smalloc(size_t request,
   void *p;
   if( posix_memalign((void**)&p, ALLOC_MEMALIGN_NUM, request) ) ERR.Pointer(cname, fname, vname);
     VRB.Smalloc(cname, fname, vname, p, request);
-    return p;
 #else 
     void *p = malloc(request);
     if(!p) ERR.Pointer(cname, fname, vname);
 #endif
+    return p;
 }
 
 void sfree(void* p, const char *vname, const char *fname, const char *cname){
