@@ -14,6 +14,7 @@ string force_label = ""
 }
 Array bosons[1] = { 
 class BosonDescr bosons[0] = {
+double epsilon =   0.0000000000000000e+00
 double stop_rsd_hb =   0.0000000000000000e+00
 }
 }

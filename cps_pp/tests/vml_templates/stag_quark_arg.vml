@@ -2,6 +2,7 @@ class StagQuarkArg stag_quark_arg = {
 int qid = 0
 class CgArg cg = {
 double mass =   1.0000000000000001e-01
+double epsilon =   0.0000000000000000e+00
 int max_num_iter = 5000
 double stop_rsd =   1.0000000000000000e-10
 double true_rsd =   1.0000000000000000e-10

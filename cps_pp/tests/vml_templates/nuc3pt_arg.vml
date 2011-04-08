@@ -61,7 +61,9 @@ int mt[4] = 0
 GaussianKernelLinkSmearType gauss_link_smear_type = GKLS_NONE
 int gauss_link_smear_N = 0
 double gauss_link_smear_coeff =   0.0000000000000000e+00
-int calc_QProp = 0
+CalcQpropType calc_QProp = READ_QPROP
+CalcSeqType calc_seqQ = READ_SEQ
+string prop_file = ""
 string ensemble_label = "AlgNuc3pt"
 int ensemble_id = 0
 }

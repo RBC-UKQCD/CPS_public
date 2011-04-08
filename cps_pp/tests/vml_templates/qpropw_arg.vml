@@ -24,4 +24,8 @@ SourceType SeqSmearSink = POINT
 string ensemble_label = ""
 string ensemble_id = ""
 int seqNum = 0
+int StartSrcSpin = 0
+int EndSrcSpin = 0
+int StartSrcColor = 0
+int EndSrcColor = 0
 }

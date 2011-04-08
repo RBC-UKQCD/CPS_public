@@ -14,6 +14,7 @@
 </data></class>
 <Array><name>bosons</name><size>1</size><data>
 <class><name>BosonDescr</name><instance>bosons[0]</instance><data>
+<item><name>epsilon</name><value><double>0.000000e+00</double></value></item>
 <item><name>stop_rsd_hb</name><value><double>0.000000e+00</double></value></item>
 </data></class>
 </data></Array>
