@@ -1,5 +1,6 @@
 <class><name>CgArg</name><instance>cg_arg</instance><data>
 <item><name>mass</name><value><double>0.000000e+00</double></value></item>
+<item><name>epsilon</name><value><double>0.000000e+00</double></value></item>
 <item><name>max_num_iter</name><value><int>0</int></value></item>
 <item><name>stop_rsd</name><value><double>0.000000e+00</double></value></item>
 <item><name>true_rsd</name><value><double>0.000000e+00</double></value></item>

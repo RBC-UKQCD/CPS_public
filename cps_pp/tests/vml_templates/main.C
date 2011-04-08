@@ -151,7 +151,66 @@ int main(int argc, char *argv[])
 
   nuc3pt_arg.cname="AlgNuc3pt";
   nuc3pt_arg.ensemble_label="AlgNuc3pt";
+
+  cg_arg.Encode("cg_arg.vml","cg_arg");
+  hmd_arg.Encode("hmd_arg.vml","hmd_arg");
+  evo_arg.Encode("evo_arg.vml","evo_arg");
+  do_arg.Encode("do_arg.vml","do_arg");
+  ws_arg.Encode("w_spect_arg.vml","w_spect_arg");
+  ws_out.Encode("w_spect_output.vml","w_spect_output");
+  Meas.Encode("meas_arg.vml","meas_arg");
+  pa.Encode("pot_arg.vml","pot_arg");
+  pbp.Encode("pbp_arg.vml","pbp_arg");
+  fga.Encode("fix_gauge_arg.vml","fix_gauge_arg");
+  hmc_arg.Encode("hmc_arg.vml","hmc_arg");
+  quo_arg.Encode("quo_arg.vml","quo_arg");
+  frm_arg.Encode("frm_arg.vml","frm_arg");
+  bsn_arg.Encode("bsn_arg.vml","bsn_arg");
+  rat_arg.Encode("rat_arg.vml","rat_arg");
+  rat_quo_arg.Encode("rat_quo_arg.vml","rat_quo_arg");
+  split_arg.Encode("split_arg.vml","split_arg");
+  gauge_arg.Encode("gauge_arg.vml","gauge_arg");
+  ab_arg.Encode("ab_arg.vml","ab_arg");
+  eig_arg.Encode("eig_arg.vml","eig_arg");
+  float_array.Encode("float_array.vml","float_array");
+  param_array.Encode("param_array.vml","param_array");
+  stag_quark_src.Encode("stag_quark_src.vml","stag_quark_src");
+  stag_quark_arg.Encode("stag_quark_arg.vml","stag_quark_arg");
+  stag_meson_arg.Encode("stag_meson_arg.vml","stag_meson_arg");
+  stag_mom_meson_arg.Encode("stag_mom_meson_arg.vml","stag_mom_meson_arg");
+  stag_nucleon_arg.Encode("stag_nucleon_arg.vml","stag_nucleon_arg");
+  stag_non_local_arg.Encode("stag_non_local_arg.vml","stag_non_local_arg");
+  nlstag_meson_arg.Encode("nlstag_meson_arg.vml","nlstag_meson_arg");
+  qpropw_arg.Encode("qpropw_arg.vml","qpropw_arg");
   nuc3pt_arg.Encode("nuc3pt_arg.vml","nuc3pt_arg");
+
+  vml_markup_type(VML_XML);
+  
+  cg_arg.Encode("cg_arg.xml","cg_arg");
+  hmd_arg.Encode("hmd_arg.xml","hmd_arg");
+  evo_arg.Encode("evo_arg.xml","evo_arg");
+  do_arg.Encode("do_arg.xml","do_arg");
+  ws_arg.Encode("w_spect_arg.xml","w_spect_arg");
+  ws_out.Encode("w_spect_output.xml","w_spect_output");
+  hmc_arg.Encode("hmc_arg.xml","hmc_arg");
+  quo_arg.Encode("quo_arg.xml","quo_arg");
+  frm_arg.Encode("frm_arg.xml","frm_arg");
+  bsn_arg.Encode("bsn_arg.xml","bsn_arg");
+  rat_arg.Encode("rat_arg.xml","rat_arg");
+  rat_quo_arg.Encode("rat_quo_arg.xml","rat_quo_arg");
+  split_arg.Encode("split_arg.xml","split_arg");
+  gauge_arg.Encode("gauge_arg.xml","gauge_arg");
+  ab_arg.Encode("ab_arg.xml","ab_arg");
+  eig_arg.Encode("eig_arg.xml","eig_arg");
+  stag_quark_src.Encode("stag_quark_src.xml","stag_quark_src");
+  stag_quark_arg.Encode("stag_quark_arg.xml","stag_quark_arg");
+  stag_meson_arg.Encode("stag_meson_arg.xml","stag_meson_arg");
+  stag_mom_meson_arg.Encode("stag_mom_meson_arg.xml","stag_mom_meson_arg");
+  stag_nucleon_arg.Encode("stag_nucleon_arg.xml","stag_nucleon_arg");
+  stag_non_local_arg.Encode("stag_non_local_arg.xml","stag_non_local_arg");
+  nlstag_meson_arg.Encode("nlstag_meson_arg.xml","nlstag_meson_arg");
+  qpropw_arg.Encode("qpropw_arg.xml","qpropw_arg");
+  nuc3pt_arg.Encode("nuc3pt_arg.xml","nuc3pt_arg");
 
 
   End();

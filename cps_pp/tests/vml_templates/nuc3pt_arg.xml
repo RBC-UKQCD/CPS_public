@@ -1,0 +1,69 @@
+<class><name>Nuc3ptArg</name><instance>nuc3pt_arg</instance><data>
+<item><name>cname</name><value><string>AlgNuc3pt </string></value></item>
+<item><name>num_masses</name><value><int>0</int></value></item>
+<Vector><name>mass</name><size>10</size><data>
+<item><name>mass[0]</name><value><double>0.000000e+00</double></value></item>
+<item><name>mass[1]</name><value><double>0.000000e+00</double></value></item>
+<item><name>mass[2]</name><value><double>0.000000e+00</double></value></item>
+<item><name>mass[3]</name><value><double>0.000000e+00</double></value></item>
+<item><name>mass[4]</name><value><double>0.000000e+00</double></value></item>
+<item><name>mass[5]</name><value><double>0.000000e+00</double></value></item>
+<item><name>mass[6]</name><value><double>0.000000e+00</double></value></item>
+<item><name>mass[7]</name><value><double>0.000000e+00</double></value></item>
+<item><name>mass[8]</name><value><double>0.000000e+00</double></value></item>
+<item><name>mass[9]</name><value><double>0.000000e+00</double></value></item>
+</data></Vector>
+<class><name>CgArg</name><instance>cg</instance><data>
+<item><name>mass</name><value><double>1.000000e-01</double></value></item>
+<item><name>epsilon</name><value><double>0.000000e+00</double></value></item>
+<item><name>max_num_iter</name><value><int>1000</int></value></item>
+<item><name>stop_rsd</name><value><double>1.000000e-08</double></value></item>
+<item><name>true_rsd</name><value><double>0.000000e+00</double></value></item>
+<item><name>RitzMatOper</name><value><RitzMatType>NONE </RitzMatType></value></item>
+<item><name>Inverter</name><value><InverterType>CG </InverterType></value></item>
+<item><name>bicgstab_n</name><value><int>0</int></value></item>
+</data></class>
+<item><name>t_source</name><value><int>0</int></value></item>
+<item><name>num_src</name><value><int>1</int></value></item>
+<item><name>source_inc</name><value><int>0</int></value></item>
+<item><name>t_sink</name><value><int>0</int></value></item>
+<item><name>BoxStart</name><value><int>0</int></value></item>
+<item><name>BoxEnd</name><value><int>1</int></value></item>
+<item><name>gauss_N</name><value><int>0</int></value></item>
+<item><name>gauss_W</name><value><double>0.000000e+00</double></value></item>
+<Vector><name>x</name><size>3</size><data>
+<item><name>x[0]</name><value><int>0</int></value></item>
+<item><name>x[1]</name><value><int>0</int></value></item>
+<item><name>x[2]</name><value><int>0</int></value></item>
+</data></Vector>
+<item><name>theta</name><value><double>0.000000e+00</double></value></item>
+<item><name>load_u1_lat</name><value><int>0</int></value></item>
+<item><name>u1_gauge_ptr</name><value><boolean>0</boolean></value></item>
+<item><name>src_type</name><value><SourceType>POINT </SourceType></value></item>
+<item><name>DoUnPolarized</name><value><int>1</int></value></item>
+<item><name>DoUnPolarizedMom</name><value><int>1</int></value></item>
+<item><name>DoPolarized</name><value><int>1</int></value></item>
+<item><name>DoPolarizedMom</name><value><int>1</int></value></item>
+<item><name>DoHalfFermion</name><value><int>1</int></value></item>
+<item><name>DoPerPlusAper</name><value><int>0</int></value></item>
+<item><name>MaxMom2</name><value><int>0</int></value></item>
+<item><name>DoSS2ptF</name><value><int>1</int></value></item>
+<item><name>DoGa1Proj</name><value><int>1</int></value></item>
+<item><name>DoConserved</name><value><int>1</int></value></item>
+<item><name>num_mult</name><value><int>1</int></value></item>
+<Vector><name>mt</name><size>5</size><data>
+<item><name>mt[0]</name><value><int>0</int></value></item>
+<item><name>mt[1]</name><value><int>0</int></value></item>
+<item><name>mt[2]</name><value><int>0</int></value></item>
+<item><name>mt[3]</name><value><int>0</int></value></item>
+<item><name>mt[4]</name><value><int>0</int></value></item>
+</data></Vector>
+<item><name>gauss_link_smear_type</name><value><GaussianKernelLinkSmearType>GKLS_NONE </GaussianKernelLinkSmearType></value></item>
+<item><name>gauss_link_smear_N</name><value><int>0</int></value></item>
+<item><name>gauss_link_smear_coeff</name><value><double>0.000000e+00</double></value></item>
+<item><name>calc_QProp</name><value><CalcQpropType>READ_QPROP </CalcQpropType></value></item>
+<item><name>calc_seqQ</name><value><CalcSeqType>READ_SEQ </CalcSeqType></value></item>
+<item><name>prop_file</name><value><string> </string></value></item>
+<item><name>ensemble_label</name><value><string>AlgNuc3pt </string></value></item>
+<item><name>ensemble_id</name><value><int>0</int></value></item>
+</data></class>

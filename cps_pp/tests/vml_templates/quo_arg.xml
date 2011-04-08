@@ -15,7 +15,9 @@
 <Array><name>quotients</name><size>1</size><data>
 <class><name>QuotientDescr</name><instance>quotients[0]</instance><data>
 <item><name>bsn_mass</name><value><double>0.000000e+00</double></value></item>
+<item><name>bsn_mass_epsilon</name><value><double>0.000000e+00</double></value></item>
 <item><name>frm_mass</name><value><double>0.000000e+00</double></value></item>
+<item><name>frm_mass_epsilon</name><value><double>0.000000e+00</double></value></item>
 <item><name>chrono</name><value><int>0</int></value></item>
 <item><name>stop_rsd_hb</name><value><double>0.000000e+00</double></value></item>
 <item><name>stop_rsd_md</name><value><double>0.000000e+00</double></value></item>

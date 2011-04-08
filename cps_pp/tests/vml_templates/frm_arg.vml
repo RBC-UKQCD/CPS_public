@@ -14,6 +14,7 @@ string force_label = ""
 }
 Array fermions[1] = { 
 class FermionDescr fermions[0] = {
+double epsilon =   0.0000000000000000e+00
 int chrono = 0
 double stop_rsd_md =   0.0000000000000000e+00
 double stop_rsd_mc =   0.0000000000000000e+00
