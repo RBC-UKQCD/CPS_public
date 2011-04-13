@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpMdwf class methods.
 
-  $Id: d_op_mdwf.C,v 1.3 2011-03-28 16:01:11 chulwoo Exp $
+  $Id: d_op_mdwf.C,v 1.4 2011-04-13 19:05:04 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-03-28 16:01:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v 1.3 2011-03-28 16:01:11 chulwoo Exp $
-//  $Id: d_op_mdwf.C,v 1.3 2011-03-28 16:01:11 chulwoo Exp $
+//  $Date: 2011-04-13 19:05:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v 1.4 2011-04-13 19:05:04 chulwoo Exp $
+//  $Id: d_op_mdwf.C,v 1.4 2011-04-13 19:05:04 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_mdwf.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v $
 //  $State: Exp $
 //
@@ -521,6 +521,14 @@ int DiracOpMdwf::MatInv(Vector *out,
   const char * fname = "MatInv()";
 
 #ifdef USE_MDWF
+
+//  printf("DiracOpMdwf::MatInv Profiled");
+  struct timeval start;
+  struct timeval end;
+  CGflops    = 0;
+  gettimeofday(&start,NULL);
+  double mdwf_time = -dclock();
+
   int n_iter;
   Float true_res_dummy;
   Float * true_res_ptr = (true_res != NULL) ? true_res : &true_res_dummy;
@@ -576,6 +584,9 @@ int DiracOpMdwf::MatInv(Vector *out,
     QOP_D3_MDWF_free_fermion(&fermion_ptr_out);
     QOP_D3_MDWF_free_fermion(&fermion_ptr_tmp);
   }
+
+  mdwf_time +=dclock();
+  print_time(cname,fname,mdwf_time);
     
   return n_iter;
 #else

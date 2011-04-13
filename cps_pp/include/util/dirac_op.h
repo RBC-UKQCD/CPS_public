@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.25 2011-03-28 16:01:11 chulwoo Exp $
+  $Id: dirac_op.h,v 1.26 2011-04-13 19:05:04 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -58,7 +58,7 @@ class DiracOp
   //!< lock that prevents more than one DiracOp object to be on scope at any time.
 
   // PAB... uniform performance counting
-  static unsigned long long CGflops; //!< Flops counter.
+  static IntFlopCounter CGflops; //!< Flops counter.
   static unsigned int CGcount;
 
   DiracOp(Lattice& latt,           // Lattice object.
@@ -157,6 +157,7 @@ class DiracOp
   virtual void DiracArg(CgArg *arg) = 0;
      // It sets the dirac_arg pointer to arg and initializes
      // the relevant parameters (kappa, m^2, ...).
+  virtual CgArg * const DiracArg() {return dirac_arg;}
 
   //! Multiplication by the square of the odd-even preconditioned fermion matrix.
   /*!

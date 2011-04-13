@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.5 2011-04-13 19:05:04 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-02-26 00:19:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.4 2011-02-26 00:19:27 chulwoo Exp $
+//  $Date: 2011-04-13 19:05:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v 1.5 2011-04-13 19:05:04 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.5 2011-04-13 19:05:04 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -347,7 +347,7 @@ int DiracOpDwf::MatInv(Vector *out,
   Vector *temp2;
   unsigned long long temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
 
-  printf("temp_size:%d\n",temp_size);
+//  printf("temp_size:%d\n",temp_size);
 //  printf("MatInv : %e %e\n",in->NormSqNode(temp_size),out->NormSqNode(temp_size));
 
 

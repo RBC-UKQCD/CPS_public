@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.35 2011-03-28 16:01:11 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.36 2011-04-13 19:05:04 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -296,13 +296,20 @@ int FdwfBase::FmatInv(Vector *f_out, Vector *f_in,
   char *fname = "FmatInv(CgArg*,V*,V*,F*,CnvFrmType)";
   VRB.Func(cname,fname);
 
+  double inv_time = -dclock();
+
+#ifdef USE_MDWF
   MdwfArg *_mdwf_arg_p = GJP.GetMdwfArg();
   if(_mdwf_arg_p != NULL){
     return FmatInvMobius(f_out, f_in, cg_arg, _mdwf_arg_p, true_res, cnv_frm, prs_f_in);
   }
+#endif
   
   DiracOpDwf dwf(*this, f_out, f_in, cg_arg, cnv_frm);
   iter = dwf.MatInv(true_res, prs_f_in);
+
+  inv_time += dclock();
+  print_time(cname,fname,inv_time);
 
   // Return the number of iterations
   return iter;

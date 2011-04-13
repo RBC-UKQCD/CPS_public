@@ -112,7 +112,7 @@ inline static void TOUCH(const double*a, int n)
 #define USE_MACROS
 
 
-#define PROFILE
+#undef PROFILE
 //#define PROF_printf(...)  printf(__VA_ARGS__);
 //#define PROF_printf(...)  if (!UniqueID()) printf(__VA_ARGS__);
 #define PROF_printf(...)  {}

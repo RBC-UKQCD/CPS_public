@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class methods.
   
-  $Id: dirac_op_base.C,v 1.11 2005-12-02 16:07:57 chulwoo Exp $
+  $Id: dirac_op_base.C,v 1.12 2011-04-13 19:05:04 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 16:07:57 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.11 2005-12-02 16:07:57 chulwoo Exp $
-//  $Id: dirac_op_base.C,v 1.11 2005-12-02 16:07:57 chulwoo Exp $
+//  $Date: 2011-04-13 19:05:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.12 2011-04-13 19:05:04 chulwoo Exp $
+//  $Id: dirac_op_base.C,v 1.12 2011-04-13 19:05:04 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v $
 //  $State: Exp $
 //
@@ -39,7 +39,7 @@ CPS_START_NAMESPACE
 // Initialize static variables
 //------------------------------------------------------------------
 int DiracOp::scope_lock = 0;
-unsigned long long DiracOp::CGflops = 0;
+IntFlopCounter DiracOp::CGflops = 0;
 unsigned int DiracOp::CGcount = 0;
 
 //------------------------------------------------------------------
