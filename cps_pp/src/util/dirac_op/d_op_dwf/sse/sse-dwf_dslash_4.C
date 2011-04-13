@@ -5,13 +5,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-02-26 00:19:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/sse/sse-dwf_dslash_4.C,v 1.2 2011-02-26 00:19:27 chulwoo Exp $
-//  $Id: sse-dwf_dslash_4.C,v 1.2 2011-02-26 00:19:27 chulwoo Exp $
+//  $Date: 2011-04-13 19:05:04 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/sse/sse-dwf_dslash_4.C,v 1.3 2011-04-13 19:05:04 chulwoo Exp $
+//  $Id: sse-dwf_dslash_4.C,v 1.3 2011-04-13 19:05:04 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: sse-dwf_dslash_4.C,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/sse/sse-dwf_dslash_4.C,v $
 //  $State: Exp $
 //
@@ -74,12 +74,12 @@ CPS_END_NAMESPACE
 //boundary communication on or not
 #define BND_COMM
 
-#define PROFILE
-//#undef PROFILE
+//#define PROFILE
+#undef PROFILE
 
 //#define PROF_printf(...)  printf(__VA_ARGS__);
-#define PROF_printf(...)  if (!UniqueID()) printf(__VA_ARGS__);
-//#define PROF_printf(...)  {}
+//#define PROF_printf(...)  if (!UniqueID()) printf(__VA_ARGS__);
+#define PROF_printf(...)  {}
 
 
 // The sizes of the block are assumed to be even numbers

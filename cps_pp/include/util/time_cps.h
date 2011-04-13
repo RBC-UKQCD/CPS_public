@@ -1,7 +1,7 @@
 /*!\file
   \brief Declaration of functions for timing and performance measurement.
 
-  $Id: time_cps.h,v 1.2 2008-02-08 18:38:26 chulwoo Exp $
+  $Id: time_cps.h,v 1.3 2011-04-13 19:05:04 chulwoo Exp $
 */
 
 #ifndef UTIL_TIME_H
@@ -17,6 +17,7 @@ CPS_START_NAMESPACE
 */
 
 //! Gets the wall-clock time.
+
 Float dclock(void);
 Float print_time(const char *cname, const char *fname, Float time);
 
