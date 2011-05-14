@@ -1,7 +1,7 @@
 /*!\file
   \brief Implementation of functions for timing and performance measurement.
 
-  $Id: time.C,v 1.12 2008-04-21 14:19:19 chulwoo Exp $
+  $Id: time.C,v 1.13 2011-05-14 06:12:35 chulwoo Exp $
 */
 
 #include <config.h>
@@ -63,7 +63,7 @@ Float print_flops(unsigned long long nflops, struct timeval *start, struct timev
   \param end The final result of calling \a gettimeofday  
   \return The FLOPS rate.
 */
-Float print_flops(char *cname, char *fname, unsigned long long nflops, struct timeval *start, struct timeval *end){
+Float print_flops(const char cname[], const char fname[], unsigned long long nflops, struct timeval *start, struct timeval *end){
     if(!UniqueID() && if_print)
 	printf("%s:%s: ",cname,fname);
 	return print_flops(nflops,start,end);
@@ -99,7 +99,7 @@ Float print_flops(unsigned long long nflops, Float time){
   \return The FLOPS rate.
 */
 
-Float print_flops(char *cname, char *fname, unsigned long long nflops, Float time){
+Float print_flops(const char cname[], const char fname[], unsigned long long nflops, Float time){
     if(!UniqueID() && if_print)
 	printf("Node 0: %s:%s: ",cname,fname);
     return print_flops(nflops,time);

@@ -32,6 +32,15 @@ AlgInt::~AlgInt()
 
 }
 
+// Calculate preliminary force for force gradient. This is just a trap
+// for all derived classes that don't implement force gradient
+// evolution.
+void AlgInt::prepare_fg(Matrix * force, Float dt_ratio)
+{
+  const char fname[] = "prepare_fg(M*,F)";
+  ERR.General(cname, fname, "Force gradient evolution not defined.\n");
+}
+
 /*
 AlgInt operator+(AlgInt &A, AlgInt &B) {
   Lattice &lat = AlgLattice();

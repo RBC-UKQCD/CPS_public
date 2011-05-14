@@ -50,7 +50,7 @@ AlgIntOmelyan44::~AlgIntOmelyan44() {
 
 void AlgIntOmelyan44::evolve(Float dt, int steps) 
 {
-
+  char * fname = "evolve(Float, int)";
   step_cnt = 0;
   if (level == TOP_LEVEL_INTEGRATOR) CSM.SaveComment(step_cnt);
 

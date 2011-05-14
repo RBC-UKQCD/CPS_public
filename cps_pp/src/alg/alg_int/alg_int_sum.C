@@ -39,9 +39,15 @@ AlgIntSum::~AlgIntSum() {
 
 }
 
+void AlgIntSum::prepare_fg(Matrix * force, Float dt_ratio)
+{
+  A -> prepare_fg(force, dt_ratio);
+  B -> prepare_fg(force, dt_ratio);
+}
+
 void AlgIntSum::evolve(Float dt, int steps) 
 {
-
+  char * fname = "evolve(Float, int)";
   step_cnt = 0;
   if (level == TOP_LEVEL_INTEGRATOR) CSM.SaveComment(step_cnt);
   for (int i=0; i<steps; i++) {

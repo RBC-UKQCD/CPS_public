@@ -74,7 +74,7 @@ AlgActionRational::AlgActionRational(AlgMomentum &mom,
 		   rat_arg->rationals.rationals_val);
 
     //!< Allocate memory for the fermion CG arguments.
-    generateCgArg(mass,&frm_cg_arg_md,&frm_cg_arg_mc,"frm_cg_arg",
+    generateCgArg(mass, &frm_cg_arg_fg, &frm_cg_arg_md, &frm_cg_arg_mc, "frm_cg_arg",
 		  rat_arg->rationals.rationals_val);
   
     max_size = 0;
@@ -187,7 +187,7 @@ AlgActionRational::~AlgActionRational() {
     sfree(frmn, "frmn", fname, cname);
 
     //!< Free memory for the fermion CG arguments
-    destroyCgArg(frm_cg_arg_md, frm_cg_arg_mc, "frm_cg_arg",
+    destroyCgArg(frm_cg_arg_fg, frm_cg_arg_md, frm_cg_arg_mc, "frm_cg_arg",
 		 remez_arg_md, remez_arg_mc);
 
     //!< Must not free these until CG args are freed.
@@ -286,89 +286,148 @@ void AlgActionRational::evolve(Float dt, int nsteps) {
   evolve(dt, nsteps, fractionSplit);
 }
 
+void AlgActionRational::prepare_fg(Matrix * force, Float dt_ratio)
+{
+  char * fname = "prepare_fg(M*,F)";
+  Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
+
+  //!< Variables required for ASQTAD partial fraction splitting
+  int total_split_degree = 0;
+  for (int i=0; i<n_masses; i++)
+    total_split_degree += fractionSplit[1][i] - fractionSplit[0][i];
+
+  int shift = 0;
+  int split_shift = 0;
+    
+  for(int i=0; i<n_masses; i++){
+	
+    int deg = fractionSplit[1][i] - fractionSplit[0][i];
+    int isz = fractionSplit[0][i];
+	
+    if (deg > 0) {
+      cg_iter = lat.FmatEvlMInv(frmn+shift+isz, phi[i], 
+                                remez_arg_md[i].pole+isz, deg, isz, 
+                                frm_cg_arg_fg[i]+isz, CNV_FRM_NO, 
+                                frmn_d+shift+isz);
+	  
+      updateCgStats(frm_cg_arg_fg[i][isz]);
+
+      if (force_measure == FORCE_MEASURE_YES ||
+          (fermion != F_CLASS_ASQTAD && fermion != F_CLASS_P4) ) {
+        Fdt = lat.RHMC_EvolveMomFforce(force, frmn+shift+isz, deg, isz,
+                                       remez_arg_md[i].residue+isz, 
+                                       mass[i], dt_ratio, frmn_d+shift+isz,
+                                       force_measure);
+
+        if (force_measure == FORCE_MEASURE_YES) {
+          char label[200];
+          sprintf(label, "%s total, mass = %e:", force_label, mass[i]);
+          Fdt.print(dt_ratio, label);
+        }
+      } else {
+        //!< Do appropriate pointer arithmetic for asqtad/p4
+        for (int j=0; j<deg; j++) {
+          all_res[split_shift+j] = remez_arg_md[i].residue[isz+j];
+          frmn_tmp[split_shift+j] = frmn[shift+isz+j];
+        }
+      }
+    }
+
+    if (fermion != F_CLASS_DWF) shift += remez_arg_md[i].degree;
+    split_shift += deg;
+  }
+
+  //!< Only for the case of asqtad/p4 fermions do we perform this optimisation
+  if ( (fermion == F_CLASS_ASQTAD || fermion == F_CLASS_P4) && 
+       total_split_degree > 0 && force_measure == FORCE_MEASURE_NO ) {
+    Fdt = lat.RHMC_EvolveMomFforce(force, frmn_tmp, total_split_degree, 0, all_res, 
+                                   0.0, dt_ratio, frmn_d, force_measure);
+    if (force_measure == FORCE_MEASURE_YES) {
+      char label[200];
+      sprintf(label, "%s total:", force_label);
+      Fdt.print(dt_ratio, label);
+    }
+  }
+  LatticeFactory::Destroy();
+}
+
 //!< run method evolves the integrator
 void AlgActionRational::evolve(Float dt, int nsteps, int **fractionSplit) 
 {
-
-  char *fname = "evolve(Float,int)";
-
-  if (n_masses > 0) {
-    Float trueMass;
+  char *fname = "evolve(Float, int, int **)";
+  if (n_masses <= 0) return;
+  Float trueMass;
     
-    //!< Variables required for ASQTAD partial fraction splitting
-    int total_split_degree = 0;
-    for (int i=0; i<n_masses; i++)
-      total_split_degree += fractionSplit[1][i] - fractionSplit[0][i];
+  //!< Variables required for ASQTAD partial fraction splitting
+  int total_split_degree = 0;
+  for (int i=0; i<n_masses; i++)
+    total_split_degree += fractionSplit[1][i] - fractionSplit[0][i];
 
-    //!< Create an appropriate lattice
-    Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
+  //!< Create an appropriate lattice
+  Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
     
-    for(int steps = 0; steps<nsteps; steps++) {
-      int shift = 0;
-      int split_shift = 0;
+  for(int steps = 0; steps<nsteps; steps++) {
+    int shift = 0;
+    int split_shift = 0;
     
-      for(int i=0; i<n_masses; i++){
+    for(int i=0; i<n_masses; i++){
 	
-	int deg = fractionSplit[1][i] - fractionSplit[0][i];
-	int isz = fractionSplit[0][i];
+      int deg = fractionSplit[1][i] - fractionSplit[0][i];
+      int isz = fractionSplit[0][i];
 	
-	if (deg > 0) {
+      if (deg > 0) {
 
-	  cg_iter = lat.FmatEvlMInv(frmn+shift+isz, phi[i], 
-				    remez_arg_md[i].pole+isz, deg, isz, 
-				    frm_cg_arg_md[i]+isz, CNV_FRM_NO, 
-				    frmn_d+shift+isz);
+        cg_iter = lat.FmatEvlMInv(frmn+shift+isz, phi[i], 
+                                  remez_arg_md[i].pole+isz, deg, isz, 
+                                  frm_cg_arg_md[i]+isz, CNV_FRM_NO, 
+                                  frmn_d+shift+isz);
 	  
-	  updateCgStats(frm_cg_arg_md[i][isz]);
+        updateCgStats(frm_cg_arg_md[i][isz]);
 
-	  if (force_measure == FORCE_MEASURE_YES ||
-	      (fermion != F_CLASS_ASQTAD && fermion != F_CLASS_P4) ) {
-	    Fdt = lat.RHMC_EvolveMomFforce(mom, frmn+shift+isz, deg, isz,
-					   remez_arg_md[i].residue+isz, 
-					   mass[i], dt, frmn_d+shift+isz,
-					   force_measure);
+        if (force_measure == FORCE_MEASURE_YES ||
+            (fermion != F_CLASS_ASQTAD && fermion != F_CLASS_P4) ) {
+          Fdt = lat.RHMC_EvolveMomFforce(mom, frmn+shift+isz, deg, isz,
+                                         remez_arg_md[i].residue+isz, 
+                                         mass[i], dt, frmn_d+shift+isz,
+                                         force_measure);
 
-	    if (force_measure == FORCE_MEASURE_YES) {
-	      char label[200];
-	      sprintf(label, "%s total, mass = %e:", force_label, mass[i]);
-	      Fdt.print(dt, label);
-	    }
-	  } else {
-	    //!< Do appropriate pointer arithmetic for asqtad/p4
-	    for (int j=0; j<deg; j++) {
-	      all_res[split_shift+j] = remez_arg_md[i].residue[isz+j];
-	      frmn_tmp[split_shift+j] = frmn[shift+isz+j];
-	    }
-	  }
-	}
-
-	if (fermion != F_CLASS_DWF) shift += remez_arg_md[i].degree;
-	split_shift += deg;
-      }
-      
-      //!< Only for the case of asqtad/p4 fermions do we perform this optimisation
-      if ( (fermion == F_CLASS_ASQTAD || fermion == F_CLASS_P4) && 
-	   total_split_degree > 0 && force_measure == FORCE_MEASURE_NO ) {
-	Fdt = lat.RHMC_EvolveMomFforce(mom, frmn_tmp, total_split_degree, 0, all_res, 
-				       0.0, dt, frmn_d, force_measure);
-	if (force_measure == FORCE_MEASURE_YES) {
-	  char label[200];
-	  sprintf(label, "%s total:", force_label);
-	  Fdt.print(dt, label);
-	}
+          if (force_measure == FORCE_MEASURE_YES) {
+            char label[200];
+            sprintf(label, "%s total, mass = %e:", force_label, mass[i]);
+            Fdt.print(dt, label);
+          }
+        } else {
+          //!< Do appropriate pointer arithmetic for asqtad/p4
+          for (int j=0; j<deg; j++) {
+            all_res[split_shift+j] = remez_arg_md[i].residue[isz+j];
+            frmn_tmp[split_shift+j] = frmn[shift+isz+j];
+          }
+        }
       }
 
-      
-      evolved = 1;
-      heatbathEval = 0;
-      energyEval = 0;
-      md_steps++;
+      if (fermion != F_CLASS_DWF) shift += remez_arg_md[i].degree;
+      split_shift += deg;
     }
-    
-    LatticeFactory::Destroy();
-
+      
+    //!< Only for the case of asqtad/p4 fermions do we perform this optimisation
+    if ( (fermion == F_CLASS_ASQTAD || fermion == F_CLASS_P4) && 
+         total_split_degree > 0 && force_measure == FORCE_MEASURE_NO ) {
+      Fdt = lat.RHMC_EvolveMomFforce(mom, frmn_tmp, total_split_degree, 0, all_res, 
+                                     0.0, dt, frmn_d, force_measure);
+      if (force_measure == FORCE_MEASURE_YES) {
+        char label[200];
+        sprintf(label, "%s total:", force_label);
+        Fdt.print(dt, label);
+      }
+    }
+      
+    evolved = 1;
+    heatbathEval = 0;
+    energyEval = 0;
+    md_steps++;
   }
-
+    
+  LatticeFactory::Destroy();
 }
 
 //!< Generate the optimal rational approximation for rational representation
@@ -531,15 +590,21 @@ int AlgActionRational::compareApprox(RemezArg &arg1, RemezArg &arg2) {
   
 }
 
-void AlgActionRational::generateCgArg(Float *mass, CgArg ****cg_arg_md, 
+void AlgActionRational::generateCgArg(Float *mass,
+                                      CgArg ****cg_arg_fg,
+                                      CgArg ****cg_arg_md, 
 				      CgArg ****cg_arg_mc, char *label, 
-				      RationalDescr *rat) 
+				      RationalDescr *rat)
 {
 
-  char *fname = "generateCgArg(F*,Cg***,Cg***,char*,RationalDescr*)";
+  char *fname = "generateCgArg(F*,Cg****,Cg***,Cg***,char*,RationalDescr*)";
+  char fg_label[100], fg_label_i[100], fg_label_ij[100];
   char md_label[100], md_label_i[100], md_label_ij[100];
   char mc_label[100], mc_label_i[100], mc_label_ij[100];
 
+  sprintf(fg_label, "%s_fg", label);
+  sprintf(fg_label_i, "%s_fg[i]", label);
+  sprintf(fg_label_ij, "%s_fg[i][j]", label);
   sprintf(md_label, "%s_md", label);
   sprintf(md_label_i, "%s_md[i]", label);
   sprintf(md_label_ij, "%s_md[i][j]", label);
@@ -547,11 +612,15 @@ void AlgActionRational::generateCgArg(Float *mass, CgArg ****cg_arg_md,
   sprintf(mc_label_i, "%s_mc[i]", label);
   sprintf(mc_label_ij, "%s_mc[i][j]", label);
 
+  (*cg_arg_fg) = (CgArg ***) smalloc(n_masses*sizeof(CgArg**),fg_label,fname,cname);
   (*cg_arg_md) = (CgArg ***) smalloc(n_masses*sizeof(CgArg**),md_label,fname,cname);
   (*cg_arg_mc) = (CgArg ***) smalloc(n_masses*sizeof(CgArg**),mc_label,fname,cname);
 				  
-  
+
   for(int i=0; i<n_masses; i++) {
+    (*cg_arg_fg)[i] = (CgArg**)smalloc(rat[i].md_approx.stop_rsd.stop_rsd_len*
+				       sizeof(CgArg*),fg_label_i,fname,cname);
+
     (*cg_arg_md)[i] = (CgArg**)smalloc(rat[i].md_approx.stop_rsd.stop_rsd_len*
 				       sizeof(CgArg*),md_label_i,fname,cname);
 				    
@@ -559,6 +628,14 @@ void AlgActionRational::generateCgArg(Float *mass, CgArg ****cg_arg_md,
 				       sizeof(CgArg*),mc_label_i,fname,cname);
 
     for (int j=0; j<rat[i].md_approx.stop_rsd.stop_rsd_len; j++) {
+      // currently force gradient step is using the same CG arg as the
+      // normal MD step, except that the stopping condition is different.
+      (*cg_arg_fg)[i][j] = (CgArg*)smalloc(sizeof(CgArg),fg_label_ij,fname,cname);
+      (*cg_arg_fg)[i][j]->mass = mass[i];
+      (*cg_arg_fg)[i][j]->max_num_iter = max_num_iter[i];
+      (*cg_arg_fg)[i][j]->stop_rsd = rat[i].stop_rsd_fg_mult *
+	rat[i].md_approx.stop_rsd.stop_rsd_val[j];
+
       (*cg_arg_md)[i][j] = (CgArg*)smalloc(sizeof(CgArg),md_label_ij,fname,cname);
       (*cg_arg_md)[i][j]->mass = mass[i];
       (*cg_arg_md)[i][j]->max_num_iter = max_num_iter[i];
@@ -575,16 +652,22 @@ void AlgActionRational::generateCgArg(Float *mass, CgArg ****cg_arg_md,
     }
 
   }
-  
 }
 
-void AlgActionRational::destroyCgArg(CgArg ***cg_arg_md, CgArg ***cg_arg_mc,
+void AlgActionRational::destroyCgArg(CgArg ***cg_arg_fg,
+                                     CgArg ***cg_arg_md,
+                                     CgArg ***cg_arg_mc,
 				     char *label, RemezArg *remez_arg_md,
 				     RemezArg *remez_arg_mc) {
 
-  char *fname = "destroyCgArg(Cg***,Cg***,char*,RemezArg*,RemezArg*)";
+  char *fname = "destroyCgArg(Cg***, Cg***,Cg***,char*,RemezArg*,RemezArg*)";
+  char fg_label[100], fg_label_i[100], fg_label_ij[100];
   char md_label[100], md_label_i[100], md_label_ij[100];
   char mc_label[100], mc_label_i[100], mc_label_ij[100];
+
+  sprintf(fg_label, "%s_fg", label);
+  sprintf(fg_label_i, "%s_fg[i]", label);
+  sprintf(fg_label_ij, "%s_fg[i][j]", label);
 
   sprintf(md_label, "%s_md", label);
   sprintf(md_label_i, "%s_md[i]", label);
@@ -599,14 +682,16 @@ void AlgActionRational::destroyCgArg(CgArg ***cg_arg_md, CgArg ***cg_arg_mc,
       sfree(cg_arg_mc[i][j], mc_label_ij, fname, cname);
     }
     for (int j=0; j<remez_arg_md[i].degree; j++) {
+      sfree(cg_arg_fg[i][j], fg_label_ij, fname, cname);
       sfree(cg_arg_md[i][j], md_label_ij, fname, cname);
     }
     sfree(cg_arg_mc[i], mc_label_i, fname, cname);
     sfree(cg_arg_md[i], md_label_i, fname, cname);
+    sfree(cg_arg_fg[i], fg_label_i, fname, cname);
   }
   sfree(cg_arg_mc, mc_label, fname, cname);
   sfree(cg_arg_md, md_label, fname, cname);
-
+  sfree(cg_arg_fg, fg_label, fname, cname);
 }
 
 void AlgActionRational::generateEigArg(EigenDescr eigen) {

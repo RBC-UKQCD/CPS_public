@@ -42,15 +42,19 @@ AlgActionFermion::AlgActionFermion(AlgMomentum &mom,
     //!< Allocate memory for the fermion CG arguments.
     frm_cg_arg_md = (CgArg **) smalloc(n_masses * sizeof(CgArg*), 
 				       "frm_cg_arg_md", fname, cname);
+    frm_cg_arg_fg = (CgArg **) smalloc(n_masses * sizeof(CgArg*), 
+                                       "frm_cg_arg_fg", fname, cname);
     frm_cg_arg_mc = (CgArg **) smalloc(n_masses * sizeof(CgArg*), 
 				       "frm_cg_arg_mc", fname, cname);
     
     for(int i=0; i<n_masses; i++){
       frm_cg_arg_md[i] = (CgArg *) 
 	smalloc(sizeof(CgArg), "frm_cg_arg_md[i]", fname, cname);
+      frm_cg_arg_fg[i] = (CgArg *) 
+	smalloc(sizeof(CgArg), "frm_cg_arg_fg[i]", fname, cname);
       frm_cg_arg_mc[i] = (CgArg *) 
 	smalloc(sizeof(CgArg), "frm_cg_arg_mc[i]", fname, cname);
-    } 
+    }
 
     //!< Initialize the fermion CG arguments
     for(int i=0; i<n_masses; i++){
@@ -59,6 +63,14 @@ AlgActionFermion::AlgActionFermion(AlgMomentum &mom,
       frm_cg_arg_md[i]->epsilon = frm_arg->fermions.fermions_val[i].epsilon;
       frm_cg_arg_md[i]->max_num_iter = max_num_iter[i];
       frm_cg_arg_md[i]->stop_rsd = frm_arg->fermions.fermions_val[i].stop_rsd_md;
+
+      frm_cg_arg_fg[i]->mass = mass[i];
+      //~~ added for twisted mass Wilson fermions
+      frm_cg_arg_fg[i]->epsilon = frm_arg->fermions.fermions_val[i].epsilon;
+      frm_cg_arg_fg[i]->max_num_iter = max_num_iter[i];
+      frm_cg_arg_fg[i]->stop_rsd = frm_arg->fermions.fermions_val[i].stop_rsd_md
+        *(frm_arg->fermions.fermions_val[i].stop_rsd_fg_mult);
+
       frm_cg_arg_mc[i]->mass = mass[i];
       //~~ added for twisted mass Wilson fermions
       frm_cg_arg_mc[i]->epsilon = frm_arg->fermions.fermions_val[i].epsilon;
@@ -104,6 +116,7 @@ AlgActionFermion::AlgActionFermion(AlgMomentum &mom,
 
   init();
 
+  fg_forecast = false;
 }
 
 void AlgActionFermion::init() {
@@ -143,9 +156,11 @@ AlgActionFermion::~AlgActionFermion() {
     for(int i=0; i<n_masses; i++) {
       sfree(frm_cg_arg_mc[i], "frm_cg_arg_mc[i]", fname,cname);
       sfree(frm_cg_arg_md[i], "frm_cg_arg_md[i]", fname,cname);
+      sfree(frm_cg_arg_fg[i], "frm_cg_arg_fg[i]", fname,cname);
     }
-    sfree(frm_cg_arg_mc, "frm_cg_arg_md", fname,cname);
-    sfree(frm_cg_arg_md, "frm_cg_arg_mc", fname,cname);
+    sfree(frm_cg_arg_mc, "frm_cg_arg_mc", fname,cname);
+    sfree(frm_cg_arg_md, "frm_cg_arg_md", fname,cname);
+    sfree(frm_cg_arg_fg, "frm_cg_arg_fg", fname,cname);
   }
 
 }
@@ -217,63 +232,114 @@ Float AlgActionFermion::energy() {
 
 }
 
-//!< run method evolves the momentum due to the fermion force
-void AlgActionFermion::evolve(Float dt, int nsteps) 
+
+void AlgActionFermion::prepare_fg(Matrix * force, Float dt_ratio)
 {
+  const char fname[] = "prepare_fg(M*,F)";
+  Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
 
-  char *fname = "run(Float,int)";
   int chronoDeg;
+  for(int i=0; i<n_masses; i++) {
+    chronoDeg = ( md_steps > chrono[i] ) ? chrono[i] : md_steps ;
 
-  if (n_masses > 0){
-    Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
-    
-    for (int steps=0; steps<nsteps; steps++) {
-      for(int i=0; i<n_masses; i++) {
-
-	if (md_steps > chrono[i]) chronoDeg = chrono[i];
-	else chronoDeg = md_steps;
+    //!< Perform pointer arithmetic to avoid unnecessary copying
+    int isz = ( chrono[i] > 0 ) ? ( md_steps % chrono[i] ) : 0 ;
+    cg_sol = v[i][isz];
 	
-	//!< Perform pointer arithmetic to avoid unnecessary copying
-	int isz=0;
-	if (chrono[i] > 0) isz = md_steps%chrono[i];
-	cg_sol = v[i][isz];
-	
-	for (int j=0; j<chrono[i]; j++) {
-	  int shift = isz - (j+1);
-	  if (shift<0) shift += chrono[i];
-	  cg_sol_old[i][j] = v[i][shift];
-	}
-
-	//!< Construct the initial guess
-	lat.FminResExt(cg_sol, phi[i], cg_sol_old[i], vm[i], 
-		       chronoDeg, frm_cg_arg_md[i], CNV_FRM_NO);
-
-	cg_iter = 
-	  lat.FmatEvlInv(cg_sol, phi[i], frm_cg_arg_md[i], CNV_FRM_NO);
-
-	updateCgStats(frm_cg_arg_md[i]);
-
-     //~~ changed for twisted mass Wilson fermions; also added DAG_YES parameter
-     Fdt = (lat.Fclass() == F_CLASS_WILSON_TM) ?
-			lat.EvolveMomFforce(mom, cg_sol, mass[i], frm_cg_arg_mc[i]->epsilon, dt) :
-   			lat.EvolveMomFforce(mom, cg_sol, mass[i], dt);
-
-	if (force_measure == FORCE_MEASURE_YES) {
-	  char label[200];
-	  sprintf(label, "%s, mass = %e:", force_label, mass[i]);
-	  Fdt.print(dt, label);
-	}
-
-      }
-
-      md_steps++;
+    for (int j=0; j<chrono[i]; j++) {
+      int shift = isz - (j+1);
+      if (shift<0) shift += chrono[i];
+      cg_sol_old[i][j] = v[i][shift];
     }
 
-    LatticeFactory::Destroy();
+    //!< Construct the initial guess
+    lat.FminResExt(cg_sol, phi[i], cg_sol_old[i], vm[i], chronoDeg, frm_cg_arg_fg[i], CNV_FRM_NO);
+    cg_iter = lat.FmatEvlInv(cg_sol, phi[i], frm_cg_arg_fg[i], CNV_FRM_NO);
 
-    evolved = 1;
+    updateCgStats(frm_cg_arg_fg[i]);
+
+    //~~ changed for twisted mass Wilson fermions; also added DAG_YES parameter
+    Fdt = (lat.Fclass() == F_CLASS_WILSON_TM) ?
+      lat.EvolveMomFforce(force, cg_sol, mass[i], frm_cg_arg_mc[i]->epsilon, dt_ratio) :
+      lat.EvolveMomFforce(force, cg_sol, mass[i], dt_ratio);
+
+    if (force_measure == FORCE_MEASURE_YES) {
+      char label[200];
+      sprintf(label, "%s, mass = %e:", force_label, mass[i]);
+      Fdt.print(dt_ratio, label);
+    }
+  }
+  // We now have a solution to forecast the next normal solve.
+  fg_forecast = true;
+  
+  md_steps++;
+  LatticeFactory::Destroy();
+}
+
+//!< run method evolves the momentum due to the fermion force
+void AlgActionFermion::evolve(Float dt, int nsteps)
+{
+  char *fname = "evolve(Float, int)";
+  
+  int chronoDeg;
+  if (n_masses <= 0) return;
+  Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
+
+  for (int steps=0; steps<nsteps; steps++) {
+    for(int i=0; i<n_masses; i++) {
+
+      chronoDeg = ( md_steps > chrono[i] ) ? chrono[i] : md_steps ;
+
+      //!< Perform pointer arithmetic to avoid unnecessary copying
+      int isz = ( chrono[i] > 0 ) ? ( md_steps % chrono[i] ) : 0 ;
+      cg_sol = v[i][isz];
+	
+      for (int j=0; j<chrono[i]; j++) {
+        int shift = isz - (j+1);
+        if (shift<0) shift += chrono[i];
+        cg_sol_old[i][j] = v[i][shift];
+      }
+
+      //!< Construct the initial guess
+      //
+      // Branch condition added by Hantao: only if we are NOT using
+      // chronological inverter as well as we have a previous
+      // fg-solution in hand, we skip the function FminResExt().
+      //
+      // If chronoDeg == 0 and we don't have a fg forecast, we still
+      // want this function to zero the initial guess for us.
+      if (fg_forecast == false || chronoDeg != 0) {
+        lat.FminResExt(cg_sol, phi[i], cg_sol_old[i], vm[i], chronoDeg, frm_cg_arg_md[i], CNV_FRM_NO);
+      }else{
+        VRB.Result(cname, fname, "Using force gradient forecasting.\n");
+      }
+      cg_iter = lat.FmatEvlInv(cg_sol, phi[i], frm_cg_arg_md[i], CNV_FRM_NO);
+
+      updateCgStats(frm_cg_arg_md[i]);
+
+      //~~ changed for twisted mass Wilson fermions; also added DAG_YES parameter
+      Fdt = (lat.Fclass() == F_CLASS_WILSON_TM) ?
+        lat.EvolveMomFforce(mom, cg_sol, mass[i], frm_cg_arg_mc[i]->epsilon, dt) :
+        lat.EvolveMomFforce(mom, cg_sol, mass[i], dt);
+
+      if (force_measure == FORCE_MEASURE_YES) {
+        char label[200];
+        sprintf(label, "%s, mass = %e:", force_label, mass[i]);
+        Fdt.print(dt, label);
+      }
+
+    }
+    // Note that as long as the last solve in a trajectory is NOT a
+    // force gradient solve (which should always be the case), we
+    // won't bring our solution across trajectories by using the
+    // statement here.
+    fg_forecast = false;
+
+    md_steps++;
   }
 
+  LatticeFactory::Destroy();
+  evolved = 1;
 }
 
 CPS_END_NAMESPACE

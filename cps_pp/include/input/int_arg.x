@@ -58,6 +58,9 @@ class RationalDescr {
   int power_den;
   //! The precision used in the Remez algorithm of the RHMC approximation.
   long precision;
+  //! The multiplier we used for additional CG inversion in force
+  //! gradient integrator.
+  Float stop_rsd_fg_mult;
   ApproxDescr md_approx;
   ApproxDescr mc_approx;
   //! The boson mass parameter used for Hasenbusch trick (staggered only)
@@ -124,6 +127,9 @@ class FermionDescr {
   //! ~~epsilon parameter for twisted mass wilson fermions
   Float epsilon;
   int   chrono;
+  //! The multiplier we used for additional CG inversion in force
+  //! gradient integrator.
+  Float stop_rsd_fg_mult;
   Float stop_rsd_md;
   Float stop_rsd_mc;
 } ;
@@ -148,6 +154,9 @@ class QuotientDescr {
   Float frm_mass_epsilon;
   int   chrono;
   Float stop_rsd_hb;
+  //! The multiplier we used for additional CG inversion in force
+  //! gradient integrator.
+  Float stop_rsd_fg_mult;
   Float stop_rsd_md;
   Float stop_rsd_mc;
 } ;
@@ -193,4 +202,3 @@ class ActionGaugeArg {
   ActionArg action_arg;
 
 };
-

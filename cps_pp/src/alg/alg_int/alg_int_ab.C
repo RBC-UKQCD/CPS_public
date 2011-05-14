@@ -86,8 +86,12 @@ AlgIntAB& AlgIntAB::Create(AlgInt &A, AlgInt &B, IntABArg &ab_arg) {
   } else if (ab_arg.type == INT_SUM) {
     AlgIntSum *sum = new AlgIntSum(A, B, ab_arg);
     return *sum;
+  } else if (ab_arg.type == INT_FORCE_GRAD_QPQPQ || 
+	     ab_arg.type == INT_FORCE_GRAD_PQPQP) {
+    AlgIntForceGrad *fg = new AlgIntForceGrad(A, B, ab_arg);
+    return *fg;
   } else {
-    ERR.General("AlgIntFactory","CreateAB()","Integrator type not defined\n");
+    ERR.General("AlgIntFactory","CreateAB()","Integrator type not defined.\n");
   }
 }
 
