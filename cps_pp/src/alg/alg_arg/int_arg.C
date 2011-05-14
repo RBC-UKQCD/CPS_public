@@ -202,6 +202,8 @@ vml_RationalDescr (VML *vmls, char *name,RationalDescr *objp)
 		 return FALSE;
 	 if (!vml_long (vmls, "precision", &objp->precision))
 		 return FALSE;
+	 if (!vml_Float (vmls, "stop_rsd_fg_mult", &objp->stop_rsd_fg_mult))
+		 return FALSE;
 	 if (!vml_ApproxDescr (vmls, "md_approx", &objp->md_approx))
 		 return FALSE;
 	 if (!vml_ApproxDescr (vmls, "mc_approx", &objp->mc_approx))
@@ -431,6 +433,8 @@ vml_FermionDescr (VML *vmls, char *name,FermionDescr *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "chrono", &objp->chrono))
 		 return FALSE;
+	 if (!vml_Float (vmls, "stop_rsd_fg_mult", &objp->stop_rsd_fg_mult))
+		 return FALSE;
 	 if (!vml_Float (vmls, "stop_rsd_md", &objp->stop_rsd_md))
 		 return FALSE;
 	 if (!vml_Float (vmls, "stop_rsd_mc", &objp->stop_rsd_mc))
@@ -503,6 +507,8 @@ vml_QuotientDescr (VML *vmls, char *name,QuotientDescr *objp)
 	 if (!vml_int (vmls, "chrono", &objp->chrono))
 		 return FALSE;
 	 if (!vml_Float (vmls, "stop_rsd_hb", &objp->stop_rsd_hb))
+		 return FALSE;
+	 if (!vml_Float (vmls, "stop_rsd_fg_mult", &objp->stop_rsd_fg_mult))
 		 return FALSE;
 	 if (!vml_Float (vmls, "stop_rsd_md", &objp->stop_rsd_md))
 		 return FALSE;

@@ -124,33 +124,51 @@ Float AlgActionBoson::energy() {
 
 }
 
+void AlgActionBoson::prepare_fg(Matrix * force, Float dt_ratio)
+{
+  const char fname[] = "prepare_fg(M*,F)";
+  Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
+
+  for (int i = 0; i<n_masses; i++) {
+    //!< Need to include this hack for stag force to be correct;
+    //!< implemented in F_none.C
+    lat.BforceVector(phi[i], bsn_cg_arg[i]);
+    // ~~changed for twisted mass Wilson fermions
+    Fdt = lat.EvolveMomFforce(force, phi[i], bsn_cg_arg[i]->mass, bsn_cg_arg[i]->epsilon, -dt_ratio);
+        
+    if (force_measure == FORCE_MEASURE_YES) {
+      char label[200];
+      sprintf(label, "%s, mass = %e:", force_label, mass[i]);
+      Fdt.print(dt_ratio, label);
+    }
+  }
+  LatticeFactory::Destroy();
+}
+
 //!< run method evolves the momentum due to the boson force
 void AlgActionBoson::evolve(Float dt, int nsteps) 
 {
-
-  char *fname = "run(Float,int)";
-
-  if (n_masses > 0){
-    Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
+  char *fname = "evolve(Float, int)";
+  if (n_masses <= 0) return;
+  Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
     
-    for (int steps=0; steps<nsteps; steps++) 
-      for (int i = 0; i<n_masses; i++) {
-	//!< Need to include this hack for stag force to be correct;
-	//!< implemented in F_none.C
-	lat.BforceVector(phi[i], bsn_cg_arg[i]);
+  for (int steps=0; steps<nsteps; steps++){
+    for (int i = 0; i<n_masses; i++) {
+      //!< Need to include this hack for stag force to be correct;
+      //!< implemented in F_none.C
+      lat.BforceVector(phi[i], bsn_cg_arg[i]);
       // ~~changed for twisted mass Wilson fermions
-	Fdt = lat.EvolveMomFforce(mom, phi[i], bsn_cg_arg[i]->mass, bsn_cg_arg[i]->epsilon, -dt);
+      Fdt = lat.EvolveMomFforce(mom, phi[i], bsn_cg_arg[i]->mass, bsn_cg_arg[i]->epsilon, -dt);
 
-	if (force_measure == FORCE_MEASURE_YES) {
-	  char label[200];
-	  sprintf(label, "%s, mass = %e:", force_label, mass[i]);
-	  Fdt.print(dt, label);
-	}
+      if (force_measure == FORCE_MEASURE_YES) {
+        char label[200];
+        sprintf(label, "%s, mass = %e:", force_label, mass[i]);
+        Fdt.print(dt, label);
       }
-    
-    LatticeFactory::Destroy();
+    }
   }
-
+  
+  LatticeFactory::Destroy();
 }
 
 CPS_END_NAMESPACE

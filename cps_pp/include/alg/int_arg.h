@@ -88,6 +88,7 @@ public:
 	int power_num;
 	int power_den;
 	long precision;
+	Float stop_rsd_fg_mult;
 	ApproxDescr md_approx;
 	ApproxDescr mc_approx;
 	Float stag_bsn_mass;
@@ -179,6 +180,7 @@ public:
 	 bool Vml(VML *vmls,char *instance);
 	Float epsilon;
 	int chrono;
+	Float stop_rsd_fg_mult;
 	Float stop_rsd_md;
 	Float stop_rsd_mc;
 };
@@ -209,6 +211,7 @@ public:
 	Float frm_mass_epsilon;
 	int chrono;
 	Float stop_rsd_hb;
+	Float stop_rsd_fg_mult;
 	Float stop_rsd_md;
 	Float stop_rsd_mc;
 };

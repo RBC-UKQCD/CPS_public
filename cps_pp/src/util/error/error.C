@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file 
   \brief   Definition of Error class methods.
 
-  $Id: error.C,v 1.12 2006-11-25 19:10:21 chulwoo Exp $
+  $Id: error.C,v 1.13 2011-05-14 06:12:35 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-11-25 19:10:21 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.12 2006-11-25 19:10:21 chulwoo Exp $
-//  $Id: error.C,v 1.12 2006-11-25 19:10:21 chulwoo Exp $
+//  $Date: 2011-05-14 06:12:35 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.13 2011-05-14 06:12:35 chulwoo Exp $
+//  $Id: error.C,v 1.13 2011-05-14 06:12:35 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: error.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v $
 //  $State: Exp $
 //
@@ -61,7 +61,7 @@ Error::Error() {
     error_string[file_r] = "Error in %s::%s :\n\tcan not open file %s to read.\n";
     error_string[file_w] = "Error in %s::%s :\n\tcan not open file %s to write.\n";
     error_string[file_a] = "Error in %s::%s :\n\tcan not open file %s to append.\n";
-    error_string[not_implemented] = "Error in %s::%s :\n\tnot implemented.\n\t";
+    error_string[not_implemented] = "Error in %s::%s :\n\tnot implemented.\n";
     error_string[hardware] = "Hardware error in %s::%s :\n\t";
     error_string[general] = "Error in %s::%s : ";
  

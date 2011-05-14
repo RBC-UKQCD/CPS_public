@@ -1,7 +1,7 @@
 /*!\file
   \brief Declaration of functions for timing and performance measurement.
 
-  $Id: time_cps.h,v 1.3 2011-04-13 19:05:04 chulwoo Exp $
+  $Id: time_cps.h,v 1.4 2011-05-14 06:12:35 chulwoo Exp $
 */
 
 #ifndef UTIL_TIME_H
@@ -24,11 +24,11 @@ Float print_time(const char *cname, const char *fname, Float time);
 //! Prints the FLOPS rate to stdout
 Float print_flops(unsigned long long nflops, Float time);
 //! Prints the FLOPS rate to stdout
-Float print_flops(char *cname, char *fname,unsigned long long nflops, Float time);
+Float print_flops(const char cname[], const char fname[],unsigned long long nflops, Float time);
 //! Prints the FLOPS rate to stdout
 Float print_flops(unsigned long long nflops, struct timeval *start, struct timeval *end);
 //! Prints the FLOPS rate to stdout
-Float print_flops(char *cname, char *fname, unsigned long long nflops, struct timeval *start, struct timeval *end);
+Float print_flops(const char cname[], const char fname[], unsigned long long nflops, struct timeval *start, struct timeval *end);
 
 /*! @} */
 

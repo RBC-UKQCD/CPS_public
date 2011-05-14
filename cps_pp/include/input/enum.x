@@ -7,19 +7,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.21 2011-03-24 15:44:45 chulwoo Exp $
+  $Id: enum.x,v 1.22 2011-05-14 06:12:35 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2011-03-24 15:44:45 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.21 2011-03-24 15:44:45 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.21 2011-03-24 15:44:45 chulwoo Exp $*/
+/*  $Date: 2011-05-14 06:12:35 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.22 2011-05-14 06:12:35 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.22 2011-05-14 06:12:35 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.21 $*/
+/*  $Revision: 1.22 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -716,6 +716,10 @@ enum IntegratorType {
   INT_CAMPOSTRINI,
   INT_OMELYAN_44,
   INT_OMELYAN_45,
+  INT_FORCE_GRAD_PQPQP,
+  INT_FORCE_GRAD_QPQPQ,
+  INT_FORCE_GRAD_QPQPQPQ,
+  INT_FORCE_GRAD_PQPQPQPQP,
   INT_SUM,
   INT_MOM,
   INT_GAUGE,

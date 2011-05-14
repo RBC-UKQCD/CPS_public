@@ -45,7 +45,7 @@ AlgIntCampostrini::~AlgIntCampostrini() {
 
 void AlgIntCampostrini::evolve(Float dt, int steps) 
 {
-
+  char * fname = "evolve(Float, int)";
   epsilon = dt/(2.0 - sigma);
 
   step_cnt = 0;

@@ -52,14 +52,25 @@ Float AlgActionGauge::energy() {
 
 }
 
+void AlgActionGauge::prepare_fg(Matrix * force, Float dt_ratio)
+{
+  const char fname[] = "prepare_fg(M*,F)";
+  Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, gluon);
+  Fdt = lat.EvolveMomGforce(force, dt_ratio);
+  if (force_measure == FORCE_MEASURE_YES) {
+    char label[200];
+    sprintf(label, "%s:", force_label);
+    Fdt.print(dt_ratio, label);
+  }
+  LatticeFactory::Destroy();
+}
+
 //!< evolve method evolves the momentum due to the gauge force
 void AlgActionGauge::evolve(Float dt, int steps) 
 {
-
-  char *fname = "evolve(Float,int)";
+  char *fname = "evolve(Float, int)";
   //!< Create an appropriate lattice
-  Lattice &lat = 
-    LatticeFactory::Create(F_CLASS_NONE, gluon);
+  Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, gluon);
 
   for (int i=0; i<steps; i++) {
     Fdt = lat.EvolveMomGforce(mom, dt);
@@ -72,7 +83,6 @@ void AlgActionGauge::evolve(Float dt, int steps)
   }
 
   LatticeFactory::Destroy();
-
 }
 
 //!< Dummy methods

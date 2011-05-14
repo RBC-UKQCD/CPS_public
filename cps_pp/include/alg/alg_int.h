@@ -46,6 +46,8 @@ class AlgInt {
   //!< method to do heatbath (if necessary)
   virtual void heatbath() = 0;
 
+  // Calculate preliminary force for force gradient
+  virtual void prepare_fg(Matrix * force, Float dt_ratio);
   //!< run method evolves the integrator
   virtual void evolve (Float dt, int steps) = 0;
 
@@ -119,7 +121,6 @@ public:
 
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
-  
 };
 
 /*!< 
@@ -138,7 +139,6 @@ public:
 
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
-  
 };
 
 /*!< 
@@ -158,7 +158,6 @@ public:
 
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
-  
 };
 
 /*!< 
@@ -179,7 +178,6 @@ public:
 
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
-  
 };
 
 /*!< 
@@ -201,7 +199,30 @@ public:
 
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
-  
+};
+
+/*!< 
+  A fourth order force gradient integrator.  
+*/
+class AlgIntForceGrad : public AlgIntAB {
+
+private:
+  char *cname;
+  Float lambda;
+  Float xi;
+  Float theta;
+  Float chi;
+  int g_size;
+
+protected:
+  void evolve_fg(AlgInt * which_int, Float fg_dt, Float dt);
+
+public:
+  AlgIntForceGrad(AlgInt &A, AlgInt &B, IntABArg &);
+  virtual ~AlgIntForceGrad();
+
+  //!< evolve method evolves the integrator
+  void evolve(Float dt, int steps);
 };
 
 /*!< 
@@ -218,9 +239,10 @@ public:
   AlgIntSum(AlgInt &A, AlgInt &B, IntABArg &);
   virtual ~AlgIntSum();
 
+  // Calculate preliminary force for force gradient
+  virtual void prepare_fg(Matrix * force, Float dt_ratio);
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
-
 };
 
 /*!< 
@@ -379,6 +401,9 @@ class AlgActionRational : public AlgActionBilinear {
   ActionRationalArg *rat_arg;
 
   //!< This is where the rational parameters are stored
+  
+  // currently force gradient calculation is using the same poles as
+  // used by the usual MD step.
   RemezArg *remez_arg_md;
   RemezArg *remez_arg_mc;
 
@@ -395,6 +420,8 @@ class AlgActionRational : public AlgActionBilinear {
 
   Float h_init;
 
+  //!<  frm_cg_arg_fg is specific to force gradient integrator and has no use otherwise.
+  CgArg ***frm_cg_arg_fg;
   CgArg ***frm_cg_arg_md;
   CgArg ***frm_cg_arg_mc;
   //!< Pointer to an array of structures containing solver parameters.
@@ -445,12 +472,16 @@ class AlgActionRational : public AlgActionBilinear {
   void destroyApprox(RemezArg *remez_arg_md, RemezArg *remez_arg_mc);
   
   //!< Allocate and setup cg arguments
-  void generateCgArg(Float *mass, CgArg ****cg_arg_md, 
-		     CgArg ****cg_arg_mc, char *label, 
+  void generateCgArg(Float *mass,
+                     CgArg **** cg_arg_fg,
+                     CgArg **** cg_arg_md, 
+		     CgArg **** cg_arg_mc, char *label, 
 		     RationalDescr *rat_des);
 
   //<! Free cg args
-  void destroyCgArg(CgArg ***cg_arg_md, CgArg ***cg_arg_mc,
+  void destroyCgArg(CgArg ***cg_arg_fg,
+                    CgArg ***cg_arg_md,
+                    CgArg ***cg_arg_mc,
 		    char *label, RemezArg *remez_arg_md,
 		    RemezArg *remez_arg_mc);
 
@@ -473,6 +504,8 @@ class AlgActionRational : public AlgActionBilinear {
   void heatbath();
   Float energy();
 
+  // Calculate preliminary force for force gradient
+  virtual void prepare_fg(Matrix * force, Float dt_ratio);
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
   //!< evolve method relevant to split timescales
@@ -511,6 +544,8 @@ class AlgActionRationalSplit : public AlgActionRational {
   void heatbath();
   Float energy();
 
+  // Calculate preliminary force for force gradient
+  void prepare_fg(Matrix * force, Float dt_ratio);
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
   
@@ -542,9 +577,11 @@ class AlgActionBoson : public AlgActionBilinear {
 
   Float energy();
 
+  // Calculate preliminary force for force gradient
+  virtual void prepare_fg(Matrix * force, Float dt_ratio);
+
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
-
 };
 
 /*!< 
@@ -563,6 +600,7 @@ class AlgActionFermion : public AlgActionBilinear {
   ActionFermionArg *frm_arg;
 
   CgArg **frm_cg_arg_md;   //!< Pointer to an array of solver parameters.
+  CgArg **frm_cg_arg_fg;   //!< Pointer to an array of solver parameters for force gradient step
   CgArg **frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
 
   int evolved;
@@ -580,6 +618,10 @@ class AlgActionFermion : public AlgActionBilinear {
 
   int *chrono;
 
+  // !< Status variable controls if we can use the CG solution from a
+  // !< previous force gradient solve to forecast the next normal solve.
+  bool fg_forecast;
+
  public:
 
   AlgActionFermion(AlgMomentum &mom, ActionFermionArg &frm_arg);
@@ -589,6 +631,8 @@ class AlgActionFermion : public AlgActionBilinear {
 
   Float energy();
 
+  // Calculate preliminary force for force gradient
+  virtual void prepare_fg(Matrix * force, Float dt_ratio);
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
 
@@ -613,6 +657,10 @@ class AlgActionQuotient : public AlgActionBilinear {
   ActionQuotientArg *quo_arg;
 
   CgArg **bsn_cg_arg;   //!< Pointer to an array of solver parameters.
+
+  //!< Pointer to an array of solver parameters, for force gradient
+  //!< step, irrevelant if using other integrators.
+  CgArg **frm_cg_arg_fg;
   CgArg **frm_cg_arg_md;   //!< Pointer to an array of solver parameters.
   CgArg **frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
 
@@ -640,6 +688,9 @@ class AlgActionQuotient : public AlgActionBilinear {
 
   int *chrono;
 
+  // !< Status variable controls if we can use the CG solution from a
+  // !< previous force gradient solve to forecast the next normal solve.
+  bool fg_forecast;
  public:
 
   AlgActionQuotient(AlgMomentum &mom, ActionQuotientArg &frm_arg);
@@ -650,6 +701,8 @@ class AlgActionQuotient : public AlgActionBilinear {
 
   Float energy();
 
+  // Calculate preliminary force for force gradient
+  virtual void prepare_fg(Matrix * force, Float dt_ratio);
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
 
@@ -683,6 +736,8 @@ class AlgActionRationalQuotient : public AlgActionRational {
   RemezArg *bsn_remez_arg_md;
   RemezArg *bsn_remez_arg_mc;
 
+  //!<  bsn_cg_arg_fg is specific to force gradient integrator and has no use otherwise.
+  CgArg ***bsn_cg_arg_fg;
   CgArg ***bsn_cg_arg_md;
   CgArg ***bsn_cg_arg_mc;
   //!< Pointer to an array of structures containing solver parameters.
@@ -704,11 +759,12 @@ class AlgActionRationalQuotient : public AlgActionRational {
   void heatbath();
   Float energy();
 
+  // Calculate preliminary force for force gradient
+  virtual void prepare_fg(Matrix * force, Float dt_ratio);
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
   //!< evolve method relevant to split timescales
   void evolve(Float dt, int steps, int **fractionSplit);
-
 };
 
 /*!< 
@@ -731,6 +787,8 @@ class AlgActionGauge : public AlgAction {
 
   Float energy();
 
+  //!< preparation for force gradient evolution
+  virtual void prepare_fg(Matrix * force, Float dt_ratio);
   //!< evolve method evolves the integrator
   void evolve(Float dt, int steps);
 

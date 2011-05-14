@@ -91,6 +91,15 @@ void AlgActionRationalSplit::cost(CgStats *cg_stats_global) {
   rat->cost(cg_stats_global);
 }
 
+void AlgActionRationalSplit::prepare_fg(Matrix * force, Float dt_ratio)
+{
+  const char fname[] = "prepare_fg(M*,F)";
+  ERR.General(cname, fname, "Force gradient evolution has not been implemented for\n"
+              "this class yet. You may delete this stub(the whole prepare_fg() function)\n"
+              "and recompile. Then it will use the inherited verion. Hopefully that will\n"
+              "work, but no test has been made yet.\n");
+}
+
 void AlgActionRationalSplit::evolve(Float dt, int steps) {
   rat->evolve(dt, steps, fractionSplit);
 }
