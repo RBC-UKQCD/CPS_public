@@ -85,7 +85,141 @@ vml_MdwfArg (VML *vmls, char *name,MdwfArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "use_single_precision", &objp->use_single_precision))
 		 return FALSE;
+	 if (!vml_int (vmls, "use_mdwf_for_dwf", &objp->use_mdwf_for_dwf))
+		 return FALSE;
 	 vml_class_end(vmls,"MdwfArg",name);
+	return TRUE;
+}
+	 bool C5State::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool C5State::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool C5State::Vml(VML *vmls,char *instance){
+		 if(!vml_C5State(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_C5State (VML *vmls, char *name,C5State *objp)
+{
+	 vml_class_begin(vmls,"C5State",name);
+	 if (!vml_Float (vmls, "val", &objp->val))
+		 return FALSE;
+	 if (!vml_int (vmls, "dwf_cg", &objp->dwf_cg))
+		 return FALSE;
+	 vml_class_end(vmls,"C5State",name);
+	return TRUE;
+}
+	 bool MdwfTuning::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool MdwfTuning::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool MdwfTuning::Vml(VML *vmls,char *instance){
+		 if(!vml_MdwfTuning(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_MdwfTuning (VML *vmls, char *name,MdwfTuning *objp)
+{
+	 vml_class_begin(vmls,"MdwfTuning",name);
+	 if (!vml_int (vmls, "stage", &objp->stage))
+		 return FALSE;
+	 if (!vml_int (vmls, "ls_min", &objp->ls_min))
+		 return FALSE;
+	 if (!vml_int (vmls, "ls_max", &objp->ls_max))
+		 return FALSE;
+	 if (!vml_int (vmls, "index", &objp->index))
+		 return FALSE;
+	 if (!vml_int (vmls, "opti_index", &objp->opti_index))
+		 return FALSE;
+	 if (!vml_Float (vmls, "opti_time", &objp->opti_time))
+		 return FALSE;
+	 if (!vml_array (vmls, "mdwf_arg", (char **)&objp->mdwf_arg.mdwf_arg_val, (u_int *) &objp->mdwf_arg.mdwf_arg_len, ~0,
+		sizeof (MdwfArg), (vmlproc_t) vml_MdwfArg))
+		 return FALSE;
+	 if (!vml_array (vmls, "c5", (char **)&objp->c5.c5_val, (u_int *) &objp->c5.c5_len, ~0,
+		sizeof (C5State), (vmlproc_t) vml_C5State))
+		 return FALSE;
+	 if (!vml_Float (vmls, "rsd_val", &objp->rsd_val))
+		 return FALSE;
+	 if (!vml_Float (vmls, "rsd_time", &objp->rsd_time))
+		 return FALSE;
+	 if (!vml_Float (vmls, "rsd_granularity", &objp->rsd_granularity))
+		 return FALSE;
+	 if (!vml_Float (vmls, "c5_range", &objp->c5_range))
+		 return FALSE;
+	 if (!vml_int (vmls, "rc_max", &objp->rc_max))
+		 return FALSE;
+	 if (!vml_int (vmls, "rc_val", &objp->rc_val))
+		 return FALSE;
+	 if (!vml_Float (vmls, "rc_time", &objp->rc_time))
+		 return FALSE;
+	 vml_class_end(vmls,"MdwfTuning",name);
+	return TRUE;
+}
+	 bool MdwfTuningInitArg::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool MdwfTuningInitArg::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool MdwfTuningInitArg::Vml(VML *vmls,char *instance){
+		 if(!vml_MdwfTuningInitArg(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_MdwfTuningInitArg (VML *vmls, char *name,MdwfTuningInitArg *objp)
+{
+	 vml_class_begin(vmls,"MdwfTuningInitArg",name);
+	 if (!vml_int (vmls, "ls_min", &objp->ls_min))
+		 return FALSE;
+	 if (!vml_int (vmls, "ls_max", &objp->ls_max))
+		 return FALSE;
+	 if (!vml_int (vmls, "rc_max", &objp->rc_max))
+		 return FALSE;
+	 if (!vml_int (vmls, "use_mdwf_for_dwf", &objp->use_mdwf_for_dwf))
+		 return FALSE;
+	 if (!vml_int (vmls, "use_single_precision", &objp->use_single_precision))
+		 return FALSE;
+	 if (!vml_Float (vmls, "c5_range", &objp->c5_range))
+		 return FALSE;
+	 if (!vml_Float (vmls, "rsd_granularity", &objp->rsd_granularity))
+		 return FALSE;
+	 if (!vml_string (vmls, "tuning_fn", &objp->tuning_fn, ~0))
+		 return FALSE;
+	 if (!vml_string (vmls, "tuning_record_fn", &objp->tuning_record_fn, ~0))
+		 return FALSE;
+	 vml_class_end(vmls,"MdwfTuningInitArg",name);
 	return TRUE;
 }
 CPS_END_NAMESPACE

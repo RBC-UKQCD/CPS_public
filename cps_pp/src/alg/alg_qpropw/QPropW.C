@@ -259,11 +259,18 @@ void QPropW::Run(const int do_rerun, const Float precision) {
 
    // does prop exist? Assume it does not.
    int do_cg = 1;
+   int StartSpin = 0;
+   int EndSpin = 4;
+   int StartColor = 0;
+   int EndColor = 3;
 
-   int StartSpin = qp_arg.StartSrcSpin;
-   int EndSpin = qp_arg.EndSrcSpin;
-   int StartColor = qp_arg.StartSrcColor;
-   int EndColor = qp_arg.EndSrcColor;
+   if(qp_arg.save_prop==2){
+	StartSpin = qp_arg.StartSrcSpin;
+	EndSpin = qp_arg.EndSrcSpin;
+	StartColor = qp_arg.StartSrcColor;
+	EndColor = qp_arg.EndSrcColor;
+   }
+
 
    /****************************************************************
      The code below is temporarily isolated for purposes of merging
@@ -724,26 +731,51 @@ void QPropW::Run(const int do_rerun, const Float precision) {
 void QPropW::ReLoad( char *infile){
 
   char *fname = "ReLoad( char *)";
-
   int float_size = sizeof(WilsonMatrix)*GJP.VolNodeSites()/sizeof(Float);
 
+  if (!prop) Allocate(0); // Allocate only if needed
 
-  if (prop == NULL) { // Allocate only if needed
-    prop = (WilsonMatrix*)smalloc(GJP.VolNodeSites()*sizeof(WilsonMatrix));
-    if (prop == 0) ERR.Pointer(cname, fname, "prop");
-    VRB.Smalloc(cname, fname, "prop", prop,
-		GJP.VolNodeSites() * sizeof(WilsonMatrix));
+  int sc_part_file_exist; // if the propagator file of source with spin/color divided exists or not
+  {    
+    char file[256];
+    sprintf(file,"%ss%dc%d",infile,3,2);
+    if(FILE* ftmp=Fopen(file,"r")) {
+      sc_part_file_exist =1;
+      VRB.Result(cname,fname, "propagator file with  divided  spin/color sources found: %s", file);
+    } else {
+      sc_part_file_exist =0;
+      VRB.Result(cname,fname, "propagator file with  divided  spin/color sources NOT found: %s", file);
+    }
+	if(UniqueID()) sc_part_file_exist =0;
+    Float sum = sc_part_file_exist;
+    glb_sum(&sum);
+    sc_part_file_exist=sum;
+      VRB.Result(cname,fname, "sc_part_file_exist=%d",sc_part_file_exist);
+  } 
+  
+  //TIZB, we only read the propagator file with divided spin/color source if they exists,
+  // if not, we will read the propagator with all spin/color source.
+  if(qp_arg.save_prop==2 && sc_part_file_exist ){
+    //        for(int spin=qpropw_arg.StartSrcSpin;spin<qpropw_arg.EndSrcSpin;spin++){
+    //          for(int color=qpropw_arg.StartSrcColor;color<qpropw_arg.EndSrcColor;color++){
+    for(int spin=0;spin<4;spin++){
+	for(int color=0;color<3;color++){
+	  char file[256];
+	  sprintf(file,"%ss%dc%d",infile,spin,color);
+	  ReLoadSC(file,spin,color);
+	}
+      }
+  } else {
+    Float *dummy_source = (Float*)smalloc(cname, fname, "dummy_source", 
+					  float_size * sizeof(Float));
+    
+#ifdef USE_QIO
+    qio_readPropagator readPropQio(infile, &prop[0], dummy_source, float_size, float_size, VOLFMT);
+#endif
+    sfree(dummy_source);
+    
   }
   
-  Float *dummy_source = (Float*)smalloc(float_size*sizeof(Float));
-  if (dummy_source == 0) ERR.Pointer(cname, fname, "dummy_source");
-  VRB.Smalloc(cname, fname, "dummy_source", dummy_source,
-	      float_size * sizeof(Float));
-
-#ifdef USE_QIO
-  qio_readPropagator readPropQio(infile, &prop[0], dummy_source, float_size, float_size, VOLFMT);
-#endif
-
   if(AlgLattice().Fclass() == F_CLASS_DWF){
     
     Float renFac = 5.-GJP.DwfHeight();
@@ -752,8 +784,6 @@ void QPropW::ReLoad( char *infile){
       prop[ii] *= renFac;
     
   }
-  
-  sfree(dummy_source);
   
 }
 
@@ -768,11 +798,8 @@ void QPropW::ReLoadSC(char *infile, int spin, int color){
   // assumes prop is already allocated
   if (prop == 0) ERR.General(cname, fname, "prop should be allocated already");
   
-  Float *dummy_source = (Float*)smalloc(float_size*sizeof(Float));
-  if (dummy_source == 0) ERR.Pointer(cname, fname, "dummy_source");
-  VRB.Smalloc(cname, fname, "dummy_source", dummy_source,
+  Float *dummy_source = (Float*)smalloc(cname, fname, "dummy_source", 
 	      float_size * sizeof(Float));
-
 #ifdef USE_QIO
   qio_readPropagator readPropQio(infile, spin, color, &prop[0], dummy_source, float_size, float_size, VOLFMT);
 #endif
@@ -787,7 +814,7 @@ void QPropW::ReLoadSC(char *infile, int spin, int color){
     
   //}
   
-  //sfree(dummy_source);
+  sfree(cname, fname, "dummy_source",dummy_source);
   
 }
 
@@ -821,7 +848,7 @@ void QPropW::CG(FermionVectorTp& source, FermionVectorTp& sol,
 
   // Do inversion
   //----------------------------------------------------------------
-  if (Lat.Fclass() == F_CLASS_DWF || Lat.Fclass() == F_CLASS_MDWF) {
+  if (Lat.Fclass() == F_CLASS_DWF) {
     Vector *src_4d    = (Vector*)source.data();
     Vector *sol_4d    = (Vector*)sol.data();
     Vector *midsol_4d = (Vector*)midsol.data();

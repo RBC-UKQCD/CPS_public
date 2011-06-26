@@ -51,6 +51,63 @@ public:
 		Float *rsd_vec_val;
 	} rsd_vec;
 	int use_single_precision;
+	int use_mdwf_for_dwf;
+};
+
+class VML;
+class C5State {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	Float val;
+	int dwf_cg;
+};
+
+class VML;
+class MdwfTuning {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	int stage;
+	int ls_min;
+	int ls_max;
+	int index;
+	int opti_index;
+	Float opti_time;
+	struct {
+		u_int mdwf_arg_len;
+		MdwfArg *mdwf_arg_val;
+	} mdwf_arg;
+	struct {
+		u_int c5_len;
+		C5State *c5_val;
+	} c5;
+	Float rsd_val;
+	Float rsd_time;
+	Float rsd_granularity;
+	Float c5_range;
+	int rc_max;
+	int rc_val;
+	Float rc_time;
+};
+
+class VML;
+class MdwfTuningInitArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	int ls_min;
+	int ls_max;
+	int rc_max;
+	int use_mdwf_for_dwf;
+	int use_single_precision;
+	Float c5_range;
+	Float rsd_granularity;
+	char *tuning_fn;
+	char *tuning_record_fn;
 };
 
 /* the xdr functions */
@@ -62,10 +119,16 @@ extern "C" {
 #if defined(__STDC__) || defined(__cplusplus)
 extern  bool_t vml_CgArg (VML *, char *instance, CgArg*);
 extern  bool_t vml_MdwfArg (VML *, char *instance, MdwfArg*);
+extern  bool_t vml_C5State (VML *, char *instance, C5State*);
+extern  bool_t vml_MdwfTuning (VML *, char *instance, MdwfTuning*);
+extern  bool_t vml_MdwfTuningInitArg (VML *, char *instance, MdwfTuningInitArg*);
 
 #else /* K&R C */
 extern  bool_t vml_CgArg (VML *, char *instance, CgArg*);
 extern  bool_t vml_MdwfArg (VML *, char *instance, MdwfArg*);
+extern  bool_t vml_C5State (VML *, char *instance, C5State*);
+extern  bool_t vml_MdwfTuning (VML *, char *instance, MdwfTuning*);
+extern  bool_t vml_MdwfTuningInitArg (VML *, char *instance, MdwfTuningInitArg*);
 
 #endif /* K&R C */
 

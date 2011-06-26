@@ -140,13 +140,13 @@ void qio_get_coords( int x[], int node, int index)
 
   // returns x[]: global(?) coordinates on this node
 
-  //if( node != UniqueID() )
-  if( node != QMP_get_node_number() )
-    { 
-      printf("ERROR QIO: node number mismatch\n");
- 
-      exit(-1); 
-    }
+//if( node != UniqueID() )
+//  if( node != QMP_get_node_number() )
+//    { 
+//      printf("Node %d: ERROR QIO: node number mismatch (%d %d %d %d) %d %d\n",
+//	QMP_get_node_number(),x[0],x[1],x[2],x[3],node,index);
+//      exit(-1); 
+//    }
 
   x[0] = GJP.XnodeCoor()*GJP.NodeSites(0);
   x[1] = GJP.YnodeCoor()*GJP.NodeSites(1);
