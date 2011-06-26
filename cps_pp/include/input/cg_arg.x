@@ -37,4 +37,90 @@ class MdwfArg {
 
   /* Set to none zero to use single precision in calculation. */
   int use_single_precision;
+
+  /* Set to none zero to use the Mdwf library for DWF solve */
+  int use_mdwf_for_dwf;
+};
+
+class C5State {
+  Float val;
+  int dwf_cg;
+};
+
+/* MdwfTuning, used for tuning Mobius preconditioned DWF inverter. */
+class MdwfTuning {
+  /* stage == 0: tuning finished */
+  /* stage == 1: test zero_time */
+  /* stage == 2: test c5 */
+  /* stage == 3: test rsd */
+  /* stage == 4: test rc */
+  int stage;
+
+  /* L_s state */
+  /* Both ls_min and ls_max must be even. */
+  int ls_min;
+  int ls_max;
+
+  /* Primary parameter showing which ls we are working on.  */
+  /* ls = ls_min + 2*index; */
+  int index;
+
+  int opti_index;
+  Float opti_time;
+
+  /* optimal MdwfArg and corresponding minimum time for each ls. */
+  MdwfArg mdwf_arg<>;
+
+  /* Mdwf B5/C5 value tuning. */
+  C5State c5<>;
+
+  /* Mdwf CG inversion residue tuning. */
+  Float rsd_val;
+  Float rsd_time;
+
+  /* Granularity when searching for an optimal residue. Must be a factor larger than 1. */
+  Float rsd_granularity;
+
+  /* controls the size of the region we test for optimal c5 values. */
+  Float c5_range;
+
+  /* Mdwf CG restart count tuning. */
+  int rc_max;
+  int rc_val;
+  Float rc_time;
+};
+
+/* use this class to initialize the MdwfTuning class. */
+class MdwfTuningInitArg {
+  /* smallest Ls in Mobius that we wish to test. */
+  int ls_min;
+  /* largest Ls in Mobius that we wish to test. */
+  int ls_max;
+
+  /* maximum allowed restart count. */
+  int rc_max;
+
+  /* set this flag so we will use the MDWF inverter for DWF(so we don't */
+  /* use the DWF inverter in CPS). */
+  int use_mdwf_for_dwf;
+
+  /* Set to none zero to use single precision in calculation. */
+  /* Note: there will always be a double precision fixup step in the end. */
+  int use_single_precision;
+
+  /* controls the size of the region we test for optimal c5 values. */
+  Float c5_range;
+
+  /* Granularity when searching for an optimal residue. Must be a factor larger than 1. */
+  Float rsd_granularity;
+
+  /* file to save the tuning state (a vml file that encodes an instance */
+  /* of class MdwfTuning).   */
+  /* note: if this file exists, we will read the MdwfTuning from the */
+  /* file, and the rest parameters in MdwfTuningInitArg will have no */
+  /* effect! */
+  string tuning_fn<>;
+
+  /* file to record the tuning test result. */
+  string tuning_record_fn<>;
 };

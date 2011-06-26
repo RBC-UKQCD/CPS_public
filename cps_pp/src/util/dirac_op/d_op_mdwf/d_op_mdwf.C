@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpMdwf class methods.
 
-  $Id: d_op_mdwf.C,v 1.4 2011-04-13 19:05:04 chulwoo Exp $
+  $Id: d_op_mdwf.C,v 1.5 2011-06-26 06:45:29 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-04-13 19:05:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v 1.4 2011-04-13 19:05:04 chulwoo Exp $
-//  $Id: d_op_mdwf.C,v 1.4 2011-04-13 19:05:04 chulwoo Exp $
+//  $Date: 2011-06-26 06:45:29 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v 1.5 2011-06-26 06:45:29 chulwoo Exp $
+//  $Id: d_op_mdwf.C,v 1.5 2011-06-26 06:45:29 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_mdwf.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v $
 //  $State: Exp $
 //
@@ -59,7 +59,7 @@ extern "C"
 static void sublattice(int lo[], int hi[], const int node[],
                        void *env) // env is currently ignored.
 {
-  const char * fname = "sublattice()";
+  const char *fname = "sublattice()";
   int xsize = GJP.XnodeSites();
   int ysize = GJP.YnodeSites();
   int zsize = GJP.ZnodeSites();
@@ -77,10 +77,10 @@ static void sublattice(int lo[], int hi[], const int node[],
 // helper function used to export gauge field to the mdwf library,
 // should not be used elsewhere.
 // env is used as the pointer to the instance of the lattice class.
-static double read_gauge(int dir, const int pos[4], int a, int b, int re_im, void * env)
+static double read_gauge(int dir, const int pos[4], int a, int b, int re_im, void *env)
 {
-  const char * fname = "read_gauge()";
-  Lattice * latt = (Lattice *)env;
+  const char *fname = "read_gauge()";
+  Lattice *latt = (Lattice *)env;
 
   if(latt->StrOrd() != CANONICAL){
     ERR.General("",fname, "Storage order of the gauge field is not acceptable.\n");
@@ -98,7 +98,7 @@ static double read_gauge(int dir, const int pos[4], int a, int b, int re_im, voi
   my_pos[2] %= GJP.ZnodeSites();
   my_pos[3] %= GJP.TnodeSites();
 
-  Matrix * gauge_field = latt->GaugeField() + latt->GsiteOffset(my_pos) + dir;
+  Matrix *gauge_field = latt->GaugeField() + latt->GsiteOffset(my_pos) + dir;
   return ( re_im == 0 ) ? (*gauge_field)[a*3+b].real() : (*gauge_field)[a*3+b].imag();
 }
 
@@ -106,10 +106,10 @@ static double read_gauge(int dir, const int pos[4], int a, int b, int re_im, voi
 // should not be used elsewhere.
 // env is used as the pointer to the Vector class that provides the fermion field,
 // corrdinate order: pos[0] is X, pos[3] is T, pos[4] is S.
-static double read_fermion_canonical(const int pos[5], int color, int dirac, int re_im, void * env)
+static double read_fermion_canonical(const int pos[5], int color, int dirac, int re_im, void *env)
 {
-  const char * fname = "read_fermion_canonical()";
-  Float * fermion_field = (Float *)env;
+  const char *fname = "read_fermion_canonical()";
+  Float *fermion_field = (Float *)env;
   if(fermion_field == NULL){
     ERR.Pointer("", fname, "fermion_field");
   }
@@ -136,8 +136,8 @@ static double read_fermion_canonical(const int pos[5], int color, int dirac, int
 
 static void write_fermion_canonical(const int pos[5], int color, int dirac, int re_im, double value, void *env)
 {
-  const char * fname = "write_fermion_canonical()";
-  Float * fermion_field = (Float *)env;
+  const char *fname = "write_fermion_canonical()";
+  Float *fermion_field = (Float *)env;
   if(fermion_field == NULL){
     ERR.Pointer("", fname, "fermion_field");
   }
@@ -170,10 +170,10 @@ static void write_fermion_canonical(const int pos[5], int color, int dirac, int 
 
 // same helper functions as above, but the source (fermion field stored
 // in CPS) field is 4-D even-odd preconditioned.
-static double read_fermion_precond(const int pos[5], int color, int dirac, int re_im, void * env)
+static double read_fermion_precond(const int pos[5], int color, int dirac, int re_im, void *env)
 {
-  const char * fname = "read_fermion_precond()";
-  Float * fermion_field = (Float *)env;
+  const char *fname = "read_fermion_precond()";
+  Float *fermion_field = (Float *)env;
   if(fermion_field == NULL){
     ERR.Pointer("", fname, "fermion_field");
   }
@@ -198,10 +198,10 @@ static double read_fermion_precond(const int pos[5], int color, int dirac, int r
   return fermion_field[offset];
 }
 
-static void write_fermion_precond(const int pos[5], int color, int dirac, int re_im, double value, void * env)
+static void write_fermion_precond(const int pos[5], int color, int dirac, int re_im, double value, void *env)
 {
-  const char * fname = "write_fermion_precond()";
-  Float * fermion_field = (Float *)env;
+  const char *fname = "write_fermion_precond()";
+  Float *fermion_field = (Float *)env;
   if(fermion_field == NULL){
     ERR.Pointer("", fname, "fermion_field");
   }
@@ -228,7 +228,7 @@ static void write_fermion_precond(const int pos[5], int color, int dirac, int re
 #endif
 
 DiracOpMdwf::DiracOpMdwf(Lattice& latt,            // Lattice object.
-                         MdwfArg * mdwf_arg_p): DiracOpWilsonTypes(latt,
+                         MdwfArg *mdwf_arg_p): DiracOpWilsonTypes(latt,
                                                                    NULL,
                                                                    NULL,
                                                                    &mdwf_arg_p->cg_arg,
@@ -236,7 +236,7 @@ DiracOpMdwf::DiracOpMdwf(Lattice& latt,            // Lattice object.
 
 {
   cname = "DiracOpMdwf";
-  const char * fname = "DiracOpMdwf(L&, MdwfArg *)";
+  const char *fname = "DiracOpMdwf(L&, MdwfArg *)";
   VRB.Func(cname, fname);
 
 #ifdef USE_MDWF
@@ -248,7 +248,7 @@ DiracOpMdwf::DiracOpMdwf(Lattice& latt,            // Lattice object.
 
   latt_ptr = &latt;
 
-  CgArg * cg_arg_p = &mdwf_arg_p->cg_arg;
+  CgArg *cg_arg_p = &mdwf_arg_p->cg_arg;
   if(cg_arg_p == NULL){
     ERR.General(cname, fname, "Invalid CgArg pointer in MdwfArg.\n");
   }
@@ -287,6 +287,7 @@ DiracOpMdwf::DiracOpMdwf(Lattice& latt,            // Lattice object.
   
   QOP_MDWF_init(&mdwf_state, lat_size, network, node, master_p, sublattice, NULL);
   QOP_MDWF_set_generic(&mdwf_param, mdwf_state, (mdwf_arg_p->b5).b5_val, (mdwf_arg_p->c5).c5_val, -mdwf_arg_p->M5, cg_arg_p -> mass);
+  VRB.Result(cname,fname,"mass(MDWF)=%g\n", cg_arg_p->mass);
 
   // import gauge field
   if(use_single_precision) {
@@ -301,7 +302,7 @@ DiracOpMdwf::DiracOpMdwf(Lattice& latt,            // Lattice object.
 
 DiracOpMdwf::~DiracOpMdwf()
 {
-  const char * fname = "~DiracOpMdwf()";
+  const char *fname = "~DiracOpMdwf()";
   VRB.Func(cname, fname);
 
 #ifdef USE_MDWF
@@ -328,7 +329,7 @@ DiracOpMdwf::~DiracOpMdwf()
 // the relevant parameters (kappa, m^2, ...).
 void DiracOpMdwf::DiracArg(CgArg *arg)
 {
-  const char * fname = "DiracArg()";
+  const char *fname = "DiracArg()";
   ERR.NotImplemented(cname, fname);
   
   //nothing to do here(we don't use this function in MDWF)
@@ -341,7 +342,7 @@ void DiracOpMdwf::DiracArg(CgArg *arg)
 // <out, in> = <MatPcDagMatPc*in, in> is returned in dot_prd.
 void DiracOpMdwf::MatPcDagMatPc(Vector *out, Vector *in, Float *dot_prd)
 {
-  const char * fname = "MatPcDagMatPc()";
+  const char *fname = "MatPcDagMatPc()";
   VRB.Func(cname, fname);
 
 #ifdef USE_MDWF
@@ -404,7 +405,7 @@ void DiracOpMdwf::Dslash(Vector *out,
                          ChkbType cb, 
                          DagType dag)
 {
-  const char * fname = "Dslash(V*, V*, ...)";
+  const char *fname = "Dslash(V*, V*, ...)";
   VRB.Func(cname, fname);
   ERR.NotImplemented(cname, fname);
 }
@@ -414,7 +415,7 @@ void DiracOpMdwf::Dslash(Vector *out,
 // The in, out fields are defined on the checkerboard lattice.
 void DiracOpMdwf::MatPc(Vector *out, Vector *in)
 {
-  const char * fname = "MatPc()";
+  const char *fname = "MatPc()";
   VRB.Func(cname, fname);
 
 #ifdef USE_MDWF
@@ -461,7 +462,7 @@ void DiracOpMdwf::MatPc(Vector *out, Vector *in)
 // The in, out fields are defined on the checkerboard lattice.
 void DiracOpMdwf::MatPcDag(Vector *out, Vector *in)
 {
-  const char * fname = "MatPcDag()";
+  const char *fname = "MatPcDag()";
   VRB.Func(cname, fname);
 
 #ifdef USE_MDWF
@@ -518,7 +519,7 @@ int DiracOpMdwf::MatInv(Vector *out,
            Float *true_res,
            PreserveType prs_in)
 {
-  const char * fname = "MatInv()";
+  const char *fname = "MatInv()";
 
 #ifdef USE_MDWF
 
@@ -529,14 +530,15 @@ int DiracOpMdwf::MatInv(Vector *out,
   gettimeofday(&start,NULL);
   double mdwf_time = -dclock();
 
+
   int n_iter;
   Float true_res_dummy;
-  Float * true_res_ptr = (true_res != NULL) ? true_res : &true_res_dummy;
+  Float *true_res_ptr = (true_res != NULL) ? true_res : &true_res_dummy;
     
   if(use_single_precision){
-    struct QOP_F3_MDWF_Fermion * fermion_ptr_in = NULL;
-    struct QOP_F3_MDWF_Fermion * fermion_ptr_out = NULL;
-    struct QOP_F3_MDWF_Fermion * fermion_ptr_tmp = NULL;
+    struct QOP_F3_MDWF_Fermion *fermion_ptr_in = NULL;
+    struct QOP_F3_MDWF_Fermion *fermion_ptr_out = NULL;
+    struct QOP_F3_MDWF_Fermion *fermion_ptr_tmp = NULL;
 
     QOP_F3_MDWF_import_fermion(&fermion_ptr_in, mdwf_state, read_fermion_canonical, (void *)in);
     QOP_F3_MDWF_allocate_fermion(&fermion_ptr_out, mdwf_state);
@@ -559,9 +561,9 @@ int DiracOpMdwf::MatInv(Vector *out,
     QOP_F3_MDWF_free_fermion(&fermion_ptr_out);
     QOP_F3_MDWF_free_fermion(&fermion_ptr_tmp);
   }else{
-    struct QOP_D3_MDWF_Fermion * fermion_ptr_in = NULL;
-    struct QOP_D3_MDWF_Fermion * fermion_ptr_out = NULL;
-    struct QOP_D3_MDWF_Fermion * fermion_ptr_tmp = NULL;
+    struct QOP_D3_MDWF_Fermion *fermion_ptr_in = NULL;
+    struct QOP_D3_MDWF_Fermion *fermion_ptr_out = NULL;
+    struct QOP_D3_MDWF_Fermion *fermion_ptr_tmp = NULL;
 
     QOP_D3_MDWF_import_fermion(&fermion_ptr_in, mdwf_state, read_fermion_canonical, (void *)in);
     QOP_D3_MDWF_allocate_fermion(&fermion_ptr_out, mdwf_state);
@@ -600,7 +602,7 @@ int DiracOpMdwf::MatInv(Vector *out,
                         Vector *in,
                         PreserveType prs_in)
 {
-  const char * fname = "MatInv()";
+  const char *fname = "MatInv()";
   Float true_res;
   return MatInv(out, in, &true_res, prs_in);
 }
@@ -609,7 +611,7 @@ int DiracOpMdwf::MatInv(Vector *out,
 int DiracOpMdwf::MatInv(Float *true_res,
                         PreserveType prs_in)
 {
-  const char * fname = "MatInv()";
+  const char *fname = "MatInv()";
   ERR.NotImplemented(cname, fname);
 }
 
@@ -617,7 +619,7 @@ int DiracOpMdwf::MatInv(Float *true_res,
 // Same as original but in = f_in, out = f_out, true_res=0.
 int DiracOpMdwf::MatInv(PreserveType prs_in)
 {
-  const char * fname = "MatInv()";
+  const char *fname = "MatInv()";
   ERR.NotImplemented(cname, fname);
 }
  
@@ -626,7 +628,7 @@ int DiracOpMdwf::MatInv(PreserveType prs_in)
 // The in, out fields are defined on the ful.
 void DiracOpMdwf::MatHerm(Vector *out, Vector *in)
 {
-  const char * fname = "MatHerm(V*, V*)";
+  const char *fname = "MatHerm(V*, V*)";
   VRB.Func(cname, fname);
 
   //----------------------------------------------------------------
@@ -652,13 +654,13 @@ void DiracOpMdwf::MatHerm(Vector *out, Vector *in)
 // The in, out fields are defined on the full lattice.
 void DiracOpMdwf::Mat(Vector *out, Vector *in)
 {
-  const char * fname = "Mat(V*, V*)";
+  const char *fname = "Mat(V*, V*)";
   VRB.Func(cname, fname);
 
 #ifdef USE_MDWF
   if(use_single_precision){
-    struct QOP_F3_MDWF_Fermion * fermion_ptr_in = NULL;
-    struct QOP_F3_MDWF_Fermion * fermion_ptr_out = NULL;
+    struct QOP_F3_MDWF_Fermion *fermion_ptr_in = NULL;
+    struct QOP_F3_MDWF_Fermion *fermion_ptr_out = NULL;
     QOP_F3_MDWF_import_fermion(&fermion_ptr_in, mdwf_state, read_fermion_canonical, (void *)in);
     QOP_F3_MDWF_allocate_fermion(&fermion_ptr_out, mdwf_state);
     if(fermion_ptr_in == NULL || fermion_ptr_out == NULL){
@@ -673,8 +675,8 @@ void DiracOpMdwf::Mat(Vector *out, Vector *in)
     QOP_F3_MDWF_free_fermion(&fermion_ptr_in);
     QOP_F3_MDWF_free_fermion(&fermion_ptr_out);
   }else{
-    struct QOP_D3_MDWF_Fermion * fermion_ptr_in = NULL;
-    struct QOP_D3_MDWF_Fermion * fermion_ptr_out = NULL;
+    struct QOP_D3_MDWF_Fermion *fermion_ptr_in = NULL;
+    struct QOP_D3_MDWF_Fermion *fermion_ptr_out = NULL;
     QOP_D3_MDWF_import_fermion(&fermion_ptr_in, mdwf_state, read_fermion_canonical, (void *)in);
     QOP_D3_MDWF_allocate_fermion(&fermion_ptr_out, mdwf_state);
     if(fermion_ptr_in == NULL || fermion_ptr_out == NULL){
@@ -699,13 +701,13 @@ void DiracOpMdwf::Mat(Vector *out, Vector *in)
 // The in, out fields are defined on the full lattice.
 void DiracOpMdwf::MatDag(Vector *out, Vector *in)
 {
-  const char * fname = "MatDag(V*, V*)";
+  const char *fname = "MatDag(V*, V*)";
   VRB.Func(cname, fname);
 
 #ifdef USE_MDWF
   if(use_single_precision){
-    struct QOP_F3_MDWF_Fermion * fermion_ptr_in = NULL;
-    struct QOP_F3_MDWF_Fermion * fermion_ptr_out = NULL;
+    struct QOP_F3_MDWF_Fermion *fermion_ptr_in = NULL;
+    struct QOP_F3_MDWF_Fermion *fermion_ptr_out = NULL;
     QOP_F3_MDWF_import_fermion(&fermion_ptr_in, mdwf_state, read_fermion_canonical, (void *)in);
     QOP_F3_MDWF_allocate_fermion(&fermion_ptr_out, mdwf_state);
     if(fermion_ptr_in == NULL || fermion_ptr_out == NULL){
@@ -720,8 +722,8 @@ void DiracOpMdwf::MatDag(Vector *out, Vector *in)
     QOP_F3_MDWF_free_fermion(&fermion_ptr_in);
     QOP_F3_MDWF_free_fermion(&fermion_ptr_out);
   }else{
-    struct QOP_D3_MDWF_Fermion * fermion_ptr_in = NULL;
-    struct QOP_D3_MDWF_Fermion * fermion_ptr_out = NULL;
+    struct QOP_D3_MDWF_Fermion *fermion_ptr_in = NULL;
+    struct QOP_D3_MDWF_Fermion *fermion_ptr_out = NULL;
     QOP_D3_MDWF_import_fermion(&fermion_ptr_in, mdwf_state, read_fermion_canonical, (void *)in);
     QOP_D3_MDWF_allocate_fermion(&fermion_ptr_out, mdwf_state);
     if(fermion_ptr_in == NULL || fermion_ptr_out == NULL){
@@ -744,13 +746,13 @@ void DiracOpMdwf::MatDag(Vector *out, Vector *in)
 //! Multiplication by the square of the fermion matrix.
 void DiracOpMdwf::MatDagMat(Vector *out, Vector *in)
 {
-  const char * fname = "MatDagMat(V*, V*)";
+  const char *fname = "MatDagMat(V*, V*)";
   VRB.Func(cname, fname);
 
 #ifdef USE_MDWF
   if(use_single_precision){
-    struct QOP_F3_MDWF_Fermion * fermion_ptr_in = NULL;
-    struct QOP_F3_MDWF_Fermion * fermion_ptr_out = NULL;
+    struct QOP_F3_MDWF_Fermion *fermion_ptr_in = NULL;
+    struct QOP_F3_MDWF_Fermion *fermion_ptr_out = NULL;
     QOP_F3_MDWF_import_fermion(&fermion_ptr_in, mdwf_state, read_fermion_canonical, (void *)in);
     QOP_F3_MDWF_allocate_fermion(&fermion_ptr_out, mdwf_state);
     if(fermion_ptr_in == NULL || fermion_ptr_out == NULL){
@@ -767,8 +769,8 @@ void DiracOpMdwf::MatDagMat(Vector *out, Vector *in)
     QOP_F3_MDWF_free_fermion(&fermion_ptr_in);
     QOP_F3_MDWF_free_fermion(&fermion_ptr_out);
   }else{
-    struct QOP_D3_MDWF_Fermion * fermion_ptr_in = NULL;
-    struct QOP_D3_MDWF_Fermion * fermion_ptr_out = NULL;
+    struct QOP_D3_MDWF_Fermion *fermion_ptr_in = NULL;
+    struct QOP_D3_MDWF_Fermion *fermion_ptr_out = NULL;
     QOP_D3_MDWF_import_fermion(&fermion_ptr_in, mdwf_state, read_fermion_canonical, (void *)in);
     QOP_D3_MDWF_allocate_fermion(&fermion_ptr_out, mdwf_state);
     if(fermion_ptr_in == NULL || fermion_ptr_out == NULL){
@@ -799,7 +801,7 @@ void DiracOpMdwf::MatDagMat(Vector *out, Vector *in)
 // the result may be used to compute the HMD fermion force.
 void DiracOpMdwf::CalcHmdForceVecs(Vector *chi)
 {
-  const char * fname = "CalcHmdForceVecs()";
+  const char *fname = "CalcHmdForceVecs()";
   ERR.NotImplemented(cname, fname);
 }
 
@@ -808,7 +810,7 @@ void DiracOpMdwf::CalcHmdForceVecs(Vector *chi)
 // of the dirac operator in the Ritz solver.
 void DiracOpMdwf::Reflex(Vector *out, Vector *in)
 {
-  const char * fname = "Reflex()";
+  const char *fname = "Reflex()";
   ERR.NotImplemented(cname, fname);
 }
 
@@ -819,7 +821,7 @@ void DiracOpMdwf::Reflex(Vector *out, Vector *in)
 // is the 5-dimensional globals sum glb_sum_five.
 //------------------------------------------------------------------
 void DiracOpMdwf::DiracOpGlbSum(Float *float_p) {
-  const char * fname = "DiracOpGlbSum()";
+  const char *fname = "DiracOpGlbSum()";
   ERR.NotImplemented(cname, fname);
 //  if(GJP.Snodes() == 1) {
 //    glb_sum(float_p);

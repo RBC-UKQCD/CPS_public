@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.36 2011-04-13 19:05:04 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.37 2011-06-26 06:45:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -262,6 +262,274 @@ void FdwfBase::FminResExt(Vector *sol, Vector *source, Vector **sol_old,
   
 }
 
+struct Results{
+  int iter;
+  Float time;
+};
+
+// ======================================================================
+// set_tuning: set MdwfArg to current parameter to be tuned.
+//
+// collect_results: write tuning state to file, collect tuning result,
+// and set up for the next tuning(we only know what to do right after
+// a test is finished).
+// ======================================================================
+static void set_tuning(const CgArg *cg_arg)
+{
+  const char *cname = "";
+  const char *fname = "set_tuning()";
+
+  const MdwfTuning *tuning = GJP.GetMdwfTuning();
+
+  switch(tuning->stage){
+  case 0: // test finished
+    if(tuning->opti_index < 0){
+      GJP.SetMdwfArg(NULL);
+    }else{
+      MdwfArg *opti_arg = &(tuning->mdwf_arg.mdwf_arg_val[tuning->opti_index]);
+
+      opti_arg->cg_arg = *cg_arg;
+      GJP.SetMdwfArg(opti_arg);
+    }
+    return;
+  case 1: // zero time
+    GJP.SetMdwfArg(NULL);
+    return;
+  case 2: // c5
+  case 3: // rsd
+  case 4: // restart count
+    {
+      MdwfArg *arg = &(tuning->mdwf_arg.mdwf_arg_val[tuning->index]);
+      GJP.SetMdwfArg(arg);
+
+      // modify rsd_vec_len, since we can't change the corresponding value in MdwfTuning.
+      arg = GJP.GetMdwfArg();
+      arg->cg_arg = *cg_arg;
+      arg->rsd_vec.rsd_vec_len = tuning->rc_val;
+      return;
+    }
+  default:
+    ERR.General(cname, fname, "Invalid value for tuning->stage (current value is %d).\n", tuning->stage);
+    return;
+  }
+}
+
+// write out one line of the test result.
+// if passing a null pointer to the first pointer, write out a header instead.
+static void record_results(const struct Results *results)
+{
+  FILE *fp = Fopen(GJP.GetMdwfTuningRecordFN(), "a+");
+
+  MdwfTuning *tuning = GJP.GetMdwfTuning();
+
+  if(tuning->stage == 1 || tuning->stage == 0 && tuning->opti_index < 0){
+    Fprintf(fp, "%5d %17.10e %17.10e %17.10e %5d %17.10e %10d\n", 0, 0.0, 0.0, 0.0, 0, results->time, results->iter);
+  }else if(tuning->stage == 0){
+    Fprintf(fp, "%5d %17.10e %17.10e %17.10e %5d %17.10e %10d\n",
+            tuning->mdwf_arg.mdwf_arg_val[tuning->opti_index].b5.b5_len,
+            tuning->mdwf_arg.mdwf_arg_val[tuning->opti_index].b5.b5_val[0],
+            tuning->mdwf_arg.mdwf_arg_val[tuning->opti_index].c5.c5_val[0],
+            tuning->mdwf_arg.mdwf_arg_val[tuning->opti_index].rsd_vec.rsd_vec_val[1],
+            tuning->mdwf_arg.mdwf_arg_val[tuning->opti_index].rsd_vec.rsd_vec_len,
+            results->time,
+            results->iter);
+  }else{
+    Fprintf(fp, "%5d %17.10e %17.10e %17.10e %5d %17.10e %10d\n",
+            tuning->mdwf_arg.mdwf_arg_val[tuning->index].b5.b5_len,
+            tuning->mdwf_arg.mdwf_arg_val[tuning->index].b5.b5_val[0],
+            tuning->mdwf_arg.mdwf_arg_val[tuning->index].c5.c5_val[0],
+            tuning->mdwf_arg.mdwf_arg_val[tuning->index].rsd_vec.rsd_vec_val[1],
+            tuning->rc_val,
+            results->time,
+            results->iter);
+  }
+  Fclose(fp);
+}
+
+static void collect_results(const struct Results *results)
+{
+  const char *cname = "";
+  const char *fname = "collect_results()";
+
+  MdwfTuning *tuning = GJP.GetMdwfTuning();
+
+  // Don't modify these 2 numbers.
+  const Float magic1 = 0.5*(3.0-sqrt(5.0)); //0.382
+  const Float magic2 = 1.0 - magic1; //0.618
+
+  switch(tuning->stage){
+  case 0: // test finished
+    break;
+  case 1: { // zero time
+    tuning->opti_time = results->time;
+    tuning->opti_index = -1;
+
+    tuning->index = 0;
+    tuning->stage = 2;
+
+    Float c5_mid = GJP.SnodeSites()/(2.0*tuning->ls_min) - 0.5;
+    Float c5_0 = c5_mid - tuning->c5_range;
+    Float c5_3 = c5_mid + tuning->c5_range;
+
+    tuning->c5.c5_val[0].val = c5_0;
+    tuning->c5.c5_val[1].val = c5_0*magic2 + c5_3*magic1;
+    tuning->c5.c5_val[2].val = c5_0*magic1 + c5_3*magic2;
+    tuning->c5.c5_val[3].val = c5_3;
+
+    tuning->c5.c5_val[0].dwf_cg = -1;
+    tuning->c5.c5_val[1].dwf_cg = -1;
+    tuning->c5.c5_val[2].dwf_cg = -1;
+    tuning->c5.c5_val[3].dwf_cg = -1;
+
+    tuning->rc_val = 2;
+    tuning->mdwf_arg.mdwf_arg_val[0].rsd_vec.rsd_vec_val[0] = 1.0e-2;
+    tuning->mdwf_arg.mdwf_arg_val[0].rsd_vec.rsd_vec_val[1] = 1.0e-8;
+
+    int i;
+    for(i = 0; i < tuning->ls_min; ++i){
+      tuning->mdwf_arg.mdwf_arg_val[0].b5.b5_val[i] = c5_0 + 1.0;
+      tuning->mdwf_arg.mdwf_arg_val[0].c5.c5_val[i] = c5_0;
+    }
+    break;
+  }
+  case 2: { // c5
+    int i = 0;
+    while(i<3 && tuning->c5.c5_val[i].dwf_cg != -1) ++i;
+    tuning->c5.c5_val[i].dwf_cg = results->iter;
+
+    do ++i; while(i<4 && tuning->c5.c5_val[i].dwf_cg != -1);
+
+    MdwfArg *arg= &(tuning->mdwf_arg.mdwf_arg_val[tuning->index]);
+    Float c5;
+    if(i == 4) { // we have done all tests and ready to shrink the search range.
+      C5State *c5_state = tuning->c5.c5_val;
+      if(c5_state[1].dwf_cg <= c5_state[2].dwf_cg && c5_state[2].dwf_cg < c5_state[3].dwf_cg){ // cut [2-3]
+        c5_state[3] = c5_state[2];
+        c5_state[2] = c5_state[1];
+        c5_state[1].val = c5_state[0].val*magic2 + c5_state[3].val*magic1;
+        c5_state[1].dwf_cg = -1;
+
+        c5 = c5_state[1].val;
+      }else if(c5_state[1].dwf_cg >= c5_state[2].dwf_cg && c5_state[0].dwf_cg > c5_state[1].dwf_cg){ // cut [0-1]
+        c5_state[0] = c5_state[1];
+        c5_state[1] = c5_state[2];
+
+        c5_state[2].val = c5_state[0].val*magic1 + c5_state[3].val*magic2;
+        c5_state[2].dwf_cg = -1;
+
+        c5 = c5_state[2].val;
+      }else{ // stop, prepare for next stage
+        tuning->stage = 3;
+
+        tuning->rsd_val = 1.0e-8;
+        tuning->rsd_time = 1.0e30;
+
+        tuning->rc_val = 2;
+        arg->rsd_vec.rsd_vec_val[0] = 1.0e-2;
+        arg->rsd_vec.rsd_vec_val[1] = tuning->rsd_val;
+
+        c5 = (c5_state[0].val + c5_state[3].val)*0.5;
+      }
+    }else{
+      c5 = tuning->c5.c5_val[i].val;
+    }
+
+    // set c5 values for the MdwfArg copy in MdwfTuning.
+    int j;
+    int ls = arg->b5.b5_len;
+    for(j = 0; j < ls; ++j){
+      arg->b5.b5_val[j] = c5 + 1.0;
+      arg->c5.c5_val[j] = c5;
+    }
+    break;
+  }
+  case 3: { // rsd
+    MdwfArg *arg= &(tuning->mdwf_arg.mdwf_arg_val[tuning->index]);
+    Float cur_time = results->time;
+    if(cur_time > tuning->rsd_time || tuning->rsd_val >= 0.3){ // stop, prepare for next stage
+      tuning->stage = 4;
+
+      arg->rsd_vec.rsd_vec_val[1] = tuning->rsd_val/(tuning->rsd_granularity);
+
+      tuning->rc_val = 3;
+      arg->rsd_vec.rsd_vec_val[2] = arg->rsd_vec.rsd_vec_val[1];
+      tuning->rc_time = tuning->rsd_time;
+    }else{ // test a larger stopping condition
+      tuning->rsd_val *= tuning->rsd_granularity;
+      tuning->rsd_time = cur_time;
+
+      arg->rsd_vec.rsd_vec_val[1] = tuning->rsd_val;
+    }
+    break;
+  }
+  case 4: { // restart count
+    MdwfArg *arg= &(tuning->mdwf_arg.mdwf_arg_val[tuning->index]);
+    Float cur_time = results->time;
+
+    if(cur_time <= tuning->rc_time){ // test a larger restart count
+      if(tuning->rc_val < tuning->rc_max){
+        tuning->rc_time = cur_time;
+
+        arg->rsd_vec.rsd_vec_val[(tuning->rc_val)++] = arg->rsd_vec.rsd_vec_val[1];
+        break;
+      }else{
+        ++tuning->rc_val;
+        tuning->rc_time = cur_time;
+        VRB.Warn(cname, fname, "rc_max reached, increase rc_max may yield a better tuning result.\n");
+      }
+    } // stop, prepare for next ls value or finalize tuning
+   
+    arg->rsd_vec.rsd_vec_len = --tuning->rc_val;
+
+    // test if this min time is also global min time
+    if(tuning->rc_time < tuning->opti_time) {
+      tuning->opti_index = tuning->index;
+      tuning->opti_time = tuning->rc_time;
+    }
+
+    // prepare for next ls
+    ++tuning->index;
+    int next_ls = tuning->index*2 + tuning->ls_min;
+    if(next_ls > tuning->ls_max){ // we have exhausted the search, finalize tuning
+      tuning->stage = 0;
+    }else{
+      tuning->stage = 2;
+      int index = tuning->index;
+
+      Float c5_mid = GJP.SnodeSites()/(2.0*next_ls) - 0.5;
+      Float c5_0 = c5_mid - tuning->c5_range;
+      Float c5_3 = c5_mid + tuning->c5_range;
+
+      tuning->c5.c5_val[0].val = c5_0;
+      tuning->c5.c5_val[1].val = c5_0*magic2 + c5_3*magic1;
+      tuning->c5.c5_val[2].val = c5_0*magic1 + c5_3*magic2;
+      tuning->c5.c5_val[3].val = c5_3;
+
+      tuning->c5.c5_val[0].dwf_cg = -1;
+      tuning->c5.c5_val[1].dwf_cg = -1;
+      tuning->c5.c5_val[2].dwf_cg = -1;
+      tuning->c5.c5_val[3].dwf_cg = -1;
+
+      tuning->rc_val = 2;
+      tuning->mdwf_arg.mdwf_arg_val[index].rsd_vec.rsd_vec_val[0] = 1.0e-2;
+      tuning->mdwf_arg.mdwf_arg_val[index].rsd_vec.rsd_vec_val[1] = 1.0e-8;
+
+      int i;
+      int ls = index*2 + tuning->ls_min;
+      for(i = 0; i < ls; ++i) {
+        tuning->mdwf_arg.mdwf_arg_val[index].b5.b5_val[i] = c5_0 + 1.0;
+        tuning->mdwf_arg.mdwf_arg_val[index].c5.c5_val[i] = c5_0;
+      }
+    }
+    break;
+  }
+  default:
+    ERR.General(cname, fname, "Invalid value for MdwfTuning::stage (current value is %d).\n", tuning->stage);
+    break;
+  }
+  tuning->Encode(GJP.GetMdwfTuningFN(), "mdwf_tuning");
+}
+
 //------------------------------------------------------------------
 // int FmatInv(Vector *f_out, Vector *f_in, 
 //             CgArg *cg_arg, 
@@ -292,28 +560,340 @@ int FdwfBase::FmatInv(Vector *f_out, Vector *f_in,
 		  CnvFrmType cnv_frm,
 		  PreserveType prs_f_in)
 {
-  int iter;
-  char *fname = "FmatInv(CgArg*,V*,V*,F*,CnvFrmType)";
-  VRB.Func(cname,fname);
+  const char *fname = "FmatInv(CgArg*,V*,V*,F*,CnvFrmType)";
+  VRB.Func(cname, fname);
 
-  double inv_time = -dclock();
+  if(GJP.GetMdwfTuning() != NULL){
+    struct Results results;
+    set_tuning(cg_arg);
+
+    results.time = -dclock();
+    results.iter = 
+      FmatInvMobius(f_out, f_in, cg_arg, GJP.GetMdwfArg(), true_res, cnv_frm, prs_f_in);
+    results.time += dclock();
+
+    record_results(&results);
+    collect_results(&results);
+
+    return results.iter;
+
+  }else if(GJP.GetMdwfArg() != NULL){
+    return FmatInvMobius(f_out, f_in, cg_arg, GJP.GetMdwfArg(), true_res, cnv_frm, prs_f_in);
+
+  }else {
+    DiracOpDwf dwf(*this, f_out, f_in, cg_arg, cnv_frm);
+    return dwf.MatInv(true_res, prs_f_in);
+  }
+}
+
+// FmatInvMobius: same as FmatInv, except that we use mobius DWF
+// to speed up the CG inversion (via constructing initial guess).
+int FdwfBase::FmatInvMobius(Vector *f_out,
+                            Vector *f_in,
+                            CgArg *cg_arg_dwf,
+                            MdwfArg *mdwf_arg,
+                            Float *true_res,
+                            CnvFrmType cnv_frm,
+                            PreserveType prs_f_in)
+{
+  const char *fname = "FmatInvMobius(V*, V*, ...)";
 
 #ifdef USE_MDWF
-  MdwfArg *_mdwf_arg_p = GJP.GetMdwfArg();
-  if(_mdwf_arg_p != NULL){
-    return FmatInvMobius(f_out, f_in, cg_arg, _mdwf_arg_p, true_res, cnv_frm, prs_f_in);
+  // this implementation doesn't allow splitting in s direction(yet).
+  if(GJP.Snodes() != 1) ERR.NotImplemented(cname, fname);
+  if(cnv_frm != CNV_FRM_YES) ERR.NotImplemented(cname, fname);
+
+  if(mdwf_arg == NULL) {
+    DiracOpDwf dwf(*this, f_out, f_in, cg_arg_dwf, cnv_frm);
+    return dwf.MatInv(f_out, f_in, true_res, prs_f_in);
   }
-#endif
+  if(mdwf_arg->rsd_vec.rsd_vec_len < 2){
+    ERR.General(cname, fname, "Invalid restart count for MdwfArg.\n");
+  }
+
+  if(mdwf_arg->use_mdwf_for_dwf) {
+    //======================================================================
+    // Construct a Mobius-simulated DWF for use with MDWF library (to
+    // supersede the slow CPS DWF solve).
+    MdwfArg mobius_dwf;
+    {
+      mobius_dwf.M5 = GJP.DwfHeight();
+      mobius_dwf.use_single_precision = mdwf_arg->use_single_precision;
+      //      mobius_dwf.cg_arg = *cg_arg_dwf;
+      
+      const int dwf_ls = GJP.SnodeSites();
+      mobius_dwf.b5.b5_len = dwf_ls;
+      mobius_dwf.c5.c5_len = dwf_ls;
+      // we need not assign values for rsd_vec, since DiracOpMdwf doesn't interpret it.
+      mobius_dwf.b5.b5_val = (Float *)smalloc(cname, fname, "b5_val", sizeof(Float)*dwf_ls);
+      mobius_dwf.c5.c5_val = (Float *)smalloc(cname, fname, "c5_val", sizeof(Float)*dwf_ls);
+      
+      for(int i=0;i<dwf_ls; ++i){
+        mobius_dwf.b5.b5_val[i] = 1.0;
+        mobius_dwf.c5.c5_val[i] = 0.0;
+      }
+    }
+    //======================================================================
+    const Float *rsd_vec = mdwf_arg->rsd_vec.rsd_vec_val;
+    
+    const int mob_ls = mdwf_arg->b5.b5_len;
+    const int dwf_size_5d = GJP.VolNodeSites() * FsiteSize();
+    const int mob_size_5d = GJP.VolNodeSites() * mob_ls * SPINOR_SIZE;
+    const int size_4d = GJP.VolNodeSites() * SPINOR_SIZE;
+    
+    Vector *tmp_dwf_5d = (Vector *)smalloc(cname, fname, "tmp_dwf_5d", sizeof(Float) * dwf_size_5d);
+    Vector *tmp2_dwf_5d = (Vector *)smalloc(cname, fname, "tmp2_dwf_5d", sizeof(Float) * dwf_size_5d);
+    Vector *tmp_mob_5d = (Vector *)smalloc(cname, fname, "tmp_mob_5d", sizeof(Float) * mob_size_5d);
+    
+    // the first time, we solve in DWF to some degree of accuracy
+    {
+      mobius_dwf.cg_arg = *cg_arg_dwf;
+      mobius_dwf.cg_arg.stop_rsd = rsd_vec[0];
+      
+      DiracOpMdwf mdwf(*this, &mobius_dwf);
+      mdwf.MatInv(f_out, f_in, NULL, PRESERVE_YES);
+    }
   
-  DiracOpDwf dwf(*this, f_out, f_in, cg_arg, cnv_frm);
-  iter = dwf.MatInv(true_res, prs_f_in);
-
-  inv_time += dclock();
-  print_time(cname,fname,inv_time);
-
-  // Return the number of iterations
-  return iter;
+    const int n_restart = mdwf_arg->rsd_vec.rsd_vec_len;
+    for(int restart_cnt = 1; restart_cnt < n_restart; ++restart_cnt){
+      //constructing the new residue, note: it's not a good idea to use single precision here.
+      tmp2_dwf_5d->CopyVec(f_in, dwf_size_5d);
+      {
+        mobius_dwf.cg_arg = *cg_arg_dwf;
+        mobius_dwf.use_single_precision = 0;
+        
+        DiracOpMdwf mdwf(*this, &mobius_dwf);
+        mdwf.Mat(tmp_dwf_5d, f_out);
+        mobius_dwf.use_single_precision = mdwf_arg->use_single_precision;
+      }
+      tmp2_dwf_5d->VecMinusEquVec(tmp_dwf_5d, dwf_size_5d);
+      //end constructing the new residue
+      
+      mdwf_arg->cg_arg.stop_rsd = rsd_vec[restart_cnt];
+      
+      tmp_dwf_5d->VecZero(dwf_size_5d);
+      {
+        mobius_dwf.cg_arg.mass = 1.0;
+        mobius_dwf.cg_arg.stop_rsd = rsd_vec[restart_cnt];
+        mobius_dwf.cg_arg.max_num_iter = mdwf_arg->cg_arg.max_num_iter;
+        
+        DiracOpMdwf mdwf(*this, &mobius_dwf);
+        mdwf.MatInv(tmp_dwf_5d, tmp2_dwf_5d, NULL, PRESERVE_YES);
+      }
+      SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 1);
+      
+      tmp_mob_5d->VecZero(mob_size_5d);
+      tmp_mob_5d->CopyVec(tmp2_dwf_5d, size_4d);
+      
+      SpinProject(tmp_dwf_5d, tmp_mob_5d, mob_ls, 0);
+      
+      {
+        Float mass= mdwf_arg->cg_arg.mass; 
+        mdwf_arg->cg_arg.mass = 1.0;
+        
+        DiracOpMdwf mdwf(*this, mdwf_arg);
+        mdwf.Mat(tmp_mob_5d, tmp_dwf_5d);
+        
+        mdwf_arg->cg_arg.mass = mass;
+      }
+      
+      tmp_dwf_5d->VecZero(mob_size_5d);
+      
+      {
+        Float time = -dclock();
+        
+        DiracOpMdwf mdwf(*this, mdwf_arg);
+        mdwf.MatInv(tmp_dwf_5d, tmp_mob_5d, NULL, PRESERVE_YES);
+        
+        time += dclock();
+        print_flops("DiracOpMdwf","MatInv", 0, time);
+      }
+      
+      SpinProject(tmp_mob_5d, tmp_dwf_5d, mob_ls, 1);
+      
+      //OV2DWF
+      tmp_dwf_5d->VecNegative(tmp_mob_5d, size_4d);
+      {
+        Vector *tmp_2nd_plane = (Vector *)((Float *)tmp_dwf_5d + size_4d);
+        Vector *src_2nd_plane = (Vector *)((Float *)tmp2_dwf_5d + size_4d);
+        tmp_2nd_plane->CopyVec(src_2nd_plane, dwf_size_5d - size_4d);
+      }
+      
+      SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 0);
+      
+      {
+        mobius_dwf.cg_arg = *cg_arg_dwf;
+        DiracOpMdwf mdwf(*this, &mobius_dwf);
+        mdwf.Mat(tmp_dwf_5d, tmp2_dwf_5d);
+      }
+      
+      tmp2_dwf_5d->VecZero(dwf_size_5d);
+      {
+        mobius_dwf.cg_arg.mass = 1.0;
+        mobius_dwf.cg_arg.stop_rsd = mdwf_arg->cg_arg.stop_rsd;
+        mobius_dwf.cg_arg.max_num_iter = mdwf_arg->cg_arg.max_num_iter;
+        
+        DiracOpMdwf mdwf(*this, &mobius_dwf);
+        mdwf.MatInv(tmp2_dwf_5d, tmp_dwf_5d, NULL, PRESERVE_NO);
+      }
+      SpinProject(tmp_dwf_5d, tmp2_dwf_5d, GJP.SnodeSites(), 1);
+      
+      tmp_dwf_5d->CopyVec(tmp_mob_5d, size_4d);
+      
+      SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 0);
+      
+      f_out->VecAddEquVec(tmp2_dwf_5d, dwf_size_5d);
+    }
+    
+    sfree(cname, fname,  "tmp_dwf_5d",  tmp_dwf_5d);
+    sfree(cname, fname, "tmp2_dwf_5d", tmp2_dwf_5d);
+    sfree(cname, fname,  "tmp_mob_5d",  tmp_mob_5d);
+    
+    int iter;
+    // ======================================================================
+    // fix up using Mobius, simulating DWF
+    {
+      mobius_dwf.cg_arg = *cg_arg_dwf;
+      mobius_dwf.cg_arg.stop_rsd /= 5.0 - GJP.DwfHeight();
+      mobius_dwf.use_single_precision = 0;
+      
+      DiracOpMdwf mdwf(*this, &mobius_dwf);
+      iter = mdwf.MatInv(f_out, f_in, NULL, PRESERVE_YES);
+      // renormalize, the MDWF package has a different normalization convention
+      f_out->VecTimesEquFloat(5.0-GJP.DwfHeight(), dwf_size_5d);
+    }
+    // ======================================================================
+    sfree(mobius_dwf.b5.b5_val);
+    sfree(mobius_dwf.c5.c5_val);
+    
+    // final solve, using CPS
+    DiracOpDwf dwf(*this, f_out, f_in, cg_arg_dwf, cnv_frm);
+    dwf.MatInv(f_out, f_in, true_res, prs_f_in);
+    return iter;
+  }else{
+    const Float *rsd_vec = mdwf_arg->rsd_vec.rsd_vec_val;
+    
+    const int mob_ls = mdwf_arg->b5.b5_len;
+    const int dwf_size_5d = GJP.VolNodeSites() * FsiteSize();
+    const int mob_size_5d = GJP.VolNodeSites() * mob_ls * SPINOR_SIZE;
+    const int size_4d = GJP.VolNodeSites() * SPINOR_SIZE;
+    
+    Vector *tmp_dwf_5d = (Vector *) smalloc(cname, fname, "tmp_dwf_5d", sizeof(Float) * dwf_size_5d);
+    Vector *tmp2_dwf_5d = (Vector *) smalloc(cname, fname, "tmp2_dwf_5d", sizeof(Float) * dwf_size_5d);
+    Vector *tmp_mob_5d = (Vector *) smalloc(cname, fname, "tmp_mob_5d", sizeof(Float) * mob_size_5d);
+    
+    // the first time, we solve in DWF to some degree of accuracy
+    {
+      Float rsd = cg_arg_dwf->stop_rsd;
+      cg_arg_dwf->stop_rsd = rsd_vec[0];
+      
+      DiracOpDwf dwf(*this, f_out, f_in, cg_arg_dwf, CNV_FRM_YES);
+      dwf.MatInv(f_out, f_in, NULL, PRESERVE_YES);
+      cg_arg_dwf->stop_rsd = rsd;
+    }
+    
+    const int n_restart = mdwf_arg->rsd_vec.rsd_vec_len;
+    for(int restart_cnt = 1; restart_cnt < n_restart; ++restart_cnt){
+      //constructing the new residue
+      tmp2_dwf_5d->CopyVec(f_in, dwf_size_5d);
+      {
+        DiracOpDwf dwf(*this, tmp_dwf_5d, f_out, cg_arg_dwf, CNV_FRM_YES);
+        dwf.Mat(tmp_dwf_5d, f_out);
+      }
+      tmp2_dwf_5d->VecMinusEquVec(tmp_dwf_5d, dwf_size_5d);
+      //end constructing the new residue
+      
+      mdwf_arg->cg_arg.stop_rsd = rsd_vec[restart_cnt];
+      
+      tmp_dwf_5d->VecZero(dwf_size_5d);
+      {
+        CgArg cg_arg;
+        cg_arg.mass = 1.0;
+        
+        cg_arg.stop_rsd = rsd_vec[restart_cnt];
+        cg_arg.max_num_iter = mdwf_arg->cg_arg.max_num_iter;
+        
+        DiracOpDwf dwf(*this, tmp_dwf_5d, tmp2_dwf_5d, &cg_arg, CNV_FRM_YES);
+        dwf.MatInv(tmp_dwf_5d, tmp2_dwf_5d, NULL, PRESERVE_YES);
+      }
+      SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 1);
+      
+      tmp_mob_5d->VecZero(mob_size_5d);
+      tmp_mob_5d->CopyVec(tmp2_dwf_5d, size_4d);
+    
+      SpinProject(tmp_dwf_5d, tmp_mob_5d, mob_ls, 0);
+      
+      {
+        Float mass = mdwf_arg->cg_arg.mass; 
+        mdwf_arg->cg_arg.mass = 1.0;
+        
+        DiracOpMdwf mdwf(*this, mdwf_arg);
+        mdwf.Mat(tmp_mob_5d, tmp_dwf_5d);
+        
+        mdwf_arg->cg_arg.mass = mass;
+      }
+      
+      tmp_dwf_5d->VecZero(mob_size_5d);
+      
+      {
+        Float time = -dclock();
+        
+        DiracOpMdwf mdwf(*this, mdwf_arg);
+        mdwf.MatInv(tmp_dwf_5d, tmp_mob_5d, NULL, PRESERVE_YES);
+        
+        time += dclock();
+        print_flops("DiracOpMdwf","MatInv", 0, time);
+      }
+      
+      SpinProject(tmp_mob_5d, tmp_dwf_5d, mob_ls, 1);
+    
+      //OV2DWF
+      tmp_dwf_5d->VecNegative(tmp_mob_5d, size_4d);
+      {
+        Vector *tmp_2nd_plane = (Vector *)((Float *)tmp_dwf_5d + size_4d);
+        Vector *src_2nd_plane = (Vector *)((Float *)tmp2_dwf_5d + size_4d);
+        tmp_2nd_plane->CopyVec(src_2nd_plane, dwf_size_5d - size_4d);
+      }
+      
+      SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 0);
+      
+      {
+        DiracOpDwf dwf(*this, tmp_dwf_5d, tmp2_dwf_5d, cg_arg_dwf, CNV_FRM_YES);
+        dwf.Mat(tmp_dwf_5d, tmp2_dwf_5d);
+      }
+      
+      tmp2_dwf_5d->VecZero(dwf_size_5d);
+      {
+        CgArg cg_arg_tmp;
+        cg_arg_tmp.mass = 1.0;
+        cg_arg_tmp.stop_rsd = mdwf_arg->cg_arg.stop_rsd;
+        cg_arg_tmp.max_num_iter = mdwf_arg->cg_arg.max_num_iter;
+        DiracOpDwf dwf(*this, tmp2_dwf_5d, tmp_dwf_5d, &cg_arg_tmp, CNV_FRM_YES);
+        dwf.MatInv(tmp2_dwf_5d, tmp_dwf_5d, NULL, PRESERVE_NO);
+      }
+      SpinProject(tmp_dwf_5d, tmp2_dwf_5d, GJP.SnodeSites(), 1);
+      
+      tmp_dwf_5d->CopyVec(tmp_mob_5d, size_4d);
+      
+      SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 0);
+      
+      f_out->VecAddEquVec(tmp2_dwf_5d, dwf_size_5d);
+    }
+    
+    sfree(cname, fname,  "tmp_dwf_5d",  tmp_dwf_5d);
+    sfree(cname, fname, "tmp2_dwf_5d", tmp2_dwf_5d);
+    sfree(cname, fname,  "tmp_mob_5d",  tmp_mob_5d);
+    
+    // final solve
+    DiracOpDwf dwf(*this, f_out, f_in, cg_arg_dwf, cnv_frm);
+    return dwf.MatInv(f_out, f_in, true_res, prs_f_in);
+  }
+#else
+  ERR.NotImplemented(cname, fname);
+  return 1;
+#endif
 }
+
 
 int FdwfBase::eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len,
 		Vector *f_out, Vector *f_in, 
@@ -332,155 +912,6 @@ int FdwfBase::eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev
 
   // Return the number of iterations
   return iter;
-}
-
-// FmatInvMobius: same as FmatInv, except that we use mobius DWF
-// formalism to speed up the CG inversion (via constructing initial guess).
-// n_restart: How many restarts we perform
-int FdwfBase::FmatInvMobius(Vector *f_out,
-                            Vector *f_in,
-                            CgArg *cg_arg_dwf,
-                            MdwfArg *mdwf_arg,
-                            Float *true_res,
-                            CnvFrmType cnv_frm,
-                            PreserveType prs_f_in)
-{
-  const char *fname = "FmatInvMobius(V*, V*, ...)";
-
-#ifdef USE_MDWF
-  // this implementation doesn't allow splitting in s direction(yet).
-  if(GJP.Snodes() != 1){
-    ERR.NotImplemented(cname, fname);
-  }
-  if(cnv_frm != CNV_FRM_YES){
-    ERR.NotImplemented(cname, fname);
-  }
-  Float *rsd_vec = mdwf_arg->rsd_vec.rsd_vec_val;
-  int n_restart = mdwf_arg->rsd_vec.rsd_vec_len;
-  CgArg *cg_arg_mob = &mdwf_arg->cg_arg;
-
-  if(n_restart < 2){
-    ERR.General(cname, fname, "Value %d is invalid for n_restart.\n", n_restart);
-  }
-
-  int mob_ls = mdwf_arg->b5.b5_len;
-  int dwf_size_5d = GJP.VolNodeSites() * FsiteSize();
-  int mob_size_5d = GJP.VolNodeSites() * mob_ls * SPINOR_SIZE;
-  int size_4d = GJP.VolNodeSites() * SPINOR_SIZE;
-
-
-  Vector *tmp_dwf_5d = (Vector *) smalloc(cname, fname, "tmp_dwf_5d", sizeof(Float) * dwf_size_5d);
-  Vector *tmp2_dwf_5d = (Vector *) smalloc(cname, fname, "tmp2_dwf_5d", sizeof(Float) * dwf_size_5d);
-  Vector *tmp_mob_5d = (Vector *) smalloc(cname, fname, "tmp_mob_5d", sizeof(Float) * mob_size_5d);
-
-  // the first time, we solve in DWF to some degree of accuracy
-  {
-    Float rsd = cg_arg_dwf->stop_rsd;
-    cg_arg_dwf->stop_rsd = rsd_vec[0];
-    
-    DiracOpDwf dwf(*this, f_out, f_in, cg_arg_dwf, CNV_FRM_YES);
-    dwf.MatInv(f_out, f_in, NULL, PRESERVE_YES);
-    cg_arg_dwf->stop_rsd = rsd;
-  }
-  
-  int restart_cnt;
-  for(restart_cnt = 1; restart_cnt < n_restart; ++restart_cnt){
-    //constructing the new residue
-    tmp2_dwf_5d->CopyVec(f_in, dwf_size_5d);
-    {
-      DiracOpDwf dwf(*this, tmp_dwf_5d, f_out, cg_arg_dwf, CNV_FRM_YES);
-      dwf.Mat(tmp_dwf_5d, f_out);
-    }
-    tmp2_dwf_5d->VecMinusEquVec(tmp_dwf_5d, dwf_size_5d);
-    //end constructing the new residue
-    
-    cg_arg_mob->stop_rsd = rsd_vec[restart_cnt];
-
-    tmp_dwf_5d->VecZero(dwf_size_5d);
-    {
-      CgArg cg_arg;
-      cg_arg.mass = 1.0;
-
-      cg_arg.stop_rsd = rsd_vec[restart_cnt];
-      cg_arg.max_num_iter = cg_arg_mob->max_num_iter;
-      
-      DiracOpDwf dwf(*this, tmp_dwf_5d, tmp2_dwf_5d, &cg_arg, CNV_FRM_YES);
-      dwf.MatInv(tmp_dwf_5d, tmp2_dwf_5d, NULL, PRESERVE_YES);
-    }
-    SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 1);
-    
-
-    tmp_mob_5d->VecZero(mob_size_5d);
-    tmp_mob_5d->CopyVec(tmp2_dwf_5d, size_4d);
-    
-    SpinProject(tmp_dwf_5d, tmp_mob_5d, mob_ls, 0);
-    
-    {
-      Float mass= cg_arg_mob->mass; 
-      cg_arg_mob->mass = 1.0;
-      
-      DiracOpMdwf mdwf(*this, mdwf_arg);
-      mdwf.Mat(tmp_mob_5d, tmp_dwf_5d);
-      
-      cg_arg_mob->mass = mass;
-    }
-    
-    tmp_dwf_5d->VecZero(mob_size_5d);
-    {
-      DiracOpMdwf mdwf(*this, mdwf_arg);
-      mdwf.MatInv(tmp_dwf_5d, tmp_mob_5d, NULL, PRESERVE_YES);
-    }
-    SpinProject(tmp_mob_5d, tmp_dwf_5d, mob_ls, 1);
-    
-    //OV2DWF
-    tmp_dwf_5d->VecNegative(tmp_mob_5d, size_4d);
-    {
-      Vector * tmp_2nd_plane = (Vector *)((Float *)tmp_dwf_5d + size_4d);
-      Vector * src_2nd_plane = (Vector *)((Float *)tmp2_dwf_5d + size_4d);
-      tmp_2nd_plane->CopyVec(src_2nd_plane, dwf_size_5d - size_4d);
-    }
-    
-    SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 0);
-    
-    {
-      DiracOpDwf dwf(*this, tmp_dwf_5d, tmp2_dwf_5d, cg_arg_dwf, CNV_FRM_YES);
-      dwf.Mat(tmp_dwf_5d, tmp2_dwf_5d);
-    }
-    
-    tmp2_dwf_5d->VecZero(dwf_size_5d);
-    {
-      CgArg cg_arg_tmp;
-      cg_arg_tmp.mass = 1.0;
-      cg_arg_tmp.stop_rsd = cg_arg_mob->stop_rsd;
-      cg_arg_tmp.max_num_iter = cg_arg_mob->max_num_iter;
-      DiracOpDwf dwf(*this, tmp2_dwf_5d, tmp_dwf_5d, &cg_arg_tmp, CNV_FRM_YES);
-      dwf.MatInv(tmp2_dwf_5d, tmp_dwf_5d, NULL, PRESERVE_NO);
-    }
-    SpinProject(tmp_dwf_5d, tmp2_dwf_5d, GJP.SnodeSites(), 1);
-    
-    tmp_dwf_5d->CopyVec(tmp_mob_5d, size_4d);
-    
-    SpinProject(tmp2_dwf_5d, tmp_dwf_5d, GJP.SnodeSites(), 0);
-
-    f_out->VecAddEquVec(tmp2_dwf_5d, dwf_size_5d);
-  }
-
-  // final solve
-  int iter;
-  {
-    DiracOpDwf dwf(*this, f_out, f_in, cg_arg_dwf, cnv_frm);
-    iter = dwf.MatInv(f_out, f_in, true_res, prs_f_in);
-  }
-
-  sfree(cname, fname,  "tmp_dwf_5d",  tmp_dwf_5d);
-  sfree(cname, fname, "tmp2_dwf_5d", tmp2_dwf_5d);
-  sfree(cname, fname,  "tmp_mob_5d",  tmp_mob_5d);
-
-  return iter;
-#else
-  ERR.NotImplemented(cname, fname);
-  return 1;
-#endif
 }
 
 //------------------------------------------------------------------
@@ -1317,21 +1748,6 @@ int FdwfBase::FsiteOffsetChkb(const int *x) const {
   return index; 
 }
 
-
-#if 0
-//------------------------------------------------------------------
-// int FsiteOffset(const int *x):
-// Sets the offsets for the fermion fields on a 
-// checkerboard. The fermion field storage order
-// is the canonical one. X[I] is the
-// ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-//------------------------------------------------------------------
-int FdwfBase::FsiteOffset(const int *x) const {
-// ???
-  ERR.NotImplemented(cname, "FsiteOffset");
-  return 0; 
-}
-#endif
 
 //--------------------------------------------------------------------
 // void SpinProject():

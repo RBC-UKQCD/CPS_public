@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.38 2011-03-28 16:01:11 chulwoo Exp $
+  $Id: gjp.h,v 1.39 2011-06-26 06:45:29 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-03-28 16:01:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.38 2011-03-28 16:01:11 chulwoo Exp $
-//  $Id: gjp.h,v 1.38 2011-03-28 16:01:11 chulwoo Exp $
+//  $Date: 2011-06-26 06:45:29 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.39 2011-06-26 06:45:29 chulwoo Exp $
+//  $Id: gjp.h,v 1.39 2011-06-26 06:45:29 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.38 $
+//  $Revision: 1.39 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -159,7 +159,9 @@ class GlobalJobParameter
       
 
   MdwfArg *mdwf_arg;
-
+  MdwfTuning *mdwf_tuning;
+  char *mdwf_tuning_fn;
+  char *mdwf_tuning_record_fn;
 public:
   GlobalJobParameter();
 
@@ -810,11 +812,19 @@ public:
   void setArg(int* argc, char*** argv);
 
 
-  void SetMdwfArg(MdwfArg *_mdwf_arg);
+  void SetMdwfArg(const MdwfArg *);
 
   MdwfArg *GetMdwfArg(void){return mdwf_arg;}
 
   void FreeMdwfArg(void);
+
+  bool InitMdwfTuning(const MdwfTuningInitArg &);
+
+  MdwfTuning *GetMdwfTuning(void){return mdwf_tuning;}
+
+  char *GetMdwfTuningFN(void){return mdwf_tuning_fn;}
+
+  char *GetMdwfTuningRecordFN(void){return mdwf_tuning_record_fn;}
 
   /*! @} */
 };
