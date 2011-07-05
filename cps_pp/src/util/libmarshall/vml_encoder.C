@@ -199,7 +199,8 @@ bool_t TextEncoder::Array     ( VML *vmls, char *type, char *name,
     for(int i=0;i<nvals;i++) { 
       if ( vals == NULL ) { DEB("NULL array\n"); return false;};
       sprintf(tmp,"%s[%d]",name,i);
-      do_one(vmls,tmp,(void *)((unsigned long)vals+i*sizeofone));
+      bool_t ret = do_one(vmls,tmp,(void *)((unsigned long)vals+i*sizeofone));
+	  if (ret == false) return false;
     }
     /*Skip the closing bracket...*/
     if (!vmls->Gets((char *)line,256)) { DEB("Array close\n"); return false;}
