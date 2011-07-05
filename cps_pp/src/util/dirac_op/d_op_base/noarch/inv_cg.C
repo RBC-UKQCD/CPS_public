@@ -1,24 +1,23 @@
 #include <config.h>
-#ifndef USE_BLAS
 #include <stdio.h>
 #include <stdlib.h>
 CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.11 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: inv_cg.C,v 1.12 2011-07-05 20:01:22 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-02-26 00:19:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.11 2011-02-26 00:19:27 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.11 2011-02-26 00:19:27 chulwoo Exp $
+//  $Date: 2011-07-05 20:01:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.12 2011-07-05 20:01:22 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.12 2011-07-05 20:01:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -326,8 +325,8 @@ int DiracOp::InvCg(Vector *out,
 
     // If d = 0 we are done
     if(d == 0.0) {
-      ERR.General(cname,fname,"d(%e) = 0.0!!\n",d);
-	exit(5);
+      VRB.Warn(cname,fname,"d(%e) = 0.0!!\n",d);
+//	exit(5);
       break;
       //??? or should we give a warning or error? Yes we should, really.
     }
@@ -617,4 +616,3 @@ int DiracOp::InvCg(void)
 
 
 CPS_END_NAMESPACE
-#endif
