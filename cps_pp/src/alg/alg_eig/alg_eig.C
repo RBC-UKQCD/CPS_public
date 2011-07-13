@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.25 2009-03-23 19:13:32 chulwoo Exp $
+  $Id: alg_eig.C,v 1.26 2011-07-13 02:18:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-03-23 19:13:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.25 2009-03-23 19:13:32 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.25 2009-03-23 19:13:32 chulwoo Exp $
+//  $Date: 2011-07-13 02:18:50 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.26 2011-07-13 02:18:50 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.26 2011-07-13 02:18:50 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.25 $
+//  $Revision: 1.26 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -36,9 +36,6 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 CPS_START_NAMESPACE
 
-#include <iostream>
-#include <fstream>
-#include <iomanip>
 using namespace std;
 
 extern void gamma_5(Float *v_out, Float *v_in, int num_sites);

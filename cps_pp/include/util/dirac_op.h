@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.27 2011-06-26 06:45:29 chulwoo Exp $
+  $Id: dirac_op.h,v 1.28 2011-07-13 02:18:50 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
