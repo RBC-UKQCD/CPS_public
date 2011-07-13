@@ -475,14 +475,14 @@ class AlgActionRational : public AlgActionBilinear {
   void generateCgArg(Float *mass,
                      CgArg **** cg_arg_fg,
                      CgArg **** cg_arg_md, 
-		     CgArg **** cg_arg_mc, char *label, 
+		     CgArg **** cg_arg_mc, const char *label, 
 		     RationalDescr *rat_des);
 
   //<! Free cg args
   void destroyCgArg(CgArg ***cg_arg_fg,
                     CgArg ***cg_arg_md,
                     CgArg ***cg_arg_mc,
-		    char *label, RemezArg *remez_arg_md,
+		    const char *label, RemezArg *remez_arg_md,
 		    RemezArg *remez_arg_mc);
 
   //!< Automatic generation of required EigArg
