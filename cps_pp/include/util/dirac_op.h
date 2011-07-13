@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.28 2011-07-13 02:18:50 chulwoo Exp $
+  $Id: dirac_op.h,v 1.29 2011-07-13 17:56:53 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -16,6 +16,8 @@ CPS_END_NAMESPACE
 #include <alg/cg_arg.h>
 #include <alg/eig_arg.h>
 CPS_START_NAMESPACE
+
+typedef unsigned long long IntFlopCounter;
 
 
 //------------------------------------------------------------------

@@ -2,24 +2,24 @@
 typedef float pooh;
 
 #ifndef VMLH
-#include"precision.h"
+#include "precision.h"
 #endif
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.22 2011-05-14 06:12:35 chulwoo Exp $
+  $Id: enum.x,v 1.23 2011-07-13 17:56:53 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2011-05-14 06:12:35 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.22 2011-05-14 06:12:35 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.22 2011-05-14 06:12:35 chulwoo Exp $*/
+/*  $Date: 2011-07-13 17:56:53 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.23 2011-07-13 17:56:53 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.23 2011-07-13 17:56:53 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.22 $*/
+/*  $Revision: 1.23 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/

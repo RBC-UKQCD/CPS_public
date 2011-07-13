@@ -593,7 +593,7 @@ int AlgActionRational::compareApprox(RemezArg &arg1, RemezArg &arg2) {
 void AlgActionRational::generateCgArg(Float *mass,
                                       CgArg ****cg_arg_fg,
                                       CgArg ****cg_arg_md, 
-				      CgArg ****cg_arg_mc, char *label, 
+				      CgArg ****cg_arg_mc, const char *label, 
 				      RationalDescr *rat)
 {
 
@@ -657,7 +657,7 @@ void AlgActionRational::generateCgArg(Float *mass,
 void AlgActionRational::destroyCgArg(CgArg ***cg_arg_fg,
                                      CgArg ***cg_arg_md,
                                      CgArg ***cg_arg_mc,
-				     char *label, RemezArg *remez_arg_md,
+				     const char *label, RemezArg *remez_arg_md,
 				     RemezArg *remez_arg_mc) {
 
   char *fname = "destroyCgArg(Cg***, Cg***,Cg***,char*,RemezArg*,RemezArg*)";

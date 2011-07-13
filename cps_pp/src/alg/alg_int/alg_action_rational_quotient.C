@@ -84,9 +84,9 @@ AlgActionRationalQuotient::AlgActionRationalQuotient(AlgMomentum &mom,
 		   rat_quo_arg->fermions.fermions_val);
     generateApprox(bsn_mass,&bsn_remez_arg_md,&bsn_remez_arg_mc,
 		   rat_quo_arg->bosons.bosons_val);
-    generateCgArg(frm_mass,&frm_cg_arg_md,&frm_cg_arg_mc,"frm_cg_arg",
+    generateCgArg(frm_mass,&frm_cg_arg_fg, &frm_cg_arg_md,&frm_cg_arg_mc,"frm_cg_arg",
 		  rat_quo_arg->fermions.fermions_val);
-    generateCgArg(bsn_mass,&bsn_cg_arg_md,&bsn_cg_arg_mc,"bsn_cg_arg",
+    generateCgArg(bsn_mass,&bsn_cg_arg_fg, &bsn_cg_arg_md,&bsn_cg_arg_mc,"bsn_cg_arg",
 		  rat_quo_arg->bosons.bosons_val);
 
     max_size = 0;
@@ -141,9 +141,9 @@ AlgActionRationalQuotient::~AlgActionRationalQuotient() {
     sfree(frmn, "frmn", fname, cname);
 
     //!< Free memory for the fermion CG arguments
-    destroyCgArg(bsn_cg_arg_md, bsn_cg_arg_mc, "bsn_cg_arg", 
+    destroyCgArg(bsn_cg_arg_fg, bsn_cg_arg_md, bsn_cg_arg_mc, "bsn_cg_arg", 
 		 bsn_remez_arg_md, bsn_remez_arg_mc);
-    destroyCgArg(frm_cg_arg_md, frm_cg_arg_mc, "frm_cg_arg", 
+    destroyCgArg(frm_cg_arg_fg, frm_cg_arg_md, frm_cg_arg_mc, "frm_cg_arg", 
 		 frm_remez_arg_md, frm_remez_arg_mc);
 
     //!< Must not free these until CG args are freed.
@@ -328,158 +328,282 @@ Float AlgActionRationalQuotient::energy() {
   
 }
 
-//!< run method evolves the integrator
-void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
+void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
 {
+  char * fname = "prepare_fg(M*,F)";
+  Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
 
-  char *fname = "evolve(Float,int)";
-  int shift = 0;
   int isz = 0;
+  for(int i=0; i<n_masses; i++){	
+    int bsn_deg = bsn_remez_arg_md[i].degree;
+    int frm_deg = frm_remez_arg_md[i].degree;
 
-  if (n_masses > 0) {
-    //!< Create an appropriate lattice
-    Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
-    
-    for(int steps = 0; steps<nsteps; steps++) {
-      for(int i=0; i<n_masses; i++){	
+    //! First apply boson rational
+    int shift = 0;
+    cg_iter = lat.FmatEvlMInv(frmn, phi[i],
+                              bsn_remez_arg_md[i].pole+isz,
+                              bsn_deg, isz,
+                              bsn_cg_arg_fg[i]+isz, CNV_FRM_NO,
+                              frmn_d+shift);
 
-	int bsn_deg = bsn_remez_arg_md[i].degree;
-	int frm_deg = frm_remez_arg_md[i].degree;
+    updateCgStats(bsn_cg_arg_fg[i][isz]);
 
-	//! First apply boson rational
-	shift = 0;
-	cg_iter = lat.FmatEvlMInv(frmn, phi[i], 
-				  bsn_remez_arg_md[i].pole+isz, 
-				  bsn_deg, isz, 
-				  bsn_cg_arg_md[i]+isz, CNV_FRM_NO, 
-				  frmn_d+shift);	
+    //!< Construct rhs
+    eta[0] -> VecEqualsVecTimesEquFloat(phi[i],bsn_remez_arg_md[i].norm,
+                                        f_size);
+    for (int j=0; j<bsn_deg; j++)
+      eta[0] -> FTimesV1PlusV2(bsn_remez_arg_md[i].residue[j],
+                               frmn[j],eta[0],f_size);
 
-	updateCgStats(bsn_cg_arg_md[i][isz]);
+    //!< Now apply fermion rational
+    shift += bsn_deg;
+    cg_iter = lat.FmatEvlMInv(frmn+shift, eta[0], 
+                              frm_remez_arg_md[i].pole+isz, 
+                              frm_deg, isz,
+                              frm_cg_arg_fg[i]+isz, CNV_FRM_NO, 
+                              frmn_d+shift+isz);
 
-	//!< Construct rhs
-	eta[0] -> VecEqualsVecTimesEquFloat(phi[i],bsn_remez_arg_md[i].norm,
-					    f_size);
-	for (int j=0; j<bsn_deg; j++)
-	  eta[0] -> FTimesV1PlusV2(bsn_remez_arg_md[i].residue[j],
-				   frmn[j],eta[0],f_size);
-
-	//!< Now apply fermion rational
-	shift += bsn_deg;
-	cg_iter = lat.FmatEvlMInv(frmn+shift, eta[0], 
-				  frm_remez_arg_md[i].pole+isz, 
-				  frm_deg, isz, 
-				  frm_cg_arg_md[i]+isz, CNV_FRM_NO, 
-				  frmn_d+shift+isz);	
-
-	updateCgStats(frm_cg_arg_md[i][isz]);
+    updateCgStats(frm_cg_arg_fg[i][isz]);
 	
-	//!< Construct rhs
-	eta[1] -> VecEqualsVecTimesEquFloat(eta[0],frm_remez_arg_md[i].norm,
-					    f_size);
-	for (int j=0; j<frm_deg; j++)
-	  eta[1] -> FTimesV1PlusV2(frm_remez_arg_md[i].residue[j],
-				   frmn[j+shift],eta[1],f_size);
+    //!< Construct rhs
+    eta[1] -> VecEqualsVecTimesEquFloat(eta[0],frm_remez_arg_md[i].norm,
+                                        f_size);
+    for (int j=0; j<frm_deg; j++)
+      eta[1] -> FTimesV1PlusV2(frm_remez_arg_md[i].residue[j],
+                               frmn[j+shift],eta[1],f_size);
 
-	//!< Apply final boson rational
-	shift += frm_deg;
-	cg_iter = lat.FmatEvlMInv(frmn+shift, eta[1], 
-				  bsn_remez_arg_md[i].pole+isz, 
-				  bsn_deg, isz, 
-				  bsn_cg_arg_md[i]+isz, CNV_FRM_NO, 
-				  frmn_d+shift);	
-	updateCgStats(bsn_cg_arg_md[i][isz]);
+    //!< Apply final boson rational
+    shift += frm_deg;
+    cg_iter = lat.FmatEvlMInv(frmn+shift, eta[1], 
+                              bsn_remez_arg_md[i].pole+isz, 
+                              bsn_deg, isz, 
+                              bsn_cg_arg_fg[i]+isz, CNV_FRM_NO, 
+                              frmn_d+shift);	
+    updateCgStats(bsn_cg_arg_fg[i][isz]);
 
-	//!< Now construct additional vectors needed
-	for (int j=0; j<bsn_deg; j++) {
+    //!< Now construct additional vectors needed
+    for (int j=0; j<bsn_deg; j++) {
       Float one=1.;
-	  frmn[j+shift+bsn_deg] -> 
-	    FTimesV1PlusV2(one, frmn[j], frmn[j+shift], f_size);
-	}
+      frmn[j+shift+bsn_deg] -> FTimesV1PlusV2(one, frmn[j], frmn[j+shift], f_size);
+    }
 
-	//!< Copy over required residues and setup pointers for bosonic force
-	for (int j=0; j<bsn_deg; j++) {
-	  all_res[j] = -bsn_remez_arg_md[i].residue[j];
-	  all_res[j+bsn_deg] = -bsn_remez_arg_md[i].residue[j];
-	  all_res[j+2*bsn_deg] = bsn_remez_arg_md[i].residue[j];
+    //!< Copy over required residues and setup pointers for bosonic force
+    for (int j=0; j<bsn_deg; j++) {
+      all_res[j] = -bsn_remez_arg_md[i].residue[j];
+      all_res[j+bsn_deg] = -bsn_remez_arg_md[i].residue[j];
+      all_res[j+2*bsn_deg] = bsn_remez_arg_md[i].residue[j];
 
-	  frmn_tmp[j] = frmn[j];
-	  frmn_tmp[j+bsn_deg] = frmn[j+bsn_deg+frm_deg];
-	  frmn_tmp[j+2*bsn_deg] = frmn[j+2*bsn_deg+frm_deg];
-	}
+      frmn_tmp[j] = frmn[j];
+      frmn_tmp[j+bsn_deg] = frmn[j+bsn_deg+frm_deg];
+      frmn_tmp[j+2*bsn_deg] = frmn[j+2*bsn_deg+frm_deg];
+    }
 
-	Matrix *mom_tmp;
-	if (force_measure == FORCE_MEASURE_YES) {
-	  mom_tmp = (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
-	  ((Vector*)mom_tmp)->VecZero(g_size);
-	} else {
-	  mom_tmp = mom;
-	}
+    Matrix * mom_tmp = force;
+    if (force_measure == FORCE_MEASURE_YES) {
+      mom_tmp = (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
+      ((Vector*)mom_tmp)->VecZero(g_size);
+    }
+    
+    //!< Do bosonic force contribution
+    Fdt = lat.RHMC_EvolveMomFforce(mom_tmp, frmn_tmp, 3*bsn_deg, 0,
+                                   all_res, bsn_mass[i], dt_ratio, frmn_d, 
+                                   force_measure);
+    if (force_measure == FORCE_MEASURE_YES) {	  
+      char label[200];
+      sprintf(label, "%s (boson), mass = %e:", 
+              force_label, bsn_mass[i]);
+      Fdt.print(dt_ratio, label);
+    }
 
-	//!< Do bosonic force contribution
-	Fdt = lat.RHMC_EvolveMomFforce(mom_tmp, frmn_tmp, 3*bsn_deg, 0,
-				       all_res, bsn_mass[i], dt, frmn_d, 
-				       force_measure);
-	if (force_measure == FORCE_MEASURE_YES) {	  
-	  char label[200];
-	  sprintf(label, "%s (boson), mass = %e:", 
-		  force_label, bsn_mass[i]);
-	  Fdt.print(dt, label);
-	}
+    //!< Do fermionic force contribution
+    Fdt = lat.RHMC_EvolveMomFforce(mom_tmp, frmn+bsn_deg, frm_deg, 0,
+                                   frm_remez_arg_md[i].residue, frm_mass[i], 
+                                   dt_ratio, frmn_d, force_measure);
+    if (force_measure == FORCE_MEASURE_YES) {
+      char label[200];
+      sprintf(label, "%s (fermion), mass = %e:", 
+              force_label, frm_mass[i]);
+      Fdt.print(dt_ratio, label);
+    }
 
-	//!< Do fermionic force contribution
-	Fdt = lat.RHMC_EvolveMomFforce(mom_tmp, frmn+bsn_deg, frm_deg, 0,
-				       frm_remez_arg_md[i].residue, frm_mass[i], 
-				       dt, frmn_d, force_measure);
-	if (force_measure == FORCE_MEASURE_YES) {	  
-	  char label[200];
-	  sprintf(label, "%s (fermion), mass = %e:", 
-		  force_label, frm_mass[i]);
-	  Fdt.print(dt, label);
-	}
-
-	//!< Monitor total force contribution
-	if (force_measure == FORCE_MEASURE_YES) {
+    //!< Monitor total force contribution
+    if (force_measure == FORCE_MEASURE_YES) {
       Float L1 = 0.0;
       Float L2 = 0.0;
       Float Linf = 0.0;
-	  for (int k=0; k<g_size/18; k++) {
-	    Float norm = (mom_tmp+k)->norm();
-	    Float tmp = sqrt(norm);
-	    L1 += tmp;
-	    L2 += norm;
-	    Linf = (tmp>Linf ? tmp : Linf);
-	  }
-	  glb_sum(&L1);
-	  glb_sum(&L2);
-	  glb_max(&Linf);
+      for (int k=0; k<g_size/18; k++) {
+        Float norm = (mom_tmp + k)->norm();
+        Float tmp = sqrt(norm);
+        L1 += tmp;
+        L2 += norm;
+        Linf = (tmp>Linf ? tmp : Linf);
+      }
+      glb_sum(&L1);
+      glb_sum(&L2);
+      glb_max(&Linf);
 
-	  L1 /= 4.0*GJP.VolSites();
-	  L2 /= 4.0*GJP.VolSites();	 
+      L1 /= 4.0*GJP.VolSites();
+      L2 /= 4.0*GJP.VolSites();	 
 
-	  fTimesV1PlusV2((IFloat*)mom,1.0,(IFloat*)mom_tmp,(IFloat*)mom,g_size);
-	  sfree(mom_tmp);
+      ((Vector *)force)->VecAddEquVec((Vector *)mom_tmp, g_size);
 
-	  char label[200];
-	  sprintf(label, "%s (total), mass = (%e,%e):", 
-		  force_label, frm_mass[i], bsn_mass[i]);
+      char label[200];
+      sprintf(label, "%s (total), mass = (%e,%e):", 
+              force_label, frm_mass[i], bsn_mass[i]);
 
-	  Fdt = ForceArg(L1, sqrt(L2), Linf);
-	  Fdt.print(dt, label);
+      Fdt = ForceArg(L1, sqrt(L2), Linf);
+      Fdt.print(dt_ratio, label);
 
-	}
+      sfree(mom_tmp, "mom_tmp", fname, cname);
+    }
+  }
+  LatticeFactory::Destroy();
+}
+
+//!< run method evolves the integrator
+void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
+{
+  char * fname = "evolve(Float, int)";
+  if (n_masses <= 0) return;
+  int isz = 0;
+  //!< Create an appropriate lattice
+  Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
+    
+  for(int steps = 0; steps<nsteps; steps++) {
+    for(int i=0; i<n_masses; i++){
+      int bsn_deg = bsn_remez_arg_md[i].degree;
+      int frm_deg = frm_remez_arg_md[i].degree;
+
+      //! First apply boson rational
+      int shift = 0;
+      cg_iter = lat.FmatEvlMInv(frmn, phi[i], 
+                                bsn_remez_arg_md[i].pole+isz, 
+                                bsn_deg, isz, 
+                                bsn_cg_arg_md[i]+isz, CNV_FRM_NO, 
+                                frmn_d+shift);	
+
+      updateCgStats(bsn_cg_arg_md[i][isz]);
+
+      //!< Construct rhs
+      eta[0] -> VecEqualsVecTimesEquFloat(phi[i],bsn_remez_arg_md[i].norm,
+                                          f_size);
+      for (int j=0; j<bsn_deg; j++)
+        eta[0] -> FTimesV1PlusV2(bsn_remez_arg_md[i].residue[j],
+                                 frmn[j],eta[0],f_size);
+
+      //!< Now apply fermion rational
+      shift += bsn_deg;
+      cg_iter = lat.FmatEvlMInv(frmn+shift, eta[0], 
+                                frm_remez_arg_md[i].pole+isz, 
+                                frm_deg, isz, 
+                                frm_cg_arg_md[i]+isz, CNV_FRM_NO, 
+                                frmn_d+shift+isz);
+
+      updateCgStats(frm_cg_arg_md[i][isz]);
+	
+      //!< Construct rhs
+      eta[1] -> VecEqualsVecTimesEquFloat(eta[0],frm_remez_arg_md[i].norm,
+                                          f_size);
+      for (int j=0; j<frm_deg; j++)
+        eta[1] -> FTimesV1PlusV2(frm_remez_arg_md[i].residue[j],
+                                 frmn[j+shift],eta[1],f_size);
+
+      //!< Apply final boson rational
+      shift += frm_deg;
+      cg_iter = lat.FmatEvlMInv(frmn+shift, eta[1], 
+                                bsn_remez_arg_md[i].pole+isz, 
+                                bsn_deg, isz, 
+                                bsn_cg_arg_md[i]+isz, CNV_FRM_NO, 
+                                frmn_d+shift);	
+      updateCgStats(bsn_cg_arg_md[i][isz]);
+
+      //!< Now construct additional vectors needed
+      for (int j=0; j<bsn_deg; j++) {
+        Float one=1.;
+        frmn[j+shift+bsn_deg] -> 
+          FTimesV1PlusV2(one, frmn[j], frmn[j+shift], f_size);
+      }
+
+      //!< Copy over required residues and setup pointers for bosonic force
+      for (int j=0; j<bsn_deg; j++) {
+        all_res[j] = -bsn_remez_arg_md[i].residue[j];
+        all_res[j+bsn_deg] = -bsn_remez_arg_md[i].residue[j];
+        all_res[j+2*bsn_deg] = bsn_remez_arg_md[i].residue[j];
+
+        frmn_tmp[j] = frmn[j];
+        frmn_tmp[j+bsn_deg] = frmn[j+bsn_deg+frm_deg];
+        frmn_tmp[j+2*bsn_deg] = frmn[j+2*bsn_deg+frm_deg];
+      }
+
+      Matrix *mom_tmp;
+      if (force_measure == FORCE_MEASURE_YES) {
+        mom_tmp = (Matrix*)smalloc(g_size*sizeof(Float),cname, fname, "mom_tmp");
+        ((Vector*)mom_tmp)->VecZero(g_size);
+      } else {
+        mom_tmp = mom;
+      }
+
+      //!< Do bosonic force contribution
+      Fdt = lat.RHMC_EvolveMomFforce(mom_tmp, frmn_tmp, 3*bsn_deg, 0,
+                                     all_res, bsn_mass[i], dt, frmn_d, 
+                                     force_measure);
+      if (force_measure == FORCE_MEASURE_YES) {	  
+        char label[200];
+        sprintf(label, "%s (boson), mass = %e:", 
+                force_label, bsn_mass[i]);
+        Fdt.print(dt, label);
+      }
+
+      //!< Do fermionic force contribution
+      Fdt = lat.RHMC_EvolveMomFforce(mom_tmp, frmn+bsn_deg, frm_deg, 0,
+                                     frm_remez_arg_md[i].residue, frm_mass[i], 
+                                     dt, frmn_d, force_measure);
+      if (force_measure == FORCE_MEASURE_YES) {	  
+        char label[200];
+        sprintf(label, "%s (fermion), mass = %e:", force_label, frm_mass[i]);
+        Fdt.print(dt, label);
+      }
+
+      //!< Monitor total force contribution
+      if (force_measure == FORCE_MEASURE_YES) {
+        Float L1 = 0.0;
+        Float L2 = 0.0;
+        Float Linf = 0.0;
+        for (int k=0; k<g_size/18; k++) {
+          Float norm = (mom_tmp+k)->norm();
+          Float tmp = sqrt(norm);
+          L1 += tmp;
+          L2 += norm;
+          Linf = (tmp>Linf ? tmp : Linf);
+        }
+        glb_sum(&L1);
+        glb_sum(&L2);
+        glb_max(&Linf);
+
+        L1 /= 4.0*GJP.VolSites();
+        L2 /= 4.0*GJP.VolSites();	 
+
+        fTimesV1PlusV2((IFloat*)mom,1.0,(IFloat*)mom_tmp,(IFloat*)mom,g_size);
+        sfree(mom_tmp);
+
+        char label[200];
+        sprintf(label, "%s (total), mass = (%e,%e):", 
+                force_label, frm_mass[i], bsn_mass[i]);
+
+        Fdt = ForceArg(L1, sqrt(L2), Linf);
+        Fdt.print(dt, label);
 
       }
-      
-      evolved = 1;
-      heatbathEval = 0;
-      energyEval = 0;
-      md_steps++;
+
     }
-    
-    LatticeFactory::Destroy();
 
+    evolved = 1;
+    heatbathEval = 0;
+    energyEval = 0;
+    md_steps++;
   }
-
+    
+  LatticeFactory::Destroy();
 }
 
 CPS_END_NAMESPACE
