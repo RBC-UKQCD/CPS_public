@@ -2,7 +2,6 @@
 #define _PRECISION_H_
 typedef @LOCALPRECISION@ Float;
 typedef @LOCALPRECISION@ IFloat;
-typedef unsigned long long IntFlopCounter;
 #endif
 
 
