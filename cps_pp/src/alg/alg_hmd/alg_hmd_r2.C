@@ -22,6 +22,7 @@ CPS_END_NAMESPACE
 #include <util/smalloc.h>
 #include <util/verbose.h>
 #include <util/error.h>
+#include <util/qcdio.h>
 CPS_START_NAMESPACE
 
 
@@ -375,10 +376,10 @@ Float AlgHmdR2::run(void)
   // Print out monitor info
   //---------------------------------------------------------------
   if(common_arg->results != 0){
-    if( (fp = fopen((char *)common_arg->results, "a")) == NULL ) {
+    if( (fp = Fopen((char *)common_arg->results, "a")) == NULL ) {
       ERR.FileA(cname,fname, (char *)common_arg->results);
     }
-    fprintf(fp,"%d %e %e %e %d %d %e %e %e\n",
+    Fprintf(fp,"%d %e %e %e %d %d %e %e %e\n",
 	    hmd_arg->steps_per_traj,
 	    IFloat(dev),
 	    IFloat(max_diff),
@@ -388,7 +389,7 @@ Float AlgHmdR2::run(void)
 	    IFloat(true_res_av),
 	    IFloat(true_res_min),
 	    IFloat(true_res_max));
-    fclose(fp);
+    Fclose(fp);
   }
 
   VRB.Result(cname,fname,
