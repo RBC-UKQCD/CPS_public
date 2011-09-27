@@ -103,7 +103,7 @@ enum INT_FORMAT  IntConv::testHostFormat() { // test the type of CPS::Float
   const char * fname = "testHostFormat()";
   // 1. endian
   char end_check[4] = {1,0,0,0};
-  unsigned long *lp = (unsigned long *)end_check;
+  uint32_t *lp = (uint32_t *)end_check;
   int host_big;
 
   if ( *lp == 0x1 ) { 
