@@ -1,0 +1,27 @@
+class ActionQuotientArg quo_arg = {
+class ActionBilinearArg bi_arg = {
+FclassType fermion = F_CLASS_DWF
+Array bilinears[1] = { 
+class BilinearDescr bilinears[0] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 5000
+}
+}
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_YES
+string force_label = "Quotient"
+}
+}
+Array quotients[1] = { 
+class QuotientDescr quotients[0] = {
+double bsn_mass =   3.0000000000000002e-02
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   2.5000000000000002e-02
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-10
+double stop_rsd_md =   9.9999999999999995e-07
+double stop_rsd_mc =   1.0000000000000000e-10
+}
+}
+}

@@ -149,7 +149,8 @@ void FermionVectorTp::SetBoxSource(int color,
 
   char *fname = "SetBoxSource(color,spin,start,end,source_time)";
   
-  VRB.Func(cname, fname);
+//  VRB.Func(cname, fname);
+  VRB.Result(cname, fname,"Entered");
   
   if (color < 0 || color >= GJP.Colors())
     ERR.General(cname, fname,
@@ -172,12 +173,17 @@ void FermionVectorTp::SetBoxSource(int color,
   int ysize = GJP.YnodeSites();
   int zsize = GJP.ZnodeSites();
   //int tsize = GJP.TnodeSites();
+  int xsites = GJP.XnodeSites()*GJP.Xnodes();
+  int ysites = GJP.YnodeSites()*GJP.Ynodes();
+  int zsites = GJP.ZnodeSites()*GJP.Znodes();
+  VRB.Result(cname,fname,"sites = %d %d %d\n",xsites,ysites,zsites);
   
   //zero source on all nodes
   for (int i = 0; i < fv_size; i++) {
      fv[i] = 0.0;
   }
   int t = node_ts;
+  int src_vol=0;
   for(int x = 0; x < xsize; x++){
     for(int y = 0; y < ysize; y++){
       for(int z = 0; z < zsize; z++){
@@ -185,16 +191,27 @@ void FermionVectorTp::SetBoxSource(int color,
 		  int i = j + GJP.Colors()*8*(x + xsize*(y+ysize*(z+zsize*(t))));
 		  //#ifdef PARALLEL
 		  if(tnode != ts_node)continue;
-		  else if(x + xnode*xsize < start || x + xnode*xsize > end) continue;
-		  else if(y + ynode*ysize < start || y + ynode*ysize > end) continue;
-		  else if(z + znode*zsize < start || z + znode*zsize > end) continue;
+		  else if( (end < xsites) && ( (x + xnode*xsize < start) || (x + xnode*xsize > end) )) continue;
+		  else if( (end < ysites) && ( (y + ynode*ysize < start) || (y + ynode*ysize > end) )) continue;
+		  else if( (end < zsites) && ( (z + znode*zsize < start) || (z + znode*zsize > end) )) continue;
+		  else if( (end >=xsites) && ( (x + xnode*xsize < start) && (x + xnode*xsize > end - xsites) )) continue;
+		  else if( (end >=ysites) && ( (y + ynode*ysize < start) && (y + ynode*ysize > end - ysites) )) continue;
+		  else if( (end >=zsites) && ( (z + znode*zsize < start) && (z + znode*zsize > end - zsites) )) continue;
+//		  else if(y + ynode*ysize < start || y + ynode*ysize > end) continue;
+//		  else if(z + znode*zsize < start || z + znode*zsize > end) continue;
 		  //#endif
 		  if(i%SPINOR_SIZE != 2*(color + COLORS*spin))continue;
 		  fv[i] = 1.0;
+		  src_vol++;
 		}
       }
     }
   }
+  Float vol_f = src_vol;
+  glb_sum(&vol_f);
+  src_vol = vol_f;
+
+  VRB.Result(cname,fname,"src_vol = %d\n",src_vol);
 }
 
 // Set source from previously defined source
