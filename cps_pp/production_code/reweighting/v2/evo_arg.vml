@@ -1,0 +1,21 @@
+class EvoArg evo_arg = {
+int traj_start = 260
+int gauge_unload_period = 50
+int gauge_configurations = 3
+int io_concurrency = 32
+int hdw_xcsum = 1
+int hdw_rcsum = 1
+int reproduce_interval = 10
+string ensemble_id = "100"
+string ensemble_label = "RBC_UKQCD_32x64x16_Iwasaki_2.25_2+1_0.004_0.03_DWF_H_RG_QUOTIENT"
+string creator = "Jung"
+string gauge_file_stem = "../configurations/ckpoint_lat"
+string rng_file_stem = "../rngs/ckpoint_rng"
+string plaquette_stem = "../results/alg_plaq/plaq"
+string pbp_stem = "pbp"
+string evo_stem = "../results/alg_hmc/hmc"
+string w_spect_directory = "../results/alg_w_spect"
+string work_directory = "."
+int measure_pbp = 10
+int measure_w_spect_interval = 5
+}

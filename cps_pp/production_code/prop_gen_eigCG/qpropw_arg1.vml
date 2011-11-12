@@ -1,0 +1,31 @@
+class QPropWArg qpropw_arg = {
+class CgArg cg = {
+double mass = 0.001 
+double epsilon =   0.0000000000000000e+00
+int max_num_iter = 20000
+double stop_rsd =   1.0000000000000000e-08
+double true_rsd =   0.0000000000000000e+00
+RitzMatType RitzMatOper = NONE
+InverterType Inverter = EIGCG
+int bicgstab_n = 0
+}
+string file = "./"
+int x = 0
+int y = 0
+int z = 0
+int t = 0
+int gauge_fix_src = 0
+int gauge_fix_snk = 0
+int store_midprop = 2
+int save_prop = 1
+int save_ls_prop = 0
+int do_half_fermion = 0
+SourceType SeqSmearSink = POINT
+string ensemble_label = "auxdet_b175ml001_ms045_32^3x64x32"
+string ensemble_id = "0"
+int seqNum = 10
+int StartSrcSpin = 0
+int EndSrcSpin = 4
+int StartSrcColor = 0
+int EndSrcColor = 3
+}

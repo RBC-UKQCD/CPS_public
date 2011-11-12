@@ -1,0 +1,16 @@
+class QPropWGaussArg gauss_arg = {
+int gauss_N = 70
+double gauss_W =   6.00
+int nt = 0
+Vector mt[5] = { 
+int mt[0] = 0
+int mt[1] = 0
+int mt[2] = 0
+int mt[3] = 0
+int mt[4] = 0
+}
+GaussianKernelLinkSmearType gauss_link_smear_type = GKLS_APE
+int gauss_link_smear_N = 25
+double gauss_link_smear_coeff =  0.4 
+double gauss_link_smear_tolerance =   1.00000000000e-06
+}

@@ -20,6 +20,7 @@
 <item><name>frm_mass_epsilon</name><value><double>0.000000e+00</double></value></item>
 <item><name>chrono</name><value><int>0</int></value></item>
 <item><name>stop_rsd_hb</name><value><double>0.000000e+00</double></value></item>
+<item><name>stop_rsd_fg_mult</name><value><double>0.000000e+00</double></value></item>
 <item><name>stop_rsd_md</name><value><double>0.000000e+00</double></value></item>
 <item><name>stop_rsd_mc</name><value><double>0.000000e+00</double></value></item>
 </data></class>

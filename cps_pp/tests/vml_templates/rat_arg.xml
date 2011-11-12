@@ -32,6 +32,7 @@
 <item><name>power_num</name><value><int>0</int></value></item>
 <item><name>power_den</name><value><int>0</int></value></item>
 <item><name>precision</name><value><i4>0</i4></value></item>
+<item><name>stop_rsd_fg_mult</name><value><double>0.000000e+00</double></value></item>
 <class><name>ApproxDescr</name><instance>md_approx</instance><data>
 <item><name>approx_type</name><value><RationalApproxType>RATIONAL_APPROX_POWER </RationalApproxType></value></item>
 <item><name>bounds_type</name><value><RationalBoundsType>RATIONAL_BOUNDS_AUTOMATIC </RationalBoundsType></value></item>
@@ -81,6 +82,7 @@
 <item><name>power_num</name><value><int>0</int></value></item>
 <item><name>power_den</name><value><int>0</int></value></item>
 <item><name>precision</name><value><i4>0</i4></value></item>
+<item><name>stop_rsd_fg_mult</name><value><double>0.000000e+00</double></value></item>
 <class><name>ApproxDescr</name><instance>md_approx</instance><data>
 <item><name>approx_type</name><value><RationalApproxType>RATIONAL_APPROX_POWER </RationalApproxType></value></item>
 <item><name>bounds_type</name><value><RationalBoundsType>RATIONAL_BOUNDS_AUTOMATIC </RationalBoundsType></value></item>
@@ -130,6 +132,7 @@
 <item><name>power_num</name><value><int>0</int></value></item>
 <item><name>power_den</name><value><int>0</int></value></item>
 <item><name>precision</name><value><i4>0</i4></value></item>
+<item><name>stop_rsd_fg_mult</name><value><double>0.000000e+00</double></value></item>
 <class><name>ApproxDescr</name><instance>md_approx</instance><data>
 <item><name>approx_type</name><value><RationalApproxType>RATIONAL_APPROX_POWER </RationalApproxType></value></item>
 <item><name>bounds_type</name><value><RationalBoundsType>RATIONAL_BOUNDS_AUTOMATIC </RationalBoundsType></value></item>
@@ -176,6 +179,7 @@
 <item><name>power_num</name><value><int>0</int></value></item>
 <item><name>power_den</name><value><int>0</int></value></item>
 <item><name>precision</name><value><i4>0</i4></value></item>
+<item><name>stop_rsd_fg_mult</name><value><double>0.000000e+00</double></value></item>
 <class><name>ApproxDescr</name><instance>md_approx</instance><data>
 <item><name>approx_type</name><value><RationalApproxType>RATIONAL_APPROX_POWER </RationalApproxType></value></item>
 <item><name>bounds_type</name><value><RationalBoundsType>RATIONAL_BOUNDS_AUTOMATIC </RationalBoundsType></value></item>

@@ -15,6 +15,8 @@
 #include<alg/int_arg.h>
 #include<alg/eig_arg.h>
 #include<alg/qpropw_arg.h>
+#include<alg/alg_nuc3pt.h>
+#include<alg/eigcg_arg.h>
 
 //--------------------------------------------------------------
 
@@ -52,6 +54,8 @@ StagNucleonArg stag_nucleon_arg;
 StagNonLocalArg stag_non_local_arg;
 NLStagMesonArg nlstag_meson_arg;
 QPropWArg qpropw_arg;
+EigCGArg eigcg_arg;
+Nuc3ptArg nuc3pt_arg;
 
 int main(int argc, char *argv[])
 { 
@@ -143,6 +147,8 @@ int main(int argc, char *argv[])
     nlstag_meson_arg.qid0[i] = i;
   nlstag_meson_arg.dir = HDM_T;
   nlstag_meson_arg.nlocal_buf = 0;
+  nuc3pt_arg.cname="AlgNuc3pt";
+  nuc3pt_arg.ensemble_label="AlgNuc3pt";
 
   cg_arg.Encode("cg_arg.vml","cg_arg");
   hmd_arg.Encode("hmd_arg.vml","hmd_arg");
@@ -174,6 +180,8 @@ int main(int argc, char *argv[])
   stag_non_local_arg.Encode("stag_non_local_arg.vml","stag_non_local_arg");
   nlstag_meson_arg.Encode("nlstag_meson_arg.vml","nlstag_meson_arg");
   qpropw_arg.Encode("qpropw_arg.vml","qpropw_arg");
+  eigcg_arg.Encode("eigcg_arg.vml","eigcg_arg");
+  nuc3pt_arg.Encode("nuc3pt_arg.vml","nuc3pt_arg");
 
   vml_markup_type(VML_XML);
   
@@ -201,6 +209,8 @@ int main(int argc, char *argv[])
   stag_non_local_arg.Encode("stag_non_local_arg.xml","stag_non_local_arg");
   nlstag_meson_arg.Encode("nlstag_meson_arg.xml","nlstag_meson_arg");
   qpropw_arg.Encode("qpropw_arg.xml","qpropw_arg");
+  eigcg_arg.Encode("eigcg_arg.xml","eigcg_arg");
+  nuc3pt_arg.Encode("nuc3pt_arg.xml","nuc3pt_arg");
 
   return(0);
 }

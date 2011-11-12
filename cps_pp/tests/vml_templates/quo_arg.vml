@@ -20,6 +20,7 @@ double frm_mass =   0.0000000000000000e+00
 double frm_mass_epsilon =   0.0000000000000000e+00
 int chrono = 0
 double stop_rsd_hb =   0.0000000000000000e+00
+double stop_rsd_fg_mult =   0.0000000000000000e+00
 double stop_rsd_md =   0.0000000000000000e+00
 double stop_rsd_mc =   0.0000000000000000e+00
 }
