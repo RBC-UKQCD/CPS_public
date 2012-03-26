@@ -1,10 +1,12 @@
-# $Id: Makefile.rules.in,v 1.29 2011-03-24 16:20:52 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.30 2012-03-26 13:50:11 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_top_builddir@
-QOS = @QOS@
-QOSLIB = ${QOS}/quser/gcc-lib-user///
+#depdrecated (used to be for QCDOC)
+#QOS = @QOS@
+#QOSLIB = ${QOS}/quser/gcc-lib-user///
+HAVE_MAKEDEPEND=@HAVE_MAKEDEPEND@
 
 PWD := $(shell pwd)
 DIR := $(subst $(BUILDDIR)/objs,,$(PWD))
@@ -33,6 +35,7 @@ endif
 ifeq	($(SEPARATE_LIB),yes)
 DIR2 := $(subst util/,,$(DIR))
 DIR2 := $(subst dirac_op/,,$(DIR2))
+DIR2 := $(subst lattice/,,$(DIR2))
 DIR2 := $(subst mem/,,$(DIR2))
 DIR2 := $(subst comms/,,$(DIR2))
 DIR2 := $(subst alg/,,$(DIR2))
@@ -133,13 +136,16 @@ XLCOBJS := $(notdir $(XLCOBJS_SRC))
 
 depend: recurse
 	echo > Makefile_depend
+ifeq ($(HAVE_MAKEDEPEND),yes)
 	cd $(SRCDIR2) ;makedepend -f$(BUILDDIR2)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
+else
 ######################################################################
 # use these lines if you don't have makedepend (is a bit slower)
 ######################################################################
-#	cd $(SRCDIR2) ; \
-#	$(CXX) -M $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
-#	| sed -e 's/:.*\.[cC]/\:/g' > $(PWD)/Makefile_depend
+	cd $(SRCDIR2) ; \
+	$(CXX) -M $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
+	| sed -e 's/:.*\.[cC]/\:/g' > $(PWD)/Makefile_depend
+endif
 
 clean: recurse
 	cd $(BUILDDIR2) ; rm -f *.o *.i *.xlo *.bak

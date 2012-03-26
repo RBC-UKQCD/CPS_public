@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: fmalloc.C,v 1.7 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: fmalloc.C,v 1.8 2012-03-26 13:50:11 chulwoo Exp $
 */
 
 #include <stdlib.h>
@@ -15,7 +15,7 @@ CPS_START_NAMESPACE
 
 #define ALLOC_MEMALIGN_NUM 4096
 void* fmalloc(size_t request,
-	      const char *vname, const char *fname, const char *cname){
+	      const char vname[], const char fname[], const char cname[]){
 
     return smalloc(request, vname, fname, cname);
     
@@ -25,8 +25,11 @@ void* fmalloc(size_t request){
     return smalloc(request);
 }
 
-void ffree(void* p, const char *vname, const char *fname, const char *cname){
+void ffree(void* p, const char vname[], const char fname[], const char cname[]){
     sfree(p, cname, fname, vname);
+}
+void ffree(void* p){
+    sfree(p);
 }
 
 

@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.58 2011-03-24 16:55:40 chulwoo Exp $
+  $Id: lattice_base.C,v 1.59 2012-03-26 13:50:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-03-24 16:55:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.58 2011-03-24 16:55:40 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.58 2011-03-24 16:55:40 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.59 2012-03-26 13:50:12 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.59 2012-03-26 13:50:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.58 $
+//  $Revision: 1.59 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -275,6 +275,7 @@ Lattice::Lattice()
 		"Unknown starting config. type %d\n", 
 		int(start_conf_kind));
   }
+#if 1
 
   // if GJP.Snodes() != 1 check that the gauge field is identical
   // on all s-slices.
@@ -299,6 +300,7 @@ Lattice::Lattice()
   //----------------------------------------------------------------
   if (GJP.XiBare() != 1.0)
     Reunitarize();  
+#endif
 
   smeared = 0;
 }
@@ -313,6 +315,7 @@ Lattice::Lattice()
 //------------------------------------------------------------------
 Lattice::~Lattice()
 {
+#if 1
   char *fname = "~Lattice()";
   VRB.Func(cname,fname);
   
@@ -336,6 +339,7 @@ Lattice::~Lattice()
   // [built into lat.MltFloat].
   MltFloat(1.0 / GJP.XiBare(), GJP.XiDir());
 //  sync();
+#endif
 
 }
 
@@ -2023,8 +2027,10 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
   int n_links = 4 * GJP.VolNodeSites();
 
   Matrix *curU_p = GaugeField();
-//  VRB.Result(cname,fname,"gauge checksum(before) = %p\n",
-//    global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
+#ifdef UNIFORM_SEED_TESTING
+  VRB.Result(cname,fname,"gauge checksum(before) = %p\n",
+    global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
+#endif
 
   // checksuming local gauge matrices before update
   //-------------------------------------------------
@@ -2076,7 +2082,7 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
   loc_sum = local_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE);
   CSM.SaveCsum(CSUM_EVL_LAT,loc_sum);
 
-#if 0
+#ifdef UNIFORM_SEED_TESTING
   VRB.Result(cname,fname,"gauge checksum(after) = %p\n",
     global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
 #endif
@@ -2500,6 +2506,7 @@ void Lattice::SetGfieldOrd(void){
 */
 //------------------------------------------------------------------
 void Lattice::SetGfieldDisOrd(void){
+#if 1
   char *fname = "SetGfieldDisOrd()";
   VRB.Func(cname,fname);
 
@@ -2516,6 +2523,7 @@ void Lattice::SetGfieldDisOrd(void){
     }
   }
   Reunitarize();
+#endif
   smeared=0;
 
 }
@@ -2761,6 +2769,9 @@ void Lattice::GsoCheck(void){
   // If GJP.Snodes() != 1 do the check
   //----------------------------------------------------------------
   if(s_nodes != 1) {
+#if 1
+    ERR.General(cname,fname,"s_nodes(%d)!=1!\n",s_nodes);
+#endif
 
     // Calculate plaquette
     //--------------------------------------------------------------
@@ -2967,6 +2978,7 @@ int Lattice::eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev,
 	 char *fname = "FmatInvProj()";
 	 ERR.General(cname,fname,"Only have code for dwf class not others so this is not a pure virtual function\n");
 }
+
 unsigned long Lattice::GsiteOffset(const int *x, const int dir) const{
   char *fname="GsiteOffset(*i,i)";
   int parity = (x[0]+x[1]+x[2]+x[3])%2;
@@ -2986,5 +2998,6 @@ unsigned long Lattice::GsiteOffset(const int *x, const int dir) const{
   }
   return index;
 }
+
 
 CPS_END_NAMESPACE

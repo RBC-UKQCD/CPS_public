@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.12 2011-07-05 20:01:22 chulwoo Exp $
+  $Id: inv_cg.C,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-07-05 20:01:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.12 2011-07-05 20:01:22 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.12 2011-07-05 20:01:22 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -94,10 +94,11 @@ static inline void print_vec( Vector *vec, char *name){
   \post true_res The true residual, if this was non-zero to start with.
 */
 //------------------------------------------------------------------
-int DiracOp::InvCg(Vector *out, 
+int DiracOp::InvCgShift(Vector *out, 
 		   Vector *in, 
 		   Float src_norm_sq, 
-		   Float *true_res){
+		   Float *true_res,
+		   Float *shift ){
   int itr;                       // Current number of CG iterations
   int max_itr;                       // Max number of CG iterations
   Float stp_cnd;                   // Stop if residual^2 <= stp_cnd
@@ -256,6 +257,9 @@ int DiracOp::InvCg(Vector *out,
   Float *in_f =  (Float *) sol;
   // Mmp = MatPcDagMatPc * sol
   MatPcDagMatPc(mmp, sol);
+  if (shift){
+    mmp -> FTimesV1PlusV2(*shift,sol,mmp, f_size_cb);
+  }
   print_vec( mmp, "mmp");
 
   // res = src
@@ -307,6 +311,12 @@ int DiracOp::InvCg(Vector *out,
     // d = <dir, MatPcDagMatPc*dir>
 
     MatPcDagMatPc(mmp, dir, &d);
+  if (shift){
+    mmp -> FTimesV1PlusV2(*shift,dir,mmp, f_size_cb);
+    Float dir_sq = dir -> NormSqNode(f_size_cb);
+    DiracOpGlbSum(&dir_sq);
+    d += shift*dir_sq;
+  }
     //printf("d=%e\n",d);
   print_vec( mmp, "mmp");
 
@@ -402,6 +412,9 @@ int DiracOp::InvCg(Vector *out,
   // Calculate and set true residual: 
   // true_res = |src - MatPcDagMatPc * sol| / |src|
   MatPcDagMatPc(mmp, sol);
+  if (shift){
+    mmp -> FTimesV1PlusV2(*shift,sol,mmp, f_size_cb);
+  }
   res->CopyVec(src, f_size_cb);
   res->VecMinusEquVec(mmp, f_size_cb);
   res_norm_sq_cur = res->NormSqNode(f_size_cb);
@@ -444,6 +457,13 @@ int DiracOp::InvCg(Vector *out,
   return itr+1;
 
 }
+int DiracOp::InvCg(Vector *out, 
+		   Vector *in, 
+		   Float src_norm_sq, 
+		   Float *true_res){
+	InvCgShift(out,in,src_norm_sq,true_res,NULL);
+}
+
 
 
 //------------------------------------------------------------------

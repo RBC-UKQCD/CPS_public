@@ -3,12 +3,13 @@
   \file
   \brief Functions for dynamical array allocation.
 
-  $Id: amalloc.C,v 1.10 2006-02-01 16:46:08 chulwoo Exp $
+  $Id: amalloc.C,v 1.11 2012-03-26 13:50:11 chulwoo Exp $
 */
 #include <util/smalloc.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <util/verbose.h>
+#include <util/error.h>
 
 
 CPS_START_NAMESPACE
@@ -90,6 +91,7 @@ void *amalloc(void*  (*allocator)(size_t, const char *vname,
   and so on, until the penultimate dimension, where the pointers point to
   the actual data.
 */
+   ERR.NotImplemented("","amalloc");
 
     int *dimension = (int*)smalloc(n_dim*sizeof(int));
 

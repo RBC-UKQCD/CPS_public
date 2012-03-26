@@ -8,34 +8,34 @@
  */  
 .text
 .align 2
-.globl vaxmy3_norm
-vaxmy3_norm:
+.globl vaxmy3
+vaxmy3:
 
 	or    %r13 , %r3 , %r3
 	la   %r1,	-736(%r1)
 	or    %r11 , %r5 , %r5
 	or    %r12 , %r6 , %r6
-	stw   %r14,	368(%r1)
-	stw   %r15,	376(%r1)
+	std   %r14,	368(%r1)
+	std   %r15,	376(%r1)
 	or    %r14 , %r7 , %r7
-	stw   %r16,	384(%r1)
+	std   %r16,	384(%r1)
 	or    %r15 , %r4 , %r4
-	stw   %r17,	392(%r1)
-	stw   %r18,	400(%r1)
+	std   %r17,	392(%r1)
+	std   %r18,	400(%r1)
 	or    %r17 , %r8 , %r8
-	stw   %r19,	408(%r1)
-	stw   %r20,	416(%r1)
-	stw   %r21,	424(%r1)
-	stw   %r22,	432(%r1)
-	stw   %r23,	440(%r1)
-	stw   %r24,	448(%r1)
-	stw   %r25,	456(%r1)
-	stw   %r26,	464(%r1)
-	stw   %r27,	472(%r1)
-	stw   %r28,	480(%r1)
-	stw   %r29,	488(%r1)
-	stw   %r30,	496(%r1)
-	stw   %r31,	504(%r1)
+	std   %r19,	408(%r1)
+	std   %r20,	416(%r1)
+	std   %r21,	424(%r1)
+	std   %r22,	432(%r1)
+	std   %r23,	440(%r1)
+	std   %r24,	448(%r1)
+	std   %r25,	456(%r1)
+	std   %r26,	464(%r1)
+	std   %r27,	472(%r1)
+	std   %r28,	480(%r1)
+	std   %r29,	488(%r1)
+	std   %r30,	496(%r1)
+	std   %r31,	504(%r1)
 	stfd  14,	112(%r1)
 	stfd  15,	120(%r1)
 	stfd  16,	128(%r1)
@@ -58,7 +58,7 @@ vaxmy3_norm:
 	li   %r18,0
 	stw   %r18,	0(%r17)
 	stw   %r18,	4(%r17)
-vaxmy3_norm_lab0:
+vaxmy3_lab0:
 	or.  %r14 , %r14 , %r14
 	lfd   19,	0(%r17)
 	lfd   20,	0(%r17)
@@ -68,7 +68,7 @@ vaxmy3_norm_lab0:
 	lfd   24,	0(%r17)
 	li   %r19,32
 	li   %r20,64
-	bf gt,  vaxmy3_norm_lab1
+	bf gt,  vaxmy3_lab1
 	lfd   1,	0(%r11)
 	lfd   7,	0(%r12)
 	lfd   2,	8(%r11)
@@ -78,9 +78,9 @@ vaxmy3_norm_lab0:
 	lfd   4,	24(%r11)
 	lfd   10,	24(%r12)
 	mtctr 	%r14
-	b       vaxmy3_norm_lab2
+	b       vaxmy3_lab2
 .align 4
-vaxmy3_norm_lab2:
+vaxmy3_lab2:
 	addi  %r16 , %r13 , 0
 	lfd   5,	32(%r11)
 	fmsub  13 , 0 , 1 , 7
@@ -120,32 +120,32 @@ vaxmy3_norm_lab2:
 	dcbt 	%r19,%r12
 	la   %r14,	-1(%r14)
 	dcbt 	%r20,%r12
-	bdnz    vaxmy3_norm_lab2
+	bdnz    vaxmy3_lab2
 	fadd   19 , 19 , 20
 	fadd   21 , 21 , 22
 	fadd   23 , 23 , 24
 	fadd   19 , 19 , 21
 	fadd   19 , 19 , 23
 	stfd  19,	0(%r17)
-vaxmy3_norm_lab1:
-	lwz   %r14,	368(%r1)
-	lwz   %r15,	376(%r1)
-	lwz   %r16,	384(%r1)
-	lwz   %r17,	392(%r1)
-	lwz   %r18,	400(%r1)
-	lwz   %r19,	408(%r1)
-	lwz   %r20,	416(%r1)
-	lwz   %r21,	424(%r1)
-	lwz   %r22,	432(%r1)
-	lwz   %r23,	440(%r1)
-	lwz   %r24,	448(%r1)
-	lwz   %r25,	456(%r1)
-	lwz   %r26,	464(%r1)
-	lwz   %r27,	472(%r1)
-	lwz   %r28,	480(%r1)
-	lwz   %r29,	488(%r1)
-	lwz   %r30,	496(%r1)
-	lwz   %r31,	504(%r1)
+vaxmy3_lab1:
+	ld   %r14,	368(%r1)
+	ld   %r15,	376(%r1)
+	ld   %r16,	384(%r1)
+	ld   %r17,	392(%r1)
+	ld   %r18,	400(%r1)
+	ld   %r19,	408(%r1)
+	ld   %r20,	416(%r1)
+	ld   %r21,	424(%r1)
+	ld   %r22,	432(%r1)
+	ld   %r23,	440(%r1)
+	ld   %r24,	448(%r1)
+	ld   %r25,	456(%r1)
+	ld   %r26,	464(%r1)
+	ld   %r27,	472(%r1)
+	ld   %r28,	480(%r1)
+	ld   %r29,	488(%r1)
+	ld   %r30,	496(%r1)
+	ld   %r31,	504(%r1)
 	lfd   14,	112(%r1)
 	lfd   15,	120(%r1)
 	lfd   16,	128(%r1)

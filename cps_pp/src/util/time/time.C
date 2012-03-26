@@ -1,7 +1,7 @@
 /*!\file
   \brief Implementation of functions for timing and performance measurement.
 
-  $Id: time.C,v 1.13 2011-05-14 06:12:35 chulwoo Exp $
+  $Id: time.C,v 1.14 2012-03-26 13:50:12 chulwoo Exp $
 */
 
 #include <config.h>
@@ -43,9 +43,11 @@ Float dclock(void){
   \return The FLOPS rate.
 */
 
-Float print_flops(unsigned long long nflops, struct timeval *start, struct timeval *end){
+Float print_flops(double nflops, struct timeval *start, struct timeval *end){
+if (0) 	printf("nflops=%u start=%p end=%p\n",nflops,start,end);
 	int sec = end->tv_sec - start->tv_sec; 
 	int usec = end->tv_usec - start->tv_usec; 
+if (0) 	printf("src=%d usec=%d\n",sec,usec);
 	Float time = sec + 1.e-6*usec;
 	if(!UniqueID() && if_print)
 	printf("%e flops /%e seconds = %e MFlops\n",(Float)nflops,time,(Float)nflops/(time*1.e6));
@@ -63,7 +65,7 @@ Float print_flops(unsigned long long nflops, struct timeval *start, struct timev
   \param end The final result of calling \a gettimeofday  
   \return The FLOPS rate.
 */
-Float print_flops(const char cname[], const char fname[], unsigned long long nflops, struct timeval *start, struct timeval *end){
+Float print_flops(const char cname[], const char fname[], double nflops, struct timeval *start, struct timeval *end){
     if(!UniqueID() && if_print)
 	printf("%s:%s: ",cname,fname);
 	return print_flops(nflops,start,end);
@@ -82,7 +84,7 @@ Float print_time(const char *cname, const char *fname, Float time){
 	return time;
 }
 
-Float print_flops(unsigned long long nflops, Float time){
+Float print_flops(double nflops, Float time){
     if(!UniqueID() && if_print)
 	printf("%e flops /%e seconds = %e MFlops\n",(Float)nflops,time,(Float)nflops/(time*1.e6));
 	return nflops/time;
@@ -99,7 +101,7 @@ Float print_flops(unsigned long long nflops, Float time){
   \return The FLOPS rate.
 */
 
-Float print_flops(const char cname[], const char fname[], unsigned long long nflops, Float time){
+Float print_flops(const char cname[], const char fname[], double nflops, Float time){
     if(!UniqueID() && if_print)
 	printf("Node 0: %s:%s: ",cname,fname);
     return print_flops(nflops,time);

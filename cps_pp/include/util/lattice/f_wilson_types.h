@@ -483,7 +483,7 @@ class FdwfBase : public virtual FwilsonTypes
         // checkerboard. The fermion field storage order
         // is not the canonical one but it is particular
         // to the Dwf fermion type. x[i] is the 
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
+        // ith coordinate where i = {0,1,2,3,4} = {x,y,z,t,s}.
 
 #if 0
     int FsiteOffset(const int *x) const;
@@ -630,6 +630,9 @@ class FdwfBase : public virtual FwilsonTypes
 			  Float mass, Float step_size);
         // It evolve the canonical momentum mom  by step_size
         // using the bosonic quotient force.
+
+    ForceArg EvolveMomFforceInt(Matrix *mom, Vector *v1, Vector *v2,
+			  Float mass, Float step_size);
 
     ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			      int isz, Float *alpha, Float mass, Float dt,

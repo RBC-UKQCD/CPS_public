@@ -108,7 +108,8 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
 
 	//tmp2 contains the sum of the staples for a given link
 	for(int i = 0; i<N;i++)
-	vaxpy3_m(tmp2[i],&tmp_plaq,tmp1[i],tmp2[i],vol*3);
+//	vaxpy3_m(tmp2[i],&tmp_plaq,tmp1[i],tmp2[i],vol*3);
+	tmp2[i]->FTimesV1PlusV2(tmp_plaq,tmp1[i],tmp2[i],vol);
 
 	//Calculating one rectangular staple
 	pt.run(N,tmp1,Units,dirs_p);
@@ -118,7 +119,8 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
 	pt.run(N,tmp1,result,dirs_p+nu);
 
 	for(int i = 0; i<N;i++)
-	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
 	//Calculating another rectangular staple;
 	pt.run(N,tmp1,Units,dirs_m+nu);
@@ -128,7 +130,8 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
 	pt.run(N,tmp1,result,dirs_p);
 
 	for(int i = 0; i<N;i++)
-	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
 	//Calculating another rectangular staple;
 	pt.run(N,tmp1,Units,dirs_m+nu);
@@ -138,7 +141,8 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
 	pt.run(N,tmp1,result,dirs_p+nu);
 
 	for(int i = 0; i<N;i++)
-	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
 	//Calculating the staple in the negative nu direction
 	pt.run(N,tmp1,Units,dirs_p+nu);
@@ -147,7 +151,8 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
 
 	//Add this result into tmp2
 	for(int i = 0; i<N;i++)
-	vaxpy3_m(tmp2[i],&tmp_plaq,tmp1[i],tmp2[i],vol*3);
+//	vaxpy3_m(tmp2[i],&tmp_plaq,tmp1[i],tmp2[i],vol*3);
+	tmp2[i]->FTimesV1PlusV2(tmp_plaq,tmp1[i],tmp2[i],vol);
 
 	//Calculating one rectangular staple
 	pt.run(N,tmp1,Units,dirs_p);
@@ -157,7 +162,8 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
 	pt.run(N,tmp1,result,dirs_m+nu);
 
 	for(int i = 0; i<N;i++)
-	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
 	//Calculating another rectangular staple;
 	pt.run(N,tmp1,Units,dirs_p+nu);
@@ -167,7 +173,8 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
 	pt.run(N,tmp1,result,dirs_p);
 
 	for(int i = 0; i<N;i++)
-	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
 	//Calculating another rectangular staple;
 	pt.run(N,tmp1,Units,dirs_p+nu);
@@ -177,7 +184,8 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
 	pt.run(N,tmp1,result,dirs_m+nu);
 
 	for(int i = 0; i<N;i++)
-	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
 	//Count the flops?
         ForceFlops +=vol*288*N;
@@ -185,6 +193,26 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
       //Multiply on the left by our original link matrix to get force term
       pt.run(N,result,tmp2,dirs_p);
   }
+
+#if 1
+#pragma omp parallel for default(shared) private(mu) reduction(+:L1,L2)
+  for(int index=0;index<4*vol;index++){
+    Matrix mp1;
+    int i = index%vol;
+    mu = index/vol;
+    Matrix *mtmp = (result[mu]+i);
+    mp1.Dagger((IFloat *)mtmp);
+    mtmp->TrLessAntiHermMatrix(mp1);
+    IFloat *ihp = (IFloat *)(mom+i*4+mu);  //The gauge momentum
+    IFloat *dotp = (IFloat *)mp0;
+    IFloat *dotp2 = (IFloat *) (result[mu]+(i));
+    fTimesV1PlusV2(ihp, dt, dotp2, ihp, 18);  //Update the gauge momentum
+    Float norm = ((Matrix*)dotp2)->norm();
+    Float tmp = sqrt(norm);
+    L1 += tmp;
+    L2 += norm;
+  }
+#else
 
       Matrix mp1;
       for(mu = 0; mu<4;mu++)
@@ -232,7 +260,9 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
       }
     }
   }
-  ForceFlops += vol*144;
+}
+#endif
+
 #ifdef PROFILE
   time += dclock();
   print_flops(cname,fname,ForceFlops+ParTrans::PTflops,time);

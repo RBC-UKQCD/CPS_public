@@ -1,5 +1,5 @@
 #include<config.h>
-#ifdef PARALLEL
+#ifdef USE_QMP
 //#include<qalloc.h>
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------

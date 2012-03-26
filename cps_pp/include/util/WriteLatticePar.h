@@ -37,7 +37,7 @@ class WriteLatticeParallel : public QioControl
   //    FPConv fpconv;
     int csum_pos;
     bool recon_row_3;
-    char *cname;
+    const char *cname;
 
  public:
     LatticeHeader hd;

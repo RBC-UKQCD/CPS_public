@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOp class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.13 2008-02-08 18:35:07 chulwoo Exp $
+   $Id: minvcg.C,v 1.14 2012-03-26 13:50:11 chulwoo Exp $
  */
 
 CPS_END_NAMESPACE
@@ -67,15 +67,15 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
 
 // Print out input parameters
 //------------------------------------------------------------------
-  VRB.Input(cname,fname,
+  VRB.Result(cname,fname,
 	    "number of shifts = %d\n",Nmass);
-  VRB.Input(cname,fname,
+  VRB.Result(cname,fname,
 	    "smallest shift stop_rsd = %e\n",IFloat(RsdCG[0]));
-  VRB.Input(cname,fname,
+  VRB.Result(cname,fname,
 	    "max_num_iter = %d\n",dirac_arg->max_num_iter);
-  VRB.Input(cname,fname,
+  VRB.Result(cname,fname,
 	    "mass = %e\n",IFloat(dirac_arg->mass));
-  VRB.Input(cname,fname,
+  VRB.Result(cname,fname,
 	    "src_norm_sq = %e\n",IFloat(chi_norm));
 
 //------------------------------------------------------------------
@@ -260,13 +260,17 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
 
     if (type == SINGLE)
       for (s=0; s<Nmass; s++) {
-	if (convsP[s]) continue;
+	if (convsP[s]){ 
+	Float *tmp_p = (Float *)psi[0];
+	VRB.Result(cname,fname,"bs[%d]=%g psi[%d]=%g\n",s,bs[s],s,*tmp_p);
+ 	continue;}
 	psi[0]->FTimesV1PlusV2(-bs[s]*alpha[s],p[s],psi[0],f_size);
 	CGflops += f_size*2;
       }
     else
       for (s=0; s<Nmass; s++) {
-	if (convsP[s]) continue;
+	if (convsP[s]){ 
+ 	continue;}
 	psi[s]->FTimesV1PlusV2(-bs[s],p[s],psi[s],f_size);
 	CGflops += f_size*2;
       }

@@ -254,6 +254,7 @@ void AlgActionQuotient::heatbath() {
     Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
     
     h_init = 0.0;
+//    Float h_init2 = 0.0;
 
     // tmp1, tmp2 < - random Gaussian vector (RGV)
     for(int i=0; i<n_masses; i++){
@@ -275,8 +276,14 @@ void AlgActionQuotient::heatbath() {
       (lat.Fclass() == F_CLASS_WILSON_TM) ?
           lat.SetPhi(phi[i], tmp2, tmp1, bsn_mass[i], bsn_mass_epsilon[i], DAG_NO) :
           lat.SetPhi(phi[i], tmp2, tmp1, bsn_mass[i], DAG_NO);
-      updateCgStats(bsn_cg_arg[i]);          
+      updateCgStats(bsn_cg_arg[i]);
+
+//      h_init2 += lat.FhamiltonNode(phi[i], phi[i]);
     }
+//    h_init2 = h_init - h_init2;
+//    glb_sum(&h_init2);
+
+//  VRB.Result(cname, fname, "Hamiltonian = %17.12e\n", h_init2);
 
     LatticeFactory::Destroy();
     evolved = 0;

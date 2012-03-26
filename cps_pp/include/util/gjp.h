@@ -4,19 +4,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.39 2011-06-26 06:45:29 chulwoo Exp $
+  $Id: gjp.h,v 1.40 2012-03-26 13:50:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-06-26 06:45:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.39 2011-06-26 06:45:29 chulwoo Exp $
-//  $Id: gjp.h,v 1.39 2011-06-26 06:45:29 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.40 2012-03-26 13:50:11 chulwoo Exp $
+//  $Id: gjp.h,v 1.40 2012-03-26 13:50:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.39 $
+//  $Revision: 1.40 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -226,6 +226,15 @@ public:
     //we need to know properties in a direction, but the direction 
     //parameter is a variable. This tweak requires the least modification
     //of the original code. 
+
+  // return positions from index number, assuming xyzt ordering
+  int LocalIndex(int index, int pos[]){
+    int rest=index;
+    for(int i=0;i<4;i++){
+      pos[i] = rest%node_sites[i]; rest = rest/node_sites[i];
+    }
+    return rest;
+  }
 
   int XnodeSites() const
       {return node_sites[0];}
@@ -808,6 +817,8 @@ public:
 
   int argc(void);
   char** argv(void);
+  int *argc_p(void);
+  char*** argv_p(void);
   
   void setArg(int* argc, char*** argv);
 
@@ -845,7 +856,7 @@ inline void Start(){}
 inline void End(){}
 inline void Start(int * argc, char ***argv){GJP.setArg(argc, argv);}
 #else
-void Start();
+//void Start();
 void End();
 void Start(int * argc, char ***argv);
 #endif
@@ -863,6 +874,11 @@ namespace QMPSCU {
 }
 #elif TARGET == BGL
 void Start(const BGLAxisMap *);
+#endif
+
+#ifdef USE_BFM
+int cps_qdp_init(int *argc, char ***argv);
+int cps_qdp_finalize();
 #endif
 
 

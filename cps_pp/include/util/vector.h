@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.28 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: vector.h,v 1.29 2012-03-26 13:50:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-02-26 00:19:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.28 2011-02-26 00:19:27 chulwoo Exp $
-//  $Id: vector.h,v 1.28 2011-02-26 00:19:27 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.29 2012-03-26 13:50:11 chulwoo Exp $
+//  $Id: vector.h,v 1.29 2012-03-26 13:50:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.28 $
+//  $Revision: 1.29 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -262,7 +262,8 @@ class Matrix
 
     //! Not what you might think.
     void TrLessAntiHermMatrix(const Matrix& this_dag);
-#if TARGET == QCDOC || TARGET == BGL || TARGET == BGP
+//#if TARGET == QCDOC || TARGET == BGL || TARGET == BGP
+#if 1
     void TrLessAntiHermMatrix();
 #else
     void TrLessAntiHermMatrix(){
@@ -365,6 +366,23 @@ class Matrix
     Complex Char8() const ;
 
     Complex Char10() const ;
+
+    void FTimesV1PlusV2(Float fb, Matrix *c, Matrix *d, int len)
+//#if TARGET == BGL  || TAGET == QCDOC
+#if 0
+    { Float coef = fb; vaxpy3_m (u, &coef, c, d, len*3); }
+#elif !defined(USE_TEST)
+	{ fTimesV1PlusV2((IFloat *)&u, IFloat(fb), (IFloat *)c, 
+	                         (IFloat *)d, len*18); }
+#else
+//#pragma omp parallel for default(shared)
+	{ 
+		for(int i=0;i<len;i++)
+		fTimesV1PlusV2(((IFloat *)u)+18*i, IFloat(fb), (IFloat *)(c+i), 
+                        (IFloat *)(d+i), 18); 
+	}
+#endif
+
 
 };
 
