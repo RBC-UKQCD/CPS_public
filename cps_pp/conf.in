@@ -37,6 +37,11 @@ case "$enable_target" in
 	HOST=powerpc-bgp-linux
 	ENABLE_TARGET='--enable-target=bgp'
 	;;
+	bgq)
+	BUILD=$build
+	HOST=powerpc64-bgq-linux
+	ENABLE_TARGET='--enable-target=bgq'
+	;;
 	*)
 	BUILD=$build
 	HOST=$host
@@ -47,6 +52,6 @@ AC_SUBST(BUILD)
 AC_SUBST(HOST)
 AC_SUBST(ENABLE_TARGET)
 AC_SUBST(ENABLE_NAMESPACE)
-AC_SUBST(QOS)
+dnl AC_SUBST(QOS)
 
 AC_OUTPUT(config_wrapper)

@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Utility routines for SU(3) matrices.
 
-  $Id: su3_util.C,v 1.3 2007-01-11 22:48:17 chulwoo Exp $
+  $Id: su3_util.C,v 1.4 2012-03-26 13:50:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-11 22:48:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v 1.3 2007-01-11 22:48:17 chulwoo Exp $
-//  $Id: su3_util.C,v 1.3 2007-01-11 22:48:17 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v 1.4 2012-03-26 13:50:12 chulwoo Exp $
+//  $Id: su3_util.C,v 1.4 2012-03-26 13:50:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v $
 //  $State: Exp $
 //
@@ -76,6 +76,7 @@ void Matrix::TrLessAntiHermMatrix(const Matrix &dag)
     *(p+17) -= c;
 }
 
+#if 0
 void Matrix::TrLessAntiHermMatrix()
 {
 
@@ -99,6 +100,7 @@ void Matrix::TrLessAntiHermMatrix()
     p[9] -= c;
     p[17] -= c;
 }
+#endif
 
 /*!
   \param v1 A complex 3-vector \a u

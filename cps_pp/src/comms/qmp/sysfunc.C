@@ -1,5 +1,5 @@
 #include<config.h>
-#ifdef PARALLEL
+#ifdef USE_QMP
 /*----------------------------------------------------------*/
 /*!\file
   \brief  Definitions for the QMP implementation of the QCDSP/QCDOC communications layer.
@@ -65,15 +65,7 @@ namespace QMPSCU {
 
   //Initialize QMP with null command line
   void init_qmp() {
-#if 1
     ERR.General("","init_qmp()","default arguments no loger supported. Call init_qmp(&argc,&argv) via (CPS_NAMESPACE)::Start(&argc,&argv)");
-#else
-    int argc=2;
-    char *argv[2];
-    argv[0] = "-qmp-geom";
-    argv[1] = "native";
-    init_qmp(&argc, (char ***)&argv);
-#endif
   }
 
 //Initialize QMP
@@ -88,16 +80,18 @@ void init_qmp(int * argc, char ***argv) {
   }
 #endif
 
-#if TARGET == BGP
+#if 0
    spi_init();
 #endif
   
     QMP_thread_level_t prv;
 #ifndef UNIFORM_SEED_NO_COMMS
     QMP_status_t init_status = QMP_init_msg_passing(argc, argv, QMP_THREAD_SINGLE, &prv);
+	if (init_status) printf("QMP_init_msg_passing returned %d\n",init_status);
     peRank = QMP_get_node_number();
     peNum = QMP_get_number_of_nodes();
-    if(!peRank)printf("QMP_init_msg_passing returned %d\n",init_status);
+	if(!peRank)printf("QMP_init_msg_passing returned %d\n",init_status);
+//    exit(-4);
     if (init_status != QMP_SUCCESS) {
       QMP_error("%s\n",QMP_error_string(init_status));
     }
@@ -114,7 +108,7 @@ void init_qmp(int * argc, char ***argv) {
 
     if(peRank==0){
       for(int i = 0; i<*argc;i++){
-        printf("argv[%d]=%s\n",i,(*argv)[i]); 
+        printf("argv[%d])(after)=%s\n",i,(*argv)[i]); 
       }
     }
 #else
@@ -132,9 +126,9 @@ void init_qmp(int * argc, char ***argv) {
     peRank = peRank % peNum;
   }
   int if_print=1;
-#if 1
   for(int i = 0;i<NDIM;i++)
   if (pePos[i]>=2) if_print=0;
+
   if (if_print){
       printf("Rank=%d Num=%d NDIM=%d\n",peRank,peNum,NDIM);
       printf("dim:");
@@ -146,7 +140,7 @@ void init_qmp(int * argc, char ***argv) {
         printf(" %d",pePos[i]);
       printf("\n");
 
-#if TARGET == BGL
+#if 0
     int rc;
     BGLPersonality pers;
     rts_get_personality(&pers, sizeof(pers));
@@ -154,7 +148,8 @@ void init_qmp(int * argc, char ***argv) {
 #endif
   }
 
-#endif
+
+//     printf("from personality:\n");
 
 #if 0
     if ( (qmp_type!= QMP_GRID) && (qmp_type !=QMP_MESH)  ) {
@@ -162,6 +157,7 @@ void init_qmp(int * argc, char ***argv) {
     }
 #endif
 
+//     printf("QMP_declare_logical_topology(peGrid, NDIM)\n");
 #ifndef UNIFORM_SEED_NO_COMMS
     //Declare the logical topology (Redundant for GRID machines)
     if (QMP_declare_logical_topology(peGrid, NDIM) != QMP_SUCCESS) {
@@ -258,7 +254,7 @@ unsigned int SeedST(){return SERIAL_SEED;} //!< Gets a RNG seed.
   \return 0
 */
 //----------------------------------------------------------------
-#ifdef UNIFORM_SEED_TESTING
+#ifdef UNIFORM_SEED_NO_COMMS
 unsigned int sync(){return 1;}
 #else
 unsigned int sync() {

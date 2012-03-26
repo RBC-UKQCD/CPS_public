@@ -1,5 +1,5 @@
 #include<config.h>
-#ifdef PARALLEL
+#ifdef USE_QMP
 #include<util/qcdio.h>
 #include<util/data_shift.h>
 CPS_START_NAMESPACE

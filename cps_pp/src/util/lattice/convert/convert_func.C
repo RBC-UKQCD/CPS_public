@@ -8,19 +8,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.19 2008-09-18 15:23:17 chulwoo Exp $
+  $Id: convert_func.C,v 1.20 2012-03-26 13:50:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-09-18 15:23:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.19 2008-09-18 15:23:17 chulwoo Exp $
-//  $Id: convert_func.C,v 1.19 2008-09-18 15:23:17 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.20 2012-03-26 13:50:12 chulwoo Exp $
+//  $Id: convert_func.C,v 1.20 2012-03-26 13:50:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.19 $
+//  $Revision: 1.20 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -269,7 +269,7 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 				  }
 //			moveMem(cap->start_ptr,tmp_gauge,cap->vol*4*sizeof(Matrix));
 			moveFloat((Float*)cap->start_ptr,(Float*)tmp_gauge,cap->vol*4*18);
-			sfree(cname_none,fname, "tmp_gauge", tmp_gauge);
+			ffree(cname_none,fname, "tmp_gauge", tmp_gauge);
 		  }
 
 			break ;
@@ -354,10 +354,8 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 
 			RunGConverter(cap, site_sort_tbl, link_sort_tbl) ;
 
-			VRB.Sfree(cname_none,fname, "link_sort_tbl", link_sort_tbl);
-			sfree(link_sort_tbl);
-			VRB.Sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
-			sfree(site_sort_tbl) ;
+			sfree(cname_none,fname, "link_sort_tbl", link_sort_tbl);
+			sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
 
 			break ;
 		case CANONICAL :
@@ -396,7 +394,7 @@ void FcanonToWilson(CAP cap, int num_chkbds)
 //-------------------------------------------------------------------------
 // Loop over current (CANONICAL) order of sites in local volume
 // Use desired (WILSON) equation for site sequence number
-// actual WILSON formula is (x-x%2+lx*(y+ly*(z+lz*t))+vol*((x+y+z+t)%2))/2
+// actual WILSON formula is (x-x%2+lx*(y+ly*(z+lz*t))+vol*((x+y+z+t+1)%2))/2
 // LSB = 1 indicates site needs converting
 //-------------------------------------------------------------------------
 
@@ -434,10 +432,10 @@ void FcanonToWilson(CAP cap, int num_chkbds)
 
 	RunGConverter(cap, site_sort_tbl, component_sort_tbl);
 
-	VRB.Sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
-	sfree(component_sort_tbl);
-	VRB.Sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
-	sfree(site_sort_tbl);
+	sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
+//	sfree(component_sort_tbl);
+	sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
+//	sfree(site_sort_tbl);
 }
 
 void FwilsonToCanon(CAP cap, int num_chkbds)
@@ -504,10 +502,10 @@ void FwilsonToCanon(CAP cap, int num_chkbds)
 
 	RunGConverter(cap, site_sort_tbl, component_sort_tbl);
 
-	VRB.Sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
-	sfree(component_sort_tbl);
-	VRB.Sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
-	sfree(site_sort_tbl);
+	sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
+//	sfree(component_sort_tbl);
+	sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
+//	sfree(site_sort_tbl);
 }
 
 void FcanonToStag(CAP cap, int num_chkbds)
@@ -585,11 +583,11 @@ void FcanonToStag(CAP cap, int num_chkbds)
 
         RunGConverter(cap, site_sort_tbl, component_sort_tbl);
 
-        VRB.Sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
-        sfree(component_sort_tbl);
+        sfree(cname_none,fname, "component_sort_tbl", component_sort_tbl);
+//        sfree(component_sort_tbl);
 
-        VRB.Sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
-        sfree(site_sort_tbl);
+        sfree(cname_none,fname, "site_sort_tbl", site_sort_tbl);
+//        sfree(site_sort_tbl);
 }
 
 void FstagToCanon(CAP cap, int num_chkbds)

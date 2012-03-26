@@ -1,16 +1,16 @@
 #include<config.h>
-#ifndef PARALLEL
+#ifndef USE_QMP
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-15 16:38:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/scu_sim/get_data_sim.C,v 1.1 2008-05-15 16:38:51 chulwoo Exp $
-//  $Id: get_data_sim.C,v 1.1 2008-05-15 16:38:51 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/scu_sim/get_data_sim.C,v 1.2 2012-03-26 13:50:11 chulwoo Exp $
+//  $Id: get_data_sim.C,v 1.2 2012-03-26 13:50:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.1 $
+//  $Revision: 1.2 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/scu_sim/get_data_sim.C,v $
 //  $State: Exp $
 //

@@ -65,14 +65,13 @@ Float AlgMomentum::energy() {
 //!< evolve method evolves the gauge field due to the momentum
 void AlgMomentum::evolve(Float dt, int steps) 
 {
+  char * fname = "evolve(Float, int)";
 
-  char *fname = "evolve(Float,int)";
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
   for (int i=0; i<steps; i++) lat.EvolveGfield(mom, dt);
   lat.MdTimeInc(dt*steps);
   VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
   LatticeFactory::Destroy();
-
 }
 
 void AlgMomentum::cost(CgStats *cg_stats_global){

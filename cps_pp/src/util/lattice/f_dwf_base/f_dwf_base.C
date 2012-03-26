@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.37 2011-06-26 06:45:30 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.38 2012-03-26 13:50:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -228,19 +228,29 @@ int FdwfBase::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 			  Float *alpha, Vector **f_out_d)
 {
   int iter;
-  char *fname = "FmatMInv(V**, V*, .....)";
+  char *fname = "FmatEvlMInv(V**, V*, .....)";
   VRB.Func(cname,fname);
 
   int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
   Float dot = f_in -> NormSqGlbSum(f_size);
+  VRB.Result(cname,fname,"f_size=%d\n",f_size);
 
   Float *RsdCG = new Float[Nshift];
   for (int s=0; s<Nshift; s++) RsdCG[s] = cg_arg[s]->stop_rsd;
 
+  Float * out_p = (Float *)f_in;
+  VRB.Result(cname,fname,"f_in=%g\n",out_p[0]);
+  for(int i =0;i<Nshift;i++){
+	Float a_tmp=1.; 
+	if (alpha) a_tmp=alpha[i];
+  VRB.Result(cname,fname,"%d: shift=%g alpha=%g RsdCG=%g\n",i,shift[i],a_tmp,RsdCG[i]);
+  }
   //Fake the constructor
   DiracOpDwf dwf(*this, f_out[0], f_in, cg_arg[0], cnv_frm);
 
   int return_value= dwf.MInvCG(f_out,f_in,dot,shift,Nshift,isz,RsdCG,type,alpha);  
+  out_p = (Float *)f_out[0];
+  VRB.Result(cname,fname,"f_out[0]=%g\n",out_p[0]);
   for (int s=0; s<Nshift; s++) cg_arg[s]->true_rsd = RsdCG[s];  
 
   delete[] RsdCG;
@@ -1244,7 +1254,8 @@ Float FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 
 #define PROFILE
 
-
+//#ifndef USE_TEST
+#if 0
 //------------------------------------------------------------------
 // "Odd" fermion force evolution routine written by Chris Dawson, taken 
 // verbatim, so performance will suck on qcdoc.
@@ -1589,6 +1600,7 @@ ForceArg FdwfBase::EvolveMomFforce( Matrix* mom, // momenta
   return ForceArg(L1, sqrt(L2), Linf);
 
 }
+#endif
 
 #define PROFILE
 
@@ -1622,6 +1634,10 @@ ForceArg FdwfBase::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 
   for (int i=0; i<degree; i++){
     ForceArg Fdt = FdwfBase::EvolveMomFforce(mom_tmp,sol[i],mass,alpha[i]*dt);
+    Float *out_p = (Float *) sol[i];
+    VRB.Result(cname,fname,"sol[%d]=%g\n",i,out_p[0]);
+    out_p = (Float *) mom_tmp;
+    VRB.Result(cname,fname,"mom_tmp[3]=%g\n",out_p[3]);
 
     if (force_measure == FORCE_MEASURE_YES) {
       sprintf(force_label, "Rational, mass = %e, pole = %d:", mass, i+isz);
@@ -1831,6 +1847,7 @@ void FdwfBase::SpinProject(Vector * out, Vector *in, int s_size, int type)
   }
   return;
 }
+#endif
 
 //--------------------------------------------------------------------
 // void Freflex (Vector *out, Vector *in)

@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.2 2008-05-26 01:49:19 chulwoo Exp $
+  $Id: vector_util.C,v 1.3 2012-03-26 13:50:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-26 01:49:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.2 2008-05-26 01:49:19 chulwoo Exp $
-//  $Id: vector_util.C,v 1.2 2008-05-26 01:49:19 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.3 2012-03-26 13:50:12 chulwoo Exp $
+//  $Id: vector_util.C,v 1.3 2012-03-26 13:50:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v $
 //  $State: Exp $
 //
@@ -60,8 +60,13 @@ void moveFloat(Float *b, const Float *a, int len) {
 #ifdef PROFILE
     double time  = -dclock();
 #endif
-//    for(int i =0;i<len;i++) *b++ = *a++; 
+
+#ifdef USE_OMP
+#pragma omp parallel for default(shared)
+    for(int i =0;i<len;i++) *(b+i) = *(a+i); 
+#else
     memcpy(b, a, len*sizeof(Float)); 
+#endif
 #ifdef PROFILE
     time += dclock();
     print_flops("","moveFloat",len*sizeof(Float),time);
@@ -278,8 +283,9 @@ void uDotXEqual(IFloat* y, const IFloat* u, const IFloat* x)
 IFloat dotProduct(const IFloat *a, const IFloat *b, int len)
 {
     IFloat sum = 0.0;
+#pragma omp parallel for default(shared) reduction(+:sum)
     for(int i = 0; i < len; ++i) {
-    	sum += *a++ * *b++;
+    	sum += *(a+i) * *(b+i);
     }
     return sum;
 }
@@ -292,8 +298,9 @@ IFloat dotProduct(const IFloat *a, const IFloat *b, int len)
  */
 void vecTimesEquFloat(IFloat *a, IFloat b, int len)
 {
+#pragma omp parallel for default(shared)
     for(int i = 0; i < len; ++i) {
-    	*a++ *= b;
+    	*(a+i) *= b;
     }
 }
 
@@ -347,9 +354,16 @@ void vecMinusEquVec(IFloat *a, const IFloat *b, int len)
 void fTimesV1PlusV2(IFloat *a, IFloat b, const IFloat *c,
 	const IFloat *d, int len)
 {
+#if 0
+#pragma omp parallel for default(shared)
+    for(int i = 0; i < len; ++i) {
+    	*(a+i) = b * *(c+i) + *(d+i);
+    }
+#else
     for(int i = 0; i < len; ++i) {
     	*a++ = b * *c++ + *d++;
     }
+#endif
 }
 
 /*!

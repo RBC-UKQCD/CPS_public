@@ -2,22 +2,22 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc_common.C,v 1.8 2008-02-08 22:01:05 chulwoo Exp $
+  $Id: smalloc_common.C,v 1.9 2012-03-26 13:50:11 chulwoo Exp $
 */
 
 #include <util/smalloc.h>
 
 CPS_START_NAMESPACE
 
-void* smalloc(const char *cname, const char *fname, const char *vname, size_t request){
+void* smalloc(const char cname[], const char fname[], const char vname[], size_t request){
     return smalloc(request, vname, fname, cname);
 }
 
-void* smalloc(size_t request){
-    return smalloc(request, "", "smalloc", "");
-}
+//void* smalloc(size_t request){
+//    return smalloc(request, "", "smalloc", "");
+//}
 
-void sfree(const char *cname, const char *fname, const char *vname, void *p){
+void sfree(const char cname[], const char fname[], const char vname[], void *p){
     sfree(p, cname, fname, vname);
 }
 

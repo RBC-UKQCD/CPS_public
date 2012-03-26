@@ -6,18 +6,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
   
-  $Id: wilson_init.C,v 1.5 2011-03-04 11:25:28 chulwoo Exp $
+  $Id: wilson_init.C,v 1.6 2012-03-26 13:50:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-03-04 11:25:28 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v 1.5 2011-03-04 11:25:28 chulwoo Exp $
-//  $Id: wilson_init.C,v 1.5 2011-03-04 11:25:28 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v 1.6 2012-03-26 13:50:12 chulwoo Exp $
+//  $Id: wilson_init.C,v 1.6 2012-03-26 13:50:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v $
 //  $State: Exp $
 //
@@ -50,9 +50,17 @@ CPS_END_NAMESPACE
 #include <util/smalloc.h>
 #include <util/verbose.h>
 #include <util/error.h>
+
+#if TARGET == BGP
+void spi_init(){}
+#endif
+
+
+
 CPS_START_NAMESPACE
-
-
+#if TARGET == BGP
+void wilson_set_sloppy(bool sloppy) {}
+#endif
 
 void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 {

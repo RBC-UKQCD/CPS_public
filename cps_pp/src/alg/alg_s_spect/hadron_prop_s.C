@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.12 2008-02-08 18:35:05 chulwoo Exp $
-//  $Id: hadron_prop_s.C,v 1.12 2008-02-08 18:35:05 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
+//  $Id: hadron_prop_s.C,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.C,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/hadron_prop_s.C,v $
 //  $State: Exp $
 //
@@ -17,7 +17,7 @@
 // hadron_prop_s.C
 
 #ifndef lint
-static char vcid[] = "$Id: hadron_prop_s.C,v 1.12 2008-02-08 18:35:05 chulwoo Exp $";
+static char vcid[] = "$Id: hadron_prop_s.C,v 1.13 2012-03-26 13:50:11 chulwoo Exp $";
 #endif /* lint */
 
 #include <util/qcdio.h>
@@ -164,7 +164,7 @@ void HadronPropS::download_prop(HadronType type, Float *buf)
 }
 
 
-#if (defined PARALLEL) && (TARGET != BGL)
+#if (defined PARALLEL) && (TARGET == QCDOC)
 //---------------------------------------------------------------------
 // download data from all nodes in the propagator direction to
 // node 0 (origin of the lattice)

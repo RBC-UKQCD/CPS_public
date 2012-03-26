@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of dynamic memory management routines.	
 
-  $Id: smalloc.h,v 1.12 2006-02-21 21:14:06 chulwoo Exp $
+  $Id: smalloc.h,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 21:14:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.12 2006-02-21 21:14:06 chulwoo Exp $
-//  $Id: smalloc.h,v 1.12 2006-02-21 21:14:06 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
+//  $Id: smalloc.h,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: smalloc.h,v $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v $
 //  $State: Exp $
 //
@@ -44,7 +44,7 @@ CPS_START_NAMESPACE
   \post Program exits with the appropriate Error code if allocation fails.  
 */
 void* smalloc(size_t request,
-	      const char *vname, const char *fname="smalloc", const char *cname="");
+	      const char vname[], const char fname[]="smalloc", const char cname[]="");
 void* smalloc(size_t request);
 
 //! Allocate memory
@@ -59,7 +59,7 @@ void* smalloc(size_t request);
   \post  Exits with the appropriate Error code if allocation fails.
 */
 
-void* smalloc(const char *cname, const char *fname, const char *vname, size_t request);
+void* smalloc(const char cname[], const char fname[], const char vname[], size_t request);
 
 //! Free allocate memory
 /*!
@@ -72,8 +72,8 @@ void* smalloc(const char *cname, const char *fname, const char *vname, size_t re
   \post  Exits with the appropriate Error code if allocation fails.  
 */
 void sfree(void* p,
-	   const char *vname="", const char *fname="sfree", const char *cname="");
-
+	   const char vname[], const char fname[]="sfree", const char cname[]="");
+void sfree(void* p);
 
 //! Free memory
 /*!
@@ -84,7 +84,7 @@ void sfree(void* p,
   \param vname The name of the variable pointing to the allocated memory.
   \param p Pointer to the memory to be freed.
 */
-void sfree(const char *cname, const char *fname, const char *vname, void *p);
+void sfree(const char cname[], const char fname[], const char vname[], void *p);
 
 //! Doesn't appear to do anything.
 void sclear();
@@ -104,7 +104,7 @@ void sclear();
   \post  Exits with the appropriate Error code if allocation fails.  
 */
 void* fmalloc(size_t request,
-	      const char *vname, const char *fname="fmalloc", const char *cname="");
+	      const char vname[], const char fname[]="fmalloc", const char cname[]="");
 void* fmalloc(size_t request);
 
 //! Free allocate memory
@@ -117,8 +117,9 @@ void* fmalloc(size_t request);
   \param cname The name of the calling class
 */
 void ffree(void* p,
-	   const char *vname="", const char *fname="ffree", const char *cname="");
-void ffree(const char *cname, const char *fname, const char *vname, void *p);
+	   const char vname[], const char fname[]="ffree", const char cname[]="");
+void ffree(const char cname[], const char fname[], const char vname[], void *p);
+void ffree(void* p);
 
 //! Allocate memory
 /*!
@@ -131,7 +132,7 @@ void ffree(const char *cname, const char *fname, const char *vname, void *p);
   \return A pointer to the allocated memory
   \post  Exits with the appropriate Error code if allocation fails.
 */
-void* fmalloc(const char *cname, const char *fname, const char *vname, size_t request);
+void* fmalloc(const char cname[], const char fname[], const char vname[], size_t request);
 
 //! Free memory
 /*!
@@ -142,7 +143,6 @@ void* fmalloc(const char *cname, const char *fname, const char *vname, size_t re
   \param vname The name of the variable pointing to the allocated memory.
   \param p Pointer to the memory to be freed.
 */
-void sfree(const char *cname, const char *fname, const char *vname, void *p);
 
 /*! @} */
 

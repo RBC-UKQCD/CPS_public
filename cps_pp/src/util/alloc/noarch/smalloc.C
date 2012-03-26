@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of dynamic memory management routines.	
 
-  $Id: smalloc.C,v 1.9 2011-04-06 20:43:34 chulwoo Exp $
+  $Id: smalloc.C,v 1.10 2012-03-26 13:50:11 chulwoo Exp $
 */
 
 #include <util/error.h>
@@ -14,8 +14,8 @@
 
 CPS_START_NAMESPACE
 
-void* smalloc(size_t request, 
-	      const char *vname, const char *fname, const char *cname){
+void* smalloc(size_t request,
+	      const char vname[], const char fname[], const char cname[]){
 
 #ifdef HAVE_POSIX_MEMALIGN
 #define ALLOC_MEMALIGN_NUM 4096
@@ -23,23 +23,33 @@ void* smalloc(size_t request,
   if( posix_memalign((void**)&p, ALLOC_MEMALIGN_NUM, request) ) ERR.Pointer(cname, fname, vname);
     VRB.Smalloc(cname, fname, vname, p, request);
 #else 
+    if (request<=0)
+	ERR.General(cname,fname,"smalloc requested with size %d!\n",request);
     void *p = malloc(request);
     if(!p) ERR.Pointer(cname, fname, vname);
 #endif
     return p;
 }
 
-void sfree(void* p, const char *vname, const char *fname, const char *cname){
+void* smalloc(size_t request){
+    if (request<=0)
+	ERR.General("","","smalloc requested with size %d!\n",request);
+    void *p = malloc(request);
+    if(!p) ERR.Pointer("", "", "");
+    VRB.Smalloc("", "", "", p, request);
+    return p;
+}
+
+void sfree(void* p, const char vname[], const char fname[], const char cname[]){
     VRB.Sfree(cname, fname, vname, p);
     free(p);
 }
 
-
+void sfree(void* p){
+    VRB.Sfree("", "", "", p);
+    free(p);
+}
 
 void sclear(void){};
-
-
-
-
 
 CPS_END_NAMESPACE

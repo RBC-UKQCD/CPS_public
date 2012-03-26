@@ -4,22 +4,21 @@
 #else
 #include <stdio.h>
 #include <math.h>
-CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
 
-  $Id: wilson_dslash.C,v 1.8 2011-03-04 11:25:28 chulwoo Exp $
+  $Id: wilson_dslash.C,v 1.9 2012-03-26 13:50:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-03-04 11:25:28 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.8 2011-03-04 11:25:28 chulwoo Exp $
-//  $Id: wilson_dslash.C,v 1.8 2011-03-04 11:25:28 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.9 2012-03-26 13:50:12 chulwoo Exp $
+//  $Id: wilson_dslash.C,v 1.9 2012-03-26 13:50:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v $
 //  $State: Exp $
 //
@@ -48,15 +47,15 @@ CPS_START_NAMESPACE
 /*                                                                          */
 /***************************************************************************/
 
-CPS_END_NAMESPACE
 #include <util/data_types.h>
 #include <util/vector.h>
 #include <util/wilson.h>
 #include <util/error.h>
 #include <comms/scu.h>
+
+
+#ifndef USE_QMP
 CPS_START_NAMESPACE
-
-
 //! Access to the elements of the \e SU(3) matrix
 /*!
   Gets the element of the \e SU(3) matrix \e u with row \e row,
@@ -82,7 +81,6 @@ CPS_START_NAMESPACE
 #define TMP7(r,c,s)     *(tmp7+(r+2*(c+3*s))) 
 #define TMP8(r,c,s)     *(tmp8+(r+2*(c+3*s))) 
 #define FBUF(r,c,s)     *(fbuf+(r+2*(c+3*s))) 
-
 
 
 
@@ -159,6 +157,7 @@ void wilson_dslash(IFloat *chi_p_f,
     for(y=0; y<ly; y++){
       for(z=0; z<lz; z++){
 	for(t=0; t<lt; t++){
+//	printf("wilson_dslash: %d %d %d %d\n",x,y,z,t);
 	 parity = x+y+z+t;
 	 parity = parity % 2;
 	 if(parity == cbn){
@@ -588,7 +587,18 @@ void wilson_dslash(IFloat *chi_p_f,
 
 
 }
+CPS_END_NAMESPACE
+#else //USE_QMP
+//#ifdef USE_TEST
+#if 1
+#include "../qmp/wilson_dslash_vec.C"
+#else
+// older version
+#include "../qmp/wilson_dslash_qmp.C"
+#endif
+#endif
 
+CPS_START_NAMESPACE
 void wilson_dslash_two(Float *chi0, Float *chi1,
                    Float *u,
                    Float *psi0, Float *psi1,

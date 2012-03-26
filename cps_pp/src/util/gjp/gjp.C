@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.41 2011-06-26 06:45:29 chulwoo Exp $
+  $Id: gjp.C,v 1.42 2012-03-26 13:50:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-06-26 06:45:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.41 2011-06-26 06:45:29 chulwoo Exp $
-//  $Id: gjp.C,v 1.41 2011-06-26 06:45:29 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.42 2012-03-26 13:50:12 chulwoo Exp $
+//  $Id: gjp.C,v 1.42 2012-03-26 13:50:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.41 $
+//  $Revision: 1.42 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -121,7 +121,8 @@ GlobalJobParameter::GlobalJobParameter()
 {
   cname = "GlobalJobParameter";
   char *fname = "GlobalJobParameter()";
-  VRB.Func(cname,fname);
+//  printf("%s::%s Entered\n",cname,fname);
+//  VRB.Func(cname,fname);
 
   arg_set=0;
 }
@@ -132,6 +133,7 @@ GlobalJobParameter::GlobalJobParameter()
 //------------------------------------------------------------------
 GlobalJobParameter::~GlobalJobParameter() {
   char *fname = "~GlobalJobParameter()";
+//  printf("%s::%s Entered\n",cname,fname);
   VRB.Func(cname,fname);
 }
 
@@ -408,6 +410,16 @@ int GlobalJobParameter::argc(void){
   return *argc_int;
 }
 
+int *GlobalJobParameter::argc_p(void){
+
+  char *fname="argc_p()";
+  if (!arg_set){
+    ERR.General(cname,fname,"ERROR: GJP.argc not initialized\n");
+    exit(-1);
+  }
+  return argc_int;
+}
+
 
 char** GlobalJobParameter::argv(void){
 
@@ -417,6 +429,17 @@ char** GlobalJobParameter::argv(void){
     exit(-1);
   }
   return *argv_int;
+}
+
+
+char*** GlobalJobParameter::argv_p(void){
+
+  char *fname="argv_p()";
+  if (!arg_set){
+    ERR.General(cname,fname,"ERROR: GJP.argv not initialized\n");
+    exit(-1);
+  }
+  return argv_int;
 }
 
 void GlobalJobParameter::setArg(int* argc, char*** argv){

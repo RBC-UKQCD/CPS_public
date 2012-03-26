@@ -41,7 +41,7 @@ unsigned long CheckSum::sum_sum[CSUM_ALL];
 CheckSum::CheckSum(){
   cname = "CheckSum";
   char *fname = "CheckSum()";
-  VRB.Func(cname,fname);
+//  VRB.Func(cname,fname);
   is_initialized = 0;
   csum = NULL;
  }
@@ -49,11 +49,13 @@ CheckSum::CheckSum(){
 
 CheckSum::~CheckSum(){
   char *fname = "~CheckSum()";
+//  printf("%s::%s Entered\n",cname,fname);
   VRB.Func(cname,fname);
   if(is_initialized){
     sfree(cname,fname,"csum",csum);
     is_initialized = 0;
   }
+  VRB.FuncEnd(cname,fname);
 }
 
 void CheckSum::Initialize(){
@@ -83,6 +85,7 @@ void CheckSum::Initialize(int len){
 void CheckSum::Activate(CsumType csum_type){
   char *fname = "Activate(CsumType)";
   VRB.Func(cname,fname);
+  VRB.Flow(cname,fname,"csum_type=%d",csum_type);
 
   if ( csum_type >= 0 && csum_type < CSUM_ALL) csum_switch[csum_type] = 1;
   else if (csum_type == CSUM_ALL) 
@@ -102,6 +105,7 @@ void CheckSum::Deactivate(CsumType csum_type){
 void CheckSum::Activate(int level){
   char *fname = "Activate(int)";
   VRB.Func(cname,fname);
+  VRB.Flow(cname,fname,"level=%d",level);
   int activate = 0;
   if ( level >= 0 && level <= CSUM_ALL) activate = level;
   else if ( level > CSUM_ALL ) activate = CSUM_ALL;
@@ -111,29 +115,33 @@ void CheckSum::Activate(int level){
 void CheckSum::SaveCsum(CsumType csum_type,unsigned long sum){
   char *fname = "SaveCsum(CsumType, unsigned long)";
   VRB.Func(cname,fname);
+  VRB.Flow(cname,fname,"csum_type=%d sum=%p",csum_type,sum);
 
   if ( csum_type >= CSUM_ALL || csum_type < 0 ) 
     ERR.General(cname,fname,"Unknown checksum type\n");
 
   if ( csum_switch[csum_type] )
     SaveCsum(csum_id[csum_type],sum);
+  VRB.FuncEnd(cname,fname);
 }
 
 
 void CheckSum::SaveCsum(const char *csum_char,unsigned long sum){
   char *fname = "SaveCsum(const char*, unsigned long)";
   VRB.Func(cname,fname);
+    unsigned long *ptr = csum + counter;
   
   if ( csum != NULL ){
-    unsigned long *ptr = csum + counter;
+#if 0
     *ptr = (unsigned long)csum_char;
     *(ptr + 1) = sum;
     counter+=2;
     if( counter >= length ) counter = 0;
-#if 0
-    printf("Current counter = %d; pointer = %x\n",counter,ptr);
+#else
+//    printf("Current counter = %d; pointer = %p\n",counter,ptr);
 #endif
   }
+  VRB.FuncEnd(cname,fname);
 }
 
 void CheckSum::SaveComment(unsigned long num){
@@ -165,12 +173,13 @@ void CheckSum::Print(){
 
   char logfile[256];
   sprintf(&logfile[0],"%d.%s",UniqueID(),filename);
-#if 0
-  printf("Current counter = %d; traj = %d\n",counter,traj_cnt);
-#endif
+#if 1
+//  printf("Current counter = %d; traj = %d\n",counter,traj_cnt);
+#else
   FILE *fp = fopen(logfile,"a");
   Print(fp);
   fclose(fp);
+#endif
 }
 
 void CheckSum::Print(FILE *fp){

@@ -7,13 +7,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-03-04 11:25:20 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.9 2011-03-04 11:25:20 chulwoo Exp $
-//  $Id: dwf_dslash_4.C,v 1.9 2011-03-04 11:25:20 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.10 2012-03-26 13:50:12 chulwoo Exp $
+//  $Id: dwf_dslash_4.C,v 1.10 2012-03-26 13:50:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v $
 //  $State: Exp $
 //
@@ -30,7 +30,6 @@ CPS_START_NAMESPACE
 //
 //------------------------------------------------------------------
 
-CPS_END_NAMESPACE
 #include<config.h>
 #include<util/dwf.h>
 #include<util/wilson.h>
@@ -44,6 +43,16 @@ CPS_END_NAMESPACE
 #include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
 #endif
+
+void wilson_dslash_vec(IFloat *chi_p_f,
+                        IFloat *u_p_f,
+                        IFloat *psi_p_f,
+                        int cb,
+                        int dag,
+                        Wilson *wilson_p,
+                        int vec_len,
+                        unsigned long vec_offset);
+
 void dwf_dslash_4(Vector *out, 
 		  Matrix *gauge_field, 
 		  Vector *in, 
@@ -71,6 +80,8 @@ void dwf_dslash_4(Vector *out,
   size_cb[0] = 24*wilson_p->vol[0];
   size_cb[1] = 24*wilson_p->vol[1];
   
+//#ifndef USE_TEST
+#if 0
   //----------------------------------------------------------------
   // Apply 4-dimensional Dslash
   //----------------------------------------------------------------
@@ -95,11 +106,18 @@ void dwf_dslash_4(Vector *out,
     frm_in = frm_in + vec_len*size_cb[parity];
     frm_out = frm_out + vec_len*size_cb[parity];
   }
+#else
+  //----------------------------------------------------------------
+  // Apply vectorized 4-dimensional Dslash
+  //----------------------------------------------------------------
+  wilson_dslash_vec(frm_out, g_field, frm_in, cb, dag, wilson_p,ls/2,2*size_cb[parity]);
+  frm_in = frm_in + size_cb[parity];
+  frm_out = frm_out + size_cb[parity];
+  wilson_dslash_vec(frm_out, g_field, frm_in, 1-cb, dag, wilson_p,ls/2,2*size_cb[parity]);
+#endif
 
 
 }
-
-
 
 CPS_END_NAMESPACE
 #endif

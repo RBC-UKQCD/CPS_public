@@ -1,5 +1,5 @@
 #include<config.h>
-#ifdef PARALLEL
+#ifdef USE_QMP
 CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
@@ -46,13 +46,15 @@ unsigned int local_checksum(Float * float_p, int len) {
 
 unsigned int global_checksum(Float * float_p, int len) {
   static int initted = 0;
+#if 0
   if (!initted)
   if (sizeof(unsigned int) != sizeof(unsigned long))
     ERR.General("","global_checksum",
     "sizeof(unsigned int)(%d) != sizeof(unsigned long)(%d)\n",
     sizeof(unsigned int),sizeof(unsigned long));
+#endif
 
-  unsigned int locsum;
+  unsigned long locsum;
 
 #ifdef UNIFORM_SEED_TESTING
   locsum = test_checksum(float_p,len);

@@ -1,5 +1,5 @@
 #include<config.h>
-#ifdef PARALLEL
+#ifdef USE_QMP
 #include<qmp.h>
 #include<util/qcdio.h>
 //#include<qalloc.h>
@@ -8,19 +8,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.9 2008-05-14 21:20:52 chulwoo Exp $
+  $Id: get_data.C,v 1.10 2012-03-26 13:50:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-05-14 21:20:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.9 2008-05-14 21:20:52 chulwoo Exp $
-//  $Id: get_data.C,v 1.9 2008-05-14 21:20:52 chulwoo Exp $
+//  $Date: 2012-03-26 13:50:11 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.10 2012-03-26 13:50:11 chulwoo Exp $
+//  $Id: get_data.C,v 1.10 2012-03-26 13:50:11 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: get_data.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v $
 //  $State: Exp $
 //
@@ -82,38 +82,65 @@ inline static void allocate_tmp(){
 
 inline static void check_length(int len){
     if ( len > MAX_LENGTH){
-        QMP_printf("getMinusData::len>MAX_LENGTH(%d)\n",MAX_LENGTH);
+        QMP_printf("getData::len>MAX_LENGTH(%d)\n",MAX_LENGTH);
+        QMP_abort(QMP_BAD_MESSAGE);
+    }
+    if ( len < 0){
+        QMP_printf("getData::len<0\n");
         QMP_abort(QMP_BAD_MESSAGE);
     }
 }
 
+
+static const int MAX_DIR=6;
+static inline int DIR(int mu,int sign){ return ((sign+1)/2)*MAX_DIR+mu; }
+
 static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len_i, int mu, int sign){
+
+
+   static int initted=0, msglen[2*MAX_DIR];
+   static QMP_msgmem_t sndmem[2*MAX_DIR];
+   static QMP_msgmem_t rcvmem[2*MAX_DIR];
+   static QMP_msghandle_t sndhandle[2*MAX_DIR];
+   static QMP_msghandle_t rcvhandle[2*MAX_DIR];
+   if (!initted){
+       for(int i = 0;i<2*MAX_DIR;i++) msglen[i]=0;
+       initted=1;
+   }
+
 
   if(gjp_local_axis[mu] == 1) {
 //    for(int i=0;i<len_i;i++) rcv_noncache[i] = send_noncache[i];
     memcpy(rcv_noncache,send_noncache,len_i*sizeof(IFloat));
     return;
   }
-//  if(!UniqueID())printf("PassData(%p %p %d %d %d)\n",rcv_noncache,send_noncache,len_i,mu,sign);
 
   int len = len_i + (len_i%2);
+  int dir = DIR(mu,sign);
 
-    QMP_msgmem_t send_msgmem = QMP_declare_msgmem(send_noncache, len*sizeof(IFloat));
-    QMP_msgmem_t rcv_msgmem = QMP_declare_msgmem(rcv_noncache, len*sizeof(IFloat));
-    QMP_msghandle_t send_msghandle = QMP_declare_send_relative(send_msgmem, mu,-sign, 0);
-    QMP_msghandle_t rcv_msghandle = QMP_declare_receive_relative(rcv_msgmem, mu, sign, 0);
-    QMP_start(rcv_msghandle);
-    QMP_start(send_msghandle);
-    QMP_status_t send_status = QMP_wait(send_msghandle);
+  if (len != msglen[dir]){
+  if(!UniqueID())printf("PassData(%p %p %d %d %d)\n",rcv_noncache,send_noncache,len_i,mu,sign);
+    if (msglen[dir]>0){ 	// previously allocated
+      QMP_free_msghandle(sndhandle[dir]);
+      QMP_free_msghandle(rcvhandle[dir]);
+      QMP_free_msgmem(sndmem[dir]);
+      QMP_free_msgmem(rcvmem[dir]);
+      if(!UniqueID())printf("msglen[%d](%d) deleted\n",dir,msglen[dir]); 
+    }
+    sndmem[dir] = QMP_declare_msgmem(send_noncache, len*sizeof(IFloat));
+    rcvmem[dir] = QMP_declare_msgmem(rcv_noncache, len*sizeof(IFloat));
+    sndhandle[dir] = QMP_declare_send_relative(sndmem[dir], mu,-sign, 0);
+    rcvhandle[dir] = QMP_declare_receive_relative(rcvmem[dir], mu, sign, 0);
+    msglen[dir]=len;
+  }
+    QMP_start(rcvhandle[dir]);
+    QMP_start(sndhandle[dir]);
+    QMP_status_t send_status = QMP_wait(sndhandle[dir]);
     if (send_status != QMP_SUCCESS) 
       QMP_error("Send failed in PassData: %s\n", QMP_error_string(send_status));
-    QMP_status_t rcv_status = QMP_wait(rcv_msghandle);
+    QMP_status_t rcv_status = QMP_wait(rcvhandle[dir]);
     if (rcv_status != QMP_SUCCESS) 
       QMP_error("Receive failed in PassData: %s\n", QMP_error_string(rcv_status));
-    QMP_free_msghandle(send_msghandle);
-    QMP_free_msghandle(rcv_msghandle);
-    QMP_free_msgmem(send_msgmem);
-    QMP_free_msgmem(rcv_msgmem);
 
 }
 
@@ -122,6 +149,7 @@ static void getData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu, int sign
 
   allocate_buffer();
   int i = 0;
+//  printf("gjp_local_axis[%d]=%d\n",mu,gjp_local_axis[mu]);
   if(gjp_local_axis[mu] == 0) {
     check_length(len);
 //    for(i=0;i<len;i++) send_noncache[i] = send_buf[i];

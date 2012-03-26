@@ -1,9 +1,10 @@
 #include<config.h>
+
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FwilsonTm class.
 
-  $Id: f_wilsonTm.C,v 1.2 2009-03-23 19:13:32 chulwoo Exp $
+  $Id: f_wilsonTm.C,v 1.3 2012-03-26 13:50:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -102,6 +103,8 @@ int FwilsonTm::FmatEvlInv(Vector *f_out, Vector *f_in,
   char *fname = "FmatEvlInv(CgArg*,V*,V*,F*,CnvFrmType)";
   VRB.Func(cname,fname);
 
+#if 1
+{
   DiracOpWilsonTm wilson(*this, f_out, f_in, cg_arg, cnv_frm);
 
   WfmFlopsTm = 0;
@@ -117,6 +120,8 @@ int FwilsonTm::FmatEvlInv(Vector *f_out, Vector *f_in,
   double secs = t_start.tv_sec + 1.E-6 *t_start.tv_usec;
 //  printf("Wilson solve: %d iteratations %d flops %f Mflops per node\n",
 //	 iter,WfmFlopsTm,flops/(secs*1000000) );
+ }
+#endif
 
   
   // Return the number of iterations
@@ -270,30 +275,25 @@ ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi,
   int f_size = FsiteSize() * GJP.VolNodeSites() ;
 
   char *str_v1 = "v1" ;
-  Vector *v1 = (Vector *)smalloc(f_size*sizeof(Float)) ;
-  if (v1 == 0) ERR.Pointer(cname, fname, str_v1) ;
-  VRB.Smalloc(cname, fname, str_v1, v1, f_size*sizeof(Float)) ;
+  Vector *v1 = (Vector *)smalloc(cname, fname, str_v1, f_size*sizeof(Float)) ;
 
   char *str_v2 = "v2" ;
-  Vector *v2 = (Vector *)smalloc(f_size*sizeof(Float)) ;
-  if (v2 == 0) ERR.Pointer(cname, fname, str_v2) ;
-  VRB.Smalloc(cname, fname, str_v2, v2, f_size*sizeof(Float)) ;
+  Vector *v2 = (Vector *)smalloc(cname, fname, str_v2, f_size*sizeof(Float)) ;
 
 //------------------------------------------------------------------
 // allocate space for two CANONICAL fermion field on a site.
 //------------------------------------------------------------------
 
   char *str_site_v1 = "site_v1";
-  Float *site_v1 = (Float *)smalloc(FsiteSize()*sizeof(Float));
-  if (site_v1 == 0) ERR.Pointer(cname, fname, str_site_v1) ;
-  VRB.Smalloc(cname, fname, str_site_v1, site_v1,
-    FsiteSize()*sizeof(Float)) ;
+  Float *site_v1 = (Float *)smalloc(cname, fname, str_site_v1, FsiteSize()*sizeof(Float));
 
   char *str_site_v2 = "site_v2";
-  Float *site_v2 = (Float *)smalloc(FsiteSize()*sizeof(Float));
-  if (site_v2 == 0) ERR.Pointer(cname, fname, str_site_v2) ;
-  VRB.Smalloc(cname, fname, str_site_v2, site_v2,
-    FsiteSize()*sizeof(Float)) ;
+  Float *site_v2 = (Float *)smalloc(cname, fname, str_site_v2, FsiteSize()*sizeof(Float));
+
+  Float L1 = 0.0;
+  Float L2 = 0.0;
+  Float Linf = 0.0;
+
 
   {
     CgArg cg_arg ;
@@ -304,6 +304,9 @@ ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi,
     // chi <- (M_f^\dag M_f)^{-1} M_f^\dag (RGV)
     wilson.CalcHmdForceVecs(chi) ;
   }
+#if 0
+  VRB.Result(cname,fname,"Being skipped for debugging!");
+#else
 
   int x, y, z, t, lx, ly, lz, lt ;
 
@@ -321,10 +324,6 @@ ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi,
   int mu ;
 
   Matrix tmp, f ;
-
-  Float L1 = 0.0;
-  Float L2 = 0.0;
-  Float Linf = 0.0;
 
   for (mu=0; mu<4; mu++) {
     for (t=0; t<lt; t++)
@@ -429,6 +428,7 @@ ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi,
       Linf = (tmp>Linf ? tmp : Linf);
     }
   }
+#endif
 
 //------------------------------------------------------------------
 // deallocate space for two CANONICAL fermion fields on a site.
@@ -454,6 +454,7 @@ ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi,
 
   L1 /= 4.0*GJP.VolSites();
   L2 /= 4.0*GJP.VolSites();
+  VRB.FuncEnd(cname,fname);
 
   return ForceArg(L1, sqrt(L2), Linf);
 }
@@ -529,6 +530,11 @@ ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi, Vector *eta,
   if (site_v2 == 0) ERR.Pointer(cname, fname, str_site_v2) ;
   VRB.Smalloc(cname, fname, str_site_v2, site_v2,
     FsiteSize()*sizeof(Float)) ;
+  
+  Float L1 = 0.0;
+  Float L2 = 0.0;
+  Float Linf = 0.0;
+
 
   {
     CgArg cg_arg ;
@@ -546,6 +552,10 @@ ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi, Vector *eta,
     wilson.CalcBsnForceVecs(chi, eta) ;
   }
 
+#if 0
+  VRB.Result(cname,fname,"Being skipped for debugging!");
+#else
+
   // evolve the momenta by the fermion force
   int mu, x, y, z, t;
  
@@ -553,10 +563,6 @@ ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi, Vector *eta,
   const int ly(GJP.YnodeSites());
   const int lz(GJP.ZnodeSites());
   const int lt(GJP.TnodeSites());
-  
-  Float L1 = 0.0;
-  Float L2 = 0.0;
-  Float Linf = 0.0;
 
 //------------------------------------------------------------------
 // start by summing first over direction (mu) and then over site
@@ -731,7 +737,9 @@ ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi, Vector *eta,
 
   L1 /= 4.0*GJP.VolSites();
   L2 /= 4.0*GJP.VolSites();
+#endif
 
+  VRB.FuncEnd(cname,fname);
   return ForceArg(L1, sqrt(L2), Linf);
 }
 
