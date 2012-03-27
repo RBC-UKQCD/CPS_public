@@ -7,7 +7,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.8 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.9 2012-03-27 20:05:49 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -246,7 +246,11 @@ ForceArg FdwfBase::EvolveMomFforceInt(Matrix *mom, Vector *v1, Vector *v2,
 
   static int called=0;
   called++;
-  const int MAX_THREADS=64;
+#ifdef USE_OMP
+  const int MAX_THREADS=omp_get_num_threads();
+#else
+  const int MAX_THREADS=1;
+#endif
 
   int f_size = FsiteSize() * GJP.VolNodeSites() ;
   int f_site_size_4d = 2 * Colors() * SpinComponents();
@@ -348,8 +352,6 @@ ForceArg FdwfBase::EvolveMomFforceInt(Matrix *mom, Vector *v1, Vector *v2,
         QMP_start(Send[mu]);
     }
   }
-#ifdef USE_OMP
-omp_set_num_threads(MAX_THREADS);
 
   Float L1[MAX_THREADS] ;
   Float L2[MAX_THREADS];
@@ -357,6 +359,8 @@ omp_set_num_threads(MAX_THREADS);
   for(int i =0;i<MAX_THREADS;i++){
     L1[i]=L2[i]=Linf[i]=0.;
   }
+#ifdef USE_OMP
+omp_set_num_threads(MAX_THREADS);
 //reduction(+:L1,L2)
    	long i =0;
 #pragma omp parallel for default(shared) private(mu)
@@ -381,6 +385,7 @@ omp_set_num_threads(MAX_THREADS);
   	Matrix *tmp_mat1,*tmp_mat2;
 	  tmp_mat1 = tmp_mat;
 	  tmp_mat2 = tmp_mat1+1;
+	  int tnum=0;
 #endif
       int gauge_offset = offset(size,pos);
       int vec_offset = f_site_size_4d*gauge_offset ;
@@ -534,7 +539,11 @@ surf_initted=1;
 #pragma omp parallel for
 	for (long i=0;i<surf[mu];i++){
         Matrix *tmp_mat1,*tmp_mat2;
+#ifdef USE_OMP
 		int tnum = omp_get_thread_num();
+#else
+		int tnum = 0;
+#endif
   		tmp_mat1 = tmp_mat + 2*tnum;
   		tmp_mat2 = tmp_mat1+1;
  		int gauge_offset = *(surf_table[mu]+i);
@@ -728,7 +737,7 @@ surf_initted=1;
 
   L1[0] /= 4.0*GJP.VolSites();
   L2[0] /= 4.0*GJP.VolSites();
-omp_set_num_threads(MAX_THREADS);
+//omp_set_num_threads(MAX_THREADS);
 
   return ForceArg(L1[0], sqrt(L2[0]), Linf[0]);
 }

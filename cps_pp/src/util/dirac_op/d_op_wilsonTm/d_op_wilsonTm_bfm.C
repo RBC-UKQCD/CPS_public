@@ -1,7 +1,9 @@
 #include <config.h>
 #include <stdio.h>
 #include <stdarg.h>
+#ifdef USE_OMP
 #include <omp.h>
+#endif
 
 #ifdef USE_BFM_TM
 #include <chroma.h>
