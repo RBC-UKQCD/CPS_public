@@ -5427,8 +5427,8 @@ if test "$enable_bfm" != "no"; then
 #   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
 #   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
    if test "$enable_bfm" != "yes"; then
-      LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib -lbfm "
-      INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${QIO_DIR}/include"
+      LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib  -lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm "
+      INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include"
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
 fi
