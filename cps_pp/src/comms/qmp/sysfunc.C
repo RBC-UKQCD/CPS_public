@@ -254,6 +254,7 @@ unsigned int SeedST(){return SERIAL_SEED;} //!< Gets a RNG seed.
   \return 0
 */
 //----------------------------------------------------------------
+#ifndef HAVE_SYNC
 #ifdef UNIFORM_SEED_NO_COMMS
 unsigned int sync(){return 1;}
 #else
@@ -265,6 +266,7 @@ if (sync_status != QMP_SUCCESS) {
 }
 return 1;
 }
+#endif
 #endif
 
 //----------------------------------------------------------------

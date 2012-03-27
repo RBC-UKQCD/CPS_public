@@ -1,16 +1,11 @@
-#if 1
-#define USE_OMP_DWF_FORCE
-#include "dwf_dslash_5_plus_omp.C"
-#else
+#ifdef USE_OMP_DWF_FORCE
+#include<omp.h>
 #include<config.h>
-#ifdef USE_SSE
-#include "../sse/dwf_dslash_5_plus.C"
-#else
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_5_plus.C,v $
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_5_plus_omp.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -108,6 +103,15 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 
+inline void fTimesV1PlusV2_single(IFloat *a, IFloat b, const IFloat *c,
+const IFloat *d, int len)
+{
+for(int i = 0; i < len; ++i) {
+*a++ = b * *c++ + *d++;
+}
+}
+
+
 void dwf_dslash_5_plus(Vector *out, 
 		       Vector *in, 
 		       Float mass,
@@ -126,7 +130,7 @@ void dwf_dslash_5_plus(Vector *out,
   int ls_stride = 24 * vol_4d_cb;
   IFloat *f_in;
   IFloat *f_out;
-  IFloat *f_temp;
+//  IFloat *f_temp;
   IFloat *comm_buf = dwf_lib_arg->comm_buf;
   IFloat two_over_a5 = 2.0 * GJP.DwfA5Inv();
   IFloat neg_mass_two_over_a5 = -2.0 * mass * GJP.DwfA5Inv();
@@ -142,15 +146,14 @@ void dwf_dslash_5_plus(Vector *out,
     f_out = f_out + 12;
   }
   f_out = f_out + ls_stride; 
-  for(s=1; s < local_ls; s++){
+omp_set_num_threads(64);
+#pragma omp parallel for default(shared)
+  for(x=0; x<vol_4d_cb*(local_ls-1); x++){
+  IFloat *f_in_t = f_in+24*x;
+  IFloat *f_out_t = f_out+24*x;
 
-    for(x=0; x<vol_4d_cb; x++){
+      fTimesV1PlusV2_single(f_out_t, two_over_a5, f_in_t, f_out_t, 12);
 
-      fTimesV1PlusV2(f_out, two_over_a5, f_in, f_out, 12);
-
-      f_in  =  f_in + 24;
-      f_out = f_out + 24;
-    }
   }
 
 
@@ -173,24 +176,20 @@ void dwf_dslash_5_plus(Vector *out,
     f_out = f_out + 12;
   }
   
+#pragma omp parallel for default(shared)
   for(x=0; x<vol_4d_cb; x++){
+  IFloat *f_in_t = f_in+24*x;
+  IFloat *f_out_t = f_out+24*x;
     
-    f_temp = f_in;
-    
-    if (s_nodes != 1 ) {
-      f_temp = comm_buf;
-      getMinusData(f_temp, f_in, 12, 4);
-    }
+    IFloat *f_temp = f_in_t;
     
     if(s_node_coor == 0) { 
-      fTimesV1PlusV2(f_out, neg_mass_two_over_a5, f_temp, f_out, 12);
+      fTimesV1PlusV2_single(f_out_t, neg_mass_two_over_a5, f_temp, f_out_t, 12);
     }
     else {
-      fTimesV1PlusV2(f_out, two_over_a5, f_temp, f_out, 12);
+      fTimesV1PlusV2_single(f_out_t, two_over_a5, f_temp, f_out_t, 12);
     }
     
-    f_in  =  f_in + 24;
-    f_out = f_out + 24;
   }
 
 
@@ -205,15 +204,13 @@ void dwf_dslash_5_plus(Vector *out,
     f_out = f_out + 12;
   }
   f_in = f_in + ls_stride;
-  for(s=0; s < local_ls - 1; s++){
+#pragma omp parallel for default(shared)
+  for(x=0; x<vol_4d_cb*(local_ls-1); x++){
+  IFloat *f_in_t = f_in+24*x;
+  IFloat *f_out_t = f_out+24*x;
 
-    for(x=0; x<vol_4d_cb; x++){
+      fTimesV1PlusV2_single(f_out_t, two_over_a5, f_in_t, f_out_t, 12);
 
-      fTimesV1PlusV2(f_out, two_over_a5, f_in, f_out, 12);
-
-      f_in  =  f_in + 24;
-      f_out = f_out + 24;
-    }
   }
 
 
@@ -236,24 +233,20 @@ void dwf_dslash_5_plus(Vector *out,
   }
 
   f_out = f_out + (local_ls-1)*ls_stride;
+#pragma omp parallel for default(shared)
   for(x=0; x<vol_4d_cb; x++){
+  IFloat *f_in_t = f_in+24*x;
+  IFloat *f_out_t = f_out+24*x;
 
-    f_temp = f_in;
+    IFloat *f_temp = f_in_t;
    
-    if (s_nodes != 1 ) {
-      f_temp = comm_buf;
-      getPlusData(f_temp, f_in, 12, 4);
-    }
-
     if(s_node_coor == s_nodes - 1) { 
-      fTimesV1PlusV2(f_out, neg_mass_two_over_a5, f_temp, f_out, 12);
+      fTimesV1PlusV2_single(f_out_t, neg_mass_two_over_a5, f_temp, f_out_t, 12);
     }
     else {
-      fTimesV1PlusV2(f_out, two_over_a5, f_temp, f_out, 12);
+      fTimesV1PlusV2_single(f_out_t, two_over_a5, f_temp, f_out_t, 12);
     }
     
-    f_in  =  f_in + 24;
-    f_out = f_out + 24;
   }
   DiracOp::CGflops+=2*2*vol_4d_cb*local_ls*12;
 
@@ -263,5 +256,4 @@ void dwf_dslash_5_plus(Vector *out,
 
 
 CPS_END_NAMESPACE
-#endif
 #endif

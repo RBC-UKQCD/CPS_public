@@ -4,6 +4,8 @@
 #include<iostream>
 #endif
 
+#include <unistd.h>
+
 #include <config.h>
 #include <util/time_cps.h>
 #include <util/dirac_op.h>

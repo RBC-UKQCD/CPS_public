@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2012-03-26 13:50:11 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.72 2012-03-26 13:50:11 chulwoo Exp $
-dnl  $Id: configure.in,v 1.72 2012-03-26 13:50:11 chulwoo Exp $
+dnl  $Date: 2012-03-27 05:02:40 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.73 2012-03-27 05:02:40 chulwoo Exp $
+dnl  $Id: configure.in,v 1.73 2012-03-27 05:02:40 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.72 $
+dnl  $Revision: 1.73 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -159,7 +159,7 @@ elif test "$enable_target" = "bgq"; then
 dnl  AC_CHECK_PROGS(CC, mpicc)
 dnl  AC_CHECK_PROGS(CXX, mpicxx)
    ARCH="BGQ"
-   ARCHDIR="BGL_QMP_DIR"
+   ARCHDIR="BGQ_DIR"
    TESTING_PARALLEL="yes";
    DFLAGS="${DFLAGS} -DUSE_OMP"
    LDFLAGS="${LDFLAGS} -fopenmp"
@@ -354,12 +354,11 @@ if test "$enable_mdwf" != "no"; then
 fi
 
 if test "$enable_qio" != "no"; then
-   if test "$enable_qio" != "yes"; then
-     QIO_DIR=${enable_qio}
-   elif test "X${QIO_DIR}X" = "XX"; then
-     echo "QIO_DIR environment variable not set"
-     exit 1
-   fi
+dnl   if test "$enable_qio" != "yes"; then
+dnl   elif test "X${QIO_DIR}X" = "XX"; then
+dnl     echo "QIO_DIR environment variable not set"
+dnl     exit 1
+dnl   fi
    if test "X${QMP_DIR}X" = "XX"; then
      echo "QMP directory not set"
      exit 1
@@ -370,6 +369,7 @@ if test "$enable_qio" != "no"; then
    LDFLAGS="${LDFLAGS} ${QMP_LDFLAGS} ${QMP_LIBS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_FLAGS} "
 if test "$enable_qio" != "yes"; then
+   QIO_DIR=${enable_qio}
    LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib -lqio -llime "
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${QIO_DIR}/include"
 fi
@@ -379,7 +379,7 @@ fi
 if test "$enable_bfm" != "no"; then
    if test "X${BFM_DIR}X" = "XX"; then
 dnl     echo "BFM_DIR environment variable not set"
-     QIO_DIR=${enable_qio}
+     BFM_DIR=${enable_bfm}
    fi
 #   QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
 #   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`

@@ -101,7 +101,7 @@ static int chroma_idx(int x[4],int node_latt[4], int reim,int i_el, int i_size)
 void importGauge(
 CPS_NAMESPACE::Lattice &Lat,
 multi1d<LatticeColorMatrix> &U,
-Float *gauge,
+CPS_NAMESPACE::Float *gauge,
 int dag){
 #if 1
   int Ncoco = 9;
@@ -152,7 +152,7 @@ void impexFermion(
 int if_export,
 CPS_NAMESPACE::Lattice &Lat,
 multi1d<LatticeFermion> const &qdp,
-Float *cps_p,
+CPS_NAMESPACE::Float *cps_p,
 int even, int odd, int Ls=0, double fac_t=1.){
 
 //  double M5 = GJP.DwfHeight();
@@ -276,9 +276,9 @@ int dwf_CG_precMdagM_oo_multi( multi2d<LatticeFermion> &sol,
 
 static int cps_qdp_dwf_invert(
 Lattice &Lat, 
-Float mass, 
-Float *sol_cps, 
-Float *src_cps,
+CPS_NAMESPACE::Float mass, 
+CPS_NAMESPACE::Float *sol_cps, 
+CPS_NAMESPACE::Float *src_cps,
 double residual,
 int max_iter
 ){
@@ -357,7 +357,7 @@ int max_iter
 //  Real M5(1.8);
 //  Real mq(0.1);
 
-  Float *gauge = (Float*) Lat.GaugeField();
+  CPS_NAMESPACE::Float *gauge = (CPS_NAMESPACE::Float*) Lat.GaugeField();
   dwfa.precon_5d = 1;
   dwfa.Ls   = Ls;
   dwfa.solver = DWF;
@@ -410,7 +410,7 @@ for(int i = 0;i<1;i++){
   dwf.importFermion(src_qdp,psi[0],1);
   impexFermion(0,Lat,src_qdp,src_cps,0,1);
   dwf.importFermion(src_qdp,src_bfm,1);
-  Float *tmp_p = (Float *)src_bfm;
+  CPS_NAMESPACE::Float *tmp_p = (CPS_NAMESPACE::Float *)src_bfm;
   Printf("src_bfm[0]=%g\n",*tmp_p);
 
   Printf("Calling half cb inverter\n"); fflush(stdout);
@@ -425,7 +425,7 @@ double bfm_time = -dclock();
   print_flops(fname,"bfm",0,bfm_time);
 
   iter = dwf.iter;
-  tmp_p = (Float *)psi[0];
+  tmp_p = (CPS_NAMESPACE::Float *)psi[0];
   Printf("psi[0]=%g\n",*(tmp_p));
   dwf.exportFermion(src_qdp,psi[0],1);
 }
