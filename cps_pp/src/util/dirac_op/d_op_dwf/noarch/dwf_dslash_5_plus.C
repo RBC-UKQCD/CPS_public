@@ -1,8 +1,8 @@
-#if 1
+#include<config.h>
+#ifdef USE_OMP
 #define USE_OMP_DWF_FORCE
 #include "dwf_dslash_5_plus_omp.C"
 #else
-#include<config.h>
 #ifdef USE_SSE
 #include "../sse/dwf_dslash_5_plus.C"
 #else

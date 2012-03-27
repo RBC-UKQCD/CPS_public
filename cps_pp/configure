@@ -5413,9 +5413,10 @@ if test "$enable_qio" != "no"; then
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_FLAGS} "
 if test "$enable_qio" != "yes"; then
    QIO_DIR=${enable_qio}
-   LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib -lqio -llime "
+   LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${QIO_DIR}/include"
 fi
+   LDFLAGS="${LDFLAGS} -lqio -llime "
    DFLAGS="${DFLAGS} -DUSE_QIO"
 fi
 
@@ -5427,11 +5428,12 @@ if test "$enable_bfm" != "no"; then
 #   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
 #   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
    if test "$enable_bfm" != "yes"; then
-      LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib  -lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm "
+      LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib "
       INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include"
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
 fi
+      LDFLAGS="${LDFLAGS} -lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm "
 
 if test "$TESTING_PARALLEL" = "yes"; then
    ENABLE_PARALLEL="define PARALLEL 1"
