@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.59 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: lattice_base.C,v 1.60 2012-03-27 21:20:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.59 2012-03-26 13:50:12 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.59 2012-03-26 13:50:12 chulwoo Exp $
+//  $Date: 2012-03-27 21:20:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.60 2012-03-27 21:20:42 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.60 2012-03-27 21:20:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.59 $
+//  $Revision: 1.60 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -232,7 +232,8 @@ Lattice::Lattice()
     GJP.StartConfKind(START_CONF_MEM);
   }
   else if(start_conf_kind == START_CONF_FILE){
-#if TARGET == QCDOC || TARGET == NOARCH || TARGET == BGL || TARGET == BGP
+//#if TARGET == QCDOC || TARGET == NOARCH || TARGET == BGL || TARGET == BGP
+#if 1
 //    gauge_field = GJP.StartConfLoadAddr();
     VRB.Flow(cname,fname, "Load starting configuration addr = %x\n",
 	     gauge_field);

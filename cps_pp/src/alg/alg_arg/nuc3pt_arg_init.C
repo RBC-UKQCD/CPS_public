@@ -1,4 +1,5 @@
 // Initialize the Nuc3pt argument structure
+#include <config.h>
 #include <alg/nuc3pt_arg.h>
 #include <util/gjp.h>
 #include <util/smalloc.h>

@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2012-03-27 15:16:08 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.74 2012-03-27 15:16:08 chulwoo Exp $
-dnl  $Id: configure.in,v 1.74 2012-03-27 15:16:08 chulwoo Exp $
+dnl  $Date: 2012-03-27 21:20:42 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.75 2012-03-27 21:20:42 chulwoo Exp $
+dnl  $Id: configure.in,v 1.75 2012-03-27 21:20:42 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.74 $
+dnl  $Revision: 1.75 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -370,9 +370,10 @@ dnl   fi
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_FLAGS} "
 if test "$enable_qio" != "yes"; then
    QIO_DIR=${enable_qio}
-   LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib -lqio -llime "
+   LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${QIO_DIR}/include"
 fi
+   LDFLAGS="${LDFLAGS} -lqio -llime "
    DFLAGS="${DFLAGS} -DUSE_QIO"
 fi
 
@@ -385,11 +386,12 @@ dnl     echo "BFM_DIR environment variable not set"
 #   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
 #   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
    if test "$enable_bfm" != "yes"; then
-      LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib  -lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm "
+      LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib "
       INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include"
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
 fi
+      LDFLAGS="${LDFLAGS} -lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm "
 
 if test "$TESTING_PARALLEL" = "yes"; then
    ENABLE_PARALLEL="define PARALLEL 1"

@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
+  $Id: inv_cg.C,v 1.14 2012-03-27 21:17:55 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
+//  $Date: 2012-03-27 21:17:55 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.14 2012-03-27 21:17:55 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.14 2012-03-27 21:17:55 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -315,7 +315,7 @@ int DiracOp::InvCgShift(Vector *out,
     mmp -> FTimesV1PlusV2(*shift,dir,mmp, f_size_cb);
     Float dir_sq = dir -> NormSqNode(f_size_cb);
     DiracOpGlbSum(&dir_sq);
-    d += shift*dir_sq;
+    d += (*shift) * dir_sq;
   }
     //printf("d=%e\n",d);
   print_vec( mmp, "mmp");
