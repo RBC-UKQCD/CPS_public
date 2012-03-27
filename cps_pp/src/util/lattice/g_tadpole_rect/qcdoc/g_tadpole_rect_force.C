@@ -30,6 +30,8 @@ ForceArg GtadpoleRect::EvolveMomGforce(Matrix *mom, Float dt)
 
   static Matrix mt0;
   static Matrix *mp0 = &mt0;
+#if TARGET == BGQ
+#endif
 
   //Sets some kind of flop counter
 #ifdef PROFILE

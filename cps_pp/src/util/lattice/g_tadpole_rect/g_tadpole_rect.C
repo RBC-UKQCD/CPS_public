@@ -159,7 +159,7 @@ void GtadpoleRect::GforceSite(Matrix& force, int *x, int mu)
   ForceFlops +=198+24;
 }
 
-#if TARGET == NOARCH
+#if ( TARGET == NOARCH ) || (TARGET ==BGQ) 
 #define PROFILE
 //------------------------------------------------------------------------------
 // EvolveMomGforce(Matrix *mom, Float dt):
