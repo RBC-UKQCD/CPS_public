@@ -9,6 +9,7 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include<alg/alg_int.h>
 #include<alg/alg_hmd.h>
 #include<util/lattice.h>
 #include<util/vector.h>
@@ -16,7 +17,6 @@ CPS_END_NAMESPACE
 #include<util/smalloc.h>
 #include<util/verbose.h>
 #include<util/error.h>
-#include<alg/alg_int.h>
 #include<util/dirac_op.h>
 CPS_START_NAMESPACE
 

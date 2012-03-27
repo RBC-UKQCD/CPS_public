@@ -29,14 +29,14 @@ USING_NAMESPACE_CPS
 void importGauge(
 CPS_NAMESPACE::Lattice &Lat,
 multi1d<LatticeColorMatrix> &U,
-Float *gauge,
+CPS_NAMESPACE::Float *gauge,
 int dag);
 
 void impexFermion(
 int if_export,
 Lattice &Lat,
 multi1d<LatticeFermion> const &qdp,
-Float *cps_p,
+CPS_NAMESPACE::Float *cps_p,
 int even, int odd,int Ls=0, double fac_p=1.);
 
 

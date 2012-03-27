@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.38 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.39 2012-03-27 05:02:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -1847,7 +1847,7 @@ void FdwfBase::SpinProject(Vector * out, Vector *in, int s_size, int type)
   }
   return;
 }
-#endif
+//#endif
 
 //--------------------------------------------------------------------
 // void Freflex (Vector *out, Vector *in)

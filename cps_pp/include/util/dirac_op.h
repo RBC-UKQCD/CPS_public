@@ -2,13 +2,12 @@
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.30 2012-03-26 13:50:11 chulwoo Exp $
+  $Id: dirac_op.h,v 1.31 2012-03-27 05:02:40 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
 #define INCLUDED_DIRAC_OP_H
 
-CPS_END_NAMESPACE
 #include<precision.h>
 #include <util/lattice.h>
 #include <util/vector.h>
@@ -1476,6 +1475,7 @@ class DiracOpMdwf : public DiracOpWilsonTypes
      // the relevant parameters (kappa, m^2, ...).
 };
 
+CPS_END_NAMESPACE
 #endif
 
 

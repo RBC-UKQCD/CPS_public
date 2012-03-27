@@ -2,18 +2,17 @@
 #ifdef USE_SSE
 #include "../sse/sse-dwf_dslash_4.C"
 #else
-CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.10 2012-03-26 13:50:12 chulwoo Exp $
-//  $Id: dwf_dslash_4.C,v 1.10 2012-03-26 13:50:12 chulwoo Exp $
+//  $Date: 2012-03-27 05:02:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.11 2012-03-27 05:02:40 chulwoo Exp $
+//  $Id: dwf_dslash_4.C,v 1.11 2012-03-27 05:02:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v $
 //  $State: Exp $
 //
@@ -37,12 +36,10 @@ CPS_START_NAMESPACE
 #include<util/vector.h>
 #include<util/verbose.h>
 #include<util/error.h>
-CPS_START_NAMESPACE
 #ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc_cps.h>
-CPS_START_NAMESPACE
 #endif
+CPS_START_NAMESPACE
 
 void wilson_dslash_vec(IFloat *chi_p_f,
                         IFloat *u_p_f,

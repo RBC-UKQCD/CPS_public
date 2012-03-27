@@ -25,6 +25,9 @@
 #include <qmp.h>
 
 #define EES_ADDON
+#if TARGET == BGQ
+#undef EES_ADDON //Chroma stuck with older QIO for now
+#endif
 
 #ifdef EES_ADDON
 // supported only since qio v2.3.4  (not v2.2.X)
