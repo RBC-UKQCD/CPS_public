@@ -7,7 +7,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.10 2012-04-02 06:40:24 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.11 2012-04-02 20:33:37 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -248,7 +248,8 @@ ForceArg FdwfBase::EvolveMomFforceInt(Matrix *mom, Vector *v1, Vector *v2,
   static int called=0;
   called++;
 #ifdef USE_OMP
-  const int MAX_THREADS=omp_get_num_threads();
+//  const int MAX_THREADS=omp_get_num_threads();
+  const int MAX_THREADS=64;
 #else
   const int MAX_THREADS=1;
 #endif
@@ -353,15 +354,14 @@ ForceArg FdwfBase::EvolveMomFforceInt(Matrix *mom, Vector *v1, Vector *v2,
         QMP_start(Send[mu]);
     }
   }
-
+#ifdef USE_OMP
+//omp_set_num_threads(MAX_THREADS);
   Float L1[MAX_THREADS] ;
   Float L2[MAX_THREADS];
   Float Linf[MAX_THREADS] ;
   for(int i =0;i<MAX_THREADS;i++){
     L1[i]=L2[i]=Linf[i]=0.;
   }
-#ifdef USE_OMP
-omp_set_num_threads(MAX_THREADS);
 //reduction(+:L1,L2)
    	long i =0;
 #pragma omp parallel for default(shared) private(mu)
@@ -372,6 +372,7 @@ omp_set_num_threads(MAX_THREADS);
 	for(int j =0; j<4;j++){
 		pos[j]= rest%size[j]; rest = rest/size[j];
 	}
+  	if((i==0) && (called%10000)==1) Printf("omp_get_num_threads=%d",omp_get_num_threads());
 	int tnum = omp_get_thread_num();
         Matrix *tmp_mat1,*tmp_mat2;
   	tmp_mat1 = tmp_mat + 2*omp_get_thread_num();
@@ -386,7 +387,6 @@ omp_set_num_threads(MAX_THREADS);
   	Matrix *tmp_mat1,*tmp_mat2;
 	  tmp_mat1 = tmp_mat;
 	  tmp_mat2 = tmp_mat1+1;
-	  int tnum=0;
 #endif
       int gauge_offset = offset(size,pos);
       int vec_offset = f_site_size_4d*gauge_offset ;
@@ -538,11 +538,7 @@ if (!surf_initted){
 #pragma omp parallel for
 	for (long i=0;i<surf[mu];i++){
         Matrix *tmp_mat1,*tmp_mat2;
-#ifdef USE_OMP
 		int tnum = omp_get_thread_num();
-#else
-		int tnum = 0;
-#endif
   		tmp_mat1 = tmp_mat + 2*tnum;
   		tmp_mat2 = tmp_mat1+1;
  		int gauge_offset = *(surf_table[mu]+i);
