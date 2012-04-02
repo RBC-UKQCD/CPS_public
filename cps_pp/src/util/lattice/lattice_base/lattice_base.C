@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.60 2012-03-27 21:20:42 chulwoo Exp $
+  $Id: lattice_base.C,v 1.61 2012-04-02 06:40:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-27 21:20:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.60 2012-03-27 21:20:42 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.60 2012-03-27 21:20:42 chulwoo Exp $
+//  $Date: 2012-04-02 06:40:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.61 2012-04-02 06:40:24 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.61 2012-04-02 06:40:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.60 $
+//  $Revision: 1.61 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -127,7 +127,7 @@ static Matrix *mp4 = &mt4;
 #endif 
 
 
-int Lattice::ForceFlops=0;
+uint64_t Lattice::ForceFlops=0;
 int Lattice::scope_lock=0;
 //------------------------------------------------------------------
 // Constructor
@@ -1218,7 +1218,7 @@ Float Lattice::ReTrPlaq(int *x, int mu, int nu) const
 Float Lattice::SumReTrPlaqNode(void) const
 {
   char *fname = "SumReTrPlaqNode() const";
-  sync();
+//  sync();
   VRB.Func(cname,fname);
   
   Float sum = 0.0;
@@ -1239,7 +1239,7 @@ Float Lattice::SumReTrPlaqNode(void) const
       }
     }
   }
-  sync();
+//  sync();
   VRB.FuncEnd(cname,fname);
   return sum;
 }

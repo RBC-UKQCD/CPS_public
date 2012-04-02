@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.3 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: vector_util.C,v 1.4 2012-04-02 06:40:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.3 2012-03-26 13:50:12 chulwoo Exp $
-//  $Id: vector_util.C,v 1.3 2012-03-26 13:50:12 chulwoo Exp $
+//  $Date: 2012-04-02 06:40:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.4 2012-04-02 06:40:24 chulwoo Exp $
+//  $Id: vector_util.C,v 1.4 2012-04-02 06:40:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v $
 //  $State: Exp $
 //
@@ -101,6 +101,7 @@ void moveVec(Float *b, const Float *a, int len) {
 
   The array \a c must not alias arrays \a a or \a b
 */
+#ifndef VEC_INLINE
 void mDotMEqual(IFloat* c, const IFloat* a, const IFloat* b)
 {
     *c      = *a      * *b      - *(a+1)  * *(b+1)    +
@@ -166,6 +167,7 @@ void mDotMEqual(IFloat* c, const IFloat* a, const IFloat* b)
     	      *(a+14) * *(b+11) + *(a+15) * *(b+10)   +
     	      *(a+16) * *(b+17) + *(a+17) * *(b+16);
 }
+#endif
 
 
 /*! The 3x3 complex matrices are assumed to be stored in a linear form
@@ -318,6 +320,7 @@ void vecEqualsVecTimesEquFloat(IFloat *a, IFloat *b, Float c, int len)
 
 }
 
+#ifndef VEC_INLINE
 /*!
   \param a A vector to be added to.
   \param b Another vector.
@@ -330,6 +333,7 @@ void vecAddEquVec(IFloat *a, const IFloat *b, int len)
     	*a++ += *b++;
     }
 }
+#endif
 
 /*!
   \param a A vector to be subtracted from.
