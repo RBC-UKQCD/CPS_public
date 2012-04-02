@@ -5125,7 +5125,7 @@ elif test "$enable_target" = "bgq"; then
    ARCH="BGQ"
    ARCHDIR="BGQ_DIR"
    TESTING_PARALLEL="yes";
-   DFLAGS="${DFLAGS} -DUSE_OMP"
+   DFLAGS="${DFLAGS} -DUSE_OMP -DVEC_INLINE"
    LDFLAGS="${LDFLAGS} -fopenmp"
    CFLAGS="${CFLAGS} -fopenmp"
    CXXFLAGS="${CFXXLAGS} -fopenmp"
@@ -5201,8 +5201,8 @@ if test "$enable_optimise" = "yes"; then
      CFLAGS="${CFLAGS} -O -Wall"
      CXXFLAGS="${CXXFLAGS} -O -Wall"
    else
-     CFLAGS="${CFLAGS} -O2"
-     CXXFLAGS="${CXXFLAGS} -O2"
+     CFLAGS="${CFLAGS} -O3"
+     CXXFLAGS="${CXXFLAGS} -O3"
    fi
 fi
 

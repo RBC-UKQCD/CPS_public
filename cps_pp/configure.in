@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2012-03-27 21:44:51 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.76 2012-03-27 21:44:51 chulwoo Exp $
-dnl  $Id: configure.in,v 1.76 2012-03-27 21:44:51 chulwoo Exp $
+dnl  $Date: 2012-04-02 15:40:53 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.77 2012-04-02 15:40:53 chulwoo Exp $
+dnl  $Id: configure.in,v 1.77 2012-04-02 15:40:53 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.76 $
+dnl  $Revision: 1.77 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -161,7 +161,7 @@ dnl  AC_CHECK_PROGS(CXX, mpicxx)
    ARCH="BGQ"
    ARCHDIR="BGQ_DIR"
    TESTING_PARALLEL="yes";
-   DFLAGS="${DFLAGS} -DUSE_OMP"
+   DFLAGS="${DFLAGS} -DUSE_OMP -DVEC_INLINE"
    LDFLAGS="${LDFLAGS} -fopenmp"
    CFLAGS="${CFLAGS} -fopenmp"
    CXXFLAGS="${CFXXLAGS} -fopenmp"
@@ -191,8 +191,8 @@ if test "$enable_optimise" = "yes"; then
      CFLAGS="${CFLAGS} -O -Wall"
      CXXFLAGS="${CXXFLAGS} -O -Wall"
    else
-     CFLAGS="${CFLAGS} -O2"
-     CXXFLAGS="${CXXFLAGS} -O2"
+     CFLAGS="${CFLAGS} -O3"
+     CXXFLAGS="${CXXFLAGS} -O3"
    fi
 fi
 
