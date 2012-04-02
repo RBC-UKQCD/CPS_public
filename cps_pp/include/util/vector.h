@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.29 2012-03-26 13:50:11 chulwoo Exp $
+  $Id: vector.h,v 1.30 2012-04-02 06:40:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.29 2012-03-26 13:50:11 chulwoo Exp $
-//  $Id: vector.h,v 1.29 2012-03-26 13:50:11 chulwoo Exp $
+//  $Date: 2012-04-02 06:40:24 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.30 2012-04-02 06:40:24 chulwoo Exp $
+//  $Id: vector.h,v 1.30 2012-04-02 06:40:24 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.29 $
+//  $Revision: 1.30 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -45,7 +45,75 @@ void moveMem(void *b, const void *a, int len);
 void moveFloat(Float *b, const Float *a, int len); 
 
     //! 3x3 complex matrix multiplication; c = ab 
+#ifndef VEC_INLINE
 void mDotMEqual(IFloat* c, const IFloat* a, const IFloat* b);
+#else
+inline void mDotMEqual(IFloat* c, const IFloat* a, const IFloat* b)
+{
+    *c      = *a      * *b      - *(a+1)  * *(b+1)    +
+    	      *(a+2)  * *(b+6)  - *(a+3)  * *(b+7)    +
+    	      *(a+4)  * *(b+12) - *(a+5)  * *(b+13);
+    *(c+1)  = *a      * *(b+1)  + *(a+1)  * *b        +
+    	      *(a+2)  * *(b+7)  + *(a+3)  * *(b+6)    +
+    	      *(a+4)  * *(b+13) + *(a+5)  * *(b+12);
+
+    *(c+2)  = *a      * *(b+2)  - *(a+1)  * *(b+3)    +
+    	      *(a+2)  * *(b+8)  - *(a+3)  * *(b+9)    +
+    	      *(a+4)  * *(b+14) - *(a+5)  * *(b+15);
+    *(c+3)  = *a      * *(b+3)  + *(a+1)  * *(b+2)    +
+    	      *(a+2)  * *(b+9)  + *(a+3)  * *(b+8)    +
+    	      *(a+4)  * *(b+15) + *(a+5)  * *(b+14);
+
+    *(c+4)  = *a      * *(b+4)  - *(a+1)  * *(b+5)    +
+    	      *(a+2)  * *(b+10) - *(a+3)  * *(b+11)   +
+    	      *(a+4)  * *(b+16) - *(a+5)  * *(b+17);
+    *(c+5)  = *a      * *(b+5)  + *(a+1)  * *(b+4)    +
+    	      *(a+2)  * *(b+11) + *(a+3)  * *(b+10)   +
+    	      *(a+4)  * *(b+17) + *(a+5)  * *(b+16);
+
+    *(c+6)  = *(a+6)  * *b      - *(a+7)  * *(b+1)    +
+    	      *(a+8)  * *(b+6)  - *(a+9)  * *(b+7)    +
+    	      *(a+10) * *(b+12) - *(a+11) * *(b+13);
+    *(c+7)  = *(a+6)  * *(b+1)  + *(a+7)  * *b        +
+    	      *(a+8)  * *(b+7)  + *(a+9)  * *(b+6)    +
+    	      *(a+10) * *(b+13) + *(a+11) * *(b+12);
+
+    *(c+8)  = *(a+6)  * *(b+2)  - *(a+7)  * *(b+3)    +
+    	      *(a+8)  * *(b+8)  - *(a+9)  * *(b+9)    +
+    	      *(a+10) * *(b+14) - *(a+11) * *(b+15);
+    *(c+9)  = *(a+6)  * *(b+3)  + *(a+7)  * *(b+2)    +
+    	      *(a+8)  * *(b+9)  + *(a+9)  * *(b+8)    +
+    	      *(a+10) * *(b+15) + *(a+11) * *(b+14);
+
+    *(c+10) = *(a+6)  * *(b+4)  - *(a+7)  * *(b+5)    +
+    	      *(a+8)  * *(b+10) - *(a+9)  * *(b+11)   +
+    	      *(a+10) * *(b+16) - *(a+11) * *(b+17);
+    *(c+11) = *(a+6)  * *(b+5)  + *(a+7)  * *(b+4)    +
+    	      *(a+8)  * *(b+11) + *(a+9)  * *(b+10)   +
+    	      *(a+10) * *(b+17) + *(a+11) * *(b+16);
+
+    *(c+12) = *(a+12) * *b      - *(a+13) * *(b+1)    +
+    	      *(a+14) * *(b+6)  - *(a+15) * *(b+7)    +
+    	      *(a+16) * *(b+12) - *(a+17) * *(b+13);
+    *(c+13) = *(a+12) * *(b+1)  + *(a+13) * *b        +
+    	      *(a+14) * *(b+7)  + *(a+15) * *(b+6)    +
+    	      *(a+16) * *(b+13) + *(a+17) * *(b+12);
+
+    *(c+14) = *(a+12) * *(b+2)  - *(a+13) * *(b+3)    +
+    	      *(a+14) * *(b+8)  - *(a+15) * *(b+9)    +
+    	      *(a+16) * *(b+14) - *(a+17) * *(b+15);
+    *(c+15) = *(a+12) * *(b+3)  + *(a+13) * *(b+2)    +
+    	      *(a+14) * *(b+9)  + *(a+15) * *(b+8)    +
+    	      *(a+16) * *(b+15) + *(a+17) * *(b+14);
+
+    *(c+16) = *(a+12) * *(b+4)  - *(a+13) * *(b+5)    +
+    	      *(a+14) * *(b+10) - *(a+15) * *(b+11)   +
+    	      *(a+16) * *(b+16) - *(a+17) * *(b+17);
+    *(c+17) = *(a+12) * *(b+5)  + *(a+13) * *(b+4)    +
+    	      *(a+14) * *(b+11) + *(a+15) * *(b+10)   +
+    	      *(a+16) * *(b+17) + *(a+17) * *(b+16);
+}
+#endif
 
     //! 3x3 complex matrix multiplication and sum; c += ab
 void mDotMPlus(IFloat* c, const IFloat* a, const IFloat* b); 
@@ -57,7 +125,16 @@ void uDotXEqual(IFloat* y, const IFloat* m, const IFloat* x);
 IFloat dotProduct(const IFloat *a, const IFloat *b, int);
 
     //! vector addition; a += b
+#ifndef VEC_INLINE
 void vecAddEquVec(IFloat *a, const IFloat *b, int); 	
+#else 
+inline void vecAddEquVec(IFloat *a, const IFloat *b, int len)
+{
+    for(int i = 0; i < len; ++i) {
+    	*a++ += *b++;
+    }
+}
+#endif
 
     //! vector subtraction; a -= b
 void vecMinusEquVec(IFloat *a, const IFloat *b, int);  
@@ -70,6 +147,13 @@ void vecZero(IFloat *a, int size);
 
     //! real scalar times vector multiplication; a *= b
 void vecTimesEquFloat(IFloat *a, IFloat b, int); // 
+
+inline void vecTimesEquFloatSingle(IFloat *a, IFloat b, int len)
+{
+    for(int i = 0; i < len; ++i) {
+    	*(a+i) *= b;
+    }
+}
 
     //! real scalar times vector multiplication; a = c*b
 void vecEqualsVecTimesEquFloat(IFloat *a, IFloat *b, IFloat c, int); // 
@@ -144,6 +228,7 @@ class Matrix
     Float u[2*COLORS*COLORS];	// The matrix
 
     friend class Vector;
+    static IFloat inv3;
 
   public:
     // CREATORS
@@ -212,7 +297,7 @@ class Matrix
       \return The multiplied matrix
     */
      Matrix& operator*=(IFloat c)
-    { vecTimesEquFloat((IFloat *)u, c, COLORS*COLORS*2); 
+    { vecTimesEquFloatSingle((IFloat *)u, c, COLORS*COLORS*2); 
     return *this; }
 
      //! Assignment to matrix product; \a ab
@@ -248,7 +333,8 @@ class Matrix
         { Trans((const IFloat *)(m.u)); }
 
     //! Hermitian conjugate.
-    void Dagger(const IFloat* m);
+    void Dagger(const Matrix& m)
+    	{ Dagger((const IFloat *)&m); }
 
     //! Assignment to hermitian conjugate.
     /*!
@@ -257,20 +343,88 @@ class Matrix
 
       \a a must not be an alias of this matrix
     */
-    void Dagger(const Matrix& m)
-    	{ Dagger((const IFloat *)&m); }
+#ifndef VEC_INLINE
+    void Dagger(const IFloat* m);
 
     //! Not what you might think.
     void TrLessAntiHermMatrix(const Matrix& this_dag);
-//#if TARGET == QCDOC || TARGET == BGL || TARGET == BGP
-#if 1
+#else 
+/*!
+  \param a A linear array representation of a 3x3 complex matrix, such that 
+  real part of the (i,j) element is at array position [6i+2j] 
+  and the imaginary part of the (i,j) element is at array position [6i+2j+1].
+  \post This matrix is the hermitian conjugate of \a m.
+
+  \a a must not be an alias of this matrix.
+ */
+inline void Dagger(const IFloat* a)
+{
+    u[0]  = a[0];   u[1]  = -a[1];
+    u[6]  = a[2];   u[7]  = -a[3];
+    u[12] = a[4];   u[13] = -a[5];
+    u[2]  = a[6];   u[3]  = -a[7];
+    u[8]  = a[8];   u[9]  = -a[9];
+    u[14] = a[10];  u[15] = -a[11];
+    u[4]  = a[12];  u[5]  = -a[13];
+    u[10] = a[14];  u[11] = -a[15];
+    u[16] = a[16];  u[17] = -a[17];
+}
+
+/*!
+  \param dag A matrix \a A.
+  \post This matrix is set to\n
+  <em>1/2(M-A) - 1/6 Trace M-A)</em>
+  \n where \a M is the original value of this matrix.
+*/
+inline void TrLessAntiHermMatrix(const Matrix& dag)
+{
+    // get 1/2(A - dag(A)) =  1/2A - dag(1/2A)
+    *this -= dag;
+
+    IFloat *p = (IFloat *)u;
+    vecTimesEquFloatSingle(p, 0.5, 18);
+
+    IFloat c = inv3 * (*(p+1) + *(p+9) + *(p+17));
+    *(p+1) -= c;
+    *(p+9) -= c;
+    *(p+17) -= c;
+}
+#endif
+
+#ifndef VEC_INLINE
     void TrLessAntiHermMatrix();
+#else
+#if 0
+inline void TrLessAntiHermMatrix()
+{
+
+    IFloat *p = (IFloat *)u;
+    *p = *(p+8) = *(p+16)=0.;
+    IFloat tmp = 0.5*(p[2] - p[6]);
+    p[2]=tmp; p[6] = -tmp;
+    tmp = 0.5*(p[3] + p[7]);
+    p[3]=tmp; p[7] = tmp;
+    tmp = 0.5*(p[4] - p[12]);
+    p[4]=tmp; p[12] = -tmp;
+    tmp = 0.5*(p[5] + p[13]);
+    p[5]=tmp; p[13] = tmp;
+    tmp = 0.5*(p[10] - p[14]);
+    p[10]=tmp; p[14] = -tmp;
+    tmp = 0.5*(p[11] + p[15]);
+    p[11]=tmp; p[15] = tmp;
+
+    IFloat c = inv3 * (*(p+1) + *(p+9) + *(p+17));
+    p[1] -= c;
+    p[9] -= c;
+    p[17] -= c;
+}
 #else
     void TrLessAntiHermMatrix(){
        Matrix dag;
        dag.Dagger(*this);
        this->TrLessAntiHermMatrix(dag);
     }
+#endif
 #endif
 
     //! Assignment to tensor product of vectors.
@@ -431,7 +585,7 @@ class Vector
       \return The multiplied vector
     */
     Vector& operator*=(IFloat p)
-    { vecTimesEquFloat((IFloat *)v, p, COLORS*2); 
+    { vecTimesEquFloatSingle((IFloat *)v, p, COLORS*2); 
     return *this; }
 
     //! Adds a vector \a m to this vector.

@@ -7,7 +7,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.9 2012-03-27 20:05:49 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.10 2012-04-02 06:40:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -120,6 +120,7 @@ ForceArg FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
 
 #ifdef PROFILE
   Float time = -dclock();
+  Float time0=time;
   ForceFlops=0;
 #endif
   {
@@ -367,10 +368,10 @@ omp_set_num_threads(MAX_THREADS);
     for (i=0;i<vol*4;i++){
   	int pos[4];
 	long rest=i;
+	mu = rest%4; rest = rest/4;
 	for(int j =0; j<4;j++){
 		pos[j]= rest%size[j]; rest = rest/size[j];
 	}
-	mu = rest;
 	int tnum = omp_get_thread_num();
         Matrix *tmp_mat1,*tmp_mat2;
   	tmp_mat1 = tmp_mat + 2*omp_get_thread_num();
@@ -427,7 +428,7 @@ omp_set_num_threads(MAX_THREADS);
 //      }
 
       tmp_mat2->DotMEqual(*(gauge+gauge_offset), *tmp_mat1) ;
-        OMP_DEBUG(" tmp_mat2->DotMEqual(*(gauge+gauge_offset), *tmp_mat1) ; thread=%d\n",omp_get_thread_num());
+//        OMP_DEBUG(" tmp_mat2->DotMEqual(*(gauge+gauge_offset), *tmp_mat1) ; thread=%d\n",omp_get_thread_num());
 
       tmp_mat1->Dagger(*tmp_mat2) ;
 
@@ -438,23 +439,25 @@ omp_set_num_threads(MAX_THREADS);
 
       *(mom+gauge_offset) += *tmp_mat2 ;
         OMP_DEBUG("*(mom+gauge_offset) += *tmp_mat2 ; thread=%d\n",omp_get_thread_num());
-
+#if 1
+{
       Float norm = tmp_mat2->norm();
       Float tmp = sqrt(norm);
-      if((called%10000)==1) Printf("%d %d %d %d %d thread=%d norm=%g tmp=%g\n",mu,pos[0],pos[1],pos[2],pos[3],tnum,norm,tmp);
 //#pragma omp atomic
-{
       L1[tnum] += tmp;
       L2[tnum] += norm;
       Linf[tnum] = (tmp>Linf[tnum] ? tmp : Linf[tnum]);
 }
+#endif
     }
 
     } // end for x,y,z,t, mu
    OMP_DEBUG("Loop ended! %d\n",mu);
+  uint64_t temp_flop = (2*9*16*ls + 18+ 198+36+24)*lx*ly*lz*lt*(4.-1./lx-1/ly-1./lz-1./lt);
+  ForceFlops += temp_flop;
 #ifdef PROFILE
   time += dclock();
-  print_flops(fname,"local",ForceFlops,time);
+  print_flops(fname,"local",temp_flop,time);
   time =- dclock();
 #endif
 
@@ -467,11 +470,10 @@ omp_set_num_threads(MAX_THREADS);
   }
 #ifdef PROFILE
   time += dclock();
-  print_flops(fname,"QMP_wait",ForceFlops,time);
+  print_flops(fname,"QMP_wait",0,time);
   time =- dclock();
 #endif
 
-#if 1
 
 static int surf_initted=0;
 static int *surf_table[4];
@@ -484,9 +486,6 @@ if (!surf_initted){
     } else {
 		surf_table[mu]=surf_mu_offset[mu]=NULL;
 	}
-surf_initted=1;
-}
-{
     int pos[4];
     int surf_index[4];
     for (mu=0; mu<4; mu++)
@@ -512,13 +511,13 @@ surf_initted=1;
 		surf_index[mu] ++;
 	  
     }
-}
-#endif
+	surf_initted=1;
 #ifdef PROFILE
   time += dclock();
-  print_flops(fname,"setup",ForceFlops,time);
+  print_flops(fname,"setup",0,time);
   time =- dclock();
 #endif
+}
 
  
 //------------------------------------------------------------------
@@ -700,10 +699,11 @@ surf_initted=1;
 
 #endif
 
-  ForceFlops += (2*9*16*ls + 18+ 198+36+24)*lx*ly*lz*lt*4;
+  temp_flop = (2*9*16*ls + 18+ 198+36+24)*lx*ly*lz*lt*(1./lx+1/ly+1./lz+1./lt);
+  ForceFlops += temp_flop;
 #ifdef PROFILE
   time += dclock();
-  print_flops(fname,"non-local",ForceFlops,time);
+  print_flops(fname,"non-local",temp_flop,time);
 #endif
  
 //------------------------------------------------------------------

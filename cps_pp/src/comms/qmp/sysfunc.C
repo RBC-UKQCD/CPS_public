@@ -73,7 +73,7 @@ namespace QMPSCU {
 
 void init_qmp(int * argc, char ***argv) {
 
-#if 0
+#if 1
   printf("init_qmp(%d %p)\n",*argc,*argv);
   for(int i = 0; i<*argc;i++){
     printf("argv[%d](before)=%s\n",i,(*argv)[i]); 

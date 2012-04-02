@@ -5,15 +5,15 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.59 2011-03-24 15:56:27 chulwoo Exp $
+  $Id: lattice.h,v 1.60 2012-04-02 06:40:24 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2011-03-24 15:56:27 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.59 2011-03-24 15:56:27 chulwoo Exp $
-  $Id: lattice.h,v 1.59 2011-03-24 15:56:27 chulwoo Exp $
+  $Date: 2012-04-02 06:40:24 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.60 2012-04-02 06:40:24 chulwoo Exp $
+  $Id: lattice.h,v 1.60 2012-04-02 06:40:24 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.59 $
+  $Revision: 1.60 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -686,7 +686,7 @@ class Lattice
       \param mu The direction of the link.
      */
 
-    static int ForceFlops;
+    static uint64_t ForceFlops;
     //!< Counter for flops in the HMD force calculations.
 
     virtual ForceArg EvolveMomGforce(Matrix *mom, Float step_size) = 0;
