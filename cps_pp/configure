@@ -5430,8 +5430,11 @@ if test "$enable_bfm" != "no"; then
    if test "$enable_bfm" != "yes"; then
       LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib "
       INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include"
+   else
+      BFM_DIR=${QMP_DIR}
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
+      INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include/libxml2"
 fi
       LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm "
 #-lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm

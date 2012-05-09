@@ -203,8 +203,8 @@ int even, int odd, int Ls=0, double fac_t=1.){
 //        QDPdouble *qdp_p = (QDPdouble *) &(qdp[x[4]].elem(0).elem(0).elem(0).real());
 	QDPdouble *qdp_p = q_p[x[4]];        
 	const int tnum = omp_get_thread_num();
-	if ((called%10000)==0)
-	Printf("impex %d: %d %d %d %d %d:%d\n",i,x[0],x[1],x[2],x[3],x[4],tnum);
+//	if ((called%10000)==0)
+//	Printf("impex %d: %d %d %d %d %d:%d\n",i,x[0],x[1],x[2],x[3],x[4],tnum);
 #endif
       
       for ( int coco=0;coco<12;coco++ ) {
@@ -314,6 +314,7 @@ int max_iter
   majorityVote  dwf;
 #else
   bfm_qdp<double>  dwf;
+//  bfm_qdp<float>  dwf;
 #endif
 
   dwfa.node_latt[0]  = lx;
