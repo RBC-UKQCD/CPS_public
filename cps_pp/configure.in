@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2012-04-02 15:40:53 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.77 2012-04-02 15:40:53 chulwoo Exp $
-dnl  $Id: configure.in,v 1.77 2012-04-02 15:40:53 chulwoo Exp $
+dnl  $Date: 2012-05-09 01:52:38 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.78 2012-05-09 01:52:38 chulwoo Exp $
+dnl  $Id: configure.in,v 1.78 2012-05-09 01:52:38 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.77 $
+dnl  $Revision: 1.78 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -388,8 +388,11 @@ dnl     echo "BFM_DIR environment variable not set"
    if test "$enable_bfm" != "yes"; then
       LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib "
       INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include"
+   else
+      BFM_DIR=${QMP_DIR}
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
+      INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include/libxml2"
 fi
       LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm "
 #-lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm
