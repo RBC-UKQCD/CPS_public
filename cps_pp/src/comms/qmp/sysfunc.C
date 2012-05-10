@@ -73,7 +73,7 @@ namespace QMPSCU {
 
 void init_qmp(int * argc, char ***argv) {
 
-#if 1
+#if 0
   printf("init_qmp(%d %p)\n",*argc,*argv);
   for(int i = 0; i<*argc;i++){
     printf("argv[%d](before)=%s\n",i,(*argv)[i]); 
@@ -125,7 +125,7 @@ void init_qmp(int * argc, char ***argv) {
 	peNum *= peGrid[i];
     peRank = peRank % peNum;
   }
-  int if_print=1;
+  int if_print=0;
   for(int i = 0;i<NDIM;i++)
   if (pePos[i]>=2) if_print=0;
 

@@ -12,18 +12,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
 
-  $Id: wilson_dslash_vec.C,v 1.2 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: wilson_dslash_vec.C,v 1.3 2012-05-10 05:51:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_vec.C,v 1.2 2012-03-26 13:50:12 chulwoo Exp $
-//  $Id: wilson_dslash_vec.C,v 1.2 2012-03-26 13:50:12 chulwoo Exp $
+//  $Date: 2012-05-10 05:51:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_vec.C,v 1.3 2012-05-10 05:51:23 chulwoo Exp $
+//  $Id: wilson_dslash_vec.C,v 1.3 2012-05-10 05:51:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_vec.C,v $
 //  $State: Exp $
 //
@@ -253,11 +253,9 @@ void wilson_dslash_vec(IFloat *chi_p_f,
 //
 //
 //omp_set_num_threads(8);
+	omp_set_num_threads(64);
 #pragma omp parallel for default(shared) private(mu)
 	for (int dir=0;dir<8;dir++){
-//	if ((called%10000==0) &&(!UniqueID())){
-//		printf("wilson_dslash: dir=%d thread %d of %d\n",dir,omp_get_thread_num(),omp_get_num_threads());
-//	}
 		int x, y, z, t;
 		int r, c, s;
 		int xp, yp, zp, tp;
@@ -595,15 +593,18 @@ Printf("getMinusData((IFloat *)fbuf, (IFloat *)tmp6, SPINOR_SIZE, 1);\n");
 	setup += time;
 
 	time = -dclock();
+	omp_set_num_threads(64);
 /*--------------------------------------------------------------------------*/
 /* Loop over sites                                                          */
 /*--------------------------------------------------------------------------*/
 	for(int i=0;i<SPINOR_SIZE;i++) fbuf[i]=0.;
-	omp_set_num_threads(64);
 	int index=0;
 #pragma omp parallel for default(shared) private(mu)
 	for(index = 0; index<vol*2;index++){
 //	Printf("wilson_dslash: %d %d %d %d\n",x,y,z,t);
+//	if ((called%10000==0) &&(!UniqueID())){
+//		printf("wilson_dslash: index=%d thread %d of %d\n",index,omp_get_thread_num(),omp_get_num_threads());
+//	}
 	int r, c, s;
 	int x, y, z, t;
 	int xp, yp, zp, tp;
@@ -630,9 +631,11 @@ Printf("getMinusData((IFloat *)fbuf, (IFloat *)tmp6, SPINOR_SIZE, 1);\n");
 	y = temp % ly; temp = temp/ly;
 	z = temp % lz; temp = temp/lz;
 	t = temp % lt; temp = temp/lt;
-//	if ((called%1000000==0) &&(!UniqueID())){
-//printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,omp_get_thread_num(),omp_get_num_threads(),tmp);
-//	}
+
+if (0) 
+if ((called%1000000==0) &&(!UniqueID())){
+printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,omp_get_thread_num(),omp_get_num_threads(),tmp);
+}
 
 
 	parity = x+y+z+t;

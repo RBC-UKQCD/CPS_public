@@ -206,7 +206,7 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
     IFloat *ihp = (IFloat *)(mom+i*4+mu);  //The gauge momentum
     IFloat *dotp = (IFloat *)mp0;
     IFloat *dotp2 = (IFloat *) (result[mu]+(i));
-    fTimesV1PlusV2(ihp, dt, dotp2, ihp, 18);  //Update the gauge momentum
+    fTimesV1PlusV2Single(ihp, dt, dotp2, ihp, 18);  //Update the gauge momentum
     Float norm = ((Matrix*)dotp2)->norm();
     Float tmp = sqrt(norm);
     L1 += tmp;
