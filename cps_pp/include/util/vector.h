@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.30 2012-04-02 06:40:24 chulwoo Exp $
+  $Id: vector.h,v 1.31 2012-05-10 05:51:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-04-02 06:40:24 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.30 2012-04-02 06:40:24 chulwoo Exp $
-//  $Id: vector.h,v 1.30 2012-04-02 06:40:24 chulwoo Exp $
+//  $Date: 2012-05-10 05:51:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.31 2012-05-10 05:51:23 chulwoo Exp $
+//  $Id: vector.h,v 1.31 2012-05-10 05:51:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.30 $
+//  $Revision: 1.31 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -139,6 +139,13 @@ inline void vecAddEquVec(IFloat *a, const IFloat *b, int len)
     //! vector subtraction; a -= b
 void vecMinusEquVec(IFloat *a, const IFloat *b, int);  
 
+inline void vecMinusEquVecSingle(IFloat *a, const IFloat *b, int len)
+{
+    for(int i = 0; i < len; ++i) {
+        *a++ -= *b++;
+    }
+}
+
     //! vector negation; a = -b
 void vecNegative(IFloat *a, const IFloat *b, int); 	
 
@@ -161,6 +168,14 @@ void vecEqualsVecTimesEquFloat(IFloat *a, IFloat *b, IFloat c, int); //
     //! vector linear combination; a = bc+d
 void fTimesV1PlusV2(IFloat *a, IFloat b, const IFloat *c,
 			const IFloat *d, int size); 	
+
+inline void fTimesV1PlusV2Single(IFloat *a, IFloat b, const IFloat *c,
+        const IFloat *d, int len)
+{
+    for(int i = 0; i < len; ++i) {
+        *a++ = b * *c++ + *d++;
+    }
+}
 
     //! vector linear combination; a = bc-d
 void fTimesV1MinusV2(IFloat *a, IFloat b, const IFloat *c,
@@ -280,7 +295,7 @@ class Matrix
       \return The matrix difference.
     */
     Matrix& operator-=(const Matrix& m)
-    { vecMinusEquVec((IFloat *)u, (IFloat *)m.u, COLORS*COLORS*2);
+    { vecMinusEquVecSingle((IFloat *)u, (IFloat *)m.u, COLORS*COLORS*2);
       return *this; }
 
     //! Subtracts a real scalar multiple of the unit matrix from this one.
@@ -522,13 +537,13 @@ inline void TrLessAntiHermMatrix()
     Complex Char10() const ;
 
     void FTimesV1PlusV2(Float fb, Matrix *c, Matrix *d, int len)
-//#if TARGET == BGL  || TAGET == QCDOC
-#if 0
+#if TARGET == BGL  || TAGET == QCDOC
     { Float coef = fb; vaxpy3_m (u, &coef, c, d, len*3); }
-#elif !defined(USE_TEST)
+#else
 	{ fTimesV1PlusV2((IFloat *)&u, IFloat(fb), (IFloat *)c, 
 	                         (IFloat *)d, len*18); }
-#else
+#endif
+#if 0
 //#pragma omp parallel for default(shared)
 	{ 
 		for(int i=0;i<len;i++)
@@ -603,7 +618,7 @@ class Vector
       \return The vector difference.
     */
     Vector& operator-=(const Vector& x)
-    { vecMinusEquVec((IFloat *)v, (IFloat *)x.v, COLORS*2);
+    { vecMinusEquVecSingle((IFloat *)v, (IFloat *)x.v, COLORS*2);
       return *this; }
 
     //! Assignment to matrix-vector product.

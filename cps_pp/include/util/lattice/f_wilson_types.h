@@ -11,7 +11,8 @@ class FwilsonTypes : public virtual Lattice
  private:
     char *cname;    // Class name.
     
- protected:
+ public:
+// protected:
     void (*sproj_tr[8])(IFloat *f, 
 			IFloat *v, 
 			IFloat *w, 

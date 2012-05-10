@@ -14,13 +14,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.9 2008-02-08 18:35:07 chulwoo Exp $
-//  $Id: asqtad_cg.C,v 1.9 2008-02-08 18:35:07 chulwoo Exp $
+//  $Date: 2012-05-10 05:51:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v 1.10 2012-05-10 05:51:23 chulwoo Exp $
+//  $Id: asqtad_cg.C,v 1.10 2012-05-10 05:51:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: asqtad_cg.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_cg.C,v $
 //  $State: Exp $
 //
@@ -48,9 +48,9 @@ void report_flops(int flops, struct timeval *start,struct timeval *end);
 
 
 #ifdef ASQD_SINGLE
-extern "C"   void asq_vaxmy_cpp(Float *scale,vector *mult,vector *sub,int ncvec);
+extern "C"   void asq_vaxmy_cpp(Float *scale,PTvector *mult,PTvector *sub,int ncvec);
 #define asq_vaxmy(A,B,C,D) asq_vaxmy_cpp(A,B,C,D)
-extern "C"   void asq_vaxmy_vxdot_s(Float *scale, vector *mult, vector *sub, 
+extern "C"   void asq_vaxmy_vxdot_s(Float *scale, PTvector *mult, PTvector *sub, 
                int ncvec, Float *norm);
 #define asq_vaxmy_vxdot(A,B,C,D,E) asq_vaxmy_vxdot_s(A,B,C,D,E)
 extern "C"   void asq_vaxpy3_s(Float *res,Float *scale,Float *mult,Float *add, int ncvec);
@@ -59,8 +59,8 @@ extern "C"   void asq_vaxpy3_norm_s(Float *res,Float *scale,Float *mult,
                Float *add, int ncvec,Float *norm);
 #define asq_vaxpy3_norm(A,B,C,D,E,F) asq_vaxpy3_norm_s(A,B,C,D,E,F)
 #else
-extern "C"   void asq_vaxmy(Float *scale,vector *mult,vector *sub,int ncvec);
-extern "C"   void asq_vaxmy_vxdot(Float *scale, vector *mult, vector *sub, 
+extern "C"   void asq_vaxmy(Float *scale,PTvector *mult,PTvector *sub,int ncvec);
+extern "C"   void asq_vaxmy_vxdot(Float *scale, PTvector *mult, PTvector *sub, 
                int ncvec, Float *norm);
 extern "C"   void asq_vaxpy3(Float *res,Float *scale,Float *mult,Float *add, 
               int ncvec);
@@ -210,12 +210,12 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
 
 // Set the source vector pointer
 //------------------------------------------------------------------
-  vector *src = in;
+  PTvector *src = in;
 //  Float *src_tmp = (Float *)src;
 
 // Set the solution vector pointer
 //------------------------------------------------------------------
-  vector *sol = out;
+  PTvector *sol = out;
 
 // Allocate memory for the solution/residual field.
 //------------------------------------------------------------------
@@ -228,22 +228,22 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
 
 // Allocate memory for the direction vector dir.
 //------------------------------------------------------------------
-  vector *dir;
+  PTvector *dir;
   if(vol >1024) dir=0;
-    else dir = (vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
+    else dir = (PTvector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
   if(dir == 0){
-    dir = (vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
+    dir = (PTvector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
   }
   if(dir == 0)
     PointerErr(cname,fname, "dir");
 
 // Allocate mem. for the result vector of matrix multiplication mmp.
 //------------------------------------------------------------------
-  vector *mmp;
+  PTvector *mmp;
   if(vol >1024) mmp=0;
-    else mmp = (vector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
+    else mmp = (PTvector *) qalloc(QCOMMS|QFAST,f_size_cb * sizeof(Float));
   if(mmp == 0){
-    mmp = (vector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
+    mmp = (PTvector *) qalloc(QCOMMS,f_size_cb * sizeof(Float));
   }
  // printf("dir=%p mmp=%p\n",dir,mmp);
   if(mmp == 0)
@@ -414,195 +414,6 @@ int AsqD::InvCg( InvArg *inv_arg, Float *out,
 
 }
 
-#if 0
 
-//------------------------------------------------------------------
-/*!
-  Solves \f$ M^\dagger M out = in \f$ for \a out using the Conjugate
-  Gradient method, where \a M is the
-  fermion matrix, possibly odd-even preconditioned, possibly a single parity
-  of the odd-even preconditioned fermion matrix.
-  The residual used for the stopping
-  criterion is \f$ |f_{in} - M^\dagger M f_{out}| / |f_{in}| \f$.
-
-  \param out The initial guess of solution vector.
-  \param in The source vector
-  \param src_norm_sq The square norm of the source vector. If this is set to
-  zero it will be calculated inside this method.
-  \return The number of solver iterations.
-  \post \a f_out contains the solution vector.
-*/
-//------------------------------------------------------------------
-int DiracOp::InvCg(vector *out, vector *in, Float src_norm_sq)
-{ return InvCg(out, in, src_norm_sq, 0); }
-
-
-//------------------------------------------------------------------
-/*!
-  Solves \f$ M^\dagger M out = in \f$ for \a out, where \a M is the
-  (possibly odd-even preconditioned) fermionic matrix, using the Conjugate
-  Gradient method,
-  The residual used for the stopping criterion  is
-  \f$ |f_{in} - M^\dagger M f_{out}| / |f_{in}| \f$.
-
-  \param out The initial guess of solution vector.
-  \param in The source vector
-  \param true_res Whether or not to report the true residual. This will
-  point to the true residual  if it initially points to something non-zero.
-  \return The number of solver iterations.
-  \post \a f_out contains the solution vector.
-  \post true_res The true residual, if this was non-zero to start with.
-*/
-// Same as original but with src_norm_sq=0.0
-//------------------------------------------------------------------
-int DiracOp::InvCg(vector *out, vector *in, Float *true_res)
-{ return InvCg(out, in, 0.0, true_res); }
-
-
-//------------------------------------------------------------------
-// Same as original but with src_norm_sq=0.0, true_res=0
-/*!
-  Solves \f$ M^\dagger M out = in \f$ for \a out using the Conjugate
-  Gradient method, where \a M is the
-  fermion matrix, possibly odd-even preconditioned, possibly a single parity
-  of the odd-even preconditioned fermion matrix.
-  The residual used for the stopping
-  criterion is \f$ |f_{in} - M^\dagger M f_{out}| / |f_{in}| \f$.
-  
-  \param out The initial guess of solution vector.
-  \param in The source vector
-  \return The number of solver iterations.
-  \post \a f_out contains the solution vector.
-*/
-//------------------------------------------------------------------
-int DiracOp::InvCg(vector *out, vector *in)
-{ return InvCg(out, in, 0.0, 0); }
-
-
-//------------------------------------------------------------------
-// Same as original but with 
-// in=f_in, out=f_out
-/*!
-  Solves \f$ M^\dagger M out = in \f$ for \a out using the Conjugate
-  Gradient method, where \a M is the
-  fermion matrix, possibly odd-even preconditioned, possibly a single parity
-  of the odd-even preconditioned fermion matrix.
-  The residual used for the stopping
-  criterion is \f$ |f_{in} - M^\dagger M f_{out}| / |f_{in}| \f$.
-
-  The initial guess of solution vector is the vector \a f_field_out passed
-  as a constructor argument.
-  The source vector is the vector \a f_field_in passed
-  as a constructor argument.
-
-  \param src_norm_sq The square norm of the source vector. If this is set to
-  zero it will be calculated inside this method.
-  \param true_res Whether or not to report the true residual. This will
-  point to the true residual  if it initially points to something non-zero.
-  \return The number of solver iterations.
-  \post \a f_field_out contains the solution vector.
-  \post true_res The true residual, if this was non-zero to start with.
-*/
-//------------------------------------------------------------------
-int DiracOp::InvCg(Float src_norm_sq, Float *true_res)
-{ return InvCg(f_out, f_in, src_norm_sq, true_res); }
-
-
-//------------------------------------------------------------------
-// Same as original but with 
-// in=f_in, out=f_out, true_res=0
-/*!
-  Solves \f$ M^\dagger M out = in \f$ for \a out using the Conjugate
-  Gradient method, where \a M is the
-  fermion matrix, possibly odd-even preconditioned, possibly a single parity
-  of the odd-even preconditioned fermion matrix.
-  The residual used for the stopping
-  criterion is \f$ |f_{in} - M^\dagger M f_{out}| / |f_{in}| \f$.
-
-  The initial guess of solution vector is the vector \a f_field_out passed
-  as a constructor argument.
-  The source vector is the vector \a f_field_in passed
-  as a constructor argument.
-
-  \param src_norm_sq The square norm of the source vector. If this is set to
-  zero it will be calculated inside this method.
-  \return The number of solver iterations.
-  \post \a f_field_out contains the solution vector.
-*/
-//------------------------------------------------------------------
-int DiracOp::InvCg(Float src_norm_sq)
-{ return InvCg(f_out, f_in, src_norm_sq, 0); }
-
-
-//------------------------------------------------------------------
-// Same as original but with 
-// in=f_in, out=f_out, src_norm_sq=0.0
-/*!
-  Solves \f$ M^\dagger M out = in \f$ for \a out using the Conjugate
-  Gradient method, where \a M is the
-  fermion matrix, possibly odd-even preconditioned, possibly a single parity
-  of the odd-even preconditioned fermion matrix.
-  The residual used for the stopping
-  criterion is \f$ |f_{in} - M^\dagger M f_{out}| / |f_{in}| \f$.
-
-  The initial guess of solution vector is the vector \a f_field_out passed
-  as a constructor argument.
-  The source vector is the vector \a f_field_in passed
-  as a constructor argument.
-
-  \param true_res Whether or not to report the true residual. This will
-  point to the true residual  if it initially points to something non-zero.
-  \return The number of solver iterations.
-  \post \a f_field_out contains the solution vector.
-  \post true_res The true residual, if this was non-zero to start with.
-*/
-//------------------------------------------------------------------
-int DiracOp::InvCg(Float *true_res)
-{ return InvCg(f_out, f_in, 0.0, true_res); }
-
-
-//------------------------------------------------------------------
-// Same as original but with 
-// in=f_in, out=f_out, src_norm_sq=0.0, true_res=0
-/*!
-  Solves \f$ M^\dagger M out = in \f$ for \a out using the Conjugate
-  Gradient method, where \a M is the
-  fermion matrix, possibly odd-even preconditioned, possibly a single parity
-  of the odd-even preconditioned fermion matrix.
-  The residual used for the stopping
-  criterion is \f$ |f_{in} - M^\dagger M f_{out}| / |f_{in}| \f$.
-
-  The initial guess of solution vector is the vector \a f_field_out passed
-  as a constructor argument.
-  The source vector is the vector \a f_field_in passed
-  as a constructor argument.
-
-  \return The number of solver iterations.
-  \post \a f_field_out contains the solution vector.
-*/
-//------------------------------------------------------------------
-int DiracOp::InvCg(void)
-{ return InvCg(f_out, f_in, 0.0, 0); }
-#endif
-
-#if 0
-#include <stdio.h>
-void report_flops(int flops, struct timeval *start,struct timeval *end)
-{
-
-  double t;
-  double mflops;
-
-  t = ( end->tv_usec - start->tv_usec )*1.E-6;
-  t+= ( end->tv_sec - start->tv_sec );
-
-  mflops = (flops * 1.E-6) / t;
-  printf("\t%ld:%ld -> %ld:%ld\n",
-	 start->tv_sec,start->tv_usec,
-	 end->tv_sec,end->tv_usec
-	 );
-  printf("\t%d flops %le seconds %lf Mflop/s\n",flops,t,mflops);
-}
-#endif
 
 //CPS_END_NAMESPACE

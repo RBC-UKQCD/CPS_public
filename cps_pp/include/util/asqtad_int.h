@@ -72,19 +72,19 @@ class matrix{
 }
 };
 
-typedef Float vector;
+typedef Float PTvector;
 
-inline Float NormSqNode(vector *src,int size){
+inline Float NormSqNode(PTvector *src,int size){
   Float sum = 0.;
   for(int i = 0;i<size;i++) sum += src[i]*src[i];
   return sum;
 }
 
-inline void CopyVec(vector *dest,vector *src, int size){
+inline void CopyVec(PTvector *dest,PTvector *src, int size){
   for(int i = 0;i<size;i++) dest[i] = src[i];
 }
 
-inline void VecMinusEquVec(vector *dest,vector *src, int size){
+inline void VecMinusEquVec(PTvector *dest,PTvector *src, int size){
   for(int i = 0;i<size;i++) dest[i] -= src[i];
 }
 

@@ -3,10 +3,10 @@
 #include "pt_int.h"
 
 extern "C" {
-void vaxpy3(vector *res,Float *scale,vector *mult,vector *add, int ncvec);
+void vaxpy3(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
   inline void vaxpy3_m(matrix *res,Float *scale,matrix *mult,matrix *add, 
   int ncvec){
-    vaxpy3((vector *)res, scale, (vector *)mult,(vector *)add,ncvec);
+    vaxpy3((PTvector *)res, scale, (PTvector *)mult,(PTvector *)add,ncvec);
   }
 }
 

@@ -3,7 +3,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: pt_force.C,v 1.3 2009-04-23 03:33:25 chulwoo Exp $
+  $Id: pt_force.C,v 1.4 2012-05-10 05:51:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 
@@ -12,12 +12,12 @@
 #include "pt_int.h"
 
 extern "C"{
-void asq_force_cross2dag(vector *chi, vector *phi, matrix *result,
+void asq_force_cross2dag(PTvector *chi, PTvector *phi, matrix *result,
                       int counter, double *fac);
-void asq_force_cross2dag_s(vector *chi, vector *phi, matrix *result,
+void asq_force_cross2dag_s(PTvector *chi, PTvector *phi, matrix *result,
                       int counter, float *fac);
-void asq_vaxpy3(vector *res,Float *scale,vector *mult,vector *add, int ncvec);
-void asq_vaxpy3_s(vector *res,Float *scale,vector *mult,vector *add, int ncvec);
+void asq_vaxpy3(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
+void asq_vaxpy3_s(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
 }
 
 #ifdef USE_QALLOC
@@ -86,44 +86,44 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float dt){
 #if 0
     // vector arrays for which we must allocate memory
 
-    vector ***Pnu = (vector***)pt_amalloc(pt_alloc, sizeof(vector), 3, n_sign, N, vol);
+    PTvector ***Pnu = (PTvector***)pt_amalloc(pt_alloc, sizeof(PTvector), 3, n_sign, N, vol);
     
-    vector ****P3 = (vector****)pt_amalloc(pt_alloc, sizeof(vector), 4, n_sign, n_sign, N, vol);
+    PTvector ****P3 = (PTvector****)pt_amalloc(pt_alloc, sizeof(PTvector), 4, n_sign, n_sign, N, vol);
 
-    vector ****Prhonu = (vector****)pt_amalloc(pt_alloc, sizeof(vector), 4, n_sign, n_sign, N, vol);
+    PTvector ****Prhonu = (PTvector****)pt_amalloc(pt_alloc, sizeof(PTvector), 4, n_sign, n_sign, N, vol);
 
-    vector *****P5 = (vector*****)pt_amalloc(pt_alloc, sizeof(vector), 5, n_sign, n_sign, n_sign, N, vol);
+    PTvector *****P5 = (PTvector*****)pt_amalloc(pt_alloc, sizeof(PTvector), 5, n_sign, n_sign, n_sign, N, vol);
 
-    vector ******P7 = (vector******)pt_amalloc(pt_alloc, sizeof(vector), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
+    PTvector ******P7 = (PTvector******)pt_amalloc(pt_alloc, sizeof(PTvector), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
 
-    vector ******Psigma7 = (vector******)pt_amalloc(pt_alloc, sizeof(vector), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
+    PTvector ******Psigma7 = (PTvector******)pt_amalloc(pt_alloc, sizeof(PTvector), 6, n_sign, n_sign, n_sign, n_sign, N, vol);
 #else
-    vector *Pnu[2][4];
-    vector *P3[2][2][4];
-    vector *Prhonu[2][2][4];
-    vector *P5[2][2][2][4];
-    vector *P7[2][2][2][2][4];
-    vector *Psigma7[2][2][2][2][4];
-    vector *Pnununu[4];
-    vector *Pnunu[2][4];
-    vector *Pnu5[2][2][4];
-    vector *Pnu3[2][2][4];
-    vector *Prho5[2][2][2][4];
-    vector *Psigmarhonu[2][2][2][4];
+    PTvector *Pnu[2][4];
+    PTvector *P3[2][2][4];
+    PTvector *Prhonu[2][2][4];
+    PTvector *P5[2][2][2][4];
+    PTvector *P7[2][2][2][2][4];
+    PTvector *Psigma7[2][2][2][2][4];
+    PTvector *Pnununu[4];
+    PTvector *Pnunu[2][4];
+    PTvector *Pnu5[2][2][4];
+    PTvector *Pnu3[2][2][4];
+    PTvector *Prho5[2][2][2][4];
+    PTvector *Psigmarhonu[2][2][2][4];
 
     size_t vec_size = 6*vol*sizeof(Float);
     for(int i = 0;i<N;i++){
       for(int j = 0;j<n_sign;j++){
-        Pnu[j][i] = (vector *)Alloc(cname,fname,"Pnu",vec_size,QCOMMS);
+        Pnu[j][i] = (PTvector *)Alloc(cname,fname,"Pnu",vec_size,QCOMMS);
 //        printf("Pnu[%d][%d]=%p\n",j,i,Pnu[j][i]);
         for(int k = 0;k<n_sign;k++){
-          P3[k][j][i] = (vector *)Alloc(cname,fname,"Pnu",vec_size,QCOMMS);
-          Prhonu[k][j][i] = (vector *)Alloc(cname,fname,"Pnu",vec_size,QCOMMS);
+          P3[k][j][i] = (PTvector *)Alloc(cname,fname,"Pnu",vec_size,QCOMMS);
+          Prhonu[k][j][i] = (PTvector *)Alloc(cname,fname,"Pnu",vec_size,QCOMMS);
           for(int l = 0;l<n_sign;l++){
-            P5[l][k][j][i] = (vector *)FastAlloc(vec_size);
+            P5[l][k][j][i] = (PTvector *)FastAlloc(vec_size);
             for(int m = 0;m<n_sign;m++){
-              P7[m][l][k][j][i] = (vector *)FastAlloc(vec_size);
-              Psigma7[m][l][k][j][i] = (vector *)FastAlloc(vec_size);
+              P7[m][l][k][j][i] = (PTvector *)FastAlloc(vec_size);
+              Psigma7[m][l][k][j][i] = (PTvector *)FastAlloc(vec_size);
             }
             Prho5[l][k][j][i] = Psigma7[0][l][k][j][i];
             Psigmarhonu[l][k][j][i] = Psigma7[0][l][k][j][i];
@@ -140,14 +140,14 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float dt){
 
     
 #if 0
-    // These vectors can be overlapped with previously allocated memory
+    // These PTvectors can be overlapped with previously allocated memory
     
-    vector *Pnununu[4] = Prhonu[0][0];
-    vector *Pnunu[2][4] = Psigma7[0][0][0];;
-    vector ****Pnu5 = P7[0][0];
-    vector ****Pnu3 = P7[0][0];
-    vector *****Prho5 = Psigma7[0];
-    vector *****Psigmarhonu = Psigma7[0];
+    PTvector *Pnununu[4] = Prhonu[0][0];
+    PTvector *Pnunu[2][4] = Psigma7[0][0][0];;
+    PTvector ****Pnu5 = P7[0][0];
+    PTvector ****Pnu3 = P7[0][0];
+    PTvector *****Prho5 = Psigma7[0];
+    PTvector *****Psigmarhonu = Psigma7[0];
 #endif
 
 
@@ -667,7 +667,7 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float dt){
 }
 
 #undef PROFILE
-void PT::force_product_sum(vector *v, vector *w,
+void PT::force_product_sum(PTvector *v, PTvector *w,
 				    Float coeff, matrix *f){
 
 //  char *fname = "force_product_sum(*V,*V,F,*M)";
@@ -679,7 +679,7 @@ void PT::force_product_sum(vector *v, vector *w,
       qalloc_is_fast(f) )
     v2 = v2 - 0xb0000000 + 0x9c000000;
 #else
-  vector *v2 = v;
+  PTvector *v2 = v;
 #endif
   
 #ifdef PROFILE
@@ -690,7 +690,7 @@ void PT::force_product_sum(vector *v, vector *w,
 //  Float *f_p = (Float *)f;
 //  printf("f = %0.3e %0.3e %0.3e %0.3e %0.3e %0.3e\n",
 //        f_p[0],f_p[1],f_p[2],f_p[3],f_p[4],f_p[5]);
-  asq_force_cross2dag((vector *)v2, w, f, vol/2, &coeff2);
+  asq_force_cross2dag((PTvector *)v2, w, f, vol/2, &coeff2);
 //  printf("f = %0.3e %0.3e %0.3e %0.3e %0.3e %0.3e\n",
  //         f_p[0],f_p[1],f_p[2],f_p[3],f_p[4],f_p[5]);
 #ifdef PROFILE

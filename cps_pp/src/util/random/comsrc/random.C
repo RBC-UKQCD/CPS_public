@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.32 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: random.C,v 1.33 2012-05-10 05:51:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.32 2012-03-26 13:50:12 chulwoo Exp $
-//  $Id: random.C,v 1.32 2012-03-26 13:50:12 chulwoo Exp $
+//  $Date: 2012-05-10 05:51:23 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.33 2012-05-10 05:51:23 chulwoo Exp $
+//  $Id: random.C,v 1.33 2012-05-10 05:51:23 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.32 $
+//  $Revision: 1.33 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -324,10 +324,10 @@ for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
 				 (x[2]/2 + vx[2]*(x[3]/2) )));
 		  }
 //		  Fprintf(stderr,"%d %d %d %d %d",x[0],x[1],x[2],x[3],x[4]);
-//		  VRB.Result(cname,fname,"index=%d start_seed= %d\n",index,start_seed);
+		  VRB.Debug(cname,fname,"index=%d start_seed= %d\n",index,start_seed);
 		  ugran[index++].Reset(start_seed);
 		  if(x[4]==x_o[4]){
-//		  	VRB.Result(cname,fname,"index_4d=%d start_seed= %d\n",index_4d,start_seed_4d);
+		  	VRB.Debug(cname,fname,"index_4d=%d start_seed= %d\n",index_4d,start_seed_4d);
  			ugran_4d[index_4d++].Reset(start_seed_4d);
 		  }
 	      }
