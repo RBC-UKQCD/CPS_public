@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.31 2012-05-10 05:51:23 chulwoo Exp $
+  $Id: vector.h,v 1.32 2012-05-15 05:50:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-05-10 05:51:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.31 2012-05-10 05:51:23 chulwoo Exp $
-//  $Id: vector.h,v 1.31 2012-05-10 05:51:23 chulwoo Exp $
+//  $Date: 2012-05-15 05:50:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.32 2012-05-15 05:50:09 chulwoo Exp $
+//  $Id: vector.h,v 1.32 2012-05-15 05:50:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.31 $
+//  $Revision: 1.32 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -787,6 +787,16 @@ class Vector
     { fTimesV1PlusV2((IFloat *)&v, IFloat(fb), (IFloat *)c, 
                         (IFloat *)d, len); }
 #endif
+     void FTimesPlusVec(Float fb, Vector *c, int len){
+		IFloat *a_f = (IFloat *)&v;
+		IFloat *c_f = (IFloat *)&(c->v);
+
+#pragma omp parallel for default(shared)
+    for(int i = 0; i < len; ++i) {
+    	*(a_f+i) += fb* *(c_f+i);
+    }
+
+	}
 
 
     //! Assignment of the linear combination  fb * c - d

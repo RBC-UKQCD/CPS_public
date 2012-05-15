@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.5 2012-05-10 05:51:23 chulwoo Exp $
+  $Id: vector_util.C,v 1.6 2012-05-15 05:50:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-05-10 05:51:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.5 2012-05-10 05:51:23 chulwoo Exp $
-//  $Id: vector_util.C,v 1.5 2012-05-10 05:51:23 chulwoo Exp $
+//  $Date: 2012-05-15 05:50:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.6 2012-05-15 05:50:09 chulwoo Exp $
+//  $Id: vector_util.C,v 1.6 2012-05-15 05:50:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v $
 //  $State: Exp $
 //
@@ -374,8 +374,10 @@ void fTimesV1PlusV2(IFloat *a, IFloat b, const IFloat *c,
 void fTimesV1MinusV2(IFloat *a, IFloat b, const IFloat *c,
 	const IFloat *d, int len)
 {
+#pragma omp parallel for default(shared)
     for(int i = 0; i < len; ++i) {
-    	*a++ = b * *c++ - *d++;
+    	*(a+i) = b * *(c+i) - *(d+i);
+//    	*a++ = b * *c++ - *d++;
     }
 }
 
@@ -470,8 +472,9 @@ void cTimesV1MinusV2(IFloat *a, IFloat re, IFloat im, const IFloat *c,
 */
 void vecZero(IFloat *a, int len) {
 
+#pragma omp parallel for default(shared)
   for (int i=0; i<len; i++)
-    *a++ = 0.0;
+    *(a+i) = 0.0;
 
 }
 
