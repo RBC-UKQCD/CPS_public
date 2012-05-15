@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random.C,v 1.33 2012-05-10 05:51:23 chulwoo Exp $
+  $Id: random.C,v 1.34 2012-05-15 05:50:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-05-10 05:51:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.33 2012-05-10 05:51:23 chulwoo Exp $
-//  $Id: random.C,v 1.33 2012-05-10 05:51:23 chulwoo Exp $
+//  $Date: 2012-05-15 05:50:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v 1.34 2012-05-15 05:50:09 chulwoo Exp $
+//  $Id: random.C,v 1.34 2012-05-15 05:50:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: random.C,v $
-//  $Revision: 1.33 $
+//  $Revision: 1.34 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/random.C,v $
 //  $State: Exp $
 //
@@ -182,6 +182,10 @@ void LatRanGen::Initialize()
     n_rgen = GJP.VolNodeSites()*GJP.SnodeSites() / 32;
 //  VRB.Flow(cname,fname,"n_rgen=%d\n",n_rgen);
 
+  int default_concur=0;
+#if TARGET==BGQ
+	default_concur=1;
+#endif
   
 
   is_initialized = 1;
@@ -266,7 +270,7 @@ void LatRanGen::Initialize()
 
   switch(GJP.StartSeedKind()){
   case START_SEED_FILE:
-	if ( !LatRanGen::Read(GJP.StartSeedFilename()) ) {
+	if ( !LatRanGen::Read(GJP.StartSeedFilename(),default_concur) ) {
 	      ERR.General(cname, fname,
 		  "Reading file %s",GJP.StartSeedFilename());
 	} 

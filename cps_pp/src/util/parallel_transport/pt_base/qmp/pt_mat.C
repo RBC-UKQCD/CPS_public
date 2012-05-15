@@ -5,19 +5,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_mat.C,v 1.7 2012-05-10 05:51:23 chulwoo Exp $
+  $Id: pt_mat.C,v 1.8 2012-05-15 05:50:09 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-05-10 05:51:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v 1.7 2012-05-10 05:51:23 chulwoo Exp $
-//  $Id: pt_mat.C,v 1.7 2012-05-10 05:51:23 chulwoo Exp $
+//  $Date: 2012-05-15 05:50:09 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v 1.8 2012-05-15 05:50:09 chulwoo Exp $
+//  $Id: pt_mat.C,v 1.8 2012-05-15 05:50:09 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_mat.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v $
 //  $State: Exp $
 //
@@ -273,7 +273,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   setup +=dtime;
   dtime = -dclock();
   int if_print = 0;
-  if ( (call_num%10000==1) && (!QMP_get_node_number()) ) if_print=1;
+//  if ( (call_num%10000==1) && (!QMP_get_node_number()) ) if_print=1;
 
 #define USE_TEST2
 #ifdef USE_TEST2

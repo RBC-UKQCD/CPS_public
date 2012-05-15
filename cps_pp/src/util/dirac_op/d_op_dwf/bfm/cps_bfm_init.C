@@ -313,8 +313,8 @@ int max_iter
 #ifdef UNIFORM_SEED_TESTING
   majorityVote  dwf;
 #else
-  bfm_qdp<double>  dwf;
-//  bfm_qdp<float>  dwf;
+//  bfm_qdp<double>  dwf;
+  bfm_qdp<float>  dwf;
 #endif
 
   dwfa.node_latt[0]  = lx;
@@ -468,21 +468,32 @@ int DiracOpDwf::InvCg(Vector *out,
   VRB.Result(cname,fname,
            "stp_cnd =%e\n", IFloat(residual));
 //  residual = 0.7*residual;
-//for(int i =0;i<1;i++) 
-   int iter = cps_qdp_dwf_invert(lat,dirac_arg->mass,sol_cps,src_cps,residual,dirac_arg->max_num_iter);
+    Vector *mmp = (Vector *) smalloc(cname,fname,"mmp",f_size_cb * sizeof(Float));
+    Vector *res = (Vector *) smalloc(cname,fname,"res",f_size_cb * sizeof(Float));
+for(int i =0;i<10;i++) {
+   Float *sol;
+   Float *src;
+	if(i==0){ sol=sol_cps;src=src_cps;}
+	else { 
+	   sol=(Float *)mmp;src=(Float *)res; 
+	   mmp->VecZero(f_size_cb);
+	}
+   int iter = cps_qdp_dwf_invert(lat,dirac_arg->mass,sol,src,residual,dirac_arg->max_num_iter);
+
+	if(i!=0){
+    out->FTimesPlusVec(1.,mmp, f_size_cb);
+	}
   //------------------------------------------------------------------
   // Done. Finish up and return
   //------------------------------------------------------------------
     // Calculate and set true residual: 
     // true_res = |src - MatPcDagMatPc * sol| / |src|
-  {
-    Vector *sol = (Vector *) out;
-    Vector *src = (Vector *) in;
-    Vector *mmp = (Vector *) smalloc(cname,fname,"mmp",f_size_cb * sizeof(Float));
-    Vector *res = (Vector *) smalloc(cname,fname,"res",f_size_cb * sizeof(Float));
-    MatPcDagMatPc(mmp, sol);
-    res->CopyVec(src, f_size_cb);
-    res->VecMinusEquVec(mmp, f_size_cb);
+//    Vector *sol = (Vector *) out;
+//    Vector *src = (Vector *) in;
+    MatPcDagMatPc(mmp, out);
+    res->CopyVec(in, f_size_cb);
+//    res->VecMinusEquVec(mmp, f_size_cb);
+    res->FTimesPlusVec(-1.,mmp, f_size_cb);
     Float res_norm_sq_cur = res->NormSqNode(f_size_cb);
     DiracOpGlbSum(&res_norm_sq_cur);
     Float tmp = res_norm_sq_cur / src_norm_sq;
@@ -492,6 +503,9 @@ int DiracOpDwf::InvCg(Vector *out,
     }
     VRB.Result(cname,fname,
   	     "True |res| / |src| = %e, iter = %d\n", IFloat(tmp), iter);
+	if(tmp<dirac_arg->stop_rsd) break;
+   residual = 0.5*dirac_arg->stop_rsd/tmp;
+}
 
     Printf("mmp =%p\n",mmp);
     sfree(cname,fname,"mmp",mmp);
@@ -499,7 +513,6 @@ int DiracOpDwf::InvCg(Vector *out,
     Printf("res =%p\n",res);
     sfree(cname,fname,"res",res);
     Printf("res freed\n");
-  }
 	cg_time +=dclock();
 	print_flops(cname,fname,0,cg_time);
 }

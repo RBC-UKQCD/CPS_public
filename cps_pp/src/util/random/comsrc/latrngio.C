@@ -119,7 +119,7 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
 
 //#if TARGET == QCDOC  // when on QCDOC, only Parallel (direct IO) mode is used
-#if 1
+#if TARGET != BGQ
   setParallel();
 #else
   setSerial();
