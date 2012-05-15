@@ -491,10 +491,22 @@ for(int i =0;i<10;i++) {
 //    Vector *sol = (Vector *) out;
 //    Vector *src = (Vector *) in;
     MatPcDagMatPc(mmp, out);
+#if 0
     res->CopyVec(in, f_size_cb);
 //    res->VecMinusEquVec(mmp, f_size_cb);
     res->FTimesPlusVec(-1.,mmp, f_size_cb);
     Float res_norm_sq_cur = res->NormSqNode(f_size_cb);
+#else
+    Float res_norm_sq_cur = 0;
+    Float *in_f = (Float *)in;
+    Float *res_f = (Float *)res;
+    Float *mmp_f = (Float *)mmp;
+#pragma omp parallel for default(shared) reduction(+: res_norm_sq_cur)
+    for(int i_tmp=0;i_tmp<f_size_cb;i_tmp++){
+	Float temp = *(res_f+i_tmp) = *(in_f+i_tmp) - *(mmp_f+i_tmp);
+	res_norm_sq_cur += temp*temp;
+    }
+#endif
     DiracOpGlbSum(&res_norm_sq_cur);
     Float tmp = res_norm_sq_cur / src_norm_sq;
     tmp = sqrt(tmp);
