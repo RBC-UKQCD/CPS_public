@@ -31,7 +31,7 @@ static int qdp_already_initted = 0;
 
 CPS_START_NAMESPACE
 int cps_qdp_init(int *argc, char ***argv){
-  VRB.Result("","cps_qdp_init()","started");
+  VRB.Result("","cps_qdp_init()","started\n");
   if (qdp_initted) return 1;
 //  if (Chroma::isInitialized()) {
   if ( qdp_already_initted ) {
@@ -56,7 +56,7 @@ int cps_qdp_init(int *argc, char ***argv){
 }
 
 int cps_qdp_finalize(){
-  VRB.Result("","cps_qdp_finalize()","started");
+  VRB.Result("","cps_qdp_finalize()","started\n");
   if (!qdp_initted) {
     ERR.General("","cps_qdp_finalize()","qdp_initted=0!");
   }
