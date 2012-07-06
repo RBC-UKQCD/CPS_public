@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.32 2012-05-15 05:50:09 chulwoo Exp $
+  $Id: vector.h,v 1.33 2012-07-06 20:22:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-05-15 05:50:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.32 2012-05-15 05:50:09 chulwoo Exp $
-//  $Id: vector.h,v 1.32 2012-05-15 05:50:09 chulwoo Exp $
+//  $Date: 2012-07-06 20:22:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.33 2012-07-06 20:22:08 chulwoo Exp $
+//  $Id: vector.h,v 1.33 2012-07-06 20:22:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.32 $
+//  $Revision: 1.33 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -248,7 +248,7 @@ class Matrix
   public:
     // CREATORS
     //! General constructor; no initialisation.
-    Matrix();
+    Matrix() {}
     //! Initialisation to real multiple of the unit matrix.
     Matrix(IFloat c);
 

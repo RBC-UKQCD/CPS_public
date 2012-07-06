@@ -5,15 +5,15 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.60 2012-04-02 06:40:24 chulwoo Exp $
+  $Id: lattice.h,v 1.61 2012-07-06 20:22:08 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2012-04-02 06:40:24 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.60 2012-04-02 06:40:24 chulwoo Exp $
-  $Id: lattice.h,v 1.60 2012-04-02 06:40:24 chulwoo Exp $
+  $Date: 2012-07-06 20:22:08 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.61 2012-07-06 20:22:08 chulwoo Exp $
+  $Id: lattice.h,v 1.61 2012-07-06 20:22:08 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.60 $
+  $Revision: 1.61 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -21,7 +21,7 @@
 
 
 #ifndef INCLUDED_LATTICE_H
-#define INCLUDED_LATTICE_H           //!< Prevent multiple inclusion
+#define INCLUDED_LATTICE_H
 
 #include <util/gjp.h>
 #include <util/enum.h>
@@ -64,7 +64,7 @@ class Lattice
 
  private:
 
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
     static Matrix* gauge_field;
        // Pointer to the gauge field configuration.
@@ -1142,7 +1142,7 @@ class Gnone : public virtual Lattice
 {
 
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
 
@@ -1182,7 +1182,7 @@ class Gwilson : public virtual Lattice
 {
 
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
 
@@ -1235,7 +1235,7 @@ class GpowerPlaq : public virtual Lattice
 {
 
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
 
@@ -1295,7 +1295,7 @@ class GimprRect : public virtual Lattice
 {
 
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
     Float plaq_coeff; // - GJP.Beta() * ( 1.0 - 8.0 * GJP.C1() ) / 3.0
 
@@ -1354,7 +1354,7 @@ class GtadpoleRect : public virtual Lattice
 {
 
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
     Float plaq_coeff; // - GJP.Beta() * ( 1.0 - 8.0 * GJP.C1() ) / 3.0
 
@@ -1424,7 +1424,7 @@ class GpowerRect : public virtual Lattice
 {
 
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
     Float plaq_coeff; // - GJP.Beta() * ( 1.0 - 8.0 * GJP.C1() ) / 3.0
 
@@ -1511,7 +1511,7 @@ class GimprOLSym : public virtual Lattice
 {
 
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
     Float rect_coeff; // loop 2x1
     Float cube_coeff; // loop 1x1x1
@@ -1563,7 +1563,7 @@ class GimprOLSym : public virtual Lattice
 class Fsmear : public virtual Lattice
 {
 private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
 protected:
     int n_fields;    //!< The number of smeared fields
@@ -1601,7 +1601,7 @@ public:
 class Fnone : public virtual Lattice
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
     
  public:
 
@@ -1722,7 +1722,7 @@ class Fnone : public virtual Lattice
 class FstagTypes : public virtual Lattice
 {
 	 private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
     int xv[3];
     
   protected:
@@ -1786,7 +1786,7 @@ class FstagTypes : public virtual Lattice
 class Fstag : public virtual FstagTypes
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
     void getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const;
     
  public:
@@ -1867,7 +1867,7 @@ class ParTransAsqtad; //forward declaration
 class Fasqtad : public virtual FstagTypes, public virtual Fsmear
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
 
@@ -1970,7 +1970,7 @@ class ParTransP4; //forward declaration
 class Fp4 : public virtual FstagTypes, public virtual Fsmear
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
 
@@ -2054,15 +2054,11 @@ class Fp4 : public virtual FstagTypes, public virtual Fsmear
 			     Matrix*);
 
     void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
-
-
-    
 };
+
 CPS_END_NAMESPACE
 
 #include <util/lattice/f_wilson_types.h>
 #include <util/lattice/lattice_types.h>
 
-CPS_START_NAMESPACE
-CPS_END_NAMESPACE
 #endif

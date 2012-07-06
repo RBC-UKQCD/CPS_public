@@ -27,7 +27,7 @@ class GnoneFnone
     public Fnone
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFnone();
@@ -46,7 +46,7 @@ class GnoneFasqtad
     public Fasqtad
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFasqtad();
@@ -64,7 +64,7 @@ class GnoneFp4
     public Fp4
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFp4();
@@ -82,7 +82,7 @@ class GnoneFstag
     public Fstag
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFstag();
@@ -101,7 +101,7 @@ class GnoneFwilson
     public Fwilson
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFwilson();
@@ -120,7 +120,7 @@ class GnoneFclover
     public Fclover
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFclover();
@@ -139,7 +139,7 @@ class GnoneFdwf
     public Fdwf
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFdwf();
@@ -156,7 +156,7 @@ class GnoneFmdwf
     public Fmdwf
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFmdwf();
@@ -174,7 +174,7 @@ class GwilsonFnone
     public Fnone
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFnone();
@@ -193,7 +193,7 @@ class GwilsonFstag
     public Fstag
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFstag();
@@ -212,7 +212,7 @@ class GwilsonFasqtad
     public Fasqtad
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFasqtad();
@@ -230,7 +230,7 @@ class GwilsonFp4
     public Fp4
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFp4();
@@ -248,7 +248,7 @@ class GwilsonFwilson
     public Fwilson
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFwilson();
@@ -267,7 +267,7 @@ class GwilsonFclover
     public Fclover
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFclover();
@@ -286,7 +286,7 @@ class GwilsonFdwf
     public Fdwf
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFdwf();
@@ -303,7 +303,7 @@ class GwilsonFmdwf
     public Fmdwf
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFmdwf();
@@ -321,7 +321,7 @@ class GpowerPlaqFnone
     public Fnone
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerPlaqFnone();
@@ -340,7 +340,7 @@ class GpowerPlaqFstag
     public Fstag
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerPlaqFstag();
@@ -358,7 +358,7 @@ class GpowerPlaqFwilson
     public Fwilson
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerPlaqFwilson();
@@ -376,7 +376,7 @@ class GpowerPlaqFclover
     public Fclover
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerPlaqFclover();
@@ -394,7 +394,7 @@ class GpowerPlaqFdwf
     public Fdwf
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerPlaqFdwf();
@@ -411,7 +411,7 @@ class GpowerPlaqFmdwf
     public Fmdwf
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerPlaqFmdwf();
@@ -428,7 +428,7 @@ class GimprRectFnone
     public Fnone
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprRectFnone();
@@ -447,7 +447,7 @@ class GimprRectFstag
     public Fstag
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprRectFstag();
@@ -466,7 +466,7 @@ class GimprRectFwilson
     public Fwilson
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprRectFwilson();
@@ -485,7 +485,7 @@ class GimprRectFclover
     public Fclover
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprRectFclover();
@@ -504,7 +504,7 @@ class GimprRectFdwf
     public Fdwf
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprRectFdwf();
@@ -521,7 +521,7 @@ class GimprRectFmdwf
     public Fmdwf
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprRectFmdwf();
@@ -534,7 +534,7 @@ class GimprRectFmdwf
 //------------------------------------------------------------------
 class GimprRectFp4 : public GimprRect, public Fp4 {
  private:
-  char *cname;    // Class name.
+  const char *cname;    // Class name.
  
  public:
   GimprRectFp4();     
@@ -551,7 +551,7 @@ class GpowerRectFnone
     public Fnone
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerRectFnone();
@@ -570,7 +570,7 @@ class GpowerRectFstag
     public Fstag
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerRectFstag();
@@ -588,7 +588,7 @@ class GpowerRectFwilson
     public Fwilson
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerRectFwilson();
@@ -606,7 +606,7 @@ class GpowerRectFclover
     public Fclover
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerRectFclover();
@@ -624,7 +624,7 @@ class GpowerRectFdwf
     public Fdwf
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GpowerRectFdwf();
@@ -641,7 +641,7 @@ class GimprOLSymFnone
     public Fnone
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprOLSymFnone();
@@ -660,7 +660,7 @@ class GimprOLSymFstag
     public Fstag
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprOLSymFstag();
@@ -679,7 +679,7 @@ class GimprOLSymFwilson
     public Fwilson
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprOLSymFwilson();
@@ -698,7 +698,7 @@ class GimprOLSymFclover
     public Fclover
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprOLSymFclover();
@@ -717,7 +717,7 @@ class GimprOLSymFdwf
     public Fdwf
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprOLSymFdwf();
@@ -730,7 +730,7 @@ class GimprOLSymFdwf
 //------------------------------------------------------------------
 class GpowerPlaqFasqtad : public GpowerPlaq, public Fasqtad {
   private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
   public:
     GpowerPlaqFasqtad();
@@ -743,7 +743,7 @@ class GpowerPlaqFasqtad : public GpowerPlaq, public Fasqtad {
 //------------------------------------------------------------------
 class GimprRectFasqtad : public GimprRect, public Fasqtad {
   private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
   public:
     GimprRectFasqtad();
@@ -757,7 +757,7 @@ class GimprRectFasqtad : public GimprRect, public Fasqtad {
 //------------------------------------------------------------------
 class GpowerRectFasqtad : public GpowerRect, public Fasqtad {
   private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
   public:
     GpowerRectFasqtad();
@@ -772,7 +772,7 @@ class GpowerRectFasqtad : public GpowerRect, public Fasqtad {
 class GimprOLSymFasqtad : public GimprOLSym, public Fasqtad{
     
   private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
   public:
     GimprOLSymFasqtad();
@@ -786,7 +786,7 @@ class GimprOLSymFasqtad : public GimprOLSym, public Fasqtad{
 class GimprOLSymFp4 : public GimprOLSym, public Fp4{
     
   private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
   public:
     GimprOLSymFp4();
@@ -800,7 +800,7 @@ class GimprOLSymFp4 : public GimprOLSym, public Fp4{
 class GtadpoleRectFp4 : public GtadpoleRect, public Fp4{
     
   private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
   public:
     GtadpoleRectFp4();
@@ -814,7 +814,7 @@ class GtadpoleRectFp4 : public GtadpoleRect, public Fp4{
 class GtadpoleRectFasqtad : public GtadpoleRect, public Fasqtad{
     
   private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
   public:
     GtadpoleRectFasqtad();
@@ -828,7 +828,7 @@ class GtadpoleRectFasqtad : public GtadpoleRect, public Fasqtad{
 class GtadpoleRectFnone : public GtadpoleRect, public Fnone{
     
   private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
   public:
     GtadpoleRectFnone();
@@ -847,7 +847,7 @@ class GnoneFwilsonTm
     public FwilsonTm
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFwilsonTm() {
@@ -874,7 +874,7 @@ class GwilsonFwilsonTm
     public FwilsonTm
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFwilsonTm() {
@@ -894,14 +894,14 @@ class GwilsonFwilsonTm
 /*! \ingroup latactions */
 //------------------------------------------------------------------
 class GimprRectFwilsonTm
-    : public virtual Lattice,
+: public virtual Lattice,
     public virtual FwilsonTypes,
     public GimprRect,
     public virtual Fwilson,
     public FwilsonTm
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprRectFwilsonTm() {
@@ -914,10 +914,8 @@ class GimprRectFwilsonTm
       char *fname = "~GimprRectFwilsonTm()";
       VRB.Func(cname,fname);
     }
-
+    
 };
-
 
 CPS_END_NAMESPACE
 #endif
-

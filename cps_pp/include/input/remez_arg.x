@@ -30,3 +30,9 @@ class RemezArg{
   memfun RemezArg();
 };
 
+class RationalQuotientRemezArg {
+      RemezArg bsn_md<>;
+      RemezArg bsn_mc<>;
+      RemezArg frm_md<>;
+      RemezArg frm_mc<>;
+};

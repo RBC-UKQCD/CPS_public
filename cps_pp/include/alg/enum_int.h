@@ -39,6 +39,7 @@ enum FclassType {
 	F_CLASS_P4 = 6,
 	F_CLASS_WILSON_TM = 7,
 	F_CLASS_MDWF = 8,
+	F_CLASS_BFM = 9,
 };
 typedef enum FclassType FclassType;
 extern struct vml_enum_map FclassType_map[];
@@ -725,6 +726,29 @@ enum CalcSeqType {
 typedef enum CalcSeqType CalcSeqType;
 extern struct vml_enum_map CalcSeqType_map[];
 
+enum BfmSolverType {
+	BFM_DWF = 0,
+	BFM_DWFrb4d = 1,
+	BFM_WilsonFermion = 2,
+	BFM_WilsonTM = 3,
+	BFM_WilsonNN = 4,
+	BFM_HwPartFracZolo = 5,
+	BFM_HwContFracZolo = 6,
+	BFM_HwPartFracTanh = 7,
+	BFM_HwContFracTanh = 8,
+	BFM_HwCayleyZolo = 9,
+	BFM_HtCayleyZolo = 10,
+	BFM_HwCayleyTanh = 11,
+	BFM_HmCayleyTanh = 12,
+	BFM_HtCayleyTanh = 13,
+	BFM_DWFTransfer = 14,
+	BFM_DWFTransferInv = 15,
+	BFM_HtContFracTanh = 16,
+	BFM_HtContFracZolo = 17,
+};
+typedef enum BfmSolverType BfmSolverType;
+extern struct vml_enum_map BfmSolverType_map[];
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -789,6 +813,7 @@ extern  bool_t vml_StaticBActionLinkSmearType (VML *, char *instance, StaticBAct
 extern  bool_t vml_GaussianKernelLinkSmearType (VML *, char *instance, GaussianKernelLinkSmearType*);
 extern  bool_t vml_CalcQpropType (VML *, char *instance, CalcQpropType*);
 extern  bool_t vml_CalcSeqType (VML *, char *instance, CalcSeqType*);
+extern  bool_t vml_BfmSolverType (VML *, char *instance, BfmSolverType*);
 
 #else /* K&R C */
 extern  bool_t vml_pooh (VML *, char *instance, pooh*);
@@ -848,6 +873,7 @@ extern  bool_t vml_StaticBActionLinkSmearType (VML *, char *instance, StaticBAct
 extern  bool_t vml_GaussianKernelLinkSmearType (VML *, char *instance, GaussianKernelLinkSmearType*);
 extern  bool_t vml_CalcQpropType (VML *, char *instance, CalcQpropType*);
 extern  bool_t vml_CalcSeqType (VML *, char *instance, CalcSeqType*);
+extern  bool_t vml_BfmSolverType (VML *, char *instance, BfmSolverType*);
 
 #endif /* K&R C */
 

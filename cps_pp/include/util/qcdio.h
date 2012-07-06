@@ -1,23 +1,22 @@
 #include<config.h>
-CPS_START_NAMESPACE
 /*----------------------------------------------------------*/
 /*!\file
   \brief Prototypes of gauge configuration IO functions.
 
-  $Id: qcdio.h,v 1.10 2008-06-18 16:07:10 chulwoo Exp $
+  $Id: qcdio.h,v 1.11 2012-07-06 20:22:08 chulwoo Exp $
 */
 /*2  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
   -----------------------------------------------------------
    CVS keywords
  
    $Author: chulwoo $
-   $Date: 2008-06-18 16:07:10 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.10 2008-06-18 16:07:10 chulwoo Exp $
-   $Id: qcdio.h,v 1.10 2008-06-18 16:07:10 chulwoo Exp $
+   $Date: 2012-07-06 20:22:08 $
+   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.11 2012-07-06 20:22:08 chulwoo Exp $
+   $Id: qcdio.h,v 1.11 2012-07-06 20:22:08 chulwoo Exp $
    $Name: not supported by cvs2svn $
    $Locker:  $
    $RCSfile: qcdio.h,v $
-   $Revision: 1.10 $
+   $Revision: 1.11 $
    $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v $
    $State: Exp $  */
 /*----------------------------------------------------------*/
@@ -25,7 +24,6 @@ CPS_START_NAMESPACE
 #ifndef INCLUDED_QCDIO_H_
 #define INCLUDED_QCDIO_H_
 
-CPS_END_NAMESPACE
 #include <stdio.h>
 #include <stdarg.h>
 #include <util/data_types.h>
@@ -33,6 +31,7 @@ CPS_END_NAMESPACE
 #include <util/qcdio_qprintf.h>
 #include <util/ReadLatticePar.h>
 #include <util/WriteLatticePar.h>
+
 CPS_START_NAMESPACE
 
 #ifndef GAUGE_CONF_PREC
@@ -228,8 +227,7 @@ int Fprintf( FILE *stream, const char *format,...);
 inline int Vfprintf( FILE *stream, const char *format, va_list ap)
     { return Vfprintf(ZERO_ONLY,stream, format, ap);}
 
+CPS_END_NAMESPACE
 #endif
 
 /*! @} */
-
-CPS_END_NAMESPACE

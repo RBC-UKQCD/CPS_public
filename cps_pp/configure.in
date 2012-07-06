@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2012-05-09 01:52:38 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.78 2012-05-09 01:52:38 chulwoo Exp $
-dnl  $Id: configure.in,v 1.78 2012-05-09 01:52:38 chulwoo Exp $
+dnl  $Date: 2012-07-06 20:22:08 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.79 2012-07-06 20:22:08 chulwoo Exp $
+dnl  $Id: configure.in,v 1.79 2012-07-06 20:22:08 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.78 $
+dnl  $Revision: 1.79 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -300,22 +300,6 @@ AC_ARG_ENABLE(qio,
 AC_MSG_CHECKING([if including QIO])
 AC_MSG_RESULT($enable_qio)
 
-AC_ARG_ENABLE(mdwf, 
-	AC_HELP_STRING([--enable-mdwf], 
-		[Compile with Mobius DWF lib. (default=no)]), 
-	,[enable_mdwf="no"])
-AC_MSG_CHECKING([if including MDWF])
-AC_MSG_RESULT($enable_mdwf)
-
-
-dnl Are we compiling with BFM library?
-AC_ARG_ENABLE(bfm, 
-	AC_HELP_STRING([--enable-bfm], 
-		[Compile with BAGEL fermion sparse-matrix (BFM) lib. (default=no)]), 
-	,[enable_bfm="no"])
-AC_MSG_CHECKING([if including BFM])
-AC_MSG_RESULT($enable_bfm)
-
 if test "$enable_qmp" != "no"; then
    if test "$enable_qmp" != "yes"; then
      QMP_DIR=${enable_qmp}
@@ -337,6 +321,13 @@ if test "$enable_qmp" != "no"; then
    TESTING_PARALLEL="yes";
 fi
 
+dnl Are we compiling with MDWF library?
+AC_ARG_ENABLE(mdwf, 
+	AC_HELP_STRING([--enable-mdwf], 
+		[Compile with Mobius DWF lib. (default=no)]), 
+	,[enable_mdwf="no"])
+AC_MSG_CHECKING([if including MDWF])
+AC_MSG_RESULT($enable_mdwf)
 if test "$enable_mdwf" != "no"; then
    if test "X${MDWF_DIR}X" = "XX"; then
      MDWF_DIR=${enable_mdwf}
@@ -377,14 +368,35 @@ fi
    DFLAGS="${DFLAGS} -DUSE_QIO"
 fi
 
+AC_ARG_ENABLE(xml, 
+	AC_HELP_STRING([--enable-xml], 
+		[Compile with XML lib. (default=no)]), 
+	,[enable_xml="no"])
+AC_MSG_CHECKING([if including XML])
+AC_MSG_RESULT($enable_xml)
+
+
+dnl Are we compiling with BFM library?
+AC_ARG_ENABLE(bfm, 
+	AC_HELP_STRING([--enable-bfm], 
+		[Compile with BAGEL fermion sparse-matrix (BFM) lib. (default=no)]), 
+	,[enable_bfm="no"])
+AC_MSG_CHECKING([if including BFM])
+AC_MSG_RESULT($enable_bfm)
+
+
 if test "$enable_bfm" != "no"; then
    if test "X${BFM_DIR}X" = "XX"; then
 dnl     echo "BFM_DIR environment variable not set"
      BFM_DIR=${enable_bfm}
    fi
-#   QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
-#   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
-#   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
+
+dnl Make sure we have XML library.
+dnl   if test "X${XML_DIR}X" = "XX"; then
+dnl     echo "XML library must be provided when compiling with bfm."
+dnl     exit 1
+dnl   fi
+
    if test "$enable_bfm" != "yes"; then
       LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib "
       INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include"
@@ -392,10 +404,27 @@ dnl     echo "BFM_DIR environment variable not set"
       BFM_DIR=${QMP_DIR}
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
-      INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include/libxml2"
+      LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm"
 fi
-      LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm "
-#-lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm
+
+if test "$enable_xml" != "no"; then
+   if test "$enable_xml" != "yes"; then
+     XML_DIR=${enable_xml}
+   elif test "X${XML_DIR}X" = "XX"; then
+     XML_DIR=${BFM_DIR}
+   fi
+
+   if test "${XML_DIR}" = "no"; then
+     echo "XML_DIR environment variable not set"
+     exit 1
+   fi
+
+   XML_CFLAGS=`${XML_DIR}/bin/xml2-config --cflags`
+   XML_LDFLAGS=`${XML_DIR}/bin/xml2-config --libs`
+
+   LDFLAGS="${LDFLAGS} ${XML_LDFLAGS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} ${XML_CFLAGS}"
+fi
 
 if test "$TESTING_PARALLEL" = "yes"; then
    ENABLE_PARALLEL="define PARALLEL 1"

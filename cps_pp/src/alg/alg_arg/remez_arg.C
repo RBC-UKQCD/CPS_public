@@ -70,4 +70,42 @@ vml_RemezArg (VML *vmls, char *name,RemezArg *objp)
 	 vml_class_end(vmls,"RemezArg",name);
 	return TRUE;
 }
+	 bool RationalQuotientRemezArg::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool RationalQuotientRemezArg::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool RationalQuotientRemezArg::Vml(VML *vmls,char *instance){
+		 if(!vml_RationalQuotientRemezArg(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_RationalQuotientRemezArg (VML *vmls, char *name,RationalQuotientRemezArg *objp)
+{
+	 vml_class_begin(vmls,"RationalQuotientRemezArg",name);
+	 if (!vml_array (vmls, "bsn_md", (char **)&objp->bsn_md.bsn_md_val, (u_int *) &objp->bsn_md.bsn_md_len, ~0,
+		sizeof (RemezArg), (vmlproc_t) vml_RemezArg))
+		 return FALSE;
+	 if (!vml_array (vmls, "bsn_mc", (char **)&objp->bsn_mc.bsn_mc_val, (u_int *) &objp->bsn_mc.bsn_mc_len, ~0,
+		sizeof (RemezArg), (vmlproc_t) vml_RemezArg))
+		 return FALSE;
+	 if (!vml_array (vmls, "frm_md", (char **)&objp->frm_md.frm_md_val, (u_int *) &objp->frm_md.frm_md_len, ~0,
+		sizeof (RemezArg), (vmlproc_t) vml_RemezArg))
+		 return FALSE;
+	 if (!vml_array (vmls, "frm_mc", (char **)&objp->frm_mc.frm_mc_val, (u_int *) &objp->frm_mc.frm_mc_len, ~0,
+		sizeof (RemezArg), (vmlproc_t) vml_RemezArg))
+		 return FALSE;
+	 vml_class_end(vmls,"RationalQuotientRemezArg",name);
+	return TRUE;
+}
 CPS_END_NAMESPACE

@@ -846,9 +846,11 @@ void QPropW::CG(FermionVectorTp& source, FermionVectorTp& sol,
   int f_size = GJP.VolNodeSites() * Lat.FsiteSize()/GJP.SnodeSites();
   int f_size_5d = f_size * ls;
 
+  VRB.Result(cname, fname, "f_size_5d = %d\n", f_size_5d);
+
   // Do inversion
   //----------------------------------------------------------------
-  if (Lat.Fclass() == F_CLASS_DWF) {
+  if (Lat.Fclass() == F_CLASS_DWF || Lat.Fclass() == F_CLASS_BFM) {
     Vector *src_4d    = (Vector*)source.data();
     Vector *sol_4d    = (Vector*)sol.data();
     Vector *midsol_4d = (Vector*)midsol.data();

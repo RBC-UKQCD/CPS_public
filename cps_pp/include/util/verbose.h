@@ -1,21 +1,23 @@
+#ifndef INCLUDED_VERBOSE_H
+#define INCLUDED_VERBOSE_H       //!< Prevent multiple inclusion.
+
 #include<config.h>
-CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class.
 
-  $Id: verbose.h,v 1.4 2004-08-18 11:57:38 zs Exp $
+  $Id: verbose.h,v 1.5 2012-07-06 20:22:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/verbose.h,v 1.4 2004-08-18 11:57:38 zs Exp $
-//  $Id: verbose.h,v 1.4 2004-08-18 11:57:38 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2012-07-06 20:22:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/verbose.h,v 1.5 2012-07-06 20:22:08 chulwoo Exp $
+//  $Id: verbose.h,v 1.5 2012-07-06 20:22:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/verbose.h,v $
 //  $State: Exp $
 //
@@ -30,10 +32,8 @@ CPS_START_NAMESPACE
 //
 //------------------------------------------------------------------
 
-#ifndef INCLUDED_VERBOSE_H
-#define INCLUDED_VERBOSE_H       //!< Prevent multiple inclusion.
 
-
+CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
 //! Definition of the types of message, related to various aspects of code activity.
@@ -72,7 +72,7 @@ enum VerboseLevelType{
 class Verbose
 {
   private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
     // Message type enabled flags
     int active[N_VERBOSE_LEVELS];
@@ -176,8 +176,5 @@ class Verbose
 extern Verbose VRB;
 
 
-#endif
-
-
-
 CPS_END_NAMESPACE
+#endif

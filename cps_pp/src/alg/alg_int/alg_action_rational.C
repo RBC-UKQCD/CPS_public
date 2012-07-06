@@ -429,7 +429,7 @@ void AlgActionRational::evolve(Float dt, int nsteps, int **fractionSplit)
     
   LatticeFactory::Destroy();
 }
-#undef USE_NEW
+
 //!< Generate the optimal rational approximation for rational representation
 // Need to add boson/fermion optimisation - requires extra space for FIRat.
 void AlgActionRational::generateApprox(Float *mass, 
@@ -438,16 +438,9 @@ void AlgActionRational::generateApprox(Float *mass,
 				       RationalDescr *rat)
 {
   char *fname = "generateApprox(F*,RA*,RA*,RD*)";
-#ifndef USE_NEW
-  *remez_arg_md = (RemezArg*) smalloc(n_masses*sizeof(RemezArg),
-				      "remez_arg_md",fname,cname);
-  
-  *remez_arg_mc = (RemezArg*) smalloc(n_masses * sizeof(RemezArg),
-				      "remez_arg_mc",fname,cname);				     
-#else
+
   *remez_arg_md = new RemezArg[n_masses];
   *remez_arg_mc = new RemezArg[n_masses];
-#endif
   
   for(int i=0; i<n_masses; i++) {
     (*remez_arg_md)[i].approx_type = rat[i].md_approx.approx_type;
@@ -553,13 +546,9 @@ void AlgActionRational::destroyApprox(RemezArg *remez_arg_md,
 				      RemezArg *remez_arg_mc) 
 {
   char *fname = "destroyApprox(RemezArg*,RemezArg*)";
-#ifndef USE_NEW
-  sfree(remez_arg_md,"remez_arg_md",fname,cname);
-  sfree(remez_arg_mc,"remez_arg_mc",fname,cname);
-#else
+
   delete[] remez_arg_md;
   delete[] remez_arg_mc;
-#endif
 }
 
 int AlgActionRational::compareApprox(RemezArg &arg1, RemezArg &arg2) {
@@ -797,8 +786,8 @@ void AlgActionRational::checkApprox(Float *mass, RemezArg *remez_arg,
   {
     //!< Measure the lowest eigenvalue
     sprintf(eig_file,"%s.%d",eigen.eig_lo_stem,traj);
-    eig_arg.fname = eig_file;        
-	// CJ: rescaling RsdR_a to be in range with rational approximation 
+    eig_arg.fname = eig_file;
+    // CJ: rescaling RsdR_a to be in range with rational approximation 
     eig_arg.RsdR_a = eig_arg.RsdR_r * remez_arg[0].lambda_high;
     eig_arg.RitzMatOper = MATPCDAG_MATPC;
     

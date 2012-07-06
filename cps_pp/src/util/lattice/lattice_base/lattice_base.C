@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.62 2012-05-10 05:51:23 chulwoo Exp $
+  $Id: lattice_base.C,v 1.63 2012-07-06 20:22:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-05-10 05:51:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.62 2012-05-10 05:51:23 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.62 2012-05-10 05:51:23 chulwoo Exp $
+//  $Date: 2012-07-06 20:22:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.63 2012-07-06 20:22:08 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.63 2012-07-06 20:22:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.62 $
+//  $Revision: 1.63 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2417,7 +2417,10 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
   int vec_size = 2 * Colors() * SpinComponents();
 
   int s_node_sites = GJP.SnodeSites();
-  if(frm_dim == FOUR_D || s_node_sites == 0  || Fclass() != F_CLASS_DWF) {
+  if(frm_dim == FOUR_D
+     || s_node_sites == 0
+     // FIXME: check Fclass() is a bad idea, replace it with something more reasonable.
+     || (Fclass() != F_CLASS_DWF && Fclass() != F_CLASS_BFM)) {
     s_node_sites = 1; frm_dim = FOUR_D;
   }
   LRG.SetSigma(sigma2);
@@ -2427,7 +2430,6 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
   IFloat sum=0.0,square=0.0;
 
 
-//  printf("num_chkbds=%d vec_size=%d s_node_sites=%d \n",num_chkbds,vec_size,s_node_sites);fflush(stdout);
   if(num_chkbds == 2) {
     for(checker = 0; checker < 2; checker++)
     for(s = 0; s < s_node_sites; s++) {

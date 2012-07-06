@@ -1,5 +1,7 @@
 #include<config.h>
 
+#include <util/lattice/fbfm.h>
+
 #include <alg/no_arg.h>
 #include <alg/common_arg.h>
 #include <alg/pbp_arg.h>
@@ -24,19 +26,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief PAB... Definitions of the AlgMeas class methods.
   
-  $Id: alg_meas.C,v 1.8 2009-03-23 19:13:32 chulwoo Exp $
+  $Id: alg_meas.C,v 1.9 2012-07-06 20:22:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-03-23 19:13:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.8 2009-03-23 19:13:32 chulwoo Exp $
-//  $Id: alg_meas.C,v 1.8 2009-03-23 19:13:32 chulwoo Exp $
+//  $Date: 2012-07-06 20:22:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.9 2012-07-06 20:22:08 chulwoo Exp $
+//  $Id: alg_meas.C,v 1.9 2012-07-06 20:22:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_meas.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v $
 //  $State: Exp $
 //
@@ -277,6 +279,16 @@ void LatticeFactory::Destroy(void)
 
 Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
 {
+  /* BFM VALENCE ANALYSIS */
+  if ( (fermion == F_CLASS_BFM) && (gluon == G_CLASS_NONE ) ) {
+    lat_p = new GnoneFbfm;
+    return *lat_p; 
+  }
+  if ( (fermion == F_CLASS_BFM) && (gluon == G_CLASS_IMPR_RECT ) ) {
+    lat_p = new GimprRectFbfm;
+    return *lat_p;
+  }
+
   /* DOMAIN WALL VALENCE ANALYSIS */
   if ( (fermion == F_CLASS_DWF) && (gluon == G_CLASS_NONE ) ) {
     lat_p = new GnoneFdwf ;

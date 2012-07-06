@@ -1,21 +1,20 @@
 #include<config.h>
-CPS_START_NAMESPACE
 /*! \file
   \brief Declarations of routine used internally in the DiracOpWilson class.
 
-  $Id: wilson.h,v 1.9 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: wilson.h,v 1.10 2012-07-06 20:22:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-02-26 00:19:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.9 2011-02-26 00:19:27 chulwoo Exp $
-//  $Id: wilson.h,v 1.9 2011-02-26 00:19:27 chulwoo Exp $
+//  $Date: 2012-07-06 20:22:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.10 2012-07-06 20:22:08 chulwoo Exp $
+//  $Id: wilson.h,v 1.10 2012-07-06 20:22:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: wilson.h,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v $
 //  $State: Exp $
 //
@@ -32,11 +31,12 @@ CPS_START_NAMESPACE
 #ifndef INCLUDED_WILSON_H
 #define INCLUDED_WILSON_H
 
-CPS_END_NAMESPACE
 #ifdef USE_QMP
 #include <qmp.h>
 #endif
+
 #include <util/data_types.h>
+
 CPS_START_NAMESPACE
 
 /*--------------------------------------------------------------------------*/
@@ -285,6 +285,5 @@ void wilson_set_sloppy(bool sloppy);
 inline void wilson_set_sloppy(bool sloppy) {}
 #endif
 
-#endif
-
 CPS_END_NAMESPACE
+#endif

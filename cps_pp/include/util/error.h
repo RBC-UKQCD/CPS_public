@@ -1,31 +1,33 @@
+#ifndef INCLUDED_ERROR_H
+#define INCLUDED_ERROR_H  //!< Prevent multiple inclusions
+
 #include<config.h>
 #ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
 #include <qcdocos/scu_checksum.h>
 #endif
-CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration and definition of Error class.
 
-  $Id: error.h,v 1.7 2006-04-18 17:21:52 chulwoo Exp $
+  $Id: error.h,v 1.8 2012-07-06 20:22:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-04-18 17:21:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v 1.7 2006-04-18 17:21:52 chulwoo Exp $
-//  $Id: error.h,v 1.7 2006-04-18 17:21:52 chulwoo Exp $
+//  $Date: 2012-07-06 20:22:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v 1.8 2012-07-06 20:22:08 chulwoo Exp $
+//  $Id: error.h,v 1.8 2012-07-06 20:22:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: error.h,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 
-#ifndef INCLUDED_ERROR_H
-#define INCLUDED_ERROR_H  //!< Prevent multiple inclusions
+
+CPS_START_NAMESPACE
 
 #define MAX_ERR_STR_LEN 500
 //!< The maximum length of error message strings
@@ -106,8 +108,5 @@ class Error
 extern Error ERR;
 
 
-#endif
-
-
-
 CPS_END_NAMESPACE
+#endif
