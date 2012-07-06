@@ -745,6 +745,7 @@ enable_gmp
 enable_mpfr
 enable_qio
 enable_mdwf
+enable_xml
 enable_bfm
 enable_namespace
 enable_double_prec
@@ -1397,6 +1398,7 @@ Optional Features:
   --enable-mpfr           Compile with GMP mpfr routines. (default=no)
   --enable-qio            Compile with SciDAC I/O (QIO) lib. (default=no)
   --enable-mdwf           Compile with Mobius DWF lib. (default=no)
+  --enable-xml            Compile with XML lib. (default=no)
   --enable-bfm            Compile with BAGEL fermion sparse-matrix (BFM) lib.
                           (default=no)
   --enable-namespace      Build the library inside a 'cps' namespace.
@@ -5339,31 +5341,6 @@ $as_echo_n "checking if including QIO... " >&6; }
 { $as_echo "$as_me:$LINENO: result: $enable_qio" >&5
 $as_echo "$enable_qio" >&6; }
 
-# Check whether --enable-mdwf was given.
-if test "${enable_mdwf+set}" = set; then
-  enableval=$enable_mdwf;
-else
-  enable_mdwf="no"
-fi
-
-{ $as_echo "$as_me:$LINENO: checking if including MDWF" >&5
-$as_echo_n "checking if including MDWF... " >&6; }
-{ $as_echo "$as_me:$LINENO: result: $enable_mdwf" >&5
-$as_echo "$enable_mdwf" >&6; }
-
-
-# Check whether --enable-bfm was given.
-if test "${enable_bfm+set}" = set; then
-  enableval=$enable_bfm;
-else
-  enable_bfm="no"
-fi
-
-{ $as_echo "$as_me:$LINENO: checking if including BFM" >&5
-$as_echo_n "checking if including BFM... " >&6; }
-{ $as_echo "$as_me:$LINENO: result: $enable_bfm" >&5
-$as_echo "$enable_bfm" >&6; }
-
 if test "$enable_qmp" != "no"; then
    if test "$enable_qmp" != "yes"; then
      QMP_DIR=${enable_qmp}
@@ -5385,6 +5362,17 @@ if test "$enable_qmp" != "no"; then
    TESTING_PARALLEL="yes";
 fi
 
+# Check whether --enable-mdwf was given.
+if test "${enable_mdwf+set}" = set; then
+  enableval=$enable_mdwf;
+else
+  enable_mdwf="no"
+fi
+
+{ $as_echo "$as_me:$LINENO: checking if including MDWF" >&5
+$as_echo_n "checking if including MDWF... " >&6; }
+{ $as_echo "$as_me:$LINENO: result: $enable_mdwf" >&5
+$as_echo "$enable_mdwf" >&6; }
 if test "$enable_mdwf" != "no"; then
    if test "X${MDWF_DIR}X" = "XX"; then
      MDWF_DIR=${enable_mdwf}
@@ -5420,13 +5408,38 @@ fi
    DFLAGS="${DFLAGS} -DUSE_QIO"
 fi
 
+# Check whether --enable-xml was given.
+if test "${enable_xml+set}" = set; then
+  enableval=$enable_xml;
+else
+  enable_xml="no"
+fi
+
+{ $as_echo "$as_me:$LINENO: checking if including XML" >&5
+$as_echo_n "checking if including XML... " >&6; }
+{ $as_echo "$as_me:$LINENO: result: $enable_xml" >&5
+$as_echo "$enable_xml" >&6; }
+
+
+# Check whether --enable-bfm was given.
+if test "${enable_bfm+set}" = set; then
+  enableval=$enable_bfm;
+else
+  enable_bfm="no"
+fi
+
+{ $as_echo "$as_me:$LINENO: checking if including BFM" >&5
+$as_echo_n "checking if including BFM... " >&6; }
+{ $as_echo "$as_me:$LINENO: result: $enable_bfm" >&5
+$as_echo "$enable_bfm" >&6; }
+
+
 if test "$enable_bfm" != "no"; then
    if test "X${BFM_DIR}X" = "XX"; then
      BFM_DIR=${enable_bfm}
    fi
-#   QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
-#   QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
-#   QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
+
+
    if test "$enable_bfm" != "yes"; then
       LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib "
       INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include"
@@ -5434,10 +5447,27 @@ if test "$enable_bfm" != "no"; then
       BFM_DIR=${QMP_DIR}
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
-      INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include/libxml2"
+      LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm"
 fi
-      LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm "
-#-lqdp -lchroma -lxml2 -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm
+
+if test "$enable_xml" != "no"; then
+   if test "$enable_xml" != "yes"; then
+     XML_DIR=${enable_xml}
+   elif test "X${XML_DIR}X" = "XX"; then
+     XML_DIR=${BFM_DIR}
+   fi
+
+   if test "${XML_DIR}" = "no"; then
+     echo "XML_DIR environment variable not set"
+     exit 1
+   fi
+
+   XML_CFLAGS=`${XML_DIR}/bin/xml2-config --cflags`
+   XML_LDFLAGS=`${XML_DIR}/bin/xml2-config --libs`
+
+   LDFLAGS="${LDFLAGS} ${XML_LDFLAGS}"
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} ${XML_CFLAGS}"
+fi
 
 if test "$TESTING_PARALLEL" = "yes"; then
    ENABLE_PARALLEL="define PARALLEL 1"

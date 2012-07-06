@@ -1,4 +1,5 @@
 #include<config.h>
+#include<string.h>
 #include<math.h>
 CPS_START_NAMESPACE 
 //------------------------------------------------------------------
@@ -18,6 +19,7 @@ CPS_END_NAMESPACE
 #include<util/smalloc.h>
 #include<util/verbose.h>
 #include<util/error.h>
+#include<util/time_cps.h>
 #include<alg/alg_int.h>
 #include<alg/alg_remez.h>
 CPS_START_NAMESPACE
@@ -69,10 +71,8 @@ AlgActionRationalQuotient::AlgActionRationalQuotient(AlgMomentum &mom,
 
   //!< Allocate memory for the fermion CG arguments.
   if(n_masses > 0){
-    bsn_mass = (Float*) smalloc(n_masses * sizeof(Float), 
-				"bsn_mass", fname, cname);
-    frm_mass = (Float*) smalloc(n_masses * sizeof(Float),
-				"frm_mass", fname, cname);
+    bsn_mass = (Float*) smalloc(n_masses * sizeof(Float), "bsn_mass", fname, cname);
+    frm_mass = (Float*) smalloc(n_masses * sizeof(Float), "frm_mass", fname, cname);
 
     for(int i=0; i<n_masses; i++) {
       bsn_mass[i] = rat_quo_arg->bsn_mass.bsn_mass_val[i];
@@ -80,10 +80,13 @@ AlgActionRationalQuotient::AlgActionRationalQuotient(AlgMomentum &mom,
     }
     
     //!< construct approximation if necessary
-    generateApprox(frm_mass,&frm_remez_arg_md,&frm_remez_arg_mc,
-		   rat_quo_arg->fermions.fermions_val);
-    generateApprox(bsn_mass,&bsn_remez_arg_md,&bsn_remez_arg_mc,
-		   rat_quo_arg->bosons.bosons_val);
+    if(!loadPoles()) {
+      generateApprox(frm_mass,&frm_remez_arg_md,&frm_remez_arg_mc,
+                     rat_quo_arg->fermions.fermions_val);
+      generateApprox(bsn_mass,&bsn_remez_arg_md,&bsn_remez_arg_mc,
+                     rat_quo_arg->bosons.bosons_val);
+      savePoles();
+    }
     generateCgArg(frm_mass,&frm_cg_arg_fg, &frm_cg_arg_md,&frm_cg_arg_mc,"frm_cg_arg",
 		  rat_quo_arg->fermions.fermions_val);
     generateCgArg(bsn_mass,&bsn_cg_arg_fg, &bsn_cg_arg_md,&bsn_cg_arg_mc,"bsn_cg_arg",
@@ -224,6 +227,8 @@ void AlgActionRationalQuotient::heatbath() {
 
   char *fname = "heatbath()";
 
+  Float dtime = -dclock();
+
   //!< Only evaluate heatbath if necessary
   if (!heatbathEval) {
 
@@ -266,6 +271,8 @@ void AlgActionRationalQuotient::heatbath() {
     traj++;
   }
 
+  dtime += dclock();
+  print_flops(cname, fname, 0, dtime);
 }
 
 // Calculate rhmc fermion contribution to the Hamiltonian
@@ -279,6 +286,8 @@ Float AlgActionRationalQuotient::energy() {
     energyEval = 1;
     return h_init;
   } else {
+      Float dtime = -dclock();
+
     int shift = 0;
     Float h = 0.0;
 
@@ -322,31 +331,36 @@ Float AlgActionRationalQuotient::energy() {
 
     energyEval = 1;
 
+    dtime += dclock();
+    print_flops(cname, fname, 0, dtime);
     return h;
   }
-
-  
 }
 
 void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
 {
   char * fname = "prepare_fg(M*,F)";
+  Float dtime = -dclock();
+  Float dtime_cg = 0.;
+  Float dtime_force = 0.;
+
   Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
 
-  int isz = 0;
   for(int i=0; i<n_masses; i++){	
     int bsn_deg = bsn_remez_arg_md[i].degree;
     int frm_deg = frm_remez_arg_md[i].degree;
 
     //! First apply boson rational
+    dtime_cg -= dclock();
     int shift = 0;
     cg_iter = lat.FmatEvlMInv(frmn, phi[i],
-                              bsn_remez_arg_md[i].pole+isz,
-                              bsn_deg, isz,
-                              bsn_cg_arg_fg[i]+isz, CNV_FRM_NO,
+                              bsn_remez_arg_md[i].pole,
+                              bsn_deg, 0,
+                              bsn_cg_arg_fg[i], CNV_FRM_NO,
                               frmn_d+shift);
+    dtime_cg += dclock();
 
-    updateCgStats(bsn_cg_arg_fg[i][isz]);
+    updateCgStats(bsn_cg_arg_fg[i][0]);
 
     //!< Construct rhs
     eta[0] -> VecEqualsVecTimesEquFloat(phi[i],bsn_remez_arg_md[i].norm,
@@ -356,14 +370,16 @@ void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
                                frmn[j],eta[0],f_size);
 
     //!< Now apply fermion rational
+    dtime_cg -= dclock();
     shift += bsn_deg;
     cg_iter = lat.FmatEvlMInv(frmn+shift, eta[0], 
-                              frm_remez_arg_md[i].pole+isz, 
-                              frm_deg, isz,
-                              frm_cg_arg_fg[i]+isz, CNV_FRM_NO, 
-                              frmn_d+shift+isz);
+                              frm_remez_arg_md[i].pole, 
+                              frm_deg, 0,
+                              frm_cg_arg_fg[i], CNV_FRM_NO, 
+                              frmn_d+shift);
+    dtime_cg += dclock();
 
-    updateCgStats(frm_cg_arg_fg[i][isz]);
+    updateCgStats(frm_cg_arg_fg[i][0]);
 	
     //!< Construct rhs
     eta[1] -> VecEqualsVecTimesEquFloat(eta[0],frm_remez_arg_md[i].norm,
@@ -373,13 +389,16 @@ void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
                                frmn[j+shift],eta[1],f_size);
 
     //!< Apply final boson rational
+    dtime_cg -= dclock();
     shift += frm_deg;
     cg_iter = lat.FmatEvlMInv(frmn+shift, eta[1], 
-                              bsn_remez_arg_md[i].pole+isz, 
-                              bsn_deg, isz, 
-                              bsn_cg_arg_fg[i]+isz, CNV_FRM_NO, 
+                              bsn_remez_arg_md[i].pole, 
+                              bsn_deg, 0, 
+                              bsn_cg_arg_fg[i], CNV_FRM_NO, 
                               frmn_d+shift);	
-    updateCgStats(bsn_cg_arg_fg[i][isz]);
+    dtime_cg += dclock();
+
+    updateCgStats(bsn_cg_arg_fg[i][0]);
 
     //!< Now construct additional vectors needed
     for (int j=0; j<bsn_deg; j++) {
@@ -404,6 +423,7 @@ void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
       ((Vector*)mom_tmp)->VecZero(g_size);
     }
     
+    dtime_force -= dclock();
     //!< Do bosonic force contribution
     Fdt = lat.RHMC_EvolveMomFforce(mom_tmp, frmn_tmp, 3*bsn_deg, 0,
                                    all_res, bsn_mass[i], dt_ratio, frmn_d, 
@@ -419,6 +439,8 @@ void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
     Fdt = lat.RHMC_EvolveMomFforce(mom_tmp, frmn+bsn_deg, frm_deg, 0,
                                    frm_remez_arg_md[i].residue, frm_mass[i], 
                                    dt_ratio, frmn_d, force_measure);
+    dtime_force += dclock();
+
     if (force_measure == FORCE_MEASURE_YES) {
       char label[200];
       sprintf(label, "%s (fermion), mass = %e:", 
@@ -458,14 +480,22 @@ void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
     }
   }
   LatticeFactory::Destroy();
+
+  dtime += dclock();
+  print_flops(cname, fname, 0, dtime);
+  print_flops(cname, "prepare_fg::cg()", 0, dtime_cg);
+  print_flops(cname, "prepare_fg::force()", 0, dtime_force);
 }
 
 //!< run method evolves the integrator
 void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
 {
   char * fname = "evolve(Float, int)";
-  if (n_masses <= 0) return;
-  int isz = 0;
+
+  Float dtime = -dclock();
+  Float dtime_cg = 0.;
+  Float dtime_force = 0.;
+
   //!< Create an appropriate lattice
   Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
     
@@ -476,13 +506,15 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
 
       //! First apply boson rational
       int shift = 0;
+      dtime_cg -= dclock();
       cg_iter = lat.FmatEvlMInv(frmn, phi[i], 
-                                bsn_remez_arg_md[i].pole+isz, 
-                                bsn_deg, isz, 
-                                bsn_cg_arg_md[i]+isz, CNV_FRM_NO, 
+                                bsn_remez_arg_md[i].pole, 
+                                bsn_deg, 0, 
+                                bsn_cg_arg_md[i], CNV_FRM_NO, 
                                 frmn_d+shift);	
+      dtime_cg += dclock();
 
-      updateCgStats(bsn_cg_arg_md[i][isz]);
+      updateCgStats(bsn_cg_arg_md[i][0]);
 
       //!< Construct rhs
       eta[0] -> VecEqualsVecTimesEquFloat(phi[i],bsn_remez_arg_md[i].norm,
@@ -491,15 +523,17 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
         eta[0] -> FTimesV1PlusV2(bsn_remez_arg_md[i].residue[j],
                                  frmn[j],eta[0],f_size);
 
+      dtime_cg -= dclock();
       //!< Now apply fermion rational
       shift += bsn_deg;
       cg_iter = lat.FmatEvlMInv(frmn+shift, eta[0], 
-                                frm_remez_arg_md[i].pole+isz, 
-                                frm_deg, isz, 
-                                frm_cg_arg_md[i]+isz, CNV_FRM_NO, 
-                                frmn_d+shift+isz);
+                                frm_remez_arg_md[i].pole, 
+                                frm_deg, 0, 
+                                frm_cg_arg_md[i], CNV_FRM_NO, 
+                                frmn_d+shift);
+      dtime_cg += dclock();
 
-      updateCgStats(frm_cg_arg_md[i][isz]);
+      updateCgStats(frm_cg_arg_md[i][0]);
 	
       //!< Construct rhs
       eta[1] -> VecEqualsVecTimesEquFloat(eta[0],frm_remez_arg_md[i].norm,
@@ -508,14 +542,17 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
         eta[1] -> FTimesV1PlusV2(frm_remez_arg_md[i].residue[j],
                                  frmn[j+shift],eta[1],f_size);
 
+      dtime_cg -= dclock();
       //!< Apply final boson rational
       shift += frm_deg;
       cg_iter = lat.FmatEvlMInv(frmn+shift, eta[1], 
-                                bsn_remez_arg_md[i].pole+isz, 
-                                bsn_deg, isz, 
-                                bsn_cg_arg_md[i]+isz, CNV_FRM_NO, 
+                                bsn_remez_arg_md[i].pole, 
+                                bsn_deg, 0, 
+                                bsn_cg_arg_md[i], CNV_FRM_NO, 
                                 frmn_d+shift);	
-      updateCgStats(bsn_cg_arg_md[i][isz]);
+      dtime_cg += dclock();
+
+      updateCgStats(bsn_cg_arg_md[i][0]);
 
       //!< Now construct additional vectors needed
       for (int j=0; j<bsn_deg; j++) {
@@ -543,6 +580,7 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
         mom_tmp = mom;
       }
 
+      dtime_force -= dclock();
       //!< Do bosonic force contribution
       Fdt = lat.RHMC_EvolveMomFforce(mom_tmp, frmn_tmp, 3*bsn_deg, 0,
                                      all_res, bsn_mass[i], dt, frmn_d, 
@@ -558,6 +596,8 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
       Fdt = lat.RHMC_EvolveMomFforce(mom_tmp, frmn+bsn_deg, frm_deg, 0,
                                      frm_remez_arg_md[i].residue, frm_mass[i], 
                                      dt, frmn_d, force_measure);
+      dtime_force += dclock();
+
       if (force_measure == FORCE_MEASURE_YES) {	  
         char label[200];
         sprintf(label, "%s (fermion), mass = %e:", force_label, frm_mass[i]);
@@ -604,6 +644,100 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
   }
     
   LatticeFactory::Destroy();
+
+  dtime += dclock();
+  print_flops(cname, fname, 0, dtime);
+  print_flops(cname, "evolve::cg()", 0, dtime_cg);
+  print_flops(cname, "evolve::force()", 0, dtime_force);
+}
+
+bool AlgActionRationalQuotient::checkPolesFile(const RemezArg &md, const RemezArg &mc, const RationalDescr &r)
+{
+  if(md.field_type != r.field_type) return false;
+  if(mc.field_type != r.field_type) return false;
+
+  if(mc.power_num != r.power_num) return false;
+  if(mc.power_den != r.power_den * 2) return false;
+
+  if(md.power_num != r.power_num) return false;
+  if(r.field_type == BOSON) {
+    if(md.power_den != r.power_den * 2) return false;
+  } else {
+    if(md.power_den != r.power_den) return false;
+  }
+
+  if(md.degree != r.md_approx.stop_rsd.stop_rsd_len) return false;
+  if(mc.degree != r.mc_approx.stop_rsd.stop_rsd_len) return false;
+
+  if(fabs(md.lambda_low  - r.md_approx.lambda_low ) > 1e-3 * fabs(r.md_approx.lambda_low ) ) return false;
+  if(fabs(md.lambda_high - r.md_approx.lambda_high) > 1e-3 * fabs(r.md_approx.lambda_high) ) return false;
+  if(fabs(mc.lambda_low  - r.mc_approx.lambda_low ) > 1e-3 * fabs(r.mc_approx.lambda_low ) ) return false;
+  if(fabs(mc.lambda_high - r.mc_approx.lambda_high) > 1e-3 * fabs(r.mc_approx.lambda_high) ) return false;
+
+  return true;
+}
+
+// return true if we successfully loaded from a file.
+bool AlgActionRationalQuotient::loadPoles(void)
+{
+  const char *fname = "loadPoles()";
+  if(rat_quo_arg->remez_generate) return false;
+  if(strlen(rat_quo_arg->rat_poles_file) == 0) return false;
+
+  FILE *fp = fopen(rat_quo_arg->rat_poles_file, "r");
+  if(fp == NULL) return false;
+  fclose(fp);
+
+  RationalQuotientRemezArg rq;
+  if(!rq.Decode(rat_quo_arg->rat_poles_file, "rq")) return false;
+
+  // a bunch of check
+  if(rq.bsn_md.bsn_md_len != n_masses) return false;
+  if(rq.bsn_mc.bsn_mc_len != n_masses) return false;
+  if(rq.frm_md.frm_md_len != n_masses) return false;
+  if(rq.frm_mc.frm_mc_len != n_masses) return false;
+
+  frm_remez_arg_md = new RemezArg[n_masses];
+  frm_remez_arg_mc = new RemezArg[n_masses];
+  bsn_remez_arg_md = new RemezArg[n_masses];
+  bsn_remez_arg_mc = new RemezArg[n_masses];
+  
+  // we don't try to make a deep copy since VML does not free space
+  // used anyway.
+  for(int i = 0; i < n_masses; ++i) {
+    frm_remez_arg_md[i] = rq.frm_md.frm_md_val[i];
+    frm_remez_arg_mc[i] = rq.frm_mc.frm_mc_val[i];
+    bsn_remez_arg_md[i] = rq.bsn_md.bsn_md_val[i];
+    bsn_remez_arg_mc[i] = rq.bsn_mc.bsn_mc_val[i];
+
+    if(! checkPolesFile(frm_remez_arg_md[i], frm_remez_arg_mc[i],
+                        rat_quo_arg->fermions.fermions_val[i])) return false;
+    if(! checkPolesFile(bsn_remez_arg_md[i], bsn_remez_arg_mc[i],
+                        rat_quo_arg->bosons.bosons_val[i])) return false;
+  }
+
+  VRB.Result(cname, fname, "Successfully loaded poles file %s.\n", rat_quo_arg->rat_poles_file);
+  return true;
+}
+
+bool AlgActionRationalQuotient::savePoles(void)
+{
+  if(strlen(rat_quo_arg->rat_poles_file) == 0) return false;
+
+  RationalQuotientRemezArg rq;
+
+  rq.bsn_md.bsn_md_len = n_masses;
+  rq.bsn_mc.bsn_mc_len = n_masses;
+  rq.frm_md.frm_md_len = n_masses;
+  rq.frm_mc.frm_mc_len = n_masses;
+
+  // no deep copy either
+  rq.bsn_md.bsn_md_val = bsn_remez_arg_md;
+  rq.bsn_mc.bsn_mc_val = bsn_remez_arg_mc;
+  rq.frm_md.frm_md_val = frm_remez_arg_md;
+  rq.frm_mc.frm_mc_val = frm_remez_arg_mc;
+
+  return rq.Encode(rat_quo_arg->rat_poles_file, "rq");
 }
 
 CPS_END_NAMESPACE

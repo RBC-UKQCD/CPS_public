@@ -17,6 +17,7 @@ CPS_END_NAMESPACE
 #include<util/smalloc.h>
 #include<util/verbose.h>
 #include<util/error.h>
+#include<util/time_cps.h>
 #include<alg/alg_int.h>
 CPS_START_NAMESPACE
 
@@ -42,19 +43,25 @@ void AlgActionGauge::heatbath() {
 
 //!< Calculate gauge contribution to the Hamiltonian
 Float AlgActionGauge::energy() {
+  Float dtime = -dclock();
 
   char *fname = "energy()";
   Lattice &lat = 
     LatticeFactory::Create(F_CLASS_NONE, gluon);
   Float h = lat.GhamiltonNode();
   LatticeFactory::Destroy();
-  return h;
 
+  dtime += dclock();
+  print_flops(cname, fname, 0, dtime);
+
+  return h;
 }
 
 void AlgActionGauge::prepare_fg(Matrix * force, Float dt_ratio)
 {
-  const char fname[] = "prepare_fg(M*,F)";
+  Float dtime = -dclock();
+  const char *fname = "prepare_fg(M*,F)";
+
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, gluon);
   Fdt = lat.EvolveMomGforce(force, dt_ratio);
   if (force_measure == FORCE_MEASURE_YES) {
@@ -63,11 +70,15 @@ void AlgActionGauge::prepare_fg(Matrix * force, Float dt_ratio)
     Fdt.print(dt_ratio, label);
   }
   LatticeFactory::Destroy();
+
+  dtime += dclock();
+  print_flops(cname, fname, 0, dtime);
 }
 
 //!< evolve method evolves the momentum due to the gauge force
 void AlgActionGauge::evolve(Float dt, int steps) 
 {
+  Float dtime = -dclock();
   char *fname = "evolve(Float, int)";
   //!< Create an appropriate lattice
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, gluon);
@@ -83,6 +94,8 @@ void AlgActionGauge::evolve(Float dt, int steps)
   }
 
   LatticeFactory::Destroy();
+  dtime += dclock();
+  print_flops(cname, fname, 0, dtime);
 }
 
 //!< Dummy methods

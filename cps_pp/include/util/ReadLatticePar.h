@@ -27,8 +27,7 @@
 CPS_START_NAMESPACE
 using namespace std;
 
-
-class  ReadLatticeParallel : public QioControl{
+class  ReadLatticeParallel : public QioControl {
   // which determines parallel reading or serial reading
 
  private:

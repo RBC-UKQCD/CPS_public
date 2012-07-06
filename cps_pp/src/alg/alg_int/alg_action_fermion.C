@@ -40,20 +40,14 @@ AlgActionFermion::AlgActionFermion(AlgMomentum &mom,
 
   if(n_masses > 0){
     //!< Allocate memory for the fermion CG arguments.
-    frm_cg_arg_md = (CgArg **) smalloc(n_masses * sizeof(CgArg*), 
-				       "frm_cg_arg_md", fname, cname);
-    frm_cg_arg_fg = (CgArg **) smalloc(n_masses * sizeof(CgArg*), 
-                                       "frm_cg_arg_fg", fname, cname);
-    frm_cg_arg_mc = (CgArg **) smalloc(n_masses * sizeof(CgArg*), 
-				       "frm_cg_arg_mc", fname, cname);
+    frm_cg_arg_md = (CgArg **) smalloc(n_masses * sizeof(CgArg*), "frm_cg_arg_md", fname, cname);
+    frm_cg_arg_fg = (CgArg **) smalloc(n_masses * sizeof(CgArg*), "frm_cg_arg_fg", fname, cname);
+    frm_cg_arg_mc = (CgArg **) smalloc(n_masses * sizeof(CgArg*), "frm_cg_arg_mc", fname, cname);
     
     for(int i=0; i<n_masses; i++){
-      frm_cg_arg_md[i] = (CgArg *) 
-	smalloc(sizeof(CgArg), "frm_cg_arg_md[i]", fname, cname);
-      frm_cg_arg_fg[i] = (CgArg *) 
-	smalloc(sizeof(CgArg), "frm_cg_arg_fg[i]", fname, cname);
-      frm_cg_arg_mc[i] = (CgArg *) 
-	smalloc(sizeof(CgArg), "frm_cg_arg_mc[i]", fname, cname);
+      frm_cg_arg_md[i] = (CgArg *) smalloc(sizeof(CgArg), "frm_cg_arg_md[i]", fname, cname);
+      frm_cg_arg_fg[i] = (CgArg *) smalloc(sizeof(CgArg), "frm_cg_arg_fg[i]", fname, cname);
+      frm_cg_arg_mc[i] = (CgArg *) smalloc(sizeof(CgArg), "frm_cg_arg_mc[i]", fname, cname);
     }
 
     //!< Initialize the fermion CG arguments
@@ -86,12 +80,9 @@ AlgActionFermion::AlgActionFermion(AlgMomentum &mom,
       chrono[i] = frm_arg->fermions.fermions_val[i].chrono;
 
     //!< Vectors used to store solution history
-    v = (Vector***) smalloc(n_masses*sizeof(Vector**),
-			    "v", fname, cname);
-    cg_sol_old = (Vector***) smalloc(n_masses*sizeof(Vector**),
-				     "cg_sol_old", fname, cname);
-    vm = (Vector***) smalloc(n_masses*sizeof(Vector**),
-			     "vm", fname, cname);
+    v = (Vector***) smalloc(n_masses*sizeof(Vector**), "v", fname, cname);
+    cg_sol_old = (Vector***) smalloc(n_masses*sizeof(Vector**), "cg_sol_old", fname, cname);
+    vm = (Vector***) smalloc(n_masses*sizeof(Vector**), "vm", fname, cname);
 
     for (int i=0; i<n_masses; i++) {
       int deg=0;
@@ -99,16 +90,12 @@ AlgActionFermion::AlgActionFermion(AlgMomentum &mom,
       else if (chrono[i] == 0) deg = 1;
       else ERR.General(cname,fname,"Cannot have negative chronology\n");
 
-      v[i] = (Vector**) smalloc(deg*sizeof(Vector*),
-				"v[i]", fname, cname);
-      cg_sol_old[i] = (Vector**) smalloc(deg*sizeof(Vector*),
-					 "cg_sol_old[i]", fname, cname);
+      v[i] = (Vector**) smalloc(deg*sizeof(Vector*), "v[i]", fname, cname);
+      cg_sol_old[i] = (Vector**) smalloc(deg*sizeof(Vector*), "cg_sol_old[i]", fname, cname);
       vm[i] = (Vector**) smalloc(deg*sizeof(Vector*), "vm[i]", fname, cname);
       for (int j=0; j<deg; j++) {
-	v[i][j] = (Vector*) smalloc(f_size*sizeof(Float),
-				    "v[i][j]", fname, cname);
-	vm[i][j] = (Vector*) smalloc(f_size*sizeof(Float),
-				    "vm[i][j]", fname, cname);
+	v[i][j] = (Vector*) smalloc(f_size*sizeof(Float), "v[i][j]", fname, cname);
+	vm[i][j] = (Vector*) smalloc(f_size*sizeof(Float), "vm[i][j]", fname, cname);
       }
     }
 
@@ -201,34 +188,34 @@ void AlgActionFermion::heatbath() {
 //!< Calculate fermion contribution to the Hamiltonian
 Float AlgActionFermion::energy() {
 
-  char *fname = "energy()";
-  Float h = 0.0;
+    char *fname = "energy()";
+    Float h = 0.0;
   
-  if (n_masses > 0) {
-    if (!evolved && h_init != 0.0) {
-      return h_init;
-    } else {
-      Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
+    if (n_masses > 0) {
+        if (!evolved && h_init != 0.0) {
+            return h_init;
+        } else {
+            Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
 
-      Vector *cg_sol = 
-	(Vector*)smalloc(f_size*sizeof(Float),"cg_sol",fname,cname);
+            Vector *cg_sol = 
+                (Vector*)smalloc(f_size*sizeof(Float),"cg_sol",fname,cname);
       
-      for(int i=0; i<n_masses; i++) {
-	cg_sol -> VecZero(f_size);
-	cg_iter = 
-	  lat.FmatEvlInv(cg_sol, phi[i], frm_cg_arg_mc[i], CNV_FRM_NO);
+            for(int i=0; i<n_masses; i++) {
+                cg_sol -> VecZero(f_size);
+                cg_iter = 
+                    lat.FmatEvlInv(cg_sol, phi[i], frm_cg_arg_mc[i], CNV_FRM_NO);
 	
-	updateCgStats(frm_cg_arg_mc[i]);
+                updateCgStats(frm_cg_arg_mc[i]);
 	  
-	h += lat.FhamiltonNode(phi[i], cg_sol);
-  }
+                h += lat.FhamiltonNode(phi[i], cg_sol);
+            }
       
-      sfree(cg_sol, "cg_sol", cname, fname);
-      LatticeFactory::Destroy();
+            sfree(cg_sol, "cg_sol", cname, fname);
+            LatticeFactory::Destroy();
+        }
     }
-  }
 
-  return h;
+    return h;
 
 }
 

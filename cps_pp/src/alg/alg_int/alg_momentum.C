@@ -17,6 +17,7 @@ CPS_END_NAMESPACE
 #include<util/smalloc.h>
 #include<util/verbose.h>
 #include<util/error.h>
+#include<util/time_cps.h>
 #include<alg/alg_int.h>
 CPS_START_NAMESPACE
 
@@ -40,6 +41,8 @@ AlgMomentum::~AlgMomentum() {
 void AlgMomentum::heatbath() {
 
   char *fname = "heatbath()";
+  Float dtime = -dclock();
+
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
   lat.RandGaussAntiHermMatrix(mom, 1.0);
 
@@ -49,22 +52,29 @@ void AlgMomentum::heatbath() {
       
   LatticeFactory::Destroy();
   
+  dtime += dclock();
+  print_flops(cname, fname, 0, dtime);
 }
 
 //!< Calculate gauge contribution to the Hamiltonian
 Float AlgMomentum::energy() {
+  Float dtime = -dclock();
 
   char *fname = "energy()";
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
   Float h = lat.MomHamiltonNode(mom);
   LatticeFactory::Destroy();
-  return h;
 
+  dtime += dclock();
+  print_flops(cname, fname, 0, dtime);
+
+  return h;
 }
 
 //!< evolve method evolves the gauge field due to the momentum
 void AlgMomentum::evolve(Float dt, int steps) 
 {
+  Float dtime = -dclock();
   char * fname = "evolve(Float, int)";
 
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
@@ -72,6 +82,9 @@ void AlgMomentum::evolve(Float dt, int steps)
   lat.MdTimeInc(dt*steps);
   VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
   LatticeFactory::Destroy();
+
+  dtime += dclock();
+  print_flops(cname, fname, 0, dtime);
 }
 
 void AlgMomentum::cost(CgStats *cg_stats_global){

@@ -1,4 +1,6 @@
+// -*- mode:c++; c-basic-offset:4 -*-
 #include<config.h>
+#include<vector>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
 /*!\file
@@ -30,38 +32,38 @@ CPS_START_NAMESPACE
 */
 class AlgInt {
 
- private:
-  char *cname;
+private:
+    const char *cname;
 
- protected:
-  //!< the current trajectory number
-  int traj;
-  IntegratorType int_type;
+protected:
+    //!< the current trajectory number
+    int traj;
+    IntegratorType int_type;
 
- public:
+public:
   
-  AlgInt();
-  virtual ~AlgInt();
+    AlgInt();
+    virtual ~AlgInt();
 
-  //!< method to do heatbath (if necessary)
-  virtual void heatbath() = 0;
+    //!< method to do heatbath (if necessary)
+    virtual void heatbath() = 0;
 
-  // Calculate preliminary force for force gradient
-  virtual void prepare_fg(Matrix * force, Float dt_ratio);
-  //!< run method evolves the integrator
-  virtual void evolve (Float dt, int steps) = 0;
+    // Calculate preliminary force for force gradient
+    virtual void prepare_fg(Matrix * force, Float dt_ratio);
+    //!< run method evolves the integrator
+    virtual void evolve (Float dt, int steps) = 0;
 
-  //!< method to calculate energy (if necessary)
-  virtual Float energy() = 0;
+    //!< method to calculate energy (if necessary)
+    virtual Float energy() = 0;
 
-  //!< method to return the cost of the integrator (wrt cg iterations)
-  virtual void cost(CgStats*) = 0;
+    //!< method to return the cost of the integrator (wrt cg iterations)
+    virtual void cost(CgStats*) = 0;
 
-  //!< method to reverse the direction of evolution (i.e. flip momenta)
-  virtual void reverse() = 0;
+    //!< method to reverse the direction of evolution (i.e. flip momenta)
+    virtual void reverse() = 0;
 
-  //!< method used to reinitialise the integrator
-  virtual void init() = 0;
+    //!< method used to reinitialise the integrator
+    virtual void init() = 0;
 
 };
 
@@ -70,39 +72,39 @@ class AlgInt {
 */
 class AlgIntAB : public AlgInt {
 
- private:
-  char *cname;
+private:
+    const char *cname;
 
- protected:
-  AlgInt *A;
-  AlgInt *B;
-  int A_steps, B_steps;
-  int A_calls, B_calls;
+protected:
+    AlgInt *A;
+    AlgInt *B;
+    int A_steps, B_steps;
+    int A_calls, B_calls;
   
-  IntegratorLevel level; //!< Is this the top level integrator?
-  unsigned long step_cnt;
-  IntABArg *ab_arg;
+    IntegratorLevel level; //!< Is this the top level integrator?
+    unsigned long step_cnt;
+    IntABArg *ab_arg;
 
- public:
-  AlgIntAB(AlgInt &A, AlgInt &B, IntABArg &);
-  virtual ~AlgIntAB();
+public:
+    AlgIntAB(AlgInt &A, AlgInt &B, IntABArg &);
+    virtual ~AlgIntAB();
 
-  void heatbath();
+    void heatbath();
 
-  Float energy();
+    Float energy();
 
-  //!< evolve method evolves the integrator
-  virtual void evolve(Float dt, int steps) = 0;
+    //!< evolve method evolves the integrator
+    virtual void evolve(Float dt, int steps) = 0;
 
-  void cost(CgStats*);
-  void reverse();
+    void cost(CgStats*);
+    void reverse();
 
-  //!< Dummy method
-  void init();
+    //!< Dummy method
+    void init();
 
-  //!< AlgIntAB factory
-  static AlgIntAB& Create(AlgInt &A, AlgInt &B, IntABArg &ab_arg);
-  static void Destroy(AlgIntAB&);
+    //!< AlgIntAB factory
+    static AlgIntAB& Create(AlgInt &A, AlgInt &B, IntABArg &ab_arg);
+    static void Destroy(AlgIntAB&);
 
 };
 
@@ -113,14 +115,14 @@ class AlgIntAB : public AlgInt {
 class AlgIntLeap : public AlgIntAB {
 
 private:
-  char *cname;
+    const char *cname;
 
 public:
-  AlgIntLeap(AlgInt &A, AlgInt &B, IntABArg &);
-  virtual ~AlgIntLeap();
+    AlgIntLeap(AlgInt &A, AlgInt &B, IntABArg &);
+    virtual ~AlgIntLeap();
 
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 };
 
 /*!< 
@@ -130,15 +132,15 @@ public:
 class AlgIntOmelyan : public AlgIntAB {
 
 private:
-  char *cname;
-  Float lambda;
+    const char *cname;
+    Float lambda;
 
 public:
-  AlgIntOmelyan(AlgInt &A, AlgInt &B, IntABArg &);
-  virtual ~AlgIntOmelyan();
+    AlgIntOmelyan(AlgInt &A, AlgInt &B, IntABArg &);
+    virtual ~AlgIntOmelyan();
 
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 };
 
 /*!< 
@@ -148,16 +150,16 @@ public:
 class AlgIntCampostrini : public AlgIntAB {
 
 private:
-  char *cname;
-  Float sigma;
-  Float epsilon;
+    const char *cname;
+    Float sigma;
+    Float epsilon;
 
 public:
-  AlgIntCampostrini(AlgInt &A, AlgInt &B, IntABArg &);
-  virtual ~AlgIntCampostrini();
+    AlgIntCampostrini(AlgInt &A, AlgInt &B, IntABArg &);
+    virtual ~AlgIntCampostrini();
 
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 };
 
 /*!< 
@@ -167,17 +169,17 @@ public:
 class AlgIntOmelyan44 : public AlgIntAB {
 
 private:
-  char *cname;
-  Float rho;
-  Float theta;
-  Float lambda;
+    const char *cname;
+    Float rho;
+    Float theta;
+    Float lambda;
 
 public:
-  AlgIntOmelyan44(AlgInt &A, AlgInt &B, IntABArg &);
-  virtual ~AlgIntOmelyan44();
+    AlgIntOmelyan44(AlgInt &A, AlgInt &B, IntABArg &);
+    virtual ~AlgIntOmelyan44();
 
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 };
 
 /*!< 
@@ -187,18 +189,18 @@ public:
 class AlgIntOmelyan45 : public AlgIntAB {
 
 private:
-  char *cname;
-  Float theta;
-  Float rho;
-  float lambda;
-  Float mu;
+    const char *cname;
+    Float theta;
+    Float rho;
+    float lambda;
+    Float mu;
 
 public:
-  AlgIntOmelyan45(AlgInt &A, AlgInt &B, IntABArg &);
-  virtual ~AlgIntOmelyan45();
+    AlgIntOmelyan45(AlgInt &A, AlgInt &B, IntABArg &);
+    virtual ~AlgIntOmelyan45();
 
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 };
 
 /*!< 
@@ -207,22 +209,22 @@ public:
 class AlgIntForceGrad : public AlgIntAB {
 
 private:
-  char *cname;
-  Float lambda;
-  Float xi;
-  Float theta;
-  Float chi;
-  int g_size;
+    const char *cname;
+    Float lambda;
+    Float xi;
+    Float theta;
+    Float chi;
+    int g_size;
 
 protected:
-  void evolve_fg(AlgInt * which_int, Float fg_dt, Float dt);
+    void evolve_fg(AlgInt * which_int, Float fg_dt, Float dt);
 
 public:
-  AlgIntForceGrad(AlgInt &A, AlgInt &B, IntABArg &);
-  virtual ~AlgIntForceGrad();
+    AlgIntForceGrad(AlgInt &A, AlgInt &B, IntABArg &);
+    virtual ~AlgIntForceGrad();
 
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 };
 
 /*!< 
@@ -233,16 +235,16 @@ public:
 class AlgIntSum : public AlgIntAB {
 
 private:
-  char *cname;
+    const char *cname;
 
 public:
-  AlgIntSum(AlgInt &A, AlgInt &B, IntABArg &);
-  virtual ~AlgIntSum();
+    AlgIntSum(AlgInt &A, AlgInt &B, IntABArg &);
+    virtual ~AlgIntSum();
 
-  // Calculate preliminary force for force gradient
-  virtual void prepare_fg(Matrix * force, Float dt_ratio);
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    // Calculate preliminary force for force gradient
+    virtual void prepare_fg(Matrix * force, Float dt_ratio);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 };
 
 /*!< 
@@ -250,20 +252,20 @@ public:
 */
 class AlgHamiltonian : public AlgInt {
 
- protected:
-  int g_size;
+protected:
+    int g_size;
 
- private:
-  char *cname;
+private:
+    const char *cname;
 
- public:
-  AlgHamiltonian();
-  virtual ~AlgHamiltonian();
+public:
+    AlgHamiltonian();
+    virtual ~AlgHamiltonian();
 
-  virtual void heatbath() = 0;
-  virtual Float energy() = 0;
-  virtual void evolve(Float dt, int steps) = 0;
-  virtual void cost(CgStats*) = 0;
+    virtual void heatbath() = 0;
+    virtual Float energy() = 0;
+    virtual void evolve(Float dt, int steps) = 0;
+    virtual void cost(CgStats*) = 0;
 
 };
 
@@ -272,32 +274,32 @@ class AlgHamiltonian : public AlgInt {
 */
 class AlgMomentum : public AlgHamiltonian {
 
- private:
-  char *cname;
+private:
+    const char *cname;
 
-  //!< This class tracks the MD time since it updates the gauge field
-  char *md_time_str;
-  Matrix *mom;
+    //!< This class tracks the MD time since it updates the gauge field
+    char *md_time_str;
+    Matrix *mom;
 
- public:
-  AlgMomentum();
-  virtual ~AlgMomentum();
+public:
+    AlgMomentum();
+    virtual ~AlgMomentum();
 
-  void heatbath();
+    void heatbath();
 
-  Float energy();
+    Float energy();
 
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 
-  void cost(CgStats*);
+    void cost(CgStats*);
 
-  Matrix* getMom();
+    Matrix* getMom();
 
-  void reverse();
+    void reverse();
 
-  //!< Dummy method
-  void init();
+    //!< Dummy method
+    void init();
 };
 
 /*!< 
@@ -305,25 +307,25 @@ class AlgMomentum : public AlgHamiltonian {
 */
 class AlgAction : public AlgHamiltonian {
 
- private:
-  char *cname;
+private:
+    const char *cname;
 
- protected:
-  Matrix *mom;
-  ForceMeasure force_measure;
-  char *force_label;
-  ForceArg Fdt;
+protected:
+    Matrix *mom;
+    ForceMeasure force_measure;
+    char *force_label;
+    ForceArg Fdt;
 
- public:
-  AlgAction();
-  AlgAction(AlgMomentum &mom, ActionArg &action_arg);
-  ~AlgAction();
+public:
+    AlgAction();
+    AlgAction(AlgMomentum &mom, ActionArg &action_arg);
+    ~AlgAction();
 
-  virtual void heatbath() = 0;
-  virtual Float energy() = 0;
-  virtual void evolve(Float dt, int steps) = 0;
-  virtual void cost(CgStats*) = 0;
-  void reverse();
+    virtual void heatbath() = 0;
+    virtual Float energy() = 0;
+    virtual void evolve(Float dt, int steps) = 0;
+    virtual void cost(CgStats*) = 0;
+    void reverse();
 
 };
 
@@ -332,55 +334,55 @@ class AlgAction : public AlgHamiltonian {
 */
 class AlgActionBilinear : public AlgAction {
 
- private:
-  char *cname;
+private:
+    const char *cname;
 
- protected:
-  ActionBilinearArg *bi_arg;
+protected:
+    ActionBilinearArg *bi_arg;
 
-  int n_masses;
-  FclassType fermion;
+    int n_masses;
+    FclassType fermion;
 
-  //!< An array which stores the values of the masses
-  Float *mass;
+    //!< An array which stores the values of the masses
+    Float *mass;
 
-  //!< Maximum number of cg iterations
-  int *max_num_iter;
+    //!< Maximum number of cg iterations
+    int *max_num_iter;
 
-  //!< Number of lattice sites
-  int f_sites;
-  //!< Number of Vectors in a Vector array
-  int f_vec_count;
-  //!< Number of Floats in a Vector array
-  int f_size;
-  //!< Number of checkerboards
-  int Ncb;
+    //!< Number of lattice sites
+    int f_sites;
+    //!< Number of Vectors in a Vector array
+    int f_vec_count;
+    //!< Number of Floats in a Vector array
+    int f_size;
+    //!< Number of checkerboards
+    int Ncb;
 
-  //!< The conjugate gradient statistics
-  CgStats cg_stats;
-  int cg_iter;
+    //!< The conjugate gradient statistics
+    CgStats cg_stats;
+    int cg_iter;
 
-  //!< Pseudofermion fields, one for each mass
-  Vector **phi;
+    //!< Pseudofermion fields, one for each mass
+    Vector **phi;
 
-  int md_steps;
+    int md_steps;
 
- public:
-  AlgActionBilinear();
-  AlgActionBilinear(AlgMomentum &, ActionBilinearArg &);
-  virtual ~AlgActionBilinear();
-  void cost(CgStats*);
-  void updateCgStats(CgArg*);
+public:
+    AlgActionBilinear();
+    AlgActionBilinear(AlgMomentum &, ActionBilinearArg &);
+    virtual ~AlgActionBilinear();
+    void cost(CgStats*);
+    void updateCgStats(CgArg*);
 
-  int getNmass();
-  Float getMass(int);
-  FclassType getFermion();
+    int getNmass();
+    Float getMass(int);
+    FclassType getFermion();
 
-  virtual void heatbath() = 0;
-  virtual Float energy() = 0;
-  virtual void evolve(Float dt, int steps) = 0;
+    virtual void heatbath() = 0;
+    virtual Float energy() = 0;
+    virtual void evolve(Float dt, int steps) = 0;
 
-  void init();
+    void init();
 
 };
 
@@ -394,132 +396,132 @@ class AlgActionBilinear : public AlgAction {
 */
 class AlgActionRational : public AlgActionBilinear {
 
- private:
-  char *cname;
-  int **fractionSplit;
-  int **splitCheck;
-  ActionRationalArg *rat_arg;
+private:
+    const char *cname;
+    int **fractionSplit;
+    int **splitCheck;
+    ActionRationalArg *rat_arg;
 
-  //!< This is where the rational parameters are stored
+    //!< This is where the rational parameters are stored
   
-  // currently force gradient calculation is using the same poles as
-  // used by the usual MD step.
-  RemezArg *remez_arg_md;
-  RemezArg *remez_arg_mc;
+    // currently force gradient calculation is using the same poles as
+    // used by the usual MD step.
+    RemezArg *remez_arg_md;
+    RemezArg *remez_arg_mc;
 
- protected:
+protected:
 
-  //!< Has any evolution taken place?
-  int evolved;
+    //!< Has any evolution taken place?
+    int evolved;
 
-  //!< Has the heatbath been evaluated?
-  int heatbathEval;
+    //!< Has the heatbath been evaluated?
+    int heatbathEval;
 
-  //!< Has the energy been evaluated?
-  int energyEval;
+    //!< Has the energy been evaluated?
+    int energyEval;
 
-  Float h_init;
+    Float h_init;
 
-  //!<  frm_cg_arg_fg is specific to force gradient integrator and has no use otherwise.
-  CgArg ***frm_cg_arg_fg;
-  CgArg ***frm_cg_arg_md;
-  CgArg ***frm_cg_arg_mc;
-  //!< Pointer to an array of structures containing solver parameters.
-  /*!<
-    These are the parameters corresponding to each of the dynamical fermion
-    masses.      
-  */
+    //!<  frm_cg_arg_fg is specific to force gradient integrator and has no use otherwise.
+    CgArg ***frm_cg_arg_fg;
+    CgArg ***frm_cg_arg_md;
+    CgArg ***frm_cg_arg_mc;
+    //!< Pointer to an array of structures containing solver parameters.
+    /*!<
+      These are the parameters corresponding to each of the dynamical fermion
+      masses.      
+    */
 
-  Vector** frmn;
-  //!< Array of vectors
-  /*!< These will hold the solutions from the solves. */
+    Vector** frmn;
+    //!< Array of vectors
+    /*!< These will hold the solutions from the solves. */
   
-  Vector** frmn_d;
-  //!< Array of vectors
-  /*!< These will hold the solutions from the solves multiplied by
-    the D-slash operator. */ 
+    Vector** frmn_d;
+    //!< Array of vectors
+    /*!< These will hold the solutions from the solves multiplied by
+      the D-slash operator. */ 
   
-  Vector** frmn_tmp;
-  //!< Used for Asqtad fraction splitting
+    Vector** frmn_tmp;
+    //!< Used for Asqtad fraction splitting
 
-  int total_size;
-  //!< The sum of the rational approximation degrees used for the force
+    int total_size;
+    //!< The sum of the rational approximation degrees used for the force
 
-  int max_size;
-  //!< The maximum degree of rational approximation used for the force
+    int max_size;
+    //!< The maximum degree of rational approximation used for the force
   
-  Float *all_res;
-  //!< An array holding the residues - used for asqtad force
+    Float *all_res;
+    //!< An array holding the residues - used for asqtad force
 
-  EigArg eig_arg;
-  //!< AlgEig parameters
+    EigArg eig_arg;
+    //!< AlgEig parameters
 
-  char eig_file[256];
-  //!< Used to store eigenvalue filename
+    char eig_file[256];
+    //!< Used to store eigenvalue filename
 
-  CommonArg ca_eig;
-  //!< Used to store eigenvalue filename
+    CommonArg ca_eig;
+    //!< Used to store eigenvalue filename
 
-  Float **lambda_low;
-  Float **lambda_high;
-  //!< Used to store calculated eigenvalue bounds
+    Float **lambda_low;
+    Float **lambda_high;
+    //!< Used to store calculated eigenvalue bounds
 
-  //!< Automatic generation of the rational approximation.
-  void generateApprox(Float *mass, RemezArg **remez_arg_md, 
-		      RemezArg **remez_arg_mc, RationalDescr *rat);
+    //!< Automatic generation of the rational approximation.
+    void generateApprox(Float *mass, RemezArg **remez_arg_md, 
+                        RemezArg **remez_arg_mc, RationalDescr *rat);
   
-  //<! Free approximations
-  void destroyApprox(RemezArg *remez_arg_md, RemezArg *remez_arg_mc);
+    //<! Free approximations
+    void destroyApprox(RemezArg *remez_arg_md, RemezArg *remez_arg_mc);
   
-  //!< Allocate and setup cg arguments
-  void generateCgArg(Float *mass,
-                     CgArg **** cg_arg_fg,
-                     CgArg **** cg_arg_md, 
-		     CgArg **** cg_arg_mc, const char *label, 
-		     RationalDescr *rat_des);
+    //!< Allocate and setup cg arguments
+    void generateCgArg(Float *mass,
+                       CgArg **** cg_arg_fg,
+                       CgArg **** cg_arg_md, 
+                       CgArg **** cg_arg_mc, const char *label, 
+                       RationalDescr *rat_des);
 
-  //<! Free cg args
-  void destroyCgArg(CgArg ***cg_arg_fg,
-                    CgArg ***cg_arg_md,
-                    CgArg ***cg_arg_mc,
-		    const char *label, RemezArg *remez_arg_md,
-		    RemezArg *remez_arg_mc);
+    //<! Free cg args
+    void destroyCgArg(CgArg ***cg_arg_fg,
+                      CgArg ***cg_arg_md,
+                      CgArg ***cg_arg_mc,
+                      const char *label, RemezArg *remez_arg_md,
+                      RemezArg *remez_arg_mc);
 
-  //!< Automatic generation of required EigArg
-  void generateEigArg(EigenDescr eigen);
+    //!< Automatic generation of required EigArg
+    void generateEigArg(EigenDescr eigen);
 
-  //!< Free EigArg
-  void destroyEigArg();
+    //!< Free EigArg
+    void destroyEigArg();
 
-  void checkApprox(Float *mass, RemezArg *remez_arg, EigenDescr eigen);
-  //!< Check that the approximation is still valid
+    void checkApprox(Float *mass, RemezArg *remez_arg, EigenDescr eigen);
+    //!< Check that the approximation is still valid
 
- public:
+public:
 
-  AlgActionRational();
-  AlgActionRational(AlgMomentum &mom, ActionRationalArg &rat_arg, int traj_num=0);
-  AlgActionRational(AlgMomentum &mom, ActionBilinearArg &bi_arg);
-  virtual ~AlgActionRational();
+    AlgActionRational();
+    AlgActionRational(AlgMomentum &mom, ActionRationalArg &rat_arg, int traj_num=0);
+    AlgActionRational(AlgMomentum &mom, ActionBilinearArg &bi_arg);
+    virtual ~AlgActionRational();
 
-  void heatbath();
-  Float energy();
+    void heatbath();
+    Float energy();
 
-  // Calculate preliminary force for force gradient
-  virtual void prepare_fg(Matrix * force, Float dt_ratio);
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
-  //!< evolve method relevant to split timescales
-  void evolve(Float dt, int steps, int **fractionSplit);
+    // Calculate preliminary force for force gradient
+    virtual void prepare_fg(Matrix * force, Float dt_ratio);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
+    //!< evolve method relevant to split timescales
+    void evolve(Float dt, int steps, int **fractionSplit);
 
-  //!< Compare two approximations to avoid recalculation if possible
-  static int compareApprox(RemezArg &, RemezArg &);
+    //!< Compare two approximations to avoid recalculation if possible
+    static int compareApprox(RemezArg &, RemezArg &);
 
-  void init(int traj_num);
+    void init(int traj_num);
 
-  void setSplit(int i, int j);
-  //!< Set mass i, pole j as included
-  void checkSplit();
-  //!< Check that all the partial fractions have been accounted for
+    void setSplit(int i, int j);
+    //!< Set mass i, pole j as included
+    void checkSplit();
+    //!< Check that all the partial fractions have been accounted for
   
 };
 
@@ -529,30 +531,30 @@ class AlgActionRational : public AlgActionBilinear {
 */
 class AlgActionRationalSplit : public AlgActionRational {
 
- private:
-  char *cname;
-  AlgActionRational *rat;
-  ActionRationalSplitArg *rat_split_arg;
-  int **fractionSplit;
+private:
+    const char *cname;
+    AlgActionRational *rat;
+    ActionRationalSplitArg *rat_split_arg;
+    int **fractionSplit;
 
- public:
-  AlgActionRationalSplit(AlgActionRational &rat, 
-			 ActionRationalSplitArg &rat_split_arg); 
+public:
+    AlgActionRationalSplit(AlgActionRational &rat, 
+                           ActionRationalSplitArg &rat_split_arg); 
 			 
-  virtual ~AlgActionRationalSplit();
+    virtual ~AlgActionRationalSplit();
 
-  void heatbath();
-  Float energy();
+    void heatbath();
+    Float energy();
 
-  // Calculate preliminary force for force gradient
-  void prepare_fg(Matrix * force, Float dt_ratio);
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    // Calculate preliminary force for force gradient
+    void prepare_fg(Matrix * force, Float dt_ratio);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
   
-  int getNmass();
-  Float getMass(int);
+    int getNmass();
+    Float getMass(int);
 
-  void cost(CgStats*);
+    void cost(CgStats*);
 };
 
 /*!< 
@@ -562,26 +564,26 @@ class AlgActionRationalSplit : public AlgActionRational {
 */
 class AlgActionBoson : public AlgActionBilinear {
 
- private:
-  char *cname;
+private:
+    const char *cname;
 
-  ActionBosonArg *bsn_arg;
-  CgArg **bsn_cg_arg;   //!< Pointer to an array of solver parameters.
+    ActionBosonArg *bsn_arg;
+    CgArg **bsn_cg_arg;   //!< Pointer to an array of solver parameters.
 
- public:
+public:
 
-  AlgActionBoson(AlgMomentum &mom, ActionBosonArg &boson_arg);
-  virtual ~AlgActionBoson();
+    AlgActionBoson(AlgMomentum &mom, ActionBosonArg &boson_arg);
+    virtual ~AlgActionBoson();
   
-  void heatbath();
+    void heatbath();
 
-  Float energy();
+    Float energy();
 
-  // Calculate preliminary force for force gradient
-  virtual void prepare_fg(Matrix * force, Float dt_ratio);
+    // Calculate preliminary force for force gradient
+    virtual void prepare_fg(Matrix * force, Float dt_ratio);
 
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 };
 
 /*!< 
@@ -594,49 +596,49 @@ class AlgActionBoson : public AlgActionBilinear {
 */
 class AlgActionFermion : public AlgActionBilinear {
 
- private:
-  char *cname;
+private:
+    const char *cname;
 
-  ActionFermionArg *frm_arg;
+    ActionFermionArg *frm_arg;
 
-  CgArg **frm_cg_arg_md;   //!< Pointer to an array of solver parameters.
-  CgArg **frm_cg_arg_fg;   //!< Pointer to an array of solver parameters for force gradient step
-  CgArg **frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
+    CgArg **frm_cg_arg_md;   //!< Pointer to an array of solver parameters.
+    CgArg **frm_cg_arg_fg;   //!< Pointer to an array of solver parameters for force gradient step
+    CgArg **frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
 
-  int evolved;
-  Float h_init;
+    int evolved;
+    Float h_init;
 
-  //!< Stores the history of cg solutions - used by chronological inversion
-  Vector ***v;
-  Vector ***cg_sol_old;
-  Vector *cg_sol;
+    //!< Stores the history of cg solutions - used by chronological inversion
+    Vector ***v;
+    Vector ***cg_sol_old;
+    Vector *cg_sol;
 
-  //!< Stores the orthogonalised vectors multiplied by MatPcDagMatPc
-  //!< These currently live in AlgActionFermion for a future
-  //!< optimisation (chronological preconditioner)
-  Vector ***vm;
+    //!< Stores the orthogonalised vectors multiplied by MatPcDagMatPc
+    //!< These currently live in AlgActionFermion for a future
+    //!< optimisation (chronological preconditioner)
+    Vector ***vm;
 
-  int *chrono;
+    int *chrono;
 
-  // !< Status variable controls if we can use the CG solution from a
-  // !< previous force gradient solve to forecast the next normal solve.
-  bool fg_forecast;
+    // !< Status variable controls if we can use the CG solution from a
+    // !< previous force gradient solve to forecast the next normal solve.
+    bool fg_forecast;
 
- public:
+public:
 
-  AlgActionFermion(AlgMomentum &mom, ActionFermionArg &frm_arg);
-  virtual ~AlgActionFermion();
+    AlgActionFermion(AlgMomentum &mom, ActionFermionArg &frm_arg);
+    virtual ~AlgActionFermion();
   
-  void heatbath();
+    void heatbath();
 
-  Float energy();
+    Float energy();
 
-  // Calculate preliminary force for force gradient
-  virtual void prepare_fg(Matrix * force, Float dt_ratio);
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    // Calculate preliminary force for force gradient
+    virtual void prepare_fg(Matrix * force, Float dt_ratio);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 
-  void init();
+    void init();
 };
 
 /*!< 
@@ -651,62 +653,63 @@ class AlgActionFermion : public AlgActionBilinear {
 */
 class AlgActionQuotient : public AlgActionBilinear {
 
- private:
-  char *cname;
+private:
+    const char *cname;
 
-  ActionQuotientArg *quo_arg;
+    ActionQuotientArg *quo_arg;
 
-  CgArg **bsn_cg_arg;   //!< Pointer to an array of solver parameters.
+    vector<CgArg> bsn_cg_arg;   //!< Pointer to an array of solver parameters.
 
-  //!< Pointer to an array of solver parameters, for force gradient
-  //!< step, irrevelant if using other integrators.
-  CgArg **frm_cg_arg_fg;
-  CgArg **frm_cg_arg_md;   //!< Pointer to an array of solver parameters.
-  CgArg **frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
+    //!< Pointer to an array of solver parameters, for force gradient
+    //!< step, irrevelant if using other integrators.
+    vector<CgArg> frm_cg_arg_fg;
 
-  Float *bsn_mass;  //!< The boson mass parameter that appears in the quotient
-      // ~~added for twisted mass Wilson fermions
-  Float *bsn_mass_epsilon;  //!< The boson mass parameter that appears in the quotient
-  Float *frm_mass;  //!< The fermion mass parameter that appears in the quotient
-      // ~~added for twisted mass Wilson fermions
-  Float *frm_mass_epsilon;  //!< The fermion mass parameter that appears in the quotient
+    vector<CgArg> frm_cg_arg_md;   //!< Pointer to an array of solver parameters.
+    vector<CgArg> frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
 
-  int evolved;
-  Float h_init;
+    vector<Float> bsn_mass; //!< The boson mass parameter that appears in the quotient
+    vector<Float> frm_mass; //!< The fermion mass parameter that appears in the quotient
 
-  //!< Stores the history of cg solutions - used by chronological inversion
-  Vector ***v;
-  Vector ***cg_sol_old;
-  Vector *cg_sol;
-  Vector *tmp1;
-  Vector *tmp2;
+    // ~~added for twisted mass Wilson fermions
+    vector<Float> bsn_mass_epsilon; //!< The boson mass parameter that appears in the quotient
+    vector<Float> frm_mass_epsilon; //!< The fermion mass parameter that appears in the quotient
 
-  //!< Stores the orthogonalised vectors multiplied by MatPcDagMatPc
-  //!< These currently live in AlgActionQuotient for a future
-  //!< optimisation (chronological preconditioner)
-  Vector ***vm;
+    int evolved;
+    Float h_init;
 
-  int *chrono;
+    //!< Stores the history of cg solutions - used by chronological inversion
+    Vector ***v;
+    Vector ***cg_sol_old;
+    Vector *cg_sol;
+    Vector *tmp1;
+    Vector *tmp2;
 
-  // !< Status variable controls if we can use the CG solution from a
-  // !< previous force gradient solve to forecast the next normal solve.
-  bool fg_forecast;
- public:
+    //!< Stores the orthogonalised vectors multiplied by MatPcDagMatPc
+    //!< These currently live in AlgActionQuotient for a future
+    //!< optimisation (chronological preconditioner)
+    Vector ***vm;
 
-  AlgActionQuotient(AlgMomentum &mom, ActionQuotientArg &frm_arg);
-  virtual ~AlgActionQuotient();
+    vector<int> chrono;
+
+    // !< Status variable controls if we can use the CG solution from a
+    // !< previous force gradient solve to forecast the next normal solve.
+    bool fg_forecast;
+public:
+
+    AlgActionQuotient(AlgMomentum &mom, ActionQuotientArg &frm_arg);
+    virtual ~AlgActionQuotient();
   
-  void reweight(Float *rw_fac,Float *norm);
-  void heatbath();
+    void reweight(Float *rw_fac,Float *norm);
+    void heatbath();
 
-  Float energy();
+    Float energy();
 
-  // Calculate preliminary force for force gradient
-  virtual void prepare_fg(Matrix * force, Float dt_ratio);
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    // Calculate preliminary force for force gradient
+    virtual void prepare_fg(Matrix * force, Float dt_ratio);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 
-  void init();
+    void init();
 };
 
 /*!< 
@@ -721,50 +724,54 @@ class AlgActionQuotient : public AlgActionBilinear {
 */
 class AlgActionRationalQuotient : public AlgActionRational {
 
- private:
-  char *cname;
-  int **fractionSplit;
-  ActionRationalQuotientArg *rat_quo_arg;
+private:
+    const char *cname;
+    int **fractionSplit;
+    ActionRationalQuotientArg *rat_quo_arg;
 
- protected:
+protected:
 
-  Float *bsn_mass;  //!< The boson mass parameter that appears in the quotient
-  Float *frm_mass;  //!< The fermion mass parameter that appears in the quotient
-  //!< This is where the rational parameters are stored
-  RemezArg *frm_remez_arg_md;
-  RemezArg *frm_remez_arg_mc;
-  RemezArg *bsn_remez_arg_md;
-  RemezArg *bsn_remez_arg_mc;
+    Float *bsn_mass;  //!< The boson mass parameter that appears in the quotient
+    Float *frm_mass;  //!< The fermion mass parameter that appears in the quotient
+    //!< This is where the rational parameters are stored
+    RemezArg *frm_remez_arg_md;
+    RemezArg *frm_remez_arg_mc;
+    RemezArg *bsn_remez_arg_md;
+    RemezArg *bsn_remez_arg_mc;
 
-  //!<  bsn_cg_arg_fg is specific to force gradient integrator and has no use otherwise.
-  CgArg ***bsn_cg_arg_fg;
-  CgArg ***bsn_cg_arg_md;
-  CgArg ***bsn_cg_arg_mc;
-  //!< Pointer to an array of structures containing solver parameters.
-  /*!<
-    These are the parameters corresponding to each of the dynamical fermion
-    masses.      
-  */
+    //!<  bsn_cg_arg_fg is specific to force gradient integrator and has no use otherwise.
+    CgArg ***bsn_cg_arg_fg;
+    CgArg ***bsn_cg_arg_md;
+    CgArg ***bsn_cg_arg_mc;
+    //!< Pointer to an array of structures containing solver parameters.
+    /*!<
+      These are the parameters corresponding to each of the dynamical fermion
+      masses.      
+    */
 
-  Vector **eta; //!< Use to accumulate solver results
+    Vector **eta; //!< Use to accumulate solver results
 
- public:
+public:
 
-  AlgActionRationalQuotient();
-  AlgActionRationalQuotient(AlgMomentum &mom, 
-			    ActionRationalQuotientArg &rat_quo_arg, int traj_num=0);
-  virtual ~AlgActionRationalQuotient();
+    AlgActionRationalQuotient();
+    AlgActionRationalQuotient(AlgMomentum &mom, 
+                              ActionRationalQuotientArg &rat_quo_arg, int traj_num=0);
+    virtual ~AlgActionRationalQuotient();
 
-  void reweight(Float *rw_fac,Float *norm);
-  void heatbath();
-  Float energy();
+    void reweight(Float *rw_fac,Float *norm);
+    void heatbath();
+    Float energy();
 
-  // Calculate preliminary force for force gradient
-  virtual void prepare_fg(Matrix * force, Float dt_ratio);
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
-  //!< evolve method relevant to split timescales
-  void evolve(Float dt, int steps, int **fractionSplit);
+    // Calculate preliminary force for force gradient
+    virtual void prepare_fg(Matrix * force, Float dt_ratio);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
+    //!< evolve method relevant to split timescales
+    void evolve(Float dt, int steps, int **fractionSplit);
+
+    bool loadPoles(void);
+    bool savePoles(void);
+    bool checkPolesFile(const RemezArg &md, const RemezArg &mc, const RationalDescr &r);
 };
 
 /*!< 
@@ -773,28 +780,28 @@ class AlgActionRationalQuotient : public AlgActionRational {
 */
 class AlgActionGauge : public AlgAction {
 
- private:
-  char *cname;
-  ActionGaugeArg *gauge_arg;
-  GclassType gluon;
+private:
+    const char *cname;
+    ActionGaugeArg *gauge_arg;
+    GclassType gluon;
 
- public:
+public:
 
-  AlgActionGauge(AlgMomentum &mom, ActionGaugeArg &gauge_arg);
-  virtual ~AlgActionGauge();
+    AlgActionGauge(AlgMomentum &mom, ActionGaugeArg &gauge_arg);
+    virtual ~AlgActionGauge();
 
-  void heatbath();
+    void heatbath();
 
-  Float energy();
+    Float energy();
 
-  //!< preparation for force gradient evolution
-  virtual void prepare_fg(Matrix * force, Float dt_ratio);
-  //!< evolve method evolves the integrator
-  void evolve(Float dt, int steps);
+    //!< preparation for force gradient evolution
+    virtual void prepare_fg(Matrix * force, Float dt_ratio);
+    //!< evolve method evolves the integrator
+    void evolve(Float dt, int steps);
 
-  void cost(CgStats*);
+    void cost(CgStats*);
 
-  void init();
+    void init();
 
 };
 

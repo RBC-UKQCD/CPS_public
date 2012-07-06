@@ -248,7 +248,7 @@ class Fwilson : public virtual FwilsonTypes
 class FwilsonTm : public virtual Fwilson
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
     
  public:
 
@@ -308,7 +308,7 @@ class FwilsonTm : public virtual Fwilson
 class Fclover : public virtual FwilsonTypes
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
     void EvolveMomFforceSupp(Matrix *mom, Vector *v1, Vector *v2,
 		 Vector *v3, Vector *v4, Float mass, Float step_size);
@@ -468,7 +468,7 @@ class Fclover : public virtual FwilsonTypes
 class FdwfBase : public virtual FwilsonTypes
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
     
  public:
 
@@ -696,7 +696,7 @@ class FdwfBase : public virtual FwilsonTypes
 //------------------------------------------------------------------
 class Fdwf : public FdwfBase {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
     
  public:
 

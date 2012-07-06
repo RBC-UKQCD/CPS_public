@@ -7,19 +7,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.23 2011-07-13 17:56:53 chulwoo Exp $
+  $Id: enum.x,v 1.24 2012-07-06 20:22:08 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2011-07-13 17:56:53 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.23 2011-07-13 17:56:53 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.23 2011-07-13 17:56:53 chulwoo Exp $*/
+/*  $Date: 2012-07-06 20:22:08 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.24 2012-07-06 20:22:08 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.24 2012-07-06 20:22:08 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.23 $*/
+/*  $Revision: 1.24 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -50,7 +50,8 @@ enum FclassType {
     F_CLASS_ASQTAD,
     F_CLASS_P4,
     F_CLASS_WILSON_TM,
-    F_CLASS_MDWF
+    F_CLASS_MDWF,
+    F_CLASS_BFM
 };
 
 
@@ -842,4 +843,25 @@ enum CalcSeqType {
  WRITE_SEQ
 } ;
 
-
+/* we have to add a prefix (here I choose it to be BFM_) to all names to avoid naming collision. */
+/* keep this list in sync with bfm releases. */
+enum BfmSolverType {
+ BFM_DWF, 
+ BFM_DWFrb4d, 
+ BFM_WilsonFermion, 
+ BFM_WilsonTM, 
+ BFM_WilsonNN,
+ BFM_HwPartFracZolo, 
+ BFM_HwContFracZolo, 
+ BFM_HwPartFracTanh, 
+ BFM_HwContFracTanh, 
+ BFM_HwCayleyZolo, 
+ BFM_HtCayleyZolo, 
+ BFM_HwCayleyTanh, 
+ BFM_HmCayleyTanh, 
+ BFM_HtCayleyTanh, 
+ BFM_DWFTransfer, 
+ BFM_DWFTransferInv, 
+ BFM_HtContFracTanh, 
+ BFM_HtContFracZolo
+};

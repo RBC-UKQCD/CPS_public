@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgPbp class.
   
-  $Id: alg_pbp.C,v 1.13 2006-02-21 21:14:07 chulwoo Exp $
+  $Id: alg_pbp.C,v 1.14 2012-07-06 20:22:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 21:14:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.13 2006-02-21 21:14:07 chulwoo Exp $
-//  $Id: alg_pbp.C,v 1.13 2006-02-21 21:14:07 chulwoo Exp $
+//  $Date: 2012-07-06 20:22:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v 1.14 2012-07-06 20:22:08 chulwoo Exp $
+//  $Id: alg_pbp.C,v 1.14 2012-07-06 20:22:08 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_pbp.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pbp/alg_pbp.C,v $
 //  $State: Exp $
 //
@@ -55,6 +55,7 @@ CPS_START_NAMESPACE
 #undef POINT
 #define Z2
 #undef Z2
+
 //------------------------------------------------------------------
 /*!
   \param latt The lattice on which to compute the condensate.
@@ -166,7 +167,7 @@ void AlgPbp::run()
   //----------------------------------------------------------------
   // Domain Wall fermions
   //----------------------------------------------------------------
-  if(lat.Fclass() == F_CLASS_DWF){
+  if(lat.Fclass() == F_CLASS_DWF || lat.Fclass() == F_CLASS_BFM){
     ls = GJP.SnodeSites();
     ls_glb = GJP.Snodes() * GJP.SnodeSites();
 
@@ -230,9 +231,15 @@ void AlgPbp::run()
       iter = lat.FmatInv(sol, src, cg_arg, &true_res, CNV_FRM_YES);
 
       // Calculate the pbp normalization factor 
-      pbp_norm = (4.0 + GJP.DwfA5Inv() - GJP.DwfHeight())
-	* GJP.VolSites() 
-	* ( lat.FsiteSize() / (2 * GJP.SnodeSites()) );  
+      pbp_norm = GJP.VolSites() * lat.Colors() * lat.SpinComponents();
+      if(lat.Fclass() == F_CLASS_DWF) {
+          pbp_norm *= 4.0 + GJP.DwfA5Inv() - GJP.DwfHeight();
+      }
+      // pbp_norm = (4.0 + GJP.DwfA5Inv() - GJP.DwfHeight())
+      //   * GJP.VolSites() 
+      //   * ( lat.FsiteSize() / (2 * GJP.SnodeSites()) );  
+
+      VRB.Result(cname, fname, "pbp_norm = %17.10e\n", pbp_norm);
 
       if (pbp_arg->snk_loop) {
 	// Loop over sink - source separation
@@ -628,7 +635,7 @@ void AlgPbp::runPointSource(int x, int y, int z, int t)
   //----------------------------------------------------------------
   // Domain Wall fermions
   //----------------------------------------------------------------
-  if(lat.Fclass() == F_CLASS_DWF){
+  if(lat.Fclass() == F_CLASS_DWF || lat.Fclass() == F_CLASS_BFM){
     ls = GJP.SnodeSites();
     ls_glb = GJP.Snodes() * GJP.SnodeSites();
 

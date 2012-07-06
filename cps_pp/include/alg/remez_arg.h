@@ -39,6 +39,30 @@ public:
 	   RemezArg (  ) ;
 };
 
+class VML;
+class RationalQuotientRemezArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	struct {
+		u_int bsn_md_len;
+		RemezArg *bsn_md_val;
+	} bsn_md;
+	struct {
+		u_int bsn_mc_len;
+		RemezArg *bsn_mc_val;
+	} bsn_mc;
+	struct {
+		u_int frm_md_len;
+		RemezArg *frm_md_val;
+	} frm_md;
+	struct {
+		u_int frm_mc_len;
+		RemezArg *frm_mc_val;
+	} frm_mc;
+};
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -47,9 +71,11 @@ extern "C" {
 
 #if defined(__STDC__) || defined(__cplusplus)
 extern  bool_t vml_RemezArg (VML *, char *instance, RemezArg*);
+extern  bool_t vml_RationalQuotientRemezArg (VML *, char *instance, RationalQuotientRemezArg*);
 
 #else /* K&R C */
 extern  bool_t vml_RemezArg (VML *, char *instance, RemezArg*);
+extern  bool_t vml_RationalQuotientRemezArg (VML *, char *instance, RationalQuotientRemezArg*);
 
 #endif /* K&R C */
 
