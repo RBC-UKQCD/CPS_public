@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definition of Vector and Matrix classes.
 
   Definitions of functions that perform operations on complex vectors.
-  $Id: vector.C,v 1.10 2008-01-28 20:23:09 chulwoo Exp $
+  $Id: vector.C,v 1.11 2012-07-09 15:51:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-01-28 20:23:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.10 2008-01-28 20:23:09 chulwoo Exp $
-//  $Id: vector.C,v 1.10 2008-01-28 20:23:09 chulwoo Exp $
+//  $Date: 2012-07-09 15:51:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.11 2012-07-09 15:51:32 chulwoo Exp $
+//  $Id: vector.C,v 1.11 2012-07-09 15:51:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v $
 //  $State: Exp $
 //
@@ -27,11 +27,6 @@ CPS_END_NAMESPACE
 #include <comms/glb.h>
 CPS_START_NAMESPACE
 
-
-//------------------------------------------------------------------
-
-Matrix::Matrix()
-{}
 
 //------------------------------------------------------------------
 /*!
