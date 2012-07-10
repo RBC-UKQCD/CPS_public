@@ -68,6 +68,7 @@ class QioArg {
  public:
   Matrix * StartConfLoadAddr;
   char FileName[256];
+//  string FileName;
   int ConcurIONumber;
 
   Float CheckPrecision;  // used in read

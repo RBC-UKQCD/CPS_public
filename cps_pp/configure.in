@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2012-07-06 20:22:08 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.79 2012-07-06 20:22:08 chulwoo Exp $
-dnl  $Id: configure.in,v 1.79 2012-07-06 20:22:08 chulwoo Exp $
+dnl  $Date: 2012-07-10 05:26:20 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.80 2012-07-10 05:26:20 chulwoo Exp $
+dnl  $Id: configure.in,v 1.80 2012-07-10 05:26:20 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.79 $
+dnl  $Revision: 1.80 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -405,6 +405,7 @@ dnl   fi
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
       LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm"
+   enable_xml="yes"
 fi
 
 if test "$enable_xml" != "no"; then

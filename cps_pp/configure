@@ -5448,6 +5448,7 @@ if test "$enable_bfm" != "no"; then
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
       LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm"
+   enable_xml="yes"
 fi
 
 if test "$enable_xml" != "no"; then
