@@ -336,6 +336,8 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
     if(isRoot()) {
       FILE *fp = Fopen(wt_arg.FileName,"w");
       Fclose(fp);
+      fp = Fopen(name_4d.c_str(),"w");
+      Fclose(fp);
 	  
       output.open(wt_arg.FileName);
     output_4d.open(name_4d.c_str());
@@ -356,8 +358,11 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   // write header
   if(isRoot()) {
     hd.init(wt_arg, intconv.fileFormat);
+	VRB.Result(cname,fname,"Writing header for %s\n",wt_arg.FileName);
     hd.write(output);
+	VRB.Result(cname,fname,"Writing header for %s\n",name_4d.c_str());
     hd.write(output_4d);
+	VRB.Result(cname,fname,"Done\n");
   }
   broadcastInt(&hd.data_start); // from 0 to all
   log();
