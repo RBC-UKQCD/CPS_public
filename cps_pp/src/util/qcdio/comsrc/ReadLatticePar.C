@@ -42,8 +42,9 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   if(synchronize(error) != 0)
     ERR.FileR(cname, fname, rd_arg.FileName);
   log();
-
-  broadcastInt(&hd.data_start);
+  int temp_start = hd.data_start;
+  broadcastInt(&temp_start);
+  hd.data_start = temp_start;
   broadcastInt(&hd.recon_row_3);
   //  cout << "recon_row_3 = " << hd.recon_row_3 << endl;
 
