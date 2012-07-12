@@ -93,6 +93,7 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
   //
   getIOTimeSlot();
 
+  if (hd.dataStart()>0) 
   input.seekg(hd.dataStart(),ios_base::beg);
 
   int jump = 0;
@@ -117,7 +118,7 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
              goto sync_error;
            }
 #else
-            unsigned int r_pos = input.tellg();
+            streampos r_pos = input.tellg();
             long long lcsum=-1,lcsum2=-1;
             do {
               lcsum2=lcsum;
@@ -264,10 +265,11 @@ int ParallelIO::store(iostream & output,
   int retry=0;
 do {
   if(dimension ==5 || wt_arg.Scoor() == 0) { // this line differs from read()
-    output.seekp(hd.data_start,ios_base::beg);
+  if (hd.dataStart()>0) 
+    output.seekp(hd.dataStart(),ios_base::beg);
 
     int jump=0;
-    unsigned long long  r_pos=0, w_pos;
+    streampos  r_pos=0, w_pos;
     if(dimension==5) jump = sbegin * sblk;
 
     for(int sr=sbegin; dimension==4 || sr<send; sr++) {
@@ -425,16 +427,25 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
     if ( !input.good() )
       error = 1;
   }
+  	VRB.Result(cname,fname,"%s opened sizeof(streamoff)=%d\n",rd_arg.FileName,sizeof(streamoff));
 
   // executed by all, sync and share error status information
   if(synchronize(error) != 0)   
     ERR.FileR(cname, fname, rd_arg.FileName);
+ VRB.Result(cname,fname,"error = %d\n",error);
 
   // TempBufAlloc is a Mem Allocator that prevents mem leak on function exits
   TempBufAlloc fbuf(chars_per_site);
+  VRB.Result(cname,fname,"fbuf done\n");
   TempBufAlloc rng(data_per_site * dconv.hostDataSize());
+  VRB.Result(cname,fname,"rng done\n");
 
-  if(isNode0())   input.seekg(hd.dataStart(),ios_base::beg);
+  VRB.Result(cname,fname,"Node %d: dataStart() = %d\n",UniqueID(),(streamoff)hd.dataStart());
+  if(isNode0())
+  if ((streamoff)hd.dataStart()>0) {
+	   input.seekg(hd.dataStart(),ios_base::beg);
+  	VRB.Result(cname,fname,"Node %d: pos = %d\n",UniqueID(),(streamoff)input.tellg());
+  }
   
   
   int global_id = 0;
@@ -448,6 +459,8 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
   for(int sc=0; dimension==4 || sc<ns; sc++) {
     for(int tc=0;tc<nt;tc++) {
       for(int zc=0;zc<nz;zc++) {
+		if(hd.headerType() == LatHeaderBase::LATTICE_HEADER) 
+		VRB.Result(cname,fname,"%d %d %d %d %d\n",0,0,zc,tc,sc);
 	for(int yc=0;yc<ny;yc++) {
 	  for(int xnd=0; xnd<rd_arg.Xnodes(); xnd++) {
 	    if(isNode0()) { // only node 0 reads
@@ -558,11 +571,12 @@ int SerialIO::store(iostream & output,
   unsigned int csum = 0, pdcsum = 0;
   Float RandSum = 0, Rand2Sum = 0;
   UGrandomGenerator * ugran = (UGrandomGenerator*)data;
-//if(hd.headerType() != LatHeaderBase::LATTICE_HEADER)
-//  printf("Node %d: ugran[0]=%e\n",UniqueID(),ugran[0].Urand(0,1));
+  VRB.Result(cname,fname,"Node %d: pos = %d\n",UniqueID(),output.tellp());
   int global_id = 0;
 
+  if (hd.dataStart()>0) 
   output.seekp(hd.dataStart(), ios_base::beg);
+  VRB.Result(cname,fname,"Node %d: pos = %d\n",UniqueID(),output.tellp());
 
   VRB.Result(cname, fname, "Serial unloading <thru node 0> starting\n");
   for(int sc=0; dimension==4 || sc<ns; sc++) {

@@ -52,7 +52,7 @@ class LatHeaderBase {
     LATRNG_HEADER
   };
   virtual enum HEADER_TYPES headerType() const = 0;
-  virtual int dataStart() const = 0;
+  virtual streamoff dataStart() const = 0;
   virtual void read(istream & fin) = 0;
   virtual void write(ostream & fout) = 0;
   virtual void fillInCheckInfo(ostream & fout, unsigned int cs, unsigned int pdcs,
@@ -62,7 +62,7 @@ class LatHeaderBase {
   LatHeaderBase() { }
   virtual ~LatHeaderBase() { }
 
-  int data_start;
+  streamoff data_start;
 
  protected:
   GCFheaderPar hd;
@@ -110,7 +110,7 @@ class LatticeHeader : public LatHeaderBase {
   void show() const { hd.Show(); }
 
   enum HEADER_TYPES headerType() const { return LATTICE_HEADER; }
-  int dataStart() const { return data_start; }
+  streamoff dataStart() const { return data_start; }
   void fillInCheckInfo(ostream & fout, unsigned int cs, unsigned int pdcs,
 		       const Float calc1, const Float calc2) const {
     fillInChecksum(fout, cs);
@@ -183,7 +183,7 @@ class LatRngHeader : public LatHeaderBase {
   
   void read(istream & fin);
 
-  int dataStart() const { return data_start; }
+  streamoff dataStart() const { return data_start; }
   
   void show() const { hd.Show(); }
 
