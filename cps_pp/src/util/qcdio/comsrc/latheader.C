@@ -193,6 +193,7 @@ void LatticeHeader::setHeader(const char * EnsembleId, const char * EnsembleLabe
 }
 
 void LatticeHeader::write(ostream & fout) {
+  const char *fname="write(ostream&)";
   fout.seekp(0,ios::beg);
   fout << "BEGIN_HEADER" << endl;
   fout << "HDR_VERSION = " << hdr_version << endl;
@@ -232,6 +233,7 @@ void LatticeHeader::write(ostream & fout) {
   fout << "END_HEADER" << endl;
   
   data_start = fout.tellp();
+  VRB.Result("LatticeHeader",fname,"data_start=%d csum_pos=%d\n",data_start.csum_pos);
 }
 
 
@@ -346,6 +348,7 @@ void LatRngHeader::init(const QioArg & qio_arg, INT_FORMAT FileFormat) {
 
 
 void LatRngHeader::write(ostream & fout) {
+  const char *fname="write(ostream&)";
   fout.seekp(0,ios::beg);
   fout << "BEGIN_HEADER" << endl;
   fout << "HDR_VERSION = " << hdr_version << endl;
@@ -384,6 +387,7 @@ void LatRngHeader::write(ostream & fout) {
   fout << "END_HEADER" << endl;
   
   data_start = fout.tellp();
+  VRB.Result("LatRngHeader",fname,"data_start=%d csum_pos=%d\n",data_start,csum_pos);
 }
 
 

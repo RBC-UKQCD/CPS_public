@@ -9,13 +9,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-05-14 06:12:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.20 2011-05-14 06:12:35 chulwoo Exp $
-//  $Id: verbose.C,v 1.20 2011-05-14 06:12:35 chulwoo Exp $
+//  $Date: 2012-07-13 15:27:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.21 2012-07-13 15:27:42 chulwoo Exp $
+//  $Id: verbose.C,v 1.21 2012-07-13 15:27:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: verbose.C,v $
-//  $Revision: 1.20 $
+//  $Revision: 1.21 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
 //  $State: Exp $
 //
@@ -192,7 +192,7 @@ void Verbose::Func(const char *class_name, const char *func_name) {
 #endif
     }
     else {
-//	printf("\n");
+	if (!UniqueID()) printf("\n");
     }
     
 } 
@@ -226,7 +226,7 @@ void Verbose::FuncEnd(const char *class_name, const char *func_name){
 #endif
     }
     else {
-//	printf("\n");
+	if (!UniqueID()) printf("\n");
     }
     
 }
