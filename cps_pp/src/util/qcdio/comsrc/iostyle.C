@@ -406,6 +406,7 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
 		   unsigned int * ptrcsum, unsigned int * ptrpdcsum,
 		   Float * rand_sum, Float * rand_2_sum) {
   const char * fname = "load()";
+  VRB.Func(cname,fname);
 
   // only node 0 is responsible for writing
   int error = 0;
@@ -539,6 +540,7 @@ int SerialIO::load(char * data, const int data_per_site, const int site_mem,
   if(rand_sum) *rand_sum = RandSum;
   if(rand_2_sum) *rand_2_sum = Rand2Sum;
 
+  VRB.FuncEnd(cname,fname);
   return 1;
 }
 
@@ -549,6 +551,7 @@ int SerialIO::store(iostream & output,
 		    unsigned int * ptrcsum, unsigned int * ptrpdcsum,
 		    Float * rand_sum, Float * rand_2_sum)  { 
   const char * fname = "store()";
+  VRB.Func(cname,fname);
   
   int error = 0;
 
@@ -571,12 +574,12 @@ int SerialIO::store(iostream & output,
   unsigned int csum = 0, pdcsum = 0;
   Float RandSum = 0, Rand2Sum = 0;
   UGrandomGenerator * ugran = (UGrandomGenerator*)data;
-  VRB.Result(cname,fname,"Node %d: pos = %d\n",UniqueID(),output.tellp());
+  VRB.Result(cname,fname,"Node %d: pos = %d\n",UniqueID(),(streamoff)output.tellp());
   int global_id = 0;
 
   if (hd.dataStart()>0) 
   output.seekp(hd.dataStart(), ios_base::beg);
-  VRB.Result(cname,fname,"Node %d: pos = %d\n",UniqueID(),output.tellp());
+  VRB.Result(cname,fname,"Node %d: pos = %d\n",UniqueID(),(streamoff)output.tellp());
 
   VRB.Result(cname, fname, "Serial unloading <thru node 0> starting\n");
   for(int sc=0; dimension==4 || sc<ns; sc++) {
@@ -660,6 +663,7 @@ int SerialIO::store(iostream & output,
   if(rand_2_sum) *rand_2_sum = Rand2Sum;
 
 
+  VRB.Func(cname,fname);
   return 1;
 }
 

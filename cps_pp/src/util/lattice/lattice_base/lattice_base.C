@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.63 2012-07-06 20:22:08 chulwoo Exp $
+  $Id: lattice_base.C,v 1.64 2012-07-13 15:27:42 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-07-06 20:22:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.63 2012-07-06 20:22:08 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.63 2012-07-06 20:22:08 chulwoo Exp $
+//  $Date: 2012-07-13 15:27:42 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.64 2012-07-13 15:27:42 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.64 2012-07-13 15:27:42 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.63 $
+//  $Revision: 1.64 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -1265,6 +1265,7 @@ Float Lattice::SumReTrPlaq(void) const
   Float sum = SumReTrPlaqNode();
   glb_sum(&sum);
 //  printf("sum= %0.18e\n",sum);
+  VRB.FuncEnd(cname,fname);
   return sum;
 }
 

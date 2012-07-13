@@ -321,9 +321,9 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   log();
 
   // start writing file
-  fstream output,output_4d;
-  string name_4d(wt_arg.FileName);
-  name_4d += ".4d";
+  fstream output;
+//  string name_4d(wt_arg.FileName);
+//  name_4d += ".4d";
 
   if(parIO()) {
     FILE *fp = Fopen(wt_arg.FileName,"w");
@@ -364,8 +364,8 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
     hd.init(wt_arg, intconv.fileFormat);
 	VRB.Result(cname,fname,"Writing header for %s\n",wt_arg.FileName);
     hd.write(output);
-	VRB.Result(cname,fname,"Writing header for %s\n",name_4d.c_str());
-    hd.write(output_4d);
+//	VRB.Result(cname,fname,"Writing header for %s\n",name_4d.c_str());
+//    hd.write(output_4d);
 	VRB.Result(cname,fname,"Done\n");
   }
   int temp_start=(int)hd.data_start;
@@ -400,7 +400,7 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
  
     VRB.Flow(cname,fname,"Start Unloading 4-D RNGs\n");
 
-    if(! pario.store(output_4d, (char*)ugran_4d, size_rng_ints, 
+    if(! pario.store(output, (char*)ugran_4d, size_rng_ints, 
 		     sizeof(UGrandomGenerator), hd, intconv, 4,
 		     &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1]))
       ERR.General(cname, fname, "Unloading Failed\n");
@@ -460,11 +460,11 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
   if(parIO()) {
     output.close();
-	output_4d.close();
+//	output_4d.close();
   } else
     if(isRoot()){
 	  output.close();
-	  output_4d.close();
+//	  output_4d.close();
 	}
   
   io_good = true;
