@@ -233,7 +233,7 @@ void LatticeHeader::write(ostream & fout) {
   fout << "END_HEADER" << endl;
   
   data_start = fout.tellp();
-  VRB.Result("LatticeHeader",fname,"data_start=%d csum_pos=%d\n",data_start.csum_pos);
+  VRB.Result("LatticeHeader",fname,"data_start=%d csum_pos=%d\n",data_start,csum_pos);
 }
 
 
