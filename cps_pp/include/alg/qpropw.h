@@ -25,6 +25,7 @@
 #include <util/rcomplex.h>
 #include <util/vector.h>
 #include <util/wilson.h>
+#include <util/qcdio.h>
 #include <alg/alg_base.h>
 #include <alg/common_arg.h>
 #include <alg/fermion_vector.h>
@@ -70,6 +71,30 @@ protected:
   
   //! The class name
   char *cname; 
+
+  int src_hyper;
+  int hyper_lower[4];
+  int hyper_upper[4];
+
+  int CheckSCfile( char *infile){
+	char *fname = "CheckSCfile(*C)";
+	int sc_part_file_exist=0;
+    char file[256];
+    snprintf(file,256,"%ss%dc%d",infile,3,2);
+    if(FILE* ftmp=Fopen(file,"r")) {
+      sc_part_file_exist =1;
+      VRB.Result(cname,fname, "propagator file with  divided  spin/color sources found: %s", file);
+    } else {
+      sc_part_file_exist =0;
+      VRB.Result(cname,fname, "propagator file with  divided  spin/color sources NOT found: %s", file);
+    }
+	if(UniqueID()) sc_part_file_exist =0;
+    Float sum = sc_part_file_exist;
+    glb_sum(&sum);
+    sc_part_file_exist=sum;
+      VRB.Result(cname,fname, "sc_part_file_exist=%d",sc_part_file_exist);
+	return sc_part_file_exist;
+  } 
   
 public:
 
@@ -143,7 +168,9 @@ public:
   void CG(Lattice &lat, CgArg *arg, FermionVectorTp& source,
         FermionVectorTp& sol , int& iter, Float& true_res);
   void FixSol(FermionVectorTp& sol);
+  void UnfixSol(FermionVectorTp& sol);
   void LoadRow(int spin, int color, FermionVectorTp&, FermionVectorTp&);
+  void SaveRow(int spin, int color, FermionVectorTp&, FermionVectorTp&);
   void SetFileName(char *nm);
   void ShiftPropForward(int n);
   void ShiftPropBackward(int n);
@@ -166,8 +193,8 @@ public:
   //! Comunicate Wilson Matrices...
   WilsonMatrix& GetMatrix(const int *, WilsonMatrix&) const;
 
-  virtual void RestoreQProp(char*, int mid);
-  virtual void SaveQProp(char*, int mid);
+  virtual void RestoreQProp(char*, int mid=0);
+  virtual void SaveQProp(char*, int mid=0);
 
   virtual void RestoreQPropLs(char*, int ls);
   virtual void SaveQPropLs(Vector* sol_5d, char*, int ls);

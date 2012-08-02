@@ -319,6 +319,7 @@ public:
 
   void load_vec(int sink_spin, int sink_color, const wilson_vector&);
   void load_row(int source_spin, int source_color, const wilson_vector&);
+  void save_row(int source_spin, int source_color, wilson_vector&);
   Rcomplex Trace();
   const wilson_matrix& wmat() const; // get p 
   WilsonMatrix& LeftTimesEqual(const WilsonMatrix& rhs);

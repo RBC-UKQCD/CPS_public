@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2012-07-10 05:26:20 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.80 2012-07-10 05:26:20 chulwoo Exp $
-dnl  $Id: configure.in,v 1.80 2012-07-10 05:26:20 chulwoo Exp $
+dnl  $Date: 2012-08-02 21:20:00 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.81 2012-08-02 21:20:00 chulwoo Exp $
+dnl  $Id: configure.in,v 1.81 2012-08-02 21:20:00 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.80 $
+dnl  $Revision: 1.81 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -220,8 +220,8 @@ fi
 dnl -O0 flag should overide any previous optimisation declarations
 AC_ARG_ENABLE(debug, 
 	AC_HELP_STRING([--enable-debug], 
-		[Compile with debug information. (default=no)]),  
-	,[enable_debug="no"])
+		[Compile with debug information. (default=yes)]),  
+	,[enable_debug="yes"])
 AC_MSG_CHECKING([if debugging])
 AC_MSG_RESULT($enable_debug)
 if test "$enable_debug" = "yes"; then

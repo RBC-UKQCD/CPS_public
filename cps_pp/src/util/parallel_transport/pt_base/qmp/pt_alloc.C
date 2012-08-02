@@ -4,7 +4,8 @@
 #include "asq_data_types.h"
 #include "pt_int.h"
 void *PT::Alloc(char *cname, char *fname, char *vname, int request,unsigned
-int flag ){
+int flag, int if_alloc ){
+	if (!if_alloc) return NULL;
     if (request<0){
       printf("Alloc(): %s::%s: %s %d bytes\n",cname,fname,vname,request);
       exit(-42);
@@ -15,7 +16,8 @@ int flag ){
 //    printf("Alloc(): %s::%s: %s %d = %p bytes\n",cname,fname,vname,request,p);
     return p;
 }
-void *PT::FastAlloc(char *cname, char *fname, char *vname, int request ){
+void *PT::FastAlloc(char *cname, char *fname, char *vname, int request ,int if_alloc){
+	if (!if_alloc) return NULL;
    if (request<0){
       printf("FastAlloc(): %s::%s: %s %d bytes\n",cname,fname,vname,request);
       exit(-42);

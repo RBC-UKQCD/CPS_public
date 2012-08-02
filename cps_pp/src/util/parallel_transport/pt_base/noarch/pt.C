@@ -1,21 +1,20 @@
 #include <config.h>
-#ifndef USE_QMP
 /*! \file
   \brief  Functions used by the ParTransAsqtad class.
   
-  $Id: pt.C,v 1.11 2009-04-23 03:33:24 chulwoo Exp $
+  $Id: pt.C,v 1.12 2012-08-02 21:20:01 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-04-23 03:33:24 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.11 2009-04-23 03:33:24 chulwoo Exp $
-//  $Id: pt.C,v 1.11 2009-04-23 03:33:24 chulwoo Exp $
+//  $Date: 2012-08-02 21:20:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.12 2012-08-02 21:20:01 chulwoo Exp $
+//  $Id: pt.C,v 1.12 2012-08-02 21:20:01 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v $
 //  $State: Exp $
 //
@@ -32,6 +31,7 @@ static Lattice  *Lat;
 static int node_sites[5];
 //--------------------------------------------------------------------
 
+#ifndef USE_QMP
 void pt_mat(int N, IFloat **fout, IFloat **fin, const int *dir){
 
     IFloat *u, *v;
@@ -185,6 +185,7 @@ void pt_1vec(int N, IFloat **fout, IFloat **fin, const int *dir){
     }
     ParTrans::PTflops += 66*N*vol;
 }
+#endif
 
 /*! 
   Computes sum[x] = vect2[x] vect[x +/- hop dir]^dagger
@@ -338,6 +339,7 @@ void pt_vvpd(IFloat **vect_v, int n_vect,
 }
 
 
+#ifndef USE_QMP
 void pt_shift_field_vec(IFloat **v_v, const int *dir, int n_dir,
                     int hop, IFloat **u_v){
   char *fname = "pt_shift_field_vec(F**,I*,I,I,F**)";
@@ -859,7 +861,7 @@ void pt_1vec_cb_pad(int n, IFloat *fout, IFloat **fin, const int *dir,ChkbType c
 }
 
 //-----------------------------------------------------------------------------
+#endif //USE_QMP
 
 CPS_END_NAMESPACE
-#endif //USE_QMP
 	

@@ -604,6 +604,9 @@ class FdwfBase : public virtual FwilsonTypes
         // 0 to [GJP.Snodes() * GJP.SnodeSites() - 1]
         // The same 4D field is generarted in all s node slices.
 
+    void Fsolfour2five(Vector *sol_5d, Vector *sol_4d, Vector *src_5d, CgArg *cg_arg);
+    // Recover the 5D solution from the 4D solution, without solve the equation again.
+
     int FeigSolv(Vector **f_eigenv, Float *lambda,
 		 Float *chirality, int *valid_eig,
 		 Float **hsum,

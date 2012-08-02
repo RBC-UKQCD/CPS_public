@@ -1,19 +1,19 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_init.C,v 1.3 2009-05-06 04:10:42 chulwoo Exp $
+  $Id: pt_init.C,v 1.4 2012-08-02 21:20:01 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-05-06 04:10:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_init.C,v 1.3 2009-05-06 04:10:42 chulwoo Exp $
-//  $Id: pt_init.C,v 1.3 2009-05-06 04:10:42 chulwoo Exp $
+//  $Date: 2012-08-02 21:20:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_init.C,v 1.4 2012-08-02 21:20:01 chulwoo Exp $
+//  $Id: pt_init.C,v 1.4 2012-08-02 21:20:01 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_init.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qcdoc/pt_init.C,v $
 //  $State: Exp $
 //
@@ -189,18 +189,23 @@ void PT::init(PTArg *pt_arg)
 
       uc_l[i] = (gauge_agg *)Alloc(cname,fname,"uc_l[i]",
 				     sizeof(gauge_agg)*(1+local_chi[i]));
+	if(!local[i])
       uc_nl[i] = (gauge_agg *)Alloc(cname,fname,"uc_nl[i]",
 				      sizeof(gauge_agg)*(1+non_local_chi[i]));
+	else uc_nl[i] = NULL;
 
     //-------------------------------------------------------------------------
     //Allocate memory for gauge_agg_cb
     for(int parity = 0; parity < 2; parity++)
     {
       uc_l_cb[parity][i] = (gauge_agg_cb *)FastAlloc(cname,fname,"uc_l_cb",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
-      uc_nl_cb[parity][i] = (gauge_agg_cb *)FastAlloc(cname,fname,"uc_nl_cb",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
-
       uc_l_pad_cb[parity][i] = (gauge_agg_cb *)(unsigned long)FastAlloc(cname,fname,"uc_l_pad_cb",sizeof(gauge_agg_cb)*(1+local_chi_cb[i]));
+	if(!local[i]){
+      uc_nl_cb[parity][i] = (gauge_agg_cb *)FastAlloc(cname,fname,"uc_nl_cb",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
       uc_nl_pad_cb[parity][i] = (gauge_agg_cb *)(unsigned long)FastAlloc(cname,fname,"uc_nl_pad_cb",sizeof(gauge_agg_cb)*(1+non_local_chi_cb[i]));
+	} else {
+		uc_nl_cb[parity][i]=uc_nl_pad_cb[parity][i]=NULL;
+	}
 //      printf("uc_pad_cb = %p %p\n",uc_l_pad_cb[parity][i],uc_nl_pad_cb[parity][i]);
     }
 

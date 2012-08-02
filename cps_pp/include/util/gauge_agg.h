@@ -5,24 +5,25 @@
 #else
 #include <util/asq_data_types.h>
 #endif
+
 struct gauge_agg{
-  int src;
-  int dest;
+  unsigned long src;
+  unsigned long dest;
   IFloat mat[18];
 };
 
 typedef struct gauge_agg_cb{
   //Index for initial position of field
-  int src;
+  unsigned long src;
   //Index for "transported field"
-  int dest;
+  unsigned long dest;
   //Index for the gauge link
-  int gauge;
+  unsigned long gauge;
 } ind_agg;
 
 struct hop_pointer {
-  int src;
-  int dest;
+  unsigned long src;
+  unsigned long dest;
 };
 //CPS_END_NAMESPACE
 #endif

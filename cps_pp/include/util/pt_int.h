@@ -14,7 +14,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.22 2012-05-10 05:51:23 chulwoo Exp $
+  $Id: pt_int.h,v 1.23 2012-08-02 21:20:00 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 #ifdef USE_SCU
@@ -271,17 +271,18 @@ int flag = QCOMMS);
   }
 #else
   void *FastAlloc(int request){
+	if ( request==0) return NULL;
     void *p =  malloc(request);
     return p;
   }
   void *Alloc(char *cname, char *fname, char *vname, int request,unsigned
-int flag = 0);
+int flag = 0, int if_alloc=1 );
   void Free(void *p){
     if (p) free(p);
   }
 #endif
 
-  void *FastAlloc(char *cname, char *fname, char *vname, int request );
+  void *FastAlloc(char *cname, char *fname, char *vname, int request, int if_alloc=1 );
 
   Float dclock(){
     struct timeval start;

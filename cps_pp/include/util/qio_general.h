@@ -21,6 +21,7 @@
 #include <alg/do_arg.h>
 
 #include <qio.h>
+#include <qioxml.h>
 
 #include <qmp.h>
 
