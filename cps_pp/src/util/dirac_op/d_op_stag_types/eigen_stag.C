@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpStagTypes class eigensolver methods.
    
-  $Id: eigen_stag.C,v 1.9 2005-10-04 05:49:47 chulwoo Exp $
+  $Id: eigen_stag.C,v 1.10 2012-08-02 21:20:01 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-10-04 05:49:47 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.9 2005-10-04 05:49:47 chulwoo Exp $
-//  $Id: eigen_stag.C,v 1.9 2005-10-04 05:49:47 chulwoo Exp $
+//  $Date: 2012-08-02 21:20:01 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.10 2012-08-02 21:20:01 chulwoo Exp $
+//  $Id: eigen_stag.C,v 1.10 2012-08-02 21:20:01 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: eigen_stag.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v $
 //  $State: Exp $
 //
@@ -61,7 +61,38 @@ CPS_END_NAMESPACE
 #include <math.h>
 CPS_START_NAMESPACE
 
-int DiracOpStagTypes::RitzLatSize() {return GJP.VolNodeSites()*lat.FsiteSize()/2;}
+//int DiracOpStagTypes::RitzLatSize() {return GJP.VolNodeSites()*lat.FsiteSize()/2;}
+//------------------------------------------------------------------
+// RitzLatSize returns the size of a fermion on a node
+// It uses the RitzMatType flag to determine the operator
+// to use and relevant checkerboard sizes.
+//------------------------------------------------------------------
+int DiracOpStagTypes::RitzLatSize() {
+  char *fname = "RitzLatSize()";
+  VRB.Func(cname,fname);
+
+  int f_size = GJP.VolNodeSites() * lat.FsiteSize();
+
+  switch(dirac_arg->RitzMatOper)
+  {
+  case MAT_HERM:
+  case MATDAG_MAT:
+  case NEG_MATDAG_MAT:
+    break;
+
+  case MATPC_HERM:
+  case MATPCDAG_MATPC:
+  case NEG_MATPCDAG_MATPC:
+    f_size >>= 1;
+    break;
+
+  default:
+    ERR.General(cname,fname,"RitzMatOper %d not implemented\n",
+		dirac_arg->RitzMatOper);
+  }
+
+  return f_size;
+}
 
 int DiracOpStagTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[], EigArg *eig_arg)
 {
@@ -125,7 +156,10 @@ int DiracOpStagTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[], E
 
 // Set the node checkerboard size of the fermion field
 //------------------------------------------------------------------
-  int f_size = RitzLatSize() / 2;
+//  INCONSISTENT with the definition of RitzLatSize() above!!!
+//  int f_size = RitzLatSize() / 2;
+
+  int f_size = RitzLatSize() ;
     
 // Set the node checkerboard size of the fermion field
 //------------------------------------------------------------------

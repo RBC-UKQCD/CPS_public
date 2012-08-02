@@ -7,7 +7,7 @@
  * Written by Peter Boyle
  */  
 #define CACHELINE 32 
-#define Isize 8
+#define Isize 4 
 #define Bdy -3 
 #define Nahead 1 
 #define SHFT_PREF_IMM 4 
@@ -39,9 +39,10 @@
 #define UIMM18 144 
 #define ZERO_IMM 0 
 #define MAT_IMM 144 
-#define GAUGE_AGG_IMM ((MAT_IMM)+2*(Isize)) 
+#define GAUGE_AGG_IMM 152 
 #define bias 0 
 #define PRE0 0 
+#define PRE1 32 
 #define PRE2 64 
 #define PRE3 96 
 #define PRE4 128 
@@ -71,6 +72,15 @@ extern "C" {
   unsigned long lenptr;
   unsigned long V_idx;
   unsigned long LOOKUP0;
+  unsigned long PRER0;
+  unsigned long PRER1;
+  unsigned long PRER2;
+  unsigned long PRER3;
+  unsigned long PRER4;
+  unsigned long PRER5;
+  unsigned long PRER6;
+  unsigned long PRER7;
+  unsigned long PRER8;
   unsigned long R21;
   unsigned long R22;
   unsigned long R23;
@@ -121,9 +131,18 @@ extern "C" {
   counter = * ( (unsigned long *) ( (ZERO_IMM)+(lenptr) ) )  ;
   if ( counter <= 0 ) goto copy_gauge_lab0;
   LOOKUP0 = Vptr | Vptr ; 
+PRER0=PRE0;
+PRER1=PRE1;
+PRER2=PRE2;
+PRER3=PRE3;
+PRER4=PRE4;
   prefscratch = * ( (unsigned long *) ( (PRE0)+(V_idx) ) )  ;
   prefscratch = prefscratch * MAT_IMM ; 
   Vptr = LOOKUP0 + prefscratch ; 
+PRER5=PRE5;
+PRER6=PRE6;
+PRER7=PRE7;
+PRER8=PRE8;
 /*pragma_store_lim 1*/
 /*pragma_dcbt_post 2*/
 copy_gauge_lab1:

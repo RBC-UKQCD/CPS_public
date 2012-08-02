@@ -209,6 +209,8 @@ ForceArg GtadpoleRect::EvolveMomGforce(Matrix *mom, Float dt){
   print_flops(cname,fname,ForceFlops,time);
 #endif
 
+  L1=L2=Linf=0.;
+
   glb_sum(&L1);
   glb_sum(&L2);
   glb_max(&Linf);

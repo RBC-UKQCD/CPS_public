@@ -57,7 +57,7 @@ public:
 		    int time_slice);
 
   /*! Gauge fix sink - Coulomb gauge only */
-  void GaugeFixSink       ( Lattice& lat, int dir);
+  void GaugeFixSink       ( Lattice& lat, int dir, int unfix=0);
 
   /*! Gauge fix sink - Landau gauge */
   void LandauGaugeFixSink ( Lattice& lat );

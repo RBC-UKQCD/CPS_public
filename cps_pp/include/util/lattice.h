@@ -5,15 +5,15 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.61 2012-07-06 20:22:08 chulwoo Exp $
+  $Id: lattice.h,v 1.62 2012-08-02 21:20:00 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2012-07-06 20:22:08 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.61 2012-07-06 20:22:08 chulwoo Exp $
-  $Id: lattice.h,v 1.61 2012-07-06 20:22:08 chulwoo Exp $
+  $Date: 2012-08-02 21:20:00 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.62 2012-08-02 21:20:00 chulwoo Exp $
+  $Id: lattice.h,v 1.62 2012-08-02 21:20:00 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.61 $
+  $Revision: 1.62 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -980,6 +980,12 @@ class Lattice
 			CnvFrmType cnv_frm = CNV_FRM_YES,
 			PreserveType prs_f_in = PRESERVE_YES)
 	{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
+
+	virtual void Fsolfour2five(Vector *sol_5d, Vector *sol_4d, Vector *src_5d, CgArg *cg_arg){
+		char *fname = "Fsolfour2five()";
+		ERR.NotImplemented(cname,fname);
+	}
+    // Recover the 5D solution from the 4D solution, without solve the equation again.
     
     virtual int FeigSolv(Vector **f_eigenv, Float *lambda, 
 			 Float *chirality, int *valid_eig,

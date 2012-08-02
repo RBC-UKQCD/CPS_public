@@ -1,0 +1,2 @@
+#!/bin/tcsh
+indent -l80 -ce -br $*

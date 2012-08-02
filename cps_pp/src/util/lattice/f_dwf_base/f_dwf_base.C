@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.39 2012-03-27 05:02:40 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.40 2012-08-02 21:20:01 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -1112,6 +1112,64 @@ void FdwfBase::Ffive2four(Vector *four, Vector *five, int s_u, int s_l, int Ncb)
     }
   }
 
+}
+
+void FdwfBase::Fsolfour2five(Vector *sol_5d, Vector *sol_4d, Vector *src_5d, CgArg *cg_arg)
+{
+  const char *fname="Fsolfour2five()";
+
+  const int f_size_4d = GJP.VolNodeSites() * SPINOR_SIZE;
+  const int f_size_5d = GJP.VolNodeSites() * FsiteSize();
+  const int ls_glb = GJP.Snodes() * GJP.SnodeSites();
+  const int s_size = GJP.SnodeSites();
+  VRB.Result(cname,fname,"sol_5d=%p sol_4d=%p src_5d=%p cg_arg=%p",sol_5d,sol_4d,src_5d,cg_arg);
+
+  Vector *tmp_5d = (Vector *)smalloc(cname, fname, "tmp_5d", sizeof(Float) * f_size_5d);
+  
+  tmp_5d->CopyVec(src_5d, f_size_5d);
+  
+  // construct P^{-1} D(1)^{-1}*src
+  sol_5d->VecZero(f_size_5d);
+  {
+    Float mass = cg_arg->mass;
+    cg_arg->mass = 1.;
+    
+    DiracOpDwf dwf(*this, sol_5d, tmp_5d, cg_arg, CNV_FRM_YES);
+    dwf.MatInv(sol_5d, tmp_5d, NULL, PRESERVE_YES);
+    cg_arg->mass = mass;
+  }
+  SpinProject(tmp_5d, sol_5d, s_size, 1);
+
+  // set c_1 = -y_1
+  if(GJP.SnodeCoor() == 0)
+    tmp_5d->VecNegative(sol_4d, f_size_4d);
+
+  SpinProject(sol_5d, tmp_5d, s_size, 0);
+  {
+    DiracOpDwf dwf(*this, tmp_5d, sol_5d, cg_arg, CNV_FRM_YES);
+    dwf.Mat(tmp_5d, sol_5d);
+  }
+  {
+    Float mass = cg_arg->mass;
+    cg_arg->mass = 1.;
+    
+    DiracOpDwf dwf(*this, sol_5d, tmp_5d, cg_arg, CNV_FRM_YES);
+    dwf.MatInv(sol_5d, tmp_5d, NULL, PRESERVE_YES);
+    cg_arg->mass = mass;
+  }
+  SpinProject(tmp_5d, sol_5d, s_size, 1);
+
+  if(GJP.SnodeCoor() == 0)
+    tmp_5d->CopyVec(sol_4d, f_size_4d);
+
+  SpinProject(sol_5d, tmp_5d, s_size, 0);
+
+  {
+    DiracOpDwf dwf(*this, sol_5d, src_5d, cg_arg, CNV_FRM_YES);
+    dwf.MatInv(sol_5d, src_5d, NULL, PRESERVE_YES);
+  }
+
+  sfree(cname, fname, "tmp_5d", tmp_5d);
 }
 
 //------------------------------------------------------------------

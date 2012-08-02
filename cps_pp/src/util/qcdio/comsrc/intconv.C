@@ -19,7 +19,7 @@ const int INT_FORMAT_ENTRIES = sizeof(INT_FORMAT_NAME)/sizeof(INT_FORMAT_NAME[0]
 
 
 IntConv::IntConv() 
-  : fileFormat(INT_UNKNOWN), cname("IntConv") { 
+  : fileFormat(INT_UNKNOWN), hostFormat(INT_UNKNOWN), cname("IntConv") { 
   testHostFormat();
 
 }

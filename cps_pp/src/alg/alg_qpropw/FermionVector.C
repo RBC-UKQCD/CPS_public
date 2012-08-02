@@ -261,6 +261,7 @@ void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where) {
   char *cname = "FermionVectorT";
   char *fname = "GFWallSource()";
   VRB.Func(cname, fname);
+  VRB.Result(cname,fname,"lat=%p spin=%d dir=%d  where=%d\n",&lat,spin,dir,where);
 
   int len;     //the local (on processor) length in "dir" direction
   //int nproc;   // total number of processors in d_ direction
@@ -310,6 +311,7 @@ void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where) {
  
   if (has_overlap) {
     int local = where % len; // on processor coordinate of
+	VRB.Result(cname,fname,"gm=%p local=%d\n",gm,local);
                              // source hyperplane
     Matrix *pM = gm[local];
 
@@ -332,7 +334,7 @@ void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where) {
 }
 
 // COULOMB GAUGE ONLY!
-void FermionVectorTp::GaugeFixSink(Lattice &lat, int dir) {
+void FermionVectorTp::GaugeFixSink(Lattice &lat, int dir, int unfix) {
   
   char *fname = "GaugeFixSink()";
   VRB.Func(cname, fname);
@@ -365,6 +367,10 @@ void FermionVectorTp::GaugeFixSink(Lattice &lat, int dir) {
                          y + GJP.YnodeSites() * (
                          z + GJP.ZnodeSites() * t)))) ;
 		  temp.CopyVec((Vector*)&fv[i], 6);
+		if(unfix)
+		  uDagDotXEqual((IFloat*)&fv[i],(const IFloat*)&pM[j],
+			     (const IFloat*)&temp);
+		else
 		  uDotXEqual((IFloat*)&fv[i],(const IFloat*)&pM[j],
 			     (const IFloat*)&temp);
 		}

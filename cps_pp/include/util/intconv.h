@@ -12,7 +12,8 @@ typedef uint64_t type64; // maybe later we'll have 64-bit int...
 
 
 enum INT_FORMAT {
-  INT_UNKNOWN = 0,
+  //INT_UNKNOWN = 0,
+  INT_UNKNOWN,
   INT_AUTOMATIC, // used as arguments to function, 
                 //will be substituted by hostFormat or fileFormat depending on situation
   INT_32BIG,
