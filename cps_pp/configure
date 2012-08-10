@@ -1391,7 +1391,7 @@ Optional Features:
   --enable-target         What target are we compiling for? (default=noarch)
   --enable-optimise       Compile with maximum optimisation. (default=yes)
   --enable-sse            Compile with SSE. (default=yes)
-  --enable-debug          Compile with debug information. (default=no)
+  --enable-debug          Compile with debug information. (default=yes)
   --enable-cg-dwf         Compile with cg-dwf (default=no)
   --enable-blas           Compile with BLAS (default=no)
   --enable-gmp            Compile with GNU Multiprecision lib. (default=no)
@@ -5237,7 +5237,7 @@ fi
 if test "${enable_debug+set}" = set; then
   enableval=$enable_debug;
 else
-  enable_debug="no"
+  enable_debug="yes"
 fi
 
 { $as_echo "$as_me:$LINENO: checking if debugging" >&5
@@ -5442,13 +5442,15 @@ if test "$enable_bfm" != "no"; then
 
    if test "$enable_bfm" != "yes"; then
       LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib "
-      INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${BFM_DIR}/include"
+      INCLUDE_FLAGS="-I${BFM_DIR}/include ${INCLUDE_FLAGS} "
    else
       BFM_DIR=${QMP_DIR}
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
       LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm"
-   enable_xml="yes"
+   if test "X{$enable_xml}X" = "XX"; then
+   	enable_xml="yes"
+   fi
 fi
 
 if test "$enable_xml" != "no"; then

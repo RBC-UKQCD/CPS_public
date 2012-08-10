@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.34 2008-05-16 16:07:47 chulwoo Exp $
+# $Id: Makefile.in,v 1.35 2012-08-10 21:25:11 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -16,7 +16,16 @@ else
 builddir_isnt_srcdir=
 endif
 
-all: rpcgenvml vml recurse copy_testdir
+# Added by Hantao, changed by chulwoo
+# #
+# # Purpose is to have a single ar operation at the end (so we can
+# # concurrently build).
+LIBNAME = cps
+
+all: rpcgenvml vml recurse copy_testdir archive
+
+archive:
+	find $(BUILDDIR) \( -name '*.o' -o -name '*.xlo' \) -a -print0 | xargs -0 ${AR} rcs ${BUILDDIR}/$(LIBNAME).a
 
 cps: recurse
 
@@ -29,10 +38,11 @@ clean: recurse
 buildlib: recurse
 
 recurse:
+	@echo CONCUR = $(CONCUR)
 	mkdir -p $(BUILDDIR)/objs
 	touch -a $(BUILDDIR)/objs/Makefile_depend
 	cp -p $(SRCDIR)/src/Makefile $(BUILDDIR)/objs
-	$(MAKE) -C $(BUILDDIR)/objs $(filter-out test, $(MAKECMDGOALS))
+	$(MAKE) -C $(BUILDDIR)/objs CONCUR=yes $(filter-out test, $(MAKECMDGOALS))
 
 vml:
 	-cp $(BUILDDIR)/include/input/Makefile ${SRCDIR}/include/input
@@ -74,7 +84,7 @@ $(HDW_TESTSUBDIRS):
 	-cp -p $(SRCDIR)/$(HDW_TESTDIR)/$@/Makefile_regression  $(HDW_TESTDIR)/$@
  
 testbuild: $(TESTBUILDDIRS)
-	echo TESTBUILDDIR = $(TESTBUILDDIRS)
+	@echo TESTBUILDDIR = $(TESTBUILDDIRS)
  
 $(TESTBUILDDIRS):
 	$(if $(builddir_isnt_srcdir), mkdir -p $(TESTDIR)/$(@D))

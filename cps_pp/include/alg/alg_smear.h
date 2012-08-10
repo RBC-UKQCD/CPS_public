@@ -6,7 +6,7 @@
   
   AlgOlegSmear added by Yasumichi 6/8/07.
 
-  $Id: alg_smear.h,v 1.7 2008-02-12 18:16:30 chulwoo Exp $
+  $Id: alg_smear.h,v 1.8 2012-08-10 21:25:12 chulwoo Exp $
 */
 //------------------------------------------------------------------
 #ifndef _ALG_SMEAR_CD_
@@ -90,7 +90,6 @@ protected:
                            int*    pos,
                            int      mu )=0;
   
-  
 };
 
 //! Calculates the three-link staple around a link.
@@ -147,6 +146,7 @@ public:
     the smearing coefficients are written to the file.
   */
   void run();
+  void smartrun();
 
   void set_coef( Float x ) { c = x ; }
 
