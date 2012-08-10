@@ -1,13 +1,13 @@
-#ifndef __ALG__TCHARGE__
-#define __ALG__TCHARGE__
+#ifndef INCLUDED_ALG_TCHARGE_H
+#define INCLUDED_ALG_TCHARGE_H
 #include <config.h>
 
 #include <util/lattice.h>
 #include <util/smalloc.h>
 #include <util/pmalloc.h> 
-#include "alg_base.h" 
-#include "common_arg.h"
-#include "no_arg.h"
+#include <alg/alg_base.h>
+#include <alg/common_arg.h>
+#include <alg/no_arg.h>
 
 CPS_START_NAMESPACE
 

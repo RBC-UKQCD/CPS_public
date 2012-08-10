@@ -6,11 +6,11 @@
   
   AlgOlegSmear added by Yasumichi 6/8/07.
 
-  $Id: alg_smear.h,v 1.8 2012-08-10 21:25:12 chulwoo Exp $
+  $Id: alg_smear.h,v 1.9 2012-08-10 21:34:27 chulwoo Exp $
 */
 //------------------------------------------------------------------
-#ifndef _ALG_SMEAR_CD_
-#define _ALG_SMEAR_CD_
+#ifndef INCLUDED_ALG_SMEAR_H
+#define INCLUDED_ALG_SMEAR_H
 #include <config.h>
 #include <alg/alg_base.h>
 #include <alg/ape_smear_arg.h>

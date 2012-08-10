@@ -6,7 +6,9 @@
 #include <alg/alg_tcharge.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
+#ifdef USE_OMP
 #include <omp.h>
+#endif
 CPS_START_NAMESPACE
 
 //----------------------------------------------------------

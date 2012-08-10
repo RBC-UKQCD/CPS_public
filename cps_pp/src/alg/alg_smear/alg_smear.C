@@ -4,7 +4,7 @@
 
   AlgSmear, AlgApeSmear, AlgKineticSmear and AlgHypSmear classes.
   
-  $Id: alg_smear.C,v 1.8 2012-08-10 21:25:12 chulwoo Exp $
+  $Id: alg_smear.C,v 1.9 2012-08-10 21:34:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 #include <config.h>
@@ -18,7 +18,9 @@
 #include <util/link_buffer.h>
 #include <util/smalloc.h>
 #include <comms/scu.h>
+#ifdef USE_OMP
 #include <omp.h>
+#endif
 
 CPS_START_NAMESPACE
 
