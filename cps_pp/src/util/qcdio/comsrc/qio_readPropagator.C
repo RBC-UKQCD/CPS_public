@@ -2100,6 +2100,9 @@ int qio_readPropagator::qio_readTmpSourceRecord(const QIO_PROP_SOURCE_TYPES sTyp
   return_val_info += QIO_read_record_info( qio_Input, record, record_xml);
 
   if(QIO_get_recordtype(record) == QIO_HYPER){
+#ifndef HAVE_QIO_GET_HYPER_SPACETIME
+  ERR.NotImplemented(cname,fname,"needs QIO_get_hyper_spacetime");
+#else
   hyper_n = QIO_get_hyper_spacetime(record);
   int *lower_p = QIO_get_hyperlower(record);
   int *upper_p = QIO_get_hyperupper(record);
@@ -2110,6 +2113,7 @@ int qio_readPropagator::qio_readTmpSourceRecord(const QIO_PROP_SOURCE_TYPES sTyp
       hyper_lower[i]=lower_p[i];
       hyper_upper[i]=upper_p[i];
     }
+#endif
   } else
   hyper_n=-1;
 

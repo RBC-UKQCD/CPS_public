@@ -12,21 +12,37 @@
 
 #include <config.h>
 #include <alg/enum.h>
+#include <cmath>
 
 CPS_START_NAMESPACE
 
 class ForceArg {
 public:
-  char *cname;
-  Float L1;
-  Float L2;
-  Float Linf;
+    const char *cname;
+    Float L1;
+    Float L2;
+    Float Linf;
 
-  ForceArg();
-  ForceArg(Float L1, Float L2, Float Linf);
-  ~ForceArg();
+public:
+    ForceArg()
+        :cname("ForceArg"),L1(0.),L2(0.),Linf(0.) {}
 
-  void print(Float dt, char *label);
+    ForceArg(Float _L1, Float _L2, Float _Linf)
+        :cname("ForceArg"),L1(fabs(_L1)),L2(fabs(_L2)),Linf(fabs(_Linf)) {}
+
+    ~ForceArg() {}
+
+    void combine(const ForceArg &a) {
+        L1 += a.L1;
+        L2 += a.L2;
+        Linf = Linf > a.Linf ? Linf : a.Linf;
+    }
+
+    void unitarize(int links) {
+        L1 /= links;
+        L2 = std::sqrt(L2 / links);
+    }
+    void print(Float dt, char *label)const;
 };
 
 CPS_END_NAMESPACE

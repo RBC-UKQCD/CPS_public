@@ -1,30 +1,29 @@
+#ifndef _smalloc_h
+#define _smalloc_h                //!< Prevent multiple inclusion
+
 #include<config.h>
 #include <stdlib.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of dynamic memory management routines.	
 
-  $Id: smalloc.h,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
+  $Id: smalloc.h,v 1.14 2012-08-10 14:05:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
-//  $Id: smalloc.h,v 1.13 2012-03-26 13:50:11 chulwoo Exp $
+//  $Date: 2012-08-10 14:05:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.14 2012-08-10 14:05:33 chulwoo Exp $
+//  $Id: smalloc.h,v 1.14 2012-08-10 14:05:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: smalloc.h,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
-#ifndef _smalloc_h
-#define _smalloc_h                //!< Prevent multiple inclusion
-
-
 
 
 /*! \addtogroup mem_alloc Memory allocation
@@ -146,6 +145,7 @@ void* fmalloc(const char cname[], const char fname[], const char vname[], size_t
 
 /*! @} */
 
-#endif /* !_smalloc_h */
 
 CPS_END_NAMESPACE
+
+#endif /* !_smalloc_h */

@@ -1,18 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  $Id: fix_gauge.C,v 1.9 2011-03-06 03:13:12 chulwoo Exp $
+  $Id: fix_gauge.C,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-03-06 03:13:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.9 2011-03-06 03:13:12 chulwoo Exp $
-//  $Id: fix_gauge.C,v 1.9 2011-03-06 03:13:12 chulwoo Exp $
+//  $Date: 2012-08-10 14:05:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
+//  $Id: fix_gauge.C,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -32,8 +32,10 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <util/smalloc.h>
 #include <util/rcomplex.h>
+#include <util/time_cps.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
+#include <omp.h>
 CPS_START_NAMESPACE
 
 #ifdef _TARTAN
@@ -155,6 +157,13 @@ protected:
   // index coordinates of site (used to avoid argument passing)
   int *index;
 
+	//Add by Jianglei
+  Matrix **nbr_gauge_minus_rec;
+	Matrix **nbr_gauge_plus_rec;
+  Matrix **nbr_gauge_minus_send;
+	Matrix **nbr_gauge_plus_send;
+	void copy_nbr_gauge();
+
 private:
 
   Matrix *gauge;          // pointer to a hyperplane of gauge fixing matrices
@@ -274,6 +283,30 @@ l0(L0)
 	copy_nbr_links(i);
       }
   }
+	//-------------------------------------------------------------------------------
+	//creat and initialize buffers for copies of neighbor node gaueg matrices
+	//, add by Jianglei
+	//------------------------------------------------------------------------------
+  {
+		int mem_size = hplane_dim * sizeof(Matrix*);
+		nbr_gauge_minus_rec = (Matrix**) smalloc(mem_size);
+		nbr_gauge_minus_send = (Matrix**) smalloc(mem_size);
+		nbr_gauge_plus_rec = (Matrix**) smalloc(mem_size);
+		nbr_gauge_plus_send = (Matrix**) smalloc(mem_size);
+
+		for(int i=0; i<hplane_dim; i++)
+		{
+			mem_size = sizeof(Matrix);
+			for(int j=0; j<hplane_dim; j++)
+				mem_size *= (i==j) ? 1 : node_size[j];
+
+			nbr_gauge_minus_rec[i] = (Matrix*) smalloc(mem_size);
+			nbr_gauge_minus_send[i] = (Matrix*) smalloc(mem_size);
+			nbr_gauge_plus_rec[i] = (Matrix*) smalloc(mem_size);
+			nbr_gauge_plus_send[i] = (Matrix*) smalloc(mem_size);
+		}
+		copy_nbr_gauge();
+  }
 }
 
 
@@ -298,6 +331,18 @@ HyperPlane::~HyperPlane()
 
   VRB.Sfree(cname, fname, "neighbor_link", neighbor_link);
   sfree(neighbor_link);
+
+  for(int i=hplane_dim; i--; )
+	{
+			sfree(nbr_gauge_minus_rec[i]);
+			sfree(nbr_gauge_minus_send[i]);
+			sfree(nbr_gauge_plus_rec[i]);
+			sfree(nbr_gauge_plus_send[i]);
+	}
+  sfree(nbr_gauge_minus_rec);
+  sfree(nbr_gauge_minus_send);
+  sfree(nbr_gauge_plus_rec);
+  sfree(nbr_gauge_plus_send);
 
   VRB.Sfree(cname, fname, "node_size", node_size);
   sfree(node_size);
@@ -402,6 +447,49 @@ void HyperPlane::copy_nbr_links(int nbr_num, int recurse)
     }
 }
 
+//Coulumb Gauge only !!!
+void HyperPlane::copy_nbr_gauge()
+{
+	int ind1, ind2;
+
+	for(int i = 0; i < node_size[1]; i++)	
+  for(int j = 0; j < node_size[2]; j++)	
+	{
+		ind1 = i + j * node_size[1];
+		ind2 = node_size[0] - 1 + node_size[0] * (i + j * node_size[1]);
+		nbr_gauge_minus_send[0][ind1] = gauge[ind2];
+		ind2 = 0 + node_size[0] * (i + j * node_size[1]);
+		nbr_gauge_plus_send[0][ind1] = gauge[ind2];
+	}
+
+  for(int i = 0; i < node_size[0]; i++)	
+  for(int j = 0; j < node_size[2]; j++)	
+	{
+		ind1 = i + j * node_size[0];
+		ind2 = i + node_size[0] * ( node_size[1] - 1 + node_size[1] * j );
+		nbr_gauge_minus_send[1][ind1] = gauge[ind2];
+		ind2 = i + node_size[0] * ( 0 + node_size[1] * j );
+		nbr_gauge_plus_send[1][ind1] = gauge[ind2];
+	}
+
+  for(int i = 0; i < node_size[0]; i++)	
+  for(int j = 0; j < node_size[1]; j++)	
+	{
+		ind1 = i + j * node_size[0];
+		ind2 = i + node_size[0] * ( j + node_size[1] * (node_size[2] - 1));
+		nbr_gauge_minus_send[2][ind1] = gauge[ind2];
+		ind2 = i + node_size[0] * ( j + node_size[1] * (0));
+		nbr_gauge_plus_send[2][ind1] = gauge[ind2];
+	}
+	
+	for(int i = 0; i < 3; i++)
+	{
+		int memsize = sizeof(Matrix) / sizeof(IFloat);
+		for(int j = 0; j < 3; j++) if(j != i) memsize *= node_size[j];
+		getMinusData((IFloat*)nbr_gauge_minus_rec[i], (IFloat*)nbr_gauge_minus_send[i], memsize, ind2dir[i]);
+		getPlusData((IFloat*)nbr_gauge_plus_rec[i], (IFloat*)nbr_gauge_plus_send[i], memsize, ind2dir[i]);
+	}
+}	
 
 
 //-------------------------------------------------------------------------
@@ -478,26 +566,42 @@ Matrix& HyperPlane::G_loc()
 
 Matrix& HyperPlane::G(int ind_link)
 {
-  if(index[ind_link] == -1)
-    {
-      index[ind_link] = node_size[ind_link] - 1;
-      getMinusData((IFloat*)&g_buf, (IFloat*)&G_loc(), 
-		   sizeof(Matrix)/sizeof(IFloat), ind2dir[ind_link]);
-      index[ind_link] = -1;
-      return g_buf;
-    }
-  else if(index[ind_link] == node_size[ind_link])
-    {
-      index[ind_link] = 0;
-      getPlusData((IFloat*)&g_buf, (IFloat*)&G_loc(), 
-		  sizeof(Matrix)/sizeof(IFloat), ind2dir[ind_link]);
-      index[ind_link] = node_size[ind_link];
-      return g_buf;
-    }
-  else
-    {
-      return G_loc();
-    }
+	if(index[ind_link] == -1)
+	{
+		//index[ind_link] = node_size[ind_link] - 1;
+		//getMinusData((IFloat*)&g_buf, (IFloat*)&G_loc(), 
+		// sizeof(Matrix)/sizeof(IFloat), ind2dir[ind_link]);
+		//index[ind_link] = -1;
+		//return g_buf;
+		int idx = 0;
+		for(int i=hplane_dim; i--; )
+			if(i != ind_link) // skip index field related to the neighbor direction
+			{
+				idx *= node_size[i];
+				idx += index[i];
+			}
+		return nbr_gauge_minus_rec[ind_link][idx];
+	}
+	else if(index[ind_link] == node_size[ind_link])
+	{
+		//index[ind_link] = 0;
+		//getPlusData((IFloat*)&g_buf, (IFloat*)&G_loc(), 
+		//		sizeof(Matrix)/sizeof(IFloat), ind2dir[ind_link]);
+		//index[ind_link] = node_size[ind_link];
+		//return g_buf;
+		int idx = 0;
+		for(int i=hplane_dim; i--; )
+			if(i != ind_link) // skip index field related to the neighbor direction
+			{
+				idx *= node_size[i];
+				idx += index[i];
+			}
+		return nbr_gauge_plus_rec[ind_link][idx];
+	}
+	else
+	{
+		return G_loc();
+	}
 }
 
 
@@ -625,13 +729,15 @@ void FixHPlane::iter()
     iter(recurse, dist);
   } else {
      VRB.Flow(cname,fname,"using checkerboared order gauge fixing");
-  //Even or Odd part
-  for(int dist = dist_max[recurse] + 1; (dist=dist-2) >= 0; )
-    iter(recurse, dist);
-  //Odd or Even part
-  for(int dist = dist_max[recurse] + 2; (dist=dist-2) >= 0; )
-    iter(recurse, dist);
-  }
+		 //Even or Odd part
+		 for(int dist = dist_max[recurse] + 1; (dist=dist-2) >= 0; )
+			 iter(recurse, dist);
+		 copy_nbr_gauge();
+		 //Odd or Even part
+		 for(int dist = dist_max[recurse] + 2; (dist=dist-2) >= 0; )
+			 iter(recurse, dist);
+		 copy_nbr_gauge();
+	}
 
 }
 
@@ -1088,6 +1194,9 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
   //------------------------------------------------------------------------
   VRB.Sfree(cname, fname, "Ind2Dir", Ind2Dir);
   sfree(Ind2Dir);
+  
+	//Add by Jianglei
+	VRB.Result(cname, fname, "Iteration numbers = %d", tot_iternum);
 
   //--------------------------------------------------------------
   // Issue a warning through broadcast if MaxIterNum is reached

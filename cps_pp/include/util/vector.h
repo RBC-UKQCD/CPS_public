@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.33 2012-07-06 20:22:08 chulwoo Exp $
+  $Id: vector.h,v 1.34 2012-08-10 14:05:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-07-06 20:22:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.33 2012-07-06 20:22:08 chulwoo Exp $
-//  $Id: vector.h,v 1.33 2012-07-06 20:22:08 chulwoo Exp $
+//  $Date: 2012-08-10 14:05:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.34 2012-08-10 14:05:33 chulwoo Exp $
+//  $Id: vector.h,v 1.34 2012-08-10 14:05:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.33 $
+//  $Revision: 1.34 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -31,7 +31,6 @@ CPS_START_NAMESPACE
 
 class Vector; 	// forward declaration
 class Matrix;
-class MyVector;
 
 //------------------------------------------------------------------
 // Declarations of some genaral c-style functions that perform
@@ -41,8 +40,8 @@ class MyVector;
 extern "C" 
 {
     //! vector copy; b = a
-void moveMem(void *b, const void *a, int len); 
-void moveFloat(Float *b, const Float *a, int len); 
+    void moveMem(void *b, const void *a, int len); 
+    void moveFloat(Float *b, const Float *a, int len); 
 
     //! 3x3 complex matrix multiplication; c = ab 
 #ifndef VEC_INLINE
@@ -116,13 +115,13 @@ inline void mDotMEqual(IFloat* c, const IFloat* a, const IFloat* b)
 #endif
 
     //! 3x3 complex matrix multiplication and sum; c += ab
-void mDotMPlus(IFloat* c, const IFloat* a, const IFloat* b); 
+    void mDotMPlus(IFloat* c, const IFloat* a, const IFloat* b); 
 
     //! 3x3 complex matrix times vector; y = Mx
-void uDotXEqual(IFloat* y, const IFloat* m, const IFloat* x); 
+    void uDotXEqual(IFloat* y, const IFloat* m, const IFloat* x); 
 
     //! vector scalar product; a.b
-IFloat dotProduct(const IFloat *a, const IFloat *b, int);
+    IFloat dotProduct(const IFloat *a, const IFloat *b, int);
 
     //! vector addition; a += b
 #ifndef VEC_INLINE
@@ -137,7 +136,7 @@ inline void vecAddEquVec(IFloat *a, const IFloat *b, int len)
 #endif
 
     //! vector subtraction; a -= b
-void vecMinusEquVec(IFloat *a, const IFloat *b, int);  
+    void vecMinusEquVec(IFloat *a, const IFloat *b, int);  
 
 inline void vecMinusEquVecSingle(IFloat *a, const IFloat *b, int len)
 {
@@ -147,13 +146,13 @@ inline void vecMinusEquVecSingle(IFloat *a, const IFloat *b, int len)
 }
 
     //! vector negation; a = -b
-void vecNegative(IFloat *a, const IFloat *b, int); 	
+    void vecNegative(IFloat *a, const IFloat *b, int); 	
 
     //! set all elements to zero
-void vecZero(IFloat *a, int size);
+    void vecZero(IFloat *a, int size);
 
     //! real scalar times vector multiplication; a *= b
-void vecTimesEquFloat(IFloat *a, IFloat b, int); // 
+    void vecTimesEquFloat(IFloat *a, IFloat b, int); // 
 
 inline void vecTimesEquFloatSingle(IFloat *a, IFloat b, int len)
 {
@@ -163,10 +162,10 @@ inline void vecTimesEquFloatSingle(IFloat *a, IFloat b, int len)
 }
 
     //! real scalar times vector multiplication; a = c*b
-void vecEqualsVecTimesEquFloat(IFloat *a, IFloat *b, IFloat c, int); // 
+    void vecEqualsVecTimesEquFloat(IFloat *a, IFloat *b, IFloat c, int); // 
 
     //! vector linear combination; a = bc+d
-void fTimesV1PlusV2(IFloat *a, IFloat b, const IFloat *c,
+    void fTimesV1PlusV2(IFloat *a, IFloat b, const IFloat *c,
 			const IFloat *d, int size); 	
 
 inline void fTimesV1PlusV2Single(IFloat *a, IFloat b, const IFloat *c,
@@ -178,26 +177,25 @@ inline void fTimesV1PlusV2Single(IFloat *a, IFloat b, const IFloat *c,
 }
 
     //! vector linear combination; a = bc-d
-void fTimesV1MinusV2(IFloat *a, IFloat b, const IFloat *c,
-			const IFloat *d, int size);    
+    void fTimesV1MinusV2(IFloat *a, IFloat b, const IFloat *c,
+                         const IFloat *d, int size);    
 
     //! complex vector scalar product; a.b
-void compDotProduct(IFloat *c_r, IFloat *c_i, 
-        	    const IFloat *a, const IFloat *b, int);
+    void compDotProduct(IFloat *c_r, IFloat *c_i, 
+                        const IFloat *a, const IFloat *b, int);
 
     //! complex vector linear combination; a = bc+d
-void cTimesV1PlusV2(IFloat *a, IFloat b_re, IFloat b_im, const IFloat *c,
-                    const IFloat *d, int size);      
+    void cTimesV1PlusV2(IFloat *a, IFloat b_re, IFloat b_im, const IFloat *c,
+                        const IFloat *d, int size);      
 
     //! Not implemented on qcdsp
-void cTimesV1MinusV2(IFloat *a, IFloat b_re, IFloat b_im, const IFloat *c,
-	             const IFloat *d, int size);      // A = b*C-D
+    void cTimesV1MinusV2(IFloat *a, IFloat b_re, IFloat b_im, const IFloat *c,
+                         const IFloat *d, int size);      // A = b*C-D
 
     //! matrix linear combination; a = 1-bc
-void oneMinusfTimesMatrix(IFloat *a, IFloat b, const IFloat *c, int n);     
+    void oneMinusfTimesMatrix(IFloat *a, IFloat b, const IFloat *c, int n);     
 
 }
-
 
 //------------------------------------------------------------------
 // Declarations of some genaral c-style functions that perform
@@ -249,27 +247,69 @@ class Matrix
     // CREATORS
     //! General constructor; no initialisation.
     Matrix() {}
+
     //! Initialisation to real multiple of the unit matrix.
-    Matrix(IFloat c);
+    //------------------------------------------------------------------
+    /*!
+      The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the real
+      number \a c; All other elements are zero.  
+      \param c The diagonal matrix element
+    */
+    Matrix(IFloat c) {*this = c;}
 
     //! Initialisation to complex multiple of the unit matrix.
-    Matrix(const Complex& c);
+    //------------------------------------------------------------------
+    /*!
+      The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the complex
+      number \a c; All other elements are zero.  
+      \param c The diagonal matrix element
+    */
+    Matrix(const Complex& c) {*this = c;}
+
     //! Copy constructor
-    Matrix(const Matrix& m);
+    //------------------------------------------------------------------
+    /*!
+      The matrix is initialised as a copy of the matrix \a m.
+      \param m The initialising matrix.
+    */
+    Matrix(const Matrix& m) {
+        memcpy(u, m.u, sizeof(Float) * COLORS * COLORS * 2);
+    }
 
     //! Assignment to real multiple of the unit matrix.
-    Matrix& operator=(IFloat c);
+    //------------------------------------------------------------------
+    /*!
+      The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the real
+      number \a c; All other elements are zero.  
+      \param c The diagonal matrix element
+    */
+    Matrix& operator=(IFloat c) {
+        this->ZeroMatrix();
+        u[0] = u[8] = u[16] = c;
+        return *this;
+    }
+
     //! Assignment to complex multiple of the unit matrix.
-    Matrix& operator=(const Complex& c);
+    //------------------------------------------------------------------
+    /*!
+      The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the complex
+      number \a c; All other elements are zero.  
+      \param c The diagonal matrix element
+    */
+    Matrix& operator=(const Complex& c) {
+        this->ZeroMatrix();
+        u[0] = u[8] = u[16] = c.real();
+        u[1] = u[9] = u[17] = c.imag();
+        return *this;
+    }
+
     //! Overloaded assignment
     /*! \a m should not alias this matrix */
-    Matrix& operator=(const Matrix& m)
-#if 1
-    { for(int i=0;i<COLORS*COLORS*2;i++) u[i] = m.u[i];
-#else
-    { moveMem(u, m.u, COLORS*COLORS*2*sizeof(Float)); 
-#endif
-      return *this; }
+    Matrix& operator=(const Matrix& m) {
+        if(this != &m) 
+            memcpy(u, m.u, sizeof(Float) * COLORS * COLORS * 2);
+        return *this;
+    }
 
     // MANIPULATORS
     //! Adds a matrix \a m to this matrix.
@@ -277,9 +317,11 @@ class Matrix
       \param m The matrix to be added.
       \return The matrix sum.
     */
-    Matrix& operator+=(const Matrix& m)
-    { vecAddEquVec((IFloat *)u, (IFloat *)m.u, COLORS*COLORS*2);
-      return *this; }
+    Matrix& operator+=(const Matrix& m) {
+        for(int i = 0; i < COLORS * COLORS * 2; ++i)
+            u[i] += m.u[i];
+        return *this;
+    }
 
     //! Adds a real scalar multiple of the unit matrix to this one.
     /*!
@@ -311,9 +353,29 @@ class Matrix
       \param c The real scalar
       \return The multiplied matrix
     */
-     Matrix& operator*=(IFloat c)
-    { vecTimesEquFloatSingle((IFloat *)u, c, COLORS*COLORS*2); 
-    return *this; }
+    Matrix& operator*=(IFloat c) {
+        for(int i = 0; i < COLORS * COLORS * 2; ++i)
+            u[i] *= c;
+        return *this;
+    }
+
+    Matrix operator+(const Matrix &m)const {
+        Matrix tmp(*this);
+        tmp += m;
+        return tmp;
+    }
+
+    Matrix operator-(const Matrix &m)const {
+        Matrix tmp(*this);
+        tmp -= m;
+        return tmp;
+    }
+
+    Matrix operator*(const Matrix &m)const {
+        Matrix tmp;
+        tmp.DotMEqual(*this, m);
+        return tmp;
+    }
 
      //! Assignment to matrix product; \a ab
      /*!
@@ -459,18 +521,35 @@ inline void TrLessAntiHermMatrix()
     int ProjSU3(void);
 
     //! Assignment to a unit matrix.
-    void UnitMatrix(void);
+    //------------------------------------------------------------------
+    /*!
+      \post This matrix is a 3x3 unit matrix.
+    */
+    void UnitMatrix(void) {
+        this->ZeroMatrix();
+        u[0] = u[8] = u[16] = 1.;
+    }
 
     //! Assignment to a zero matrix.
-    void ZeroMatrix(void);
+    //------------------------------------------------------------------
+    /*!
+      \post This matrix is a 3x3 zero matrix.
+    */
+    void ZeroMatrix(void) {
+        for(int i = 0; i < 18; ++i) {
+            u[i] = 0.;
+        }
+    }
 
     //! Assignment to a negated matrix.
     /*!
       \param m A matrix.
       \post This matrix has the value \a -m.
     */
-    void NegMatrix(const Matrix& m)
-    	{ vecNegative((IFloat *)u, (IFloat *)&m, COLORS*COLORS*2); }
+    void NegMatrix(const Matrix& m) {
+        for(int i = 0; i < COLORS * COLORS * 2; ++i)
+            u[i] = -m.u[i];
+    }
 
     //! Assignment to the matrix linear combination 1-xm
     /*!
@@ -513,10 +592,14 @@ inline void TrLessAntiHermMatrix()
     void Det(IFloat* c) const;
 
     //! Returns the real part of the trace.
-    IFloat ReTr() const;		
+    IFloat ReTr() const {
+        return u[0] + u[8] + u[16];
+    }
 
     //! Returns the trace.
-    Complex Tr() const;
+    Complex Tr() const {
+        return ((Complex*)u)[0] + ((Complex*)u)[4] + ((Complex*)u)[8];
+    }
 
     //! -1/2 times the trace of the square.
     IFloat NegHalfTrSquare() const;
@@ -524,7 +607,18 @@ inline void TrLessAntiHermMatrix()
     //! The deviation of this matrix from unitarity
     IFloat ErrorSU3() const;
 
-    IFloat norm() const;
+    /*! Returns the SU(3) matrix norm, defined by
+      ||X||^2 = -2 trace X^2
+    */
+    // !!FIXME: Why does it calculate this?
+    IFloat norm() const {
+        Matrix x2;
+        x2.DotMEqual(*this, *this);
+        return -2.0*x2.ReTr();
+        
+        //IFloat *m = (IFloat*)&u[0];
+        //return dotProduct(m, m, 18);
+    }
 
     // SU(3) Characters
 
@@ -581,7 +675,7 @@ class Vector
 
   public:
     // CREATORS
-    Vector();
+    Vector() {}
 
     //! Overloaded assignment
     /*! \a x should not alias this matrix */

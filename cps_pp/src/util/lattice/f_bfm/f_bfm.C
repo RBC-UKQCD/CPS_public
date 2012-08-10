@@ -1,4 +1,6 @@
 // -*- c-basic-offset: 4 -*-
+#ifdef USE_BFM
+
 #include<config.h>
 #include<math.h>
 
@@ -12,12 +14,19 @@
 #include <comms/glb.h>
 #include <util/enum_func.h>
 #include <util/sproj_tr.h>
-
 #include<util/time_cps.h>
 
 #include<omp.h>
 
 CPS_START_NAMESPACE
+
+inline void compute_coord(int x[4], const int hl[4], const int low[4], int i)
+{
+    x[0] = i % hl[0] + low[0]; i /= hl[0];
+    x[1] = i % hl[1] + low[1]; i /= hl[1];
+    x[2] = i % hl[2] + low[2]; i /= hl[2];
+    x[3] = i % hl[3] + low[3];
+}
 
 // ----------------------------------------------------------------
 // static void BondCond: toggle boundary condition on/off for any
@@ -45,11 +54,7 @@ static void BondCond(Float *u_base)
 #pragma omp parallel for
         for(int i = 0; i < hl_sites; ++i) {
             int x[4];
-            int tmp = i;
-            x[0] = tmp % hl[0] + low[0]; tmp /= hl[0];
-            x[1] = tmp % hl[1] + low[1]; tmp /= hl[1];
-            x[2] = tmp % hl[2] + low[2]; tmp /= hl[2];
-            x[3] = tmp % hl[3] + low[3];
+            compute_coord(x, hl, low, i);
 
             int off = mu + 4 * (x[0] + high[0] *
                                 (x[1] + high[1] *
@@ -145,16 +150,8 @@ void Fbfm::CopySendFrmData(Float *v3d, Float *v4d, int mu, bool send_neg)
 #pragma omp parallel for 
     for(int i = 0; i < hl_sites; ++i) {
         int x[4];
-        int tmp = i;
-        x[0] = tmp % hl[0] + low[0]; tmp /= hl[0];
-        x[1] = tmp % hl[1] + low[1]; tmp /= hl[1];
-        x[2] = tmp % hl[2] + low[2]; tmp /= hl[2];
-        x[3] = tmp % hl[3] + low[3];
-
+        compute_coord(x, hl, low, i);
         int off_4d = idx_4d(x, lclx);
- 
-        // in principle I can use ++off_3d instead of the
-        // following because of the way I order the loops.
         int off_3d = idx_4d_surf(x, lclx, mu);
         
         memcpy(v3d + off_3d * block_size,
@@ -193,6 +190,17 @@ static inline void trless_am(Float *p, Float coef)
     p[17] = (p[17] - c) * coef;
 }
 
+static void thread_work_partial(int nwork, int me, int nthreads,
+                                int &mywork, int &myoff)
+{
+    int basework = nwork / nthreads;
+    int backfill = nthreads - (nwork % nthreads);
+    mywork = (nwork + me) / nthreads;
+    myoff  = basework * me;
+    if ( me > backfill ) 
+        myoff += (me-backfill);
+}
+
 ForceArg Fbfm::EvolveMomFforceInternal(Matrix *mom,
                                        Float *v1, Float *v2, // only internal data will be used
                                        Float coef, int mu)
@@ -200,26 +208,26 @@ ForceArg Fbfm::EvolveMomFforceInternal(Matrix *mom,
     int low[4] = { 0, 0, 0, 0 };
     int high[4] = { lclx[0], lclx[1], lclx[2], lclx[3] };
     --high[mu];
-
-    Matrix *gauge = GaugeField();
-
-    int block_size = SPINOR_SIZE * lclx[4];
-
     const int hl[4] = {high[0] - low[0],
                        high[1] - low[1],
                        high[2] - low[2],
                        high[3] - low[3] };
     const int hl_sites = hl[0] * hl[1] * hl[2] * hl[3];
 
-#pragma omp parallel for 
-    for(int i = 0; i < hl_sites; ++i) {
-        int x[4];
-        int tmp = i;
-        x[0] = tmp % hl[0] + low[0]; tmp /= hl[0];
-        x[1] = tmp % hl[1] + low[1]; tmp /= hl[1];
-        x[2] = tmp % hl[2] + low[2]; tmp /= hl[2];
-        x[3] = tmp % hl[3] + low[3];
+    Matrix *gauge = GaugeField();
 
+    int block_size = SPINOR_SIZE * lclx[4];
+
+    int nthreads = omp_get_num_threads();
+    int me = omp_get_thread_num();
+    int mywork, myoff;
+    // 4 threads are used in communication
+    thread_work_partial(hl_sites, me, nthreads - 4, mywork, myoff);
+
+    ForceArg f_arg(0, 0, 0);
+    for(int i = 0; i < mywork; ++i) {
+        int x[4];
+        compute_coord(x, hl, low, i + myoff);
         int off_4d = idx_4d(x, lclx);
         int gid = mu + 4 * off_4d;
         int fid = block_size * off_4d;
@@ -229,18 +237,17 @@ ForceArg Fbfm::EvolveMomFforceInternal(Matrix *mom,
         int fidp = block_size * idx_4d(y, lclx);
 
         Matrix force;
-        // remind: s direction is done in FforceSite().
         FforceSiteS(force, gauge[gid],
                     v2 + fid, v2 + fidp,
                     v1 + fid, v1 + fidp, mu);
-
         trless_am((Float *)&force, -coef);
         // force.TrLessAntiHermMatrix();
         // force *= -coef;
         *(mom + gid) += force;
+        updateForce(f_arg, force);
     }
 
-    return ForceArg();
+    return f_arg;
 }
 
 ForceArg Fbfm::EvolveMomFforceSurface(Matrix *mom,
@@ -252,46 +259,43 @@ ForceArg Fbfm::EvolveMomFforceSurface(Matrix *mom,
     int high[4] = { lclx[0], lclx[1], lclx[2], lclx[3] };
     low[mu] = lclx[mu] - 1;
     high[mu] = lclx[mu];
-
-    Matrix *gauge = GaugeField();
-
-    ForceArg f_arg;
-
-    int block_size = SPINOR_SIZE * lclx[4];
-
-    int sign = GJP.NodeBc(mu) == BND_CND_APRD ? -1.0 : 1.0;
-
     const int hl[4] = {high[0] - low[0],
                        high[1] - low[1],
                        high[2] - low[2],
                        high[3] - low[3] };
     const int hl_sites = hl[0] * hl[1] * hl[2] * hl[3];
 
-#pragma omp parallel for
-    for(int i = 0; i < hl_sites; ++i) {
+    Matrix *gauge = GaugeField();
+
+    int block_size = SPINOR_SIZE * lclx[4];
+    int sign = GJP.NodeBc(mu) == BND_CND_APRD ? -1.0 : 1.0;
+
+    int nthreads = omp_get_num_threads();
+    int me = omp_get_thread_num();
+    int mywork, myoff;
+
+    // here all threads participate
+    thread_work_partial(hl_sites, me, nthreads, mywork, myoff);
+
+    ForceArg f_arg(0, 0, 0);
+    for(int i = 0; i < mywork; ++i) {
         int x[4];
-        int tmp = i;
-        x[0] = tmp % hl[0] + low[0]; tmp /= hl[0];
-        x[1] = tmp % hl[1] + low[1]; tmp /= hl[1];
-        x[2] = tmp % hl[2] + low[2]; tmp /= hl[2];
-        x[3] = tmp % hl[3] + low[3];
+        compute_coord(x, hl, low, i + myoff);
 
         int off_4d = idx_4d(x, lclx);
         int gid = mu + 4 * off_4d;
         int fid = block_size * off_4d;
-
         int fid_s = block_size * idx_4d_surf(x, lclx, mu);
 
         Matrix force;
-        // remind: s direction is done in FforceSite().
         FforceSiteS(force, gauge[gid],
                     v2 + fid, v2_s + fid_s,
                     v1 + fid, v1_s + fid_s, mu);
-
         trless_am((Float *)&force, -coef * sign);
         // force.TrLessAntiHermMatrix();
         // force *= -coef * sign;
         *(mom + gid) += force;
+        updateForce(f_arg, force);
     }
 
     return f_arg;
@@ -322,8 +326,6 @@ void Fbfm::CalcHmdForceVecsBilinear(Float *v1,
                                     Vector *phi2,
                                     Float mass)
 {
-    const char *fname = "CalcHmdForceVecsBilinear()";
-
     Fermion_t pi[2] = {bevo.allocFermion(), bevo.allocFermion()};
     Fermion_t po[4] = {bevo.allocFermion(), bevo.allocFermion(),
                        bevo.allocFermion(), bevo.allocFermion()};
@@ -406,7 +408,7 @@ ForceArg Fbfm::EvolveMomFforceBase(Matrix *mom,
                                    Float mass,
                                    Float coef)
 {
-    const char *fname = "EvolveMomFforceBase(M*,V*,V*,F,F)";
+    const char *fname = "EvolveMomFforceBase()";
 
 #if 0
     return EvolveMomFforceBaseThreaded(mom, phi1, phi2, mass, coef);
@@ -433,44 +435,74 @@ ForceArg Fbfm::EvolveMomFforceBase(Matrix *mom,
 
     Float dtime3 = dclock();
 
-    // This can be made non-blocking to gain some additional benefit.
-    for(int i = 0; i < 4; ++i) {
-        getPlusData(rcvbuf + surf_v1[i], sndbuf + surf_v1[i],
-                    surf_size[i] * 2, i); 
+    omp_set_num_threads(bfm_arg.threads);
+    ForceArg ret;
+
+    // Fused comm/force.
+    //
+    // 1. The last 4 threads (typically 60-63) are used for
+    // communication. All other threads (typically 0-59) are used to
+    // calculate internal forces.
+    //
+    // 2. All threads are used to calculate surface forces.
+#pragma omp parallel
+    {
+        int nthreads = omp_get_num_threads();
+        int me = omp_get_thread_num();
+        ForceArg f_arg; // threaded
+
+        if(nthreads <= 4) {
+            if(!me) {
+                VRB.Result(cname, fname, "error: at least 5 threads are required.\n");
+            }
+            exit(-1);
+        }
+
+        if(me >= nthreads - 4) {
+            int dir = nthreads - me - 1;
+            getPlusData(rcvbuf + surf_v1[dir], sndbuf + surf_v1[dir],
+                        surf_size[dir] * 2, dir);
+        } else {
+            for(int i = 0; i < 4; ++i) {
+                ForceArg t = EvolveMomFforceInternal(mom, v1, v2, coef, i);
+                f_arg.combine(t);
+            }
+        }
+
+#pragma omp barrier
+
+        for(int i = 0; i < 4; ++i) {
+            ForceArg t = EvolveMomFforceSurface(mom, v1, v2,
+                                                rcvbuf + surf_v1[i], // v1 surface
+                                                rcvbuf + surf_v2[i], // v2 surface
+                                                coef, i);
+            f_arg.combine(t);
+        }
+
+#pragma omp critical
+        {
+            ret.combine(f_arg);
+        }
     }
 
     Float dtime4 = dclock();
-
-    ForceArg f_arg; // not implemented yet
-
-    for(int i = 0; i < 4; ++i) {
-        EvolveMomFforceInternal(mom, v1, v2, coef, i);
-    }
-
-    Float dtime5 = dclock();
-
-    for(int i = 0; i < 4; ++i) {
-        EvolveMomFforceSurface(mom, v1, v2,
-                               rcvbuf + surf_v1[i], // v1 surface
-                               rcvbuf + surf_v2[i], // v2 surface
-                               coef, i);
-    }
-
-    Float dtime6 = dclock();
 
     sfree(cname, fname, "v1", v1);
     sfree(cname, fname, "v2", v2);
     sfree(cname, fname, "sndbuf", sndbuf);
     sfree(cname, fname, "rcvbuf", rcvbuf);
 
-    VRB.Result(cname, fname, "Calculating auxiliary vectors: takes %17.10e seconds\n", dtime2 - dtime1);
-    VRB.Result(cname, fname, "Collecting surface data      : takes %17.10e seconds\n", dtime3 - dtime2);
-    VRB.Result(cname, fname, "Communication                : takes %17.10e seconds\n", dtime4 - dtime3);
-    VRB.Result(cname, fname, "Calculating internal forces  : takes %17.10e seconds\n", dtime5 - dtime4);
-    VRB.Result(cname, fname, "Calculating surface forces   : takes %17.10e seconds\n", dtime6 - dtime5);
-    VRB.Result(cname, fname, "Total                        : takes %17.10e seconds\n", dtime6 - dtime1);
+    VRB.Result(cname, fname, "cal aux vectors  : takes %17.10e seconds\n", dtime2 - dtime1);
+    VRB.Result(cname, fname, "prepare for comm : takes %17.10e seconds\n", dtime3 - dtime2);
+    VRB.Result(cname, fname, "comm/forces      : takes %17.10e seconds\n", dtime4 - dtime3);
+    VRB.Result(cname, fname, "total            : takes %17.10e seconds\n", dtime4 - dtime1);
 
-    return f_arg;
+    glb_sum(&ret.L1);
+    glb_sum(&ret.L2);
+    glb_max(&ret.Linf);
+
+    ret.unitarize(4 * GJP.VolSites());
+    return ret;
 }
 
 //------------------------------------------------------------------
@@ -562,7 +594,8 @@ int Fbfm::FmatEvlInv(Vector *f_out, Vector *f_in,
 
     if(use_mixed_solver) {
         return FmatEvlInvMixed(f_out, f_in, cg_arg, 1e-5,
-                               cg_arg->max_num_iter, 4);
+                               cg_arg->max_num_iter,
+                               5);
     }
 
     Fermion_t in  = bevo.allocFermion();
@@ -626,9 +659,16 @@ int Fbfm::FmatEvlInvMixed(Vector *f_out, Vector *f_in,
     bevo.cps_impexcbFermion((Float *)f_in , src, 1, 1);
     bevo.cps_impexcbFermion((Float *)f_out, sol, 1, 1);
 
-    int iter = mixed_cg::cg_mixed_MdagM(sol, src, bevo, bfm_f, max_cycle);
+    int iter = -1;
+#pragma omp parallel
+    {
+        iter = mixed_cg::threaded_cg_mixed_MdagM(sol, src, bevo, bfm_f, max_cycle);
 
-    // FIXME: For bfm_f, comm_end() has been called here.
+        // bevo.max_iter = 20;
+        // iter = mixed_cg::cg_MdagM_single_precnd(sol, src, bevo, bfm_f);
+        // bevo.max_iter = cg_arg->max_num_iter;
+    }
+
     bevo.comm_end();
     bfm_f.comm_init();
     bfm_f.end();
@@ -1225,3 +1265,5 @@ void Fbfm::Dminus(Vector *out, Vector *in)
 }
 
 CPS_END_NAMESPACE
+
+#endif

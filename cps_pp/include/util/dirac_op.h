@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.31 2012-03-27 05:02:40 chulwoo Exp $
+  $Id: dirac_op.h,v 1.32 2012-08-10 14:05:33 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -34,7 +34,7 @@ typedef unsigned long long IntFlopCounter;
 class DiracOp
 {
  private:
-  char *cname;                     // Class name.
+  const char *cname;                     // Class name.
 
 
  protected:
@@ -240,7 +240,7 @@ class DiracOp
 
   virtual int eig_MatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len, Vector *out, Vector *in, Float *true_res, PreserveType prs_in = PRESERVE_YES)
   {
-	  char *fname="eig_MatInv()";
+	  const char *fname="eig_MatInv()";
 	  ERR.General(cname, fname,"only implemented for dwf currently, so not pure virtual\n");
 	  return 0;
   } 
@@ -362,7 +362,7 @@ class DiracOp
 class DiracOpStagTypes : public DiracOp
 {
  private:
-  char *cname;    // Class name.
+  const char *cname;    // Class name.
 
  public:
   DiracOpStagTypes(Lattice& latt,            // Lattice object.
@@ -413,7 +413,7 @@ class DiracOpStagTypes : public DiracOp
 class DiracOpStag : public DiracOpStagTypes
 {
  private:
-  char *cname;         // Class name.
+  const char *cname;         // Class name.
 
   Float mass_rs;       // rescaled mass
   Float mass_sq;       // = mass^2
@@ -526,7 +526,7 @@ class DiracOpStag : public DiracOpStagTypes
 class DiracOpAsqtad : public DiracOpStagTypes
 {
  private:
-  char *cname;         // Class name.
+  const char *cname;         // Class name.
 
   Float mass_rs;       // rescaled mass
   Float mass_sq;       // = mass^2
@@ -644,7 +644,7 @@ class DiracOpAsqtad : public DiracOpStagTypes
 class DiracOpP4 : public DiracOpStagTypes
 {
  private:
-  char *cname;         // Class name.
+  const char *cname;         // Class name.
 
   Float mass_rs;       // rescaled mass
   Float mass_sq;       // = mass^2
@@ -826,7 +826,7 @@ The following representation of the Euclidean gamma matrices is probably used:
 class DiracOpWilsonTypes : public DiracOp
 {
  private:
-  char *cname;    // Class name.
+  const char *cname;    // Class name.
 
   protected:
 
@@ -934,7 +934,7 @@ class DiracOpWilsonTypes : public DiracOp
 class DiracOpWilson : public DiracOpWilsonTypes
 {
  private:
-  char *cname;    // Class name.
+  const char *cname;    // Class name.
 
  public:
 
@@ -1034,7 +1034,7 @@ class DiracOpWilson : public DiracOpWilsonTypes
 class DiracOpWilsonTm : public DiracOpWilson
 {
  private:
-  char *cname;    // Class name.
+  const char *cname;    // Class name.
 
   Float epsilon;	 // fractional imaginary mass 
   Float ctheta, stheta;	 // gamma_5(theta) parameters
@@ -1138,7 +1138,7 @@ class Fclover;
 class DiracOpClover : public DiracOpWilsonTypes
 {
  private:
-  char *cname;            // Class name.
+  const char *cname;            // Class name.
   Clover *clover_lib_arg; // pointer to an argument structure related
                           // to the clover library.
   Float kappa;    /* For isotropic lattices:
@@ -1356,7 +1356,7 @@ CPS_START_NAMESPACE
 class DiracOpMdwf : public DiracOpWilsonTypes
 {
  private:
-  char *cname;    // Class name.
+  const char *cname;    // Class name.
 
   Float epsilon;
   int max_num_iter;

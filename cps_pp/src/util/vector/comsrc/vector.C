@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definition of Vector and Matrix classes.
 
   Definitions of functions that perform operations on complex vectors.
-  $Id: vector.C,v 1.11 2012-07-09 15:51:32 chulwoo Exp $
+  $Id: vector.C,v 1.12 2012-08-10 14:05:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-07-09 15:51:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.11 2012-07-09 15:51:32 chulwoo Exp $
-//  $Id: vector.C,v 1.11 2012-07-09 15:51:32 chulwoo Exp $
+//  $Date: 2012-08-10 14:05:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v 1.12 2012-08-10 14:05:33 chulwoo Exp $
+//  $Id: vector.C,v 1.12 2012-08-10 14:05:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector.C,v $
 //  $State: Exp $
 //
@@ -26,62 +26,6 @@ CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <comms/glb.h>
 CPS_START_NAMESPACE
-
-
-//------------------------------------------------------------------
-/*!
-  The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the real
-  number \a c; All other elements are zero.  
-  \param c The diagonal matrix element
-*/
-Matrix::Matrix(IFloat c) 
-{ *this = c; }
-
-
-//------------------------------------------------------------------
-/*!
-  The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the complex
-  number \a c; All other elements are zero.  
-  \param c The diagonal matrix element
-*/
-Matrix::Matrix(const Complex& c) 
-{ *this = c; }
-
-
-//------------------------------------------------------------------
-/*!
-  The matrix is initialised as a copy of the matrix \a m.
-  \param m The initialising matrix.
-*/
-Matrix::Matrix(const Matrix& m) 
-{ *this = m; }
-
-
-//------------------------------------------------------------------
-/*!
-  The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the real
-  number \a c; All other elements are zero.  
-  \param c The diagonal matrix element
-*/
-Matrix& Matrix::operator = (IFloat c)
-{
-  this -> ZeroMatrix();
-  u[0] = u[8] = u[16] = c;
-  return *this;
-}
-
-//------------------------------------------------------------------
-/*!
-  The diagonal matrix elements (0,0), (1,1) and (2,2) are set to the complex
-  number \a c; All other elements are zero.  
-  \param c The diagonal matrix element
-*/
-Matrix& Matrix::operator = (const Complex& c)
-{
-  this -> ZeroMatrix();
-  ((Complex*)u)[0] = ((Complex*)u)[4] = ((Complex*)u)[8] = c;
-  return *this;
-}
 
 //------------------------------------------------------------------
 // 0, 1, 2
@@ -103,38 +47,6 @@ void Matrix::Trans(const IFloat *m)
   dst[3] = src[1]; dst[4] = src[4]; dst[5] = src[7];
   dst[6] = src[2]; dst[7] = src[5]; dst[8] = src[8];
 }
-
-//------------------------------------------------------------------
-/*!
-  \post This matrix is a 3x3 unit matrix.
-*/
-void Matrix::UnitMatrix(void)
-{
-  IFloat *p = (IFloat *)u;
-
-  for(int i = 0; i < 18; ++i) {
-    *p++ = 0.0;
-  }
-  p = (IFloat *)u;
-  //u[0].re = 1.0; u[4].re = 1.0; u[8].re = 1.0;
-  *p = 1.0;
-  *(p+8) = 1.0;
-  *(p+16) = 1.0;
-}
-
-//------------------------------------------------------------------
-/*!
-  \post This matrix is a 3x3 zero matrix.
-*/
-void Matrix::ZeroMatrix(void)
-{
-  IFloat *p = (IFloat *)u;
-
-  for(int i = 0; i < 18; ++i) {
-    *p++ = 0.0;
-  }
-}
-
 
 /*!
   \return <em>|U^dagger U - I|^2</em>, where the norm used is the L2 norm
@@ -175,10 +87,6 @@ const Complex& Matrix::operator()(int i, int j) const
 
 
 //------------------------------------------------------------------
-Complex Matrix::Tr() const
-{ return ((Complex*)u)[0] + ((Complex*)u)[4] + ((Complex*)u)[8]; }
-
-//------------------------------------------------------------------
 Complex Matrix::Char6() const
 {
   Complex tmp(reChar6((IFloat *)u), imChar6((IFloat *)u)) ;
@@ -200,25 +108,9 @@ Complex Matrix::Char10() const
 }
 
 
-/*! Returns the SU(3) matrix norm, defined by
-  ||X||^2 = -2 trace X^2
-*/
-IFloat Matrix::norm() const {
-  Matrix x2;
-  x2.DotMEqual(*this, *this);
-  return -2.0*x2.ReTr();
-
-  //IFloat *m = (IFloat*)&u[0];
-  //return dotProduct(m, m, 18);
-}
-
 //------------------------------------------------------------------
 // The Vector class.
 //------------------------------------------------------------------
-
-Vector::Vector()
-{}
-
 
 //------------------------------------------------------------------
 /*!

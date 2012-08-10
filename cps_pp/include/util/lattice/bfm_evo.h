@@ -1,10 +1,10 @@
 /* -*- mode:c++; c-basic-offset:2 -*- */
 /****************************************************************************/
-/* Apr 2012                                                                 */
+/* Aug 2012                                                                 */
 /* Hantao Yin                                                               */
 /*                                                                          */
 /* bfm_evo.h                                                                */
-/* functions added by Hantao (mainly mobius evolution related).             */
+/* functions added by Hantao (mainly DWF-like fermion evolution related).   */
 /*                                                                          */
 /****************************************************************************/
 
@@ -16,19 +16,9 @@
 #include <bfm_qdp.h>
 #include <omp.h>
 #include <math.h>
+#include <vector>
 #include "bfm_evo_aux.h"
 
-struct rquo_approx {
-  double bsn_a0;
-  double frm_a0;
-  vector<double> bsn_alpha;
-  vector<double> bsn_beta;
-  vector<double> frm_alpha;
-  vector<double> frm_beta;
-};
-
-// currently it uses 4D preconditioning only.
-//
 // FIXME: it inherits from bfm_qdp for the sole reason of using its
 // importGauge() function. I'm too lazy to do any manual
 // shifts/conjugates ......
@@ -73,8 +63,9 @@ private:
                    Float *v2, Float *v2p, int mu, Float coef);
 
   void fforce_internal(Float *mom, Float *gauge,
-                              Float *v1, Float *v2, // internal data
-                              Float coef, int mu);
+                       Float *v1, Float *v2, // internal data
+                       Float coef, int mu,
+                       int me, int nthreads);
 
   void fforce_surface(Float *mom, Float *gauge,
                       Float *v1, Float *v2, // internal data
@@ -82,6 +73,20 @@ private:
                       Float coef, int mu);
 
   void copySendFrmData(Float v3d[], Float v4d[], int mu, bool send_neg);
+
+  void thread_work_partial_nobarrier(int nwork, int me, int nthreads,
+                                     int &mywork, int &myoff)
+  {
+    int basework = nwork / nthreads;
+    int backfill = nthreads - (nwork % nthreads);
+    mywork = (nwork + me) / nthreads;
+    myoff  = basework * me;
+    if ( me > backfill ) 
+        myoff += (me-backfill);
+  }
+
+  // complex version of axpy()
+  void axpy_c(Fermion_t r, Fermion_t x, Fermion_t y, std::complex<double> a, Fermion_t tmp);
 public:
   // compute fermion force:
   //
@@ -90,14 +95,6 @@ public:
   // For BFM M is M = M_oo - M_oe M^{-1}_ee M_eo
   void compute_force(Float *mom, Float *gauge, Fermion_t phiL, Fermion_t phiR, double coef);
   
-  // compute quotient and rational quotient fermion forces
-  void compute_force_quotient(Float *mom, Float *gauge, Fermion_t phi, double mb, double mf);
-  // not implemented yet.
-
-  void compute_force_rquotient(Float *mom, Float *gauge, Fermion_t phi, double mb, double mf,
-                               const rquo_approx &rq_param);
-  // not implemented yet.
-
   // psi assumes the following order: (color, spin, s, x, y, z, t),
   // mainly used to import/export the "v1" and "v2" vectors in evolution.
   template<typename FloatEXT>
@@ -106,6 +103,19 @@ public:
   Float *threadedAllocFloat(size_t size, int mem_type=mem_slow);
   void threadedFreeFloat(Float *);
 
+  // bicg_M: Biconjugate gradient method on preconditioned Dirac
+  // operator (It never converges).
+  //
+  // FIXME: test code only, don't use it unless you know what you are
+  // doing.
+  int bicg_M(Fermion_t sol, Fermion_t src);
+
+  // bicgstab_M: Biconjugate gradient stabilized method on
+  // preconditioned Dirac operator.
+  //
+  // FIXME: test code only, don't use it unless you know what you are
+  // doing.
+  int bicgstab_M(Fermion_t sol, Fermion_t src);
 public:
   //======================================================================
   // the following member functions are single-threaded functions:
@@ -190,39 +200,36 @@ void bfm_evo<Float>::cps_impexcbFermion(FloatEXT *psi, Fermion_t handle, int doi
   Float *bagel = (Float *)handle;
   omp_set_num_threads(this->nthread);
 
-#pragma omp parallel
-  {
-#pragma omp for 
-    for (int site = 0; site < vol5d; site++) {
+#pragma omp parallel for 
+  for (int site = 0; site < vol5d; site++) {
     
-      int x[4], s;
-      int si=site;
-      x[0]=si%this->node_latt[0];    si=si/this->node_latt[0];
-      x[1]=si%this->node_latt[1];    si=si/this->node_latt[1];
-      x[2]=si%this->node_latt[2];    si=si/this->node_latt[2];
-      x[3]=si%this->node_latt[3];
-      s   =si/this->node_latt[3];
+    int x[4], s;
+    int si=site;
+    x[0]=si%this->node_latt[0];    si=si/this->node_latt[0];
+    x[1]=si%this->node_latt[1];    si=si/this->node_latt[1];
+    x[2]=si%this->node_latt[2];    si=si/this->node_latt[2];
+    x[3]=si%this->node_latt[3];
+    s   =si/this->node_latt[3];
     
-      int sp = this->precon_5d ? s : 0;
-      if ( (x[0]+x[1]+x[2]+x[3] + sp &0x1) == cb ) {
+    int sp = this->precon_5d ? s : 0;
+    if ( (x[0]+x[1]+x[2]+x[3] + sp &0x1) == cb ) {
 
-        int bidx_base = this->bagel_idx5d(x, s, 0, 0, Nspinco, 1);
-        int cidx_base = this->cps_idx_cb(x, s, 0, 0, Nspinco);
+      int bidx_base = this->bagel_idx5d(x, s, 0, 0, Nspinco, 1);
+      int cidx_base = this->cps_idx_cb(x, s, 0, 0, Nspinco);
 
-        for ( int co=0;co<Nspinco;co++ ) { 
-          for ( int reim=0;reim<2;reim++ ) {
-            // int bidx = bagel_idx(x, reim, co + Nspinco * (s / 2), Nspinco * this->cbLs, 1);
-            // int bidx = this->bagel_idx5d(x, s, reim, co, Nspinco, 1);
-            // int cidx = cps_idx_cb(x, s, reim, co, Nspinco);
-            int bidx = bidx_base + reim + co * i_inc;
-            int cidx = cidx_base + reim + co * 2;
+      for ( int co=0;co<Nspinco;co++ ) { 
+        for ( int reim=0;reim<2;reim++ ) {
+          // int bidx = bagel_idx(x, reim, co + Nspinco * (s / 2), Nspinco * this->cbLs, 1);
+          // int bidx = this->bagel_idx5d(x, s, reim, co, Nspinco, 1);
+          // int cidx = cps_idx_cb(x, s, reim, co, Nspinco);
+          int bidx = bidx_base + reim + co * i_inc;
+          int cidx = cidx_base + reim + co * 2;
 
-            if ( doimport ) bagel[bidx] = psi[cidx];
-            else psi[cidx] = bagel[bidx] ;
-          }}//co,reim
-      }//cb
-    }//xyzts
-  }//omp
+          if ( doimport ) bagel[bidx] = psi[cidx];
+          else psi[cidx] = bagel[bidx] ;
+        }}//co,reim
+    }//cb
+  }//xyzts
 }
 
 template <class Float> template<typename FloatEXT>
@@ -240,37 +247,34 @@ void bfm_evo<Float>::cps_impexFermion(FloatEXT *psi, Fermion_t handle[2], int do
   omp_set_num_threads(this->nthread);
   Float *bagel[2] = { (Float *)handle[0], (Float *)handle[1] };
 
-#pragma omp parallel
-  {
-#pragma omp for 
-    for (int site = 0; site < vol5d; site++) {
-      int x[4], s;
-      int si=site;
-      x[0]=si%this->node_latt[0];    si=si/this->node_latt[0];
-      x[1]=si%this->node_latt[1];    si=si/this->node_latt[1];
-      x[2]=si%this->node_latt[2];    si=si/this->node_latt[2];
-      x[3]=si%this->node_latt[3];
-      s   =si/this->node_latt[3];
+#pragma omp parallel for 
+  for (int site = 0; site < vol5d; site++) {
+    int x[4], s;
+    int si=site;
+    x[0]=si%this->node_latt[0];    si=si/this->node_latt[0];
+    x[1]=si%this->node_latt[1];    si=si/this->node_latt[1];
+    x[2]=si%this->node_latt[2];    si=si/this->node_latt[2];
+    x[3]=si%this->node_latt[3];
+    s   =si/this->node_latt[3];
     
-      int sp = this->precon_5d ? s : 0;
-      int cb = x[0]+x[1]+x[2]+x[3]+sp &0x1;
+    int sp = this->precon_5d ? s : 0;
+    int cb = x[0]+x[1]+x[2]+x[3]+sp &0x1;
 
-      int bidx_base = this->bagel_idx5d(x, s, 0, 0, Nspinco, 1);
-      int cidx_base = this->cps_idx(x, s, 0, 0, Nspinco);
+    int bidx_base = this->bagel_idx5d(x, s, 0, 0, Nspinco, 1);
+    int cidx_base = this->cps_idx(x, s, 0, 0, Nspinco);
 
-      for ( int co=0;co<Nspinco;co++ ) { 
-        for ( int reim=0;reim<2;reim++ ) { 
-          // int bidx = bagel_idx(x, reim, co + Nspinco * (s / 2), Nspinco * this->cbLs, 1);
-          // int bidx = this->bagel_idx5d(x, s, reim, co, Nspinco, 1);
-          // int cidx = cps_idx(x, s, reim, co, Nspinco);
-          int bidx = bidx_base + reim + co * i_inc;
-          int cidx = cidx_base + reim + co * 2;
+    for ( int co=0;co<Nspinco;co++ ) { 
+      for ( int reim=0;reim<2;reim++ ) { 
+        // int bidx = bagel_idx(x, reim, co + Nspinco * (s / 2), Nspinco * this->cbLs, 1);
+        // int bidx = this->bagel_idx5d(x, s, reim, co, Nspinco, 1);
+        // int cidx = cps_idx(x, s, reim, co, Nspinco);
+        int bidx = bidx_base + reim + co * i_inc;
+        int cidx = cidx_base + reim + co * 2;
 
-          if ( doimport ) bagel[cb][bidx] = psi[cidx];
-          else psi[cidx] = bagel[cb][bidx];
-        }}//co, reim
-    }//xyzts
-  }//omp
+        if ( doimport ) bagel[cb][bidx] = psi[cidx];
+        else psi[cidx] = bagel[cb][bidx];
+      }}//co, reim
+  }//xyzts
 }
 
 template <class Float> template<typename FloatEXT>
@@ -288,36 +292,33 @@ void bfm_evo<Float>::cps_impexFermion_s(FloatEXT *psi, Fermion_t handle[2], int 
   omp_set_num_threads(this->nthread);
   Float *bagel[2] = { (Float *)handle[0], (Float *)handle[1] };
 
-#pragma omp parallel
-  {
-#pragma omp for 
-    for (int site = 0; site < vol5d; site++) {
-      int x[4], s;
-      int si=site;
-      s   =si%this->Ls;              si=si/this->Ls;
-      x[0]=si%this->node_latt[0];    si=si/this->node_latt[0];
-      x[1]=si%this->node_latt[1];    si=si/this->node_latt[1];
-      x[2]=si%this->node_latt[2];
-      x[3]=si/this->node_latt[2];
+#pragma omp parallel for 
+  for (int site = 0; site < vol5d; site++) {
+    int x[4], s;
+    int si=site;
+    s   =si%this->Ls;              si=si/this->Ls;
+    x[0]=si%this->node_latt[0];    si=si/this->node_latt[0];
+    x[1]=si%this->node_latt[1];    si=si/this->node_latt[1];
+    x[2]=si%this->node_latt[2];
+    x[3]=si/this->node_latt[2];
 
-      int sp = this->precon_5d ? s : 0;
-      int cb = x[0]+x[1]+x[2]+x[3]+sp & 0x1;
+    int sp = this->precon_5d ? s : 0;
+    int cb = x[0]+x[1]+x[2]+x[3]+sp & 0x1;
 
-      int bidx_base = this->bagel_idx5d(x, s, 0, 0, Nspinco, 1);
-      int cidx_base = this->cps_idx_s(x, s, 0, 0, Nspinco);
+    int bidx_base = this->bagel_idx5d(x, s, 0, 0, Nspinco, 1);
+    int cidx_base = this->cps_idx_s(x, s, 0, 0, Nspinco);
 
-      for ( int co=0;co<Nspinco;co++ ) {
-        for ( int reim=0;reim<2;reim++ ) {
-          // int bidx = this->bagel_idx5d(x, s, reim, co, Nspinco, 1);
-          // int cidx = cps_idx_s(x, s, reim, co, Nspinco);
-          int bidx = bidx_base + reim + co * i_inc;
-          int cidx = cidx_base + reim + co * 2;
+    for ( int co=0;co<Nspinco;co++ ) {
+      for ( int reim=0;reim<2;reim++ ) {
+        // int bidx = this->bagel_idx5d(x, s, reim, co, Nspinco, 1);
+        // int cidx = cps_idx_s(x, s, reim, co, Nspinco);
+        int bidx = bidx_base + reim + co * i_inc;
+        int cidx = cidx_base + reim + co * 2;
 
-          if ( doimport ) bagel[cb][bidx] = psi[cidx];
-          else psi[cidx] = bagel[cb][bidx];
-        }}//co, reim
-    }//xyzts
-  }//omp
+        if ( doimport ) bagel[cb][bidx] = psi[cidx];
+        else psi[cidx] = bagel[cb][bidx];
+      }}//co, reim
+  }//xyzts
 }
 
 template <class Float> template<typename FloatEXT>
@@ -443,31 +444,27 @@ void bfm_evo<Float>::cps_importGauge(FloatEXT *importme)
   for (int mu=0;mu<Nd;mu++) {
     U_p = (QDPdouble *)&(U[mu].elem(0).elem());
 
-#pragma omp parallel
-    {
-
-#pragma omp for 
-      for (int site=0;site<vol4d;site++ ) {
-        int x[4];
-        int s=site;
-        x[0]=s%this->node_latt[0];    s=s/this->node_latt[0];
-        x[1]=s%this->node_latt[1];    s=s/this->node_latt[1];
-        x[2]=s%this->node_latt[2];    s=s/this->node_latt[2];
-        x[3]=s%this->node_latt[3];
+#pragma omp parallel for 
+    for (int site=0;site<vol4d;site++ ) {
+      int x[4];
+      int s=site;
+      x[0]=s%this->node_latt[0];    s=s/this->node_latt[0];
+      x[1]=s%this->node_latt[1];    s=s/this->node_latt[1];
+      x[2]=s%this->node_latt[2];    s=s/this->node_latt[2];
+      x[3]=s%this->node_latt[3];
       
-        int qidx_base = this->chroma_idx(x, 0, 0, Ncoco);
+      int qidx_base = this->chroma_idx(x, 0, 0, Ncoco);
 
-        for(int coco = 0; coco < Ncoco; ++coco) {
-          for ( int reim = 0; reim < 2; ++reim) {
-            // int qidx = this->chroma_idx(x,reim,coco,Ncoco);
-            int qidx = qidx_base + reim + coco * 2;
+      for(int coco = 0; coco < Ncoco; ++coco) {
+        for ( int reim = 0; reim < 2; ++reim) {
+          // int qidx = this->chroma_idx(x,reim,coco,Ncoco);
+          int qidx = qidx_base + reim + coco * 2;
 
-            int siteoff = mu + Nd * site;
-            int cidx = reim + 2 * (coco + Ncoco * siteoff);
-            U_p[qidx] = importme[cidx];
-          }} // reim,coco
-      } // x
-    }
+          int siteoff = mu + Nd * site;
+          int cidx = reim + 2 * (coco + Ncoco * siteoff);
+          U_p[qidx] = importme[cidx];
+        }} // reim,coco
+    } // x
   }//mu
 
   // to bfm
@@ -809,32 +806,33 @@ void bfm_evo<Float>::fforce_site(Float *mom, Float *gauge,
 
     switch(mu) {
     case 0:
-      sprojTrXm(t1, v1p, v2, this->Ls, 0, 0);
-      sprojTrXp(t2, v2p, v1, this->Ls, 0, 0);
+      bfm_evo_aux::sprojTrXm(t1, v1p, v2, this->Ls, 0, 0);
+      bfm_evo_aux::sprojTrXp(t2, v2p, v1, this->Ls, 0, 0);
       break;
     case 1:
-      sprojTrYm(t1, v1p, v2, this->Ls, 0, 0);
-      sprojTrYp(t2, v2p, v1, this->Ls, 0, 0);
+      bfm_evo_aux::sprojTrYm(t1, v1p, v2, this->Ls, 0, 0);
+      bfm_evo_aux::sprojTrYp(t2, v2p, v1, this->Ls, 0, 0);
       break;
     case 2:
-      sprojTrZm(t1, v1p, v2, this->Ls, 0, 0);
-      sprojTrZp(t2, v2p, v1, this->Ls, 0, 0);
+      bfm_evo_aux::sprojTrZm(t1, v1p, v2, this->Ls, 0, 0);
+      bfm_evo_aux::sprojTrZp(t2, v2p, v1, this->Ls, 0, 0);
       break;
     default:
-      sprojTrTm(t1, v1p, v2, this->Ls, 0, 0);
-      sprojTrTp(t2, v2p, v1, this->Ls, 0, 0);
+      bfm_evo_aux::sprojTrTm(t1, v1p, v2, this->Ls, 0, 0);
+      bfm_evo_aux::sprojTrTp(t2, v2p, v1, this->Ls, 0, 0);
     }
 
-    su3_add(t1, t2);
-    mDotMEqual(t2, gauge, t1);
-    trless_am(t2, -coef);
-    su3_add(mom, t2);
+    bfm_evo_aux::su3_add(t1, t2);
+    bfm_evo_aux::mDotMEqual(t2, gauge, t1);
+    bfm_evo_aux::trless_am(t2, -coef);
+    bfm_evo_aux::su3_add(mom, t2);
 }
 
 template<class Float>
 void bfm_evo<Float>::fforce_internal(Float *mom, Float *gauge,
                                      Float *v1, Float *v2, // internal data
-                                     Float coef, int mu)
+                                     Float coef, int mu,
+                                     int me, int nthreads)
 {
   int lclx[5] = {this->node_latt[0],
                  this->node_latt[1],
@@ -853,8 +851,12 @@ void bfm_evo<Float>::fforce_internal(Float *mom, Float *gauge,
                      high[3] - low[3] };
   const int hl_sites = hl[0] * hl[1] * hl[2] * hl[3];
 
-  int me, thrlen, throff;
-  this->thread_work(hl_sites, me, thrlen, throff);
+  // note: some of the threads are dedicated to communication. There
+  // must be exactly *nthreads* threads executing this function, the
+  // variable *me* must range from 0 to nthreads - 1, inclusive.
+  int thrlen, throff;
+  this->thread_work_partial_nobarrier(hl_sites, me, nthreads,
+                                      thrlen, throff);
 
   for(int i = 0; i < thrlen; ++i) {
     int x[4];
@@ -923,15 +925,15 @@ void bfm_evo<Float>::fforce_surface(Float *mom, Float *gauge,
   }
 }
 
-// compute fermion force:
+// compute fermion force for Mobius class fermions:
+// This is the threaded equivalent of fbfm::EvolveMemFforceBase() in CPS.
 //
 // mom += coef * (phiL^\dag e_i(M) \phiR + \phiR^\dag e_i(M^\dag) \phiL)
+// M = M_oo - M_oe M^{-1}_ee M_eo
 //
-// For BFM M is M = M_oo - M_oe M^{-1}_ee M_eo
-//
-// Be careful about the boundary conditions.
-// Currently only for DWF like fermions.
-// This is the threaded equivalent of fbfm::EvolveMemFforceBase() in CPS.
+// IMPORTANT: at least 5 threads are needed for this function to work
+// correctly since we want to interleave communication and the
+// evaluation of internal forces.
 template<class Float>
 void bfm_evo<Float>::compute_force(Float *mom, Float *gauge, Fermion_t phiL, Fermion_t phiR, double coef)
 {
@@ -975,21 +977,30 @@ void bfm_evo<Float>::compute_force(Float *mom, Float *gauge, Fermion_t phiL, Fer
     this->copySendFrmData(sndbuf + surf_v2[i], v2f, i, true);
   }
 
-  // FIXME: can I have thread 0 do the communication only while the
-  // rest of the threads compute internal forces? If this is possible
-  // then we can turn blocking communications into non-blocking ones
-  // (it blocks only 1 thread).
-  if(!me) {
+  // Fused comm/internal force.
+  //
+  // The last 4 threads (typically 60-63) are used for
+  // communication. All other threads (typically 0-59) are used to
+  // calculate internal forces.
+  if(this->nthread <= 4) {
+    if(!me) {
+      printf("compute_force: Oops, at least 5 threads are needed.\n");
+    }
+    exit(-1);
+  }
+
+  // parallelize comm/internal force calculation
+  if(me >= this->nthread - 4) {
+    int dir = this->nthread - me - 1;
+    cps::getPlusData(rcvbuf + surf_v1[dir], sndbuf + surf_v1[dir],
+                     surf_size[dir] * 2, dir);
+  } else {
     for(int i = 0; i < 4; ++i) {
-      cps::getPlusData(rcvbuf + surf_v1[i], sndbuf + surf_v1[i],
-                       surf_size[i] * 2, i); 
+      fforce_internal(mom, gauge, v1f, v2f, coef, i, me, this->nthread - 4);
     }
   }
 
   this->thread_barrier();
-  for(int i = 0; i < 4; ++i) {
-    fforce_internal(mom, gauge, v1f, v2f, coef, i);
-  }
 
   for(int i = 0; i < 4; ++i) {
     fforce_surface(mom, gauge, v1f, v2f,
@@ -1007,6 +1018,228 @@ void bfm_evo<Float>::compute_force(Float *mom, Float *gauge, Fermion_t phiL, Fer
   this->threadedFreeFermion(v1[1]);
   this->threadedFreeFermion(v2[0]);
   this->threadedFreeFermion(v2[1]);
+}
+
+// complex version of axpy()
+template<class Float>
+void bfm_evo<Float>::axpy_c(Fermion_t r, Fermion_t x, Fermion_t y, std::complex<double> a, Fermion_t tmp)
+{
+  this->copy(tmp, x);
+  this->scale(tmp, std::real(a), std::imag(a));
+  this->axpy(r, tmp, y, 1.0);
+}
+
+// bicg_M: Biconjugate gradient method on preconditioned Dirac
+// operator (It never converges).
+//
+// FIXME: test code only, don't use it unless you know what you are
+// doing.
+template<class Float>
+int bfm_evo<Float>::bicg_M(Fermion_t sol, Fermion_t src)
+{
+  int me = this->thread_barrier();
+
+  Fermion_t r   = this->threadedAllocFermion();
+  Fermion_t rd  = this->threadedAllocFermion();
+  Fermion_t p   = this->threadedAllocFermion();
+  Fermion_t pd  = this->threadedAllocFermion();
+  Fermion_t mp  = this->threadedAllocFermion();
+  Fermion_t mdpd= this->threadedAllocFermion();
+  Fermion_t x   = sol;
+  Fermion_t xd  = this->threadedAllocFermion();
+  this->copy(xd, x);
+
+  Fermion_t tv1 = this->threadedAllocFermion();
+  Fermion_t tv2 = this->threadedAllocFermion();
+
+  const double src_norm = this->norm(src);
+  const double stop = src_norm * this->residual * this->residual;
+
+  this->Mprec(x , r , tv1, 0, 0);
+  this->Mprec(xd, rd, tv1, 1, 0);
+  double rnorm  = this->axpy_norm(r , r , src, -1.0); // r0 <- b-M*x0
+  double rdnorm = this->axpy_norm(rd, rd, src, -1.0);// r0d <- b-Md*x0
+
+  if ( this->isBoss() && !me ) {
+    printf("iter = %5d rsd = %17.10e true rsd = %17.10e\n", 0, rnorm, rnorm);
+  }
+
+  this->copy(p, r);
+  this->copy(pd, rd);
+
+  std::complex<double> rddr = this->inner(rd, r);
+
+  int k = 1;
+  for(; k <= this->max_iter; ++k) {
+    this->Mprec(p, mp, tv1, 0, 0);
+    this->Mprec(pd, mdpd, tv1, 1, 0);
+
+    std::complex<double> pddmp = this->inner(pd, mp);
+    std::complex<double> alpha = rddr / pddmp;
+
+    this->axpy_c(x , p , x , alpha, tv1); // x <- x + alpha * p
+    this->axpy_c(xd, pd, xd, alpha, tv1); // xd <- xd + alpha * pd
+
+    this->axpy_c(r , mp  , r , -alpha, tv1); // r <- r - alpha * Mp
+    this->axpy_c(rd, mdpd, rd, -alpha, tv1); // rd <- rd - alpha * Mdpd
+
+    rnorm = this->norm(r);
+    rdnorm = this->norm(rd);
+
+    // check stopping condition
+    if(rnorm < stop) {
+      // compute true residual
+      this->Mprec(x, tv2, tv1, 0, 0);
+      double true_rsd = this->axpy_norm(tv1, tv2, src, -1.0);
+
+      if(this->isBoss() && !me) {
+        printf("bicg_M: converged in %d iterations.\n", k);
+        printf("bicg_M: acc_rsd = %9.3e %9.3e true_rsd = %9.3e\n",
+               sqrt(rnorm/src_norm), sqrt(rdnorm/src_norm), sqrt(true_rsd/src_norm));
+      }
+      break;
+    }
+
+    std::complex<double> tmp = this->inner(rd, r);
+    std::complex<double> beta = tmp / rddr;
+    rddr = tmp;
+
+    this->axpy_c(p , p , r , beta, tv1); // p <- r + beta * p
+    this->axpy_c(pd, pd, rd, beta, tv1); // pd <- rd + beta * pd
+
+    // ======================================================================
+    // compare rsd and true rsd
+    this->Mprec(x, tv2, tv1, 0, 0);
+    double true_rsd = this->axpy_norm(tv2, tv2, src, -1.0);
+
+    if ( this->isBoss() && !me ) {
+        printf("iter = %5d rsd = %9.3e true rsd = %9.3e a = (%9.3e %9.3e) b = (%9.3e %9.3e)\n",
+               k, rnorm, true_rsd, real(alpha), imag(alpha), real(beta), imag(beta));
+    }
+    // ======================================================================
+  }
+
+  if(k > this->max_iter) {
+    if(this->isBoss() && !me) {
+      printf("bicg_M: not converged in %d iterations.\n", k);
+    }
+  }
+
+  this->threadedFreeFermion(r);
+  this->threadedFreeFermion(rd);
+  this->threadedFreeFermion(p);
+  this->threadedFreeFermion(pd);
+  this->threadedFreeFermion(mp);
+  this->threadedFreeFermion(mdpd);
+  this->threadedFreeFermion(xd);
+  this->threadedFreeFermion(tv1);
+  this->threadedFreeFermion(tv2);
+  
+  return k;
+}
+
+// bicgstab_M: Biconjugate gradient stabilized method on
+// preconditioned Dirac operator.
+//
+// FIXME: test code only, don't use it unless you know what you are
+// doing.
+template<class Float>
+int bfm_evo<Float>::bicgstab_M(Fermion_t sol, Fermion_t src)
+{
+  int me = this->thread_barrier();
+
+  Fermion_t r0  = this->threadedAllocFermion();
+  Fermion_t r   = this->threadedAllocFermion();
+  Fermion_t p   = this->threadedAllocFermion();
+  Fermion_t v   = this->threadedAllocFermion();
+  Fermion_t s   = this->threadedAllocFermion();
+  Fermion_t t   = this->threadedAllocFermion();
+  Fermion_t x   = sol;
+  Fermion_t tv1 = this->threadedAllocFermion();
+  Fermion_t tv2 = this->threadedAllocFermion();
+
+  const double src_norm = this->norm(src);
+  const double stop = src_norm * this->residual * this->residual;
+
+  this->Mprec(x, r0, tv1, 0, 0);
+  double r0n = this->axpy_norm(r0, r0, src, -1.0); // r0 <- b-M*x0, r0^hat = r0
+  this->copy(r, r0);
+
+  if ( this->isBoss() && !me ) {
+    printf("iter = %5d rsd = %17.10e true rsd = %17.10e\n", 0, r0n, r0n);
+  }
+
+  std::complex<double> rho(1, 0);
+  std::complex<double> alpha(1, 0);
+  std::complex<double> omega(1, 0);
+
+  this->set_zero(v);
+  this->set_zero(p);
+
+  int k = 1;
+  for(; k <= this->max_iter; ++k) {
+    std::complex<double> rho_k = this->inner(r0, r);
+    std::complex<double> beta = rho_k / rho * alpha / omega;
+    rho = rho_k;
+
+    this->axpy_c(tv1, v, p, -omega, tv2);
+    this->axpy_c(p, tv1, r, beta, tv2);
+
+    this->Mprec(p, v, tv1, 0, 0);
+
+    alpha = rho / this->inner(r0, v);
+
+    this->axpy_c(s, v, r, -alpha, tv1);
+    this->Mprec(s, t, tv1, 0, 0);
+
+    omega = this->inner(t, s) / this->norm(t);
+    
+    this->axpy_c(x, p, x, alpha, tv1);
+    this->axpy_c(x, s, x, omega, tv1);
+    this->axpy_c(r, t, s, -omega, tv1);
+
+    // compute true residual
+    this->Mprec(x, tv2, tv1, 0, 0);
+    double true_rsd = this->axpy_norm(tv1, tv2, src, -1.0);
+
+    // check stopping condition
+    if(true_rsd < stop) {
+      if(this->isBoss() && !me) {
+        printf("bicgstab_M: converged in %d iterations.\n", k);
+        printf("bicgstab_M: true_rsd = %10.3e\n", sqrt(true_rsd/src_norm));
+      }
+      break;
+    }
+
+    // ======================================================================
+    // debug information
+    if ( this->isBoss() && !me ) {
+        printf("iter = %5d true rsd = %10.3e "
+               "rho = (%10.3e %10.3e) alpha = (%10.3e %10.3e) omega = (%10.3e %10.3e)\n",
+               k, true_rsd,
+               real(rho), imag(rho),
+               real(alpha), imag(alpha),
+               real(omega), imag(omega));
+    }
+    // ======================================================================
+  }
+
+  if(k > this->max_iter) {
+    if(this->isBoss() && !me) {
+      printf("bicgstab_M: not converged in %d iterations.\n", k);
+    }
+  }
+
+  this->threadedFreeFermion(r0);
+  this->threadedFreeFermion(r);
+  this->threadedFreeFermion(p);
+  this->threadedFreeFermion(v);
+  this->threadedFreeFermion(s);
+  this->threadedFreeFermion(t);
+  this->threadedFreeFermion(tv1);
+  this->threadedFreeFermion(tv2);
+  
+  return k;
 }
 
 #endif

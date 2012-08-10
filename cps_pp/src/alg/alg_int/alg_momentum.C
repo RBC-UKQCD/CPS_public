@@ -24,7 +24,7 @@ CPS_START_NAMESPACE
 AlgMomentum::AlgMomentum() : AlgHamiltonian()
 {
   cname = "AlgMomentum";
-  char *fname = "AlgMomentum()";
+  const char *fname = "AlgMomentum()";
 
   int_type = INT_MOM;
   md_time_str = "MD_time/step_size = ";
@@ -33,14 +33,14 @@ AlgMomentum::AlgMomentum() : AlgHamiltonian()
 }
 
 AlgMomentum::~AlgMomentum() {
-  char *fname = "~AlgMomentum()";
+  const char *fname = "~AlgMomentum()";
   sfree(mom, "mom", fname, cname);
 }
 
 //!< Heat Bath for the conjugate momentum
 void AlgMomentum::heatbath() {
 
-  char *fname = "heatbath()";
+  const char *fname = "heatbath()";
   Float dtime = -dclock();
 
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
@@ -60,7 +60,7 @@ void AlgMomentum::heatbath() {
 Float AlgMomentum::energy() {
   Float dtime = -dclock();
 
-  char *fname = "energy()";
+  const char *fname = "energy()";
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
   Float h = lat.MomHamiltonNode(mom);
   LatticeFactory::Destroy();
@@ -74,8 +74,8 @@ Float AlgMomentum::energy() {
 //!< evolve method evolves the gauge field due to the momentum
 void AlgMomentum::evolve(Float dt, int steps) 
 {
+  const char *fname = "evolve()";
   Float dtime = -dclock();
-  char * fname = "evolve(Float, int)";
 
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
   for (int i=0; i<steps; i++) lat.EvolveGfield(mom, dt);
@@ -84,7 +84,7 @@ void AlgMomentum::evolve(Float dt, int steps)
   LatticeFactory::Destroy();
 
   dtime += dclock();
-  print_flops(cname, fname, 0, dtime);
+  print_flops(cname, fname, 1968. * 4. * GJP.VolNodeSites() * steps, dtime);
 }
 
 void AlgMomentum::cost(CgStats *cg_stats_global){
