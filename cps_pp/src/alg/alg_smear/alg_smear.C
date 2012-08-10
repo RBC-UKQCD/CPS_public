@@ -4,7 +4,7 @@
 
   AlgSmear, AlgApeSmear, AlgKineticSmear and AlgHypSmear classes.
   
-  $Id: alg_smear.C,v 1.7 2008-02-12 18:16:30 chulwoo Exp $
+  $Id: alg_smear.C,v 1.8 2012-08-10 21:25:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 #include <config.h>
@@ -17,6 +17,8 @@
 #include <util/site.h>
 #include <util/link_buffer.h>
 #include <util/smalloc.h>
+#include <comms/scu.h>
+#include <omp.h>
 
 CPS_START_NAMESPACE
 
@@ -99,6 +101,113 @@ int su3_proj( Matrix& x , Float tolerance )
   return i;
 } 
  
+inline Float * GsiteOffset(Float * p, const int *x, const int *g_dir_offset)
+{
+  return p + 
+    x[0] * g_dir_offset[0] +
+    x[1] * g_dir_offset[1] +
+    x[2] * g_dir_offset[2] +
+    x[3] * g_dir_offset[3];
+}
+
+void PathOrdProdPlus(Matrix & mat, int* x, int* dirs, int n, 
+    Float *gfield, const int *g_dir_offset)
+{
+  int abs_dir;
+  int dir_sign;
+  int link_site[4];
+  const int MatrixSize = 18;
+  
+  const Matrix * p1;
+
+  int i;
+  for(i = 0; i < 4; ++i)
+    link_site[i] = x[i]; 
+
+  //deal with the first link
+  //abs_dir is {0,1,2,3}
+  //dir_sign is {0 = positive, 1 = negative}
+  //------------------------------
+  abs_dir = dirs[0] & 3; 
+  dir_sign = dirs[0] >> 2; 
+
+  //if dir_sign == 1, the link is at x-n_v
+  link_site[abs_dir] -= dir_sign; 
+
+  //p1 = GetBufferedLink(link_site, abs_dir);  
+  //get the first link 
+  p1 = (Matrix*) GsiteOffset(gfield, link_site, g_dir_offset) + abs_dir;    
+
+  //if dir_sign == 0, march on to the next site, 
+  //if dir_sign == 1, we have already moved.
+  link_site[abs_dir] += 1 - dir_sign; 
+  //
+  //Temporary matrices and ther pointers
+  Matrix ma, mb, mc;
+  Matrix *pma  = &ma;
+  Matrix *pmb  = &mb;
+  Matrix *pmc  = &mc;
+
+  //if dir_sign==1 the link is going backward so get its dagger
+  if(dir_sign) 
+    pma -> Dagger((IFloat*)p1);
+  else 
+    memcpy((IFloat*)pma, (IFloat*)p1, MatrixSize * sizeof(IFloat));
+
+  for(i = 1; i < n; ++i)
+  {
+    abs_dir = dirs[i]&3; 
+    dir_sign = dirs[i]>>2; 
+    
+    link_site[abs_dir] -= dir_sign; 
+    p1 = (Matrix*) GsiteOffset(gfield, link_site, g_dir_offset) + abs_dir;    
+    link_site[abs_dir] += 1 - dir_sign; 
+
+    //put the next link on the path in mb
+    //--------------------------------------
+    if(dir_sign)
+      mb.Dagger((IFloat*)p1); 
+    else 
+      memcpy((IFloat*)pmb, (IFloat*)p1, MatrixSize * sizeof(IFloat));
+
+    // if not the last link on the path, just multiply to the earlier result
+    // mc = ma * mb
+    // if the last link, multiply and add to mat
+    if(i != n - 1)
+      mDotMEqual((IFloat*)pmc, (IFloat*)pma, (IFloat*)pmb);
+    else
+      mDotMPlus((IFloat*)&mat, (IFloat*)pma, (IFloat*)pmb);
+
+    //swap pma and pmc;
+    Matrix * tmp_p = pma; pma = pmc; pmc = tmp_p;
+  }
+}
+
+void three_staple(Matrix& link, int *pos, int u, int orth, Float * gfield, const int * g_dir_offset)
+{
+  Matrix acumulate_mp; 
+  acumulate_mp.ZeroMatrix();
+  int dir[3];
+  //loop over all directions (+ve and -ve)
+
+  for(int v = 0; v < 8; ++v)
+  {      
+    // except the ones the link is aligned with 
+    if((v & 3) == u || (v & 3) == orth)  continue; 
+
+    const int v1((v + 4) & 7); // direction opposite to v
+
+    dir[0] = v;
+    dir[1] = u;
+    dir[2] = v1;
+
+    PathOrdProdPlus(acumulate_mp, pos, dir, 3, gfield, g_dir_offset); 
+  }
+
+  // 18 is the matrix size
+  memcpy((Float *) &link, (Float*) &acumulate_mp, 18 * sizeof(Float));
+}
+
 /*!
   \param latt The Lattice object containg the gauge field with which smearing
   is done.
@@ -371,6 +480,448 @@ void AlgApeSmear::run()
 }
 
 
+void AlgApeSmear::smartrun()
+{
+  const char fname[] = "smartrun";
+
+  if(common_arg->filename != 0)
+  {
+    FILE* f = Fopen(common_arg->filename, "a");
+    if(!f) ERR.FileA(cname, "run", common_arg->filename);
+    Fprintf(f, "AlgApeSmear: coef = %e ", c);
+    if(!ifSu3Proj())
+      Fprintf(f, "with NO SU(3) projection");
+    Fprintf(f, "\n");
+    Fclose(f);
+  }
+
+  Lattice& lat(AlgLattice());
+
+  //Float c = ape_arg.coef;
+  Float tolerance = get_tol();
+  int bool_su3_proj = ifSu3Proj();
+  int orthog = get_orthog();
+
+  const int Slab = 1; //Expansion in each direction
+  const int MatrixSize = 2 * lat.Colors() * lat.Colors();
+  const int GsiteSize = 4 * MatrixSize;
+  int l_node_sites[4] = {
+    GJP.XnodeSites(),
+    GJP.YnodeSites(),
+    GJP.ZnodeSites(),
+    GJP.TnodeSites()};
+  int l_dir_offset[4];
+  l_dir_offset[0] = GsiteSize;
+  l_dir_offset[1] = l_dir_offset[0] * l_node_sites[0];
+  l_dir_offset[2] = l_dir_offset[1] * l_node_sites[1];
+  l_dir_offset[3] = l_dir_offset[2] * l_node_sites[2];
+
+  int vol_node_sites = GJP.VolNodeSites();
+
+  Float * lfield = (Float*) smalloc(cname, fname, "lfield", GsiteSize * vol_node_sites * sizeof(Float));
+  memcpy(lfield, (Float *)lat.GaugeField(), GsiteSize * vol_node_sites * sizeof(Float));
+
+  int x[4], y[4];
+
+  const int g_node_sites[4] = {
+    l_node_sites[0] + 2 * Slab,
+    l_node_sites[1] + 2 * Slab,
+    l_node_sites[2] + 2 * Slab,
+    l_node_sites[3] + 2 * Slab};
+
+  int g_dir_offset[4];
+  g_dir_offset[0] = GsiteSize;
+  g_dir_offset[1] = g_dir_offset[0] * g_node_sites[0];
+  g_dir_offset[2] = g_dir_offset[1] * g_node_sites[1];
+  g_dir_offset[3] = g_dir_offset[2] * g_node_sites[2];
+
+  const int g_lcl_vol = g_node_sites[0]
+    * g_node_sites[1]
+    * g_node_sites[2]
+    * g_node_sites[3];
+
+  Float * gfield = (Float*) smalloc(cname, fname, "gfield", GsiteSize * g_lcl_vol * sizeof(Float));
+
+  Float *g_offset;  //offset on the expanded hypercube
+  Float *l_offset;  //offset on the orignial hypercube
+
+  int xsta[4] = {0, 0, 0, 0};
+  int xend[4] = {l_node_sites[0],
+                 l_node_sites[1],
+                 l_node_sites[2],
+                 l_node_sites[3]};
+  int ysta[4] = {Slab, Slab, Slab, Slab};
+
+  int yend[4] = {l_node_sites[0] + Slab,
+                 l_node_sites[1] + Slab,
+                 l_node_sites[2] + Slab,
+                 l_node_sites[3] + Slab};
+
+  // ------------------------------------------------------------------
+  // Move the whole local gauge field to a new location
+  // Every dimension is shifted by Slab
+  // From L: 0    < x[k] < l_node_sites[k]
+  // To   G: Slab < y[k] < l_node_sites[k] + Slab
+  // ------------------------------------------------------------------
+  x[0] = xsta[0];
+  y[0] = ysta[0];
+  for(x[1] = xsta[1], y[1] = ysta[1]; x[1] < xend[1]; ++x[1], ++y[1])
+    for(x[2] = xsta[2], y[2] = ysta[2]; x[2] < xend[2]; ++x[2], ++y[2])
+      for(x[3] = xsta[3], y[3] = ysta[3]; x[3] < xend[3]; ++x[3], ++y[3])
+      {
+        g_offset = GsiteOffset(gfield, y, g_dir_offset);
+        l_offset = GsiteOffset(lfield, x, l_dir_offset);
+        memcpy(g_offset, l_offset, l_dir_offset[1] * sizeof(Float));
+      }
+
+  Float *surf0;
+  Float *surf1;
+  int SurfSize;
+  int s_dir_offset[4];
+
+  // ------------------------------------------------------------------
+  // Propagate the surface slab to neighboring nodes
+  // Loop over direction
+  // ------------------------------------------------------------------
+  for(int i = 0; i < 4; ++i)
+  {
+    // ------------------------------------------------------------------
+    // Set offset on each direction
+    // 0 < x[i] < Slab
+    // 0 < x[k != i] < l_node_sites[k]
+    // ------------------------------------------------------------------
+    for(int k = 0; k < 4; ++k)
+      s_dir_offset[k] = l_dir_offset[k];
+    for(int k = i + 1; k < 4; ++k)
+      s_dir_offset[k] = s_dir_offset[k] * Slab / l_node_sites[i];
+    xend[i] = Slab;
+
+    // ------------------------------------------------------------------
+    // Allocate momory for the data
+    // ------------------------------------------------------------------
+    SurfSize = vol_node_sites * Slab / l_node_sites[i]; 
+    surf0 = (Float*) smalloc(cname, fname, "surf0", GsiteSize * SurfSize * sizeof(Float));
+    surf1 = (Float*) smalloc(cname, fname, "surf1", GsiteSize * SurfSize * sizeof(Float));
+
+    // ------------------------------------------------------------------
+    // Assemble the data to propagate in the negative "i" direction
+    // From L: 0 < x[i] < Slab
+    //         0 < x[k != i] < l_node_sites[k]
+    // To   S: 0 < x[i] < Slab
+    //         0 < x[k != i] < l_node_sites[k]
+    // ------------------------------------------------------------------
+    x[0] = xsta[0];
+    for(x[1] = xsta[1]; x[1] < xend[1]; ++x[1])
+      for(x[2] = xsta[2]; x[2] < xend[2]; ++x[2])
+        for(x[3] = xsta[3]; x[3] < xend[3]; ++x[3])
+        {
+          g_offset = GsiteOffset(surf0, x, s_dir_offset);
+          l_offset = GsiteOffset(lfield, x, l_dir_offset);
+          memcpy(g_offset, l_offset, s_dir_offset[1] * sizeof(Float));
+        }
+
+    getPlusData(surf1, surf0, GsiteSize * SurfSize, i);
+
+    // ------------------------------------------------------------------
+    // Dissemble the received data to the allocated memory 
+    // From S: 0 < x[i] < Slab
+    //         0 < x[k != i] < l_node_sites[k]
+    // To   G: l_node_sites[i] + Slab < y[i] < l_node_sites[i] + 2 * Slab
+    //         Slab < y[k != i] < l_node_sites[k] + Slab
+    // ------------------------------------------------------------------
+    ysta[i] = l_node_sites[i] + Slab;
+    x[0] = xsta[0];
+    y[0] = ysta[0];
+    for(x[1] = xsta[1], y[1] = ysta[1]; x[1] < xend[1]; ++x[1], ++y[1])
+      for(x[2] = xsta[2], y[2] = ysta[2]; x[2] < xend[2]; ++x[2], ++y[2])
+        for(x[3] = xsta[3], y[3] = ysta[3]; x[3] < xend[3]; ++x[3], ++y[3])
+        {
+          l_offset = GsiteOffset(surf1, x, s_dir_offset);
+          g_offset = GsiteOffset(gfield, y, g_dir_offset);
+          memcpy(g_offset, l_offset, s_dir_offset[1] * sizeof(Float));
+        }
+    ysta[i] = Slab;
+
+    // ------------------------------------------------------------------
+    // If l_node_site[i] == Slab,  we only need to pass the same slab
+    // to the opposite direcction
+    // Otherwise we need to assemble the appropriate slab again
+    // From L: l_node_sites[i] - Slab < x[i] < l_node_sites[i]
+    //         0 < x[k != i] < l_node_sites[k]
+    // To   S: 0 < x[i] < Slab
+    //         0 < x[k != i] < l_node_sites[k]
+    // ------------------------------------------------------------------
+    if(l_node_sites[i] != Slab)
+    {
+      ysta[i] = l_node_sites[i];
+      x[0] = xsta[0];
+      y[0] = ysta[0];
+      for(x[1] = xsta[1], y[1] = ysta[1]; x[1] < xend[1]; ++x[1], ++y[1])
+        for(x[2] = xsta[2], y[2] = ysta[2]; x[2] < xend[2]; ++x[2], ++y[2])
+          for(x[3] = xsta[3], y[3] = ysta[3]; x[3] < xend[3]; ++x[3], ++y[3])
+          {
+            g_offset = GsiteOffset(surf0, x, s_dir_offset);
+            l_offset = GsiteOffset(gfield, y, g_dir_offset);
+            memcpy(g_offset, l_offset, s_dir_offset[1] * sizeof(Float));
+          }
+      ysta[i] = Slab;
+    }
+
+    getMinusData(surf1, surf0, GsiteSize * SurfSize, i);
+
+    // ------------------------------------------------------------------
+    // Dissemble the received data to the allocated memory 
+    // From S: 0 < x[i] < Slab
+    //         0 < x[k != i] < l_node_sites[k]
+    // To   G: 0 < y[i] < Slab
+    //         Slab < y[k != i] < l_node_sites[k] + Slab
+    // ------------------------------------------------------------------
+    ysta[i] = 0;
+    x[0] = xsta[0];
+    y[0] = ysta[0];
+    for(x[1] = xsta[1], y[1] = ysta[1]; x[1] < xend[1]; ++x[1], ++y[1])
+      for(x[2] = xsta[2], y[2] = ysta[2]; x[2] < xend[2]; ++x[2], ++y[2])
+        for(x[3] = xsta[3], y[3] = ysta[3]; x[3] < xend[3]; ++x[3], ++y[3])
+        {
+          l_offset = GsiteOffset(surf1, x, s_dir_offset);
+          g_offset = GsiteOffset(gfield, y, g_dir_offset);
+          memcpy(g_offset, l_offset, s_dir_offset[1] * sizeof(Float));
+        }
+    ysta[i] = Slab;
+
+    sfree(cname, fname, "surf0", surf0);
+    sfree(cname, fname, "surf1", surf1);
+
+    // ------------------------------------------------------------------
+    // Propagate the cornered chunk to neighboring nodes
+    // Loop over direction
+    // ------------------------------------------------------------------
+    for(int j = i + 1; j < 4; ++j)
+    {
+      // ------------------------------------------------------------------
+      // 0 < x[i, j] < Slab
+      // 0 < x[k != i, j] < l_node_sites[k]
+      // ------------------------------------------------------------------
+      for(int k = i + 1; k < 4; ++k)
+        s_dir_offset[k] = l_dir_offset[k] * Slab / l_node_sites[i];
+      for(int k = j + 1; k < 4; ++k)
+        s_dir_offset[k] = s_dir_offset[k] * Slab / l_node_sites[j];
+
+      xend[j] = Slab;
+
+      Float * surf2;
+
+      // ------------------------------------------------------------------
+      // Every chunk contains two corner pieces
+      // ------------------------------------------------------------------
+      SurfSize = vol_node_sites * Slab  * Slab / l_node_sites[i] / l_node_sites[j]; 
+      surf0 = (Float*) smalloc(cname, fname, "surf0", 2 * GsiteSize * SurfSize * sizeof(Float));
+      surf1 = (Float*) smalloc(cname, fname, "surf1", 2 * GsiteSize * SurfSize * sizeof(Float));
+
+      // ------------------------------------------------------------------
+      // Assemble the data to propagate in the negative "j" direction
+      // From G: 0 < y[i] < Slab
+      //         Slab < y[j] <  2 * Slab
+      //         Slab < y[k != i, j] < l_node_sites[k] + Slab
+      // To   S: 0 < x[i, j] < Slab
+      //         0 < x[k != i,j] < l_node_sites[k]
+      // Also:
+      // From G: l_node_sites[i] + Slab < y[i] < l_node_sites[i] + 2 * Slab
+      //         Slab < y[j] <  2 * Slab
+      //         Slab < y[k != i, j] < l_node_sites[k] + Slab
+      // To   S: 0 < x[i, j] < Slab
+      //         0 < x[k != i,j] < l_node_sites[k]
+      // ------------------------------------------------------------------
+      surf2 = surf0 + GsiteSize * SurfSize;
+      ysta[i] = 0;
+      x[0] = xsta[0];
+      y[0] = ysta[0];
+      for(x[1] = xsta[1], y[1] = ysta[1]; x[1] < xend[1]; ++x[1], ++y[1])
+        for(x[2] = xsta[2], y[2] = ysta[2]; x[2] < xend[2]; ++x[2], ++y[2])
+          for(x[3] = xsta[3], y[3] = ysta[3]; x[3] < xend[3]; ++x[3], ++y[3])
+          {
+            l_offset = GsiteOffset(surf0, x, s_dir_offset);
+            g_offset = GsiteOffset(gfield, y, g_dir_offset);
+            memcpy(l_offset, g_offset, s_dir_offset[1] * sizeof(Float));
+            y[i] += l_node_sites[i] + Slab;
+            l_offset = GsiteOffset(surf2, x, s_dir_offset);
+            g_offset = GsiteOffset(gfield, y, g_dir_offset);
+            memcpy(l_offset, g_offset, s_dir_offset[1] * sizeof(Float));
+            y[i] -= l_node_sites[i] + Slab;
+          }
+      ysta[i] = Slab;
+
+      getPlusData(surf1, surf0, 2 * GsiteSize * SurfSize, j);
+
+      // ------------------------------------------------------------------
+      // Dissemble the received data to the allocated memory 
+      // From S: 0 < x[i, j] < Slab
+      //         0 < x[k != i,j] < l_node_sites[k]
+      // To   G: 0 < y[i] < Slab
+      //         l_node_sites[j] + Slab < y[j] < l_node_sites[j] + 2 * Slab
+      //         Slab < y[k != i, j] < l_node_sites[k] + Slab
+      // Also:
+      // From S: 0 < x[i, j] < Slab
+      //         0 < x[k != i,j] < l_node_sites[k]
+      // To   G: l_node_sites[i] + Slab < y[i] < l_node_sites[i] + 2 * Slab
+      //         l_node_sites[j] + Slab < y[j] < l_node_sites[j] + 2 * Slab
+      //         Slab < y[k != i, j] < l_node_sites[k] + Slab
+      // ------------------------------------------------------------------
+      surf2 = surf1 + GsiteSize * SurfSize;
+      ysta[i] = 0;
+      ysta[j] = l_node_sites[j] + Slab;
+      x[0] = xsta[0];
+      y[0] = ysta[0];
+      for(x[1] = xsta[1], y[1] = ysta[1]; x[1] < xend[1]; ++x[1], ++y[1])
+        for(x[2] = xsta[2], y[2] = ysta[2]; x[2] < xend[2]; ++x[2], ++y[2])
+          for(x[3] = xsta[3], y[3] = ysta[3]; x[3] < xend[3]; ++x[3], ++y[3])
+          {
+            l_offset = GsiteOffset(surf1, x, s_dir_offset);
+            g_offset = GsiteOffset(gfield, y, g_dir_offset);
+            memcpy(g_offset, l_offset, s_dir_offset[1] * sizeof(Float));
+            y[i] += l_node_sites[i] + Slab;
+            l_offset = GsiteOffset(surf2, x, s_dir_offset);
+            g_offset = GsiteOffset(gfield, y, g_dir_offset);
+            memcpy(g_offset, l_offset, s_dir_offset[1] * sizeof(Float));
+            y[i] -= l_node_sites[i] + Slab;
+          }
+      ysta[i] = Slab;
+      ysta[j] = Slab;
+
+      // ------------------------------------------------------------------
+      // If l_node_site[j] == Slab,  We only need to pass the same slab
+      // to the opposite direcction
+      // Otherwise we need to assemble the appropriate slab
+      // Assemble the data to propagate in the positive "j" direction
+      // From G: 0 < y[i] < Slab
+      //         Slab < y[j] <  2 * Slab
+      //         l_node_sites[j] < y[j] < l_node_sites[j] + Slab
+      //         Slab < y[k != i, j] < l_node_sites[k] + Slab
+      // To   S: 0 < x[i, j] < Slab
+      //         0 < x[k != i,j] < l_node_sites[k]
+      // Also:
+      // From G: l_node_sites[i] + Slab < y[i] < l_node_sites[i] + 2 * Slab
+      //         l_node_sites[j] < y[j] < l_node_sites[j] + Slab
+      //         Slab < y[k != i, j] < l_node_sites[k] + Slab
+      // To   S: 0 < x[i, j] < Slab
+      //         0 < x[k != i,j] < l_node_sites[k]
+      // ------------------------------------------------------------------
+      if(l_node_sites[j] != Slab)
+      {
+        surf2 = surf0 + GsiteSize * SurfSize;
+        ysta[i] = 0;
+        ysta[j] = l_node_sites[j];
+        x[0] = xsta[0];
+        y[0] = ysta[0];
+        for(x[1] = xsta[1], y[1] = ysta[1]; x[1] < xend[1]; ++x[1], ++y[1])
+          for(x[2] = xsta[2], y[2] = ysta[2]; x[2] < xend[2]; ++x[2], ++y[2])
+            for(x[3] = xsta[3], y[3] = ysta[3]; x[3] < xend[3]; ++x[3], ++y[3])
+            {
+              l_offset = GsiteOffset(surf0, x, s_dir_offset);
+              g_offset = GsiteOffset(gfield, y, g_dir_offset);
+              memcpy(l_offset, g_offset, s_dir_offset[1] * sizeof(Float));
+              y[i] += l_node_sites[i] + Slab;
+              l_offset = GsiteOffset(surf2, x, s_dir_offset);
+              g_offset = GsiteOffset(gfield, y, g_dir_offset);
+              memcpy(l_offset, g_offset, s_dir_offset[1] * sizeof(Float));
+              y[i] -= l_node_sites[i] + Slab;
+            }
+        ysta[i] = Slab;
+        ysta[j] = Slab;
+      }
+
+      getMinusData(surf1, surf0, 2 * GsiteSize * SurfSize, j);
+
+      // ------------------------------------------------------------------
+      // Dissemble the received data to the allocated memory 
+      // From S: 0 < x[i, j] < Slab
+      //         0 < x[k != i,j] < l_node_sites[k]
+      // To   G: 0 < y[i] < Slab
+      //         0 < y[j] < Slab
+      //         Slab < y[k != i, j] < l_node_sites[k] + Slab
+      // Also:
+      // From S: 0 < x[i, j] < Slab
+      //         0 < x[k != i,j] < l_node_sites[k]
+      // To   G: l_node_sites[i] + Slab < y[i] < l_node_sites[i] + 2 * Slab
+      //         0 < y[j] < Slab
+      //         Slab < y[k != i, j] < l_node_sites[k] + Slab
+      // ------------------------------------------------------------------
+      surf2 = surf1 + GsiteSize * SurfSize;
+      ysta[i] = 0;
+      ysta[j] = 0;
+      x[0] = xsta[0];
+      y[0] = ysta[0];
+      for(x[1] = xsta[1], y[1] = ysta[1]; x[1] < xend[1]; ++x[1], ++y[1])
+        for(x[2] = xsta[2], y[2] = ysta[2]; x[2] < xend[2]; ++x[2], ++y[2])
+          for(x[3] = xsta[3], y[3] = ysta[3]; x[3] < xend[3]; ++x[3], ++y[3])
+          {
+            l_offset = GsiteOffset(surf1, x, s_dir_offset);
+            g_offset = GsiteOffset(gfield, y, g_dir_offset);
+            memcpy(g_offset, l_offset, s_dir_offset[1] * sizeof(Float));
+            y[i] += l_node_sites[i] + Slab;
+            l_offset = GsiteOffset(surf2, x, s_dir_offset);
+            g_offset = GsiteOffset(gfield, y, g_dir_offset);
+            memcpy(g_offset, l_offset, s_dir_offset[1] * sizeof(Float));
+            y[i] -= l_node_sites[i] + Slab;
+          }
+      ysta[i] = Slab;
+      ysta[j] = Slab;
+
+      // ------------------------------------------------------------------
+      // Release memory and  set xend[j] = l_node_sites[j]
+      // ------------------------------------------------------------------
+      sfree(cname, fname, "surf0", surf0);
+      sfree(cname, fname, "surf1", surf1);
+      xend[j] = l_node_sites[j];
+    }
+    // ------------------------------------------------------------------
+    // Before go on to the next direction, set xend[i] = l_node_sites[i]
+    // ------------------------------------------------------------------
+    xend[i] = l_node_sites[i];
+  }
+
+  omp_set_num_threads(64);
+#pragma omp parallel for 
+  for(int i = 0; i < GJP.VolNodeSites(); ++i)
+  {
+    int j = i;
+    int x[4] = {0};
+    x[0] = j % GJP.XnodeSites() + xsta[0]; j /= GJP.XnodeSites();
+    x[1] = j % GJP.YnodeSites() + xsta[1]; j /= GJP.YnodeSites();
+    x[2] = j % GJP.ZnodeSites() + xsta[2]; j /= GJP.ZnodeSites();
+    x[3] = j                    + xsta[3]; 
+    int y[4] = {x[0] + Slab, 
+      x[1] + Slab,
+      x[2] + Slab,
+      x[3] + Slab};
+
+    //for(x[0] = xsta[0], y[0] = ysta[0]; x[0] < xend[0]; ++x[0], ++y[0])
+    //  for(x[1] = xsta[1], y[1] = ysta[1]; x[1] < xend[1]; ++x[1], ++y[1])
+    //    for(x[2] = xsta[2], y[2] = ysta[2]; x[2] < xend[2]; ++x[2], ++y[2])
+    //      for(x[3] = xsta[3], y[3] = ysta[3]; x[3] < xend[3]; ++x[3], ++y[3])
+    for(int mu = 0; mu < 4; ++mu)
+    {
+      if(mu == orthog)
+        continue;
+      Matrix & link(* ((Matrix *) (GsiteOffset(lfield, x, l_dir_offset) + mu * MatrixSize)));
+
+      Matrix stap;
+      three_staple(stap, y, mu, orthog, gfield, g_dir_offset);
+      link *= 1.0 - c;
+      stap *= c / 6.;
+      link += stap;
+
+      if(bool_su3_proj)  
+        su3_proj(link , tolerance); 
+    }
+  }
+
+
+  memcpy((Float *)lat.GaugeField(), lfield, GsiteSize * vol_node_sites * sizeof(Float));
+  sfree(cname, fname, "gfield", gfield);
+  sfree(cname, fname, "lfield", lfield);
+
+}
 
 void AlgApeSmear::smear_link(Matrix& link,
                              int*     pos,
@@ -383,7 +934,6 @@ void AlgApeSmear::smear_link(Matrix& link,
   stap*=c/6.0;
   link+=stap;
 }
-
 
 AlgKineticSmear::AlgKineticSmear(Lattice&   lat,
                                  CommonArg* ca ,

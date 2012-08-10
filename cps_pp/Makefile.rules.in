@@ -1,4 +1,4 @@
-# $Id: Makefile.rules.in,v 1.30 2012-03-26 13:50:11 chulwoo Exp $
+# $Id: Makefile.rules.in,v 1.31 2012-08-10 21:25:11 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -70,6 +70,7 @@ libcps_CFLAGS = $(INCLUDE_FLAGS) $(CFLAGS) $(DFLAGS)
 all: cps 
 
 recurse: $(RECURSEDIRS)
+	@echo CONCUR = $(CONCUR)
 
 $(RECURSEDIRS):
 	$(if $(findstring s, $(MAKEFLAGS)),,@echo RECURSEDIRS = $(RECURSEDIRS))
@@ -109,30 +110,40 @@ XLCOBJS := $(notdir $(XLCOBJS_SRC))
 
 %.o:%.c
 	${CC} -c $< -o $(BUILDDIR2)/$@ ${libcps_CFLAGS}
+ifneq ($(CONCUR),yes)
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+endif
 
 %.o:%.C
 #	$(CXX) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR2)/$*.i
 	${CXX} -c $< -o $(BUILDDIR2)/$@ ${libcps_CXXFLAGS}
+ifneq ($(CONCUR),yes)
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+endif
 
 %.xlo:%.c
 	cd $(BUILDDIR2)/ ; xlC -F$(BUILDDIR)/XLC.cfg -S $< ${XLCFLAGS}
 	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@ ${XLCFLAGS}
+ifneq ($(CONCUR),yes)
 	cd $(BUILDDIR2) ; objcopy -R .eh_frame $@
 	cd $(BUILDDIR2) ; ar  rcs ${BUILDDIR}/$(LIBNAME).xla $@
+endif
 
 %.xlo:%.C
 	cd $(BUILDDIR2)/ ; xlC -F$(BUILDDIR)/XLC.cfg -S $< ${XLCFLAGS}
 	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@ ${XLCFLAGS}
+ifneq ($(CONCUR),yes)
 	cd $(BUILDDIR2) ; objcopy -R .eh_frame $@
 	cd $(BUILDDIR2) ; ar  rcs ${BUILDDIR}/$(LIBNAME).xla $@
+endif
 
 %.o:%.S
 	${CC} -c $< -o $(BUILDDIR2)/$@ ${libcps_CFLAGS}
 #       $(CC) -E $(libcps_CXXFLAGS) $< > $(BUILDDIR2)/$*.i
 #       $(AS) $(ASFLAGS) -o $(BUILDDIR2)/$@ $(BUILDDIR2)/$*.i
+ifneq ($(CONCUR),yes)
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
+endif
 
 depend: recurse
 	echo > Makefile_depend

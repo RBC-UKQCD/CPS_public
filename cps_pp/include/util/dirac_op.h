@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.32 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: dirac_op.h,v 1.33 2012-08-10 21:25:12 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -15,7 +15,7 @@
 #include <alg/eig_arg.h>
 CPS_START_NAMESPACE
 
-typedef unsigned long long IntFlopCounter;
+//typedef unsigned long long IntFlopCounter;
 
 
 //------------------------------------------------------------------

@@ -27,7 +27,7 @@ class AlgTcharge : public Alg
 {
 private:
 
-  char *cname;
+  const char *cname;
  
 public:
 
@@ -48,6 +48,7 @@ public:
   virtual ~AlgTcharge() {;}
   
   void run();
+  void smartrun();
 
 };
 
