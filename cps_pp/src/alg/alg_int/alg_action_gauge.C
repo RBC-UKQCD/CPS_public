@@ -22,10 +22,8 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 AlgActionGauge::AlgActionGauge(AlgMomentum &mom, ActionGaugeArg &g_arg)
-  : AlgAction(mom, g_arg.action_arg)
+    : AlgAction(mom, g_arg.action_arg), cname("AlgActionGauge")
 {
-
-  cname = "AlgActionGauge(Gclasstype, M*)";
   int_type = INT_GAUGE;
   gauge_arg = &g_arg;
   gluon = g_arg.gluon;
@@ -79,7 +77,7 @@ void AlgActionGauge::prepare_fg(Matrix * force, Float dt_ratio)
 void AlgActionGauge::evolve(Float dt, int steps) 
 {
   Float dtime = -dclock();
-  char *fname = "evolve(Float, int)";
+  const char *fname = "evolve()";
   //!< Create an appropriate lattice
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, gluon);
 

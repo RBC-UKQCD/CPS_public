@@ -10,8 +10,6 @@
 #include <util/latheader.h>
 
 CPS_START_NAMESPACE
-using namespace std;
-
 
 /************************************************************************************/
 
@@ -27,7 +25,7 @@ class IoStyle : protected QioControl {
 		   const int dimension /* 4 or 5 */,
 		   unsigned int * ptrcsum, unsigned int * ptrpdcsum = 0,
 		   Float * rand_sum = 0, Float * rand_2_sum = 0) = 0;
-  virtual int store(iostream & output,
+    virtual int store(std::iostream & output,
 		    char * data, const int data_per_site, const int site_mem,
 		    LatHeaderBase & hd, const DataConversion & dconv,
 		    const int dimension /* 4 or 5 */,
@@ -47,7 +45,7 @@ class ParallelIO : public IoStyle {
 		   const int dimension /* 4 or 5 */,
 		   unsigned int * ptrcsum, unsigned int * ptrpdcsum = 0,
 		   Float * rand_sum = 0, Float * rand_2_sum = 0);
-  virtual int store(iostream & output,
+    virtual int store(std::iostream & output,
 		    char * data, const int data_per_site, const int site_mem,
 		    LatHeaderBase & hd, const DataConversion & dconv,
 		    const int dimension /* 4 or 5 */,
@@ -71,7 +69,7 @@ class SerialIO : public IoStyle {
 		   const int dimension /* 4 or 5 */,
 		   unsigned int * ptrcsum, unsigned int * ptrpdcsum = 0,
 		   Float * rand_sum = 0, Float * rand_2_sum = 0);
-  virtual int store(iostream & output,
+    virtual int store(std::iostream & output,
 		    char * data, const int data_per_site, const int site_mem,
 		    LatHeaderBase & hd, const DataConversion & dconv,
 		    const int dimension /* 4 or 5 */,

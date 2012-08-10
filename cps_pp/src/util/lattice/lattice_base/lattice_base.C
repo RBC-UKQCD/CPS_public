@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.65 2012-08-02 21:20:01 chulwoo Exp $
+  $Id: lattice_base.C,v 1.66 2012-08-10 14:05:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-02 21:20:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.65 2012-08-02 21:20:01 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.65 2012-08-02 21:20:01 chulwoo Exp $
+//  $Date: 2012-08-10 14:05:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.66 2012-08-10 14:05:33 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.66 2012-08-10 14:05:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.65 $
+//  $Revision: 1.66 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -45,6 +45,7 @@
 #include <comms/glb.h>
 #include <comms/scu.h>
 #include <comms/cbuf.h>
+#include<util/time_cps.h>
 
 #ifdef _TARTAN
 #include <math64.h>
@@ -59,6 +60,8 @@
 #if TARGET == BGL
 #include <sys/bgl/bgl_sys_all.h>
 #endif
+
+#include <omp.h>
 
 CPS_START_NAMESPACE
 
@@ -101,11 +104,6 @@ static Matrix m_tmp2 CPS_FLOAT_ALIGN;
 //------------------------------------------------------------------
 // static variables used only inside this file
 //------------------------------------------------------------------
-static IFloat invs[10] = { -100.0,	// not used (1/0)
-	-1.0,	-0.5,	-1./3.,	-0.25,	-0.2,
-	-1./6.,	-1./7.,	-0.125,	-1./9. };
-
-
 //  CRAM temp buffer
 #ifdef _TARTAN
 static Matrix *mp0 = (Matrix *)CRAM_SCRATCH_ADDR;	// ihdot
@@ -139,7 +137,7 @@ int Lattice::scope_lock=0;
 Lattice::Lattice()
 {
   cname = "Lattice";
-  char *fname = "Lattice()";
+  const char *fname = "Lattice()";
   int array_size;  // On-node size of the gauge field array.
 
   VRB.Func(cname,fname);
@@ -317,7 +315,7 @@ Lattice::Lattice()
 Lattice::~Lattice()
 {
 #if 1
-  char *fname = "~Lattice()";
+  const char *fname = "~Lattice()";
   VRB.Func(cname,fname);
   
   // if GJP.Snodes() != 1 check that the gauge field is identical
@@ -345,16 +343,6 @@ Lattice::~Lattice()
 }
 
 //------------------------------------------------------------------
-// const Matrix *GaugeField(void) const:
-// Returns the pointer to the gauge field configuration.
-//------------------------------------------------------------------
-Matrix *Lattice::GaugeField(void) const
-{
-  return gauge_field;
-}
-
-
-//------------------------------------------------------------------
 /*! Copies the array pointed to by u into the gauge configuration.
    \param u The array to be copied from.
    \post The gauge configuration ia a copy of the array \a u
@@ -366,7 +354,7 @@ Matrix *Lattice::GaugeField(void) const
 //------------------------------------------------------------------
 void Lattice::GaugeField(Matrix *u)
 {
-  char *fname = "GaugeField(M*)";
+  const char *fname = "GaugeField(M*)";
   VRB.Func(cname,fname);
   int size;
 
@@ -391,7 +379,7 @@ void Lattice::GaugeField(Matrix *u)
 //------------------------------------------------------------------
 void Lattice::CopyGaugeField(Matrix* u)
 {
-  char *fname = "CopyGaugeField(M*)";
+  const char *fname = "CopyGaugeField(M*)";
   VRB.Func(cname,fname);
   int size;
 
@@ -408,7 +396,7 @@ void Lattice::CopyGaugeField(Matrix* u)
 //------------------------------------------------------------------
 int Lattice::CompareGaugeField(Matrix* u)
 {
-  char *fname = "CompareGaugeField(M*)";
+  const char *fname = "CompareGaugeField(M*)";
   VRB.Func(cname,fname);
 
   int m_size = GsiteSize() * GJP.VolNodeSites() ;
@@ -489,7 +477,7 @@ int Lattice::GsiteSize(void)
 const Matrix *
 Lattice::GetLink(const int *site, int dir) const
 {
-char *fname = "GetLink()";
+const char *fname = "GetLink()";
 //VRB.Func(cname,fname);
 
   // offset out-of-range coordinates site[] into on_node_site[]
@@ -576,7 +564,7 @@ const unsigned CBUF_MODE4 = 0xcca52112;
 //------------------------------------------------------------------
 void Lattice::Staple(Matrix& stap, int *x, int mu)
 {
-//char *fname = "Staple(M&,i*,i)";
+//const char *fname = "Staple(M&,i*,i)";
 //VRB.Func(cname,fname);
 
   // set cbuf
@@ -722,7 +710,7 @@ void Lattice::Staple(Matrix& stap, int *x, int mu)
 //------------------------------------------------------------------
 void Lattice::RectStaple(Matrix& rect, int *x, int mu)
 {
-//char *fname = "RectStaple(M&,i*,i)" ;
+//const char *fname = "RectStaple(M&,i*,i)" ;
 //VRB.Func(cname, fname) ;
 //VRB.Debug(cname,fname, "rect %3i %3i %3i %3i ; %i\n",
 //          x[0], x[1], x[2], x[3], mu) ;
@@ -1155,7 +1143,7 @@ void Lattice::Plaq(Matrix &plaq, int *x, int mu, int nu) const
 */
 Float Lattice::ReTrPlaq(int *x, int mu, int nu) const
 {
-//  char *fname = "ReTrPlaq(i*,i,i) const";
+//  const char *fname = "ReTrPlaq(i*,i,i) const";
 //  VRB.Func(cname,fname);
 
   // set cbuf
@@ -1217,8 +1205,8 @@ Float Lattice::ReTrPlaq(int *x, int mu, int nu) const
 //------------------------------------------------------------------
 Float Lattice::SumReTrPlaqNode(void) const
 {
-  char *fname = "SumReTrPlaqNode() const";
-//  sync();
+  const char *fname = "SumReTrPlaqNode() const";
+  sync();
   VRB.Func(cname,fname);
   
   Float sum = 0.0;
@@ -1259,7 +1247,7 @@ Float Lattice::SumReTrPlaqNode(void) const
 //------------------------------------------------------------------
 Float Lattice::SumReTrPlaq(void) const
 {
-  char *fname = "SumReTrPlaq() const";
+  const char *fname = "SumReTrPlaq() const";
   VRB.Func(cname,fname);
 
   Float sum = SumReTrPlaqNode();
@@ -1288,7 +1276,7 @@ Float Lattice::SumReTrPlaq(void) const
 //-----------------------------------------------------------------------------
 Float Lattice::ReTrRect(int *x, int mu, int nu) const
 {
-    char *fname = "ReTrRect(i*,i,i) const";
+    const char *fname = "ReTrRect(i*,i,i) const";
 //  VRB.Func(cname,fname);
 
   int link_site[4] ;
@@ -1398,7 +1386,7 @@ combinations.
 //-----------------------------------------------------------------------------
 Float Lattice::SumReTrRectNode(void) const
 {
-//char *fname = "SumReTrRectNode() const";
+//const char *fname = "SumReTrRectNode() const";
 //VRB.Func(cname,fname);
 
   Float sum = 0.0 ;
@@ -1434,7 +1422,7 @@ Float Lattice::SumReTrRectNode(void) const
 //-----------------------------------------------------------------------------
 Float Lattice::SumReTrRect(void) const
 {
-  char *fname = "SumReTrRect() const" ;
+  const char *fname = "SumReTrRect() const" ;
   VRB.Func(cname, fname) ;
 
   Float sum = SumReTrRectNode() ;
@@ -1460,7 +1448,7 @@ Float Lattice::SumReTrRect(void) const
 //--------------------------------------------------------------------
 Float Lattice::ReTrLoop(const int *x, const int *dir,  int length)
 {
-  char *fname = "ReTrLoop(i*,i,i)";
+  const char *fname = "ReTrLoop(i*,i,i)";
   VRB.Func(cname, fname) ;
 
   const unsigned CBUF_MODE4 = 0xcca52112;
@@ -1497,7 +1485,7 @@ The sum runs over all positive values of \f$ \mu\f$, \f$ \nu>\mu \f$ and
 //-----------------------------------------------------------------------------
 Float Lattice::SumReTrCubeNode(void) 
 {
-  char *fname = "SumReTrCubeNode()";
+  const char *fname = "SumReTrCubeNode()";
   VRB.Func(cname, fname) ;
 
   Float sum = 0.0 ;
@@ -1560,7 +1548,7 @@ U^\dagger_\nu(x+\nu+\rho) U^\dagger_\rho(x+\rho)
 //-----------------------------------------------------------------------------
 Float Lattice::SumReTrCube(void)
 {
-  char *fname = "SumReTrCube()" ;
+  const char *fname = "SumReTrCube()" ;
   VRB.Func(cname, fname) ;
 
   Float sum = SumReTrCubeNode() ;
@@ -1600,7 +1588,7 @@ enum {NUM_SPACE_PLAQ = 3, //!< Number of planes in a 3-dimensional lattice slice
 //------------------------------------------------------------------
 Float Lattice::AveReTrPlaqNodeNoXi() const
 {
-  char *fname = "AveReTrPlaqNodeNoXi()";
+  const char *fname = "AveReTrPlaqNodeNoXi()";
   VRB.Func(cname,fname);
   
   Float sum = 0.0;
@@ -1645,7 +1633,7 @@ Float Lattice::AveReTrPlaqNodeNoXi() const
 //------------------------------------------------------------------
 Float Lattice::AveReTrPlaqNodeXi() const
 {
-  char *fname = "AveReTrPlaqNodeXi()";
+  const char *fname = "AveReTrPlaqNodeXi()";
   VRB.Func(cname,fname);
   
   Float sum = 0.0;
@@ -1689,7 +1677,7 @@ Float Lattice::AveReTrPlaqNodeXi() const
 //------------------------------------------------------------------
 Float Lattice::AveReTrPlaqNoXi() const
 {
-  char *fname = "AveReTrPlaqNoXi()";
+  const char *fname = "AveReTrPlaqNoXi()";
   VRB.Func(cname,fname);
 
   Float sum = AveReTrPlaqNodeNoXi();
@@ -1717,7 +1705,7 @@ Float Lattice::AveReTrPlaqNoXi() const
 //------------------------------------------------------------------
 Float Lattice::AveReTrPlaqXi() const
 {
-  char *fname = "AveReTrPlaqXi()";
+  const char *fname = "AveReTrPlaqXi()";
   VRB.Func(cname,fname);
   
   Float sum = AveReTrPlaqNodeXi();
@@ -1755,7 +1743,7 @@ enum {NUM_SPACE_RECT = 6, //!< Number of planes in a 3-dimensional lattice slice
 //------------------------------------------------------------------
 Float Lattice::AveReTrRectNodeNoXi() const
 {
-  char *fname = "AveReTrRectNodeNoXi()";
+  const char *fname = "AveReTrRectNodeNoXi()";
   VRB.Func(cname,fname);
   
   Float sum = 0.0;
@@ -1803,7 +1791,7 @@ Float Lattice::AveReTrRectNodeNoXi() const
 //------------------------------------------------------------------
 Float Lattice::AveReTrRectNodeXi1() const
 {
-  char *fname = "AveReTrRectNodeXi1()";
+  const char *fname = "AveReTrRectNodeXi1()";
   VRB.Func(cname,fname);
   
   Float sum = 0.0;
@@ -1850,7 +1838,7 @@ Float Lattice::AveReTrRectNodeXi1() const
 //------------------------------------------------------------------
 Float Lattice::AveReTrRectNodeXi2() const
 {
-  char *fname = "AveReTrRectNodeXi2()";
+  const char *fname = "AveReTrRectNodeXi2()";
   VRB.Func(cname,fname);
   
   Float sum = 0.0;
@@ -1898,7 +1886,7 @@ Float Lattice::AveReTrRectNodeXi2() const
 //------------------------------------------------------------------
 Float Lattice::AveReTrRectNoXi() const
 {
-  char *fname = "AveReTrRectNoXi()";
+  const char *fname = "AveReTrRectNoXi()";
   VRB.Func(cname,fname);
 
   Float sum = AveReTrRectNodeNoXi();
@@ -1928,7 +1916,7 @@ Float Lattice::AveReTrRectNoXi() const
 //------------------------------------------------------------------
 Float Lattice::AveReTrRectXi1() const
 {
-  char *fname = "AveReTrRectXi1()";
+  const char *fname = "AveReTrRectXi1()";
   VRB.Func(cname,fname);
   
   Float sum = AveReTrRectNodeXi1();
@@ -1958,7 +1946,7 @@ Float Lattice::AveReTrRectXi1() const
 //------------------------------------------------------------------
 Float Lattice::AveReTrRectXi2() const
 {
-  char *fname = "AveReTrRectXi2()";
+  const char *fname = "AveReTrRectXi2()";
   VRB.Func(cname,fname);
   
   Float sum = AveReTrRectNodeXi2();
@@ -2018,78 +2006,64 @@ void Lattice::MltFloatImpl(Float factor, int dir)
   numerical integration of the equations of motion.  
 */  
 //------------------------------------------------------------------
-void Lattice::EvolveGfield(Matrix *mom, Float step_size){
-  char *fname = "EvolveGfield(M*,F)";
+void Lattice::EvolveGfield(Matrix *mom, Float step_size)
+{
+    const char *fname = "EvolveGfield(M*,F)";
+    VRB.Func(cname,fname);
 
-//  sync();
-  VRB.Func(cname,fname);
+    setCbufCntrlReg(4, CBUF_MODE4);
 
-  setCbufCntrlReg(4, CBUF_MODE4);
+    int n_links = 4 * GJP.VolNodeSites();
 
-  int n_links = 4 * GJP.VolNodeSites();
-
-  Matrix *curU_p = GaugeField();
 #ifdef UNIFORM_SEED_TESTING
-  VRB.Result(cname,fname,"gauge checksum(before) = %p\n",
-    global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
+    VRB.Result(cname,fname,"gauge checksum(before) = %p\n",
+               global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
 #endif
 
-  // checksuming local gauge matrices before update
-  //-------------------------------------------------
-  unsigned long loc_sum = local_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE);
+    // checksuming local gauge matrices before update
+    //-------------------------------------------------
+    unsigned long loc_sum = local_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE);
 
-  // checksuming local momentum matrices
-  //----------------------------------------------
-  loc_sum = local_checksum((Float *)mom,n_links*MATRIX_SIZE);
-  CSM.SaveCsum(CSUM_EVL_MOM,loc_sum);
+    // checksuming local momentum matrices
+    //----------------------------------------------
+    loc_sum = local_checksum((Float *)mom,n_links*MATRIX_SIZE);
+    CSM.SaveCsum(CSUM_EVL_MOM,loc_sum);
 
-  for(int i = 0; i < n_links; ++i) {
+    Matrix *curU_p = GaugeField();
 
-    // *mp1 = *(mom+i)
-    moveMem((IFloat *)mp1, (IFloat *)(mom+i),
-    	MATRIX_SIZE * sizeof(IFloat));
+#pragma omp parallel for
+    for(int i = 0; i < n_links; ++i) {
+        Matrix t1, t2, t3;
 
-    *mp1 *= step_size;	// t*iH
-    *mp2 = *mp1;
+        t1 = mom[i];
+        t1 *= step_size;
+        t2 = t1;
 
-    for(int j = 9; j > 1; --j) {
+        for(int j = 9; j > 1; --j) {
+            // t3 = 1 + (1/j) * t2
+            oneMinusfTimesMatrix((Float *)&t3, -1./j, (const Float *)&t2, 18);
+            // t2 = t1 * t3
+            t2.DotMEqual(t1, t3);
+        }
 
-      // mp3 = 1 + 1/j*mp2
-      oneMinusfTimesMatrix((IFloat *)mp3, invs[j],
-			   (const IFloat *)mp2, 18);
-
-      // mp2 = mp1 * mp3
-      mDotMEqual((IFloat *)mp2, (const IFloat *)mp1,
-		 (const IFloat *)mp3);
-
+        // t3 = 1 + t2
+        oneMinusfTimesMatrix((Float *)&t3, -1., (const Float *)&t2, 18);
+        t2 = curU_p[i];
+        // U' = t3 * U
+        curU_p[i].DotMEqual(t3, t2);
     }
 
-
-    // mp3 = 1 + mp2
-    oneMinusfTimesMatrix((IFloat *)mp3, -1, (const IFloat *)mp2, 18);
-    
-
-    // need to copy
-    moveMem((IFloat *)mp2, (IFloat *)(curU_p+i),
-	    MATRIX_SIZE * sizeof(IFloat));
-
-    // U' = mp3 U
-    mDotMEqual((IFloat *)(curU_p+i),(const IFloat *)mp3,
-	       (const IFloat *)mp2);
-  }
-
-
-  // checksuming local gauge matrices after update
-  //------------------------------------------------
-  loc_sum = local_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE);
-  CSM.SaveCsum(CSUM_EVL_LAT,loc_sum);
+    // checksuming local gauge matrices after update
+    //------------------------------------------------
+    loc_sum = local_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE);
+    CSM.SaveCsum(CSUM_EVL_LAT,loc_sum);
 
 #ifdef UNIFORM_SEED_TESTING
-  VRB.Result(cname,fname,"gauge checksum(after) = %p\n",
-    global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
+    VRB.Result(cname,fname,"gauge checksum(after) = %p\n",
+               global_checksum((Float *)GaugeField(),n_links*MATRIX_SIZE));
 #endif
-//  sync();
-  smeared = 0;
+
+    smeared = 0;
 }
 
 
@@ -2107,12 +2081,13 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size){
  */
 //------------------------------------------------------------------
 Float Lattice::MomHamiltonNode(Matrix *momentum){
-  char *fname = "MomHamiltonNode(M*)";
+  const char *fname = "MomHamiltonNode(M*)";
   VRB.Func(cname,fname);
+
   Float ham = 0.0;
-  int n_links = 4 * GJP.XnodeSites() * GJP.YnodeSites()
-      * GJP.ZnodeSites() * GJP.TnodeSites();
-  // In other words,  4 * GJP.VolNodeSites(); 
+  int n_links = 4 * GJP.VolNodeSites();
+
+#pragma omp parallel for reduction(+:ham)
   for(int i = 0; i < n_links; ++i) {
     ham += momentum[i].NegHalfTrSquare();
   }
@@ -2132,7 +2107,7 @@ Float Lattice::MomHamiltonNode(Matrix *momentum){
  */
 void Lattice::Reunitarize(void)
 {
-  char *fname = "Reunitarize()";
+  const char *fname = "Reunitarize()";
   VRB.Func(cname,fname);
   int i;
   int links;
@@ -2178,7 +2153,7 @@ void Lattice::Reunitarize(void)
 //------------------------------------------------------------------
 void Lattice::Reunitarize(Float &dev, Float &max_diff)
 {
-  char *fname = "Reunitarize(F&,F&)";
+  const char *fname = "Reunitarize(F&,F&)";
   VRB.Func(cname,fname);
 
   // Modified here by Ping for anisotropic lattices
@@ -2232,7 +2207,7 @@ void Lattice::Reunitarize(Float &dev, Float &max_diff)
 //------------------------------------------------------------------
 int Lattice::MetropolisAccept(Float delta_h, Float *accept) 
 {
-  char *fname = "MetropolisAccept(F)";
+  const char *fname = "MetropolisAccept(F)";
   VRB.Func(cname,fname);
   int node_id;
   Float flag = 0.0;
@@ -2326,7 +2301,7 @@ int Lattice::MetropolisAccept(Float delta_h)
 //------------------------------------------------------------------
 void Lattice::RandGaussAntiHermMatrix(Matrix *mat, Float sigma2)
 {
-  char *fname = "RandGaussAntiHermMatrix(M*,F)";
+  const char *fname = "RandGaussAntiHermMatrix(M*,F)";
   VRB.Func(cname,fname);
 
 #if TARGET == QCDSP
@@ -2412,7 +2387,7 @@ chkbds,FermionFieldDimension frm_field_dim  )
 void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
              StrOrdType str, FermionFieldDimension frm_dim /* = FIVE_D */ )
 {
-  char * fname = "RandGaussVector(Vector *, Float, int, FermionFieldDimension)";
+  const char *fname = "RandGaussVector(Vector *, Float, int, FermionFieldDimension)";
   VRB.Func(cname, fname);
 
   int vec_size = 2 * Colors() * SpinComponents();
@@ -2420,7 +2395,7 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
   int s_node_sites = GJP.SnodeSites();
   if(frm_dim == FOUR_D
      || s_node_sites == 0
-     // FIXME: check Fclass() is a bad idea, replace it with something more reasonable.
+     // FIXME: checking Fclass() is a bad idea, replace it with something more reasonable.
      || (Fclass() != F_CLASS_DWF && Fclass() != F_CLASS_BFM)) {
     s_node_sites = 1; frm_dim = FOUR_D;
   }
@@ -2489,7 +2464,7 @@ void Lattice::RandGaussVector(Vector * frm, Float sigma2, int num_chkbds,
 */
 //------------------------------------------------------------------
 void Lattice::SetGfieldOrd(void){
-  char *fname = "SetGfieldOrd()";
+  const char *fname = "SetGfieldOrd()";
   VRB.Func(cname,fname);
   int i;
   int links;
@@ -2511,7 +2486,7 @@ void Lattice::SetGfieldOrd(void){
 //------------------------------------------------------------------
 void Lattice::SetGfieldDisOrd(void){
 #if 1
-  char *fname = "SetGfieldDisOrd()";
+  const char *fname = "SetGfieldDisOrd()";
   VRB.Func(cname,fname);
 
   int site_size = GsiteSize();
@@ -2636,7 +2611,7 @@ Float Lattice::FixGaugeStopCond(void){
 // v_out = gamma_5 v_in
 //------------------------------------------------------------------
 void Lattice::Gamma5(Vector *v_out, Vector *v_in, int num_sites){
-  char *fname = "Gamma5";
+  const char *fname = "Gamma5";
   ERR.NotImplemented(cname,fname);
 }
 
@@ -2655,7 +2630,7 @@ void Lattice::Gamma5(Vector *v_out, Vector *v_in, int num_sites){
 void Lattice::Ffour2five(Vector *five, Vector *four, 
 			 int s_r, int s_l, int Ncb)
 {
-  char *fname = "Ffour2five";
+  const char *fname = "Ffour2five";
   ERR.NotImplemented(cname,fname);
 }
 
@@ -2665,7 +2640,7 @@ void Lattice::Ffour2five(Vector *five, Vector *four,
 void Lattice::Ffive2four(Vector *four, Vector *five, 
 			 int s_r, int s_l, int Ncb)
 {
-  char *fname = "Ffive2four";
+  const char *fname = "Ffive2four";
   ERR.NotImplemented(cname,fname);
 }
 
@@ -2678,7 +2653,7 @@ void Lattice::Ffive2four(Vector *four, Vector *five,
 void Lattice::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		    CnvFrmType cnv_frm, int dir_flag)
 {
-  char *fname = "Fdslash";
+  const char *fname = "Fdslash";
   ERR.NotImplemented(cname,fname);
 }
 
@@ -2691,7 +2666,7 @@ void Lattice::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
 void Lattice::FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		    CnvFrmType cnv_frm, int order)
 {
-  char *fname = "FdMdmu";
+  const char *fname = "FdMdmu";
   ERR.NotImplemented(cname,fname);
 }
 
@@ -2706,27 +2681,27 @@ void Lattice::FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg,
 
 Float Lattice::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
     		Float mass, Float epsilon, DagType dag) { 
-  char *fname = "SetPhi(V*,V*,V*,F,F,DagType)";
+  const char *fname = "SetPhi(V*,V*,V*,F,F,DagType)";
   ERR.NotImplemented(cname,fname);
   return ((Float) 0.0);
 };
 
 ForceArg Lattice::EvolveMomFforce(Matrix *mom, Vector *frm, 
 				 Float mass, Float epsilon, Float step_size) {
-  char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
+  const char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
   ERR.NotImplemented(cname,fname);
   return ForceArg(0.0,0.0,0.0);
 };
 
 ForceArg Lattice::EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 		 Float mass, Float epsilon, Float step_size) {
-  char *fname = "EvolveMomFforce(M*,V*,V*,F,F,F)";
+  const char *fname = "EvolveMomFforce(M*,V*,V*,F,F,F)";
   ERR.NotImplemented(cname,fname);
   return ForceArg(0.0,0.0,0.0);
 };
 
 Float Lattice::BhamiltonNode(Vector *boson, Float mass, Float epsilon)  {
-  char *fname = "BhamiltonNode(V*,F,F)";
+  const char *fname = "BhamiltonNode(V*,F,F)";
   ERR.NotImplemented(cname,fname);
   return ((Float) 0.0);
 };
@@ -2760,7 +2735,7 @@ void *Lattice::Aux1Ptr(void){
 */
 //------------------------------------------------------------------
 void Lattice::GsoCheck(void){
-  char *fname = "GsoCheck()";
+  const char *fname = "GsoCheck()";
   VRB.Func(cname,fname);
   int s;
   IFloat rcv_buf[2];
@@ -2874,7 +2849,7 @@ void Lattice::GsoCheck(void){
   \param num The number to check.
 *///------------------------------------------------------------------
 void Lattice::SoCheck(Float num){
-  char *fname = "SoCheck()";
+  const char *fname = "SoCheck()";
   VRB.Func(cname,fname);
   int s;
   IFloat rcv_buf;
@@ -2937,7 +2912,7 @@ void Lattice::Shift()
 void Lattice::ForceMagnitude(Matrix *mom, Matrix *mom_old, 
 			     Float mass, Float dt, char *type) {
 
-  char *fname = "ForceMagnitude(Matrix*, Matrix*, Float, Float, char*)";
+  const char *fname = "ForceMagnitude(Matrix*, Matrix*, Float, Float, char*)";
   FILE *fp;
 
 
@@ -2979,12 +2954,12 @@ int Lattice::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
 int Lattice::eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart,const int restart_len, Vector *f_out, Vector *f_in, CgArg *cg_arg, Float *true_res, CnvFrmType cnv_frm , PreserveType prs_f_in)
 {
 	 char *cname = "Lattice";
-	 char *fname = "FmatInvProj()";
+	 const char *fname = "FmatInvProj()";
 	 ERR.General(cname,fname,"Only have code for dwf class not others so this is not a pure virtual function\n");
 }
 
 unsigned long Lattice::GsiteOffset(const int *x, const int dir) const{
-  char *fname="GsiteOffset(*i,i)";
+  const char *fname="GsiteOffset(*i,i)";
   int parity = (x[0]+x[1]+x[2]+x[3])%2;
   int vol = GJP.VolNodeSites();
   unsigned long index;

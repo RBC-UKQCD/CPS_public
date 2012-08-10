@@ -158,8 +158,6 @@ namespace mixed_cg {
 
         int iter = 0;
         for(int i = 0; i < max_cycle; ++i) {
-            // double sol_norm = bfm_d.norm(sol);
-
             // compute double precision rsd and also new RHS vector.
             bfm_d.Mprec(sol,   tv1_d, src_d, 0, 0);
             bfm_d.Mprec(tv1_d, tv2_d, src_d, 1, 0); // tv2_d = MdagM * sol
@@ -171,12 +169,11 @@ namespace mixed_cg {
             }
 
             // my ad hoc stopping condition
-            // if(norm < stop) break;
-            if(norm < 10000. * stop) break;
+            if(norm < 100. * stop) break;
 
             // will this cause a deadlock when combined with the
-            // condition above?  i.e., will we lose a factor of
-            // 10000/4. in the accuracy of rsd when converting from
+            // condition above?  i.e., will we lose a factor of huge
+            // factor in the accuracy of rsd when converting from
             // single to double?
             while(norm * bfm_f.residual * bfm_f.residual < stop) bfm_f.residual *= 2;
 
@@ -186,14 +183,8 @@ namespace mixed_cg {
             bfm_f.set_zero(sol_f);
             iter += bfm_f.CGNE_prec_MdagM(sol_f, src_f);
 
-            // double norm_sol_f_1 = bfm_f.norm(sol_f);
             switch_comm(bfm_d, bfm_f);
             threaded_convFermion(tv1_d, sol_f, bfm_d, bfm_f);
-            // double norm_sol_f_2 = bfm_d.norm(tv1_d);
-            // if(bfm_d.isBoss() && !me) {
-            //     printf("cg_mixed_MdagM: iter = %d sol norm = %17.10e(f) %17.10e(d)\n",
-            //            i, norm_sol_f_1, norm_sol_f_2);
-            // }
 
             bfm_d.axpy(sol, tv1_d, sol, 1.);
         }
@@ -206,6 +197,7 @@ namespace mixed_cg {
         bfm_f.threadedFreeFermion(src_f);
 
         iter += bfm_d.CGNE_prec_MdagM(sol, src);
+
         double sol_norm = bfm_d.norm(sol);
         if(bfm_d.isBoss() && !me) {
             printf("cg_mixed_MdagM: final sol norm = %17.10e\n", sol_norm);
@@ -215,60 +207,122 @@ namespace mixed_cg {
         return iter;
     }
 
-    struct mixed_cg_thread_arg {
-        bfm_evo<double> &bfm_d;
-        bfm_evo<float>  &bfm_f;
-
-        Fermion_t src; // double precision
-        Fermion_t sol; // double precision
-
-        int max_cycle;
-    };
-
-    inline void *mixed_cg_thread_function(void *myarg)
+    // apply single precision solver to double precision vectors. Both
+    // sol_d and src_d are in double precision.
+    //
+    // sol_f and src_f are auxiliary fermions in single
+    // precision. Their content will be overriden after calling this
+    // function.
+    //
+    // If import_guess == true, then we import sol_d as an initial
+    // guess, other we do a zero start CG.
+    inline int cg_single_prec(Fermion_t sol_d, Fermion_t src_d,
+                              Fermion_t sol_f, Fermion_t src_f,
+                              bfm_evo<double> &bfm_d, bfm_evo<float> &bfm_f)
     {
-        mixed_cg_thread_arg *args = (mixed_cg_thread_arg *)myarg;
-    
-        bfm_evo<double> &bfm_d = args->bfm_d;
-        bfm_evo<float>  &bfm_f = args->bfm_f;
-        Fermion_t src = args->src;
-        Fermion_t sol = args->sol;
-        int max_cycle = args->max_cycle;
-
-        args->max_cycle = threaded_cg_mixed_MdagM(sol, src, bfm_d, bfm_f, max_cycle);
-
-        return myarg;
+        threaded_convFermion(src_f, src_d, bfm_f, bfm_d);
+        switch_comm(bfm_f, bfm_d);
+        
+        bfm_f.set_zero(sol_f);
+        int iter = bfm_f.CGNE_prec_MdagM(sol_f, src_f);
+        
+        switch_comm(bfm_d, bfm_f);
+        threaded_convFermion(sol_d, sol_f, bfm_d, bfm_f);
+        return iter;
     }
 
-    inline void mixed_cg_spawn_and_run(void *(*thread_func)(void *), void *arg)
+    // cg_MdagM_single_precnd: Nested CG, single precision solver is
+    // used as a preconditioner.
+    //
+    // Calling interface is the same as threaded_cg_mixed_MdagM().
+    inline int cg_MdagM_single_precnd(Fermion_t sol, Fermion_t src,
+                                      bfm_evo<double> &bfm_d, bfm_evo<float> &bfm_f)
     {
-        int THREADS=64;
-        pthread_t *handles = (pthread_t *) malloc(THREADS*sizeof(pthread_t));
+        int me = bfm_d.thread_barrier();
 
-        for(int t =0; t<THREADS; t++ ) {
-            if ( pthread_create(&handles[t],(pthread_attr_t *)NULL, thread_func, arg))
-                perror("pthread create");
+        double frsd = bfm_f.residual;
+
+        Fermion_t r = bfm_d.threadedAllocFermion();
+        Fermion_t minvr = bfm_d.threadedAllocFermion();
+        Fermion_t d = bfm_d.threadedAllocFermion();
+        Fermion_t ad = bfm_d.threadedAllocFermion();
+        Fermion_t aad = bfm_d.threadedAllocFermion();
+        Fermion_t tv1 = bfm_d.threadedAllocFermion();
+        Fermion_t sol_f = bfm_f.threadedAllocFermion();
+        Fermion_t src_f = bfm_f.threadedAllocFermion();
+
+        const double src_norm = bfm_d.norm(src);
+        const double stop = src_norm * bfm_d.residual * bfm_d.residual;
+
+        int iter_s = 0;
+
+        bfm_d.Mprec(sol,  ad, tv1, 0, 0);
+        bfm_d.Mprec(ad , aad, tv1, 1, 0); // aad = MdagM * x0 (double prec)
+        bfm_d.axpy(r, aad, src, -1.0); // r0 = b - MdagM * x0
+
+        iter_s += cg_single_prec(minvr, r, sol_f, src_f, bfm_d, bfm_f);
+        bfm_d.copy(d, minvr); // d0 = (M'dagM')^(-1) * r0 
+        double rtminvr = bfm_d.inner_real(r, minvr);
+
+        int k = 1;
+        for(; k <= bfm_d.max_iter; ++k) {
+            double dtad = bfm_d.Mprec(d, ad, tv1, 0, 1);
+            bfm_d.Mprec(ad, aad, tv1, 1, 0);  // aad = MdagM * d[k] (double prec)
+
+            double alpha = rtminvr / dtad;
+            bfm_d.axpy(sol, d, sol, alpha);
+            double rsd = bfm_d.axpy_norm(r, aad, r, -alpha);
+            
+            // check watch file
+            FILE *fp = fopen("stop.file", "r");
+            if(fp) {
+                fclose(fp);
+                printf("Found watchfile stop.file\n");
+                return 1;
+            }
+
+            // check stopping condition
+            if(rsd < stop) {
+                // compute true residual
+                bfm_d.Mprec(sol,  ad, tv1, 0, 0);
+                bfm_d.Mprec(ad , aad, tv1, 1, 0);
+                double true_rsd = bfm_d.axpy_norm(tv1, aad, src, -1.0);
+
+                if(bfm_d.isBoss() && !me) {
+                    printf("cg_MdagM_single_precnd: converged in %d(d)+%d(s) iterations.\n", k, iter_s);
+                    printf("cg_MdagM_single_precnd: true residual = %17.10e.\n", sqrt(true_rsd/src_norm));
+                }
+                break;
+            }
+
+            iter_s += cg_single_prec(minvr, r, sol_f, src_f, bfm_d, bfm_f);
+            double tmp = bfm_d.inner_real(r, minvr);
+            double beta = tmp / rtminvr;
+            rtminvr = tmp;
+
+            bfm_d.axpby(d, minvr, d, 1.0, beta);
         }
 
-        for(int t =0; t<THREADS; t++ ) {
-            if ( pthread_join(handles[t],NULL)) {
-                perror("pthread_join");
+        if(k > bfm_d.max_iter) {
+            if(bfm_d.isBoss() && !me) {
+                printf("cg_MdagM_single_precnd: CG not converged in %d(d)+%d(s) iterations.\n", k, iter_s);
             }
         }
 
-        free (handles);
-    }
+        bfm_d.threadedFreeFermion(r);
+        bfm_d.threadedFreeFermion(minvr);
+        bfm_d.threadedFreeFermion(d);
+        bfm_d.threadedFreeFermion(ad);
+        bfm_d.threadedFreeFermion(aad);
+        bfm_d.threadedFreeFermion(tv1);
+        bfm_f.threadedFreeFermion(sol_f);
+        bfm_f.threadedFreeFermion(src_f);
 
-    // non-threaded version, just a wrapper
-    inline int cg_mixed_MdagM(Fermion_t sol, Fermion_t src,
-                              bfm_evo<double> &bfm_d, bfm_evo<float> &bfm_f,
-                              int max_cycle)
-    {
-        mixed_cg_thread_arg arg = { bfm_d, bfm_f, src, sol, max_cycle };
-        mixed_cg_spawn_and_run(mixed_cg_thread_function, (void *)&arg);
-        return arg.max_cycle;
-    }
+        bfm_d.CGNE_prec_MdagM(sol, src);
 
-};
+        bfm_f.residual = frsd;
+        return k + iter_s;
+    }
+}
 
 #endif

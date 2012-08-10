@@ -2,7 +2,7 @@
   \file
   \brief
   
-  $Id: fpconv.h,v 1.9 2008-05-29 21:04:27 chulwoo Exp $
+  $Id: fpconv.h,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
  */
 
 #ifndef __FP_CONV__
@@ -12,7 +12,6 @@
 
 
 CPS_START_NAMESPACE
-using namespace std;
 
 typedef uint32_t type32 ;
 typedef uint64_t type64;

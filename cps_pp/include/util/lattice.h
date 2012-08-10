@@ -1,3 +1,6 @@
+#ifndef INCLUDED_LATTICE_H
+#define INCLUDED_LATTICE_H
+
 #include<config.h>
 #include<math.h>
 
@@ -5,23 +8,20 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.62 2012-08-02 21:20:00 chulwoo Exp $
+  $Id: lattice.h,v 1.63 2012-08-10 14:05:33 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2012-08-02 21:20:00 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.62 2012-08-02 21:20:00 chulwoo Exp $
-  $Id: lattice.h,v 1.62 2012-08-02 21:20:00 chulwoo Exp $
+  $Date: 2012-08-10 14:05:33 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.63 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: lattice.h,v 1.63 2012-08-10 14:05:33 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.62 $
+  $Revision: 1.63 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
 //------------------------------------------------------------------
 
-
-#ifndef INCLUDED_LATTICE_H
-#define INCLUDED_LATTICE_H
 
 #include <util/gjp.h>
 #include <util/enum.h>
@@ -238,11 +238,13 @@ class Lattice
 
     virtual ~Lattice();
 
-    Matrix *GaugeField() const;
-    	//!< Returns the pointer to the gauge field configuration.
+    Matrix *GaugeField() const {
+        return gauge_field;
+    }
+    //!< Returns the pointer to the gauge field configuration.
 
     void GaugeField(Matrix *u);
-        //!< Copies an array into the gauge configuration.
+    //!< Copies an array into the gauge configuration.
 
     int GsiteOffset(const int *x) const
         { return x[0]*g_dir_offset[0]+x[1]*g_dir_offset[1]
@@ -1126,6 +1128,15 @@ class Lattice
     //!< staggered fermion formulations).
     virtual void BforceVector(Vector *in, CgArg *cg_arg) = 0;
 
+    // added by Hantao to facilitate doing force statistics.
+    void updateForce(ForceArg &f_arg, const Matrix &m)const {
+        Float a2 = m.norm();
+        Float a = sqrt(a2);
+
+        f_arg.L1 += a;
+        f_arg.L2 += a2;
+        f_arg.Linf = f_arg.Linf > a ? f_arg.Linf : a;
+    }
 };
 
 //------------------------------------------------------------------

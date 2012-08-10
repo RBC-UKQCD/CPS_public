@@ -9,7 +9,7 @@ CPS_START_NAMESPACE
 class FwilsonTypes : public virtual Lattice
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
     
  public:
 // protected:
@@ -107,7 +107,7 @@ class FwilsonTypes : public virtual Lattice
 class Fwilson : public virtual FwilsonTypes
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
     
  public:
 

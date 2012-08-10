@@ -1,12 +1,16 @@
 #ifndef INCLUDED_FBFM_H__
 #define INCLUDED_FBFM_H__
 
+#ifdef USE_BFM
 #include <util/lattice/bfm_evo.h>
 #include <util/lattice/bfm_mixed_solver.h>
+#endif
+
 #include <util/lattice.h>
 
 CPS_START_NAMESPACE
 
+#ifdef USE_BFM
 class Fbfm : public virtual Lattice {
 public:
     // have to do this since lattice factory does not accept any input
@@ -328,7 +332,7 @@ class GnoneFbfm
       public virtual Gnone,
       public virtual Fbfm {
 private:
-    char *cname;
+    const char *cname;
 public:
     GnoneFbfm(void);
     virtual ~GnoneFbfm();
@@ -339,11 +343,13 @@ class GimprRectFbfm
       public virtual GimprRect,
       public virtual Fbfm {
 private:
-    char *cname;
+    const char *cname;
 public:
     GimprRectFbfm(void);
     virtual ~GimprRectFbfm();
 };
+
+#endif
 
 CPS_END_NAMESPACE
 

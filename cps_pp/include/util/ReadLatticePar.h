@@ -1,12 +1,11 @@
 #ifndef __READLATTPAR__
 #define __READLATTPAR__
 
-
 // a slight modification on ReadLattice class (if not inheritance)
 // to enable parallel reading/writing of "Gauge Connection Format" lattice data
 
-#include <stdlib.h>	// exit()
-#include <stdio.h>
+#include <cstdlib>	// exit()
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -25,23 +24,24 @@
 #include <util/latheader.h>
 
 CPS_START_NAMESPACE
-using namespace std;
 
-class  ReadLatticeParallel : public QioControl {
+class  ReadLatticeParallel : public QioControl
+{
   // which determines parallel reading or serial reading
 
  private:
-  char *cname;
-  LatticeHeader hd;
+    const char *cname;
+    LatticeHeader hd;
+    bool UseParIO;
 
 public:
   // ctor for 2-step loading
-  ReadLatticeParallel()
-    : QioControl(), cname("ReadLatticeParallel"), UseParIO(1)
+    ReadLatticeParallel()
+        : QioControl(), cname("ReadLatticeParallel"), UseParIO(1)
     {  }
 
   // ctor invoking loading behavior
-  ReadLatticeParallel(Lattice & lat, const char * filename, const Float chkprec = 0.01)
+    ReadLatticeParallel(Lattice &lat, const char *filename, const Float chkprec = 0.01)
     : 
     QioControl(),
     cname("ReadLatticeParallel") , 
@@ -60,23 +60,21 @@ public:
   
   virtual ~ReadLatticeParallel() {}
 
-  void read(Lattice & lat, const char * filename, const Float chkprec = 0.01){
+  void read(Lattice &lat, const char *filename, const Float chkprec = 0.01){
     QioArg rd_arg(filename,chkprec);
     read(lat,rd_arg);
   }
 
   void read(Lattice & lat, const QioArg & rd_arg);
 
-  string getEnsembleId(){ return hd.ensemble_id; } // CAREFULL: only on MasterNode!!
-  string getEnsembleLabel(){ return hd.ensemble_label; } // CAREFULL: only on MasterNode!!
+    std::string getEnsembleId(){ return hd.ensemble_id; } // CAREFULL: only on MasterNode!!
+    std::string getEnsembleLabel(){ return hd.ensemble_label; } // CAREFULL: only on MasterNode!!
   int getSequenceNumber();// same on all nodes!
 
  private:
   bool CheckPlaqLinktrace(Lattice & lat, const QioArg & rd_arg,
 			  const Float plaq_inheader, const Float linktrace_inheader);
 
- private:
-    bool UseParIO;
  public:
     inline void setParallel() { UseParIO = 1; }
     inline void setSerial() { 
@@ -121,6 +119,4 @@ class ReadLatticeSerial : public ReadLatticeParallel {
 
 
 CPS_END_NAMESPACE
-#endif 
-
-
+#endif

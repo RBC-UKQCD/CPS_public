@@ -3,7 +3,6 @@
 
 #include <config.h>
 #include <vector>
-using namespace std;
 
 CPS_START_NAMESPACE
 

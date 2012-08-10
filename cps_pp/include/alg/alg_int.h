@@ -658,21 +658,21 @@ private:
 
     ActionQuotientArg *quo_arg;
 
-    vector<CgArg> bsn_cg_arg;   //!< Pointer to an array of solver parameters.
+    std::vector<CgArg> bsn_cg_arg;   //!< Pointer to an array of solver parameters.
 
     //!< Pointer to an array of solver parameters, for force gradient
     //!< step, irrevelant if using other integrators.
-    vector<CgArg> frm_cg_arg_fg;
+    std::vector<CgArg> frm_cg_arg_fg;
 
-    vector<CgArg> frm_cg_arg_md;   //!< Pointer to an array of solver parameters.
-    vector<CgArg> frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
+    std::vector<CgArg> frm_cg_arg_md;   //!< Pointer to an array of solver parameters.
+    std::vector<CgArg> frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
 
-    vector<Float> bsn_mass; //!< The boson mass parameter that appears in the quotient
-    vector<Float> frm_mass; //!< The fermion mass parameter that appears in the quotient
+    std::vector<Float> bsn_mass; //!< The boson mass parameter that appears in the quotient
+    std::vector<Float> frm_mass; //!< The fermion mass parameter that appears in the quotient
 
     // ~~added for twisted mass Wilson fermions
-    vector<Float> bsn_mass_epsilon; //!< The boson mass parameter that appears in the quotient
-    vector<Float> frm_mass_epsilon; //!< The fermion mass parameter that appears in the quotient
+    std::vector<Float> bsn_mass_epsilon; //!< The boson mass parameter that appears in the quotient
+    std::vector<Float> frm_mass_epsilon; //!< The fermion mass parameter that appears in the quotient
 
     int evolved;
     Float h_init;
@@ -689,7 +689,7 @@ private:
     //!< optimisation (chronological preconditioner)
     Vector ***vm;
 
-    vector<int> chrono;
+    std::vector<int> chrono;
 
     // !< Status variable controls if we can use the CG solution from a
     // !< previous force gradient solve to forecast the next normal solve.

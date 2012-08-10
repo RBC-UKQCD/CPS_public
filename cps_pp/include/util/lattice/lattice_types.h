@@ -1,7 +1,7 @@
-#include <config.h>
-
 #ifndef INCLUDED_LATTICE_TYPES_H
 #define INCLUDED_LATTICE_TYPES_H
+
+#include <config.h>
 
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
@@ -852,12 +852,12 @@ class GnoneFwilsonTm
  public:
     GnoneFwilsonTm() {
       cname = "GnoneFwilsonTm";
-      char *fname = "GnoneFwilsonTm()";
+      const char *fname = "GnoneFwilsonTm()";
       VRB.Func(cname,fname);
     }
 
     ~GnoneFwilsonTm() {
-      char *fname = "~GnoneFwilsonTm()";
+      const char *fname = "~GnoneFwilsonTm()";
       VRB.Func(cname,fname);
     }
 
@@ -879,12 +879,12 @@ class GwilsonFwilsonTm
  public:
     GwilsonFwilsonTm() {
       cname = "GwilsonFwilsonTm";
-      char *fname = "GwilsonFwilsonTm()";
+      const char *fname = "GwilsonFwilsonTm()";
       VRB.Func(cname,fname);
     }
 
     ~GwilsonFwilsonTm() {
-      char *fname = "~GwilsonFwilsonTm()";
+      const char *fname = "~GwilsonFwilsonTm()";
       VRB.Func(cname,fname);
     }
 
@@ -906,12 +906,12 @@ class GimprRectFwilsonTm
  public:
     GimprRectFwilsonTm() {
       cname = "GimprRectFwilsonTm";
-      char *fname = "GimprRectFwilsonTm()";
+      const char *fname = "GimprRectFwilsonTm()";
       VRB.Func(cname,fname);
     }
 
     ~GimprRectFwilsonTm() {
-      char *fname = "~GimprRectFwilsonTm()";
+      const char *fname = "~GimprRectFwilsonTm()";
       VRB.Func(cname,fname);
     }
     

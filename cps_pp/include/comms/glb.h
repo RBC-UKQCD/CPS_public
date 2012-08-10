@@ -1,21 +1,23 @@
+#ifndef INCLUDED_GLB_H
+#define INCLUDED_GLB_H
+
 #include<config.h>
-CPS_START_NAMESPACE
 //-------------------------------------------------------------------
 /*!\file
   \brief  Declarations of collective communications routines
 
-  $Id: glb.h,v 1.8 2008-09-18 14:40:18 chulwoo Exp $
+  $Id: glb.h,v 1.9 2012-08-10 14:05:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-09-18 14:40:18 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v 1.8 2008-09-18 14:40:18 chulwoo Exp $
-//  $Id: glb.h,v 1.8 2008-09-18 14:40:18 chulwoo Exp $
+//  $Date: 2012-08-10 14:05:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v 1.9 2012-08-10 14:05:33 chulwoo Exp $
+//  $Id: glb.h,v 1.9 2012-08-10 14:05:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/glb.h,v $
 //  $State: Exp $
 //
@@ -23,10 +25,7 @@ CPS_START_NAMESPACE
 /*
  *  glb.h
  */
-#ifndef INCLUDED_GLB_H
-#define INCLUDED_GLB_H
 
-CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/lattice.h>
 //#include <comms/nga_reg.h>
@@ -83,6 +82,5 @@ extern unsigned int local_checksum(Float * float_p, int len);
 extern unsigned int global_checksum(Float * float_p, int len);
 extern unsigned int test_checksum(Float * float_p, int len);
 
-#endif
-
 CPS_END_NAMESPACE
+#endif

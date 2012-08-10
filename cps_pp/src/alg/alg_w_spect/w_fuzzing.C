@@ -568,7 +568,7 @@ void WspectFuzzing::cabbibo(int hit, int maxhit, Matrix &X, Matrix &T){
 
   h1=(X(0,0)+conj(X(1,1)))*0.5;
   h2=(X(1,0)-conj(X(0,1)))*0.5;
-  h=sqrt(h1.norm()+h2.norm());
+  h=sqrt(norm(h1)+norm(h2));
   h=1./h;
   
   h1=h1*h;
@@ -593,7 +593,7 @@ void WspectFuzzing::cabbibo(int hit, int maxhit, Matrix &X, Matrix &T){
     
     h1=(X(1,1)+conj(X(2,2)))*0.5;
     h2=(X(2,1)-conj(X(1,2)))*0.5;
-    h=sqrt(h1.norm()+h2.norm());
+    h=sqrt(norm(h1)+norm(h2));
     h=1./h;
     
     h1=h1*h;
@@ -617,7 +617,7 @@ void WspectFuzzing::cabbibo(int hit, int maxhit, Matrix &X, Matrix &T){
     // + o +
     h1=(X(0,0)+conj(X(2,2)))*0.5;
     h2=(X(2,0)-conj(X(0,2)))*0.5;
-    h=sqrt(h1.norm()+h2.norm());
+    h=sqrt(norm(h1)+norm(h2));
     h=1./h;
     
     h1=h1*h;

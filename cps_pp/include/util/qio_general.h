@@ -113,7 +113,8 @@
 /* one of QIO_SERIAL, QIO_PARALLEL */
 /* for safety added for QCDOC */
 
-#if (TARGET == QCDOC) || (TARGET == BGP)
+//#if (TARGET == QCDOC) || (TARGET == BGP)
+#if 1
   #define QIO_SERPAR QIO_PARALLEL
 #else
   #define QIO_SERPAR QIO_SERIAL

@@ -13,14 +13,11 @@
 
 
 CPS_START_NAMESPACE
-using namespace std;
-
-
 
 // GCFheaderPar class
 // header parser for parallel IO
 // removed "exit()"'s, others same as class GCFheader
-typedef map<string,string> GCFHMapParT;
+typedef std::map<std::string, std::string> GCFHMapParT;
 
 class GCFheaderPar
 {
@@ -33,12 +30,12 @@ public:
   
   inline bool found() { return prevFound; }
 
-  bool    add( string key_eq_value );
+    bool    add( std::string key_eq_value );
 
-  int     asInt   ( string key );
-  unsigned int     asHex   ( string key );
-  Float   asFloat ( string key );
-  string  asString( string key );
+    int     asInt   ( std::string key );
+    unsigned int     asHex   ( std::string key );
+    Float   asFloat ( std::string key );
+    std::string  asString( std::string key );
 
   void Show() const;
 };
@@ -53,9 +50,9 @@ class LatHeaderBase {
   };
   virtual enum HEADER_TYPES headerType() const = 0;
   virtual streamoff dataStart() const = 0;
-  virtual void read(istream & fin) = 0;
-  virtual void write(ostream & fout) = 0;
-  virtual void fillInCheckInfo(ostream & fout, unsigned int cs, unsigned int pdcs,
+  virtual void read(std::istream & fin) = 0;
+  virtual void write(std::ostream & fout) = 0;
+  virtual void fillInCheckInfo(std::ostream & fout, unsigned int cs, unsigned int pdcs,
 			       const Float calc1, const Float calc2) const = 0;
   virtual void show() const = 0;
 
@@ -73,9 +70,9 @@ class LatHeaderBase {
 class LatticeHeader : public LatHeaderBase {
  public:
   // header strings
-  string hdr_version;
+    std::string hdr_version;
   int recon_row_3; // determines DATATYPE = 4D_SU3_GAUGE or 4D_SU3_GAUGE_3X3
-  string storage_format;
+    std::string storage_format;
 
   int dimension[4];
   Float link_trace;
@@ -84,13 +81,13 @@ class LatticeHeader : public LatHeaderBase {
   BndCndType boundary[4]; 
   unsigned int checksum;
 
-  string ensemble_id ;
-  string ensemble_label ;
+    std::string ensemble_id ;
+    std::string ensemble_label ;
   int sequence_number ;
-  string creator ;
-  string creator_hardware ;
-  string creation_date ;
-  string archive_date ;
+    std::string creator ;
+    std::string creator_hardware ;
+    std::string creation_date ;
+    std::string archive_date ;
 
   FP_FORMAT floating_point;
 
@@ -102,10 +99,10 @@ class LatticeHeader : public LatHeaderBase {
 
   void init(const QioArg & qio_arg, FP_FORMAT FileFormat, Float LinkTrace, Float Plaq);
   void setHeader(const char * EnsembleId, const char * EnsembleLabel, const int SequenceNumber,const char *CreatorName = NULL, const char *CreatorHardware = NULL );
-  void write(ostream & fout);
-  void fillInChecksum(ostream & fout, unsigned int checksum) const;
+    void write(std::ostream & fout);
+    void fillInChecksum(std::ostream & fout, unsigned int checksum) const;
   
-  void read(istream & fin);
+    void read(std::istream & fin);
 
   void show() const { hd.Show(); }
 
@@ -156,9 +153,9 @@ END_HEADER
 class LatRngHeader : public LatHeaderBase {
  public:
   // header strings
-  string hdr_version;
-  string datatype;
-  string storage_format;
+  std::string hdr_version;
+  std::string datatype;
+  std::string storage_format;
 
   int dimension[5];
   unsigned int checksum;
@@ -167,10 +164,10 @@ class LatRngHeader : public LatHeaderBase {
   Float average;
   Float variance;
 
-  string creator ;
-  string creator_hardware ;
-  string creation_date ;
-  string archive_date ;
+  std::string creator ;
+  std::string creator_hardware ;
+  std::string creation_date ;
+  std::string archive_date ;
 
   INT_FORMAT int_format;
 
@@ -178,10 +175,10 @@ class LatRngHeader : public LatHeaderBase {
   LatRngHeader() {  }
 
   void init(const QioArg & qio_arg, INT_FORMAT FileFormat);
-  void write(ostream & fout);
-  void fillInCheckInfo(ostream & fout, unsigned int cs, unsigned int pdcs, Float avg, Float var) const;
+    void write(std::ostream & fout);
+    void fillInCheckInfo(std::ostream & fout, unsigned int cs, unsigned int pdcs, Float avg, Float var) const;
   
-  void read(istream & fin);
+    void read(std::istream & fin);
 
   streamoff dataStart() const { return data_start; }
   

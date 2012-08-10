@@ -22,7 +22,6 @@
 
 
 CPS_START_NAMESPACE
-using namespace std;
 
 //----------------------------------------
 // WriteLatticeParallel class

@@ -51,10 +51,10 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
 
   int chars_per_site  = data_per_site * dconv.fileDataSize();
 
-  int yblk = nx*chars_per_site;
-  int zblk = ny * yblk;
-  int tblk = nz * zblk;
-  int sblk = nt * tblk;
+  int64_t yblk = nx*chars_per_site;
+  int64_t zblk = ny * yblk;
+  int64_t tblk = nz * zblk;
+  int64_t sblk = nt * tblk;
 
   int xbegin = rd_arg.XnodeSites() * rd_arg.Xcoor(), xend = rd_arg.XnodeSites() * (rd_arg.Xcoor()+1);
   int ybegin = rd_arg.YnodeSites() * rd_arg.Ycoor(), yend = rd_arg.YnodeSites() * (rd_arg.Ycoor()+1);
@@ -96,7 +96,7 @@ int ParallelIO::load(char * data, const int data_per_site, const int site_mem,
   if (hd.dataStart()>0) 
   input.seekg(hd.dataStart(),ios_base::beg);
 
-  int jump = 0;
+  int64_t jump = 0;
   if(dimension == 5) jump = sbegin * sblk;
 
   for(int sr=sbegin; dimension==4 || sr<send; sr++) { // if 4-dim, has to enter once
@@ -236,10 +236,10 @@ int ParallelIO::store(iostream & output,
   int ns = wt_arg.SnodeSites() * wt_arg.Snodes();
 
 
-  int yblk = nx*chars_per_site;
-  int zblk = yblk * ny;
-  int tblk = zblk * nz;
-  int sblk = tblk * nt;
+  int64_t yblk = nx*chars_per_site;
+  int64_t zblk = yblk * ny;
+  int64_t tblk = zblk * nz;
+  int64_t sblk = tblk * nt;
 
 
   // TempBufAlloc is a mem allocator that prevents mem leak on function exits
@@ -268,7 +268,7 @@ do {
   if (hd.dataStart()>0) 
     output.seekp(hd.dataStart(),ios_base::beg);
 
-    int jump=0;
+    int64_t jump=0;
     streampos  r_pos=0, w_pos;
     if(dimension==5) jump = sbegin * sblk;
 

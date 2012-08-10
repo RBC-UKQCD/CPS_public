@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Utility routines for SU(3) matrices.
 
-  $Id: su3_util.C,v 1.4 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: su3_util.C,v 1.5 2012-08-10 14:05:33 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v 1.4 2012-03-26 13:50:12 chulwoo Exp $
-//  $Id: su3_util.C,v 1.4 2012-03-26 13:50:12 chulwoo Exp $
+//  $Date: 2012-08-10 14:05:33 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v 1.5 2012-08-10 14:05:33 chulwoo Exp $
+//  $Id: su3_util.C,v 1.5 2012-08-10 14:05:33 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v $
 //  $State: Exp $
 //
@@ -75,32 +75,6 @@ void Matrix::TrLessAntiHermMatrix(const Matrix &dag)
     *(p+9) -= c;
     *(p+17) -= c;
 }
-
-#if 0
-void Matrix::TrLessAntiHermMatrix()
-{
-
-    IFloat *p = (IFloat *)u;
-    *p = *(p+8) = *(p+16)=0.;
-    IFloat tmp = 0.5*(p[2] - p[6]);
-    p[2]=tmp; p[6] = -tmp;
-    tmp = 0.5*(p[3] + p[7]);
-    p[3]=tmp; p[7] = tmp;
-    tmp = 0.5*(p[4] - p[12]);
-    p[4]=tmp; p[12] = -tmp;
-    tmp = 0.5*(p[5] + p[13]);
-    p[5]=tmp; p[13] = tmp;
-    tmp = 0.5*(p[10] - p[14]);
-    p[10]=tmp; p[14] = -tmp;
-    tmp = 0.5*(p[11] + p[15]);
-    p[11]=tmp; p[15] = tmp;
-
-    IFloat c = inv3 * (*(p+1) + *(p+9) + *(p+17));
-    p[1] -= c;
-    p[9] -= c;
-    p[17] -= c;
-}
-#endif
 
 /*!
   \param v1 A complex 3-vector \a u
@@ -198,13 +172,6 @@ void Matrix::Det(IFloat* q) const
          + *(p+4) * re2 - *(p+5) * im2 ;
     *(q+1) = *p * im0 + *(p+1) * re0 + *(p+2) * im1 + *(p+3) * re1
             + *(p+4) * im2 + *(p+5) * re2 ;
-}
-
-
-IFloat Matrix::ReTr() const
-{
-    IFloat *p = (IFloat *)u;
-    return *p + *(p+8) + *(p+16);
 }
 
 /*!

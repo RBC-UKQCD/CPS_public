@@ -8,8 +8,6 @@
 #include <util/latheader.h>
 
 CPS_START_NAMESPACE
-using namespace std;
-
 
 class LatRngIO : public QioControl {
  private:
