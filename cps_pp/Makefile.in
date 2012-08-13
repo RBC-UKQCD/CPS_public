@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.35 2012-08-10 21:25:11 chulwoo Exp $
+# $Id: Makefile.in,v 1.36 2012-08-13 19:25:45 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -7,8 +7,8 @@ BUILDDIR = @abs_builddir@
 TESTDIR = tests
 HDW_TESTDIR= hdw_tests
 DOCDIR = doc
-QOS = @QOS@
-QOSLIB = ${QOS}/quser/gcc-lib-user///
+#QOS = @QOS@
+#QOSLIB = ${QOS}/quser/gcc-lib-user///
 
 ifneq "$(BUILDDIR)"  "$(SRCDIR)"
 builddir_isnt_srcdir="yes"
@@ -16,15 +16,11 @@ else
 builddir_isnt_srcdir=
 endif
 
-# Added by Hantao, changed by chulwoo
-# #
-# # Purpose is to have a single ar operation at the end (so we can
-# # concurrently build).
 LIBNAME = cps
 
-all: rpcgenvml vml recurse copy_testdir archive
+all: rpcgenvml vml cps copy_testdir archive
 
-archive:
+archive: cps
 	find $(BUILDDIR) \( -name '*.o' -o -name '*.xlo' \) -a -print0 | xargs -0 ${AR} rcs ${BUILDDIR}/$(LIBNAME).a
 
 cps: recurse
