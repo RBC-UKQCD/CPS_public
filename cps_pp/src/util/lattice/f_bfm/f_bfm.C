@@ -1,8 +1,8 @@
 // -*- c-basic-offset: 4 -*-
-#ifdef USE_BFM
-
 #include<config.h>
 #include<math.h>
+
+#ifdef USE_BFM
 
 #include <util/lattice/bfm_evo.h>
 #include <util/lattice/fbfm.h>
@@ -203,7 +203,8 @@ static void thread_work_partial(int nwork, int me, int nthreads,
 
 ForceArg Fbfm::EvolveMomFforceInternal(Matrix *mom,
                                        Float *v1, Float *v2, // only internal data will be used
-                                       Float coef, int mu)
+                                       Float coef, int mu,
+                                       int nthreads)
 {
     int low[4] = { 0, 0, 0, 0 };
     int high[4] = { lclx[0], lclx[1], lclx[2], lclx[3] };
@@ -218,11 +219,10 @@ ForceArg Fbfm::EvolveMomFforceInternal(Matrix *mom,
 
     int block_size = SPINOR_SIZE * lclx[4];
 
-    int nthreads = omp_get_num_threads();
     int me = omp_get_thread_num();
     int mywork, myoff;
-    // 4 threads are used in communication
-    thread_work_partial(hl_sites, me, nthreads - 4, mywork, myoff);
+    // some threads are used in communication
+    thread_work_partial(hl_sites, me, nthreads, mywork, myoff);
 
     ForceArg f_arg(0, 0, 0);
     for(int i = 0; i < mywork; ++i) {
@@ -435,41 +435,28 @@ ForceArg Fbfm::EvolveMomFforceBase(Matrix *mom,
 
     Float dtime3 = dclock();
 
+    // single threaded comm
+    for(int dir = 0; dir < 4; ++dir) {
+        getPlusData(rcvbuf + surf_v1[dir], sndbuf + surf_v1[dir],
+                    surf_size[dir] * 2, dir);
+    }
+
     omp_set_num_threads(bfm_arg.threads);
     ForceArg ret;
 
-    // Fused comm/force.
-    //
-    // 1. The last 4 threads (typically 60-63) are used for
-    // communication. All other threads (typically 0-59) are used to
-    // calculate internal forces.
-    //
-    // 2. All threads are used to calculate surface forces.
 #pragma omp parallel
     {
         int nthreads = omp_get_num_threads();
-        int me = omp_get_thread_num();
+        // int me = omp_get_thread_num();
         ForceArg f_arg; // threaded
 
-        if(nthreads <= 4) {
-            if(!me) {
-                VRB.Result(cname, fname, "error: at least 5 threads are required.\n");
-            }
-            exit(-1);
+        // internal forces
+        for(int i = 0; i < 4; ++i) {
+            ForceArg t = EvolveMomFforceInternal(mom, v1, v2, coef, i, nthreads);
+            f_arg.combine(t);
         }
 
-        if(me >= nthreads - 4) {
-            int dir = nthreads - me - 1;
-            getPlusData(rcvbuf + surf_v1[dir], sndbuf + surf_v1[dir],
-                        surf_size[dir] * 2, dir);
-        } else {
-            for(int i = 0; i < 4; ++i) {
-                ForceArg t = EvolveMomFforceInternal(mom, v1, v2, coef, i);
-                f_arg.combine(t);
-            }
-        }
-
-#pragma omp barrier
+// #pragma omp barrier
 
         for(int i = 0; i < 4; ++i) {
             ForceArg t = EvolveMomFforceSurface(mom, v1, v2,

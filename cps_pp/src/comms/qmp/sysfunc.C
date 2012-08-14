@@ -87,13 +87,34 @@ void init_qmp(int * argc, char ***argv) {
     QMP_thread_level_t prv;
 #ifndef UNIFORM_SEED_NO_COMMS
     QMP_status_t init_status = QMP_init_msg_passing(argc, argv, QMP_THREAD_SINGLE, &prv);
-	if (init_status) printf("QMP_init_msg_passing returned %d\n",init_status);
+    if (init_status) printf("QMP_init_msg_passing returned %d\n",init_status);
     peRank = QMP_get_node_number();
     peNum = QMP_get_number_of_nodes();
-	if(!peRank)printf("QMP_init_msg_passing returned %d\n",init_status);
-//    exit(-4);
+    if(!peRank)printf("QMP_init_msg_passing returned %d\n",init_status);
+
     if (init_status != QMP_SUCCESS) {
       QMP_error("%s\n",QMP_error_string(init_status));
+    }
+
+    // check QMP thread level
+    // Added by Hantao
+    if(peRank == 0) {
+        switch(prv) {
+        case QMP_THREAD_SINGLE:
+            printf("QMP thread level = QMP_THREAD_SINGLE\n");
+            break;
+        case QMP_THREAD_FUNNELED:
+            printf("QMP thread level = QMP_THREAD_FUNNELED\n");
+            break;
+        case QMP_THREAD_SERIALIZED:
+            printf("QMP thread level = QMP_THREAD_SERIALIZED\n");
+            break;
+        case QMP_THREAD_MULTIPLE:
+            printf("QMP thread level = QMP_THREAD_MULTIPLE\n");
+            break;
+        default:
+            printf("QMP thread level = no idea what this is, boom!\n");
+        }
     }
 
     //Check to make sure that this machine is a GRID machine

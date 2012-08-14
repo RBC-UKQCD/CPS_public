@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.66 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: lattice_base.C,v 1.67 2012-08-14 18:56:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-10 14:05:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.66 2012-08-10 14:05:33 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.66 2012-08-10 14:05:33 chulwoo Exp $
+//  $Date: 2012-08-14 18:56:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.67 2012-08-14 18:56:27 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.67 2012-08-14 18:56:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.66 $
+//  $Revision: 1.67 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2031,6 +2031,7 @@ void Lattice::EvolveGfield(Matrix *mom, Float step_size)
 
     Matrix *curU_p = GaugeField();
 
+    // Hantao: no problem with this since there are no thread reductions.
 #pragma omp parallel for
     for(int i = 0; i < n_links; ++i) {
         Matrix t1, t2, t3;
@@ -2087,7 +2088,10 @@ Float Lattice::MomHamiltonNode(Matrix *momentum){
   Float ham = 0.0;
   int n_links = 4 * GJP.VolNodeSites();
 
-#pragma omp parallel for reduction(+:ham)
+  // We remove the openmp directive since it may give different
+  // answers even on an identical set of data.
+
+  //#pragma omp parallel for reduction(+:ham)
   for(int i = 0; i < n_links; ++i) {
     ham += momentum[i].NegHalfTrSquare();
   }
