@@ -111,7 +111,8 @@ public:
 
   WilsonVector& conj() {
     for(int s1=0;s1<4;s1++) for(int c1=0;c1<3;c1++)
-      d[s1].c[c1].imag(-d[s1].c[c1].imag());
+	  d[s1].c[c1]=Complex(d[s1].c[c1].real(),-d[s1].c[c1].imag());
+//      d[s1].c[c1].imag(-d[s1].c[c1].imag());
     return *this;
   }
 
