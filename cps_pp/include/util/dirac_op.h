@@ -2,13 +2,13 @@
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.34 2012-08-14 19:32:02 chulwoo Exp $
+  $Id: dirac_op.h,v 1.35 2012-08-14 19:32:46 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
 #define INCLUDED_DIRAC_OP_H
 
-#include<precision.h>
+#include<util/enum.h>
 #include <util/lattice.h>
 #include <util/vector.h>
 #include <alg/cg_arg.h>
