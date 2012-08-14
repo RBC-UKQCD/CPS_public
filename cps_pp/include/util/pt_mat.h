@@ -6,19 +6,19 @@
 /*! \file
   \brief  Generic parallel transport.
   
-  $Id: pt_mat.h,v 1.2 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: pt_mat.h,v 1.3 2012-08-14 18:56:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-10 14:05:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v 1.2 2012-08-10 14:05:33 chulwoo Exp $
-//  $Id: pt_mat.h,v 1.2 2012-08-10 14:05:33 chulwoo Exp $
+//  $Date: 2012-08-14 18:56:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v 1.3 2012-08-14 18:56:27 chulwoo Exp $
+//  $Id: pt_mat.h,v 1.3 2012-08-14 18:56:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_mat.h,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v $
 //  $State: Exp $
 //
@@ -222,45 +222,41 @@ namespace pt_generic {
             }
         }
 
+        // 3. compute/collect surface sites for communication
 #pragma omp parallel
         {
-            int nthreads = omp_get_num_threads();
-            int me = omp_get_thread_num();
-
-            if(nthreads <= 4) {
-                if(!UniqueID() && !me) {
-                    printf("pt_mat<Link, Site> error: at least 5 threads are required.\n");
-                }
-                exit(-1);
-            }
-
-            // 3. compute/collect surface sites for communication
             for(int d = 0; d < N; ++d) {
                 collect(sndbuf[dir[d]] + comm_off[d], gauge[d], in[d], dir[d], true);
             }
+        }
 
-#pragma omp barrier
-            // 4. communication / compute internal parallel transport
-            if(me >= nthreads - 4) {
-                int dir = nthreads - me - 1;
-                // forwards                
-                if(total[2 * dir]) {
-                    getPlusData((Float *)rcvbuf[2 * dir], (Float *)sndbuf[2 * dir],
-                                sizeof(Site) * total[2 * dir] / sizeof(Float), dir);
-                }
-                // backwards
-                if(total[2 * dir + 1]) {
-                    getMinusData((Float *)rcvbuf[2 * dir + 1], (Float *)sndbuf[2 * dir + 1],
-                                 sizeof(Site) * total[2 * dir + 1] / sizeof(Float), dir);
-                }
-            } else {
-                for(int d = 0; d < N; ++d) {
-                    compute_internal(out[d], gauge[d], in[d], dir[d], nthreads - 4);
-                }
+        // 4. single threaded comm
+        // If you fix the multi thread MPI problem on BG/Q you can do multithreaded comm here.
+        for(int dir = 0; dir < 4; ++dir) {
+            // forwards                
+            if(total[2 * dir]) {
+                getPlusData((Float *)rcvbuf[2 * dir], (Float *)sndbuf[2 * dir],
+                            sizeof(Site) * total[2 * dir] / sizeof(Float), dir);
             }
-#pragma omp barrier
+            // backwards
+            if(total[2 * dir + 1]) {
+                getMinusData((Float *)rcvbuf[2 * dir + 1], (Float *)sndbuf[2 * dir + 1],
+                             sizeof(Site) * total[2 * dir + 1] / sizeof(Float), dir);
+            }
+        }
 
-            // 5. compute/collect surface sites 
+#pragma omp parallel
+        {
+            int nthreads = omp_get_num_threads();
+            // int me = omp_get_thread_num();
+
+            // 5. compute internal parallel transport
+            for(int d = 0; d < N; ++d) {
+                compute_internal(out[d], gauge[d], in[d], dir[d], nthreads);
+            }
+            //#pragma omp barrier
+
+            // 6. compute/collect surface sites 
             for(int d = 0; d < N; ++d) {
                 collect(rcvbuf[dir[d]] + comm_off[d], gauge[d], out[d], dir[d], false);
             }

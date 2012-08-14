@@ -1,6 +1,8 @@
 #ifndef INCLUDED_FBFM_H__
 #define INCLUDED_FBFM_H__
 
+#include<config.h>
+
 #ifdef USE_BFM
 #include <util/lattice/bfm_evo.h>
 #include <util/lattice/bfm_mixed_solver.h>
@@ -104,7 +106,7 @@ public:
     // evolve momentum, only calculates internal forces
     ForceArg EvolveMomFforceInternal(Matrix *mom,
                                      Float *v1, Float *v2, // only internal data will be used
-                                     Float coef, int mu);
+                                     Float coef, int mu, int nthreads);
 
     // evolve momemtum, only calculates surface forces
     ForceArg EvolveMomFforceSurface(Matrix *mom,

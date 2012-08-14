@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.7 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: vector_util.C,v 1.8 2012-08-14 18:56:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-10 14:05:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.7 2012-08-10 14:05:33 chulwoo Exp $
-//  $Id: vector_util.C,v 1.7 2012-08-10 14:05:33 chulwoo Exp $
+//  $Date: 2012-08-14 18:56:27 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.8 2012-08-14 18:56:27 chulwoo Exp $
+//  $Id: vector_util.C,v 1.8 2012-08-14 18:56:27 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v $
 //  $State: Exp $
 //
@@ -286,7 +286,7 @@ void uDotXEqual(IFloat* y, const IFloat* u, const IFloat* x)
 IFloat dotProduct(const IFloat *a, const IFloat *b, int len)
 {
     IFloat sum = 0.0;
-#pragma omp parallel for reduction(+:sum)
+// #pragma omp parallel for reduction(+:sum)
     for(int i = 0; i < len; ++i) {
     	sum += a[i] * b[i];
     }
