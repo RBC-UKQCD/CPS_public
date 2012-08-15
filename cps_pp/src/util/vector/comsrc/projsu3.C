@@ -102,15 +102,13 @@ int Matrix::ProjSU3(void)
     // double degeneracy
     } else if ((r - l) == (2*COLORS - 2)) {
       for (i = 0; i < COLORS; i++) {
-	temp(i, k).real(v[i][l]);
-	temp(i, k).imag(v[COLORS + i][l]);
+	temp(i, k)=Complex(v[i][l], v[COLORS + i][l]);
       }
       k++;
       i = 0;
       if (l == 0) {
 	for (i = 0; i < COLORS; i++) {
-	  temp(i, k + 1).real(v[i][r]);
-	  temp(i, k + 1).imag(v[COLORS + i][r]);
+	  temp(i, k + 1)=Complex(v[i][r], v[COLORS + i][r]);
 	  i = k + 1;
 	}
       }
@@ -122,8 +120,7 @@ int Matrix::ProjSU3(void)
     // simple eigenvalue
     } else {
       for (i = 0; i < COLORS; i++) {
-	temp(i, k).real(v[i][l]);
-	temp(i, k).imag(v[COLORS + i][l]);
+	temp(i, k)=Complex(v[i][l], v[COLORS + i][l]);
       }
     }
     l = r;
@@ -144,8 +141,7 @@ int Matrix::ProjSU3(void)
   (*this).Det(det);
   radius = pow(det[0]*det[0] + det[1]*det[1], -1.0/6.0);
    theta = -atan2(det[1], det[0])/3.0;
-   norm.real(radius*cos(theta));
-   norm.imag(radius*sin(theta));
+   norm=Complex(radius*cos(theta), radius*sin(theta));
    h = norm;
    temp.DotMEqual(h, *this);
    *this = temp;

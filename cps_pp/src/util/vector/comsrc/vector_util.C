@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.8 2012-08-14 18:56:27 chulwoo Exp $
+  $Id: vector_util.C,v 1.9 2012-08-15 03:45:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-14 18:56:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.8 2012-08-14 18:56:27 chulwoo Exp $
-//  $Id: vector_util.C,v 1.8 2012-08-14 18:56:27 chulwoo Exp $
+//  $Date: 2012-08-15 03:45:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.9 2012-08-15 03:45:46 chulwoo Exp $
+//  $Id: vector_util.C,v 1.9 2012-08-15 03:45:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v $
 //  $State: Exp $
 //
@@ -31,7 +31,7 @@ CPS_END_NAMESPACE
 #include <string.h>		/* memcpy */
 #include <util/vector.h>
 #include <util/time_cps.h>
-#include<omp.h>
+//#include<omp.h>
 CPS_START_NAMESPACE
 
 

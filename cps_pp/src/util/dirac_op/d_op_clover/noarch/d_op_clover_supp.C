@@ -275,8 +275,7 @@ static void iDotM(Matrix &m, int num_complex)
     Complex & c = m[i];
     IFloat new_im = c.real();
     IFloat new_re = - c.imag();
-    c.real(new_re);
-    c.imag(new_im);
+    c=Complex(new_re, new_im);
   }
 }
 

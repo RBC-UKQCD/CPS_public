@@ -63,8 +63,7 @@ WilsonMatrix::WilsonMatrix(const Float& rhs)
 
 	for(int s1=0;s1<4;++s1) for(int c1=0;c1<3;++c1)
 	  for(int s2=0;s2<4;++s2) for(int c2=0;c2<3;++c2){
-	    p.d[s1].c[c1].d[s2].c[c2].real(rhs);
-	    p.d[s1].c[c1].d[s2].c[c2].imag(0.0);
+	    p.d[s1].c[c1].d[s2].c[c2]=Complex(rhs,0.0);
         }
 }
 
@@ -339,8 +338,7 @@ WilsonMatrix& WilsonMatrix::operator=(const Float& rhs)
 	  for(int c1=0;c1<3;++c1){
 	    for(int s2=0;s2<4;++s2){
 	      for(int c2=0;c2<3;++c2){
-		    p.d[s1].c[c1].d[s2].c[c2].real(rhs);
-		    p.d[s1].c[c1].d[s2].c[c2].imag(0.0);
+		    p.d[s1].c[c1].d[s2].c[c2]=Complex(rhs,0.0);
 	      }
 	    }
 	  }
@@ -519,8 +517,10 @@ Matrix SpinTrace(const WilsonMatrix& Wmat, const WilsonMatrix& Wmat2,
 
 #define TIMESPLUSONE(a,b) { b=a; }
 #define TIMESMINUSONE(a,b) { b=-a; }
-#define TIMESPLUSI(a,b) { b.real(-a.imag()); b.imag(a.real()); }
-#define TIMESMINUSI(a,b) { b.real(a.imag()); b.imag(-a.real()); }
+//#define TIMESPLUSI(a,b) { b.real(-a.imag()); b.imag(a.real()); }
+//#define TIMESMINUSI(a,b) { b.real(a.imag()); b.imag(-a.real()); }
+#define TIMESPLUSI(a,b) { b=Complex(-a.imag(),a.real()); }
+#define TIMESMINUSI(a,b) { b=Complex(a.imag(),-a.real()); }
 
 /*!
   Left Multiplication by Dirac gamma's
@@ -812,8 +812,10 @@ Rcomplex Tr(const SpinMatrix& a, const SpinMatrix& b)
 #ifndef TIMESPLUSONE
 #define TIMESPLUSONE(a,b) { b=a; }
 #define TIMESMINUSONE(a,b) { b=-a; }
-#define TIMESPLUSI(a,b) { b.real(-a.imag()); b.imag(a.real()); }
-#define TIMESMINUSI(a,b) { b.real(a.imag()); b.imag(-a.real()); }
+//#define TIMESPLUSI(a,b) { b.real(-a.imag()); b.imag(a.real()); }
+//#define TIMESMINUSI(a,b) { b.real(a.imag()); b.imag(-a.real()); }
+#define TIMESPLUSI(a,b) { b=Complex(-a.imag(),a.real()); }
+#define TIMESMINUSI(a,b) { b=Complex(a.imag(),-a.real()); }
 #endif
 
 // Left mult by Charge conjugation matrix C or gamma5*C

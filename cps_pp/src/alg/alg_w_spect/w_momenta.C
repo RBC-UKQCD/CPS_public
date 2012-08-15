@@ -3,14 +3,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-09-02 17:00:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_momenta.C,v 1.7 2004-09-02 17:00:02 zs Exp $
-//  $Id: w_momenta.C,v 1.7 2004-09-02 17:00:02 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2012-08-15 03:45:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_momenta.C,v 1.8 2012-08-15 03:45:46 chulwoo Exp $
+//  $Id: w_momenta.C,v 1.8 2012-08-15 03:45:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: w_momenta.C,v $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_momenta.C,v $
 //  $State: Exp $
 //
@@ -144,25 +144,22 @@ WspectMomenta::WspectMomenta(const WspectHyperRectangle & whr,
       for (int x = d_glb_min2[0]; x <= d_glb_max2[0]; x+=2) {
 	switch (d_num_non_zero)  {    // no break between cases!
 	case MAX_NUM:                 // spatial [2, 2, 2] 
-          cp[5].real(COS(2*(x+y+z), d_L2));
-          cp[5].imag(SIN(2*(x+y+z), d_L2));
+          cp[5]=Complex(COS(2*(x+y+z), d_L2), SIN(2*(x+y+z), d_L2));
 	case 5:                       // spatial [1, 1, 1]
-          cp[4].real(COS(x+y+z, d_L2));
-          cp[4].imag(SIN(x+y+z, d_L2));
+          cp[4]=Complex(COS(x+y+z, d_L2), SIN(x+y+z, d_L2));
 	case 4:                       // spatial [0, 2, 2] + permutations
-          cp[3].real((COS(2*(x+y),d_L2) + COS(2*(y+z),d_L2) +
-                      COS(2*(x+z),d_L2))/3.0);
-          cp[3].imag((SIN(2*(x+y),d_L2) + SIN(2*(y+z),d_L2) +
-                      SIN(2*(x+z),d_L2))/3.0);
+          cp[3]=Complex(
+			(COS(2*(x+y),d_L2) + COS(2*(y+z),d_L2) + COS(2*(x+z),d_L2))/3.0,
+          (SIN(2*(x+y),d_L2) + SIN(2*(y+z),d_L2) + SIN(2*(x+z),d_L2))/3.0);
 	case 3:                       // spatial [0, 1, 1] + permutations
-          cp[2].real((COS(x+y, d_L2) + COS(y+z, d_L2) + COS(x+z, d_L2))/3.0);
-          cp[2].imag((SIN(x+y, d_L2) + SIN(y+z, d_L2) + SIN(x+z, d_L2))/3.0);
+          cp[2]=Complex((COS(x+y, d_L2) + COS(y+z, d_L2) + COS(x+z, d_L2))/3.0,
+          (SIN(x+y, d_L2) + SIN(y+z, d_L2) + SIN(x+z, d_L2))/3.0);
 	case 2:                       // spatial [0, 0, 2] + permutations
-          cp[1].real((COS(2*x, d_L2) + COS(2*y, d_L2) + COS(2*z, d_L2))/3.0);
-          cp[1].imag((SIN(2*x, d_L2) + SIN(2*y, d_L2) + SIN(2*z, d_L2))/3.0);
+          cp[1]=Complex((COS(2*x, d_L2) + COS(2*y, d_L2) + COS(2*z, d_L2))/3.0,
+          (SIN(2*x, d_L2) + SIN(2*y, d_L2) + SIN(2*z, d_L2))/3.0);
 	case 1:                       // spatial [0, 0, 1] + permutations
-          cp[0].real((COS(x, d_L2) + COS(y, d_L2) + COS(z, d_L2))/3.0);
-          cp[0].imag((SIN(x, d_L2) + SIN(y, d_L2) + SIN(z, d_L2))/3.0);
+          cp[0]=Complex((COS(x, d_L2) + COS(y, d_L2) + COS(z, d_L2))/3.0,
+          (SIN(x, d_L2) + SIN(y, d_L2) + SIN(z, d_L2))/3.0);
 	}
 	cp += d_num_non_zero;
       }
