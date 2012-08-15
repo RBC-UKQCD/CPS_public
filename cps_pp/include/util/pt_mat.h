@@ -6,26 +6,26 @@
 /*! \file
   \brief  Generic parallel transport.
   
-  $Id: pt_mat.h,v 1.3 2012-08-14 18:56:27 chulwoo Exp $
+  $Id: pt_mat.h,v 1.4 2012-08-15 03:45:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-14 18:56:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v 1.3 2012-08-14 18:56:27 chulwoo Exp $
-//  $Id: pt_mat.h,v 1.3 2012-08-14 18:56:27 chulwoo Exp $
+//  $Date: 2012-08-15 03:45:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v 1.4 2012-08-15 03:45:46 chulwoo Exp $
+//  $Id: pt_mat.h,v 1.4 2012-08-15 03:45:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_mat.h,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 #include <util/gjp.h>
 #include <comms/scu.h>
-#include <omp.h>
+#include <util/omp_wrapper.h>
 #include <vector>
 #include <cstddef>
 

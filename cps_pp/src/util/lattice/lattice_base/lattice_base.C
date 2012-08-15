@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.67 2012-08-14 18:56:27 chulwoo Exp $
+  $Id: lattice_base.C,v 1.68 2012-08-15 03:45:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-14 18:56:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.67 2012-08-14 18:56:27 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.67 2012-08-14 18:56:27 chulwoo Exp $
+//  $Date: 2012-08-15 03:45:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.68 2012-08-15 03:45:46 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.68 2012-08-15 03:45:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.67 $
+//  $Revision: 1.68 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -61,7 +61,7 @@
 #include <sys/bgl/bgl_sys_all.h>
 #endif
 
-#include <omp.h>
+//#include <util/omp_wrapper.h>
 
 CPS_START_NAMESPACE
 

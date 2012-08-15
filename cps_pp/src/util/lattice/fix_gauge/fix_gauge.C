@@ -1,18 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  $Id: fix_gauge.C,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: fix_gauge.C,v 1.11 2012-08-15 03:45:46 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-10 14:05:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
-//  $Id: fix_gauge.C,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
+//  $Date: 2012-08-15 03:45:46 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.11 2012-08-15 03:45:46 chulwoo Exp $
+//  $Id: fix_gauge.C,v 1.11 2012-08-15 03:45:46 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -35,7 +35,7 @@ CPS_END_NAMESPACE
 #include <util/time_cps.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
-#include <omp.h>
+//#include <omp.h>
 CPS_START_NAMESPACE
 
 #ifdef _TARTAN

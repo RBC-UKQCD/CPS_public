@@ -250,14 +250,14 @@ void AlgMom::run()
 	      alpha[2] = x[i]*mom[k] + x[j]*mom[i] + x[k]*mom[j];
 
 	      // sum and normalise with respect to degenrate number of momenta
-	      mom_fact[offset].real( ( cos(alpha[0])+cos(alpha[1])+cos(alpha[2]))/3.0 );
-	      mom_fact[offset].imag( (-sin(alpha[0])-sin(alpha[1])-sin(alpha[2]))/3.0 );
+	      mom_fact[offset]=Complex( ( cos(alpha[0])+cos(alpha[1])+cos(alpha[2]))/3.0, (-sin(alpha[0])-sin(alpha[1])-sin(alpha[2]))/3.0 );
+//	      mom_fact[offset].real( ( cos(alpha[0])+cos(alpha[1])+cos(alpha[2]))/3.0 );
+//	      mom_fact[offset].imag( (-sin(alpha[0])-sin(alpha[1])-sin(alpha[2]))/3.0 );
 
 	    } else {
 	      // take only the first momentum choice
       
-	      mom_fact[offset].real(  cos(alpha[0]) );
-	      mom_fact[offset].imag( -sin(alpha[0]) );
+	      mom_fact[offset]=Complex(  cos(alpha[0]) , -sin(alpha[0]) );
 	    } // end if (deg) { } else { }
 
 	  } // s[3]

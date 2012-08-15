@@ -34,8 +34,8 @@ CPS_START_NAMESPACE
 
 Complex I = Complex(0,1);
 
-inline Matrix operator * (const Matrix& m1, const Matrix& m2)
-{ Matrix r; r.DotMEqual(m1,m2); return r; }
+//inline Matrix operator * (const Matrix& m1, const Matrix& m2)
+//{ Matrix r; r.DotMEqual(m1,m2); return r; }
 
 void p(Matrix x)
 {

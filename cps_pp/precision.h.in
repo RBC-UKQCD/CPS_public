@@ -1,9 +1,9 @@
-#include <stdint.h>
+//#include <stdint.h>
 #ifndef _PRECISION_H_
 #define _PRECISION_H_
 typedef @LOCALPRECISION@ Float;
 typedef @LOCALPRECISION@ IFloat;
-typedef uint64_t IntFlopCounter;
+//typedef uint64_t IntFlopCounter;
 #endif
 
 

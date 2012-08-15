@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitiion of Mom class methods.
 
-  $Id: mom.C,v 1.4 2004-08-18 11:58:06 zs Exp $ 
+  $Id: mom.C,v 1.5 2012-08-15 03:45:46 chulwoo Exp $ 
 */
 // mom.C
 //
@@ -193,14 +193,12 @@ void Mom::run()
 		  alpha[2] = x[i]*mom[k] + x[j]*mom[i] + x[k]*mom[j];
 
 		  // sum and normalise with respect to degenrate number of momenta
-		  mom_fact[offset].real( ( cos(alpha[0])+cos(alpha[1])+cos(alpha[2]))/3.0 );
-		  mom_fact[offset].imag( (-sin(alpha[0])-sin(alpha[1])-sin(alpha[2]))/3.0 );
+		  mom_fact[offset]=Complex( ( cos(alpha[0])+cos(alpha[1])+cos(alpha[2]))/3.0, (-sin(alpha[0])-sin(alpha[1])-sin(alpha[2]))/3.0 );
 
 		} else {
 		  // take only the first momentum choice
       
-		  mom_fact[offset].real(  cos(alpha[0]) );
-		  mom_fact[offset].imag( -sin(alpha[0]) );
+		  mom_fact[offset]=Complex(  cos(alpha[0]) , -sin(alpha[0]) );
 		} // end if (deg) { } else { }
 
 	      } // s[i]

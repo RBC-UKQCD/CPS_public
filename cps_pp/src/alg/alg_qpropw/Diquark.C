@@ -188,7 +188,7 @@ void Diquark::D_diquark(WilsonMatrix& Q1, WilsonMatrix& Q2,
   Epsilon eps2 ; //sink
 
 
-  float sign ;
+  Float sign ;
   Complex pp1 ;
   Complex pp2 ;
   
@@ -262,7 +262,7 @@ void Diquark::U_diquark(WilsonMatrix& Q1, WilsonMatrix& Q2, int spin,int color)
   Epsilon eps2 ; //sink
 
 
-  float sign ;
+  Float sign ;
   Complex pp1 ;
   Complex pp2 ;
   
