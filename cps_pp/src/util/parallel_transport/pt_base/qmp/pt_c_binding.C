@@ -3,6 +3,7 @@
 #include <util/pt.h>
 #include <util/gjp.h>
 #include <util/lattice.h>
+#include <util/error.h>
 //#include "pt_int.h"
 
 CPS_START_NAMESPACE
@@ -84,7 +85,7 @@ void pt_mat(int n, IFloat **mout, IFloat **min, int const *dir){
   ParTrans::PTflops +=198*n*PT::vol;
 }
 
-#if 0
+#if 1
 void pt_vvpd(IFloat **vect, int n_vect, const int *dir,
              int n_dir, int hop, IFloat **sum){
   StaticPT.vvpd(vect, n_vect, dir, n_dir, hop, sum);
