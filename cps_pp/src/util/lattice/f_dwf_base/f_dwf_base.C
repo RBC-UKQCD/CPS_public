@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.40 2012-08-02 21:20:01 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.41 2012-08-31 04:55:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -1312,7 +1312,6 @@ Float FdwfBase::SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
 
 #define PROFILE
 
-//#ifndef USE_TEST
 #if 0
 //------------------------------------------------------------------
 // "Odd" fermion force evolution routine written by Chris Dawson, taken 
