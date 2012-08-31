@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definitions of the AlgThreePt class.
 
-  $Id: alg_threept.h,v 1.6 2010-04-05 19:55:48 chulwoo Exp $
+  $Id: alg_threept.h,v 1.7 2012-08-31 04:55:08 chulwoo Exp $
 */
 //------------------------------------------------------------------
 
@@ -96,6 +96,9 @@ class AlgThreePt : public Alg
     void eye(QPropW& q_str, QPropW& q_spc,
 			 QPropW& q_snk,
 			 QPropW& q_ppl);
+// copied from 5_0_3-wme to ensure backward compatibillity, bu CJ
+    void figure8_spectator_old(QPropW& q_str, QPropW& q_spc,
+						   QPropW& q_snk1, QPropW& q_snk2, QPropW& q_snk3);
 
     void figure8_spectator(QPropW& q_str, QPropW& q_spc,
 						   QPropW& q_snk1, QPropW& q_snk2, QPropW& q_snk3, int mom_num=0, int mom_dir=0);

@@ -329,6 +329,38 @@ void AlgThreePt::run() {
     }
     
   } //m (for loop, light quarks)
+
+  //Light quarks
+  for (int m=0; m<num_light; m++) {
+  for (int n=0; n<= m; n++) {
+    
+    //tpi light quarks
+
+    QPropW *q_src_m=q_light_tpi[m][0][0][0];
+    QPropW *q_src_n=q_light_tpi[n][0][0][0];
+    QPropW *q_snk_m=q_light_tpi[m][1][0][0];
+    QPropW *q_snk_n=q_light_tpi[n][1][0][0];
+
+    //Calculate the contractions needed in the denominators
+    //for mres and ZA before we do P+A.
+    Fprintf(fp, "MASS= %e %e\n", l_mass[n],l_mass[m]);
+    spectrum(*q_src_n,*q_src_m,2);
+    spectrum(*q_snk_n,*q_snk_m,2);
+    box_spectrum(*q_src_n,*q_src_m,2);
+    box_spectrum(*q_snk_n,*q_snk_m,2);
+
+    figure8(*q_src_n,*q_src_m,*q_snk_n,*q_snk_m);
+    figure8(*q_src_n,*q_src_m,*q_snk_m,*q_snk_m,1);
+    figure8(*q_snk_n,*q_snk_m,*q_src_m,*q_src_m,1);
+    figure8_vacuum(*q_src_n,*q_src_m,*q_snk_m,*q_snk_m,*q_snk_m);
+    figure8_vacuum(*q_snk_n,*q_snk_m,*q_src_m,*q_src_m,*q_src_m);
+    figure8_spectator_old(*q_src_n,*q_src_m,*q_snk_m,*q_snk_m,*q_snk_m);
+    figure8_spectator_old(*q_snk_n,*q_snk_m,*q_src_m,*q_src_m,*q_src_m);
+//    fflush(fp);
+
+  }
+  }
+
   
   //Strange quarks
   for (int m=0; m<num_strange; m++) {
@@ -2124,6 +2156,132 @@ void AlgThreePt::eye(QPropW& q_str, QPropW& q_spc,
 	sfree(pp[gat][trt]);
   }
   */
+}
+
+// figure-eight with a spectator quark (labelled F8s), old version from v5_0_3-wme
+//----------------------------------------------------------------
+void AlgThreePt::figure8_spectator_old(QPropW& q_str, QPropW& q_spc,
+								   QPropW& q_snk1,QPropW& q_snk2,
+								   QPropW& q_snk3) {
+ 
+  char *fname = "figure8_spectator()";
+  VRB.Func(cname,fname);
+
+  int gat, trt;
+  int t_src = q_str.SourceTime();
+  int t_snk = q_snk1.SourceTime();
+  int t, time_size=GJP.Tnodes()*GJP.TnodeSites();
+  Rcomplex *op[3][4], *po[3][4], *sd;
+  for (gat=0;gat<3;gat++) for (trt=0;trt<4;trt++) {
+	SMALLOC(op[gat][trt],Rcomplex,time_size);
+	SMALLOC(po[gat][trt],Rcomplex,time_size);
+  }
+  SMALLOC(sd,Rcomplex,time_size); // strange-down insertion
+  WilsonMatrix tmp_str, tmp_snk;     // source, sink
+  WilsonMatrix tmp_spc = (Float)0.0; // spectator
+  SpinMatrix spn_eye, spn_vac; // eye, vacuum bubble
+  Matrix     col_eye, col_vac;
+
+  for (gat=0;gat<3;gat++) for (trt=0;trt<4;trt++) for (t=0;t<time_size;t++) 
+	op[gat][trt][t] = po[gat][trt][t] = 0.0;
+  for (t=0;t<time_size;t++) 
+	sd[t] = 0.0;
+
+/* 
+   Commented out, assuming this routine is called only for P+A P-A 
+   There could be a need for a different parameter checking routine (CJ)
+  if ( alg_threept_arg->explicit_src_snk && (t_snk<0 || t_snk>=time_size) )
+    ERR.General(cname,fname,"Source/sink time set to %d, should be between 0 and %d since explicit_src_snk is turned on.\n",t_snk,time_size);
+*/
+  int t_snk_mod, t_displace;
+  t_snk_mod = t_snk>=0 ? t_snk%time_size
+                           : (time_size+(t_snk%time_size))%time_size;
+               // puts t_snk into the domain [0,time_size-1] using mod
+               // special treatment is needed for t_snk<0
+               // this is needed for example because t_snk=time_size for
+               //   P-A
+  t_displace = t_snk>=0 ? t_snk/time_size : (-t_snk-1)/time_size+1;
+               // this is the number of domains that t_snk is away from
+               //   the fundamental domain [0,time_size-1]
+	       // it is >= 0
+  if ( t_displace%2 == 0 )
+    tmp_spc = q_spc.WallSinkProp(t_snk_mod);
+  else {
+    //If t_displace is odd then use the other propagator,
+    //i.e. if q_spc is P+A then use P-A and vice versa.
+    tmp_spc = q_snk1.WallSinkProp(t_snk_mod);
+  }
+  tmp_spc.gl(-5); // pion-quark
+
+  int shift_t = GJP.TnodeCoor()*GJP.TnodeSites();
+  int vol = GJP.VolNodeSites()/GJP.TnodeSites();
+  for (int mu=-1; mu<4; mu++) {
+	for (int nu=-1; nu<4; nu++) {
+	  if (mu>0 && nu>0 && mu<=nu) continue;
+	  gat = (nu<0?0:(mu<0?1:2));
+	  if (!do_susy && gat!=1) continue;
+	  for (int i=0; i<GJP.VolNodeSites(); i++) {
+		t = i/vol + shift_t;
+		tmp_str = q_str[i];
+		//tmp_str.hconj().gr(-5); // pion-antiquark
+		tmp_str.hconj();
+		tmp_str.gr(-5); // pion-antiquark
+		tmp_snk = q_snk2[i];
+		//tmp_snk.hconj().gr(-5); // pion-antiquark
+		tmp_snk.hconj();
+		tmp_snk.gr(-5); // pion-antiquark
+		if (mu<0 && nu==0) sd[t] += Trace(tmp_spc * tmp_str, q_snk3[i]);
+		tmp_str.gr(mu).gr(nu);        // gammas
+		tmp_snk.gr(mu).gr(nu).gr(-5); // gammas
+		op[gat][TR][t] += Trace(q_snk1[i]*tmp_spc*tmp_str,q_snk3[i]*tmp_snk);
+		op[gat][TRTR][t] += Trace(q_snk1[i]*tmp_spc,tmp_str)*Trace(q_snk3[i],tmp_snk);
+		spn_eye = ColorTrace(q_snk1[i]*tmp_spc*tmp_str);
+		spn_vac = ColorTrace(q_snk3[i]*tmp_snk);
+		op[gat][TR_MX][t] += Tr(spn_eye,spn_vac);
+		col_eye = SpinTrace(q_snk1[i]*tmp_spc*tmp_str);
+		col_vac = SpinTrace(q_snk3[i]*tmp_snk);
+		op[gat][TRTR_MX][t] += Tr(col_eye,col_vac);
+		tmp_str.gr(-5); // parity swap
+		tmp_snk.gr(-5);
+		po[gat][TR][t] += Trace(q_snk1[i]*tmp_spc*tmp_str,q_snk3[i]*tmp_snk);
+		po[gat][TRTR][t] += Trace(q_snk1[i]*tmp_spc,tmp_str)*Trace(q_snk3[i],tmp_snk);
+		spn_eye = ColorTrace(q_snk1[i]*tmp_spc*tmp_str);
+		spn_vac = ColorTrace(q_snk3[i]*tmp_snk);
+		po[gat][TR_MX][t] += Tr(spn_eye,spn_vac);
+		col_eye = SpinTrace(q_snk1[i]*tmp_spc*tmp_str);
+		col_vac = SpinTrace(q_snk3[i]*tmp_snk);
+		po[gat][TRTR_MX][t] += Tr(col_eye,col_vac);
+	  }
+	}
+  }
+  
+  // Global sums
+  for (gat=0;gat<3;gat++) for (trt=0;trt<4;trt++) for (t=0;t<time_size;t++) {
+    lat_sum((Float*)&op[gat][trt][t], 2);
+    lat_sum((Float*)&po[gat][trt][t], 2);
+  }
+  for (t=0;t<time_size;t++)
+	lat_sum((Float*)&sd[t], 2);
+  // Print out results
+  //----------------------------------------------------------------
+  for (gat=0;gat<3;gat++) {
+	if (!do_susy && gat!=1) continue;
+	for (trt=0;trt<4;trt++) for (t=0;t<time_size;t++)
+	  Fprintf(fp,"F8s%s%s %d %d %d  %.16e %.16e\t%.16e %.16e\n",
+			  tra[trt], gam[gat], t_src, t, t_snk,
+			  op[gat][trt][t].real(), op[gat][trt][t].imag(),
+			  po[gat][trt][t].real(), po[gat][trt][t].imag());
+  }
+  for (t=0;t<time_size;t++) {
+	Fprintf(fp,"SD %d %d %d  %.16e %.16e\n", t_src, t, t_snk,
+			sd[t].real(), sd[t].imag());
+  }
+  sfree(sd);
+  for (gat=0;gat<3;gat++) for (trt=0;trt<4;trt++) {
+	sfree(op[gat][trt]);
+	sfree(po[gat][trt]);
+  }
+
 }
 
 // figure-eight with a spectator quark (labelled F8s)
