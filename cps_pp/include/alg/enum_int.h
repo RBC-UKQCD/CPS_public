@@ -722,6 +722,9 @@ enum CalcSeqType {
 	READ_SEQ = 0,
 	NOIO_SEQ = 1,
 	WRITE_SEQ = 2,
+	MULT_SEQ = 3,
+	READ_MULT_SEQ = 4,
+	WRITE_MULT_SEQ = 5,
 };
 typedef enum CalcSeqType CalcSeqType;
 extern struct vml_enum_map CalcSeqType_map[];

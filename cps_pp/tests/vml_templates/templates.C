@@ -23,6 +23,7 @@
 USING_NAMESPACE_CPS
 using namespace std;
 
+MdwfArg mdwf_arg;
 CgArg  cg_arg;
 HmdArg hmd_arg;
 EvoArg evo_arg;
@@ -68,7 +69,6 @@ int main(int argc, char *argv[])
 
   Task.OutputFilestem = "";
   Task.ArgFilename = "arg_stem";
-
   ws_out.cg = "";
   ws_out.cg2 = "filename";
   ws_out.pbp = "filename";
@@ -79,7 +79,6 @@ int main(int argc, char *argv[])
   ws_out.delta_y = "filename";
   ws_out.delta_z = "filename";
   ws_out.delta_t = "filename";
-
   evo_arg.ensemble_id = "id";
   evo_arg.ensemble_label = "label";
   evo_arg.creator = "creator";
@@ -150,7 +149,11 @@ int main(int argc, char *argv[])
   nuc3pt_arg.cname="AlgNuc3pt";
   nuc3pt_arg.ensemble_label="AlgNuc3pt";
 
+  mdwf_arg.M5 = 1.8;
+  mdwf_arg.cg_arg_p = &cg_arg;
+
   cg_arg.Encode("cg_arg.vml","cg_arg");
+  mdwf_arg.Encode("mdwf_arg.vml","mdwf_arg");
   hmd_arg.Encode("hmd_arg.vml","hmd_arg");
   evo_arg.Encode("evo_arg.vml","evo_arg");
   do_arg.Encode("do_arg.vml","do_arg");

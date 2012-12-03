@@ -62,14 +62,17 @@ class AlgNuc3pt : public Alg
     Nuc3ptArg* Nuc3pt_arg ;
         // The argument structure for the
         // three point calculation
-
-    QPropW* q_prop ; // Stores the quark propagator
-    QPropWSeqBar* u_s_prop ; // Stores the up   quark sequential propagator
-    QPropWSeqBar* d_s_prop ; // Stores the down quark sequential propagator
+    int num_qprop; // the number of the forward propagators needed (added by MFL)
+    QPropW** q_prop ; // Stores the quark propagator (changed by MFL)
+    QPropWMultSeqBar* u_s_prop ; // Stores the up   quark sequential propagator
+    QPropWMultSeqBar* d_s_prop ; // Stores the down quark sequential propagator
 
     FILE *fp ; // The I/O file pointer
 
-    void GetThePropagator(int,Float) ;
+    void GetThePropagator(int n, int time, Float mass) ;
+    void GetThePropagator(int time, Float mass) {
+	GetThePropagator(0,time,mass);
+	}
     void GetTheSeqPropagator(int, Float, SourceType, int*, ProjectType) ;
     
     //void QIO_SaveProp(QPropW& prop, char*, char*, int) ;
@@ -78,7 +81,6 @@ class AlgNuc3pt : public Alg
     void OpenFile();
     void CloseFile() 
       {
-//	Fprintf(stdout,"====closing nuc3pt file\n");
 	if(fp != NULL)
 	  Fclose(fp);
       }
@@ -92,13 +94,15 @@ class AlgNuc3pt : public Alg
      */
     void calc_Scalar()
       {     
-	Gamma S;
-	Nuc3ptGamma Scal(S) ;
-	Scal.Calc3pt(*u_s_prop,*q_prop);
-	Scal.Calc3pt(*d_s_prop,*q_prop);
-	OpenFile(); 
-	Scal.Print(fp) ;
-	CloseFile();
+	for ( int n = 0; n < num_qprop; n++) {
+	  Gamma S;
+	  Nuc3ptGamma Scal(S) ;
+	  Scal.Calc3pt(*u_s_prop,*q_prop[n]);
+	  Scal.Calc3pt(*d_s_prop,*q_prop[n]);
+	  OpenFile(); 
+	  Scal.Print(fp) ;
+	  CloseFile();
+	}
       }
     
 
@@ -107,24 +111,28 @@ class AlgNuc3pt : public Alg
 
     //! Integration trick for NEDM
     void calc_NEDM(){ 
-      Gamma Gt(T);
-      Nuc3ptGammaR NEDM(Gt,Z) ;
-      NEDM.Calc3pt(*u_s_prop,*q_prop);
-      NEDM.Calc3pt(*d_s_prop,*q_prop);
-      OpenFile(); 
-      NEDM.Print(fp) ;
-      CloseFile();
+      for ( int n = 0; n < num_qprop; n++ ) {
+	Gamma Gt(T);
+	Nuc3ptGammaR NEDM(Gt,Z) ;
+	NEDM.Calc3pt(*u_s_prop,*q_prop[n]);
+	NEDM.Calc3pt(*d_s_prop,*q_prop[n]);
+	OpenFile(); 
+	NEDM.Print(fp) ;
+	CloseFile();
+      }
     }
 
     //! Integration trick for NEDM
     void calc_NMM(){
-      Gamma Gx(X);
-      Nuc3ptGammaR NMM(Gx,Y) ;
-      NMM.Calc3pt(*u_s_prop,*q_prop);
-      NMM.Calc3pt(*d_s_prop,*q_prop);
-      OpenFile(); 
-      NMM.Print(fp) ;
-      CloseFile();
+      for ( int n = 0; n < num_qprop; n++ ) {
+	Gamma Gx(X);
+	Nuc3ptGammaR NMM(Gx,Y) ;
+	NMM.Calc3pt(*u_s_prop,*q_prop[n]);
+	NMM.Calc3pt(*d_s_prop,*q_prop[n]);
+	OpenFile(); 
+	NMM.Print(fp) ;
+	CloseFile();
+      }
     }
 
 #endif
@@ -184,13 +192,15 @@ class AlgNuc3pt : public Alg
      */
     void calc_Vector()
       {     
-	Gamma Gt(T);
-	Nuc3ptGamma VectCurr(Gt) ;
-	VectCurr.Calc3pt(*u_s_prop,*q_prop);
-	VectCurr.Calc3pt(*d_s_prop,*q_prop);
-	OpenFile(); 
-	VectCurr.Print(fp) ;
-	CloseFile();
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Gamma Gt(T);
+	  Nuc3ptGamma VectCurr(Gt) ;
+	  VectCurr.Calc3pt(*u_s_prop,*q_prop[n]);
+	  VectCurr.Calc3pt(*d_s_prop,*q_prop[n]);
+	  OpenFile(); 
+	  VectCurr.Print(fp) ;
+	  CloseFile();
+	}
       }
 
     /*!
@@ -211,25 +221,27 @@ class AlgNuc3pt : public Alg
     */
     void calc_X_q_a()
       {
-	Gamma Gx(X);
-	Gamma Gt(T);
-	Derivative Der_t(T);
-	Derivative Der_x(T);
-
-	Nuc3ptStru Xq_xt(Gx, Der_t);
-	Xq_xt.Calc3pt(*u_s_prop, *q_prop);
-	Xq_xt.Calc3pt(*d_s_prop, *q_prop);
-
-	Nuc3ptStru Xq_tx(Gt,Der_x);
-	Xq_tx.Calc3pt(*u_s_prop, *q_prop);
-	Xq_tx.Calc3pt(*d_s_prop, *q_prop);
-	
-	Xq_xt += Xq_tx ;
-
-	OpenFile(); 
-	Fprintf(fp,"The next is: 14 + 41\n");
-	Xq_xt.Print(fp) ; 
-	CloseFile();
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Gamma Gx(X);
+	  Gamma Gt(T);
+	  Derivative Der_t(T);
+	  Derivative Der_x(T);
+	  
+	  Nuc3ptStru Xq_xt(Gx, Der_t);
+	  Xq_xt.Calc3pt(*u_s_prop, *q_prop[n]);
+	  Xq_xt.Calc3pt(*d_s_prop, *q_prop[n]);
+	  
+	  Nuc3ptStru Xq_tx(Gt,Der_x);
+	  Xq_tx.Calc3pt(*u_s_prop, *q_prop[n]);
+	  Xq_tx.Calc3pt(*d_s_prop, *q_prop[n]);
+	  
+	  Xq_xt += Xq_tx ;
+	  
+	  OpenFile(); 
+	  Fprintf(fp,"The next is: 14 + 41\n");
+	  Xq_xt.Print(fp) ; 
+	  CloseFile();
+	}
       }
 
     /*!
@@ -251,27 +263,29 @@ class AlgNuc3pt : public Alg
     */
     void calc_X_q_b()
       {
-	Gamma Gt(T) ;
-	Derivative Der_t(T) ;
-	Nuc3ptStru Xq_tt(Gt,Der_t) ;
-	Xq_tt.Calc3pt(*u_s_prop,*q_prop);
-	Xq_tt.Calc3pt(*d_s_prop,*q_prop);
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Gamma Gt(T) ;
+	  Derivative Der_t(T) ;
+	  Nuc3ptStru Xq_tt(Gt,Der_t) ;
+	  Xq_tt.Calc3pt(*u_s_prop,*q_prop[n]);
+	  Xq_tt.Calc3pt(*d_s_prop,*q_prop[n]);
 	 
-	for(int k(X);k<T;k++)
-	  {
-	    Gamma Gk(k) ;
-	    Derivative Der_k(k) ;
-	    Nuc3ptStru tmp(Complex(-1.0/3.0,0.0), Gk, Der_k) ;
-	    tmp.Calc3pt(*u_s_prop,*q_prop);
-	    tmp.Calc3pt(*d_s_prop,*q_prop);
-	    Xq_tt+=tmp ;
-	  }
-	OpenFile(); 
-	Fprintf(fp,"The next is: 44 - 1/3 (11 + 22 + 33)\n");
-	Xq_tt.Print(fp) ; 
-	CloseFile();
+	  for(int k(X);k<T;k++)
+	    {
+	      Gamma Gk(k) ;
+	      Derivative Der_k(k) ;
+	      Nuc3ptStru tmp(Complex(-1.0/3.0,0.0), Gk, Der_k) ;
+	      tmp.Calc3pt(*u_s_prop,*q_prop[n]);
+	      tmp.Calc3pt(*d_s_prop,*q_prop[n]);
+	      Xq_tt+=tmp ;
+	    }
+	  OpenFile(); 
+	  Fprintf(fp,"The next is: 44 - 1/3 (11 + 22 + 33)\n");
+	  Xq_tt.Print(fp) ; 
+	  CloseFile();
+	}
       }
-
+    
     /*!
       Computes the second unpolarized moment
       \f[
@@ -293,24 +307,26 @@ class AlgNuc3pt : public Alg
     */
     void calc_X2_q()
       {
-	Gamma Gt(T);
-	Derivative D_xx(X,X);
-	Nuc3ptStru X2q_txx(Gt,D_xx) ;
-	X2q_txx.Calc3pt(*u_s_prop,*q_prop);
-	X2q_txx.Calc3pt(*d_s_prop,*q_prop);
-	 
-	for(int k(Y);k<T;k++)
-	  {
-	    Derivative D_kk(k,k);
-	    Nuc3ptStru tmp(Complex(-0.5,0.0),Gt,D_kk) ;
-	    tmp.Calc3pt(*u_s_prop,*q_prop);
-	    tmp.Calc3pt(*d_s_prop,*q_prop);
-	    X2q_txx+=tmp ;
-	  }
-	OpenFile(); 
-	Fprintf(fp,"The next is: 411 - 1/2(422+433)\n");
-	X2q_txx.Print(fp) ; 
-	CloseFile();	
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Gamma Gt(T);
+	  Derivative D_xx(X,X);
+	  Nuc3ptStru X2q_txx(Gt,D_xx) ;
+	  X2q_txx.Calc3pt(*u_s_prop,*q_prop[n]);
+	  X2q_txx.Calc3pt(*d_s_prop,*q_prop[n]);
+	  
+	  for(int k(Y);k<T;k++)
+	    {
+	      Derivative D_kk(k,k);
+	      Nuc3ptStru tmp(Complex(-0.5,0.0),Gt,D_kk) ;
+	      tmp.Calc3pt(*u_s_prop,*q_prop[n]);
+	      tmp.Calc3pt(*d_s_prop,*q_prop[n]);
+	      X2q_txx+=tmp ;
+	    }
+	  OpenFile(); 
+	  Fprintf(fp,"The next is: 411 - 1/2(422+433)\n");
+	  X2q_txx.Print(fp) ; 
+	  CloseFile();	
+	}
       }
 
      /*!
@@ -343,43 +359,45 @@ class AlgNuc3pt : public Alg
     */
     void calc_X3_q()
       {
-	Gamma Gx(X);
-	Gamma Gy(Y);
-
-	Derivative D_xtt(X,T,T);
-	Nuc3ptStru X3q_xxtt(Gx,D_xtt) ;
-	X3q_xxtt.Calc3pt(*u_s_prop,*q_prop);
-	X3q_xxtt.Calc3pt(*d_s_prop,*q_prop);
-	
-	{
-	  Derivative D_yzz(Y,Z,Z) ;
-	  Nuc3ptStru tmp(Gy,D_yzz) ;
-	  tmp.Calc3pt(*u_s_prop,*q_prop);
-	  tmp.Calc3pt(*d_s_prop,*q_prop);
-	  X3q_xxtt += tmp ;
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Gamma Gx(X);
+	  Gamma Gy(Y);
+	  
+	  Derivative D_xtt(X,T,T);
+	  Nuc3ptStru X3q_xxtt(Gx,D_xtt) ;
+	  X3q_xxtt.Calc3pt(*u_s_prop,*q_prop[n]);
+	  X3q_xxtt.Calc3pt(*d_s_prop,*q_prop[n]);
+	  
+	  {
+	    Derivative D_yzz(Y,Z,Z) ;
+	    Nuc3ptStru tmp(Gy,D_yzz) ;
+	    tmp.Calc3pt(*u_s_prop,*q_prop[n]);
+	    tmp.Calc3pt(*d_s_prop,*q_prop[n]);
+	    X3q_xxtt += tmp ;
+	  }
+	  
+	  {
+	    Derivative D_xzz(X,Z,Z) ;
+	    Nuc3ptStru tmp(Complex(-1.0,0.0),Gx,D_xzz) ;
+	    tmp.Calc3pt(*u_s_prop,*q_prop[n]);
+	    tmp.Calc3pt(*d_s_prop,*q_prop[n]);
+	    X3q_xxtt += tmp ;
+	  }
+	  
+	  {
+	    Derivative D_ytt(Y,T,T) ;
+	    Nuc3ptStru tmp(Complex(-1.0,0.0),Gy, D_ytt) ;
+	    tmp.Calc3pt(*u_s_prop,*q_prop[n]);
+	    tmp.Calc3pt(*d_s_prop,*q_prop[n]);
+	    X3q_xxtt += tmp ;
+	  }
+	  
+	  
+	  OpenFile(); 
+	  Fprintf(fp,"The next is: 1144 + 2233 - 1133 - 2244\n");
+	  X3q_xxtt.Print(fp) ; 
+	  CloseFile();
 	}
-	
-	{
-	  Derivative D_xzz(X,Z,Z) ;
-	  Nuc3ptStru tmp(Complex(-1.0,0.0),Gx,D_xzz) ;
-	  tmp.Calc3pt(*u_s_prop,*q_prop);
-	  tmp.Calc3pt(*d_s_prop,*q_prop);
-	  X3q_xxtt += tmp ;
-	}
-	
-	{
-	  Derivative D_ytt(Y,T,T) ;
-	  Nuc3ptStru tmp(Complex(-1.0,0.0),Gy, D_ytt) ;
-	  tmp.Calc3pt(*u_s_prop,*q_prop);
-	  tmp.Calc3pt(*d_s_prop,*q_prop);
-	  X3q_xxtt += tmp ;
-	}
-
-	
-	OpenFile(); 
-	Fprintf(fp,"The next is: 1144 + 2233 - 1133 - 2244\n");
-	X3q_xxtt.Print(fp) ; 
-	CloseFile();
       }
 
     //Polarized
@@ -393,16 +411,17 @@ class AlgNuc3pt : public Alg
     */
     void calc_Axial()
       {
-	Gamma G5z(G5,Z);
-	Nuc3ptGamma AxialCurr(Complex(0.0,1.0),G5z) ;
-	AxialCurr.Calc3pt(*u_s_prop,*q_prop);
-	AxialCurr.Calc3pt(*d_s_prop,*q_prop);
-	
-	OpenFile();
-	AxialCurr.Print(fp) ;
-	CloseFile();
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Gamma G5z(G5,Z);
+	  Nuc3ptGamma AxialCurr(Complex(0.0,1.0),G5z) ;
+	  AxialCurr.Calc3pt(*u_s_prop,*q_prop[n]);
+	  AxialCurr.Calc3pt(*d_s_prop,*q_prop[n]);
+	  
+	  OpenFile();
+	  AxialCurr.Print(fp) ;
+	  CloseFile();
+	}
       }
-
 
     /*!
       Computes the first polarized moment
@@ -424,22 +443,23 @@ class AlgNuc3pt : public Alg
     */
     void calc_X_Dq_a()
       {
-	Nuc3ptStru XDq_xz(Complex(0.0,1.0),Gamma(G5,X),Derivative(Z)) ;
-	XDq_xz.Calc3pt(*u_s_prop,*q_prop);
-	XDq_xz.Calc3pt(*d_s_prop,*q_prop);
-	 
-	Nuc3ptStru XDq_zx(Complex(0.0,1.0),Gamma(G5,Z),Derivative(X)) ;
-	XDq_zx.Calc3pt(*u_s_prop,*q_prop);
-	XDq_zx.Calc3pt(*d_s_prop,*q_prop);
-
-	XDq_xz+=XDq_xz ;
-
-	OpenFile();
-	Fprintf(fp,"The next is: 13 + 31\n");
-	XDq_zx.Print(fp);
-	CloseFile();
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Nuc3ptStru XDq_xz(Complex(0.0,1.0),Gamma(G5,X),Derivative(Z)) ;
+	  XDq_xz.Calc3pt(*u_s_prop,*q_prop[n]);
+	  XDq_xz.Calc3pt(*d_s_prop,*q_prop[n]);
+	  
+	  Nuc3ptStru XDq_zx(Complex(0.0,1.0),Gamma(G5,Z),Derivative(X)) ;
+	  XDq_zx.Calc3pt(*u_s_prop,*q_prop[n]);
+	  XDq_zx.Calc3pt(*d_s_prop,*q_prop[n]);
+	  
+	  XDq_xz+=XDq_xz ;
+	  
+	  OpenFile();
+	  Fprintf(fp,"The next is: 13 + 31\n");
+	  XDq_zx.Print(fp);
+	  CloseFile();
+	}
       }
-
     /*!
       Computes the first polarized moment
       \f[
@@ -460,22 +480,23 @@ class AlgNuc3pt : public Alg
     */
     void calc_X_Dq_b()
       {
-	Nuc3ptStru XDq_zt(Complex(0.0,1.0),Gamma(G5,Z),Derivative(T)) ;
-	XDq_zt.Calc3pt(*u_s_prop,*q_prop);
-	XDq_zt.Calc3pt(*d_s_prop,*q_prop);
-	 
-	Nuc3ptStru XDq_tz(Complex(0.0,1.0),Gamma(G5,T),Derivative(Z)) ;
-	XDq_tz.Calc3pt(*u_s_prop,*q_prop);
-	XDq_tz.Calc3pt(*d_s_prop,*q_prop);
-
-	XDq_zt+=XDq_tz ;
-
-	XDq_zt.setTag("p") ;
-	OpenFile();
-	Fprintf(fp,"The next is: 34 + 43\n");
-	XDq_zt.Print(fp);
-	CloseFile();
-
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Nuc3ptStru XDq_zt(Complex(0.0,1.0),Gamma(G5,Z),Derivative(T)) ;
+	  XDq_zt.Calc3pt(*u_s_prop,*q_prop[n]);
+	  XDq_zt.Calc3pt(*d_s_prop,*q_prop[n]);
+	  
+	  Nuc3ptStru XDq_tz(Complex(0.0,1.0),Gamma(G5,T),Derivative(Z)) ;
+	  XDq_tz.Calc3pt(*u_s_prop,*q_prop[n]);
+	  XDq_tz.Calc3pt(*d_s_prop,*q_prop[n]);
+	  
+	  XDq_zt+=XDq_tz ;
+	  
+	  XDq_zt.setTag("p") ;
+	  OpenFile();
+	  Fprintf(fp,"The next is: 34 + 43\n");
+	  XDq_zt.Print(fp);
+	  CloseFile();
+	}
       }
 
 
@@ -500,21 +521,23 @@ class AlgNuc3pt : public Alg
     */
     void calc_d1() // Could be compined with X_Dq_a
       {
-	Nuc3ptStru d1_zt(Complex(0.0,1.0),Gamma(G5,Z),Derivative(T)) ;
-	d1_zt.Calc3pt(*u_s_prop,*q_prop);
-	d1_zt.Calc3pt(*d_s_prop,*q_prop);
-	 
-	Nuc3ptStru XDq_tz(Complex(0.0,-1.0),Gamma(G5,T),Derivative(Z)) ;
-	XDq_tz.Calc3pt(*u_s_prop,*q_prop);
-	XDq_tz.Calc3pt(*d_s_prop,*q_prop);
-
-	d1_zt+=XDq_tz ;
-	d1_zt.setTag("m") ;
-
-	OpenFile();
-	Fprintf(fp,"The next is: 34 - 43\n");
-	d1_zt.Print(fp);
-	CloseFile();
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Nuc3ptStru d1_zt(Complex(0.0,1.0),Gamma(G5,Z),Derivative(T)) ;
+	  d1_zt.Calc3pt(*u_s_prop,*q_prop[n]);
+	  d1_zt.Calc3pt(*d_s_prop,*q_prop[n]);
+	  
+	  Nuc3ptStru XDq_tz(Complex(0.0,-1.0),Gamma(G5,T),Derivative(Z)) ;
+	  XDq_tz.Calc3pt(*u_s_prop,*q_prop[n]);
+	  XDq_tz.Calc3pt(*d_s_prop,*q_prop[n]);
+	  
+	  d1_zt+=XDq_tz ;
+	  d1_zt.setTag("m") ;
+	  
+	  OpenFile();
+	  Fprintf(fp,"The next is: 34 - 43\n");
+	  d1_zt.Print(fp);
+	  CloseFile();
+	}
       }
     void calc_d2()
       {
@@ -532,13 +555,15 @@ class AlgNuc3pt : public Alg
     */
     void calc_Tensor()
       {
-	Nuc3ptGamma Tensor(Complex(0.0,1.0),Gamma(G5,Z,T)) ;
-	Tensor.Calc3pt(*u_s_prop,*q_prop);
-	Tensor.Calc3pt(*d_s_prop,*q_prop);
-
-	OpenFile();
-	Tensor.Print(fp) ;
-	CloseFile();
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Nuc3ptGamma Tensor(Complex(0.0,1.0),Gamma(G5,Z,T)) ;
+	  Tensor.Calc3pt(*u_s_prop,*q_prop[n]);
+	  Tensor.Calc3pt(*d_s_prop,*q_prop[n]);
+	  
+	  OpenFile();
+	  Tensor.Print(fp) ;
+	  CloseFile();
+	}
       }
     
     /*!
@@ -565,20 +590,22 @@ class AlgNuc3pt : public Alg
     */
     void calc_X_dq()
       {
-	Nuc3ptStru Xdq_ztx(Complex(0.0,1.0),Gamma(G5,Z,T),Derivative(X)) ;
-	Xdq_ztx.Calc3pt(*u_s_prop, *q_prop);
-	Xdq_ztx.Calc3pt(*d_s_prop, *q_prop);
-	 
-	Nuc3ptStru Xdq_zxt(Complex(0.0,1.0),Gamma(G5,Z,X),Derivative(T)) ;
-	Xdq_zxt.Calc3pt(*u_s_prop, *q_prop);
-	Xdq_zxt.Calc3pt(*d_s_prop, *q_prop);
-	
-	Xdq_ztx += Xdq_zxt ;
-
-	OpenFile();
-	Fprintf(fp,"The next is: 341 + 314\n");
-	Xdq_ztx.Print(fp) ;
-	CloseFile();
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  Nuc3ptStru Xdq_ztx(Complex(0.0,1.0),Gamma(G5,Z,T),Derivative(X)) ;
+	  Xdq_ztx.Calc3pt(*u_s_prop, *q_prop[n]);
+	  Xdq_ztx.Calc3pt(*d_s_prop, *q_prop[n]);
+	  
+	  Nuc3ptStru Xdq_zxt(Complex(0.0,1.0),Gamma(G5,Z,X),Derivative(T)) ;
+	  Xdq_zxt.Calc3pt(*u_s_prop, *q_prop[n]);
+	  Xdq_zxt.Calc3pt(*d_s_prop, *q_prop[n]);
+	  
+	  Xdq_ztx += Xdq_zxt ;
+	  
+	  OpenFile();
+	  Fprintf(fp,"The next is: 341 + 314\n");
+	  Xdq_ztx.Print(fp) ;
+	  CloseFile();
+	}
       }
 
     /*!

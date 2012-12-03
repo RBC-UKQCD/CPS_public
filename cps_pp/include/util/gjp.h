@@ -5,19 +5,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.41 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: gjp.h,v 1.42 2012-12-03 20:52:40 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-10 14:05:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.41 2012-08-10 14:05:33 chulwoo Exp $
-//  $Id: gjp.h,v 1.41 2012-08-10 14:05:33 chulwoo Exp $
+//  $Date: 2012-12-03 20:52:40 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.42 2012-12-03 20:52:40 chulwoo Exp $
+//  $Id: gjp.h,v 1.42 2012-12-03 20:52:40 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.41 $
+//  $Revision: 1.42 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -155,7 +155,9 @@ class GlobalJobParameter
   int vol_sites;       // The number of sites (4-D) of the whole lattice
 
   void Initialize();
-      
+
+
+  MdwfArg *mdwf_arg;
 
   MdwfArg *mdwf_arg;
   MdwfTuning *mdwf_tuning;

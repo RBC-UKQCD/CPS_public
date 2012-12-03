@@ -1058,6 +1058,9 @@ struct vml_enum_map CalcSeqType_map[] = {
 	{"CalcSeqType","READ_SEQ",READ_SEQ},
 	{"CalcSeqType","NOIO_SEQ",NOIO_SEQ},
 	{"CalcSeqType","WRITE_SEQ",WRITE_SEQ},
+	{"CalcSeqType","MULT_SEQ",MULT_SEQ},
+	{"CalcSeqType","READ_MULT_SEQ",READ_MULT_SEQ},
+	{"CalcSeqType","WRITE_MULT_SEQ",WRITE_MULT_SEQ},
 	{NULL,NULL,0}
 };
 
