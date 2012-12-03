@@ -7,19 +7,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.24 2012-07-06 20:22:08 chulwoo Exp $
+  $Id: enum.x,v 1.25 2012-12-03 20:52:40 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2012-07-06 20:22:08 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.24 2012-07-06 20:22:08 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.24 2012-07-06 20:22:08 chulwoo Exp $*/
+/*  $Date: 2012-12-03 20:52:40 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.25 2012-12-03 20:52:40 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.25 2012-12-03 20:52:40 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.24 $*/
+/*  $Revision: 1.25 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -832,15 +832,18 @@ enum GaussianKernelLinkSmearType {
 /*! IO type for the quark propagator calculations in AlgNuc3pt. */
 
 enum CalcQpropType {
- READ_QPROP,
- NOIO_QPROP,
- WRITE_QPROP
+ READ_QPROP, // load quark propagator
+ NOIO_QPROP, // calculate quark propagator without IO
+ WRITE_QPROP // calculate quark propagator and write it to disk
 };
 
 enum CalcSeqType {
- READ_SEQ,
- NOIO_SEQ,
- WRITE_SEQ
+ READ_SEQ,  // load sequential propagator
+ NOIO_SEQ,  // calculate sequential propagator for each quark propagator without IO
+ WRITE_SEQ, // calculate sequential propagator and write it to disk
+ MULT_SEQ,  // calculate multiple sequential propagators without IO
+ READ_MULT_SEQ, // read a sequential propagators calculated using multiple-sink method
+ WRITE_MULT_SEQ // calculate multiple sequential propagators and write to disk
 } ;
 
 /* we have to add a prefix (here I choose it to be BFM_) to all names to avoid naming collision. */

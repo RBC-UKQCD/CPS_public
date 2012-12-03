@@ -635,6 +635,102 @@ public:
   SourceType SrcType() { return PROT_D_SEQ; }
 };
 
+//=== for multiple sequential sources ================================
+// Added by Meifeng Lin, 10/18/2010 
+//====================================================================
+
+
+/* A sister class of QPropWSeq, but with multiple sequential sources */
+/* added by Meifeng Lin, 10/18/2010 */
+class QPropWMultSeq : public QPropW {
+
+protected:
+  QPropW** quark;
+  ThreeMom mom;
+  Float quark_mass;
+  int n_mult;
+
+public:
+  
+  // CONSTRUCTORS
+  
+  QPropWMultSeq(Lattice& lat, int N, QPropW** q,  int *p, QPropWArg*, CommonArg*);
+  
+  //QPropWSeq(const QPropWSeq& rhs);  //copy constructor not needed
+  
+  ThreeMom Mom() { return mom; }
+
+  //assuming all the sequential sources are of the same type, 
+  //which should usually be the case. 
+  SourceType SeqSmearSource() const { 
+    return quark[0]->SeqSmearSink() ; 
+  }
+
+  //! Returns the quark mass of the source propagator  
+  Float SourceMass(){ return quark_mass; }
+};
+
+/* A sister class of QPropWSeqBar, but with multiple sequential sources */
+/* Added by Meifeng Lin, 10/18/2010 */
+
+class QPropWMultSeqBar : public QPropWMultSeq {
+
+protected:
+  
+  ProjectType proj;
+  
+public:
+  
+  // CONSTRUCTORS
+  
+  QPropWMultSeqBar(Lattice& lat, int N, QPropW** quark,  int *p, 
+			   ProjectType pp, QPropWArg*, CommonArg*);
+
+  ProjectType Projection() { return proj; }
+
+};
+
+/* A sister class of QPropWSeqProtUSrc but with multiple sequential sources */
+/* Added by Meifeng Lin, 10/18/2010 */
+class QPropWMultSeqProtUSrc : public QPropWMultSeqBar {
+
+private:
+  QPropWGaussArg gauss_arg;
+  int *time; //location of the sinks, only relevant for the source construction
+public:
+  
+  // CONSTRUCTORS
+
+  QPropWMultSeqProtUSrc(Lattice& lat, int N, QPropW** quark,  int *p, 
+		ProjectType pp, QPropWArg*, QPropWGaussArg *gauss_arg, CommonArg*, int *t);
+  QPropWMultSeqProtUSrc(Lattice& lat, int N, QPropW** quark,  int *p, 
+		ProjectType pp, QPropWArg*, QPropWGaussArg *gauss_arg, CommonArg*, char*);
+
+  void SetSource(FermionVectorTp& src, int spin, int color);
+  SourceType SrcType() { return PROT_U_SEQ; }
+};
+
+/* A sister class of QPropWSeqProtDSrc but with multiple sequential sources */
+/* Added by Meifeng Lin, 10/18/2010 */
+class QPropWMultSeqProtDSrc : public QPropWMultSeqBar {
+
+private:
+  QPropWGaussArg gauss_arg;
+  int *time; //location of the sinks, only relevant for the source construction.
+
+public:
+  
+  // CONSTRUCTORS
+
+  QPropWMultSeqProtDSrc(Lattice& lat, int N, QPropW** quark,  int *p, 
+		    ProjectType pp, QPropWArg*, QPropWGaussArg *gauss_arg, CommonArg*, int *t);
+  QPropWMultSeqProtDSrc(Lattice& lat, int N, QPropW** quark,  int *p, 
+		    ProjectType pp, QPropWArg*, QPropWGaussArg *gauss_arg, CommonArg*, char*);
+
+   void SetSource(FermionVectorTp& src, int spin, int color);
+  SourceType SrcType() { return PROT_D_SEQ; }
+};
+
 // === for exponential smeared source ==================================
 
 // exponential smeared source

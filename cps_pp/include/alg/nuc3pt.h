@@ -64,6 +64,8 @@ public:
 
   void Calc3pt(QPropWSeqBar& seqQ, QPropW& Quark);
   void Calc3pt(QPropWSeqBar& seqQ, QPropW& Quark, int Nmom, ThreeMom* mom);
+  void Calc3pt(QPropWMultSeqBar& seqQ, QPropW& Quark);
+  void Calc3pt(QPropWMultSeqBar& seqQ, QPropW& Quark, int Nmom, ThreeMom* mom);
 
   void Zero()
   {
