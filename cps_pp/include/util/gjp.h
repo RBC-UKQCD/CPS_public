@@ -5,19 +5,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.42 2012-12-03 20:52:40 chulwoo Exp $
+  $Id: gjp.h,v 1.43 2012-12-05 16:39:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-12-03 20:52:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.42 2012-12-03 20:52:40 chulwoo Exp $
-//  $Id: gjp.h,v 1.42 2012-12-03 20:52:40 chulwoo Exp $
+//  $Date: 2012-12-05 16:39:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.43 2012-12-05 16:39:19 chulwoo Exp $
+//  $Id: gjp.h,v 1.43 2012-12-05 16:39:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.42 $
+//  $Revision: 1.43 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -47,6 +47,11 @@
 #include <comms/sysfunc_cps.h>
 #include <alg/do_arg.h>
 #include <alg/cg_arg.h>
+
+#ifdef USE_QUDA
+#include <alg/quda_arg.h>
+#endif
+
 CPS_START_NAMESPACE
 
 #ifdef PARALLEL
@@ -848,19 +853,21 @@ public:
 extern GlobalJobParameter GJP;
 
 
+#ifdef USE_QUDA
+  extern QudaArg QudaParam;
+#endif
+
 /*! declaration for Start() and End() which should be called at the
 start and end of main()
 */
 
 #if TARGET == NOARCH && (!defined USE_QMP)
 inline void Start(){}
-inline void End(){}
-inline void Start(int * argc, char ***argv){GJP.setArg(argc, argv);}
-#else
-//void Start();
+#endif
+//inline void End(){}
+//inline void Start(int * argc, char ***argv){GJP.setArg(argc, argv);}
 void End();
 void Start(int * argc, char ***argv);
-#endif
 
 #if TARGET == QCDOC 
 extern "C" {

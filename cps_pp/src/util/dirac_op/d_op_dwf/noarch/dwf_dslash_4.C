@@ -6,13 +6,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-27 05:02:40 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.11 2012-03-27 05:02:40 chulwoo Exp $
-//  $Id: dwf_dslash_4.C,v 1.11 2012-03-27 05:02:40 chulwoo Exp $
+//  $Date: 2012-12-05 16:39:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v 1.12 2012-12-05 16:39:19 chulwoo Exp $
+//  $Id: dwf_dslash_4.C,v 1.12 2012-12-05 16:39:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_4.C,v $
 //  $State: Exp $
 //
@@ -64,7 +64,7 @@ void dwf_dslash_4(Vector *out,
   IFloat *g_field;
   Wilson *wilson_p;
   int size_cb[2];
-  int parity;
+  int parity=cb;
 
   //----------------------------------------------------------------
   // Initializations

@@ -2,18 +2,23 @@
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.35 2012-08-14 19:32:46 chulwoo Exp $
+  $Id: dirac_op.h,v 1.36 2012-12-05 16:39:19 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
 #define INCLUDED_DIRAC_OP_H
 
-#include<util/enum.h>
+#include <util/enum.h>
 #include <util/lattice.h>
 #include <util/vector.h>
 #include <alg/cg_arg.h>
 #include <alg/eig_arg.h>
-#include<stdint.h>
+#include <stdint.h>
+
+#ifdef USE_QUDA
+#include <alg/quda_arg.h>
+#endif
+
 CPS_START_NAMESPACE
 
 typedef unsigned long long IntFlopCounter;
@@ -85,6 +90,7 @@ class DiracOp
 	    Vector *in,
 	    Float src_norm_sq,
 	    Float *true_res);
+
 
 #if 0
 	{
@@ -505,6 +511,7 @@ class DiracOpStag : public DiracOpStagTypes
      // RitzMat is the fermion matrix used in Ritz
      // RitzMat works on the full lattice or half lattice
      // The in, out fields are defined on the full or half lattice.
+
 };
 
 //------------------------------------------------------------------
@@ -1020,6 +1027,11 @@ class DiracOpWilson : public DiracOpWilsonTypes
     // CANONICAL fermion vectors with conversion enabled to the
     // constructor.  Using chi, the function fills these vectors;
     // the result may be used to compute the HMD fermion force.
+
+#ifdef USE_QUDA
+  int QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_type);
+#endif
+
 
 };
 

@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: d_op_dwf.h,v 1.2 2012-03-26 13:50:11 chulwoo Exp $
+  $Id: d_op_dwf.h,v 1.3 2012-12-05 16:39:19 chulwoo Exp $
 */
 
 #ifndef INCLUDED_D_OP_DWF_H
@@ -156,6 +156,10 @@ class DiracOpDwf : public DiracOpWilsonTypes
   //!< Not implemented
     // Reflexion in s operator, needed for the hermitian version 
     // of the dirac operator in the Ritz solver.
+#ifdef USE_QUDA
+  int QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_type);
+#endif
+
 };
 CPS_END_NAMESPACE
 
