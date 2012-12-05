@@ -1,0 +1,16 @@
+${CPS_DIR}/configure
+${CPS_DIR}/include/input/Makefile
+ *${CPS_DIR}/include/input/quda_arg.x
+ *${CPS_DIR}/include/input/quda_arg.stmp
+${CPS_DIR}/include/util/gjp.h
+${CPS_DIR}/include/util/dirac_op.h
+${CPS_DIR}/src/util/dirac_op/d_op_wilson/Makefile
+${CPS_DIR}/src/util/dirac_op/d_op_wilson/quda/d_op_wilson.C
+ *${CPS_DIR}/src/util/dirac_op/d_op_wilson/quda/wilson_quda.C
+${CPS_DIR}/src/util/dirac_op/d_op_dwf/Makefile
+${CPS_DIR}/src/util/dirac_op/d_op_dwf/d_op_dwf.C
+ *${CPS_DIR}/src/util/dirac_op/d_op_dwf/quda/dwf_quda.C
+${CPS_DIR}/src/util/gjp/gjp.C
+${CPS_DIR}/src/util/gjp/qmp/start_end.C
+
+" *" files are newly added

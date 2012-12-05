@@ -747,6 +747,8 @@ enable_qio
 enable_mdwf
 enable_xml
 enable_bfm
+enable_cuda
+enable_quda
 enable_namespace
 enable_double_prec
 '
@@ -1401,6 +1403,8 @@ Optional Features:
   --enable-xml            Compile with XML lib. (default=no)
   --enable-bfm            Compile with BAGEL fermion sparse-matrix (BFM) lib.
                           (default=no)
+  --enable-cuda           Location of CUDA installation. (default=no)
+  --enable-quda           Compile with QUDA GPU lib. (default=no)
   --enable-namespace      Build the library inside a 'cps' namespace.
                           (default=no for QCDOC, yes otherwise)
   --enable-double-prec    Build the library in double precision (default=yes)
@@ -5353,7 +5357,7 @@ if test "$enable_qmp" != "no"; then
    QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
    LDFLAGS="${LDFLAGS} ${QMP_LDFLAGS} ${QMP_LIBS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_CFLAGS} "
-   DFLAGS="${DFLAGS} -DUSE_QMP"
+   DFLAGS="${DFLAGS} -DUSE_QMP -DUSE_OMP"
    if test "$enable_target" = "bgl"; then
      ARCHDIR="BGL_QMP_DIR"
    elif test "$enable_target" = "bgp"; then
@@ -5471,6 +5475,62 @@ if test "$enable_xml" != "no"; then
    LDFLAGS="${LDFLAGS} ${XML_LDFLAGS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${XML_CFLAGS}"
 fi
+#----------------------------windy-------------------------------
+#Edited by hjkim. configuration for QUDA and CUDA implementaion
+#----------------------------windy-------------------------------
+# Check whether --enable-cuda was given.
+if test "${enable_cuda+set}" = set; then
+  enableval="$enable_cuda"
+
+else
+  enable_cuda="no"
+fi
+
+{ $as_echo "$as_me:$LINENO: checking if including CUDA" >&5
+$as_echo_n "checking if including CUDA... " >&6; }
+{ $as_echo "$as_me:$LINENO: result: $enable_cuda" >&5
+$as_echo "$enable_cuda" >&6; }
+
+# Check whether --enable-quda was given.
+if test "${enable_quda+set}" = set; then
+  enableval="$enable_quda"
+
+else
+  enable_quda="no"
+fi
+
+{ $as_echo "$as_me:$LINENO: checking if including QUDA" >&5
+$as_echo_n "checking if including QUDA... " >&6; }
+{ $as_echo "$as_me:$LINENO: result: $enable_quda" >&5
+$as_echo "$enable_quda" >&6; }
+
+#QUDA was given first and CUDA was given later, 
+#this is because library dependency.
+if test "$enable_quda" != "no"; then
+   if test "X${QUDA_DIR}X" = "XX"; then
+     QUDA_DIR=${enable_quda}
+   fi
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${QUDA_DIR}/include"
+   LDFLAGS="${LDFLAGS} -L${QUDA_DIR}/lib -lquda"
+   DFLAGS="${DFLAGS} -DUSE_QUDA"
+fi
+
+if test "$enable_cuda" != "no"; then
+   if test "X${CUDA_DIR}X" = "XX"; then
+     CUDA_DIR=${enable_cuda}
+   fi
+   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${CUDA_DIR}/include"
+   LDFLAGS="${LDFLAGS} -L${CUDA_DIR}/lib64 -lcudart"
+fi
+
+# If --enable-cuda was given for --enable-quda case, program will stop.
+if test "$enable_quda" != "no"; then
+   if test "X${CUDA_DIR}X" = "XX"; then
+     echo "CUDA_DIR environment variable not set (required for QUDA)"
+     exit 1
+   fi
+fi
+#----------------------------windy-------------------------------
 
 if test "$TESTING_PARALLEL" = "yes"; then
    ENABLE_PARALLEL="define PARALLEL 1"
@@ -5497,24 +5557,6 @@ then
         CPS_NAMESPACE="cps"
         CPS_START_NAMESPACE="namespace cps {"
 fi
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

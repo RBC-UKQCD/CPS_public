@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.5 2011-04-13 19:05:04 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.6 2012-12-05 16:39:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-04-13 19:05:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v 1.5 2011-04-13 19:05:04 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.5 2011-04-13 19:05:04 chulwoo Exp $
+//  $Date: 2012-12-05 16:39:19 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v 1.6 2012-12-05 16:39:19 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.6 2012-12-05 16:39:19 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -347,18 +347,6 @@ int DiracOpDwf::MatInv(Vector *out,
   Vector *temp2;
   unsigned long long temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
 
-//  printf("temp_size:%d\n",temp_size);
-//  printf("MatInv : %e %e\n",in->NormSqNode(temp_size),out->NormSqNode(temp_size));
-
-
-
-  // check out if converted
-  //for (int ii = 0; ii < 2 * temp_size; ii++) {
-  //  VRB.Result(cname, fname, "in[%d] = %e\n", ii, 
-  //  *((IFloat *)in + ii));
-  //  VRB.Result(cname, fname, "out[%d] = %e\n", ii, 
-  //  *((IFloat *)out + ii));
-  //}
 
   Vector *temp = (Vector *) smalloc(temp_size * sizeof(Float));
   if (temp == 0) ERR.Pointer(cname, fname, "temp");
@@ -387,15 +375,15 @@ int DiracOpDwf::MatInv(Vector *out,
 
 //  printf("MatInv : even : Dslash : temp:%e \n",temp->NormSqNode(temp_size));
 
+  int iter;
+
+
   // save source
   if(prs_in == PRESERVE_YES){
     moveMem((IFloat *)temp2, (IFloat *)in, 
 		temp_size * sizeof(IFloat) / sizeof(char));
   }
 
-
-
-  int iter;
   switch (dirac_arg->Inverter) {
   case CG:
 #ifdef USE_CG_DWF_WRAPPER
@@ -407,10 +395,18 @@ int DiracOpDwf::MatInv(Vector *out,
 	}
 #endif
     MatPcDag(in, temp);
+#ifdef USE_QUDA
+    iter = QudaInvert(out, in, true_res, 1);
+#else
     iter = InvCg(out,in,true_res);
+#endif
     break;
   case BICGSTAB:
+#ifdef USE_QUDA
+    iter = QudaInvert(out, temp, true_res, 0);
+#else
     iter = BiCGstab(out,temp,0.0,dirac_arg->bicgstab_n,true_res);
+#endif
     break;
   default:
     ERR.General(cname,fname,"InverterType %d not implemented\n",
