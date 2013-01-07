@@ -17,6 +17,11 @@
  *
  * Revision History:
  *   $Log: not supported by cvs2svn $
+ *   Revision 1.2  2011/02/26 00:33:23  chulwoo
+ *   Merging v5_0_8-RICC_3
+ *   i) SSE Wilson & DWF dslash by Taku
+ *   ii) Interface to CG-DWF by Andrew Pochinsky
+ *
  *   Revision 1.1.2.2  2010/12/03 15:02:23  chulwoo
  *   *** empty log message ***
  *
@@ -507,11 +512,13 @@ extern QMP_msghandle_t    QMP_declare_receive_relative (QMP_msgmem_t m,
 							int dir,
 							int priority);
 
+#if 0
 extern QMP_msghandle_t    QMP_declare_receive_relative_tag (QMP_msgmem_t m, 
 							int axis,
 							int dir,
 							    int priority,
 							    int tag);
+#endif
 
 /**
  * Declares an endpoint for a message channel of sending operations
@@ -532,11 +539,13 @@ extern QMP_msghandle_t    QMP_declare_send_relative    (QMP_msgmem_t m,
 							int dir,
 							int priority);
 
+#if 0
 extern QMP_msghandle_t    QMP_declare_send_relative_tag    (QMP_msgmem_t m,
 							int axis,
 							int dir,
     						    int priority,
 							    int tag);
+#endif
 
 /**
  * Declare an endpoint for message send channel operation using remote

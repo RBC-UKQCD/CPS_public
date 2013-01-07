@@ -17,6 +17,11 @@
  *
  * Revision History:
  *   $Log: not supported by cvs2svn $
+ *   Revision 1.2  2011/02/26 00:33:23  chulwoo
+ *   Merging v5_0_8-RICC_3
+ *   i) SSE Wilson & DWF dslash by Taku
+ *   ii) Interface to CG-DWF by Andrew Pochinsky
+ *
  *   Revision 1.1.2.2  2011/02/07 06:33:16  chulwoo
  *   *** empty log message ***
  *
@@ -397,6 +402,7 @@ QMP_free_msghandle (QMP_msghandle_t msgh)
   LEAVE;
 }
 
+#if 0
 QMP_msghandle_t
 QMP_declare_receive_from (QMP_msgmem_t mmt, int sourceNode, int priority)
 {
@@ -446,11 +452,15 @@ QMP_declare_receive_from (QMP_msgmem_t mmt, int sourceNode, int priority)
   LEAVE;
   return (QMP_msghandle_t)mh;
 }
+#endif
+
 QMP_msghandle_t
 QMP_declare_receive_from_tag (QMP_msgmem_t mmt, int sourceNode, int priority, int tag)
 {
   Message_Handle_t mh;
   ENTER;
+
+  if (tag < 0 ) QMP_abort_string(-1,"QMP_declare_receive_from_tag received negative tag");
 
   mh = (Message_Handle_t)MP_allocMsgHandler();
   if (mh) {
@@ -497,6 +507,13 @@ QMP_declare_receive_from_tag (QMP_msgmem_t mmt, int sourceNode, int priority, in
   return (QMP_msghandle_t)mh;
 }
 
+QMP_msghandle_t
+QMP_declare_receive_from (QMP_msgmem_t mmt, int sourceNode, int priority)
+{
+  QMP_declare_receive_from_tag (mmt, sourceNode, priority, TAG_CHANNEL);
+}
+
+#if 0
 /* Remote memory write - a send */
 QMP_msghandle_t
 QMP_declare_send_to (QMP_msgmem_t mmt, int remoteHost, int priority)
@@ -551,12 +568,16 @@ QMP_declare_send_to (QMP_msgmem_t mmt, int remoteHost, int priority)
   LEAVE;
   return (QMP_msghandle_t)mh;
 }
+#endif
+
 /* Remote memory write - a send */
 QMP_msghandle_t
 QMP_declare_send_to_tag (QMP_msgmem_t mmt, int remoteHost, int priority, int tag)
 {
   Message_Handle_t mh;
   ENTER;
+
+  if (tag < 0 ) QMP_abort_string(-1,"QMP_declare_send_to_tag received negative tag");
 
   mh = (Message_Handle_t)MP_allocMsgHandler();
   if (mh) {
@@ -605,6 +626,12 @@ QMP_declare_send_to_tag (QMP_msgmem_t mmt, int remoteHost, int priority, int tag
 
   LEAVE;
   return (QMP_msghandle_t)mh;
+}
+
+QMP_msghandle_t
+QMP_declare_send_to (QMP_msgmem_t mmt, int remoteHost, int priority)
+{
+  QMP_declare_send_to_tag (mmt, remoteHost, priority, TAG_CHANNEL);
 }
 
 /* (Supposedly) fast nearest neighbor communication */
