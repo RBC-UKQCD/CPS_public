@@ -5,19 +5,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.43 2012-12-05 16:39:19 chulwoo Exp $
+  $Id: gjp.h,v 1.44 2013-01-07 22:08:22 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-12-05 16:39:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.43 2012-12-05 16:39:19 chulwoo Exp $
-//  $Id: gjp.h,v 1.43 2012-12-05 16:39:19 chulwoo Exp $
+//  $Date: 2013-01-07 22:08:22 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.44 2013-01-07 22:08:22 chulwoo Exp $
+//  $Id: gjp.h,v 1.44 2013-01-07 22:08:22 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.43 $
+//  $Revision: 1.44 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -161,8 +161,6 @@ class GlobalJobParameter
 
   void Initialize();
 
-
-  MdwfArg *mdwf_arg;
 
   MdwfArg *mdwf_arg;
   MdwfTuning *mdwf_tuning;
