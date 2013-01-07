@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
   
-  $Id: wilson_init.C,v 1.2 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: wilson_init.C,v 1.3 2013-01-07 19:19:26 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-02-26 00:19:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/sse/wilson_init.C,v 1.2 2011-02-26 00:19:27 chulwoo Exp $
-//  $Id: wilson_init.C,v 1.2 2011-02-26 00:19:27 chulwoo Exp $
+//  $Date: 2013-01-07 19:19:26 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/sse/wilson_init.C,v 1.3 2013-01-07 19:19:26 chulwoo Exp $
+//  $Id: wilson_init.C,v 1.3 2013-01-07 19:19:26 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/sse/wilson_init.C,v $
 //  $State: Exp $
 //
@@ -106,9 +106,9 @@ void wilson_init_comm(int dir, int block, Wilson *wilson_p)
     wilson_p->msgmem[idx][0] =
       QMP_declare_msgmem((void *)(wilson_p->recv_buf[idx]), len);
     wilson_p->msghandle[idx][1] =
-      QMP_declare_send_relative_tag(wilson_p->msgmem[idx][1], dir, -sflag, 0,idx);
+      QMP_declare_send_relative(wilson_p->msgmem[idx][1], dir, -sflag, 0);
     wilson_p->msghandle[idx][0] =
-      QMP_declare_receive_relative_tag(wilson_p->msgmem[idx][0], dir, +sflag, 0,idx);
+      QMP_declare_receive_relative(wilson_p->msgmem[idx][0], dir, +sflag, 0);
     wilson_p->multiple[idx] = QMP_declare_multiple(wilson_p->msghandle[idx], 2);
     
     idx=dir+4;
@@ -121,9 +121,9 @@ void wilson_init_comm(int dir, int block, Wilson *wilson_p)
     wilson_p->msgmem[idx][0] =
       QMP_declare_msgmem((void *)(wilson_p->recv_buf[idx]), len);
     wilson_p->msghandle[idx][1] =
-      QMP_declare_send_relative_tag(wilson_p->msgmem[idx][1], dir, +sflag, 0,idx);
+      QMP_declare_send_relative(wilson_p->msgmem[idx][1], dir, +sflag, 0);
     wilson_p->msghandle[idx][0] =
-      QMP_declare_receive_relative_tag(wilson_p->msgmem[idx][0], dir, -sflag, 0,idx);
+      QMP_declare_receive_relative(wilson_p->msgmem[idx][0], dir, -sflag, 0);
     wilson_p->multiple[idx] = QMP_declare_multiple(wilson_p->msghandle[idx], 2);
 }
 	       
