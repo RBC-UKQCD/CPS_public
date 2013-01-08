@@ -21,7 +21,7 @@
 //#include <comms/scu.h>
 #include <util/data_types.h>
 //#include <omp.h>
-#include "fake_omp.h"
+#include <util/omp_wrapper.h>
 //inline int omp_get_num_threads(void) {return 1;}
 #include <pmmintrin.h>
 

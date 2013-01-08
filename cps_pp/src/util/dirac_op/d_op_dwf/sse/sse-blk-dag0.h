@@ -1,8 +1,8 @@
 #if 0
 #include "try-blk-dag0.h"
 #else
-#include "fake_omp.h"
-inline int omp_get_num_threads(void){return 1;}
+#include <util/omp_wrapper.h>
+//inline int omp_get_num_threads(void){return 1;}
 void wilson_dslash_blk_dag0(IFloat *chi_p_f, 
 			    IFloat *u_p_f, 
 			    IFloat *psi_p_f, 
