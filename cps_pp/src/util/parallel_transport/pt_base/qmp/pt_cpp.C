@@ -3,6 +3,7 @@
 #include <math.h>
 #include "asq_data_types.h"
 #include "pt_int.h"
+#undef USE_SSE
 #ifdef USE_SSE
 #include "inline_sse.h"
 #endif
