@@ -106,14 +106,6 @@ vml_Nuc3ptArg (VML *vmls, char *name,Nuc3ptArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "ensemble_id", &objp->ensemble_id))
 		 return FALSE;
-	 if (!vml_int (vmls, "StartSrcSpin", &objp->StartSrcSpin))
-		 return FALSE;
-	 if (!vml_int (vmls, "EndSrcSpin", &objp->EndSrcSpin))
-		 return FALSE;
-	 if (!vml_int (vmls, "StartSrcColor", &objp->StartSrcColor))
-		 return FALSE;
-	 if (!vml_int (vmls, "EndSrcColor", &objp->EndSrcColor))
-		 return FALSE;
 	 vml_class_end(vmls,"Nuc3ptArg",name);
 	return TRUE;
 }
