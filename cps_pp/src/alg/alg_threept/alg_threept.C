@@ -150,9 +150,6 @@ void AlgThreePt::run() {
 
   const int num_nodes=GJP.Xnodes()*GJP.Ynodes()*GJP.Znodes()*GJP.Tnodes()*GJP.Snodes();
 
-#if TARGET==cpsMPI
-    using MPISCU::Fprintf;
-#endif
   char *fname = "run()";
   VRB.Func(cname,fname);
 
