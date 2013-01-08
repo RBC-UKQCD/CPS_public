@@ -36,6 +36,11 @@ class Nuc3ptArg {
 	string prop_file<>;
 	string ensemble_label<>;
 	int ensemble_id;
+	int StartSrcSpin;
+	int EndSrcSpin;
+	int StartSrcColor;
+	int EndSrcColor;
+
 	memfun   Nuc3ptArg (  ) ;
 	memfun   void check_args (  ) ;
 	memfun   int NumMasses (  ) ;
