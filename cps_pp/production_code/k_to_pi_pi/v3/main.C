@@ -49,8 +49,10 @@ USING_NAMESPACE_CPS
 
 void chkpt(const int num_nodes,int& chkpoint_no,const Float dtime_start,Float& dtime_last,Float& dtime_now);
 
+#if 0
 inline Matrix operator * (const Matrix& m1, const Matrix& m2)
 { Matrix r; r.DotMEqual(m1,m2); return r; }
+#endif
 
 void rotate_gauge_explicit(Lattice &lat,int dir=3);
 
