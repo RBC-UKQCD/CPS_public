@@ -357,6 +357,7 @@ int DiracOpDwf::QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_typ
   return total_iter;
 }
 
+CPS_END_NAMESPACE
+
 #endif
 
-CPS_END_NAMESPACE

@@ -345,6 +345,5 @@ int DiracOpWilson::QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_
   return total_iter;
 }
 
-#endif
-
 CPS_END_NAMESPACE
+#endif
