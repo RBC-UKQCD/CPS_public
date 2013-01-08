@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
   
-  $Id: wilson_init.C,v 1.3 2013-01-07 19:19:26 chulwoo Exp $
+  $Id: wilson_init.C,v 1.4 2013-01-08 21:09:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-01-07 19:19:26 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/sse/wilson_init.C,v 1.3 2013-01-07 19:19:26 chulwoo Exp $
-//  $Id: wilson_init.C,v 1.3 2013-01-07 19:19:26 chulwoo Exp $
+//  $Date: 2013-01-08 21:09:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/sse/wilson_init.C,v 1.4 2013-01-08 21:09:25 chulwoo Exp $
+//  $Id: wilson_init.C,v 1.4 2013-01-08 21:09:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/sse/wilson_init.C,v $
 //  $State: Exp $
 //
@@ -54,7 +54,7 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 //#include <omp.h>
-#include "fake_omp.h"
+#include <util/omp_wrapper.h>
 
 
 CPS_START_NAMESPACE

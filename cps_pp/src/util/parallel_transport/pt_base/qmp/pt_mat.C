@@ -1,23 +1,21 @@
 #ifdef USE_QMP
-#ifdef USE_OMP
-#include <omp.h>
-#endif
+#include <util/omp_wrapper.h>
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_mat.C,v 1.8 2012-05-15 05:50:09 chulwoo Exp $
+  $Id: pt_mat.C,v 1.9 2013-01-08 21:09:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-05-15 05:50:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v 1.8 2012-05-15 05:50:09 chulwoo Exp $
-//  $Id: pt_mat.C,v 1.8 2012-05-15 05:50:09 chulwoo Exp $
+//  $Date: 2013-01-08 21:09:25 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v 1.9 2013-01-08 21:09:25 chulwoo Exp $
+//  $Id: pt_mat.C,v 1.9 2013-01-08 21:09:25 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_mat.C,v $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v $
 //  $State: Exp $
 //
