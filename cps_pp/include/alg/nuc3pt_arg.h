@@ -56,6 +56,10 @@ public:
 	char *prop_file;
 	char *ensemble_label;
 	int ensemble_id;
+	int StartSrcSpin;
+	int EndSrcSpin;
+	int StartSrcColor;
+	int EndSrcColor;
 	   Nuc3ptArg (  ) ;
 	   void check_args (  ) ;
 	   int NumMasses (  ) ;
