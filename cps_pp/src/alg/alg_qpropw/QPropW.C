@@ -757,7 +757,12 @@ void QPropW::ReLoad( char *infile){
 					  float_size * sizeof(Float));
     
 #ifdef USE_QIO
-    qio_readPropagator readPropQio(infile, &prop[0], dummy_source, float_size, float_size, VOLFMT);
+  Float qio_read_time = -dclock();
+  qio_readPropagator readPropQio(infile, &prop[0], dummy_source, float_size, float_size, VOLFMT);
+  qio_read_time +=dclock();
+  print_time("QPropW::Run","qio_readPropagator",qio_read_time);
+
+
 #endif
     sfree(dummy_source);
     
@@ -837,7 +842,7 @@ void QPropW::CG(FermionVectorTp& source, FermionVectorTp& sol,
 
   // Do inversion
   //----------------------------------------------------------------
-  if (Lat.Fclass() == F_CLASS_DWF || Lat.Fclass() == F_CLASS_BFM) {
+  if (Lat.Fclass() == F_CLASS_DWF || Lat.Fclass() == F_CLASS_MDWF || Lat.Fclass() == F_CLASS_BFM) {
     Vector *src_4d    = (Vector*)source.data();
     Vector *sol_4d    = (Vector*)sol.data();
     Vector *midsol_4d = (Vector*)midsol.data();
@@ -3455,5 +3460,290 @@ Float QPropW::Gauss_W() const{
   ERR.NotImplemented(cname,"Gauss_W()");
   return 0;
 }
+
+//================================================================
+// Added by Meifeng Lin to do multiple sequential propagators
+//================================================================
+
+//------------------------------------------------------------------
+// Quark Propagator (Wilson type) with Multiple Sequential Sources
+// Added by Meifeng Lin, 10/18/2010
+//------------------------------------------------------------------
+QPropWMultSeq::QPropWMultSeq(Lattice& lat, int N, QPropW** q, int *p, 
+		     QPropWArg* q_arg, CommonArg* c_arg) : 
+  QPropW(lat, q_arg, c_arg), n_mult(N), quark(q), mom(p) {
+
+  char *fname = "QPropWMultSeq(L&, ComArg*)";
+  cname = "QPropWMultSeq";
+  VRB.Func(cname, fname);
+  
+  // Stores the quark mass of the source propagator
+  // Needed by Yasumichi's not degenerate mass runs
+  quark_mass = quark[0]->Mass() ; 
+  
+  //if the QPropW used for constructing the sequential source
+  //propagator is done using HalfFerion set the DoHalfFermion 
+  //in case the user forgot to do so.
+  if (quark[0]->DoHalfFermion()) qp_arg.do_half_fermion = 1;
+}
+
+
+
+//-----------------------------------------------------------------------------
+// Multi-sequential source propagator. -- Meifeng Lin, 10/22/2010
+//-----------------------------------------------------------------------------
+QPropWMultSeqBar::QPropWMultSeqBar(Lattice& lat, int N, QPropW** quark,  int *p, 
+						   ProjectType pp, QPropWArg* q_arg, 
+						   CommonArg* c_arg) : 
+  QPropWMultSeq(lat, N, quark, p, q_arg, c_arg), proj(pp) {
+
+  char *fname = "QPropWMultSeqBar(L&,...)";
+  cname = "QPropWMultSeq";
+  VRB.Func(cname, fname);
+}
+
+//-----------------------------------------------------------------------------
+// Multi-sequential source propagator for the d quark. -- Meifeng Lin, 10/22/2010
+//-----------------------------------------------------------------------------
+QPropWMultSeqProtDSrc::QPropWMultSeqProtDSrc(Lattice& lat, int N, QPropW** quark,  int *p, 
+									 ProjectType pp, QPropWArg* q_arg,
+									 QPropWGaussArg *g_arg, CommonArg* c_arg, int *t):
+  QPropWMultSeqBar(lat, N, quark, p, pp, q_arg, c_arg),gauss_arg(*g_arg),time(t) {
+
+  char *fname = "QPropWMultSeqProtDSrc(L&,...)";
+  cname = "QPropWMultSeq";
+  VRB.Func(cname, fname);
+
+  Run();
+
+  //Multiply by gamma5 and take the dagger to make it in to quark.
+  Site s;
+  for (s.Begin();s.End();s.nextSite()) {
+	QPropW::operator[](s.Index()).gl(-5);
+	QPropW::operator[](s.Index()).hconj();
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Multi-sequential source propagator for the d quark. -- Meifeng Lin, 10/22/2010
+// A dummy function used to load quark propagators. 
+//-----------------------------------------------------------------------------
+QPropWMultSeqProtDSrc::QPropWMultSeqProtDSrc(Lattice& lat, int N,  QPropW** quark, int *p, ProjectType pp, QPropWArg* q_arg, QPropWGaussArg *g_arg, CommonArg* c_arg, char* dummy):
+  QPropWMultSeqBar(lat, N, quark, p, pp, q_arg, c_arg),gauss_arg(*g_arg)
+{
+  //   char *fname = "QPropWMultSeqProtDSrc(Lattice&, int,  QPropW**, int *, ProjectType, QPropWArg*, QPropWGaussArg *, CommonArg*, char*)";
+  //   VRB.Func(cname, fname);
+}
+
+//--------------------------------------------------------------------------
+// Source for the multiple-sequential propagator. 
+// The source is the superposition of individual sequential d-quark sources.
+// The only difference between this and QPropWSeqProtDSrc::SetSource is that
+// the input is multiple quark propagators, hence
+// q = quark[i] is replaced by 
+// q= quark[nt]->operator[](i)
+// Perhaps there is an easier way to implement this? 
+// -- Meifeng Lin, 10/22/2010
+//--------------------------------------------------------------------------
+void QPropWMultSeqProtDSrc::SetSource(FermionVectorTp& src, int spin, int color) {
+
+  char *fname = "SetSource()";  
+  VRB.Func(cname, fname);
+  
+  if (color < 0 || color >= GJP.Colors())
+    ERR.General(cname, fname,
+		"Color index out of range: color = %d\n", color);
+  
+  if (spin < 0 || spin > 3)
+    ERR.General(cname, fname,
+		"Spin index out of range: spin = %d\n", spin);
+  
+  src.ZeroSource();
+  Site s;
+  Diquark diq;
+  WilsonVector S;
+  
+  WilsonMatrix q;
+  WilsonMatrix OqO;
+  WilsonMatrix qO ;
+  WilsonMatrix Oq ;
+  for (int n=0; n<n_mult; n++) {
+  for (s.Begin();s.End();s.nextSite())
+    for(int nt=0; nt<gauss_arg.nt; nt++){
+      if (gauss_arg.mt[nt] == s.physT() || time[n] == s.physT()) {
+	int i = s.Index();
+	q = quark[n]->operator[](i);
+
+	// If DoHalfFermion is on we have non-relativistic sources
+	// Multiply the sink by 1/2(1+gamma_t) when we do Half Spinors
+	// By doing this we implement the non-relativistic sink
+	if (DoHalfFermion()) q.PParProjectSink(); 
+	Oq = qO = q;
+	// multiply C*gamma_5 left  C is the charge conjugation
+	Oq.ccl(5);
+	// multiply C*gamma_5 right C is the charge conjugation
+	qO.ccr(5);
+	OqO = Oq;
+	// multiply C*gamma_5 right C is the charge conjugation
+	// Shoichi's code misses a minus sign here (or in ccl)
+	OqO.ccr(5);
+	// spin is denoted as delta in notes
+	// color is denoted as d in notes
+	diq.D_diquark(OqO, q, Oq, qO, spin, color);
+	diq.Project(S,proj);
+	
+	//multiply by the momentum factor exp(ipx)
+	Complex tt(conj(mom.Fact(s)));
+	S*=tt;
+	
+	S.conj();
+	
+	//if non-relativistic sink is needed multiply  by 1/2(1+gamma_t)
+	if (DoHalfFermion()) S.PParProject(); 
+	//Note the order first project then multiply by gamma5 
+	//multily by gamma5
+	S.gamma(-5);	
+	
+	src.CopyWilsonVec(i,S);
+      }
+    } // nt loop
+  
+  // Gauge fix the source. If quark sink is gauge fixed
+  // this has to be done!
+  if (quark[n]->GFixedSnk()) {
+    for (int ss=0;ss<4;ss++)
+      src.GFWallSource(AlgLattice(), ss, 3, time[n]);
+  }
+  if(quark[n]->SeqSmearSink()==GAUSS_GAUGE_INV){
+    DoLinkSmear(gauss_arg);  // YA: smear link if needed
+    for(int nt=0; nt<gauss_arg.nt; nt++){
+      for(int ss=0;ss<4;ss++)
+	src.GaussianSmearVector(AlgLattice(),ss,
+				quark[n]->GaussArg().gauss_N,quark[n]->GaussArg().gauss_W,time[n]);
+      //source sink smearing is the same
+    }
+    UndoLinkSmear(gauss_arg); // YA: get back the original link
+  }
+ } // loop over forward propagators
+}
+
+//--------------------------------------------------------------------------------
+// Multi-sequential source propagator for the u quark. -- Meifeng Lin, 10/22/2010
+//--------------------------------------------------------------------------------
+QPropWMultSeqProtUSrc::QPropWMultSeqProtUSrc(Lattice& lat, int N, QPropW** quark,  int *p, 
+									 ProjectType pp, QPropWArg* q_arg,
+									 QPropWGaussArg *g_arg, CommonArg* c_arg, int *t):
+  QPropWMultSeqBar(lat, N, quark, p, pp, q_arg, c_arg),gauss_arg(*g_arg),time(t) {
+
+  char *fname = "QPropWSeqProtUSrc(L&,...)";
+  cname = "QPropWSeq";
+  VRB.Func(cname, fname);
+
+  Run();
+
+  //Multiply by gamma5 and take the dagger to make it in to quark.
+  Site s;
+  for (s.Begin();s.End();s.nextSite()) {
+	QPropW::operator[](s.Index()).gl(-5);
+	QPropW::operator[](s.Index()).hconj(); 
+  }
+}
+
+QPropWMultSeqProtUSrc::QPropWMultSeqProtUSrc(Lattice& lat, int N,  QPropW** quark, int *p, ProjectType pp, QPropWArg* q_arg, QPropWGaussArg *g_arg, CommonArg* c_arg, char* dummy):
+  QPropWMultSeqBar(lat, N, quark, p, pp, q_arg, c_arg),gauss_arg(*g_arg)
+{
+  //   char *fname = "QPropWMultSeqProtUSrc(Lattice&, int,  QPropW**, int *, ProjectType, QPropWArg*, QPropWGaussArg *, CommonArg*, char*)";
+  //   VRB.Func(cname, fname);
+}
+
+
+//--------------------------------------------------------------------------
+// Source for the multiple-sequential propagator. 
+// The source is the superposition of individual sequential d-quark sources.
+// The only difference between this and QPropWSeqProtUSrc::SetSource is that
+// the input is multiple quark propagators, hence
+// q = quark[i] is replaced by 
+// q= quark[nt]->operator[](i)
+// Perhaps there is an easier way to implement this? 
+// -- Meifeng Lin, 10/22/2010
+//--------------------------------------------------------------------------
+void QPropWMultSeqProtUSrc::SetSource(FermionVectorTp& src, int spin, int color) {
+
+  char *fname = "SetSource()";  
+  VRB.Func(cname, fname);
+
+  if (color < 0 || color >= GJP.Colors())
+    ERR.General(cname, fname,
+				"Color index out of range: color = %d\n", color);
+  
+  if (spin < 0 || spin > 3)
+    ERR.General(cname, fname,
+				"Spin index out of range: spin = %d\n", spin);
+  
+  src.ZeroSource();
+  Site s;
+  Diquark diq;
+  WilsonVector S;
+  WilsonMatrix q;
+  WilsonMatrix OqO;
+  
+  for (int n=0; n<n_mult; n++) {
+  for (s.Begin();s.End();s.nextSite())
+    for(int nt=0; nt<gauss_arg.nt; nt++){
+    if (gauss_arg.mt[nt] == s.physT() || time[n] == s.physT()) {
+	  int i(s.Index());
+          q = quark[n]->operator[](i);
+	  // If DoHalfFermion is on we have non-relativistic sources
+	  // Multiply the sink by 1/2(1+gamma_t) when we do Half Spinors
+	  // By doing this we implement the non-relativistic sink
+	  if (DoHalfFermion()) q.PParProjectSink();
+	  OqO = q;
+	  
+	  // multiply C*gamma_5 left  C is the charge conjugation
+	  OqO.ccl(5);
+	  // multiply C*gamma_5 right C is the charge conjugation
+	  OqO.ccr(5);
+	  // spin is denoted as delta in notes
+	  // color is denoted as d in notes
+	  
+	  diq.U_diquark(OqO, q, spin, color);
+	  diq.Project(S,proj);
+	  
+	  //multiply by the momentum factor exp(ipx)
+	  Complex tt(conj(mom.Fact(s)));
+	  S*=tt;
+	  
+	  S.conj();
+	  
+	  //if non-relativistic sink is needed multiply  by 1/2(1+gamma_t)
+	  if (DoHalfFermion()) S.PParProject(); 
+	  //Note the order first project then multiply by gamma5 
+	  //multily by gamma5
+	  S.gamma(-5);
+	  
+	  src.CopyWilsonVec(i,S);
+    }// Loop over sites
+    } // nt loop
+  
+  // Gauge fix the source. If quark sink is gauge fixed
+  // this has to be done!
+  if (quark[n]->GFixedSnk()) {
+	for (int ss=0;ss<4;ss++)
+	  src.GFWallSource(AlgLattice(), ss, 3, time[n]);
+  }
+  if(quark[n]->SeqSmearSink()==GAUSS_GAUGE_INV){
+  DoLinkSmear(gauss_arg);  // YA: smear link if needed
+  for(int nt=0; nt<gauss_arg.nt; nt++){
+    for(int ss=0;ss<4;ss++)
+      src.GaussianSmearVector(AlgLattice(),ss,
+                              quark[n]->GaussArg().gauss_N,quark[n]->GaussArg().gauss_W,time[n]);
+    //source sink smearing is the same
+  }
+  UndoLinkSmear(gauss_arg); // YA: get back the original link
+  }
+  } //loop over forward propagators
+}
+
+
 
 CPS_END_NAMESPACE
