@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2012-12-05 16:39:19 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.83 2012-12-05 16:39:19 chulwoo Exp $
-dnl  $Id: configure.in,v 1.83 2012-12-05 16:39:19 chulwoo Exp $
+dnl  $Date: 2013-01-12 22:18:04 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.84 2013-01-12 22:18:04 chulwoo Exp $
+dnl  $Id: configure.in,v 1.84 2013-01-12 22:18:04 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.83 $
+dnl  $Revision: 1.84 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -164,7 +164,7 @@ dnl  AC_CHECK_PROGS(CXX, mpicxx)
    DFLAGS="${DFLAGS} -DUSE_OMP -DVEC_INLINE"
    LDFLAGS="${LDFLAGS} -fopenmp"
    CFLAGS="${CFLAGS} -fopenmp"
-   CXXFLAGS="${CFXXLAGS} -fopenmp"
+   CXXFLAGS="${CXXLAGS} -fopenmp"
 else
 
    ARCH=NOARCH
