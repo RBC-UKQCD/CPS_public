@@ -4367,7 +4367,7 @@ elif test "$enable_target" = "bgq"; then
    DFLAGS="${DFLAGS} -DUSE_OMP -DVEC_INLINE"
    LDFLAGS="${LDFLAGS} -fopenmp"
    CFLAGS="${CFLAGS} -fopenmp"
-   CXXFLAGS="${CFXXLAGS} -fopenmp"
+   CXXFLAGS="${CXXLAGS} -fopenmp"
 else
 
    ARCH=NOARCH
