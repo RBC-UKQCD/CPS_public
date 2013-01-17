@@ -1,0 +1,20 @@
+class EigCGArg eigcg_arg={
+int nev = 8
+int m = 24
+int max_def_len = 400
+double max_eig_cut = 2e-3
+bool always_restart = 0
+int restart_len = 1
+Array restart[]={
+double restart[0] = 2e-5
+double restart[1] = 0
+double restart[2] = 0
+double restart[3] = 0
+double restart[4] = 0
+double restart[5] = 0
+double restart[6] = 0
+double restart[7] = 0
+double restart[8] = 0
+double restart[9] = 0
+}
+}
