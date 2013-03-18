@@ -1,18 +1,18 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-	$Id: fix_gauge.C,v 1.12 2013-03-05 18:47:00 chulwoo Exp $
+	$Id: fix_gauge.C,v 1.13 2013-03-18 20:50:41 chulwoo Exp $
 	*/
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-03-05 18:47:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.12 2013-03-05 18:47:00 chulwoo Exp $
-//  $Id: fix_gauge.C,v 1.12 2013-03-05 18:47:00 chulwoo Exp $
+//  $Date: 2013-03-18 20:50:41 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v 1.13 2013-03-18 20:50:41 chulwoo Exp $
+//  $Id: fix_gauge.C,v 1.13 2013-03-18 20:50:41 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/fix_gauge/fix_gauge.C,v $
 //  $State: Exp $
 //
@@ -33,10 +33,12 @@ CPS_END_NAMESPACE
 #include <util/smalloc.h>
 #include <util/rcomplex.h>
 #include <util/time_cps.h>
+#include <util/omp_wrapper.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
+#ifdef USE_BFM
 #include <bfm.h>
-#include <omp.h>
+#endif
 CPS_START_NAMESPACE
 
 #ifdef _TARTAN

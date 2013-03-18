@@ -6,6 +6,8 @@
 //------------------------------------------------------------------
 #include <stdlib.h>
 #include <stdio.h>
+#include <cmath>
+
 #include <alg/common_arg.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
@@ -13,9 +15,8 @@
 #include <util/momentum.h>
 #include <comms/sysfunc_cps.h>
 #include <alg/fermion_vector.h>
+#include <util/omp_wrapper.h>
 
-#include <cmath>
-#include <omp.h>
 
 CPS_START_NAMESPACE
 

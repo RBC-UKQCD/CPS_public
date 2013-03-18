@@ -3,6 +3,7 @@
 #include <util/gjp.h>
 #include <util/error.h>
 #include <util/vector.h>
+#include <util/omp_wrapper.h>
 #include <util/sproj_tr.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
@@ -10,7 +11,6 @@
 #include <util/wilson.h>
 #include <util/lattice/fforce_wilson_type.h>
 
-#include<omp.h>
 
 USING_NAMESPACE_CPS;
 

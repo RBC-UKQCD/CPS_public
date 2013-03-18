@@ -1,13 +1,14 @@
+#include <config.h>
 #include <util/qcdio.h>
 #include <alg/force_arg.h>
 #include <comms/glb.h>
 #include <util/gjp.h>
+#include <util/omp_wrapper.h>
 
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
 
-#include <omp.h>
 
 CPS_START_NAMESPACE
 using namespace std;
