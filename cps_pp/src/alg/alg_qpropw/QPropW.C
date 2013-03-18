@@ -34,13 +34,12 @@
 #include <util/qioarg.h>
 #include <util/sproj_tr.h>
 #include <util/time_cps.h>
+#include <util/omp_wrapper.h>
 
 //YA
 #include <alg/alg_plaq.h>
 #include <alg/alg_smear.h>
 #include <alg/no_arg.h>
-
-#include <omp.h>
 
 #define VOLFMT QIO_VOLFMT
 
