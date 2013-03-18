@@ -56,6 +56,17 @@ public:
   void SetBoxSource  ( int color, int spin, int bstart, int bend, 
 		    int time_slice);
 
+  // Sets a 4D box source. If you want to set a 3D xyz box, set
+  // size[3] == 1 and glb_x[3] to the global time slice you want.
+  //
+  // With this function in disposal, why do we need separate functions
+  // for point/wall/box sources?
+  void Set4DBoxSource(int color,
+                      int spin,
+                      const int start[4], // global starting location in x, y, z and t directions
+                      const int size[4], // global size in x, y, z and t directions
+                      const Float mom[4]); // momentum
+
   /*! Gauge fix sink - Coulomb gauge only */
   void GaugeFixSink       ( Lattice& lat, int dir, int unfix=0);
 
@@ -123,6 +134,7 @@ public:
   /* source for the NPR of derivative operators */
   void SetGFDerivativeSource(Lattice& lat,int color, int spin,
 			     int d, int x, int y, int z, int t) ;
+
 };
 
 CPS_END_NAMESPACE

@@ -197,11 +197,7 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
     for(int i = 0;i<4;i++) 
         ffree(result[i]);
 
-    glb_sum(&ret.L1);
-    glb_sum(&ret.L2);
-    glb_max(&ret.Linf);
-
-    ret.unitarize(4 * GJP.VolSites());
+    ret.glb_reduce();
     return ret;
 }
 

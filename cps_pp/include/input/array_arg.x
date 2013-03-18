@@ -15,6 +15,10 @@ class ParamArray{
   ParamArg params<>;
 };
 
+class IntArray {
+  int v<>;
+};
+
 /*
 typedef char CharArray[100];
 class Filenames{

@@ -27,6 +27,10 @@ QPropWBoxArg::QPropWBoxArg()
 :box_start(0),box_end(0)
 {};
 
+// added by Hantao
+QPropW4DBoxArg::QPropW4DBoxArg()
+{}
+
 QPropWRandArg::QPropWRandArg()
 :rng(NORAND),seed(1111)
 {};

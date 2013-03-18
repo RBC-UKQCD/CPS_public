@@ -365,29 +365,12 @@ void AlgActionQuotient::prepare_fg(Matrix * force, Float dt_ratio)
             Fdt.print(dt_ratio, label);
 	  
             // If measuring the force, need to measure and then sum to mom
-            Float L1=0.;
-            Float L2=0.;
-            Float Linf=0.;
-            for (int k=0; k<g_size/18; k++) {
-                Float norm = (mom_tmp + k)->norm();
-                Float tmp = sqrt(norm);
-                L1 += tmp;
-                L2 += norm;
-                Linf = (tmp>Linf ? tmp : Linf);
-            }
-            glb_sum(&L1);
-            glb_sum(&L2);
-            glb_max(&Linf);
-
-            L1 /= 4.0*GJP.VolSites();
-            L2 /= 4.0*GJP.VolSites();
+            Fdt.measure(mom_tmp);
+            Fdt.glb_reduce();
 
             ((Vector *)force)->VecAddEquVec((Vector *)mom_tmp, g_size);
 
-            sprintf(label, "%s (total), mass = (%e,%e):", 
-                    force_label, frm_mass[i], bsn_mass[i]); 
-	  
-            Fdt = ForceArg(L1, sqrt(L2), Linf);
+            sprintf(label, "%s (total), mass = (%e,%e):", force_label, frm_mass[i], bsn_mass[i]);
             Fdt.print(dt_ratio, label);
 
             sfree(mom_tmp, "mom_tmp", fname, cname);
@@ -500,30 +483,11 @@ void AlgActionQuotient::evolve(Float dt, int nsteps)
                 Fdt.print(dt, label);
 	  
                 // If measuring the force, need to measure and then sum to mom
-                Float L1=0.;
-                Float L2=0.;
-                Float Linf=0.;
-                for (int k=0; k<g_size/18; k++) {
-                    Float norm = (mom_tmp+k)->norm();
-                    Float tmp = sqrt(norm);
-                    L1 += tmp;
-                    L2 += norm;
-                    Linf = (tmp>Linf ? tmp : Linf);
-                }
-                glb_sum(&L1);
-                glb_sum(&L2);
-                glb_max(&Linf);
+                Fdt.measure(mom_tmp);
+                Fdt.glb_reduce();
 
-                L1 /= 4.0*GJP.VolSites();
-                L2 /= 4.0*GJP.VolSites();
-
-                fTimesV1PlusV2((IFloat*)mom, 1.0, (IFloat*)mom_tmp, 
-                               (IFloat*)mom, g_size);
-
-                sprintf(label, "%s (total), mass = (%e,%e):", 
-                        force_label, frm_mass[i], bsn_mass[i]); 
-	  
-                Fdt = ForceArg(L1, sqrt(L2), Linf);
+                fTimesV1PlusV2((IFloat*)mom, 1.0, (IFloat*)mom_tmp, (IFloat*)mom, g_size);
+                sprintf(label, "%s (total), mass = (%e,%e):", force_label, frm_mass[i], bsn_mass[i]); 
                 Fdt.print(dt, label);
 	  
                 sfree(mom_tmp, "mom_tmp", fname, cname);

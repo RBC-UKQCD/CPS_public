@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FwilsonTm class.
 
-  $Id: f_wilsonTm.C,v 1.3 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: f_wilsonTm.C,v 1.4 2013-03-18 19:33:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -31,30 +31,9 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
-
-#define BENCHMARK
-#ifdef BENCHMARK
-#include <util/qcdio.h>
-#include <sys/time.h>
-unsigned long WfmFlopsTm;
-#ifndef timersub
-#define timersub(a, b, result)                                                \
-  do {                                                                        \
-    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
-    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
-    if ((result)->tv_usec < 0) {                                              \
-      --(result)->tv_sec;                                                     \
-      (result)->tv_usec += 1000000;                                           \
-    }                                                                         \
-  } while (0)
-#endif
-#endif
+#include <util/lattice/fforce_wilson_type.h>
 
 CPS_START_NAMESPACE
-
-//------------------------------------------------------------------
-// Initialize static variables.
-//------------------------------------------------------------------
 
 //------------------------------------------------------------------
 // This constructor does nothing.
@@ -95,37 +74,18 @@ FclassType FwilsonTm::Fclass() const{
 //~~ see full notes in f_wilson
 //------------------------------------------------------------------
 int FwilsonTm::FmatEvlInv(Vector *f_out, Vector *f_in, 
-			CgArg *cg_arg, 
-			Float *true_res,
-			CnvFrmType cnv_frm)
+                          CgArg *cg_arg, 
+                          Float *true_res,
+                          CnvFrmType cnv_frm)
 {
-  int iter;
-  char *fname = "FmatEvlInv(CgArg*,V*,V*,F*,CnvFrmType)";
-  VRB.Func(cname,fname);
+    char *fname = "FmatEvlInv(CgArg*,V*,V*,F*,CnvFrmType)";
+    VRB.Func(cname,fname);
 
-#if 1
-{
-  DiracOpWilsonTm wilson(*this, f_out, f_in, cg_arg, cnv_frm);
+    DiracOpWilsonTm wilson(*this, f_out, f_in, cg_arg, cnv_frm);
+    int iter = wilson.InvCg(&(cg_arg->true_rsd));
+    if (true_res) *true_res = cg_arg ->true_rsd;
 
-  WfmFlopsTm = 0;
-  struct timeval t_start, t_stop;
-  gettimeofday(&t_start,NULL);
-  
-  iter = wilson.InvCg(&(cg_arg->true_rsd));
-  if (true_res) *true_res = cg_arg ->true_rsd;
-
-  gettimeofday(&t_stop,NULL);
-  timersub(&t_stop,&t_start,&t_start);
-  double flops= (double)WfmFlopsTm;
-  double secs = t_start.tv_sec + 1.E-6 *t_start.tv_usec;
-//  printf("Wilson solve: %d iteratations %d flops %f Mflops per node\n",
-//	 iter,WfmFlopsTm,flops/(secs*1000000) );
- }
-#endif
-
-  
-  // Return the number of iterations
-  return iter;
+    return iter;
 }
 
 //------------------------------------------------------------------
@@ -257,206 +217,35 @@ Float FwilsonTm::BhamiltonNode(Vector *boson, Float mass){
 // chi <- (M_f^\dag M_f)^{-1} M_f^\dag (RGV)
 //------------------------------------------------------------------
 ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi, 
-			      Float mass, Float epsilon, Float dt)
+                                    Float mass, Float epsilon, Float dt)
 {
-  char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
-  VRB.Func(cname,fname);
+    const char *fname = "EvolveMomFforce(M*,V*,F,F,F)";
+    if (mom == 0) ERR.Pointer(cname,fname,"mom");
+    if (chi == 0) ERR.Pointer(cname,fname,"chi");
 
-  Matrix *gauge = GaugeField() ;
+    const int f_size = FsiteSize() * GJP.VolNodeSites();
+    Vector *v1 = (Vector *)smalloc(cname, fname, "v1", f_size*sizeof(Float));
+    Vector *v2 = (Vector *)smalloc(cname, fname, "v2", f_size*sizeof(Float));
 
-  if (Colors() != 3) ERR.General(cname,fname,"Wrong nbr of colors.") ;
-  if (SpinComponents() != 4) ERR.General(cname,fname,"Wrong nbr of spin comp.") ;
-  if (mom == 0) ERR.Pointer(cname,fname,"mom") ;
-  if (chi == 0) ERR.Pointer(cname,fname,"chi") ;
-
-//------------------------------------------------------------------
-// allocate space for two CANONICAL fermion fields.
-//------------------------------------------------------------------
-  int f_size = FsiteSize() * GJP.VolNodeSites() ;
-
-  char *str_v1 = "v1" ;
-  Vector *v1 = (Vector *)smalloc(cname, fname, str_v1, f_size*sizeof(Float)) ;
-
-  char *str_v2 = "v2" ;
-  Vector *v2 = (Vector *)smalloc(cname, fname, str_v2, f_size*sizeof(Float)) ;
-
-//------------------------------------------------------------------
-// allocate space for two CANONICAL fermion field on a site.
-//------------------------------------------------------------------
-
-  char *str_site_v1 = "site_v1";
-  Float *site_v1 = (Float *)smalloc(cname, fname, str_site_v1, FsiteSize()*sizeof(Float));
-
-  char *str_site_v2 = "site_v2";
-  Float *site_v2 = (Float *)smalloc(cname, fname, str_site_v2, FsiteSize()*sizeof(Float));
-
-  Float L1 = 0.0;
-  Float L2 = 0.0;
-  Float Linf = 0.0;
-
-
-  {
-    CgArg cg_arg ;
-    cg_arg.mass = mass ;
-    cg_arg.epsilon = epsilon;
-
-    DiracOpWilsonTm wilson(*this, v1, v2, &cg_arg, CNV_FRM_YES) ;
-    // chi <- (M_f^\dag M_f)^{-1} M_f^\dag (RGV)
-    wilson.CalcHmdForceVecs(chi) ;
-  }
-#if 0
-  VRB.Result(cname,fname,"Being skipped for debugging!");
-#else
-
-  int x, y, z, t, lx, ly, lz, lt ;
-
-  lx = GJP.XnodeSites() ;
-  ly = GJP.YnodeSites() ;
-  lz = GJP.ZnodeSites() ;
-  lt = GJP.TnodeSites() ;
-
-//------------------------------------------------------------------
-// start by summing first over direction (mu) and then over site
-// to allow SCU transfers to happen face-by-face in the outermost
-// loop.
-//------------------------------------------------------------------
-
-  int mu ;
-
-  Matrix tmp, f ;
-
-  for (mu=0; mu<4; mu++) {
-    for (t=0; t<lt; t++)
-    for (z=0; z<lz; z++)
-    for (y=0; y<ly; y++)
-    for (x=0; x<lx; x++) {
-      int gauge_offset = x+lx*(y+ly*(z+lz*t)) ;
-      int vec_offset = FsiteSize()*gauge_offset ;
-      gauge_offset = mu+4*gauge_offset ;
-
-      Float *v1_plus_mu ;
-      Float *v2_plus_mu ;
-      int vec_plus_mu_offset = FsiteSize() ;
-
-      Float coeff = -2.0 * dt ;
-
-      switch (mu) {
-        case 0 :
-          vec_plus_mu_offset *= (x+1)%lx+lx*(y+ly*(z+lz*t)) ;
-          if ((x+1) == lx) {
-            getPlusData( (IFloat *)site_v1,
-                         (IFloat *)v1+vec_plus_mu_offset, FsiteSize(), mu) ;
-            getPlusData( (IFloat *)site_v2,
-                         (IFloat *)v2+vec_plus_mu_offset, FsiteSize(), mu) ;
-            v1_plus_mu = site_v1 ;                        
-            v2_plus_mu = site_v2 ;                        
-            if (GJP.XnodeBc()==BND_CND_APRD) coeff = -coeff ;
-          } else {
-            v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-            v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-          }
-          break ;
-        case 1 :
-          vec_plus_mu_offset *= x+lx*((y+1)%ly+ly*(z+lz*t)) ;
-          if ((y+1) == ly) {
-            getPlusData( (IFloat *)site_v1,
-                         (IFloat *)v1+vec_plus_mu_offset, FsiteSize(), mu) ;
-            getPlusData( (IFloat *)site_v2,
-                         (IFloat *)v2+vec_plus_mu_offset, FsiteSize(), mu) ;
-            v1_plus_mu = site_v1 ;                        
-            v2_plus_mu = site_v2 ;                        
-            if (GJP.YnodeBc()==BND_CND_APRD) coeff = -coeff ;
-          } else {
-            v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-            v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-          }
-          break ;
-        case 2 :
-          vec_plus_mu_offset *= x+lx*(y+ly*((z+1)%lz+lz*t)) ;
-          if ((z+1) == lz) {
-            getPlusData( (IFloat *)site_v1,
-                         (IFloat *)v1+vec_plus_mu_offset, FsiteSize(), mu) ;
-            getPlusData( (IFloat *)site_v2,
-                         (IFloat *)v2+vec_plus_mu_offset, FsiteSize(), mu) ;
-            v1_plus_mu = site_v1 ;
-            v2_plus_mu = site_v2 ;
-            if (GJP.ZnodeBc()==BND_CND_APRD) coeff = -coeff ;
-          } else {
-            v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-            v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-          }
-          break ;
-        case 3 :
-          vec_plus_mu_offset *= x+lx*(y+ly*(z+lz*((t+1)%lt))) ;
-          if ((t+1) == lt) {
-            getPlusData( (IFloat *)site_v1,
-                         (IFloat *)v1+vec_plus_mu_offset, FsiteSize(), mu) ;
-            getPlusData( (IFloat *)site_v2,
-                         (IFloat *)v2+vec_plus_mu_offset, FsiteSize(), mu) ;
-            v1_plus_mu = site_v1 ;
-            v2_plus_mu = site_v2 ;
-            if (GJP.TnodeBc()==BND_CND_APRD) coeff = -coeff ;
-          } else {
-            v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-            v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-          }
-      } // end switch mu
-
-      sproj_tr[mu](   (IFloat *)&tmp,
-                      (IFloat *)v1_plus_mu,
-                      (IFloat *)v2+vec_offset, 1, 0, 0);
-
-      sproj_tr[mu+4]( (IFloat *)&f,
-                      (IFloat *)v2_plus_mu,
-                      (IFloat *)v1+vec_offset, 1, 0, 0);
-
-      tmp += f ;
-
-      f.DotMEqual(*(gauge+gauge_offset), tmp) ;
-
-      tmp.Dagger(f) ;
-
-      f.TrLessAntiHermMatrix(tmp) ;
-
-      f *= coeff ;
-
-      *(mom+gauge_offset) += f ;
-      Float norm = f.norm();
-      Float tmp = sqrt(norm);
-      L1 += tmp;
-      L2 += norm;
-      Linf = (tmp>Linf ? tmp : Linf);
+    {
+        CgArg cg_arg ;
+        cg_arg.mass = mass ;
+        cg_arg.epsilon = epsilon;
+      
+        DiracOpWilsonTm wilson(*this, v1, v2, &cg_arg, CNV_FRM_YES) ;
+        // chi <- (M_f^\dag M_f)^{-1} M_f^\dag (RGV)
+        wilson.CalcHmdForceVecs(chi);
     }
-  }
-#endif
 
-//------------------------------------------------------------------
-// deallocate space for two CANONICAL fermion fields on a site.
-//------------------------------------------------------------------
-  VRB.Sfree(cname, fname, str_site_v2, site_v2) ;
-  sfree(site_v2) ;
+    this->BondCond();
+    FforceWilsonType cal_force(mom, this->GaugeField(),
+                               (Float *)v2, (Float *)v1, 1, 2.0 * dt);
+    ForceArg ret = cal_force.run();
+    this->BondCond();
 
-  VRB.Sfree(cname, fname, str_site_v1, site_v1) ;
-  sfree(site_v1) ;
-
-//------------------------------------------------------------------
-// deallocate space for two CANONICAL fermion fields.
-//------------------------------------------------------------------
-  VRB.Sfree(cname, fname, str_v2, v2) ;
-  sfree(v2) ;
-
-  VRB.Sfree(cname, fname, str_v1, v1) ;
-  sfree(v1) ;
-
-  glb_sum(&L1);
-  glb_sum(&L2);
-  glb_max(&Linf);
-
-  L1 /= 4.0*GJP.VolSites();
-  L2 /= 4.0*GJP.VolSites();
-  VRB.FuncEnd(cname,fname);
-
-  return ForceArg(L1, sqrt(L2), Linf);
+    sfree(cname, fname, "v1", v1);
+    sfree(cname, fname, "v2", v2);
+    return ret;
 }
 
 //------------------------------------------------------------------
@@ -485,264 +274,42 @@ ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi,
 // phi <- M_b (M_b^\dag M_b)^{-1} M_f^\dag (RGV)
 //------------------------------------------------------------------
 ForceArg FwilsonTm::EvolveMomFforce(Matrix *mom, Vector *chi, Vector *eta,
-		      Float mass, Float epsilon, Float dt) {
-  char *fname = "EvolveMomFforce(M*,V*,V*,F,F,F)";
-  VRB.Func(cname,fname);
+                                    Float mass, Float epsilon, Float dt)
+{
+    const char *fname = "EvolveMomFforce(M*,V*,V*,F,F,F)";
+    if (mom == 0)            { ERR.Pointer(cname,fname,"mom") ; }
+    if (eta == 0)            { ERR.Pointer(cname,fname,"eta") ; }
 
-  Matrix *gauge = GaugeField() ;
+    const int f_size = FsiteSize() * GJP.VolNodeSites();
+    Vector *v1 = (Vector *)smalloc(cname, fname, "v1", f_size*sizeof(Float)) ;
+    Vector *v2 = (Vector *)smalloc(cname, fname, "v2", f_size*sizeof(Float)) ;
 
-  if (Colors() != 3)       { ERR.General(cname,fname,"Wrong nbr of colors.") ; }
-  if (SpinComponents()!=4) { ERR.General(cname,fname,"Wrong nbr of spin comp.") ;}
-  if (mom == 0)            { ERR.Pointer(cname,fname,"mom") ; }
-  if (eta == 0)            { ERR.Pointer(cname,fname,"eta") ; }
+    {
+        CgArg cg_arg ;
+        cg_arg.mass = mass ;
+        cg_arg.epsilon = epsilon;
 
-//------------------------------------------------------------------
-// allocate space for two CANONICAL fermion fields.
-// these are all full fermion vector sizes ( i.e. *not* preconditioned )
-//------------------------------------------------------------------
+        DiracOpWilsonTm wilson(*this, v1, v2, &cg_arg, CNV_FRM_YES) ;
 
-  const int f_size        ( FsiteSize() * GJP.VolNodeSites() );
-
-  char *str_v1 = "v1" ;
-  Vector *v1 = (Vector *)smalloc(f_size*sizeof(Float)) ;
-  if (v1 == 0) ERR.Pointer(cname, fname, str_v1) ;
-  VRB.Smalloc(cname, fname, str_v1, v1, f_size*sizeof(Float)) ;
-
-  char *str_v2 = "v2" ;
-  Vector *v2 = (Vector *)smalloc(f_size*sizeof(Float)) ;
-  if (v2 == 0) ERR.Pointer(cname, fname, str_v2) ;
-  VRB.Smalloc(cname, fname, str_v2, v2, f_size*sizeof(Float)) ;
-
-//------------------------------------------------------------------
-// two fermion vectors at a single position
-//    - these will be used to store off-node
-//      field components
-//------------------------------------------------------------------
-
-  char *str_site_v1 = "site_v1";
-  Float *site_v1 = (Float *)smalloc(FsiteSize()*sizeof(Float));
-  if (site_v1 == 0) ERR.Pointer(cname, fname, str_site_v1) ;
-  VRB.Smalloc(cname, fname, str_site_v1, site_v1,
-    FsiteSize()*sizeof(Float)) ;
-
-  char *str_site_v2 = "site_v2";
-  Float *site_v2 = (Float *)smalloc(FsiteSize()*sizeof(Float));
-  if (site_v2 == 0) ERR.Pointer(cname, fname, str_site_v2) ;
-  VRB.Smalloc(cname, fname, str_site_v2, site_v2,
-    FsiteSize()*sizeof(Float)) ;
-  
-  Float L1 = 0.0;
-  Float L2 = 0.0;
-  Float Linf = 0.0;
-
-
-  {
-    CgArg cg_arg ;
-    cg_arg.mass = mass ;
-    cg_arg.epsilon = epsilon;
-
-    DiracOpWilsonTm wilson(*this, v1, v2, &cg_arg, CNV_FRM_YES) ;
-
-//~~
-//~~ fermion version:  	wilson.CalcHmdForceVecs(chi)
-//~~ boson version:  	wilson.CalcBsnForceVecs(chi, eta)
-//~~
-    // chi <- (M_f^\dag M_f)^{-1} M_f^\dag (RGV)
-    // phi <- M_b (M_b^\dag M_b)^{-1} M_f^\dag (RGV)
-    wilson.CalcBsnForceVecs(chi, eta) ;
-  }
-
-#if 0
-  VRB.Result(cname,fname,"Being skipped for debugging!");
-#else
-
-  // evolve the momenta by the fermion force
-  int mu, x, y, z, t;
- 
-  const int lx(GJP.XnodeSites());
-  const int ly(GJP.YnodeSites());
-  const int lz(GJP.ZnodeSites());
-  const int lt(GJP.TnodeSites());
-
-//------------------------------------------------------------------
-// start by summing first over direction (mu) and then over site
-// to allow SCU transfers to happen face-by-face in the outermost
-// loop.
-//------------------------------------------------------------------
-
-// (1-gamma_\mu) Tr_s[v1(x+\mu) v2^{\dagger}(x)] +          
-// 		(1+gamma_\mu) Tr_s [v2(x+\mu) v1^{\dagger}(x)]
-  for (mu=0; mu<4; mu++) {
-    for (t=0; t<lt; t++)
-      for (z=0; z<lz; z++)
-        for (y=0; y<ly; y++)
-          for (x=0; x<lx; x++) {
-            // position offset
-            int gauge_offset = x+lx*(y+ly*(z+lz*t)) ;
-            
-            // offset for vector field at this point
-            int vec_offset = FsiteSize()*gauge_offset ;
-
-            // offset for link in mu direction from this point
-            gauge_offset = mu+4*gauge_offset ;
-
-            Float *v1_plus_mu ;
-            Float *v2_plus_mu ;
-            int vec_plus_mu_offset = FsiteSize() ;
-
-            // sign of coeff (look at momenta update)
-            Float coeff = -2.0 * dt ;
-
-            switch (mu) {
-              case 0 :
-                // next position in mu direction
-                vec_plus_mu_offset *= (x+1)%lx+lx*(y+ly*(z+lz*t)) ;
-                if ((x+1) == lx) {
-                   // off-node
-                   // fill site_v1 and site_v2 with v1 and v2 data
-                   // from x=0 on next node, need loop because
-                   // data is not contiguous in memory 
-                   getPlusData( (IFloat *)site_v1,
-                              (IFloat *)v1+vec_plus_mu_offset, FsiteSize(), mu) ;
-                   getPlusData( (IFloat *)site_v2,
-                              (IFloat *)v2+vec_plus_mu_offset, FsiteSize(), mu) ;
-
-                   v1_plus_mu = site_v1 ;                        
-                   v2_plus_mu = site_v2 ;                        
-
-                   // GJP.XnodeBc() gives the forward boundary
-                   // condition only (so this should work).
-                   if (GJP.XnodeBc()==BND_CND_APRD) coeff = -coeff ;
-                } else {
-                   //
-                   //  on - node: just add offset to v1 and v2
-                   // (they are now 1 forward in the mu direction )
-                   //
-                   v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-                   v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-                }
-                break ;
-
-        // Repeat for the other directions
-        case 1 :
-          vec_plus_mu_offset *= x+lx*((y+1)%ly+ly*(z+lz*t)) ;
-          if ((y+1) == ly) {
-            getPlusData( (IFloat *)site_v1,
-                         (IFloat *)v1+vec_plus_mu_offset, FsiteSize(), mu) ;
-            getPlusData( (IFloat *)site_v2,
-                         (IFloat *)v2+vec_plus_mu_offset, FsiteSize(), mu) ;
-            v1_plus_mu = site_v1 ;                        
-            v2_plus_mu = site_v2 ;                        
-            if (GJP.YnodeBc()==BND_CND_APRD) coeff = -coeff ;
-          } else {
-            v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-            v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-          }
-          break ;
-        case 2 :
-          vec_plus_mu_offset *= x+lx*(y+ly*((z+1)%lz+lz*t)) ;
-          if ((z+1) == lz) {
-            getPlusData( (IFloat *)site_v1,
-                         (IFloat *)v1+vec_plus_mu_offset, FsiteSize(), mu) ;
-            getPlusData( (IFloat *)site_v2,
-                         (IFloat *)v2+vec_plus_mu_offset, FsiteSize(), mu) ;
-            v1_plus_mu = site_v1 ;
-            v2_plus_mu = site_v2 ;
-            if (GJP.ZnodeBc()==BND_CND_APRD) coeff = -coeff ;
-          } else {
-            v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-            v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-          }
-          break ;
-        case 3 :
-          vec_plus_mu_offset *= x+lx*(y+ly*(z+lz*((t+1)%lt))) ;
-          if ((t+1) == lt) {
-            getPlusData( (IFloat *)site_v1,
-                         (IFloat *)v1+vec_plus_mu_offset, FsiteSize(), mu) ;
-            getPlusData( (IFloat *)site_v2,
-                         (IFloat *)v2+vec_plus_mu_offset, FsiteSize(), mu) ;
-            v1_plus_mu = site_v1 ;
-            v2_plus_mu = site_v2 ;
-            if (GJP.TnodeBc()==BND_CND_APRD) coeff = -coeff ;
-          } else {
-            v1_plus_mu = (Float *)v1+vec_plus_mu_offset ;
-            v2_plus_mu = (Float *)v2+vec_plus_mu_offset ;
-          }
-      } // end (the evil) mu switch 
-
-      Matrix tmp_mat1, tmp_mat2;  
-
-// ( 1 - gamma_\mu ) Tr_s [ v1(x+\mu) v2^{\dagger}(x) ]           
-      sproj_tr[mu](   (IFloat *)&tmp_mat1,   	// output color matrix
-                      (IFloat *)v1_plus_mu,		// row vector, NOT conjugated
-                      (IFloat *)v2+vec_offset, 	// col vector, IS conjugated
-                      1, 0, 0);				// 1 block, 0 strides
-
-// (1 + gamma_\mu)  Tr_s [ v2(x+\mu) v1^{\dagger}(x) ]
-      sproj_tr[mu+4]( (IFloat *)&tmp_mat2,		// output color matrix
-                      (IFloat *)v2_plus_mu,		// row vector, NOT conjugated
-                      (IFloat *)v1+vec_offset, 	// col vector, IS conjugated
-                      1, 0, 0);				// 1 block, 0 strides
-
-      // exactly what this sounds like
-      tmp_mat1 += tmp_mat2 ;
-            
-      // multiply sum by the link in the \mu direction
-      tmp_mat2.DotMEqual(*(gauge+gauge_offset), tmp_mat1) ;
-      
-      // take tracless antihermitian piece
-      // TrLessAntiHermMatrix need to be passed
-      // the dagger of the matrix in question
-      tmp_mat1.Dagger(tmp_mat2) ;
-      tmp_mat2.TrLessAntiHermMatrix(tmp_mat1) ;
-
-      tmp_mat2 *= coeff ;
-            
-//~~
-//~~ fermion version:  	(mom+gauge_offset) += f
-//~~ boson version:  	(mom+gauge_offset) -= f
-//~~
-      *(mom+gauge_offset) -= tmp_mat2 ;
-
-	 Float norm = tmp_mat2.norm();
-	 Float tmp = sqrt(norm);
-	 L1 += tmp;
-	 L2 += norm;
-	 Linf = (tmp>Linf ? tmp : Linf);
-	 
+        //~~
+        //~~ fermion version:  	wilson.CalcHmdForceVecs(chi)
+        //~~ boson version:  	wilson.CalcBsnForceVecs(chi, eta)
+        //~~
+        // chi <- (M_f^\dag M_f)^{-1} M_f^\dag (RGV)
+        // phi <- M_b (M_b^\dag M_b)^{-1} M_f^\dag (RGV)
+        wilson.CalcBsnForceVecs(chi, eta) ;
     }
-  }
 
-//------------------------------------------------------------------
-// deallocate space for two CANONICAL fermion fields on a site.
-//------------------------------------------------------------------
-  VRB.Sfree(cname, fname, str_site_v2, site_v2) ;
-  sfree(site_v2) ;
+    this->BondCond();
+    FforceWilsonType cal_force(mom, this->GaugeField(),
+                               (Float *)v2, (Float *)v1, 1, -2.0 * dt);
+    ForceArg ret = cal_force.run();
+    this->BondCond();
 
-  VRB.Sfree(cname, fname, str_site_v1, site_v1) ;
-  sfree(site_v1) ;
-
-//------------------------------------------------------------------
-// deallocate space for two CANONICAL fermion fields.
-//------------------------------------------------------------------
-  VRB.Sfree(cname, fname, str_v2, v2) ;
-  sfree(v2) ;
-
-  VRB.Sfree(cname, fname, str_v1, v1) ;
-  sfree(v1) ;
-
-  glb_sum(&L1);
-  glb_sum(&L2);
-  glb_max(&Linf);
-
-  L1 /= 4.0*GJP.VolSites();
-  L2 /= 4.0*GJP.VolSites();
-#endif
-
-  VRB.FuncEnd(cname,fname);
-  return ForceArg(L1, sqrt(L2), Linf);
+    sfree(cname, fname, "v1", v1);
+    sfree(cname, fname, "v2", v2);
+    return ret;
 }
-
 
 //------------------------------------------------------------------
 // ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,

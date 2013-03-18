@@ -38,10 +38,11 @@ public:
         Linf = Linf > a.Linf ? Linf : a.Linf;
     }
 
-    void unitarize(int links) {
-        L1 /= links;
-        L2 = std::sqrt(L2 / links);
-    }
+    void glb_reduce();
+
+    // measure the L1/L2/Linf norm, mom is an array of momenta defined
+    // on each link.
+    void measure(const Matrix mom[]);
     void print(Float dt, char *label)const;
 };
 

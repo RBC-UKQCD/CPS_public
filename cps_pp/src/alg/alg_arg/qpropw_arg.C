@@ -31,6 +31,7 @@ struct vml_enum_map SourceType_map[] = {
 	{"SourceType","SUM_MOM",SUM_MOM},
 	{"SourceType","FL_FUNC",FL_FUNC},
 	{"SourceType","MOM",MOM},
+	{"SourceType","BOX_4D",BOX_4D},
 	{NULL,NULL,0}
 };
 
@@ -202,6 +203,42 @@ vml_QPropWBoxArg (VML *vmls, char *name,QPropWBoxArg *objp)
 	 if (!vml_int (vmls, "box_end", &objp->box_end))
 		 return FALSE;
 	 vml_class_end(vmls,"QPropWBoxArg",name);
+	return TRUE;
+}
+	 bool QPropW4DBoxArg::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool QPropW4DBoxArg::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool QPropW4DBoxArg::Vml(VML *vmls,char *instance){
+		 if(!vml_QPropW4DBoxArg(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_QPropW4DBoxArg (VML *vmls, char *name,QPropW4DBoxArg *objp)
+{
+	 vml_class_begin(vmls,"QPropW4DBoxArg",name);
+	int i;
+	 if (!vml_vector (vmls, "box_start", (char *)objp->box_start, 4,
+		sizeof (int), (vmlproc_t) vml_int))
+		 return FALSE;
+	 if (!vml_vector (vmls, "box_size", (char *)objp->box_size, 4,
+		sizeof (int), (vmlproc_t) vml_int))
+		 return FALSE;
+	 if (!vml_vector (vmls, "mom", (char *)objp->mom, 4,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 vml_class_end(vmls,"QPropW4DBoxArg",name);
 	return TRUE;
 }
 	 bool QPropWRandArg::Encode(char *filename,char *instance){

@@ -1,5 +1,5 @@
 # CPS makefile
-# $Id: Makefile.in,v 1.36 2012-08-13 19:25:45 chulwoo Exp $
+# $Id: Makefile.in,v 1.37 2013-03-18 19:33:13 chulwoo Exp $
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
@@ -33,14 +33,14 @@ clean: recurse
 
 buildlib: recurse
 
-recurse:
+recurse: vml
 	@echo CONCUR = $(CONCUR)
 	mkdir -p $(BUILDDIR)/objs
 	touch -a $(BUILDDIR)/objs/Makefile_depend
 	cp -p $(SRCDIR)/src/Makefile $(BUILDDIR)/objs
 	$(MAKE) -C $(BUILDDIR)/objs CONCUR=yes $(filter-out test, $(MAKECMDGOALS))
 
-vml:
+vml: rpcgenvml
 	-cp $(BUILDDIR)/include/input/Makefile ${SRCDIR}/include/input
 	$(MAKE) -C $(SRCDIR)/include/input
 

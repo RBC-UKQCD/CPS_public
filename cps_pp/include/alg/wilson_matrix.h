@@ -1,3 +1,4 @@
+// -*- mode:c++;c-basic-offset:4 -*-
 //------------------------------------------------------------------
 //
 // wilson_matrix.h
@@ -95,7 +96,11 @@ public:
   ~WilsonVector() {}
 
   void Zero()
-	{ for(int s1=0;s1<4;s1++) for(int c1=0;c1<3;c1++) d[s1].c[c1] = 0.0; }
+    {
+        for(int s1=0;s1<4;s1++)
+            for(int c1=0;c1<3;c1++)
+                d[s1].c[c1] = 0.0;
+    }
 
   WilsonVector& operator+=(WilsonVector& rhs) {
     for(int s1=0;s1<4;s1++) for(int c1=0; c1<3;c1++)
@@ -238,21 +243,69 @@ typedef struct { color_wilson_vector d[4]; } wilson_matrix;
        \end{tabular}\right)
        \f]
 */
-class WilsonMatrix {
+class WilsonMatrix;
 
+// single precision WilsonMatrix, only a container to save memory.
+class WilsonMatrixS
+{
+public:
+    WilsonMatrixS() {}
+    WilsonMatrixS(const WilsonMatrix &w);
+    const WilsonMatrixS &operator=(const WilsonMatrix &w);
+
+    float a[288];
+};
+
+class WilsonMatrix
+{
+private:
+    static const char *cname;
   wilson_matrix p;
   
 public:
-  
+    WilsonMatrix() {}
 
-  WilsonMatrix();
-  WilsonMatrix(const WilsonMatrix& rhs);
-  WilsonMatrix(const wilson_matrix& rhs);
+    // no need to redefine copy constructor.
+    // WilsonMatrix(const WilsonMatrix& rhs);
+  
+    WilsonMatrix(const wilson_matrix& rhs) {
+        p = rhs;
+    }
+
   WilsonMatrix(const Float& rhs);
+
   WilsonMatrix(const Rcomplex& rhs);
+
   WilsonMatrix(int sink_spin, int sink_color, const wilson_vector&);
+
   WilsonMatrix(int sink_spin, int sink_color, int source_spin, 
                int source_color, const Rcomplex&);
+
+    // added by Hantao
+    WilsonMatrix(const WilsonMatrixS &ws) {
+        for(int i = 0; i < 144; ++i) {
+            int j = i;
+            int c2 = j % 3; j /= 3;
+            int s2 = j % 4; j /= 4;
+            int c1 = j % 3; j /= 3;
+            int s1 = j % 4;
+
+            p.d[s1].c[c1].d[s2].c[c2] = Complex(ws.a[2*i], ws.a[2*i+1]);
+        }
+    }
+
+    const WilsonMatrix &operator=(const WilsonMatrixS &ws) {
+        for(int i = 0; i < 144; ++i) {
+            int j = i;
+            int c2 = j % 3; j /= 3;
+            int s2 = j % 4; j /= 4;
+            int c1 = j % 3; j /= 3;
+            int s1 = j % 4;
+
+            p.d[s1].c[c1].d[s2].c[c2] = Complex(ws.a[2*i], ws.a[2*i+1]);
+        }
+        return *this;
+    }
 
   // Access to elements 
 
@@ -292,19 +345,23 @@ public:
   //! mult the prop by gamma_dir on the left
   WilsonMatrix& gl(int dir); 
   //! mult the prop by gamma_dir*(1-gamma_5) on the left, and return the new matrix
-  WilsonMatrix glL(int dir);
+    WilsonMatrix glL(int dir)const;
   //! mult the prop by gamma_dir*(1+gamma_5) on the left, and return the new matrix
-  WilsonMatrix glR(int dir);
+    WilsonMatrix glR(int dir)const;
 
   //! mult the prop by gamma_dir*gamma_5 on the left, and return the new matrix
-  WilsonMatrix glA(int dir);
+    WilsonMatrix glA(int dir)const;
   //! glA another version. result = gamma_dir*gamma_5*from
-  void glA(const WilsonMatrix & from, int dir);
+    WilsonMatrix& glA(const WilsonMatrix & from, int dir);
   //! mult the prop by gamma_dir on the left, and return the new matrix
-  WilsonMatrix glV(int dir);
+    WilsonMatrix glV(int dir)const;
   //! glV another version. result = gamma_dir*from
-  void glV(const WilsonMatrix & from, int dir);
+    WilsonMatrix& glV(const WilsonMatrix & from, int dir);
 
+    //! mult the prop by gamma_dir*gamma_5 on the left
+    WilsonMatrix& grA(const WilsonMatrix & from, int dir);
+    //! mult the prop by gamma_dir on the left
+    WilsonMatrix& grV(const WilsonMatrix & from, int dir);
 
   //! mult the prop by gamma_dir on the left
   WilsonMatrix& gr(int dir); 
@@ -319,7 +376,15 @@ public:
   wilson_vector& sol(int source_spin, int source_color); 
 
   void load_vec(int sink_spin, int sink_color, const wilson_vector&);
-  void load_row(int source_spin, int source_color, const wilson_vector&);
+    void load_row(int source_spin, int source_color, const wilson_vector&rhs)
+    {
+        for(int s1 = 0; s1 < 4; ++s1) {
+            for(int c1 = 0; c1 < 3; ++c1) {
+                p.d[s1].c[c1].d[source_spin].c[source_color]
+                    = rhs.d[s1].c[c1];
+            }
+        }
+    }
   void save_row(int source_spin, int source_color, wilson_vector&);
   Rcomplex Trace();
   const wilson_matrix& wmat() const; // get p 
@@ -337,8 +402,12 @@ public:
   
   // operator functions
 
-  WilsonMatrix& operator= (const WilsonMatrix& rhs);
-  WilsonMatrix& operator= (const wilson_matrix& rhs);
+    // another "equal" operator for WilsonMatrix
+    WilsonMatrix& operator= (const wilson_matrix& rhs) {
+        p=rhs;
+        return *this;
+    }
+
   WilsonMatrix& operator= (const Float& rhs);
   WilsonMatrix& operator+=(const WilsonMatrix& rhs);
   WilsonMatrix& operator-=(const WilsonMatrix& rhs);
@@ -365,7 +434,45 @@ public:
   
   friend Rcomplex Trace(const WilsonMatrix& p1, const WilsonMatrix& p2);
   
+    SpinMatrix ColorComponent(int row, int col)const {
+        SpinMatrix ret;
+        for(int i = 0; i < 4; ++i) {
+            for(int j = 0; j < 4; ++j) {
+                ret(i, j) = p.d[i].c[row].d[j].c[col];
+            }
+        }
+        return ret;
+    }
 };
+
+// added by Hantao
+inline WilsonMatrixS::WilsonMatrixS(const WilsonMatrix &w) {
+    for(int i = 0; i < 144; ++i) {
+        int j = i;
+        int c2 = j % 3; j /= 3;
+        int s2 = j % 4; j /= 4;
+        int c1 = j % 3; j /= 3;
+        int s1 = j % 4;
+        
+        a[2*i  ] = std::real(w(s1, c1, s2, c2));
+        a[2*i+1] = std::imag(w(s1, c1, s2, c2));
+    }
+}
+
+inline const WilsonMatrixS &WilsonMatrixS::operator=(const WilsonMatrix &w) {
+    for(int i = 0; i < 144; ++i) {
+        int j = i;
+        int c2 = j % 3; j /= 3;
+        int s2 = j % 4; j /= 4;
+        int c1 = j % 3; j /= 3;
+        int s1 = j % 4;
+        
+        a[2*i  ] = std::real(w(s1, c1, s2, c2));
+        a[2*i+1] = std::imag(w(s1, c1, s2, c2));
+    }
+    return *this;
+}
+
 
 WilsonMatrix& eq_mult( WilsonMatrix& xmat,
 		       const WilsonMatrix& amat,
