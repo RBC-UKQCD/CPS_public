@@ -1,21 +1,20 @@
-
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprRect class.
 
-  $Id: g_impr_rect.C,v 1.12 2008-09-18 15:23:17 chulwoo Exp $
+  $Id: g_impr_rect.C,v 1.13 2013-03-18 19:33:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-09-18 15:23:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.12 2008-09-18 15:23:17 chulwoo Exp $
-//  $Id: g_impr_rect.C,v 1.12 2008-09-18 15:23:17 chulwoo Exp $
+//  $Date: 2013-03-18 19:33:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v 1.13 2013-03-18 19:33:14 chulwoo Exp $
+//  $Id: g_impr_rect.C,v 1.13 2013-03-18 19:33:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/g_impr_rect/g_impr_rect.C,v $
 //  $State: Exp $
 //
@@ -40,34 +39,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 #endif
 
-
-//------------------------------------------------------------------------------
 enum { MATRIX_SIZE = 18 };
-
-
-//------------------------------------------------------------------------------
-// static variables used only inside this file
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-//  CRAM temp buffer
-//------------------------------------------------------------------------------
-#ifdef _TARTAN
-static Matrix *mp0 = (Matrix *)CRAM_SCRATCH_ADDR;	// ihdot
-static Matrix *mp1 = mp0 + 1;
-static Matrix *mp2 = mp1 + 1;
-//static Matrix *mp3 = mp2 + 1;
-#else
-static Matrix mt0;
-static Matrix mt1;
-static Matrix mt2;
-//static Matrix mt3;
-static Matrix *mp0 = &mt0;		// ihdot
-static Matrix *mp1 = &mt1;
-static Matrix *mp2 = &mt2;
-//static Matrix *mp3 = &mt3;
-#endif 
-
 
 //------------------------------------------------------------------------------
 // Constructor
@@ -79,16 +51,14 @@ GimprRect::GimprRect()
   VRB.Func(cname,fname);
 
 // This action cannot be used with anisotropic lattices
-  if(GJP.XiBare()!=1)
-    {
+  if(GJP.XiBare()!=1) {
       VRB.Warn(cname,fname,"Anisotropic version not implemented\n") ;
       exit(-1) ;
-    }
+  }
 
   plaq_coeff = - GJP.Beta() * ( 1.0 - 8.0 * GJP.C1() ) / 3.0 ;
   rect_coeff = - GJP.Beta() * (             GJP.C1() ) / 3.0 ;
 }
-
 
 //------------------------------------------------------------------------------
 // Destructor
@@ -117,60 +87,60 @@ unsigned GimprRect::CBUF_MODE4 = 0xcca52112;
 //------------------------------------------------------------------------------
 void GimprRect::GforceSite(Matrix& force, int *x, int mu)
 {
-  char *fname = "GforceSite(M&,i*,i)";
-//  VRB.Func(cname,fname);
-
-  Float tmp ;
-
+  const char *fname = "GforceSite(M&,i*,i)";
   setCbufCntrlReg(4, CBUF_MODE4);
 
   Matrix *u_off = GaugeField()+GsiteOffset(x)+mu;
 
+  Matrix mt1;
   //----------------------------------------------------------------------------
   //  get staple
-  //     mp1 = staple
+  //     mt1 = staple
   //----------------------------------------------------------------------------
-  Staple(*mp1, x, mu);	
+  Staple(mt1, x, mu);	
   ForceFlops += 198*3*3+12+216*3;
 
   //----------------------------------------------------------------------------
-  // mp2 = U_mu(x)
+  // mt2 = U_mu(x)
   //----------------------------------------------------------------------------
-  moveMem((IFloat *)mp2, (IFloat *)u_off,
-          MATRIX_SIZE*sizeof(IFloat)) ;
+  Matrix mt2(*u_off);
+  // moveMem((IFloat *)mp2, (IFloat *)u_off, MATRIX_SIZE * sizeof(IFloat)) ;
 
   //----------------------------------------------------------------------------
   // force = -(beta*(1-8*c_1)/3)*U_mu(x)*stap
   //----------------------------------------------------------------------------
-  mDotMEqual((IFloat *)&force, (const IFloat *)mp2, (const IFloat *)mp1);
-
-  tmp = plaq_coeff ;
-  vecTimesEquFloat((IFloat *)&force, tmp, MATRIX_SIZE);
+  force.DotMEqual(mt2, mt1);
+  force *= plaq_coeff;
+  // mDotMEqual((IFloat *)&force, (const IFloat *)mp2, (const IFloat *)mp1);
+  // tmp = plaq_coeff ;
+  // vecTimesEquFloat((IFloat *)&force, tmp, MATRIX_SIZE);
 
   //----------------------------------------------------------------------------
   //  get rectangle staple
-  //     mp1 = rect_stap
+  //     mt1 = rect_stap
   //----------------------------------------------------------------------------
-  RectStaple(*mp1, x, mu) ;
+  RectStaple(mt1, x, mu);
   ForceFlops += 198*3*18+216*3*6;
 
   //----------------------------------------------------------------------------
-  // mp2 = -(beta*c_1/3)*U_mu(x)
+  // mt2 = -(beta*c_1/3)*U_mu(x)
   //----------------------------------------------------------------------------
-  moveMem((IFloat *)mp2, (IFloat *)u_off,
-          MATRIX_SIZE*sizeof(IFloat));
+  // mt2 = *u_off;
+  // moveMem((IFloat *)mp2, (IFloat *)u_off, MATRIX_SIZE*sizeof(IFloat));
 
-  tmp = rect_coeff ;
-  vecTimesEquFloat((IFloat *)mp2, tmp, MATRIX_SIZE) ;
+  mt2 *= rect_coeff;
+  // tmp = rect_coeff;
+  // vecTimesEquFloat((IFloat *)mp2, tmp, MATRIX_SIZE) ;
   ForceFlops +=234;
 
   //----------------------------------------------------------------------------
   // force += -(beta*c_1/3)*U_mu(x)*rect_stap
   //----------------------------------------------------------------------------
-  mDotMPlus((IFloat *)&force, (const IFloat *)mp2, (const IFloat *)mp1);
+  force.DotMPlus(mt2, mt1); 
+  // mDotMPlus((IFloat *)&force, (const IFloat *)mp2, (const IFloat *)mp1);
 
-  mp1->Dagger((IFloat *)&force);
-  force.TrLessAntiHermMatrix(*mp1);
+  mt1.Dagger(force);
+  force.TrLessAntiHermMatrix(mt1);
   ForceFlops +=198+24;
 }
 
@@ -203,27 +173,33 @@ void GimprRect::GactionGradient(Matrix &grad, int *x, int mu)
   //----------------------------------------------------------------------------
   // get plaq_staple
   //----------------------------------------------------------------------------
-  Staple(*mp1, x, mu) ;
+  Matrix mt1;
+  Staple(mt1, x, mu) ;
 
   //----------------------------------------------------------------------------
   // grad = (-beta*(1-8*c_1)/3) * plaq_staple
   //----------------------------------------------------------------------------
-  vecTimesEquFloat((IFloat *)&grad, plaq_coeff, MATRIX_SIZE) ;
+
+  // Something missing here?
+  grad *= plaq_coeff;
+  // vecTimesEquFloat((IFloat *)&grad, plaq_coeff, MATRIX_SIZE) ;
 
   //----------------------------------------------------------------------------
   // get rect_staple
   //----------------------------------------------------------------------------
-  RectStaple(*mp1, x, mu) ;
+  RectStaple(mt1, x, mu) ;
+  mt1 *= rect_coeff;
 
   //----------------------------------------------------------------------------
   // mp1 = (-beta*c_1/3) * rect_staple
   //----------------------------------------------------------------------------
-  vecTimesEquFloat((IFloat *)mp1, rect_coeff, MATRIX_SIZE) ;
+  // vecTimesEquFloat((IFloat *)mp1, rect_coeff, MATRIX_SIZE) ;
 
   //----------------------------------------------------------------------------
   // grad = (-beta*(1-8*c_1)/3)*plaq_staple + (-beta*c_1/3)*rect_staple
   //----------------------------------------------------------------------------
-  vecAddEquVec((IFloat *)&grad, (const IFloat *)mp1, MATRIX_SIZE) ;
+  grad += mt1;
+  // vecAddEquVec((IFloat *)&grad, (const IFloat *)mp1, MATRIX_SIZE) ;
 }
 
 

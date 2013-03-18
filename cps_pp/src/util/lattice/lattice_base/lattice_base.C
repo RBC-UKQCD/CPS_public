@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.68 2012-08-15 03:45:46 chulwoo Exp $
+  $Id: lattice_base.C,v 1.69 2013-03-18 19:33:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-15 03:45:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.68 2012-08-15 03:45:46 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.68 2012-08-15 03:45:46 chulwoo Exp $
+//  $Date: 2013-03-18 19:33:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.69 2013-03-18 19:33:14 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.69 2013-03-18 19:33:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.68 $
+//  $Revision: 1.69 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -2982,5 +2982,49 @@ unsigned long Lattice::GsiteOffset(const int *x, const int dir) const{
   return index;
 }
 
+
+inline void compute_coord(int x[4], const int hl[4], const int low[4], int i)
+{
+    x[0] = i % hl[0] + low[0]; i /= hl[0];
+    x[1] = i % hl[1] + low[1]; i /= hl[1];
+    x[2] = i % hl[2] + low[2]; i /= hl[2];
+    x[3] = i % hl[3] + low[3];
+}
+
+// ----------------------------------------------------------------
+// BondCond: toggle boundary condition on/off for gauge field. Based
+// on code from src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C
+//
+// The gauge field must be in CANONICAL order.
+// ----------------------------------------------------------------
+void Lattice::BondCond()
+{
+    Matrix *u_base = this->GaugeField();
+
+    for(int mu = 0; mu < 4; ++mu) {
+        if(GJP.NodeBc(mu) != BND_CND_APRD) continue;
+
+        int low[4] = { 0, 0, 0, 0 };
+        int high[4] = { GJP.XnodeSites(), GJP.YnodeSites(),
+                        GJP.ZnodeSites(), GJP.TnodeSites() };
+        low[mu] = high[mu] - 1;
+
+        int hl[4] = { high[0] - low[0], high[1] - low[1],
+                      high[2] - low[2], high[3] - low[3] };
+
+        const int hl_sites = hl[0] * hl[1] * hl[2] * hl[3];
+
+#pragma omp parallel for
+        for(int i = 0; i < hl_sites; ++i) {
+            int x[4];
+            compute_coord(x, hl, low, i);
+
+            int off = mu + 4 * (x[0] + high[0] *
+                                (x[1] + high[1] *
+                                 (x[2] + high[2] * x[3])));
+            u_base[off] *= -1.;
+        }
+    }
+}
 
 CPS_END_NAMESPACE

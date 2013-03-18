@@ -93,4 +93,33 @@ vml_ParamArray (VML *vmls, char *name,ParamArray *objp)
 	 vml_class_end(vmls,"ParamArray",name);
 	return TRUE;
 }
+	 bool IntArray::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool IntArray::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool IntArray::Vml(VML *vmls,char *instance){
+		 if(!vml_IntArray(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_IntArray (VML *vmls, char *name,IntArray *objp)
+{
+	 vml_class_begin(vmls,"IntArray",name);
+	 if (!vml_array (vmls, "v", (char **)&objp->v.v_val, (u_int *) &objp->v.v_len, ~0,
+		sizeof (int), (vmlproc_t) vml_int))
+		 return FALSE;
+	 vml_class_end(vmls,"IntArray",name);
+	return TRUE;
+}
 CPS_END_NAMESPACE

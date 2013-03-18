@@ -8,15 +8,15 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.63 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: lattice.h,v 1.64 2013-03-18 19:33:13 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2012-08-10 14:05:33 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.63 2012-08-10 14:05:33 chulwoo Exp $
-  $Id: lattice.h,v 1.63 2012-08-10 14:05:33 chulwoo Exp $
+  $Date: 2013-03-18 19:33:13 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.64 2013-03-18 19:33:13 chulwoo Exp $
+  $Id: lattice.h,v 1.64 2013-03-18 19:33:13 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.63 $
+  $Revision: 1.64 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -1137,6 +1137,12 @@ class Lattice
         f_arg.L2 += a2;
         f_arg.Linf = f_arg.Linf > a ? f_arg.Linf : a;
     }
+
+    //!< Toggle boundary condition
+    //
+    //!< Note: Agent classes which needs to import gauge field to
+    //!external libraries need to overwrite this function.
+    virtual void BondCond();
 };
 
 //------------------------------------------------------------------

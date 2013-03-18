@@ -31,6 +31,7 @@ enum SourceType {
 	SUM_MOM = 14,
 	FL_FUNC = 15,
 	MOM = 16,
+	BOX_4D = 17,
 };
 typedef enum SourceType SourceType;
 extern struct vml_enum_map SourceType_map[];
@@ -106,6 +107,18 @@ public:
 };
 
 class VML;
+class QPropW4DBoxArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	int box_start[4];
+	int box_size[4];
+	Float mom[4];
+	   QPropW4DBoxArg (  ) ;
+};
+
+class VML;
 class QPropWRandArg {
 public:
 	 bool Encode(char *filename,char *instance);
@@ -168,6 +181,7 @@ extern  bool_t vml_QPropWArg (VML *, char *instance, QPropWArg*);
 extern  bool_t vml_QPropWGFArg (VML *, char *instance, QPropWGFArg*);
 extern  bool_t vml_QPropWPointArg (VML *, char *instance, QPropWPointArg*);
 extern  bool_t vml_QPropWBoxArg (VML *, char *instance, QPropWBoxArg*);
+extern  bool_t vml_QPropW4DBoxArg (VML *, char *instance, QPropW4DBoxArg*);
 extern  bool_t vml_QPropWRandArg (VML *, char *instance, QPropWRandArg*);
 extern  bool_t vml_QPropWSlabArg (VML *, char *instance, QPropWSlabArg*);
 extern  bool_t vml_QPropWExpArg (VML *, char *instance, QPropWExpArg*);
@@ -180,6 +194,7 @@ extern  bool_t vml_QPropWArg (VML *, char *instance, QPropWArg*);
 extern  bool_t vml_QPropWGFArg (VML *, char *instance, QPropWGFArg*);
 extern  bool_t vml_QPropWPointArg (VML *, char *instance, QPropWPointArg*);
 extern  bool_t vml_QPropWBoxArg (VML *, char *instance, QPropWBoxArg*);
+extern  bool_t vml_QPropW4DBoxArg (VML *, char *instance, QPropW4DBoxArg*);
 extern  bool_t vml_QPropWRandArg (VML *, char *instance, QPropWRandArg*);
 extern  bool_t vml_QPropWSlabArg (VML *, char *instance, QPropWSlabArg*);
 extern  bool_t vml_QPropWExpArg (VML *, char *instance, QPropWExpArg*);

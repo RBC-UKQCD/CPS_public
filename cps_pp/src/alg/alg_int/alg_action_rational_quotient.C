@@ -450,33 +450,18 @@ void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
 
     //!< Monitor total force contribution
     if (force_measure == FORCE_MEASURE_YES) {
-      Float L1 = 0.0;
-      Float L2 = 0.0;
-      Float Linf = 0.0;
-      for (int k=0; k<g_size/18; k++) {
-        Float norm = (mom_tmp + k)->norm();
-        Float tmp = sqrt(norm);
-        L1 += tmp;
-        L2 += norm;
-        Linf = (tmp>Linf ? tmp : Linf);
-      }
-      glb_sum(&L1);
-      glb_sum(&L2);
-      glb_max(&Linf);
+        Fdt.measure(mom_tmp);
+        Fdt.glb_reduce();
 
-      L1 /= 4.0*GJP.VolSites();
-      L2 /= 4.0*GJP.VolSites();	 
+        ((Vector *)force)->VecAddEquVec((Vector *)mom_tmp, g_size);
 
-      ((Vector *)force)->VecAddEquVec((Vector *)mom_tmp, g_size);
+        char label[200];
+        sprintf(label, "%s (total), mass = (%e,%e):", 
+                force_label, frm_mass[i], bsn_mass[i]);
 
-      char label[200];
-      sprintf(label, "%s (total), mass = (%e,%e):", 
-              force_label, frm_mass[i], bsn_mass[i]);
+        Fdt.print(dt_ratio, label);
 
-      Fdt = ForceArg(L1, sqrt(L2), Linf);
-      Fdt.print(dt_ratio, label);
-
-      sfree(mom_tmp, "mom_tmp", fname, cname);
+        sfree(mom_tmp, "mom_tmp", fname, cname);
     }
   }
   LatticeFactory::Destroy();
@@ -556,9 +541,9 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
 
       //!< Now construct additional vectors needed
       for (int j=0; j<bsn_deg; j++) {
-        Float one=1.;
-        frmn[j+shift+bsn_deg] -> 
-          FTimesV1PlusV2(one, frmn[j], frmn[j+shift], f_size);
+          Float one=1.;
+          frmn[j+shift+bsn_deg] -> 
+              FTimesV1PlusV2(one, frmn[j], frmn[j+shift], f_size);
       }
 
       //!< Copy over required residues and setup pointers for bosonic force
@@ -606,35 +591,18 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
 
       //!< Monitor total force contribution
       if (force_measure == FORCE_MEASURE_YES) {
-        Float L1 = 0.0;
-        Float L2 = 0.0;
-        Float Linf = 0.0;
-        for (int k=0; k<g_size/18; k++) {
-          Float norm = (mom_tmp+k)->norm();
-          Float tmp = sqrt(norm);
-          L1 += tmp;
-          L2 += norm;
-          Linf = (tmp>Linf ? tmp : Linf);
-        }
-        glb_sum(&L1);
-        glb_sum(&L2);
-        glb_max(&Linf);
+          Fdt.measure(mom_tmp);
+          Fdt.glb_reduce();
 
-        L1 /= 4.0*GJP.VolSites();
-        L2 /= 4.0*GJP.VolSites();	 
+          fTimesV1PlusV2((IFloat*)mom,1.0,(IFloat*)mom_tmp,(IFloat*)mom,g_size);
+          sfree(mom_tmp);
 
-        fTimesV1PlusV2((IFloat*)mom,1.0,(IFloat*)mom_tmp,(IFloat*)mom,g_size);
-        sfree(mom_tmp);
-
-        char label[200];
-        sprintf(label, "%s (total), mass = (%e,%e):", 
-                force_label, frm_mass[i], bsn_mass[i]);
-
-        Fdt = ForceArg(L1, sqrt(L2), Linf);
-        Fdt.print(dt, label);
-
+          char label[200];
+          sprintf(label, "%s (total), mass = (%e,%e):", 
+                  force_label, frm_mass[i], bsn_mass[i]);
+          
+          Fdt.print(dt, label);
       }
-
     }
 
     evolved = 1;

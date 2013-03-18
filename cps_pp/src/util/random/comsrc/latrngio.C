@@ -121,11 +121,11 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
 
 //#if TARGET == QCDOC  // when on QCDOC, only Parallel (direct IO) mode is used
-#if TARGET != BGQ
-  setParallel();
-#else
-  setSerial();
-#endif
+// #if 1
+//   setParallel();
+// #else
+//   setSerial();
+// #endif
   VRB.Result(cname,fname,"parIO()=%d\n",parIO());
 
   if(parIO()) {
@@ -386,12 +386,12 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
     if(! pario.store(output, (char*)ugran, size_rng_ints,
 		     sizeof(UGrandomGenerator), hd, intconv, 5,
 		     &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0]))
-      ERR.General(cname, fname, "Unloading failed\n");
-
+        ERR.General(cname, fname, "Unloading failed\n");
+    
     VRB.Flow(cname,fname,"Node %d - 5D: csum=%x, order_csum=%x\n",
 	       UniqueID(),csum[0],pos_dep_csum[0]);
-//    printf("Node %d - 5D: csum=%x, order_csum=%x\n",
-//	       UniqueID(),csum[0],pos_dep_csum[0]);
+    //    printf("Node %d - 5D: csum=%x, order_csum=%x\n",
+    //	       UniqueID(),csum[0],pos_dep_csum[0]);
 
 
 	streamoff total = (streamoff) size_rng_chars * (streamoff) rng_arg.VolSites() * 
@@ -399,19 +399,17 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
     hd.data_start +=  total;
  
     VRB.Flow(cname,fname,"Start Unloading 4-D RNGs\n");
-
+    
     if(! pario.store(output, (char*)ugran_4d, size_rng_ints, 
 		     sizeof(UGrandomGenerator), hd, intconv, 4,
 		     &csum[1], &pos_dep_csum[1], &RandSum[1], &Rand2Sum[1]))
-      ERR.General(cname, fname, "Unloading Failed\n");
-
+        ERR.General(cname, fname, "Unloading Failed\n");
+    
     VRB.Flow(cname,fname,"Node %d - 4D: csum=%x, order_csum=%x\n",
-	       UniqueID(),csum[1],pos_dep_csum[1]);
-//    printf("Node %d - 4D: csum=%x, order_csum=%x\n",
-//	       UniqueID(),csum[1],pos_dep_csum[1]);
-
-  }
-  else {
+             UniqueID(),csum[1],pos_dep_csum[1]);
+    //    printf("Node %d - 4D: csum=%x, order_csum=%x\n",
+    //	       UniqueID(),csum[1],pos_dep_csum[1]);
+  } else {
     VRB.Flow(cname,fname,"Start Unloading 5-D RNGs\n");
 
     SerialIO serio(rng_arg);

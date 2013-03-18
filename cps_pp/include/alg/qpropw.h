@@ -1,3 +1,4 @@
+// -*- mode: c++ -*-
 //------------------------------------------------------------------
 //
 // qpropw.h
@@ -252,9 +253,15 @@ public:
   /*! Returns the prop */
   WilsonMatrix& operator[](int i){ return prop[i]; }
 
+  /*! Returns the prop */
+  const WilsonMatrix& operator[](int i)const{ return prop[i]; }
+
   /*! Returns the midpoint prop */
   WilsonMatrix& operator()(int i){ return midprop[i]; }
   
+  /*! Returns the midpoint prop */
+  const WilsonMatrix& operator()(int i)const{ return midprop[i]; }
+
   // DESTRUCTORS
   virtual ~QPropW();
   int GFixedSrc() const { return qp_arg.gauge_fix_src; } 
@@ -365,7 +372,7 @@ public:
   // CONSTRUCTORS
   QPropWMomCosSrc(Lattice& lat, CommonArg* c_arg);
   QPropWMomCosSrc(const QPropWMomCosSrc& rhs);
-  QPropWMomCosSrc(Lattice& lat, QPropWArg* arg, int *p, CommonArg* c_arg);
+  QPropWMomCosSrc(Lattice& lat, QPropWArg* arg, const int *p, CommonArg* c_arg);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
   
@@ -381,7 +388,7 @@ public:
   // CONSTRUCTORS
   QPropWMomCosTwistSrc(Lattice& lat, CommonArg* c_arg);
   QPropWMomCosTwistSrc(const QPropWMomCosTwistSrc& rhs);
-  QPropWMomCosTwistSrc(Lattice& lat, QPropWArg* arg, int *p, CommonArg* c_arg);
+  QPropWMomCosTwistSrc(Lattice& lat, QPropWArg* arg, const int *p, CommonArg* c_arg);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
   
@@ -458,6 +465,30 @@ public:
   SourceType SrcType(){ return BOX; }
   int BoxSrcStart() const { return box_arg.box_start; } 
   int BoxSrcEnd()   const { return box_arg.box_end; }     
+};
+
+// Added by Hantao to handle 4D boxes (in fact it handles all uniform
+// point/wall/box sources as special cases).
+class QPropW4DBoxSrc : public QPropW
+{
+protected:
+    QPropW4DBoxArg box_arg;
+public:
+  
+    QPropW4DBoxSrc(Lattice& lat, QPropWArg* arg,
+                   QPropW4DBoxArg *b_arg, CommonArg* c_arg);
+  
+    void SetSource(FermionVectorTp& src, int spin, int color);
+
+    SourceType SrcType(){ return BOX_4D; }
+
+    int BoxSrcStart(int mu)const {
+        return box_arg.box_start[mu];
+    }
+
+    int BoxSrcSize(int mu)const {
+        return box_arg.box_size[mu];
+    }
 };
 
 class QPropWRand : public QPropW {

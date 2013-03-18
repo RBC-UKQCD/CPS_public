@@ -6,19 +6,19 @@
 /*! \file
   \brief  Generic parallel transport.
   
-  $Id: pt_mat.h,v 1.4 2012-08-15 03:45:46 chulwoo Exp $
+  $Id: pt_mat.h,v 1.5 2013-03-18 19:33:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-15 03:45:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v 1.4 2012-08-15 03:45:46 chulwoo Exp $
-//  $Id: pt_mat.h,v 1.4 2012-08-15 03:45:46 chulwoo Exp $
+//  $Date: 2013-03-18 19:33:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v 1.5 2013-03-18 19:33:13 chulwoo Exp $
+//  $Id: pt_mat.h,v 1.5 2013-03-18 19:33:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: pt_mat.h,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v $
 //  $State: Exp $
 //
@@ -232,16 +232,16 @@ namespace pt_generic {
 
         // 4. single threaded comm
         // If you fix the multi thread MPI problem on BG/Q you can do multithreaded comm here.
-        for(int dir = 0; dir < 4; ++dir) {
+        for(int mu = 0; mu < 4; ++mu) {
             // forwards                
-            if(total[2 * dir]) {
-                getPlusData((Float *)rcvbuf[2 * dir], (Float *)sndbuf[2 * dir],
-                            sizeof(Site) * total[2 * dir] / sizeof(Float), dir);
+            if(total[2 * mu]) {
+                getPlusData((Float *)rcvbuf[2 * mu], (Float *)sndbuf[2 * mu],
+                            sizeof(Site) * total[2 * mu] / sizeof(Float), mu);
             }
             // backwards
-            if(total[2 * dir + 1]) {
-                getMinusData((Float *)rcvbuf[2 * dir + 1], (Float *)sndbuf[2 * dir + 1],
-                             sizeof(Site) * total[2 * dir + 1] / sizeof(Float), dir);
+            if(total[2 * mu + 1]) {
+                getMinusData((Float *)rcvbuf[2 * mu + 1], (Float *)sndbuf[2 * mu + 1],
+                             sizeof(Site) * total[2 * mu + 1] / sizeof(Float), mu);
             }
         }
 

@@ -3,6 +3,7 @@
 #define INCLUDED_BFM_MIXED_SOLVER_HT_H
 
 #include <util/lattice/bfm_evo.h>
+#include <alg/enum_int.h>
 
 #include <chroma.h>
 #include <omp.h>
@@ -141,7 +142,11 @@ namespace mixed_cg {
     // max_cycle: the maximum number of restarts will be performed.
     inline int threaded_cg_mixed_MdagM(Fermion_t sol, Fermion_t src,
                                        bfm_evo<double> &bfm_d, bfm_evo<float> &bfm_f,
-                                       int max_cycle)
+                                       int max_cycle, cps::InverterType itype = cps::CG,
+                                       // the following parameters are for deflation
+                                       multi1d<Fermion_t[2]> *evec = NULL,
+                                       multi1d<float> *eval = NULL,
+                                       int N = 0)
     {
         int me = bfm_d.thread_barrier();
 
@@ -181,7 +186,22 @@ namespace mixed_cg {
             switch_comm(bfm_f, bfm_d);
 
             bfm_f.set_zero(sol_f);
-            iter += bfm_f.CGNE_prec_MdagM(sol_f, src_f);
+            switch(itype) {
+            case cps::CG:
+                if(evec && eval && N) {
+                    bfm_f.deflate(sol_f, src_f, evec, eval, N);
+                }
+                iter += bfm_f.CGNE_prec_MdagM(sol_f, src_f);
+                break;
+            case cps::EIGCG:
+                iter += bfm_f.Eig_CGNE_prec(sol_f, src_f);
+                break;
+            default:
+                if(bfm_f.isBoss() && !me) {
+                    printf("cg_mixed_MdagM: unsupported inverter type.\n");
+                }
+                exit(-1);
+            }
 
             switch_comm(bfm_d, bfm_f);
             threaded_convFermion(tv1_d, sol_f, bfm_d, bfm_f);
@@ -322,6 +342,62 @@ namespace mixed_cg {
 
         bfm_f.residual = frsd;
         return k + iter_s;
+    }
+    
+    inline int threaded_cg_mixed_M(Fermion_t sol[2], Fermion_t src[2],
+                                   bfm_evo<double> &bfm_d, bfm_evo<float> &bfm_f,
+                                   int max_cycle, cps::InverterType itype = cps::CG,
+                                   // the following parameters are for deflation
+                                   multi1d<Fermion_t[2]> *evec = NULL,
+                                   multi1d<float> *eval = NULL,
+                                   int N = 0)
+    {
+        int me = bfm_d.thread_barrier();
+        Fermion_t be = bfm_d.threadedAllocFermion();
+        Fermion_t bo = bfm_d.threadedAllocFermion();
+        Fermion_t ta = bfm_d.threadedAllocFermion(); 
+        Fermion_t tb = bfm_d.threadedAllocFermion(); 
+
+        double nsrc = bfm_d.norm(src[0]) + bfm_d.norm(src[1]);
+        if (bfm_d.isBoss() && !me ) {
+            printf("threaded_cg_mixed_M: source norm is %17.10e\n", nsrc);
+        }
+
+        // eo preconditioning
+        bfm_d.MooeeInv(src[Even], ta, DaggerNo);
+        bfm_d.Meo     (ta, tb, Odd, DaggerNo); // tb == Moe Mee^{-1} src[e]
+        bfm_d.axpy    (ta, tb, src[Odd], -1.0);
+        bfm_d.Mprec   (ta, bo, tb, DaggerYes); // bo = Mprec^dag (src[o] - Moe Mee^{-1} src[e])
+
+        int iter = threaded_cg_mixed_MdagM(sol[Odd], bo, bfm_d, bfm_f, max_cycle, itype, evec, eval, N);
+  
+        bfm_d.Meo(sol[Odd], ta, Even, DaggerNo);
+        bfm_d.axpy(tb, ta, src[Even], -1.0);
+        bfm_d.MooeeInv(tb, sol[Even], DaggerNo);
+  
+        double nsol = bfm_d.norm(sol[0]) + bfm_d.norm(sol[1]);
+
+        // compute final residual
+        Fermion_t tmp[2] = {be, bo};
+        bfm_d.Munprec(sol, tmp, ta, DaggerNo);
+
+        double ndiff = 0.;
+        for(int i = 0; i < 2; ++i) {
+            bfm_d.axpy(tb, tmp[i], src[i], -1.0);
+            ndiff += bfm_d.norm(tb);
+        }
+
+        if (bfm_d.isBoss() && !me ) {
+            printf("threaded_cg_mixed_M: unprec sol norm = %17.10e, residual = %17.10e\n",
+                   nsol, sqrt(ndiff / nsrc));
+        }
+  
+        bfm_d.threadedFreeFermion(be);
+        bfm_d.threadedFreeFermion(bo);
+        bfm_d.threadedFreeFermion(ta);
+        bfm_d.threadedFreeFermion(tb);
+
+        return iter;
     }
 }
 

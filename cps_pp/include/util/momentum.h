@@ -27,7 +27,7 @@ class ThreeMom
  public:
   ThreeMom() ;
 
-  ThreeMom(int *q) ;
+  ThreeMom(const int *q) ;
 
   ThreeMom(int q0,int q1,int q2) ;
 
@@ -58,7 +58,7 @@ class ThreeMomTwist : public ThreeMom
  public:
   ThreeMomTwist() ;
   
-  ThreeMomTwist(int *q) ;
+  ThreeMomTwist(const int *q) ;
   
   ThreeMomTwist(int q0,int q1,int q2) ;
   

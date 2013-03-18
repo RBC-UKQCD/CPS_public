@@ -18,19 +18,11 @@ CPS_START_NAMESPACE
 // The SpinMatrix class.
 //------------------------------------------------------------------
 
-SpinMatrix::SpinMatrix() {}
-
 //------------------------------------------------------------------
 SpinMatrix::SpinMatrix(IFloat c) { *this = c; }
 
-
 //------------------------------------------------------------------
 SpinMatrix::SpinMatrix(const Complex& c) { *this = c; }
-
-
-//------------------------------------------------------------------
-SpinMatrix::SpinMatrix(const SpinMatrix& m) { *this = m; }
-
 
 //------------------------------------------------------------------
 SpinMatrix& SpinMatrix::operator=(IFloat c) {
@@ -61,23 +53,6 @@ void SpinMatrix::UnitSpinMatrix(void) {
   p[2*(2+2*SPINS)] = 1.0;
   p[2*(3+3*SPINS)] = 1.0;
 }
-
-//------------------------------------------------------------------
-void SpinMatrix::ZeroSpinMatrix(void) {
-  IFloat *p = (IFloat*)u;
-
-  for(int i=0; i<2*SPINS*SPINS; i++) *p++ = 0.0;
-}
-
-//------------------------------------------------------------------
-Complex& SpinMatrix::operator()(int i, int j)
-{ return ((Complex*)u)[i*SPINS+j]; }
-
-
-//------------------------------------------------------------------
-const Complex& SpinMatrix::operator()(int i, int j) const
-{ return ((Complex*)u)[i*SPINS+j]; }
-
 
 //------------------------------------------------------------------
 Complex SpinMatrix::Tr() const

@@ -51,6 +51,18 @@ public:
 	} params;
 };
 
+class VML;
+class IntArray {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	struct {
+		u_int v_len;
+		int *v_val;
+	} v;
+};
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -61,11 +73,13 @@ extern "C" {
 extern  bool_t vml_FloatArray (VML *, char *instance, FloatArray*);
 extern  bool_t vml_ParamArg (VML *, char *instance, ParamArg*);
 extern  bool_t vml_ParamArray (VML *, char *instance, ParamArray*);
+extern  bool_t vml_IntArray (VML *, char *instance, IntArray*);
 
 #else /* K&R C */
 extern  bool_t vml_FloatArray (VML *, char *instance, FloatArray*);
 extern  bool_t vml_ParamArg (VML *, char *instance, ParamArg*);
 extern  bool_t vml_ParamArray (VML *, char *instance, ParamArray*);
+extern  bool_t vml_IntArray (VML *, char *instance, IntArray*);
 
 #endif /* K&R C */
 

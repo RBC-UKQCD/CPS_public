@@ -102,7 +102,7 @@ ThreeMom::ThreeMom()
   setZeroMomFlag() ;
 }
 
-ThreeMom::ThreeMom(int *q)
+ThreeMom::ThreeMom(const int *q)
 {
   CalcLatMom() ;
   p[0]=q[0] ;
@@ -139,7 +139,7 @@ ThreeMomTwist::ThreeMomTwist() : ThreeMom()
     pp[i]*=0.5;
 }
 
-ThreeMomTwist::ThreeMomTwist(int *q) : ThreeMom(q)
+ThreeMomTwist::ThreeMomTwist(const int *q) : ThreeMom(q)
 {
   for (int i=0 ; i<3 ; i++)
     pp[i]*=0.5;

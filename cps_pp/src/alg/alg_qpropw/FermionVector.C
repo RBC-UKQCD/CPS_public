@@ -14,6 +14,9 @@
 #include <comms/sysfunc_cps.h>
 #include <alg/fermion_vector.h>
 
+#include <cmath>
+#include <omp.h>
+
 CPS_START_NAMESPACE
 
 const Float& FermionVectorTp::operator[](int i) {
@@ -46,14 +49,14 @@ FermionVectorTp::~FermionVectorTp() {
 
 // Zero at every color,spin,space-time point
 void FermionVectorTp::ZeroSource() {
-
   char *fname = "ZeroSource()";
-  
   VRB.Func(cname, fname);
 
   int fv_size = GJP.VolNodeSites() * 2 * GJP.Colors() * 4;
-  for (int i=0; i<fv_size; i++)
+#pragma omp parallel for
+  for (int i=0; i<fv_size; i++) {
 	fv[i] = 0.0;
+  }
 }
 
 // Unit color/spin source at every space-time point
@@ -214,6 +217,92 @@ void FermionVectorTp::SetBoxSource(int color,
   VRB.Result(cname,fname,"src_vol = %d\n",src_vol);
 }
 
+inline void compute_coord(int x[4], const int hl[4], const int low[4], int i)
+{
+    x[0] = i % hl[0] + low[0]; i /= hl[0];
+    x[1] = i % hl[1] + low[1]; i /= hl[1];
+    x[2] = i % hl[2] + low[2]; i /= hl[2];
+    x[3] = i % hl[3] + low[3];
+}
+
+// Note: The following code sets a 4D box source. If you want to set a
+// 3D xyz box, set size[3] == 1 and glb_x[3] to the global time slice
+// you want.
+void FermionVectorTp::Set4DBoxSource(int color,
+                                     int spin,
+                                     const int start[4], // global starting location in x, y, z and t directions
+                                     const int size[4], // global size in x, y, z and t directions
+                                     const Float mom[4]) // momentum
+{
+    const char *fname = "Set4DBoxSource()";
+
+    if (color < 0 || color >= GJP.Colors())
+        ERR.General(cname, fname, "Color index out of range: color = %d\n", color);
+  
+    if (spin < 0 || spin > 3)
+        ERR.General(cname, fname, "Spin index out of range: spin = %d\n", spin);
+  
+    ZeroSource();
+
+    const int lcl[4] = {
+        GJP.XnodeSites(), GJP.YnodeSites(),
+        GJP.ZnodeSites(), GJP.TnodeSites(),
+    };
+
+    const int shift[4] = {
+        GJP.XnodeSites() * GJP.XnodeCoor(), GJP.YnodeSites() * GJP.YnodeCoor(),
+        GJP.ZnodeSites() * GJP.ZnodeCoor(), GJP.TnodeSites() * GJP.TnodeCoor(),
+    };
+
+    const int glb[4] = {
+        GJP.XnodeSites() * GJP.Xnodes(), GJP.YnodeSites() * GJP.Ynodes(),
+        GJP.ZnodeSites() * GJP.Znodes(), GJP.TnodeSites() * GJP.Tnodes(),
+    };
+
+    // need to check starting point
+    for(int mu = 0; mu < 4; ++mu) {
+        if(start[mu] >= 0 && start[mu] < glb[mu]) continue;
+        ERR.General(cname, fname, "Invalid starting point: start[%d] = %d", mu, start[mu]);
+    }
+
+    const int sites = lcl[0] * lcl[1] * lcl[2] * lcl[3];
+    // have to use Float since there is no CPS glb_sum() for int.
+    Float src_vol = 0;
+
+    VRB.Result(cname, fname, "mom = %.3e %.3e %.3e %.3e\n",
+               mom[0], mom[1], mom[2], mom[3]);
+
+#pragma omp parallel for reduction(+:src_vol)
+    for(int i = 0; i < sites; ++i) {
+        int glb_x[4];
+        compute_coord(glb_x, lcl, shift, i);
+
+        bool inbox = true;
+        for(int mu = 0; mu < 4; ++mu) {
+            if((glb_x[mu] + glb[mu] - start[mu]) % glb[mu] >= size[mu]) {
+                inbox = false;
+                break;
+            }
+        }
+
+        if(inbox) {
+            src_vol += 1;
+
+            const double PI = 3.1415926535897932384626433832795028842;
+            double alpha = 0.;
+            for(int mu = 0; mu < 4; ++mu) {
+                alpha += mom[mu] * 2.0 * PI * glb_x[mu] / glb[mu];
+            }
+
+            fv[i * SPINOR_SIZE + 2 * (color + COLORS * spin)    ] = std::cos(alpha);
+            fv[i * SPINOR_SIZE + 2 * (color + COLORS * spin) + 1] = std::sin(alpha);
+        }
+    }
+
+    glb_sum(&src_vol);
+    VRB.Result(cname, fname, "src_vol = %f\n", src_vol);
+}
+
 // Set source from previously defined source
 // Does not zero the rest of the  time slices
 void FermionVectorTp::SetWallSource(int color, int spin, int source_time, 
@@ -256,81 +345,40 @@ void FermionVectorTp::SetWallSource(int color, int spin, int source_time,
 }
 
 // COULOMB GAUGE ONLY!
-void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where) {
+void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where)
+{
+    char *fname = "GFWallSource()";
+    VRB.Func(cname, fname);
+    VRB.Result(cname,fname,"lat=%p spin=%d dir=%d  where=%d\n",&lat,spin,dir,where);
 
-  char *cname = "FermionVectorT";
-  char *fname = "GFWallSource()";
-  VRB.Func(cname, fname);
-  VRB.Result(cname,fname,"lat=%p spin=%d dir=%d  where=%d\n",&lat,spin,dir,where);
-
-  int len;     //the local (on processor) length in "dir" direction
-  //int nproc;   // total number of processors in d_ direction
-  int lproc;   // local processor coordinate in d_ direction
-               // 0 <= lproc <= nproc
- 
-  switch(dir) {
-    case 0:
-      len = GJP.XnodeSites();
-      //nproc = GJP.Xnodes();
-      lproc = GJP.XnodeCoor();
-      break;
-    case 1:
-      len = GJP.YnodeSites();
-      //nproc = GJP.Ynodes();
-      lproc = GJP.YnodeCoor();
-      break;
-    case 2:
-      len = GJP.ZnodeSites();
-      //nproc = GJP.Znodes();
-      lproc = GJP.ZnodeCoor();
-      break;
-    case 3:
-      len = GJP.TnodeSites();
-      //nproc = GJP.Tnodes();
-      lproc = GJP.TnodeCoor();
-      break;
-    // trap for wrong direction
-    //-----------------------------------------------------------
-    default:
-      {
-		len = lproc = 0 ; // Keep GCC happy!
-		ERR.General(cname, fname, "bad argument: dir = %d\n", dir);
-      }
-  }
-
-  Matrix **gm = lat.FixGaugePtr();
-
-  Vector temp;
-  Matrix tempmat;
-
-  // find out if this node overlaps with the hyperplane
-  // in which the wall source sits
-  int has_overlap = 0;
-  if (lproc * len <= where && where < (lproc + 1) * len)
-    has_overlap = 1;
- 
-  if (has_overlap) {
-    int local = where % len; // on processor coordinate of
-	VRB.Result(cname,fname,"gm=%p local=%d\n",gm,local);
-                             // source hyperplane
-    Matrix *pM = gm[local];
-
-    for (int z = 0; z < GJP.ZnodeSites(); z++)
-    for (int y = 0; y < GJP.YnodeSites(); y++) 
-    for (int x = 0; x < GJP.XnodeSites(); x++)
-    {
-      // the matrix offset
-      int j =  x + GJP.XnodeSites() * ( y + GJP.YnodeSites() * z);
-      // the vector offset
-      int i = 2 * GJP.Colors() * ( spin + 4 * (
-              x + GJP.XnodeSites() * (
-              y + GJP.YnodeSites() * (
-              z + GJP.ZnodeSites() * local))));
-      temp.CopyVec((Vector*)&fv[i], 6);
-      tempmat.Dagger((IFloat*)&pM[j]);
-      uDotXEqual((IFloat*)&fv[i], (const IFloat*)&tempmat, (const IFloat*)&temp);
+    if(dir != 3) {
+        ERR.NotImplemented(cname, fname);
     }
-  }
+
+    // nc: node coordinate
+    // lc: local coordinate
+    int nc = where / GJP.TnodeSites();
+    int lc = where % GJP.TnodeSites();
+
+    if(nc != GJP.TnodeCoor()) return; // nothing to do here.
+
+    Matrix **gm = lat.FixGaugePtr();
+    Matrix *pM = gm[lc];
+
+    int vol_3d = GJP.XnodeSites() * GJP.YnodeSites() * GJP.ZnodeSites();
+#pragma omp parallel for
+    for(int i = 0; i < vol_3d; ++i) {
+        int mid = i;
+        int vid = 6 * spin + SPINOR_SIZE * (i + vol_3d * lc);
+
+        Vector *v = (Vector *)(fv + vid);
+        Vector vt(*v);
+
+        Matrix mt;
+        mt.Dagger(pM[mid]);
+
+        v->DotXEqual(mt, vt);
+    }
 }
 
 // COULOMB GAUGE ONLY!
@@ -339,48 +387,41 @@ void FermionVectorTp::GaugeFixSink(Lattice &lat, int dir, int unfix) {
   char *fname = "GaugeFixSink()";
   VRB.Func(cname, fname);
 
-  Matrix **gm = lat.FixGaugePtr();
-
-  if(dir!=3)
-    ERR.General(cname,fname,"Works only for dir=3\n");
-
-  if(lat.FixGaugeKind()!=FIX_GAUGE_COULOMB_T)
-    ERR.General(cname,fname,"Works only for FIX_GAUGE_COULOMB_T\n");
-
-  for (int t=0; t < GJP.TnodeSites(); t++) {
-
-    Matrix *pM = gm[t];
-    Vector temp;
-
-    if(gm[t] != NULL ){
-      for (int z = 0; z < GJP.ZnodeSites(); z++)
-	for (int y = 0; y < GJP.YnodeSites(); y++)
-	  for (int x = 0; x < GJP.XnodeSites(); x++)
-	    {
-	      // the matrix offset
-	      int j =  x + GJP.XnodeSites() * ( y + GJP.YnodeSites() * z);
-	      for (int spin = 0; spin < 4; spin++)
-		{
-		  // the vector offset
-		  int i= 2 * GJP.Colors() * ( spin + 4 * (
-                         x + GJP.XnodeSites() * (
-                         y + GJP.YnodeSites() * (
-                         z + GJP.ZnodeSites() * t)))) ;
-		  temp.CopyVec((Vector*)&fv[i], 6);
-		if(unfix)
-		  uDagDotXEqual((IFloat*)&fv[i],(const IFloat*)&pM[j],
-			     (const IFloat*)&temp);
-		else
-		  uDotXEqual((IFloat*)&fv[i],(const IFloat*)&pM[j],
-			     (const IFloat*)&temp);
-		}
-	    }
+    if(dir!=3) {
+        ERR.General(cname,fname,"Works only for dir=3\n");
     }
-  }
+    if(lat.FixGaugeKind()!=FIX_GAUGE_COULOMB_T) {
+        ERR.General(cname,fname,"Works only for FIX_GAUGE_COULOMB_T\n");
+    }
+
+    Matrix **gm = lat.FixGaugePtr();
+
+    int loc_3d = GJP.VolNodeSites() / GJP.TnodeSites();
+#pragma omp parallel for 
+    for(int site = 0; site < GJP.VolNodeSites(); site++) {
+        int t = site / loc_3d;
+        // the matrix offset
+        int j = site % loc_3d;
+        Matrix *pM = gm[t];
+
+        if(gm[t] != NULL ) {
+            for (int spin = 0; spin < 4; spin++) {
+                int i= 6 * (spin + 4 * site);
+                Vector *v = (Vector *)(fv + i);
+                Vector vt(*v);
+		if(unfix)
+		uDagDotXEqual((IFloat*)&fv[i],(const IFloat*)&pM[j],
+			     (const IFloat*)&vt);
+		else
+		uDotXEqual((IFloat*)&fv[i],(const IFloat*)&pM[j],
+			     (const IFloat*)&vt);
+            }
+        }
+    }
 }
 
-void FermionVectorTp::LandauGaugeFixSink( Lattice& lat ) {
-
+void FermionVectorTp::LandauGaugeFixSink( Lattice& lat )
+{
   char *fname = "LandauGaugeFixSink()";
   VRB.Func(cname, fname);
   

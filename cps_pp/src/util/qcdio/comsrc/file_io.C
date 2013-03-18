@@ -43,6 +43,12 @@ size_t Fread(void *ptr, size_t size, size_t n, FILE *stream){
   return fread( ptr, size, n, stream);
 }
 
+int Fflush(FILE *stream)
+{
+    if(stream == FAKE_P) return 0;
+    return fflush(stream);
+}
+
 int Fclose( FileIoType type, FILE *stream){
   if ( stream == FAKE_P )  return 1;
   return fclose(stream);

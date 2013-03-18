@@ -19,7 +19,9 @@ enum SourceType {
   EXP             = 13,  // for exponential smearing
   SUM_MOM         = 14,
   FL_FUNC         = 15,
-  MOM         = 16};
+  MOM         = 16,
+  BOX_4D     = 17
+};
 
 enum RandomType {
   GAUSS  = 0, 
@@ -64,6 +66,7 @@ class QPropWArg {
   int EndSrcSpin;
   int StartSrcColor;
   int EndSrcColor;
+
   memfun QPropWArg();
 };
 
@@ -84,6 +87,17 @@ class QPropWBoxArg {
   int box_start;
   int box_end;
   memfun QPropWBoxArg();
+};
+
+// 4D box source
+class QPropW4DBoxArg {
+    // These are NOT start/end pairs!
+    int box_start[4];
+    int box_size[4];
+    // momentum, in units of 2*Pi/L, where L is the global size of the
+    // lattice in the concerned direction.
+    Float mom[4];
+    memfun QPropW4DBoxArg();
 };
 
 class QPropWRandArg {
