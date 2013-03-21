@@ -1,13 +1,9 @@
 #include<config.h>
-//#define USE_OMP
-#ifdef USE_OMP
-#include <omp.h>
-#endif
 CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.C,v 1.11 2012-04-02 20:33:37 chulwoo Exp $
+  $Id: f_dwf_base_force.C,v 1.12 2013-03-21 18:50:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -46,6 +42,7 @@ CPS_END_NAMESPACE
 #include <util/random.h>
 #include <util/error.h>
 #include <util/time_cps.h>
+#include <util/omp_wrapper.h>
 #include <comms/scu.h> // GRF
 #include <comms/glb.h>
 CPS_START_NAMESPACE
@@ -247,12 +244,6 @@ ForceArg FdwfBase::EvolveMomFforceInt(Matrix *mom, Vector *v1, Vector *v2,
 
   static int called=0;
   called++;
-#ifdef USE_OMP
-//  const int MAX_THREADS=omp_get_num_threads();
-  const int MAX_THREADS=64;
-#else
-  const int MAX_THREADS=1;
-#endif
 
   int f_size = FsiteSize() * GJP.VolNodeSites() ;
   int f_site_size_4d = 2 * Colors() * SpinComponents();
@@ -301,12 +292,7 @@ ForceArg FdwfBase::EvolveMomFforceInt(Matrix *mom, Vector *v1, Vector *v2,
     v1_buf[i]=v2_buf[i]=NULL;
  }
 
-#ifndef USE_OMP
-  Matrix *tmp_mat = (Matrix *)fmalloc(cname,fname,"tmp_mat",sizeof(Matrix)*2);
-#else
-//  VRB.Result(cname,fname,"omp_get_num_threads=%d\n",omp_get_num_threads());
   Matrix *tmp_mat = (Matrix *)fmalloc(cname,fname,"tmp_mat",sizeof(Matrix)*2*MAX_THREADS);
-#endif
 
   size_t f_bytes = sizeof(Float)*f_site_size_4d;
   size_t st_bytes = sizeof(Float)*f_size_4d - f_bytes;
@@ -354,7 +340,7 @@ ForceArg FdwfBase::EvolveMomFforceInt(Matrix *mom, Vector *v1, Vector *v2,
         QMP_start(Send[mu]);
     }
   }
-#ifdef USE_OMP
+#if 1
 //omp_set_num_threads(MAX_THREADS);
   Float L1[MAX_THREADS] ;
   Float L2[MAX_THREADS];
