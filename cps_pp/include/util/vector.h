@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.35 2013-03-18 19:33:13 chulwoo Exp $
+  $Id: vector.h,v 1.36 2013-03-21 14:22:45 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-03-18 19:33:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.35 2013-03-18 19:33:13 chulwoo Exp $
-//  $Id: vector.h,v 1.35 2013-03-18 19:33:13 chulwoo Exp $
+//  $Date: 2013-03-21 14:22:45 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.36 2013-03-21 14:22:45 chulwoo Exp $
+//  $Id: vector.h,v 1.36 2013-03-21 14:22:45 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.35 $
+//  $Revision: 1.36 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -483,7 +483,12 @@ inline void TrLessAntiHermMatrix(const Matrix& dag)
 #endif
 
 #ifndef VEC_INLINE
-    void TrLessAntiHermMatrix();
+//    void TrLessAntiHermMatrix();
+    void TrLessAntiHermMatrix(){
+       Matrix dag;
+       dag.Dagger(*this);
+       this->TrLessAntiHermMatrix(dag);
+    }
 #else
 #if 0
 inline void TrLessAntiHermMatrix()
@@ -510,11 +515,6 @@ inline void TrLessAntiHermMatrix()
     p[17] -= c;
 }
 #else
-    void TrLessAntiHermMatrix(){
-       Matrix dag;
-       dag.Dagger(*this);
-       this->TrLessAntiHermMatrix(dag);
-    }
 #endif
 #endif
 
