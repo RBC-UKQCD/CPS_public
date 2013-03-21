@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.36 2013-03-21 14:22:45 chulwoo Exp $
+  $Id: vector.h,v 1.37 2013-03-21 18:11:57 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-03-21 14:22:45 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.36 2013-03-21 14:22:45 chulwoo Exp $
-//  $Id: vector.h,v 1.36 2013-03-21 14:22:45 chulwoo Exp $
+//  $Date: 2013-03-21 18:11:57 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.37 2013-03-21 18:11:57 chulwoo Exp $
+//  $Id: vector.h,v 1.37 2013-03-21 18:11:57 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.36 $
+//  $Revision: 1.37 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -645,8 +645,8 @@ inline void TrLessAntiHermMatrix()
     Complex Char10() const ;
 
     void FTimesV1PlusV2(Float fb, Matrix *c, Matrix *d, int len)
-#if TARGET == BGL  || TAGET == QCDOC
-    { Float coef = fb; vaxpy3_m (u, &coef, c, d, len*3); }
+#if TARGET == BGL  
+    { Float coef = fb; vaxpy3_m (this, &coef, c, d, len*3); }
 #else
 	{ fTimesV1PlusV2((IFloat *)&u, IFloat(fb), (IFloat *)c, 
 	                         (IFloat *)d, len*18); }
