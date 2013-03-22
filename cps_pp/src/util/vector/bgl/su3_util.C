@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Utility routines for SU(3) matrices.
 
-  $Id: su3_util.C,v 1.5 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: su3_util.C,v 1.6 2013-03-22 05:40:05 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-10 14:05:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v 1.5 2012-08-10 14:05:33 chulwoo Exp $
-//  $Id: su3_util.C,v 1.5 2012-08-10 14:05:33 chulwoo Exp $
+//  $Date: 2013-03-22 05:40:05 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v 1.6 2013-03-22 05:40:05 chulwoo Exp $
+//  $Id: su3_util.C,v 1.6 2013-03-22 05:40:05 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/bgl/su3_util.C,v $
 //  $State: Exp $
 //
@@ -29,7 +29,7 @@ CPS_START_NAMESPACE
 //---------------------------------------------------------------//
 // pre-calculated 1/3
 //---------------------------------------------------------------//
-static IFloat inv3 = 1./3.;
+IFloat Matrix::inv3 = 1./3.;
 
 
 //---------------------------------------------------------------//
