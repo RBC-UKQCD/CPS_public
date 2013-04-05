@@ -29,6 +29,13 @@ enum DirType {
 typedef enum DirType DirType;
 extern struct vml_enum_map DirType_map[];
 
+enum ChiralProj {
+	PL = -6,
+	PR = -7,
+};
+typedef enum ChiralProj ChiralProj;
+extern struct vml_enum_map ChiralProj_map[];
+
 enum FclassType {
 	F_CLASS_NONE = 0,
 	F_CLASS_STAG = 1,
@@ -40,6 +47,8 @@ enum FclassType {
 	F_CLASS_WILSON_TM = 7,
 	F_CLASS_MDWF = 8,
 	F_CLASS_BFM = 9,
+	F_CLASS_MOBIUS = 10,
+	F_CLASS_NAIVE = 11,
 };
 typedef enum FclassType FclassType;
 extern struct vml_enum_map FclassType_map[];
@@ -62,6 +71,9 @@ enum StrOrdType {
 	WILSON = 2,
 	G_WILSON_HB = 3,
 	STAG_BLOCK = 4,
+	DWF_5D_EOPREC = WILSON,
+	DWF_4D_EOPREC = 5,
+	DWF_4D_EOPREC_EE = 6,
 };
 typedef enum StrOrdType StrOrdType;
 extern struct vml_enum_map StrOrdType_map[];
@@ -182,6 +194,8 @@ enum RitzMatType {
 	NEG_MATDAG_MAT = 6,
 	MATDAG_MAT_NORM = 7,
 	NEG_MATDAG_MAT_NORM = 8,
+	MATPCDAG_MATPC_SHIFT = 9,
+	RitzMatType_LAST = 10,
 };
 typedef enum RitzMatType RitzMatType;
 extern struct vml_enum_map RitzMatType_map[];
@@ -670,6 +684,8 @@ enum InverterType {
 	CG = 0,
 	BICGSTAB = 1,
 	EIGCG = 2,
+	LOWMODEAPPROX = 3,
+	CG_LOWMODE_DEFL = 4,
 };
 typedef enum InverterType InverterType;
 extern struct vml_enum_map InverterType_map[];
@@ -763,6 +779,7 @@ extern  bool_t vml_pooh (VML *, char *instance, pooh*);
 extern  bool_t vml_Float (VML *, char *instance, Float*);
 extern  bool_t vml_IFloat (VML *, char *instance, IFloat*);
 extern  bool_t vml_DirType (VML *, char *instance, DirType*);
+extern  bool_t vml_ChiralProj (VML *, char *instance, ChiralProj*);
 extern  bool_t vml_FclassType (VML *, char *instance, FclassType*);
 extern  bool_t vml_GclassType (VML *, char *instance, GclassType*);
 extern  bool_t vml_StrOrdType (VML *, char *instance, StrOrdType*);
@@ -823,6 +840,7 @@ extern  bool_t vml_pooh (VML *, char *instance, pooh*);
 extern  bool_t vml_Float (VML *, char *instance, Float*);
 extern  bool_t vml_IFloat (VML *, char *instance, IFloat*);
 extern  bool_t vml_DirType (VML *, char *instance, DirType*);
+extern  bool_t vml_ChiralProj (VML *, char *instance, ChiralProj*);
 extern  bool_t vml_FclassType (VML *, char *instance, FclassType*);
 extern  bool_t vml_GclassType (VML *, char *instance, GclassType*);
 extern  bool_t vml_StrOrdType (VML *, char *instance, StrOrdType*);

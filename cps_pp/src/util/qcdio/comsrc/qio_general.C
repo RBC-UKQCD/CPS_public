@@ -131,6 +131,8 @@ int  qio_node_index( const int x[])
 }
 
 
+#ifndef QIO_SPARSE_PARTFILE
+// this is the original version, only works for  node == QMP_get_node_number()
 void qio_get_coords( int x[], int node, int index)
 {
 
@@ -140,13 +142,14 @@ void qio_get_coords( int x[], int node, int index)
 
   // returns x[]: global(?) coordinates on this node
 
-//if( node != UniqueID() )
-//  if( node != QMP_get_node_number() )
-//    { 
-//      printf("Node %d: ERROR QIO: node number mismatch (%d %d %d %d) %d %d\n",
-//	QMP_get_node_number(),x[0],x[1],x[2],x[3],node,index);
-//      exit(-1); 
-//    }
+  //if( node != UniqueID() )
+  if( node != QMP_get_node_number() )
+    { 
+      printf("ERROR QIO: node number mismatch %d vs %d [%d]\n",
+	     node, QMP_get_node_number(),UniqueID());
+ 
+      exit(-1); 
+    }
 
   x[0] = GJP.XnodeCoor()*GJP.NodeSites(0);
   x[1] = GJP.YnodeCoor()*GJP.NodeSites(1);
@@ -193,14 +196,105 @@ void qio_get_coords( int x[], int node, int index)
   for(int ii(0); ii < 4; ++ii)
     x[ii] += xLoc[ii];
           
-
+  //#define DEBUG_GetCorrds
+  
   #ifdef DEBUG_GetCoords
   printf("UID: %i, called qio_get_coords with node: %i, index %i; returns x: [%i, %i, %i, %i]\n", UniqueID(), node, index, x[0], x[1], x[2], x[3]);
   #endif // DEBUG_GetCoords
-
-
 }
 
+#else
+// To supporthe QIO_PARTFILE format for totnode != num io node
+void qio_get_coords( int x[], int node, int index)
+{
+
+  #ifdef DEBUG_GetCoords
+  printf("UID: %i, called qio_get_coords with node: %i, index %i; calc...\n", UniqueID(), node, index);
+  #endif // DEBUG_GetCoords
+
+  int node_coor[4];
+  int nodes[5];
+  nodes[0] = GJP.Xnodes();
+  nodes[1] = GJP.Ynodes();
+  nodes[2] = GJP.Znodes();
+  nodes[3] = GJP.Tnodes();
+  nodes[4] = GJP.Snodes();
+  
+
+  int nd=node;
+  node_coor[0]= nd % nodes[0];  nd /= nodes[0];
+  node_coor[1]= nd % nodes[1];  nd /= nodes[1];  
+  node_coor[2]= nd % nodes[2];  nd /= nodes[2];    
+  node_coor[3]= nd % nodes[3];  nd /= nodes[3];    
+  
+  // check the assumption, that the above code is actually 
+  // calculating corrdinate correctly for the local node
+
+  if( node == QMP_get_node_number() )
+    { 
+      if( GJP.XnodeCoor() != node_coor[0] ||
+	  GJP.YnodeCoor() != node_coor[1] ||
+	  GJP.ZnodeCoor() != node_coor[2] ||
+	  GJP.TnodeCoor() != node_coor[3]) {
+	printf("ERROR QIO: node number mismatch\n");
+	exit(-1);
+      }
+    }
+  
+     
+  x[0] = node_coor[0]*GJP.NodeSites(0);
+  x[1] = node_coor[1]*GJP.NodeSites(1);
+  x[2] = node_coor[2]*GJP.NodeSites(2);
+  x[3] = node_coor[3]*GJP.NodeSites(3);
+
+  int localIndex_t;
+
+  if( GJP.Snodes() > 1 )
+    {
+      ERR.NotImplemented("","qio_get_coords(...)","many Ls is not supported for now, as I don't understand the QIO's logic fully, sorry");
+
+      localIndex_t = GJP.NodeSites(3)/GJP.Snodes();
+      x[3] += GJP.SnodeCoor()*GJP.NodeSites(3)/GJP.Snodes() ; 
+
+    }
+  else
+    localIndex_t = GJP.NodeSites(3);
+
+  int xLoc[4]={0,0,0,0};
+
+  for( int ii(0); ii < index; ++ii)
+    { 
+      if( ++xLoc[0] == GJP.NodeSites(0) ) 
+	{ 
+	 xLoc[0]=0; 
+	 if( ++xLoc[1] == GJP.NodeSites(1) )
+	   {
+	     xLoc[1]=0;
+	     if( ++xLoc[2] == GJP.NodeSites(2) )
+	       {
+		 xLoc[2]=0;
+		 //if( ++xLoc[3] == GJP.NodeSites(3) )
+		 if( ++xLoc[3] == localIndex_t )
+		   {
+		     printf("ERROR in QIO: with index/global-coor-conver\n");
+		     exit(-1);
+		   }
+	       }
+	   }
+	}
+    }
+      
+	
+  for(int ii(0); ii < 4; ++ii)
+    x[ii] += xLoc[ii];
+          
+  //#define DEBUG_GetCorrds
+  
+  #ifdef DEBUG_GetCoords
+  printf("UID: %i, called qio_get_coords with node: %i, index %i; returns x: [%i, %i, %i, %i]\n", UniqueID(), node, index, x[0], x[1], x[2], x[3]);
+  #endif // DEBUG_GetCoords
+      }
+#endif
 
 int qio_num_sites(int node)
 {
@@ -230,6 +324,17 @@ int qio_sites_on_node()
   else
     return GJP.VolNodeSites();
 }
+
+
+#ifdef QIO_SPARSE_PARTFILE
+static int qio_get_node(int node)
+{
+  //printf("qio_get_node: %d %d\n",node,QIO_SPARSE_PARTFILE_NODES);
+  if (QIO_SPARSE_PARTFILE_NODES==0) return node;
+  return (node / QIO_SPARSE_PARTFILE_NODES)*QIO_SPARSE_PARTFILE_NODES;
+}
+static int qio_master_io_node(){ return 0; }
+#endif
 
 // now start the qio_init-class functions
 
@@ -262,6 +367,27 @@ void qio_init::qio_setLayout()
   layout.this_node       = QMP_get_node_number();// number of this node
   layout.number_of_nodes = NumNodes();           // total number of nodes
 
+}
+
+void qio_init::qio_setFilesystem()
+{
+
+#ifdef QIO_SPARSE_PARTFILE
+  fs. number_io_nodes = NumNodes() / QIO_SPARSE_PARTFILE_NODES;
+  fs. type = QIO_SINGLE_PATH;// or QIO_MULTIPLE_PATH
+  fs. my_io_node =  qio_get_node;
+  fs. master_io_node = qio_master_io_node;
+
+  fs. io_node = NULL;
+  fs. node_path=NULL; // Provide array for path for each io-node, for QIO_MULTIPLE_PATH
+
+  pointer_fs = &fs;
+
+#else
+  pointer_fs = NULL; //indicating the default filesystem setting
+#endif
+
+  
 }
 
 

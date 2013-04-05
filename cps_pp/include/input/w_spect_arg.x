@@ -213,6 +213,7 @@ class WspectArg {
   int BEfuzzing_c_num;/*number of coefficients to run*/
   Float BEfuzzing_c[MAX_FUZZING_C_NUM]; /*multiplier*/
   int BEfuzzing_hits; /*cabbobo hits*/
+  int GaugeFixProp;
 memfun WspectArg();
 };
 

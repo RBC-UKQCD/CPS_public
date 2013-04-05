@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgEig class.
 
-  $Id: alg_eig.h,v 1.4 2005-12-02 15:00:21 chulwoo Exp $
+  $Id: alg_eig.h,v 1.5 2013-04-05 17:46:30 chulwoo Exp $
 */
 //------------------------------------------------------------------
 
@@ -55,7 +55,8 @@ class AlgEig : public Alg
     virtual ~AlgEig();
 
     void run(void);
-    void run(Float **lambda);
+    void run(Float **lambda, Vector** in_eigv=0);
+    void runLanczos();//Float *eval, Vector **evec);
 };
 
 #endif

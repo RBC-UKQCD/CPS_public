@@ -7,19 +7,19 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.25 2012-12-03 20:52:40 chulwoo Exp $
+  $Id: enum.x,v 1.26 2013-04-05 17:46:30 chulwoo Exp $
 */
 /*--------------------------------------------------------------------*/
 /*  CVS keywords*/
 /**/
 /*  $Author: chulwoo $*/
-/*  $Date: 2012-12-03 20:52:40 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.25 2012-12-03 20:52:40 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.25 2012-12-03 20:52:40 chulwoo Exp $*/
+/*  $Date: 2013-04-05 17:46:30 $*/
+/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.26 2013-04-05 17:46:30 chulwoo Exp $*/
+/*  $Id: enum.x,v 1.26 2013-04-05 17:46:30 chulwoo Exp $*/
 /*  $Name: not supported by cvs2svn $*/
 /*  $Locker:  $*/
 /*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.25 $*/
+/*  $Revision: 1.26 $*/
 /*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
 /*  $State: Exp $*/
 /**/
@@ -36,6 +36,8 @@ enum DirType {DIR_X,
 	      DIR_Z,
 	      DIR_T,
 	      DIR_S};
+// chiral projectors 1+-g5
+enum ChiralProj{PL=-6,PR=-7};
 
 /*------------------------------------------------------------------*/
 /*! The types of fermion action*/
@@ -51,7 +53,9 @@ enum FclassType {
     F_CLASS_P4,
     F_CLASS_WILSON_TM,
     F_CLASS_MDWF,
-    F_CLASS_BFM
+    F_CLASS_BFM,
+    F_CLASS_MOBIUS,
+    F_CLASS_NAIVE
 };
 
 
@@ -148,7 +152,10 @@ enum StrOrdType {
 		       are 0, 1, 2 or 3  for direction T, X, Y and Z
 		       respectively.
 		       This order is expected by all QncWilsonHb functions.*/
-    STAG_BLOCK = 4
+    STAG_BLOCK = 4,
+    DWF_5D_EOPREC = WILSON,  /*!< DWF with 5 dimensional even/odd precondition, it's actually same as WILSON. */
+    DWF_4D_EOPREC = 5, /*!<  DWF with 4 dimensional even/odd precondition, for odd-odd preconditioning. This should work for Mobius as well. */
+    DWF_4D_EOPREC_EE = 6  /*!<  DWF with 4 dimensional even/odd precondition, for even-even preconditioning. This should work for Mobius as well. */
 };
 
 
@@ -317,15 +324,21 @@ enum SigmaprojType {
 enum RitzMatType {
     NONE,            /*!< No eigenvalues requested */
     MAT_HERM,        /*!< The hermitian matrix on the full lattice */
-    MATPC_HERM,      /*!< The preconditioned hermitian matrix on a single parity. */
+    MATPC_HERM,      /*!< The preconditioned hermitian matrix on a single parity.  For Wilson case, it's the gamma_5 D_oo.  For DWF, it's the gamma_5  R   D4_eo, where D4_ee is the 4dim even/odd preconditioned matrix */
     MATPCDAG_MATPC,  /*!< The preconditioned \f$M^\dagger M\f$
 		          on a single parity */
     NEG_MATPCDAG_MATPC,  /*!< The preconditioned \f$-M^\dagger M\f$
 		          on a single parity */
     MATDAG_MAT,      /*!< \f$M^\dagger M\f$ on the full lattice */
     NEG_MATDAG_MAT,   /*!< \f$-M^\dagger M\f$ on the full lattice*/
-    MATDAG_MAT_NORM,  /*!< \f$cM^\dagger M\f$ on the full lattice (normalised)*/
-    NEG_MATDAG_MAT_NORM  /*!< \f$-cM^\dagger M\f$ on the full lattice (normalised)*/
+    MATDAG_MAT_NORM,      /*!< \f$cM^\dagger M\f$ on the full lattice (normalised)*/
+    NEG_MATDAG_MAT_NORM,  /*!< \f$-cM^\dagger M\f$ on the full lattice (normalised)*/
+    MATPCDAG_MATPC_SHIFT,  /*!< The preconditioned \f$M^\dagger M\f$
+		           on a single parity, Shift for eigen spectrum will be applied, currently DWF only. When
+                           the original (unshifted) opertor is \f$M^\dagger M = H^2, H = \Gamma_5 M$\f, 
+                           the shifted operator will be \f (H-\mu)(H-\mu)\f, here \f$M$\f is 
+                           the 4d-even/odd precondition operator. For Wilson types, it's easy to extend, I don't know for staggered.*/
+  RitzMatType_LAST  	   /* sentinel */			   
 };
 
 /*------------------------------------------------------------------*/
@@ -793,7 +806,9 @@ enum HmdLimits {
 enum InverterType {
   CG = 0,       /* Conjugate Gradients. */
   BICGSTAB = 1,  /* BiCGstab(n). */
-  EIGCG = 2  /* EigCG */
+  EIGCG   = 2,  /* EigCG */
+  LOWMODEAPPROX    = 3,  /* Low Mode Approximation */
+  CG_LOWMODE_DEFL  = 4  /* CG accelerated using low-mode deflation */
 };
 
 /* Which type of approximation to use? */

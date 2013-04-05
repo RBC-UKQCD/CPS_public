@@ -5,19 +5,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.44 2013-01-07 22:08:22 chulwoo Exp $
+  $Id: gjp.h,v 1.45 2013-04-05 17:46:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-01-07 22:08:22 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.44 2013-01-07 22:08:22 chulwoo Exp $
-//  $Id: gjp.h,v 1.44 2013-01-07 22:08:22 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.45 2013-04-05 17:46:30 chulwoo Exp $
+//  $Id: gjp.h,v 1.45 2013-04-05 17:46:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.44 $
+//  $Revision: 1.45 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -390,6 +390,20 @@ public:
     \return The grid coordinate of this node in the 5th direction.
   */
 
+  Float TwistBc(int dir) const
+  { 
+    switch(dir){
+    case 0: return doarg_int.twist_bc_x;
+    case 1: return doarg_int.twist_bc_y;
+    case 2: return doarg_int.twist_bc_z;
+    case 3: return doarg_int.twist_bc_t;
+    default: printf("GJP::TwistBc(): Incorrect dir for twist\n"); 
+      exit(0);
+    }
+  }
+
+  int Traj(){ return doarg_int.trajectory; }
+
   BndCndType Bc(int dir) const
       { return bc[dir];}
   //!< Gets the global lattice boundary condition in a given direction.
@@ -477,11 +491,21 @@ public:
   /*!<
     \return The type of initial gauge configuration.
   */    
+  StartConfType StartU1ConfKind() const
+      {return doarg_int.start_u1_conf_kind;}
+  //!< Gets the type of initial u1 gauge configuration.
+  /*!<
+    \return The type of initial u1 gauge configuration.
+  */
 
   Matrix *StartConfLoadAddr() const
       {return (Matrix *)doarg_int.start_conf_load_addr;}
   void StartConfLoadAddr( Matrix * addr) 
       { doarg_int.start_conf_load_addr = (unsigned long) addr;}
+  Float *StartU1ConfLoadAddr() const
+      {return (Float *)doarg_int.start_u1_conf_load_addr;}
+  void StartU1ConfLoadAddr( Float * addr)
+      { doarg_int.start_u1_conf_load_addr = (unsigned long) addr;}
   //!< Gets the initial configuration.
   /*!<
     \return The address of the starting configuration
@@ -490,12 +514,18 @@ public:
 
   const char * StartConfFilename() const
       {return doarg_int.start_conf_filename;}
+  const char * StartU1ConfFilename() const
+      {return doarg_int.start_u1_conf_filename;}
 
   const char * StartSeedFilename() const
       {return doarg_int.start_seed_filename;}
 
   const int StartConfAllocFlag() 
       {return doarg_int.start_conf_alloc_flag;}
+  const int StartU1ConfAllocFlag()
+      {return doarg_int.start_u1_conf_alloc_flag;}
+  const int mult_u1()
+      {return doarg_int.mult_u1_conf_flag;}
 
   const int WfmSendAllocFlag() 
       {return doarg_int.wfm_send_alloc_flag;}
@@ -528,7 +558,11 @@ public:
   Float Beta() const
       {return doarg_int.beta;}
   //!< Gets the "beta" parameter in the pure gauge action.
-  
+ 
+  int SaveStride() const
+      {return doarg_int.save_stride;}
+  //!< Gets the stride (number) of eigenvectors to save at-a-time in Eigencontainer
+ 
   /*!
     \return The coefficient of the plaquette term in the pure gauge action. .
   */
@@ -566,6 +600,10 @@ public:
     Obviously, only relevant for Domain Wall Fermions.
     \return The inverse of the 5th direction lattice spacing.
   */
+  Float Mobius_b() const
+      {return doarg_int.mobius_b_coeff;}
+  Float Mobius_c() const
+      {return doarg_int.mobius_c_coeff;}
   
 
   //------------------------------------------------------------------
@@ -786,6 +824,12 @@ public:
 
   void StartConfKind(StartConfType sc)
       {doarg_int.start_conf_kind = sc;}
+  //!< Sets the type of initial  gauge configuration.
+  /*!<
+    \param sc The type of initial gauge configuration.
+  */
+  void StartU1ConfKind(StartConfType sc)
+      {doarg_int.start_u1_conf_kind = sc;}
   //!< Sets the type of initial  gauge configuration.
   /*!<
     \param sc The type of initial gauge configuration.

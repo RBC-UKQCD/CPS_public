@@ -3,7 +3,8 @@ NORECURSE_DIR = CVS bgl qcdoc noarch qcdsp_nos qcdsp_nos_hdw_diag qmp sse bfm qu
 BGL_DIR = bgl
 BGL_QMP_DIR = bgl
 BGQ_DIR = bfm noarch
-QCDOC_DIR = qcdoc
-NOARCH_DIR =  noarch
-include ../../../../Makefile.rules
-# DO NOT DELETE
+#NOARCH_DIR =  noarch
+NOARCH_DIR =  sse
+#include ../../../../Makefile.rules.xlc
+include ../../../../Makefile.rules.sse
+#include ../../../../Makefile.rules

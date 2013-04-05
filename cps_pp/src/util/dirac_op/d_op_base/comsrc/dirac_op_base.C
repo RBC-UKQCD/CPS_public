@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class methods.
   
-  $Id: dirac_op_base.C,v 1.12 2011-04-13 19:05:04 chulwoo Exp $
+  $Id: dirac_op_base.C,v 1.13 2013-04-05 17:46:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-04-13 19:05:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.12 2011-04-13 19:05:04 chulwoo Exp $
-//  $Id: dirac_op_base.C,v 1.12 2011-04-13 19:05:04 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v 1.13 2013-04-05 17:46:30 chulwoo Exp $
+//  $Id: dirac_op_base.C,v 1.13 2013-04-05 17:46:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.12 $
+//  $Revision: 1.13 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/dirac_op_base.C,v $
 //  $State: Exp $
 //
@@ -222,5 +222,78 @@ DiracOp::~DiracOp() {
 void DiracOp::DiracOpGlbSum(Float *float_p) {
   glb_sum(float_p);
 }
+
+
+#if 1
+void DiracOp::RitzMat(Vector *out, Vector *in,
+		     MatrixPolynomialArg* cheby_arg) {
+  ERR.NotImplemented(cname,"RitzMat(V*,V*,MP*)");
+}
+#else 
+//TIZB  PolynomialAccerelation
+//
+//  Q = [ -2 Ddag D + (alpha + beta) ] / [ alpha - beta ]
+//
+//  Output:  out =  T_n(Q) in
+//
+//  T_0 = 1,    T_1 = Q
+//   T_{n+1}(Q) =  2 Q T_n(Q)  - T_{n-1}(Q)
+//  
+// Calling virtual RitzMat(V*,V*)
+//
+void DiracOp::RitzMat(Vector *out, Vector *in,
+		     MatrixPolynomialArg* cheby_arg) {
+  char *fname = "RitzMat(V*,V*,I,F,F,F,V*,V*)";
+  VRB.Func(cname,fname);
+
+  const int Npol = cheby_arg-> Npol;
+  const int size = RitzLatSize();
+  //
+  // Q = 2 / (alpha-beta)  Ddag D  -   (alpha+beta)/(alpha-beta)
+  // 2 Q =   c1  (  c0 Ddag D  -   1 )
+  //  c1 = 2 (alpha+beta)/(alpha-beta),   c0 =  2 / (alpha+beta)
+  //
+  const Float alpha =cheby_arg-> params[0];
+  const Float beta =cheby_arg-> params[1];
+
+
+  const Float c1 =   2.0*(alpha+beta)/(alpha-beta);
+  const Float c0 =   2.0/(alpha+beta);
+
+  Vector *tmp  = (Vector*)cheby_arg->tmp1;
+  Vector *tmp2 = (Vector*)cheby_arg->tmp2;
+  
+  //  tmp2 =  T_0 v = v = in
+  tmp2 -> CopyVec(in, size);
+  //  tmp =  T_1 v = Q v = Q in
+  //  QV = 0.5* (2Q)V = 0.5 c1 ( c0 Ddag D - 1)
+  RitzMat(tmp, in);
+  tmp->VecTimesEquFloat(c0, size);
+  tmp->VecMinusEquVec(in,size);
+  tmp->VecTimesEquFloat(0.5*c1, size);
+
+  // debug
+  out->CopyVec(tmp,size);
+  //printf("cheby %f %f\n", alpha,beta);
+  
+  // loop over
+  for(int i=2; i<=Npol; ++i){
+    // out = 2 Q tmp
+    RitzMat(out, tmp);
+    out->VecTimesEquFloat(c0, size);
+    out->VecMinusEquVec(tmp,size);
+    out->VecTimesEquFloat(c1, size);
+
+    // out = out - tmp2
+    out->VecMinusEquVec(tmp2, size);
+    if( i!=Npol) {
+      // tmp2 = tmp
+      tmp2->CopyVec(tmp, size);
+      // tmp = out
+      tmp->CopyVec(out, size);
+    }
+  }
+}
+#endif
 
 CPS_END_NAMESPACE

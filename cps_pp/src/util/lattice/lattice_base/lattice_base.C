@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.69 2013-03-18 19:33:14 chulwoo Exp $
+  $Id: lattice_base.C,v 1.70 2013-04-05 17:46:31 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-03-18 19:33:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.69 2013-03-18 19:33:14 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.69 2013-03-18 19:33:14 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.70 2013-04-05 17:46:31 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.70 2013-04-05 17:46:31 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.69 $
+//  $Revision: 1.70 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -39,6 +39,7 @@
 #include <util/error.h>
 #include <util/random.h>
 #include <util/ReadLatticePar.h>
+#include <util/ReadU1LatticePar.h>
 #include <util/checksum.h>
 #include <util/data_shift.h>
 #include <comms/nga_reg.h>
@@ -83,8 +84,10 @@ enum { MATRIX_SIZE = 18 };
 // Initialize static variables
 //------------------------------------------------------------------
 Matrix* Lattice::gauge_field = 0;
+Float* Lattice::u1_gauge_field = 0;
 int Lattice::is_allocated = 0;
 int Lattice::is_initialized = 0;
+int Lattice::u1_is_initialized = 0;
 StrOrdType Lattice::str_ord = CANONICAL;
 Matrix** Lattice::fix_gauge_ptr = 0;
 FixGaugeType Lattice::fix_gauge_kind = FIX_GAUGE_NONE;
@@ -143,6 +146,8 @@ Lattice::Lattice()
   VRB.Func(cname,fname);
 
   StartConfType start_conf_kind = GJP.StartConfKind();
+  StartConfType start_u1_conf_kind = GJP.StartU1ConfKind();
+
   link_buffer = 0;
 
   //----------------------------------------------------------------
@@ -167,11 +172,15 @@ Lattice::Lattice()
     VRB.Flow(cname,fname,"gauge_field=%p\n",gauge_field);
 #else
       gauge_field = (Matrix *) pmalloc(array_size);
+      u1_gauge_field = (Float *) pmalloc(array_size/18);
 #endif
 //     printf("gauge_field=%p\n",gauge_field);
       if( gauge_field == 0) ERR.Pointer(cname,fname, "gauge_field");
       VRB.Pmalloc(cname, fname, "gauge_field", gauge_field, array_size);
       GJP.StartConfLoadAddr(gauge_field);
+      if( u1_gauge_field == 0) ERR.Pointer(cname,fname, "u1_gauge_field");
+      VRB.Pmalloc(cname, fname, "u1_gauge_field", u1_gauge_field, array_size/9);
+      GJP.StartU1ConfLoadAddr(u1_gauge_field);
     }
 
     //--------------------------------------------------------------
@@ -214,6 +223,32 @@ Lattice::Lattice()
 
 
   //Load gauge field configuration
+
+  // QED (angles)
+  //----------------------------------------------------------------
+  if(start_u1_conf_kind == START_CONF_ORD){
+    SetU1GfieldOrd();
+    u1_is_initialized = 1;
+    str_ord = CANONICAL;
+    VRB.Flow(cname,fname, "Ordered starting U1 configuration\n");
+    GJP.StartU1ConfKind(START_CONF_MEM);
+  }
+  else if(start_u1_conf_kind == START_CONF_FILE){
+#if TARGET == QCDOC || TARGET == NOARCH || TARGET == BGL || TARGET == BGP
+    VRB.Flow(cname,fname, "Load starting U1 configuration addr = %x\n",
+             gauge_field);
+    ReadU1LatticeParallel rd_lat(*this,GJP.StartU1ConfFilename());
+    str_ord = CANONICAL;
+    u1_is_initialized = 1;
+    GJP.StartU1ConfKind(START_CONF_MEM);
+#else
+    //???
+    VRB.Flow(cname,fname, "File starting U1 configuration\n");
+    ERR.NotImplemented(cname,fname,
+    "Starting U1 config. type  START_CONF_FILE not implemented\n");
+#endif
+  }
+  // QCD links
   //----------------------------------------------------------------
   if(start_conf_kind == START_CONF_ORD){
     SetGfieldOrd();
@@ -302,7 +337,7 @@ Lattice::Lattice()
 #endif
 
   smeared = 0;
-}
+  }
 
 
 //------------------------------------------------------------------
@@ -343,6 +378,173 @@ Lattice::~Lattice()
 }
 
 //------------------------------------------------------------------
+// const Matrix *GaugeField(void) const:
+// Returns the pointer to the gauge field configuration.
+//------------------------------------------------------------------
+Matrix *Lattice::GaugeField(void) const
+{
+  return gauge_field;
+}
+//------------------------------------------------------------------
+// Float *U1GaugeField(void) const:
+// Returns the pointer to the u1 gauge field configuration.
+//------------------------------------------------------------------
+Float *Lattice::U1GaugeField(void) const
+{
+  return u1_gauge_field;
+}
+
+// Mult su3 links by u1 phase factor, exp(i theta_mu/L_mu)
+// (i.e., twisted b.c.)
+void Lattice::twist_bc(int sign)
+{
+  // multiply su3 links by u1 links
+  // assumes both are in canonical order!
+  // link =  exp(-i A_mu Q) where Q is the
+  // quark electric charge or twist angle
+  int x[4];
+  const double PI = 3.1415926535897932384626433832795028842;
+  const Float eps = 1e-16;
+  Float theta[4];
+  for(int mu=0; mu<4; ++mu)
+    theta[mu] = sign*2.0*PI*GJP.TwistBc(mu)/GJP.Sites(mu);
+
+  Matrix temp;
+
+  for(x[3]=0; x[3]<GJP.TnodeSites();x[3]++){
+    for(x[2]=0; x[2]<GJP.ZnodeSites();x[2]++){
+      for(x[1]=0; x[1]<GJP.YnodeSites();x[1]++){
+        for(x[0]=0; x[0]<GJP.XnodeSites();x[0]++){
+          for(int mu=0; mu<4; ++mu) {
+	    if(fabs(theta[mu]) < eps) continue;
+            int offset_x = GsiteOffset(x);
+            // the link matrix at current site, in direction mu:
+            Matrix *su3_link = GaugeField() + offset_x + mu;
+	    Rcomplex cc(cos(theta[mu]),sin(theta[mu]));
+            vecTimesComplex((IFloat*)&temp, (IFloat)cc.real(), (IFloat)cc.imag(), (const IFloat*)su3_link, 18);
+            moveMem((IFloat*)su3_link, (IFloat*)&temp,sizeof(IFloat)*18);
+          }//loop(mu)
+        }
+      }
+    }
+  }
+  // must re-smear the lattice after implementing new bc
+  // so reset
+  smeared =0;
+}
+
+
+// Mult su3 links by u1 phase factor, exp(i Q theta)
+void Lattice::mult_su3_links_by_u1(const Float Q)
+{
+  // multiply su3 links by u1 links
+  // assumes both are in canonical order!
+  // link =  exp(-i A_mu Q) where Q is the
+  // quark electric charge or twist angle
+  int x[4];
+
+  Matrix temp;
+  for(x[3]=0; x[3]<GJP.TnodeSites();x[3]++){
+    for(x[2]=0; x[2]<GJP.ZnodeSites();x[2]++){
+      for(x[1]=0; x[1]<GJP.YnodeSites();x[1]++){
+        for(x[0]=0; x[0]<GJP.XnodeSites();x[0]++){
+          for(int mu=0; mu<4; ++mu) {
+            int offset_x = GsiteOffset(x);
+            // the link matrix at current site, in direction mu:
+            Matrix *su3_link = GaugeField() + offset_x + mu;
+            // the u1 link at current site, in direction mu:
+            Float theta = *(U1GaugeField() + offset_x + mu);
+            theta *= Q;
+            Rcomplex cc(cos(theta),sin(theta));
+            vecTimesComplex((IFloat*)&temp, (IFloat)cc.real(), (IFloat)cc.imag(), (const IFloat*)su3_link, 18);
+            moveMem((IFloat*)su3_link, (IFloat*)&temp,sizeof(IFloat)*18);
+          }//loop(mu)
+        }
+      }
+    }
+  }
+}
+
+// multiply by exp(i potential) of external B field
+// it is linear in coordinates. Includes boundary links
+// to ensure flux is same on every plaquette, assunming
+// q B = 2 pi n / L_i L_j
+void Lattice::mult_su3_links_by_mag_field(Float* B0)
+{
+  // multiply su3 links by u1 links
+  // assumes both are in canonical order!
+  // link =  exp(-i A_mu Q) where Q is the
+  // quark electric charge or twist angle
+  // \vec B = \vec const, so \vec A = 1/3 \vec B x \vec x
+  // Oops! Really \vec A = 1/2 \vec B x \vec x
+  int x[4];
+
+  int xshift = GJP.XnodeCoor()*GJP.XnodeSites();
+  int yshift = GJP.YnodeCoor()*GJP.YnodeSites();
+  int zshift = GJP.ZnodeCoor()*GJP.ZnodeSites();
+  int Lx = GJP.Xnodes()*GJP.XnodeSites();
+  int Ly = GJP.Ynodes()*GJP.YnodeSites();
+  int Lz = GJP.Znodes()*GJP.ZnodeSites();
+  Matrix temp;
+
+  printf("MAGNETIC FIELD IN GAUGE FIELD: %g %g %g\n",B0[0],B0[1],B0[2]);
+
+  for(x[3]=0; x[3]<GJP.TnodeSites();x[3]++){
+    for(x[2]=0; x[2]<GJP.ZnodeSites();x[2]++){
+      for(x[1]=0; x[1]<GJP.YnodeSites();x[1]++){
+        for(x[0]=0; x[0]<GJP.XnodeSites();x[0]++){
+          // only for spatial links, A_t = 0
+          for(int mu=0; mu<3; ++mu) {
+            int offset_x = GsiteOffset(x);
+            // the link matrix at current site, in direction mu:
+            Matrix *su3_link = GaugeField() + offset_x + mu;
+            // the linear vector potential, compactified
+            int gx = x[0]+xshift;
+            int gy = x[1]+yshift;
+            int gz = x[2]+zshift;
+            Float theta;
+            switch (mu) {
+            case 0:
+              theta = (Float)gz*B0[1]-(Float)gy*B0[2];
+              // fix up the boundary
+              if(gx==Lx-1){
+                theta -= (Float)gy*B0[2]*Lx;
+                theta += (Float)gz*B0[1]*Lx;
+              }
+              break;
+            case 1:
+              theta = (Float)gx*B0[2]-(Float)gz*B0[0];
+              // fix up the boundary
+              if(gy==Ly-1){
+                theta += (Float)gx*B0[2]*Ly;
+                theta -= (Float)gz*B0[0]*Ly;
+              }
+              break;
+            case 2:
+              theta = (Float)gy*B0[0]-(Float)gx*B0[1];
+              // fix up the boundary
+              if(gz==Lz-1){
+                theta -= (Float)gx*B0[1]*Lz;
+                theta += (Float)gy*B0[0]*Lz;
+              }
+              break;
+            default:
+              ERR.General(cname, "mult_su3_links_by_const_mag_field", "Someone messed up!\n") ;
+            }
+            //
+            theta *= 0.5;
+            Rcomplex cc(cos(theta),sin(theta));
+            vecTimesComplex((IFloat*)&temp, (IFloat)cc.real(), (IFloat)cc.imag(), (const IFloat*)su3_link, 18);
+            moveMem((IFloat*)su3_link, (IFloat*)&temp,sizeof(IFloat)*18);
+          }//loop(mu)
+        }
+      }
+    }
+  }
+}
+
+
+//------------------------------------------------------------------
 /*! Copies the array pointed to by u into the gauge configuration.
    \param u The array to be copied from.
    \post The gauge configuration ia a copy of the array \a u
@@ -366,6 +568,19 @@ void Lattice::GaugeField(Matrix *u)
   smeared = 0;
 }
 
+void Lattice::U1GaugeField(Float *u)
+{
+  char *fname = "U1GaugeField(F*)";
+  VRB.Func(cname,fname);
+  int size;
+
+  size = U1GsiteSize() * GJP.VolNodeSites() * sizeof(IFloat);
+
+  // Copy from u to gauge_field
+  //----------------------------
+  moveMem((IFloat *) u1_gauge_field, (IFloat *) u, size);
+  smeared = 0;
+}
 
 //------------------------------------------------------------------
 /*!
@@ -388,6 +603,19 @@ void Lattice::CopyGaugeField(Matrix* u)
   // Copy from gauge_field to u
   //----------------------------
   moveMem((IFloat *) u, (IFloat *) gauge_field, size);
+}
+
+void Lattice::CopyU1GaugeField(Float* u)
+{
+  char *fname = "CopyU1GaugeField(f*)";
+  VRB.Func(cname,fname);
+  int size;
+
+  size = U1GsiteSize() * GJP.VolNodeSites() * sizeof(IFloat);
+
+  // Copy from gauge_field to u
+  //----------------------------
+  moveMem((IFloat *) u, (IFloat *) u1_gauge_field, size);
 }
 
 //------------------------------------------------------------------
@@ -445,6 +673,10 @@ int Lattice::Colors(void) const
 int Lattice::GsiteSize(void)
 {
   return  2 * Colors() * Colors() * 4; //re/im * colors*colors * dim
+}
+int Lattice::U1GsiteSize(void)
+{
+  return  4; // dim
 }
 
 
@@ -543,6 +775,19 @@ GetLinkOld(Matrix *g_offset, const int *x, int v, int mu) const
     }
 }
 
+// U1 field
+const Float* Lattice::
+GetLinkOld(Float *g_offset, const int *x, int v, int mu) const
+{
+    if(x[v] == node_sites[v]-1) {  // off node
+        getPlusData((IFloat *)&m_tmp1,
+            (IFloat *)(g_offset-x[v]*g_dir_offset[v]+mu),
+            1, v);
+        return (Float*)&m_tmp1;
+    } else {
+        return g_offset+g_dir_offset[v]+mu;
+    }
+}
 
 
 const unsigned CBUF_MODE2 = 0xcca52112;
@@ -681,6 +926,42 @@ void Lattice::Staple(Matrix& stap, int *x, int mu)
   }
 }
 
+// U1 plaquette
+Float Lattice::ReU1Plaq(int *x, int mu, int nu) const
+{
+//char *fname = "Staple(C&,i*,i)";
+//VRB.Func(cname,fname);
+
+  // set cbuf
+  setCbufCntrlReg(2, CBUF_MODE2);
+  setCbufCntrlReg(4, CBUF_MODE4);
+
+  int offset_x = GsiteOffset(x);
+  Float *g_offset = U1GaugeField()+offset_x;
+
+  //----------------------------------------------------------
+  // U_u(x)
+  //----------------------------------------------------------
+  Float p1 = *((IFloat *)(g_offset+mu));
+
+  //----------------------------------------------------------
+  // U_v(x+u)
+  //----------------------------------------------------------
+  p1 += *(GetLinkOld(g_offset, x, mu, nu));
+
+  //----------------------------------------------------------
+  // U_u(x+v)^dagger
+  //----------------------------------------------------------
+  p1 -= *(GetLinkOld(g_offset, x, nu, mu));
+
+  //----------------------------------------------------------
+  // U_v(x)^dagger
+  //----------------------------------------------------------
+  p1 -= *((IFloat *)(g_offset+nu));
+
+  return cos(p1);
+
+}
 
 //------------------------------------------------------------------
 // RectStaple(Matrix& stap, int *x, int mu):
@@ -1232,6 +1513,34 @@ Float Lattice::SumReTrPlaqNode(void) const
   return sum;
 }
 
+Float Lattice::SumReU1PlaqNode() const
+{
+  char *fname = "SumReU1PlaqNode() const";
+  sync();
+  VRB.Func(cname,fname);
+
+  Float sum = 0.0;
+  int x[4];
+
+  for(x[0] = 0; x[0] < node_sites[0]; ++x[0]) {
+    for(x[1] = 0; x[1] < node_sites[1]; ++x[1]) {
+      for(x[2] = 0; x[2] < node_sites[2]; ++x[2]) {
+        for(x[3] = 0; x[3] < node_sites[3]; ++x[3]) {
+
+          for (int mu = 0; mu < 3; ++mu) {
+            for(int nu = mu+1; nu < 4; ++nu) {
+//              VRB.Flow(cname,fname,"%d %d %d %d %d %d\n",x[0],x[1],x[2],x[3],mu,nu);
+              sum += ReU1Plaq(x,mu,nu);
+            }
+          }
+        }
+      }
+    }
+  }
+  sync();
+  VRB.FuncEnd(cname,fname);
+  return sum;
+}
 
 //------------------------------------------------------------------
 /*!
@@ -1257,6 +1566,15 @@ Float Lattice::SumReTrPlaq(void) const
   return sum;
 }
 
+Float Lattice::SumReU1Plaq(void) const
+{
+  char *fname = "SumReTrPlaq() const";
+  VRB.Func(cname,fname);
+
+  Float sum = SumReU1PlaqNode();
+  glb_sum(&sum);
+  return sum;
+}
 
 //-----------------------------------------------------------------------------
 /*!
@@ -2479,6 +2797,26 @@ void Lattice::SetGfieldOrd(void){
 
   for(i=0; i<links; i++){
     u[i].UnitMatrix();
+  }
+}
+
+//------------------------------------------------------------------
+/*
+  \post Each u1 field(angle) is set to zero.
+*/
+//------------------------------------------------------------------
+void Lattice::SetU1GfieldOrd(void){
+  char *fname = "SetGfieldOrd()";
+  VRB.Func(cname,fname);
+  int i;
+  int links;
+  Float *u;
+
+  links = 4 * GJP.VolNodeSites();
+  u = U1GaugeField();
+
+  for(i=0; i<links; i++){
+    u[i]=0.0;
   }
 }
 

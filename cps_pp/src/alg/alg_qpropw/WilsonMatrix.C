@@ -104,6 +104,9 @@ void WilsonMatrix::save_row(int source_spin, int source_color, wilson_vector& rh
 	  }
 	}
 }
+void WilsonMatrix::load_elem(int i, int j, int k, int l, Rcomplex elem) {
+  p.d[i].c[j].d[k].c[l] = elem;
+}
 
 // return the propagator
 const wilson_matrix& WilsonMatrix::wmat() const
@@ -135,6 +138,23 @@ void WilsonMatrix::hconj()
 	
 }
 
+void WilsonMatrix::dump()
+{
+        int c1, c2;
+        int s1, s2;
+	wilson_matrix mat=p;
+
+	for(s1=0;s1<4;s1++)
+	  for(c1=0;c1<3;c1++)
+	    for(s2=0;s2<4;s2++)
+	      for(c2=0;c2<3;c2++)
+		printf("%d %d %d %d %e %e\n",
+		       c1,s1,c2,s2,
+		       p.d[s2].c[c2].d[s1].c[c1].real(), 
+		       p.d[s2].c[c2].d[s1].c[c1].imag()
+		       );
+	
+}
 // return the hermitean conjugate 
 WilsonMatrix WilsonMatrix::conj_cp()
 {
@@ -242,6 +262,59 @@ WilsonMatrix& WilsonMatrix::LeftTimesEqual(const WilsonMatrix& rhs)
     eq_mult(*this,rhs,temp);
     return *this;
 } 
+
+// Left times-equal member for WilsonMatrix
+/*WilsonMatrix& WilsonMatrix::LeftTimesEqual(const WilsonMatrix& rhs)
+{
+        int c1, c2, c3;
+        int s1, s2, s3;
+        wilson_matrix temp=p;
+
+        for(s1=0;s1<4;++s1){
+          for(c1=0;c1<3;++c1){
+            for(s2=0;s2<4;++s2){
+              for(c2=0;c2<3;++c2){
+                p.d[s1].c[c1].d[s2].c[c2]=0.0;
+                for(s3=0;s3<4;++s3){
+                  for(c3=0;c3<3;++c3){
+                    p.d[s1].c[c1].d[s2].c[c2]+=
+                        rhs.p.d[s1].c[c1].d[s3].c[c3]*
+                        temp.d[s3].c[c3].d[s2].c[c2];
+                  }
+                }
+              }
+            }
+          }
+        }
+        return *this;
+}
+*/
+WilsonMatrix& WilsonMatrix::LeftTimesEqual(const Matrix& rhs) {
+  wilson_matrix temp = p;
+
+  for(int s1=0;s1<4;s1++) for(int c1=0;c1<3;c1++)
+        for(int s2=0;s2<4;s2++) for(int c2=0;c2<3;c2++) {
+          p.d[s1].c[c1].d[s2].c[c2] = 0.0;
+          for(int c3=0;c3<3;c3++)
+            p.d[s1].c[c1].d[s2].c[c2] +=
+              rhs(c1,c3) * temp.d[s1].c[c3].d[s2].c[c2];
+          }
+  return *this;
+}
+
+// Multiply WilsonVector by su(3) matrix
+WilsonVector& WilsonVector::LeftTimesEqual(const Matrix& rhs) {
+
+  for(int s=0;s<4;s++){
+    su3_vector temp = d[s];
+    for(int c2=0;c2<3;c2++) {
+      d[s].c[c2] = 0.0;
+      for(int c1=0;c1<3;c1++)
+        d[s].c[c2] += rhs(c2,c1) * temp.c[c1];
+    }
+  }
+  return *this;
+}
 
 // times-equal member operator for WilsonMatrix
 WilsonMatrix& WilsonMatrix::operator*=(const Float& rhs)
@@ -528,6 +601,26 @@ WilsonMatrix& WilsonMatrix::gl(int dir)
                     TIMESMINUSONE( src.d[3].c[i].d[s2].c[c2],
                                    p.d[3].c[i].d[s2].c[c2] );
                 }
+        break;
+  case PL: // (1-g5)/2
+    for(i=0;i<3;i++)for(s2=0;s2<4;s2++)for(c2=0;c2<3;c2++){
+	  p.d[0].c[i].d[s2].c[c2]=0.0;
+	  p.d[1].c[i].d[s2].c[c2]=0.0;
+	  TIMESPLUSONE( src.d[2].c[i].d[s2].c[c2],
+			p.d[2].c[i].d[s2].c[c2] );
+	  TIMESPLUSONE( src.d[3].c[i].d[s2].c[c2],
+			p.d[3].c[i].d[s2].c[c2] );
+        }
+        break;
+  case PR: // (1+g5)/2
+    for(i=0;i<3;i++)for(s2=0;s2<4;s2++)for(c2=0;c2<3;c2++){
+	  TIMESPLUSONE(  src.d[0].c[i].d[s2].c[c2],
+			 p.d[0].c[i].d[s2].c[c2] );
+	  TIMESPLUSONE(  src.d[1].c[i].d[s2].c[c2],
+			 p.d[1].c[i].d[s2].c[c2] );
+	  p.d[2].c[i].d[s2].c[c2]=0.0;
+	  p.d[3].c[i].d[s2].c[c2]=0.0;
+	}
         break;
     default:
 	ERR.General("WilsonMatrix", "gl()", "BAD CALL TO gl()\n");
@@ -1121,11 +1214,31 @@ WilsonMatrix& WilsonMatrix::grA(const WilsonMatrix & from, int dir)
                                    p.d[s1].c[c1].d[3].c[i] );
                 }
         break;
-    default:
-        //VRB.Result(cname,fname,"BAD CALL TO gl()\n");
-        break;
-    }
-    return *this;
+  case PL: // 1-g5
+    for(i=0;i<3;i++)for(s1=0;s1<4;s1++)for(c1=0;c1<3;c1++){
+	  p.d[s1].c[c1].d[0].c[i]=0.0;
+	  p.d[s1].c[c1].d[1].c[i]=0.0;
+	  TIMESPLUSONE( src.d[s1].c[c1].d[2].c[i],
+			p.d[s1].c[c1].d[2].c[i] );
+	  TIMESPLUSONE( src.d[s1].c[c1].d[3].c[i],
+			p.d[s1].c[c1].d[3].c[i] );
+        }
+    break;
+  case PR: // 1+g5
+    for(i=0;i<3;i++)for(s1=0;s1<4;s1++)for(c1=0;c1<3;c1++){
+	  TIMESPLUSONE(  src.d[s1].c[c1].d[0].c[i],
+			 p.d[s1].c[c1].d[0].c[i] );
+	  TIMESPLUSONE(  src.d[s1].c[c1].d[1].c[i],
+			 p.d[s1].c[c1].d[1].c[i] );
+	  p.d[s1].c[c1].d[2].c[i]=0.0;
+	  p.d[s1].c[c1].d[3].c[i]=0.0;
+        }
+    break;
+  default:
+    //VRB.Result(cname,fname,"BAD CALL TO gl()\n");
+    break;
+  }
+  return *this;
 }
 
 // Color trace of a WilsonMatrix

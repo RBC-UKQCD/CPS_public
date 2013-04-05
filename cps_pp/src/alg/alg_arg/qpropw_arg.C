@@ -202,6 +202,8 @@ vml_QPropWBoxArg (VML *vmls, char *name,QPropWBoxArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "box_end", &objp->box_end))
 		 return FALSE;
+	 if (!vml_int (vmls, "use_xyz_offset", &objp->use_xyz_offset))
+		 return FALSE;
 	 vml_class_end(vmls,"QPropWBoxArg",name);
 	return TRUE;
 }

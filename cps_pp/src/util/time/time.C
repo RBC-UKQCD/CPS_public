@@ -1,7 +1,7 @@
 /*!\file
   \brief Implementation of functions for timing and performance measurement.
 
-  $Id: time.C,v 1.14 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: time.C,v 1.15 2013-04-05 17:46:31 chulwoo Exp $
 */
 
 #include <config.h>
@@ -105,6 +105,17 @@ Float print_flops(const char cname[], const char fname[], double nflops, Float t
     if(!UniqueID() && if_print)
 	printf("Node 0: %s:%s: ",cname,fname);
     return print_flops(nflops,time);
+}
+
+
+void print_asctime_(){
+    time_t timer;
+    struct tm *date;
+    char str[256];
+    
+    timer = time(NULL);
+    date = localtime(&timer);
+    printf(" : %s\n", asctime(date));
 }
 
 CPS_END_NAMESPACE

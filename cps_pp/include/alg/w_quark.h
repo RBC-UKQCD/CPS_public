@@ -32,7 +32,14 @@ public:
 	      WspectFuzzing *srcfuzz_p=0,
 	      WspectField *fld_p=0);
 
-  
+  // initialize, allocate memory, nothing else.
+  // add args to mollify stupid WspectQuark.
+  // TB. 6.9.2008  
+  WspectQuark(Lattice &,
+	      WspectArg & warg,      
+	      const WspectHyperRectangle & whr,
+	      DEVOperatorKind src_op_kind=UNIT); 
+ 
   // DTOR
   //-------------------------------------------------------------------------
   ~WspectQuark();
@@ -46,6 +53,9 @@ public:
   const IFloat* Data()             const     { return d_data_p; }
   const IFloat* Data_SP1()      const     { return d_data_mid_point_1; }
   const IFloat* Data_SP2()      const     { return d_data_mid_point_2; }
+  // want to read in data, so can't be const pointer: (TB 6.9.2008)
+        IFloat* Data2()                      { return d_data_p; }
+
   int dataSize()                  const          {return d_size;}
   const IFloat* SourceSlice()      const     { return source_matrix_p; }
   DEVOperatorKind srcOpKind() const { return src_op_kind;}

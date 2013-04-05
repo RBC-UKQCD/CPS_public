@@ -43,6 +43,7 @@
 
 #define MIDPROP 1
 #define PROP  0
+#define PROP5D  2
 
 CPS_START_NAMESPACE
 
@@ -67,6 +68,8 @@ protected:
   // Hueywen: move prop from private to protected
   //! pointer to 4d prop
   WilsonMatrix* prop;
+  //! pointer to 5d prop
+  WilsonMatrix* prop5d;
   
   QPropWArg qp_arg; 
   
@@ -165,6 +168,7 @@ public:
 
   void eig_CG(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len, FermionVectorTp& source, FermionVectorTp& sol, FermionVectorTp& midsol, int& iter, Float& true_res); //by Qi Liu
   void CG(FermionVectorTp&, FermionVectorTp&, FermionVectorTp&, int&, Float&);
+  void CG(int, int, FermionVectorTp&, FermionVectorTp&, FermionVectorTp&, int&, Float&);
    // HueyWen: addtional CG definition
   void CG(Lattice &lat, CgArg *arg, FermionVectorTp& source,
         FermionVectorTp& sol , int& iter, Float& true_res);
@@ -252,6 +256,8 @@ public:
 
   /*! Returns the prop */
   WilsonMatrix& operator[](int i){ return prop[i]; }
+  /*! Returns the 5d prop */
+  WilsonMatrix& operator()(int s,int site){ return prop5d[site+GJP.VolNodeSites()*s]; }
 
   /*! Returns the prop */
   const WilsonMatrix& operator[](int i)const{ return prop[i]; }
@@ -269,6 +275,8 @@ public:
   int PointSrcY()   const { return qp_arg.y; }        
   int PointSrcZ()   const { return qp_arg.z; }
   int siteOffset(const int lcl_site[], const int lcl_sites[]) const; 
+  // if we shfit the box source location by qpropw or not
+  virtual int BoxSrcUseXYZOffset() {return 0; }
 };
   
 
@@ -465,6 +473,8 @@ public:
   SourceType SrcType(){ return BOX; }
   int BoxSrcStart() const { return box_arg.box_start; } 
   int BoxSrcEnd()   const { return box_arg.box_end; }     
+
+  virtual int BoxSrcUseXYZOffset() const {return box_arg.use_xyz_offset; }
 };
 
 // Added by Hantao to handle 4D boxes (in fact it handles all uniform

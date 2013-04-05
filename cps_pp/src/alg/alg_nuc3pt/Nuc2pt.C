@@ -42,6 +42,7 @@ void Nuc2pt::calcNucleon(QPropW& quark){
     HalfFerm=1;
 
   srcdesc[0]=srcdesc[1]=srcdesc[2]=srcdesc[3]=-1 ;
+  srcdesc[4]=srcdesc[5]=-1 ; // TIZB
   switch (quark.SrcType())
     {
     case WALL:
@@ -52,6 +53,11 @@ void Nuc2pt::calcNucleon(QPropW& quark){
       srcdesc[0] = quark.BoxSrcStart() ; 
       srcdesc[1] = quark.BoxSrcEnd() ;
       srcdesc[2] = quark.SourceTime() ;
+      if( quark. BoxSrcUseXYZOffset() ){ // use QPropWArg.{x,y,z} as offset
+	srcdesc[3] = quark.PointSrcX() ; 
+	srcdesc[4] = quark.PointSrcX() ; 
+	srcdesc[5] = quark.PointSrcX() ; 
+      }
       source="BOX" ;
       break ;
     case POINT:
@@ -132,6 +138,7 @@ void Nuc2pt::calcNucleon(QPropW& upquark, QPropW& downquark){
     HalfFerm=1;
 
   srcdesc[0]=srcdesc[1]=srcdesc[2]=srcdesc[3]=-1 ;
+  srcdesc[4]=srcdesc[5]=-1 ; // TIZB
   switch (downquark.SrcType())
     {
     case WALL:
@@ -142,6 +149,11 @@ void Nuc2pt::calcNucleon(QPropW& upquark, QPropW& downquark){
       srcdesc[0] = downquark.BoxSrcStart() ; 
       srcdesc[1] = downquark.BoxSrcEnd() ;
       srcdesc[2] = downquark.SourceTime() ;
+      if( downquark. BoxSrcUseXYZOffset() ){ // use QPropWArg.{x,y,z} as offset
+	srcdesc[3] = downquark.PointSrcX() ; 
+	srcdesc[4] = downquark.PointSrcX() ; 
+	srcdesc[5] = downquark.PointSrcX() ; 
+      }
       source="BOX" ;
       break ;
     case POINT:
@@ -225,6 +237,7 @@ void Nuc2pt::calcWallMomNucleon(QPropW& quark, QPropWMomSrc& mom_quark)
   // p --> - p 
   
   srcdesc[0]=srcdesc[1]=srcdesc[2]=srcdesc[3]=-1 ;
+  srcdesc[4]=srcdesc[5]=-1 ; // TIZB
   switch (quark.SrcType())
     {
     case WALL:
@@ -273,6 +286,7 @@ void Nuc2pt::calcMomNucleon(QPropW& quark, ThreeMom& Mom)
   // p --> - p 
   
   srcdesc[0]=srcdesc[1]=srcdesc[2]=srcdesc[3]=-1 ;
+  srcdesc[4]=srcdesc[5]=-1 ; // TIZB
   switch (quark.SrcType())
     {
     case BOX:
@@ -280,6 +294,11 @@ void Nuc2pt::calcMomNucleon(QPropW& quark, ThreeMom& Mom)
       srcdesc[1] = quark.BoxSrcEnd() ;
       srcdesc[2] = quark.SourceTime() ;
       source="BOX" ;
+      if( quark. BoxSrcUseXYZOffset() ){ // use QPropWArg.{x,y,z} as offset
+	srcdesc[3] = quark.PointSrcX() ; 
+	srcdesc[4] = quark.PointSrcX() ; 
+	srcdesc[5] = quark.PointSrcX() ; 
+      }
       break ;
     case POINT:
       srcdesc[0] = quark.PointSrcX() ; 
@@ -341,6 +360,7 @@ void Nuc2pt::calcNucleon(QPropW& quark, int dohalf){
   HalfFerm=dohalf;
 
   srcdesc[0]=srcdesc[1]=srcdesc[2]=srcdesc[3]=-1 ;
+  srcdesc[4]=srcdesc[5]=-1 ; // TIZB
   switch (quark.SrcType())
     {
     case WALL:
@@ -351,6 +371,11 @@ void Nuc2pt::calcNucleon(QPropW& quark, int dohalf){
       srcdesc[0] = quark.BoxSrcStart() ; 
       srcdesc[1] = quark.BoxSrcEnd() ;
       srcdesc[2] = quark.SourceTime() ;
+      if( quark. BoxSrcUseXYZOffset() ){ // use QPropWArg.{x,y,z} as offset
+	srcdesc[3] = quark.PointSrcX() ; 
+	srcdesc[4] = quark.PointSrcX() ; 
+	srcdesc[5] = quark.PointSrcX() ; 
+      }
       source="BOX" ;
       break ;
     case POINT:
@@ -437,12 +462,18 @@ void Nuc2pt::calcMomNucleon(QPropW& quark, ThreeMom& Mom, int dohalf)
   HalfFerm=dohalf;
   
   srcdesc[0]=srcdesc[1]=srcdesc[2]=srcdesc[3]=-1 ;
+  srcdesc[4]=srcdesc[5]=-1 ; // TIZB
   switch (quark.SrcType())
     {
     case BOX:
       srcdesc[0] = quark.BoxSrcStart() ; 
       srcdesc[1] = quark.BoxSrcEnd() ;
       srcdesc[2] = quark.SourceTime() ;
+      if( quark. BoxSrcUseXYZOffset() ){ // use QPropWArg.{x,y,z} as offset
+	srcdesc[3] = quark.PointSrcX() ; 
+	srcdesc[4] = quark.PointSrcX() ; 
+	srcdesc[5] = quark.PointSrcX() ; 
+      }
       source="BOX" ;
       break ;
     case POINT:
@@ -551,7 +582,7 @@ void Nuc2pt::Print(FILE *fp)
   Fprintf(fp,"MASSES:  %e %e %e\n",
 	  (float)quark_mass,(float)quark_mass,(float)quark_mass) ;
   Fprintf(fp,"SOURCE: %s ",source) ;
-  for(int i(0) ; i<4;i++)
+  for(int i(0) ; i<6;i++) // TIZB
     if(srcdesc[i]>-1)
       Fprintf(fp,"%i ",srcdesc[i]) ;
   Fprintf(fp,"\n" ) ;

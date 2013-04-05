@@ -349,7 +349,7 @@ void qio_writePropagator::qio_openOutput(char *filename, QIO_String *record_file
 
   oflag.mode = QIO_TRUNC;
 
-  outfile = QIO_open_write(record_file, filename, volfmt, &layout, NULL, &oflag);
+  outfile = QIO_open_write(record_file, filename, volfmt, &layout, pointer_fs, &oflag);
 
   qio_Output = outfile;
 
@@ -395,6 +395,8 @@ void qio_writePropagator::write_ScS_12sink(char *outfile, const void *prop, cons
 
   qio_setLayout();
 
+  qio_setFilesystem();
+  
   //detect output format
 
   int SingleDouble(1);
@@ -783,6 +785,8 @@ void qio_writePropagator::write_12pairs(char *outfile, const QIO_PROP_SOURCE_TYP
   record_file = QIO_string_create();
 
   qio_setLayout();
+  
+  qio_setFilesystem();
   
   //detect output format
 

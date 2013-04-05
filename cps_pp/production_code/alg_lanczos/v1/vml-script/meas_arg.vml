@@ -1,0 +1,33 @@
+class MeasArg meas_arg = {
+FclassType Fermion = F_CLASS_DWF
+GclassType Gluon = G_CLASS_IMPR_RECT
+string WorkDirectory="./"
+string GaugeStem="/lqcdproj/Muon/izubuchi/Conf/DW_b2.13_16x32_ms0.032-mu0.01/ckpoint_lat.IEEE64BIG"
+string RNGStem=""
+MeasIOTask GaugeIO = MeasIONone
+MeasIOTask RNGIO = MeasIONone
+int TrajStart = 1100
+int TrajIncrement = 100
+int TrajLessThanLimit = 1100
+int TrajCur = 0
+int HdwXCsum = 1
+int HdwRCsum = 1
+int IOconcurrency = 1
+Array TaskList[3] = { 
+class MeasTask TaskList[0] = {
+MeasType Measurement = MeasAlgPlaq
+string ArgFilename = "no_arg.vml"
+string OutputFilestem = "./results/alg_plaq/plaq"
+}
+class MeasTask TaskList[1] = {
+MeasType Measurement = MeasAlgWspect
+string ArgFilename = "w_spect_arg.vml"
+string OutputFilestem = "./results/alg_w_spect/m0.02/lat"
+}
+class MeasTask TaskList[2] = {
+MeasType Measurement = MeasAlgEig
+string ArgFilename = "eig_arg.vml"
+string OutputFilestem = "./results/alg_eig/eig"
+}
+}
+}

@@ -53,8 +53,11 @@ public:
 
   void SetWallSource ( int color, int spin, int time_slice);
   void SetWallSource ( int color, int spin, int time_slice, Float* src);
+
+  // if src_offset is non NULL use the array as offsets for the starts and ends of the box soruce
   void SetBoxSource  ( int color, int spin, int bstart, int bend, 
-		    int time_slice);
+		       int time_slice,
+		       int* src_offset=0);
 
   // Sets a 4D box source. If you want to set a 3D xyz box, set
   // size[3] == 1 and glb_x[3] to the global time slice you want.

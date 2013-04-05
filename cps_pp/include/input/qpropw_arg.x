@@ -66,7 +66,6 @@ class QPropWArg {
   int EndSrcSpin;
   int StartSrcColor;
   int EndSrcColor;
-
   memfun QPropWArg();
 };
 
@@ -86,6 +85,7 @@ class QPropWBoxArg {
   // box source size
   int box_start;
   int box_end;
+  int use_xyz_offset; // if we use QPropW.{x,y,z} for the offset of the box 
   memfun QPropWBoxArg();
 };
 

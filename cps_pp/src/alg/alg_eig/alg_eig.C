@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Methods of the AlgEig class.
   
-  $Id: alg_eig.C,v 1.26 2011-07-13 02:18:50 chulwoo Exp $
+  $Id: alg_eig.C,v 1.27 2013-04-05 17:46:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-07-13 02:18:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.26 2011-07-13 02:18:50 chulwoo Exp $
-//  $Id: alg_eig.C,v 1.26 2011-07-13 02:18:50 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v 1.27 2013-04-05 17:46:30 chulwoo Exp $
+//  $Id: alg_eig.C,v 1.27 2013-04-05 17:46:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_eig.C,v $
-//  $Revision: 1.26 $
+//  $Revision: 1.27 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eig/alg_eig.C,v $
 //  $State: Exp $
 //
@@ -34,6 +34,12 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/verbose.h>
 #include <util/error.h>
+//#include <util/time_cps.h>
+//#include <util/qcdio.h>
+//#include <util/qio_writeGenericFields.h>
+//#include <util/qio_readGenericFields.h>
+
+
 CPS_START_NAMESPACE
 
 using namespace std;
@@ -99,25 +105,29 @@ AlgEig::AlgEig(Lattice& latt,
   //----------------------------------------------------------------
   int f_size = GJP.VolNodeSites() * latt.FsiteSize() * Ncb / 2;
   VRB.Flow(cname,fname,"f_size=%d\n",0);
-//  int f_size = GJP.VolNodeSites() * Ncb / 2;
-//  exit(1);
-  int N_eig = alg_eig_arg->N_eig;
 
+  //  int f_size = GJP.VolNodeSites() * Ncb / 2;
+  //  exit(1);
+
+  
+  //VRB.Flow(cname,fname,"Doing Ritz");
+  int N_eig = alg_eig_arg->N_eig;
+  
   // Allocate memory for the eigenvectors and eigenvalues
   //----------------------------------------------------------------
   eigenv = (Vector **) smalloc (cname,fname, "eigenv", N_eig * sizeof(Vector *));
   
   for(int n = 0; n < N_eig; ++n)
-  {
-    eigenv[n] = (Vector *) smalloc(cname,fname, "eigenv[n]", (f_size)* sizeof(Float));
-  }
-
+    {
+      eigenv[n] = (Vector *) smalloc(cname,fname, "eigenv[n]", (f_size)* sizeof(Float));
+    }
+  
   lambda = (Float *) smalloc(cname,fname, "lambda", 2*N_eig * sizeof(Float));
-
+  
   chirality = (Float *) smalloc(cname,fname,"chirality", N_eig * sizeof(Float));
-
+  
   valid_eig = (int *) smalloc(cname,fname,"valid_eig",N_eig * sizeof(int));
-
+  
   // Print out input parameters
   //----------------------------------------------------------------
   VRB.Input(cname,fname,
@@ -130,7 +140,7 @@ AlgEig::AlgEig(Lattice& latt,
 	    "Mass_final = %g\n",IFloat(alg_eig_arg->Mass_final));
   VRB.Input(cname,fname,
 	    "Mass_step = %g\n",IFloat(alg_eig_arg->Mass_step));
-
+  
   // Calculate n_masses if necessary
   VRB.Flow(cname,fname,"alg_eig_arg->pattern_kind=%d\n",alg_eig_arg->pattern_kind);
   switch( alg_eig_arg->pattern_kind ) {
@@ -139,11 +149,11 @@ AlgEig::AlgEig(Lattice& latt,
     break;
   case LOG:
     n_masses = (int) ((log(alg_eig_arg->Mass_final - alg_eig_arg->Mass_init)
-		    / log(alg_eig_arg->Mass_step)) + 1.000001);
+		       / log(alg_eig_arg->Mass_step)) + 1.000001);
     break;
   case LIN:   
     n_masses = (int) (fabs((alg_eig_arg->Mass_final 
-      - alg_eig_arg->Mass_init)/alg_eig_arg->Mass_step) + 1.000001); 
+			    - alg_eig_arg->Mass_init)/alg_eig_arg->Mass_step) + 1.000001); 
     break;
   default: 
     ERR.General(cname, fname,
@@ -151,8 +161,8 @@ AlgEig::AlgEig(Lattice& latt,
 		alg_eig_arg->pattern_kind);
     break;
   }  
+  
   VRB.FuncEnd(cname,fname);
-
 }
 
 
@@ -166,18 +176,17 @@ AlgEig::~AlgEig() {
   // Free memory
   //----------------------------------------------------------------
   sfree(cname,fname, "valid_eig", valid_eig);
-
+    
   sfree(cname,fname, "chirality", chirality);
-
+    
   sfree(cname,fname, "lambda", lambda);
-
+    
   for(int n = alg_eig_arg->N_eig - 1; n >= 0; --n)
-  {
-    sfree(cname,fname, "eigenv[n] ",eigenv[n]);
-  }
-
+    {
+      sfree(cname,fname, "eigenv[n] ",eigenv[n]);
+    }
+    
   sfree(cname,fname, "eigenv", eigenv);
-
   //???
 }
 
@@ -187,7 +196,6 @@ void AlgEig::run()
   run((Float**)0);
 }
 
-
 //------------------------------------------------------------------
 //! Performs the computation.
 /*!
@@ -195,7 +203,7 @@ void AlgEig::run()
   structure.
 */
 //------------------------------------------------------------------
-void AlgEig::run(Float **evalues)
+void AlgEig::run(Float **evalues, Vector **in_eigv)
 {
 #if TARGET==cpsMPI
     using MPISCU::fprintf;
@@ -319,11 +327,20 @@ void AlgEig::run(Float **evalues)
     }
 
 
-    // random guess every time; do *not* put in the old solution
-    for(n = 0; n<N_eig; ++n)
-    {
-      lat.RandGaussVector(eigenv[n], 0.5, Ncb);
-    }
+    // TIZB use the input eigenvector as starting vectors
+    //if(in_eigv){
+     // for(n = 0; n<N_eig; ++n)
+//	eigenv[n]->CopyVec(in_eigv[n],f_size); 
+ //   } else {
+      // random guess every time; do *not* put in the old solution
+      // TIZB why ? Ask Chulwoo !
+      for(n = 0; n<N_eig; ++n)
+	{
+	  lat.RandGaussVector(eigenv[n], 0.5, Ncb);
+	}
+  //  }
+
+
 
 /*
     // DEBUG, dumping start vector from QCDOC to be read in QCDSP
@@ -379,11 +396,11 @@ void AlgEig::run(Float **evalues)
 #endif
    
     //!< Copy over eigenvalues to return them
-    if (evalues != 0) {
-      for (int eig=0; eig<eig_arg->N_eig; eig++) {
-	evalues[eig][m] = lambda[eig];
-      }
-    }
+    //if (evalues != 0) {
+    //  for (int eig=0; eig<eig_arg->N_eig; eig++) {
+//	evalues[eig][m] = lambda[eig];
+ //     }
+  //  }
 
     if ( iter < 0 )
     {
@@ -497,6 +514,14 @@ void AlgEig::run(Float **evalues)
   time +=dclock();
   print_flops(cname,fname,0,time);
 
+  // TIZB
+  //if(in_eigv){
+   // for(n = 0; n<N_eig; ++n)
+    //  in_eigv[n]->CopyVec(eigenv[n],f_size); 
+  //}
+
 }
+
+
 
 CPS_END_NAMESPACE
