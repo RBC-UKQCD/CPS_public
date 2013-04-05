@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgGheatBath class methods.
   
-  $Id: alg_ghb.C,v 1.14 2006-07-03 04:48:06 chulwoo Exp $
+  $Id: alg_ghb.C,v 1.15 2013-04-05 17:51:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-07-03 04:48:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.14 2006-07-03 04:48:06 chulwoo Exp $
-//  $Id: alg_ghb.C,v 1.14 2006-07-03 04:48:06 chulwoo Exp $
+//  $Date: 2013-04-05 17:51:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.15 2013-04-05 17:51:13 chulwoo Exp $
+//  $Id: alg_ghb.C,v 1.15 2013-04-05 17:51:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
 //  $State: Exp $
 //
@@ -35,7 +35,7 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/verbose.h>
 #include <util/error.h>
-#include <mem/p2v.h>
+////#include <mem/p2v.h>
 CPS_START_NAMESPACE
 
 //Uncomment next line to switch on timing
@@ -107,7 +107,7 @@ void AlgGheatBath::relocate(){
 #if TARGET == QCDSP
   /*{
     // relocate assembly code into CRAM
-    p2vGhb();
+//    p2vGhb();
 
     // Special initialization actions required for relocatable 
     // assembly.  Must be preformed _after_ asembly code has been

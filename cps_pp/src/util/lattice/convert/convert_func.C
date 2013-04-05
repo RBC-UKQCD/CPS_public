@@ -1,27 +1,26 @@
 #include<config.h>
 #include<unistd.h>
-#if TARGET != QCDOC
-#ifndef HAVE_SYNC
-void inline sync(){}
-#endif
-#endif
+//#ifndef HAVE_SYNC
+//static void inline CPS_NAMESPACE::sync(){}
+//#endif
+#include<comms/sysfunc_qmp.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.22 2012-05-15 05:50:09 chulwoo Exp $
+  $Id: convert_func.C,v 1.23 2013-04-05 17:51:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-05-15 05:50:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.22 2012-05-15 05:50:09 chulwoo Exp $
-//  $Id: convert_func.C,v 1.22 2012-05-15 05:50:09 chulwoo Exp $
+//  $Date: 2013-04-05 17:51:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.23 2013-04-05 17:51:14 chulwoo Exp $
+//  $Id: convert_func.C,v 1.23 2013-04-05 17:51:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.22 $
+//  $Revision: 1.23 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -32,7 +31,7 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/lattice.h>
 #include <comms/sysfunc_cps.h>
-//#include <comms/nga_reg.h>
+////#include <comms/nga_reg.h>
 #include <comms/cbuf.h>
 CPS_START_NAMESPACE
 

@@ -3,20 +3,20 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: zs $
-//  $Date: 2004-08-18 11:57:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/cbuf/cram.C,v 1.3 2004-08-18 11:57:41 zs Exp $
-//  $Id: cram.C,v 1.3 2004-08-18 11:57:41 zs Exp $
+//  $Author: chulwoo $
+//  $Date: 2013-04-05 17:51:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/cbuf/cram.C,v 1.4 2013-04-05 17:51:13 chulwoo Exp $
+//  $Id: cram.C,v 1.4 2013-04-05 17:51:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: cram.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/cbuf/cram.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 CPS_END_NAMESPACE
-#include<comms/nga_reg.h>
+//#include<comms/nga_reg.h>
 CPS_START_NAMESPACE
 //Allocate space for the SCRATCH CRAM 
 //Workstation version only

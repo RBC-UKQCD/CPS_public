@@ -10,12 +10,12 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-09-18 15:23:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.8 2008-09-18 15:23:17 chulwoo Exp $
-//  $Id: link_buffer.C,v 1.8 2008-09-18 15:23:17 chulwoo Exp $
+//  $Date: 2013-04-05 17:51:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v 1.9 2013-04-05 17:51:14 chulwoo Exp $
+//  $Id: link_buffer.C,v 1.9 2013-04-05 17:51:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.8 $
+//  $Revision: 1.9 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/link_buffer.C,v $
 //  $State: Exp $
 //
@@ -23,7 +23,7 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/verbose.h>
-#include <comms/nga_reg.h>
+//#include <comms/nga_reg.h>
 #include <comms/scu.h>
 #include <comms/cbuf.h>
 #include <util/gjp.h>

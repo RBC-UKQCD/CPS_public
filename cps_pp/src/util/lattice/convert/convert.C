@@ -18,7 +18,7 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 #include <util/gjp.h>
-#include <comms/nga_reg.h>
+//#include <comms/nga_reg.h>
 #include <comms/cbuf.h>
 CPS_START_NAMESPACE
 

@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpMdwf class methods.
 
-  $Id: d_op_mdwf.C,v 1.5 2011-06-26 06:45:29 chulwoo Exp $
+  $Id: d_op_mdwf.C,v 1.6 2013-04-05 17:51:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-06-26 06:45:29 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v 1.5 2011-06-26 06:45:29 chulwoo Exp $
-//  $Id: d_op_mdwf.C,v 1.5 2011-06-26 06:45:29 chulwoo Exp $
+//  $Date: 2013-04-05 17:51:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v 1.6 2013-04-05 17:51:14 chulwoo Exp $
+//  $Id: d_op_mdwf.C,v 1.6 2013-04-05 17:51:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_mdwf.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mdwf/d_op_mdwf.C,v $
 //  $State: Exp $
 //
@@ -39,7 +39,7 @@ CPS_END_NAMESPACE
 #include <util/wilson.h>
 #include <util/time_cps.h>
 #include <util/dwf.h>
-#include <mem/p2v.h>
+//#include <mem/p2v.h>
 #include <comms/glb.h>
 CPS_START_NAMESPACE
 #ifdef USE_MDWF

@@ -303,9 +303,9 @@ return 1;
 */
 /* In this implementation, this just returns the integer value
   associated with the direction from the SCUDir enum */
-int SCURemap( SCUDir dir ) {
-    return (int)dir;
-}
+//int SCURemap( SCUDir dir ) {
+//    return (int)dir;
+//}
 
 
 CPS_END_NAMESPACE

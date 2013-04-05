@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C.sav,v 1.2 2008-04-21 17:18:02 chulwoo Exp $
+  $Id: d_op_dwf.C.sav,v 1.3 2013-04-05 17:51:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-21 17:18:02 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/d_op_dwf.C.sav,v 1.2 2008-04-21 17:18:02 chulwoo Exp $
-//  $Id: d_op_dwf.C.sav,v 1.2 2008-04-21 17:18:02 chulwoo Exp $
+//  $Date: 2013-04-05 17:51:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/d_op_dwf.C.sav,v 1.3 2013-04-05 17:51:13 chulwoo Exp $
+//  $Id: d_op_dwf.C.sav,v 1.3 2013-04-05 17:51:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C.sav,v $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/d_op_dwf.C.sav,v $
 //  $State: Exp $
 //
@@ -38,7 +38,7 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <util/wilson.h>
 #include <util/dwf.h>
-#include <mem/p2v.h>
+//#include <mem/p2v.h>
 #include <comms/glb.h>
 CPS_START_NAMESPACE
 
@@ -116,7 +116,7 @@ DiracOpDwf::DiracOpDwf(Lattice & latt,
   //----------------------------------------------------------------
   // Copy optimized code into its execution place (CRAM)
   //----------------------------------------------------------------
-  p2vWilsonLib();
+//  p2vWilsonLib();
 
 }
 

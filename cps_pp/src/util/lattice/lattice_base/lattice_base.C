@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.70 2013-04-05 17:46:31 chulwoo Exp $
+  $Id: lattice_base.C,v 1.71 2013-04-05 17:51:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-04-05 17:46:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.70 2013-04-05 17:46:31 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.70 2013-04-05 17:46:31 chulwoo Exp $
+//  $Date: 2013-04-05 17:51:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.71 2013-04-05 17:51:14 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.71 2013-04-05 17:51:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.70 $
+//  $Revision: 1.71 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -42,7 +42,7 @@
 #include <util/ReadU1LatticePar.h>
 #include <util/checksum.h>
 #include <util/data_shift.h>
-#include <comms/nga_reg.h>
+//#include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
 #include <comms/cbuf.h>

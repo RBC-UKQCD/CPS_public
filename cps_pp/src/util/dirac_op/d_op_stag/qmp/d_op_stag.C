@@ -23,7 +23,7 @@ CPS_END_NAMESPACE
 #include<comms/cbuf.h>
 #include<comms/glb.h>
 #include<comms/scu.h>
-#include<mem/p2v.h>
+//#include<mem/p2v.h>
 CPS_START_NAMESPACE
 
 

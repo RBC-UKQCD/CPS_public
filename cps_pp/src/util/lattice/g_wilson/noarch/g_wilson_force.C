@@ -2,7 +2,7 @@
 #include <util/gjp.h>
 #include <util/lattice.h>
 #include <util/time_cps.h>
-#include <comms/nga_reg.h>
+//#include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/cbuf.h>
 CPS_START_NAMESPACE

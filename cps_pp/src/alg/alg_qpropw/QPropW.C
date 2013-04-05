@@ -427,6 +427,7 @@ void QPropW::Run(const int do_rerun, const Float precision)
      for (int spn=StartSpin; spn < EndSpin; spn++)
        for (int col=StartColor; col < EndColor; col++) {
 		 
+   Float dt_src = -dclock();
 	 // initial guess (Zero)
 	 sol.ZeroSource();
 
@@ -455,13 +456,19 @@ void QPropW::Run(const int do_rerun, const Float precision)
 
 	 if ((DoHalfFermion())&&(!seq_src)) // Rotate to chiral basis
 	   src.DiracToChiral();
+   dt_src += dclock();
+   VRB.Result(cname, fname, "Time taken to fix source,etc: %17.10e seconds.\n",dt_src);
 
+   dt_src = -dclock();
 	 // Get the prop
 	 VRB.Debug(cname,fname,"Before CG in QpropW.Run() \n");
 	 //CG(src, sol, midsol, iter, true_res);
 	 CG(spn, col, src, sol, midsol, iter, true_res);
 
 	 //gauge fix solution
+   dt_src += dclock();
+   VRB.Result(cname, fname, "Time taken to CG: %17.10e seconds.\n",dt_src);
+   dt_src = -dclock();
 	 FixSol(sol);
 	 if (StoreMidprop()) FixSol(midsol);
 	 
@@ -477,6 +484,8 @@ void QPropW::Run(const int do_rerun, const Float precision)
 	     LoadRow(spn2,col,src,src);
 	   }
 	 }
+   dt_src += dclock();
+   VRB.Result(cname, fname, "Time taken to fix sink,etc: %17.10e seconds.\n",dt_src);
 		 
 	 if (common_arg->results != 0) {
 	   FILE *fp = Fopen((char *)common_arg->results, "a");

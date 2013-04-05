@@ -21,7 +21,7 @@
 #ifndef UNIFORM_SEED_NO_COMMS
 #include<qmp.h>
 #endif
-#include <comms/scu_enum.h>
+//#include <comms/scu_enum.h>
 CPS_START_NAMESPACE
 
 
@@ -59,10 +59,10 @@ unsigned int SeedS();  //!< Gets a RNG seed.
 unsigned int SeedT();  //!< Gets a RNG seed.
 unsigned int SeedST(); //!< Gets a RNG seed.
 
-//! A barrier function.
-//inline void sync(){QMP_barrier();}
 #ifndef HAVE_SYNC
 unsigned int sync();
+//! A barrier function.
+//inline void sync(){QMP_barrier();}
 #endif
 
 //! Gets the direction used internally by the comms layer.
