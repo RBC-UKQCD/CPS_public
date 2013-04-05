@@ -2,19 +2,19 @@
 /*! \file
   \brief Declarations of routine used internally in the DiracOpWilson class.
 
-  $Id: wilson.h,v 1.10 2012-07-06 20:22:08 chulwoo Exp $
+  $Id: wilson.h,v 1.11 2013-04-05 17:46:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-07-06 20:22:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.10 2012-07-06 20:22:08 chulwoo Exp $
-//  $Id: wilson.h,v 1.10 2012-07-06 20:22:08 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v 1.11 2013-04-05 17:46:30 chulwoo Exp $
+//  $Id: wilson.h,v 1.11 2013-04-05 17:46:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: wilson.h,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/wilson.h,v $
 //  $State: Exp $
 //
@@ -34,7 +34,6 @@
 #ifdef USE_QMP
 #include <qmp.h>
 #endif
-
 #include <util/data_types.h>
 
 CPS_START_NAMESPACE
@@ -137,7 +136,6 @@ typedef struct
   QMP_msghandle_t msghandle[8][2];
   QMP_msghandle_t multiple[8];
 #endif
-
 
   // For Profile in SSEOMP
   IFloat MultFlops,MultFlops_bnd, MultFlops_blk;

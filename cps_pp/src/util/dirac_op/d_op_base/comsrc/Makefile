@@ -6,4 +6,5 @@ QCDOC_DIR = qcdoc
 QCDOC_SERIAL_DIR = qcdoc
 NOARCH_DIR = noarch
 PWD = $(shell pwd)
+#include ../../../../../Makefile.rules.xlc
 include ../../../../../Makefile.rules

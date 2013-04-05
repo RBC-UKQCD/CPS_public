@@ -11,6 +11,7 @@
 //
 //------------------------------------------------------------------
 #include <alg/meson.h>
+#include <util/site.h>
 
 CPS_START_NAMESPACE
 
@@ -111,6 +112,82 @@ void Meson::calcMeson(QPropW& q1, QPropW& q2)//adds to the correlation function
     }
 
   // Global sum the correlators
+  // TIZB, THIS IS VERY BAD for more than one source location sum !!
+  func.GlobalSum() ;
+}
+
+
+void Meson::calcMesonMom(QPropW& q1, QPropW& q2, int* mom)//adds to the correlation function
+{
+  char *cname = "MesonMom";
+  char *fname = "calcMeson(QpropW&,QpropW&, int*)";
+  VRB.Func(cname,fname);
+
+  if ( mom ){
+    ThreeMom tmom ( mom );
+    calcMesonMom(q1, q2, tmom);
+  } else {// if mom is NULL call the zero mom meson
+    calcMeson(q1, q2);
+  }
+}
+
+
+//adds to the correlation function
+void Meson::calcMesonMom(QPropW& q1, QPropW& q2, ThreeMom& tmom)
+{
+  char *cname = "MesonMom";
+  char *fname = "calcMeson(QpropW&,QpropW&,ThtreeMom&)";
+  VRB.Func(cname,fname);
+
+  
+  // m[i] should have been set by setMass!
+  if((m[0]!=q1.Mass())||(m[1]!=q2.Mass())) 
+    ERR.General(cname,fname,"OOPS: Masses changed! %s %s %e %e %e %e\n",
+		src,snk,
+		m[0],q1.Mass(), m[1], q2.Mass() );
+  
+  int t_src(q1.SourceTime());
+  if(t_src!=q2.SourceTime())
+    ERR.General(cname,fname,"Source times not equal!\n");
+  
+
+  int t ;
+  int first_index(0) ;
+  int second_index(0) ;
+
+  WilsonMatrix temp;
+
+  if( (gamma[0]==-5) || ((gamma[0]>-1) && (gamma[0]<4)) )
+    first_index = 1 ;
+
+  if( (gamma[1]==-5) || ((gamma[1]>-1) && (gamma[1]<4)) )
+    second_index = 1 ;
+  // If both indices are out of range then the Scalar meson is constructed
+
+  int Nt(func.TimeSize());
+  Site x;
+  while ( x.LoopsOverNode() )
+    {
+      int i=x.Index();
+
+      t=i/(GJP.VolNodeSites()/GJP.TnodeSites()); // t coordinate in node 
+      t += GJP.TnodeCoor()*GJP.TnodeSites(); // plus t node offset physical t
+      
+      temp = q2[i] ;
+      temp.hconj() ;
+      temp.gr(-5).gl(-5);
+      //temp is the antiquark
+
+      if(first_index)  temp.gl(gamma[0]).gr(gamma[0]) ;
+      if(second_index) temp.gl(gamma[1]).gr(gamma[1]) ;
+      
+      //Shift the time to make source be at t=0
+      func[(t + Nt - t_src)%Nt] += Trace(q1[i],temp)*tmom.Fact(x) ; // exp(-i p*x) ; 
+      // meson correlator point sink
+    }
+
+  // Global sum the correlators
+  // TIZB, THIS IS VERY BAD for more than one source location sum !!
   func.GlobalSum() ;
 
 }

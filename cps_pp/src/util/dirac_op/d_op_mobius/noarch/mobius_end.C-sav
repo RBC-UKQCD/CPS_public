@@ -1,0 +1,65 @@
+#include<config.h>
+CPS_START_NAMESPACE
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/noarch/mobius_end.C-sav,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
+//------------------------------------------------------------------
+// 10/16/97
+//
+// mobius_end:
+//
+// This routine frees any memory that was allocated by mobius_init
+//
+// WARNING:
+//
+// This set of routines will work only if the node sublattices have
+// even number of sites in each direction.
+//
+//------------------------------------------------------------------
+
+CPS_END_NAMESPACE
+#include<util/mobius.h>
+#include<util/smalloc.h>
+#include<util/verbose.h>
+CPS_START_NAMESPACE
+
+
+void mobius_end( Mobius *mobius_p)
+{
+  char *cname = " ";
+  char *fname = "mobius_end(Mobius*)";
+  VRB.Func(cname,fname);
+
+  //------------------------------------------------------------------
+  // Free memory of the 12 word communications buffer needed
+  // for the spread-out case.
+  //------------------------------------------------------------------
+  VRB.Sfree(cname,fname, "comm_buf", mobius_p->comm_buf);
+  sfree(mobius_p->comm_buf);
+
+  //----------------------------------------------------------------
+  // Free temporary femrion fields 2 and 1
+  //----------------------------------------------------------------
+#if 0
+  VRB.Sfree(cname,fname, "frm_tmp3", mobius_p->frm_tmp3);
+  sfree(mobius_p->frm_tmp3);
+#endif
+  
+  VRB.Sfree(cname,fname, "frm_tmp2", mobius_p->frm_tmp2);
+  sfree(mobius_p->frm_tmp2);
+
+  VRB.Sfree(cname,fname, "frm_tmp1", mobius_p->frm_tmp1);
+  sfree(mobius_p->frm_tmp1);
+
+  //----------------------------------------------------------------
+  // Un-initialize the wilson library. Memory is set free here.
+  //----------------------------------------------------------------
+  wilson_end(mobius_p->wilson_p);
+
+
+}
+CPS_END_NAMESPACE

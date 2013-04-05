@@ -67,6 +67,8 @@ class QioArg {
 
  public:
   Matrix * StartConfLoadAddr;
+  Float * StartU1ConfLoadAddr;
+
   char FileName[256];
 //  string FileName;
   int ConcurIONumber;

@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-07-21 16:56:44 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.13 2008-07-21 16:56:44 chulwoo Exp $
-//  $Id: quark_prop_s.C,v 1.13 2008-07-21 16:56:44 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.14 2013-04-05 17:46:30 chulwoo Exp $
+//  $Id: quark_prop_s.C,v 1.14 2013-04-05 17:46:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: quark_prop_s.C,v $
-//  $Revision: 1.13 $
+//  $Revision: 1.14 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v $
 //  $State: Exp $
 //
@@ -192,8 +192,9 @@ void QuarkPropS::setPntSrc(const int *src_p, int color)
       for (int k = 0; k < 4; k++) {
         site[k] -= node_origin[k];
       }
-      int soff = X_OFFSET(site);
-      *(qSrc+soff+2*color) = 1.0;
+      //int soff = X_OFFSET(site);
+      int soff = site[0]+GJP.XnodeSites()*(site[1]+GJP.YnodeSites()*(site[2]+GJP.ZnodeSites()*(site[3])));
+      *(qSrc+VECT_LEN*soff+2*color) = 1.0;
     }
 
 }
@@ -374,9 +375,11 @@ void QuarkPropS::getQuarkPropS(char *results)
       }
 
       IFloat *src = (IFloat *)qSrc;
+      //lat.Convert(CANONICAL,(Vector*)src);
       IFloat *sln = (IFloat *)prop[color];
       cg_iter = lat.FmatInv((Vector *)sln, (Vector *)src, 
-			    &(qarg.cg), &true_res, CNV_FRM_NO);
+			    &(qarg.cg), &true_res, CNV_FRM_YES);
+			    //&(qarg.cg), &true_res, CNV_FRM_NO);
 
       // Added for anisotropic lattices
       vecTimesEquFloat(sln, GJP.XiBare()/GJP.XiV(), 2*vsize); 

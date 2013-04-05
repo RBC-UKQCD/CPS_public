@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Utility routines for SU(3) matrices.
 
-  $Id: su3_util.C,v 1.7 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: su3_util.C,v 1.8 2013-04-05 17:46:31 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-10 14:05:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v 1.7 2012-08-10 14:05:33 chulwoo Exp $
-//  $Id: su3_util.C,v 1.7 2012-08-10 14:05:33 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v 1.8 2013-04-05 17:46:31 chulwoo Exp $
+//  $Id: su3_util.C,v 1.8 2013-04-05 17:46:31 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.7 $
+//  $Revision: 1.8 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v $
 //  $State: Exp $
 //
@@ -56,6 +56,32 @@ void Matrix::Dagger(const IFloat* a)
     u[4]  = a[12];  u[5]  = -a[13];
     u[10] = a[14];  u[11] = -a[15];
     u[16] = a[16];  u[17] = -a[17];
+}
+void Matrix::Transpose(const IFloat* a)
+{
+    u[0]  = a[0];   u[1]  = a[1];
+    u[6]  = a[2];   u[7]  = a[3];
+    u[12] = a[4];   u[13] = a[5];
+    u[2]  = a[6];   u[3]  = a[7];
+    u[8]  = a[8];   u[9]  = a[9];
+    u[14] = a[10];  u[15] = a[11];
+    u[4]  = a[12];  u[5]  = a[13];
+    u[10] = a[14];  u[11] = a[15];
+    u[16] = a[16];  u[17] = a[17];
+}
+void Matrix::Transpose()
+{
+    Matrix m;
+    m=*this;
+    u[0]  = m.u[0];   u[1]  = m.u[1];
+    u[6]  = m.u[2];   u[7]  = m.u[3];
+    u[12] = m.u[4];   u[13] = m.u[5];
+    u[2]  = m.u[6];   u[3]  = m.u[7];
+    u[8]  = m.u[8];   u[9]  = m.u[9];
+    u[14] = m.u[10];  u[15] = m.u[11];
+    u[4]  = m.u[12];  u[5]  = m.u[13];
+    u[10] = m.u[14];  u[11] = m.u[15];
+    u[16] = m.u[16];  u[17] = m.u[17];
 }
 
 /*!

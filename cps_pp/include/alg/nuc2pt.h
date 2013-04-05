@@ -27,15 +27,18 @@ class Nuc2pt
   char *source ;
   char *sink ;
   char mom[12] ;
-  int srcdesc[4] ; // source descriptor
+  int srcdesc[6] ; // source descriptor
   int HalfFerm ; // Flag indicating Non-Relativistic sources and sinks
 
   NucOp nuc ;
   SourceType SnkType ;
   Float quark_mass ;
+
+public:
   CorrFunc plus_parity ;
   CorrFunc minus_parity ;
 
+private:
   ProjectType pos_par ;
   ProjectType neg_par ;
 

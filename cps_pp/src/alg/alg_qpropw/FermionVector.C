@@ -146,11 +146,12 @@ void FermionVectorTp::SetWallSource(int color, int spin, int source_time) {
 }
 
 void FermionVectorTp::SetBoxSource(int color, 
-								   int spin,
-								   int start,
-								   int end,
-								   int source_time) {
-
+				   int spin,
+				   int start,
+				   int end,
+				   int source_time,
+				   int* src_offset ) {
+  
   char *fname = "SetBoxSource(color,spin,start,end,source_time)";
   
 //  VRB.Func(cname, fname);
@@ -182,6 +183,18 @@ void FermionVectorTp::SetBoxSource(int color,
   int zsites = GJP.ZnodeSites()*GJP.Znodes();
   VRB.Result(cname,fname,"sites = %d %d %d\n",xsites,ysites,zsites);
   
+  // TIZB offset the start/end locations
+  int gsize[3] = { xsize*GJP.Xnodes(), ysize*GJP.Ynodes(), zsize*GJP.Znodes()};
+  int src_start[3] = {start,start,start};
+  int src_end[3] = {end,end,end};
+
+  if(src_offset){
+    for(int i=0;i<3;++i){
+      src_start[i] += src_offset[i] + gsize[i]; src_start[i] %= gsize[i];
+      src_end[i] += src_offset[i] +gsize[i];  src_end[i] %= gsize[i];
+    }
+  }
+  
   //zero source on all nodes
   for (int i = 0; i < fv_size; i++) {
      fv[i] = 0.0;
@@ -195,16 +208,15 @@ void FermionVectorTp::SetBoxSource(int color,
 		  int i = j + GJP.Colors()*8*(x + xsize*(y+ysize*(z+zsize*(t))));
 		  //#ifdef PARALLEL
 		  if(tnode != ts_node)continue;
-		  else if( (end < xsites) && ( (x + xnode*xsize < start) || (x + xnode*xsize > end) )) continue;
-		  else if( (end < ysites) && ( (y + ynode*ysize < start) || (y + ynode*ysize > end) )) continue;
-		  else if( (end < zsites) && ( (z + znode*zsize < start) || (z + znode*zsize > end) )) continue;
-		  else if( (end >=xsites) && ( (x + xnode*xsize < start) && (x + xnode*xsize > end - xsites) )) continue;
-		  else if( (end >=ysites) && ( (y + ynode*ysize < start) && (y + ynode*ysize > end - ysites) )) continue;
-		  else if( (end >=zsites) && ( (z + znode*zsize < start) && (z + znode*zsize > end - zsites) )) continue;
-//		  else if(y + ynode*ysize < start || y + ynode*ysize > end) continue;
-//		  else if(z + znode*zsize < start || z + znode*zsize > end) continue;
+		  else if( (src_end[0] < xsites) && ( (x + xnode*xsize < src_start[0]) || (x + xnode*xsize > src_end[0]) )) continue;
+		  else if( (src_end[1] < ysites) && ( (y + ynode*ysize < src_start[1]) || (y + ynode*ysize > src_end[1]) )) continue;
+		  else if( (src_end[2] < zsites) && ( (z + znode*zsize < src_start[2]) || (z + znode*zsize > src_end[2]) )) continue;
+		  else if( (src_end[0] >=xsites) && ( (x + xnode*xsize < src_start[0]) && (x + xnode*xsize > src_end[0] - xsites) )) continue;
+		  else if( (src_end[1] >=ysites) && ( (y + ynode*ysize < src_start[1]) && (y + ynode*ysize > src_end[1] - ysites) )) continue;
+		  else if( (src_end[2] >=zsites) && ( (z + znode*zsize < src_start[2]) && (z + znode*zsize > src_end[2] - zsites) )) continue;
 		  //#endif
 		  if(i%SPINOR_SIZE != 2*(color + COLORS*spin))continue;
+		  //printf("BOXSRC %d %d %d %d %d %d\n", x,y,z,t, spin,color);
 		  fv[i] = 1.0;
 		  src_vol++;
 		}
@@ -378,7 +390,39 @@ void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where)
         Matrix mt;
         mt.Dagger(pM[mid]);
 
+<<<<<<< FermionVector.C
         v->DotXEqual(mt, vt);
+=======
+  // find out if this node overlaps with the hyperplane
+  // in which the wall source sits
+  int has_overlap = 0;
+  if (lproc * len <= where && where < (lproc + 1) * len)
+    has_overlap = 1;
+ 
+  if (has_overlap) {
+    int local = where % len; // on processor coordinate of
+                             // source hyperplane
+    Matrix *pM = gm[local];
+
+    for (int z = 0; z < GJP.ZnodeSites(); z++)
+    for (int y = 0; y < GJP.YnodeSites(); y++) 
+    for (int x = 0; x < GJP.XnodeSites(); x++)
+    {
+      // the matrix offset
+      int j =  x + GJP.XnodeSites() * ( y + GJP.YnodeSites() * z);
+      // the vector offset
+      int i = 2 * GJP.Colors() * ( spin + 4 * (
+              x + GJP.XnodeSites() * (
+              y + GJP.YnodeSites() * (
+              z + GJP.ZnodeSites() * local))));
+      temp.CopyVec((Vector*)&fv[i], 6);
+      tempmat.Dagger((IFloat*)&pM[j]);
+      uDotXEqual((IFloat*)&fv[i], (const IFloat*)&tempmat, (const IFloat*)&temp);
+
+      //printf("FT:GFWALL %d %d %d %d : ",x,y,z,spin);
+      //for(int col=0;col<6;++col){ printf("%e ", *(col+(Float*)&(fv[i]))); }
+      //printf("\n");
+>>>>>>> 1.11.100.1
     }
 }
 

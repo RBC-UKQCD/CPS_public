@@ -93,8 +93,9 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   // see if file Floating Points is acceptable
   if(isRoot()) {
     fpconv.setFileFormat(hd.floating_point);
+    // TIZB, VRB is only on the master node.
+    VRB.Flow(cname,fname,"FileFormat=%d",hd.floating_point);
   }
-  VRB.Flow(cname,fname,"FileFormat=%d",hd.floating_point);
   broadcastInt((int*)&fpconv.fileFormat);
   if(fpconv.fileFormat == FP_UNKNOWN) {
     ERR.General(cname,fname, "Data file Floating Point Format UNKNOWN\n");

@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definitions of the EigArg structure.
   
-  $Id: eig_arg.x,v 1.7 2008-05-19 21:06:37 chulwoo Exp $
+  $Id: eig_arg.x,v 1.8 2013-04-05 17:46:30 chulwoo Exp $
 */
 /*------------------------------------------------------------------*/
 
@@ -62,7 +62,7 @@ class EigArg {
     string fname<>;   // should be moved from common_arg to here -- Sam
     int ncorr;
 
-	memfun void resize(u_int nmass);
+    memfun void resize(u_int nmass);
     memfun EigArg();
     memfun ~EigArg();
 };

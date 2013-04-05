@@ -110,6 +110,7 @@ public:
 	int BEfuzzing_c_num;
 	Float BEfuzzing_c[MAX_FUZZING_C_NUM];
 	int BEfuzzing_hits;
+	int GaugeFixProp;
 	   WspectArg (  ) ;
 };
 

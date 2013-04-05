@@ -259,7 +259,7 @@ void qio_readPropagator::qio_openInput(char *filename, QIO_String *xml_file_in, 
   
   VRB.Flow(cname,fname,"open input file %s\n",filename);
 
-  infile = QIO_open_read(xml_file_in, filename, &layout, NULL, &iflag);
+  infile = QIO_open_read(xml_file_in, filename, &layout, pointer_fs, &iflag);
 
   #ifdef DEBUG_openInput
   printf("done QIO_open_read\n");
@@ -297,6 +297,7 @@ void qio_readPropagator::read(char *infile, void *prop, void *source, int max_Fl
   record_file = QIO_string_create();
   
   qio_setLayout();
+  qio_setFilesystem();
 
   QIO_USQCDPropFileInfo *qio_FileRecordInfo;
 
@@ -707,6 +708,8 @@ void qio_readPropagator::read_12pairs(char *infile, void *prop, void *source, co
   
   qio_setLayout();
 
+  qio_setFilesystem();
+  
   // create the record info
   record_prop         = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0, 0, 0, 0);
   record_source       = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0, 0, 0, 0);
@@ -999,6 +1002,9 @@ void qio_readPropagator::read_ScS_12sink(char *infile, void *prop, void *source,
 
   qio_setLayout();
 
+  qio_setFilesystem();
+
+  
   // create the record info
   record_prop         = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0, 0, 0, 0);
   record_source       = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0, 0, 0, 0);

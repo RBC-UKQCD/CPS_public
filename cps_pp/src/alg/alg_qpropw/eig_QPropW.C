@@ -210,18 +210,18 @@ void QPropW::eig_Run(Vector **V, const int vec_len, Float *M, Float max_eig, con
      //-----------------------------------------------------------------
      
 
-	 int *low=NULL;
-	 if(nev>0)low=(int *)smalloc(2*nev*sizeof(int));
-	 Rcomplex *invH=(Rcomplex *)smalloc(max_def_len*max_def_len*sizeof(Rcomplex));
-	 Vector *AU=(Vector *)fmalloc(cname,fname,"AU",vec_len * sizeof(Float));
+     int *low=NULL;
+     if(nev>0)low=(int *)smalloc(2*nev*sizeof(int));
+     Rcomplex *invH=(Rcomplex *)smalloc(max_def_len*max_def_len*sizeof(Rcomplex));
+     Vector *AU=(Vector *)fmalloc(cname,fname,"AU",vec_len * sizeof(Float));
      Lattice& Lat = this->AlgLattice() ;
-
+     
      for (int spn=0; spn < Nspins; spn++)
        for (int col=0; col < GJP.Colors(); col++) {
-		 
+	 
 	 // initial guess (Zero)
 	 sol.ZeroSource();
-
+	 
 	 if(!do_rerun){
 	   SetSource(src,spn,col);
 	   
@@ -238,80 +238,98 @@ void QPropW::eig_Run(Vector **V, const int vec_len, Float *M, Float max_eig, con
 	 }
 	 else{ // rerun
 	   for(int index(0); index < GJP.VolNodeSites(); ++index){
-	   
+	     
 	     WilsonMatrix *tmp_mat= (WilsonMatrix *) save_source+index;
 	     
 	     src.CopyWilsonMatSink(index, spn, col,*tmp_mat);
 	   }
 	 }
-
+	 
 	 if ((DoHalfFermion())&&(!seq_src)) // Rotate to chiral basis
 	   src.DiracToChiral();
-	   	 
-
-
 
 	 // Get the prop
 	 VRB.Debug(cname,fname,"Before CG in QpropW.Run() \n");
 
 	 //calculate invH from H (def_len*def_len matrix)
 	 if(def_len>0)
-	 {
-		 for(int i=0;i<def_len;i++)
-			for(int j=0;j<def_len;j++)
-			 invH[i*def_len+j]=H[i*max_def_len+j];
-		 invert_H_matrix(invH, def_len);
-	 }
+	   {	    
+	     //initialize H if necessary
+	     if(nev == 0){
+	       Vector *temp=(Vector *)fmalloc(cname,fname,"temp",vec_len * sizeof(Float));
+	       DiracOpDwf dwf_aux(Lat, NULL, NULL, &(qp_arg.cg),CNV_FRM_NO);
+	       for(int i=0;i<max_def_len;i++){
+		 for(int j=0;j<vec_len;++j) *((Float*)temp + j) = U[i][j];
+		 dwf_aux.MatPcDagMatPc(AU,temp);
+		 for(int j=0;j<i;j++)
+		   {
+		     Float c_r, c_i;
+		     compDotProduct<float,Float>(&c_r, &c_i, U[j], (Float *)AU,vec_len);
+		     glb_sum_five(&c_r);
+		     glb_sum_five(&c_i);
+		     H[j*max_def_len+i]=Complex(c_r,c_i);
+		   }
+		 for(int j=0;j<i;j++)H[i*max_def_len+j]=conj(H[j*max_def_len+i]);
+		 H[i*max_def_len+i]=temp->ReDotProductGlbSum(AU,vec_len);
+	       }
+	       sfree(temp);
+	     }
+	     // Hinv
+	     for(int i=0;i<def_len;i++)
+	       for(int j=0;j<def_len;j++)
+		 invH[i*def_len+j]=H[i*max_def_len+j];
+	     invert_H_matrix(invH, def_len);
+	   }
 	 if(!always_restart && nev>0 && def_len<max_def_len)
-	 {
-		eig_CG(V, vec_len, M, nev, m, U, invH, def_len, restart, 0, src, sol, midsol, iter, true_res);
-	 }
+	   {
+	     eig_CG(V, vec_len, M, nev, m, U, invH, def_len, restart, 0, src, sol, midsol, iter, true_res);
+	   }
 	 else{
-		if(def_len==max_def_len)eig_CG(V, vec_len, M, 0, 0, U, invH, def_len, restart,restart_len, src, sol, midsol, iter, true_res);
-		else eig_CG(V, vec_len, M, nev, m, U, invH, def_len, restart,restart_len, src, sol, midsol, iter, true_res);
+	   if(def_len==max_def_len)eig_CG(V, vec_len, M, 0, 0, U, invH, def_len, restart,restart_len, src, sol, midsol, iter, true_res);
+	   else eig_CG(V, vec_len, M, nev, m, U, invH, def_len, restart,restart_len, src, sol, midsol, iter, true_res);
 	 }
-
+	 
 	 if(def_len<max_def_len)
-	 {
-		Float *fvptr=NULL;
-	   	DiracOpDwf dwf_aux(Lat, NULL, NULL, &(qp_arg.cg),CNV_FRM_NO);
-		//add low modes from the lowest first
-		int s;
-		for(s=0;s<2*nev;s++)low[s]=s;
-		 for(int i=0;i<2*nev-1;i++)
-		 {
-			 for(int j=2*nev-1;j>i;j--)
-			 {
-				 if(M[low[j]]<M[low[j-1]]){s=low[j];low[j]=low[j-1];low[j-1]=s;}
-			 }
-		 }
-		 for(int i=0;i<2*nev;i++)
-		 {
-			VRB.Result(cname,fname,"eigen value %d is %e \n",i,M[low[i]]);
-			//update deflation space U from V
-			if(M[low[i]]<max_eig && M[low[i]]>1e-30 && def_len<max_def_len) //remember to set M[i>=rank] to zero
-			{
-			//update H 
-			 //U[def_len]->CopyVec(V[low[i]],vec_len);
-			 fvptr = (Float *)V[low[i]];
-			 for(int ii=0;ii<vec_len;ii++){U[def_len][ii]=(float)(fvptr[ii]);fvptr[ii]=(Float)(U[def_len][ii]);}//Make low accuracy
-			 dwf_aux.MatPcDagMatPc(AU,V[low[i]]);
-			 //for(int j=0;j<def_len;j++)H[j*max_def_len+def_len]=U[j]->CompDotProductGlbSum(AU,vec_len);
-			 for(int j=0;j<def_len;j++)
-			 {
-				 Float c_r, c_i;
-				 compDotProduct<float,Float>(&c_r, &c_i, U[j], (Float *)AU,vec_len);
-				 glb_sum_five(&c_r);
-				 glb_sum_five(&c_i);
-				 H[j*max_def_len+def_len]=Complex(c_r,c_i);
-			 }
-			 for(int j=0;j<def_len;j++)H[def_len*max_def_len+j]=conj(H[j*max_def_len+def_len]);
-			 H[def_len*max_def_len+def_len]=V[low[i]]->ReDotProductGlbSum(AU,vec_len);
-			
-			 def_len++;	
-			}
-		 }
-	 }
+	   {
+	     Float *fvptr=NULL;
+	     DiracOpDwf dwf_aux(Lat, NULL, NULL, &(qp_arg.cg),CNV_FRM_NO);
+	     //add low modes from the lowest first
+	     int s;
+	     for(s=0;s<2*nev;s++)low[s]=s;
+	     for(int i=0;i<2*nev-1;i++)
+	       {
+		 for(int j=2*nev-1;j>i;j--)
+		   {
+		     if(M[low[j]]<M[low[j-1]]){s=low[j];low[j]=low[j-1];low[j-1]=s;}
+		   }
+	       }
+	     for(int i=0;i<2*nev;i++)
+	       {
+		 VRB.Result(cname,fname,"eigen value %d is %e \n",i,M[low[i]]);
+		 //update deflation space U from V
+		 if(M[low[i]]<max_eig && M[low[i]]>1e-30 && def_len<max_def_len) //remember to set M[i>=rank] to zero
+		   {
+		     //update H 
+		     //U[def_len]->CopyVec(V[low[i]],vec_len);
+		     fvptr = (Float *)V[low[i]];
+		     for(int ii=0;ii<vec_len;ii++){U[def_len][ii]=(float)(fvptr[ii]);fvptr[ii]=(Float)(U[def_len][ii]);}//Make low accuracy
+		     dwf_aux.MatPcDagMatPc(AU,V[low[i]]);
+		     //for(int j=0;j<def_len;j++)H[j*max_def_len+def_len]=U[j]->CompDotProductGlbSum(AU,vec_len);
+		     for(int j=0;j<def_len;j++)
+		       {
+			 Float c_r, c_i;
+			 compDotProduct<float,Float>(&c_r, &c_i, U[j], (Float *)AU,vec_len);
+			 glb_sum_five(&c_r);
+			 glb_sum_five(&c_i);
+			 H[j*max_def_len+def_len]=Complex(c_r,c_i);
+		       }
+		     for(int j=0;j<def_len;j++)H[def_len*max_def_len+j]=conj(H[j*max_def_len+def_len]);
+		     H[def_len*max_def_len+def_len]=V[low[i]]->ReDotProductGlbSum(AU,vec_len);
+		     
+		     def_len++;	
+		   }
+	       }
+	   }
 	 //gauge fix solution
 	 FixSol(sol);
 	 if (StoreMidprop()) FixSol(midsol);
