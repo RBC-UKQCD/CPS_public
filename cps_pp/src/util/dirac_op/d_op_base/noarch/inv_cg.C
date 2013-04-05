@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.14 2012-03-27 21:17:55 chulwoo Exp $
+  $Id: inv_cg.C,v 1.15 2013-04-05 17:51:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-27 21:17:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.14 2012-03-27 21:17:55 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.14 2012-03-27 21:17:55 chulwoo Exp $
+//  $Date: 2013-04-05 17:51:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v 1.15 2013-04-05 17:51:13 chulwoo Exp $
+//  $Id: inv_cg.C,v 1.15 2013-04-05 17:51:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.14 $
+//  $Revision: 1.15 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/noarch/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -36,7 +36,7 @@ CPS_END_NAMESPACE
 #include <util/verbose.h>
 #include <util/error.h>
 #include <util/time_cps.h>
-#include <comms/nga_reg.h>
+////#include <comms/nga_reg.h>
 #include <comms/cbuf.h>
 #include <math.h>
 #if TARGET == BGL

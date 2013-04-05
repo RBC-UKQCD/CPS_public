@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-02-21 21:14:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v 1.6 2006-02-21 21:14:09 chulwoo Exp $
-//  $Id: d_op_clover.C,v 1.6 2006-02-21 21:14:09 chulwoo Exp $
+//  $Date: 2013-04-05 17:51:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v 1.7 2013-04-05 17:51:13 chulwoo Exp $
+//  $Id: d_op_clover.C,v 1.7 2013-04-05 17:51:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_clover.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_clover/qcdoc/d_op_clover.C,v $
 //  $State: Exp $
 //
@@ -38,7 +38,7 @@ CPS_END_NAMESPACE
 #include<util/verbose.h>
 #include<util/wilson.h>
 #include<util/clover.h>
-#include<mem/p2v.h>
+//#include<mem/p2v.h>
 CPS_START_NAMESPACE
 
 #if 0
@@ -99,7 +99,7 @@ DiracOpClover::DiracOpClover(Lattice & latt,
 
   // Copy optimized code into its execution place (CRAM)
   //----------------------------------------------------------------
-  p2vCloverLib();
+//  p2vCloverLib();
 }
 
 

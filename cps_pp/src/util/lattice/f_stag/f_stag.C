@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.24 2013-04-05 17:46:31 chulwoo Exp $
+  $Id: f_stag.C,v 1.25 2013-04-05 17:51:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -29,7 +29,7 @@ CPS_END_NAMESPACE
 #include <util/dirac_op.h>
 #include <util/stag.h>
 #include <util/gjp.h>
-#include <comms/nga_reg.h>
+//#include <comms/nga_reg.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
 #include <comms/cbuf.h>

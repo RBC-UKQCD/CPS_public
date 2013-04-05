@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.45 2012-12-05 16:39:19 chulwoo Exp $
+  $Id: gjp.C,v 1.46 2013-04-05 17:51:14 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-12-05 16:39:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.45 2012-12-05 16:39:19 chulwoo Exp $
-//  $Id: gjp.C,v 1.45 2012-12-05 16:39:19 chulwoo Exp $
+//  $Date: 2013-04-05 17:51:14 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.46 2013-04-05 17:51:14 chulwoo Exp $
+//  $Id: gjp.C,v 1.46 2013-04-05 17:51:14 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.C,v $
-//  $Revision: 1.45 $
+//  $Revision: 1.46 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
 //  $State: Exp $
 //
@@ -52,7 +52,7 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <util/checksum.h>
 #include <alg/do_arg.h>
-#include <mem/p2v.h>
+//#include <mem/p2v.h>
 
 #ifdef USE_QUDA
 #include <alg/quda_arg.h>
@@ -74,6 +74,7 @@ int gjp_local_axis[6] = {0, 0, 0, 0, 1, 1};
      // (some written in assembly).
      // It is set by GJP.Initialize.
 
+#if 0
 SCUDir gjp_scu_dir[10] = { SCU_XP, SCU_XM, SCU_YP, SCU_YM,	
                            SCU_ZP, SCU_ZM, SCU_TP, SCU_TM,
                            SCU_TP, SCU_TM };
@@ -85,6 +86,7 @@ SCUDir gjp_scu_dir[10] = { SCU_XP, SCU_XM, SCU_YP, SCU_YM,
      // the direction for communication.
      // It is set by GJP.Initialize.
      // {0,1,2,3,4} corresponds to {x,y,z,t,s}
+#endif
 
 int gjp_scu_wire_map[10] = {0, 1, 2, 3, 4, 5, 6, 7, 0, 0};
      // it gives the wire number for directions
@@ -303,6 +305,7 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
     printf("dim %d: nodes=%d gjp_local_axis=%d\n",la,nodes[la],gjp_local_axis[la]);
   }
 
+#if 0
   gjp_scu_dir[0] = SCU_XP;
   gjp_scu_dir[1] = SCU_XM;
   gjp_scu_dir[2] = SCU_YP;
@@ -313,6 +316,7 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
   gjp_scu_dir[7] = SCU_TM;
   gjp_scu_dir[8] = SCU_SP;
   gjp_scu_dir[9] = SCU_SM;
+#endif
 
 #if TARGET == QCDOC
   for(int i = 0;i<5;i++)
