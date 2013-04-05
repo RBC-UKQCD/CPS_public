@@ -18,19 +18,22 @@
 #include <util/data_types.h>
 #include <alg/qpropw.h>
 #include <comms/glb.h>
+#include <util/momentum.h>
 #include "corrfunc.h"
 
 CPS_START_NAMESPACE
 
 class Meson {
+public:
   CorrFunc func ;
+private:
   char src[9];
   char snk[8];
   int gamma[2] ;
   Float m[2] ;
 
+public:
 
- public:
   Meson(int mu, int nu, char *src_i) ;
   Meson(int mu, char *src_i) ;
   Meson(char *src_i) ;
@@ -66,6 +69,8 @@ class Meson {
   void setSrc(char *src_i) ;
 
   void calcMeson(QPropW& q1, QPropW& q2) ;
+  void calcMesonMom(QPropW& q1, QPropW& q2, int* mom=0);
+  void calcMesonMom(QPropW& q1, QPropW& q2, ThreeMom& tmom);
   void calcMidPointPion(QPropW& q1, QPropW& q2) ;
 
   void Zero(){func.Zero();}

@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.23 2008-09-18 15:23:17 chulwoo Exp $
+  $Id: f_stag.C,v 1.24 2013-04-05 17:46:31 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -348,7 +348,12 @@ int Fstag::FeigSolv(Vector **f_eigenv, Float *lambda,
   Vector *v2 = (Vector *)0;
 
   DiracOpStag stag(*this, v1, v2, &cg_arg, CNV_FRM_NO);
-  
+ 
+  stag.RitzMat(f_eigenv[0],f_eigenv[1]);
+  //for(int i=0;i<GJP.VolNodeSites()*3;i++){
+   //  printf("VEC %d %g\n",i,*((Float*)f_eigenv[0]+i));
+  //} 
+  //exit(0);
   iter = stag.RitzEig(f_eigenv, lambda, valid_eig, eig_arg);
   
 #if 0
@@ -376,6 +381,50 @@ int Fstag::FeigSolv(Vector **f_eigenv, Float *lambda,
 #endif
 
   // Return the number of iterations
+  return iter;
+}
+
+//------------------------------------------------------------------
+// Solve  A * f_eigenv = lambda * f_eigenv where
+// A is the fermion matrix (Dirac operator). The solution
+// is done with the Lanczos algorithm. eig_arg is the
+// structure that contains all the control parameters, f_eigenv
+// is the fermion field eigenvectors, lambda are the
+// returned eigenvalues.
+// f_eigenv is defined on the whole lattice.
+//------------------------------------------------------------------
+int Fstag::FeigSolv(Vector **f_eigenv, Float *lambda,
+                    LanczosArg *eig_arg,
+                    CnvFrmType cnv_frm)
+{
+  int iter;
+  char *fname = "FeigSolv(V*,F*,LanczosArg*,CnvFrmType)";
+  VRB.Func(cname,fname);
+  CgArg cg_arg;
+  cg_arg.mass = eig_arg->mass;
+  //cg_arg.RitzMatOper = eig_arg->RitzMatOper;
+  //int N_eig = eig_arg->N_eig;
+  int nk = eig_arg->nk_lanczos_vectors;
+  int np = eig_arg->np_lanczos_vectors;
+  int maxiters = eig_arg->maxiters;
+  Float stopres = eig_arg->stop_residual;
+  MatrixPolynomialArg* cheby_arg = (MatrixPolynomialArg*)eig_arg->matpoly_arg;
+
+  if(cnv_frm == CNV_FRM_YES) // convert only nk, not (nk+np)
+    for(int i=0; i < nk; ++i)
+      Fconvert(f_eigenv[i], STAG, StrOrd());
+
+  // Call constructor and solve for eigenvectors.
+  // Use null pointers to fake out constructor.
+  Vector *v1 = (Vector *)0;
+  Vector *v2 = (Vector *)0;
+  DiracOpStag stag(*this, v1, v2, &cg_arg, CNV_FRM_NO);
+
+  iter = stag.ImpResLanczos(f_eigenv, lambda,  eig_arg);
+
+  if(cnv_frm == CNV_FRM_YES) for(int i=0; i < nk; ++i) // convert only nk, not (nk+np)
+                               Fconvert(f_eigenv[i], CANONICAL, StrOrd());
+
   return iter;
 }
 

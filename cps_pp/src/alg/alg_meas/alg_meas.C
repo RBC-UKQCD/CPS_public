@@ -28,19 +28,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief PAB... Definitions of the AlgMeas class methods.
   
-  $Id: alg_meas.C,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
+  $Id: alg_meas.C,v 1.11 2013-04-05 17:46:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-10 14:05:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
-//  $Id: alg_meas.C,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.11 2013-04-05 17:46:30 chulwoo Exp $
+//  $Id: alg_meas.C,v 1.11 2013-04-05 17:46:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: alg_meas.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.11 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v $
 //  $State: Exp $
 //
@@ -306,8 +306,24 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     lat_p = new GimprRectFdwf ;
     return *lat_p;
   }
+  if ( (fermion == F_CLASS_MOBIUS) && (gluon == G_CLASS_NONE ) ) {
+    lat_p = new GnoneFmobius ;
+    return *lat_p; 
+  }
+  if ( (fermion == F_CLASS_MOBIUS) && (gluon == G_CLASS_WILSON ) ) {
+    lat_p = new GwilsonFmobius;
+    return *lat_p;
+  }
+  if ( (fermion == F_CLASS_MOBIUS) && (gluon == G_CLASS_IMPR_RECT ) ) {
+    lat_p = new GimprRectFmobius ;
+    return *lat_p;
+  }
 
   /* WILSON VALENCE ANALYSIS */
+  if ( (fermion == F_CLASS_NAIVE) && (gluon == G_CLASS_NONE ) ) {
+    lat_p = new GnoneFnaive ;
+    return *lat_p;
+  }
   if ( (fermion == F_CLASS_WILSON) && (gluon == G_CLASS_NONE ) ) {
     lat_p = new GnoneFwilson ;
     return *lat_p;

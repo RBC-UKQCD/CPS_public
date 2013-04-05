@@ -47,13 +47,13 @@ class CorrFunc {
   // Output functions
   void print(FILE *fp) const 
     {
-      for(int t=0; t<Nt; t++)
-	Fprintf(fp,"%i  %e  %e\n", t,func[t].real(),func[t].imag());
+      for(int t=0; t<Nt; t++) 
+	Fprintf(fp,"%i  %.16e  %.16e\n", t,func[t].real(),func[t].imag());
     }
   
   void print(FILE *fp,int t) const
     {
-      Fprintf(fp," %e  %e ",func[t].real(),func[t].imag());
+      Fprintf(fp," %.16e  %.16e ",func[t].real(),func[t].imag());
     }
 
   void GlobalSum(void)

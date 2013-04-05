@@ -3,18 +3,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class Ritz eigensolver methods.
 
-  $Id: ritz.C,v 1.11 2011-03-24 16:20:52 chulwoo Exp $
+  $Id: ritz.C,v 1.12 2013-04-05 17:46:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-03-24 16:20:52 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.11 2011-03-24 16:20:52 chulwoo Exp $
-//  $Id: ritz.C,v 1.11 2011-03-24 16:20:52 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v 1.12 2013-04-05 17:46:30 chulwoo Exp $
+//  $Id: ritz.C,v 1.12 2013-04-05 17:46:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/ritz.C,v $
 //  $State: Exp $
 //
@@ -140,6 +140,18 @@ void DiracOp::GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_siz
     }
   }
 }
+// same as above, but orthogonalize only one vector
+void DiracOp::GramSchm(Vector *psi, Vector **vec, int Nvec, int f_size) 
+{
+  Complex xp;
+
+  for(int i = 0; i < Nvec; ++i)
+    {
+      xp = vec[i]->CompDotProductGlbSum(psi, f_size);
+      /* psi = psi - <vec[i],psi> vec[i] */
+      psi->CTimesV1PlusV2(-xp, vec[i], psi, f_size);
+    }
+}
 
 /*!
   The eigensolver implemented here finds the \e n th lowest eigenvalue
@@ -201,7 +213,8 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   VRB.Input(cname,fname,"RsdR_a=%e RsdR_r=%e Rsdlam=%e Cv_fact=%e\n", 
       RsdR_a,RsdR_r,Rsdlam,Cv_fact);
 
-  acc = 2.0e-6;
+  //TIZB acc = 2.0e-6;
+  acc = 2.0e-24;
   acc *= acc;
   rsda_sq = RsdR_a * RsdR_a;
   rsdr_sq = RsdR_r * RsdR_r;
@@ -473,6 +486,8 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
       /*  g2  =  |g[k]|**2 = |Ap|**2 */
       g2 = Ap->NormSqGlbSum(f_size);
 
+      VRB.Result(cname,fname,"g2 at iter %d: %g\n", k, (IFloat)g2);
+
       /*  Project p[k] to orthogonal subspace  */
       GramSchm(&p, 1, psi_all, nn, f_size);
 
@@ -496,7 +511,8 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
     /*  p2  =  |p[k]|**2 */
     p2 = p->NormSqGlbSum(f_size);
 
-#if 0
+    //TIZB
+#if 1
     if (ProjApsiP == 1)
       VRB.Result(cname,fname,"At iter %d, lambda = %g, del_lam = %g, g2 = %g\n",
 	     k, (IFloat)lambda, (IFloat)del_lam, (IFloat)g2);

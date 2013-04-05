@@ -1,0 +1,105 @@
+#include<config.h>
+CPS_START_NAMESPACE
+//--------------------------------------------------------------------
+//  CVS keywords
+//
+//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/noarch/mobius_init.C-sav,v $
+//  $State: Exp $
+//
+//--------------------------------------------------------------------
+//------------------------------------------------------------------
+// 11/26/97
+// 9/2012 updated to mobius
+// mobius_int:
+//
+// This routine performs all initializations needed before mobius
+// func are called. It sets the addressing related arrays and 
+// reserves memory for the needed temporary buffers. It only needs
+// to be called once at the begining of the program (or after a 
+// dwf_end call) before any number of calls to dwf funcs are made.
+//
+// WARNING:
+//
+// This set of routines will work only if the node sublattices have
+// even number of sites in each direction.
+//
+//------------------------------------------------------------------
+
+CPS_END_NAMESPACE
+#include<util/mobius.h>
+#include<util/gjp.h>
+#include<util/smalloc.h>
+#include<util/verbose.h>
+#include<util/error.h>
+CPS_START_NAMESPACE
+
+
+void mobius_init(Mobius *mobius_p)
+{
+  char *cname = " ";
+  char *fname = "mobius_init(Mobius*)";
+  VRB.Func(cname,fname);
+
+
+  if( GJP.Snodes()!=1) ERR.General("","mobius_init", "mobius_m5inv does not work for spread-out Ls\n");
+  
+  //------------------------------------------------------------------
+// Do initializations before the wilson library can be used
+// Initialization involve memory allocation.
+//------------------------------------------------------------------
+  static Wilson wilson_struct;
+  //if(!UniqueID())printf("GJP.Snodes()=%d\n",GJP.Snodes());
+  mobius_p->wilson_p = &wilson_struct;
+  //if(!UniqueID())printf("GJP.Snodes()=%d\n",GJP.Snodes());
+  wilson_init(mobius_p->wilson_p);
+
+//------------------------------------------------------------------
+// Allocate memory for two temporary fermion checkerboard fields  
+//------------------------------------------------------------------
+  int f_size = 24 * GJP.VolNodeSites() * GJP.SnodeSites() / 2; 
+
+  mobius_p->frm_tmp1 = (IFloat *) smalloc(f_size*sizeof(IFloat));
+  if(mobius_p->frm_tmp1 == 0)
+    ERR.Pointer(cname,fname, "frm_tmp1");
+  VRB.Smalloc(cname,fname,
+	      "frm_tmp1", mobius_p->frm_tmp1, f_size*sizeof(IFloat));
+
+  mobius_p->frm_tmp2 = (IFloat *) smalloc(f_size*sizeof(IFloat));
+  if(mobius_p->frm_tmp2 == 0)
+    ERR.Pointer(cname,fname, "frm_tmp2");
+  VRB.Smalloc(cname,fname,
+	      "frm_tmp2", mobius_p->frm_tmp2, f_size*sizeof(IFloat));
+
+#if 0
+  mobius_p->frm_tmp3 = (IFloat *) smalloc(f_size*sizeof(IFloat));
+  if(mobius_p->frm_tmp3 == 0)
+    ERR.Pointer(cname,fname, "frm_tmp3");
+  VRB.Smalloc(cname,fname,
+	      "frm_tmp3", mobius_p->frm_tmp3, f_size*sizeof(IFloat));
+#endif
+  
+//------------------------------------------------------------------
+// Allocate memory for a 12 word communications buffer needed
+// for the spread-out case.
+//------------------------------------------------------------------
+  mobius_p->comm_buf = (IFloat *) smalloc(12 * sizeof(IFloat));
+  if(mobius_p->comm_buf == 0)
+    ERR.Pointer(cname,fname, "comm_buf");
+  VRB.Smalloc(cname,fname,
+	      "comm_buf", mobius_p->comm_buf, 12*sizeof(IFloat));
+
+
+//------------------------------------------------------------------
+// Set the mobius coefficients
+//------------------------------------------------------------------
+  mobius_p->vol_4d = GJP.VolNodeSites();
+  mobius_p->ls = GJP.SnodeSites();
+  mobius_p->mobius_kappa_b = 
+    1.0 / ( 2 * (GJP.Mobius_b()*( 4 - GJP.DwfHeight() ) + GJP.DwfA5Inv()) );
+  mobius_p->mobius_kappa_c = 
+    1.0 / ( 2 * (GJP.Mobius_c()*( 4 - GJP.DwfHeight() ) - GJP.DwfA5Inv()) );
+
+}
+
+
+CPS_END_NAMESPACE

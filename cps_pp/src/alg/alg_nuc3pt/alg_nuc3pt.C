@@ -248,8 +248,9 @@ void AlgNuc3pt::run()
 
   for(int i_source=0; i_source < Nuc3pt_arg->num_src; i_source++)
     {
+      int t_sink = (ts + Nuc3pt_arg->t_sink)%(GJP.Tnodes()*GJP.TnodeSites());
       OpenFile();
-      Fprintf(fp,"Doing source time slice: %d\n", ts); 
+      Fprintf(fp,"Doing source/sink time slices: %d %d\n", ts, t_sink);
       CloseFile();
 
       // First calculate the needed two point functions
@@ -294,7 +295,7 @@ void AlgNuc3pt::run()
 	for(int p(0);p<4;p++)
 	  {
 	    Nuc2pt Nuc_c5_p(NUC_G5C,POINT,ptype[p]) ;
-	    Nuc_c5_p.Zero();
+//	    Nuc_c5_p.Zero();
 	    
 	    if(Nuc3pt_arg->DoGa1Proj||(p>2))
 	      {
@@ -453,9 +454,9 @@ void AlgNuc3pt::run()
 	  // Finally, smear the sink at time t_sink for 3-pt functions (below) 
 	  for(int nt=0; nt<Nuc3pt_arg->num_mult; nt++){
 	    // Multi Gauss t_sink set
-	    mt[nt]=Nuc3pt_arg->mt[nt];
+	    mt[nt]=Nuc3pt_arg->mt[nt]; //save
 	    Nuc3pt_arg->mt[nt]+=Nuc3pt_arg->t_sink; // locations of the proton sinks
-	    
+            Nuc3pt_arg->mt[nt]=Nuc3pt_arg->mt[nt]%(GJP.Tnodes()*GJP.TnodeSites());
 	    q_prop[n]->GaussSmearSinkProp(Nuc3pt_arg->mt[nt],q_prop[n]->GaussArg());
           }
 	  
@@ -739,10 +740,15 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
   qp_arg.cg.mass = mass ;
   qp_arg.t = time ;
 
-  qp_arg.StartSrcSpin  = (Nuc3pt_arg->StartSrcSpin);
-  qp_arg.EndSrcSpin    = (Nuc3pt_arg->EndSrcSpin);
-  qp_arg.StartSrcColor = (Nuc3pt_arg->StartSrcColor);
-  qp_arg.EndSrcColor   = (Nuc3pt_arg->EndSrcColor);
+  qp_arg.StartSrcSpin = 0 ;
+  qp_arg.EndSrcSpin = 4 ;
+  qp_arg.StartSrcColor = 0 ;
+  qp_arg.EndSrcColor = 3 ;
+
+//  qp_arg.StartSrcSpin  = (Nuc3pt_arg->StartSrcSpin);
+//  qp_arg.EndSrcSpin    = (Nuc3pt_arg->EndSrcSpin);
+//  qp_arg.StartSrcColor = (Nuc3pt_arg->StartSrcColor);
+//  qp_arg.EndSrcColor   = (Nuc3pt_arg->EndSrcColor);
 
   if (qp_arg.StartSrcSpin >= qp_arg.EndSrcSpin 
 	|| qp_arg.StartSrcColor >= qp_arg.EndSrcColor)   
@@ -755,6 +761,8 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
   //Do half fermions ?
   qp_arg.do_half_fermion = Nuc3pt_arg->DoHalfFermion ;
   if(Nuc3pt_arg->DoHalfFermion == 2) qp_arg.do_half_fermion = 0;
+   // for both
+  if(Nuc3pt_arg->DoHalfFermion == 1) qp_arg.EndSrcSpin = 2;
  
   //Save 5d prop in memory
   if(Nuc3pt_arg->DoConserved) qp_arg.save_ls_prop = 2;
@@ -802,6 +810,7 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
 	  }
 	}
 	  q_prop[n] = new QPropWBoxSrc(AlgLattice(),&qp_arg, &box_arg, common_arg);
+	  q_prop->Run();
       }
     }
     break ;
@@ -829,6 +838,7 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
 	  }
 	}
 	  q_prop[n] = new QPropWPointSrc(AlgLattice(),&qp_arg,common_arg);
+	  q_prop->Run();
       }
     }
     break ;
@@ -882,7 +892,8 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
 	  } else {
 	    q_prop[n] = new QPropWGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg,qp_arg.file);
 	    q_prop[n]->Allocate(0);
-	    q_prop[n]->ReLoad(qp_arg.file); //TODO: need different filenames for different propagators (MFL)
+//	    q_prop[n]->ReLoad(qp_arg.file); //TODO: need different filenames for different propagators (MFL)
+	    q_prop->RestoreQProp(out_prop,0);
 	  }
       }
     }
@@ -940,10 +951,15 @@ void  AlgNuc3pt::GetTheSeqPropagator(int time, Float mass, SourceType type,
   qp_arg.cg.mass = mass ;
   qp_arg.t = time ;
 
-  qp_arg.StartSrcSpin  = (Nuc3pt_arg->StartSrcSpin);
-  qp_arg.EndSrcSpin    = (Nuc3pt_arg->EndSrcSpin);
-  qp_arg.StartSrcColor = (Nuc3pt_arg->StartSrcColor);
-  qp_arg.EndSrcColor   = (Nuc3pt_arg->EndSrcColor);
+  qp_arg.StartSrcSpin  = 0;
+  qp_arg.EndSrcSpin    = 4;
+  qp_arg.StartSrcColor = 0;
+  qp_arg.EndSrcColor   = 3;
+
+//  qp_arg.StartSrcSpin  = (Nuc3pt_arg->StartSrcSpin);
+//  qp_arg.EndSrcSpin    = (Nuc3pt_arg->EndSrcSpin);
+//  qp_arg.StartSrcColor = (Nuc3pt_arg->StartSrcColor);
+//  qp_arg.EndSrcColor   = (Nuc3pt_arg->EndSrcColor);
 
   // for multi-sink calculations. -MFL
   int *t_sink=(int *) smalloc(cname,fname,"t_sink",num_qprop*sizeof(int));

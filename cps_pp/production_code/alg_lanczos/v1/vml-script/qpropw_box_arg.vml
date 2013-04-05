@@ -1,0 +1,4 @@
+class QPropWBoxArg qpropw_box_arg = {
+int box_start = 0
+int box_end = 1
+}

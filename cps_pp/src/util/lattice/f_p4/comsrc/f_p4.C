@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.18 2008-04-21 14:19:18 chulwoo Exp $
+  $Id: f_p4.C,v 1.19 2013-04-05 17:46:31 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -280,6 +280,49 @@ int Fp4::FeigSolv(Vector **f_eigenv, Float lambda[],
 }
 
 //------------------------------------------------------------------
+// Solve  A * f_eigenv = lambda * f_eigenv where
+// A is the fermion matrix (Dirac operator). The solution
+// is done with the Lanczos algorithm. eig_arg is the
+// structure that contains all the control parameters, f_eigenv
+// is the fermion field eigenvectors, lambda are the
+// returned eigenvalues.
+// f_eigenv is defined on the whole lattice.
+//------------------------------------------------------------------
+int Fp4::FeigSolv(Vector **f_eigenv, Float *lambda,
+                    LanczosArg *eig_arg,
+                    CnvFrmType cnv_frm)
+{
+  int iter;
+  char *fname = "FeigSolv(V*,F*,LanczosArg*,CnvFrmType)";
+  VRB.Func(cname,fname);
+  CgArg cg_arg;
+  cg_arg.mass = eig_arg->mass;
+  //cg_arg.RitzMatOper = eig_arg->RitzMatOper;
+  //int N_eig = eig_arg->N_eig;
+  int nk = eig_arg->nk_lanczos_vectors;
+  int np = eig_arg->np_lanczos_vectors;
+  int maxiters = eig_arg->maxiters;
+  Float stopres = eig_arg->stop_residual;
+  MatrixPolynomialArg* cheby_arg = (MatrixPolynomialArg*)eig_arg->matpoly_arg;
+
+  if(cnv_frm == CNV_FRM_YES) // convert only nk, not (nk+np)
+    for(int i=0; i < nk; ++i)
+      Fconvert(f_eigenv[i], STAG, StrOrd());
+
+  // Call constructor and solve for eigenvectors.
+  // Use null pointers to fake out constructor.
+  Vector *v1 = (Vector *)0;
+  Vector *v2 = (Vector *)0;
+  DiracOpP4 stag(*this, v1, v2, &cg_arg, CNV_FRM_NO);
+
+  iter = stag.ImpResLanczos(f_eigenv, lambda,  eig_arg);
+
+  if(cnv_frm == CNV_FRM_YES) for(int i=0; i < nk; ++i) // convert only nk, not (nk+np)
+                               Fconvert(f_eigenv[i], CANONICAL, StrOrd());
+
+  return iter;
+}
+//------------------------------------------------------------------
 // SetPhi(Vector *phi, Vector *frm_e, Vector *frm_o, Float mass,
 //        DagType dag):
 // It sets the pseudofermion field phi from frm_e, frm_o.
@@ -437,7 +480,7 @@ void Fp4::Smear(){
 
   int i, j, N = 4;
   int vol = GJP.VolNodeSites();
-  if (vol>1024) N=1;
+  //if (vol>1024) N=1;
   ParTransAsqtad pt(*this);
   Matrix *result[NUM_DIR];
   Matrix *Unit;
@@ -673,6 +716,15 @@ VRB.Flow(cname,fname,"vol=%d\n",vol);
   printf("%e ",*tmp);
   }
   printf("\n");
+  }
+#endif
+
+#if 0
+  for(int nu=0;nu<1;nu++){
+    Matrix* link = fields[0];
+    for(int i=0; i<3; i++)
+      for(int j=0; j<3; j++)
+	printf("link %d nu %d  %d %d  %g %g\n",0,nu,i,j,*((Float*)link+2*i+6*j),*((Float*)link+2*i+6*j+1));
   }
 #endif
 

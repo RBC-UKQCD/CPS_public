@@ -4,13 +4,13 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-04-21 14:19:17 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dwf.h,v 1.6 2008-04-21 14:19:17 chulwoo Exp $
-//  $Id: dwf.h,v 1.6 2008-04-21 14:19:17 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:30 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dwf.h,v 1.7 2013-04-05 17:46:30 chulwoo Exp $
+//  $Id: dwf.h,v 1.7 2013-04-05 17:46:30 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: dwf.h,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dwf.h,v $
 //  $State: Exp $
 //
@@ -46,10 +46,17 @@ extern int dwfso_wire_map[];
 // The Dwf structure typedef
 typedef struct{
   IFloat dwf_kappa;    // 1/[2*(5-dwf_height)]
+  IFloat mobius_kappa_b;    // 1/[2*(b*(4-dwf_height)+1)]
+  IFloat mobius_kappa_c;    // 1/[2*(c*(4-dwf_height)-1)]
   int vol_4d;         // The 4-dimensional volume   
   int ls;             // The extent of the 5th direction
   IFloat *frm_tmp1;    // Pointer to temorary fermion field 1
   IFloat *frm_tmp2;    // Pointer to temorary fermion field 2
+  IFloat *frm_tmp3;    // Pointer to temorary fermion field 3
+
+  // doesn't need any more
+  //IFloat *frm_tmp3;    // Pointer to temorary fermion field 3
+  
   IFloat *comm_buf;    // Communications buffer (12 words for dwfso)
   Wilson *wilson_p;   // Pointer to the wilson structure
 #if TARGET == QCDOC
@@ -96,6 +103,15 @@ void  dwf_mdagm(Vector *out,
 		Dwf *dwf_lib_arg);
 
 
+// spectrum shifted version : (H-mu)(H-mu)
+void    dwf_mdagm_shift(Vector *out, 
+			Matrix *gauge_field, 
+			Vector *in, 
+			Float *dot_prd,
+			Float mass,
+			Dwf *dwf_lib_arg,
+			Float shift);
+
 //------------------------------------------------------------------
 // dwf_dslash is the derivative part of the fermion matrix. 
 // The in, out fields are defined on the checkerboard lattice
@@ -120,6 +136,16 @@ void  dwf_m(Vector *out,
 	    Vector *in,
 	    Float mass,
 	    Dwf *dwf_lib_arg);
+void  dwf_m_4dpc(Vector *out, 
+		 Matrix *gauge_field, 
+		 Vector *in,
+		 Float mass,
+		 Dwf *dwf_lib_arg);
+void  dwf_mdag_4dpc(Vector *out, 
+		    Matrix *gauge_field, 
+		    Vector *in,
+		    Float mass,
+		    Dwf *dwf_lib_arg);
 
 
 //------------------------------------------------------------------
@@ -131,6 +157,11 @@ void dwf_mdag(Vector *out,
 	      Vector *in,
 	      Float mass,
 	      Dwf *dwf_lib_arg);
+void  dwf_mdag_4dpc(Vector *out, 
+		    Matrix *gauge_field, 
+		    Vector *in,
+		    Float mass,
+		    Dwf *dwf_lib_arg);
 
 
 
@@ -184,6 +215,25 @@ void dwf_dslash_all(Vector *out,
 		int cb,
 		int dag,
 		Dwf *dwf_lib_arg);
+
+
+
+void dwf_m5inv(Vector *out,
+	       Vector *in, 
+	       Float mass,
+	       int dag,
+	       Dwf *dwf_lib_arg);
+
+// in-place version
+void dwf_m5inv(Vector *inout, 
+	       Float mass,
+	       int dag,
+	       Dwf *dwf_lib_arg);
+
+
+
+void ReflectAndMultGamma5( Vector *out, const Vector *in,  int nodevol, int ls);
+
 
 #endif
 

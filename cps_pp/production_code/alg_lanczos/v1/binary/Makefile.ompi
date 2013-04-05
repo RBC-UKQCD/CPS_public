@@ -1,0 +1,89 @@
+# $Id: Makefile.ompi,v 1.2 2013-04-05 17:46:30 chulwoo Exp $
+# Makefile.users.  Generated from Makefile.users.in by configure.
+#   This is the makefile for all the commands
+#   that are common for all testing applications.
+#----------------------------------------------------------------------
+
+
+SRCDIR = /home/h_k/izubuchi/src/CPS508-Lanczos-4deo
+BUILDDIR = /home/izubuchi/src/CPS508-Lanczos-4deo/obj-ompi
+QOS = 
+QOSLIB = ${QOS}/quser/gcc-lib-user///
+
+AS  = as
+LDFLAGS =  -L/home/izubuchi/scidac/qmp-2.3.1-Izubuchi-ompi/lib -lqmp -L/home/izubuchi/scidac/qio-2.3.8-ompi/lib  -lqio -llime -lqmp /home/izubuchi/GotoBLAS2/libgoto2.a
+
+me = $(notdir $(PWD))
+BIN = cps-lanczos.x
+
+
+#
+# include list for the Columbia code
+#
+INCLIST = -I${BUILDDIR} -I${SRCDIR}/include  -I/home/izubuchi/scidac/qmp-2.3.1-Izubuchi-ompi/include    -I/home/izubuchi/scidac/qio-2.3.8-ompi/include
+
+#ICCOPT=  -O3 -xS  -fno-alias  -align -inline-max-total-size=10000 -ip  -i-static -fasm-blocks -std=c++0x 
+ICCOPT=  -O3 -xS  -fno-alias  -align -inline-max-total-size=10000 -ip  -i-static -fasm-blocks -std=c++0x 
+CC = OMPI_CC=icc mpicc $(ICCOPT)
+CXX = OMPI_CXX=icpc  mpicxx $(ICCOPT)
+CC_PATH = $(CXX)
+
+CFLAGS=  
+CXXFLAGS=
+ASFLAGS= 
+DFLAGS +=  -DUSE_QMP -DUSE_QIO -DUSE_SSE
+
+
+
+#
+# Libraries for the Columbia code
+#
+# (These are for the scalar version of the code)
+#
+#
+
+.PHONY: cps clean
+
+
+LIBLIST =\
+  $(BUILDDIR)/cps.a \
+
+#
+#  targets
+#
+
+
+all:$(BIN)
+
+.SUFFIXES:
+.SUFFIXES:  .o .C .S .c
+
+CSRC :=$(wildcard *.c)
+CCSRC :=$(wildcard *.C)
+SSRC :=$(wildcard *.S)
+
+COBJ=$(CSRC:.c=.o)
+CCOBJ=$(CCSRC:.C=.o)
+SOBJ=$(SSRC:.S=.o)
+
+OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
+OBJS := $(notdir $(OBJS_SRC))
+
+$(BIN):  $(OBJS) $(LIBLIST)
+	@echo OBJS = $(OBJS)
+	$(CXX) $(OBJS) $(LIBLIST) $(LDFLAGS) -o $(BIN)
+
+.c.o:
+	$(CC) -o $@ $(CFLAGS) $(DFLAGS) -c $(INCLIST) $<
+.C.o:
+	$(CXX) -o $@ $(CXXFLAGS) $(DFLAGS) -c $(INCLIST) $<
+.S.o:
+	$(AS) -o $@ $(ASFLAGS) -c $(INCLIST) $<
+
+cps:
+	$(MAKE) -C $(BUILDDIR)
+
+clean:
+	rm -f *.dat *.o  $(BIN)
+	rm -f ../regressions/*$(me).dat
+	rm -f ../regressions/*$(me).checklog

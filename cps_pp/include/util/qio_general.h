@@ -101,7 +101,6 @@
 
 #define QIO_RW_DIMENSION 4
 
-
 /* default OUTPUT-format (default input is QIO_UNKNOWN) */
 /* one of QIO_UNKNOWN, QIO_SINGLEFILE, QIO_PARTFILE, QIO_MULTIFILE */ 
 #if ( TARGET == QCDOC ) || (TARGET == BGP)
@@ -109,6 +108,8 @@
 #else
  #define QIO_VOLFMT QIO_SINGLEFILE
 #endif
+
+
 
 /* one of QIO_SERIAL, QIO_PARALLEL */
 /* for safety added for QCDOC */
@@ -118,6 +119,30 @@
   #define QIO_SERPAR QIO_PARALLEL
 #else
   #define QIO_SERPAR QIO_SERIAL
+#endif
+
+// Uncomment the following to enforce the PARTFILE, which may or may not
+// improve the speed of I/O on cluster
+//#define QIO_VOLFMT QIO_PARTFILE
+
+// The following three lines FORCE PARTFILE with io-node being smaller than
+// total nodes. For RICC and FNAL. 
+
+//#define USE_QIO_SPARSE_PARTFILE
+
+#ifdef USE_QIO_SPARSE_PARTFILE
+#define QIO_VOLFMT QIO_PARTFILE
+#define QIO_SPARSE_PARTFILE
+#define QIO_SERPAR QIO_PARALLEL
+// Number of nodes, per which one io-node is designated.
+// Set it to zero if you want all nodes to be io-node.
+
+// For FNAL DS
+#define QIO_SPARSE_PARTFILE_NODES 32
+
+// For RICC
+//#define QIO_SPARSE_PARTFILE_NODES 8
+
 #endif
 
 
@@ -145,6 +170,7 @@
 /* spin and color range for propagator-output in QIO */
 #define QIO_PROP_SPIN_MAX 4
 #define QIO_PROP_COLOR_MAX 3
+
 
 
 /***********************************************************************************************/
@@ -268,10 +294,14 @@ class qio_init {
       }
 
 
-    QIO_Layout layout;
+  QIO_Layout layout;
+  QIO_Filesystem fs; 
+  QIO_Filesystem* pointer_fs; //so that we could sustitue NULL for default case
+  
+  void qio_setLayout();
 
-    void qio_setLayout();
-
+  void qio_setFilesystem();  
+  
 
 };
 

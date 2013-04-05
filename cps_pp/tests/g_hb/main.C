@@ -3,13 +3,13 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hb/main.C,v 1.9 2008-02-08 18:35:08 chulwoo Exp $
-//  $Id: main.C,v 1.9 2008-02-08 18:35:08 chulwoo Exp $
+//  $Date: 2013-04-05 17:46:31 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hb/main.C,v 1.10 2013-04-05 17:46:31 chulwoo Exp $
+//  $Id: main.C,v 1.10 2013-04-05 17:46:31 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hb/main.C,v $
 //  $State: Exp $
 //
@@ -33,7 +33,7 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   // Initializes all Global Job Parameters
   //----------------------------------------------------------------
-  Start();
+  Start(&argc,&argv);
   DoArg do_arg;
 
   int nx,ny,nz,nt;

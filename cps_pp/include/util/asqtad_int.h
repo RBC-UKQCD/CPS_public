@@ -22,7 +22,7 @@
 #ifdef USE_QALLOC
 #include <qalloc.h>
 #else
-#include <malloc.h>
+//#include <malloc.h>
 #endif
 #ifdef USE_QMP
 #include <qmp.h>
@@ -145,8 +145,7 @@ class AsqD : public AsqDArg{
     int local_chi_3[2];
     int nflush;
     int odd_num;
-enum{VECT_LEN=6, VECT_LEN2=8, MATRIX_SIZE=18, SITE_LEN=72, NUM_DIR=8,
-N=4};
+enum{VECT_LEN=6, VECT_LEN2=6, MATRIX_SIZE=18, SITE_LEN=72, NUM_DIR=8, N=4};
 //---------------------------------------------------------------------
 //  uc_l[0] points to a cluster of matrices per even site for local 
 //  computations , arranged so that all parallel transport of spinors 

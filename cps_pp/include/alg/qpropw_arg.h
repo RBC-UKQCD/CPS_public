@@ -103,6 +103,7 @@ public:
 	 bool Vml(VML *vmls,char *instance);
 	int box_start;
 	int box_end;
+	int use_xyz_offset;
 	   QPropWBoxArg (  ) ;
 };
 

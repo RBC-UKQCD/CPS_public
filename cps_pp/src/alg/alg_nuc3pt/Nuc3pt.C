@@ -95,9 +95,9 @@ void Nuc3pt::Print(FILE *fp)
   Calculates the 3pt function given the sequential propagator and the 
   quark propagator.
  */
-void Nuc3pt::Calc3pt(QPropWMultSeqBar& seqQ, QPropW& Quark)
+void Nuc3pt::Calc3pt(QPropWSeqBar& seqQ, QPropW& Quark)
 {
-   char *fname = "Calc3pt(QPropWMultSeqBar&, QPropW&)";
+   char *fname = "Calc3pt(QPropWSeqBar&, QPropW&)";
 
   VRB.Func(cname,fname);
 
@@ -252,9 +252,9 @@ void Nuc3pt::Print(FILE *fp, int Nmom, ThreeMom* momo)
   Calculates the 3pt function given the sequential propagator and the 
   quark propagator.
  */
-void Nuc3pt::Calc3pt(QPropWMultSeqBar& seqQ, QPropW& Quark, int Nmom, ThreeMom* momo)
+void Nuc3pt::Calc3pt(QPropWSeqBar& seqQ, QPropW& Quark, int Nmom, ThreeMom* momo)
 {
-   char *fname = "Calc3pt(QPropWMultSeqBar&, QPropW&)";
+   char *fname = "Calc3pt(QPropWSeqBar&, QPropW&)";
 
   VRB.Func(cname,fname);
 

@@ -14,7 +14,7 @@
 /*!\file
   \brief Declaration of functions used by the parallel transport classes.
 
-  $Id: pt_int.h,v 1.23 2012-08-02 21:20:00 chulwoo Exp $
+  $Id: pt_int.h,v 1.24 2013-04-05 17:46:30 chulwoo Exp $
   Why are (at least some of) these not class methods?
 */
 #ifdef USE_SCU
@@ -211,7 +211,7 @@ int conjugated;
     	  GAUGE_LEN=18,
 		  VECT_LEN=6, 
 		  VECT_LEN_OUT=6,
-		  VECT_LEN_PAD=8};
+		  VECT_LEN_PAD=6};
     PT() {};
     ~PT() {};
     static int evenodd;
