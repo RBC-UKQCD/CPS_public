@@ -8,7 +8,7 @@
 #include <util/wilson.h>
 #include <util/time_cps.h>
 #include <util/dwf.h>
-#include <mem/p2v.h>
+//#include <mem/p2v.h>
 #include <comms/glb.h>
 
 CPS_START_NAMESPACE

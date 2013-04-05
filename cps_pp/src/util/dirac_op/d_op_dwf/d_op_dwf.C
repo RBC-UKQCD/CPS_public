@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.6 2012-12-05 16:39:19 chulwoo Exp $
+  $Id: d_op_dwf.C,v 1.7 2013-04-05 17:51:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-12-05 16:39:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v 1.6 2012-12-05 16:39:19 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.6 2012-12-05 16:39:19 chulwoo Exp $
+//  $Date: 2013-04-05 17:51:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v 1.7 2013-04-05 17:51:13 chulwoo Exp $
+//  $Id: d_op_dwf.C,v 1.7 2013-04-05 17:51:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.6 $
+//  $Revision: 1.7 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v $
 //  $State: Exp $
 //
@@ -40,7 +40,7 @@ CPS_END_NAMESPACE
 #include <util/wilson.h>
 #include <util/time_cps.h>
 #include <util/dwf.h>
-#include <mem/p2v.h>
+//#include <mem/p2v.h>
 #include <comms/glb.h>
 
 #ifdef USE_CG_DWF_WRAPPER
@@ -92,7 +92,7 @@ DiracOpDwf::DiracOpDwf(Lattice & latt,
   //----------------------------------------------------------------
   // Do the necessary conversions
   //----------------------------------------------------------------
-#undef PROFILE
+#define PROFILE
 #ifdef PROFILE
   Float time = -dclock();
 #endif
@@ -145,7 +145,7 @@ DiracOpDwf::~DiracOpDwf() {
   //----------------------------------------------------------------
   // Do the necessary conversions
   //----------------------------------------------------------------
-#undef PROFILE
+#define PROFILE
 #ifdef PROFILE
   Float time = -dclock();
 #endif
@@ -330,6 +330,10 @@ int DiracOpDwf::MatInv(Vector *out,
   VRB.Func(cname,fname);
 //  VRB.Result(cname,fname,"Not using cg-dwf");
 
+#define PROFILE
+#ifdef PROFILE
+  Float time = -dclock();
+#endif
   //----------------------------------------------------------------
   // Initialize kappa and ls. This has already been done by the Fdwf
   // and DiracOpDwf constructors but is done again in case the
@@ -395,10 +399,20 @@ int DiracOpDwf::MatInv(Vector *out,
 	}
 #endif
     MatPcDag(in, temp);
+#ifdef PROFILE
+  time += dclock();
+  print_flops(fname,"Before InvCg()",0,time);
+  time = -dclock();
+#endif
 #ifdef USE_QUDA
     iter = QudaInvert(out, in, true_res, 1);
 #else
     iter = InvCg(out,in,true_res);
+#endif
+#ifdef PROFILE
+  time += dclock();
+  print_flops(fname,"MatPcDat+InvCg()",0,time);
+  time = -dclock();
 #endif
     break;
   case BICGSTAB:
@@ -431,6 +445,10 @@ int DiracOpDwf::MatInv(Vector *out,
     VRB.Sfree(cname, fname, "temp2", temp2);
     sfree(temp2);
   }
+#ifdef PROFILE
+  time += dclock();
+  print_flops(fname,"After InvCg()",0,time);
+#endif
 
   return iter;
 }

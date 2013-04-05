@@ -20,7 +20,7 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/lattice.h>          // Lattice::GetLink()
 #include <comms/scu.h>               //getMinusData, getPlusData
-#include <comms/nga_reg.h>
+////#include <comms/nga_reg.h>
 #include <comms/cbuf.h>
 CPS_START_NAMESPACE
 

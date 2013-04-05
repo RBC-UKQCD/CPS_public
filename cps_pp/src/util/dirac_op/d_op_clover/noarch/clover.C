@@ -34,7 +34,7 @@ CPS_START_NAMESPACE
 // external variable definition for clover_mat_mlt_asm.asm
 //----------------------------------------------------------------------
 CPS_END_NAMESPACE
-#include<comms/nga_reg.h>
+//#include<comms/nga_reg.h>
 CPS_START_NAMESPACE
 //extern const unsigned int clover_cram_scratch_addr = CRAM_SCRATCH_ADDR;
 

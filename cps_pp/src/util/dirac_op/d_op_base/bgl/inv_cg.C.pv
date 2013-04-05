@@ -20,7 +20,7 @@ CPS_END_NAMESPACE
 #include <util/gjp.h>
 #include <util/verbose.h>
 #include <util/error.h>
-#include <comms/nga_reg.h>
+//#include <comms/nga_reg.h>
 #include <comms/cbuf.h>
 #include <math.h>
 #if TARGET_BGL == 1
