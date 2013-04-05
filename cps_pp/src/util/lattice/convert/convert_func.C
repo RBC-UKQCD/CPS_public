@@ -8,19 +8,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.23 2013-04-05 17:51:14 chulwoo Exp $
+  $Id: convert_func.C,v 1.24 2013-04-05 20:05:48 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-04-05 17:51:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.23 2013-04-05 17:51:14 chulwoo Exp $
-//  $Id: convert_func.C,v 1.23 2013-04-05 17:51:14 chulwoo Exp $
+//  $Date: 2013-04-05 20:05:48 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.24 2013-04-05 20:05:48 chulwoo Exp $
+//  $Id: convert_func.C,v 1.24 2013-04-05 20:05:48 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: convert_func.C,v $
-//  $Revision: 1.23 $
+//  $Revision: 1.24 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
 //  $State: Exp $
 //
@@ -121,7 +121,7 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 // cram1, cram2 should be in CRAM
 //-------------------------------------------------------------------------
 //   VRB.Func("",fname);
-  sync();
+//  sync();
   const int GSIZE= 72;
 //  if(!UniqueID())printf("%s:cap->site_size=%d\n",fname,cap->site_size);
   if (cap->site_size>GSIZE)
@@ -195,7 +195,7 @@ void RunGConverter(CAP cap, unsigned *site_tbl, unsigned *link_tbl)
 		}
 	}
 
-  sync();
+//  sync();
 //   VRB.Func("",fname);
 //	sfree(cname_none,fname, "cram2", cram2);
 //	sfree(cname_none,fname, "cram1", cram1);
