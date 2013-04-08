@@ -193,4 +193,56 @@ vml_DoArg (VML *vmls, char *name,DoArg *objp)
 	 vml_class_end(vmls,"DoArg",name);
 	return TRUE;
 }
+	 bool DoArgExt::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool DoArgExt::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool DoArgExt::Vml(VML *vmls,char *instance){
+		 if(!vml_DoArgExt(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_DoArgExt (VML *vmls, char *name,DoArgExt *objp)
+{
+	 vml_class_begin(vmls,"DoArgExt",name);
+	 if (!vml_Float (vmls, "twist_bc_x", &objp->twist_bc_x))
+		 return FALSE;
+	 if (!vml_Float (vmls, "twist_bc_y", &objp->twist_bc_y))
+		 return FALSE;
+	 if (!vml_Float (vmls, "twist_bc_z", &objp->twist_bc_z))
+		 return FALSE;
+	 if (!vml_Float (vmls, "twist_bc_t", &objp->twist_bc_t))
+		 return FALSE;
+	 if (!vml_StartConfType (vmls, "start_u1_conf_kind", &objp->start_u1_conf_kind))
+		 return FALSE;
+	 if (!vml_u_long (vmls, "start_u1_conf_load_addr", &objp->start_u1_conf_load_addr))
+		 return FALSE;
+	 if (!vml_pointer (vmls, "start_u1_conf_filename", (char **)&objp->start_u1_conf_filename, sizeof (char), (vmlproc_t) vml_char))
+		 return FALSE;
+	 if (!vml_int (vmls, "trajectory", &objp->trajectory))
+		 return FALSE;
+	 if (!vml_int (vmls, "start_u1_conf_alloc_flag", &objp->start_u1_conf_alloc_flag))
+		 return FALSE;
+	 if (!vml_int (vmls, "mult_u1_conf_flag", &objp->mult_u1_conf_flag))
+		 return FALSE;
+	 if (!vml_int (vmls, "save_stride", &objp->save_stride))
+		 return FALSE;
+	 if (!vml_Float (vmls, "mobius_b_coeff", &objp->mobius_b_coeff))
+		 return FALSE;
+	 if (!vml_Float (vmls, "mobius_c_coeff", &objp->mobius_c_coeff))
+		 return FALSE;
+	 vml_class_end(vmls,"DoArgExt",name);
+	return TRUE;
+}
 CPS_END_NAMESPACE

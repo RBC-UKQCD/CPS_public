@@ -138,8 +138,8 @@ void DiracOpAsqtad::MatPcDagMatPc(Vector *out,
   gettimeofday(&start,NULL);
 #endif
 
-  asqtad_dirac((IFloat *)frm_tmp, (IFloat *)in, 0, 0);
-  asqtad_dirac((IFloat *)out, (IFloat *)frm_tmp, 1, 0);
+  asqtad_dirac((IFloat*)frm_tmp, (IFloat *)in, 0, 0);
+  asqtad_dirac((IFloat*)out, (IFloat *)frm_tmp, 1, 0);
   out->FTimesV1MinusV2(mass_sq, in, out, f_size_cb);
 
   if( dot_prd !=0 ){
@@ -349,7 +349,7 @@ int DiracOpAsqtad::MatInv(Vector *out,
 
   // tmp = (2m - D)k
 
-  asqtad_dirac((IFloat *)tmp, k_o, 1, 0);
+  asqtad_dirac((IFloat *)tmp, (IFloat*)k_o, 1, 0);
   fTimesV1MinusV2((IFloat *)tmp, 2.*mass_rs, k_e,
   	(IFloat *)tmp, f_size_cb);
 
@@ -359,7 +359,7 @@ int DiracOpAsqtad::MatInv(Vector *out,
   IFloat *x_e = (IFloat *)out;
   IFloat *x_o = x_e+f_size_cb;
   moveMem(x_o, k_o, f_size_cb*sizeof(Float));
-  asqtad_dirac((IFloat *)tmp, x_e, 0, 0);
+  asqtad_dirac((IFloat *)tmp, (IFloat*)x_e, 0, 0);
   vecMinusEquVec(x_o, (IFloat *)tmp, f_size_cb);
   vecTimesEquFloat(x_o, 0.5/mass_rs, f_size_cb);
 
@@ -398,50 +398,6 @@ int DiracOpAsqtad::MatInv(PreserveType prs_in)
 // RitzMat works on the full or half lattice.
 // The in, out fields are defined on the full or half lattice.
 //------------------------------------------------------------------
-void DiracOpAsqtad::RitzMat(Vector *out, Vector *in) {
-  char *fname = "RitzMat(V*,V*)";
-  VRB.Func(cname,fname);
-  Float *dot=0;
-
-  Float mass = dirac_arg->mass;
-  Float c = 1.0/(64.0 + 4.0*mass*mass);
-
-  switch(dirac_arg->RitzMatOper)
-    {
-    case MATDAG_MAT:
-      MatPcDagMatPc(out, in, dot);
-      break;
-
-    case MATPCDAG_MATPC:
-      MatPcDagMatPc(out, in, dot);
-      break;
-      
-    case NEG_MATPCDAG_MATPC:
-      MatPcDagMatPc(out, in, dot);
-      out->VecNegative(out, RitzLatSize());
-      break;
-      
-    case NEG_MATDAG_MAT:
-      MatPcDagMatPc(out, in, dot);
-      out->VecNegative(out, RitzLatSize());
-      break;
-      
-    case MATDAG_MAT_NORM:
-      MatPcDagMatPc(out, in, dot);
-      out->VecTimesEquFloat(c,RitzLatSize());
-      break;
-
-    case NEG_MATDAG_MAT_NORM:
-      MatPcDagMatPc(out, in, dot);
-      out->VecTimesEquFloat(-c,RitzLatSize());
-      break;
-
-    default:
-      ERR.General(cname,fname,"RitzMatOper %d not implemented",
-		  dirac_arg->RitzMatOper);
-    }
-  
-}
 
 //------------------------------------------------------------------
 // RitzEigMat(Vector *out, Vector *in) :

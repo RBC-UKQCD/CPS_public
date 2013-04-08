@@ -61,6 +61,10 @@ class AlgMuon : public Alg
     void  FFT4(Float* fpin, const int nleft, const int nright,
 	       int flag_dist_back=1, int fft_forward=1  )
     {
+#ifndef USE_FFTW
+      ERR.General(cname,"FFTW4()","Needs FFTW");
+#else
+
       const int data_size = GJP.VolNodeSites()*nleft*nright;
       //< total data length in units of Float
       
@@ -72,10 +76,14 @@ class AlgMuon : public Alg
 	FFT_one_dir(mu, fpin, nl,n,nr,  fft_forward, flag_dist_back);
 	nr_stride *= n;
       }
+#endif
     }
     void  FFTXYZ(Float* fpin, const int nleft, const int nright,
 		 int flag_dist_back=1, int fft_forward=1  )
     {
+#ifndef USE_FFTW
+      ERR.General(cname,"FFTWXYZ()","Needs FFTW");
+#else
       const int data_size = GJP.VolNodeSites()*nleft*nright;
       //< total data length in the unit of Float
       
@@ -87,6 +95,7 @@ class AlgMuon : public Alg
 	FFT_one_dir(mu, fpin, nl,n,nr,  fft_forward, flag_dist_back);
 	nr_stride *= n;
       }
+#endif
     }
 
     void Mres();

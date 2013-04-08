@@ -285,6 +285,7 @@ void QPropW::Run(const int do_rerun, const Float precision)
 
    // does prop exist? Assume it does not.
    int do_cg = 1;
+
    int StartSpin = 0;
    int EndSpin = 4;
    int StartColor = 0;
@@ -296,11 +297,6 @@ void QPropW::Run(const int do_rerun, const Float precision)
 	StartColor = qp_arg.StartSrcColor;
 	EndColor = qp_arg.EndSrcColor;
    }
-
-   int StartSpin = qp_arg.StartSrcSpin;
-   int EndSpin = qp_arg.EndSrcSpin;
-   int StartColor = qp_arg.StartSrcColor;
-   int EndColor = qp_arg.EndSrcColor;
 
    /****************************************************************
      The code below is temporarily isolated for purposes of merging
@@ -418,7 +414,7 @@ void QPropW::Run(const int do_rerun, const Float precision)
        j5q_pion = (Float *) smalloc(cname, fname, "d_j5q_pion_p", glb_walls * sizeof(Float));
 //       j5q_pion = (Float *) smalloc(fsize);
      
-       flt_p = (Float *) j5q_pion;
+       Float *flt_p = (Float *) j5q_pion;
        for ( int i = 0; i < glb_walls; i++) *flt_p++ = 0.0;
      }
      // End M. Lightman

@@ -23,6 +23,8 @@
 #include <comms/cbuf.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
+#include <util/qcdio.h>
+
 CPS_START_NAMESPACE
 
 //extern "C" void dirac_comm_assert(void);
@@ -153,7 +155,26 @@ void DiracOpP4::MatPcDagMatPc(Vector *out,
   struct timeval start,end;
   gettimeofday(&start,NULL);
 #endif
+
+#if 0
+for(int i=0;i<GJP.VolNodeSites()/2*6;i++){
+printf("P4: IN %d %.14e\n",i,*((IFloat*)in+i));
+}
+exit(0);
+#endif
+
   p4_dirac(frm_tmp, in, 0, 0);
+
+#if 0
+  FileIoType ft= ADD_ID;
+  FILE *fp=Fopen(ft,"FRMTMP.dat", "a");
+  for(int i=0;i<GJP.VolNodeSites()/2*6;i++){
+    fprintf(fp,"P4: IN FRMTMP %d %.14e %.14e\n",i,*((IFloat*)in+i),*((IFloat*)frm_tmp+i));
+  }
+  fclose(fp);
+  exit(0);
+#endif
+
   p4_dirac(out, frm_tmp, 1, 0);
   out->FTimesV1MinusV2(mass_sq,in,out,f_size_cb);
 
@@ -369,11 +390,27 @@ int DiracOpP4::MatInv(Vector *out,
   fTimesV1MinusV2((IFloat *)tmp, 2.*mass_rs, (IFloat *)k_e,
   	(IFloat *)tmp, f_size_cb);
 
-#define PROFILE
+//#define PROFILE
 #ifdef PROFILE
   gettimeofday(&start,NULL);
 #endif
-  int iter = InvCg(out, tmp, true_res);
+  int iter;
+  switch (dirac_arg->Inverter) {
+  case CG:
+    iter = InvCg(out, tmp, true_res);
+    break;
+  case LOWMODEAPPROX :
+    iter = InvLowModeApprox(out, tmp, dirac_arg->fname_eigen, dirac_arg->neig, true_res );
+    break;
+  case CG_LOWMODE_DEFL :
+    InvLowModeApprox(out, tmp, dirac_arg->fname_eigen, dirac_arg->neig, true_res );   
+    iter = InvCg(out,tmp,true_res);
+    break;
+  default:
+    ERR.General(cname,fname,"InverterType %d not implemented\n",
+                dirac_arg->Inverter);
+  }
+
 #ifdef PROFILE
   gettimeofday(&end,NULL);
   printf("DiracOpP4::InvCg:: ");
@@ -416,57 +453,6 @@ int DiracOpP4::MatInv(Float *true_res, PreserveType prs_in)
 //------------------------------------------------------------------
 int DiracOpP4::MatInv(PreserveType prs_in)
 { return MatInv(f_out, f_in, 0, prs_in); }
-
-//------------------------------------------------------------------
-// RitzMat(Vector *out, Vector *in) :
-// RitzMat is the base operator used in in Ritz.
-// RitzMat works on the full or half lattice.
-// The in, out fields are defined on the full or half lattice.
-//------------------------------------------------------------------
-void DiracOpP4::RitzMat(Vector *out, Vector *in) {
-  char *fname = "RitzMat(V*,V*)";
-  VRB.Func(cname,fname);
-  Float *dot=0;
-
-  Float mass = dirac_arg->mass;
-  Float c = 1.0/(64.0 + 4.0*mass*mass);
-
-  switch(dirac_arg->RitzMatOper)
-    {
-    case MATDAG_MAT:
-      MatPcDagMatPc(out, in, dot);
-      break;
-
-    case MATPCDAG_MATPC:
-      MatPcDagMatPc(out, in, dot);
-      break;
-      
-    case NEG_MATPCDAG_MATPC:
-      MatPcDagMatPc(out, in, dot);
-      out->VecNegative(out, RitzLatSize());
-      break;
-      
-    case NEG_MATDAG_MAT:
-      MatPcDagMatPc(out, in, dot);
-      out->VecNegative(out, RitzLatSize());
-      break;
-      
-    case MATDAG_MAT_NORM:
-      MatPcDagMatPc(out, in, dot);
-      out->VecTimesEquFloat(c,RitzLatSize());
-      break;
-
-    case NEG_MATDAG_MAT_NORM:
-      MatPcDagMatPc(out, in, dot);
-      out->VecTimesEquFloat(-c,RitzLatSize());
-      break;
-
-    default:
-      ERR.General(cname,fname,"RitzMatOper %d not implemented",
-		  dirac_arg->RitzMatOper);
-    }
-  
-}
 
 //------------------------------------------------------------------
 // dMdmu(Vector *out, Vector *in, ChkbType cb, DagType dag, int order) :

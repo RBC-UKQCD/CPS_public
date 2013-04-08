@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.38 2013-04-05 17:46:30 chulwoo Exp $
+  $Id: vector.h,v 1.39 2013-04-08 20:50:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-04-05 17:46:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.38 2013-04-05 17:46:30 chulwoo Exp $
-//  $Id: vector.h,v 1.38 2013-04-05 17:46:30 chulwoo Exp $
+//  $Date: 2013-04-08 20:50:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.39 2013-04-08 20:50:00 chulwoo Exp $
+//  $Id: vector.h,v 1.39 2013-04-08 20:50:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.38 $
+//  $Revision: 1.39 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -431,14 +431,10 @@ class Matrix
         { Trans((const IFloat *)(m.u)); }
 
     //! Hermitian conjugate.
-<<<<<<< vector.h
     void Dagger(const Matrix& m)
     	{ Dagger((const IFloat *)&m); }
-=======
-    void Dagger(const IFloat* m);
     void Transpose(const IFloat* m);
     void Transpose();
->>>>>>> 1.27.82.1.12.1
 
     //! Assignment to hermitian conjugate.
     /*!

@@ -469,7 +469,7 @@ void AlgNuc3pt::run()
       // If doing coherent sinks, don't calculate the 3pt functions until all the 
       // forward propagators have been calculated. --MFL
       int do_seq = 0;
-      int t_sink;
+//      int t_sink;
 
       if(Nuc3pt_arg->calc_seqQ != MULT_SEQ 
 	&& Nuc3pt_arg->calc_seqQ != WRITE_MULT_SEQ 
@@ -810,7 +810,7 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
 	  }
 	}
 	  q_prop[n] = new QPropWBoxSrc(AlgLattice(),&qp_arg, &box_arg, common_arg);
-	  q_prop->Run();
+	  q_prop[n]->Run();
       }
     }
     break ;
@@ -838,7 +838,7 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
 	  }
 	}
 	  q_prop[n] = new QPropWPointSrc(AlgLattice(),&qp_arg,common_arg);
-	  q_prop->Run();
+	  q_prop[n]->Run();
       }
     }
     break ;
@@ -893,7 +893,7 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
 	    q_prop[n] = new QPropWGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg,qp_arg.file);
 	    q_prop[n]->Allocate(0);
 //	    q_prop[n]->ReLoad(qp_arg.file); //TODO: need different filenames for different propagators (MFL)
-	    q_prop->RestoreQProp(out_prop,0);
+	    q_prop[n]->RestoreQProp(out_prop,0);
 	  }
       }
     }

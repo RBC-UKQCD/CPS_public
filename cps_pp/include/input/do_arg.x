@@ -154,6 +154,20 @@ memfun  void SetupAsqTadU0(double u0);
     
 };
 
-
+class DoArgExt {
+    Float twist_bc_x;
+    Float twist_bc_y;
+    Float twist_bc_z;
+    Float twist_bc_t;
+    StartConfType start_u1_conf_kind;
+    u_long start_u1_conf_load_addr;
+    char *start_u1_conf_filename;
+    int trajectory;
+    int start_u1_conf_alloc_flag;
+    int mult_u1_conf_flag;
+    int save_stride;
+    Float mobius_b_coeff;
+    Float mobius_c_coeff;
+};
 
 

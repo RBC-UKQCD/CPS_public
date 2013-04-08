@@ -8,15 +8,15 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.65 2013-04-05 17:46:30 chulwoo Exp $
+  $Id: lattice.h,v 1.66 2013-04-08 20:50:00 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2013-04-05 17:46:30 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.65 2013-04-05 17:46:30 chulwoo Exp $
-  $Id: lattice.h,v 1.65 2013-04-05 17:46:30 chulwoo Exp $
+  $Date: 2013-04-08 20:50:00 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.66 2013-04-08 20:50:00 chulwoo Exp $
+  $Id: lattice.h,v 1.66 2013-04-08 20:50:00 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.65 $
+  $Revision: 1.66 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -244,14 +244,10 @@ class Lattice
 
     virtual ~Lattice();
 
-<<<<<<< lattice.h
     Matrix *GaugeField() const {
         return gauge_field;
     }
     //!< Returns the pointer to the gauge field configuration.
-=======
-    Matrix *GaugeField() const;
-    	//!< Returns the pointer to the gauge field configuration.
     Float *U1GaugeField() const;
          //!< Returns the pointer to the gauge field configuration.
     void twist_bc(int sign);
@@ -262,15 +258,11 @@ class Lattice
       //mult su3 links by constant B field (linear vector potential)
       // and fix boundary links to give same plaquette (flux)
 
->>>>>>> 1.57.28.2.12.1
 
     void GaugeField(Matrix *u);
-<<<<<<< lattice.h
     //!< Copies an array into the gauge configuration.
-=======
     void U1GaugeField(Float *u);
         //!< Copies an array into the gauge configuration.
->>>>>>> 1.57.28.2.12.1
 
     int GsiteOffset(const int *x) const
         { return x[0]*g_dir_offset[0]+x[1]*g_dir_offset[1]
