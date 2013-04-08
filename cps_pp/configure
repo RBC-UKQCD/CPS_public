@@ -1312,6 +1312,7 @@ Optional Features:
                           (default=no)
   --enable-cuda           Location of CUDA installation. (default=no)
   --enable-quda           Compile with QUDA GPU lib. (default=no)
+  --enable-fftw           Compile with FFTW (default=no)
   --enable-namespace      Build the library inside a 'cps' namespace.
                           (default=no for QCDOC, yes otherwise)
   --enable-double-prec    Build the library in double precision (default=yes)
@@ -5406,6 +5407,27 @@ if test "$enable_quda" != "no"; then
 fi
 #-------------------------windy---------------------------
 
+# Check whether --enable-fftw was given.
+if test "${enable_fftw+set}" = set; then
+  enableval=$enable_fftw;
+else
+  enable_fftw="no"
+fi
+
+{ echo "$as_me:$LINENO: checking if including fftw" >&5
+echo $ECHO_N "checking if including fftw... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: result: $enable_blas" >&5
+echo "${ECHO_T}$enable_blas" >&6; }
+if test "$enable_fftw" != "no"; then
+#	if test "$enable_blas" != "yes"; then
+   		LDFLAGS="${LDFLAGS} -L${enable_fftw}/lib -lfftw3"
+   		INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_fftw}/include"
+#	else
+#   		LDFLAGS="${LDFLAGS} -L\${SRCDIR}/aux/GotoBLAS2 -lgoto2"
+#   		INCLUDE_FLAGS="${INCLUDE_FLAGS} -I\${SRCDIR}/aux/GotoBLAS2"
+#	fi
+   	DFLAGS="${DFLAGS} -DUSE_FFTW"
+fi
 
 # Check whether --enable-namespace was given.
 if test "${enable_namespace+set}" = set; then

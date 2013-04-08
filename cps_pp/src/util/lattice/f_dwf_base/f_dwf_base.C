@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.42 2012-12-05 16:39:19 chulwoo Exp $
+  $Id: f_dwf_base.C,v 1.43 2013-04-08 20:50:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -904,7 +904,6 @@ int FdwfBase::FmatInvMobius(Vector *f_out,
 #endif
 }
 
-
 int FdwfBase::eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len,
 		Vector *f_out, Vector *f_in, 
 		  CgArg *cg_arg, 
@@ -1201,7 +1200,7 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float *lambda,
  
   if(cnv_frm == CNV_FRM_YES)
     for(int i=0; i < N_eig; ++i)
-      Fconvert(f_eigenv[i], WILSON, StrOrd());
+      Fconvert(f_eigenv[i], DWF_4D_EOPREC_EE, StrOrd());
  
   // Call constructor and solve for eigenvectors.
   // Use null pointers to fake out constructor.
@@ -1273,6 +1272,53 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float *lambda,
   sfree(cname,fname, "four",four);
   sfree(cname,fname, "fourg5",fourg5);
   // Return the number of iterations
+  return iter;
+}
+
+//------------------------------------------------------------------
+// Solve  A * f_eigenv = lambda * f_eigenv where
+// A is the fermion matrix (Dirac operator). The solution
+// is done with the Lanczos algorithm. eig_arg is the 
+// structure that contains all the control parameters, f_eigenv
+// is the fermion field eigenvectors, lambda are the
+// returned eigenvalues.
+// f_eigenv is defined on the whole lattice.
+//------------------------------------------------------------------
+int FdwfBase::FeigSolv(Vector **f_eigenv, Float *lambda,
+		       LanczosArg *eig_arg, 
+		       CnvFrmType cnv_frm)
+{
+  int iter;
+  char *fname = "FeigSolv(V*,F*,LanczosArg*,CnvFrmType)";
+  VRB.Func(cname,fname);
+  CgArg cg_arg;
+  cg_arg.mass = eig_arg->mass;
+  cg_arg.RitzMatOper = eig_arg->RitzMat_convcheck;
+  cg_arg.eigen_shift = eig_arg->eigen_shift;
+  // printf("Shift=%e\n",cg_arg.eigen_shift );exit(2);
+  //int N_eig = eig_arg->N_eig;
+  int nk = eig_arg->nk_lanczos_vectors;
+  int np = eig_arg->np_lanczos_vectors;
+  int maxiters = eig_arg->maxiters;
+  Float stopres = eig_arg->stop_residual;
+  MatrixPolynomialArg* cheby_arg = (MatrixPolynomialArg*)eig_arg->matpoly_arg;
+  
+  if(cnv_frm == CNV_FRM_YES) // convert only nk, not (nk+np)
+    for(int i=0; i < nk; ++i) 
+      Fconvert(f_eigenv[i], DWF_4D_EOPREC_EE, StrOrd());
+ 
+  // Call constructor and solve for eigenvectors.
+  // Use null pointers to fake out constructor.
+  Vector *v1 = (Vector *)0;
+  Vector *v2 = (Vector *)0;
+  DiracOpDwf dwf(*this, v1, v2, &cg_arg, CNV_FRM_NO);
+  
+  iter = dwf.ImpResLanczos(f_eigenv, lambda,  eig_arg); 
+
+  if(cnv_frm == CNV_FRM_YES)
+    for(int i=0; i < nk; ++i) // convert only nk, not (nk+np)
+      Fconvert(f_eigenv[i], CANONICAL, StrOrd());
+  
   return iter;
 }
 

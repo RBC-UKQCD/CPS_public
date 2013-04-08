@@ -6,5 +6,5 @@ BGQ_DIR = bfm noarch
 #NOARCH_DIR =  noarch
 NOARCH_DIR =  sse
 #include ../../../../Makefile.rules.xlc
-include ../../../../Makefile.rules.sse
-#include ../../../../Makefile.rules
+#include ../../../../Makefile.rules.sse
+include ../../../../Makefile.rules

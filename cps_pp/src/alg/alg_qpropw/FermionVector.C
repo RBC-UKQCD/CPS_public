@@ -376,8 +376,8 @@ void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where)
     if(nc != GJP.TnodeCoor()) return; // nothing to do here.
 
     Matrix **gm = lat.FixGaugePtr();
+#ifdef USE_OMP
     Matrix *pM = gm[lc];
-
     int vol_3d = GJP.XnodeSites() * GJP.YnodeSites() * GJP.ZnodeSites();
 #pragma omp parallel for
     for(int i = 0; i < vol_3d; ++i) {
@@ -392,7 +392,12 @@ void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where)
 
 <<<<<<< FermionVector.C
         v->DotXEqual(mt, vt);
-=======
+#else
+  Vector temp;
+  Matrix tempmat; 
+    int len;     //the local (on processor) length in "dir" direction
+  int lproc;   // local processor coordinate in d_ direction
+               // 0 <= lproc <= nproc
   // find out if this node overlaps with the hyperplane
   // in which the wall source sits
   int has_overlap = 0;
@@ -422,8 +427,9 @@ void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where)
       //printf("FT:GFWALL %d %d %d %d : ",x,y,z,spin);
       //for(int col=0;col<6;++col){ printf("%e ", *(col+(Float*)&(fv[i]))); }
       //printf("\n");
->>>>>>> 1.11.100.1
     }
+  }
+#endif
 }
 
 // COULOMB GAUGE ONLY!

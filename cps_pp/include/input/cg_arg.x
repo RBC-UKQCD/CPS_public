@@ -16,7 +16,13 @@ class CgArg {
   enum InverterType Inverter;     /*!< Which solver to use.*/
   
   int bicgstab_n;             /* BiCGstab(n) parameter. */
-  
+
+  string  fname_eigen<>;    /* file name for Low Eigen Modes */
+
+  int neig;         /* number of eigenvectors */
+
+  Float eigen_shift; /* shift for eigen spectrum, place holder. Don't input */
+  Float ama_stop_rsd;         /*!<  The target residual for AMA. */
   memfun CgArg();
 };
 

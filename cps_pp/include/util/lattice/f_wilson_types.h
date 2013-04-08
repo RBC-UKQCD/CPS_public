@@ -76,7 +76,7 @@ class FwilsonTypes : public virtual Lattice
     //! Multiplication of a lattice spin-colour vector by gamma_5.
     void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
 
-    void Fconvert(Vector*, StrOrdType, StrOrdType);
+    void Fconvert(Vector*, StrOrdType, StrOrdType, int cb=2);
 
     Float FhamiltonNode( Vector*,  Vector*) ;
 
@@ -202,6 +202,9 @@ class Fwilson : public virtual FwilsonTypes
         // is less by half the size of a fermion vector.
 	// The function returns the total number of CG iterations.
 
+    int FeigSolv(Vector **f_eigenv, Float *lambda,
+		 LanczosArg *eig_arg, 
+		 CnvFrmType cnv_frm = CNV_FRM_YES){ return 0; };
     int FeigSolv(Vector **f_eigenv, Float *lambda, 
 		 Float *chirality, int *valid_eig,
 		 Float **hsum,
@@ -235,6 +238,151 @@ class Fwilson : public virtual FwilsonTypes
 			      Vector **sol_d, ForceMeasure measure);
 
     Float BhamiltonNode(Vector *boson, Float mass);
+        // The boson Hamiltonian of the node sublattice.
+
+};
+
+
+//------------------------------------------------------------------
+//! A class implementing Wilson fermions.
+/*!
+  \ingroup factions
+*/
+//------------------------------------------------------------------
+class Fnaive : public virtual FwilsonTypes
+{
+ private:
+    char *cname;    // Class name.
+    
+ public:
+
+    Fnaive();
+
+    virtual ~Fnaive();
+
+    int FsiteSize() const;
+
+    FclassType Fclass() const; 
+
+    int FchkbEvl() const;
+	// returns 1 => The fermion fields in the evolution
+        //      or the CG that inverts the evolution matrix
+	//      are defined on a single checkerboard (half the 
+	//      lattice).
+
+    int FmatEvlInv(Vector *f_out, Vector *f_in, 
+		   CgArg *cg_arg, 
+		   Float *true_res,
+		   CnvFrmType cnv_frm = CNV_FRM_YES){};
+        // It calculates f_out where A * f_out = f_in and
+        // A is the preconditioned fermion matrix that appears
+        // in the HMC evolution (even/odd  preconditioning 
+        // of [Dirac^dag Dirac]. The inversion is done
+	// with the conjugate gradient. cg_arg is the structure
+        // that contains all the control parameters, f_in is the
+        // fermion field source vector, f_out should be set to be
+        // the initial guess and on return is the solution.
+	// f_in and f_out are defined on a checkerboard.
+        // If true_res !=0 the value of the true residual is returned
+        // in true_res.
+        // *true_res = |src - MatPcDagMatPc * sol| / |src|
+	// The function returns the total number of CG iterations.
+
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg **cg_arg, 
+		    CnvFrmType cnv_frm, MultiShiftSolveType type, 
+		    Float *alpha, Vector **f_out_d){};
+    //!< The matrix inversion used in the molecular dynamics algorithms.
+    /*!<
+      Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
+      where \a M is the (possibly odd-even preconditioned) fermionic matrix.
+
+      \param f_out The solution vectors.
+      \param f_in The source vector
+      \param shift The shifts of the fermion matrix.
+      \param Nshift The number of shifts
+      \param isz The smallest shift (required by MInvCG)
+      \param cg_arg The solver parameters
+      \param cnv_frm Whether the lattice fields need to be converted to
+      to a new storage order appropriate for the type of fermion action.
+      If this is ::CNV_FRM_NO, then just the gauge field is converted.
+      If this is ::CNV_FRM_YES, then the fields \a f_out and \a f_in
+      are also converted: This assumes they are initially in the same order as
+      the gauge field. Fields that are converted are restored to their original
+      order upon exit of this method. \e N.B. If the fields are already in the
+      suitable order, then specifying ::CNV_FRM_YES here has no effect.
+      \param type The type of multimass inverter.
+      If type == MULTI, then regular multishift inversion is performed, each solution
+      stored separately.  If type == SINGLE, the there is a single solution vector, and
+      each solution is summed to this vector with amount alpha.
+      \param alpha The contribution of each shifted solution to the total solution vector
+      \param f_out_d ?
+      \return The number of solver iterations.
+      \post \a f_out contains the solution vector.
+    */
+
+    void FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+		    Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm){};
+
+    int FmatInv(Vector *f_out, Vector *f_in, 
+		CgArg *cg_arg, 
+		Float *true_res,
+		CnvFrmType cnv_frm = CNV_FRM_YES,
+		PreserveType prs_f_in = PRESERVE_YES);
+        // It calculates f_out where A * f_out = f_in and
+        // A is the fermion matrix (Dirac operator). The inversion
+	// is done with the conjugate gradient. cg_arg is the 
+        // structure that contains all the control parameters, f_in 
+        // is the fermion field source vector, f_out should be set 
+        // to be the initial guess and on return is the solution.
+	// f_in and f_out are defined on the whole lattice.
+        // If true_res !=0 the value of the true residual is returned
+        // in true_res.
+        // *true_res = |src - MatPcDagMatPc * sol| / |src|
+        // cnv_frm is used to specify if f_in should be converted 
+        // from canonical to fermion order and f_out from fermion 
+        // to canonical. 
+        // prs_f_in is used to specify if the source
+        // f_in should be preserved or not. If not the memory usage
+        // is less by half the size of a fermion vector.
+	// The function returns the total number of CG iterations.
+
+    int FeigSolv(Vector **f_eigenv, Float *lambda,
+		 LanczosArg *eig_arg, 
+		 CnvFrmType cnv_frm = CNV_FRM_YES){ return 0; };
+    int FeigSolv(Vector **f_eigenv, Float *lambda, 
+		 Float *chirality, int *valid_eig,
+		 Float **hsum,
+		 EigArg *eig_arg, 
+		 CnvFrmType cnv_frm = CNV_FRM_YES);
+        // It finds the eigenvectors and eigenvalues of A where
+        // A is the fermion matrix (Dirac operator). The solution
+	// uses Ritz minimization. eig_arg is the 
+        // structure that contains all the control parameters, f_eigenv
+        // are the fermion field source vectors which should be
+        // defined initially, lambda are the eigenvalues returned 
+        // on solution. f_eigenv is defined on the whole lattice.
+	// The function returns the total number of Ritz iterations.
+
+    Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+		 Float mass, DagType dag);
+	// It sets the pseudofermion field phi from frm1, frm2.
+
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
+			     Float mass, Float step_size){};
+        // It evolves the canonical momentum mom by step_size
+        // using the fermion force. 
+
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+			     Float mass, Float step_size){};
+        // It evolve the canonical momentum mom  by step_size
+        // using the bosonic quotient force.
+
+    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+			      int isz, Float *alpha, Float mass, Float dt,
+				  Vector **sol_d, ForceMeasure measure){};
+
+    Float BhamiltonNode(Vector *boson, Float mass){};
         // The boson Hamiltonian of the node sublattice.
 
 };
@@ -421,6 +569,9 @@ class Fclover : public virtual FwilsonTypes
     // The function returns the total number of CG iterations.
 
 
+    int FeigSolv(Vector **f_eigenv, Float *lambda,
+		 LanczosArg *eig_arg, 
+		 CnvFrmType cnv_frm = CNV_FRM_YES){ return 0; };
     int FeigSolv(Vector **f_eigenv, Float *lambda,
 		 Float *chirality, int *valid_eig,
 		 Float **hsum,
@@ -620,6 +771,17 @@ class FdwfBase : public virtual FwilsonTypes
         // defined initially, lambda are the eigenvalues returned 
         // on solution. f_eigenv is defined on the whole lattice.
 	// The function returns the total number of Ritz iterations.
+    int FeigSolv(Vector **f_eigenv, Float *lambda,
+		 LanczosArg *eig_arg, 
+		 CnvFrmType cnv_frm = CNV_FRM_YES);
+        // It finds the eigenvectors and eigenvalues of A where
+        // A is the fermion matrix (Dirac operator). The solution
+	// uses implicitly started Lanczos. eig_arg is the 
+        // structure that contains all the control parameters, f_eigenv
+        // are the fermion field source vectors which should be
+        // defined initially, lambda are the eigenvalues returned 
+        // on solution. f_eigenv is defined on the whole lattice.
+	// The function returns the total number of iterations.
 
     Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,	       
 		 Float mass, DagType dag);
@@ -648,7 +810,7 @@ class FdwfBase : public virtual FwilsonTypes
 
     void Fconvert(Vector *f_field,
 			  StrOrdType to,
-			  StrOrdType from);
+		  StrOrdType from, int cb=2);
         // Convert fermion field f_field from -> to
 
     void SpinProject(Vector * out, Vector *in, int s_size, int type);
@@ -710,7 +872,6 @@ class Fdwf : public FdwfBase {
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
 };
-
 
 class Fmdwf : public virtual Lattice {
  private:
@@ -927,6 +1088,34 @@ class Fmdwf : public virtual Lattice {
   //!< Method to ensure bosonic force works (does nothing for Wilson
   //!< theories.
   void BforceVector(Vector *in, CgArg *cg_arg);
+};
+
+class Fmobius : public FdwfBase {
+ private:
+    char *cname;    // Class name.
+    
+ public:
+
+    Fmobius(void);
+    ~Fmobius(void);
+
+    FclassType Fclass(void) const;
+
+    int FmatInv(Vector *f_out, Vector *f_in, 
+		CgArg *cg_arg, 
+		Float *true_res,
+		CnvFrmType cnv_frm,
+		PreserveType prs_f_in);
+
+    int FeigSolv(Vector **f_eigenv, Float *lambda,
+		 Float *chirality, int *valid_eig,
+		 Float **hsum,
+		 EigArg *eig_arg, 
+		 CnvFrmType cnv_frm);
+
+    int FeigSolv(Vector **f_eigenv, Float *lambda,
+		 LanczosArg *eig_arg, 
+		 CnvFrmType cnv_frm);
 };
 
 CPS_END_NAMESPACE

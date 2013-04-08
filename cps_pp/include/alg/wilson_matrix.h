@@ -134,7 +134,9 @@ public:
   }
 
   WilsonVector& gamma(int dir);
-  
+  WilsonVector& LeftTimesEqual(const Matrix& rhs);
+
+
   /*!
     Rotate from Dirac to Chiral basis.
     It multiplies the by the rotation matrix 
@@ -341,6 +343,7 @@ public:
   //! hermitean conjugate the WilsonMatrix
   //WilsonMatrix& hconj();
   void hconj();
+  void dump(); // print out the prop
  
   //! mult the prop by gamma_dir on the left
   WilsonMatrix& gl(int dir); 
@@ -376,6 +379,7 @@ public:
   wilson_vector& sol(int source_spin, int source_color); 
 
   void load_vec(int sink_spin, int sink_color, const wilson_vector&);
+#if 0
     void load_row(int source_spin, int source_color, const wilson_vector&rhs)
     {
         for(int s1 = 0; s1 < 4; ++s1) {
@@ -385,11 +389,16 @@ public:
             }
         }
     }
+#endif  //temporarily commented out
   void save_row(int source_spin, int source_color, wilson_vector&);
+  void load_row(int source_spin, int source_color, const wilson_vector&);
+  void load_elem(int i, int j, int k, int l, Rcomplex elem);
+
   Rcomplex Trace();
   const wilson_matrix& wmat() const; // get p 
   WilsonMatrix& LeftTimesEqual(const WilsonMatrix& rhs);
-  
+  WilsonMatrix& LeftTimesEqual(const Matrix& rhs);
+
   //! Projects positive parity on the sink
   WilsonMatrix& PParProjectSink();
   WilsonMatrix& NParProjectSink();

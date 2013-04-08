@@ -5,19 +5,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.45 2013-04-05 17:46:30 chulwoo Exp $
+  $Id: gjp.h,v 1.46 2013-04-08 20:50:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-04-05 17:46:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.45 2013-04-05 17:46:30 chulwoo Exp $
-//  $Id: gjp.h,v 1.45 2013-04-05 17:46:30 chulwoo Exp $
+//  $Date: 2013-04-08 20:50:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.46 2013-04-08 20:50:00 chulwoo Exp $
+//  $Id: gjp.h,v 1.46 2013-04-08 20:50:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.45 $
+//  $Revision: 1.46 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -125,30 +125,12 @@ class GlobalJobParameter
  private:
   const char *cname;    // Class name.
   DoArg doarg_int;
+  DoArgExt doext_int;
 
   int* argc_int;
   char*** argv_int;
   int arg_set;
 
-
-#if 0
-  int bgl_machine_dir_x;
-  int bgl_machine_dir_y;
-  int bgl_machine_dir_z;
-  int bgl_machine_dir_t;
-     // For a given direction of the physics system 
-     // (x,y,z,t) it gives the direction of the processor 
-     // grid that it is "mapped" on. The processor grid has dir 0,1,2,3
-     // with 3 being the chip internal direction connecting the two
-     // cores. The hardware x,y,z,t are labeled 0,1,2,3.
-     // For example if the physics sytem direction y is mapped
-     // allong the processor grid direction t then 
-     // bgl_machine_dir_y = 3. These variables must be set before any 
-     // calls to bgl_sys routines are made. These variables are used 
-     // to "rotate" the physics system with respect to the 
-     // processor grid.
-
-#endif //TARGET == BGL
 
   int node_sites[5]; // sites of a single node along {X,Y,Z,T,S} direction
   int nodes[5];      // number of nodes along {X,Y,Z,T,S} direction
@@ -393,16 +375,16 @@ public:
   Float TwistBc(int dir) const
   { 
     switch(dir){
-    case 0: return doarg_int.twist_bc_x;
-    case 1: return doarg_int.twist_bc_y;
-    case 2: return doarg_int.twist_bc_z;
-    case 3: return doarg_int.twist_bc_t;
+    case 0: return doext_int.twist_bc_x;
+    case 1: return doext_int.twist_bc_y;
+    case 2: return doext_int.twist_bc_z;
+    case 3: return doext_int.twist_bc_t;
     default: printf("GJP::TwistBc(): Incorrect dir for twist\n"); 
       exit(0);
     }
   }
 
-  int Traj(){ return doarg_int.trajectory; }
+  int Traj(){ return doext_int.trajectory; }
 
   BndCndType Bc(int dir) const
       { return bc[dir];}
@@ -492,7 +474,7 @@ public:
     \return The type of initial gauge configuration.
   */    
   StartConfType StartU1ConfKind() const
-      {return doarg_int.start_u1_conf_kind;}
+      {return doext_int.start_u1_conf_kind;}
   //!< Gets the type of initial u1 gauge configuration.
   /*!<
     \return The type of initial u1 gauge configuration.
@@ -503,9 +485,9 @@ public:
   void StartConfLoadAddr( Matrix * addr) 
       { doarg_int.start_conf_load_addr = (unsigned long) addr;}
   Float *StartU1ConfLoadAddr() const
-      {return (Float *)doarg_int.start_u1_conf_load_addr;}
+      {return (Float *)doext_int.start_u1_conf_load_addr;}
   void StartU1ConfLoadAddr( Float * addr)
-      { doarg_int.start_u1_conf_load_addr = (unsigned long) addr;}
+      { doext_int.start_u1_conf_load_addr = (unsigned long) addr;}
   //!< Gets the initial configuration.
   /*!<
     \return The address of the starting configuration
@@ -515,7 +497,7 @@ public:
   const char * StartConfFilename() const
       {return doarg_int.start_conf_filename;}
   const char * StartU1ConfFilename() const
-      {return doarg_int.start_u1_conf_filename;}
+      {return doext_int.start_u1_conf_filename;}
 
   const char * StartSeedFilename() const
       {return doarg_int.start_seed_filename;}
@@ -523,9 +505,9 @@ public:
   const int StartConfAllocFlag() 
       {return doarg_int.start_conf_alloc_flag;}
   const int StartU1ConfAllocFlag()
-      {return doarg_int.start_u1_conf_alloc_flag;}
+      {return doext_int.start_u1_conf_alloc_flag;}
   const int mult_u1()
-      {return doarg_int.mult_u1_conf_flag;}
+      {return doext_int.mult_u1_conf_flag;}
 
   const int WfmSendAllocFlag() 
       {return doarg_int.wfm_send_alloc_flag;}
@@ -560,7 +542,7 @@ public:
   //!< Gets the "beta" parameter in the pure gauge action.
  
   int SaveStride() const
-      {return doarg_int.save_stride;}
+      {return doext_int.save_stride;}
   //!< Gets the stride (number) of eigenvectors to save at-a-time in Eigencontainer
  
   /*!
@@ -601,9 +583,9 @@ public:
     \return The inverse of the 5th direction lattice spacing.
   */
   Float Mobius_b() const
-      {return doarg_int.mobius_b_coeff;}
+      {return doext_int.mobius_b_coeff;}
   Float Mobius_c() const
-      {return doarg_int.mobius_c_coeff;}
+      {return doext_int.mobius_c_coeff;}
   
 
   //------------------------------------------------------------------
@@ -794,6 +776,7 @@ public:
   void Initialize(char *filename, char *instname);
   //! to be deprecated. Will point to the routine above
   void Initialize(const DoArg& do_arg);
+  void InitializeExt(const DoArgExt& do_ext);
 
   //PAB... Need to serialise the do arg as a means of meta-data preservation
   DoArg *GetDoArg(void) { return &doarg_int;};
@@ -829,7 +812,7 @@ public:
     \param sc The type of initial gauge configuration.
   */
   void StartU1ConfKind(StartConfType sc)
-      {doarg_int.start_u1_conf_kind = sc;}
+      {doext_int.start_u1_conf_kind = sc;}
   //!< Sets the type of initial  gauge configuration.
   /*!<
     \param sc The type of initial gauge configuration.

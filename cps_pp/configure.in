@@ -2,13 +2,13 @@ dnl--------------------------------------------------------------------
 dnl  CVS keywords
 dnl
 dnl  $Author: chulwoo $
-dnl  $Date: 2013-04-05 17:51:13 $
-dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.85 2013-04-05 17:51:13 chulwoo Exp $
-dnl  $Id: configure.in,v 1.85 2013-04-05 17:51:13 chulwoo Exp $
+dnl  $Date: 2013-04-08 20:50:00 $
+dnl  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v 1.86 2013-04-08 20:50:00 chulwoo Exp $
+dnl  $Id: configure.in,v 1.86 2013-04-08 20:50:00 chulwoo Exp $
 dnl  $Name: not supported by cvs2svn $
 dnl  $Locker:  $
 dnl  $RCSfile: configure.in,v $
-dnl  $Revision: 1.85 $
+dnl  $Revision: 1.86 $
 dnl  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/configure.in,v $
 dnl  $State: Exp $
 dnl
@@ -484,6 +484,23 @@ if test "$enable_quda" != "no"; then
 fi
 #-------------------------windy---------------------------	
 
+dnl Are we compiling with fftw?
+AC_ARG_ENABLE(fftw, 
+	AC_HELP_STRING([--enable-fftw], 
+		[Compile with FFTW (default=no)]), 
+	,[enable_fftw="no"])
+AC_MSG_CHECKING([if including fftw])
+AC_MSG_RESULT($enable_blas)
+if test "$enable_fftw" != "no"; then
+#	if test "$enable_blas" != "yes"; then
+   		LDFLAGS="${LDFLAGS} -L${enable_fftw}/lib -lfftw3"
+   		INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_fftw}/include"
+#	else
+#   		LDFLAGS="${LDFLAGS} -L\${SRCDIR}/aux/GotoBLAS2 -lgoto2"
+#   		INCLUDE_FLAGS="${INCLUDE_FLAGS} -I\${SRCDIR}/aux/GotoBLAS2"
+#	fi
+   	DFLAGS="${DFLAGS} -DUSE_FFTW"
+fi
 	
 dnl Shall we use the cps namespace?
 AC_ARG_ENABLE(namespace, 

@@ -1143,7 +1143,7 @@ void GramSchm_save(Float *psi, Float **vec, int Nvec, int f_size)
     }
 }
 
-#define USE_BLAS
+//#define USE_BLAS
 #ifndef USE_BLAS
 #define MOVE_FLOAT( pa, pb, n )  moveFloat(pa, pb, n)
 #define VEC_TIMESEQU_FLOAT(py, fact, n ) vecTimesEquFloat( py, fact, n)

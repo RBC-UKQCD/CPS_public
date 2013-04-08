@@ -44,6 +44,14 @@ vml_CgArg (VML *vmls, char *name,CgArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "bicgstab_n", &objp->bicgstab_n))
 		 return FALSE;
+	 if (!vml_string (vmls, "fname_eigen", &objp->fname_eigen, ~0))
+		 return FALSE;
+	 if (!vml_int (vmls, "neig", &objp->neig))
+		 return FALSE;
+	 if (!vml_Float (vmls, "eigen_shift", &objp->eigen_shift))
+		 return FALSE;
+	 if (!vml_Float (vmls, "ama_stop_rsd", &objp->ama_stop_rsd))
+		 return FALSE;
 	 vml_class_end(vmls,"CgArg",name);
 	return TRUE;
 }
