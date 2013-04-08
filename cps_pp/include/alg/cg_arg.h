@@ -27,6 +27,10 @@ public:
 	enum RitzMatType RitzMatOper;
 	enum InverterType Inverter;
 	int bicgstab_n;
+	char *fname_eigen;
+	int neig;
+	Float eigen_shift;
+	Float ama_stop_rsd;
 	   CgArg (  ) ;
 };
 

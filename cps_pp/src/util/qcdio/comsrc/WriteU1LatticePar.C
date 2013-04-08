@@ -113,7 +113,11 @@ void WriteU1LatticeParallel::write(Lattice & lat, const QioArg & wt_arg)
 //    ERR.General(cname,fname,"Writing header failed\n");
   log();
 
-  broadcastInt(&hd.data_start);
+{
+  int temp_start = hd.data_start;
+  broadcastInt(&temp_start);
+  hd.data_start = temp_start;
+}
 
   if(parIO()) {
     ParallelIO pario(wt_arg);

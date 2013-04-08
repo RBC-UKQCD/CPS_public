@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStag class methods.
 
-  $Id: d_op_stag.C,v 1.11 2010-07-26 18:07:23 chulwoo Exp $
+  $Id: d_op_stag.C,v 1.12 2013-04-08 20:50:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //  $Author: chulwoo $
-//  $Date: 2010-07-26 18:07:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.11 2010-07-26 18:07:23 chulwoo Exp $
-//  $Id: d_op_stag.C,v 1.11 2010-07-26 18:07:23 chulwoo Exp $
+//  $Date: 2013-04-08 20:50:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.12 2013-04-08 20:50:00 chulwoo Exp $
+//  $Id: d_op_stag.C,v 1.12 2013-04-08 20:50:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_stag.C,v $
-//  $Revision: 1.11 $
+//  $Revision: 1.12 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v $
 //  $State: Exp $
 //
@@ -166,11 +166,10 @@ DiracOpStag::~DiracOpStag() {
 void DiracOpStag::MatPcDagMatPc(Vector *out, 
 				Vector *in, 
 				Float *dot_prd){
-  setCbufCntrlReg(1, CBUF_MODE1);
-  setCbufCntrlReg(2, CBUF_MODE2);
-  setCbufCntrlReg(3, CBUF_MODE3);
-  setCbufCntrlReg(4, CBUF_MODE4);
-
+//  setCbufCntrlReg(1, CBUF_MODE1);
+//  setCbufCntrlReg(2, CBUF_MODE2);
+//  setCbufCntrlReg(3, CBUF_MODE3);
+//  setCbufCntrlReg(4, CBUF_MODE4);
   stag_dirac(frm_tmp, in, 0, 0);
   stag_dirac(out, frm_tmp, 1, 0);
   out->FTimesV1MinusV2(mass_sq, in, out, f_size_cb);
@@ -293,7 +292,22 @@ int DiracOpStag::MatInv(Vector *out,
   	(IFloat *)tmp, f_size_cb);
 
 
-  int iter = InvCg(out, tmp, true_res);
+  int iter;
+  switch (dirac_arg->Inverter) {
+  case CG:
+    iter = InvCg(out,tmp,true_res);
+    break;
+  case LOWMODEAPPROX :
+    iter = InvLowModeApprox(out,tmp, dirac_arg->fname_eigen, dirac_arg->neig, true_res );
+    break;
+  case CG_LOWMODE_DEFL :
+    InvLowModeApprox(out,tmp, dirac_arg->fname_eigen, dirac_arg->neig, true_res );   
+    iter = InvCg(out,tmp,true_res);
+    break;
+  default:
+    ERR.General(cname,fname,"InverterType %d not implemented\n",
+                dirac_arg->Inverter);
+  }
 
   // calculate odd solution
   IFloat *x_e = (IFloat *)out;
@@ -332,56 +346,6 @@ int DiracOpStag::MatInv(Float *true_res, PreserveType prs_in)
 int DiracOpStag::MatInv(PreserveType prs_in)
 { return MatInv(f_out, f_in, 0, prs_in); }
 
-//------------------------------------------------------------------
-// RitzMat(Vector *out, Vector *in) :
-// RitzMat is the base operator used in in Ritz.
-// RitzMat works on the full or half lattice.
-// The in, out fields are defined on the full or half lattice.
-//------------------------------------------------------------------
-void DiracOpStag::RitzMat(Vector *out, Vector *in) {
-  char *fname = "RitzMat(V*,V*)";
-  VRB.Func(cname,fname);
-  Float *dot=0;
-
-  Float mass = dirac_arg->mass;
-  Float c = 1.0/(64.0 + 4.0*mass*mass);
-
-  switch(dirac_arg->RitzMatOper)
-    {
-    case MATDAG_MAT:
-      MatPcDagMatPc(out, in, dot);
-      break;
-
-    case MATPCDAG_MATPC:
-      MatPcDagMatPc(out, in, dot);
-      break;
-      
-    case NEG_MATPCDAG_MATPC:
-      MatPcDagMatPc(out, in, dot);
-      out->VecNegative(out, RitzLatSize());
-      break;
-      
-    case NEG_MATDAG_MAT:
-      MatPcDagMatPc(out, in, dot);
-      out->VecNegative(out, RitzLatSize());
-      break;
-      
-    case MATDAG_MAT_NORM:
-      MatPcDagMatPc(out, in, dot);
-      out->VecTimesEquFloat(c,RitzLatSize());
-      break;
-
-    case NEG_MATDAG_MAT_NORM:
-      MatPcDagMatPc(out, in, dot);
-      out->VecTimesEquFloat(-c,RitzLatSize());
-      break;
-
-    default:
-      ERR.General(cname,fname,"RitzMatOper %d not implemented",
-		  dirac_arg->RitzMatOper);
-    }
-  
-}
 
 //------------------------------------------------------------------
 // RitzEigMat(Vector *out, Vector *in) :

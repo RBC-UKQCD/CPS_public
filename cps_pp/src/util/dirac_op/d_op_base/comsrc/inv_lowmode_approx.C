@@ -1,6 +1,6 @@
 #include <config.h>
 
-#define USE_BLAS
+//#define USE_BLAS
 
 CPS_START_NAMESPACE
 /*! \file

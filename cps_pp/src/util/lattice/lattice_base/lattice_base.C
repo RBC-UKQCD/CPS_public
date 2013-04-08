@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.71 2013-04-05 17:51:14 chulwoo Exp $
+  $Id: lattice_base.C,v 1.72 2013-04-08 20:50:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-04-05 17:51:14 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.71 2013-04-05 17:51:14 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.71 2013-04-05 17:51:14 chulwoo Exp $
+//  $Date: 2013-04-08 20:50:00 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.72 2013-04-08 20:50:00 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.72 2013-04-08 20:50:00 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.71 $
+//  $Revision: 1.72 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -381,10 +381,10 @@ Lattice::~Lattice()
 // const Matrix *GaugeField(void) const:
 // Returns the pointer to the gauge field configuration.
 //------------------------------------------------------------------
-Matrix *Lattice::GaugeField(void) const
-{
-  return gauge_field;
-}
+//Matrix *Lattice::GaugeField(void) const
+//{
+//  return gauge_field;
+//}
 //------------------------------------------------------------------
 // Float *U1GaugeField(void) const:
 // Returns the pointer to the u1 gauge field configuration.

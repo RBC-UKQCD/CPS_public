@@ -108,6 +108,24 @@ class GnoneFwilson
     virtual ~GnoneFwilson();
 };
 
+//------------------------------------------------------------------
+//! Trivial gauge action with wilson fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GnoneFnaive 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gnone, 
+    public Fnaive
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GnoneFnaive();
+    virtual ~GnoneFnaive();
+};
+
 
 //------------------------------------------------------------------
 //! Trivial gauge action with clover Wilson fermion action
@@ -144,6 +162,19 @@ class GnoneFdwf
  public:
     GnoneFdwf();
     virtual ~GnoneFdwf();
+};
+class GnoneFmobius 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gnone, 
+    public Fmobius
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GnoneFmobius();
+    virtual ~GnoneFmobius();
 };
 
 //------------------------------------------------------------------
@@ -291,6 +322,23 @@ class GwilsonFdwf
  public:
     GwilsonFdwf();
     virtual ~GwilsonFdwf();
+};
+//------------------------------------------------------------------
+//! Wilson gauge action with domain wall fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GwilsonFmobius 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gwilson, 
+    public Fmobius
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GwilsonFmobius();
+    virtual ~GwilsonFmobius();
 };
 
 //------------------------------------------------------------------
@@ -509,6 +557,23 @@ class GimprRectFdwf
  public:
     GimprRectFdwf();
     virtual ~GimprRectFdwf();
+};
+//------------------------------------------------------------------
+//! Improved rectangle gauge action with domain wall fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GimprRectFmobius
+    : public virtual Lattice,
+    public virtual FwilsonTypes,
+    public GimprRect,
+    public Fmobius
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GimprRectFmobius();
+    virtual ~GimprRectFmobius();
 };
 
 //------------------------------------------------------------------
