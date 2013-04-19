@@ -4,18 +4,18 @@ CPS_START_NAMESPACE
   \brief  Definitions of functions that perform operations on complex matrices
   and vectors.
 
-  $Id: vector_util.C,v 1.9 2012-08-15 03:45:46 chulwoo Exp $
+  $Id: vector_util.C,v 1.10 2013-04-19 20:25:52 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-08-15 03:45:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.9 2012-08-15 03:45:46 chulwoo Exp $
-//  $Id: vector_util.C,v 1.9 2012-08-15 03:45:46 chulwoo Exp $
+//  $Date: 2013-04-19 20:25:52 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v 1.10 2013-04-19 20:25:52 chulwoo Exp $
+//  $Id: vector_util.C,v 1.10 2013-04-19 20:25:52 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/comsrc/vector_util.C,v $
 //  $State: Exp $
 //
@@ -304,6 +304,26 @@ void vecTimesEquFloat(IFloat *a, IFloat b, int len)
 #pragma omp parallel for
     for(int i = 0; i < len; ++i) {
     	a[i] *= b;
+    }
+}
+
+void vecAddEquFloat(IFloat *a, IFloat b, int len)
+{
+    for(int i = 0; i < len; ++i) {
+        *a++ += b;
+    }
+}
+
+void vecTimesComplex(IFloat *a,
+                     IFloat re,
+                     IFloat im,
+                     const IFloat *c,
+                     int len)
+{
+  for(int i = 0; i < len; i += 2, c += 2)
+    {
+      *a++ = re * *c     - im * *(c+1);   // real part
+      *a++ = re * *(c+1) + im * *c;       // imag part
     }
 }
 
