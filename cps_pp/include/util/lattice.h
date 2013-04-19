@@ -8,15 +8,15 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.66 2013-04-08 20:50:00 chulwoo Exp $
+  $Id: lattice.h,v 1.67 2013-04-19 20:34:59 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2013-04-08 20:50:00 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.66 2013-04-08 20:50:00 chulwoo Exp $
-  $Id: lattice.h,v 1.66 2013-04-08 20:50:00 chulwoo Exp $
+  $Date: 2013-04-19 20:34:59 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.67 2013-04-19 20:34:59 chulwoo Exp $
+  $Id: lattice.h,v 1.67 2013-04-19 20:34:59 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.66 $
+  $Revision: 1.67 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -1041,7 +1041,10 @@ class Lattice
     */
     virtual int FeigSolv(Vector **f_eigenv, Float *lambda, 
 			 LanczosArg *eig_arg, 
-			 CnvFrmType cnv_frm = CNV_FRM_YES) = 0;
+			 CnvFrmType cnv_frm = CNV_FRM_YES){
+		char *fname = "FeigSolv(**V,F*,L*,C)";
+		ERR.NotImplemented(cname,fname);
+	}
 
   
     //!< It solves the eigenvectors and eigenvalues of the fermion matrix Using Ritz function minimization.
@@ -1150,7 +1153,10 @@ class Lattice
 
     virtual void Fconvert(Vector *f_field, 
 		   	  StrOrdType to,
-			  StrOrdType from, int cb=2) = 0;
+			  StrOrdType from, int cb=2){
+		char *fname = "Fconvert(*V,O,O)";
+		ERR.NotImplemented(cname,fname);
+	}
     //!< Converts the field layout.
     /*!
       Exactly which data layouts are supported depends on the type of

@@ -80,17 +80,17 @@ void WilsonMatrix::load_vec(int sink_spin, int sink_color, const wilson_vector& 
     p.d[sink_spin].c[sink_color]=rhs;
 }
 
-// void WilsonMatrix::load_row(int source_spin, int source_color, const wilson_vector& rhs)
-// {
-//     int c1;
-//     int s1;
+void WilsonMatrix::load_row(int source_spin, int source_color, const wilson_vector& rhs)
+{
+     int c1;
+     int s1;
 
-//     for(s1=0;s1<4;++s1){
-//         for(c1=0;c1<3;++c1){
-// 	    p.d[s1].c[c1].d[source_spin].c[source_color] = rhs.d[s1].c[c1];
-//         }
-//     }
-// }
+     for(s1=0;s1<4;++s1){
+         for(c1=0;c1<3;++c1){
+ 	    p.d[s1].c[c1].d[source_spin].c[source_color] = rhs.d[s1].c[c1];
+         }
+     }
+}
 
 void WilsonMatrix::save_row(int source_spin, int source_color, wilson_vector& rhs)
 {
