@@ -390,8 +390,8 @@ void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where)
         Matrix mt;
         mt.Dagger(pM[mid]);
 
-<<<<<<< FermionVector.C
         v->DotXEqual(mt, vt);
+   }
 #else
   Vector temp;
   Matrix tempmat; 
