@@ -44,7 +44,6 @@ public:
 	Float reliable_delta;
 	int max_restart;
 	int device;
-	   QudaArg (  ) ;
 };
 
 /* the xdr functions */

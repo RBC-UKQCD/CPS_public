@@ -34,6 +34,7 @@ void lanczos_GramSchm(Float *psi, Float **vec, int Nvec, int f_size, Float* alph
 void QRtrf(Float *d, Float *e,int nk, int n, Float **Q, Float dsh, int kmin, int kmax);
 
 //int eigen_solver(Float **A, int n, Float *Eval, Float *aux)
+extern "C"
 int eigen_solver(Float *A, Float *Evec, Float *Eval, int n)
 //use the same call as the old version of eigen solver, so do not need to change the function that call it
 //Float A[n*(n+1)/2], EV[n*n], E[n];

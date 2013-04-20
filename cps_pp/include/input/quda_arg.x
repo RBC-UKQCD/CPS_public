@@ -22,5 +22,5 @@ class QudaArg {
   Float reliable_delta; /*!< delta parameter for reliableupdates. */
   int max_restart; /*< Maximum number of restarts. */
   int device; /*!< Which CUDA device to use. */
-  memfun QudaArg();
+//  memfun QudaArg();
 };
