@@ -12,18 +12,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
 
-  $Id: wilson_dslash_vec.C,v 1.3 2012-05-10 05:51:23 chulwoo Exp $
+  $Id: wilson_dslash_vec.C,v 1.4 2013-04-24 21:16:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-05-10 05:51:23 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_vec.C,v 1.3 2012-05-10 05:51:23 chulwoo Exp $
-//  $Id: wilson_dslash_vec.C,v 1.3 2012-05-10 05:51:23 chulwoo Exp $
+//  $Date: 2013-04-24 21:16:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_vec.C,v 1.4 2013-04-24 21:16:13 chulwoo Exp $
+//  $Id: wilson_dslash_vec.C,v 1.4 2013-04-24 21:16:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_vec.C,v $
 //  $State: Exp $
 //
@@ -253,7 +253,7 @@ void wilson_dslash_vec(IFloat *chi_p_f,
 //
 //
 //omp_set_num_threads(8);
-	omp_set_num_threads(64);
+//	omp_set_num_threads(64);
 #pragma omp parallel for default(shared) private(mu)
 	for (int dir=0;dir<8;dir++){
 		int x, y, z, t;

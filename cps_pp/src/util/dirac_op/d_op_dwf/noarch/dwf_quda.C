@@ -230,7 +230,6 @@ int DiracOpDwf::QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_typ
   inv_param.tol_precondition = 1e-1;
   inv_param.maxiter_precondition = 10;
   inv_param.verbosity_precondition = QUDA_VERBOSE;
-  inv_param.prec_precondition = QUDA_HALF_PRECISION;
   inv_param.omega = 1.0;
 
   gauge_param.ga_pad = 0; 
@@ -283,11 +282,13 @@ int DiracOpDwf::QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_typ
   // Initial residual
   if (mat_type == 0)
   {
-    MatPc(r, out);
+    //MatPc(r, out); // CPU version of Dslash operator
+    MatQuda(r, out, &inv_param); // GPU version of Dslash operator
   }
   else
   {
-    MatPcDagMatPc(r, out);
+    //MatPcDagMatPc(r, out); // CPU version of Dslash operator
+    MatDagMatQuda(r, out, &inv_param); // GPU version of Dslash operator
   }
   r->FTimesV1MinusV2(1.0,in,r,f_size_cb);
   Float r2 = r->NormSqGlbSum(f_size_cb);
@@ -315,9 +316,15 @@ int DiracOpDwf::QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_typ
     //------------------------------------
     // Calculate new residual
     if (mat_type == 0)
-      MatPc(r, out);
+    {
+      //MatPc(r, out); // CPU version of Dslash operator
+      MatQuda(r, out, &inv_param); // GPU version of Dslash operator
+    }
     else
-      MatPcDagMatPc(r, out);
+    {
+      //MatPcDagMatPc(r, out); // CPU version of Dslash operator
+      MatDagMatQuda(r, out, &inv_param); // GPU version of Dslash operator
+    }
 
     r->FTimesV1MinusV2(1.0,in,r,f_size_cb);
     r2 = r->NormSqGlbSum(f_size_cb);
@@ -336,6 +343,7 @@ int DiracOpDwf::QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_typ
   
   gettimeofday(&end,NULL);
   print_flops(cname,fname,flops,&start,&end);
+  CGflops += flops;
     
   VRB.Flow(cname, fname, "Cuda Space Required. Spinor:%f + Gauge:%f GiB\n", 
 	   inv_param.spinorGiB, gauge_param.gaugeGiB);
