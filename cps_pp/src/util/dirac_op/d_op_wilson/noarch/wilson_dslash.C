@@ -1,5 +1,6 @@
 #include <config.h>
-#ifdef USE_SSE
+//#ifdef USE_SSE
+#if 0
 #include "../sse/sse-wilson_dslash.C"
 #else
 #include <stdio.h>
@@ -7,18 +8,18 @@
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
 
-  $Id: wilson_dslash.C,v 1.9 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: wilson_dslash.C,v 1.10 2013-04-24 21:16:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.9 2012-03-26 13:50:12 chulwoo Exp $
-//  $Id: wilson_dslash.C,v 1.9 2012-03-26 13:50:12 chulwoo Exp $
+//  $Date: 2013-04-24 21:16:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v 1.10 2013-04-24 21:16:13 chulwoo Exp $
+//  $Id: wilson_dslash.C,v 1.10 2013-04-24 21:16:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.9 $
+//  $Revision: 1.10 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/noarch/wilson_dslash.C,v $
 //  $State: Exp $
 //
