@@ -12,18 +12,18 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
 
-  $Id: wilson_dslash_qmp.C,v 1.2 2012-03-26 13:50:12 chulwoo Exp $
+  $Id: wilson_dslash_qmp.C,v 1.3 2013-04-24 21:16:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_qmp.C,v 1.2 2012-03-26 13:50:12 chulwoo Exp $
-//  $Id: wilson_dslash_qmp.C,v 1.2 2012-03-26 13:50:12 chulwoo Exp $
+//  $Date: 2013-04-24 21:16:13 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_qmp.C,v 1.3 2013-04-24 21:16:13 chulwoo Exp $
+//  $Id: wilson_dslash_qmp.C,v 1.3 2013-04-24 21:16:13 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
-//  $Revision: 1.2 $
+//  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_qmp.C,v $
 //  $State: Exp $
 //
@@ -557,7 +557,7 @@ Printf("getMinusData((IFloat *)fbuf, (IFloat *)tmp6, SPINOR_SIZE, 1);\n");
 /* Loop over sites                                                          */
 /*--------------------------------------------------------------------------*/
 	for(int i=0;i<SPINOR_SIZE;i++) fbuf[i]=0.;
-	omp_set_num_threads(64);
+//	omp_set_num_threads(64);
 	int index=0;
 #pragma omp parallel for default(shared) private(mu)
 	for(index = 0; index<vol*2;index++){
