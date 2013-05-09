@@ -6,19 +6,19 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.39 2013-04-08 20:50:00 chulwoo Exp $
+  $Id: vector.h,v 1.40 2013-05-09 04:38:03 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-04-08 20:50:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.39 2013-04-08 20:50:00 chulwoo Exp $
-//  $Id: vector.h,v 1.39 2013-04-08 20:50:00 chulwoo Exp $
+//  $Date: 2013-05-09 04:38:03 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.40 2013-05-09 04:38:03 chulwoo Exp $
+//  $Id: vector.h,v 1.40 2013-05-09 04:38:03 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: vector.h,v $
-//  $Revision: 1.39 $
+//  $Revision: 1.40 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
 //  $State: Exp $
 //
@@ -499,7 +499,6 @@ inline void TrLessAntiHermMatrix(const Matrix& dag)
        this->TrLessAntiHermMatrix(dag);
     }
 #else
-#if 0
 inline void TrLessAntiHermMatrix()
 {
 
@@ -523,8 +522,6 @@ inline void TrLessAntiHermMatrix()
     p[9] -= c;
     p[17] -= c;
 }
-#else
-#endif
 #endif
 
     //! Assignment to tensor product of vectors.
