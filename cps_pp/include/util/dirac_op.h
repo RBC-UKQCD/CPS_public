@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.37 2013-04-05 17:46:30 chulwoo Exp $
+  $Id: dirac_op.h,v 1.38 2013-05-14 16:56:34 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -449,13 +449,14 @@ class DiracOpStagTypes : public DiracOp
      // Can also use non KS algorithm to return eigenvalues only of 
      // RitzEigMat = RitzMat.
 
-  virtual void RitzMat(Vector *out, Vector *in);
+  virtual void RitzMat(Vector *out, Vector *in)
+  {ERR.NotImplemented(cname,"RitzMat(V*,V*)");}
      // RitzMat is the fermion matrix used in Ritz
      // RitzMat works on the full lattice or half lattice
      // The in, out fields are defined on the full or half lattice.
 
-  virtual void RitzMat(Vector *out, Vector *in,
-                       MatrixPolynomialArg* cheby_arg);
+//  virtual void RitzMat(Vector *out, Vector *in,
+ //                      MatrixPolynomialArg* cheby_arg);
     // TIZB
 
 
@@ -985,6 +986,7 @@ class DiracOpWilsonTypes : public DiracOp
      // The in, out fields are defined on the full or half lattice.
 
   virtual void RitzMat(Vector *out, Vector *in);
+//  {ERR.NotImplemented(cname,"RitzMat(V*,V*)");}
      // RitzMat is the fermion matrix used in Ritz
      // RitzMat works on the full lattice or half lattice
      // The in, out fields are defined on the full or half lattice.
@@ -1699,8 +1701,8 @@ class DiracOpMdwf : public DiracOpWilsonTypes
      // RitzMat works on the full lattice or half lattice
      // The in, out fields are defined on the full or half lattice.
 
-  virtual void RitzMat(Vector *out, Vector *in,
-		       MatrixPolynomialArg* cheby_arg);
+//  virtual void RitzMat(Vector *out, Vector *in,
+//		       MatrixPolynomialArg* cheby_arg);
   
   void MatPcHerm(Vector *out, Vector *in);
      // MatPcHerm is the hermitian version of MatPc.
