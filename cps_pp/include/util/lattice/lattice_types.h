@@ -173,8 +173,22 @@ class GnoneFmobius
     char *cname;    // Class name.
 
  public:
-    GnoneFmobius();
-    virtual ~GnoneFmobius();
+    GnoneFmobius()
+{
+  cname = "GnoneFmobius";
+  char *fname = "GnoneFmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
+    virtual ~GnoneFmobius()
+{
+  char *fname = "~GnoneFmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
+
 };
 
 //------------------------------------------------------------------
@@ -337,8 +351,21 @@ class GwilsonFmobius
     char *cname;    // Class name.
 
  public:
-    GwilsonFmobius();
-    virtual ~GwilsonFmobius();
+    GwilsonFmobius()
+{
+  cname = "GwilsonFmobius";
+  char *fname = "GwilsonFmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
+    virtual ~GwilsonFmobius()
+{
+  char *fname = "~GwilsonFmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
 };
 
 //------------------------------------------------------------------
@@ -572,8 +599,21 @@ class GimprRectFmobius
     char *cname;    // Class name.
 
  public:
-    GimprRectFmobius();
-    virtual ~GimprRectFmobius();
+    GimprRectFmobius()
+{
+  cname = "GimprRectFmobius";
+  char *fname = "GimprRectFmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
+    virtual ~GimprRectFmobius()
+{
+  char *fname = "~GimprRectFmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
 };
 
 //------------------------------------------------------------------

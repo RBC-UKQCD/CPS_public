@@ -1,7 +1,7 @@
 #ifndef BLAS_SUBS_H
 #define BLAS_SUBS_H
 
-#define USE_BLAS
+//#define USE_BLAS
 #ifdef USE_BLAS
 #if TARGET == BGL
 #define cblas_dcopy dcopy

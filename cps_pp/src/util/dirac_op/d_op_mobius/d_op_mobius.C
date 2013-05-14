@@ -8,19 +8,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpMobius class methods.
 
-  $Id: d_op_mobius.C,v 1.3 2013-04-08 20:50:00 chulwoo Exp $
+  $Id: d_op_mobius.C,v 1.4 2013-05-14 16:56:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-04-08 20:50:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/d_op_mobius.C,v 1.3 2013-04-08 20:50:00 chulwoo Exp $
-//  $Id: d_op_mobius.C,v 1.3 2013-04-08 20:50:00 chulwoo Exp $
+//  $Date: 2013-05-14 16:56:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/d_op_mobius.C,v 1.4 2013-05-14 16:56:34 chulwoo Exp $
+//  $Id: d_op_mobius.C,v 1.4 2013-05-14 16:56:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_mobius.C,v $
-//  $Revision: 1.3 $
+//  $Revision: 1.4 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/d_op_mobius.C,v $
 //  $State: Exp $
 //
@@ -48,7 +48,7 @@ CPS_END_NAMESPACE
 //#include <mem/p2v.h>
 #include <comms/glb.h>
 
-#define USE_BLAS
+//#define USE_BLAS
 #ifdef USE_BLAS
 #include "noarch/blas-subs.h"
 #endif
