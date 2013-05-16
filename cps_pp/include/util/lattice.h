@@ -8,15 +8,15 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.67 2013-04-19 20:34:59 chulwoo Exp $
+  $Id: lattice.h,v 1.68 2013-05-16 04:17:10 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2013-04-19 20:34:59 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.67 2013-04-19 20:34:59 chulwoo Exp $
-  $Id: lattice.h,v 1.67 2013-04-19 20:34:59 chulwoo Exp $
+  $Date: 2013-05-16 04:17:10 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.68 2013-05-16 04:17:10 chulwoo Exp $
+  $Id: lattice.h,v 1.68 2013-05-16 04:17:10 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.67 $
+  $Revision: 1.68 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -2157,9 +2157,15 @@ class Fp4 : public virtual FstagTypes, public virtual Fsmear
     void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
 };
 
+// specific to dwf , in src/util/dirac_op/d_op_mobius/d_op_mobius.C
+void ReflectAndMultGamma5( Vector *out, const Vector *in,  int nodevol, int ls);
+void HermicianDWF_ee( Vector* vtmp, Vector* evec, Float mass, Lattice* lattice, Vector* Apsi );
+
 CPS_END_NAMESPACE
 
 #include <util/lattice/f_wilson_types.h>
 #include <util/lattice/lattice_types.h>
+
+
 
 #endif

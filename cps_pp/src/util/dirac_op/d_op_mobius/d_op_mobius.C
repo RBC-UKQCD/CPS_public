@@ -8,19 +8,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpMobius class methods.
 
-  $Id: d_op_mobius.C,v 1.4 2013-05-14 16:56:34 chulwoo Exp $
+  $Id: d_op_mobius.C,v 1.5 2013-05-16 04:16:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-05-14 16:56:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/d_op_mobius.C,v 1.4 2013-05-14 16:56:34 chulwoo Exp $
-//  $Id: d_op_mobius.C,v 1.4 2013-05-14 16:56:34 chulwoo Exp $
+//  $Date: 2013-05-16 04:16:32 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/d_op_mobius.C,v 1.5 2013-05-16 04:16:32 chulwoo Exp $
+//  $Id: d_op_mobius.C,v 1.5 2013-05-16 04:16:32 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_mobius.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.5 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/d_op_mobius.C,v $
 //  $State: Exp $
 //
@@ -1038,6 +1038,39 @@ void DiracOpMobius::MatPcHerm(Vector *out, Vector *in) {
   MatPc(vtmp,in);
   ReflectAndMultGamma5( out, vtmp,  mobius_arg->vol_4d/2, mobius_arg->ls);
   
+}
+
+// specific to dwf 
+void ReflectAndMultGamma5( Vector *out, const Vector *in,  int nodevol, int ls)
+{
+  char *fname = "MultGamma5(V*,V*,i)";
+  VRB.Func("",fname);
+  for(int s=0; s< ls; ++s) { 
+    IFloat *p = (IFloat *)out + 24*nodevol*s;
+    IFloat *q = (IFloat *)in + 24*nodevol*(ls-1-s);
+    for(int n = 0; n < nodevol; ++n)
+      {
+	int i;
+	for(i = 0; i < 12; ++i)
+	  *p++ = *q++;
+	
+	for(i = 0; i < 12; ++i)
+	  *p++ = - *q++;
+      }
+  }
+
+}
+
+void HermicianDWF_ee( Vector* vtmp, Vector* evec, Float mass, Lattice* lattice, Vector* Apsi )
+{
+	CgArg cg_arg;
+	cg_arg.mass = mass;
+	cg_arg.RitzMatOper = MATPC_HERM; // could be MATPCDAG_MATPC;
+	DiracOpDwf dop( *lattice, 0, 0, &cg_arg, CNV_FRM_NO );
+
+	dop. MatPc(Apsi, evec);
+	ReflectAndMultGamma5( vtmp, Apsi,  
+			      GJP.VolNodeSites()/2, GJP.SnodeSites() );
 }
 
 CPS_END_NAMESPACE
