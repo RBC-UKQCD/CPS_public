@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of some Fasqtad class methods.
 
-  $Id: f_asqtad.C,v 1.27 2008-02-08 18:35:07 chulwoo Exp $
+  $Id: f_asqtad.C,v 1.28 2013-05-16 05:22:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
@@ -264,6 +264,50 @@ int Fasqtad::FeigSolv(Vector **f_eigenv, Float lambda[],
 #endif
 
   // Return the number of iterations
+  return iter;
+}
+
+//------------------------------------------------------------------
+// Solve  A * f_eigenv = lambda * f_eigenv where
+// A is the fermion matrix (Dirac operator). The solution
+// is done with the Lanczos algorithm. eig_arg is the
+// structure that contains all the control parameters, f_eigenv
+// is the fermion field eigenvectors, lambda are the
+// returned eigenvalues.
+// f_eigenv is defined on the whole lattice.
+//------------------------------------------------------------------
+int Fasqtad::FeigSolv(Vector **f_eigenv, Float *lambda,
+                    LanczosArg *eig_arg,
+                    CnvFrmType cnv_frm)
+{
+  int iter;
+  char *fname = "FeigSolv(V*,F*,LanczosArg*,CnvFrmType)";
+  VRB.Func(cname,fname);
+  CgArg cg_arg;
+  cg_arg.mass = eig_arg->mass;
+  //cg_arg.RitzMatOper = eig_arg->RitzMatOper;
+  //int N_eig = eig_arg->N_eig;
+  int nk = eig_arg->nk_lanczos_vectors;
+  int np = eig_arg->np_lanczos_vectors;
+  int maxiters = eig_arg->maxiters;
+  Float stopres = eig_arg->stop_residual;
+  MatrixPolynomialArg* cheby_arg = (MatrixPolynomialArg*)eig_arg->matpoly_arg;
+
+  if(cnv_frm == CNV_FRM_YES) // convert only nk, not (nk+np)
+    for(int i=0; i < nk; ++i)
+      Fconvert(f_eigenv[i], STAG, StrOrd());
+
+  // Call constructor and solve for eigenvectors.
+  // Use null pointers to fake out constructor.
+  Vector *v1 = (Vector *)0;
+  Vector *v2 = (Vector *)0;
+  DiracOpAsqtad stag(*this, v1, v2, &cg_arg, CNV_FRM_NO);
+
+  iter = stag.ImpResLanczos(f_eigenv, lambda,  eig_arg);
+
+  if(cnv_frm == CNV_FRM_YES) for(int i=0; i < nk; ++i) // convert only nk, not (nk+np)
+                               Fconvert(f_eigenv[i], CANONICAL, StrOrd());
+
   return iter;
 }
 
