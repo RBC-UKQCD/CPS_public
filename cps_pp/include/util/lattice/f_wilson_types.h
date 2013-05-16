@@ -258,7 +258,7 @@ class Fnaive : public virtual FwilsonTypes
 
     Fnaive();
 
-    virtual ~Fnaive();
+    virtual ~Fnaive() ;
 
     int FsiteSize() const;
 
