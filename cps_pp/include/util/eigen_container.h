@@ -56,39 +56,6 @@ CPS_START_NAMESPACE
 
 void lanczos_GramSchm(Float *psi, Float **vec, int Nvec, int f_size, Float* alpha);
 
-// specific to dwf 
-static void ReflectAndMultGamma5( Vector *out, const Vector *in,  int nodevol, int ls)
-{
-  char *fname = "MultGamma5(V*,V*,i)";
-  VRB.Func("",fname);
-  for(int s=0; s< ls; ++s) { 
-    IFloat *p = (IFloat *)out + 24*nodevol*s;
-    IFloat *q = (IFloat *)in + 24*nodevol*(ls-1-s);
-    for(int n = 0; n < nodevol; ++n)
-      {
-	int i;
-	for(i = 0; i < 12; ++i)
-	  *p++ = *q++;
-	
-	for(i = 0; i < 12; ++i)
-	  *p++ = - *q++;
-      }
-  }
-
-}
-
-static void HermicianDWF_ee( Vector* vtmp, Vector* evec, Float mass, Lattice* lattice, Vector* Apsi )
-{
-	CgArg cg_arg;
-	cg_arg.mass = mass;
-	cg_arg.RitzMatOper = MATPC_HERM; // could be MATPCDAG_MATPC;
-	DiracOpDwf dop( *lattice, 0, 0, &cg_arg, CNV_FRM_NO );
-
-	dop. MatPc(Apsi, evec);
-	ReflectAndMultGamma5( vtmp, Apsi,  
-			      GJP.VolNodeSites()/2, GJP.SnodeSites() );
-}
-
 //----------------------------------------------------------------------------
 class EigenContainer;  // forward declaration
 
