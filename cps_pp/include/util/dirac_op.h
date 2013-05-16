@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.38 2013-05-14 16:56:34 chulwoo Exp $
+  $Id: dirac_op.h,v 1.39 2013-05-16 04:19:29 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -1696,7 +1696,7 @@ class DiracOpMdwf : public DiracOpWilsonTypes
      // It sets the dirac_arg pointer to arg and initializes
      // the relevant parameters (kappa, m^2, ...).
 
-  virtual void RitzMat(Vector *out, Vector *in);
+//  virtual void RitzMat(Vector *out, Vector *in);
      // RitzMat is the fermion matrix used in Ritz
      // RitzMat works on the full lattice or half lattice
      // The in, out fields are defined on the full or half lattice.
