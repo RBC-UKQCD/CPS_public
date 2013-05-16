@@ -122,8 +122,19 @@ class GnoneFnaive
     char *cname;    // Class name.
 
  public:
-    GnoneFnaive();
-    virtual ~GnoneFnaive();
+    GnoneFnaive(){
+      cname = "GnoneFnaive";
+      const char *fname = "GnoneFnaive()";
+      VRB.Func(cname,fname);
+    }
+
+//    virtual ~GnoneFnaive();
+    virtual ~GnoneFnaive() {
+      const char *fname = "~GnoneFnaive()";
+      VRB.Func(cname,fname);
+    }
+
+
 };
 
 
