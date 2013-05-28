@@ -8,6 +8,15 @@
 /*! A structure holding the parameters relevant to the Lanczos eigenvalue measurement.*/
 /*! \ingroup algargs */
 
+class  MatrixPolynomialArg {
+   int Npol; // degree of the polynomial
+
+   Float params<>;
+
+   Float* tmp1;
+   Float* tmp2; // the pointer to the temporaly vectors
+};
+
 class LanczosArg {
     enum RitzMatType RitzMat_lanczos; /*!< Which operator to be used
                                       in the lanczos process */
@@ -27,7 +36,7 @@ class LanczosArg {
 
     string results<>;  // the file name for ascii output file (number of iteration and whatnot)
     string file<>;  // the file name for eigen vector/values
-    Float* matpoly_arg; // (will-be-casted) pointer to the MatrixPolynomialArg, used for the Polynomial filtering
+    MatrixPolynomialArg matpoly_arg; // (will-be-casted) pointer to the MatrixPolynomialArg, used for the Polynomial filtering
 
  
 };

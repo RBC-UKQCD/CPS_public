@@ -228,15 +228,15 @@ vml_DoArgExt (VML *vmls, char *name,DoArgExt *objp)
 		 return FALSE;
 	 if (!vml_u_long (vmls, "start_u1_conf_load_addr", &objp->start_u1_conf_load_addr))
 		 return FALSE;
-	 if (!vml_pointer (vmls, "start_u1_conf_filename", (char **)&objp->start_u1_conf_filename, sizeof (char), (vmlproc_t) vml_char))
-		 return FALSE;
-	 if (!vml_int (vmls, "trajectory", &objp->trajectory))
+	 if (!vml_string (vmls, "start_u1_conf_filename", &objp->start_u1_conf_filename, ~0))
 		 return FALSE;
 	 if (!vml_int (vmls, "start_u1_conf_alloc_flag", &objp->start_u1_conf_alloc_flag))
 		 return FALSE;
 	 if (!vml_int (vmls, "mult_u1_conf_flag", &objp->mult_u1_conf_flag))
 		 return FALSE;
 	 if (!vml_int (vmls, "save_stride", &objp->save_stride))
+		 return FALSE;
+	 if (!vml_int (vmls, "trajectory", &objp->trajectory))
 		 return FALSE;
 	 if (!vml_Float (vmls, "mobius_b_coeff", &objp->mobius_b_coeff))
 		 return FALSE;
