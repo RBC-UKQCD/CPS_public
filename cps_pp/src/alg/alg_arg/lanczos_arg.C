@@ -5,6 +5,41 @@
 
 #include <alg/lanczos_arg.h>
 CPS_START_NAMESPACE
+	 bool MatrixPolynomialArg::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool MatrixPolynomialArg::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool MatrixPolynomialArg::Vml(VML *vmls,char *instance){
+		 if(!vml_MatrixPolynomialArg(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_MatrixPolynomialArg (VML *vmls, char *name,MatrixPolynomialArg *objp)
+{
+	 vml_class_begin(vmls,"MatrixPolynomialArg",name);
+	 if (!vml_int (vmls, "Npol", &objp->Npol))
+		 return FALSE;
+	 if (!vml_array (vmls, "params", (char **)&objp->params.params_val, (u_int *) &objp->params.params_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_pointer (vmls, "tmp1", (char **)&objp->tmp1, sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_pointer (vmls, "tmp2", (char **)&objp->tmp2, sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 vml_class_end(vmls,"MatrixPolynomialArg",name);
+	return TRUE;
+}
 	 bool LanczosArg::Encode(char *filename,char *instance){
 		 VML vmls;
 		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
@@ -52,7 +87,7 @@ vml_LanczosArg (VML *vmls, char *name,LanczosArg *objp)
 		 return FALSE;
 	 if (!vml_string (vmls, "file", &objp->file, ~0))
 		 return FALSE;
-	 if (!vml_pointer (vmls, "matpoly_arg", (char **)&objp->matpoly_arg, sizeof (Float), (vmlproc_t) vml_Float))
+	 if (!vml_MatrixPolynomialArg (vmls, "matpoly_arg", &objp->matpoly_arg))
 		 return FALSE;
 	 vml_class_end(vmls,"LanczosArg",name);
 	return TRUE;

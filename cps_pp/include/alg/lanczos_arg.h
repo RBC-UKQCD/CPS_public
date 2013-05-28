@@ -14,6 +14,21 @@
 CPS_START_NAMESPACE
 
 class VML;
+class MatrixPolynomialArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	int Npol;
+	struct {
+		u_int params_len;
+		Float *params_val;
+	} params;
+	Float *tmp1;
+	Float *tmp2;
+};
+
+class VML;
 class LanczosArg {
 public:
 	 bool Encode(char *filename,char *instance);
@@ -31,7 +46,7 @@ public:
 	int conv_check;
 	char *results;
 	char *file;
-	Float *matpoly_arg;
+	MatrixPolynomialArg matpoly_arg;
 };
 
 /* the xdr functions */
@@ -41,9 +56,11 @@ extern "C" {
 #endif
 
 #if defined(__STDC__) || defined(__cplusplus)
+extern  bool_t vml_MatrixPolynomialArg (VML *, char *instance, MatrixPolynomialArg*);
 extern  bool_t vml_LanczosArg (VML *, char *instance, LanczosArg*);
 
 #else /* K&R C */
+extern  bool_t vml_MatrixPolynomialArg (VML *, char *instance, MatrixPolynomialArg*);
 extern  bool_t vml_LanczosArg (VML *, char *instance, LanczosArg*);
 
 #endif /* K&R C */
