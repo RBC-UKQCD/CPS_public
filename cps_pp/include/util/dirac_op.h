@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: dirac_op.h,v 1.39 2013-05-16 04:19:29 chulwoo Exp $
+  $Id: dirac_op.h,v 1.40 2013-06-07 19:26:34 chulwoo Exp $
 */
 
 #ifndef INCLUDED_DIRAC_OP_H
@@ -16,7 +16,7 @@
 #include <stdint.h>
 #include <alg/lanczos_arg.h>
 
-#include <alg/matrixpolynomial_arg.h>
+//#include <alg/matrixpolynomial_arg.h>
 #include <util/error.h>
 
 #ifdef USE_QUDA

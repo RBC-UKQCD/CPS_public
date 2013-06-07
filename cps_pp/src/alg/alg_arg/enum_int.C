@@ -31,6 +31,14 @@ vml_IFloat (VML *vmls, char *name,IFloat *objp)
 }
 
 bool_t
+vml_Pointer (VML *vmls, char *name,Pointer *objp)
+{
+	if (!vml_uint64_t (vmls,name,objp))
+		return FALSE;
+	return TRUE;
+}
+
+bool_t
 vml_DirType (VML *vmls, char *name,DirType *objp)
 {
 	if (!vml_enum (vmls,name,(enum_t *)objp,DirType_map))

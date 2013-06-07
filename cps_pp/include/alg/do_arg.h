@@ -55,7 +55,7 @@ public:
 	BndCndType z_bc;
 	BndCndType t_bc;
 	StartConfType start_conf_kind;
-	u_long start_conf_load_addr;
+	Pointer start_conf_load_addr;
 	StartSeedType start_seed_kind;
 	char *start_seed_filename;
 	char *start_conf_filename;
@@ -110,7 +110,7 @@ public:
 	Float twist_bc_z;
 	Float twist_bc_t;
 	StartConfType start_u1_conf_kind;
-	u_long start_u1_conf_load_addr;
+	Pointer start_u1_conf_load_addr;
 	char *start_u1_conf_filename;
 	int start_u1_conf_alloc_flag;
 	int mult_u1_conf_flag;

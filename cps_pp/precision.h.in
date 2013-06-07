@@ -4,6 +4,11 @@
 typedef @LOCALPRECISION@ Float;
 typedef @LOCALPRECISION@ IFloat;
 //typedef uint64_t IntFlopCounter;
+#ifdef HAVE_UINT64_T
+typedef uint64_t Pointer;
+#else
+typedef uint32_t Pointer;
+#endif
 #endif
 
 
