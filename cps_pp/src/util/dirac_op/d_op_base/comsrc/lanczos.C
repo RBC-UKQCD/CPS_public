@@ -11,7 +11,7 @@
 #include <util/error.h>
 #include <math.h>
 #include <util/qcdio.h>
-#include <alg/matrixpolynomial_arg.h>
+//#include <alg/matrixpolynomial_arg.h>
 #include <util/time_cps.h>
 
 //#define TEST_MAT_YES
@@ -121,7 +121,8 @@ int DiracOp::ImpResLanczos(Vector **V, //Lanczos vectors, eigenvectors of RitzMa
   Float StopRes  = eig_arg-> stop_residual;// stop when residual is smaller than this
     
   //arguments for the filtering polynomial
-  MatrixPolynomialArg *cheby_arg  = (MatrixPolynomialArg*) (eig_arg-> matpoly_arg);
+//  MatrixPolynomialArg *cheby_arg  = (MatrixPolynomialArg*) (eig_arg-> matpoly_arg);
+  MatrixPolynomialArg *cheby_arg  = &(eig_arg-> matpoly_arg);
 
 
   // Set the node checkerboard size of the fermion field
@@ -147,8 +148,8 @@ int DiracOp::ImpResLanczos(Vector **V, //Lanczos vectors, eigenvectors of RitzMa
   Float *scratch_2m = (Float*) smalloc(cname,fname,"scratch_m", m*2*sizeof(Float));
 
   // setup temporaly vectors for the the matrix polynomial
-  cheby_arg->tmp1 = (Float*) smalloc(cname,fname,"matrix_polynomial.tmp1", f_size *sizeof(Float));
-  cheby_arg->tmp2 = (Float*) smalloc(cname,fname,"matrix_polynomial.tmp2", f_size *sizeof(Float));  
+  cheby_arg->tmp1 = (Pointer) smalloc(cname,fname,"matrix_polynomial.tmp1", f_size *sizeof(Float));
+  cheby_arg->tmp2 = (Pointer) smalloc(cname,fname,"matrix_polynomial.tmp2", f_size *sizeof(Float));  
 
   // save the eigenvalues so we don't have to computed them after last iter.
   //Float *savelambda = (Float *) smalloc(cname,fname, "savelambda", m * sizeof(Float));
@@ -530,8 +531,8 @@ int DiracOp::ImpResLanczos(Vector **V, //Lanczos vectors, eigenvectors of RitzMa
   sfree(cname,fname, "beta",beta);
   sfree(cname,fname, "Apsi",Apsi);
   sfree(cname,fname, "r",r);
-  sfree(cname,fname,"matrix_polynomial.tmp1", cheby_arg->tmp1);
-  sfree(cname,fname,"matrix_polynomial.tmp2", cheby_arg->tmp2);
+  sfree(cname,fname,"matrix_polynomial.tmp1", (Float *)cheby_arg->tmp1);
+  sfree(cname,fname,"matrix_polynomial.tmp2", (Float *)cheby_arg->tmp2);
 
   // make sure we won't change the original RitMatOper.
   dirac_arg->RitzMatOper = save_RitzMatOper;

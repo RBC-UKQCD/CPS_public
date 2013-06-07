@@ -8,19 +8,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpMobius class methods.
 
-  $Id: d_op_mobius.C,v 1.5 2013-05-16 04:16:32 chulwoo Exp $
+  $Id: d_op_mobius.C,v 1.6 2013-06-07 19:26:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-05-16 04:16:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/d_op_mobius.C,v 1.5 2013-05-16 04:16:32 chulwoo Exp $
-//  $Id: d_op_mobius.C,v 1.5 2013-05-16 04:16:32 chulwoo Exp $
+//  $Date: 2013-06-07 19:26:34 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/d_op_mobius.C,v 1.6 2013-06-07 19:26:34 chulwoo Exp $
+//  $Id: d_op_mobius.C,v 1.6 2013-06-07 19:26:34 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: d_op_mobius.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.6 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/d_op_mobius.C,v $
 //  $State: Exp $
 //
@@ -942,8 +942,8 @@ void DiracOpMobius::RitzMat(Vector *out, Vector *in,
   // 2 Q =   c1  (  c0 Ddag D  -   1 )
   //  c1 = 2 (alpha+beta)/(alpha-beta),   c0 =  2 / (alpha+beta)
   //
-  const Float alpha = pow( cheby_arg-> params[0], 2);
-  const Float beta  = pow( cheby_arg-> params[1] + fabs(shift), 2);
+  const Float alpha = pow( cheby_arg-> params.params_val[0], 2);
+  const Float beta  = pow( cheby_arg-> params.params_val[1] + fabs(shift), 2);
   //printf("alpha=%e beta=%e\n", alpha,beta);
   
   const Float c1 =   2.0*(alpha+beta)/(alpha-beta);

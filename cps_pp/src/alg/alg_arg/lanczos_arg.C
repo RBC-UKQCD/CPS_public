@@ -33,9 +33,9 @@ vml_MatrixPolynomialArg (VML *vmls, char *name,MatrixPolynomialArg *objp)
 	 if (!vml_array (vmls, "params", (char **)&objp->params.params_val, (u_int *) &objp->params.params_len, ~0,
 		sizeof (Float), (vmlproc_t) vml_Float))
 		 return FALSE;
-	 if (!vml_pointer (vmls, "tmp1", (char **)&objp->tmp1, sizeof (Float), (vmlproc_t) vml_Float))
+	 if (!vml_Pointer (vmls, "tmp1", &objp->tmp1))
 		 return FALSE;
-	 if (!vml_pointer (vmls, "tmp2", (char **)&objp->tmp2, sizeof (Float), (vmlproc_t) vml_Float))
+	 if (!vml_Pointer (vmls, "tmp2", &objp->tmp2))
 		 return FALSE;
 	 vml_class_end(vmls,"MatrixPolynomialArg",name);
 	return TRUE;
