@@ -35,7 +35,7 @@ class DoArg {
   BndCndType t_bc;  /*!< Boundary condition in the t direction.*/
    
   StartConfType start_conf_kind; /*!< The kind of initial configuration*/
-  unsigned long start_conf_load_addr;
+  Pointer start_conf_load_addr;
 
   StartSeedType start_seed_kind;  /*!< The kind of initial random number generator seed*/
   string start_seed_filename<>;
@@ -160,7 +160,7 @@ class DoArgExt {
     Float twist_bc_z;
     Float twist_bc_t;
     StartConfType start_u1_conf_kind;
-    u_long start_u1_conf_load_addr;
+    Pointer start_u1_conf_load_addr;
     string start_u1_conf_filename<>;
     int start_u1_conf_alloc_flag;
     int mult_u1_conf_flag;
