@@ -55,7 +55,7 @@ public:
 	BndCndType z_bc;
 	BndCndType t_bc;
 	StartConfType start_conf_kind;
-	Pointer start_conf_load_addr;
+	u_long start_conf_load_addr;
 	StartSeedType start_seed_kind;
 	char *start_seed_filename;
 	char *start_conf_filename;

@@ -110,7 +110,7 @@ vml_DoArg (VML *vmls, char *name,DoArg *objp)
 		 return FALSE;
 	 if (!vml_StartConfType (vmls, "start_conf_kind", &objp->start_conf_kind))
 		 return FALSE;
-	 if (!vml_Pointer (vmls, "start_conf_load_addr", &objp->start_conf_load_addr))
+	 if (!vml_u_long (vmls, "start_conf_load_addr", &objp->start_conf_load_addr))
 		 return FALSE;
 	 if (!vml_StartSeedType (vmls, "start_seed_kind", &objp->start_seed_kind))
 		 return FALSE;
