@@ -60,6 +60,7 @@ void QPropW::Allocate(int mid) {
     case 1:
       if (midprop == NULL) { // Allocate only if needed
         midprop = (WilsonMatrix*)smalloc(cname, fname, "midprop", GJP.VolNodeSites()*sizeof(WilsonMatrix));
+	VRB.Result(cname,fname,"midprop=%p\n",midprop);
       }
       break;
     case 2:
@@ -290,6 +291,7 @@ void QPropW::Run(const int do_rerun, const Float precision)
    int EndSpin = 4;
    int StartColor = 0;
    int EndColor = 3;
+  Lattice& lat = AlgLattice();
 
    if(qp_arg.save_prop==2) {
 	StartSpin = qp_arg.StartSrcSpin;
@@ -298,25 +300,6 @@ void QPropW::Run(const int do_rerun, const Float precision)
 	EndColor = qp_arg.EndSrcColor;
    }
 
-   /****************************************************************
-     The code below is temporarily isolated for purposes of merging
-     with CPS main branch,  12/09/04, Oleg Loktik
-   -------------------- Quarantine starts --------------------------
-
-   if (pfs_file_exists(Arg.file)){
-     // read data into prop
-     RestoreQProp(Arg.file,PROP); // Only restores stuff into prop 
-
-     // multiply source by 1/2(1+gamma_t). If the propagator  
-     // on disk is half fermion it does nothing. Otherwise it gets
-     // converted to the half fermion propagator. 
-     if (Arg.DoHalfFermion) 
-       for (int s(0);s<GJP.VolNodeSites();s++)
-	 prop[s].PParProjectSink() ;
-      
-     do_cg = 0;
-   }
-   -------------------- End of quarantine -------------------------*/ 
 
   //-----------------------------------------------------------------
   // TY Add Start
@@ -334,8 +317,8 @@ void QPropW::Run(const int do_rerun, const Float precision)
      for(int i=0;i<GJP.VolNodeSites();i++){
        prop[i] =0.0;
      }
-
-     if(AlgLattice().Fclass() == F_CLASS_DWF || AlgLattice().Fclass() == F_CLASS_MOBIUS ){
+VRB.Result(cname,fname,"Fclass()=%d\n",lat.Fclass());
+     if (lat.F5D() || lat.Fclass() == F_CLASS_BFM ) {
        Allocate(PROP5D);
        if (StoreMidprop()) Allocate(MIDPROP);
        
@@ -364,7 +347,7 @@ void QPropW::Run(const int do_rerun, const Float precision)
      // TY Add Start
      // For conserved axial current
      int glb_walls = GJP.TnodeSites()*GJP.Tnodes();
-     if(0) {
+     if(AlgLattice().F5D()) {
        conserved = (Float *) smalloc(cname, fname, "d_conserved_p",
                                      glb_walls * sizeof(Float));
        for ( int i = 0; i < glb_walls; i++) conserved[i] = 0.0;
@@ -410,12 +393,14 @@ void QPropW::Run(const int do_rerun, const Float precision)
      //-----------------------------------------------------------------
      // M. Lightman
      // For m_res
-     if(AlgLattice().Fclass() == F_CLASS_DWF || AlgLattice().Fclass() == F_CLASS_MOBIUS ){
+     if(AlgLattice().F5D()) {
        j5q_pion = (Float *) smalloc(cname, fname, "d_j5q_pion_p", glb_walls * sizeof(Float));
 //       j5q_pion = (Float *) smalloc(fsize);
      
        Float *flt_p = (Float *) j5q_pion;
        for ( int i = 0; i < glb_walls; i++) *flt_p++ = 0.0;
+     } else {
+            j5q_pion = NULL;
      }
      // End M. Lightman
      //-----------------------------------------------------------------
@@ -904,8 +889,9 @@ void QPropW::CG(int spn, int col,
   int f_size_5d = f_size * ls;
 
   // Do inversion
+  
   //----------------------------------------------------------------
-  if (Lat.Fclass() == F_CLASS_DWF || Lat.Fclass() == F_CLASS_MDWF || Lat.Fclass() == F_CLASS_BFM || Lat.Fclass() == F_CLASS_MOBIUS) {
+  if (Lat.F5D() || Lat.Fclass() == F_CLASS_BFM ) {
     Vector *src_4d    = (Vector*)source.data();
     Vector *sol_4d    = (Vector*)sol.data();
     Vector *midsol_4d = (Vector*)midsol.data();
@@ -925,6 +911,7 @@ void QPropW::CG(int spn, int col,
 #define STORE5DPROP
 #ifdef STORE5DPROP
     int vol=GJP.VolNodeSites();
+    if(Lat.F5D()) //checking prop5d != NULL
     for(int s=0;s<ls;s++){
       for(int site=0;site<vol;site++){
         int site5d = (site+vol*s);
@@ -947,7 +934,7 @@ void QPropW::CG(int spn, int col,
       for(int nls(0);nls<GJP.SnodeSites();nls++) SaveQPropLs(sol_5d, qp_arg.file, nls);
     spnclr_cnt++;
 
-    if(0) {
+    if(AlgLattice().F5D()) {
       MeasConAxialOld(sol_5d);
     }
     // TY Add End
@@ -955,7 +942,7 @@ void QPropW::CG(int spn, int col,
 
     //-----------------------------------------------------------------
     // M. Lightman
-    if(0) {
+    if(AlgLattice().F5D()) {
       MeasJ5qPion(sol_5d);
     }
     // End M. Lightman
@@ -1053,6 +1040,7 @@ void QPropW::LoadRow(int spin, int color,
                      FermionVectorTp& sol, 
                      FermionVectorTp& midsol)
 {
+ VRB.Result(cname,"LoadRow()","%d %d %p %p %p %p\n",spin,color,&sol,&midsol,prop,midprop);
 #pragma omp parallel for
   for (int s=0; s<GJP.VolNodeSites(); s++) {
     int i = s*SPINOR_SIZE;
@@ -1060,13 +1048,14 @@ void QPropW::LoadRow(int spin, int color,
   }
 
   // Collect solutions in midpoint propagator.
-  if (StoreMidprop()) {
+  if (StoreMidprop() ) {
 #pragma omp parallel for
     for (int s=0; s<GJP.VolNodeSites(); s++) {
       int i = s*SPINOR_SIZE;
       midprop[s].load_row(spin, color, (wilson_vector &)midsol[i]);
     }
   }
+ VRB.FuncEnd(cname,"LoadRow()");
 } 
 
 /*!
