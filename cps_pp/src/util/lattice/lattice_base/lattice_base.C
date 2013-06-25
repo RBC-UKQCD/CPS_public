@@ -6,19 +6,19 @@
 /*!\file
   \brief  Lattice class methods.
   
-  $Id: lattice_base.C,v 1.72 2013-04-08 20:50:00 chulwoo Exp $
+  $Id: lattice_base.C,v 1.73 2013-06-25 12:51:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-04-08 20:50:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.72 2013-04-08 20:50:00 chulwoo Exp $
-//  $Id: lattice_base.C,v 1.72 2013-04-08 20:50:00 chulwoo Exp $
+//  $Date: 2013-06-25 12:51:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v 1.73 2013-06-25 12:51:12 chulwoo Exp $
+//  $Id: lattice_base.C,v 1.73 2013-06-25 12:51:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: lattice_base.C,v $
-//  $Revision: 1.72 $
+//  $Revision: 1.73 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_base/lattice_base.C,v $
 //  $State: Exp $
 //
@@ -146,7 +146,6 @@ Lattice::Lattice()
   VRB.Func(cname,fname);
 
   StartConfType start_conf_kind = GJP.StartConfKind();
-  StartConfType start_u1_conf_kind = GJP.StartU1ConfKind();
 
   link_buffer = 0;
 
@@ -167,20 +166,11 @@ Lattice::Lattice()
 
     if(start_conf_kind != START_CONF_LOAD ){
 //       start_conf_kind!=START_CONF_FILE){
-#if TARGET == QCDOC
-       gauge_field = (Matrix *) qalloc(GJP.StartConfAllocFlag(),array_size);
-    VRB.Flow(cname,fname,"gauge_field=%p\n",gauge_field);
-#else
       gauge_field = (Matrix *) pmalloc(array_size);
-      u1_gauge_field = (Float *) pmalloc(array_size/18);
-#endif
 //     printf("gauge_field=%p\n",gauge_field);
       if( gauge_field == 0) ERR.Pointer(cname,fname, "gauge_field");
       VRB.Pmalloc(cname, fname, "gauge_field", gauge_field, array_size);
       GJP.StartConfLoadAddr(gauge_field);
-      if( u1_gauge_field == 0) ERR.Pointer(cname,fname, "u1_gauge_field");
-      VRB.Pmalloc(cname, fname, "u1_gauge_field", u1_gauge_field, array_size/9);
-      GJP.StartU1ConfLoadAddr(u1_gauge_field);
     }
 
     //--------------------------------------------------------------
@@ -226,6 +216,14 @@ Lattice::Lattice()
 
   // QED (angles)
   //----------------------------------------------------------------
+if ( GJP.ExtInitialized()){
+  StartConfType start_u1_conf_kind = GJP.StartU1ConfKind();
+    if(start_u1_conf_kind != START_CONF_LOAD ){
+      u1_gauge_field = (Float *) pmalloc(array_size/18);
+      if( u1_gauge_field == 0) ERR.Pointer(cname,fname, "u1_gauge_field");
+      VRB.Pmalloc(cname, fname, "u1_gauge_field", u1_gauge_field, array_size/9);
+      GJP.StartU1ConfLoadAddr(u1_gauge_field);
+    }
   if(start_u1_conf_kind == START_CONF_ORD){
     SetU1GfieldOrd();
     u1_is_initialized = 1;
@@ -234,7 +232,7 @@ Lattice::Lattice()
     GJP.StartU1ConfKind(START_CONF_MEM);
   }
   else if(start_u1_conf_kind == START_CONF_FILE){
-#if TARGET == QCDOC || TARGET == NOARCH || TARGET == BGL || TARGET == BGP
+#if TARGET == NOARCH || TARGET == BGL || TARGET == BGP
     VRB.Flow(cname,fname, "Load starting U1 configuration addr = %x\n",
              gauge_field);
     ReadU1LatticeParallel rd_lat(*this,GJP.StartU1ConfFilename());
@@ -248,6 +246,7 @@ Lattice::Lattice()
     "Starting U1 config. type  START_CONF_FILE not implemented\n");
 #endif
   }
+}
   // QCD links
   //----------------------------------------------------------------
   if(start_conf_kind == START_CONF_ORD){

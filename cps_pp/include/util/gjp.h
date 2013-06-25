@@ -5,19 +5,19 @@
 /*!\file
   \brief  Definitions of global job parameters.
 
-  $Id: gjp.h,v 1.46 2013-04-08 20:50:00 chulwoo Exp $
+  $Id: gjp.h,v 1.47 2013-06-25 12:51:12 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2013-04-08 20:50:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.46 2013-04-08 20:50:00 chulwoo Exp $
-//  $Id: gjp.h,v 1.46 2013-04-08 20:50:00 chulwoo Exp $
+//  $Date: 2013-06-25 12:51:12 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v 1.47 2013-06-25 12:51:12 chulwoo Exp $
+//  $Id: gjp.h,v 1.47 2013-06-25 12:51:12 chulwoo Exp $
 //  $Name: not supported by cvs2svn $
 //  $Locker:  $
 //  $RCSfile: gjp.h,v $
-//  $Revision: 1.46 $
+//  $Revision: 1.47 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/gjp.h,v $
 //  $State: Exp $
 //--------------------------------------------------------------------
@@ -126,6 +126,7 @@ class GlobalJobParameter
   const char *cname;    // Class name.
   DoArg doarg_int;
   DoArgExt doext_int;
+  DoArgExt *doext_p;
 
   int* argc_int;
   char*** argv_int;
@@ -375,16 +376,16 @@ public:
   Float TwistBc(int dir) const
   { 
     switch(dir){
-    case 0: return doext_int.twist_bc_x;
-    case 1: return doext_int.twist_bc_y;
-    case 2: return doext_int.twist_bc_z;
-    case 3: return doext_int.twist_bc_t;
+    case 0: return doext_p->twist_bc_x;
+    case 1: return doext_p->twist_bc_y;
+    case 2: return doext_p->twist_bc_z;
+    case 3: return doext_p->twist_bc_t;
     default: printf("GJP::TwistBc(): Incorrect dir for twist\n"); 
       exit(0);
     }
   }
 
-  int Traj(){ return doext_int.trajectory; }
+  int Traj(){ return doext_p->trajectory; }
 
   BndCndType Bc(int dir) const
       { return bc[dir];}
@@ -474,7 +475,7 @@ public:
     \return The type of initial gauge configuration.
   */    
   StartConfType StartU1ConfKind() const
-      {return doext_int.start_u1_conf_kind;}
+      {return doext_p->start_u1_conf_kind;}
   //!< Gets the type of initial u1 gauge configuration.
   /*!<
     \return The type of initial u1 gauge configuration.
@@ -485,9 +486,10 @@ public:
   void StartConfLoadAddr( Matrix * addr) 
       { doarg_int.start_conf_load_addr = (unsigned long) addr;}
   Float *StartU1ConfLoadAddr() const
-      {return (Float *)doext_int.start_u1_conf_load_addr;}
+      { if (!doext_p) return NULL;
+        else return (Float *)doext_p->start_u1_conf_load_addr;}
   void StartU1ConfLoadAddr( Float * addr)
-      { doext_int.start_u1_conf_load_addr = (unsigned long) addr;}
+      { doext_p->start_u1_conf_load_addr = (unsigned long) addr;}
   //!< Gets the initial configuration.
   /*!<
     \return The address of the starting configuration
@@ -497,7 +499,7 @@ public:
   const char * StartConfFilename() const
       {return doarg_int.start_conf_filename;}
   const char * StartU1ConfFilename() const
-      {return doext_int.start_u1_conf_filename;}
+      {return doext_p->start_u1_conf_filename;}
 
   const char * StartSeedFilename() const
       {return doarg_int.start_seed_filename;}
@@ -505,9 +507,9 @@ public:
   const int StartConfAllocFlag() 
       {return doarg_int.start_conf_alloc_flag;}
   const int StartU1ConfAllocFlag()
-      {return doext_int.start_u1_conf_alloc_flag;}
+      {return doext_p->start_u1_conf_alloc_flag;}
   const int mult_u1()
-      {return doext_int.mult_u1_conf_flag;}
+      {return doext_p->mult_u1_conf_flag;}
 
   const int WfmSendAllocFlag() 
       {return doarg_int.wfm_send_alloc_flag;}
@@ -542,7 +544,7 @@ public:
   //!< Gets the "beta" parameter in the pure gauge action.
  
   int SaveStride() const
-      {return doext_int.save_stride;}
+      {return doext_p->save_stride;}
   //!< Gets the stride (number) of eigenvectors to save at-a-time in Eigencontainer
  
   /*!
@@ -583,9 +585,9 @@ public:
     \return The inverse of the 5th direction lattice spacing.
   */
   Float Mobius_b() const
-      {return doext_int.mobius_b_coeff;}
+      {return doext_p->mobius_b_coeff;}
   Float Mobius_c() const
-      {return doext_int.mobius_c_coeff;}
+      {return doext_p->mobius_c_coeff;}
   
 
   //------------------------------------------------------------------
@@ -777,6 +779,10 @@ public:
   //! to be deprecated. Will point to the routine above
   void Initialize(const DoArg& do_arg);
   void InitializeExt(const DoArgExt& do_ext);
+  int  ExtInitialized(){
+    if (!doext_p) return 0;
+    else return 1;
+  }
 
   //PAB... Need to serialise the do arg as a means of meta-data preservation
   DoArg *GetDoArg(void) { return &doarg_int;};
@@ -812,7 +818,7 @@ public:
     \param sc The type of initial gauge configuration.
   */
   void StartU1ConfKind(StartConfType sc)
-      {doext_int.start_u1_conf_kind = sc;}
+      {doext_p->start_u1_conf_kind = sc;}
   //!< Sets the type of initial  gauge configuration.
   /*!<
     \param sc The type of initial gauge configuration.
