@@ -8,15 +8,15 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.68 2013-05-16 04:17:10 chulwoo Exp $
+  $Id: lattice.h,v 1.69 2013-06-25 12:51:12 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   $Author: chulwoo $
-  $Date: 2013-05-16 04:17:10 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.68 2013-05-16 04:17:10 chulwoo Exp $
-  $Id: lattice.h,v 1.68 2013-05-16 04:17:10 chulwoo Exp $
+  $Date: 2013-06-25 12:51:12 $
+  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.69 2013-06-25 12:51:12 chulwoo Exp $
+  $Id: lattice.h,v 1.69 2013-06-25 12:51:12 chulwoo Exp $
   $Name: not supported by cvs2svn $
-  $Revision: 1.68 $
+  $Revision: 1.69 $
   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
   $State: Exp $
 */  
@@ -757,7 +757,15 @@ class Lattice
     int FwilsonType(){
       if (Fclass()==F_CLASS_WILSON || Fclass() ==F_CLASS_CLOVER || 
 	  Fclass() ==F_CLASS_DWF || Fclass()==F_CLASS_MOBIUS 
-        || Fclass() ==F_CLASS_WILSON_TM || Fclass() ==F_CLASS_NAIVE) return 1;
+        || Fclass() ==F_CLASS_WILSON_TM || Fclass() ==F_CLASS_NAIVE
+        || Fclass() ==F_CLASS_BFM ) return 1;
+      else return 0;
+    }
+
+    //~~ to distinguish 5D types. Currently exclude BFM, as BFM does all the 5D stuff outside CPS.
+    int F5D(){
+      if ( Fclass() ==F_CLASS_DWF || Fclass()==F_CLASS_MOBIUS 
+        || Fclass() ==F_CLASS_MDWF ) return 1;
       else return 0;
     }
 

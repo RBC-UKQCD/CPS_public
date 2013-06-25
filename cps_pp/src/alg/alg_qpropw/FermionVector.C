@@ -248,6 +248,7 @@ void FermionVectorTp::Set4DBoxSource(int color,
                                      const Float mom[4]) // momentum
 {
     const char *fname = "Set4DBoxSource()";
+    VRB.Func(cname,fname);
 
     if (color < 0 || color >= GJP.Colors())
         ERR.General(cname, fname, "Color index out of range: color = %d\n", color);
@@ -314,6 +315,7 @@ void FermionVectorTp::Set4DBoxSource(int color,
 
     glb_sum(&src_vol);
     VRB.Result(cname, fname, "src_vol = %f\n", src_vol);
+    VRB.FuncEnd(cname,fname);
 }
 
 // Set source from previously defined source
