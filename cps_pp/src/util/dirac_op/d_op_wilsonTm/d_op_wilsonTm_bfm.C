@@ -150,7 +150,7 @@ int DiracOpWilsonTm::InvCg(Vector *out,
   //  Real M5(1.8);
   //  Real mq(0.1);
   
-    omp_set_num_threads(64);
+//    omp_set_num_threads(64);
     Float *gauge = (Float*) lat.GaugeField();
     wilsa.precon_5d = 0;
     wilsa.Ls   = 1;
@@ -159,8 +159,12 @@ int DiracOpWilsonTm::InvCg(Vector *out,
     wilsa.mass = toDouble(mass);
     wilsa.twistedmass = toDouble(epsilon);
     wilsa.Csw  = 0.0;
+
+#if 0 
+\\deprecated in bfm-2.99
     wilsa.list_engine=0;
     wilsa.list_length=0;
+#endif
     wilsa.max_iter = max_iter;
     wilsa.residual = toDouble(residual);
   //OK
