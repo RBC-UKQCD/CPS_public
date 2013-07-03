@@ -6,6 +6,7 @@
 
 #include <util/lattice/bfm_evo.h>
 #include <util/lattice/bfm_eigcg.h>
+#include <util/lattice/bfm_hdcg.h>
 #include <util/lattice/fbfm.h>
 #include <util/wilson.h>
 #include <util/verbose.h>
@@ -406,6 +407,9 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
                 break;
             case EIGCG:
                 iter = bd.EIG_CGNE_M(out, in);
+                break;
+            case HDCG:
+                iter = bd.HD_CGNE_M(out, in);
                 break;
             default:
                 if(bd.isBoss()) {
