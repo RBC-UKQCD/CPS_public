@@ -809,7 +809,8 @@ enum InverterType {
   BICGSTAB = 1,  /* BiCGstab(n). */
   EIGCG   = 2,  /* EigCG */
   LOWMODEAPPROX    = 3,  /* Low Mode Approximation */
-  CG_LOWMODE_DEFL  = 4  /* CG accelerated using low-mode deflation */
+  CG_LOWMODE_DEFL  = 4,  /* CG accelerated using low-mode deflation */
+  HDCG  = 5  /* HDCG */
 };
 
 /* Which type of approximation to use? */

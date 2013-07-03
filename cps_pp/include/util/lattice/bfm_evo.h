@@ -155,6 +155,8 @@ public:
   void threaded_free(void *handle);
   int EIG_CGNE_M(Fermion_t solution[2], Fermion_t source[2]);
   int Eig_CGNE_prec(Fermion_t psi, Fermion_t src);
+  int HD_CGNE_M(Fermion_t solution[2], Fermion_t source[2]);
+  int HD_CGNE_prec(Fermion_t psi, Fermion_t src);
 
   // copied from Jianglei's bfm
   double CompactMprec(Fermion_t compact_psi,
