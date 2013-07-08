@@ -6,6 +6,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+#include<bfm_qdp.h>
 #include<BfmMultiGrid.h>
 
 template <class Float>
@@ -17,6 +18,11 @@ class HDCGController
 		const int max_def_len;//the size of the deflation space that we try to accumulate
 		const double max_eig_cut; //throw away those fake low modes
 		const bool always_restart; //it is better not to usually
+
+		const int Ls;
+		const int NumberSubspace;
+		int block[5];
+		int quadrant[4];
 
 		Float* V; //the space for eigen vectors
 		std::vector<Float*> U;	  //at some point, we want to use float for U no matter what.
@@ -35,9 +41,14 @@ class HDCGController
 
 	private:
 		static HDCGController* _instance;
-		static BfmMultiGrid* _bfm_mg;
+		static BfmMultiGrid<Float>* _bfm_mg;
 		HDCGController(HDCGController<Float> &){};
 		HDCGController<Float> & operator=(HDCGController const &){};
+		HDCGController(int _Ls, int _NS,int _block,int _quad):
+			Ls(_Ls),NumberSubspace(_NS),block(_block),quadrant(_quad)
+			{
+			}
+#if 0
 		HDCGController(int _nev, int _m, int _max_def_len, double _max_eig_cut, std::vector<double> &_restart, bool _ar, int cg_vec_len):
 			nev(_nev),m(_m),max_def_len(_max_def_len),max_eig_cut(_max_eig_cut),restart(_restart),vec_len(cg_vec_len),always_restart(_ar)
 		{
@@ -83,6 +94,7 @@ class HDCGController
 				}
 			}
 		}
+#endif
 
 	public:
 		static void free()
@@ -100,17 +112,18 @@ class HDCGController
 			}
 			return _instance;
 		}
-		static HDCGController<Float>* setInstance(int nev, int m, int max_def_len, double max_eig_cut, std::vector<double> &restart, bool always_restart, int vec_len)
+		static HDCGController<Float>* setInstance(int Ls, int NumberSubspace,int block,int quadrant)
 		{
 			if(NULL == _instance)
 			{
-				_instance = new HDCGController<Float>(nev, m, max_def_len, max_eig_cut, restart, always_restart, vec_len);
+				_instance = new HDCGController<Float>(Ls, NumberSubspace,block,quadrant);
 			}
 			else
 			{
 				printf("Should be initialized once only! or should be deleted before another use for a different case!\n");
 				exit(-1);
 			}
+			return _instance;
 		}
 		~HDCGController()
 		{
@@ -127,32 +140,47 @@ class HDCGController
 		Float* getU(int i){return U.at(i);}
 		Float* getV(int i){return V+i*vec_len;}
 		bool is_always_restart() const{return always_restart;}
-		static HDCGController<Float>* getInstance()
+
+#if 1
+		static BfmMultiGrid<Float>* getHDCG()
 		{
-			if(NULL == _instance)
+			if(NULL == _bfm_mg)
 			{
 				printf("Need to setup/initialize the instance first!\n");
 				exit(-1);
-				//_instance = new HDCGController<Float>();
+//				_instance = new HDCGController<Float>();
 			}
-			return _instance;
+			return _bfm_mg;
 		}
-		static HDCGController<Float>* setInstance(int nev, int m, int max_def_len, double max_eig_cut, std::vector<double> &restart, bool always_restart, int vec_len)
+#endif
+
+#if 1
+template <class Float1, class Float2>
+		void  setHDCG(bfm_qdp<Float1> &dop, bfm_qdp<Float2> &dop_sp)
 		{
-			if(NULL == _instance)
+			if(NULL == _bfm_mg)
 			{
-				_instance = new HDCGController<Float>(nev, m, max_def_len, max_eig_cut, restart, always_restart, vec_len);
+				_bfm_mg = new BfmMultiGrid<Float>(Ls,NumberSubspace,block,quadrant,&dop,&dop_sp);
+//Initialization sequence
+				_bfm_mg->RelaxSubspace(&dop);
+				_bfm_mg->ComputeLittleMatrixColored();
+				_bfm_mg->LdopDeflationBasisInit(NumberSubspace);
+				_bfm_mg->LdopDeflationBasisDiagonalise(NumberSubspace);
+				_bfm_mg->SinglePrecSubspace();
+
 			}
-			else
-			{
-				printf("Should be initialized once only! or should be deleted before another use for a different case!\n");
-				exit(-1);
-			}
+		//	else
+		//	{
+		//		printf("Should be initialized once only! or should be deleted before another use for a different case!\n");
+		//		exit(-1);
+		//	}
+//			return _bfm_mg;
 		}
+#endif
 };
 
 template<class Float> HDCGController<Float>* HDCGController<Float>::_instance =  NULL;
-template<class Float> BfmMultiGrid<Float>* BfmMultiGrid<Float>::_bfm_mg =  NULL;
+template<class Float> BfmMultiGrid<Float>* HDCGController<Float>::_bfm_mg =  NULL;
 
 
 #endif

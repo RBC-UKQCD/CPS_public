@@ -6,7 +6,8 @@
 
 #include <util/lattice/bfm_evo.h>
 #include <util/lattice/bfm_eigcg.h>
-#include <util/lattice/bfm_hdcg.h>
+//#include <util/lattice/bfm_hdcg.h>
+#include <util/lattice/hdcg_controller.h>
 #include <util/lattice/fbfm.h>
 #include <util/wilson.h>
 #include <util/verbose.h>
@@ -368,6 +369,28 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
 
     if(cg_arg == NULL)
         ERR.Pointer(cname, fname, "cg_arg");
+    int threads =   omp_get_max_threads();
+if (cg_arg->Inverter == HDCG){
+    HDCGController<Float> *control = HDCGController<Float>::getInstance();
+    BfmMultiGrid<Float> *hdcg = control->getHDCG();
+    if (!hdcg){
+    	VRB.Result(cname,fname,"HDCG first called with nthreads=%d. Initialzing Ldop\n",threads);
+	control->setHDCG<Float,float>(bd,bf); 
+#if 0
+	hdcg = control->getHDCG();
+	hdcg->RelaxSubspace<Float>(&bd);
+	hdcg->LdopDeflationBasis(control->get_vec_len());
+	hdcg->LdopDeflationBasisDiagonalise(control->get_vec_len());
+	hdcg->SinglePrecSubspace();
+#endif 
+    }
+    hdcg->InnerKrylovIterMax  = 8;
+    hdcg->InnerKrylovShift    = 1.0;
+    hdcg->PcgShift       = 1.0;
+    hdcg->PcgType        = PcgAdef2f;
+//    filecg=file+".PcgADef2f_1e-2";
+    bd.InverterLoggingBegin("BfmMultiGrid.log");
+}
 
     Fermion_t in[2]  = {bd.allocFermion(), bd.allocFermion()};
     Fermion_t out[2] = {bd.allocFermion(), bd.allocFermion()};
@@ -409,7 +432,16 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
                 iter = bd.EIG_CGNE_M(out, in);
                 break;
             case HDCG:
-                iter = bd.HD_CGNE_M(out, in);
+{
+    HDCGController<Float> *control = HDCGController<Float>::getInstance();
+    BfmMultiGrid<Float> *hdcg = control->getHDCG();
+                iter = bd.HD_CGNE_M<Float>(*hdcg,out, in);
+//#pragma omp for 
+//    for(int i=0;i<threads;i++) {
+//      hdcg.axpy(chi_h[Odd],src,src,0.0);
+//      hdcg.Pcg(out[Odd],src,in[Even],1.0e-6,5.0e-3);
+//    }
+}
                 break;
             default:
                 if(bd.isBoss()) {
@@ -420,6 +452,11 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
             }
         }
     }
+if (cg_arg->Inverter == HDCG){
+//    HDCGController<Float> *control = HDCGController::getInstance();
+//    BfmMultiGrid<Float> *hdcg = control->getHDCG();
+    bd.InverterLoggingEnd();
+}
 
     bd.cps_impexFermion((Float *)f_out, out, 0);
 

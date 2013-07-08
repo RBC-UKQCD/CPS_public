@@ -1,6 +1,6 @@
 /* -*- mode:c++; c-basic-offset:4 -*- */
-#ifndef BFM_EIGCG_H
-#define BFM_EIGCG_H
+#ifndef BFM_HDCG_H
+#define BFM_HDCG_H
 
 /* EigCG code for Mpc^dagger Mpc solver 2012 by Qi
  * copied from the CG code (2012 ?version in bfm) and made modifications and 
@@ -11,7 +11,7 @@
 #include <bfm_qdp.h>
 
 #include <util/lattice/bfm_evo.h>
-#include <util/lattice/eigcg_controller.h>
+#include <util/lattice/hdcg_controller.h>
 
 #include <stdio.h>
 #include <cmath>
@@ -32,8 +32,8 @@ template<class Float> void matrix_dgemm (const int M,const int N, const int K, F
 //void invert_H_matrix(complex<double> *data, int n); //if n is large enough, must be parallerized!!!
 //template<class Float> void eigcg_vec_mult(Float* V, const int m, double *QZ, const int n, const int f_size_cb, const int nthread, const int me);
 
-template<class Float>
-int bfm_evo<Float>::HD_CGNE_M(Fermion_t solution[2], Fermion_t source[2])
+template<class Float, class Float_h>
+int bfm_evo<Float>::HD_CGNE_M(BfmMultiGrid<Float_h> &hdcg, Fermion_t solution[2], Fermion_t source[2])
 {
     int me = this->thread_barrier();
     Fermion_t src = this->threadedAllocFermion(); 
@@ -46,7 +46,8 @@ int bfm_evo<Float>::HD_CGNE_M(Fermion_t solution[2], Fermion_t source[2])
     this->axpy(tmp,src,source[Odd],-1.0);
     this->Mprec(tmp,src,Mtmp,DaggerYes);  
   
-    int iter = this->HD_CGNE_prec(solution[Odd], src);
+    hdcg.Pcg(out[Odd],src,in[Even],1.0e-6,5.0e-3);
+//    int iter = this->HD_CGNE_prec(solution[Odd], src);
 
     // sol_e = M_ee^-1 * ( src_e - Meo sol_o )...
     this->Meo(solution[Odd],tmp,Even,DaggerNo);
@@ -60,6 +61,7 @@ int bfm_evo<Float>::HD_CGNE_M(Fermion_t solution[2], Fermion_t source[2])
     return iter;
 }
 
+#if 0
 template<class Float>
 int bfm_evo<Float>::HD_CGNE_prec(Fermion_t psi, Fermion_t src)
 {
@@ -986,5 +988,6 @@ void eigcg_vec_mult3(Float* V, const int m, double *QZ, const int n, const int f
         bfmobj.threadedFreeFermion(ret[i]);
     }
 }
+#endif
 
 #endif
