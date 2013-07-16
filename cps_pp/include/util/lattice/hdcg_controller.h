@@ -13,30 +13,32 @@ template <class Float>
 class HDCGController
 {
 	private:
+#if 0
 		const int nev; //typical nev=8;
 		const int m; //typical m=24; should be bigger than 2*nev
 		const int max_def_len;//the size of the deflation space that we try to accumulate
 		const double max_eig_cut; //throw away those fake low modes
 		const bool always_restart; //it is better not to usually
+#endif
 
 		const int Ls;
 		const int NumberSubspace;
 		int block[5];
 		int quadrant[4];
 
-		Float* V; //the space for eigen vectors
-		std::vector<Float*> U;	  //at some point, we want to use float for U no matter what.
+//		Float* V; //the space for eigen vectors
+//		std::vector<Float*> U;	  //at some point, we want to use float for U no matter what.
 		//To save the usage of memory, 
 		//it is fine to use float since the low modes are not 
 		//accurately any way and it has not effect on the final result
 		
 
-		const int vec_len; //for convenient use between cps and bfm, this is as an input parameter. 
+//		const int vec_len; //for convenient use between cps and bfm, this is as an input parameter. 
 		//better be infered from bfm_qdp class, it is the length of Fermion_t
 	public:
-		int def_len; //keep the record of the number of low modes we achieved
-		std::complex<double> *H;
-		std::vector<double> restart;
+//		int def_len; //keep the record of the number of low modes we achieved
+//		std::complex<double> *H;
+//		std::vector<double> restart;
 		
 
 	private:
@@ -44,9 +46,11 @@ class HDCGController
 		static BfmMultiGrid<Float>* _bfm_mg;
 		HDCGController(HDCGController<Float> &){};
 		HDCGController<Float> & operator=(HDCGController const &){};
-		HDCGController(int _Ls, int _NS,int _block,int _quad):
-			Ls(_Ls),NumberSubspace(_NS),block(_block),quadrant(_quad)
+		HDCGController(int _Ls, int _NS,int _block[],int _quad[]):
+			Ls(_Ls),NumberSubspace(_NS)
 			{
+				for(int i=0;i<5;i++) block[i]=_block[i];
+				for(int i=0;i<4;i++) quadrant[i]=_quad[i];
 			}
 #if 0
 		HDCGController(int _nev, int _m, int _max_def_len, double _max_eig_cut, std::vector<double> &_restart, bool _ar, int cg_vec_len):
@@ -101,37 +105,41 @@ class HDCGController
 		{
 			delete _instance;
 			_instance = NULL;
+			if (_bfm_mg) delete _bfm_mg;
+			_bfm_mg = NULL;
 		}
 		static HDCGController<Float>* getInstance()
 		{
-			if(NULL == _instance)
+//			if(NULL == _instance)
+			if(0)
 			{
-				printf("Need to setup/initialize the instance first!\n");
+				printf("Need to setup/initialize the HDCGController instance first!\n");
 				exit(-1);
 				//_instance = new HDCGController<Float>();
 			}
 			return _instance;
 		}
-		static HDCGController<Float>* setInstance(int Ls, int NumberSubspace,int block,int quadrant)
+		static HDCGController<Float>* setInstance(int _Ls, int _NS,int _block[],int _quad[])
 		{
 			if(NULL == _instance)
 			{
-				_instance = new HDCGController<Float>(Ls, NumberSubspace,block,quadrant);
+				_instance = new HDCGController<Float>(_Ls, _NS,_block,_quad);
 			}
 			else
 			{
-				printf("Should be initialized once only! or should be deleted before another use for a different case!\n");
+				printf("HDCGController should be initialized once only! or should be deleted before another use for a different case!\n");
 				exit(-1);
 			}
 			return _instance;
 		}
 		~HDCGController()
 		{
-			if(H!=NULL) delete [] H; H=NULL;
-			if(V!=NULL) delete [] V; V=NULL;
-			for(int i=0;i<max_def_len;i++){if(U[i]!=NULL)delete [] U[i];U[i]=NULL;}
+			printf(" ~HDCGController() called!!" );
+//			if(H!=NULL) delete [] H; H=NULL;
+//			if(V!=NULL) delete [] V; V=NULL;
+//			for(int i=0;i<max_def_len;i++){if(U[i]!=NULL)delete [] U[i];U[i]=NULL;}
 		}
-
+#if 0
 		int get_nev() const{return nev;}
 		int get_m() const{return m;}
 		int get_max_def_len() const{return max_def_len;}
@@ -140,40 +148,44 @@ class HDCGController
 		Float* getU(int i){return U.at(i);}
 		Float* getV(int i){return V+i*vec_len;}
 		bool is_always_restart() const{return always_restart;}
+#endif
 
 #if 1
 		static BfmMultiGrid<Float>* getHDCG()
 		{
-			if(NULL == _bfm_mg)
-			{
-				printf("Need to setup/initialize the instance first!\n");
-				exit(-1);
+//			if(NULL == _bfm_mg)
+//			{
+//				printf("Need to setup/initialize BfmMultiGrid first!\n");
+//				exit(-1);
 //				_instance = new HDCGController<Float>();
-			}
+//			}
 			return _bfm_mg;
 		}
 #endif
 
-#if 1
-template <class Float1, class Float2>
-		void  setHDCG(bfm_qdp<Float1> &dop, bfm_qdp<Float2> &dop_sp)
+#if  1
+		void   setHDCG(bfm_qdp<double> &dop, bfm_qdp<float> &dop_sp)
 		{
 			if(NULL == _bfm_mg)
 			{
-				_bfm_mg = new BfmMultiGrid<Float>(Ls,NumberSubspace,block,quadrant,&dop,&dop_sp);
+				_bfm_mg = new BfmMultiGrid<double>(Ls,NumberSubspace,block,quadrant,&dop,&dop_sp);
 //Initialization sequence
 				_bfm_mg->RelaxSubspace(&dop);
 				_bfm_mg->ComputeLittleMatrixColored();
-				_bfm_mg->LdopDeflationBasisInit(NumberSubspace);
-				_bfm_mg->LdopDeflationBasisDiagonalise(NumberSubspace);
+				_bfm_mg->LdopDeflationBasisInit(8);
+				_bfm_mg->LdopDeflationBasisInit(16);
+				_bfm_mg->LdopDeflationBasisInit(32);
+				_bfm_mg->LdopDeflationBasisInit(64);
+				_bfm_mg->LdopDeflationBasisInit(128);
+				_bfm_mg->LdopDeflationBasisDiagonalise(128);
 				_bfm_mg->SinglePrecSubspace();
 
 			}
-		//	else
-		//	{
-		//		printf("Should be initialized once only! or should be deleted before another use for a different case!\n");
-		//		exit(-1);
-		//	}
+			else
+			{
+				printf("Should be initialized once only! or should be deleted before another use for a different case!\n");
+				exit(-1);
+			}
 //			return _bfm_mg;
 		}
 #endif
