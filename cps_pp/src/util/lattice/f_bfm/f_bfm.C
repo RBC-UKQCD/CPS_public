@@ -48,6 +48,7 @@ Fbfm::Fbfm(void):cname("Fbfm")
     bd.init(bfm_arg);
 
     if(use_mixed_solver) {
+//    if(1) {
         bd.comm_end();
         bf.init(bfm_arg);
         bf.comm_end();
@@ -70,6 +71,7 @@ Fbfm::~Fbfm(void)
     Lattice::BondCond();
     bd.end();
     if(use_mixed_solver) {
+//    if(1) {
         bf.end();
     }
 }
@@ -371,11 +373,22 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
         ERR.Pointer(cname, fname, "cg_arg");
     int threads =   omp_get_max_threads();
 if (cg_arg->Inverter == HDCG){
+    if(!use_mixed_solver)
+	ERR.General(cname,fname,"Fbfm::use_mixed_solver should be set true to use HDCG\n");
     HDCGController<Float> *control = HDCGController<Float>::getInstance();
+    if (!control){
+	int Ls = GJP.Sites(4);
+	int _Ns = 20;
+	int block[5]={4,4,4,4,Ls};
+	int quad[4]={4,4,4,4};
+	control = HDCGController<Float>::setInstance(Ls,_Ns,block,quad);
+//	setInstance(int _Ls, int _NS,int _block[],int _quad[])
+    }
     BfmMultiGrid<Float> *hdcg = control->getHDCG();
     if (!hdcg){
     	VRB.Result(cname,fname,"HDCG first called with nthreads=%d. Initialzing Ldop\n",threads);
-	control->setHDCG<Float,float>(bd,bf); 
+	control->setHDCG(bd,bf); 
+    	VRB.Result(cname,fname,"control->setHDCG<Float,float>(bd,bf) done\n");
 #if 0
 	hdcg = control->getHDCG();
 	hdcg->RelaxSubspace<Float>(&bd);
@@ -383,8 +396,10 @@ if (cg_arg->Inverter == HDCG){
 	hdcg->LdopDeflationBasisDiagonalise(control->get_vec_len());
 	hdcg->SinglePrecSubspace();
 #endif 
+	hdcg = control->getHDCG();
     }
     hdcg->InnerKrylovIterMax  = 8;
+    hdcg->SubspaceSurfaceDepth= 256;
     hdcg->InnerKrylovShift    = 1.0;
     hdcg->PcgShift       = 1.0;
     hdcg->PcgType        = PcgAdef2f;
@@ -417,7 +432,7 @@ if (cg_arg->Inverter == HDCG){
     int iter = -1;
 #pragma omp parallel
     {
-        if(use_mixed_solver) {
+        if(use_mixed_solver && (cg_arg->Inverter != HDCG)) {
             iter = mixed_cg::threaded_cg_mixed_M(out, in, bd, bf, 5, cg_arg->Inverter, evec, evalf, ecnt);
         } else {
             switch(cg_arg->Inverter) {
@@ -435,7 +450,7 @@ if (cg_arg->Inverter == HDCG){
 {
     HDCGController<Float> *control = HDCGController<Float>::getInstance();
     BfmMultiGrid<Float> *hdcg = control->getHDCG();
-                iter = bd.HD_CGNE_M<Float>(*hdcg,out, in);
+                iter = bd.HD_CGNE_M<Float>(hdcg,out, in);
 //#pragma omp for 
 //    for(int i=0;i<threads;i++) {
 //      hdcg.axpy(chi_h[Odd],src,src,0.0);
