@@ -170,7 +170,7 @@ int HD_CGNE_M(BfmMultiGrid<Float_h> *hdcg, Fermion_t solution[2], Fermion_t sour
     Fermion_t Mtmp= this->threadedAllocFermion(); 
 
     // src_o = Mdag * (source_o - Moe MeeInv source_e)
-#if 0
+#if 1
     this->MooeeInv(source[Even],tmp,DaggerNo);
     this->Meo(tmp,src,Odd,DaggerNo);
     this->axpy(tmp,src,source[Odd],-1.0);
@@ -182,7 +182,7 @@ int HD_CGNE_M(BfmMultiGrid<Float_h> *hdcg, Fermion_t solution[2], Fermion_t sour
 //    int iter = this->HD_CGNE_prec(solution[Odd], src);
 
     // sol_e = M_ee^-1 * ( src_e - Meo sol_o )...
-#if 0
+#if 1
     this->Meo(solution[Odd],tmp,Even,DaggerNo);
     this->axpy(src,tmp,source[Even],-1.0);
     this->MooeeInv(src,solution[Even],DaggerNo);
