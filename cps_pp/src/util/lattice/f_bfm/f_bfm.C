@@ -386,6 +386,7 @@ if (cg_arg->Inverter == HDCG){
     }
     BfmMultiGrid<Float> *hdcg = control->getHDCG();
     if (!hdcg){
+    	SetMass(cg_arg->mass);
     	VRB.Result(cname,fname,"HDCG first called with nthreads=%d. Initialzing Ldop\n",threads);
 	control->setHDCG(bd,bf); 
     	VRB.Result(cname,fname,"control->setHDCG<Float,float>(bd,bf) done\n");
