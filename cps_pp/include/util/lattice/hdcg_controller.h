@@ -8,6 +8,7 @@
 
 #include<bfm_qdp.h>
 #include<BfmMultiGrid.h>
+#include<util/time_cps.h>
 
 template <class Float>
 class HDCGController
@@ -44,6 +45,7 @@ class HDCGController
 	private:
 		static HDCGController* _instance;
 		static BfmMultiGrid<Float>* _bfm_mg;
+		static char *cname;
 		HDCGController(HDCGController<Float> &){};
 		HDCGController<Float> & operator=(HDCGController const &){};
 		HDCGController(int _Ls, int _NS,int _block[],int _quad[]):
@@ -103,10 +105,9 @@ class HDCGController
 	public:
 		static void free()
 		{
+			freeHDCG();
 			delete _instance;
 			_instance = NULL;
-			if (_bfm_mg) delete _bfm_mg;
-			_bfm_mg = NULL;
 		}
 		static HDCGController<Float>* getInstance()
 		{
@@ -168,6 +169,7 @@ class HDCGController
 		{
 			if(NULL == _bfm_mg)
 			{
+				Float t1 = -CPS_NAMESPACE::dclock();
 				_bfm_mg = new BfmMultiGrid<double>(Ls,NumberSubspace,block,quadrant,&dop,&dop_sp);
 //Initialization sequence
 				_bfm_mg->RelaxSubspace(&dop);
@@ -179,6 +181,9 @@ class HDCGController
 				_bfm_mg->LdopDeflationBasisInit(128);
 				_bfm_mg->LdopDeflationBasisDiagonalise(128);
 				_bfm_mg->SinglePrecSubspace();
+				
+				t1 +=CPS_NAMESPACE::dclock();
+				CPS_NAMESPACE::print_flops(cname,"setHDCG()",0,t1);
 
 			}
 			else
@@ -188,11 +193,16 @@ class HDCGController
 			}
 //			return _bfm_mg;
 		}
+		void   freeHDCG(){
+			delete _bfm_mg;
+			_bfm_mg = NULL;
+		}
 #endif
 };
 
 template<class Float> HDCGController<Float>* HDCGController<Float>::_instance =  NULL;
 template<class Float> BfmMultiGrid<Float>* HDCGController<Float>::_bfm_mg =  NULL;
+template<class Float> char* HDCGController<Float>::cname = "HDCGController";
 
 
 #endif
