@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cmath>
+#include <vector>
 
 #include <alg/common_arg.h>
 #include <comms/glb.h>
@@ -317,6 +318,86 @@ void FermionVectorTp::Set4DBoxSource(int color,
     VRB.Result(cname, fname, "src_vol = %f\n", src_vol);
     VRB.FuncEnd(cname,fname);
 }
+
+
+// Note: The following code sets a Z3 boxed wall source.
+void FermionVectorTp::SetZ3BWall(int color, int spin, int t, const int size[3],
+                                 const std::vector<Rcomplex> &rand_num)
+{
+    const char *fname = "SetZ3BWall()";
+
+    if (color < 0 || color >= GJP.Colors())
+        ERR.General(cname, fname, "Color index out of range: color = %d\n", color);
+  
+    if (spin < 0 || spin > 3)
+        ERR.General(cname, fname, "Spin index out of range: spin = %d\n", spin);
+
+    for(int mu = 0; mu < 3; ++mu) {
+        if(size[mu] > 0) continue;
+        ERR.General(cname, fname, "Invalid box size in %d direction: %d\n", mu, size[mu]);
+    }
+  
+    ZeroSource();
+
+    const int lcl[4] = {
+        GJP.XnodeSites(), GJP.YnodeSites(),
+        GJP.ZnodeSites(), GJP.TnodeSites(),
+    };
+
+    const int shift[4] = {
+        GJP.XnodeSites() * GJP.XnodeCoor(), GJP.YnodeSites() * GJP.YnodeCoor(),
+        GJP.ZnodeSites() * GJP.ZnodeCoor(), GJP.TnodeSites() * GJP.TnodeCoor(),
+    };
+
+    const int glb[4] = {
+        GJP.XnodeSites() * GJP.Xnodes(), GJP.YnodeSites() * GJP.Ynodes(),
+        GJP.ZnodeSites() * GJP.Znodes(), GJP.TnodeSites() * GJP.Tnodes(),
+    };
+
+
+
+
+// Changed from Hantao's version to avoid putting sources in remainder portion of the 3D slices when size[] does not divide glb[]
+
+    const int rand_grid[3] = {
+        (glb[0] ) / size[0], 
+        (glb[1] ) / size[1], 
+        (glb[2] ) / size[2]
+    };
+
+    const int sites = lcl[0] * lcl[1] * lcl[2] * lcl[3];
+
+#pragma omp parallel for
+    for(int i = 0; i < sites; ++i) {
+        int glb_x[4];
+        compute_coord(glb_x, lcl, shift, i);
+
+        if(glb_x[3] != t) continue;
+    for(int mu = 0; mu < 3; ++mu) 
+        if(glb_x[mu] >= (size[mu]*rand_grid[mu]) ) continue;
+
+        int id = 0;
+        for(int k = 0; k < 3; ++k) {
+            id = id * rand_grid[k] + glb_x[k] / size[k];
+        }
+
+        fv[i * SPINOR_SIZE + 2 * (color + COLORS * spin)    ] = std::real(rand_num[id]);
+        fv[i * SPINOR_SIZE + 2 * (color + COLORS * spin) + 1] = std::imag(rand_num[id]);
+    }
+
+    // debug code, check the source by printing it.
+    // for(int i = 0; i < sites; ++i) {
+    //     int glb_x[4];
+    //     compute_coord(glb_x, lcl, shift, i);
+    //     if(glb_x[3] != t) continue;
+
+    //     printf("Z3B Source: %d %d %d %d = %17.10e %17.10e\n",
+    //            glb_x[0], glb_x[1], glb_x[2], glb_x[3],
+    //            fv[i * SPINOR_SIZE + 2 * (color + COLORS * spin)    ],
+    //            fv[i * SPINOR_SIZE + 2 * (color + COLORS * spin) + 1]);
+    // }
+}
+
 
 // Set source from previously defined source
 // Does not zero the rest of the  time slices

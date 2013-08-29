@@ -28,6 +28,8 @@
 #include <fcntl.h>      // read and write control flags,
 #include <unistd.h>     // close(). These are needed for io parts to
                         // compile on PCs
+#include <cassert> 	// for assert()
+
 #include <alg/qpropw.h>
 #include <util/qcdio.h>
 
@@ -2892,6 +2894,78 @@ void QPropW4DBoxSrc::SetSource(FermionVectorTp& src, int spin, int color)
         VRB.Warn(cname,fname,"Warning: 4D box src not gauge fixed");
     }
 }
+
+// ------------------------------------------------------------------
+// Quark Propagator, wall source filled with Z3 boxes
+//
+// Added by Hantao
+// ------------------------------------------------------------------
+QPropWZ3BWallSrc::QPropWZ3BWallSrc(Lattice& lat, QPropWArg* arg,
+                                   QPropW4DBoxArg *b_arg, CommonArg* c_arg)
+    : QPropW(lat, arg, c_arg)
+{
+    cname = "QPropWZ3BWallSrc";
+    const char *fname = "QPropWZ3BWallSrc()";
+
+    for(int mu = 0; mu < 4; ++mu) {
+        box_arg.box_start[mu] = b_arg->box_start[mu];
+        box_arg.box_size[mu] = b_arg->box_size[mu];
+        box_arg.mom[mu] = b_arg->mom[mu];
+        if(box_arg.box_size[mu] <= 0) {
+          ERR.General(cname, fname, "Invalid size in %d direction: %d.\n",
+                      mu, box_arg.box_size[mu]);
+        }
+    }
+    if(box_arg.box_size[3] != 1) {
+      ERR.NotImplemented(cname, fname);
+    }
+    if(box_arg.box_start[3] != arg->t) {
+      ERR.General(cname, fname, "BoxArg and QPropWArg starting time does not match.\n");
+    }
+
+    const int glb[4] = {
+        GJP.XnodeSites() * GJP.Xnodes(), GJP.YnodeSites() * GJP.Ynodes(),
+        GJP.ZnodeSites() * GJP.Znodes(), GJP.TnodeSites() * GJP.Tnodes(),
+    };
+
+    for(int i = 0; i < 3; ++i) {
+      rand_grid[i] = (glb[i] ) / box_arg.box_size[i];
+    }
+    rand_size = rand_grid[0] * rand_grid[1] * rand_grid[2];
+    rand_num.assign(rand_size, 0);
+
+    const Rcomplex Z3consts[3] = {1,
+                                  Rcomplex(-0.5, 0.5*sqrt(3.0)),
+                                  Rcomplex(-0.5, -0.5*sqrt(3.0)),};
+
+    VRB.Result(cname, fname, "rand_size = %d %d %d = %d\n",
+               rand_grid[0], rand_grid[1], rand_grid[2], rand_size);
+
+    for(int i = 0; i < rand_size; ++i) {
+        unsigned rnd = drand48() * 3;
+        assert(rnd < 3);
+        rand_num[i] = Z3consts[rnd];
+    }
+    QMP_broadcast(rand_num.data(), sizeof(Rcomplex) * rand_size);
+
+    Run();
+}
+
+void QPropWZ3BWallSrc::SetSource(FermionVectorTp& src, int spin, int color)
+{
+    const char *fname = "SetSource()";
+    VRB.Func(cname, fname);
+  
+    VRB.Result(cname, fname, "Set Z3 boxed wall source at t=%d.\n", qp_arg.t);
+    src.SetZ3BWall(color, spin, qp_arg.t, box_arg.box_size, rand_num);
+
+    if (GFixedSrc()) {
+      src.GFWallSource(AlgLattice(), spin, 3, qp_arg.t);
+    } else {
+        VRB.Warn(cname,fname,"Warning: 4D box src not gauge fixed");
+    }
+}
+
 
 //------------------------------------------------------------------
 // Quark Propagator (Wilson type) with Random Source
