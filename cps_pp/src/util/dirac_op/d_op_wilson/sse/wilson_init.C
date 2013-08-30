@@ -88,6 +88,7 @@ double read_cpu_MHz()
   return max_freq;
 }
 
+#define USE_TAG
 //! allocate communication buffers and prepare communication
 void wilson_init_comm(int dir, int block, Wilson *wilson_p)
 {
@@ -106,9 +107,17 @@ void wilson_init_comm(int dir, int block, Wilson *wilson_p)
     wilson_p->msgmem[idx][0] =
       QMP_declare_msgmem((void *)(wilson_p->recv_buf[idx]), len);
     wilson_p->msghandle[idx][1] =
+#ifdef USE_TAG
+      QMP_declare_send_relative_tag(wilson_p->msgmem[idx][1], dir, -sflag, 0,idx);
+#else
       QMP_declare_send_relative(wilson_p->msgmem[idx][1], dir, -sflag, 0);
+#endif
     wilson_p->msghandle[idx][0] =
+#ifdef USE_TAG
+      QMP_declare_receive_relative_tag(wilson_p->msgmem[idx][0], dir, +sflag, 0,idx);
+#else
       QMP_declare_receive_relative(wilson_p->msgmem[idx][0], dir, +sflag, 0);
+#endif
     wilson_p->multiple[idx] = QMP_declare_multiple(wilson_p->msghandle[idx], 2);
     
     idx=dir+4;
@@ -121,9 +130,17 @@ void wilson_init_comm(int dir, int block, Wilson *wilson_p)
     wilson_p->msgmem[idx][0] =
       QMP_declare_msgmem((void *)(wilson_p->recv_buf[idx]), len);
     wilson_p->msghandle[idx][1] =
+#ifdef USE_TAG
+      QMP_declare_send_relative_tag(wilson_p->msgmem[idx][1], dir, +sflag, 0,idx);
+#else
       QMP_declare_send_relative(wilson_p->msgmem[idx][1], dir, +sflag, 0);
+#endif
     wilson_p->msghandle[idx][0] =
+#ifdef USE_TAG
+      QMP_declare_receive_relative_tag(wilson_p->msgmem[idx][0], dir, -sflag, 0,idx);
+#else
       QMP_declare_receive_relative(wilson_p->msgmem[idx][0], dir, -sflag, 0);
+#endif
     wilson_p->multiple[idx] = QMP_declare_multiple(wilson_p->msghandle[idx], 2);
 }
 	       
