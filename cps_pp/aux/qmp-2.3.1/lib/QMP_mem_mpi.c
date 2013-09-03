@@ -652,7 +652,7 @@ QMP_declare_receive_relative(QMP_msgmem_t mm, int dir, int isign,
   ii = (isign > 0) ? 1 : 0;
 //  mh = QMP_declare_receive_from (mm, QMP_topo->neigh[ii][dir], priority);
 // has to match receive_relative in the negative direction
-  int tag_num = TAG_REL - isign*dir;
+  int tag_num = TAG_REL - isign*(dir+1);
   mh = QMP_declare_receive_from_tag(mm, QMP_topo->neigh[ii][dir], priority,tag_num);
 
   LEAVE;
@@ -683,7 +683,7 @@ QMP_declare_send_relative (QMP_msgmem_t mm, int dir, int isign,
 
   ii = (isign > 0) ? 1 : 0;
 // has to match receive_relative in the negative direction
-  int tag_num = TAG_REL + isign*dir;
+  int tag_num = TAG_REL + isign*(dir+1);
   mh = QMP_declare_send_to_tag(mm, QMP_topo->neigh[ii][dir], priority,tag_num);
 
   LEAVE;
