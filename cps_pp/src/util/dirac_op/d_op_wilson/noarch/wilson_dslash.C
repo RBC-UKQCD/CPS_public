@@ -1,6 +1,6 @@
 #include <config.h>
-//#ifdef USE_SSE
-#if 0
+#ifdef USE_SSE
+//#if 0
 #include "../sse/sse-wilson_dslash.C"
 #else
 #include <stdio.h>

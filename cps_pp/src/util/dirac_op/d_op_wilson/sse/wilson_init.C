@@ -88,7 +88,7 @@ double read_cpu_MHz()
   return max_freq;
 }
 
-#define USE_TAG
+#undef USE_TAG
 //! allocate communication buffers and prepare communication
 void wilson_init_comm(int dir, int block, Wilson *wilson_p)
 {
