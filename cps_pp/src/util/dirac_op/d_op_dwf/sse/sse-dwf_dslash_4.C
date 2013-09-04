@@ -37,6 +37,7 @@ CPS_END_NAMESPACE
 #include<config.h>
 #include<util/dwf.h>
 #include<util/wilson.h>
+#include<util/dirac_op.h>
 #include<util/gjp.h>
 #include<util/vector.h>
 #include<util/verbose.h>
@@ -305,6 +306,8 @@ void dwf_dslash_4(Vector *out,
        }
      }//loop(ls)
    }//lop(parity_5)
+
+DiracOp::CGflops += 1320*wilson_p->vol[0]*ls;
 
 #ifdef PROFILE
 	 Float time_tot= time_bnd+time_blk+time_comm2;
