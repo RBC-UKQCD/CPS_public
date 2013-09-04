@@ -1,6 +1,7 @@
 #include <config.h>
 #include <stdio.h>
 #include <math.h>
+#include <util/dirac_op.h>
 #include <util/omp_wrapper.h>
 #include <qmp.h>
 
@@ -1292,9 +1293,10 @@ printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,
 #endif
 	}
 //	VRB.Result(cname,fname,"done");
+DiracOp::CGflops += 1320*vol*vec_len;
 }
 
-#if 1
+#if 0
 void wilson_dslash(IFloat *chi_p_f, 
 			IFloat *u_p_f, 
 			IFloat *psi_p_f, 

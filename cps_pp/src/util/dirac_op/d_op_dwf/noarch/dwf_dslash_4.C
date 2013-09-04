@@ -1,5 +1,6 @@
 #include<config.h>
-#ifdef USE_SSE
+//#ifdef USE_SSE
+#if 0
 #include "../sse/sse-dwf_dslash_4.C"
 #else
 //--------------------------------------------------------------------
