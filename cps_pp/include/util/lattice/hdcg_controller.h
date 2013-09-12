@@ -10,6 +10,23 @@
 #include<BfmMultiGrid.h>
 #include<util/time_cps.h>
 
+#include <bfm_hdcg_wrapper.h>
+class HDCGInstance{
+	public:
+	static BfmMultiGridParams  Params;
+	static HDCG_wrapper  * _instance ;
+	static HDCG_wrapper *getInstance(){return _instance;} 
+	static HDCG_wrapper *setInstance(HDCG_wrapper *_new){_instance = _new;} 
+	static void free(){
+		if (_instance){ 
+			_instance->HDCG_end();
+			delete _instance;
+		}
+		_instance=NULL;
+	}
+};
+
+#if 0
 template <class Float>
 class HDCGController
 {
@@ -204,5 +221,7 @@ template<class Float> HDCGController<Float>* HDCGController<Float>::_instance = 
 template<class Float> BfmMultiGrid<Float>* HDCGController<Float>::_bfm_mg =  NULL;
 template<class Float> char* HDCGController<Float>::cname = "HDCGController";
 
+
+#endif
 
 #endif
