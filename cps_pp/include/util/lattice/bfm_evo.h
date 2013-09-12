@@ -76,10 +76,17 @@ private:
 
   void copySendFrmData(Float v3d[], Float v4d[], int mu, bool send_neg);
 
+#if 0
   // complex version of axpy()
   void axpy_c(Fermion_t r, Fermion_t x, Fermion_t y, std::complex<double> a, Fermion_t tmp) {
     this->zaxpy(r, x, y, a);
   }
+#endif
+
+void zaxpy(Fermion_t r, Fermion_t x, Fermion_t y, std::complex<double> a)
+{
+   this->caxpy(r,x,y,std::real(a),std::imag(a));
+}
 public:
   void thread_work_partial_nobarrier(int nwork, int me, int nthreads,
                                      int &mywork, int &myoff)
@@ -178,7 +185,7 @@ int HD_CGNE_M(BfmMultiGrid<Float_h> *hdcg, Fermion_t solution[2], Fermion_t sour
 #endif
   
     if (this->isBoss() && !me) printf("hdcg.Pcg(solution[%d](%p),src(%p),tmp(%p)\n",Odd,solution[Odd],src,tmp);
-    int iter = hdcg->Pcg(solution[Odd],src,tmp,1.0e-6,5.0e-3);
+    int iter = hdcg->Pcg(solution[Odd],src,tmp);
 //    int iter = this->HD_CGNE_prec(solution[Odd], src);
 
     // sol_e = M_ee^-1 * ( src_e - Meo sol_o )...
