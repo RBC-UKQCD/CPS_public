@@ -1266,11 +1266,11 @@ printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,
 
 	called++;
 
-	if (called%10==0){
-		print_flops("wilson_dslash_vec()","local*10",0,local);
-		print_flops("wilson_dslash_vec()","nonlocal*10",0,nonlocal);
-		print_flops("wilson_dslash_vec()","qmp*10",0,qmp);
-		print_flops("wilson_dslash_vec()","setup*10",0,setup);
+	if (called%100==0){
+		print_flops("wilson_dslash_vec()","local*100",0,local);
+		print_flops("wilson_dslash_vec()","nonlocal*100",0,nonlocal);
+		print_flops("wilson_dslash_vec()","qmp*100",0,qmp);
+		print_flops("wilson_dslash_vec()","setup*100",0,setup);
 		local=nonlocal=qmp=setup=0.;
 #ifdef USE_BFM
 {
