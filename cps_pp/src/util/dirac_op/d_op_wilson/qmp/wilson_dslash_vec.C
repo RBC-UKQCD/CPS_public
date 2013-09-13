@@ -5,7 +5,8 @@
 #include <util/omp_wrapper.h>
 #include <qmp.h>
 
-#ifdef USE_BFM
+//#ifdef USE_BFM
+#if 0
 #include "/bgsys/drivers/ppcfloor/hwi/include/bqc/nd_rese_dcr.h"
 #endif
 
@@ -1272,7 +1273,8 @@ printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,
 		print_flops("wilson_dslash_vec()","qmp*10",0,qmp);
 		print_flops("wilson_dslash_vec()","setup*10",0,setup);
 		local=nonlocal=qmp=setup=0.;
-#ifdef USE_BFM
+//#ifdef USE_BFM
+#if 0
 {
 	 char link_name[ND_RESE_DCR_num][10] = { "A-", "A+", "B-", "B+", "C-", "C+", "D-", "D+", "E-", "E+", "IO" };
     uint32_t i;
