@@ -21,6 +21,28 @@
 #include <util/lattice/fforce_wilson_type.h>
 
 #include<omp.h>
+#include<bfm_hdcg_wrapper.h>
+#include<BfmMultiGrid.h>
+
+#if 0
+class HDCGInstance{
+	public:
+	static BfmMultiGridParams  Params;
+	static HDCG_wrapper  * _instance ;
+	static HDCG_wrapper *getInstance(){return _instance;} 
+	static HDCG_wrapper *setInstance(HDCG_wrapper *_new){_instance = _new;} 
+	static void free(){
+		if (_instance){ 
+			_instance->HDCG_end();
+			delete _instance;
+		}
+		_instance=NULL;
+	}
+};
+#endif
+
+BfmMultiGridParams HDCGInstance::Params;
+ HDCG_wrapper  *HDCGInstance:: _instance=NULL;
 
 CPS_START_NAMESPACE
 
@@ -37,6 +59,7 @@ bool Fbfm::use_mixed_solver = false;
 Fbfm::Fbfm(void):cname("Fbfm")
 {
     const char *fname = "Fbfm()";
+    VRB.Func(cname,fname);
 
     if(GJP.Snodes() != 1) {
         ERR.NotImplemented(cname, fname);
@@ -66,6 +89,8 @@ Fbfm::Fbfm(void):cname("Fbfm")
 
 Fbfm::~Fbfm(void)
 {
+    const char *fname = "~Fbfm()";
+    VRB.Func(cname,fname);
     // we call base version just to revert the change, no need to
     // import to BFM in a destructor.
     Lattice::BondCond();
@@ -368,6 +393,7 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
                   PreserveType prs_f_in)
 {
     const char *fname = "FmatInv()";
+    VRB.Func(cname,fname);
 
     if(cg_arg == NULL)
         ERR.Pointer(cname, fname, "cg_arg");
@@ -375,37 +401,57 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
 if (cg_arg->Inverter == HDCG){
     if(!use_mixed_solver)
 	ERR.General(cname,fname,"Fbfm::use_mixed_solver should be set true to use HDCG\n");
-    HDCGController<Float> *control = HDCGController<Float>::getInstance();
+//    HDCGController<Float> *control = HDCGController<Float>::getInstance();
+	HDCG_wrapper *control = HDCGInstance::getInstance();
     if (!control){
-	int Ls = GJP.Sites(4);
-	int _Ns = 20;
-	int block[5]={4,4,4,4,Ls};
-	int quad[4]={4,4,4,4};
-	control = HDCGController<Float>::setInstance(Ls,_Ns,block,quad);
-//	setInstance(int _Ls, int _NS,int _block[],int _quad[])
-    }
-    BfmMultiGrid<Float> *hdcg = control->getHDCG();
-    if (!hdcg){
+	bfmActionParams BAP_;
+	BAP_.M5 = bfm_arg.M5;
+	BAP_.mass = cg_arg->mass;
+	BAP_.twistedmass=0;
+	BAP_.Csw=0;
+	BAP_.solver=bfm_arg.solver;
+	BAP_.mobius_scale=bfm_arg.mobius_scale;
+	BAP_.zolo_hi=bfm_arg.zolo_hi;
+	BAP_.zolo_lo=bfm_arg.zolo_lo;
+	BAP_.Ls=bfm_arg.Ls;
+	BAP_.precon_5d=bfm_arg.precon_5d;
+	HDCGInstance::Params.SubspaceRationalLo=1.0;
+	HDCGInstance::Params.SubspaceRationalResidual=1e-4;
+	HDCGInstance::Params.SubspaceRationalLs=bfm_arg.Ls;
+	HDCGInstance::Params.SubspaceRationalMass=cg_arg->mass;
+	BAP_.solveMobiusDminus=1;
+
+//	int _Ns = 20;
+//	int block[5]={4,4,4,4,Ls};
+//	int quad[4]={4,4,4,4};
+//	control = HDCGController<Float>::setInstance(Ls,_Ns,block,quad);
+	control = new HDCG_wrapper;
+	HDCGInstance::setInstance(control);
+	HDCGInstance::Params.PreconditionerKrylovResidual=1e-4;
+	HDCGInstance::Params.PreconditionerKrylovIterMax=8;
+	HDCGInstance::Params.PreconditionerKrylovShift=1.0;
+	control->HDCG_init( HDCGInstance::Params, BAP_); 
+    	Float *gauge = (Float *)(this->GaugeField());
+	control->HDCG_gauge_import_cps<Float>(gauge);
     	SetMass(cg_arg->mass);
+	control->HDCG_set_mass(cg_arg->mass);
     	VRB.Result(cname,fname,"HDCG first called with nthreads=%d. Initialzing Ldop\n",threads);
-	control->setHDCG(bd,bf); 
-    	VRB.Result(cname,fname,"control->setHDCG<Float,float>(bd,bf) done\n");
-#if 0
-	hdcg = control->getHDCG();
-	hdcg->RelaxSubspace<Float>(&bd);
-	hdcg->LdopDeflationBasis(control->get_vec_len());
-	hdcg->LdopDeflationBasisDiagonalise(control->get_vec_len());
-	hdcg->SinglePrecSubspace();
-#endif 
-	hdcg = control->getHDCG();
+	control->HDCG_subspace_init();
+	control->HDCG_subspace_compute(0);
+	control->HDCG_subspace_refine();
+//    }
+//    BfmMultiGrid<Float> *hdcg = control->ldop_d;
+//    if (!hdcg){
+//	control->setHDCG(bd,bf); 
+//	hdcg = control->getHDCG();
     }
-    hdcg->InnerKrylovIterMax  = 8;
-    hdcg->SubspaceSurfaceDepth= 256;
-    hdcg->InnerKrylovShift    = 1.0;
-    hdcg->PcgShift       = 1.0;
-    hdcg->PcgType        = PcgAdef2f;
+////    hdcg->InnerKrylovIterMax  = 8;
+//    hdcg->SubspaceSurfaceDepth= 256;
+//    hdcg->InnerKrylovShift    = 1.0;
+//    hdcg->PcgShift       = 1.0;
+//    hdcg->PcgType        = PcgAdef2f;
 //    filecg=file+".PcgADef2f_1e-2";
-    bd.InverterLoggingBegin("BfmMultiGrid.log");
+//    bd.InverterLoggingBegin("BfmMultiGrid.log");
 }
 
     Fermion_t in[2]  = {bd.allocFermion(), bd.allocFermion()};
@@ -449,9 +495,9 @@ if (cg_arg->Inverter == HDCG){
                 break;
             case HDCG:
 {
-    HDCGController<Float> *control = HDCGController<Float>::getInstance();
-    BfmMultiGrid<Float> *hdcg = control->getHDCG();
-                iter = bd.HD_CGNE_M<Float>(hdcg,out, in);
+//    HDCGController<Float> *control = HDCGController<Float>::getInstance();
+//    BfmMultiGrid<Float> *hdcg = control->getHDCG();
+//                iter = bd.HD_CGNE_M<Float>(hdcg,out, in);
 //#pragma omp for 
 //    for(int i=0;i<threads;i++) {
 //      hdcg.axpy(chi_h[Odd],src,src,0.0);
