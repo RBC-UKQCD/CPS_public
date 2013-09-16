@@ -419,6 +419,13 @@ if (cg_arg->Inverter == HDCG){
 	HDCGInstance::Params.SubspaceRationalResidual=1e-4;
 	HDCGInstance::Params.SubspaceRationalLs=bfm_arg.Ls;
 	HDCGInstance::Params.SubspaceRationalMass=cg_arg->mass;
+//	HDCGInstance::Params.LittleDopSolverResidual=1e-4;
+	HDCGInstance::Params.LittleDopSolverResidualInner=1e-4;
+	HDCGInstance::Params.LittleDopSolverResidualVstart=1e-4;
+	HDCGInstance::Params.LittleDopSolverResidualSubspace;
+	HDCGInstance::Params.LittleDopSolverIterMax=100;
+	HDCGInstance::Params.LittleDopSolver = LittleDopSolverCG;
+
 	BAP_.solveMobiusDminus=1;
 
 //	int _Ns = 20;
