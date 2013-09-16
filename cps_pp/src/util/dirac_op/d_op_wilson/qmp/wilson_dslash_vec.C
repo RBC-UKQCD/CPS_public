@@ -1117,20 +1117,20 @@ printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,
 
 #undef NL_OMP
 {
-	int i_nl,i_mu;
 #pragma omp parallel for default(shared)
 	for( int i=0;i<num_nl[0];i++){ 
-		i_nl=i;
-		i_mu = 0;
+//		int i_nl;
+//		i_nl=i;
+//		i_mu = 0;
 	Float tmp[SPINOR_SIZE];
 	Float tmp1[SPINOR_SIZE];
 
 		/* 1-gamma_0 */
 		/*-----------*/
 
-		Float *chi = chi_p + SPINOR_SIZE * ( *(t_ind[0]+i_nl) );
-		Float *u   = u_p + GAUGE_SIZE * ( *(u_ind[0]+i_nl) );
-		Float *psi = ind_buf[0] + i_nl* SPINOR_SIZE*vec_len;
+		Float *chi = chi_p + SPINOR_SIZE * ( *(t_ind[0]+i) );
+		Float *u   = u_p + GAUGE_SIZE * ( *(u_ind[0]+i) );
+		Float *psi = ind_buf[0] + i* SPINOR_SIZE*vec_len;
 		int r, c, s;
 		for(int vec_ind=0;vec_ind<vec_len;vec_ind++){
 			MINUSX(u,tmp,tmp1,sdag,psi);
@@ -1141,9 +1141,9 @@ printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,
 			psi += SPINOR_SIZE;
 			chi +=vec_offset;
 		}
-		chi = chi_p + SPINOR_SIZE * ( *(t_ind[4]+i_nl) );
-		u   = u_p + GAUGE_SIZE * ( *(u_ind[4]+i_nl) );
-		psi = ind_buf[4] + i_nl* SPINOR_SIZE*vec_len;
+		chi = chi_p + SPINOR_SIZE * ( *(t_ind[4]+i) );
+		u   = u_p + GAUGE_SIZE * ( *(u_ind[4]+i) );
+		psi = ind_buf[4] + i* SPINOR_SIZE*vec_len;
 		for(int vec_ind=0;vec_ind<vec_len;vec_ind++){
 			for(s=0;s<4;s++)
 			for(c=0;c<3;c++)
@@ -1156,7 +1156,7 @@ printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,
 
 #pragma omp parallel for default(shared)
 	for( int i=0;i<num_nl[1];i++){ 
-		i_mu = 1;
+//		i_mu = 1;
 	Float tmp[SPINOR_SIZE];
 	Float tmp1[SPINOR_SIZE];
 	Float tmp2[SPINOR_SIZE];
@@ -1189,7 +1189,7 @@ printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,
 
 #pragma omp parallel for default(shared)
 	for( int i=0;i<num_nl[2];i++){ 
-		i_mu = 0;
+//		i_mu = 0;
 	Float tmp[SPINOR_SIZE];
 	Float tmp3[SPINOR_SIZE];
 
@@ -1223,7 +1223,7 @@ printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,
 	}
 #pragma omp parallel for default(shared)
 	for( int i=0;i<num_nl[3];i++){ 
-		i_mu = 0;
+//		i_mu = 0;
 	Float tmp[SPINOR_SIZE];
 	Float tmp4[SPINOR_SIZE];
 
