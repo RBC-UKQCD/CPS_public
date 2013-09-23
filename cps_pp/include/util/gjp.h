@@ -383,6 +383,7 @@ public:
     default: printf("GJP::TwistBc(): Incorrect dir for twist\n"); 
       exit(0);
     }
+    return 0.;
   }
 
   int Traj(){ return doext_p->trajectory; }

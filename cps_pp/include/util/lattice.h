@@ -1052,6 +1052,7 @@ class Lattice
 			 CnvFrmType cnv_frm = CNV_FRM_YES){
 		char *fname = "FeigSolv(**V,F*,L*,C)";
 		ERR.NotImplemented(cname,fname);
+		return -1;
 	}
 
   
