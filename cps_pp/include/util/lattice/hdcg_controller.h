@@ -9,6 +9,8 @@
 #include<bfm_qdp.h>
 #include<BfmMultiGrid.h>
 #include<util/time_cps.h>
+#include<comms/sysfunc_cps.h>
+//#include<comms/sysfunc_qmp.h>
 
 #include <bfm_hdcg_wrapper.h>
 class HDCGInstance{
@@ -24,6 +26,48 @@ class HDCGInstance{
 		}
 		_instance=NULL;
 	}
+	static void SetDefault(){
+		if (!CPS_NAMESPACE::UniqueID()) printf("HDCGInstance()\n");
+// Partially tuned for 64^3, from PAB's message
+#if 0
+		Params.NumberSubspace=40;
+		Params.SubspaceRationalLs=8;
+		Params.SubspaceRationalLo=0.001;
+		Params.SubspaceRationalResidual=1e-5;
+		Params.SubspaceRationalRefine=1;
+		Params.SubspaceRationalRefineResidual=1e-5;
+		Params.SubspaceRationalRefineLo=0.001;
+		Params.SubspaceSurfaceDepth=12;
+		Params.PreconditionerKrylovResidual=1e-5;
+		Params.PreconditionerKrylovIterMax=8;
+		Params.PreconditionerKrylovShift=1.0;
+		Params.LittleDopSolverResidualInner=5e-3;
+		Params.LittleDopSolverResidualVstart=1e-4;
+		Params.LittleDopSolverResidualSubspace=1.0e-7;
+		Params.LittleDopSolverIterMax = 10000;
+		Params.LittleDopSolver = LittleDopSolverCG;
+#else  
+// 48^3
+		Params.NumberSubspace=44;
+		Params.SubspaceRationalLs=12; // Ls/2
+		Params.SubspaceRationalLo=0.001;
+		Params.SubspaceRationalResidual=1e-5;
+		Params.SubspaceRationalRefine=1;
+		Params.SubspaceRationalRefineResidual=1e-4;
+		Params.SubspaceRationalRefineLo=0.003;
+		Params.SubspaceSurfaceDepth=24;
+		Params.PreconditionerKrylovResidual=1e-5;
+		Params.PreconditionerKrylovIterMax=6;
+		Params.PreconditionerKrylovShift=1.0;
+		Params.LittleDopSolverResidualInner=5e-3;
+		Params.LittleDopSolverResidualVstart=1e-5;
+		Params.LittleDopSolverResidualSubspace=1.0e-7;
+		Params.LittleDopSolverIterMax = 10000;
+//		Params.LittleDopSolver = LittleDopSolverCG;
+#endif
+		if (!CPS_NAMESPACE::UniqueID()) printf("HDCGInstance::Params defaults set\n");
+	}
+//	~HDCGInstance(){}
 };
 
 #if 0

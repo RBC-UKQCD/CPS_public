@@ -7,7 +7,6 @@
 #include <util/lattice/bfm_evo.h>
 #include <util/lattice/bfm_eigcg.h>
 //#include <util/lattice/bfm_hdcg.h>
-#include <util/lattice/hdcg_controller.h>
 #include <util/lattice/fbfm.h>
 #include <util/wilson.h>
 #include <util/verbose.h>
@@ -41,8 +40,15 @@ class HDCGInstance{
 };
 #endif
 
+#include <util/lattice/hdcg_controller.h>
+
+
+
+HDCGInstance hdcg_instance; // to invoke constructor with defaults
 BfmMultiGridParams HDCGInstance::Params;
- HDCG_wrapper  *HDCGInstance:: _instance=NULL;
+HDCG_wrapper  *HDCGInstance:: _instance=NULL;
+
+
 
 CPS_START_NAMESPACE
 
@@ -415,16 +421,6 @@ if (cg_arg->Inverter == HDCG){
 	BAP_.zolo_lo=bfm_arg.zolo_lo;
 	BAP_.Ls=bfm_arg.Ls;
 	BAP_.precon_5d=bfm_arg.precon_5d;
-	HDCGInstance::Params.SubspaceRationalLo=1.0;
-	HDCGInstance::Params.SubspaceRationalResidual=1e-4;
-	HDCGInstance::Params.SubspaceRationalLs=bfm_arg.Ls;
-	HDCGInstance::Params.SubspaceRationalMass=cg_arg->mass;
-//	HDCGInstance::Params.LittleDopSolverResidual=1e-4;
-	HDCGInstance::Params.LittleDopSolverResidualInner=1e-4;
-	HDCGInstance::Params.LittleDopSolverResidualVstart=1e-4;
-	HDCGInstance::Params.LittleDopSolverResidualSubspace;
-	HDCGInstance::Params.LittleDopSolverIterMax=100;
-	HDCGInstance::Params.LittleDopSolver = LittleDopSolverCG;
 
 	BAP_.solveMobiusDminus=1;
 
@@ -434,9 +430,10 @@ if (cg_arg->Inverter == HDCG){
 //	control = HDCGController<Float>::setInstance(Ls,_Ns,block,quad);
 	control = new HDCG_wrapper;
 	HDCGInstance::setInstance(control);
-	HDCGInstance::Params.PreconditionerKrylovResidual=1e-4;
-	HDCGInstance::Params.PreconditionerKrylovIterMax=8;
-	HDCGInstance::Params.PreconditionerKrylovShift=1.0;
+	HDCGInstance::Params.SubspaceRationalMass=cg_arg->mass;
+//	HDCGInstance::Params.PreconditionerKrylovResidual=1e-4;
+//	HDCGInstance::Params.PreconditionerKrylovIterMax=8;
+//	HDCGInstance::Params.PreconditionerKrylovShift=1.0;
 	control->HDCG_init( HDCGInstance::Params, BAP_); 
     	Float *gauge = (Float *)(this->GaugeField());
 	control->HDCG_gauge_import_cps<Float>(gauge);
