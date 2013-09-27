@@ -15,6 +15,9 @@
 #include <alg/qpropw_arg.h>
 #include <alg/meas_arg.h>
 #ifdef USE_HDCG
+#ifdef BFM_V3
+#include <bfm_hdcg_wrapper.h>
+#endif
 #include <util/lattice/hdcg_controller.h>
 #endif
 
@@ -273,22 +276,24 @@ void run_all(Lattice &lat,
 
     Float dtime0 = dclock();
 
+#ifndef GITLAB
     FixGauge fg(lat, fix_gauge_arg, traj);
+#endif
 
     Float dtime1 = dclock();
 
     // l untwisted
-    run_wall_prop(&lprop_e, &lprop, l_ut_loc, lat, lqpropw_arg, NULL, traj, true );
+    run_wall_prop("lprop",&lprop_e, &lprop, l_ut_loc, lat, lqpropw_arg, NULL, traj, true );
     VRB.Result(cname,"run_wall_prop()(l untwisted)", "Done\n");
 
     // l twisted
     twisted_bc(lat, ltw, true);
-    run_wall_prop(&ltwst_e, &ltwst, l_tw_loc, lat, lqpropw_arg, NULL, traj, false);
+    run_wall_prop("ltwst", &ltwst_e, &ltwst, l_tw_loc, lat, lqpropw_arg, NULL, traj, false);
     VRB.Result(cname,"run_wall_prop()(l twisted)", "Done\n");
     twisted_bc(lat, ltw, false);
 
     // s untwisted
-    run_wall_prop(NULL, &sprop, s_ut_loc, lat, sqpropw_arg, NULL, traj, true );
+    run_wall_prop("sprop",NULL, &sprop, s_ut_loc, lat, sqpropw_arg, NULL, traj, true );
     VRB.Result(cname,"run_wall_prop()(s untwisted)", "Done\n");
 
     // s twisted
@@ -318,7 +323,7 @@ void run_all(Lattice &lat,
     stwst.clear();
 
     // twisted light for K -> pi pi
-    run_mom_prop(&ltwst_e, &ltwst, l_tw_loc, lat, lqpropw_arg, &l_eigcg_arg, traj, mom);
+    run_mom_prop("ltwst",&ltwst_e, &ltwst, l_tw_loc, lat, lqpropw_arg, &l_eigcg_arg, traj, mom);
     VRB.Result(cname,"run_mom_prop()", "Done\n");
 
     Float dtime4 = dclock();
@@ -527,17 +532,50 @@ void init_bfm(int *argc, char **argv[])
     bfmarg::Reproduce(0);
     bfmarg::ReproduceChecksum(0);
     bfmarg::ReproduceMasterCheck(0);
-    bfmarg::Verbose(11);
+//    bfmarg::Verbose(11);
     bfmarg::UseCGdiagonalMee(0);
 
+
 #ifdef USE_HDCG
+#ifndef BFM_V3
 {
         int Ls = GJP.Sites(4);
         int Ns = 40;
-        int block[5]={8,4,4,8,Ls};
-        int quad[4]={8,4,4,8};
+	int block[5],quad[4];
+	int _block[5]={8,4,4,8,Ls};
+	for(int i=0;i<4;i++){
+		block[i] = (GJP.NodeSites(i)>_block[i])? _block[i] : GJP.NodeSites(i);
+		quad[i] = block[i];
+		if (!UniqueID()) printf("block quad[%d] = %d\n",i,block[i]);
+	}
+	block[4]= Ls;
+	if (!UniqueID()) printf("block[%d] = %d\n",4,block[4]);
         HDCGController<Float>::setInstance(Ls,Ns,block,quad);
 }
+#else
+{
+        int Ls = GJP.Sites(4);
+        int Ns = 40;
+	int block[5],quad[4];
+	int _block[5]={8,4,4,8,Ls};
+	for(int i=0;i<4;i++){
+		block[i] = (GJP.NodeSites(i)>_block[i])? _block[i] : GJP.NodeSites(i);
+		quad[i] = block[i];
+		if (!UniqueID()) printf("block quad[%d] = %d\n",i,block[i]);
+	}
+	block[4]= Ls;
+	if (!UniqueID()) printf("block[%d] = %d\n",4,block[4]);
+        HDCGInstance::SetDefault();
+        HDCGInstance::Params.NumberSubspace=Ns;
+        HDCGInstance::Params.Ls=Ls;
+//        HDCGInstance::Params.SubspaceRationalLs=8;
+//        HDCGInstance::Params.PreconditionerKrylovResidual=1e-4;
+//        HDCGInstance::Params.PreconditionerKrylovIterMax=8;
+	for(int i=0;i<5;i++)
+        HDCGInstance::Params.Block[i]=block[i];
+}
 #endif
+#endif
+
     Fbfm::use_mixed_solver = true;
 }

@@ -15,6 +15,9 @@
 #include <util/time_cps.h>
 #include <util/verbose.h>
 #include <util/error.h>
+
+#undef USE_HDCG
+
 #ifdef USE_HDCG
 #include <util/lattice/hdcg_controller.h>
 #endif
@@ -27,6 +30,8 @@
 #include "eigcg.h"
 #include "my_util.h"
 #include "run_mres.h"
+
+static const int SAVE_PROP = 0;
 
 static const char *cname = "";
 
@@ -81,7 +86,8 @@ static void collect_lowmodes(Lattice &lat,
     qp_arg.cg.true_rsd = true_rsd;
 }
 
-void run_wall_prop(AllProp *prop_e,
+void run_wall_prop(const char *pname,
+		   AllProp *prop_e,
                    AllProp *prop,
                    IntArray &eloc, 
                    Lattice &lat,
@@ -136,6 +142,10 @@ void run_wall_prop(AllProp *prop_e,
             for(unsigned i = 0; i < eloc.v.v_len; ++i) {
                 qp_arg.t = eloc.v.v_val[i];
                 VRB.Result(cname, fname, "Solving exact propagator at %d\n", qp_arg.t);
+		string t_name = string(pname)+"_e_"+tostring(qp_arg.t)+"_"+tostring(bc)+"."+tostring(traj);
+		VRB.Result(cname,fname,"qp_wall.SaveQProp(%s,0)\n",t_name.c_str());
+		qp_arg.file = &t_name[0];
+		qp_arg.save_prop = SAVE_PROP;
 
                 QPropWWallSrc qp_wall(lat, &qp_arg, &com_prop);
                 if(do_mres) {
@@ -147,11 +157,16 @@ void run_wall_prop(AllProp *prop_e,
             }
             qp_arg.cg.stop_rsd = stop_rsd;
             qp_arg.cg.true_rsd = true_rsd;
+	    qp_arg.save_prop = 0;
         }
 
         // inexact propagators
         for(int t = 0; t < GJP.Sites(3); ++t) {
             qp_arg.t = t;
+	    string t_name = string(pname)+"_"+tostring(qp_arg.t)+"_"+tostring(bc)+"."+tostring(traj);
+	    VRB.Result("",fname,"qp_wall.SaveQProp(%s,0)\n",t_name.c_str());
+		qp_arg.file = &t_name[0];
+		qp_arg.save_prop = SAVE_PROP;
             QPropWWallSrc qp_wall(lat, &qp_arg, &com_prop);
             if(do_mres) {
                 run_mres_za(qp_wall, qp_arg,
@@ -159,6 +174,7 @@ void run_wall_prop(AllProp *prop_e,
                             traj);
             }
             prop->add(qp_wall, qp_arg.t, bc == 0);
+	    qp_arg.save_prop = 0;
         }
 
         delete eig_cg;
@@ -170,7 +186,8 @@ void run_wall_prop(AllProp *prop_e,
     GJP.Tbc(BND_CND_PRD);
 }
 
-void run_mom_prop(AllProp *prop_e,
+void run_mom_prop(const char *pname,
+		  AllProp *prop_e,
                   AllProp *prop,
                   IntArray &eloc,
                   Lattice &lat,
@@ -231,19 +248,37 @@ void run_mom_prop(AllProp *prop_e,
                 qp_arg.t = eloc.v.v_val[i];
                 VRB.Result(cname, fname, "Solving exact propagator at %d\n", qp_arg.t);
 
+	    string t_name = string(pname)+"_"+tostring(qp_arg.t)+"_"+tostring(bc)
+		+tostring(mom[0])
+		+tostring(mom[1])
+		+tostring(mom[2])
+		+"."+tostring(traj);
+		VRB.Result("",fname,"qp_mom.SaveQProp(%s,0)\n",t_name.c_str());
+		qp_arg.file = &t_name[0];
+		qp_arg.save_prop = SAVE_PROP;
                 QPropWMomCosTwistSrc qp_mom(lat, &qp_arg, mom, &com_prop);
                 prop_e->add(qp_mom, qp_arg.t, bc == 0);
             }
             qp_arg.cg.stop_rsd = stop_rsd;
             qp_arg.cg.true_rsd = true_rsd;
+	    qp_arg.save_prop = 0;
         }
 
         // inexact propagators
         for(int t = 0; t < GJP.Sites(3); ++t) {
             qp_arg.t = t;
+	    string t_name = string(pname)+"_"+tostring(qp_arg.t)+"_"+tostring(bc)
+		+tostring(mom[0])
+		+tostring(mom[1])
+		+tostring(mom[2])
+		+"."+tostring(traj);
+	    VRB.Result("",fname,"qp_mom.SaveQProp(%s,0)\n",t_name.c_str());
+		qp_arg.file = &t_name[0];
+		qp_arg.save_prop = SAVE_PROP;
             QPropWMomCosTwistSrc qp_mom(lat, &qp_arg, mom, &com_prop);
             prop->add(qp_mom, qp_arg.t, bc == 0);
         }
+	qp_arg.save_prop = 0;
 
         delete eig_cg;
         lat.BondCond();

@@ -1,0 +1,7 @@
+class IntArray d_mom_kpp={
+Array v[3]={
+int v[0] = 0
+int v[1] = 0
+int v[2] = 1
+}
+}

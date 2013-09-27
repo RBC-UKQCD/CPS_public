@@ -1,0 +1,12 @@
+class IntArray l_tw_loc={
+Array v[8]={
+int v[0] = 0
+int v[1] = 28
+int v[2] = 24
+int v[3] = 20
+int v[4] = 16
+int v[5] = 12
+int v[6] = 8
+int v[7] = 4
+}
+}

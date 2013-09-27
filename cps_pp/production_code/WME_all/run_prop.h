@@ -21,7 +21,8 @@ namespace cps {
     class Lattice;
 };
 
-void run_wall_prop(AllProp *prop_e,
+void run_wall_prop(const char *pname,
+		   AllProp *prop_e,
                    AllProp *prop,
                    cps::IntArray &eloc, 
                    cps::Lattice &lat,
@@ -30,7 +31,8 @@ void run_wall_prop(AllProp *prop_e,
                    int traj,
                    bool do_mres);
 
-void run_mom_prop(AllProp *prop_e,
+void run_mom_prop(const char *pname,
+		  AllProp *prop_e,
                   AllProp *prop,
                   cps::IntArray &eloc,
                   cps::Lattice &lat,
