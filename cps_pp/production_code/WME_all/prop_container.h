@@ -177,6 +177,9 @@ private:
     void store(const std::string &fn,
                const std::vector<cps::WilsonMatrix> &prop,
                int t)const;
+    void store_qio(const std::string &fn,
+               const std::vector<cps::WilsonMatrix> &prop,
+               int t)const;
 private:
     const size_t lcl_vol;
     const size_t t_size_glb;
