@@ -481,6 +481,12 @@ if (cg_arg->Inverter == HDCG){
     bd.cps_impexFermion((Float *)f_out, out, 1);
 
     int iter = -1;
+if((cg_arg->Inverter == HDCG)) {
+	HDCG_wrapper *control = HDCGInstance::getInstance();
+	control->HDCG_set_mass(cg_arg->mass);
+        control->HDCG_invert(out, in, cg_arg->stop_rsd, cg_arg->max_num_iter);
+}
+else {
 #pragma omp parallel
     {
         if(use_mixed_solver && (cg_arg->Inverter != HDCG)) {
@@ -498,16 +504,9 @@ if (cg_arg->Inverter == HDCG){
                 iter = bd.EIG_CGNE_M(out, in);
                 break;
             case HDCG:
-{
-//    HDCGController<Float> *control = HDCGController<Float>::getInstance();
-//    BfmMultiGrid<Float> *hdcg = control->getHDCG();
-//                iter = bd.HD_CGNE_M<Float>(hdcg,out, in);
-//#pragma omp for 
-//    for(int i=0;i<threads;i++) {
-//      hdcg.axpy(chi_h[Odd],src,src,0.0);
-//      hdcg.Pcg(out[Odd],src,in[Even],1.0e-6,5.0e-3);
-//    }
-}
+                if(bd.isBoss()) {
+                    printf("%s::%s: HDCG implemented outside threaded region. Shouldn't have reached this line!\n", cname, fname);
+                }
                 break;
             default:
                 if(bd.isBoss()) {
@@ -518,6 +517,7 @@ if (cg_arg->Inverter == HDCG){
             }
         }
     }
+}
 if (cg_arg->Inverter == HDCG){
 //    HDCGController<Float> *control = HDCGController::getInstance();
 //    BfmMultiGrid<Float> *hdcg = control->getHDCG();
