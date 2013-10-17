@@ -803,9 +803,10 @@ void Fbfm::Fconvert(Vector *f_field,
                     StrOrdType from)
 {
     const char *fname = "Fconvert()";
+    VRB.Func(cname,fname);
 
     // nothing needs to be done
-    //ERR.NotImplemented(cname, fname);
+//    ERR.NotImplemented(cname, fname);
 }
 
 
