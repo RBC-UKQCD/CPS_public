@@ -1,5 +1,4 @@
 #include <config.h>
-#include "../qmp/wilson_dslash_vec.C"
 //#ifdef USE_SSE
 #if 0
 #include "../sse/sse-wilson_dslash.C"
@@ -592,6 +591,7 @@ void wilson_dslash(IFloat *chi_p_f,
 CPS_END_NAMESPACE
 #else //USE_QMP
 #if 1 
+#include "../qmp/wilson_dslash_vec.C"
 CPS_START_NAMESPACE
 void wilson_dslash(IFloat *chi_p_f, 
 			IFloat *u_p_f, 

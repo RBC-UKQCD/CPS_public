@@ -183,6 +183,66 @@ using namespace std;
 enum QIO_PROP_SOURCE_TYPES {QIO_UNKNOWN_SOURCE=0, QIO_SCALAR_SOURCE, QIO_FULL_SOURCE};
 
 //! initialize everything needed for QIO
+#ifndef USE_QIO
+//#include <util/qio_dummy.h>
+class qio_init {
+
+ private:
+
+  char *cname;
+//  QMP_bool_t qmp_run;
+
+ public:
+
+  qio_init(int argc, char* argv[]):cname("qio_init")
+    {
+
+      const char * fname = "qio_init()";
+      ERR.NotImplemented(cname,fname);
+      
+    }
+
+
+
+    virtual ~qio_init()
+      {
+	const char * fname = "~qio_init()";
+	ERR.NotImplemented(cname,fname);
+      }
+
+  void qio_setLayout()
+      {
+	const char * fname = "qio_setLayout()";
+	ERR.NotImplemented(cname,fname);
+      }
+
+  void qio_setFilesystem()
+      {
+	const char * fname = "qio_setFilesystem()";
+	ERR.NotImplemented(cname,fname);
+      }
+  
+
+};
+
+// general functions for reading global data
+
+
+//void qio_putGlobal(char *buf, size_t index, int count, void *arg);
+
+//void qio_putGlobalSingle(char *buf, size_t index, int count, void *arg);
+
+
+// writing global data
+
+
+//void qio_getGlobal(char *buf, size_t index, int count, void *arg);
+
+//void qio_getGlobalSingle(char *buf, size_t index, int count, void *arg);
+
+#else
+
+//! initialize everything needed for QIO
 class qio_init {
 
  private:
@@ -321,8 +381,7 @@ void qio_getGlobal(char *buf, size_t index, int count, void *arg);
 void qio_getGlobalSingle(char *buf, size_t index, int count, void *arg);
 
 
-
-
+#endif // USE_QIO
 
 
 CPS_END_NAMESPACE

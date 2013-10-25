@@ -6,6 +6,39 @@
 CPS_START_NAMESPACE
 using namespace std;
 
+#ifndef USE_QIO
+class qio_readMuon: private qio_init {
+
+ private:
+
+  char *cname;
+
+ public:
+
+  qio_readMuon(int argc, char *argv[]): qio_init(argc, argv), cname("qio_readMuon"){}
+
+  virtual ~qio_readMuon(){
+  }
+
+  void read(char *infile, Lattice &lat, Rcomplex *muon, int count, int volFormat=0){
+      ERR.NotImplemented(cname,"read()");
+	}
+
+#if 0
+ private:
+  void qio_openInput(char *filename, int volFormat){
+      ERR.NotImplemented(cname,"qio_openInput()");
+	}
+  
+
+  void qio_closeInput(){
+      ERR.NotImplemented(cname,"qio_closeInput()");
+	}
+#endif
+
+};
+
+#else
 
 class qio_readMuon: private qio_init {
 
@@ -35,7 +68,7 @@ class qio_readMuon: private qio_init {
     { QIO_close_read(qio_Input);}
 
 };
-
+#endif //USE_QIO
 
 
 CPS_END_NAMESPACE

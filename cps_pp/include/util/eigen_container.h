@@ -29,8 +29,10 @@
 #include <alg/no_arg.h>
 #include <util/time_cps.h>
 #include <util/qcdio.h>
+#ifdef USE_QIO
 #include <util/qio_writeGenericFields.h>
 #include <util/qio_readGenericFields.h>
+#endif
 #include <util/dirac_op.h>
 #include <alg/cg_arg.h>
 
@@ -428,6 +430,25 @@ class EigenContainer {
       }
   }
 
+#ifndef USE_QIO
+  // load from file with the specified "nev" index
+  Vector* nev_load( int index )
+  {
+
+    ERR.NotImplemented(cname,"nev_load(I)");
+    return NULL;
+  }
+
+  // save to file with the specified "nev" index
+  void nev_save( int index, Vector* evec_,
+		 char* field_type_label,
+		 char* ensemble_id="n/a",
+		 char* ensemble_label="n/a",
+		 int seqNum=777 )
+  {
+    ERR.NotImplemented(cname,"nev_save(I)");
+  }
+#else
 
   // load from file with the specified "nev" index
   Vector* nev_load( int index )
@@ -499,6 +520,7 @@ class EigenContainer {
 
     if(!UniqueID()) printf("nev_save, time to save :%e sec\n",time-dclock());
   }
+#endif
 
 
   void nev_check( Vector* vtmp, Float mass, Float* residual = 0, Float* eval = 0)
