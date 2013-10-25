@@ -2946,7 +2946,9 @@ QPropWZ3BWallSrc::QPropWZ3BWallSrc(Lattice& lat, QPropWArg* arg,
         assert(rnd < 3);
         rand_num[i] = Z3consts[rnd];
     }
+#ifdef USE_QMP //should be OK as QMP is needed for any multi-node build now
     QMP_broadcast(rand_num.data(), sizeof(Rcomplex) * rand_size);
+#endif
 
     Run();
 }

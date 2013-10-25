@@ -8,6 +8,47 @@
 CPS_START_NAMESPACE
 using namespace std;
 
+#ifndef USE_QIO
+class qio_writeMuon {
+
+ private:
+
+  char *cname;
+
+ public:
+
+ qio_writeMuon( int argc, char *argv[]): cname("qio_writeMuon") { }
+  
+  virtual ~qio_writeMuon() { }
+  
+  void write(char *outfile, Lattice &lat, Rcomplex *muon, int count,
+	      char *ildgLFN="added ildgLFN", 
+	      int volFormat=0, 
+	      FP_FORMAT floatFormat=FP_AUTOMATIC){
+      ERR.NotImplemented(cname,"wrte()");
+	}
+  
+  void setHeader(const char * ensemble_id, const char * ensemble_label, const int traj);
+  
+  
+ private:
+  
+
+  void qio_openOutput(char *filename, char *stringLFN, char *xml_write_file, int volFormat){
+      ERR.NotImplemented(cname,"qio_openOutput()");
+	}
+
+  void qio_closeOutput(){
+      ERR.NotImplemented(cname,"qio_closeOutput()");
+	}
+
+  void initHeader() { }
+
+
+
+};
+#else
+
 
 class qio_writeMuon: private qio_init {
 
@@ -61,6 +102,7 @@ class qio_writeMuon: private qio_init {
 
 
 };
+#endif
 
 
 
