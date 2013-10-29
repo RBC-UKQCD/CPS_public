@@ -1,13 +1,13 @@
 #ifndef __QIOREADMUON__
 #define __QIOREADMUON__
 
-#include <util/qio_general.h>
 
 CPS_START_NAMESPACE
 using namespace std;
 
 #ifndef USE_QIO
-class qio_readMuon: private qio_init {
+
+class qio_readMuon {
 
  private:
 
@@ -15,7 +15,7 @@ class qio_readMuon: private qio_init {
 
  public:
 
-  qio_readMuon(int argc, char *argv[]): qio_init(argc, argv), cname("qio_readMuon"){}
+  qio_readMuon(int argc, char *argv[]): cname("qio_readMuon"){}
 
   virtual ~qio_readMuon(){
   }
@@ -39,6 +39,8 @@ class qio_readMuon: private qio_init {
 };
 
 #else
+
+#include <util/qio_general.h>
 
 class qio_readMuon: private qio_init {
 

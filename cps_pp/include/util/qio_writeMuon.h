@@ -1,7 +1,6 @@
 #ifndef __QIOWRITEMUON__
 #define __QIOWRITEMUON__
 
-#include <util/qio_general.h>
 #include <util/fpconv.h>
 
 
@@ -50,6 +49,7 @@ class qio_writeMuon {
 #else
 
 
+#include <util/qio_general.h>
 class qio_writeMuon: private qio_init {
 
  private:
