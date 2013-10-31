@@ -76,7 +76,7 @@ inline unsigned int SeedS(){return SERIAL_SEED;}  //!< Gets a RNG seed.
 inline unsigned int SeedT(){return SERIAL_SEED;}  //!< Gets a RNG seed.
 inline unsigned int SeedST(){return SERIAL_SEED;} //!< Gets a RNG seed.
 
-#if 1
+#ifndef HAVE_SYNC
 //! A barrier function.
 inline unsigned int sync(){return 1;}
 #endif

@@ -22,7 +22,8 @@
 
 #if TARGET == cpsMPI
 
-namespace cps{
+//namespace cps{
+CPS_START_NAMESPACE
 
 namespace MPISCU{
   //! Reimplementation of printf that prints from only a single node.
@@ -51,7 +52,8 @@ namespace MPISCU{
 } // namespace MPISCU
 
 
-} // namespace cps
+//} // namespace cps
+CPS_END_NAMESPACE
 
 #endif
 #endif

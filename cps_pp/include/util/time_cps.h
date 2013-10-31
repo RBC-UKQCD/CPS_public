@@ -37,7 +37,7 @@ Float print_flops(const char cname[], const char fname[], double nflops, struct 
 
 static double time_now, time_prev;
 inline double time_elapse(){
-  time_now = cps::dclock();
+  time_now = CPS_NAMESPACE::dclock();
   double elp  = time_now - time_prev;
   time_prev=time_now;
   return elp;

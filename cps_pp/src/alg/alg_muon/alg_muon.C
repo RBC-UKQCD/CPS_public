@@ -16,6 +16,7 @@
 #include <util/qcdio.h>
 #include <util/momentum.h>
 #include <comms/glb.h>
+#include <comms/scu.h>
 #include <alg/alg_eig.h>
 #include <alg/eig_arg.h>
 #include <util/lat_cont.h>
