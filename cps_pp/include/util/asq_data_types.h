@@ -7,6 +7,7 @@
 #endif
 #endif
 #include <stdint.h>
+#include <conf.h>
 #include <precision.h>
 
 #endif
