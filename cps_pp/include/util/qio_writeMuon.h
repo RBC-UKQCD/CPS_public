@@ -4,10 +4,10 @@
 #include <util/fpconv.h>
 
 
-CPS_START_NAMESPACE
 using namespace std;
 
 #ifndef USE_QIO
+CPS_START_NAMESPACE
 class qio_writeMuon {
 
  private:
@@ -46,10 +46,12 @@ class qio_writeMuon {
 
 
 };
+CPS_END_NAMESPACE
 #else
 
 
 #include <util/qio_general.h>
+CPS_START_NAMESPACE
 class qio_writeMuon: private qio_init {
 
  private:
@@ -102,9 +104,9 @@ class qio_writeMuon: private qio_init {
 
 
 };
+CPS_END_NAMESPACE
 #endif
 
 
 
-CPS_END_NAMESPACE
 #endif // __QIOWRITEMUON__

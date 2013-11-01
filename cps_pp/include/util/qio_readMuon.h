@@ -1,12 +1,12 @@
+#include <config.h>
 #ifndef __QIOREADMUON__
 #define __QIOREADMUON__
 
-
-CPS_START_NAMESPACE
 using namespace std;
 
 #ifndef USE_QIO
 
+CPS_START_NAMESPACE
 class qio_readMuon {
 
  private:
@@ -37,11 +37,13 @@ class qio_readMuon {
 #endif
 
 };
+CPS_END_NAMESPACE
 
 #else
 
 #include <util/qio_general.h>
 
+CPS_START_NAMESPACE
 class qio_readMuon: private qio_init {
 
  private:
@@ -70,10 +72,11 @@ class qio_readMuon: private qio_init {
     { QIO_close_read(qio_Input);}
 
 };
+CPS_END_NAMESPACE
+
 #endif //USE_QIO
 
 
-CPS_END_NAMESPACE
 #endif // __QIOREADMUON__
 
 
