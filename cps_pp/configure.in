@@ -190,7 +190,7 @@ if test "$enable_optimise" = "yes"; then
    if test "$enable_target" = "bgl"; then
      CFLAGS="${CFLAGS} -O -Wall"
      CXXFLAGS="${CXXFLAGS} -O -Wall"
-   if test "$enable_target" = "bgq"; then
+   elif test "$enable_target" = "bgq"; then
      CFLAGS="${CFLAGS} -O2 -Wall"
      CXXFLAGS="${CXXFLAGS} -O2 -Wall"
    else
@@ -220,16 +220,16 @@ if test "$enable_sse" != "no"; then
 fi
 
 
-dnl -O0 flag should overide any previous optimisation declarations
+dnl -Og flag should overide any previous optimisation declarations
 AC_ARG_ENABLE(debug, 
 	AC_HELP_STRING([--enable-debug], 
 		[Compile with debug information. (default=yes)]),  
-	,[enable_debug="yes"])
+	,[enable_debug="no"])
 AC_MSG_CHECKING([if debugging])
 AC_MSG_RESULT($enable_debug)
 if test "$enable_debug" = "yes"; then
-   CFLAGS="${CFLAGS} -g -O0"
-   CXXFLAGS="${CXXFLAGS} -g -O0"
+   CFLAGS="${CFLAGS} -g -Og"
+   CXXFLAGS="${CXXFLAGS} -g -Og"
 fi
 
 dnl Are we compiling with cg-dwf?
@@ -406,8 +406,8 @@ dnl   fi
    else
       BFM_DIR=${QMP_DIR}
    fi
-      DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM"
-      LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm"
+      DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM -DUSE_HDCG"
+      LDFLAGS="-lqdp -lchroma ${LDFLAGS} -lqdp -lchroma -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm -L/soft/libraries/essl/current/lib64 -lesslbg -L/soft/compilers/ibmcmp-nov2012/xlf/bg/14.1/lib64 -lxlf90_r -lxlfmath -lxl -ldl"
    if test "X{$enable_xml}X" = "XX"; then
    	enable_xml="yes"
    fi
