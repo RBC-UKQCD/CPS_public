@@ -36,27 +36,6 @@ IFloat Matrix::inv3 = 1./3.;
 //  Matrix
 //---------------------------------------------------------------//
 
-#ifndef VEC_INLINE
-/*!
-  \param a A linear array representation of a 3x3 complex matrix, such that 
-  real part of the (i,j) element is at array position [6i+2j] 
-  and the imaginary part of the (i,j) element is at array position [6i+2j+1].
-  \post This matrix is the hermitian conjugate of \a m.
-
-  \a a must not be an alias of this matrix.
- */
-void Matrix::Dagger(const IFloat* a)
-{
-    u[0]  = a[0];   u[1]  = -a[1];
-    u[6]  = a[2];   u[7]  = -a[3];
-    u[12] = a[4];   u[13] = -a[5];
-    u[2]  = a[6];   u[3]  = -a[7];
-    u[8]  = a[8];   u[9]  = -a[9];
-    u[14] = a[10];  u[15] = -a[11];
-    u[4]  = a[12];  u[5]  = -a[13];
-    u[10] = a[14];  u[11] = -a[15];
-    u[16] = a[16];  u[17] = -a[17];
-}
 void Matrix::Transpose(const IFloat* a)
 {
     u[0]  = a[0];   u[1]  = a[1];
@@ -82,6 +61,28 @@ void Matrix::Transpose()
     u[4]  = m.u[12];  u[5]  = m.u[13];
     u[10] = m.u[14];  u[11] = m.u[15];
     u[16] = m.u[16];  u[17] = m.u[17];
+}
+
+#ifndef VEC_INLINE
+/*!
+  \param a A linear array representation of a 3x3 complex matrix, such that 
+  real part of the (i,j) element is at array position [6i+2j] 
+  and the imaginary part of the (i,j) element is at array position [6i+2j+1].
+  \post This matrix is the hermitian conjugate of \a m.
+
+  \a a must not be an alias of this matrix.
+ */
+void Matrix::Dagger(const IFloat* a)
+{
+    u[0]  = a[0];   u[1]  = -a[1];
+    u[6]  = a[2];   u[7]  = -a[3];
+    u[12] = a[4];   u[13] = -a[5];
+    u[2]  = a[6];   u[3]  = -a[7];
+    u[8]  = a[8];   u[9]  = -a[9];
+    u[14] = a[10];  u[15] = -a[11];
+    u[4]  = a[12];  u[5]  = -a[13];
+    u[10] = a[14];  u[11] = -a[15];
+    u[16] = a[16];  u[17] = -a[17];
 }
 
 /*!
