@@ -443,6 +443,7 @@ if (cg_arg->Inverter == HDCG){
 	control->HDCG_subspace_init();
 	control->HDCG_subspace_compute(0);
 	control->HDCG_subspace_refine();
+	control->HDCG_subspace_compute(0);
 //    }
 //    BfmMultiGrid<Float> *hdcg = control->ldop_d;
 //    if (!hdcg){
@@ -798,6 +799,8 @@ Float Fbfm::FhamiltonNode(Vector *phi, Vector *chi)
 }
 
 // Convert fermion field f_field from -> to
+// Moved to fbfm.h by CJ
+#if 0
 void Fbfm::Fconvert(Vector *f_field,
                     StrOrdType to,
                     StrOrdType from)
@@ -808,6 +811,7 @@ void Fbfm::Fconvert(Vector *f_field,
     // nothing needs to be done
 //    ERR.NotImplemented(cname, fname);
 }
+#endif
 
 
 // The boson Hamiltonian of the node sublattice

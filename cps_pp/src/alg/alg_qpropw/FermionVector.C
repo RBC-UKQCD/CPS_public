@@ -34,9 +34,7 @@ FermionVectorTp::FermionVectorTp() {
 
   // allocate space for source
   int fv_size = GJP.VolNodeSites() * GJP.Colors() * 8;
-  fv = (Float*)smalloc(fv_size * sizeof(Float));
-  if(fv == 0) ERR.Pointer(cname, fname, "fv");
-  VRB.Smalloc(cname,fname, "fv", fv, fv_size * sizeof(Float));
+  fv = (Float*)smalloc(cname,fname, "fv", fv_size * sizeof(Float));
 
 }
 
@@ -459,8 +457,11 @@ void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where)
     if(nc != GJP.TnodeCoor()) return; // nothing to do here.
 
     Matrix **gm = lat.FixGaugePtr();
+    if (!gm) ERR.Pointer(cname,fname,"fix_gauge_ptr");
+//    printf("gm(%d)=%p\n",UniqueID(),gm);
 #ifdef USE_OMP
     Matrix *pM = gm[lc];
+    VRB.Debug(cname,fname,"pM=%p\n",pM);
     int vol_3d = GJP.XnodeSites() * GJP.YnodeSites() * GJP.ZnodeSites();
 #pragma omp parallel for
     for(int i = 0; i < vol_3d; ++i) {
@@ -781,12 +782,8 @@ void FermionVectorTp::GaussianSmearVector(Lattice& lat,
   // working vector for the smeared source
   Vector* chi;
  
-  src = (Vector*) smalloc(sizeof(Vector)*nx[0]*nx[1]*nx[2]);
-  if(src == 0) ERR.Pointer(cname, fname, "src");
-  VRB.Smalloc(cname,fname, "src", src, nx[0]*nx[1]*nx[2]*sizeof(Vector));
-  chi = (Vector*) smalloc(sizeof(Vector)*nx[0]*nx[1]*nx[2]);
-  if(chi == 0) ERR.Pointer(cname, fname, "chi");
-  VRB.Smalloc(cname,fname, "chi", chi, nx[0]*nx[1]*nx[2]*sizeof(Vector));
+  src = (Vector*) smalloc(cname,fname, "src", sizeof(Vector)*nx[0]*nx[1]*nx[2]);
+  chi = (Vector*) smalloc(cname,fname, "chi", sizeof(Vector)*nx[0]*nx[1]*nx[2]);
 
   // do the smearchig on all nodes since they have to wait anyway.
   // In the end we take only the result for the source time_slice
@@ -1044,12 +1041,8 @@ void FermionVectorTp::GaussianSmearVector(Lattice& lat,
   // working vector for the smeared source
   Vector* chi;
  
-  src = (Vector*) smalloc(sizeof(Vector)*nx[0]*nx[1]*nx[2]);
-  if(src == 0) ERR.Pointer(cname, fname, "src");
-  VRB.Smalloc(cname,fname, "src", src, nx[0]*nx[1]*nx[2]*sizeof(Vector));
-  chi = (Vector*) smalloc(sizeof(Vector)*nx[0]*nx[1]*nx[2]);
-  if(chi == 0) ERR.Pointer(cname, fname, "chi");
-  VRB.Smalloc(cname,fname, "chi", chi, nx[0]*nx[1]*nx[2]*sizeof(Vector));
+  src = (Vector*) smalloc(cname,fname, "src", sizeof(Vector)*nx[0]*nx[1]*nx[2]);
+  chi = (Vector*) smalloc(cname,fname, "chi", sizeof(Vector)*nx[0]*nx[1]*nx[2]);
 
   // do the smearchig on all nodes since they have to wait anyway.
   // In the end we take only the result for the source time_slice
