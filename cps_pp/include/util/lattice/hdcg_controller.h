@@ -29,7 +29,7 @@ class HDCGInstance{
 	static void SetDefault(){
 		if (!CPS_NAMESPACE::UniqueID()) printf("HDCGInstance()\n");
 // Partially tuned for 64^3, from PAB's message
-#if 1
+#if 0
 		Params.NumberSubspace=40;
 		Params.SubspaceRationalLs=8;
 		Params.SubspaceRationalLo=0.001;
@@ -49,6 +49,7 @@ class HDCGInstance{
 #else  
 // 48^3
 		Params.NumberSubspace=44;
+		Params.SubspaceRationalMass=0.00078;
 		Params.SubspaceRationalLs=12; // Ls/2
 		Params.SubspaceRationalLo=0.001;
 		Params.SubspaceRationalResidual=1e-5;

@@ -1319,10 +1319,9 @@ void Lattice::FixGaugeAllocate(FixGaugeType GaugeKind,
     {
         int mem_size = GaugePtrLen * sizeof(Matrix*);
     
-        fix_gauge_ptr = (Matrix**) smalloc(mem_size);
-        if(fix_gauge_ptr == NULL)
-            ERR.Pointer(cname, fname, "fix_gauge_ptr");
-        VRB.Smalloc(cname, fname, "fix_gauge_ptr", fix_gauge_ptr, mem_size);
+        fix_gauge_ptr = (Matrix**) 
+        smalloc(cname, fname, "fix_gauge_ptr", mem_size);
+//        printf("fix_gauge_ptr(%d)=%p\n",UniqueID(),fix_gauge_ptr);
     
         for(int i=0; i<GaugePtrLen; i++)
             fix_gauge_ptr[i] = NULL;

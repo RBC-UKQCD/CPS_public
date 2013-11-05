@@ -70,4 +70,20 @@ void DoArg::SetupAsqTadU0(double u)
   asqtad_7staple= (1.0/8.0)*(1.0/48.0)*pow(u0,-6);
   asqtad_lepage = (-1.0/16.0)*pow(u0,-4);
 }
+
+DoArgExt::DoArgExt() {
+  twist_bc_x=0.;
+  twist_bc_y=0.;
+  twist_bc_z=0.;
+  twist_bc_t=0.;
+  start_u1_conf_kind=START_CONF_ORD;
+  start_u1_conf_load_addr=NULL;
+  start_u1_conf_filename=NULL;
+  start_u1_conf_alloc_flag=0;
+  mult_u1_conf_flag=0;
+  save_stride=0;
+  trajectory=0;
+  mobius_b_coeff=1.;
+  mobius_c_coeff=0.;
+}
 CPS_END_NAMESPACE
