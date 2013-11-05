@@ -49,6 +49,7 @@ class HDCGInstance{
 #else  
 // 48^3
 		Params.NumberSubspace=44;
+		Params.SubspaceRationalMass=0.00078;
 		Params.SubspaceRationalLs=12; // Ls/2
 		Params.SubspaceRationalLo=0.001;
 		Params.SubspaceRationalResidual=1e-5;

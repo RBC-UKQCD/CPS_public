@@ -168,6 +168,7 @@ class DoArgExt {
     int trajectory;
     Float mobius_b_coeff;
     Float mobius_c_coeff;
+    memfun  DoArgExt();
 };
 
 

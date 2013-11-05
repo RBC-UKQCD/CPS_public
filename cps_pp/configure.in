@@ -190,9 +190,12 @@ if test "$enable_optimise" = "yes"; then
    if test "$enable_target" = "bgl"; then
      CFLAGS="${CFLAGS} -O -Wall"
      CXXFLAGS="${CXXFLAGS} -O -Wall"
+   if test "$enable_target" = "bgq"; then
+     CFLAGS="${CFLAGS} -O2 -Wall"
+     CXXFLAGS="${CXXFLAGS} -O2 -Wall"
    else
-     CFLAGS="${CFLAGS} -O3"
-     CXXFLAGS="${CXXFLAGS} -O3"
+     CFLAGS="${CFLAGS} -O3 -Wall"
+     CXXFLAGS="${CXXFLAGS} -O3 -Wall"
    fi
 fi
 

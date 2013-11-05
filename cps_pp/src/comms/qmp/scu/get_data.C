@@ -144,6 +144,7 @@ static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len_i, int
 
 }
 
+#if 0
 static void getData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu, int sign)
 {
 
@@ -189,6 +190,69 @@ void getMinusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu){
   }
   getData(rcv_p,send_p,len_t,mu,-1);
 }
+#else
+static void getData(void *rcv_buf, void *snd_buf, size_t size, int mu, int sign)
+{
+    if(gjp_local_axis[mu] == 1) {
+        memcpy(rcv_buf, snd_buf, size);
+        return;
+    }
+
+    QMP_msgmem_t snd_msg = QMP_declare_msgmem(snd_buf, size);
+    QMP_msgmem_t rcv_msg = QMP_declare_msgmem(rcv_buf , size);
+    QMP_msghandle_t snd_hnd = QMP_declare_send_relative   (snd_msg, mu, -sign, 0);
+    QMP_msghandle_t rcv_hnd = QMP_declare_receive_relative(rcv_msg, mu,  sign, 0);
+
+    QMP_start(snd_hnd);
+    QMP_start(rcv_hnd);
+
+    QMP_status_t snd = QMP_wait(snd_hnd);
+    QMP_status_t rcv = QMP_wait(rcv_hnd);
+
+    if(snd != QMP_SUCCESS || rcv != QMP_SUCCESS) {
+      QMP_error("Send/Receive failed in getData: %s %s\n",
+                QMP_error_string(snd),
+                QMP_error_string(rcv));
+    }
+
+    QMP_free_msghandle(snd_hnd);
+    QMP_free_msghandle(rcv_hnd);
+    QMP_free_msgmem(snd_msg);
+    QMP_free_msgmem(rcv_msg);
+}
+
+void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
+{
+    getData(rcv_buf, send_buf, sizeof(Float) * len, mu, +1);
+
+  // IFloat *rcv_p = rcv_buf;
+  // IFloat *send_p = send_buf;
+  // int  len_t = len;
+  // while (len_t > MAX_LENGTH){
+  //   getData(rcv_p,send_p,MAX_LENGTH,mu,+1);
+  //   len_t -= MAX_LENGTH;
+  //   rcv_p += MAX_LENGTH;
+  //   send_p += MAX_LENGTH;
+  // }
+  // getData(rcv_p,send_p,len_t,mu,+1);
+}
+
+void getMinusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
+{
+    getData(rcv_buf, send_buf, sizeof(Float) * len, mu, -1);
+
+  // IFloat *rcv_p = rcv_buf;
+  // IFloat *send_p = send_buf;
+  // int  len_t = len;
+  // while (len_t > MAX_LENGTH){
+  //   getData(rcv_p,send_p,MAX_LENGTH,mu,-1);
+  //   len_t -= MAX_LENGTH;
+  //   rcv_p += MAX_LENGTH;
+  //   send_p += MAX_LENGTH;
+  // }
+  // getData(rcv_p,send_p,len_t,mu,-1);
+}
+#endif
 
 //====================================================================
 //*  SUI
