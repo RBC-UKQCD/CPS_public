@@ -455,6 +455,7 @@ class Matrix
        this->TrLessAntiHermMatrix(dag);
     }
 #else 
+//#define TAH_INLINE
 /*!
   \param a A linear array representation of a 3x3 complex matrix, such that 
   real part of the (i,j) element is at array position [6i+2j] 
