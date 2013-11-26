@@ -56,6 +56,8 @@ AlgRemez::AlgRemez(RemezArg &arg_remez)
   VRB.Result(cname,fname,"Approximation kernel is x^{%d/%d}\n", power_num, power_den);
 
   n = remez_arg->degree;
+  if (n> MAX_RAT_DEGREE)
+  ERR.General(cname,fname,"remez_arg->degree(%d) > MAX_RAT_DEGREE(%d)!\n", n, MAX_RAT_DEGREE);
   d = remez_arg->degree;
 
   VRB.Flow(cname,fname,"precision=%d power_num=%d power_den=%d degree = %d \n",prec,power_num,power_den,n);

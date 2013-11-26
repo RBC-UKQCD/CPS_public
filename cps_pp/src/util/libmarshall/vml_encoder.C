@@ -66,6 +66,7 @@ bool_t TextEncoder::Enum ( VML *vmls,char *ename, char *name, char *&value)
   char format[256]; 
   char line[256]; 
   sprintf(format,"%s %s = %%s\n",ename,name);
+//  printf("Enum::%s %s %s",ename,name,format);
   if ( vmls->x_op == VML_ENCODE ) { 
     sprintf(line,format,value);
     if(!vmls->Puts(line)) return false;
@@ -187,7 +188,9 @@ bool_t TextEncoder::Array     ( VML *vmls, char *type, char *name,
   } else if ( vmls->x_op == VML_DECODE ) { 
     if (!vmls->Gets((char *)line,256)) return false;
     sprintf(tmp,"%s %s[%%d] = { \n",type,name);
-    sscanf(line,tmp,&nvals);
+    int ret = sscanf(line,tmp,&nvals);  
+    if (ret < 1 ) {DEB("Array mismatch! expecting ");DEB(name);DEB("\nline= "); DEB(line); return false;}
+    
 
     if ( DoAlloc ) { 
       if ( nvals )
@@ -200,7 +203,7 @@ bool_t TextEncoder::Array     ( VML *vmls, char *type, char *name,
       if ( vals == NULL ) { DEB("NULL array\n"); return false;};
       sprintf(tmp,"%s[%d]",name,i);
       bool_t ret = do_one(vmls,tmp,(void *)((unsigned long)vals+i*sizeofone));
-	  if (ret == false) return false;
+	  if (ret == false) { DEB("Array do_one fails\n"); return false;}
     }
     /*Skip the closing bracket...*/
     if (!vmls->Gets((char *)line,256)) { DEB("Array close\n"); return false;}

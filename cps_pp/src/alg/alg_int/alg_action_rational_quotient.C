@@ -655,8 +655,7 @@ bool AlgActionRationalQuotient::loadPoles(void)
   FILE *fp = fopen(rat_quo_arg->rat_poles_file, "r");
   if(fp == NULL) return false;
   fclose(fp);
-  if(n_masses>MAX_RAT_DEGREE)
-  ERR.General(cname,fname,"n_masses(%d)>MAX_RAT_DEGREE(%d)!, Please change MAX_RAT_DEGREE in cps_pp/include/input/enum.x and recompile.");
+
 
   RationalQuotientRemezArg rq;
   if(!rq.Decode(rat_quo_arg->rat_poles_file, "rq")) return false;
@@ -692,10 +691,8 @@ bool AlgActionRationalQuotient::loadPoles(void)
 
 bool AlgActionRationalQuotient::savePoles(void)
 {
+  const char *fname = "savePoles()";
   if(strlen(rat_quo_arg->rat_poles_file) == 0) return false;
-  if(n_masses>MAX_RAT_DEGREE)
-  ERR.General(cname,fname,"n_masses(%d)>MAX_RAT_DEGREE(%d)!, Please change MAX_RAT_DEGREE in cps_pp/include/input/enum.x and recompile.");
-
 
   RationalQuotientRemezArg rq;
 

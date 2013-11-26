@@ -88,4 +88,5 @@ double BEfuzzing_c[8] =   0.0000000000000000e+00
 double BEfuzzing_c[9] =   0.0000000000000000e+00
 }
 int BEfuzzing_hits = 0
+int GaugeFixProp = 0
 }
