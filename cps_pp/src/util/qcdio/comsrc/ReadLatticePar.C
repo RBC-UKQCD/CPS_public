@@ -3,7 +3,9 @@
 #include <util/ReadLatticePar.h>
 #include <util/time_cps.h>
 
+#ifdef USE_QMP
 #include <qmp.h>
+#endif
 
 CPS_START_NAMESPACE
 using namespace std;
@@ -45,9 +47,16 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
     ERR.FileR(cname, fname, rd_arg.FileName);
   log();
 
+#ifndef USE_QMP
+	int temp_start = hd.data_start;
+	broadcastInt(&temp_start);
+	hd.data_start = temp_start;
+#else
   QMP_broadcast(&hd.data_start, sizeof(long));
   broadcastInt(&hd.recon_row_3);
   //  cout << "recon_row_3 = " << hd.recon_row_3 << endl;
+#endif
+
 
 
   // check all conditions between FILE and GJP

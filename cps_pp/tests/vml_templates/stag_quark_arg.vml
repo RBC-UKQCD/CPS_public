@@ -9,6 +9,10 @@ double true_rsd =   1.0000000000000000e-10
 RitzMatType RitzMatOper = MATPCDAG_MATPC
 InverterType Inverter = CG
 int bicgstab_n = 1
+string fname_eigen = ""
+int neig = 0
+double eigen_shift =   0.0000000000000000e+00
+double ama_stop_rsd =   0.0000000000000000e+00
 }
 class StagQuarkSrc src = {
 StagQuarkSrcType type = S_QUARK_POINT
