@@ -18,6 +18,7 @@
 #include <math.h>
 #include <vector>
 #include "bfm_evo_aux.h"
+#include <BfmMultiGrid.h>
 
 // FIXME: it inherits from bfm_qdp for the sole reason of using its
 // importGauge() function. I'm too lazy to do any manual
@@ -75,10 +76,17 @@ private:
 
   void copySendFrmData(Float v3d[], Float v4d[], int mu, bool send_neg);
 
+#if 0
   // complex version of axpy()
   void axpy_c(Fermion_t r, Fermion_t x, Fermion_t y, std::complex<double> a, Fermion_t tmp) {
     this->zaxpy(r, x, y, a);
   }
+#endif
+
+void zaxpy(Fermion_t r, Fermion_t x, Fermion_t y, std::complex<double> a)
+{
+   this->caxpy(r,x,y,std::real(a),std::imag(a));
+}
 public:
   void thread_work_partial_nobarrier(int nwork, int me, int nthreads,
                                      int &mywork, int &myoff)
@@ -155,6 +163,48 @@ public:
   void threaded_free(void *handle);
   int EIG_CGNE_M(Fermion_t solution[2], Fermion_t source[2]);
   int Eig_CGNE_prec(Fermion_t psi, Fermion_t src);
+//template <class hdFloat>
+//  int HD_CGNE_M(BfmMultiGrid<hdFloat> &hdcg, Fermion_t solution[2], Fermion_t source[2])
+template<class Float_h>
+int HD_CGNE_M(BfmMultiGrid<Float_h> *hdcg, Fermion_t solution[2], Fermion_t source[2])
+{
+    int me = this->thread_barrier();
+    if ( this->isBoss()  && (me==0) ) {
+         printf("HD_CGME_M started\n");
+    }
+    Fermion_t src = this->threadedAllocFermion(); 
+    Fermion_t tmp = this->threadedAllocFermion(); 
+    Fermion_t Mtmp= this->threadedAllocFermion(); 
+
+    // src_o = Mdag * (source_o - Moe MeeInv source_e)
+#if 1
+    this->MooeeInv(source[Even],tmp,DaggerNo);
+    this->Meo(tmp,src,Odd,DaggerNo);
+    this->axpy(tmp,src,source[Odd],-1.0);
+    this->Mprec(tmp,src,Mtmp,DaggerYes);  
+#endif
+  
+    if (this->isBoss() && !me) printf("hdcg.Pcg(solution[%d](%p),src(%p),tmp(%p)\n",Odd,solution[Odd],src,tmp);
+    int iter = hdcg->Pcg(solution[Odd],src,tmp);
+//    int iter = this->HD_CGNE_prec(solution[Odd], src);
+
+    // sol_e = M_ee^-1 * ( src_e - Meo sol_o )...
+#if 1
+    this->Meo(solution[Odd],tmp,Even,DaggerNo);
+    this->axpy(src,tmp,source[Even],-1.0);
+    this->MooeeInv(src,solution[Even],DaggerNo);
+  
+    this->threadedFreeFermion(tmp);
+    this->threadedFreeFermion(src);
+    this->threadedFreeFermion(Mtmp);
+#endif
+    if ( this->isBoss()  && (me==0) ) {
+         printf("HD_CGME_M finished! iter=%d\n",iter);
+    }
+
+    return iter;
+}
+//  int HD_CGNE_prec(Fermion_t psi, Fermion_t src);
 
   // copied from Jianglei's bfm
   double CompactMprec(Fermion_t compact_psi,

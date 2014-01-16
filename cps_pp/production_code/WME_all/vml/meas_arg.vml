@@ -1,0 +1,18 @@
+class MeasArg meas_arg = {
+FclassType Fermion = F_CLASS_DWF
+GclassType Gluon = G_CLASS_NONE
+string WorkDirectory = "../work"
+string GaugeStem = "../gfixed_configs/ckpoint_lat.Coulomb"
+string RNGStem = "../rngs/ckpoint_rng"
+MeasIOTask GaugeIO = MeasIOLoad
+MeasIOTask RNGIO = MeasIOLoad
+int TrajStart = 800
+int TrajIncrement = 100
+int TrajLessThanLimit = 1
+int TrajCur = 0
+int HdwXCsum = 1
+int HdwRCsum = 1
+int IOconcurrency = 64
+Array TaskList[0] = { 
+}
+}

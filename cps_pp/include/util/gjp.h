@@ -63,7 +63,8 @@ extern int gjp_local_axis[];
      // It is set by GJP.Initialize.
      // {0,1,2,3,4} corresponds to {x,y,z,t,s}
 
-#if TARGET==QCDOC
+//#if TARGET==QCDOC
+#if 0
 extern SCUDir gjp_scu_dir[];
      // set to:  SCU_XP, SCU_XM, SCU_YP, SCU_YM,
      // SCU_ZP, SCU_ZM, SCU_TP, SCU_TM, s_p, s_m
@@ -383,6 +384,7 @@ public:
     default: printf("GJP::TwistBc(): Incorrect dir for twist\n"); 
       exit(0);
     }
+    return 0.;
   }
 
   int Traj(){ return doext_p->trajectory; }

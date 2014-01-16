@@ -21,6 +21,8 @@
 #include <util/vector.h>
 #include <util/wilson.h>
 
+#undef INLINE_WILSON_MATRIX
+
 #include <alg/spin_matrix.h>
 
 CPS_START_NAMESPACE
@@ -258,6 +260,10 @@ public:
     float a[288];
 };
 
+WilsonMatrix& eq_mult( WilsonMatrix& xmat,
+		       const WilsonMatrix& amat,
+		       const WilsonMatrix& bmat );
+
 class WilsonMatrix
 {
 private:
@@ -342,7 +348,24 @@ public:
   
   //! hermitean conjugate the WilsonMatrix
   //WilsonMatrix& hconj();
+#ifndef INLINE_WILSON_MATRIX
   void hconj();
+#else
+    void hconj()
+    {
+        int c1, c2;
+        int s1, s2;
+        wilson_matrix mat=p;
+
+        for(s1=0;s1<4;s1++)
+            for(c1=0;c1<3;c1++)
+                for(s2=0;s2<4;s2++)
+                    for(c2=0;c2<3;c2++)
+                        p.d[s2].c[c2].d[s1].c[c1] = conj(mat.d[s1].c[c1].d[s2].c[c2]);
+	
+    }
+#endif
+
   void dump(); // print out the prop
  
   //! mult the prop by gamma_dir on the left
@@ -358,8 +381,98 @@ public:
     WilsonMatrix& glA(const WilsonMatrix & from, int dir);
   //! mult the prop by gamma_dir on the left, and return the new matrix
     WilsonMatrix glV(int dir)const;
+
+#ifndef INLINE_WILSON_MATRIX
   //! glV another version. result = gamma_dir*from
     WilsonMatrix& glV(const WilsonMatrix & from, int dir);
+#else
+
+#define TIMESPLUSONE(a,b) { b=a; }
+#define TIMESMINUSONE(a,b) { b=-a; }
+#define TIMESPLUSI(a,b) { b.real(-a.imag()); b.imag(a.real()); }
+#define TIMESMINUSI(a,b) { b.real(a.imag()); b.imag(-a.real()); }
+
+    //! glV another version. result = gamma_dir*from
+    WilsonMatrix& glV(const WilsonMatrix & from, int dir)
+    {
+        int i; /*color*/
+        int c2,s2;    /* column indices, color and spin */
+        const wilson_matrix & from_mat=from.wmat();
+
+        switch(dir){
+        case 0:
+            for(i=0;i<3;i++)for(s2=0;s2<4;s2++)for(c2=0;c2<3;c2++){
+                        TIMESPLUSI(  from_mat.d[3].c[i].d[s2].c[c2],
+                                     p.d[0].c[i].d[s2].c[c2] );
+                        TIMESPLUSI(  from_mat.d[2].c[i].d[s2].c[c2],
+                                     p.d[1].c[i].d[s2].c[c2] );
+                        TIMESMINUSI( from_mat.d[1].c[i].d[s2].c[c2],
+                                     p.d[2].c[i].d[s2].c[c2] );
+                        TIMESMINUSI( from_mat.d[0].c[i].d[s2].c[c2],
+                                     p.d[3].c[i].d[s2].c[c2] );
+                    }
+            break;
+        case 1:
+            for(i=0;i<3;i++)for(s2=0;s2<4;s2++)for(c2=0;c2<3;c2++){
+                        TIMESMINUSONE( from_mat.d[3].c[i].d[s2].c[c2],
+                                       p.d[0].c[i].d[s2].c[c2] );
+                        TIMESPLUSONE(  from_mat.d[2].c[i].d[s2].c[c2],
+                                       p.d[1].c[i].d[s2].c[c2] );
+                        TIMESPLUSONE(  from_mat.d[1].c[i].d[s2].c[c2],
+                                       p.d[2].c[i].d[s2].c[c2] );
+                        TIMESMINUSONE( from_mat.d[0].c[i].d[s2].c[c2],
+                                       p.d[3].c[i].d[s2].c[c2] );
+                    }
+            break;
+        case 2:
+            for(i=0;i<3;i++)for(s2=0;s2<4;s2++)for(c2=0;c2<3;c2++){
+                        TIMESPLUSI(  from_mat.d[2].c[i].d[s2].c[c2],
+                                     p.d[0].c[i].d[s2].c[c2] );
+                        TIMESMINUSI( from_mat.d[3].c[i].d[s2].c[c2],
+                                     p.d[1].c[i].d[s2].c[c2] );
+                        TIMESMINUSI( from_mat.d[0].c[i].d[s2].c[c2],
+                                     p.d[2].c[i].d[s2].c[c2] );
+                        TIMESPLUSI(  from_mat.d[1].c[i].d[s2].c[c2],
+                                     p.d[3].c[i].d[s2].c[c2] );
+                    }
+            break;
+        case 3:
+            for(i=0;i<3;i++)for(s2=0;s2<4;s2++)for(c2=0;c2<3;c2++){
+                        TIMESPLUSONE( from_mat.d[2].c[i].d[s2].c[c2],
+                                      p.d[0].c[i].d[s2].c[c2] );
+                        TIMESPLUSONE( from_mat.d[3].c[i].d[s2].c[c2],
+                                      p.d[1].c[i].d[s2].c[c2] );
+                        TIMESPLUSONE( from_mat.d[0].c[i].d[s2].c[c2],
+                                      p.d[2].c[i].d[s2].c[c2] );
+                        TIMESPLUSONE( from_mat.d[1].c[i].d[s2].c[c2],
+                                      p.d[3].c[i].d[s2].c[c2] );
+                    }
+            break;
+        case -5:
+            for(i=0;i<3;i++)for(s2=0;s2<4;s2++)for(c2=0;c2<3;c2++){
+                        TIMESPLUSONE(  from_mat.d[0].c[i].d[s2].c[c2],
+                                       p.d[0].c[i].d[s2].c[c2] );
+                        TIMESPLUSONE(  from_mat.d[1].c[i].d[s2].c[c2],
+                                       p.d[1].c[i].d[s2].c[c2] );
+                        TIMESMINUSONE( from_mat.d[2].c[i].d[s2].c[c2],
+                                       p.d[2].c[i].d[s2].c[c2] );
+                        TIMESMINUSONE( from_mat.d[3].c[i].d[s2].c[c2],
+                                       p.d[3].c[i].d[s2].c[c2] );
+                    }
+            break;
+        default:
+            ERR.General(cname, "glV", "BAD CALL TO glV(), dir = %d\n", dir);
+            break;
+        }
+        return *this;
+    }
+
+#undef TIMESPLUSONE
+#undef TIMESMINUSONE
+#undef TIMESPLUSI
+#undef TIMESMINUSI
+
+#endif
 
     //! mult the prop by gamma_dir*gamma_5 on the left
     WilsonMatrix& grA(const WilsonMatrix & from, int dir);
@@ -488,7 +601,8 @@ WilsonMatrix& eq_mult( WilsonMatrix& xmat,
 		       const WilsonMatrix& bmat );
 
 // some proto-types for functions that operate on WilsonMatrices
-#ifdef _TARTAN
+//#ifdef _TARTAN
+#if 0
 
 /*! C = A * B */
 extern "C" void wmatMultwmat(IFloat* C, const IFloat* A, const IFloat* B);
@@ -499,7 +613,15 @@ extern "C" void Tracewmatwmat(IFloat* C, const IFloat* A, const IFloat* B);
 #endif
 
 //! times operator
+#ifndef INLINE_WILSON_MATRIX
 extern WilsonMatrix operator*(const WilsonMatrix& lhs, const WilsonMatrix& rhs);
+#else
+static inline WilsonMatrix operator*(const WilsonMatrix& lhs, const WilsonMatrix& rhs)
+{
+    WilsonMatrix result(lhs);
+    return result *= rhs;
+}
+#endif
 
 //! times operator
 extern WilsonMatrix operator*(const Float& num, const WilsonMatrix& mat);

@@ -50,23 +50,13 @@
 #define TARGET NOARCH
 #endif
 
-#if TARGET == QCDOC
-#include<qalloc.h>
-#include<qcdocos.h>
-#endif
-
 #if TARGET == BGL
 #define CPS_FLOAT_ALIGN __attribute__((aligned(16)))
 #else
 #define CPS_FLOAT_ALIGN
 #endif
 
-#if TARGET == QCDOC
-// temporary hack until qos is more mature
-#define CWDPREFIX(A) "@CWD@/"A
-#else
 #define CWDPREFIX(A) A
-#endif
 
 
 

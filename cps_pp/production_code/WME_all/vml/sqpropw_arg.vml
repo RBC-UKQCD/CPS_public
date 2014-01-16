@@ -1,0 +1,35 @@
+class QPropWArg sprop_arg={
+class CgArg cg={
+double mass = 0.066
+double epsilon = 0
+int max_num_iter = 10000
+double stop_rsd = 1.0e-8
+double true_rsd = 1.0e-8
+RitzMatType RitzMatOper = MAT_HERM
+InverterType Inverter = CG
+int bicgstab_n = 0
+string fname_eigen = ""
+int neig = 0
+double eigen_shift = 0
+double ama_stop_rsd = 0
+}
+string file = ""
+int x = 0
+int y = 0
+int z = 0
+int t = 0
+int gauge_fix_src = 0
+int gauge_fix_snk = 0
+int store_midprop = 1
+int save_prop = 0
+int save_ls_prop = 0
+int do_half_fermion = 0
+SourceType SeqSmearSink = WALL
+string ensemble_label = "squark"
+string ensemble_id = "0001"
+int seqNum = 0
+int StartSrcSpin = 0
+int EndSrcSpin = 4
+int StartSrcColor = 0
+int EndSrcColor = 3
+}

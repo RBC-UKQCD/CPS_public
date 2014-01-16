@@ -1,7 +1,8 @@
 /*
-  $Id: main.C,v 1.3 2011-03-04 14:23:10 chulwoo Exp $
+  $Id: main.C,v 1.12.30.1 2007/07/19 04:26:03 chulwoo Exp $
 */
 
+#include<omp.h>
 #include<config.h>
 #include <util/qcdio.h>
 #include <math.h>
@@ -29,12 +30,12 @@ USING_NAMESPACE_CPS
 static int nx,ny,nz,nt,ns;
 static CgArg cg_arg;
 
-#ifdef USE_OMP
-#include<omp.h>
+#if 0
+#include <omp.h>
 #else
-void omp_set_num_threads(int num){}
-int omp_get_num_threads(){return 1;}
-int omp_get_thread_num(){return 0;}
+inline void omp_set_num_threads(int num){}
+inline int omp_get_num_threads(){return 1;}
+inline int omp_get_thread_num(){return 0;}
 #endif
 
 void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, int DO_CHECK);
@@ -42,8 +43,7 @@ void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, i
 int main(int argc,char *argv[]){
 
     Start(&argc, &argv);
-#ifdef USE_OMP
-omp_set_num_threads(16);
+//omp_set_num_threads(16);
 #pragma omp parallel default(shared)
 {
   int tnum = omp_get_num_threads();
@@ -55,7 +55,6 @@ for(int  i = 0;i<100;i++){
   printf("thread %d of %d i=%d\n",omp_get_thread_num(),tnum,i);
 }
 }
-#endif
 
     //----------------------------------------------------------------
     // Initializes all Global Job Parameters
@@ -100,9 +99,9 @@ for(int  i = 0;i<100;i++){
     do_arg.dwf_height = 1.8;
     do_arg.clover_coeff = 2.0171;
 #ifdef USE_CG_DWF
-    do_arg.verbose_level = -1202;
+    do_arg.verbose_level = -120205;
 #else
-    do_arg.verbose_level = -1202;
+    do_arg.verbose_level = -120205;
 #endif
 
     do_arg.asqtad_KS = (1.0/8.0)+(6.0/16.0)+(1.0/8.0);
@@ -112,27 +111,22 @@ for(int  i = 0;i<100;i++){
     do_arg.asqtad_7staple = (-1.0/8.0)*0.125*(1.0/6.0);
     do_arg.asqtad_lepage = -1.0/16;
 
-//	VRB.Level(0);
-//	VRB.ActivateLevel(VERBOSE_RNGSEED_LEVEL);
-//	VRB.ActivateLevel(VERBOSE_FUNC_LEVEL);
-//	VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
-    
-
-    cg_arg.mass =2;
-    cg_arg.stop_rsd = 1e-10;
-    cg_arg.max_num_iter = 4000;
+    cg_arg.mass =0.001;
+    cg_arg.stop_rsd = 1e-9;
+    cg_arg.max_num_iter = 10000;
 #ifndef USE_CG_DWF
     cg_arg.max_num_iter++;
 #endif
     GJP.Initialize(do_arg);
+
    
-#if 0
     wilson_set_sloppy(false);
 {
     GwilsonFwilson lat;
     DiracOpWilson dirac(lat,NULL,NULL,&cg_arg,CNV_FRM_NO);
-	run_inv(lat,dirac,WILSON,NULL,1);
+	run_inv(lat,dirac,WILSON,out_file,1);
 }
+#if 0
    
     wilson_set_sloppy(true);
 {
@@ -147,14 +141,14 @@ for(int  i = 0;i<100;i++){
     DiracOpDwf dirac(lat,NULL,NULL,&cg_arg,CNV_FRM_NO);
 	run_inv(lat,dirac,WILSON,NULL,0);
 }
+#endif
 
     wilson_set_sloppy(true);
-#endif
 for(int i = 0;i<1;i++)
 {
     GwilsonFdwf lat;
     DiracOpDwf dirac(lat,NULL,NULL,&cg_arg,CNV_FRM_NO);
-	run_inv(lat,dirac,WILSON,out_file,1);
+	run_inv(lat,dirac,WILSON,NULL,1);
 }
 	
 	
@@ -177,6 +171,8 @@ void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, i
     Vector *X_out2 = (Vector*)smalloc("","","X_out2",GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
     Vector *tmp = (Vector*)smalloc("","","tmp",GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
 
+	int s_size = 1;
+	if (lat.F5D()) s_size = GJP.SnodeSites();
 
     int s[5];
     Vector *X_in =
@@ -190,10 +186,10 @@ void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, i
 //    lat.RandGaussVector(X_in,1.0);
     Matrix *gf = lat.GaugeField();
     IFloat *gf_p = (IFloat *)lat.GaugeField();
-    int fsize = lat.FsiteSize()/GJP.SnodeSites();
+    int fsize = lat.FsiteSize()/s_size;
     VRB.Result("","main()","fsize=%d",fsize);
 
-    for(s[4]=0; s[4]<GJP.NodeSites(4); s[4]++)
+    for(s[4]=0; s[4]<s_size; s[4]++)
     for(s[3]=0; s[3]<GJP.NodeSites(3); s[3]++)
 	for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
 	    for(s[1]=0; s[1]<GJP.NodeSites(1); s[1]++)
@@ -201,13 +197,13 @@ void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, i
 
 		    int n = lat.FsiteOffset(s)+s[4]*GJP.VolNodeSites();
 
-		int crd=0.;
+		int crd=1.;
 		  if(CoorX()==0 && CoorY()==0 && CoorZ()==0 && CoorT()==0) crd=1.0; else crd = 0.0;
 		  if(s[0]!=0 ) crd = 0.;
 		  if(s[1]!=0 ) crd = 0.;
 		  if(s[2]!=0 ) crd = 0.;
 		  if(s[3]!=0 ) crd = 0.;
-		  if(s[4]!=0 ) crd = 0.;
+			if(s[4]!=0 ) crd = 0.;
 					
 			IFloat *X_f = (IFloat *)(X_in)+(n*fsize);
 		    for(int v=0; v<fsize ; v+=1){ 
@@ -252,13 +248,16 @@ if (1){
 		lat.Fconvert(result,CANONICAL,str_ord);
 		lat.Fconvert(X_in,CANONICAL,str_ord);
 		lat.Fconvert(X_out2,CANONICAL,str_ord);
+	if (lat.F5D())
 		X_out2->FTimesV1PlusV2(-0.5/(5.0-GJP.DwfHeight()),X_out2,out,GJP.VolNodeSites()*lat.FsiteSize());
 //		X_out2->FTimesV1PlusV2(-2.*(5.0-GJP.DwfHeight()),out,X_out2,GJP.VolNodeSites()*lat.FsiteSize());
+	else
+		X_out2->FTimesV1PlusV2(-0.5/(cg_arg.mass+4.0),X_out2,out,GJP.VolNodeSites()*lat.FsiteSize()); 
     
     Float dummy;
     Float dt = 2;
 if (DO_CHECK){
-    for(s[4]=0; s[4]<GJP.NodeSites(4); s[4]++) 
+    for(s[4]=0; s[4]<s_size; s[4]++) 
     for(s[3]=0; s[3]<GJP.NodeSites(3); s[3]++) 
 	for(s[2]=0; s[2]<GJP.NodeSites(2); s[2]++)
 	    for(s[1]=0; s[1]<GJP.NodeSites(1); s[1]++)
@@ -267,6 +266,11 @@ if (DO_CHECK){
 //		    int n = lat.FsiteOffset(s)*lat.SpinComponents()*GJP.SnodeSites();
 		    int n = (lat.FsiteOffset(s)+GJP.VolNodeSites()*s[4]) *lat.SpinComponents();
 			for(int i=0; i<(3*lat.SpinComponents()); i++){
+	double re_re =	*((IFloat*)&result[n]+i*2);
+	double in_re =	*((IFloat*)&X_in[n]+i*2);
+	double re_im =	*((IFloat*)&result[n]+i*2+1);
+	double in_im =	*((IFloat*)&X_in[n]+i*2+1);
+if((re_re*re_re+re_im*re_im + in_re*in_re+in_im*in_im)>1e-8)
 if(DO_IO){
 		    if ( k==0 )
 				Fprintf(ADD_ID,fp," %d %d %d %d %d (%d) ", 
@@ -280,7 +284,7 @@ if(DO_IO){
 				Fprintf(ADD_ID, fp," ( %0.7e %0.7e ) (%0.7e %0.7e)",
 				*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
 				*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1));
-#if 1
+#if 0
 				Fprintf(ADD_ID, fp," ( %0.2e %0.2e )\n",
 	#if 1
 		*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), 

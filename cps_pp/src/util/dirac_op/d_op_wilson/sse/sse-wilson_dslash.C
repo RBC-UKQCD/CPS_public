@@ -324,6 +324,7 @@ DiracOp::CGflops += 1320*vol;
 }//extern"C"
 
 
+#define BND_COMM
 
 #include "sse-subs.h"
 

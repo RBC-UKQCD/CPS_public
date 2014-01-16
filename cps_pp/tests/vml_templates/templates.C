@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
   nuc3pt_arg.ensemble_label="AlgNuc3pt";
 
   mdwf_arg.M5 = 1.8;
-  mdwf_arg.cg_arg_p = &cg_arg;
+ // mdwf_arg.cg_arg_p = &cg_arg;
 
   cg_arg.Encode("cg_arg.vml","cg_arg");
   mdwf_arg.Encode("mdwf_arg.vml","mdwf_arg");

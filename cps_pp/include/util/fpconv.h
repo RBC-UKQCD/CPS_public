@@ -9,6 +9,7 @@
 #define __FP_CONV__
 
 #include <config.h>
+#include <stdint.h>
 
 
 CPS_START_NAMESPACE

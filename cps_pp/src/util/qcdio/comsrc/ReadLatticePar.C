@@ -3,6 +3,10 @@
 #include <util/ReadLatticePar.h>
 #include <util/time_cps.h>
 
+#ifdef USE_QMP
+#include <qmp.h>
+#endif
+
 CPS_START_NAMESPACE
 using namespace std;
 
@@ -42,11 +46,17 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   if(synchronize(error) != 0)
     ERR.FileR(cname, fname, rd_arg.FileName);
   log();
-  int temp_start = hd.data_start;
-  broadcastInt(&temp_start);
-  hd.data_start = temp_start;
+
+#ifndef USE_QMP
+	int temp_start = hd.data_start;
+	broadcastInt(&temp_start);
+	hd.data_start = temp_start;
+#else
+  QMP_broadcast(&hd.data_start, sizeof(long));
   broadcastInt(&hd.recon_row_3);
   //  cout << "recon_row_3 = " << hd.recon_row_3 << endl;
+#endif
+
 
 
   // check all conditions between FILE and GJP
@@ -93,9 +103,8 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   // see if file Floating Points is acceptable
   if(isRoot()) {
     fpconv.setFileFormat(hd.floating_point);
-    // TIZB, VRB is only on the master node.
-    VRB.Flow(cname,fname,"FileFormat=%d",hd.floating_point);
   }
+  VRB.Flow(cname,fname,"FileFormat=%d",hd.floating_point);
   broadcastInt((int*)&fpconv.fileFormat);
   if(fpconv.fileFormat == FP_UNKNOWN) {
     ERR.General(cname,fname, "Data file Floating Point Format UNKNOWN\n");
@@ -111,7 +120,7 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 
 
 #if TARGET != QCDOC
-  setSerial();
+//  setSerial();
 #endif
 
   log();

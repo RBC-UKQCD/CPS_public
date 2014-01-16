@@ -3,7 +3,6 @@
 //#ifndef HAVE_SYNC
 //static void inline CPS_NAMESPACE::sync(){}
 //#endif
-#include<comms/sysfunc_qmp.h>
 CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.

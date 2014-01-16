@@ -88,4 +88,5 @@
 <item><name>BEfuzzing_c[9]</name><value><double>0.000000e+00</double></value></item>
 </data></Vector>
 <item><name>BEfuzzing_hits</name><value><int>0</int></value></item>
+<item><name>GaugeFixProp</name><value><int>0</int></value></item>
 </data></class>

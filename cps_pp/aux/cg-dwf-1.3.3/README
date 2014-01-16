@@ -1,0 +1,13 @@
+This is the top directory. It contains noweb sources for the interface and the
+implementation, generic makefile to build pdfs and programs (and compile the
+engine). Configuration files for different targets are in ./config/, some tests
+and and a sample integration into QDP/C are under ./tests/
+
+FILES:
+Makefile
+README
+algorithm2e.sty
+config
+dwf.nw
+interface.nw
+tests
