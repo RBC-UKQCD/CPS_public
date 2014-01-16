@@ -118,6 +118,7 @@ public:
 	int trajectory;
 	Float mobius_b_coeff;
 	Float mobius_c_coeff;
+	   DoArgExt (  ) ;
 };
 
 /* the xdr functions */

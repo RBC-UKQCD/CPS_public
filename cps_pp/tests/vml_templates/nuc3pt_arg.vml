@@ -22,6 +22,10 @@ double true_rsd =   0.0000000000000000e+00
 RitzMatType RitzMatOper = NONE
 InverterType Inverter = CG
 int bicgstab_n = 0
+string fname_eigen = ""
+int neig = 0
+double eigen_shift =   0.0000000000000000e+00
+double ama_stop_rsd =   0.0000000000000000e+00
 }
 int t_source = 0
 int num_src = 1
@@ -66,4 +70,8 @@ CalcSeqType calc_seqQ = READ_SEQ
 string prop_file = ""
 string ensemble_label = "AlgNuc3pt"
 int ensemble_id = 0
+int StartSrcSpin = 0
+int EndSrcSpin = 0
+int StartSrcColor = 0
+int EndSrcColor = 0
 }

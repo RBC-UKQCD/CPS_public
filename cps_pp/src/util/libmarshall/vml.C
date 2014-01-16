@@ -200,6 +200,7 @@ char *vml_enum_string ( enum_t *val, struct vml_enum_map *map )
 }
 enum_t *vml_enum_val  ( char *string, struct vml_enum_map * map)
 {
+//  printf("vml_enum_val: %s\n",string);
   for ( int i=0;map[i].name!=NULL; i++ ) {
     if ( !strcmp(string,map[i].name) ) {
       return &map[i].val;

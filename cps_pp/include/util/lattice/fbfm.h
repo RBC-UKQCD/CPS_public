@@ -246,8 +246,15 @@ public:
   
     void Fconvert(Vector *f_field,
                   StrOrdType to,
-                  StrOrdType from);
+                  StrOrdType from, int cb=2)
     // Convert fermion field f_field from -> to
+{
+    const char *fname = "Fconvert()";
+    VRB.Func(cname,fname);
+
+    // nothing needs to be done
+    // //    ERR.NotImplemented(cname, fname);
+}
   
     Float BhamiltonNode(Vector *boson, Float mass);
     // The boson Hamiltonian of the node sublattice

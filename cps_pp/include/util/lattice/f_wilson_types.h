@@ -273,7 +273,9 @@ class Fnaive : public virtual FwilsonTypes
     int FmatEvlInv(Vector *f_out, Vector *f_in, 
 		   CgArg *cg_arg, 
 		   Float *true_res,
-		   CnvFrmType cnv_frm = CNV_FRM_YES){};
+		   CnvFrmType cnv_frm = CNV_FRM_YES)
+		{ ERR.NotImplemented(cname,"FmatEvlInv()");
+			return -1;}
         // It calculates f_out where A * f_out = f_in and
         // A is the preconditioned fermion matrix that appears
         // in the HMC evolution (even/odd  preconditioning 
@@ -291,7 +293,9 @@ class Fnaive : public virtual FwilsonTypes
     int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg **cg_arg, 
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, 
-		    Float *alpha, Vector **f_out_d){};
+		    Float *alpha, Vector **f_out_d)
+		{ ERR.NotImplemented(cname,"FmatEvlMInv()");
+			return -1;}
     //!< The matrix inversion used in the molecular dynamics algorithms.
     /*!<
       Solves \f$ (M^\dagger M + shift) f_{out} = f_{in} \f$ for \f$ f_{out} \f$,
@@ -369,20 +373,28 @@ class Fnaive : public virtual FwilsonTypes
 	// It sets the pseudofermion field phi from frm1, frm2.
 
     ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
-			     Float mass, Float step_size){};
+			     Float mass, Float step_size)
+		{ ERR.NotImplemented(cname,"EvolveMomFforce()");
+		ForceArg null_force; return null_force ;}
         // It evolves the canonical momentum mom by step_size
         // using the fermion force. 
 
     ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
-			     Float mass, Float step_size){};
+			     Float mass, Float step_size)
+		{ ERR.NotImplemented(cname,"EvolveMomFforce()");
+		ForceArg null_force; return null_force ;}
         // It evolve the canonical momentum mom  by step_size
         // using the bosonic quotient force.
 
     ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			      int isz, Float *alpha, Float mass, Float dt,
-				  Vector **sol_d, ForceMeasure measure){};
+				  Vector **sol_d, ForceMeasure measure)
+		{ ERR.NotImplemented(cname,"RHMC_EvolveMomFforce()");
+		ForceArg null_force; return null_force ;}
 
-    Float BhamiltonNode(Vector *boson, Float mass){};
+    Float BhamiltonNode(Vector *boson, Float mass)
+		{ ERR.NotImplemented(cname,"BhamiltonNode()");
+		return 0.;}
         // The boson Hamiltonian of the node sublattice.
 
 };

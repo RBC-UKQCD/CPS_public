@@ -22,6 +22,10 @@
 <item><name>RitzMatOper</name><value><RitzMatType>NONE </RitzMatType></value></item>
 <item><name>Inverter</name><value><InverterType>CG </InverterType></value></item>
 <item><name>bicgstab_n</name><value><int>0</int></value></item>
+<item><name>fname_eigen</name><value><string> </string></value></item>
+<item><name>neig</name><value><int>0</int></value></item>
+<item><name>eigen_shift</name><value><double>0.000000e+00</double></value></item>
+<item><name>ama_stop_rsd</name><value><double>0.000000e+00</double></value></item>
 </data></class>
 <item><name>t_source</name><value><int>0</int></value></item>
 <item><name>num_src</name><value><int>1</int></value></item>
@@ -66,4 +70,8 @@
 <item><name>prop_file</name><value><string> </string></value></item>
 <item><name>ensemble_label</name><value><string>AlgNuc3pt </string></value></item>
 <item><name>ensemble_id</name><value><int>0</int></value></item>
+<item><name>StartSrcSpin</name><value><int>0</int></value></item>
+<item><name>EndSrcSpin</name><value><int>0</int></value></item>
+<item><name>StartSrcColor</name><value><int>0</int></value></item>
+<item><name>EndSrcColor</name><value><int>0</int></value></item>
 </data></class>

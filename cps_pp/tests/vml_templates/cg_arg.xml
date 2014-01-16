@@ -7,4 +7,8 @@
 <item><name>RitzMatOper</name><value><RitzMatType>NONE </RitzMatType></value></item>
 <item><name>Inverter</name><value><InverterType>CG </InverterType></value></item>
 <item><name>bicgstab_n</name><value><int>0</int></value></item>
+<item><name>fname_eigen</name><value><string> </string></value></item>
+<item><name>neig</name><value><int>0</int></value></item>
+<item><name>eigen_shift</name><value><double>0.000000e+00</double></value></item>
+<item><name>ama_stop_rsd</name><value><double>0.000000e+00</double></value></item>
 </data></class>

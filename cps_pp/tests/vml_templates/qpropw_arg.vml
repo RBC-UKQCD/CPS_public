@@ -8,6 +8,10 @@ double true_rsd =   0.0000000000000000e+00
 RitzMatType RitzMatOper = NONE
 InverterType Inverter = CG
 int bicgstab_n = 0
+string fname_eigen = ""
+int neig = 0
+double eigen_shift =   0.0000000000000000e+00
+double ama_stop_rsd =   0.0000000000000000e+00
 }
 string file = ""
 int x = 0

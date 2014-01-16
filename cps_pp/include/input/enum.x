@@ -800,7 +800,7 @@ enum RhmcPolesAction { 	RHMC_POLES_CALC = 0,
 
 enum HmdLimits { 
   MAX_HMD_MASSES=200 ,   /* The maximum number of dynamical masses.*/
-  MAX_RAT_DEGREE=20 /* The maximum degree of the rational approximation.*/
+  MAX_RAT_DEGREE=30 /* The maximum degree of the rational approximation.*/
 }; 
 
 /* Which type of solver to use? */
@@ -809,7 +809,8 @@ enum InverterType {
   BICGSTAB = 1,  /* BiCGstab(n). */
   EIGCG   = 2,  /* EigCG */
   LOWMODEAPPROX    = 3,  /* Low Mode Approximation */
-  CG_LOWMODE_DEFL  = 4  /* CG accelerated using low-mode deflation */
+  CG_LOWMODE_DEFL  = 4,  /* CG accelerated using low-mode deflation */
+  HDCG  = 5  /* HDCG */
 };
 
 /* Which type of approximation to use? */

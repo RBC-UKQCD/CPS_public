@@ -590,13 +590,24 @@ void wilson_dslash(IFloat *chi_p_f,
 }
 CPS_END_NAMESPACE
 #else //USE_QMP
-//#ifdef USE_TEST
-#if 1
+#if 1 
 #include "../qmp/wilson_dslash_vec.C"
+CPS_START_NAMESPACE
+void wilson_dslash(IFloat *chi_p_f, 
+			IFloat *u_p_f, 
+			IFloat *psi_p_f, 
+			int cb,
+			int dag,
+			Wilson *wilson_p)
+{
+	wilson_dslash_vec(chi_p_f,u_p_f,psi_p_f,cb,dag,wilson_p,1,0);
+}
+CPS_END_NAMESPACE
 #else
 // older version
 #include "../qmp/wilson_dslash_qmp.C"
 #endif
+#endif //USE_QMP
 #endif
 
 CPS_START_NAMESPACE
@@ -612,4 +623,3 @@ void wilson_dslash_two(Float *chi0, Float *chi1,
 }
 
 CPS_END_NAMESPACE
-#endif

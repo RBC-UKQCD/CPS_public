@@ -1,0 +1,8 @@
+class FloatArray l_twist_arg = {
+Array Floats[4]={
+double Floats[0] = 0.210637
+double Floats[1] = 0.210637
+double Floats[2] = 0.210637
+double Floats[3] = 0
+}
+}

@@ -656,6 +656,7 @@ bool AlgActionRationalQuotient::loadPoles(void)
   if(fp == NULL) return false;
   fclose(fp);
 
+
   RationalQuotientRemezArg rq;
   if(!rq.Decode(rat_quo_arg->rat_poles_file, "rq")) return false;
 
@@ -690,6 +691,7 @@ bool AlgActionRationalQuotient::loadPoles(void)
 
 bool AlgActionRationalQuotient::savePoles(void)
 {
+  const char *fname = "savePoles()";
   if(strlen(rat_quo_arg->rat_poles_file) == 0) return false;
 
   RationalQuotientRemezArg rq;

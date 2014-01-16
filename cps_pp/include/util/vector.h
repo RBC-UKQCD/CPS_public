@@ -448,7 +448,14 @@ class Matrix
 
     //! Not what you might think.
     void TrLessAntiHermMatrix(const Matrix& this_dag);
+//    void TrLessAntiHermMatrix();
+    void TrLessAntiHermMatrix(){
+       Matrix dag;
+       dag.Dagger(*this);
+       this->TrLessAntiHermMatrix(dag);
+    }
 #else 
+//#define TAH_INLINE
 /*!
   \param a A linear array representation of a 3x3 complex matrix, such that 
   real part of the (i,j) element is at array position [6i+2j] 
@@ -489,16 +496,7 @@ inline void TrLessAntiHermMatrix(const Matrix& dag)
     *(p+9) -= c;
     *(p+17) -= c;
 }
-#endif
 
-#ifndef VEC_INLINE
-//    void TrLessAntiHermMatrix();
-    void TrLessAntiHermMatrix(){
-       Matrix dag;
-       dag.Dagger(*this);
-       this->TrLessAntiHermMatrix(dag);
-    }
-#else
 inline void TrLessAntiHermMatrix()
 {
 

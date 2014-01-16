@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <vector>
 #include <util/gjp.h>
 #include <util/lattice.h>
 #include <util/random.h>
@@ -69,6 +70,9 @@ public:
                       const int start[4], // global starting location in x, y, z and t directions
                       const int size[4], // global size in x, y, z and t directions
                       const Float mom[4]); // momentum
+
+  void SetZ3BWall(int color, int spin, int t, const int size[3],
+                  const std::vector<Rcomplex> &rand_num);
 
   /*! Gauge fix sink - Coulomb gauge only */
   void GaugeFixSink       ( Lattice& lat, int dir, int unfix=0);

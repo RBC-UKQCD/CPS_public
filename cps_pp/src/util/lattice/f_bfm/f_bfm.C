@@ -6,6 +6,7 @@
 
 #include <util/lattice/bfm_evo.h>
 #include <util/lattice/bfm_eigcg.h>
+//#include <util/lattice/bfm_hdcg.h>
 #include <util/lattice/fbfm.h>
 #include <util/wilson.h>
 #include <util/verbose.h>
@@ -19,6 +20,35 @@
 #include <util/lattice/fforce_wilson_type.h>
 
 #include<omp.h>
+#include<bfm_hdcg_wrapper.h>
+#include<BfmMultiGrid.h>
+
+#if 0
+class HDCGInstance{
+	public:
+	static BfmMultiGridParams  Params;
+	static HDCG_wrapper  * _instance ;
+	static HDCG_wrapper *getInstance(){return _instance;} 
+	static HDCG_wrapper *setInstance(HDCG_wrapper *_new){_instance = _new;} 
+	static void free(){
+		if (_instance){ 
+			_instance->HDCG_end();
+			delete _instance;
+		}
+		_instance=NULL;
+	}
+};
+#endif
+
+#include <util/lattice/hdcg_controller.h>
+
+
+
+HDCGInstance hdcg_instance; // to invoke constructor with defaults
+BfmMultiGridParams HDCGInstance::Params;
+HDCG_wrapper  *HDCGInstance:: _instance=NULL;
+
+
 
 CPS_START_NAMESPACE
 
@@ -35,6 +65,7 @@ bool Fbfm::use_mixed_solver = false;
 Fbfm::Fbfm(void):cname("Fbfm")
 {
     const char *fname = "Fbfm()";
+    VRB.Func(cname,fname);
 
     if(GJP.Snodes() != 1) {
         ERR.NotImplemented(cname, fname);
@@ -46,6 +77,7 @@ Fbfm::Fbfm(void):cname("Fbfm")
     bd.init(bfm_arg);
 
     if(use_mixed_solver) {
+//    if(1) {
         bd.comm_end();
         bf.init(bfm_arg);
         bf.comm_end();
@@ -63,11 +95,14 @@ Fbfm::Fbfm(void):cname("Fbfm")
 
 Fbfm::~Fbfm(void)
 {
+    const char *fname = "~Fbfm()";
+    VRB.Func(cname,fname);
     // we call base version just to revert the change, no need to
     // import to BFM in a destructor.
     Lattice::BondCond();
     bd.end();
     if(use_mixed_solver) {
+//    if(1) {
         bf.end();
     }
 }
@@ -364,9 +399,65 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
                   PreserveType prs_f_in)
 {
     const char *fname = "FmatInv()";
+    VRB.Func(cname,fname);
 
     if(cg_arg == NULL)
         ERR.Pointer(cname, fname, "cg_arg");
+    int threads =   omp_get_max_threads();
+if (cg_arg->Inverter == HDCG){
+    if(!use_mixed_solver)
+	ERR.General(cname,fname,"Fbfm::use_mixed_solver should be set true to use HDCG\n");
+//    HDCGController<Float> *control = HDCGController<Float>::getInstance();
+	HDCG_wrapper *control = HDCGInstance::getInstance();
+    if (!control){
+	bfmActionParams BAP_;
+	BAP_.M5 = bfm_arg.M5;
+	BAP_.mass = cg_arg->mass;
+	BAP_.twistedmass=0;
+	BAP_.Csw=0;
+	BAP_.solver=bfm_arg.solver;
+	BAP_.mobius_scale=bfm_arg.mobius_scale;
+	BAP_.zolo_hi=bfm_arg.zolo_hi;
+	BAP_.zolo_lo=bfm_arg.zolo_lo;
+	BAP_.Ls=bfm_arg.Ls;
+	BAP_.precon_5d=bfm_arg.precon_5d;
+
+	BAP_.solveMobiusDminus=1;
+
+//	int _Ns = 20;
+//	int block[5]={4,4,4,4,Ls};
+//	int quad[4]={4,4,4,4};
+//	control = HDCGController<Float>::setInstance(Ls,_Ns,block,quad);
+	control = new HDCG_wrapper;
+	HDCGInstance::setInstance(control);
+	HDCGInstance::Params.SubspaceRationalMass=cg_arg->mass;
+//	HDCGInstance::Params.PreconditionerKrylovResidual=1e-4;
+//	HDCGInstance::Params.PreconditionerKrylovIterMax=8;
+//	HDCGInstance::Params.PreconditionerKrylovShift=1.0;
+	control->HDCG_init( HDCGInstance::Params, BAP_); 
+    	Float *gauge = (Float *)(this->GaugeField());
+	control->HDCG_gauge_import_cps<Float>(gauge);
+    	SetMass(cg_arg->mass);
+	control->HDCG_set_mass(cg_arg->mass);
+    	VRB.Result(cname,fname,"HDCG first called with nthreads=%d. Initialzing Ldop\n",threads);
+	control->HDCG_subspace_init();
+	control->HDCG_subspace_compute(0);
+	control->HDCG_subspace_refine();
+	control->HDCG_subspace_compute(0);
+//    }
+//    BfmMultiGrid<Float> *hdcg = control->ldop_d;
+//    if (!hdcg){
+//	control->setHDCG(bd,bf); 
+//	hdcg = control->getHDCG();
+    }
+////    hdcg->InnerKrylovIterMax  = 8;
+//    hdcg->SubspaceSurfaceDepth= 256;
+//    hdcg->InnerKrylovShift    = 1.0;
+//    hdcg->PcgShift       = 1.0;
+//    hdcg->PcgType        = PcgAdef2f;
+//    filecg=file+".PcgADef2f_1e-2";
+//    bd.InverterLoggingBegin("BfmMultiGrid.log");
+}
 
     Fermion_t in[2]  = {bd.allocFermion(), bd.allocFermion()};
     Fermion_t out[2] = {bd.allocFermion(), bd.allocFermion()};
@@ -391,9 +482,15 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
     bd.cps_impexFermion((Float *)f_out, out, 1);
 
     int iter = -1;
+if((cg_arg->Inverter == HDCG)) {
+	HDCG_wrapper *control = HDCGInstance::getInstance();
+	control->HDCG_set_mass(cg_arg->mass);
+        control->HDCG_invert(out, in, cg_arg->stop_rsd, cg_arg->max_num_iter);
+}
+else {
 #pragma omp parallel
     {
-        if(use_mixed_solver) {
+        if(use_mixed_solver && (cg_arg->Inverter != HDCG)) {
             iter = mixed_cg::threaded_cg_mixed_M(out, in, bd, bf, 5, cg_arg->Inverter, evec, evalf, ecnt);
         } else {
             switch(cg_arg->Inverter) {
@@ -407,6 +504,11 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
             case EIGCG:
                 iter = bd.EIG_CGNE_M(out, in);
                 break;
+            case HDCG:
+                if(bd.isBoss()) {
+                    printf("%s::%s: HDCG implemented outside threaded region. Shouldn't have reached this line!\n", cname, fname);
+                }
+                break;
             default:
                 if(bd.isBoss()) {
                     printf("%s::%s: Not implemented\n", cname, fname);
@@ -416,6 +518,12 @@ int Fbfm::FmatInv(Vector *f_out, Vector *f_in,
             }
         }
     }
+}
+if (cg_arg->Inverter == HDCG){
+//    HDCGController<Float> *control = HDCGController::getInstance();
+//    BfmMultiGrid<Float> *hdcg = control->getHDCG();
+    bd.InverterLoggingEnd();
+}
 
     bd.cps_impexFermion((Float *)f_out, out, 0);
 
@@ -691,15 +799,19 @@ Float Fbfm::FhamiltonNode(Vector *phi, Vector *chi)
 }
 
 // Convert fermion field f_field from -> to
+// Moved to fbfm.h by CJ
+#if 0
 void Fbfm::Fconvert(Vector *f_field,
                     StrOrdType to,
                     StrOrdType from)
 {
     const char *fname = "Fconvert()";
+    VRB.Func(cname,fname);
 
     // nothing needs to be done
-    //ERR.NotImplemented(cname, fname);
+//    ERR.NotImplemented(cname, fname);
 }
+#endif
 
 
 // The boson Hamiltonian of the node sublattice

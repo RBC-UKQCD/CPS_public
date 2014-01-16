@@ -135,13 +135,15 @@ void AlgFixGauge::run()
 
   }
 
-  // Allocate gauge fixing matrices
+  // Allocate gauge fixing matrices and set them to 1
   //----------------------------------------------------------------
   lat.FixGaugeAllocate(fix, num, h_planes);
 
 
   // Calculate the gauge fixing matrices
   //----------------------------------------------------------------
+// added to make it possible to explicitly bypass gauge fixin:w
+  if ( alg_fix_gauge_arg->max_iter_num > 0 ) 
   lat.FixGauge(alg_fix_gauge_arg->stop_cond, 
 	       alg_fix_gauge_arg->max_iter_num);
 
