@@ -4,3 +4,4 @@ cps_pp/aux
 cps_pp/src/util/dirac_op/d_op_base/comsrc/lanczos.C
 cps_pp/src/util/dirac_op/d_op_base/comsrc/lanczos.C
 cps_pp/src/util/dirac_op/d_op_base/comsrc/lanczos.C
+cps_pp/src/util/dirac_op/d_op_base/comsrc/eigen_solver.C
