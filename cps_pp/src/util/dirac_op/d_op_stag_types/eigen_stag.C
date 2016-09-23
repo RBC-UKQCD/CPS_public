@@ -3,23 +3,7 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOpStagTypes class eigensolver methods.
    
-  $Id: eigen_stag.C,v 1.10 2012-08-02 21:20:01 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012-08-02 21:20:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v 1.10 2012-08-02 21:20:01 chulwoo Exp $
-//  $Id: eigen_stag.C,v 1.10 2012-08-02 21:20:01 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: eigen_stag.C,v $
-//  $Revision: 1.10 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag_types/eigen_stag.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 /*  Compute the spectrol flow using the Ritz functional minimization */
 /*  routine, if desired in the Kalkreuter-Simma algorithm */
 

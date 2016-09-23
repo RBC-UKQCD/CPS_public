@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>	// exit()
-#if TARGET==QCDOC
-#include <sysfunc_cps.h>
-#endif
+#include <comms/sysfunc_cps.h>
 #include <util/lattice.h>
+#include <alg/do_arg.h>
 #include <util/gjp.h>
 #include <util/verbose.h>
 #include <util/error.h>
@@ -19,6 +18,7 @@
 #include <util/WriteLatticePar.h>
 
 //#include <util/CommandLine.h>
+USING_NAMESPACE_CPS
 
 int main(int argc,char *argv[])
 {

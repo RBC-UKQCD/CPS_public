@@ -1,20 +1,20 @@
 /*! \file
   \brief  Definition of ParTransAsqtad class methods.
   
-  $Id: pt_asqtad.C,v 1.4 2004-12-21 19:02:41 chulwoo Exp $
+  $Id: pt_asqtad.C,v 1.4 2004/12/21 19:02:41 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-12-21 19:02:41 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/noarch/pt_asqtad.C,v 1.4 2004-12-21 19:02:41 chulwoo Exp $
-//  $Id: pt_asqtad.C,v 1.4 2004-12-21 19:02:41 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/12/21 19:02:41 $
+//  $Header: /space/cvs/cps/cps++/src/util/parallel_transport/pt_asqtad/noarch/pt_asqtad.C,v 1.4 2004/12/21 19:02:41 chulwoo Exp $
+//  $Id: pt_asqtad.C,v 1.4 2004/12/21 19:02:41 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: pt_asqtad.C,v $
 //  $Revision: 1.4 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_asqtad/noarch/pt_asqtad.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/parallel_transport/pt_asqtad/noarch/pt_asqtad.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

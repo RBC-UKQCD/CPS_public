@@ -73,6 +73,7 @@ void mobius_dminus(Vector *out,
   
   IFloat* frm_;
   Vector  *frm_tmp3 = (Vector *) mobius_lib_arg->frm_tmp3;
+  VRB.Flow("","mobius_dminus()","frm_tmp3=%p\n",frm_tmp3);
   frm_ = (IFloat*)frm_tmp3;
 
   //----------------------------------------------------------------

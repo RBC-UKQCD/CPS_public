@@ -1,11 +1,16 @@
 #ifdef USE_QIO
 #include <config.h>
 #include <util/qio_general.h>
+#include <util/time_cps.h>
+
 
 CPS_START_NAMESPACE
 using namespace std;
 
 
+static int qio_sparse_num=1;
+void setQioSparseNum(int n) { qio_sparse_num = n;}
+int getQioSparseNum() { return qio_sparse_num;}
 
 
 
@@ -118,6 +123,9 @@ int  qio_node_index( const int x[])
   if( tmp >= GJP.VolNodeSites() )
     { 
       printf("ERROR QIO: qio_node_index got index >= local volume");
+  printf("UID: %i, called qio_node_index with x: [%i, %i, %i, %i] \n",UniqueID(),x[0],x[1],x[2],x[3]);
+  printf("UID: %i, called qio_node_index with NodeCoor: [%i, %i, %i, %i] \n",UniqueID(), GJP.NodeCoor(0), GJP.NodeCoor(1), GJP.NodeCoor(2), GJP.NodeCoor(3));
+  printf("UID: %i, called qio_node_index with NodeSites: [%i, %i, %i, %i] \n",UniqueID(), GJP.NodeSites(0), GJP.NodeSites(1), GJP.NodeSites(2), GJP.NodeSites(3));
       exit(-1);
     }
 
@@ -168,6 +176,8 @@ void qio_get_coords( int x[], int node, int index)
   else
     localIndex_t = GJP.NodeSites(3);
 
+#undef USE_SLOW_INDEX
+#ifdef USE_SLOW_INDEX
   int xLoc[4]={0,0,0,0};
 
   for( int ii(0); ii < index; ++ii)
@@ -191,10 +201,25 @@ void qio_get_coords( int x[], int node, int index)
 	   }
 	}
     }
-      
+#endif
+  int xLoc2[4]={0,0,0,0};
+  int rest = index;
+  for(int ii=0;ii<4;ii++){
+	xLoc2[ii] = rest % GJP.NodeSites(ii);
+	rest = rest/GJP.NodeSites(ii);
+#ifdef USE_SLOW_INDEX
+	if (xLoc2[ii] != xLoc[ii])
+	ERR.General("",fname,"index=%d xLoc2[%d](%d) != xLoc[%d](%d)\n",
+        index,ii,xLoc2[ii],ii,xLoc[ii]);
+#endif
+  }
+  if( xLoc2[3] >= localIndex_t ) {
+     printf("ERROR in QIO: with index/global-coor-conver\n");
+     exit(-1);
+   }
 	
   for(int ii(0); ii < 4; ++ii)
-    x[ii] += xLoc[ii];
+    x[ii] += xLoc2[ii];
           
   //#define DEBUG_GetCorrds
   
@@ -207,7 +232,7 @@ void qio_get_coords( int x[], int node, int index)
 // To supporthe QIO_PARTFILE format for totnode != num io node
 void qio_get_coords( int x[], int node, int index)
 {
-
+  const char *fname="qio_get_coords(i[],i,i)";
   #ifdef DEBUG_GetCoords
   printf("UID: %i, called qio_get_coords with node: %i, index %i; calc...\n", UniqueID(), node, index);
   #endif // DEBUG_GetCoords
@@ -260,6 +285,8 @@ void qio_get_coords( int x[], int node, int index)
   else
     localIndex_t = GJP.NodeSites(3);
 
+#undef USE_SLOW_INDEX
+#ifdef USE_SLOW_INDEX
   int xLoc[4]={0,0,0,0};
 
   for( int ii(0); ii < index; ++ii)
@@ -283,10 +310,25 @@ void qio_get_coords( int x[], int node, int index)
 	   }
 	}
     }
-      
+#endif
+  int xLoc2[4]={0,0,0,0};
+  int rest = index;
+  for(int ii=0;ii<4;ii++){
+	xLoc2[ii] = rest % GJP.NodeSites(ii);
+	rest = rest/GJP.NodeSites(ii);
+#ifdef USE_SLOW_INDEX
+	if (xLoc2[ii] != xLoc[ii])
+	ERR.General("",fname,"index=%d xLoc2[%d](%d) != xLoc[%d](%d)\n",
+        index,ii,xLoc2[ii],ii,xLoc[ii]);
+#endif
+  }
+  if( xLoc2[3] >= localIndex_t ) {
+     printf("ERROR in QIO: with index/global-coor-conver\n");
+     exit(-1);
+   }
 	
   for(int ii(0); ii < 4; ++ii)
-    x[ii] += xLoc[ii];
+    x[ii] += xLoc2[ii];
           
   //#define DEBUG_GetCorrds
   
@@ -330,6 +372,7 @@ int qio_sites_on_node()
 static int qio_get_node(int node)
 {
   //printf("qio_get_node: %d %d\n",node,QIO_SPARSE_PARTFILE_NODES);
+  int QIO_SPARSE_PARTFILE_NODES=getQioSparseNum();
   if (QIO_SPARSE_PARTFILE_NODES==0) return node;
   return (node / QIO_SPARSE_PARTFILE_NODES)*QIO_SPARSE_PARTFILE_NODES;
 }
@@ -342,6 +385,7 @@ static int qio_master_io_node(){ return 0; }
 //void qio_init::qio_setLayout( QIO_Layout *layout)
 void qio_init::qio_setLayout()
 {
+  Float time = -dclock();
   static int lattice_size[QIO_RW_DIMENSION];
 
   
@@ -373,7 +417,7 @@ void qio_init::qio_setFilesystem()
 {
 
 #ifdef QIO_SPARSE_PARTFILE
-  fs. number_io_nodes = NumNodes() / QIO_SPARSE_PARTFILE_NODES;
+  fs. number_io_nodes = NumNodes() / getQioSparseNum();
   fs. type = QIO_SINGLE_PATH;// or QIO_MULTIPLE_PATH
   fs. my_io_node =  qio_get_node;
   fs. master_io_node = qio_master_io_node;

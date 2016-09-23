@@ -3,21 +3,21 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:05 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/qcdoc/hadron_prop_s.C,v 1.3 2008-02-08 18:35:05 chulwoo Exp $
-//  $Id: hadron_prop_s.C,v 1.3 2008-02-08 18:35:05 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2008/02/08 18:35:05 $
+//  $Header: /space/cvs/cps/cps++/src/alg/alg_s_spect/qcdoc/hadron_prop_s.C,v 1.3 2008/02/08 18:35:05 chulwoo Exp $
+//  $Id: hadron_prop_s.C,v 1.3 2008/02/08 18:35:05 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: hadron_prop_s.C,v $
 //  $Revision: 1.3 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/qcdoc/hadron_prop_s.C,v $
+//  $Source: /space/cvs/cps/cps++/src/alg/alg_s_spect/qcdoc/hadron_prop_s.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
 // hadron_prop_s.C
 
 #ifndef lint
-static char vcid[] = "$Id: hadron_prop_s.C,v 1.3 2008-02-08 18:35:05 chulwoo Exp $";
+static char vcid[] = "$Id: hadron_prop_s.C,v 1.3 2008/02/08 18:35:05 chulwoo Exp $";
 #endif /* lint */
 
 #include <util/qcdio.h>

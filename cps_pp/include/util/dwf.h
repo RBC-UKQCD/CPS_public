@@ -1,20 +1,5 @@
 #include<config.h>
 CPS_START_NAMESPACE
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:46:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dwf.h,v 1.7 2013-04-05 17:46:30 chulwoo Exp $
-//  $Id: dwf.h,v 1.7 2013-04-05 17:46:30 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: dwf.h,v $
-//  $Revision: 1.7 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dwf.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // dwf.h
@@ -29,6 +14,8 @@ CPS_START_NAMESPACE
 CPS_END_NAMESPACE
 #include <util/wilson.h>
 #include <util/vector.h>
+#include <util/rcomplex.h>
+#include <comms/sysfunc_cps.h> //for UniqueID()
 CPS_START_NAMESPACE
 
 //------------------------------------------------------------------
@@ -39,15 +26,38 @@ extern int dwfso_wire_map[];
 // Set in dwf_int. For a given index 0-1 corresponding to
 // S+, S-  it gives the corresponding wire.
 
+inline void DEBTIZB(char* str, Vector* vp, int len)
+{
+  Float norm = vp->NormSqGlbSum(len);
+  if(!UniqueID()) printf("DEBTIZB %s %.16e\n", str, norm);
+}
+
 
 //------------------------------------------------------------------
 // Type definitions
 //------------------------------------------------------------------
+
+// pre/post-conditioning variations
+enum ZMobiusPCType {
+  ZMOB_PC_ORIG,
+  ZMOB_PC_SYM1,
+  ZMOB_PC_SYM2,
+  ZMOB_PC_SYM1_MIT,
+  ZMOB_PC_SYM2_MIT,
+  ZMOB_PC_SYM3};
+
+
 // The Dwf structure typedef
 typedef struct{
   IFloat dwf_kappa;    // 1/[2*(5-dwf_height)]
   IFloat mobius_kappa_b;    // 1/[2*(b*(4-dwf_height)+1)]
   IFloat mobius_kappa_c;    // 1/[2*(c*(4-dwf_height)-1)]
+  Rcomplex *zmobius_kappa_b;    // 1/[2*(b*(4-dwf_height)+1)]
+  Rcomplex *zmobius_kappa_c;    // 1/[2*(c*(4-dwf_height)-1)]
+  Rcomplex *zmobius_kappa_ratio;//    kappa_b / kappa_c
+  // pre/post-conditioning for zmobius
+  ZMobiusPCType pc_type;
+
   int vol_4d;         // The 4-dimensional volume   
   int ls;             // The extent of the 5th direction
   IFloat *frm_tmp1;    // Pointer to temorary fermion field 1
@@ -59,12 +69,6 @@ typedef struct{
   
   IFloat *comm_buf;    // Communications buffer (12 words for dwfso)
   Wilson *wilson_p;   // Pointer to the wilson structure
-#if TARGET == QCDOC
-  SCUDirArgIR *PlusArg[2];
-  SCUDirArgIR *MinusArg[2];
-  SCUDirArgMulti *Plus;
-  SCUDirArgMulti *Minus;
-#endif
 } Dwf;
 
 

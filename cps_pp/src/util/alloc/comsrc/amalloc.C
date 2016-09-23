@@ -3,7 +3,7 @@
   \file
   \brief Functions for dynamical array allocation.
 
-  $Id: amalloc.C,v 1.11 2012-03-26 13:50:11 chulwoo Exp $
+  $Id: amalloc.C,v 1.11 2012/03/26 13:50:11 chulwoo Exp $
 */
 #include <util/smalloc.h>
 #include <stdarg.h>

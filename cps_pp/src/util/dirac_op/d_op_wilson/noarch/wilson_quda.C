@@ -221,7 +221,6 @@ int DiracOpWilson::QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_
   inv_param.tol_precondition = 1e-1;
   inv_param.maxiter_precondition = 10;
   inv_param.verbosity_precondition = QUDA_VERBOSE;
-  inv_param.prec_precondition = QUDA_HALF_PRECISION;
   inv_param.omega = 1.0;
 
   

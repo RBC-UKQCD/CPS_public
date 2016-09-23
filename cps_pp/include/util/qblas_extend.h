@@ -1,6 +1,6 @@
 #ifndef __QBLAS_EXTEND__CD
 #define __QBLAS_EXTEND__CD
-#include "qblas.h"
+#include <cblas.h>
 
 /*
   some convenience functions for 
@@ -34,6 +34,15 @@ inline double cblas_ddot(const int N,
 
 inline double cblas_ddot(const int N, const double *X)
 { return cblas_ddot(N,X,1,X,1); }
+
+inline void cblas_zdotc_sub(const int N, const double *X, const double *Y,
+			  double* dot)
+{ return cblas_zdotc_sub(N,X,1,Y,1, dot); }
+
+//inline void cblas_cdotc_sub(const int N, const float *X, const float *Y,
+//		  float* dot)
+//{ return cblas_cdotc_sub(N,X,Y,dot); }
+
 
 
 #endif 

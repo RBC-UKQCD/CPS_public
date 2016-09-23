@@ -1,7 +1,7 @@
 /*!\file
   \brief Pion correlation function for the testing framework.
 
-  $Id: staggered_local_pion.C,v 1.6 2004-12-11 20:58:06 chulwoo Exp $
+  $Id: staggered_local_pion.C,v 1.6 2004/12/11 20:58:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 // Compute the local pion correlator for staggered fermions.
@@ -12,8 +12,8 @@
 //
 //
 //  Starting point
-//  $Date: 2004-12-11 20:58:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/testing_framework/staggered_local_pion.C,v 1.6 2004-12-11 20:58:06 chulwoo Exp $
+//  $Date: 2004/12/11 20:58:06 $
+//  $Header: /space/cvs/cps/cps++/src/util/testing_framework/staggered_local_pion.C,v 1.6 2004/12/11 20:58:06 chulwoo Exp $
 //
 //-------------------------------------------------------------------
 

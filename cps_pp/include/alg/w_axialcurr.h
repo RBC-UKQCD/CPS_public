@@ -66,7 +66,7 @@ public:
   // PRIVATEs
   //-------------------------------------------------------------------------
 private:
-  static char *  d_class_name;
+  static const char *  d_class_name;
   char *          ap_filename;
 
   Float *           d_local_p;        // Complex[global_slice]

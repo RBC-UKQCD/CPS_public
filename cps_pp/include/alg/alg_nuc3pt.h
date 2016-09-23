@@ -588,6 +588,24 @@ class AlgNuc3pt : public Alg
 
       We use the i since the projector used is \f$i\gamma_5\gamma_3\f$.
     */
+
+    // same as calc_Tensor, but includes Fmunu (clover leaf)
+    void calc_TensorClover()
+      {
+	for ( int n = 0; n < num_qprop; n++ ) {
+	  for (int mu = 0; mu < 4; mu++){
+	    for (int nu = mu+1; nu < 4; nu++){
+	      Nuc3ptClover Tensor(Complex(0.0,1.0),Gamma(mu,nu)) ;
+	      Tensor.Calc3pt(*u_s_prop,*q_prop[n]);
+	      Tensor.Calc3pt(*d_s_prop,*q_prop[n]);
+	      
+	      OpenFile();
+	      Tensor.Print(fp) ;
+	      CloseFile();
+	    }
+	  }
+	}
+      }
     void calc_X_dq()
       {
 	for ( int n = 0; n < num_qprop; n++ ) {

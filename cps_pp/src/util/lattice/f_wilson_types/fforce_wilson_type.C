@@ -11,7 +11,6 @@
 #include <util/wilson.h>
 #include <util/lattice/fforce_wilson_type.h>
 
-
 USING_NAMESPACE_CPS;
 
 static void compute_coord(long x[4], const long hl[4], const long low[4], long i)

@@ -7,23 +7,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of dynamic memory management routines.	
 
-  $Id: smalloc.h,v 1.14 2012-08-10 14:05:33 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012-08-10 14:05:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v 1.14 2012-08-10 14:05:33 chulwoo Exp $
-//  $Id: smalloc.h,v 1.14 2012-08-10 14:05:33 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: smalloc.h,v $
-//  $Revision: 1.14 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/smalloc.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 
 
 /*! \addtogroup mem_alloc Memory allocation

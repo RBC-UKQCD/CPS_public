@@ -1,7 +1,7 @@
 /*!\file
   \brief  Definition of the DensArg structure.
 
-  $Id: dens_arg.x,v 1.2 2006-02-21 21:44:22 chulwoo Exp $
+  $Id: dens_arg.x,v 1.2 2006/02/21 21:44:22 chulwoo Exp $
 */
 /*---------------------------------------------------------------------------*/
 

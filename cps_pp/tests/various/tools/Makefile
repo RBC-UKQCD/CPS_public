@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 ##--------------------------------------------------------------------
 ##  CVS keywords
 ##
-##  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/various/tools/Makefile,v $
+##  $Source: /space/cvs/cps/cps++/tests/various/tools/Makefile,v $
 ##  $State: Exp $
 ##
 ##--------------------------------------------------------------------

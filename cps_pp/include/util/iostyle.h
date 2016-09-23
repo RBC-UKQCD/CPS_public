@@ -36,7 +36,7 @@ class IoStyle : protected QioControl {
 
 class ParallelIO : public IoStyle {
  private:
-  char * cname;
+  const char * cname;
  public:
   ParallelIO(const QioArg & qarg) : IoStyle(qarg), cname("ParallelIO") { }
 
@@ -60,7 +60,7 @@ class ParallelIO : public IoStyle {
 
 class SerialIO : public IoStyle {
  private:
-  char * cname;
+  const char * cname;
  public:
   SerialIO(const QioArg & qarg) : IoStyle(qarg), cname("SerialIO") { }
 

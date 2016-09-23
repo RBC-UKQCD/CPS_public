@@ -1,7 +1,3 @@
-/*
-  $Id: main.C,v 1.12.30.1 2007/07/19 04:26:03 chulwoo Exp $
-*/
-
 #include<omp.h>
 #include<config.h>
 #include <util/qcdio.h>
@@ -22,6 +18,9 @@
 
 USING_NAMESPACE_CPS
 
+DoArg do_arg;
+DoArgExt doext_arg;
+MobiusArg mobius_arg;
 
 
 //const char *f_wilson_test_filename = CWDPREFIX("f_wilson_test");
@@ -38,11 +37,13 @@ inline int omp_get_num_threads(){return 1;}
 inline int omp_get_thread_num(){return 0;}
 #endif
 
-void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, int DO_CHECK);
+//void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, int DO_CHECK);
+void run_inv(Lattice &lat, StrOrdType str_ord, char *out_name, int DO_CHECK);
 
 int main(int argc,char *argv[]){
 
     Start(&argc, &argv);
+    char *fname = "main()";
 //omp_set_num_threads(16);
 #pragma omp parallel default(shared)
 {
@@ -60,7 +61,52 @@ for(int  i = 0;i<100;i++){
     // Initializes all Global Job Parameters
     //----------------------------------------------------------------
     DoArg do_arg;
+    char *out_file=NULL;
+#if 1
+    if(argc>1) out_file=argv[1];
+  if ( !do_arg.Decode("do_arg.vml","do_arg") )
+    {
+      do_arg.Encode("do_arg.dat","do_arg");
+      ERR.General("",fname,"Decoding of do_arg failed\n");
+    }
+  if ( !cg_arg.Decode("cg_arg.vml","cg_arg") )
+    {
+      ERR.General("",fname,"Decoding of cg_arg failed\n");
+    }
+#else
 
+
+    char *out_file=NULL;
+    char *fname = "main()";
+#if 1
+    if(argc>1) out_file=argv[1];
+  if ( !do_arg.Decode("do_arg.vml","do_arg") )
+    {
+      ERR.General("",fname,"Decoding of do_arg failed\n");
+    }
+  if ( !doext_arg.Decode("doext_arg.vml","doext_arg") )
+    {
+      ERR.General("",fname,"Decoding of doext_arg failed\n");
+    }
+  if ( !mobius_arg.Decode("mobius_arg.vml","mobius_arg") )
+    {
+      mobius_arg.Encode("mobius_arg.dat","mobius_arg");
+      ERR.General("",fname,"Decoding of mobius_arg failed\n");
+    }
+
+  do_arg.Encode("do_arg.dat","do_arg");
+  doext_arg.Encode("doext_arg.dat","doext_arg");
+  mobius_arg.Encode("mobius_arg.dat","mobius_arg");
+      GJP.SnodeSites(mobius_arg.ls);
+    GJP.ZMobius_b (mobius_arg.zmobius_b_coeff.zmobius_b_coeff_val,
+                   mobius_arg.ls);
+    GJP.ZMobius_c (mobius_arg.zmobius_c_coeff.zmobius_c_coeff_val,
+                   mobius_arg.ls);
+
+//HACK!! Needs to be fixed, as cg_arg has dynamical allocation now.
+    cg_arg = mobius_arg.cg; 
+
+#else
     if (argc < 6){
         ERR.General("f_wilson_test","main()","usage: %s nx ny nz nt ns (filename) \n",argv[0]);
     }
@@ -69,7 +115,6 @@ for(int  i = 0;i<100;i++){
     sscanf(argv[3],"%d",&nz);
     sscanf(argv[4],"%d",&nt);
     sscanf(argv[5],"%d",&ns);  
-    char *out_file=NULL;
     if(argc>6) out_file=argv[6];
     VRB.Result("","main()","sites = %d %d %d %d %d\n",nx,ny,nz,nt,ns);
     do_arg.x_sites = nx;
@@ -117,38 +162,32 @@ for(int  i = 0;i<100;i++){
 #ifndef USE_CG_DWF
     cg_arg.max_num_iter++;
 #endif
+#endif
+
     GJP.Initialize(do_arg);
 
-   
+#if 0
     wilson_set_sloppy(false);
 {
     GwilsonFwilson lat;
     DiracOpWilson dirac(lat,NULL,NULL,&cg_arg,CNV_FRM_NO);
 	run_inv(lat,dirac,WILSON,out_file,1);
 }
-#if 0
    
-    wilson_set_sloppy(true);
-{
-    GwilsonFwilson lat;
-    DiracOpWilson dirac(lat,NULL,NULL,&cg_arg,CNV_FRM_NO);
-	run_inv(lat,dirac,WILSON,NULL,1);
-}
-
-    wilson_set_sloppy(false);
 {
     GwilsonFdwf lat;
     DiracOpDwf dirac(lat,NULL,NULL,&cg_arg,CNV_FRM_NO);
-	run_inv(lat,dirac,WILSON,NULL,0);
+	run_inv(lat,dirac,WILSON,out_file,0);
 }
 #endif
 
+#if 0
     wilson_set_sloppy(true);
 for(int i = 0;i<1;i++)
 {
-    GwilsonFdwf lat;
-    DiracOpDwf dirac(lat,NULL,NULL,&cg_arg,CNV_FRM_NO);
-	run_inv(lat,dirac,WILSON,NULL,1);
+    GnoneFzmobius lat;
+//    DiracOpZMobius dirac(lat,NULL,NULL,&cg_arg,CNV_FRM_NO);
+	run_inv(lat,DWF_4D_EOPREC_EE,NULL,1);
 }
 	
 	
@@ -157,7 +196,8 @@ for(int i = 0;i<1;i++)
     return 0; 
 }
 
-void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, int DO_CHECK){
+//void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, int DO_CHECK){
+void run_inv(Lattice &lat,  StrOrdType str_ord, char *out_name, int DO_CHECK){
     FILE *fp;
     double dtime;
 	int DO_IO =1;
@@ -230,28 +270,31 @@ void run_inv(Lattice &lat, DiracOp &dirac, StrOrdType str_ord, char *out_name, i
 		int offset = GJP.VolNodeSites()*lat.FsiteSize()/ (2*6);
 #if 1
 		dtime = -dclock();
-   		int iter = dirac.MatInv(result,X_in,&true_res,PRESERVE_YES);
+//   		int iter = dirac.MatInv(result,X_in,&true_res,PRESERVE_YES);
+   		int iter = lat.FmatInv(result,X_in,&cg_arg,&true_res,CNV_FRM_NO,PRESERVE_YES);
 		dtime +=dclock();
 #else
-		dirac.Dslash(result,X_in+offset,CHKB_EVEN,DAG_NO);
-		dirac.Dslash(result+offset,X_in,CHKB_ODD,DAG_NO);
+		lat.Fdslash(result,X_in,&cg_arg,CNV_FRM_NO,0);
+//		dirac.Dslash(result,X_in+offset,CHKB_EVEN,DAG_NO);
+//		dirac.Dslash(result+offset,X_in,CHKB_ODD,DAG_NO);
 #endif
 
 //if (DO_CHECK){
 if (1){
 		if (k == 0){
 			memset((char *)X_out2, 0,GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-			dirac.Dslash(X_out2,result+offset,CHKB_EVEN,DAG_NO);
-			dirac.Dslash(X_out2+offset,result,CHKB_ODD,DAG_NO);
+			lat.Fdslash(X_out2,result,&cg_arg,CNV_FRM_NO,0);
+//			dirac.Dslash(X_out2,result+offset,CHKB_EVEN,DAG_NO);
+//			dirac.Dslash(X_out2+offset,result,CHKB_ODD,DAG_NO);
 		}
 }
 		lat.Fconvert(result,CANONICAL,str_ord);
 		lat.Fconvert(X_in,CANONICAL,str_ord);
 		lat.Fconvert(X_out2,CANONICAL,str_ord);
-	if (lat.F5D())
+//	if (lat.F5D())
+	if (lat.Fclass()== F_CLASS_DWF)
 		X_out2->FTimesV1PlusV2(-0.5/(5.0-GJP.DwfHeight()),X_out2,out,GJP.VolNodeSites()*lat.FsiteSize());
-//		X_out2->FTimesV1PlusV2(-2.*(5.0-GJP.DwfHeight()),out,X_out2,GJP.VolNodeSites()*lat.FsiteSize());
-	else
+	else if (lat.Fclass()== F_CLASS_WILSON)
 		X_out2->FTimesV1PlusV2(-0.5/(cg_arg.mass+4.0),X_out2,out,GJP.VolNodeSites()*lat.FsiteSize()); 
     
     Float dummy;
@@ -284,9 +327,9 @@ if(DO_IO){
 				Fprintf(ADD_ID, fp," ( %0.7e %0.7e ) (%0.7e %0.7e)",
 				*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
 				*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1));
-#if 0
+#if 1
 				Fprintf(ADD_ID, fp," ( %0.2e %0.2e )\n",
-	#if 1
+	#if 0
 		*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2), 
 	*((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1));
 	#else

@@ -5,7 +5,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations for the serial emulation of the QCDSP/QCDOC communications  layer.
   
-  $Id: sysfunc_noarch.h,v 1.9 2008-02-08 18:35:05 chulwoo Exp $
+  $Id: sysfunc_noarch.h,v 1.9 2008/02/08 18:35:05 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
   The Sysfunc Comms Interface: sysfunc_cps.h
@@ -17,14 +17,14 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: chulwoo $
-  $Date: 2008-02-08 18:35:05 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v 1.9 2008-02-08 18:35:05 chulwoo Exp $
-  $Id: sysfunc_noarch.h,v 1.9 2008-02-08 18:35:05 chulwoo Exp $
-  $Name: not supported by cvs2svn $
+  $Date: 2008/02/08 18:35:05 $
+  $Header: /space/cvs/cps/cps++/include/comms/sysfunc_noarch.h,v 1.9 2008/02/08 18:35:05 chulwoo Exp $
+  $Id: sysfunc_noarch.h,v 1.9 2008/02/08 18:35:05 chulwoo Exp $
+  $Name: v5_0_16_hantao_io_test_v7 $
   $Locker:  $
   $RCSfile: sysfunc_noarch.h,v $
   $Revision: 1.9 $
-  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/sysfunc_noarch.h,v $
+  $Source: /space/cvs/cps/cps++/include/comms/sysfunc_noarch.h,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 
@@ -81,89 +81,7 @@ inline unsigned int SeedST(){return SERIAL_SEED;} //!< Gets a RNG seed.
 inline unsigned int sync(){return 1;}
 #endif
 
-// done up to here yet.
-#if 0 
-//! Gets the direction used internally by the comms layer.
-int SCURemap( SCUDir dir );
-
-/* The following are the primary functions for generic SCU transfers: */
-
-//! Generic single communication.
-void SCUTrans( SCUDirArg * arg );
-
-//! Generic multiple communication.
-void SCUTrans( SCUDirArg ** arg, int n );
-
-//! Does a number of similar communications.
-void SCUTrans( SCUDirArg * arg, unsigned int * offset, int n );
-
-//! Initialise a data transfer.
-void SCUSetDMA( SCUDirArg * arg );
-
-//! Initialise multiple data transfers.
-void SCUSetDMA( SCUDirArg ** arg, int n );
-
-//! Performs a previously set-up data transfer.
-void SCUTransAddr( SCUDirArg * arg );
-
-//! Performs multiple previously set-up data transfers.
-void SCUTransAddr( SCUDirArg ** arg, int n );
-
-//! A communications barrier function,
-void SCUTransComplete(void);
-
-
-
-//! The global comms-layer initialization flag.
-    extern bool Is_Initialised;
-
-
-/* Useful extra subroutines, part of the MPI version:          */
-
-
-//! Communicates the processor grid dimensions to the MPI-SCU layer.
-    void set_pe_grid(int x, int y, int z, int t, int s=1);
-
-//! Initialises the MPI communications layer.
-    void CommsInit();
-
-//! Performs a clean exit from the MPI communications layer.
-    void CommsFinalize();
-
-//! Computes a global sum directly using MPI 
-    void GlobalSum(Type_tag t, size_t tsize, int n, void *ivec, void *ovec );
-
-//! Reports an error.
-    void RaiseError( char* errstr );
-
-//! Reports an error.
-    void RaiseError( const char* errstring );
-
-/*! @} */
-
-/*-------------------------------------------------------------------------*/
-/*              Implementation-specific internal subroutines:              */
-/*              If this were a class, these would be private.              */
-/*-------------------------------------------------------------------------*/
-
-//! An implementation-specific internal subroutine
-    void Trans( void* addr, MPI_Datatype mpi_dt, SCUDir dir, SCUXR sendrx );
-
-//! An implementation-specific internal subroutine
-    void ParseCommsParam( char *);
-
-//! An implementation-specific internal subroutine
-    char *CommsStringTokenizer(char* str, const char* tokens, char** tok_pos );
-
-//! An implementation-specific internal subroutine
-    MPI_Datatype MPITypeConv( Type_tag t, size_t tsize );
-
-//! An implementation-specific internal subroutine
-    unsigned int ReadSeedFile(  );
-
-#endif
-
-
+inline void broadcast( void *, size_t size){}
 #endif
 
 

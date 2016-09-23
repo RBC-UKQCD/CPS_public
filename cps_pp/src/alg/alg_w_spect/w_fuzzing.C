@@ -50,7 +50,7 @@ static Matrix scuBufM;
 //------------------------------------------------------------
 //class WspectFuzzing definition
 //------------------------------------------------------------
-char *WspectFuzzing::d_class_name="WspectFuzzing";
+const char *WspectFuzzing::d_class_name="WspectFuzzing";
 
 WspectFuzzing::WspectFuzzing(Lattice &lat, WspectArg & warg, int singleslice,int fuzzing_c_index)
   :d_lat(lat),prop_dir(warg.prop_dir),sliceonly(singleslice){
@@ -97,7 +97,7 @@ WspectFuzzing::~WspectFuzzing(){
 
 void WspectFuzzing::run(int wall){
   //construct fuzzed links on single time slice
-  char *fname="run";
+  const char *fname="run";
   //if already done, return immediately
   if(slice==wall) return;
 
@@ -134,7 +134,7 @@ void WspectFuzzing::run(int wall){
 }
 
 void WspectFuzzing::run(){
-  char *fname="run";
+  const char *fname="run";
   if(sliceonly) ERR.General(d_class_name, fname, "sliceonly mode");
   
   fuzzedlink_tmp_p = (Matrix *)smalloc(d_size*sizeof(Float));
@@ -182,7 +182,7 @@ void WspectFuzzing::run(){
 //FU[site][i][c1][c2], site[4],i=0,1,2
 
 void  WspectFuzzing::fuzz(Matrix *FU, const Matrix *U, int lclWall, Float c, int flevel, int hit_iter){
-  char *fname="fuzz";
+  const char *fname="fuzz";
   //printf("Inside WpsectFuzzing::fuzz\n");
   //assume memory has been allocated
   if(!FU || !U) ERR.General(d_class_name,fname,"Null pointer");
@@ -338,7 +338,7 @@ void  WspectFuzzing::fuzz(Matrix *FU, const Matrix *U, int lclWall, Float c, int
 const Matrix *
 WspectFuzzing::GetLink(const int *site, int dir) const
 {
-  char *fname = "GetLink";
+  const char *fname = "GetLink";
   
   //VRB.Debug(cname, fname, "link %3i %3i %3i %3i ; %i\n",
   //  site[0], site[1], site[2], site[3], dir) ;
@@ -440,7 +440,7 @@ const unsigned MYBANK_SIZE=0;
 
 Matrix WspectFuzzing::staple_s(Matrix *gf_p,int x[4],int mu){
   
-  //char *fname = "Staple";
+  //const char *fname = "Staple";
  
   // set cbuf registers
 #ifdef USE_CBUF

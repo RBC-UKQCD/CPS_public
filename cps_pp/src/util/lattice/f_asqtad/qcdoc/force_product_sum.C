@@ -4,7 +4,7 @@
 /*!\file
   \brief Helper routines for the fermionic force term
 
-  $Id: force_product_sum.C,v 1.4 2008-02-08 18:35:07 chulwoo Exp $
+  $Id: force_product_sum.C,v 1.4 2008/02/08 18:35:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 

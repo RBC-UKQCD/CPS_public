@@ -20,6 +20,7 @@ CPS_END_NAMESPACE
 #include<util/error.h>
 #include<alg/alg_int.h>
 #include<alg/alg_remez.h>
+#include <util/lattice/fbfm.h>
 CPS_START_NAMESPACE
 
 //!< Dummy contructor - does nothing
@@ -153,6 +154,7 @@ void AlgActionRational::init(int traj_num) {
   heatbathEval = 0;
   energyEval = 0;
   traj = traj_num-1;  
+  VRB.FuncEnd(cname,fname);
 }
 
 AlgActionRational::~AlgActionRational() {
@@ -778,6 +780,11 @@ void AlgActionRational::checkApprox(Float *mass, RemezArg *remez_arg,
 
   char *fname = "checkApprox()";
   
+  // Necessary so that functions called by AlgEig know what Ls Fbfm is using:
+#ifdef USE_BFM
+  Fbfm::current_key_mass = mass[0];
+#endif
+
   Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
   
   //!< First setup the masses
@@ -795,6 +802,7 @@ void AlgActionRational::checkApprox(Float *mass, RemezArg *remez_arg,
     eig.run(lambda_low);
 
     for (int i=0; i<n_masses; i++) {
+//      if (0){
       if (lambda_low[0][i] < remez_arg[i].lambda_low) {
 	ERR.General(cname, fname, 
 		    "Lower bound exceeded: mass[%d] = %f, %e < %e\n", 
@@ -818,6 +826,7 @@ void AlgActionRational::checkApprox(Float *mass, RemezArg *remez_arg,
     
     for (int i=0; i<n_masses; i++) {
       lambda_high[0][i] *= -1.0;
+//      if (0){
       if (lambda_high[0][i] > remez_arg[i].lambda_high) {
 	ERR.General(cname, fname, 
 		    "Upper bound exceeded: mass[%d] = %f, %e > %e\n", 

@@ -43,48 +43,48 @@ typedef struct { Complex c[3]; } su3_vector;
 
   The Dirac basis is
 
-       \f[
-       \gamma_0 = \gamma_x =
-       \left(\begin{tabular}{rrrr}
-	0 & 0 &  0 & -i \\
-	0 & 0 & -i &  0 \\
-	0 & i &  0 &  0 \\
-	i & 0 &  0 &  0 
-	\end{tabular}\right),\;\;\;\;
-	\gamma_1 = \gamma_y = 
-	\left(\begin{tabular}{rrrr}
-	0 &  0 &  0 & 1 \\
-	0 &  0 & -1 & 0 \\
-	0 & -1 &  0 & 0 \\
-	1 &  0 &  0 & 0 
-	\end{tabular}\right)
-	\f]
+  \f[
+  \gamma_0 = \gamma_x =
+  \left(\begin{tabular}{rrrr}
+  0 & 0 &  0 & -i \\
+  0 & 0 & -i &  0 \\
+  0 & i &  0 &  0 \\
+  i & 0 &  0 &  0 
+  \end{tabular}\right),\;\;\;\;
+  \gamma_1 = \gamma_y = 
+  \left(\begin{tabular}{rrrr}
+  0 &  0 &  0 & 1 \\
+  0 &  0 & -1 & 0 \\
+  0 & -1 &  0 & 0 \\
+  1 &  0 &  0 & 0 
+  \end{tabular}\right)
+  \f]
 
-	\f[
-	\gamma_2 = \gamma_z = 
-	\left(\begin{tabular}{rrrr}
-	0 &  0 & -i & 0 \\
-	0 &  0 &  0 & i \\
-	i &  0 &  0 & 0 \\
-	0 & -i &  0 & 0
-	\end{tabular}\right), \;\;\;\;
-	\gamma_3 = \gamma_t = 
-	\left(\begin{tabular}{rrrr}
-        1 &  0  &  0 &  0 \\
-        0 &  1  &  0 &  0 \\
-        0 &  0  & -1 &  0 \\
-        0 &  0  &  0 & -1 
-	\end{tabular}\right)
-	\f]
+  \f[
+  \gamma_2 = \gamma_z = 
+  \left(\begin{tabular}{rrrr}
+  0 &  0 & -i & 0 \\
+  0 &  0 &  0 & i \\
+  i &  0 &  0 & 0 \\
+  0 & -i &  0 & 0
+  \end{tabular}\right), \;\;\;\;
+  \gamma_3 = \gamma_t = 
+  \left(\begin{tabular}{rrrr}
+  1 &  0  &  0 &  0 \\
+  0 &  1  &  0 &  0 \\
+  0 &  0  & -1 &  0 \\
+  0 &  0  &  0 & -1 
+  \end{tabular}\right)
+  \f]
 
-	\f[
-	\gamma_5 = \left(\begin{tabular}{rrrr}
-	0 & 0 & 1 & 0 \\
-	0 & 0 & 0 & 1 \\
-	1 & 0 & 0 & 0 \\
-	0 & 1 & 0 & 0
-	\end{tabular}\right)
-	\f]
+  \f[
+  \gamma_5 = \left(\begin{tabular}{rrrr}
+  0 & 0 & 1 & 0 \\
+  0 & 0 & 0 & 1 \\
+  1 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0
+  \end{tabular}\right)
+  \f]
 */
 
 /*! This is equivalent with the wilson_vector */
@@ -151,45 +151,45 @@ public:
     \f[
       V = V^\dagger = \frac{\sqrt 2}{2}\left(
       \begin{tabular}{rrrr}
-       1 &   0 &   1 &   0 \\
-       0 &   1 &   0 &   1 \\
-       1 &   0 &  -1 &   0 \\
-       0 &   1 &   0 &  -1 
+      1 &   0 &   1 &   0 \\
+      0 &   1 &   0 &   1 \\
+      1 &   0 &  -1 &   0 \\
+      0 &   1 &   0 &  -1 
       \end{tabular}\right)
-     \f]
+      \f]
 
-     A gamma matrix in the Chiral basis (\f$ G_c \f$) transforms
-     to the Dirac basis (\f$ G_{d} \f$) as following
-     \f[
-     G_d = V^\dagger G_c V 
-     \f]
+      A gamma matrix in the Chiral basis (\f$ G_c \f$) transforms
+      to the Dirac basis (\f$ G_{d} \f$) as following
+      \f[
+      G_d = V^\dagger G_c V 
+      \f]
 
  
-  */
-  WilsonVector& DiracToChiral() ;
+    */
+    WilsonVector& DiracToChiral() ;
   
 
-  /*!
-    Rotate from Chiral to Dirac basis.
-    It multiplies by the rotation matrix that rotates 
-    from the Dirac basis to the Chiral basis
+    /*!
+      Rotate from Chiral to Dirac basis.
+      It multiplies by the rotation matrix that rotates 
+      from the Dirac basis to the Chiral basis
 
-    Since
-    \f[
-    V = V^\dagger
-    \f]
+      Since
+      \f[
+      V = V^\dagger
+      \f]
     
-    this routine is identical with DiracToChiral
-  */ 
-  WilsonVector& ChiralToDirac(){ return DiracToChiral(); }
+      this routine is identical with DiracToChiral
+    */ 
+    WilsonVector& ChiralToDirac(){ return DiracToChiral(); }
 
-  /*!
-    Multiplies  by \f$ \frac{1}{2}(1+\gamma_t)\$
-    \f[
-    V_{s,c}=\sum_{s_1}\left.\frac{1}{2}(1+\gamma_t)\right|_{s,s_1} W_{s_1,c}  
-    \f]
-  */
-  WilsonVector& PParProject();
+    /*!
+      Multiplies  by \f$ \frac{1}{2}(1+\gamma_t)\$
+      \f[
+      V_{s,c}=\sum_{s_1}\left.\frac{1}{2}(1+\gamma_t)\right|_{s,s_1} W_{s_1,c}  
+      \f]
+    */
+    WilsonVector& PParProject();
 
 };
 
@@ -203,49 +203,49 @@ typedef struct { color_wilson_vector d[4]; } wilson_matrix;
      
   The gamma matrices used are in the Chiral basis:
 
-     \f[
-     \gamma_0 = \gamma_x =
-     \left(\begin{tabular}{rrrr}
-       0 &  0  &  0 &  i \\
-       0 &  0  &  i &  0 \\
-       0 & -i  &  0 &  0 \\
-      -i &  0  &  0 &  0 
-      \end{tabular}\right),\;\;\;\;
-      \gamma_1 = \gamma_y = 
-      \left(\begin{tabular}{rrrr}
-       0 &  0  &  0 & -1 \\
-       0 &  0  &  1 &  0 \\
-       0 &  1  &  0 &  0 \\
-      -1 &  0  &  0 &  0 
-      \end{tabular}\right)
-      \f]
+  \f[
+  \gamma_0 = \gamma_x =
+  \left(\begin{tabular}{rrrr}
+  0 &  0  &  0 &  i \\
+  0 &  0  &  i &  0 \\
+  0 & -i  &  0 &  0 \\
+  -i &  0  &  0 &  0 
+  \end{tabular}\right),\;\;\;\;
+  \gamma_1 = \gamma_y = 
+  \left(\begin{tabular}{rrrr}
+  0 &  0  &  0 & -1 \\
+  0 &  0  &  1 &  0 \\
+  0 &  1  &  0 &  0 \\
+  -1 &  0  &  0 &  0 
+  \end{tabular}\right)
+  \f]
 
-      \f[
-      \gamma_2 = \gamma_z = 
-      \left(\begin{tabular}{rrrr}
-       0 &  0  &  i &  0 \\
-       0 &  0  &  0 & -i \\
-      -i &  0  &  0 &  0 \\
-       0 &  i  &  0 &  0 
-       \end{tabular}\right), \;\;\;\;
-       \gamma_3 = \gamma_t = 
-       \left(\begin{tabular}{rrrr}
-       0 &  0  &  1 &  0 \\
-       0 &  0  &  0 &  1 \\
-       1 &  0  &  0 &  0 \\
-       0 &  1  &  0 &  0 
-       \end{tabular}\right)
-       \f]
+  \f[
+  \gamma_2 = \gamma_z = 
+  \left(\begin{tabular}{rrrr}
+  0 &  0  &  i &  0 \\
+  0 &  0  &  0 & -i \\
+  -i &  0  &  0 &  0 \\
+  0 &  i  &  0 &  0 
+  \end{tabular}\right), \;\;\;\;
+  \gamma_3 = \gamma_t = 
+  \left(\begin{tabular}{rrrr}
+  0 &  0  &  1 &  0 \\
+  0 &  0  &  0 &  1 \\
+  1 &  0  &  0 &  0 \\
+  0 &  1  &  0 &  0 
+  \end{tabular}\right)
+  \f]
 
-       \f[
-       \gamma_5 = 
-       \left(\begin{tabular}{rrrr}
-       1 &  0  &  0 &  0 \\
-       0 &  1  &  0 &  0 \\
-       0 &  0  & -1 &  0 \\
-       0 &  0  &  0 & -1 
-       \end{tabular}\right)
-       \f]
+  \f[
+  \gamma_5 = 
+  \left(\begin{tabular}{rrrr}
+  1 &  0  &  0 &  0 \\
+  0 &  1  &  0 &  0 \\
+  0 &  0  & -1 &  0 \\
+  0 &  0  &  0 & -1 
+  \end{tabular}\right)
+  \f]
 */
 class WilsonMatrix;
 
@@ -335,16 +335,16 @@ public:
   Complex& operator()(int s1, int c1, int s2, int c2) 
 	{ return p.d[s1].c[c1].d[s2].c[c2]; }
   
-  /*!
-    Return the complex number references by
-    s1 - sink_spin
-    c1 - sink_colour
-    s2 - source_spin
-    c2 - source_colour
-    ( const version )
-  */
-  Complex  operator()(int s1, int c1, int s2, int c2) const
-	{ return p.d[s1].c[c1].d[s2].c[c2]; }
+    /*!
+      Return the complex number references by
+      s1 - sink_spin
+      c1 - sink_colour
+      s2 - source_spin
+      c2 - source_colour
+      ( const version )
+    */
+    Complex  operator()(int s1, int c1, int s2, int c2) const
+    { return p.d[s1].c[c1].d[s2].c[c2]; }
   
   //! hermitean conjugate the WilsonMatrix
   //WilsonMatrix& hconj();
@@ -516,11 +516,11 @@ public:
   WilsonMatrix& PParProjectSink();
   WilsonMatrix& NParProjectSink();
 
-  //! Projects positive parity on the source
-  WilsonMatrix& PParProjectSource();
+    //! Projects positive parity on the source
+    WilsonMatrix& PParProjectSource();
 
-  //! sink chiral to dirac rotation
-  WilsonMatrix& SinkChiralToDirac();
+    //! sink chiral to dirac rotation
+    WilsonMatrix& SinkChiralToDirac();
   
   // operator functions
 
@@ -530,31 +530,36 @@ public:
         return *this;
     }
 
-  WilsonMatrix& operator= (const Float& rhs);
-  WilsonMatrix& operator+=(const WilsonMatrix& rhs);
-  WilsonMatrix& operator-=(const WilsonMatrix& rhs);
-  WilsonMatrix& operator*=(const WilsonMatrix& rhs);
-  WilsonMatrix& operator*=(const Float& rhs);
-  WilsonMatrix& operator*=(const Rcomplex& rhs);
-  
-  WilsonMatrix& UMultSource   ( Matrix& U, WilsonMatrix& W);
-  WilsonMatrix& UdagMultSource( Matrix& U, WilsonMatrix& W);
-  
-  // algebra shortcuts
+    WilsonMatrix& operator= (const Float& rhs);
+    WilsonMatrix& operator+=(const WilsonMatrix& rhs);
+    WilsonMatrix& operator-=(const WilsonMatrix& rhs);
+    WilsonMatrix& operator*=(const WilsonMatrix& rhs);
+    WilsonMatrix& operator*=(const Float& rhs);
+    WilsonMatrix& operator*=(const Rcomplex& rhs);
 
-  /*!
-    Logically equivalent to   += fact * x , but 
-    does not require a temporary WilsonMtarix
-  */
-  WilsonMatrix& AddMult( const Rcomplex& fact, const WilsonMatrix& x );
+    friend WilsonMatrix operator*(const WilsonMatrix &wm, const SpinMatrix &sm);
+    friend WilsonMatrix operator*(const SpinMatrix &sm, const WilsonMatrix &wm);
+    friend WilsonMatrix operator*(const WilsonMatrix &wm, const Matrix &cm);
+    friend WilsonMatrix operator*(const Matrix &cm, const WilsonMatrix &wm);
+
+    WilsonMatrix& UMultSource   ( Matrix& U, WilsonMatrix& W);
+    WilsonMatrix& UdagMultSource( Matrix& U, WilsonMatrix& W);
   
-  // Baryon things
-  WilsonMatrix& ccl(int dir);
-  WilsonMatrix& ccr(int dir);
-  WilsonMatrix& diq(const WilsonMatrix& rhs);
-  WilsonMatrix& joint(const WilsonMatrix& rhs);
+    // algebra shortcuts
+
+    /*!
+      Logically equivalent to   += fact * x , but 
+      does not require a temporary WilsonMtarix
+    */
+    WilsonMatrix& AddMult( const Rcomplex& fact, const WilsonMatrix& x );
   
-  friend Rcomplex Trace(const WilsonMatrix& p1, const WilsonMatrix& p2);
+    // Baryon things
+    WilsonMatrix& ccl(int dir);
+    WilsonMatrix& ccr(int dir);
+    WilsonMatrix& diq(const WilsonMatrix& rhs);
+    WilsonMatrix& joint(const WilsonMatrix& rhs);
+  
+    friend Rcomplex Trace(const WilsonMatrix& p1, const WilsonMatrix& p2);
   
     SpinMatrix ColorComponent(int row, int col)const {
         SpinMatrix ret;
@@ -635,6 +640,11 @@ extern WilsonMatrix operator*(const Rcomplex& num, const WilsonMatrix& mat);
 //! times operator
 extern WilsonMatrix operator*(const WilsonMatrix& mat, const Rcomplex& num);
 
+extern WilsonMatrix operator*(const WilsonMatrix &wm, const SpinMatrix &sm);
+extern WilsonMatrix operator*(const SpinMatrix &sm, const WilsonMatrix &wm);
+extern WilsonMatrix operator*(const WilsonMatrix &wm, const Matrix &cm);
+extern WilsonMatrix operator*(const Matrix &cm, const WilsonMatrix &wm);
+
 //! plus operator
 extern WilsonMatrix operator+(const WilsonMatrix& lhs, const WilsonMatrix& rhs);
 
@@ -660,7 +670,7 @@ extern Matrix SpinTrace(const WilsonMatrix& Wmat, const WilsonMatrix& Wmat2);
 
 //! Spin trace of two WilsonMatrices
 extern Matrix SpinTrace(const WilsonMatrix& Wmat, const WilsonMatrix& Wmat2,
-						const WilsonMatrix& Wmat3); 
+                        const WilsonMatrix& Wmat3); 
 //! Color trace of a WilsonMatrix
 extern SpinMatrix ColorTrace(const WilsonMatrix& Wmat);
 
@@ -669,7 +679,7 @@ extern SpinMatrix ColorTrace(const WilsonMatrix& Wmat, const WilsonMatrix& Wmat2
 
 //! Color trace of three WilsonMatrices
 extern SpinMatrix ColorTrace(const WilsonMatrix& Wmat, const WilsonMatrix& Wmat2,
-						const WilsonMatrix& Wmat3);
+                             const WilsonMatrix& Wmat3);
 
 //! trace of two (color) Matrices
 extern Rcomplex Tr(const Matrix& a, const Matrix& b);
@@ -677,8 +687,7 @@ extern Rcomplex Tr(const Matrix& a, const Matrix& b);
 //! trace of two SpinMatrices
 extern Rcomplex Tr(const SpinMatrix& a, const SpinMatrix& b);
 
+
 CPS_END_NAMESPACE
 
 #endif
-
-

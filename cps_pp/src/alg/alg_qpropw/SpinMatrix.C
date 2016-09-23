@@ -11,6 +11,7 @@
 //------------------------------------------------------------------
 
 #include <alg/spin_matrix.h>
+#include <util/error.h>
 
 CPS_START_NAMESPACE
 
@@ -58,6 +59,82 @@ void SpinMatrix::UnitSpinMatrix(void) {
 Complex SpinMatrix::Tr() const
 { return ((Complex*)u)[0+0*SPINS] + ((Complex*)u)[1+1*SPINS] + 
 	((Complex*)u)[2+2*SPINS] + ((Complex*)u)[3+3*SPINS];
+}
+
+
+SpinMatrix SpinMatrix::One()
+{
+    SpinMatrix ret;
+    ret.UnitSpinMatrix();
+    return ret;
+}
+
+SpinMatrix SpinMatrix::Gamma5()
+{
+    SpinMatrix ret;
+    ret.ZeroSpinMatrix();
+    ret(0, 0) = ret(1, 1) = 1.0;
+    ret(2, 2) = ret(3, 3) = -1.0;
+    return ret;
+}
+
+SpinMatrix SpinMatrix::Gamma(int mu)
+{
+    SpinMatrix ret;
+    ret.ZeroSpinMatrix();
+
+    switch (mu) {
+	case 0:
+	    ret(0, 3) = ret(1, 2) = Rcomplex(0, 1);
+	    ret(2, 1) = ret(3, 0) = Rcomplex(0, -1);
+	    break;
+
+	case 1:
+	    ret(0, 3) = ret(3, 0) = -1;
+	    ret(1, 2) = ret(2, 1) = 1;
+	    break;
+
+	case 2:
+	    ret(0, 2) = ret(3, 1) = Rcomplex(0, 1);
+	    ret(1, 3) = ret(2, 0) = Rcomplex(0, -1);
+	    break;
+
+	case 3:
+	    ret(0, 2) = ret(1, 3) = ret(2, 0) = ret(3, 1) = 1;
+	    break;
+
+	default:
+	    ERR.General("SpinMatrix", "Gamma", "Unknown mu = %d\n", mu);
+	    break;
+    }
+
+    return ret;
+}
+
+SpinMatrix SpinMatrix::GammaMuGamma5(int mu)
+{
+    return Gamma(mu) * Gamma5();
+}
+
+SpinMatrix SpinMatrix::Sigma(int mu, int nu)
+{
+    return (Gamma(mu) * Gamma(nu) - Gamma(nu) * Gamma(mu)) * Rcomplex(0.5, 0);
+}
+
+SpinMatrix SpinMatrix::SigmaGamma5(int mu, int nu)
+{
+    return Sigma(mu, nu) * Gamma5();
+}
+
+
+SpinMatrix SpinMatrix::OnePlusGamma(int mu)
+{
+    return One() + Gamma(mu);
+}
+
+SpinMatrix SpinMatrix::OneMinusGamma(int mu)
+{
+    return One() - Gamma(mu);
 }
 
 CPS_END_NAMESPACE

@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of Mom class.
 
-  $Id: mom.h,v 1.3 2004-08-18 11:57:37 zs Exp $
+  $Id: mom.h,v 1.3 2004/08/18 11:57:37 zs Exp $
 */
 //------------------------------------------------------------------
 //

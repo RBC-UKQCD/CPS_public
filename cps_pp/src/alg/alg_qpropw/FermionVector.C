@@ -19,7 +19,14 @@
 #include <util/omp_wrapper.h>
 
 
+#include <cmath>
+#include <cassert>
+#include <vector>
+//#include <omp.h>
+//#include <qmp.h>
+
 CPS_START_NAMESPACE
+using namespace std;
 
 const Float& FermionVectorTp::operator[](int i) {
   return fv[i];
@@ -396,7 +403,6 @@ void FermionVectorTp::SetZ3BWall(int color, int spin, int t, const int size[3],
     // }
 }
 
-
 // Set source from previously defined source
 // Does not zero the rest of the  time slices
 void FermionVectorTp::SetWallSource(int color, int spin, int source_time, 
@@ -443,7 +449,7 @@ void FermionVectorTp::GFWallSource(Lattice &lat, int spin, int dir, int where)
 {
     char *fname = "GFWallSource()";
     VRB.Func(cname, fname);
-    VRB.Result(cname,fname,"lat=%p spin=%d dir=%d  where=%d\n",&lat,spin,dir,where);
+    VRB.Debug(cname,fname,"lat=%p spin=%d dir=%d  where=%d\n",&lat,spin,dir,where);
 
     if(dir != 3) {
         ERR.NotImplemented(cname, fname);
@@ -552,6 +558,29 @@ void FermionVectorTp::GaugeFixSink(Lattice &lat, int dir, int unfix) {
 			     (const IFloat*)&vt);
             }
         }
+    }
+}
+
+void FermionVectorTp::LandauGaugeFixSrc(Lattice& lat, int spin)
+{
+    //Landau gauge fixing the source added by Qi
+    char *fname = "LandauGaugeFixSrc()";
+    VRB.Func(cname, fname);
+
+    if (lat.FixGaugeKind() != FIX_GAUGE_LANDAU)
+	ERR.General(cname, fname, "lattice not in Landau gauge\n");
+
+    Matrix *pM(lat.FixGaugePtr()[0]);
+
+#pragma omp parallel for
+    for (int site = 0; site < GJP.VolNodeSites(); site++) {
+	// site offset
+	Matrix Adj;
+	Adj.Dagger(pM[site]);
+	const int f_off(2 * GJP.Colors() * (spin + 4 * site));
+	Vector *v = (Vector*)(fv + f_off);
+	Vector vt(*v);
+	uDotXEqual((IFloat*)&fv[f_off], (const IFloat*)&Adj, (const IFloat*)&vt);
     }
 }
 
@@ -926,6 +955,7 @@ void FermionVectorTp::GaussianSmearVector(Lattice& lat,
 
   //multiply  fv by 1000. Makes the source a little larger to preven
   //numerical instabilities
+#if 0
   for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
     for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
       for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
@@ -938,6 +968,7 @@ void FermionVectorTp::GaussianSmearVector(Lattice& lat,
       }
     }
   }
+#endif
 
 #ifdef DEBUG_GAUSS_SMEAR
 Float nn = 0 ;
@@ -1186,6 +1217,7 @@ void FermionVectorTp::GaussianSmearVector(Lattice& lat,
 
   //multiply  fv by 1000. Makes the source a little larger to preven
   //numerical instabilities
+#if 0
   for(x[3]=0;x[3]<GJP.TnodeSites();x[3]++) {
   for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
     for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
@@ -1200,6 +1232,7 @@ void FermionVectorTp::GaussianSmearVector(Lattice& lat,
     }
   }
   }
+#endif 
 
 #ifdef DEBUG_GAUSS_SMEAR
 Float nn = 0 ;

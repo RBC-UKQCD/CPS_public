@@ -6,23 +6,7 @@
 /*! \file
   \brief  Generic parallel transport.
   
-  $Id: pt_mat.h,v 1.5 2013-03-18 19:33:13 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-03-18 19:33:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v 1.5 2013-03-18 19:33:13 chulwoo Exp $
-//  $Id: pt_mat.h,v 1.5 2013-03-18 19:33:13 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: pt_mat.h,v $
-//  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/pt_mat.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 #include <util/gjp.h>
 #include <comms/scu.h>
 #include <util/omp_wrapper.h>

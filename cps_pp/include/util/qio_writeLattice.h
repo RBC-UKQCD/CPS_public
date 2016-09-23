@@ -6,8 +6,6 @@
 
 
 CPS_START_NAMESPACE
-using namespace std;
-
 
 class qio_writeLattice: private qio_init {
 
@@ -106,7 +104,7 @@ class qio_writeLattice: private qio_init {
 
   virtual ~qio_writeLattice(){ 
     #ifdef DEBUG_Init
-    printf("finished: qio_writeLattice\n");
+      std::printf("finished: qio_writeLattice\n");
     #endif // DEBUG_Init
   }
 

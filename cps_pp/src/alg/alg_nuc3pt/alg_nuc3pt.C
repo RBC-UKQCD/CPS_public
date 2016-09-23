@@ -27,14 +27,12 @@
 #include <stdlib.h>	// exit()
 #include <stdio.h>
 #include <alg/alg_nuc3pt.h>
-#include <alg/nuc3pt.h>
 #include <alg/meson.h>
-//#include <util/u1.h>
 
 CPS_START_NAMESPACE
 
 
-
+#if 0
 //-----------------------------------------------------------------
 //  Twisted B.C stuff (similar redundant stuff in U1.C, U1.h)
 //---------------------------------------------------------------
@@ -81,7 +79,7 @@ void twist_links(Lattice &lat, const Float Q, const int mu)
   }
 }
 
-
+#endif
 
 
 //------------------------------------------------------------------
@@ -245,14 +243,18 @@ void AlgNuc3pt::run()
   int mt[5];
   
   if ( Nuc3pt_arg->num_mult > 1) ts=Nuc3pt_arg->mt[0]; // use the t_source, source_inc counter if not doing MultGauss. -MFL
-
+  
   for(int i_source=0; i_source < Nuc3pt_arg->num_src; i_source++)
     {
       int t_sink = (ts + Nuc3pt_arg->t_sink)%(GJP.Tnodes()*GJP.TnodeSites());
+
+      for(int nt=0; nt<Nuc3pt_arg->num_mult; nt++)
+	mt[nt]=Nuc3pt_arg->mt[nt]; //save since it will be overwritten when sink is smeared.
+	
       OpenFile();
       Fprintf(fp,"Doing source/sink time slices: %d %d\n", ts, t_sink);
       CloseFile();
-
+      
       // First calculate the needed two point functions
       Nuc_c5.Zero() ;
       pion.Zero() ;
@@ -260,7 +262,7 @@ void AlgNuc3pt::run()
       vector[1].Zero() ;
       vector[2].Zero() ;
       char out_prop[200];
-
+      
       // If we don't do the coherent sink, we only allocate 1 propagator
       // hence we reuse the memory for the propagator for different source locations.
       // Otherwise we need to have all the propagators present at the same time
@@ -268,212 +270,207 @@ void AlgNuc3pt::run()
       int n;
       if (Nuc3pt_arg->num_src == num_qprop) n = i_source;
       else n = 0;
-
+      
       GetThePropagator(n, ts, qmass);
-
-	Nuc_c5.calcNucleon(*q_prop[n]) ;
-	pion.setMass(qmass,qmass) ;
-	pion.calcMeson(*q_prop[n],*q_prop[n]) ;
-	vector[0].setMass(qmass,qmass) ;
-	vector[0].calcMeson(*q_prop[n],*q_prop[n]) ;
-	vector[1].setMass(qmass,qmass) ;
-	vector[1].calcMeson(*q_prop[n],*q_prop[n]) ;
-	vector[2].setMass(qmass,qmass) ;
-	vector[2].calcMeson(*q_prop[n],*q_prop[n]) ;
-
+      
+      Nuc_c5.calcNucleon(*q_prop[n]) ;
+      pion.setMass(qmass,qmass) ;
+      pion.calcMeson(*q_prop[n],*q_prop[n]) ;
+      vector[0].setMass(qmass,qmass) ;
+      vector[0].calcMeson(*q_prop[n],*q_prop[n]) ;
+      vector[1].setMass(qmass,qmass) ;
+      vector[1].calcMeson(*q_prop[n],*q_prop[n]) ;
+      vector[2].setMass(qmass,qmass) ;
+      vector[2].calcMeson(*q_prop[n],*q_prop[n]) ;
+      
+      // Print out 2pt function results
+      //----------------------------------------------------------------
+      OpenFile();
+      Nuc_c5.Print(fp) ;
+      pion.Print(fp) ;
+      vector[0].Print(fp) ;
+      vector[1].Print(fp) ;
+      vector[2].Print(fp) ;
+      CloseFile();
+      
+      //Do the projections needed for disconnected Ga
+      for(int p(0);p<4;p++)
+	{
+	  Nuc2pt Nuc_c5_p(NUC_G5C,POINT,ptype[p]) ;
+	  //	    Nuc_c5_p.Zero();
+	  
+	  if(Nuc3pt_arg->DoGa1Proj||(p>2))
+	    {
+	      Nuc_c5_p.calcNucleon(*q_prop[n]) ;
+	      
+	      OpenFile();
+	      Nuc_c5_p.Print(fp) ;
+	      CloseFile();
+	    }	  
+	}
+	
+      //do some non-zero momenta
+      {
+	Nuc2pt Nuc_c5_p(NUC_G5C,POINT,PPAR_5) ;
+	for(int m(0);m<Nmom;m++)
+	  {
+	    
+	    Nuc_c5.Zero() ;
+	    Nuc_c5.calcMomNucleon(*q_prop[n],sink_mom[m]) ;
+	    // Print out 2pt function results
+	    //----------------------------------------------------------------
+	    OpenFile();
+	    Nuc_c5.Print(fp) ;
+	    CloseFile();
+	    
+	    // Calculate the smeared smeared momentum two point function
+	    // to extract alpha for  NEDM reweighting	    
+	    Nuc_c5_p.Zero() ;
+	    Nuc_c5_p.calcMomNucleon(*q_prop[n],sink_mom[m]) ;
+	    // Print out 2pt function result
+	    //----------------------------------------------------------------
+	    OpenFile();
+	    Nuc_c5_p.Print(fp) ;
+	    CloseFile();
+	    
+	    
+	  }// End momentum
+      }
+      
+      //Do the smeared sink stuff
+      if((Nuc3pt_arg->src_type==GAUSS_GAUGE_INV)&&(Nuc3pt_arg->DoSS2ptF)){
+	
+	Nuc2pt Nuc_c5_ss(NUC_G5C,GAUSS_GAUGE_INV) ;
+	
+	QPropWGaussSrc smr(*q_prop[n]) ;
+	QPropWGaussArg gauss_arg = q_prop[n]->GaussArg();
+	smr.GaussSmearSinkProp(gauss_arg);
+	
+	// First calculate the needed two point functions
+	Nuc_c5_ss.Zero() ;
+	Nuc_c5_ss.calcNucleon(smr) ;
+	
+	pion.Zero() ;
+	pion.calcMeson(smr,smr) ;
+	
+	
 	// Print out 2pt function results
 	//----------------------------------------------------------------
 	OpenFile();
-	Nuc_c5.Print(fp) ;
+	Nuc_c5_ss.Print(fp) ;
 	pion.Print(fp) ;
-	vector[0].Print(fp) ;
-	vector[1].Print(fp) ;
-	vector[2].Print(fp) ;
 	CloseFile();
 	
 	//Do the projections needed for disconnected Ga
 	for(int p(0);p<4;p++)
 	  {
-	    Nuc2pt Nuc_c5_p(NUC_G5C,POINT,ptype[p]) ;
-//	    Nuc_c5_p.Zero();
-	    
-	    if(Nuc3pt_arg->DoGa1Proj||(p>2))
-	      {
-		Nuc_c5_p.calcNucleon(*q_prop[n]) ;
-		
-		OpenFile();
-		Nuc_c5_p.Print(fp) ;
-		CloseFile();
-	      }
-	    
+	    Nuc2pt Nuc_c5_ss_p(NUC_G5C,GAUSS_GAUGE_INV,ptype[p]) ;
+	    if(Nuc3pt_arg->DoGa1Proj||(p>2)){
+	      Nuc_c5_ss_p.calcNucleon(smr) ;
+	      OpenFile();
+	      Nuc_c5_ss_p.Print(fp) ;
+	      CloseFile();
+	    }
 	  }
 	
 	//do some non-zero momenta
 	{
-	  Nuc2pt Nuc_c5_p(NUC_G5C,POINT,PPAR_5) ;
+	  Nuc2pt Nuc_c5_ss_p(NUC_G5C,GAUSS_GAUGE_INV,PPAR_5) ;
 	  for(int m(0);m<Nmom;m++)
 	    {
-	      
-	      Nuc_c5.Zero() ;
-	      Nuc_c5.calcMomNucleon(*q_prop[n],sink_mom[m]) ;
+	      Nuc_c5_ss.Zero() ;
+	      Nuc_c5_ss.calcMomNucleon(smr,sink_mom[m]) ;
 	      // Print out 2pt function results
 	      //----------------------------------------------------------------
 	      OpenFile();
-	      Nuc_c5.Print(fp) ;
+	      Nuc_c5_ss.Print(fp) ;
 	      CloseFile();
 	      
 	      // Calculate the smeared smeared momentum two point function
-	      // to extract alpha for  NEDM reweighting	    
-	      Nuc_c5_p.Zero() ;
-	      Nuc_c5_p.calcMomNucleon(*q_prop[n],sink_mom[m]) ;
-	      // Print out 2pt function result
+	      // to extract alpha for  NEDM reweighting
+	      Nuc_c5_ss_p.Zero() ;
+	      Nuc_c5_ss_p.calcMomNucleon(smr,sink_mom[m]) ;
+	      // Print out 2pt function results
 	      //----------------------------------------------------------------
 	      OpenFile();
-	      Nuc_c5_p.Print(fp) ;
+	      Nuc_c5_ss_p.Print(fp) ;
 	      CloseFile();
-
-
 	    }// End momentum
-	}
-
-	//Do the smeared sink stuff
-	if((Nuc3pt_arg->src_type==GAUSS_GAUGE_INV)&&(Nuc3pt_arg->DoSS2ptF)){
-	  
-	  Nuc2pt Nuc_c5_ss(NUC_G5C,GAUSS_GAUGE_INV) ;
-	  
-	  QPropWGaussSrc smr(*q_prop[n]) ;
-	  QPropWGaussArg gauss_arg = q_prop[n]->GaussArg();
-	  smr.GaussSmearSinkProp(gauss_arg);
-	  
-	  // First calculate the needed two point functions
-	  Nuc_c5_ss.Zero() ;
-	  Nuc_c5_ss.calcNucleon(smr) ;
-	  
-	  pion.Zero() ;
-	  pion.calcMeson(smr,smr) ;
 	  
 	  
-	  // Print out 2pt function results
-	  //----------------------------------------------------------------
-	  OpenFile();
-	  Nuc_c5_ss.Print(fp) ;
-	  pion.Print(fp) ;
-	  CloseFile();
-	  
-	  //Do the projections needed for disconnected Ga
-	  for(int p(0);p<4;p++)
+	  if(Nuc3pt_arg->DoHalfFermion == 2) {
+	    OpenFile();
+	    Fprintf(fp,"DoHalfFermion=%d non-rel nucleon 2-pt\n",Nuc3pt_arg->DoHalfFermion);
+	    CloseFile();
+	    
+	    q_prop[n]->NonRelProp( 1 );
+	    
 	    {
-	      Nuc2pt Nuc_c5_ss_p(NUC_G5C,GAUSS_GAUGE_INV,ptype[p]) ;
-	      if(Nuc3pt_arg->DoGa1Proj||(p>2)){
-		Nuc_c5_ss_p.calcNucleon(smr) ;
+	      Nuc2pt Nuc_c5_p_nr(NUC_G5C,POINT) ;
+	      Nuc_c5_p_nr.Zero() ;
+	      Nuc_c5_p_nr.calcNucleon(*q_prop[n]) ;
+	      OpenFile();
+	      Nuc_c5_p_nr.Print(fp) ;
+	      CloseFile();
+	      
+	      for(int m(0);m<Nmom;m++) {
+		Nuc_c5_p_nr.Zero() ;
+		Nuc_c5_p_nr.calcMomNucleon(*q_prop[n],sink_mom[m]) ;
 		OpenFile();
-		Nuc_c5_ss_p.Print(fp) ;
+		Nuc_c5_p_nr.Print(fp);
 		CloseFile();
 	      }
 	    }
-	  
-	  //do some non-zero momenta
-	  {
-	    Nuc2pt Nuc_c5_ss_p(NUC_G5C,GAUSS_GAUGE_INV,PPAR_5) ;
-	    for(int m(0);m<Nmom;m++)
-	      {
-		Nuc_c5_ss.Zero() ;
-		Nuc_c5_ss.calcMomNucleon(smr,sink_mom[m]) ;
-		// Print out 2pt function results
-		//----------------------------------------------------------------
-		OpenFile();
-		Nuc_c5_ss.Print(fp) ;
-		CloseFile();
-		
-		// Calculate the smeared smeared momentum two point function
-		// to extract alpha for  NEDM reweighting
-		Nuc_c5_ss_p.Zero() ;
-		Nuc_c5_ss_p.calcMomNucleon(smr,sink_mom[m]) ;
-		// Print out 2pt function results
-		//----------------------------------------------------------------
-		OpenFile();
-		Nuc_c5_ss_p.Print(fp) ;
-		CloseFile();
-	      }// End momentum
 	    
+	    smr.NonRelProp( 0 );
 	    
-	    if(Nuc3pt_arg->DoHalfFermion == 2) {
+	    int dohalf = Nuc3pt_arg->DoHalfFermion;
+	    // First calculate the needed two point functions
+	    {
+	      Nuc2pt Nuc_c5_g_nr(NUC_G5C,GAUSS_GAUGE_INV) ;
+	      Nuc_c5_g_nr.Zero() ;
+	      Nuc_c5_g_nr.calcNucleon(smr) ;
+	      
+	      // Print out 2pt function results
+	      //----------------------------------------------------------------
 	      OpenFile();
-	      Fprintf(fp,"DoHalfFermion=%d non-rel nucleon 2-pt\n",Nuc3pt_arg->DoHalfFermion);
+	      Nuc_c5_g_nr.Print(fp) ;
 	      CloseFile();
 	      
-	      q_prop[n]->NonRelProp( 1 );
-	      
-	      {
-		Nuc2pt Nuc_c5_p_nr(NUC_G5C,POINT) ;
-		Nuc_c5_p_nr.Zero() ;
-		Nuc_c5_p_nr.calcNucleon(*q_prop[n]) ;
-		OpenFile();
-		Nuc_c5_p_nr.Print(fp) ;
-		CloseFile();
-		
-		for(int m(0);m<Nmom;m++) {
-		  Nuc_c5_p_nr.Zero() ;
-		  Nuc_c5_p_nr.calcMomNucleon(*q_prop[n],sink_mom[m]) ;
+	      //do some non-zero momenta
+	      for(int m(0);m<Nmom;m++)
+		{
+		  Nuc_c5_g_nr.Zero() ;
+		  Nuc_c5_g_nr.calcMomNucleon(smr,sink_mom[m]) ;
+		  // Print out 2pt function results
+		  //----------------------------------------------------------------
 		  OpenFile();
-		  Nuc_c5_p_nr.Print(fp);
+		  Nuc_c5_g_nr.Print(fp) ;
 		  CloseFile();
-		}
-	      }
-	      
-	      smr.NonRelProp( 0 );
-	      
-	      int dohalf = Nuc3pt_arg->DoHalfFermion;
-	      // First calculate the needed two point functions
-	      {
-		Nuc2pt Nuc_c5_g_nr(NUC_G5C,GAUSS_GAUGE_INV) ;
-		Nuc_c5_g_nr.Zero() ;
-		Nuc_c5_g_nr.calcNucleon(smr) ;
-		
-		// Print out 2pt function results
-		//----------------------------------------------------------------
-		OpenFile();
-		Nuc_c5_g_nr.Print(fp) ;
-		CloseFile();
-		
-		//do some non-zero momenta
-		for(int m(0);m<Nmom;m++)
-		  {
-		    Nuc_c5_g_nr.Zero() ;
-		    Nuc_c5_g_nr.calcMomNucleon(smr,sink_mom[m]) ;
-		    // Print out 2pt function results
-		    //----------------------------------------------------------------
-		    OpenFile();
-		    Nuc_c5_g_nr.Print(fp) ;
-		    CloseFile();
-		  }// End momentum
-	      }
-	    } // DoHalfF = 2
- //         } // End loop over qprop
+		}// End momentum
+	    }
+	  } // DoHalfF = 2
 	  
 	  // Finally, smear the sink at time t_sink for 3-pt functions (below) 
 	  for(int nt=0; nt<Nuc3pt_arg->num_mult; nt++){
 	    // Multi Gauss t_sink set
-	    mt[nt]=Nuc3pt_arg->mt[nt]; //save
+	    //mt[nt]=Nuc3pt_arg->mt[nt]; //save// move this out of smeared block
 	    Nuc3pt_arg->mt[nt]+=Nuc3pt_arg->t_sink; // locations of the proton sinks
             Nuc3pt_arg->mt[nt]=Nuc3pt_arg->mt[nt]%(GJP.Tnodes()*GJP.TnodeSites());
 	    q_prop[n]->GaussSmearSinkProp(Nuc3pt_arg->mt[nt],q_prop[n]->GaussArg());
-          }
-	  
-	} //end smeared sink
-      }
-
-
+          } 
+	}
+      } //end smeared sink
+      
+      
       //Now do the 3pt functions
-
+      
       // If doing coherent sinks, don't calculate the 3pt functions until all the 
       // forward propagators have been calculated. --MFL
       int do_seq = 0;
-//      int t_sink;
-
       if(Nuc3pt_arg->calc_seqQ != MULT_SEQ 
-	&& Nuc3pt_arg->calc_seqQ != WRITE_MULT_SEQ 
-	&& Nuc3pt_arg->calc_seqQ != READ_MULT_SEQ) {
+	 && Nuc3pt_arg->calc_seqQ != WRITE_MULT_SEQ 
+	 && Nuc3pt_arg->calc_seqQ != READ_MULT_SEQ) {
 	do_seq = 1;
         t_sink = ts + Nuc3pt_arg->t_sink;
       }
@@ -483,8 +480,8 @@ void AlgNuc3pt::run()
 	do_seq = 1;
 	t_sink = Nuc3pt_arg->t_source + Nuc3pt_arg->t_sink;
       }
-
-
+      
+      
       if(Nuc3pt_arg->DoUnPolarized && do_seq)
 	{
 	  // for conserved vector currents
@@ -492,36 +489,36 @@ void AlgNuc3pt::run()
 	  Nuc3ptCons VectCurr(Gt);
 	  Nuc3ptCons *VectCurrp[4];
 	  if(Nuc3pt_arg->DoConserved) {
-	  for (int i(X);i<4;i++){
-	    DIR d = DIR(i) ;
-	    Gamma G(d);
-	    VectCurrp[i] = new Nuc3ptCons(Nmom,G) ;
+	    for (int i(X);i<4;i++){
+	      DIR d = DIR(i) ;
+	      Gamma G(d);
+	      VectCurrp[i] = new Nuc3ptCons(Nmom,G) ;
+	    }
 	  }
-	  }
-
+	  
 	  OpenFile();
 	  Fprintf(fp,"UnPolarized Zero mom.\n");
 	  CloseFile();
-
+	  
   	  //first do the zero momentum un-polarized stuff
-
+	  
 	  //up-quark
 	  GetTheSeqPropagator(t_sink,qmass,
 			      PROT_U_SEQ,ZeroMom,PPAR);
-
+	  
 	  //down-quark
 	  GetTheSeqPropagator(t_sink,qmass,
 			      PROT_D_SEQ,ZeroMom,PPAR);
-
+	  
 	  calc_Scalar();         //needed for the sigma term
 	  calc_Vector();	 //Vector current
 	  calc_X_q_b();          //<x>_q (b) does not need non-zero momentum
 	  for(int i(0) ; i<Nmom ; i++) calc_Vector(sink_mom[i]);
-
+	  
 	  //conserved current
 	  if(Nuc3pt_arg->DoConserved) {
 	    if(GJP.Snodes()==2) u_s_prop->SwapQPropLs();
-
+	    
 	    for ( int nt = 0; nt < num_qprop; nt++ ) {
 	      VectCurr.Calc3pt(*u_s_prop,*q_prop[nt]);
 	      for (int i(X);i<4;i++)
@@ -530,18 +527,18 @@ void AlgNuc3pt::run()
 	    char* dummy;
 	    u_s_prop->RestoreOrgProp(dummy,1);
 	    u_s_prop->DeleteQPropLs();
-
+	    
 	    if(GJP.Snodes()==2) d_s_prop->SwapQPropLs();
 	    
 	    for ( int nt = 0; nt < num_qprop; nt++ ) {
 	      VectCurr.Calc3pt(*d_s_prop,*q_prop[nt]);
 	      for (int i(X);i<4;i++)
-	      VectCurrp[i]->Calc3pt(*d_s_prop,*q_prop[nt],Nmom,sink_mom);
+		VectCurrp[i]->Calc3pt(*d_s_prop,*q_prop[nt],Nmom,sink_mom);
 	    }
 	    
 	    d_s_prop->RestoreOrgProp(dummy,1);
 	    d_s_prop->DeleteQPropLs();
-
+	    
 	    OpenFile();
 	    Fprintf(fp,"UnPolarized Zero mom Conserved Vector\n");
 	    VectCurr.Print(fp) ;
@@ -549,13 +546,13 @@ void AlgNuc3pt::run()
 	      VectCurrp[i]->Print(fp,Nmom,sink_mom) ;
 	    CloseFile();
 	  }
-
+	  
 	  if(Nuc3pt_arg->DoConserved) {
-	  for (int i(X);i<4;i++)
-	    delete VectCurrp[i];
+	    for (int i(X);i<4;i++)
+	      delete VectCurrp[i];
 	  }
 	}
-
+      
       if(Nuc3pt_arg->DoUnPolarizedMom && do_seq)
 	{
 	  OpenFile();
@@ -571,18 +568,17 @@ void AlgNuc3pt::run()
 	  //down-quark
 	  GetTheSeqPropagator(t_sink,qmass,
 			      PROT_D_SEQ,UnitMom,PPAR);
-
+	  
 	  calc_Scalar();         //needed for the sigma term
 	  calc_Vector();	 //Vector current
 	  calc_X_q_b();          //<x>_q (b) does not need non-zero momentum
 	  for(int i(0) ; i<Nmom ; i++) calc_Vector(sink_mom[i]);
-
+	  
 	  calc_X_q_a(); //<x>_q (a) needs non-zero momentum
 	  calc_X2_q(); //<x^2>_q    needs non-zero momentum
-	  calc_X3_q(); //<x^3>_q    needs non-zero momentum
-
+	  calc_X3_q(); //<x^3>_q    needs non-zero momentum 
 	}
-
+      
       // Polarized 
       if(Nuc3pt_arg->DoPolarized && do_seq)
 	{
@@ -592,17 +588,17 @@ void AlgNuc3pt::run()
 	  Nuc3ptCons *AxialCurrp[4];
 	  Nuc3ptCons *VectCurrp[4];
 	  if(Nuc3pt_arg->DoConserved) {
-	  for (int i(X);i<4;i++){
-	    DIR d = DIR(i);
-	    Gamma G5d(G5,d);
-	    AxialCurrp[i] = new Nuc3ptCons(Nmom,Complex(0.0,1.0),G5d);
-
-	    d = DIR(i) ;
-	    Gamma G(d);
-	    VectCurrp[i] = new Nuc3ptCons(Nmom,G) ;
+	    for (int i(X);i<4;i++){
+	      DIR d = DIR(i);
+	      Gamma G5d(G5,d);
+	      AxialCurrp[i] = new Nuc3ptCons(Nmom,Complex(0.0,1.0),G5d);
+	      
+	      d = DIR(i) ;
+	      Gamma G(d);
+	      VectCurrp[i] = new Nuc3ptCons(Nmom,G) ;
+	    }
 	  }
-	  }
-
+	  
 	  OpenFile();
 	  Fprintf(fp,"Polarized Zero mom.\n");
 	  CloseFile();
@@ -610,13 +606,14 @@ void AlgNuc3pt::run()
 	  //up-quark
 	  GetTheSeqPropagator(t_sink,qmass,
 			      PROT_U_SEQ,ZeroMom,PPAR_5Z);
-
+	  
 	  //down-quark
 	  GetTheSeqPropagator(t_sink,qmass,
 			      PROT_D_SEQ,ZeroMom,PPAR_5Z);
 	  
 	  calc_Axial(); //Axial-Vector current i Gamma_5 Gamma_z
 	  calc_Tensor() ;//Tensor current i Gamma_5 Gamma_z Gamma_t
+	  calc_TensorClover() ;//Tensor current i Gamma_5 Gamma_z Gamma_t
 	  calc_X_Dq_b() ; 
 	  calc_d1() ;
 	  
@@ -626,16 +623,16 @@ void AlgNuc3pt::run()
 	    calc_EnergyMomentum(sink_mom[i]) ; // proton spin
 	    calc_PScalar(sink_mom[i]);//pseudoscalar form factors
 	  }
-
+	  
 	  if(Nuc3pt_arg->DoConserved) {
-
+	    
 	    if(GJP.Snodes()==2) {
 	      u_s_prop->SwapQPropLs();
 	      d_s_prop->SwapQPropLs();
 	    }
-
+	    
 	    for ( int nt = 0; nt < num_qprop; nt++ ) {
-
+	      
 	      AxialCurr.Calc3pt(*u_s_prop,*q_prop[nt]);
 	      for(int i(X);i<4;i++){
 		AxialCurrp[i]->Calc3pt(*u_s_prop,*q_prop[nt],Nmom,sink_mom);
@@ -647,7 +644,7 @@ void AlgNuc3pt::run()
 		AxialCurrp[i]->Calc3pt(*d_s_prop,*q_prop[nt],Nmom,sink_mom);
 		VectCurrp[i]->Calc3pt(*d_s_prop,*q_prop[nt],Nmom,sink_mom);
 	      }
-
+	      
 	      OpenFile();
 	      Fprintf(fp,"Polarized Zero mom Conserved Axial and Vector\n");
 	      AxialCurr.Print(fp) ;
@@ -666,7 +663,7 @@ void AlgNuc3pt::run()
 	    d_s_prop->RestoreOrgProp(dummy,1);
 	    d_s_prop->DeleteQPropLs();
 	  }
-	  	  
+	  
 	  if(Nuc3pt_arg->DoConserved) {
 	    for(int i(X);i<4;i++) {
 	      delete AxialCurrp[i];
@@ -674,7 +671,7 @@ void AlgNuc3pt::run()
 	    }
 	  }
 	}
-
+      
       
       if(Nuc3pt_arg->DoPolarizedMom && do_seq)
 	{
@@ -702,24 +699,119 @@ void AlgNuc3pt::run()
 	  calc_X_dq() ;
 	  calc_d2() ;
 	}
-
+      
       if(Nuc3pt_arg->DoConserved) q_prop[n]->DeleteQPropLs();
+      
+      // do some disconnected traces
+      if(Nuc3pt_arg->DoDisconnected){
 
+	//put disconnected loop time slice in the middle for now.	
+	int disc_ts = (ts + Nuc3pt_arg->t_sink/2)%(GJP.Tnodes()*GJP.TnodeSites());
+	SourceType save_src_type = Nuc3pt_arg->src_type;
+	if(save_src_type != POINT){
+	  SourceType save_src_type = Nuc3pt_arg->src_type;
+	  Nuc3pt_arg->src_type=POINT;
+	  GetThePropagator(n, disc_ts, qmass);
+	}
+	
+	// sink site = src site
+	// get src node coordinates
+	int procCoorX = Nuc3pt_arg->x[0] / GJP.XnodeSites();
+	int procCoorY = Nuc3pt_arg->x[1] / GJP.YnodeSites();
+	int procCoorZ = Nuc3pt_arg->x[2] / GJP.ZnodeSites();
+	int procCoorT = disc_ts / GJP.TnodeSites();
+	// get my node coordinates
+	int coor_x = GJP.XnodeCoor();
+	int coor_y = GJP.YnodeCoor();
+	int coor_z = GJP.ZnodeCoor();
+	int coor_t = GJP.TnodeCoor();
+	
+	int Node = UniqueID();
+	// write disconnected to own file for each node
+	int srcNode;
+	FileIoType T=ADD_ID;
+	if (coor_x == procCoorX && coor_y == procCoorY && coor_z == procCoorZ && coor_t == procCoorT)
+	  {
+	    srcNode = UniqueID();
+	    if(common_arg->results != 0)
+	      {
+		if((fp = Fopen(T,(char *)common_arg->results, "a")) == NULL )
+		  ERR.FileA(cname,fname, (char *)common_arg->results);
+	      }
+	  }
+	
+	//src  site
+	Site srcSite(Nuc3pt_arg->x[0] % GJP.XnodeSites(),
+		     Nuc3pt_arg->x[1] % GJP.YnodeSites(), 
+		     Nuc3pt_arg->x[2] % GJP.ZnodeSites(), 
+		     disc_ts % GJP.TnodeSites() );
+	int srcIndex = srcSite.Index();
+	
+	// loop over sites since cloverleaf requires links to be sent from off node,
+	// even though we only want it at one site!
+	Site site;
+	while(site.LoopsOverNode()){
+	  
+	  int x=site.physX();
+	  int y=site.physY();
+	  int z=site.physZ();
+	  
+	  //prop at site
+	  int Index = site.Index();
+	  WilsonMatrix temp = (*q_prop[n])[Index];
+	  
+	  //scalar
+	  Rcomplex cc = temp.Trace();
+	  if(Index==srcIndex && Node==srcNode)
+	    Fprintf(fp,"Disc tr scalar %d %d %d %d %0.14e %0.14e\n",x,y,z,disc_ts,cc.real(),cc.imag());
+	  //pseudoscalar
+	  temp.gl(-5);
+	  cc = temp.Trace();
+	  if(Index==srcIndex && Node==srcNode)
+	    Fprintf(fp,"Disc tr gamma5 %d %d %d %d %0.14e %0.14e\n",x,y,z,disc_ts,cc.real(),cc.imag());
+	  //vector
+	  for(int mu=0; mu < 4; mu++){
+	    temp = (*q_prop[n])[Index];
+	    temp.gl(mu);
+	    Rcomplex cc = temp.Trace();
+	    if(Index==srcIndex && Node==srcNode)
+	      Fprintf(fp,"Disc tr gamma%d %d %d %d %d %0.14e %0.14e\n",mu,x,y,z,disc_ts,cc.real(),cc.imag());
+	  }
+	  //tensor
+	  int my_x[4];
+	  my_x[0]=site.X(); my_x[1]=site.Y(); my_x[2]=site.Z(); my_x[3]=site.T(); 
+	  for(int mu=0; mu < 4; mu++){
+	    for(int nu=mu+1; nu < 4; nu++){
+	      temp = (*q_prop[n])[Index];
+	      temp.gl(mu).gl(nu);
+	      Matrix mat = SpinTrace(temp);
+	      Rcomplex cc = mat.Tr();
+	      Matrix Leaf;
+	      AlgLattice().CloverLeaf(Leaf,my_x,mu,nu);
+	      Leaf.TrLessAntiHermMatrix();
+	      Rcomplex cc2 = Tr(mat,Leaf);
+	      if(Index==srcIndex && Node==srcNode)
+		Fprintf(fp,"Disc tr sigma%d%d (x Field Str) %d %d %d %d %0.14e %0.14e  %0.14e %0.14e\n",
+			mu,nu,x,y,z,disc_ts,cc.real(),cc.imag(),cc2.real(),cc2.imag());
+	    }
+	  }
+	}
+	
+	if (coor_x == procCoorX && coor_y == procCoorY && coor_z == procCoorZ && coor_t == procCoorT)
+	  Fclose(T,fp);
+	
+	Nuc3pt_arg->src_type=save_src_type;
+	
+      }// end disconnected
+      
+#if 1
       ts+=Nuc3pt_arg->source_inc;
       for(int nt=0; nt<Nuc3pt_arg->num_mult; nt++){
 	Nuc3pt_arg->mt[nt]=mt[nt];
 	Nuc3pt_arg->mt[nt]+=Nuc3pt_arg->source_inc;
       }
-
-/*
-      if(i_source==1){ // obsolete. commented out  --MFL
-	ts+=Nuc3pt_arg->mt[4];
-	for(int nt=0; nt<Nuc3pt_arg->num_mult; nt++){
-	  Nuc3pt_arg->mt[nt]+=Nuc3pt_arg->mt[4];
-	}
-      }
-*/
-    } // end loop over source timeslices
+#endif
+    } // end loop over sources
 } // end run
 
 
@@ -740,15 +832,10 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
   qp_arg.cg.mass = mass ;
   qp_arg.t = time ;
 
-  qp_arg.StartSrcSpin = 0 ;
-  qp_arg.EndSrcSpin = 4 ;
-  qp_arg.StartSrcColor = 0 ;
-  qp_arg.EndSrcColor = 3 ;
-
-//  qp_arg.StartSrcSpin  = (Nuc3pt_arg->StartSrcSpin);
-//  qp_arg.EndSrcSpin    = (Nuc3pt_arg->EndSrcSpin);
-//  qp_arg.StartSrcColor = (Nuc3pt_arg->StartSrcColor);
-//  qp_arg.EndSrcColor   = (Nuc3pt_arg->EndSrcColor);
+  qp_arg.StartSrcSpin  = (Nuc3pt_arg->StartSrcSpin);
+  qp_arg.EndSrcSpin    = (Nuc3pt_arg->EndSrcSpin);
+  qp_arg.StartSrcColor = (Nuc3pt_arg->StartSrcColor);
+  qp_arg.EndSrcColor   = (Nuc3pt_arg->EndSrcColor);
 
   if (qp_arg.StartSrcSpin >= qp_arg.EndSrcSpin 
 	|| qp_arg.StartSrcColor >= qp_arg.EndSrcColor)   
@@ -781,6 +868,7 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
     qp_arg.ensemble_label = Nuc3pt_arg->ensemble_label;
     qp_arg.seqNum=Nuc3pt_arg->ensemble_id;
   }
+  char out_prop[1024];
 
   int mu;
 
@@ -801,14 +889,6 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
 	  delete aprop ;
 	  GJP.Tbc(save_bc); // Restore original BC
       }else{
-	// impose twisted b.c. if requested
-	if(Nuc3pt_arg->theta != 0){
-	  
-	  for(mu=0;mu<3;mu++){
-	    twist_links(AlgLattice(), 
-			Nuc3pt_arg->theta, mu);
-	  }
-	}
 	  q_prop[n] = new QPropWBoxSrc(AlgLattice(),&qp_arg, &box_arg, common_arg);
 	  q_prop[n]->Run();
       }
@@ -830,15 +910,21 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
 	  delete apr ;
 	  GJP.Tbc(save_bc); // Restore original BC
       }else{
-	// impose twisted b.c. if requested
-	if(Nuc3pt_arg->theta != 0){
-	  for(mu=0;mu<3;mu++){
-	    twist_links(AlgLattice(), 
-			     Nuc3pt_arg->theta, mu);
-	  }
-	}
+
+	//sprintf(out_prop, "prop_m%g_tsrc%d_%s_%d",mass,time,
+	//Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id);	  
+	//qp_arg.file = out_prop;
+	qp_arg.file = Nuc3pt_arg->ptsrc_prop_file;
+	
+	Fprintf(stdout, "prop outfile = %s\n", qp_arg.file);
+	
+	if(Nuc3pt_arg->calc_QProp != READ_QPROP){
 	  q_prop[n] = new QPropWPointSrc(AlgLattice(),&qp_arg,common_arg);
-	  q_prop[n]->Run();
+	} else {
+	  q_prop[n] = new QPropWPointSrc(AlgLattice(),&qp_arg,common_arg,qp_arg.file);
+	  q_prop[n]->Allocate(0);
+	  q_prop[n]->RestoreQProp(qp_arg.file,0);
+	}
       }
     }
     break ;
@@ -870,59 +956,26 @@ void AlgNuc3pt::GetThePropagator(int n, int time, Float mass){
 	  delete apr ;
 	  GJP.Tbc(save_bc); // Restore original BC
       }else{
-	// impose twisted b.c. if requested
-	if(Nuc3pt_arg->theta != 0){
-	  //printf("Made it here\n");
-	  for(mu=0;mu<3;mu++){
-	    twist_links(AlgLattice(), 
-			Nuc3pt_arg->theta, mu);
-	  }
+
+	//sprintf(out_prop, "prop_m%g_tsrc%d_GS_w%g_n%d_%s_%d",mass,time,
+	//Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,
+	//Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id);	  
+	//qp_arg.file = out_prop;
+	qp_arg.file = Nuc3pt_arg->prop_file;
+
+	Fprintf(stdout, "prop outfile = %s\n", qp_arg.file);
+	
+	if(Nuc3pt_arg->calc_QProp != READ_QPROP){
+	  q_prop[n] = new QPropWMultGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg);
+	} else {
+	  q_prop[n] = new QPropWGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg,qp_arg.file);
+	  q_prop[n]->Allocate(0);
+	  q_prop[n]->RestoreQProp(qp_arg.file,0);
 	}
-
-	char out_prop[200];
-	
-	qp_arg.file = out_prop;
-
-	 sprintf(out_prop,"%s%i",Nuc3pt_arg->prop_file,time);
-	  
-	 Fprintf(stdout, "prop outfile = %s\n", qp_arg.file);
-	
-	  if(Nuc3pt_arg->calc_QProp != READ_QPROP){
-	    q_prop[n] = new QPropWMultGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg);
-	  } else {
-	    q_prop[n] = new QPropWGaussSrc(AlgLattice(),&qp_arg,&gauss_arg,common_arg,qp_arg.file);
-	    q_prop[n]->Allocate(0);
-//	    q_prop[n]->ReLoad(qp_arg.file); //TODO: need different filenames for different propagators (MFL)
-	    q_prop[n]->RestoreQProp(out_prop,0);
-	  }
       }
     }
     break ;
-/*
-  case SUM_MOM:
-    {
-      qp_arg.gauge_fix_src=1;
-      // make sources with these momenta, and sum
-      int **mom;
-      int nsrc = 3;
-      mom = (int**) smalloc(nsrc * sizeof(int*) );
-      for(int i=0;i<nsrc;i++) mom[i] = (int*) smalloc(3*sizeof(int));
-            
-      mom[0][0]=1; mom[0][1]=0; mom[0][2]=0;
-      mom[1][0]=0; mom[1][1]=1; mom[1][2]=0;
-      mom[2][0]=0; mom[2][1]=0; mom[2][2]=1;
-   
-      // impose twisted b.c. if requested
-      if(Nuc3pt_arg->theta != 0){
-	//printf("Made it here\n");
-	for(mu=0;mu<3;mu++){
-	  twist_links(AlgLattice(), Nuc3pt_arg->theta, mu);
-	}
-      }
-      q_prop = new QPropWSumMomSrc(AlgLattice(),&qp_arg,nsrc,mom,common_arg);
-    }
-    break ;
- */
+
  default: // It should  never get here! 
     ERR.General(cname,fname,"Invalid source type\n");
     break ;
@@ -951,15 +1004,10 @@ void  AlgNuc3pt::GetTheSeqPropagator(int time, Float mass, SourceType type,
   qp_arg.cg.mass = mass ;
   qp_arg.t = time ;
 
-  qp_arg.StartSrcSpin  = 0;
-  qp_arg.EndSrcSpin    = 4;
-  qp_arg.StartSrcColor = 0;
-  qp_arg.EndSrcColor   = 3;
-
-//  qp_arg.StartSrcSpin  = (Nuc3pt_arg->StartSrcSpin);
-//  qp_arg.EndSrcSpin    = (Nuc3pt_arg->EndSrcSpin);
-//  qp_arg.StartSrcColor = (Nuc3pt_arg->StartSrcColor);
-//  qp_arg.EndSrcColor   = (Nuc3pt_arg->EndSrcColor);
+  qp_arg.StartSrcSpin  = (Nuc3pt_arg->StartSrcSpin);
+  qp_arg.EndSrcSpin    = (Nuc3pt_arg->EndSrcSpin);
+  qp_arg.StartSrcColor = (Nuc3pt_arg->StartSrcColor);
+  qp_arg.EndSrcColor   = (Nuc3pt_arg->EndSrcColor);
 
   // for multi-sink calculations. -MFL
   int *t_sink=(int *) smalloc(cname,fname,"t_sink",num_qprop*sizeof(int));
@@ -1045,22 +1093,24 @@ void  AlgNuc3pt::GetTheSeqPropagator(int time, Float mass, SourceType type,
 	else{
 	  //Save 5d prop in memory
 	  if(Nuc3pt_arg->DoConserved) qp_arg.save_ls_prop = 2;
-          qp_arg.file=out_prop;
 
 	  //Assuming we place the sources and sinks evenly on the lattice.
 	  //There is little reason why we don't want to do that. --MFL
-	  sprintf( out_prop, "prop_seq_u_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop[0]->SourceTime(),time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+	  sprintf( out_prop, "prop_seq_u_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",
+		   mass,q_prop[0]->SourceTime(),time,Nuc3pt_arg->gauss_W,
+		   Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+          qp_arg.file=out_prop;
 
-	 //commented out for the moment. --MFL 
-	 //if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "prop_seq_u_m%g_tsrc%d_%d_tsnk%d_%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),Nuc3pt_arg->mt[1]-Nuc3pt_arg->t_sink,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+          //qp_arg.file=Nuc3pt_arg->u_seq_prop_file;
+
 	  if(Nuc3pt_arg->calc_seqQ != READ_SEQ){
 	    u_s_prop = new QPropWMultSeqProtUSrc(AlgLattice(), num_qprop, q_prop, mom, P, 
-					     &qp_arg,&gauss_arg, common_arg,t_sink);
+						 &qp_arg,&gauss_arg, common_arg,t_sink);
 	  } else {
-	    u_s_prop = new QPropWMultSeqProtUSrc(AlgLattice(), 1, q_prop, mom, P, &qp_arg, &gauss_arg, common_arg, out_prop);
+	    u_s_prop = new QPropWMultSeqProtUSrc(AlgLattice(), 1, q_prop, mom, P, &qp_arg, &gauss_arg, common_arg, qp_arg.file);
 	    u_s_prop->Allocate(0);
-//	    u_s_prop->RestoreQProp(out_prop,0);
-	    u_s_prop->ReLoad(out_prop);	
+	    u_s_prop->RestoreQProp(qp_arg.file,0); // "0" no midpoint
+	    //u_s_prop->ReLoad(out_prop);	
 	  }
 	}
       }
@@ -1091,18 +1141,22 @@ void  AlgNuc3pt::GetTheSeqPropagator(int time, Float mass, SourceType type,
 	    sprintf(qp_arg.file,"prop_d");
 	  }
 	  if(Nuc3pt_arg->DoConserved == 2) qp_arg.save_ls_prop = 2;
+
+	  sprintf( out_prop, "prop_seq_d_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",
+		   mass,q_prop[0]->SourceTime(),time,Nuc3pt_arg->gauss_W,
+		   Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
           qp_arg.file=out_prop;
 
-	  sprintf( out_prop, "prop_seq_d_m%g_tsrc%d_tsnk%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop[0]->SourceTime(),time,Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
-	  //	  if(Nuc3pt_arg->num_mult==2) sprintf( out_prop, "prop_seq_d_m%g_tsrc%d_%d_tsnk%d_%d_GS_w%g_n%d_%s_%s_%d",mass,q_prop->SourceTime(),Nuc3pt_arg->mt[1]-Nuc3pt_arg->t_sink,Nuc3pt_arg->mt[0],Nuc3pt_arg->mt[1],Nuc3pt_arg->gauss_W,Nuc3pt_arg->gauss_N,prjct,Nuc3pt_arg->ensemble_label,Nuc3pt_arg->ensemble_id );
+          //qp_arg.file=Nuc3pt_arg->d_seq_prop_file;
 
 	  if(Nuc3pt_arg->calc_seqQ != READ_SEQ){
 	    d_s_prop = new QPropWMultSeqProtDSrc(AlgLattice(),num_qprop, q_prop, mom, P, 
 					   &qp_arg, &gauss_arg,common_arg,t_sink);
 	  } else {
-	    d_s_prop = new QPropWMultSeqProtDSrc(AlgLattice(), 1, q_prop, mom, P, &qp_arg, &gauss_arg, common_arg, out_prop);
+	    d_s_prop = new QPropWMultSeqProtDSrc(AlgLattice(), 1, q_prop, mom, P, &qp_arg, &gauss_arg, common_arg, qp_arg.file);
 	    d_s_prop->Allocate(0);
-	    d_s_prop->ReLoad(out_prop);
+	    //d_s_prop->ReLoad(out_prop);
+	    d_s_prop->RestoreQProp(qp_arg.file,0); // "0" no midpoint
 	  }
 	}
       }

@@ -1,27 +1,12 @@
 #include <config.h>
+#ifndef USE_BLAS
 #include <stdio.h>
 #include <stdlib.h>
 CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOp class CG solver methods.
 
-  $Id: inv_cg.C,v 1.4 2013-04-05 17:51:13 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:51:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/inv_cg.C,v 1.4 2013-04-05 17:51:13 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.4 2013-04-05 17:51:13 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.4 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/comsrc/inv_cg.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // inv_cg.C
@@ -68,10 +53,12 @@ const unsigned CBUF_MODE4 = 0xcb18c1ff;
 static int f_size_cb;     // Node checkerboard size of the fermion field
 
 static inline void print_vec( Vector *vec, char *name){
+#if 0
   Float temp_f = vec->NormSqNode(f_size_cb);
   Float *temp_p = (Float *)vec;
   glb_sum(&temp_f);
   VRB.Flow("","print_vec()", "%s = %e %e \n", name,IFloat(temp_f),*temp_p);
+#endif
 }
 
 //------------------------------------------------------------------
@@ -636,3 +623,4 @@ int DiracOp::InvCg(void)
 
 
 CPS_END_NAMESPACE
+#endif

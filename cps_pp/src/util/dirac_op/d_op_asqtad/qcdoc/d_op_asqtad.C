@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_asqtad/qcdoc/d_op_asqtad.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

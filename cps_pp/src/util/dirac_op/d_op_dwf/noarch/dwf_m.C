@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_m.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_dwf/noarch/dwf_m.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -19,12 +19,12 @@ CPS_START_NAMESPACE
 //------------------------------------------------------------------
 
 CPS_END_NAMESPACE
+#include<util/dirac_op.h>
 #include<util/dwf.h>
 #include<util/gjp.h>
 #include<util/vector.h>
 #include<util/verbose.h>
 #include<util/error.h>
-#include<util/dirac_op.h>
 CPS_START_NAMESPACE
 
 

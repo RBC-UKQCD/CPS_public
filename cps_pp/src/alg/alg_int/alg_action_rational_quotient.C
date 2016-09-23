@@ -22,6 +22,8 @@ CPS_END_NAMESPACE
 #include<util/time_cps.h>
 #include<alg/alg_int.h>
 #include<alg/alg_remez.h>
+#include <util/timer.h>
+#include <util/lattice/fbfm.h>
 CPS_START_NAMESPACE
 
 //!< Dummy contructor - does nothing
@@ -38,6 +40,7 @@ AlgActionRationalQuotient::AlgActionRationalQuotient(AlgMomentum &mom,
 				     ActionRationalQuotientArg &r_arg, int traj_num)
 				     
   : AlgActionRational(mom, r_arg.bi_arg)
+//    skip_force(false)
 {
 
   cname = "AlgActionRationalQuotient";
@@ -71,12 +74,47 @@ AlgActionRationalQuotient::AlgActionRationalQuotient(AlgMomentum &mom,
 
   //!< Allocate memory for the fermion CG arguments.
   if(n_masses > 0){
+#ifdef USE_BFM
+      if (rat_quo_arg->bi_arg.fermion == F_CLASS_BFM) {
+	  // AlgActionBilinear does not set fermion field size correctly for Fbfm
+	  int Ls = Fbfm::arg_map.at(rat_quo_arg->bsn_mass.bsn_mass_val[0]).Ls;
+
+	  VRB.Result(cname, fname, "Recalculating fermion field size for Fbfm based on Ls = %d\n", Ls);
+
+	  //!< Number of Floats in a Vector array
+	  f_size = GJP.VolNodeSites() * Ls * (2 * 3 * 4) / 2; // (reim * color * spin) / Ncheckerboard
+	  //!< Number of Vectors in a Vector array
+	  f_vec_count = f_size / (2 * 3);
+	  //!< Number of lattice sites
+	  f_sites = f_size / (2 * 3 * 4);
+
+	  VRB.Result(cname, fname, "Allocating phi fields\n");
+	  for (int i = 0; i < n_masses; i++) {
+	      phi[i] = (Vector *)smalloc(f_size*sizeof(Float), "phi[i]", fname, cname);
+	  }
+      }
+#endif
+
+
     bsn_mass = (Float*) smalloc(n_masses * sizeof(Float), "bsn_mass", fname, cname);
     frm_mass = (Float*) smalloc(n_masses * sizeof(Float), "frm_mass", fname, cname);
 
     for(int i=0; i<n_masses; i++) {
       bsn_mass[i] = rat_quo_arg->bsn_mass.bsn_mass_val[i];
       frm_mass[i] = rat_quo_arg->frm_mass.frm_mass_val[i];
+
+#ifdef USE_BFM
+      if (rat_quo_arg->bi_arg.fermion == F_CLASS_BFM) {
+	  // Make sure all quotients have the same Ls
+	  int Ls = Fbfm::arg_map.at(bsn_mass[0]).Ls;
+	  if (Fbfm::arg_map.at(bsn_mass[i]).Ls != Ls) {
+	      ERR.General(cname, fname, "Boson mass #%d doesn't have the same Ls as boson mass #0!\n", i);
+	  }
+	  if (Fbfm::arg_map.at(frm_mass[i]).Ls != Ls) {
+	      ERR.General(cname, fname, "Fermion mass #%d doesn't have the same Ls as boson mass #0!\n", i);
+	  }
+      }
+#endif
     }
     
     //!< construct approximation if necessary
@@ -106,6 +144,8 @@ AlgActionRationalQuotient::AlgActionRationalQuotient(AlgMomentum &mom,
     frmn[0] = (Vector*) smalloc(f_size*max_size*sizeof(Float), 
 				"frmn[0]", fname, cname);
     
+    VRB.Result(cname, fname, "allocating fermion fields of size %d Floats\n", f_size);
+
     for (int i=1; i<max_size; i++) frmn[i] = frmn[0] + i*f_vec_count;
     
     frmn_d = 0;
@@ -180,7 +220,13 @@ void AlgActionRationalQuotient::reweight(Float *rw_fac,Float *norm) {
     Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
     
     for(int i=0; i<n_masses; i++){
-
+#ifdef USE_BFM
+	if (rat_quo_arg->bi_arg.fermion == F_CLASS_BFM) {
+	    // Fbfm needs current_key_mass set before calling RandGaussVector
+	    Fbfm::current_key_mass = bsn_mass[i];
+	    VRB.Result(cname, fname, "Setting Fbfm::current_key_mass = %e before calling RandGaussVector\n", Fbfm::current_key_mass);
+	}
+#endif
       lat.RandGaussVector(phi[i], 0.5, Ncb);
       norm[i] = lat.FhamiltonNode(phi[i],phi[i]);
 
@@ -226,6 +272,8 @@ void AlgActionRationalQuotient::reweight(Float *rw_fac,Float *norm) {
 void AlgActionRationalQuotient::heatbath() {
 
   char *fname = "heatbath()";
+  static Timer timer(cname, fname);
+  timer.start(true);
 
   Float dtime = -dclock();
 
@@ -237,28 +285,42 @@ void AlgActionRationalQuotient::heatbath() {
     h_init = 0.0;
     
     for(int i=0; i<n_masses; i++){
-
+#ifdef USE_BFM
+	if (rat_quo_arg->bi_arg.fermion == F_CLASS_BFM) {
+	    // Fbfm needs current_key_mass set before calling RandGaussVector
+	    Fbfm::current_key_mass = bsn_mass[i];
+	    VRB.Result(cname, fname, "Setting Fbfm::current_key_mass = %e before calling RandGaussVector\n", Fbfm::current_key_mass);
+	}
+#endif
       lat.RandGaussVector(phi[i], 0.5, Ncb);
-      h_init += lat.FhamiltonNode(phi[i],phi[i]);
+      Float h_i = lat.FhamiltonNode(phi[i],phi[i]);
+      h_init += h_i;
+      Float total_h_i = h_i;
+      glb_sum(&total_h_i);
+      VRB.Result(cname, fname, "heatbath: mass ratio %0.4f/%0.4f initial ham = %0.16e\n", frm_cg_arg_mc[i][0]->mass, bsn_cg_arg_mc[i][0]->mass, total_h_i);
 
       //!< First apply the fermion rational
       frmn[0] -> 
 	VecEqualsVecTimesEquFloat(phi[i],frm_remez_arg_mc[i].norm_inv,f_size);
       
+      VRB.Result(cname, fname, "Calling lat.FmatEvlMInv for fermion mass %d\n", i);
       cg_iter = lat.FmatEvlMInv(frmn, phi[i], frm_remez_arg_mc[i].pole_inv, 
 				frm_remez_arg_mc[i].degree, 0, 
 				frm_cg_arg_mc[i], CNV_FRM_NO, SINGLE,
 				frm_remez_arg_mc[i].residue_inv);
-      
+      VRB.Result(cname, fname, "fermion mass %e multishift inversion cg_iter = %d\n", frm_cg_arg_mc[i][0]->mass, cg_iter);
+
       //!< Now apply the boson rational
       phi[i] -> 
 	VecEqualsVecTimesEquFloat(frmn[0],bsn_remez_arg_mc[i].norm_inv,f_size);
 
+      VRB.Result(cname, fname, "Calling lat.FmatEvlMInv for boson mass %d\n", i);
       cg_iter = lat.FmatEvlMInv(phi+i, frmn[0], bsn_remez_arg_mc[i].pole_inv, 
 				bsn_remez_arg_mc[i].degree, 0, 
 				bsn_cg_arg_mc[i], CNV_FRM_NO, SINGLE,
 				bsn_remez_arg_mc[i].residue_inv);
-      
+      VRB.Result(cname, fname, "boson mass %e multishift inversion cg_iter = %d\n", bsn_cg_arg_mc[i][0]->mass, cg_iter);
+
       updateCgStats(frm_cg_arg_mc[i][0]);
       updateCgStats(bsn_cg_arg_mc[i][0]);
     }
@@ -273,6 +335,7 @@ void AlgActionRationalQuotient::heatbath() {
 
   dtime += dclock();
   print_flops(cname, fname, 0, dtime);
+  timer.stop(true);
 }
 
 // Calculate rhmc fermion contribution to the Hamiltonian
@@ -284,16 +347,23 @@ Float AlgActionRationalQuotient::energy() {
     return 0.0;
   } else if (!evolved) {
     energyEval = 1;
+    Float glb_h = h_init;
+    glb_sum(&glb_h);
+    VRB.Result(cname, fname, "glb_h = %0.15e\n", glb_h);
     return h_init;
   } else {
-      Float dtime = -dclock();
+    static Timer timer(cname, fname);
+    timer.start(true);
+    Float dtime = -dclock();
 
     int shift = 0;
     Float h = 0.0;
 
     //!< Before energy is measured, do we want to check bounds?
     if (rat_quo_arg->eigen.eigen_measure == EIGEN_MEASURE_YES) {
+      VRB.Result(cname, fname, "Checking boson eigenvalue bounds\n");
       checkApprox(bsn_mass, bsn_remez_arg_mc, rat_quo_arg->eigen);
+      VRB.Result(cname, fname, "Checking fermion eigenvalue bounds\n");
       checkApprox(frm_mass, frm_remez_arg_mc, rat_quo_arg->eigen);
     }
 
@@ -306,25 +376,33 @@ Float AlgActionRationalQuotient::energy() {
       frmn[0] -> VecEqualsVecTimesEquFloat(phi[i],bsn_remez_arg_mc[i].norm,
 					   f_size);
       
+      VRB.Result(cname, fname, "Calling lat.FmatEvlMInv for boson mass %d\n", i);
       cg_iter = lat.FmatEvlMInv(frmn, phi[i], bsn_remez_arg_mc[i].pole, 
 				bsn_remez_arg_mc[i].degree, 0, 
 				bsn_cg_arg_mc[i], CNV_FRM_NO, SINGLE, 
 				bsn_remez_arg_mc[i].residue);
+      VRB.Result(cname, fname, "boson mass %e multishift inversion cg_iter = %d\n", bsn_cg_arg_mc[i][0]->mass, cg_iter);
       
       //!< Now apply fermion rational
       frmn[1] -> VecEqualsVecTimesEquFloat(frmn[0],frm_remez_arg_mc[i].norm,
 					   f_size);
       
+      VRB.Result(cname, fname, "Calling lat.FmatEvlMInv for fermion mass %d\n", i);
       cg_iter = lat.FmatEvlMInv(frmn+1, frmn[0], frm_remez_arg_mc[i].pole, 
 				frm_remez_arg_mc[i].degree, 0, 
 				frm_cg_arg_mc[i], CNV_FRM_NO, SINGLE, 
 				frm_remez_arg_mc[i].residue);
-      
+      VRB.Result(cname, fname, "fermion mass %e multishift inversion cg_iter = %d\n", frm_cg_arg_mc[i][0]->mass, cg_iter);
+
       updateCgStats(bsn_cg_arg_mc[i][0]);
       updateCgStats(frm_cg_arg_mc[i][0]);
 
       // shift this evaluation into minvcg?
-      h += lat.FhamiltonNode(frmn[1], frmn[1]);
+      Float h_i = lat.FhamiltonNode(frmn[1], frmn[1]);
+      h += h_i;
+      Float total_h_i = h_i;
+      glb_sum(&total_h_i);
+      VRB.Result(cname, fname, "energy: mass ratio %0.4f/%0.4f final ham = %0.16e\n", frm_cg_arg_mc[i][0]->mass, bsn_cg_arg_mc[i][0]->mass, total_h_i);
     }
 
     LatticeFactory::Destroy();
@@ -333,6 +411,7 @@ Float AlgActionRationalQuotient::energy() {
 
     dtime += dclock();
     print_flops(cname, fname, 0, dtime);
+    timer.stop(true);
     return h;
   }
 }
@@ -340,9 +419,18 @@ Float AlgActionRationalQuotient::energy() {
 void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
 {
   char * fname = "prepare_fg(M*,F)";
+  static Timer timer(cname, fname);
+  timer.start(true);
   Float dtime = -dclock();
   Float dtime_cg = 0.;
   Float dtime_force = 0.;
+
+  if (skip_force) {
+    VRB.Result(cname, fname, "WARNING! skipping prepare_fg() because AlgActionRationalQuotient::skip_force is true!\n");
+    evolved = 1;
+    timer.stop(true);
+    return;
+  }
 
   Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
 
@@ -353,12 +441,14 @@ void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
     //! First apply boson rational
     dtime_cg -= dclock();
     int shift = 0;
+    VRB.Result(cname, fname, "Calling first lat.FmatEvlMInv for boson mass %d\n", i);
     cg_iter = lat.FmatEvlMInv(frmn, phi[i],
                               bsn_remez_arg_md[i].pole,
                               bsn_deg, 0,
                               bsn_cg_arg_fg[i], CNV_FRM_NO,
                               frmn_d+shift);
     dtime_cg += dclock();
+    VRB.Result(cname, fname, "boson mass %e first multishift inversion cg_iter = %d\n", bsn_cg_arg_fg[i][0]->mass, cg_iter);
 
     updateCgStats(bsn_cg_arg_fg[i][0]);
 
@@ -372,12 +462,14 @@ void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
     //!< Now apply fermion rational
     dtime_cg -= dclock();
     shift += bsn_deg;
+    VRB.Result(cname, fname, "Calling lat.FmatEvlMInv for fermion mass %d\n", i);
     cg_iter = lat.FmatEvlMInv(frmn+shift, eta[0], 
                               frm_remez_arg_md[i].pole, 
                               frm_deg, 0,
                               frm_cg_arg_fg[i], CNV_FRM_NO, 
                               frmn_d+shift);
     dtime_cg += dclock();
+    VRB.Result(cname, fname, "fermion mass %e multishift inversion cg_iter = %d\n", frm_cg_arg_fg[i][0]->mass, cg_iter);
 
     updateCgStats(frm_cg_arg_fg[i][0]);
 	
@@ -391,12 +483,14 @@ void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
     //!< Apply final boson rational
     dtime_cg -= dclock();
     shift += frm_deg;
+    VRB.Result(cname, fname, "Calling second lat.FmatEvlMInv for boson mass %d\n", i);
     cg_iter = lat.FmatEvlMInv(frmn+shift, eta[1], 
                               bsn_remez_arg_md[i].pole, 
                               bsn_deg, 0, 
                               bsn_cg_arg_fg[i], CNV_FRM_NO, 
                               frmn_d+shift);	
     dtime_cg += dclock();
+    VRB.Result(cname, fname, "boson mass %e second multishift inversion cg_iter = %d\n", bsn_cg_arg_fg[i][0]->mass, cg_iter);
 
     updateCgStats(bsn_cg_arg_fg[i][0]);
 
@@ -470,16 +564,26 @@ void AlgActionRationalQuotient::prepare_fg(Matrix * force, Float dt_ratio)
   print_flops(cname, fname, 0, dtime);
   print_flops(cname, "prepare_fg::cg()", 0, dtime_cg);
   print_flops(cname, "prepare_fg::force()", 0, dtime_force);
+  timer.stop(true);
 }
 
 //!< run method evolves the integrator
 void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
 {
   char * fname = "evolve(Float, int)";
+  static Timer timer(cname, fname);
+  timer.start(true);
 
   Float dtime = -dclock();
   Float dtime_cg = 0.;
   Float dtime_force = 0.;
+
+  if (skip_force) {
+    VRB.Result(cname, fname, "WARNING! skipping evolve() because AlgActionRationalQuotient::skip_force is true!\n");
+    evolved = 1;
+    timer.stop(true);
+    return;
+  }
 
   //!< Create an appropriate lattice
   Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
@@ -492,12 +596,14 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
       //! First apply boson rational
       int shift = 0;
       dtime_cg -= dclock();
+//      VRB.Result(cname, fname, "Calling first lat.FmatEvlMInv for boson mass %d\n", i);
       cg_iter = lat.FmatEvlMInv(frmn, phi[i], 
                                 bsn_remez_arg_md[i].pole, 
                                 bsn_deg, 0, 
                                 bsn_cg_arg_md[i], CNV_FRM_NO, 
                                 frmn_d+shift);	
       dtime_cg += dclock();
+      VRB.Result(cname, fname, "boson mass %e first multishift inversion cg_iter = %d\n", bsn_cg_arg_md[i][0]->mass, cg_iter);
 
       updateCgStats(bsn_cg_arg_md[i][0]);
 
@@ -511,12 +617,14 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
       dtime_cg -= dclock();
       //!< Now apply fermion rational
       shift += bsn_deg;
+      VRB.Result(cname, fname, "Calling lat.FmatEvlMInv for fermion mass %d\n", i);
       cg_iter = lat.FmatEvlMInv(frmn+shift, eta[0], 
                                 frm_remez_arg_md[i].pole, 
                                 frm_deg, 0, 
                                 frm_cg_arg_md[i], CNV_FRM_NO, 
                                 frmn_d+shift);
       dtime_cg += dclock();
+      VRB.Result(cname, fname, "fermion mass %e multishift inversion cg_iter = %d\n", frm_cg_arg_md[i][0]->mass, cg_iter);
 
       updateCgStats(frm_cg_arg_md[i][0]);
 	
@@ -530,12 +638,14 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
       dtime_cg -= dclock();
       //!< Apply final boson rational
       shift += frm_deg;
+      VRB.Result(cname, fname, "Calling second lat.FmatEvlMInv for boson mass %d\n", i);
       cg_iter = lat.FmatEvlMInv(frmn+shift, eta[1], 
                                 bsn_remez_arg_md[i].pole, 
                                 bsn_deg, 0, 
                                 bsn_cg_arg_md[i], CNV_FRM_NO, 
                                 frmn_d+shift);	
       dtime_cg += dclock();
+      VRB.Result(cname, fname, "boson mass %e second multishift inversion cg_iter = %d\n", bsn_cg_arg_md[i][0]->mass, cg_iter);
 
       updateCgStats(bsn_cg_arg_md[i][0]);
 
@@ -617,6 +727,7 @@ void AlgActionRationalQuotient::evolve(Float dt, int nsteps)
   print_flops(cname, fname, 0, dtime);
   print_flops(cname, "evolve::cg()", 0, dtime_cg);
   print_flops(cname, "evolve::force()", 0, dtime_force);
+  timer.stop(true);
 }
 
 bool AlgActionRationalQuotient::checkPolesFile(const RemezArg &md, const RemezArg &mc, const RationalDescr &r)
@@ -641,21 +752,67 @@ bool AlgActionRationalQuotient::checkPolesFile(const RemezArg &md, const RemezAr
   if(fabs(md.lambda_high - r.md_approx.lambda_high) > 1e-3 * fabs(r.md_approx.lambda_high) ) return false;
   if(fabs(mc.lambda_low  - r.mc_approx.lambda_low ) > 1e-3 * fabs(r.mc_approx.lambda_low ) ) return false;
   if(fabs(mc.lambda_high - r.mc_approx.lambda_high) > 1e-3 * fabs(r.mc_approx.lambda_high) ) return false;
+  
+  if(md.field_type != r.field_type) { printf("a\n"); return false; }
+  if(mc.field_type != r.field_type) { printf("b\n"); return false; }
+
+  if(mc.power_num != r.power_num) { printf("c\n"); return false; }
+  if(mc.power_den != r.power_den * 2) { printf("d\n"); return false; }
+
+  if(md.power_num != r.power_num) { printf("e\n"); return false; }
+  if(r.field_type == BOSON) {
+    if(md.power_den != r.power_den * 2) { printf("f\n"); return false; }
+  } else {
+    if(md.power_den != r.power_den) { printf("g\n"); return false; }
+  }
+
+  if(md.degree != r.md_approx.stop_rsd.stop_rsd_len) { printf("h\n"); return false; }
+  if(mc.degree != r.mc_approx.stop_rsd.stop_rsd_len) { printf("i\n"); return false; }
+
+  if(fabs(md.lambda_low  - r.md_approx.lambda_low ) > 1e-3 * fabs(r.md_approx.lambda_low ) ) { printf("j\n"); return false; }
+  if(fabs(md.lambda_high - r.md_approx.lambda_high) > 1e-3 * fabs(r.md_approx.lambda_high) ) { printf("k\n"); return false; }
+  if(fabs(mc.lambda_low  - r.mc_approx.lambda_low ) > 1e-3 * fabs(r.mc_approx.lambda_low ) ) { printf("l\n"); return false; }
+  if(fabs(mc.lambda_high - r.mc_approx.lambda_high) > 1e-3 * fabs(r.mc_approx.lambda_high) ) { printf("m\n"); return false; }
+  if(fabs(mc.lambda_high - r.mc_approx.lambda_high) > 1e-3 * fabs(r.mc_approx.lambda_high) ) return false;
 
   return true;
+}
+
+void PrintPFE(const char* name, Float norm, const Float* residue, const Float* pole, int degree)
+{
+  const char* cname = "AlgActionRationalQuotient";
+  const char* fname = "PrintPFE";
+
+  char pfe[10000];
+  sprintf(pfe, "%.15e", norm);
+
+  for(int i = 0; i < degree; i++) {
+    char term[1024];
+    sprintf(term, " + %.15e/(x + %.15e)", residue[i], pole[i]);
+    strcat(pfe, term);
+  }
+
+  if(!UniqueID()) printf("PFE of %s:    %s\n", name, pfe);
+}
+
+void PrintRemezArg(const char* name, const RemezArg& remez_arg)
+{
+  char pfe_name[1024];
+
+  sprintf(pfe_name, "%s normal", name);
+  PrintPFE(pfe_name, remez_arg.norm, remez_arg.residue, remez_arg.pole, remez_arg.degree);
+  sprintf(pfe_name, "%s inv", name);
+  PrintPFE(pfe_name, remez_arg.norm_inv, remez_arg.residue_inv, remez_arg.pole_inv, remez_arg.degree);
 }
 
 // return true if we successfully loaded from a file.
 bool AlgActionRationalQuotient::loadPoles(void)
 {
-  const char *fname = "loadPoles()";
-  if(rat_quo_arg->remez_generate) return false;
-  if(strlen(rat_quo_arg->rat_poles_file) == 0) return false;
+  const char* fname = "loadPoles()";
 
   FILE *fp = fopen(rat_quo_arg->rat_poles_file, "r");
   if(fp == NULL) return false;
   fclose(fp);
-
 
   RationalQuotientRemezArg rq;
   if(!rq.Decode(rat_quo_arg->rat_poles_file, "rq")) return false;
@@ -683,7 +840,13 @@ bool AlgActionRationalQuotient::loadPoles(void)
                         rat_quo_arg->fermions.fermions_val[i])) return false;
     if(! checkPolesFile(bsn_remez_arg_md[i], bsn_remez_arg_mc[i],
                         rat_quo_arg->bosons.bosons_val[i])) return false;
+  
+    PrintRemezArg("frm_remez_arg_md", frm_remez_arg_md[i]);
+    PrintRemezArg("frm_remez_arg_mc", frm_remez_arg_mc[i]);
+    PrintRemezArg("bsn_remez_arg_md", bsn_remez_arg_md[i]);
+    PrintRemezArg("bsn_remez_arg_mc", bsn_remez_arg_mc[i]);
   }
+
 
   VRB.Result(cname, fname, "Successfully loaded poles file %s.\n", rat_quo_arg->rat_poles_file);
   return true;
@@ -691,7 +854,6 @@ bool AlgActionRationalQuotient::loadPoles(void)
 
 bool AlgActionRationalQuotient::savePoles(void)
 {
-  const char *fname = "savePoles()";
   if(strlen(rat_quo_arg->rat_poles_file) == 0) return false;
 
   RationalQuotientRemezArg rq;

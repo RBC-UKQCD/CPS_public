@@ -3,7 +3,7 @@
 /*!\file
   \brief Helper routines for the fermionic force term
 
-  $Id: force_product_sum.C,v 1.4 2004-08-19 22:20:49 mclark Exp $
+  $Id: force_product_sum.C,v 1.4 2004/08/19 22:20:49 mclark Exp $
 */
 //--------------------------------------------------------------------
 

@@ -4,14 +4,16 @@
 #include <omp.h>
 #ifdef USE_BFM
 
+#ifdef USE_CHROMA
 #include <chroma.h>
+#include <actions/ferm/invert/syssolver_linop_cg_array.h>
+#endif
 #include <bfm.h>
 #include <bfm_qdp.h>
 #ifdef UNIFORM_SEED_TESTING
 #include "majority_vote.h"
 #endif
-#include <actions/ferm/invert/syssolver_linop_cg_array.h>
-//#include <qdp.h>
+#include <qdp.h>
 #include <util/gjp.h>
 #include <comms/sysfunc_cps.h>
 #include <util/error.h>
@@ -26,7 +28,9 @@
 //#define Printf printf
 
 
+#ifdef USE_CHROMA
 using namespace Chroma;
+#endif
 
 //typedef LatticeFermion T;
 //typedef multi1d<LatticeFermion> T5;

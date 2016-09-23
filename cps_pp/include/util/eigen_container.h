@@ -29,19 +29,18 @@
 #include <alg/no_arg.h>
 #include <util/time_cps.h>
 #include <util/qcdio.h>
-#ifdef USE_QIO
 #include <util/qio_writeGenericFields.h>
 #include <util/qio_readGenericFields.h>
-#endif
 #include <util/dirac_op.h>
 #include <alg/cg_arg.h>
-
 #include <comms/sysfunc_cps.h>
 #include <comms/glb.h>
 
 
 #include <util/vector.h>
 
+#include <stdlib.h>
+#include <cstdlib>
 
 
 CPS_START_NAMESPACE
@@ -57,6 +56,41 @@ CPS_START_NAMESPACE
 //-----------------------------------------------------------
 
 void lanczos_GramSchm(Float *psi, Float **vec, int Nvec, int f_size, Float* alpha);
+
+#if 0
+// specific to dwf 
+static void ReflectAndMultGamma5( Vector *out, const Vector *in,  int nodevol, int ls)
+{
+  char *fname = "MultGamma5(V*,V*,i)";
+  VRB.Func("",fname);
+  for(int s=0; s< ls; ++s) { 
+    IFloat *p = (IFloat *)out + 24*nodevol*s;
+    IFloat *q = (IFloat *)in + 24*nodevol*(ls-1-s);
+    for(int n = 0; n < nodevol; ++n)
+      {
+	int i;
+	for(i = 0; i < 12; ++i)
+	  *p++ = *q++;
+	
+	for(i = 0; i < 12; ++i)
+	  *p++ = - *q++;
+      }
+  }
+
+}
+
+static void HermicianDWF_ee( Vector* vtmp, Vector* evec, Float mass, Lattice* lattice, Vector* Apsi )
+{
+	CgArg cg_arg;
+	cg_arg.mass = mass;
+	cg_arg.RitzMatOper = MATPC_HERM; // could be MATPCDAG_MATPC;
+	DiracOpDwf dop( *lattice, 0, 0, &cg_arg, CNV_FRM_NO );
+
+	dop. MatPc(Apsi, evec);
+	ReflectAndMultGamma5( vtmp, Apsi,  
+			      GJP.VolNodeSites()/2, GJP.SnodeSites() );
+}
+#endif
 
 //----------------------------------------------------------------------------
 class EigenContainer;  // forward declaration
@@ -74,7 +108,8 @@ class EigenCache {
   char fname_root_bc[1024];  // cached root_fname
   //int bc[4]; // boundary conditions in 4 dim, those used in the cached eigen vectors
   Float* eval; 
-  Vector** evec;
+  //Vector** evec;
+  Vector* evec;
   //Float* tmp;
 
   int f_size;
@@ -144,11 +179,8 @@ class EigenCache {
   
       eval = (Float*) smalloc(cname,fname, "eval", neig*sizeof(Float) );
       if(eval==0)ERR.General(cname,fname,"eval could not malloced\n");
-      evec = (Vector**) smalloc(cname,fname, "evec[]", neig*sizeof(Vector*));
+      evec = (Vector*) smalloc(cname,fname, "evec[]", neig*f_size* sizeof(Float));
       if(evec==0)ERR.General(cname,fname,"evec could not malloced\n");
-      Float* tmp = (Float*) smalloc(cname,fname, "evec[][]", neig*f_size* sizeof(Float));
-      if(tmp==0)ERR.General(cname,fname,"tmp could not malloced\n");
-      for(int i=0;i<neig;++i)  evec[i] = (Vector*)( tmp+i*f_size );
 
       index = (int*) smalloc(cname,fname,"index", neig*sizeof(int));
       
@@ -170,16 +202,22 @@ class EigenCache {
     if(! alloc_flag) return;
     neig = 0;
     *fname_root_bc=0;
-    //for(int i=0;i<neig;++i) sfree(cname,fname,"evec[i]", evec[i]);
-    //sfree(cname,fname,"tmp", tmp);
-    sfree(cname,fname,"evec[0]", evec[0]);
+    sfree(cname,fname,"index", index);
     sfree(cname,fname,"evec", evec);
     sfree(cname,fname,"eval", eval);
-    sfree(cname,fname,"index", index);
     alloc_flag = 0;
     eval_cached = 0;
   }
 
+  void free_vec(int vec_i)
+  {
+    char* fname="free(int n)";
+    VRB.Func(cname,fname);
+    if(! alloc_flag) return;
+    neig--;
+    evec = (Vector*)std::realloc(evec,neig*f_size*sizeof(Float));
+  }
+  
   // save eigenvalues into cache 
   void save( Float* lam )
   {
@@ -205,7 +243,9 @@ class EigenCache {
       index[idx] = idx;   // currently only for a full contents support
 
       int c_idx = index[idx]; // for future extention, like circular buffer 
-      moveFloat((Float*)(evec[c_idx]), (Float*)v, f_size);
+      //moveFloat((Float*)(evec[c_idx]), (Float*)v, f_size);
+      moveFloat((Float*)evec + c_idx*f_size, (Float*)v, f_size);
+      //moveMem((Float*)evec + c_idx*f_size, (float*)v, f_size);
     }
   }
 
@@ -216,20 +256,31 @@ class EigenCache {
     VRB.Flow(cname,"loadvec(V*,I)", "idx %d index %d\n",idx, index[idx]);
     if ( index[idx] < 0 )  return 0;
     int c_idx = index[idx]; // for future extention, like circular buffer 
-    moveFloat( (Float*)v, (Float*)(evec[c_idx]), f_size);
+    //moveFloat( (Float*)v, (Float*)(evec[c_idx]), f_size);
+    moveFloat( (Float*)v, (Float*)evec+c_idx*f_size, f_size);
     return 1;
   }
 
+  // just return the pointer in the cache
+  Vector* vec_ptr(  int idx )
+  {
+    VRB.Flow(cname,"vec_ptr(index)", "idx %d index %d\n",idx, index[idx]);
+    if(! alloc_flag) return 0;
+    return (Vector*)((Float*)evec + idx*f_size);
+  }
   // just return the pointer in the cache, not copy
   // return 0 if it's not in the cache
   Vector* pointer(  int idx )
   {
-    VRB.Flow(cname,"poiner(I)", "idx %d index %d\n",idx, index[idx]);
+    VRB.Flow(cname,"pointer(index)", "idx %d index %d\n",idx, index[idx]);
     if ( index[idx] < 0 )  return 0;
     int c_idx = index[idx]; // for future extention, like circular buffer 
-    return (Vector*)(evec[c_idx]);
+    //return (Vector*)(evec[c_idx]);
+    Vector* ptr = (Vector*)((Float*)evec + c_idx*f_size);
+    //printf("evec: %d %d %x",idx, c_idx, ptr);
+    return ptr;
   }
-  Vector** evec_address()
+  Vector* evec_address()
   {
     VRB.Flow(cname,"evec_address()", "\n");
     return evec;
@@ -242,6 +293,10 @@ class EigenCache {
   void set_neig(int n)
   {
     neig=n;
+  }
+  void set_index(int n)
+  {
+    index[n]=n;
   }
 };
 
@@ -341,8 +396,10 @@ class EigenContainer {
       n_fields = n_fields_;
       f_size = f_size_per_site*n_fields*GJP.VolNodeSites();
       neig = neig_;
-      f_stride_size = f_size_per_site*n_fields*GJP.SaveStride()*GJP.VolNodeSites();
-      stride = (f_size_per_site / 3) * n_fields * GJP.VolNodeSites() / 2;
+      f_stride_size = f_size_per_site*n_fields*GJP.SaveStride()*GJP.VolNodeSites() ;
+      // number of Vectors in one eigenvector
+      //stride = (f_size_per_site / 3) * n_fields * GJP.VolNodeSites() / 2 ;
+      stride = lattice->SpinComponents() * n_fields * GJP.VolNodeSites() / 2 /2 ; //last two for single prec.
 
       strcpy(fname_root_bc, a_fname_root_bc);
 
@@ -359,7 +416,7 @@ class EigenContainer {
 	}
       eval = (Float*) smalloc(cname,fname, "eval", neig*sizeof(Float) );
       if(eval==0)ERR.General(cname,fname,"eval could not malloced\n");
-      evec = (Vector*) smalloc(cname,fname, "evec", f_stride_size* sizeof(Float));
+      evec = (Vector*) smalloc(cname,fname, "evec", f_stride_size* sizeof(float));
       if(evec==0)ERR.General(cname,fname,"evec could not be malloced\n");
     }
 
@@ -430,25 +487,6 @@ class EigenContainer {
       }
   }
 
-#ifndef USE_QIO
-  // load from file with the specified "nev" index
-  Vector* nev_load( int index )
-  {
-
-    ERR.NotImplemented(cname,"nev_load(I)");
-    return NULL;
-  }
-
-  // save to file with the specified "nev" index
-  void nev_save( int index, Vector* evec_,
-		 char* field_type_label,
-		 char* ensemble_id="n/a",
-		 char* ensemble_label="n/a",
-		 int seqNum=777 )
-  {
-    ERR.NotImplemented(cname,"nev_save(I)");
-  }
-#else
 
   // load from file with the specified "nev" index
   Vector* nev_load( int index )
@@ -460,12 +498,13 @@ class EigenContainer {
 	       index,ecache->index[index]);
       
       if ( ecache-> index[index] >= 0) {
-	if(!UniqueID()) printf("Getting cached eig-vec %d\n",index);
+	//if(!UniqueID()) printf("Getting cached eig-vec %d\n",index);
 	// copy version
 	//ecache-> loadvec ( evec,  index );
 	//return evec;
 	// no-copy version
 	return ecache->pointer( index );
+	//return ecache->vec_ptr( index );
       }
     }
 
@@ -475,13 +514,21 @@ class EigenContainer {
     snprintf(file,1024, "%s.nev%03d", fname_root_bc, num);
     
     qio_readGenericFields readGenField;
-    readGenField. read_genericfields( file, save_stride*n_fields, f_size_per_site, evec, QIO_UNKNOWN);
+    //readGenField. read_genericfields( file, save_stride*n_fields, f_size_per_site, evec, QIO_UNKNOWN);
+    readGenField. read_genericfields( file, save_stride*n_fields, f_size_per_site, evec, QIO_UNKNOWN, FP_IEEE32LITTLE);
+    //printf("EVEC %e %e\n",*((float*)evec),*((float*)evec+1));
+    //for(int i=0;i<f_size;i++)
+    //printf("EVEC after qio read %d %e\n", i, *((float*)evec+i));
+
     // convert *to* stag ordering
+#if 0
     if(lattice->Fclass()==F_CLASS_P4){
+      ERR.General("nev_load","EigenContainer","SINGLE Prec probably doesn't work for P4 conversion!\n");
       for(int i=0;i<save_stride;i++){
 	lattice->Fconvert(evec+i*stride,STAG,CANONICAL,1);
       }
     }
+#endif
 
     // evec is type Vector, with at least one 3-complex vector at each site and working on checkerboard
     if( ecache ){
@@ -490,7 +537,9 @@ class EigenContainer {
 	if(!UniqueID()) printf("Cached eig-vec %d (size=%d)\n",num+i,stride);
       }
     }
-    printf("returning eig-vec %d\n",index % save_stride);
+    //printf("returning eig-vec %d\n",index % save_stride);
+    //for(int i=0;i<f_size;i++)
+    //printf("EVEC after cache %d %e\n", i, *((float*)evec+i));
     return evec+(index % save_stride)*stride;
   }
 
@@ -510,17 +559,16 @@ class EigenContainer {
     qio_writeGenericFields writeGenField;
 
     int save_stride = GJP.SaveStride();
-    if(lattice->Fclass()==F_CLASS_P4){
-      for(int i=0;i<save_stride;i++){
-	lattice->Fconvert(evec_+i*stride,CANONICAL,STAG,1);
-      }
-    }
     writeGenField.setHeader( ensemble_id, ensemble_label, seqNum, field_type_label );
-    writeGenField. write_genericfields( file, save_stride*n_fields, f_size_per_site, evec_);
+    //writeGenField. write_genericfields( file, save_stride*n_fields, f_size_per_site, evec_, QIO_VOLFMT);
+    // save in single
+    VRB.Result("writeGenField", "write_genericfields","(%s,%d x %d,%d,%p,%d,%d)\n",
+ file, save_stride,n_fields, f_size_per_site, evec_, QIO_VOLFMT, FP_IEEE32LITTLE);
+
+    writeGenField. write_genericfields( file, save_stride*n_fields, f_size_per_site, evec_, QIO_VOLFMT, FP_IEEE32LITTLE);
 
     if(!UniqueID()) printf("nev_save, time to save :%e sec\n",time-dclock());
   }
-#endif
 
 
   void nev_check( Vector* vtmp, Float mass, Float* residual = 0, Float* eval = 0)
@@ -530,6 +578,8 @@ class EigenContainer {
     CgArg cg_arg;
     cg_arg.mass = mass;
     cg_arg.eigen_shift = 0.0;
+
+    //printf("VTMP %e %e\n",*((Float*)vtmp),*((Float*)vtmp+1));exit(0);
 
     Vector* Apsi = (Vector*) smalloc(cname,fname, "Apsi", f_size* sizeof(Float));
     if(Apsi==0)ERR.General(cname,fname,"Apsi could not malloced\n");
@@ -546,6 +596,12 @@ class EigenContainer {
       cg_arg.RitzMatOper = MATPCDAG_MATPC;
       DiracOpP4 dop( *lattice, 0, 0, &cg_arg, CNV_FRM_NO );
       dop.RitzMat(Apsi, vtmp );
+#if 0 //temporarily commented out until Fhisq is merged
+    }else if(lattice->Fclass()==F_CLASS_HISQ){
+      cg_arg.RitzMatOper = MATPCDAG_MATPC;
+      DiracOpHisq dop( *lattice, 0, 0, &cg_arg, CNV_FRM_NO );
+      dop.RitzMat(Apsi, vtmp );
+#endif
     }else{
       ERR.General(cname,fname,"Error: valid class type is dwf, mobius or p4\n");
     }
@@ -695,6 +751,8 @@ class EigenContainer {
 
 
 };
+
+extern std::vector<EigenCache*> EigenCacheList;
 
 CPS_END_NAMESPACE
 #endif

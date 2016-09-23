@@ -1,25 +1,15 @@
-#ifdef USE_SSE
+#if (defined USE_SSE)||(defined SSE_TO_C)
 #include <config.h>
+#ifdef SSE_TO_C
+#include "sse-defs.h"
+#else
+#define SSE_C_FLOAT Float
+#endif
 CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
   
-  $Id: wilson_init.C,v 1.4 2013-01-08 21:09:25 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-01-08 21:09:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/sse/wilson_init.C,v 1.4 2013-01-08 21:09:25 chulwoo Exp $
-//  $Id: wilson_init.C,v 1.4 2013-01-08 21:09:25 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $Revision: 1.4 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/sse/wilson_init.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 /****************************************************************************/
 /* 10/16/97                                                                 */
 /*                                                                          */
@@ -95,12 +85,19 @@ void wilson_init_comm(int dir, int block, Wilson *wilson_p)
 
     int idx;
     int sflag=+1; //?check
-    size_t len = sizeof(IFloat)*block;
+    size_t len = sizeof(SSE_C_FLOAT)*block;
 
     idx=dir; 
-    
+
+    wilson_p->send_buf[idx]=(Float *) smalloc("","wilson_init_comm()","send_buf",block*sizeof(Float));
+    wilson_p->recv_buf[idx]=(Float *) smalloc("","wilson_init_comm()","recv_buf",block*sizeof(Float));
+#if 0
     wilson_p->send_buf[idx]=(Float *) smalloc(block*sizeof(Float));
     wilson_p->recv_buf[idx]=(Float *) smalloc(block*sizeof(Float));
+	printf("send_buf[%d]=%p recv_buf[%d]=%p\n",
+		idx, wilson_p->send_buf[idx],
+		idx, wilson_p->recv_buf[idx]);
+#endif
 
     wilson_p->msgmem[idx][1] =
       QMP_declare_msgmem((void *)(wilson_p->send_buf[idx]), len);

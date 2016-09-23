@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file 
   \brief  PAB... Definitions of the AlgMeas class.
 
-  $Id: alg_meas.h,v 1.2 2005-05-21 09:41:33 chulwoo Exp $
+  $Id: alg_meas.h,v 1.2 2005/05/21 09:41:33 chulwoo Exp $
 */
 //------------------------------------------------------------------
 

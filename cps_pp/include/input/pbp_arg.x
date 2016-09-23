@@ -1,7 +1,7 @@
 /*!\file
   \brief  Definition of the PbpArg structure.
 
-  $Id: pbp_arg.x,v 1.3 2005-05-18 06:17:35 chulwoo Exp $
+  $Id: pbp_arg.x,v 1.3 2005/05/18 06:17:35 chulwoo Exp $
 */
 /*---------------------------------------------------------------------------*/
 

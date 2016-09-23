@@ -49,7 +49,7 @@ class WspectArg;
 class AlgWspect : public Alg
 {
  private:
-  static char *d_class_name;
+  static const char *d_class_name;
  protected:                 
   static int   d_counter;
   static int   d_count_step;
@@ -78,7 +78,7 @@ class AlgWspect : public Alg
 class AlgWspectExtMeson : public AlgWspect
 {
  private:
-  static char *d_class_name;
+  static const char *d_class_name;
   //simply override the run() function
  public:
   AlgWspectExtMeson(Lattice & latt, 

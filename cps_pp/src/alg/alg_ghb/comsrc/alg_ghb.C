@@ -3,21 +3,9 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgGheatBath class methods.
   
-  $Id: alg_ghb.C,v 1.15 2013-04-05 17:51:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:51:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v 1.15 2013-04-05 17:51:13 chulwoo Exp $
-//  $Id: alg_ghb.C,v 1.15 2013-04-05 17:51:13 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: alg_ghb.C,v $
-//  $Revision: 1.15 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/comsrc/alg_ghb.C,v $
-//  $State: Exp $
 //
 
 CPS_END_NAMESPACE

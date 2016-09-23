@@ -4,23 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of GlobalJobParameter class methods.
 
-  $Id: gjp.C,v 1.47 2013-06-25 12:51:12 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-06-25 12:51:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v 1.47 2013-06-25 12:51:12 chulwoo Exp $
-//  $Id: gjp.C,v 1.47 2013-06-25 12:51:12 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: gjp.C,v $
-//  $Revision: 1.47 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/gjp/gjp.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // gjp.C
@@ -137,6 +121,10 @@ GlobalJobParameter::GlobalJobParameter()
 //  VRB.Func(cname,fname);
   doext_p = NULL;
   arg_set=0;
+
+  zmobius_b=NULL;
+  zmobius_c=NULL;
+  zmobius_pc_type= ZMOB_PC_SYM2;
 }
 
 

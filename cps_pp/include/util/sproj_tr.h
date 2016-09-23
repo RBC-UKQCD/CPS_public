@@ -3,20 +3,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declaration of spin projection and trace routines.
 
-  $Id: sproj_tr.h,v 1.5 2004-11-21 21:40:00 chulwoo Exp $
+  $Id: sproj_tr.h,v 1.5 2004/11/21 21:40:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-11-21 21:40:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/sproj_tr.h,v 1.5 2004-11-21 21:40:00 chulwoo Exp $
-//  $Id: sproj_tr.h,v 1.5 2004-11-21 21:40:00 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/11/21 21:40:00 $
+//  $Header: /space/cvs/cps/cps++/include/util/sproj_tr.h,v 1.5 2004/11/21 21:40:00 chulwoo Exp $
+//  $Id: sproj_tr.h,v 1.5 2004/11/21 21:40:00 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: sproj_tr.h,v $
 //  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/sproj_tr.h,v $
+//  $Source: /space/cvs/cps/cps++/include/util/sproj_tr.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

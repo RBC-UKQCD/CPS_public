@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Double64 class/type.
 
-  $Id: double64.h,v 1.5 2007-06-05 15:44:19 chulwoo Exp $
+  $Id: double64.h,v 1.5 2007/06/05 15:44:19 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-06-05 15:44:19 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/double64.h,v 1.5 2007-06-05 15:44:19 chulwoo Exp $
-//  $Id: double64.h,v 1.5 2007-06-05 15:44:19 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2007/06/05 15:44:19 $
+//  $Header: /space/cvs/cps/cps++/include/comms/double64.h,v 1.5 2007/06/05 15:44:19 chulwoo Exp $
+//  $Id: double64.h,v 1.5 2007/06/05 15:44:19 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/double64.h,v $
+//  $Source: /space/cvs/cps/cps++/include/comms/double64.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

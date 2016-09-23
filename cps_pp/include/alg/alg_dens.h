@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgDens class.
 
-  $Id: alg_dens.h,v 1.2 2006-02-21 02:44:11 chulwoo Exp $
+  $Id: alg_dens.h,v 1.2 2006/02/21 02:44:11 chulwoo Exp $
 */
 //---------------------------------------------------------------------------
 

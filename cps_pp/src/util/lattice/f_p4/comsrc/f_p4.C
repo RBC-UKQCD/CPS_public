@@ -5,13 +5,9 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fp4 class.
 
-  $Id: f_p4.C,v 1.20 2013-06-07 19:26:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_p4/comsrc/f_p4.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 //------------------------------------------------------------------

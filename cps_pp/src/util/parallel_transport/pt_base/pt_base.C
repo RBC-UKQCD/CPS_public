@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of ParTrans class methods.
   
-  $Id: pt_base.C,v 1.10 2004-08-18 11:58:06 zs Exp $
+  $Id: pt_base.C,v 1.10 2004/08/18 11:58:06 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v 1.10 2004-08-18 11:58:06 zs Exp $
-//  $Id: pt_base.C,v 1.10 2004-08-18 11:58:06 zs Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/08/18 11:58:06 $
+//  $Header: /space/cvs/cps/cps++/src/util/parallel_transport/pt_base/pt_base.C,v 1.10 2004/08/18 11:58:06 zs Exp $
+//  $Id: pt_base.C,v 1.10 2004/08/18 11:58:06 zs Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: pt_base.C,v $
 //  $Revision: 1.10 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/pt_base.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/parallel_transport/pt_base/pt_base.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -37,7 +37,7 @@ CPS_START_NAMESPACE
 // Initialize static variables
 //------------------------------------------------------------------
 int ParTrans::scope_lock = 0;
-int ParTrans::PTflops = 0;
+double ParTrans::PTflops = 0;
 int ParTrans:: bc[4] = {0,0,0,0};	// boundary condition on this node
 int ParTrans::node_sites[5] = {0,0,0,0,0};
 
@@ -123,8 +123,9 @@ ParTrans::ParTrans(Lattice & latt) :
   //----------------------------------------------------------------
   // turn on the boundary condition, if not inside a dirac operator
   //----------------------------------------------------------------
-  if(DiracOp::scope_lock ==0)
-  BondCond(latt, gauge_field);
+  if(DiracOp::scope_lock || lat.BcApplied() ) bc_already_applied=1;
+  else bc_already_applied=0;
+  if (!bc_already_applied) lat.BondCond();
 
 //  lat.Convert(STAG);
 
@@ -150,8 +151,9 @@ ParTrans::~ParTrans() {
   //----------------------------------------------------------------
   // turn off the boundary condition
   //----------------------------------------------------------------
-  if(DiracOp::scope_lock ==0)
-  BondCond(lat, gauge_field);
+//  if(DiracOp::scope_lock ==0)
+  if (!bc_already_applied)
+  lat.BondCond();
 
   VRB.Clock(cname,fname,"Exiting\n");
 

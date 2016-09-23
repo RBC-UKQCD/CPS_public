@@ -8,23 +8,7 @@ typedef float pooh;
 /*!\file
   \brief  Magic numbers.
 
-  $Id: enum.x,v 1.27 2013-06-07 19:26:34 chulwoo Exp $
 */
-/*--------------------------------------------------------------------*/
-/*  CVS keywords*/
-/**/
-/*  $Author: chulwoo $*/
-/*  $Date: 2013-06-07 19:26:34 $*/
-/*  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v 1.27 2013-06-07 19:26:34 chulwoo Exp $*/
-/*  $Id: enum.x,v 1.27 2013-06-07 19:26:34 chulwoo Exp $*/
-/*  $Name: not supported by cvs2svn $*/
-/*  $Locker:  $*/
-/*  $RCSfile: enum.x,v $*/
-/*  $Revision: 1.27 $*/
-/*  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/input/enum.x,v $*/
-/*  $State: Exp $*/
-/**/
-/*--------------------------------------------------------------------*/
 
 
 
@@ -55,7 +39,11 @@ enum FclassType {
     F_CLASS_WILSON_TM,
     F_CLASS_MDWF,
     F_CLASS_BFM,
+    F_CLASS_BFM_TYPE2,
     F_CLASS_MOBIUS,
+    F_CLASS_DWF4D,
+    F_CLASS_DWF4D_PAIR,
+    F_CLASS_ZMOBIUS,
     F_CLASS_NAIVE
 };
 

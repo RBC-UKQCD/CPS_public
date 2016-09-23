@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
  /*! \file
    \brief  Definition of DiracOp class multishift CG solver method.
 
-   $Id: minvcg.C,v 1.14 2012-03-26 13:50:11 chulwoo Exp $
+   $Id: minvcg.C,v 1.14 2012/03/26 13:50:11 chulwoo Exp $
  */
 
 CPS_END_NAMESPACE

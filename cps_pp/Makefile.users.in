@@ -1,4 +1,4 @@
-# $Id: Makefile.users.in,v 1.6 2011-03-24 16:20:52 chulwoo Exp $
+# $Id: Makefile.users.in,v 1.6 2011/03/24 16:20:52 chulwoo Exp $
 # @configure_input@
 #   This is the makefile for all the commands
 #   that are common for all testing applications.

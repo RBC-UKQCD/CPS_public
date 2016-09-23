@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprRectFasqtad class.
 
-  $Id: lattice_ra.C,v 1.5 2004-08-18 11:58:05 zs Exp $
+  $Id: lattice_ra.C,v 1.5 2004/08/18 11:58:05 zs Exp $
 */
 //--------------------------------------------------------------------
 

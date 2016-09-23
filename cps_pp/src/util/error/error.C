@@ -3,20 +3,20 @@ CPS_START_NAMESPACE
 /*!\file 
   \brief   Definition of Error class methods.
 
-  $Id: error.C,v 1.13 2011-05-14 06:12:35 chulwoo Exp $
+  $Id: error.C,v 1.13.30.1 2012/11/04 15:12:14 yinnht Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2011-05-14 06:12:35 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v 1.13 2011-05-14 06:12:35 chulwoo Exp $
-//  $Id: error.C,v 1.13 2011-05-14 06:12:35 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Author: yinnht $
+//  $Date: 2012/11/04 15:12:14 $
+//  $Header: /space/cvs/cps/cps++/src/util/error/error.C,v 1.13.30.1 2012/11/04 15:12:14 yinnht Exp $
+//  $Id: error.C,v 1.13.30.1 2012/11/04 15:12:14 yinnht Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: error.C,v $
-//  $Revision: 1.13 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/error/error.C,v $
+//  $Revision: 1.13.30.1 $
+//  $Source: /space/cvs/cps/cps++/src/util/error/error.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -370,8 +370,5 @@ void Error::General(const char *class_name, const char *func_name,
 
   Exit(exit_value[general]);
 }
-        
-
-
 
 CPS_END_NAMESPACE

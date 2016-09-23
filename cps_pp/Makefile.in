@@ -7,8 +7,32 @@ BUILDDIR = @abs_builddir@
 TESTDIR = tests
 HDW_TESTDIR= hdw_tests
 DOCDIR = doc
-#QOS = @QOS@
-#QOSLIB = ${QOS}/quser/gcc-lib-user///
+
+# Added by Hantao
+#
+# Purpose is to have a single ar operation at the end (so we can
+# concurrently build).
+ifeq	($(LIB_NAME_SET),yes)
+SEPARATE_LIB = yes
+endif
+
+ifeq	($(SEPARATE_LIB),yes)
+DIR2 := $(subst util/,,$(DIR))
+DIR2 := $(subst dirac_op/,,$(DIR2))
+DIR2 := $(subst mem/,,$(DIR2))
+DIR2 := $(subst comms/,,$(DIR2))
+DIR2 := $(subst alg/,,$(DIR2))
+LIBNAME := XXX$(subst /,_,$(DIR2))XXX
+LIBNAME := $(subst XXX_,,$(LIBNAME))
+LIBNAME := $(subst _XXX,,$(LIBNAME))
+LIBNAME := $(subst XXX,,$(LIBNAME))
+else
+LIBNAME = cps
+endif
+LIBNAME ?= cps
+
+AR = @AR@
+#End of Hantao's addition
 
 ifneq "$(BUILDDIR)"  "$(SRCDIR)"
 builddir_isnt_srcdir="yes"
@@ -34,7 +58,7 @@ clean: recurse
 buildlib: recurse
 
 recurse: vml
-	@echo CONCUR = $(CONCUR)
+#	@echo CONCUR = $(CONCUR)
 	mkdir -p $(BUILDDIR)/objs
 	touch -a $(BUILDDIR)/objs/Makefile_depend
 	cp -p $(SRCDIR)/src/Makefile $(BUILDDIR)/objs

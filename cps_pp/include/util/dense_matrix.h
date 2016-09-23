@@ -4,14 +4,14 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:43:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dense_matrix.h,v 1.3 2004-08-18 11:43:07 zs Exp $
-//  $Id: dense_matrix.h,v 1.3 2004-08-18 11:43:07 zs Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/08/18 11:43:07 $
+//  $Header: /space/cvs/cps/cps++/include/util/dense_matrix.h,v 1.3 2004/08/18 11:43:07 zs Exp $
+//  $Id: dense_matrix.h,v 1.3 2004/08/18 11:43:07 zs Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: dense_matrix.h,v $
 //  $Revision: 1.3 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/dense_matrix.h,v $
+//  $Source: /space/cvs/cps/cps++/include/util/dense_matrix.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

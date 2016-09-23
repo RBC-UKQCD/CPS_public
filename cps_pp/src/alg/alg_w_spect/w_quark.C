@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_quark.C,v 1.16 2007-06-06 16:06:22 chulwoo Exp $
+  $Id: w_quark.C,v 1.16 2007/06/06 16:06:22 chulwoo Exp $
 */
 #include<config.h>
 #include <util/gjp.h>              // GJP

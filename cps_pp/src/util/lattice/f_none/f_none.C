@@ -3,12 +3,12 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fnone class.
 
-  $Id: f_none.C,v 1.15 2006-04-13 18:19:45 chulwoo Exp $
+  $Id: f_none.C,v 1.15 2006/04/13 18:19:45 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_none/f_none.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/lattice/f_none/f_none.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

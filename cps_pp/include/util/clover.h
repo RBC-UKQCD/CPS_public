@@ -3,20 +3,20 @@ CPS_START_NAMESPACE
 /*! \file
   \brief Declarations of routines used internally in the DiracOpClover class.
 
-  $Id: clover.h,v 1.5 2004-09-02 16:59:27 zs Exp $
+  $Id: clover.h,v 1.5 2004/09/02 16:59:27 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-09-02 16:59:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/clover.h,v 1.5 2004-09-02 16:59:27 zs Exp $
-//  $Id: clover.h,v 1.5 2004-09-02 16:59:27 zs Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/09/02 16:59:27 $
+//  $Header: /space/cvs/cps/cps++/include/util/clover.h,v 1.5 2004/09/02 16:59:27 zs Exp $
+//  $Id: clover.h,v 1.5 2004/09/02 16:59:27 zs Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: clover.h,v $
 //  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/clover.h,v $
+//  $Source: /space/cvs/cps/cps++/include/util/clover.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

@@ -47,6 +47,7 @@ struct vml_enum_map RandomType_map[] = {
 	{"RandomType","UONE",UONE},
 	{"RandomType","ZTWO",ZTWO},
 	{"RandomType","NORAND",NORAND},
+	{"RandomType","TEST",TEST},
 	{NULL,NULL,0}
 };
 	 bool QPropWArg::Encode(char *filename,char *instance){
@@ -111,6 +112,10 @@ vml_QPropWArg (VML *vmls, char *name,QPropWArg *objp)
 	 if (!vml_int (vmls, "StartSrcColor", &objp->StartSrcColor))
 		 return FALSE;
 	 if (!vml_int (vmls, "EndSrcColor", &objp->EndSrcColor))
+		 return FALSE;
+	 if (!vml_pointer (vmls, "mob_arg_l", (char **)&objp->mob_arg_l, sizeof (int), (vmlproc_t) vml_int))
+		 return FALSE;
+	 if (!vml_pointer (vmls, "mob_arg_s", (char **)&objp->mob_arg_s, sizeof (int), (vmlproc_t) vml_int))
 		 return FALSE;
 	 vml_class_end(vmls,"QPropWArg",name);
 	return TRUE;

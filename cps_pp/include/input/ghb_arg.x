@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definition of the GhbArg structure.
 
-  $Id: ghb_arg.x,v 1.3 2006-05-22 21:12:04 chulwoo Exp $
+  $Id: ghb_arg.x,v 1.3 2006/05/22 21:12:04 chulwoo Exp $
 */
 /*-----------------------------------------------------------------------------*/
 

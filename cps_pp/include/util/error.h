@@ -8,23 +8,7 @@
 /*!\file
   \brief  Declaration and definition of Error class.
 
-  $Id: error.h,v 1.8 2012-07-06 20:22:08 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012-07-06 20:22:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v 1.8 2012-07-06 20:22:08 chulwoo Exp $
-//  $Id: error.h,v 1.8 2012-07-06 20:22:08 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: error.h,v $
-//  $Revision: 1.8 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/error.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 
 
 CPS_START_NAMESPACE

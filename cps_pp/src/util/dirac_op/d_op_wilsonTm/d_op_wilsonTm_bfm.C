@@ -6,10 +6,12 @@
 #endif
 
 #ifdef USE_BFM_TM
+#ifdef USE_CHROMA
 #include <chroma.h>
+#include <actions/ferm/invert/syssolver_linop_cg_array.h>
+#endif
 #include <bfm.h>
 #include <bfm_qdp.h>
-#include <actions/ferm/invert/syssolver_linop_cg_array.h>
 //#include <qdp.h>
 #include <util/gjp.h>
 #include <comms/sysfunc_cps.h>
@@ -24,7 +26,9 @@ static int  Printf(char *format,...){}
 //#define Printf printf
 
 
+#ifdef USE_CHROMA
 using namespace Chroma;
+#endif
 
 USING_NAMESPACE_CPS
 

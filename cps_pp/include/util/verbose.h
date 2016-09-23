@@ -5,23 +5,7 @@
 /*!\file
   \brief  Definition of Verbose class.
 
-  $Id: verbose.h,v 1.5 2012-07-06 20:22:08 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012-07-06 20:22:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/verbose.h,v 1.5 2012-07-06 20:22:08 chulwoo Exp $
-//  $Id: verbose.h,v 1.5 2012-07-06 20:22:08 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: verbose.h,v $
-//  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/verbose.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // verbose.h

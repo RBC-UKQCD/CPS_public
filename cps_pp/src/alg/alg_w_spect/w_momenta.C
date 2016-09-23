@@ -1,18 +1,7 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2012-08-15 03:45:46 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_momenta.C,v 1.8 2012-08-15 03:45:46 chulwoo Exp $
-//  $Id: w_momenta.C,v 1.8 2012-08-15 03:45:46 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: w_momenta.C,v $
-//  $Revision: 1.8 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_w_spect/w_momenta.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 

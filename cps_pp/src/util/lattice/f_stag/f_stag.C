@@ -5,13 +5,9 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fstag class.
 
-  $Id: f_stag.C,v 1.26 2013-06-07 19:26:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_stag/f_stag.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 //------------------------------------------------------------------
@@ -349,7 +345,7 @@ int Fstag::FeigSolv(Vector **f_eigenv, Float *lambda,
 
   DiracOpStag stag(*this, v1, v2, &cg_arg, CNV_FRM_NO);
  
-  stag.RitzMat(f_eigenv[0],f_eigenv[1]);
+//  stag.RitzMat(f_eigenv[0],f_eigenv[1]);
   //for(int i=0;i<GJP.VolNodeSites()*3;i++){
    //  printf("VEC %d %g\n",i,*((Float*)f_eigenv[0]+i));
   //} 

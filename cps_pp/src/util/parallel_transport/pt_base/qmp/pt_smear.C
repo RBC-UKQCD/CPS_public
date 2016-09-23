@@ -5,7 +5,7 @@
 
 extern "C" {
 void vaxpy3(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
-  inline void vaxpy3_m(matrix *res,Float *scale,matrix *mult,matrix *add, 
+  inline void vaxpy3_m(PTmatrix *res,Float *scale,PTmatrix *mult,PTmatrix *add, 
   int ncvec){
     vaxpy3((PTvector *)res, scale, (PTvector *)mult,(PTvector *)add,ncvec);
   }
@@ -26,7 +26,7 @@ static int NotParallel( int mu, int nu){
         else return 1;
 }
 
-void PT::asqtad_fat(AsqDArg *asq_arg, matrix *fatlink){
+void PT::asqtad_fat(AsqDArg *asq_arg, PTmatrix *fatlink){
   char *fname = "Smear()";
 
 //--------------------------------------------------------------------
@@ -52,39 +52,39 @@ void PT::asqtad_fat(AsqDArg *asq_arg, matrix *fatlink){
   const int N = 4;
 //  int vol = GJP.VolNodeSites();
 //  ParTransAsqtad pt(*this);
-  matrix *result[NUM_DIR];
-  matrix *Unit;
-  matrix *P3[NUM_DIR];
-  matrix *P3mu[NUM_DIR];
-  matrix *P5[NUM_DIR];
-  matrix *P5mu[NUM_DIR];
-  matrix *P7[NUM_DIR];
-  matrix *P7mu[NUM_DIR];
-  matrix *P6[NUM_DIR];
-  matrix *P6mu[NUM_DIR];
-  matrix *Pmumu[NUM_DIR];
-  matrix *Pmumumu[NUM_DIR];
+  PTmatrix *result[NUM_DIR];
+  PTmatrix *Unit;
+  PTmatrix *P3[NUM_DIR];
+  PTmatrix *P3mu[NUM_DIR];
+  PTmatrix *P5[NUM_DIR];
+  PTmatrix *P5mu[NUM_DIR];
+  PTmatrix *P7[NUM_DIR];
+  PTmatrix *P7mu[NUM_DIR];
+  PTmatrix *P6[NUM_DIR];
+  PTmatrix *P6mu[NUM_DIR];
+  PTmatrix *Pmumu[NUM_DIR];
+  PTmatrix *Pmumumu[NUM_DIR];
 //VRB.Flow(cname,fname,"vol=%d\n",vol);
-  Unit = (matrix *)Alloc(cname,fname,"Unit",sizeof(matrix)*vol);
+  Unit = (PTmatrix *)Alloc(cname,fname,"Unit",sizeof(PTmatrix)*vol);
   for(i = 0;i<N;i++)
-    Pmumumu[i] = P7mu[i] = (matrix *)Alloc(cname,fname,"Pmumumu[i]",sizeof(matrix)*vol);
+    Pmumumu[i] = P7mu[i] = (PTmatrix *)Alloc(cname,fname,"Pmumumu[i]",sizeof(PTmatrix)*vol);
   for(i = 0;i<N;i++)
-    Pmumu[i] = P7[i] = (matrix *)Alloc(cname,fname,"Pmumu[i]",sizeof(matrix)*vol);
+    Pmumu[i] = P7[i] = (PTmatrix *)Alloc(cname,fname,"Pmumu[i]",sizeof(PTmatrix)*vol);
   for(i = 0;i<N;i++)
-    P6mu[i] = P5mu[i] = (matrix *)Alloc(cname,fname,"P6mu[i]",sizeof(matrix)*vol);
+    P6mu[i] = P5mu[i] = (PTmatrix *)Alloc(cname,fname,"P6mu[i]",sizeof(PTmatrix)*vol);
   for(i = 0;i<N;i++)
-    P6[i] = P5[i] = (matrix *)Alloc(cname,fname,"P6[i]",sizeof(matrix)*vol);
+    P6[i] = P5[i] = (PTmatrix *)Alloc(cname,fname,"P6[i]",sizeof(PTmatrix)*vol);
   for(i = 0;i<N;i++)
-    P3mu[i] = (matrix *)Alloc(cname,fname,"P3mu[i]",sizeof(matrix)*vol);
+    P3mu[i] = (PTmatrix *)Alloc(cname,fname,"P3mu[i]",sizeof(PTmatrix)*vol);
   for(i = 0;i<N;i++)
-    P3[i] = (matrix *)Alloc(cname,fname,"P3[i]",sizeof(matrix)*vol);
+    P3[i] = (PTmatrix *)Alloc(cname,fname,"P3[i]",sizeof(PTmatrix)*vol);
   for(j = 0;j<POS_DIR;j++){
 //     result[j] = fields[0] + vol*j;
      result[j] = fatlink + vol*j;
 //    result[j+POS_DIR] = fields[1] + vol*j;
 //     VRB.Flow(cname,fname,"result[%d]=%p\n",j,result[j]);
   }
-//     result[j] = (matrix *)fmalloc(sizeof(matrix)*vol);
+//     result[j] = (PTmatrix *)fmalloc(sizeof(PTmatrix)*vol);
 
   for(j = 0;j<vol;j++) Unit[j] = c1;
   for(j = 0;j<POS_DIR;j++)
@@ -97,7 +97,7 @@ void PT::asqtad_fat(AsqDArg *asq_arg, matrix *fatlink){
   int nflops = 0;
 //  ParTrans::PTflops=0;
   int dir[] = {6,0,2,4,7,1,3,5},dirs[8]; //mapping between ParTrans and DiracOpAsqtad
-  matrix *min[NUM_DIR],*mout[NUM_DIR];
+  PTmatrix *min[NUM_DIR],*mout[NUM_DIR];
   if (NUM_DIR%N !=0) fprintf(stderr,"%s:NUM_DIR(%d)is not divisible by N(%d)\n",fname,NUM_DIR,N);
   for(int mu = 0;mu<POS_DIR;mu += N){
 	int mu_p,nu_p,rho_p,sigma_p;
@@ -237,17 +237,17 @@ void PT::asqtad_fat(AsqDArg *asq_arg, matrix *fatlink){
   }
 }
   
-void PT::asqtad_long(AsqDArg *asq_arg, matrix *longlink, matrix *longlink_m){
+void PT::asqtad_long(AsqDArg *asq_arg, PTmatrix *longlink, PTmatrix *longlink_m){
 
   IFloat c2 = asq_arg->c2;
   int i, j; 
   const int N = 4;
 
-  matrix *result[NUM_DIR];
-  matrix *Unit;
-  matrix *Pmumu[NUM_DIR];
+  PTmatrix *result[NUM_DIR];
+  PTmatrix *Unit;
+  PTmatrix *Pmumu[NUM_DIR];
   int dir[] = {6,0,2,4,7,1,3,5},dirs[8]; //mapping between ParTrans and DiracOpAsqtad
-  matrix *min[NUM_DIR],*mout[NUM_DIR];
+  PTmatrix *min[NUM_DIR],*mout[NUM_DIR];
 
   for(j = 0;j<POS_DIR;j++){
      result[j] = longlink + vol*j;

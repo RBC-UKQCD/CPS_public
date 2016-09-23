@@ -1,4 +1,4 @@
-#ifdef USE_SSE
+#if (defined USE_SSE)||(defined SSE_TO_C)
 #include <config.h>
 #include <stdlib.h>
 #include <math.h>
@@ -7,19 +7,19 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpWilson class methods.
 
-  $Id: d_op_wilson.C,v 1.2 2011-02-26 00:19:27 chulwoo Exp $
+  $Id: d_op_wilson.C,v 1.2 2011/02/26 00:19:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-02-26 00:19:27 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/sse/d_op_wilson.C,v 1.2 2011-02-26 00:19:27 chulwoo Exp $
-//  $Id: d_op_wilson.C,v 1.2 2011-02-26 00:19:27 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2011/02/26 00:19:27 $
+//  $Header: /space/cvs/cps/cps++/src/util/dirac_op/d_op_wilson/sse/d_op_wilson.C,v 1.2 2011/02/26 00:19:27 chulwoo Exp $
+//  $Id: d_op_wilson.C,v 1.2 2011/02/26 00:19:27 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $Revision: 1.2 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/sse/d_op_wilson.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_wilson/sse/d_op_wilson.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

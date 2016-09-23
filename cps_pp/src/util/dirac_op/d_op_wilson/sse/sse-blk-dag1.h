@@ -1,4 +1,5 @@
 #include <util/omp_wrapper.h>
+ extern "C"
 void wilson_dslash_blk_dag1(IFloat *chi_p_f, 
 			    IFloat *u_p_f, 
 			    IFloat *psi_p_f, 
@@ -33,14 +34,14 @@ void wilson_dslash_blk_dag1(IFloat *chi_p_f,
   const int t_nloc =  GJP.Tnodes() == 1 ? 0 : 1;
     
 
-  const Float* const recv_buf1 =  wilson_p->recv_buf[0];
-  const Float* const recv_buf2 =  wilson_p->recv_buf[1];
-  const Float* const recv_buf3 =  wilson_p->recv_buf[2];
-  const Float* const recv_buf4 =  wilson_p->recv_buf[3];
-  const Float* const recv_buf5 =  wilson_p->recv_buf[4];
-  const Float* const recv_buf6 =  wilson_p->recv_buf[5];
-  const Float* const recv_buf7 =  wilson_p->recv_buf[6];
-  const Float* const recv_buf8 =  wilson_p->recv_buf[7];
+  const SSE_C_FLOAT* const recv_buf1 =  (SSE_C_FLOAT*)wilson_p->recv_buf[0];
+  const SSE_C_FLOAT* const recv_buf2 =  (SSE_C_FLOAT*)wilson_p->recv_buf[1];
+  const SSE_C_FLOAT* const recv_buf3 =  (SSE_C_FLOAT*)wilson_p->recv_buf[2];
+  const SSE_C_FLOAT* const recv_buf4 =  (SSE_C_FLOAT*)wilson_p->recv_buf[3];
+  const SSE_C_FLOAT* const recv_buf5 =  (SSE_C_FLOAT*)wilson_p->recv_buf[4];
+  const SSE_C_FLOAT* const recv_buf6 =  (SSE_C_FLOAT*)wilson_p->recv_buf[5];
+  const SSE_C_FLOAT* const recv_buf7 =  (SSE_C_FLOAT*)wilson_p->recv_buf[6];
+  const SSE_C_FLOAT* const recv_buf8 =  (SSE_C_FLOAT*)wilson_p->recv_buf[7];
 
 
   //for(int itr=0;itr<NITR;++itr){
@@ -152,19 +153,19 @@ void wilson_dslash_blk_dag1(IFloat *chi_p_f,
 		register __m128d t06, t07, t08, t09, t10, t11; 
 #else
 
-		__m128d __RESTRICT wxp[6];
-		__m128d __RESTRICT wyp[6];
-		__m128d __RESTRICT wzp[6];
-		__m128d __RESTRICT wtp[6];
+		M128D __RESTRICT wxp[6];
+		M128D __RESTRICT wyp[6];
+		M128D __RESTRICT wzp[6];
+		M128D __RESTRICT wtp[6];
 
-		__m128d __RESTRICT wxm[6];
-		__m128d __RESTRICT wym[6];
-		__m128d __RESTRICT wzm[6];
-		__m128d __RESTRICT wtm[6];
+		M128D __RESTRICT wxm[6];
+		M128D __RESTRICT wym[6];
+		M128D __RESTRICT wzm[6];
+		M128D __RESTRICT wtm[6];
 #endif
 
 #ifndef USE_HERN
-		register __m128d _a, _b, _c, _d;		
+		register M128D _a, _b, _c, _d;		
 #endif
 
 		xyzt = (x >> 1) + _xyzt;
@@ -271,12 +272,16 @@ void wilson_dslash_blk_dag1(IFloat *chi_p_f,
 		  psi = psi_p + SPINOR_SIZE * xmyzt;
 		  if(x == 0 && x_nloc)  {
 		    const size_t shft  = (SPINOR_SIZE/2)* ((y+ly*(z+lz*t))/2);
+#if 1
+                        LOAD(wxm,recv_buf5);
+#else
 		    wxm[0] = _mm_load_pd( recv_buf5+shft );
 		    wxm[1] = _mm_load_pd( recv_buf5+shft + 2);
 		    wxm[2] = _mm_load_pd( recv_buf5+shft + 4);
 		    wxm[3] = _mm_load_pd( recv_buf5+shft + 6);
 		    wxm[4] = _mm_load_pd( recv_buf5+shft + 8);
 		    wxm[5] = _mm_load_pd( recv_buf5+shft + 10);
+#endif
 		  } else  {N_KERN_XM;}
 		  PREFETCH_U0;
 		  PREFETCH_PSI;
@@ -286,12 +291,16 @@ void wilson_dslash_blk_dag1(IFloat *chi_p_f,
 
 		  if( y_nloc && y==0)  {
 		    const size_t shft  = (SPINOR_SIZE/2)* ((x+lx*(z+lz*t))/2);
+#if 1
+                        LOAD(wym,recv_buf6);
+#else
 		    wym[0] = _mm_load_pd( recv_buf6+shft );
 		    wym[1] = _mm_load_pd( recv_buf6+shft + 2);
 		    wym[2] = _mm_load_pd( recv_buf6+shft + 4);
 		    wym[3] = _mm_load_pd( recv_buf6+shft + 6);
 		    wym[4] = _mm_load_pd( recv_buf6+shft + 8);
 		    wym[5] = _mm_load_pd( recv_buf6+shft + 10);
+#endif
 
 		  }
 		  else  {N_KERN_YM;}
@@ -303,12 +312,16 @@ void wilson_dslash_blk_dag1(IFloat *chi_p_f,
 		  if ( z_nloc && z == 0 )  {
 		    const size_t shft  = (SPINOR_SIZE/2)* ((x+lx*(y+ly*t))/2);
 
+#if 1
+			LOAD(wzm,recv_buf7);
+#else
 		      wzm[0] = _mm_load_pd( recv_buf7+shft );
 		      wzm[1] = _mm_load_pd( recv_buf7+shft + 2);
 		      wzm[2] = _mm_load_pd( recv_buf7+shft + 4);
 		      wzm[3] = _mm_load_pd( recv_buf7+shft + 6);
 		      wzm[4] = _mm_load_pd( recv_buf7+shft + 8);
 		      wzm[5] = _mm_load_pd( recv_buf7+shft + 10);
+#endif
 
 		  } else    {N_KERN_ZM;}
 		  PREFETCH_U2;
@@ -318,12 +331,16 @@ void wilson_dslash_blk_dag1(IFloat *chi_p_f,
 		  psi = psi_p + SPINOR_SIZE * xyztm;
 		  if ( t_nloc && t == 0 ) {
 	    const size_t shft  = (SPINOR_SIZE/2)* ((x+lx*(y+ly*z))/2);
+#if 1
+                        LOAD(wtm,recv_buf8);
+#else
 		      wtm[0] = _mm_load_pd( recv_buf8+shft );
 		      wtm[1] = _mm_load_pd( recv_buf8+shft + 2);
 		      wtm[2] = _mm_load_pd( recv_buf8+shft + 4);
 		      wtm[3] = _mm_load_pd( recv_buf8+shft + 6);
 		      wtm[4] = _mm_load_pd( recv_buf8+shft + 8);
 		      wtm[5] = _mm_load_pd( recv_buf8+shft + 10);
+#endif
 		      
 		  } else   {N_KERN_TM;}
 		  PREFETCH_U3;

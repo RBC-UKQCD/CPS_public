@@ -3,7 +3,7 @@
 ///
 
 /*!----------------------------------------------------------------------
-  $Id: main.C,v 1.10 2008-02-08 18:35:09 chulwoo Exp $
+  $Id: main.C,v 1.10 2008/02/08 18:35:09 chulwoo Exp $
   Test Asqtad dirac operator code.	
 
    This is a simple regression test of the Asqtad inverter.
@@ -76,11 +76,6 @@ int main(int argc,char *argv[])
     do_arg.asqtad_5staple = ( 1.0/8.0)*0.25*0.5 * (1.0/pow(u0,4.0)) ;
     do_arg.asqtad_7staple = (-1.0/8.0)*0.125*(1.0/6.0)* (1.0/(pow(u0,6.0))) ;
     
-#if TARGET==cpsMPI
-    MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
-    using MPISCU::printf;
-    using MPISCU::fprintf;
-#endif
 
     printf("Computation of staggered pion correlator\n") ; 
     printf("Physical lattice volume [xyzt] = %d %d %d %d\n",nx,ny,nz,nt); 

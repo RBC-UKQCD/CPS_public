@@ -7,23 +7,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion routines.
 
-  $Id: convert_func.C,v 1.24 2013-04-05 20:05:48 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 20:05:48 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v 1.24 2013-04-05 20:05:48 chulwoo Exp $
-//  $Id: convert_func.C,v 1.24 2013-04-05 20:05:48 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: convert_func.C,v $
-//  $Revision: 1.24 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert_func.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/smalloc.h>
@@ -285,9 +269,11 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 			break ;
 
 		case WILSON :
+		case DWF_4D_EOPREC :
+                case DWF_4D_EOPREC_EE :
 		case G_WILSON_HB :
 
-			if (new_str_ord == WILSON)
+			if (new_str_ord == WILSON || new_str_ord == DWF_4D_EOPREC || new_str_ord == DWF_4D_EOPREC_EE )
 				VRB.Flow(cname_none,fname,
 				"Converting gauge field order: %s",
 				"CANONICAL -> WILSON\n");
@@ -320,7 +306,7 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 // LSB = 1 indicates site needs converting
 //-------------------------------------------------------------------------
 
-				if (new_str_ord == WILSON)
+				if (new_str_ord == WILSON || new_str_ord == DWF_4D_EOPREC || new_str_ord == DWF_4D_EOPREC_EE )
 					*(site_sort_tbl+offset) = (x - x%2
 					+ cap->lx*(y+cap->ly*(z+cap->lz*t))
 					+ cap->vol*((x+y+z+t)%2)) | 1 ;
@@ -352,7 +338,7 @@ void CanonToAnything(CAP cap, StrOrdType new_str_ord)
 // Use desired (WILSON or G_WILSON_HB) equation for reals in site
 //-------------------------------------------------------------------------
 
-				if (new_str_ord == WILSON)
+				if (new_str_ord == WILSON || new_str_ord == DWF_4D_EOPREC || new_str_ord == DWF_4D_EOPREC_EE )
 					*(link_sort_tbl+offset) =
 					r+2*(row+cap->nc*(col+cap->nc*mu)) ;
 				else

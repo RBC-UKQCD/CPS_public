@@ -5,13 +5,9 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of some Fasqtad class methods.
 
-  $Id: f_asqtad.C,v 1.29 2013-06-07 19:26:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_asqtad/comsrc/f_asqtad.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 //------------------------------------------------------------------
@@ -291,7 +287,8 @@ int Fasqtad::FeigSolv(Vector **f_eigenv, Float *lambda,
   int np = eig_arg->np_lanczos_vectors;
   int maxiters = eig_arg->maxiters;
   Float stopres = eig_arg->stop_residual;
-  MatrixPolynomialArg* cheby_arg = &(eig_arg->matpoly_arg);
+  MatrixPolynomialArg* cheby_arg = &eig_arg->matpoly_arg;
+//(MatrixPolynomialArg*)eig_arg->matpoly_arg;
 
   if(cnv_frm == CNV_FRM_YES) // convert only nk, not (nk+np)
     for(int i=0; i < nk; ++i)

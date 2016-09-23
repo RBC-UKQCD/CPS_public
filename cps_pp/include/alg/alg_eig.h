@@ -4,7 +4,6 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgEig class.
 
-  $Id: alg_eig.h,v 1.5 2013-04-05 17:46:30 chulwoo Exp $
 */
 //------------------------------------------------------------------
 

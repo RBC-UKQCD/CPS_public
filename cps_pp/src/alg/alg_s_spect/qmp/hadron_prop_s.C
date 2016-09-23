@@ -1,24 +1,6 @@
 #include<config.h>
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-04-19 20:34:59 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/qmp/hadron_prop_s.C,v 1.4 2013-04-19 20:34:59 chulwoo Exp $
-//  $Id: hadron_prop_s.C,v 1.4 2013-04-19 20:34:59 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: hadron_prop_s.C,v $
-//  $Revision: 1.4 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/qmp/hadron_prop_s.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 // hadron_prop_s.C
 
-#ifndef lint
-static char vcid[] = "$Id: hadron_prop_s.C,v 1.4 2013-04-19 20:34:59 chulwoo Exp $";
-#endif /* lint */
 
 #include <util/qcdio.h>
 #include <alg/hadron_prop_s.h>

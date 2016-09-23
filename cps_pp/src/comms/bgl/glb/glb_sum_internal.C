@@ -9,7 +9,7 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/bgl/glb/glb_sum_internal.C,v $
+//  $Source: /space/cvs/cps/cps++/src/comms/bgl/glb/glb_sum_internal.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

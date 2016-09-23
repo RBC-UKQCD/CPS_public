@@ -3,7 +3,7 @@
 
   Generated automatically from config.h.in by configure procedure.
 
-  $Id: config.h.in,v 1.29 2012-03-26 13:50:11 chulwoo Exp $
+  $Id: config.h.in,v 1.29 2012/03/26 13:50:11 chulwoo Exp $
 */
 /* Global options for compiling the Columbia code:  
  * @configure_input@
@@ -12,14 +12,14 @@
  *  CVS keywords
  *
  *  $Author: chulwoo $
- *  $Date: 2012-03-26 13:50:11 $
- *  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v 1.29 2012-03-26 13:50:11 chulwoo Exp $
- *  $Id: config.h.in,v 1.29 2012-03-26 13:50:11 chulwoo Exp $
- *  $Name: not supported by cvs2svn $
+ *  $Date: 2012/03/26 13:50:11 $
+ *  $Header: /space/cvs/cps/cps++/config.h.in,v 1.29 2012/03/26 13:50:11 chulwoo Exp $
+ *  $Id: config.h.in,v 1.29 2012/03/26 13:50:11 chulwoo Exp $
+ *  $Name: v5_0_16_hantao_io_test_v7 $
  *  $Locker:  $
  *  $RCSfile: config.h.in,v $
  *  $Revision: 1.29 $
- *  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/config.h.in,v $
+ *  $Source: /space/cvs/cps/cps++/config.h.in,v $
  *  $State: Exp $
  */
 /* ------------------------------------------------------------------*/

@@ -41,6 +41,7 @@ enum RandomType {
 	UONE = 1,
 	ZTWO = 2,
 	NORAND = 3,
+	TEST = 4,
 };
 typedef enum RandomType RandomType;
 extern struct vml_enum_map RandomType_map[];
@@ -71,6 +72,8 @@ public:
 	int EndSrcSpin;
 	int StartSrcColor;
 	int EndSrcColor;
+	int *mob_arg_l;
+	int *mob_arg_s;
 	   QPropWArg (  ) ;
 };
 

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgFixGauge class.
 
-  $Id: alg_fix_gauge.h,v 1.3 2004-09-02 16:56:28 zs Exp $
+  $Id: alg_fix_gauge.h,v 1.3 2004/09/02 16:56:28 zs Exp $
 */
 //------------------------------------------------------------------
 

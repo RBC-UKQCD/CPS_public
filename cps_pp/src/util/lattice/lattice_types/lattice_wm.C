@@ -3,19 +3,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of the GwilsonFdwf class.
 
-  $Id: lattice_wm.C,v 1.2 2011-03-21 21:04:50 chulwoo Exp $
+  $Id: lattice_wm.C,v 1.2 2011/03/21 21:04:50 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2011-03-21 21:04:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_types/lattice_wm.C,v 1.2 2011-03-21 21:04:50 chulwoo Exp $
-//  $Id: lattice_wm.C,v 1.2 2011-03-21 21:04:50 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2011/03/21 21:04:50 $
+//  $Header: /space/cvs/cps/cps++/src/util/lattice/lattice_types/lattice_wm.C,v 1.2 2011/03/21 21:04:50 chulwoo Exp $
+//  $Id: lattice_wm.C,v 1.2 2011/03/21 21:04:50 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $Revision: 1.2 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/lattice_types/lattice_wm.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/lattice/lattice_types/lattice_wm.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

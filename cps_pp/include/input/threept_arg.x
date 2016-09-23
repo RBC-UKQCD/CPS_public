@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definition of the ThreePtArg structure.
 
-  $Id: threept_arg.x,v 1.2 2004-12-11 20:57:38 chulwoo Exp $ 
+  $Id: threept_arg.x,v 1.2 2004/12/11 20:57:38 chulwoo Exp $ 
 */
 /*---------------------------------------------------------------------------*/
 

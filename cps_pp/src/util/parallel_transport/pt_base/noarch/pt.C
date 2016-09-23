@@ -2,23 +2,7 @@
 /*! \file
   \brief  Functions used by the ParTransAsqtad class.
   
-  $Id: pt.C,v 1.12 2012-08-02 21:20:01 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012-08-02 21:20:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v 1.12 2012-08-02 21:20:01 chulwoo Exp $
-//  $Id: pt.C,v 1.12 2012-08-02 21:20:01 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: pt.C,v $
-//  $Revision: 1.12 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/noarch/pt.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 #include <util/gjp.h>
 #include <util/pt.h>
 #include <comms/scu.h>
@@ -185,7 +169,6 @@ void pt_1vec(int N, IFloat **fout, IFloat **fin, const int *dir){
     }
     ParTrans::PTflops += 66*N*vol;
 }
-#endif
 
 /*! 
   Computes sum[x] = vect2[x] vect[x +/- hop dir]^dagger
@@ -283,7 +266,6 @@ void pt_vvpd(IFloat **vect2_v, IFloat ***vect_v, int n_vect, const int *dir, int
   
   ParTrans::PTflops += 90*n_vect*n_dir*vol;
 }
-
 /*! 
   Computes sum[x] = vect[x] vect[x + hop dir]^dagger
   where the sum is over n_vect vectors and the hop is in a forward direction.
@@ -337,6 +319,7 @@ void pt_vvpd(IFloat **vect_v, int n_vect,
 
   ParTrans::PTflops += 90*n_vect*n_dir*vol;
 }
+#endif // USE_QMP
 
 
 #ifndef USE_QMP

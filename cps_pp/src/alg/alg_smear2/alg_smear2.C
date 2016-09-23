@@ -4,7 +4,7 @@
 
   AlgSmear, AlgApeSmear, AlgKineticSmear and AlgHypSmear classes.
   
-  $Id: alg_smear2.C,v 1.2 2006-05-30 20:32:27 chulwoo Exp $
+  $Id: alg_smear2.C,v 1.2 2006/05/30 20:32:27 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 #include <config.h>

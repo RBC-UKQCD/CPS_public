@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.4 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: main.C,v 1.4 2008/02/08 18:35:08 chulwoo Exp $
 */
 
 #include<config.h>
@@ -143,7 +143,7 @@ int main(int argc,char *argv[]){
 
     int s[4];
 #if 1
-	lat.RandGaussVector(X_in,1.0);
+	lat.RandGaussVector(X_in.Vec(),1.0);
 #else
 
     Matrix *gf = lat.GaugeField();
@@ -172,20 +172,21 @@ int main(int argc,char *argv[]){
 		}
 #endif
 
-    Vector *out;
-    DiracOpWilson dirac(lat,X_out,X_in,&cg_arg,CNV_FRM_NO);
+    LatVector *out;
+    DiracOpWilson dirac(lat,X_out.Vec(),X_in.Vec(),&cg_arg,CNV_FRM_NO);
 
 	for(int k = 0; k< 1; k++){
     	double maxdiff=0.;
 		printf("k=%d ",k);
 		if (k ==0)
-			out = result;
+			out = &result;
 		else
-			out = X_out;
-		bzero((char *)out, GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-		lat.Fconvert(out,WILSON,CANONICAL);
-		lat.Fconvert(X_in,WILSON,CANONICAL);
+			out = &X_out;
+		bzero((char *)out->Vec(), GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+		lat.Fconvert(out->Vec(),WILSON,CANONICAL);
+		lat.Fconvert(X_in.Vec(),WILSON,CANONICAL);
 		int offset = GJP.VolNodeSites()*lat.FsiteSize()/ (2*6);
+		int offset2 = GJP.VolNodeSites()/2;
 #if 1
 #if 1
 #if TARGET==QCDOC
@@ -194,23 +195,23 @@ int main(int argc,char *argv[]){
 		int vol = nx*ny*nz*nt;
 #endif
 		dtime = -dclock();
-   		int iter = dirac.MatInv(out,X_in);
+   		int iter = dirac.MatInv(out->Vec(),X_in.Vec());
 		dtime +=dclock();
 #else
-		dirac.Dslash(out,X_in+offset,CHKB_EVEN,DAG_NO);
-		dirac.Dslash(out+offset,X_in,CHKB_ODD,DAG_NO);
+		dirac.Dslash(out->Vec(),X_in.Vec(offset2),CHKB_EVEN,DAG_NO);
+		dirac.Dslash(out->Vec(offset2),X_in.Vec(),CHKB_ODD,DAG_NO);
 #endif
 #endif
 
 		if (k == 0){
-			bzero((char *)X_out2, GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
-			dirac.Dslash(X_out2,out+offset,CHKB_EVEN,DAG_NO);
-			dirac.Dslash(X_out2+offset,out,CHKB_ODD,DAG_NO);
-			lat.Fconvert(X_out2,CANONICAL,WILSON);
+			bzero((char *)X_out2.Vec(), GJP.VolNodeSites()*lat.FsiteSize()*sizeof(IFloat));
+			dirac.Dslash(X_out2.Vec(),out->Vec(offset2),CHKB_EVEN,DAG_NO);
+			dirac.Dslash(X_out2.Vec(offset2),out->Vec(),CHKB_ODD,DAG_NO);
+			lat.Fconvert(X_out2.Vec(),CANONICAL,WILSON);
 		}
-		lat.Fconvert(out,CANONICAL,WILSON);
-		lat.Fconvert(X_in,CANONICAL,WILSON);
-		X_out2->FTimesV1PlusV2(-0.5/(cg_arg.mass+4.0),X_out2,out,GJP.VolNodeSites()*lat.FsiteSize());
+		lat.Fconvert(out->Vec(),CANONICAL,WILSON);
+		lat.Fconvert(X_in.Vec(),CANONICAL,WILSON);
+		X_out2.FTimesV1PlusV2(-0.5/(cg_arg.mass+4.0),&X_out2,out);
     
     Float dummy;
     Float dt = 2;
@@ -221,6 +222,7 @@ int main(int argc,char *argv[]){
 		for(s[0]=0; s[0]<GJP.NodeSites(0); s[0]++) {
 
 		    int n = lat.FsiteOffset(s)*lat.SpinComponents();
+		    int n2 = lat.FsiteOffset(s);
 			for(int i=0; i<(lat.FsiteSize()/2); i++){
 #if TARGET == QCDOC
 		    if ( k==0 )
@@ -231,8 +233,10 @@ int main(int argc,char *argv[]){
 #endif
 		    if ( k==0 )
 				Fprintf(ADD_ID, fp," (%0.7e %0.7e) (%0.7e %0.7e)",
-				*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
-				*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1));
+				*(result.Field(n2)+i*2), *(result.Field(n2)+i*2+1),
+				*(X_in.Field(n2)+i*2), *(X_in.Field(n2)+i*2+1));
+//				*((IFloat*)&result[n]+i*2), *((IFloat*)&result[n]+i*2+1),
+//				*((IFloat*)&X_in[n]+i*2), *((IFloat*)&X_in[n]+i*2+1));
 #if 0
 				Fprintf(ADD_ID, fp," (%0.2e %0.2e)\n",
 #if 0
@@ -245,9 +249,9 @@ int main(int argc,char *argv[]){
 #else
 				Fprintf(ADD_ID, fp,"\n");
 #endif
-	double diff =	*((IFloat*)&X_out2[n]+i*2)-*((IFloat*)&X_in[n]+i*2);
+	double diff =	*(X_out2.Field(n2)+i*2)-*(X_in.Field(n2)+i*2);
         if (fabs(diff)>maxdiff) maxdiff = fabs(diff);
- 	diff = *((IFloat*)&X_out2[n]+i*2+1)-*((IFloat*)&X_in[n]+i* 2+1);
+	diff =	*(X_out2.Field(n2)+i*2+1)-*(X_in.Field(n2)+i*2+1);
         if (fabs(diff)>maxdiff) maxdiff = fabs(diff);
 			}
 		}
@@ -255,9 +259,5 @@ int main(int argc,char *argv[]){
 }
     Fclose(fp);
     
-    sfree(X_in);
-    sfree(result);
-    sfree(X_out);
-    sfree(X_out2);
     return 0; 
 }

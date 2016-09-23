@@ -4,21 +4,9 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.5 2013-04-05 17:51:13 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:51:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/get_data.C,v 1.5 2013-04-05 17:51:13 chulwoo Exp $
-//  $Id: get_data.C,v 1.5 2013-04-05 17:51:13 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: get_data.C,v $
-//  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/get_data.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 CPS_END_NAMESPACE

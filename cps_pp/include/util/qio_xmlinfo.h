@@ -6,8 +6,6 @@
 
 
 CPS_START_NAMESPACE
-using namespace std;
-
 
 // these are missing in qio_xml.h
 //

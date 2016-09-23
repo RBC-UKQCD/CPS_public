@@ -348,7 +348,7 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   #ifdef CPP
   for(nu = 0; nu < NUM_DIR; nu+=2)
     {
-      bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
+      memset((char *)tmp_frm[nu],0,(vol/2)*VECT_LEN*sizeof(IFloat));
       //bzero((char *)tmp_frm[nu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
       for(n = 0; n < vol/2; n++)
 	{
@@ -426,7 +426,7 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
   #ifdef CPP
   for(mu = 0; mu < NUM_DIR; mu+=2)
     {
-      bzero((char *)tmp_frm[mu],(vol/2)*VECT_LEN*sizeof(IFloat));
+      memset((char *)tmp_frm[mu],0,(vol/2)*VECT_LEN*sizeof(IFloat));
       //bzero((char *)tmp_frm[mu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
       for(n = 0; n < vol/2; n++)
 	{
@@ -496,7 +496,7 @@ void p4_dirac(Vector *f_out, Vector *f_in, int cb, int dag)
 #endif
 
 
-  bzero((char*)f_out,(vol/2)*VECT_LEN*sizeof(IFloat));
+  memset((char*)f_out,0,(vol/2)*VECT_LEN*sizeof(IFloat));
   #ifdef CPP
    for(n = 0; n < vol/2; n++)
     {
@@ -648,7 +648,7 @@ void p4_dMdmu(Vector *f_out, Vector *f_in, int cb, int dag, int order)
   #ifdef CPP
   for(nu = 0; nu < NUM_DIR; nu+=2)
     {
-      bzero((char *)tmp_frm[nu],(vol/2)*VECT_LEN*sizeof(IFloat));
+      memset((char *)tmp_frm[nu],0,(vol/2)*VECT_LEN*sizeof(IFloat));
       //bzero((char *)tmp_frm[nu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
       for(n = 0; n < vol/2; n++)
 	{
@@ -733,7 +733,7 @@ void p4_dMdmu(Vector *f_out, Vector *f_in, int cb, int dag, int order)
   #ifdef CPP
   for(mu = 0; mu < NUM_DIR; mu+=2)
     {
-      bzero((char *)tmp_frm[mu],(vol/2)*VECT_LEN*sizeof(IFloat));
+      memset((char *)tmp_frm[mu],0,(vol/2)*VECT_LEN*sizeof(IFloat));
       //bzero((char *)tmp_frm[mu+1],(vol/2)*VECT_LEN*sizeof(IFloat));
       for(n = 0; n < vol/2; n++)
 	{
@@ -816,7 +816,7 @@ void p4_dMdmu(Vector *f_out, Vector *f_in, int cb, int dag, int order)
 #endif
 
 
-  bzero((char*)f_out,(vol/2)*VECT_LEN*sizeof(IFloat));
+  memset((char*)f_out,0,(vol/2)*VECT_LEN*sizeof(IFloat));
   #ifdef CPP
 
    for(n = 0; n < vol/2; n++)

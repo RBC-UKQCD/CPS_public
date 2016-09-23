@@ -1,21 +1,21 @@
 /*!\file
   \brief Definition of EqStateArg structure.
 
-  $Id: eq_state_arg.h,v 1.3 2004-09-02 17:00:08 zs Exp $
+  $Id: eq_state_arg.h,v 1.3 2004/09/02 17:00:08 zs Exp $
 */
 	
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-09-02 17:00:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/eq_state_arg.h,v 1.3 2004-09-02 17:00:08 zs Exp $
-//  $Id: eq_state_arg.h,v 1.3 2004-09-02 17:00:08 zs Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/09/02 17:00:08 $
+//  $Header: /space/cvs/cps/cps++/include/alg/eq_state_arg.h,v 1.3 2004/09/02 17:00:08 zs Exp $
+//  $Id: eq_state_arg.h,v 1.3 2004/09/02 17:00:08 zs Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: eq_state_arg.h,v $
 //  $Revision: 1.3 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/eq_state_arg.h,v $
+//  $Source: /space/cvs/cps/cps++/include/alg/eq_state_arg.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

@@ -1,23 +1,12 @@
 #ifdef USE_QMP
+#include <assert.h>
 #include <util/omp_wrapper.h>
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_mat.C,v 1.9 2013-01-08 21:09:25 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2013-01-08 21:09:25 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v 1.9 2013-01-08 21:09:25 chulwoo Exp $
-//  $Id: pt_mat.C,v 1.9 2013-01-08 21:09:25 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: pt_mat.C,v $
-//  $Revision: 1.9 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_mat.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 #include <string.h>
@@ -53,7 +42,6 @@ parity)
 
 static const int MAX_DIR=10;
 
-#define PROFILE
 #undef PROFILE
 void PT::mat_cb_norm(int n, IFloat **mout, IFloat **min, const int *dir, int
 parity, IFloat * gauge)
@@ -221,8 +209,8 @@ parity, IFloat * gauge)
 //Parallel transport of a matrix. through one hop.
 //The matrix min is parallel transported and the result is placed in mout
 #if 1
-#undef PROFILE
-void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
+#define PROFILE
+void PT::mat(int n, PTmatrix **mout, PTmatrix **min, const int *dir){
     
   int wire[MAX_DIR];
   int i;
@@ -233,7 +221,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   static int call_num = 0;
 
   call_num++;
-//  char *fname="pt_mat()";
+  char *fname="pt_mat()";
 //  VRB.Func("",fname);
 //  if (call_num%100==1) printf("PT:mat()\n");
 
@@ -271,9 +259,9 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   setup +=dtime;
   dtime = -dclock();
   int if_print = 0;
-//  if ( (call_num%10000==1) && (!QMP_get_node_number()) ) if_print=1;
+  if ( (call_num%10000==1) && (!QMP_get_node_number()) ) if_print=1;
 
-#define USE_TEST2
+#undef USE_TEST2
 #ifdef USE_TEST2
 //assume nt > n!
     static char *cname="mat()";
@@ -283,6 +271,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   iam = omp_get_thread_num();
   nt = omp_get_num_threads();
   int nt_dir = nt/n;
+  assert(nt_dir>0);
   int n_t = iam/nt_dir;
   int i_t = iam%nt_dir;
   if (n_t >= n ){  n_t = n-1;
@@ -291,10 +280,11 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   }
   int w_t = wire[n_t];
   ipoints = (local_chi[w_t]/2)/nt_dir;
+  if(((local_chi[w_t]/2)%nt_dir)>0) ipoints += 1;
   offset = ipoints*i_t;
   if (i_t == (nt_dir-1)) ipoints = (local_chi[w_t]/2)-offset;
     if ( if_print )
-      printf("thread %d of %d nt_dir n_t i_t ipoints offset= %d %d %d %d %d\n",iam,nt,nt_dir,n_t,i_t,ipoints,offset);
+      printf("thread %d of %d local_chi/2 nt_dir n_t i_t ipoints offset= %d %d %d %d %d %d\n",iam,nt,local_chi[w_t]/2,nt_dir,n_t,i_t,ipoints,offset);
   //Interleaving of local computation of matrix multiplication
   partrans_cmm_agg((uc_l[w_t]+offset*2),min[n_t],mout[n_t],ipoints);
     if ( if_print )
@@ -305,6 +295,11 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   //Interleaving of local computation of matrix multiplication
 #pragma omp parallel for default(shared)
   for(i=0;i<n;i++){
+  int iam,nt;
+  iam = omp_get_thread_num();
+  nt = omp_get_num_threads();
+    if ( if_print )
+      printf("thread %d of %d i=%d\n",iam,nt,i);
     partrans_cmm_agg(uc_l[wire[i]],min[i],mout[i],local_chi[wire[i]]/2);
   }
 }
@@ -348,13 +343,14 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   }
   int w_t = wire[n_t];
   ipoints = (non_local_chi[w_t]/2)/nt_dir;
+  if(((non_local_chi[w_t]/2)%nt_dir)>0) ipoints += 1;
   offset = ipoints*i_t;
   if (i_t == (nt_dir-1)) ipoints = (non_local_chi[w_t]/2)-offset;
     if ( if_print )
-      printf("thread %d of %d nt_dir n_t i_t ipoints offset= %d %d %d %d %d\n",iam,nt,nt_dir,n_t,i_t,ipoints,offset);
+      printf("thread %d of %d local_chi/2 nt_dir n_t i_t ipoints offset= %d %d %d %d %d %d\n",iam,nt,non_local_chi[w_t]/2,nt_dir,n_t,i_t,ipoints,offset);
   //Non-local computation
   if (ipoints>0)
-  partrans_cmm_agg((uc_nl[w_t]+offset*2),(matrix *)rcv_buf[w_t],mout[n_t],ipoints);
+  partrans_cmm_agg((uc_nl[w_t]+offset*2),(PTmatrix *)rcv_buf[w_t],mout[n_t],ipoints);
     if ( if_print )
       printf("thread %d of %d done\n",iam,nt);
 }
@@ -367,7 +363,7 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
     if (call_num%10000==1 && !QMP_get_node_number() ) 
       printf("thread %d of %d i=%d\n",omp_get_thread_num(),omp_get_num_threads(),i);
 #endif
-    partrans_cmm_agg(uc_nl[wire[i]],(matrix *)rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
+    partrans_cmm_agg(uc_nl[wire[i]],(PTmatrix *)rcv_buf[wire[i]],mout[i],non_local_chi[wire[i]]/2);
   }
 
 }//#pragma omp parallel
@@ -388,12 +384,18 @@ void PT::mat(int n, matrix **mout, matrix **min, const int *dir){
   }
 
 
-#ifdef PROFILE
+//#ifdef PROFILE
+#if 0
+  if (call_num%100==0){
   dtime2 +=dclock();
-  print_flops("",fname,198*vol*n,dtime2);
+  print_flops(fname,198*vol*n,dtime2);
+  }
 #endif
 //  ParTrans::PTflops +=198*n*vol;
+//
+  if(call_num>=10000) call_num=0;
 }
 #endif
+#undef PROFILE
 
 #endif

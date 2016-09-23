@@ -189,7 +189,7 @@ void Nuc3pt::Calc3pt(QPropWMultSeqBar& seqQ, QPropW& Quark)
 
   //Global sum
   tmp.GlobalSum();
-  
+
   //Multiply by the factor...
   tmp *=  factor ;
 
@@ -432,6 +432,76 @@ void Nuc3ptGamma::InsertOp(CorrFunc* tmp,QPropW& seqQ, QPropW& Quark, int Nmom, 
   char *fname = "InsertOp()";
 }
 
+
+Nuc3ptClover::Nuc3ptClover(Gamma op):Nuc3pt(),G(op)
+{
+  cname = "Nuc3ptClover";    
+}
+
+Nuc3ptClover::Nuc3ptClover(ThreeMom m, Gamma op):Nuc3pt(m),G(op)
+{
+  cname = "Nuc3ptClover";    
+}
+
+Nuc3ptClover::Nuc3ptClover(Complex cc, Gamma op):Nuc3pt(cc),G(op)
+{
+  cname = "Nuc3ptClover";    
+}
+
+Nuc3ptClover::Nuc3ptClover(ThreeMom m, Complex cc, Gamma op):Nuc3pt(m,cc),G(op)
+{
+  cname = "Nuc3ptClover";    
+}
+  
+
+/*! 
+  Computes
+  \f[
+   Trace(seqQ \, 
+     \gamma_{\mu_1} \, \gamma_{\mu_2} \, \gamma_{\mu_3}\, 
+     e^{-i mom . x}\, Quark)
+  \f]
+  where \f$\mu\f$ is the member int gamma and ThreeMom mom is
+  the momentum injected at the operator. 
+**/
+void Nuc3ptClover::InsertOp(CorrFunc& corr,QPropW& seqQ, QPropW& Quark)
+{
+  char *fname = "InsertOp()";
+
+  VRB.Func(cname, fname);
+
+  Site s ;
+  int x[4];
+  for(s.Begin();s.End();s.nextSite())
+    {
+      int t(s.physT()) ;
+      WilsonMatrix q(Quark[s.Index()]) ;
+      for(int mu(G.N()-1);mu>=0;mu--)
+	q.gl(G[mu]) ; // Multiply by gamma_mu 
+      Matrix Leaf;
+      //x[0]=s.X();
+      //x[1]=s.Y();
+      //x[2]=s.Z();
+      //x[3]=s.T();
+      Quark.AlgLattice().CloverLeaf(Leaf,s.pos(),G[0],G[1]);
+      Leaf.TrLessAntiHermMatrix();
+#if 0
+      printf("Leaf %d %e %e  %e %e  %e %e\n",s.Index(),Leaf(0,0).real(),Leaf(0,0).imag(),Leaf(0,1).real(),Leaf(0,1).imag(),Leaf(0,2).real(),Leaf(0,2).imag());
+      printf("Leaf %d %e %e  %e %e  %e %e\n",s.Index(),Leaf(1,0).real(),Leaf(1,0).imag(),Leaf(1,1).real(),Leaf(1,1).imag(),Leaf(1,2).real(),Leaf(1,2).imag());
+      printf("Leaf %d %e %e  %e %e  %e %e\n",s.Index(),Leaf(2,0).real(),Leaf(2,0).imag(),Leaf(2,1).real(),Leaf(2,1).imag(),Leaf(2,2).real(),Leaf(2,2).imag());
+#endif
+      Complex cc(mom.Fact(s)) ; // The momentum factor exp(-ipx)
+      Matrix tmp = SpinTrace(q,seqQ[s.Index()]);
+      cc *= Tr(Leaf,tmp);
+      //cc *= tmp.Tr();
+      corr[t] += cc ;
+    }
+}
+
+void Nuc3ptClover::InsertOp(CorrFunc* tmp,QPropW& seqQ, QPropW& Quark, int Nmom, ThreeMom* momo)
+{
+  char *fname = "InsertOp()";
+}
 
 Nuc3ptStru::Nuc3ptStru(Gamma gg, Derivative dd):Nuc3pt(),G(gg),D(dd)
 {

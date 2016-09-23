@@ -5,9 +5,9 @@
 #include <util/vector.h>
 #include <util/time_cps.h>
 
-#if 0
-#define qalloc(A,B) malloc(B)
-#define qfree(A) free(A)
+#if 1
+#define qalloc(A,B) smalloc(B)
+#define qfree(A) sfree(A)
 #endif
 
 USING_NAMESPACE_CPS

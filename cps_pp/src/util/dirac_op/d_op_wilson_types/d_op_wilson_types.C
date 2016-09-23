@@ -7,7 +7,7 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_wilson_types/d_op_wilson_types.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -158,6 +158,7 @@ void DiracOpWilsonTypes::RitzMat(Vector *out, Vector *in) {
       MatDagMat(out, in);
       break;
       
+    case MATPC_HERM:
     case MATPCDAG_MATPC:
       MatPcDagMatPc(out, in);
       break;
@@ -188,33 +189,48 @@ void DiracOpWilsonTypes::RitzEigMat(Vector *out, Vector *in) {
   char *fname = "RitzEigMat(V*,V*)";
   VRB.Func(cname,fname);
 
+  int temp_size;
+  Vector *temp;
+
   switch(dirac_arg->RitzMatOper)
   {
-  case MAT_HERM:
-    MatHerm(out, in);
-    break;
+    case MAT_HERM:
+      MatHerm(out, in);
+      break;
 
-  case MATDAG_MAT:
-    MatDagMat(out, in);
-    break;
+    case MATDAG_MAT:
+      MatDagMat(out, in);
+      break;
 
-  case MATPCDAG_MATPC:
-    MatPcDagMatPc(out, in);
-    break;
+    case MATPCDAG_MATPC:
+      MatPcDagMatPc(out, in);
+      break;
 
-  case NEG_MATPCDAG_MATPC:
-    MatPcDagMatPc(out, in);
-    out->VecNegative(out, RitzLatSize());
-    break;
+    case NEG_MATPCDAG_MATPC:
+      MatPcDagMatPc(out, in);
+      out->VecNegative(out, RitzLatSize());
+      break;
 
-  case NEG_MATDAG_MAT:
-    MatDagMat(out, in);
-    out->VecNegative(out, RitzLatSize());
-    break;
+    case NEG_MATDAG_MAT:
+      MatDagMat(out, in);
+      out->VecNegative(out, RitzLatSize());
+      break;
 
-  default:
-    ERR.General(cname,fname,"RitzMatOper %d not implemented",
-		dirac_arg->RitzMatOper);
+    //added by Greg, since there is no MatPcHerm
+    case MATPC_HERM:
+      temp_size = RitzLatSize() * lat.FsiteSize();
+      temp = (Vector *) smalloc(temp_size * sizeof(Float));
+      if (temp == 0) ERR.Pointer(cname, fname, "temp");
+      VRB.Smalloc(cname,fname, "temp", temp, temp_size);
+      MatPc(temp, in);
+      MultGamma(out, temp, 15, RitzLatSize());
+      VRB.Sfree(cname, fname, "temp", temp);
+      sfree(temp);
+      break;
+
+    default:
+      ERR.General(cname,fname,"RitzMatOper %d not implemented",
+          dirac_arg->RitzMatOper);
   }
 }
 

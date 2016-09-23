@@ -3,12 +3,12 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_mdwf.C,v 1.3 2011-03-28 16:01:11 chulwoo Exp $
+  $Id: f_mdwf.C,v 1.3 2011/03/28 16:01:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_mdwf/f_mdwf.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/lattice/f_mdwf/f_mdwf.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -213,15 +213,34 @@ int Fmdwf::FmatInv(Vector *f_out, Vector *f_in,
 
   MdwfArg *_mdwf_arg_p = GJP.GetMdwfArg();
 
+  const int ls = _mdwf_arg_p->b5.b5_len;
+  const int f_size = SPINOR_SIZE * GJP.VolNodeSites() * ls;
+  Vector *tmp = (Vector *)smalloc(cname, fname, "tmp", sizeof(Float) * f_size);
+
+#if 1
+  this->Dminus(tmp, f_in);
+#else
+  moveFloat((IFloat*)tmp,(IFloat*)f_in, f_size);
+#endif
+  {  Float norm;
+  norm = tmp->NormSqGlbSum(f_size);
+  if(!UniqueID()) printf("dminus_in Norm (mdwf) %.14e\n",norm);
+  }
+
+  
   CgArg cg_arg_old = _mdwf_arg_p->cg_arg;
   _mdwf_arg_p->cg_arg = *cg_arg;  
 
   DiracOpMdwf mdwf(*this, _mdwf_arg_p);
-  int iter = mdwf.MatInv(f_out, f_in, true_res, prs_f_in);
+  int iter = mdwf.MatInv(f_out, tmp, true_res, prs_f_in);
 
   _mdwf_arg_p->cg_arg = cg_arg_old;
+
+  sfree(cname, fname,  "tmp",  tmp);
+
   return iter;
 }
+
 
 // FmatInvMobius: same as FmatInv, except that we use mobius DWF
 // formalism to speed up the CG inversion (via constructing initial guess).
@@ -236,6 +255,8 @@ int Fmdwf::FmatInvMobius(Vector *f_out,
                          int n_restart, Float rsd_vec[])
 {
   const char *fname = "FmatInvMobius(V*, V*, ...)";
+  ERR.NotImplemented(cname,fname,"need to deal with Dminus, perhaps we should port from or to  v5_0_13_hantao later\n");
+  
   // this implementation doesn't allow splitting in s direction(yet).
   if(GJP.Snodes() != 1){
     ERR.NotImplemented(cname, fname);
@@ -847,5 +868,52 @@ void Fmdwf::BforceVector(Vector *in, CgArg *cg_arg)
 {
   return;
 }
+
+
+// !< Special for Mobius fermions, applies the D_- 5D matrix to an
+// !< unpreconditioned fermion vector.
+//
+// !< The following gives an example of D_- with Ls = 4:                          
+//       [ -D_-^1 0      0      0      ]                                          
+//       [ 0      -D_-^2 0      0      ]                                          
+// D_- = [ 0      0      -D_-^3 0      ]                                          
+//       [ 0      0      0      -D_-^4 ]                                          
+//                                                                                
+// !< where D_-^s = c[s] D_W - 1, D_W is the 4D Wilson Dirac operator.
+void Fmdwf::Dminus(Vector *out, Vector *in)
+{
+  const char *fname = "Dminus(V*, V*)";
+  VRB.Func(cname, fname);
+
+  MdwfArg &mdwf_arg = *GJP.GetMdwfArg();
+
+  const int ls = mdwf_arg.b5.b5_len;
+  const int f_size = SPINOR_SIZE * GJP.VolNodeSites() * ls;
+
+  Vector *tmp = (Vector *)smalloc(cname, fname, "tmp", sizeof(Float) * f_size);
+  Float *b5_tmp = (Float *)smalloc(cname, fname, "b5_tmp", sizeof(Float) * ls);
+
+  {
+    memcpy(b5_tmp, mdwf_arg.b5.b5_val, sizeof(Float) * ls);
+    for(int i = 0; i < ls; ++i) {
+      mdwf_arg.b5.b5_val[i] += mdwf_arg.c5.c5_val[i];
+    }
+    DiracOpMdwf mdwf(*this, &mdwf_arg);
+    mdwf.Mat(tmp, in);
+  }
+
+ {
+    memcpy(mdwf_arg.b5.b5_val, b5_tmp, sizeof(Float) * ls);
+    DiracOpMdwf mdwf(*this, &mdwf_arg);
+    mdwf.Mat(out, in);
+  }
+  tmp->VecMinusEquVec(out, f_size);
+  out->CopyVec(in, f_size);
+  out->VecMinusEquVec(tmp, f_size);
+
+  sfree(tmp, cname, fname, "tmp");
+  sfree(b5_tmp, cname, fname, "b5_tmp");
+}
+
 
 CPS_END_NAMESPACE

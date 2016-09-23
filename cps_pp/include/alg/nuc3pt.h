@@ -112,6 +112,27 @@ class Nuc3ptGamma : public Nuc3pt
   ~Nuc3ptGamma(){} ;
 } ;
 
+class Nuc3ptClover : public Nuc3pt
+{
+  Gamma G ;
+ 
+ public:  
+  Nuc3ptClover(Gamma op) ; 
+  Nuc3ptClover(ThreeMom m, Gamma op) ; 
+
+  Nuc3ptClover(Complex cc, Gamma op) ; 
+
+  Nuc3ptClover(ThreeMom m, Complex cc, Gamma op) ; 
+  
+  void InsertOp(CorrFunc& tmp,QPropW& seqQ, QPropW& Quark) ;
+  void InsertOp(CorrFunc* tmp,QPropW& seqQ, QPropW& Quark, int Nmom, ThreeMom* mom) ;
+
+  void PrintTheTag(FILE *fp){G.printTag(fp,"Clover");} 
+
+  void CloverLeaf(Lattice &lat, Matrix &plaq, int *link_site, int mu, int nu);
+
+  ~Nuc3ptClover(){} ;
+} ;
 
 /*!
   Class for construncting the nucleon three point function

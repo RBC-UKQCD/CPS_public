@@ -1,22 +1,23 @@
 #include<config.h>
+#ifndef USE_C11_RNG
 CPS_START_NAMESPACE
 /*!\file
   \brief   Methods for the Random Number Generator classes.
 
-  $Id: random_asm.C,v 1.17 2009-10-08 15:00:24 chulwoo Exp $
+  $Id: random_asm.C,v 1.17 2009/10/08 15:00:24 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2009-10-08 15:00:24 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v 1.17 2009-10-08 15:00:24 chulwoo Exp $
-//  $Id: random_asm.C,v 1.17 2009-10-08 15:00:24 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2009/10/08 15:00:24 $
+//  $Header: /space/cvs/cps/cps++/src/util/random/noarch/random_asm.C,v 1.17 2009/10/08 15:00:24 chulwoo Exp $
+//  $Id: random_asm.C,v 1.17 2009/10/08 15:00:24 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: random_asm.C,v $
 //  $Revision: 1.17 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/noarch/random_asm.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/random/noarch/random_asm.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -72,6 +73,7 @@ IFloat GaussianRandomGenerator::Rand(int noexit)
 {
     char *cname = "GaussianRandomGenerator";
     char *fname = "Rand()";
+    static int called=0;
 //    VRB.Result(cname,fname,"noexit=%d iset=%d\n",noexit,iset);
     if(iset == 0) {	// We don't have an extra deviate handy
         int num_try = 1;
@@ -102,6 +104,8 @@ IFloat GaussianRandomGenerator::Rand(int noexit)
 	IFloat fac = sqrt(-2.0 * sigma2 * log(rsq)/rsq);
 
 	gset = v1 * fac;   iset = 1;
+	if (called<100) VRB.Flow(cname,fname," num=%g\n",v2*fac);
+	called++;
 	return v2 * fac;
 
     } else {
@@ -136,3 +140,4 @@ IFloat UniformRandomGenerator::Rand(Float high, Float low)
 
 
 CPS_END_NAMESPACE
+#endif

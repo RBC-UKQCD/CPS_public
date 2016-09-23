@@ -1,4 +1,5 @@
 #include <config.h>
+#ifndef USE_C11_RNG
 #include <util/random.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
@@ -75,3 +76,4 @@ void LRGState::SetStates(){
 }
 
 CPS_END_NAMESPACE
+#endif

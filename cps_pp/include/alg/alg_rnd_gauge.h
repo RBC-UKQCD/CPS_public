@@ -1,7 +1,7 @@
 /*!\file
   \brief Definition of AlgRandomGauge and AlgRotateGauge classes.
 
-  $Id: alg_rnd_gauge.h,v 1.2 2004-09-02 16:56:31 zs Exp $
+  $Id: alg_rnd_gauge.h,v 1.2 2004/09/02 16:56:31 zs Exp $
 */
 //----------------------------------------------------------------------
 

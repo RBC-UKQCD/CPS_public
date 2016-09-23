@@ -1,22 +1,8 @@
 #include<config.h>
 CPS_START_NAMESPACE
 /*!\file
-  $Id: fix_gauge.C,v 1.9.30.1.6.4 2013/02/19 22:32:04 yinnht Exp $
+  $Id: fix_gauge.C,v 1.9 2011-03-06 03:13:12 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: yinnht $
-//  $Date: 2013/02/19 22:32:04 $
-//  $Header: /space/cvs/cps/cps++/src/util/lattice/fix_gauge/fix_gauge.C,v 1.9.30.1.6.4 2013/02/19 22:32:04 yinnht Exp $
-//  $Id: fix_gauge.C,v 1.9.30.1.6.4 2013/02/19 22:32:04 yinnht Exp $
-//  $Name:  $
-//  $Locker:  $
-//  $Revision: 1.9.30.1.6.4 $
-//  $Source: /space/cvs/cps/cps++/src/util/lattice/fix_gauge/fix_gauge.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 
 /*--------------------------------------------------------------------
  * File fix_gauge.C. Version 14.5. Last modified on 98/11/25 at 19:50:37.
@@ -32,10 +18,9 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <util/smalloc.h>
 #include <util/rcomplex.h>
-#include <util/time_cps.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
-#include <omp.h>
+#include <util/omp_wrapper.h>
 CPS_START_NAMESPACE
 
 #ifdef _TARTAN
@@ -50,6 +35,7 @@ CPS_START_NAMESPACE
 
 //! The number of colours, again.
 #define COLORS 3  // implemented only for this number of colors
+#undef NEW_GFIX
 
 //------------------------------------------------------------------------//
 // class XXX - gathers functions that hopefully will be replaced with     //
@@ -157,6 +143,7 @@ protected:
     // index coordinates of site (used to avoid argument passing)
     int *index;
 
+#ifdef NEW_GFIX
     //Add by Jianglei
     Matrix **nbr_gauge_minus_rec;
     Matrix **nbr_gauge_plus_rec;
@@ -164,6 +151,7 @@ protected:
     Matrix **nbr_gauge_plus_send;
     void copy_nbr_gauge();
 
+#endif
 private:
 
     Matrix *gauge;          // pointer to a hyperplane of gauge fixing matrices
@@ -283,6 +271,7 @@ HyperPlane::HyperPlane(const Matrix*L0, int Ind2Dir[],
                 copy_nbr_links(i);
             }
     }
+#ifdef NEW_GFIX
     //-------------------------------------------------------------------------------
     //creat and initialize buffers for copies of neighbor node gaueg matrices
     //, add by Jianglei
@@ -307,6 +296,21 @@ HyperPlane::HyperPlane(const Matrix*L0, int Ind2Dir[],
             }
         copy_nbr_gauge();
     }
+    for(int i=0; i<hplane_dim; i++)
+      {
+	int mem_size = sizeof(Matrix);
+	for(int j=0; j<hplane_dim; j++)
+	  mem_size *= (i==j) ? 1 : node_size[j];
+
+	neighbor_link[i] = (Matrix*) smalloc(mem_size);
+	if(neighbor_link[i] == NULL)
+	  ERR.Pointer(cname, fname, "neighbor_link[i]");
+        VRB.Smalloc(cname,fname,"neighbor_link[i]",neighbor_link[i],mem_size);
+
+	copy_nbr_links(i);
+      }
+  }
+#endif
 }
 
 
@@ -332,6 +336,7 @@ HyperPlane::~HyperPlane()
     VRB.Sfree(cname, fname, "neighbor_link", neighbor_link);
     sfree(neighbor_link);
 
+#ifdef NEW_GFIX
     for(int i=hplane_dim; i--; )
 	{
             sfree(nbr_gauge_minus_rec[i]);
@@ -343,6 +348,7 @@ HyperPlane::~HyperPlane()
     sfree(nbr_gauge_minus_send);
     sfree(nbr_gauge_plus_rec);
     sfree(nbr_gauge_plus_send);
+#endif
 
     VRB.Sfree(cname, fname, "node_size", node_size);
     sfree(node_size);
@@ -447,6 +453,7 @@ void HyperPlane::copy_nbr_links(int nbr_num, int recurse)
         }
 }
 
+#ifdef NEW_GFIX
 //Coulumb Gauge only !!!
 void HyperPlane::copy_nbr_gauge()
 {
@@ -490,6 +497,7 @@ void HyperPlane::copy_nbr_gauge()
             getPlusData((IFloat*)nbr_gauge_plus_rec[i], (IFloat*)nbr_gauge_plus_send[i], memsize, ind2dir[i]);
 	}
 }	
+#endif
 
 
 //-------------------------------------------------------------------------
@@ -566,6 +574,7 @@ Matrix& HyperPlane::G_loc()
 
 Matrix& HyperPlane::G(int ind_link)
 {
+#ifdef NEW_GFIX
     if(index[ind_link] == -1)
 	{
             //index[ind_link] = node_size[ind_link] - 1;
@@ -602,6 +611,28 @@ Matrix& HyperPlane::G(int ind_link)
 	{
             return G_loc();
 	}
+#else
+  if(index[ind_link] == -1)
+    {
+      index[ind_link] = node_size[ind_link] - 1;
+      getMinusData((IFloat*)&g_buf, (IFloat*)&G_loc(), 
+		   sizeof(Matrix)/sizeof(IFloat), ind2dir[ind_link]);
+      index[ind_link] = -1;
+      return g_buf;
+    }
+  else if(index[ind_link] == node_size[ind_link])
+    {
+      index[ind_link] = 0;
+      getPlusData((IFloat*)&g_buf, (IFloat*)&G_loc(), 
+		  sizeof(Matrix)/sizeof(IFloat), ind2dir[ind_link]);
+      index[ind_link] = node_size[ind_link];
+      return g_buf;
+    }
+  else
+    {
+      return G_loc();
+    }
+#endif
 }
 
 
@@ -715,6 +746,7 @@ void FixHPlane::iter()
 
     VRB.Func(cname, fname);
   
+#ifdef NEW_GFIX
     int recurse = hplane_dim - 1;
     //----------------------------------------------------------------------
     // I divided distance loop to even and odd part.
@@ -740,6 +772,29 @@ void FixHPlane::iter()
             iter(recurse, dist);
         copy_nbr_gauge();
     }
+#else
+  int recurse = hplane_dim - 1;
+  //----------------------------------------------------------------------
+  // I divided distance loop to even and odd part.
+  //
+  // Even or Odd is defined by
+  // mod( index[0]+...+index[hplane_dim-1], 2 ) = 0 or 1
+  //                                        Takeshi Yamazaki
+  //----------------------------------------------------------------------
+  if (GJP.GfixChkb()==0){
+     VRB.Flow(cname,fname,"using sequential order gauge fixing");
+  for(int dist = dist_max[recurse] + 1; dist-- > 0; )
+    iter(recurse, dist);
+  } else {
+     VRB.Flow(cname,fname,"using checkerboared order gauge fixing");
+  //Even or Odd part
+  for(int dist = dist_max[recurse] + 1; (dist=dist-2) >= 0; )
+    iter(recurse, dist);
+  //Odd or Even part
+  for(int dist = dist_max[recurse] + 2; (dist=dist-2) >= 0; )
+    iter(recurse, dist);
+  }
+#endif
 
 }
 
@@ -1186,9 +1241,38 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
                         if(iternum >= MaxIterNum)
                             not_converged += 1;
 	    
+#ifdef NEW_GFIX
                         tot_iternum += iternum;
                     }
             }
+#else
+	    tot_iternum += iternum;
+	  }
+      }
+  }
+
+  //------------------------------------------------------------------------
+  // deallocate Ind2Dir
+  //------------------------------------------------------------------------
+  VRB.Sfree(cname, fname, "Ind2Dir", Ind2Dir);
+  sfree(Ind2Dir);
+
+  //--------------------------------------------------------------
+  // Issue a warning through broadcast if MaxIterNum is reached
+  //--------------------------------------------------------------
+  glb_sum(&not_converged);
+  if (not_converged > 0.5) 
+    {
+      VRB.Warn(cname,fname, 
+	       "Some hyperplanes did not reach accuracy in %d iterations\n",
+	       MaxIterNum);
+      return -tot_iternum;
+    }
+  else
+    {
+      return tot_iternum;
+#endif
+#ifdef NEW_GFIX
     }
 
     //------------------------------------------------------------------------
@@ -1217,6 +1301,7 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
     else
         {
             return (int)tot_iternum;
+#endif
         }
 }
 

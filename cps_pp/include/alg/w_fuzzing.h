@@ -26,7 +26,7 @@ class WspectFuzzing : public WspectGinfo {
   //private members
   //---------------  
 private:
-  static char *d_class_name;
+  static const char *d_class_name;
   
   Matrix *fuzzedlink_p;  //storage [site][mu][c1][c2][re,img],  mu=0,1,2
   Matrix *fuzzedlink_tmp_p; //temporary buffer

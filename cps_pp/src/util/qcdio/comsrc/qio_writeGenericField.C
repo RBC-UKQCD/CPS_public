@@ -38,7 +38,6 @@ void qio_getGenField(char *buf_, size_t site_index, int count, void *arg)
 {
  /*printf(" called  with count %i\n",count);*/\
   
-  const Float *field = (Float*) arg;
 
   const int n_field = qio_genfield_glb. n_fields;
   const int f_size = qio_genfield_glb. f_size_per_site;
@@ -47,9 +46,7 @@ void qio_getGenField(char *buf_, size_t site_index, int count, void *arg)
 #if 0
   printf("qio_geGenField: %d %d %d %d %d %x\n", n_field, f_size, n_sites,count, site_index, buf_);
 #endif
-  
-  Float *buf = (Float*) buf_;
-  
+
   /*
     The field should store data in memory in the following format :
 
@@ -69,11 +66,28 @@ void qio_getGenField(char *buf_, size_t site_index, int count, void *arg)
     
   */
 
-  for(int field_i=0; field_i<n_field;++field_i){
-    moveMem(  buf  + f_size* ( field_i   ),  
-	      field+ f_size* (site_index + n_sites * field_i   ), 
-	      sizeof(Float)* f_size);
+  if(qio_genfield_glb.precision){
+    
+    const Float *field = (Float*) arg;
+
+    Float *buf = (Float*) buf_;
+    for(int field_i=0; field_i<n_field;++field_i){
+      moveMem(  buf  + f_size* ( field_i   ),  
+		field+ f_size* (site_index + n_sites * field_i   ), 
+		sizeof(Float)* f_size);
+    }
+  }else{
+
+    const float *field = (float*) arg;
+
+    float *buf = (float*) buf_;
+    for(int field_i=0; field_i<n_field;++field_i){
+      moveMem(  buf  + f_size* ( field_i   ),  
+		field+ f_size* (site_index + n_sites * field_i   ), 
+		sizeof(float)* f_size);
+    }
   }
+    
   //printf("\n");
   
   /*printf("  %i wrote %f %f\n",ii,*(array + 2*ii), *(array+2*ii+1));*/\  
@@ -188,19 +202,20 @@ void qio_writeGenericFields::write_genericfields(
   // For the actual I/O, we use the number of local sites
   qio_genfield_glb. n_sites = GJP. VolNodeSites();
 
-  // Now create the record info for fireld itself
+  // Now create the record info for field itself
 
   // printf("record :%d %d = %d\n", n_fields, f_size_per_site, n_fields * f_size_per_site);
   
-  QIO_RecordInfo *record_field 
-    =   QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, (char*)"GenericField", (char*)"D", 0, 0,
-			       n_fields * f_size_per_site*sizeof(Float), 1);
-  // color=0 (not used), spin=0 (not used),  sizepersite, there will be num_fields
+  QIO_RecordInfo *record_field ;
   
   // Do the actual work
   if(SingleDouble)
     {
       //output in double-precision
+
+      record_field = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, (char*)"GenericField", (char*)"D", 0, 0,
+	  		                    n_fields * f_size_per_site*sizeof(Float), 1);
+      // color=0 (not used), spin=0 (not used),  sizepersite, there will be num_fields
 
       return_val += QIO_write( qio_Output, record_field, no_string,
 			       qio_getGenField,
@@ -210,7 +225,17 @@ void qio_writeGenericFields::write_genericfields(
     }
   else
     {
-      ERR.NotImplemented(cname,fname,"Sorry for lack of support for single precision sotre at this moment");
+      //ERR.NotImplemented(cname,fname,"Sorry for lack of support for single precision sotre at this moment");
+      //output in single-precision
+
+      record_field = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, (char*)"GenericField", (char*)"F", 0, 0,
+	  		                    n_fields * f_size_per_site*sizeof(float), 1);
+      // color=0 (not used), spin=0 (not used),  sizepersite, there will be num_fields
+
+      return_val += QIO_write( qio_Output, record_field, no_string,
+			       qio_getGenField,
+			       n_fields* f_size_per_site*sizeof(float),
+			       sizeof(float), field);
     }
 
   if ( (return_val == 0) ) 

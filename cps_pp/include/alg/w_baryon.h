@@ -88,7 +88,7 @@ public:
   //-------------------------------------------------------------------------
 private:
   // static data member
-  static char *                d_class_name;
+  static const char *                d_class_name;
 
   // the correlators after Dirac projection with Tr(Unit...) etc
   Float *                      d_unit_p;      // Tr (Unit ...)

@@ -1,7 +1,7 @@
 /*!\file
     Asqtad Dirac operator code for QCDOC.
 
-    $Id: asqd_sum_cpp.C,v 1.3 2008-02-08 18:35:07 chulwoo Exp $
+    $Id: asqd_sum_cpp.C,v 1.3 2008/02/08 18:35:07 chulwoo Exp $
 */
 
 #include "asq_data_types.h"

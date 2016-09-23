@@ -30,7 +30,7 @@ class WspectField : public WspectGinfo{
 
  private:
 
-  static char *  d_class_name;
+  static const char *  d_class_name;
   
   //Buffer used to store Field Tensors
   int ft_size; //size of buffer in IFloats

@@ -5,19 +5,19 @@ CPS_START_NAMESPACE
 
   Used by derivatives of the FwilsonTypes class.
 
-  $Id: gamma_5.C,v 1.4 2004-08-18 11:58:04 zs Exp $
+  $Id: gamma_5.C,v 1.4 2004/08/18 11:58:04 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:04 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/noarch/gamma_5.C,v 1.4 2004-08-18 11:58:04 zs Exp $
-//  $Id: gamma_5.C,v 1.4 2004-08-18 11:58:04 zs Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/08/18 11:58:04 $
+//  $Header: /space/cvs/cps/cps++/src/util/lattice/f_wilson_types/noarch/gamma_5.C,v 1.4 2004/08/18 11:58:04 zs Exp $
+//  $Id: gamma_5.C,v 1.4 2004/08/18 11:58:04 zs Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $Revision: 1.4 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson_types/noarch/gamma_5.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/lattice/f_wilson_types/noarch/gamma_5.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

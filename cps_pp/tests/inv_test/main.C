@@ -1,5 +1,4 @@
 /*
-  $Id: main.C,v 1.4 2012-12-05 16:39:19 chulwoo Exp $
 */
 
 #include<stdlib.h>

@@ -73,7 +73,8 @@ QPropW::RestoreQProp (char *name, int mid)
       }
     }
   } else {
-    qio_readPropagator readPropQio (qp_arg.file, QIO_FULL_SOURCE,
+    //qio_readPropagator readPropQio (qp_arg.file, QIO_FULL_SOURCE,
+    qio_readPropagator readPropQio (name, QIO_FULL_SOURCE,
 				    &prop[0], read_source, GJP.argc (),
 				    GJP.argv (), VOLFMT);
 		src_hyper=readPropQio.hyper_n;
@@ -96,11 +97,18 @@ QPropW::RestoreQProp (char *name, int mid)
 
     for (int ii (0); ii < GJP.VolNodeSites (); ++ii)
       *(prop + ii) *= renFac;
+
+  }else if(Lat.Fclass () == F_CLASS_MOBIUS){
+    
+    Float renFac = (GJP.Mobius_b()*( 4 - GJP.DwfHeight() ) + GJP.DwfA5Inv());
+    
+    for(int ii(0); ii < GJP.VolNodeSites(); ++ii)
+      *(prop + ii) *= renFac;    
   }
 
   int glb_walls = GJP.TnodeSites () * GJP.Tnodes ();
 
-  if ((Lat.Fclass () == F_CLASS_DWF) && mid) {
+  if ( (Lat.F5D()) && mid ) {
 
     // Set the node size of the full (non-checkerboarded) fermion field
     //----------------------------------------------------------------
@@ -613,6 +621,11 @@ QPropW::SaveQProp (char *name, int mid)
 	     GJP.DwfHeight ());
     break;
 
+  case F_CLASS_MOBIUS:
+    sprintf(fermionInfo,"MOBIUS, Ls=%i, M5=%0.2f, B=%0.2f, C=%0.2f",
+	    GJP.Sites(4),GJP.DwfHeight(),GJP.Mobius_b(),GJP.Mobius_c());
+    break;
+
   case F_CLASS_NONE:
     sprintf (fermionInfo, "NO FERMION TYPE");
     break;
@@ -671,7 +684,17 @@ QPropW::SaveQProp (char *name, int mid)
     for (int ii (0); ii < GJP.VolNodeSites (); ++ii)
       *(save_prop + ii) = renFac * prop[ii];
 
+  }else if(AlgLattice().Fclass() == F_CLASS_MOBIUS){
+    
+    Float renFac = 1./((GJP.Mobius_b()*( 4 - GJP.DwfHeight() ) + GJP.DwfA5Inv()));
 
+    save_prop =
+      (WilsonMatrix *) smalloc (cname, fname, "save_prop",
+				GJP.VolNodeSites () * sizeof (WilsonMatrix));
+
+    for (int ii (0); ii < GJP.VolNodeSites (); ++ii)
+      *(save_prop + ii) = renFac * prop[ii];
+     
   } else
     save_prop = &prop[0];
 
@@ -754,7 +777,7 @@ QPropW::SaveQProp (char *name, int mid)
 
 #endif // USE_QIO
 
-  if (AlgLattice ().Fclass () == F_CLASS_DWF)
+  if ( AlgLattice().F5D() )
     sfree (save_prop);
 
   sfree (save_source);

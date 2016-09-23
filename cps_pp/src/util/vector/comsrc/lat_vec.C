@@ -2,7 +2,7 @@
 /*!\file
   \brief  Implementation of LatData class methods.
 
-  $Id: lat_vec.C,v 1.7 2006-07-13 20:14:44 chulwoo Exp $
+  $Id: lat_vec.C,v 1.7 2006/07/13 20:14:44 chulwoo Exp $
 */
 //------------------------------------------------------------------
 

@@ -27,7 +27,7 @@ extern "C"{
   //C++ routines
 #ifdef CPP
   //Matrix multiplication for full matrix fields
-  void cmm_agg_cpp(gauge_agg *chi, matrix *phi, matrix *result, int counter);
+  void cmm_agg_cpp(gauge_agg *chi, PTmatrix *phi, PTmatrix *result, int counter);
   void cmv_agg_cpp( int sites, long u,long in, long out);
   #define partrans_cmm_agg(A,B,C,D) cmm_agg_cpp(A,B,C,2*D)
   #define partrans_cmv_agg(A,B,C,D) cmv_agg_cpp(A,B,C,D)
@@ -51,7 +51,7 @@ extern "C"{
   //Assembly Routines
 #else
   //Matrix multiplication for full matrix fields
-  void pt_cmm_agg(gauge_agg *chi, matrix *phi,matrix *result, int counter);
+  void pt_cmm_agg(gauge_agg *chi, PTmatrix *phi,PTmatrix *result, int counter);
   //void cmm_agg(gauge_agg *chi, matrix *phi,matrix *result, int counter);
   void pt_asqtad_agg( int sites, long chi, long u,long in, long out);
   void pt_asqtad_agg_s( int sites, long chi, long u,long in, long out);
@@ -106,18 +106,18 @@ extern "C"{
   
   //---------------------------------------------------------------------------
 
-  void m1m2_lookup(matrix *result, matrix *m1, matrix *m2, int length,
+  void m1m2_lookup(PTmatrix *result, PTmatrix *m1, PTmatrix *m2, int length,
 		   unsigned long *dest, unsigned long *dest2, unsigned long *src);
-  void m1m2_lookup_copy(matrix *result2, matrix *result, matrix *m1, matrix *m2, 
+  void m1m2_lookup_copy(PTmatrix *result2, PTmatrix *result, PTmatrix *m1, PTmatrix *m2, 
 			int length, unsigned long *dest2,  
 			unsigned long *dest, unsigned long *dest3, 
 			unsigned long *src);
-  void m1m2_lin_copy(matrix *result2, matrix *result, matrix *m1, matrix *m2, 
+  void m1m2_lin_copy(PTmatrix *result2, PTmatrix *result, PTmatrix *m1, PTmatrix *m2, 
 		     int length, unsigned long *dest2,
 		     unsigned long *dest, unsigned long *dest3);
   
 }
-inline  void pt_cmm_agg_print(gauge_agg *chi, matrix *phi,matrix *result, int counter){
+inline  void pt_cmm_agg_print(gauge_agg *chi, PTmatrix *phi,PTmatrix *result, int counter){
    printf("pt_cmm_agg(%p %p %p %d)\n",chi,phi,result,counter);
 //    for(int i =0;i<2*counter;i++){
 //      printf("%d: %d %d\n",i,chi[i].src,chi[i].dest);

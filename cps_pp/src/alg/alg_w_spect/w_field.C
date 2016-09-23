@@ -39,7 +39,7 @@ CPS_START_NAMESPACE
 
 #define MATRIX_SIZE 18
 
-char *WspectField::d_class_name="WspectField"; 
+const char *WspectField::d_class_name="WspectField"; 
 
 
 

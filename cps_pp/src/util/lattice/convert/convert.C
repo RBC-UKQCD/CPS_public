@@ -7,7 +7,7 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/convert/convert.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/lattice/convert/convert.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

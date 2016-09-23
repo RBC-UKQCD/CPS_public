@@ -16,7 +16,6 @@
 ----------------------------------------------------------*/
 
 #include <comms/sysfunc_qmp.h>
-//#include <comms/scu_dir_arg.h>
 #include <util/qcdio.h>
 #include <util/error.h>
 #include <stdlib.h>
@@ -60,7 +59,11 @@ namespace QMPSCU {
 
   //Clean up resources used by QMP
   void destroy_qmp() {
-    QMP_finalize_msg_passing();
+QMP_status_t sync_status = QMP_barrier(); 
+if (sync_status != QMP_SUCCESS) {
+      QMP_error("Error in destrot_qmp QMP_barrier():%s\n", QMP_error_string(sync_status));
+}
+QMP_finalize_msg_passing();
   }
 
   //Initialize QMP with null command line
@@ -146,7 +149,7 @@ void init_qmp(int * argc, char ***argv) {
 	peNum *= peGrid[i];
     peRank = peRank % peNum;
   }
-  int if_print=1;
+  int if_print=0;
   for(int i = 0;i<NDIM;i++)
   if (pePos[i]>=2) if_print=0;
 
@@ -276,7 +279,6 @@ unsigned int SeedST(){return SERIAL_SEED;} //!< Gets a RNG seed.
   \return 0
 */
 //----------------------------------------------------------------
-#ifndef HAVE_SYNC
 #ifdef UNIFORM_SEED_NO_COMMS
 unsigned int sync(){return 1;}
 #else
@@ -288,7 +290,6 @@ if (sync_status != QMP_SUCCESS) {
 }
 return 1;
 }
-#endif
 #endif
 
 //----------------------------------------------------------------

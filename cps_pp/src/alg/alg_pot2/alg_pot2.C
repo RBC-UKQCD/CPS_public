@@ -1,18 +1,7 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2012-08-10 14:05:33 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot2/alg_pot2.C,v 1.3 2012-08-10 14:05:33 chulwoo Exp $
-//  $Id: alg_pot2.C,v 1.3 2012-08-10 14:05:33 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: alg_pot2.C,v $
-//  $Revision: 1.3 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_pot2/alg_pot2.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 // last modification: manke, Feb 1, 2001

@@ -6,7 +6,7 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_init.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_dwf/noarch/dwf_init.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -57,17 +57,20 @@ void dwf_init(Dwf *dwf_p)
 //------------------------------------------------------------------
   int f_size = 24 * GJP.VolNodeSites() * GJP.SnodeSites() / 2; 
 
-  dwf_p->frm_tmp1 = (IFloat *) smalloc(f_size*sizeof(IFloat));
-  if(dwf_p->frm_tmp1 == 0)
-    ERR.Pointer(cname,fname, "frm_tmp1");
-  VRB.Smalloc(cname,fname,
-	      "frm_tmp1", dwf_p->frm_tmp1, f_size*sizeof(IFloat));
+  dwf_p->frm_tmp1 = (IFloat *) smalloc(cname,fname,"frm_tmp1",f_size*sizeof(IFloat));
+//  if(dwf_p->frm_tmp1 == 0)
+//    ERR.Pointer(cname,fname, "frm_tmp1");
+//  VRB.Smalloc(cname,fname,
+//	      "frm_tmp1", dwf_p->frm_tmp1, f_size*sizeof(IFloat));
 
-  dwf_p->frm_tmp2 = (IFloat *) smalloc(f_size*sizeof(IFloat));
-  if(dwf_p->frm_tmp2 == 0)
-    ERR.Pointer(cname,fname, "frm_tmp2");
-  VRB.Smalloc(cname,fname,
-	      "frm_tmp2", dwf_p->frm_tmp2, f_size*sizeof(IFloat));
+  dwf_p->frm_tmp2 = (IFloat *) smalloc(cname,fname,"frm_tmp2",f_size*sizeof(IFloat));
+//  if(dwf_p->frm_tmp2 == 0)
+//    ERR.Pointer(cname,fname, "frm_tmp2");
+//  VRB.Smalloc(cname,fname,
+//	      "frm_tmp2", dwf_p->frm_tmp2, f_size*sizeof(IFloat));
+  dwf_p->frm_tmp3 = (IFloat *) smalloc(cname,fname,"frm_tmp3",f_size*sizeof(IFloat));
+  VRB.Result(cname,fname,"frm_tmp1 frm_tmp2 frm_tmp3= %p %p %p\n",
+	dwf_p->frm_tmp1, dwf_p->frm_tmp2, dwf_p->frm_tmp3);
 
 //------------------------------------------------------------------
 // Allocate memory for a 12 word communications buffer needed

@@ -9,7 +9,6 @@
 #include <cstdio>
 #include <cmath>
 
-
 CPS_START_NAMESPACE
 using namespace std;
 

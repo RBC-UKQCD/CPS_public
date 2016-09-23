@@ -2,23 +2,7 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_vec.C,v 1.8 2012-08-02 21:20:01 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012-08-02 21:20:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v 1.8 2012-08-02 21:20:01 chulwoo Exp $
-//  $Id: pt_vec.C,v 1.8 2012-08-02 21:20:01 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: pt_vec.C,v $
-//  $Revision: 1.8 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_vec.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 #include "asq_data_types.h"
 #include "pt_int.h"
 #include "pt_qcdoc.h"

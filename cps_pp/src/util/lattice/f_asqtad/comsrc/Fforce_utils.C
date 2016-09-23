@@ -3,7 +3,7 @@
 /*!\file
   \brief  Routines used in the Asqtad RHMC fermion force calculation
 
-  $Id: Fforce_utils.C,v 1.4 2006-04-13 18:16:16 chulwoo Exp $
+  $Id: Fforce_utils.C,v 1.4 2006/04/13 18:16:16 chulwoo Exp $
 */
 //----------------------------------------------------------------------
 

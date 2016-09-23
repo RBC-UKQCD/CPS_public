@@ -32,7 +32,7 @@
  * From @(#)rpc_main.c 1.30 89/03/30 (C) 1987 SMI;
  */
 const char main_rcsid[] =
-  "$Id: rpc_main.c,v 1.6 2005-05-18 06:19:46 chulwoo Exp $";
+  "$Id: rpc_main.c,v 1.6 2005/05/18 06:19:46 chulwoo Exp $";
 
 /*
  * rpc_main.c, Top level of the RPC protocol compiler.

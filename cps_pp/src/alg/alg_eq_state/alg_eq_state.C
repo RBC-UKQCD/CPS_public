@@ -1,7 +1,7 @@
 /*!\file
   \brief Implementation of AlgEqState class methods.
 
-  $Id: alg_eq_state.C,v 1.8 2004-09-02 17:00:12 zs Exp $
+  $Id: alg_eq_state.C,v 1.8 2004/09/02 17:00:12 zs Exp $
 */
 
 #include<config.h>
@@ -10,14 +10,14 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-09-02 17:00:12 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eq_state/alg_eq_state.C,v 1.8 2004-09-02 17:00:12 zs Exp $
-//  $Id: alg_eq_state.C,v 1.8 2004-09-02 17:00:12 zs Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/09/02 17:00:12 $
+//  $Header: /space/cvs/cps/cps++/src/alg/alg_eq_state/alg_eq_state.C,v 1.8 2004/09/02 17:00:12 zs Exp $
+//  $Id: alg_eq_state.C,v 1.8 2004/09/02 17:00:12 zs Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: alg_eq_state.C,v $
 //  $Revision: 1.8 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_eq_state/alg_eq_state.C,v $
+//  $Source: /space/cvs/cps/cps++/src/alg/alg_eq_state/alg_eq_state.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /*!\file
   \brief  Definition of the NoiseArg structure.
 
-  $Id: noise_arg.x,v 1.3 2006-05-22 21:12:04 chulwoo Exp $
+  $Id: noise_arg.x,v 1.3 2006/05/22 21:12:04 chulwoo Exp $
 */
 /*---------------------------------------------------------------------------*/
 /*  noise_arg.h */

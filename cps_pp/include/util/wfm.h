@@ -2,7 +2,7 @@
 /*! \file
  \brief Definitions for the Wilson fermion matrix code
 
- $Id: wfm.h,v 1.7 2009-03-23 19:13:32 chulwoo Exp $
+ $Id: wfm.h,v 1.7 2009/03/23 19:13:32 chulwoo Exp $
 */
 /* Jan/2003                                                                 */
 /* Peter Boyle.                                                             */

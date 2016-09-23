@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgHQPotential class.
 
-  $Id: alg_hq_pot.h,v 1.2 2007-06-05 15:44:19 chulwoo Exp $
+  $Id: alg_hq_pot.h,v 1.2 2007/06/05 15:44:19 chulwoo Exp $
 */
 //------------------------------------------------------------------
 

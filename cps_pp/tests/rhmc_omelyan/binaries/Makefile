@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2005-10-04 15:29:14 chulwoo Exp $
+# $Id: Makefile,v 1.2 2005/10/04 15:29:14 chulwoo Exp $
 # tests/Makefile_common.  Generated from Makefile_common.in by configure.
 #   This is the makefile for all the commands
 #   that are common for all testing applications.

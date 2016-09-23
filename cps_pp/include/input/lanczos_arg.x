@@ -13,8 +13,8 @@ class  MatrixPolynomialArg {
 
    Float params<>;
 
-   Pointer tmp1;
-   Pointer tmp2; // the pointer to the temporaly vectors
+   Float* tmp1;
+   Float* tmp2; // the pointer to the temporaly vectors
 };
 
 class LanczosArg {
@@ -26,7 +26,9 @@ class LanczosArg {
 
     Float mass; // mass of the operator
 
-    int nk_lanczos_vectors;  //desired number of Lanczos eigenvectors
+    int nk_lanczos_vectors;  //number of Lanczos eigenvectors kept in implicit restart
+    int nt_lanczos_vectors;  //desired number of Lanczos eigenvectors
+
     int np_lanczos_vectors;  // extra Lanczos eigenvectors used in Implicit Restart
     Float eigen_shift;     // shift for target eigenvalues, only for DWF, for now 
     Float stop_residual;     /*!< Absolute residual.  */

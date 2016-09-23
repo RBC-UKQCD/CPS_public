@@ -1,7 +1,7 @@
 /*!\file
   Wilson Dirac operator code for QCDOC
 
-  $Id: d_op_wilson.C,v 1.10 2006-02-21 21:14:09 chulwoo Exp $
+  $Id: d_op_wilson.C,v 1.10 2006/02/21 21:14:09 chulwoo Exp $
 */
 //------------------------------------------------------------------
 //

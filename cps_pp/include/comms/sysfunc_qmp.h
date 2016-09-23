@@ -59,11 +59,15 @@ unsigned int SeedS();  //!< Gets a RNG seed.
 unsigned int SeedT();  //!< Gets a RNG seed.
 unsigned int SeedST(); //!< Gets a RNG seed.
 
-#ifndef HAVE_SYNC
+//#ifndef HAVE_SYNC
 unsigned int sync();
 //! A barrier function.
 //inline void sync(){QMP_barrier();}
-#endif
+//#endif
+inline void broadcast( void *data, size_t size){
+   QMP_status_t status = QMP_broadcast(data, size);
+   if(status) QMP_abort_string( status, "failed inside CPS::broadcast\n");
+}
 
 //! Gets the direction used internally by the comms layer.
 //int SCURemap( SCUDir dir );

@@ -4,20 +4,20 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Routines used by the AlgGheatBath class methods:
 
-  $Id: alg_ghb_krn.C,v 1.9 2005-09-06 20:33:36 chulwoo Exp $
+  $Id: alg_ghb_krn.C,v 1.9 2005/09/06 20:33:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2005-09-06 20:33:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v 1.9 2005-09-06 20:33:36 chulwoo Exp $
-//  $Id: alg_ghb_krn.C,v 1.9 2005-09-06 20:33:36 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2005/09/06 20:33:36 $
+//  $Header: /space/cvs/cps/cps++/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v 1.9 2005/09/06 20:33:36 chulwoo Exp $
+//  $Id: alg_ghb_krn.C,v 1.9 2005/09/06 20:33:36 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: alg_ghb_krn.C,v $
 //  $Revision: 1.9 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v $
+//  $Source: /space/cvs/cps/cps++/src/alg/alg_ghb/noarch/alg_ghb_krn.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

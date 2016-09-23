@@ -78,6 +78,7 @@ public:
   void GaugeFixSink       ( Lattice& lat, int dir, int unfix=0);
 
   /*! Gauge fix sink - Landau gauge */
+  void LandauGaugeFixSrc(Lattice& lat, int spin);
   void LandauGaugeFixSink ( Lattice& lat );
   void SetLandauGaugeMomentaSource ( Lattice& lat , 
                                      int colour   , 

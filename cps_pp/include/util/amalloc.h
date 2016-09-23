@@ -2,7 +2,7 @@
 /*!\file
   \brief  Declaration of dynamic memory allocation routine for arrays.
 
-  $Id: amalloc.h,v 1.5 2004-11-07 23:52:47 chulwoo Exp $
+  $Id: amalloc.h,v 1.5 2004/11/07 23:52:47 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 #ifndef AMALLOC_H

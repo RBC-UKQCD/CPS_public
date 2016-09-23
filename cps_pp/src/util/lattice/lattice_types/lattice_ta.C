@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GtadpoleRectFasqtad class.
 
-  $Id: lattice_ta.C,v 1.2 2005-05-12 20:47:01 chulwoo Exp $
+  $Id: lattice_ta.C,v 1.2 2005/05/12 20:47:01 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 

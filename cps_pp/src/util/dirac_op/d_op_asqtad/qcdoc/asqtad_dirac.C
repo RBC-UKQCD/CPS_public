@@ -1,15 +1,15 @@
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2006-06-11 05:35:06 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.30 2006-06-11 05:35:06 chulwoo Exp $
-//  $Id: asqtad_dirac.C,v 1.30 2006-06-11 05:35:06 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2006/06/11 05:35:06 $
+//  $Header: /space/cvs/cps/cps++/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v 1.30 2006/06/11 05:35:06 chulwoo Exp $
+//  $Id: asqtad_dirac.C,v 1.30 2006/06/11 05:35:06 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: asqtad_dirac.C,v $
 //  $Revision: 1.30 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_asqtad/qcdoc/asqtad_dirac.C,v $
 //  $State: Exp $
 //
 //    12/02 HueyWen Lin, Chulwoo Jung

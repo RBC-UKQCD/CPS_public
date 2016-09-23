@@ -54,12 +54,16 @@ public:
 	CalcQpropType calc_QProp;
 	CalcSeqType calc_seqQ;
 	char *prop_file;
+	char *u_seq_prop_file;
+	char *d_seq_prop_file;
+	char *ptsrc_prop_file;
 	char *ensemble_label;
 	int ensemble_id;
 	int StartSrcSpin;
 	int EndSrcSpin;
 	int StartSrcColor;
 	int EndSrcColor;
+	int DoDisconnected;
 	   Nuc3ptArg (  ) ;
 	   void check_args (  ) ;
 	   int NumMasses (  ) ;

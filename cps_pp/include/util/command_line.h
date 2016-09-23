@@ -40,6 +40,9 @@ public:
 
   static void reset()      { inst.count=0; } 
   static int    num() { return inst.count; } 
+  static int    len() { return inst.argc; } 
+  static int    end() { if (inst.count>=(inst.argc-1)) return 1; 
+			else return 0; } 
 
   static char* arg         ( int num );
   static int   arg_as_int  ( int num );

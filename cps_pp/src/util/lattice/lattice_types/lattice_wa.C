@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of the GwilsonFasqtad class.
 
-  $Id: lattice_wa.C,v 1.5 2004-08-18 11:58:06 zs Exp $
+  $Id: lattice_wa.C,v 1.5 2004/08/18 11:58:06 zs Exp $
 */
 //--------------------------------------------------------------------
 

@@ -4,23 +4,7 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
-  $Id: d_op_dwf.C,v 1.7 2013-04-05 17:51:13 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:51:13 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v 1.7 2013-04-05 17:51:13 chulwoo Exp $
-//  $Id: d_op_dwf.C,v 1.7 2013-04-05 17:51:13 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: d_op_dwf.C,v $
-//  $Revision: 1.7 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/d_op_dwf.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // d_op_dwf.C
@@ -42,6 +26,9 @@ CPS_END_NAMESPACE
 #include <util/dwf.h>
 //#include <mem/p2v.h>
 #include <comms/glb.h>
+#ifdef USE_BLAS
+#include <util/qblas_extend.h>
+#endif
 
 #ifdef USE_CG_DWF_WRAPPER
 #include "cps_cg_dwf.h"
@@ -703,5 +690,227 @@ void DiracOpDwf::DiracOpGlbSum(Float *float_p) {
 //  }
 }
 
+
+//#undef DEBUG_DWF_DSLASH
+//#define DEBUG_DWF_DSLASH
+#ifdef  DEBUG_DWF_DSLASH
+#undef DEBUG_DWF_DSLASH
+#define DEBUG_DWF_DSLASH(msg,a ...) do		\
+    if( UniqueID()%100==0 )			\
+      printf("[%05d] " msg, UniqueID() ,##a);	\
+  while(0);
+
+#else
+#define time_elapse() 0
+#define DEBUG_DWF_DSLASH(msg,a ...) {}
+#endif
+
+
+#ifndef USE_BLAS
+#define MOVE_FLOAT( pa, pb, n )  moveFloat(pa, pb, n) 
+#define VEC_TIMESEQU_FLOAT(py, fact, n ) vecTimesEquFloat( py, fact, n)
+#define AXPY(n, fact, px, py)  fTimesV1PlusV2(py, fact, px, py, n)
+#else
+#define MOVE_FLOAT( pa, pb, n )  cblas_dcopy(n, pb, 1, pa, 1)
+#define VEC_TIMESEQU_FLOAT(py, fact, n ) cblas_dscal( n,  fact, py,1 )
+#define AXPY(n, fact, px, py)  cblas_daxpy(n, fact, px,1,py,1)
+#endif
+
+
+//------------------------------------------------------------------
+// RitzMat(Vector *out, Vector *in) :
+// RitzMat is the base operator used in in Ritz.
+// RitzMat works on the full or half lattice.
+// The in, out fields are defined on the full or half lattice.
+//------------------------------------------------------------------
+void DiracOpDwf::RitzMat(Vector *out, Vector *in) {
+  char *fname = "RitzMat(V*,V*)";
+  VRB.Func(cname,fname);
+
+  //printf("single ritzmat %d\n",dirac_arg->RitzMatOper);
+  switch(dirac_arg->RitzMatOper)
+    {
+      // Now always call MatPcDagMatPcShift even for MATPCDAG_MATPC case
+      //
+      //case MATPCDAG_MATPC:
+    case MATPCDAG_MATPC:
+      MatPcDagMatPc(out, in);
+      break;
+    //case MATPCDAG_MATPC_SHIFT:
+      //MatPcDagMatPcShift(out, in);
+      //break;
+    case MATPC_HERM :
+      MatPcHerm(out, in);
+      break;
+
+    case MAT_HERM:
+    case MATDAG_MAT:
+      MatDagMat(out, in);
+      break;
+    case NEG_MATPCDAG_MATPC:
+      MatPcDagMatPc(out, in);
+      out -> VecNegative(out, RitzLatSize());
+      break;    
+      
+    case NEG_MATDAG_MAT:
+      MatDagMat(out, in);
+      out->VecNegative(out, RitzLatSize());
+      break;
+      
+    default:
+      ERR.General(cname,fname,"RitzMatOper %d not implemented\n",
+		  dirac_arg->RitzMatOper);
+    }
+
+#if 0
+  //debug
+  const int size = RitzLatSize(); // this is number of Float, f_size .
+  Complex deb = out->CompDotProductGlbSum(in, size);
+  Float d_deb = in->NormSqGlbSum(size);
+  printf("single Ritz %e %e %e\n", deb.real()/d_deb, deb.imag()/d_deb,d_deb);
+  //debug
+#endif
+}
+
+
+
+// PolynomialAccerelation
+//
+//  Q = [ -2 RitzMat + (alpha + beta) ] / [ alpha - beta ]
+//
+//  Output:  out =  T_n(Q) in
+//
+//  T_0 = 1,    T_1 = Q
+//   T_{n+1}(Q) =  2 Q T_n(Q)  - T_{n-1}(Q)
+//  
+// Calling virtual RitzMat(V*,V*)
+//
+//   alpha = param[0]^2
+//   beta = ( param[1] + fabs(eigend_shift) )^2
+//
+void DiracOpDwf::RitzMat(Vector *out, Vector *in,
+			 MatrixPolynomialArg* cheby_arg) {
+  char *fname = "RitzMat(V*,V*,I,F,F,F,V*,V*)";
+  VRB.Func(cname,fname);
+
+  //MatPcDagMatPcShift(out, in);
+  //return;
+  
+  //DEBUG_DWF_DSLASH( "dummy %e\n", time_elapse() );
+  double time_start=dclock();
+    
+  //printf("cheby ritzmat %d\n", dirac_arg->RitzMatOper);
+
+
+  //debug const
+  const Dwf *dwf_arg = (Dwf *) dwf_lib_arg;
+  const Float shift = dirac_arg->eigen_shift;
+  //printf("shift =%e\n",shift);exit(1);
+
+
+  const int Npol = cheby_arg-> Npol;
+  const int size = RitzLatSize(); // this is number of Float, f_size .
+  //
+  // Q = 2 / (alpha-beta)  RitzMat  -   (alpha+beta)/(alpha-beta)
+  // 2 Q =   c1  (  c0 Ddag D  -   1 )
+  //  c1 = 2 (alpha+beta)/(alpha-beta),   c0 =  2 / (alpha+beta)
+  //
+  const Float alpha = pow( cheby_arg-> params.params_val[0], 2);
+  const Float beta  = pow( cheby_arg-> params.params_val[1] + fabs(shift), 2);
+  //printf("alpha=%e beta=%e\n", alpha,beta);
+  
+  const Float c1 =   2.0*(alpha+beta)/(alpha-beta);
+  const Float c0 =   2.0/(alpha+beta);
+
+  Vector *tmp  = (Vector*)cheby_arg->tmp1;
+  Vector *tmp2 = (Vector*)cheby_arg->tmp2;
+  
+
+  //  tmp2 =  T_0 v = v = in
+  //tmp2 -> CopyVec(in, size);
+  MOVE_FLOAT( (Float*)tmp2, (Float*)in, size );
+  //  tmp =  T_1 v = Q v = Q in
+  //  QV = 0.5* (2Q)V = 0.5 c1 ( c0 Ddag D - 1)
+
+  RitzMat(tmp, in);
+  
+#if 0
+  tmp->VecTimesEquFloat(c0, size);
+  tmp->VecMinusEquVec(in,size);
+  tmp->VecTimesEquFloat(0.5*c1, size);
+  //  tmp =  0.5 c1 ( c0 DdagD in - in )
+#else
+  VEC_TIMESEQU_FLOAT((Float*)tmp,0.5*c1*c0, size);
+  AXPY( size, -0.5*c1, (Float*)in, (Float*)tmp );
+#endif
+  
+  // debug
+  //out->CopyVec(tmp,size);
+  //printf("cheby %f %f\n", alpha,beta);
+  
+  // loop over
+  for(int i=2; i<=Npol; ++i){
+#if 0
+    // out = 2 Q tmp
+    RitzMat(out, tmp);
+
+    out->VecTimesEquFloat(c0, size);
+    out->VecMinusEquVec(tmp,size);
+    out->VecTimesEquFloat(c1, size);
+
+    // out = out - tmp2
+    out->VecMinusEquVec(tmp2, size);
+#else
+    // out = c1 (  c0 DagD tmp - tmp) -tmp2
+
+    RitzMat(out, tmp);
+
+    VEC_TIMESEQU_FLOAT((Float*)out, c1*c0, size);
+    AXPY( size , - c1, (Float*)tmp, (Float*)out);
+    AXPY( size,  -1.0, (Float*)tmp2, (Float*)out);
+#endif
+
+    
+    if( i!=Npol) {
+#if 0
+      // tmp2 = tmp
+      tmp2->CopyVec(tmp, size);
+      // tmp = out
+      tmp->CopyVec(out, size);
+#else
+      // tmp2 = tmp
+      Vector* swap_tmp2 = tmp2;
+      tmp2 = tmp;
+      tmp = swap_tmp2;
+      // tmp = out
+      tmp->CopyVec(out, size);
+#endif
+    }
+  }
+ 
+  
+  if(!UniqueID()) printf("mpoly tot = %e\n", dclock() - time_start);
+  
+#if 0
+  //debug
+  Complex deb = out->CompDotProductGlbSum(in, size);
+  printf("debug %e %e %e\n", deb.real(), deb.imag(),in->NormSqGlbSum(size));
+  //debug
+#endif
+  
+}
+
+
+//!! N.B. This overwrites contents of  dwf_arg->frm_tmp2
+void DiracOpDwf::MatPcHerm(Vector *out, Vector *in) {
+  char *fname = "MatPcHerm(V*,V*)";
+  VRB.Func(cname,fname);
+  Dwf *dwf_arg = (Dwf *) dwf_lib_arg;
+  Vector* vtmp = (Vector*)(dwf_arg->frm_tmp1);
+  
+  MatPc(vtmp,in);
+  ReflectAndMultGamma5( out, vtmp,  dwf_arg->vol_4d/2, dwf_arg->ls);
+  
+}
 
 CPS_END_NAMESPACE

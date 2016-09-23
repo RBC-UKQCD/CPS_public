@@ -1,4 +1,5 @@
 #ifdef USE_SSE
+//#if 0
 #include "mobius_dslash_5_plus-nonowait.C"
 #else
 #include<config.h>

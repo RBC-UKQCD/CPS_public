@@ -6,23 +6,7 @@
 
   Also declarations of functions that perform operations on complex vectors.
 
-  $Id: vector.h,v 1.40 2013-05-09 04:38:03 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-05-09 04:38:03 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v 1.40 2013-05-09 04:38:03 chulwoo Exp $
-//  $Id: vector.h,v 1.40 2013-05-09 04:38:03 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: vector.h,v $
-//  $Revision: 1.40 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 #include <string.h>
 #include <util/data_types.h>
 #include <util/vector_asm.h>
@@ -170,6 +154,7 @@ void vecTimesComplex(IFloat *a,
 
     //! real scalar times vector multiplication; a = c*b
     void vecEqualsVecTimesEquFloat(IFloat *a, IFloat *b, IFloat c, int); // 
+
 
     //! vector linear combination; a = bc+d
     void fTimesV1PlusV2(IFloat *a, IFloat b, const IFloat *c,

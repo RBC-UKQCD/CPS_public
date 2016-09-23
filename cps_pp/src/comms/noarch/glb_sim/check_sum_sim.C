@@ -8,7 +8,7 @@ CPS_START_NAMESPACE
 */
 //--------------------------------------------------------------------
 //  CVS keywords
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/noarch/glb_sim/check_sum_sim.C,v $
+//  $Source: /space/cvs/cps/cps++/src/comms/noarch/glb_sim/check_sum_sim.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

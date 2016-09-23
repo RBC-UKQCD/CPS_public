@@ -174,6 +174,7 @@ class GnoneFdwf
     GnoneFdwf();
     virtual ~GnoneFdwf();
 };
+
 class GnoneFmobius 
     : public virtual Lattice, 
     public virtual FwilsonTypes, 
@@ -195,6 +196,35 @@ class GnoneFmobius
     virtual ~GnoneFmobius()
 {
   char *fname = "~GnoneFmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
+
+};
+
+
+class GnoneFzmobius 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gnone, 
+    public Fzmobius
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GnoneFzmobius()
+{
+  cname = "GnoneFzmobius";
+  char *fname = "GnoneFzmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
+    virtual ~GnoneFzmobius()
+{
+  char *fname = "~GnoneFzmobius()";
   VRB.Func(cname,fname);
 
   //???
@@ -373,6 +403,36 @@ class GwilsonFmobius
     virtual ~GwilsonFmobius()
 {
   char *fname = "~GwilsonFmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
+};
+//------------------------------------------------------------------
+//! Wilson gauge action with domain wall fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GwilsonFzmobius 
+    : public virtual Lattice, 
+    public virtual FwilsonTypes, 
+    public Gwilson, 
+    public Fzmobius
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GwilsonFzmobius()
+{
+  cname = "GwilsonFzmobius";
+  char *fname = "GwilsonFzmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
+    virtual ~GwilsonFzmobius()
+{
+  char *fname = "~GwilsonFzmobius()";
   VRB.Func(cname,fname);
 
   //???
@@ -621,6 +681,37 @@ class GimprRectFmobius
     virtual ~GimprRectFmobius()
 {
   char *fname = "~GimprRectFmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
+};
+
+//------------------------------------------------------------------
+//! Improved rectangle gauge action with domain wall fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GimprRectFzmobius
+    : public virtual Lattice,
+    public virtual FwilsonTypes,
+    public GimprRect,
+    public Fzmobius
+{
+ private:
+    char *cname;    // Class name.
+
+ public:
+    GimprRectFzmobius()
+{
+  cname = "GimprRectFzmobius";
+  char *fname = "GimprRectFzmobius()";
+  VRB.Func(cname,fname);
+
+  //???
+}
+    virtual ~GimprRectFzmobius()
+{
+  char *fname = "~GimprRectFzmobius()";
   VRB.Func(cname,fname);
 
   //???

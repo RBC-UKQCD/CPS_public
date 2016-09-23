@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions for the MPI implementation of the QCDSP/QCDOC communications layer.
   
-  $Id: sysfunc.C,v 1.10 2008-02-08 18:35:06 chulwoo Exp $
+  $Id: sysfunc.C,v 1.10 2008/02/08 18:35:06 chulwoo Exp $
 */
 /*----------------------------------------------------------------------
 /* The Sysfunc Comms Interface: sysfunc.C
@@ -16,14 +16,14 @@ CPS_START_NAMESPACE
   CVS keywords
  
   $Author: chulwoo $
-  $Date: 2008-02-08 18:35:06 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v 1.10 2008-02-08 18:35:06 chulwoo Exp $
-  $Id: sysfunc.C,v 1.10 2008-02-08 18:35:06 chulwoo Exp $
-  $Name: not supported by cvs2svn $
+  $Date: 2008/02/08 18:35:06 $
+  $Header: /space/cvs/cps/cps++/src/comms/mpi/scu/sysfunc.C,v 1.10 2008/02/08 18:35:06 chulwoo Exp $
+  $Id: sysfunc.C,v 1.10 2008/02/08 18:35:06 chulwoo Exp $
+  $Name: v5_0_16_hantao_io_test_v7 $
   $Locker:  $
   $RCSfile: sysfunc.C,v $
   $Revision: 1.10 $
-  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/mpi/scu/sysfunc.C,v $
+  $Source: /space/cvs/cps/cps++/src/comms/mpi/scu/sysfunc.C,v $
   $State: Exp $  */
 /*----------------------------------------------------------*/
 

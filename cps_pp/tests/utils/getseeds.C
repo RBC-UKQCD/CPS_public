@@ -3,14 +3,14 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:09 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v 1.7 2008-02-08 18:35:09 chulwoo Exp $
-//  $Id: getseeds.C,v 1.7 2008-02-08 18:35:09 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2008/02/08 18:35:09 $
+//  $Header: /space/cvs/cps/cps++/tests/utils/getseeds.C,v 1.7 2008/02/08 18:35:09 chulwoo Exp $
+//  $Id: getseeds.C,v 1.7 2008/02/08 18:35:09 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: getseeds.C,v $
 //  $Revision: 1.7 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/utils/getseeds.C,v $
+//  $Source: /space/cvs/cps/cps++/tests/utils/getseeds.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -71,7 +71,7 @@ int main(int argc,char *argv[]){
 
 
 
-  VRB.Deactivate_level(VERBOSE_RNGSEED_LEVEL);
+  VRB.DeactivateLevel(VERBOSE_RNGSEED_LEVEL);
 
   //----------------------------------------------------------------
   // Get all of the seeds:

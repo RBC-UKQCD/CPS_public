@@ -34,12 +34,16 @@ class Nuc3ptArg {
 	CalcQpropType calc_QProp;
 	CalcSeqType calc_seqQ;
 	string prop_file<>;
+	string u_seq_prop_file<>;
+	string d_seq_prop_file<>;
+	string ptsrc_prop_file<>;
 	string ensemble_label<>;
 	int ensemble_id;
 	int StartSrcSpin;
 	int EndSrcSpin;
 	int StartSrcColor;
 	int EndSrcColor;
+	int DoDisconnected;
 
 	memfun   Nuc3ptArg (  ) ;
 	memfun   void check_args (  ) ;

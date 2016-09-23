@@ -3,14 +3,14 @@
 #define USE_OMP_DWF_FORCE
 #include "dwf_dslash_5_plus_omp.C"
 #else
-#ifdef USE_SSE
+#ifdef USE_SSE_
 #include "../sse/dwf_dslash_5_plus.C"
 #else
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_5_plus.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_dwf/noarch/dwf_dslash_5_plus.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

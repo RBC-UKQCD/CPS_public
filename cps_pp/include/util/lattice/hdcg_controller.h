@@ -7,7 +7,11 @@
 #include<stdlib.h>
 
 #include<bfm_qdp.h>
+#ifdef BFM_OLD
 #include<BfmMultiGrid.h>
+#else
+#include<BfmHDCG.h>
+#endif
 #include<util/time_cps.h>
 #include<comms/sysfunc_cps.h>
 //#include<comms/sysfunc_qmp.h>
@@ -15,7 +19,11 @@
 #include <bfm_hdcg_wrapper.h>
 class HDCGInstance{
 	public:
+#ifdef BFM_OLD
 	static BfmMultiGridParams  Params;
+#else
+	static BfmHDCGParams  Params;
+#endif
 	static HDCG_wrapper  * _instance ;
 	static HDCG_wrapper *getInstance(){return _instance;} 
 	static HDCG_wrapper *setInstance(HDCG_wrapper *_new){_instance = _new;} 
@@ -29,44 +37,48 @@ class HDCGInstance{
 	static void SetDefault(){
 		if (!CPS_NAMESPACE::UniqueID()) printf("HDCGInstance()\n");
 // Partially tuned for 64^3, from PAB's message
-#if 0
-		Params.NumberSubspace=40;
-		Params.SubspaceRationalLs=8;
-		Params.SubspaceRationalLo=0.001;
-		Params.SubspaceRationalResidual=1e-5;
-		Params.SubspaceRationalRefine=1;
-		Params.SubspaceRationalRefineResidual=1e-5;
-		Params.SubspaceRationalRefineLo=0.001;
-		Params.SubspaceSurfaceDepth=12;
-		Params.PreconditionerKrylovResidual=1e-5;
-		Params.PreconditionerKrylovIterMax=8;
-		Params.PreconditionerKrylovShift=1.0;
-		Params.LittleDopSolverResidualInner=5e-3;
-		Params.LittleDopSolverResidualVstart=1e-4;
-		Params.LittleDopSolverResidualSubspace=1.0e-7;
-		Params.LittleDopSolverIterMax = 10000;
-		Params.LittleDopSolver = LittleDopSolverCG;
-#else  
+  int    NumberSubspace;
+  int    Ls;
+  int    Block[5];
+  int    SubspaceRationalRefine;
+  double SubspaceRationalRefineLo; // Mass, Ls??
+  double SubspaceRationalRefineResidual;
+  int    SubspaceRationalLs;
+  double SubspaceRationalLo;
+  double SubspaceRationalMass;
+  double SubspaceRationalResidual;
+  int    SubspaceSurfaceDepth;
+  double LittleDopSolverResidualInner;
+  double LittleDopSolverResidualVstart;
+  double LittleDopSolverResidualSubspace;
+  int    LittleDopSolverIterMax;
+  int    LittleDopSolver;
+  int    LdopDeflVecs;
+  int    PreconditionerType;
+
 // 48^3
-		Params.NumberSubspace=44;
-		Params.SubspaceRationalMass=0.00078;
-		Params.SubspaceRationalLs=12; // Ls/2
-		Params.SubspaceRationalLo=0.001;
-		Params.SubspaceRationalResidual=1e-5;
-		Params.SubspaceRationalRefine=1;
-		Params.SubspaceRationalRefineResidual=1e-4;
-		Params.SubspaceRationalRefineLo=0.003;
-		Params.SubspaceSurfaceDepth=24;
-		Params.PreconditionerKrylovResidual=1e-5;
-		Params.PreconditionerKrylovIterMax=6;
-		Params.PreconditionerKrylovShift=1.0;
-		Params.LittleDopSolverResidualInner=5e-3;
-		Params.LittleDopSolverResidualVstart=1e-5;
-		Params.LittleDopSolverResidualSubspace=1.0e-7;
-		Params.LittleDopSolverIterMax = 10000;
-//		Params.LittleDopSolver = LittleDopSolverCG;
-#endif
-		if (!CPS_NAMESPACE::UniqueID()) printf("HDCGInstance::Params defaults set\n");
+  Params.NumberSubspace=44;
+  Params.LdopDeflVecs=128;
+  Params.SubspaceRationalLs=12; 
+  Params.SubspaceRationalLo=0.001;
+  Params.SubspaceRationalResidual=1e-5;
+  Params.SubspaceRationalRefine=1;
+  Params.SubspaceRationalRefineResidual=1e-4;
+  Params.SubspaceRationalRefineLo=0.003;
+  Params.SubspaceSurfaceDepth=24;
+  Params.PreconditionerKrylovResidual=1e-5;
+  Params.PreconditionerKrylovIterMax=6;
+  Params.PreconditionerKrylovShift=1.0;
+  Params.LittleDopSolverResidualInner=5e-3;
+  Params.LittleDopSolverResidualVstart=5e-4;
+  Params.LittleDopSolverResidualSubspace=1.0e-7;
+  Params.LittleDopSolverIterMax = 10000;
+  Params.ParamSmoother=SmootherMirs;
+  Params.PcgType=PcgAdef2f;
+  Params.Flexible=1;
+  
+
+  if (!CPS_NAMESPACE::UniqueID()) printf("HDCGInstance::Params defaults set\n");
 	}
 //	~HDCGInstance(){}
 };
@@ -106,7 +118,7 @@ class HDCGController
 
 	private:
 		static HDCGController* _instance;
-		static BfmMultiGrid<Float>* _bfm_mg;
+		static BfmHDCG<Float>* _bfm_mg;
 		static char *cname;
 		HDCGController(HDCGController<Float> &){};
 		HDCGController<Float> & operator=(HDCGController const &){};
@@ -214,11 +226,11 @@ class HDCGController
 #endif
 
 #if 1
-		static BfmMultiGrid<Float>* getHDCG()
+		static BfmHDCG<Float>* getHDCG()
 		{
 //			if(NULL == _bfm_mg)
 //			{
-//				printf("Need to setup/initialize BfmMultiGrid first!\n");
+//				printf("Need to setup/initialize BfmHDCG first!\n");
 //				exit(-1);
 //				_instance = new HDCGController<Float>();
 //			}
@@ -232,7 +244,7 @@ class HDCGController
 			if(NULL == _bfm_mg)
 			{
 				Float t1 = -CPS_NAMESPACE::dclock();
-				_bfm_mg = new BfmMultiGrid<double>(Ls,NumberSubspace,block,quadrant,&dop,&dop_sp);
+				_bfm_mg = new BfmHDCG<double>(Ls,NumberSubspace,block,quadrant,&dop,&dop_sp);
 //Initialization sequence
 				_bfm_mg->RelaxSubspace(&dop);
 				_bfm_mg->ComputeLittleMatrixColored();
@@ -256,6 +268,7 @@ class HDCGController
 //			return _bfm_mg;
 		}
 		void   freeHDCG(){
+		        _bfm_mg->HDCG_end();
 			delete _bfm_mg;
 			_bfm_mg = NULL;
 		}
@@ -263,7 +276,7 @@ class HDCGController
 };
 
 template<class Float> HDCGController<Float>* HDCGController<Float>::_instance =  NULL;
-template<class Float> BfmMultiGrid<Float>* HDCGController<Float>::_bfm_mg =  NULL;
+template<class Float> BfmHDCG<Float>* HDCGController<Float>::_bfm_mg =  NULL;
 template<class Float> char* HDCGController<Float>::cname = "HDCGController";
 
 

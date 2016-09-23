@@ -6,13 +6,9 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base.C,v 1.44 2013-06-07 19:26:34 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_dwf_base/f_dwf_base.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 //------------------------------------------------------------------
@@ -53,6 +49,9 @@ CPS_START_NAMESPACE
 // Hack to measure the time for constructor/destructors
 static unsigned long called=1;
 Float ctor_time=0.;
+
+Dwf FdwfBase::dwf_struct;
+
 FdwfBase::FdwfBase()
 {
   ctor_time -= dclock();
@@ -75,9 +74,10 @@ FdwfBase::FdwfBase()
   //----------------------------------------------------------------
   // Do initializations before the dwf library can be used
   //----------------------------------------------------------------
-  static Dwf dwf_struct;
+//  static Dwf dwf_struct;
   f_dirac_op_init_ptr = &dwf_struct;
   dwf_init((Dwf *) f_dirac_op_init_ptr);
+  VRB.Result(cname,fname,"f_dirac_op_init_ptr=%p\n",f_dirac_op_init_ptr);
   ctor_time += dclock();
 }
 
@@ -1301,7 +1301,8 @@ int FdwfBase::FeigSolv(Vector **f_eigenv, Float *lambda,
   int np = eig_arg->np_lanczos_vectors;
   int maxiters = eig_arg->maxiters;
   Float stopres = eig_arg->stop_residual;
-  MatrixPolynomialArg* cheby_arg = &(eig_arg->matpoly_arg);
+  MatrixPolynomialArg* cheby_arg = &eig_arg->matpoly_arg;
+//(MatrixPolynomialArg*)eig_arg->matpoly_arg;
   
   if(cnv_frm == CNV_FRM_YES) // convert only nk, not (nk+np)
     for(int i=0; i < nk; ++i) 

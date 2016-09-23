@@ -3,23 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of Verbose class methods.
 
->>>>>>> 1.18.12.1
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012-07-13 15:27:42 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v 1.21 2012-07-13 15:27:42 chulwoo Exp $
-//  $Id: verbose.C,v 1.21 2012-07-13 15:27:42 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: verbose.C,v $
-//  $Revision: 1.21 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/verbose/verbose.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <util/qcdio.h>
@@ -152,7 +136,7 @@ int Verbose::Active(int test_level, int level){
 	    y = x % base;
 	    if( int(test_level) == y){
              if (!UniqueID())
-             printf("Verbose::Acitve(%d,%d)=1\n",test_level,level);
+             printf("Verbose::Active(%d,%d)=1\n",test_level,level);
              return 1;
              }
 	    x = (x - y) / base;
@@ -182,7 +166,7 @@ void Verbose::Func(const char *class_name, const char *func_name) {
     if(!active[VERBOSE_FUNC_LEVEL]) return;
 
 //    printf("%s::%s : Entered :", class_name, func_name);
-    vrb_printf(class_name,func_name,"Entered :");
+    vrb_printf(class_name,func_name,"Entered :\n");
     if(active[VERBOSE_FUNC_CLOCK_LEVEL]){
 #ifdef _TARTAN
 	printf("  Clock (12.5 MHz) = %d\n", (int)clock());
@@ -215,7 +199,7 @@ void Verbose::FuncEnd(const char *class_name, const char *func_name){
     if(!active[VERBOSE_FUNC_LEVEL]) return;
 
 //    printf("%s::%s : Exiting :", class_name, func_name);
-    vrb_printf(class_name,func_name,"Exiting :");
+    vrb_printf(class_name,func_name,"Exiting :\n");
     if(active[VERBOSE_FUNC_CLOCK_LEVEL]){
 #ifdef _TARTAN
 	printf("  Clock (12.5 MHz) = %d\n", (int)clock());
@@ -727,6 +711,7 @@ void Verbose::RNGSeed(const char *class_name, const char *func_name,
  */
 void Verbose::ActivateLevel(VerboseLevelType value){
 
+  if (!UniqueID()) printf("Node %d: %s::ActiveLevel(): %d activated ",UniqueID(),cname,(int)value);
     active[value] = 1;
 
 }

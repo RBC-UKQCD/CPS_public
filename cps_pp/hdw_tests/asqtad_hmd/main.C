@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.3 2008-02-08 18:35:05 chulwoo Exp $
+  $Id: main.C,v 1.3 2008/02/08 18:35:05 chulwoo Exp $
 */
 
 /* Quick Asqtad Monte Carlo code, which measures the plaquette on each trajectory. */

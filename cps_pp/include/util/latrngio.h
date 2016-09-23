@@ -6,6 +6,7 @@
 #include <util/iostyle.h>
 #include <util/intconv.h>
 #include <util/latheader.h>
+#include <util/random.h>
 
 CPS_START_NAMESPACE
 
@@ -47,8 +48,13 @@ class LatRngRead : public LatRngIO {
   LatRngRead();
   virtual ~LatRngRead();
 
+#ifndef USE_C11_RNG
   void read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 	    const QioArg & rd_arg);
+#else
+  void read(RNGSTATE *mtran_dump,
+	    const QioArg & rd_arg);
+#endif
 
 };
 
@@ -59,8 +65,13 @@ class LatRngWrite : public LatRngIO {
   LatRngWrite();
   virtual ~LatRngWrite();
 
+#ifndef USE_C11_RNG
   void write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 	     const QioArg & wt_arg);
+#else
+  void write(RNGSTATE *mtran_dump,
+	    const QioArg & rd_arg);
+#endif
 
 };
 

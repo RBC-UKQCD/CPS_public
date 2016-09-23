@@ -2,7 +2,7 @@
 /*!\file
   \brief  Definitions of the bigfloat wrapper class.
 
-  $Id: bigfloat.h,v 1.9 2007-11-07 05:24:41 chulwoo Exp $
+  $Id: bigfloat.h,v 1.9 2007/11/07 05:24:41 chulwoo Exp $
 */
 //------------------------------------------------------------------
 #include<config.h>

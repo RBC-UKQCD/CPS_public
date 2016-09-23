@@ -1,4 +1,5 @@
 #include <config.h>
+#include <util/gjp.h>
 #include <util/lat_data.h>
 #include <util/smalloc.h>
 #include <util/vector.h>
@@ -12,6 +13,7 @@ void LatData::Init(LatDataAlloc flags, int len, int volume){
         ERR.General(cname,"Init()","not allowed to initialize twice\n");
 	size = len;
 	vol = volume;
+	if (vol == 0) vol = GJP.VolNodeSites();
 	switch (flags){
 		case DEFAULT:
 			data = (IFloat *)smalloc(sizeof(IFloat)*size*vol);

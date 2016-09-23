@@ -99,6 +99,7 @@ AlgMuon::AlgMuon(Lattice& latt, CommonArg *c_arg, MuonArg *arg, QPropWArg *qarg)
                ext_mom[count] = ThreeMom(p1,p2,p3);
                count++ ;
              }
+  Nmom = count;
 
   prop=NULL ;
   // must initialize
@@ -151,6 +152,7 @@ AlgMuon::AlgMuon(Lattice& latt, CommonArg *c_arg, MuonArg *arg, QPropWArg *qarg,
                ext_mom[count] = ThreeMom(p1,p2,p3);
                count++ ;
              }
+  Nmom = count;
 
   prop=NULL ;
   // must initialize
@@ -2200,7 +2202,7 @@ void AlgMuon::MuonLineCons(int *out_mom, QPropWMomSrc &in, Rcomplex* Muon)
   AlgLattice().SetGfieldOrd();
   AlgLattice().mult_su3_links_by_u1(alg_muon_arg->charge);
   QPropWMomSrc out(AlgLattice(), qp_arg, out_mom, common_arg);
-  out.Run();
+  //out.Run();
   // restore lattice
   lat_cont.Set(AlgLattice());
 
@@ -2401,9 +2403,272 @@ void AlgMuon::MuonLineCons(int *out_mom, QPropWMomSrc &in, Rcomplex* Muon)
   writeQio.write(filename,AlgLattice(),Muon,size); fflush(stdout); 
   
   // fourier transform the sink of out-going prop.
-  two_point(out_mom,out);
+  two_point(out_mom,out,alg_muon_arg->source_time);
 
 }
+
+
+
+// calc the muon line with an insertion of the conserved current
+// incoming muon has -out-going-momentum
+void AlgMuon::MuonLineCons(int *out_mom, Rcomplex* Muon)
+{
+  
+  char *fname = "MuonLineCons(int *out_mom, QPropWMomSrc &min, Rcomplex* Muon))";
+  VRB.Func(cname,fname);
+  int x[5], x_n[4];
+  int n[5];
+  int nu, mu, proj;
+  int i, spin, color;
+  n[0] = GJP.XnodeSites();
+  n[1] = GJP.YnodeSites();
+  n[2] = GJP.ZnodeSites();
+  n[3] = GJP.TnodeSites();
+  n[4] = GJP.SnodeSites();
+  Rcomplex Ihalf(0.0,0.5);
+  Rcomplex Zero(0.0,0.0);
+  WilsonMatrix temp;  
+  int size = 4*NPROJ; // 4 dirs * 4 projectors
+  int fsize = 3*4;
+  char filename[100];
+  const int shiftT = GJP.TnodeCoor()*GJP.TnodeSites();
+  const int shiftX = GJP.XnodeCoor()*GJP.XnodeSites();
+  const int shiftY = GJP.YnodeCoor()*GJP.YnodeSites();
+  const int shiftZ = GJP.ZnodeCoor()*GJP.ZnodeSites();
+
+  // incoming muon momentum
+  int in_mom[3];
+  in_mom[0] = -out_mom[0];
+  in_mom[1] = -out_mom[1];
+  in_mom[2] = -out_mom[2];
+
+  // outgoing muon with momentum p
+  //------------------------------
+  qp_arg->cg.mass = alg_muon_arg->line_mass ;
+
+  // U1 links only
+  LatticeContainer lat_cont;
+  // save lattice
+  lat_cont.Get(AlgLattice());
+  // u1 lattice
+  AlgLattice().SetGfieldOrd();
+  AlgLattice().mult_su3_links_by_u1(alg_muon_arg->charge);
+
+  qp_arg->t = alg_muon_arg->source_time;
+  QPropWMomSrc out(AlgLattice(), qp_arg, out_mom, common_arg);
+  qp_arg->t = 0;
+  QPropWMomSrc in(AlgLattice(), qp_arg, in_mom, common_arg);
+
+  // restore lattice
+  lat_cont.Set(AlgLattice());
+
+  // initialize to zero since we are accumulating sum over s
+  for(mu=0; mu< 4; mu++){
+    for(proj=0; proj< NPROJ; proj++){
+      for (int site=0; site<GJP.VolNodeSites(); site++) {
+	Muon[mu+4*(proj+NPROJ*site)] = Zero;
+      }
+    }
+  }
+
+  //FileIoType T=ADD_ID;
+  //sprintf(filename,"ml-consloc-cs-sumS.mom%d%d%d.dat",out_mom[0],out_mom[1],out_mom[2]);
+  //FILE *fp=Fopen(T, filename, "w");
+  
+  // 5th dimension loop is cut in half since
+  // sum is same for both halves (mult by 2)
+  // check first
+  int ls = n[4];
+  for(x[4] = 0; x[4] < n[4]; x[4]++){ 
+    int s=x[4];
+    for(nu=0; nu< 4; nu++){//sink gamma (conserved current)
+      for(x[3] = 0; x[3] < n[3]; x[3]++){
+	int tg = x[3]+shiftT;
+	for(x[2] = 0; x[2] < n[2]; x[2]++){
+	  int zg = x[2]+shiftZ;
+	  for(x[1] = 0; x[1] < n[1]; x[1]++){
+	    int yg = x[1]+shiftY;
+	    for(x[0] = 0; x[0] < n[0]; x[0]++){
+	      int xg = x[0]+shiftX;
+
+	      
+	      // coordinates for neighbor
+	      for (i = 0; i < 4; i++ )
+		x_n[i] = (i == nu) ? (x[i]+1)%n[i] : x[i];               // +hop check
+	      
+	      // offsets
+	      int site = x[0]+n[0]*(x[1]+n[1]*(x[2]+n[2]*(x[3])));
+	      int neighbor_site = x_n[0]+n[0]*(x_n[1]+n[1]*(x_n[2]+n[2]*(x_n[3])));
+	      
+	      // U_nu(x) where nu = prop_dir
+	      Matrix *link = AlgLattice().GaugeField() + 4*site + nu;
+	      Matrix tempmat;
+	      tempmat.Dagger(*link);                                     // check dag
+	      
+	      // start with incoming
+	      WilsonMatrix mat = in(s,site);                           // s check
+	      //can't, proj: mat.gr(-5);                              // gamma check
+	      
+	      WilsonMatrix wmat_neigh;
+	      
+	      // get prop in +nu dir.
+	      // need the transpose (conjugate later)
+	      if( /* offsite */ x[nu]+1 == n[nu] ){
+		
+		getPlusData( (IFloat *)&wmat_neigh,
+			     (IFloat *)&out(ls-1-s,neighbor_site),     // s,x check
+			     288, nu);
+	      } else {
+		
+		wmat_neigh = out(ls-1-s,neighbor_site);                      // s,x check
+	      }
+	      
+	      // mult on sink by gamma_5 (1+gamma_nu) U^dagger_nu
+	      WilsonMatrix temp = mat;
+	      WilsonMatrix temp2 = temp;
+	      temp2 += temp.gl(nu);
+	      temp2.gl(-5);                                              // gamma check
+	      temp2.LeftTimesEqual(tempmat);                             // link check
+	      // spin-color trace
+	      WilsonMatrix cc = wmat_neigh;
+	      cc.hconj();                                                // conj check
+	      cc.gl(-5);                                                // conj check
+	      WilsonMatrix line = cc*temp2;                              // tr. check
+	      WilsonMatrix line1 = cc*temp2;                              // debug
+
+	      // the other contraction...
+	      
+	      // mult sink by gamma5
+	      mat = out(ls-1-s,site);
+	      mat.gr(-5); // (conj below)
+	      
+	      // get the fields in plus direction
+	      if( /* offsite */ x[nu]+1 == n[nu] ){
+		
+		getPlusData( (IFloat *)&wmat_neigh,
+			     (IFloat *)&in(s,neighbor_site), 
+			     288, nu);
+	      } else {
+		
+		wmat_neigh = in(s,neighbor_site);               // check s,x
+	      }
+	      
+	      temp = wmat_neigh;
+	      temp2 = temp;
+	      temp2 -= temp.gl(nu);
+	      temp2.gl(-5);
+	      temp2.LeftTimesEqual(*link);                     // check gamma, U_nu
+	      
+	      // spin-color trace
+	      cc=mat;
+	      cc.hconj();                                      // check s,x, conj
+	      line -=  cc * temp2;
+	      WilsonMatrix line2 = cc*temp2; //debug
+	      
+	      // project with (1+gamma_t)/2 (1, gamma_x gamma_y, gamma_x gamma_z, and perms.)
+	      //                 proj=       0, 1              , 2
+	      line.PParProjectSink(); //(multiplies on the left)
+	      // project some more, and trace
+	      Muon[nu+4*(0+NPROJ*site)] +=   0.5 * line.Trace(); 
+	      line.gl(0).gl(1); // i gy gx * line
+	      Muon[nu+4*(1+NPROJ*site)] += Ihalf * line.Trace(); 
+	      line.gl(1).gl(2); // i gz gx ...
+	      Muon[nu+4*(2+NPROJ*site)] += Ihalf * line.Trace();
+	      line.gl(0).gl(1); // i gz gy ...
+	      Muon[nu+4*(3+NPROJ*site)] += Ihalf * line.Trace(); 
+	    }
+	  }
+	}
+      }
+    } // nu
+  } // s
+  //Fclose(T,fp);
+
+  // Fourier transform the muon line (vertex coordinate->vertex momentum)
+  FFT4((Float*)Muon, 1, 2*size, 1, 1);
+
+  // multiply by extra phases from source, point-split sink
+  //-------------------------------------------------------
+
+  int conf = alg_muon_arg->conf;
+ 
+  FileIoType T=ADD_ID;
+  /*sprintf(filename,"%s/muonline-consloc.m%g.i000.o%d%d%d.dat.%d",
+	  DIRML,
+	  alg_muon_arg->line_mass,
+	  out_mom[0],out_mom[1],out_mom[2],
+	  alg_muon_arg->conf);*/
+  //FILE *fp=Fopen(T, filename, "w");
+  Float q[4];
+  Float L[4];
+  L[0] = n[0]*GJP.Xnodes();
+  L[1] = n[1]*GJP.Ynodes();
+  L[2] = n[2]*GJP.Znodes();
+  L[3] = n[3]*GJP.Tnodes();
+  
+  for(x[3] = 0; x[3] < n[3]; x[3]++){
+    int ptg = x[3]+shiftT;
+    for(x[2] = 0; x[2] < n[2]; x[2]++){
+      int pzg = x[2]+shiftZ;
+      for(x[1] = 0; x[1] < n[1]; x[1]++){
+	int pyg = x[1]+shiftY;
+	for(x[0] = 0; x[0] < n[0]; x[0]++){
+	  int pxg = x[0]+shiftX;
+	  
+	  
+	  int site = x[0] + n[0]*(x[1] +n[1]*(x[2] + n[2]*(x[3])));
+	  
+	  for(nu=0;nu<4;nu++){
+	    // point-split sink phase (these should be opp. to vacpol ones)
+	    q[0] = nu==0 ? -PI*pxg/L[0] : 0;
+	    q[1] = nu==1 ? -PI*pyg/L[1] : 0;
+	    q[2] = nu==2 ? -PI*pzg/L[2] : 0;
+	    q[3] = nu==3 ? -PI*ptg/L[3] : 0;
+	    // this is the source phase from both props. Since they were already
+	    // mom src props, only need the t component. And the incoming is 
+	    // hard-wired at t=0!
+	    //q[3] += 2.*PI*ptg/L[3]*qp_arg->t;
+	    Float theta = (q[0]+q[1]+q[2]+q[3]);
+	    Rcomplex phase(cos(theta),sin(theta));
+	    for(proj=0;proj<NPROJ;proj++){
+	      Muon[nu+4*(proj+NPROJ*site)] *= phase;
+	      //debug:
+	      /*Rcomplex cc(1.,0.);
+	      int fact = (ptg*pxg*pyg*pzg);
+	      if(fact==0){fact=1;}
+	      Muon[nu+4*(proj+NPROJ*site)] = cc*fact;*/
+	      //Fprintf(fp,"proj= %d nu= %d mom= %d %d %d %d %e %e\n", 
+	      //      proj, nu, pxg, pyg, pzg, ptg,
+	      //Fprintf(fp,"%le %le\n", 
+	      //      Muon[nu+4*(proj+NPROJ*site)].real(), 
+	      //      Muon[nu+4*(proj+NPROJ*site)].imag());
+	    }
+	  }
+	}
+      }
+    }
+  }
+  //Fclose(T,fp);
+
+  qio_writeMuon writeQio(argc,argv);
+  sprintf(filename,"%s/muonline-consloc.m%g.i%d%d%d.o%d%d%d.dat.%d",
+	  DIRML,
+	  alg_muon_arg->line_mass,
+	  in_mom[0],in_mom[1],in_mom[2],
+	  out_mom[0],out_mom[1],out_mom[2],
+	  alg_muon_arg->conf);
+  writeQio.write(filename,AlgLattice(),Muon,size); fflush(stdout); 
+  
+  // fourier transform the sink of out-going prop.
+  two_point(out_mom,out,alg_muon_arg->source_time);
+  // fourier transform the sink of in-going prop
+  two_point(in_mom,in, 0);
+
+}
+
+
+
+
 
 
 
@@ -2448,17 +2713,21 @@ void AlgMuon::run()
       int saveSrcColorEnd=qp_arg->EndSrcColor;
       qp_arg->StartSrcColor=0;
       qp_arg->EndSrcColor=1;
+#if 0
       QPropWMomSrc min(AlgLattice(), qp_arg, in_mom, common_arg);
       min.Run();
       // fft and print trace of in-coming prop
-      two_point(in_mom, min); // 1=conj the prop
+      two_point(in_mom, min, 0); // 1=conj the prop
+#endif
       // Loop over external photon momentum
       for(i=0; i < Nmom; i++){
 	// Muonline
 	out_mom[0]=ext_mom[i].cmp(0);
 	out_mom[1]=ext_mom[i].cmp(1);
 	out_mom[2]=ext_mom[i].cmp(2);
-	MuonLineCons(out_mom, min, Muon);
+	//MuonLineCons(out_mom, min, Muon);
+	// computes incoming prop with -out_mom
+	MuonLineCons(out_mom, Muon);
       }
       qp_arg->StartSrcColor=saveSrcColorStart;
       qp_arg->EndSrcColor=saveSrcColorEnd;
@@ -4420,10 +4689,10 @@ void AlgMuon::two_point()
   sfree(two_pt);
 }
 
-void AlgMuon::two_point(int *mom, QPropWMomSrc &prop, int conj)
+void AlgMuon::two_point(int *mom, QPropWMomSrc &prop, int src_time_slice, int conj)
 {
 
-  char *fname = "two_point(QPropWMomSrc &prop)";
+  char *fname = "two_point(int *mom, QPropWMomSrc &prop, int src_time_slice, int conj)";
   VRB.Func(cname,fname);
   WilsonMatrix temp;
 
@@ -4497,9 +4766,9 @@ void AlgMuon::two_point(int *mom, QPropWMomSrc &prop, int conj)
     }
   }
   
-  // Fourier transform spatial comps. (2 is size in Floats per site)
-  // since we will take anti-muon -> muon for two_pt_np, flip sign in fft, 
-  // or 0 last arg. ok since for "incoming" prop (two_pt), we only need 0 mom case
+  // Fourier transform the sink. "size" is number of complex.
+  // "0" in last arg is for "backward" fft, i.e. exp +ipx
+  // which is consistent with our mom source, exp -ipx
   if(conj){
     FFTXYZ((Float*)two_pt, 1, 2, 1, 1);	
     FFTXYZ((Float*)two_pt_np, 1, 2, 1, 1);
@@ -4515,10 +4784,11 @@ void AlgMuon::two_point(int *mom, QPropWMomSrc &prop, int conj)
   // Print out results
   //------------------
   FileIoType T=ADD_ID;
-  char filename[100];
-  sprintf(filename,"%s/prop-m%g.mom%d%d%d.%d.dat",
+  char filename[128];
+  sprintf(filename,"%s/prop-m%g.t%d.mom%d%d%d.%d.dat",
 	  DIRML,
 	  alg_muon_arg->line_mass,
+	  src_time_slice,
 	  mom[0],mom[1],mom[2],
 	  alg_muon_arg->conf);
   for(x[3] = 0; x[3] < n[3]; x[3]++){

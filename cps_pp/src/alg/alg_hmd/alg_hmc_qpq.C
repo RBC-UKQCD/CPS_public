@@ -2,18 +2,18 @@
 /*!\file
   \brief Definitions of the AlgHmcRHMC methods.
 
-  $Id: alg_hmc_qpq.C,v 1.6 2005-12-02 15:19:32 chulwoo Exp $
+  $Id: alg_hmc_qpq.C,v 1.6 2005/12/02 15:19:32 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  $Author: chulwoo $
-//  $Date: 2005-12-02 15:19:32 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_qpq.C,v 1.6 2005-12-02 15:19:32 chulwoo Exp $
-//  $Id: alg_hmc_qpq.C,v 1.6 2005-12-02 15:19:32 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2005/12/02 15:19:32 $
+//  $Header: /space/cvs/cps/cps++/src/alg/alg_hmd/alg_hmc_qpq.C,v 1.6 2005/12/02 15:19:32 chulwoo Exp $
+//  $Id: alg_hmc_qpq.C,v 1.6 2005/12/02 15:19:32 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: alg_hmc_qpq.C,v $
 //  $Revision: 1.6 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_hmd/alg_hmc_qpq.C,v $
+//  $Source: /space/cvs/cps/cps++/src/alg/alg_hmd/alg_hmc_qpq.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

@@ -4,14 +4,14 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-21 20:16:51 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_clover_pbp/main.C,v 1.7 2004-09-21 20:16:51 chulwoo Exp $
-//  $Id: main.C,v 1.7 2004-09-21 20:16:51 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/09/21 20:16:51 $
+//  $Header: /space/cvs/cps/cps++/tests/f_clover_pbp/main.C,v 1.7 2004/09/21 20:16:51 chulwoo Exp $
+//  $Id: main.C,v 1.7 2004/09/21 20:16:51 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
 //  $Revision: 1.7 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/f_clover_pbp/main.C,v $
+//  $Source: /space/cvs/cps/cps++/tests/f_clover_pbp/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -61,11 +61,6 @@ int main(int argc,char *argv[])
   do_arg.beta = 6.0;
   do_arg.clover_coeff = 1.0;
 
-#if TARGET==cpsMPI
-    MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);    
-    using MPISCU::fprintf;
-    using MPISCU::printf;
-#endif
 
   GJP.Initialize(do_arg);
 

@@ -1,19 +1,4 @@
 #include<config.h>
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:46:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hb/main.C,v 1.10 2013-04-05 17:46:31 chulwoo Exp $
-//  $Id: main.C,v 1.10 2013-04-05 17:46:31 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: main.C,v $
-//  $Revision: 1.10 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/g_hb/main.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 
 #include<util/lattice.h>
 #include<alg/do_arg.h>

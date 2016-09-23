@@ -15,6 +15,7 @@
 #include <util/time_cps.h>
 #include <unistd.h>
 
+#ifndef USE_C11_RNG
 CPS_START_NAMESPACE
 using namespace std;
 
@@ -121,11 +122,11 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
 
 //#if TARGET == QCDOC  // when on QCDOC, only Parallel (direct IO) mode is used
-// #if 1
-//   setParallel();
-// #else
-//   setSerial();
-// #endif
+#if 0
+  setParallel();
+#else
+  setSerial();
+#endif
   VRB.Result(cname,fname,"parIO()=%d\n",parIO());
 
   if(parIO()) {
@@ -311,7 +312,7 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   //  cout << "size_rng_ints = " << size_rng_ints << endl;
   int size_rng_chars = size_rng_ints * intconv.fileIntSize();
 
-#if TARGET == QCDOC
+#if 0
   setParallel();
 #else
   setSerial();
@@ -479,4 +480,4 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
 
 CPS_END_NAMESPACE
- 
+#endif 

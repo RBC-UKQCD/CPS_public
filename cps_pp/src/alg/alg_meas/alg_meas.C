@@ -2,6 +2,7 @@
 
 #ifdef USE_BFM
 #include <util/lattice/fbfm.h>
+#include <util/lattice/f_dwf4d.h>
 #endif
 
 #include <alg/no_arg.h>
@@ -28,21 +29,9 @@ CPS_START_NAMESPACE
 /*!\file
   \brief PAB... Definitions of the AlgMeas class methods.
   
-  $Id: alg_meas.C,v 1.11 2013-04-05 17:46:30 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:46:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v 1.11 2013-04-05 17:46:30 chulwoo Exp $
-//  $Id: alg_meas.C,v 1.11 2013-04-05 17:46:30 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: alg_meas.C,v $
-//  $Revision: 1.11 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_meas/alg_meas.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 //------------------------------------------------------------------
@@ -291,6 +280,11 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     lat_p = new GimprRectFbfm;
     return *lat_p;
   }
+
+  if ((fermion == F_CLASS_DWF4D) && (gluon == G_CLASS_NONE)) {
+    lat_p = new GnoneFdwf4d;
+    return *lat_p;
+  }
 #endif
 
   /* DOMAIN WALL VALENCE ANALYSIS */
@@ -306,6 +300,7 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     lat_p = new GimprRectFdwf ;
     return *lat_p;
   }
+
   if ( (fermion == F_CLASS_MOBIUS) && (gluon == G_CLASS_NONE ) ) {
     lat_p = new GnoneFmobius ;
     return *lat_p; 
@@ -316,6 +311,19 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
   }
   if ( (fermion == F_CLASS_MOBIUS) && (gluon == G_CLASS_IMPR_RECT ) ) {
     lat_p = new GimprRectFmobius ;
+    return *lat_p;
+  }
+
+  if ( (fermion == F_CLASS_ZMOBIUS) && (gluon == G_CLASS_NONE ) ) {
+    lat_p = new GnoneFzmobius ;
+    return *lat_p; 
+  }
+  if ( (fermion == F_CLASS_ZMOBIUS) && (gluon == G_CLASS_WILSON ) ) {
+    lat_p = new GwilsonFzmobius;
+    return *lat_p;
+  }
+  if ( (fermion == F_CLASS_ZMOBIUS) && (gluon == G_CLASS_IMPR_RECT ) ) {
+    lat_p = new GimprRectFzmobius ;
     return *lat_p;
   }
 

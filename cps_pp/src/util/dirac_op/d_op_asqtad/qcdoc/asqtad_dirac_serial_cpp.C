@@ -1,7 +1,7 @@
 /*!\file
     Asqtad Dirac operator code for QCDOC.
 
-    $Id: asqtad_dirac_serial_cpp.C,v 1.7 2005-12-02 16:07:32 chulwoo Exp $
+    $Id: asqtad_dirac_serial_cpp.C,v 1.7 2005/12/02 16:07:32 chulwoo Exp $
 */
 
 #include <stdio.h>

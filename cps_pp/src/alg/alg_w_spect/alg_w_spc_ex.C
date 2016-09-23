@@ -40,7 +40,7 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------------
 // Static data members
 //--------------------------------------------------------------------------
-char * AlgWspectExtMeson::d_class_name = "AlgWspectExtMeson";
+const char * AlgWspectExtMeson::d_class_name = "AlgWspectExtMeson";
 
 //---------------------------------------------------------------------------
 // CTOR
@@ -69,7 +69,7 @@ void AlgWspectExtMeson::run()
   int total_e;  
 #endif
 
-  char *fname = "run()";
+  const char *fname = "run()";
   VRB.Func(d_class_name,fname);
 
   //common_arg->results is initialized in main program

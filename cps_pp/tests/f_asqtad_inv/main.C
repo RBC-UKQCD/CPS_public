@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.19 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: main.C,v 1.19 2008/02/08 18:35:08 chulwoo Exp $
 */
 
 #include<config.h>
@@ -111,11 +111,6 @@ int main(int argc,char *argv[]){
     cg_arg.stop_rsd = 1e-12;
     cg_arg.max_num_iter = 500;
 
-#if TARGET==cpsMPI
-    MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);    
-    using MPISCU::fprintf;
-    using MPISCU::printf;
-#endif
 
     printf("total sites = %d %d %d %d\n",nx,ny,nz,nt);
     

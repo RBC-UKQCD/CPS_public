@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgNoise class.
 
-  $Id: alg_noise.h,v 1.4 2004-09-02 16:56:35 zs Exp $
+  $Id: alg_noise.h,v 1.4 2004/09/02 16:56:35 zs Exp $
 */
 //------------------------------------------------------------------
 

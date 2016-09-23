@@ -59,7 +59,7 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
       tmp1[i] = (Matrix *) fmalloc(vol*sizeof(Matrix));
       tmp2[i] = (Matrix *) fmalloc(vol*sizeof(Matrix));
       //Set all bytes in tmp2 to zero
-      bzero((char*)tmp2[i],vol*sizeof(Matrix));
+      memset((char*)tmp2[i],0,vol*sizeof(Matrix));
     }
 
   //Holds the sum of staples associated with each lattice site

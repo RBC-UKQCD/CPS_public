@@ -118,6 +118,14 @@ public:
 	int trajectory;
 	Float mobius_b_coeff;
 	Float mobius_c_coeff;
+	struct {
+		u_int zmobius_b_coeff_len;
+		Float *zmobius_b_coeff_val;
+	} zmobius_b_coeff;
+	struct {
+		u_int zmobius_c_coeff_len;
+		Float *zmobius_c_coeff_val;
+	} zmobius_c_coeff;
 	   DoArgExt (  ) ;
 };
 

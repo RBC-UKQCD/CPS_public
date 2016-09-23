@@ -17,6 +17,10 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include<math.h>
+#ifdef USE_BFM
+#include <util/lattice/bfm_mixed_solver_multi.h>
+#endif
+#include <util/multi_cg_controller.h>
 #include<alg/alg_hmc.h>
 #include<alg/alg_meas.h>
 #include<comms/glb.h>
@@ -30,6 +34,7 @@ CPS_END_NAMESPACE
 #include<util/smalloc.h>
 #include<util/qcdio.h>
 #include<util/wilson.h>
+#include <util/timer.h>
 
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
@@ -131,13 +136,10 @@ AlgHmc::~AlgHmc() {
   -# Maximum solver residue
 */
 //------------------------------------------------------------------
-Float AlgHmc::run(void)
+Float AlgHmc::run(int if_met)
 {
   char *fname = "run()";
 
-#if TARGET==cpsMPI
-  using MPISCU::fprintf;
-#endif
 
   int accept;
 
@@ -181,18 +183,36 @@ Float AlgHmc::run(void)
       }
 
       //!< Evaluate the heatbath
+      static Timer heatbath_timer("HMC heatbath");
+      heatbath_timer.start(true);
+      MultiShiftController.setEnvironment(MultiShiftCGcontroller::Heatbath);
       integrator->heatbath();
+      MultiShiftController.setEnvironment(MultiShiftCGcontroller::Generic);
+      heatbath_timer.stop(true);
 
       //!< Calculate initial Hamiltonian
       wilson_set_sloppy( false);
-      h_init = integrator->energy();
+      static Timer ham1_timer("HMC start energy");
+      ham1_timer.start(true);
+      if (if_met) {
+      MultiShiftController.setEnvironment(MultiShiftCGcontroller::EnergyCalculation);
+	h_init = integrator->energy();
+      MultiShiftController.setEnvironment(MultiShiftCGcontroller::Generic);
+      VRB.Result(cname, fname, "h_init = %0.16e\n", h_init);
+	}
+      ham1_timer.stop(true);
 //      Float total_h_init =h_init;
 //      glb_sum(&total_h_init);
 
       // Molecular Dynamics Trajectory
-      if(hmc_arg->wfm_md_sloppy) wilson_set_sloppy(true);
+      static Timer evo_timer("HMC evolve");
+      evo_timer.start(true);
+      if (hmc_arg->wfm_md_sloppy) wilson_set_sloppy(true);
+      MultiShiftController.setEnvironment(MultiShiftCGcontroller::MolecularDynamics);
       integrator->evolve(hmc_arg->step_size, hmc_arg->steps_per_traj);
+      MultiShiftController.setEnvironment(MultiShiftCGcontroller::Generic);
       wilson_set_sloppy(false);
+      evo_timer.stop(true);
 
       // Reunitarize
       if(hmc_arg->reunitarize == REUNITARIZE_YES){
@@ -208,7 +228,13 @@ Float AlgHmc::run(void)
 #endif
 
       //!< Calculate final Hamiltonian
+if (if_met){ 
+      static Timer ham2_timer("HMC end energy");
+      ham2_timer.start(true);
+      MultiShiftController.setEnvironment(MultiShiftCGcontroller::EnergyCalculation);
       h_final = integrator->energy();
+      MultiShiftController.setEnvironment(MultiShiftCGcontroller::Generic);
+      ham2_timer.stop(true);
 //      Float total_h_final =h_final;
 //      glb_sum(&total_h_final);
 
@@ -226,6 +252,7 @@ Float AlgHmc::run(void)
 	lat.SoCheck(delta_h);
 	LatticeFactory::Destroy();
       }
+}
 
       if ( !(test == 0 && attempt ==0) ){
         shiftStates(-SHIFT_X,-SHIFT_Y,-SHIFT_Z,0);
@@ -236,17 +263,15 @@ Float AlgHmc::run(void)
 	saveFinalState();
 
 	integrator->reverse();
-      if(hmc_arg->wfm_md_sloppy) wilson_set_sloppy(true);
-	integrator->evolve(hmc_arg->step_size, hmc_arg->steps_per_traj);
-      wilson_set_sloppy(false);
+        if(hmc_arg->wfm_md_sloppy) wilson_set_sloppy(true);
+        MultiShiftController.setEnvironment(MultiShiftCGcontroller::MolecularDynamics);
+        integrator->evolve(hmc_arg->step_size, hmc_arg->steps_per_traj);
+        MultiShiftController.setEnvironment(MultiShiftCGcontroller::Generic);
+        wilson_set_sloppy(false);
 
-#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
-  printf("SCU checksum test\n");
-  if ( ! ScuChecksum::CsumSwap() )
-    ERR.Hardware(cname,fname, "SCU Checksum mismatch\n");
-#endif
-
+	MultiShiftController.setEnvironment(MultiShiftCGcontroller::EnergyCalculation);
 	h_delta = h_final - integrator->energy();
+	MultiShiftController.setEnvironment(MultiShiftCGcontroller::Generic);
 	glb_sum(&h_delta);
 
 	reverseTest();

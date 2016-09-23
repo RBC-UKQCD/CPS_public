@@ -94,7 +94,7 @@ class WriteLatticeParallel : public QioControl
 
 class WriteLatticeSerial : public WriteLatticeParallel {
  private:
-  char * cname;
+  const char * cname;
 
  public:
     // ctor for 2-step unloading

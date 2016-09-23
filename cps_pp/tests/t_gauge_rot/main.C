@@ -1,4 +1,4 @@
-///  $Id: main.C,v 1.13 2008-02-08 18:35:09 chulwoo Exp $
+///  $Id: main.C,v 1.13 2008/02/08 18:35:09 chulwoo Exp $
 ///  Demonstrate the random gauge transformation code.
 ///
 
@@ -25,7 +25,7 @@
 #include <util/random.h>
 #include <alg/alg_plaq.h>
 #include <alg/do_arg.h>
-#include <util/ReadLattice.h>
+//#include <util/ReadLattice.h>
 #include <alg/alg_rnd_gauge.h>
 #include<util/testing_framework.h>
 #include<util/dump_xml.h>
@@ -36,10 +36,6 @@ USING_NAMESPACE_CPS
 
 static Float link_trace(Lattice& lattice)
 {
-#if TARGET==cpsMPI
-  using MPISCU::printf;
-  using MPISCU::fprintf;
-#endif
     
   Float linktrace(0);
   int is;
@@ -69,11 +65,6 @@ int main(int argc,char *argv[])
     DoArg do_arg;
     setup_do_arg(do_arg);
 
-#if TARGET==cpsMPI
-  MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
-  using MPISCU::printf;
-  using MPISCU::fprintf;
-#endif
 
   printf("Demonstrate random gauge transform code\n") ;
   printf("node_sites[x,y,z,t] = [%d,%d,%d,%d]  \n",

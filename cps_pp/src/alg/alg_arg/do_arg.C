@@ -242,6 +242,12 @@ vml_DoArgExt (VML *vmls, char *name,DoArgExt *objp)
 		 return FALSE;
 	 if (!vml_Float (vmls, "mobius_c_coeff", &objp->mobius_c_coeff))
 		 return FALSE;
+	 if (!vml_array (vmls, "zmobius_b_coeff", (char **)&objp->zmobius_b_coeff.zmobius_b_coeff_val, (u_int *) &objp->zmobius_b_coeff.zmobius_b_coeff_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "zmobius_c_coeff", (char **)&objp->zmobius_c_coeff.zmobius_c_coeff_val, (u_int *) &objp->zmobius_c_coeff.zmobius_c_coeff_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
 	 vml_class_end(vmls,"DoArgExt",name);
 	return TRUE;
 }

@@ -5,20 +5,20 @@
   \brief  Declaration/definition of Assembly routines used in Vector class
 
 
-  $Id: vector_asm.h,v 1.1 2007-01-10 18:30:36 chulwoo Exp $
+  $Id: vector_asm.h,v 1.1 2007/01/10 18:30:36 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2007-01-10 18:30:36 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector_asm.h,v 1.1 2007-01-10 18:30:36 chulwoo Exp $
-//  $Id: vector_asm.h,v 1.1 2007-01-10 18:30:36 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2007/01/10 18:30:36 $
+//  $Header: /space/cvs/cps/cps++/include/util/vector_asm.h,v 1.1 2007/01/10 18:30:36 chulwoo Exp $
+//  $Id: vector_asm.h,v 1.1 2007/01/10 18:30:36 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: vector_asm.h,v $
 //  $Revision: 1.1 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/vector_asm.h,v $
+//  $Source: /space/cvs/cps/cps++/include/util/vector_asm.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

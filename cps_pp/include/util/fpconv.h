@@ -2,7 +2,6 @@
   \file
   \brief
   
-  $Id: fpconv.h,v 1.10 2012-08-10 14:05:33 chulwoo Exp $
  */
 
 #ifndef __FP_CONV__

@@ -26,13 +26,10 @@ void qio_putGenField(char *buf_, size_t site_index, int count, void *arg)
 {
  /*printf(" called  with count %i\n",count);*/\
   
-  Float *field = (Float*) arg;
 
   const int n_field = qio_genfield_glb. n_fields;
   const int f_size = qio_genfield_glb. f_size_per_site;
   const int n_sites = qio_genfield_glb. n_sites;
-
-  Float *buf = (Float*) buf_;
   
   /*
     The field should store data in memory in the following format :
@@ -53,11 +50,29 @@ void qio_putGenField(char *buf_, size_t site_index, int count, void *arg)
     
   */
 
-  for(int field_i=0; field_i<n_field;++field_i) {
- 
-    moveMem(  field+ f_size* (site_index + n_sites * field_i   ), 
-	      buf  + f_size* ( field_i ),  
-	      sizeof(Float)* f_size);
+  if(qio_genfield_glb.precision){
+
+    Float *field = (Float*) arg;
+
+    Float *buf = (Float*) buf_;
+
+    for(int field_i=0; field_i<n_field;++field_i) {
+      
+      moveMem(  field+ f_size* (site_index + n_sites * field_i   ), 
+		buf  + f_size* ( field_i ),  
+		sizeof(Float)* f_size);
+    }
+  }else{
+
+    float *field = (float*) arg;
+
+    float *buf = (float*) buf_;
+    for(int field_i=0; field_i<n_field;++field_i) {
+      
+      moveMem(  field+ f_size* (site_index + n_sites * field_i   ), 
+		buf  + f_size* ( field_i ),  
+		sizeof(float)* f_size);
+    } 
   }
   
   /*printf("  %i wrote %f %f\n",ii,*(array + 2*ii), *(array+2*ii+1));*/\  
@@ -127,7 +142,6 @@ void qio_readGenericFields::read_genericfields(
    qio_setLayout();
    qio_setFilesystem();
    
-#if 0
    //detect output format
 
   int SingleDouble(1);
@@ -143,10 +157,8 @@ void qio_readGenericFields::read_genericfields(
     }
 
   if (SingleDouble) VRB.Flow(cname,fname," input-precision: DOUBLE\n");
-  else VRB.Flow(cname,fname," output-precision: SINGLE\n");
+  else VRB.Flow(cname,fname," input-precision: SINGLE\n");
 
-#endif
-  
   
   char xml_info_field[7*(MAX_HEADER_LINE+10)];
 
@@ -171,8 +183,6 @@ void qio_readGenericFields::read_genericfields(
   n_fields = qio_genfield_glb.n_fields;
   f_size_per_site = qio_genfield_glb. f_size_per_site;
 
-
-
   // In the file, the number of global sites are saved
   if ( qio_genfield_glb. n_sites != GJP. VolSites() )
     ERR.General(cname,fname,"read VolSites is wrong %d vs %d", qio_genfield_glb. n_sites, GJP.VolSites() );
@@ -183,10 +193,10 @@ void qio_readGenericFields::read_genericfields(
   // For the actual I/O, we will use the number of local sites
   qio_genfield_glb. n_sites =  GJP.VolNodeSites();
   
-  if( qio_genfield_glb. precision != 1 )
-    ERR.NotImplemented(cname,fname, "Only double precision is supported for I/O");
+  //if( qio_genfield_glb. precision != 1 )
+  //ERR.NotImplemented(cname,fname, "Only double precision is supported for I/O");
 
-  int SingleDouble(1);
+  //int SingleDouble(1);
     // 1=double (standard), else single
 
   // Now create the record info for fireld itself
@@ -208,8 +218,17 @@ void qio_readGenericFields::read_genericfields(
     }
   else
     {
-      ERR.NotImplemented(cname,fname,"Sorry for lack of support for single precision sotre at this moment");
+      //ERR.NotImplemented(cname,fname,"Sorry for lack of support for single precision sotre at this moment");
+      //output in double-precision
+
+      return_val += QIO_read( qio_Input, record_field, no_string,
+			       qio_putGenField,
+			       n_fields* f_size_per_site*sizeof(float),
+			       sizeof(float), field);
     }
+  //int f_size = f_size_per_site*GJP.VolNodeSites();
+  //for(int i=0;i<f_size;i++)
+  //printf("EVEC %d %e\n",i,*((float*)field+i));exit(0);
 
 
   if ( (return_val == 0) ) 

@@ -52,6 +52,8 @@ class Gamma
 
   /*! prints the tag */
   void printTag(FILE *fp){Fprintf(fp,"%s",tag);}
+  /*! prints the tag */
+  void printTag(FILE *fp, char* tag2){Fprintf(fp,"%s%s",tag2,tag);}
 
   /*! Returns the the number of indices */
   int N(){return _n;}

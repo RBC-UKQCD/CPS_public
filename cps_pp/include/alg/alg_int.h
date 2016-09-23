@@ -300,6 +300,9 @@ public:
 
     //!< Dummy method
     void init();
+    // for HMC restarting. Not working yet
+    void SaveState(std::string);
+    void LoadState(std::string);
 };
 
 /*!< 
@@ -366,6 +369,7 @@ protected:
     Vector **phi;
 
     int md_steps;
+    bool skip_force;
 
 public:
     AlgActionBilinear();
@@ -383,6 +387,9 @@ public:
     virtual void evolve(Float dt, int steps) = 0;
 
     void init();
+    // for HMC restarting. Not working yet
+    void SaveState(std::string);
+    void LoadState(std::string);
 
 };
 
@@ -710,6 +717,8 @@ public:
     void evolve(Float dt, int steps);
 
     void init();
+
+    void set_skip_force(bool _skip_force) { skip_force = _skip_force; }
 };
 
 /*!< 
@@ -772,6 +781,8 @@ public:
     bool loadPoles(void);
     bool savePoles(void);
     bool checkPolesFile(const RemezArg &md, const RemezArg &mc, const RationalDescr &r);
+
+    void set_skip_force(bool _skip_force) { skip_force = _skip_force; }
 };
 
 /*!< 

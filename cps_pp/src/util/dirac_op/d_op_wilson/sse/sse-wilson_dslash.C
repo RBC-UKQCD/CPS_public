@@ -1,4 +1,4 @@
-#ifdef USE_SSE
+#if (defined USE_SSE)||(defined SSE_TO_C)
 /*
  *  Wilson Dslahsh  2010/03/  Taku Izubuchi
  *
@@ -23,13 +23,35 @@
 //#include <omp.h>
 #include <util/omp_wrapper.h>
 //inline int omp_get_num_threads(void) {return 1;}
+#ifdef USE_SSE
 #include <pmmintrin.h>
+#endif
 
+#include "sse-defs.h"
+#include "sse-subs.h"
+#ifdef SSE_TO_C
+#else
+#define SSE_C_FLOAT Float
+#endif
+
+
+//#define SSE_TO_C
+
+//#ifdef SSE_TO_C
+#if 0
+//#else
+inline static void TOUCH(const double*a, int n)
+{
+  int i;
+  for(i=0;i<n;i+=64/sizeof(double)){
+    __builtin_prefetch (((const char*)(a+i)), 0, (_MM_HINT_T0)) ;
+  }
+}
+#endif
 
 // TIZB, restore later !
 #pragma warning disable 592
 
-#include <pmmintrin.h>
 
 #if defined(_OPENMP) && defined(__linux__)
 /*
@@ -75,41 +97,13 @@ void cpubind(void)
 
 
 
-inline static void TOUCH(const double*a, int n)
-{
-  int i;
-  for(i=0;i<n;i+=64/sizeof(double)){
-    __builtin_prefetch (((const char*)(a+i)), 0, (_MM_HINT_T0)) ;
-  }
-}
-
-
-#define __RESTRICT 
-#define __RESTRICT
-
 
 // #define AXG_WILSON
-
-
-#define X_DIR_ON
-// 2.95(inline), 3.02 (no-inline)
-#define Y_DIR_ON
-// 3.78(inline), 4.04 (no-inline)
-#define Z_DIR_ON
-// 3.17(inline), 3.24 (no-inline) 
-#define T_DIR_ON
-// 3.44(inline), 4.70 (no-inline)
-
-#define POS_DIR_ON
-#define NEG_DIR_ON
 
 //#define DEBUG_PRINT_DAG0
 //#define DEBUG_PRINT_DAG1
 //#define DEBUG_NOEDGE
 #define DEBUG_MFLOPS (1*1);
-
-// use macro version or inlines
-#define USE_MACROS
 
 
 #undef PROFILE
@@ -117,11 +111,6 @@ inline static void TOUCH(const double*a, int n)
 //#define PROF_printf(...)  if (!UniqueID()) printf(__VA_ARGS__);
 #define PROF_printf(...)  {}
 
-
-
-// The sizes of the block are assumed to be even numbers
-#define Y_BLOCK 16
-#define Z_BLOCK 16
 
 
 
@@ -140,15 +129,6 @@ inline static void TOUCH(const double*a, int n)
 CPS_START_NAMESPACE
 
 #if 0
-__declspec(align(16)) Float tmp1[SPINOR_SIZE];
-__declspec(align(16)) Float tmp2[SPINOR_SIZE];
-__declspec(align(16)) Float tmp3[SPINOR_SIZE];
-__declspec(align(16)) Float tmp4[SPINOR_SIZE];
-__declspec(align(16)) Float tmp5[SPINOR_SIZE];
-__declspec(align(16)) Float fbuf[SPINOR_SIZE];
-#endif
-
-
 #define U(r,row,col,d)  *(u+(r+2*(row+3*(col+3*d))))
 #define PSI(r,c,s)      *(psi +(r+2*(c+3*s)))
 //! As above, but the vector is called chi
@@ -163,6 +143,7 @@ __declspec(align(16)) Float fbuf[SPINOR_SIZE];
 #define TMP7(r,c,s)     *(tmp7+(r+2*(c+3*s))) 
 #define TMP8(r,c,s)     *(tmp8+(r+2*(c+3*s))) 
 #define FBUF(r,c,s)     *(fbuf+(r+2*(c+3*s))) 
+#endif
 
 
 Float dclock(void);
@@ -213,14 +194,15 @@ void wilson_dslash(
   const int   vol = wilson_p->vol[0];
 
 
-  IFloat *send_buf[4] = 
+#if 0
+  SSE_C_FLOAT *send_buf[4] = 
     {wilson_p->send_buf[0],
      wilson_p->send_buf[1],
      wilson_p->send_buf[2],
      wilson_p->send_buf[3],
     };
 
-  IFloat *recv_buf[8] =
+  SSE_C_FLOAT *recv_buf[8] =
     {wilson_p->recv_buf[0],
      wilson_p->recv_buf[1],
      wilson_p->recv_buf[2],
@@ -230,6 +212,7 @@ void wilson_dslash(
      wilson_p->recv_buf[6],
      wilson_p->recv_buf[7]
     }; 
+#endif
 
 
 
@@ -323,16 +306,22 @@ DiracOp::CGflops += 1320*vol;
 
 }//extern"C"
 
+#ifdef SSE_TO_C
+#define SSE_TO_C2
+#undef SSE_TO_C
+#endif
 
 #define BND_COMM
 
-#include "sse-subs.h"
 
+#ifndef SSE_TO_C2
+#define SSE_C_FLOAT Float
 #include "sse-blk-dag0.h"
 #include "sse-blk-dag1.h"
-
 #include "sse-bnd-dag0.h"
 #include "sse-bnd-dag1.h"
+#endif
+
 
 CPS_END_NAMESPACE
 

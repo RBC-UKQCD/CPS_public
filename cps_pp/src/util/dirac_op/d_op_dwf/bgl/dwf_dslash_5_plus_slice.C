@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/bgl/dwf_dslash_5_plus_slice.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_dwf/bgl/dwf_dslash_5_plus_slice.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

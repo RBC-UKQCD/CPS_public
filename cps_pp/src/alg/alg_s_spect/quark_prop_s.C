@@ -1,18 +1,7 @@
 #include<config.h>
 CPS_START_NAMESPACE
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:46:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v 1.14 2013-04-05 17:46:30 chulwoo Exp $
-//  $Id: quark_prop_s.C,v 1.14 2013-04-05 17:46:30 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: quark_prop_s.C,v $
-//  $Revision: 1.14 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_s_spect/quark_prop_s.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 // quark_prop_s.C

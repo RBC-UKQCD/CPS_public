@@ -1,20 +1,20 @@
 /*!\file
   \brief Definition of AlgEqState class..
 
-  $Id: alg_eq_state.h,v 1.3 2004-09-02 17:00:10 zs Exp $
+  $Id: alg_eq_state.h,v 1.3 2004/09/02 17:00:10 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-09-02 17:00:10 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/alg_eq_state.h,v 1.3 2004-09-02 17:00:10 zs Exp $
-//  $Id: alg_eq_state.h,v 1.3 2004-09-02 17:00:10 zs Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/09/02 17:00:10 $
+//  $Header: /space/cvs/cps/cps++/include/alg/alg_eq_state.h,v 1.3 2004/09/02 17:00:10 zs Exp $
+//  $Id: alg_eq_state.h,v 1.3 2004/09/02 17:00:10 zs Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: alg_eq_state.h,v $
 //  $Revision: 1.3 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/alg/alg_eq_state.h,v $
+//  $Source: /space/cvs/cps/cps++/include/alg/alg_eq_state.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

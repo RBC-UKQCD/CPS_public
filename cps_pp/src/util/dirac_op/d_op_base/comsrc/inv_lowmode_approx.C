@@ -1,6 +1,9 @@
 #include <config.h>
 
 //#define USE_BLAS
+#undef USE_BLAS
+#define EIGEN_CACHE_IN_INV_LOWMODE_APPROX_YES
+//#undef EIGEN_CACHE_IN_INV_LOWMODE_APPROX_YES
 
 CPS_START_NAMESPACE
 /*! \file
@@ -44,12 +47,15 @@ CPS_END_NAMESPACE
 
 CPS_START_NAMESPACE
 
+void movefloattoFloat(Float* out, float* in, int f_size);
+
 int DiracOp::InvLowModeApprox(
 			Vector *out, 
 			Vector *in, 
 			char* fname_eig_root,
 			int neig,
 			Float *true_res){
+
 
   time_elapse();
   
@@ -64,6 +70,9 @@ int DiracOp::InvLowModeApprox(
   Float d;
   int i, j;
   char *fname = "InvLowModeApprox(V*,V*,C,I,F*)";
+#ifndef USE_BLAS
+  ERR.General(cname,fname,"Broken without BLAS\n");
+#else
 
   Float mdagm_time=0.;
   Float gsum_time=0.;
@@ -115,7 +124,6 @@ int DiracOp::InvLowModeApprox(
   //------------------------------------------------------------------------------------------------//
   
 
-#define EIGEN_CACHE_IN_INV_LOWMODE_APPROX_YES
 
 #ifdef EIGEN_CACHE_IN_INV_LOWMODE_APPROX_YES
   // search for eigen cache
@@ -131,7 +139,7 @@ int DiracOp::InvLowModeApprox(
 #endif
   
   Float mass = dirac_arg->mass;
-  EigenContainer eigcon( lat, fname_eig_root_bc, neig, f_size_per_site, n_fields, ecache );
+  EigenContainer eigcon( lat, fname_eig_root_bc, neig, f_size_per_site/2 , n_fields, ecache );
 
   Float* eval = eigcon.load_eval();
   //
@@ -157,23 +165,27 @@ int DiracOp::InvLowModeApprox(
 
   sol->VecZero( f_size_cb );
 
+  Float* evecFloat = (Float*)smalloc(f_size_cb * sizeof(Float));
+  Vector *evecVec = (Vector *)evecFloat;
+
   for(int iev=0;iev<neig;++iev) {
     
     //time_elapse();
     Vector* evec = eigcon.nev_load( iev );
+    movefloattoFloat(evecFloat,(float*)evec,f_size_cb);
     //print_time("inv_lowmode_approx","loading", time_elapse());
 
 #ifndef USE_BLAS
-    Complex z = evec->CompDotProductGlbSum( src, f_size_cb );
+    Complex z = evecVec->CompDotProductGlbSum( src, f_size_cb );
 #else
     Complex z;
 
 #if TARGET != BGL
     cblas_zdotc_sub( f_size_cb / 2,
-		     (double*)evec, 1, (double*)src, 1, (double*)&z);
+		     (double*)evecFloat, 1, (double*)src, 1, (double*)&z);
 #else
     *(complex<double>*)&z=cblas_zdotc( f_size_cb / 2,
-		     (complex<double>*)evec, 1, (complex<double>*)src, 1);
+		     (complex<double>*)evecFloat, 1, (complex<double>*)src, 1);
 #endif
     
     glb_sum((double*)&z);
@@ -184,12 +196,12 @@ int DiracOp::InvLowModeApprox(
     z /= eval[ iev ];
 
 #ifndef USE_BLAS
-    sol -> CTimesV1PlusV2(z, evec, sol, f_size_cb );
+    sol -> CTimesV1PlusV2(z, evecVec, sol, f_size_cb );
 #else
 #if TARGET == BGL
-    cblas_zaxpy( f_size_cb / 2, *(complex<double>*)&z, (complex<double>*)evec, 1, (complex<double>*)sol,1);
+    cblas_zaxpy( f_size_cb / 2, *(complex<double>*)&z, (complex<double>*)evecFloat, 1, (complex<double>*)sol,1);
 #else
-    cblas_zaxpy( f_size_cb / 2, (double*)&z, (Float*)evec, 1, (Float*)sol,1);
+    cblas_zaxpy( f_size_cb / 2, (double*)&z, (Float*)evecFloat, 1, (Float*)sol,1);
 #endif    
 #endif
     //print_flops("inv_lowmode_approx","ctimesv1pv2", f_size_cb*4, time_elapse());
@@ -198,7 +210,10 @@ int DiracOp::InvLowModeApprox(
 
   print_flops(cname,fname, f_size_cb*7*neig, time_elapse());
   
+  sfree(evecFloat);
+
   *true_res = 0.0; // could compute the residue norm here, but saving a dirac operator for now
+#endif
   return neig;
 }
 
@@ -218,6 +233,9 @@ void DiracOp::InvLowModeProj( Vector *in,
   Float d;
   int i, j;
   char *fname = "InvLowModeApprox(V*,V*,C,I,F*)";
+#ifndef USE_BLAS
+  ERR.General(cname,fname,"Broken without BLAS\n");
+#else
 
 //------------------------------------------------------------------
 // Initializations
@@ -261,7 +279,6 @@ void DiracOp::InvLowModeProj( Vector *in,
   //------------------------------------------------------------------------------------------------//
   
 
-#define EIGEN_CACHE_IN_INV_LOWMODE_APPROX_YES
 
 #ifdef EIGEN_CACHE_IN_INV_LOWMODE_APPROX_YES
   // search for eigen cache
@@ -331,6 +348,7 @@ void DiracOp::InvLowModeProj( Vector *in,
 
   }
   fclose(fp);
+#endif
   return;
 
 }

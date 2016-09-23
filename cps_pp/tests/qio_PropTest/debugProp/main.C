@@ -1,6 +1,7 @@
 
-#define CHECKSOURCE
-#define VOLFMT QIO_PARTFILE 
+#undef CHECKSOURCE
+//#define VOLFMT QIO_PARTFILE 
+#define VOLFMT QIO_SINGLEFILE 
 // QIO_PARTFILE, QIO_SINGLEFILE
 
 
@@ -8,6 +9,7 @@
 #include <stdlib.h>
 
 #include <util/lattice.h>
+#include <util/time_cps.h>
 #include <alg/do_arg.h>
 #include <alg/common_arg.h>
 #include <alg/hmd_arg.h>
@@ -67,6 +69,7 @@ int main(int argc,char *argv[])
   CommandLine::is(argc,argv);
 
   DoArg do_arg;
+  DoArgExt doext_arg;
 
   /* get parameter from command line */
 
@@ -84,8 +87,14 @@ int main(int argc,char *argv[])
   
   
   if ( !do_arg.Decode(CommandLine::arg(),"do_arg") ) { printf("Bum do_arg\n"); exit(-1);}
+  if ( !doext_arg.Decode(CommandLine::arg(),"doext_arg") ) { printf("Bum doext_arg\n"); exit(-1);}
 
   GJP.Initialize(do_arg);
+  GJP.InitializeExt(doext_arg);
+
+  do_arg.Encode("do_arg.dat","do_arg");
+  doext_arg.Encode("doext_arg.dat","doext_arg");
+
 
   char out_prop[200], in_prop[200], mode[10]; 
 
@@ -97,8 +106,12 @@ int main(int argc,char *argv[])
 
   if(argc > 6)
     prec = CommandLine::arg_as_Float();
+  int sparse_num = 1;
+  if(argc > 7)
+    sparse_num = CommandLine::arg_as_int();
+  setQioSparseNum(sparse_num);
 
-  GimprRectFdwf lattice;
+  GnoneFmobius lattice;
  
   CommonArg common_arg("my_file", "my_label");    
 
@@ -153,24 +166,46 @@ int main(int argc,char *argv[])
     writePropQIO.setHeader("DUMMY_ID", "DEBUG_PROPAGATOR", traj);
     
 
-    printf("  using format source/sink pairs\n");
-    printf("  writing: %s (QIO-format, double)\n",out_prop_b);
+//    printf("  using format source/sink pairs\n");
+   VRB.Result("","main()",  "  writing: %s (QIO-format, double)\n",out_prop_b);
     
+
+    Float bytes = 1.;
+        for(int i =0; i<3; i++) bytes *= GJP.Sites(i);
+        bytes *= (GJP.Sites(3)+1);
+        bytes *= 12*12*2*sizeof(Float);
+//        cps::sync();
+        Float time = -dclock();
+    writePropQIO.setSourceTslice(0);
     writePropQIO.write_12pairs(out_prop_b, QIO_FULL_SOURCE, &propagator[0], fSourcePairs_write, VOLFMT);
+        time += dclock();
+        print_flops("write_12pairs","double",bytes,time);
+//        cps::sync();
+
     
-    printf("  writing: %s (QIO-format, single)\n",out_prop_b_sg);
+#if 0
+   VRB.Result("","main()",  "  writing: %s (QIO-format, single)\n",out_prop_b_sg);
+//        cps::sync();
+        time = -dclock();
     writePropQIO.write_12pairs(out_prop_b_sg, QIO_FULL_SOURCE, &propagator[0], fSourcePairs_write, VOLFMT,  FP_IEEE32);
+//        cps::sync();
+        time += dclock();
+        bytes /= 2;
+        print_flops("write_12pairs","single",bytes,time);
+#endif
+
     
   }	
 
 
 
   if( !(strcmp(mode,"r")) || !(strcmp(mode,"rw")) || !(strcmp(mode,"wr")) ) {
+     setQioSparseNum(1);
     
     qio_readPropagator readPropQio;
     
     printf("  using 12 fullSource sink pairs\n");
-    printf("  reading: %s (QIO-format)\n",in_prop);
+    printf("  reading: %s (QIO-format)\n",out_prop_b);
     
     for(int ii(0); ii < fSourcePairsSize; ++ii)
       *(fSourcePairs_read + ii) = 0.0;
@@ -181,7 +216,16 @@ int main(int argc,char *argv[])
 	*(zeroIt + ii) = 0.0;
     }
     
-    readPropQio.read_12pairs(in_prop, &propagator_read[0], fSourcePairs_read, QIO_FULL_SOURCE);
+    Float bytes = 1.;
+        for(int i =0; i<3; i++) bytes *= GJP.Sites(i);
+        bytes *= (GJP.Sites(3)+1);
+        bytes *= 12*12*2*sizeof(Float);
+        cps::sync();
+        Float time = -dclock();
+    readPropQio.read_12pairs(out_prop_b, &propagator_read[0], fSourcePairs_read, QIO_FULL_SOURCE);
+        cps::sync();
+        time += dclock();
+        print_flops("read_12pairs","double",bytes,time);
     
     {
       Float errCount(0);
@@ -246,8 +290,5 @@ int main(int argc,char *argv[])
 
 
   }
+  End();
 }
-
-
-
-

@@ -3,14 +3,14 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2004-09-21 20:16:55 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v 1.10 2004-09-21 20:16:55 chulwoo Exp $
-//  $Id: main.C,v 1.10 2004-09-21 20:16:55 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/09/21 20:16:55 $
+//  $Header: /space/cvs/cps/cps++/tests/s_spect/main.C,v 1.10 2004/09/21 20:16:55 chulwoo Exp $
+//  $Id: main.C,v 1.10 2004/09/21 20:16:55 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
 //  $Revision: 1.10 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/s_spect/main.C,v $
+//  $Source: /space/cvs/cps/cps++/tests/s_spect/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -66,11 +66,6 @@ int main(int argc,char *argv[])
   do_arg.start_seed_kind = START_SEED_FIXED;
   do_arg.beta = 5.375;
 
-#if TARGET==cpsMPI
-    MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
-    using MPISCU::fprintf;
-    using MPISCU::printf;
-#endif
 
   GJP.Initialize(do_arg);
 
@@ -122,7 +117,7 @@ int main(int argc,char *argv[])
   p_qarg1.cg.mass = 0.1;
   p_qarg1.cg.max_num_iter = 5000;
   p_qarg1.cg.stop_rsd = 1e-8;
-  p_qarg1.src.type = POINT;
+  p_qarg1.src.type = S_QUARK_POINT;
   p_qarg1.src.origin[0] = 0;
   p_qarg1.src.origin[1] = 0;
   p_qarg1.src.origin[2] = 0;

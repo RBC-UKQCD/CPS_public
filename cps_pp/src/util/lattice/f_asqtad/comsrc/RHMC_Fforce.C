@@ -5,7 +5,7 @@
 /*!\file
   \brief  Implementation of Fasqtad::RHMC_EvolveMomFforce.
 
-  $Id: RHMC_Fforce.C,v 1.14 2008-02-08 18:35:07 chulwoo Exp $
+  $Id: RHMC_Fforce.C,v 1.14 2008/02/08 18:35:07 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 

@@ -3,9 +3,6 @@
 
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_top_builddir@
-#depdrecated (used to be for QCDOC)
-#QOS = @QOS@
-#QOSLIB = ${QOS}/quser/gcc-lib-user///
 HAVE_MAKEDEPEND=@HAVE_MAKEDEPEND@
 
 PWD := $(shell pwd)

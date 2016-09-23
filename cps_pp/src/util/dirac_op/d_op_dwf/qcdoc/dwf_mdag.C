@@ -4,14 +4,14 @@ CPS_START_NAMESPACE
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:57:50 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_mdag.C,v 1.7 2004-08-18 11:57:50 zs Exp $
-//  $Id: dwf_mdag.C,v 1.7 2004-08-18 11:57:50 zs Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/08/18 11:57:50 $
+//  $Header: /space/cvs/cps/cps++/src/util/dirac_op/d_op_dwf/qcdoc/dwf_mdag.C,v 1.7 2004/08/18 11:57:50 zs Exp $
+//  $Id: dwf_mdag.C,v 1.7 2004/08/18 11:57:50 zs Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: dwf_mdag.C,v $
 //  $Revision: 1.7 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/dwf_mdag.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_dwf/qcdoc/dwf_mdag.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

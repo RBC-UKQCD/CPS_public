@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2011-11-12 03:59:56 chulwoo Exp $
+# $Id: Makefile,v 1.1 2011/11/12 03:59:56 chulwoo Exp $
 # Makefile.users.  Generated from Makefile.users.in by configure.
 #   This is the makefile for all the commands
 #   that are common for all testing applications.

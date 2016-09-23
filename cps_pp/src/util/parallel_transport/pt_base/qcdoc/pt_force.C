@@ -2,7 +2,6 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: pt_force.C,v 1.7 2012-05-10 05:51:23 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 

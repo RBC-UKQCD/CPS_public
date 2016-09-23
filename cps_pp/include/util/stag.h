@@ -4,21 +4,21 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Declaration of utility routines for the staggered fermions Dirac operator.
 
-  $Id: stag.h,v 1.8 2010-07-26 17:39:53 chulwoo Exp $
+  $Id: stag.h,v 1.8 2010/07/26 17:39:53 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2010-07-26 17:39:53 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/stag.h,v 1.8 2010-07-26 17:39:53 chulwoo Exp $
-//  $Id: stag.h,v 1.8 2010-07-26 17:39:53 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2010/07/26 17:39:53 $
+//  $Header: /space/cvs/cps/cps++/include/util/stag.h,v 1.8 2010/07/26 17:39:53 chulwoo Exp $
+//  $Id: stag.h,v 1.8 2010/07/26 17:39:53 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: stag.h,v $
 //  $Revision: 1.8 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/stag.h,v $
+//  $Source: /space/cvs/cps/cps++/include/util/stag.h,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

@@ -1,6 +1,6 @@
 /*! \file
 
-  $Id: w_ferm_vec.C,v 1.11 2008-02-08 18:35:05 chulwoo Exp $
+  $Id: w_ferm_vec.C,v 1.11 2008/02/08 18:35:05 chulwoo Exp $
 */
 
 #include<config.h>

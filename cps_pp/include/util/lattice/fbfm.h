@@ -6,6 +6,8 @@
 #ifdef USE_BFM
 #include <util/lattice/bfm_evo.h>
 #include <util/lattice/bfm_mixed_solver.h>
+#include <util/lattice/bfm_mixed_solver_multi.h>
+#include <util/lattice/eff_overlap.h>
 #endif
 
 #include <util/lattice.h>
@@ -17,15 +19,30 @@ class Fbfm : public virtual Lattice {
 public:
     // have to do this since lattice factory does not accept any input
     // parameters.
-    static bfmarg bfm_arg;
+    //static bfmarg bfm_arg;
+
+    //CK: Modified to allow for multiple sets of arguments for different fermion types
+//    static int current_arg_idx;  //current array index of bfmarg within arg array. Switch is performed either manually or automatically in LatticeFactory
+//    static bfmarg bfm_args[2]; //currently setup to allow 2 different choices corresponding to F_CLASS_BFM and F_CLASS_BFM_TYPE2, can be extended in principle
+//    static int nthreads[2];
+
+    static std::map<Float, bfmarg> arg_map;
+    static Float current_key_mass;
+
+    // Lets the user specify what MADWF parameters should be used for each key mass during measurements.
+    // Leave empty to use regular CG.
+    static std::map<Float, MADWFParams> madwf_arg_map;
 
     // set true to use single precision BFM object.
     static bool use_mixed_solver;
 
     bfm_evo<double> bd;
     bfm_evo<float> bf;
+//    bfm_evo<double> kernel;
 private:
     const char *cname;
+
+    bool bfm_inited;
 
     // These are eigenvectors/eigenvalues obtained from Rudy's Lanczos
     // code. Use them for deflation.
@@ -105,7 +122,16 @@ public:
     // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
   
     int FsiteSize() const {
-        return 24 * Fbfm::bfm_arg.Ls;
+	const char* fname = "FsiteSize()";
+	if (arg_map.count(current_key_mass) == 0) {
+	    ERR.General(cname, fname, "No entry for current key mass %e in arg_map!\n", current_key_mass);
+	    return 0;
+	} else {
+	    int Ls = arg_map.at(current_key_mass).Ls;
+	    int ret = 24 * Ls;
+	    //printf("FsiteSize() using current_key_mass = %e -> Ls = %d -> site size = %d!\n", current_key_mass, Ls, ret);
+	    return ret;
+	}
     }
     // Returns the number of fermion field 
     // components (including real/imaginary) on a
@@ -246,15 +272,8 @@ public:
   
     void Fconvert(Vector *f_field,
                   StrOrdType to,
-                  StrOrdType from, int cb=2)
+                  StrOrdType from);
     // Convert fermion field f_field from -> to
-{
-    const char *fname = "Fconvert()";
-    VRB.Func(cname,fname);
-
-    // nothing needs to be done
-    // //    ERR.NotImplemented(cname, fname);
-}
   
     Float BhamiltonNode(Vector *boson, Float mass);
     // The boson Hamiltonian of the node sublattice
@@ -296,18 +315,30 @@ public:
 
     void ImportGauge();
 
+    void SetBfmArg(Float key_mass);
+
     void SetMass(Float mass) {
         if(bd.mass != mass) {
             bd.mass = mass;
             bd.GeneralisedFiveDimEnd();
             bd.GeneralisedFiveDimInit();
         }
-        if(use_mixed_solver && bf.mass != mass) {
+//        if(use_mixed_solver && bf.mass != mass) {
+        if( bf.mass != mass) {
             bf.mass = mass;
             bf.GeneralisedFiveDimEnd();
             bf.GeneralisedFiveDimInit();
         }
+//        if( kernel.mass != mass) {
+//            kernel.mass = mass;
+//            kernel.GeneralisedFiveDimEnd();
+//            kernel.GeneralisedFiveDimInit();
+//        }
     }
+
+
+    void SaveFmatEvlInvProblem(const char* path, Vector *f_in, CgArg *cg_arg);
+    void LoadFmatEvlInvProblem(const char* path, int save_number, Vector *f_in, CgArg *cg_arg);
 };
 
 class GnoneFbfm

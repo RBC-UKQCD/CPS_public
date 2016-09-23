@@ -8,17 +8,6 @@
 /*!\file
   \brief  Definitions of the Lattice classes.
 
-  $Id: lattice.h,v 1.69 2013-06-25 12:51:12 chulwoo Exp $
-*/
-/*----------------------------------------------------------------------
-  $Author: chulwoo $
-  $Date: 2013-06-25 12:51:12 $
-  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v 1.69 2013-06-25 12:51:12 chulwoo Exp $
-  $Id: lattice.h,v 1.69 2013-06-25 12:51:12 chulwoo Exp $
-  $Name: not supported by cvs2svn $
-  $Revision: 1.69 $
-  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/lattice.h,v $
-  $State: Exp $
 */  
 //------------------------------------------------------------------
 
@@ -39,6 +28,7 @@
 #include <alg/eig_arg.h>
 #include <alg/lanczos_arg.h>
 #include <alg/force_arg.h>
+#include <alg/mobius_arg.h>
 #ifdef PARALLEL
 #include <comms/sysfunc_cps.h>
 #endif
@@ -71,6 +61,10 @@ class Lattice
        // Pointer to the gauge field configuration.
     static Float* u1_gauge_field;
        // Pointer to the u1 gauge field configuration.
+    
+    static int* sigma_field;
+       // There is one sigma variable for each plaquette.
+       // Each sigma variable is either 0 or 1.
   
     static int is_allocated;	
        // 0 = gauge field has not been allocated
@@ -112,6 +106,7 @@ class Lattice
       // The last stopping condition used.
 
     static int scope_lock;
+    static int bc_applied;
 
  protected:
 
@@ -161,7 +156,8 @@ class Lattice
     //!< The array of off-node links, accessed by methods in link_buffer.C
 
 
-
+	//block noisy MC;
+    static int sigma_blocks[4]; 
     
 
  public:
@@ -259,6 +255,43 @@ class Lattice
       // and fix boundary links to give same plaquette (flux)
 
 
+    int *SigmaField() const {
+        return sigma_field;
+    }
+    //!< Returns the pointer to the sigma field configuration.
+
+    static Float delta_beta;
+    static Float deltaS_offset;
+    static Float deltaS_cutoff;
+    int GetSigma(const int *site, int mu, int nu) const;
+    virtual int SigmaBlockSize();
+    virtual int SetSigmaBlock(int []);
+    void ScaleStaple(Matrix *stap, int x[4], int mu, int nu, Float *ReTrPlaq);
+    void StapleWithSigmaCorrections(Matrix& stap, int *x, int mu, Float *ReTrPlaq=NULL);
+    Float SumSigmaEnergyNode();
+    virtual void SigmaHeatbath() { ERR.NotImplemented(cname, "SigmaHeatBath()"); }
+    Float ReTrPlaqNonlocal(int *x, int mu, int nu);
+    Float ReTrLoopReentrant(const int *x, const int *dir,  int length);
+
+    Float DeltaSOrig(Float re_tr_plaq) const {
+      double temp =  deltaS_offset - (delta_beta/3.0) * re_tr_plaq; 
+      return temp;
+    }
+
+    Float DeltaS(Float re_tr_plaq) const {
+//      double temp =  deltaS_offset - (delta_beta/3.0) * re_tr_plaq; 
+      double temp =  DeltaSOrig(re_tr_plaq);
+      if (temp < 0.) return log (exp(temp)+1);
+      else return (temp + log (1 + exp(-temp))) ;
+    }
+
+    Float DeltaSDer(Float re_tr_plaq) const {
+      double temp =  deltaS_offset - (delta_beta/3.0) * re_tr_plaq; 
+      if (temp >0.) return 1./(exp(-temp)+1.);
+      else return (exp(temp)/(1+exp(temp)));
+    }
+    int SigmaTest(int x[], Float re_tr_plaq);
+
     void GaugeField(Matrix *u);
     //!< Copies an array into the gauge configuration.
     void U1GaugeField(Float *u);
@@ -276,6 +309,9 @@ class Lattice
 	\return The array index.
 	*/
     virtual unsigned long GsiteOffset(const int *x, const int dir) const;
+ 
+    int SigmaOffset(const int x[4], int mu, int nu) const;
+    int SigmaOffset(const int index, int mu, int nu) const;
 
 
     void CopyGaugeField(Matrix* u);
@@ -306,6 +342,9 @@ class Lattice
         //!< Calculates the gauge field square staple sum  around a link
         //Buffered version of staple
 
+    // compute the clover leaf version of field strength Gmunu. User must take anti-hermitian traceless part.
+    void CloverLeaf(Matrix &plaq, int *link_site, int mu, int nu) ;
+    
     void RectStaple(Matrix& stap, int *x, int mu) ;
         //!< Calculates the rectangle staple sum around a link.
         // The rectangle field is:
@@ -485,6 +524,7 @@ class Lattice
         // where U(i), V(i) is the gauge field before and after 
         // reunitarization. The index i runs over all components of
         // the gauge field.
+    void CheckUnitarity(Float &max_dev, Float &max_diff);
 
     int MetropolisAccept(Float delta_h, Float *accept);
     //!< Metropolis algorithm decision.
@@ -756,18 +796,26 @@ class Lattice
     //~~ added F_CLASS_WILSON_TM for twisted mass fermions
     int FwilsonType(){
       if (Fclass()==F_CLASS_WILSON || Fclass() ==F_CLASS_CLOVER || 
-	  Fclass() ==F_CLASS_DWF || Fclass()==F_CLASS_MOBIUS 
+	  Fclass() ==F_CLASS_DWF || Fclass()==F_CLASS_MOBIUS
+	  || Fclass()==F_CLASS_ZMOBIUS 
         || Fclass() ==F_CLASS_WILSON_TM || Fclass() ==F_CLASS_NAIVE
         || Fclass() ==F_CLASS_BFM ) return 1;
       else return 0;
     }
 
     //~~ to distinguish 5D types. Currently exclude BFM, as BFM does all the 5D stuff outside CPS.
-    int F5D(){
+    int F5D();
+#if 0
+{
       if ( Fclass() ==F_CLASS_DWF || Fclass()==F_CLASS_MOBIUS 
-        || Fclass() ==F_CLASS_MDWF || Fclass() == F_CLASS_BFM ) return 1;
+	   || Fclass()==F_CLASS_ZMOBIUS 
+#ifdef USE_BFM
+     || ( (Fclass() == F_CLASS_BFM) && Fbfm::arg_map.at(Fbfm::current_key_mass).solver == WilsonTM) //added by CK, moved here  by CJ
+#endif
+	   || Fclass() ==F_CLASS_MDWF ) return 1;
       else return 0;
     }
+#endif
 
     virtual int FsiteOffsetChkb(const int *x) const = 0;
     //!< Gets the lattice site index for the odd-even (checkerboard) order.
@@ -986,6 +1034,12 @@ class Lattice
                         Float *true_res,
 			CnvFrmType cnv_frm = CNV_FRM_YES,
 			PreserveType prs_f_in = PRESERVE_YES) = 0;
+    virtual int FmatInvTest(Vector *f_out, Vector *f_in,
+                CgArg *cg_arg,
+                Float *true_res,
+                CnvFrmType cnv_frm,
+                PreserveType prs_f_in)
+	{ return FmatInv(f_out, f_in, cg_arg, true_res , cnv_frm,prs_f_in); }
     //!< Fermion matrix inversion.
     /*!<
       Solves <em> A f_out = f_in </em> for \a f_out, where \a A is the
@@ -1081,6 +1135,18 @@ class Lattice
 			 Float **hsum,
 			 EigArg *eig_arg, 
 			 CnvFrmType cnv_frm = CNV_FRM_YES) = 0;
+
+
+
+  // MADWF solver
+  virtual int FmatInv(Vector *f_out,
+	      Vector *f_in,
+	      MobiusArg *mob_l,
+	      MobiusArg *mob_s,
+	      Float *true_res,
+	      CnvFrmType cnv_frm ,
+	      PreserveType prs_f_in)
+  {ERR.NotImplemented(cname,"FmatInv(V*,V*,M*,M*,F*,C*,P*)");} // for now
 
   
     virtual Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
@@ -1214,6 +1280,8 @@ class Lattice
     //!< Note: Agent classes which needs to import gauge field to
     //!external libraries need to overwrite this function.
     virtual void BondCond();
+    Float GetReTrPlaq(const int x[4],Float *ReTrPlaq);
+    int BcApplied(){return bc_applied;}
 };
 
 //------------------------------------------------------------------
@@ -1287,12 +1355,14 @@ class Gwilson : public virtual Lattice
     GclassType Gclass();
         // It returns the type of gauge class
 
+    void SigmaHeatbath();
+
     void GactionGradient(Matrix &grad, int *x, int mu) ;
         // Calculates the partial derivative of the gauge action
         // w.r.t. the link U_mu(x).  Typical implementation has this
         // func called with Matrix &grad = *mp0, so avoid using it.
 
-    void GforceSite(Matrix& force, int *x, int mu);
+    void GforceSite(Matrix& force, int *x, int mu, Float *ReTrPlaq=NULL);
     //!< Calculates the gauge force at site x and direction mu.
 
     ForceArg EvolveMomGforce(Matrix *mom, Float step_size);
@@ -2104,6 +2174,8 @@ class Fp4 : public virtual FstagTypes, public virtual Fsmear
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
 
+
+  
     int FeigSolv(Vector **f_eigenv, Float *lambda, 
 		 LanczosArg *eig_arg, 
 		 CnvFrmType cnv_frm = CNV_FRM_YES);
@@ -2174,7 +2246,5 @@ CPS_END_NAMESPACE
 
 #include <util/lattice/f_wilson_types.h>
 #include <util/lattice/lattice_types.h>
-
-
 
 #endif

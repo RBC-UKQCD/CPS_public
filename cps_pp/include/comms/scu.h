@@ -4,22 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Declarations of communications routines
 
-  $Id: scu.h,v 1.7 2012-07-06 20:22:08 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012-07-06 20:22:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu.h,v 1.7 2012-07-06 20:22:08 chulwoo Exp $
-//  $Id: scu.h,v 1.7 2012-07-06 20:22:08 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $Revision: 1.7 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/comms/scu.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 /*******************************************************************
 *
 * scu.h

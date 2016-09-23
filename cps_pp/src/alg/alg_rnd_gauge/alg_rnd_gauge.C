@@ -1,7 +1,7 @@
 /*!\file
   \brief Implementation of AlgRandomGauge and AlgRotateGauge methods.
 
-  $Id: alg_rnd_gauge.C,v 1.3 2004-09-02 16:52:48 zs Exp $
+  $Id: alg_rnd_gauge.C,v 1.3 2004/09/02 16:52:48 zs Exp $
 */
 
 #include <math.h>

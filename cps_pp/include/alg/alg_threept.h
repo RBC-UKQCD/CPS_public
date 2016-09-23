@@ -2,7 +2,6 @@
 /*!\file
   \brief  Definitions of the AlgThreePt class.
 
-  $Id: alg_threept.h,v 1.7 2012-08-31 04:55:08 chulwoo Exp $
 */
 //------------------------------------------------------------------
 

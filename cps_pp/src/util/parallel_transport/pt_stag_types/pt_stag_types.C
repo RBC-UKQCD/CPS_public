@@ -3,20 +3,20 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of ParTransStagTypes class constructor and destructor.
 
-  $Id: pt_stag_types.C,v 1.6 2004-08-18 11:58:07 zs Exp $
+  $Id: pt_stag_types.C,v 1.6 2004/08/18 11:58:07 zs Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: zs $
-//  $Date: 2004-08-18 11:58:07 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_stag_types/pt_stag_types.C,v 1.6 2004-08-18 11:58:07 zs Exp $
-//  $Id: pt_stag_types.C,v 1.6 2004-08-18 11:58:07 zs Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2004/08/18 11:58:07 $
+//  $Header: /space/cvs/cps/cps++/src/util/parallel_transport/pt_stag_types/pt_stag_types.C,v 1.6 2004/08/18 11:58:07 zs Exp $
+//  $Id: pt_stag_types.C,v 1.6 2004/08/18 11:58:07 zs Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: pt_stag_types.C,v $
 //  $Revision: 1.6 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_stag_types/pt_stag_types.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/parallel_transport/pt_stag_types/pt_stag_types.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

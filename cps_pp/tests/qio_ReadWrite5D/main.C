@@ -1,5 +1,7 @@
-
-
+// QIO needs QMP!
+#ifndef USE_QMP
+#error This test needs QMP
+#else
 // v4.1
 
 
@@ -79,13 +81,8 @@
 #include <util/qio_writePropagator.h>
 
 using namespace std;
-using namespace cps;
+USING_NAMESPACE_CPS
 
-#if(0==1)
- GlobalJobParameter GJP;
- Verbose VRB;
- Error ERR;
-#endif
 
 
 
@@ -1027,7 +1024,4 @@ int main(int argc,char *argv[])
 
 }
 
-
-
-
-
+#endif // #ifndef USE_QMP

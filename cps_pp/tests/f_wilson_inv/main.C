@@ -1,5 +1,5 @@
 /*
-  $Id: main.C,v 1.15 2008-06-03 19:43:37 chulwoo Exp $
+  $Id: main.C,v 1.15 2008/06/03 19:43:37 chulwoo Exp $
 */
 
 #include<config.h>

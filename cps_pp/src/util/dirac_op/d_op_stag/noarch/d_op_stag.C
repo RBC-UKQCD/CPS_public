@@ -4,20 +4,8 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpStag class methods.
 
-  $Id: d_op_stag.C,v 1.12 2013-04-08 20:50:00 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-//  CVS keywords
-//  $Author: chulwoo $
-//  $Date: 2013-04-08 20:50:00 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v 1.12 2013-04-08 20:50:00 chulwoo Exp $
-//  $Id: d_op_stag.C,v 1.12 2013-04-08 20:50:00 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: d_op_stag.C,v $
-//  $Revision: 1.12 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_stag/noarch/d_op_stag.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 //------------------------------------------------------------------

@@ -41,6 +41,8 @@ class AlgHmc
 {
  private:
     char *cname;
+ protected:
+ public:
 
     //!< Save the gauge field and rngs (for accept/reject and repro)
     int saveInitialState();
@@ -57,7 +59,6 @@ class AlgHmc
     //!< used to shift lattice/RNG for a stronger reproducibility testing
     void shiftStates(const int x,const int y,const int z, const int t);
 
- protected:
 
     //!< The size of the gauge field.
     int g_size;
@@ -99,14 +100,13 @@ class AlgHmc
     unsigned int checksum[2];
     //!< Store the checksums of the final lattice (used for repro test)
 
- public:
 
   AlgHmc(AlgIntAB &integrator, CommonArg &c_arg, HmcArg &arg);
 
   virtual ~AlgHmc();
 
   //!< Performs a single HMC trajectory
-  Float run(void);
+  Float run(int if_met=1);
 };
 
 #endif

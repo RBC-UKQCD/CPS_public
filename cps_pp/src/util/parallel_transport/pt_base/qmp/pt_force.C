@@ -3,35 +3,27 @@
 /*!\file
   \brief  Implementation of Fasqtad::EvolveMomFforce.
 
-  $Id: pt_force.C,v 1.4 2012-05-10 05:51:23 chulwoo Exp $
 */
-//--------------------------------------------------------------------
 
 #include <string.h>
+#include <malloc.h>
 #include "asq_data_types.h"
 #include "pt_int.h"
 
 extern "C"{
-void asq_force_cross2dag(PTvector *chi, PTvector *phi, matrix *result,
+void asq_force_cross2dag(PTvector *chi, PTvector *phi, PTmatrix *result,
                       int counter, double *fac);
-void asq_force_cross2dag_s(PTvector *chi, PTvector *phi, matrix *result,
+void asq_force_cross2dag_s(PTvector *chi, PTvector *phi, PTmatrix *result,
                       int counter, float *fac);
 void asq_vaxpy3(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
 void asq_vaxpy3_s(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
 }
 
-#ifdef USE_QALLOC
-void *pt_alloc(size_t request, const char *cname, const
-char *fname, const char *vname){
-    return qalloc(QCOMMS,request);
-}
-#else
 void *pt_alloc(size_t request, const char *cname, const
 char *fname, const char *vname){
     return malloc(request);
 }
 const int QCOMMS = 0;
-#endif
 
 #ifdef ASQD_SINGLE
 #define asq_force_cross2dag(A,B,C,D,E) asq_force_cross2dag_s(A,B,C,D,E)
@@ -45,7 +37,7 @@ const int QCOMMS = 0;
 // N.B. No optimising provision is made if any of the asqtad coefficients
 // are zero.
 
-void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float dt){
+void PT::asqtad_force(AsqDArg *asq_arg, PTmatrix *mom, Float *X, Float dt){
 
     char *fname = "asqtad_force()";
 //    VRB.Func(cname,fname);
@@ -73,13 +65,13 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float dt){
     // this must be initialised to zero 
 
 #if 0
-    matrix **force = (matrix**)pt_amalloc(pt_alloc, sizeof(matrix), 2, 4, vol);
-    memset( (char *)force,0,sizeof(matrix)*4*vol);
+    PTmatrix **force = (PTmatrix**)pt_amalloc(pt_alloc, sizeof(PTmatrix), 2, 4, vol);
+    memset( (char *)force,0,sizeof(PTmatrix)*4*vol);
 #endif
-    matrix *force[4];
+    PTmatrix *force[4];
     for(int i =0;i<4;i++){
-      force[i] = (matrix *)FastAlloc(sizeof(matrix)*vol);
-      memset( (char *)force[i],0,sizeof(matrix)*vol);
+      force[i] = (PTmatrix *)FastAlloc(sizeof(PTmatrix)*vol);
+      memset( (char *)force[i],0,sizeof(PTmatrix)*vol);
     }
 
 
@@ -668,7 +660,7 @@ void PT::asqtad_force(AsqDArg *asq_arg, matrix *mom, Float *X, Float dt){
 
 #undef PROFILE
 void PT::force_product_sum(PTvector *v, PTvector *w,
-				    Float coeff, matrix *f){
+				    Float coeff, PTmatrix *f){
 
 //  char *fname = "force_product_sum(*V,*V,F,*M)";
   Flops +=78*vol;
@@ -703,9 +695,9 @@ inline int parity(int *n){
   return( (PT::evenodd + n[0]+n[1]+n[2]+n[3])%2);
 }
 
-void PT::update_momenta(matrix **force, Float dt, matrix *mom) {
+void PT::update_momenta(PTmatrix **force, Float dt, PTmatrix *mom) {
 
-    matrix mf, mfd;
+    PTmatrix mf, mfd;
     double dt_tmp;
 
     int s[4];
@@ -714,7 +706,7 @@ void PT::update_momenta(matrix **force, Float dt, matrix *mom) {
 	    for(s[1]=0; s[1]<size[1]; s[1]++)
 		for(s[0]=0; s[0]<size[0]; s[0]++){
 
-//		    matrix *ip = mom+LexGauge(s,0);
+//		    PTmatrix *ip = mom+LexGauge(s,0);
 
 		    for (int mu=0; mu<4; mu++){			
 			mf = force[mu][LexVector(s)];
@@ -722,7 +714,7 @@ void PT::update_momenta(matrix **force, Float dt, matrix *mom) {
 //			mf *= 0.5;	
 			if(parity(s)) dt_tmp =-dt;
 			else dt_tmp = dt;
-		        matrix *ip = mom+LexGauge(s,mu);
+		        PTmatrix *ip = mom+LexGauge(s,mu);
 			(ip)->fTimesV1Plus(0.5*dt_tmp,mf);
 #if 0
                     Float *ip_f =(Float *)ip;

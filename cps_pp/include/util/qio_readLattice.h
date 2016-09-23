@@ -4,8 +4,6 @@
 #include <util/qio_general.h>
 
 CPS_START_NAMESPACE
-using namespace std;
-
 
 class qio_readLattice: private qio_init {
 
@@ -43,7 +41,7 @@ class qio_readLattice: private qio_init {
 
   virtual ~qio_readLattice(){
     #ifdef DEBUG_Init
-    printf("finished qio_readLattice\n");
+      std::printf("finished qio_readLattice\n");
     #endif //DEBUG_Init
   }
 

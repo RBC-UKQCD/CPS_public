@@ -4,8 +4,6 @@
 #include <util/qio_general.h>
 
 CPS_START_NAMESPACE
-using namespace std;
-
 
 class qio_readPropagator: private qio_init {
 
@@ -113,7 +111,7 @@ class qio_readPropagator: private qio_init {
 
   virtual ~qio_readPropagator(){
     #ifdef DEBUG_Init
-    printf("finished qio_readPropagator\n");
+      std::printf("finished qio_readPropagator\n");
     #endif //DEBUG_Init
   }
 

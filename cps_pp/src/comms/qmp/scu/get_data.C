@@ -8,26 +8,14 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of communications routines
 
-  $Id: get_data.C,v 1.10 2012-03-26 13:50:11 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-//  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2012-03-26 13:50:11 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v 1.10 2012-03-26 13:50:11 chulwoo Exp $
-//  $Id: get_data.C,v 1.10 2012-03-26 13:50:11 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: get_data.C,v $
-//  $Revision: 1.10 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/comms/qmp/scu/get_data.C,v $
-//  $State: Exp $
 //
 //--------------------------------------------------------------------
 CPS_END_NAMESPACE
 #include<util/gjp.h>
-//#include<sysfunc_cps.h>
+#include<util/time_cps.h>
 CPS_START_NAMESPACE
 #ifndef USE_QMP
 #define USE_QMP
@@ -119,13 +107,15 @@ static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len_i, int
   int dir = DIR(mu,sign);
 
   if (len != msglen[dir]){
-  if(!UniqueID())printf("PassData(%p %p %d %d %d)\n",rcv_noncache,send_noncache,len_i,mu,sign);
+  //Commented out by Greg for speed and log readability
+  //if(!UniqueID())printf("PassData(%p %p %d %d %d)\n",rcv_noncache,send_noncache,len_i,mu,sign);
     if (msglen[dir]>0){ 	// previously allocated
       QMP_free_msghandle(sndhandle[dir]);
       QMP_free_msghandle(rcvhandle[dir]);
       QMP_free_msgmem(sndmem[dir]);
       QMP_free_msgmem(rcvmem[dir]);
-      if(!UniqueID())printf("msglen[%d](%d) deleted\n",dir,msglen[dir]); 
+      //Commented out by Greg for speed and log readability:
+      //if(!UniqueID())printf("msglen[%d](%d) deleted\n",dir,msglen[dir]); 
     }
     sndmem[dir] = QMP_declare_msgmem(send_noncache, len*sizeof(IFloat));
     rcvmem[dir] = QMP_declare_msgmem(rcv_noncache, len*sizeof(IFloat));
@@ -147,48 +137,64 @@ static void PassData(IFloat *rcv_noncache, IFloat *send_noncache, int len_i, int
 #if 0
 static void getData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu, int sign)
 {
+    if(gjp_local_axis[mu] == 1) {
+        memcpy(rcv_buf, snd_buf, size);
+        return;
+    }
 
-  allocate_buffer();
-  int i = 0;
-//  printf("gjp_local_axis[%d]=%d\n",mu,gjp_local_axis[mu]);
-  if(gjp_local_axis[mu] == 0) {
-    check_length(len);
-//    for(i=0;i<len;i++) send_noncache[i] = send_buf[i];
-    memcpy(send_noncache,send_buf,len*sizeof(IFloat));
-    PassData(rcv_noncache,send_noncache,len,mu,sign);
-//    for(i=0;i<len;i++) rcv_buf[i] = rcv_noncache[i];
-    memcpy(rcv_buf,rcv_noncache,len*sizeof(IFloat));
-  }
-  else {
-//    for(int i = 0; i < len; ++i) *rcv_buf++ = *send_buf++;
-    memcpy(rcv_buf,send_buf,len*sizeof(IFloat));
-  }
+    QMP_msgmem_t snd_msg = QMP_declare_msgmem(snd_buf, size);
+    QMP_msgmem_t rcv_msg = QMP_declare_msgmem(rcv_buf , size);
+    QMP_msghandle_t snd_hnd = QMP_declare_send_relative   (snd_msg, mu, -sign, 0);
+    QMP_msghandle_t rcv_hnd = QMP_declare_receive_relative(rcv_msg, mu,  sign, 0);
+
+    QMP_start(snd_hnd);
+    QMP_start(rcv_hnd);
+
+    QMP_status_t snd = QMP_wait(snd_hnd);
+    QMP_status_t rcv = QMP_wait(rcv_hnd);
+
+    if(snd != QMP_SUCCESS || rcv != QMP_SUCCESS) {
+      QMP_error("Send/Receive failed in getData: %s %s\n",
+                QMP_error_string(snd),
+                QMP_error_string(rcv));
+    }
+
+    QMP_free_msghandle(snd_hnd);
+    QMP_free_msghandle(rcv_hnd);
+    QMP_free_msgmem(snd_msg);
+    QMP_free_msgmem(rcv_msg);
 }
 
-void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu){
-  IFloat *rcv_p = rcv_buf;
-  IFloat *send_p = send_buf;
-  int  len_t = len;
-  while (len_t > MAX_LENGTH){
-    getData(rcv_p,send_p,MAX_LENGTH,mu,+1);
-    len_t -= MAX_LENGTH;
-    rcv_p += MAX_LENGTH;
-    send_p += MAX_LENGTH;
-  }
-  getData(rcv_p,send_p,len_t,mu,+1);
+void getPlusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
+{
+    getData(rcv_buf, send_buf, sizeof(Float) * len, mu, +1);
+
+  // IFloat *rcv_p = rcv_buf;
+  // IFloat *send_p = send_buf;
+  // int  len_t = len;
+  // while (len_t > MAX_LENGTH){
+  //   getData(rcv_p,send_p,MAX_LENGTH,mu,+1);
+  //   len_t -= MAX_LENGTH;
+  //   rcv_p += MAX_LENGTH;
+  //   send_p += MAX_LENGTH;
+  // }
+  // getData(rcv_p,send_p,len_t,mu,+1);
 }
 
-void getMinusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu){
-  IFloat *rcv_p = rcv_buf;
-  IFloat *send_p = send_buf;
-  int  len_t = len;
-  while (len_t > MAX_LENGTH){
-    getData(rcv_p,send_p,MAX_LENGTH,mu,-1);
-    len_t -= MAX_LENGTH;
-    rcv_p += MAX_LENGTH;
-    send_p += MAX_LENGTH;
-  }
-  getData(rcv_p,send_p,len_t,mu,-1);
+void getMinusData(IFloat *rcv_buf, IFloat *send_buf, int len, int mu)
+{
+    getData(rcv_buf, send_buf, sizeof(Float) * len, mu, -1);
+
+  // IFloat *rcv_p = rcv_buf;
+  // IFloat *send_p = send_buf;
+  // int  len_t = len;
+  // while (len_t > MAX_LENGTH){
+  //   getData(rcv_p,send_p,MAX_LENGTH,mu,-1);
+  //   len_t -= MAX_LENGTH;
+  //   rcv_p += MAX_LENGTH;
+  //   send_p += MAX_LENGTH;
+  // }
+  // getData(rcv_p,send_p,len_t,mu,-1);
 }
 #else
 static void getData(void *rcv_buf, void *snd_buf, size_t size, int mu, int sign)

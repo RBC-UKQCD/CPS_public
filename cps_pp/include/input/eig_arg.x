@@ -2,7 +2,6 @@
 /*!\file
   \brief  Definitions of the EigArg structure.
   
-  $Id: eig_arg.x,v 1.8 2013-04-05 17:46:30 chulwoo Exp $
 */
 /*------------------------------------------------------------------*/
 

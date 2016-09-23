@@ -1,6 +1,12 @@
 #include <config.h>
 #include <util/momentum.h>
 #include <math.h>
+#ifdef C11
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+#endif
+
 
 CPS_START_NAMESPACE
 

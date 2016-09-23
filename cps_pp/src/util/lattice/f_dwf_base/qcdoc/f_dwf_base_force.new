@@ -4,12 +4,12 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of FdwfBase class.
 
-  $Id: f_dwf_base_force.new,v 1.2 2008-02-08 18:35:08 chulwoo Exp $
+  $Id: f_dwf_base_force.new,v 1.2 2008/02/08 18:35:08 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_dwf_base/qcdoc/f_dwf_base_force.new,v $
+//  $Source: /space/cvs/cps/cps++/src/util/lattice/f_dwf_base/qcdoc/f_dwf_base_force.new,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

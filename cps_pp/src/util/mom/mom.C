@@ -3,7 +3,6 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitiion of Mom class methods.
 
-  $Id: mom.C,v 1.5 2012-08-15 03:45:46 chulwoo Exp $ 
 */
 // mom.C
 //

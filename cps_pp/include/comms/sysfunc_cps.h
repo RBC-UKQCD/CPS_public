@@ -3,7 +3,7 @@
 /*!\file
   \brief Declarations for the communications layer.
   
-  $Id: sysfunc_cps.h,v 1.4 2012-03-27 21:17:55 chulwoo Exp $
+  $Id: sysfunc_cps.h,v 1.4 2012/03/27 21:17:55 chulwoo Exp $
 */
 
 #ifdef USE_QMP

@@ -137,6 +137,15 @@ class SpinMatrix
         }
         return ret;
     }
+
+    static SpinMatrix One();
+    static SpinMatrix Gamma5();
+    static SpinMatrix Gamma(int mu);
+    static SpinMatrix GammaMuGamma5(int mu);
+    static SpinMatrix Sigma(int mu, int nu);
+    static SpinMatrix SigmaGamma5(int mu, int nu);
+    static SpinMatrix OnePlusGamma(int mu);
+    static SpinMatrix OneMinusGamma(int mu);
 };
 
 static inline Rcomplex Trace(const SpinMatrix &a, const SpinMatrix &b) {

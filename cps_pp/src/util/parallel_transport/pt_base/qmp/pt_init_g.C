@@ -2,23 +2,7 @@
 /*! \file
   \brief  Definition of parallel transport definitions for QCDOC.
   
-  $Id: pt_init_g.C,v 1.5 2012-08-02 21:20:01 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012-08-02 21:20:01 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init_g.C,v 1.5 2012-08-02 21:20:01 chulwoo Exp $
-//  $Id: pt_init_g.C,v 1.5 2012-08-02 21:20:01 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: pt_init_g.C,v $
-//  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/parallel_transport/pt_base/qmp/pt_init_g.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 #include "asq_data_types.h"
 #include "pt_int.h"
 //#include <qmp.h>
@@ -142,8 +126,8 @@ void PT::init_g(Float * g_addr){
 
 	      #ifdef USE_QMP
 	      {
-		QMP_msgmem_t snd_msgmem = QMP_declare_msgmem((void *)(u+LexGauge(x,i)*GAUGE_LEN), sizeof(matrix));
-		QMP_msgmem_t rcv_msgmem = QMP_declare_msgmem((void *)rcv_mat, sizeof(matrix));
+		QMP_msgmem_t snd_msgmem = QMP_declare_msgmem((void *)(u+LexGauge(x,i)*GAUGE_LEN), sizeof(PTmatrix));
+		QMP_msgmem_t rcv_msgmem = QMP_declare_msgmem((void *)rcv_mat, sizeof(PTmatrix));
 		QMP_msghandle_t snd_msghandle = QMP_declare_send_relative(snd_msgmem, i, +1, 0);
 		QMP_msghandle_t rcv_msghandle = QMP_declare_receive_relative(rcv_msgmem, i, -1, 0);
 		QMP_start(snd_msghandle);

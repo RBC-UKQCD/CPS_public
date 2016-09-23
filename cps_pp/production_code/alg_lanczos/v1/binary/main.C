@@ -36,11 +36,7 @@ void ReadGaugeField(const MeasArg &meas_arg);
 void WriteGaugeField(const MeasArg &meas_arg);
 
 
-#if TARGET == BGL
-extern "C"
-int omp_get_thread_num(){return 1;}
-#endif
-
+#if 0
 //------------------------------------------
 // should go to eigen_container.C later, someday 
 //------------------------------------------
@@ -68,6 +64,7 @@ void cps::EigenCacheListCleanup( )
   }
   EigenCacheList.clear() ;
 }
+#endif
 
 //----------------------------------------------------
 

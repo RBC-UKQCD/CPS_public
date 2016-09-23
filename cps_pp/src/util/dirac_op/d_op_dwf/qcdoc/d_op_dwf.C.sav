@@ -4,12 +4,17 @@ CPS_START_NAMESPACE
 /*! \file
   \brief  Definition of DiracOpDwf class methods.
 
+<<<<<<< HEAD
   $Id: d_op_dwf.C.sav,v 1.3 2013-04-05 17:51:14 chulwoo Exp $
+=======
+  $Id: d_op_dwf.C.sav,v 1.2 2008/04/21 17:18:02 chulwoo Exp $
+>>>>>>> 23ac05e5c207bc26081fd5b07fe4d1353d7fd549
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
 //  $Author: chulwoo $
+<<<<<<< HEAD
 //  $Date: 2013-04-05 17:51:14 $
 //  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C.sav,v 1.3 2013-04-05 17:51:14 chulwoo Exp $
 //  $Id: d_op_dwf.C.sav,v 1.3 2013-04-05 17:51:14 chulwoo Exp $
@@ -18,6 +23,16 @@ CPS_START_NAMESPACE
 //  $RCSfile: d_op_dwf.C.sav,v $
 //  $Revision: 1.3 $
 //  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C.sav,v $
+=======
+//  $Date: 2008/04/21 17:18:02 $
+//  $Header: /space/cvs/cps/cps++/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C.sav,v 1.2 2008/04/21 17:18:02 chulwoo Exp $
+//  $Id: d_op_dwf.C.sav,v 1.2 2008/04/21 17:18:02 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
+//  $Locker:  $
+//  $RCSfile: d_op_dwf.C.sav,v $
+//  $Revision: 1.2 $
+//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_dwf/qcdoc/d_op_dwf.C.sav,v $
+>>>>>>> 23ac05e5c207bc26081fd5b07fe4d1353d7fd549
 //  $State: Exp $
 //
 //--------------------------------------------------------------------

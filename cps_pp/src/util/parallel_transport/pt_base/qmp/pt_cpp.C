@@ -175,7 +175,7 @@ void pt_cmm_dag_cpp(int sites, long u, long a, long tmpfrm, long gauge_field)
 //----------------------------------------------------------------------------
 
 extern "C"
-void cmm_agg_cpp(gauge_agg *u, matrix *a, matrix *tmpfrm, int sites)
+void cmm_agg_cpp(gauge_agg *u, PTmatrix *a, PTmatrix *tmpfrm, int sites)
 {
   IFloat *fp0, *fp1, *uu;
   int s, c,i;
@@ -228,7 +228,7 @@ void pt_copy_cpp(int sites, ind_agg *u, double *a, double *tmpfrm)
       fp1 = (IFloat *)((long)tmpfrm + agg[s].dest);
       fp0 = (IFloat *)((long)a + agg[s].src);
 
-      //d indexes the row of the gauge link matrix
+      //d indexes the row of the gauge link PTmatrix
       for(d = 0; d<3; d++)
 	{
 	  tmp = uu+6*d;

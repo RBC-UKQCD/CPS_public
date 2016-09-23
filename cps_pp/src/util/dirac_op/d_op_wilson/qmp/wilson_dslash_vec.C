@@ -5,31 +5,12 @@
 #include <util/omp_wrapper.h>
 #include <qmp.h>
 
-//#ifdef USE_BFM
-#if 0
-#include "/bgsys/drivers/ppcfloor/hwi/include/bqc/nd_rese_dcr.h"
-#endif
 
 CPS_START_NAMESPACE
 /*! \file
   \brief  Routine used internally in the DiracOpWilson class.
 
-  $Id: wilson_dslash_vec.C,v 1.5 2013-05-14 16:56:34 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-05-14 16:56:34 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_vec.C,v 1.5 2013-05-14 16:56:34 chulwoo Exp $
-//  $Id: wilson_dslash_vec.C,v 1.5 2013-05-14 16:56:34 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $Revision: 1.5 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_wilson/qmp/wilson_dslash_vec.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 /***************************************************************************/
 /*                                                                         */
 /* wilson_dslash: It calculates chi = Dslash * psi, or                     */
@@ -247,7 +228,7 @@ void wilson_dslash_vec(IFloat *chi_p_f,
 		ind_buf[i]=Send_buf[i];
 	}
 
-	if (called%100==0)
+	if (called%10000==0)
 	VRB.Result(cname,fname,"local_comm=%d %d %d %d\n",local_comm[0],local_comm[1],local_comm[2],local_comm[3]);
 
 //
@@ -1267,11 +1248,11 @@ printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,
 
 	called++;
 
-	if (called%100==0){
-		print_flops("wilson_dslash_vec()","local*100",0,local);
-		print_flops("wilson_dslash_vec()","nonlocal*100",0,nonlocal);
-		print_flops("wilson_dslash_vec()","qmp*100",0,qmp);
-		print_flops("wilson_dslash_vec()","setup*100",0,setup);
+	if (called%10000==0){
+		print_flops("wilson_dslash_vec()","local*10000",0,local);
+		print_flops("wilson_dslash_vec()","nonlocal*00100",0,nonlocal);
+		print_flops("wilson_dslash_vec()","qmp*10000",0,qmp);
+		print_flops("wilson_dslash_vec()","setup*10000",0,setup);
 		local=nonlocal=qmp=setup=0.;
 //#ifdef USE_BFM
 #if 0

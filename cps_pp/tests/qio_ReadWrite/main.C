@@ -1,4 +1,7 @@
-
+// QIO needs QMP!
+#ifndef USE_QMP
+#error This test needs QMP
+#else
 
 // v4.1
 
@@ -946,6 +949,4 @@ int main(int argc,char *argv[])
 }
 
 
-
-
-
+#endif // #ifndef USE_QMP

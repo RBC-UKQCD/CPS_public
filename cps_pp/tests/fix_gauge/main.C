@@ -3,14 +3,14 @@
 //  CVS keywords
 //
 //  $Author: chulwoo $
-//  $Date: 2008-02-08 18:35:08 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v 1.9 2008-02-08 18:35:08 chulwoo Exp $
-//  $Id: main.C,v 1.9 2008-02-08 18:35:08 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
+//  $Date: 2008/02/08 18:35:08 $
+//  $Header: /space/cvs/cps/cps++/tests/fix_gauge/main.C,v 1.9 2008/02/08 18:35:08 chulwoo Exp $
+//  $Id: main.C,v 1.9 2008/02/08 18:35:08 chulwoo Exp $
+//  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: main.C,v $
 //  $Revision: 1.9 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/tests/fix_gauge/main.C,v $
+//  $Source: /space/cvs/cps/cps++/tests/fix_gauge/main.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -500,6 +500,8 @@ q************/
 #define MZ 0L
 #define FAC 1.0e-9			/* 	1.0/MBIG 	*/
 
+CPS_START_NAMESPACE
+
 static long ma[55] ;
 static long mk,mj  ;
 static int i,k,ii ;
@@ -550,5 +552,4 @@ Float ran345(long *idum)
 	return temp;
 }
 
-
-
+CPS_END_NAMESPACE

@@ -529,7 +529,6 @@ int bfm_evo<Float>::Eig_CGNE_prec(Fermion_t psi, Fermion_t src)
                         invHUb[i] += invH[i*eigcg->def_len+j]*Ub[j]; //notice the index ofr invH.
                 }
             }
-
             //set tmp=0.0;
             this->set_zero(tmp);
             for(int i=0;i<eigcg->def_len;i++) {
@@ -587,6 +586,7 @@ int bfm_evo<Float>::Eig_CGNE_prec(Fermion_t psi, Fermion_t src)
             t += diff.tv_sec*1.0E6 + diff.tv_usec;
             t -= t_lancos;
             if ( this->isBoss()&& !me ) {
+                //printf("bfmbase::Eig_CGNE_prec: %d mprec flops/site\n",mprecFlopsPerSite());
                 printf("bfmbase::Eig_CGNE_prec: CG part: %le s for %le flops\n",t/1e6, flops);
                 printf("bfmbase::Eig_CGNE_prec: CG part: %le Mflops per node\n",flops/t);
                 if(do_eigcg) {

@@ -1,4 +1,4 @@
-# $Id: mkdocs.sh,v 1.5 2004-09-02 16:51:48 zs Exp $
+# $Id: mkdocs.sh,v 1.5 2004/09/02 16:51:48 zs Exp $
 
 # Runs doxygen to produce the reference manual and the user guide and 
 # installdox to get the cross-references right.
@@ -32,7 +32,7 @@ tempdoxcfg=/tmp/dox$$
 # The version number:
 # I assume that the tag is of the form <something>4_8_0<something>
 
-version=`echo '$Name: not supported by cvs2svn $' | sed -e 's/[^1234567890_]//g' -e 'y/_/./'`
+version=`echo '$Name: v5_0_16_hantao_io_test_v7 $' | sed -e 's/[^1234567890_]//g' -e 'y/_/./'`
 
 for here in usr ref 
 do

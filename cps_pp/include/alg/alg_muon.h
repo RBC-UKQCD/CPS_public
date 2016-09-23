@@ -101,6 +101,7 @@ class AlgMuon : public Alg
     void Mres();
     void MuonLine(int *out_mom, QPropWMomSrc &min, Rcomplex* MuonLine);
     void MuonLineCons(int *out_mom, QPropWMomSrc &min, Rcomplex* MuonLine);
+    void MuonLineCons(int *out_mom, Rcomplex* MuonLine);
     double photon_prop(int *q,int mu,double momX,double momT);
     void print_vacpol_muonline(void);
     void print_vacpol(void);
@@ -137,7 +138,7 @@ class AlgMuon : public Alg
     void VacPolConsLocRandSrc(int t_op, int *mom, Rcomplex* VacPol);
     void VacPolConsLocQIO(int t_op, Rcomplex* VacPol);
     void two_point(void);
-    void two_point(int *mom, QPropWMomSrc &prop, int conj=0);
+    void two_point(int *mom, QPropWMomSrc &prop, int src_time=0, int conj=0);
     void two_pointv2(void);
 
     void AxialConsLoc(int t_op); //for checking

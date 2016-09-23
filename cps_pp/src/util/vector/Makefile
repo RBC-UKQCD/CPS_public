@@ -1,5 +1,5 @@
 #SEPARATE_LIB=yes
-NORECURSE_DIR = bgl qcdoc qcdsp noarch mpi CVS 
+NORECURSE_DIR = bgl qcdoc qcdsp noarch mpi qcdoc_asm CVS 
 BGL_DIR = bgl
 BGL_QMP_DIR = bgl
 BGQ_DIR = noarch

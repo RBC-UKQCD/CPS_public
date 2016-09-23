@@ -6,7 +6,16 @@
 #ifndef NO_CPS
 #include <config.h>
 #endif
+//#include <stdio.h>
+#ifdef  __STRICT_ANSI__
+// for fdopen, to be checked later and probably should be deprecated with VML
+#undef __STRICT_ANSI__
+#include <cstdio>
+//#include <stdio.h>
+#define __STRICT_ANSI__
+#else
 #include <stdio.h>
+#endif
 #include <limits.h>
 #include <string.h>
 #define DEB(A) fprintf(stderr,A)

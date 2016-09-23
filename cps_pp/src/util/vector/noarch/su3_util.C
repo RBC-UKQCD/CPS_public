@@ -3,22 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Utility routines for SU(3) matrices.
 
-  $Id: su3_util.C,v 1.8 2013-04-05 17:46:31 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:46:31 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v 1.8 2013-04-05 17:46:31 chulwoo Exp $
-//  $Id: su3_util.C,v 1.8 2013-04-05 17:46:31 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $Revision: 1.8 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/vector/noarch/su3_util.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <math.h>

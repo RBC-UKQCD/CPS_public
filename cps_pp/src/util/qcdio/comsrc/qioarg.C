@@ -89,6 +89,8 @@ int QioControl::synchronize(const int errorStatus)  const {
   }
   return error;
 }
+void QioControl::broadcastInt(int * data, int fromID)  const {
+}
 
 void QioControl::broadcastInt(int * data, int fromID)  const {
   if(NumNodes() > 1) {

@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Auxilary algebra.
  
-  $Id: algebra.h,v 1.2 2004-09-21 18:07:15 chulwoo Exp $
+  $Id: algebra.h,v 1.2 2004/09/21 18:07:15 chulwoo Exp $
 */
 //------------------------------------------------------------------
  

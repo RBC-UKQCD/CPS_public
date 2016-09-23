@@ -1,6 +1,6 @@
 /*! \file
 
-$Id: cps_compat.C,v 1.7 2009-03-23 19:13:32 chulwoo Exp $
+$Id: cps_compat.C,v 1.7 2009/03/23 19:13:32 chulwoo Exp $
 */
 	
 //~~

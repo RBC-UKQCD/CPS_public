@@ -1,4 +1,5 @@
 #include <util/omp_wrapper.h>
+extern "C"
 void wilson_dslash_bnd_dag1(
                    IFloat *chi_p_f, 
 		   IFloat *u_p_f, 
@@ -62,6 +63,7 @@ void wilson_dslash_bnd_dag1(
   vol = wilson_p->vol[0];
   
 
+#if 0
   Float* const recv_buf1 = wilson_p->recv_buf[0];
   Float* const recv_buf2 = wilson_p->recv_buf[1];
   Float* const recv_buf3 = wilson_p->recv_buf[2];
@@ -70,6 +72,7 @@ void wilson_dslash_bnd_dag1(
   Float* const recv_buf6 = wilson_p->recv_buf[5];
   Float* const recv_buf7 = wilson_p->recv_buf[6];
   Float* const recv_buf8 = wilson_p->recv_buf[7];
+#endif
 
 
 
@@ -92,14 +95,14 @@ int izp=0;
 int izm=0;
 int itp=0;	
 int itm=0;
-Float* const send_buf0 = wilson_p->send_buf[0];
-Float* const send_buf1 = wilson_p->send_buf[1];
-Float* const send_buf2 = wilson_p->send_buf[2];
-Float* const send_buf3 = wilson_p->send_buf[3];
-Float* const send_buf4 = wilson_p->send_buf[4];
-Float* const send_buf5 = wilson_p->send_buf[5];
-Float* const send_buf6 = wilson_p->send_buf[6];
-Float* const send_buf7 = wilson_p->send_buf[7];
+SSE_C_FLOAT* const send_buf0 = (SSE_C_FLOAT*)wilson_p->send_buf[0];
+SSE_C_FLOAT* const send_buf1 = (SSE_C_FLOAT*)wilson_p->send_buf[1];
+SSE_C_FLOAT* const send_buf2 = (SSE_C_FLOAT*)wilson_p->send_buf[2];
+SSE_C_FLOAT* const send_buf3 = (SSE_C_FLOAT*)wilson_p->send_buf[3];
+SSE_C_FLOAT* const send_buf4 = (SSE_C_FLOAT*)wilson_p->send_buf[4];
+SSE_C_FLOAT* const send_buf5 = (SSE_C_FLOAT*)wilson_p->send_buf[5];
+SSE_C_FLOAT* const send_buf6 = (SSE_C_FLOAT*)wilson_p->send_buf[6];
+SSE_C_FLOAT* const send_buf7 = (SSE_C_FLOAT*)wilson_p->send_buf[7];
 
   int x, y, z, t;
   int xp, yp, zp, tp;

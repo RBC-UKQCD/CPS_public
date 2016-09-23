@@ -250,6 +250,7 @@ void qio_readPropagator::qio_openInput(char *filename, QIO_String *xml_file_in, 
   #endif // DEBUG_openInput
 
   const int serpar(QIO_SERPAR);
+   VRB.Result(cname,fname,"volfmt=%d serpar=%d",volFormat,serpar);
 
   QIO_Reader *infile;
   QIO_Iflag iflag;
@@ -2089,7 +2090,7 @@ int qio_readPropagator::qio_readNextPropPairRecord(Float *rprop, int &readSpin, 
 int qio_readPropagator::qio_readTmpSourceRecord(const QIO_PROP_SOURCE_TYPES sType, Float *rsource)
 {
 
-  char * fname="qio_readTmpSourceRecord()";
+  char * fname="qio_readTmpSourceRecord(const QIO_PROP_SOURCE_TYPES sType, Float *rsource)";
   VRB.Func(cname,fname);
 
   int return_val(0), return_val_info(0), return_val_decode(0);

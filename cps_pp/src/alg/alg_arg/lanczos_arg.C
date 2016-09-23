@@ -33,9 +33,9 @@ vml_MatrixPolynomialArg (VML *vmls, char *name,MatrixPolynomialArg *objp)
 	 if (!vml_array (vmls, "params", (char **)&objp->params.params_val, (u_int *) &objp->params.params_len, ~0,
 		sizeof (Float), (vmlproc_t) vml_Float))
 		 return FALSE;
-	 if (!vml_Pointer (vmls, "tmp1", &objp->tmp1))
+	 if (!vml_pointer (vmls, "tmp1", (char **)&objp->tmp1, sizeof (Float), (vmlproc_t) vml_Float))
 		 return FALSE;
-	 if (!vml_Pointer (vmls, "tmp2", &objp->tmp2))
+	 if (!vml_pointer (vmls, "tmp2", (char **)&objp->tmp2, sizeof (Float), (vmlproc_t) vml_Float))
 		 return FALSE;
 	 vml_class_end(vmls,"MatrixPolynomialArg",name);
 	return TRUE;
@@ -70,6 +70,8 @@ vml_LanczosArg (VML *vmls, char *name,LanczosArg *objp)
 	 if (!vml_Float (vmls, "mass", &objp->mass))
 		 return FALSE;
 	 if (!vml_int (vmls, "nk_lanczos_vectors", &objp->nk_lanczos_vectors))
+		 return FALSE;
+	 if (!vml_int (vmls, "nt_lanczos_vectors", &objp->nt_lanczos_vectors))
 		 return FALSE;
 	 if (!vml_int (vmls, "np_lanczos_vectors", &objp->np_lanczos_vectors))
 		 return FALSE;

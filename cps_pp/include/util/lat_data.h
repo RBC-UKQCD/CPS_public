@@ -29,11 +29,11 @@ class LatData{
       status = NEW;
       Init(flags,size,vol);
     }
-    LatData(int size, int vol){
+#endif
+    LatData(int size, int vol=0){
       status = NEW;
       Init(DEFAULT,size,vol);
     }
-#endif
     void  Init(LatDataAlloc flags, int size, int vol);
     void  Init(int size, int vol){
       Init(DEFAULT,size,vol);
@@ -41,7 +41,7 @@ class LatData{
     int Vol() { return vol;}
     LatData &operator=(const LatData &lat);
     ~LatData();
-    const IFloat *Field(int pos=0, int n=0)
+    Float *Field(int pos=0, int n=0)
       { return (data+pos*size+n);}
     const int Size(){return size*vol;}
 

@@ -2,7 +2,7 @@
   \file
   \brief Functions for dynamical array allocation.
 
-  $Id: pt_amalloc.C,v 1.1 2005-09-15 19:47:28 chulwoo Exp $
+  $Id: pt_amalloc.C,v 1.1 2005/09/15 19:47:28 chulwoo Exp $
 */
 #include <stdarg.h>
 #include <stddef.h>

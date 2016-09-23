@@ -21,6 +21,7 @@
 #include <vector>
 #include <math.h>
 #include <string.h>
+#include <vector>
 #include <util/gjp.h>
 #include <util/lattice.h>
 #include <util/random.h>
@@ -73,7 +74,7 @@ protected:
   WilsonMatrix* prop5d;
   
   QPropWArg qp_arg; 
-  
+
   //! The class name
   char *cname; 
 
@@ -114,6 +115,7 @@ public:
 
   QPropW(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
 
+  
   //! copy constructor
   QPropW(const QPropW& rhs); 
 
@@ -280,6 +282,24 @@ public:
   virtual int BoxSrcUseXYZOffset() {return 0; }
 };
   
+
+// read in a prop with SrcType
+class QPropWRead : public QPropW {
+
+  SourceType src_type;
+
+public:
+  
+  // CONSTRUCTORS
+  QPropWRead(Lattice& lat, QPropWArg* arg, CommonArg* c_arg, SourceType src_type);
+
+  SourceType SrcType() { return src_type; }
+};
+
+
+
+
+
 
 
 class QPropWWallSrc : public QPropW {
@@ -451,6 +471,8 @@ public:
   // will be used. CHECK it!!!
   //    QPropWPointSrc(const QPropWPointSrc& rhs);
   QPropWPointSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
+  // use for reading in prop:
+  QPropWPointSrc(Lattice& lat, QPropWArg* arg, CommonArg* c_arg, char* dummy);
   
   void SetSource(FermionVectorTp& src, int spin, int color);
   SourceType SrcType() { return POINT; }

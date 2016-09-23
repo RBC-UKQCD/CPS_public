@@ -295,7 +295,7 @@ int DiracOpDwf::QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_typ
 
   flops += 4*f_size_cb + matvec_flops;
 
-  VRB.Flow(cname, fname, "0 iterations, res^2 = %1.15e, restart = 0\n", r2);
+  VRB.Flow(cname, fname, "0 iterations, res^2 = %1.15e, restart = 0 stop=%e max_restart=%d\n", r2,stop,QudaParam.max_restart );
 
   while (r2 > stop && k < QudaParam.max_restart) {
     inv_param.tol = dirac_arg->stop_rsd;

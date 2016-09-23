@@ -3,12 +3,12 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of Fwilson class.
 
-  $Id: f_wilson.C,v 1.22 2006-06-11 05:35:06 chulwoo Exp $
+  $Id: f_wilson.C,v 1.22 2006/06/11 05:35:06 chulwoo Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/lattice/f_wilson/f_wilson.C,v $
+//  $Source: /space/cvs/cps/cps++/src/util/lattice/f_wilson/f_wilson.C,v $
 //  $State: Exp $
 //
 //--------------------------------------------------------------------
@@ -315,11 +315,11 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
   // convert fermion field
   //=========================
 
-
-  for(i=0; i < N_eig; ++i)
-    Fconvert(f_eigenv[i], WILSON, CANONICAL);
-
-
+  if(cnv_frm == CNV_FRM_YES) {
+    for(i=0; i < N_eig; ++i) {
+      Fconvert(f_eigenv[i], WILSON, CANONICAL);
+    }
+  }
 
   //------------------------------------------------------------------
   //  we want both the eigenvalues of D_{hermitian} and
@@ -336,11 +336,11 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
     iter = wilson.RitzEig(f_eigenv, lambda2, valid_eig, eig_arg);
   }
 
-
-  for(i=0; i < N_eig; ++i)
-    {
+  if(cnv_frm == CNV_FRM_YES) {
+    for(i=0; i < N_eig; ++i) {
       Fconvert(f_eigenv[i], CANONICAL, WILSON);
     }
+  }
 
   /*
     the call to RitzEig returns a negative number if either the KS or CG maxes
@@ -398,6 +398,7 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
 
   // The remaining part in QCDSP version are all about "downloading
   // eigenvectors", supposedly not applicable here.
+
 
   // Return the number of iterations
   return iter;

@@ -2,7 +2,6 @@
 /*!\file
   \brief  Definition of the Dirac operator classes: DiracOp, DiracOpStagTypes.
 
-  $Id: d_op_dwf.h,v 1.3 2012-12-05 16:39:19 chulwoo Exp $
 */
 
 #ifndef INCLUDED_D_OP_DWF_H
@@ -61,6 +60,22 @@ class DiracOpDwf : public DiracOpWilsonTypes
      // The in, out fields are defined on the checkerboard lattice.
      // If dot_prd is not 0 then the dot product (on node)
      // <out, in> = <MatPcDagMatPc*in, in> is returned in dot_prd.
+
+//  void MatPcDagMatPcShift(Vector *out, Vector *in, Float *dot_prd=0);
+  // MatPcDagMatPc is the fermion matrix that appears in the HMC 
+  // evolution. It is a Hermitian matrix.
+  // The in, out fields are defined on the checkerboard lattice.
+  // If dot_prd is not 0 then the dot product (on node)
+  // <out, in> = <MatPcDagMatPc*in, in> is returned in dot_prd.
+  //
+  // When dirac_arg->eigen_shift is non-zero, it shift the spectrum of matrix:
+  //    MatPcDagMatPc = H^2  ->  (H-shift)(H-shift)
+  // where H = Gamma_5 MatPc
+  //
+  // For other fermions, one could also implement similar shifts.
+  // For wilson, H = gamma_5 MatPC .
+  //------------------------------------------------------------------
+
 
   void Dslash(Vector *out, 
 		      Vector *in,
@@ -134,6 +149,7 @@ class DiracOpDwf : public DiracOpWilsonTypes
      // MatHerm works on the full lattice.
      // The in, out fields are defined on the ful.
 
+  void Mat5doe(Vector *out, Vector *in);
   void Mat(Vector *out, Vector *in);
      // Mat is the unpreconditioned fermion matrix.  
      // Mat works on the full lattice
@@ -159,6 +175,19 @@ class DiracOpDwf : public DiracOpWilsonTypes
 #ifdef USE_QUDA
   int QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_type);
 #endif
+  virtual void RitzMat(Vector *out, Vector *in);
+     // RitzMat is the fermion matrix used in Ritz
+     // RitzMat works on the full lattice or half lattice
+     // The in, out fields are defined on the full or half lattice.
+
+  virtual void RitzMat(Vector *out, Vector *in,
+               MatrixPolynomialArg* cheby_arg);
+
+  void MatPcHerm(Vector *out, Vector *in);
+     // MatPcHerm is the hermitian version of MatPc.
+     // MatHerm works on the 4d-eo half-parity lattice.
+     // The in, out fields are defined on the even-even parity.
+
 
 };
 CPS_END_NAMESPACE

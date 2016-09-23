@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definition of AlgWline class.
 
-  $Id: alg_wline.h,v 1.3 2004-09-02 16:53:10 zs Exp $
+  $Id: alg_wline.h,v 1.3 2004/09/02 16:53:10 zs Exp $
 */
 //------------------------------------------------------------------
 

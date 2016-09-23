@@ -3,23 +3,7 @@
 /*!\file
   \brief Prototypes of gauge configuration IO functions.
 
-  $Id: qcdio.h,v 1.12 2013-03-18 19:33:13 chulwoo Exp $
 */
-/*2  A.N.Jackson: ajackson@epcc.ed.ac.uk                      
-  -----------------------------------------------------------
-   CVS keywords
- 
-   $Author: chulwoo $
-   $Date: 2013-03-18 19:33:13 $
-   $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v 1.12 2013-03-18 19:33:13 chulwoo Exp $
-   $Id: qcdio.h,v 1.12 2013-03-18 19:33:13 chulwoo Exp $
-   $Name: not supported by cvs2svn $
-   $Locker:  $
-   $RCSfile: qcdio.h,v $
-   $Revision: 1.12 $
-   $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/include/util/qcdio.h,v $
-   $State: Exp $  */
-/*----------------------------------------------------------*/
 
 #ifndef INCLUDED_QCDIO_H_
 #define INCLUDED_QCDIO_H_

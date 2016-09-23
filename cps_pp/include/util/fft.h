@@ -1,10 +1,11 @@
 #include<config.h>
 
-#ifdef USE_FFTW
-#include <fftw3.h>
 
 #ifndef INCLUDED_FFT_H_
 #define INCLUDED_FFT_H_
+
+#ifdef USE_FFTW
+#include <fftw3.h>
 
 #include <util/data_types.h>
 #include <util/site.h>
@@ -469,6 +470,25 @@ public:
 
 
 CPS_END_NAMESPACE
-#endif
-
+#else
+#include <util/error.h>
+CPS_START_NAMESPACE
+class FFT_one_dir
+{
+  public: 
+  FFT_one_dir(const int _mu,
+	      Float* fpin,
+	      const int _nl, const int _n, const int _nr,
+	      int fft_forward=1,
+	      int flag_dist_back=1 )
+//: mu(_mu), N(GJP.Nodes(mu)), n(_n),  nl(_nl), nr(_nr)   
+  {
+    char *cname="FFT_one_dir"; 
+    char* fname="FFT_one_dir(...)";
+    ERR.General(cname,fname,"Not implemented without fftw (USE_FFTW)\n");
+  }
+};
+CPS_END_NAMESPACE
 #endif //#ifdef USE_FFTW
+
+#endif

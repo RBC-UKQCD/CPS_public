@@ -92,7 +92,7 @@ public:
 
 class ReadLatticeSerial : public ReadLatticeParallel {
  private:
-  char * cname;
+  const char * cname;
 
  public:
   // ctor for 2-step loading

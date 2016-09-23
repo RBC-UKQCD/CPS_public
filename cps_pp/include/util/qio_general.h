@@ -20,10 +20,12 @@
 
 #include <alg/do_arg.h>
 
+#ifdef USE_QIO
 #include <qio.h>
 #include <qioxml.h>
 
 #include <qmp.h>
+#endif
 
 #define EES_ADDON
 #if TARGET == BGQ
@@ -85,6 +87,8 @@
  #undef DEBUG_PAIRRECORD_STD
 #endif
 
+#define HAVE_QIO_GET_HYPER_SPACETIME
+
 #ifdef RUN_PAIRRECORD_STD_CHECK
  #define DEBUG_PAIRRECORD
  #define DEBUG_PAIRRECORD_STD
@@ -103,7 +107,7 @@
 
 /* default OUTPUT-format (default input is QIO_UNKNOWN) */
 /* one of QIO_UNKNOWN, QIO_SINGLEFILE, QIO_PARTFILE, QIO_MULTIFILE */ 
-#if ( TARGET == QCDOC ) || (TARGET == BGP)
+#if ( TARGET == BGQ ) || (TARGET == BGP)
  #define QIO_VOLFMT QIO_PARTFILE
 #else
  #define QIO_VOLFMT QIO_SINGLEFILE
@@ -114,8 +118,7 @@
 /* one of QIO_SERIAL, QIO_PARALLEL */
 /* for safety added for QCDOC */
 
-//#if (TARGET == QCDOC) || (TARGET == BGP)
-#if 1
+#if (TARGET == BGQ) || (TARGET == BGP)
   #define QIO_SERPAR QIO_PARALLEL
 #else
   #define QIO_SERPAR QIO_SERIAL
@@ -128,7 +131,7 @@
 // The following three lines FORCE PARTFILE with io-node being smaller than
 // total nodes. For RICC and FNAL. 
 
-//#define USE_QIO_SPARSE_PARTFILE
+#define USE_QIO_SPARSE_PARTFILE
 
 #ifdef USE_QIO_SPARSE_PARTFILE
 #define QIO_VOLFMT QIO_PARTFILE
@@ -137,8 +140,10 @@
 // Number of nodes, per which one io-node is designated.
 // Set it to zero if you want all nodes to be io-node.
 
-// For FNAL DS
-#define QIO_SPARSE_PARTFILE_NODES 32
+// For FNAL DS, BC (NODES = CORES/NODE)
+//#define QIO_SPARSE_PARTFILE_NODES 32
+// For FNAL PI0
+//#define QIO_SPARSE_PARTFILE_NODES 16
 
 // For RICC
 //#define QIO_SPARSE_PARTFILE_NODES 8
@@ -177,7 +182,9 @@
 
 
 CPS_START_NAMESPACE
-using namespace std;
+
+void setQioSparseNum(int n);
+int getQioSparseNum();
 
 //! source types
 enum QIO_PROP_SOURCE_TYPES {QIO_UNKNOWN_SOURCE=0, QIO_SCALAR_SOURCE, QIO_FULL_SOURCE};
@@ -256,7 +263,7 @@ class qio_init {
     {
 
       #ifdef DEBUG_Init
-      printf("qio_init is up\n");
+        std::printf("qio_init is up\n");
       #endif //DEBUG_Init
 
       const char * fname = "qio_init()";
@@ -329,7 +336,7 @@ class qio_init {
     virtual ~qio_init()
       {
 	#ifdef DEBUG_Init
-	printf("shut down qio_init\n");
+          std::printf("shut down qio_init\n");
 	#endif //DEBUG_Init
 
 	const char * fname = "~qio_init()";

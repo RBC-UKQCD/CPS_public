@@ -4,7 +4,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Implementation of GimprOLSymFasqtad class.
 
-  $Id: lattice_oa.C,v 1.4 2004-08-18 11:58:05 zs Exp $
+  $Id: lattice_oa.C,v 1.4 2004/08/18 11:58:05 zs Exp $
 */
 //--------------------------------------------------------------------
 
