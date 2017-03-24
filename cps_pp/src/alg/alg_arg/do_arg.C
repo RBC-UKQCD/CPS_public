@@ -226,7 +226,7 @@ vml_DoArgExt (VML *vmls, char *name,DoArgExt *objp)
 		 return FALSE;
 	 if (!vml_StartConfType (vmls, "start_u1_conf_kind", &objp->start_u1_conf_kind))
 		 return FALSE;
-	 if (!vml_Pointer (vmls, "start_u1_conf_load_addr", &objp->start_u1_conf_load_addr))
+	 if (!vml_u_long (vmls, "start_u1_conf_load_addr", &objp->start_u1_conf_load_addr))
 		 return FALSE;
 	 if (!vml_string (vmls, "start_u1_conf_filename", &objp->start_u1_conf_filename, ~0))
 		 return FALSE;

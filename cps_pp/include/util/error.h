@@ -1,10 +1,9 @@
 #ifndef INCLUDED_ERROR_H
 #define INCLUDED_ERROR_H  //!< Prevent multiple inclusions
 
+#include<cstring>
+#include<string>
 #include<config.h>
-#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
-#include <qcdocos/scu_checksum.h>
-#endif
 /*!\file
   \brief  Declaration and definition of Error class.
 

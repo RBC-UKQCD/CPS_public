@@ -160,7 +160,7 @@ class DoArgExt {
     Float twist_bc_z;
     Float twist_bc_t;
     StartConfType start_u1_conf_kind;
-    Pointer start_u1_conf_load_addr;
+    unsigned long start_u1_conf_load_addr;
     string start_u1_conf_filename<>;
     int start_u1_conf_alloc_flag;
     int mult_u1_conf_flag;

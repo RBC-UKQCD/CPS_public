@@ -110,7 +110,7 @@ public:
 	Float twist_bc_z;
 	Float twist_bc_t;
 	StartConfType start_u1_conf_kind;
-	Pointer start_u1_conf_load_addr;
+	u_long start_u1_conf_load_addr;
 	char *start_u1_conf_filename;
 	int start_u1_conf_alloc_flag;
 	int mult_u1_conf_flag;
