@@ -722,12 +722,14 @@ ac_user_opts='
 enable_option_checking
 enable_qmp
 enable_target
+enable_openmp
 enable_optimise
 enable_sse
 enable_c11
 enable_debug
 enable_cg_dwf
 enable_blas
+enable_lapack
 enable_gmp
 enable_mpfr
 enable_qio
@@ -1378,12 +1380,14 @@ Optional Features:
   --enable-qmp            Compile with SciDAC Communication (QMP) lib.
                           (default=no)
   --enable-target         What target are we compiling for? (default=noarch)
+  --enable-openmp         Compile with OpenMP. (default=no)
   --enable-optimise       Compile with maximum optimisation. (default=yes)
   --enable-sse            Compile with SSE. (default=no)
   --enable-c11            Compile with C11 features. (default=no)
   --enable-debug          Compile with debug information. (default=yes)
   --enable-cg-dwf         Compile with cg-dwf (default=no)
   --enable-blas           Compile with BLAS (default=no)
+  --enable-lapack         Compile with lapack (default=no)
   --enable-gmp            Compile with GNU Multiprecision lib. (default=no)
   --enable-mpfr           Compile with GMP mpfr routines. (default=no)
   --enable-qio            Compile with SciDAC I/O (QIO) lib. (default=no)
@@ -4866,32 +4870,14 @@ $as_echo "$enable_target" >&6; }
 #CFLAGS=""
 #CXXFLAGS=""
 #DFLAGS=""
-if test "$enable_target" = "qcdoc"; then
-   CC="env QGCC_EXEC_PREFIX=\${QOSLIB} ${CC}"
-   CXX="env QGCC_EXEC_PREFIX=\${QOSLIB} ${CXX}"
-   AS="env QGCC_EXEC_PREFIX=\${QOSLIB} ${AS}"
-   AR="env QGCC_EXEC_PREFIX=\${QOSLIB} ${AR}"
-   LD="env QGCC_EXEC_PREFIX=\${QOSLIB} ${LD}"
-   INCLUDE_FLAGS=""
-   CFLAGS="-D_GCC_ -Wall"
-   CXXFLAGS="-D_GCC_ -Wall"
-   ASFLAGS=""
-   LDFLAGS=""
-
-   ARCH="QCDOC"
-   ARCHDIR="QCDOC_DIR"
-   TESTING_PARALLEL="yes";
-#   namespace_default="no"
-
-elif test "$enable_target" = "bgl"; then
+if test "$enable_target" = "bgl"; then
 #     AC_PATH_PROG(CC, blrts_xlc)
 #    AC_PATH_PROG(CXX, blrts_xlC)
 
-   CFLAGS="${CFLAGS}"
-   CXXFLAGS="${CXXFLAGS}"
-   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I/bgl/BlueLight/ppcfloor/bglsys/include/"
-   LDFLAGS="-I/bgl/BlueLight/ppcfloor/bglsys/include/ -L/bgl/BlueLight/ppcfloor/bglsys/lib/ -lrts.rts"
-#   LDFLAGS="-I/bgl/BlueLight/ppcfloor/bglsys/include/ -L/bgl/BlueLight/ppcfloor/bglsys/lib/ -lkek.rts -lbgl_perfctr.rts -lbglnet.rts -lmpich.rts -lmsglayer.rts -lrts.rts -ldevices.rts"
+   CFLAGS+="${CFLAGS}"
+   CXXFLAGS+="${CXXFLAGS}"
+   INCLUDE_FLAGS+="${INCLUDE_FLAGS} -I/bgl/BlueLight/ppcfloor/bglsys/include/"
+   LDFLAGS="${LDFLAGS} -I/bgl/BlueLight/ppcfloor/bglsys/include/ -L/bgl/BlueLight/ppcfloor/bglsys/lib/ -lrts.rts"
 
    ARCH="BGL"
    ARCHDIR="BGL_DIR"
@@ -4902,10 +4888,9 @@ elif test "$enable_target" = "bgp"; then
 #   AC_CHECK_PROGS(CC, mpicc)
 #   AC_CHECK_PROGS(CXX, mpicxx)
 
-   CFLAGS="${CFLAGS}"
-   CXXFLAGS="${CXXFLAGS}"
-   INCLUDE_FLAGS="${INCLUDE_FLAGS} -I/bgsys/drivers/ppcfloor/arch/include/"
-#   LDFLAGS="-I/bgl/BlueLight/ppcfloor/bglsys/include/ -L/bgl/BlueLight/ppcfloor/bglsys/lib/ -lrts.rts"
+   CFLAGS+="${CFLAGS}"
+   CXXFLAGS+="${CXXFLAGS}"
+   INCLUDE_FLAGS+="${INCLUDE_FLAGS} -I/bgsys/drivers/ppcfloor/arch/include/"
 
    ARCH="BGP"
    ARCHDIR="BGL_QMP_DIR"
@@ -4975,6 +4960,24 @@ test -n "$CXX" || CXX="g++"
    fi
 fi
 
+
+# Check whether --enable-openmp was given.
+if test "${enable_openmp+set}" = set; then :
+  enableval=$enable_openmp;
+else
+  enable_openmp="no"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if using OpenMP" >&5
+$as_echo_n "checking if using OpenMP... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_openmp" >&5
+$as_echo "$enable_openmp" >&6; }
+if test "$enable_openmp" = "yes"; then
+   DFLAGS="${DFLAGS} -DUSE_OMP"
+#   LDFLAGS="${LDFLAGS} -fopenmp"
+#   CFLAGS="${CFLAGS} -fopenmp"
+#   CXXFLAGS="${CXXLAGS} -fopenmp"
+fi
 
 # Check whether --enable-optimise was given.
 if test "${enable_optimise+set}" = set; then :
@@ -5092,7 +5095,22 @@ $as_echo_n "checking if including blas... " >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_blas" >&5
 $as_echo "$enable_blas" >&6; }
 if test "$enable_blas" != "no"; then
-	echo "USE_BLAS disabled temporarily, until reconciled with zMobius"
+   	DFLAGS="${DFLAGS} -DUSE_BLAS"
+fi
+
+# Check whether --enable-lapack was given.
+if test "${enable_lapack+set}" = set; then :
+  enableval=$enable_lapack;
+else
+  enable_lapack="no"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if including lapack" >&5
+$as_echo_n "checking if including lapack... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_lapack" >&5
+$as_echo "$enable_lapack" >&6; }
+if test "$enable_lapack" != "no"; then
+   	DFLAGS="${DFLAGS} -DUSE_BLAS -DUSE_LAPACK"
 fi
 
 
@@ -5352,8 +5370,8 @@ fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if including fftw" >&5
 $as_echo_n "checking if including fftw... " >&6; }
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_blas" >&5
-$as_echo "$enable_blas" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_fftw" >&5
+$as_echo "$enable_fftw" >&6; }
 if test "$enable_fftw" != "no"; then
 #	if test "$enable_blas" != "yes"; then
    		LDFLAGS="${LDFLAGS} -L${enable_fftw}/lib -lfftw3"
@@ -5740,6 +5758,42 @@ do :
 if test "x$ac_cv_header_gmp_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_GMP_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in cblas.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "cblas.h" "ac_cv_header_cblas_h" "$ac_includes_default"
+if test "x$ac_cv_header_cblas_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_CBLAS_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in mkl_cblas.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "mkl_cblas.h" "ac_cv_header_mkl_cblas_h" "$ac_includes_default"
+if test "x$ac_cv_header_mkl_cblas_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_MKL_CBLAS_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in gsl_cblas.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "gsl_cblas.h" "ac_cv_header_gsl_cblas_h" "$ac_includes_default"
+if test "x$ac_cv_header_gsl_cblas_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GSL_CBLAS_H 1
 _ACEOF
 
 fi

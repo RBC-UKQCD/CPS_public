@@ -46,9 +46,6 @@ static void v_free(void *ptr){
 }
 
 
-#if 0
-extern "C" void vaxpy3(Vector *a, Float *b, Vector *c,Vector *d, int nvec);
-#endif
 const int VAXPY_UNROLL =6;
 
 

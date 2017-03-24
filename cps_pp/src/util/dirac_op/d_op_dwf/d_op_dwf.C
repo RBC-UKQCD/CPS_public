@@ -409,6 +409,15 @@ int DiracOpDwf::MatInv(Vector *out,
     iter = BiCGstab(out,temp,0.0,dirac_arg->bicgstab_n,true_res);
 #endif
     break;
+  case LOWMODEAPPROX :
+    MatPcDag(in, temp);
+    iter = InvLowModeApprox(out,in, dirac_arg->fname_eigen, dirac_arg->neig, true_res );
+    break;
+  case CG_LOWMODE_DEFL :
+    MatPcDag(in, temp);
+    InvLowModeApprox(out,in, dirac_arg->fname_eigen, dirac_arg->neig, true_res );
+    iter = InvCg(out,in,true_res);
+    break;
   default:
     ERR.General(cname,fname,"InverterType %d not implemented\n",
 		dirac_arg->Inverter);

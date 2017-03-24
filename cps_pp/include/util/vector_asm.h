@@ -5,24 +5,7 @@
   \brief  Declaration/definition of Assembly routines used in Vector class
 
 
-  $Id: vector_asm.h,v 1.1 2007/01/10 18:30:36 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2007/01/10 18:30:36 $
-//  $Header: /space/cvs/cps/cps++/include/util/vector_asm.h,v 1.1 2007/01/10 18:30:36 chulwoo Exp $
-//  $Id: vector_asm.h,v 1.1 2007/01/10 18:30:36 chulwoo Exp $
-//  $Name: v5_0_16_hantao_io_test_v7 $
-//  $Locker:  $
-//  $RCSfile: vector_asm.h,v $
-//  $Revision: 1.1 $
-//  $Source: /space/cvs/cps/cps++/include/util/vector_asm.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
-
 
 CPS_START_NAMESPACE
 
@@ -31,21 +14,25 @@ class Vector; 	// forward declaration
 class Matrix;
 
 
-#if TARGET == QCDOC ||  TARGET == BGL || ( defined USE_QMP )
+#if TARGET == BGL
+// || ( defined USE_QMP )
 
 extern "C" {
   void xaxpy (Float *scalep,Float *InOutScale, Float *Add, int len);
   void xaxpy_norm (Float *scalep, Float *InOutScale, Float *Add, int len, Float *res);
-  
+
+#if 1
   void vaxpy3(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec);
   inline void vaxpy3_m(Matrix *res,Float *scale,Matrix *mult,const Matrix *add, int ncvec){
     vaxpy3((Vector *)res, scale, (Vector *)mult,(Vector *)add,ncvec);
   }
+#endif
 
   void vaxpy3_norm(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec,Float *norm);
   inline void vaxpy3_norm_m(Vector *res,Float *scale,Vector *mult,Vector *add, int ncvec,Float *norm){
     vaxpy3_norm((Vector *)res, scale, (Vector *)mult,(Vector *)add,ncvec,norm);
   }
+
 
   // SU(3) * SU(3) streaming operations
   void m1m2(Matrix *res, const Matrix *m1, const Matrix *m2, int *length);
@@ -64,7 +51,6 @@ extern "C" {
 		     const Matrix *m1, Matrix *m2, int *length);
 
 }
-
 #endif
 CPS_END_NAMESPACE
 #endif

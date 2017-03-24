@@ -5,9 +5,19 @@
 #include <gauge_agg.h>
 #include <asqtad_int.h>
 #else //SCIDAC
-//#include <precision.h>
 #include <util/gauge_agg.h>
 #include <util/asqtad_int.h>
+#include <util/vector.h>
+  inline void vaxpy3(PTmatrix *res,Float *scale,PTmatrix *mult,PTmatrix
+*add, int ncvec){
+  cps::fTimesV1PlusV2((IFloat *)res, (IFloat)*scale, (IFloat *)mult,
+    (IFloat *)add, ncvec*6);
+}
+  inline void vaxpy3_m(PTmatrix *res,Float *scale,PTmatrix *mult,PTmatrix
+*add, int ncvec){
+  cps::fTimesV1PlusV2((IFloat *)res, (IFloat)*scale, (IFloat *)mult,
+    (IFloat *)add, ncvec*6);
+}
 #endif //SCIDAC
 
 
@@ -296,4 +306,25 @@ int flag = 0, int if_alloc=1 );
   void asqtad_fat(AsqDArg *asq_arg, PTmatrix *fatlink);
   void asqtad_long(AsqDArg *asq_arg, PTmatrix *longlink, PTmatrix *longlink_m = NULL);
 };
+
+extern "C"{
+void asq_force_cross2dag(PTvector *chi, PTvector *phi, PTmatrix *result,
+                      int counter, double *fac);
+void asq_force_cross2dag_s(PTvector *chi, PTvector *phi, PTmatrix *result,
+                      int counter, float *fac);
+void asq_vaxpy3(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
+void asq_vaxpy3_s(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
+//void vaxpy3(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
+//inline void vaxpy3_m(PTmatrix *res,Float *scale,PTmatrix *mult,PTmatrix *add,
+//int ncvec){
+//  vaxpy3((PTvector *)res, scale, (PTvector *)mult,(PTvector *)add,ncvec);
+//}
+
+}
+
+inline void *pt_alloc(size_t request, const char *cname, const char *fname, const char *vname){
+    return malloc(request);
+}
+
+
 #endif

@@ -36,6 +36,7 @@ enum FclassType {
     F_CLASS_DWF,
     F_CLASS_ASQTAD,
     F_CLASS_P4,
+    F_CLASS_HISQ,
     F_CLASS_WILSON_TM,
     F_CLASS_MDWF,
     F_CLASS_BFM,

@@ -2133,6 +2133,101 @@ class Fasqtad : public virtual FstagTypes, public virtual Fsmear
     
 };
 
+class Fhisq : public virtual FstagTypes, public virtual Fsmear
+{
+ private:
+    const char *cname;    // Class name.
+
+ public:
+
+    Fhisq();
+    virtual ~Fhisq();
+
+    FclassType Fclass() const;
+    
+    int FmatEvlInv(Vector *f_out, Vector *f_in, 
+		   CgArg *cg_arg, 
+		   Float *true_res,
+		   CnvFrmType cnv_frm = CNV_FRM_YES);
+
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg **cg_arg, 
+		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
+		    Vector **f_out_d);
+
+    void FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
+
+    int FmatInv(Vector *f_out, Vector *f_in, 
+		CgArg *cg_arg, 
+		Float *true_res,
+		CnvFrmType cnv_frm = CNV_FRM_YES,
+		PreserveType prs_f_in = PRESERVE_YES);
+
+
+  
+    int FeigSolv(Vector **f_eigenv, Float *lambda, 
+		 LanczosArg *eig_arg, 
+		 CnvFrmType cnv_frm = CNV_FRM_YES);
+    
+    int FeigSolv(Vector **f_eigenv, Float *lambda, 
+		 Float *chirality, int *valid_eig,
+		 Float **hsum,
+		 EigArg *eig_arg,
+		 CnvFrmType cnv_frm = CNV_FRM_YES);
+
+    Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
+		 Float mass, DagType dag);
+
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
+			 Float mass, Float step_size);
+
+    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+			  Float mass, Float step_size);
+        // It evolve the canonical momentum mom  by step_size
+        // using the bosonic quotient force.
+
+    Float BhamiltonNode(Vector *boson, Float mass);
+
+    //!< Method to ensure bosonic force works.
+    void BforceVector(Vector *in, CgArg *cg_arg);
+
+    void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm, int dir_flag);
+
+    void FdMdmu(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
+		 CnvFrmType cnv_frm, int order);
+
+
+    //! Momentum update in the RHMC algorithm.
+    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+			      int isz, Float *alpha, Float mass, Float dt,
+			      Vector **sol_d, ForceMeasure measure);
+
+    // Various utility routines for the momentum force computation.
+
+    void Smear();
+    
+  private:
+
+    ForceArg update_momenta(Matrix**, IFloat, Matrix*);
+    
+    ChkbType parity(const int*);
+
+    void force_product_sum(const Matrix*,  int, IFloat, Matrix*);
+    
+    void force_product_sum(const Matrix*, const Matrix*, const Matrix*, 
+			   IFloat, Matrix*, Matrix*);
+
+    void force_product_sum(const Matrix*, const Matrix*, IFloat, 
+			   Matrix*);
+
+    void force_product_d_sum(const Matrix*, const Matrix*, IFloat, 
+			     Matrix*);
+
+    void force_product_sum(const Vector*, const Vector*, IFloat, Matrix*);
+};
+
 
 class ParTransP4; //forward declaration
 

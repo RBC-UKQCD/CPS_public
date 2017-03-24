@@ -406,14 +406,6 @@ static int NotParallel( int mu, int nu){
 	else return 1;
 }
 
-#if TARGET != QCDOC
-  inline void vaxpy3_m(Matrix *res,Float *scale,Matrix *mult,Matrix
-*add, int ncvec){
-  fTimesV1PlusV2((IFloat *)res, (IFloat)*scale, (IFloat *)mult,
-    (IFloat *)add, ncvec*6);
-}
-#endif
-
 enum {NUM_DIR=8,POS_DIR=4};
 
 void Fasqtad::Smear(){

@@ -315,6 +315,14 @@ class Matrix
         return *this;
     }
 
+    Matrix& operator*=(const Matrix& m) {
+      Matrix tmp(*this);
+      mDotMEqual((IFloat *)u, (IFloat *) tmp.u, (IFloat *) m.u);
+      //this->DotMEqual(tmp,m);
+      return *this;
+    }
+
+
     //! Adds a real scalar multiple of the unit matrix to this one.
     /*!
       \param c The real scalar multiple
@@ -418,6 +426,11 @@ class Matrix
     //! Hermitian conjugate.
     void Dagger(const Matrix& m)
     	{ Dagger((const IFloat *)&m); }
+    void Dagger(){
+       Matrix dag;
+       dag.Dagger(*this);
+       *this = dag;
+    }
     void Transpose(const IFloat* m);
     void Transpose();
 
@@ -878,7 +891,7 @@ class Vector
 //    void FTimesV1PlusV2(const Float &fb, const Vector *c,
 //			const Vector *d, int len)
      void FTimesV1PlusV2(Float fb, Vector *c, Vector *d, int len)
-#if TARGET == BGL  || TAGET == QCDOC
+#if TARGET == BGL  
     { Float coef = fb; vaxpy3 ((Vector *)v, &coef, c, d, len/6); }
 #else
     { fTimesV1PlusV2((IFloat *)&v, IFloat(fb), (IFloat *)c, 
@@ -952,6 +965,19 @@ class Vector
 	                (IFloat *)d, len); }
 
 };
+
+#if TARGET != BGL
+  inline void vaxpy3(Vector *res,Float *scale,Vector *mult,Vector
+*add, int ncvec){
+  fTimesV1PlusV2((IFloat *)res, (IFloat)*scale, (IFloat *)mult,
+    (IFloat *)add, ncvec*6);
+}
+  inline void vaxpy3_m(Matrix *res,Float *scale,Matrix *mult,Matrix
+*add, int ncvec){
+  fTimesV1PlusV2((IFloat *)res, (IFloat)*scale, (IFloat *)mult,
+    (IFloat *)add, ncvec*6);
+}
+#endif
 
 CPS_END_NAMESPACE
 #endif

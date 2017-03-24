@@ -1,6 +1,13 @@
 #ifndef __QBLAS_EXTEND__CD
 #define __QBLAS_EXTEND__CD
+#ifdef HAVE_CBLAS_H
 #include <cblas.h>
+#elif (defined HAVE_MKL_CBLAS_H)
+#include <mkl_cblas.h>
+#elif (defined HAVE_GSL_CBLAS_H)
+#include <gsl_cblas.h>
+#endif
+
 
 /*
   some convenience functions for 

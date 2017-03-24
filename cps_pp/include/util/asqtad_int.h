@@ -274,7 +274,6 @@ SCUDirArgMulti SCUmulti_2[2];
 //  calculate the offset into the receive buffers (chi_off_node);
 //-------------------------------------------------------------------
 
-//extern "C" void vaxpy3(Matrix *a,Float *b,Matrix *c,Matrix *d,int nvec);
 
     int LexSurface( int * cc, int surface );
   public:

@@ -835,16 +835,108 @@ class DiracOpP4 : public DiracOpStagTypes
      // RitzEigMat works on the full lattice or half lattice
      // The in, out fields are defined on the full or half lattice.
 
-  //void RitzMat(Vector *out, Vector *in);
-     // RitzMat is the fermion matrix used in Ritz
-     // RitzMat works on the full lattice or half lattice
-     // The in, out fields are defined on the full or half lattice.
+};
 
-  //v////oid RitzMat(Vector *out, Vector *in,
-//		       MatrixPolynomialArg* cheby_arg)
- // {ERR.NotImplemented(cname,"RitzMat(V*,V*,MatrixPolynomialArg*");}
-  // TIZB
-
+//------------------------------------------------------------------
+class DiracOpHisq : public DiracOpStagTypes
+{
+ private:
+  const char *cname;         // Class name.
+  
+  Float mass_rs;       // rescaled mass
+  Float mass_sq;       // = mass^2
+  
+  int f_size_cb;       //The node checkerbrd. size of the ferm. field
+  
+  Vector *frm_tmp;     // Temporary fermion field
+  
+  
+ public:
+  DiracOpHisq(Lattice& latt,            // Lattice object.
+	      Vector *f_field_out,      // Output fermion field ptr.
+	      Vector *f_field_in,       // Input fermion field ptr.
+	      CgArg *arg,               // Argument structure
+	      CnvFrmType convert);  // Fermion conversion flag
+  
+  virtual ~DiracOpHisq();
+  
+  void DiracArg(CgArg *arg);
+  // It sets the dirac_arg pointer to arg and initializes
+  // mass_sq = 4 * mass^2
+  
+  void MatPcDagMatPc(Vector *out, Vector *in, Float *dot_prd=0);
+  // MatPcDagMatPc is the fermion matrix that appears in the HMC 
+  // evolution. It is a Hermitian matrix where M is
+  // the Dirac Operator matrix.        
+  // MatPcDagMatPc connects only even-->even or odd-->odd sites.
+  // The in, out fields are defined on a checkerboard.
+  // If dot_prd is not 0 then the dot product (on node)
+  // <out, in> = <MatPcDagMatPc*in, in> is returned in dot_prd.
+  
+  void Dslash(Vector *out, 
+	      Vector *in,
+	      ChkbType cb, 
+	      DagType dag);
+  // Dslash is the derivative part of the fermion matrix. 
+  // Dslash conects only odd-->even or even-->odd sites.
+  // The in, out fields are defined on a checkerboard.
+  // cb refers to the checkerboard of the in field.
+  
+  //! The derivative part of the fermion matrix.
+  /* void Dslash(Vector *out, 
+     Vector *in,
+     ChkbType cb, 
+     DagType dag,
+     int dir_flag);*/
+  // Dslash is the derivative part of the fermion matrix. 
+  // Dslash conects only odd-->even or even-->odd sites.
+  // The in, out fields are defined on a checkerboard.
+  // cb refers to the checkerboard of the in field.
+  // dir_flag is flag which takes value 0 when all direction contribute 
+  // 1 - when only the special anisotropic direction contributes to D,
+  // 2 - when all  except the special anisotropic direction.
+  
+  void dMdmu(Vector *out, 
+	     Vector *in,
+	     ChkbType cb, 
+	     DagType dag,
+	     int order);
+  // dMDmu is the derivative of the fermion matrix with
+  // respect to the chemical potential. 
+  // dMdmu conects only odd-->even or even-->odd sites.
+  // The in, out fields are defined on a checkerboard.
+  // cb refers to the checkerboard of the in field.
+  // order refers to the order of the derivative.
+  
+  int MatInv(Vector *out, 
+	     Vector *in, 
+	     Float *true_res,
+	     PreserveType prs_in = PRESERVE_YES);
+  // The inverse of the Dirac Operator (D+m)
+  // using Conjugate gradient.
+  // Assume: the vector in contains both even and odd src.
+  //		even part is the 1st part.
+  // Return: the vector out contains both even and odd solutions.
+  // 	the even solution is the 1st part.
+  // If true_res !=0 the value of the true residual is returned
+  // in true_res.
+  // *true_res = |src - MatPcDagMatPc * sol| / |src|
+  // prs_in is not used. The source in is always preserved.
+  // The function returns the total number of CG iterations.
+  
+  int MatInv(Vector *out, 
+	     Vector *in,
+	     PreserveType prs_in = PRESERVE_YES);
+  // Same as original but true_res=0.
+  
+  int MatInv(Float *true_res,
+	     PreserveType prs_in = PRESERVE_YES);
+  // Same as original but in = f_in and out = f_out.
+  
+  int MatInv(PreserveType prs_in = PRESERVE_YES);
+  // Same as original but in = f_in, out = f_out, true_res=0.
+  
+  void RitzEigMat(Vector *out, Vector *in);
 
 };
 

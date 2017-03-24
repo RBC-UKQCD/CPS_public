@@ -158,6 +158,9 @@ class EigenCache {
   // if the arguments are already cached
   int is_cached( char* a_fname_root_bc, int a_neig )
   {
+    VRB.Debug(cname,"is_cached","%s %d: %s %d\n",
+	fname_root_bc, neig,
+	a_fname_root_bc, a_neig);
 
     return 
       strcmp( fname_root_bc, a_fname_root_bc)==0  &&
@@ -752,7 +755,7 @@ class EigenContainer {
 
 };
 
-extern std::vector<EigenCache*> EigenCacheList;
+//extern std::vector<EigenCache*> EigenCacheList;
 
 CPS_END_NAMESPACE
 #endif

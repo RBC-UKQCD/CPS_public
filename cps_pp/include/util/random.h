@@ -312,6 +312,13 @@ class LatRanGen
     ~LatRanGen();
     void Initialize();  
 #if 0
+//doesn't work properly. Fix needed before enabling
+    void ReInit()  
+{
+  is_initialized == 0;
+  this->Initialize();
+}
+
     int RngSize(){return state_size;}
     int RngNum(){return n_rgen_4d;}
 #endif

@@ -10,19 +10,6 @@
 #include "asq_data_types.h"
 #include "pt_int.h"
 
-extern "C"{
-void asq_force_cross2dag(PTvector *chi, PTvector *phi, PTmatrix *result,
-                      int counter, double *fac);
-void asq_force_cross2dag_s(PTvector *chi, PTvector *phi, PTmatrix *result,
-                      int counter, float *fac);
-void asq_vaxpy3(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
-void asq_vaxpy3_s(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
-}
-
-void *pt_alloc(size_t request, const char *cname, const
-char *fname, const char *vname){
-    return malloc(request);
-}
 const int QCOMMS = 0;
 
 #ifdef ASQD_SINGLE

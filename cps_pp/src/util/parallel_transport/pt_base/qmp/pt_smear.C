@@ -3,13 +3,6 @@
 #include "asq_data_types.h"
 #include "pt_int.h"
 
-extern "C" {
-void vaxpy3(PTvector *res,Float *scale,PTvector *mult,PTvector *add, int ncvec);
-  inline void vaxpy3_m(PTmatrix *res,Float *scale,PTmatrix *mult,PTmatrix *add, 
-  int ncvec){
-    vaxpy3((PTvector *)res, scale, (PTvector *)mult,(PTvector *)add,ncvec);
-  }
-}
 
 enum {NUM_DIR=8,POS_DIR=4};
 
@@ -39,14 +32,6 @@ void PT::asqtad_fat(AsqDArg *asq_arg, PTmatrix *fatlink){
   IFloat c5 = asq_arg->c5;
   IFloat c7 = asq_arg->c7;
   IFloat c6 = asq_arg->c6;
-#if 0
-  IFloat c1 = GJP.KS_coeff();
-  IFloat c2 = GJP.Naik_coeff();
-  IFloat c3 = -GJP.staple3_coeff();
-  IFloat c5 = GJP.staple5_coeff();
-  IFloat c7 = -GJP.staple7_coeff();
-  IFloat c6 = GJP.Lepage_coeff();
-#endif
 
   int i, j; 
   const int N = 4;

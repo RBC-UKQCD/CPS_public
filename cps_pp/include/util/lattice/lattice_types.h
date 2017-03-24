@@ -119,7 +119,7 @@ class GnoneFnaive
     public Fnaive
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFnaive(){
@@ -131,6 +131,34 @@ class GnoneFnaive
 //    virtual ~GnoneFnaive();
     virtual ~GnoneFnaive() {
       const char *fname = "~GnoneFnaive()";
+      VRB.Func(cname,fname);
+    }
+
+
+};
+
+//------------------------------------------------------------------
+//! Trivial gauge action with wilson fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GnoneFhisq 
+    : public virtual Lattice, 
+    public virtual FstagTypes, 
+    public virtual Fsmear, 
+    public Gnone, 
+    public Fhisq
+{
+ private:
+    const char *cname;    // Class name.
+
+ public:
+    GnoneFhisq():Fsmear(1),cname ( "GnoneFnaive"){
+      const char *fname = "GnoneFhisq()";
+      VRB.Func(cname,fname);
+    }
+
+    virtual ~GnoneFhisq() {
+      const char *fname = "~GnoneFhisq()";
       VRB.Func(cname,fname);
     }
 
@@ -182,20 +210,20 @@ class GnoneFmobius
     public Fmobius
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFmobius()
 {
   cname = "GnoneFmobius";
-  char *fname = "GnoneFmobius()";
+  const char *fname = "GnoneFmobius()";
   VRB.Func(cname,fname);
 
   //???
 }
     virtual ~GnoneFmobius()
 {
-  char *fname = "~GnoneFmobius()";
+  const char *fname = "~GnoneFmobius()";
   VRB.Func(cname,fname);
 
   //???
@@ -211,20 +239,20 @@ class GnoneFzmobius
     public Fzmobius
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GnoneFzmobius()
 {
   cname = "GnoneFzmobius";
-  char *fname = "GnoneFzmobius()";
+  const char *fname = "GnoneFzmobius()";
   VRB.Func(cname,fname);
 
   //???
 }
     virtual ~GnoneFzmobius()
 {
-  char *fname = "~GnoneFzmobius()";
+  const char *fname = "~GnoneFzmobius()";
   VRB.Func(cname,fname);
 
   //???
@@ -247,6 +275,33 @@ class GnoneFmdwf
  public:
     GnoneFmdwf();
     virtual ~GnoneFmdwf();
+};
+//------------------------------------------------------------------
+//! Trivial gauge action with twisted-mass wilson fermion action
+/*! \ingroup latactions */
+//------------------------------------------------------------------
+class GnoneFwilsonTm
+    : public virtual Lattice,
+    public virtual FwilsonTypes,
+    public Gnone,
+    public virtual Fwilson,
+    public FwilsonTm
+{
+ private:
+    const char *cname;    // Class name.
+
+ public:
+    GnoneFwilsonTm() {
+      cname = "GnoneFwilsonTm";
+      const char *fname = "GnoneFwilsonTm()";
+      VRB.Func(cname,fname);
+    }
+
+    ~GnoneFwilsonTm() {
+      const char *fname = "~GnoneFwilsonTm()";
+      VRB.Func(cname,fname);
+    }
+
 };
 
 
@@ -323,6 +378,20 @@ class GwilsonFp4
     virtual ~GwilsonFp4();
 };
 
+class GwilsonFhisq
+    : public virtual Lattice,
+    public virtual FstagTypes,
+    public Gwilson,
+    public Fhisq
+{
+ private:
+    const char *cname;    // Class name.
+
+ public:
+    GwilsonFhisq();
+    virtual ~GwilsonFhisq();
+};
+
 //------------------------------------------------------------------
 //! Wilson gauge action with wilson fermion action
 /*! \ingroup latactions */
@@ -389,20 +458,20 @@ class GwilsonFmobius
     public Fmobius
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFmobius()
 {
   cname = "GwilsonFmobius";
-  char *fname = "GwilsonFmobius()";
+  const char *fname = "GwilsonFmobius()";
   VRB.Func(cname,fname);
 
   //???
 }
     virtual ~GwilsonFmobius()
 {
-  char *fname = "~GwilsonFmobius()";
+  const char *fname = "~GwilsonFmobius()";
   VRB.Func(cname,fname);
 
   //???
@@ -419,20 +488,20 @@ class GwilsonFzmobius
     public Fzmobius
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GwilsonFzmobius()
 {
   cname = "GwilsonFzmobius";
-  char *fname = "GwilsonFzmobius()";
+  const char *fname = "GwilsonFzmobius()";
   VRB.Func(cname,fname);
 
   //???
 }
     virtual ~GwilsonFzmobius()
 {
-  char *fname = "~GwilsonFzmobius()";
+  const char *fname = "~GwilsonFzmobius()";
   VRB.Func(cname,fname);
 
   //???
@@ -667,20 +736,20 @@ class GimprRectFmobius
     public Fmobius
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprRectFmobius()
 {
   cname = "GimprRectFmobius";
-  char *fname = "GimprRectFmobius()";
+  const char *fname = "GimprRectFmobius()";
   VRB.Func(cname,fname);
 
   //???
 }
     virtual ~GimprRectFmobius()
 {
-  char *fname = "~GimprRectFmobius()";
+  const char *fname = "~GimprRectFmobius()";
   VRB.Func(cname,fname);
 
   //???
@@ -698,20 +767,20 @@ class GimprRectFzmobius
     public Fzmobius
 {
  private:
-    char *cname;    // Class name.
+    const char *cname;    // Class name.
 
  public:
     GimprRectFzmobius()
 {
   cname = "GimprRectFzmobius";
-  char *fname = "GimprRectFzmobius()";
+  const char *fname = "GimprRectFzmobius()";
   VRB.Func(cname,fname);
 
   //???
 }
     virtual ~GimprRectFzmobius()
 {
-  char *fname = "~GimprRectFzmobius()";
+  const char *fname = "~GimprRectFzmobius()";
   VRB.Func(cname,fname);
 
   //???
@@ -1042,33 +1111,6 @@ class GtadpoleRectFnone : public GtadpoleRect, public Fnone{
     ~GtadpoleRectFnone();
 };
 
-//------------------------------------------------------------------
-//! Trivial gauge action with twisted-mass wilson fermion action
-/*! \ingroup latactions */
-//------------------------------------------------------------------
-class GnoneFwilsonTm
-    : public virtual Lattice,
-    public virtual FwilsonTypes,
-    public Gnone,
-    public virtual Fwilson,
-    public FwilsonTm
-{
- private:
-    const char *cname;    // Class name.
-
- public:
-    GnoneFwilsonTm() {
-      cname = "GnoneFwilsonTm";
-      const char *fname = "GnoneFwilsonTm()";
-      VRB.Func(cname,fname);
-    }
-
-    ~GnoneFwilsonTm() {
-      const char *fname = "~GnoneFwilsonTm()";
-      VRB.Func(cname,fname);
-    }
-
-};
 //------------------------------------------------------------------
 //! Trivial gauge action with twisted-mass wilson fermion action
 /*! \ingroup latactions */

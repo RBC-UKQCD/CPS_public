@@ -1,109 +1,104 @@
+/* conf.h.  Generated from conf.h.in by configure.  */
 /* conf.h.in.  Generated from configure.in by autoheader.  */
 
 /* Define to 1 if the system has the type `bool_t'. */
-#undef HAVE_BOOL_T
-
-/* Define to 1 if you have the <cblas.h> header file. */
-#undef HAVE_CBLAS_H
+/* #undef HAVE_BOOL_T */
 
 /* Define to 1 if the system has the type `enum_t'. */
-#undef HAVE_ENUM_T
+/* #undef HAVE_ENUM_T */
 
 /* Define to 1 if you have the <gmp.h> header file. */
-#undef HAVE_GMP_H
-
-/* Define to 1 if you have the <gsl_cblas.h> header file. */
-#undef HAVE_GSL_CBLAS_H
+#define HAVE_GMP_H 1
 
 /* Define to 1 if the system has the type `int16_t'. */
-#undef HAVE_INT16_T
+#define HAVE_INT16_T 1
 
 /* Define to 1 if the system has the type `int32_t'. */
-#undef HAVE_INT32_T
+#define HAVE_INT32_T 1
 
 /* Define to 1 if the system has the type `int64_t'. */
-#undef HAVE_INT64_T
+#define HAVE_INT64_T 1
 
 /* Define to 1 if the system has the type `int8_t'. */
-#undef HAVE_INT8_T
+#define HAVE_INT8_T 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#undef HAVE_INTTYPES_H
+#define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the <malloc.h> header file. */
-#undef HAVE_MALLOC_H
+#define HAVE_MALLOC_H 1
 
 /* Define to 1 if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H
-
-/* Define to 1 if you have the <mkl_cblas.h> header file. */
-#undef HAVE_MKL_CBLAS_H
+#define HAVE_MEMORY_H 1
 
 /* Define to 1 if the system has the type `netobj'. */
-#undef HAVE_NETOBJ
+/* #undef HAVE_NETOBJ */
 
 /* Define to 1 if you have the `posix_memalign' function. */
-#undef HAVE_POSIX_MEMALIGN
+#define HAVE_POSIX_MEMALIGN 1
+
+/* Define to 1 if you have the <qcdocos/scu_checksum.h> header file. */
+/* #undef HAVE_QCDOCOS_SCU_CHECKSUM_H */
 
 /* Define to 1 if the system has the type `quad_t'. */
-#undef HAVE_QUAD_T
+#define HAVE_QUAD_T 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#undef HAVE_STDINT_H
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-#undef HAVE_STDLIB_H
+#define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the <strings.h> header file. */
-#undef HAVE_STRINGS_H
+#define HAVE_STRINGS_H 1
 
 /* Define to 1 if you have the <string.h> header file. */
-#undef HAVE_STRING_H
+#define HAVE_STRING_H 1
+
+/* Define to 1 if you have the `sync' function. */
+/* #undef HAVE_SYNC */
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
-#undef HAVE_SYS_STAT_H
+#define HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
-#undef HAVE_SYS_TYPES_H
+#define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if the system has the type `uint16_t'. */
-#undef HAVE_UINT16_T
+#define HAVE_UINT16_T 1
 
 /* Define to 1 if the system has the type `uint32_t'. */
-#undef HAVE_UINT32_T
+#define HAVE_UINT32_T 1
 
 /* Define to 1 if the system has the type `uint64_t'. */
-#undef HAVE_UINT64_T
+#define HAVE_UINT64_T 1
 
 /* Define to 1 if the system has the type `uint8_t'. */
-#undef HAVE_UINT8_T
+#define HAVE_UINT8_T 1
 
 /* Define to 1 if the system has the type `uint_t'. */
-#undef HAVE_UINT_T
+/* #undef HAVE_UINT_T */
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#undef HAVE_UNISTD_H
+#define HAVE_UNISTD_H 1
 
 /* Define to 1 if the system has the type `u_quad_t'. */
-#undef HAVE_U_QUAD_T
+#define HAVE_U_QUAD_T 1
 
 /* Define to the address where bug reports for this package should be sent. */
-#undef PACKAGE_BUGREPORT
+#define PACKAGE_BUGREPORT ""
 
 /* Define to the full name of this package. */
-#undef PACKAGE_NAME
+#define PACKAGE_NAME ""
 
 /* Define to the full name and version of this package. */
-#undef PACKAGE_STRING
+#define PACKAGE_STRING ""
 
 /* Define to the one symbol short name of this package. */
-#undef PACKAGE_TARNAME
-
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
+#define PACKAGE_TARNAME ""
 
 /* Define to the version of this package. */
-#undef PACKAGE_VERSION
+#define PACKAGE_VERSION ""
 
 /* Define to 1 if you have the ANSI C header files. */
-#undef STDC_HEADERS
+#define STDC_HEADERS 1

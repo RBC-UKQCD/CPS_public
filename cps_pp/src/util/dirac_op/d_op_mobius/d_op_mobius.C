@@ -69,7 +69,7 @@ DiracOpMobius::DiracOpMobius(Lattice & latt,
 		     cnv_frm_flg)
 {
   cname = "DiracOpMobius";
-  char *fname = "DiracOpMobius(L&,V*,V*,CgArg*,CnvFrmType)";
+  const char *fname = "DiracOpMobius(L&,V*,V*,CgArg*,CnvFrmType)";
   VRB.Func(cname,fname);
 
 
@@ -124,7 +124,7 @@ DiracOpMobius::DiracOpMobius(Lattice & latt,
 */
 //------------------------------------------------------------------
 DiracOpMobius::~DiracOpMobius() {
-  char *fname = "~DiracOpMobius()";
+  const char *fname = "~DiracOpMobius()";
   VRB.Func(cname,fname);
 
   //----------------------------------------------------------------
@@ -333,7 +333,7 @@ void DiracOpMobius::MatPc(Vector *out, Vector *in) {
 //------------------------------------------------------------------
 void DiracOpMobius::MatPcDag(Vector *out, Vector *in) {
 
-  char *fname = "MatPcDag(*V,*V)";
+  const char *fname = "MatPcDag(*V,*V)";
   VRB.Func(fname,cname);
   //----------------------------------------------------------------
   // Initialize kappa and ls. This has already been done by the Fmobius
@@ -378,7 +378,7 @@ int DiracOpMobius::MatInv(Vector *out,
 			  Vector *in, 
 			  Float *true_res,
 			  PreserveType prs_in) {
-  char *fname = "MatInv(V*,V*,F*)";
+  const char *fname = "MatInv(V*,V*,F*)";
   VRB.Func(cname,fname);
   
 
@@ -600,7 +600,7 @@ int DiracOpMobius::MatInv(PreserveType prs_in)
 // The in, out fields are defined on the full lattice.
 //------------------------------------------------------------------
 void DiracOpMobius::Mat(Vector *out, Vector *in) {  
-  char *fname = "Mat(V*,V*)";
+  const char *fname = "Mat(V*,V*)";
   VRB.Func(cname,fname);
 
   //----------------------------------------------------------------
@@ -660,7 +660,7 @@ void DiracOpMobius::Mat(Vector *out, Vector *in) {
 
 
 void DiracOpMobius::Dminus(Vector *out, Vector *in) {  
-  char *fname = "Dminus(V*,V*)";
+  const char *fname = "Dminus(V*,V*)";
   VRB.Func(cname,fname);
   VRB.Func(cname,fname);
   VRB.Func(cname,fname);
@@ -705,7 +705,7 @@ void DiracOpMobius::Dminus(Vector *out, Vector *in) {
 // The in, out fields are defined on the full lattice.
 //------------------------------------------------------------------
 void DiracOpMobius::MatDag(Vector *out, Vector *in) {
-  char *fname = "MatDag(V*,V*)";
+  const char *fname = "MatDag(V*,V*)";
   VRB.Func(cname,fname);
 
   //----------------------------------------------------------------
@@ -771,7 +771,7 @@ void DiracOpMobius::MatDag(Vector *out, Vector *in) {
 // The in, out fields are defined on the full lattice.
 //------------------------------------------------------------------
 void DiracOpMobius::MatHerm(Vector *out, Vector *in) {
-  char *fname = "MatHerm(V*,V*)";
+  const char *fname = "MatHerm(V*,V*)";
   VRB.Func(cname,fname);
 
   //----------------------------------------------------------------
@@ -827,7 +827,7 @@ void DiracOpMobius::MatHerm(Vector *out, Vector *in) {
 
 void DiracOpMobius::CalcHmdForceVecs(Vector *chi)
 {
-  char *fname = "CalcHmdForceVecs(V*)" ;
+  const char *fname = "CalcHmdForceVecs(V*)" ;
   VRB.Func(cname,fname) ;
 
   if (f_out == 0)
@@ -924,7 +924,7 @@ void DiracOpMobius::DiracOpGlbSum(Float *float_p) {
 // The in, out fields are defined on the full or half lattice.
 //------------------------------------------------------------------
 void DiracOpMobius::RitzMat(Vector *out, Vector *in) {
-  char *fname = "RitzMat(V*,V*)";
+  const char *fname = "RitzMat(V*,V*)";
   VRB.Func(cname,fname);
 
   //printf("single ritzmat %d\n",dirac_arg->RitzMatOper);
@@ -990,7 +990,7 @@ void DiracOpMobius::RitzMat(Vector *out, Vector *in) {
 //
 void DiracOpMobius::RitzMat(Vector *out, Vector *in,
 			 MatrixPolynomialArg* cheby_arg) {
-  char *fname = "RitzMat(V*,V*,MatrixPolyArg*)";
+  const char *fname = "RitzMat(V*,V*,MatrixPolyArg*)";
   VRB.Func(cname,fname);
 
   double time_start=dclock();
@@ -1094,7 +1094,7 @@ void DiracOpMobius::RitzMat(Vector *out, Vector *in,
 
 //!! N.B. This overwrites contents of  mobius_arg->frm_tmp2
 void DiracOpMobius::MatPcHerm(Vector *out, Vector *in) {
-  char *fname = "MatPcHerm(V*,V*)";
+  const char *fname = "MatPcHerm(V*,V*)";
   VRB.Func(cname,fname);
   Dwf *mobius_arg = (Dwf *) mobius_lib_arg;
   Vector* vtmp = (Vector*)(mobius_arg->frm_tmp1);
@@ -1107,7 +1107,7 @@ void DiracOpMobius::MatPcHerm(Vector *out, Vector *in) {
 // specific to dwf 
 void ReflectAndMultGamma5( Vector *out, const Vector *in,  int nodevol, int ls)
 {
-  char *fname = "MultGamma5(V*,V*,i)";
+  const char *fname = "MultGamma5(V*,V*,i)";
   VRB.Func("",fname);
   for(int s=0; s< ls; ++s) { 
     IFloat *p = (IFloat *)out + 24*nodevol*s;
