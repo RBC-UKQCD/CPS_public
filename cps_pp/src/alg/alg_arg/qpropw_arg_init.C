@@ -12,11 +12,14 @@ QPropWArg::QPropWArg()
   save_prop(0),
   save_ls_prop(0),
   do_half_fermion(0),
-//  bstart(0),
-//  bend(0),
-//  gauss_N(30),
-//  gauss_W(4.35), 
-  SeqSmearSink(POINT)
+  SeqSmearSink(POINT),
+  seqNum(0),
+  StartSrcSpin(0),
+  EndSrcSpin(3),
+  StartSrcColor(0),
+  EndSrcColor(2),
+  mob_arg_l(NULL),
+  mob_arg_s(NULL)
 {};
 
 QPropWPointArg::QPropWPointArg()

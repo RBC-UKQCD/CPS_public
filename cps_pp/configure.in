@@ -422,7 +422,8 @@ dnl     echo "BFM_DIR environment variable not set"
       INCLUDE_FLAGS="-I${QMP_DIR}/include ${INCLUDE_FLAGS} "
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM -DUSE_HDCG"
-      LDFLAGS="${LDFLAGS} -lqdp -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm -L/soft/libraries/essl/current/lib64 -lesslbg -L/soft/compilers/ibmcmp-nov2012/xlf/bg/14.1/lib64 -lxlf90_r -lxlfmath -lxl -ldl -lgsl -lgslblas -lqmp"
+      LDFLAGS="${LDFLAGS} -lqdp -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm -lgsl -lgslcblas -lqmp"
+dnl -L/soft/libraries/essl/current/lib64 -lesslbg -L/soft/compilers/ibmcmp-nov2012/xlf/bg/14.1/lib64 -lxlf90_r -lxlfmath -lxl -ldl 
    if test "X{$enable_xml}X" = "XX"; then
    	enable_xml="yes"
    fi

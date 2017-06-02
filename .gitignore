@@ -1,0 +1,13 @@
+*.o
+*.stmp
+*~
+.DS_Store
+cps_pp/include/input/Makefile
+cps_pp/include/input/conf.h
+cps_pp/include/input/config.h
+cps_pp/include/input/enum_int.stmp2
+cps_pp/include/input/precision.h
+cps_pp/include/input/vml.done
+cps_pp/misc/vml_encode/rpcgenvml/rpcgenvml
+cps_pp/obj/
+CVS
