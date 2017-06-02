@@ -1,0 +1,24 @@
+class LanczosArg lanczos_arg = {
+RitzMatType RitzMat_lanczos   =  MATPCDAG_MATPC
+RitzMatType RitzMat_convcheck =  MATPCDAG_MATPC
+double mass =  0.005
+int nk_lanczos_vectors = 10
+int nt_lanczos_vectors = 10
+int np_lanczos_vectors = 4
+double eigen_shift = 0.0
+double stop_residual =  5e-06
+int maxiters = 50
+int save = 1
+int conv_check = 1
+string results = "lanczos.dat"
+string file = "eigen3"
+class MatrixPolynomialArg cheby_arg = {
+int Npol = 10
+Array params[2] = {
+double params[0] = 25
+double params[1] = 0.5
+}
+bool tmp1 = 0x0
+bool tmp2 = 0x0
+}
+}

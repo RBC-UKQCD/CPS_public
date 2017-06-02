@@ -1,0 +1,103 @@
+class ActionQuotientArg quo_arg = {
+class ActionBilinearArg bi_arg = {
+FclassType fermion = F_CLASS_BFM
+Array bilinears[6] = { 
+class BilinearDescr bilinears[0] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[1] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[2] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[3] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[4] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[5] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+}
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_YES
+string force_label = "Quotient"
+}
+}
+Array quotients[6] = { 
+class QuotientDescr quotients[0] = {
+double bsn_mass =   24.005
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   24.00078
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-12
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1e-7
+double stop_rsd_mc =   1.0000000000000000e-12
+}
+class QuotientDescr quotients[1] = {
+double bsn_mass =   24.017
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   24.005
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-12
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1e-7
+double stop_rsd_mc =   1.0000000000000000e-12
+}
+class QuotientDescr quotients[2] = {
+double bsn_mass =   24.07
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   24.017
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-12
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1e-7
+double stop_rsd_mc =   1.0000000000000000e-12
+}
+class QuotientDescr quotients[3] = {
+double bsn_mass =   24.18
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   24.07
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-12
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1e-7
+double stop_rsd_mc =   1.0000000000000000e-12
+}
+class QuotientDescr quotients[4] = {
+double bsn_mass =   24.45
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   24.18
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-12
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1e-7
+double stop_rsd_mc =   1.0000000000000000e-12
+}
+class QuotientDescr quotients[5] = {
+double bsn_mass =   241.00
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   24.45
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-12
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1e-7
+double stop_rsd_mc =   1.0000000000000000e-12
+}
+}
+}

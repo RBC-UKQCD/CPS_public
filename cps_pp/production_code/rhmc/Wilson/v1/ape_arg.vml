@@ -1,0 +1,5 @@
+class ApeSmearArg ape_arg = {
+double tolerance = 1.000000e-12
+int orthog = -1
+double coef = 0.45
+}

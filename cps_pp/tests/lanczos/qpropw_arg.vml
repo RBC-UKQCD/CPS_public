@@ -1,0 +1,37 @@
+class QPropWArg qpropw_arg = {
+class CgArg cg = {
+double mass = 0.005
+double epsilon =   0.0000000000000000e+00
+int max_num_iter = 1000
+double stop_rsd =  1e-08 
+double true_rsd =   0.0000000000000000e+00
+RitzMatType RitzMatOper = MATPC_HERM
+InverterType Inverter = CG_LOWMODE_DEFL
+int bicgstab_n = 0
+string fname_eigen = "eigen2/eig4dee.mass0.001.ls16"
+int neig = 100
+double eigen_shift =  0.0
+double ama_stop_rsd =  0.001
+}
+string file = "./"
+int x = 0
+int y = 0
+int z = 0
+int t = 10
+int gauge_fix_src = 0
+int gauge_fix_snk = 0
+int store_midprop = 0
+int save_prop = 0
+int save_ls_prop = 0
+int do_half_fermion = 0
+SourceType SeqSmearSink = POINT
+string ensemble_label = "test4c8"
+string ensemble_id = "0"
+int seqNum = 0
+int StartSrcSpin = 0
+int EndSrcSpin = 4
+int StartSrcColor = 0
+int EndSrcColor = 3
+bool mob_arg_l = 0x0
+bool mob_arg_s = 0x0
+}

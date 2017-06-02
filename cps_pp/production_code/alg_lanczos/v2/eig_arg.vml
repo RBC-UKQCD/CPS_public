@@ -1,0 +1,29 @@
+class EigArg eig_arg = {
+PatternType pattern_kind = ARRAY
+double Mass_init =   0.0000000000000000e+00
+double Mass_final =   0.0000000000000000e+00
+double Mass_step =   0.0000000000000000e+00
+Array Mass[1] = { 
+double Mass[0] = 0.005
+}
+int n_masses = 1
+int N_eig = 1
+int N_eigacc = 1
+int Kalk_Sim = 0
+int MaxCG = 100000
+double RsdR_a =   1e-7
+double RsdR_r =   1e-7
+double Rsdlam =   1e-7
+double Cv_fact =  0.
+int N_min = 0
+int N_max = 0
+int N_KS_max = 0
+int n_renorm = 100
+int ProjApsiP = 0
+RitzMatType RitzMatOper =  NEG_MATPCDAG_MATPC
+int print_hsum = 0
+int hsum_dir = 0
+double mass =   0.00078
+string fname = "./eig.log"
+int ncorr = 0
+}

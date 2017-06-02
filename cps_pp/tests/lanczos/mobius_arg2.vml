@@ -1,0 +1,59 @@
+class MobiusArg mdwf_arg = {
+double mobius_b_coeff = 1.5
+double mobius_c_coeff = 0.5
+Array zmobius_b_coeff[16] = {
+double zmobius_b_coeff[0] = 8.7405859026591415e-01
+double zmobius_b_coeff[1] = 0.0000000000000000e+00
+double zmobius_b_coeff[2] = 1.0190035946640621e+00
+double zmobius_b_coeff[3] = 0.0000000000000000e+00
+double zmobius_b_coeff[4] = 1.3658219772391325e+00
+double zmobius_b_coeff[5] = 0.0000000000000000e+00
+double zmobius_b_coeff[6] = 2.0514624685283716e+00
+double zmobius_b_coeff[7] = 0.0000000000000000e+00
+double zmobius_b_coeff[8] = 3.3661546566870935e+00
+double zmobius_b_coeff[9] = 0.0000000000000000e+00
+double zmobius_b_coeff[10] = 5.7994094935966318e+00
+double zmobius_b_coeff[11] = 0.0000000000000000e+00
+double zmobius_b_coeff[12] = 6.7467786395784248e+00
+double zmobius_b_coeff[13] = -3.5543607236727506e+00
+double zmobius_b_coeff[14] = 6.7467786395784248e+00
+double zmobius_b_coeff[15] = 3.5543607236727506e+00
+}
+Array zmobius_c_coeff[16] = {
+double zmobius_c_coeff[0] = -1.2594140973408585e-01
+double zmobius_c_coeff[1] = 0.0000000000000000e+00
+double zmobius_c_coeff[2] = 1.9003594664062096e-02
+double zmobius_c_coeff[3] = 0.0000000000000000e+00
+double zmobius_c_coeff[4] = 3.6582197723913246e-01
+double zmobius_c_coeff[5] = 0.0000000000000000e+00
+double zmobius_c_coeff[6] = 1.0514624685283716e+00
+double zmobius_c_coeff[7] = 0.0000000000000000e+00
+double zmobius_c_coeff[8] = 2.3661546566870935e+00
+double zmobius_c_coeff[9] = 0.0000000000000000e+00
+double zmobius_c_coeff[10] = 4.7994094935966318e+00
+double zmobius_c_coeff[11] = 0.0000000000000000e+00
+double zmobius_c_coeff[12] = 5.7467786395784248e+00
+double zmobius_c_coeff[13] = -3.5543607236727506e+00
+double zmobius_c_coeff[14] = 5.7467786395784248e+00
+double zmobius_c_coeff[15] = 3.5543607236727506e+00
+}
+int ls = 8
+double M5 = 1.8
+class CgArg cg = {
+double mass = 0.005
+double epsilon = 0.0
+int max_num_iter = 1000
+double stop_rsd = 1.0e-8
+double true_rsd = 1.0e-8
+RitzMatType RitzMatOper = MATPCDAG_MATPC
+InverterType Inverter = CG_LOWMODE_DEFL
+int bicgstab_n = 0
+string fname_eigen = "eigen/eig4dee.ls10.pc5.mass0.01"
+int neig = 100
+double eigen_shift = 0.0
+double ama_stop_rsd =   0.001
+}
+Array rsd_vec[0] = {
+}
+int use_single_precision = 0
+}
