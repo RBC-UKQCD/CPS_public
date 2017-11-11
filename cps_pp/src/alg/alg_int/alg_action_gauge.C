@@ -89,6 +89,12 @@ void AlgActionGauge::prepare_fg(Matrix * force, Float dt_ratio)
   time.stop(true);
 }
 
+void AlgActionGauge::CheckPoint(){
+  Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, gluon);
+//lat.GaugeField() should be saved
+  LatticeFactory::Destroy();
+}
+
 //!< evolve method evolves the momentum due to the gauge force
 void AlgActionGauge::evolve(Float dt, int steps) 
 {

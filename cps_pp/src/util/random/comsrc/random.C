@@ -354,14 +354,14 @@ for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
 //		int new_seed = ugran[index].Urand(RandomGenerator::MBIG,0);
 		int new_seed = rng_seed_5d.Urand(RandomGenerator::MBIG,0);
 			rng_count++;
-		printf("index=%d start_seed=%d new_seed=%d\n",index,start_seed,new_seed);
+		VRB.Debug(cname,fname,"index=%d start_seed=%d new_seed=%d\n",index,start_seed,new_seed);
 		  ugran[index].Reset(new_seed);
 }
 #endif
 #ifdef RNG_WARMUP
 {
 		int n_warm = ugran[index].Urand(N_WARMUP,0);
-		if(!index)printf("index=%d n_warm=%d\n",index,n_warm);
+		VRB.Debug(cname,fname,"index=%d n_warm=%d\n",index,n_warm);
 		while (n_warm>0) {int temp = ugran[index].Urand(100,0); n_warm--; }
 }
 #endif
@@ -378,7 +378,7 @@ for(x[4] = x_o[4]; x[4] <= x_f[4]; x[4]+=2) {
 //		int new_seed = ugran[index_4d].Urand(RandomGenerator::MBIG,0);
 		int new_seed = rng_seed_4d.Urand(RandomGenerator::MBIG,0);
 			rng_count_4d++;
-		printf("index_4d=%d start_seed_4d=%d new_seed=%d\n",index_4d,start_seed_4d,new_seed);
+		VRB.Debug(cname,fname,"index_4d=%d start_seed_4d=%d new_seed=%d\n",index_4d,start_seed_4d,new_seed);
 		  ugran_4d[index_4d].Reset(new_seed);
 }
 #endif

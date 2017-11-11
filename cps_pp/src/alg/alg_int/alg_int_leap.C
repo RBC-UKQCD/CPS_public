@@ -45,19 +45,31 @@ void AlgIntLeap::evolve(Float dt, int steps)
   char * fname = "evolve(Float, int)";
 
   step_cnt = 0;
-  if (level == TOP_LEVEL_INTEGRATOR) CSM.SaveComment(step_cnt);
+  if (level == TOP_LEVEL_INTEGRATOR){
+	 CSM.SaveComment(step_cnt);
+  }
 
   A->evolve(0.5*dt/(Float)A_steps, A_steps);
 
   for (int i=0; i<steps; i++) {
-    if (level == TOP_LEVEL_INTEGRATOR) CSM.SaveComment(++step_cnt);
+  if (level == TOP_LEVEL_INTEGRATOR){
+	 CSM.SaveComment(++step_cnt);
+	 A->CheckPoint();
+	 B->CheckPoint();
+	 CheckPoint();// i should be saved
+// LRG should be saved. Has it's own checkpoint function. Should I just use that herer?
+  }
 
     B->evolve(dt/(Float)B_steps, B_steps);    
     if (i < steps-1) A->evolve(dt/(Float)A_steps, A_steps);
     else A->evolve(0.5*dt/(Float)A_steps, A_steps);
   }
 
-  if (level == TOP_LEVEL_INTEGRATOR) CSM.SaveComment(++step_cnt);
+  if (level == TOP_LEVEL_INTEGRATOR){
+	 CSM.SaveComment(++step_cnt);
+	 A->CheckPoint();
+	 B->CheckPoint();
+  }
 
 }
 

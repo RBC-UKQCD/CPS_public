@@ -65,6 +65,8 @@ public:
     //!< method used to reinitialise the integrator
     virtual void init() = 0;
 
+    virtual void CheckPoint(){}
+
 };
 
 /*!< 
@@ -105,6 +107,7 @@ public:
     //!< AlgIntAB factory
     static AlgIntAB& Create(AlgInt &A, AlgInt &B, IntABArg &ab_arg);
     static void Destroy(AlgIntAB&);
+    virtual void CheckPoint(){}
 
 };
 
@@ -300,6 +303,7 @@ public:
 
     //!< Dummy method
     void init();
+    virtual void CheckPoint(){} // mom should be saved
     // for HMC restarting. Not working yet
     void SaveState(std::string);
     void LoadState(std::string);
@@ -813,6 +817,7 @@ public:
     void cost(CgStats*);
 
     void init();
+    virtual void CheckPoint();
 
 };
 
