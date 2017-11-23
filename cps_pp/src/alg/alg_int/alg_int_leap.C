@@ -50,14 +50,17 @@ void AlgIntLeap::evolve(Float dt, int steps)
   }
 
   A->evolve(0.5*dt/(Float)A_steps, A_steps);
+  std::stringstream veloc_label("AlgIntLeapTop");
 
   for (int i=0; i<steps; i++) {
   if (level == TOP_LEVEL_INTEGRATOR){
 	 CSM.SaveComment(++step_cnt);
-	 A->CheckPoint();
-	 B->CheckPoint();
-	 CheckPoint();// i should be saved
-// LRG should be saved. Has it's own checkpoint function. Should I just use that herer?
+//	 VELOC_Checkpoint_begin(veloc_label.str.c_str(), i );
+//	 VELOC_Checkpoint_end(veloc_label.str.c_str(), i );
+//	 CheckPoint();// i should be saved
+// LRG should be saved. 
+//	veloc_label << i ;
+//	LRG.Write(veloc_label.str().c_str());
   }
 
     B->evolve(dt/(Float)B_steps, B_steps);    

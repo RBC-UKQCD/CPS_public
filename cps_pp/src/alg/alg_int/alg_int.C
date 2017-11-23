@@ -21,6 +21,8 @@ CPS_END_NAMESPACE
 #include<alg/alg_int.h>
 CPS_START_NAMESPACE
 
+int AlgInt::veloc_id=0;
+
 AlgInt::AlgInt()
 {
   cname = "AlgInt()";

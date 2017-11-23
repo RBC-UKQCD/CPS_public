@@ -41,6 +41,11 @@ protected:
     IntegratorType int_type;
 
 public:
+
+    static int veloc_id;
+    static int VeloCCounter(){
+	veloc_id++; return veloc_id;
+    }
   
     AlgInt();
     virtual ~AlgInt();
@@ -282,7 +287,7 @@ private:
 
     //!< This class tracks the MD time since it updates the gauge field
     char *md_time_str;
-    Matrix *mom;
+    Matrix *mom; //VeloC: should be checkpointed
 
 public:
     AlgMomentum();
@@ -303,7 +308,7 @@ public:
 
     //!< Dummy method
     void init();
-    virtual void CheckPoint(){} // mom should be saved
+//    virtual void CheckPoint(){} // mom should be saved
     // for HMC restarting. Not working yet
     void SaveState(std::string);
     void LoadState(std::string);
@@ -817,7 +822,7 @@ public:
     void cost(CgStats*);
 
     void init();
-    virtual void CheckPoint();
+//    virtual void CheckPoint();
 
 };
 
