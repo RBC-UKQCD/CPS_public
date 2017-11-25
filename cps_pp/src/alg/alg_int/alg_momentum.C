@@ -36,7 +36,11 @@ AlgMomentum::AlgMomentum() : AlgHamiltonian()
   md_time_str = "MD_time/step_size = ";
 
   mom = (Matrix*)smalloc(g_size*sizeof(Float),"mom",fname,cname);
-// VELOC_Mem_protect (  VeloCCounter(), mom, g_size, sizeof(Float) );
+#ifdef HAVE_VELOC
+ int veloc_id;
+ VELOC_Mem_protect (  (veloc_id= VeloCCounter() ) , mom, g_size, sizeof(Float) );
+ VRB.Result(cname,fname,"mom VELOC id:%d\n",veloc_id);
+#endif
 }
 
 AlgMomentum::~AlgMomentum() {

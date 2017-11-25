@@ -1,4 +1,6 @@
 #include<config.h>
+#include<config.h>
+#include<config.h>
 CPS_START_NAMESPACE 
 //------------------------------------------------------------------
 //
@@ -16,6 +18,7 @@ CPS_START_NAMESPACE
 
 CPS_END_NAMESPACE
 #include<math.h>
+#include<assert.h>
 #include<alg/alg_hmd.h>
 #include<util/lattice.h>
 #include<util/vector.h>
@@ -53,14 +56,31 @@ void AlgIntLeap::evolve(Float dt, int steps)
   std::stringstream veloc_label("AlgIntLeapTop");
 
   for (int i=0; i<steps; i++) {
+  std::stringstream veloc_label, veloc_label2;
   if (level == TOP_LEVEL_INTEGRATOR){
+	veloc_label <<"Veloc_traj"<<traj<<std::endl;
+	std::cout <<"Veloc label: "<<veloc_label.str().c_str() <<std::endl;
+#ifdef HAVE_VELOC
+       int veloc_v = VELOC_Restart_test(veloc_label.str().c_str());
+	if(veloc_v == VELOC_FAILURE){ // no restart, checkpoint
+	 VELOC_Checkpoint_begin(veloc_label.str().c_str(), i );
+	 VELOC_Checkpoint_mem(i );
+	 VELOC_Checkpoint_end(i,1 );
+	veloc_label2 <<"Veloc_traj"<<traj<<"_"<<i<<std::endl;
+	std::cout <<"Veloc label2: "<<veloc_label2.str().c_str() <<std::endl;
+	 LRG.Write(veloc_label2.str().c_str());
+        } else {
+	assert(veloc_v <steps);
+	 i = veloc_v;
+	 VELOC_Restart_begin (veloc_label.str().c_str(), i );
+	 VELOC_Restart_mem(i );
+	 VELOC_Restart_end( i,1 );
+	veloc_label2 <<"Veloc_traj"<<traj<<"_"<<i<<std::endl;
+	std::cout <<"Veloc label2: "<<veloc_label2.str().c_str() <<std::endl;
+	 LRG.Read(veloc_label2.str().c_str());
+	}
+#endif
 	 CSM.SaveComment(++step_cnt);
-//	 VELOC_Checkpoint_begin(veloc_label.str.c_str(), i );
-//	 VELOC_Checkpoint_end(veloc_label.str.c_str(), i );
-//	 CheckPoint();// i should be saved
-// LRG should be saved. 
-//	veloc_label << i ;
-//	LRG.Write(veloc_label.str().c_str());
   }
 
     B->evolve(dt/(Float)B_steps, B_steps);    

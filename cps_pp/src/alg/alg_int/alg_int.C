@@ -27,6 +27,8 @@ AlgInt::AlgInt()
 {
   cname = "AlgInt()";
   traj = -1;
+  GnoneFnone lat;
+  g_size = (size_t) GJP.VolNodeSites() * lat.GsiteSize();
 }
 
 AlgInt::~AlgInt()

@@ -1,6 +1,9 @@
 // -*- mode:c++; c-basic-offset:4 -*-
 #include<config.h>
 #include<vector>
+#ifdef HAVE_VELOC
+#include<veloc.h>
+#endif
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
 /*!\file
@@ -39,6 +42,7 @@ protected:
     //!< the current trajectory number
     int traj;
     IntegratorType int_type;
+    int g_size;
 
 public:
 
@@ -47,6 +51,7 @@ public:
 	veloc_id++; return veloc_id;
     }
   
+    static int traj_num; //VeloC
     AlgInt();
     virtual ~AlgInt();
 
@@ -259,9 +264,6 @@ public:
   Super class of all Hamiltonian constituents
 */
 class AlgHamiltonian : public AlgInt {
-
-protected:
-    int g_size;
 
 private:
     const char *cname;

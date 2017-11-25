@@ -25,12 +25,19 @@ CPS_START_NAMESPACE
 AlgActionGauge::AlgActionGauge(AlgMomentum &mom, ActionGaugeArg &g_arg)
     : AlgAction(mom, g_arg.action_arg), cname("AlgActionGauge")
 {
+
+  const char *fname="AlgActionGauge()";
   int_type = INT_GAUGE;
   gauge_arg = &g_arg;
   gluon = g_arg.gluon;
 
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, gluon);
 //  VELOC_Mem_protect (  VeloCCounter(), lat.GaugeField(), g_size, sizeof(Float) );
+#ifdef HAVE_VELOC
+ int veloc_id;
+ VELOC_Mem_protect (  (veloc_id= VeloCCounter() ) , lat.GaugeField(), g_size, sizeof(Float) );
+ VRB.Result(cname,fname,"mom VELOC id:%d ptr=%p g_size=%d \n",veloc_id,lat.GaugeField(), g_size);
+#endif
   LatticeFactory::Destroy();
 //lat.GaugeField() should be saved
   
