@@ -55,11 +55,22 @@ void AlgMomentum::heatbath() {
   Float dtime = -dclock();
   VRB.Func(cname, fname);
 
+#ifdef HAVE_VELOC
+//  if (level == TOP_LEVEL_INTEGRATOR)
+  {
+    std::stringstream veloc_label;
+    veloc_label <<"Veloc_traj"<<traj<<std::endl;
+    std::cout <<"Veloc label: "<<veloc_label.str().c_str() <<std::endl;
+    int veloc_v = VELOC_Restart_test(veloc_label.str().c_str());
+    if(veloc_v != VELOC_FAILURE) // no restart, checkpoint
+    return;
+  }
+#endif
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
   lat.RandGaussAntiHermMatrix(mom, 1.0);
+  lat.MdTime(0.0);
 
   //!< reset MD time in Lattice (a momentum refresh means a new trajectory)
-  lat.MdTime(0.0);
   VRB.Flow(cname,fname,"%s%f\n", md_time_str, IFloat(lat.MdTime()));
       
   LatticeFactory::Destroy();

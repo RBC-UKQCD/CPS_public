@@ -53,7 +53,6 @@ void AlgIntLeap::evolve(Float dt, int steps)
   }
 
   A->evolve(0.5*dt/(Float)A_steps, A_steps);
-  std::stringstream veloc_label("AlgIntLeapTop");
 
   for (int i=0; i<steps; i++) {
   std::stringstream veloc_label, veloc_label2;
