@@ -22,6 +22,7 @@ CPS_END_NAMESPACE
 CPS_START_NAMESPACE
 
 int AlgInt::veloc_id=0;
+int AlgInt::traj_num=0;
 
 AlgInt::AlgInt()
 {
