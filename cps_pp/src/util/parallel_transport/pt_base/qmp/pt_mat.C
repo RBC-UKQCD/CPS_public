@@ -261,7 +261,7 @@ void PT::mat(int n, PTmatrix **mout, PTmatrix **min, const int *dir){
   int if_print = 0;
   if ( (call_num%10000==1) && (!QMP_get_node_number()) ) if_print=1;
 
-#undef USE_TEST2
+#define USE_TEST2
 #ifdef USE_TEST2
 //assume nt > n!
     static char *cname="mat()";

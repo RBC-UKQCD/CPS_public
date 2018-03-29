@@ -89,7 +89,7 @@ void init_qmp(int * argc, char ***argv) {
   
     QMP_thread_level_t prv;
 #ifndef UNIFORM_SEED_NO_COMMS
-    QMP_status_t init_status = QMP_init_msg_passing(argc, argv, QMP_THREAD_SINGLE, &prv);
+    QMP_status_t init_status = QMP_init_msg_passing(argc, argv, QMP_THREAD_MULTIPLE, &prv);
     if (init_status) printf("QMP_init_msg_passing returned %d\n",init_status);
     peRank = QMP_get_node_number();
     peNum = QMP_get_number_of_nodes();
