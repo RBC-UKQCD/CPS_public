@@ -589,6 +589,15 @@ AC_SUBST(GSUMPRECISION)
 AC_SUBST(LOCALPRECISION)
 AC_SUBST(PRECDIR)
 
+if test "X${SRCDIR}X" = "XX"; then
+        SRCDIR='${SRCDIR0}'
+fi
+if test "X${BUILDDIR}X" = "XX"; then
+        BUILDDIR='${BUILDDIR0}'
+fi
+AC_SUBST(SRCDIR)
+AC_SUBST(BUILDDIR)
+
 dnl configuring version number
 .  $srcdir/VERSION
 echo CPS source: $srcdir
